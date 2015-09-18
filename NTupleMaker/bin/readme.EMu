@@ -1,0 +1,152 @@
+=================================================================
+= The Z->TauTau->E+Mu analysis code to run with early Run2 data =
+=================================================================
+
+The source code is 
+DesyTauAnalyses/NTupleMaker/bin/AnalysisMacro_EMu.cpp
+Please get yourself familiarized with the code. It is not that complicated.
+
+The code uses single muon or single electron trigger.
+
+In data ->
+HLT_IsoMu24_eta2p1_v* OR HLT_Ele23_WPLoose_Gsf_v*
+
+In Spring15 MC (50ns) ->
+HLT_IsoMu24_eta2p1_v* OR HLT_Ele22_eta2p1_WP75_Gsf_v*
+
+The configuration files are:
+DesyTauAnalyses/NTupleMaker/test/analysisMacro_EMu_IsoMu24.conf (to run on SingleMuon dataset)
+DesyTauAnalyses/NTupleMaker/test/analysisMacro_EMu_Ele23.conf (to run on SingleElectron dataset)
+DesyTauAnalyses/NTupleMaker/test/analysisMacro_EMu.conf (to run on MC Spring15 50ns samples)
+
+The example filelists:
+DesyTauAnalyses/NTupleMaker/test/SingleElectron_Run2015B (/SingleElectron/Run2015B-PromptReco-v1)
+DesyTauAnalyses/NTupleMaker/test/SingleMuon_Run2015B (/SingleMuon/Run2015B-PromptReco-v1)
+DesyTauAnalyses/NTupleMaker/test/DYJetsToLL_M-50_aMCatNLO_50ns (Spring15 MC DYToLL)
+
+Running examples:
+> AnalysisMacro_EMu analysisMacro_EMu_IsoMu24.conf SingleMuon_Run2015B
+> AnalysisMacro_EMu analysisMacro_EMu_Ele23.conf SingleElectron_Run2015B
+> AnalysisMacro_EMu analysisMacro_EMu.conf DYJetsToLL_M-50_aMCatNLO_50ns
+
+---
+
+The config file analysisMacro_EMu_IsoMu24.conf implements event selection 
+with the trigger logic : 'HLT_IsoMu24_eta2p1'
+whereas the config file analysisMacro_EMu_Ele23.conf implements event selection
+with the trigger logic : 'HLT_Ele23_WPLoose_Gsf && !HLT_IsoMu24_eta2p1'.
+This removes overlap between SingleElectron  and SingleMuon primary datasets.
+The config file analysisMacro_EMu.conf implements event selection 
+with the trigger logic : 'HLT_IsoMu24_eta2p1 || HLT_Ele22_eta2p1_WP75_Gsf'.
+
+After running on SingleMuon and SingleElectron datasets the output RooT
+files must be merged
+> hadd Data_Run2015B.root SingleMuon_Run2015B.root SingleElectron_Run2015B.root
+
+The good run-lumi selection is performed when configuration parameter in the
+config file 
+
+ApplyGoodRunSelection = true 
+
+(It is false by default)
+The selection is implemented with class RunLumiSelector:
+DesyTauAnalyses/NTupleMaker/interface/RunLumiReader.h
+DesyTauAnalyses/NTupleMaker/src/RunLumiReader.cc
+
+Currently good run-lumi selection is done with JSON file
+DesyTauAnalyses/NTupleMaker/test/Cert_246908-251642_13TeV_PromptReco_Collisions15_JSON.txt:
+https://github.com/DesyTau/DesyTauAnalyses74/blob/master/DesyTauAnalyses/NTupleMaker/bin/AnalysisMacro_EMu.cpp#L361-365
+
+===================
+
+The selection of events is steered by config files 
+DesyTauAnalyses/NTupleMaker/test/analysisMacro_EMu_IsoMu24.conf 
+DesyTauAnalyses/NTupleMaker/test/analysisMacro_EMu_Ele23.conf 
+DesyTauAnalyses/NTupleMaker/test/analysisMacro_EMu.conf 
+where lepton kinematic cuts are specified:
+
+# electron kinematic cuts
+ptElectronLowCut = 10    
+ptElectronHighCut = 24   
+etaElectronLowCut = 2.5  
+etaElectronHighCut = 2.1 
+dxyElectronCut = 0.045   
+dzElectronCut = 0.2      
+isoElectronLowCut = -0.1 
+isoElectronHighCut = 0.15
+ApplyElectronId = true   
+                                                  
+# muon kinematic cuts    
+ptMuonLowCut = 10        
+ptMuonHighCut = 25       
+etaMuonLowCut = 2.4      
+etaMuonHighCut = 2.1     
+dxyMuonCut = 0.045       
+dzMuonCut = 0.2          
+isoMuonLowCut = -0.1     
+isoMuonHighCut = 0.15    
+ApplyMuonId = true       
+
+---
+
+In addition there are also topological cuts:
+
+# topological cuts
+dRleptonsCut = 0.4
+MEtCut   = 80
+dZetaCut = -60
+oppositeSign = true
+
+which correspond to
+deltaR(e,mu) > 0.4;
+MET < 80 GeV;
+Dzeta > -60 GeV;
+opposite sign e-mu pair.
+
+---
+
+The code also implements selection of the TTBar enriched sample with MET cut (MET > 60 GeV)
+
+MEtCutTTJets = 60 
+
+and requiring at least one b-tagged jet (IFVCSVv2 with loose WP).
+
+----
+
+The key histograms to monitor
+
+electronPtSelH (electron pt after final selection)
+electronEtaSelH (electron eta after final selection)
+muonPtSelH (muon pt after final selection)
+muonEtaSelH (muon eta after final selection)
+dileptonMassSelH (dilepton mass after final selection)
+dileptonPtSelH (dilepton pt after final selection)
+dileptonEtaSelH (dilepton eta after final selection)
+nJets30SelH (# of jets with pt>30 GeV after final selection)
+nJets20SelH (# of jets with pt>20 GeV after final selection)
+nBLooseJetsSelH (# of b-jets with pt>20 GeV loose WP)
+nBMediumJetsSelH (# of b-jets with pt>20 GeV tight WP)
+
+(Please feel free to look at other histograms as well)
+
+The histogram with event weight sum is 
+weightsH.
+
+For each MC sample, histograms should be properly normalized:
+histogram->Scale(xsec*lumi/weightsH->GetSumOfWeights());
+where
+xsec - cross section of MC sample
+lumi - luminosity in data
+weightsH->GetSumOfWeights() - sum of weights in the histogram weightsH.
+
+The mail goal is to check data/MC agreement. 
+Put MC histograms in stack! 
+
+Available datasets are located here:
+/nfs/dust/cms/group/susy-desy/Run2/Stau/Data/50ns/SingleElectron
+/nfs/dust/cms/group/susy-desy/Run2/Stau/Data/50ns/SingleMuon
+
+Available MC Spring15 (50ns) samples are located here:
+/nfs/dust/cms/user/rasp/ntuples/MC_Spring15/
+
+GOOD LUCK!

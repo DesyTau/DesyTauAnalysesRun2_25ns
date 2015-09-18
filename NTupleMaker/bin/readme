@@ -1,0 +1,66 @@
+Running Sync NTuple producer --->
+
+em channel:
+source code : DesyTauAnalyses/NTupleMaker/bin/SynchNTupleProducer_em.cpp
+config file : DesyTauAnalyses/NTupleMaker/test/analysisMacroSynch_em.conf
+filelist    : DesyTauAnalyses/NTupleMaker/test/SUSYGluGluToHToTauTau_M-160_em
+
+Runnning ->
+> cd DesyTauAnalyses/NTupleMaker/test
+> SynchNTupleProducer_em analysisMacroSynch_em.conf SUSYGluGluToHToTauTau_M-160_em
+This will create RooT file SUSYGluGluToHToTauTau_M-160_em.root with
+sync NTuple for em channel
+
+---
+
+mt channel :
+source code : DesyTauAnalyses/NTupleMaker/bin/SynchNTupleProducer_mt.cpp
+config file : DesyTauAnalyses/NTupleMaker/test/analysisMacroSynch_mt.conf
+filelist    : DesyTauAnalyses/NTupleMaker/test/SUSYGluGluToHToTauTau_M-160_mt
+
+Runnning ->
+> cd DesyTauAnalyses/NTupleMaker/test
+> SynchNTupleProducer_mt analysisMacroSynch_mt.conf SUSYGluGluToHToTauTau_M-160_mt
+This will create RooT file SUSYGluGluToHToTauTau_M-160_mt.root with
+sync NTuple for mt channel
+
+---
+
+Generally sync NTuple producer is run like this
+> SynchNTupleProducer_$chan $config_file $filelist
+
+You can produce sync NTuples by running on other MC samples located here:
+/nfs/dust/cms/user/rasp/ntuples/MC_Spring15
+
+You can also run on NTuples produced from Run2015B primary datasets: 
+/SingleMuon/Run2015B-PromptReco-v1/MINIAOD
+/SingleElectron/Run2015B-PromptReco-v1/MINIAOD 
+/MuonEG/Run2015B-PromptReco-v1/MINIAOD
+/Tau/Run2015B-PromptReco-v1/MINIAOD
+
+Alexis has already produced initial NTuples out of the
+following primary datasets
+/SingleMuon/Run2015B-PromptReco-v1/MINIAOD
+/SingleElectron/Run2015B-PromptReco-v1/MINIAOD
+/Tau/Run2015B-PromptReco-v1/MINIAOD
+They are located here:
+/nfs/dust/cms/group/susy-desy/Run2/Stau/Data/50ns
+
+Before running sync NTuple producer make sure that HLT filter names
+are correctly specified in configuration files.
+
+Current setting for HLT filter names (for MC Spring14 samples) ->
+
+DesyTauAnalyses/NTupleMaker/test/analysisMacroSynch_em.conf :
+LowPtLegElectron = hltMu23TrkIsoVVLEle12CaloIdLTrackIdLIsoVLElectronlegTrackIsoFilter
+HighPtLegElectron = hltMu8TrkIsoVVLEle23CaloIdLTrackIdLIsoVLElectronlegTrackIsoFilter
+LowPtLegMuon = hltMu8TrkIsoVVLEle23CaloIdLTrackIdLIsoVLMuonlegL3IsoFiltered8
+HighPtLegMuon = hltMu23TrkIsoVVLEle12CaloIdLTrackIdLIsoVLMuonlegL3IsoFiltered23
+
+DesyTauAnalyses/NTupleMaker/test/analysisMacroSynch_mt.conf :
+IsoMuon24Leg   = hltL3crIsoL1sMu20Eta2p1L1f0L2f10QL3f24QL3trkIsoFiltered0p09
+MuonTauMuonLeg = hltL3crIsoL1sMu16erTauJet20erL1f0L2f10QL3f17QL3trkIsoFiltered0p09
+MuonTauOverlap = hltOverlapFilterIsoMu17LooseIsoPFTau20
+MuonTauTauLeg = hltPFTau20TrackLooseIsoAgainstMuon
+
+ 

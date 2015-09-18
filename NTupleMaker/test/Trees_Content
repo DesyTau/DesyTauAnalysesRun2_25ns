@@ -1,0 +1,563 @@
+
+Processing TestTree.C...
+Entries = 456682
+
+event number = 1
+
+nhlt = 8
+HLT Path : HLT_IsoMu24_eta2p1_IterTrk02_v
+HLT Path : HLT_IsoTkMu24_eta2p1_IterTrk02_v
+HLT Path : HLT_Ele27_eta2p1_WP85_Gsf_v
+HLT Path : HLT_Ele32_eta2p1_WP85_Gsf_v
+HLT Path : HLT_Mu23_TrkIsoVVL_Ele12_Gsf_CaloId_TrackId_Iso_MediumWP_v
+HLT Path : HLT_Mu8_TrkIsoVVL_Ele23_Gsf_CaloId_TrackId_Iso_MediumWP_v
+HLT Path : HLT_LooseIsoPFTau50_Trk30_eta2p1_MET120_v
+HLT Path : HLT_PFMET170_NoiseCleaned_v
+
+ntrig = 8
+HLT_Ele27_eta2p1_WP85_Gsf_v1  :  0
+HLT_Ele32_eta2p1_WP85_Gsf_v1  :  0
+HLT_IsoMu24_eta2p1_IterTrk02_v1  :  0
+HLT_IsoTkMu24_eta2p1_IterTrk02_v1  :  0
+HLT_LooseIsoPFTau50_Trk30_eta2p1_MET120_v1  :  0
+HLT_Mu23_TrkIsoVVL_Ele12_Gsf_CaloId_TrackId_Iso_MediumWP_v1  :  0
+HLT_Mu8_TrkIsoVVL_Ele23_Gsf_CaloId_TrackId_Iso_MediumWP_v1  :  0
+HLT_PFMET170_NoiseCleaned_v1  :  0
+
+npres = 8
+HLT_Ele27_eta2p1_WP85_Gsf_v1  :  1
+HLT_Ele32_eta2p1_WP85_Gsf_v1  :  1
+HLT_IsoMu24_eta2p1_IterTrk02_v1  :  1
+HLT_IsoTkMu24_eta2p1_IterTrk02_v1  :  1
+HLT_LooseIsoPFTau50_Trk30_eta2p1_MET120_v1  :  1
+HLT_Mu23_TrkIsoVVL_Ele12_Gsf_CaloId_TrackId_Iso_MediumWP_v1  :  1
+HLT_Mu8_TrkIsoVVL_Ele23_Gsf_CaloId_TrackId_Iso_MediumWP_v1  :  1
+HLT_PFMET170_NoiseCleaned_v1  :  1
+
+nfiltres = 9
+HLT Filter : hltL3crIsoL1sMu20Eta2p1L1f0L2f20QL3f24QL3crIsoRhoFiltered0p15IterTrk02
+HLT Filter : hltL3fL1sMu20L1Eta2p1f0TkFiltered24QL3crIsoRhoFiltered0p15IterTrk02
+HLT Filter : hltL1Mu12EG7L3IsoMuFiltered23
+HLT Filter : hltL1sL1Mu5EG20ORL1Mu5IsoEG18L3IsoFiltered8
+HLT Filter : hltEle27WP85GsfTrackIsoFilter
+HLT Filter : hltEle32WP85GsfTrackIsoFilter
+HLT Filter : hltMu23Ele12GsfTrackIsoLegEle12GsfCaloIdTrackIdIsoMediumWPFilter
+HLT Filter : hltMu8Ele23GsfTrackIsoLegEle23GsfCaloIdTrackIdIsoMediumWPFilter
+HLT Filter : hltPFTau50TrackPt30LooseAbsOrRelIso
+
+nbtags = 9
+BTag discriminator : jetBProbabilityBJetTags
+BTag discriminator : jetProbabilityBJetTags
+BTag discriminator : trackCountingHighPurBJetTags
+BTag discriminator : trackCountingHighEffBJetTags
+BTag discriminator : simpleSecondaryVertexHighEffBJetTags
+BTag discriminator : simpleSecondaryVertexHighPurBJetTags
+BTag discriminator : combinedInclusiveSecondaryVertexV2BJetTags
+BTag discriminator : pfCombinedSecondaryVertexBJetTags
+BTag discriminator : combinedMVABJetTags
+
+++++++++++++++++++++++++++++++++++++
+
+event number = 2
+
+nhlt = 8
+HLT Path : HLT_IsoMu24_eta2p1_IterTrk02_v
+HLT Path : HLT_IsoTkMu24_eta2p1_IterTrk02_v
+HLT Path : HLT_Ele27_eta2p1_WP85_Gsf_v
+HLT Path : HLT_Ele32_eta2p1_WP85_Gsf_v
+HLT Path : HLT_Mu23_TrkIsoVVL_Ele12_Gsf_CaloId_TrackId_Iso_MediumWP_v
+HLT Path : HLT_Mu8_TrkIsoVVL_Ele23_Gsf_CaloId_TrackId_Iso_MediumWP_v
+HLT Path : HLT_LooseIsoPFTau50_Trk30_eta2p1_MET120_v
+HLT Path : HLT_PFMET170_NoiseCleaned_v
+
+ntrig = 8
+HLT_Ele27_eta2p1_WP85_Gsf_v1  :  0
+HLT_Ele32_eta2p1_WP85_Gsf_v1  :  0
+HLT_IsoMu24_eta2p1_IterTrk02_v1  :  0
+HLT_IsoTkMu24_eta2p1_IterTrk02_v1  :  0
+HLT_LooseIsoPFTau50_Trk30_eta2p1_MET120_v1  :  0
+HLT_Mu23_TrkIsoVVL_Ele12_Gsf_CaloId_TrackId_Iso_MediumWP_v1  :  0
+HLT_Mu8_TrkIsoVVL_Ele23_Gsf_CaloId_TrackId_Iso_MediumWP_v1  :  0
+HLT_PFMET170_NoiseCleaned_v1  :  0
+
+npres = 8
+HLT_Ele27_eta2p1_WP85_Gsf_v1  :  1
+HLT_Ele32_eta2p1_WP85_Gsf_v1  :  1
+HLT_IsoMu24_eta2p1_IterTrk02_v1  :  1
+HLT_IsoTkMu24_eta2p1_IterTrk02_v1  :  1
+HLT_LooseIsoPFTau50_Trk30_eta2p1_MET120_v1  :  1
+HLT_Mu23_TrkIsoVVL_Ele12_Gsf_CaloId_TrackId_Iso_MediumWP_v1  :  1
+HLT_Mu8_TrkIsoVVL_Ele23_Gsf_CaloId_TrackId_Iso_MediumWP_v1  :  1
+HLT_PFMET170_NoiseCleaned_v1  :  1
+
+nfiltres = 9
+HLT Filter : hltL3crIsoL1sMu20Eta2p1L1f0L2f20QL3f24QL3crIsoRhoFiltered0p15IterTrk02
+HLT Filter : hltL3fL1sMu20L1Eta2p1f0TkFiltered24QL3crIsoRhoFiltered0p15IterTrk02
+HLT Filter : hltL1Mu12EG7L3IsoMuFiltered23
+HLT Filter : hltL1sL1Mu5EG20ORL1Mu5IsoEG18L3IsoFiltered8
+HLT Filter : hltEle27WP85GsfTrackIsoFilter
+HLT Filter : hltEle32WP85GsfTrackIsoFilter
+HLT Filter : hltMu23Ele12GsfTrackIsoLegEle12GsfCaloIdTrackIdIsoMediumWPFilter
+HLT Filter : hltMu8Ele23GsfTrackIsoLegEle23GsfCaloIdTrackIdIsoMediumWPFilter
+HLT Filter : hltPFTau50TrackPt30LooseAbsOrRelIso
+
+nbtags = 9
+BTag discriminator : jetBProbabilityBJetTags
+BTag discriminator : jetProbabilityBJetTags
+BTag discriminator : trackCountingHighPurBJetTags
+BTag discriminator : trackCountingHighEffBJetTags
+BTag discriminator : simpleSecondaryVertexHighEffBJetTags
+BTag discriminator : simpleSecondaryVertexHighPurBJetTags
+BTag discriminator : combinedInclusiveSecondaryVertexV2BJetTags
+BTag discriminator : pfCombinedSecondaryVertexBJetTags
+BTag discriminator : combinedMVABJetTags
+
+++++++++++++++++++++++++++++++++++++
+
+event number = 3
+
+nhlt = 8
+HLT Path : HLT_IsoMu24_eta2p1_IterTrk02_v
+HLT Path : HLT_IsoTkMu24_eta2p1_IterTrk02_v
+HLT Path : HLT_Ele27_eta2p1_WP85_Gsf_v
+HLT Path : HLT_Ele32_eta2p1_WP85_Gsf_v
+HLT Path : HLT_Mu23_TrkIsoVVL_Ele12_Gsf_CaloId_TrackId_Iso_MediumWP_v
+HLT Path : HLT_Mu8_TrkIsoVVL_Ele23_Gsf_CaloId_TrackId_Iso_MediumWP_v
+HLT Path : HLT_LooseIsoPFTau50_Trk30_eta2p1_MET120_v
+HLT Path : HLT_PFMET170_NoiseCleaned_v
+
+ntrig = 8
+HLT_Ele27_eta2p1_WP85_Gsf_v1  :  1
+HLT_Ele32_eta2p1_WP85_Gsf_v1  :  1
+HLT_IsoMu24_eta2p1_IterTrk02_v1  :  0
+HLT_IsoTkMu24_eta2p1_IterTrk02_v1  :  0
+HLT_LooseIsoPFTau50_Trk30_eta2p1_MET120_v1  :  0
+HLT_Mu23_TrkIsoVVL_Ele12_Gsf_CaloId_TrackId_Iso_MediumWP_v1  :  0
+HLT_Mu8_TrkIsoVVL_Ele23_Gsf_CaloId_TrackId_Iso_MediumWP_v1  :  1
+HLT_PFMET170_NoiseCleaned_v1  :  0
+
+npres = 8
+HLT_Ele27_eta2p1_WP85_Gsf_v1  :  1
+HLT_Ele32_eta2p1_WP85_Gsf_v1  :  1
+HLT_IsoMu24_eta2p1_IterTrk02_v1  :  1
+HLT_IsoTkMu24_eta2p1_IterTrk02_v1  :  1
+HLT_LooseIsoPFTau50_Trk30_eta2p1_MET120_v1  :  1
+HLT_Mu23_TrkIsoVVL_Ele12_Gsf_CaloId_TrackId_Iso_MediumWP_v1  :  1
+HLT_Mu8_TrkIsoVVL_Ele23_Gsf_CaloId_TrackId_Iso_MediumWP_v1  :  1
+HLT_PFMET170_NoiseCleaned_v1  :  1
+
+nfiltres = 9
+HLT Filter : hltL3crIsoL1sMu20Eta2p1L1f0L2f20QL3f24QL3crIsoRhoFiltered0p15IterTrk02
+HLT Filter : hltL3fL1sMu20L1Eta2p1f0TkFiltered24QL3crIsoRhoFiltered0p15IterTrk02
+HLT Filter : hltL1Mu12EG7L3IsoMuFiltered23
+HLT Filter : hltL1sL1Mu5EG20ORL1Mu5IsoEG18L3IsoFiltered8
+HLT Filter : hltEle27WP85GsfTrackIsoFilter
+HLT Filter : hltEle32WP85GsfTrackIsoFilter
+HLT Filter : hltMu23Ele12GsfTrackIsoLegEle12GsfCaloIdTrackIdIsoMediumWPFilter
+HLT Filter : hltMu8Ele23GsfTrackIsoLegEle23GsfCaloIdTrackIdIsoMediumWPFilter
+HLT Filter : hltPFTau50TrackPt30LooseAbsOrRelIso
+
+nbtags = 9
+BTag discriminator : jetBProbabilityBJetTags
+BTag discriminator : jetProbabilityBJetTags
+BTag discriminator : trackCountingHighPurBJetTags
+BTag discriminator : trackCountingHighEffBJetTags
+BTag discriminator : simpleSecondaryVertexHighEffBJetTags
+BTag discriminator : simpleSecondaryVertexHighPurBJetTags
+BTag discriminator : combinedInclusiveSecondaryVertexV2BJetTags
+BTag discriminator : pfCombinedSecondaryVertexBJetTags
+BTag discriminator : combinedMVABJetTags
+
+++++++++++++++++++++++++++++++++++++
+
+event number = 4
+
+nhlt = 8
+HLT Path : HLT_IsoMu24_eta2p1_IterTrk02_v
+HLT Path : HLT_IsoTkMu24_eta2p1_IterTrk02_v
+HLT Path : HLT_Ele27_eta2p1_WP85_Gsf_v
+HLT Path : HLT_Ele32_eta2p1_WP85_Gsf_v
+HLT Path : HLT_Mu23_TrkIsoVVL_Ele12_Gsf_CaloId_TrackId_Iso_MediumWP_v
+HLT Path : HLT_Mu8_TrkIsoVVL_Ele23_Gsf_CaloId_TrackId_Iso_MediumWP_v
+HLT Path : HLT_LooseIsoPFTau50_Trk30_eta2p1_MET120_v
+HLT Path : HLT_PFMET170_NoiseCleaned_v
+
+ntrig = 8
+HLT_Ele27_eta2p1_WP85_Gsf_v1  :  1
+HLT_Ele32_eta2p1_WP85_Gsf_v1  :  1
+HLT_IsoMu24_eta2p1_IterTrk02_v1  :  0
+HLT_IsoTkMu24_eta2p1_IterTrk02_v1  :  0
+HLT_LooseIsoPFTau50_Trk30_eta2p1_MET120_v1  :  0
+HLT_Mu23_TrkIsoVVL_Ele12_Gsf_CaloId_TrackId_Iso_MediumWP_v1  :  0
+HLT_Mu8_TrkIsoVVL_Ele23_Gsf_CaloId_TrackId_Iso_MediumWP_v1  :  0
+HLT_PFMET170_NoiseCleaned_v1  :  0
+
+npres = 8
+HLT_Ele27_eta2p1_WP85_Gsf_v1  :  1
+HLT_Ele32_eta2p1_WP85_Gsf_v1  :  1
+HLT_IsoMu24_eta2p1_IterTrk02_v1  :  1
+HLT_IsoTkMu24_eta2p1_IterTrk02_v1  :  1
+HLT_LooseIsoPFTau50_Trk30_eta2p1_MET120_v1  :  1
+HLT_Mu23_TrkIsoVVL_Ele12_Gsf_CaloId_TrackId_Iso_MediumWP_v1  :  1
+HLT_Mu8_TrkIsoVVL_Ele23_Gsf_CaloId_TrackId_Iso_MediumWP_v1  :  1
+HLT_PFMET170_NoiseCleaned_v1  :  1
+
+nfiltres = 9
+HLT Filter : hltL3crIsoL1sMu20Eta2p1L1f0L2f20QL3f24QL3crIsoRhoFiltered0p15IterTrk02
+HLT Filter : hltL3fL1sMu20L1Eta2p1f0TkFiltered24QL3crIsoRhoFiltered0p15IterTrk02
+HLT Filter : hltL1Mu12EG7L3IsoMuFiltered23
+HLT Filter : hltL1sL1Mu5EG20ORL1Mu5IsoEG18L3IsoFiltered8
+HLT Filter : hltEle27WP85GsfTrackIsoFilter
+HLT Filter : hltEle32WP85GsfTrackIsoFilter
+HLT Filter : hltMu23Ele12GsfTrackIsoLegEle12GsfCaloIdTrackIdIsoMediumWPFilter
+HLT Filter : hltMu8Ele23GsfTrackIsoLegEle23GsfCaloIdTrackIdIsoMediumWPFilter
+HLT Filter : hltPFTau50TrackPt30LooseAbsOrRelIso
+
+nbtags = 9
+BTag discriminator : jetBProbabilityBJetTags
+BTag discriminator : jetProbabilityBJetTags
+BTag discriminator : trackCountingHighPurBJetTags
+BTag discriminator : trackCountingHighEffBJetTags
+BTag discriminator : simpleSecondaryVertexHighEffBJetTags
+BTag discriminator : simpleSecondaryVertexHighPurBJetTags
+BTag discriminator : combinedInclusiveSecondaryVertexV2BJetTags
+BTag discriminator : pfCombinedSecondaryVertexBJetTags
+BTag discriminator : combinedMVABJetTags
+
+++++++++++++++++++++++++++++++++++++
+
+event number = 5
+
+nhlt = 8
+HLT Path : HLT_IsoMu24_eta2p1_IterTrk02_v
+HLT Path : HLT_IsoTkMu24_eta2p1_IterTrk02_v
+HLT Path : HLT_Ele27_eta2p1_WP85_Gsf_v
+HLT Path : HLT_Ele32_eta2p1_WP85_Gsf_v
+HLT Path : HLT_Mu23_TrkIsoVVL_Ele12_Gsf_CaloId_TrackId_Iso_MediumWP_v
+HLT Path : HLT_Mu8_TrkIsoVVL_Ele23_Gsf_CaloId_TrackId_Iso_MediumWP_v
+HLT Path : HLT_LooseIsoPFTau50_Trk30_eta2p1_MET120_v
+HLT Path : HLT_PFMET170_NoiseCleaned_v
+
+ntrig = 8
+HLT_Ele27_eta2p1_WP85_Gsf_v1  :  0
+HLT_Ele32_eta2p1_WP85_Gsf_v1  :  0
+HLT_IsoMu24_eta2p1_IterTrk02_v1  :  0
+HLT_IsoTkMu24_eta2p1_IterTrk02_v1  :  0
+HLT_LooseIsoPFTau50_Trk30_eta2p1_MET120_v1  :  0
+HLT_Mu23_TrkIsoVVL_Ele12_Gsf_CaloId_TrackId_Iso_MediumWP_v1  :  0
+HLT_Mu8_TrkIsoVVL_Ele23_Gsf_CaloId_TrackId_Iso_MediumWP_v1  :  0
+HLT_PFMET170_NoiseCleaned_v1  :  0
+
+npres = 8
+HLT_Ele27_eta2p1_WP85_Gsf_v1  :  1
+HLT_Ele32_eta2p1_WP85_Gsf_v1  :  1
+HLT_IsoMu24_eta2p1_IterTrk02_v1  :  1
+HLT_IsoTkMu24_eta2p1_IterTrk02_v1  :  1
+HLT_LooseIsoPFTau50_Trk30_eta2p1_MET120_v1  :  1
+HLT_Mu23_TrkIsoVVL_Ele12_Gsf_CaloId_TrackId_Iso_MediumWP_v1  :  1
+HLT_Mu8_TrkIsoVVL_Ele23_Gsf_CaloId_TrackId_Iso_MediumWP_v1  :  1
+HLT_PFMET170_NoiseCleaned_v1  :  1
+
+nfiltres = 9
+HLT Filter : hltL3crIsoL1sMu20Eta2p1L1f0L2f20QL3f24QL3crIsoRhoFiltered0p15IterTrk02
+HLT Filter : hltL3fL1sMu20L1Eta2p1f0TkFiltered24QL3crIsoRhoFiltered0p15IterTrk02
+HLT Filter : hltL1Mu12EG7L3IsoMuFiltered23
+HLT Filter : hltL1sL1Mu5EG20ORL1Mu5IsoEG18L3IsoFiltered8
+HLT Filter : hltEle27WP85GsfTrackIsoFilter
+HLT Filter : hltEle32WP85GsfTrackIsoFilter
+HLT Filter : hltMu23Ele12GsfTrackIsoLegEle12GsfCaloIdTrackIdIsoMediumWPFilter
+HLT Filter : hltMu8Ele23GsfTrackIsoLegEle23GsfCaloIdTrackIdIsoMediumWPFilter
+HLT Filter : hltPFTau50TrackPt30LooseAbsOrRelIso
+
+nbtags = 9
+BTag discriminator : jetBProbabilityBJetTags
+BTag discriminator : jetProbabilityBJetTags
+BTag discriminator : trackCountingHighPurBJetTags
+BTag discriminator : trackCountingHighEffBJetTags
+BTag discriminator : simpleSecondaryVertexHighEffBJetTags
+BTag discriminator : simpleSecondaryVertexHighPurBJetTags
+BTag discriminator : combinedInclusiveSecondaryVertexV2BJetTags
+BTag discriminator : pfCombinedSecondaryVertexBJetTags
+BTag discriminator : combinedMVABJetTags
+
+++++++++++++++++++++++++++++++++++++
+
+event number = 6
+
+nhlt = 8
+HLT Path : HLT_IsoMu24_eta2p1_IterTrk02_v
+HLT Path : HLT_IsoTkMu24_eta2p1_IterTrk02_v
+HLT Path : HLT_Ele27_eta2p1_WP85_Gsf_v
+HLT Path : HLT_Ele32_eta2p1_WP85_Gsf_v
+HLT Path : HLT_Mu23_TrkIsoVVL_Ele12_Gsf_CaloId_TrackId_Iso_MediumWP_v
+HLT Path : HLT_Mu8_TrkIsoVVL_Ele23_Gsf_CaloId_TrackId_Iso_MediumWP_v
+HLT Path : HLT_LooseIsoPFTau50_Trk30_eta2p1_MET120_v
+HLT Path : HLT_PFMET170_NoiseCleaned_v
+
+ntrig = 8
+HLT_Ele27_eta2p1_WP85_Gsf_v1  :  0
+HLT_Ele32_eta2p1_WP85_Gsf_v1  :  0
+HLT_IsoMu24_eta2p1_IterTrk02_v1  :  0
+HLT_IsoTkMu24_eta2p1_IterTrk02_v1  :  0
+HLT_LooseIsoPFTau50_Trk30_eta2p1_MET120_v1  :  0
+HLT_Mu23_TrkIsoVVL_Ele12_Gsf_CaloId_TrackId_Iso_MediumWP_v1  :  0
+HLT_Mu8_TrkIsoVVL_Ele23_Gsf_CaloId_TrackId_Iso_MediumWP_v1  :  0
+HLT_PFMET170_NoiseCleaned_v1  :  0
+
+npres = 8
+HLT_Ele27_eta2p1_WP85_Gsf_v1  :  1
+HLT_Ele32_eta2p1_WP85_Gsf_v1  :  1
+HLT_IsoMu24_eta2p1_IterTrk02_v1  :  1
+HLT_IsoTkMu24_eta2p1_IterTrk02_v1  :  1
+HLT_LooseIsoPFTau50_Trk30_eta2p1_MET120_v1  :  1
+HLT_Mu23_TrkIsoVVL_Ele12_Gsf_CaloId_TrackId_Iso_MediumWP_v1  :  1
+HLT_Mu8_TrkIsoVVL_Ele23_Gsf_CaloId_TrackId_Iso_MediumWP_v1  :  1
+HLT_PFMET170_NoiseCleaned_v1  :  1
+
+nfiltres = 9
+HLT Filter : hltL3crIsoL1sMu20Eta2p1L1f0L2f20QL3f24QL3crIsoRhoFiltered0p15IterTrk02
+HLT Filter : hltL3fL1sMu20L1Eta2p1f0TkFiltered24QL3crIsoRhoFiltered0p15IterTrk02
+HLT Filter : hltL1Mu12EG7L3IsoMuFiltered23
+HLT Filter : hltL1sL1Mu5EG20ORL1Mu5IsoEG18L3IsoFiltered8
+HLT Filter : hltEle27WP85GsfTrackIsoFilter
+HLT Filter : hltEle32WP85GsfTrackIsoFilter
+HLT Filter : hltMu23Ele12GsfTrackIsoLegEle12GsfCaloIdTrackIdIsoMediumWPFilter
+HLT Filter : hltMu8Ele23GsfTrackIsoLegEle23GsfCaloIdTrackIdIsoMediumWPFilter
+HLT Filter : hltPFTau50TrackPt30LooseAbsOrRelIso
+
+nbtags = 9
+BTag discriminator : jetBProbabilityBJetTags
+BTag discriminator : jetProbabilityBJetTags
+BTag discriminator : trackCountingHighPurBJetTags
+BTag discriminator : trackCountingHighEffBJetTags
+BTag discriminator : simpleSecondaryVertexHighEffBJetTags
+BTag discriminator : simpleSecondaryVertexHighPurBJetTags
+BTag discriminator : combinedInclusiveSecondaryVertexV2BJetTags
+BTag discriminator : pfCombinedSecondaryVertexBJetTags
+BTag discriminator : combinedMVABJetTags
+
+++++++++++++++++++++++++++++++++++++
+
+event number = 7
+
+nhlt = 8
+HLT Path : HLT_IsoMu24_eta2p1_IterTrk02_v
+HLT Path : HLT_IsoTkMu24_eta2p1_IterTrk02_v
+HLT Path : HLT_Ele27_eta2p1_WP85_Gsf_v
+HLT Path : HLT_Ele32_eta2p1_WP85_Gsf_v
+HLT Path : HLT_Mu23_TrkIsoVVL_Ele12_Gsf_CaloId_TrackId_Iso_MediumWP_v
+HLT Path : HLT_Mu8_TrkIsoVVL_Ele23_Gsf_CaloId_TrackId_Iso_MediumWP_v
+HLT Path : HLT_LooseIsoPFTau50_Trk30_eta2p1_MET120_v
+HLT Path : HLT_PFMET170_NoiseCleaned_v
+
+ntrig = 8
+HLT_Ele27_eta2p1_WP85_Gsf_v1  :  0
+HLT_Ele32_eta2p1_WP85_Gsf_v1  :  0
+HLT_IsoMu24_eta2p1_IterTrk02_v1  :  0
+HLT_IsoTkMu24_eta2p1_IterTrk02_v1  :  1
+HLT_LooseIsoPFTau50_Trk30_eta2p1_MET120_v1  :  0
+HLT_Mu23_TrkIsoVVL_Ele12_Gsf_CaloId_TrackId_Iso_MediumWP_v1  :  0
+HLT_Mu8_TrkIsoVVL_Ele23_Gsf_CaloId_TrackId_Iso_MediumWP_v1  :  0
+HLT_PFMET170_NoiseCleaned_v1  :  0
+
+npres = 8
+HLT_Ele27_eta2p1_WP85_Gsf_v1  :  1
+HLT_Ele32_eta2p1_WP85_Gsf_v1  :  1
+HLT_IsoMu24_eta2p1_IterTrk02_v1  :  1
+HLT_IsoTkMu24_eta2p1_IterTrk02_v1  :  1
+HLT_LooseIsoPFTau50_Trk30_eta2p1_MET120_v1  :  1
+HLT_Mu23_TrkIsoVVL_Ele12_Gsf_CaloId_TrackId_Iso_MediumWP_v1  :  1
+HLT_Mu8_TrkIsoVVL_Ele23_Gsf_CaloId_TrackId_Iso_MediumWP_v1  :  1
+HLT_PFMET170_NoiseCleaned_v1  :  1
+
+nfiltres = 9
+HLT Filter : hltL3crIsoL1sMu20Eta2p1L1f0L2f20QL3f24QL3crIsoRhoFiltered0p15IterTrk02
+HLT Filter : hltL3fL1sMu20L1Eta2p1f0TkFiltered24QL3crIsoRhoFiltered0p15IterTrk02
+HLT Filter : hltL1Mu12EG7L3IsoMuFiltered23
+HLT Filter : hltL1sL1Mu5EG20ORL1Mu5IsoEG18L3IsoFiltered8
+HLT Filter : hltEle27WP85GsfTrackIsoFilter
+HLT Filter : hltEle32WP85GsfTrackIsoFilter
+HLT Filter : hltMu23Ele12GsfTrackIsoLegEle12GsfCaloIdTrackIdIsoMediumWPFilter
+HLT Filter : hltMu8Ele23GsfTrackIsoLegEle23GsfCaloIdTrackIdIsoMediumWPFilter
+HLT Filter : hltPFTau50TrackPt30LooseAbsOrRelIso
+
+nbtags = 9
+BTag discriminator : jetBProbabilityBJetTags
+BTag discriminator : jetProbabilityBJetTags
+BTag discriminator : trackCountingHighPurBJetTags
+BTag discriminator : trackCountingHighEffBJetTags
+BTag discriminator : simpleSecondaryVertexHighEffBJetTags
+BTag discriminator : simpleSecondaryVertexHighPurBJetTags
+BTag discriminator : combinedInclusiveSecondaryVertexV2BJetTags
+BTag discriminator : pfCombinedSecondaryVertexBJetTags
+BTag discriminator : combinedMVABJetTags
+
+++++++++++++++++++++++++++++++++++++
+
+event number = 8
+
+nhlt = 8
+HLT Path : HLT_IsoMu24_eta2p1_IterTrk02_v
+HLT Path : HLT_IsoTkMu24_eta2p1_IterTrk02_v
+HLT Path : HLT_Ele27_eta2p1_WP85_Gsf_v
+HLT Path : HLT_Ele32_eta2p1_WP85_Gsf_v
+HLT Path : HLT_Mu23_TrkIsoVVL_Ele12_Gsf_CaloId_TrackId_Iso_MediumWP_v
+HLT Path : HLT_Mu8_TrkIsoVVL_Ele23_Gsf_CaloId_TrackId_Iso_MediumWP_v
+HLT Path : HLT_LooseIsoPFTau50_Trk30_eta2p1_MET120_v
+HLT Path : HLT_PFMET170_NoiseCleaned_v
+
+ntrig = 8
+HLT_Ele27_eta2p1_WP85_Gsf_v1  :  0
+HLT_Ele32_eta2p1_WP85_Gsf_v1  :  0
+HLT_IsoMu24_eta2p1_IterTrk02_v1  :  0
+HLT_IsoTkMu24_eta2p1_IterTrk02_v1  :  0
+HLT_LooseIsoPFTau50_Trk30_eta2p1_MET120_v1  :  0
+HLT_Mu23_TrkIsoVVL_Ele12_Gsf_CaloId_TrackId_Iso_MediumWP_v1  :  0
+HLT_Mu8_TrkIsoVVL_Ele23_Gsf_CaloId_TrackId_Iso_MediumWP_v1  :  0
+HLT_PFMET170_NoiseCleaned_v1  :  0
+
+npres = 8
+HLT_Ele27_eta2p1_WP85_Gsf_v1  :  1
+HLT_Ele32_eta2p1_WP85_Gsf_v1  :  1
+HLT_IsoMu24_eta2p1_IterTrk02_v1  :  1
+HLT_IsoTkMu24_eta2p1_IterTrk02_v1  :  1
+HLT_LooseIsoPFTau50_Trk30_eta2p1_MET120_v1  :  1
+HLT_Mu23_TrkIsoVVL_Ele12_Gsf_CaloId_TrackId_Iso_MediumWP_v1  :  1
+HLT_Mu8_TrkIsoVVL_Ele23_Gsf_CaloId_TrackId_Iso_MediumWP_v1  :  1
+HLT_PFMET170_NoiseCleaned_v1  :  1
+
+nfiltres = 9
+HLT Filter : hltL3crIsoL1sMu20Eta2p1L1f0L2f20QL3f24QL3crIsoRhoFiltered0p15IterTrk02
+HLT Filter : hltL3fL1sMu20L1Eta2p1f0TkFiltered24QL3crIsoRhoFiltered0p15IterTrk02
+HLT Filter : hltL1Mu12EG7L3IsoMuFiltered23
+HLT Filter : hltL1sL1Mu5EG20ORL1Mu5IsoEG18L3IsoFiltered8
+HLT Filter : hltEle27WP85GsfTrackIsoFilter
+HLT Filter : hltEle32WP85GsfTrackIsoFilter
+HLT Filter : hltMu23Ele12GsfTrackIsoLegEle12GsfCaloIdTrackIdIsoMediumWPFilter
+HLT Filter : hltMu8Ele23GsfTrackIsoLegEle23GsfCaloIdTrackIdIsoMediumWPFilter
+HLT Filter : hltPFTau50TrackPt30LooseAbsOrRelIso
+
+nbtags = 9
+BTag discriminator : jetBProbabilityBJetTags
+BTag discriminator : jetProbabilityBJetTags
+BTag discriminator : trackCountingHighPurBJetTags
+BTag discriminator : trackCountingHighEffBJetTags
+BTag discriminator : simpleSecondaryVertexHighEffBJetTags
+BTag discriminator : simpleSecondaryVertexHighPurBJetTags
+BTag discriminator : combinedInclusiveSecondaryVertexV2BJetTags
+BTag discriminator : pfCombinedSecondaryVertexBJetTags
+BTag discriminator : combinedMVABJetTags
+
+++++++++++++++++++++++++++++++++++++
+
+event number = 9
+
+nhlt = 8
+HLT Path : HLT_IsoMu24_eta2p1_IterTrk02_v
+HLT Path : HLT_IsoTkMu24_eta2p1_IterTrk02_v
+HLT Path : HLT_Ele27_eta2p1_WP85_Gsf_v
+HLT Path : HLT_Ele32_eta2p1_WP85_Gsf_v
+HLT Path : HLT_Mu23_TrkIsoVVL_Ele12_Gsf_CaloId_TrackId_Iso_MediumWP_v
+HLT Path : HLT_Mu8_TrkIsoVVL_Ele23_Gsf_CaloId_TrackId_Iso_MediumWP_v
+HLT Path : HLT_LooseIsoPFTau50_Trk30_eta2p1_MET120_v
+HLT Path : HLT_PFMET170_NoiseCleaned_v
+
+ntrig = 8
+HLT_Ele27_eta2p1_WP85_Gsf_v1  :  0
+HLT_Ele32_eta2p1_WP85_Gsf_v1  :  0
+HLT_IsoMu24_eta2p1_IterTrk02_v1  :  0
+HLT_IsoTkMu24_eta2p1_IterTrk02_v1  :  0
+HLT_LooseIsoPFTau50_Trk30_eta2p1_MET120_v1  :  0
+HLT_Mu23_TrkIsoVVL_Ele12_Gsf_CaloId_TrackId_Iso_MediumWP_v1  :  0
+HLT_Mu8_TrkIsoVVL_Ele23_Gsf_CaloId_TrackId_Iso_MediumWP_v1  :  0
+HLT_PFMET170_NoiseCleaned_v1  :  0
+
+npres = 8
+HLT_Ele27_eta2p1_WP85_Gsf_v1  :  1
+HLT_Ele32_eta2p1_WP85_Gsf_v1  :  1
+HLT_IsoMu24_eta2p1_IterTrk02_v1  :  1
+HLT_IsoTkMu24_eta2p1_IterTrk02_v1  :  1
+HLT_LooseIsoPFTau50_Trk30_eta2p1_MET120_v1  :  1
+HLT_Mu23_TrkIsoVVL_Ele12_Gsf_CaloId_TrackId_Iso_MediumWP_v1  :  1
+HLT_Mu8_TrkIsoVVL_Ele23_Gsf_CaloId_TrackId_Iso_MediumWP_v1  :  1
+HLT_PFMET170_NoiseCleaned_v1  :  1
+
+nfiltres = 9
+HLT Filter : hltL3crIsoL1sMu20Eta2p1L1f0L2f20QL3f24QL3crIsoRhoFiltered0p15IterTrk02
+HLT Filter : hltL3fL1sMu20L1Eta2p1f0TkFiltered24QL3crIsoRhoFiltered0p15IterTrk02
+HLT Filter : hltL1Mu12EG7L3IsoMuFiltered23
+HLT Filter : hltL1sL1Mu5EG20ORL1Mu5IsoEG18L3IsoFiltered8
+HLT Filter : hltEle27WP85GsfTrackIsoFilter
+HLT Filter : hltEle32WP85GsfTrackIsoFilter
+HLT Filter : hltMu23Ele12GsfTrackIsoLegEle12GsfCaloIdTrackIdIsoMediumWPFilter
+HLT Filter : hltMu8Ele23GsfTrackIsoLegEle23GsfCaloIdTrackIdIsoMediumWPFilter
+HLT Filter : hltPFTau50TrackPt30LooseAbsOrRelIso
+
+nbtags = 9
+BTag discriminator : jetBProbabilityBJetTags
+BTag discriminator : jetProbabilityBJetTags
+BTag discriminator : trackCountingHighPurBJetTags
+BTag discriminator : trackCountingHighEffBJetTags
+BTag discriminator : simpleSecondaryVertexHighEffBJetTags
+BTag discriminator : simpleSecondaryVertexHighPurBJetTags
+BTag discriminator : combinedInclusiveSecondaryVertexV2BJetTags
+BTag discriminator : pfCombinedSecondaryVertexBJetTags
+BTag discriminator : combinedMVABJetTags
+
+++++++++++++++++++++++++++++++++++++
+
+event number = 10
+
+nhlt = 8
+HLT Path : HLT_IsoMu24_eta2p1_IterTrk02_v
+HLT Path : HLT_IsoTkMu24_eta2p1_IterTrk02_v
+HLT Path : HLT_Ele27_eta2p1_WP85_Gsf_v
+HLT Path : HLT_Ele32_eta2p1_WP85_Gsf_v
+HLT Path : HLT_Mu23_TrkIsoVVL_Ele12_Gsf_CaloId_TrackId_Iso_MediumWP_v
+HLT Path : HLT_Mu8_TrkIsoVVL_Ele23_Gsf_CaloId_TrackId_Iso_MediumWP_v
+HLT Path : HLT_LooseIsoPFTau50_Trk30_eta2p1_MET120_v
+HLT Path : HLT_PFMET170_NoiseCleaned_v
+
+ntrig = 8
+HLT_Ele27_eta2p1_WP85_Gsf_v1  :  0
+HLT_Ele32_eta2p1_WP85_Gsf_v1  :  0
+HLT_IsoMu24_eta2p1_IterTrk02_v1  :  0
+HLT_IsoTkMu24_eta2p1_IterTrk02_v1  :  0
+HLT_LooseIsoPFTau50_Trk30_eta2p1_MET120_v1  :  0
+HLT_Mu23_TrkIsoVVL_Ele12_Gsf_CaloId_TrackId_Iso_MediumWP_v1  :  0
+HLT_Mu8_TrkIsoVVL_Ele23_Gsf_CaloId_TrackId_Iso_MediumWP_v1  :  0
+HLT_PFMET170_NoiseCleaned_v1  :  0
+
+npres = 8
+HLT_Ele27_eta2p1_WP85_Gsf_v1  :  1
+HLT_Ele32_eta2p1_WP85_Gsf_v1  :  1
+HLT_IsoMu24_eta2p1_IterTrk02_v1  :  1
+HLT_IsoTkMu24_eta2p1_IterTrk02_v1  :  1
+HLT_LooseIsoPFTau50_Trk30_eta2p1_MET120_v1  :  1
+HLT_Mu23_TrkIsoVVL_Ele12_Gsf_CaloId_TrackId_Iso_MediumWP_v1  :  1
+HLT_Mu8_TrkIsoVVL_Ele23_Gsf_CaloId_TrackId_Iso_MediumWP_v1  :  1
+HLT_PFMET170_NoiseCleaned_v1  :  1
+
+nfiltres = 9
+HLT Filter : hltL3crIsoL1sMu20Eta2p1L1f0L2f20QL3f24QL3crIsoRhoFiltered0p15IterTrk02
+HLT Filter : hltL3fL1sMu20L1Eta2p1f0TkFiltered24QL3crIsoRhoFiltered0p15IterTrk02
+HLT Filter : hltL1Mu12EG7L3IsoMuFiltered23
+HLT Filter : hltL1sL1Mu5EG20ORL1Mu5IsoEG18L3IsoFiltered8
+HLT Filter : hltEle27WP85GsfTrackIsoFilter
+HLT Filter : hltEle32WP85GsfTrackIsoFilter
+HLT Filter : hltMu23Ele12GsfTrackIsoLegEle12GsfCaloIdTrackIdIsoMediumWPFilter
+HLT Filter : hltMu8Ele23GsfTrackIsoLegEle23GsfCaloIdTrackIdIsoMediumWPFilter
+HLT Filter : hltPFTau50TrackPt30LooseAbsOrRelIso
+
+nbtags = 9
+BTag discriminator : jetBProbabilityBJetTags
+BTag discriminator : jetProbabilityBJetTags
+BTag discriminator : trackCountingHighPurBJetTags
+BTag discriminator : trackCountingHighEffBJetTags
+BTag discriminator : simpleSecondaryVertexHighEffBJetTags
+BTag discriminator : simpleSecondaryVertexHighPurBJetTags
+BTag discriminator : combinedInclusiveSecondaryVertexV2BJetTags
+BTag discriminator : pfCombinedSecondaryVertexBJetTags
+BTag discriminator : combinedMVABJetTags
+
+++++++++++++++++++++++++++++++++++++

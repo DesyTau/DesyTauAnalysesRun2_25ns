@@ -1,0 +1,38 @@
+<export>
+</export>
+<library   name="DesyTauAnalysesNTupleMaker_plugins" file="*.cc">
+<use   name="DataFormats/Common"/>
+<use   name="DataFormats/JetReco"/>
+<use   name="DataFormats/Math"/>
+<use   name="DataFormats/MuonReco"/>
+<use   name="DataFormats/Luminosity"/>
+<use   name="DataFormats/PatCandidates"/>
+<use   name="DataFormats/L1GlobalTrigger"/>
+<use   name="FWCore/Framework"/>
+<use   name="FWCore/ParameterSet"/>
+<use   name="FWCore/ServiceRegistry"/>
+<use   name="FWCore/MessageService"/>
+<use   name="FWCore/Utilities"/>
+<use   name="PhysicsTools/PatUtils"/>
+<use   name="PhysicsTools/IsolationUtils"/>
+<use   name="PhysicsTools/Utilities"/>
+<use   name="PhysicsTools/JetMCUtils"/>
+<use   name="CommonTools/UtilAlgos"/>
+<use   name="JetMETCorrections/Objects"/>
+<use   name="HLTrigger/HLTcore"/>
+<use   name="MagneticField/Engine"/>
+<use   name="TrackingTools/MaterialEffects"/>
+<use   name="TrackingTools/GeomPropagators"/>
+<use   name="RecoEgamma/EgammaTools"/>
+<use   name="Geometry/CaloGeometry"/>
+<use   name="RecoVertex/KalmanVertexFit"/>
+<use   name="RecoVertex/VertexPrimitives"/>
+<use   name="EgammaAnalysis/ElectronTools"/>
+<use   name="RecoBTag/BTagTools"/>
+<use   name="RecoVertex/KinematicFitPrimitives"/>
+<use   name="DesyTauAnalyses/CandidateTools"/>
+<use   name="clhep"/>
+<use   name="RecoVertex/AdaptiveVertexFit"/>
+<use   name="root"/>
+<flags   CXXFLAGS="-Wno-unused-variable -Wno-error=unused-but-set-variable" />
+</library>
