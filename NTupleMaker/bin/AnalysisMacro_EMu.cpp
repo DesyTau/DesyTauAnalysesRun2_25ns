@@ -328,7 +328,6 @@ int main(int argc, char * argv[]) {
   const bool oppositeSign    = cfg.get<bool>("oppositeSign");
   const float DRTrigMatch    = cfg.get<float>("DRTrigMatch");
   const float MEtCutTTJets   = cfg.get<float>("MEtCutTTJets");
-  const float DzetaCutTTJets = cfg.get<float>("DzetaCutTTJets");
   const bool isoDR03         = cfg.get<bool>("IsoDR03");
 
   // trigger
@@ -378,6 +377,11 @@ int main(int argc, char * argv[]) {
   // **** end of configuration
 
   // Run-lumi selector
+  std::vector<std::string> jsonFiles;
+  jsonFiles.push_back("/nfs/dust/cms/user/rasp/CMSSW/CMSSW_7_4_6/src/DesyTauAnalyses/NTupleMaker/test/Cert_246908-251883_13TeV_PromptReco_Collisions15_JSON_v2.txt");
+
+  RunLumiSelector runLumiSelector;
+  runLumiSelector = RunLumiSelector(jsonFiles);
 
   std::vector<Period> periods;
     
@@ -517,46 +521,6 @@ int main(int argc, char * argv[]) {
   TH1F * TTJetsDiLeptonEleEtaH = new TH1F("TTJetsDiLeptonEleEtaH","",100,-5,5);
   TH1F * TTJetsDiLeptonMuEtaH = new TH1F("TTJetsDiLeptonMuEtaH","",100,-5,5);
   TH1F * TTJetsDiLeptonAccH = new TH1F("TTJetsDiLeptonAccH","",1,-0.5,0.5);
-
-
-  TH1F * ptMu23TTJetsPassH = new TH1F("ptMu23TTJetsPassH","",200,0,200);
-  TH1F * ptMu23TTJetsFailH = new TH1F("ptMu23TTJetsFailH","",200,0,200);
-
-  TH1F * ptMu8TTJetsPassH = new TH1F("ptMu8TTJetsPassH","",200,0,200);
-  TH1F * ptMu8TTJetsFailH = new TH1F("ptMu8TTJetsFailH","",200,0,200);
-
-  TH1F * ptEle23TTJetsPassH = new TH1F("ptEle23TTJetsPassH","",200,0,200);
-  TH1F * ptEle23TTJetsFailH = new TH1F("ptEle23TTJetsFailH","",200,0,200);
-
-  TH1F * ptEle12TTJetsPassH = new TH1F("ptEle12TTJetsPassH","",200,0,200);
-  TH1F * ptEle12TTJetsFailH = new TH1F("ptEle12TTJetsFailH","",200,0,200);
-
-
-  TH1F * ptMu23TTJetsBarrelPassH = new TH1F("ptMu23TTJetsBarrelPassH","",200,0,200);
-  TH1F * ptMu23TTJetsBarrelFailH = new TH1F("ptMu23TTJetsBarrelFailH","",200,0,200);
-
-  TH1F * ptMu8TTJetsBarrelPassH = new TH1F("ptMu8TTJetsBarrelPassH","",200,0,200);
-  TH1F * ptMu8TTJetsBarrelFailH = new TH1F("ptMu8TTJetsBarrelFailH","",200,0,200);
-
-  TH1F * ptEle23TTJetsBarrelPassH = new TH1F("ptEle23TTJetsBarrelPassH","",200,0,200);
-  TH1F * ptEle23TTJetsBarrelFailH = new TH1F("ptEle23TTJetsBarrelFailH","",200,0,200);
-
-  TH1F * ptEle12TTJetsBarrelPassH = new TH1F("ptEle12TTJetsBarrelPassH","",200,0,200);
-  TH1F * ptEle12TTJetsBarrelFailH = new TH1F("ptEle12TTJetsBarrelFailH","",200,0,200);
-
-
-  TH1F * ptMu23TTJetsEndcapPassH = new TH1F("ptMu23TTJetsEndcapPassH","",200,0,200);
-  TH1F * ptMu23TTJetsEndcapFailH = new TH1F("ptMu23TTJetsEndcapFailH","",200,0,200);
-
-  TH1F * ptMu8TTJetsEndcapPassH = new TH1F("ptMu8TTJetsEndcapPassH","",200,0,200);
-  TH1F * ptMu8TTJetsEndcapFailH = new TH1F("ptMu8TTJetsEndcapFailH","",200,0,200);
-
-  TH1F * ptEle23TTJetsEndcapPassH = new TH1F("ptEle23TTJetsEndcapPassH","",200,0,200);
-  TH1F * ptEle23TTJetsEndcapFailH = new TH1F("ptEle23TTJetsEndcapFailH","",200,0,200);
-
-  TH1F * ptEle12TTJetsEndcapPassH = new TH1F("ptEle12TTJetsEndcapPassH","",200,0,200);
-  TH1F * ptEle12TTJetsEndcapFailH = new TH1F("ptEle12TTJetsEndcapFailH","",200,0,200);
-
 
   TH1F * DYJetsDiLeptonH = new TH1F("DYJetsDiLeptonH","",1,-0.5,0.5);
   TH1F * DYJetsDiLeptonElePtH = new TH1F("DYJetsDiLeptonElePtH","",1000,0,1000);
@@ -933,15 +897,6 @@ int main(int argc, char * argv[]) {
       if (trigger==5) {
 	if (isTriggerMu23Ele12 || isTriggerMu8Ele23) acceptTrig = true;
       }
-      if (trigger==6) {
-	if (isTriggerMu23Ele12 || isTriggerMu8Ele23 || isTriggerMuon || isTriggerElectron) 
-	  acceptTrig = true;
-      }
-      if (trigger==7) {
-	if ( (isTriggerMu23Ele12 || isTriggerMu8Ele23) && !(isTriggerMuon || isTriggerElectron) ) 
-	  acceptTrig = true;
-      }
-
       if (!acceptTrig) continue;
       weightsTriggerH->Fill(0.0,weight);
 
@@ -1106,20 +1061,12 @@ int main(int argc, char * argv[]) {
       float dRleptons = -1;
       int electronIndex = -1;
       int muonIndex = -1;
-      bool selElectronTrigMatched  = false;
-      bool selElectronEle23Matched = false;
-      bool selElectronEle12Matched = false;
-      bool selMuonTrigMatched = false;
-      bool selMuonMu23Matched = false;
-      bool selMuonMu8Matched  = false;
       for (unsigned int ie=0; ie<electrons.size(); ++ie) {
 	//	std::cout << "Electron " << ie << std::endl;
 	int eIndex = electrons[ie];
 	bool electronMatch = false;
 	bool ele23Match = false;
 	bool ele12Match = false;
-	bool ele23TrigMatch = false;
-	bool ele12TrigMatch = false;
 	for (unsigned int iT=0; iT<analysisTree.trigobject_count; ++iT) {
 	  float dRtrig = deltaR(analysisTree.electron_eta[eIndex],analysisTree.electron_phi[eIndex],
 				analysisTree.trigobject_eta[iT],analysisTree.trigobject_phi[iT]);
@@ -1129,17 +1076,15 @@ int main(int argc, char * argv[]) {
 	      fabs(analysisTree.electron_eta[eIndex])<etaElectronHighCut) { // Electron Leg of single electron trigger
 	    electronMatch = true;
 	  }
-	  if (analysisTree.trigobject_filters[iT][nMu23Ele12ElectronFilter]) { // Electron Leg of Mu23Ele12 trigger 
-	    ele12TrigMatch = true;
-	    if (analysisTree.electron_pt[eIndex]>ptElectronLowCut && 
-		fabs(analysisTree.electron_eta[eIndex])<etaElectronLowCut) 
-	      ele12Match = true;
+	  if (analysisTree.trigobject_filters[iT][nMu23Ele12ElectronFilter] && 
+	      analysisTree.electron_pt[eIndex]>ptElectronLowCut && 
+	      fabs(analysisTree.electron_eta[eIndex])<etaElectronLowCut) { // Electron Leg of Mu23Ele12 trigger
+	    ele12Match = true;
 	  }
-	  if (analysisTree.trigobject_filters[iT][nMu8Ele23ElectronFilter]) { // Electron Leg of Mu8Ele23 trigger
-	    ele23TrigMatch = true;
-	    if (analysisTree.electron_pt[eIndex]>ptElectronHighCut && 
-		fabs(analysisTree.electron_eta[eIndex])<etaElectronLowCut)
-	      ele23Match = true;
+	  if (analysisTree.trigobject_filters[iT][nMu8Ele23ElectronFilter] && 
+	      analysisTree.electron_pt[eIndex]>ptElectronHighCut && 
+	      fabs(analysisTree.electron_eta[eIndex])<etaElectronHighCut) { // Electron Leg of Mu8Ele23 trigger
+	    ele23Match = true;
 	  }
 	}
 	for (unsigned int im=0; im<muons.size(); ++im) {
@@ -1148,8 +1093,6 @@ int main(int argc, char * argv[]) {
 	  bool muonMatch = false;
 	  bool muon23Match = false;
 	  bool muon8Match = false;
-	  bool muon23TrigMatch = false;
-	  bool muon8TrigMatch = false;
 	  for (unsigned int iT=0; iT<analysisTree.trigobject_count; ++iT) {
 	    float dRtrig = deltaR(analysisTree.muon_eta[mIndex],analysisTree.muon_phi[mIndex],
 				  analysisTree.trigobject_eta[iT],analysisTree.trigobject_phi[iT]);
@@ -1159,26 +1102,21 @@ int main(int argc, char * argv[]) {
 		fabs(analysisTree.muon_eta[mIndex])<etaMuonHighCut) { // Muon Leg of single muon trigger
 	      muonMatch = true;
 	    }
-	    if (analysisTree.trigobject_filters[iT][nMu23Ele12MuonFilter]) { // Muon Leg of Mu23Ele12 trigger
-	      muon23TrigMatch = true;
-	      if (analysisTree.muon_pt[mIndex]>ptMuonHighCut && 
-		  fabs(analysisTree.muon_eta[mIndex])<etaMuonLowCut) 
-		muon23Match = true;
+	    if (analysisTree.trigobject_filters[iT][nMu23Ele12MuonFilter] &&
+		analysisTree.muon_pt[mIndex]>ptMuonHighCut && 
+		fabs(analysisTree.muon_eta[mIndex])<etaMuonHighCut) { // Muon Leg of Mu23Ele12 trigger
+	      muon23Match = true;
 	    }
-	    if (analysisTree.trigobject_filters[iT][nMu8Ele23MuonFilter]) { // Muon Leg of Mu8Ele23 trigger
-	      muon8TrigMatch = true;
-	      if (analysisTree.muon_pt[mIndex]>ptMuonLowCut && 
-		  fabs(analysisTree.muon_eta[mIndex])<etaMuonLowCut) 
-		muon8Match = true;
+	    if (analysisTree.trigobject_filters[iT][nMu8Ele23MuonFilter] &&
+		analysisTree.muon_pt[mIndex]>ptMuonLowCut && 
+		fabs(analysisTree.muon_eta[mIndex])<etaMuonLowCut) { // Muon Leg of Mu8Ele23 trigger
+	      muon8Match = true;
 	    }
 	  }
 
 	  bool trigMatch = electronMatch || muonMatch;
 	  if (trigger==5)
 	    trigMatch = (muon23Match && ele12Match) || (muon8Match && ele23Match);
-	  if (trigger==6 || trigger==7)
-	    trigMatch = (muon23Match && ele12Match) || (muon8Match && ele23Match) ||  electronMatch || muonMatch;
-	    
 
 	  if (!trigMatch) continue;
 
@@ -1196,13 +1134,8 @@ int main(int argc, char * argv[]) {
 	    dRleptons = dR;
 	    electronIndex = ie;
 	    muonIndex = im;
-	    selElectronTrigMatched = electronMatch;
-	    selElectronEle23Matched = ele23TrigMatch;
-	    selElectronEle12Matched = ele12TrigMatch;
-	    selMuonTrigMatched = muonMatch;
-	    selMuonMu23Matched = muon23TrigMatch;
-	    selMuonMu8Matched   = muon8TrigMatch;
 	  }
+	  
 	}
       }
       //      std::cout << std::endl;
@@ -1412,7 +1345,7 @@ int main(int argc, char * argv[]) {
 	nVertSelH->Fill(nVert,weight);
       }
       
-      if (ETmiss>MEtCutTTJets&&DZeta<DzetaCutTTJets) {
+      if (ETmiss>MEtCutTTJets&&nBLooseJets>0) {
 	
 	electronPtTTJetsSelH->Fill(electronLV.Pt(),weight);
 	electronEtaTTJetsSelH->Fill(electronLV.Eta(),weight);
@@ -1433,75 +1366,6 @@ int main(int argc, char * argv[]) {
 	nJets20TTJetsSelH->Fill(float(nJets20),weight);
 	nBLooseJetsTTJetsSelH->Fill(float(nBLooseJets),weight);
 	nBMediumJetsTTJetsSelH->Fill(float(nBMediumJets),weight);
-
-	if (selElectronTrigMatched) {
-
-	  if (selMuonMu23Matched) {
-	    ptMu23TTJetsPassH->Fill(muonLV.Pt(),weight);
-	    if (fabs(muonLV.Eta())<1.48)
-	      ptMu23TTJetsBarrelPassH->Fill(muonLV.Pt(),weight);
-	    else
-	      ptMu23TTJetsEndcapPassH->Fill(muonLV.Pt(),weight);
-	  } 
-	  else {
-	    ptMu23TTJetsFailH->Fill(muonLV.Pt(),weight);
-	    if (fabs(muonLV.Eta())<1.48)
-              ptMu23TTJetsBarrelFailH->Fill(muonLV.Pt(),weight);
-            else
-              ptMu23TTJetsEndcapFailH->Fill(muonLV.Pt(),weight);
-	  }
-
-	  if (selMuonMu8Matched) {
-	    ptMu8TTJetsPassH->Fill(muonLV.Pt(),weight);
-	    if (fabs(muonLV.Eta())<1.48)
-	      ptMu8TTJetsBarrelPassH->Fill(muonLV.Pt(),weight);
-	    else
-	      ptMu8TTJetsEndcapPassH->Fill(muonLV.Pt(),weight);
-	  } 
-	  else {
-	    ptMu8TTJetsFailH->Fill(muonLV.Pt(),weight);
-	    if (fabs(muonLV.Eta())<1.48)
-              ptMu8TTJetsBarrelFailH->Fill(muonLV.Pt(),weight);
-            else
-              ptMu8TTJetsEndcapFailH->Fill(muonLV.Pt(),weight);
-	  }
-
-	}
-
-	if (selMuonTrigMatched) {
-
-	  if (selElectronEle23Matched) {
-            ptEle23TTJetsPassH->Fill(electronLV.Pt(),weight);
-            if (fabs(electronLV.Eta())<1.48)
-              ptEle23TTJetsBarrelPassH->Fill(electronLV.Pt(),weight);
-            else
-              ptEle23TTJetsEndcapPassH->Fill(electronLV.Pt(),weight);
-          }
-          else {
-            ptEle23TTJetsFailH->Fill(electronLV.Pt(),weight);
-            if (fabs(electronLV.Eta())<1.48)
-              ptEle23TTJetsBarrelFailH->Fill(electronLV.Pt(),weight);
-            else
-              ptEle23TTJetsEndcapFailH->Fill(electronLV.Pt(),weight);
-          }
-
-	  if (selElectronEle12Matched) {
-            ptEle12TTJetsPassH->Fill(electronLV.Pt(),weight);
-            if (fabs(electronLV.Eta())<1.48)
-              ptEle12TTJetsBarrelPassH->Fill(electronLV.Pt(),weight);
-            else
-              ptEle12TTJetsEndcapPassH->Fill(electronLV.Pt(),weight);
-          }
-          else {
-            ptEle12TTJetsFailH->Fill(electronLV.Pt(),weight);
-            if (fabs(electronLV.Eta())<1.48)
-              ptEle12TTJetsBarrelFailH->Fill(electronLV.Pt(),weight);
-            else
-              ptEle12TTJetsEndcapFailH->Fill(electronLV.Pt(),weight);
-          }
-
-	}
-	
 
 	nVertTTJetsSelH->Fill(nVert,weight);
       }
