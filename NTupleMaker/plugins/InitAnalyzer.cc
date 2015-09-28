@@ -16,7 +16,6 @@
 //
 //
 
-
 // system include files
 #include <memory>
 
@@ -25,6 +24,7 @@
 #include "FWCore/Framework/interface/EDAnalyzer.h"
 
 #include "FWCore/Framework/interface/Event.h"
+#include "FWCore/Utilities/interface/InputTag.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
 
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
@@ -37,11 +37,14 @@
 #include "TH2D.h"
 #include "TMath.h"
 #include "TTree.h"
+#include "FWCore/Framework/interface/MakerMacros.h"
+
 //
 // class declaration
 //
 
 using namespace reco;
+using namespace std;
 class InitAnalyzer : public edm::EDAnalyzer {
    public:
       explicit InitAnalyzer(const edm::ParameterSet&);
@@ -55,9 +58,7 @@ class InitAnalyzer : public edm::EDAnalyzer {
       virtual void analyze(const edm::Event&, const edm::EventSetup&) override;
       virtual void endJob() override;
 
-  TTree* tree;
-  TTree* lumitree;
-  TTree* runtree;
+  TTree* tree0;
   TH1D*  nEvents;
   bool cdata;
   bool cgen;
@@ -81,13 +82,12 @@ class InitAnalyzer : public edm::EDAnalyzer {
 //
 // constructors and destructor
 //
-InitAnalyzer::InitAnalyzer(const edm::ParameterSet& iConfig)
-
+InitAnalyzer::InitAnalyzer(const edm::ParameterSet& iConfig) :
+  cdata(iConfig.getUntrackedParameter<bool>("IsData", false)),
+  cgen(iConfig.getUntrackedParameter<bool>("GenParticles", false))
 {
-   //now do what ever initialization is needed
-
+	
 }
-
 
 InitAnalyzer::~InitAnalyzer()
 {
@@ -113,15 +113,15 @@ InitAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   genweight = 1.;
   if(cgen && !cdata)
     {
-
       edm::Handle<GenEventInfoProduct> HEPMC;
       iEvent.getByLabel(edm::InputTag("generator"), HEPMC);
       if(HEPMC.isValid())
 	{
 	  genweight = HEPMC->weight();
-	  //	  cout << "Event weight from HEPMC : " << genweight << endl;
+	//  	  cout << "Event weight from HEPMC : " << genweight << endl;
 	}
     }
+  tree0->Fill();
 #ifdef THIS_IS_AN_EVENT_EXAMPLE
    Handle<ExampleData> pIn;
    iEvent.getByLabel("example",pIn);
@@ -139,10 +139,10 @@ void
 InitAnalyzer::beginJob()
 {
   edm::Service<TFileService> FS;
-  tree = FS->make<TTree>("AC1B", "AC1B", 1);
+  tree0 = FS->make<TTree>("AC1B", "AC1B", 1);
   nEvents = FS->make<TH1D>("nEvents", "nEvents", 2, -0.5, +1.5);
   if (cgen && !cdata) {
-    tree->Branch("genweight", &genweight, "genweight/F");
+    tree0->Branch("genweight", &genweight, "genweight/F");
 	}
 }
 

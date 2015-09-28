@@ -195,6 +195,17 @@ for idmod in my_id_modules:
 
 ### END Electron ID ====================================================================================
 
+### HBHE noise Filter
+
+##___________________________HCAL_Noise_Filter________________________________||
+process.load('CommonTools.RecoAlgos.HBHENoiseFilterResultProducer_cfi')
+process.HBHENoiseFilterResultProducer.minZeros = cms.int32(99999)
+
+process.ApplyBaselineHBHENoiseFilter = cms.EDFilter('BooleanFlagFilter',
+		   inputLabel = cms.InputTag('HBHENoiseFilterResultProducer','HBHENoiseFilterResult'),
+		      reverseDecision = cms.bool(False)
+		      )
+
 
 ### ====================================================================================================
 
@@ -456,6 +467,11 @@ process.mvaMetSequence  = cms.Sequence(process.leptonPreSelectionSequence +
 
 # NTuple Maker =======================================================================
 
+process.initroottree = cms.EDAnalyzer("InitAnalyzer",
+IsData = cms.untracked.bool(isData),
+#IsData = cms.untracked.bool(False),
+GenParticles = cms.untracked.bool(True)
+)
 #process.patJets.addBTagInfo = cms.bool(True)
 process.makeroottree = cms.EDAnalyzer("NTupleMaker",
 # data, year, period, skim
@@ -501,7 +517,7 @@ HLTriggerPaths = cms.untracked.vstring(
 'HLT_IsoMu24_eta2p1_v',
 'HLT_IsoMu27_v',
 'HLT_IsoMu17_eta2p1_LooseIsoPFTau20_v',
-'HLT_Ele22_eta2p1_WP75_Gsf_LooseIsoPFTau20_v',
+#'HLT_Ele22_eta2p1_WP75_Gsf_LooseIsoPFTau20_v',
 'HLT_Ele22_eta2p1_WPLoose_Gsf_LooseIsoPFTau20_v',
 'HLT_Ele23_WPLoose_Gsf_v',
 'HLT_Ele22_eta2p1_WP75_Gsf_v',
@@ -540,8 +556,8 @@ RecElectronEtaMax = cms.untracked.double(2.5),
 RecElectronHLTriggerMatching = cms.untracked.vstring(
 'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v.*:hltMu23TrkIsoVVLEle12CaloIdLTrackIdLIsoVLElectronlegTrackIsoFilter', 
 'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v.*:hltMu8TrkIsoVVLEle23CaloIdLTrackIdLIsoVLElectronlegTrackIsoFilter', 
-'HLT_Ele22_eta2p1_WP75_Gsf_LooseIsoPFTau20_v.*:hltSingleEle22WP75GsfTrackIsoFilter',
-'HLT_Ele22_eta2p1_WP75_Gsf_LooseIsoPFTau20_v.*:hltOverlapFilterIsoEle22WP75GsfLooseIsoPFTau20',
+#'HLT_Ele22_eta2p1_WP75_Gsf_LooseIsoPFTau20_v.*:hltSingleEle22WP75GsfTrackIsoFilter',
+#'HLT_Ele22_eta2p1_WP75_Gsf_LooseIsoPFTau20_v.*:hltOverlapFilterIsoEle22WP75GsfLooseIsoPFTau20',
 'HLT_Ele22_eta2p1_WPLoose_Gsf_LooseIsoPFTau20_v.*:hltSingleEle22WPLooseGsfTrackIsoFilter',
 'HLT_Ele22_eta2p1_WPLoose_Gsf_LooseIsoPFTau20_v.*:hltOverlapFilterIsoEle22WPLooseGsfLooseIsoPFTau20',
 'HLT_Ele22_eta2p1_WP75_Gsf_v.*:hltSingleEle22WP75GsfTrackIsoFilter',
@@ -557,8 +573,8 @@ RecElectronNum = cms.untracked.int32(0),
 RecTauPtMin = cms.untracked.double(18),
 RecTauEtaMax = cms.untracked.double(2.5),                                      
 RecTauHLTriggerMatching = cms.untracked.vstring(
-'HLT_Ele22_eta2p1_WP75_Gsf_LooseIsoPFTau20_v.*:hltPFTau20TrackLooseIso',
-'HLT_Ele22_eta2p1_WP75_Gsf_LooseIsoPFTau20_v.*:hltOverlapFilterIsoEle22WP75GsfLooseIsoPFTau20', 
+#'HLT_Ele22_eta2p1_WP75_Gsf_LooseIsoPFTau20_v.*:hltPFTau20TrackLooseIso',
+#'HLT_Ele22_eta2p1_WP75_Gsf_LooseIsoPFTau20_v.*:hltOverlapFilterIsoEle22WP75GsfLooseIsoPFTau20', 
 'HLT_Ele22_eta2p1_WPLoose_Gsf_LooseIsoPFTau20_v.*:hltPFTau20TrackLooseIso',
 'HLT_Ele22_eta2p1_WPLoose_Gsf_LooseIsoPFTau20_v.*:hltOverlapFilterIsoEle22WPLooseGsfLooseIsoPFTau20',
 'HLT_IsoMu17_eta2p1_LooseIsoPFTau20_v.*:hltPFTau20TrackLooseIsoAgainstMuon',
@@ -651,7 +667,7 @@ SampleName = cms.untracked.string("MC")
 
 )
 
-
+"""
 process.p = cms.Path(
 #                     process.particleFlowPtrs +
 #                     process.makePatElectrons +
@@ -668,13 +684,25 @@ process.p = cms.Path(
 
 
   #process.leptonPreSelectionSequence +
+  #process.initroottree*
   process.mvaMetSequence +
   process.egmGsfElectronIDSequence + 
   process.patJetCorrFactorsReapplyJEC + process.patJetsReapplyJEC +
   process.makeroottree
 )
+"""
+process.p = cms.Path(
+  process.initroottree*
+  process.mvaMetSequence *
+  process.egmGsfElectronIDSequence * 
+  process.patJetCorrFactorsReapplyJEC * process.patJetsReapplyJEC *
+  process.HBHENoiseFilterResultProducer* #produces HBHE bools
+  process.ApplyBaselineHBHENoiseFilter*  #reject events based 
+  process.makeroottree
+)
 
-process.TFileService = cms.Service("TFileService", fileName = cms.string("outputJEC.root") )
+process.TFileService = cms.Service("TFileService", fileName = cms.string("output.root") )
+
 
 #process.end = cms.EndPath(process.Out*process.TFileService)
 
@@ -741,4 +769,6 @@ def customise_for_gc(process):
 process = customise_for_gc(process)
 
 # grid-control: https://ekptrac.physik.uni-karlsruhe.de/trac/grid-control
+
+
 
