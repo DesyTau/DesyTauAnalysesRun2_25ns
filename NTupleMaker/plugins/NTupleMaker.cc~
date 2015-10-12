@@ -156,8 +156,8 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
   //  propagatorWithMaterial = NULL;
   if(cYear != 2011 && cYear != 2012 && cYear != 2015)
     throw cms::Exception("NTupleMaker") << "Invalid Year, only 2011, 2012 and 2015  are allowed!";
-  if(cPeriod != "Summer11" && cPeriod != "Fall11" && cPeriod != "Summer12" && cPeriod != "PHYS14" && cPeriod != "Spring15" && cPeriod != "Run2015B")
-    throw cms::Exception("NTupleMaker") << "Invalid period, only Summer11, Fall11, Summer12, PHYS14, Spring15 and Run2015B are allowed!";
+  if(cPeriod != "Summer11" && cPeriod != "Fall11" && cPeriod != "Summer12" && cPeriod != "PHYS14" && cPeriod != "Spring15" && cPeriod != "Run2015B" && cPeriod != "Run2015C" )
+    throw cms::Exception("NTupleMaker") << "Invalid period, only Summer11, Fall11, Summer12, PHYS14, Spring15, Run2015B Run2015C are allowed!";
   
   double barrelRadius = 129.;  //p81, p50, ECAL TDR
   double endcapZ      = 320.5; // fig 3.26, p81, ECAL TDR

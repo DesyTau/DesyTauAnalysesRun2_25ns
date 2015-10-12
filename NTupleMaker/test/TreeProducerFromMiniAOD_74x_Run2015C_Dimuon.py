@@ -1,9 +1,9 @@
 import FWCore.ParameterSet.Config as cms
 
-isData = False
+isData = True
 #skim = 0
 year = 2015
-#period = 'Spring15'
+period = 'Run2015B'
 #sampleName = 'MonteCarlo'
 # sampleName = 'TTJets', "QCD", "DYJetsToLL_M50"
 
@@ -29,34 +29,48 @@ process.load("Configuration.StandardSequences.MagneticField_cff")
 
 from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag
 #process.GlobalTag = GlobalTag(process.GlobalTag, 'MCRUN2_74_V7C', '')
-process.GlobalTag = GlobalTag(process.GlobalTag, 'MCRUN2_74_V9A', '')
-#process.GlobalTag = GlobalTag(process.GlobalTag, 'MCRUN2_74_V9', '')
+process.GlobalTag = GlobalTag(process.GlobalTag, '74X_dataRun2_Prompt_v0', '')
+
 #process.GlobalTag.globaltag = cms.string('MCRUN2_74_V9::Al')
-#process.GlobalTag.globaltag = cms.string('MCRUN2_74_V9')
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(1000)
+    input = cms.untracked.int32(-1)
 )
 
 process.source = cms.Source("PoolSource",
-		fileNames = cms.untracked.vstring(
-		# SUSYGluGluToBBHToTauTau_M-160
-#		'/store/mc/RunIISpring15DR74/SUSYGluGluToBBHToTauTau_M-160_TuneCUETP8M1_13TeV-pythia8/MINIAODSIM/Asympt25ns_MCRUN2_74_V9-v2/50000/1A81092B-1A11-E511-B683-002618943849.root'
-		# SUSYGluGluToHToTauTau_M-160
-#		'/store/mc/RunIISpring15DR74/SUSYGluGluToHToTauTau_M-160_TuneCUETP8M1_13TeV-pythia8/MINIAODSIM/Asympt25ns_MCRUN2_74_V9-v1/10000/2A3929AE-5303-E511-9EFE-0025905A48C0.root'
-		# DYJetsToLL_M-50 (aMC@NLO 25ns)
-		'/store/mc/RunIISpring15DR74/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/Asympt25ns_MCRUN2_74_V9-v3/10000/009D49A5-7314-E511-84EF-0025905A605E.root'
-		# DYJetsToLL_M-50 (aMC@NLO 50ns)
-#		'/store/mc/RunIISpring15DR74/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/Asympt50ns_MCRUN2_74_V9A-v2/00000/02DE3B74-6C08-E511-ABE3-0025905A60D0.root'
-		# TTJets
-#		'/store/mc/RunIISpring15DR74/TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/Asympt50ns_MCRUN2_74_V9A-v1/00000/00466730-F801-E511-9594-549F35AF450A.root'
-		)	    
-##    dropDescendantsOfDroppedBranches=cms.untracked.bool(False),
-##    inputCommands=cms.untracked.vstring(
-##        'keep *',
-##        'drop patTaus_*_*_*',
-##        'drop *PFTau*_*_*_*'
-##    )
+	fileNames = cms.untracked.vstring(
+		# Single Muon Run2015B
+#		'/store/data/Run2015B/SingleMuon/MINIAOD/PromptReco-v1/000/251/164/00000/544E58CD-A226-E511-834E-02163E0134D6.root',
+#		'/store/data/Run2015B/SingleMuon/MINIAOD/PromptReco-v1/000/251/167/00000/EE9594B8-A826-E511-A18B-02163E011A7D.root',
+#		'/store/data/Run2015B/SingleMuon/MINIAOD/PromptReco-v1/000/251/168/00000/4E8E390B-EA26-E511-9EDA-02163E013567.root',
+#		'/store/data/Run2015B/SingleMuon/MINIAOD/PromptReco-v1/000/251/168/00000/60FF8405-EA26-E511-A892-02163E01387D.root'
+		# Double Muon Run2015B
+#		'/store/data/Run2015B/DoubleMuon/MINIAOD/PromptReco-v1/000/251/162/00000/12284DB9-4227-E511-A438-02163E013674.root',
+#		'/store/data/Run2015B/DoubleMuon/MINIAOD/PromptReco-v1/000/251/164/00000/402F0995-A326-E511-86BB-02163E013948.root',
+#		'/store/data/Run2015B/DoubleMuon/MINIAOD/PromptReco-v1/000/251/167/00000/70C4A781-A826-E511-95B4-02163E013414.root',
+#		'/store/data/Run2015B/DoubleMuon/MINIAOD/PromptReco-v1/000/251/168/00000/627E9C65-DD26-E511-87FB-02163E013576.root',
+#		'/store/data/Run2015B/DoubleMuon/MINIAOD/PromptReco-v1/000/251/244/00000/E42FEF61-6E27-E511-B93A-02163E0143C0.root'
+		# Single Electron Run2015B
+#		'/store/data/Run2015B/SingleElectron/MINIAOD/PromptReco-v1/000/251/096/00000/22D22D7F-5626-E511-BDE3-02163E011FAB.root',
+#		'/store/data/Run2015B/SingleElectron/MINIAOD/PromptReco-v1/000/251/161/00000/7019DC27-9C26-E511-84FF-02163E011CC2.root',
+#		'/store/data/Run2015B/SingleElectron/MINIAOD/PromptReco-v1/000/251/163/00000/9C435096-9F26-E511-A1D7-02163E012AB6.root',
+#		'/store/data/Run2015B/SingleElectron/MINIAOD/PromptReco-v1/000/251/164/00000/4633CC68-A326-E511-95D0-02163E0124EA.root',
+#		'/store/data/Run2015B/SingleElectron/MINIAOD/PromptReco-v1/000/251/167/00000/E661FBF2-A726-E511-8B8B-02163E01207C.root',
+#		'/store/data/Run2015B/SingleElectron/MINIAOD/PromptReco-v1/000/251/168/00000/FCB6CB61-BC26-E511-8858-02163E01375B.root'
+                # Double EG Run2015B
+#		'/store/data/Run2015B/DoubleEG/MINIAOD/PromptReco-v1/000/251/096/00000/8A2D533C-5626-E511-AF3C-02163E011FAB.root',
+#		'/store/data/Run2015B/DoubleEG/MINIAOD/PromptReco-v1/000/251/161/00000/AC857A3B-9C26-E511-B32E-02163E012704.root',
+#		'/store/data/Run2015B/DoubleEG/MINIAOD/PromptReco-v1/000/251/163/00000/9CB965BF-9F26-E511-8FB1-02163E012040.root',
+#		'/store/data/Run2015B/DoubleEG/MINIAOD/PromptReco-v1/000/251/164/00000/2CA2349A-A526-E511-A371-02163E0138D0.root',
+#		'/store/data/Run2015B/DoubleEG/MINIAOD/PromptReco-v1/000/251/167/00000/C446EC67-A726-E511-81C1-02163E0119E7.root',
+#		'/store/data/Run2015B/DoubleEG/MINIAOD/PromptReco-v1/000/251/168/00000/747F782A-BB26-E511-BA24-02163E011EE9.root'
+		# Single Muon Run2015C        
+		'/store/data/Run2015C/SingleMuon/MINIAOD/PromptReco-v1/000/253/888/00000/DA473838-0941-E511-9644-02163E014405.root',
+		'/store/data/Run2015C/SingleMuon/MINIAOD/PromptReco-v1/000/253/890/00000/B0BE6B62-0941-E511-8FBB-02163E014499.root',
+		'/store/data/Run2015C/SingleMuon/MINIAOD/PromptReco-v1/000/253/944/00000/BA286EB7-5141-E511-8829-02163E01437D.root',
+		'/store/data/Run2015C/SingleMuon/MINIAOD/PromptReco-v1/000/253/952/00000/C6F1C99F-4241-E511-A877-02163E01439D.root',
+		'/store/data/Run2015C/SingleMuon/MINIAOD/PromptReco-v1/000/253/954/00000/824EBBD8-4541-E511-BDA3-02163E014419.root'
+        )		    
 )
  
 #####################################################
@@ -474,13 +488,11 @@ process.puJetIdSequence += process.makePatJets
 '''
 ##################################################
 # Main
-
-#process.patJets.addBTagInfo = cms.bool(True)
 process.makeroottree = cms.EDAnalyzer("NTupleMaker",
 # data, year, period, skim
 IsData = cms.untracked.bool(isData),
 Year = cms.untracked.uint32(year),
-Period = cms.untracked.string("Spring15"),
+Period = cms.untracked.string(period),
 Skim = cms.untracked.uint32(0),
 # switches of collections
 GenParticles = cms.untracked.bool(True),
@@ -496,8 +508,8 @@ RecElectron = cms.untracked.bool(True),
 RecTau = cms.untracked.bool(True),
 RecJet = cms.untracked.bool(True),
 # collections
-MuonCollectionTag = cms.InputTag("slimmedMuons"), 
 L1MuonCollectionTag = cms.InputTag("l1extraParticles"),
+MuonCollectionTag = cms.InputTag("slimmedMuons"), 
 ElectronCollectionTag = cms.InputTag("slimmedElectrons"),
 TauCollectionTag = cms.InputTag("slimmedTaus"),
 JetCollectionTag = cms.InputTag("slimmedJets"),
@@ -510,22 +522,16 @@ BeamSpotCollectionTag =  cms.InputTag("offlineBeamSpot"),
 PVCollectionTag = cms.InputTag("offlineSlimmedPrimaryVertices"),
 # trigger info
 HLTriggerPaths = cms.untracked.vstring(
-'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v',
-'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v',
-'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v',
 'HLT_IsoMu24_eta2p1_v',
-'HLT_IsoMu27_v',
-'HLT_IsoMu17_eta2p1_LooseIsoPFTau20_v',
-#'HLT_Ele22_eta2p1_WP75_Gsf_LooseIsoPFTau20_v',
-'HLT_Ele22_eta2p1_WPLoose_Gsf_LooseIsoPFTau20_v',
-'HLT_Ele23_WPLoose_Gsf_v',
-'HLT_Ele22_eta2p1_WP75_Gsf_v',
-'HLT_Ele27_eta2p1_WP75_Gsf_v',
-'HLT_Ele32_eta2p1_WP75_Gsf_v',
-'HLT_Ele22_eta2p1_WPLoose_Gsf_v',
-'HLT_Ele27_eta2p1_WPLoose_Gsf_v',
-'HLT_Ele32_eta2p1_WPLoose_Gsf_v',
-'HLT_DoubleMediumIsoPFTau40_Trk1_eta2p1_Reg_v',
+'HLT_Mu24_v',
+'HLT_Mu24_eta2p1_v',
+'HLT_Mu27_v',
+'HLT_Mu34_v',
+'HLT_Mu17_Mu8_v',
+'HLT_Mu17_Mu8_DZ_v',
+'HLT_Mu17_Mu8_SameSign_DZ_v',
+'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v',
+'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v'
 ),
 TriggerProcess = cms.untracked.string("HLT"),
 # tracks
@@ -533,15 +539,28 @@ RecTrackPtMin = cms.untracked.double(0.5),
 RecTrackEtaMax = cms.untracked.double(2.4),
 RecTrackNum = cms.untracked.int32(0),
 # muons
-RecMuonPtMin = cms.untracked.double(8.),
+RecMuonPtMin = cms.untracked.double(5.),
 RecMuonEtaMax = cms.untracked.double(2.5),
 RecMuonHLTriggerMatching = cms.untracked.vstring(
-'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v.*:hltMu8TrkIsoVVLEle23CaloIdLTrackIdLIsoVLMuonlegL3IsoFiltered8', 
-'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v.*:hltMu23TrkIsoVVLEle12CaloIdLTrackIdLIsoVLMuonlegL3IsoFiltered23',
-'HLT_IsoMu17_eta2p1_LooseIsoPFTau20_v.*:hltL3crIsoL1sMu16erTauJet20erL1f0L2f10QL3f17QL3trkIsoFiltered0p09',
-'HLT_IsoMu17_eta2p1_LooseIsoPFTau20_v.*:hltOverlapFilterIsoMu17LooseIsoPFTau20',
-'HLT_IsoMu24_eta2p1_v.*:hltL3crIsoL1sMu20Eta2p1L1f0L2f10QL3f24QL3trkIsoFiltered0p09', 
-'HLT_IsoMu27_v.*:hltL3crIsoL1sMu25L1f0L2f10QL3f27QL3trkIsoFiltered0p09' 
+'HLT_IsoMu24_eta2p1_v.*:hltL3crIsoL1sMu20Eta2p1L1f0L2f10QL3f24QL3trkIsoFiltered0p09',
+'HLT_Mu24_v.*:hltL3fL1sMu16L1f0L2f16L3Filtered24',
+'HLT_Mu24_eta2p1_v.*:hltL3fL1sMu20Eta2p1L1f0L2f10QL3Filtered24Q',
+'HLT_Mu27_v.*:hltL3fL1sMu25L1f0L2f10QL3Filtered27Q',
+'HLT_Mu34_v.*:hltL3fL1sMu20L1f0L2f20L3Filtered34',
+'HLT_Mu17_Mu8_v.*:hltL3pfL1sDoubleMu103p5L1f0L2pf0L3PreFiltered8',
+'HLT_Mu17_Mu8_v.*:hltL3fL1sDoubleMu103p5L1f0L2f10OneMuL3Filtered17',
+'HLT_Mu17_Mu8_DZ_v.*:hltL3pfL1sDoubleMu103p5L1f0L2pf0L3PreFiltered8',
+'HLT_Mu17_Mu8_DZ_v.*:hltL3fL1sDoubleMu103p5L1f0L2f10OneMuL3Filtered17',
+'HLT_Mu17_Mu8_DZ_v.*:hltDiMuonGlb17Glb8DzFiltered0p2',
+'HLT_Mu17_Mu8_SameSign_DZ_v.*:hltL3pfL1sDoubleMu103p5L1f0L2pf0L3PreFiltered8',
+'HLT_Mu17_Mu8_SameSign_DZ_v.*:hltL3fL1sDoubleMu103p5L1f0L2f10OneMuL3Filtered17',
+'HLT_Mu17_Mu8_SameSign_DZ_v.*:hltDiMuonGlb17Glb8DzFiltered0p2',
+'HLT_Mu17_Mu8_SameSign_DZ_v.*:hltDiMuonGlb17Glb8DzFiltered0p2SameSign', 
+'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v.*:hltL3pfL1sDoubleMu103p5L1f0L2pf0L3PreFiltered8',
+'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v.*:hltL3fL1sDoubleMu103p5L1f0L2f10OneMuL3Filtered17',
+'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v.*:hltDiMuonGlb17Glb8RelTrkIsoFiltered0p4DzFiltered0p2',
+'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v.*:hltL3pfL1sDoubleMu103p5L1f0L2pf0L3PreFiltered8',
+'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v.*:hltL3fL1sDoubleMu103p5L1f0L2f10OneMuL3Filtered17'
 ),
 RecMuonNum = cms.untracked.int32(0),
 # photons
@@ -553,35 +572,12 @@ RecPhotonNum = cms.untracked.int32(0),
 RecElectronPtMin = cms.untracked.double(8.),
 RecElectronEtaMax = cms.untracked.double(2.6),
 RecElectronHLTriggerMatching = cms.untracked.vstring(
-'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v.*:hltMu23TrkIsoVVLEle12CaloIdLTrackIdLIsoVLElectronlegTrackIsoFilter', 
-'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v.*:hltMu8TrkIsoVVLEle23CaloIdLTrackIdLIsoVLElectronlegTrackIsoFilter', 
-'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v.*:hltEle23Ele12CaloIdLTrackIdLIsoVLTrackIsoLeg1Filter',
-'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v.*:hltEle23Ele12CaloIdLTrackIdLIsoVLTrackIsoLeg2Filter',
-'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v.*:hltEle23Ele12CaloIdLTrackIdLIsoVLDZFilter',
-#'HLT_Ele22_eta2p1_WP75_Gsf_LooseIsoPFTau20_v.*:hltSingleEle22WP75GsfTrackIsoFilter',
-#'HLT_Ele22_eta2p1_WP75_Gsf_LooseIsoPFTau20_v.*:hltOverlapFilterIsoEle22WP75GsfLooseIsoPFTau20',
-'HLT_Ele22_eta2p1_WPLoose_Gsf_LooseIsoPFTau20_v.*:hltSingleEle22WPLooseGsfTrackIsoFilter',
-'HLT_Ele22_eta2p1_WPLoose_Gsf_LooseIsoPFTau20_v.*:hltOverlapFilterIsoEle22WPLooseGsfLooseIsoPFTau20',
-'HLT_Ele22_eta2p1_WP75_Gsf_v.*:hltSingleEle22WP75GsfTrackIsoFilter',
-'HLT_Ele27_eta2p1_WP75_Gsf_v.*:hltEle27WP75GsfTrackIsoFilter',
-'HLT_Ele32_eta2p1_WP75_Gsf_v.*:hltEle32WP75GsfTrackIsoFilter',
-'HLT_Ele23_WPLoose_Gsf_v.*:hltEle23WPLooseGsfTrackIsoFilter',
-'HLT_Ele22_eta2p1_WPLoose_Gsf_v.*:hltEle22WPLooseGsfTrackIsoFilter',
-'HLT_Ele27_eta2p1_WPLoose_Gsf_v.*:hltEle27WPLooseGsfTrackIsoFilter',
-'HLT_Ele32_eta2p1_WPLoose_Gsf_v.*:hltEle32WPLooseGsfTrackIsoFilter'
 ),
 RecElectronNum = cms.untracked.int32(0),
 # taus
 RecTauPtMin = cms.untracked.double(18),
 RecTauEtaMax = cms.untracked.double(2.4),                                      
 RecTauHLTriggerMatching = cms.untracked.vstring(
-#'HLT_Ele22_eta2p1_WP75_Gsf_LooseIsoPFTau20_v.*:hltPFTau20TrackLooseIso',
-#'HLT_Ele22_eta2p1_WP75_Gsf_LooseIsoPFTau20_v.*:hltOverlapFilterIsoEle22WP75GsfLooseIsoPFTau20', 
-#'HLT_Ele22_eta2p1_WPLoose_Gsf_LooseIsoPFTau20_v.*:hltPFTau20TrackLooseIso',
-#'HLT_Ele22_eta2p1_WPLoose_Gsf_LooseIsoPFTau20_v.*:hltOverlapFilterIsoEle22WPLooseGsfLooseIsoPFTau20',
-#'HLT_IsoMu17_eta2p1_LooseIsoPFTau20_v.*:hltPFTau20TrackLooseIsoAgainstMuon',
-#'HLT_IsoMu17_eta2p1_LooseIsoPFTau20_v.*:hltOverlapFilterIsoMu17LooseIsoPFTau20',
-#'HLT_DoubleMediumIsoPFTau40_Trk1_eta2p1_Reg_v.*:hltDoublePFTau40TrackPt1MediumIsolationDz02Reg'
 ),
 RecTauFloatDiscriminators = cms.untracked.vstring(
 #'againstElectronLoose',
@@ -659,12 +655,13 @@ RecJetBtagDiscriminators = cms.untracked.vstring(
 'simpleSecondaryVertexHighPurBJetTags',
 'combinedInclusiveSecondaryVertexV2BJetTags',
 'pfCombinedSecondaryVertexBJetTags',
-'pfCombinedInclusiveSecondaryVertexV2BJetTags',
 'combinedMVABJetTags'
 ),
 RecJetNum = cms.untracked.int32(0),
-SampleName = cms.untracked.string("MC") 
+SampleName = cms.untracked.string("Data") 
 )
+
+#process.patJets.addBTagInfo = cms.bool(True)
 
 
 process.p = cms.Path(

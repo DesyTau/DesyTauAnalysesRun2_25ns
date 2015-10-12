@@ -3,7 +3,8 @@ import FWCore.ParameterSet.Config as cms
 isData = False
 #skim = 0
 year = 2015
-#period = 'Spring15'
+#period = 'Run2015B'
+period = "Spring15"
 #sampleName = 'MonteCarlo'
 # sampleName = 'TTJets', "QCD", "DYJetsToLL_M50"
 
@@ -29,34 +30,37 @@ process.load("Configuration.StandardSequences.MagneticField_cff")
 
 from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag
 #process.GlobalTag = GlobalTag(process.GlobalTag, 'MCRUN2_74_V7C', '')
-process.GlobalTag = GlobalTag(process.GlobalTag, 'MCRUN2_74_V9A', '')
-#process.GlobalTag = GlobalTag(process.GlobalTag, 'MCRUN2_74_V9', '')
+process.GlobalTag = GlobalTag(process.GlobalTag, '74X_dataRun2_Prompt_v0', '')
+
 #process.GlobalTag.globaltag = cms.string('MCRUN2_74_V9::Al')
-#process.GlobalTag.globaltag = cms.string('MCRUN2_74_V9')
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(1000)
+    input = cms.untracked.int32(-1)
 )
 
 process.source = cms.Source("PoolSource",
-		fileNames = cms.untracked.vstring(
-		# SUSYGluGluToBBHToTauTau_M-160
-#		'/store/mc/RunIISpring15DR74/SUSYGluGluToBBHToTauTau_M-160_TuneCUETP8M1_13TeV-pythia8/MINIAODSIM/Asympt25ns_MCRUN2_74_V9-v2/50000/1A81092B-1A11-E511-B683-002618943849.root'
-		# SUSYGluGluToHToTauTau_M-160
-#		'/store/mc/RunIISpring15DR74/SUSYGluGluToHToTauTau_M-160_TuneCUETP8M1_13TeV-pythia8/MINIAODSIM/Asympt25ns_MCRUN2_74_V9-v1/10000/2A3929AE-5303-E511-9EFE-0025905A48C0.root'
-		# DYJetsToLL_M-50 (aMC@NLO 25ns)
-		'/store/mc/RunIISpring15DR74/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/Asympt25ns_MCRUN2_74_V9-v3/10000/009D49A5-7314-E511-84EF-0025905A605E.root'
-		# DYJetsToLL_M-50 (aMC@NLO 50ns)
+	fileNames = cms.untracked.vstring(
+# DYJets (25 ns)
+		'/store/mc/RunIISpring15DR74/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/Asympt25ns_MCRUN2_74_V9-v3/10000/009D49A5-7314-E511-84EF-0025905A605E.root',
+		'/store/mc/RunIISpring15DR74/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/Asympt25ns_MCRUN2_74_V9-v3/10000/00C0BECF-6F14-E511-96F8-0025904B739A.root',
+		'/store/mc/RunIISpring15DR74/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/Asympt25ns_MCRUN2_74_V9-v3/10000/0260F225-7614-E511-A79F-00A0D1EE8EB4.root',
+		'/store/mc/RunIISpring15DR74/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/Asympt25ns_MCRUN2_74_V9-v3/10000/02B810EA-7214-E511-BDAB-0025905964C2.root',
+		'/store/mc/RunIISpring15DR74/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/Asympt25ns_MCRUN2_74_V9-v3/10000/02CEA7DD-7714-E511-A93E-00266CFAEA68.root',
+		'/store/mc/RunIISpring15DR74/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/Asympt25ns_MCRUN2_74_V9-v3/10000/0453351C-7014-E511-A296-0025905B85AA.root',
+		'/store/mc/RunIISpring15DR74/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/Asympt25ns_MCRUN2_74_V9-v3/10000/0679BC6F-7714-E511-945E-0025905B8562.root',
+		'/store/mc/RunIISpring15DR74/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/Asympt25ns_MCRUN2_74_V9-v3/10000/0823BF6F-7814-E511-8E48-00A0D1EE8B08.root',
+		'/store/mc/RunIISpring15DR74/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/Asympt25ns_MCRUN2_74_V9-v3/10000/08271551-9714-E511-B209-0025907FD2DA.root'
+# DYJets (50 ns)
 #		'/store/mc/RunIISpring15DR74/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/Asympt50ns_MCRUN2_74_V9A-v2/00000/02DE3B74-6C08-E511-ABE3-0025905A60D0.root'
-		# TTJets
-#		'/store/mc/RunIISpring15DR74/TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/Asympt50ns_MCRUN2_74_V9A-v1/00000/00466730-F801-E511-9594-549F35AF450A.root'
-		)	    
-##    dropDescendantsOfDroppedBranches=cms.untracked.bool(False),
-##    inputCommands=cms.untracked.vstring(
-##        'keep *',
-##        'drop patTaus_*_*_*',
-##        'drop *PFTau*_*_*_*'
-##    )
+# /JpsiToMuMu_OniaMuonFilter_TuneCUEP8M1_13TeV-pythia8/RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v2/MINIAODSIM
+#		'/store/mc/RunIISpring15DR74/JpsiToMuMu_OniaMuonFilter_TuneCUEP8M1_13TeV-pythia8/MINIAODSIM/Asympt50ns_MCRUN2_74_V9A-v2/20000/02AD184C-B527-E511-A654-0025905A612C.root',
+#		'/store/mc/RunIISpring15DR74/JpsiToMuMu_OniaMuonFilter_TuneCUEP8M1_13TeV-pythia8/MINIAODSIM/Asympt50ns_MCRUN2_74_V9A-v2/20000/06660B0D-132C-E511-8440-0CC47A13CEAC.root',
+#		'/store/mc/RunIISpring15DR74/JpsiToMuMu_OniaMuonFilter_TuneCUEP8M1_13TeV-pythia8/MINIAODSIM/Asympt50ns_MCRUN2_74_V9A-v2/20000/0AA97DB6-F62B-E511-8A3F-20CF3027A594.root',
+#		'/store/mc/RunIISpring15DR74/JpsiToMuMu_OniaMuonFilter_TuneCUEP8M1_13TeV-pythia8/MINIAODSIM/Asympt50ns_MCRUN2_74_V9A-v2/20000/0C7C6DA1-B427-E511-B640-0025905C2CD0.root',
+#		'/store/mc/RunIISpring15DR74/JpsiToMuMu_OniaMuonFilter_TuneCUEP8M1_13TeV-pythia8/MINIAODSIM/Asympt50ns_MCRUN2_74_V9A-v2/20000/0CDA43E5-B427-E511-BEB7-0025905A48FC.root',
+#		'/store/mc/RunIISpring15DR74/JpsiToMuMu_OniaMuonFilter_TuneCUEP8M1_13TeV-pythia8/MINIAODSIM/Asympt50ns_MCRUN2_74_V9A-v2/20000/0E12C74A-F72B-E511-A866-20CF300E9EC1.root',
+#		'/store/mc/RunIISpring15DR74/JpsiToMuMu_OniaMuonFilter_TuneCUEP8M1_13TeV-pythia8/MINIAODSIM/Asympt50ns_MCRUN2_74_V9A-v2/20000/14386780-BD27-E511-B94B-0025904C656A.root'
+        )		    
 )
  
 #####################################################
@@ -474,13 +478,11 @@ process.puJetIdSequence += process.makePatJets
 '''
 ##################################################
 # Main
-
-#process.patJets.addBTagInfo = cms.bool(True)
 process.makeroottree = cms.EDAnalyzer("NTupleMaker",
 # data, year, period, skim
 IsData = cms.untracked.bool(isData),
 Year = cms.untracked.uint32(year),
-Period = cms.untracked.string("Spring15"),
+Period = cms.untracked.string(period),
 Skim = cms.untracked.uint32(0),
 # switches of collections
 GenParticles = cms.untracked.bool(True),
@@ -496,8 +498,8 @@ RecElectron = cms.untracked.bool(True),
 RecTau = cms.untracked.bool(True),
 RecJet = cms.untracked.bool(True),
 # collections
-MuonCollectionTag = cms.InputTag("slimmedMuons"), 
 L1MuonCollectionTag = cms.InputTag("l1extraParticles"),
+MuonCollectionTag = cms.InputTag("slimmedMuons"), 
 ElectronCollectionTag = cms.InputTag("slimmedElectrons"),
 TauCollectionTag = cms.InputTag("slimmedTaus"),
 JetCollectionTag = cms.InputTag("slimmedJets"),
@@ -510,22 +512,17 @@ BeamSpotCollectionTag =  cms.InputTag("offlineBeamSpot"),
 PVCollectionTag = cms.InputTag("offlineSlimmedPrimaryVertices"),
 # trigger info
 HLTriggerPaths = cms.untracked.vstring(
-'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v',
-'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v',
-'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v',
 'HLT_IsoMu24_eta2p1_v',
-'HLT_IsoMu27_v',
-'HLT_IsoMu17_eta2p1_LooseIsoPFTau20_v',
-#'HLT_Ele22_eta2p1_WP75_Gsf_LooseIsoPFTau20_v',
-'HLT_Ele22_eta2p1_WPLoose_Gsf_LooseIsoPFTau20_v',
-'HLT_Ele23_WPLoose_Gsf_v',
-'HLT_Ele22_eta2p1_WP75_Gsf_v',
-'HLT_Ele27_eta2p1_WP75_Gsf_v',
-'HLT_Ele32_eta2p1_WP75_Gsf_v',
-'HLT_Ele22_eta2p1_WPLoose_Gsf_v',
-'HLT_Ele27_eta2p1_WPLoose_Gsf_v',
-'HLT_Ele32_eta2p1_WPLoose_Gsf_v',
-'HLT_DoubleMediumIsoPFTau40_Trk1_eta2p1_Reg_v',
+'HLT_Mu24_v',
+'HLT_Mu24_eta2p1_v',
+'HLT_Mu27_v',
+'HLT_Mu34_v',
+'HLT_Mu45_eta2p1_v',
+'HLT_Mu17_Mu8_v',
+'HLT_Mu17_Mu8_DZ_v',
+'HLT_Mu17_Mu8_SameSign_v',
+'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v',
+'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v'
 ),
 TriggerProcess = cms.untracked.string("HLT"),
 # tracks
@@ -533,15 +530,29 @@ RecTrackPtMin = cms.untracked.double(0.5),
 RecTrackEtaMax = cms.untracked.double(2.4),
 RecTrackNum = cms.untracked.int32(0),
 # muons
-RecMuonPtMin = cms.untracked.double(8.),
+RecMuonPtMin = cms.untracked.double(5.),
 RecMuonEtaMax = cms.untracked.double(2.5),
 RecMuonHLTriggerMatching = cms.untracked.vstring(
-'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v.*:hltMu8TrkIsoVVLEle23CaloIdLTrackIdLIsoVLMuonlegL3IsoFiltered8', 
-'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v.*:hltMu23TrkIsoVVLEle12CaloIdLTrackIdLIsoVLMuonlegL3IsoFiltered23',
-'HLT_IsoMu17_eta2p1_LooseIsoPFTau20_v.*:hltL3crIsoL1sMu16erTauJet20erL1f0L2f10QL3f17QL3trkIsoFiltered0p09',
-'HLT_IsoMu17_eta2p1_LooseIsoPFTau20_v.*:hltOverlapFilterIsoMu17LooseIsoPFTau20',
-'HLT_IsoMu24_eta2p1_v.*:hltL3crIsoL1sMu20Eta2p1L1f0L2f10QL3f24QL3trkIsoFiltered0p09', 
-'HLT_IsoMu27_v.*:hltL3crIsoL1sMu25L1f0L2f10QL3f27QL3trkIsoFiltered0p09' 
+'HLT_IsoMu24_eta2p1_v.*:hltL3crIsoL1sMu20Eta2p1L1f0L2f10QL3f24QL3trkIsoFiltered0p09',
+'HLT_Mu24_v.*:hltL3fL1sMu16L1f0L2f16L3Filtered24',
+'HLT_Mu24_eta2p1_v.*:hltL3fL1sMu20Eta2p1L1f0L2f10QL3Filtered24Q',
+'HLT_Mu27_v.*:hltL3fL1sMu25L1f0L2f10QL3Filtered27Q',
+'HLT_Mu34_v.*:hltL3fL1sMu20L1f0L2f20L3Filtered34',
+'HLT_Mu45_eta2p1_v.*:hltL3fL1sMu16orMu25L1f0L2f16QL3Filtered45e2p1Q',
+'HLT_Mu17_Mu8_v.*:hltL3pfL1sDoubleMu103p5L1f0L2pf0L3PreFiltered8',
+'HLT_Mu17_Mu8_v.*:hltL3fL1sDoubleMu103p5L1f0L2f10OneMuL3Filtered17',
+'HLT_Mu17_Mu8_DZ_v.*:hltL3pfL1sDoubleMu103p5L1f0L2pf0L3PreFiltered8',
+'HLT_Mu17_Mu8_DZ_v.*:hltL3fL1sDoubleMu103p5L1f0L2f10OneMuL3Filtered17',
+'HLT_Mu17_Mu8_DZ_v.*:hltDiMuonGlb17Glb8DzFiltered0p2',
+'HLT_Mu17_Mu8_SameSign_v.*:hltL3pfL1sDoubleMu103p5L1f0L2pf0L3PreFiltered8',
+'HLT_Mu17_Mu8_SameSign_v.*:hltL3fL1sDoubleMu103p5L1f0L2f10OneMuL3Filtered17',
+'HLT_Mu17_Mu8_SameSign_v.*:hltDiMuonGlb17Glb8DzFiltered0p2',
+'HLT_Mu17_Mu8_SameSign_v.*:hltDiMuonGlb17Glb8DzFiltered0p2SameSign', 
+'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v.*:hltL3pfL1sDoubleMu103p5L1f0L2pf0L3PreFiltered8',
+'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v.*:hltL3fL1sDoubleMu103p5L1f0L2f10OneMuL3Filtered17',
+'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v.*:hltDiMuonGlb17Glb8RelTrkIsoFiltered0p4DzFiltered0p2',
+'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v.*:hltL3pfL1sDoubleMu103p5L1f0L2pf0L3PreFiltered8',
+'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v.*:hltL3fL1sDoubleMu103p5L1f0L2f10OneMuL3Filtered17'
 ),
 RecMuonNum = cms.untracked.int32(0),
 # photons
@@ -553,35 +564,12 @@ RecPhotonNum = cms.untracked.int32(0),
 RecElectronPtMin = cms.untracked.double(8.),
 RecElectronEtaMax = cms.untracked.double(2.6),
 RecElectronHLTriggerMatching = cms.untracked.vstring(
-'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v.*:hltMu23TrkIsoVVLEle12CaloIdLTrackIdLIsoVLElectronlegTrackIsoFilter', 
-'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v.*:hltMu8TrkIsoVVLEle23CaloIdLTrackIdLIsoVLElectronlegTrackIsoFilter', 
-'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v.*:hltEle23Ele12CaloIdLTrackIdLIsoVLTrackIsoLeg1Filter',
-'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v.*:hltEle23Ele12CaloIdLTrackIdLIsoVLTrackIsoLeg2Filter',
-'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v.*:hltEle23Ele12CaloIdLTrackIdLIsoVLDZFilter',
-#'HLT_Ele22_eta2p1_WP75_Gsf_LooseIsoPFTau20_v.*:hltSingleEle22WP75GsfTrackIsoFilter',
-#'HLT_Ele22_eta2p1_WP75_Gsf_LooseIsoPFTau20_v.*:hltOverlapFilterIsoEle22WP75GsfLooseIsoPFTau20',
-'HLT_Ele22_eta2p1_WPLoose_Gsf_LooseIsoPFTau20_v.*:hltSingleEle22WPLooseGsfTrackIsoFilter',
-'HLT_Ele22_eta2p1_WPLoose_Gsf_LooseIsoPFTau20_v.*:hltOverlapFilterIsoEle22WPLooseGsfLooseIsoPFTau20',
-'HLT_Ele22_eta2p1_WP75_Gsf_v.*:hltSingleEle22WP75GsfTrackIsoFilter',
-'HLT_Ele27_eta2p1_WP75_Gsf_v.*:hltEle27WP75GsfTrackIsoFilter',
-'HLT_Ele32_eta2p1_WP75_Gsf_v.*:hltEle32WP75GsfTrackIsoFilter',
-'HLT_Ele23_WPLoose_Gsf_v.*:hltEle23WPLooseGsfTrackIsoFilter',
-'HLT_Ele22_eta2p1_WPLoose_Gsf_v.*:hltEle22WPLooseGsfTrackIsoFilter',
-'HLT_Ele27_eta2p1_WPLoose_Gsf_v.*:hltEle27WPLooseGsfTrackIsoFilter',
-'HLT_Ele32_eta2p1_WPLoose_Gsf_v.*:hltEle32WPLooseGsfTrackIsoFilter'
 ),
 RecElectronNum = cms.untracked.int32(0),
 # taus
 RecTauPtMin = cms.untracked.double(18),
 RecTauEtaMax = cms.untracked.double(2.4),                                      
 RecTauHLTriggerMatching = cms.untracked.vstring(
-#'HLT_Ele22_eta2p1_WP75_Gsf_LooseIsoPFTau20_v.*:hltPFTau20TrackLooseIso',
-#'HLT_Ele22_eta2p1_WP75_Gsf_LooseIsoPFTau20_v.*:hltOverlapFilterIsoEle22WP75GsfLooseIsoPFTau20', 
-#'HLT_Ele22_eta2p1_WPLoose_Gsf_LooseIsoPFTau20_v.*:hltPFTau20TrackLooseIso',
-#'HLT_Ele22_eta2p1_WPLoose_Gsf_LooseIsoPFTau20_v.*:hltOverlapFilterIsoEle22WPLooseGsfLooseIsoPFTau20',
-#'HLT_IsoMu17_eta2p1_LooseIsoPFTau20_v.*:hltPFTau20TrackLooseIsoAgainstMuon',
-#'HLT_IsoMu17_eta2p1_LooseIsoPFTau20_v.*:hltOverlapFilterIsoMu17LooseIsoPFTau20',
-#'HLT_DoubleMediumIsoPFTau40_Trk1_eta2p1_Reg_v.*:hltDoublePFTau40TrackPt1MediumIsolationDz02Reg'
 ),
 RecTauFloatDiscriminators = cms.untracked.vstring(
 #'againstElectronLoose',
@@ -659,12 +647,13 @@ RecJetBtagDiscriminators = cms.untracked.vstring(
 'simpleSecondaryVertexHighPurBJetTags',
 'combinedInclusiveSecondaryVertexV2BJetTags',
 'pfCombinedSecondaryVertexBJetTags',
-'pfCombinedInclusiveSecondaryVertexV2BJetTags',
 'combinedMVABJetTags'
 ),
 RecJetNum = cms.untracked.int32(0),
-SampleName = cms.untracked.string("MC") 
+SampleName = cms.untracked.string("Data") 
 )
+
+#process.patJets.addBTagInfo = cms.bool(True)
 
 
 process.p = cms.Path(
@@ -682,10 +671,6 @@ process.p = cms.Path(
 #    process.puJetIdSequence*
     process.makeroottree
     )
-
-
-
-
 
 
 process.TFileService = cms.Service("TFileService",
