@@ -36,7 +36,7 @@
 #include <TString.h>
 
 using namespace reco;
-
+using namespace pat;
 //typedef std::vector<NSVfitEventHypothesisByIntegration> NSVfitEventHypothesisByIntegrationCollection;
 typedef ROOT::Math::XYZVector Vector;
 
@@ -142,9 +142,17 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
   mvaCategoriesMapToken_(consumes<edm::ValueMap<int> >(iConfig.getParameter<edm::InputTag>("mvaCategoriesMap"))),
   TauCollectionTag_(iConfig.getParameter<edm::InputTag>("TauCollectionTag")),
   JetCollectionTag_(iConfig.getParameter<edm::InputTag>("JetCollectionTag")),
+  /*
   MetCollectionTag_(iConfig.getParameter<edm::InputTag>("MetCollectionTag")),
   MetCorrCollectionTag_(iConfig.getParameter<edm::InputTag>("MetCorrCollectionTag")),
-  MvaMetCollectionsTag_(iConfig.getParameter<std::vector<edm::InputTag> >("MvaMetCollectionsTag")),
+  */
+  //MetCollectionTag_(iConfig.getParameter<edm::EDGetToken>("MetCollectionTag")),
+  //MetCollectionTag_(consumes<pat::METCollection>(iConfig.getParameter<edm::InputTag>("MetCollectionTag"))),
+  MetCollectionTag_(consumes<pat::METCollection>(iConfig.getParameter<edm::InputTag>("MetCollectionTag"))),
+  MetCorrCollectionTag_(consumes<pat::METCollection>(iConfig.getParameter<edm::InputTag>("MetCorrCollectionTag"))),
+  
+  //MvaMetCollectionsTag_(iConfig.getParameter<std::vector<edm::InputTag> >("MvaMetCollectionsTag")),
+  //MvaMetCollectionsTag_(consumes<pat::METCollection>(iConfig.getParameter<edm::InputTag>("MvaMetCollectionsTag"))),
   TrackCollectionTag_(iConfig.getParameter<edm::InputTag>("TrackCollectionTag")),
   GenParticleCollectionTag_(iConfig.getParameter<edm::InputTag>("GenParticleCollectionTag")),
   TriggerObjectCollectionTag_(iConfig.getParameter<edm::InputTag>("TriggerObjectCollectionTag")),
@@ -1251,7 +1259,8 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   if(crecpfmet)
     {
       edm::Handle<pat::METCollection> patMet;
-      iEvent.getByLabel(MetCollectionTag_, patMet);
+      //iEvent.getByLabel(MetCollectionTag_, patMet);
+      iEvent.getByToken(MetCollectionTag_, patMet);
 
       assert(patMet->size() > 0);
       pfmet_ex = (*patMet)[0].px();
@@ -1282,7 +1291,8 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   if(crecpfmetcorr)
     {
       edm::Handle<pat::METCollection> patMet;
-      iEvent.getByLabel(MetCorrCollectionTag_, patMet);
+      //iEvent.getByLabel(MetCorrCollectionTag_, patMet);
+      iEvent.getByToken(MetCorrCollectionTag_, patMet);
 
       assert(patMet->size() > 0);
       pfmetcorr_ex = (*patMet)[0].px();
@@ -1309,16 +1319,18 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     {
       int numberOfElectrons = int(AddElectrons(iEvent,iSetup));
     } // crecelectron
-  
+  /*
   if(doDebug)  cout<<"add MVA MET"<< endl; 
   if(crecmvamet)
     {
       for(std::vector<edm::InputTag>::iterator mit = MvaMetCollectionsTag_.begin();
-	  mit != MvaMetCollectionsTag_.end(); mit++){
+	
+         mit != MvaMetCollectionsTag_.end(); mit++){
 	
 	//collect MVA Mets
 	edm::Handle<pat::METCollection> imets;
 	iEvent.getByLabel(*mit, imets);
+        //iEvent.getByToken(*mit, imets);
 
 	if(!imets.isValid()) continue;	
 	if(imets->size() == 0)continue;
@@ -1362,7 +1374,7 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	}
       }	
     }// crecmvamet
-
+*/
   if(doDebug)  cout<<"add rho"<< endl; 
   // rho neutral
   edm::Handle<double> rho;
