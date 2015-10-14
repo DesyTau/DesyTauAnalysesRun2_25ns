@@ -2,8 +2,8 @@ export USERNAME=YOURUSERNAME
 
 export CMSSW_GIT_REFERENCE=/nfs/dust/cms/user/${USERNAME}/.cmsgit-cache
 
-cmsrel CMSSW_7_4_15
-cd CMSSW_7_4_15/src
+cmsrel CMSSW_7_4_14
+cd CMSSW_7_4_14/src
 cmsenv
 
 git cms-init
@@ -18,7 +18,7 @@ git checkout svFit_2015Apr03
 cd ${CMSSW_BASE}/src/
 
 ## Electron id
-git cms-merge-topic ikrav:egm_id_747_v2
+git cms-merge-topic ikrav:egm_id_7.4.12_v1
 
 ## MVA MEt
 git cms-addpkg RecoMET/METPUSubtraction/
