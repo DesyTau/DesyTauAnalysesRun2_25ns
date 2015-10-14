@@ -61,7 +61,8 @@
 #include "DataFormats/TauReco/interface/PFTau.h"
 #include "DataFormats/TauReco/interface/PFTauFwd.h"
 #include "DataFormats/TauReco/interface/PFTauDiscriminator.h"
-#include "DataFormats/METReco/interface/MET.h"
+//#include "DataFormats/METReco/interface/MET.h"
+#include "DataFormats/PatCandidates/interface/MET.h"
 #include "DataFormats/METReco/interface/METFwd.h"
 #include "DataFormats/METReco/interface/CaloMET.h"
 #include "DataFormats/METReco/interface/CaloMETFwd.h"
@@ -135,7 +136,7 @@
 #include "EgammaAnalysis/ElectronTools/interface/EGammaMvaEleEstimatorCSA14.h"
 
 #include "DataFormats/Common/interface/ValueMap.h"
-//#include "FWCore/Utilities/interface/EDGetToken.h"
+#include "FWCore/Utilities/interface/EDGetToken.h"
 
 using namespace std;
 using namespace reco;
@@ -345,9 +346,13 @@ class NTupleMaker : public edm::EDAnalyzer{
 
   edm::InputTag TauCollectionTag_;
   edm::InputTag JetCollectionTag_;
-  edm::InputTag MetCollectionTag_;
-  edm::InputTag MetCorrCollectionTag_;
-  std::vector<edm::InputTag> MvaMetCollectionsTag_;
+
+  //edm::InputTag MetCollectionTag_;
+  edm::EDGetTokenT<pat::METCollection> MetCollectionTag_;
+  edm::EDGetTokenT<pat::METCollection> MetCorrCollectionTag_;
+  //edm::InputTag MetCorrCollectionTag_;
+  //edm::EDGetTokenT<pat::METCollection> MvaMetCollectionsTag_;
+  //std::vector<edm::InputTag> MvaMetCollectionsTag_;
   edm::InputTag TrackCollectionTag_;
   edm::InputTag GenParticleCollectionTag_;
   edm::InputTag TriggerObjectCollectionTag_;
