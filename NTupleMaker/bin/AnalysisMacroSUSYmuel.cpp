@@ -45,6 +45,7 @@ int main(int argc, char * argv[]) {
   string SelectionSign="muel";
 
   // kinematic cuts on electrons
+  const bool isData = cfg.get<bool>("IsData");
   const float ptElectronLowCut   = cfg.get<float>("ptElectronLowCut");
   const float ptElectronHighCut  = cfg.get<float>("ptElectronHighCut");
   const float etaElectronCut     = cfg.get<float>("etaElectronCut");
@@ -280,10 +281,10 @@ int main(int argc, char * argv[]) {
       
       
       Float_t weight = 1;
-      isData= false;
+      //isData= false;
       bool lumi=false;
 
-      if (XSec == 1)  isData = true;
+      //if (XSec == 1)  isData = true;
       if (!isData && XSec !=1 )  { 
 
      	      histWeights->Fill(1,weight); 
