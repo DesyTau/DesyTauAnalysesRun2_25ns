@@ -1,4 +1,4 @@
-export USERNAME=YOURUSERNAME
+export USERNAME=$USER
 
 export CMSSW_GIT_REFERENCE=/nfs/dust/cms/user/${USERNAME}/.cmsgit-cache
 

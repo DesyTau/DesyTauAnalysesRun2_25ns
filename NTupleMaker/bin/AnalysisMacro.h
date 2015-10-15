@@ -23,7 +23,7 @@ unsigned int tau_index=-1;
 unsigned int mu_index=-1;
 unsigned int el_index=-1;
 
-bool isData = false;
+//bool isData = false;
 
 double ChiMass=0;
 double mIntermediate = tauMass;
@@ -31,11 +31,40 @@ double mIntermediate = tauMass;
 Float_t XSec=-1;
 Float_t xs,fact,fact2;
   
+  int nPtBins = 6;
+  float ptBins[7] = {10,15,20,30,40,60,1000};
+
+  int nPtBinsTrig = 7;
+  float ptBinsTrig[8] = {10,15,19,24,30,40,60,1000};  
+  
+  int nEtaBins = 2;
+  float etaBins[3] = {0,1.48,2.5}; 
+  
+  TString PtBins[6] = {"Pt10to15",
+		       "Pt15to20",
+		       "Pt20to30",
+		       "Pt30to40",
+		       "Pt40to60",
+		       "PtGt60"};
+  
+  TString PtBinsTrig[7] = {"Pt10to15",
+			   "Pt15to19",
+			   "Pt19to24",
+			   "Pt24to30",
+			   "Pt30to40",
+			   "Pt40to60",
+			   "PtGt60"};
+
+  TString EtaBins[2] = {"Barrel",
+			"Endcap"};
+
 //string CutList[10];
 vector<string> CutList;
 
 //TH1D * histWeights = new TH1D("histWeights","",1,-0.5,0.5);
 TH1D * histWeights = new TH1D("histWeights","",1,0,0);
+
+TH1F * histWeightsH = new TH1F("histWeightsH","",1,-0.5,0.5);
 
 TH1D * histWeights2 = new TH1D("histWeights2","",1,0,0);
 
@@ -512,11 +541,16 @@ bool electronVetoTight(Float_t SuperClusterEta, Float_t eta, Float_t phi, Float_
 
 
 
+void WriteHists(int CutNer, TFile *in, TString dir){
 
+	in->cd(dir);
 
+  for(int cj = 0; cj < CutNer; cj++)
+    {
 
-
-
+      hHTOsqrMET[cj]->Write();
+    }
+}
 
 //string CutList[CutN];// ={"No cut","Trigger","2- l", "dR < "};
 void SetupHists(int CutNer){
@@ -572,7 +606,7 @@ void SetupHists(int CutNer){
       hnBJet[cj] = new TH1D ("nBJet_"+nCut,"nBJet "+cutName,20,0,20);
       hnBJet[cj]->Sumw2();
 
-      hWeights[cj] = new TH1D ("hWeights_"+nCut,"hWeights "+cutName,20,0,0);
+      hWeights[cj] = new TH1D ("hWeights_"+nCut,"hWeights "+cutName,10,-1,9);
       hWeights[cj]->Sumw2();
 	
       hInvMassMuTau[cj] = new TH1D ("hInvMassMuTau_"+nCut,"hInvMassMuTau "+cutName,80,0,160);
@@ -787,6 +821,7 @@ void FillMainHists(int CutIndex, Double_t EvWeight, vector<TLorentzVector>  ElV,
 
 void FillMainHists(int CutIndex, Double_t EvWeight, vector<TLorentzVector>  ElV, vector<TLorentzVector>  MuV, vector<TLorentzVector>  TauV, vector<TLorentzVector>  JetsV, TLorentzVector  MetV, double Chimass, double mintermediate,AC1B &tree_, string & Sel, int  mIndex, int eIndex, int  tIndex){	
 
+
   Float_t sumpT=0;
 
   Float_t sumMuonpT=0;
@@ -824,8 +859,9 @@ void FillMainHists(int CutIndex, Double_t EvWeight, vector<TLorentzVector>  ElV,
   //
   //cout << " Passing arguments befor" << JetsV.size()<<" muV "<<MuV.size()<<" tauV "<<TauV.size()<<" elV "<<ElV.size()<<" elI "<<eIndex<<" mI "<<mIndex<<"  tI "<<tIndex<<endl;
   if (Sel=="mutau" && MuV.size()>0 && TauV.size()>0 && mIndex >-1 && tIndex >-1 ){
-	double Mt2 =  asymm_mt2_lester_bisect::get_mT2(muonMass, muV.Px(), muV.Py(),tauMass,tauV.Px(),tauV.Py(),MetV.Px(),MetV.Py(),Chimass,Chimass,0);
-      //cout<<" Will call with Mt2 "<<Mt2<<"   "<<Chimass<<endl;
+	double Mt2 = 0;
+	       	//Mt2 =asymm_mt2_lester_bisect::get_mT2(muonMass, muV.Px(), muV.Py(),tauMass,tauV.Px(),tauV.Py(),MetV.Px(),MetV.Py(),Chimass,Chimass,0);
+   //   cout<<" Will call with Mt2 "<<Mt2<<"   "<<Chimass<<endl;
 	hMt2mutau[CutIndex]->Fill(Mt2,EvWeight);
  
 	//double mTB = Lester::mTBound(muV.E(), muV.Px(), muV.Py(), muV.Pz(), tauV.E(),tauV.Px(),tauV.Py(),tauV.Pz(),MetV.Px(),MetV.Py(), mintermediate);
