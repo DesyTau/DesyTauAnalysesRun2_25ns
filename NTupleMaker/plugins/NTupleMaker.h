@@ -137,6 +137,7 @@
 
 #include "DataFormats/Common/interface/ValueMap.h"
 #include "FWCore/Utilities/interface/EDGetToken.h"
+#include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
 
 using namespace std;
 using namespace reco;
@@ -296,6 +297,7 @@ class NTupleMaker : public edm::EDAnalyzer{
   bool crecpfjet;
   bool crecpfmet;
   bool crecpfmetcorr;
+  bool crecpuppimet;
   bool crecmvamet;
 
   vector<string> cHLTriggerPaths;
@@ -338,11 +340,19 @@ class NTupleMaker : public edm::EDAnalyzer{
   // Electron Configuration
   edm::InputTag ElectronCollectionTag_;
   //// ID decisions objects
+  edm::EDGetTokenT<edm::ValueMap<bool> > eleVetoIdMapToken_;
+  edm::EDGetTokenT<edm::ValueMap<bool> > eleLooseIdMapToken_;
   edm::EDGetTokenT<edm::ValueMap<bool> > eleMediumIdMapToken_;
   edm::EDGetTokenT<edm::ValueMap<bool> > eleTightIdMapToken_;
+  edm::EDGetTokenT<edm::ValueMap<bool> > eleMvaNonTrigWP80MapToken_;
+  edm::EDGetTokenT<edm::ValueMap<bool> > eleMvaNonTrigWP90MapToken_;
+  edm::EDGetTokenT<edm::ValueMap<bool> > eleMvaTrigWP80MapToken_;
+  edm::EDGetTokenT<edm::ValueMap<bool> > eleMvaTrigWP90MapToken_;
   //// MVA values and categories
-  edm::EDGetTokenT<edm::ValueMap<float> > mvaValuesMapToken_;
-  edm::EDGetTokenT<edm::ValueMap<int> > mvaCategoriesMapToken_;
+  edm::EDGetTokenT<edm::ValueMap<float> > mvaNonTrigValuesMapToken_;
+  edm::EDGetTokenT<edm::ValueMap<int> >   mvaNonTrigCategoriesMapToken_;
+  edm::EDGetTokenT<edm::ValueMap<float> > mvaTrigValuesMapToken_;
+  edm::EDGetTokenT<edm::ValueMap<int> >   mvaTrigCategoriesMapToken_;
 
   edm::InputTag TauCollectionTag_;
   edm::InputTag JetCollectionTag_;
@@ -350,6 +360,7 @@ class NTupleMaker : public edm::EDAnalyzer{
   //edm::InputTag MetCollectionTag_;
   edm::EDGetTokenT<pat::METCollection> MetCollectionTag_;
   edm::EDGetTokenT<pat::METCollection> MetCorrCollectionTag_;
+  edm::EDGetTokenT<pat::METCollection> PuppiMetCollectionTag_;
   //edm::InputTag MetCorrCollectionTag_;
   //edm::EDGetTokenT<pat::METCollection> MvaMetCollectionsTag_;
   //std::vector<edm::InputTag> MvaMetCollectionsTag_;
@@ -519,10 +530,14 @@ class NTupleMaker : public edm::EDAnalyzer{
   Float_t pfjet_pt[M_jetmaxcount];
   Float_t pfjet_eta[M_jetmaxcount];
   Float_t pfjet_phi[M_jetmaxcount];
+
   Float_t pfjet_neutralhadronicenergy[M_jetmaxcount];
   Float_t pfjet_chargedhadronicenergy[M_jetmaxcount];
   Float_t pfjet_neutralemenergy[M_jetmaxcount];
   Float_t pfjet_chargedemenergy[M_jetmaxcount];
+  Float_t pfjet_muonenergy[M_jetmaxcount];
+  Float_t pfjet_chargedmuonenergy[M_jetmaxcount];
+
   UInt_t pfjet_chargedmulti[M_jetmaxcount];	
   UInt_t pfjet_neutralmulti[M_jetmaxcount];	
   UInt_t pfjet_chargedhadronmulti[M_jetmaxcount];
@@ -545,6 +560,7 @@ class NTupleMaker : public edm::EDAnalyzer{
   Float_t pfjet_pu_jet_full_mva[M_jetmaxcount];
   Int_t pfjet_flavour[M_jetmaxcount];
   Float_t pfjet_btag[M_jetmaxcount][10];
+  Float_t pfjet_jecUncertainty[M_jetmaxcount];
 
   // pat electrons 
   UInt_t electron_count;
@@ -618,11 +634,24 @@ class NTupleMaker : public edm::EDAnalyzer{
   Int_t electron_numbrems[M_electronmaxcount];
   Int_t electron_superclusterindex[M_electronmaxcount];
   UChar_t electron_info[M_electronmaxcount];
+
   Float_t electron_mva_id_nontrigPhys14[M_electronmaxcount];
   Float_t electron_mva_value_nontrig_Spring15_v1[M_electronmaxcount];
+  Float_t electron_mva_value_trig_Spring15_v1[M_electronmaxcount];
   Int_t electron_mva_category_nontrig_Spring15_v1[M_electronmaxcount];
-  Int_t electron_mva_mediumId_nontrig_Spring15_v1[M_electronmaxcount];
-  Int_t electron_mva_tightId_nontrig_Spring15_v1[M_electronmaxcount];
+  Int_t electron_mva_category_trig_Spring15_v1[M_electronmaxcount];
+
+  Bool_t electron_mva_wp80_nontrig_Spring15_v1[M_electronmaxcount];
+  Bool_t electron_mva_wp90_nontrig_Spring15_v1[M_electronmaxcount];
+  Bool_t electron_mva_wp80_trig_Spring15_v1[M_electronmaxcount];
+  Bool_t electron_mva_wp90_trig_Spring15_v1[M_electronmaxcount];
+
+  Bool_t electron_cutId_veto_Spring15[M_electronmaxcount];
+  Bool_t electron_cutId_loose_Spring15[M_electronmaxcount];
+  Bool_t electron_cutId_medium_Spring15[M_electronmaxcount];
+  Bool_t electron_cutId_tight_Spring15[M_electronmaxcount];
+
+
   Bool_t electron_pass_conversion[M_electronmaxcount];
   
   UInt_t photon_count;
@@ -778,6 +807,18 @@ class NTupleMaker : public edm::EDAnalyzer{
   Float_t pfmet_sigyx;
   Float_t pfmet_sigyy;
 
+  Float_t pfmet_ex_JetEnUp;
+  Float_t pfmet_ey_JetEnUp;
+
+  Float_t pfmet_ex_JetEnDown;
+  Float_t pfmet_ey_JetEnDown;
+
+  Float_t pfmet_ex_UnclusteredEnUp;
+  Float_t pfmet_ey_UnclusteredEnUp;
+
+  Float_t pfmet_ex_UnclusteredEnDown;
+  Float_t pfmet_ey_UnclusteredEnDown;
+
   Float_t pfmetcorr_ex;
   Float_t pfmetcorr_ey;
   Float_t pfmetcorr_ez;
@@ -789,6 +830,42 @@ class NTupleMaker : public edm::EDAnalyzer{
   Float_t pfmetcorr_sigxy;
   Float_t pfmetcorr_sigyx;
   Float_t pfmetcorr_sigyy;
+
+  Float_t pfmetcorr_ex_JetEnUp;
+  Float_t pfmetcorr_ey_JetEnUp;
+
+  Float_t pfmetcorr_ex_JetEnDown;
+  Float_t pfmetcorr_ey_JetEnDown;
+
+  Float_t pfmetcorr_ex_UnclusteredEnUp;
+  Float_t pfmetcorr_ey_UnclusteredEnUp;
+
+  Float_t pfmetcorr_ex_UnclusteredEnDown;
+  Float_t pfmetcorr_ey_UnclusteredEnDown;
+
+  Float_t puppimet_ex;
+  Float_t puppimet_ey;
+  Float_t puppimet_ez;
+  Float_t puppimet_pt;
+  Float_t puppimet_phi;
+  Float_t puppimet_sumet;
+
+  Float_t puppimet_ex_JetEnUp;
+  Float_t puppimet_ey_JetEnUp;
+
+  Float_t puppimet_ex_JetEnDown;
+  Float_t puppimet_ey_JetEnDown;
+
+  Float_t puppimet_ex_UnclusteredEnUp;
+  Float_t puppimet_ey_UnclusteredEnUp;
+
+  Float_t puppimet_ex_UnclusteredEnDown;
+  Float_t puppimet_ey_UnclusteredEnDown;
+
+  Float_t puppimet_sigxx;
+  Float_t puppimet_sigxy;
+  Float_t puppimet_sigyx;
+  Float_t puppimet_sigyy;
 
   UInt_t mvamet_count;
   Float_t mvamet_ex[M_mvametmaxcount];
@@ -890,6 +967,7 @@ class NTupleMaker : public edm::EDAnalyzer{
   //std::vector< double > embeddingWeights_; //for RhEmb
   //float TauSpinnerWeight_;
   EGammaMvaEleEstimatorCSA14* myMVAnonTrigPhys14;
+  JetCorrectionUncertainty *jecUnc;
 
 };
 
