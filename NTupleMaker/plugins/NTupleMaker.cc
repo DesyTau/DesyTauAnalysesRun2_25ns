@@ -174,8 +174,8 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
   //  propagatorWithMaterial = NULL;
   if(cYear != 2011 && cYear != 2012 && cYear != 2015)
     throw cms::Exception("NTupleMaker") << "Invalid Year, only 2011, 2012 and 2015  are allowed!";
-  if(cPeriod != "Summer11" && cPeriod != "Fall11" && cPeriod != "Summer12" && cPeriod != "PHYS14" && cPeriod != "Spring15" && cPeriod != "Run2015B" && cPeriod != "Run2015C" )
-    throw cms::Exception("NTupleMaker") << "Invalid period, only Summer11, Fall11, Summer12, PHYS14, Spring15, Run2015B Run2015C are allowed!";
+  if(cPeriod != "Summer11" && cPeriod != "Fall11" && cPeriod != "Summer12" && cPeriod != "PHYS14" && cPeriod != "Spring15" && cPeriod != "Run2015B" && cPeriod != "Run2015C" && cPeriod != "Run2015D")
+    throw cms::Exception("NTupleMaker") << "Invalid period, only Summer11, Fall11, Summer12, PHYS14, Spring15, Run2015B, Run2015C and Run2015D are allowed!";
   
   double barrelRadius = 129.;  //p81, p50, ECAL TDR
   double endcapZ      = 320.5; // fig 3.26, p81, ECAL TDR
@@ -1947,6 +1947,7 @@ unsigned int NTupleMaker::AddMuons(const edm::Event& iEvent)
 	muon_isTight[muon_count] = (*Muons)[i].isTightMuon(primvertex); 
 	muon_isLoose[muon_count] = (*Muons)[i].isLooseMuon();
 	muon_isGlobal[muon_count] = (*Muons)[i].isGlobalMuon();
+	muon_isMedium[muon_count] = (*Muons)[i].isMediumMuon();
 
 	muon_chargedHadIso[muon_count] = (*Muons)[i].chargedHadronIso();
 	muon_neutralHadIso[muon_count] = (*Muons)[i].neutralHadronIso();
@@ -2004,10 +2005,9 @@ unsigned int NTupleMaker::AddMuons(const edm::Event& iEvent)
 	    muon_validFraction[muon_count] = 0;
 	  }
 
-	bool goodGlb = muon_isGlobal[muon_count] && muon_normChi2[muon_count]  < 3 && muon_normChi2[muon_count] > 0 
-	 && muon_combQ_chi2LocalPosition[muon_count] < 12 && muon_combQ_trkKink[muon_count] < 20;
-	muon_isMedium[muon_count] =  muon_isLoose[muon_count] && muon_validFraction[muon_count] > 0.8 && muon_segmentComp[muon_count] > (goodGlb ? 0.303 : 0.451);
-
+	//	bool goodGlb = muon_isGlobal[muon_count] && muon_normChi2[muon_count]  < 3 && muon_normChi2[muon_count] > 0 
+	//	 && muon_combQ_chi2LocalPosition[muon_count] < 12 && muon_combQ_trkKink[muon_count] < 20;
+	//	muon_isMedium[muon_count] =  muon_isLoose[muon_count] && muon_validFraction[muon_count] > 0.8 && muon_segmentComp[muon_count] > (goodGlb ? 0.303 : 0.451);
 
 	muon_count++;
 	
