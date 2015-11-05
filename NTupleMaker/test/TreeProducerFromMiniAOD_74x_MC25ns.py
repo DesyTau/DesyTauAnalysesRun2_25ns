@@ -370,10 +370,10 @@ mvaMETTauMu.srcLeptons = cms.VInputTag(cms.InputTag("tauPreSelectionTauMu", "", 
                                                cms.InputTag("muonPreSelectionTauMu", "", ""))
 mvaMETTauMu.permuteLeptons = cms.bool(True)
 
-mvaMETTauMu.inputFileNames = cms.PSet(U     = cms.FileInPath('RecoMET/METPUSubtraction/data/gbru_7_4_X_miniAOD_50NS_July2015.root'),
-                                      DPhi  = cms.FileInPath('RecoMET/METPUSubtraction/data/gbrphi_7_4_X_miniAOD_50NS_July2015.root'),
-                                      CovU1 = cms.FileInPath('RecoMET/METPUSubtraction/data/gbru1cov_7_4_X_miniAOD_50NS_July2015.root'),
-                                      CovU2 = cms.FileInPath('RecoMET/METPUSubtraction/data/gbru2cov_7_4_X_miniAOD_50NS_July2015.root')
+mvaMETTauMu.inputFileNames = cms.PSet(U     = cms.FileInPath('RecoMET/METPUSubtraction/data/gbru_7_4_X_miniAOD_25NS_July2015.root'),
+                                      DPhi  = cms.FileInPath('RecoMET/METPUSubtraction/data/gbrphi_7_4_X_miniAOD_25NS_July2015.root'),
+                                      CovU1 = cms.FileInPath('RecoMET/METPUSubtraction/data/gbru1cov_7_4_X_miniAOD_25NS_July2015.root'),
+                                      CovU2 = cms.FileInPath('RecoMET/METPUSubtraction/data/gbru2cov_7_4_X_miniAOD_25NS_July2015.root')
                                       )
 
 process.mvaMETTauMu = mvaMETTauMu
