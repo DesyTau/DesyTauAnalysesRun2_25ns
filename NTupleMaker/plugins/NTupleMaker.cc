@@ -158,11 +158,12 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
   //MetCollectionTag_(iConfig.getParameter<edm::EDGetToken>("MetCollectionTag")),
   //MetCollectionTag_(consumes<pat::METCollection>(iConfig.getParameter<edm::InputTag>("MetCollectionTag"))),
   MetCollectionTag_(consumes<pat::METCollection>(iConfig.getParameter<edm::InputTag>("MetCollectionTag"))),
+  MetCovMatrixTag_(iConfig.getParameter<edm::InputTag>("MetCovMatrixTag")),
+  MetSigTag_(iConfig.getParameter<edm::InputTag>("MetSigTag")),
   MetCorrCollectionTag_(consumes<pat::METCollection>(iConfig.getParameter<edm::InputTag>("MetCorrCollectionTag"))),
   PuppiMetCollectionTag_(consumes<pat::METCollection>(iConfig.getParameter<edm::InputTag>("PuppiMetCollectionTag"))),
-  
-  //MvaMetCollectionsTag_(iConfig.getParameter<std::vector<edm::InputTag> >("MvaMetCollectionsTag")),
-  //MvaMetCollectionsTag_(consumes<pat::METCollection>(iConfig.getParameter<edm::InputTag>("MvaMetCollectionsTag"))),
+  MvaMetCollectionsTag_(iConfig.getParameter<std::vector<edm::InputTag> >("MvaMetCollectionsTag")),
+  //MvaMetCollectionsTag_(consumes<pat::METCollection>(iConfig.getParameter<std::vector<edm::InputTag> >("MvaMetCollectionsTag"))),
   TrackCollectionTag_(iConfig.getParameter<edm::InputTag>("TrackCollectionTag")),
   GenParticleCollectionTag_(iConfig.getParameter<edm::InputTag>("GenParticleCollectionTag")),
   TriggerObjectCollectionTag_(iConfig.getParameter<edm::InputTag>("TriggerObjectCollectionTag")),
@@ -620,6 +621,7 @@ void NTupleMaker::beginJob(){
     tree->Branch("pfmet_sigxy", &pfmet_sigxy, "pfmet_sigxy/F");
     tree->Branch("pfmet_sigyx", &pfmet_sigyx, "pfmet_sigyx/F");
     tree->Branch("pfmet_sigyy", &pfmet_sigyy, "pfmet_sigyy/F");
+    tree->Branch("pfmet_sig", &pfmet_sig, "pfmet_sig/F");
 
     tree->Branch("genmet_ex", &genmet_ex, "genmet_ex/F");
     tree->Branch("genmet_ey", &genmet_ey, "genmet_ey/F");
@@ -1369,10 +1371,17 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       // 	// else cout << "  PFMet = " << pfmet_et << std::endl;
       // }
       
-      pfmet_sigxx = (*patMet)[0].getSignificanceMatrix()(0,0);
-      pfmet_sigxy = (*patMet)[0].getSignificanceMatrix()(0,1);
-      pfmet_sigyx = (*patMet)[0].getSignificanceMatrix()(1,0);
-      pfmet_sigyy = (*patMet)[0].getSignificanceMatrix()(1,1);
+      edm::Handle<ROOT::Math::SMatrix<double, 2, 2, ROOT::Math::MatRepSym<double, 2> > > metcov;
+      iEvent.getByLabel( MetCovMatrixTag_, metcov);
+      pfmet_sigxx = (*metcov)(0,0);
+      pfmet_sigxy = (*metcov)(0,1);
+      pfmet_sigyx = (*metcov)(1,0);
+      pfmet_sigyy = (*metcov)(1,1);
+
+      edm::Handle<double> metsig;
+      iEvent.getByLabel( MetSigTag_, metsig);
+      assert(metsig.isValid());
+      pfmet_sig = *metsig;
 
       pfmet_ex_JetEnUp = (*patMet)[0].shiftedPx(pat::MET::METUncertainty::JetEnUp,pat::MET::METCorrectionLevel::Type1);
       pfmet_ey_JetEnUp = (*patMet)[0].shiftedPy(pat::MET::METUncertainty::JetEnUp,pat::MET::METCorrectionLevel::Type1);
@@ -1458,8 +1467,7 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       puppimet_ey_UnclusteredEnDown = (*patMet)[0].shiftedPy(pat::MET::METUncertainty::UnclusteredEnDown,pat::MET::METCorrectionLevel::Type1);
 
     } // crecpuppimet
-
-  /*
+  
   if(doDebug)  cout<<"add MVA MET"<< endl; 
   if(crecmvamet)
     {
@@ -1514,7 +1522,7 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	}
       }	
     }// crecmvamet
-*/
+  
   if(doDebug)  cout<<"add rho"<< endl; 
   // rho neutral
   edm::Handle<double> rho;

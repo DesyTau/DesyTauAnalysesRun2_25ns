@@ -359,11 +359,13 @@ class NTupleMaker : public edm::EDAnalyzer{
 
   //edm::InputTag MetCollectionTag_;
   edm::EDGetTokenT<pat::METCollection> MetCollectionTag_;
+  edm::InputTag MetCovMatrixTag_;
+  edm::InputTag MetSigTag_;
   edm::EDGetTokenT<pat::METCollection> MetCorrCollectionTag_;
   edm::EDGetTokenT<pat::METCollection> PuppiMetCollectionTag_;
   //edm::InputTag MetCorrCollectionTag_;
   //edm::EDGetTokenT<pat::METCollection> MvaMetCollectionsTag_;
-  //std::vector<edm::InputTag> MvaMetCollectionsTag_;
+  std::vector<edm::InputTag> MvaMetCollectionsTag_;
   edm::InputTag TrackCollectionTag_;
   edm::InputTag GenParticleCollectionTag_;
   edm::InputTag TriggerObjectCollectionTag_;
@@ -802,6 +804,7 @@ class NTupleMaker : public edm::EDAnalyzer{
   Float_t pfmet_phi;
   Float_t pfmet_sumet;
 
+  Float_t pfmet_sig;
   Float_t pfmet_sigxx;
   Float_t pfmet_sigxy;
   Float_t pfmet_sigyx;

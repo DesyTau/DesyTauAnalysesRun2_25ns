@@ -1,12 +1,12 @@
 import FWCore.ParameterSet.Config as cms
 
-isData = False
+isData = True
 is25ns = True
-isPRv4 = False
+isPRv4 = True
 isRepr05Oct = False
 #skim = 0
 year = 2015
-period = 'Spring15'
+period = 'Run2015D'
 
 #sampleName = 'MonteCarlo'
 # sampleName = 'TTJets', "QCD", "DYJetsToLL_M50"
@@ -72,7 +72,7 @@ else:
     process.GlobalTag.globaltag = '74X_mcRun2_startup_v2'
 
 print 'The conditions are =======>',process.GlobalTag.globaltag
-"""    
+    
 if usePrivateSQlite:
     from CondCore.DBCommon.CondDBSetup_cfi import *
     import os
@@ -99,7 +99,7 @@ if usePrivateSQlite:
     process.es_prefer_jec = cms.ESPrefer("PoolDBESSource",'jec')
 
 ### =====================================================================================================
-"""
+
 
 """
 ### ReRun JEC ===========================================================================================
@@ -250,9 +250,6 @@ else:
   if is25ns:
 #    fname='/store/mc/RunIISpring15MiniAODv2/TT_TuneCUETP8M1_13TeV-powheg-pythia8/MINIAODSIM/74X_mcRun2_asymptotic_v2_ext3-v1/10000/020B5100-426E-E511-888A-0026189437F9.root'
     fname='/store/mc/RunIISpring15MiniAODv2/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/74X_mcRun2_asymptotic_v2-v1/50000/00E88378-6F6F-E511-9D54-001E6757EAA4.root'
-    fname='/store/mc/RunIISpring15MiniAODv2/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/74X_mcRun2_asymptotic_v2-v1/50000/00759690-D16E-E511-B29E-00261894382D.root'
-    #fname='/store/mc/RunIISpring15MiniAODv2/TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/74X_mcRun2_asymptotic_v2-v3/60000/00181849-176A-E511-8B11-848F69FD4C94.root'
-
   else:
     fname='/store/mc/RunIISpring15DR74/TTJets_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/AsymptNoPU_MCRUN2_74_V9A-v2/00000/02AD5DBB-1C0C-E511-8C41-00A0D1EE8E64.root'
 
@@ -312,6 +309,7 @@ process.source = cms.Source("PoolSource",
 #----------------------------------------------------------------------------------
 # produce PU Jet Ids & MVA MET
 #----------------------------------------------------------------------------------
+
 
 # Pairwise MVA MET ================================================================================= 
 # as from jan 
@@ -426,15 +424,13 @@ process.ak4PFJets = cms.EDProducer("FastjetJetProducer",
     inputEMin = cms.double(0.0)
 )
 """
+
 from RecoJets.JetProducers.ak4PFJets_cfi import ak4PFJets
 from RecoJets.Configuration.RecoPFJets_cff import ak4PFJetsCHS
 from RecoJets.Configuration.RecoJets_cff import *
 from JetMETCorrections.Configuration.JetCorrectionProducersAllAlgos_cff import *
 from JetMETCorrections.Configuration.JetCorrectionServicesAllAlgos_cff import *
 """
-
-#from JetMETCorrections.Configuration.DefaultJEC_cff import ak4PFJetsL1FastL2L3
-
 process.load("JetMETCorrections.Configuration.DefaultJEC_cff")
 
 
@@ -442,6 +438,7 @@ if runOnData:
   process.calibratedAK4PFJetsForPFMVAMEt = cms.EDProducer("PFJetCorrectionProducer",
                                                           src = cms.InputTag("ak4PFJets"),
                                                           correctors = cms.vstring('ak4PFL1FastL2L3Residual')
+                                                          #correctors = cms.vstring('ak4PFL1FastL2L3')
                                                         )
 else:
   process.calibratedAK4PFJetsForPFMVAMEt = cms.EDProducer("PFJetCorrectionProducer",
