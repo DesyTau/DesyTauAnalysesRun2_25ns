@@ -1559,7 +1559,7 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	}
 
       edm::Handle<vector<PileupSummaryInfo> > PUInfo;
-      iEvent.getByLabel(edm::InputTag("addPileupInfo"), PUInfo);
+      iEvent.getByLabel(edm::InputTag("slimmedAddPileupInfo"), PUInfo);
       if(PUInfo.isValid())
 	{
 	  for(vector<PileupSummaryInfo>::const_iterator PVI = PUInfo->begin(); PVI != PUInfo->end(); ++PVI)
