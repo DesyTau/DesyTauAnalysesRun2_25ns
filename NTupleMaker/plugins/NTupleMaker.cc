@@ -1512,6 +1512,16 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	    mvamet_lep1[mvamet_count] = find_lep(tau_count, tau_px, tau_py, tau_pz, met->userCand("lepton1")->p4() );
 	    mvamet_lep2[mvamet_count] = find_lep(tau_count, tau_px, tau_py, tau_pz, met->userCand("lepton2")->p4() );
 	  }
+	  else if(mit->label().find("MuMu") != std::string::npos){
+	    mvamet_channel[mvamet_count] = MUMU;
+	    mvamet_lep1[mvamet_count] = find_lep(muon_count, muon_px, muon_py, muon_pz, met->userCand("lepton1")->p4() );
+	    mvamet_lep2[mvamet_count] = find_lep(muon_count, muon_px, muon_py, muon_pz, met->userCand("lepton2")->p4() );
+	  }
+	  else if(mit->label().find("EleEle") != std::string::npos){
+	    mvamet_channel[mvamet_count] = EE;
+	    mvamet_lep1[mvamet_count] = find_lep(electron_count, electron_px, electron_py, electron_pz, met->userCand("lepton1")->p4() );
+	    mvamet_lep2[mvamet_count] = find_lep(electron_count, electron_px, electron_py, electron_pz, met->userCand("lepton2")->p4() );
+	  }
 	  else {
 	    mvamet_channel[mvamet_count] = UNKNOWN;
 	    mvamet_lep1[mvamet_count] = -1;

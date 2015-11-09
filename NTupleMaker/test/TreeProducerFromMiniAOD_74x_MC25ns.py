@@ -394,6 +394,16 @@ process.mvaMETTauEle = cms.EDProducer('PFMETProducerMVATauTau',
 process.mvaMETTauEle.srcLeptons = cms.VInputTag(cms.InputTag("tauPreSelectionTauEle", "", ""),
                                                 cms.InputTag("electronPreSelectionTauEle", "", ""))
 
+process.mvaMETMuMu = cms.EDProducer('PFMETProducerMVATauTau',
+                                     **mvaMETTauMu.parameters_())
+process.mvaMETMuMu.srcLeptons = cms.VInputTag(cms.InputTag("muonPreSelectionMuEle", "", ""),
+                                              cms.InputTag("muonPreSelectionMuEle", "", ""))
+
+process.mvaMETEleEle = cms.EDProducer('PFMETProducerMVATauTau',
+                                      **mvaMETTauMu.parameters_())
+process.mvaMETEleEle.srcLeptons = cms.VInputTag(cms.InputTag("electronPreSelectionMuEle", "", ""),
+                                                cms.InputTag("electronPreSelectionMuEle", "", ""))
+
 process.ak4PFJets = cms.EDProducer("FastjetJetProducer",
                                    Active_Area_Repeats = cms.int32(1),
     doAreaFastjet = cms.bool(True),
@@ -505,7 +515,8 @@ process.puJetIdForPFMVAMEt = cms.EDProducer("PileupJetIdProducer",
 )
 process.mvaMetSequence  = cms.Sequence(process.leptonPreSelectionSequence +
                                        process.ak4PFJets + process.calibratedAK4PFJetsForPFMVAMEt + process.puJetIdForPFMVAMEt +
-                                       process.mvaMETDiTau + process.mvaMETTauMu + process.mvaMETTauEle + process.mvaMETMuEle)
+                                       process.mvaMETDiTau + process.mvaMETTauMu + process.mvaMETTauEle + process.mvaMETMuEle + 
+                                       process.mvaMETMuMu + process.mvaMETEleEle)
 
 
 # END Pairwise MVA MET ==============================================================
@@ -584,7 +595,7 @@ MetSigTag = cms.InputTag("METSignificance:METSignificance:TreeProducer"),
 #MetCorrCollectionTag = cms.InputTag("slimmedMETs::TreeProducer"),
 MetCorrCollectionTag = cms.InputTag("slimmedMETsNoHF"),
 PuppiMetCollectionTag = cms.InputTag("slimmedMETsPuppi"),
-MvaMetCollectionsTag = cms.VInputTag("mvaMETDiTau", "mvaMETTauMu", "mvaMETTauEle", "mvaMETMuEle"),
+MvaMetCollectionsTag = cms.VInputTag("mvaMETDiTau", "mvaMETTauMu", "mvaMETTauEle", "mvaMETMuEle", "mvaMETMuMu", "mvaMETEleEle"),
 TrackCollectionTag = cms.InputTag("generalTracks"),
 GenParticleCollectionTag = cms.InputTag("prunedGenParticles"),
 TriggerObjectCollectionTag = cms.InputTag("selectedPatTrigger"),
