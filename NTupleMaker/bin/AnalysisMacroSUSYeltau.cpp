@@ -41,6 +41,7 @@ int main(int argc, char * argv[]) {
   string SelectionSign="eltau";
 
   // kinematic cuts on electrons
+  const bool isData = cfg.get<bool>("IsData");
   const Float_t ptElectronLowCut   = cfg.get<Float_t>("ptElectronLowCut");
   const Float_t ptElectronHighCut  = cfg.get<Float_t>("ptElectronHighCut");
   const Float_t etaElectronCut     = cfg.get<Float_t>("etaElectronCut");
@@ -274,11 +275,11 @@ int main(int argc, char * argv[]) {
       iCut = 0;
 
       Float_t weight = 1;
-      isData= false;
+      //isData= false;
       bool lumi=false;
 
-      if (XSec == 1)  isData = true;
-      if (!isData && XSec !=1 )  { 
+      //if (XSec == 1)  isData = true;
+      if (XSec !=1 )  { 
 	      
       histWeights->Fill(1,analysisTree.genweight);  
 	     weight *= analysisTree.genweight;

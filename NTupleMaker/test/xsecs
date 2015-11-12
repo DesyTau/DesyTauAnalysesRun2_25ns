@@ -1,6 +1,9 @@
 TTJets 831.76
 TTJets_powheg 831.76
 TTJets_amatnlo 831.76
+TTJetsLO 831.76
+TTJetsNLO 831.76
+TTPowHeg 831.76
 ST_tW_antitop 35.6
 ST_tW_top 35.6
 ST_t-channel 103.02
@@ -14,8 +17,30 @@ ST_t-channel_antitop 80.95
 TTWJets 0.6647
 TTZJets 0.8565
 
+QCD_HT1000to1500 1064
+QCD_HT100to200 27540000
+QCD_HT1500to2000 121.5 
+QCD_HT200to300 1735000
+QCD_HT700to1000 6524
+
+ST_s-channel_4f_leptonDecays 10.32 0.328
+ST_t-channel_4f_leptonDecays_ext1 216.99 0.328
+ST_tW_antitop_5f_DS_inclusiveDecays_13TeV-powheg-pythia8 35.85 0.328
+ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8 35.85 0.328
+ST_tW_top_5f_DS_inclusiveDecays_13TeV-powheg-pythia8 35.85 0.328
+ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8 35.85 0.328
+
+TTWJetsToLNu 0.2043
+TTWJetsToQQ 0.4062 
+TTZToQQ 0.5297 
+WWTo2L2Nu 2.927
+WWZ 0.1651 
+WZJets  0.4896
+WZZ 0.05565 
+ZZTo2L2Q 3.38 
+
 WJetsToLNu 61526.7 
-WJets
+
 WJetsToLNu_HT-2500ToInf 0.03089 1.23 
 WJetsToLNu_HT-1200To2500 1.334 1.23
 WJetsToLNu_HT-800To1200 5.261 1.23

@@ -36,7 +36,7 @@
 #include <TString.h>
 
 using namespace reco;
-
+using namespace pat;
 //typedef std::vector<NSVfitEventHypothesisByIntegration> NSVfitEventHypothesisByIntegrationCollection;
 typedef ROOT::Math::XYZVector Vector;
 
@@ -97,6 +97,7 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
   crecpfjet(iConfig.getUntrackedParameter<bool>("RecJet", false)),
   crecpfmet(iConfig.getUntrackedParameter<bool>("RecPFMet", false)),
   crecpfmetcorr(iConfig.getUntrackedParameter<bool>("RecPFMetCorr", false)),
+  crecpuppimet(iConfig.getUntrackedParameter<bool>("RecPuppiMet", false)),
   crecmvamet(iConfig.getUntrackedParameter<bool>("RecMvaMet", false)),
   // triggers
   cHLTriggerPaths(iConfig.getUntrackedParameter<vector<string> >("HLTriggerPaths")),
@@ -136,15 +137,33 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
   // collections
   MuonCollectionTag_(iConfig.getParameter<edm::InputTag>("MuonCollectionTag")),
   ElectronCollectionTag_(iConfig.getParameter<edm::InputTag>("ElectronCollectionTag")),
+  eleVetoIdMapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleVetoIdMap"))),
+  eleLooseIdMapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleLooseIdMap"))),
   eleMediumIdMapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleMediumIdMap"))),
   eleTightIdMapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleTightIdMap"))),
-  mvaValuesMapToken_(consumes<edm::ValueMap<float> >(iConfig.getParameter<edm::InputTag>("mvaValuesMap"))),
-  mvaCategoriesMapToken_(consumes<edm::ValueMap<int> >(iConfig.getParameter<edm::InputTag>("mvaCategoriesMap"))),
+  eleMvaNonTrigWP80MapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleMvaNonTrigIdWP80Map"))),
+  eleMvaNonTrigWP90MapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleMvaNonTrigIdWP90Map"))),
+  eleMvaTrigWP80MapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleMvaTrigIdWP80Map"))),
+  eleMvaTrigWP90MapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleMvaTrigIdWP90Map"))),
+  mvaNonTrigValuesMapToken_(consumes<edm::ValueMap<float> >(iConfig.getParameter<edm::InputTag>("mvaNonTrigValuesMap"))),
+  mvaNonTrigCategoriesMapToken_(consumes<edm::ValueMap<int> >(iConfig.getParameter<edm::InputTag>("mvaNonTrigCategoriesMap"))),
+  mvaTrigValuesMapToken_(consumes<edm::ValueMap<float> >(iConfig.getParameter<edm::InputTag>("mvaTrigValuesMap"))),
+  mvaTrigCategoriesMapToken_(consumes<edm::ValueMap<int> >(iConfig.getParameter<edm::InputTag>("mvaTrigCategoriesMap"))),
   TauCollectionTag_(iConfig.getParameter<edm::InputTag>("TauCollectionTag")),
   JetCollectionTag_(iConfig.getParameter<edm::InputTag>("JetCollectionTag")),
+  /*
   MetCollectionTag_(iConfig.getParameter<edm::InputTag>("MetCollectionTag")),
   MetCorrCollectionTag_(iConfig.getParameter<edm::InputTag>("MetCorrCollectionTag")),
+  */
+  //MetCollectionTag_(iConfig.getParameter<edm::EDGetToken>("MetCollectionTag")),
+  //MetCollectionTag_(consumes<pat::METCollection>(iConfig.getParameter<edm::InputTag>("MetCollectionTag"))),
+  MetCollectionTag_(consumes<pat::METCollection>(iConfig.getParameter<edm::InputTag>("MetCollectionTag"))),
+  MetCovMatrixTag_(iConfig.getParameter<edm::InputTag>("MetCovMatrixTag")),
+  MetSigTag_(iConfig.getParameter<edm::InputTag>("MetSigTag")),
+  MetCorrCollectionTag_(consumes<pat::METCollection>(iConfig.getParameter<edm::InputTag>("MetCorrCollectionTag"))),
+  PuppiMetCollectionTag_(consumes<pat::METCollection>(iConfig.getParameter<edm::InputTag>("PuppiMetCollectionTag"))),
   MvaMetCollectionsTag_(iConfig.getParameter<std::vector<edm::InputTag> >("MvaMetCollectionsTag")),
+  //MvaMetCollectionsTag_(consumes<pat::METCollection>(iConfig.getParameter<std::vector<edm::InputTag> >("MvaMetCollectionsTag"))),
   TrackCollectionTag_(iConfig.getParameter<edm::InputTag>("TrackCollectionTag")),
   GenParticleCollectionTag_(iConfig.getParameter<edm::InputTag>("GenParticleCollectionTag")),
   TriggerObjectCollectionTag_(iConfig.getParameter<edm::InputTag>("TriggerObjectCollectionTag")),
@@ -156,8 +175,8 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
   //  propagatorWithMaterial = NULL;
   if(cYear != 2011 && cYear != 2012 && cYear != 2015)
     throw cms::Exception("NTupleMaker") << "Invalid Year, only 2011, 2012 and 2015  are allowed!";
-  if(cPeriod != "Summer11" && cPeriod != "Fall11" && cPeriod != "Summer12" && cPeriod != "PHYS14" && cPeriod != "Spring15" && cPeriod != "Run2015B" && cPeriod != "Run2015C" )
-    throw cms::Exception("NTupleMaker") << "Invalid period, only Summer11, Fall11, Summer12, PHYS14, Spring15, Run2015B Run2015C are allowed!";
+  if(cPeriod != "Summer11" && cPeriod != "Fall11" && cPeriod != "Summer12" && cPeriod != "PHYS14" && cPeriod != "Spring15" && cPeriod != "Run2015B" && cPeriod != "Run2015C" && cPeriod != "Run2015D")
+    throw cms::Exception("NTupleMaker") << "Invalid period, only Summer11, Fall11, Summer12, PHYS14, Spring15, Run2015B, Run2015C and Run2015D are allowed!";
   
   double barrelRadius = 129.;  //p81, p50, ECAL TDR
   double endcapZ      = 320.5; // fig 3.26, p81, ECAL TDR
@@ -210,7 +229,10 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
 				 EGammaMvaEleEstimatorCSA14::kNonTrigPhys14,
 				 true,
 				 myManualCatWeigthsTrig);
-  
+
+  string cmsswBase = (getenv ("CMSSW_BASE"));
+  jecUnc = new JetCorrectionUncertainty(cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/JEC/Summer15_25nsV5_MC_Uncertainty_AK4PFchs.txt");  
+
 }//NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig)
 
 
@@ -360,6 +382,8 @@ void NTupleMaker::beginJob(){
     tree->Branch("pfjet_chargedhadronicenergy", pfjet_chargedhadronicenergy, "pfjet_chargedhadronicenergy[pfjet_count]/F");
     tree->Branch("pfjet_neutralemenergy", pfjet_neutralemenergy, "pfjet_neutralemenergy[pfjet_count]/F");
     tree->Branch("pfjet_chargedemenergy", pfjet_chargedemenergy, "pfjet_chargedemenergy[pfjet_count]/F");
+    tree->Branch("pfjet_muonenergy", pfjet_muonenergy, "pfjet_muonenergy[pfjet_count]/F");
+    tree->Branch("pfjet_chargedmuonenergy", pfjet_chargedmuonenergy, "pfjet_chargedmuonenergy[pfjet_count]/F");
     tree->Branch("pfjet_chargedmulti", pfjet_chargedmulti, "pfjet_chargedmulti[pfjet_count]/i");	
     tree->Branch("pfjet_neutralmulti", pfjet_neutralmulti, "pfjet_neutralmulti[pfjet_count]/i");	
     tree->Branch("pfjet_chargedhadronmulti", pfjet_chargedhadronmulti, "pfjet_chargedhadronmulti[pfjet_count]/i");
@@ -382,6 +406,7 @@ void NTupleMaker::beginJob(){
     tree->Branch("pfjet_pu_jet_full_mva", pfjet_pu_jet_full_mva, "pfjet_pu_jet_full_mva[pfjet_count]/F");
     tree->Branch("pfjet_flavour", pfjet_flavour, "pfjet_flavour[pfjet_count]/I");
     tree->Branch("pfjet_btag", pfjet_btag,"pfjet_btag[pfjet_count][10]/F");
+    tree->Branch("pfjet_jecUncertainty",pfjet_jecUncertainty,"pfjet_jecUncertainty[pfjet_count]/F");
   }    
 
   // electrons
@@ -459,10 +484,22 @@ void NTupleMaker::beginJob(){
 
     tree->Branch("electron_mva_id_nontrigPhys14", electron_mva_id_nontrigPhys14, "electron_mva_id_nontrigPhys14[electron_count]/F");
     tree->Branch("electron_mva_value_nontrig_Spring15_v1", electron_mva_value_nontrig_Spring15_v1, "electron_mva_value_nontrig_Spring15_v1[electron_count]/F");
+    tree->Branch("electron_mva_value_trig_Spring15_v1", electron_mva_value_trig_Spring15_v1, "electron_mva_value_trig_Spring15_v1[electron_count]/F");
     tree->Branch("electron_mva_category_nontrig_Spring15_v1", electron_mva_category_nontrig_Spring15_v1, "electron_mva_category_nontrig_Spring15_v1[electron_count]/I");
-    tree->Branch("electron_mva_mediumId_nontrig_Spring15_v1", electron_mva_mediumId_nontrig_Spring15_v1, "electron_mva_mediumId_nontrig_Spring15_v1[electron_count]/I");
-    tree->Branch("electron_mva_tightId_nontrig_Spring15_v1", electron_mva_tightId_nontrig_Spring15_v1, "electron_mva_tightId_nontrig_Spring15_v1[electron_count]/I");
+    tree->Branch("electron_mva_category_trig_Spring15_v1", electron_mva_category_trig_Spring15_v1, "electron_mva_category_trig_Spring15_v1[electron_count]/I");
+
+    tree->Branch("electron_mva_wp80_nontrig_Spring15_v1", electron_mva_wp80_nontrig_Spring15_v1, "electron_mva_wp80_nontrig_Spring15_v1[electron_count]/O");
+    tree->Branch("electron_mva_wp90_nontrig_Spring15_v1", electron_mva_wp90_nontrig_Spring15_v1, "electron_mva_wp90_nontrig_Spring15_v1[electron_count]/O");
+    tree->Branch("electron_mva_wp80_trig_Spring15_v1", electron_mva_wp80_trig_Spring15_v1, "electron_mva_wp80_trig_Spring15_v1[electron_count]/O");
+    tree->Branch("electron_mva_wp90_trig_Spring15_v1", electron_mva_wp90_trig_Spring15_v1, "electron_mva_wp90_trig_Spring15_v1[electron_count]/O");
+
+    tree->Branch("electron_cutId_veto_Spring15", electron_cutId_veto_Spring15, "electron_cutId_veto_Spring15[electron_count]/O");
+    tree->Branch("electron_cutId_loose_Spring15", electron_cutId_loose_Spring15, "electron_cutId_loose_Spring15[electron_count]/O");
+    tree->Branch("electron_cutId_medium_Spring15", electron_cutId_medium_Spring15, "electron_cutId_medium_Spring15[electron_count]/O");
+    tree->Branch("electron_cutId_tight_Spring15", electron_cutId_tight_Spring15, "electron_cutId_tight_Spring15[electron_count]/O");
+
     tree->Branch("electron_pass_conversion", electron_pass_conversion, "electron_pass_conversion[electron_count]/O");
+
   }  
 
   //tree->Branch("photon_count", &photon_count, "photon_count/i");
@@ -584,9 +621,23 @@ void NTupleMaker::beginJob(){
     tree->Branch("pfmet_sigxy", &pfmet_sigxy, "pfmet_sigxy/F");
     tree->Branch("pfmet_sigyx", &pfmet_sigyx, "pfmet_sigyx/F");
     tree->Branch("pfmet_sigyy", &pfmet_sigyy, "pfmet_sigyy/F");
+    tree->Branch("pfmet_sig", &pfmet_sig, "pfmet_sig/F");
 
     tree->Branch("genmet_ex", &genmet_ex, "genmet_ex/F");
     tree->Branch("genmet_ey", &genmet_ey, "genmet_ey/F");
+
+    tree->Branch("pfmet_ex_JetEnUp", &pfmet_ex_JetEnUp, "pfmet_ex_JetEnUp/F");
+    tree->Branch("pfmet_ey_JetEnUp", &pfmet_ey_JetEnUp, "pfmet_ey_JetEnUp/F");
+
+    tree->Branch("pfmet_ex_JetEnDown", &pfmet_ex_JetEnDown, "pfmet_ex_JetEnDown/F");
+    tree->Branch("pfmet_ey_JetEnDown", &pfmet_ey_JetEnDown, "pfmet_ey_JetEnDown/F");
+
+    tree->Branch("pfmet_ex_UnclusteredEnUp", &pfmet_ex_UnclusteredEnUp, "pfmet_ex_UnclusteredEnUp/F");
+    tree->Branch("pfmet_ey_UnclusteredEnUp", &pfmet_ey_UnclusteredEnUp, "pfmet_ey_UnclusteredEnUp/F");
+
+    tree->Branch("pfmet_ex_UnclusteredEnDown", &pfmet_ex_UnclusteredEnDown, "pfmet_ex_UnclusteredEnDown/F");
+    tree->Branch("pfmet_ey_UnclusteredEnDown", &pfmet_ey_UnclusteredEnDown, "pfmet_ey_UnclusteredEnDown/F");
+
   }
 
   if (crecpfmetcorr) {
@@ -599,8 +650,48 @@ void NTupleMaker::beginJob(){
     tree->Branch("pfmetcorr_sigxy", &pfmetcorr_sigxy, "pfmetcorr_sigxy/F");
     tree->Branch("pfmetcorr_sigyx", &pfmetcorr_sigyx, "pfmetcorr_sigyx/F");
     tree->Branch("pfmetcorr_sigyy", &pfmetcorr_sigyy, "pfmetcorr_sigyy/F");
+
+    tree->Branch("pfmetcorr_ex_JetEnUp", &pfmetcorr_ex_JetEnUp, "pfmetcorr_ex_JetEnUp/F");
+    tree->Branch("pfmetcorr_ey_JetEnUp", &pfmetcorr_ey_JetEnUp, "pfmetcorr_ey_JetEnUp/F");
+
+    tree->Branch("pfmetcorr_ex_JetEnDown", &pfmetcorr_ex_JetEnDown, "pfmetcorr_ex_JetEnDown/F");
+    tree->Branch("pfmetcorr_ey_JetEnDown", &pfmetcorr_ey_JetEnDown, "pfmetcorr_ey_JetEnDown/F");
+
+    tree->Branch("pfmetcorr_ex_UnclusteredEnUp", &pfmetcorr_ex_UnclusteredEnUp, "pfmetcorr_ex_UnclusteredEnUp/F");
+    tree->Branch("pfmetcorr_ey_UnclusteredEnUp", &pfmetcorr_ey_UnclusteredEnUp, "pfmetcorr_ey_UnclusteredEnUp/F");
+
+    tree->Branch("pfmetcorr_ex_UnclusteredEnDown", &pfmetcorr_ex_UnclusteredEnDown, "pfmetcorr_ex_UnclusteredEnDown/F");
+    tree->Branch("pfmetcorr_ey_UnclusteredEnDown", &pfmetcorr_ey_UnclusteredEnDown, "pfmetcorr_ey_UnclusteredEnDown/F");
+
   }
 
+  
+  if (crecpuppimet) {
+    tree->Branch("puppimet_ex", &puppimet_ex, "puppimet_ex/F");
+    tree->Branch("puppimet_ey", &puppimet_ey, "puppimet_ey/F");
+    tree->Branch("puppimet_ez", &puppimet_ey, "puppimet_ez/F");
+    tree->Branch("puppimet_pt", &puppimet_pt, "puppimet_pt/F");
+    tree->Branch("puppimet_phi", &puppimet_phi, "puppimet_phi/F");
+    tree->Branch("puppimet_sigxx", &puppimet_sigxx, "puppimet_sigxx/F");
+    tree->Branch("puppimet_sigxy", &puppimet_sigxy, "puppimet_sigxy/F");
+    tree->Branch("puppimet_sigyx", &puppimet_sigyx, "puppimet_sigyx/F");
+    tree->Branch("puppimet_sigyy", &puppimet_sigyy, "puppimet_sigyy/F");
+
+    tree->Branch("puppimet_ex_JetEnUp", &puppimet_ex_JetEnUp, "puppimet_ex_JetEnUp/F");
+    tree->Branch("puppimet_ey_JetEnUp", &puppimet_ey_JetEnUp, "puppimet_ey_JetEnUp/F");
+
+    tree->Branch("puppimet_ex_JetEnDown", &puppimet_ex_JetEnDown, "puppimet_ex_JetEnDown/F");
+    tree->Branch("puppimet_ey_JetEnDown", &puppimet_ey_JetEnDown, "puppimet_ey_JetEnDown/F");
+
+    tree->Branch("puppimet_ex_UnclusteredEnUp", &puppimet_ex_UnclusteredEnUp, "puppimet_ex_UnclusteredEnUp/F");
+    tree->Branch("puppimet_ey_UnclusteredEnUp", &puppimet_ey_UnclusteredEnUp, "puppimet_ey_UnclusteredEnUp/F");
+
+    tree->Branch("puppimet_ex_UnclusteredEnDown", &puppimet_ex_UnclusteredEnDown, "puppimet_ex_UnclusteredEnDown/F");
+    tree->Branch("puppimet_ey_UnclusteredEnDown", &puppimet_ey_UnclusteredEnDown, "puppimet_ey_UnclusteredEnDown/F");
+
+  }
+
+  
 
   if (crecmvamet) {
     tree->Branch("mvamet_count", &mvamet_count, "mvamet_count/i");
@@ -1205,8 +1296,21 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	}
     }
 
+  if (crecmuon) 
+    {
+      if(doDebug)  cout<<"add muons"<< endl; 
+      int numberOfMuons = int(AddMuons(iEvent));
+    } // crecmuon
+  
+  if (crecelectron) 
+    {
+      if(doDebug)  cout<<"add electrons"<< endl; 
+      int numberOfElectrons = int(AddElectrons(iEvent,iSetup));
+    } // crecelectron
+
   if(crectau)
     {
+      if (doDebug) cout<<"add taus"<< endl;
       int numberOfTaus = int(AddTaus(iEvent, iSetup));
       // if (cSkim>0) {
       // 	bool goodTaus = false;
@@ -1227,9 +1331,9 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       // }  
     }
 
-  if(doDebug)  cout<<"add PF jets"<< endl; 
   if (crecpfjet) 
     {
+      if(doDebug)  cout<<"add PF jets"<< endl; 
       int numberOfJets = int(AddPFJets(iEvent,iSetup));
       // if (cSkim) {
       // 	bool goodJets = false;
@@ -1247,11 +1351,12 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     } // crecpfjet
 
 
-  if(doDebug)  cout<<"add PF MET"<< endl; 
   if(crecpfmet)
     {
+      if(doDebug)  cout<<"add PF MET"<< endl; 
       edm::Handle<pat::METCollection> patMet;
-      iEvent.getByLabel(MetCollectionTag_, patMet);
+      //iEvent.getByLabel(MetCollectionTag_, patMet);
+      iEvent.getByToken(MetCollectionTag_, patMet);
 
       assert(patMet->size() > 0);
       pfmet_ex = (*patMet)[0].px();
@@ -1266,10 +1371,29 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       // 	// else cout << "  PFMet = " << pfmet_et << std::endl;
       // }
       
-      pfmet_sigxx = (*patMet)[0].getSignificanceMatrix()(0,0);
-      pfmet_sigxy = (*patMet)[0].getSignificanceMatrix()(0,1);
-      pfmet_sigyx = (*patMet)[0].getSignificanceMatrix()(1,0);
-      pfmet_sigyy = (*patMet)[0].getSignificanceMatrix()(1,1);
+      edm::Handle<ROOT::Math::SMatrix<double, 2, 2, ROOT::Math::MatRepSym<double, 2> > > metcov;
+      iEvent.getByLabel( MetCovMatrixTag_, metcov);
+      pfmet_sigxx = (*metcov)(0,0);
+      pfmet_sigxy = (*metcov)(0,1);
+      pfmet_sigyx = (*metcov)(1,0);
+      pfmet_sigyy = (*metcov)(1,1);
+
+      edm::Handle<double> metsig;
+      iEvent.getByLabel( MetSigTag_, metsig);
+      assert(metsig.isValid());
+      pfmet_sig = *metsig;
+
+      pfmet_ex_JetEnUp = (*patMet)[0].shiftedPx(pat::MET::METUncertainty::JetEnUp,pat::MET::METCorrectionLevel::Type1);
+      pfmet_ey_JetEnUp = (*patMet)[0].shiftedPy(pat::MET::METUncertainty::JetEnUp,pat::MET::METCorrectionLevel::Type1);
+
+      pfmet_ex_JetEnDown = (*patMet)[0].shiftedPx(pat::MET::METUncertainty::JetEnDown,pat::MET::METCorrectionLevel::Type1);
+      pfmet_ey_JetEnDown = (*patMet)[0].shiftedPy(pat::MET::METUncertainty::JetEnDown,pat::MET::METCorrectionLevel::Type1);
+
+      pfmet_ex_UnclusteredEnUp = (*patMet)[0].shiftedPx(pat::MET::METUncertainty::UnclusteredEnUp,pat::MET::METCorrectionLevel::Type1);
+      pfmet_ey_UnclusteredEnUp = (*patMet)[0].shiftedPy(pat::MET::METUncertainty::UnclusteredEnUp,pat::MET::METCorrectionLevel::Type1);
+
+      pfmet_ex_UnclusteredEnDown = (*patMet)[0].shiftedPx(pat::MET::METUncertainty::UnclusteredEnDown,pat::MET::METCorrectionLevel::Type1);
+      pfmet_ey_UnclusteredEnDown = (*patMet)[0].shiftedPy(pat::MET::METUncertainty::UnclusteredEnDown,pat::MET::METCorrectionLevel::Type1);
 
       if (!cdata) {
 	const reco::GenMET * genMET = (*patMet)[0].genMET();
@@ -1278,11 +1402,12 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       }
     } // crecpfmet
 
-  if(doDebug)  cout<<"add Corrected PF MET"<< endl; 
   if(crecpfmetcorr)
     {
+      if(doDebug)  cout<<"add Corrected PF MET"<< endl; 
       edm::Handle<pat::METCollection> patMet;
-      iEvent.getByLabel(MetCorrCollectionTag_, patMet);
+      //iEvent.getByLabel(MetCorrCollectionTag_, patMet);
+      iEvent.getByToken(MetCorrCollectionTag_, patMet);
 
       assert(patMet->size() > 0);
       pfmetcorr_ex = (*patMet)[0].px();
@@ -1296,29 +1421,64 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       pfmetcorr_sigyx = (*patMet)[0].getSignificanceMatrix()(1,0);
       pfmetcorr_sigyy = (*patMet)[0].getSignificanceMatrix()(1,1);
 
+      pfmetcorr_ex_JetEnUp = (*patMet)[0].shiftedPx(pat::MET::METUncertainty::JetEnUp,pat::MET::METCorrectionLevel::Type1);
+      pfmetcorr_ey_JetEnUp = (*patMet)[0].shiftedPy(pat::MET::METUncertainty::JetEnUp,pat::MET::METCorrectionLevel::Type1);
+
+      pfmetcorr_ex_JetEnDown = (*patMet)[0].shiftedPx(pat::MET::METUncertainty::JetEnDown,pat::MET::METCorrectionLevel::Type1);
+      pfmetcorr_ey_JetEnDown = (*patMet)[0].shiftedPy(pat::MET::METUncertainty::JetEnDown,pat::MET::METCorrectionLevel::Type1);
+
+      pfmetcorr_ex_UnclusteredEnUp = (*patMet)[0].shiftedPx(pat::MET::METUncertainty::UnclusteredEnUp,pat::MET::METCorrectionLevel::Type1);
+      pfmetcorr_ey_UnclusteredEnUp = (*patMet)[0].shiftedPy(pat::MET::METUncertainty::UnclusteredEnUp,pat::MET::METCorrectionLevel::Type1);
+
+      pfmetcorr_ex_UnclusteredEnDown = (*patMet)[0].shiftedPx(pat::MET::METUncertainty::UnclusteredEnDown,pat::MET::METCorrectionLevel::Type1);
+      pfmetcorr_ey_UnclusteredEnDown = (*patMet)[0].shiftedPy(pat::MET::METUncertainty::UnclusteredEnDown,pat::MET::METCorrectionLevel::Type1);
+
     } // crecpfmetcorr
 
-  if(doDebug)  cout<<"add muons"<< endl; 
-  if (crecmuon) 
+  if(crecpuppimet)
     {
-      int numberOfMuons = int(AddMuons(iEvent));
-    } // crecmuon
-  
-  if(doDebug)  cout<<"add electrons"<< endl; 
-  if (crecelectron) 
-    {
-      int numberOfElectrons = int(AddElectrons(iEvent,iSetup));
-    } // crecelectron
+      if(doDebug)  cout<<"add Puppi MET"<< endl; 
+      edm::Handle<pat::METCollection> patMet;
+      //iEvent.getByLabel(MetCorrCollectionTag_, patMet);
+      iEvent.getByToken(PuppiMetCollectionTag_, patMet);
+
+      assert(patMet->size() > 0);
+      puppimet_ex = (*patMet)[0].px();
+      puppimet_ey = (*patMet)[0].py();
+      puppimet_ez = (*patMet)[0].pz();
+      puppimet_pt = (*patMet)[0].pt();
+      puppimet_phi = (*patMet)[0].phi();
+      
+      puppimet_sigxx = (*patMet)[0].getSignificanceMatrix()(0,0);
+      puppimet_sigxy = (*patMet)[0].getSignificanceMatrix()(0,1);
+      puppimet_sigyx = (*patMet)[0].getSignificanceMatrix()(1,0);
+      puppimet_sigyy = (*patMet)[0].getSignificanceMatrix()(1,1);
+
+      puppimet_ex_JetEnUp = (*patMet)[0].shiftedPx(pat::MET::METUncertainty::JetEnUp,pat::MET::METCorrectionLevel::Type1);
+      puppimet_ey_JetEnUp = (*patMet)[0].shiftedPy(pat::MET::METUncertainty::JetEnUp,pat::MET::METCorrectionLevel::Type1);
+
+      puppimet_ex_JetEnDown = (*patMet)[0].shiftedPx(pat::MET::METUncertainty::JetEnDown,pat::MET::METCorrectionLevel::Type1);
+      puppimet_ey_JetEnDown = (*patMet)[0].shiftedPy(pat::MET::METUncertainty::JetEnDown,pat::MET::METCorrectionLevel::Type1);
+
+      puppimet_ex_UnclusteredEnUp = (*patMet)[0].shiftedPx(pat::MET::METUncertainty::UnclusteredEnUp,pat::MET::METCorrectionLevel::Type1);
+      puppimet_ey_UnclusteredEnUp = (*patMet)[0].shiftedPy(pat::MET::METUncertainty::UnclusteredEnUp,pat::MET::METCorrectionLevel::Type1);
+
+      puppimet_ex_UnclusteredEnDown = (*patMet)[0].shiftedPx(pat::MET::METUncertainty::UnclusteredEnDown,pat::MET::METCorrectionLevel::Type1);
+      puppimet_ey_UnclusteredEnDown = (*patMet)[0].shiftedPy(pat::MET::METUncertainty::UnclusteredEnDown,pat::MET::METCorrectionLevel::Type1);
+
+    } // crecpuppimet
   
   if(doDebug)  cout<<"add MVA MET"<< endl; 
   if(crecmvamet)
     {
       for(std::vector<edm::InputTag>::iterator mit = MvaMetCollectionsTag_.begin();
-	  mit != MvaMetCollectionsTag_.end(); mit++){
+	
+         mit != MvaMetCollectionsTag_.end(); mit++){
 	
 	//collect MVA Mets
 	edm::Handle<pat::METCollection> imets;
 	iEvent.getByLabel(*mit, imets);
+        //iEvent.getByToken(*mit, imets);
 
 	if(!imets.isValid()) continue;	
 	if(imets->size() == 0)continue;
@@ -1352,6 +1512,16 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	    mvamet_lep1[mvamet_count] = find_lep(tau_count, tau_px, tau_py, tau_pz, met->userCand("lepton1")->p4() );
 	    mvamet_lep2[mvamet_count] = find_lep(tau_count, tau_px, tau_py, tau_pz, met->userCand("lepton2")->p4() );
 	  }
+	  else if(mit->label().find("MuMu") != std::string::npos){
+	    mvamet_channel[mvamet_count] = MUMU;
+	    mvamet_lep1[mvamet_count] = find_lep(muon_count, muon_px, muon_py, muon_pz, met->userCand("lepton1")->p4() );
+	    mvamet_lep2[mvamet_count] = find_lep(muon_count, muon_px, muon_py, muon_pz, met->userCand("lepton2")->p4() );
+	  }
+	  else if(mit->label().find("EleEle") != std::string::npos){
+	    mvamet_channel[mvamet_count] = EE;
+	    mvamet_lep1[mvamet_count] = find_lep(electron_count, electron_px, electron_py, electron_pz, met->userCand("lepton1")->p4() );
+	    mvamet_lep2[mvamet_count] = find_lep(electron_count, electron_px, electron_py, electron_pz, met->userCand("lepton2")->p4() );
+	  }
 	  else {
 	    mvamet_channel[mvamet_count] = UNKNOWN;
 	    mvamet_lep1[mvamet_count] = -1;
@@ -1362,7 +1532,7 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	}
       }	
     }// crecmvamet
-
+  
   if(doDebug)  cout<<"add rho"<< endl; 
   // rho neutral
   edm::Handle<double> rho;
@@ -1399,7 +1569,7 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	}
 
       edm::Handle<vector<PileupSummaryInfo> > PUInfo;
-      iEvent.getByLabel(edm::InputTag("addPileupInfo"), PUInfo);
+      iEvent.getByLabel(edm::InputTag("slimmedAddPileupInfo"), PUInfo);
       if(PUInfo.isValid())
 	{
 	  for(vector<PileupSummaryInfo>::const_iterator PVI = PUInfo->begin(); PVI != PUInfo->end(); ++PVI)
@@ -1422,21 +1592,9 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	    }
 	}
     } // cgen
-  if(doDebug)  cout<<"add muons"<< endl; 
-  if (crecmuon) 
-    {
-      int numberOfMuons = int(AddMuons(iEvent));
-    } // crecmuon
-  
-  if(doDebug)  cout<<"add electrons"<< endl; 
-  if (crecelectron) 
-    {
-      int numberOfElectrons = int(AddElectrons(iEvent,iSetup));
-    } // crecelectron
-  
-  if(doDebug)  cout<<"add trigger info"<< endl; 
   if (ctrigger) 
     {
+      if(doDebug)  cout<<"add trigger info"<< endl; 
       int numberOfTriggerObjects = int(AddTriggerObjects(iEvent));
     } // ctrigger
 
@@ -1807,6 +1965,7 @@ unsigned int NTupleMaker::AddMuons(const edm::Event& iEvent)
 	muon_isTight[muon_count] = (*Muons)[i].isTightMuon(primvertex); 
 	muon_isLoose[muon_count] = (*Muons)[i].isLooseMuon();
 	muon_isGlobal[muon_count] = (*Muons)[i].isGlobalMuon();
+	muon_isMedium[muon_count] = (*Muons)[i].isMediumMuon();
 
 	muon_chargedHadIso[muon_count] = (*Muons)[i].chargedHadronIso();
 	muon_neutralHadIso[muon_count] = (*Muons)[i].neutralHadronIso();
@@ -1864,10 +2023,9 @@ unsigned int NTupleMaker::AddMuons(const edm::Event& iEvent)
 	    muon_validFraction[muon_count] = 0;
 	  }
 
-	bool goodGlb = muon_isGlobal[muon_count] && muon_normChi2[muon_count]  < 3 && muon_normChi2[muon_count] > 0 
-	 && muon_combQ_chi2LocalPosition[muon_count] < 12 && muon_combQ_trkKink[muon_count] < 20;
-	muon_isMedium[muon_count] =  muon_isLoose[muon_count] && muon_validFraction[muon_count] > 0.8 && muon_segmentComp[muon_count] > (goodGlb ? 0.303 : 0.451);
-
+	//	bool goodGlb = muon_isGlobal[muon_count] && muon_normChi2[muon_count]  < 3 && muon_normChi2[muon_count] > 0 
+	//	 && muon_combQ_chi2LocalPosition[muon_count] < 12 && muon_combQ_trkKink[muon_count] < 20;
+	//	muon_isMedium[muon_count] =  muon_isLoose[muon_count] && muon_validFraction[muon_count] > 0.8 && muon_segmentComp[muon_count] > (goodGlb ? 0.303 : 0.451);
 
 	muon_count++;
 	
@@ -2571,6 +2729,8 @@ unsigned int NTupleMaker::AddPFJets(const edm::Event& iEvent, const edm::EventSe
 	  pfjet_chargedhadronicenergy[pfjet_count] = (*pfjets)[i].chargedHadronEnergy();
 	  pfjet_neutralemenergy[pfjet_count] = (*pfjets)[i].neutralEmEnergy();
 	  pfjet_chargedemenergy[pfjet_count] = (*pfjets)[i].chargedEmEnergy();
+	  pfjet_muonenergy[pfjet_count] = (*pfjets)[i].muonEnergy();
+	  pfjet_chargedmuonenergy[pfjet_count] = (*pfjets)[i].chargedMuEnergy();
 	  pfjet_chargedmulti[pfjet_count] = (*pfjets)[i].chargedMultiplicity();
 	  pfjet_neutralmulti[pfjet_count] = (*pfjets)[i].neutralMultiplicity();
 	  pfjet_chargedhadronmulti[pfjet_count] = (*pfjets)[i].chargedHadronMultiplicity();
@@ -2611,18 +2771,21 @@ unsigned int NTupleMaker::AddPFJets(const edm::Event& iEvent, const edm::EventSe
 	  
 	  //get MVA Id
           //for(reco::PFJetCollection::const_iterator iak4jets = ak4jets->begin(); iak4jets != ak4jets->end(); iak4jets++){
-	  pfjet_pu_jet_full_mva[pfjet_count] = -9999;
-	  if (puJetIdMVAFull.isValid()&&ak4jets.isValid()) {
-	    for(size_t ij = 0; ij < ak4jets->size(); ij++){
-	      reco::PFJetRef jetRef (ak4jets, ij);
-	      if(deltaR((*pfjets)[i].p4(), jetRef->p4()) < 0.3){
-		if(deltaR((*pfjets)[i].p4(), jetRef->p4()) > 0.1)
-		  std::cout<<"original jet pt "<<(*pfjets)[i].pt()<<" re-recoed jet pt "<<jetRef->pt()<<" pu mva value "<<(*puJetIdMVAFull)[jetRef]<<std::endl;
-		pfjet_pu_jet_full_mva[pfjet_count] = (*puJetIdMVAFull)[jetRef];
-	      }
-	    }
-	  }	  
-
+	  //	  pfjet_pu_jet_full_mva[pfjet_count] = -9999;
+	  //	  if (puJetIdMVAFull.isValid()&&ak4jets.isValid()) {
+	  //	    for(size_t ij = 0; ij < ak4jets->size(); ij++){
+	  //	      reco::PFJetRef jetRef (ak4jets, ij);
+	  //	      if(deltaR((*pfjets)[i].p4(), jetRef->p4()) < 0.3){
+	  //		if(deltaR((*pfjets)[i].p4(), jetRef->p4()) > 0.1)
+	  //		  std::cout<<"original jet pt "<<(*pfjets)[i].pt()<<" re-recoed jet pt "<<jetRef->pt()<<" pu mva value "<<(*puJetIdMVAFull)[jetRef]<<std::endl;
+	  //		pfjet_pu_jet_full_mva[pfjet_count] = (*puJetIdMVAFull)[jetRef];
+	  //	      }
+	  //	    }
+	  //	  }	  
+	  pfjet_pu_jet_full_mva[pfjet_count] = (*pfjets)[i].userFloat("pileupJetId:fullDiscriminant");
+	  jecUnc->setJetEta(pfjet_eta[pfjet_count]);
+	  jecUnc->setJetPt(pfjet_pt[pfjet_count]);
+	  pfjet_jecUncertainty[pfjet_count] = jecUnc->getUncertainty(true);
 	  pfjet_flavour[pfjet_count] = (*pfjets)[i].partonFlavour();
 		
 	  for(unsigned n = 0 ; n < cBtagDiscriminators.size() ; n++)
@@ -2654,14 +2817,35 @@ unsigned int NTupleMaker::AddElectrons(const edm::Event& iEvent, const edm::Even
         edm::Handle<pat::PackedCandidateCollection> pfcands;
         iEvent.getByLabel("packedPFCandidates", pfcands);
 
+	// cut based
+	edm::Handle<edm::ValueMap<bool> > veto_id_decisions;
+	edm::Handle<edm::ValueMap<bool> > loose_id_decisions;
 	edm::Handle<edm::ValueMap<bool> > medium_id_decisions;
-	edm::Handle<edm::ValueMap<bool> > tight_id_decisions; 
-	iEvent.getByToken(eleMediumIdMapToken_,medium_id_decisions);
-	iEvent.getByToken(eleTightIdMapToken_,tight_id_decisions);
-	edm::Handle<edm::ValueMap<float> > mvaValues;
-	edm::Handle<edm::ValueMap<int> > mvaCategories;
-	iEvent.getByToken(mvaValuesMapToken_,mvaValues);
-	iEvent.getByToken(mvaCategoriesMapToken_,mvaCategories);
+	edm::Handle<edm::ValueMap<bool> > tight_id_decisions;
+        iEvent.getByToken(eleVetoIdMapToken_,veto_id_decisions);
+        iEvent.getByToken(eleLooseIdMapToken_,loose_id_decisions);
+        iEvent.getByToken(eleMediumIdMapToken_,medium_id_decisions);
+        iEvent.getByToken(eleTightIdMapToken_,tight_id_decisions);
+
+	// mva
+	edm::Handle<edm::ValueMap<bool> > nontrig_wp80_decisions;
+	edm::Handle<edm::ValueMap<bool> > nontrig_wp90_decisions;
+	edm::Handle<edm::ValueMap<bool> > trig_wp80_decisions;
+	edm::Handle<edm::ValueMap<bool> > trig_wp90_decisions;
+        iEvent.getByToken(eleMvaNonTrigWP80MapToken_,nontrig_wp80_decisions);
+        iEvent.getByToken(eleMvaNonTrigWP90MapToken_,nontrig_wp90_decisions);
+        iEvent.getByToken(eleMvaTrigWP80MapToken_,trig_wp80_decisions);
+        iEvent.getByToken(eleMvaTrigWP90MapToken_,trig_wp90_decisions);
+
+	edm::Handle<edm::ValueMap<float> > mvaNonTrigValues;
+	edm::Handle<edm::ValueMap<int> > mvaNonTrigCategories;
+        iEvent.getByToken(mvaNonTrigValuesMapToken_,mvaNonTrigValues);
+        iEvent.getByToken(mvaNonTrigCategoriesMapToken_,mvaNonTrigCategories);
+
+	edm::Handle<edm::ValueMap<float> > mvaTrigValues;
+	edm::Handle<edm::ValueMap<int> > mvaTrigCategories;
+        iEvent.getByToken(mvaTrigValuesMapToken_,mvaTrigValues);
+        iEvent.getByToken(mvaTrigCategoriesMapToken_,mvaTrigCategories);
 
 	/*if(crecelectrontrigger)
 	{
@@ -2776,11 +2960,20 @@ unsigned int NTupleMaker::AddElectrons(const edm::Event& iEvent, const edm::Even
 
 	  electron_mva_id_nontrigPhys14[electron_count] = myMVAnonTrigPhys14->mvaValue(Electrons->at(i),false);
 
-	  
-	  electron_mva_value_nontrig_Spring15_v1[electron_count] = (*mvaValues)[el];
-	  electron_mva_category_nontrig_Spring15_v1[electron_count] = (*mvaValues)[el];
-	  electron_mva_mediumId_nontrig_Spring15_v1[electron_count] = (*medium_id_decisions)[el];
-	  electron_mva_tightId_nontrig_Spring15_v1[electron_count] = (*tight_id_decisions)[el];
+	  electron_mva_value_nontrig_Spring15_v1[electron_count] = (*mvaNonTrigValues)[el];
+	  electron_mva_category_nontrig_Spring15_v1[electron_count] = (*mvaNonTrigCategories)[el];
+	  electron_mva_value_trig_Spring15_v1[electron_count] = (*mvaTrigValues)[el];
+	  electron_mva_category_trig_Spring15_v1[electron_count] = (*mvaTrigCategories)[el];
+
+          electron_cutId_veto_Spring15[electron_count] = (*veto_id_decisions)[el];
+          electron_cutId_loose_Spring15[electron_count] = (*loose_id_decisions)[el];
+          electron_cutId_medium_Spring15[electron_count] = (*medium_id_decisions)[el];
+          electron_cutId_tight_Spring15[electron_count] = (*tight_id_decisions)[el];
+
+	  electron_mva_wp80_nontrig_Spring15_v1[electron_count] = (*nontrig_wp80_decisions)[el];
+	  electron_mva_wp90_nontrig_Spring15_v1[electron_count] = (*nontrig_wp90_decisions)[el];
+	  electron_mva_wp80_trig_Spring15_v1[electron_count] = (*trig_wp80_decisions)[el];
+	  electron_mva_wp90_trig_Spring15_v1[electron_count] = (*trig_wp90_decisions)[el];
 	  
 	  electron_pass_conversion[electron_count] = (*Electrons)[i].passConversionVeto();
 	  
