@@ -45,6 +45,8 @@ int main(int argc, char * argv[]) {
   const bool isData = cfg.get<bool>("IsData");
   const bool applyPUreweighting = cfg.get<bool>("ApplyPUreweighting");
   const bool applyLeptonSF = cfg.get<bool>("ApplyLeptonSF");
+  const bool InvertTauIso = cfg.get<bool>("InvertTauIso");
+  const bool InvertMuIso = cfg.get<bool>("InvertMuIso");
   const double ptElectronLowCut   = cfg.get<double>("ptElectronLowCut");
   const double ptElectronHighCut  = cfg.get<double>("ptElectronHighCut");
   const double etaElectronCut     = cfg.get<double>("etaElectronCut");
@@ -77,7 +79,10 @@ int main(int argc, char * argv[]) {
   const string Mu17Tau20MuLegB  = cfg.get<string>("Mu17Tau20MuLegB");
   const string Mu17Tau20TauLegA  = cfg.get<string>("Mu17Tau20TauLegA");
   const string Mu17Tau20TauLegB  = cfg.get<string>("Mu17Tau20TauLegB");
-
+  
+//  const string Region  = cfg.get<string>("Region");
+  const string Sign  = cfg.get<string>("Sign");
+  string Region;
 
 
   const double leadchargedhadrcand_dz = cfg.get<double>("leadchargedhadrcand_dz");
@@ -184,7 +189,7 @@ int main(int argc, char * argv[]) {
 	ChiMass=0.0;
     }
 
-  if (XSec<0&& !isData) {cout<<" Something probably wrong with the xsecs...please check  - the input was "<<argv[2]<<endl;return 0;}
+  if (XSec<0 && !isData) {cout<<" Something probably wrong with the xsecs...please check  - the input was "<<argv[2]<<endl;return 0;}
 
   std::vector<unsigned int> allRuns; allRuns.clear();
 
@@ -256,11 +261,33 @@ int main(int argc, char * argv[]) {
   std::string ntupleName("makeroottree/AC1B");
   
   TString era=argv[3];
-  TString TStrName(rootFileName);
-  std::cout <<TStrName <<std::endl;  
+  TString invMu, invTau;
 
+  /*
+  if (InvertMuIso && !InvertTauIso && Sign=="OS") { invMu = "_InvMuIso_"; Region= "C";}
+  if (!InvertMuIso && InvertTauIso && Sign=="OS") { invTau = "_InvTauIso_"; Region= "C";}
+  if (InvertMuIso  && InvertTauIso && Sign=="OS") { invMu = "_InvMuIso_"; invTau ="_InvTauIso_"; Region= "C";}
+
+  if (InvertMuIso && !InvertTauIso && Sign=="SS") { invMu = "_InvMuIso_"; Region= "D";}
+  if (!InvertMuIso && InvertTauIso && Sign=="SS") { invTau = "_InvTauIso_"; Region= "D";}
+  if (InvertMuIso  && InvertTauIso && Sign=="SS") { invMu = "_InvMuIso_"; invTau ="_InvTauIso_"; Region= "D";}
+
+
+  if (!InvertMuIso  && !InvertTauIso && Sign=="SS") { Region= "A";}
+  if (!InvertMuIso  && InvertTauIso && Sign=="SS") { invTau ="_InvTauIso_";Region= "A";}
+  if (InvertMuIso  && !InvertTauIso && Sign=="SS") { invMu ="_InvMuIso_";Region= "A";}
+
+
+  if (!InvertMuIso  && !InvertTauIso && Sign=="OS") { Region= "B";}
+ */
+  if(InvertMuIso) invMu = "_InvMuIso_";
+  if(InvertTauIso) invMu = "_InvTauIso_";
+
+  TString TStrName(rootFileName+invMu+invTau+Sign);
+  std::cout <<TStrName <<std::endl;  
+ 
   // output fileName with histograms
-  TFile * file = new TFile(era+"/"+TStrName+TString(".root"),"update");
+  TFile * file = new TFile(era+"/"+TStrName+TString("_DataDriven.root"),"update");
   file->mkdir(SelectionSign.c_str());
   file->cd(SelectionSign.c_str());
 
@@ -271,6 +298,11 @@ int main(int argc, char * argv[]) {
   int selEventsAllMuons = 0;
   int selEventsIdMuons = 0;
   int selEventsIsoMuons = 0;
+      bool lumi=false;
+      bool isLowIsoMu=false;
+      bool isHighIsoMu = false;
+      bool isLowIsoTau=false;
+      bool isHighIsoTau = false;
 
 
   std::string dummy;
@@ -321,7 +353,7 @@ int main(int argc, char * argv[]) {
 
     AC1B analysisTree(_tree);
     
-    float genweights=1;
+    double genweights=1;
     
     if(!isData) 
     {
@@ -363,9 +395,14 @@ int main(int argc, char * argv[]) {
       if (analysisTree.primvertex_count<2) continue;  
 
       //isData= false;
-      bool lumi=false;
-      if (!isData && XSec !=1 )  { 
-	      
+      lumi=false;
+      isLowIsoMu=false;
+      isHighIsoMu = false;
+      isLowIsoTau=false;
+      isHighIsoTau = false;
+
+      if (!isData && XSec!=1)  { 
+
         //cout<<"  "<<genweights<<"  "<<numberOfEntries<<endl;
 	//histWeights->Fill(1,analysisTree.genweight);  
 	weight *= analysisTree.genweight;
@@ -375,7 +412,7 @@ int main(int argc, char * argv[]) {
       } 
 
       if (isData)  {
-	XSec = 1.;
+	XSec=1;
 	histWeights->Fill(1);
 	histWeightsH->Fill(double(1));
 	histRuns->Fill(analysisTree.event_run);
@@ -512,55 +549,6 @@ int main(int argc, char * argv[]) {
       iCFCounter[iCut]++;
       iCut++;
 
-    //if (!isData && !applyPUreweighting) continue;
-      //cout<<"  CFCounter  "<<CFCounter[0]<<"  "<<weight<<endl;
-      //continue;
-      // hnJets[->Fill(pfjet_count);
-
-      //      std::cout << "Entry : " << iEntry << std::endl;
-      //      std::cout << "Number of gen particles = " << analysisTree.genparticles_count << std::endl;
-      //      std::cout << "Number of taus  = " << analysisTree.tau_count << std::endl;
-      //      std::cout << "Number of jets  = " << analysisTree.pfjet_count << std::endl;
-      //      std::cout << "Number of muons = " << analysisTree.muon_count << std::endl;
-      
-      // **** Analysis of generator info
-      // int indexW  = -1;
-      // int indexNu = -1; 
-      // int indexMu = -1;
-      // int indexE  = -1;
-      // int nGenMuons = 0;
-      // int nGenElectrons = 0;
-      // for (unsigned int igen=0; igen<analysisTree.genparticles_count; ++igen) {
-
-      // 	double pxGen = analysisTree.genparticles_px[igen];
-      // 	double pyGen = analysisTree.genparticles_py[igen];
-      // 	double pzGen = analysisTree.genparticles_pz[igen];
-      // 	double etaGen = PtoEta(pxGen,pyGen,pzGen);
-      // 	double ptGen  = PtoPt(pxGen,pyGen);
-
-      // 	if (fabs(analysisTree.genparticles_pdgid[igen])==24 && analysisTree.genparticles_status[igen]==62) 
-      // 	  indexW = igen;
-      // 	if ((fabs(analysisTree.genparticles_pdgid[igen])==12 
-      // 	     ||fabs(analysisTree.genparticles_pdgid[igen])==14
-      // 	     ||fabs(analysisTree.genparticles_pdgid[igen])==16) 
-      // 	    && analysisTree.genparticles_info[igen]== (1<<1) )
-      // 	  indexNu = igen;
-
-      // 	if (fabs(analysisTree.genparticles_pdgid[igen])==13) {
-      // 	  if ( analysisTree.genparticles_info[igen]== (1<<1) ) {
-      // 	    indexMu = igen;
-      // 	    if (fabs(etaGen)<2.3 && ptGen>10.)
-      // 	      nGenMuons++;
-      // 	  }
-      // 	}
-      // 	if (fabs(analysisTree.genparticles_pdgid[igen])==11) {
-      // 	  if ( analysisTree.genparticles_info[igen]== (1<<1) ) {
-      // 	    indexE = igen;
-      // 	    if (fabs(etaGen)<2.3 && ptGen>10.)
-      // 	      nGenElectrons++;
-      // 	  }
-      // 	}
-      // }
 
  
       //selecTable.Fill(1,0, weight );      
@@ -643,13 +631,6 @@ int main(int argc, char * argv[]) {
 	std::cout << "LowPtM  : " << LowPtLegMuon << " : " << nLowPtLegMuon << std::endl;
 	std::cout << "HighPtM : " << HighPtLegMuon << " : " << nHighPtLegMuon << std::endl;
 	std::cout << std::endl;
-	//      continue;
-	// vertex cuts
-	if (fabs(analysisTree.primvertex_z)>zVertexCut) continue;
-	if (analysisTree.primvertex_ndof<ndofVertexCut) continue;
-	double dVertex = (analysisTree.primvertex_x*analysisTree.primvertex_x+
-	analysisTree.primvertex_y*analysisTree.primvertex_y);
-	if (dVertex>dVertexCut) continue;
       */
 
       /////now clear the Mu.El.Jets again to fill them again after cleaning
@@ -676,17 +657,9 @@ int main(int argc, char * argv[]) {
 
 	double relIso = absIso/analysisTree.muon_pt[im];
  
- /*
-	double absIso = analysisTree.muon_r03_sumChargedHadronPt[im];
-	Float_ neutralIso = analysisTree.muon_r03_sumNeutralHadronEt[im] + 
-	  analysisTree.muon_r03_sumPhotonEt[im] - 
-	  0.5*analysisTree.muon_r03_sumPUPt[im];
-	neutralIso = TMath::Max(double(0),neutralIso); 
-	absIso += neutralIso;
-	double relIso = absIso/analysisTree.muon_pt[im];
-*/
+
 	hmu_relISO[1]->Fill(relIso,weight);
-	if (relIso>isoMuonHighCut) continue;
+
 	if (relIso<isoMuonLowCut) continue;
 
 	if (applyMuonId && !analysisTree.muon_isMedium[im]) continue;
@@ -701,6 +674,7 @@ int main(int argc, char * argv[]) {
 	  MuMV.push_back(MuV);
           LeptMV.push_back(MuV);
 	}
+
 	//cout<<" Indexes here  "<<im<<"   "<<mu_index<<endl;
 //	if (relIso!=0 && relIso==isoMuMin && im != mu_index) {
 
@@ -711,16 +685,32 @@ int main(int argc, char * argv[]) {
    
       }
       if (muons.size()==0 || !mu_iso) continue;
-       sort(LeptMV.begin(), LeptMV.end(),ComparePt); 
-       if (LeptMV.size() == 0 ) continue; 
+
+        double absIso= analysisTree.muon_r03_sumChargedHadronPt[mu_index]
+	            + max(analysisTree.muon_r03_sumNeutralHadronEt[mu_index] + analysisTree.muon_r03_sumPhotonEt[mu_index]
+	            - 0.5 * analysisTree.muon_r03_sumPUPt[mu_index],0.0);
+
+	double relIso = absIso/analysisTree.muon_pt[mu_index];
+
+	if (relIso>isoMuonHighCut ) { isHighIsoMu=true ;isLowIsoMu=false;}
+	else	{ isHighIsoMu = false;isLowIsoMu=true;}
+
       
+       	sort(LeptMV.begin(), LeptMV.end(),ComparePt); 
+        if (LeptMV.size() == 0 ) continue; 
+      
+	if (InvertMuIso && !isHighIsoMu) continue;
+	if (!InvertMuIso && isHighIsoMu) continue;
+	if (InvertMuIso && isLowIsoMu) continue;
+
+
       //mu_index=muons[0];
       FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, SelectionSign, mu_index,el_index,tau_index);
       CFCounter[iCut]+= weight;
       iCFCounter[iCut]++;
       iCut++;
 
-      double isoTauMin = 999;
+      double isoTauMin = 9999;
       bool tau_iso = false;
       vector<int> tau; tau.clear();
       for (unsigned  int it = 0; it<analysisTree.tau_count; ++it) {
@@ -735,17 +725,20 @@ int main(int argc, char * argv[]) {
 	if (analysisTree.tau_againstElectronVLooseMVA5[it]<againstElectronVLooseMVA5) continue;
 	if (analysisTree.tau_againstMuonTight3[it]<againstMuonTight3) continue;
 	//phys14 if ( fabs(analysisTree.tau_vertexz[it] - analysisTree.primvertex_z ) > vertexz ) continue;
-	if (analysisTree.tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[it] > byCombinedIsolationDeltaBetaCorrRaw3Hits ) continue;
 	
 
 	double  tauIso = analysisTree.tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[it];
+      
 
-	if (tauIso<isoTauMin ) {
+ //     cout<< " Lets check   "<<mu_index<<" isLowIsoTau "<<isLowIsoTau<<"  isLowIsoMu "<<isLowIsoMu<<" isHighIsoMu  "<<isHighIsoMu<<"  isHighIsoTau  "<<isHighIsoTau<<" invertMu "<<InvertMuIso<<" InvertTauIso "<<InvertTauIso<<"  Charge "<<Sign<<" tauIso "<<tauIso<<" tauIsoCut "<<byCombinedIsolationDeltaBetaCorrRaw3Hits<< endl;
+
+
+      if (tauIso<isoTauMin ) {
 	  //      cout<<"  there was a chenge  "<<tauIso<<"  "<<isoTauMin<<" it "<<it<<" tau_index "<<tau_index<<"  "<<analysisTree.tau_count<<endl;
 	  isoTauMin  = tauIso;
 	  tau_iso=true;
 	  //   it > 0 ? tau_index= it -1: 
-	  tau_index = it;
+	  tau_index = int(it);
 	  tau.push_back(it);
 	  TauV.SetPtEtaPhiM(analysisTree.tau_pt[it], analysisTree.tau_eta[it], analysisTree.tau_phi[it], tauMass);
 	  //	      TauMV.push_back(TauV);
@@ -760,14 +753,42 @@ int main(int argc, char * argv[]) {
       }
       if (tau.size()==0 || !tau_iso) continue;
 
+      double tauIso = analysisTree.tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[tau_index];
+	
+      if (tauIso > byCombinedIsolationDeltaBetaCorrRaw3Hits && !InvertTauIso) continue;
 
-      //cout<< " Lets check  "<<mu_index <<"  "<<tau_index <<"  "<<endl;
+      if (tauIso > byCombinedIsolationDeltaBetaCorrRaw3Hits ) {isHighIsoTau =true ; isLowIsoTau=false;} 
+      else {isHighIsoTau =false ; isLowIsoTau=true;} 
+
+	if (InvertTauIso && !isHighIsoTau) continue;
+	if (!InvertTauIso && isHighIsoTau) continue;
+	if (InvertTauIso && isLowIsoTau) continue;
+
+      //cout<< " Lets check  mu_index "<<mu_index <<" tau_index "<<tau_index <<" isLowIsoTau "<<isLowIsoTau<<"  isLowIsoMu "<<isLowIsoMu<<" isHighIsoMu  "<<isHighIsoMu<<"  isLowIsoTau  "<<isLowIsoTau<<endl;
       //cout<<"  "<<endl;
 
-      double q = analysisTree.tau_charge[tau_index] * analysisTree.muon_charge[mu_index];
-      if (q>0) continue;
+     double q = analysisTree.tau_charge[tau_index] * analysisTree.muon_charge[mu_index];
+    
+    // cout<< " Lets check first  here "<<mu_index <<" tau_index "<<tau_index <<" isLowIsoTau "<<isLowIsoTau<<"  isLowIsoMu "<<isLowIsoMu<<" isHighIsoMu  "<<isHighIsoMu<<"  isHighIsoTau  "<<isHighIsoTau<<" invertMu "<<InvertMuIso<<" InvertTauIso "<<InvertTauIso<<"  Charge "<<Sign<<" q "<<q<<" tauIso "<<analysisTree.tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[tau_index]<<" muIso "<<relIso<< "  "<<iEntry<<endl; 
 
-      FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, SelectionSign, mu_index,el_index,tau_index);
+    
+      //if (q>0 &&  (Sign=="OS" || Region !="B" || Region !="C")  ) continue;
+      //if (q<0 && (Sign=="SS" || Region !="A" || Region !="D") ) continue;
+      
+      if (q>0 &&  Sign=="OS" ) continue;
+      if (q<0 && Sign=="SS" ) continue;
+
+      bool regionB = (q<0 && isLowIsoMu);
+      bool regionA = (q>0 && isLowIsoMu);
+      bool regionC = (q<0 && isHighIsoMu);
+      bool regionD = (q>0 && isHighIsoMu);
+
+	
+
+
+   //  cout<< " Lets check  here "<<mu_index <<" tau_index "<<tau_index <<" isLowIsoTau "<<isLowIsoTau<<"  isLowIsoMu "<<isLowIsoMu<<" isHighIsoMu  "<<isHighIsoMu<<"  isHighIsoTau  "<<isHighIsoTau<<"  A   "<< regionA<<"  B  "<<regionB<<" C "<<regionC<<"  D  "<<regionD<<" invertMu "<<InvertMuIso<<" InvertTauIso "<<InvertTauIso<<"  Charge "<<Sign<<" q "<<q<<" tauIso "<<analysisTree.tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[tau_index]<<" muIso "<<relIso<< "  invertMu ? "<<InvertMuIso<< " InverTau ? "<<InvertTauIso<<"  "<<iEntry<<" Region Category "<<Region<<"   "<<TStrName<<endl; 
+ 
+     FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, SelectionSign, mu_index,el_index,tau_index);
       CFCounter[iCut]+= weight;
       iCFCounter[iCut]++;
       iCut++;
@@ -1099,8 +1120,8 @@ int main(int argc, char * argv[]) {
 	    }
 	  }
 
-	    cout<<" Jets "<<analysisTree.pfjet_pt[xj]<<"  "<<JetsMV.at(ib).Pt()<<"  "<<ib<<"  "<<xj<<endl;
-	if (analysisTree.pfjet_btag[xj][0]  > bTag) btagged = true;
+	//     cout<<" Jets "<<analysisTree.pfjet_pt[xj]<<"  "<<JetsMV.at(ib).Pt()<<"  "<<ib<<"  "<<xj<<endl;
+	if (analysisTree.pfjet_btag[xj][8]  > bTag) btagged = true;
       }
       
       if (btagged ) continue;
