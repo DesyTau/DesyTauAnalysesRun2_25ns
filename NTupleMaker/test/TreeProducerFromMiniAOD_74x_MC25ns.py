@@ -40,7 +40,7 @@ process.options = cms.untracked.PSet(
 
 # How many events to process
 process.maxEvents = cms.untracked.PSet( 
-   input = cms.untracked.int32(50)
+   input = cms.untracked.int32(5000)
 )
 
 
@@ -247,6 +247,8 @@ if runOnData:
 else:
   if is25ns:
     fname='/store/mc/RunIISpring15MiniAODv2/TT_TuneCUETP8M1_13TeV-powheg-pythia8/MINIAODSIM/74X_mcRun2_asymptotic_v2_ext3-v1/10000/020B5100-426E-E511-888A-0026189437F9.root'
+    #fname='file:/nfs/dust/cms/user/alkaloge/ACD/NAFtools-RunOnProcessed/CMSSW_7_4_4/src/SUS-RunIISpring15FSPremix-00070.root'
+    #fname='file:/nfs/dust/cms/user/alkaloge/ACD/NAFtools-RunOnProcessed/CMSSW_7_4_14/src/miniAOD/Output/RootFiles/stau_stau400_LSP300_run55863_unwgt_GEN-SIM_chunk4.root'
   else:
     fname='/store/mc/RunIISpring15DR74/TTJets_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/AsymptNoPU_MCRUN2_74_V9A-v2/00000/02AD5DBB-1C0C-E511-8C41-00A0D1EE8E64.root'
 
@@ -522,6 +524,7 @@ process.ApplyBaselineHBHEIsoNoiseFilter = cms.EDFilter('BooleanFlagFilter',
 
 
 
+
 #####################################################################################
 
 # NTuple Maker =======================================================================
@@ -545,7 +548,7 @@ RecPrimVertex = cms.untracked.bool(True),
 RecBeamSpot = cms.untracked.bool(True),
 RecTrack = cms.untracked.bool(False),
 RecPFMet = cms.untracked.bool(True),
-RecPFMetCorr = cms.untracked.bool(True),
+RecPFMetCorr = cms.untracked.bool(False),
 RecMvaMet = cms.untracked.bool(True),                                      
 RecMuon = cms.untracked.bool(True),
 RecPhoton = cms.untracked.bool(False),
@@ -744,21 +747,23 @@ RecJetPtMin = cms.untracked.double(18.),
 RecJetEtaMax = cms.untracked.double(5.2),
 RecJetHLTriggerMatching = cms.untracked.vstring(),
 RecJetBtagDiscriminators = cms.untracked.vstring(
-'jetBProbabilityBJetTags',
-'jetProbabilityBJetTags',
-'trackCountingHighPurBJetTags',
-'trackCountingHighEffBJetTags',
-'simpleSecondaryVertexHighEffBJetTags',
-'simpleSecondaryVertexHighPurBJetTags',
-'combinedInclusiveSecondaryVertexV2BJetTags',
-'pfCombinedSecondaryVertexBJetTags',
-'combinedMVABJetTags'
+'pfCombinedInclusiveSecondaryVertexV2BJetTags',
+'pfJetProbabilityBJetTags'
 ),
 RecJetNum = cms.untracked.int32(0),
 SampleName = cms.untracked.string("Data") 
 )
 #process.patJets.addBTagInfo = cms.bool(True)
 
+#'jetBProbabilityBJetTags',
+#'jetProbabilityBJetTags',
+#'trackCountingHighPurBJetTags',
+#'trackCountingHighEffBJetTags',
+#'simpleSecondaryVertexHighEffBJetTags',
+#'simpleSecondaryVertexHighPurBJetTags',
+#'combinedInclusiveSecondaryVertexV2BJetTags',
+#'pfCombinedSecondaryVertexBJetTags',
+#'combinedMVABJetTags'
 
 process.p = cms.Path(
   process.initroottree*
