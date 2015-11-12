@@ -40,7 +40,11 @@ process.options = cms.untracked.PSet(
 
 # How many events to process
 process.maxEvents = cms.untracked.PSet( 
+<<<<<<< HEAD
+   input = cms.untracked.int32(5000)
+=======
    input = cms.untracked.int32(10000)
+>>>>>>> 2e9938c306842c82f35c60cc599d758d57feafba
 )
 
 
@@ -248,11 +252,17 @@ if runOnData:
           fname = '/store/data/Run2015D/SingleMuon/MINIAOD/05Oct2015-v1/10000/021FD3F0-876F-E511-99D2-0025905A6060.root'
 else:
   if is25ns:
+<<<<<<< HEAD
+    fname='/store/mc/RunIISpring15MiniAODv2/TT_TuneCUETP8M1_13TeV-powheg-pythia8/MINIAODSIM/74X_mcRun2_asymptotic_v2_ext3-v1/10000/020B5100-426E-E511-888A-0026189437F9.root'
+    #fname='file:/nfs/dust/cms/user/alkaloge/ACD/NAFtools-RunOnProcessed/CMSSW_7_4_4/src/SUS-RunIISpring15FSPremix-00070.root'
+    #fname='file:/nfs/dust/cms/user/alkaloge/ACD/NAFtools-RunOnProcessed/CMSSW_7_4_14/src/miniAOD/Output/RootFiles/stau_stau400_LSP300_run55863_unwgt_GEN-SIM_chunk4.root'
+=======
 #    fname='/store/mc/RunIISpring15MiniAODv2/TT_TuneCUETP8M1_13TeV-powheg-pythia8/MINIAODSIM/74X_mcRun2_asymptotic_v2_ext3-v1/10000/020B5100-426E-E511-888A-0026189437F9.root'
     fname='/store/mc/RunIISpring15MiniAODv2/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/74X_mcRun2_asymptotic_v2-v1/50000/00E88378-6F6F-E511-9D54-001E6757EAA4.root'
     fname='/store/mc/RunIISpring15MiniAODv2/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/74X_mcRun2_asymptotic_v2-v1/50000/00759690-D16E-E511-B29E-00261894382D.root'
     #fname='/store/mc/RunIISpring15MiniAODv2/TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/74X_mcRun2_asymptotic_v2-v3/60000/00181849-176A-E511-8B11-848F69FD4C94.root'
 
+>>>>>>> 2e9938c306842c82f35c60cc599d758d57feafba
   else:
     fname='/store/mc/RunIISpring15DR74/TTJets_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/AsymptNoPU_MCRUN2_74_V9A-v2/00000/02AD5DBB-1C0C-E511-8C41-00A0D1EE8E64.root'
 
@@ -537,6 +547,7 @@ process.ApplyBaselineHBHEIsoNoiseFilter = cms.EDFilter('BooleanFlagFilter',
 
 
 
+
 #####################################################################################
 
 # NTuple Maker =======================================================================
@@ -560,8 +571,12 @@ RecPrimVertex = cms.untracked.bool(True),
 RecBeamSpot = cms.untracked.bool(True),
 RecTrack = cms.untracked.bool(False),
 RecPFMet = cms.untracked.bool(True),
+<<<<<<< HEAD
+RecPFMetCorr = cms.untracked.bool(False),
+=======
 RecPFMetCorr = cms.untracked.bool(True),
 RecPuppiMet = cms.untracked.bool(True),
+>>>>>>> 2e9938c306842c82f35c60cc599d758d57feafba
 RecMvaMet = cms.untracked.bool(True),                                      
 RecMuon = cms.untracked.bool(True),
 RecPhoton = cms.untracked.bool(False),
@@ -773,23 +788,28 @@ RecJetPtMin = cms.untracked.double(18.),
 RecJetEtaMax = cms.untracked.double(5.2),
 RecJetHLTriggerMatching = cms.untracked.vstring(),
 RecJetBtagDiscriminators = cms.untracked.vstring(
-'jetBProbabilityBJetTags',
-'jetProbabilityBJetTags',
-'trackCountingHighPurBJetTags',
-'trackCountingHighEffBJetTags',
-'simpleSecondaryVertexHighEffBJetTags',
-'simpleSecondaryVertexHighPurBJetTags',
-'combinedInclusiveSecondaryVertexV2BJetTags',
-'pfCombinedSecondaryVertexBJetTags',
-'combinedMVABJetTags'
+'pfCombinedInclusiveSecondaryVertexV2BJetTags',
+'pfJetProbabilityBJetTags'
 ),
 RecJetNum = cms.untracked.int32(0),
 SampleName = cms.untracked.string("Data") 
 )
 #process.patJets.addBTagInfo = cms.bool(True)
 
+<<<<<<< HEAD
+#'jetBProbabilityBJetTags',
+#'jetProbabilityBJetTags',
+#'trackCountingHighPurBJetTags',
+#'trackCountingHighEffBJetTags',
+#'simpleSecondaryVertexHighEffBJetTags',
+#'simpleSecondaryVertexHighPurBJetTags',
+#'combinedInclusiveSecondaryVertexV2BJetTags',
+#'pfCombinedSecondaryVertexBJetTags',
+#'combinedMVABJetTags'
+=======
 process.load("RecoMET/METProducers.METSignificance_cfi")
 process.load("RecoMET/METProducers.METSignificanceParams_cfi")
+>>>>>>> 2e9938c306842c82f35c60cc599d758d57feafba
 
 process.p = cms.Path(
   process.initroottree*
