@@ -19,6 +19,7 @@ cd ${CMSSW_BASE}/src/
 git cms-merge-topic ikrav:egm_id_7.4.12_v1
 
 ## PileUp Jet Id patch
+## ref. https://github.com/cms-sw/cmssw/pull/12398
 git-cms-addpkg DataFormats/JetReco
 git-cms-addpkg RecoJets/JetProducers
 
