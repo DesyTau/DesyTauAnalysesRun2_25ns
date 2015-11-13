@@ -770,15 +770,8 @@ RecJetPtMin = cms.untracked.double(18.),
 RecJetEtaMax = cms.untracked.double(5.2),
 RecJetHLTriggerMatching = cms.untracked.vstring(),
 RecJetBtagDiscriminators = cms.untracked.vstring(
-'jetBProbabilityBJetTags',
-'jetProbabilityBJetTags',
-'trackCountingHighPurBJetTags',
-'trackCountingHighEffBJetTags',
-'simpleSecondaryVertexHighEffBJetTags',
-'simpleSecondaryVertexHighPurBJetTags',
-'combinedInclusiveSecondaryVertexV2BJetTags',
-'pfCombinedSecondaryVertexBJetTags',
-'combinedMVABJetTags'
+'pfCombinedInclusiveSecondaryVertexV2BJetTags',
+'pfJetProbabilityBJetTags'
 ),
 RecJetNum = cms.untracked.int32(0),
 SampleName = cms.untracked.string("Data") 
