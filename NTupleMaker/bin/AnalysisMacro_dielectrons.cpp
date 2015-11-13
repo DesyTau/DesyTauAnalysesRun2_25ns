@@ -365,16 +365,21 @@ int main(int argc, char * argv[]) {
   const string eleSfMcBarrel = cfg.get<string>("EleSfMcBarrel");
   const string eleSfMcEndcap = cfg.get<string>("EleSfMcEndcap");
 
-  std::vector<Period> periods;
-    
-  std::fstream inputFileStream("temp", std::ios::in);
-  for(std::string s; std::getline(inputFileStream, s); )
-    {
-      periods.push_back(Period());
-      std::stringstream ss(s);
-      ss >> periods.back();
-    }
+  std::vector<Period> periods;  
+  if (isData) { // read the good runs from the temp file 	
+	  std::fstream inputFileStream("temp", std::ios::in);
+  	  if (inputFileStream.fail() ) {
+           std::cout << "Error: can not find the temp file. create it and put it in the bin directory " << std::endl;
+	   std::cout << "Hint: the temp file is created with the strip.sh script in /test/json. " << std::endl; 
+	   return 1;
+	  }
   
+          for(std::string s; std::getline(inputFileStream, s); ) {
+           periods.push_back(Period());
+           std::stringstream ss(s);
+           ss >> periods.back();
+          }
+  }
   // **** end of configuration
 
   // file name and tree name
@@ -732,6 +737,8 @@ int main(int argc, char * argv[]) {
     std::cout << "      number of entries in Tree      = " << numberOfEntries << std::endl;
     AC1B analysisTree(_tree);
 
+  
+    
     for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) { 
 
       analysisTree.GetEntry(iEntry);
@@ -739,6 +746,7 @@ int main(int argc, char * argv[]) {
 
       if (nEvents%10000==0) 
 	cout << "      processed " << nEvents << " events" << endl; 
+
       
       float weight = 1;
 
