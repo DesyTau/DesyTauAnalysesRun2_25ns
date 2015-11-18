@@ -1115,9 +1115,6 @@ int main(int argc, char * argv[]) {
 					muonMass);
 	TLorentzVector dimuon = mu1 + mu2;
 
-
-
-
 	//	std::cout << "Before corrections : MetX = " << pfmet_ex << "   MetY = " << pfmet_ey << "   Met_Phi = " << pfmet_phi << std::endl;
 
 	if (!isData) {
@@ -1131,11 +1128,11 @@ int main(int argc, char * argv[]) {
 	    int etaBin1 = binNumber(eta1,nEtaBins,etaBins);
 	    float sf1 = mueffSF[etaBin1][ptBin1];
 
-	    std::cout << "mu1 : pt=" << mu1.Pt() << " (" << ptBin1 << ")"
-		      << "  eta=" << mu1.Eta() << " (" << etaBin1 << ")"
-		      << "  eff(data)=" << mueffData[etaBin1][ptBin1] 
-		      << "  eff(MC)=" << mueffMC[etaBin1][ptBin1]
-		      << "  SF=" << mueffSF[etaBin1][ptBin1] << std::endl;
+	    //	    std::cout << "mu1 : pt=" << mu1.Pt() << " (" << ptBin1 << ")"
+	    //		      << "  eta=" << mu1.Eta() << " (" << etaBin1 << ")"
+	    //		      << "  eff(data)=" << mueffData[etaBin1][ptBin1] 
+	    //		      << "  eff(MC)=" << mueffMC[etaBin1][ptBin1]
+	    //		      << "  SF=" << mueffSF[etaBin1][ptBin1] << std::endl;
 
 	    float pt2 = mu2.Pt(); 
 	    if (pt2>1000) pt2 = 999;
@@ -1145,11 +1142,11 @@ int main(int argc, char * argv[]) {
 	    int etaBin2 = binNumber(eta2,nEtaBins,etaBins);
 	    float sf2 = mueffSF[etaBin2][ptBin2];
 
-	    std::cout << "mu2 : pt=" << mu2.Pt() << " (" << ptBin2 << ")"
-		      << "  eta=" << mu2.Eta() << " (" << etaBin2 << ")"
-		      << "  eff(data)=" << mueffData[etaBin2][ptBin2] 
-		      << "  eff(MC)=" << mueffMC[etaBin2][ptBin2]
-		      << "  SF=" << mueffSF[etaBin2][ptBin2] << std::endl;
+	    //	    std::cout << "mu2 : pt=" << mu2.Pt() << " (" << ptBin2 << ")"
+	    //		      << "  eta=" << mu2.Eta() << " (" << etaBin2 << ")"
+	    //		      << "  eff(data)=" << mueffData[etaBin2][ptBin2] 
+	    //		      << "  eff(MC)=" << mueffMC[etaBin2][ptBin2]
+	    //		      << "  SF=" << mueffSF[etaBin2][ptBin2] << std::endl;
 
 	    float sf = sf1 * sf2;
 	    weight *= sf;
