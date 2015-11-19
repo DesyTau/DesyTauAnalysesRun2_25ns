@@ -2,8 +2,8 @@ import FWCore.ParameterSet.Config as cms
 
 isData = True
 is25ns = True
-isPRv4 = False
-isRepr05Oct = True
+isPRv4 = True
+isRepr05Oct = False
 #skim = 0
 year = 2015
 period = 'Run2015D'
