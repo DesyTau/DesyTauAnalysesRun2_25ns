@@ -341,13 +341,13 @@ int main(int argc, char * argv[]) {
   const string muonHLTFilterName  = cfg.get<string>("MuonHLTFilterName");
   const string electronHLTFilterName  = cfg.get<string>("ElectronHLTFilterName");
 
-  const string mu23Ele12HLTName =  cfg.get<string>("Mu23Ele12HLTName");
-  const string mu8Ele23HLTName =  cfg.get<string>("Mu8Ele23HLTName");
+  const string mu23Ele12HLTName =  cfg.get<string>("Mu17Ele12HLTName");
+  const string mu8Ele17HLTName =  cfg.get<string>("Mu8Ele17HLTName");
 
-  const string mu23Ele12MuonFilterName =  cfg.get<string>("Mu23Ele12MuonFilterName");
-  const string mu8Ele23MuonFilterName =  cfg.get<string>("Mu8Ele23MuonFilterName");
-  const string mu23Ele12ElectronFilterName =  cfg.get<string>("Mu23Ele12ElectronFilterName");
-  const string mu8Ele23ElectronFilterName =  cfg.get<string>("Mu8Ele23ElectronFilterName");
+  const string mu23Ele12MuonFilterName =  cfg.get<string>("Mu17Ele12MuonFilterName");
+  const string mu8Ele17MuonFilterName =  cfg.get<string>("Mu8Ele17MuonFilterName");
+  const string mu23Ele12ElectronFilterName =  cfg.get<string>("Mu17Ele12ElectronFilterName");
+  const string mu8Ele17ElectronFilterName =  cfg.get<string>("Mu8Ele17ElectronFilterName");
 
 
   TString MuonHLTName(muonHLTName);
@@ -355,12 +355,12 @@ int main(int argc, char * argv[]) {
   TString MuonHLTFilterName(muonHLTFilterName);
   TString ElectronHLTFilterName(electronHLTFilterName);
 
-  TString Mu23Ele12HLTName(Mu23Ele12HLTName);
-  TString Mu8Ele23HLTName(Mu8Ele23HLTName);
-  TString Mu23Ele12MuonFilterName(mu23Ele12MuonFilterName);
-  TString Mu8Ele23MuonFilterName(mu8Ele23MuonFilterName);
-  TString Mu23Ele12ElectronFilterName(mu23Ele12ElectronFilterName);
-  TString Mu8Ele23ElectronFilterName(mu8Ele23ElectronFilterName);
+  TString Mu17Ele12HLTName(Mu17Ele12HLTName);
+  TString Mu8Ele17HLTName(Mu8Ele17HLTName);
+  TString Mu17Ele12MuonFilterName(mu23Ele12MuonFilterName);
+  TString Mu8Ele17MuonFilterName(mu8Ele17MuonFilterName);
+  TString Mu17Ele12ElectronFilterName(mu23Ele12ElectronFilterName);
+  TString Mu8Ele17ElectronFilterName(mu8Ele17ElectronFilterName);
 
   // cuts on jets
   const float jetEtaCut = cfg.get<float>("JetEtaCut");
@@ -393,24 +393,24 @@ int main(int argc, char * argv[]) {
   const string eleSfMcBarrel = cfg.get<string>("EleSfMcBarrel");
   const string eleSfMcEndcap = cfg.get<string>("EleSfMcEndcap");
 
-  const float legMu23BarrelData = cfg.get<float>("LegMu23BarrelData");
+  const float legMu17BarrelData = cfg.get<float>("LegMu17BarrelData");
   const float legMu8BarrelData = cfg.get<float>("LegMu8BarrelData");
-  const float legMu23EndcapData = cfg.get<float>("LegMu23EndcapData");
+  const float legMu17EndcapData = cfg.get<float>("LegMu17EndcapData");
   const float legMu8EndcapData = cfg.get<float>("LegMu8EndcapData");
 
-  const float legMu23BarrelMC = cfg.get<float>("LegMu23BarrelMC");
+  const float legMu17BarrelMC = cfg.get<float>("LegMu17BarrelMC");
   const float legMu8BarrelMC = cfg.get<float>("LegMu8BarrelMC");
-  const float legMu23EndcapMC = cfg.get<float>("LegMu23EndcapMC");
+  const float legMu17EndcapMC = cfg.get<float>("LegMu17EndcapMC");
   const float legMu8EndcapMC = cfg.get<float>("LegMu8EndcapMC");
 
-  const float legEle23BarrelData = cfg.get<float>("LegEle23BarrelData");
+  const float legEle17BarrelData = cfg.get<float>("LegEle17BarrelData");
   const float legEle12BarrelData = cfg.get<float>("LegEle12BarrelData");
-  const float legEle23EndcapData = cfg.get<float>("LegEle23EndcapData");
+  const float legEle17EndcapData = cfg.get<float>("LegEle17EndcapData");
   const float legEle12EndcapData = cfg.get<float>("LegEle12EndcapData");
 
-  const float legEle23BarrelMC = cfg.get<float>("LegEle23BarrelMC");
+  const float legEle17BarrelMC = cfg.get<float>("LegEle17BarrelMC");
   const float legEle12BarrelMC = cfg.get<float>("LegEle12BarrelMC");
-  const float legEle23EndcapMC = cfg.get<float>("LegEle23EndcapMC");
+  const float legEle17EndcapMC = cfg.get<float>("LegEle17EndcapMC");
   const float legEle12EndcapMC = cfg.get<float>("LegEle12EndcapMC");
 
   const float muMomentumSF = cfg.get<float>("MuonMomentumSF");
@@ -561,39 +561,39 @@ int main(int argc, char * argv[]) {
   TH1F * TTJetsDiLeptonAccH = new TH1F("TTJetsDiLeptonAccH","",1,-0.5,0.5);
 
 
-  TH1F * ptMu23TTJetsPassH = new TH1F("ptMu23TTJetsPassH","",200,0,200);
-  TH1F * ptMu23TTJetsFailH = new TH1F("ptMu23TTJetsFailH","",200,0,200);
+  TH1F * ptMu17TTJetsPassH = new TH1F("ptMu17TTJetsPassH","",200,0,200);
+  TH1F * ptMu17TTJetsFailH = new TH1F("ptMu17TTJetsFailH","",200,0,200);
 
   TH1F * ptMu8TTJetsPassH = new TH1F("ptMu8TTJetsPassH","",200,0,200);
   TH1F * ptMu8TTJetsFailH = new TH1F("ptMu8TTJetsFailH","",200,0,200);
 
-  TH1F * ptEle23TTJetsPassH = new TH1F("ptEle23TTJetsPassH","",200,0,200);
-  TH1F * ptEle23TTJetsFailH = new TH1F("ptEle23TTJetsFailH","",200,0,200);
+  TH1F * ptEle17TTJetsPassH = new TH1F("ptEle17TTJetsPassH","",200,0,200);
+  TH1F * ptEle17TTJetsFailH = new TH1F("ptEle17TTJetsFailH","",200,0,200);
 
   TH1F * ptEle12TTJetsPassH = new TH1F("ptEle12TTJetsPassH","",200,0,200);
   TH1F * ptEle12TTJetsFailH = new TH1F("ptEle12TTJetsFailH","",200,0,200);
 
-  TH1F * ptMu23TTJetsBarrelPassH = new TH1F("ptMu23TTJetsBarrelPassH","",200,0,200);
-  TH1F * ptMu23TTJetsBarrelFailH = new TH1F("ptMu23TTJetsBarrelFailH","",200,0,200);
+  TH1F * ptMu17TTJetsBarrelPassH = new TH1F("ptMu17TTJetsBarrelPassH","",200,0,200);
+  TH1F * ptMu17TTJetsBarrelFailH = new TH1F("ptMu17TTJetsBarrelFailH","",200,0,200);
 
   TH1F * ptMu8TTJetsBarrelPassH = new TH1F("ptMu8TTJetsBarrelPassH","",200,0,200);
   TH1F * ptMu8TTJetsBarrelFailH = new TH1F("ptMu8TTJetsBarrelFailH","",200,0,200);
 
-  TH1F * ptEle23TTJetsBarrelPassH = new TH1F("ptEle23TTJetsBarrelPassH","",200,0,200);
-  TH1F * ptEle23TTJetsBarrelFailH = new TH1F("ptEle23TTJetsBarrelFailH","",200,0,200);
+  TH1F * ptEle17TTJetsBarrelPassH = new TH1F("ptEle17TTJetsBarrelPassH","",200,0,200);
+  TH1F * ptEle17TTJetsBarrelFailH = new TH1F("ptEle17TTJetsBarrelFailH","",200,0,200);
 
   TH1F * ptEle12TTJetsBarrelPassH = new TH1F("ptEle12TTJetsBarrelPassH","",200,0,200);
   TH1F * ptEle12TTJetsBarrelFailH = new TH1F("ptEle12TTJetsBarrelFailH","",200,0,200);
 
 
-  TH1F * ptMu23TTJetsEndcapPassH = new TH1F("ptMu23TTJetsEndcapPassH","",200,0,200);
-  TH1F * ptMu23TTJetsEndcapFailH = new TH1F("ptMu23TTJetsEndcapFailH","",200,0,200);
+  TH1F * ptMu17TTJetsEndcapPassH = new TH1F("ptMu17TTJetsEndcapPassH","",200,0,200);
+  TH1F * ptMu17TTJetsEndcapFailH = new TH1F("ptMu17TTJetsEndcapFailH","",200,0,200);
 
   TH1F * ptMu8TTJetsEndcapPassH = new TH1F("ptMu8TTJetsEndcapPassH","",200,0,200);
   TH1F * ptMu8TTJetsEndcapFailH = new TH1F("ptMu8TTJetsEndcapFailH","",200,0,200);
 
-  TH1F * ptEle23TTJetsEndcapPassH = new TH1F("ptEle23TTJetsEndcapPassH","",200,0,200);
-  TH1F * ptEle23TTJetsEndcapFailH = new TH1F("ptEle23TTJetsEndcapFailH","",200,0,200);
+  TH1F * ptEle17TTJetsEndcapPassH = new TH1F("ptEle17TTJetsEndcapPassH","",200,0,200);
+  TH1F * ptEle17TTJetsEndcapFailH = new TH1F("ptEle17TTJetsEndcapFailH","",200,0,200);
 
   TH1F * ptEle12TTJetsEndcapPassH = new TH1F("ptEle12TTJetsEndcapPassH","",200,0,200);
   TH1F * ptEle12TTJetsEndcapFailH = new TH1F("ptEle12TTJetsEndcapFailH","",200,0,200);
@@ -1067,8 +1067,8 @@ int main(int argc, char * argv[]) {
       // triggers
       bool isTriggerMuon = false;
       bool isTriggerElectron = false;
-      bool isTriggerMu23Ele12 = false;
-      bool isTriggerMu8Ele23 = false;
+      bool isTriggerMu17Ele12 = false;
+      bool isTriggerMu8Ele17 = false;
       for (std::map<string,int>::iterator it=analysisTree.hltriggerresults->begin(); it!=analysisTree.hltriggerresults->end(); ++it) {
 	TString trigName(it->first);
 	if (trigName.Contains(MuonHLTName)) {
@@ -1081,15 +1081,15 @@ int main(int argc, char * argv[]) {
 	  if (it->second==1)
             isTriggerElectron = true;
 	}
-	if (trigName.Contains(Mu23Ele12HLTName)) {
-	  //  std::cout << Mu23Ele12HLTName << " : " << it->second << std::endl;
+	if (trigName.Contains(Mu17Ele12HLTName)) {
+	  //  std::cout << Mu17Ele12HLTName << " : " << it->second << std::endl;
 	  if (it->second==1)
-            isTriggerMu23Ele12 = true;
+            isTriggerMu17Ele12 = true;
 	}
-	if (trigName.Contains(Mu8Ele23HLTName)) {
-	  //  std::cout << Mu8Ele23HLTName << " : " << it->second << std::endl;
+	if (trigName.Contains(Mu8Ele17HLTName)) {
+	  //  std::cout << Mu8Ele17HLTName << " : " << it->second << std::endl;
 	  if (it->second==1)
-            isTriggerMu8Ele23 = true;
+            isTriggerMu8Ele17 = true;
 	}
       }
 
@@ -1110,14 +1110,14 @@ int main(int argc, char * argv[]) {
 	if (!isTriggerMuon&&isTriggerElectron) acceptTrig = true;
       }
       if (trigger==5) {
-	if (isTriggerMu23Ele12 || isTriggerMu8Ele23) acceptTrig = true;
+	if (isTriggerMu17Ele12 || isTriggerMu8Ele17) acceptTrig = true;
       }
       if (trigger==6) {
-	if (isTriggerMu23Ele12 || isTriggerMu8Ele23 || isTriggerMuon || isTriggerElectron) 
+	if (isTriggerMu17Ele12 || isTriggerMu8Ele17 || isTriggerMuon || isTriggerElectron) 
 	  acceptTrig = true;
       }
       if (trigger==7) {
-	if ( (isTriggerMu23Ele12 || isTriggerMu8Ele23) && !(isTriggerMuon || isTriggerElectron) ) 
+	if ( (isTriggerMu17Ele12 || isTriggerMu8Ele17) && !(isTriggerMuon || isTriggerElectron) ) 
 	  acceptTrig = true;
       }
 
@@ -1131,17 +1131,17 @@ int main(int argc, char * argv[]) {
       unsigned int nElectronHLTFilter = 0;
       bool isElectronHLTFilter = false;
 
-      unsigned int nMu23Ele12MuonFilter = 0;
-      bool isMu23Ele12MuonFilter = false;
+      unsigned int nMu17Ele12MuonFilter = 0;
+      bool isMu17Ele12MuonFilter = false;
 
-      unsigned int nMu8Ele23MuonFilter = 0;
-      bool isMu8Ele23MuonFilter = false;
+      unsigned int nMu8Ele17MuonFilter = 0;
+      bool isMu8Ele17MuonFilter = false;
 
-      unsigned int nMu23Ele12ElectronFilter = 0;
-      bool isMu23Ele12ElectronFilter = false;
+      unsigned int nMu17Ele12ElectronFilter = 0;
+      bool isMu17Ele12ElectronFilter = false;
 
-      unsigned int nMu8Ele23ElectronFilter = 0;
-      bool isMu8Ele23ElectronFilter = false;
+      unsigned int nMu8Ele17ElectronFilter = 0;
+      bool isMu8Ele17ElectronFilter = false;
 
       unsigned int nfilters = analysisTree.run_hltfilters->size();
       for (unsigned int i=0; i<nfilters; ++i) {
@@ -1154,21 +1154,21 @@ int main(int argc, char * argv[]) {
 	  nElectronHLTFilter = i;
 	  isElectronHLTFilter = true;
 	}
-	if (HLTFilter==Mu23Ele12MuonFilterName) {
-	  nMu23Ele12MuonFilter = i;
-	  isMu23Ele12MuonFilter = true;
+	if (HLTFilter==Mu17Ele12MuonFilterName) {
+	  nMu17Ele12MuonFilter = i;
+	  isMu17Ele12MuonFilter = true;
 	}
-	if (HLTFilter==Mu8Ele23MuonFilterName) {
-	  nMu8Ele23MuonFilter = i;
-	  isMu8Ele23MuonFilter = true;
+	if (HLTFilter==Mu8Ele17MuonFilterName) {
+	  nMu8Ele17MuonFilter = i;
+	  isMu8Ele17MuonFilter = true;
 	}
-	if (HLTFilter==Mu23Ele12ElectronFilterName) {
-	  nMu23Ele12ElectronFilter = i;
-	  isMu23Ele12ElectronFilter = true;
+	if (HLTFilter==Mu17Ele12ElectronFilterName) {
+	  nMu17Ele12ElectronFilter = i;
+	  isMu17Ele12ElectronFilter = true;
 	}
-	if (HLTFilter==Mu8Ele23ElectronFilterName) {
-	  nMu8Ele23ElectronFilter = i;
-	  isMu8Ele23ElectronFilter = true;
+	if (HLTFilter==Mu8Ele17ElectronFilterName) {
+	  nMu8Ele17ElectronFilter = i;
+	  isMu8Ele17ElectronFilter = true;
 	}
        }
       if (!isElectronHLTFilter) {
@@ -1179,17 +1179,17 @@ int main(int argc, char * argv[]) {
 	//	std::cout << "HLT filter " << MuonHLTFilterName << " not found" << std::endl;
 	//	exit(-1);
       }
-      if (!isMu23Ele12MuonFilter) {
-	std::cout << "HLT filter " << Mu23Ele12MuonFilterName << " not found" << std::endl; 
+      if (!isMu17Ele12MuonFilter) {
+	std::cout << "HLT filter " << Mu17Ele12MuonFilterName << " not found" << std::endl; 
       }
-      if (!isMu8Ele23MuonFilter) {
-	std::cout << "HLT filter " << Mu8Ele23MuonFilterName << " not found" << std::endl; 
+      if (!isMu8Ele17MuonFilter) {
+	std::cout << "HLT filter " << Mu8Ele17MuonFilterName << " not found" << std::endl; 
       }
-      if (!isMu23Ele12ElectronFilter) {
-	std::cout << "HLT filter " << Mu23Ele12ElectronFilterName << " not found" << std::endl; 
+      if (!isMu17Ele12ElectronFilter) {
+	std::cout << "HLT filter " << Mu17Ele12ElectronFilterName << " not found" << std::endl; 
       }
-      if (!isMu8Ele23ElectronFilter) {
-	std::cout << "HLT filter " << Mu8Ele23ElectronFilterName << " not found" << std::endl; 
+      if (!isMu8Ele17ElectronFilter) {
+	std::cout << "HLT filter " << Mu8Ele17ElectronFilterName << " not found" << std::endl; 
       }
 
       // vertex cuts
@@ -1297,10 +1297,10 @@ int main(int argc, char * argv[]) {
       int electronIndex = -1;
       int muonIndex = -1;
       bool selElectronTrigMatched  = false;
-      bool selElectronEle23Matched = false;
+      bool selElectronEle17Matched = false;
       bool selElectronEle12Matched = false;
       bool selMuonTrigMatched = false;
-      bool selMuonMu23Matched = false;
+      bool selMuonMu17Matched = false;
       bool selMuonMu8Matched  = false;
       for (unsigned int ie=0; ie<electrons.size(); ++ie) {
 	//	std::cout << "Electron " << ie << std::endl;
@@ -1319,13 +1319,13 @@ int main(int argc, char * argv[]) {
 	      fabs(analysisTree.electron_eta[eIndex])<etaElectronHighCut) { // Electron Leg of single electron trigger
 	    electronMatch = true;
 	  }
-	  if (analysisTree.trigobject_filters[iT][nMu23Ele12ElectronFilter]) { // Electron Leg of Mu23Ele12 trigger 
+	  if (analysisTree.trigobject_filters[iT][nMu17Ele12ElectronFilter]) { // Electron Leg of Mu17Ele12 trigger 
 	    ele12TrigMatch = true;
 	    if (analysisTree.electron_pt[eIndex]>ptElectronLowCut && 
 		fabs(analysisTree.electron_eta[eIndex])<etaElectronLowCut) 
 	      ele12Match = true;
 	  }
-	  if (analysisTree.trigobject_filters[iT][nMu8Ele23ElectronFilter]) { // Electron Leg of Mu8Ele23 trigger
+	  if (analysisTree.trigobject_filters[iT][nMu8Ele17ElectronFilter]) { // Electron Leg of Mu8Ele17 trigger
 	    ele23TrigMatch = true;
 	    if (analysisTree.electron_pt[eIndex]>ptElectronHighCut && 
 		fabs(analysisTree.electron_eta[eIndex])<etaElectronLowCut)
@@ -1349,13 +1349,13 @@ int main(int argc, char * argv[]) {
 		fabs(analysisTree.muon_eta[mIndex])<etaMuonHighCut) { // Muon Leg of single muon trigger
 	      muonMatch = true;
 	    }
-	    if (analysisTree.trigobject_filters[iT][nMu23Ele12MuonFilter]) { // Muon Leg of Mu23Ele12 trigger
+	    if (analysisTree.trigobject_filters[iT][nMu17Ele12MuonFilter]) { // Muon Leg of Mu17Ele12 trigger
 	      muon23TrigMatch = true;
 	      if (analysisTree.muon_pt[mIndex]>ptMuonHighCut && 
 		  fabs(analysisTree.muon_eta[mIndex])<etaMuonLowCut) 
 		muon23Match = true;
 	    }
-	    if (analysisTree.trigobject_filters[iT][nMu8Ele23MuonFilter]) { // Muon Leg of Mu8Ele23 trigger
+	    if (analysisTree.trigobject_filters[iT][nMu8Ele17MuonFilter]) { // Muon Leg of Mu8Ele17 trigger
 	      muon8TrigMatch = true;
 	      if (analysisTree.muon_pt[mIndex]>ptMuonLowCut && 
 		  fabs(analysisTree.muon_eta[mIndex])<etaMuonLowCut) 
@@ -1387,10 +1387,10 @@ int main(int argc, char * argv[]) {
 	    electronIndex = ie;
 	    muonIndex = im;
 	    selElectronTrigMatched = electronMatch;
-	    selElectronEle23Matched = ele23TrigMatch;
+	    selElectronEle17Matched = ele23TrigMatch;
 	    selElectronEle12Matched = ele12TrigMatch;
 	    selMuonTrigMatched = muonMatch;
-	    selMuonMu23Matched = muon23TrigMatch;
+	    selMuonMu17Matched = muon23TrigMatch;
 	    selMuonMu8Matched   = muon8TrigMatch;
 	  }
 	}
@@ -1482,25 +1482,25 @@ int main(int argc, char * argv[]) {
 	  weight = weight*wMu*wEle;
 	}
 	if (applyTrigWeight) {
-	  float mu23data = legMu23BarrelData;
-	  float mu23mc = legMu23BarrelMC;
+	  float mu23data = legMu17BarrelData;
+	  float mu23mc = legMu17BarrelMC;
 	  float mu8data = legMu8BarrelData;
 	  float mu8mc = legMu8BarrelMC;
 	  if (absEtaMu>1.48) { 
-	    mu23data = legMu23EndcapData;
-	    mu23mc = legMu23EndcapMC;
+	    mu23data = legMu17EndcapData;
+	    mu23mc = legMu17EndcapMC;
 	    mu8data = legMu8EndcapData;
-	    mu8mc = legMu23EndcapMC;
+	    mu8mc = legMu17EndcapMC;
 	  }
-	  float ele23data = legEle23BarrelData;
-	  float ele23mc = legEle23BarrelMC;
+	  float ele23data = legEle17BarrelData;
+	  float ele23mc = legEle17BarrelMC;
 	  float ele12data = legEle12BarrelData;
 	  float ele12mc = legEle12BarrelMC;
 	  if (absEtaEle>1.48) { 
-	    ele23data = legEle23EndcapData;
-	    ele23mc = legEle23EndcapMC;
+	    ele23data = legEle17EndcapData;
+	    ele23mc = legEle17EndcapMC;
 	    ele12data = legEle12EndcapData;
-	    ele12mc = legEle23EndcapMC;
+	    ele12mc = legEle17EndcapMC;
 	  }
 	  float trigData = mu23data*ele12data + mu8data*ele23data - mu23data*ele23data;
 	  float trigMC = mu23mc*ele12mc + mu8mc*ele23mc - mu23mc*ele23mc;
@@ -1758,19 +1758,19 @@ int main(int argc, char * argv[]) {
 
 	if (selElectronTrigMatched) {
 
-	  if (selMuonMu23Matched) {
-	    ptMu23TTJetsPassH->Fill(muonLV.Pt(),weight);
+	  if (selMuonMu17Matched) {
+	    ptMu17TTJetsPassH->Fill(muonLV.Pt(),weight);
 	    if (fabs(muonLV.Eta())<1.48)
-	      ptMu23TTJetsBarrelPassH->Fill(muonLV.Pt(),weight);
+	      ptMu17TTJetsBarrelPassH->Fill(muonLV.Pt(),weight);
 	    else
-	      ptMu23TTJetsEndcapPassH->Fill(muonLV.Pt(),weight);
+	      ptMu17TTJetsEndcapPassH->Fill(muonLV.Pt(),weight);
 	  } 
 	  else {
-	    ptMu23TTJetsFailH->Fill(muonLV.Pt(),weight);
+	    ptMu17TTJetsFailH->Fill(muonLV.Pt(),weight);
 	    if (fabs(muonLV.Eta())<1.48)
-              ptMu23TTJetsBarrelFailH->Fill(muonLV.Pt(),weight);
+              ptMu17TTJetsBarrelFailH->Fill(muonLV.Pt(),weight);
             else
-              ptMu23TTJetsEndcapFailH->Fill(muonLV.Pt(),weight);
+              ptMu17TTJetsEndcapFailH->Fill(muonLV.Pt(),weight);
 	  }
 
 	  if (selMuonMu8Matched) {
@@ -1792,19 +1792,19 @@ int main(int argc, char * argv[]) {
 
 	if (selMuonTrigMatched) {
 
-	  if (selElectronEle23Matched) {
-            ptEle23TTJetsPassH->Fill(electronLV.Pt(),weight);
+	  if (selElectronEle17Matched) {
+            ptEle17TTJetsPassH->Fill(electronLV.Pt(),weight);
             if (fabs(electronLV.Eta())<1.48)
-              ptEle23TTJetsBarrelPassH->Fill(electronLV.Pt(),weight);
+              ptEle17TTJetsBarrelPassH->Fill(electronLV.Pt(),weight);
             else
-              ptEle23TTJetsEndcapPassH->Fill(electronLV.Pt(),weight);
+              ptEle17TTJetsEndcapPassH->Fill(electronLV.Pt(),weight);
           }
           else {
-            ptEle23TTJetsFailH->Fill(electronLV.Pt(),weight);
+            ptEle17TTJetsFailH->Fill(electronLV.Pt(),weight);
             if (fabs(electronLV.Eta())<1.48)
-              ptEle23TTJetsBarrelFailH->Fill(electronLV.Pt(),weight);
+              ptEle17TTJetsBarrelFailH->Fill(electronLV.Pt(),weight);
             else
-              ptEle23TTJetsEndcapFailH->Fill(electronLV.Pt(),weight);
+              ptEle17TTJetsEndcapFailH->Fill(electronLV.Pt(),weight);
           }
 
 	  if (selElectronEle12Matched) {
