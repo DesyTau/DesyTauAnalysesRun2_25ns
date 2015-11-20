@@ -341,12 +341,12 @@ int main(int argc, char * argv[]) {
   const string muonHLTFilterName  = cfg.get<string>("MuonHLTFilterName");
   const string electronHLTFilterName  = cfg.get<string>("ElectronHLTFilterName");
 
-  const string mu23Ele12HLTName =  cfg.get<string>("Mu17Ele12HLTName");
+  const string mu17Ele12HLTName =  cfg.get<string>("Mu17Ele12HLTName");
   const string mu8Ele17HLTName =  cfg.get<string>("Mu8Ele17HLTName");
 
-  const string mu23Ele12MuonFilterName =  cfg.get<string>("Mu17Ele12MuonFilterName");
+  const string mu17Ele12MuonFilterName =  cfg.get<string>("Mu17Ele12MuonFilterName");
   const string mu8Ele17MuonFilterName =  cfg.get<string>("Mu8Ele17MuonFilterName");
-  const string mu23Ele12ElectronFilterName =  cfg.get<string>("Mu17Ele12ElectronFilterName");
+  const string mu17Ele12ElectronFilterName =  cfg.get<string>("Mu17Ele12ElectronFilterName");
   const string mu8Ele17ElectronFilterName =  cfg.get<string>("Mu8Ele17ElectronFilterName");
 
 
@@ -357,9 +357,9 @@ int main(int argc, char * argv[]) {
 
   TString Mu17Ele12HLTName(Mu17Ele12HLTName);
   TString Mu8Ele17HLTName(Mu8Ele17HLTName);
-  TString Mu17Ele12MuonFilterName(mu23Ele12MuonFilterName);
+  TString Mu17Ele12MuonFilterName(mu17Ele12MuonFilterName);
   TString Mu8Ele17MuonFilterName(mu8Ele17MuonFilterName);
-  TString Mu17Ele12ElectronFilterName(mu23Ele12ElectronFilterName);
+  TString Mu17Ele12ElectronFilterName(mu17Ele12ElectronFilterName);
   TString Mu8Ele17ElectronFilterName(mu8Ele17ElectronFilterName);
 
   // cuts on jets
@@ -1306,9 +1306,9 @@ int main(int argc, char * argv[]) {
 	//	std::cout << "Electron " << ie << std::endl;
 	int eIndex = electrons[ie];
 	bool electronMatch = false;
-	bool ele23Match = false;
+	bool ele17Match = false;
 	bool ele12Match = false;
-	bool ele23TrigMatch = false;
+	bool ele17TrigMatch = false;
 	bool ele12TrigMatch = false;
 	for (unsigned int iT=0; iT<analysisTree.trigobject_count; ++iT) {
 	  float dRtrig = deltaR(analysisTree.electron_eta[eIndex],analysisTree.electron_phi[eIndex],
@@ -1326,10 +1326,10 @@ int main(int argc, char * argv[]) {
 	      ele12Match = true;
 	  }
 	  if (analysisTree.trigobject_filters[iT][nMu8Ele17ElectronFilter]) { // Electron Leg of Mu8Ele17 trigger
-	    ele23TrigMatch = true;
+	    ele17TrigMatch = true;
 	    if (analysisTree.electron_pt[eIndex]>ptElectronHighCut && 
 		fabs(analysisTree.electron_eta[eIndex])<etaElectronLowCut)
-	      ele23Match = true;
+	      ele17Match = true;
 	  }
 	}
 	for (unsigned int im=0; im<muons.size(); ++im) {
@@ -1365,9 +1365,9 @@ int main(int argc, char * argv[]) {
 
 	  bool trigMatch = electronMatch || muonMatch;
 	  if (trigger==5)
-	    trigMatch = (muon23Match && ele12Match) || (muon8Match && ele23Match);
+	    trigMatch = (muon23Match && ele12Match) || (muon8Match && ele17Match);
 	  if (trigger==6 || trigger==7)
-	    trigMatch = (muon23Match && ele12Match) || (muon8Match && ele23Match) ||  electronMatch || muonMatch;
+	    trigMatch = (muon23Match && ele12Match) || (muon8Match && ele17Match) ||  electronMatch || muonMatch;
 	    
 
 	  if (!trigMatch) continue;
@@ -1387,7 +1387,7 @@ int main(int argc, char * argv[]) {
 	    electronIndex = ie;
 	    muonIndex = im;
 	    selElectronTrigMatched = electronMatch;
-	    selElectronEle17Matched = ele23TrigMatch;
+	    selElectronEle17Matched = ele17TrigMatch;
 	    selElectronEle12Matched = ele12TrigMatch;
 	    selMuonTrigMatched = muonMatch;
 	    selMuonMu17Matched = muon23TrigMatch;
@@ -1482,28 +1482,28 @@ int main(int argc, char * argv[]) {
 	  weight = weight*wMu*wEle;
 	}
 	if (applyTrigWeight) {
-	  float mu23data = legMu17BarrelData;
-	  float mu23mc = legMu17BarrelMC;
+	  float mu17data = legMu17BarrelData;
+	  float mu17mc = legMu17BarrelMC;
 	  float mu8data = legMu8BarrelData;
 	  float mu8mc = legMu8BarrelMC;
 	  if (absEtaMu>1.48) { 
-	    mu23data = legMu17EndcapData;
-	    mu23mc = legMu17EndcapMC;
+	    mu17data = legMu17EndcapData;
+	    mu17mc = legMu17EndcapMC;
 	    mu8data = legMu8EndcapData;
 	    mu8mc = legMu17EndcapMC;
 	  }
-	  float ele23data = legEle17BarrelData;
-	  float ele23mc = legEle17BarrelMC;
+	  float ele17data = legEle17BarrelData;
+	  float ele17mc = legEle17BarrelMC;
 	  float ele12data = legEle12BarrelData;
 	  float ele12mc = legEle12BarrelMC;
 	  if (absEtaEle>1.48) { 
-	    ele23data = legEle17EndcapData;
-	    ele23mc = legEle17EndcapMC;
+	    ele17data = legEle17EndcapData;
+	    ele17mc = legEle17EndcapMC;
 	    ele12data = legEle12EndcapData;
 	    ele12mc = legEle17EndcapMC;
 	  }
-	  float trigData = mu23data*ele12data + mu8data*ele23data - mu23data*ele23data;
-	  float trigMC = mu23mc*ele12mc + mu8mc*ele23mc - mu23mc*ele23mc;
+	  float trigData = mu17data*ele12data + mu8data*ele17data - mu17data*ele17data;
+	  float trigMC = mu17mc*ele12mc + mu8mc*ele17mc - mu17mc*ele17mc;
 	  weight = weight*trigData/trigMC;
 	  //	  cout << "Trig weight = " << trigData/trigMC << endl;
 	}
