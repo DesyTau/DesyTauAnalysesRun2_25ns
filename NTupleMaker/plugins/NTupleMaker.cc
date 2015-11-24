@@ -300,6 +300,7 @@ void NTupleMaker::beginJob(){
   // primary vertex
   if (crecprimvertex) {
     tree->Branch("primvertex_count", &primvertex_count, "primvertex_count/i"); 
+    tree->Branch("goodprimvertex_count", &goodprimvertex_count, "goodprimvertex_count/i"); 
     tree->Branch("primvertex_x", &primvertex_x, "primvertex_x/F");
     tree->Branch("primvertex_y", &primvertex_y, "primvertex_y/F");
     tree->Branch("primvertex_z", &primvertex_z, "primvertex_z/F");
@@ -1132,6 +1133,7 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   if(doDebug)  cout<<"inside the analyze function"<< endl; 
 
   track_count = 0;
+  goodprimvertex_count = 0;
   primvertex_count = 0;
   muon_count = 0;
   tau_count = 0;
@@ -1257,43 +1259,36 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     {
       edm::Handle<VertexCollection> Vertex;
       iEvent.getByLabel(PVTag_, Vertex);
-      if(Vertex.isValid())
-	{
-	  for(unsigned i = 0 ; i < Vertex->size(); i++)
-	    {
-	      if((*Vertex)[i].isValid() && !(*Vertex)[i].isFake())
-		{
-		  if((*Vertex)[i].ndof() >= 4 && (*Vertex)[i].z() > -24 && (*Vertex)[i].z() < 24 && (*Vertex)[i].position().Rho() < 2.){
-		    if(primvertex_count == 0)
-		      {
-			primvertex_x = (*Vertex)[i].x();
-			primvertex_y = (*Vertex)[i].y();
-			primvertex_z = (*Vertex)[i].z();
-			primvertex_chi2 = (*Vertex)[i].chi2();
-			primvertex_ndof = (*Vertex)[i].ndof();
-			primvertex_ntracks = (*Vertex)[i].tracksSize();
-			primvertex_cov[0] = (*Vertex)[i].covariance(0,0); // xError()
-			primvertex_cov[1] = (*Vertex)[i].covariance(0,1); 
-			primvertex_cov[2] = (*Vertex)[i].covariance(0,2);
-			primvertex_cov[3] = (*Vertex)[i].covariance(1,1); // yError()
-			primvertex_cov[4] = (*Vertex)[i].covariance(1,2);
-			primvertex_cov[5] = (*Vertex)[i].covariance(2,2); // zError()
-			Float_t ptq = 0.;
-			for(Vertex::trackRef_iterator it = (*Vertex)[i].tracks_begin() ; it != (*Vertex)[i].tracks_end() ; ++it)
-			  {
-			    ptq += (*it)->pt() * (*it)->pt();
-			  }
-			primvertex_ptq = ptq;
-			
-			pv_position = (*Vertex)[i].position();
-			primvertex = (*Vertex)[i];
-		      }
-		  
-		    primvertex_count++;
-		  }
-		}
-	    }
+      if(Vertex.isValid()) {
+	for(unsigned i = 0 ; i < Vertex->size(); i++) {
+	  primvertex_count++;
+	  if(i == 0) {
+	    primvertex_x = (*Vertex)[i].x();
+	    primvertex_y = (*Vertex)[i].y();
+	    primvertex_z = (*Vertex)[i].z();
+	    primvertex_chi2 = (*Vertex)[i].chi2();
+	    primvertex_ndof = (*Vertex)[i].ndof();
+	    primvertex_ntracks = (*Vertex)[i].tracksSize();
+	    primvertex_cov[0] = (*Vertex)[i].covariance(0,0); // xError()
+	    primvertex_cov[1] = (*Vertex)[i].covariance(0,1); 
+	    primvertex_cov[2] = (*Vertex)[i].covariance(0,2);
+	    primvertex_cov[3] = (*Vertex)[i].covariance(1,1); // yError()
+	    primvertex_cov[4] = (*Vertex)[i].covariance(1,2);
+	    primvertex_cov[5] = (*Vertex)[i].covariance(2,2); // zError()
+	    Float_t ptq = 0.;
+	    for(Vertex::trackRef_iterator it = (*Vertex)[i].tracks_begin() ; it != (*Vertex)[i].tracks_end() ; ++it)
+	      {
+		ptq += (*it)->pt() * (*it)->pt();
+	      }
+	    primvertex_ptq = ptq;
+	    
+	    pv_position = (*Vertex)[i].position();
+	    primvertex = (*Vertex)[i];
+	  }
+	  if((*Vertex)[i].isValid() && !(*Vertex)[i].isFake() && (*Vertex)[i].ndof() >= 4 && (*Vertex)[i].z() > -24 && (*Vertex)[i].z() < 24 && (*Vertex)[i].position().Rho() < 2.)
+	    goodprimvertex_count++;
 	}
+      }
     }
 
   if (crecmuon) 
@@ -2792,7 +2787,7 @@ unsigned int NTupleMaker::AddPFJets(const edm::Event& iEvent, const edm::EventSe
 	    {
 	      pfjet_btag[pfjet_count][n] = -1000;
 	      if(cBtagDiscriminators[n] != "F"){
-	//			std::cout << " " << cBtagDiscriminators.at(n) << "  : " <<  (*pfjets)[i].bDiscriminator(cBtagDiscriminators[n]) << std::endl;
+		//		std::cout << " " << cBtagDiscriminators.at(n) << "  : " <<  (*pfjets)[i].bDiscriminator(cBtagDiscriminators[n]) << std::endl;
 		pfjet_btag[pfjet_count][n] = (*pfjets)[i].bDiscriminator(cBtagDiscriminators[n]) ;
 	      }
 	    }

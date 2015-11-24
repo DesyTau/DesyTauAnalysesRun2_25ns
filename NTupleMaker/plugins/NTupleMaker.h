@@ -427,6 +427,7 @@ class NTupleMaker : public edm::EDAnalyzer{
 
   // primary vertex
   UInt_t  primvertex_count;
+  UInt_t  goodprimvertex_count;
   Float_t primvertex_x;
   Float_t primvertex_y;
   Float_t primvertex_z;
