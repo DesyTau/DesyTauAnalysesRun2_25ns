@@ -303,6 +303,8 @@ int main(int argc, char * argv[]) {
   const bool applyLeptonSF = cfg.get<bool>("ApplyLeptonSF");
   const bool applyTrigWeight = cfg.get<bool>("ApplyTrigWeight");
 
+  const string jsonFile = cfg.get<string>("jsonFile");
+
   // kinematic cuts on electrons
   const float ptElectronLowCut   = cfg.get<float>("ptElectronLowCut");
   const float ptElectronHighCut  = cfg.get<float>("ptElectronHighCut");
@@ -419,18 +421,30 @@ int main(int argc, char * argv[]) {
 
   // **** end of configuration
 
+  string cmsswBase = (getenv ("CMSSW_BASE"));
+
   // Run-lumi selector
 
   std::vector<Period> periods;
     
-  std::fstream inputFileStream("temp", std::ios::in);
-  for(std::string s; std::getline(inputFileStream, s); )
-    {
-      periods.push_back(Period());
-      std::stringstream ss(s);
-      ss >> periods.back();
+  string fullPathToJsonFile = cmsswBase + "/src/DesyTauAnalyses/NTupleMaker/test/json/" + jsonFile;
+
+  if (isData) {
+    std::fstream inputFileStream(fullPathToJsonFile.c_str(), std::ios::in);
+    if (inputFileStream.fail()) {
+      std::cout << "Error: cannot find json file " << fullPathToJsonFile << std::endl;
+      std::cout << "please check" << std::endl;
+      std::cout << "quitting program" << std::endl;
+      exit(-1);
     }
-  
+
+    for(std::string s; std::getline(inputFileStream, s); )
+      {
+        periods.push_back(Period());
+	std::stringstream ss(s);
+        ss >> periods.back();
+      }
+  }
 
   // file name and tree name
   std::string rootFileName(argv[2]);
@@ -462,6 +476,18 @@ int main(int argc, char * argv[]) {
 
   TH1F * muonPtAllH = new TH1F("muonPtAllH","",40,0,200);
   TH1F * electronPtAllH = new TH1F("electronPtAllH","",40,0,200);
+
+  // histograms (ntuple level selection)
+  TH1F * electronPtNtH  = new TH1F("electronPtNtH","",40,0,200);
+  TH1F * electronEtaNtH = new TH1F("electronEtaNtH","",50,-2.5,2.5); 
+  TH1F * muonPtNtH  = new TH1F("muonPtNtH","",40,0,200);
+  TH1F * muonEtaNtH = new TH1F("muonEtaNtH","",50,-2.5,2.5); 
+  TH1F * dileptonMassNtH = new TH1F("dileptonMassNtH","",40,0,200);
+  TH1F * dileptonPtNtH = new TH1F("dileptonPtNtH","",40,0,200);
+  TH1F * dileptonEtaNtH = new TH1F("dileptonEtaNtH","",100,-5,5);
+  TH1F * dileptondRNtH = new TH1F("dileptondRNtH","",60,0,6);
+  TH1F * ETmissNtH = new TH1F("ETmissNtH","",40,0,200);
+
 
   // histograms (dilepton selection)
   TH1F * electronPtH  = new TH1F("electronPtH","",40,0,200);
@@ -660,7 +686,6 @@ int main(int argc, char * argv[]) {
   eventTree->Branch("Run",&iRun,"Run/i");
   eventTree->Branch("Event",&iEvent,"Event/i");
 
-  string cmsswBase = (getenv ("CMSSW_BASE"));
 
   // reading vertex weights                                                                                                                                                     
   TFile * fileDataNVert = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/"+vertDataFileName);
@@ -1202,85 +1227,33 @@ int main(int argc, char * argv[]) {
       float nVert = float(analysisTree.primvertex_count);
       
       // electron selection
-
       vector<int> electrons; electrons.clear();
       for (unsigned int ie = 0; ie<analysisTree.electron_count; ++ie) {
-	if (!isData) {
-	  analysisTree.electron_pt[ie] *= eleMomentumSF;
-	  analysisTree.electron_px[ie] *= eleMomentumSF;
-	  analysisTree.electron_py[ie] *= eleMomentumSF;
-	  analysisTree.electron_pz[ie] *= eleMomentumSF;
-	}
-	electronPtAllH->Fill(analysisTree.electron_pt[ie],weight);
-	if (analysisTree.electron_pt[ie]<ptElectronLowCut) continue;
-	if (fabs(analysisTree.electron_eta[ie])>etaElectronLowCut) continue;
-	if (fabs(analysisTree.electron_dxy[ie])>dxyElectronCut) continue;
-	if (fabs(analysisTree.electron_dz[ie])>dzElectronCut) continue;
-	float neutralHadIsoE = analysisTree.electron_neutralHadIso[ie];
-	float photonIsoE = analysisTree.electron_photonIso[ie];
-	float chargedHadIsoE = analysisTree.electron_chargedHadIso[ie];
-	float puIsoE = analysisTree.electron_puIso[ie];
-	if (isoDR03) {
-	  neutralHadIsoE = analysisTree.electron_r03_sumNeutralHadronEt[ie];
-	  photonIsoE = analysisTree.electron_r03_sumPhotonEt[ie];
-	  chargedHadIsoE = analysisTree.electron_r03_sumChargedHadronPt[ie];
-	  puIsoE = analysisTree.electron_r03_sumPUPt[ie];
-	}
-	float neutralIsoE = 
-	  neutralHadIsoE + 
-	  photonIsoE - 
-	  0.5*puIsoE;
-	neutralIsoE = TMath::Max(float(0),neutralIsoE); 
-	float absIso = chargedHadIsoE + neutralIsoE;
-	float relIso = absIso/analysisTree.electron_pt[ie];
-	if (relIso>isoElectronHighCut) continue;
-	if (relIso<isoElectronLowCut) continue;
-	bool electronMvaId = electronMvaIdWP80(analysisTree.electron_pt[ie],
-					       analysisTree.electron_superclusterEta[ie],
-					       analysisTree.electron_mva_id_nontrigPhys14[ie]);
-	if (!electronMvaId&&applyElectronId) continue;
-	if (!analysisTree.electron_pass_conversion[ie]&&applyElectronId) continue;
-	if (analysisTree.electron_nmissinginnerhits[ie]>1&&applyElectronId) continue;
-	electrons.push_back(ie);
+        if (analysisTree.electron_pt[ie]<ptElectronLowCut) continue;
+        if (fabs(analysisTree.electron_eta[ie])>etaElectronLowCut) continue;
+        if (fabs(analysisTree.electron_dxy[ie])>dxyElectronCut) continue;
+        if (fabs(analysisTree.electron_dz[ie])>dzElectronCut) continue;
+        //      bool electronMvaId = electronMvaIdWP80(analysisTree.electron_pt[ie],                                                            
+        //                                             analysisTree.electron_superclusterEta[ie],                                               
+        //                                             analysisTree.electron_mva_id_nontrigPhys14[ie]);                                         
+        bool electronMvaId = analysisTree.electron_mva_wp80_nontrig_Spring15_v1[ie];
+        if (!electronMvaId&&applyElectronId) continue;
+        if (!analysisTree.electron_pass_conversion[ie]&&applyElectronId) continue;
+        if (analysisTree.electron_nmissinginnerhits[ie]>1&&applyElectronId) continue;
+        electrons.push_back(ie);
       }
 
       // muon selection
-
       vector<int> muons; muons.clear();
       for (unsigned int im = 0; im<analysisTree.muon_count; ++im) {
-	if (!isData) {
-	  analysisTree.muon_pt[im] *= muMomentumSF;
-	  analysisTree.muon_px[im] *= muMomentumSF;
-	  analysisTree.muon_py[im] *= muMomentumSF;
-	  analysisTree.muon_pz[im] *= muMomentumSF;
-	}
-	muonPtAllH->Fill(analysisTree.muon_pt[im],weight);
-	if (analysisTree.muon_pt[im]<ptMuonLowCut) continue;
-	if (fabs(analysisTree.muon_eta[im])>etaMuonLowCut) continue;
-	if (fabs(analysisTree.muon_dxy[im])>dxyMuonCut) continue;
-	if (fabs(analysisTree.muon_dz[im])>dzMuonCut) continue;
-	float neutralHadIsoMu = analysisTree.muon_neutralHadIso[im];
-        float photonIsoMu = analysisTree.muon_photonIso[im];
-        float puIsoMu = analysisTree.muon_puIso[im];
-        float chargedHadIsoMu = analysisTree.muon_chargedHadIso[im];
-        if (isoDR03) {
-          neutralHadIsoMu = analysisTree.muon_r03_sumNeutralHadronEt[im];
-          photonIsoMu = analysisTree.muon_r03_sumPhotonEt[im];
-          chargedHadIsoMu = analysisTree.muon_r03_sumChargedHadronPt[im];
-          puIsoMu = analysisTree.muon_r03_sumPUPt[im];
-        }
-	float neutralIsoMu = 
-	  neutralHadIsoMu + 
-	  photonIsoMu - 
-	  0.5*puIsoMu;
-	neutralIsoMu = TMath::Max(float(0),neutralIsoMu); 
-	float absIso = chargedHadIsoMu + neutralIsoMu;
-	float relIso = absIso/analysisTree.muon_pt[im];
-	if (relIso>isoMuonHighCut) continue;
-	if (relIso<isoMuonLowCut) continue;
-	if (applyMuonId && !analysisTree.muon_isMedium[im]) continue;
-	muons.push_back(im);
+        if (analysisTree.muon_pt[im]<ptMuonLowCut) continue;
+        if (fabs(analysisTree.muon_eta[im])>etaMuonLowCut) continue;
+        if (fabs(analysisTree.muon_dxy[im])>dxyMuonCut) continue;
+        if (fabs(analysisTree.muon_dz[im])>dzMuonCut) continue;
+        if (applyMuonId && !analysisTree.muon_isMedium[im]) continue;
+        muons.push_back(im);
       }
+
 
       //      std::cout << "# electrons = " << electrons.size() << std::endl;
       //      std::cout << "# muons = " << muons.size() << std::endl;
@@ -1404,8 +1377,6 @@ int main(int argc, char * argv[]) {
       lumiBlock = analysisTree.event_luminosityblock;
       eventWeight = weight;
       tree->Fill();
-
-
 
       // computation of kinematic variables
 
