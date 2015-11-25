@@ -15,18 +15,18 @@
 #include "TVector3.h"
 #include "TRFIOFile.h"
 #include "TH1D.h"
-#include "TH1D.h"
 #include "TChain.h"
 #include "TMath.h"
-
+#include "TGraphAsymmErrors.h"
 #include "TLorentzVector.h"
-
+#include "TCanvas.h"
+#include "TPaveText.h"
 #include "TRandom.h"
 
 #include "DesyTauAnalyses/NTupleMaker/interface/Config.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/AC1B.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/json.h"
-#include "TGraphAsymmErrors.h"
+
 
 
 const float MuMass = 0.105658367;
@@ -365,13 +365,22 @@ int main(int argc, char * argv[]) {
   const string eleSfMcBarrel = cfg.get<string>("EleSfMcBarrel");
   const string eleSfMcEndcap = cfg.get<string>("EleSfMcEndcap");
 
+  const string jsonFile = cfg.get<string>("jsonFile");
+  // **** end of configuration
+  
+
+  string cmsswBase = (getenv ("CMSSW_BASE"));
+  string fullPathToJsonFile = cmsswBase + "/src/DesyTauAnalyses/NTupleMaker/test/json/" + jsonFile;
+
+  // Run-lumi selector
   std::vector<Period> periods;  
-  if (isData) { // read the good runs from the temp file 	
-	  std::fstream inputFileStream("temp", std::ios::in);
+  if (isData) { // read the good runs 
+	  std::fstream inputFileStream(fullPathToJsonFile.c_str(), std::ios::in);
   	  if (inputFileStream.fail() ) {
-           std::cout << "Error: can not find the temp file. create it and put it in the bin directory " << std::endl;
-	   std::cout << "Hint: the temp file is created with the strip.sh script in /test/json. " << std::endl; 
-	   return 1;
+            std::cout << "Error: cannot find json file " << fullPathToJsonFile << std::endl;
+            std::cout << "please check" << std::endl;
+            std::cout << "quitting program" << std::endl;
+	    exit(-1);
 	  }
   
           for(std::string s; std::getline(inputFileStream, s); ) {
@@ -380,7 +389,7 @@ int main(int argc, char * argv[]) {
            ss >> periods.back();
           }
   }
-  // **** end of configuration
+
 
   // file name and tree name
   std::string rootFileName(argv[2]);
@@ -534,6 +543,26 @@ int main(int argc, char * argv[]) {
 
   TString JetBins[3] = {"Jet0","Jet1","JetGe2"};
 
+  //*****  create eta histogram with eta ranges associated to their names (eg. endcap, barrel)   ***** //
+  TH1F * etaBinsH = new TH1F("etaBinsH", "etaBinsH", nEtaBins, etaBins);
+  etaBinsH->SetStats(0);
+  etaBinsH->Draw();
+  etaBinsH->GetXaxis()->Set(nEtaBins, etaBins);
+  for (int i=0; i<nEtaBins; i++){ etaBinsH->GetXaxis()->SetBinLabel(i+1, EtaBins[i]);}
+  TPaveText *pavetext = new TPaveText(0.6,0.85,0.98,0.98, "brNDC");
+  for (int i=0; i<nEtaBins; i++){    
+	pavetext->AddText(etaBinsH->GetXaxis()->GetBinLabel(i+1));
+	pavetext->AddText(Form("from %f to %f",etaBinsH->GetXaxis()->GetBinLowEdge(i+1), etaBinsH->GetXaxis()->GetBinLowEdge(i+1)+etaBinsH->GetXaxis()->GetBinWidth(i+1)));
+	}
+  TCanvas *cEta = new TCanvas("c1","demo bin labels",10,10,900,500);
+  cEta->cd();
+  etaBinsH->Draw();
+  pavetext->Draw();
+  file->cd();
+  etaBinsH->Write("etaBinsH");
+  cEta->Write("etaBinsCan");
+  
+
   TH1F * ZMassJetEtaPtPass[2][3][7];
   TH1F * ZMassJetEtaPtFail[2][3][7];
 
@@ -632,7 +661,7 @@ int main(int argc, char * argv[]) {
 
 
   // reweighting for vertices
-  string cmsswBase = (getenv ("CMSSW_BASE"));
+
 
   // reading vertex weights
   TFile * fileDataNVert = new TFile(TString(cmsswBase)+"/src/"+dataBaseDir+"/"+vertDataFileName);
@@ -699,12 +728,13 @@ int main(int argc, char * argv[]) {
   std::vector<unsigned int> allRuns; allRuns.clear();
 		
   for (int iF=0; iF<nTotalFiles; ++iF) {
-
+    //for (int iF=0; iF<10; ++iF) {
     std::string filen;
     fileList >> filen;
     
     std::cout << "file " << iF+1 << " out of " << nTotalFiles << " filename : " << filen << std::endl;
     TFile * file_ = TFile::Open(TString(filen));
+    if (file_->IsZombie()) {std::cout << "Failed to open file "<< filen << std::endl; exit(-1);} 
 
     TH1D * histoInputEvents = NULL;
     histoInputEvents = (TH1D*)file_->Get("makeroottree/nEvents");
