@@ -25,6 +25,8 @@
 
 #include "DesyTauAnalyses/NTupleMaker/interface/Config.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/AC1B.h"
+#include "DesyTauAnalyses/NTupleMaker/interface/RunLumiReader.h"
+#include "DesyTauAnalyses/NTupleMaker/interface/json.h"
 
 const float MuMass = 0.105658367;
 
@@ -268,7 +270,9 @@ bool electronMvaIdWP90(float pt, float eta, float mva) {
   return passed;
 
 }
-
+struct myclass {
+  bool operator() (int i,int j) { return (i<j);}
+} myobject, myobjectX;
 
 const float electronMass = 0;
 const float muonMass = 0.10565837;
@@ -285,7 +289,9 @@ int main(int argc, char * argv[]) {
   Config cfg(argv[1]);
 
   const bool applyInclusiveSelection = cfg.get<bool>("ApplyInclusiveSelection");
-
+  const bool isData = cfg.get<bool>("IsData");
+  const bool applyGoodRunSelection = cfg.get<bool>("ApplyGoodRunSelection");
+  const string jsonFile = cfg.get<string>("jsonFile");
   // kinematic cuts on electrons
   const float ptElectronLowCut   = cfg.get<float>("ptElectronLowCut");
   const float ptElectronHighCut  = cfg.get<float>("ptElectronHighCut");
@@ -377,7 +383,8 @@ int main(int argc, char * argv[]) {
   TH1F * inputEventsH = new TH1F("inputEventsH","",1,-0.5,0.5);
   TTree * tree = new TTree("TauCheck","TauCheck");
    // Declaration of leaf types
-
+  unsigned int minRun = 99999999;
+  unsigned int maxRun = 0;
   Int_t           run;
   Int_t           lumi;
   Int_t           evt;
@@ -491,6 +498,10 @@ int main(int argc, char * argv[]) {
   Float_t         beta;
   Float_t         bphi;
   
+  Bool_t isZLL;
+  Bool_t isZMM;
+  Bool_t isZEE;
+  
 
   tree->Branch("run", &run, "run/I");
   tree->Branch("lumi", &lumi, "lumi/I");
@@ -498,6 +509,10 @@ int main(int argc, char * argv[]) {
   tree->Branch("npv", &npv, "npv/I");
   tree->Branch("npu", &npu, "npu/I");
   tree->Branch("rho", &rho, "rho/F");
+
+  tree->Branch("isZLL",&isZLL,"isZLL/O");
+  tree->Branch("isZEE",&isZEE,"isZEE/O");
+  tree->Branch("isZMM",&isZMM,"isZMM/O");
 
   tree->Branch("mcweight", &mcweight, "mcweight/F");
   tree->Branch("puweight", &puweight, "puweight/F");
@@ -617,6 +632,25 @@ int main(int argc, char * argv[]) {
   std::string dummy;
   // count number of files --->
   while (fileList0 >> dummy) nTotalFiles++;
+  std::vector<Period> periods;
+  string cmsswBase = (getenv ("CMSSW_BASE"));
+  string fullPathToJsonFile = cmsswBase + "/src/DesyTauAnalyses/NTupleMaker/test/json/" + jsonFile;
+  
+  if (isData) {
+  std::fstream inputFileStream(fullPathToJsonFile.c_str(), std::ios::in);
+  if (inputFileStream.fail()) {
+       std::cout << "Error: cannot find json file " << fullPathToJsonFile << std::endl;
+       std::cout << "please check" << std::endl;
+       std::cout << "quitting program" << std::endl;
+       exit(-1);
+     }
+  for(std::string s; std::getline(inputFileStream, s); )
+    {
+      periods.push_back(Period());
+      std::stringstream ss(s);
+      ss >> periods.back();
+    }
+   }
 
   int nEvents = 0;
   int selEvents = 0;
@@ -626,7 +660,9 @@ int main(int argc, char * argv[]) {
 
   vector<unsigned int> runList; runList.clear();
   vector<unsigned int> eventList; eventList.clear();
-
+  
+  std::vector<unsigned int> allRuns; allRuns.clear();
+  std::vector<unsigned int> allGoodRuns; allGoodRuns.clear();
   if (checkOverlap) {
     std::ifstream fileEvents("overlap.txt");
     int Run, Event, Lumi;
@@ -676,9 +712,53 @@ int main(int argc, char * argv[]) {
 
       analysisTree.GetEntry(iEntry);
       nEvents++;
-      
+      if (analysisTree.event_run>maxRun)
+        maxRun = analysisTree.event_run;
+
+      if (analysisTree.event_run<minRun)
+        minRun = analysisTree.event_run;
+     
       if (nEvents%10000==0) 
 	cout << "      processed " << nEvents << " events" << endl; 
+      bool isNewRun = true;
+      if (allRuns.size()>0) {
+        for (unsigned int iR=0; iR<allRuns.size(); ++iR) {
+          if (analysisTree.event_run==allRuns.at(iR)) {
+            isNewRun = false;
+            break;
+          }
+        }
+      }
+
+      isZLL = false;
+      isZEE = false;
+      isZMM = false;
+
+      if (!isData) {
+	bool isMuPlusFromZ = false;
+	bool isMuMinusFromZ = false;
+	bool isEPlusFromZ = false;
+	bool isEMinusFromZ = false;
+	
+	for (unsigned int igen=0; igen < analysisTree.genparticles_count; ++igen) {
+	  if (analysisTree.genparticles_info[igen]==1) {
+	    if (analysisTree.genparticles_status[igen]==1 && analysisTree.genparticles_pdgid[igen]==11)
+	      isEMinusFromZ = true;
+	    if (analysisTree.genparticles_status[igen]==1 && analysisTree.genparticles_pdgid[igen]==-11)
+	      isEPlusFromZ = true;
+	    if (analysisTree.genparticles_status[igen]==1 && analysisTree.genparticles_pdgid[igen]==13)
+	      isMuMinusFromZ = true;
+	    if (analysisTree.genparticles_status[igen]==1 && analysisTree.genparticles_pdgid[igen]==-13)
+	      isMuPlusFromZ = true;
+	  }
+	}
+	isZEE = isEMinusFromZ  && isEPlusFromZ;
+	isZMM = isMuMinusFromZ && isMuPlusFromZ;
+	isZLL = isZEE || isZMM;
+      }
+
+      if (isNewRun)
+        allRuns.push_back(analysisTree.event_run);
 
       run = int(analysisTree.event_run);
       lumi = int(analysisTree.event_luminosityblock);
@@ -693,7 +773,42 @@ int main(int argc, char * argv[]) {
 	  }
 	}
       }
+      if (isData && applyGoodRunSelection) {
+        bool lumi = false;
+        int n=analysisTree.event_run;
+        int lum = analysisTree.event_luminosityblock;
 
+        std::string num = std::to_string(n);
+        std::string lnum = std::to_string(lum);
+        for(const auto& a : periods)
+          {
+
+            if ( num.c_str() ==  a.name ) {
+              for(auto b = a.ranges.begin(); b != std::prev(a.ranges.end()); ++b) {
+                if (lum  >= b->lower && lum <= b->bigger ) lumi = true;
+              }
+              auto last = std::prev(a.ranges.end());
+              if (  (lum >=last->lower && lum <= last->bigger )) lumi=true;
+            }
+
+          }
+        if (!lumi) continue;
+
+
+
+      }
+      isNewRun = true;
+      if (allGoodRuns.size()>0) {
+        for (unsigned int iR=0; iR<allGoodRuns.size(); ++iR) {
+          if (analysisTree.event_run==allGoodRuns.at(iR)) {
+            isNewRun = false;
+            break;
+          }
+        }
+      }
+
+      if (isNewRun)
+        allGoodRuns.push_back(analysisTree.event_run);
 
       // weights
       mcweight = analysisTree.genweight;
@@ -1327,7 +1442,18 @@ int main(int argc, char * argv[]) {
   std::cout << "Total number of events in Tree  = " << nEvents << std::endl;
   std::cout << "Total number of selected events = " << selEvents << std::endl;
   std::cout << std::endl;
-  
+  std::cout << "Run range " << minRun << ":" << maxRun << std::endl;
+  std::cout << std::endl;
+  std::sort (allRuns.begin(), allRuns.end(), myobject);
+  std::sort (allGoodRuns.begin(), allGoodRuns.end(), myobjectX);
+  std::cout << "Runs      : ";
+  for (unsigned int iR=0; iR<allRuns.size(); ++iR)
+    std::cout << " " << allRuns.at(iR);
+  std::cout << std::endl;
+  std::cout << "Good Runs : ";
+  for (unsigned int iR=0; iR<allGoodRuns.size(); ++iR)
+    std::cout << " " << allGoodRuns.at(iR); 
+  std::cout << std::endl;
   file->cd("");
   file->Write();
   file->Close();
