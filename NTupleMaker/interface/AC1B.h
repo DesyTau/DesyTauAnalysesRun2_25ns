@@ -344,6 +344,14 @@ public :
    Float_t         gentau_visible_eta[50];   //[gentau_count]
    Float_t         gentau_visible_phi[50];   //[gentau_count]
    Float_t         gentau_visible_mass[50];   //[gentau_count]
+   Float_t         gentau_visibleNoLep_e[50];   //[gentau_count]
+   Float_t         gentau_visibleNoLep_px[50];   //[gentau_count]
+   Float_t         gentau_visibleNoLep_py[50];   //[gentau_count]
+   Float_t         gentau_visibleNoLep_pz[50];   //[gentau_count]
+   Float_t         gentau_visibleNoLep_pt[50];   //[gentau_count]
+   Float_t         gentau_visibleNoLep_eta[50];   //[gentau_count]
+   Float_t         gentau_visibleNoLep_phi[50];   //[gentau_count]
+   Float_t         gentau_visibleNoLep_mass[50];   //[gentau_count]
    Int_t           gentau_status[50];   //[gentau_count]
    Int_t           gentau_fromHardProcess[50];   //[gentau_count]
    Int_t           gentau_fromHardProcessBeforeFSR[50];   //[gentau_count]
@@ -741,6 +749,14 @@ public :
    TBranch        *b_gentau_visible_eta;   //!
    TBranch        *b_gentau_visible_phi;   //!
    TBranch        *b_gentau_visible_mass;   //!
+   TBranch        *b_gentau_visibleNoLep_e;   //!
+   TBranch        *b_gentau_visibleNoLep_px;   //!
+   TBranch        *b_gentau_visibleNoLep_py;   //!
+   TBranch        *b_gentau_visibleNoLep_pz;   //!
+   TBranch        *b_gentau_visibleNoLep_pt;   //!
+   TBranch        *b_gentau_visibleNoLep_eta;   //!
+   TBranch        *b_gentau_visibleNoLep_phi;   //!
+   TBranch        *b_gentau_visibleNoLep_mass;   //!
    TBranch        *b_gentau_status;   //!
    TBranch        *b_gentau_fromHardProcess;   //!
    TBranch        *b_gentau_fromHardProcessBeforeFSR;   //!
@@ -1244,6 +1260,14 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("gentau_visible_eta", gentau_visible_eta, &b_gentau_visible_eta);
    fChain->SetBranchAddress("gentau_visible_phi", gentau_visible_phi, &b_gentau_visible_phi);
    fChain->SetBranchAddress("gentau_visible_mass", gentau_visible_mass, &b_gentau_visible_mass);
+   fChain->SetBranchAddress("gentau_visibleNoLep_e", gentau_visibleNoLep_e, &b_gentau_visibleNoLep_e);
+   fChain->SetBranchAddress("gentau_visibleNoLep_px", gentau_visibleNoLep_px, &b_gentau_visibleNoLep_px);
+   fChain->SetBranchAddress("gentau_visibleNoLep_py", gentau_visibleNoLep_py, &b_gentau_visibleNoLep_py);
+   fChain->SetBranchAddress("gentau_visibleNoLep_pz", gentau_visibleNoLep_pz, &b_gentau_visibleNoLep_pz);
+   fChain->SetBranchAddress("gentau_visibleNoLep_pt", gentau_visibleNoLep_pt, &b_gentau_visibleNoLep_pt);
+   fChain->SetBranchAddress("gentau_visibleNoLep_eta", gentau_visibleNoLep_eta, &b_gentau_visibleNoLep_eta);
+   fChain->SetBranchAddress("gentau_visibleNoLep_phi", gentau_visibleNoLep_phi, &b_gentau_visibleNoLep_phi);
+   fChain->SetBranchAddress("gentau_visibleNoLep_mass", gentau_visibleNoLep_mass, &b_gentau_visibleNoLep_mass);
    fChain->SetBranchAddress("gentau_status", gentau_status, &b_gentau_status);
    fChain->SetBranchAddress("gentau_fromHardProcess", gentau_fromHardProcess, &b_gentau_fromHardProcess);
    fChain->SetBranchAddress("gentau_fromHardProcessBeforeFSR", gentau_fromHardProcessBeforeFSR, &b_gentau_fromHardProcessBeforeFSR);

@@ -54,6 +54,8 @@ typedef ROOT::Math::SVector<double, 3> SVector3; //// SVector: vector of size 3
 // static const unsigned int SKIM_EMU        = (1 << 6);     //64 : e+mu
 // static const unsigned int SKIM_TAUTAU     = (1 << 7);     //128: tau+tau
 
+#include "DesyTauAnalyses/NTupleMaker/interface/genMatch.h"
+
 
 Int_t NTupleMaker::find_lep(const Int_t nlep, const Float_t px[], const Float_t py[], const Float_t pz[], const reco::Candidate::LorentzVector& refp4){
   Int_t ilep = -1;
@@ -743,6 +745,16 @@ void NTupleMaker::beginJob(){
     tree->Branch("gentau_visible_phi", gentau_visible_phi, "tau_visible_phi[gentau_count]/F");
     tree->Branch("gentau_visible_mass", gentau_visible_mass, "tau_visible_mass[gentau_count]/F");
 
+    tree->Branch("gentau_visibleNoLep_e",  gentau_visibleNoLep_e,  "tau_visibleNoLep_e[gentau_count]/F");
+    tree->Branch("gentau_visibleNoLep_px", gentau_visibleNoLep_px, "tau_visibleNoLep_px[gentau_count]/F");
+    tree->Branch("gentau_visibleNoLep_py", gentau_visibleNoLep_py, "tau_visibleNoLep_py[gentau_count]/F");
+    tree->Branch("gentau_visibleNoLep_pz", gentau_visibleNoLep_pz, "tau_visibleNoLep_pz[gentau_count]/F");
+
+    tree->Branch("gentau_visibleNoLep_pt",  gentau_visibleNoLep_pt,  "tau_visibleNoLep_pt[gentau_count]/F");
+    tree->Branch("gentau_visibleNoLep_eta", gentau_visibleNoLep_eta, "tau_visibleNoLep_eta[gentau_count]/F");
+    tree->Branch("gentau_visibleNoLep_phi", gentau_visibleNoLep_phi, "tau_visibleNoLep_phi[gentau_count]/F");
+    tree->Branch("gentau_visibleNoLep_mass", gentau_visibleNoLep_mass, "tau_visibleNoLep_mass[gentau_count]/F");
+    
     tree->Branch("gentau_status", gentau_status, "gentau_status[gentau_count]/I");
     tree->Branch("gentau_fromHardProcess", gentau_fromHardProcess, "gentau_fromHardProcess[gentau_count]/I");
     tree->Branch("gentau_fromHardProcessBeforeFSR", gentau_fromHardProcessBeforeFSR, "gentau_fromHardProcessBeforeFSR[gentau_count]/I");
@@ -1812,6 +1824,7 @@ bool NTupleMaker::AddGenParticles(const edm::Event& iEvent) {
 	      //	       		<< "   status = " << (*GenParticles)[i].status() 
 	      //	       		<< "   mother = " << mother << std::endl;
 	      reco::Candidate::LorentzVector tau_visible_p4 = getVisMomentum(&(*GenParticles)[i]);
+	      reco::Candidate::LorentzVector tau_visibleNoLep_p4 = utils_genMatch::getVisMomentumNoLep(&(*GenParticles)[i]);
 	      // std::cout << "   visible pt = " << tau_visible_p4.pt() 
 	      // 		<< "   eta = " << tau_visible_p4.eta() 
 	      // 		<< "   phi = " << tau_visible_p4.phi() 
@@ -1835,6 +1848,16 @@ bool NTupleMaker::AddGenParticles(const edm::Event& iEvent) {
 	      gentau_visible_phi[gentau_count]  = tau_visible_p4.phi();
 	      gentau_visible_mass[gentau_count] = tau_visible_p4.mass();
 
+	      gentau_visibleNoLep_px[gentau_count] = tau_visibleNoLep_p4.px();
+	      gentau_visibleNoLep_py[gentau_count] = tau_visibleNoLep_p4.py();
+	      gentau_visibleNoLep_pz[gentau_count] = tau_visibleNoLep_p4.pz();
+	      gentau_visibleNoLep_e[gentau_count]  = tau_visibleNoLep_p4.energy();
+	      
+	      gentau_visibleNoLep_pt[gentau_count]   = tau_visibleNoLep_p4.pt();
+	      gentau_visibleNoLep_eta[gentau_count]  = tau_visibleNoLep_p4.eta();
+	      gentau_visibleNoLep_phi[gentau_count]  = tau_visibleNoLep_p4.phi();
+	      gentau_visibleNoLep_mass[gentau_count] = tau_visibleNoLep_p4.mass();
+	      
 	      const GenStatusFlags statusFlags = (*GenParticles)[i].statusFlags();
 	      gentau_fromHardProcess[gentau_count] = statusFlags.fromHardProcess();
 	      gentau_fromHardProcessBeforeFSR[gentau_count] = statusFlags.fromHardProcessBeforeFSR();
@@ -3053,7 +3076,7 @@ unsigned int NTupleMaker::AddElectrons(const edm::Event& iEvent, const edm::Even
 	  
 	  //	  std::cout << "  passed conversion veto = " << electron_pass_conversion[electron_count] << std::endl;
 
-	  electron_genmatch[electron_count] = 0;
+	  electron_genmatch[electron_count] = 0.;//utils_genMatch::genMatch();
 
 	  electron_count++;
 

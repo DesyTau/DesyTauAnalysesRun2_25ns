@@ -792,6 +792,16 @@ class NTupleMaker : public edm::EDAnalyzer{
   Float_t gentau_visible_phi[M_taumaxcount];
   Float_t gentau_visible_mass[M_taumaxcount];
 
+  Float_t gentau_visibleNoLep_px[M_taumaxcount];
+  Float_t gentau_visibleNoLep_py[M_taumaxcount];
+  Float_t gentau_visibleNoLep_pz[M_taumaxcount];
+  Float_t gentau_visibleNoLep_e[M_taumaxcount];
+
+  Float_t gentau_visibleNoLep_pt[M_taumaxcount];
+  Float_t gentau_visibleNoLep_eta[M_taumaxcount];
+  Float_t gentau_visibleNoLep_phi[M_taumaxcount];
+  Float_t gentau_visibleNoLep_mass[M_taumaxcount];
+  
   Int_t gentau_status[M_taumaxcount];
   Int_t gentau_fromHardProcess[M_taumaxcount];
   Int_t gentau_fromHardProcessBeforeFSR[M_taumaxcount];
