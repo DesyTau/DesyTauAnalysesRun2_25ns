@@ -1,12 +1,56 @@
 #include "DesyTauAnalyses/NTupleMaker/interface/genMatch.h"
 
 #include "DesyTauAnalyses/CandidateTools/interface/candidateAuxFunctions.h"
+#include "DesyTauAnalyses/NTupleMaker/interface/genMatch.h"
+#include "Math/GenVector/VectorUtil.h"
 
-int utils_genMatch::genMatch( const reco::Candidate::LorentzVector& p4, const std::vector<const reco::GenParticle*>& genPart){
+int utils_genMatch::genMatch( const reco::Candidate::LorentzVector& p4, const std::vector<reco::GenParticle>& genParticles){
+  int match = 6;
+  float dr = 0.2;
+  float dr_new = 0.2;
+  
+  for ( std::vector<reco::GenParticle>::const_iterator genp = genParticles.begin();
+	genp != genParticles.end(); ++genp ) {
+    dr_new = ROOT::Math::VectorUtil::DeltaR( p4, genp->p4());
 
+    if (dr_new < dr){
+      dr = dr_new;
 
-  //if (!(*daughter)->statusFlags().isPrompt()) continue;
-  return 0;
+      if (TMath::Abs(genp->pdgId()) == 11) {
+	if (genp->pt() > 8) {
+	  if (genp->statusFlags().isPrompt()) {
+	    match = 1;
+	  }
+	  else if (genp->statusFlags().isDirectPromptTauDecayProduct()) {
+	    match = 3;
+	  }
+	}
+      }
+      else if (TMath::Abs(genp->pdgId()) == 13) {
+	if (genp->pt() > 8) {
+	  if (genp->isPromptFinalState()){
+	    match = 2;
+	  }
+	  if (genp->isDirectPromptTauDecayProductFinalState()){
+	    match = 4;
+	  }
+	}
+      }
+      else if (TMath::Abs(genp->pdgId()) == 15) {
+	if (genp->statusFlags().isPrompt()) {
+	  reco::Candidate::LorentzVector tau_p4 = utils_genMatch::getVisMomentumNoLep(&(*genp));
+	  if (tau_p4.pt() > 15) {
+	    match = 5;
+	  }
+	}
+      }
+      else {
+	match = 6;	
+      }	      
+    }
+  }
+
+  return match;
 }
 
 reco::Candidate::LorentzVector utils_genMatch::getVisMomentumNoLep(const std::vector<const reco::GenParticle*>& daughters, int status)

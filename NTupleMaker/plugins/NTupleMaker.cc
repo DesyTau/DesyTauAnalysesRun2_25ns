@@ -2120,7 +2120,13 @@ unsigned int NTupleMaker::AddMuons(const edm::Event& iEvent)
 	//	muon_isMedium[muon_count] =  muon_isLoose[muon_count] && muon_validFraction[muon_count] > 0.8 && muon_segmentComp[muon_count] > (goodGlb ? 0.303 : 0.451);
 
 	muon_genmatch[muon_count] = 0;
-
+	if(cgen && !cdata){
+	  edm::Handle<reco::GenParticleCollection> GenParticles;
+	  iEvent.getByLabel(GenParticleCollectionTag_, GenParticles);
+	  if(GenParticles.isValid())
+	    muon_genmatch[muon_count] = utils_genMatch::genMatch( (*Muons)[i].p4(), *GenParticles);
+	}
+	
 	muon_count++;
 	
 	if (muon_count==M_muonmaxcount) {
@@ -2639,7 +2645,13 @@ unsigned int NTupleMaker::AddTaus(const edm::Event& iEvent, const edm::EventSetu
 	  //		    << "  pt>1.0 = " << tau_ntracks_pt1[tau_count] << std::endl;
 
 	  tau_genmatch[tau_count] = 0;
-
+	  if(cgen && !cdata){
+	    edm::Handle<reco::GenParticleCollection> GenParticles;
+	    iEvent.getByLabel(GenParticleCollectionTag_, GenParticles);
+	    if(GenParticles.isValid())
+	      tau_genmatch[tau_count] = utils_genMatch::genMatch( (*Taus)[i].p4(), *GenParticles);
+	  }
+	  
 	  tau_count++;
 	  if(tau_count == M_taumaxcount) {
 	    cerr << "number of taus > M_taumaxcount. They are missing." << endl; 
@@ -2968,7 +2980,7 @@ unsigned int NTupleMaker::AddElectrons(const edm::Event& iEvent, const edm::Even
 	  electron_charge[electron_count] = el->charge();
 	  
 	  const pat::Electron &lep = (*Electrons)[i];
-          electron_miniISO[muon_count]=getPFIsolation(pfcands, dynamic_cast<const reco::Candidate *>(&lep), 0.05, 0.2, 10., false);
+          electron_miniISO[electron_count]=getPFIsolation(pfcands, dynamic_cast<const reco::Candidate *>(&lep), 0.05, 0.2, 10., false);
 
 	  electron_esuperclusterovertrack[electron_count] = el->eSuperClusterOverP();
 	  electron_eseedclusterovertrack[electron_count] = el->eSeedClusterOverP();
@@ -3076,8 +3088,14 @@ unsigned int NTupleMaker::AddElectrons(const edm::Event& iEvent, const edm::Even
 	  
 	  //	  std::cout << "  passed conversion veto = " << electron_pass_conversion[electron_count] << std::endl;
 
-	  electron_genmatch[electron_count] = 0.;//utils_genMatch::genMatch();
-
+	  electron_genmatch[electron_count] = 0;
+	  if(cgen && !cdata){
+	    edm::Handle<reco::GenParticleCollection> GenParticles;
+	    iEvent.getByLabel(GenParticleCollectionTag_, GenParticles);
+	    if(GenParticles.isValid())
+	      electron_genmatch[electron_count] = utils_genMatch::genMatch(  (*Electrons)[i].p4(), *GenParticles);
+	  }
+	  
 	  electron_count++;
 
 	  if(electron_count == M_electronmaxcount)
