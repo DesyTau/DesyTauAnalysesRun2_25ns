@@ -15,18 +15,18 @@
 #include "TVector3.h"
 #include "TRFIOFile.h"
 #include "TH1D.h"
-#include "TH1D.h"
 #include "TChain.h"
 #include "TMath.h"
-
+#include "TCanvas.h"
 #include "TLorentzVector.h"
-
+#include "TPaveText.h"
 #include "TRandom.h"
+#include "TGraphAsymmErrors.h"
 
 #include "DesyTauAnalyses/NTupleMaker/interface/Config.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/AC1B.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/json.h"
-#include "TGraphAsymmErrors.h"
+
 
 const float electronMass = 0;
 const float muonMass = 0.10565837;
@@ -362,18 +362,29 @@ int main(int argc, char * argv[]) {
   const string muonSfMcBarrel = cfg.get<string>("MuonSfMcBarrel");
   const string muonSfMcEndcap = cfg.get<string>("MuonSfMcEndcap");
 
+  const string jsonFile = cfg.get<string>("jsonFile");
   // **** end of configuration
 
+  string cmsswBase = (getenv ("CMSSW_BASE"));
+  string fullPathToJsonFile = cmsswBase + "/src/DesyTauAnalyses/NTupleMaker/test/json/" + jsonFile;
+
   // Run-lumi selector
-  std::vector<Period> periods;
-    
-  std::fstream inputFileStream("temp", std::ios::in);
-  for(std::string s; std::getline(inputFileStream, s); )
-    {
-      periods.push_back(Period());
-      std::stringstream ss(s);
-      ss >> periods.back();
-    }
+  std::vector<Period> periods;  
+  if (isData) { // read the good runs 
+	  std::fstream inputFileStream(fullPathToJsonFile.c_str(), std::ios::in);
+  	  if (inputFileStream.fail() ) {
+            std::cout << "Error: cannot find json file " << fullPathToJsonFile << std::endl;
+            std::cout << "please check" << std::endl;
+            std::cout << "quitting program" << std::endl;
+	    exit(-1);
+	  }
+  
+          for(std::string s; std::getline(inputFileStream, s); ) {
+           periods.push_back(Period());
+           std::stringstream ss(s);
+           ss >> periods.back();
+          }
+  }
 
 
   // file name and tree name
@@ -510,6 +521,25 @@ int main(int argc, char * argv[]) {
 
   TString JetBins[3] = {"Jet0","Jet1","JetGe2"};
 
+  //*****  create eta histogram with eta ranges associated to their names (eg. endcap, barrel)   ***** //
+  TH1F * etaBinsH = new TH1F("etaBinsH", "etaBinsH", nEtaBins, etaBins);
+  etaBinsH->SetStats(0);
+  etaBinsH->Draw();
+  etaBinsH->GetXaxis()->Set(nEtaBins, etaBins);
+  for (int i=0; i<nEtaBins; i++){ etaBinsH->GetXaxis()->SetBinLabel(i+1, EtaBins[i]);}
+  TPaveText *pavetext = new TPaveText(0.6,0.85,0.98,0.98, "brNDC");
+  for (int i=0; i<nEtaBins; i++){    
+	pavetext->AddText(etaBinsH->GetXaxis()->GetBinLabel(i+1));
+	pavetext->AddText(Form("from %f to %f",etaBinsH->GetXaxis()->GetBinLowEdge(i+1), etaBinsH->GetXaxis()->GetBinLowEdge(i+1)+etaBinsH->GetXaxis()->GetBinWidth(i+1)));
+	}
+  TCanvas *cEta = new TCanvas("c1","demo bin labels",10,10,900,500);
+  cEta->cd();
+  etaBinsH->Draw();
+  pavetext->Draw();
+  file->cd();
+  etaBinsH->Write("etaBinsH");
+  cEta->Write("etaBinsCan");
+
   TH1F * ZMassJetEtaPtPass[3][3][7];
   TH1F * ZMassJetEtaPtFail[3][3][7];
 
@@ -625,7 +655,7 @@ int main(int argc, char * argv[]) {
   int selEventsIdMuons = 0;
   int selEventsIsoMuons = 0;
 
-  string cmsswBase = (getenv ("CMSSW_BASE"));
+
 
   // reading vertex weights
   TFile * fileDataNVert = new TFile(TString(cmsswBase)+"/src/"+dataBaseDir+"/"+vertDataFileName);
