@@ -367,6 +367,8 @@ void NTupleMaker::beginJob(){
     tree->Branch("muon_isLoose",muon_isLoose,"muon_isLoose[muon_count]/O");
     tree->Branch("muon_isMedium",muon_isMedium,"muon_isMedium[muon_count]/O");
     
+    tree->Branch("muon_genmatch", muon_genmatch, "muon_genmatch[muon_count]/I");
+
   }
 
   // pf jets
@@ -501,6 +503,8 @@ void NTupleMaker::beginJob(){
 
     tree->Branch("electron_pass_conversion", electron_pass_conversion, "electron_pass_conversion[electron_count]/O");
 
+    tree->Branch("electron_genmatch", electron_genmatch, "electron_genmatch[electron_count]/I");
+
   }  
 
   //tree->Branch("photon_count", &photon_count, "photon_count/i");
@@ -561,6 +565,7 @@ void NTupleMaker::beginJob(){
     tree->Branch("tau_genjet_py", tau_genjet_py, "tau_genjet_py[tau_count]/F");
     tree->Branch("tau_genjet_pz", tau_genjet_pz, "tau_genjet_pz[tau_count]/F");
     tree->Branch("tau_genjet_e", tau_genjet_e, "tau_genjet_e[tau_count]/F");
+    tree->Branch("tau_genmatch", tau_genmatch, "tau_genmatch[tau_count]/I");
 
     tree->Branch("tau_decayModeFinding", tau_decayModeFinding, "tau_decayModeFinding[tau_count]/F");
     tree->Branch("tau_decayModeFindingNewDMs", tau_decayModeFindingNewDMs, "tau_decayModeFindingNewDMs[tau_count]/F");
@@ -738,6 +743,23 @@ void NTupleMaker::beginJob(){
     tree->Branch("gentau_visible_phi", gentau_visible_phi, "tau_visible_phi[gentau_count]/F");
     tree->Branch("gentau_visible_mass", gentau_visible_mass, "tau_visible_mass[gentau_count]/F");
 
+    tree->Branch("gentau_status", gentau_status, "gentau_status[gentau_count]/I");
+    tree->Branch("gentau_fromHardProcess", gentau_fromHardProcess, "gentau_fromHardProcess[gentau_count]/I");
+    tree->Branch("gentau_fromHardProcessBeforeFSR", gentau_fromHardProcessBeforeFSR, "gentau_fromHardProcessBeforeFSR[gentau_count]/I");
+    tree->Branch("gentau_isDecayedLeptonHadron", gentau_isDecayedLeptonHadron, "gentau_isDecayedLeptonHadron[gentau_count]/I");
+    tree->Branch("gentau_isDirectHadronDecayProduct", gentau_isDirectHadronDecayProduct, "gentau_isDirectHadronDecayProduct[gentau_count]/I");
+    tree->Branch("gentau_isDirectHardProcessTauDecayProduct", gentau_isDirectHardProcessTauDecayProduct, "gentau_isDirectHardProcessTauDecayProduct[gentau_count]/I");
+    tree->Branch("gentau_isDirectPromptTauDecayProduct", gentau_isDirectPromptTauDecayProduct, "gentau_isDirectPromptTauDecayProduct[gentau_count]/I");
+    tree->Branch("gentau_isDirectTauDecayProduct", gentau_isDirectTauDecayProduct, "gentau_isDirectTauDecayProduct[gentau_count]/I");
+    tree->Branch("gentau_isFirstCopy", gentau_isFirstCopy, "gentau_isFirstCopy[gentau_count]/I");
+    tree->Branch("gentau_isHardProcess", gentau_isHardProcess, "gentau_isHardProcess[gentau_count]/I");
+    tree->Branch("gentau_isHardProcessTauDecayProduct", gentau_isHardProcessTauDecayProduct, "gentau_isHardProcessTauDecayProduct[gentau_count]/I");
+    tree->Branch("gentau_isLastCopy", gentau_isLastCopy, "gentau_isLastCopy[gentau_count]/I");
+    tree->Branch("gentau_isLastCopyBeforeFSR", gentau_isLastCopyBeforeFSR, "gentau_isLastCopyBeforeFSR[gentau_count]/I");
+    tree->Branch("gentau_isPrompt", gentau_isPrompt, "gentau_isPrompt[gentau_count]/I");
+    tree->Branch("gentau_isPromptTauDecayProduct", gentau_isPromptTauDecayProduct, "gentau_isPromptTauDecayProduct[gentau_count]/I");
+    tree->Branch("gentau_isTauDecayProduct", gentau_isTauDecayProduct, "gentau_isTauDecayProduct[gentau_count]/I");
+
     tree->Branch("gentau_decayMode",  gentau_decayMode,  "tau_decayMode[gentau_count]/I");
     tree->Branch("gentau_decayMode_name",  gentau_decayMode_name,  "tau_decayMode_name[gentau_count]/C");
     tree->Branch("gentau_mother",gentau_mother,"gentau_mother[gentau_count]/b");
@@ -754,6 +776,23 @@ void NTupleMaker::beginJob(){
     tree->Branch("genparticles_pdgid", genparticles_pdgid, "genparticles_pdgid[genparticles_count]/I");
     tree->Branch("genparticles_status", genparticles_status, "genparticles_status[genparticles_count]/I");
     tree->Branch("genparticles_info", genparticles_info, "genparticles_info[genparticles_count]/i");
+
+    tree->Branch("genparticles_fromHardProcess", genparticles_fromHardProcess, "genparticles_fromHardProcess[genparticles_count]/I");
+    tree->Branch("genparticles_fromHardProcessBeforeFSR", genparticles_fromHardProcessBeforeFSR, "genparticles_fromHardProcessBeforeFSR[genparticles_count]/I");
+    tree->Branch("genparticles_isDecayedLeptonHadron", genparticles_isDecayedLeptonHadron, "genparticles_isDecayedLeptonHadron[genparticles_count]/I");
+    tree->Branch("genparticles_isDirectHadronDecayProduct", genparticles_isDirectHadronDecayProduct, "genparticles_isDirectHadronDecayProduct[genparticles_count]/I");
+    tree->Branch("genparticles_isDirectHardProcessTauDecayProduct", genparticles_isDirectHardProcessTauDecayProduct, "genparticles_isDirectHardProcessTauDecayProduct[genparticles_count]/I");
+    tree->Branch("genparticles_isDirectPromptTauDecayProduct", genparticles_isDirectPromptTauDecayProduct, "genparticles_isDirectPromptTauDecayProduct[genparticles_count]/I");
+    tree->Branch("genparticles_isDirectTauDecayProduct", genparticles_isDirectTauDecayProduct, "genparticles_isDirectTauDecayProduct[genparticles_count]/I");
+    tree->Branch("genparticles_isFirstCopy", genparticles_isFirstCopy, "genparticles_isFirstCopy[genparticles_count]/I");
+    tree->Branch("genparticles_isHardProcess", genparticles_isHardProcess, "genparticles_isHardProcess[genparticles_count]/I");
+    tree->Branch("genparticles_isHardProcessTauDecayProduct", genparticles_isHardProcessTauDecayProduct, "genparticles_isHardProcessTauDecayProduct[genparticles_count]/I");
+    tree->Branch("genparticles_isLastCopy", genparticles_isLastCopy, "genparticles_isLastCopy[genparticles_count]/I");
+    tree->Branch("genparticles_isLastCopyBeforeFSR", genparticles_isLastCopyBeforeFSR, "genparticles_isLastCopyBeforeFSR[genparticles_count]/I");
+    tree->Branch("genparticles_isPrompt", genparticles_isPrompt, "genparticles_isPrompt[genparticles_count]/I");
+    tree->Branch("genparticles_isPromptTauDecayProduct", genparticles_isPromptTauDecayProduct, "genparticles_isPromptTauDecayProduct[genparticles_count]/I");
+    tree->Branch("genparticles_isTauDecayProduct", genparticles_isTauDecayProduct, "genparticles_isTauDecayProduct[genparticles_count]/I");
+ 
     tree->Branch("genparticles_mother", genparticles_mother, "genparticles_mother[genparticles_count]/b");
   }    
 
@@ -1796,6 +1835,23 @@ bool NTupleMaker::AddGenParticles(const edm::Event& iEvent) {
 	      gentau_visible_phi[gentau_count]  = tau_visible_p4.phi();
 	      gentau_visible_mass[gentau_count] = tau_visible_p4.mass();
 
+	      const GenStatusFlags statusFlags = (*GenParticles)[i].statusFlags();
+	      gentau_fromHardProcess[gentau_count] = statusFlags.fromHardProcess();
+	      gentau_fromHardProcessBeforeFSR[gentau_count] = statusFlags.fromHardProcessBeforeFSR();
+	      gentau_isDecayedLeptonHadron[gentau_count] = statusFlags.isDecayedLeptonHadron();
+	      gentau_isDirectHadronDecayProduct[gentau_count] = statusFlags.isDirectHadronDecayProduct();
+	      gentau_isDirectHardProcessTauDecayProduct[gentau_count] = statusFlags.isDirectHardProcessTauDecayProduct();
+	      gentau_isDirectPromptTauDecayProduct[gentau_count] = statusFlags.isDirectPromptTauDecayProduct();
+	      gentau_isDirectTauDecayProduct[gentau_count] = statusFlags.isDirectTauDecayProduct();
+	      gentau_isFirstCopy[gentau_count] = statusFlags.isFirstCopy();
+	      gentau_isHardProcess[gentau_count] = statusFlags.isHardProcess();
+	      gentau_isHardProcessTauDecayProduct[gentau_count] = statusFlags.isHardProcessTauDecayProduct();
+	      gentau_isLastCopy[gentau_count] = statusFlags.isLastCopy();
+	      gentau_isLastCopyBeforeFSR[gentau_count] = statusFlags.isLastCopyBeforeFSR();
+	      gentau_isPrompt[gentau_count] = statusFlags.isPrompt();
+	      gentau_isPromptTauDecayProduct[gentau_count] = statusFlags.isPromptTauDecayProduct();
+	      gentau_isTauDecayProduct[gentau_count] = statusFlags.isTauDecayProduct();
+
 	      gentau_decayMode_name[gentau_count] = genTauDecayMode;
 
 	      if( genTauDecayMode.find("oneProng0Pi0")!=string::npos )          gentau_decayMode[gentau_count] = 0;
@@ -1884,6 +1940,24 @@ bool NTupleMaker::AddGenParticles(const edm::Event& iEvent) {
 	      genparticles_status[genparticles_count] = (*GenParticles)[i].status();
 	      genparticles_info[genparticles_count] = info;
 	      genparticles_mother[genparticles_count] = mother;
+
+	      const GenStatusFlags statusFlags = (*GenParticles)[i].statusFlags();
+	      genparticles_fromHardProcess[genparticles_count] = statusFlags.fromHardProcess();
+	      genparticles_fromHardProcessBeforeFSR[genparticles_count] = statusFlags.fromHardProcessBeforeFSR();
+	      genparticles_isDecayedLeptonHadron[genparticles_count] = statusFlags.isDecayedLeptonHadron();
+	      genparticles_isDirectHadronDecayProduct[genparticles_count] = statusFlags.isDirectHadronDecayProduct();
+	      genparticles_isDirectHardProcessTauDecayProduct[genparticles_count] = statusFlags.isDirectHardProcessTauDecayProduct();
+	      genparticles_isDirectPromptTauDecayProduct[genparticles_count] = statusFlags.isDirectPromptTauDecayProduct();
+	      genparticles_isDirectTauDecayProduct[genparticles_count] = statusFlags.isDirectTauDecayProduct();
+	      genparticles_isFirstCopy[genparticles_count] = statusFlags.isFirstCopy();
+	      genparticles_isHardProcess[genparticles_count] = statusFlags.isHardProcess();
+	      genparticles_isHardProcessTauDecayProduct[genparticles_count] = statusFlags.isHardProcessTauDecayProduct();
+	      genparticles_isLastCopy[genparticles_count] = statusFlags.isLastCopy();
+	      genparticles_isLastCopyBeforeFSR[genparticles_count] = statusFlags.isLastCopyBeforeFSR();
+	      genparticles_isPrompt[genparticles_count] = statusFlags.isPrompt();
+	      genparticles_isPromptTauDecayProduct[genparticles_count] = statusFlags.isPromptTauDecayProduct();
+	      genparticles_isTauDecayProduct[genparticles_count] = statusFlags.isTauDecayProduct();
+	      
 	      genparticles_count++;
 	    }
 	} // for(unsigned i = 0 ; i < GenParticles->size() ; i++)
@@ -2021,6 +2095,8 @@ unsigned int NTupleMaker::AddMuons(const edm::Event& iEvent)
 	//	bool goodGlb = muon_isGlobal[muon_count] && muon_normChi2[muon_count]  < 3 && muon_normChi2[muon_count] > 0 
 	//	 && muon_combQ_chi2LocalPosition[muon_count] < 12 && muon_combQ_trkKink[muon_count] < 20;
 	//	muon_isMedium[muon_count] =  muon_isLoose[muon_count] && muon_validFraction[muon_count] > 0.8 && muon_segmentComp[muon_count] > (goodGlb ? 0.303 : 0.451);
+
+	muon_genmatch[muon_count] = 0;
 
 	muon_count++;
 	
@@ -2538,6 +2614,9 @@ unsigned int NTupleMaker::AddTaus(const edm::Event& iEvent, const edm::EventSetu
 	  //	  std::cout << " tracks around :  pt>0.5 = " << tau_ntracks_pt05[tau_count]
 	  //		    << "  pt>0.8 = " << tau_ntracks_pt08[tau_count]
 	  //		    << "  pt>1.0 = " << tau_ntracks_pt1[tau_count] << std::endl;
+
+	  tau_genmatch[tau_count] = 0;
+
 	  tau_count++;
 	  if(tau_count == M_taumaxcount) {
 	    cerr << "number of taus > M_taumaxcount. They are missing." << endl; 
@@ -2973,6 +3052,8 @@ unsigned int NTupleMaker::AddElectrons(const edm::Event& iEvent, const edm::Even
 	  electron_pass_conversion[electron_count] = (*Electrons)[i].passConversionVeto();
 	  
 	  //	  std::cout << "  passed conversion veto = " << electron_pass_conversion[electron_count] << std::endl;
+
+	  electron_genmatch[electron_count] = 0;
 
 	  electron_count++;
 
