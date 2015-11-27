@@ -26,6 +26,7 @@
 #include "DesyTauAnalyses/NTupleMaker/interface/Config.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/AC1B.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/json.h"
+#include "DesyTauAnalyses/NTupleMaker/interface/PileUp.h"
 
 
 
@@ -297,7 +298,11 @@ int main(int argc, char * argv[]) {
 
   const bool isData = cfg.get<bool>("IsData");
   const bool applyGoodRunSelection = cfg.get<bool>("ApplyGoodRunSelection");
-  const bool applyPUreweighting = cfg.get<bool>("ApplyPUreweighting");
+
+  // pile up reweighting
+  const bool applyPUreweighting_vertices = cfg.get<bool>("ApplyPUreweighting_vertices");
+  const bool applyPUreweighting_official = cfg.get<bool>("ApplyPUreweighting_official");
+
   const bool applyLeptonSF = cfg.get<bool>("ApplyLeptonSF");
 
   // kinematic cuts on electron
@@ -659,9 +664,14 @@ int main(int argc, char * argv[]) {
   TH1F * ZMassIsoEleEndcapPass = new TH1F("ZMassIsoEleEndcapPass","",60,60,120);
   TH1F * ZMassIsoEleEndcapFail = new TH1F("ZMassIsoEleEndcapFail","",60,60,120);
 
+  TH1D * PUweightsOfficialH = new TH1D("PUweightsOfficialH","PU weights w/ official reweighting",1000, 0, -1);
 
-  // reweighting for vertices
+  // PILE UP REWEIGHTING - OPTIONS
 
+  if (applyPUreweighting_vertices and applyPUreweighting_official) 
+	{std::cout<<"ERROR: Choose only ONE PU reweighting method (vertices or official, not both!) " <<std::endl; exit(-1);}
+
+  // reweighting with vertices
 
   // reading vertex weights
   TFile * fileDataNVert = new TFile(TString(cmsswBase)+"/src/"+dataBaseDir+"/"+vertDataFileName);
@@ -676,6 +686,23 @@ int main(int argc, char * argv[]) {
   Float_t normMC =  hNvertMC->GetSumOfWeights();
   hNvertData->Scale(1/normData);
   hNvertMC->Scale(1/normMC);
+
+
+  // reweighting official recipe 
+  	// initialize pile up object
+  PileUp * PUofficial = new PileUp();
+  
+
+  
+  if (applyPUreweighting_official) {
+    TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/Data_Pileup_2015D_Nov17.root","read"); 
+    TFile * filePUdistribution_MC = new TFile (TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/MC_Spring15_PU25_Startup.root", "read"); 
+    TH1D * PU_data = (TH1D *)filePUdistribution_data->Get("pileup");
+    TH1D * PU_mc = (TH1D *)filePUdistribution_MC->Get("pileup");
+    PUofficial->set_h_data(PU_data); 
+    PUofficial->set_h_MC(PU_mc);
+  }
+
   
   TFile *f10= new TFile(TString(cmsswBase)+"/src/"+dataBaseDir+"/"+eleSfDataBarrel);  // ele SF barrel data
   TFile *f11 = new TFile(TString(cmsswBase)+"/src/"+dataBaseDir+"/"+eleSfDataEndcap); // ele SF endcap data
@@ -768,6 +795,7 @@ int main(int argc, char * argv[]) {
     AC1B analysisTree(_tree);
 
   
+    // EVENT LOOP //
     
     for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) { 
 
@@ -786,8 +814,9 @@ int main(int argc, char * argv[]) {
       }
       histWeightsSkimmedH->Fill(float(0),weight);
 
-      if (!isData && applyPUreweighting) {
-	//reweighting
+      // PU reweighting with vertices 
+      if (!isData && applyPUreweighting_vertices) {
+	
 	int binNvert = hNvert->FindBin(analysisTree.primvertex_count);
 	float_t dataNvert = hNvertData->GetBinContent(binNvert);
 	float_t mcNvert = hNvertMC->GetBinContent(binNvert);
@@ -797,6 +826,14 @@ int main(int argc, char * argv[]) {
 	weight *= vertWeight;
 	//	cout << "NVert = " << analysisTree.primvertex_count << "  : " << vertWeight << endl;
       }
+
+      // PU reweighting with Ninteractions (official recipe) 
+      if (!isData and applyPUreweighting_official) {
+	double Ninteractions = analysisTree.numtruepileupinteractions;
+	double PUweight = PUofficial->get_PUweight(Ninteractions);
+	weight *= PUweight;
+	PUweightsOfficialH->Fill(PUweight);
+	}
 
       if (isData && applyGoodRunSelection){
 
