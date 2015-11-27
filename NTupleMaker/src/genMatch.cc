@@ -14,15 +14,15 @@ int utils_genMatch::genMatch( const reco::Candidate::LorentzVector& p4, const st
     dr_new = ROOT::Math::VectorUtil::DeltaR( p4, genp->p4());
 
     if (dr_new < dr){
-      dr = dr_new;
-
       if (TMath::Abs(genp->pdgId()) == 11) {
 	if (genp->pt() > 8) {
 	  if (genp->statusFlags().isPrompt()) {
 	    match = 1;
+	    dr = dr_new;
 	  }
 	  else if (genp->statusFlags().isDirectPromptTauDecayProduct()) {
 	    match = 3;
+	    dr = dr_new;
 	  }
 	}
       }
@@ -30,9 +30,11 @@ int utils_genMatch::genMatch( const reco::Candidate::LorentzVector& p4, const st
 	if (genp->pt() > 8) {
 	  if (genp->isPromptFinalState()){
 	    match = 2;
+	    dr = dr_new;
 	  }
 	  if (genp->isDirectPromptTauDecayProductFinalState()){
 	    match = 4;
+	    dr = dr_new;
 	  }
 	}
       }
@@ -41,12 +43,10 @@ int utils_genMatch::genMatch( const reco::Candidate::LorentzVector& p4, const st
 	  reco::Candidate::LorentzVector tau_p4 = utils_genMatch::getVisMomentumNoLep(&(*genp));
 	  if (tau_p4.pt() > 15) {
 	    match = 5;
+	    dr = dr_new;
 	  }
 	}
       }
-      else {
-	match = 6;	
-      }	      
     }
   }
 

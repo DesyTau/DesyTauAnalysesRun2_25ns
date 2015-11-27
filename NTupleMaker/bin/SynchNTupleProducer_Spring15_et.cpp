@@ -30,6 +30,8 @@
 
 #include "DesyTauAnalyses/NTupleMaker/interface/Spring15Tree.h"
 
+#include "TauAnalysis/SVfitStandalone/interface/SVfitStandaloneAlgorithm.h"
+
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/foreach.hpp>
@@ -392,12 +394,19 @@ int main(int argc, char * argv[]) {
   // **** configuration analysis
   Config cfg(argv[1]);
 
+  //svfit
+  const string svFitPtResFile = cfg.get<string>("svFitPtResFile");
+
+  // HLT filters
+  const string isoLeg   = cfg.get<string>("isoLeg");
+  const float ptTrigObjCut  = cfg.get<float>("ptTrigObjCut");
+  
   // vertex cuts
   const float ndofVertexCut  = cfg.get<float>("NdofVertexCut");   
   const float zVertexCut     = cfg.get<float>("ZVertexCut");
   const float dVertexCut     = cfg.get<float>("DVertexCut");
 
-  // electron cuta
+  // electron cuts
   const float ptElectronLowCut   = cfg.get<float>("ptElectronLowCut");
   const float ptElectronHighCut  = cfg.get<float>("ptElectronHighCut");
   const float etaElectronCut     = cfg.get<float>("etaElectronCut");
@@ -406,7 +415,7 @@ int main(int argc, char * argv[]) {
   const float isoElectronLowCut  = cfg.get<float>("isoElectronLowCut");
   const float isoElectronHighCut = cfg.get<float>("isoElectronHighCut");
   const bool applyElectronId     = cfg.get<bool>("ApplyElectronId");
-
+  
   // tau cuts
   const float ptTauLowCut    = cfg.get<float>("ptTauLowCut");
   const float ptTauHighCut   = cfg.get<float>("ptTauHighCut");  
@@ -468,7 +477,6 @@ int main(int argc, char * argv[]) {
   // **** end of configuration analysis
 
   // configuration process
-
   Config cfg2(argv[2]);
 
   const string sample = cfg2.get<string>("sample");
@@ -484,25 +492,7 @@ int main(int argc, char * argv[]) {
     xs = cfg2.get<float>("xs");
   }
   // **** end of configuration analysis
-  
-  // Trigger Configuration
-
-  int singleEle = 10;
-
-  int xEle = 7;
-  int xTau = 14;
-  int xOverlap = 8;
-
-  if (isData){
-    singleEle = 15;
-
-    xEle = 11;
-    xTau = 25;
-    xOverlap = 12;
-  }
-  
-  // **** end of Trigger configuration
-  
+    
   int ifile = 0;
   int jfile = -1;
 
@@ -539,6 +529,10 @@ int main(int argc, char * argv[]) {
       jfile = fileList.size();   
   }
 
+  for (int iF=ifile; iF<jfile; ++iF) {
+    std::cout<<fileList[iF]<<std::endl;
+  }
+  
   TString rootFileName(sample);
   std::string ntupleName("makeroottree/AC1B");
 
@@ -580,6 +574,9 @@ int main(int argc, char * argv[]) {
   }
   std::ofstream fileOutput("overlap.out");
 
+  //sfFit
+  TH1::AddDirectory(false);  
+  TFile* inputFile_visPtResolution = new TFile(svFitPtResFile.data());
 
   for (int iF=ifile; iF<jfile; ++iF) {
 
@@ -618,6 +615,22 @@ int main(int argc, char * argv[]) {
 	nWeightedEventsH->Fill(0., 1.);
       else
 	nWeightedEventsH->Fill(0., analysisTree.genweight);
+
+      unsigned int nIsoLeg = 0;
+      bool checkIsoLeg = false;
+
+      unsigned int nfilters = analysisTree.run_hltfilters->size();
+      for (unsigned int i=0; i<nfilters; ++i) {
+	TString HLTFilter(analysisTree.run_hltfilters->at(i));
+	if (HLTFilter==isoLeg) {
+	  nIsoLeg = i;
+	  checkIsoLeg = true;
+	}
+      }
+      if (!checkIsoLeg) {
+	std::cout << "HLT filter " << isoLeg << " not found" << std::endl;
+	exit(-1);
+      }
       
       if (nEvents%10000==0) 
 	cout << "      processed " << nEvents << " events" << endl; 
@@ -663,16 +676,16 @@ int main(int argc, char * argv[]) {
       otree->weight = 1;
       
       otree->npv = analysisTree.primvertex_count;
-      otree->npu = analysisTree.numpileupinteractions;
+      otree->npu = analysisTree.numtruepileupinteractions;// numpileupinteractions;
       otree->rho = analysisTree.rho;
 
       // vertex cuts
-      if (fabs(analysisTree.primvertex_z)>zVertexCut) continue;
-      if (analysisTree.primvertex_ndof<=ndofVertexCut) continue;
-      float dVertex = sqrt(analysisTree.primvertex_x*analysisTree.primvertex_x+
-			   analysisTree.primvertex_y*analysisTree.primvertex_y);
-      if (dVertex>dVertexCut)
-	continue;
+      //if (fabs(analysisTree.primvertex_z)>zVertexCut) continue;
+      //if (analysisTree.primvertex_ndof<=ndofVertexCut) continue;
+      //float dVertex = sqrt(analysisTree.primvertex_x*analysisTree.primvertex_x+
+      //		   analysisTree.primvertex_y*analysisTree.primvertex_y);
+      //if (dVertex>dVertexCut)
+      //continue;
       
       if (debug)
 	fileOutput << "Vertex cuts are passed " << std::endl;
@@ -682,9 +695,9 @@ int main(int argc, char * argv[]) {
       if (debug)
 	fileOutput << "# electrons = " << analysisTree.electron_count << std::endl;
       for (unsigned int ie = 0; ie<analysisTree.electron_count; ++ie) {
-	bool electronMvaId = electronMvaIdWP80(analysisTree.electron_pt[ie],
-					       analysisTree.electron_superclusterEta[ie],
-					       analysisTree.electron_mva_id_nontrigPhys14[ie]);
+
+	bool electronMvaId = analysisTree.electron_mva_wp80_nontrig_Spring15_v1[ie];
+	
 	if (debug)
 	  fileOutput << "  " << ie 
 		     << " pt = " << analysisTree.electron_pt[ie] 
@@ -694,10 +707,10 @@ int main(int argc, char * argv[]) {
 		     << " passConv = " << analysisTree.electron_pass_conversion[ie]
 		     << " nmisshits = " << int(analysisTree.electron_nmissinginnerhits[ie])
 		     << " mvaTight = " << electronMvaId << std::endl;
-	if (analysisTree.electron_pt[ie]<ptElectronLowCut) continue;
-	if (fabs(analysisTree.electron_eta[ie])>etaElectronCut) continue;
-	if (fabs(analysisTree.electron_dxy[ie])>dxyElectronCut) continue;
-	if (fabs(analysisTree.electron_dz[ie])>dzElectronCut) continue;
+	if (analysisTree.electron_pt[ie]<=ptElectronLowCut) continue;
+	if (fabs(analysisTree.electron_eta[ie])>=etaElectronCut) continue;
+	if (fabs(analysisTree.electron_dxy[ie])>=dxyElectronCut) continue;
+	if (fabs(analysisTree.electron_dz[ie])>=dzElectronCut) continue;
 	if (!electronMvaId&&applyElectronId) continue;
 	if (!analysisTree.electron_pass_conversion[ie]&&applyElectronId) continue;
 	if (analysisTree.electron_nmissinginnerhits[ie]>1&&applyElectronId) continue;
@@ -716,18 +729,13 @@ int main(int argc, char * argv[]) {
 		     << " decayModeFinding = " << analysisTree.tau_decayModeFinding[it]
 		     << " decayModeFindingNewDMs = " << analysisTree.tau_decayModeFindingNewDMs[it]
 		     << " tau_vertexz = " << analysisTree.tau_vertexz[it] <<std::endl;
-	if (analysisTree.tau_pt[it]<ptTauLowCut) continue;
-	if (fabs(analysisTree.tau_eta[it])>etaTauCut) continue;
+	if (analysisTree.tau_pt[it]<=ptTauLowCut) continue;
+	if (fabs(analysisTree.tau_eta[it])>=etaTauCut) continue;
 	if (fabs(fabs(analysisTree.tau_charge[it])-1)>0.001) continue;
-	if (fabs(analysisTree.tau_leadchargedhadrcand_dz[it])>dzTauCut) continue;
+	if (fabs(analysisTree.tau_leadchargedhadrcand_dz[it])>=dzTauCut) continue;
 	if (applyTauId &&
 	    analysisTree.tau_decayModeFindingNewDMs[it] < 0.5) continue;
 	
-	float ctgTheta = analysisTree.tau_pz[it] / sqrt(analysisTree.tau_px[it]*analysisTree.tau_px[it] + analysisTree.tau_py[it]*analysisTree.tau_py[it]);
-	float zImpact = analysisTree.tau_vertexz[it] + 130. * ctgTheta;
-
-	//if ( zImpact > -1.5 && zImpact < 0.5) continue;
-
 	taus.push_back(it);
       }
 
@@ -769,24 +777,21 @@ int main(int argc, char * argv[]) {
 	if (debug)
 	  fileOutput << "Electron " << eIndex << " -> relIso = "<<relIsoEle<<" absIso = "<<absIsoEle<<std::endl;
 
+	bool isSingleLepTrig = false;
 	for (unsigned int iT=0; iT<analysisTree.trigobject_count; ++iT) {
-	  //if (!analysisTree.trigobject_isElectron[iT]) continue;
-	  
 	  float dRtrig = deltaR(analysisTree.electron_eta[eIndex],analysisTree.electron_phi[eIndex],
 				analysisTree.trigobject_eta[iT],analysisTree.trigobject_phi[iT]);
 
 	  if (dRtrig < deltaRTrigMatch){
-	    if (analysisTree.trigobject_filters[iT][xEle] && analysisTree.trigobject_filters[iT][xOverlap]) // Ele22 Leg
-	      isTrigEle22 = true;	      
-	    if (analysisTree.trigobject_filters[iT][singleEle]) // Ele32 Leg
-	      isTrigEle32 = true;
+	    if (analysisTree.trigobject_filters[iT][nIsoLeg] && ( isData || analysisTree.trigobject_pt[iT] > ptTrigObjCut)) // Ele23 Leg
+	      isSingleLepTrig = true;
 	  }
 	}
 	  
 	if (debug)
-	  fileOutput << "Electron " << eIndex << " -> isTrigEle22 = " << isTrigEle22 << " ; isTrigEle32 = " << isTrigEle32 << std::endl;
+	  fileOutput << "Electron " << eIndex << " -> isTrigEle23 = " << isSingleLepTrig << std::endl;
 
-	if ((!isTrigEle22) && (!isTrigEle32)) continue;
+	if (!isSingleLepTrig) continue;
       
 	for (unsigned int it=0; it<taus.size(); ++it) {
 	  unsigned int tIndex = taus.at(it);
@@ -803,59 +808,12 @@ int main(int argc, char * argv[]) {
 	    fileOutput << "dR(ele,tau) = " << dR << std::endl;
 
 	  if (dR<dRleptonsCut) continue;
-	  
-	  bool isTrigTau = false;
-	  float dRtrig_min = 9999.;
-	  
-	  for (unsigned int iT=0; iT<analysisTree.trigobject_count; ++iT) {
-	    if (debug){
-	      if (analysisTree.trigobject_isElectron[iT] && analysisTree.trigobject_isMuon[iT])
-		fileOutput<<" trigObj "<<iT<<" both e and mu"<<std::endl;
-	      
-	      if (analysisTree.trigobject_isMuon[iT] && analysisTree.trigobject_isTau[iT])
-		fileOutput<<" trigObj "<<iT<<" both mu and tau"<<std::endl;
-	      
-	      if (analysisTree.trigobject_isElectron[iT] && analysisTree.trigobject_isTau[iT])
-		fileOutput<<" trigObj "<<iT<<" both e and tau"<<std::endl;
-	    }
-	    
-	    /*if (analysisTree.trigobject_isElectron[iT] ||
-		analysisTree.trigobject_isMuon[iT] ||
-		!analysisTree.trigobject_isTau[iT]) continue;*/
-	    
-	    float dRtrig = deltaR(analysisTree.tau_eta[tIndex],analysisTree.tau_phi[tIndex],
-				  analysisTree.trigobject_eta[iT],analysisTree.trigobject_phi[iT]);
-	    
-	    if (dRtrig < deltaRTrigMatch){
-	      if (analysisTree.trigobject_filters[iT][xTau] && analysisTree.trigobject_filters[iT][xOverlap]){
-		isTrigTau = true;
-		if (dRtrig < dRtrig_min)
-		  dRtrig_min = dRtrig;
-	      }
-	    }
-	  }
-	  
-	  if (debug)
-	    fileOutput << "Tau " << it << " -> isTrigTau = " << isTrigTau << " DR="<<dRtrig_min<<std::endl;
 
-	  bool trigMatch = isTrigEle32 || (isTrigEle22 && isTrigTau);
-	  if (!trigMatch) continue;
-	  
-	  bool isKinematicMatch = false;
-	  
-	  if (isTrigEle22 && isTrigTau) {
-            if (analysisTree.electron_pt[eIndex]>ptElectronLowCut && analysisTree.tau_pt[tIndex]>ptTauHighCut)
-              isKinematicMatch = true;
-	  }
-	  else if (isTrigEle32) {
-	    if (analysisTree.electron_pt[eIndex]>ptElectronHighCut)
-	      isKinematicMatch = true;
-	  }
-	  	  
-	  if (!isKinematicMatch) continue;
-	  
+	  // kinematic match
+	  if (analysisTree.electron_pt[eIndex]<=ptElectronHighCut) continue;
+
+	  // change pair
 	  bool changePair =  false;
-	  
 	  if (relIsoEle<isoEleMin) {
 	    if(debug)
 	      fileOutput<<"ChangePair ele iso"<<std::endl;
@@ -903,8 +861,23 @@ int main(int argc, char * argv[]) {
       otree->q_1 = -1;
       if (analysisTree.electron_charge[electronIndex]>0)
         otree->q_1 = 1;
-      otree->iso_1 = isoEleMin;
-      otree->mva_1 = analysisTree.electron_mva_id_nontrigPhys14[electronIndex];
+      otree->gen_match_1 = analysisTree.electron_genmatch[electronIndex];
+      
+      float neutralHadIsoEle = analysisTree.electron_neutralHadIso[electronIndex];
+      float photonIsoEle = analysisTree.electron_photonIso[electronIndex];
+      float chargedHadIsoEle = analysisTree.electron_chargedHadIso[electronIndex];
+      float puIsoEle = analysisTree.electron_puIso[electronIndex];
+      if (isIsoR03) {
+	neutralHadIsoEle = analysisTree.electron_r03_sumNeutralHadronEt[electronIndex];
+	photonIsoEle = analysisTree.electron_r03_sumPhotonEt[electronIndex];
+	chargedHadIsoEle = analysisTree.electron_r03_sumChargedHadronPt[electronIndex];
+	puIsoEle = analysisTree.electron_r03_sumPUPt[electronIndex];
+      }
+      float neutralIsoEle = neutralHadIsoEle + photonIsoEle - 0.5*puIsoEle;
+      neutralIsoEle = TMath::Max(float(0),neutralIsoEle); 
+      otree->iso_1 = (chargedHadIsoEle + neutralIsoEle)/analysisTree.electron_pt[electronIndex];
+      otree->mva_1 = analysisTree.electron_mva_value_nontrig_Spring15_v1[electronIndex];
+
       otree->d0_1 = analysisTree.electron_dxy[electronIndex];
       otree->dZ_1 = analysisTree.electron_dz[electronIndex];
 
@@ -922,11 +895,12 @@ int main(int argc, char * argv[]) {
       otree->eta_2 = analysisTree.tau_eta[tauIndex];
       otree->phi_2 = analysisTree.tau_phi[tauIndex];
       otree->q_2 = analysisTree.tau_charge[tauIndex];
+      otree->gen_match_2 = analysisTree.tau_genmatch[tauIndex];
       //if (analysisTree.tau_charge[tauIndex]>0)
       //otree->q_2 = 1;
       otree->mva_2 = log(0);
-      otree->d0_2 = analysisTree.tau_dxy[tauIndex];
-      otree->dZ_2 = analysisTree.tau_dz[tauIndex];
+      otree->d0_2 = analysisTree.tau_leadchargedhadrcand_dxy[tauIndex];
+      otree->dZ_2 = analysisTree.tau_leadchargedhadrcand_dz[tauIndex];      
       otree->iso_2 = analysisTree.tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[tauIndex];
       otree->m_2 = analysisTree.tau_mass[tauIndex];
 
@@ -950,10 +924,17 @@ int main(int argc, char * argv[]) {
 					  analysisTree.tau_pz[tauIndex],
 					  tauMass);
 
+      TLorentzVector metLV; metLV.SetXYZT(analysisTree.pfmet_ex,
+					  analysisTree.pfmet_ey,
+					  0,
+					  TMath::Sqrt(analysisTree.pfmet_ex*analysisTree.pfmet_ex + analysisTree.pfmet_ey*analysisTree.pfmet_ey));
+      
       TLorentzVector dileptonLV = electronLV + tauLV;
 
+      // visible mass
       otree->m_vis = dileptonLV.M();
-      otree->pt_tt = dileptonLV.Pt();
+      // visible ditau pt 
+      otree->pt_tt = (dileptonLV+metLV).Pt();
 
       // opposite charge
       otree->os = (otree->q_1 * otree->q_2) < 0.;
@@ -962,47 +943,38 @@ int main(int argc, char * argv[]) {
       otree->dilepton_veto = 0;
 
       for (unsigned int ie = 0; ie<analysisTree.electron_count; ++ie) {
-	if (analysisTree.electron_pt[ie]<ptDiElectronVeto) continue;
-	if (fabs(analysisTree.electron_eta[ie])>etaDiElectronVeto) continue;	
+	if (analysisTree.electron_pt[ie]<=ptDiElectronVeto) continue;
+	if (fabs(analysisTree.electron_eta[ie])>=etaDiElectronVeto) continue;	
 	
-	if (fabs(analysisTree.electron_dxy[ie])>dxyDiElectronVeto) continue;
-	if (fabs(analysisTree.electron_dz[ie])>dzDiElectronVeto) continue;
+	if (fabs(analysisTree.electron_dxy[ie])>=dxyDiElectronVeto) continue;
+	if (fabs(analysisTree.electron_dz[ie])>=dzDiElectronVeto) continue;
 
-	float neutralHadIsoEle = analysisTree.electron_neutralHadIso[ie];
-	float photonIsoEle = analysisTree.electron_photonIso[ie];
-	float chargedHadIsoEle = analysisTree.electron_chargedHadIso[ie];
-	float puIsoEle = analysisTree.electron_puIso[ie];
+	neutralHadIsoEle = analysisTree.electron_neutralHadIso[ie];
+	photonIsoEle = analysisTree.electron_photonIso[ie];
+	chargedHadIsoEle = analysisTree.electron_chargedHadIso[ie];
+	puIsoEle = analysisTree.electron_puIso[ie];
 	if (isIsoR03) {
 	  neutralHadIsoEle = analysisTree.electron_r03_sumNeutralHadronEt[ie];
 	  photonIsoEle = analysisTree.electron_r03_sumPhotonEt[ie];
 	  chargedHadIsoEle = analysisTree.electron_r03_sumChargedHadronPt[ie];
 	  puIsoEle = analysisTree.electron_r03_sumPUPt[ie];
 	}
-	float neutralIsoEle = neutralHadIsoEle + photonIsoEle - 0.5*puIsoEle;
+	neutralIsoEle = neutralHadIsoEle + photonIsoEle - 0.5*puIsoEle;
 	neutralIsoEle = TMath::Max(float(0),neutralIsoEle); 
 	float absIsoEle =  chargedHadIsoEle + neutralIsoEle;
 	float relIsoEle = absIsoEle/analysisTree.electron_pt[ie];
-	if(relIsoEle > isoDiElectronVeto) continue;
+
+	if(relIsoEle >= isoDiElectronVeto) continue;
 	
-	bool passedVetoId = electron_Phys14_25ns_Veto( analysisTree.electron_superclusterEta[ie],
-						       analysisTree.electron_deltaetasuperclustertrack[ie],
-						       analysisTree.electron_deltaphisuperclustertrack[ie],
-						       analysisTree.electron_full5x5_sigmaietaieta[ie],
-						       analysisTree.electron_ehcaloverecal[ie],
-						       analysisTree.electron_dxy[ie],
-						       analysisTree.electron_dz[ie],
-						       analysisTree.electron_ooemoop[ie],
-						       relIsoEle,
-						       analysisTree.electron_nmissinginnerhits[ie],
-						       analysisTree.electron_pass_conversion[ie]);
+	bool passedVetoId =  analysisTree.electron_cutId_veto_Spring15[ie];
 	if (!passedVetoId && applyDiElectronVetoId) continue;
 	
 	for (unsigned int je = ie+1; je<analysisTree.electron_count; ++je) {
-	  if (analysisTree.electron_pt[je]<ptDiElectronVeto) continue;
-	  if (fabs(analysisTree.electron_eta[je])>etaDiElectronVeto) continue;	
+	  if (analysisTree.electron_pt[je]<=ptDiElectronVeto) continue;
+	  if (fabs(analysisTree.electron_eta[je])>=etaDiElectronVeto) continue;	
 	  
-	  if (fabs(analysisTree.electron_dxy[je])>dxyDiElectronVeto) continue;
-	  if (fabs(analysisTree.electron_dz[je])>dzDiElectronVeto) continue;
+	  if (fabs(analysisTree.electron_dxy[je])>=dxyDiElectronVeto) continue;
+	  if (fabs(analysisTree.electron_dz[je])>=dzDiElectronVeto) continue;
 	  
 	  if (analysisTree.electron_charge[ie] * analysisTree.electron_charge[je] > 0. && applyDiElectronOS) continue;
 
@@ -1020,61 +992,50 @@ int main(int argc, char * argv[]) {
 	  neutralIsoEle = TMath::Max(float(0),neutralIsoEle); 
 	  absIsoEle =  chargedHadIsoEle + neutralIsoEle;
 	  relIsoEle = absIsoEle/analysisTree.electron_pt[je];
-	
-	  if(relIsoEle > isoDiElectronVeto) continue;	
 
-	  passedVetoId = electron_Phys14_25ns_Veto( analysisTree.electron_superclusterEta[je],
-						    analysisTree.electron_deltaetasuperclustertrack[je],
-						    analysisTree.electron_deltaphisuperclustertrack[je],
-						    analysisTree.electron_full5x5_sigmaietaieta[je],
-						    analysisTree.electron_ehcaloverecal[je],
-						    analysisTree.electron_dxy[je],
-						    analysisTree.electron_dz[je],
-						    analysisTree.electron_ooemoop[je],
-						    relIsoEle,
-						    analysisTree.electron_nmissinginnerhits[je],
-						    analysisTree.electron_pass_conversion[je]);
+	  if(relIsoEle >= isoDiElectronVeto) continue;	
+
+	  passedVetoId =  analysisTree.electron_cutId_veto_Spring15[je];
 	  if (!passedVetoId && applyDiElectronVetoId) continue;
 	  
 	  float dr = deltaR(analysisTree.electron_eta[ie],analysisTree.electron_phi[ie],
 			    analysisTree.electron_eta[je],analysisTree.electron_phi[je]);
 
-	  if(dr<drDiElectronVeto) continue;
+	  if(dr<=drDiElectronVeto) continue;
 
 	  otree->dilepton_veto = 1;
 	}
       }
       
-      // extra electron veto 
+      // extra electron veto
       otree->extraelec_veto = 0;
 
       for (unsigned int ie = 0; ie<analysisTree.electron_count; ++ie) {
 	if (int(ie)==electronIndex) continue;
-	if (analysisTree.electron_pt[ie]<ptVetoElectronCut) continue;
-	if (fabs(analysisTree.electron_eta[ie])>etaVetoElectronCut) continue;
-	if (fabs(analysisTree.electron_dxy[ie])>dxyVetoElectronCut) continue;
-	if (fabs(analysisTree.electron_dz[ie])>dzVetoElectronCut) continue;
-	bool electronMvaId = electronMvaIdWP90(analysisTree.electron_pt[ie],
-					       analysisTree.electron_superclusterEta[ie],
-					       analysisTree.electron_mva_id_nontrigPhys14[ie]);
+	if (analysisTree.electron_pt[ie]<=ptVetoElectronCut) continue;
+	if (fabs(analysisTree.electron_eta[ie])>=etaVetoElectronCut) continue;
+	if (fabs(analysisTree.electron_dxy[ie])>=dxyVetoElectronCut) continue;
+	if (fabs(analysisTree.electron_dz[ie])>=dzVetoElectronCut) continue;
+	bool electronMvaId = analysisTree.electron_mva_wp90_nontrig_Spring15_v1[ie];
 	if (!electronMvaId && applyVetoElectronId) continue;
 	if (!analysisTree.electron_pass_conversion[ie] && applyVetoElectronId) continue;
 	if (analysisTree.electron_nmissinginnerhits[ie]>1 && applyVetoElectronId) continue;
-	float neutralHadIsoEle = analysisTree.electron_neutralHadIso[ie];
-	float photonIsoEle = analysisTree.electron_photonIso[ie];
-	float chargedHadIsoEle = analysisTree.electron_chargedHadIso[ie];
-	float puIsoEle = analysisTree.electron_puIso[ie];
+	neutralHadIsoEle = analysisTree.electron_neutralHadIso[ie];
+	photonIsoEle = analysisTree.electron_photonIso[ie];
+	chargedHadIsoEle = analysisTree.electron_chargedHadIso[ie];
+	puIsoEle = analysisTree.electron_puIso[ie];
 	if (isIsoR03) {
 	  neutralHadIsoEle = analysisTree.electron_r03_sumNeutralHadronEt[ie];
 	  photonIsoEle = analysisTree.electron_r03_sumPhotonEt[ie];
 	  chargedHadIsoEle = analysisTree.electron_r03_sumChargedHadronPt[ie];
 	  puIsoEle = analysisTree.electron_r03_sumPUPt[ie];
 	}
-	float neutralIsoEle = neutralHadIsoEle + photonIsoEle - 0.5*puIsoEle;
+	neutralIsoEle = neutralHadIsoEle + photonIsoEle - 0.5*puIsoEle;
 	neutralIsoEle = TMath::Max(float(0),neutralIsoEle); 
 	float absIsoEle =  chargedHadIsoEle + neutralIsoEle;
 	float relIsoEle = absIsoEle/analysisTree.electron_pt[ie];	
-	if (relIsoEle>isoVetoElectronCut) continue;
+
+	if (relIsoEle>=isoVetoElectronCut) continue;
 	
 	otree->extraelec_veto = 1;
       }
@@ -1112,8 +1073,8 @@ int main(int argc, char * argv[]) {
       otree->pt_sv = -9999;
       otree->eta_sv = -9999;
       otree->phi_sv = -9999;
-
-      // pfmet variables      
+      
+      // pfmet variables
       otree->met = TMath::Sqrt(analysisTree.pfmet_ex*analysisTree.pfmet_ex + analysisTree.pfmet_ey*analysisTree.pfmet_ey);
       otree->metphi = TMath::ATan2(analysisTree.pfmet_ey,analysisTree.pfmet_ex);
       otree->metcov00 = analysisTree.pfmet_sigxx;
@@ -1149,6 +1110,7 @@ int main(int argc, char * argv[]) {
       float vectorVisY = electronLV.Py() + tauLV.Py();
 
       otree->pzetavis  = vectorVisX*zetaX + vectorVisY*zetaY;
+      otree->pzetamiss = analysisTree.pfmet_ex*zetaX + analysisTree.pfmet_ey*zetaY;
       
       // choosing mva met
       unsigned int iMet = 0;
@@ -1156,7 +1118,8 @@ int main(int argc, char * argv[]) {
 	if ((int)analysisTree.mvamet_channel[iMet]==2) break;
       }
       
-      if (iMet>=analysisTree.mvamet_count){
+      //if (iMet>=analysisTree.mvamet_count){
+      if (true) {
 	if(debug)
 	  fileOutput<<"MVA MET channel ploblems.."<<std::endl;
 
@@ -1173,26 +1136,57 @@ int main(int argc, char * argv[]) {
 	otree->pzetamiss = log(0);	
       }
       else {
-	float mvamet_x = analysisTree.mvamet_ex[iMet];
-	float mvamet_y = analysisTree.mvamet_ey[iMet];
+	// choosing mva met
+	unsigned int iMet = 0;
+	for (; iMet<analysisTree.mvamet_count; ++iMet) {
+	  if (analysisTree.mvamet_channel[iMet]==2){
+	    if( ((int)analysisTree.mvamet_lep1[iMet])==tauIndex && ((int)analysisTree.mvamet_lep2[iMet])==electronIndex)
+	    break;
+	  }
+	}
+	
+	float mvamet_x = 0;
+	float mvamet_y = 0;
+	otree->mvacov00 = 0.;
+	otree->mvacov01 = 0.;
+	otree->mvacov10 = 0.;
+	otree->mvacov11 = 0.;
+	if(iMet < analysisTree.mvamet_count){
+	  mvamet_x = analysisTree.mvamet_ex[iMet];
+	  mvamet_y = analysisTree.mvamet_ey[iMet];
+	  otree->mvacov00 = analysisTree.mvamet_sigxx[iMet];
+	  otree->mvacov01 = analysisTree.mvamet_sigxy[iMet];
+	  otree->mvacov10 = analysisTree.mvamet_sigyx[iMet];
+	  otree->mvacov11 = analysisTree.mvamet_sigyy[iMet];
+	}
+	
 	float mvamet_x2 = mvamet_x * mvamet_x;
 	float mvamet_y2 = mvamet_y * mvamet_y;
-
 	otree->mvamet = TMath::Sqrt(mvamet_x2+mvamet_y2);
 	otree->mvametphi = TMath::ATan2(mvamet_y,mvamet_x);
-	otree->mvacov00 = analysisTree.mvamet_sigxx[iMet];
-	otree->mvacov01 = analysisTree.mvamet_sigxy[iMet];
-	otree->mvacov10 = analysisTree.mvamet_sigyx[iMet];
-	otree->mvacov11 = analysisTree.mvamet_sigyy[iMet];
-
+	
 	// computation of mt
 	//otree->mt_1 = sqrt(2*otree->pt_1*otree->mvamet*(1.-cos(otree->phi_1-otree->mvametphi)));
-	//otree->mt_2 = sqrt(2*otree->pt_2*otree->mvamet*(1.-cos(otree->phi_2-otree->mvametphi)));  
-	
-	// computation of DZeta variable
-	otree->pzetamiss = analysisTree.pfmet_ex*zetaX + analysisTree.pfmet_ey*zetaY;
+	//otree->mt_2 = sqrt(2*otree->pt_2*otree->mvamet*(1.-cos(otree->phi_2-otree->mvametphi)));  	
       }
 
+      // define MET covariance
+      TMatrixD covMET(2, 2);
+      covMET[0][0] = otree->mvacov00;
+      covMET[1][0] = otree->mvacov10;
+      covMET[0][1] = otree->mvacov01;
+      covMET[1][1] = otree->mvacov11;
+      // define lepton four vectors
+      //std::vector<svFitStandalone::MeasuredTauLepton> measuredTauLeptons;
+      //measuredTauLeptons.push_back(svFitStandalone::MeasuredTauLepton(svFitStandalone::kTauToElecDecay, otree->pt_1, otree->eta_1,  otree->phi_1, 0.51100e-3)); // tau -> electron decay (Pt, eta, phi, mass)
+      //measuredTauLeptons.push_back(svFitStandalone::MeasuredTauLepton(svFitStandalone::kTauToHadDecay, otree->pt_1, otree->eta_1,  otree->phi_1, otree->m_2, 0));//analysisTree.tau_decayMode[tauIndex])); // tau -> 1prong0pi0 hadronic decay (Pt, eta, phi, mass, pat::Tau.decayMode())
+      //SVfitStandaloneAlgorithm algo(measuredTauLeptons, analysisTree.mvamet_ex[iMet], analysisTree.mvamet_ey[iMet], covMET, 0);
+      //algo.addLogM(false);  
+      //algo.shiftVisPt(true, inputFile_visPtResolution);
+      //algo.integrateMarkovChain();
+
+      //otree->m_sv = algo.getMass(); // return value is in units of GeV
+      
       // counting jets
       vector<unsigned int> jets; jets.clear();
       vector<unsigned int> jetspt20; jetspt20.clear();
@@ -1208,42 +1202,43 @@ int main(int argc, char * argv[]) {
       float ptLeadingBJet = -1;
 
       for (unsigned int jet=0; jet<analysisTree.pfjet_count; ++jet) {
+
 	float absJetEta = fabs(analysisTree.pfjet_eta[jet]);
-	if (absJetEta>jetEtaCut) continue;
+	if (absJetEta>=jetEtaCut) continue;
 
 	float jetPt = analysisTree.pfjet_pt[jet];
-	if (jetPt<jetPtLowCut) continue;
+	if (jetPt<=jetPtLowCut) continue;
 
 	float dR1 = deltaR(analysisTree.pfjet_eta[jet],analysisTree.pfjet_phi[jet],
 			   otree->eta_1,otree->phi_1);
+	if (dR1<=dRJetLeptonCut) continue;
 
 	float dR2 = deltaR(analysisTree.pfjet_eta[jet],analysisTree.pfjet_phi[jet],
                            otree->eta_2,otree->phi_2);
-	
-	// pf jet Id
+        if (dR2<=dRJetLeptonCut) continue;
+
+	// jetId
 	float energy = analysisTree.pfjet_e[jet];
+        energy *= analysisTree.pfjet_energycorr[jet];
         float chf = analysisTree.pfjet_chargedhadronicenergy[jet]/energy;
         float nhf = analysisTree.pfjet_neutralhadronicenergy[jet]/energy;
         float phf = analysisTree.pfjet_neutralemenergy[jet]/energy;
         float elf = analysisTree.pfjet_chargedemenergy[jet]/energy;
+	float muf = analysisTree.pfjet_muonenergy[jet]/energy;
         float chm = analysisTree.pfjet_chargedmulti[jet];
+	float nm = analysisTree.pfjet_neutralmulti[jet];
         float npr = analysisTree.pfjet_chargedmulti[jet] + analysisTree.pfjet_neutralmulti[jet];
-	bool isPFJetId = (npr>1 && phf<0.99 && nhf<0.99) && (absJetEta>2.4 || (elf<0.99 && chf>0 && chm>0)); // muon fraction missing
-
-	if(debug)
-	  fileOutput<<" jet "<<jet<<": pt="<<analysisTree.pfjet_pt[jet]<<" eta="<<analysisTree.pfjet_eta[jet]
-		    <<" dr1="<<dR1<<" dr2="<<dR2<<" npr="<<npr<<" phf="<<phf<<" nhf="<<nhf<<std::endl;
-
-	// apply dR cut
-	if (dR1<dRJetLeptonCut) continue;
-	if (dR2<dRJetLeptonCut) continue;
-
-	// apply pf jet Id
-	if (applyJetPfId&&!isPFJetId) continue;
+	//bool isPFJetId = (npr>1 && phf<0.99 && nhf<0.99) && (absJetEta>3.0 || (elf<0.99 && chf>0 && chm>0));
+	bool isPFJetId = false;
+	if (absJetEta<=3.0)
+	  isPFJetId = (nhf < 0.99 && phf < 0.99 && npr > 1) && (absJetEta>2.4 || (chf>0 && chm > 0 && elf < 0.99));
+	else
+	  isPFJetId = phf < 0.9 && nm > 10;
+	//isPFJetId = (npr>1 && phf<0.99 && nhf<0.99 && muf < 0.8) && (absJetEta>3.0 || (elf<0.99 && chf>0 && chm>0));
+	//isPFJetId = (npr>1 && phf<0.99 && nhf<0.99) && (absJetEta>3.0 || (elf<0.99 && chf>0 && chm>0));
 	
-	// pu jet Id
-	if (applyJetPuId&&!puJetIdLoose(analysisTree.pfjet_eta[jet],analysisTree.pfjet_pu_jet_full_mva[jet])) continue;
-	
+	if (!isPFJetId) continue;
+
 	jetspt20.push_back(jet);
 
 	if (absJetEta<bJetEtaCut && analysisTree.pfjet_btag[jet][6]>btagCut) { // b-jet
@@ -1254,23 +1249,22 @@ int main(int argc, char * argv[]) {
 	  }
 	} 
 
-	if (jetPt<jetPtHighCut) continue;
-	
-	jets.push_back(jet);
-
-	if(jetPt>ptLeadingJet){
-	  ptSubLeadingJet = ptLeadingJet;
-	  indexSubLeadingJet = indexLeadingJet;
-
-	  ptLeadingJet = jetPt;
-	  indexLeadingJet = jet;
+	if (indexLeadingJet>=0) {
+	  if (jetPt<ptLeadingJet&&jetPt>ptSubLeadingJet) {
+	    indexSubLeadingJet = jet;
+	    ptSubLeadingJet = jetPt;
+	  }
 	}
-	else if(jetPt>ptSubLeadingJet){
-	  ptSubLeadingJet = jetPt;
-	  indexSubLeadingJet = jet;
-	}	
+
+	if (jetPt>ptLeadingJet) {
+	  indexLeadingJet = jet;
+	  ptLeadingJet = jetPt;
+	}
+
+	if (jetPt<jetPtHighCut) continue;
+	jets.push_back(jet);
       }
-      
+	
       otree->njets = jets.size();
       otree->njetspt20 = jetspt20.size();
       otree->nbtag = bjets.size();
@@ -1284,7 +1278,7 @@ int main(int argc, char * argv[]) {
 	otree->beta = analysisTree.pfjet_eta[indexLeadingBJet];
 	otree->bphi = analysisTree.pfjet_phi[indexLeadingBJet];
       }
-     
+
       otree->jpt_1 = -9999;
       otree->jeta_1 = -9999;
       otree->jphi_1 = -9999;
@@ -1324,10 +1318,10 @@ int main(int argc, char * argv[]) {
 
       otree->mjj =  -9999;
       otree->jdeta =  -9999;
-      otree->njetingap = 0;
+      otree->njetingap = -1;
 
       if (indexLeadingJet>=0 && indexSubLeadingJet>=0) {
-
+	otree->njetingap = 0;
 	TLorentzVector jet1; jet1.SetPxPyPzE(analysisTree.pfjet_px[indexLeadingJet],
 					     analysisTree.pfjet_py[indexLeadingJet],
 					     analysisTree.pfjet_pz[indexLeadingJet],
@@ -1349,14 +1343,13 @@ int main(int argc, char * argv[]) {
 	  etamax = etamin;
 	  etamin = tmp;
 	}
-	for (unsigned int jet=0; jet<jetspt20.size(); ++jet) {
-	  int index = jetspt20.at(jet);
+	for (unsigned int jet=0; jet<jets.size(); ++jet) {
+	  int index = jets.at(jet);
 	  float etaX = analysisTree.pfjet_eta[index];
 	  if (index!=indexLeadingJet&&index!=indexSubLeadingJet&&etaX>etamin&&etaX<etamax) 
 	    otree->njetingap++;
 	}
       }
-      
       otree->Fill();
       selEvents++;
     } // end of file processing (loop over events in one file)
