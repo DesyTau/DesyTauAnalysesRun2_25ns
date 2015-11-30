@@ -55,6 +55,7 @@ public :
   Float_t         phi_1;
   Float_t         eta_1;
   Float_t         m_1;
+  Int_t           gen_match_1; 
   Int_t           q_1;
   Float_t         iso_1;
   Float_t         mva_1;
@@ -65,6 +66,7 @@ public :
   Float_t         phi_2;
   Float_t         eta_2;
   Float_t         m_2;
+  Int_t           gen_match_2; 
   Int_t           q_2;
   Float_t         iso_2;
   Float_t         d0_2;
@@ -76,6 +78,9 @@ public :
   Int_t           extraelec_veto;
   Int_t           extramuon_veto;
   Float_t         byCombinedIsolationDeltaBetaCorrRaw3Hits_1;
+  Float_t         byLooseCombinedIsolationDeltaBetaCorr3Hits_1;
+  Float_t         byMediumCombinedIsolationDeltaBetaCorr3Hits_1;
+  Float_t         byTightCombinedIsolationDeltaBetaCorr3Hits_1;
   Float_t         againstElectronLooseMVA5_1;
   Float_t         againstElectronMediumMVA5_1;
   Float_t         againstElectronTightMVA5_1;
@@ -84,6 +89,9 @@ public :
   Float_t         againstMuonLoose3_1;
   Float_t         againstMuonTight3_1;
   Float_t         byCombinedIsolationDeltaBetaCorrRaw3Hits_2;
+  Float_t         byLooseCombinedIsolationDeltaBetaCorr3Hits_2;
+  Float_t         byMediumCombinedIsolationDeltaBetaCorr3Hits_2;
+  Float_t         byTightCombinedIsolationDeltaBetaCorr3Hits_2;
   Float_t         againstElectronLooseMVA5_2;
   Float_t         againstElectronMediumMVA5_2;
   Float_t         againstElectronTightMVA5_2;
@@ -163,6 +171,7 @@ public :
   TBranch        *b_phi_1;   //!
   TBranch        *b_eta_1;   //!
   TBranch        *b_m_1;   //!
+  TBranch        *b_gen_match_1;   //!
   TBranch        *b_q_1;   //!
   TBranch        *b_iso_1;   //!
   TBranch        *b_mva_1;   //!
@@ -173,6 +182,7 @@ public :
   TBranch        *b_phi_2;   //!
   TBranch        *b_eta_2;   //!
   TBranch        *b_m_2;   //!
+  TBranch        *b_gen_match_2;   //!
   TBranch        *b_q_2;   //!
   TBranch        *b_iso_2;   //!
   TBranch        *b_d0_2;   //!
@@ -184,6 +194,9 @@ public :
   TBranch        *b_extraelec_veto;   //!
   TBranch        *b_extramuon_veto;   //!
   TBranch        *b_byCombinedIsolationDeltaBetaCorrRaw3Hits_1;   //!
+  TBranch        *b_byLooseCombinedIsolationDeltaBetaCorr3Hits_1;   //!
+  TBranch        *b_byMediumCombinedIsolationDeltaBetaCorr3Hits_1;   //!
+  TBranch        *b_byTightCombinedIsolationDeltaBetaCorr3Hits_1;   //!
   TBranch        *b_againstElectronLooseMVA5_1;   //!
   TBranch        *b_againstElectronMediumMVA5_1;   //!
   TBranch        *b_againstElectronTightMVA5_1;   //!
@@ -192,6 +205,9 @@ public :
   TBranch        *b_againstMuonLoose3_1;   //!
   TBranch        *b_againstMuonTight3_1;   //!
   TBranch        *b_byCombinedIsolationDeltaBetaCorrRaw3Hits_2;   //!
+  TBranch        *b_byLooseCombinedIsolationDeltaBetaCorr3Hits_2;   //!
+  TBranch        *b_byMediumCombinedIsolationDeltaBetaCorr3Hits_2;   //!
+  TBranch        *b_byTightCombinedIsolationDeltaBetaCorr3Hits_2;   //!
   TBranch        *b_againstElectronLooseMVA5_2;   //!
   TBranch        *b_againstElectronMediumMVA5_2;   //!
   TBranch        *b_againstElectronTightMVA5_2;   //!
