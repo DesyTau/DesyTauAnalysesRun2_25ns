@@ -1779,7 +1779,7 @@ bool NTupleMaker::AddGenParticles(const edm::Event& iEvent) {
 	  bool fill = false;
 	  UInt_t info = 0;
 	  UInt_t mother = 100;
-	  if(abs((*GenParticles)[i].pdgId()) == 13 && (*GenParticles)[i].pt() > 8. && (*GenParticles)[i].status()==1)
+	  if(abs((*GenParticles)[i].pdgId()) == 13 /*&& (*GenParticles)[i].pt() > 8.*/ && (*GenParticles)[i].status()==1)
 	    {
 	      fill = true;
 	      if(HasAnyMother(&(*GenParticles)[i], 23) > 0 || HasAnyMother(&(*GenParticles)[i], 22) > 0) {info |= 1<<0; mother=ZBOSON;}
@@ -1794,7 +1794,7 @@ bool NTupleMaker::AddGenParticles(const edm::Event& iEvent) {
 	      //			<< "   status = " << (*GenParticles)[i].status() 
 	      //			<< "   mother = " << mother << std::endl;
 	    }
-	  else if(abs((*GenParticles)[i].pdgId()) == 11 && (*GenParticles)[i].pt() > 8. && (*GenParticles)[i].status()==1)
+	  else if(abs((*GenParticles)[i].pdgId()) == 11 /*&& (*GenParticles)[i].pt() > 8.*/ && (*GenParticles)[i].status()==1)
 	    {
 	      fill = true;
 	      if(HasAnyMother(&(*GenParticles)[i], 23) > 0 || HasAnyMother(&(*GenParticles)[i], 22) > 0) {info |= 1<<0; mother=ZBOSON;}
@@ -1809,7 +1809,7 @@ bool NTupleMaker::AddGenParticles(const edm::Event& iEvent) {
 	      //			<< "   status = " << (*GenParticles)[i].status() 
 	      //			<< "   mother = " << mother << std::endl;
 	    }
-	  else if(abs((*GenParticles)[i].pdgId()) == 15 && (*GenParticles)[i].pt() > 10.)
+	  else if(abs((*GenParticles)[i].pdgId()) == 15 /*&& (*GenParticles)[i].pt() > 10.*/)
 	    {
 	      fill = false;
 	      if(HasAnyMother(&(*GenParticles)[i], 23) > 0 || HasAnyMother(&(*GenParticles)[i], 22) > 0) {info |= 1<<0; mother=ZBOSON;}
@@ -1936,14 +1936,33 @@ bool NTupleMaker::AddGenParticles(const edm::Event& iEvent) {
 	  else if(abs((*GenParticles)[i].pdgId()) == 23 || abs((*GenParticles)[i].pdgId()) == 24 )
 	    {
 	      count_partons = true;
-	      if ( (*GenParticles)[i].status()==62 || (*GenParticles)[i].status()==52 ) {
-		fill = true;
-		//		std::cout << "GenBoson : " << (*GenParticles)[i].pdgId() 
-		//			  << "   pt = " << (*GenParticles)[i].pt() 
-		//		 	  << "   eta = " << (*GenParticles)[i].eta()
-		//		 	  << "   phi = " << (*GenParticles)[i].phi() 
-		//		 	  << "   status = " << (*GenParticles)[i].status() << std::endl;
+	      fill = true;
+	      int nDaughters = (*GenParticles)[i].numberOfDaughters();
+	      bool posElectronFound = false;
+	      bool negElectronFound = false;
+	      bool posMuonFound = false;
+	      bool negMuonFound = false;
+	      bool posTauFound = false;
+	      bool negTauFound = false;
+	      for (int iD=0 ; iD<nDaughters; ++iD) {
+		const reco::Candidate * kid = (*GenParticles)[i].daughter(iD);
+		int pdgId = kid->pdgId();
+		if (pdgId==11) negElectronFound = true;
+		if (pdgId==-11) posElectronFound = true;
+		if (pdgId==13) negMuonFound = true;
+		if (pdgId==-13) posMuonFound = true;
+		if (pdgId==15) negTauFound = true;
+		if (pdgId==-15) posTauFound = true;
 	      }
+	      if (posElectronFound&&negElectronFound) info = 11;
+	      else if (posMuonFound&&negMuonFound) info = 13;
+	      else if (posTauFound&&negTauFound) info = 15;
+	      //	      std::cout << "GenBoson : " << (*GenParticles)[i].pdgId() 
+	      //			<< "   pt = " << (*GenParticles)[i].pt() 
+	      //			<< "   eta = " << (*GenParticles)[i].eta()
+	      //			<< "   phi = " << (*GenParticles)[i].phi() 
+	      //			<< "   status = " << (*GenParticles)[i].status() 
+	      //			<< "   info = " << info << std::endl;
 	    }
 	  //Save Higgs bosons
 	  else if(abs((*GenParticles)[i].pdgId()) == 25 || abs((*GenParticles)[i].pdgId()) == 35 ||
