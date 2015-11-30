@@ -25,8 +25,8 @@
 
 #include "DesyTauAnalyses/NTupleMaker/interface/Config.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/AC1B.h"
-#include "DesyTauAnalyses/NTupleMaker/interface/RunLumiReader.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/json.h"
+#include "DesyTauAnalyses/NTupleMaker/interface/PileUp.h"
 
 const float MuMass = 0.105658367;
 
@@ -354,9 +354,6 @@ int main(int argc, char * argv[]) {
   const bool applyJetPfId = cfg.get<bool>("ApplyJetPfId");
   const bool applyJetPuId = cfg.get<bool>("ApplyJetPuId");
 
-  // check overlap
-  const bool checkOverlap = cfg.get<bool>("CheckOverlap");
-  
   TString LowPtLegElectron(lowPtLegElectron);
   TString HighPtLegElectron(highPtLegElectron);
   
@@ -372,6 +369,7 @@ int main(int argc, char * argv[]) {
   std::ifstream fileList(argv[2]);
   std::ifstream fileList0(argv[2]);
   std::string ntupleName("makeroottree/AC1B");
+  std::string initNtupleName("initroottree/AC1B");
 
   TString TStrName(rootFileName);
   std::cout <<TStrName <<std::endl;  
@@ -380,7 +378,13 @@ int main(int argc, char * argv[]) {
   TFile * file = new TFile(TStrName+TString(".root"),"recreate");
   file->cd("");
 
-  TH1F * inputEventsH = new TH1F("inputEventsH","",1,-0.5,0.5);
+  TH1D * inputEventsH = new TH1D("inputEventsH","",1,-0.5,0.5);
+  TH1D * ZMM = new TH1D("ZMM","",1,-0.5,0.5);
+  TH1D * ZEE = new TH1D("ZEE","",1,-0.5,0.5);
+  TH1D * ZTT = new TH1D("ZTT","",1,-0.5,0.5);
+  TH1D * ALL = new TH1D("ALL","",1,-0.5,0.5);
+  TH1D * histWeightsH = new TH1D("histWeightsH","",1,-0.5,0.5);
+
   TTree * tree = new TTree("TauCheck","TauCheck");
    // Declaration of leaf types
   unsigned int minRun = 99999999;
@@ -501,7 +505,7 @@ int main(int argc, char * argv[]) {
   Bool_t isZLL;
   Bool_t isZMM;
   Bool_t isZEE;
-  
+  Bool_t isZTT;
 
   tree->Branch("run", &run, "run/I");
   tree->Branch("lumi", &lumi, "lumi/I");
@@ -513,6 +517,7 @@ int main(int argc, char * argv[]) {
   tree->Branch("isZLL",&isZLL,"isZLL/O");
   tree->Branch("isZEE",&isZEE,"isZEE/O");
   tree->Branch("isZMM",&isZMM,"isZMM/O");
+  tree->Branch("isZTT",&isZTT,"isZTT/O");
 
   tree->Branch("mcweight", &mcweight, "mcweight/F");
   tree->Branch("puweight", &puweight, "puweight/F");
@@ -561,23 +566,23 @@ int main(int argc, char * argv[]) {
   tree->Branch("extraelec_veto", &extraelec_veto, "extraelec_veto/O");
   tree->Branch("extramuon_veto", &extramuon_veto, "extramuon_veto/O");
 
-  tree->Branch("byCombinedIsolationDeltaBetaCorrRaw3Hits_1", &byCombinedIsolationDeltaBetaCorrRaw3Hits_1, "byCombinedIsolationDeltaBetaCorrRaw3Hits_1/F");
-  tree->Branch("againstElectronLooseMVA5_1", &againstElectronLooseMVA5_1, "againstElectronLooseMVA5_1/F");
-  tree->Branch("againstElectronMediumMVA5_1", &againstElectronMediumMVA5_1, "againstElectronMediumMVA5_1/F");
-  tree->Branch("againstElectronTightMVA5_1", &againstElectronTightMVA5_1, "againstElectronTightMVA5_1/F");
-  tree->Branch("againstElectronVLooseMVA5_1", &againstElectronVLooseMVA5_1, "againstElectronVLooseMVA5_1/F");
-  tree->Branch("againstElectronVTightMVA5_1", &againstElectronVTightMVA5_1, "againstElectronVTightMVA5_1/F");
-  tree->Branch("againstMuonLoose3_1", &againstMuonLoose3_1, "againstMuonLoose3_1/F");
-  tree->Branch("againstMuonTight3_1", &againstMuonTight3_1, "againstMuonTight3_1/F");
+  //  tree->Branch("byCombinedIsolationDeltaBetaCorrRaw3Hits_1", &byCombinedIsolationDeltaBetaCorrRaw3Hits_1, "byCombinedIsolationDeltaBetaCorrRaw3Hits_1/F");
+  //  tree->Branch("againstElectronLooseMVA5_1", &againstElectronLooseMVA5_1, "againstElectronLooseMVA5_1/F");
+  //  tree->Branch("againstElectronMediumMVA5_1", &againstElectronMediumMVA5_1, "againstElectronMediumMVA5_1/F");
+  //  tree->Branch("againstElectronTightMVA5_1", &againstElectronTightMVA5_1, "againstElectronTightMVA5_1/F");
+  //  tree->Branch("againstElectronVLooseMVA5_1", &againstElectronVLooseMVA5_1, "againstElectronVLooseMVA5_1/F");
+  //  tree->Branch("againstElectronVTightMVA5_1", &againstElectronVTightMVA5_1, "againstElectronVTightMVA5_1/F");
+  //  tree->Branch("againstMuonLoose3_1", &againstMuonLoose3_1, "againstMuonLoose3_1/F");
+  //  tree->Branch("againstMuonTight3_1", &againstMuonTight3_1, "againstMuonTight3_1/F");
 
-  tree->Branch("byCombinedIsolationDeltaBetaCorrRaw3Hits_2", &byCombinedIsolationDeltaBetaCorrRaw3Hits_2, "byCombinedIsolationDeltaBetaCorrRaw3Hits_2/F");
-  tree->Branch("againstElectronLooseMVA5_2", &againstElectronLooseMVA5_2, "againstElectronLooseMVA5_2/F");
-  tree->Branch("againstElectronMediumMVA5_2", &againstElectronMediumMVA5_2, "againstElectronMediumMVA5_2/F");
-  tree->Branch("againstElectronTightMVA5_2", &againstElectronTightMVA5_2, "againstElectronTightMVA5_2/F");
-  tree->Branch("againstElectronVLooseMVA5_2", &againstElectronVLooseMVA5_2, "againstElectronVLooseMVA5_2/F");
-  tree->Branch("againstElectronVTightMVA5_2", &againstElectronVTightMVA5_2, "againstElectronVTightMVA5_2/F");
-  tree->Branch("againstMuonLoose3_2", &againstMuonLoose3_2, "againstMuonLoose3_2/F");
-  tree->Branch("againstMuonTight3_2", &againstMuonTight3_2, "againstMuonTight3_2/F");
+  //  tree->Branch("byCombinedIsolationDeltaBetaCorrRaw3Hits_2", &byCombinedIsolationDeltaBetaCorrRaw3Hits_2, "byCombinedIsolationDeltaBetaCorrRaw3Hits_2/F");
+  //  tree->Branch("againstElectronLooseMVA5_2", &againstElectronLooseMVA5_2, "againstElectronLooseMVA5_2/F");
+  //  tree->Branch("againstElectronMediumMVA5_2", &againstElectronMediumMVA5_2, "againstElectronMediumMVA5_2/F");
+  //  tree->Branch("againstElectronTightMVA5_2", &againstElectronTightMVA5_2, "againstElectronTightMVA5_2/F");
+  //  tree->Branch("againstElectronVLooseMVA5_2", &againstElectronVLooseMVA5_2, "againstElectronVLooseMVA5_2/F");
+  //  tree->Branch("againstElectronVTightMVA5_2", &againstElectronVTightMVA5_2, "againstElectronVTightMVA5_2/F");
+  //  tree->Branch("againstMuonLoose3_2", &againstMuonLoose3_2, "againstMuonLoose3_2/F");
+  //  tree->Branch("againstMuonTight3_2", &againstMuonTight3_2, "againstMuonTight3_2/F");
 
   tree->Branch("met", &met, "met/F");
   tree->Branch("metphi", &metphi, "metphi/F");
@@ -652,6 +657,15 @@ int main(int argc, char * argv[]) {
     }
    }
 
+  PileUp * PUofficial = new PileUp();
+
+  TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/Data_Pileup_2015D_Nov17.root","read");
+  TFile * filePUdistribution_MC = new TFile (TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/MC_Spring15_PU25_Startup.root", "read");
+  TH1D * PU_data = (TH1D *)filePUdistribution_data->Get("pileup");
+  TH1D * PU_mc = (TH1D *)filePUdistribution_MC->Get("pileup");
+  PUofficial->set_h_data(PU_data);
+  PUofficial->set_h_MC(PU_mc);
+
   int nEvents = 0;
   int selEvents = 0;
   int nFiles = 0;
@@ -661,20 +675,6 @@ int main(int argc, char * argv[]) {
   vector<unsigned int> runList; runList.clear();
   vector<unsigned int> eventList; eventList.clear();
   
-  std::vector<unsigned int> allRuns; allRuns.clear();
-  std::vector<unsigned int> allGoodRuns; allGoodRuns.clear();
-  if (checkOverlap) {
-    std::ifstream fileEvents("overlap.txt");
-    int Run, Event, Lumi;
-    std::cout << "Non-overlapping events ->" << std::endl;
-    while (fileEvents >> Run >> Event >> Lumi) {
-      runList.push_back(Run);
-      eventList.push_back(Event);
-      std::cout << Run << ":" << Event << std::endl;
-    }
-    std::cout << std::endl;
-  }
-  std::ofstream fileOutput("overlap.out");
 
   for (int iF=0; iF<nTotalFiles; ++iF) {
 
@@ -684,21 +684,31 @@ int main(int argc, char * argv[]) {
     std::cout << "file " << iF+1 << " out of " << nTotalFiles << " filename : " << filen << std::endl;
     TFile * file_ = TFile::Open(TString(filen));
     
+    TTree * _inittree = NULL;
+    _inittree = (TTree*)file_->Get(TString(initNtupleName));
+    if (_inittree==NULL) continue;
+    Float_t genweight;
+    if (!isData)
+      _inittree->SetBranchAddress("genweight",&genweight);
+    Long64_t numberOfEntriesInitTree = _inittree->GetEntries();
+    std::cout << "      number of entries in Init Tree = " << numberOfEntriesInitTree << std::endl;
+    for (Long64_t iEntry=0; iEntry<numberOfEntriesInitTree; iEntry++) {
+      _inittree->GetEntry(iEntry);
+      if (isData)
+	histWeightsH->Fill(0.,1.);
+      else
+	histWeightsH->Fill(0.,genweight);
+    }
+
     TTree * _tree = NULL;
     _tree = (TTree*)file_->Get(TString(ntupleName));
-  
     if (_tree==NULL) continue;
     
     TH1D * histoInputEvents = NULL;
-   
     histoInputEvents = (TH1D*)file_->Get("makeroottree/nEvents");
-    
     if (histoInputEvents==NULL) continue;
-    
     int NE = int(histoInputEvents->GetEntries());
-    
     std::cout << "      number of input events    = " << NE << std::endl;
-    
     for (int iE=0;iE<NE;++iE)
       inputEventsH->Fill(0.);
 
@@ -720,59 +730,62 @@ int main(int argc, char * argv[]) {
      
       if (nEvents%10000==0) 
 	cout << "      processed " << nEvents << " events" << endl; 
-      bool isNewRun = true;
-      if (allRuns.size()>0) {
-        for (unsigned int iR=0; iR<allRuns.size(); ++iR) {
-          if (analysisTree.event_run==allRuns.at(iR)) {
-            isNewRun = false;
-            break;
-          }
-        }
-      }
 
       isZLL = false;
       isZEE = false;
       isZMM = false;
+      isZTT = false;
 
+      bool isPrompMuPlus = false;
+      bool isPrompMuMinus = false;
+      bool isPrompElePlus = false;
+      bool isPrompEleMinus = false;
+      
       if (!isData) {
-	bool isMuPlusFromZ = false;
-	bool isMuMinusFromZ = false;
-	bool isEPlusFromZ = false;
-	bool isEMinusFromZ = false;
-	
-	for (unsigned int igen=0; igen < analysisTree.genparticles_count; ++igen) {
-	  if (analysisTree.genparticles_info[igen]==1) {
-	    if (analysisTree.genparticles_status[igen]==1 && analysisTree.genparticles_pdgid[igen]==11)
-	      isEMinusFromZ = true;
-	    if (analysisTree.genparticles_status[igen]==1 && analysisTree.genparticles_pdgid[igen]==-11)
-	      isEPlusFromZ = true;
-	    if (analysisTree.genparticles_status[igen]==1 && analysisTree.genparticles_pdgid[igen]==13)
-	      isMuMinusFromZ = true;
-	    if (analysisTree.genparticles_status[igen]==1 && analysisTree.genparticles_pdgid[igen]==-13)
-	      isMuPlusFromZ = true;
-	  }
+	for (unsigned int igen=0; igen < analysisTree.gentau_count; ++igen) {
+	  if (analysisTree.gentau_isPrompt[igen]) isZTT = true; 
 	}
-	isZEE = isEMinusFromZ  && isEPlusFromZ;
-	isZMM = isMuMinusFromZ && isMuPlusFromZ;
-	isZLL = isZEE || isZMM;
+	for (unsigned int igen=0; igen < analysisTree.genparticles_count; ++igen) {
+	  if (analysisTree.genparticles_isPrompt[igen]&&fabs(analysisTree.genparticles_pdgid[igen])==11) isZEE = true;
+	  if (analysisTree.genparticles_isPrompt[igen]&&fabs(analysisTree.genparticles_pdgid[igen])==13) isZMM = true;
+	  if (analysisTree.genparticles_isPrompt[igen]&&analysisTree.genparticles_pdgid[igen]==11) isPrompEleMinus = true;
+	  if (analysisTree.genparticles_isPrompt[igen]&&analysisTree.genparticles_pdgid[igen]==13) isPrompMuMinus = true;
+	  if (analysisTree.genparticles_isPrompt[igen]&&analysisTree.genparticles_pdgid[igen]==-11) isPrompElePlus = true;
+	  if (analysisTree.genparticles_isPrompt[igen]&&analysisTree.genparticles_pdgid[igen]==-13) isPrompMuPlus = true;
+	  //	if (analysisTree.genparticles_fromHardProcessBeforeFSR[igen]&&fabs(analysisTree.genparticles_pdgid[igen])==11) isZEE = true;
+	  //	if (analysisTree.genparticles_fromHardProcessBeforeFSR[igen]&&fabs(analysisTree.genparticles_pdgid[igen])==13) isZMM = true;
+	  //	if (analysisTree.genparticles_fromHardProcessBeforeFSR[igen]&&analysisTree.genparticles_pdgid[igen]==11) isPrompEleMinus = true;
+	  //	if (analysisTree.genparticles_fromHardProcessBeforeFSR[igen]&&analysisTree.genparticles_pdgid[igen]==13) isPrompMuMinus = true;
+	  //	if (analysisTree.genparticles_fromHardProcessBeforeFSR[igen]&&analysisTree.genparticles_pdgid[igen]==-11) isPrompElePlus = true;
+	  //	if (analysisTree.genparticles_fromHardProcessBeforeFSR[igen]&&analysisTree.genparticles_pdgid[igen]==-13) isPrompMuPlus = true;
+	}
+	
+	ALL->Fill(0.0);
+	if (isZMM) ZMM->Fill(0.);
+	if (isZEE) ZEE->Fill(0.);
+	if (isZTT) ZTT->Fill(0.);
       }
 
-      if (isNewRun)
-        allRuns.push_back(analysisTree.event_run);
+      //      if (isZEE&&isZMM) {
+      //	cout << "Warning : isZEE && isZMM simultaneously" << endl;
+      //	cout << "Mu+:" << isPrompMuPlus
+      //	     << "  Mu-:"  << isPrompMuMinus
+      //	     << "  E+:" << isPrompElePlus
+      //	     << "  E-:" << isPrompEleMinus << endl;
+      //      }
+
+      //      if ((isPrompElePlus&&!isPrompEleMinus)||(!isPrompElePlus&&isPrompEleMinus))
+      //	cout << "Warning : only one prompt electron!" << endl;
+
+      //      if ((isPrompMuPlus&&!isPrompMuMinus)||(!isPrompMuPlus&&isPrompMuMinus))
+      //	cout << "Warning : only one prompt muon!" << endl;
+
+      isZLL = isZEE || isZMM;
 
       run = int(analysisTree.event_run);
       lumi = int(analysisTree.event_luminosityblock);
       evt = int(analysisTree.event_nr);
 
-      bool nonOverlap = false;
-      if (checkOverlap) {
-	for (unsigned int iRuns=0; iRuns<runList.size(); ++iRuns) {
-	  if (runList.at(iRuns)==analysisTree.event_run && eventList.at(iRuns)==analysisTree.event_nr) {
-	    nonOverlap = true;
-	    fileOutput << "Run=" << run << "   Event=" << evt << std::endl;
-	  }
-	}
-      }
       if (isData && applyGoodRunSelection) {
         bool lumi = false;
         int n=analysisTree.event_run;
@@ -794,40 +807,31 @@ int main(int argc, char * argv[]) {
           }
         if (!lumi) continue;
 
-
-
       }
-      isNewRun = true;
-      if (allGoodRuns.size()>0) {
-        for (unsigned int iR=0; iR<allGoodRuns.size(); ++iR) {
-          if (analysisTree.event_run==allGoodRuns.at(iR)) {
-            isNewRun = false;
-            break;
-          }
-        }
-      }
-
-      if (isNewRun)
-        allGoodRuns.push_back(analysisTree.event_run);
 
       // weights
       mcweight = analysisTree.genweight;
-      puweight = 0;
-      trigweight_1 = 0;
-      trigweight_2 = 0;
-      idweight_1 = 0;
-      idweight_2 = 0;
-      isoweight_1 = 0;
-      isoweight_2 = 0;
-      effweight = 0;
-      fakeweight = 0;
-      embeddedWeight = 0;
-      signalWeight = 0;
+      puweight = 1;
+      trigweight_1 = 1;
+      trigweight_2 = 1;
+      idweight_1 = 1;
+      idweight_2 = 1;
+      isoweight_1 = 1;
+      isoweight_2 = 1;
+      effweight = 1;
+      fakeweight = 1;
+      embeddedWeight = 1;
+      signalWeight = 1;
       weight = 1;
-      
+
+      //      cout << "Ok" << endl;
       npv = analysisTree.primvertex_count;
-      npu = floor(analysisTree.numtruepileupinteractions+0.5);
+      npu = analysisTree.numtruepileupinteractions;
       rho = analysisTree.rho;
+      
+      if (!isData)
+	puweight = float(PUofficial->get_PUweight(double(analysisTree.numtruepileupinteractions)));
+      //      cout << "Ok1 : " << puweight << endl;
 
       unsigned int nLowPtLegElectron = 0;
       bool isLowPtLegElectron = false;
@@ -906,22 +910,13 @@ int main(int argc, char * argv[]) {
       //      bool trigAccept = (analysisTree.hltriggerresults_second[5]==1)||(analysisTree.hltriggerresults_second[6]==1);
       //      if (!trigAccept) continue;
 
-      if (nonOverlap&&checkOverlap)
-	fileOutput << "Muons = " << analysisTree.muon_count 
-		   << "   Electrons = " << analysisTree.electron_count << std::endl;
+      //      if (nonOverlap&&checkOverlap)
+      //      cout << "Muons = " << analysisTree.muon_count 
+      //	   << "   Electrons = " << analysisTree.electron_count << std::endl;
       
       // electron selection
       vector<int> electrons; electrons.clear();
       for (unsigned int ie = 0; ie<analysisTree.electron_count; ++ie) {
-	if (nonOverlap&&checkOverlap)
-	  fileOutput << " ele" << ie 
-		     << "  pt=" << analysisTree.electron_pt[ie]
-		     << " eta=" << analysisTree.electron_eta[ie]
-		     << " dxy=" << analysisTree.electron_dxy[ie]
-		     << "  dz=" << analysisTree.electron_dz[ie]
-		     << "  Id=" << analysisTree.electron_mva_wp80_nontrig_Spring15_v1[ie] 
-		     << "  conv=" << analysisTree.electron_pass_conversion[ie]
-		     << "  mis=" << int(analysisTree.electron_nmissinginnerhits[ie]) << std::endl;
 	if (analysisTree.electron_pt[ie]<ptElectronLowCut) continue;
 	if (fabs(analysisTree.electron_eta[ie])>etaElectronCut) continue;
 	if (fabs(analysisTree.electron_dxy[ie])>dxyElectronCut) continue;
@@ -939,13 +934,6 @@ int main(int argc, char * argv[]) {
       // muon selection
       vector<int> muons; muons.clear();
       for (unsigned int im = 0; im<analysisTree.muon_count; ++im) {
-	if (nonOverlap&&checkOverlap)
-	  fileOutput << "  muon" << im
-                     << "   pt=" << analysisTree.muon_pt[im]
-                     << "  eta=" << analysisTree.muon_eta[im]
-                     << "  dxy=" << analysisTree.muon_dxy[im]
-                     << "   dz=" << analysisTree.muon_dz[im]
-                     << "   Id=" << analysisTree.muon_isMedium[im] << std::endl;
 	if (analysisTree.muon_pt[im]<ptMuonLowCut) continue;
 	if (fabs(analysisTree.muon_eta[im])>etaMuonCut) continue;
 	if (fabs(analysisTree.muon_dxy[im])>dxyMuonCut) continue;
@@ -954,9 +942,8 @@ int main(int argc, char * argv[]) {
 	muons.push_back(im);
       }
 
-      if (nonOverlap&&checkOverlap)
-	fileOutput << "  SelEle=" << electrons.size() 
-		   << "  SelMu=" << muons.size() << std::endl;
+      //      cout << "  SelEle=" << electrons.size() 
+      //      	   << "  SelMu=" << muons.size() << std::endl;
 
       if (electrons.size()==0) continue;
       if (muons.size()==0) continue;
@@ -1094,12 +1081,11 @@ int main(int argc, char * argv[]) {
 	}
       }
 
-      if (nonOverlap&&checkOverlap)
-	fileOutput << "mIndex = " << muonIndex << "   eIndex = " << electronIndex << std::endl;
+      //      cout << "mIndex = " << muonIndex << "   eIndex = " << electronIndex << std::endl;
 
       if (electronIndex<0) continue;
       if (muonIndex<0) continue;
-      //      std::cout << "OK " << std::endl;
+      //      std::cout << "Post synch selection " << std::endl;
       //      std::cout << std::endl;
 
       
@@ -1177,6 +1163,9 @@ int main(int argc, char * argv[]) {
 	if (isoEleMin>isoElectronHighCut) continue;
       }
 
+      //      cout << "dilepton_veto : " << dilepton_veto
+      //	   << "   extraelec_veto : " << extraelec_veto
+      //	   << "   extramuon_veto : " << extramuon_veto << endl;
 
       // filling muon variables
       pt_2 = analysisTree.muon_pt[muonIndex];
@@ -1224,6 +1213,8 @@ int main(int argc, char * argv[]) {
       metcov10 = analysisTree.pfmet_sigyx;
       metcov11 = analysisTree.pfmet_sigyy;
 
+      //      cout << "m_vis = " << endl;
+
       // visible ditau pt 
       pt_tt = dileptonLV.Pt();
 
@@ -1243,21 +1234,21 @@ int main(int argc, char * argv[]) {
       zetaY = zetaY/normZeta;
 
       // choosing mva met
-      unsigned int metEMu = 0;
-      for (unsigned int iMet=0; iMet<analysisTree.mvamet_count; ++iMet) {
-	if (analysisTree.mvamet_channel[iMet]==1) metEMu = iMet;
-      }
-      float mvamet_x = analysisTree.mvamet_ex[metEMu];
-      float mvamet_y = analysisTree.mvamet_ey[metEMu];
-      float mvamet_x2 = mvamet_x * mvamet_x;
-      float mvamet_y2 = mvamet_y * mvamet_y;
+      //      unsigned int metEMu = 0;
+      //      for (unsigned int iMet=0; iMet<analysisTree.mvamet_count; ++iMet) {
+      //	if (analysisTree.mvamet_channel[iMet]==1) metEMu = iMet;
+      //      }
+      //      float mvamet_x = analysisTree.mvamet_ex[metEMu];
+      //      float mvamet_y = analysisTree.mvamet_ey[metEMu];
+      //      float mvamet_x2 = mvamet_x * mvamet_x;
+      //      float mvamet_y2 = mvamet_y * mvamet_y;
 
-      mvamet = TMath::Sqrt(mvamet_x2+mvamet_y2);
-      mvametphi = TMath::ATan2(mvamet_y,mvamet_x);
-      mvacov00 = analysisTree.mvamet_sigxx[metEMu];
-      mvacov01 = analysisTree.mvamet_sigxy[metEMu];
-      mvacov10 = analysisTree.mvamet_sigyx[metEMu];
-      mvacov11 = analysisTree.mvamet_sigyy[metEMu];
+      //      mvamet = TMath::Sqrt(mvamet_x2+mvamet_y2);
+      //     mvametphi = TMath::ATan2(mvamet_y,mvamet_x);
+      //      mvacov00 = analysisTree.mvamet_sigxx[metEMu];
+      //      mvacov01 = analysisTree.mvamet_sigxy[metEMu];
+      //      mvacov10 = analysisTree.mvamet_sigyx[metEMu];
+      //      mvacov11 = analysisTree.mvamet_sigyy[metEMu];
 
       float vectorX = analysisTree.pfmet_ex + muonLV.Px() + electronLV.Px();
       float vectorY = analysisTree.pfmet_ey + muonLV.Py() + electronLV.Py();
@@ -1441,18 +1432,6 @@ int main(int argc, char * argv[]) {
   std::cout << "Total number of input events    = " << allEvents << std::endl;
   std::cout << "Total number of events in Tree  = " << nEvents << std::endl;
   std::cout << "Total number of selected events = " << selEvents << std::endl;
-  std::cout << std::endl;
-  std::cout << "Run range " << minRun << ":" << maxRun << std::endl;
-  std::cout << std::endl;
-  std::sort (allRuns.begin(), allRuns.end(), myobject);
-  std::sort (allGoodRuns.begin(), allGoodRuns.end(), myobjectX);
-  std::cout << "Runs      : ";
-  for (unsigned int iR=0; iR<allRuns.size(); ++iR)
-    std::cout << " " << allRuns.at(iR);
-  std::cout << std::endl;
-  std::cout << "Good Runs : ";
-  for (unsigned int iR=0; iR<allGoodRuns.size(); ++iR)
-    std::cout << " " << allGoodRuns.at(iR); 
   std::cout << std::endl;
   file->cd("");
   file->Write();
