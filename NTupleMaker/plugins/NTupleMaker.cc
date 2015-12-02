@@ -712,6 +712,8 @@ void NTupleMaker::beginJob(){
     tree->Branch("mvamet_channel", mvamet_channel, "mvamet_channel[mvamet_count]/b");
     tree->Branch("mvamet_lep1", mvamet_lep1, "mvamet_lep1[mvamet_count]/i");
     tree->Branch("mvamet_lep2", mvamet_lep2, "mvamet_lep2[mvamet_count]/i");
+    tree->Branch("mvamet_lep1_pt", mvamet_lep1_pt, "mvamet_lep1_pt[mvamet_count]/F");
+    tree->Branch("mvamet_lep2_pt", mvamet_lep2_pt, "mvamet_lep2_pt[mvamet_count]/F");    
   }
 
   // generator info
@@ -1520,16 +1522,18 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       for(std::vector<edm::InputTag>::iterator mit = MvaMetCollectionsTag_.begin();
 	
          mit != MvaMetCollectionsTag_.end(); mit++){
-	
+
 	//collect MVA Mets
 	edm::Handle<pat::METCollection> imets;
+	//edm::Handle<reco::PFMETCollection> imets;
 	iEvent.getByLabel(*mit, imets);
         //iEvent.getByToken(*mit, imets);
 
-	if(!imets.isValid()) continue;	
+	if(!imets.isValid()) continue;
 	if(imets->size() == 0)continue;
 	
 	for(std::vector<pat::MET>::const_iterator met = imets->begin(); met != imets->end(); met++){
+	  //for(std::vector<reco::PFMET>::const_iterator met = imets->begin(); met != imets->end(); met++){
 	  mvamet_ex[mvamet_count] = met->px();
 	  mvamet_ey[mvamet_count] = met->py();
 
@@ -1537,6 +1541,9 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	  mvamet_sigxy[mvamet_count] = met->getSignificanceMatrix()(0,1);
 	  mvamet_sigyx[mvamet_count] = met->getSignificanceMatrix()(1,0);
 	  mvamet_sigyy[mvamet_count] = met->getSignificanceMatrix()(1,1);
+
+	  mvamet_lep1_pt[mvamet_count] = met->userCand("lepton1")->pt();
+	  mvamet_lep2_pt[mvamet_count] = met->userCand("lepton2")->pt();
 	  
 	  if(mit->label().find("MuEle") != std::string::npos){
 	    mvamet_channel[mvamet_count] = EMU;
