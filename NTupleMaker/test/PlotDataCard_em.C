@@ -21,18 +21,15 @@ void PlotDataCard_em(TString filename = "htt_em.inputs-sm-13TeV-mvis_noPU.root",
 	"VV",
 	"QCD"
 	};
-std::cout <<"here" << std::endl;
 	TH1D * histDataOld = (TH1D*)file->Get("em_inclusive/data_obs");
 	int nBins = histDataOld->GetNbinsX();
 	float xMin = histDataOld->GetBinLowEdge(1);
 	float xMax = histDataOld->GetBinLowEdge(nBins+1);
-std::cout <<"here2"<< std::endl;	
 	float bins[100];
 	int nBinsNew = numberofbins;
         float binWidth = (xMax-xMin)/float(nBinsNew);
 	for (int iB=0; iB<=nBinsNew; ++iB)
 		bins[iB] = xMin + float(iB)*binWidth;
-std::cout <<bins[2] << std::endl; 
 	TH1D * histData = new TH1D("histData","",nBinsNew,bins);
 
 	TH1D * qcdHist = new TH1D("qcdHist","",nBinsNew,bins);
@@ -48,9 +45,9 @@ std::cout <<bins[2] << std::endl;
 
 	for (int iS=0; iS<nSamples; ++iS) 
 	{
-		std::cout << "Sample = " << iS << std::endl;
+		//std::cout << "Sample = " << iS << std::endl;
 		TH1D * histOld = (TH1D*)file->Get("em_inclusive/"+histName[iS]);
-		TH1D * hist = TH1toTH1(histOld,nBinsNew,bins,true,"_new_"+histName[iS]);
+		TH1D * hist = TH1DtoTH1D(histOld,nBinsNew,bins,true,"_new_"+histName[iS]);
     		if(iS==0) histData = hist;
 		if(iS==1) qcdHist = hist;
 		if(iS==2) vvHist = hist;
