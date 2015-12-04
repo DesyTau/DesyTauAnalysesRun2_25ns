@@ -473,13 +473,6 @@ int main(int argc, char * argv[]) {
 
   TH1F * NumberOfVerticesH = new TH1F("NumberOfVerticesH","",51,-0.5,50.5);
 
-  //
-  TH1F * genMuonPt10to15mediumH = new TH1F("genMuonPt10to15mediumH","",2,-0.5,1.5);
-  TH1F * genMuonPt10to15isoH = new TH1F("genMuonPt10to15isoH","",200,0,2);
-  TH1F * genMuonPt10to15dxyH = new TH1F("genMuonPt10to15dxy","",200,-1,1); 
-  TH1F * genMuonPt10to15dzH = new TH1F("genMuonPt10to15dz","",200,-1,1);
-  //
-  
   int nPtBins = 8;
   float ptBins[9] = {10,13,16,20,25,30,40,60,1000};
 
@@ -542,22 +535,6 @@ int main(int argc, char * argv[]) {
 
   //*****  create eta histogram with eta ranges associated to their names (eg. endcap, barrel)   ***** //
   TH1F * etaBinsH = new TH1F("etaBinsH", "etaBinsH", nEtaBins, etaBins);
-  //  etaBinsH->SetStats(0);
-  //  etaBinsH->Draw();
-  //  etaBinsH->GetXaxis()->Set(nEtaBins, etaBins);
-  //  for (int i=0; i<nEtaBins; i++){ etaBinsH->GetXaxis()->SetBinLabel(i+1, EtaBins[i]);}
-  //  TPaveText *pavetext = new TPaveText(0.6,0.85,0.98,0.98, "brNDC");
-  // for (int i=0; i<nEtaBins; i++){    
-  //	pavetext->AddText(etaBinsH->GetXaxis()->GetBinLabel(i+1));
-  //	pavetext->AddText(Form("from %f to %f",etaBinsH->GetXaxis()->GetBinLowEdge(i+1), etaBinsH->GetXaxis()->GetBinLowEdge(i+1)+etaBinsH->GetXaxis()->GetBinWidth(i+1)));
-  //	}
-  //  TCanvas *cEta = new TCanvas("c1","demo bin labels",10,10,900,500);
-  //  cEta->cd();
-  //  etaBinsH->Draw();
-  //  pavetext->Draw();
-  //  file->cd();
-  //  etaBinsH->Write("etaBinsH");
-  //  cEta->Write("etaBinsCan");
 
   TH1F * ZMassJetEtaPtPass[3][3][8];
   TH1F * ZMassJetEtaPtFail[3][3][8];
@@ -591,6 +568,9 @@ int main(int argc, char * argv[]) {
 
   TH1F * ZMassIsoMuEtaPtPass[3][16];
   TH1F * ZMassIsoMuEtaPtFail[3][16];
+
+  TH1F * ZMassPass = new TH1F("ZMassPass","",80,50,130);
+  TH1F * ZMassFail = new TH1F("ZMassFail","",80,50,130);
 
   for (int iEta=0; iEta<nEtaBins; ++iEta) {
     PromptPtPass[iEta] = new TH1F("PromptPt"+EtaBins[iEta]+"Pass","",nPtBins,ptBins);
@@ -1118,7 +1098,6 @@ int main(int argc, char * argv[]) {
 	}
       }	
 
-      //      cout << "Ok" << endl;
       vector<bool> isMuonPrompt; isMuonPrompt.clear();
       for (unsigned int iRecoMuons=0; iRecoMuons<allMuons.size(); iRecoMuons++) {
 	unsigned int irec = allMuons[iRecoMuons];
@@ -1140,16 +1119,8 @@ int main(int argc, char * argv[]) {
 	  if (relativeDifference<0.05) {
 	    isPrompt = true;
 	    float absEtaProbe = TMath::Abs(genMuon.Eta());
+	    if (absEtaProbe>=etaMuonLowCut) absEtaProbe = etaMuonLowCut - 0.01;
 	    int iEta = binNumber(absEtaProbe,nEtaBins,etaBins);
-	    if (recMuon.Pt()>10&&recMuon.Pt()<15&&fabs(recMuon.Eta())<2.4) {
-	      float ismedium = 0.0;
-	      if (analysisTree.muon_isMedium[irec]) 
-		float ismedium = 1.0;
-	      genMuonPt10to15mediumH->Fill(ismedium);
-	      genMuonPt10to15isoH->Fill(allMuonsIso[iRecoMuons]);
-	      genMuonPt10to15dxyH->Fill(analysisTree.muon_dxy[irec]);
-	      genMuonPt10to15dzH->Fill(analysisTree.muon_dz[irec]);
-	    }
 	    if (isMuonPassedIdIso[iRecoMuons]) 
 	      PromptPtPass[iEta]->Fill(genMuon.Pt(),weight);
 	    else
@@ -1158,7 +1129,6 @@ int main(int argc, char * argv[]) {
 	}
 	isMuonPrompt.push_back(isPrompt);
       }
-      //      cout << "Ok2" << endl;
 
       vector<bool> isMuonNonPrompt; isMuonNonPrompt.clear();
       for (unsigned int iRecoMuons=0; iRecoMuons<allMuons.size(); iRecoMuons++) {
@@ -1181,6 +1151,7 @@ int main(int argc, char * argv[]) {
 	  if (relativeDifference<0.05) {
 	    isNonPrompt = true;
 	    float absEtaProbe = TMath::Abs(genMuon.Eta());
+	    if (absEtaProbe>=etaMuonLowCut) absEtaProbe = etaMuonLowCut - 0.01;
             int iEta = binNumber(absEtaProbe,nEtaBins,etaBins);
  	    if (isMuonPassedIdIso[iRecoMuons]) 
 	      NonPromptPtPass[iEta]->Fill(genMuon.Pt(),weight);
@@ -1190,6 +1161,7 @@ int main(int argc, char * argv[]) {
 	}
 	isMuonNonPrompt.push_back(isNonPrompt);
       }
+
 
       unsigned int indx1 = 0;
       unsigned int indx2 = 0;
@@ -1281,6 +1253,7 @@ int main(int argc, char * argv[]) {
  
 	      float mass = (muon1+muon2).M();
 	      if (isMuonPassedIdIso[iMu]) { 
+		ZMassPass->Fill(mass,weight);
 		ZMassEtaPtPass[etaBin][ptBin]->Fill(mass,weight);
 		ZMassJetEtaPtPass[etaBin][JetBin][ptBin]->Fill(mass,weight);
 		if (isMuonPrompt[iMu]) {
@@ -1372,6 +1345,7 @@ int main(int argc, char * argv[]) {
 		}
 	      }
 	      else {
+		ZMassFail->Fill(mass,weight);
 		ZMassEtaPtFail[etaBin][ptBin]->Fill(mass,weight);
 		ZMassJetEtaPtFail[etaBin][JetBin][ptBin]->Fill(mass,weight);
 		if (isMuonPrompt[iMu]) {
