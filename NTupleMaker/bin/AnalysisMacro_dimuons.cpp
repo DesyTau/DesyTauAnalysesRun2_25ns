@@ -34,7 +34,7 @@ const float pionMass = 0.1396;
 
 int binNumber(float x, int nbins, float * bins) {
 
-  int binN = 0;
+  int binN = -1;
 
   for (int iB=0; iB<nbins; ++iB) {
     if (x>=bins[iB]&&x<bins[iB+1]) {
@@ -309,6 +309,8 @@ int main(int argc, char * argv[]) {
   const float etaMuonLowCut = cfg.get<float>("etaMuonLowCut");
   const float dxyMuonCut     = cfg.get<float>("dxyMuonCut");
   const float dzMuonCut      = cfg.get<float>("dzMuonCut");
+  const float dxyMuonLooseCut     = cfg.get<float>("dxyMuonLooseCut");
+  const float dzMuonLooseCut      = cfg.get<float>("dzMuonLooseCut");
   const float isoMuonCut     = cfg.get<float>("isoMuonCut");
   const bool  applyTauTauSelection = cfg.get<bool>("ApplyTauTauSelection");
   const bool  selectZToTauTauMuMu = cfg.get<bool>("SelectZToTauTauMuMu");
@@ -478,8 +480,8 @@ int main(int argc, char * argv[]) {
   TH1F * genMuonPt10to15dzH = new TH1F("genMuonPt10to15dz","",200,-1,1);
   //
   
-  int nPtBins = 7;
-  float ptBins[8] = {10,15,20,25,30,40,60,1000};
+  int nPtBins = 8;
+  float ptBins[9] = {10,13,16,20,25,30,40,60,1000};
 
   int nPtBinsTrig = 16;
   float ptBinsTrig[17] = {10,
@@ -503,8 +505,9 @@ int main(int argc, char * argv[]) {
   int nEtaBins = 3;
   float etaBins[4] = {0,0.9,1.2,2.4}; 
   
-  TString PtBins[7] = {"Pt10to15",
-		       "Pt15to20",
+  TString PtBins[8] = {"Pt10to13",
+		       "Pt13to16",
+		       "Pt16to20",
 		       "Pt20to25",
 		       "Pt25to30",
 		       "Pt30to40",
@@ -532,32 +535,32 @@ int main(int argc, char * argv[]) {
 			"Eta0p9to1p2",
 			"EtaGt1p2"};
 
-  TH1F * ZMassEtaPtPass[3][7];
-  TH1F * ZMassEtaPtFail[3][7];
+  TH1F * ZMassEtaPtPass[3][8];
+  TH1F * ZMassEtaPtFail[3][8];
 
   TString JetBins[3] = {"Jet0","Jet1","JetGe2"};
 
   //*****  create eta histogram with eta ranges associated to their names (eg. endcap, barrel)   ***** //
   TH1F * etaBinsH = new TH1F("etaBinsH", "etaBinsH", nEtaBins, etaBins);
-  etaBinsH->SetStats(0);
-  etaBinsH->Draw();
-  etaBinsH->GetXaxis()->Set(nEtaBins, etaBins);
-  for (int i=0; i<nEtaBins; i++){ etaBinsH->GetXaxis()->SetBinLabel(i+1, EtaBins[i]);}
-  TPaveText *pavetext = new TPaveText(0.6,0.85,0.98,0.98, "brNDC");
-  for (int i=0; i<nEtaBins; i++){    
-	pavetext->AddText(etaBinsH->GetXaxis()->GetBinLabel(i+1));
-	pavetext->AddText(Form("from %f to %f",etaBinsH->GetXaxis()->GetBinLowEdge(i+1), etaBinsH->GetXaxis()->GetBinLowEdge(i+1)+etaBinsH->GetXaxis()->GetBinWidth(i+1)));
-	}
-  TCanvas *cEta = new TCanvas("c1","demo bin labels",10,10,900,500);
-  cEta->cd();
-  etaBinsH->Draw();
-  pavetext->Draw();
-  file->cd();
-  etaBinsH->Write("etaBinsH");
-  cEta->Write("etaBinsCan");
+  //  etaBinsH->SetStats(0);
+  //  etaBinsH->Draw();
+  //  etaBinsH->GetXaxis()->Set(nEtaBins, etaBins);
+  //  for (int i=0; i<nEtaBins; i++){ etaBinsH->GetXaxis()->SetBinLabel(i+1, EtaBins[i]);}
+  //  TPaveText *pavetext = new TPaveText(0.6,0.85,0.98,0.98, "brNDC");
+  // for (int i=0; i<nEtaBins; i++){    
+  //	pavetext->AddText(etaBinsH->GetXaxis()->GetBinLabel(i+1));
+  //	pavetext->AddText(Form("from %f to %f",etaBinsH->GetXaxis()->GetBinLowEdge(i+1), etaBinsH->GetXaxis()->GetBinLowEdge(i+1)+etaBinsH->GetXaxis()->GetBinWidth(i+1)));
+  //	}
+  //  TCanvas *cEta = new TCanvas("c1","demo bin labels",10,10,900,500);
+  //  cEta->cd();
+  //  etaBinsH->Draw();
+  //  pavetext->Draw();
+  //  file->cd();
+  //  etaBinsH->Write("etaBinsH");
+  //  cEta->Write("etaBinsCan");
 
-  TH1F * ZMassJetEtaPtPass[3][3][7];
-  TH1F * ZMassJetEtaPtFail[3][3][7];
+  TH1F * ZMassJetEtaPtPass[3][3][8];
+  TH1F * ZMassJetEtaPtFail[3][3][8];
 
   TH1F * PromptPtPass[3];
   TH1F * PromptPtFail[3];
@@ -1029,14 +1032,16 @@ int main(int argc, char * argv[]) {
       vector<bool> isMuonMatchedSingleMuFilter; isMuonMatchedSingleMuFilter.clear();
 
       for (unsigned int im = 0; im<analysisTree.muon_count; ++im) {
-	allMuons.push_back(im);
 	bool muPassed    = true;
 	bool mu23Matched = false;
 	bool mu17Matched = false;
 	bool mu8Matched  = false;
 	bool muSingleMatched = false;
-	if (analysisTree.muon_pt[im]<5) muPassed = false;
-	if (fabs(analysisTree.muon_eta[im])>etaMuonLowCut) muPassed = false;
+	if (analysisTree.muon_pt[im]<ptMuonLowCut) continue;
+	if (fabs(analysisTree.muon_eta[im])>etaMuonLowCut) continue;
+	if (fabs(analysisTree.muon_dxy[im])>dxyMuonLooseCut) continue;
+	if (fabs(analysisTree.muon_dz[im])>dzMuonLooseCut) continue;
+	allMuons.push_back(im);
 	if (fabs(analysisTree.muon_dxy[im])>dxyMuonCut) muPassed = false;
 	if (fabs(analysisTree.muon_dz[im])>dzMuonCut) muPassed = false;
 	if (!analysisTree.muon_isMedium[im]) muPassed = false;
@@ -1071,13 +1076,15 @@ int main(int argc, char * argv[]) {
 	  float dRtrig = deltaR(analysisTree.muon_eta[im],analysisTree.muon_phi[im],
 				analysisTree.trigobject_eta[iT],analysisTree.trigobject_phi[iT]);
 	  if (dRtrig>DRTrigMatch) continue;
-	  if (analysisTree.trigobject_filters[iT][nMuon17Filter] && analysisTree.trigobject_pt[iT]>23.0) 
+	  if (analysisTree.trigobject_filters[iT][nMuon17Filter]) 
 	    mu23Matched = true;
-	  if (analysisTree.trigobject_filters[iT][nMuon17Filter] && analysisTree.trigobject_pt[iT]>17.0)
+	  if (analysisTree.trigobject_filters[iT][nMuon17Filter])
 	    mu17Matched = true;
-	  if (analysisTree.trigobject_filters[iT][nSingleMuonFilter] && analysisTree.trigobject_pt[iT]>singleMuonTriggerPtCut)
+	  if (analysisTree.trigobject_filters[iT][nSingleMuonFilter] 
+	      && analysisTree.trigobject_pt[iT]>singleMuonTriggerPtCut
+	      && fabs(analysisTree.trigobject_eta[iT])<singleMuonTriggerEtaCut)
 	    muSingleMatched = true;
-	  if (analysisTree.trigobject_filters[iT][nMuon8Filter] && analysisTree.trigobject_pt[iT]>8.0) 
+	  if (analysisTree.trigobject_filters[iT][nMuon8Filter]) 
 	    mu8Matched = true;
 	  
 	}
@@ -1203,6 +1210,7 @@ int main(int argc, char * argv[]) {
 	  }
 	  if (isMu1matched) {
 	    for (unsigned int iMu=0; iMu<allMuons.size(); ++iMu) {
+	      //	      if (!isMuonPrompt[iMu]) continue;
 	      unsigned int indexProbe = allMuons[iMu];
 	      if (index1==indexProbe) continue;
 	      float q1 = analysisTree.muon_charge[index1];
@@ -1217,8 +1225,12 @@ int main(int argc, char * argv[]) {
 	      float ptProbe = TMath::Min(float(analysisTree.muon_pt[indexProbe]),float(ptBins[nPtBins]-0.1));
 	      float absEtaProbe = fabs(analysisTree.muon_eta[indexProbe]);
 	      int ptBin = binNumber(ptProbe,nPtBins,ptBins);
+	      if (ptBin<0) continue;
 	      int ptBinTrig = binNumber(ptProbe,nPtBinsTrig,ptBinsTrig);
+	      if (ptBinTrig<0) continue;
 	      int etaBin = binNumber(absEtaProbe,nEtaBins,etaBins);
+	      if (etaBin<0) continue;
+
 	      TLorentzVector muon1; muon1.SetXYZM(analysisTree.muon_px[index1],
 						  analysisTree.muon_py[index1],
 						  analysisTree.muon_pz[index1],
