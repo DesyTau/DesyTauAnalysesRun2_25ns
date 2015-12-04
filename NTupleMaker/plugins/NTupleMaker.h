@@ -911,7 +911,9 @@ class NTupleMaker : public edm::EDAnalyzer{
   UChar_t mvamet_channel[M_mvametmaxcount];
   UInt_t mvamet_lep1[M_mvametmaxcount];
   UInt_t mvamet_lep2[M_mvametmaxcount];
-  
+  Float_t mvamet_lep1_pt[M_mvametmaxcount];
+  Float_t mvamet_lep2_pt[M_mvametmaxcount]; 
+
   Float_t genmet_ex;
   Float_t genmet_ey;
 

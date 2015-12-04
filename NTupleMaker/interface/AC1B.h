@@ -312,15 +312,17 @@ public :
    Float_t         puppimet_ex_UnclusteredEnDown;
    Float_t         puppimet_ey_UnclusteredEnDown;
    UInt_t          mvamet_count;
-   Float_t         mvamet_ex[10];   //[mvamet_count]
-   Float_t         mvamet_ey[10];   //[mvamet_count]
-   Float_t         mvamet_sigxx[10];   //[mvamet_count]
-   Float_t         mvamet_sigxy[10];   //[mvamet_count]
-   Float_t         mvamet_sigyx[10];   //[mvamet_count]
-   Float_t         mvamet_sigyy[10];   //[mvamet_count]
-   UChar_t         mvamet_channel[10];   //[mvamet_count]
-   UInt_t          mvamet_lep1[10];   //[mvamet_count]
-   UInt_t          mvamet_lep2[10];   //[mvamet_count]
+   Float_t         mvamet_ex[50];   //[mvamet_count]
+   Float_t         mvamet_ey[50];   //[mvamet_count]
+   Float_t         mvamet_sigxx[50];   //[mvamet_count]
+   Float_t         mvamet_sigxy[50];   //[mvamet_count]
+   Float_t         mvamet_sigyx[50];   //[mvamet_count]
+   Float_t         mvamet_sigyy[50];   //[mvamet_count]
+   UChar_t         mvamet_channel[50];   //[mvamet_count]
+   UInt_t          mvamet_lep1[50];   //[mvamet_count]
+   UInt_t          mvamet_lep2[50];   //[mvamet_count]
+   Float_t         mvamet_lep1_pt[50];   //[mvamet_count]
+   Float_t         mvamet_lep2_pt[50];   //[mvamet_count]
    Float_t         genweight;
    Float_t         genid1;
    Float_t         genx1;
@@ -726,6 +728,8 @@ public :
    TBranch        *b_mvamet_channel;   //!
    TBranch        *b_mvamet_lep1;   //!
    TBranch        *b_mvamet_lep2;   //!
+   TBranch        *b_mvamet_lep1_pt;   //!
+   TBranch        *b_mvamet_lep2_pt;   //!
    TBranch        *b_genweight;   //!
    TBranch        *b_genid1;   //!
    TBranch        *b_genx1;   //!
@@ -1237,6 +1241,8 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("mvamet_channel", &mvamet_channel, &b_mvamet_channel);
    fChain->SetBranchAddress("mvamet_lep1", &mvamet_lep1, &b_mvamet_lep1);
    fChain->SetBranchAddress("mvamet_lep2", &mvamet_lep2, &b_mvamet_lep2);
+   fChain->SetBranchAddress("mvamet_lep1_pt", &mvamet_lep1_pt, &b_mvamet_lep1_pt);
+   fChain->SetBranchAddress("mvamet_lep2_pt", &mvamet_lep2_pt, &b_mvamet_lep2_pt);
    fChain->SetBranchAddress("genweight", &genweight, &b_genweight);
    fChain->SetBranchAddress("genid1", &genid1, &b_genid1);
    fChain->SetBranchAddress("genx1", &genx1, &b_genx1);

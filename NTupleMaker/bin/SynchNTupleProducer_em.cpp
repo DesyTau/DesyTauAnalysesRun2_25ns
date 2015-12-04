@@ -686,18 +686,19 @@ int main(int argc, char * argv[]) {
     
     TTree * _inittree = NULL;
     _inittree = (TTree*)file_->Get(TString(initNtupleName));
-    if (_inittree==NULL) continue;
-    Float_t genweight;
-    if (!isData)
-      _inittree->SetBranchAddress("genweight",&genweight);
-    Long64_t numberOfEntriesInitTree = _inittree->GetEntries();
-    std::cout << "      number of entries in Init Tree = " << numberOfEntriesInitTree << std::endl;
-    for (Long64_t iEntry=0; iEntry<numberOfEntriesInitTree; iEntry++) {
-      _inittree->GetEntry(iEntry);
-      if (isData)
-	histWeightsH->Fill(0.,1.);
-      else
-	histWeightsH->Fill(0.,genweight);
+    if (_inittree!=NULL) {
+      Float_t genweight;
+      if (!isData)
+	_inittree->SetBranchAddress("genweight",&genweight);
+      Long64_t numberOfEntriesInitTree = _inittree->GetEntries();
+      std::cout << "      number of entries in Init Tree = " << numberOfEntriesInitTree << std::endl;
+      for (Long64_t iEntry=0; iEntry<numberOfEntriesInitTree; iEntry++) {
+	_inittree->GetEntry(iEntry);
+	if (isData)
+	  histWeightsH->Fill(0.,1.);
+	else
+	  histWeightsH->Fill(0.,genweight);
+      }
     }
 
     TTree * _tree = NULL;
@@ -942,8 +943,8 @@ int main(int argc, char * argv[]) {
 	muons.push_back(im);
       }
 
-      //      cout << "  SelEle=" << electrons.size() 
-      //      	   << "  SelMu=" << muons.size() << std::endl;
+      cout << "  SelEle=" << electrons.size() 
+	   << "  SelMu=" << muons.size() << std::endl;
 
       if (electrons.size()==0) continue;
       if (muons.size()==0) continue;
@@ -1085,8 +1086,8 @@ int main(int argc, char * argv[]) {
 
       if (electronIndex<0) continue;
       if (muonIndex<0) continue;
-      //      std::cout << "Post synch selection " << std::endl;
-      //      std::cout << std::endl;
+      std::cout << "Post synch selection " << std::endl;
+      std::cout << std::endl;
 
       
 

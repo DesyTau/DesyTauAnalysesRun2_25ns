@@ -537,6 +537,8 @@ int main(int argc, char * argv[]) {
   std::string ntupleName("makeroottree/AC1B");
 
   // output fileName with histograms
+  rootFileName += "_";
+  rootFileName += ifile;
   rootFileName += "_et_Sync.root";
   std::cout <<rootFileName <<std::endl;  
 
@@ -754,9 +756,6 @@ int main(int argc, char * argv[]) {
       float isoEleMin = 1e+10;
       float isoTauMin = 1e+10;      
       for (unsigned int ie=0; ie<electrons.size(); ++ie) {
-	bool isTrigEle22 = false;
-	bool isTrigEle32 = false;
-
 	unsigned int eIndex  = electrons.at(ie);
 
 	float neutralHadIsoEle = analysisTree.electron_neutralHadIso[ie];
@@ -821,17 +820,20 @@ int main(int argc, char * argv[]) {
 	  }
 	  else if (fabs(relIsoEle - isoEleMin) < 1.e-5) {
 	    if (analysisTree.electron_pt[eIndex] > analysisTree.electron_pt[electronIndex]) {
-	      fileOutput<<"ChangePair ele pt"<<std::endl; 
+	      if(debug)
+		fileOutput<<"ChangePair ele pt"<<std::endl; 
 	      changePair = true;
 	    }	    
 	    else if (fabs(analysisTree.electron_pt[eIndex] - analysisTree.electron_pt[electronIndex]) < 1.e-5) {
 	      if (absIsoTau < isoTauMin) {
-		fileOutput<<"ChangePair tau iso"<<std::endl; 
+		if(debug)
+		  fileOutput<<"ChangePair tau iso"<<std::endl; 
 		changePair = true;
 	      }
 	      else if ((absIsoTau - isoTauMin) < 1.e-5){
 		if (analysisTree.tau_pt[tIndex] > analysisTree.tau_pt[tauIndex]) {
-		  fileOutput<<"ChangePair tau pt"<<std::endl; 
+		  if(debug)
+		    fileOutput<<"ChangePair tau pt"<<std::endl; 
 		  changePair = true;
 		}
 	      }
@@ -882,6 +884,9 @@ int main(int argc, char * argv[]) {
       otree->dZ_1 = analysisTree.electron_dz[electronIndex];
 
       otree->byCombinedIsolationDeltaBetaCorrRaw3Hits_1 = 0;
+      otree->byLooseCombinedIsolationDeltaBetaCorr3Hits_1 = 0;
+      otree->byMediumCombinedIsolationDeltaBetaCorr3Hits_1 = 0;
+      otree->byTightCombinedIsolationDeltaBetaCorr3Hits_1 = 0;
       otree->againstElectronLooseMVA5_1 = 0;
       otree->againstElectronMediumMVA5_1 = 0;
       otree->againstElectronTightMVA5_1 = 0;
@@ -905,6 +910,9 @@ int main(int argc, char * argv[]) {
       otree->m_2 = analysisTree.tau_mass[tauIndex];
 
       otree->byCombinedIsolationDeltaBetaCorrRaw3Hits_2 = analysisTree.tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[tauIndex];
+      otree->byLooseCombinedIsolationDeltaBetaCorr3Hits_2 = analysisTree.tau_byLooseCombinedIsolationDeltaBetaCorr3Hits[tauIndex];
+      otree->byMediumCombinedIsolationDeltaBetaCorr3Hits_2 = analysisTree.tau_byMediumCombinedIsolationDeltaBetaCorr3Hits[tauIndex];
+      otree->byTightCombinedIsolationDeltaBetaCorr3Hits_2 = analysisTree.tau_byTightCombinedIsolationDeltaBetaCorr3Hits[tauIndex];
       otree->againstElectronLooseMVA5_2 = analysisTree.tau_againstElectronLooseMVA5[tauIndex];
       otree->againstElectronMediumMVA5_2 = analysisTree.tau_againstElectronMediumMVA5[tauIndex];
       otree->againstElectronTightMVA5_2 = analysisTree.tau_againstElectronTightMVA5[tauIndex];
@@ -1114,12 +1122,19 @@ int main(int argc, char * argv[]) {
       
       // choosing mva met
       unsigned int iMet = 0;
+      float mvamet_x = 0;
+      float mvamet_y = 0;
+      otree->mvacov00 = 0.;
+      otree->mvacov01 = 0.;
+      otree->mvacov10 = 0.;
+      otree->mvacov11 = 0.;
+      
       for (; iMet<analysisTree.mvamet_count; ++iMet) {
 	if ((int)analysisTree.mvamet_channel[iMet]==2) break;
       }
       
-      //if (iMet>=analysisTree.mvamet_count){
-      if (true) {
+      if (iMet>=analysisTree.mvamet_count){
+	//if (true) {
 	if(debug)
 	  fileOutput<<"MVA MET channel ploblems.."<<std::endl;
 
@@ -1144,6 +1159,11 @@ int main(int argc, char * argv[]) {
 	    break;
 	  }
 	}
+
+	if ( fabs(analysisTree.mvamet_lep1_pt[iMet] - otree->pt_2) > 0.0001 )
+	  std::cout<<"tau pt does not match"<<std::endl;
+	if ( fabs(analysisTree.mvamet_lep2_pt[iMet] - otree->pt_1) > 0.0001 )
+	  std::cout<<"ele pt does not match"<<std::endl;
 	
 	float mvamet_x = 0;
 	float mvamet_y = 0;
@@ -1151,6 +1171,7 @@ int main(int argc, char * argv[]) {
 	otree->mvacov01 = 0.;
 	otree->mvacov10 = 0.;
 	otree->mvacov11 = 0.;
+	
 	if(iMet < analysisTree.mvamet_count){
 	  mvamet_x = analysisTree.mvamet_ex[iMet];
 	  mvamet_y = analysisTree.mvamet_ey[iMet];
@@ -1159,6 +1180,16 @@ int main(int argc, char * argv[]) {
 	  otree->mvacov10 = analysisTree.mvamet_sigyx[iMet];
 	  otree->mvacov11 = analysisTree.mvamet_sigyy[iMet];
 	}
+	else{
+	  std::cout<<"MVA MEt not found!"<<std::endl;
+	  iMet = 0;
+	  std::cout<<"tau = "<<tauIndex<<" ele = "<<electronIndex<<std::endl;
+	  for (; iMet<analysisTree.mvamet_count; ++iMet) {
+	    std::cout<<"imet = "<<analysisTree.mvamet_channel[iMet]<<" itau = "<<analysisTree.mvamet_lep1[iMet]<<" iele = "<<analysisTree.mvamet_lep2[iMet]<<std::endl;
+	  }
+	  
+	}
+	
 	
 	float mvamet_x2 = mvamet_x * mvamet_x;
 	float mvamet_y2 = mvamet_y * mvamet_y;
@@ -1169,7 +1200,8 @@ int main(int argc, char * argv[]) {
 	//otree->mt_1 = sqrt(2*otree->pt_1*otree->mvamet*(1.-cos(otree->phi_1-otree->mvametphi)));
 	//otree->mt_2 = sqrt(2*otree->pt_2*otree->mvamet*(1.-cos(otree->phi_2-otree->mvametphi)));  	
       }
-
+      
+      
       // define MET covariance
       TMatrixD covMET(2, 2);
       covMET[0][0] = otree->mvacov00;
