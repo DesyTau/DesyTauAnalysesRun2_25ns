@@ -1,6 +1,9 @@
 #!/bin/csh
 ./qsub_seq.csh AnalysisMacro_dimuons analysisMacro_dimuons_MC.conf /nfs/dust/cms/group/susy-desy/Run2/Stau/MC/25ns/cmssw7414v1_noMVAmet_v2 DYJetsToLL_M-50_MG 0 9
+./qsub_seq.csh AnalysisMacro_dimuons analysisMacro_dimuons_MC.conf /nfs/dust/cms/group/susy-desy/Run2/Stau/MC/25ns/cmssw7414v1_noMVAmet_v2 DYJetsToLL_M-50 10 99
 ./qsub_seq.csh AnalysisMacro_dimuons analysisMacro_dimuons_MC.conf /nfs/dust/cms/group/susy-desy/Run2/Stau/MC/25ns/cmssw7414v1_noMVAmet_v2 DYJetsToLL_M-5to50 0 9
+./qsub_seq.csh AnalysisMacro_dimuons analysisMacro_dimuons_MC.conf /nfs/dust/cms/group/susy-desy/Run2/Stau/MC/25ns/cmssw7414v1_noMVAmet_v2 DYJetsToLL_M-10to50 15 32
+./qsub_seq.csh AnalysisMacro_dimuons analysisMacro_dimuons_MC.conf /nfs/dust/cms/user/rasp/ntuples/Sync_2015_v1 WJetsToLNu_MG 64 138
 ./qsub_seq.csh AnalysisMacro_dimuons analysisMacro_dimuons_MC.conf /nfs/dust/cms/group/susy-desy/Run2/Stau/MC/25ns/cmssw7414v1_noMVAmet_v2 wJetsToLNu 127 140
 ./qsub_seq.csh AnalysisMacro_dimuons analysisMacro_dimuons_MC.conf /nfs/dust/cms/group/susy-desy/Run2/Stau/MC/25ns/cmssw7414v1_noMVAmet_v2 TTPowHeg 77 127
 ./qsub_seq.csh AnalysisMacro_dimuons analysisMacro_dimuons_MC.conf /nfs/dust/cms/group/susy-desy/Run2/Stau/MC/25ns/cmssw7414v1_noMVAmet_v2 ST_tW_antitop_5f_inclusiveDecays 5 10
