@@ -2,8 +2,8 @@ import FWCore.ParameterSet.Config as cms
 
 isData = True
 is25ns = True
-isPRv4 = True
-isRepr05Oct = False
+isPRv4 = False
+isRepr05Oct = True
 #skim = 0
 year = 2015
 period = 'Run2015D'
@@ -42,7 +42,7 @@ process.options = cms.untracked.PSet(
 
 # How many events to process
 process.maxEvents = cms.untracked.PSet( 
-   input = cms.untracked.int32(500)
+   input = cms.untracked.int32(10000)
 )
 
 
@@ -612,9 +612,11 @@ mvaTrigCategoriesMap = cms.InputTag("electronMVAValueMapProducer:ElectronMVAEsti
 TauCollectionTag = cms.InputTag("slimmedTaus"),
 JetCollectionTag = cms.InputTag("patJetsReapplyJEC::TreeProducer"),
 #JetCollectionTag = cms.InputTag("slimmedJets"),
-MetCollectionTag = cms.InputTag("slimmedMETs::RECO"),
+MetCollectionTag = cms.InputTag("slimmedMETs::RECO" if isPRv4 else "slimmedMETs::PAT"),
 MetCovMatrixTag = cms.InputTag("METSignificance:METCovariance:TreeProducer"),
 MetSigTag = cms.InputTag("METSignificance:METSignificance:TreeProducer"),
+MetCorrCovMatrixTag = cms.InputTag("METCorrSignificance:METCovariance:TreeProducer"),
+MetCorrSigTag = cms.InputTag("METCorrSignificance:METSignificance:TreeProducer"),
 MetCorrCollectionTag = cms.InputTag("slimmedMETs::TreeProducer"),
 #MetCorrCollectionTag = cms.InputTag("slimmedMETsNoHF"),
 PuppiMetCollectionTag = cms.InputTag("slimmedMETsPuppi"),
@@ -835,15 +837,17 @@ SampleName = cms.untracked.string("Data")
 process.load("RecoMET/METProducers.METSignificance_cfi")
 process.load("RecoMET/METProducers.METSignificanceParams_cfi")
 
-process.METSignificance.srcPfJets = cms.InputTag('patJetsReapplyJEC::TreeProducer')
-process.METSignificance.srcMet = cms.InputTag('slimmedMETs::TreeProducer')
+process.METCorrSignificance = process.METSignificance.clone(
+  srcPfJets = cms.InputTag('patJetsReapplyJEC::TreeProducer'),
+  srcMet = cms.InputTag('slimmedMETs::TreeProducer')
+)
 
 #################################################################################
 
 process.p = cms.Path(
   process.initroottree*
   process.patJetCorrFactorsReapplyJEC * process.patJetsReapplyJEC *
-  process.METSignificance*
+  process.METSignificance * process.METCorrSignificance *
   process.mvaMetSequence *
   process.egmGsfElectronIDSequence * 
   #process.HBHENoiseFilterResultProducer* #produces HBHE bools baseline

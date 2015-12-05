@@ -42,7 +42,7 @@ process.options = cms.untracked.PSet(
 
 # How many events to process
 process.maxEvents = cms.untracked.PSet( 
-   input = cms.untracked.int32(2000)
+   input = cms.untracked.int32(10000)
 )
 
 
@@ -636,6 +636,8 @@ JetCollectionTag = cms.InputTag("slimmedJets"),
 MetCollectionTag = cms.InputTag("slimmedMETs"),
 MetCovMatrixTag = cms.InputTag("METSignificance:METCovariance:TreeProducer"),
 MetSigTag = cms.InputTag("METSignificance:METSignificance:TreeProducer"),
+MetCorrCovMatrixTag = cms.InputTag("METCorrSignificance:METCovariance:TreeProducer"),
+MetCorrSigTag = cms.InputTag("METCorrSignificance:METSignificance:TreeProducer"),
 #MetCorrCollectionTag = cms.InputTag("slimmedMETs::TreeProducer"),
 MetCorrCollectionTag = cms.InputTag("slimmedMETsNoHF"),
 PuppiMetCollectionTag = cms.InputTag("slimmedMETsPuppi"),
@@ -829,12 +831,17 @@ SampleName = cms.untracked.string("Data")
 process.load("RecoMET/METProducers.METSignificance_cfi")
 process.load("RecoMET/METProducers.METSignificanceParams_cfi")
 
+process.METCorrSignificance = process.METSignificance.clone(
+  srcPfJets = cms.InputTag('patJetsReapplyJEC::TreeProducer'),
+  srcMet = cms.InputTag('slimmedMETs::TreeProducer')
+)
+
 process.p = cms.Path(
   process.initroottree*
-  process.METSignificance*
+  #process.patJetCorrFactorsReapplyJEC * process.patJetsReapplyJEC *
+  process.METSignificance * #process.METCorrSignificance *
   process.mvaMetSequence *
   process.egmGsfElectronIDSequence * 
-  #process.patJetCorrFactorsReapplyJEC * process.patJetsReapplyJEC *
   #process.HBHENoiseFilterResultProducer* #produces HBHE bools baseline
   #process.ApplyBaselineHBHENoiseFilter*  #reject events based 
   #process.ApplyBaselineHBHEISONoiseFilter*  #reject events based -- disable the module, performance is being investigated fu
