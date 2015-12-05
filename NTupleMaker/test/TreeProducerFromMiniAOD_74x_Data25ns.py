@@ -42,13 +42,13 @@ process.options = cms.untracked.PSet(
 
 # How many events to process
 process.maxEvents = cms.untracked.PSet( 
-   input = cms.untracked.int32(2000)
+   input = cms.untracked.int32(500)
 )
 
 
 #configurable options =======================================================================
 runOnData=isData #data/MC switch
-usePrivateSQlite=False #use external JECs (sqlite file) /// OUTDATED for 25ns
+usePrivateSQlite=False #use external JECs (sqlite file)
 useHFCandidates=True #create an additionnal NoHF slimmed MET collection if the option is set to false  == existing as slimmedMETsNoHF
 applyResiduals=True #application of residual corrections. Have to be set to True once the 13 TeV residual corrections are available. False to be kept meanwhile. Can be kept to False later for private tests or for analysis checks and developments (not the official recommendation!).
 #===================================================================
@@ -60,13 +60,14 @@ applyResiduals=True #application of residual corrections. Have to be set to True
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff')
 from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag
 
-
 if runOnData:
   process.GlobalTag.globaltag = '74X_dataRun2_v2'
   if isPRv4:
-      process.GlobalTag.globaltag = '74X_dataRun2_Prompt_v4'
+    #process.GlobalTag.globaltag = '74X_dataRun2_Prompt_v4'
+    process.GlobalTag.globaltag = '74X_dataRun2_v5'
   if isRepr05Oct:
-      process.GlobalTag.globaltag = '74X_dataRun2_reMiniAOD_v0'
+    #process.GlobalTag.globaltag = '74X_dataRun2_reMiniAOD_v0'
+    process.GlobalTag.globaltag = '74X_dataRun2_v5'
 else:
   if is25ns:
     process.GlobalTag.globaltag = '74X_mcRun2_asymptotic_v2'
@@ -79,9 +80,9 @@ if usePrivateSQlite:
     from CondCore.DBCommon.CondDBSetup_cfi import *
     import os
     if runOnData:
-      era="Summer15_25nsV2"
+      era="Summer15_25nsV6_DATA"
     else:
-      era="Summer15_25nsV2"
+      era="Summer15_25nsV6_MC"
     dBFile = os.path.expandvars("$CMSSW_BASE/src/DesyTauAnalyses/NTupleMaker/data/"+era+".db")
     process.jec = cms.ESSource("PoolDBESSource",CondDBSetup,
                                connect = cms.string( "sqlite_file://"+dBFile ),
@@ -103,28 +104,44 @@ if usePrivateSQlite:
 ### =====================================================================================================
 
 
-"""
 ### ReRun JEC ===========================================================================================
 
 from PhysicsTools.PatAlgos.producersLayer1.jetUpdater_cff import patJetCorrFactorsUpdated
 process.patJetCorrFactorsReapplyJEC = patJetCorrFactorsUpdated.clone(
   src = cms.InputTag("slimmedJets"),
   levels = ['L1FastJet', 
-        'L2Relative', 
-        'L3Absolute'],
+            'L2Relative', 
+            'L3Absolute',
+            'L2L3Residual'],
   payload = 'AK4PFchs' ) # Make sure to choose the appropriate levels and payload here!
 
 from PhysicsTools.PatAlgos.producersLayer1.jetUpdater_cff import patJetsUpdated
 process.patJetsReapplyJEC = patJetsUpdated.clone(
   jetSource = cms.InputTag("slimmedJets"),
   jetCorrFactorsSource = cms.VInputTag(cms.InputTag("patJetCorrFactorsReapplyJEC"))
-  )
-"""
+)
+
 
 ### END ReRun JEC ======================================================================================
 
 ### PFMET Corrections ==================================================================================
-"""
+
+#default configuration for miniAOD reprocessing, change the isData flag to run on data
+#for a full met computation, remove the pfCandColl input
+jecUncertaintyFile=""
+if runOnData:
+  if is25ns:
+    jecUncertaintyFile="DesyTauAnalyses/NTupleMaker/data/Summer15_25nsV6/Summer15_25nsV6_DATA_UncertaintySources_AK4PFchs.txt"
+    print ' JECUNCERTAINTY  ',jecUncertaintyFile
+  else:
+    jecUncertaintyFile="DesyTauAnalyses/NTupleMaker/data/Summer15_50nsV6/Summer15_50nsV6_DATA_UncertaintySources_AK4PFchs.txt"    
+else:
+  if is25ns:
+    jecUncertaintyFile="DesyTauAnalyses/NTupleMaker/data/Summer15_25nsV6/Summer15_25nsV6_MC_UncertaintySources_AK4PFchs.txt"
+    print ' JECUNCERTAINTY  ',jecUncertaintyFile
+  else:
+    jecUncertaintyFile="DesyTauAnalyses/NTupleMaker/data/Summer15_50nsV6/Summer15_50nsV6_MC_UncertaintySources_AK4PFchs.txt"
+
 ### ---------------------------------------------------------------------------
 ### Removing the HF from the MET computation
 ### ---------------------------------------------------------------------------
@@ -141,33 +158,23 @@ from PhysicsTools.PatUtils.tools.runMETCorrectionsAndUncertainties import runMet
 
 #default configuration for miniAOD reprocessing, change the isData flag to run on data
 #for a full met computation, remove the pfCandColl input
-jecUncertaintyFile=""
-if runOnData:
-  if is25ns:
-    jecUncertaintyFile="DesyTauAnalyses/NTupleMaker/data/Summer15_25nsV2/Summer15_25nsV2_DATA_UncertaintySources_AK4PFchs.txt"
-    print ' JECUNCERTAINTY  ',jecUncertaintyFile
-  else:
-    jecUncertaintyFile="DesyTauAnalyses/NTupleMaker/data/Summer15_50nsV5/Summer15_50nsV5_DATA_UncertaintySources_AK4PFchs.txt"    
-else:
-  if is25ns:
-    jecUncertaintyFile="DesyTauAnalyses/NTupleMaker/data/Summer15_25nsV2/Summer15_25nsV2_MC_UncertaintySources_AK4PFchs.txt"
-    print ' JECUNCERTAINTY  ',jecUncertaintyFile
-  else:
-    jecUncertaintyFile="DesyTauAnalyses/NTupleMaker/data/Summer15_50nsV5/Summer15_50nsV5_MC_UncertaintySources_AK4PFchs.txt"
-
 runMetCorAndUncFromMiniAOD(process,
                            isData=runOnData,
-                           jecUncFile=jecUncertaintyFile
                            )
-
+process.slimmedMETs.t01Variation = cms.InputTag("slimmedMETs","","PAT") 
+if (runOnData and isPRv4): 
+  process.slimmedMETs.t01Variation = cms.InputTag("slimmedMETs","","RECO")
+    
 if not useHFCandidates:
     runMetCorAndUncFromMiniAOD(process,
                                isData=runOnData,
                                pfCandColl=cms.InputTag("noHFCands"),
-                               jecUncFile=jecUncertaintyFile,
                                postfix="NoHF"
                                )
-
+    process.slimmedMETsNoHF.t01Variation = cms.InputTag("slimmedMETsNoHF","","PAT") 
+    if (runOnData and isPRv4): 
+      process.slimmedMETsNoHF.t01Variation = cms.InputTag("slimmedMETsNoHF","","RECO")
+          
 ### -------------------------------------------------------------------
 ### the lines below remove the L2L3 residual corrections when processing data
 ### -------------------------------------------------------------------
@@ -186,9 +193,10 @@ if not applyResiduals:
           process.patPFMetT2SmearCorrNoHF.jetCorrLabelRes = cms.InputTag("L3Absolute")
           process.shiftedPatJetEnDownNoHF.jetCorrLabelUpToL3Res = cms.InputTag("ak4PFCHSL1FastL2L3Corrector")
           process.shiftedPatJetEnUpNoHF.jetCorrLabelUpToL3Res = cms.InputTag("ak4PFCHSL1FastL2L3Corrector")
+### ------------------------------------------------------------------
 
 ### END PFMET CORRECTIONS ==============================================================================
-"""
+
 
 # Electron ID ==========================================================================================
 
@@ -227,17 +235,17 @@ process.HBHENoiseFilterResultProducer.minZeros = cms.int32(99999)
 process.HBHENoiseFilterResultProducer.IgnoreTS4TS5ifJetInLowBVRegion=cms.bool(False) 
 process.HBHENoiseFilterResultProducer.defaultDecision = cms.string("HBHENoiseFilterResultRun2Loose")
 
+process.ApplyBaselineHBHENoiseFilter = cms.EDFilter('BooleanFlagFilter',
+   inputLabel = cms.InputTag('HBHENoiseFilterResultProducer','HBHENoiseFilterResult'),
+   reverseDecision = cms.bool(False)
+)
 
+process.ApplyBaselineHBHEIsoNoiseFilter = cms.EDFilter('BooleanFlagFilter',
+   inputLabel = cms.InputTag('HBHENoiseFilterResultProducer','HBHEIsoNoiseFilterResult'),
+   reverseDecision = cms.bool(False)
+)
 
-#####MVAMet
-"""
-from JetMETCorrections.Configuration.JetCorrectionServicesAllAlgos_cff import *
-from JetMETCorrections.Configuration.DefaultJEC_cff import *
-"""
-### ====================================================================================================
-
-
-
+##################################################################################
 
 
 # Define the input source
@@ -313,6 +321,8 @@ process.source = cms.Source("PoolSource",
 # produce PU Jet Ids & MVA MET
 #----------------------------------------------------------------------------------
 
+
+#####MVAMet
 
 # Pairwise MVA MET ================================================================================= 
 # as from jan 
@@ -548,20 +558,6 @@ else:
 
 # END Pairwise MVA MET ==============================================================
 
-########### HBHE
-
-
-
-process.ApplyBaselineHBHENoiseFilter = cms.EDFilter('BooleanFlagFilter',
-   inputLabel = cms.InputTag('HBHENoiseFilterResultProducer','HBHENoiseFilterResult'),
-   reverseDecision = cms.bool(False)
-)
-
-process.ApplyBaselineHBHEIsoNoiseFilter = cms.EDFilter('BooleanFlagFilter',
-   inputLabel = cms.InputTag('HBHENoiseFilterResultProducer','HBHEIsoNoiseFilterResult'),
-   reverseDecision = cms.bool(False)
-)
-
 
 
 #####################################################################################
@@ -614,13 +610,13 @@ mvaTrigValuesMap     = cms.InputTag("electronMVAValueMapProducer:ElectronMVAEsti
 mvaTrigCategoriesMap = cms.InputTag("electronMVAValueMapProducer:ElectronMVAEstimatorRun2Spring15Trig25nsV1Categories"),
 
 TauCollectionTag = cms.InputTag("slimmedTaus"),
-#JetCollectionTag = cms.InputTag("patJetsReapplyJEC::TreeProducer"),
-JetCollectionTag = cms.InputTag("slimmedJets"),
-MetCollectionTag = cms.InputTag("slimmedMETs"),
+JetCollectionTag = cms.InputTag("patJetsReapplyJEC::TreeProducer"),
+#JetCollectionTag = cms.InputTag("slimmedJets"),
+MetCollectionTag = cms.InputTag("slimmedMETs::RECO"),
 MetCovMatrixTag = cms.InputTag("METSignificance:METCovariance:TreeProducer"),
 MetSigTag = cms.InputTag("METSignificance:METSignificance:TreeProducer"),
-#MetCorrCollectionTag = cms.InputTag("slimmedMETs::TreeProducer"),
-MetCorrCollectionTag = cms.InputTag("slimmedMETsNoHF"),
+MetCorrCollectionTag = cms.InputTag("slimmedMETs::TreeProducer"),
+#MetCorrCollectionTag = cms.InputTag("slimmedMETsNoHF"),
 PuppiMetCollectionTag = cms.InputTag("slimmedMETsPuppi"),
 MvaMetCollectionsTag = cms.VInputTag("mvaMETDiTau", "mvaMETTauMu", "mvaMETTauEle", "mvaMETMuEle", "mvaMETMuMu", "mvaMETEleEle"),
 TrackCollectionTag = cms.InputTag("generalTracks"),
@@ -839,12 +835,17 @@ SampleName = cms.untracked.string("Data")
 process.load("RecoMET/METProducers.METSignificance_cfi")
 process.load("RecoMET/METProducers.METSignificanceParams_cfi")
 
+process.METSignificance.srcPfJets = cms.InputTag('patJetsReapplyJEC::TreeProducer')
+process.METSignificance.srcMet = cms.InputTag('slimmedMETs::TreeProducer')
+
+#################################################################################
+
 process.p = cms.Path(
   process.initroottree*
+  process.patJetCorrFactorsReapplyJEC * process.patJetsReapplyJEC *
   process.METSignificance*
   process.mvaMetSequence *
   process.egmGsfElectronIDSequence * 
-  #process.patJetCorrFactorsReapplyJEC * process.patJetsReapplyJEC *
   #process.HBHENoiseFilterResultProducer* #produces HBHE bools baseline
   #process.ApplyBaselineHBHENoiseFilter*  #reject events based 
   #process.ApplyBaselineHBHEISONoiseFilter*  #reject events based -- disable the module, performance is being investigated fu
@@ -857,15 +858,10 @@ process.TFileService = cms.Service("TFileService",
                                    fileName = cms.string("output.root")
                                	)
 
-
 #process.end = cms.EndPath(process.Out*process.TFileService)
 
 #processDumpFile = open('MyRootMaker.dump', 'w')
 #print >> processDumpFile, process.dumpPython()
-
-
-
-
 
 def customise_for_gc(process):
 	import FWCore.ParameterSet.Config as cms
