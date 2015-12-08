@@ -42,7 +42,7 @@ process.options = cms.untracked.PSet(
 
 # How many events to process
 process.maxEvents = cms.untracked.PSet( 
-   input = cms.untracked.int32(10000)
+   input = cms.untracked.int32(100)
 )
 
 

@@ -26,6 +26,7 @@
 #include "DesyTauAnalyses/NTupleMaker/interface/Config.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/AC1B.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/json.h"
+#include "DesyTauAnalyses/NTupleMaker/interface/PileUp.h"
 #include "TGraphAsymmErrors.h"
 
 const float electronMass = 0;
@@ -326,8 +327,13 @@ int main(int argc, char * argv[]) {
   Config cfg(argv[1]);
 
   const bool isData = cfg.get<bool>("IsData");
-  const bool applyPUreweighting = cfg.get<bool>("ApplyPUreweighting");
   const bool applyLeptonSF = cfg.get<bool>("ApplyLeptonSF");
+
+  const bool applyGoodRunSelection = cfg.get<bool>("ApplyGoodRunSelection");
+
+  // pile up reweighting
+  const bool applyPUreweighting_vertices = cfg.get<bool>("ApplyPUreweighting_vertices");
+  const bool applyPUreweighting_official = cfg.get<bool>("ApplyPUreweighting_official");
 
 
   // kinematic cuts on muons
@@ -363,10 +369,36 @@ int main(int argc, char * argv[]) {
   const unsigned int RunRangeMin = cfg.get<unsigned int>("RunRangeMin");
   const unsigned int RunRangeMax = cfg.get<unsigned int>("RunRangeMax");
 
+  const string dataBaseDir = cfg.get<string>("DataBaseDir");
+  // vertex distributions filenames and histname
+  const string vertDataFileName = cfg.get<string>("VertexDataFileName");
+  const string vertMcFileName   = cfg.get<string>("VertexMcFileName");
+  const string vertHistName     = cfg.get<string>("VertexHistName");
 
+  const string jsonFile = cfg.get<string>("jsonFile");
+  string cmsswBase = (getenv ("CMSSW_BASE"));
+  string fullPathToJsonFile = cmsswBase + "/src/DesyTauAnalyses/NTupleMaker/test/json/" + jsonFile;
+
+  // Run-lumi selector
+  std::vector<Period> periods;  
+  if (isData) { // read the good runs 
+	  std::fstream inputFileStream(fullPathToJsonFile.c_str(), std::ios::in);
+  	  if (inputFileStream.fail() ) {
+            std::cout << "Error: cannot find json file " << fullPathToJsonFile << std::endl;
+            std::cout << "please check" << std::endl;
+            std::cout << "quitting program" << std::endl;
+	    exit(-1);
+	  }
+  
+          for(std::string s; std::getline(inputFileStream, s); ) {
+           periods.push_back(Period());
+           std::stringstream ss(s);
+           ss >> periods.back();
+          }
+  }
 
   // **** end of configuration
-
+/*
   // Run-lumi selector
   std::vector<Period> periods;
     
@@ -377,7 +409,7 @@ int main(int argc, char * argv[]) {
       std::stringstream ss(s);
       ss >> periods.back();
     }
-
+*/
   char ff[100];
 
   sprintf(ff,"%s/%s",argv[3],argv[2]);
@@ -405,6 +437,43 @@ int main(int argc, char * argv[]) {
   TH1D * hDiJet1mass = new TH1D("hDiJet1mass","",400,0,4000);
   TH1D * hDiJet2mass = new TH1D("hDiJet2mass","",400,0,4000);
   TH1D * hHT_ = new TH1D("hHT_","",400,0,4000);
+  TH1D * PUweightsOfficialH = new TH1D("PUweightsOfficialH","PU weights w/ official reweighting",1000, 0, -1);
+
+ // PILE UP REWEIGHTING - OPTIONS
+
+  if (applyPUreweighting_vertices and applyPUreweighting_official) 
+	{std::cout<<"ERROR: Choose only ONE PU reweighting method (vertices or official, not both!) " <<std::endl; exit(-1);}
+
+  // reweighting with vertices
+
+  // reading vertex weights
+  TFile * fileDataNVert = new TFile(TString(cmsswBase)+"/src/"+dataBaseDir+"/"+vertDataFileName);
+  TFile * fileMcNVert   = new TFile(TString(cmsswBase)+"/src/"+dataBaseDir+"/"+vertMcFileName);
+
+  TH1F * vertexDataH = (TH1F*)fileDataNVert->Get(TString(vertHistName));
+  TH1F * vertexMcH   = (TH1F*)fileMcNVert->Get(TString(vertHistName));
+
+  float normVertexData = vertexDataH->GetSumOfWeights();
+  float normVertexMc   = vertexMcH->GetSumOfWeights();
+
+  vertexDataH->Scale(1/normVertexData);
+  vertexMcH->Scale(1/normVertexMc);
+
+
+ // reweighting official recipe 
+  	// initialize pile up object
+  PileUp * PUofficial = new PileUp();
+  
+
+  
+  if (applyPUreweighting_official) {
+    TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/Data_Pileup_2015D_Nov17.root","read"); 
+    TFile * filePUdistribution_MC = new TFile (TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/MC_Spring15_PU25_Startup.root", "read"); 
+    TH1D * PU_data = (TH1D *)filePUdistribution_data->Get("pileup");
+    TH1D * PU_mc = (TH1D *)filePUdistribution_MC->Get("pileup");
+    PUofficial->set_h_data(PU_data); 
+    PUofficial->set_h_MC(PU_mc);
+  }
 
   
 
@@ -425,15 +494,19 @@ int main(int argc, char * argv[]) {
   unsigned int RunMax = 0;
 
   std::vector<unsigned int> allRuns; allRuns.clear();
- vector <int> run_;
- vector <int> lumi_;
- vector <int> event_;
+ vector <unsigned int> run_;
+ vector <unsigned int> lumi_;
+ vector <unsigned int> event_;
+ run_.clear();
+ lumi_.clear();
+ event_.clear();
  
     std::vector<Event> EventList;
     std::string line;
     std::ifstream EventsFile;
     TString file_events=argv[4]; //eventlist_csc2015.txt
-    EventsFile.open("MET_filters/eventlist_"+file_events+".txt");
+    //EventsFile.open("MET_filters/eventlist_"+file_events+".txt");
+    EventsFile.open("MET_filters/"+file_events+".txt");
  
     cout<<" The file that will be used will be  MET_filters/"<<file_events<<endl;
     while (getline(EventsFile, line))
@@ -441,7 +514,7 @@ int main(int argc, char * argv[]) {
         std::vector<std::string> columns = split(line,':');
         run_.push_back(std::stoi(columns[0]));
         lumi_.push_back(std::stoi(columns[1]));
-        event_.push_back(std::stoi(columns[2]));
+        event_.push_back(std::stoul(columns[2]));
    	/*   Event events_;
 
         events_.name     = "Test";
@@ -468,6 +541,12 @@ int main(int argc, char * argv[]) {
   //----Attention----//
   //if(XSec!=1) nTotalFiles=20;
   //nTotalFiles=5;
+  //
+  //
+ 
+
+  std::string initNtupleName("initroottree/AC1B");
+
   for (int iF=0; iF<nTotalFiles; ++iF) {
 
     std::string filen;
@@ -476,27 +555,40 @@ int main(int argc, char * argv[]) {
     std::cout << "file " << iF+1 << " out of " << nTotalFiles << " filename : " << filen << std::endl;
     TFile * file_ = TFile::Open(TString(filen));
     
-    TTree * _tree = NULL;
-    _tree = (TTree*)file_->Get(TString(ntupleName));
-  
-    if (_tree==NULL) continue;
-    
     TH1D * histoInputEvents = NULL;
-   
     histoInputEvents = (TH1D*)file_->Get("makeroottree/nEvents");
-    
     if (histoInputEvents==NULL) continue;
-    
     int NE = int(histoInputEvents->GetEntries());
-    
-    std::cout << "      number of input events    = " << NE << std::endl;
-    
     for (int iE=0;iE<NE;++iE)
       inputEventsH->Fill(0.);
+    std::cout << "      number of input events         = " << NE << std::endl;
 
+    TTree * _inittree = NULL;
+    _inittree = (TTree*)file_->Get(TString(initNtupleName));
+    if (_inittree==NULL) continue;
+    Float_t genweight;
+    if (!isData)
+      _inittree->SetBranchAddress("genweight",&genweight);
+    Long64_t numberOfEntriesInitTree = _inittree->GetEntries();
+    std::cout << "      number of entries in Init Tree = " << numberOfEntriesInitTree << std::endl;
+    for (Long64_t iEntry=0; iEntry<numberOfEntriesInitTree; iEntry++) {
+      _inittree->GetEntry(iEntry);
+      if (isData)
+	histWeightsH->Fill(0.,1.);
+      else
+	histWeightsH->Fill(0.,genweight);
+    }
+
+    TTree * _tree = NULL;
+    _tree = (TTree*)file_->Get(TString(ntupleName));
+    if (_tree==NULL) continue;
+    Long64_t numberOfEntries = _tree->GetEntries();
+    std::cout << "      number of entries in Tree      = " << numberOfEntries << std::endl;
     AC1B analysisTree(_tree);
+
+
+    // EVENT LOOP //
     
-    Long64_t numberOfEntries = analysisTree.GetEntries();
     
     std::cout << "      number of entries in Tree = " << numberOfEntries << std::endl;
     
@@ -513,24 +605,42 @@ int main(int argc, char * argv[]) {
 
 
       //------------------------------------------------
+      // vertex cuts
+      
+      if (fabs(analysisTree.primvertex_z)>zVertexCut) continue;
+      if (analysisTree.primvertex_ndof<ndofVertexCut) continue;
+      float dVertex = (analysisTree.primvertex_x*analysisTree.primvertex_x+
+		       analysisTree.primvertex_y*analysisTree.primvertex_y);
+      if (dVertex>dVertexCut) continue;
 
       if (!isData) 
 	weight *=analysisTree.genweight;
 
       histWeightsH->Fill(float(0),weight);
 
-      // vertex cuts
-   /*   
-      if (fabs(analysisTree.primvertex_z)>zVertexCut) continue;
-      if (analysisTree.primvertex_ndof<ndofVertexCut) continue;
-      float dVertex = (analysisTree.primvertex_x*analysisTree.primvertex_x+
-		       analysisTree.primvertex_y*analysisTree.primvertex_y);
-      if (dVertex>dVertexCut) continue;
-      if (analysisTree.primvertex_count  < 2  ) continue; 
-*/
+
       //cout<< " We have zero counts ? "<<analysisTree.primvertex_count<<endl;
 
+      if (!isData) {
+	if (applyPUreweighting_vertices) {
+	  int binNvert = vertexDataH->FindBin(analysisTree.primvertex_count);
+	  float_t dataNvert = vertexDataH->GetBinContent(binNvert);
+	  float_t mcNvert = vertexMcH->GetBinContent(binNvert);
+	  if (mcNvert < 1e-10){mcNvert=1e-10;}
+	  float_t vertWeight = dataNvert/mcNvert;
+	  weight *= vertWeight;
+	  //	  cout << "NVert = " << analysisTree.primvertex_count << "   weight = " << vertWeight << endl;
+	}
 
+        if (applyPUreweighting_official) {
+
+	double Ninteractions = analysisTree.numtruepileupinteractions;
+	double PUweight = PUofficial->get_PUweight(Ninteractions);
+	weight *= PUweight;
+	PUweightsOfficialH->Fill(PUweight);
+
+        }
+      }
       if (isData){
 	
 	

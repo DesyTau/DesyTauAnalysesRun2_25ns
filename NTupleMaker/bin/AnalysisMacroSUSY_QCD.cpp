@@ -39,7 +39,7 @@ int main(int argc, char * argv[]) {
 
   // **** configuration
   Config cfg(argv[1]);
-  string SelectionSign="mutau";
+  string Channel="mutau";
 
   // kinematic cuts on electrons
   const bool isData = cfg.get<bool>("IsData");
@@ -74,7 +74,9 @@ int main(int argc, char * argv[]) {
   const double etaMuonCutmtau = cfg.get<double>("etaMuonCutmtau"); 
 
 
-  const string Mu20Leg  = cfg.get<string>("Mu20Leg");
+  string TrigLeg  ;
+   if (!isData) TrigLeg  = cfg.get<string>("Mu17LegMC");
+   if (isData) TrigLeg  = cfg.get<string>("Mu18LegData");
   const string Mu17Tau20MuLegA  = cfg.get<string>("Mu17Tau20MuLegA");
   const string Mu17Tau20MuLegB  = cfg.get<string>("Mu17Tau20MuLegB");
   const string Mu17Tau20TauLegA  = cfg.get<string>("Mu17Tau20TauLegA");
@@ -127,7 +129,7 @@ int main(int argc, char * argv[]) {
   const string muonSfMcBarrel = cfg.get<string>("MuonSfMcBarrel");
   const string muonSfMcEndcap = cfg.get<string>("MuonSfMcEndcap");
   
-  TString Muon20Leg(Mu20Leg);
+  TString MainTrigger(TrigLeg);
   TString Muon17Tau20MuLegA (Mu17Tau20MuLegA );
   TString Muon17Tau20MuLegB (Mu17Tau20MuLegB );
   TString Muon17Tau20TauLegA (Mu17Tau20TauLegA );
@@ -288,8 +290,8 @@ int main(int argc, char * argv[]) {
  
   // output fileName with histograms
   TFile * file = new TFile(era+"/"+TStrName+TString("_DataDriven.root"),"update");
-  file->mkdir(SelectionSign.c_str());
-  file->cd(SelectionSign.c_str());
+  file->mkdir(Channel.c_str());
+  file->cd(Channel.c_str());
 
   int nFiles = 0;
   int nEvents = 0;
@@ -494,7 +496,7 @@ int main(int argc, char * argv[]) {
       el_index=-1;
       
 
-      FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, SelectionSign, mu_index,el_index,tau_index);
+      FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, Channel, mu_index,el_index,tau_index);
       CFCounter[iCut]+= weight;
       iCFCounter[iCut]++;
       iCut++;
@@ -543,8 +545,8 @@ int main(int argc, char * argv[]) {
 
 
       
-      // vector <string> ss; ss.push_back(SelectionSign.c_str());
-      FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, SelectionSign, mu_index,el_index,tau_index);
+      // vector <string> ss; ss.push_back(Channel.c_str());
+      FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, Channel, mu_index,el_index,tau_index);
       CFCounter[iCut]+= weight;
       iCFCounter[iCut]++;
       iCut++;
@@ -554,8 +556,8 @@ int main(int argc, char * argv[]) {
       //selecTable.Fill(1,0, weight );      
       bool trigAccept = false;
       
-      unsigned int nMuon20Leg = 0;
-      bool isMuon20Leg = false;
+      unsigned int nMainTrigger = 0;
+      bool isMainTrigger = false;
       
       
       unsigned int nMuon17Tau20MuLegA = 0;
@@ -575,9 +577,9 @@ int main(int argc, char * argv[]) {
       for (unsigned int i=0; i<nfilters; ++i) {
 	//	std::cout << "HLT Filter : " << i << " = " << analysisTree.run_hltfilters->at(i) << std::endl;
 	TString HLTFilter(analysisTree.run_hltfilters->at(i));
-	if (HLTFilter==Muon20Leg) {
-	  nMuon20Leg = i;
-	  isMuon20Leg = true;
+	if (HLTFilter==MainTrigger) {
+	  nMainTrigger = i;
+	  isMainTrigger = true;
 	}
       
 	if (HLTFilter==Muon17Tau20MuLegA) {
@@ -604,8 +606,8 @@ int main(int argc, char * argv[]) {
       }
 
 
-      if (!isMuon20Leg) {
-	std::cout << "HLT filter for Mu20 " << Muon20Leg << " not found" << std::endl;
+      if (!isMainTrigger) {
+	std::cout << "HLT filter for Mu20 " << MainTrigger << " not found" << std::endl;
 	return(-1);
       }
       if (!isMuon17Tau20MuLegA) {
@@ -705,7 +707,7 @@ int main(int argc, char * argv[]) {
 
 
       //mu_index=muons[0];
-      FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, SelectionSign, mu_index,el_index,tau_index);
+      FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, Channel, mu_index,el_index,tau_index);
       CFCounter[iCut]+= weight;
       iCFCounter[iCut]++;
       iCut++;
@@ -788,26 +790,28 @@ int main(int argc, char * argv[]) {
 
    //  cout<< " Lets check  here "<<mu_index <<" tau_index "<<tau_index <<" isLowIsoTau "<<isLowIsoTau<<"  isLowIsoMu "<<isLowIsoMu<<" isHighIsoMu  "<<isHighIsoMu<<"  isHighIsoTau  "<<isHighIsoTau<<"  A   "<< regionA<<"  B  "<<regionB<<" C "<<regionC<<"  D  "<<regionD<<" invertMu "<<InvertMuIso<<" InvertTauIso "<<InvertTauIso<<"  Charge "<<Sign<<" q "<<q<<" tauIso "<<analysisTree.tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[tau_index]<<" muIso "<<relIso<< "  invertMu ? "<<InvertMuIso<< " InverTau ? "<<InvertTauIso<<"  "<<iEntry<<" Region Category "<<Region<<"   "<<TStrName<<endl; 
  
-     FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, SelectionSign, mu_index,el_index,tau_index);
+     FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, Channel, mu_index,el_index,tau_index);
       CFCounter[iCut]+= weight;
       iCFCounter[iCut]++;
       iCut++;
 
 
-      bool isMu20 = false;
+
+	//cout<<"  HOW MANY MUONS DO I HAVE ??  "<<muons.size()<<endl;
+	/*
+      isMainTrigger = false;
       bool isMu27 = false;
       bool isMuTau_MuLegA = false;
       bool isMuTau_MuLegB = false;
       bool isMuTau_TauLegA = false;
       bool isMuTau_TauLegB = false;
       for (unsigned int im=0; im<muons.size(); ++im) {
-	isMu20 = false;
+	isMainTrigger = false;
 	isMu27 = false;
 	isMuTau_MuLegA = false;
 	isMuTau_MuLegB = false;
         unsigned int mIndex  = muons.at(im);
 
-	/*
 	  double neutralHadIsoMu = analysisTree.muon_neutralHadIso[mIndex];
 	  double photonIsoMu = analysisTree.muon_photonIso[mIndex];
 	  double chargedHadIsoMu = analysisTree.muon_chargedHadIso[mIndex];
@@ -825,15 +829,17 @@ int main(int argc, char * argv[]) {
 	*/
 
 	for (unsigned int iT=0; iT<analysisTree.trigobject_count; ++iT) {
-	  if (analysisTree.trigobject_filters[iT][nMuon20Leg]) { // Mu20 Leg
-	    double dRtrig = deltaR(analysisTree.muon_eta[mIndex],analysisTree.muon_phi[mIndex],
+	  if (analysisTree.trigobject_filters[iT][nMainTrigger]) { // Mu17 Leg
+	    double dRtrig = deltaR(analysisTree.muon_eta[mu_index],analysisTree.muon_phi[mu_index],
 				  analysisTree.trigobject_eta[iT],analysisTree.trigobject_phi[iT]);
 	    if (dRtrig>deltaRTrigMatch) continue;
-	  if (analysisTree.trigobject_filters[iT][nMuon20Leg] && analysisTree.trigobject_pt[iT]>24) 
-	      isMu20 = true;
+	 //cout<< " "<<analysisTree.muon_pt[mu_index]<<"   "<<analysisTree.trigobject_pt[iT]<<endl;
+	    //if (!isData && analysisTree.trigobject_filters[iT][nMainTrigger] && analysisTree.trigobject_pt[iT]>18) 
+	      isMainTrigger = true;
 	    
 	  }
-
+	}
+	/*
 	  if (analysisTree.trigobject_filters[iT][nMuon17Tau20MuLegA]) { // Mu27 Leg
 	    double dRtrig = deltaR(analysisTree.muon_eta[mIndex],analysisTree.muon_phi[mIndex],
 				  analysisTree.trigobject_eta[iT],analysisTree.trigobject_phi[iT]);
@@ -851,15 +857,21 @@ int main(int argc, char * argv[]) {
 	      isMuTau_MuLegB = true;
 	    
 	  }
-	}
+	*/
 		
 	
-	bool passedTrigger = isMu20 || (isMuTau_MuLegA && isMuTau_MuLegB);
+	bool passedTrigger = isMainTrigger ;//|| (isMuTau_MuLegA && isMuTau_MuLegB);
 	if (!passedTrigger) continue;
-	//if ((!isMu20 && !isMu27) || (!isMuTau_MuLegA && !isMuTau_MuLegB) ) continue;
-     	//if ((!isMu20 ) && (!isMuTau_MuLegA && !isMuTau_MuLegB) ) continue;
 
+	double dR = deltaR(analysisTree.tau_eta[tau_index],analysisTree.tau_phi[tau_index],
+			analysisTree.muon_eta[mu_index],analysisTree.muon_phi[mu_index]);
 
+      	if (dR<dRleptonsCutmutau) continue;
+
+	//if ((!isMainTrigger && !isMu27) || (!isMuTau_MuLegA && !isMuTau_MuLegB) ) continue;
+     	//if ((!isMainTrigger ) && (!isMuTau_MuLegA && !isMuTau_MuLegB) ) continue;
+
+	/*
         for (unsigned int it=0; it<tau.size(); ++it) {
 	  isMuTau_TauLegA = false;
 	  isMuTau_TauLegB = false;
@@ -883,35 +895,32 @@ int main(int argc, char * argv[]) {
 	      
 	    } 
 	  }
-	double dR = deltaR(analysisTree.tau_eta[tIndex],analysisTree.tau_phi[tIndex],
-			analysisTree.muon_eta[mIndex],analysisTree.muon_phi[mIndex]);
-
-      	if (dR<dRleptonsCutmutau) continue;
 	
 
-	//if (   ( (isMu20) || (isMu27) )  || ( (isMuTau_MuLegA && isMuTau_MuLegB) && (isMuTau_TauLegA && isMuTau_TauLegB) ) ) trigAccept=true;
-     	//if ((!isMu20 ) && (!isMuTau_MuLegA || !isMuTau_MuLegB) ) continue;
+	//if (   ( (isMainTrigger) || (isMu27) )  || ( (isMuTau_MuLegA && isMuTau_MuLegB) && (isMuTau_TauLegA && isMuTau_TauLegB) ) ) trigAccept=true;
+     	//if ((!isMainTrigger ) && (!isMuTau_MuLegA || !isMuTau_MuLegB) ) continue;
   
    	bool passedMuTauTriggerMuLeg	= isMuTau_MuLegA && isMuTau_MuLegB;
    	bool passedMuTauTriggerTauLeg   = isMuTau_TauLegA && isMuTau_TauLegB;
-	bool OnlyMuTrigger = isMu20 && (!passedMuTauTriggerMuLeg && !passedMuTauTriggerTauLeg);
+	bool OnlyMuTrigger = isMainTrigger && (!passedMuTauTriggerMuLeg && !passedMuTauTriggerTauLeg);
 
-      	//if ( (isMu20 || isMu27) && ( (!isMuTau_MuLegA && !isMuTau_MuLegB) && (!isMuTau_TauLegA && !isMuTau_TauLegB) )  && 
-//         if ( (isMu20 ) && ( (!isMuTau_MuLegA && !isMuTau_MuLegB) && (!isMuTau_TauLegA && !isMuTau_TauLegB) )  && 
+      	//if ( (isMainTrigger || isMu27) && ( (!isMuTau_MuLegA && !isMuTau_MuLegB) && (!isMuTau_TauLegA && !isMuTau_TauLegB) )  && 
+//         if ( (isMainTrigger ) && ( (!isMuTau_MuLegA && !isMuTau_MuLegB) && (!isMuTau_TauLegA && !isMuTau_TauLegB) )  && 
 	if (OnlyMuTrigger  && ( analysisTree.muon_pt[mu_index] < ptMuonHighCut || fabs(analysisTree.muon_eta[mu_index]) > 2.1) ) continue;
 	
-
+	
 //	trigAccept=true;
 
 //	if (!trigAccept) continue;
 	
 	}//taus
-      	
 
       }//muons 
+      	*/
 	
-	//cout<<" mu_index "<<mu_index<<"  "<<isMu20<<"  "<<isMu27<<"  "<<isMuTau_MuLegA<<"  "<<isMuTau_MuLegB<<"  "<<isMuTau_TauLegA<<"  "<<isMuTau_TauLegB<<endl;
+	//cout<<" mu_index "<<mu_index<<"  "<<isMainTrigger<<"  "<<isMu27<<"  "<<isMuTau_MuLegA<<"  "<<isMuTau_MuLegB<<"  "<<isMuTau_TauLegA<<"  "<<isMuTau_TauLegB<<endl;
       
+
 	  double dataMu1 = 1;
 	  double mcMu1 = 1;
 	if (!isData && applyLeptonSF) {
@@ -935,8 +944,8 @@ int main(int argc, char * argv[]) {
 
 
       //Trigger
-      //FillMainHists(iCut, weight, ElMV, MuMV, JetsMV,METV,analysisTree, SelectionSign, mu_index,el_index,tau_index);
-      FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, SelectionSign, mu_index,el_index,tau_index);
+      //FillMainHists(iCut, weight, ElMV, MuMV, JetsMV,METV,analysisTree, Channel, mu_index,el_index,tau_index);
+      FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, Channel, mu_index,el_index,tau_index);
       CFCounter[iCut]+= weight;
       iCFCounter[iCut]++;
       iCut++;
@@ -989,7 +998,7 @@ int main(int argc, char * argv[]) {
       }
       if (MuVeto) continue;
 
-      FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, SelectionSign, mu_index,el_index,tau_index);
+      FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, Channel, mu_index,el_index,tau_index);
       CFCounter[iCut]+= weight;
       iCFCounter[iCut]++;
       iCut++;
@@ -1048,7 +1057,7 @@ int main(int argc, char * argv[]) {
       if (ThirdLeptVeto) continue;
 
 
-      FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, SelectionSign, mu_index,el_index,tau_index);
+      FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, Channel, mu_index,el_index,tau_index);
       CFCounter[iCut]+= weight;
       iCFCounter[iCut]++;
       iCut++;
@@ -1090,7 +1099,7 @@ int main(int argc, char * argv[]) {
       
 
       if (JetsMV.size() >3) continue;
-      FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, SelectionSign, mu_index,el_index,tau_index);
+      FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, Channel, mu_index,el_index,tau_index);
       CFCounter[iCut]+= weight;
       iCFCounter[iCut]++;
       iCut++;
@@ -1104,7 +1113,7 @@ int main(int argc, char * argv[]) {
       //if (JetsPt30C ) continue;
       //if (JetsMV.size() >3) continue;
     /*
-      FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, SelectionSign, mu_index,el_index,tau_index);
+      FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, Channel, mu_index,el_index,tau_index);
       CFCounter[iCut]+= weight;
       iCFCounter[iCut]++;
       iCut++;
@@ -1126,7 +1135,7 @@ int main(int argc, char * argv[]) {
       
       if (btagged ) continue;
 	
-      FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, SelectionSign, mu_index,el_index,tau_index);
+      FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, Channel, mu_index,el_index,tau_index);
       CFCounter[iCut]+= weight;
       iCFCounter[iCut]++;
       iCut++;
@@ -1139,7 +1148,7 @@ int main(int argc, char * argv[]) {
 
       TLorentzVector diL = MuMV.at(mu_index) + TauMV.at(tau_index);
       if ( diL.M() <80 && diL.M()>40 ) continue;
-      FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, SelectionSign, mu_index,el_index,tau_index);
+      FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, Channel, mu_index,el_index,tau_index);
       CFCounter[iCut]+= weight;
       iCFCounter[iCut]++;
       iCut++;
@@ -1163,7 +1172,7 @@ int main(int argc, char * argv[]) {
       // MtH->Fill(MT,weight);
       
       if (ETmiss < 85) continue;
-      FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, SelectionSign, mu_index,el_index,tau_index);
+      FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, Channel, mu_index,el_index,tau_index);
       CFCounter[iCut]+= weight;
       iCFCounter[iCut]++;
       iCut++;
@@ -1171,13 +1180,13 @@ int main(int argc, char * argv[]) {
        double MTv = mT(diL,METV);
      /* if (ETmiss < 100) continue;
       //if (MTv>80 && MTv<120) continue;
-      FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, SelectionSign, mu_index,el_index,tau_index);
+      FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, Channel, mu_index,el_index,tau_index);
       CFCounter[iCut]+= weight;
       iCFCounter[iCut]++;
       iCut++;
 
       if (ETmiss < 120) continue;
-      FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, SelectionSign, mu_index,el_index,tau_index);
+      FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, Channel, mu_index,el_index,tau_index);
       CFCounter[iCut]+= weight;
       iCFCounter[iCut]++;
       iCut++;
@@ -1193,13 +1202,13 @@ int main(int argc, char * argv[]) {
       
       if (dRr<1.5 || dRr>4) continue;
       
-      FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, SelectionSign, mu_index,el_index,tau_index);
+      FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, Channel, mu_index,el_index,tau_index);
       CFCounter[iCut]+= weight;
       iCFCounter[iCut]++;
       iCut++;
       /*
       if (dPhi<1) continue; 
-      FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, SelectionSign, mu_index,el_index,tau_index);
+      FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, Channel, mu_index,el_index,tau_index);
       CFCounter[iCut]+= weight;
       iCFCounter[iCut]++;
       iCut++;
@@ -1232,7 +1241,7 @@ int main(int argc, char * argv[]) {
   ofstream tfile;
   // TString outname = argv[argc-1];
   TString outname=argv[2];
-  TString textfilename = "cutflow_"+outname+"_"+SelectionSign+"_"+argv[3]+".txt";
+  TString textfilename = "cutflow_"+outname+"_"+Channel+"_"+argv[3]+".txt";
 //  tfile.open(textfilename);
 //  tfile << "########################################" << endl;
   for(int ci = 0; ci < CutNumb; ci++)
@@ -1274,7 +1283,7 @@ int main(int argc, char * argv[]) {
   std::cout << "Total number of selected events = " << selEvents << std::endl;
   std::cout << std::endl;
   
-  file->cd(SelectionSign.c_str());
+  file->cd(Channel.c_str());
   hxsec->Fill(XSec);
   hxsec->Write();
   inputEventsH->Write();

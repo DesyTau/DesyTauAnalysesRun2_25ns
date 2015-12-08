@@ -40,13 +40,13 @@ process.options = cms.untracked.PSet(
 
 # How many events to process
 process.maxEvents = cms.untracked.PSet( 
-   input = cms.untracked.int32(10000)
+   input = cms.untracked.int32(100)
 )
 
 
 #configurable options =======================================================================
 runOnData=isData #data/MC switch
-usePrivateSQlite=False #use external JECs (sqlite file) /// OUTDATED for 25ns
+usePrivateSQlite=True #use external JECs (sqlite file) ///
 useHFCandidates=True #create an additionnal NoHF slimmed MET collection if the option is set to false  == existing as slimmedMETsNoHF
 applyResiduals=True #application of residual corrections. Have to be set to True once the 13 TeV residual corrections are available. False to be kept meanwhile. Can be kept to False later for private tests or for analysis checks and developments (not the official recommendation!).
 #===================================================================
@@ -60,7 +60,7 @@ from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag
 
 
 if runOnData:
-  process.GlobalTag.globaltag = '74X_dataRun2_v2'
+  process.GlobalTag.globaltag = '74X_dataRun2_v5'
   if isPRv4:
       process.GlobalTag.globaltag = '74X_dataRun2_Prompt_v4'
   if isRepr05Oct:
@@ -77,9 +77,9 @@ if usePrivateSQlite:
     from CondCore.DBCommon.CondDBSetup_cfi import *
     import os
     if runOnData:
-      era="Summer15_25nsV2"
+      era="Summer15_25nsV6_DATA"
     else:
-      era="Summer15_25nsV2"
+      era="Summer15_25nsV5_MC"
     dBFile = os.path.expandvars("$CMSSW_BASE/src/DesyTauAnalyses/NTupleMaker/data/"+era+".db")
     process.jec = cms.ESSource("PoolDBESSource",CondDBSetup,
                                connect = cms.string( "sqlite_file://"+dBFile ),
@@ -101,7 +101,6 @@ if usePrivateSQlite:
 ### =====================================================================================================
 
 
-"""
 ### ReRun JEC ===========================================================================================
 
 from PhysicsTools.PatAlgos.producersLayer1.jetUpdater_cff import patJetCorrFactorsUpdated
@@ -117,12 +116,11 @@ process.patJetsReapplyJEC = patJetsUpdated.clone(
   jetSource = cms.InputTag("slimmedJets"),
   jetCorrFactorsSource = cms.VInputTag(cms.InputTag("patJetCorrFactorsReapplyJEC"))
   )
-"""
 
 ### END ReRun JEC ======================================================================================
 
 ### PFMET Corrections ==================================================================================
-"""
+
 ### ---------------------------------------------------------------------------
 ### Removing the HF from the MET computation
 ### ---------------------------------------------------------------------------
@@ -142,13 +140,13 @@ from PhysicsTools.PatUtils.tools.runMETCorrectionsAndUncertainties import runMet
 jecUncertaintyFile=""
 if runOnData:
   if is25ns:
-    jecUncertaintyFile="DesyTauAnalyses/NTupleMaker/data/Summer15_25nsV2/Summer15_25nsV2_DATA_UncertaintySources_AK4PFchs.txt"
+    jecUncertaintyFile="DesyTauAnalyses/NTupleMaker/data/Summer15_25nsV6/Summer15_25nsV6_DATA_UncertaintySources_AK4PFchs.txt"
     print ' JECUNCERTAINTY  ',jecUncertaintyFile
   else:
     jecUncertaintyFile="DesyTauAnalyses/NTupleMaker/data/Summer15_50nsV5/Summer15_50nsV5_DATA_UncertaintySources_AK4PFchs.txt"    
 else:
   if is25ns:
-    jecUncertaintyFile="DesyTauAnalyses/NTupleMaker/data/Summer15_25nsV2/Summer15_25nsV2_MC_UncertaintySources_AK4PFchs.txt"
+    jecUncertaintyFile="DesyTauAnalyses/NTupleMaker/data/Summer15_25nsV5/Summer15_25nsV5_MC_UncertaintySources_AK4PFchs.txt"
     print ' JECUNCERTAINTY  ',jecUncertaintyFile
   else:
     jecUncertaintyFile="DesyTauAnalyses/NTupleMaker/data/Summer15_50nsV5/Summer15_50nsV5_MC_UncertaintySources_AK4PFchs.txt"
@@ -186,7 +184,6 @@ if not applyResiduals:
           process.shiftedPatJetEnUpNoHF.jetCorrLabelUpToL3Res = cms.InputTag("ak4PFCHSL1FastL2L3Corrector")
 
 ### END PFMET CORRECTIONS ==============================================================================
-"""
 
 # Electron ID ==========================================================================================
 
@@ -738,7 +735,7 @@ process.p = cms.Path(
   process.METSignificance*
 #  process.mvaMetSequence *
   process.egmGsfElectronIDSequence * 
-#  process.patJetCorrFactorsReapplyJEC * process.patJetsReapplyJEC *
+  process.patJetCorrFactorsReapplyJEC * process.patJetsReapplyJEC *
   process.HBHENoiseFilterResultProducer* #produces HBHE bools baseline
   process.ApplyBaselineHBHENoiseFilter*  #reject events based 
   #process.ApplyBaselineHBHEISONoiseFilter*  #reject events based -- disable the module, performance is being investigated fu
