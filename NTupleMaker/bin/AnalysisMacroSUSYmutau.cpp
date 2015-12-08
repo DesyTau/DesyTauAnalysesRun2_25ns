@@ -39,78 +39,79 @@ int main(int argc, char * argv[]) {
 
   // **** configuration
   Config cfg(argv[1]);
-  string SelectionSign="mutau";
+  string Channel="mutau";
 
   // kinematic cuts on electrons
   const bool isData = cfg.get<bool>("IsData");
   const bool applyPUreweighting = cfg.get<bool>("ApplyPUreweighting");
   const bool applyLeptonSF = cfg.get<bool>("ApplyLeptonSF");
-  const Float_t ptElectronLowCut   = cfg.get<Float_t>("ptElectronLowCut");
-  const Float_t ptElectronHighCut  = cfg.get<Float_t>("ptElectronHighCut");
-  const Float_t etaElectronCut     = cfg.get<Float_t>("etaElectronCut");
-  const Float_t dxyElectronCut     = cfg.get<Float_t>("dxyElectronCut");
-  const Float_t dzElectronCut      = cfg.get<Float_t>("dzElectronCut");
-  const Float_t isoElectronLowCut  = cfg.get<Float_t>("isoElectronLowCut");
-  const Float_t isoElectronHighCut = cfg.get<Float_t>("isoElectronHighCut");
+  const bool InvertTauIso = cfg.get<bool>("InvertTauIso");
+  const bool InvertMuIso = cfg.get<bool>("InvertMuIso");
+  const double ptElectronLowCut   = cfg.get<double>("ptElectronLowCut");
+  const double ptElectronHighCut  = cfg.get<double>("ptElectronHighCut");
+  const double etaElectronCut     = cfg.get<double>("etaElectronCut");
+  const double dxyElectronCut     = cfg.get<double>("dxyElectronCut");
+  const double dzElectronCut      = cfg.get<double>("dzElectronCut");
+  const double isoElectronLowCut  = cfg.get<double>("isoElectronLowCut");
+  const double isoElectronHighCut = cfg.get<double>("isoElectronHighCut");
   const bool applyElectronId     = cfg.get<bool>("ApplyElectronId");
 
   // vertex cuts
-  const float ndofVertexCut  = cfg.get<float>("NdofVertexCut");   
-  const float zVertexCut     = cfg.get<float>("ZVertexCut");
-  const float dVertexCut     = cfg.get<float>("DVertexCut");
+  const double ndofVertexCut  = cfg.get<double>("NdofVertexCut");   
+  const double zVertexCut     = cfg.get<double>("ZVertexCut");
+  const double dVertexCut     = cfg.get<double>("DVertexCut");
   // kinematic cuts on muons
-  const Float_t ptMuonLowCuT   = cfg.get<Float_t>("ptMuonLowCut");
-  const Float_t ptMuonHighCut  = cfg.get<Float_t>("ptMuonHighCut");
-  const Float_t etaMuonCut     = cfg.get<Float_t>("etaMuonCut");
-  const Float_t dxyMuonCut     = cfg.get<Float_t>("dxyMuonCut");
-  const Float_t dzMuonCut      = cfg.get<Float_t>("dzMuonCut");
-  const Float_t isoMuonLowCut  = cfg.get<Float_t>("isoMuonLowCut");
-  const Float_t isoMuonHighCut = cfg.get<Float_t>("isoMuonHighCut");
+  const double ptMuonLowCuT   = cfg.get<double>("ptMuonLowCut");
+  const double ptMuonHighCut  = cfg.get<double>("ptMuonHighCut");
+  const double etaMuonCut     = cfg.get<double>("etaMuonCut");
+  const double dxyMuonCut     = cfg.get<double>("dxyMuonCut");
+  const double dzMuonCut      = cfg.get<double>("dzMuonCut");
+  const double isoMuonLowCut  = cfg.get<double>("isoMuonLowCut");
+  const double isoMuonHighCut = cfg.get<double>("isoMuonHighCut");
   const bool applyMuonId     = cfg.get<bool>("ApplyMuonId");
  
-  const Float_t ptMuonLowCutmtau = cfg.get<Float_t>("ptMuonLowCutmtau"); 
-  const Float_t etaMuonCutmtau = cfg.get<Float_t>("etaMuonCutmtau"); 
+  const double ptMuonLowCutmtau = cfg.get<double>("ptMuonLowCutmtau"); 
+  const double etaMuonCutmtau = cfg.get<double>("etaMuonCutmtau"); 
 
 
-  const string Mu22Leg  = cfg.get<string>("Mu22Leg");
+  string TrigLeg  ;
+   if (!isData) TrigLeg  = cfg.get<string>("Mu17LegMC");
+   if (isData) TrigLeg  = cfg.get<string>("Mu18LegData");
   const string Mu17Tau20MuLegA  = cfg.get<string>("Mu17Tau20MuLegA");
   const string Mu17Tau20MuLegB  = cfg.get<string>("Mu17Tau20MuLegB");
   const string Mu17Tau20TauLegA  = cfg.get<string>("Mu17Tau20TauLegA");
   const string Mu17Tau20TauLegB  = cfg.get<string>("Mu17Tau20TauLegB");
 
+  const string Region  = cfg.get<string>("Region");
+  const string Sign  = cfg.get<string>("Sign");
 
 
-  const Float_t leadchargedhadrcand_dz = cfg.get<Float_t>("leadchargedhadrcand_dz");
-  const Float_t leadchargedhadrcand_dxy = cfg.get<Float_t>("leadchargedhadrcand_dxy");
+  const double leadchargedhadrcand_dz = cfg.get<double>("leadchargedhadrcand_dz");
+  const double leadchargedhadrcand_dxy = cfg.get<double>("leadchargedhadrcand_dxy");
 
-
-  //  const float ndofVertexCut  = cfg.get<float>("NdofVertexCut");  
- 
-  //  const float zVertexCut     = cfg.get<float>("ZVertexCut");
-  //  const float dVertexCut     = cfg.get<float>("DVertexCut");
 
 
   // kinematic cuts on Jets
-  const Float_t etaJetCut   = cfg.get<Float_t>("etaJetCut");
-  const Float_t ptJetCut   = cfg.get<Float_t>("ptJetCut");
+  const double etaJetCut   = cfg.get<double>("etaJetCut");
+  const double ptJetCut   = cfg.get<double>("ptJetCut");
   
   
   // topological cuts
-  const Float_t dRleptonsCutmutau   = cfg.get<Float_t>("dRleptonsCutmutau");
-  const Float_t dZetaCut       = cfg.get<Float_t>("dZetaCut");
-  const float deltaRTrigMatch = cfg.get<float>("DRTrigMatch");
+  const double dRleptonsCutmutau   = cfg.get<double>("dRleptonsCutmutau");
+  const double dZetaCut       = cfg.get<double>("dZetaCut");
+  const double deltaRTrigMatch = cfg.get<double>("DRTrigMatch");
   const bool oppositeSign    = cfg.get<bool>("oppositeSign");
   const bool isIsoR03 = cfg.get<bool>("IsIsoR03");
  
   // tau
-  const Float_t taupt    = cfg.get<Float_t>("taupt");
-  const Float_t taueta    = cfg.get<Float_t>("taueta");
-  const Float_t decayModeFinding    = cfg.get<Float_t>("decayModeFinding");
-  const Float_t   decayModeFindingNewDMs  = cfg.get<Float_t>("decayModeFindingNewDMs");
-  const Float_t   againstElectronVLooseMVA5  = cfg.get<Float_t>("againstElectronVLooseMVA5");
-  const Float_t   againstMuonTight3  = cfg.get<Float_t>("againstMuonTight3");
-  const Float_t   vertexz =  cfg.get<Float_t>("vertexz");
-  const Float_t   byCombinedIsolationDeltaBetaCorrRaw3Hits = cfg.get<Float_t>("byCombinedIsolationDeltaBetaCorrRaw3Hits");
+  const double taupt    = cfg.get<double>("taupt");
+  const double taueta    = cfg.get<double>("taueta");
+  const double decayModeFinding    = cfg.get<double>("decayModeFinding");
+  const double   decayModeFindingNewDMs  = cfg.get<double>("decayModeFindingNewDMs");
+  const double   againstElectronVLooseMVA5  = cfg.get<double>("againstElectronVLooseMVA5");
+  const double   againstMuonTight3  = cfg.get<double>("againstMuonTight3");
+  const double   vertexz =  cfg.get<double>("vertexz");
+  const double   byCombinedIsolationDeltaBetaCorrRaw3Hits = cfg.get<double>("byCombinedIsolationDeltaBetaCorrRaw3Hits");
   
 
   const unsigned int RunRangeMin = cfg.get<unsigned int>("RunRangeMin");
@@ -127,7 +128,7 @@ int main(int argc, char * argv[]) {
   const string muonSfMcBarrel = cfg.get<string>("MuonSfMcBarrel");
   const string muonSfMcEndcap = cfg.get<string>("MuonSfMcEndcap");
   
-  TString Muon22Leg(Mu22Leg);
+  TString MainTrigger(TrigLeg);
   TString Muon17Tau20MuLegA (Mu17Tau20MuLegA );
   TString Muon17Tau20MuLegB (Mu17Tau20MuLegB );
   TString Muon17Tau20TauLegA (Mu17Tau20TauLegA );
@@ -135,9 +136,9 @@ int main(int argc, char * argv[]) {
 
 
 
-  const Float_t Lumi   = cfg.get<Float_t>("Lumi");
-  const Float_t bTag   = cfg.get<Float_t>("bTag");
-  const Float_t metcut = cfg.get<Float_t>("metcut");
+  const double Lumi   = cfg.get<double>("Lumi");
+  const double bTag   = cfg.get<double>("bTag");
+  const double metcut = cfg.get<double>("metcut");
  
   CutList.clear();
   CutList.push_back("No cut");
@@ -185,10 +186,11 @@ int main(int argc, char * argv[]) {
   	if ( argv[2] == st1) {ChiMass=100;mIntermediate=200;}
 	else if (argv[2] == st2) {ChiMass=200;mIntermediate=500;}
 	*/
+      if (isData) XSec=1.;
 	ChiMass=0.0;
     }
 
-  if (XSec<0) {cout<<" Something probably wrong with the xsecs...please check  - the input was "<<argv[2]<<endl;return 0;}
+  if (XSec<0&& !isData) {cout<<" Something probably wrong with the xsecs...please check  - the input was "<<argv[2]<<endl;return 0;}
 
   std::vector<unsigned int> allRuns; allRuns.clear();
 
@@ -205,14 +207,18 @@ int main(int argc, char * argv[]) {
   string cmsswBase = (getenv ("CMSSW_BASE"));
 
   // reading vertex weights
-  TFile * fileDataNVert = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/"+vertDataFileName);
-  TFile * fileMcNVert   = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/"+vertMcFileName);
+ // TFile * fileDataNVert = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/"+vertDataFileName);
+ // TFile * fileMcNVert   = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/"+vertMcFileName);
+  TFile * fileDataNVert = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/SingleMuon_Run2015D_Stau.root");
+ TFile * fileMcNVert = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/MC.root");
+//hardcoded
+  //TH1D * vertexDataH = (TH1D*)fileDataNVert->Get(TString(vertHistName));
+  //TH1D * vertexMcH   = (TH1D*)fileMcNVert->Get(TString(vertHistName));
+  TH1D * vertexDataH = (TH1D*)fileDataNVert->Get("mutau/npv_0");
+  TH1D * vertexMcH   = (TH1D*)fileMcNVert->Get("mutau/npv_0");
 
-  TH1F * vertexDataH = (TH1F*)fileDataNVert->Get(TString(vertHistName));
-  TH1F * vertexMcH   = (TH1F*)fileMcNVert->Get(TString(vertHistName));
-
-  float normVertexData = vertexDataH->GetSumOfWeights();
-  float normVertexMc   = vertexMcH->GetSumOfWeights();
+  double normVertexData = vertexDataH->GetSumOfWeights();
+  double normVertexMc   = vertexMcH->GetSumOfWeights();
 
   vertexDataH->Scale(1/normVertexData);
   vertexMcH->Scale(1/normVertexMc);
@@ -236,7 +242,7 @@ int main(int argc, char * argv[]) {
   dataEffEndcap = hEffEndcapData->GetY();
   mcEffBarrel = hEffBarrelMC->GetY();
   mcEffEndcap = hEffEndcapMC->GetY();
-  Float_t Weight=0;
+  double Weight=0;
   int nTotalFiles = 0;
   int iCut=0;
   double CFCounter[CutNumb];
@@ -256,13 +262,19 @@ int main(int argc, char * argv[]) {
   std::string ntupleName("makeroottree/AC1B");
   
   TString era=argv[3];
-  TString TStrName(rootFileName);
+  TString invMu, invTau;
+  if(InvertMuIso) invMu = "_InvMuIso_";
+  if(InvertTauIso) invMu = "_InvTauIso_";
+
+  TString TStrName(rootFileName+invMu+invTau+"_"+Region+"_"+Sign);
   std::cout <<TStrName <<std::endl;  
 
   // output fileName with histograms
-  TFile * file = new TFile(era+"/"+TStrName+TString(".root"),"update");
-  file->mkdir(SelectionSign.c_str());
-  file->cd(SelectionSign.c_str());
+  TFile * file ;
+  if (isData) file = new TFile(era+"/"+TStrName+TString("_DataDriven.root"),"update");
+  if (!isData) file = new TFile(era+"/"+TStrName+TString(".root"),"update");
+  file->mkdir(Channel.c_str());
+  file->cd(Channel.c_str());
 
   int nFiles = 0;
   int nEvents = 0;
@@ -271,6 +283,11 @@ int main(int argc, char * argv[]) {
   int selEventsAllMuons = 0;
   int selEventsIdMuons = 0;
   int selEventsIsoMuons = 0;
+      bool lumi=false;
+      bool isLowIsoMu=false;
+      bool isHighIsoMu = false;
+      bool isLowIsoTau=false;
+      bool isHighIsoTau = false;
 
 
   std::string dummy;
@@ -321,7 +338,7 @@ int main(int argc, char * argv[]) {
 
     AC1B analysisTree(_tree);
     
-    Float_t genweights=1;
+    float genweights=1;
     
     if(!isData) 
     {
@@ -332,14 +349,13 @@ int main(int argc, char * argv[]) {
     Long64_t numberOfEntriesInit = genweightsTree->GetEntries();
     for (Long64_t iEntryInit=0; iEntryInit<numberOfEntriesInit; iEntryInit++) { 
       genweightsTree->GetEntry(iEntryInit);
-	histWeights->Fill(1,genweights);  
-	histWeightsH->Fill(float(0),genweights);
+	histWeightsH->Fill(double(0),genweights);
     }
  	}
 
     Long64_t numberOfEntries = analysisTree.GetEntries();
     //numberOfEntries = 1000;
-    Float_t weight=1;
+    double weight=1;
 
     std::cout << "      number of entries in Tree = " << numberOfEntries <<" starting weight "<<weight<< std::endl;
     // numberOfEntries = 1000;
@@ -356,22 +372,34 @@ int main(int argc, char * argv[]) {
       if (nEvents%50000==0) 
 	cout << "      processed " << nEvents << " events" << endl; 
      
-         
+      if (fabs(analysisTree.primvertex_z)>zVertexCut) continue;
+      if (analysisTree.primvertex_ndof<ndofVertexCut) continue;
+      double dVertex = (analysisTree.primvertex_x*analysisTree.primvertex_x+
+		       analysisTree.primvertex_y*analysisTree.primvertex_y);
+      if (dVertex>dVertexCut) continue;
+      if (analysisTree.primvertex_count<2) continue;  
+
       //isData= false;
       bool lumi=false;
+      isLowIsoMu=false;
+      isHighIsoMu = false;
+      isLowIsoTau=false;
+      isHighIsoTau = false;
       if (!isData && XSec !=1 )  { 
 	      
         //cout<<"  "<<genweights<<"  "<<numberOfEntries<<endl;
 	//histWeights->Fill(1,analysisTree.genweight);  
 	weight *= analysisTree.genweight;
+	histWeights->Fill(1,weight);  
         //cout<<"  weight from init "<<genweights<< "  "<<analysisTree.genweight<<"  "<<weight<<endl;
 	lumi=true;
       } 
 
-      if (isData && XSec == 1)  {
+      if (isData)  {
+	XSec = 1.;
 	histWeights->Fill(1);
-	histWeightsH->Fill(float(1));
-
+	histWeightsH->Fill(double(1));
+	histRuns->Fill(analysisTree.event_run);
       // cout<<"  "<<histWeights->GetBinContent(1)<<"  "<<histWeights2->GetSumOfWeights()<<"  "<<weight<<endl; //(TH1D*)file_->Get("makeroottree/histoWeights");
 
 	//if (analysisTree.event_run<RunRangeMin || analysisTree.event_run>RunRangeMax)
@@ -438,6 +466,7 @@ int main(int argc, char * argv[]) {
 	  }
     
       }
+      //lumi=true;
       if (!lumi) continue;
       JetsMV.clear();
       ElMV.clear();
@@ -449,29 +478,24 @@ int main(int argc, char * argv[]) {
       el_index=-1;
       
 
-      FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, SelectionSign, mu_index,el_index,tau_index);
+      FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, Channel, mu_index,el_index,tau_index);
       CFCounter[iCut]+= weight;
       iCFCounter[iCut]++;
       iCut++;
 	
 	if (!isData && applyPUreweighting) {
 	  int binNvert = vertexDataH->FindBin(analysisTree.primvertex_count);
-	  float_t dataNvert = vertexDataH->GetBinContent(binNvert);
-	  float_t mcNvert = vertexMcH->GetBinContent(binNvert);
+	  double_t dataNvert = vertexDataH->GetBinContent(binNvert);
+	  double_t mcNvert = vertexMcH->GetBinContent(binNvert);
 	  if (mcNvert < 1e-10){mcNvert=1e-10;}
-	  float_t vertWeight = dataNvert/mcNvert;
+	  double_t vertWeight = dataNvert/mcNvert;
 	  weight *= vertWeight;
 	//  	  cout << "NVert = " << analysisTree.primvertex_count << "   weight = " << vertWeight << endl;
 	}
 
-      if (fabs(analysisTree.primvertex_z)>zVertexCut) continue;
-      if (analysisTree.primvertex_ndof<ndofVertexCut) continue;
-      float dVertex = (analysisTree.primvertex_x*analysisTree.primvertex_x+
-		       analysisTree.primvertex_y*analysisTree.primvertex_y);
-      if (dVertex>dVertexCut) continue;
 
 
-      Float_t MET = sqrt ( analysisTree.pfmet_ex*analysisTree.pfmet_ex + analysisTree.pfmet_ey*analysisTree.pfmet_ey);
+      double MET = sqrt ( analysisTree.pfmet_ex*analysisTree.pfmet_ex + analysisTree.pfmet_ey*analysisTree.pfmet_ey);
       
       METV.SetPx(analysisTree.pfmet_ex);	      
       METV.SetPy(analysisTree.pfmet_ey);
@@ -503,11 +527,13 @@ int main(int argc, char * argv[]) {
 
 
       
-      // vector <string> ss; ss.push_back(SelectionSign.c_str());
-      FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, SelectionSign, mu_index,el_index,tau_index);
+      // vector <string> ss; ss.push_back(.c_str());
+      FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, Channel, mu_index,el_index,tau_index);
       CFCounter[iCut]+= weight;
       iCFCounter[iCut]++;
       iCut++;
+
+    //if (!isData && !applyPUreweighting) continue;
       //cout<<"  CFCounter  "<<CFCounter[0]<<"  "<<weight<<endl;
       //continue;
       // hnJets[->Fill(pfjet_count);
@@ -527,11 +553,11 @@ int main(int argc, char * argv[]) {
       // int nGenElectrons = 0;
       // for (unsigned int igen=0; igen<analysisTree.genparticles_count; ++igen) {
 
-      // 	Float_t pxGen = analysisTree.genparticles_px[igen];
-      // 	Float_t pyGen = analysisTree.genparticles_py[igen];
-      // 	Float_t pzGen = analysisTree.genparticles_pz[igen];
-      // 	Float_t etaGen = PtoEta(pxGen,pyGen,pzGen);
-      // 	Float_t ptGen  = PtoPt(pxGen,pyGen);
+      // 	double pxGen = analysisTree.genparticles_px[igen];
+      // 	double pyGen = analysisTree.genparticles_py[igen];
+      // 	double pzGen = analysisTree.genparticles_pz[igen];
+      // 	double etaGen = PtoEta(pxGen,pyGen,pzGen);
+      // 	double ptGen  = PtoPt(pxGen,pyGen);
 
       // 	if (fabs(analysisTree.genparticles_pdgid[igen])==24 && analysisTree.genparticles_status[igen]==62) 
       // 	  indexW = igen;
@@ -561,8 +587,8 @@ int main(int argc, char * argv[]) {
       //selecTable.Fill(1,0, weight );      
       bool trigAccept = false;
       
-      unsigned int nMuon22Leg = 0;
-      bool isMuon22Leg = false;
+      unsigned int nMainTrigger = 0;
+      bool isMainTrigger = false;
       
       
       unsigned int nMuon17Tau20MuLegA = 0;
@@ -582,9 +608,9 @@ int main(int argc, char * argv[]) {
       for (unsigned int i=0; i<nfilters; ++i) {
 	//	std::cout << "HLT Filter : " << i << " = " << analysisTree.run_hltfilters->at(i) << std::endl;
 	TString HLTFilter(analysisTree.run_hltfilters->at(i));
-	if (HLTFilter==Muon22Leg) {
-	  nMuon22Leg = i;
-	  isMuon22Leg = true;
+	if (HLTFilter==MainTrigger) {
+	  nMainTrigger = i;
+	  isMainTrigger = true;
 	}
       
 	if (HLTFilter==Muon17Tau20MuLegA) {
@@ -611,25 +637,25 @@ int main(int argc, char * argv[]) {
       }
 
 
-      if (!isMuon22Leg) {
-	std::cout << "HLT filter " << Muon22Leg << " not found" << std::endl;
+      if (!isMainTrigger) {
+	std::cout << "HLT filter for Mu20 " << MainTrigger << " not found" << std::endl;
 	return(-1);
       }
       if (!isMuon17Tau20MuLegA) {
-	std::cout << "HLT filter " << Muon17Tau20MuLegA << " not found" << std::endl;
+	std::cout << "HLT filter for Mu17LegA " << Muon17Tau20MuLegA << " not found" << std::endl;
 	return(-1);
       }
       if (!isMuon17Tau20MuLegB) {
-	std::cout << "HLT filter " << Muon17Tau20MuLegB << " not found" << std::endl;
+	std::cout << "HLT filter fpr Mu17LegB " << Muon17Tau20MuLegB << " not found" << std::endl;
 	return(-1);
       }
       if (!isMuon17Tau20TauLegA) {
-	std::cout << "HLT filter " << Muon17Tau20TauLegA << " not found" << std::endl;
+	std::cout << "HLT filter TauLegA " << Muon17Tau20TauLegA << " not found" << std::endl;
 	return(-1);
       }
      
       if (!isMuon17Tau20TauLegB) {
-	std::cout << "HLT filter " << Muon17Tau20TauLegB << " not found" << std::endl;
+	std::cout << "HLT filter TauLegB " << Muon17Tau20TauLegB << " not found" << std::endl;
 	return(-1);
       }
       /*
@@ -642,85 +668,88 @@ int main(int argc, char * argv[]) {
 	// vertex cuts
 	if (fabs(analysisTree.primvertex_z)>zVertexCut) continue;
 	if (analysisTree.primvertex_ndof<ndofVertexCut) continue;
-	float dVertex = (analysisTree.primvertex_x*analysisTree.primvertex_x+
+	double dVertex = (analysisTree.primvertex_x*analysisTree.primvertex_x+
 	analysisTree.primvertex_y*analysisTree.primvertex_y);
 	if (dVertex>dVertexCut) continue;
       */
 
       /////now clear the Mu.El.Jets again to fill them again after cleaning
-      /*  MuMV.clear();
-	  ElMV.clear();
-	  TauMV.clear();
-	  LeptMV.clear();
-      */
-      Float_t isoMuMin = 9999;
+        MuMV.clear();
+        ElMV.clear();
+        TauMV.clear();
+        LeptMV.clear();
+
+      double isoMuMin = 9999;
       bool mu_iso=false;
       vector<int> muons; muons.clear();
       for (unsigned int im = 0; im<analysisTree.muon_count; ++im) {
-	muonPtAllH->Fill(analysisTree.muon_pt[im],weight);
 	if (analysisTree.muon_pt[im]<ptMuonLowCuT) continue;
 	if (fabs(analysisTree.muon_eta[im])>etaMuonCut) continue;
 	if (fabs(analysisTree.muon_dxy[im])>dxyMuonCut) continue;
 	if (fabs(analysisTree.muon_dz[im])>dzMuonCut) continue;
 
 
-         Float_t absIso= analysisTree.muon_r03_sumChargedHadronPt[im]
+         double absIso= analysisTree.muon_r03_sumChargedHadronPt[im]
 	            + max(analysisTree.muon_r03_sumNeutralHadronEt[im] + analysisTree.muon_r03_sumPhotonEt[im]
 	            - 0.5 * analysisTree.muon_r03_sumPUPt[im],0.0);
 
 
-	Float_t relIso = absIso/analysisTree.muon_pt[im];
+	double relIso = absIso/analysisTree.muon_pt[im];
  
- /*
-	Float_t absIso = analysisTree.muon_r03_sumChargedHadronPt[im];
-	Float_ neutralIso = analysisTree.muon_r03_sumNeutralHadronEt[im] + 
-	  analysisTree.muon_r03_sumPhotonEt[im] - 
-	  0.5*analysisTree.muon_r03_sumPUPt[im];
-	neutralIso = TMath::Max(float(0),neutralIso); 
-	absIso += neutralIso;
-	Float_t relIso = absIso/analysisTree.muon_pt[im];
-*/
-	hmu_relISO[1]->Fill(relIso,weight);
-	if (relIso>isoMuonHighCut) continue;
 	if (relIso<isoMuonLowCut) continue;
 
 	if (applyMuonId && !analysisTree.muon_isMedium[im]) continue;
 
-	if (float(relIso)<float(isoMuMin)) {
 	  //cout<<" after muIso index "<<int(mu_index)<<" pT "<<analysisTree.muon_pt[im]<<" relIso "<<relIso<<" isoMuMin "<<isoMuMin<<" muon_count "<<analysisTree.muon_count<<" im "<<im<<" event "<<iEntry<<endl;
+	if (double(relIso)<double(isoMuMin)) {
 	  isoMuMin  = relIso;
 	  mu_index = int(im);
 	  mu_iso=true;
+	  //cout<<" after muIso index "<<int(mu_index)<<" pT "<<analysisTree.muon_pt[im]<<" relIso "<<relIso<<" isoMuMin "<<isoMuMin<<" muon_count "<<analysisTree.muon_count<<" im "<<im<<" event "<<iEntry<<endl;
 	  muons.push_back(im);
-	  MuV.SetPtEtaPhiM(analysisTree.muon_pt[im], analysisTree.muon_eta[im], analysisTree.muon_phi[im], muonMass);
+	  MuV.SetPtEtaPhiM(analysisTree.muon_pt[mu_index], analysisTree.muon_eta[mu_index], analysisTree.muon_phi[mu_index], muonMass);
 	  MuMV.push_back(MuV);
           LeptMV.push_back(MuV);
 	}
-//	if (relIso!=0 && relIso==isoMuMin && im != mu_index) {
+	//cout<<" Indexes here  "<<im<<"   "<<mu_index<<endl;
 
-	if (relIso == isoMuMin && int(im) != int(mu_index)) {
+	if (relIso == isoMuMin && im != mu_index) {
 	  //cout<<" found a pair  for muons " <<relIso <<" mu_index  "<<mu_index<<"  pT "<<analysisTree.muon_pt[int(mu_index)]<<" new  index "<<im<<"  pT  "<<analysisTree.muon_pt[int(im)]<<" event "<<iEntry<<endl;
 	  analysisTree.muon_pt[im] > analysisTree.muon_pt[mu_index] ? mu_index = int(im) : mu_index = mu_index;
 	}
    
       }
-      if (muons.size()==0 || !mu_iso) continue;
+         if (muons.size()==0 || !mu_iso ) continue;
+
+         double absIso= analysisTree.muon_r03_sumChargedHadronPt[mu_index]
+	            + max(analysisTree.muon_r03_sumNeutralHadronEt[mu_index] + analysisTree.muon_r03_sumPhotonEt[mu_index]
+	            - 0.5 * analysisTree.muon_r03_sumPUPt[mu_index],0.0);
+
+
+	double relIso = absIso/analysisTree.muon_pt[mu_index];
+
+	 if (relIso>isoMuonHighCut ) { isHighIsoMu=true ;isLowIsoMu=false;}
+	  else    { isHighIsoMu = false;isLowIsoMu=true;}
+ 
+
        sort(LeptMV.begin(), LeptMV.end(),ComparePt); 
        if (LeptMV.size() == 0 ) continue; 
+	if (InvertMuIso && !isHighIsoMu) continue;
+	if (!InvertMuIso && isHighIsoMu) continue;
+	if (InvertMuIso && isLowIsoMu) continue;
       
-      //mu_index=muons[0];
-      FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, SelectionSign, mu_index,el_index,tau_index);
+      FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, Channel, mu_index,el_index,tau_index);
       CFCounter[iCut]+= weight;
       iCFCounter[iCut]++;
       iCut++;
 
-      Float_t isoTauMin = 999;
+      double isoTauMin = 999;
       bool tau_iso = false;
       vector<int> tau; tau.clear();
       for (unsigned  int it = 0; it<analysisTree.tau_count; ++it) {
 
-	tauPtAllH->Fill(analysisTree.tau_pt[it],weight);
-	tauEtaAllH->Fill(analysisTree.tau_eta[it],weight);
+	//tauPtAllH->Fill(analysisTree.tau_pt[it],weight);
+	//tauEtaAllH->Fill(analysisTree.tau_eta[it],weight);
 	if (analysisTree.tau_pt[it] < ptMuonLowCutmtau || fabs(analysisTree.tau_eta[it])> etaMuonCutmtau) continue;
 	//if (analysisTree.tau_decayModeFinding[it]<decayModeFinding || analysisTree.tau_decayModeFindingNewDMs[it]<decayModeFindingNewDMs) continue;
 	if (analysisTree.tau_decayModeFindingNewDMs[it]<decayModeFindingNewDMs) continue;
@@ -728,87 +757,101 @@ int main(int argc, char * argv[]) {
 	
 	if (analysisTree.tau_againstElectronVLooseMVA5[it]<againstElectronVLooseMVA5) continue;
 	if (analysisTree.tau_againstMuonTight3[it]<againstMuonTight3) continue;
-	//phys14 if ( fabs(analysisTree.tau_vertexz[it] - analysisTree.primvertex_z ) > vertexz ) continue;
-	if (analysisTree.tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[it] > byCombinedIsolationDeltaBetaCorrRaw3Hits ) continue;
+	if (!InvertTauIso && analysisTree.tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[it] > byCombinedIsolationDeltaBetaCorrRaw3Hits ) continue;
 	
 
-	Float_t  tauIso = analysisTree.tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[it];
+	double  tauIso = analysisTree.tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[it];
 
 	if (tauIso<isoTauMin ) {
 	  //      cout<<"  there was a chenge  "<<tauIso<<"  "<<isoTauMin<<" it "<<it<<" tau_index "<<tau_index<<"  "<<analysisTree.tau_count<<endl;
 	  isoTauMin  = tauIso;
 	  tau_iso=true;
-	  //   it > 0 ? tau_index= it -1: 
-	  tau_index = it;
-	  tau.push_back(it);
-	  TauV.SetPtEtaPhiM(analysisTree.tau_pt[it], analysisTree.tau_eta[it], analysisTree.tau_phi[it], tauMass);
-	  //	      TauMV.push_back(TauV);
+	  tau_index = int(it);
+	  tau.push_back(tau_index);
+	  TauV.SetPtEtaPhiM(analysisTree.tau_pt[tau_index], analysisTree.tau_eta[tau_index], analysisTree.tau_phi[tau_index], tauMass);
+	  TauMV.push_back(TauV);
 
 	}
 
 	//if (tauIso!=0 && tauIso==isoTauMin && it != tau_index) {
 	if (tauIso==isoTauMin && it != tau_index) {
 	  analysisTree.tau_pt[it] > analysisTree.tau_pt[tau_index] ? tau_index = it : tau_index = tau_index;
-	  cout<<" found a pair  " <<tauIso <<"  "<<tau_index<<"  "<<it<<endl;
+	  //cout<<" found a pair  " <<tauIso <<"  "<<tau_index<<"  "<<it<<endl;
 	}
       }
-      if (tau.size()==0 || !tau_iso) continue;
+      if (tau.size()==0 || !tau_iso ) continue;
 
-
-      //cout<< " Lets check  "<<mu_index <<"  "<<tau_index <<"  "<<endl;
+     // cout<< " Lets check  "<<mu_index <<"  "<<tau_index <<"  "<<endl;
       //cout<<"  "<<endl;
+  
+      double tauIso = analysisTree.tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[tau_index];
+      if (tauIso > byCombinedIsolationDeltaBetaCorrRaw3Hits ) {isHighIsoTau =true ; isLowIsoTau=false;} 
+      else {isHighIsoTau =false ; isLowIsoTau=true;} 
 
-      float q = analysisTree.tau_charge[tau_index] * analysisTree.muon_charge[mu_index];
-      if (q>0) continue;
+	if (InvertTauIso && !isHighIsoTau) continue;
+	if (!InvertTauIso && isHighIsoTau) continue;
+	if (InvertTauIso && isLowIsoTau) continue;
 
-      FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, SelectionSign, mu_index,el_index,tau_index);
+      double q = analysisTree.tau_charge[tau_index] * analysisTree.muon_charge[mu_index];
+  
+      if (q>0 &&  Sign=="OS" ) continue;
+      if (q<0 && Sign=="SS" ) continue;
+
+      bool regionB = (q<0 && isLowIsoMu);
+      bool regionA = (q>0 && isLowIsoMu);
+      bool regionC = (q<0 && isHighIsoMu);
+      bool regionD = (q>0 && isHighIsoMu);
+
+      FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, Channel, mu_index,el_index,tau_index);
       CFCounter[iCut]+= weight;
       iCFCounter[iCut]++;
       iCut++;
 
-
-      bool isMu22 = false;
+	//cout<<"  HOW MANY MUONS DO I HAVE ??  "<<muons.size()<<endl;
+	/*
+      isMainTrigger = false;
       bool isMu27 = false;
       bool isMuTau_MuLegA = false;
       bool isMuTau_MuLegB = false;
       bool isMuTau_TauLegA = false;
       bool isMuTau_TauLegB = false;
       for (unsigned int im=0; im<muons.size(); ++im) {
-	isMu22 = false;
+	isMainTrigger = false;
 	isMu27 = false;
 	isMuTau_MuLegA = false;
 	isMuTau_MuLegB = false;
         unsigned int mIndex  = muons.at(im);
 
-	/*
-	  float neutralHadIsoMu = analysisTree.muon_neutralHadIso[mIndex];
-	  float photonIsoMu = analysisTree.muon_photonIso[mIndex];
-	  float chargedHadIsoMu = analysisTree.muon_chargedHadIso[mIndex];
-	  float puIsoMu = analysisTree.muon_puIso[mIndex];
+	  double neutralHadIsoMu = analysisTree.muon_neutralHadIso[mIndex];
+	  double photonIsoMu = analysisTree.muon_photonIso[mIndex];
+	  double chargedHadIsoMu = analysisTree.muon_chargedHadIso[mIndex];
+	  double puIsoMu = analysisTree.muon_puIso[mIndex];
 	  if (isIsoR03) {
 	  neutralHadIsoMu = analysisTree.muon_r03_sumNeutralHadronEt[mIndex];
 	  photonIsoMu = analysisTree.muon_r03_sumPhotonEt[mIndex];
 	  chargedHadIsoMu = analysisTree.muon_r03_sumChargedHadronPt[mIndex];
 	  puIsoMu = analysisTree.muon_r03_sumPUPt[mIndex];
 	  }
-	  float neutralIsoMu = neutralHadIsoMu + photonIsoMu - 0.5*puIsoMu;
-	  neutralIsoMu = TMath::Max(float(0),neutralIsoMu); 
-	  float absIsoMu = chargedHadIsoMu + neutralIsoMu;
-	  float relIsoMu = absIsoMu/analysisTree.muon_pt[mIndex];
+	  double neutralIsoMu = neutralHadIsoMu + photonIsoMu - 0.5*puIsoMu;
+	  neutralIsoMu = TMath::Max(double(0),neutralIsoMu); 
+	  double absIsoMu = chargedHadIsoMu + neutralIsoMu;
+	  double relIsoMu = absIsoMu/analysisTree.muon_pt[mIndex];
 	*/
 
 	for (unsigned int iT=0; iT<analysisTree.trigobject_count; ++iT) {
-	  if (analysisTree.trigobject_filters[iT][nMuon22Leg]) { // Mu22 Leg
-	    float dRtrig = deltaR(analysisTree.muon_eta[mIndex],analysisTree.muon_phi[mIndex],
+	  if (analysisTree.trigobject_filters[iT][nMainTrigger]) { // Mu17 Leg
+	    double dRtrig = deltaR(analysisTree.muon_eta[mu_index],analysisTree.muon_phi[mu_index],
 				  analysisTree.trigobject_eta[iT],analysisTree.trigobject_phi[iT]);
 	    if (dRtrig>deltaRTrigMatch) continue;
-	  if (analysisTree.trigobject_filters[iT][nMuon22Leg] && analysisTree.trigobject_pt[iT]>24) 
-	      isMu22 = true;
+	 //cout<< " "<<analysisTree.muon_pt[mu_index]<<"   "<<analysisTree.trigobject_pt[iT]<<endl;
+	    //if (!isData && analysisTree.trigobject_filters[iT][nMainTrigger] && analysisTree.trigobject_pt[iT]>18) 
+	      isMainTrigger = true;
 	    
 	  }
-
+	}
+	/*
 	  if (analysisTree.trigobject_filters[iT][nMuon17Tau20MuLegA]) { // Mu27 Leg
-	    float dRtrig = deltaR(analysisTree.muon_eta[mIndex],analysisTree.muon_phi[mIndex],
+	    double dRtrig = deltaR(analysisTree.muon_eta[mIndex],analysisTree.muon_phi[mIndex],
 				  analysisTree.trigobject_eta[iT],analysisTree.trigobject_phi[iT]);
 	    if (dRtrig>deltaRTrigMatch) continue;
 	    if (analysisTree.trigobject_filters[iT][nMuon17Tau20MuLegA] && analysisTree.trigobject_pt[iT]>17) 
@@ -817,29 +860,35 @@ int main(int argc, char * argv[]) {
 	  }
 
 	  if (analysisTree.trigobject_filters[iT][nMuon17Tau20MuLegB]) { // Mu27 Leg
-	    float dRtrig = deltaR(analysisTree.muon_eta[mIndex],analysisTree.muon_phi[mIndex],
+	    double dRtrig = deltaR(analysisTree.muon_eta[mIndex],analysisTree.muon_phi[mIndex],
 				  analysisTree.trigobject_eta[iT],analysisTree.trigobject_phi[iT]);
 	    if (dRtrig>deltaRTrigMatch) continue;
 	    if (analysisTree.trigobject_filters[iT][nMuon17Tau20MuLegB] && analysisTree.trigobject_pt[iT]>17) 
 	      isMuTau_MuLegB = true;
 	    
 	  }
-	}
+	*/
 		
 	
-	bool passedTrigger = isMu22 || (isMuTau_MuLegA && isMuTau_MuLegB);
+	bool passedTrigger = isMainTrigger ;//|| (isMuTau_MuLegA && isMuTau_MuLegB);
 	if (!passedTrigger) continue;
-	//if ((!isMu22 && !isMu27) || (!isMuTau_MuLegA && !isMuTau_MuLegB) ) continue;
-     	//if ((!isMu22 ) && (!isMuTau_MuLegA && !isMuTau_MuLegB) ) continue;
 
+	double dR = deltaR(analysisTree.tau_eta[tau_index],analysisTree.tau_phi[tau_index],
+			analysisTree.muon_eta[mu_index],analysisTree.muon_phi[mu_index]);
 
+      	if (dR<dRleptonsCutmutau) continue;
+
+	//if ((!isMainTrigger && !isMu27) || (!isMuTau_MuLegA && !isMuTau_MuLegB) ) continue;
+     	//if ((!isMainTrigger ) && (!isMuTau_MuLegA && !isMuTau_MuLegB) ) continue;
+
+	/*
         for (unsigned int it=0; it<tau.size(); ++it) {
 	  isMuTau_TauLegA = false;
 	  isMuTau_TauLegB = false;
 	  unsigned int tIndex  = tau.at(it);
 	  for (unsigned int iT=0; iT<analysisTree.trigobject_count; ++iT) {
 	    if (analysisTree.trigobject_filters[iT][nMuon17Tau20TauLegA] ) { 
-	      float dRtrig = deltaR(analysisTree.tau_eta[tIndex],analysisTree.tau_phi[tIndex],
+	      double dRtrig = deltaR(analysisTree.tau_eta[tIndex],analysisTree.tau_phi[tIndex],
 				    analysisTree.trigobject_eta[iT],analysisTree.trigobject_phi[iT]);
 	      if (dRtrig>deltaRTrigMatch) continue;
 	      if (analysisTree.trigobject_filters[iT][nMuon17Tau20TauLegA] && analysisTree.trigobject_pt[iT]>20) 
@@ -848,7 +897,7 @@ int main(int argc, char * argv[]) {
 	    }
 
 	    if (analysisTree.trigobject_filters[iT][nMuon17Tau20TauLegB]) { 
-	      float dRtrig = deltaR(analysisTree.tau_eta[tIndex],analysisTree.tau_phi[tIndex],
+	      double dRtrig = deltaR(analysisTree.tau_eta[tIndex],analysisTree.tau_phi[tIndex],
 				    analysisTree.trigobject_eta[iT],analysisTree.trigobject_phi[iT]);
 	      if (dRtrig>deltaRTrigMatch) continue;
 	      if (analysisTree.trigobject_filters[iT][nMuon17Tau20TauLegA] && analysisTree.trigobject_pt[iT]>20) 
@@ -856,41 +905,37 @@ int main(int argc, char * argv[]) {
 	      
 	    } 
 	  }
-	float dR = deltaR(analysisTree.tau_eta[tIndex],analysisTree.tau_phi[tIndex],
-			analysisTree.muon_eta[mIndex],analysisTree.muon_phi[mIndex]);
-
-      	if (dR<dRleptonsCutmutau) continue;
 	
 
-	//if (   ( (isMu22) || (isMu27) )  || ( (isMuTau_MuLegA && isMuTau_MuLegB) && (isMuTau_TauLegA && isMuTau_TauLegB) ) ) trigAccept=true;
-     	//if ((!isMu22 ) && (!isMuTau_MuLegA || !isMuTau_MuLegB) ) continue;
+	//if (   ( (isMainTrigger) || (isMu27) )  || ( (isMuTau_MuLegA && isMuTau_MuLegB) && (isMuTau_TauLegA && isMuTau_TauLegB) ) ) trigAccept=true;
+     	//if ((!isMainTrigger ) && (!isMuTau_MuLegA || !isMuTau_MuLegB) ) continue;
   
    	bool passedMuTauTriggerMuLeg	= isMuTau_MuLegA && isMuTau_MuLegB;
    	bool passedMuTauTriggerTauLeg   = isMuTau_TauLegA && isMuTau_TauLegB;
-	bool OnlyMuTrigger = isMu22 && (!passedMuTauTriggerMuLeg && !passedMuTauTriggerTauLeg);
+	bool OnlyMuTrigger = isMainTrigger && (!passedMuTauTriggerMuLeg && !passedMuTauTriggerTauLeg);
 
-      	//if ( (isMu22 || isMu27) && ( (!isMuTau_MuLegA && !isMuTau_MuLegB) && (!isMuTau_TauLegA && !isMuTau_TauLegB) )  && 
-//         if ( (isMu22 ) && ( (!isMuTau_MuLegA && !isMuTau_MuLegB) && (!isMuTau_TauLegA && !isMuTau_TauLegB) )  && 
+      	//if ( (isMainTrigger || isMu27) && ( (!isMuTau_MuLegA && !isMuTau_MuLegB) && (!isMuTau_TauLegA && !isMuTau_TauLegB) )  && 
+//         if ( (isMainTrigger ) && ( (!isMuTau_MuLegA && !isMuTau_MuLegB) && (!isMuTau_TauLegA && !isMuTau_TauLegB) )  && 
 	if (OnlyMuTrigger  && ( analysisTree.muon_pt[mu_index] < ptMuonHighCut || fabs(analysisTree.muon_eta[mu_index]) > 2.1) ) continue;
 	
-
+	
 //	trigAccept=true;
 
 //	if (!trigAccept) continue;
 	
 	}//taus
-      	
 
       }//muons 
+      	*/
 	
-	//cout<<" mu_index "<<mu_index<<"  "<<isMu22<<"  "<<isMu27<<"  "<<isMuTau_MuLegA<<"  "<<isMuTau_MuLegB<<"  "<<isMuTau_TauLegA<<"  "<<isMuTau_TauLegB<<endl;
+	//cout<<" mu_index "<<mu_index<<"  "<<isMainTrigger<<"  "<<isMu27<<"  "<<isMuTau_MuLegA<<"  "<<isMuTau_MuLegB<<"  "<<isMuTau_TauLegA<<"  "<<isMuTau_TauLegB<<endl;
       
-	  float dataMu1 = 1;
-	  float mcMu1 = 1;
+	  double dataMu1 = 1;
+	  double mcMu1 = 1;
 	if (!isData && applyLeptonSF) {
-	  float ptMu1 = TMath::Min(float(59),analysisTree.muon_pt[mu_index]);
+	  double ptMu1 = TMath::Min(float(59),analysisTree.muon_pt[mu_index]);
 	  int ptBinMu1 = binNumber(ptMu1,nPtBins,ptBins);
-	  float absEtaMu1 = fabs(analysisTree.muon_eta[mu_index]);
+	  double absEtaMu1 = fabs(analysisTree.muon_eta[mu_index]);
 	  dataMu1 = 1;
 	  mcMu1 = 1;
 	  if(absEtaMu1 < 1.48){
@@ -901,15 +946,15 @@ int main(int argc, char * argv[]) {
 	    dataMu1 = dataEffEndcap[ptBinMu1];
 	    mcMu1 = mcEffEndcap[ptBinMu1];
 	  }
-	  float wMu1 = dataMu1/mcMu1;
+	  double wMu1 = dataMu1/mcMu1;
 	  	//  cout << "Muons SF : Mu1 = " << wMu1 << endl;
 	  weight = weight*wMu1;
 	}
 
 
       //Trigger
-      //FillMainHists(iCut, weight, ElMV, MuMV, JetsMV,METV,analysisTree, SelectionSign, mu_index,el_index,tau_index);
-      FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, SelectionSign, mu_index,el_index,tau_index);
+      //FillMainHists(iCut, weight, ElMV, MuMV, JetsMV,METV,analysisTree, Channel, mu_index,el_index,tau_index);
+      FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, Channel, mu_index,el_index,tau_index);
       CFCounter[iCut]+= weight;
       iCFCounter[iCut]++;
       iCut++;
@@ -930,23 +975,23 @@ int main(int argc, char * argv[]) {
 	  for (unsigned  int imv = 0; imv<analysisTree.muon_count; ++imv) {
 	    if ( imv != mu_index ){
 /*
-	      Float_t neutralIso = 
+	      double neutralIso = 
 		analysisTree.muon_neutralHadIso[imv] + 
 		analysisTree.muon_photonIso[imv] - 
 		0.5*analysisTree.muon_puIso[imv];
-	      neutralIso = TMath::Max(Float_t(0),neutralIso); 
-	      Float_t absIso = analysisTree.muon_chargedHadIso[imv] + neutralIso;
-	      Float_t relIso = absIso/analysisTree.muon_pt[imv];
+	      neutralIso = TMath::Max(double(0),neutralIso); 
+	      double absIso = analysisTree.muon_chargedHadIso[imv] + neutralIso;
+	      double relIso = absIso/analysisTree.muon_pt[imv];
   */    
-              Float_t absIso= analysisTree.muon_r03_sumChargedHadronPt[imv]
+              double absIso= analysisTree.muon_r03_sumChargedHadronPt[imv]
 	            + max(analysisTree.muon_r03_sumNeutralHadronEt[imv] + analysisTree.muon_r03_sumPhotonEt[imv]
 	            - 0.5 * analysisTree.muon_r03_sumPUPt[imv],0.0);
 
 
-	     Float_t relIso = absIso/analysisTree.muon_pt[imv];
+	     double relIso = absIso/analysisTree.muon_pt[imv];
 
 
-	      float dRr = deltaR(analysisTree.muon_eta[mu_index],analysisTree.muon_phi[mu_index],
+	      double dRr = deltaR(analysisTree.muon_eta[mu_index],analysisTree.muon_phi[mu_index],
 				 analysisTree.muon_eta[imv],analysisTree.muon_phi[imv]);
 	        bool OSCharge = false;  
 		if ( imv != mu_index  && analysisTree.muon_charge[imv] != analysisTree.muon_charge[mu_index] ) OSCharge=true;
@@ -962,7 +1007,7 @@ int main(int argc, char * argv[]) {
       }
       if (MuVeto) continue;
 
-      FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, SelectionSign, mu_index,el_index,tau_index);
+      FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, Channel, mu_index,el_index,tau_index);
       CFCounter[iCut]+= weight;
       iCFCounter[iCut]++;
       iCut++;
@@ -976,17 +1021,17 @@ int main(int argc, char * argv[]) {
 	  for (unsigned int iev = 0; iev<analysisTree.electron_count; ++iev) {
 
 /*
-	    Float_t neutralIsoV = analysisTree.electron_r03_sumNeutralHadronEt[iev] + analysisTree.electron_r03_sumNeutralHadronEt[iev] + analysisTree.electron_r03_sumPhotonEt[iev] -  4*TMath::Pi()*(0.3*0.3)*analysisTree.rho;
-	    Float_t IsoWithEA =  analysisTree.electron_r03_sumChargedHadronPt[iev] + TMath::Max(Float_t(0), neutralIsoV);
+	    double neutralIsoV = analysisTree.electron_r03_sumNeutralHadronEt[iev] + analysisTree.electron_r03_sumNeutralHadronEt[iev] + analysisTree.electron_r03_sumPhotonEt[iev] -  4*TMath::Pi()*(0.3*0.3)*analysisTree.rho;
+	    double IsoWithEA =  analysisTree.electron_r03_sumChargedHadronPt[iev] + TMath::Max(double(0), neutralIsoV);
 	
 
 */
 
-           Float_t IsoWithEA = analysisTree.electron_r03_sumChargedHadronPt[iev] 
+           double IsoWithEA = analysisTree.electron_r03_sumChargedHadronPt[iev] 
 			   + max(analysisTree.electron_r03_sumNeutralHadronEt[iev] + analysisTree.electron_r03_sumPhotonEt[iev]
 		           - 0.5 * analysisTree.electron_r03_sumPUPt[iev], 0.0) ;
 
-           Float_t relIsoV = IsoWithEA/analysisTree.electron_pt[iev];
+           double relIsoV = IsoWithEA/analysisTree.electron_pt[iev];
 
 
 	    bool electronMvaId = electronMvaIdWP90(analysisTree.electron_pt[iev], analysisTree.electron_superclusterEta[iev], analysisTree.electron_mva_id_nontrigPhys14[iev]);
@@ -1005,11 +1050,11 @@ int main(int argc, char * argv[]) {
 
 	    //       if ( imvv != mu_index  && analysisTree.muon_charge[imvv] != analysisTree.muon_charge[mu_index] ){
 
-         Float_t absIso= analysisTree.muon_r03_sumChargedHadronPt[imvv]
+         double absIso= analysisTree.muon_r03_sumChargedHadronPt[imvv]
 	            + max(analysisTree.muon_r03_sumNeutralHadronEt[imvv] + analysisTree.muon_r03_sumPhotonEt[imvv]
 	            - 0.5 * analysisTree.muon_r03_sumPUPt[imvv],0.0);
 
-	Float_t relIso = absIso/analysisTree.muon_pt[imvv];
+	double relIso = absIso/analysisTree.muon_pt[imvv];
 
 
 	    if ( imvv != mu_index &&  analysisTree.muon_isMedium[imvv] &&  analysisTree.muon_pt[imvv]> 10 &&  fabs(analysisTree.muon_eta[imvv])< 2.4 && fabs(analysisTree.muon_dxy[imvv])<0.045 
@@ -1021,14 +1066,14 @@ int main(int argc, char * argv[]) {
       if (ThirdLeptVeto) continue;
 
 
-      FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, SelectionSign, mu_index,el_index,tau_index);
+      FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, Channel, mu_index,el_index,tau_index);
       CFCounter[iCut]+= weight;
       iCFCounter[iCut]++;
       iCut++;
       //	for (unsigned int j=0;j<LeptMV.size();++j) cout<<" j "<<j<<"  "<<LeptMV.at(j).Pt()<<endl;
       //	cout<<""<<endl;
       ////////jets cleaning 
-      Float_t DRmax=0.4;
+      double DRmax=0.4;
       vector<int> jets; jets.clear();
       TLorentzVector leptonsV, muonJ, jetsLV;
       
@@ -1043,7 +1088,7 @@ int main(int argc, char * argv[]) {
        //   if(fabs(JetsMV.at(ij).Pt())<ptJetCut) continue;
       
 
-	  Float_t Dr= deltaR(LeptMV.at(il).Eta(), LeptMV.at(il).Phi(),JetsMV.at(ij).Eta(),JetsMV.at(ij).Phi());
+	  double Dr= deltaR(LeptMV.at(il).Eta(), LeptMV.at(il).Phi(),JetsMV.at(ij).Eta(),JetsMV.at(ij).Phi());
 
 	  if (  Dr  < DRmax) {
 	     
@@ -1055,7 +1100,7 @@ int main(int argc, char * argv[]) {
       
 
 
-      Float_t ptScalarSum = -1;
+      double ptScalarSum = -1;
 
 
       bool btagged= false;
@@ -1063,7 +1108,7 @@ int main(int argc, char * argv[]) {
       
 
       if (JetsMV.size() >3) continue;
-      FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, SelectionSign, mu_index,el_index,tau_index);
+      FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, Channel, mu_index,el_index,tau_index);
       CFCounter[iCut]+= weight;
       iCFCounter[iCut]++;
       iCut++;
@@ -1076,57 +1121,49 @@ int main(int argc, char * argv[]) {
     
       //if (JetsPt30C ) continue;
       //if (JetsMV.size() >3) continue;
-    /*
-      FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, SelectionSign, mu_index,el_index,tau_index);
-      CFCounter[iCut]+= weight;
-      iCFCounter[iCut]++;
-      iCut++;
-*/
+
       for (unsigned int ib = 0; ib <JetsMV.size();++ib){
 	
 	//	if (JetsMV.at(ib).Pt()>30 ) JetsPt30C = true;
 	for (unsigned int il = 0; il < analysisTree.pfjet_count; ++il)
 	  {
 	
-	    if (float(JetsMV.at(ib).Pt()) == float(analysisTree.pfjet_pt[il])) {xj=il;
+	    if (double(JetsMV.at(ib).Pt()) == double(analysisTree.pfjet_pt[il])) {xj=il;
 	      //cout<<" found Jets "<<analysisTree.pfjet_pt[il]<<"  "<<JetsMV.at(ib).Pt()<<"  "<<ib<<"  "<<xj<<"  "<<il<<endl;
 	    }
 	  }
 
-	//     cout<<" Jets "<<analysisTree.pfjet_pt[xj]<<"  "<<JetsMV.at(ib).Pt()<<"  "<<ib<<"  "<<xj<<endl;
-	if (analysisTree.pfjet_btag[xj][8]  > bTag) btagged = true;
+//	    cout<<" Jets "<<analysisTree.pfjet_pt[xj]<<"  "<<JetsMV.at(ib).Pt()<<"  "<<ib<<"  "<<xj<<endl;
+	if (analysisTree.pfjet_btag[xj][0]  > bTag) btagged = true;
       }
       
-      if (btagged ) continue;
+      if (btagged) continue;
 	
-      FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, SelectionSign, mu_index,el_index,tau_index);
+      FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, Channel, mu_index,el_index,tau_index);
       CFCounter[iCut]+= weight;
       iCFCounter[iCut]++;
       iCut++;
   
   
       // pt Scalar
-      // computations of kinematic variables
 
       //cout<<"  "<<mu_index<<"  "<<tau_index<<"   "<<MuMV.at(mu_index).M()<<"  "<<TauMV.at(tau_index).M()<<endl;
 
-      TLorentzVector diL = MuMV.at(mu_index) + TauMV.at(tau_index);
+       TLorentzVector muVc ;  muVc.SetPtEtaPhiM(analysisTree.muon_pt[mu_index], analysisTree.muon_eta[mu_index], analysisTree.muon_phi[mu_index], muonMass);
+       TLorentzVector tauVc;  tauVc.SetPtEtaPhiM(analysisTree.tau_pt[tau_index], analysisTree.tau_eta[tau_index], analysisTree.tau_phi[tau_index], tauMass);
+
+      TLorentzVector diL = muVc + tauVc;
       if ( diL.M() <80 && diL.M()>40 ) continue;
-      FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, SelectionSign, mu_index,el_index,tau_index);
+      FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, Channel, mu_index,el_index,tau_index);
       CFCounter[iCut]+= weight;
       iCFCounter[iCut]++;
       iCut++;
 
-      Float_t ETmiss = TMath::Sqrt(analysisTree.pfmet_ex*analysisTree.pfmet_ex + analysisTree.pfmet_ey*analysisTree.pfmet_ey);
+      double ETmiss = TMath::Sqrt(analysisTree.pfmet_ex*analysisTree.pfmet_ex + analysisTree.pfmet_ey*analysisTree.pfmet_ey);
 
+     // continue;
       // bisector of electron and muon transverse momenta
 
-      // computation of MT variable
-      Float_t dPhi=-999; 
-
-
-      dPhi=dPhiFrom2P( LeptMV.at(0).Px(), LeptMV.at(0).Py(), analysisTree.pfmet_ex,  analysisTree.pfmet_ey );
-      //MT = TMath::Sqrt(2*LeptMV.at(0).Pt()*ETmiss*(1-TMath::Cos(dPhi)));
 
 
       // filling histograms after dilepton selection
@@ -1136,7 +1173,7 @@ int main(int argc, char * argv[]) {
       // MtH->Fill(MT,weight);
       
       if (ETmiss < 85) continue;
-      FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, SelectionSign, mu_index,el_index,tau_index);
+      FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, Channel, mu_index,el_index,tau_index);
       CFCounter[iCut]+= weight;
       iCFCounter[iCut]++;
       iCut++;
@@ -1144,13 +1181,13 @@ int main(int argc, char * argv[]) {
        double MTv = mT(diL,METV);
      /* if (ETmiss < 100) continue;
       //if (MTv>80 && MTv<120) continue;
-      FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, SelectionSign, mu_index,el_index,tau_index);
+      FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, Channel, mu_index,el_index,tau_index);
       CFCounter[iCut]+= weight;
       iCFCounter[iCut]++;
       iCut++;
 
       if (ETmiss < 120) continue;
-      FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, SelectionSign, mu_index,el_index,tau_index);
+      FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, Channel, mu_index,el_index,tau_index);
       CFCounter[iCut]+= weight;
       iCFCounter[iCut]++;
       iCut++;
@@ -1158,26 +1195,16 @@ int main(int argc, char * argv[]) {
       //if (DZeta<dZetaCut) continue;
        */
 
-       TLorentzVector muVc ; MuV.SetPtEtaPhiM(analysisTree.muon_pt[mu_index], analysisTree.muon_eta[mu_index], analysisTree.muon_phi[mu_index], muonMass);
-       TLorentzVector tauVc; TauV.SetPtEtaPhiM(analysisTree.tau_pt[tau_index], analysisTree.tau_eta[tau_index], analysisTree.tau_phi[tau_index], tauMass);
 
-       TLorentzVector Dil =  muVc + tauVc;
-      float dRr = deltaR(Dil.Eta(), Dil.Phi(), METV.Eta(), METV.Phi());
+      double dRr = deltaR(diL.Eta(), diL.Phi(), METV.Eta(), METV.Phi());
       
       if (dRr<1.5 || dRr>4) continue;
       
-      FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, SelectionSign, mu_index,el_index,tau_index);
+      FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, Channel, mu_index,el_index,tau_index);
       CFCounter[iCut]+= weight;
       iCFCounter[iCut]++;
       iCut++;
-      /*
-      if (dPhi<1) continue; 
-      FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, SelectionSign, mu_index,el_index,tau_index);
-      CFCounter[iCut]+= weight;
-      iCFCounter[iCut]++;
-      iCut++;
-      //      std::cout << std::endl;
-      */
+
       selEvents++;
       //histWeights->SetBinContent(1,Weight+ histWeights->GetBinContent(1));  
     } // end of file processing (loop over events in one file)
@@ -1196,7 +1223,7 @@ int main(int argc, char * argv[]) {
   cout<<" Run range from -----> "<<RunMin<<" to  "<<RunMax<<endl;
   /*
     for (int i=0;i<CutNumb;++i){
-    CFCounter[i] *= Float_t(XSec*Lumi/( histWeights->GetSumOfWeights()));
+    CFCounter[i] *= double(XSec*Lumi/( histWeights->GetSumOfWeights()));
     if (iCFCounter[i] <0.2) statUnc[i] =0;
     else statUnc[i] = CFCounter[i]/sqrt(iCFCounter[i]);
     }
@@ -1205,7 +1232,7 @@ int main(int argc, char * argv[]) {
   ofstream tfile;
   // TString outname = argv[argc-1];
   TString outname=argv[2];
-  TString textfilename = "cutflow_"+outname+"_"+SelectionSign+"_"+argv[3]+".txt";
+  TString textfilename = "cutflow_"+outname+"_"+Channel+"_"+argv[3]+".txt";
 //  tfile.open(textfilename);
 //  tfile << "########################################" << endl;
   for(int ci = 0; ci < CutNumb; ci++)
@@ -1216,7 +1243,7 @@ int main(int argc, char * argv[]) {
     cout << " i "<<ci<<" "<<iCFCounter[ci]<<"  "<<XSec*Lumi/( histWeights->GetSumOfWeights())<<endl;  
    
       CutFlowUnW->SetBinContent(1+ci,CFCounter[ci] );
-      CFCounter[ci] *= Float_t(XSec*Lumi/( histWeights->GetSumOfWeights()));
+      CFCounter[ci] *= double(XSec*Lumi/( histWeights->GetSumOfWeights()));
     //}
       CutFlow->SetBinContent(1+ci,CFCounter[ci]);
       
@@ -1228,7 +1255,6 @@ int main(int argc, char * argv[]) {
   //TString textfile_Con = "CMG_cutflow_Con_Mu_"+outname+".txt";
   //tfile1.open(textfile_Con);
   //tfile1 << "########################################" << endl;
-  //tfile1 << "RCS:" << endl;
 
 
 
@@ -1247,18 +1273,22 @@ int main(int argc, char * argv[]) {
   std::cout << "Total number of selected events = " << selEvents << std::endl;
   std::cout << std::endl;
   
-  file->cd(SelectionSign.c_str());
+  file->cd(Channel.c_str());
   hxsec->Fill(XSec);
   hxsec->Write();
   inputEventsH->Write();
   histWeights->Write();
   histWeightsH->Write();
+  histRuns->Write();
   //histWeights2->Write();
   
   CutFlow->Write();
   CutFlowUnW->Write();
-
-  /*
+   /*
+  CutFlowUnWNorm = (TH1D*) CutFlowUnW->Clone();
+  double normCF = CutFlowUnW->GetSumOfWeights();
+  CutFlowUnWNorm->Scale(1/normCF);
+  CutFlowUnWNorm->Write();
     muonPtAllH->Write();
     electronPtAllH->Write();
 

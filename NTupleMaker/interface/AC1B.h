@@ -94,6 +94,7 @@ public :
    Bool_t          muon_isTight[50];   //[muon_count]
    Bool_t          muon_isLoose[50];   //[muon_count]
    Bool_t          muon_isMedium[50];   //[muon_count]
+   Int_t           muon_genmatch[50];   //[muon_count]
    UInt_t          pfjet_count;
    Float_t         pfjet_e[100];   //[pfjet_count]
    Float_t         pfjet_px[100];   //[pfjet_count]
@@ -183,6 +184,7 @@ public :
    Float_t         electron_charge[50];   //[electron_count]
    Int_t           electron_superclusterindex[50];   //[electron_count]
    UChar_t         electron_info[50];   //[electron_count]
+   Int_t           electron_genmatch[50];   //[electron_count]
    Float_t         electron_mva_id_nontrigPhys14[50];   //[electron_count]
    Float_t         electron_mva_value_nontrig_Spring15_v1[50];   //[electron_count]
    Float_t         electron_mva_value_trig_Spring15_v1[50];   //[electron_count]
@@ -255,6 +257,7 @@ public :
    Int_t           tau_genDecayMode[50];   //[tau_count]
    Char_t          tau_decayMode_name[50];   //[tau_count]
    Int_t           tau_decayMode[50];   //[tau_count]
+   Int_t           tau_genmatch[50];   //[tau_count]
    Float_t         pfmet_ex;
    Float_t         pfmet_ey;
    Float_t         pfmet_ez;
@@ -309,15 +312,17 @@ public :
    Float_t         puppimet_ex_UnclusteredEnDown;
    Float_t         puppimet_ey_UnclusteredEnDown;
    UInt_t          mvamet_count;
-   Float_t         mvamet_ex[10];   //[mvamet_count]
-   Float_t         mvamet_ey[10];   //[mvamet_count]
-   Float_t         mvamet_sigxx[10];   //[mvamet_count]
-   Float_t         mvamet_sigxy[10];   //[mvamet_count]
-   Float_t         mvamet_sigyx[10];   //[mvamet_count]
-   Float_t         mvamet_sigyy[10];   //[mvamet_count]
-   UChar_t         mvamet_channel[10];   //[mvamet_count]
-   UInt_t          mvamet_lep1[10];   //[mvamet_count]
-   UInt_t          mvamet_lep2[10];   //[mvamet_count]
+   Float_t         mvamet_ex[50];   //[mvamet_count]
+   Float_t         mvamet_ey[50];   //[mvamet_count]
+   Float_t         mvamet_sigxx[50];   //[mvamet_count]
+   Float_t         mvamet_sigxy[50];   //[mvamet_count]
+   Float_t         mvamet_sigyx[50];   //[mvamet_count]
+   Float_t         mvamet_sigyy[50];   //[mvamet_count]
+   UChar_t         mvamet_channel[50];   //[mvamet_count]
+   UInt_t          mvamet_lep1[50];   //[mvamet_count]
+   UInt_t          mvamet_lep2[50];   //[mvamet_count]
+   Float_t         mvamet_lep1_pt[50];   //[mvamet_count]
+   Float_t         mvamet_lep2_pt[50];   //[mvamet_count]
    Float_t         genweight;
    Float_t         genid1;
    Float_t         genx1;
@@ -341,6 +346,30 @@ public :
    Float_t         gentau_visible_eta[50];   //[gentau_count]
    Float_t         gentau_visible_phi[50];   //[gentau_count]
    Float_t         gentau_visible_mass[50];   //[gentau_count]
+   Float_t         gentau_visibleNoLep_e[50];   //[gentau_count]
+   Float_t         gentau_visibleNoLep_px[50];   //[gentau_count]
+   Float_t         gentau_visibleNoLep_py[50];   //[gentau_count]
+   Float_t         gentau_visibleNoLep_pz[50];   //[gentau_count]
+   Float_t         gentau_visibleNoLep_pt[50];   //[gentau_count]
+   Float_t         gentau_visibleNoLep_eta[50];   //[gentau_count]
+   Float_t         gentau_visibleNoLep_phi[50];   //[gentau_count]
+   Float_t         gentau_visibleNoLep_mass[50];   //[gentau_count]
+   Int_t           gentau_status[50];   //[gentau_count]
+   Int_t           gentau_fromHardProcess[50];   //[gentau_count]
+   Int_t           gentau_fromHardProcessBeforeFSR[50];   //[gentau_count]
+   Int_t           gentau_isDecayedLeptonHadron[50];   //[gentau_count]
+   Int_t           gentau_isDirectHadronDecayProduct[50];   //[gentau_count]
+   Int_t           gentau_isDirectHardProcessTauDecayProduct[50];   //[gentau_count]
+   Int_t           gentau_isDirectPromptTauDecayProduct[50];   //[gentau_count]
+   Int_t           gentau_isDirectTauDecayProduct[50];   //[gentau_count]
+   Int_t           gentau_isFirstCopy[50];   //[gentau_count]
+   Int_t           gentau_isHardProcess[50];   //[gentau_count]
+   Int_t           gentau_isHardProcessTauDecayProduct[50];   //[gentau_count]
+   Int_t           gentau_isLastCopy[50];   //[gentau_count]
+   Int_t           gentau_isLastCopyBeforeFSR[50];   //[gentau_count]
+   Int_t           gentau_isPrompt[50];   //[gentau_count]
+   Int_t           gentau_isPromptTauDecayProduct[50];   //[gentau_count]
+   Int_t           gentau_isTauDecayProduct[50];   //[gentau_count] 
    Int_t           gentau_decayMode[50];   //[gentau_count]
    Char_t          gentau_decayMode_name[50];   //[gentau_count]
    UChar_t         gentau_mother[50];   //[gentau_count]
@@ -356,6 +385,21 @@ public :
    Int_t           genparticles_status[100];   //[genparticles_count]
    UInt_t          genparticles_info[100];   //[genparticles_count]
    UChar_t         genparticles_mother[100];   //[genparticles_count]
+   Int_t           genparticles_fromHardProcess[100];   //[genparticles_count];
+   Int_t           genparticles_fromHardProcessBeforeFSR[100];   //[genparticles_count]
+   Int_t           genparticles_isDecayedLeptonHadron[100];   //[genparticles_count]
+   Int_t           genparticles_isDirectHadronDecayProduct[100];   //[genparticles_count]
+   Int_t           genparticles_isDirectHardProcessTauDecayProduct[100];   //[genparticles_count]
+   Int_t           genparticles_isDirectPromptTauDecayProduct[100];   //[genparticles_count]
+   Int_t           genparticles_isDirectTauDecayProduct[100];   //[genparticles_count]
+   Int_t           genparticles_isFirstCopy[100];   //[genparticles_count]
+   Int_t           genparticles_isHardProcess[100];   //[genparticles_count]
+   Int_t           genparticles_isHardProcessTauDecayProduct[100];   //[genparticles_count]
+   Int_t           genparticles_isLastCopy[100];   //[genparticles_count]
+   Int_t           genparticles_isLastCopyBeforeFSR[100];   //[genparticles_count]
+   Int_t           genparticles_isPrompt[100];   //[genparticles_count]
+   Int_t           genparticles_isPromptTauDecayProduct[100];   //[genparticles_count]
+   Int_t           genparticles_isTauDecayProduct[100];   //[genparticles_count]
    UInt_t          trigobject_count;
    Float_t         trigobject_px[50];   //[trigobject_count]
    Float_t         trigobject_py[50];   //[trigobject_count]
@@ -457,6 +501,7 @@ public :
    TBranch        *b_muon_isTight;   //!
    TBranch        *b_muon_isLoose;   //!
    TBranch        *b_muon_isMedium;   //!
+   TBranch        *b_muon_genmatch;   //! 
    TBranch        *b_pfjet_count;   //!
    TBranch        *b_pfjet_e;   //!
    TBranch        *b_pfjet_px;   //!
@@ -546,6 +591,7 @@ public :
    TBranch        *b_electron_charge;   //!
    TBranch        *b_electron_superclusterindex;   //!
    TBranch        *b_electron_info;   //!
+   TBranch        *b_electron_genmatch;   //!
    TBranch        *b_electron_mva_id_nontrigPhys14;   //!
    TBranch        *b_electron_mva_value_nontrig_Spring15_v1;   //!
    TBranch        *b_electron_mva_value_trig_Spring15_v1;   //!
@@ -618,6 +664,7 @@ public :
    TBranch        *b_tau_genDecayMode;   //!
    TBranch        *b_tau_decayMode_name;   //!
    TBranch        *b_tau_decayMode;   //!
+   TBranch        *b_tau_genmatch;   //!
    TBranch        *b_pfmet_ex;   //!
    TBranch        *b_pfmet_ey;   //!
    TBranch        *b_pfmet_ez;   //!
@@ -681,6 +728,8 @@ public :
    TBranch        *b_mvamet_channel;   //!
    TBranch        *b_mvamet_lep1;   //!
    TBranch        *b_mvamet_lep2;   //!
+   TBranch        *b_mvamet_lep1_pt;   //!
+   TBranch        *b_mvamet_lep2_pt;   //!
    TBranch        *b_genweight;   //!
    TBranch        *b_genid1;   //!
    TBranch        *b_genx1;   //!
@@ -704,6 +753,30 @@ public :
    TBranch        *b_gentau_visible_eta;   //!
    TBranch        *b_gentau_visible_phi;   //!
    TBranch        *b_gentau_visible_mass;   //!
+   TBranch        *b_gentau_visibleNoLep_e;   //!
+   TBranch        *b_gentau_visibleNoLep_px;   //!
+   TBranch        *b_gentau_visibleNoLep_py;   //!
+   TBranch        *b_gentau_visibleNoLep_pz;   //!
+   TBranch        *b_gentau_visibleNoLep_pt;   //!
+   TBranch        *b_gentau_visibleNoLep_eta;   //!
+   TBranch        *b_gentau_visibleNoLep_phi;   //!
+   TBranch        *b_gentau_visibleNoLep_mass;   //!
+   TBranch        *b_gentau_status;   //!
+   TBranch        *b_gentau_fromHardProcess;   //!
+   TBranch        *b_gentau_fromHardProcessBeforeFSR;   //!
+   TBranch        *b_gentau_isDecayedLeptonHadron;   //!
+   TBranch        *b_gentau_isDirectHadronDecayProduct;   //!
+   TBranch        *b_gentau_isDirectHardProcessTauDecayProduct;   //!
+   TBranch        *b_gentau_isDirectPromptTauDecayProduct;   //!
+   TBranch        *b_gentau_isDirectTauDecayProduct;   //!
+   TBranch        *b_gentau_isFirstCopy;   //!
+   TBranch        *b_gentau_isHardProcess;   //!
+   TBranch        *b_gentau_isHardProcessTauDecayProduct;   //!
+   TBranch        *b_gentau_isLastCopy;   //!
+   TBranch        *b_gentau_isLastCopyBeforeFSR;   //!
+   TBranch        *b_gentau_isPrompt;   //!
+   TBranch        *b_gentau_isPromptTauDecayProduct;   //!
+   TBranch        *b_gentau_isTauDecayProduct;   //!
    TBranch        *b_gentau_decayMode;   //!
    TBranch        *b_gentau_decayMode_name;   //!
    TBranch        *b_gentau_mother;   //!
@@ -719,6 +792,21 @@ public :
    TBranch        *b_genparticles_status;   //!
    TBranch        *b_genparticles_info;   //!
    TBranch        *b_genparticles_mother;   //!
+   TBranch        *b_genparticles_fromHardProcess;   //!
+   TBranch        *b_genparticles_fromHardProcessBeforeFSR;   //!
+   TBranch        *b_genparticles_isDecayedLeptonHadron;   //!
+   TBranch        *b_genparticles_isDirectHadronDecayProduct;   //!
+   TBranch        *b_genparticles_isDirectHardProcessTauDecayProduct;   //!
+   TBranch        *b_genparticles_isDirectPromptTauDecayProduct;   //!
+   TBranch        *b_genparticles_isDirectTauDecayProduct;   //!
+   TBranch        *b_genparticles_isFirstCopy;   //!
+   TBranch        *b_genparticles_isHardProcess;   //!
+   TBranch        *b_genparticles_isHardProcessTauDecayProduct;   //!
+   TBranch        *b_genparticles_isLastCopy;   //!
+   TBranch        *b_genparticles_isLastCopyBeforeFSR;   //!
+   TBranch        *b_genparticles_isPrompt;   //!
+   TBranch        *b_genparticles_isPromptTauDecayProduct;   //!
+   TBranch        *b_genparticles_isTauDecayProduct;   //!
    TBranch        *b_trigobject_count;   //!
    TBranch        *b_trigobject_px;   //!
    TBranch        *b_trigobject_py;   //!
@@ -926,6 +1014,7 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("muon_isTight", muon_isTight, &b_muon_isTight);
    fChain->SetBranchAddress("muon_isLoose", muon_isLoose, &b_muon_isLoose);
    fChain->SetBranchAddress("muon_isMedium", muon_isMedium, &b_muon_isMedium);
+   fChain->SetBranchAddress("muon_genmatch", muon_genmatch, &b_muon_genmatch);
    fChain->SetBranchAddress("pfjet_count", &pfjet_count, &b_pfjet_count);
    fChain->SetBranchAddress("pfjet_e", pfjet_e, &b_pfjet_e);
    fChain->SetBranchAddress("pfjet_px", pfjet_px, &b_pfjet_px);
@@ -1015,6 +1104,7 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("electron_charge", electron_charge, &b_electron_charge);
    fChain->SetBranchAddress("electron_superclusterindex", electron_superclusterindex, &b_electron_superclusterindex);
    fChain->SetBranchAddress("electron_info", electron_info, &b_electron_info);
+   fChain->SetBranchAddress("electron_genmatch", electron_genmatch, &b_electron_genmatch);
    fChain->SetBranchAddress("electron_mva_id_nontrigPhys14", electron_mva_id_nontrigPhys14, &b_electron_mva_id_nontrigPhys14);
    fChain->SetBranchAddress("electron_mva_value_nontrig_Spring15_v1", electron_mva_value_nontrig_Spring15_v1, &b_electron_mva_value_nontrig_Spring15_v1);
    fChain->SetBranchAddress("electron_mva_value_trig_Spring15_v1", electron_mva_value_trig_Spring15_v1, &b_electron_mva_value_trig_Spring15_v1);
@@ -1087,6 +1177,7 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("tau_genDecayMode", tau_genDecayMode, &b_tau_genDecayMode);
    fChain->SetBranchAddress("tau_decayMode_name", tau_decayMode_name, &b_tau_decayMode_name);
    fChain->SetBranchAddress("tau_decayMode", tau_decayMode, &b_tau_decayMode);
+   fChain->SetBranchAddress("tau_genmatch", tau_genmatch, &b_tau_genmatch);
    fChain->SetBranchAddress("pfmet_ex", &pfmet_ex, &b_pfmet_ex);
    fChain->SetBranchAddress("pfmet_ey", &pfmet_ey, &b_pfmet_ey);
    fChain->SetBranchAddress("pfmet_ez", &pfmet_ez, &b_pfmet_ez);
@@ -1150,6 +1241,8 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("mvamet_channel", &mvamet_channel, &b_mvamet_channel);
    fChain->SetBranchAddress("mvamet_lep1", &mvamet_lep1, &b_mvamet_lep1);
    fChain->SetBranchAddress("mvamet_lep2", &mvamet_lep2, &b_mvamet_lep2);
+   fChain->SetBranchAddress("mvamet_lep1_pt", &mvamet_lep1_pt, &b_mvamet_lep1_pt);
+   fChain->SetBranchAddress("mvamet_lep2_pt", &mvamet_lep2_pt, &b_mvamet_lep2_pt);
    fChain->SetBranchAddress("genweight", &genweight, &b_genweight);
    fChain->SetBranchAddress("genid1", &genid1, &b_genid1);
    fChain->SetBranchAddress("genx1", &genx1, &b_genx1);
@@ -1173,6 +1266,30 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("gentau_visible_eta", gentau_visible_eta, &b_gentau_visible_eta);
    fChain->SetBranchAddress("gentau_visible_phi", gentau_visible_phi, &b_gentau_visible_phi);
    fChain->SetBranchAddress("gentau_visible_mass", gentau_visible_mass, &b_gentau_visible_mass);
+   fChain->SetBranchAddress("gentau_visibleNoLep_e", gentau_visibleNoLep_e, &b_gentau_visibleNoLep_e);
+   fChain->SetBranchAddress("gentau_visibleNoLep_px", gentau_visibleNoLep_px, &b_gentau_visibleNoLep_px);
+   fChain->SetBranchAddress("gentau_visibleNoLep_py", gentau_visibleNoLep_py, &b_gentau_visibleNoLep_py);
+   fChain->SetBranchAddress("gentau_visibleNoLep_pz", gentau_visibleNoLep_pz, &b_gentau_visibleNoLep_pz);
+   fChain->SetBranchAddress("gentau_visibleNoLep_pt", gentau_visibleNoLep_pt, &b_gentau_visibleNoLep_pt);
+   fChain->SetBranchAddress("gentau_visibleNoLep_eta", gentau_visibleNoLep_eta, &b_gentau_visibleNoLep_eta);
+   fChain->SetBranchAddress("gentau_visibleNoLep_phi", gentau_visibleNoLep_phi, &b_gentau_visibleNoLep_phi);
+   fChain->SetBranchAddress("gentau_visibleNoLep_mass", gentau_visibleNoLep_mass, &b_gentau_visibleNoLep_mass);
+   fChain->SetBranchAddress("gentau_status", gentau_status, &b_gentau_status);
+   fChain->SetBranchAddress("gentau_fromHardProcess", gentau_fromHardProcess, &b_gentau_fromHardProcess);
+   fChain->SetBranchAddress("gentau_fromHardProcessBeforeFSR", gentau_fromHardProcessBeforeFSR, &b_gentau_fromHardProcessBeforeFSR);
+   fChain->SetBranchAddress("gentau_isDecayedLeptonHadron", gentau_isDecayedLeptonHadron, &b_gentau_isDecayedLeptonHadron);
+   fChain->SetBranchAddress("gentau_isDirectHadronDecayProduct", gentau_isDirectHadronDecayProduct, &b_gentau_isDirectHadronDecayProduct);
+   fChain->SetBranchAddress("gentau_isDirectHardProcessTauDecayProduct", gentau_isDirectHardProcessTauDecayProduct, &b_gentau_isDirectHardProcessTauDecayProduct);
+   fChain->SetBranchAddress("gentau_isDirectPromptTauDecayProduct", gentau_isDirectPromptTauDecayProduct, &b_gentau_isDirectPromptTauDecayProduct);
+   fChain->SetBranchAddress("gentau_isDirectTauDecayProduct", gentau_isDirectTauDecayProduct, &b_gentau_isDirectTauDecayProduct);
+   fChain->SetBranchAddress("gentau_isFirstCopy", gentau_isFirstCopy, &b_gentau_isFirstCopy);
+   fChain->SetBranchAddress("gentau_isHardProcess", gentau_isHardProcess, &b_gentau_isHardProcess);
+   fChain->SetBranchAddress("gentau_isHardProcessTauDecayProduct", gentau_isHardProcessTauDecayProduct, &b_gentau_isHardProcessTauDecayProduct);
+   fChain->SetBranchAddress("gentau_isLastCopy", gentau_isLastCopy, &b_gentau_isLastCopy);
+   fChain->SetBranchAddress("gentau_isLastCopyBeforeFSR", gentau_isLastCopyBeforeFSR, &b_gentau_isLastCopyBeforeFSR);
+   fChain->SetBranchAddress("gentau_isPrompt", gentau_isPrompt, &b_gentau_isPrompt);
+   fChain->SetBranchAddress("gentau_isPromptTauDecayProduct", gentau_isPromptTauDecayProduct, &b_gentau_isPromptTauDecayProduct);
+   fChain->SetBranchAddress("gentau_isTauDecayProduct", gentau_isTauDecayProduct, &b_gentau_isTauDecayProduct);
    fChain->SetBranchAddress("gentau_decayMode", gentau_decayMode, &b_gentau_decayMode);
    fChain->SetBranchAddress("gentau_decayMode_name", gentau_decayMode_name, &b_gentau_decayMode_name);
    fChain->SetBranchAddress("gentau_mother", gentau_mother, &b_gentau_mother);
@@ -1188,6 +1305,21 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("genparticles_status", genparticles_status, &b_genparticles_status);
    fChain->SetBranchAddress("genparticles_info", genparticles_info, &b_genparticles_info);
    fChain->SetBranchAddress("genparticles_mother", genparticles_mother, &b_genparticles_mother);
+   fChain->SetBranchAddress("genparticles_fromHardProcess", genparticles_fromHardProcess, &b_genparticles_fromHardProcess);
+   fChain->SetBranchAddress("genparticles_fromHardProcessBeforeFSR", genparticles_fromHardProcessBeforeFSR, &b_genparticles_fromHardProcessBeforeFSR);
+   fChain->SetBranchAddress("genparticles_isDecayedLeptonHadron", genparticles_isDecayedLeptonHadron, &b_genparticles_isDecayedLeptonHadron);
+   fChain->SetBranchAddress("genparticles_isDirectHadronDecayProduct", genparticles_isDirectHadronDecayProduct, &b_genparticles_isDirectHadronDecayProduct);
+   fChain->SetBranchAddress("genparticles_isDirectHardProcessTauDecayProduct", genparticles_isDirectHardProcessTauDecayProduct, &b_genparticles_isDirectHardProcessTauDecayProduct);
+   fChain->SetBranchAddress("genparticles_isDirectPromptTauDecayProduct", genparticles_isDirectPromptTauDecayProduct, &b_genparticles_isDirectPromptTauDecayProduct);
+   fChain->SetBranchAddress("genparticles_isDirectTauDecayProduct", genparticles_isDirectTauDecayProduct, &b_genparticles_isDirectTauDecayProduct);
+   fChain->SetBranchAddress("genparticles_isFirstCopy", genparticles_isFirstCopy, &b_genparticles_isFirstCopy);
+   fChain->SetBranchAddress("genparticles_isHardProcess", genparticles_isHardProcess, &b_genparticles_isHardProcess);
+   fChain->SetBranchAddress("genparticles_isHardProcessTauDecayProduct", genparticles_isHardProcessTauDecayProduct, &b_genparticles_isHardProcessTauDecayProduct);
+   fChain->SetBranchAddress("genparticles_isLastCopy", genparticles_isLastCopy, &b_genparticles_isLastCopy);
+   fChain->SetBranchAddress("genparticles_isLastCopyBeforeFSR", genparticles_isLastCopyBeforeFSR, &b_genparticles_isLastCopyBeforeFSR);
+   fChain->SetBranchAddress("genparticles_isPrompt", genparticles_isPrompt, &b_genparticles_isPrompt);
+   fChain->SetBranchAddress("genparticles_isPromptTauDecayProduct", genparticles_isPromptTauDecayProduct, &b_genparticles_isPromptTauDecayProduct);
+   fChain->SetBranchAddress("genparticles_isTauDecayProduct", genparticles_isTauDecayProduct, &b_genparticles_isTauDecayProduct);
    fChain->SetBranchAddress("trigobject_count", &trigobject_count, &b_trigobject_count);
    fChain->SetBranchAddress("trigobject_px", trigobject_px, &b_trigobject_px);
    fChain->SetBranchAddress("trigobject_py", trigobject_py, &b_trigobject_py);

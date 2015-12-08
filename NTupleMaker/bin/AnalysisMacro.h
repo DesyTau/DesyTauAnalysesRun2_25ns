@@ -6,13 +6,13 @@
 #include "DesyTauAnalyses/NTupleMaker/interface/lester_mt2_bisect.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/mTBound.h"
 using namespace std;
-const Float_t MuMass = 0.105658367;
-const Float_t tauMass = 1.776;
+const double MuMass = 0.105658367;
+const double tauMass = 1.776;
 
 
-const Float_t electronMass = 0;
-const Float_t muonMass = 0.10565837;
-const Float_t pionMass = 0.1396;
+const double electronMass = 0;
+const double muonMass = 0.10565837;
+const double pionMass = 0.1396;
 const  int CutN=18;
 
 
@@ -28,35 +28,35 @@ unsigned int el_index=-1;
 double ChiMass=0;
 double mIntermediate = tauMass;
 
-Float_t XSec=-1;
-Float_t xs,fact,fact2;
+double XSec=-1;
+double xs,fact,fact2;
   
-  int nPtBins = 6;
-  float ptBins[7] = {10,15,20,30,40,60,1000};
+int nPtBins = 6;
+double ptBins[7] = {10,15,20,30,40,60,1000};
 
-  int nPtBinsTrig = 7;
-  float ptBinsTrig[8] = {10,15,19,24,30,40,60,1000};  
+int nPtBinsTrig = 7;
+double ptBinsTrig[8] = {10,15,19,24,30,40,60,1000};  
   
-  int nEtaBins = 2;
-  float etaBins[3] = {0,1.48,2.5}; 
+int nEtaBins = 2;
+double etaBins[3] = {0,1.48,2.5}; 
   
-  TString PtBins[6] = {"Pt10to15",
-		       "Pt15to20",
-		       "Pt20to30",
-		       "Pt30to40",
-		       "Pt40to60",
-		       "PtGt60"};
+TString PtBins[6] = {"Pt10to15",
+		     "Pt15to20",
+		     "Pt20to30",
+		     "Pt30to40",
+		     "Pt40to60",
+		     "PtGt60"};
   
-  TString PtBinsTrig[7] = {"Pt10to15",
-			   "Pt15to19",
-			   "Pt19to24",
-			   "Pt24to30",
-			   "Pt30to40",
-			   "Pt40to60",
-			   "PtGt60"};
+TString PtBinsTrig[7] = {"Pt10to15",
+			 "Pt15to19",
+			 "Pt19to24",
+			 "Pt24to30",
+			 "Pt30to40",
+			 "Pt40to60",
+			 "PtGt60"};
 
-  TString EtaBins[2] = {"Barrel",
-			"Endcap"};
+TString EtaBins[2] = {"Barrel",
+		      "Endcap"};
 
 //string CutList[10];
 vector<string> CutList;
@@ -64,11 +64,22 @@ vector<string> CutList;
 //TH1D * histWeights = new TH1D("histWeights","",1,-0.5,0.5);
 TH1D * histWeights = new TH1D("histWeights","",1,0,0);
 
-TH1F * histWeightsH = new TH1F("histWeightsH","",1,-0.5,0.5);
+TH1D * histRuns = new TH1D("histRuns","",6000,24000,30000);
+
+TH1D * histWeightsH = new TH1D("histWeightsH","",1,-0.5,0.5);
 
 TH1D * histWeights2 = new TH1D("histWeights2","",1,0,0);
 
 TH1D * hWeights [CutN];
+
+TH1D * hmu_dxy [CutN];
+TH1D * hmu_dz [CutN];
+
+TH1D * hel_dxy [CutN];
+TH1D * hel_dz [CutN];
+
+TH1D * htau_dxy [CutN];
+TH1D * htau_dz [CutN];
 
 TH1D *hMeffMuon[CutN];
 TH1D *hMeffEl[CutN];
@@ -79,6 +90,8 @@ TH1D *hMeffElOsqrMET[CutN];
 TH1D *hMeffTauOsqrMET[CutN];
 
 TH1D *hHT[CutN];
+TH1D *hHText[CutN];
+TH1D *hRht[CutN];
 TH1D *hHT2[CutN];
 TH1D *hHT3[CutN];
 TH1D *hHT4[CutN];
@@ -86,6 +99,8 @@ TH1D *hHT4[CutN];
 //TH1D *h0JetpT[CutN];
 TH1D *hnJet[CutN];
 TH1D *hnBJet[CutN];
+
+TH1D *hCentrality[CutN];
 
 TH1D *hPtJ0[CutN];
 TH1D *hPtJ1[CutN];
@@ -189,12 +204,16 @@ TH2D *hMT_dPhi[CutN];
 TH2D *hMT_dPhiel[CutN];
 TH2D *hMT_dPhimu[CutN];
 TH2D *hMT_dPhitau[CutN];
+
+TH2D *hIso_sign[CutN];
   
 TH1D *CutFlow= new TH1D("CutFlow","Cut Flow",CutN,0.5,CutN+0.5);
 TH1D *CutFlowUnW= new TH1D("CutFlowUnW","Cut Flow",CutN,0.5,CutN+0.5);
+TH1D *CutFlowUnWNorm= new TH1D("CutFlowUnWNorm","Cut Flow",CutN,0.5,CutN+0.5);
 
 TH1D * inputEventsH = new TH1D("inputEventsH","",1,-0.5,0.5);
 TH1D * hxsec = new TH1D("xsec","",1,0,10e+20);
+
 
 TH1D * muonPtAllH = new TH1D("muonPtAllH","",40,0,200);
 TH1D * electronPtAllH = new TH1D("electronPtAllH","",40,0,200);
@@ -231,6 +250,7 @@ TH1D * DZetaSelH = new TH1D("DZetaSelH","",60,-400,200);
 
 TLorentzVector ElV, MuV, TauV, JetsV, METV;
 
+vector<TLorentzVector> AllJets_Lepton_noMet;
 vector<TLorentzVector> JetsMV;
 vector<TLorentzVector>  ElMV;
 vector<TLorentzVector>  MuMV;
@@ -240,7 +260,7 @@ vector<TLorentzVector>  LeptMV;
 bool ComparePt(TLorentzVector a, TLorentzVector b) { return a.Pt() > b.Pt(); }
 
 
-int binNumber(Float_t x, int nbins, Float_t * bins) {
+int binNumber(double x, int nbins, double * bins) {
 
   int binN = 0;
 
@@ -256,7 +276,7 @@ int binNumber(Float_t x, int nbins, Float_t * bins) {
 }
 
 
-Float_t effBin(Float_t x, int nbins, Float_t * bins, Float_t * eff) {
+double effBin(double x, int nbins, double * bins, double * eff) {
 
   int bin = binNumber(x, nbins, bins);
 
@@ -357,10 +377,10 @@ double deltaR(double Eta1, double Phi1,
 
 double mT (TLorentzVector v1, TLorentzVector Metv){
 
-	Float_t dPhimT=dPhiFrom2P( v1.Px(), v1.Py(), Metv.Px(),  Metv.Py() );
+  double dPhimT=dPhiFrom2P( v1.Px(), v1.Py(), Metv.Px(),  Metv.Py() );
 
-	Float_t MT = TMath::Sqrt(2*v1.Pt()*Metv.Pt()*(1-TMath::Cos(dPhimT)));
-	return MT;
+  double MT = TMath::Sqrt(2*v1.Pt()*Metv.Pt()*(1-TMath::Cos(dPhimT)));
+  return MT;
 }
 
 
@@ -424,9 +444,9 @@ double DeltaPhi(TLorentzVector METV, TLorentzVector LeptonV){
 
 
 
-bool electronMvaIdTight(Float_t eta, Float_t mva) {
+bool electronMvaIdTight(double eta, double mva) {
 
-  Float_t absEta = fabs(eta);
+  double absEta = fabs(eta);
 
   bool passed = false;
   if (absEta<0.8) {
@@ -443,9 +463,9 @@ bool electronMvaIdTight(Float_t eta, Float_t mva) {
 
 }
 
-bool electronMvaIdLoose(float eta, float mva) {
+bool electronMvaIdLoose(double eta, double mva) {
 
-  float absEta = fabs(eta);
+  double absEta = fabs(eta);
 
   bool passed = false;
   if (absEta<0.8) {
@@ -461,9 +481,9 @@ bool electronMvaIdLoose(float eta, float mva) {
   return passed;
 
 }
-bool electronMvaIdWP80(float pt, float eta, float mva) {
+bool electronMvaIdWP80(double pt, double eta, double mva) {
 
-  float absEta = fabs(eta);
+  double absEta = fabs(eta);
   bool passed = false;
   if (absEta<0.8) {
     if (pt<10) 
@@ -487,9 +507,9 @@ bool electronMvaIdWP80(float pt, float eta, float mva) {
   return passed;
 
 }
-bool electronMvaIdWP90(float pt, float eta, float mva) {
+bool electronMvaIdWP90(double pt, double eta, double mva) {
 
-  float absEta = fabs(eta);
+  double absEta = fabs(eta);
   bool passed = false;
   if (absEta<0.8) {
     if (pt<10) 
@@ -515,7 +535,7 @@ bool electronMvaIdWP90(float pt, float eta, float mva) {
 }
 
 
-bool electronVetoTight(Float_t SuperClusterEta, Float_t eta, Float_t phi, Float_t full5, Float_t hOverE, Float_t d0, Float_t dZ, Float_t ooE, Float_t pfISO, Float_t nMissing, bool convVeto) {
+bool electronVetoTight(double SuperClusterEta, double eta, double phi, double full5, double hOverE, double d0, double dZ, double ooE, double pfISO, double nMissing, bool convVeto) {
 
 
   bool passed = false;
@@ -543,7 +563,7 @@ bool electronVetoTight(Float_t SuperClusterEta, Float_t eta, Float_t phi, Float_
 
 void WriteHists(int CutNer, TFile *in, TString dir){
 
-	in->cd(dir);
+  in->cd(dir);
 
   for(int cj = 0; cj < CutNer; cj++)
     {
@@ -560,10 +580,18 @@ void SetupHists(int CutNer){
       CutFlowUnW->GetXaxis()->SetBinLabel(cj+1,CutList[cj].c_str());
       TString cutName=CutList[cj];
       TString nCut;
-      nCut.Form("%d",cj);
+      nCut.Form("%i",cj);
       ///generic variables
       //
       //Jets
+      hmu_dxy[cj] = new TH1D ("hmu_dxy_"+nCut,"hmu_dxy "+cutName,100,-5.,5.);
+      hel_dxy[cj] = new TH1D ("hel_dxy_"+nCut,"hel_dxy "+cutName,100,-5.,5.);
+      htau_dxy[cj] = new TH1D ("htau_dxy_"+nCut,"htau_dxy "+cutName,100,-5.,5.);
+      
+      htau_dz[cj] = new TH1D ("htau_dz_"+nCut,"htau_dz "+cutName,200,-50.,50.);
+      hel_dz[cj] = new TH1D ("hel_dz_"+nCut,"hel_dz "+cutName,200,-50.,50.);
+      hmu_dz[cj] = new TH1D ("hmu_dz_"+nCut,"hmu_dz "+cutName,200,-50.,50.);
+
       hHTOsqrMET[cj] = new TH1D ("hHTOsqrMET_"+nCut,"hHTOsqrMET "+cutName,400,0.0,4000.0);
       hHTOsqrMET[cj]->Sumw2();
       
@@ -581,8 +609,17 @@ void SetupHists(int CutNer){
       hMeffTau[cj] = new TH1D ("hMeffTau_"+nCut,"hMeffTau "+cutName,400,0.0,4000.0); 
       hMeffTau[cj]->Sumw2();
 
+      hCentrality[cj]  = new TH1D ("hCentrality_"+nCut,"hCentrality "+cutName,20,0.,2.);
+      hCentrality[cj]->Sumw2();
+
       hHT[cj] = new TH1D ("HT_"+nCut,"HT "+cutName,400,0.0,4000.0);
       hHT[cj]->Sumw2();
+ 
+      hRht[cj] = new TH1D ("Rht_"+nCut,"Rht "+cutName,20,0.0,2.0);
+      hRht[cj]->Sumw2();
+    
+      hHText[cj] = new TH1D ("HText_"+nCut,"HText "+cutName,400,0.0,4000.0);
+      hHText[cj]->Sumw2();
       hHT2[cj] = new TH1D ("HT2_"+nCut,"HT2 "+cutName,400,0.0,4000.0);
       hHT2[cj]->Sumw2();
       hHT3[cj] = new TH1D ("HT3_"+nCut,"HT3 "+cutName,400,0.0,4000.0);
@@ -603,7 +640,7 @@ void SetupHists(int CutNer){
       //h0JetpT[cj]->Sumw2();
       hnJet[cj] = new TH1D ("nJet_"+nCut,"nJet "+cutName,20,0.5,20.5);
       hnJet[cj]->Sumw2();
-      hnBJet[cj] = new TH1D ("nBJet_"+nCut,"nBJet "+cutName,20,0,20);
+      hnBJet[cj] = new TH1D ("nBJet_"+nCut,"nBJet "+cutName,10,0.5,10.5);
       hnBJet[cj]->Sumw2();
 
       hWeights[cj] = new TH1D ("hWeights_"+nCut,"hWeights "+cutName,10,-1,9);
@@ -618,7 +655,7 @@ void SetupHists(int CutNer){
       //Leptons
       //
       //
-      hnLep[cj] = new TH1D ("nLep_"+nCut,"nLep "+cutName,10,0,10);
+      hnLep[cj] = new TH1D ("nLep_"+nCut,"nLep "+cutName,10,0.5,10.5);
       hnLep[cj]->Sumw2();
       hLeppt[cj] = new TH1D ("LeppT_"+nCut,"Lep pT "+cutName,100,0,1000);
       hLeppt[cj]->Sumw2();
@@ -630,7 +667,7 @@ void SetupHists(int CutNer){
       //Muons
       //
       //
-      hnMu[cj] = new TH1D ("nMu_"+nCut,"nMu "+cutName,10,0,10);
+      hnMu[cj] = new TH1D ("nMu_"+nCut,"nMu "+cutName,10,0.5,10.5);
       hnMu[cj]->Sumw2();
       hMupt[cj] = new TH1D ("MupT_"+nCut,"Mu pT "+cutName,100,0,1000);
       hMupt[cj]->Sumw2();
@@ -640,7 +677,7 @@ void SetupHists(int CutNer){
       //Taus
       //
       //
-      hnTau[cj] = new TH1D ("nTau_"+nCut,"nTau "+cutName,10,0,10);
+      hnTau[cj] = new TH1D ("nTau_"+nCut,"nTau "+cutName,10,0.5,10.5);
       hnTau[cj]->Sumw2();
       hTaupt[cj] = new TH1D ("TaupT_"+nCut,"Tau pT "+cutName,100,0,1000);
       hTaupt[cj]->Sumw2();
@@ -651,7 +688,7 @@ void SetupHists(int CutNer){
       //Electrons
       //
       //
-      hnEl[cj] = new TH1D ("nEl_"+nCut,"nEl "+cutName,10,0,10);
+      hnEl[cj] = new TH1D ("nEl_"+nCut,"nEl "+cutName,10,0.5,10.5);
       hnEl[cj]->Sumw2();
       hElpt[cj] = new TH1D ("ElpT_"+nCut,"El pT "+cutName,100,0,1000);
       hElpt[cj]->Sumw2();
@@ -727,25 +764,25 @@ void SetupHists(int CutNer){
       /*       hDZeta[CutN]= new TH1D ("DZeta_"+nCut,"DZeta "+cutName,300,-400,200);
 	       hDZeta[cj]->Sumw2();
       */
-      hel_miniISO[cj]= new TH1D ("elminiISO_"+nCut,"elminiISO "+cutName,50,0,5);;
+      hel_miniISO[cj]= new TH1D ("elminiISO_"+nCut,"elminiISO "+cutName,100,0,5);;
       hel_miniISO[cj]->Sumw2();
-      hel_miniISOL[cj]= new TH1D ("elminiISOL_"+nCut,"elminiISOL "+cutName,50,0,5);;
+      hel_miniISOL[cj]= new TH1D ("elminiISOL_"+nCut,"elminiISOL "+cutName,100,0,5);;
       hel_miniISOL[cj]->Sumw2();
 
-      hel_relISO[cj]= new TH1D ("elrelISO_"+nCut,"elrelISO "+cutName,50,0,5);;
+      hel_relISO[cj]= new TH1D ("elrelISO_"+nCut,"elrelISO "+cutName,100,0,5);;
       hel_relISO[cj]->Sumw2();
-      hel_relISOL[cj]= new TH1D ("elrelISOL_"+nCut,"murelISOL "+cutName,50,0,5);;
+      hel_relISOL[cj]= new TH1D ("elrelISOL_"+nCut,"elrelISOL "+cutName,100,0,5);;
       hel_relISOL[cj]->Sumw2();
         
         
-      hmu_miniISO[cj]= new TH1D ("muminiISO_"+nCut,"muminiISO "+cutName,50,0,5);;
+      hmu_miniISO[cj]= new TH1D ("muminiISO_"+nCut,"muminiISO "+cutName,100,0,5);;
       hmu_miniISO[cj]->Sumw2();
-      hmu_miniISOL[cj]= new TH1D ("muminiISOL_"+nCut,"muminiISOL "+cutName,50,0,5);;
+      hmu_miniISOL[cj]= new TH1D ("muminiISOL_"+nCut,"muminiISOL "+cutName,100,0,5);;
       hmu_miniISOL[cj]->Sumw2();
 
-      hmu_relISO[cj]= new TH1D ("murelISO_"+nCut,"murelISO "+cutName,50,0,5);;
+      hmu_relISO[cj]= new TH1D ("murelISO_"+nCut,"murelISO "+cutName,100,0,5);;
       hmu_relISO[cj]->Sumw2();
-      hmu_relISOL[cj]= new TH1D ("murelISOL_"+nCut,"murelISOL "+cutName,50,0,5);;
+      hmu_relISOL[cj]= new TH1D ("murelISOL_"+nCut,"murelISOL "+cutName,100,0,5);;
       hmu_relISOL[cj]->Sumw2();
  
       hdR_eltau[cj]= new TH1D ("dR_eltau_"+nCut,"dR_eltau "+cutName,60,0,6);;
@@ -760,11 +797,11 @@ void SetupHists(int CutNer){
       hdR_muel[cj]= new TH1D ("dR_muel_"+nCut,"dR_muel "+cutName,60,0,6);;
       hdR_muel[cj]->Sumw2();
 
-      hnpv[cj]= new TH1D ("npv_"+nCut,"npv "+cutName,50,0,50);;
+      hnpv[cj]= new TH1D ("npv_"+nCut,"npv "+cutName,100,0.5,50.5);;
       hnpv[cj]->Sumw2();
-      hnpu[cj]= new TH1D ("npu_"+nCut,"npu "+cutName,50,0,50);;
+      hnpu[cj]= new TH1D ("npu_"+nCut,"npu "+cutName,100,0.5,50.5);;
       hnpu[cj]->Sumw2();
-      hnrho[cj]= new TH1D ("nrho_"+nCut,"nrho "+cutName,50,0,50);;
+      hnrho[cj]= new TH1D ("nrho_"+nCut,"nrho "+cutName,100,0.5,50.5);;
       hnrho[cj]->Sumw2();
  
       
@@ -808,6 +845,10 @@ void SetupHists(int CutNer){
       hMT_dPhimu[cj]->Sumw2();
       hMT_dPhitau[cj]= new TH2D ("MTtau_dPhi_"+nCut,"MTtau_dPhi "+cutName,40,0,200,64,0.0,3.2);
       hMT_dPhitau[cj]->Sumw2();
+      hIso_sign[cj]= new TH2D ("Iso_sign_"+nCut,"Iso_sign "+cutName,100,0,5,2,0,2);
+      hIso_sign[cj]->GetYaxis()->SetBinLabel(1,"SS");
+      hIso_sign[cj]->GetYaxis()->SetBinLabel(2,"OS");
+      hIso_sign[cj]->Sumw2();
 
     }
 }
@@ -819,33 +860,59 @@ void FillMainHists(int CutIndex, Double_t EvWeight, vector<TLorentzVector>  ElV,
 
 void FillMainHists(int CutIndex, Double_t EvWeight, vector<TLorentzVector>  ElV, vector<TLorentzVector>  MuV, vector<TLorentzVector>  TauV, vector<TLorentzVector>  JetsV, TLorentzVector  MetV, AC1B &tree_, string & Sel, int  mIndex, int eIndex, int  tIndex){};
 
+
+double Centrality (vector < TLorentzVector > AllJets_Lepton_noMet_){
+    // Centrality
+    double Centrality = 0, Centrality_N = 0, Centrality_D = 0;
+    for (unsigned int i = 0; i < AllJets_Lepton_noMet_.size (); i++)
+    {
+    Centrality_N += AllJets_Lepton_noMet_[i].Pt ();
+    Centrality_D += AllJets_Lepton_noMet_[i].P ();
+    }
+    double Centr_=-1;
+
+    Centrality_D > 0 ? Centr_ = Centrality_N / Centrality_D : Centr_=-1;
+
+    return Centr_ ;
+  }
+
+
+
 void FillMainHists(int CutIndex, Double_t EvWeight, vector<TLorentzVector>  ElV, vector<TLorentzVector>  MuV, vector<TLorentzVector>  TauV, vector<TLorentzVector>  JetsV, TLorentzVector  MetV, double Chimass, double mintermediate,AC1B &tree_, string & Sel, int  mIndex, int eIndex, int  tIndex){	
 
+    AllJets_Lepton_noMet.clear();
+    for (unsigned int i = 0; i <   JetsV.size(); i++) AllJets_Lepton_noMet.push_back (JetsV.at(i));
 
-  Float_t sumpT=0;
+ if (mIndex<0 && tree_.muon_count > 0) mIndex=0;  
+ if (eIndex<0 && tree_.electron_count > 0) eIndex=0;  
+ if (tIndex<0 && tree_.tau_count > 0) tIndex=0;  
 
-  Float_t sumMuonpT=0;
-  Float_t sumElpT=0;
-  Float_t sumTaupT=0;  
-      	//void FillMainHists(int CutIndex, Double_t EvWeight, vector<TLorentzVector>  *JetsV){
+  TLorentzVector muV ; if (tree_.muon_count > 0) muV.SetPtEtaPhiM(tree_.muon_pt[mIndex], tree_.muon_eta[mIndex], tree_.muon_phi[mIndex], muonMass);
+  TLorentzVector tauV; if (tree_.tau_count > 0) tauV.SetPtEtaPhiM(tree_.tau_pt[tIndex], tree_.tau_eta[tIndex], tree_.tau_phi[tIndex], tauMass);
+  TLorentzVector elV;  if (tree_.electron_count > 0) elV.SetPtEtaPhiM(tree_.electron_pt[eIndex], tree_.electron_eta[eIndex], tree_.electron_phi[eIndex], tauMass);
+		
+if (Sel=="mutau" && mIndex !=-1 && MuV.size()>0)    AllJets_Lepton_noMet.push_back (muV);
+if (Sel=="eltau" && eIndex !=-1 && ElV.size()>0)    AllJets_Lepton_noMet.push_back (elV);
 
-       	// if (JetsV.size()>0 )	
-	  hnJet[CutIndex]->Fill(JetsV.size(),EvWeight);
- // if (MuV.size() >0  )      
-	  hnMu[CutIndex]->Fill(MuV.size(),EvWeight);
- // if (TauV.size() >0 )      
-	  hnTau[CutIndex]->Fill(TauV.size(),EvWeight);
-//  if (ElV.size() >0  )     
-	  hnEl[CutIndex]->Fill(ElV.size(),EvWeight);
-  hnLep[CutIndex]->Fill(ElV.size()+MuV.size()+TauV.size(),EvWeight);
+
+	//cout<<" Init  "<<mIndex<<"  "<<eIndex<<"  "<<tIndex<<endl;
+
+  double sumpT=0;
+
+  double sumMuonpT=0;
+  double sumElpT=0;
+  double sumTaupT=0;  
+
+  hnJet[CutIndex]->Fill(tree_.pfjet_count,EvWeight);
+  hnMu[CutIndex]->Fill(tree_.muon_count,EvWeight);
+  hnTau[CutIndex]->Fill(tree_.tau_count,EvWeight);
+  hnEl[CutIndex]->Fill(tree_.electron_count,EvWeight);
+  hnLep[CutIndex]->Fill(tree_.electron_count+tree_.muon_count+tree_.tau_count,EvWeight);
   hnpu[CutIndex]->Fill(tree_.numpileupinteractions,EvWeight);
   hnpv[CutIndex]->Fill(tree_.primvertex_count,EvWeight);
   hnrho[CutIndex]->Fill(tree_.rho,EvWeight);
   hWeights[CutIndex]->Fill(EvWeight);
 
-  TLorentzVector muV ; muV.SetPtEtaPhiM(tree_.muon_pt[mIndex], tree_.muon_eta[mIndex], tree_.muon_phi[mIndex], muonMass);
-  TLorentzVector tauV; tauV.SetPtEtaPhiM(tree_.tau_pt[tIndex], tree_.tau_eta[tIndex], tree_.tau_phi[tIndex], tauMass);
-  TLorentzVector elV;  elV.SetPtEtaPhiM(tree_.electron_pt[eIndex], tree_.electron_eta[eIndex], tree_.electron_phi[eIndex], tauMass);
 
    
 
@@ -858,141 +925,45 @@ void FillMainHists(int CutIndex, Double_t EvWeight, vector<TLorentzVector>  ElV,
   //  }
   //
   //cout << " Passing arguments befor" << JetsV.size()<<" muV "<<MuV.size()<<" tauV "<<TauV.size()<<" elV "<<ElV.size()<<" elI "<<eIndex<<" mI "<<mIndex<<"  tI "<<tIndex<<endl;
-  if (Sel=="mutau" && MuV.size()>0 && TauV.size()>0 && mIndex >-1 && tIndex >-1 ){
-	double Mt2 = 0;
-	       	//Mt2 =asymm_mt2_lester_bisect::get_mT2(muonMass, muV.Px(), muV.Py(),tauMass,tauV.Px(),tauV.Py(),MetV.Px(),MetV.Py(),Chimass,Chimass,0);
-   //   cout<<" Will call with Mt2 "<<Mt2<<"   "<<Chimass<<endl;
-	hMt2mutau[CutIndex]->Fill(Mt2,EvWeight);
- 
-	//double mTB = Lester::mTBound(muV.E(), muV.Px(), muV.Py(), muV.Pz(), tauV.E(),tauV.Px(),tauV.Py(),tauV.Pz(),MetV.Px(),MetV.Py(), mintermediate);
-	//hTBoundmutau[CutIndex]->Fill(mTB);
-	//cout<<"  "<<mTB<<endl;
-	//	     	Float_t Dr= deltaR(MuV.at(mIndex).Eta(), MuV.at(mIndex).Phi(),TauV.at(mIndex).Eta(),TauV.at(mIndex).Phi());
-    //Float_t Dr= deltaR(MuV.at(0).Eta(), MuV.at(0).Phi(),TauV.at(0).Eta(),TauV.at(0).Phi());
-    //Float_t Dr = MuV.at(mIndex).DeltaR(TauV.at(tIndex));
-    Float_t Dr = muV.DeltaR(tauV);
-    //
+  //if (Sel=="mutau" && MuV.size()>0 && TauV.size()>0 && mIndex >-1 && tIndex >-1 ){
 
+  if (Sel=="mutau" && tree_.muon_count > 0 && tree_.tau_count>0 ){
+
+      	  double Mt2 = 0;
+    Mt2 =asymm_mt2_lester_bisect::get_mT2(muonMass, tree_.muon_px[mIndex], tree_.muon_py[mIndex],tauMass,tree_.tau_px[tIndex],tree_.muon_py[tIndex],MetV.Px(),MetV.Py(),Chimass,Chimass,0);
+    //   cout<<" Will call with Mt2 "<<Mt2<<"   "<<Chimass<<endl;
+    hMt2mutau[CutIndex]->Fill(Mt2,EvWeight);
+ 
+    double Centr = Centrality(AllJets_Lepton_noMet);
+    hCentrality[CutIndex]->Fill(Centr,EvWeight);
+    //cout<<"Centr "<<Centr<<"  "<< EvWeight <<endl;
+    //double mTB = Lester::mTBound(muV.E(), muV.Px(), muV.Py(), muV.Pz(), tauV.E(),tauV.Px(),tauV.Py(),tauV.Pz(),MetV.Px(),MetV.Py(), mintermediate);
+    //hTBoundmutau[CutIndex]->Fill(mTB);
+    //cout<<"  "<<mTB<<endl;
+    //	     	double Dr= deltaR(MuV.at(mIndex).Eta(), MuV.at(mIndex).Phi(),TauV.at(mIndex).Eta(),TauV.at(mIndex).Phi());
+    //double Dr= deltaR(MuV.at(0).Eta(), MuV.at(0).Phi(),TauV.at(0).Eta(),TauV.at(0).Phi());
+    //double Dr = MuV.at(mIndex).DeltaR(TauV.at(tIndex));
+    double Dr = muV.DeltaR(tauV);
+    //
     TLorentzVector DiL = muV  + tauV;
-    Float_t dPhi=dPhiFrom2P( DiL.Px(), DiL.Py(), MetV.Px(),  MetV.Py() );
-    Float_t MT = TMath::Sqrt(2*DiL.Pt()*MetV.Pt()*(1-TMath::Cos(dPhi)));
+    double dPhi=dPhiFrom2P( DiL.Px(), DiL.Py(), MetV.Px(),  MetV.Py() );
+    double MT = TMath::Sqrt(2*DiL.Pt()*MetV.Pt()*(1-TMath::Cos(dPhi)));
     hMTmutau[CutIndex]->Fill(MT,EvWeight);
     hInvMassMuTau[CutIndex]->Fill(DiL.M(),EvWeight);
     hdR_mutau[CutIndex]->Fill(Dr,EvWeight);
 
     hdRmt_dPhi[CutIndex]->Fill(Dr,dPhi,EvWeight);
-  }
-
-  if (Sel=="eltau" && ElV.size()>0 && TauV.size()>0  && mIndex>-1 && eIndex > -1){
-    //Float_t Dr= deltaR(ElV.at(eIndex).Eta(), ElV.at(eIndex).Phi(),TauV.at(tIndex).Eta(),TauV.at(tIndex).Phi());
-    Float_t Dr = elV.DeltaR(tauV);
-    hdR_eltau[CutIndex]->Fill(Dr,EvWeight);
-     
-    TLorentzVector DiL = elV + tauV;
-    Float_t dPhi=dPhiFrom2P( DiL.Px(), DiL.Py(), MetV.Px(),  MetV.Py() );
-    Float_t MT = TMath::Sqrt(2*DiL.Pt()*MetV.Pt()*(1-TMath::Cos(dPhi)));
-    hMTeltau[CutIndex]->Fill(MT,EvWeight);
-    hInvMassElTau[CutIndex]->Fill(DiL.M(),EvWeight);
-	
-    hdRet_dPhi[CutIndex]->Fill(Dr,dPhi,EvWeight);
-  }
-
-  if (Sel=="muel" && MuV.size()>0 && ElV.size()>0  && mIndex>-1 && eIndex > -1 ){
-    //Flaat_t Dr= deltaR(MuV.at(mIndex).Eta(), MuV.at(mIndex).Phi(),ElV.at(eIndex).Eta(),ElV.at(eIndex).Phi());
-    Float_t Dr = ElV.at(0).DeltaR(MuV.at(0));
-    hdR_muel[CutIndex]->Fill(Dr,EvWeight);
-    TLorentzVector DiL = ElV.at(0) + MuV.at(0);
-    Float_t dPhi=dPhiFrom2P( DiL.Px(), DiL.Py(), MetV.Px(),  MetV.Py() );
-    Float_t MT = TMath::Sqrt(2*DiL.Pt()*MetV.Pt()*(1-TMath::Cos(dPhi)));
-    hMTmuel[CutIndex]->Fill(MT,EvWeight);
-    hInvMassMuEl[CutIndex]->Fill(DiL.M(),EvWeight);
-    hdRme_dPhi[CutIndex]->Fill(Dr,dPhi,EvWeight);
-  }
-  //////////////// FIX THE INDEXES FOR TWO TAU CANDIDATES!!!!
-  if (Sel=="tautau" &&  TauV.size()>1 && tIndex > -1){
-    Float_t Dr = TauV.at(0).DeltaR(TauV.at(0));
-    //Float_t Dr= deltaR(TauV.at(mIndex).Eta(), TauV.at(mIndex).Phi(),TauV.at(tIndex).Eta(),TauV.at(tIndex).Phi());
-    hdR_mutau[CutIndex]->Fill(Dr,EvWeight);
-    TLorentzVector DiL = TauV.at(0) + TauV.at(0);
-    Float_t dPhi=dPhiFrom2P( DiL.Px(), DiL.Py(), MetV.Px(),  MetV.Py() );
-    Float_t MT = TMath::Sqrt(2*DiL.Pt()*MetV.Pt()*(1-TMath::Cos(dPhi)));
-    hMTtautau[CutIndex]->Fill(MT,EvWeight);
-    hdRtt_dPhi[CutIndex]->Fill(Dr,dPhi,EvWeight);
-    if (mIndex >-1 && tIndex >-1){
-      TLorentzVector dimass = TauV.at(mIndex) + TauV.at(tIndex);
-      hInvMassTauTau[CutIndex]->Fill(dimass.M(),EvWeight);
-    }
-  }
-
-  if (ElV.size() > 0 && eIndex>-1)
-    {
-      hElpt[CutIndex]->Fill(elV.Pt(),EvWeight);
-      hEleta[CutIndex]->Fill(elV.Eta(),EvWeight);
-
-      Float_t dPhi=dPhiFrom2P( elV.Px(), elV.Py(), MetV.Px(),  MetV.Py() );
-      hdPhiMETLep[CutIndex]->Fill(dPhi,EvWeight);
-      hdPhiMETEl[CutIndex]->Fill(dPhi,EvWeight);
-      		
-      Float_t MT = TMath::Sqrt(2*elV.Pt()*MetV.Pt()*(1-TMath::Cos(dPhi)));
-      hMT[CutIndex]->Fill(MT,EvWeight);
-      hMTel[CutIndex]->Fill(MT,EvWeight);
-
-      hmet_dPhi[CutIndex]->Fill(MetV.Pt(),dPhi,EvWeight);
-      hmet_dPhiel[CutIndex]->Fill(MetV.Pt(),dPhi,EvWeight);
-
-      hmet_MT[CutIndex]->Fill(MetV.Pt(),MT,EvWeight);
-      hmet_MTel[CutIndex]->Fill(MetV.Pt(),MT,EvWeight);
-
-      hMT_dPhi[CutIndex]->Fill(MT,dPhi,EvWeight);
-      hMT_dPhiel[CutIndex]->Fill(MT,dPhi,EvWeight);
-
-      Float_t dPhiJ=dPhiFrom2P( elV.Px(), elV.Py(), MetV.Px(),  MetV.Py() );
-      hdPhiElMET[CutIndex]->Fill(dPhiJ,EvWeight);
-    
-	   
-      hel_miniISOL[CutIndex]->Fill(tree_.electron_miniISO[eIndex],EvWeight);
-      Float_t neutralIso = 
-	tree_.electron_neutralHadIso[eIndex] + 
-	tree_.electron_photonIso[eIndex] - 
-	0.5*tree_.electron_puIso[eIndex];
-      neutralIso = TMath::Max(Float_t(0),neutralIso); 
-      Float_t absIso = tree_.electron_chargedHadIso[eIndex] + neutralIso;
-      Float_t relIso = absIso/tree_.electron_pt[eIndex];
-      hel_relISOL[CutIndex]->Fill(relIso,EvWeight);
-
-      for (unsigned int ie=0;ie<ElV.size();ie++){
-
-        sumElpT +=ElV.at(ie).Pt();
-	hLeppt[CutIndex]->Fill(ElV.at(ie).Pt(),EvWeight);
-	hLepeta[CutIndex]->Fill(ElV.at(ie).Eta(),EvWeight);
-
-	hel_miniISO[CutIndex]->Fill(tree_.electron_miniISO[ie],EvWeight);
-	Float_t neutralIso = 
-	  tree_.electron_neutralHadIso[ie] + 
-	  tree_.electron_photonIso[ie] - 
-	  0.5*tree_.electron_puIso[ie];
-	neutralIso = TMath::Max(Float_t(0),neutralIso); 
-	Float_t absIso = tree_.electron_chargedHadIso[ie] + neutralIso;
-	Float_t relIso = absIso/tree_.electron_pt[ie];
-        hel_relISO[CutIndex]->Fill(relIso,EvWeight);
-	
-      }
-    }
 
 
 
-  if (MuV.size() > 0 && mIndex>-1)
-    {
       TLorentzVector WBos = MetV + muV;
-      hMupt[CutIndex]->Fill(muV.Pt(),EvWeight);
-      hMueta[CutIndex]->Fill(muV.Eta(),EvWeight);
   
 
-      Float_t dPhi=dPhiFrom2P( muV.Px(), muV.Py(), MetV.Px(),  MetV.Py() );
+      dPhi=dPhiFrom2P( tree_.muon_px[mIndex], tree_.muon_py[mIndex], MetV.Px(),  MetV.Py() );
       hdPhiMETLep[CutIndex]->Fill(dPhi,EvWeight);
       hdPhiMETMu[CutIndex]->Fill(dPhi,EvWeight);
       
-      Float_t MT = TMath::Sqrt(2*muV.Pt()*MetV.Pt()*(1-TMath::Cos(dPhi)));
+      MT = TMath::Sqrt(2*tree_.muon_pt[mIndex]*MetV.Pt()*(1-TMath::Cos(dPhi)));
       hMT[CutIndex]->Fill(MT,EvWeight);
       hMTmu[CutIndex]->Fill(MT,EvWeight);
 
@@ -1005,19 +976,114 @@ void FillMainHists(int CutIndex, Double_t EvWeight, vector<TLorentzVector>  ElV,
       hMT_dPhi[CutIndex]->Fill(MT,dPhi,EvWeight);
       hMT_dPhimu[CutIndex]->Fill(MT,dPhi,EvWeight);
  
-      Float_t dPhiJ=dPhiFrom2P( muV.Px(), muV.Py(), MetV.Px(),  MetV.Py() );
-      hdPhiMuMET[CutIndex]->Fill(dPhiJ,EvWeight);
-	   
-      hmu_miniISOL[CutIndex]->Fill(tree_.muon_miniISO[mIndex],EvWeight);
-      Float_t neutralIso = 
-	tree_.muon_neutralHadIso[mIndex] + 
-	tree_.muon_photonIso[mIndex] - 
-	0.5*tree_.muon_puIso[mIndex];
-      neutralIso = TMath::Max(Float_t(mIndex),neutralIso); 
-      Float_t absIso = tree_.muon_chargedHadIso[mIndex] + neutralIso;
-      Float_t relIso = absIso/tree_.muon_pt[mIndex];
-      hmu_relISOL[CutIndex]->Fill(relIso,EvWeight);
+      
+
+//	cout<<"  MUV SIZE ==================== "<<MuV.size()<<"  iCut "<<CutIndex<<"  mIndex  "<<mIndex<<" tIndex  "<<tIndex<<endl;
+
+  }
+
+
+
+
+  if (Sel=="eltau" && ElV.size()>0 && TauV.size()>0  && mIndex>-1 && eIndex > -1){
+    //double Dr= deltaR(ElV.at(eIndex).Eta(), ElV.at(eIndex).Phi(),TauV.at(tIndex).Eta(),TauV.at(tIndex).Phi());
+    double Dr = elV.DeltaR(tauV);
+    hdR_eltau[CutIndex]->Fill(Dr,EvWeight);
      
+    TLorentzVector DiL = elV + tauV;
+    double dPhi=dPhiFrom2P( DiL.Px(), DiL.Py(), MetV.Px(),  MetV.Py() );
+    double MT = TMath::Sqrt(2*DiL.Pt()*MetV.Pt()*(1-TMath::Cos(dPhi)));
+    hMTeltau[CutIndex]->Fill(MT,EvWeight);
+    hInvMassElTau[CutIndex]->Fill(DiL.M(),EvWeight);
+	
+    hdRet_dPhi[CutIndex]->Fill(Dr,dPhi,EvWeight);
+  }
+
+  if (Sel=="muel" && MuV.size()>0 && ElV.size()>0  && mIndex>-1 && eIndex > -1 ){
+    //Flaat_t Dr= deltaR(MuV.at(mIndex).Eta(), MuV.at(mIndex).Phi(),ElV.at(eIndex).Eta(),ElV.at(eIndex).Phi());
+    double Dr = ElV.at(0).DeltaR(MuV.at(0));
+    hdR_muel[CutIndex]->Fill(Dr,EvWeight);
+    TLorentzVector DiL = ElV.at(0) + MuV.at(0);
+    double dPhi=dPhiFrom2P( DiL.Px(), DiL.Py(), MetV.Px(),  MetV.Py() );
+    double MT = TMath::Sqrt(2*DiL.Pt()*MetV.Pt()*(1-TMath::Cos(dPhi)));
+    hMTmuel[CutIndex]->Fill(MT,EvWeight);
+    hInvMassMuEl[CutIndex]->Fill(DiL.M(),EvWeight);
+    hdRme_dPhi[CutIndex]->Fill(Dr,dPhi,EvWeight);
+  }
+  //////////////// FIX THE INDEXES FOR TWO TAU CANDIDATES!!!!
+  if (Sel=="tautau" &&  TauV.size()>1 && tIndex > -1){
+    double Dr = TauV.at(0).DeltaR(TauV.at(0));
+    //double Dr= deltaR(TauV.at(mIndex).Eta(), TauV.at(mIndex).Phi(),TauV.at(tIndex).Eta(),TauV.at(tIndex).Phi());
+    hdR_tautau[CutIndex]->Fill(Dr,EvWeight);
+    TLorentzVector DiL = TauV.at(0) + TauV.at(0);
+    double dPhi=dPhiFrom2P( DiL.Px(), DiL.Py(), MetV.Px(),  MetV.Py() );
+    double MT = TMath::Sqrt(2*DiL.Pt()*MetV.Pt()*(1-TMath::Cos(dPhi)));
+    hMTtautau[CutIndex]->Fill(MT,EvWeight);
+    hdRtt_dPhi[CutIndex]->Fill(Dr,dPhi,EvWeight);
+    if (mIndex >-1 && tIndex >-1){
+      TLorentzVector dimass = TauV.at(mIndex) + TauV.at(tIndex);
+      hInvMassTauTau[CutIndex]->Fill(dimass.M(),EvWeight);
+    }
+  }
+
+
+
+  if (ElV.size() > 0 && eIndex>-1)
+    {
+	
+        hElpt[CutIndex]->Fill(tree_.electron_pt[eIndex],EvWeight);
+        hEleta[CutIndex]->Fill(tree_.electron_eta[eIndex],EvWeight);
+        hel_dxy[CutIndex]->Fill(tree_.electron_dxy[eIndex],EvWeight);
+        hel_dz[CutIndex]->Fill(tree_.electron_dz[eIndex],EvWeight);
+
+      double dPhiJ=dPhiFrom2P( tree_.electron_px[eIndex], tree_.electron_py[eIndex], MetV.Px(),  MetV.Py() );
+      hdPhiElMET[CutIndex]->Fill(dPhiJ,EvWeight);
+
+      for (unsigned int ie=0;ie<ElV.size();ie++){
+
+        sumElpT +=ElV.at(ie).Pt();
+	hLeppt[CutIndex]->Fill(ElV.at(ie).Pt(),EvWeight);
+	hLepeta[CutIndex]->Fill(ElV.at(ie).Eta(),EvWeight);
+
+	hel_miniISO[CutIndex]->Fill(tree_.electron_miniISO[ie],EvWeight);
+	double absIso= tree_.electron_r03_sumChargedHadronPt[ie]
+	                    + max(tree_.electron_r03_sumNeutralHadronEt[ie] + tree_.electron_r03_sumPhotonEt[ie]
+			    - 0.5 * tree_.electron_r03_sumPUPt[ie],0.0);
+
+	double relIso = absIso/tree_.electron_pt[ie];
+
+	hel_relISO[CutIndex]->Fill(relIso,EvWeight);
+      }
+	double absIso= tree_.electron_r03_sumChargedHadronPt[eIndex]
+	                    + max(tree_.electron_r03_sumNeutralHadronEt[eIndex] + tree_.electron_r03_sumPhotonEt[eIndex]
+			    - 0.5 * tree_.electron_r03_sumPUPt[eIndex],0.0);
+
+	double relIso = absIso/tree_.electron_pt[eIndex];
+
+      hel_relISOL[CutIndex]->Fill(relIso,EvWeight);
+      hel_miniISOL[CutIndex]->Fill(tree_.electron_miniISO[mIndex],EvWeight);
+
+	if (tIndex>-1){
+      double q = tree_.electron_charge[eIndex] * tree_.muon_charge[mIndex];
+      if (q>0) hIso_sign[CutIndex]->Fill(relIso,0.5,EvWeight);
+      if (q<0) hIso_sign[CutIndex]->Fill(relIso,1.5,EvWeight);
+	}
+
+    }
+
+
+  if (MuV.size() > 0 && tree_.muon_count > 0)
+    {
+	    if (mIndex<0) mIndex = 0;
+
+        hMupt[CutIndex]->Fill(tree_.muon_pt[mIndex],EvWeight);
+        hMueta[CutIndex]->Fill(tree_.muon_eta[mIndex],EvWeight);
+        hmu_dxy[CutIndex]->Fill(tree_.muon_dxy[mIndex],EvWeight);
+        hmu_dz[CutIndex]->Fill(tree_.muon_dz[mIndex],EvWeight);
+
+      double dPhiJ=dPhiFrom2P( tree_.muon_px[mIndex], tree_.muon_py[mIndex], MetV.Px(),  MetV.Py() );
+      hdPhiMuMET[CutIndex]->Fill(dPhiJ,EvWeight);
+
       for (unsigned int im=0;im<MuV.size();im++){
 
         sumMuonpT +=MuV.at(im).Pt();
@@ -1025,27 +1091,42 @@ void FillMainHists(int CutIndex, Double_t EvWeight, vector<TLorentzVector>  ElV,
 	hLepeta[CutIndex]->Fill(MuV.at(im).Eta(),EvWeight);
 
 	hmu_miniISO[CutIndex]->Fill(tree_.muon_miniISO[im],EvWeight);
-   
-	Float_t neutralIso = 
-	  tree_.muon_neutralHadIso[im] + 
-	  tree_.muon_photonIso[im] - 
-	  0.5*tree_.muon_puIso[im];
-	neutralIso = TMath::Max(Float_t(im),neutralIso); 
-	Float_t absIso = tree_.muon_chargedHadIso[im] + neutralIso;
-	Float_t relIso = absIso/tree_.muon_pt[im];
-        hmu_relISO[CutIndex]->Fill(relIso,EvWeight);
-      }
-    }
-  
-  if (TauV.size() > 0 && tIndex>-1)
-    {
-      hTaupt[CutIndex]->Fill(tauV.Pt(),EvWeight);
-      hTaueta[CutIndex]->Fill(tauV.Eta(),EvWeight);
-      Float_t dPhi=dPhiFrom2P( tauV.Px(), tauV.Py(), MetV.Px(),  MetV.Py() );
-      hdPhiMETTau[CutIndex]->Fill(dPhi,EvWeight);
-      Float_t dPhiJ=dPhiFrom2P( tauV.Px(), tauV.Py(), MetV.Px(),  MetV.Py() );
-    
+	double absIso= tree_.muon_r03_sumChargedHadronPt[im]
+	                    + max(tree_.muon_r03_sumNeutralHadronEt[im] + tree_.muon_r03_sumPhotonEt[im]
+			    - 0.5 * tree_.muon_r03_sumPUPt[im],0.0);
 
+	double relIso = absIso/tree_.muon_pt[im];
+
+	hmu_relISO[CutIndex]->Fill(relIso,EvWeight);
+      }
+
+     double absIso= tree_.muon_r03_sumChargedHadronPt[mIndex]
+	            + max(tree_.muon_r03_sumNeutralHadronEt[mIndex] + tree_.muon_r03_sumPhotonEt[mIndex]
+	            - 0.5 * tree_.muon_r03_sumPUPt[mIndex],0.0);
+
+      double relIso = absIso/tree_.muon_pt[mIndex];
+      hmu_relISOL[CutIndex]->Fill(relIso,EvWeight);
+      hmu_miniISOL[CutIndex]->Fill(tree_.muon_miniISO[mIndex],EvWeight);
+
+      if (tIndex>-1 && tree_.tau_count > 0){
+      double q = tree_.tau_charge[tIndex] * tree_.muon_charge[mIndex];
+      if (q>0) hIso_sign[CutIndex]->Fill(relIso,0.5,EvWeight);
+      if (q<0) hIso_sign[CutIndex]->Fill(relIso,1.5,EvWeight);
+	}
+
+    }
+
+
+  if (TauV.size() > 0 && tree_.tau_count > 0)
+    {
+	    if (tIndex<0) tIndex = 0;
+      hTaupt[CutIndex]->Fill(tree_.tau_pt[tIndex],EvWeight);
+      hTaueta[CutIndex]->Fill(tree_.tau_eta[tIndex],EvWeight);
+      htau_dxy[CutIndex]->Fill(tree_.tau_dxy[tIndex],EvWeight);
+      htau_dz[CutIndex]->Fill(tree_.tau_dz[tIndex],EvWeight);
+
+
+      double dPhiJ=dPhiFrom2P( tree_.tau_px[mIndex], tree_.tau_py[mIndex], MetV.Px(),  MetV.Py() );
       hdPhiTauMET[CutIndex]->Fill(dPhiJ,EvWeight);
 
       for (unsigned int it=0;it<TauV.size();it++){
@@ -1056,70 +1137,83 @@ void FillMainHists(int CutIndex, Double_t EvWeight, vector<TLorentzVector>  ElV,
       }
     }
 
+
   int bjets=0;
   
   if (JetsV.size()>0){
   
 
-      Float_t dPhiJ=dPhiFrom2P( JetsV.at(0).Px(), JetsV.at(0).Py(), MetV.Px(),  MetV.Py() );
-      hdPhiJ0MET[CutIndex]->Fill(dPhiJ,EvWeight);
+    double dPhiJ=dPhiFrom2P( JetsV.at(0).Px(), JetsV.at(0).Py(), MetV.Px(),  MetV.Py() );
+    hdPhiJ0MET[CutIndex]->Fill(dPhiJ,EvWeight);
 
     hPtJ0[CutIndex]->Fill(JetsV.at(0).Pt(),EvWeight);
 
     if (JetsV.size()>1){
       hPtJ1[CutIndex]->Fill(JetsV.at(1).Pt(),EvWeight);
       hHT2[CutIndex]->Fill(JetsV.at(0).Pt()+JetsV.at(1).Pt(),EvWeight);
-      Float_t dPhiJ=dPhiFrom2P( JetsV.at(1).Px(), JetsV.at(1).Py(), MetV.Px(),  MetV.Py() );
+      double dPhiJ=dPhiFrom2P( JetsV.at(1).Px(), JetsV.at(1).Py(), MetV.Px(),  MetV.Py() );
       hdPhiJ1MET[CutIndex]->Fill(dPhiJ,EvWeight);
     }
     if (JetsV.size()>2){
       hPtJ2[CutIndex]->Fill(JetsV.at(2).Pt(),EvWeight);
       hHT3[CutIndex]->Fill(JetsV.at(0).Pt()+JetsV.at(1).Pt()+JetsV.at(2).Pt(),EvWeight);
-      Float_t dPhiJ=dPhiFrom2P( JetsV.at(2).Px(), JetsV.at(2).Py(), MetV.Px(),  MetV.Py() );
+      double dPhiJ=dPhiFrom2P( JetsV.at(2).Px(), JetsV.at(2).Py(), MetV.Px(),  MetV.Py() );
       hdPhiJ2MET[CutIndex]->Fill(dPhiJ,EvWeight);
     }
     if (JetsV.size()>3){
       hPtJ3[CutIndex]->Fill(JetsV.at(3).Pt(),EvWeight);
       hHT4[CutIndex]->Fill(JetsV.at(0).Pt()+JetsV.at(1).Pt()+JetsV.at(2).Pt()+JetsV.at(3).Pt(),EvWeight);
-      Float_t dPhiJ=dPhiFrom2P( JetsV.at(3).Px(), JetsV.at(3).Py(), MetV.Px(),  MetV.Py() );
+      double dPhiJ=dPhiFrom2P( JetsV.at(3).Px(), JetsV.at(3).Py(), MetV.Px(),  MetV.Py() );
       hdPhiJ3MET[CutIndex]->Fill(dPhiJ,EvWeight);
     }
 
     for (unsigned int ij=0;ij<JetsV.size();ij++){
       sumpT+=JetsV.at(ij).Pt();
-      Float_t dPhiJ=dPhiFrom2P( JetsV.at(ij).Px(), JetsV.at(ij).Py(), MetV.Px(),  MetV.Py() );
+      double dPhiJ=dPhiFrom2P( JetsV.at(ij).Px(), JetsV.at(ij).Py(), MetV.Px(),  MetV.Py() );
       hdPhiJMET[CutIndex]->Fill(dPhiJ,EvWeight);
-	 
+
+
       for (unsigned int ib = 0; ib <tree_.pfjet_count;ib++){
-        if (float(tree_.pfjet_pt[ib]) == float(JetsV.at(ij).Pt())  &&  tree_.pfjet_btag[ib][8]  > 0.814) {
+        //if (double(tree_.pfjet_pt[ib]) == double(JetsV.at(ij).Pt())  &&  tree_.pfjet_btag[ib][0]  > 0.89) {
+         float comp1_ = tree_.pfjet_pt[ib];
+	  float comp2_ =JetsV.at(ij).Pt();
+	      if (    comp1_ == comp2_ && tree_.pfjet_btag[ib][0]  > 0.89)   {
 	  bjets++;
-	  // cout<<tree_.pfjet_pt[ib] <<"  "<<JetsV.at(ij).Pt()<<"  "<< tree_.pfjet_btag[ib][8]  <<endl;
+	  //for (unsigned bb=0;bb<9;bb++)
+	//   cout<<tree_.pfjet_pt[ib] <<"  "<<JetsV.at(ij).Pt()<<"  "<< tree_.pfjet_btag[ib][0]  <<"  "<<bjets<<"  "<<tree_.pfjet_pt[ib]/JetsV.at(ij).Pt()<<endl;
      	}
       }
-      hnBJet[CutIndex]->Fill(bjets,EvWeight);
-	    
+    hnBJet[CutIndex]->Fill(bjets,EvWeight);
     }
+      
     hHT[CutIndex]->Fill(sumpT,EvWeight);
+    double HText =sumpT;
+    if (Sel=="mutau" && mIndex !=-1)    HText += tree_.muon_pt[mIndex];
+    if (Sel=="eltau" && eIndex !=-1)    HText += tree_.electron_pt[eIndex];
+    hHText[CutIndex]->Fill(HText,EvWeight);
+  if (Sel=="mutau" && mIndex !=-1)   hRht[CutIndex]->Fill(tree_.muon_pt[mIndex]/HText,EvWeight);
+  if (Sel=="eltau" && eIndex !=-1)   hRht[CutIndex]->Fill(tree_.electron_pt[eIndex]/HText,EvWeight);
+
   }
   hMET[CutIndex]->Fill(MetV.Pt(),EvWeight);
 
   hMeffMuon[CutIndex]->Fill(sumMuonpT+sumpT,EvWeight);
   hMeffEl[CutIndex]->Fill(sumElpT+sumpT,EvWeight);
   hMeffTau[CutIndex]->Fill(sumTaupT+sumpT,EvWeight);
-  Float_t mett = MetV.Pt();
+  double mett = MetV.Pt();
   if (MetV.Pt()>0 ) {
-  hHTOsqrMET[CutIndex]->Fill(  sumpT/sqrt(MetV.Pt()),EvWeight);
-  hMeffMuonOsqrMET[CutIndex]->Fill( (sumMuonpT+sumpT)/sqrt(MetV.Pt()),EvWeight);
-  hMeffElOsqrMET[CutIndex]->Fill( (sumElpT+sumpT)/sqrt(MetV.Pt()),EvWeight);
-  hMeffTauOsqrMET[CutIndex]->Fill( (sumTaupT+sumpT)/sqrt(MetV.Pt()),EvWeight);
-	  }
+    hHTOsqrMET[CutIndex]->Fill(  sumpT/sqrt(MetV.Pt()),EvWeight);
+    hMeffMuonOsqrMET[CutIndex]->Fill( (sumMuonpT+sumpT)/sqrt(MetV.Pt()),EvWeight);
+    hMeffElOsqrMET[CutIndex]->Fill( (sumElpT+sumpT)/sqrt(MetV.Pt()),EvWeight);
+    hMeffTauOsqrMET[CutIndex]->Fill( (sumTaupT+sumpT)/sqrt(MetV.Pt()),EvWeight);
+  }
 
-     else {
-  hHTOsqrMET[CutIndex]->Fill(  -1,EvWeight);
-  hMeffMuonOsqrMET[CutIndex]->Fill(-1,EvWeight);
-  hMeffElOsqrMET[CutIndex]->Fill( -1,EvWeight);
-  hMeffTauOsqrMET[CutIndex]->Fill( -1,EvWeight);
-	  }
+  else {
+    hHTOsqrMET[CutIndex]->Fill(  -1,EvWeight);
+    hMeffMuonOsqrMET[CutIndex]->Fill(-1,EvWeight);
+    hMeffElOsqrMET[CutIndex]->Fill( -1,EvWeight);
+    hMeffTauOsqrMET[CutIndex]->Fill( -1,EvWeight);
+  }
 
   // hMT[CutIndex]->Fill(MT,EvWeight);
   //  hDZeta->Fill(DZeta,EvWeight);

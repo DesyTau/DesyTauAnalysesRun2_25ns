@@ -15,18 +15,19 @@
 #include "TVector3.h"
 #include "TRFIOFile.h"
 #include "TH1D.h"
-#include "TH1D.h"
 #include "TChain.h"
 #include "TMath.h"
-
+#include "TGraphAsymmErrors.h"
 #include "TLorentzVector.h"
-
+#include "TCanvas.h"
+#include "TPaveText.h"
 #include "TRandom.h"
 
 #include "DesyTauAnalyses/NTupleMaker/interface/Config.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/AC1B.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/json.h"
-#include "TGraphAsymmErrors.h"
+#include "DesyTauAnalyses/NTupleMaker/interface/PileUp.h"
+
 
 
 const float MuMass = 0.105658367;
@@ -297,7 +298,11 @@ int main(int argc, char * argv[]) {
 
   const bool isData = cfg.get<bool>("IsData");
   const bool applyGoodRunSelection = cfg.get<bool>("ApplyGoodRunSelection");
-  const bool applyPUreweighting = cfg.get<bool>("ApplyPUreweighting");
+
+  // pile up reweighting
+  const bool applyPUreweighting_vertices = cfg.get<bool>("ApplyPUreweighting_vertices");
+  const bool applyPUreweighting_official = cfg.get<bool>("ApplyPUreweighting_official");
+
   const bool applyLeptonSF = cfg.get<bool>("ApplyLeptonSF");
 
   // kinematic cuts on electron
@@ -365,17 +370,31 @@ int main(int argc, char * argv[]) {
   const string eleSfMcBarrel = cfg.get<string>("EleSfMcBarrel");
   const string eleSfMcEndcap = cfg.get<string>("EleSfMcEndcap");
 
-  std::vector<Period> periods;
-    
-  std::fstream inputFileStream("temp", std::ios::in);
-  for(std::string s; std::getline(inputFileStream, s); )
-    {
-      periods.push_back(Period());
-      std::stringstream ss(s);
-      ss >> periods.back();
-    }
-  
+  const string jsonFile = cfg.get<string>("jsonFile");
   // **** end of configuration
+  
+
+  string cmsswBase = (getenv ("CMSSW_BASE"));
+  string fullPathToJsonFile = cmsswBase + "/src/DesyTauAnalyses/NTupleMaker/test/json/" + jsonFile;
+
+  // Run-lumi selector
+  std::vector<Period> periods;  
+  if (isData) { // read the good runs 
+	  std::fstream inputFileStream(fullPathToJsonFile.c_str(), std::ios::in);
+  	  if (inputFileStream.fail() ) {
+            std::cout << "Error: cannot find json file " << fullPathToJsonFile << std::endl;
+            std::cout << "please check" << std::endl;
+            std::cout << "quitting program" << std::endl;
+	    exit(-1);
+	  }
+  
+          for(std::string s; std::getline(inputFileStream, s); ) {
+           periods.push_back(Period());
+           std::stringstream ss(s);
+           ss >> periods.back();
+          }
+  }
+
 
   // file name and tree name
   std::string rootFileName(argv[2]);
@@ -529,6 +548,26 @@ int main(int argc, char * argv[]) {
 
   TString JetBins[3] = {"Jet0","Jet1","JetGe2"};
 
+  //*****  create eta histogram with eta ranges associated to their names (eg. endcap, barrel)   ***** //
+  TH1F * etaBinsH = new TH1F("etaBinsH", "etaBinsH", nEtaBins, etaBins);
+  etaBinsH->SetStats(0);
+  etaBinsH->Draw();
+  etaBinsH->GetXaxis()->Set(nEtaBins, etaBins);
+  for (int i=0; i<nEtaBins; i++){ etaBinsH->GetXaxis()->SetBinLabel(i+1, EtaBins[i]);}
+  TPaveText *pavetext = new TPaveText(0.6,0.85,0.98,0.98, "brNDC");
+  for (int i=0; i<nEtaBins; i++){    
+	pavetext->AddText(etaBinsH->GetXaxis()->GetBinLabel(i+1));
+	pavetext->AddText(Form("from %f to %f",etaBinsH->GetXaxis()->GetBinLowEdge(i+1), etaBinsH->GetXaxis()->GetBinLowEdge(i+1)+etaBinsH->GetXaxis()->GetBinWidth(i+1)));
+	}
+  TCanvas *cEta = new TCanvas("c1","demo bin labels",10,10,900,500);
+  cEta->cd();
+  etaBinsH->Draw();
+  pavetext->Draw();
+  file->cd();
+  etaBinsH->Write("etaBinsH");
+  cEta->Write("etaBinsCan");
+  
+
   TH1F * ZMassJetEtaPtPass[2][3][7];
   TH1F * ZMassJetEtaPtFail[2][3][7];
 
@@ -625,9 +664,14 @@ int main(int argc, char * argv[]) {
   TH1F * ZMassIsoEleEndcapPass = new TH1F("ZMassIsoEleEndcapPass","",60,60,120);
   TH1F * ZMassIsoEleEndcapFail = new TH1F("ZMassIsoEleEndcapFail","",60,60,120);
 
+  TH1D * PUweightsOfficialH = new TH1D("PUweightsOfficialH","PU weights w/ official reweighting",1000, 0, -1);
 
-  // reweighting for vertices
-  string cmsswBase = (getenv ("CMSSW_BASE"));
+  // PILE UP REWEIGHTING - OPTIONS
+
+  if (applyPUreweighting_vertices and applyPUreweighting_official) 
+	{std::cout<<"ERROR: Choose only ONE PU reweighting method (vertices or official, not both!) " <<std::endl; exit(-1);}
+
+  // reweighting with vertices
 
   // reading vertex weights
   TFile * fileDataNVert = new TFile(TString(cmsswBase)+"/src/"+dataBaseDir+"/"+vertDataFileName);
@@ -642,6 +686,23 @@ int main(int argc, char * argv[]) {
   Float_t normMC =  hNvertMC->GetSumOfWeights();
   hNvertData->Scale(1/normData);
   hNvertMC->Scale(1/normMC);
+
+
+  // reweighting official recipe 
+  	// initialize pile up object
+  PileUp * PUofficial = new PileUp();
+  
+
+  
+  if (applyPUreweighting_official) {
+    TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/Data_Pileup_2015D_Nov17.root","read"); 
+    TFile * filePUdistribution_MC = new TFile (TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/MC_Spring15_PU25_Startup.root", "read"); 
+    TH1D * PU_data = (TH1D *)filePUdistribution_data->Get("pileup");
+    TH1D * PU_mc = (TH1D *)filePUdistribution_MC->Get("pileup");
+    PUofficial->set_h_data(PU_data); 
+    PUofficial->set_h_MC(PU_mc);
+  }
+
   
   TFile *f10= new TFile(TString(cmsswBase)+"/src/"+dataBaseDir+"/"+eleSfDataBarrel);  // ele SF barrel data
   TFile *f11 = new TFile(TString(cmsswBase)+"/src/"+dataBaseDir+"/"+eleSfDataEndcap); // ele SF endcap data
@@ -694,12 +755,13 @@ int main(int argc, char * argv[]) {
   std::vector<unsigned int> allRuns; allRuns.clear();
 		
   for (int iF=0; iF<nTotalFiles; ++iF) {
-
+    //for (int iF=0; iF<10; ++iF) {
     std::string filen;
     fileList >> filen;
     
     std::cout << "file " << iF+1 << " out of " << nTotalFiles << " filename : " << filen << std::endl;
     TFile * file_ = TFile::Open(TString(filen));
+    if (file_->IsZombie()) {std::cout << "Failed to open file "<< filen << std::endl; exit(-1);} 
 
     TH1D * histoInputEvents = NULL;
     histoInputEvents = (TH1D*)file_->Get("makeroottree/nEvents");
@@ -732,6 +794,9 @@ int main(int argc, char * argv[]) {
     std::cout << "      number of entries in Tree      = " << numberOfEntries << std::endl;
     AC1B analysisTree(_tree);
 
+  
+    // EVENT LOOP //
+    
     for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) { 
 
       analysisTree.GetEntry(iEntry);
@@ -739,6 +804,7 @@ int main(int argc, char * argv[]) {
 
       if (nEvents%10000==0) 
 	cout << "      processed " << nEvents << " events" << endl; 
+
       
       float weight = 1;
 
@@ -748,8 +814,9 @@ int main(int argc, char * argv[]) {
       }
       histWeightsSkimmedH->Fill(float(0),weight);
 
-      if (!isData && applyPUreweighting) {
-	//reweighting
+      // PU reweighting with vertices 
+      if (!isData && applyPUreweighting_vertices) {
+	
 	int binNvert = hNvert->FindBin(analysisTree.primvertex_count);
 	float_t dataNvert = hNvertData->GetBinContent(binNvert);
 	float_t mcNvert = hNvertMC->GetBinContent(binNvert);
@@ -759,6 +826,14 @@ int main(int argc, char * argv[]) {
 	weight *= vertWeight;
 	//	cout << "NVert = " << analysisTree.primvertex_count << "  : " << vertWeight << endl;
       }
+
+      // PU reweighting with Ninteractions (official recipe) 
+      if (!isData and applyPUreweighting_official) {
+	double Ninteractions = analysisTree.numtruepileupinteractions;
+	double PUweight = PUofficial->get_PUweight(Ninteractions);
+	weight *= PUweight;
+	PUweightsOfficialH->Fill(PUweight);
+	}
 
       if (isData && applyGoodRunSelection){
 

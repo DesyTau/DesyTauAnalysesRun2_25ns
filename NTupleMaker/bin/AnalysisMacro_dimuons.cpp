@@ -15,18 +15,18 @@
 #include "TVector3.h"
 #include "TRFIOFile.h"
 #include "TH1D.h"
-#include "TH1D.h"
 #include "TChain.h"
 #include "TMath.h"
-
+#include "TCanvas.h"
 #include "TLorentzVector.h"
-
+#include "TPaveText.h"
 #include "TRandom.h"
+#include "TGraphAsymmErrors.h"
 
 #include "DesyTauAnalyses/NTupleMaker/interface/Config.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/AC1B.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/json.h"
-#include "TGraphAsymmErrors.h"
+#include "DesyTauAnalyses/NTupleMaker/interface/PileUp.h"
 
 const float electronMass = 0;
 const float muonMass = 0.10565837;
@@ -294,7 +294,12 @@ int main(int argc, char * argv[]) {
 
   const bool isData = cfg.get<bool>("IsData");
   const bool applyGoodRunSelection = cfg.get<bool>("ApplyGoodRunSelection");
-  const bool applyPUreweighting = cfg.get<bool>("ApplyPUreweighting");
+
+  // pile up reweighting
+  const bool applyPUreweighting_vertices = cfg.get<bool>("ApplyPUreweighting_vertices");
+  const bool applyPUreweighting_official = cfg.get<bool>("ApplyPUreweighting_official");
+
+  //const bool applyPUreweighting = cfg.get<bool>("ApplyPUreweighting");
   const bool applyLeptonSF = cfg.get<bool>("ApplyLeptonSF");
 
   // kinematic cuts on muons
@@ -362,18 +367,29 @@ int main(int argc, char * argv[]) {
   const string muonSfMcBarrel = cfg.get<string>("MuonSfMcBarrel");
   const string muonSfMcEndcap = cfg.get<string>("MuonSfMcEndcap");
 
+  const string jsonFile = cfg.get<string>("jsonFile");
   // **** end of configuration
 
+  string cmsswBase = (getenv ("CMSSW_BASE"));
+  string fullPathToJsonFile = cmsswBase + "/src/DesyTauAnalyses/NTupleMaker/test/json/" + jsonFile;
+
   // Run-lumi selector
-  std::vector<Period> periods;
-    
-  std::fstream inputFileStream("temp", std::ios::in);
-  for(std::string s; std::getline(inputFileStream, s); )
-    {
-      periods.push_back(Period());
-      std::stringstream ss(s);
-      ss >> periods.back();
-    }
+  std::vector<Period> periods;  
+  if (isData) { // read the good runs 
+	  std::fstream inputFileStream(fullPathToJsonFile.c_str(), std::ios::in);
+  	  if (inputFileStream.fail() ) {
+            std::cout << "Error: cannot find json file " << fullPathToJsonFile << std::endl;
+            std::cout << "please check" << std::endl;
+            std::cout << "quitting program" << std::endl;
+	    exit(-1);
+	  }
+  
+          for(std::string s; std::getline(inputFileStream, s); ) {
+           periods.push_back(Period());
+           std::stringstream ss(s);
+           ss >> periods.back();
+          }
+  }
 
 
   // file name and tree name
@@ -510,6 +526,25 @@ int main(int argc, char * argv[]) {
 
   TString JetBins[3] = {"Jet0","Jet1","JetGe2"};
 
+  //*****  create eta histogram with eta ranges associated to their names (eg. endcap, barrel)   ***** //
+  TH1F * etaBinsH = new TH1F("etaBinsH", "etaBinsH", nEtaBins, etaBins);
+  etaBinsH->SetStats(0);
+  etaBinsH->Draw();
+  etaBinsH->GetXaxis()->Set(nEtaBins, etaBins);
+  for (int i=0; i<nEtaBins; i++){ etaBinsH->GetXaxis()->SetBinLabel(i+1, EtaBins[i]);}
+  TPaveText *pavetext = new TPaveText(0.6,0.85,0.98,0.98, "brNDC");
+  for (int i=0; i<nEtaBins; i++){    
+	pavetext->AddText(etaBinsH->GetXaxis()->GetBinLabel(i+1));
+	pavetext->AddText(Form("from %f to %f",etaBinsH->GetXaxis()->GetBinLowEdge(i+1), etaBinsH->GetXaxis()->GetBinLowEdge(i+1)+etaBinsH->GetXaxis()->GetBinWidth(i+1)));
+	}
+  TCanvas *cEta = new TCanvas("c1","demo bin labels",10,10,900,500);
+  cEta->cd();
+  etaBinsH->Draw();
+  pavetext->Draw();
+  file->cd();
+  etaBinsH->Write("etaBinsH");
+  cEta->Write("etaBinsCan");
+
   TH1F * ZMassJetEtaPtPass[3][3][7];
   TH1F * ZMassJetEtaPtFail[3][3][7];
 
@@ -598,7 +633,8 @@ int main(int argc, char * argv[]) {
   TH1F * ZMassMu8EndcapPass  = new TH1F("ZMassMu8EndcapPass", "",60,60,120);
   TH1F * ZMassMu8EndcapFail  = new TH1F("ZMassMu8EndcapFail", "",60,60,120);
 
-  
+  TH1D * PUweightsOfficialH = new TH1D("PUweightsOfficialH","PU weights w/ official reweighting",1000, 0, -1);
+
   int nJetBins = 3;
   int nZPtBins = 5;
   float zPtBins[6] = {0,10,20,30,50,1000};
@@ -619,13 +655,12 @@ int main(int argc, char * argv[]) {
   }
   
 
-  int nFiles = 0;
-  int nEvents = 0;
-  int selEventsAllMuons = 0;
-  int selEventsIdMuons = 0;
-  int selEventsIsoMuons = 0;
+ // PILE UP REWEIGHTING - OPTIONS
 
-  string cmsswBase = (getenv ("CMSSW_BASE"));
+  if (applyPUreweighting_vertices and applyPUreweighting_official) 
+	{std::cout<<"ERROR: Choose only ONE PU reweighting method (vertices or official, not both!) " <<std::endl; exit(-1);}
+
+  // reweighting with vertices
 
   // reading vertex weights
   TFile * fileDataNVert = new TFile(TString(cmsswBase)+"/src/"+dataBaseDir+"/"+vertDataFileName);
@@ -639,6 +674,24 @@ int main(int argc, char * argv[]) {
 
   vertexDataH->Scale(1/normVertexData);
   vertexMcH->Scale(1/normVertexMc);
+
+
+ // reweighting official recipe 
+  	// initialize pile up object
+  PileUp * PUofficial = new PileUp();
+  
+
+  
+  if (applyPUreweighting_official) {
+    TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/Data_Pileup_2015D_Nov17.root","read"); 
+    TFile * filePUdistribution_MC = new TFile (TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/MC_Spring15_PU25_Startup.root", "read"); 
+    TH1D * PU_data = (TH1D *)filePUdistribution_data->Get("pileup");
+    TH1D * PU_mc = (TH1D *)filePUdistribution_MC->Get("pileup");
+    PUofficial->set_h_data(PU_data); 
+    PUofficial->set_h_MC(PU_mc);
+  }
+
+
 
   TFile *f10 = new TFile(TString(cmsswBase)+"/src/"+dataBaseDir+"/"+muonSfDataBarrel);  // mu SF barrel data
   TFile *f11 = new TFile(TString(cmsswBase)+"/src/"+dataBaseDir+"/"+muonSfDataEndcap); // mu SF endcap data
@@ -660,6 +713,14 @@ int main(int argc, char * argv[]) {
   mcEffBarrel = hEffBarrelMC->GetY();
   mcEffEndcap = hEffEndcapMC->GetY();
 
+
+  int nFiles = 0;
+  int nEvents = 0;
+  int selEventsAllMuons = 0;
+  int selEventsIdMuons = 0;
+  int selEventsIsoMuons = 0;
+
+
   int nTotalFiles = 0;
   std::string dummy;
   // count number of files --->
@@ -673,6 +734,9 @@ int main(int argc, char * argv[]) {
   //----Attention----//
   //if(XSec!=1) nTotalFiles=20;
   //nTotalFiles=5;
+
+
+
   for (int iF=0; iF<nTotalFiles; ++iF) {
 
     std::string filen;
@@ -711,7 +775,9 @@ int main(int argc, char * argv[]) {
     Long64_t numberOfEntries = _tree->GetEntries();
     std::cout << "      number of entries in Tree      = " << numberOfEntries << std::endl;
     AC1B analysisTree(_tree);
-    
+
+
+    // EVENT LOOP //
     for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) { 
     
       analysisTree.GetEntry(iEntry);
@@ -730,7 +796,7 @@ int main(int argc, char * argv[]) {
       histWeightsSkimmedH->Fill(float(0),weight);
 
       if (!isData) {
-	if (applyPUreweighting) {
+	if (applyPUreweighting_vertices) {
 	  int binNvert = vertexDataH->FindBin(analysisTree.primvertex_count);
 	  float_t dataNvert = vertexDataH->GetBinContent(binNvert);
 	  float_t mcNvert = vertexMcH->GetBinContent(binNvert);
@@ -739,6 +805,16 @@ int main(int argc, char * argv[]) {
 	  weight *= vertWeight;
 	  //	  cout << "NVert = " << analysisTree.primvertex_count << "   weight = " << vertWeight << endl;
 	}
+
+        if (applyPUreweighting_official) {
+
+	double Ninteractions = analysisTree.numtruepileupinteractions;
+	double PUweight = PUofficial->get_PUweight(Ninteractions);
+	weight *= PUweight;
+	PUweightsOfficialH->Fill(PUweight);
+
+        }
+
 	if (applyTauTauSelection) {
 	  unsigned int nTaus = 0;
 	  if (analysisTree.gentau_count>0) {
@@ -1417,8 +1493,8 @@ int main(int argc, char * argv[]) {
 	  nJets20SelH->Fill(double(nJets20),weight);
 	  nJets30etaCutSelH->Fill(double(nJets30etaCut),weight);
 	  nJets20etaCutSelH->Fill(double(nJets20etaCut),weight);
-	  
-	  HT30SelH->Fill(double(HT30),weight);
+
+  HT30SelH->Fill(double(HT30),weight);
 	  HT20SelH->Fill(double(HT20),weight);
 	  HT30etaCutSelH->Fill(double(HT30etaCut),weight);
 	  HT20etaCutSelH->Fill(double(HT20etaCut),weight);

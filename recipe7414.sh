@@ -18,6 +18,19 @@ cd ${CMSSW_BASE}/src/
 ## Electron id
 git cms-merge-topic ikrav:egm_id_7.4.12_v1
 
+## PileUp Jet Id patch
+## ref. https://github.com/cms-sw/cmssw/pull/12398
+git-cms-addpkg DataFormats/JetReco
+git-cms-addpkg RecoJets/JetProducers
+
+rm -rf ${CMSSW_BASE}/src/RecoJets/JetProducers/data
+git clone https://github.com/cms-data/RecoJets-JetProducers.git ${CMSSW_BASE}/src/RecoJets/JetProducers/data
+
+cp ${CMSSW_BASE}/src/DesyTauAnalyses/patch/PileUpJetID/DataFormats/JetReco/interface/PileupJetIdentifier.h ${CMSSW_BASE}/src/DataFormats/JetReco/interface/PileupJetIdentifier.h
+cp ${CMSSW_BASE}/src/DesyTauAnalyses/patch/PileUpJetID/RecoJets/JetProducers/plugins/PileupJetIdProducer.cc ${CMSSW_BASE}/src/RecoJets/JetProducers/plugins/PileupJetIdProducer.cc
+cp ${CMSSW_BASE}/src/DesyTauAnalyses/patch/PileUpJetID/RecoJets/JetProducers/python/PileupJetIDParams_cfi.py ${CMSSW_BASE}/src/RecoJets/JetProducers/python/PileupJetIDParams_cfi.py
+cp ${CMSSW_BASE}/src/DesyTauAnalyses/patch/PileUpJetID/RecoJets/JetProducers/src/PileupJetIdAlgo.cc ${CMSSW_BASE}/src/RecoJets/JetProducers/src/PileupJetIdAlgo.cc
+
 ## MVA MEt
 git cms-addpkg RecoMET/METPUSubtraction/
 cd ${CMSSW_BASE}/src/RecoMET/METPUSubtraction/
@@ -27,5 +40,5 @@ cd ${CMSSW_BASE}/src/
 cp ${CMSSW_BASE}/src/DesyTauAnalyses/patch/MVAMEt/PFMETProducerMVATauTau* ${CMSSW_BASE}/src/RecoMET/METPUSubtraction/plugins/.
 
 scram b -j 32
-
+scram b -j 32
 

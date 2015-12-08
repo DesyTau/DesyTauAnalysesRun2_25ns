@@ -33,6 +33,7 @@
 <use   name="DesyTauAnalyses/CandidateTools"/>
 <use   name="clhep"/>
 <use   name="RecoVertex/AdaptiveVertexFit"/>
+<use   name="DesyTauAnalyses/NTupleMaker"/>
 <use   name="root"/>
 <flags   CXXFLAGS="-Wno-unused-variable -Wno-error=unused-but-set-variable" />
 </library>

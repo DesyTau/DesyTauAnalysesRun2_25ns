@@ -427,6 +427,7 @@ class NTupleMaker : public edm::EDAnalyzer{
 
   // primary vertex
   UInt_t  primvertex_count;
+  UInt_t  goodprimvertex_count;
   Float_t primvertex_x;
   Float_t primvertex_y;
   Float_t primvertex_z;
@@ -522,6 +523,8 @@ class NTupleMaker : public edm::EDAnalyzer{
 
   Bool_t muon_globalTrack[M_muonmaxcount];
   Bool_t muon_innerTrack[M_muonmaxcount];
+  
+  Int_t muon_genmatch[M_muonmaxcount];
 
   // pat jets 
   UInt_t pfjet_count;
@@ -653,8 +656,9 @@ class NTupleMaker : public edm::EDAnalyzer{
   Bool_t electron_cutId_medium_Spring15[M_electronmaxcount];
   Bool_t electron_cutId_tight_Spring15[M_electronmaxcount];
 
-
   Bool_t electron_pass_conversion[M_electronmaxcount];
+
+  Int_t electron_genmatch[M_electronmaxcount];
   
   UInt_t photon_count;
   Float_t photon_px[M_photonmaxcount];
@@ -720,6 +724,7 @@ class NTupleMaker : public edm::EDAnalyzer{
   Float_t tau_genjet_px[M_taumaxcount];
   Float_t tau_genjet_py[M_taumaxcount];
   Float_t tau_genjet_pz[M_taumaxcount];
+  Int_t tau_genmatch[M_taumaxcount];
 
   // main tau discriminators
 
@@ -787,11 +792,36 @@ class NTupleMaker : public edm::EDAnalyzer{
   Float_t gentau_visible_phi[M_taumaxcount];
   Float_t gentau_visible_mass[M_taumaxcount];
 
+  Float_t gentau_visibleNoLep_px[M_taumaxcount];
+  Float_t gentau_visibleNoLep_py[M_taumaxcount];
+  Float_t gentau_visibleNoLep_pz[M_taumaxcount];
+  Float_t gentau_visibleNoLep_e[M_taumaxcount];
+
+  Float_t gentau_visibleNoLep_pt[M_taumaxcount];
+  Float_t gentau_visibleNoLep_eta[M_taumaxcount];
+  Float_t gentau_visibleNoLep_phi[M_taumaxcount];
+  Float_t gentau_visibleNoLep_mass[M_taumaxcount];
+  
+  Int_t gentau_status[M_taumaxcount];
+  Int_t gentau_fromHardProcess[M_taumaxcount];
+  Int_t gentau_fromHardProcessBeforeFSR[M_taumaxcount];
+  Int_t gentau_isDecayedLeptonHadron[M_taumaxcount];
+  Int_t gentau_isDirectHadronDecayProduct[M_taumaxcount];
+  Int_t gentau_isDirectHardProcessTauDecayProduct[M_taumaxcount];
+  Int_t gentau_isDirectPromptTauDecayProduct[M_taumaxcount];
+  Int_t gentau_isDirectTauDecayProduct[M_taumaxcount];
+  Int_t gentau_isFirstCopy[M_taumaxcount];
+  Int_t gentau_isHardProcess[M_taumaxcount];
+  Int_t gentau_isHardProcessTauDecayProduct[M_taumaxcount];
+  Int_t gentau_isLastCopy[M_taumaxcount];
+  Int_t gentau_isLastCopyBeforeFSR[M_taumaxcount];
+  Int_t gentau_isPrompt[M_taumaxcount];
+  Int_t gentau_isPromptTauDecayProduct[M_taumaxcount];
+  Int_t gentau_isTauDecayProduct[M_taumaxcount];
+
   Int_t gentau_decayMode[M_taumaxcount];
   string gentau_decayMode_name[M_taumaxcount];
   UChar_t gentau_mother[M_taumaxcount];
-
-  Int_t gentau_status[M_taumaxcount];
 
   // rho neutral
   Float_t rhoNeutral;
@@ -881,7 +911,9 @@ class NTupleMaker : public edm::EDAnalyzer{
   UChar_t mvamet_channel[M_mvametmaxcount];
   UInt_t mvamet_lep1[M_mvametmaxcount];
   UInt_t mvamet_lep2[M_mvametmaxcount];
-  
+  Float_t mvamet_lep1_pt[M_mvametmaxcount];
+  Float_t mvamet_lep2_pt[M_mvametmaxcount]; 
+
   Float_t genmet_ex;
   Float_t genmet_ey;
 
@@ -911,6 +943,22 @@ class NTupleMaker : public edm::EDAnalyzer{
   Int_t genparticles_status[M_genparticlesmaxcount];
   UInt_t genparticles_info[M_genparticlesmaxcount];
   UChar_t genparticles_mother[M_genparticlesmaxcount];
+
+  Int_t genparticles_fromHardProcess[M_genparticlesmaxcount];
+  Int_t genparticles_fromHardProcessBeforeFSR[M_genparticlesmaxcount];
+  Int_t genparticles_isDecayedLeptonHadron[M_genparticlesmaxcount];
+  Int_t genparticles_isDirectHadronDecayProduct[M_genparticlesmaxcount];
+  Int_t genparticles_isDirectHardProcessTauDecayProduct[M_genparticlesmaxcount];
+  Int_t genparticles_isDirectPromptTauDecayProduct[M_genparticlesmaxcount];
+  Int_t genparticles_isDirectTauDecayProduct[M_genparticlesmaxcount];
+  Int_t genparticles_isFirstCopy[M_genparticlesmaxcount];
+  Int_t genparticles_isHardProcess[M_genparticlesmaxcount];
+  Int_t genparticles_isHardProcessTauDecayProduct[M_genparticlesmaxcount];
+  Int_t genparticles_isLastCopy[M_genparticlesmaxcount];
+  Int_t genparticles_isLastCopyBeforeFSR[M_genparticlesmaxcount];
+  Int_t genparticles_isPrompt[M_genparticlesmaxcount];
+  Int_t genparticles_isPromptTauDecayProduct[M_genparticlesmaxcount];
+  Int_t genparticles_isTauDecayProduct[M_genparticlesmaxcount];
 
   // trigger objects
   UInt_t trigobject_count;

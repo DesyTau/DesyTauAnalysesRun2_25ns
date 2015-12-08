@@ -4,6 +4,7 @@
 <use   name="PhysicsTools/Utilities"/>
 <use   name="CommonTools/Utils"/>
 <use   name="HLTrigger/HLTcore"/>
+<use   name="DesyTauAnalyses/CandidateTools"/>
 <export>
   <lib   name="1"/>
 </export>
