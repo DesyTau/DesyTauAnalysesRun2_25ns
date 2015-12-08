@@ -612,26 +612,6 @@ int main(int argc, char * argv[]) {
     }
   }
 
-  TH1D * ZMassMu23BarrelPass = new TH1D("ZMassMu23BarrelPass","",80,50,130);
-  TH1D * ZMassMu23BarrelFail = new TH1D("ZMassMu23BarrelFail","",80,50,130);
-  TH1D * ZMassMu23EndcapPass = new TH1D("ZMassMu23EndcapPass","",80,50,130);
-  TH1D * ZMassMu23EndcapFail = new TH1D("ZMassMu23EndcapFail","",80,50,130);
-
-  TH1D * ZMassMu17BarrelPass = new TH1D("ZMassMu17BarrelPass","",80,50,130);
-  TH1D * ZMassMu17BarrelFail = new TH1D("ZMassMu17BarrelFail","",80,50,130);
-  TH1D * ZMassMu17EndcapPass = new TH1D("ZMassMu17EndcapPass","",80,50,130);
-  TH1D * ZMassMu17EndcapFail = new TH1D("ZMassMu17EndcapFail","",80,50,130);
-
-  TH1D * ZMassIsoMuBarrelPass = new TH1D("ZMassIsoMuBarrelPass","",80,50,130);
-  TH1D * ZMassIsoMuBarrelFail = new TH1D("ZMassIsoMuBarrelFail","",80,50,130);
-  TH1D * ZMassIsoMuEndcapPass = new TH1D("ZMassIsoMuEndcapPass","",80,50,130);
-  TH1D * ZMassIsoMuEndcapFail = new TH1D("ZMassIsoMuEndcapFail","",80,50,130);
-
-  TH1D * ZMassMu8BarrelPass  = new TH1D("ZMassMu8BarrelPass", "",80,50,130);
-  TH1D * ZMassMu8BarrelFail  = new TH1D("ZMassMu8BarrelFail", "",80,50,130);
-  TH1D * ZMassMu8EndcapPass  = new TH1D("ZMassMu8EndcapPass", "",80,50,130);
-  TH1D * ZMassMu8EndcapFail  = new TH1D("ZMassMu8EndcapFail", "",80,50,130);
-
   TH1D * PUweightsOfficialH = new TH1D("PUweightsOfficialH","PU weights w/ official reweighting",1000, 0, 10);
   TH1D * nTruePUInteractionsH = new TH1D("nTruePUInteractionsH","",50,-0.5,49.5);
 
@@ -836,7 +816,7 @@ int main(int argc, char * argv[]) {
 	  double Ninteractions = analysisTree.numtruepileupinteractions;
 	  double PUweight = PUofficial->get_PUweight(Ninteractions);
 	  weight *= float(PUweight);
-	  //	  PUweightsOfficialH->Fill(PUweight);
+	  PUweightsOfficialH->Fill(PUweight);
 	  //	  cout << PUweight << endl;
         }
 
@@ -1273,79 +1253,22 @@ int main(int argc, char * argv[]) {
 		  ZMassMu23EtaPtPass[etaBin][ptBinTrig]->Fill(mass,weight); 
 		else
 		  ZMassMu23EtaPtFail[etaBin][ptBinTrig]->Fill(mass,weight); 
-		if (ptProbe>24&&absEtaProbe<2.4) {
-		  if (absEtaProbe<1.48) {
-		    if (isMuonMatched23Filter[iMu]) 
-		      ZMassMu23BarrelPass->Fill(mass,weight); 
-		    else
-		      ZMassMu23BarrelFail->Fill(mass,weight);
-		  }
-		  else {
-		    if (isMuonMatched23Filter[iMu])
-                      ZMassMu23EndcapPass->Fill(mass,weight);
-                    else
-                      ZMassMu23EndcapFail->Fill(mass,weight);
-		  }
-		}
 		// muon17 filter
 		if (isMuonMatched17Filter[iMu]) 
 		  ZMassMu17EtaPtPass[etaBin][ptBinTrig]->Fill(mass,weight); 
 		else
 		  ZMassMu17EtaPtFail[etaBin][ptBinTrig]->Fill(mass,weight); 
-		if (ptProbe>18&&absEtaProbe<2.4) {
-		  if (absEtaProbe<1.48) {
-		    if (isMuonMatched17Filter[iMu]) 
-		      ZMassMu17BarrelPass->Fill(mass,weight); 
-		    else
-		      ZMassMu17BarrelFail->Fill(mass,weight);
-		  }
-		  else {
-		    if (isMuonMatched17Filter[iMu])
-                      ZMassMu17EndcapPass->Fill(mass,weight);
-                    else
-                      ZMassMu17EndcapFail->Fill(mass,weight);
-		  }
-		}
 		// muon8 filter
 		if (isMuonMatched8Filter[iMu]) 
 		  ZMassMu8EtaPtPass[etaBin][ptBinTrig]->Fill(mass,weight); 
 		else
 		  ZMassMu8EtaPtFail[etaBin][ptBinTrig]->Fill(mass,weight); 
-		if (ptProbe>10&&absEtaProbe<2.4) {
-		  if (absEtaProbe<1.48) {
-		    if (isMuonMatched8Filter[iMu]) 
-		      ZMassMu8BarrelPass->Fill(mass,weight); 
-		    else
-		      ZMassMu8BarrelFail->Fill(mass,weight);
-		  }
-		  else {
-		    if (isMuonMatched8Filter[iMu])
-                      ZMassMu8EndcapPass->Fill(mass,weight);
-                    else
-                      ZMassMu8EndcapFail->Fill(mass,weight);
-		  }
-		}
 		// single muon filter
 		if (absEtaProbe<singleMuonTriggerEtaCut) { 
 		  if (isMuonMatchedSingleMuFilter[iMu]) 
 		    ZMassIsoMuEtaPtPass[etaBin][ptBinTrig]->Fill(mass,weight); 
 		  else
 		    ZMassIsoMuEtaPtFail[etaBin][ptBinTrig]->Fill(mass,weight);
-		  float offlinePtCut = singleMuonTriggerPtCut + 1.0;
-		  if (ptProbe>offlinePtCut) {
-		    if (absEtaProbe<1.48) {
-		      if (isMuonMatchedSingleMuFilter[iMu]) 
-			ZMassIsoMuBarrelPass->Fill(mass,weight); 
-		      else
-			ZMassIsoMuBarrelFail->Fill(mass,weight);
-		    }
-		    else {
-		      if (isMuonMatchedSingleMuFilter[iMu])
-			ZMassIsoMuEndcapPass->Fill(mass,weight);
-		      else
-			ZMassIsoMuEndcapFail->Fill(mass,weight);
-		    }
-		  }
 		}
 	      }
 	      else {
