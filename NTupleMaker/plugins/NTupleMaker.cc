@@ -162,6 +162,8 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
   MetCollectionTag_(consumes<pat::METCollection>(iConfig.getParameter<edm::InputTag>("MetCollectionTag"))),
   MetCovMatrixTag_(iConfig.getParameter<edm::InputTag>("MetCovMatrixTag")),
   MetSigTag_(iConfig.getParameter<edm::InputTag>("MetSigTag")),
+  MetCorrCovMatrixTag_(iConfig.getParameter<edm::InputTag>("MetCorrCovMatrixTag")),
+  MetCorrSigTag_(iConfig.getParameter<edm::InputTag>("MetCorrSigTag")),  
   MetCorrCollectionTag_(consumes<pat::METCollection>(iConfig.getParameter<edm::InputTag>("MetCorrCollectionTag"))),
   PuppiMetCollectionTag_(consumes<pat::METCollection>(iConfig.getParameter<edm::InputTag>("PuppiMetCollectionTag"))),
   MvaMetCollectionsTag_(iConfig.getParameter<std::vector<edm::InputTag> >("MvaMetCollectionsTag")),
@@ -653,12 +655,13 @@ void NTupleMaker::beginJob(){
     tree->Branch("pfmetcorr_ey", &pfmetcorr_ey, "pfmetcorr_ey/F");
     tree->Branch("pfmetcorr_ez", &pfmetcorr_ey, "pfmetcorr_ez/F");
     tree->Branch("pfmetcorr_pt", &pfmetcorr_pt, "pfmetcorr_pt/F");
-    tree->Branch("pfmetcorr_phi", &pfmetcorr_phi, "pfmetcorr_phi/F");
+    tree->Branch("pfmetcorr_phi", &pfmetcorr_phi, "pfmetcorr_phi/F");  
     tree->Branch("pfmetcorr_sigxx", &pfmetcorr_sigxx, "pfmetcorr_sigxx/F");
     tree->Branch("pfmetcorr_sigxy", &pfmetcorr_sigxy, "pfmetcorr_sigxy/F");
     tree->Branch("pfmetcorr_sigyx", &pfmetcorr_sigyx, "pfmetcorr_sigyx/F");
     tree->Branch("pfmetcorr_sigyy", &pfmetcorr_sigyy, "pfmetcorr_sigyy/F");
-
+    tree->Branch("pfmetcorr_sig", &pfmetcorr_sig, "pfmetcorr_sig/F");  
+    
     tree->Branch("pfmetcorr_ex_JetEnUp", &pfmetcorr_ex_JetEnUp, "pfmetcorr_ex_JetEnUp/F");
     tree->Branch("pfmetcorr_ey_JetEnUp", &pfmetcorr_ey_JetEnUp, "pfmetcorr_ey_JetEnUp/F");
 
@@ -1464,10 +1467,22 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       pfmetcorr_pt = (*patMet)[0].pt();
       pfmetcorr_phi = (*patMet)[0].phi();
       
-      pfmetcorr_sigxx = (*patMet)[0].getSignificanceMatrix()(0,0);
+      edm::Handle<ROOT::Math::SMatrix<double, 2, 2, ROOT::Math::MatRepSym<double, 2> > > metcov;
+      iEvent.getByLabel( MetCorrCovMatrixTag_, metcov);
+      pfmetcorr_sigxx = (*metcov)(0,0);
+      pfmetcorr_sigxy = (*metcov)(0,1);
+      pfmetcorr_sigyx = (*metcov)(1,0);
+      pfmetcorr_sigyy = (*metcov)(1,1);
+
+      edm::Handle<double> metsig;
+      iEvent.getByLabel( MetCorrSigTag_, metsig);
+      assert(metsig.isValid());
+      pfmetcorr_sig = *metsig;
+
+      /*pfmetcorr_sigxx = (*patMet)[0].getSignificanceMatrix()(0,0);
       pfmetcorr_sigxy = (*patMet)[0].getSignificanceMatrix()(0,1);
       pfmetcorr_sigyx = (*patMet)[0].getSignificanceMatrix()(1,0);
-      pfmetcorr_sigyy = (*patMet)[0].getSignificanceMatrix()(1,1);
+      pfmetcorr_sigyy = (*patMet)[0].getSignificanceMatrix()(1,1);*/
 
       pfmetcorr_ex_JetEnUp = (*patMet)[0].shiftedPx(pat::MET::METUncertainty::JetEnUp,pat::MET::METCorrectionLevel::Type1);
       pfmetcorr_ey_JetEnUp = (*patMet)[0].shiftedPy(pat::MET::METUncertainty::JetEnUp,pat::MET::METCorrectionLevel::Type1);
