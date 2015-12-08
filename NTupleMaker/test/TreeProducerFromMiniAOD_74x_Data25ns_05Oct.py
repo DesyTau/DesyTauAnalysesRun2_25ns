@@ -42,7 +42,7 @@ process.options = cms.untracked.PSet(
 
 # How many events to process
 process.maxEvents = cms.untracked.PSet( 
-   input = cms.untracked.int32(-1)
+   input = cms.untracked.int32(10000)
 )
 
 
@@ -66,9 +66,8 @@ if runOnData:
     #process.GlobalTag.globaltag = '74X_dataRun2_Prompt_v4'
     process.GlobalTag.globaltag = '74X_dataRun2_v5'
   if isRepr05Oct:
-      #process.GlobalTag.globaltag = '74X_dataRun2_reMiniAOD_v0'
-      #process.GlobalTag.globaltag = '74X_dataRun2_v5'
-      process.GlobalTag.globaltag = '74X_dataRun2_reMiniAOD_v1'
+    #process.GlobalTag.globaltag = '74X_dataRun2_reMiniAOD_v0'
+    process.GlobalTag.globaltag = '74X_dataRun2_v5'
 else:
   if is25ns:
     process.GlobalTag.globaltag = '74X_mcRun2_asymptotic_v2'
@@ -159,21 +158,6 @@ from PhysicsTools.PatUtils.tools.runMETCorrectionsAndUncertainties import runMet
 
 #default configuration for miniAOD reprocessing, change the isData flag to run on data
 #for a full met computation, remove the pfCandColl input
-jecUncertaintyFile=""
-if runOnData:
-  if is25ns:
-    jecUncertaintyFile="DesyTauAnalyses/NTupleMaker/data/Summer15_25nsV6/Summer15_25nsV6_DATA_UncertaintySources_AK4PFchs.txt"
-    print ' JECUNCERTAINTY  ',jecUncertaintyFile
-  else:
-    jecUncertaintyFile="DesyTauAnalyses/NTupleMaker/data/Summer15_50nsV6/Summer15_50nsV6_DATA_UncertaintySources_AK4PFchs.txt"    
-else:
-  if is25ns:
-    jecUncertaintyFile="DesyTauAnalyses/NTupleMaker/data/Summer15_25nsV6/Summer15_25nsV6_MC_UncertaintySources_AK4PFchs.txt"
-    print ' JECUNCERTAINTY  ',jecUncertaintyFile
-  else:
-    jecUncertaintyFile="DesyTauAnalyses/NTupleMaker/data/Summer15_50nsV5/Summer15_50nsV5_MC_UncertaintySources_AK4PFchs.txt"
-
-
 runMetCorAndUncFromMiniAOD(process,
                            isData=runOnData,
                            )
