@@ -405,6 +405,8 @@ int main(int argc, char * argv[]) {
   TString TStrName(rootFileName);
   std::cout <<TStrName <<std::endl;  
 
+  TH1::SetDefaultSumw2(true);
+
   TFile * file = new TFile(TStrName+TString(".root"),"recreate");
   file->cd("");
 
@@ -413,65 +415,65 @@ int main(int argc, char * argv[]) {
   TH1D * histWeightsSkimmedH = new TH1D("histWeightsSkimmedH","",1,-0.5,0.5);
 
   // Histograms after final selection
-  TH1F * ptLeadingMuSelH = new TH1F("ptLeadingMuSelH","",100,0,200);
-  TH1F * ptTrailingMuSelH = new TH1F("ptTrailingMuSelH","",100,0,200);
-  TH1F * etaLeadingMuSelH = new TH1F("etaLeadingMuSelH","",50,-2.5,2.5);
-  TH1F * etaTrailingMuSelH = new TH1F("etaTrailingMuSelH","",50,-2.5,2.5);
-  TH1F * massSelH = new TH1F("massSelH","",200,0,200);
-  TH1F * metSelH  = new TH1F("metSelH","",200,0,400);
-  TH1F * puppimetSelH = new TH1F("puppiMetSelH","",200,0,400);
+  TH1D * ptLeadingMuSelH = new TH1D("ptLeadingMuSelH","",100,0,200);
+  TH1D * ptTrailingMuSelH = new TH1D("ptTrailingMuSelH","",100,0,200);
+  TH1D * etaLeadingMuSelH = new TH1D("etaLeadingMuSelH","",50,-2.5,2.5);
+  TH1D * etaTrailingMuSelH = new TH1D("etaTrailingMuSelH","",50,-2.5,2.5);
+  TH1D * massSelH = new TH1D("massSelH","",200,0,200);
+  TH1D * metSelH  = new TH1D("metSelH","",200,0,400);
+  TH1D * puppimetSelH = new TH1D("puppiMetSelH","",200,0,400);
 
   TString scales[21] = {"M10","M9","M8","M7","M6","M5","M4","M3","M2","M1","0",
 			"P1","P2","P3","P4","P5","P6","P7","P8","P9","P10"};
   
-  TH1F * massSelScaleH[21];
-  TH1F * metSelScaleH[21];
-  TH1F * puppimetSelScaleH[21];
+  TH1D * massSelScaleH[21];
+  TH1D * metSelScaleH[21];
+  TH1D * puppimetSelScaleH[21];
   for (int iScale=0; iScale<21; ++iScale) {    
-    massSelScaleH[iScale] = new TH1F("massSel"+scales[iScale]+"H","",200,0,200);
-    metSelScaleH[iScale] = new TH1F("metSel"+scales[iScale]+"H","",200,0,400);
-    puppimetSelScaleH[iScale] = new TH1F("puppimetSel"+scales[iScale]+"H","",200,0,400);
+    massSelScaleH[iScale] = new TH1D("massSel"+scales[iScale]+"H","",200,0,200);
+    metSelScaleH[iScale] = new TH1D("metSel"+scales[iScale]+"H","",200,0,400);
+    puppimetSelScaleH[iScale] = new TH1D("puppimetSel"+scales[iScale]+"H","",200,0,400);
   }
 
 
-  TH1F * nJets30SelH    = new TH1F("nJets30SelH","",11,-0.5,10.5);
-  TH1F * nJets30etaCutSelH = new TH1F("nJets30etaCutSelH","",11,-0.5,10.5);
-  TH1F * nJets20SelH    = new TH1F("nJets20SelH","",11,-0.5,10.5);
-  TH1F * nJets20etaCutSelH = new TH1F("nJets20etaCutSelH","",11,-0.5,10.5);
+  TH1D * nJets30SelH    = new TH1D("nJets30SelH","",11,-0.5,10.5);
+  TH1D * nJets30etaCutSelH = new TH1D("nJets30etaCutSelH","",11,-0.5,10.5);
+  TH1D * nJets20SelH    = new TH1D("nJets20SelH","",11,-0.5,10.5);
+  TH1D * nJets20etaCutSelH = new TH1D("nJets20etaCutSelH","",11,-0.5,10.5);
 
-  TH1F * HT30SelH       = new TH1F("HT30SelH","",50,0,500);
-  TH1F * HT30etaCutSelH = new TH1F("HT30etaCutSelH","",50,0,500);
-  TH1F * HT20SelH       = new TH1F("HT20SelH","",50,0,500);
-  TH1F * HT20etaCutSelH = new TH1F("HT20etaCutSelH","",50,0,500);
+  TH1D * HT30SelH       = new TH1D("HT30SelH","",50,0,500);
+  TH1D * HT30etaCutSelH = new TH1D("HT30etaCutSelH","",50,0,500);
+  TH1D * HT20SelH       = new TH1D("HT20SelH","",50,0,500);
+  TH1D * HT20etaCutSelH = new TH1D("HT20etaCutSelH","",50,0,500);
   
   //Discriminiant histos
-  TH1F * h_dimuonEta = new TH1F("dimuonEta","",50,-6,+6);//21Aug
-  TH1F * h_dimuonEta_genMuMatch = new TH1F("dimuonEta_genMuMatch","",50,-6,+6);//21Aug
-  TH1F * h_ptRatio = new TH1F ("ptRatio","",50,0,1);
-  TH1F * h_dxy_muon1 =new TH1F ("dxy_muon1","",50,-0.02,0.02);
-  TH1F * h_dxy_muon2 =new TH1F ("dxy_muon2","",50,-0.02,0.02);
-  TH1F * h_dz_muon1 = new TH1F ("dz_muon1","",50,-0.1,0.1);
-  TH1F * h_dz_muon2 = new TH1F ("dz_muon2","",50,-0.1,0.1);
-  TH1F * h_dcaSigdxy_mu1 = new TH1F ("dcaSigdxy_mu1","",50,-4,4);
-  TH1F * h_dcaSigdxy_mu2 = new TH1F ("dcaSigdxy_mu2","",50,-4,4);
-  TH1F * h_dcaSigdz_mu1 = new TH1F ("dcaSigdz_mu1","",50,-4,4);
-  TH1F * h_dcaSigdz_mu2 = new TH1F ("dcaSigdz_mu2","",50,-4,4);
-  TH1F * h_dcaSigdxy_muon1 = new TH1F ("dcaSigdxy_muon1","",50,-4,4);
-  TH1F * h_dcaSigdxy_muon2 = new TH1F ("dcaSigdxy_muon2","",50,-4,4);
-  TH1F * h_dcaSigdz_muon1 = new TH1F ("dcaSigdz_muon1","",50,-4,4);
-  TH1F * h_dcaSigdz_muon2 = new TH1F ("dcaSigdz_muon2","",50,-4,4);
-  TH1F * h_dcaSigdxy_mu1_genMuMatch = new TH1F ("dcaSigdxy_mu1_genMuMatch","",50,-4,4);
-  TH1F * h_dcaSigdxy_mu2_genMuMatch = new TH1F ("dcaSigdxy_mu2_genMuMatch","",50,-4,4);
-  TH1F * h_dcaSigdz_mu1_genMuMatch = new TH1F ("dcaSigdz_mu1_genMuMatch","",50,-4,4);
-  TH1F * h_dcaSigdz_mu2_genMuMatch = new TH1F ("dcaSigdz_mu2_genMuMatch","",50,-4,4);
-  TH1F * h_phi_leadingMu_MET =new TH1F ("phi_leadingMu_MET","",50,0,3);
-  TH1F * h_phi_trailingMu_MET =new TH1F ("phi_trailingMu_MET","",50,0,3);
-  TH1F * h_dxy_muon1_dcaCut =new TH1F ("dxy_muon1_dcaCut","",50,-0.02,0.02);
-  TH1F * h_dxy_muon2_dcaCut =new TH1F ("dxy_muon2_dcaCut","",50,-0.02,0.02);
-  TH1F * h_dimuonEta_dcaCut = new TH1F("dimuonEta_dcaCut","",50,-6,+6);
-  TH1F * h_ptRatio_dcaCut = new TH1F ("ptRatio_dcaCut","",50,0,1);
+  TH1D * h_dimuonEta = new TH1D("dimuonEta","",50,-6,+6);//21Aug
+  TH1D * h_dimuonEta_genMuMatch = new TH1D("dimuonEta_genMuMatch","",50,-6,+6);//21Aug
+  TH1D * h_ptRatio = new TH1D ("ptRatio","",50,0,1);
+  TH1D * h_dxy_muon1 =new TH1D ("dxy_muon1","",50,-0.02,0.02);
+  TH1D * h_dxy_muon2 =new TH1D ("dxy_muon2","",50,-0.02,0.02);
+  TH1D * h_dz_muon1 = new TH1D ("dz_muon1","",50,-0.1,0.1);
+  TH1D * h_dz_muon2 = new TH1D ("dz_muon2","",50,-0.1,0.1);
+  TH1D * h_dcaSigdxy_mu1 = new TH1D ("dcaSigdxy_mu1","",50,-4,4);
+  TH1D * h_dcaSigdxy_mu2 = new TH1D ("dcaSigdxy_mu2","",50,-4,4);
+  TH1D * h_dcaSigdz_mu1 = new TH1D ("dcaSigdz_mu1","",50,-4,4);
+  TH1D * h_dcaSigdz_mu2 = new TH1D ("dcaSigdz_mu2","",50,-4,4);
+  TH1D * h_dcaSigdxy_muon1 = new TH1D ("dcaSigdxy_muon1","",50,-4,4);
+  TH1D * h_dcaSigdxy_muon2 = new TH1D ("dcaSigdxy_muon2","",50,-4,4);
+  TH1D * h_dcaSigdz_muon1 = new TH1D ("dcaSigdz_muon1","",50,-4,4);
+  TH1D * h_dcaSigdz_muon2 = new TH1D ("dcaSigdz_muon2","",50,-4,4);
+  TH1D * h_dcaSigdxy_mu1_genMuMatch = new TH1D ("dcaSigdxy_mu1_genMuMatch","",50,-4,4);
+  TH1D * h_dcaSigdxy_mu2_genMuMatch = new TH1D ("dcaSigdxy_mu2_genMuMatch","",50,-4,4);
+  TH1D * h_dcaSigdz_mu1_genMuMatch = new TH1D ("dcaSigdz_mu1_genMuMatch","",50,-4,4);
+  TH1D * h_dcaSigdz_mu2_genMuMatch = new TH1D ("dcaSigdz_mu2_genMuMatch","",50,-4,4);
+  TH1D * h_phi_leadingMu_MET =new TH1D ("phi_leadingMu_MET","",50,0,3);
+  TH1D * h_phi_trailingMu_MET =new TH1D ("phi_trailingMu_MET","",50,0,3);
+  TH1D * h_dxy_muon1_dcaCut =new TH1D ("dxy_muon1_dcaCut","",50,-0.02,0.02);
+  TH1D * h_dxy_muon2_dcaCut =new TH1D ("dxy_muon2_dcaCut","",50,-0.02,0.02);
+  TH1D * h_dimuonEta_dcaCut = new TH1D("dimuonEta_dcaCut","",50,-6,+6);
+  TH1D * h_ptRatio_dcaCut = new TH1D ("ptRatio_dcaCut","",50,0,1);
 
-  TH1F * NumberOfVerticesH = new TH1F("NumberOfVerticesH","",51,-0.5,50.5);
+  TH1D * NumberOfVerticesH = new TH1D("NumberOfVerticesH","",51,-0.5,50.5);
 
   int nPtBins = 8;
   float ptBins[9] = {10,13,16,20,25,30,40,60,1000};
@@ -528,106 +530,109 @@ int main(int argc, char * argv[]) {
 			"Eta0p9to1p2",
 			"EtaGt1p2"};
 
-  TH1F * ZMassEtaPtPass[3][8];
-  TH1F * ZMassEtaPtFail[3][8];
+  TH1D * ZMassEtaPtPass[3][8];
+  TH1D * ZMassEtaPtFail[3][8];
 
   TString JetBins[3] = {"Jet0","Jet1","JetGe2"};
 
   //*****  create eta histogram with eta ranges associated to their names (eg. endcap, barrel)   ***** //
-  TH1F * etaBinsH = new TH1F("etaBinsH", "etaBinsH", nEtaBins, etaBins);
+  TH1D * etaBinsH = new TH1D("etaBinsH", "etaBinsH", nEtaBins, etaBins);
+  etaBinsH->Draw();
+  etaBinsH->GetXaxis()->Set(nEtaBins, etaBins);
+  for (int i=0; i<nEtaBins; i++){ etaBinsH->GetXaxis()->SetBinLabel(i+1, EtaBins[i]);}
 
-  TH1F * ZMassJetEtaPtPass[3][3][8];
-  TH1F * ZMassJetEtaPtFail[3][3][8];
+  TH1D * ZMassJetEtaPtPass[3][3][8];
+  TH1D * ZMassJetEtaPtFail[3][3][8];
 
-  TH1F * PromptPtPass[3];
-  TH1F * PromptPtFail[3];
+  TH1D * PromptPtPass[3];
+  TH1D * PromptPtFail[3];
 
-  TH1F * NonPromptPtPass[3];
-  TH1F * NonPromptPtFail[3];
+  TH1D * NonPromptPtPass[3];
+  TH1D * NonPromptPtFail[3];
 
-  TH1F * PromptSelPtPass[3];
-  TH1F * PromptSelPtFail[3];
+  TH1D * PromptSelPtPass[3];
+  TH1D * PromptSelPtFail[3];
 
-  TH1F * NonPromptSelPtPass[3];
-  TH1F * NonPromptSelPtFail[3];
+  TH1D * NonPromptSelPtPass[3];
+  TH1D * NonPromptSelPtFail[3];
 
-  TH1F * PromptSelJetPtPass[3][3];
-  TH1F * PromptSelJetPtFail[3][3];
+  TH1D * PromptSelJetPtPass[3][3];
+  TH1D * PromptSelJetPtFail[3][3];
 
-  TH1F * NonPromptSelJetPtPass[3][3];
-  TH1F * NonPromptSelJetPtFail[3][3];
+  TH1D * NonPromptSelJetPtPass[3][3];
+  TH1D * NonPromptSelJetPtFail[3][3];
 
-  TH1F * ZMassMu23EtaPtPass[3][16];
-  TH1F * ZMassMu23EtaPtFail[3][16];
+  TH1D * ZMassMu23EtaPtPass[3][16];
+  TH1D * ZMassMu23EtaPtFail[3][16];
 
-  TH1F * ZMassMu17EtaPtPass[3][16];
-  TH1F * ZMassMu17EtaPtFail[3][16];
+  TH1D * ZMassMu17EtaPtPass[3][16];
+  TH1D * ZMassMu17EtaPtFail[3][16];
 
-  TH1F * ZMassMu8EtaPtPass[3][16];
-  TH1F * ZMassMu8EtaPtFail[3][16];
+  TH1D * ZMassMu8EtaPtPass[3][16];
+  TH1D * ZMassMu8EtaPtFail[3][16];
 
-  TH1F * ZMassIsoMuEtaPtPass[3][16];
-  TH1F * ZMassIsoMuEtaPtFail[3][16];
+  TH1D * ZMassIsoMuEtaPtPass[3][16];
+  TH1D * ZMassIsoMuEtaPtFail[3][16];
 
-  TH1F * ZMassPass = new TH1F("ZMassPass","",80,50,130);
-  TH1F * ZMassFail = new TH1F("ZMassFail","",80,50,130);
+  TH1D * ZMassPass = new TH1D("ZMassPass","",80,50,130);
+  TH1D * ZMassFail = new TH1D("ZMassFail","",80,50,130);
 
   for (int iEta=0; iEta<nEtaBins; ++iEta) {
-    PromptPtPass[iEta] = new TH1F("PromptPt"+EtaBins[iEta]+"Pass","",nPtBins,ptBins);
-    PromptPtFail[iEta] = new TH1F("PromptPt"+EtaBins[iEta]+"Fail","",nPtBins,ptBins);
-    NonPromptPtPass[iEta] = new TH1F("NonPromptPt"+EtaBins[iEta]+"Pass","",nPtBins,ptBins);
-    NonPromptPtFail[iEta] = new TH1F("NonPromptPt"+EtaBins[iEta]+"Fail","",nPtBins,ptBins);
-    PromptSelPtPass[iEta] = new TH1F("PromptSelPt"+EtaBins[iEta]+"Pass","",nPtBins,ptBins);
-    PromptSelPtFail[iEta] = new TH1F("PromptSelPt"+EtaBins[iEta]+"Fail","",nPtBins,ptBins);
-    NonPromptSelPtPass[iEta] = new TH1F("NonPromptSelPt"+EtaBins[iEta]+"Pass","",nPtBins,ptBins);
-    NonPromptSelPtFail[iEta] = new TH1F("NonPromptSelPt"+EtaBins[iEta]+"Fail","",nPtBins,ptBins);
+    PromptPtPass[iEta] = new TH1D("PromptPt"+EtaBins[iEta]+"Pass","",nPtBins,ptBins);
+    PromptPtFail[iEta] = new TH1D("PromptPt"+EtaBins[iEta]+"Fail","",nPtBins,ptBins);
+    NonPromptPtPass[iEta] = new TH1D("NonPromptPt"+EtaBins[iEta]+"Pass","",nPtBins,ptBins);
+    NonPromptPtFail[iEta] = new TH1D("NonPromptPt"+EtaBins[iEta]+"Fail","",nPtBins,ptBins);
+    PromptSelPtPass[iEta] = new TH1D("PromptSelPt"+EtaBins[iEta]+"Pass","",nPtBins,ptBins);
+    PromptSelPtFail[iEta] = new TH1D("PromptSelPt"+EtaBins[iEta]+"Fail","",nPtBins,ptBins);
+    NonPromptSelPtPass[iEta] = new TH1D("NonPromptSelPt"+EtaBins[iEta]+"Pass","",nPtBins,ptBins);
+    NonPromptSelPtFail[iEta] = new TH1D("NonPromptSelPt"+EtaBins[iEta]+"Fail","",nPtBins,ptBins);
     for (int iJet=0; iJet<3; ++iJet) {
-      PromptSelJetPtPass[iEta][iJet] = new TH1F("PromptSelPt"+EtaBins[iEta]+JetBins[iJet]+"Pass","",nPtBins,ptBins);
-      PromptSelJetPtFail[iEta][iJet] = new TH1F("PromptSelPt"+EtaBins[iEta]+JetBins[iJet]+"Fail","",nPtBins,ptBins);
-      NonPromptSelJetPtPass[iEta][iJet] = new TH1F("NonPromptSelPt"+EtaBins[iEta]+JetBins[iJet]+"Pass","",nPtBins,ptBins);
-      NonPromptSelJetPtFail[iEta][iJet] = new TH1F("NonPromptSelPt"+EtaBins[iEta]+JetBins[iJet]+"Fail","",nPtBins,ptBins);
+      PromptSelJetPtPass[iEta][iJet] = new TH1D("PromptSelPt"+EtaBins[iEta]+JetBins[iJet]+"Pass","",nPtBins,ptBins);
+      PromptSelJetPtFail[iEta][iJet] = new TH1D("PromptSelPt"+EtaBins[iEta]+JetBins[iJet]+"Fail","",nPtBins,ptBins);
+      NonPromptSelJetPtPass[iEta][iJet] = new TH1D("NonPromptSelPt"+EtaBins[iEta]+JetBins[iJet]+"Pass","",nPtBins,ptBins);
+      NonPromptSelJetPtFail[iEta][iJet] = new TH1D("NonPromptSelPt"+EtaBins[iEta]+JetBins[iJet]+"Fail","",nPtBins,ptBins);
     }
     for (int iPt=0; iPt<nPtBins; ++iPt) {
-      ZMassEtaPtPass[iEta][iPt] = new TH1F("ZMass"+EtaBins[iEta]+PtBins[iPt]+"Pass","",80,50,130);
-      ZMassEtaPtFail[iEta][iPt] = new TH1F("ZMass"+EtaBins[iEta]+PtBins[iPt]+"Fail","",80,50,130);
+      ZMassEtaPtPass[iEta][iPt] = new TH1D("ZMass"+EtaBins[iEta]+PtBins[iPt]+"Pass","",80,50,130);
+      ZMassEtaPtFail[iEta][iPt] = new TH1D("ZMass"+EtaBins[iEta]+PtBins[iPt]+"Fail","",80,50,130);
       for (int iJet=0; iJet<3; ++iJet) {
-	ZMassJetEtaPtPass[iEta][iJet][iPt] = new TH1F("ZMass"+EtaBins[iEta]+JetBins[iJet]+PtBins[iPt]+"Pass","",80,50,130);
-	ZMassJetEtaPtFail[iEta][iJet][iPt] = new TH1F("ZMass"+EtaBins[iEta]+JetBins[iJet]+PtBins[iPt]+"Fail","",80,50,130);
+	ZMassJetEtaPtPass[iEta][iJet][iPt] = new TH1D("ZMass"+EtaBins[iEta]+JetBins[iJet]+PtBins[iPt]+"Pass","",80,50,130);
+	ZMassJetEtaPtFail[iEta][iJet][iPt] = new TH1D("ZMass"+EtaBins[iEta]+JetBins[iJet]+PtBins[iPt]+"Fail","",80,50,130);
       }
     }
     for (int iPt=0; iPt<nPtBinsTrig; ++iPt) {
-      ZMassMu23EtaPtPass[iEta][iPt] = new TH1F("ZMassMu23"+EtaBins[iEta]+PtBinsTrig[iPt]+"Pass","",80,50,130);
-      ZMassMu23EtaPtFail[iEta][iPt] = new TH1F("ZMassMu23"+EtaBins[iEta]+PtBinsTrig[iPt]+"Fail","",80,50,130);
-      ZMassMu17EtaPtPass[iEta][iPt] = new TH1F("ZMassMu17"+EtaBins[iEta]+PtBinsTrig[iPt]+"Pass","",80,50,130);
-      ZMassMu17EtaPtFail[iEta][iPt] = new TH1F("ZMassMu17"+EtaBins[iEta]+PtBinsTrig[iPt]+"Fail","",80,50,130);
-      ZMassMu8EtaPtPass[iEta][iPt]  = new TH1F("ZMassMu8"+EtaBins[iEta]+PtBinsTrig[iPt]+"Pass","",80,50,130);
-      ZMassMu8EtaPtFail[iEta][iPt]  = new TH1F("ZMassMu8"+EtaBins[iEta]+PtBinsTrig[iPt]+"Fail","",80,50,130);
-      ZMassIsoMuEtaPtPass[iEta][iPt]  = new TH1F("ZMassIsoMu"+EtaBins[iEta]+PtBinsTrig[iPt]+"Pass","",80,50,130);
-      ZMassIsoMuEtaPtFail[iEta][iPt]  = new TH1F("ZMassIsoMu"+EtaBins[iEta]+PtBinsTrig[iPt]+"Fail","",80,50,130);
+      ZMassMu23EtaPtPass[iEta][iPt] = new TH1D("ZMassMu23"+EtaBins[iEta]+PtBinsTrig[iPt]+"Pass","",80,50,130);
+      ZMassMu23EtaPtFail[iEta][iPt] = new TH1D("ZMassMu23"+EtaBins[iEta]+PtBinsTrig[iPt]+"Fail","",80,50,130);
+      ZMassMu17EtaPtPass[iEta][iPt] = new TH1D("ZMassMu17"+EtaBins[iEta]+PtBinsTrig[iPt]+"Pass","",80,50,130);
+      ZMassMu17EtaPtFail[iEta][iPt] = new TH1D("ZMassMu17"+EtaBins[iEta]+PtBinsTrig[iPt]+"Fail","",80,50,130);
+      ZMassMu8EtaPtPass[iEta][iPt]  = new TH1D("ZMassMu8"+EtaBins[iEta]+PtBinsTrig[iPt]+"Pass","",80,50,130);
+      ZMassMu8EtaPtFail[iEta][iPt]  = new TH1D("ZMassMu8"+EtaBins[iEta]+PtBinsTrig[iPt]+"Fail","",80,50,130);
+      ZMassIsoMuEtaPtPass[iEta][iPt]  = new TH1D("ZMassIsoMu"+EtaBins[iEta]+PtBinsTrig[iPt]+"Pass","",80,50,130);
+      ZMassIsoMuEtaPtFail[iEta][iPt]  = new TH1D("ZMassIsoMu"+EtaBins[iEta]+PtBinsTrig[iPt]+"Fail","",80,50,130);
     }
   }
 
-  TH1F * ZMassMu23BarrelPass = new TH1F("ZMassMu23BarrelPass","",80,50,130);
-  TH1F * ZMassMu23BarrelFail = new TH1F("ZMassMu23BarrelFail","",80,50,130);
-  TH1F * ZMassMu23EndcapPass = new TH1F("ZMassMu23EndcapPass","",80,50,130);
-  TH1F * ZMassMu23EndcapFail = new TH1F("ZMassMu23EndcapFail","",80,50,130);
+  TH1D * ZMassMu23BarrelPass = new TH1D("ZMassMu23BarrelPass","",80,50,130);
+  TH1D * ZMassMu23BarrelFail = new TH1D("ZMassMu23BarrelFail","",80,50,130);
+  TH1D * ZMassMu23EndcapPass = new TH1D("ZMassMu23EndcapPass","",80,50,130);
+  TH1D * ZMassMu23EndcapFail = new TH1D("ZMassMu23EndcapFail","",80,50,130);
 
-  TH1F * ZMassMu17BarrelPass = new TH1F("ZMassMu17BarrelPass","",80,50,130);
-  TH1F * ZMassMu17BarrelFail = new TH1F("ZMassMu17BarrelFail","",80,50,130);
-  TH1F * ZMassMu17EndcapPass = new TH1F("ZMassMu17EndcapPass","",80,50,130);
-  TH1F * ZMassMu17EndcapFail = new TH1F("ZMassMu17EndcapFail","",80,50,130);
+  TH1D * ZMassMu17BarrelPass = new TH1D("ZMassMu17BarrelPass","",80,50,130);
+  TH1D * ZMassMu17BarrelFail = new TH1D("ZMassMu17BarrelFail","",80,50,130);
+  TH1D * ZMassMu17EndcapPass = new TH1D("ZMassMu17EndcapPass","",80,50,130);
+  TH1D * ZMassMu17EndcapFail = new TH1D("ZMassMu17EndcapFail","",80,50,130);
 
-  TH1F * ZMassIsoMuBarrelPass = new TH1F("ZMassIsoMuBarrelPass","",80,50,130);
-  TH1F * ZMassIsoMuBarrelFail = new TH1F("ZMassIsoMuBarrelFail","",80,50,130);
-  TH1F * ZMassIsoMuEndcapPass = new TH1F("ZMassIsoMuEndcapPass","",80,50,130);
-  TH1F * ZMassIsoMuEndcapFail = new TH1F("ZMassIsoMuEndcapFail","",80,50,130);
+  TH1D * ZMassIsoMuBarrelPass = new TH1D("ZMassIsoMuBarrelPass","",80,50,130);
+  TH1D * ZMassIsoMuBarrelFail = new TH1D("ZMassIsoMuBarrelFail","",80,50,130);
+  TH1D * ZMassIsoMuEndcapPass = new TH1D("ZMassIsoMuEndcapPass","",80,50,130);
+  TH1D * ZMassIsoMuEndcapFail = new TH1D("ZMassIsoMuEndcapFail","",80,50,130);
 
-  TH1F * ZMassMu8BarrelPass  = new TH1F("ZMassMu8BarrelPass", "",80,50,130);
-  TH1F * ZMassMu8BarrelFail  = new TH1F("ZMassMu8BarrelFail", "",80,50,130);
-  TH1F * ZMassMu8EndcapPass  = new TH1F("ZMassMu8EndcapPass", "",80,50,130);
-  TH1F * ZMassMu8EndcapFail  = new TH1F("ZMassMu8EndcapFail", "",80,50,130);
+  TH1D * ZMassMu8BarrelPass  = new TH1D("ZMassMu8BarrelPass", "",80,50,130);
+  TH1D * ZMassMu8BarrelFail  = new TH1D("ZMassMu8BarrelFail", "",80,50,130);
+  TH1D * ZMassMu8EndcapPass  = new TH1D("ZMassMu8EndcapPass", "",80,50,130);
+  TH1D * ZMassMu8EndcapFail  = new TH1D("ZMassMu8EndcapFail", "",80,50,130);
 
-  //  TH1D * PUweightsOfficialH = new TH1D("PUweightsOfficialH","PU weights w/ official reweighting",1000, 0, -1);
+  TH1D * PUweightsOfficialH = new TH1D("PUweightsOfficialH","PU weights w/ official reweighting",1000, 0, 10);
   TH1D * nTruePUInteractionsH = new TH1D("nTruePUInteractionsH","",50,-0.5,49.5);
 
   int nJetBins = 3;
@@ -646,29 +651,29 @@ int main(int argc, char * argv[]) {
   TString RecoilPuppiZParal("recoilPuppiZParal_");
   TString RecoilPuppiZPerp("recoilPuppiZPerp_");
 
-  TH1F * recoilZParalH[3];
-  TH1F * recoilZPerpH[3];
-  TH1F * recoilPuppiZParalH[3];
-  TH1F * recoilPuppiZPerpH[3];
+  TH1D * recoilZParalH[3];
+  TH1D * recoilZPerpH[3];
+  TH1D * recoilPuppiZParalH[3];
+  TH1D * recoilPuppiZPerpH[3];
 
-  TH1F * recoilZParal_Ptbins_nJetsH[3][5];
-  TH1F * recoilZPerp_Ptbins_nJetsH[3][5];
-  TH1F * recoilPuppiZParal_Ptbins_nJetsH[3][5];
-  TH1F * recoilPuppiZPerp_Ptbins_nJetsH[3][5];
+  TH1D * recoilZParal_Ptbins_nJetsH[3][5];
+  TH1D * recoilZPerp_Ptbins_nJetsH[3][5];
+  TH1D * recoilPuppiZParal_Ptbins_nJetsH[3][5];
+  TH1D * recoilPuppiZPerp_Ptbins_nJetsH[3][5];
 
   for (int iBin=0; iBin<nJetBins; ++iBin) {
-    recoilZParalH[iBin] = new TH1F("recoilZParal"+NJetBins[iBin]+"H","",100,-200,200);
-    recoilZPerpH[iBin] = new TH1F("recoilZPerp"+NJetBins[iBin]+"H","",100,-200,200);
-    recoilPuppiZParalH[iBin] = new TH1F("recoilPuppiZParal"+NJetBins[iBin]+"H","",100,-200,200);
-    recoilPuppiZPerpH[iBin] = new TH1F("recoilPuppiZPerp"+NJetBins[iBin]+"H","",100,-200,200);
+    recoilZParalH[iBin] = new TH1D("recoilZParal"+NJetBins[iBin]+"H","",100,-200,200);
+    recoilZPerpH[iBin] = new TH1D("recoilZPerp"+NJetBins[iBin]+"H","",100,-200,200);
+    recoilPuppiZParalH[iBin] = new TH1D("recoilPuppiZParal"+NJetBins[iBin]+"H","",100,-200,200);
+    recoilPuppiZPerpH[iBin] = new TH1D("recoilPuppiZPerp"+NJetBins[iBin]+"H","",100,-200,200);
   }
   
   for (int iJets=0; iJets<nJetBins; ++iJets) {
     for (int iPtBins=0; iPtBins<nZPtBins; ++iPtBins){
-      recoilZParal_Ptbins_nJetsH[iJets][iPtBins] = new TH1F(RecoilZParal+NJetBins[iJets]+ZPtBins[iPtBins],"",100,-200,200);
-      recoilZPerp_Ptbins_nJetsH[iJets][iPtBins] = new TH1F(RecoilZPerp+NJetBins[iJets]+ZPtBins[iPtBins],"",100,-200,200);
-      recoilPuppiZParal_Ptbins_nJetsH[iJets][iPtBins] = new TH1F(RecoilPuppiZParal+NJetBins[iJets]+ZPtBins[iPtBins],"",100,-200,200);
-      recoilPuppiZPerp_Ptbins_nJetsH[iJets][iPtBins] = new TH1F(RecoilPuppiZPerp+NJetBins[iJets]+ZPtBins[iPtBins],"",100,-200,200);
+      recoilZParal_Ptbins_nJetsH[iJets][iPtBins] = new TH1D(RecoilZParal+NJetBins[iJets]+ZPtBins[iPtBins],"",100,-200,200);
+      recoilZPerp_Ptbins_nJetsH[iJets][iPtBins] = new TH1D(RecoilZPerp+NJetBins[iJets]+ZPtBins[iPtBins],"",100,-200,200);
+      recoilPuppiZParal_Ptbins_nJetsH[iJets][iPtBins] = new TH1D(RecoilPuppiZParal+NJetBins[iJets]+ZPtBins[iPtBins],"",100,-200,200);
+      recoilPuppiZPerp_Ptbins_nJetsH[iJets][iPtBins] = new TH1D(RecoilPuppiZPerp+NJetBins[iJets]+ZPtBins[iPtBins],"",100,-200,200);
     }
   }
 
@@ -684,8 +689,8 @@ int main(int argc, char * argv[]) {
   TFile * fileDataNVert = new TFile(TString(cmsswBase)+"/src/"+dataBaseDir+"/"+vertDataFileName);
   TFile * fileMcNVert   = new TFile(TString(cmsswBase)+"/src/"+dataBaseDir+"/"+vertMcFileName);
 
-  TH1F * vertexDataH = (TH1F*)fileDataNVert->Get(TString(vertHistName));
-  TH1F * vertexMcH   = (TH1F*)fileMcNVert->Get(TString(vertHistName));
+  TH1D * vertexDataH = (TH1D*)fileDataNVert->Get(TString(vertHistName));
+  TH1D * vertexMcH   = (TH1D*)fileMcNVert->Get(TString(vertHistName));
 
   float normVertexData = vertexDataH->GetSumOfWeights();
   float normVertexMc   = vertexMcH->GetSumOfWeights();
@@ -992,11 +997,11 @@ int main(int argc, char * argv[]) {
       float puppimet = TMath::Sqrt(puppimet_ex*puppimet_ex+puppimet_ey*puppimet_ey);
 
       // vertex cuts
-      if (fabs(analysisTree.primvertex_z)>zVertexCut) continue;
-      if (analysisTree.primvertex_ndof<ndofVertexCut) continue;
-      float dVertex = (analysisTree.primvertex_x*analysisTree.primvertex_x+
-		       analysisTree.primvertex_y*analysisTree.primvertex_y);
-      if (dVertex>dVertexCut) continue;
+      //      if (fabs(analysisTree.primvertex_z)>zVertexCut) continue;
+      //      if (analysisTree.primvertex_ndof<ndofVertexCut) continue;
+      //      float dVertex = (analysisTree.primvertex_x*analysisTree.primvertex_x+
+      //		       analysisTree.primvertex_y*analysisTree.primvertex_y);
+      //      if (dVertex>dVertexCut) continue;
       
       // muon selection
 
@@ -1182,7 +1187,6 @@ int main(int argc, char * argv[]) {
 	  }
 	  if (isMu1matched) {
 	    for (unsigned int iMu=0; iMu<allMuons.size(); ++iMu) {
-	      //	      if (!isMuonPrompt[iMu]) continue;
 	      unsigned int indexProbe = allMuons[iMu];
 	      if (index1==indexProbe) continue;
 	      float q1 = analysisTree.muon_charge[index1];
