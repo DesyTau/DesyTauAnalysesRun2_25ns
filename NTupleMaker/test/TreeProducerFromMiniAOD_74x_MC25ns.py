@@ -40,7 +40,7 @@ process.options = cms.untracked.PSet(
 
 # How many events to process
 process.maxEvents = cms.untracked.PSet( 
-   input = cms.untracked.int32(10000)
+   input = cms.untracked.int32(-1)
 )
 
 
@@ -48,7 +48,7 @@ process.maxEvents = cms.untracked.PSet(
 runOnData=isData #data/MC switch
 usePrivateSQlite=False #use external JECs (sqlite file) /// OUTDATED for 25ns
 useHFCandidates=True #create an additionnal NoHF slimmed MET collection if the option is set to false  == existing as slimmedMETsNoHF
-applyResiduals=True #application of residual corrections. Have to be set to True once the 13 TeV residual corrections are available. False to be kept meanwhile. Can be kept to False later for private tests or for analysis checks and developments (not the official recommendation!).
+applyResiduals=False #application of residual corrections. Have to be set to True once the 13 TeV residual corrections are available. False to be kept meanwhile. Can be kept to False later for private tests or for analysis checks and developments (not the official recommendation!).
 #===================================================================
 
 
@@ -709,7 +709,7 @@ process.load("RecoMET/METProducers.METSignificanceParams_cfi")
 process.p = cms.Path(
   process.initroottree*
   process.METSignificance*
-  process.mvaMetSequence *
+#  process.mvaMetSequence *
   process.egmGsfElectronIDSequence * 
 #  process.patJetCorrFactorsReapplyJEC * process.patJetsReapplyJEC *
   process.HBHENoiseFilterResultProducer* #produces HBHE bools baseline
