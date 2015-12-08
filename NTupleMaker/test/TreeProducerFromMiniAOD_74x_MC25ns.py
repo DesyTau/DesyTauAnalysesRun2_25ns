@@ -42,7 +42,7 @@ process.options = cms.untracked.PSet(
 
 # How many events to process
 process.maxEvents = cms.untracked.PSet( 
-   input = cms.untracked.int32(-1)
+   input = cms.untracked.int32(10000)
 )
 
 
@@ -50,7 +50,7 @@ process.maxEvents = cms.untracked.PSet(
 runOnData=isData #data/MC switch
 usePrivateSQlite=False #use external JECs (sqlite file) /// OUTDATED for 25ns
 useHFCandidates=True #create an additionnal NoHF slimmed MET collection if the option is set to false  == existing as slimmedMETsNoHF
-applyResiduals=False #application of residual corrections. Have to be set to True once the 13 TeV residual corrections are available. False to be kept meanwhile. Can be kept to False later for private tests or for analysis checks and developments (not the official recommendation!).
+applyResiduals=True #application of residual corrections. Have to be set to True once the 13 TeV residual corrections are available. False to be kept meanwhile. Can be kept to False later for private tests or for analysis checks and developments (not the official recommendation!).
 #===================================================================
 
 
@@ -453,7 +453,7 @@ if usePUJetID5X:
                                      src = cms.InputTag("packedPFCandidates"),
                                      inputEtMin = cms.double(0.0),
                                      srcPVs = cms.InputTag(""),
-                                     jetPtMin = cms.double(3.0),
+                                     jetPtMin = cms.double(5.0),
                                      radiusPU = cms.double(0.5),
                                      maxProblematicEcalCells = cms.uint32(9999999),
                                      doPUOffsetCorr = cms.bool(False),
@@ -840,6 +840,7 @@ process.p = cms.Path(
   process.initroottree*
   #process.patJetCorrFactorsReapplyJEC * process.patJetsReapplyJEC *
   process.METSignificance * #process.METCorrSignificance *
+  process.mvaMetSequence *
   process.egmGsfElectronIDSequence * 
   #process.HBHENoiseFilterResultProducer* #produces HBHE bools baseline
   #process.ApplyBaselineHBHENoiseFilter*  #reject events based 
