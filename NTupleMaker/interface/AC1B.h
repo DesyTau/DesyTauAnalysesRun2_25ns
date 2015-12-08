@@ -267,6 +267,7 @@ public :
    Float_t         pfmet_sigxy;
    Float_t         pfmet_sigyx;
    Float_t         pfmet_sigyy;
+   Float_t         pfmet_sig;  
    Float_t         genmet_ex;
    Float_t         genmet_ey;
    Float_t         pfmet_ex_JetEnUp;
@@ -286,6 +287,7 @@ public :
    Float_t         pfmetcorr_sigxy;
    Float_t         pfmetcorr_sigyx;
    Float_t         pfmetcorr_sigyy;
+   Float_t         pfmetcorr_sig;  
    Float_t         pfmetcorr_ex_JetEnUp;
    Float_t         pfmetcorr_ey_JetEnUp;
    Float_t         pfmetcorr_ex_JetEnDown;
@@ -674,6 +676,7 @@ public :
    TBranch        *b_pfmet_sigxy;   //!
    TBranch        *b_pfmet_sigyx;   //!
    TBranch        *b_pfmet_sigyy;   //!
+   TBranch        *b_pfmet_sig;   //!  
    TBranch        *b_genmet_ex;   //!
    TBranch        *b_genmet_ey;   //!
    TBranch        *b_pfmet_ex_JetEnUp;   //!
@@ -693,6 +696,7 @@ public :
    TBranch        *b_pfmetcorr_sigxy;   //!
    TBranch        *b_pfmetcorr_sigyx;   //!
    TBranch        *b_pfmetcorr_sigyy;   //!
+   TBranch        *b_pfmetcorr_sig;   //!
    TBranch        *b_pfmetcorr_ex_JetEnUp;   //!
    TBranch        *b_pfmetcorr_ey_JetEnUp;   //!
    TBranch        *b_pfmetcorr_ex_JetEnDown;   //!
@@ -1187,6 +1191,7 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("pfmet_sigxy", &pfmet_sigxy, &b_pfmet_sigxy);
    fChain->SetBranchAddress("pfmet_sigyx", &pfmet_sigyx, &b_pfmet_sigyx);
    fChain->SetBranchAddress("pfmet_sigyy", &pfmet_sigyy, &b_pfmet_sigyy);
+   fChain->SetBranchAddress("pfmet_sig", &pfmet_sig, &b_pfmet_sig);
    fChain->SetBranchAddress("genmet_ex", &genmet_ex, &b_genmet_ex);
    fChain->SetBranchAddress("genmet_ey", &genmet_ey, &b_genmet_ey);
    fChain->SetBranchAddress("pfmet_ex_JetEnUp", &pfmet_ex_JetEnUp, &b_pfmet_ex_JetEnUp);
@@ -1206,6 +1211,7 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("pfmetcorr_sigxy", &pfmetcorr_sigxy, &b_pfmetcorr_sigxy);
    fChain->SetBranchAddress("pfmetcorr_sigyx", &pfmetcorr_sigyx, &b_pfmetcorr_sigyx);
    fChain->SetBranchAddress("pfmetcorr_sigyy", &pfmetcorr_sigyy, &b_pfmetcorr_sigyy);
+   fChain->SetBranchAddress("pfmetcorr_sig", &pfmetcorr_sig, &b_pfmetcorr_sig);
    fChain->SetBranchAddress("pfmetcorr_ex_JetEnUp", &pfmetcorr_ex_JetEnUp, &b_pfmetcorr_ex_JetEnUp);
    fChain->SetBranchAddress("pfmetcorr_ey_JetEnUp", &pfmetcorr_ey_JetEnUp, &b_pfmetcorr_ey_JetEnUp);
    fChain->SetBranchAddress("pfmetcorr_ex_JetEnDown", &pfmetcorr_ex_JetEnDown, &b_pfmetcorr_ex_JetEnDown);
