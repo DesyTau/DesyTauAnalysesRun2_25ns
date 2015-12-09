@@ -27,6 +27,8 @@
 #include "DesyTauAnalyses/NTupleMaker/interface/AC1B.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/json.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/PileUp.h"
+#include "DesyTauAnalyses/NTupleMaker/interface/ScaleFactor.h"
+
 
 const float electronMass = 0;
 const float muonMass = 0.10565837;
@@ -365,10 +367,13 @@ int main(int argc, char * argv[]) {
   const string vertHistName     = cfg.get<string>("VertexHistName");
 
   // lepton scale factors
+/*
   const string muonSfDataBarrel = cfg.get<string>("MuonSfDataBarrel");
   const string muonSfDataEndcap = cfg.get<string>("MuonSfDataEndcap");
   const string muonSfMcBarrel = cfg.get<string>("MuonSfMcBarrel");
   const string muonSfMcEndcap = cfg.get<string>("MuonSfMcEndcap");
+*/
+  const string MuonIdIsoFile = cfg.get<string>("MuonIdIsoEff");
 
   const string jsonFile = cfg.get<string>("jsonFile");
   // **** end of configuration
@@ -521,6 +526,10 @@ int main(int argc, char * argv[]) {
   TH1D * h_ptRatio_dcaCut = new TH1D ("ptRatio_dcaCut","",50,0,1);
 
   TH1D * NumberOfVerticesH = new TH1D("NumberOfVerticesH","",51,-0.5,50.5);
+
+
+  TH1D * MuSF_IdIso_Mu1 = new TH1D("MuIdIsoSF_Mu1", "MuIdIsoSF_Mu1", 1000, 0.5,1.5);
+  TH1D * MuSF_IdIso_Mu2 = new TH1D("MuIdIsoSF_Mu2", "MuIdIsoSF_Mu2", 1000, 0.5,1.5);
 
   int nPtBins = 8;
   float ptBins[9] = {10,13,16,20,25,30,40,60,1000};
@@ -754,7 +763,7 @@ int main(int argc, char * argv[]) {
   }
 
 
-
+/*
   TFile *f10 = new TFile(TString(cmsswBase)+"/src/"+dataBaseDir+"/"+muonSfDataBarrel);  // mu SF barrel data
   TFile *f11 = new TFile(TString(cmsswBase)+"/src/"+dataBaseDir+"/"+muonSfDataEndcap); // mu SF endcap data
   TFile *f12 = new TFile(TString(cmsswBase)+"/src/"+dataBaseDir+"/"+muonSfMcBarrel);  // mu SF barrel MC
@@ -774,6 +783,15 @@ int main(int argc, char * argv[]) {
   dataEffEndcap = hEffEndcapData->GetY();
   mcEffBarrel = hEffBarrelMC->GetY();
   mcEffEndcap = hEffEndcapMC->GetY();
+*/
+
+
+// Lepton Scale Factors 
+
+  ScaleFactor * SF_muonIdIso = new ScaleFactor();
+  SF_muonIdIso->init_ScaleFactor(TString(MuonIdIsoFile));
+
+
 
 
   int nFiles = 0;
@@ -800,7 +818,7 @@ int main(int argc, char * argv[]) {
 
 
   for (int iF=0; iF<nTotalFiles; ++iF) {
-
+  
     std::string filen;
     fileList >> filen;
 
@@ -1502,6 +1520,8 @@ int main(int argc, char * argv[]) {
 	}
 
 	if (!isData && applyLeptonSF) {
+
+	/*
 	  float ptMu1 = TMath::Min(float(59),analysisTree.muon_pt[indx1]);
 	  float ptMu2 = TMath::Min(float(59),analysisTree.muon_pt[indx2]);
 	  int ptBinMu1 = binNumber(ptMu1,nPtBins,ptBins);
@@ -1531,7 +1551,26 @@ int main(int argc, char * argv[]) {
 	  float wMu1 = dataMu1/mcMu1;
 	  float wMu2 = dataMu2/mcMu2;
 	  //	  cout << "Muons SF : Mu1 = " << wMu1 << "   Mu2 = " << wMu2 << endl;
-	  weight = weight*wMu1*wMu2;
+	*/
+
+	//leptonSFweight = SF_yourScaleFactor->get_ScaleFactor(pt, eta)	
+	double ptMu1 = (double)analysisTree.muon_pt[indx1];
+	double ptMu2 = (double)analysisTree.muon_pt[indx2];
+	double etaMu1 = (double)analysisTree.muon_eta[indx1];
+	double etaMu2 = (double)analysisTree.muon_eta[indx2];
+	double IdIsoSF_mu1 = SF_muonIdIso->get_ScaleFactor(ptMu1, etaMu1);
+	double IdIsoSF_mu2 = SF_muonIdIso->get_ScaleFactor(ptMu2, etaMu2);
+	
+	MuSF_IdIso_Mu1->Fill(IdIsoSF_mu1);
+	MuSF_IdIso_Mu2->Fill(IdIsoSF_mu2);
+        //std::cout << " weight " << weight << std::endl;
+	//std::cout << "eff data mu 1 = " << SF_muonIdIso->get_EfficiencyData(ptMu1, etaMu1)<< " |  eff mc mu 1 = " << SF_muonIdIso->get_EfficiencyMC(ptMu1, etaMu1)<<std::endl;
+ 	 //std::cout << "SF mu1 = " << IdIsoSF_mu1 << std::endl;
+	//std::cout << "SF mu2 = " << IdIsoSF_mu2 << std::endl;
+
+	weight = weight*IdIsoSF_mu1*IdIsoSF_mu2;
+        //std::cout << " weight " << weight << std::endl;
+
 	}
 
 	TLorentzVector mu1; mu1.SetXYZM(analysisTree.muon_px[indx1],
