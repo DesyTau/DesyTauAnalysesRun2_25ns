@@ -13,15 +13,17 @@ void ScaleFactor::init_ScaleFactor(TString inputRootFile){
 	int nEtaBins = etaBinsH->GetNbinsX();
  	for (int iBin=0; iBin<nEtaBins; iBin++){    
 		etaLabel = etaBinsH->GetXaxis()->GetBinLabel(iBin+1);
-				//std::cout << "eta label " << etaLabel << std::endl;
+				std::cout << "eta label " << etaLabel << std::endl;
 		GraphName = HistoBaseName+etaLabel+"_Data";
-				//std::cout << "- data " << GraphName << std::endl;
+				std::cout << "- data " << GraphName << std::endl;
 		eff_data[etaLabel] = (TGraphAsymmErrors*)fileIn->Get(TString(GraphName)); 
+				std::cout << "eff_data[etaLabel] " << eff_data[etaLabel] << std::endl;
 		SetAxisBins(eff_data[etaLabel]);
 
 		GraphName = HistoBaseName+etaLabel+"_MC";
-				//std::cout << "- mc " << GraphName << std::endl;
+				std::cout << "- mc " << GraphName << std::endl;
 		eff_mc[etaLabel] = (TGraphAsymmErrors*)fileIn->Get(TString(GraphName));
+				std::cout << "eff_mc[etaLabel] " << eff_mc[etaLabel] << std::endl;
 		SetAxisBins(eff_mc[etaLabel]); 
 		bool sameBinning = check_SameBinning(eff_data[etaLabel], eff_mc[etaLabel]);
 		if (!sameBinning) {std::cout<< "ERROR in ScaleFactor::init_ScaleFactor(TString inputRootFile) from NTupleMaker/src/ScaleFactor.cc . Can not proceed because ScaleFactor::check_SameBinning returned different pT binning for data and MC for eta label " << etaLabel << std::endl; exit(1); }; 
@@ -85,7 +87,7 @@ double ScaleFactor::get_EfficiencyData(double pt, double eta){
 	
 	// if pt is underflow, eff=1 and WARNING message
 	else if (pt < ptMIN ) {
-	  eff=1; 
+	  eff=-1; 
 	  std::cout<< "WARNING in ScaleFactor::get_EfficiencyData(double pt, double eta) from NTupleMaker/src/ScaleFactor.cc: pT too low (pt = " << pt << "), min value is " << ptMIN << ". Returned efficiency =1. Weight will be 1. " << std::endl;
 	}
 	
@@ -111,24 +113,24 @@ double ScaleFactor::get_EfficiencyMC(double pt, double eta) {
 	}
 	
 	// check if pt is overflow or underflow wrt to ptMIN and ptMAX  
-	int Npoints = eff_data[label]->GetN();
-	double ptMAX = (eff_data[label]->GetX()[Npoints-1])+(eff_data[label]->GetErrorXhigh(Npoints-1));
-	double ptMIN = (eff_data[label]->GetX()[0])-(eff_data[label]->GetErrorXlow(0));
+	int Npoints = eff_mc[label]->GetN();
+	double ptMAX = (eff_mc[label]->GetX()[Npoints-1])+(eff_mc[label]->GetErrorXhigh(Npoints-1));
+	double ptMIN = (eff_mc[label]->GetX()[0])-(eff_mc[label]->GetErrorXlow(0));
 	double eff;		
 
 	// if pt is overflow, take eff of highest pt bin 
-	if (pt >= ptMAX ) { eff= eff_data[label]->GetY()[Npoints-1];} 
+	if (pt >= ptMAX ) { eff= eff_mc[label]->GetY()[Npoints-1];} 
 
 	// if pt is underflow, eff=1 and WARNING message
 	else if (pt < ptMIN ) {
-	  eff=1; 
+	  eff=-1; 
 	  std::cout<< "WARNING in ScaleFactor::get_EfficiencyMC(double pt, double eta) from NTupleMaker/src/ScaleFactor.cc: pT too low (pt = " << pt << "), min value is " << ptMIN << ". Returned efficiency =1. Weight will be 1. " << std::endl;
 	}
 	
 	// if pt is in range take corresponding efficiency
 	else {
-		int ptbin = eff_data[label]->GetXaxis()->FindFixBin(pt);
-		eff = eff_data[label]->GetY()[ptbin-1];
+		int ptbin = eff_mc[label]->GetXaxis()->FindFixBin(pt);
+		eff = eff_mc[label]->GetY()[ptbin-1];
 		if (eff > 1. ) {std::cout << "WARNING in ScaleFactor::get_EfficiencyMC(double pt, double eta) from NTupleMaker/src/ScaleFactor.cc : Returned efficiency in MC > 1. " << std::endl;} 		
 		if (eff < 0 ) {std::cout<<"WARNING in ScaleFactor::get_EfficiencyMC(double pt, double eta) from NTupleMaker/src/ScaleFactor.cc : Returned negative efficiency in MC. " <<std::endl;}
 	}
