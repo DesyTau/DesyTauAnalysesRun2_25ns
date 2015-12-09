@@ -141,8 +141,8 @@ Double_t SignalFSRPlusBackground(Double_t * x,
 
 
 
-#include "HttStylesNew.cc"
-#include "HtoH.h"
+#include "/nfs/dust/cms/user/bottav/CMSSW_7_4_14/src/DesyTauAnalyses/NTupleMaker/test/HttStylesNew.cc"
+#include "/nfs/dust/cms/user/bottav/CMSSW_7_4_14/src/DesyTauAnalyses/NTupleMaker/test/HtoH.h"
 
 // ranges of m(ll) distribution
 // to compute yields in samples
@@ -422,7 +422,7 @@ void FitPassAndFail(TString SampleName, // Data or MC
   if (fitFail)
     bkgFuncFail->Draw("lsame");
   c2->Update();
-  c2->Print(SampleName+"_"+Name+"_fail.png");
+  c2->Print("./plots_wFSR/"+SampleName+"_"+Name+"_fail.png");
 
   // signal function to compute
   // yield in the sample of failing probes
@@ -496,55 +496,87 @@ void FitPassAndFail(TString SampleName, // Data or MC
 // Names of pt bins are specified in the macro
 
 
-void FitTP(
-	   TString fileName = "SingleMuon_Run2015D", // RooT file with tag-&-probe histograms (w/o *.root extension)
+void FitTP(TString fileName = "SingleMuon_2015D_iso0p15", // RooT file with tag-&-probe histograms 
  	   TString histBaseName = "ZMassEta0p9to1p2", // Basename of the histograms to fit (eta bin) 
-	   TString xTitle = "muon p_{T} [GeV]", // x axis title (efficiency plot)
+	   TString xTitle = "muonp_{T}[GeV]", // x axis title (efficiency plot)
 	   TString yTitle = "efficiency", // y axis title (efficiency plot)
-	   TString xtit = "m_{#mu#mu} [GeV]", // title for dilepton mass distributions
+	   TString xtit = "m_{#mu#mu}[GeV]", // title for dilepton mass distributions
 	   float norm = 1 // luminosity normalization factor (1 for data) 
 	   ) {
   
-  int nPtBins = 6;
-  float ptBins[7]; 
-  ptBins[0] = 10;
-  ptBins[1] = 15;
-  ptBins[2] = 20;
-  ptBins[3] = 25;
-  ptBins[4] = 30;
-  ptBins[5] = 40;
-  ptBins[6] = 60;
+  TString SampleName("_MC");
+  if (fileName.Contains("SingleMuon")) SampleName = "_Data";
+  if (fileName.Contains("SingleElectron")) SampleName = "_Data";
+
+   //std::cout << "ok 1" << std::endl;
 
   // define if in the fit of failing probes
   // the FSR component will be used in the 
   // signal function
-  bool fitWithFSR[6];
-  for (int i=0; i<6; ++i)
-    fitWithFSR[i] = false;
+  bool fitWithFSR[17];
+  for (int i=0; i<17; ++i)
+    fitWithFSR[i] = true;
 
-  TString PtBins[6];
-  PtBins[0] = "Pt10to15";
-  PtBins[1] = "Pt15to20";
-  PtBins[2] = "Pt20to25";
-  PtBins[3] = "Pt25to30";
-  PtBins[4] = "Pt30to40";
-  PtBins[5] = "Pt40to60";
+  // binning for ID+ISO efficiency
+  int nPtBins = 8; 
+	float ptBins[17];
+	ptBins[0] = 10;	 
+	ptBins[1] = 13;
+	ptBins[2] = 16;
+	ptBins[3] = 20;
+	ptBins[4] = 25; 
+	ptBins[5] = 30; 
+	ptBins[6] = 40;
+	ptBins[7] = 60;
+	ptBins[8] = 80;
+
+  TString PtBins[17];
+  PtBins[0]= "Pt10to13"; PtBins[1]= "Pt13to16"; PtBins[2]= "Pt16to20"; PtBins[3]= "Pt20to25"; PtBins[4]="Pt25to30"; 
+  PtBins[5]="Pt30to40"; PtBins[6]="Pt40to60"; PtBins[7]="PtGt60";
+
+  //binning for trigger efficiency
+
+	//std::cout << histBaseName << std::endl;
+	//std::cout << histBaseName.Contains("ZMassEle") << std::endl;
+
+  if ( histBaseName.Contains("ZMassEle") || histBaseName.Contains("ZMassIsoEle") || histBaseName.Contains("ZMassMu") || histBaseName.Contains("ZMassIsoMu") ) {
+	nPtBins = 16;
+	ptBins[0] = 10; ptBins[1] = 13; ptBins[2] = 16; ptBins[3] = 19; ptBins[4] = 22; ptBins[5] = 25; ptBins[6] = 28; ptBins[7] = 31; ptBins[8] = 34; ptBins[9] = 37;
+	ptBins[10] = 40; ptBins[11] = 45; ptBins[12] = 50; ptBins[13] = 60; ptBins[14] = 70; ptBins[15] = 100; ptBins[16] = 150;     
+
+	PtBins[0] = "Pt10to13"; PtBins[1] = "Pt13to16"; PtBins[2] = "Pt16to19"; PtBins[3] ="Pt19to22"; PtBins[4] ="Pt22to25"; PtBins[5] ="Pt25to28"; PtBins[6] ="Pt28to31"; 
+	PtBins[7] ="Pt31to34"; PtBins[8] ="Pt34to37"; PtBins[9] ="Pt37to40"; PtBins[10] ="Pt40to45"; PtBins[11] ="Pt45to50"; PtBins[12] ="Pt50to60"; PtBins[13] ="Pt60to70";
+	PtBins[14] ="Pt70to100"; PtBins[15] ="PtGt100";
+	};
+
+
 
   TH1F * numeratorH   = new TH1F("numeratorH","",nPtBins,ptBins);
   TH1F * denominatorH = new TH1F("denominatorH","",nPtBins,ptBins);
 
   TFile * file = new TFile(fileName+".root");
 
-  for (int iPt=0; iPt<nPtBins; ++iPt) { // loop ove pt bins
+   //std::cout << "ok 2" << std::endl;
+
+  for (int iPt=0; iPt<nPtBins; ++iPt) { // loop over pt bins
+
     TH1F * histPassOld = (TH1F*)file->Get(histBaseName+PtBins[iPt]+"Pass");
+ 	//std::cout << histBaseName+PtBins[iPt]+"Pass" <<std::endl;
+	int nBinsX = histPassOld->GetNbinsX();
     TH1F * histFailOld = (TH1F*)file->Get(histBaseName+PtBins[iPt]+"Fail");
-    int nBinsX = histPassOld->GetNbinsX();
+ 	//std::cout << histBaseName+PtBins[iPt]+"Fail" <<std::endl;
+	//std::cout << histPassOld << std::endl;
+	//std::cout << histFailOld << std::endl;
+    //int nBinsX = histPassOld->GetNbinsX();
+	//std::cout << "ok 3" << std::endl;
+
     for (int iB=1;iB<=nBinsX;++iB) {
       histPassOld->SetBinContent(iB,norm*histPassOld->GetBinContent(iB));
       histPassOld->SetBinError(iB,norm*histPassOld->GetBinError(iB));
       histFailOld->SetBinContent(iB,norm*histFailOld->GetBinContent(iB));
       histFailOld->SetBinError(iB,norm*histFailOld->GetBinError(iB));
     }
+	//std::cout << "ok 4" << std::endl;
     float output[2];
     TCanvas * c1 = new TCanvas("c1","",700,600);
     TCanvas * c2 = new TCanvas("c2","",700,600);
@@ -552,6 +584,7 @@ void FitTP(
     bool fitFail = true;
     bool rebinPass = false;
     bool rebinFail = false;
+    //std::cout << "ok before fitting" << std::endl;
     FitPassAndFail(fileName,histBaseName+PtBins[iPt],xtit,histPassOld,histFailOld,fitPass,fitFail,fitWithFSR[iPt],rebinPass,rebinFail,c1,c2,output);
     c1->cd();
     c1->Update();
@@ -575,7 +608,14 @@ void FitTP(
   TCanvas * canv = new TCanvas("canv","",700,600);
   eff->Draw("APE");
   canv->Update();
-  eff->Write(histBaseName);
+  canv->SaveAs(fileName+"_"+histBaseName+".png");
+  eff->Write(histBaseName+SampleName);
+
+ // copy the eta bins histogram in the output file
+  file->cd();
+  TH1F * etaBinsH = (TH1F*)file->Get("etaBinsH");
+  outputFile->cd(); 
+  etaBinsH->Write();
   outputFile->Close();
 
 
