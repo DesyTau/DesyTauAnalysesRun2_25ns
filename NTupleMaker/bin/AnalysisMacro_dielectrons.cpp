@@ -1151,7 +1151,18 @@ int main(int argc, char * argv[]) {
 	  int nJets20 = 0;
 	  int nJets30etaCut = 0;
 	  int nJets20etaCut = 0;
-	  
+
+	  if (!isData&&applyLeptonSF) {
+	    // insert code for leptons SF here
+	    // SF1 - scale factor for first muon index = iE1
+	    // pt1 = analysisTree.electron_pt[iE1];
+	    // eta2 = analysisTree.electron_eta[iE1];
+	    // SF2 - scale factor for the second muon index = iE2
+	    // pt2 = analysisTree.electron_pt[iE2];
+	    // eta2 = analysisTree.electron_eta[iE2];
+	    // weight = weight*SF1*SF2
+	  }
+	   
 	  for (unsigned int jet=0; jet<analysisTree.pfjet_count; ++jet) {
 	    float absJetEta = fabs(analysisTree.pfjet_eta[jet]);
 	    if (absJetEta>jetEtaCut) continue;
