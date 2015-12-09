@@ -387,6 +387,20 @@ int main(int argc, char * argv[]) {
   etaBinsH->GetXaxis()->Set(nEtaBins, etaBins);
   for (int i=0; i<nEtaBins; i++){ etaBinsH->GetXaxis()->SetBinLabel(i+1, EtaBins[i]);}
 
+  //*****  create pt histogram_s with pt ranges associated to their names (eg. Pt10to13, ..)   ***** //
+  //*****  two different pT binning, one for IdIso and one for trigger   ***** //
+
+  TH1D * ptBinsH =  new TH1D("ptBinsH", "ptBinsH", nPtBins, ptBins);
+  ptBinsH->Draw();
+  ptBinsH->GetXaxis()->Set(nPtBins, ptBins);
+  for (int i=0; i<nPtBins; i++){ ptBinsH->GetXaxis()->SetBinLabel(i+1, PtBins[i]);}
+
+  TH1D * ptBinsTrigH =  new TH1D("ptBinsTrigH", "ptBinsTrigH", nPtBinsTrig, ptBinsTrig);
+  ptBinsTrigH->Draw();
+  ptBinsTrigH->GetXaxis()->Set(nPtBinsTrig, ptBinsTrig);
+  for (int i=0; i<nPtBinsTrig; i++){ ptBinsTrigH->GetXaxis()->SetBinLabel(i+1, PtBinsTrig[i]);}
+
+
   TH1D * ZMassPass = new TH1D("ZMassPass","",80,50,130);
   TH1D * ZMassFail = new TH1D("ZMassFail","",80,50,130);
 
