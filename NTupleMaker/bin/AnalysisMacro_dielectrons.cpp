@@ -27,6 +27,7 @@
 #include "DesyTauAnalyses/NTupleMaker/interface/AC1B.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/json.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/PileUp.h"
+#include "DesyTauAnalyses/NTupleMaker/interface/Jets.h"
 
 int binNumber(float x, int nbins, float * bins) {
 
@@ -149,9 +150,6 @@ struct myclass {
   bool operator() (int i,int j) { return (i<j);}
 } myobject;
 
-const float electronMass = 0;
-const float muonMass = 0.10565837;
-const float pionMass = 0.1396;
 float ht=0;
 
 int main(int argc, char * argv[]) {
@@ -799,7 +797,6 @@ int main(int argc, char * argv[]) {
 
 	// selecting sample of probes
 	if (analysisTree.electron_pt[im]<ptBins[0]) continue;
-	if (analysisTree.electron_pt[im]>ptBins[nPtBins]) continue;
 	if (fabs(analysisTree.electron_eta[im])>etaBins[nEtaBins]) continue;
 	if (fabs(analysisTree.electron_dxy[im])>dxyElectronLooseCut) continue;
 	if (fabs(analysisTree.electron_dz[im])>dzElectronLooseCut) continue;
@@ -815,11 +812,8 @@ int main(int argc, char * argv[]) {
 	  if (dRtrig>DRTrigMatch) continue;
 	  if (analysisTree.trigobject_filters[iT][nElectronFilter] &&
 	      analysisTree.trigobject_pt[iT]>eleTriggerPtCut&&
-	      fabs(analysisTree.trigobject_eta[iT])<eleTriggerEtaCut&&
-	      analysisTree.electron_pt[im]>ptElectronHighCut && 
-	      fabs(analysisTree.electron_eta[im])<etaElectronHighCut) { // Electron Leg of single electron trigger
+	      fabs(analysisTree.trigobject_eta[iT])<eleTriggerEtaCut)  // Electron Leg of electron trigger
 	    electronTriggerMatch = true;
-	  }
 	  if (analysisTree.trigobject_filters[iT][nEle23Filter])
 	    electronEle23Match = true;
 	  if (analysisTree.trigobject_filters[iT][nEle17Filter])
@@ -864,6 +858,7 @@ int main(int argc, char * argv[]) {
           absIso += neutralIso;
 	}
 	float relIso = absIso/analysisTree.electron_pt[im];
+	allElectronsIso.push_back(relIso);
 	bool electronId = analysisTree.electron_mva_wp80_nontrig_Spring15_v1[im];
 	if (electronIdType==1)
 	  electronId = analysisTree.electron_mva_wp90_nontrig_Spring15_v1[im];
@@ -883,6 +878,11 @@ int main(int argc, char * argv[]) {
 	if (analysisTree.electron_nmissinginnerhits[im]>1) electronId = false;
 	isPassed = isPassed && electronId && relIso<isoElectronCut;
 	isElectronPassedIdIso.push_back(isPassed);
+	if (isPassed) { 
+	  isoIdElectrons.push_back(im);
+	  isoIdElectronsIsTriggerMatched.push_back(electronTriggerMatch);
+	  isoIdElectronsIso.push_back(relIso);
+	}
       }
 
       // end of electron selection
@@ -1025,15 +1025,7 @@ int main(int argc, char * argv[]) {
 		if (dR2<dRJetLeptonCut) continue;
 	  
 		// pfJetId
-		
-		float energy = analysisTree.pfjet_e[jet];
-		float chf = analysisTree.pfjet_chargedhadronicenergy[jet]/energy;
-		float nhf = 1 - analysisTree.pfjet_chargedhadronicenergy[jet]/energy;
-		float phf = 1 - analysisTree.pfjet_chargedemenergy[jet]/energy;
-		float elf = analysisTree.pfjet_chargedemenergy[jet]/energy;
-		float chm = analysisTree.pfjet_chargedmulti[jet];
-		float npr = analysisTree.pfjet_chargedmulti[jet] + analysisTree.pfjet_neutralmulti[jet];
-		bool isPFJetId = (npr>1 && phf<0.99 && nhf<0.99) && (absJetEta>2.4 || (elf<0.99 && chf>0 && chm>0));
+		bool isPFJetId = looseJetiD(analysisTree,int(jet));
 		if (!isPFJetId) continue;
 		if (analysisTree.pfjet_pt[jet]>jetPtHighCut) {
 		  nJets30++;
@@ -1108,8 +1100,13 @@ int main(int argc, char * argv[]) {
 	    bool isTriggerMatched2 = isoIdElectronsIsTriggerMatched[im2]&& 
 	      analysisTree.electron_pt[index2]>ptElectronHighCut &&
 	      fabs(analysisTree.electron_eta[index2])<etaElectronHighCut; 
-	    bool isTriggerMatched = (isTriggerMatched1 && analysisTree.electron_pt[index2]>ptElectronLowCut) ||
-	      (isTriggerMatched2 && analysisTree.electron_pt[index1]>ptElectronLowCut);
+	    bool isTriggerMatched = 
+	      (isTriggerMatched1 
+	       && analysisTree.electron_pt[index2]>ptElectronLowCut 
+	       && fabs(analysisTree.electron_eta[index2])<etaElectronCut) ||
+	      (isTriggerMatched2 
+	       && analysisTree.electron_pt[index1]>ptElectronLowCut
+	       && fabs(analysisTree.electron_eta[index1])<etaElectronCut);
 	    bool sign = q1*q2>0;
 	    float deltaREE = deltaR(analysisTree.electron_eta[index1],analysisTree.electron_phi[index1],
 				    analysisTree.electron_eta[index2],analysisTree.electron_phi[index2]);
@@ -1122,8 +1119,8 @@ int main(int argc, char * argv[]) {
 		isPairFound = true;
 		iE1 = index1;
 		iE2 = index2;
+		isElectronsPair = true;
 	      }
-	      isElectronsPair = true;
 	    }
 	  }
 	}
@@ -1178,14 +1175,7 @@ int main(int argc, char * argv[]) {
 	  
 	    // pfJetId
 
-	    float energy = analysisTree.pfjet_e[jet];
-	    float chf = analysisTree.pfjet_chargedhadronicenergy[jet]/energy;
-	    float nhf = analysisTree.pfjet_neutralhadronicenergy[jet]/energy;
-	    float phf = analysisTree.pfjet_neutralemenergy[jet]/energy;
-	    float elf = analysisTree.pfjet_chargedemenergy[jet]/energy;
-	    float chm = analysisTree.pfjet_chargedmulti[jet];
-	    float npr = analysisTree.pfjet_chargedmulti[jet] + analysisTree.pfjet_neutralmulti[jet];
-	    bool isPFJetId = (npr>1 && phf<0.99 && nhf<0.99) && (absJetEta>2.4 || (elf<0.99 && chf>0 && chm>0));
+	    bool isPFJetId = looseJetiD(analysisTree,int(jet));
 	    if (!isPFJetId) continue;
 	    
 	    if (analysisTree.pfjet_pt[jet]>jetPtHighCut) {
