@@ -410,6 +410,53 @@ int main(int argc, char * argv[]) {
   TFile * file = new TFile(TStrName+TString(".root"),"recreate");
   file->cd("");
 
+  int eventNumber;
+  int runNumber;
+  bool IsoMu17;
+
+  float ptTag;
+  float etaTag;
+  float phiTag;
+  float dxyTag;
+  float dzTag;
+  float chargeTag;
+  float isoTag;
+  bool isMediumTag;
+
+  float ptProbe;
+  float etaProbe;
+  float phiProbe;
+  float dxyProbe;
+  float dzProbe;
+  float chargeProbe;
+  float isoProbe;
+  bool isMediumProbe;
+
+  float massTagProbe;
+
+  TTree * events = new TTree("events","events");
+  events->Branch("eventNumber",&eventNumber,"eventNumber/I");
+  events->Branch("runNumber",&runNumber,"runNumber/I");
+  events->Branch("IsoMu17",&IsoMu17,"IsoMu17/O");
+  events->Branch("ptTag",&ptTag,"ptTag/F");
+  events->Branch("etaTag",&etaTag,"etaTag/F");
+  events->Branch("phiTag",&phiTag,"phiTag/F");
+  events->Branch("dxyTag",&dxyTag,"dxyTag/F");
+  events->Branch("dzTag",&dzTag,"dzTag/F");
+  events->Branch("chargeTag",&chargeTag,"chargeTag/F");
+  events->Branch("isoTag",&isoTag,"isoTag/F");
+  events->Branch("isMediumTag",&isMediumTag,"isMediumTag/O");
+  events->Branch("ptProbe",&ptProbe,"ptProbe/F");
+  events->Branch("etaProbe",&etaProbe,"etaProbe/F");
+  events->Branch("phiProbe",&phiProbe,"phiProbe/F");
+  events->Branch("dxyProbe",&dxyProbe,"dxyProbe/F");
+  events->Branch("dzProbe",&dzProbe,"dzProbe/F");
+  events->Branch("chargeProbe",&chargeProbe,"chargeProbe/F");
+  events->Branch("isoProbe",&isoProbe,"isoProbe/F");
+  events->Branch("isMediumProbe",&isMediumProbe,"isMediumProbe/O");
+  events->Branch("massTagProbe",&massTagProbe,"massTagProbe/F");
+
+
   TH1D * inputEventsH = new TH1D("inputEventsH","",1,-0.5,0.5);
   TH1D * histWeightsH = new TH1D("histWeightsH","",1,-0.5,0.5);
   TH1D * histWeightsSkimmedH = new TH1D("histWeightsSkimmedH","",1,-0.5,0.5);
@@ -1118,7 +1165,7 @@ int main(int argc, char * argv[]) {
 	  if (relativeDifference<0.05) {
 	    isPrompt = true;
 	    float absEtaProbe = TMath::Abs(genMuon.Eta());
-	    if (absEtaProbe>=etaMuonLowCut) absEtaProbe = etaMuonLowCut - 0.01;
+	    if (absEtaProbe>=etaMuonLowCut) absEtaProbe = fabs(etaBins[nEtaBins]) - 0.01;
 	    int iEta = binNumber(absEtaProbe,nEtaBins,etaBins);
 	    if (isMuonPassedIdIso[iRecoMuons]) 
 	      PromptPtPass[iEta]->Fill(genMuon.Pt(),weight);
@@ -1150,7 +1197,7 @@ int main(int argc, char * argv[]) {
 	  if (relativeDifference<0.05) {
 	    isNonPrompt = true;
 	    float absEtaProbe = TMath::Abs(genMuon.Eta());
-	    if (absEtaProbe>=etaMuonLowCut) absEtaProbe = etaMuonLowCut - 0.01;
+	    if (absEtaProbe>=etaMuonLowCut) absEtaProbe = fabs(etaBins[nEtaBins]) - 0.01;
             int iEta = binNumber(absEtaProbe,nEtaBins,etaBins);
  	    if (isMuonPassedIdIso[iRecoMuons]) 
 	      NonPromptPtPass[iEta]->Fill(genMuon.Pt(),weight);
@@ -1297,6 +1344,34 @@ int main(int argc, char * argv[]) {
                   NonPromptSelPtFail[etaBin]->Fill(ptProbe,weight);
                   NonPromptSelJetPtFail[etaBin][JetBin]->Fill(ptProbe,weight);
                 }
+		// filling events tree
+		if (!isData&&etaBin==0&&ptBin==6) {
+
+		  eventNumber = analysisTree.event_nr;
+		  runNumber = analysisTree.event_run;
+		  IsoMu17 = isTriggerMuon;
+
+		  ptTag = analysisTree.muon_pt[index1];
+		  etaTag = analysisTree.muon_eta[index1];
+		  phiTag = analysisTree.muon_phi[index1];
+		  dxyTag = analysisTree.muon_dxy[index1];
+		  dzTag = analysisTree.muon_dz[index1];
+		  chargeTag = analysisTree.muon_charge[index1];
+		  isoTag = isoMuonsValue[im1];
+		  isMediumTag = analysisTree.muon_isMedium[index1];
+
+		  ptProbe = analysisTree.muon_pt[indexProbe];
+		  etaProbe = analysisTree.muon_eta[indexProbe];
+		  phiProbe = analysisTree.muon_phi[indexProbe];
+		  dxyProbe = analysisTree.muon_dxy[indexProbe];
+		  dzProbe = analysisTree.muon_dz[indexProbe];
+		  chargeProbe = analysisTree.muon_charge[indexProbe];
+		  isoProbe = allMuonsIso[iMu];
+		  isMediumProbe = analysisTree.muon_isMedium[indexProbe];
+		  
+		  massTagProbe = mass;
+		  events->Fill();
+		}
 	      }
 	    }
 	  }
