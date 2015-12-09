@@ -1,3 +1,4 @@
+
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -1093,32 +1094,12 @@ int main(int argc, char * argv[]) {
       float met_x = analysisTree.pfmet_ex;
       float met_y = analysisTree.pfmet_ey;
       float met_x2 = met_x * met_x;
-      float met_y2 = met_y * met_y;
+      float met_y2 = met_y * met_y;     	
 
-      // computation of mt
-      otree->mt_1 = sqrt(2*otree->pt_1*otree->met*(1.-cos(otree->phi_1-otree->metphi)));
-      otree->mt_2 = sqrt(2*otree->pt_2*otree->met*(1.-cos(otree->phi_2-otree->metphi)));       
-      
-      // bisector of muon and tau transverse momenta
-      float electronUnitX = electronLV.Px()/electronLV.Pt();
-      float electronUnitY = electronLV.Py()/electronLV.Pt();
-	
-      float tauUnitX = tauLV.Px()/tauLV.Pt();
-      float tauUnitY = tauLV.Py()/tauLV.Pt();
-
-      float zetaX = electronUnitX + tauUnitX;
-      float zetaY = electronUnitY + tauUnitY;
-      
-      float normZeta = TMath::Sqrt(zetaX*zetaX+zetaY*zetaY);
-
-      zetaX = zetaX/normZeta;
-      zetaY = zetaY/normZeta;
-
-      float vectorVisX = electronLV.Px() + tauLV.Px();
-      float vectorVisY = electronLV.Py() + tauLV.Py();
-
-      otree->pzetavis  = vectorVisX*zetaX + vectorVisY*zetaY;
-      otree->pzetamiss = analysisTree.pfmet_ex*zetaX + analysisTree.pfmet_ey*zetaY;
+      // puppimet variables
+      otree->puppimet = TMath::Sqrt(analysisTree.puppimet_ex*analysisTree.puppimet_ex +
+				    analysisTree.puppimet_ey*analysisTree.puppimet_ey);
+      otree->puppimetphi = TMath::ATan2(analysisTree.puppimet_ey,analysisTree.puppimet_ex);      
       
       // choosing mva met
       unsigned int iMet = 0;
@@ -1144,11 +1125,6 @@ int main(int argc, char * argv[]) {
 	otree->mvacov01 = log(0);
 	otree->mvacov10 = log(0);
 	otree->mvacov11 = log(0);
-
-	//otree->mt_1 = log(0);
-	//otree->mt_2 = log(0);
-	
-	otree->pzetamiss = log(0);	
       }
       else {
 	// choosing mva met
@@ -1190,15 +1166,10 @@ int main(int argc, char * argv[]) {
 	  
 	}
 	
-	
 	float mvamet_x2 = mvamet_x * mvamet_x;
 	float mvamet_y2 = mvamet_y * mvamet_y;
 	otree->mvamet = TMath::Sqrt(mvamet_x2+mvamet_y2);
 	otree->mvametphi = TMath::ATan2(mvamet_y,mvamet_x);
-	
-	// computation of mt
-	//otree->mt_1 = sqrt(2*otree->pt_1*otree->mvamet*(1.-cos(otree->phi_1-otree->mvametphi)));
-	//otree->mt_2 = sqrt(2*otree->pt_2*otree->mvamet*(1.-cos(otree->phi_2-otree->mvametphi)));  	
       }
       
       
@@ -1208,6 +1179,47 @@ int main(int argc, char * argv[]) {
       covMET[1][0] = otree->mvacov10;
       covMET[0][1] = otree->mvacov01;
       covMET[1][1] = otree->mvacov11;
+
+      // mt calculation
+      otree->mt_1 = sqrt(2*otree->pt_1*otree->mvamet*(1.-cos(otree->phi_1-otree->mvametphi)));
+      otree->mt_2 = sqrt(2*otree->pt_2*otree->mvamet*(1.-cos(otree->phi_2-otree->mvametphi)));
+      
+      otree->pfmt_1 = sqrt(2*otree->pt_1*otree->met*(1.-cos(otree->phi_1-otree->metphi)));
+      otree->pfmt_2 = sqrt(2*otree->pt_2*otree->met*(1.-cos(otree->phi_2-otree->metphi)));
+
+      otree->puppimt_1 = sqrt(2*otree->pt_1*otree->puppimet*(1.-cos(otree->phi_1-otree->puppimetphi)));
+      otree->puppimt_2 = sqrt(2*otree->pt_2*otree->puppimet*(1.-cos(otree->phi_2-otree->puppimetphi)));      
+
+      // bisector of muon and tau transverse momenta
+      float electronUnitX = electronLV.Px()/electronLV.Pt();
+      float electronUnitY = electronLV.Py()/electronLV.Pt();
+	
+      float tauUnitX = tauLV.Px()/tauLV.Pt();
+      float tauUnitY = tauLV.Py()/tauLV.Pt();
+
+      float zetaX = electronUnitX + tauUnitX;
+      float zetaY = electronUnitY + tauUnitY;
+      
+      float normZeta = TMath::Sqrt(zetaX*zetaX+zetaY*zetaY);
+
+      zetaX = zetaX/normZeta;
+      zetaY = zetaY/normZeta;
+
+      float vectorVisX = electronLV.Px() + tauLV.Px();
+      float vectorVisY = electronLV.Py() + tauLV.Py();
+
+      otree->pzetavis  = vectorVisX*zetaX + vectorVisY*zetaY;
+      otree->pzetamiss = otree->mvamet*TMath::Cos(otree->mvametphi)*zetaX + otree->mvamet*TMath::Sin(otree->mvametphi)*zetaY;
+      otree->pfpzetamiss = analysisTree.pfmet_ex*zetaX + analysisTree.pfmet_ey*zetaY;      
+      otree->puppipzetamiss = analysisTree.puppimet_ex*zetaX + analysisTree.puppimet_ey*zetaY;
+
+      metLV.SetXYZT(otree->mvamet*TMath::Cos(otree->mvametphi),
+		    otree->mvamet*TMath::Sin(otree->mvametphi),
+		    0,
+		    TMath::Sqrt( otree->mvamet*TMath::Sin(otree->mvametphi)*otree->mvamet*TMath::Sin(otree->mvametphi) +
+				 otree->mvamet*TMath::Cos(otree->mvametphi)*otree->mvamet*TMath::Cos(otree->mvametphi)));
+      otree->pt_tt = (dileptonLV+metLV).Pt();      
+      
       // define lepton four vectors
       //std::vector<svFitStandalone::MeasuredTauLepton> measuredTauLeptons;
       //measuredTauLeptons.push_back(svFitStandalone::MeasuredTauLepton(svFitStandalone::kTauToElecDecay, otree->pt_1, otree->eta_1,  otree->phi_1, 0.51100e-3)); // tau -> electron decay (Pt, eta, phi, mass)
