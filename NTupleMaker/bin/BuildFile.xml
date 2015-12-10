@@ -1,15 +1,4 @@
-<Flags CXXFLAGS="-Wno-unused-variable -Wno-error=unused-but-set-variable" />
-
-<bin name="AnalysisMacro" file="AnalysisMacro.cpp">
- <use name="PhysicsTools/Utilities"/>
- <use name="rootgraphics"/>
- <use name="root"/>
- <use name="rootmath"/>
- <use name="roottmva"/>
- <use name="boost" />
- <use name="boost_program_options"/>
- <use name="DesyTauAnalyses/NTupleMaker"/>
-</bin>
+<Flags CXXFLAGS="-Wno-unused-variable -Wno-error=unused-but-set-variable -Wno-error=maybe-uninitialized" />
 
 <bin name="AnalysisMacro_dimuons" file="AnalysisMacro_dimuons.cpp">
  <use name="PhysicsTools/Utilities"/>
