@@ -60,16 +60,17 @@ applyResiduals=True #application of residual corrections. Have to be set to True
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff')
 from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag
 
-
 if runOnData:
   process.GlobalTag.globaltag = '74X_dataRun2_v2'
   if isPRv4:
-      process.GlobalTag.globaltag = '74X_dataRun2_Prompt_v4'
+    #process.GlobalTag.globaltag = '74X_dataRun2_Prompt_v4'
+    process.GlobalTag.globaltag = '74X_dataRun2_v5'
   if isRepr05Oct:
-      process.GlobalTag.globaltag = '74X_dataRun2_reMiniAOD_v0'
+    #process.GlobalTag.globaltag = '74X_dataRun2_reMiniAOD_v0'
+    process.GlobalTag.globaltag = '74X_dataRun2_v5'
 else:
   if is25ns:
-    process.GlobalTag.globaltag = '74X_mcRun2_asymptotic_v2'
+    process.GlobalTag.globaltag = '74X_mcRun2_asymptotic_v4'
   else:
     process.GlobalTag.globaltag = '74X_mcRun2_startup_v2'
 
@@ -604,7 +605,7 @@ RecPrimVertex = cms.untracked.bool(True),
 RecBeamSpot = cms.untracked.bool(True),
 RecTrack = cms.untracked.bool(False),
 RecPFMet = cms.untracked.bool(True),
-RecPFMetCorr = cms.untracked.bool(False),
+RecPFMetCorr = cms.untracked.bool(True),
 RecPuppiMet = cms.untracked.bool(True),
 RecMvaMet = cms.untracked.bool(True),                                      
 RecMuon = cms.untracked.bool(True),
@@ -631,8 +632,8 @@ mvaTrigValuesMap     = cms.InputTag("electronMVAValueMapProducer:ElectronMVAEsti
 mvaTrigCategoriesMap = cms.InputTag("electronMVAValueMapProducer:ElectronMVAEstimatorRun2Spring15Trig25nsV1Categories"),
 
 TauCollectionTag = cms.InputTag("slimmedTaus"),
-#JetCollectionTag = cms.InputTag("patJetsReapplyJEC::TreeProducer"),
-JetCollectionTag = cms.InputTag("slimmedJets"),
+JetCollectionTag = cms.InputTag("patJetsReapplyJEC::TreeProducer"),
+#JetCollectionTag = cms.InputTag("slimmedJets"),
 MetCollectionTag = cms.InputTag("slimmedMETs"),
 MetCovMatrixTag = cms.InputTag("METSignificance:METCovariance:TreeProducer"),
 MetSigTag = cms.InputTag("METSignificance:METSignificance:TreeProducer"),
