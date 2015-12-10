@@ -46,6 +46,8 @@ int main(int argc, char * argv[]) {
   bool fillplots= true;
   const bool isData = cfg.get<bool>("IsData");
   const bool applyPUreweighting = cfg.get<bool>("ApplyPUreweighting");
+  const bool applyPUreweighting_vertices = cfg.get<bool>("ApplyPUreweighting_vertices");
+  const bool applyPUreweighting_official = cfg.get<bool>("ApplyPUreweighting_official");
   const bool applyLeptonSF = cfg.get<bool>("ApplyLeptonSF");
   const bool InvertTauIso = cfg.get<bool>("InvertTauIso");
   const bool InvertMuIso = cfg.get<bool>("InvertMuIso");
@@ -77,6 +79,7 @@ int main(int argc, char * argv[]) {
   const double ptMuonLowCutmtau = cfg.get<double>("ptMuonLowCutmtau"); 
   const double etaMuonCutmtau = cfg.get<double>("etaMuonCutmtau"); 
 
+  const string dataBaseDir = cfg.get<string>("DataBaseDir");
 
   string TrigLeg  ;
    if (!isData) TrigLeg  = cfg.get<string>("Mu17LegMC");
@@ -85,6 +88,9 @@ int main(int argc, char * argv[]) {
   const string Mu17Tau20MuLegB  = cfg.get<string>("Mu17Tau20MuLegB");
   const string Mu17Tau20TauLegA  = cfg.get<string>("Mu17Tau20TauLegA");
   const string Mu17Tau20TauLegB  = cfg.get<string>("Mu17Tau20TauLegB");
+ 
+  const float singleMuonTriggerPtCut = cfg.get<float>("SingleMuonTriggerPtCut");
+  const float singleMuonTriggerEtaCut = cfg.get<float>("SingleMuonTriggerEtaCut");
 
   const string Region  = cfg.get<string>("Region");
   const string Sign  = cfg.get<string>("Sign");
@@ -232,20 +238,22 @@ int main(int argc, char * argv[]) {
 	
   sprintf(ff,"%s/%s",argv[3],argv[2]);
 
+  if (applyPUreweighting_vertices and applyPUreweighting_official) 
+
+	{std::cout<<"ERROR: Choose only ONE PU reweighting method (vertices or official, not both!) " <<std::endl; exit(-1);}
+
+  // reweighting with vertices
 
   // reading vertex weights
- // TFile * fileDataNVert = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/"+vertDataFileName);
- // TFile * fileMcNVert   = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/"+vertMcFileName);
-  TFile * fileDataNVert = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/SingleMuon_Run2015D_Stau.root");
- TFile * fileMcNVert = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/MC.root");
-//hardcoded
-  //TH1D * vertexDataH = (TH1D*)fileDataNVert->Get(TString(vertHistName));
-  //TH1D * vertexMcH   = (TH1D*)fileMcNVert->Get(TString(vertHistName));
-  TH1D * vertexDataH = (TH1D*)fileDataNVert->Get("mutau/npv_0");
-  TH1D * vertexMcH   = (TH1D*)fileMcNVert->Get("mutau/npv_0");
+  TFile * fileDataNVert = new TFile(TString(cmsswBase)+"/src/"+dataBaseDir+"/"+vertDataFileName);
+  TFile * fileMcNVert   = new TFile(TString(cmsswBase)+"/src/"+dataBaseDir+"/"+vertMcFileName);
 
-  double normVertexData = vertexDataH->GetSumOfWeights();
-  double normVertexMc   = vertexMcH->GetSumOfWeights();
+  TH1D * vertexDataH = (TH1D*)fileDataNVert->Get(TString(vertHistName));
+  TH1D * vertexMcH   = (TH1D*)fileMcNVert->Get(TString(vertHistName));
+
+  float normVertexData = vertexDataH->GetSumOfWeights();
+  float normVertexMc   = vertexMcH->GetSumOfWeights();
+
 
   vertexDataH->Scale(1/normVertexData);
   vertexMcH->Scale(1/normVertexMc);
@@ -365,8 +373,8 @@ int main(int argc, char * argv[]) {
       _inittree->GetEntry(iEntry);
       if (isData)
 	histWeightsH->Fill(0.,1.);
-      else
-	histWeightsH->Fill(0.,genweight);
+//      else
+//	histWeightsH->Fill(0.,genweight);
     }
 
     TTree * _tree = NULL;
@@ -376,7 +384,7 @@ int main(int argc, char * argv[]) {
     std::cout << "      number of entries in Tree      = " << numberOfEntries << std::endl;
     AC1B analysisTree(_tree);
 
-/*
+
     float genweights=1;
     
     if(!isData) 
@@ -388,10 +396,10 @@ int main(int argc, char * argv[]) {
     Long64_t numberOfEntriesInit = genweightsTree->GetEntries();
     for (Long64_t iEntryInit=0; iEntryInit<numberOfEntriesInit; ++iEntryInit) { 
       genweightsTree->GetEntry(iEntryInit);
-	histWeights->Fill(0.,genweights);
+	histWeightsH->Fill(0.,genweights);
     }
  	}
-*/
+
     //numberOfEntries = 1000;
 
     // numberOfEntries = 1000;
@@ -427,7 +435,6 @@ int main(int argc, char * argv[]) {
       if (!isData )  { 
 
 	  weight *= analysisTree.genweight;
-	  histWeights->Fill(0.,weight);
 	  lumi=true;
         //cout<<"  weight from init "<<genweights<< "  "<<analysisTree.genweight<<"  "<<weight<<endl;
 /*
@@ -445,14 +452,41 @@ int main(int argc, char * argv[]) {
 
 
 
-
-
-
       if (isData)  {
 	XSec = 1.;
-	histWeights->Fill(0.,1.);
 	histRuns->Fill(analysisTree.event_run);
-      // cout<<"  "<<histWeights->GetBinContent(1)<<"  "<<histWeights2->GetSumOfWeights()<<"  "<<weight<<endl; //(TH1D*)file_->Get("makeroottree/histoWeights");
+///////////////according to dimuons
+	int n=analysisTree.event_run;
+	int lum = analysisTree.event_luminosityblock;
+	
+	std::string num = std::to_string(n);
+	std::string lnum = std::to_string(lum);
+	for(const auto& a : periods)
+	  {
+	    
+	    if ( num.c_str() ==  a.name ) {
+	      //std::cout<< " Eureka "<<num<<"  "<<a.name<<" ";
+	      //     std::cout <<"min "<< last->lower << "- max last " << last->bigger << std::endl;
+	      
+	      for(auto b = a.ranges.begin(); b != std::prev(a.ranges.end()); ++b) {
+		
+		//	cout<<b->lower<<"  "<<b->bigger<<endl;
+		if (lum  >= b->lower && lum <= b->bigger ) lumi = true;
+	      }
+	      auto last = std::prev(a.ranges.end());
+	      //    std::cout <<"min "<< last->lower << "- max last " << last->bigger << std::endl;
+	      if (  (lum >=last->lower && lum <= last->bigger )) lumi=true;
+	      
+	      
+	    }
+	    
+	  }
+    
+	if (!lumi) continue;
+	//if (lumi ) cout<<"  =============  Found good run"<<"  "<<n<<"  "<<lum<<endl;
+	//std::remove("myinputfile");
+
+	/*
 
 	//if (analysisTree.event_run<RunRangeMin || analysisTree.event_run>RunRangeMax)
 	//      cout<< "  event_run "<<analysisTree.event_run<<"  Min  "<<RunRangeMin<<" Max "<<RunRangeMax<<endl;
@@ -480,8 +514,6 @@ int main(int argc, char * argv[]) {
 
 	if (isNewRun) 
 	  allRuns.push_back(analysisTree.event_run);
-
-   
 	int n=analysisTree.event_run;
 	int lum = analysisTree.event_luminosityblock;
 
@@ -507,9 +539,38 @@ int main(int argc, char * argv[]) {
 	    }
 	
 	  }
-    
+    */
+	if (!lumi) continue;
       }
-      //lumi=true;
+
+////according to dimuons
+	//if (lumi ) cout<<"  =============  Found good run"<<"  "<<n<<"  "<<lum<<endl;
+	//std::remove("myinputfile");
+
+      if (analysisTree.event_run<RunMin)
+	RunMin = analysisTree.event_run;
+      
+      if (analysisTree.event_run>RunMax)
+	RunMax = analysisTree.event_run;
+      
+      //std::cout << " Run : " << analysisTree.event_run << std::endl;
+      
+      bool isNewRun = true;
+      if (allRuns.size()>0) {
+	for (unsigned int iR=0; iR<allRuns.size(); ++iR) {
+	  if (analysisTree.event_run==allRuns.at(iR)) {
+	    isNewRun = false;
+	    break;
+	  }
+	}
+      }
+	
+      if (isNewRun) 
+	allRuns.push_back(analysisTree.event_run);
+
+
+
+
       if (!lumi) continue;
       JetsMV.clear();
       ElMV.clear();
@@ -892,8 +953,8 @@ int main(int argc, char * argv[]) {
 	    double dRtrig = deltaR(analysisTree.muon_eta[mu_index],analysisTree.muon_phi[mu_index],
 				  analysisTree.trigobject_eta[iT],analysisTree.trigobject_phi[iT]);
 	    if (dRtrig>deltaRTrigMatch) continue;
-	 //cout<< " "<<analysisTree.muon_pt[mu_index]<<"   "<<analysisTree.trigobject_pt[iT]<<endl;
-	    //if (!isData && analysisTree.trigobject_filters[iT][nMainTrigger] && analysisTree.trigobject_pt[iT]>18) 
+	 //cout<< " "<<analysisTree.muon_pt[mu_index]<<"   "<<analysisTree.trigobject_pt[iT]<<"   "<<analysisTree.trigobject_filters[iT][nMainTrigger]<<endl;
+	    if (analysisTree.trigobject_filters[iT][nMainTrigger] && analysisTree.trigobject_pt[iT]>singleMuonTriggerPtCut && fabs(analysisTree.trigobject_eta[iT])<singleMuonTriggerEtaCut) 
 	      isMainTrigger = true;
 	    
 	  }
@@ -918,9 +979,7 @@ int main(int argc, char * argv[]) {
 	  }
 	*/
 		
-	
-	bool passedTrigger = isMainTrigger ;//|| (isMuTau_MuLegA && isMuTau_MuLegB);
-	if (!passedTrigger) continue;
+	     if (!isMainTrigger) continue;
 
 	double dR = deltaR(analysisTree.tau_eta[tau_index],analysisTree.tau_phi[tau_index],
 			analysisTree.muon_eta[mu_index],analysisTree.muon_phi[mu_index]);
@@ -978,15 +1037,14 @@ int main(int argc, char * argv[]) {
       	*/
 	
 	//cout<<" mu_index "<<mu_index<<"  "<<isMainTrigger<<"  "<<isMu27<<"  "<<isMuTau_MuLegA<<"  "<<isMuTau_MuLegB<<"  "<<isMuTau_TauLegA<<"  "<<isMuTau_TauLegB<<endl;
-      
-	  double dataMu1 = 1;
-	  double mcMu1 = 1;
+      /*
+
 	if (!isData && applyLeptonSF) {
-	  double ptMu1 = TMath::Min(float(59),analysisTree.muon_pt[mu_index]);
+	  float ptMu1 = TMath::Min(float(59),analysisTree.muon_pt[mu_index]);
 	  int ptBinMu1 = binNumber(ptMu1,nPtBins,ptBins);
-	  double absEtaMu1 = fabs(analysisTree.muon_eta[mu_index]);
-	  dataMu1 = 1;
-	  mcMu1 = 1;
+	  float absEtaMu1 = fabs(analysisTree.muon_eta[mu_index]);
+	  float dataMu1 = 1;
+	  float mcMu1 = 1;
 	  if(absEtaMu1 < 1.48){
 	    dataMu1 = dataEffBarrel[ptBinMu1];
 	    mcMu1 = mcEffBarrel[ptBinMu1];
@@ -995,11 +1053,14 @@ int main(int argc, char * argv[]) {
 	    dataMu1 = dataEffEndcap[ptBinMu1];
 	    mcMu1 = mcEffEndcap[ptBinMu1];
 	  }
-	  double wMu1 = dataMu1/mcMu1;
-	  	//  cout << "Muons SF : Mu1 = " << wMu1 << endl;
+	  float wMu1 = 1;
+	  if (mcMu1!=0) wMu1 = dataMu1/float(mcMu1);
+
 	  weight = weight*wMu1;
+	  	 // cout << "Muons SF : Mu1 = " << wMu1 <<"  "<<mcMu1<<"     total = " << weight << " eta "<<absEtaMu1<<" pt bin "<<ptBinMu1<<"   "<<dataMu1<<"   "<<mcMu1<<endl;
 	}
 
+*/
 
       //Trigger
       //FillMainHists(iCut, weight, ElMV, MuMV, JetsMV,METV,analysisTree, Channel, mu_index,el_index,tau_index);
@@ -1183,8 +1244,8 @@ int main(int argc, char * argv[]) {
       iCFCounter[iCut]++;
       iCut++;
       		JetsMV.clear();
-	        float jetEtaCut = 4.7;
-      		float DRmax = 0.4;
+	        float jetEtaCut = 2.4;
+      		float DRmax = 0.5;
 	      for (unsigned int jet=0; jet<analysisTree.pfjet_count; ++jet) {
 		float absJetEta = fabs(analysisTree.pfjet_eta[jet]);
 	
@@ -1195,7 +1256,7 @@ int main(int argc, char * argv[]) {
 	  	//double Dr= deltaR(LeptMV.at(il).Eta(), LeptMV.at(il).Phi(),
 	  	double Dr= deltaR(analysisTree.muon_eta[mu_index],analysisTree.muon_phi[mu_index],
 		     analysisTree.pfjet_eta[jet],analysisTree.pfjet_phi[jet]);
-		if (  Dr  > DRmax)  continue;
+		if (  Dr  < DRmax)  continue;
 	  
 		// pfJetId
 		
@@ -1275,11 +1336,8 @@ int main(int argc, char * argv[]) {
       iCut++;
 
       selEvents++;
-      //histWeights->SetBinContent(1,Weight+ histWeights->GetBinContent(1));  
     } // end of file processing (loop over events in one file)
-    //histWeights->Fill(Weight);
   
-    //cout<< " Weight  "<<Weight<<  "   histWeigh Sum " <<histWeights->GetBinContent(1)<<"  "<<histWeights2->GetSumOfWeights()<<"   "<<" Events "<<inputEventsH->GetSum()<<"  "<<inputEventsH->GetSumOfWeights()<<endl;
     nFiles++;
     delete _tree;
     file_->Close();
@@ -1287,7 +1345,7 @@ int main(int argc, char * argv[]) {
   }
   cout<<"done"<<endl;
 	
-  cout<<" Total events  "<<nEvents<<"  Will use weight  "<<histWeightsH->GetSumOfWeights()<<" Norm Factor "<<XSec*Lumi/( histWeightsH->GetSumOfWeights())<<endl;
+  cout<<" Total events  "<<nEvents<<"  Will use weight  "<<histWeightsH->GetSumOfWeights()<<" Norm Factor for a Lumi of "<<Lumi<<"/pb is "<<XSec*Lumi/( histWeightsH->GetSumOfWeights())<<endl;
   cout<<" First content "<<CFCounter[0]<<endl;
   cout<<" Run range from -----> "<<RunMin<<" to  "<<RunMax<<endl;
   /*
@@ -1308,14 +1366,17 @@ int main(int argc, char * argv[]) {
     {
      // tfile << CutList[ci]<<"\t & \t"
 //	    << CFCounter[ci]  <<"\t & \t"<< statUnc[ci] <<"\t & \t"<< iCFCounter[ci] << endl;
-//      if (!isData) { 
-    cout << " i "<<ci<<" "<<iCFCounter[ci]<<"  "<<XSec*Lumi/( histWeightsH->GetSumOfWeights())<<endl;  
    
-      CutFlowUnW->SetBinContent(1+ci,CFCounter[ci] );
+      CutFlowUnW->SetBinContent(1+ci,0);
+      CutFlow->SetBinContent(1+ci,0);
+      CutFlowUnW->SetBinContent(1+ci,float(CFCounter[ci]) );
+  
+
       CFCounter[ci] *= double(XSec*Lumi/( histWeightsH->GetSumOfWeights()));
-    //}
-      CutFlow->SetBinContent(1+ci,CFCounter[ci]);
+     
+      CutFlow->SetBinContent(1+ci,float(CFCounter[ci]));
       
+      cout << " i "<<ci<<" "<<iCFCounter[ci]<<"  "<<XSec*Lumi/( histWeightsH->GetSumOfWeights())<<"  "<<CutFlowUnW->GetBinContent(1+ci)<<"  "<<CutFlow->GetBinContent(1+ci)<<endl;   
       if (iCFCounter[ci] <0.2) statUnc[ci] =0;
     //else statUnc[i] = CFCounter[i]/sqrt(iCFCounter[i]);
     else statUnc[ci] = sqrt(CFCounter[ci]);
@@ -1346,82 +1407,10 @@ int main(int argc, char * argv[]) {
   hxsec->Fill(XSec);
   hxsec->Write();
   inputEventsH->Write();
-  histWeights->Write();
   histWeightsH->Write();
   histRuns->Write();
-  //histWeights2->Write();
-  
-  CutFlow->Write();
   CutFlowUnW->Write();
-   /*
-  CutFlowUnWNorm = (TH1D*) CutFlowUnW->Clone();
-  double normCF = CutFlowUnW->GetSumOfWeights();
-  CutFlowUnWNorm->Scale(1/normCF);
-  CutFlowUnWNorm->Write();
-    muonPtAllH->Write();
-    electronPtAllH->Write();
-
-    // histograms (dilepton selection)
-    electronPtH->Write();  
-    electronEtaH ->Write();
-    muonPtH ->Write();
-    muonEtaH ->Write();
-
-    dileptonMassH ->Write();
-    dileptonPtH ->Write();
-    dileptonEtaH ->Write();
-    dileptondRH ->Write();
-    ETmissH ->Write();
-    MtH ->Write();
-    DZetaH ->Write();
-
-    // histograms (dilepton selection + DZeta cut DZeta)
-    electronPtSelH ->Write();
-    electronEtaSelH ->Write();
-    muonPtSelH  ->Write();
-    muonEtaSelH ->Write();
-
-    dileptonMassSelH ->Write();
-    dileptonPtSelH ->Write();
-    dileptonEtaSelH ->Write();
-    dileptondRSelH ->Write();
-    ETmissSelH ->Write();
-    MtSelH ->Write();
-  */
-  DZetaSelH ->Write();
-  /*
-    for(int cj = 0; cj < CutNumb; cj++)
-    {
-    file->cd("");
-    //outf->mkdir(CutList[cj]);
-    //outf->cd(CutList[cj]);
-    h0JetpT[cj]->Write();
-    hnJet[cj]->Write();
-    hnOver[cj]->Write();
-    hnBJet[cj]->Write();
-    hnEl[cj]->Write();
-    hElpt[cj]->Write();
-    hnMu[cj]->Write();
-    hMupt[cj]->Write();
-    hLepeta[cj]->Write();
-    hMET[cj]->Write();
-    hHT[cj]->Write();
-    hST[cj]->Write();
-    hToppT[cj]->Write();
-    hnTop[cj]->Write();
-    hWTagpT[cj]->Write();
-    hWTagMass[cj]->Write();
-    hnW[cj]->Write();
-    hWmassTagpT[cj]->Write();
-    hWmassTagMass[cj]->Write();
-    hnWmass[cj]->Write();
-    hdPhiMETLep[cj]->Write();
-    hdPhiJMET[cj]->Write();
-
-    }
- */ 
-  
-  //WriteHists(CutNumb,file,"mutau");
+  CutFlow->Write();
   file->Write();
   file->Close();
    
