@@ -200,8 +200,8 @@ int main(int argc, char * argv[]) {
   
   TH1F * NumberOfVerticesH = new TH1F("NumberOfVerticesH","",51,-0.5,50.5);
   
-  int nPtBins = 8;
-  float ptBins[9] = {10,13,16,20,25,30,40,60,1000};
+  int nPtBins = 6;
+  float ptBins[7] = {13,20,25,30,40,60,1000};
 
   int nPtBinsTrig = 16;
   float ptBinsTrig[17] = {10,
@@ -225,9 +225,7 @@ int main(int argc, char * argv[]) {
   int nEtaBins = 2;
   float etaBins[3] = {0,1.48,2.5}; 
   
-  TString PtBins[8] = {"Pt10to13",
-		       "Pt13to16",
-		       "Pt16to20",
+  TString PtBins[6] = {"Pt13to20",
 		       "Pt20to25",
 		       "Pt25to30",
 		       "Pt30to40",
@@ -292,11 +290,11 @@ int main(int argc, char * argv[]) {
   TH1D * ZMassPass = new TH1D("ZMassPass","",80,50,130);
   TH1D * ZMassFail = new TH1D("ZMassFail","",80,50,130);
 
-  TH1F * ZMassJetEtaPtPass[2][3][8];
-  TH1F * ZMassJetEtaPtFail[2][3][8];
+  TH1F * ZMassJetEtaPtPass[2][3][6];
+  TH1F * ZMassJetEtaPtFail[2][3][6];
 
-  TH1F * ZMassEtaPtPass[2][8];
-  TH1F * ZMassEtaPtFail[2][8];
+  TH1F * ZMassEtaPtPass[2][6];
+  TH1F * ZMassEtaPtFail[2][6];
 
   TH1F * PromptPtPass[2];
   TH1F * PromptPtFail[2];
@@ -911,13 +909,13 @@ int main(int argc, char * argv[]) {
 		if (dR1<dRJetLeptonCut) continue;
 		
 		float dR2 = deltaR(analysisTree.pfjet_eta[jet],analysisTree.pfjet_phi[jet],
-				   analysisTree.electron_eta[indexProbe],analysisTree.electron_phi[indexProbe]);
-		
+				   analysisTree.electron_eta[indexProbe],analysisTree.electron_phi[indexProbe]);		
 		if (dR2<dRJetLeptonCut) continue;
 	  
 		// pfJetId
 		bool isPFJetId = looseJetiD(analysisTree,int(jet));
 		if (!isPFJetId) continue;
+
 		if (analysisTree.pfjet_pt[jet]>jetPtHighCut) {
 		  nJets30++;
 		  if (fabs(analysisTree.pfjet_eta[jet])<jetEtaTrkCut) {
