@@ -279,8 +279,8 @@ int main(int argc, char * argv[]) {
   TH1D * MuSF_IdIso_Mu1 = new TH1D("MuIdIsoSF_Mu1", "MuIdIsoSF_Mu1", 1000, 0.5,1.5);
   TH1D * MuSF_IdIso_Mu2 = new TH1D("MuIdIsoSF_Mu2", "MuIdIsoSF_Mu2", 1000, 0.5,1.5);
 
-  int nPtBins = 8;
-  float ptBins[9] = {10,13,16,20,25,30,40,60,1000};
+  int nPtBins = 7;
+  float ptBins[8] = {10,15,20,25,30,40,60,1000};
 
   int nPtBinsTrig = 16;
   float ptBinsTrig[17] = {10,
@@ -304,9 +304,8 @@ int main(int argc, char * argv[]) {
   int nEtaBins = 3;
   float etaBins[4] = {0,0.9,1.2,2.4}; 
   
-  TString PtBins[8] = {"Pt10to13",
-		       "Pt13to16",
-		       "Pt16to20",
+  TString PtBins[7] = {"Pt10to15",
+		       "Pt15to20",
 		       "Pt20to25",
 		       "Pt25to30",
 		       "Pt30to40",
@@ -333,9 +332,6 @@ int main(int argc, char * argv[]) {
   TString EtaBins[3] = {"EtaLt0p9",
 			"Eta0p9to1p2",
 			"EtaGt1p2"};
-
-  TH1D * ZMassEtaPtPass[3][8];
-  TH1D * ZMassEtaPtFail[3][8];
 
   TString JetBins[3] = {"Jet0","Jet1","JetGe2"};
 
@@ -369,8 +365,11 @@ int main(int argc, char * argv[]) {
   file->cd();
   ptBinsTrigH->Write("ptBinsTrigH");
 
-  TH1D * ZMassJetEtaPtPass[3][3][8];
-  TH1D * ZMassJetEtaPtFail[3][3][8];
+  TH1D * ZMassEtaPtPass[3][7];
+  TH1D * ZMassEtaPtFail[3][7];
+
+  TH1D * ZMassJetEtaPtPass[3][3][7];
+  TH1D * ZMassJetEtaPtFail[3][3][7];
 
   TH1D * PromptPtPass[3];
   TH1D * PromptPtFail[3];
@@ -446,6 +445,7 @@ int main(int argc, char * argv[]) {
   int nJetBins = 3;
   int nZPtBins = 5;
   float zPtBins[6] = {0,10,20,30,50,1000};
+  float jetBins[4] = {-0.5,0.5,1.5,2.5};
 
   TString NJetBins[3] = {"NJet0","NJet1","NJetGe2"};
   TString ZPtBins[5] = {"Pt0to10",
@@ -458,6 +458,16 @@ int main(int argc, char * argv[]) {
   TString RecoilZPerp("recoilZPerp_");
   TString RecoilPuppiZParal("recoilPuppiZParal_");
   TString RecoilPuppiZPerp("recoilPuppiZPerp_");
+
+  // Saving Z pt bins
+  TH1D * ZPtBinsH = new TH1D("ZPtBinsH","ZPtBinsH",nZPtBins,zPtBins);
+  for (int iB=0; iB<nZPtBins; ++iB) 
+    ZPtBinsH->GetXaxis()->SetBinLabel(iB+1,ZPtBins[iB]);
+  
+  // Saving jet bins
+  TH1D * JetBinsH = new TH1D("JetBinsH","JetBinsH",nJetBins,jetBins);
+  for (int iB=0; iB<=nJetBins; ++iB)
+    JetBinsH->GetXaxis()->SetBinLabel(iB+1,NJetBins[iB]);
 
   TH1D * recoilZParalH[3];
   TH1D * recoilZPerpH[3];
@@ -1050,15 +1060,7 @@ int main(int argc, char * argv[]) {
 		if (dR2<dRJetLeptonCut) continue;
 	  
 		// pfJetId
-		
-		float energy = analysisTree.pfjet_e[jet];
-		float chf = analysisTree.pfjet_chargedhadronicenergy[jet]/energy;
-		float nhf = 1 - analysisTree.pfjet_chargedhadronicenergy[jet]/energy;
-		float phf = 1 - analysisTree.pfjet_chargedemenergy[jet]/energy;
-		float elf = analysisTree.pfjet_chargedemenergy[jet]/energy;
-		float chm = analysisTree.pfjet_chargedmulti[jet];
-		float npr = analysisTree.pfjet_chargedmulti[jet] + analysisTree.pfjet_neutralmulti[jet];
-		bool isPFJetId = (npr>1 && phf<0.99 && nhf<0.99) && (absJetEta>2.4 || (elf<0.99 && chf>0 && chm>0));
+		bool isPFJetId = looseJetiD(analysisTree,int(jet));
 		if (!isPFJetId) continue;
 		
 		if (analysisTree.pfjet_pt[jet]>jetPtHighCut) {
@@ -1245,15 +1247,7 @@ int main(int argc, char * argv[]) {
 	  if (dR2<dRJetLeptonCut) continue;
 	  
 	  // pfJetId
-
-	  float energy = analysisTree.pfjet_e[jet];
-	  float chf = analysisTree.pfjet_chargedhadronicenergy[jet]/energy;
-	  float nhf = analysisTree.pfjet_neutralhadronicenergy[jet]/energy;
-	  float phf = analysisTree.pfjet_neutralemenergy[jet]/energy;
-	  float elf = analysisTree.pfjet_chargedemenergy[jet]/energy;
-	  float chm = analysisTree.pfjet_chargedmulti[jet];
-	  float npr = analysisTree.pfjet_chargedmulti[jet] + analysisTree.pfjet_neutralmulti[jet];
-	  bool isPFJetId = (npr>1 && phf<0.99 && nhf<0.99) && (absJetEta>2.4 || (elf<0.99 && chf>0 && chm>0));
+	  bool isPFJetId = looseJetiD(analysisTree,int(jet));
 	  if (!isPFJetId) continue;
 	  
 	  if (analysisTree.pfjet_pt[jet]>jetPtHighCut) {
