@@ -16,7 +16,6 @@
 #include "TRFIOFile.h"
 #include "TH1D.h"
 #include "TChain.h"
-#include "TMath.h"
 #include "TGraphAsymmErrors.h"
 #include "TLorentzVector.h"
 #include "TCanvas.h"
@@ -29,128 +28,7 @@
 #include "DesyTauAnalyses/NTupleMaker/interface/PileUp.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/Jets.h"
 
-int binNumber(float x, int nbins, float * bins) {
-
-  int binN = -1;
-
-  for (int iB=0; iB<nbins; ++iB) {
-    if (x>=bins[iB]&&x<bins[iB+1]) {
-      binN = iB;
-      break;
-    }
-  }
-
-  return binN;
-
-}
-
-double PtoEta(double Px, double Py, double Pz) {
-
-  double P = TMath::Sqrt(Px*Px+Py*Py+Pz*Pz);
-  double cosQ = Pz/P;
-  double Q = TMath::ACos(cosQ);
-  double Eta = - TMath::Log(TMath::Tan(0.5*Q));  
-  return Eta;
-
-}
-
-double PtoPhi(double Px, double Py) {
-  return TMath::ATan2(Py,Px);
-}
-
-double PtoPt(double Px, double Py) {
-  return TMath::Sqrt(Px*Px+Py*Py);
-}
-
-double dPhiFrom2P(double Px1, double Py1,
-		  double Px2, double Py2) {
-
-
-  double prod = Px1*Px2 + Py1*Py2;
-  double mod1 = TMath::Sqrt(Px1*Px1+Py1*Py1);
-  double mod2 = TMath::Sqrt(Px2*Px2+Py2*Py2);
-  
-  double cosDPhi = prod/(mod1*mod2);
-  
-  return TMath::ACos(cosDPhi);
-
-}
-
-double deltaEta(double Px1, double Py1, double Pz1,
-		double Px2, double Py2, double Pz2) {
-
-  double eta1 = PtoEta(Px1,Py1,Pz1);
-  double eta2 = PtoEta(Px2,Py2,Pz2);
-
-  double dEta = eta1 - eta2;
-
-  return dEta;
-
-}
-
-double deltaR(double Eta1, double Phi1,
-	      double Eta2, double Phi2) {
-
-  double Px1 = TMath::Cos(Phi1);
-  double Py1 = TMath::Sin(Phi1);
-
-  double Px2 = TMath::Cos(Phi2);
-  double Py2 = TMath::Sin(Phi2);
-
-  double dPhi = dPhiFrom2P(Px1,Py1,Px2,Py2);
-  double dEta = Eta1 - Eta2;
-
-  double dR = TMath::Sqrt(dPhi*dPhi+dEta*dEta);
-
-  return dR;
-
-}
-
-double PtEtaToP(double Pt, double Eta) {
-
-  //  double Q = EtaToQ(Eta);
-
-  //double P = Pt/TMath::Sin(Q);
-  double P = Pt*TMath::CosH(Eta);
-
-  return P;
-}
-double Px(double Pt, double Phi){
-
-  double Px=Pt*TMath::Cos(Phi);
-  return Px;
-}
-double Py(double Pt, double Phi){
-
-  double Py=Pt*TMath::Sin(Phi);
-  return Py;
-}
-double Pz(double Pt, double Eta){
-
-  double Pz=Pt*TMath::SinH(Eta);
-  return Pz;
-}
-double InvariantMass(double energy,double Px,double Py, double Pz){
-
-  double M_2=energy*energy-Px*Px-Py*Py-Pz*Pz;
-  double M=TMath::Sqrt(M_2);
-  return M;
-
-
-}
-double EFromPandM0(double M0,double Pt,double Eta){
-
-  double E_2=M0*M0+PtEtaToP(Pt,Eta)*PtEtaToP(Pt,Eta);
-  double E =TMath::Sqrt(E_2);
-  return E;
-
-}
-
-struct myclass {
-  bool operator() (int i,int j) { return (i<j);}
-} myobject;
-
-float ht=0;
+#include "functions.h"
 
 int main(int argc, char * argv[]) {
 
@@ -181,6 +59,7 @@ int main(int argc, char * argv[]) {
   const float dxyElectronLooseCut     = cfg.get<float>("dxyElectronLooseCut");
   const float dzElectronLooseCut      = cfg.get<float>("dzElectronLooseCut");
   const float isoElectronCut     = cfg.get<float>("isoElectronCut");
+  const float isoElectronProbeCut = cfg.get<float>("isoElectronProbeCut");
   const unsigned int electronIdType  = cfg.get<unsigned int>("ElectronIdType");
 
   // topological cuts
@@ -266,7 +145,6 @@ int main(int argc, char * argv[]) {
       ss >> periods.back();
     }
   }
-
 
   // file name and tree name
   std::string rootFileName(argv[2]);
@@ -876,8 +754,9 @@ int main(int argc, char * argv[]) {
 	  electronId = analysisTree.electron_cutId_veto_Spring15[im];
 	if (!analysisTree.electron_pass_conversion[im]) electronId = false;
 	if (analysisTree.electron_nmissinginnerhits[im]>1) electronId = false;
+	bool isPassedProbe = isPassed && electronId && relIso<isoElectronProbeCut;
+	isElectronPassedIdIso.push_back(isPassedProbe);
 	isPassed = isPassed && electronId && relIso<isoElectronCut;
-	isElectronPassedIdIso.push_back(isPassed);
 	if (isPassed) { 
 	  isoIdElectrons.push_back(im);
 	  isoIdElectronsIsTriggerMatched.push_back(electronTriggerMatch);
