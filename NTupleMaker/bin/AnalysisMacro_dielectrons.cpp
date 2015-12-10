@@ -258,10 +258,17 @@ int main(int argc, char * argv[]) {
   TString JetBins[3] = {"Jet0","Jet1","JetGe2"};
 
   //*****  create eta histogram with eta ranges associated to their names (eg. endcap, barrel)   ***** //
+
+
+
   TH1F * etaBinsH = new TH1F("etaBinsH", "etaBinsH", nEtaBins, etaBins);
-  etaBinsH->Draw();
-  etaBinsH->GetXaxis()->Set(nEtaBins, etaBins);
-  for (int i=0; i<nEtaBins; i++){ etaBinsH->GetXaxis()->SetBinLabel(i+1, EtaBins[i]);}
+   etaBinsH->Draw();
+   etaBinsH->GetXaxis()->Set(nEtaBins, etaBins);
+   for (int i=0; i<nEtaBins; i++){ etaBinsH->GetXaxis()->SetBinLabel(i+1, EtaBins[i]);}
+   etaBinsH->Draw();
+   file->cd();
+   etaBinsH->Write("etaBinsH");
+
 
   //*****  create pt histogram_s with pt ranges associated to their names (eg. Pt10to13, ..)   ***** //
   //*****  two different pT binning, one for IdIso and one for trigger   ***** //
@@ -270,12 +277,17 @@ int main(int argc, char * argv[]) {
   ptBinsH->Draw();
   ptBinsH->GetXaxis()->Set(nPtBins, ptBins);
   for (int i=0; i<nPtBins; i++){ ptBinsH->GetXaxis()->SetBinLabel(i+1, PtBins[i]);}
+  ptBinsH->Draw();
+  file->cd();
+  ptBinsH->Write("ptBinsH");
 
   TH1D * ptBinsTrigH =  new TH1D("ptBinsTrigH", "ptBinsTrigH", nPtBinsTrig, ptBinsTrig);
   ptBinsTrigH->Draw();
   ptBinsTrigH->GetXaxis()->Set(nPtBinsTrig, ptBinsTrig);
   for (int i=0; i<nPtBinsTrig; i++){ ptBinsTrigH->GetXaxis()->SetBinLabel(i+1, PtBinsTrig[i]);}
-
+  ptBinsTrigH->Draw();
+  file->cd();
+  ptBinsTrigH->Write("ptBinsTrigH");
 
   TH1D * ZMassPass = new TH1D("ZMassPass","",80,50,130);
   TH1D * ZMassFail = new TH1D("ZMassFail","",80,50,130);
