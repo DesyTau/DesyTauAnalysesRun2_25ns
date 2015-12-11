@@ -16,7 +16,6 @@
 #include "TRFIOFile.h"
 #include "TH1D.h"
 #include "TChain.h"
-#include "TMath.h"
 #include "TGraphAsymmErrors.h"
 #include "TLorentzVector.h"
 #include "TCanvas.h"
@@ -28,129 +27,9 @@
 #include "DesyTauAnalyses/NTupleMaker/interface/json.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/PileUp.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/Jets.h"
+#include "DesyTauAnalyses/NTupleMaker/interface/ScaleFactor.h"
 
-int binNumber(float x, int nbins, float * bins) {
-
-  int binN = -1;
-
-  for (int iB=0; iB<nbins; ++iB) {
-    if (x>=bins[iB]&&x<bins[iB+1]) {
-      binN = iB;
-      break;
-    }
-  }
-
-  return binN;
-
-}
-
-double PtoEta(double Px, double Py, double Pz) {
-
-  double P = TMath::Sqrt(Px*Px+Py*Py+Pz*Pz);
-  double cosQ = Pz/P;
-  double Q = TMath::ACos(cosQ);
-  double Eta = - TMath::Log(TMath::Tan(0.5*Q));  
-  return Eta;
-
-}
-
-double PtoPhi(double Px, double Py) {
-  return TMath::ATan2(Py,Px);
-}
-
-double PtoPt(double Px, double Py) {
-  return TMath::Sqrt(Px*Px+Py*Py);
-}
-
-double dPhiFrom2P(double Px1, double Py1,
-		  double Px2, double Py2) {
-
-
-  double prod = Px1*Px2 + Py1*Py2;
-  double mod1 = TMath::Sqrt(Px1*Px1+Py1*Py1);
-  double mod2 = TMath::Sqrt(Px2*Px2+Py2*Py2);
-  
-  double cosDPhi = prod/(mod1*mod2);
-  
-  return TMath::ACos(cosDPhi);
-
-}
-
-double deltaEta(double Px1, double Py1, double Pz1,
-		double Px2, double Py2, double Pz2) {
-
-  double eta1 = PtoEta(Px1,Py1,Pz1);
-  double eta2 = PtoEta(Px2,Py2,Pz2);
-
-  double dEta = eta1 - eta2;
-
-  return dEta;
-
-}
-
-double deltaR(double Eta1, double Phi1,
-	      double Eta2, double Phi2) {
-
-  double Px1 = TMath::Cos(Phi1);
-  double Py1 = TMath::Sin(Phi1);
-
-  double Px2 = TMath::Cos(Phi2);
-  double Py2 = TMath::Sin(Phi2);
-
-  double dPhi = dPhiFrom2P(Px1,Py1,Px2,Py2);
-  double dEta = Eta1 - Eta2;
-
-  double dR = TMath::Sqrt(dPhi*dPhi+dEta*dEta);
-
-  return dR;
-
-}
-
-double PtEtaToP(double Pt, double Eta) {
-
-  //  double Q = EtaToQ(Eta);
-
-  //double P = Pt/TMath::Sin(Q);
-  double P = Pt*TMath::CosH(Eta);
-
-  return P;
-}
-double Px(double Pt, double Phi){
-
-  double Px=Pt*TMath::Cos(Phi);
-  return Px;
-}
-double Py(double Pt, double Phi){
-
-  double Py=Pt*TMath::Sin(Phi);
-  return Py;
-}
-double Pz(double Pt, double Eta){
-
-  double Pz=Pt*TMath::SinH(Eta);
-  return Pz;
-}
-double InvariantMass(double energy,double Px,double Py, double Pz){
-
-  double M_2=energy*energy-Px*Px-Py*Py-Pz*Pz;
-  double M=TMath::Sqrt(M_2);
-  return M;
-
-
-}
-double EFromPandM0(double M0,double Pt,double Eta){
-
-  double E_2=M0*M0+PtEtaToP(Pt,Eta)*PtEtaToP(Pt,Eta);
-  double E =TMath::Sqrt(E_2);
-  return E;
-
-}
-
-struct myclass {
-  bool operator() (int i,int j) { return (i<j);}
-} myobject;
-
-float ht=0;
+#include "functions.h"
 
 int main(int argc, char * argv[]) {
 
@@ -181,6 +60,7 @@ int main(int argc, char * argv[]) {
   const float dxyElectronLooseCut     = cfg.get<float>("dxyElectronLooseCut");
   const float dzElectronLooseCut      = cfg.get<float>("dzElectronLooseCut");
   const float isoElectronCut     = cfg.get<float>("isoElectronCut");
+  const float isoElectronProbeCut = cfg.get<float>("isoElectronProbeCut");
   const unsigned int electronIdType  = cfg.get<unsigned int>("ElectronIdType");
 
   // topological cuts
@@ -224,23 +104,12 @@ int main(int argc, char * argv[]) {
   const float zVertexCut     = cfg.get<float>("ZVertexCut");
   const float dVertexCut     = cfg.get<float>("DVertexCut");
 
-  // Run range
-  const unsigned int RunRangeMin = cfg.get<unsigned int>("RunRangeMin");
-  const unsigned int RunRangeMax = cfg.get<unsigned int>("RunRangeMax");
-
-  //
-  const string dataBaseDir = cfg.get<string>("DataBaseDir");
-
   // vertex distributions filenames and histname
   const string vertDataFileName = cfg.get<string>("VertexDataFileName");
   const string vertMcFileName   = cfg.get<string>("VertexMcFileName");
   const string vertHistName     = cfg.get<string>("VertexHistName");
 
-  // lepton scale factors
-  const string eleSfDataBarrel = cfg.get<string>("EleSfDataBarrel");
-  const string eleSfDataEndcap = cfg.get<string>("EleSfDataEndcap");
-  const string eleSfMcBarrel = cfg.get<string>("EleSfMcBarrel");
-  const string eleSfMcEndcap = cfg.get<string>("EleSfMcEndcap");
+  const string ElectronIdIsoFile = cfg.get<string>("ElectronIdIsoEff");
 
   const string jsonFile = cfg.get<string>("jsonFile");
   // **** end of configuration
@@ -266,7 +135,6 @@ int main(int argc, char * argv[]) {
       ss >> periods.back();
     }
   }
-
 
   // file name and tree name
   std::string rootFileName(argv[2]);
@@ -322,8 +190,11 @@ int main(int argc, char * argv[]) {
   
   TH1F * NumberOfVerticesH = new TH1F("NumberOfVerticesH","",51,-0.5,50.5);
   
-  int nPtBins = 8;
-  float ptBins[9] = {10,13,16,20,25,30,40,60,1000};
+  TH1D * EleSF_IdIso_Ele1H = new TH1D("EleIdIsoSF_Ele1H", "EleIdIsoSF_Ele1", 100, 0.5,1.5);
+  TH1D * EleSF_IdIso_Ele2H = new TH1D("EleIdIsoSF_Ele2H", "EleIdIsoSF_Ele2", 100, 0.5,1.5);
+
+  int nPtBins = 6;
+  float ptBins[7] = {13,20,25,30,40,60,1000};
 
   int nPtBinsTrig = 16;
   float ptBinsTrig[17] = {10,
@@ -347,9 +218,7 @@ int main(int argc, char * argv[]) {
   int nEtaBins = 2;
   float etaBins[3] = {0,1.48,2.5}; 
   
-  TString PtBins[8] = {"Pt10to13",
-		       "Pt13to16",
-		       "Pt16to20",
+  TString PtBins[6] = {"Pt13to20",
 		       "Pt20to25",
 		       "Pt25to30",
 		       "Pt30to40",
@@ -380,10 +249,16 @@ int main(int argc, char * argv[]) {
   TString JetBins[3] = {"Jet0","Jet1","JetGe2"};
 
   //*****  create eta histogram with eta ranges associated to their names (eg. endcap, barrel)   ***** //
+
+
+
   TH1F * etaBinsH = new TH1F("etaBinsH", "etaBinsH", nEtaBins, etaBins);
   etaBinsH->Draw();
   etaBinsH->GetXaxis()->Set(nEtaBins, etaBins);
   for (int i=0; i<nEtaBins; i++){ etaBinsH->GetXaxis()->SetBinLabel(i+1, EtaBins[i]);}
+  etaBinsH->Draw();
+  file->cd();
+  etaBinsH->Write("etaBinsH");
 
   //*****  create pt histogram_s with pt ranges associated to their names (eg. Pt10to13, ..)   ***** //
   //*****  two different pT binning, one for IdIso and one for trigger   ***** //
@@ -392,21 +267,26 @@ int main(int argc, char * argv[]) {
   ptBinsH->Draw();
   ptBinsH->GetXaxis()->Set(nPtBins, ptBins);
   for (int i=0; i<nPtBins; i++){ ptBinsH->GetXaxis()->SetBinLabel(i+1, PtBins[i]);}
+  ptBinsH->Draw();
+  file->cd();
+  ptBinsH->Write("ptBinsH");
 
   TH1D * ptBinsTrigH =  new TH1D("ptBinsTrigH", "ptBinsTrigH", nPtBinsTrig, ptBinsTrig);
   ptBinsTrigH->Draw();
   ptBinsTrigH->GetXaxis()->Set(nPtBinsTrig, ptBinsTrig);
   for (int i=0; i<nPtBinsTrig; i++){ ptBinsTrigH->GetXaxis()->SetBinLabel(i+1, PtBinsTrig[i]);}
-
+  ptBinsTrigH->Draw();
+  file->cd();
+  ptBinsTrigH->Write("ptBinsTrigH");
 
   TH1D * ZMassPass = new TH1D("ZMassPass","",80,50,130);
   TH1D * ZMassFail = new TH1D("ZMassFail","",80,50,130);
 
-  TH1F * ZMassJetEtaPtPass[2][3][8];
-  TH1F * ZMassJetEtaPtFail[2][3][8];
+  TH1F * ZMassJetEtaPtPass[2][3][6];
+  TH1F * ZMassJetEtaPtFail[2][3][6];
 
-  TH1F * ZMassEtaPtPass[2][8];
-  TH1F * ZMassEtaPtFail[2][8];
+  TH1F * ZMassEtaPtPass[2][6];
+  TH1F * ZMassEtaPtFail[2][6];
 
   TH1F * PromptPtPass[2];
   TH1F * PromptPtFail[2];
@@ -483,8 +363,8 @@ int main(int argc, char * argv[]) {
   // reweighting with vertices
 
   // reading vertex weights
-  TFile * fileDataNVert = new TFile(TString(cmsswBase)+"/src/"+dataBaseDir+"/"+vertDataFileName);
-  TFile * fileMcNVert   = new TFile(TString(cmsswBase)+"/src/"+dataBaseDir+"/"+vertMcFileName);
+  TFile * fileDataNVert = new TFile(TString(cmsswBase)+"/src/"+vertDataFileName);
+  TFile * fileMcNVert   = new TFile(TString(cmsswBase)+"/src/"+vertMcFileName);
 
   TH1F * hvertWeight = new TH1F("hvertWeight","",40,0,1);
   TH1F * hNvert = new TH1F("hNvert","",51,-0.5,50.5);
@@ -510,26 +390,13 @@ int main(int argc, char * argv[]) {
     PUofficial->set_h_MC(PU_mc);
   }
 
-  
-  TFile *f10= new TFile(TString(cmsswBase)+"/src/"+dataBaseDir+"/"+eleSfDataBarrel);  // ele SF barrel data
-  TFile *f11 = new TFile(TString(cmsswBase)+"/src/"+dataBaseDir+"/"+eleSfDataEndcap); // ele SF endcap data
-  TFile *f12= new TFile(TString(cmsswBase)+"/src/"+dataBaseDir+"/"+eleSfMcBarrel);  // ele SF barrel MC
-  TFile *f13 = new TFile(TString(cmsswBase)+"/src/"+dataBaseDir+"/"+eleSfMcEndcap); // ele SF endcap MC 
-  
-  TGraphAsymmErrors *hEffBarrelData = (TGraphAsymmErrors*)f10->Get("ZMassBarrel");
-  TGraphAsymmErrors *hEffEndcapData = (TGraphAsymmErrors*)f11->Get("ZMassEndcap");
-  TGraphAsymmErrors *hEffBarrelMC = (TGraphAsymmErrors*)f12->Get("ZMassBarrel");
-  TGraphAsymmErrors *hEffEndcapMC = (TGraphAsymmErrors*)f13->Get("ZMassEndcap");
-  
-  double * dataEffBarrel = new double[10];
-  double * dataEffEndcap = new double[10];
-  double * mcEffBarrel = new double[10];
-  double * mcEffEndcap = new double[10];
-  
-  dataEffBarrel = hEffBarrelData->GetY();
-  dataEffEndcap = hEffEndcapData->GetY();
-  mcEffBarrel = hEffBarrelMC->GetY();
-  mcEffEndcap = hEffEndcapMC->GetY();
+// Lepton Scale Factors 
+
+  ScaleFactor * SF_electronIdIso; 
+  if (applyLeptonSF) {
+    SF_electronIdIso = new ScaleFactor();
+    SF_electronIdIso->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(ElectronIdIsoFile));
+  }
   
   int nFiles = 0;
   int nEvents = 0;
@@ -876,8 +743,9 @@ int main(int argc, char * argv[]) {
 	  electronId = analysisTree.electron_cutId_veto_Spring15[im];
 	if (!analysisTree.electron_pass_conversion[im]) electronId = false;
 	if (analysisTree.electron_nmissinginnerhits[im]>1) electronId = false;
+	bool isPassedProbe = isPassed && electronId && relIso<isoElectronProbeCut;
+	isElectronPassedIdIso.push_back(isPassedProbe);
 	isPassed = isPassed && electronId && relIso<isoElectronCut;
-	isElectronPassedIdIso.push_back(isPassed);
 	if (isPassed) { 
 	  isoIdElectrons.push_back(im);
 	  isoIdElectronsIsTriggerMatched.push_back(electronTriggerMatch);
@@ -1020,13 +888,13 @@ int main(int argc, char * argv[]) {
 		if (dR1<dRJetLeptonCut) continue;
 		
 		float dR2 = deltaR(analysisTree.pfjet_eta[jet],analysisTree.pfjet_phi[jet],
-				   analysisTree.electron_eta[indexProbe],analysisTree.electron_phi[indexProbe]);
-		
+				   analysisTree.electron_eta[indexProbe],analysisTree.electron_phi[indexProbe]);		
 		if (dR2<dRJetLeptonCut) continue;
 	  
 		// pfJetId
 		bool isPFJetId = looseJetiD(analysisTree,int(jet));
 		if (!isPFJetId) continue;
+
 		if (analysisTree.pfjet_pt[jet]>jetPtHighCut) {
 		  nJets30++;
 		  if (fabs(analysisTree.pfjet_eta[jet])<jetEtaTrkCut) {
@@ -1151,13 +1019,34 @@ int main(int argc, char * argv[]) {
 
 	  if (!isData&&applyLeptonSF) {
 	    // insert code for leptons SF here
-	    // SF1 - scale factor for first muon index = iE1
+	    // SF1 - scale factor for first electron index = iE1
 	    // pt1 = analysisTree.electron_pt[iE1];
 	    // eta2 = analysisTree.electron_eta[iE1];
-	    // SF2 - scale factor for the second muon index = iE2
+	    // SF2 - scale factor for the second electron index = iE2
 	    // pt2 = analysisTree.electron_pt[iE2];
 	    // eta2 = analysisTree.electron_eta[iE2];
 	    // weight = weight*SF1*SF2
+	    double ptEle1 = (double)analysisTree.electron_pt[iE1];
+	    double ptEle2 = (double)analysisTree.electron_pt[iE2];
+	    double etaEle1 = (double)analysisTree.electron_eta[iE1];
+	    double etaEle2 = (double)analysisTree.electron_eta[iE2];
+	    double IdIsoSF_ele1 = SF_electronIdIso->get_ScaleFactor(ptEle1, etaEle1);
+	    double IdIsoSF_ele2 = SF_electronIdIso->get_ScaleFactor(ptEle2, etaEle2);
+	
+	    EleSF_IdIso_Ele1H->Fill(IdIsoSF_ele1);
+	    EleSF_IdIso_Ele2H->Fill(IdIsoSF_ele2);
+	    //	    if (ptEle1<20||ptEle2<20) {
+	    //	      std::cout << "ele 1 ->  pt = " << ptEle1 << "   eta = " << etaEle1 << std::endl;
+	    //	      std::cout << "eff data ele 1 = " << SF_electronIdIso->get_EfficiencyData(ptEle1, etaEle1)<< " |  eff mc ele 1 = " << SF_electronIdIso->get_EfficiencyMC(ptEle1, etaEle1)<<std::endl;
+	    //	      std::cout << "ele 2 ->  pt = " << ptEle2 << "   eta = " << etaEle2 << std::endl;
+	    //	      std::cout << "eff data ele 2 = " << SF_electronIdIso->get_EfficiencyData(ptEle2, etaEle2)<< " |  eff mc ele 2 = " << SF_electronIdIso->get_EfficiencyMC(ptEle2, etaEle2)<<std::endl;
+	    //	      std::cout << "SF ele1 = " << IdIsoSF_ele1 << std::endl;
+	    //	      std::cout << "SF ele2 = " << IdIsoSF_ele2 << std::endl;
+	    //	      
+	    //	      std::cout << " mass = " << mass << std::endl;
+	    //	      std::cout << std::endl;
+	    //	    }
+	    weight = weight*IdIsoSF_ele1*IdIsoSF_ele2;
 	  }
 	   
 	  for (unsigned int jet=0; jet<analysisTree.pfjet_count; ++jet) {
