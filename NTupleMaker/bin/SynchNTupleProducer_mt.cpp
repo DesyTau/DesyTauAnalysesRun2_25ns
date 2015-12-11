@@ -1258,19 +1258,19 @@ int main(int argc, char * argv[]) {
       mvacov10 = -999999;
       mvacov11 = -999999;
 
-      //      unsigned int metIndex = 0;
-      //      bool mvaFound = false;
-      //      if (analysisTree.mvamet_count>0) {
-      //	for (unsigned int imva=0; imva<analysisTree.mvamet_count; ++imva) {
-      //	  if (analysisTree.mvamet_channel[imva]==3) {
-      //	    if (int(analysisTree.mvamet_lep1[imva])==tauIndex&&int(analysisTree.mvamet_lep2[imva])==muonIndex) {
-      //	      metIndex = imva;
-      //	      mvaFound = true;
-      //	    }
-      //	  }
-      //	}
-      //      }
-      //
+      unsigned int metIndex = 0;
+      bool mvaFound = false;
+      if (analysisTree.mvamet_count>0) {
+      	for (unsigned int imva=0; imva<analysisTree.mvamet_count; ++imva) {
+      	  if (analysisTree.mvamet_channel[imva]==3) {
+      	    if (int(analysisTree.mvamet_lep1[imva])==tauIndex&&int(analysisTree.mvamet_lep2[imva])==muonIndex) {
+      	      metIndex = imva;
+      	      mvaFound = true;
+      	    }
+      	  }
+      	}
+      }
+      
       float genmet_x = analysisTree.genmet_ex;
       float genmet_y = analysisTree.genmet_ey;
       genmet = TMath::Sqrt(genmet_x*genmet_x+genmet_y*genmet_y);
