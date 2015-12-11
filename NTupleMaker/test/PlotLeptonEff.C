@@ -1,8 +1,8 @@
 #include "HttStylesNew.cc"
-void PlotLeptonEff(TString effFileName = "Muon_IdIso0p10_eff",
-		   TString histBaseName = "ZMassEtaGt1p2",
-		   TString xtit = "muon p_{T} [GeV]",
-		   TString header = "|#eta|>1.2") {
+void PlotLeptonEff(TString effFileName = "Electron_IdIso0p10_eff",
+		   TString histBaseName = "ZMassEtaGt1p48",
+		   TString xtit = "electron p_{T} [GeV]",
+		   TString header = "Endcap") {
  
   SetStyle();
   gStyle->SetOptStat(0000);

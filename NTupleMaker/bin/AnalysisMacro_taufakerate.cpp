@@ -26,7 +26,6 @@
 #include "DesyTauAnalyses/NTupleMaker/interface/AC1B.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/json.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/PileUp.h"
-#include "DesyTauAnalyses/NTupleMaker/interface/Jets.h"
 #include "TGraphAsymmErrors.h"
 
 int main(int argc, char * argv[]) {
