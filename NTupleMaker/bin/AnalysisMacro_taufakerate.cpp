@@ -282,37 +282,51 @@ int main(int argc, char * argv[]) {
   if (isData) file = new TFile(era+"/"+TStrName+TString("_DataDriven.root"),"update");
   if (!isData) file = new TFile(era+"/"+TStrName+TString(".root"),"update");
   TH1::SetDefaultSumw2(true);
-  file->mkdir(Channel.c_str());
-  file->cd(Channel.c_str());
+  //file->mkdir(Channel.c_str());
+  //file->cd();
   TH1D * PUweightsOfficialH = new TH1D("PUweightsOfficialH","PU weights w/ official reweighting",1000, 0, 10);
   TH1D * nTruePUInteractionsH = new TH1D("nTruePUInteractionsH","",50,-0.5,49.5);
   TH1D * NumberOfVerticesH = new TH1D("NumberOfVerticesH","",51,-0.5,50.5);
   TH1D * inputEventsH = new TH1D("inputEventsH","",1,-0.5,0.5);
   TH1D * histWeightsH = new TH1D("histWeightsH","",1,-0.5,0.5);
   TH1D * histWeightsSkimmedH = new TH1D("histWeightsSkimmedH","",1,-0.5,0.5);
+  TH1D * hMT = new TH1D("hMT","",20,0,200);
+  TH1D * hRatioSum = new TH1D("hRatioSum","",10,0,1);
+  TH1D * hDPhi = new TH1D("hDPhi","",70,0,3.5);
+  TH1D * hxsec = new TH1D("xsec","",1,0,10e+20);
 
-  int nPtBins = 5;
-  float ptBins[6] = {20,25,30,40,60,1000};
+  int nPtBins = 11;
+  float ptBins[12] = {20,25,30,40,60,100,150,200,300,400,500,1000};
 
   
   int nEtaBins = 3;
   float etaBins[4] = {0,0.9,1.2,2.4}; 
   
-  TString PtBins[5] = {
-		       "Pt20to25",
+  TString PtBins[12] = {"Pt20to25",
 		       "Pt25to30",
 		       "Pt30to40",
 		       "Pt40to60",
-		       "PtGt60"};
+		       "Pt60to100",
+		       "Pt100to150",
+		       "Pt150to200",
+		        "Pt200to300",
+			"Pt300to400",
+			"Pt400to500",
+			"Pt500to1000",
+			"PtGt100"};
   
 
   TString EtaBins[3] = {"EtaLt0p9",
 			"Eta0p9to1p2",
-		"EtaGt1p2"};
+		         "EtaGt1p2"};
 
-  TH1D * FakeRatePt[3][5];
-  TH1D * FakeRateNV[3][5];
-  TH1D * FakeRateEta[3][5];
+
+
+  TH1D * FakeRatePtIncLoose[3];
+  TH1D * FakeRatePtIncTight[3];
+  TH1D * FakeRatePt[3][11];
+  TH1D * FakeRateNV[3][11];
+  TH1D * FakeRateEta[3][11];
 
   
   TH1D * etaBinsH = new TH1D("etaBinsH", "etaBinsH", nEtaBins, etaBins);
@@ -321,7 +335,9 @@ int main(int argc, char * argv[]) {
   for (int i=0; i<nEtaBins; i++){ etaBinsH->GetXaxis()->SetBinLabel(i+1, EtaBins[i]);}
   
   
-  for (int iEta=0; iEta<nEtaBins; ++iEta) {
+  	for (int iEta=0; iEta<nEtaBins; ++iEta) {
+      FakeRatePtIncLoose[iEta] = new TH1D("FakeRatePtIncLoose"+EtaBins[iEta],"",nPtBins,ptBins);
+      FakeRatePtIncTight[iEta] = new TH1D("FakeRatePtIncTight"+EtaBins[iEta],"",nPtBins,ptBins);
     for (int iPt=0; iPt<nPtBins; ++iPt) {
       FakeRatePt[iEta][iPt] = new TH1D("FakeRatePt"+EtaBins[iEta]+PtBins[iPt],"",100,0,1000);
       FakeRateNV[iEta][iPt] = new TH1D("FakeRateNV"+EtaBins[iEta]+PtBins[iPt],"",50,0,50);
@@ -532,46 +548,6 @@ int main(int argc, char * argv[]) {
       //if(fillplots)
       iCut++;
 	
-
-
-
-      double MET = sqrt ( analysisTree.pfmet_ex*analysisTree.pfmet_ex + analysisTree.pfmet_ey*analysisTree.pfmet_ey);
-      
-      METV.SetPx(analysisTree.pfmet_ex);	      
-      METV.SetPy(analysisTree.pfmet_ey);
-    
- 
-      for (unsigned int ijj = 0; ijj<analysisTree.pfjet_count; ++ijj) {
-	JetsV.SetPxPyPzE(analysisTree.pfjet_px[ijj], analysisTree.pfjet_py[ijj], analysisTree.pfjet_pz[ijj], analysisTree.pfjet_e[ijj]);
-	JetsMV.push_back(JetsV);
-      } 
-
-
-      for (unsigned int imm = 0; imm<analysisTree.muon_count; ++imm) {
-	MuV.SetPtEtaPhiM(analysisTree.muon_pt[imm], analysisTree.muon_eta[imm], analysisTree.muon_phi[imm], muonMass);
-	MuMV.push_back(MuV);
-	//	mu_index=0;
-      }
-
-      for (unsigned int ie = 0; ie<analysisTree.electron_count; ++ie) {
-	ElV.SetPtEtaPhiM(analysisTree.electron_pt[ie], analysisTree.electron_eta[ie], analysisTree.electron_phi[ie], electronMass);
-	ElMV.push_back(ElV);
-	//	el_index=0;
-      }
-   
-      for (unsigned int itt = 0; itt<analysisTree.tau_count; ++itt) {
-	TauV.SetPtEtaPhiM(analysisTree.tau_pt[itt], analysisTree.tau_eta[itt], analysisTree.tau_phi[itt], tauMass);
-	TauMV.push_back(TauV);
-	//	tau_index=0;
-      }
-
-
-      
-      // vector <string> ss; ss.push_back(.c_str());
-      //if(fillplots)
-      iCut++;
-
- 
       bool trigAccept = false;
       
       unsigned int nMainTrigger = 0;
@@ -599,10 +575,6 @@ int main(int argc, char * argv[]) {
       }
 
       /////now clear the Mu.El.Jets again to fill them again after cleaning
-        MuMV.clear();
-        ElMV.clear();
-        TauMV.clear();
-        LeptMV.clear();
 
       double isoMuMin = 9999;
       bool mu_iso=false;
@@ -674,6 +646,7 @@ int main(int argc, char * argv[]) {
 
 //      	if (dR<dRleptonsCutmutau) continue;
 
+	/*
 	//cout<<" mu_index "<<mu_index<<"  "<<isMainTrigger<<"  "<<isMu27<<"  "<<isMuTau_MuLegA<<"  "<<isMuTau_MuLegB<<"  "<<isMuTau_TauLegA<<"  "<<isMuTau_TauLegB<<endl;
 	  float ptMu1 = TMath::Min(float(59),float(analysisTree.muon_pt[mu_index]));
 	  int ptBinMu1 = binNumber(ptMu1,nPtBins,ptBins);
@@ -691,7 +664,7 @@ int main(int argc, char * argv[]) {
 	  float wMu1 = dataMu1/mcMu1;
 	  //	  cout << "Muons SF : Mu1 = " << wMu1 << "   Mu2 = " << wMu2 << endl;
 	  //weight = weight*wMu1;
-      
+      */
       
 
 //cout<<"  Iso check  "<<relIso<<" InvertMuIso "<<InvertMuIso<<" isHighIsoMu "<<isHighIsoMu<<" isLowIsoMu "<<isLowIsoMu<<" cutQCD "<<isoMuonHighCutQCD<<endl;
@@ -742,6 +715,35 @@ int main(int argc, char * argv[]) {
       }
 
 	if (!isLoose && !isTight) continue;
+
+	if (isLoose && int(tau_loose) !=-1 && int(mu_index) !=-1){
+      double met = sqrt ( analysisTree.pfmet_ex*analysisTree.pfmet_ex + analysisTree.pfmet_ey*analysisTree.pfmet_ey);
+	
+      double SumPtMuTau = sqrt ( (analysisTree.tau_px[tau_loose]+analysisTree.muon_px[mu_index])*(analysisTree.tau_px[tau_loose]+analysisTree.muon_px[mu_index]) + 
+		      		 (analysisTree.tau_py[tau_loose]+analysisTree.muon_py[mu_index])*(analysisTree.tau_py[tau_loose]+analysisTree.muon_py[mu_index]));
+
+      double RatioSums = (SumPtMuTau - met )/ (SumPtMuTau + met );
+      	
+
+      TLorentzVector MetV; 
+      MetV.SetPx(analysisTree.pfmet_ex); 
+      MetV.SetPy(analysisTree.pfmet_ey);
+      
+      TLorentzVector muV ;  muV.SetPtEtaPhiM(analysisTree.muon_pt[mu_index], analysisTree.muon_eta[mu_index], analysisTree.muon_phi[mu_index], muonMass);
+      TLorentzVector tauV;  tauV.SetPtEtaPhiM(analysisTree.tau_pt[tau_loose], analysisTree.tau_eta[tau_loose], analysisTree.tau_phi[tau_loose], tauMass);
+
+       TLorentzVector DiL = muV  + tauV;
+      
+       double dPhi=dPhiFrom2P( DiL.Px(), DiL.Py(), MetV.Px(),  MetV.Py() );
+       double MT = TMath::Sqrt(2*DiL.Pt()*MetV.Pt()*(1-TMath::Cos(dPhi)));
+
+
+	hRatioSum->Fill(RatioSums,weight);
+	hMT->Fill(MT,weight);
+	hDPhi->Fill(dPhi, weight);
+	}
+
+
       //if (tau.size()==0 || !tau_iso ) continue;
 
       //cout<< " Lets check  "<<mu_index <<"  "<<int(tau_index) <<"  "<<isTight<<"  "<<isLoose<<endl;
@@ -759,6 +761,10 @@ int main(int argc, char * argv[]) {
 
 //cout<< "filling here  "<<analysisTree.tau_pt[tau_loose]<<"  "<<ptBin<<"  "<<etaBin<<"  "<<weight<<endl;
 		FakeRatePt[etaBin][ptBin]->Fill(analysisTree.tau_pt[tau_loose],weight);
+		
+		if (int(tau_loose)!=-1)FakeRatePtIncLoose[etaBin]->Fill(analysisTree.tau_pt[tau_loose],weight);
+		if (int(tau_index)!=-1) FakeRatePtIncTight[etaBin]->Fill(analysisTree.tau_pt[tau_index],weight);
+
 		FakeRateEta[etaBin][ptBin]->Fill(analysisTree.tau_eta[tau_loose],weight);
 		FakeRateNV[etaBin][ptBin]->Fill(analysisTree.tau_vertexz[tau_loose],weight);
 
@@ -833,11 +839,11 @@ int main(int argc, char * argv[]) {
   std::cout << "Total number of events in Tree  = " << nEvents << std::endl;
   std::cout << "Total number of selected events = " << selEvents << std::endl;
   std::cout << std::endl;
-  
+  file->cd();
   hxsec->Fill(XSec);
-  hxsec->Write();
+ // hxsec->Write();
   file->Write();
-  //file->Close();
+  file->Close();
    
   delete file;
   
