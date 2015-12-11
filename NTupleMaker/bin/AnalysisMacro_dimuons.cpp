@@ -70,6 +70,7 @@ int main(int argc, char * argv[]) {
   const float dPhileptonsCut = cfg.get<float>("dPhileptonsCut");
   const float DRTrigMatch    = cfg.get<float>("DRTrigMatch"); 
   const bool oppositeSign    = cfg.get<bool>("OppositeSign");
+  const float dimuonMassCut = cfg.get<float>("DimuonMassCut");
   const bool isoDR03         = cfg.get<bool>("IsoDR03");
 
   // trigger
@@ -102,25 +103,11 @@ int main(int argc, char * argv[]) {
   const float jetPtLowCut    = cfg.get<float>("JetPtLowCut");
   const float dRJetLeptonCut = cfg.get<float>("dRJetLeptonCut");
 
-  // Run range
-  const unsigned int RunRangeMin = cfg.get<unsigned int>("RunRangeMin");
-  const unsigned int RunRangeMax = cfg.get<unsigned int>("RunRangeMax");
-
-  //
-  const string dataBaseDir = cfg.get<string>("DataBaseDir");
-
   // vertex distributions filenames and histname
   const string vertDataFileName = cfg.get<string>("VertexDataFileName");
   const string vertMcFileName   = cfg.get<string>("VertexMcFileName");
   const string vertHistName     = cfg.get<string>("VertexHistName");
 
-  // lepton scale factors
-/*
-  const string muonSfDataBarrel = cfg.get<string>("MuonSfDataBarrel");
-  const string muonSfDataEndcap = cfg.get<string>("MuonSfDataEndcap");
-  const string muonSfMcBarrel = cfg.get<string>("MuonSfMcBarrel");
-  const string muonSfMcEndcap = cfg.get<string>("MuonSfMcEndcap");
-*/
   const string MuonIdIsoFile = cfg.get<string>("MuonIdIsoEff");
 
   const string jsonFile = cfg.get<string>("jsonFile");
@@ -275,12 +262,11 @@ int main(int argc, char * argv[]) {
 
   TH1D * NumberOfVerticesH = new TH1D("NumberOfVerticesH","",51,-0.5,50.5);
 
+  TH1D * MuSF_IdIso_Mu1H = new TH1D("MuIdIsoSF_Mu1H", "MuIdIsoSF_Mu1", 100, 0.5,1.5);
+  TH1D * MuSF_IdIso_Mu2H = new TH1D("MuIdIsoSF_Mu2H", "MuIdIsoSF_Mu2", 100, 0.5,1.5);
 
-  TH1D * MuSF_IdIso_Mu1 = new TH1D("MuIdIsoSF_Mu1", "MuIdIsoSF_Mu1", 1000, 0.5,1.5);
-  TH1D * MuSF_IdIso_Mu2 = new TH1D("MuIdIsoSF_Mu2", "MuIdIsoSF_Mu2", 1000, 0.5,1.5);
-
-  int nPtBins = 8;
-  float ptBins[9] = {10,13,16,20,25,30,40,60,1000};
+  int nPtBins = 7;
+  float ptBins[8] = {10,15,20,25,30,40,60,1000};
 
   int nPtBinsTrig = 16;
   float ptBinsTrig[17] = {10,
@@ -304,9 +290,8 @@ int main(int argc, char * argv[]) {
   int nEtaBins = 3;
   float etaBins[4] = {0,0.9,1.2,2.4}; 
   
-  TString PtBins[8] = {"Pt10to13",
-		       "Pt13to16",
-		       "Pt16to20",
+  TString PtBins[7] = {"Pt10to15",
+		       "Pt15to20",
 		       "Pt20to25",
 		       "Pt25to30",
 		       "Pt30to40",
@@ -333,9 +318,6 @@ int main(int argc, char * argv[]) {
   TString EtaBins[3] = {"EtaLt0p9",
 			"Eta0p9to1p2",
 			"EtaGt1p2"};
-
-  TH1D * ZMassEtaPtPass[3][8];
-  TH1D * ZMassEtaPtFail[3][8];
 
   TString JetBins[3] = {"Jet0","Jet1","JetGe2"};
 
@@ -369,8 +351,11 @@ int main(int argc, char * argv[]) {
   file->cd();
   ptBinsTrigH->Write("ptBinsTrigH");
 
-  TH1D * ZMassJetEtaPtPass[3][3][8];
-  TH1D * ZMassJetEtaPtFail[3][3][8];
+  TH1D * ZMassEtaPtPass[3][7];
+  TH1D * ZMassEtaPtFail[3][7];
+
+  TH1D * ZMassJetEtaPtPass[3][3][7];
+  TH1D * ZMassJetEtaPtFail[3][3][7];
 
   TH1D * PromptPtPass[3];
   TH1D * PromptPtFail[3];
@@ -446,6 +431,7 @@ int main(int argc, char * argv[]) {
   int nJetBins = 3;
   int nZPtBins = 5;
   float zPtBins[6] = {0,10,20,30,50,1000};
+  float jetBins[4] = {-0.5,0.5,1.5,2.5};
 
   TString NJetBins[3] = {"NJet0","NJet1","NJetGe2"};
   TString ZPtBins[5] = {"Pt0to10",
@@ -458,6 +444,16 @@ int main(int argc, char * argv[]) {
   TString RecoilZPerp("recoilZPerp_");
   TString RecoilPuppiZParal("recoilPuppiZParal_");
   TString RecoilPuppiZPerp("recoilPuppiZPerp_");
+
+  // Saving Z pt bins
+  TH1D * ZPtBinsH = new TH1D("ZPtBinsH","ZPtBinsH",nZPtBins,zPtBins);
+  for (int iB=0; iB<nZPtBins; ++iB) 
+    ZPtBinsH->GetXaxis()->SetBinLabel(iB+1,ZPtBins[iB]);
+  
+  // Saving jet bins
+  TH1D * JetBinsH = new TH1D("JetBinsH","JetBinsH",nJetBins,jetBins);
+  for (int iB=0; iB<nJetBins; ++iB)
+    JetBinsH->GetXaxis()->SetBinLabel(iB+1,NJetBins[iB]);
 
   TH1D * recoilZParalH[3];
   TH1D * recoilZPerpH[3];
@@ -494,8 +490,8 @@ int main(int argc, char * argv[]) {
   // reweighting with vertices
 
   // reading vertex weights
-  TFile * fileDataNVert = new TFile(TString(cmsswBase)+"/src/"+dataBaseDir+"/"+vertDataFileName);
-  TFile * fileMcNVert   = new TFile(TString(cmsswBase)+"/src/"+dataBaseDir+"/"+vertMcFileName);
+  TFile * fileDataNVert = new TFile(TString(cmsswBase)+"/src/"+vertDataFileName);
+  TFile * fileMcNVert   = new TFile(TString(cmsswBase)+"/src/"+vertMcFileName);
 
   TH1D * vertexDataH = (TH1D*)fileDataNVert->Get(TString(vertHistName));
   TH1D * vertexMcH   = (TH1D*)fileMcNVert->Get(TString(vertHistName));
@@ -521,35 +517,12 @@ int main(int argc, char * argv[]) {
   }
 
 
-/*
-  TFile *f10 = new TFile(TString(cmsswBase)+"/src/"+dataBaseDir+"/"+muonSfDataBarrel);  // mu SF barrel data
-  TFile *f11 = new TFile(TString(cmsswBase)+"/src/"+dataBaseDir+"/"+muonSfDataEndcap); // mu SF endcap data
-  TFile *f12 = new TFile(TString(cmsswBase)+"/src/"+dataBaseDir+"/"+muonSfMcBarrel);  // mu SF barrel MC
-  TFile *f13 = new TFile(TString(cmsswBase)+"/src/"+dataBaseDir+"/"+muonSfMcEndcap); // mu SF endcap MC 
-  
-  TGraphAsymmErrors *hEffBarrelData = (TGraphAsymmErrors*)f10->Get("ZMassBarrel");
-  TGraphAsymmErrors *hEffEndcapData = (TGraphAsymmErrors*)f11->Get("ZMassEndcap");
-  TGraphAsymmErrors *hEffBarrelMC = (TGraphAsymmErrors*)f12->Get("ZMassBarrel");
-  TGraphAsymmErrors *hEffEndcapMC = (TGraphAsymmErrors*)f13->Get("ZMassEndcap");
-  
-  double * dataEffBarrel = new double[10];
-  double * dataEffEndcap = new double[10];
-  double * mcEffBarrel = new double[10];
-  double * mcEffEndcap = new double[10];
-  
-  dataEffBarrel = hEffBarrelData->GetY();
-  dataEffEndcap = hEffEndcapData->GetY();
-  mcEffBarrel = hEffBarrelMC->GetY();
-  mcEffEndcap = hEffEndcapMC->GetY();
-*/
-
-
 // Lepton Scale Factors 
 
   ScaleFactor * SF_muonIdIso; 
   if (applyLeptonSF) {
     SF_muonIdIso = new ScaleFactor();
-    SF_muonIdIso->init_ScaleFactor(TString(MuonIdIsoFile));
+    SF_muonIdIso->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(MuonIdIsoFile));
   }
 
   int nFiles = 0;
@@ -1050,15 +1023,7 @@ int main(int argc, char * argv[]) {
 		if (dR2<dRJetLeptonCut) continue;
 	  
 		// pfJetId
-		
-		float energy = analysisTree.pfjet_e[jet];
-		float chf = analysisTree.pfjet_chargedhadronicenergy[jet]/energy;
-		float nhf = 1 - analysisTree.pfjet_chargedhadronicenergy[jet]/energy;
-		float phf = 1 - analysisTree.pfjet_chargedemenergy[jet]/energy;
-		float elf = analysisTree.pfjet_chargedemenergy[jet]/energy;
-		float chm = analysisTree.pfjet_chargedmulti[jet];
-		float npr = analysisTree.pfjet_chargedmulti[jet] + analysisTree.pfjet_neutralmulti[jet];
-		bool isPFJetId = (npr>1 && phf<0.99 && nhf<0.99) && (absJetEta>2.4 || (elf<0.99 && chf>0 && chm>0));
+		bool isPFJetId = looseJetiD(analysisTree,int(jet));
 		if (!isPFJetId) continue;
 		
 		if (analysisTree.pfjet_pt[jet]>jetPtHighCut) {
@@ -1146,7 +1111,7 @@ int main(int argc, char * argv[]) {
 		  isMediumProbe = analysisTree.muon_isMedium[indexProbe];
 		  
 		  massTagProbe = mass;
-		  events->Fill();
+		  //		  events->Fill();
 		}
 	      }
 	    }
@@ -1245,15 +1210,7 @@ int main(int argc, char * argv[]) {
 	  if (dR2<dRJetLeptonCut) continue;
 	  
 	  // pfJetId
-
-	  float energy = analysisTree.pfjet_e[jet];
-	  float chf = analysisTree.pfjet_chargedhadronicenergy[jet]/energy;
-	  float nhf = analysisTree.pfjet_neutralhadronicenergy[jet]/energy;
-	  float phf = analysisTree.pfjet_neutralemenergy[jet]/energy;
-	  float elf = analysisTree.pfjet_chargedemenergy[jet]/energy;
-	  float chm = analysisTree.pfjet_chargedmulti[jet];
-	  float npr = analysisTree.pfjet_chargedmulti[jet] + analysisTree.pfjet_neutralmulti[jet];
-	  bool isPFJetId = (npr>1 && phf<0.99 && nhf<0.99) && (absJetEta>2.4 || (elf<0.99 && chf>0 && chm>0));
+	  bool isPFJetId = looseJetiD(analysisTree,int(jet));
 	  if (!isPFJetId) continue;
 	  
 	  if (analysisTree.pfjet_pt[jet]>jetPtHighCut) {
@@ -1277,60 +1234,6 @@ int main(int argc, char * argv[]) {
 
 	}
 
-	if (!isData && applyLeptonSF) {
-
-	/*
-	  float ptMu1 = TMath::Min(float(59),analysisTree.muon_pt[indx1]);
-	  float ptMu2 = TMath::Min(float(59),analysisTree.muon_pt[indx2]);
-	  int ptBinMu1 = binNumber(ptMu1,nPtBins,ptBins);
-	  int ptBinMu2 = binNumber(ptMu2,nPtBins,ptBins);
-	  float absEtaMu1 = fabs(analysisTree.muon_eta[indx1]);
-	  float absEtaMu2 = fabs(analysisTree.muon_eta[indx2]);
-	  float dataMu1 = 1;
-	  float mcMu1 = 1;
-	  float dataMu2 = 1;
-	  float mcMu2 = 1;
-	  if(absEtaMu1 < 1.48){
-	    dataMu1 = dataEffBarrel[ptBinMu1];
-	    mcMu1 = mcEffBarrel[ptBinMu1];
-	  }
-	  else {
-	    dataMu1 = dataEffEndcap[ptBinMu1];
-	    mcMu1 = mcEffEndcap[ptBinMu1];
-	  }
-	  if(absEtaMu2 < 1.48){
-	    dataMu2 = dataEffBarrel[ptBinMu2];
-	    mcMu2 = mcEffBarrel[ptBinMu2];
-	  }
-	  else {
-	    dataMu2 = dataEffEndcap[ptBinMu2];
-	    mcMu2 = mcEffEndcap[ptBinMu2];
-	  }
-	  float wMu1 = dataMu1/mcMu1;
-	  float wMu2 = dataMu2/mcMu2;
-	  //	  cout << "Muons SF : Mu1 = " << wMu1 << "   Mu2 = " << wMu2 << endl;
-	*/
-
-	//leptonSFweight = SF_yourScaleFactor->get_ScaleFactor(pt, eta)	
-	double ptMu1 = (double)analysisTree.muon_pt[indx1];
-	double ptMu2 = (double)analysisTree.muon_pt[indx2];
-	double etaMu1 = (double)analysisTree.muon_eta[indx1];
-	double etaMu2 = (double)analysisTree.muon_eta[indx2];
-	double IdIsoSF_mu1 = SF_muonIdIso->get_ScaleFactor(ptMu1, etaMu1);
-	double IdIsoSF_mu2 = SF_muonIdIso->get_ScaleFactor(ptMu2, etaMu2);
-	
-	MuSF_IdIso_Mu1->Fill(IdIsoSF_mu1);
-	MuSF_IdIso_Mu2->Fill(IdIsoSF_mu2);
-        //std::cout << " weight " << weight << std::endl;
-	//std::cout << "eff data mu 1 = " << SF_muonIdIso->get_EfficiencyData(ptMu1, etaMu1)<< " |  eff mc mu 1 = " << SF_muonIdIso->get_EfficiencyMC(ptMu1, etaMu1)<<std::endl;
- 	 //std::cout << "SF mu1 = " << IdIsoSF_mu1 << std::endl;
-	//std::cout << "SF mu2 = " << IdIsoSF_mu2 << std::endl;
-
-	weight = weight*IdIsoSF_mu1*IdIsoSF_mu2;
-        //std::cout << " weight " << weight << std::endl;
-
-	}
-
 	TLorentzVector mu1; mu1.SetXYZM(analysisTree.muon_px[indx1],
 					analysisTree.muon_py[indx1],
 					analysisTree.muon_pz[indx1],
@@ -1344,6 +1247,33 @@ int main(int argc, char * argv[]) {
 	TLorentzVector dimuon = mu1 + mu2;
 	float massSel = dimuon.M();
 	//	cout << "massSel = " << massSel << endl;
+
+	if (!isData && applyLeptonSF) {
+
+	//leptonSFweight = SF_yourScaleFactor->get_ScaleFactor(pt, eta)	
+	  double ptMu1 = (double)analysisTree.muon_pt[indx1];
+	  double ptMu2 = (double)analysisTree.muon_pt[indx2];
+	  double etaMu1 = (double)analysisTree.muon_eta[indx1];
+	  double etaMu2 = (double)analysisTree.muon_eta[indx2];
+	  double IdIsoSF_mu1 = SF_muonIdIso->get_ScaleFactor(ptMu1, etaMu1);
+	  double IdIsoSF_mu2 = SF_muonIdIso->get_ScaleFactor(ptMu2, etaMu2);
+	
+	  MuSF_IdIso_Mu1H->Fill(IdIsoSF_mu1);
+	  MuSF_IdIso_Mu2H->Fill(IdIsoSF_mu2);
+	  //	  if (ptMu1<20||ptMu2<20) {
+	  //	    std::cout << "mu 1 ->  pt = " << ptMu1 << "   eta = " << etaMu1 << std::endl;
+	  //	    std::cout << "eff data mu 1 = " << SF_muonIdIso->get_EfficiencyData(ptMu1, etaMu1)<< " |  eff mc mu 1 = " << SF_muonIdIso->get_EfficiencyMC(ptMu1, etaMu1)<<std::endl;
+	  //	    std::cout << "mu 2 ->  pt = " << ptMu2 << "   eta = " << etaMu2 << std::endl;
+	  //	    std::cout << "eff data mu 2 = " << SF_muonIdIso->get_EfficiencyData(ptMu2, etaMu2)<< " |  eff mc mu 2 = " << SF_muonIdIso->get_EfficiencyMC(ptMu2, etaMu2)<<std::endl;
+	  //	    std::cout << "SF mu1 = " << IdIsoSF_mu1 << std::endl;
+	  //	    std::cout << "SF mu2 = " << IdIsoSF_mu2 << std::endl;
+	  //	    
+	  //	    std::cout << " mass = " << massSel << std::endl;
+	  //	    std::cout << std::endl;
+	  //	  }
+	  weight = weight*IdIsoSF_mu1*IdIsoSF_mu2;
+	}
+
 	
 	massSelH->Fill(massSel,weight);
 	for (int iScale=0; iScale<21; ++ iScale) {
@@ -1352,7 +1282,7 @@ int main(int argc, char * argv[]) {
 	}
 
 	// selection on mass
-	if (massSel>20) {
+	if (massSel>dimuonMassCut) {
 	  ptLeadingMuSelH->Fill(analysisTree.muon_pt[indx1],weight);
 	  ptTrailingMuSelH->Fill(analysisTree.muon_pt[indx2],weight);
 	  etaLeadingMuSelH->Fill(analysisTree.muon_eta[indx1],weight);

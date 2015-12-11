@@ -70,7 +70,7 @@ if runOnData:
     process.GlobalTag.globaltag = '74X_dataRun2_v5'
 else:
   if is25ns:
-    process.GlobalTag.globaltag = '74X_mcRun2_asymptotic_v2'
+    process.GlobalTag.globaltag = '74X_mcRun2_asymptotic_v4'
   else:
     process.GlobalTag.globaltag = '74X_mcRun2_startup_v2'
 
@@ -447,7 +447,7 @@ if usePUJetID5X:
                                      src = cms.InputTag("packedPFCandidates"),
                                      inputEtMin = cms.double(0.0),
                                      srcPVs = cms.InputTag(""),
-                                     jetPtMin = cms.double(3.0),
+                                     jetPtMin = cms.double(5.0),
                                      radiusPU = cms.double(0.5),
                                      maxProblematicEcalCells = cms.uint32(9999999),
                                      doPUOffsetCorr = cms.bool(False),
