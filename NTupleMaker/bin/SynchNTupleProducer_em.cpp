@@ -470,9 +470,22 @@ int main(int argc, char * argv[]) {
   Float_t         mvacov10;
   Float_t         mvacov11;
 
+  Float_t         puppimet;
+  Float_t         puppimetphi;
+
   Float_t         pt_tt;
   Float_t         pzetavis;
   Float_t         pzetamiss;
+
+  Float_t         pzetavis_mvamet;
+  Float_t         pzetamiss_mvamet; 
+
+  Float_t         pzetavis_puppimet;
+  Float_t         pzetamiss_puppimet; 
+  
+  Float_t         genmet;
+  Float_t         genmetphi;
+
   Float_t         mva_gf;
 
   Int_t           njets;
@@ -597,6 +610,10 @@ int main(int argc, char * argv[]) {
   tree->Branch("mvacov01", &mvacov01, "mvacov01/F");
   tree->Branch("mvacov10", &mvacov10, "mvacov10/F");
   tree->Branch("mvacov11", &mvacov11, "mvacov11/F");
+
+  tree->Branch("puppimet", &puppimet, "puppimet/F");
+  tree->Branch("puppimetphi", &puppimetphi, "puppimetphi/F");
+
 
   tree->Branch("pt_tt", &pt_tt, "pt_tt/F");
   tree->Branch("pzetavis", &pzetavis, "pzetavis/F");
@@ -943,8 +960,8 @@ int main(int argc, char * argv[]) {
 	muons.push_back(im);
       }
 
-      cout << "  SelEle=" << electrons.size() 
-	   << "  SelMu=" << muons.size() << std::endl;
+      //      cout << "  SelEle=" << electrons.size() 
+      //	   << "  SelMu=" << muons.size() << std::endl;
 
       if (electrons.size()==0) continue;
       if (muons.size()==0) continue;
@@ -1086,8 +1103,8 @@ int main(int argc, char * argv[]) {
 
       if (electronIndex<0) continue;
       if (muonIndex<0) continue;
-      std::cout << "Post synch selection " << std::endl;
-      std::cout << std::endl;
+      //      std::cout << "Post synch selection " << std::endl;
+      //      std::cout << std::endl;
 
       
 
@@ -1214,6 +1231,12 @@ int main(int argc, char * argv[]) {
       metcov10 = analysisTree.pfmet_sigyx;
       metcov11 = analysisTree.pfmet_sigyy;
 
+      puppimet = TMath::Sqrt(analysisTree.puppimet_ex*analysisTree.puppimet_ex + analysisTree.puppimet_ey*analysisTree.puppimet_ey);
+      puppimetphi = TMath::ATan2(analysisTree.puppimet_ey,analysisTree.puppimet_ex);
+
+      genmet = TMath::Sqrt(analysisTree.genmet_ex*analysisTree.genmet_ex + analysisTree.genmet_ey*analysisTree.genmet_ey);
+      genmetphi = TMath::ATan2(analysisTree.genmet_ey,analysisTree.genmet_ex);
+
       //      cout << "m_vis = " << endl;
 
       // visible ditau pt 
@@ -1235,21 +1258,34 @@ int main(int argc, char * argv[]) {
       zetaY = zetaY/normZeta;
 
       // choosing mva met
-      //      unsigned int metEMu = 0;
-      //      for (unsigned int iMet=0; iMet<analysisTree.mvamet_count; ++iMet) {
-      //	if (analysisTree.mvamet_channel[iMet]==1) metEMu = iMet;
-      //      }
-      //      float mvamet_x = analysisTree.mvamet_ex[metEMu];
-      //      float mvamet_y = analysisTree.mvamet_ey[metEMu];
-      //      float mvamet_x2 = mvamet_x * mvamet_x;
-      //      float mvamet_y2 = mvamet_y * mvamet_y;
+      unsigned int metEMu = 0;
+      bool mvaMetFound = false;
+      for (unsigned int iMet=0; iMet<analysisTree.mvamet_count; ++iMet) {
+      	if (analysisTree.mvamet_channel[iMet]==1) {
+	  if (int(analysisTree.mvamet_lep1[iMet])==muonIndex&&
+	      int(analysisTree.mvamet_lep2[iMet])==electronIndex) {
+	    metEMu = iMet;
+	    mvaMetFound = true;
+	  }
+	}
+      }
+      if (analysisTree.mvamet_count>0) {
+	float mvamet_x = analysisTree.mvamet_ex[metEMu];
+	float mvamet_y = analysisTree.mvamet_ey[metEMu];
+	float mvamet_x2 = mvamet_x * mvamet_x;
+	float mvamet_y2 = mvamet_y * mvamet_y;
 
-      //      mvamet = TMath::Sqrt(mvamet_x2+mvamet_y2);
-      //     mvametphi = TMath::ATan2(mvamet_y,mvamet_x);
-      //      mvacov00 = analysisTree.mvamet_sigxx[metEMu];
-      //      mvacov01 = analysisTree.mvamet_sigxy[metEMu];
-      //      mvacov10 = analysisTree.mvamet_sigyx[metEMu];
-      //      mvacov11 = analysisTree.mvamet_sigyy[metEMu];
+	mvamet = TMath::Sqrt(mvamet_x2+mvamet_y2);
+	mvametphi = TMath::ATan2(mvamet_y,mvamet_x);
+	mvacov00 = TMath::Sqrt(analysisTree.mvamet_sigxx[metEMu]);
+	mvacov01 = analysisTree.mvamet_sigxy[metEMu]/TMath::Sqrt(fabs(analysisTree.mvamet_sigxy[metEMu]));
+	mvacov10 = analysisTree.mvamet_sigyx[metEMu]/TMath::Sqrt(fabs(analysisTree.mvamet_sigyx[metEMu]));
+	mvacov11 = TMath::Sqrt(analysisTree.mvamet_sigyy[metEMu]);
+      }
+
+      if (!mvaMetFound) {
+	cout << "Warning : mvaMet not found : " << endl;
+      }
 
       float vectorX = analysisTree.pfmet_ex + muonLV.Px() + electronLV.Px();
       float vectorY = analysisTree.pfmet_ey + muonLV.Py() + electronLV.Py();
@@ -1258,8 +1294,12 @@ int main(int argc, char * argv[]) {
       float vectorVisY = muonLV.Py() + electronLV.Py();
 
       // computation of DZeta variable
+      // pfmet
       pzetamiss = analysisTree.pfmet_ex*zetaX + analysisTree.pfmet_ey*zetaY;
       pzetavis  = vectorVisX*zetaX + vectorVisY*zetaY;
+
+      // puppimet
+      
 
       // counting jets
       vector<unsigned int> jets; jets.clear();
