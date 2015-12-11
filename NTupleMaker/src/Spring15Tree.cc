@@ -92,6 +92,8 @@ void Spring15Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("d0_1", &d0_1, &b_d0_1);
    fChain->SetBranchAddress("dZ_1", &dZ_1, &b_dZ_1);
    fChain->SetBranchAddress("mt_1", &mt_1, &b_mt_1);
+   fChain->SetBranchAddress("pfmt_1", &pfmt_1, &b_pfmt_1);
+   fChain->SetBranchAddress("puppimt_1", &puppimt_1, &b_puppimt_1);
    fChain->SetBranchAddress("pt_2", &pt_2, &b_pt_2);
    fChain->SetBranchAddress("phi_2", &phi_2, &b_phi_2);
    fChain->SetBranchAddress("eta_2", &eta_2, &b_eta_2);
@@ -103,6 +105,8 @@ void Spring15Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("dZ_2", &dZ_2, &b_dZ_2);
    fChain->SetBranchAddress("mva_2", &mva_2, &b_mva_2);
    fChain->SetBranchAddress("mt_2", &mt_2, &b_mt_2);
+   fChain->SetBranchAddress("pfmt_2", &pfmt_2, &b_pfmt_2);
+   fChain->SetBranchAddress("puppimt_2", &puppimt_2, &b_puppimt_2);
    fChain->SetBranchAddress("os", &os, &b_os);
    fChain->SetBranchAddress("dilepton_veto", &dilepton_veto, &b_dilepton_veto);
    fChain->SetBranchAddress("extraelec_veto", &extraelec_veto, &b_extraelec_veto);
@@ -141,9 +145,13 @@ void Spring15Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("mvacov01", &mvacov01, &b_mvacov01);
    fChain->SetBranchAddress("mvacov10", &mvacov10, &b_mvacov10);
    fChain->SetBranchAddress("mvacov11", &mvacov11, &b_mvacov11);
+   fChain->SetBranchAddress("puppimet", &puppimet, &b_puppimet);
+   fChain->SetBranchAddress("puppimetphi", &puppimetphi, &b_puppimetphi);   
    fChain->SetBranchAddress("pt_tt", &pt_tt, &b_pt_tt);
    fChain->SetBranchAddress("pzetavis", &pzetavis, &b_pzetavis);
    fChain->SetBranchAddress("pzetamiss", &pzetamiss, &b_pzetamiss);
+   fChain->SetBranchAddress("pfpzetamiss", &pfpzetamiss, &b_pfpzetamiss);
+   fChain->SetBranchAddress("puppipzetamiss", &puppipzetamiss, &b_puppipzetamiss);
    fChain->SetBranchAddress("mva_gf", &mva_gf, &b_mva_gf);
    fChain->SetBranchAddress("njets", &njets, &b_njets);
    fChain->SetBranchAddress("njetspt20", &njetspt20, &b_njetspt20);
@@ -282,7 +290,9 @@ void Spring15Tree::WriteInit(TTree *tree) {
   fChain->Branch("d0_1", &d0_1, "d0_1/F");
   fChain->Branch("dZ_1", &dZ_1, "dZ_1/F");
   fChain->Branch("mt_1", &mt_1, "mt_1/F");
-
+  fChain->Branch("pfmt_1", &pfmt_1, "pfmt_1/F");
+  fChain->Branch("puppimt_1", &puppimt_1, "puppimt_1/F");
+  
   fChain->Branch("pt_2", &pt_2, "pt_2/F");
   fChain->Branch("phi_2", &phi_2, "phi_2/F");
   fChain->Branch("eta_2", &eta_2, "eta_2/F");
@@ -294,6 +304,8 @@ void Spring15Tree::WriteInit(TTree *tree) {
   fChain->Branch("dZ_2", &dZ_2, "dZ_2/F");
   fChain->Branch("mva_2", &mva_2, "mva_2/F");
   fChain->Branch("mt_2", &mt_2, "mt_2/F");
+  fChain->Branch("pfmt_2", &pfmt_2, "pfmt_2/F");
+  fChain->Branch("puppimt_2", &puppimt_2, "puppimt_2/F");
   
   fChain->Branch("os", &os, "os/I");
   fChain->Branch("dilepton_veto", &dilepton_veto, "dilepton_veto/I");
@@ -337,10 +349,15 @@ void Spring15Tree::WriteInit(TTree *tree) {
   fChain->Branch("mvacov01", &mvacov01, "mvacov01/F");
   fChain->Branch("mvacov10", &mvacov10, "mvacov10/F");
   fChain->Branch("mvacov11", &mvacov11, "mvacov11/F");
+
+  fChain->Branch("puppimet", &puppimet, "puppimet/F");
+  fChain->Branch("puppimetphi", &puppimetphi, "puppimetphi/F");  
   
   fChain->Branch("pt_tt", &pt_tt, "pt_tt/F");
   fChain->Branch("pzetavis", &pzetavis, "pzetavis/F");
   fChain->Branch("pzetamiss", &pzetamiss, "pzetamiss/F");
+  fChain->Branch("pfpzetamiss", &pfpzetamiss, "pfpzetamiss/F");
+  fChain->Branch("puppipzetamiss", &puppipzetamiss, "puppipzetamiss/F");
   fChain->Branch("mva_gf", &mva_gf, "mva_gf/F");
   
   fChain->Branch("njets", &njets, "njets/I");

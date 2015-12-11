@@ -62,6 +62,8 @@ public :
   Float_t         d0_1;
   Float_t         dZ_1;
   Float_t         mt_1;
+  Float_t         pfmt_1;
+  Float_t         puppimt_1;
   Float_t         pt_2;
   Float_t         phi_2;
   Float_t         eta_2;
@@ -73,6 +75,8 @@ public :
   Float_t         dZ_2;
   Float_t         mva_2;
   Float_t         mt_2;
+  Float_t         pfmt_2;
+  Float_t         puppimt_2;
   Int_t           os;
   Int_t           dilepton_veto;
   Int_t           extraelec_veto;
@@ -111,9 +115,13 @@ public :
   Float_t         mvacov01;
   Float_t         mvacov10;
   Float_t         mvacov11;
+  Float_t         puppimet;
+  Float_t         puppimetphi;
   Float_t         pt_tt;
   Float_t         pzetavis;
   Float_t         pzetamiss;
+  Float_t         pfpzetamiss;
+  Float_t         puppipzetamiss;
   Float_t         mva_gf;
   Int_t           njets;
   Int_t           njetspt20;
@@ -178,6 +186,8 @@ public :
   TBranch        *b_d0_1;   //!
   TBranch        *b_dZ_1;   //!
   TBranch        *b_mt_1;   //!
+  TBranch        *b_pfmt_1;   //!
+  TBranch        *b_puppimt_1;   //!
   TBranch        *b_pt_2;   //!
   TBranch        *b_phi_2;   //!
   TBranch        *b_eta_2;   //!
@@ -189,6 +199,8 @@ public :
   TBranch        *b_dZ_2;   //!
   TBranch        *b_mva_2;   //!
   TBranch        *b_mt_2;   //!
+  TBranch        *b_pfmt_2;   //!
+  TBranch        *b_puppimt_2;   //!
   TBranch        *b_os;   //!
   TBranch        *b_dilepton_veto;   //!
   TBranch        *b_extraelec_veto;   //!
@@ -227,9 +239,13 @@ public :
   TBranch        *b_mvacov01;   //!
   TBranch        *b_mvacov10;   //!
   TBranch        *b_mvacov11;   //!
+  TBranch        *b_puppimet;   //!
+  TBranch        *b_puppimetphi;   //!  
   TBranch        *b_pt_tt;   //!
   TBranch        *b_pzetavis;   //!
   TBranch        *b_pzetamiss;   //!
+  TBranch        *b_pfpzetamiss;   //!
+  TBranch        *b_puppipzetamiss;   //!
   TBranch        *b_mva_gf;   //!
   TBranch        *b_njets;   //!
   TBranch        *b_njetspt20;   //!

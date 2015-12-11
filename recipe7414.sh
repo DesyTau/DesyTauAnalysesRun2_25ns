@@ -39,6 +39,16 @@ cd ${CMSSW_BASE}/src/
 ## ## adding the pairwise MVA MEt calculation
 cp ${CMSSW_BASE}/src/DesyTauAnalyses/patch/MVAMEt/PFMETProducerMVATauTau* ${CMSSW_BASE}/src/RecoMET/METPUSubtraction/plugins/.
 
+## MVA MEt covariance matrix fix as from Raphael's talk
+findline='mvaOutputCovU1_ = GetResponse(mvaReaderCovU1_, varForCovU1_)\* mvaOutputU_ \* var_\["particleFlow_U"\]\;'
+replaceline='mvaOutputCovU1_ = std::pow(GetResponse(mvaReaderCovU1_, varForCovU1_)\* mvaOutputU_ \* var_\["particleFlow_U"\], 2)\;'
+sed -i -e 's/'$findline'/'$replaceline'/' ${CMSSW_BASE}/src/RecoMET/METPUSubtraction/src/PFMETAlgorithmMVA.cc
+
+findline='mvaOutputCovU2_ = GetResponse(mvaReaderCovU2_, varForCovU2_)\* mvaOutputU_ \* var_\["particleFlow_U"\]\;'
+replaceline='mvaOutputCovU2_ = std::pow(GetResponse(mvaReaderCovU2_, varForCovU2_)\* mvaOutputU_ \* var_\["particleFlow_U"\], 2)\;'
+sed -i -e 's/'$findline'/'$replaceline'/' ${CMSSW_BASE}/src/RecoMET/METPUSubtraction/src/PFMETAlgorithmMVA.cc
+
+
 scram b -j 32
 scram b -j 32
 
