@@ -237,9 +237,9 @@ void FitPassAndFail(TString SampleName,
   fitFuncPass->SetLineWidth(2);
   fitFuncPass->SetLineColor(2);
 
-  float xBkg = aPar*exp(-bPar*91.2);
-  float xTot = histPass->GetBinContent(histPass->FindBin(91.2));
-  float xSig = xTot - xBkg;
+  //float xBkg = aPar*exp(-bPar*91.2);
+  //float xTot = histPass->GetBinContent(histPass->FindBin(91.2));
+  //float xSig = xTot - xBkg;
   fitFuncPass->SetParameter(0,xSig);
 
   c1->cd();

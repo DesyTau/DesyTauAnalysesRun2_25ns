@@ -1,12 +1,8 @@
-
+#ifndef Jets_h
+#define Jets_h
 #include "DesyTauAnalyses/NTupleMaker/interface/Config.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/AC1B.h"
 using namespace std;
-const double MuMass = 0.105658367;
-const double tauMass = 1.776;
-const double electronMass = 0;
-const double muonMass = 0.10565837;
-const double pionMass = 0.1396;
 
 
 bool tightJetiD(AC1B &tree_ ,int jet){
@@ -74,6 +70,23 @@ bool tightLepVetoJetiD(AC1B &tree_, int jet){
 }
 
 
+double JERSF(double eta, double weight){
+
+  double absEta = fabs(eta);
+
+  if ( absEta<0.8) { weight *=1.061;}
+  if ( absEta>0.8 && absEta<1.3) { weight *=1.088;}
+  if ( absEta>1.3 && absEta<1.9) { weight *=1.106;}
+  if ( absEta>1.9 && absEta<2.5) { weight *=1.126;}
+  if ( absEta>2.5 && absEta<3.0) { weight *=1.343;}
+  if ( absEta>3.0 && absEta<3.2) { weight *=1.303;}
+  if ( absEta>3.2 && absEta<3.5) { weight *=1.320;}
+
+  return weight;
+
+}	
 
 
 
+
+#endif

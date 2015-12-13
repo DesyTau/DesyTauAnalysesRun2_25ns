@@ -21,11 +21,11 @@
 
 #include "TRandom.h"
 
-#include "AnalysisMacro.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/Config.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/AC1B.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/json.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/PileUp.h"
+#include "DesyTauAnalyses/NTupleMaker/interface/AnalysisMacro.h"
 #include "TGraphAsymmErrors.h"
 
 int main(int argc, char * argv[]) {
