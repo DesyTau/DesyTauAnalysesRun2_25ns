@@ -16,6 +16,7 @@
 #include "TRFIOFile.h"
 #include "TH1D.h"
 #include "TChain.h"
+#include "TMath.h"
 #include "TCanvas.h"
 #include "TLorentzVector.h"
 #include "TPaveText.h"
@@ -26,9 +27,259 @@
 #include "DesyTauAnalyses/NTupleMaker/interface/AC1B.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/json.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/PileUp.h"
-#include "DesyTauAnalyses/NTupleMaker/interface/ScaleFactor.h"
-#include "DesyTauAnalyses/NTupleMaker/interface/Jets.h"
-#include "DesyTauAnalyses/NTupleMaker/interface/functions.h"
+
+const float electronMass = 0;
+const float muonMass = 0.10565837;
+const float pionMass = 0.1396;
+
+int binNumber(float x, int nbins, float * bins) {
+
+  int binN = -1;
+
+  for (int iB=0; iB<nbins; ++iB) {
+    if (x>=bins[iB]&&x<bins[iB+1]) {
+      binN = iB;
+      break;
+    }
+  }
+
+  return binN;
+
+}
+
+float effBin(float x, int nbins, float * bins, float * eff) {
+
+  int bin = binNumber(x, nbins, bins);
+
+  return eff[bin];
+
+}
+
+double cosRestFrame(TLorentzVector boost, TLorentzVector vect) {
+
+  double bx = -boost.Px()/boost.E();
+  double by = -boost.Py()/boost.E();
+  double bz = -boost.Pz()/boost.E();
+
+  vect.Boost(bx,by,bz);
+  double prod = -vect.Px()*bx-vect.Py()*by-vect.Pz()*bz;
+  double modBeta = TMath::Sqrt(bx*bx+by*by+bz*bz); 
+  double modVect = TMath::Sqrt(vect.Px()*vect.Px()+vect.Py()*vect.Py()+vect.Pz()*vect.Pz());
+  
+  double cosinus = prod/(modBeta*modVect);
+
+  return cosinus;
+
+}
+
+double QToEta(double Q) {
+  double Eta = - TMath::Log(TMath::Tan(0.5*Q));  
+  return Eta;
+}
+
+double EtaToQ(double Eta) {
+  double Q = 2.0*TMath::ATan(TMath::Exp(-Eta));
+  if (Q<0.0) Q += TMath::Pi();
+  return Q;
+}
+
+double PtoEta(double Px, double Py, double Pz) {
+
+  double P = TMath::Sqrt(Px*Px+Py*Py+Pz*Pz);
+  double cosQ = Pz/P;
+  double Q = TMath::ACos(cosQ);
+  double Eta = - TMath::Log(TMath::Tan(0.5*Q));  
+  return Eta;
+
+}
+
+double PtoPhi(double Px, double Py) {
+  return TMath::ATan2(Py,Px);
+}
+
+double PtoPt(double Px, double Py) {
+  return TMath::Sqrt(Px*Px+Py*Py);
+}
+
+double dPhiFrom2P(double Px1, double Py1,
+		  double Px2, double Py2) {
+
+
+  double prod = Px1*Px2 + Py1*Py2;
+  double mod1 = TMath::Sqrt(Px1*Px1+Py1*Py1);
+  double mod2 = TMath::Sqrt(Px2*Px2+Py2*Py2);
+  
+  double cosDPhi = prod/(mod1*mod2);
+  
+  return TMath::ACos(cosDPhi);
+
+}
+
+double deltaEta(double Px1, double Py1, double Pz1,
+		double Px2, double Py2, double Pz2) {
+
+  double eta1 = PtoEta(Px1,Py1,Pz1);
+  double eta2 = PtoEta(Px2,Py2,Pz2);
+
+  double dEta = eta1 - eta2;
+
+  return dEta;
+
+}
+
+double deltaR(double Eta1, double Phi1,
+	      double Eta2, double Phi2) {
+
+  double Px1 = TMath::Cos(Phi1);
+  double Py1 = TMath::Sin(Phi1);
+
+  double Px2 = TMath::Cos(Phi2);
+  double Py2 = TMath::Sin(Phi2);
+
+  double dPhi = dPhiFrom2P(Px1,Py1,Px2,Py2);
+  double dEta = Eta1 - Eta2;
+
+  double dR = TMath::Sqrt(dPhi*dPhi+dEta*dEta);
+
+  return dR;
+
+}
+
+double PtEtaToP(double Pt, double Eta) {
+
+  //  double Q = EtaToQ(Eta);
+
+  //double P = Pt/TMath::Sin(Q);
+  double P = Pt*TMath::CosH(Eta);
+
+  return P;
+}
+double Px(double Pt, double Phi){
+
+  double Px=Pt*TMath::Cos(Phi);
+  return Px;
+}
+double Py(double Pt, double Phi){
+
+  double Py=Pt*TMath::Sin(Phi);
+  return Py;
+}
+double Pz(double Pt, double Eta){
+
+  double Pz=Pt*TMath::SinH(Eta);
+  return Pz;
+}
+double InvariantMass(double energy,double Px,double Py, double Pz){
+
+  double M_2=energy*energy-Px*Px-Py*Py-Pz*Pz;
+  double M=TMath::Sqrt(M_2);
+  return M;
+
+
+}
+double EFromPandM0(double M0,double Pt,double Eta){
+
+  double E_2=M0*M0+PtEtaToP(Pt,Eta)*PtEtaToP(Pt,Eta);
+  double E =TMath::Sqrt(E_2);
+  return E;
+
+}
+
+bool electronMvaIdTight(float eta, float mva) {
+
+  float absEta = fabs(eta);
+
+  bool passed = false;
+  if (absEta<0.8) {
+    if (mva>0.73) passed = true;
+  }
+  else if (absEta<1.479) {
+    if (mva>0.57) passed = true;
+  }
+  else {
+    if (mva>0.05) passed = true;
+  }
+
+  return passed;
+
+}
+
+bool electronMvaIdLoose(float eta, float mva) {
+
+  float absEta = fabs(eta);
+
+  bool passed = false;
+  if (absEta<0.8) {
+    if (mva>0.35) passed = true;
+  }
+  else if (absEta<1.479) {
+    if (mva>0.20) passed = true;
+  }
+  else {
+    if (mva>-0.52) passed = true;
+  }
+
+  return passed;
+
+}
+
+bool electronMvaIdWP80(float pt, float eta, float mva) {
+
+  float absEta = fabs(eta);
+  bool passed = false;
+  if (absEta<0.8) {
+    if (pt<10) 
+      passed = mva > -0.253;
+    else 
+      passed = mva > 0.965;
+  }
+  else if (absEta<1.479) {
+    if (pt<10)
+      passed = mva > 0.081;
+    else
+      passed = mva > 0.917;
+  }
+  else {
+    if (pt<10)
+      passed = mva > -0.081;
+    else
+      passed = mva > 0.683;
+  }
+
+  return passed;
+
+}
+
+bool electronMvaIdWP90(float pt, float eta, float mva) {
+
+  float absEta = fabs(eta);
+  bool passed = false;
+  if (absEta<0.8) {
+    if (pt<10) 
+      passed = mva > -0.483;
+    else 
+      passed = mva > 0.933;
+  }
+  else if (absEta<1.479) {
+    if (pt<10)
+      passed = mva > -0.267;
+    else
+      passed = mva > 0.825;
+  }
+  else {
+    if (pt<10)
+      passed = mva > -0.323;
+    else
+      passed = mva > 0.337;
+  }
+
+  return passed;
+
+}
+
+struct myclass {
+  bool operator() (int i,int j) { return (i<j);}
+} myobject, myobjectX;
 
 
 int main(int argc, char * argv[]) {
@@ -61,7 +312,6 @@ int main(int argc, char * argv[]) {
   const float dxyMuonLooseCut     = cfg.get<float>("dxyMuonLooseCut");
   const float dzMuonLooseCut      = cfg.get<float>("dzMuonLooseCut");
   const float isoMuonCut     = cfg.get<float>("isoMuonCut");
-  const float isoMuonProbeCut = cfg.get<float>("isoMuonProbeCut");
   const bool  applyTauTauSelection = cfg.get<bool>("ApplyTauTauSelection");
   const bool  selectZToTauTauMuMu = cfg.get<bool>("SelectZToTauTauMuMu");
 
@@ -70,7 +320,6 @@ int main(int argc, char * argv[]) {
   const float dPhileptonsCut = cfg.get<float>("dPhileptonsCut");
   const float DRTrigMatch    = cfg.get<float>("DRTrigMatch"); 
   const bool oppositeSign    = cfg.get<bool>("OppositeSign");
-  const float dimuonMassCut = cfg.get<float>("DimuonMassCut");
   const bool isoDR03         = cfg.get<bool>("IsoDR03");
 
   // trigger
@@ -103,12 +352,23 @@ int main(int argc, char * argv[]) {
   const float jetPtLowCut    = cfg.get<float>("JetPtLowCut");
   const float dRJetLeptonCut = cfg.get<float>("dRJetLeptonCut");
 
+  // Run range
+  const unsigned int RunRangeMin = cfg.get<unsigned int>("RunRangeMin");
+  const unsigned int RunRangeMax = cfg.get<unsigned int>("RunRangeMax");
+
+  //
+  const string dataBaseDir = cfg.get<string>("DataBaseDir");
+
   // vertex distributions filenames and histname
   const string vertDataFileName = cfg.get<string>("VertexDataFileName");
   const string vertMcFileName   = cfg.get<string>("VertexMcFileName");
   const string vertHistName     = cfg.get<string>("VertexHistName");
 
-  const string MuonIdIsoFile = cfg.get<string>("MuonIdIsoEff");
+  // lepton scale factors
+  const string muonSfDataBarrel = cfg.get<string>("MuonSfDataBarrel");
+  const string muonSfDataEndcap = cfg.get<string>("MuonSfDataEndcap");
+  const string muonSfMcBarrel = cfg.get<string>("MuonSfMcBarrel");
+  const string muonSfMcEndcap = cfg.get<string>("MuonSfMcEndcap");
 
   const string jsonFile = cfg.get<string>("jsonFile");
   // **** end of configuration
@@ -136,65 +396,25 @@ int main(int argc, char * argv[]) {
 
 
   // file name and tree name
-  std::string rootFileName(argv[2]);
-  std::ifstream fileList(argv[2]);
-  std::ifstream fileList0(argv[2]);
-  std::string ntupleName("makeroottree/AC1B");
-  std::string initNtupleName("initroottree/AC1B");
-
-  TString TStrName(rootFileName);
-  std::cout <<TStrName <<std::endl;  
 
   TH1::SetDefaultSumw2(true);
 
-  TFile * file = new TFile(TStrName+TString(".root"),"recreate");
+  char ff[100];
+  sprintf(ff,"%s/%s",argv[3],argv[2]);
+  // file name and tree name
+  std::string rootFileName(argv[2]);
+  std::ifstream fileList(ff);
+  std::ifstream fileList0(ff);
+  std::string ntupleName("makeroottree/AC1B");
+  std::string initNtupleName("initroottree/AC1B");
+  
+  TString era=argv[3];
+
+  TString TStrName(rootFileName);
+  std::cout <<" The filename will be "<<TStrName <<std::endl;  
+  TFile * file = new TFile(era+"/"+TStrName+TString(".root"),"recreate");
   file->cd("");
 
-  int eventNumber;
-  int runNumber;
-  bool IsoMu17;
-
-  float ptTag;
-  float etaTag;
-  float phiTag;
-  float dxyTag;
-  float dzTag;
-  float chargeTag;
-  float isoTag;
-  bool isMediumTag;
-
-  float ptProbe;
-  float etaProbe;
-  float phiProbe;
-  float dxyProbe;
-  float dzProbe;
-  float chargeProbe;
-  float isoProbe;
-  bool isMediumProbe;
-
-  float massTagProbe;
-
-  TTree * events = new TTree("events","events");
-  events->Branch("eventNumber",&eventNumber,"eventNumber/I");
-  events->Branch("runNumber",&runNumber,"runNumber/I");
-  events->Branch("IsoMu17",&IsoMu17,"IsoMu17/O");
-  events->Branch("ptTag",&ptTag,"ptTag/F");
-  events->Branch("etaTag",&etaTag,"etaTag/F");
-  events->Branch("phiTag",&phiTag,"phiTag/F");
-  events->Branch("dxyTag",&dxyTag,"dxyTag/F");
-  events->Branch("dzTag",&dzTag,"dzTag/F");
-  events->Branch("chargeTag",&chargeTag,"chargeTag/F");
-  events->Branch("isoTag",&isoTag,"isoTag/F");
-  events->Branch("isMediumTag",&isMediumTag,"isMediumTag/O");
-  events->Branch("ptProbe",&ptProbe,"ptProbe/F");
-  events->Branch("etaProbe",&etaProbe,"etaProbe/F");
-  events->Branch("phiProbe",&phiProbe,"phiProbe/F");
-  events->Branch("dxyProbe",&dxyProbe,"dxyProbe/F");
-  events->Branch("dzProbe",&dzProbe,"dzProbe/F");
-  events->Branch("chargeProbe",&chargeProbe,"chargeProbe/F");
-  events->Branch("isoProbe",&isoProbe,"isoProbe/F");
-  events->Branch("isMediumProbe",&isMediumProbe,"isMediumProbe/O");
-  events->Branch("massTagProbe",&massTagProbe,"massTagProbe/F");
 
 
   TH1D * inputEventsH = new TH1D("inputEventsH","",1,-0.5,0.5);
@@ -262,11 +482,8 @@ int main(int argc, char * argv[]) {
 
   TH1D * NumberOfVerticesH = new TH1D("NumberOfVerticesH","",51,-0.5,50.5);
 
-  TH1D * MuSF_IdIso_Mu1H = new TH1D("MuIdIsoSF_Mu1H", "MuIdIsoSF_Mu1", 100, 0.5,1.5);
-  TH1D * MuSF_IdIso_Mu2H = new TH1D("MuIdIsoSF_Mu2H", "MuIdIsoSF_Mu2", 100, 0.5,1.5);
-
-  int nPtBins = 7;
-  float ptBins[8] = {10,15,20,25,30,40,60,1000};
+  int nPtBins = 8;
+  float ptBins[9] = {10,13,16,20,25,30,40,60,1000};
 
   int nPtBinsTrig = 16;
   float ptBinsTrig[17] = {10,
@@ -290,8 +507,9 @@ int main(int argc, char * argv[]) {
   int nEtaBins = 3;
   float etaBins[4] = {0,0.9,1.2,2.4}; 
   
-  TString PtBins[7] = {"Pt10to15",
-		       "Pt15to20",
+  TString PtBins[8] = {"Pt10to13",
+		       "Pt13to16",
+		       "Pt16to20",
 		       "Pt20to25",
 		       "Pt25to30",
 		       "Pt30to40",
@@ -319,43 +537,19 @@ int main(int argc, char * argv[]) {
 			"Eta0p9to1p2",
 			"EtaGt1p2"};
 
+  TH1D * ZMassEtaPtPass[3][8];
+  TH1D * ZMassEtaPtFail[3][8];
+
   TString JetBins[3] = {"Jet0","Jet1","JetGe2"};
 
   //*****  create eta histogram with eta ranges associated to their names (eg. endcap, barrel)   ***** //
-
-  TH1F * etaBinsH = new TH1F("etaBinsH", "etaBinsH", nEtaBins, etaBins);
+  TH1D * etaBinsH = new TH1D("etaBinsH", "etaBinsH", nEtaBins, etaBins);
   etaBinsH->Draw();
   etaBinsH->GetXaxis()->Set(nEtaBins, etaBins);
   for (int i=0; i<nEtaBins; i++){ etaBinsH->GetXaxis()->SetBinLabel(i+1, EtaBins[i]);}
-  etaBinsH->Draw();
-  file->cd();
-  etaBinsH->Write("etaBinsH");
 
-
-  //*****  create pt histogram_s with pt ranges associated to their names (eg. Pt10to13, ..)   ***** //
-  //*****  two different pT binning, one for IdIso and one for trigger   ***** //
-
-  TH1D * ptBinsH =  new TH1D("ptBinsH", "ptBinsH", nPtBins, ptBins);
-  ptBinsH->Draw();
-  ptBinsH->GetXaxis()->Set(nPtBins, ptBins);
-  for (int i=0; i<nPtBins; i++){ ptBinsH->GetXaxis()->SetBinLabel(i+1, PtBins[i]);}
-  ptBinsH->Draw();
-  file->cd();
-  ptBinsH->Write("ptBinsH");
-
-  TH1D * ptBinsTrigH =  new TH1D("ptBinsTrigH", "ptBinsTrigH", nPtBinsTrig, ptBinsTrig);
-  ptBinsTrigH->Draw();
-  ptBinsTrigH->GetXaxis()->Set(nPtBinsTrig, ptBinsTrig);
-  for (int i=0; i<nPtBinsTrig; i++){ ptBinsTrigH->GetXaxis()->SetBinLabel(i+1, PtBinsTrig[i]);}
-  ptBinsTrigH->Draw();
-  file->cd();
-  ptBinsTrigH->Write("ptBinsTrigH");
-
-  TH1D * ZMassEtaPtPass[3][7];
-  TH1D * ZMassEtaPtFail[3][7];
-
-  TH1D * ZMassJetEtaPtPass[3][3][7];
-  TH1D * ZMassJetEtaPtFail[3][3][7];
+  TH1D * ZMassJetEtaPtPass[3][3][8];
+  TH1D * ZMassJetEtaPtFail[3][3][8];
 
   TH1D * PromptPtPass[3];
   TH1D * PromptPtFail[3];
@@ -425,13 +619,32 @@ int main(int argc, char * argv[]) {
     }
   }
 
+  TH1D * ZMassMu23BarrelPass = new TH1D("ZMassMu23BarrelPass","",80,50,130);
+  TH1D * ZMassMu23BarrelFail = new TH1D("ZMassMu23BarrelFail","",80,50,130);
+  TH1D * ZMassMu23EndcapPass = new TH1D("ZMassMu23EndcapPass","",80,50,130);
+  TH1D * ZMassMu23EndcapFail = new TH1D("ZMassMu23EndcapFail","",80,50,130);
+
+  TH1D * ZMassMu17BarrelPass = new TH1D("ZMassMu17BarrelPass","",80,50,130);
+  TH1D * ZMassMu17BarrelFail = new TH1D("ZMassMu17BarrelFail","",80,50,130);
+  TH1D * ZMassMu17EndcapPass = new TH1D("ZMassMu17EndcapPass","",80,50,130);
+  TH1D * ZMassMu17EndcapFail = new TH1D("ZMassMu17EndcapFail","",80,50,130);
+
+  TH1D * ZMassIsoMuBarrelPass = new TH1D("ZMassIsoMuBarrelPass","",80,50,130);
+  TH1D * ZMassIsoMuBarrelFail = new TH1D("ZMassIsoMuBarrelFail","",80,50,130);
+  TH1D * ZMassIsoMuEndcapPass = new TH1D("ZMassIsoMuEndcapPass","",80,50,130);
+  TH1D * ZMassIsoMuEndcapFail = new TH1D("ZMassIsoMuEndcapFail","",80,50,130);
+
+  TH1D * ZMassMu8BarrelPass  = new TH1D("ZMassMu8BarrelPass", "",80,50,130);
+  TH1D * ZMassMu8BarrelFail  = new TH1D("ZMassMu8BarrelFail", "",80,50,130);
+  TH1D * ZMassMu8EndcapPass  = new TH1D("ZMassMu8EndcapPass", "",80,50,130);
+  TH1D * ZMassMu8EndcapFail  = new TH1D("ZMassMu8EndcapFail", "",80,50,130);
+
   TH1D * PUweightsOfficialH = new TH1D("PUweightsOfficialH","PU weights w/ official reweighting",1000, 0, 10);
   TH1D * nTruePUInteractionsH = new TH1D("nTruePUInteractionsH","",50,-0.5,49.5);
 
   int nJetBins = 3;
   int nZPtBins = 5;
   float zPtBins[6] = {0,10,20,30,50,1000};
-  float jetBins[4] = {-0.5,0.5,1.5,2.5};
 
   TString NJetBins[3] = {"NJet0","NJet1","NJetGe2"};
   TString ZPtBins[5] = {"Pt0to10",
@@ -444,16 +657,6 @@ int main(int argc, char * argv[]) {
   TString RecoilZPerp("recoilZPerp_");
   TString RecoilPuppiZParal("recoilPuppiZParal_");
   TString RecoilPuppiZPerp("recoilPuppiZPerp_");
-
-  // Saving Z pt bins
-  TH1D * ZPtBinsH = new TH1D("ZPtBinsH","ZPtBinsH",nZPtBins,zPtBins);
-  for (int iB=0; iB<nZPtBins; ++iB) 
-    ZPtBinsH->GetXaxis()->SetBinLabel(iB+1,ZPtBins[iB]);
-  
-  // Saving jet bins
-  TH1D * JetBinsH = new TH1D("JetBinsH","JetBinsH",nJetBins,jetBins);
-  for (int iB=0; iB<nJetBins; ++iB)
-    JetBinsH->GetXaxis()->SetBinLabel(iB+1,NJetBins[iB]);
 
   TH1D * recoilZParalH[3];
   TH1D * recoilZPerpH[3];
@@ -490,8 +693,8 @@ int main(int argc, char * argv[]) {
   // reweighting with vertices
 
   // reading vertex weights
-  TFile * fileDataNVert = new TFile(TString(cmsswBase)+"/src/"+vertDataFileName);
-  TFile * fileMcNVert   = new TFile(TString(cmsswBase)+"/src/"+vertMcFileName);
+  TFile * fileDataNVert = new TFile(TString(cmsswBase)+"/src/"+dataBaseDir+"/"+vertDataFileName);
+  TFile * fileMcNVert   = new TFile(TString(cmsswBase)+"/src/"+dataBaseDir+"/"+vertMcFileName);
 
   TH1D * vertexDataH = (TH1D*)fileDataNVert->Get(TString(vertHistName));
   TH1D * vertexMcH   = (TH1D*)fileMcNVert->Get(TString(vertHistName));
@@ -517,13 +720,27 @@ int main(int argc, char * argv[]) {
   }
 
 
-// Lepton Scale Factors 
 
-  ScaleFactor * SF_muonIdIso; 
-  if (applyLeptonSF) {
-    SF_muonIdIso = new ScaleFactor();
-    SF_muonIdIso->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(MuonIdIsoFile));
-  }
+  TFile *f10 = new TFile(TString(cmsswBase)+"/src/"+dataBaseDir+"/"+muonSfDataBarrel);  // mu SF barrel data
+  TFile *f11 = new TFile(TString(cmsswBase)+"/src/"+dataBaseDir+"/"+muonSfDataEndcap); // mu SF endcap data
+  TFile *f12 = new TFile(TString(cmsswBase)+"/src/"+dataBaseDir+"/"+muonSfMcBarrel);  // mu SF barrel MC
+  TFile *f13 = new TFile(TString(cmsswBase)+"/src/"+dataBaseDir+"/"+muonSfMcEndcap); // mu SF endcap MC 
+  
+  TGraphAsymmErrors *hEffBarrelData = (TGraphAsymmErrors*)f10->Get("ZMassBarrel");
+  TGraphAsymmErrors *hEffEndcapData = (TGraphAsymmErrors*)f11->Get("ZMassEndcap");
+  TGraphAsymmErrors *hEffBarrelMC = (TGraphAsymmErrors*)f12->Get("ZMassBarrel");
+  TGraphAsymmErrors *hEffEndcapMC = (TGraphAsymmErrors*)f13->Get("ZMassEndcap");
+  
+  double * dataEffBarrel = new double[10];
+  double * dataEffEndcap = new double[10];
+  double * mcEffBarrel = new double[10];
+  double * mcEffEndcap = new double[10];
+  
+  dataEffBarrel = hEffBarrelData->GetY();
+  dataEffEndcap = hEffEndcapData->GetY();
+  mcEffBarrel = hEffBarrelMC->GetY();
+  mcEffEndcap = hEffEndcapMC->GetY();
+
 
   int nFiles = 0;
   int nEvents = 0;
@@ -549,7 +766,7 @@ int main(int argc, char * argv[]) {
 
 
   for (int iF=0; iF<nTotalFiles; ++iF) {
-  
+
     std::string filen;
     fileList >> filen;
 
@@ -626,7 +843,7 @@ int main(int argc, char * argv[]) {
 	  double Ninteractions = analysisTree.numtruepileupinteractions;
 	  double PUweight = PUofficial->get_PUweight(Ninteractions);
 	  weight *= float(PUweight);
-	  PUweightsOfficialH->Fill(PUweight);
+	  //	  PUweightsOfficialH->Fill(PUweight);
 	  //	  cout << PUweight << endl;
         }
 
@@ -812,8 +1029,8 @@ int main(int argc, char * argv[]) {
 	bool mu17Matched = false;
 	bool mu8Matched  = false;
 	bool muSingleMatched = false;
-	if (analysisTree.muon_pt[im]<ptBins[0]) continue;
-	if (fabs(analysisTree.muon_eta[im])>etaBins[nEtaBins]) continue;
+	if (analysisTree.muon_pt[im]<ptMuonLowCut) continue;
+	if (fabs(analysisTree.muon_eta[im])>etaMuonLowCut) continue;
 	if (fabs(analysisTree.muon_dxy[im])>dxyMuonLooseCut) continue;
 	if (fabs(analysisTree.muon_dz[im])>dzMuonLooseCut) continue;
 	allMuons.push_back(im);
@@ -840,11 +1057,11 @@ int main(int argc, char * argv[]) {
 	}
 	float relIso = absIso/analysisTree.muon_pt[im];
 	allMuonsIso.push_back(relIso);
-	if (muPassed && relIso<isoMuonCut) { 
+	if (relIso>isoMuonCut) muPassed = false;
+	if (muPassed && analysisTree.muon_pt[im]>ptMuonLowCut) { 
 	  isoMuons.push_back(im);
 	  isoMuonsValue.push_back(relIso);
 	}
-	if (relIso>isoMuonProbeCut) muPassed = false;
 	//	cout << "pt:" << analysisTree.muon_pt[im] << "  passed:" << muPassed << endl;
 	isMuonPassedIdIso.push_back(muPassed);
 	for (unsigned int iT=0; iT<analysisTree.trigobject_count; ++iT) {
@@ -914,7 +1131,7 @@ int main(int argc, char * argv[]) {
 	  if (relativeDifference<0.05) {
 	    isPrompt = true;
 	    float absEtaProbe = TMath::Abs(genMuon.Eta());
-	    if (absEtaProbe>=etaMuonLowCut) absEtaProbe = fabs(etaBins[nEtaBins]) - 0.01;
+	    if (absEtaProbe>=etaMuonLowCut) absEtaProbe = etaMuonLowCut - 0.01;
 	    int iEta = binNumber(absEtaProbe,nEtaBins,etaBins);
 	    if (isMuonPassedIdIso[iRecoMuons]) 
 	      PromptPtPass[iEta]->Fill(genMuon.Pt(),weight);
@@ -946,7 +1163,7 @@ int main(int argc, char * argv[]) {
 	  if (relativeDifference<0.05) {
 	    isNonPrompt = true;
 	    float absEtaProbe = TMath::Abs(genMuon.Eta());
-	    if (absEtaProbe>=etaMuonLowCut) absEtaProbe = fabs(etaBins[nEtaBins]) - 0.01;
+	    if (absEtaProbe>=etaMuonLowCut) absEtaProbe = etaMuonLowCut - 0.01;
             int iEta = binNumber(absEtaProbe,nEtaBins,etaBins);
  	    if (isMuonPassedIdIso[iRecoMuons]) 
 	      NonPromptPtPass[iEta]->Fill(genMuon.Pt(),weight);
@@ -1023,7 +1240,15 @@ int main(int argc, char * argv[]) {
 		if (dR2<dRJetLeptonCut) continue;
 	  
 		// pfJetId
-		bool isPFJetId = looseJetiD(analysisTree,int(jet));
+		
+		float energy = analysisTree.pfjet_e[jet];
+		float chf = analysisTree.pfjet_chargedhadronicenergy[jet]/energy;
+		float nhf = 1 - analysisTree.pfjet_chargedhadronicenergy[jet]/energy;
+		float phf = 1 - analysisTree.pfjet_chargedemenergy[jet]/energy;
+		float elf = analysisTree.pfjet_chargedemenergy[jet]/energy;
+		float chm = analysisTree.pfjet_chargedmulti[jet];
+		float npr = analysisTree.pfjet_chargedmulti[jet] + analysisTree.pfjet_neutralmulti[jet];
+		bool isPFJetId = (npr>1 && phf<0.99 && nhf<0.99) && (absJetEta>2.4 || (elf<0.99 && chf>0 && chm>0));
 		if (!isPFJetId) continue;
 		
 		if (analysisTree.pfjet_pt[jet]>jetPtHighCut) {
@@ -1055,22 +1280,79 @@ int main(int argc, char * argv[]) {
 		  ZMassMu23EtaPtPass[etaBin][ptBinTrig]->Fill(mass,weight); 
 		else
 		  ZMassMu23EtaPtFail[etaBin][ptBinTrig]->Fill(mass,weight); 
+		if (ptProbe>24&&absEtaProbe<2.4) {
+		  if (absEtaProbe<1.48) {
+		    if (isMuonMatched23Filter[iMu]) 
+		      ZMassMu23BarrelPass->Fill(mass,weight); 
+		    else
+		      ZMassMu23BarrelFail->Fill(mass,weight);
+		  }
+		  else {
+		    if (isMuonMatched23Filter[iMu])
+                      ZMassMu23EndcapPass->Fill(mass,weight);
+                    else
+                      ZMassMu23EndcapFail->Fill(mass,weight);
+		  }
+		}
 		// muon17 filter
 		if (isMuonMatched17Filter[iMu]) 
 		  ZMassMu17EtaPtPass[etaBin][ptBinTrig]->Fill(mass,weight); 
 		else
 		  ZMassMu17EtaPtFail[etaBin][ptBinTrig]->Fill(mass,weight); 
+		if (ptProbe>18&&absEtaProbe<2.4) {
+		  if (absEtaProbe<1.48) {
+		    if (isMuonMatched17Filter[iMu]) 
+		      ZMassMu17BarrelPass->Fill(mass,weight); 
+		    else
+		      ZMassMu17BarrelFail->Fill(mass,weight);
+		  }
+		  else {
+		    if (isMuonMatched17Filter[iMu])
+                      ZMassMu17EndcapPass->Fill(mass,weight);
+                    else
+                      ZMassMu17EndcapFail->Fill(mass,weight);
+		  }
+		}
 		// muon8 filter
 		if (isMuonMatched8Filter[iMu]) 
 		  ZMassMu8EtaPtPass[etaBin][ptBinTrig]->Fill(mass,weight); 
 		else
 		  ZMassMu8EtaPtFail[etaBin][ptBinTrig]->Fill(mass,weight); 
+		if (ptProbe>10&&absEtaProbe<2.4) {
+		  if (absEtaProbe<1.48) {
+		    if (isMuonMatched8Filter[iMu]) 
+		      ZMassMu8BarrelPass->Fill(mass,weight); 
+		    else
+		      ZMassMu8BarrelFail->Fill(mass,weight);
+		  }
+		  else {
+		    if (isMuonMatched8Filter[iMu])
+                      ZMassMu8EndcapPass->Fill(mass,weight);
+                    else
+                      ZMassMu8EndcapFail->Fill(mass,weight);
+		  }
+		}
 		// single muon filter
 		if (absEtaProbe<singleMuonTriggerEtaCut) { 
 		  if (isMuonMatchedSingleMuFilter[iMu]) 
 		    ZMassIsoMuEtaPtPass[etaBin][ptBinTrig]->Fill(mass,weight); 
 		  else
 		    ZMassIsoMuEtaPtFail[etaBin][ptBinTrig]->Fill(mass,weight);
+		  float offlinePtCut = singleMuonTriggerPtCut + 1.0;
+		  if (ptProbe>offlinePtCut) {
+		    if (absEtaProbe<1.48) {
+		      if (isMuonMatchedSingleMuFilter[iMu]) 
+			ZMassIsoMuBarrelPass->Fill(mass,weight); 
+		      else
+			ZMassIsoMuBarrelFail->Fill(mass,weight);
+		    }
+		    else {
+		      if (isMuonMatchedSingleMuFilter[iMu])
+			ZMassIsoMuEndcapPass->Fill(mass,weight);
+		      else
+			ZMassIsoMuEndcapFail->Fill(mass,weight);
+		    }
+		  }
 		}
 	      }
 	      else {
@@ -1085,34 +1367,6 @@ int main(int argc, char * argv[]) {
                   NonPromptSelPtFail[etaBin]->Fill(ptProbe,weight);
                   NonPromptSelJetPtFail[etaBin][JetBin]->Fill(ptProbe,weight);
                 }
-		// filling events tree
-		if (!isData&&etaBin==0&&ptBin==6) {
-
-		  eventNumber = analysisTree.event_nr;
-		  runNumber = analysisTree.event_run;
-		  IsoMu17 = isTriggerMuon;
-
-		  ptTag = analysisTree.muon_pt[index1];
-		  etaTag = analysisTree.muon_eta[index1];
-		  phiTag = analysisTree.muon_phi[index1];
-		  dxyTag = analysisTree.muon_dxy[index1];
-		  dzTag = analysisTree.muon_dz[index1];
-		  chargeTag = analysisTree.muon_charge[index1];
-		  isoTag = isoMuonsValue[im1];
-		  isMediumTag = analysisTree.muon_isMedium[index1];
-
-		  ptProbe = analysisTree.muon_pt[indexProbe];
-		  etaProbe = analysisTree.muon_eta[indexProbe];
-		  phiProbe = analysisTree.muon_phi[indexProbe];
-		  dxyProbe = analysisTree.muon_dxy[indexProbe];
-		  dzProbe = analysisTree.muon_dz[indexProbe];
-		  chargeProbe = analysisTree.muon_charge[indexProbe];
-		  isoProbe = allMuonsIso[iMu];
-		  isMediumProbe = analysisTree.muon_isMedium[indexProbe];
-		  
-		  massTagProbe = mass;
-		  //		  events->Fill();
-		}
 	      }
 	    }
 	  }
@@ -1210,7 +1464,15 @@ int main(int argc, char * argv[]) {
 	  if (dR2<dRJetLeptonCut) continue;
 	  
 	  // pfJetId
-	  bool isPFJetId = looseJetiD(analysisTree,int(jet));
+
+	  float energy = analysisTree.pfjet_e[jet];
+	  float chf = analysisTree.pfjet_chargedhadronicenergy[jet]/energy;
+	  float nhf = analysisTree.pfjet_neutralhadronicenergy[jet]/energy;
+	  float phf = analysisTree.pfjet_neutralemenergy[jet]/energy;
+	  float elf = analysisTree.pfjet_chargedemenergy[jet]/energy;
+	  float chm = analysisTree.pfjet_chargedmulti[jet];
+	  float npr = analysisTree.pfjet_chargedmulti[jet] + analysisTree.pfjet_neutralmulti[jet];
+	  bool isPFJetId = (npr>1 && phf<0.99 && nhf<0.99) && (absJetEta>2.4 || (elf<0.99 && chf>0 && chm>0));
 	  if (!isPFJetId) continue;
 	  
 	  if (analysisTree.pfjet_pt[jet]>jetPtHighCut) {
@@ -1234,6 +1496,39 @@ int main(int argc, char * argv[]) {
 
 	}
 
+	if (!isData && applyLeptonSF) {
+	  float ptMu1 = TMath::Min(float(59),analysisTree.muon_pt[indx1]);
+	  float ptMu2 = TMath::Min(float(59),analysisTree.muon_pt[indx2]);
+	  int ptBinMu1 = binNumber(ptMu1,nPtBins,ptBins);
+	  int ptBinMu2 = binNumber(ptMu2,nPtBins,ptBins);
+	  float absEtaMu1 = fabs(analysisTree.muon_eta[indx1]);
+	  float absEtaMu2 = fabs(analysisTree.muon_eta[indx2]);
+	  float dataMu1 = 1;
+	  float mcMu1 = 1;
+	  float dataMu2 = 1;
+	  float mcMu2 = 1;
+	  if(absEtaMu1 < 1.48){
+	    dataMu1 = dataEffBarrel[ptBinMu1];
+	    mcMu1 = mcEffBarrel[ptBinMu1];
+	  }
+	  else {
+	    dataMu1 = dataEffEndcap[ptBinMu1];
+	    mcMu1 = mcEffEndcap[ptBinMu1];
+	  }
+	  if(absEtaMu2 < 1.48){
+	    dataMu2 = dataEffBarrel[ptBinMu2];
+	    mcMu2 = mcEffBarrel[ptBinMu2];
+	  }
+	  else {
+	    dataMu2 = dataEffEndcap[ptBinMu2];
+	    mcMu2 = mcEffEndcap[ptBinMu2];
+	  }
+	  float wMu1 = dataMu1/mcMu1;
+	  float wMu2 = dataMu2/mcMu2;
+	    cout << "Muons SF : Mu1 = " << wMu1 << "   Mu2 = " << wMu2 << endl;
+	  weight = weight*wMu1*wMu2;
+	}
+
 	TLorentzVector mu1; mu1.SetXYZM(analysisTree.muon_px[indx1],
 					analysisTree.muon_py[indx1],
 					analysisTree.muon_pz[indx1],
@@ -1247,33 +1542,6 @@ int main(int argc, char * argv[]) {
 	TLorentzVector dimuon = mu1 + mu2;
 	float massSel = dimuon.M();
 	//	cout << "massSel = " << massSel << endl;
-
-	if (!isData && applyLeptonSF) {
-
-	//leptonSFweight = SF_yourScaleFactor->get_ScaleFactor(pt, eta)	
-	  double ptMu1 = (double)analysisTree.muon_pt[indx1];
-	  double ptMu2 = (double)analysisTree.muon_pt[indx2];
-	  double etaMu1 = (double)analysisTree.muon_eta[indx1];
-	  double etaMu2 = (double)analysisTree.muon_eta[indx2];
-	  double IdIsoSF_mu1 = SF_muonIdIso->get_ScaleFactor(ptMu1, etaMu1);
-	  double IdIsoSF_mu2 = SF_muonIdIso->get_ScaleFactor(ptMu2, etaMu2);
-	
-	  MuSF_IdIso_Mu1H->Fill(IdIsoSF_mu1);
-	  MuSF_IdIso_Mu2H->Fill(IdIsoSF_mu2);
-	  //	  if (ptMu1<20||ptMu2<20) {
-	  //	    std::cout << "mu 1 ->  pt = " << ptMu1 << "   eta = " << etaMu1 << std::endl;
-	  //	    std::cout << "eff data mu 1 = " << SF_muonIdIso->get_EfficiencyData(ptMu1, etaMu1)<< " |  eff mc mu 1 = " << SF_muonIdIso->get_EfficiencyMC(ptMu1, etaMu1)<<std::endl;
-	  //	    std::cout << "mu 2 ->  pt = " << ptMu2 << "   eta = " << etaMu2 << std::endl;
-	  //	    std::cout << "eff data mu 2 = " << SF_muonIdIso->get_EfficiencyData(ptMu2, etaMu2)<< " |  eff mc mu 2 = " << SF_muonIdIso->get_EfficiencyMC(ptMu2, etaMu2)<<std::endl;
-	  //	    std::cout << "SF mu1 = " << IdIsoSF_mu1 << std::endl;
-	  //	    std::cout << "SF mu2 = " << IdIsoSF_mu2 << std::endl;
-	  //	    
-	  //	    std::cout << " mass = " << massSel << std::endl;
-	  //	    std::cout << std::endl;
-	  //	  }
-	  weight = weight*IdIsoSF_mu1*IdIsoSF_mu2;
-	}
-
 	
 	massSelH->Fill(massSel,weight);
 	for (int iScale=0; iScale<21; ++ iScale) {
@@ -1282,7 +1550,7 @@ int main(int argc, char * argv[]) {
 	}
 
 	// selection on mass
-	if (massSel>dimuonMassCut) {
+	if (massSel>20) {
 	  ptLeadingMuSelH->Fill(analysisTree.muon_pt[indx1],weight);
 	  ptTrailingMuSelH->Fill(analysisTree.muon_pt[indx2],weight);
 	  etaLeadingMuSelH->Fill(analysisTree.muon_eta[indx1],weight);

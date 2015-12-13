@@ -22,10 +22,10 @@
 #include "TRandom.h"
 #include "TRandom.h"
 
-#include "AnalysisMacro.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/Config.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/AC1B.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/json.h"
+#include "DesyTauAnalyses/NTupleMaker/inteface/AnalysisMacro.h"
 
 using namespace std;
 
