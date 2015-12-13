@@ -22,7 +22,7 @@
 #include "TRandom.h"
 
 #include "DesyTauAnalyses/NTupleMaker/interface/Config.h"
-#include "../bin/AnalysisMacro.h"
+#include "DesyTauAnalyses/NTupleMaker/interface/AnalysisMacro.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/AC1B.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/json.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/PileUp.h"

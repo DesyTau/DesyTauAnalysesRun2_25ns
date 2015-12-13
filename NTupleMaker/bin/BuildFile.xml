@@ -68,17 +68,6 @@
  <use name="TauAnalysis/SVfitStandalone"/>
 </bin>
 
-<bin name="SUSYmuel" file="AnalysisMacroSUSYmuel.cpp">
- <use name="PhysicsTools/Utilities"/>
- <use name="rootgraphics"/>
- <use name="root"/>
- <use name="rootmath"/>
- <use name="roottmva"/>
- <use name="boost" />
- <use name="boost_program_options"/>
- <use name="DesyTauAnalyses/NTupleMaker"/>
-</bin>
-
 <bin name="SUSYmutau" file="AnalysisMacroSUSYmutau.cpp">
  <use name="PhysicsTools/Utilities"/>
  <use name="rootgraphics"/>
@@ -90,27 +79,6 @@
  <use name="DesyTauAnalyses/NTupleMaker"/>
 </bin>
 
-<bin name="SUSYeltau" file="AnalysisMacroSUSYeltau.cpp">
- <use name="PhysicsTools/Utilities"/>
- <use name="rootgraphics"/>
- <use name="root"/>
- <use name="rootmath"/>
- <use name="roottmva"/>
- <use name="boost" />
- <use name="boost_program_options"/>
- <use name="DesyTauAnalyses/NTupleMaker"/>
-</bin>
-
-<bin name="SUSYtautau" file="AnalysisMacroSUSYtautau.cpp">
- <use name="PhysicsTools/Utilities"/>
- <use name="rootgraphics"/>
- <use name="root"/>
- <use name="rootmath"/>
- <use name="roottmva"/>
- <use name="boost" />
- <use name="boost_program_options"/>
- <use name="DesyTauAnalyses/NTupleMaker"/>
-</bin>
 
 <bin   file="preAnalyzerTauTau_Summer15.cc"  name="preAnalyzerTauTau">
   <use   name="DataFormats/FWLite"/>
@@ -182,50 +150,6 @@
  <use name="DesyTauAnalyses/NTupleMaker"/>
 </bin>
 
-
-<bin name="SUSYmuel" file="AnalysisMacroSUSYmuel.cpp">
- <use name="PhysicsTools/Utilities"/>
- <use name="rootgraphics"/>
- <use name="root"/>
- <use name="rootmath"/>
- <use name="roottmva"/>
- <use name="boost" />
- <use name="boost_program_options"/>
- <use name="DesyTauAnalyses/NTupleMaker"/>
-</bin>
-
-<bin name="SUSYmutau" file="AnalysisMacroSUSYmutau.cpp">
- <use name="PhysicsTools/Utilities"/>
- <use name="rootgraphics"/>
- <use name="root"/>
- <use name="rootmath"/>
- <use name="roottmva"/>
- <use name="boost" />
- <use name="boost_program_options"/>
- <use name="DesyTauAnalyses/NTupleMaker"/>
-</bin>
-
-<bin name="SUSYeltau" file="AnalysisMacroSUSYeltau.cpp">
- <use name="PhysicsTools/Utilities"/>
- <use name="rootgraphics"/>
- <use name="root"/>
- <use name="rootmath"/>
- <use name="roottmva"/>
- <use name="boost" />
- <use name="boost_program_options"/>
- <use name="DesyTauAnalyses/NTupleMaker"/>
-</bin>
-
-<bin name="SUSYtautau" file="AnalysisMacroSUSYtautau.cpp">
- <use name="PhysicsTools/Utilities"/>
- <use name="rootgraphics"/>
- <use name="root"/>
- <use name="rootmath"/>
- <use name="roottmva"/>
- <use name="boost" />
- <use name="boost_program_options"/>
- <use name="DesyTauAnalyses/NTupleMaker"/>
-</bin>
 
 <bin name="AnalysisMacro_taufakerate" file="AnalysisMacro_taufakerate.cpp">
  <use name="PhysicsTools/Utilities"/>
