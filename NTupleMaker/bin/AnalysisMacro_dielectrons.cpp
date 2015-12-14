@@ -29,7 +29,7 @@
 #include "DesyTauAnalyses/NTupleMaker/interface/Jets.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/ScaleFactor.h"
 
-#include "functions.h"
+#include "DesyTauAnalyses/NTupleMaker/interface/functions.h"
 
 int main(int argc, char * argv[]) {
 

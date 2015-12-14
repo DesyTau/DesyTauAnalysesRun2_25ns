@@ -31,44 +31,69 @@ double mIntermediate = tauMass;
 double XSec=-1;
 double xs,fact,fact2;
   
-int nPtBins = 6;
-double ptBins[7] = {10,15,20,30,40,60,1000};
 
-int nPtBinsTrig = 7;
-double ptBinsTrig[8] = {10,15,19,24,30,40,60,1000};  
-  
-int nEtaBins = 2;
-double etaBins[3] = {0,1.48,2.5}; 
-  
-TString PtBins[6] = {"Pt10to15",
-		     "Pt15to20",
-		     "Pt20to30",
-		     "Pt30to40",
-		     "Pt40to60",
-		     "PtGt60"};
-  
-TString PtBinsTrig[7] = {"Pt10to15",
-			 "Pt15to19",
-			 "Pt19to24",
-			 "Pt24to30",
-			 "Pt30to40",
-			 "Pt40to60",
-			 "PtGt60"};
+  int nPtBins = 8;
+  float ptBins[9] = {10,13,16,20,25,30,40,60,1000};
 
-TString EtaBins[2] = {"Barrel",
-		      "Endcap"};
+  int nPtBinsTrig = 16;
+  float ptBinsTrig[17] = {10,
+			  13,
+			  16,
+			  19,
+			  22,
+			  25,
+			  28,
+			  31,
+			  34,
+			  37,
+			  40,
+			  45,
+			  50,
+			  60,
+			  70,
+			  100,
+			  1000};  
+  
+  int nEtaBins = 3;
+  float etaBins[4] = {0,0.9,1.2,2.4}; 
+  
+  TString PtBins[8] = {"Pt10to13",
+		       "Pt13to16",
+		       "Pt16to20",
+		       "Pt20to25",
+		       "Pt25to30",
+		       "Pt30to40",
+		       "Pt40to60",
+		       "PtGt60"};
+  
+  TString PtBinsTrig[16] = {"Pt10to13",
+			    "Pt13to16",
+			    "Pt16to19",
+			    "Pt19to22",
+			    "Pt22to25",
+			    "Pt25to28",
+			    "Pt28to31",
+			    "Pt31to34",
+			    "Pt34to37",
+			    "Pt37to40",
+			    "Pt40to45",
+			    "Pt45to50",
+			    "Pt50to60",
+			    "Pt60to70",
+			    "Pt70to100",
+			    "PtGt100"};
+
+  TString EtaBins[3] = {"EtaLt0p9",
+			"Eta0p9to1p2",
+			"EtaGt1p2"};
 
 //string CutList[10];
 vector<string> CutList;
 
-//TH1D * histWeights = new TH1D("histWeights","",1,-0.5,0.5);
-TH1D * histWeights = new TH1D("histWeights","",1,-0.5,0.5);
 
 TH1D * histRuns = new TH1D("histRuns","",6000,24000,30000);
 
 TH1D * histWeightsH = new TH1D("histWeightsH","",1,-0.5,0.5);
-
-TH1D * histWeights2 = new TH1D("histWeights2","",1,0,0);
 
 TH1D * hWeights [CutN];
 
@@ -262,9 +287,10 @@ vector<TLorentzVector>  LeptMV;
 bool ComparePt(TLorentzVector a, TLorentzVector b) { return a.Pt() > b.Pt(); }
 
 
-int binNumber(double x, int nbins, double * bins) {
 
-  int binN = 0;
+int binNumber(float x, int nbins, float * bins) {
+
+  int binN = -1;
 
   for (int iB=0; iB<nbins; ++iB) {
     if (x>=bins[iB]&&x<bins[iB+1]) {
@@ -277,14 +303,14 @@ int binNumber(double x, int nbins, double * bins) {
 
 }
 
-
-double effBin(double x, int nbins, double * bins, double * eff) {
+float effBin(float x, int nbins, float * bins, float * eff) {
 
   int bin = binNumber(x, nbins, bins);
 
   return eff[bin];
 
 }
+
 
 double cosRestFrame(TLorentzVector boost, TLorentzVector vect) {
 

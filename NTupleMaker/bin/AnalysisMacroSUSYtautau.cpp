@@ -21,8 +21,8 @@
 
 #include "TRandom.h"
 
-#include "AnalysisMacro.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/mt2.h"
+#include "DesyTauAnalyses/NTupleMaker/interface/AnalysisMacro.h"
 
 int main(int argc, char * argv[]) {
 
