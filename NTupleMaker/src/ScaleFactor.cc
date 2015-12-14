@@ -33,6 +33,40 @@ void ScaleFactor::init_ScaleFactor(TString inputRootFile){
 	return;
 }
 
+void ScaleFactor::init_ScaleFactor(TString inputRootFile, std::string HistoBaseName){
+
+  TFile * fileIn = new TFile(inputRootFile, "read");
+  // if root file not found                                                                                                                                                                          
+  if (fileIn->IsZombie() ) { std::cout << "ERROR in ScaleFactor::init_ScaleFactor(TString inputRootFile) from NTupleMaker/src/ScaleFactor.cc : ?File " <<inputRootFile << " does not exist. Please check. " <<std::endl; exit(1); };
+
+  //  std::string HistoBaseName = "ZMass";
+  etaBinsH = (TH1D*)fileIn->Get("etaBinsH");
+  std::string etaLabel, GraphName;
+  int nEtaBins = etaBinsH->GetNbinsX();
+  for (int iBin=0; iBin<nEtaBins; iBin++){
+    etaLabel = etaBinsH->GetXaxis()->GetBinLabel(iBin+1);
+    std::cout << "eta label " << etaLabel << std::endl;
+    GraphName = HistoBaseName+etaLabel+"_Data";
+    std::cout << "- data " << GraphName << std::endl;
+    eff_data[etaLabel] = (TGraphAsymmErrors*)fileIn->Get(TString(GraphName));
+    std::cout << "eff_data[etaLabel] " << eff_data[etaLabel] << std::endl;
+    SetAxisBins(eff_data[etaLabel]);
+
+    GraphName = HistoBaseName+etaLabel+"_MC";
+    std::cout << "- mc " << GraphName << std::endl;
+    eff_mc[etaLabel] = (TGraphAsymmErrors*)fileIn->Get(TString(GraphName));
+    std::cout << "eff_mc[etaLabel] " << eff_mc[etaLabel] << std::endl;
+    SetAxisBins(eff_mc[etaLabel]);
+    bool sameBinning = check_SameBinning(eff_data[etaLabel], eff_mc[etaLabel]);
+    if (!sameBinning) {std::cout<< "ERROR in ScaleFactor::init_ScaleFactor(TString inputRootFile) from NTupleMaker/src/ScaleFactor.cc . Can not proceed because ScaleFactor::check_SameBinning\
+ returned different pT binning for data and MC for eta label " << etaLabel << std::endl; exit(1); };
+    //else std::cout<< "NOT same binning " << std::endl;                                                                                                                                       
+  }
+
+  return;
+}
+
+
 
 void ScaleFactor::SetAxisBins(TGraphAsymmErrors* graph) {
 
@@ -87,7 +121,7 @@ double ScaleFactor::get_EfficiencyData(double pt, double eta){
 	
 	// if pt is underflow, eff=1 and WARNING message
 	else if (pt < ptMIN ) {
-	  eff=-1; 
+	  eff=1; 
 	  std::cout<< "WARNING in ScaleFactor::get_EfficiencyData(double pt, double eta) from NTupleMaker/src/ScaleFactor.cc: pT too low (pt = " << pt << "), min value is " << ptMIN << ". Returned efficiency =1. Weight will be 1. " << std::endl;
 	}
 	
@@ -123,7 +157,7 @@ double ScaleFactor::get_EfficiencyMC(double pt, double eta) {
 
 	// if pt is underflow, eff=1 and WARNING message
 	else if (pt < ptMIN ) {
-	  eff=-1; 
+	  eff=1; 
 	  std::cout<< "WARNING in ScaleFactor::get_EfficiencyMC(double pt, double eta) from NTupleMaker/src/ScaleFactor.cc: pT too low (pt = " << pt << "), min value is " << ptMIN << ". Returned efficiency =1. Weight will be 1. " << std::endl;
 	}
 	
