@@ -4,13 +4,13 @@
 #$ -S /bin/sh
 #
 #(the cpu time for this job)
-#$ -l h_cpu=1:29:00
+#$ -l h_cpu=0:39:00
 #
 #(the maximum memory usage of this job)
-#$ -l h_vmem=2000M
+#$ -l h_vmem=10000M
 #
 #(use hh site)
-#$ -l site=hh 
+#$ -l site=hh
 #(stderr and stdout are merged together to stdout)
 #$ -j y
 #
@@ -21,10 +21,7 @@
 #$ -cwd
 #$ -V
 #
-##$ -o NTuple_$1.out
-#
-##$ -e NTuple_$1.err
-#mkdir $1
 
-cd /nfs/dust/cms/user/alkaloge/TauAnalysis/new/CMSSW_7_2_3_patch1/src/DesyTauAnalyses/NTupleMaker/test;cmsenv;
+cd /nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/CMSSW_7_4_14/src/DesyTauAnalyses/NTupleMaker/test;cmsenv
+
 
