@@ -151,7 +151,7 @@
 </bin>
 
 
-<bin name="AnalysisMacro_taufakerate" file="AnalysisMacro_taufakerate.cpp">
+<bin name="taufakerate" file="AnalysisMacro_taufakerate.cpp">
  <use name="PhysicsTools/Utilities"/>
  <use name="rootgraphics"/>
  <use name="root"/>
@@ -162,3 +162,13 @@
  <use name="DesyTauAnalyses/NTupleMaker"/>
 </bin>
 
+<bin name="taufakerateJets" file="AnalysisMacro_taufakerateJets.cpp">
+ <use name="PhysicsTools/Utilities"/>
+ <use name="rootgraphics"/>
+ <use name="root"/>
+ <use name="rootmath"/>
+ <use name="roottmva"/>
+ <use name="boost" />
+ <use name="boost_program_options"/>
+ <use name="DesyTauAnalyses/NTupleMaker"/>
+</bin>
