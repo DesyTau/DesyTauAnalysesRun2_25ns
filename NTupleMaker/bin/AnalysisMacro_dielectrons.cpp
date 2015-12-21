@@ -664,7 +664,7 @@ int main(int argc, char * argv[]) {
 
 	// selecting sample of probes
 	if (analysisTree.electron_pt[im]<ptBins[0]) continue;
-	if (fabs(analysisTree.electron_eta[im])>etaBins[nEtaBins]) continue;
+	if (fabs(analysisTree.electron_eta[im])>etaElectronCut) continue;
 	if (fabs(analysisTree.electron_dxy[im])>dxyElectronLooseCut) continue;
 	if (fabs(analysisTree.electron_dz[im])>dzElectronLooseCut) continue;
 
@@ -907,6 +907,8 @@ int main(int argc, char * argv[]) {
 	      if (JetBin>2) JetBin = 2;
 
 	      float mass = (electron1+electron2).M();
+	      //	      cout << "probe electron : eta = " << analysisTree.electron_eta[indexProbe]
+	      //		   << "   pt = " << analysisTree.electron_eta[indexProbe] << endl;
 	      if (isElectronPassedIdIso[iE]) {
 		ZMassPass->Fill(mass,weight);
 		ZMassEtaPtPass[etaBin][ptBin]->Fill(mass,weight);
