@@ -30,6 +30,7 @@
 #include "DesyTauAnalyses/NTupleMaker/interface/Jets.h"
 
 #include "DesyTauAnalyses/NTupleMaker/interface/functions.h"
+#include "DesyTauAnalyses/NTupleMaker/interface/EventWeight.h"
 
 int main(int argc, char * argv[]) {
 
@@ -50,6 +51,8 @@ int main(int argc, char * argv[]) {
 
   //const bool applyPUreweighting = cfg.get<bool>("ApplyPUreweighting");
   const bool applyLeptonSF = cfg.get<bool>("ApplyLeptonSF");
+  const bool applyRecoilCorrections = cfg.get<bool>("ApplyRecoilCorrections");
+
 
   // kinematic cuts on muons
   const float ptMuonLowCut   = cfg.get<float>("ptMuonLowCut");
@@ -109,6 +112,13 @@ int main(int argc, char * argv[]) {
   const string vertHistName     = cfg.get<string>("VertexHistName");
 
   const string MuonIdIsoFile = cfg.get<string>("MuonIdIsoEff");
+
+  const string recoilFileName   = cfg.get<string>("RecoilFileName");
+  TString RecoilFileName(recoilFileName);
+
+  const string recoilPuppiFileName   = cfg.get<string>("RecoilPuppiFileName");
+  TString RecoilPuppiFileName(recoilPuppiFileName);
+
 
   const string jsonFile = cfg.get<string>("jsonFile");
   // **** end of configuration
@@ -465,11 +475,18 @@ int main(int argc, char * argv[]) {
   TH1D * recoilPuppiZParal_Ptbins_nJetsH[3][5];
   TH1D * recoilPuppiZPerp_Ptbins_nJetsH[3][5];
 
+  TH1D * recoilResponse[3];
+  TH1D * recoilResponse_Ptbins_nJetsH[3][5];
+  TH1D * recoilPuppiResponse[3];
+  TH1D * recoilPuppiResponse_Ptbins_nJetsH[3][5];
+  
   for (int iBin=0; iBin<nJetBins; ++iBin) {
     recoilZParalH[iBin] = new TH1D("recoilZParal"+NJetBins[iBin]+"H","",100,-200,200);
     recoilZPerpH[iBin] = new TH1D("recoilZPerp"+NJetBins[iBin]+"H","",100,-200,200);
     recoilPuppiZParalH[iBin] = new TH1D("recoilPuppiZParal"+NJetBins[iBin]+"H","",100,-200,200);
     recoilPuppiZPerpH[iBin] = new TH1D("recoilPuppiZPerp"+NJetBins[iBin]+"H","",100,-200,200);
+    recoilResponse[iBin] = new TH1D("recoilResponse"+NJetBins[iBin]+"H","",200,-10,10);
+    recoilPuppiResponse[iBin] = new TH1D("recoilPuppiResponse"+NJetBins[iBin]+"H","",200,-10,10);
   }
   
   for (int iJets=0; iJets<nJetBins; ++iJets) {
@@ -478,6 +495,8 @@ int main(int argc, char * argv[]) {
       recoilZPerp_Ptbins_nJetsH[iJets][iPtBins] = new TH1D(RecoilZPerp+NJetBins[iJets]+ZPtBins[iPtBins],"",100,-200,200);
       recoilPuppiZParal_Ptbins_nJetsH[iJets][iPtBins] = new TH1D(RecoilPuppiZParal+NJetBins[iJets]+ZPtBins[iPtBins],"",100,-200,200);
       recoilPuppiZPerp_Ptbins_nJetsH[iJets][iPtBins] = new TH1D(RecoilPuppiZPerp+NJetBins[iJets]+ZPtBins[iPtBins],"",100,-200,200);
+      recoilResponse_Ptbins_nJetsH[iJets][iPtBins] = new TH1D("recoilResponse"+NJetBins[iJets]+ZPtBins[iPtBins],"",200,-10,10);
+      recoilPuppiResponse_Ptbins_nJetsH[iJets][iPtBins] = new TH1D("recoilPuppiResponse"+NJetBins[iJets]+ZPtBins[iPtBins],"",200,-10,10);
     }
   }
 
@@ -514,6 +533,32 @@ int main(int argc, char * argv[]) {
     TH1D * PU_mc = (TH1D *)filePUdistribution_MC->Get("pileup");
     PUofficial->set_h_data(PU_data); 
     PUofficial->set_h_MC(PU_mc);
+  }
+
+  // Met recoil corrections
+  EventWeight * recoil = NULL;
+  EventWeight * recoilPuppi = NULL;
+  if (applyRecoilCorrections) {
+    TString fullDir = TString(cmsswBase)+TString("/src/DesyTauAnalyses/NTupleMaker/data/");
+    recoil = new EventWeight(fullDir);
+    recoilPuppi = new EventWeight(fullDir);
+    recoil->InitMEtWeights(RecoilFileName,
+			   RecoilZPerp,
+			   RecoilZParal,
+			   nZPtBins,
+			   zPtBins,
+			   ZPtBins,
+			   nJetBins,
+			   NJetBins);
+    recoilPuppi->InitMEtWeights(RecoilPuppiFileName,
+				RecoilPuppiZPerp,
+				RecoilPuppiZParal,
+				nZPtBins,
+				zPtBins,
+				ZPtBins,
+				nJetBins,
+				NJetBins);
+
   }
 
 
@@ -785,6 +830,7 @@ int main(int argc, char * argv[]) {
       float puppimet_ey = analysisTree.puppimet_ey;
       float puppimet_phi = analysisTree.puppimet_phi;
       float puppimet = TMath::Sqrt(puppimet_ex*puppimet_ex+puppimet_ey*puppimet_ey);
+
 
       // vertex cuts
       //      if (fabs(analysisTree.primvertex_z)>zVertexCut) continue;
@@ -1157,8 +1203,30 @@ int main(int argc, char * argv[]) {
       if (isIsoMuonsPair) {      
 	//match to genparticles
 	bool genmatch_m1 = false, genmatch_m2 = false;
+
+	TLorentzVector mu1; mu1.SetXYZM(analysisTree.muon_px[indx1],
+					analysisTree.muon_py[indx1],
+					analysisTree.muon_pz[indx1],
+					muonMass);
+
+	TLorentzVector mu2; mu2.SetXYZM(analysisTree.muon_px[indx2],
+					analysisTree.muon_py[indx2],
+					analysisTree.muon_pz[indx2],
+					muonMass);
+
+	TLorentzVector dimuon = mu1 + mu2;
+
+	TLorentzVector genZ; genZ.SetXYZM(dimuon.Px(),dimuon.Py(),dimuon.Pz(),91.2); 
+
 	if (!isData) {
+
 	  for (unsigned int igen=0; igen<analysisTree.genparticles_count; ++igen) {
+	    if (analysisTree.genparticles_pdgid[igen]==23) {
+	      genZ.SetXYZT(analysisTree.genparticles_px[igen],
+			   analysisTree.genparticles_py[igen],
+			   analysisTree.genparticles_pz[igen],
+			   analysisTree.genparticles_e[igen]);
+	    }
 	    if (fabs(analysisTree.genparticles_pdgid[igen])==13 &&
 		analysisTree.genparticles_status[igen]==1) {
 
@@ -1234,17 +1302,6 @@ int main(int argc, char * argv[]) {
 
 	}
 
-	TLorentzVector mu1; mu1.SetXYZM(analysisTree.muon_px[indx1],
-					analysisTree.muon_py[indx1],
-					analysisTree.muon_pz[indx1],
-					muonMass);
-
-	TLorentzVector mu2; mu2.SetXYZM(analysisTree.muon_px[indx2],
-					analysisTree.muon_py[indx2],
-					analysisTree.muon_pz[indx2],
-					muonMass);
-
-	TLorentzVector dimuon = mu1 + mu2;
 	float massSel = dimuon.M();
 	//	cout << "massSel = " << massSel << endl;
 
@@ -1272,6 +1329,14 @@ int main(int argc, char * argv[]) {
 	  //	    std::cout << std::endl;
 	  //	  }
 	  weight = weight*IdIsoSF_mu1*IdIsoSF_mu2;
+	}
+	if (!isData && applyRecoilCorrections) {
+	  recoil->RecoilCorrected(pfmet_ex,pfmet_ey,genZ.Px(),genZ.Py(),dimuon.Px(),dimuon.Py(),nJets30,1);
+	  pfmet_phi = TMath::ATan2(pfmet_ey,pfmet_ex);
+	  pfmet = TMath::Sqrt(pfmet_ex*pfmet_ex+pfmet_ey*pfmet_ey);
+	  recoilPuppi->RecoilCorrected(puppimet_ex,puppimet_ey,genZ.Px(),genZ.Py(),dimuon.Px(),dimuon.Py(),nJets30,1);
+	  puppimet_phi = TMath::ATan2(puppimet_ey,puppimet_ex);
+	  puppimet = TMath::Sqrt(puppimet_ex*puppimet_ex+puppimet_ey*puppimet_ey);
 	}
 
 	
@@ -1392,6 +1457,7 @@ int main(int argc, char * argv[]) {
 	    // pfmet
 	    float recoilParal = pfmet_ex*unitX + pfmet_ey*unitY;
 	    float recoilPerp = pfmet_ex*perpUnitX + pfmet_ey*perpUnitY;
+	    float responseHad = 1 + recoilParal/dimuonPt;
 	    int jetBin = 0;
 	    if (nJets30==1)
 	      jetBin = 1;
@@ -1401,16 +1467,20 @@ int main(int argc, char * argv[]) {
 	    recoilZParalH[jetBin]->Fill(recoilParal,weight);
 	    recoilZPerpH[jetBin]->Fill(recoilPerp,weight);
 	    recoilZParal_Ptbins_nJetsH[jetBin][ptBin]->Fill(recoilParal,weight);
-	    recoilZPerp_Ptbins_nJetsH[jetBin][ptBin]->Fill(recoilParal,weight);
+	    recoilZPerp_Ptbins_nJetsH[jetBin][ptBin]->Fill(recoilPerp,weight);
+	    recoilResponse[jetBin]->Fill(responseHad,weight);
+	    recoilResponse_Ptbins_nJetsH[jetBin][ptBin]->Fill(responseHad,weight);
 
 	    // puppimet
 	    recoilParal = puppimet_ex*unitX + puppimet_ey*unitY;
 	    recoilPerp  = puppimet_ex*perpUnitX + puppimet_ey*perpUnitY;
+	    responseHad = 1 + recoilParal/dimuonPt;
 	    recoilPuppiZParalH[jetBin]->Fill(recoilParal,weight);
             recoilPuppiZPerpH[jetBin]->Fill(recoilPerp,weight);
             recoilPuppiZParal_Ptbins_nJetsH[jetBin][ptBin]->Fill(recoilParal,weight);
-            recoilPuppiZPerp_Ptbins_nJetsH[jetBin][ptBin]->Fill(recoilParal,weight);
-
+            recoilPuppiZPerp_Ptbins_nJetsH[jetBin][ptBin]->Fill(recoilPerp,weight);
+	    recoilPuppiResponse[jetBin]->Fill(responseHad,weight);
+	    recoilPuppiResponse_Ptbins_nJetsH[jetBin][ptBin]->Fill(responseHad,weight);
 	  }
 
 	}
