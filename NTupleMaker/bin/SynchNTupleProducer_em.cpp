@@ -27,7 +27,9 @@
 #include "DesyTauAnalyses/NTupleMaker/interface/AC1B.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/json.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/PileUp.h"
-#include "DesyTauAnalyses/NTupleMaker/interface/ScaleFactor.h"
+//#include "DesyTauAnalyses/NTupleMaker/interface/ScaleFactor.h"
+#include "HTT-utilities/LepEffInterface/interface/ScaleFactor.h"
+
 
 int binNumber(float x, int nbins, float * bins) {
 

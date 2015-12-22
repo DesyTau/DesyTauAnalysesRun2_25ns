@@ -1,5 +1,18 @@
 <Flags CXXFLAGS="-Wno-unused-variable -Wno-error=unused-but-set-variable -Wno-error=maybe-uninitialized" />
 
+<bin name="ScaleFactor_test" file="ScaleFactor_test.cpp">
+ <use name="PhysicsTools/Utilities"/>
+ <use name="rootgraphics"/>
+ <use name="root"/>
+ <use name="rootmath"/>
+ <use name="roottmva"/>
+ <use name="boost" />
+ <use name="boost_program_options"/>
+ <use name="DesyTauAnalyses/NTupleMaker"/>
+ <use name="HTT-utilities/LepEffInterface"/>
+</bin>
+
+
 <bin name="AnalysisMacro_dimuons" file="AnalysisMacro_dimuons.cpp">
  <use name="PhysicsTools/Utilities"/>
  <use name="rootgraphics"/>
@@ -9,6 +22,7 @@
  <use name="boost" />
  <use name="boost_program_options"/>
  <use name="DesyTauAnalyses/NTupleMaker"/>
+ <use name="HTT-utilities/LepEffInterface"/>
 </bin>
 
 <bin name="AnalysisMacro_dielectrons" file="AnalysisMacro_dielectrons.cpp">
@@ -20,6 +34,7 @@
  <use name="boost" />
  <use name="boost_program_options"/>
  <use name="DesyTauAnalyses/NTupleMaker"/>
+ <use name="HTT-utilities/LepEffInterface"/>
 </bin>
 
 <bin name="AnalysisMacro_EMu" file="AnalysisMacro_EMu.cpp">
@@ -53,6 +68,7 @@
  <use name="boost" />
  <use name="boost_program_options"/>
  <use name="DesyTauAnalyses/NTupleMaker"/>
+ <use name="HTT-utilities/LepEffInterface"/>
 </bin>
 
 <bin name="SynchNTupleProducer_mt" file="SynchNTupleProducer_mt.cpp">
@@ -66,6 +82,7 @@
  <use name="DesyTauAnalyses/NTupleMaker"/>
  <use name="FWCore/ParameterSet"/>
  <use name="TauAnalysis/SVfitStandalone"/>
+ <use name="HTT-utilities/LepEffInterface"/>
 </bin>
 
 <bin name="SUSYmutau" file="AnalysisMacroSUSYmutau.cpp">
