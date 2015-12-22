@@ -48,6 +48,13 @@ findline='mvaOutputCovU2_ = GetResponse(mvaReaderCovU2_, varForCovU2_)\* mvaOutp
 replaceline='mvaOutputCovU2_ = std::pow(GetResponse(mvaReaderCovU2_, varForCovU2_)\* mvaOutputU_ \* var_\["particleFlow_U"\], 2)\;'
 sed -i -e 's/'$findline'/'$replaceline'/' ${CMSSW_BASE}/src/RecoMET/METPUSubtraction/src/PFMETAlgorithmMVA.cc
 
+## Lepton efficiencies interface and ROOT files from CMS-HTT 
+cd ${CMSSW_BASE}/src
+git clone https://github.com/CMS-HTT/LeptonEff-interface.git HTT-utilities 
+cd HTT-utilities/LepEffInterface/
+git clone https://github.com/CMS-HTT/LeptonEfficiencies.git data 
+
+cd ${CMSSW_BASE}/src
 
 scram b -j 32
 scram b -j 32
