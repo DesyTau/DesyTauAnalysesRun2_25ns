@@ -99,7 +99,7 @@ typedef ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> > LV;
 
 //RecoilCorrector *RecoilCorrector_;
 enum MotherNames{HIGGS=1, WBOSON, ZBOSON, TAU};
-enum MvaMetChannel{EMU=1, ETAU, MUTAU, TAUTAU, UNKNOWN};
+enum MvaMetChannel{EMU=1, ETAU, MUTAU, TAUTAU, MUMU, EE, UNKNOWN};
 enum MCEVENTTYPE{HADHAD, LEPHAD, LEPLEP, LL, LNU, LEPNU, TAUNU, OTHERS};
 
 enum BVariation{kNo = 0, kDown = 1, kUp = 2};
@@ -536,9 +536,10 @@ void fillTrees_TauTauStream(TChain* currentTree,
     //electron_full5x5_sigmaietaieta[40], electron_ehcaloverecal[40],
     //electron_ooemoop[40],
     electron_r03_sumChargedHadronPt[40], electron_r03_sumNeutralHadronEt[40], 
-    electron_r03_sumPhotonEt[40], electron_r03_sumPUPt[40],
-    electron_mva_id_nontrigPhys14[40];
-  bool electron_pass_conversion[40];
+    electron_r03_sumPhotonEt[40], electron_r03_sumPUPt[40];
+    //electron_mva_id_nontrigPhys14[40];
+    
+  bool electron_pass_conversion[40], electron_mva_wp90_nontrig_Spring15_v1[40];
   UChar_t electron_nmissinginnerhits[40];
   
   //Taus
@@ -574,8 +575,9 @@ void fillTrees_TauTauStream(TChain* currentTree,
   //MET
   float pfmet_ex, pfmet_ey, pfmet_sigxx, pfmet_sigxy, pfmet_sigyx, pfmet_sigyy;
   UInt_t mvamet_count;
-  float mvamet_ex[20], mvamet_ey[20], mvamet_sigxx[20], mvamet_sigxy[20], mvamet_sigyx[20], mvamet_sigyy[20];
-  Char_t mvamet_channel[20][100];
+  float mvamet_ex[200], mvamet_ey[200], mvamet_sigxx[200], mvamet_sigxy[200], mvamet_sigyx[200], mvamet_sigyy[200];
+  UChar_t mvamet_channel[200];
+  UInt_t mvamet_lep1[200], mvamet_lep2[200];
 
   //GetParticles
   unsigned int genparticles_count;
@@ -583,12 +585,13 @@ void fillTrees_TauTauStream(TChain* currentTree,
     genparticles_vx[1000], genparticles_vy[1000], genparticles_vz[1000]; 
   Int_t genparticles_pdgid[1000], genparticles_status[1000];
   UChar_t genparticles_mother[1000];
-  
+  Int_t genparticles_isPrompt[1000], genparticles_isDirectPromptTauDecayProduct[1000];
+
   UInt_t gentau_count;
   float gentau_e[20], gentau_px[20], gentau_py[20], gentau_pz[20],
     gentau_visible_e[20], gentau_visible_px[20], gentau_visible_py[20],
     gentau_visible_pz[20];
-  int  gentau_decayMode[20]; 
+  int  gentau_decayMode[20], gentau_isPrompt[20]; 
   UChar_t gentau_mother[20];
 
   std::vector<std::string> *hltriggerresultsV = new std::vector<std::string> ();
@@ -652,7 +655,8 @@ void fillTrees_TauTauStream(TChain* currentTree,
   currentTree->SetBranchStatus("electron_r03_sumNeutralHadronEt", 1);
   currentTree->SetBranchStatus("electron_r03_sumPhotonEt", 1);
   currentTree->SetBranchStatus("electron_r03_sumPUPt", 1);
-  currentTree->SetBranchStatus("electron_mva_id_nontrigPhys14", 1);
+  //currentTree->SetBranchStatus("electron_mva_id_nontrigPhys14", 1);
+  currentTree->SetBranchStatus("electron_mva_wp90_nontrig_Spring15_v1", 1);
   currentTree->SetBranchStatus("electron_pass_conversion", 1);
   currentTree->SetBranchStatus("electron_nmissinginnerhits", 1);
   currentTree->SetBranchStatus("tau_count"        ,1);
@@ -720,6 +724,8 @@ void fillTrees_TauTauStream(TChain* currentTree,
   currentTree->SetBranchStatus("mvamet_sigyx",        1);
   currentTree->SetBranchStatus("mvamet_sigyy",        1);
   currentTree->SetBranchStatus("mvamet_channel",        1);
+  currentTree->SetBranchStatus("mvamet_lep1",        1);
+  currentTree->SetBranchStatus("mvamet_lep2",        1);
   currentTree->SetBranchStatus("genparticles_count"      ,1);
   currentTree->SetBranchStatus("genparticles_e"      ,1);
   currentTree->SetBranchStatus("genparticles_px"      ,1);
@@ -731,6 +737,8 @@ void fillTrees_TauTauStream(TChain* currentTree,
   currentTree->SetBranchStatus("genparticles_pdgid"      ,1);
   currentTree->SetBranchStatus("genparticles_status"      ,1);
   currentTree->SetBranchStatus("genparticles_mother"      ,1);
+  currentTree->SetBranchStatus("genparticles_isPrompt"   ,1);
+  currentTree->SetBranchStatus("genparticles_isDirectPromptTauDecayProduct" ,1);
   currentTree->SetBranchStatus("gentau_count", 1);
   currentTree->SetBranchStatus("gentau_e", 1);
   currentTree->SetBranchStatus("gentau_px", 1);
@@ -742,6 +750,7 @@ void fillTrees_TauTauStream(TChain* currentTree,
   currentTree->SetBranchStatus("gentau_visible_pz", 1);
   currentTree->SetBranchStatus("gentau_decayMode", 1);
   currentTree->SetBranchStatus("gentau_mother", 1);
+  currentTree->SetBranchStatus("gentau_isPrompt", 1);
   currentTree->SetBranchStatus("run_hltfilters"      ,1);
   currentTree->SetBranchStatus("trigobject_count",  1);
   currentTree->SetBranchStatus("trigobject_px",  1);
@@ -805,7 +814,8 @@ void fillTrees_TauTauStream(TChain* currentTree,
   currentTree->SetBranchAddress("electron_r03_sumNeutralHadronEt", electron_r03_sumNeutralHadronEt);
   currentTree->SetBranchAddress("electron_r03_sumPhotonEt", electron_r03_sumPhotonEt);
   currentTree->SetBranchAddress("electron_r03_sumPUPt", electron_r03_sumPUPt);
-  currentTree->SetBranchAddress("electron_mva_id_nontrigPhys14", electron_mva_id_nontrigPhys14);
+  //currentTree->SetBranchAddress("electron_mva_id_nontrigPhys14", electron_mva_id_nontrigPhys14);
+  currentTree->SetBranchAddress("electron_mva_wp90_nontrig_Spring15_v1", electron_mva_wp90_nontrig_Spring15_v1);
   currentTree->SetBranchAddress("electron_pass_conversion", electron_pass_conversion);
   currentTree->SetBranchAddress("electron_nmissinginnerhits", electron_nmissinginnerhits);
   currentTree->SetBranchAddress("tau_count"        ,&tau_count);
@@ -873,6 +883,8 @@ void fillTrees_TauTauStream(TChain* currentTree,
   currentTree->SetBranchAddress("mvamet_sigyx",        mvamet_sigyx);
   currentTree->SetBranchAddress("mvamet_sigyy",        mvamet_sigyy);
   currentTree->SetBranchAddress("mvamet_channel",        mvamet_channel);
+  currentTree->SetBranchAddress("mvamet_lep1",        mvamet_lep1);
+  currentTree->SetBranchAddress("mvamet_lep2",        mvamet_lep2);
   currentTree->SetBranchAddress("genparticles_count"      ,&genparticles_count);
   currentTree->SetBranchAddress("genparticles_e"      ,genparticles_e);
   currentTree->SetBranchAddress("genparticles_px"      ,genparticles_px);
@@ -884,6 +896,8 @@ void fillTrees_TauTauStream(TChain* currentTree,
   currentTree->SetBranchAddress("genparticles_pdgid"      ,genparticles_pdgid);
   currentTree->SetBranchAddress("genparticles_status"      ,genparticles_status);
   currentTree->SetBranchAddress("genparticles_mother"      ,genparticles_mother);
+  currentTree->SetBranchAddress("genparticles_isPrompt"    ,genparticles_isPrompt);
+  currentTree->SetBranchAddress("genparticles_isDirectPromptTauDecayProduct" ,genparticles_isDirectPromptTauDecayProduct);
   currentTree->SetBranchAddress("gentau_count", &gentau_count);
   currentTree->SetBranchAddress("gentau_e", gentau_e);
   currentTree->SetBranchAddress("gentau_px", gentau_px);
@@ -895,6 +909,7 @@ void fillTrees_TauTauStream(TChain* currentTree,
   currentTree->SetBranchAddress("gentau_visible_pz", gentau_visible_pz);
   currentTree->SetBranchAddress("gentau_decayMode", gentau_decayMode);
   currentTree->SetBranchAddress("gentau_mother", gentau_mother);
+  currentTree->SetBranchAddress("gentau_isPrompt", gentau_isPrompt);
   currentTree->SetBranchAddress("run_hltfilters"      ,&run_hltfilters);
   currentTree->SetBranchAddress("trigobject_count",  &trigobject_count);
   currentTree->SetBranchAddress("trigobject_px",  trigobject_px);
@@ -954,6 +969,7 @@ void fillTrees_TauTauStream(TChain* currentTree,
   int genDecayModeL1_;
   float visGenTauMassL2, genTauPtL2, genTauEtaL2;
   int genDecayModeL2_;
+  int genMatchL1_, genMatchL2_;
   
   // event-related variables
   int nVetoMuon_, nVetoElectron_;
@@ -969,7 +985,7 @@ void fillTrees_TauTauStream(TChain* currentTree,
   //event weights
   float evtweight, mcweight, puweight; 
   //clasify DY events for splitting
-  bool isZtt_, isZll_, isZj_;
+  bool isZtt_, isZl_, isZj_;
 
   outTree->Branch("ptj1",  &ptj1,"ptj1/F");
   outTree->Branch("ptj2",  &ptj2,"ptj2/F");
@@ -1048,6 +1064,8 @@ void fillTrees_TauTauStream(TChain* currentTree,
   outTree->Branch("genTauPtL2",                &genTauPtL2, "genTauPtL2/F");
   outTree->Branch("genTauEtaL2",               &genTauEtaL2, "genTauEtaL2/F");
   outTree->Branch("genDecayModeL2",            &genDecayModeL2_, "genDecayModeL2/I");
+  outTree->Branch("genMatchL1", &genMatchL1_, "genMatchL1/I");
+  outTree->Branch("genMatchL2", &genMatchL2_, "genMatchL2/I");
   
   outTree->Branch("diTauCharge", &diTauCharge_,"diTauCharge/F");
   outTree->Branch("chargeL1", &chargeL1_,"chargeL1/F");
@@ -1140,15 +1158,15 @@ void fillTrees_TauTauStream(TChain* currentTree,
   outTree->Branch("mcweight", &mcweight,"mcweight/F");
   outTree->Branch("puweight", &puweight, "puweight/F");
   outTree->Branch("isZtt", &isZtt_, "isZtt/O");
-  outTree->Branch("isZll", &isZll_, "isZll/O");
+  outTree->Branch("isZl", &isZl_, "isZl/O");
   outTree->Branch("isZj", &isZj_, "isZj/O");
   
   // define JSON selector //
   cout << "JSON selection" << endl;
   int nJson=1;
   string jsonFile[nJson];
-  string dirJson = "/nfs/dust/cms/user/anayak/CMS/OnSLC6/CMSSW_746p6_htt/src/DesyTauAnalyses/NTupleMaker/test/"; 
-  jsonFile[0] = dirJson+"/Cert_246908-251883_13TeV_PromptReco_Collisions15_JSON.txt"; // promptReco 
+  string dirJson = "/nfs/dust/cms/user/anayak/CMS/OnSLC6/CMSSW_7414_htt/src/DesyTauAnalyses/NTupleMaker/test/"; 
+  jsonFile[0] = dirJson+"/Cert_246908-260627_13TeV_PromptReco_Collisions15_25ns_JSON.txt"; // promptReco 
   map<int, vector<pair<int, int> > > jsonMap[nJson] ;  
   for(int iJ=0 ; iJ<nJson ; iJ++)
     jsonMap[iJ] = readJSONFile(jsonFile[iJ]);
@@ -1212,12 +1230,13 @@ void fillTrees_TauTauStream(TChain* currentTree,
       isGoodRun = AcceptEventByRunAndLumiSection(event_run, event_luminosityblock, jsonMap[iJson_]);
     
     if(!isGoodRun) continue;
-    
+    if(event_nr == 30706)std::cout<<"pass none: event "<<event_nr<<std::endl;
     //cut on PV
     if(primvertex_count <= 0)continue;
-    if(primvertex_ndof < 4)continue;
-    if(primvertex_z < -24 || primvertex_z > 24) continue;
-    
+    if(event_nr == 30706)std::cout<<"pass PV1: event "<<event_nr<<std::endl;
+    //if(primvertex_ndof < 4)continue;
+    //if(primvertex_z < -24 || primvertex_z > 24) continue;
+    if(event_nr == 30706)std::cout<<"pass PV: event "<<event_nr<<std::endl;
     evtweight = scaleFactor;
     mcweight = genweight;
     puweight = 1.0; //no Pileup weight for now
@@ -1238,6 +1257,7 @@ void fillTrees_TauTauStream(TChain* currentTree,
     std::vector<int>genLeptonPdgId_; genLeptonPdgId_.clear();
     int nLepton_ = 0, TauLepDecay_ = 0, TauHadDecay_ = 0;
 
+    /* //not needed to define this way
     if(!isData){ //for mc only
 
       if( (sample_.find("WJets")!=string::npos && sample_.find("WWJets")==string::npos ) ||
@@ -1289,10 +1309,26 @@ void fillTrees_TauTauStream(TChain* currentTree,
       EventType_ = HADHAD;
     else if(TauLepDecay_ == 0 && nLepton_ == 0 && TauHadDecay_ == 1)
       EventType_ = TAUNU;
+    */
 
     //require HLT
-    if(GetTriggerResult((*hltriggerresultsV), "HLT_DoubleMediumIsoPFTau40_Trk1_eta2p1_Reg_v") < 0.5) continue;
-    
+    string hltPath_(""); string hltFilter_("");
+    if(!isData){
+      hltPath_ = "HLT_DoubleMediumIsoPFTau40_Trk1_eta2p1_Reg_v";
+      hltFilter_ = "hltDoublePFTau40TrackPt1MediumIsolationDz02Reg";
+    }
+    else{
+      if(sample.Contains("2015D")){
+	hltPath_ = "HLT_DoubleMediumIsoPFTau35_Trk1_eta2p1_Reg_v";
+	hltFilter_ = "hltDoublePFTau35TrackPt1MediumIsolationDz02Reg";
+      }
+      else{
+	hltPath_ = "HLT_DoubleMediumIsoPFTau40_Trk1_eta2p1_Reg_v";
+	hltFilter_ = "hltDoublePFTau40TrackPt1MediumIsolationDz02Reg";
+      }
+    }
+    if(GetTriggerResult((*hltriggerresultsV), hltPath_) < 0.5) continue;
+    if(event_nr== 30706)std::cout<<"pass tigger: event "<<event_nr<<std::endl;
     std::vector<DiTauInfo>sortDiTauInfos; sortDiTauInfos.clear();
     //Loop over taus
     for(unsigned int it = 0; it < tau_count; it++){ //tauL1
@@ -1308,7 +1344,7 @@ void fillTrees_TauTauStream(TChain* currentTree,
       //if(tau_againstElectronVLooseMVA5[it] < 0.5) continue;
       //if(tau_againstMuonLoose3[it] < 0.5) continue;
       if(TMath::Abs(tau_charge[it]) != 1) continue;
-
+      if(event_nr== 30706)std::cout<<" pass offline sel. Leg1: event "<<event_nr<<std::endl;
       //HLT match
       bool HLTmatchLeg1_ = false;
       bool matchLeg1Level1_ = false; bool matchLeg1Level2_ = false; bool matchLeg1Level3_ = false;
@@ -1317,11 +1353,11 @@ void fillTrees_TauTauStream(TChain* currentTree,
 
         //if(IsHLTMatched("hltL1sDoubleTauJet36erORDoubleTauJet68er", (*run_hltfilters), trigCandP4_, trigobject_filters[it], tauLeg1_) )matchLeg1Level1_ = true;
         //if(IsHLTMatched("hltDoubleL2IsoTau35eta2p1", (*run_hltfilters), trigCandP4_, trigobject_filters[it], tauLeg1_) )matchLeg1Level2_ = true;
-        if(IsHLTMatched("hltDoublePFTau40TrackPt1MediumIsolationDz02Reg", (*run_hltfilters), trigCandP4_, trigobject_filters[it], tauLeg1_) )matchLeg1Level3_ = true;
+        if(IsHLTMatched(hltFilter_, (*run_hltfilters), trigCandP4_, trigobject_filters[it], tauLeg1_) )matchLeg1Level3_ = true;
       }
       HLTmatchLeg1_ = matchLeg1Level3_; //(matchLeg1Level1_ && matchLeg1Level2_ && matchLeg1Level3_);
       if(!HLTmatchLeg1_) continue;
-
+      if(event_nr== 30706)std::cout<<" found HLTLeg1 : event "<<event_nr<<std::endl;
       for(unsigned int jt = it+1; jt < tau_count; jt++){ //tauL2   
 	    
 	LV tauLeg2_(tau_px[jt], tau_py[jt], tau_pz[jt], tau_e[jt]);
@@ -1335,7 +1371,7 @@ void fillTrees_TauTauStream(TChain* currentTree,
 	//if(tau_againstElectronVLooseMVA5[jt] < 0.5) continue;
 	//if(tau_againstMuonLoose3[jt] < 0.5) continue;
 	if(TMath::Abs(tau_charge[jt]) != 1) continue;
-
+	if(event_nr== 30706)std::cout<<" pass offline sel. Leg2: event "<<event_nr<<std::endl;
 	//HLT match
 	bool HLTmatchLeg2_ = false;
 	bool matchLeg2Level1_ = false; bool matchLeg2Level2_ = false; bool matchLeg2Level3_ = false;
@@ -1344,13 +1380,13 @@ void fillTrees_TauTauStream(TChain* currentTree,
 
 	  //if(IsHLTMatched("hltL1sDoubleTauJet36erORDoubleTauJet68er", (*run_hltfilters), trigCandP4_, trigobject_filters[it], tauLeg2_) )matchLeg2Level1_ = true;
 	  //if(IsHLTMatched("hltDoubleL2IsoTau35eta2p1", (*run_hltfilters), trigCandP4_, trigobject_filters[it], tauLeg2_) )matchLeg2Level2_ = true;
-	  if(IsHLTMatched("hltDoublePFTau40TrackPt1MediumIsolationDz02Reg", (*run_hltfilters), trigCandP4_, trigobject_filters[it], tauLeg2_) )matchLeg2Level3_ = true;
+	  if(IsHLTMatched(hltFilter_, (*run_hltfilters), trigCandP4_, trigobject_filters[it], tauLeg2_) )matchLeg2Level3_ = true;
 	}
 	HLTmatchLeg2_ = matchLeg2Level3_; //(matchLeg2Level1_ && matchLeg2Level2_ && matchLeg2Level3_);
 	if(!HLTmatchLeg2_) continue;
-
+	if(event_nr== 30706)std::cout<<" found HLTLeg2 : event "<<event_nr<<std::endl;
 	if(ROOT::Math::VectorUtil::DeltaR(tauLeg1_, tauLeg2_) < 0.5) continue;
-
+	if(event_nr== 30706)std::cout<<" pass DeltaR filter : event "<<event_nr<<std::endl;
 	float sumPt = tauLeg1_.pt() + tauLeg2_.pt();
 	float sumIso = tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[it] + tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[jt];
 	int pairCharge = tau_charge[it]*tau_charge[jt];
@@ -1364,7 +1400,7 @@ void fillTrees_TauTauStream(TChain* currentTree,
       }
     }
   
-    
+
     //sort diTaus, 1st according to sumIso, then sumPt  
     std::sort(sortDiTauInfos.begin(), sortDiTauInfos.end(), SortDiTauPairs()); 
 
@@ -1373,7 +1409,7 @@ void fillTrees_TauTauStream(TChain* currentTree,
       if(diTauCounter >= 0) continue;
       //diTauCounter++;
       //pairIndex   = diTauCounter;
-
+      if(event_nr== 30706)std::cout<<"pass selection: event "<<event_nr<<std::endl;
       int tau1 = iter->index1_;
       int tau2 = iter->index2_;
 
@@ -1445,32 +1481,22 @@ void fillTrees_TauTauStream(TChain* currentTree,
 	//apply PF JetID
 	bool passLooseJetID = false;
 	float totalPFEnergy = (JetP4_*pfjet_energycorr[ijet]).energy(); 
-	//pfjet_neutralhadronicenergy[ijet] + pfjet_chargedhadronicenergy[ijet] +
-	//pfjet_neutralemenergy[ijet] + pfjet_chargedemenergy[ijet];
-	if((TMath::Abs(JetP4_.eta())>2.4 && 
-	    (pfjet_neutralhadronicenergy[ijet]/totalPFEnergy)<0.99 && 
-	    (pfjet_neutralemenergy[ijet]/totalPFEnergy)<0.99 &&
-	    pfjet_chargedmulti[ijet]+pfjet_neutralmulti[ijet] > 1 ) ||
-	   (TMath::Abs(JetP4_.eta())<2.4 && 
-	    (pfjet_neutralhadronicenergy[ijet]/totalPFEnergy)<0.99 &&
-            (pfjet_neutralemenergy[ijet]/totalPFEnergy)<0.99 &&
-            pfjet_chargedmulti[ijet]+pfjet_neutralmulti[ijet] > 1 && 
-	    pfjet_chargedhadronicenergy[ijet]/totalPFEnergy > 0 &&
-	    pfjet_chargedmulti[ijet] > 0 &&
-	    pfjet_chargedemenergy[ijet]/totalPFEnergy<0.99
+	float NHF = pfjet_neutralhadronicenergy[ijet]/totalPFEnergy;
+	float NEMF = pfjet_neutralemenergy[ijet]/totalPFEnergy;
+	float NumConstituent = pfjet_chargedmulti[ijet]+pfjet_neutralmulti[ijet];
+	float CHF = pfjet_chargedhadronicenergy[ijet]/totalPFEnergy;
+	float CHM = pfjet_chargedmulti[ijet];
+	float CEMF = pfjet_chargedemenergy[ijet]/totalPFEnergy;
+	float NumNeutral = pfjet_neutralmulti[ijet];
+
+	if((TMath::Abs(JetP4_.eta())>3.0 && 
+	    NEMF < 0.90 && NumNeutral > 10) || 
+	   (TMath::Abs(JetP4_.eta())<=3.0 && 
+	    NHF<0.99 && NEMF<0.99 && NumConstituent > 1 && 
+	    ((TMath::Abs(JetP4_.eta())<=2.4 && CHF>0 && CHM>0 && CEMF<0.99) || 
+	      TMath::Abs(JetP4_.eta())>2.4)
 	    )
 	   ) passLooseJetID = true;
-	/*if(TMath::Abs(JetP4_.eta())>4.0  && JetP4_.pt() > 30)
-	  cout<<"jet eta "<<JetP4_.eta()<<" jet Id vriables "<<
-	    totalPFEnergy<<" "
-	      <<(pfjet_neutralhadronicenergy[ijet])/totalPFEnergy<<" "
-	      <<(pfjet_neutralemenergy[ijet]/totalPFEnergy)<<" "
-	      <<pfjet_chargedmulti[ijet]+pfjet_neutralmulti[ijet]<<" "
-	    //<<pfjet_chargedhadronicenergy[ijet]/totalPFEnergy<<" "
-	    //<<pfjet_chargedmulti[ijet]<<" "
-	    //<<pfjet_chargedemenergy[ijet]/totalPFEnergy<<" "
-	      <<endl;
-	*/
 	if(!passLooseJetID) continue;
 	//Apply PU JetID
 	//if(getJetIDMVALoose(JetP4_.pt(), JetP4_.eta(), pfjet_pu_jet_full_mva[ijet]) < 0.5) continue;
@@ -1484,7 +1510,7 @@ void fillTrees_TauTauStream(TChain* currentTree,
 	  //int jetFlavour = pfjet_flavour[ijet]; //get it from tree
 	  //bool isBtag = btsf->isbtagged(JetP4_.Pt(), JetP4_.Eta(), pfjet_btag[ijet][2], jetFlavour, isData ,kNo, kNo, true); //use CSV Medium WP
 	  float BDiscr = GetBTagDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags", (*run_btagdiscriminators), pfjet_btag[ijet]);
-	  bool isBtag = (BDiscr > 0.814); //pfCombinedInclusiveSecondaryVertexV2BJetTags
+	  bool isBtag = (BDiscr > 0.89); //pfCombinedInclusiveSecondaryVertexV2BJetTags
 	  //bool isBtag = (pfjet_btag[ijet][8] > 0.814); //pfCombinedInclusiveSecondaryVertexV2BJetTags
 
 	  if(isBtag){
@@ -1600,12 +1626,16 @@ void fillTrees_TauTauStream(TChain* currentTree,
 
       //Apply MET Recoil Correction
       //For Z+Jets, W+jets and Higgs
-      int mvamet_index = 0;
-      //for(UInt_t imet = 0; imet < mvamet_count; imet++){
-      //	std::cout<<"mva met channel "<<mvamet_channel[imet]<<std::endl;
-      //	if(strcmp(mvamet_channel[imet], "DiTau") == 0)mvamet_index = imet;
-      //}
-      //if(mvamet_index < 0) { std::cout<<"mvamet_index < 0"<<std::endl; break;}
+      int mvamet_index = -1;
+      for(UInt_t imet = 0; imet < mvamet_count; imet++){
+      	//std::cout<<"mva met channel "<<mvamet_channel[imet]<<std::endl;
+      	if(mvamet_channel[imet] == TAUTAU){
+	  if((int(mvamet_lep1[imet]) == tau1 && int(mvamet_lep2[imet]) == tau2) ||
+	     (int(mvamet_lep1[imet]) == tau2 && int(mvamet_lep2[imet]) == tau1))
+	    mvamet_index = imet;
+	}
+      }
+      if(mvamet_index < 0) { std::cout<<"mvamet_index < 0"<<std::endl; break;}
 
       LV mvaMetP4_(mvamet_ex[mvamet_index], mvamet_ey[mvamet_index], 0, 
 		   sqrt(mvamet_ex[mvamet_index]*mvamet_ex[mvamet_index] + mvamet_ey[mvamet_index]*mvamet_ey[mvamet_index]));
@@ -1704,23 +1734,12 @@ void fillTrees_TauTauStream(TChain* currentTree,
 	//Isolation
 	float eleIso_ = (electron_r03_sumChargedHadronPt[ie] + std::max(electron_r03_sumPhotonEt[ie]+electron_r03_sumNeutralHadronEt[ie] - 0.5*electron_r03_sumPUPt[ie], 0.0))/eleP4_.pt(); 
 	//MVA Id, 90% Eff WP
-	bool pass_eid_ = ((TMath::Abs(scEta)< 0.8 && electron_mva_id_nontrigPhys14[ie] > 0.933 ) || 
+	/*bool pass_eid_ = ((TMath::Abs(scEta)< 0.8 && electron_mva_id_nontrigPhys14[ie] > 0.933 ) || 
 			  (TMath::Abs(scEta)> 0.8 && TMath::Abs(scEta)< 1.479 && electron_mva_id_nontrigPhys14[ie] > 0.825 ) ||
 			  (TMath::Abs(scEta)> 1.479 && electron_mva_id_nontrigPhys14[ie] > 0.337 )
 			  );
-	
-	/* //Cut Based ID (not used)
-	bool pass_eid = ((TMath::Abs(scEta) <= 1.479 && electron_full5x5_sigmaietaieta[ie] < 0.011100 && electron_deltaetasuperclustertrack[ie] < 0.016315
-			  && electron_deltaphisuperclustertrack[ie] < 0.252044 && electron_ehcaloverecal[ie] < 0.345843 && electron_ooemoop[ie] < 0.248070
-			  && TMath::Abs(electron_dxy[ie]) < 0.060279 && TMath::Abs(electron_dz[ie]) < 0.800538 && electron_nmissinginnerhits[ie] <= 2
-			  && electron_pass_conversion[ie] == true)
-			 ||
-			 (TMath::Abs(scEta) > 1.479 && electron_full5x5_sigmaietaieta[ie] < 0.033987 && electron_deltaetasuperclustertrack[ie] < 0.010671
-                          && electron_deltaphisuperclustertrack[ie] < 0.245263 && electron_ehcaloverecal[ie] < 0.134691 && electron_ooemoop[ie] < 0.157160
-                          && TMath::Abs(electron_dxy[ie]) < 0.273097 && TMath::Abs(electron_dz[ie]) < 0.885860 && electron_nmissinginnerhits[ie] <= 3
-                          && electron_pass_conversion[ie] == true)
-			 );
 	*/
+	bool pass_eid_ = (electron_mva_wp90_nontrig_Spring15_v1[ie] > 0);
 
 	bool pass_conversion_ = (electron_pass_conversion[ie] == true && electron_nmissinginnerhits[ie] <= 1);
 
@@ -1746,35 +1765,67 @@ void fillTrees_TauTauStream(TChain* currentTree,
       bool matchLeg2Level1_ = false; bool matchLeg2Level2_ = false; bool matchLeg2Level3_ = false;
       for(unsigned int it = 0; it < trigobject_count; it++){
         LV trigCandP4_(trigobject_px[it], trigobject_py[it], trigobject_pz[it], sqrt(trigobject_px[it]*trigobject_px[it] + trigobject_py[it]*trigobject_py[it] + trigobject_pz[it]*trigobject_pz[it]));
-
-	//if(IsHLTMatched("hltL1sDoubleTauJet36erORDoubleTauJet68er", (*run_hltfilters), trigCandP4_, trigobject_filters[it], Leg1P4_) )matchLeg1Level1_ = true;
-	//if(IsHLTMatched("hltDoubleL2IsoTau35eta2p1", (*run_hltfilters), trigCandP4_, trigobject_filters[it], Leg1P4_) )matchLeg1Level2_ = true;
-	if(IsHLTMatched("hltDoublePFTau40TrackPt1MediumIsolationDz02Reg", (*run_hltfilters), trigCandP4_, trigobject_filters[it], Leg1P4_) )matchLeg1Level3_ = true;
-	
-	//if(IsHLTMatched("hltL1sDoubleTauJet36erORDoubleTauJet68er", (*run_hltfilters), trigCandP4_, trigobject_filters[it], Leg2P4_) )matchLeg2Level1_ = true;
-	//if(IsHLTMatched("hltDoubleL2IsoTau35eta2p1", (*run_hltfilters), trigCandP4_, trigobject_filters[it], Leg2P4_) )matchLeg2Level2_ = true;
-	if(IsHLTMatched("hltDoublePFTau40TrackPt1MediumIsolationDz02Reg", (*run_hltfilters), trigCandP4_, trigobject_filters[it], Leg2P4_) )matchLeg2Level3_ = true;
+	if(IsHLTMatched(hltFilter_, (*run_hltfilters), trigCandP4_, trigobject_filters[it], Leg1P4_) )matchLeg1Level3_ = true;
+	if(IsHLTMatched(hltFilter_, (*run_hltfilters), trigCandP4_, trigobject_filters[it], Leg2P4_) )matchLeg2Level3_ = true;
 
       }
-      HLTmatchL1 = matchLeg1Level3_; //(matchLeg1Level1_ && matchLeg1Level2_ && matchLeg1Level3_);
-      HLTmatchL2 = matchLeg2Level3_; //(matchLeg2Level1_ && matchLeg2Level2_ && matchLeg2Level3_);
-
-
+      HLTmatchL1 = matchLeg1Level3_; 
+      HLTmatchL2 = matchLeg2Level3_; 
+      
       //Define MC DY event type (used to split DY events)
-      isZtt_=false; isZll_=false; isZj_=false;
+      isZtt_=false; isZl_=false; isZj_=false;
+      genMatchL1_ = 99; genMatchL2_ = 99;
       if(sample_.find("DYJets") != std::string::npos){
 	//std::cout<<"sample "<<sample_<<" type "<<EventType_<<std::endl;
-	if(EventType_ == HADHAD)isZtt_ = true;
-	else if(nLepton_ >= 1 || TauLepDecay_ >= 1){
-	  bool matchl1gen_ = false, matchl2gen_ = false;
-	  for(size_t l = 0; l < genLeptonP4_.size(); l++){
-	    if(deltaR(Leg1P4_, genLeptonP4_[l]) < 0.5)matchl1gen_ = true;
-	    if(deltaR(Leg2P4_, genLeptonP4_[l]) < 0.5)matchl2gen_ = true;
+	int Leg1GenMatch_ = 6; int Leg2GenMatch_ = 6;
+	for(unsigned int ig = 0; ig < genparticles_count; ig++){
+	  int GenPdgId = genparticles_pdgid[ig];
+	  int GenStatus = genparticles_status[ig];
+	  //check electon
+	  if(fabs(GenPdgId) == 11 && (genparticles_isPrompt[ig] > 0 || genparticles_isDirectPromptTauDecayProduct[ig] > 0)) {
+	    LV genElecP4_(genparticles_px[ig], genparticles_py[ig], genparticles_pz[ig], genparticles_e[ig]);
+	    if(genElecP4_.pt() > 8){
+	      if(deltaR(Leg1P4_, genElecP4_) < 0.2){
+		if(genparticles_isPrompt[ig] > 0)Leg1GenMatch_ = 1;
+		else if(genparticles_isDirectPromptTauDecayProduct[ig] > 0)Leg1GenMatch_ = 3;
+	      }
+	      if(deltaR(Leg2P4_, genElecP4_) < 0.2){
+                if(genparticles_isPrompt[ig] > 0)Leg2GenMatch_ = 1;
+		else if(genparticles_isDirectPromptTauDecayProduct[ig] > 0)Leg2GenMatch_ = 3;
+              }
+	    }
 	  }
-	  if(matchl1gen_ && matchl2gen_) isZll_ = true;
+	  //check muon
+	  if(fabs(GenPdgId) == 13 && GenStatus == 1 && (genparticles_isPrompt[ig] > 0 || genparticles_isDirectPromptTauDecayProduct[ig] > 0)) {
+            LV genMuonP4_(genparticles_px[ig], genparticles_py[ig], genparticles_pz[ig], genparticles_e[ig]);
+            if(genMuonP4_.pt() > 8){
+              if(deltaR(Leg1P4_, genMuonP4_) < 0.2){
+                if(genparticles_isPrompt[ig] > 0)Leg1GenMatch_ = 2;
+		else if(genparticles_isDirectPromptTauDecayProduct[ig] > 0)Leg1GenMatch_ = 4;
+              }
+	      if(deltaR(Leg2P4_, genMuonP4_) < 0.2){
+		if(genparticles_isPrompt[ig] > 0)Leg2GenMatch_ = 2;
+                else if(genparticles_isDirectPromptTauDecayProduct[ig] > 0)Leg2GenMatch_ = 4;
+              }
+            }
+          }
 	}
-	if(!isZtt_ && !isZll_)isZj_ = true;
-      }
+	//check tau
+	for(unsigned int ig = 0; ig < gentau_count; ig++){                                         
+	  if(gentau_isPrompt[ig] <= 0) continue;
+	  LV genTauVisP4_(gentau_visible_px[ig], gentau_visible_py[ig], gentau_visible_pz[ig], gentau_visible_e[ig]); 
+	  if(genTauVisP4_.pt() > 15){
+	    if(deltaR(Leg1P4_, genTauVisP4_) < 0.2) Leg1GenMatch_ = 5;
+	    if(deltaR(Leg2P4_, genTauVisP4_) < 0.2) Leg2GenMatch_ = 5;
+	  }
+	}
+
+	if(Leg1GenMatch_ == 5 && Leg2GenMatch_ == 5) isZtt_=true;
+	else if(Leg1GenMatch_ < 5 || Leg2GenMatch_ < 5) isZl_= true;
+	else if(Leg1GenMatch_ == 6 || Leg2GenMatch_ == 6) isZj_ = true;
+
+	genMatchL1_ = Leg1GenMatch_; genMatchL2_ = Leg2GenMatch_;
+      }//end of gen matching
 
       pairIndex = -1;
       if(HLTx && HLTmatchL1 && HLTmatchL2){
