@@ -33,6 +33,9 @@
 
 #include "TauAnalysis/SVfitStandalone/interface/SVfitStandaloneAlgorithm.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/functions.h"
+#include "HTT-utilities/LepEffInterface/interface/ScaleFactor.h"
+#include "DesyTauAnalyses/NTupleMaker/interface/PileUp.h"
+
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/foreach.hpp>
@@ -266,6 +269,27 @@ int main(int argc, char * argv[]) {
   TString rootFileName(sample);
   std::string ntupleName("makeroottree/AC1B");
 
+
+  string cmsswBase = (getenv ("CMSSW_BASE"));
+
+  // PU reweighting - initialization
+  PileUp * PUofficial = new PileUp();
+  TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/Data_Pileup_2015D_Nov17.root","read");
+  TFile * filePUdistribution_MC = new TFile (TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/MC_Spring15_PU25_Startup.root", "read");
+  TH1D * PU_data = (TH1D *)filePUdistribution_data->Get("pileup");
+  TH1D * PU_mc = (TH1D *)filePUdistribution_MC->Get("pileup");
+  PUofficial->set_h_data(PU_data);
+  PUofficial->set_h_MC(PU_mc);
+
+  // Lepton Scale Factors
+  // Electron Id+Iso scale factor
+  ScaleFactor * SF_eleIdIso = new ScaleFactor();
+  SF_eleIdIso->init_ScaleFactor(TString(cmsswBase)+"/src/HTT-utilities/LepEffInterface/data/Electron/Electron_IdIso0p10_eff.root");
+
+  // Electron SingleElectron trigger scale factor
+  ScaleFactor * SF_eleTrigger = new ScaleFactor();
+  SF_eleTrigger->init_ScaleFactor(TString(cmsswBase)+"/src/HTT-utilities/LepEffInterface/data/Electron/Electron_SingleEle_eff.root");
+
   // output fileName with histograms
   rootFileName += "_";
   rootFileName += ifile;
@@ -306,9 +330,9 @@ int main(int argc, char * argv[]) {
   }
   std::ofstream fileOutput("overlap.out");
 
-  //sfFit
+  //svFit
   TH1::AddDirectory(false);  
-  TFile* inputFile_visPtResolution = new TFile(svFitPtResFile.data());
+  //TFile* inputFile_visPtResolution = new TFile(svFitPtResFile.data());
 
   for (int iF=ifile; iF<jfile; ++iF) {
 
@@ -391,15 +415,17 @@ int main(int argc, char * argv[]) {
       
       // weights
       otree->mcweight = 1.;
+      otree->puweight = 0;
+
       if(!isData)
 	otree->mcweight = analysisTree.genweight;
+	otree->puweight = float(PUofficial->get_PUweight(double(analysisTree.numtruepileupinteractions)));
+
       otree->xs = xs;
-      otree->puweight = 0;
       otree->trigweight_1 = 0;
       otree->trigweight_2 = 0;
-      otree->idweight_1 = 0;
+      otree->idisoweight_1 = 0;
       otree->idweight_2 = 0;
-      otree->isoweight_1 = 0;
       otree->isoweight_2 = 0;
       otree->effweight = 0;
       otree->fakeweight = 0;
@@ -410,6 +436,7 @@ int main(int argc, char * argv[]) {
       otree->npv = analysisTree.primvertex_count;
       otree->npu = analysisTree.numtruepileupinteractions;// numpileupinteractions;
       otree->rho = analysisTree.rho;
+	
 
       // vertex cuts
       //if (fabs(analysisTree.primvertex_z)>zVertexCut) continue;
@@ -624,7 +651,16 @@ int main(int argc, char * argv[]) {
       otree->againstElectronVTightMVA5_1 = 0;
       otree->againstMuonLoose3_1 = 0;
       otree->againstMuonTight3_1 = 0;
-      
+
+      // filling electron weights 
+      if (!isData) {
+      			// Scale Factor SingleEle trigger SF_eleTrigger
+      otree->trigweight_1 = (SF_eleTrigger->get_ScaleFactor(double(analysisTree.electron_pt[electronIndex]),double(analysisTree.electron_eta[electronIndex])));
+
+      			// Scale Factor Id+Iso SF_eleIdIso
+      otree->idisoweight_1 = (SF_eleIdIso->get_ScaleFactor(double(analysisTree.electron_pt[electronIndex]),double(analysisTree.electron_eta[electronIndex])));
+      }
+
       // filling tau variables
       otree->pt_2 = analysisTree.tau_pt[tauIndex];
       otree->eta_2 = analysisTree.tau_eta[tauIndex];

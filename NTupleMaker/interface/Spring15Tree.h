@@ -37,9 +37,8 @@ public :
   Float_t         puweight;
   Float_t         trigweight_1;
   Float_t         trigweight_2;
-  Float_t         idweight_1;
+  Float_t         idisoweight_1;
   Float_t         idweight_2;
-  Float_t         isoweight_1;
   Float_t         isoweight_2;
   Float_t         effweight;
   Float_t         fakeweight;
@@ -161,9 +160,8 @@ public :
   TBranch        *b_puweight;   //!
   TBranch        *b_trigweight_1;   //!
   TBranch        *b_trigweight_2;   //!
-  TBranch        *b_idweight_1;   //!
+  TBranch        *b_idisoweight_1;   //!
   TBranch        *b_idweight_2;   //!
-  TBranch        *b_isoweight_1;   //!
   TBranch        *b_isoweight_2;   //!
   TBranch        *b_effweight;   //!
   TBranch        *b_fakeweight;   //!

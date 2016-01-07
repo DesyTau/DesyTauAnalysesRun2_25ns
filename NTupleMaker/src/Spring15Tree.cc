@@ -67,9 +67,8 @@ void Spring15Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("puweight", &puweight, &b_puweight);
    fChain->SetBranchAddress("trigweight_1", &trigweight_1, &b_trigweight_1);
    fChain->SetBranchAddress("trigweight_2", &trigweight_2, &b_trigweight_2);
-   fChain->SetBranchAddress("idweight_1", &idweight_1, &b_idweight_1);
+   fChain->SetBranchAddress("idisoweight_1", &idisoweight_1, &b_idisoweight_1);
    fChain->SetBranchAddress("idweight_2", &idweight_2, &b_idweight_2);
-   fChain->SetBranchAddress("isoweight_1", &isoweight_1, &b_isoweight_1);
    fChain->SetBranchAddress("isoweight_2", &isoweight_2, &b_isoweight_2);
    fChain->SetBranchAddress("effweight", &effweight, &b_effweight);
    fChain->SetBranchAddress("fakeweight", &fakeweight, &b_fakeweight);
@@ -263,9 +262,8 @@ void Spring15Tree::WriteInit(TTree *tree) {
   fChain->Branch("puweight", &puweight, "puweight/F");
   fChain->Branch("trigweight_1", &trigweight_1, "trigweight_1/F");
   fChain->Branch("trigweight_2", &trigweight_2, "trigweight_2/F");
-  fChain->Branch("idweight_1", &idweight_1, "idweight_1/F");
+  fChain->Branch("idisoweight_1", &idisoweight_1, "idisoweight_1/F");
   fChain->Branch("idweight_2", &idweight_2, "idweight_2/F");
-  fChain->Branch("isoweight_1", &isoweight_1, "isoweight_1/F");
   fChain->Branch("isoweight_2", &isoweight_2, "isoweight_2/F");
   fChain->Branch("effweight", &effweight, "effweight/F");
   fChain->Branch("fakeweight", &fakeweight, "fakeweight/F");
