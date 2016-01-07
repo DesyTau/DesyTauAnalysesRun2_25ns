@@ -47,6 +47,8 @@ void synchNtuple(string sample = "GGFH125", string stream = "MuTau", bool incl=f
    float lTrigweight_2 = 0; lOTree->Branch("trigweight_2"     ,&lTrigweight_2        ,"lTrigweight_2/F"  ); 
    float lIdweight_2 = 0; lOTree->Branch("idweight_2"     ,&lIdweight_2        ,"lIdweight_2/F"  ); 
    float lIsoweight_2 = 0; lOTree->Branch("isoweight_2"     ,&lIsoweight_2        ,"lIsoweight_2/F"  );
+   int lgen_match_1 = 99; lOTree->Branch("gen_match_1",   &lgen_match_1,    "lgen_match_1/I");
+   int lgen_match_2 = 99; lOTree->Branch("gen_match_2",   &lgen_match_2,    "lgen_match_2/I");
 
    //SV Fit variables
    float lMSV         = 0; lOTree->Branch("m_sv"       ,&lMSV           ,"lMSV/F"     );//SV Fit using integration method
@@ -199,14 +201,8 @@ void synchNtuple(string sample = "GGFH125", string stream = "MuTau", bool incl=f
    /////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-   //TFile *file = new TFile(("./batch/nTuple"+sample+"_Open_"+stream+"Stream.root").c_str(),"READ");
-   //TTree *tree_orig = (TTree*)file->Get("outTreePtOrd")->Clone("tree");
    TChain *tree = new TChain("outTree");
-   tree->Add(("/nfs/dust/cms/user/anayak/CMS/Ntuple_HttAnalysis/ntuples74/nTuple"+sample+".root").c_str());
-
-   //TCut sbinPair("etaL1<999.");
-   //if( stream.find("TauTau")!=string::npos)
-   //sbinPair = TCut("ptL1>45 && ptL2>45 && tightestHPSMVA3oldDMwLTWPL1>2 && tightestHPSMVA3oldDMwLTWPL2>2 && genVMass>(0.7*130) && genVMass<(1.3*130) && HLTx"); // && HLTmatchL1 && HLTmatchL2 && HLTx");
+   tree->Add(("/nfs/dust/cms/user/anayak/CMS/Ntuple_HttAnalysis/ntuples74_25ns_v2//nTuple"+sample+".root").c_str());
 
    int iPairIndex      ; tree->SetBranchAddress("pairIndex"     ,&iPairIndex);
    int  iHLTx          ; tree->SetBranchAddress("HLTx"        ,&iHLTx   );
@@ -332,7 +328,10 @@ void synchNtuple(string sample = "GGFH125", string stream = "MuTau", bool incl=f
    int   iNJets20    ; tree->SetBranchAddress("nJets20"      ,&iNJets20       );
   
    float iDiTauCharge; tree->SetBranchAddress("diTauCharge"      ,&iDiTauCharge         );
-   
+
+   int iGenMatchL1; tree->SetBranchAddress("genMatchL1",       &iGenMatchL1 );
+   int iGenMatchL2; tree->SetBranchAddress("genMatchL2",       &iGenMatchL2 );
+
    //float igenVMass = 0; tree->SetBranchAddress("genVMass",    &igenVMass);
    /*
    tree->Draw(">>+skim", sbinPair,"entrylist");   
@@ -465,6 +464,9 @@ void synchNtuple(string sample = "GGFH125", string stream = "MuTau", bool incl=f
 
      ldiTauCharge = iDiTauCharge;
 
+     lgen_match_1 = iGenMatchL1;
+     lgen_match_2 = iGenMatchL2;
+     
      //veto lepton
      lNVetoMuon = iNVetoMuon;
      lNVetoElectron = iNVetoElectron;

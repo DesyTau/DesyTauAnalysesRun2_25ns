@@ -105,6 +105,10 @@ void compareSync(TString myGroup,TString myPath,TString myRootFile, TString myTr
   drawHistos(&C,filename,"inclusive",Tmine,Tother,"againstMuonTight3_2",10,0,2,selection,myGroup,myRootFile,group,groupRootFile,mySel,groupSel);
   drawHistos(&C,filename,"inclusive",Tmine,Tother,"met",20,0,200,selection,myGroup,myRootFile,group,groupRootFile,mySel,groupSel);
   drawHistos(&C,filename,"inclusive",Tmine,Tother,"metphi",30,-3.5,3.5,selection,myGroup,myRootFile,group,groupRootFile,mySel,groupSel);
+  drawHistos(&C,filename,"inclusive",Tmine,Tother,"metcov00",50,0,2500,selection,myGroup,myRootFile,group,groupRootFile,mySel,groupSel);
+  drawHistos(&C,filename,"inclusive",Tmine,Tother,"metcov01",50,0,2500,selection,myGroup,myRootFile,group,groupRootFile,mySel,groupSel);
+  drawHistos(&C,filename,"inclusive",Tmine,Tother,"metcov10",50,0,2500,selection,myGroup,myRootFile,group,groupRootFile,mySel,groupSel);
+  drawHistos(&C,filename,"inclusive",Tmine,Tother,"metcov11",50,0,2500,selection,myGroup,myRootFile,group,groupRootFile,mySel,groupSel);
   drawHistos(&C,filename,"inclusive",Tmine,Tother,"mvamet",50,0,100,selection,myGroup,myRootFile,group,groupRootFile,mySel,groupSel);
   drawHistos(&C,filename,"inclusive",Tmine,Tother,"mvametphi",35,-3.5,3.5,selection,myGroup,myRootFile,group,groupRootFile,mySel,groupSel);
   drawHistos(&C,filename,"inclusive",Tmine,Tother,"mvacov00",50,0,2500,selection,myGroup,myRootFile,group,groupRootFile,mySel,groupSel);
