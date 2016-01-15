@@ -130,8 +130,11 @@ int main(int argc, char * argv[]) {
   //svfit
   const string svFitPtResFile = cfg.get<string>("svFitPtResFile");
 
+  //pileup distrib in data
+  const string pileUpInDataFile = cfg.get<string>("pileUpInDataFile");
+
   // HLT filters
-  const string isoLeg   = cfg.get<string>("isoLeg");
+  string isoLeg;//   = cfg.get<string>("isoLegData");
   const float ptTrigObjCut  = cfg.get<float>("ptTrigObjCut");
   
   // vertex cuts
@@ -224,6 +227,11 @@ int main(int argc, char * argv[]) {
   else{
     xs = cfg2.get<float>("xs");
   }
+  if (isData){
+    isoLeg = cfg.get<string>("isoLegData");
+  }
+  else {isoLeg = cfg.get<string>("isoLegMC");}
+
   // **** end of configuration analysis
     
   int ifile = 0;
@@ -274,7 +282,7 @@ int main(int argc, char * argv[]) {
 
   // PU reweighting - initialization
   PileUp * PUofficial = new PileUp();
-  TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/Data_Pileup_2015D_Nov17.root","read");
+  TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/"+TString(pileUpInDataFile),"read");
   TFile * filePUdistribution_MC = new TFile (TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/MC_Spring15_PU25_Startup.root", "read");
   TH1D * PU_data = (TH1D *)filePUdistribution_data->Get("pileup");
   TH1D * PU_mc = (TH1D *)filePUdistribution_MC->Get("pileup");
@@ -674,6 +682,7 @@ int main(int argc, char * argv[]) {
       otree->dZ_2 = analysisTree.tau_leadchargedhadrcand_dz[tauIndex];      
       otree->iso_2 = analysisTree.tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[tauIndex];
       otree->m_2 = analysisTree.tau_mass[tauIndex];
+      otree->decayMode_2 = analysisTree.tau_decayMode[tauIndex];
 
       otree->byCombinedIsolationDeltaBetaCorrRaw3Hits_2 = analysisTree.tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[tauIndex];
       otree->byLooseCombinedIsolationDeltaBetaCorr3Hits_2 = analysisTree.tau_byLooseCombinedIsolationDeltaBetaCorr3Hits[tauIndex];
@@ -900,12 +909,12 @@ int main(int argc, char * argv[]) {
 	    break;
 	  }
 	}
-
+/*
 	if ( fabs(analysisTree.mvamet_lep1_pt[iMet] - otree->pt_2) > 0.0001 )
 	  std::cout<<"tau pt does not match"<<std::endl;
 	if ( fabs(analysisTree.mvamet_lep2_pt[iMet] - otree->pt_1) > 0.0001 )
 	  std::cout<<"ele pt does not match"<<std::endl;
-	
+*/
 	float mvamet_x = 0;
 	float mvamet_y = 0;
 	otree->mvacov00 = 0.;

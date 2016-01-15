@@ -76,6 +76,7 @@ public :
   Float_t         mt_2;
   Float_t         pfmt_2;
   Float_t         puppimt_2;
+  Int_t 	  decayMode_2;
   Int_t           os;
   Int_t           dilepton_veto;
   Int_t           extraelec_veto;
@@ -199,6 +200,7 @@ public :
   TBranch        *b_mt_2;   //!
   TBranch        *b_pfmt_2;   //!
   TBranch        *b_puppimt_2;   //!
+  TBranch        *b_decayMode_2;   //!
   TBranch        *b_os;   //!
   TBranch        *b_dilepton_veto;   //!
   TBranch        *b_extraelec_veto;   //!

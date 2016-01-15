@@ -106,6 +106,7 @@ void Spring15Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("mt_2", &mt_2, &b_mt_2);
    fChain->SetBranchAddress("pfmt_2", &pfmt_2, &b_pfmt_2);
    fChain->SetBranchAddress("puppimt_2", &puppimt_2, &b_puppimt_2);
+   fChain->SetBranchAddress("decayMode_2", &decayMode_2, &b_decayMode_2); 
    fChain->SetBranchAddress("os", &os, &b_os);
    fChain->SetBranchAddress("dilepton_veto", &dilepton_veto, &b_dilepton_veto);
    fChain->SetBranchAddress("extraelec_veto", &extraelec_veto, &b_extraelec_veto);
@@ -304,6 +305,7 @@ void Spring15Tree::WriteInit(TTree *tree) {
   fChain->Branch("mt_2", &mt_2, "mt_2/F");
   fChain->Branch("pfmt_2", &pfmt_2, "pfmt_2/F");
   fChain->Branch("puppimt_2", &puppimt_2, "puppimt_2/F");
+  fChain->Branch("decayMode_2", &decayMode_2, "decayMode_2/I");
   
   fChain->Branch("os", &os, "os/I");
   fChain->Branch("dilepton_veto", &dilepton_veto, "dilepton_veto/I");
