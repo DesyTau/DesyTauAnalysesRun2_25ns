@@ -27,8 +27,260 @@
 #include "DesyTauAnalyses/NTupleMaker/interface/Config.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/AC1B.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/json.h"
-#include "DesyTauAnalyses/NTupleMaker/interface/functions.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/EventWeight.h"
+
+const float electronMass = 0;
+const float muonMass = 0.10565837;
+const float pionMass = 0.1396;
+
+int binNumber(float x, int nbins, float * bins) {
+
+  int binN = 0;
+
+  for (int iB=0; iB<nbins; ++iB) {
+    if (x>=bins[iB]&&x<bins[iB+1]) {
+      binN = iB;
+      break;
+    }
+  }
+
+  return binN;
+
+}
+
+float effBin(float x, int nbins, float * bins, float * eff) {
+
+  int bin = binNumber(x, nbins, bins);
+
+  return eff[bin];
+
+}
+
+double cosRestFrame(TLorentzVector boost, TLorentzVector vect) {
+
+  double bx = -boost.Px()/boost.E();
+  double by = -boost.Py()/boost.E();
+  double bz = -boost.Pz()/boost.E();
+
+  vect.Boost(bx,by,bz);
+  double prod = -vect.Px()*bx-vect.Py()*by-vect.Pz()*bz;
+  double modBeta = TMath::Sqrt(bx*bx+by*by+bz*bz); 
+  double modVect = TMath::Sqrt(vect.Px()*vect.Px()+vect.Py()*vect.Py()+vect.Pz()*vect.Pz());
+  
+  double cosinus = prod/(modBeta*modVect);
+
+  return cosinus;
+
+}
+
+double QToEta(double Q) {
+  double Eta = - TMath::Log(TMath::Tan(0.5*Q));  
+  return Eta;
+}
+
+double EtaToQ(double Eta) {
+  double Q = 2.0*TMath::ATan(TMath::Exp(-Eta));
+  if (Q<0.0) Q += TMath::Pi();
+  return Q;
+}
+
+double PtoEta(double Px, double Py, double Pz) {
+
+  double P = TMath::Sqrt(Px*Px+Py*Py+Pz*Pz);
+  double cosQ = Pz/P;
+  double Q = TMath::ACos(cosQ);
+  double Eta = - TMath::Log(TMath::Tan(0.5*Q));  
+  return Eta;
+
+}
+
+double PtoPhi(double Px, double Py) {
+  return TMath::ATan2(Py,Px);
+}
+
+double PtoPt(double Px, double Py) {
+  return TMath::Sqrt(Px*Px+Py*Py);
+}
+
+double dPhiFrom2P(double Px1, double Py1,
+		  double Px2, double Py2) {
+
+
+  double prod = Px1*Px2 + Py1*Py2;
+  double mod1 = TMath::Sqrt(Px1*Px1+Py1*Py1);
+  double mod2 = TMath::Sqrt(Px2*Px2+Py2*Py2);
+  
+  double cosDPhi = prod/(mod1*mod2);
+  
+  return TMath::ACos(cosDPhi);
+
+}
+
+double deltaEta(double Px1, double Py1, double Pz1,
+		double Px2, double Py2, double Pz2) {
+
+  double eta1 = PtoEta(Px1,Py1,Pz1);
+  double eta2 = PtoEta(Px2,Py2,Pz2);
+
+  double dEta = eta1 - eta2;
+
+  return dEta;
+
+}
+
+double deltaR(double Eta1, double Phi1,
+	      double Eta2, double Phi2) {
+
+  double Px1 = TMath::Cos(Phi1);
+  double Py1 = TMath::Sin(Phi1);
+
+  double Px2 = TMath::Cos(Phi2);
+  double Py2 = TMath::Sin(Phi2);
+
+  double dPhi = dPhiFrom2P(Px1,Py1,Px2,Py2);
+  double dEta = Eta1 - Eta2;
+
+  double dR = TMath::Sqrt(dPhi*dPhi+dEta*dEta);
+
+  return dR;
+
+}
+
+double PtEtaToP(double Pt, double Eta) {
+
+  //  double Q = EtaToQ(Eta);
+
+  //double P = Pt/TMath::Sin(Q);
+  double P = Pt*TMath::CosH(Eta);
+
+  return P;
+}
+double Px(double Pt, double Phi){
+
+  double Px=Pt*TMath::Cos(Phi);
+  return Px;
+}
+double Py(double Pt, double Phi){
+
+  double Py=Pt*TMath::Sin(Phi);
+  return Py;
+}
+double Pz(double Pt, double Eta){
+
+  double Pz=Pt*TMath::SinH(Eta);
+  return Pz;
+}
+double InvariantMass(double energy,double Px,double Py, double Pz){
+
+  double M_2=energy*energy-Px*Px-Py*Py-Pz*Pz;
+  double M=TMath::Sqrt(M_2);
+  return M;
+
+
+}
+double EFromPandM0(double M0,double Pt,double Eta){
+
+  double E_2=M0*M0+PtEtaToP(Pt,Eta)*PtEtaToP(Pt,Eta);
+  double E =TMath::Sqrt(E_2);
+  return E;
+
+}
+
+bool electronMvaIdTight(float eta, float mva) {
+
+  float absEta = fabs(eta);
+
+  bool passed = false;
+  if (absEta<0.8) {
+    if (mva>0.73) passed = true;
+  }
+  else if (absEta<1.479) {
+    if (mva>0.57) passed = true;
+  }
+  else {
+    if (mva>0.05) passed = true;
+  }
+
+  return passed;
+
+}
+
+bool electronMvaIdLoose(float eta, float mva) {
+
+  float absEta = fabs(eta);
+
+  bool passed = false;
+  if (absEta<0.8) {
+    if (mva>0.35) passed = true;
+  }
+  else if (absEta<1.479) {
+    if (mva>0.20) passed = true;
+  }
+  else {
+    if (mva>-0.52) passed = true;
+  }
+
+  return passed;
+
+}
+
+bool electronMvaIdWP80(float pt, float eta, float mva) {
+
+  float absEta = fabs(eta);
+  bool passed = false;
+  if (absEta<0.8) {
+    if (pt<10) 
+      passed = mva > -0.253;
+    else 
+      passed = mva > 0.965;
+  }
+  else if (absEta<1.479) {
+    if (pt<10)
+      passed = mva > 0.081;
+    else
+      passed = mva > 0.917;
+  }
+  else {
+    if (pt<10)
+      passed = mva > -0.081;
+    else
+      passed = mva > 0.683;
+  }
+
+  return passed;
+
+}
+
+bool electronMvaIdWP90(float pt, float eta, float mva) {
+
+  float absEta = fabs(eta);
+  bool passed = false;
+  if (absEta<0.8) {
+    if (pt<10) 
+      passed = mva > -0.483;
+    else 
+      passed = mva > 0.933;
+  }
+  else if (absEta<1.479) {
+    if (pt<10)
+      passed = mva > -0.267;
+    else
+      passed = mva > 0.825;
+  }
+  else {
+    if (pt<10)
+      passed = mva > -0.323;
+    else
+      passed = mva > 0.337;
+  }
+
+  return passed;
+
+}
+
+struct myclass {
+  bool operator() (int i,int j) { return (i<j);}
+} myobject, myobjectX;
 
 
 int main(int argc, char * argv[]) {
@@ -96,7 +348,10 @@ int main(int argc, char * argv[]) {
 
   const string recoilFileName   = cfg.get<string>("RecoilFileName");
   TString RecoilFileName(recoilFileName);
-    
+
+  //Run-lumi selector
+  const string jsonFile = cfg.get<string>("jsonFile");
+  
   // lepton scale factors
   const string muonSfData = cfg.get<string>("MuonSfData");
   const string muonSfMC = cfg.get<string>("MuonSfMC");
@@ -112,7 +367,42 @@ int main(int argc, char * argv[]) {
   string cmsswBase = (getenv ("CMSSW_BASE"));
 
   TString fullDir = TString(cmsswBase)+TString("/src/DesyTauAnalyses/NTupleMaker/data/");
+  
+  //Run-lumi selector
 
+  //  std:: vector<Period> periods;
+
+  //  string fullPathToJsonFile = cmsswBase + "/src/DesyTauAnalyses/NTupleMaker/test/json/" + jsonFile;
+
+  int nDPtBins = 9;
+  float DPtBins[10] = {0,10,15,20,25,30,40,50,60,1000};
+  TString dPtBins[9] = {"Pt0to10",
+			"Pt10to15",
+			"Pt15to20",
+			"Pt20to25",
+			"Pt25to30",
+			"Pt30to40",
+			"Pt40to50",
+			"Pt50to60",
+			"PtGt60"};
+  int nDEtaBins = 4;
+  float DEtaBins[5]= {0,0.9,1.2,2.1,2.4};
+  TString dEtaBins[4] = {"Eta0to0p9",
+			 "Eta0p9to1p2",
+			 "Eta1p2to2p1",
+			 "Eta2p1to2p4"};
+  TH1D * dxyMu1[4][9];
+  TH1D * dxyMu2[4][9];
+  TH1D * dzMu1[4][9];
+  TH1D * dzMu2[4][9];
+
+  /*
+  TH1D * dxyMu1_m70to110[5][9];
+  TH1D * dxyMu2_m70to110[5][9];
+  TH1D * dzMu1_m70to110[5][9];
+  TH1D * dzMu2_m70to110[5][9];
+  */
+  
   EventWeight * eventWeight = new EventWeight(fullDir);
 
   int nJetBins = 3;
@@ -125,13 +415,13 @@ int main(int argc, char * argv[]) {
 			"Pt20to30H",
 			"Pt30to50H",
 			"PtGt50H"};
-
-  TH1F * recoilZParalH[3];
-  TH1F * recoilZPerpH[3];
-  TH1F * recoilZParal_Ptbins_nJetsH[3][5];
-  TH1F * recoilZPerp_Ptbins_nJetsH[3][5];
   
-  TH1F * ptRatio_nJetsH[3];
+  TH1D * recoilZParalH[3];
+  TH1D * recoilZPerpH[3];
+  TH1D * recoilZParal_Ptbins_nJetsH[3][5];
+  TH1D * recoilZPerp_Ptbins_nJetsH[3][5];
+  
+  TH1D * ptRatio_nJetsH[3];
 
   TString RecoilZParal("recoilZParal_");
   TString RecoilZPerp("recoilZPerp_");
@@ -162,8 +452,8 @@ int main(int argc, char * argv[]) {
   if (!vertexFileFound) 
     exit(-1);
 
-  TH1F * vertexDataH = (TH1F*)fileDataNVert->Get(TString(vertHistName));
-  TH1F * vertexMcH   = (TH1F*)fileMcNVert->Get(TString(vertHistName));
+  TH1D * vertexDataH = (TH1D*)fileDataNVert->Get(TString(vertHistName));
+  TH1D * vertexMcH   = (TH1D*)fileMcNVert->Get(TString(vertHistName));
   if (vertexDataH==NULL||vertexMcH==NULL) {
     std::cout << "Vertex distribution histogram " << vertHistName << " is not found" << std::endl;
     exit(-1);
@@ -239,7 +529,7 @@ int main(int argc, char * argv[]) {
   }
   ptBinsSF[nPtBinsSF] = 1000000;
 
-
+  /*
   // Run-lumi selector
   std::vector<Period> periods;
     
@@ -250,7 +540,7 @@ int main(int argc, char * argv[]) {
       std::stringstream ss(s);
       ss >> periods.back();
     }
-
+  */   //This part is commented out, since we using direct jsonfiles
 
   // file name and tree name
   std::string rootFileName(argv[2]);
@@ -265,28 +555,28 @@ int main(int argc, char * argv[]) {
   file->cd("");
 
 
-  TH1F * inputEventsH = new TH1F("inputEventsH","",1,-0.5,0.5);
-  TH1F * histWeightsH = new TH1F("histWeightsH","",1,-0.5,0.5);
+  TH1D * inputEventsH = new TH1D("inputEventsH","",1,-0.5,0.5);
+  TH1D * histWeightsH = new TH1D("histWeightsH","",1,-0.5,0.5);
 
   // Histograms after selecting unique dimuon pair
-  TH1F * ptLeadingMuSelH = new TH1F("ptLeadingMuSelH","",100,0,200);
-  TH1F * ptTrailingMuSelH = new TH1F("ptTrailingMuSelH","",100,0,200);
+  TH1D * ptLeadingMuSelH = new TH1D("ptLeadingMuSelH","",100,0,200);
+  TH1D * ptTrailingMuSelH = new TH1D("ptTrailingMuSelH","",100,0,200);
   TH2F * ptScatter =new TH2F("ptScatter","",100,0,200,100,0,200);
   TProfile2D *hprof2D_pt = new TProfile2D("hprof2D_pt","",100,0,200,100,0,200);
-  TH1F * etaLeadingMuSelH = new TH1F("etaLeadingMuSelH","",50,-2.5,2.5);
-  TH1F * etaTrailingMuSelH = new TH1F("etaTrailingMuSelH","",50,-2.5,2.5);
-  TH1F * massSelH = new TH1F("massSelH","",200,0,200);
-  TH1F * metSelH  = new TH1F("metSelH","",200,0,400);
+  TH1D * etaLeadingMuSelH = new TH1D("etaLeadingMuSelH","",50,-2.5,2.5);
+  TH1D * etaTrailingMuSelH = new TH1D("etaTrailingMuSelH","",50,-2.5,2.5);
+  TH1D * massSelH = new TH1D("massSelH","",200,0,200);
+  TH1D * metSelH  = new TH1D("metSelH","",200,0,400);
 
-  TH1F * nJets30SelH    = new TH1F("nJets30SelH","",11,-0.5,10.5);
-  TH1F * nJets30etaCutSelH = new TH1F("nJets30etaCutSelH","",11,-0.5,10.5);
-  TH1F * nJets20SelH    = new TH1F("nJets20SelH","",11,-0.5,10.5);
-  TH1F * nJets20etaCutSelH = new TH1F("nJets20etaCutSelH","",11,-0.5,10.5);
+  TH1D * nJets30SelH    = new TH1D("nJets30SelH","",11,-0.5,10.5);
+  TH1D * nJets30etaCutSelH = new TH1D("nJets30etaCutSelH","",11,-0.5,10.5);
+  TH1D * nJets20SelH    = new TH1D("nJets20SelH","",11,-0.5,10.5);
+  TH1D * nJets20etaCutSelH = new TH1D("nJets20etaCutSelH","",11,-0.5,10.5);
 
-  TH1F * HT30SelH       = new TH1F("HT30SelH","",50,0,500);
-  TH1F * HT30etaCutSelH = new TH1F("HT30etaCutSelH","",50,0,500);
-  TH1F * HT20SelH       = new TH1F("HT20SelH","",50,0,500);
-  TH1F * HT20etaCutSelH = new TH1F("HT20etaCutSelH","",50,0,500);
+  TH1D * HT30SelH       = new TH1D("HT30SelH","",50,0,500);
+  TH1D * HT30etaCutSelH = new TH1D("HT30etaCutSelH","",50,0,500);
+  TH1D * HT20SelH       = new TH1D("HT20SelH","",50,0,500);
+  TH1D * HT20etaCutSelH = new TH1D("HT20etaCutSelH","",50,0,500);
   
   //Discriminiant histos
   TH1D * h_dimuonEta = new TH1D("dimuonEta","",50,-6,+6);//21Aug
@@ -328,8 +618,8 @@ int main(int argc, char * argv[]) {
    //TH1D * h_dxy_muon2_dcaCut =new TH1D ("dxy_muon2_dcaCut","",50,-0.02,0.02);
    //TH1D * h_dimuonEta_dcaCut = new TH1D("dimuonEta_dcaCut","",50,-6,+6);
    //TH1D * h_ptRatio_dcaCut = new TH1D ("ptRatio_dcaCut","",50,0,1);
-  TH1D * h_DZeta = new TH1D("DZeta","",60,-400,200);
-
+  TH1D * h_DZeta = new TH1D("DZeta","",100,-400,200);
+  TH1D * h_Njets = new TH1D("Njets","",100,0,10);
 
   //Booking variables in Tree for BDT training  
   Float_t n_genWeight;
@@ -338,6 +628,11 @@ int main(int argc, char * argv[]) {
   Float_t n_dcaSigdxy1;
   Float_t n_dcaSigdxy2;
   Float_t n_phiangle;
+  Float_t n_twomuPhi;
+  Float_t n_dxy_muon1;
+  Float_t n_dxy_muon2;
+  Float_t n_dz_muon1;
+  Float_t n_dz_muon2;
   //Float_t n_dcaSigdxy_mu1;
   //Float_t n_dcaSigdxy_mu2;
   Float_t n_dcaSigdz1;
@@ -346,12 +641,20 @@ int main(int argc, char * argv[]) {
   //Float_t n_dcaSigdz_mu2;
   Float_t n_MissingEt;
   Float_t n_DZeta;
-  Float_t n_dimuonMass;
-  Float_t n_met;
-  
+  Float_t n_dimuonMass;  Float_t n_met;
+
+  Float_t genWeight;
+
+  TTree * TW = new TTree("TW","Weights");
+  TW->Branch("genWeight",&genWeight,"genWeight/F");
+
   TTree * T = new TTree("T","Discriminant variables for BDT");
   T->Branch("dimuonEta",&n_dimuonEta,"n_dimuonEta/F");
   T->Branch("ptRatio",&n_ptRatio,"n_ptRatio/F");
+  T->Branch("dxy_muon1",&n_dxy_muon1,"n_dxy_muon1/F");
+  T->Branch("dxy_muon2",&n_dxy_muon2,"n_dxy_muon2/F");
+  T->Branch("dz_muon1",&n_dz_muon1,"n_dz_muon1/F");
+  T->Branch("dz_muon2",&n_dz_muon2,"n_dz_muon2/F");
   T->Branch("dcaSigdxy_muon1",&n_dcaSigdxy1,"n_dcaSigdxy1/F");
   T->Branch("dcaSigdxy_muon2",&n_dcaSigdxy2,"n_dcaSigdxy2/F");
   // T->Branch("dcaSigdxy_m1",&n_dcaSigdxy_mu1,"n_dcaSigdxy_mu1/F");
@@ -362,39 +665,55 @@ int main(int argc, char * argv[]) {
   //T->Branch("dcaSigdz_mu2",&n_dcaSigdz_mu2,"n_dcaSigdz_mu2/F");
   T->Branch("MissingET",&n_MissingEt,"n_MissingEt/F");
   T->Branch("phi_PosMu_MET",&n_phiangle, "n_phiangle/F");
+  T->Branch("phi_TwoMu",&n_twomuPhi,"n_twomuPhi/F");
   T->Branch("DZeta",&n_DZeta,"n_DZeta/F");
   T->Branch("genWeight",&n_genWeight,"n_genWeight/F");
   T->Branch("dimuonMass",&n_dimuonMass,"n_dimuonMass/F");
   T->Branch("met",&n_met,"n_met/F");
 
-  TH1F * NumberOfVerticesH = new TH1F("NumberOfVerticesH","",51,-0.5,50.5);
+  TH1D * NumberOfVerticesH = new TH1D("NumberOfVerticesH","",50,-0.5,50.5);
   
-  TH1F * ZMassEtaPtPass[3][7];
-  TH1F * ZMassEtaPtFail[3][7];
+  TH1D * ZMassEtaPtPass[3][7];
+  TH1D * ZMassEtaPtFail[3][7];
 
   for (int iEta=0; iEta<nEtaBins; ++iEta) {
     for (int iPt=0; iPt<nPtBins; ++iPt) {
-      ZMassEtaPtPass[iEta][iPt] = new TH1F("ZMass"+EtaBins[iEta]+PtBins[iPt]+"Pass","",60,60,120);
-      ZMassEtaPtFail[iEta][iPt] = new TH1F("ZMass"+EtaBins[iEta]+PtBins[iPt]+"Fail","",60,60,120);
+      ZMassEtaPtPass[iEta][iPt] = new TH1D("ZMass"+EtaBins[iEta]+PtBins[iPt]+"Pass","",60,60,120);
+      ZMassEtaPtFail[iEta][iPt] = new TH1D("ZMass"+EtaBins[iEta]+PtBins[iPt]+"Fail","",60,60,120);
     }
   }
 
   for (int iBin=0; iBin<nJetBins; ++iBin) {
-    recoilZParalH[iBin] = new TH1F(RecoilZParal+NJetBins[iBin]+"H","",100,-200,200);
-    recoilZPerpH[iBin] = new TH1F(RecoilZPerp+NJetBins[iBin]+"H","",100,-200,200);
+    recoilZParalH[iBin] = new TH1D(RecoilZParal+NJetBins[iBin]+"H","",100,-200,200);
+    recoilZPerpH[iBin] = new TH1D(RecoilZPerp+NJetBins[iBin]+"H","",100,-200,200);
   }
   
   for (int iJets=0; iJets<nJetBins; ++iJets) {
     for (int iPtBins=0; iPtBins<nZPtBins; ++iPtBins){
-      recoilZParal_Ptbins_nJetsH[iJets][iPtBins] = new TH1F(RecoilZParal+NJetBins[iJets]+ZPtBins[iPtBins],"",100,-200,200);
-      recoilZPerp_Ptbins_nJetsH[iJets][iPtBins] = new TH1F(RecoilZPerp+NJetBins[iJets]+ZPtBins[iPtBins],"",100,-200,200);
+      recoilZParal_Ptbins_nJetsH[iJets][iPtBins] = new TH1D(RecoilZParal+NJetBins[iJets]+ZPtBins[iPtBins],"",100,-200,200);
+      recoilZPerp_Ptbins_nJetsH[iJets][iPtBins] = new TH1D(RecoilZPerp+NJetBins[iJets]+ZPtBins[iPtBins],"",100,-200,200);
     }
   }
 
   for (int iJetBin=0; iJetBin<nJetBins; ++iJetBin) {
-    ptRatio_nJetsH[iJetBin]= new TH1F("ptRatio_nJets"+NJetBins[iJetBin]+"H","",100,0,1);
+    ptRatio_nJetsH[iJetBin]= new TH1D("ptRatio_nJets"+NJetBins[iJetBin]+"H","",100,0,1);
   }
-
+  
+  for (int iEta=0; iEta<nDEtaBins; ++iEta){
+    for (int iPt=0; iPt<nDPtBins; ++iPt){
+      std::cout<< "iEta =" <<iEta<< " and iPt =" << iPt<<std::endl;
+      dxyMu1[iEta][iPt]= new TH1D("dxyMu1_"+dEtaBins[iEta]+"_"+dPtBins[iPt],"",50,-0.02,0.02);
+      dxyMu2[iEta][iPt]= new TH1D("dxyMu2_"+dEtaBins[iEta]+"_"+dPtBins[iPt],"",50,-0.02,0.02);
+      dzMu1[iEta][iPt]= new TH1D("dzMu1_"+dEtaBins[iEta]+"_"+dPtBins[iPt],"",50,-0.2,0.2);
+      dzMu2[iEta][iPt]= new TH1D("dzMu2_"+dEtaBins[iEta]+"_"+dPtBins[iPt],"",50,-0.2,0.2);
+      /* 
+      dxyMu1_m70to110[iEta][iPt]= new TH1D("dxyMu1_m70to110"+dEtaBins[iEta]+dPtBins[iPt],"",50,-0.02,0.02);
+      dxyMu2_m70to110[iEta][iPt]= new TH1D("dxyMu2_m70to110"+dEtaBins[iEta]+dPtBins[iPt],"",50,-0.02,0.02);
+      dzMu1_m70to110[iEta][iPt]= new TH1D("dzMu1_m70to110"+dEtaBins[iEta]+dPtBins[iPt],"",50,-0.2,0.2);
+      dzMu2_m70to110[iEta][iPt]= new TH1D("dzMu2_m70to110"+dEtaBins[iEta]+dPtBins[iPt],"",50,-0.2,0.2);
+      */
+      }
+  }
   int nFiles = 0;
   int nEvents = 0;
   int selEventsAllMuons = 0;
@@ -463,11 +782,16 @@ int main(int argc, char * argv[]) {
 
       //------------------------------------------------
 
-      if (!isData) 
-	weight *=analysisTree.genweight;
+      if (!isData) {
+	genWeight = 1;
+	if (analysisTree.genweight<0)
+	  genWeight = -1;
+	//	std::cout << "GenWeight = " << analysisTree.genweight << std::endl;
+	weight *= genWeight;
+	TW->Fill();
+      }
 
       histWeightsH->Fill(float(0),weight);
-
 
       if (!isData) {
 	if (applyPUreweighting) {
@@ -508,10 +832,28 @@ int main(int argc, char * argv[]) {
 	  //	  cout << endl;
 	}
       }
+      std:: vector<Period> periods;
+
+      string fullPathToJsonFile = cmsswBase + "/src/DesyTauAnalyses/NTupleMaker/test/json/" + jsonFile;
 
       if (isData){
 	
-	
+	std:: fstream inputFileStream(fullPathToJsonFile.c_str(), std::ios::in);
+	if (inputFileStream.fail()) {
+	  std:: cout << "Error: cannot find json file " << fullPathToJsonFile <<
+	     std::endl;
+	  std:: cout << "please check" << std::endl;
+	  std:: cout << "quitting program" << std::endl;
+	  exit(-1);
+	}
+
+	for(std::string s; std::getline(inputFileStream, s); )
+	  {
+	    periods.push_back(Period());
+	    std:: stringstream ss(s);
+	    ss >>  periods.back();
+	  }
+
 	bool lumi = false;
 	int n=analysisTree.event_run;
 	int lum = analysisTree.event_luminosityblock;
@@ -910,7 +1252,6 @@ int main(int argc, char * argv[]) {
 
 
 	float massSel = dimuon.M();
-	massSelH->Fill(massSel,weight);
 
 	//bisector of dimuon transerve momenta
 	float mu1UnitX = mu1.Px()/mu1.Pt();
@@ -938,7 +1279,8 @@ int main(int argc, char * argv[]) {
 	float PVisZeta = vectorVisX*zetaX + vectorVisY*zetaY;
 	float DZeta = PZeta - 1.85*PVisZeta;
 
-	if (massSel>20) {
+	if (massSel>0) {
+	  massSelH->Fill(massSel,weight);
 	  ptLeadingMuSelH->Fill(analysisTree.muon_pt[indx1],weight);
 	  ptTrailingMuSelH->Fill(analysisTree.muon_pt[indx2],weight);
 	  etaLeadingMuSelH->Fill(analysisTree.muon_eta[indx1],weight);
@@ -1013,6 +1355,35 @@ int main(int argc, char * argv[]) {
 	  h_dxy_muon2->Fill(analysisTree.muon_dxy[indx2],weight);
 	  h_dz_muon1->Fill(analysisTree.muon_dz[indx1],weight);
 	  h_dz_muon2->Fill(analysisTree.muon_dz[indx2],weight);
+	  
+	  int iEta=0, iPt=0;
+	  if (dimuonEta < 0.9) iEta = 0;
+	  if (dimuonEta>0.9 && dimuonEta<1.2) iEta = 1;
+	  if (dimuonEta>1.2 && dimuonEta<2.1) iEta = 2;
+	  if (dimuonEta>2.1 && dimuonEta<2.4) iEta = 3;
+	  //if (dimuonEta>2.4) iEta = 4;
+	  if (dimuonPt < 10) iPt = 0;
+	  if (dimuonPt>10 && dimuonPt<15) iPt = 1;
+	  if (dimuonPt>15 && dimuonPt<20) iPt = 2;
+	  if (dimuonPt>20 && dimuonPt<25) iPt = 3;
+	  if (dimuonPt>25 && dimuonPt<30) iPt = 4;
+	  if (dimuonPt>30 && dimuonPt<40) iPt = 5;
+	  if (dimuonPt>40 && dimuonPt<50) iPt = 6;
+	  if (dimuonPt>50 && dimuonPt<60) iPt = 7;
+	  if (dimuonPt>60) iPt = 8;
+
+	  dxyMu1[iEta][iPt]->Fill(analysisTree.muon_dxy[indx1],weight);
+	  dxyMu2[iEta][iPt]->Fill(analysisTree.muon_dxy[indx2],weight);
+	  dzMu1[iEta][iPt]->Fill(analysisTree.muon_dz[indx1],weight);
+	  dzMu2[iEta][iPt]->Fill(analysisTree.muon_dz[indx2],weight);
+	  
+	  /* if (massSel>70&&massSel<110){
+	    dxyMu1_m70to110[iEta][iPt]->Fill(analysisTree.muon_dxy[indx1],weight);
+	    dxyMu2_m70to110[iEta][iPt]->Fill(analysisTree.muon_dxy[indx2],weight);
+	    dzMu1_m70to110[iEta][iPt]->Fill(analysisTree.muon_dz[indx1],weight);
+	    dzMu2_m70to110[iEta][iPt]->Fill(analysisTree.muon_dz[indx2],weight);
+	  }    
+	  */
 	  if (massSel< 70){
 	    h_dxy_mu1_mlt70->Fill(analysisTree.muon_dxy[indx1],weight);
 	    h_dxy_mu2_mlt70->Fill(analysisTree.muon_dxy[indx2],weight);
@@ -1047,29 +1418,37 @@ int main(int argc, char * argv[]) {
 	  
 	  float q1 = analysisTree.muon_charge[indx1];
 	  float q2 = analysisTree.muon_charge[indx2];
-	  phi_LeadingMu_MET = (analysisTree.muon_phi[indx1]-pfmet_phi);
-	  if (fabs(phi_LeadingMu_MET)> TMath::Pi()) phi_LeadingMu_MET = (2*TMath::Pi()- fabs(phi_LeadingMu_MET));
+	  //	  phi_LeadingMu_MET = (analysisTree.muon_phi[indx1]-pfmet_phi);
+	  //	  if (fabs(phi_LeadingMu_MET)> TMath::Pi()) phi_LeadingMu_MET = (2*TMath::Pi()- fabs(phi_LeadingMu_MET));
+	  phi_LeadingMu_MET = dPhiFrom2P(analysisTree.muon_px[indx1],analysisTree.muon_py[indx1],
+					     pfmet_ex,pfmet_ey);
 	  h_phi_leadingMu_MET->Fill(fabs(phi_LeadingMu_MET),weight);
 	  
-	  phi_TrailingMu_MET = (analysisTree.muon_phi[indx2]-pfmet_phi);
-	  if (fabs(phi_TrailingMu_MET)> TMath::Pi())phi_TrailingMu_MET = 2*TMath::Pi()- fabs(phi_TrailingMu_MET);
+	  //	  phi_TrailingMu_MET = (analysisTree.muon_phi[indx2]-pfmet_phi);
+	  //	  if (fabs(phi_TrailingMu_MET)> TMath::Pi())phi_TrailingMu_MET = 2*TMath::Pi()- fabs(phi_TrailingMu_MET);
+	  phi_TrailingMu_MET = dPhiFrom2P(analysisTree.muon_px[indx2],analysisTree.muon_py[indx2],
+					      pfmet_ex,pfmet_ey);
 	  h_phi_trailingMu_MET->Fill(fabs(phi_TrailingMu_MET),weight);
 	  
 	  if (q1>0)
-	    phi_PosMu_MET = (analysisTree.muon_phi[indx1]-pfmet_phi);
+	    phi_PosMu_MET = phi_LeadingMu_MET;
 	  else
-	    phi_PosMu_MET = (analysisTree.muon_phi[indx2]-pfmet_phi);
+	    phi_PosMu_MET = phi_TrailingMu_MET;
 	  
-	  if (fabs(phi_PosMu_MET)> TMath::Pi()) phi_PosMu_MET = (2*TMath::Pi()- fabs(phi_PosMu_MET));
+	  //	  if (fabs(phi_PosMu_MET)> TMath::Pi()) phi_PosMu_MET = (2*TMath::Pi()- fabs(phi_PosMu_MET));
 	  h_phi_PosMu_MET->Fill(fabs(phi_PosMu_MET),weight);
 	  
-	  phi_TwoMu = (analysisTree.muon_phi[indx1]-analysisTree.muon_phi[indx2]);
+	  //	  phi_TwoMu = (analysisTree.muon_phi[indx1]-analysisTree.muon_phi[indx2]);
+	  //	  if (fabs(phi_Two)> TMath::Pi()) phi_PosMu_MET = (2*TMath::Pi()- fabs(phi_PosMu_MET));
+	  phi_TwoMu = dPhiFrom2P(analysisTree.muon_px[indx1],analysisTree.muon_py[indx1],
+				     analysisTree.muon_px[indx2],analysisTree.muon_py[indx2]);
 	  h_phi_TwoMu->Fill(phi_TwoMu,weight);
-	  if (fabs(phi_TwoMu)<2) continue;
-	  h_ptRatio_test-> Fill (ptRatio_test, weight);
+	  if (fabs(phi_TwoMu)>2) 
+	    h_ptRatio_test-> Fill (ptRatio_test, weight);
 
 	  h_DZeta->Fill(DZeta,weight);
-
+	  h_Njets->Fill(analysisTree.pfjet_count,weight);
+	  
 	  /*  if(!isData){
 	    if (dcaSigdxy_muon1<1.8 && dcaSigdxy_muon1>0.2) h_dxy_muon1_dcaCut->Fill(analysisTree.muon_dxy[indx1],weight);
 	    if (dcaSigdxy_muon1<1.8 && dcaSigdxy_muon1>0.2) h_dxy_muon2_dcaCut->Fill(analysisTree.muon_dxy[indx2],weight);
@@ -1086,6 +1465,10 @@ int main(int argc, char * argv[]) {
 	  	  // fill ntuples for BDT training
           n_dimuonEta=dimuonEta;
 	  n_ptRatio=ptRatio;
+	  n_dxy_muon1= analysisTree.muon_dxy[indx1];
+	  n_dxy_muon2= analysisTree.muon_dxy[indx2]; 
+	  n_dz_muon1= analysisTree.muon_dz[indx1]; 
+	  n_dz_muon2= analysisTree.muon_dz[indx2]; 
 	  n_dcaSigdxy1=dcaSigdxy_muon1;
 	  n_dcaSigdxy2=dcaSigdxy_muon2;
 	  // n_dcaSigdxy_mu1=dcaSigdxy_mu1;
@@ -1096,6 +1479,7 @@ int main(int argc, char * argv[]) {
 	  //n_dcaSigdz_mu2=dcaSigdz_mu2;
 	  n_MissingEt=metSel;
 	  n_phiangle=fabs(phi_PosMu_MET);
+	  n_twomuPhi=fabs(phi_TwoMu);
 	  n_DZeta = DZeta;
 	  n_genWeight = weight;
 	  n_dimuonMass = massSel;
