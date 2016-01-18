@@ -307,8 +307,8 @@ int main(int argc, char * argv[]) {
   TFile * file = new TFile( rootFileName ,"recreate");
   file->cd("");
 
-  TH1F * inputEventsH = new TH1F("inputEventsH","",1,-0.5,0.5);
-  TH1F * nWeightedEventsH = new TH1F("nWeightedEvents", "", 1, -0.5,0.5);
+  TH1D * inputEventsH = new TH1D("inputEventsH","",1,-0.5,0.5);
+  TH1D * nWeightedEventsH = new TH1D("nWeightedEvents", "", 1, -0.5,0.5);
   
   TTree * tree = new TTree("TauCheck","TauCheck");
 
