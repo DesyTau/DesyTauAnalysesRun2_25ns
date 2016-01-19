@@ -782,6 +782,7 @@ void NTupleMaker::beginJob(){
     tree->Branch("gentau_mother",gentau_mother,"gentau_mother[gentau_count]/b");
 
     // generated particles
+    tree->Branch("genparticles_lheHt", &genparticles_lheHt, "genparticles_lheHt/F");
     tree->Branch("genparticles_count", &genparticles_count, "genparticles_count/i");
     tree->Branch("genparticles_e", genparticles_e, "genparticles_e[genparticles_count]/F");
     tree->Branch("genparticles_px", genparticles_px, "genparticles_px[genparticles_count]/F");
@@ -1617,10 +1618,14 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   numtruepileupinteractions  = -1.0f;
   hepNUP_ = -1;
 
+  genparticles_lheHt = 0.;
+
   // generator info and generated particles 
   if(doDebug)  cout<<"add gen info"<< endl; 
   if(cgen && !cdata)
     {
+      AddGenHt(iEvent);
+
       bool haveGenParticles = AddGenParticles(iEvent);
 
       edm::Handle<GenEventInfoProduct> HEPMC;
@@ -1783,6 +1788,31 @@ math::XYZPoint NTupleMaker::PositionOnECalSurface(TransientTrack& trTrack)
 		ecalPosition = stateAtECal.globalPosition();
 	}
 	return(ecalPosition);
+}
+
+bool NTupleMaker::AddGenHt(const edm::Event& iEvent) {
+
+  genparticles_lheHt = 0.;
+
+  edm::Handle<LHEEventProduct> lheEventProduct;  
+  iEvent.getByLabel( "externalLHEProducer", lheEventProduct);
+  
+  if(!lheEventProduct.isValid())
+    return false;
+
+  const lhef::HEPEUP& lheEvent = lheEventProduct->hepeup();
+  std::vector<lhef::HEPEUP::FiveVector> lheParticles = lheEvent.PUP;
+
+  size_t numParticles = lheParticles.size();
+  for ( size_t idxParticle = 0; idxParticle < numParticles; ++idxParticle ) {
+   int absPdgId = TMath::Abs(lheEvent.IDUP[idxParticle]);
+   int status = lheEvent.ISTUP[idxParticle];
+   if ( status == 1 && ((absPdgId >= 1 && absPdgId <= 6) || absPdgId == 21) ) { // quarks and gluons
+       genparticles_lheHt += TMath::Sqrt(TMath::Power(lheParticles[idxParticle][0], 2.) + TMath::Power(lheParticles[idxParticle][1], 2.)); // first entry is px, second py
+   } 
+  }
+
+  return true;
 }
 
 bool NTupleMaker::AddGenParticles(const edm::Event& iEvent) {

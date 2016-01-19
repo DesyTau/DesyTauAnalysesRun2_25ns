@@ -245,6 +245,7 @@ class NTupleMaker : public edm::EDAnalyzer{
   virtual void endLuminosityBlock(const edm::LuminosityBlock& iLumiBlock, const edm::EventSetup& iSetup);
   virtual void analyze( const edm::Event& iEvent, const edm::EventSetup& iSetup );
 
+  bool AddGenHt(const edm::Event& iEvent);
   bool AddGenParticles(const edm::Event& iEvent);
   unsigned int AddElectrons(const edm::Event& iEvent, const edm::EventSetup& iSetup);
   unsigned int AddMuons(const edm::Event& iEvent);
@@ -934,6 +935,7 @@ class NTupleMaker : public edm::EDAnalyzer{
   Float_t numtruepileupinteractions;
   Int_t hepNUP_;
   
+  Float_t genparticles_lheHt;
   UInt_t genparticles_count;
   Float_t genparticles_e[M_genparticlesmaxcount];
   Float_t genparticles_px[M_genparticlesmaxcount];

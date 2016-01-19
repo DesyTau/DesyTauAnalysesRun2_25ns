@@ -440,6 +440,7 @@ int main(int argc, char * argv[]) {
       otree->embeddedWeight = 0;
       otree->signalWeight = 0;
       otree->weight = 1;
+      otree->lheHt = analysisTree.genparticles_lheHt;
       
       otree->npv = analysisTree.primvertex_count;
       otree->npu = analysisTree.numtruepileupinteractions;// numpileupinteractions;

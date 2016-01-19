@@ -75,6 +75,7 @@ void Spring15Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("embeddedWeight", &embeddedWeight, &b_embeddedWeight);
    fChain->SetBranchAddress("signalWeight", &signalWeight, &b_signalWeight);
    fChain->SetBranchAddress("weight", &weight, &b_weight);
+   fChain->SetBranchAddress("lheHt", &lheHt, &b_lheHt);
    fChain->SetBranchAddress("m_vis", &m_vis, &b_m_vis);
    fChain->SetBranchAddress("m_sv", &m_sv, &b_m_sv);
    fChain->SetBranchAddress("pt_sv", &pt_sv, &b_pt_sv);
@@ -271,6 +272,7 @@ void Spring15Tree::WriteInit(TTree *tree) {
   fChain->Branch("embeddedWeight", &embeddedWeight, "embeddedWeight/F");
   fChain->Branch("signalWeight", &signalWeight, "signalWeight/F");
   fChain->Branch("weight", &weight, "weight/F");
+  fChain->Branch("lheHt", &lheHt, "lheHt/F");
 
   fChain->Branch("m_vis", &m_vis, "m_vis/F");
   fChain->Branch("m_sv", &m_sv, "m_sv/F");

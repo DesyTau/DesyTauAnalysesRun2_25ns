@@ -45,6 +45,7 @@ public :
   Float_t         embeddedWeight;
   Float_t         signalWeight;
   Float_t         weight;
+  Float_t         lheHt;
   Float_t         m_vis;
   Float_t         m_sv;
   Float_t         pt_sv;
@@ -169,6 +170,7 @@ public :
   TBranch        *b_embeddedWeight;   //!
   TBranch        *b_signalWeight;   //!
   TBranch        *b_weight;   //!
+  TBranch        *b_lheHt;   //!
   TBranch        *b_m_vis;   //!
   TBranch        *b_m_sv;   //!
   TBranch        *b_pt_sv;   //!

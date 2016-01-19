@@ -375,6 +375,7 @@ public :
    Int_t           gentau_decayMode[50];   //[gentau_count]
    Char_t          gentau_decayMode_name[50];   //[gentau_count]
    UChar_t         gentau_mother[50];   //[gentau_count]
+   Float_t         genparticles_lheHt;
    UInt_t          genparticles_count;
    Float_t         genparticles_e[100];   //[genparticles_count]
    Float_t         genparticles_px[100];   //[genparticles_count]
@@ -784,6 +785,7 @@ public :
    TBranch        *b_gentau_decayMode;   //!
    TBranch        *b_gentau_decayMode_name;   //!
    TBranch        *b_gentau_mother;   //!
+   TBranch        *b_genparticles_lheHt;   //!
    TBranch        *b_genparticles_count;   //!
    TBranch        *b_genparticles_e;   //!
    TBranch        *b_genparticles_px;   //!
@@ -1299,6 +1301,7 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("gentau_decayMode", gentau_decayMode, &b_gentau_decayMode);
    fChain->SetBranchAddress("gentau_decayMode_name", gentau_decayMode_name, &b_gentau_decayMode_name);
    fChain->SetBranchAddress("gentau_mother", gentau_mother, &b_gentau_mother);
+   fChain->SetBranchAddress("genparticles_lheHt", &genparticles_lheHt, &b_genparticles_lheHt);
    fChain->SetBranchAddress("genparticles_count", &genparticles_count, &b_genparticles_count);
    fChain->SetBranchAddress("genparticles_e", genparticles_e, &b_genparticles_e);
    fChain->SetBranchAddress("genparticles_px", genparticles_px, &b_genparticles_px);
