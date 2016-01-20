@@ -1,3 +1,9 @@
+// author : F. Costanza
+// date : 20.01.16
+//
+// Function to calculte weights for HT binned samples
+
+
 enum samples{ DYM5to50=1, DYM50, W};
 
 double DYM5to50_HTBinned_Weights( float ht){
