@@ -2,6 +2,7 @@
 // date : 20.01.16
 //
 // Function to calculte weights for HT binned samples
+// Returned weights must be multiplied by instantaneous luminosity[pb-1].
 
 
 enum samples{ DYM5to50=1, DYM50, W};
