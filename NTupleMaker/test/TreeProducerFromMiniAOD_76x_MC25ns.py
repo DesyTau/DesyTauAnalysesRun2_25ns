@@ -463,14 +463,14 @@ if usePUJetID5X:
   process.load("JetMETCorrections.Configuration.DefaultJEC_cff")
 
   if runOnData:
-    process.calibratedAK4PFJetsForPFMVAMEt = cms.EDProducer("PFJetCorrectionProducer",
+    process.calibratedAK4PFJetsForPFMVAMEt = cms.EDProducer("CorrectedPFJetProducer",
                                                             src = cms.InputTag("ak4PFJets"),
-                                                            correctors = cms.vstring('ak4PFL1FastL2L3Residual')
+                                                            correctors = cms.VInputTag('ak4PFL1FastL2L3Residual')
                                                           )
   else:
-    process.calibratedAK4PFJetsForPFMVAMEt = cms.EDProducer("PFJetCorrectionProducer",
+    process.calibratedAK4PFJetsForPFMVAMEt = cms.EDProducer("CorrectedPFJetProducer",
                                                             src = cms.InputTag("ak4PFJets"),
-                                                            correctors = cms.vstring('ak4PFL1FastL2L3')
+                                                            correctors = cms.VInputTag('ak4PFL1FastL2L3')
                                                           )  
   process.puJetIdForPFMVAMEt = cms.EDProducer("PileupJetIdProducer",
                                               algos = cms.VPSet(cms.PSet(
