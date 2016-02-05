@@ -36,7 +36,7 @@ process.MessageLogger.cerr.threshold = cms.untracked.string('INFO')
 process.MessageLogger.cerr.FwkReport.reportEvery = 500
 # Set the process options -- Display summary at the end, enable unscheduled execution
 process.options = cms.untracked.PSet( 
-    allowUnscheduled = cms.untracked.bool(True),
+    allowUnscheduled = cms.untracked.bool(False),
     wantSummary = cms.untracked.bool(True) 
 )
 
@@ -460,17 +460,35 @@ if usePUJetID5X:
                                    )
   
 
-  process.load("JetMETCorrections.Configuration.DefaultJEC_cff")
+  #process.load("JetMETCorrections.Configuration.CorrectedJetProducersDefault_cff")
+  """
+  process.ak4PFJetsL1FastL2L3 = cms.EDProducer('CorrectedPF',
+    src         = cms.InputTag('ak4PFJets'),
+    correctors  = cms.VInputTag('ak4PFL1FastL2L3')
+  )
+
+  process.ak4PFJetsL1FastL2L3Residual =  cms.EDProducer('PFJetCorrectionProducer',
+    src         = cms.InputTag('ak4PFJets'),
+    correctors  = cms.VInputTag('ak4PFL1FastL2L3Residual')
+  )
+  """
+
+  #from JetMETCorrections.Configuration.JetCorrectionProducersAllAlgos_cff import ak4PFL1FastL2L3Residual, ak4PFL1FastL2L3
+
+  process.load("JetMETCorrections.Configuration.CorrectedJetProducersAllAlgos_cff")
+  #from JetMETCorrections.Configuration.CorrectedJetProducersAllAlgos_cff import ak4PFL1FastL2L3CorrectorChain
+
+  #process.ak4PFL1FastL2L3CorrectorChain = ak4PFL1FastL2L3CorrectorChain
 
   if runOnData:
     process.calibratedAK4PFJetsForPFMVAMEt = cms.EDProducer("CorrectedPFJetProducer",
                                                             src = cms.InputTag("ak4PFJets"),
-                                                            correctors = cms.VInputTag('ak4PFL1FastL2L3Residual')
+                                                            correctors = cms.VInputTag('ak4PFL1FastL2L3ResidualCorrector')
                                                           )
   else:
     process.calibratedAK4PFJetsForPFMVAMEt = cms.EDProducer("CorrectedPFJetProducer",
                                                             src = cms.InputTag("ak4PFJets"),
-                                                            correctors = cms.VInputTag('ak4PFL1FastL2L3')
+                                                            correctors = cms.VInputTag('ak4PFL1FastL2L3Corrector')
                                                           )  
   process.puJetIdForPFMVAMEt = cms.EDProducer("PileupJetIdProducer",
                                               algos = cms.VPSet(cms.PSet(
@@ -525,7 +543,7 @@ if usePUJetID5X:
                                             runMvas = cms.bool(True)
                                           )
   process.mvaMetSequence  = cms.Sequence(process.leptonPreSelectionSequence +
-                                         process.ak4PFJets + process.calibratedAK4PFJetsForPFMVAMEt +
+                                         process.ak4PFJets + process.ak4PFL1FastL2L3CorrectorChain + process.calibratedAK4PFJetsForPFMVAMEt +
                                          process.puJetIdForPFMVAMEt +
                                          process.mvaMETDiTau + process.mvaMETTauMu + process.mvaMETTauEle + process.mvaMETMuEle + 
                                          process.mvaMETMuMu + process.mvaMETEleEle)
@@ -535,17 +553,17 @@ else:
   process.chs = cms.EDFilter("CandPtrSelector", src = cms.InputTag("packedPFCandidates"), cut = cms.string("fromPV"))
   process.ak4PFJetsCHS = ak4PFJets.clone(src = 'chs', doAreaFastjet = True)
 
-  process.load("JetMETCorrections.Configuration.DefaultJEC_cff")
+  #process.load("JetMETCorrections.Configuration.CorrectedJetProducersDefault_cff")
 
   if runOnData:
-    process.calibratedAK4PFJetsCHSForPFMVAMEt = cms.EDProducer("PFJetCorrectionProducer",
+    process.calibratedAK4PFJetsCHSForPFMVAMEt = cms.EDProducer("CorrectedPFJetProducer",
                                                                src = cms.InputTag("ak4PFJetsCHS"),
-                                                               correctors = cms.vstring('ak4PFCHSL1FastL2L3Residual')
+                                                               correctors = cms.VInputTag('ak4PFCHSL1FastL2L3Residual')
                                                              )
   else:
-    process.calibratedAK4PFJetsCHSForPFMVAMEt = cms.EDProducer("PFJetCorrectionProducer",
+    process.calibratedAK4PFJetsCHSForPFMVAMEt = cms.EDProducer("CorrectedPFJetProducer",
                                                                src = cms.InputTag("ak4PFJetsCHS"),
-                                                               correctors = cms.vstring('ak4PFCHSL1FastL2L3')
+                                                               correctors = cms.VInputTag('ak4PFCHSL1FastL2L3')
                                                              )
 
   from RecoJets.JetProducers.PileupJetID_cfi import pileupJetId
@@ -835,6 +853,8 @@ process.METCorrSignificance = process.METSignificance.clone(
   srcMet = cms.InputTag('slimmedMETs::TreeProducer')
 )
 
+print process.mvaMetSequence
+
 process.p = cms.Path(
   #process.initroottree*
   #process.patJetCorrFactorsReapplyJEC * process.patJetsReapplyJEC *
@@ -846,6 +866,8 @@ process.p = cms.Path(
   #process.ApplyBaselineHBHEISONoiseFilter*  #reject events based -- disable the module, performance is being investigated fu
   process.makeroottree
 )
+
+print process.p
 
 process.TFileService = cms.Service("TFileService",
                                    #fileName = cms.string("/nfs/dust/cms/user/alkaloge/TauAnalysis/new/CMSSW_7_4_6/src/DesyTauAnalyses/NTupleMaker/test/Ntuple74.root"),
