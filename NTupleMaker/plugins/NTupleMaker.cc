@@ -1033,7 +1033,8 @@ void NTupleMaker::beginRun(const edm::Run& iRun, const edm::EventSetup& iSetup)
   
   bool changed = true;
   HLTConfiguration.init(iRun, iSetup, cTriggerProcess, changed);
-  
+  //HLTPrescaleConfig->init(iRun, iSetup, cTriggerProcess, changed);
+
   vector<pair<boost::regex, string> > muonregexes;
   for(unsigned i = 0 ; i < cMuHLTriggerMatching.size() ; i++)
     {
@@ -1262,7 +1263,8 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       if(cHLTriggerPaths.size() > 0){
   	for(size_t ip = 0; ip < cHLTriggerPaths.size(); ip++){
   	  if(trigName.find(cHLTriggerPaths[ip]) != string::npos){
-	    hltriggerprescales_->insert(std::pair<string, int>(trigName, HLTConfiguration.prescaleValue(iEvent,iSetup,trigName)));
+	    
+	    hltriggerprescales_->insert(std::pair<string, int>(trigName, 1.));// FIXME HLTPrescaleConfig->prescaleValue(iEvent,iSetup,trigName)));
   	    hltriggerresults_->insert(std::pair<string, int>(trigName, HLTrigger->accept(i)));
 	    TString TriggerName(trigName);
 	    //	    std::cout << trigName << " : " 

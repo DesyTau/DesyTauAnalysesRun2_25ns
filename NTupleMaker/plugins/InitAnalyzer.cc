@@ -39,6 +39,9 @@
 #include "TTree.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
+
+#include "FWCore/Utilities/interface/EDGetToken.h"
+  edm::EDGetTokenT<edm::ValueMap<bool> > eleVetoIdMapToken_;
 //
 // class declaration
 //
@@ -67,6 +70,7 @@ class InitAnalyzer : public edm::EDAnalyzer {
 
   bool cdata;
   bool cgen;
+  edm::EDGetTokenT< std::vector<PileupSummaryInfo> > PUInfoToken_;
   Float_t genweight;
       //virtual void beginRun(edm::Run const&, edm::EventSetup const&) override;
       //virtual void endRun(edm::Run const&, edm::EventSetup const&) override;
@@ -89,7 +93,8 @@ class InitAnalyzer : public edm::EDAnalyzer {
 //
 InitAnalyzer::InitAnalyzer(const edm::ParameterSet& iConfig) :
   cdata(iConfig.getUntrackedParameter<bool>("IsData", false)),
-  cgen(iConfig.getUntrackedParameter<bool>("GenParticles", false))
+  cgen(iConfig.getUntrackedParameter<bool>("GenParticles", false)),
+  PUInfoToken_( consumes< std::vector<PileupSummaryInfo> >(edm::InputTag("slimmedAddPileupInfo"))) 
 {
 	
 }
@@ -116,7 +121,8 @@ InitAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   if (!cdata) {
      edm::Handle<vector<PileupSummaryInfo> > PUInfo;
-      iEvent.getByLabel(edm::InputTag("slimmedAddPileupInfo"), PUInfo);
+     //iEvent.getByLabel(edm::InputTag("slimmedAddPileupInfo"), PUInfo);
+     iEvent.getByToken( PUInfoToken_, PUInfo);
       if(PUInfo.isValid())
 	{
 	  for(vector<PileupSummaryInfo>::const_iterator PVI = PUInfo->begin(); PVI != PUInfo->end(); ++PVI)

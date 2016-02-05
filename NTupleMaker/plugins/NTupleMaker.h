@@ -27,6 +27,7 @@
 #include "DataFormats/Luminosity/interface/LumiSummary.h"
 
 #include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
+#include "HLTrigger/HLTcore/interface/HLTPrescaleProvider.h"
 #include "DataFormats/Common/interface/TriggerResults.h"
 #include "DataFormats/HLTReco/interface/TriggerEvent.h"
 #include "FWCore/Common/interface/TriggerNames.h"
@@ -388,6 +389,7 @@ class NTupleMaker : public edm::EDAnalyzer{
   //  RecoilCorrector *                     corrector_ ;  
   
   HLTConfigProvider HLTConfiguration;
+  HLTPrescaleProvider* HLTPrescaleConfig;
   edm::Handle<edm::TriggerResults> HLTrigger;
   edm::Handle<trigger::TriggerEvent> HLTriggerEvent;
   //edm::Handle<l1extra::L1MuonParticleCollection> L1Muons;
