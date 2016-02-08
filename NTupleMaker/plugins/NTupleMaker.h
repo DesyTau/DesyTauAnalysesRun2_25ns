@@ -159,6 +159,7 @@ using namespace reco;
 #define M_trigobjectmaxcount 1000
 typedef ROOT::Math::PositionVector3D<ROOT::Math::Cartesian3D<double>,ROOT::Math::DefaultCoordinateSystemTag> Point3D;
 typedef ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> > LorentzVector;
+typedef ROOT::Math::SMatrix<double, 2, 2, ROOT::Math::MatRepSym<double, 2> > CovMatrix2D;
 
 bool doDebug = false;
 class NTupleMaker : public edm::EDAnalyzer{ 
@@ -337,10 +338,10 @@ class NTupleMaker : public edm::EDAnalyzer{
   vector<string> cJetHLTriggerMatching;
   int cJetNum;
 
-  edm::InputTag MuonCollectionTag_;
+  edm::EDGetTokenT<pat::MuonCollection> MuonCollectionToken_;
   
   // Electron Configuration
-  edm::InputTag ElectronCollectionTag_;
+  edm::EDGetTokenT<edm::View<pat::Electron> > ElectronCollectionToken_;
   //// ID decisions objects
   edm::EDGetTokenT<edm::ValueMap<bool> > eleVetoIdMapToken_;
   edm::EDGetTokenT<edm::ValueMap<bool> > eleLooseIdMapToken_;
@@ -356,25 +357,25 @@ class NTupleMaker : public edm::EDAnalyzer{
   edm::EDGetTokenT<edm::ValueMap<float> > mvaTrigValuesMapToken_;
   edm::EDGetTokenT<edm::ValueMap<int> >   mvaTrigCategoriesMapToken_;
 
-  edm::InputTag TauCollectionTag_;
-  edm::InputTag JetCollectionTag_;
+  edm::EDGetTokenT<pat::TauCollection> TauCollectionToken_;
+  edm::EDGetTokenT<pat::JetCollection> JetCollectionToken_;
 
-  //edm::InputTag MetCollectionTag_;
-  edm::EDGetTokenT<pat::METCollection> MetCollectionTag_;
-  edm::InputTag MetCovMatrixTag_;
-  edm::InputTag MetSigTag_;
-  edm::InputTag MetCorrCovMatrixTag_;
-  edm::InputTag MetCorrSigTag_;  
-  edm::EDGetTokenT<pat::METCollection> MetCorrCollectionTag_;
-  edm::EDGetTokenT<pat::METCollection> PuppiMetCollectionTag_;
-  //edm::InputTag MetCorrCollectionTag_;
-  //edm::EDGetTokenT<pat::METCollection> MvaMetCollectionsTag_;
+  edm::EDGetTokenT<pat::METCollection> MetCollectionToken_;
+  edm::EDGetTokenT<CovMatrix2D> MetCovMatrixToken_;
+  edm::EDGetTokenT<double> MetSigToken_;
+  edm::EDGetTokenT<CovMatrix2D> MetCorrCovMatrixToken_;
+  edm::EDGetTokenT<double> MetCorrSigToken_;  
+  edm::EDGetTokenT<pat::METCollection> MetCorrCollectionToken_;
+  edm::EDGetTokenT<pat::METCollection> PuppiMetCollectionToken_;
   std::vector<edm::InputTag> MvaMetCollectionsTag_;
-  edm::InputTag TrackCollectionTag_;
-  edm::InputTag GenParticleCollectionTag_;
-  edm::InputTag TriggerObjectCollectionTag_;
-  edm::InputTag BeamSpotTag_;
-  edm::InputTag PVTag_;
+  std::vector<edm::EDGetTokenT<pat::METCollection> > MvaMetCollectionsToken_;
+  edm::EDGetTokenT<reco::GenParticleCollection> GenParticleCollectionToken_;
+  edm::EDGetTokenT<l1extra::L1JetParticleCollection> L1JetCollectionToken_;
+  edm::EDGetTokenT<l1extra::L1JetParticleCollection> L1TauCollectionToken_;
+  edm::EDGetTokenT<pat::PackedCandidateCollection> PackedCantidateCollectionToken_;
+  edm::EDGetTokenT<pat::TriggerObjectStandAloneCollection> TriggerObjectCollectionToken_;
+  edm::EDGetTokenT<BeamSpot> BeamSpotToken_;
+  edm::EDGetTokenT<VertexCollection> PVToken_;
   std::string sampleName;
 
   PropagatorWithMaterial*               propagatorWithMaterial; 
@@ -742,6 +743,9 @@ class NTupleMaker : public edm::EDAnalyzer{
   Float_t tau_byLooseCombinedIsolationDeltaBetaCorr3Hits[M_taumaxcount];
   Float_t tau_byMediumCombinedIsolationDeltaBetaCorr3Hits[M_taumaxcount];
   Float_t tau_byTightCombinedIsolationDeltaBetaCorr3Hits[M_taumaxcount];
+  
+  Float_t tau_byIsolationMVArun2v1DBoldDMwLTraw[M_taumaxcount];
+  Float_t tau_byIsolationMVArun2v1DBnewDMwLTraw[M_taumaxcount];
 
   // isolation sums
   Float_t tau_chargedIsoPtSum[M_taumaxcount];

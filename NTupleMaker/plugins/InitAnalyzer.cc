@@ -41,7 +41,7 @@
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
 
 #include "FWCore/Utilities/interface/EDGetToken.h"
-  edm::EDGetTokenT<edm::ValueMap<bool> > eleVetoIdMapToken_;
+
 //
 // class declaration
 //
@@ -70,7 +70,8 @@ class InitAnalyzer : public edm::EDAnalyzer {
 
   bool cdata;
   bool cgen;
-  edm::EDGetTokenT< std::vector<PileupSummaryInfo> > PUInfoToken_;
+  edm::EDGetTokenT<std::vector<PileupSummaryInfo> > PUInfoToken_;
+  edm::EDGetTokenT<GenEventInfoProduct > GenToken_;
   Float_t genweight;
       //virtual void beginRun(edm::Run const&, edm::EventSetup const&) override;
       //virtual void endRun(edm::Run const&, edm::EventSetup const&) override;
@@ -94,7 +95,8 @@ class InitAnalyzer : public edm::EDAnalyzer {
 InitAnalyzer::InitAnalyzer(const edm::ParameterSet& iConfig) :
   cdata(iConfig.getUntrackedParameter<bool>("IsData", false)),
   cgen(iConfig.getUntrackedParameter<bool>("GenParticles", false)),
-  PUInfoToken_( consumes< std::vector<PileupSummaryInfo> >(edm::InputTag("slimmedAddPileupInfo"))) 
+  PUInfoToken_( consumes< std::vector<PileupSummaryInfo> >(edm::InputTag("slimmedAddPileupInfo"))),
+  GenToken_( consumes<GenEventInfoProduct>(edm::InputTag("generator")))
 {
 	
 }
@@ -121,7 +123,6 @@ InitAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   if (!cdata) {
      edm::Handle<vector<PileupSummaryInfo> > PUInfo;
-     //iEvent.getByLabel(edm::InputTag("slimmedAddPileupInfo"), PUInfo);
      iEvent.getByToken( PUInfoToken_, PUInfo);
       if(PUInfo.isValid())
 	{
@@ -150,25 +151,15 @@ InitAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   if(cgen && !cdata)
     {
       edm::Handle<GenEventInfoProduct> HEPMC;
-      iEvent.getByLabel(edm::InputTag("generator"), HEPMC);
+      iEvent.getByToken( GenToken_, HEPMC);
       if(HEPMC.isValid())
 	{
 	  genweight = HEPMC->weight();
-	//  	  cout << "Event weight from HEPMC : " << genweight << endl;
+	  //  	  cout << "Event weight from HEPMC : " << genweight << endl;
 	}
     }
   tree0->Fill();
-#ifdef THIS_IS_AN_EVENT_EXAMPLE
-   Handle<ExampleData> pIn;
-   iEvent.getByLabel("example",pIn);
-#endif
-   
-#ifdef THIS_IS_AN_EVENTSETUP_EXAMPLE
-   ESHandle<SetupData> pSetup;
-   iSetup.get<SetupRecord>().get(pSetup);
-#endif
 }
-
 
 // ------------ method called once each job just before starting event loop  ------------
 void 

@@ -42,7 +42,7 @@ process.options = cms.untracked.PSet(
 
 # How many events to process
 process.maxEvents = cms.untracked.PSet( 
-   input = cms.untracked.int32(10000)
+   input = cms.untracked.int32(3000)
 )
 
 
@@ -621,7 +621,7 @@ RecPrimVertex = cms.untracked.bool(True),
 RecBeamSpot = cms.untracked.bool(True),
 RecTrack = cms.untracked.bool(False),
 RecPFMet = cms.untracked.bool(True),
-RecPFMetCorr = cms.untracked.bool(True),
+RecPFMetCorr = cms.untracked.bool(False),
 RecPuppiMet = cms.untracked.bool(True),
 RecMvaMet = cms.untracked.bool(True),                                      
 RecMuon = cms.untracked.bool(True),
@@ -655,8 +655,7 @@ MetCovMatrixTag = cms.InputTag("METSignificance:METCovariance:TreeProducer"),
 MetSigTag = cms.InputTag("METSignificance:METSignificance:TreeProducer"),
 MetCorrCovMatrixTag = cms.InputTag("METCorrSignificance:METCovariance:TreeProducer"),
 MetCorrSigTag = cms.InputTag("METCorrSignificance:METSignificance:TreeProducer"),
-#MetCorrCollectionTag = cms.InputTag("slimmedMETs::TreeProducer"),
-MetCorrCollectionTag = cms.InputTag("slimmedMETsNoHF"),
+MetCorrCollectionTag = cms.InputTag("slimmedMETs::TreeProducer"),
 PuppiMetCollectionTag = cms.InputTag("slimmedMETsPuppi"),
 MvaMetCollectionsTag = cms.VInputTag("mvaMETDiTau", "mvaMETTauMu", "mvaMETTauEle", "mvaMETMuEle", "mvaMETMuMu", "mvaMETEleEle"),
 #MvaMetCollectionsTag = cms.VInputTag("pfMVAMEt"),
@@ -853,10 +852,8 @@ process.METCorrSignificance = process.METSignificance.clone(
   srcMet = cms.InputTag('slimmedMETs::TreeProducer')
 )
 
-print process.mvaMetSequence
-
 process.p = cms.Path(
-  #process.initroottree*
+  process.initroottree*
   #process.patJetCorrFactorsReapplyJEC * process.patJetsReapplyJEC *
   process.METSignificance * #process.METCorrSignificance *
   process.mvaMetSequence *
@@ -866,8 +863,6 @@ process.p = cms.Path(
   #process.ApplyBaselineHBHEISONoiseFilter*  #reject events based -- disable the module, performance is being investigated fu
   process.makeroottree
 )
-
-print process.p
 
 process.TFileService = cms.Service("TFileService",
                                    #fileName = cms.string("/nfs/dust/cms/user/alkaloge/TauAnalysis/new/CMSSW_7_4_6/src/DesyTauAnalyses/NTupleMaker/test/Ntuple74.root"),

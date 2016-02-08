@@ -137,8 +137,8 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
   cJetHLTriggerMatching(iConfig.getUntrackedParameter<vector<string> >("RecJetHLTriggerMatching")),
   cJetNum(iConfig.getUntrackedParameter<int>("RecJetNum", 0)),
   // collections
-  MuonCollectionTag_(iConfig.getParameter<edm::InputTag>("MuonCollectionTag")),
-  ElectronCollectionTag_(iConfig.getParameter<edm::InputTag>("ElectronCollectionTag")),
+  MuonCollectionToken_(consumes<pat::MuonCollection>(iConfig.getParameter<edm::InputTag>("MuonCollectionTag"))),
+  ElectronCollectionToken_(consumes<edm::View<pat::Electron> >(iConfig.getParameter<edm::InputTag>("ElectronCollectionTag"))),
   eleVetoIdMapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleVetoIdMap"))),
   eleLooseIdMapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleLooseIdMap"))),
   eleMediumIdMapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleMediumIdMap"))),
@@ -151,28 +151,24 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
   mvaNonTrigCategoriesMapToken_(consumes<edm::ValueMap<int> >(iConfig.getParameter<edm::InputTag>("mvaNonTrigCategoriesMap"))),
   mvaTrigValuesMapToken_(consumes<edm::ValueMap<float> >(iConfig.getParameter<edm::InputTag>("mvaTrigValuesMap"))),
   mvaTrigCategoriesMapToken_(consumes<edm::ValueMap<int> >(iConfig.getParameter<edm::InputTag>("mvaTrigCategoriesMap"))),
-  TauCollectionTag_(iConfig.getParameter<edm::InputTag>("TauCollectionTag")),
-  JetCollectionTag_(iConfig.getParameter<edm::InputTag>("JetCollectionTag")),
-  /*
-  MetCollectionTag_(iConfig.getParameter<edm::InputTag>("MetCollectionTag")),
-  MetCorrCollectionTag_(iConfig.getParameter<edm::InputTag>("MetCorrCollectionTag")),
-  */
-  //MetCollectionTag_(iConfig.getParameter<edm::EDGetToken>("MetCollectionTag")),
-  //MetCollectionTag_(consumes<pat::METCollection>(iConfig.getParameter<edm::InputTag>("MetCollectionTag"))),
-  MetCollectionTag_(consumes<pat::METCollection>(iConfig.getParameter<edm::InputTag>("MetCollectionTag"))),
-  MetCovMatrixTag_(iConfig.getParameter<edm::InputTag>("MetCovMatrixTag")),
-  MetSigTag_(iConfig.getParameter<edm::InputTag>("MetSigTag")),
-  MetCorrCovMatrixTag_(iConfig.getParameter<edm::InputTag>("MetCorrCovMatrixTag")),
-  MetCorrSigTag_(iConfig.getParameter<edm::InputTag>("MetCorrSigTag")),  
-  MetCorrCollectionTag_(consumes<pat::METCollection>(iConfig.getParameter<edm::InputTag>("MetCorrCollectionTag"))),
-  PuppiMetCollectionTag_(consumes<pat::METCollection>(iConfig.getParameter<edm::InputTag>("PuppiMetCollectionTag"))),
+  TauCollectionToken_(consumes<pat::TauCollection>(iConfig.getParameter<edm::InputTag>("TauCollectionTag"))),
+  JetCollectionToken_(consumes<pat::JetCollection>(iConfig.getParameter<edm::InputTag>("JetCollectionTag"))),
+  MetCollectionToken_(consumes<pat::METCollection>(iConfig.getParameter<edm::InputTag>("MetCollectionTag"))),
+  MetCovMatrixToken_(consumes<CovMatrix2D>(iConfig.getParameter<edm::InputTag>("MetCovMatrixTag"))),
+  MetSigToken_(consumes<double>(iConfig.getParameter<edm::InputTag>("MetSigTag"))),
+  MetCorrCovMatrixToken_(consumes<CovMatrix2D>(iConfig.getParameter<edm::InputTag>("MetCorrCovMatrixTag"))),
+  MetCorrSigToken_(consumes<double>(iConfig.getParameter<edm::InputTag>("MetCorrSigTag"))),  
+  MetCorrCollectionToken_(consumes<pat::METCollection>(iConfig.getParameter<edm::InputTag>("MetCorrCollectionTag"))),
+  PuppiMetCollectionToken_(consumes<pat::METCollection>(iConfig.getParameter<edm::InputTag>("PuppiMetCollectionTag"))),
   MvaMetCollectionsTag_(iConfig.getParameter<std::vector<edm::InputTag> >("MvaMetCollectionsTag")),
-  //MvaMetCollectionsTag_(consumes<pat::METCollection>(iConfig.getParameter<std::vector<edm::InputTag> >("MvaMetCollectionsTag"))),
-  TrackCollectionTag_(iConfig.getParameter<edm::InputTag>("TrackCollectionTag")),
-  GenParticleCollectionTag_(iConfig.getParameter<edm::InputTag>("GenParticleCollectionTag")),
-  TriggerObjectCollectionTag_(iConfig.getParameter<edm::InputTag>("TriggerObjectCollectionTag")),
-  BeamSpotTag_(iConfig.getParameter<edm::InputTag>("BeamSpotCollectionTag")),
-  PVTag_(iConfig.getParameter<edm::InputTag>("PVCollectionTag")),
+
+  GenParticleCollectionToken_(consumes<reco::GenParticleCollection>(iConfig.getParameter<edm::InputTag>("GenParticleCollectionTag"))),
+  L1JetCollectionToken_(consumes<l1extra::L1JetParticleCollection>(edm::InputTag("l1extraParticles","Central"))),
+  L1TauCollectionToken_(consumes<l1extra::L1JetParticleCollection>(edm::InputTag("l1extraParticles","Tau"))),
+  PackedCantidateCollectionToken_(consumes<pat::PackedCandidateCollection>(edm::InputTag("packedPFCandidates"))),
+  TriggerObjectCollectionToken_(consumes<pat::TriggerObjectStandAloneCollection>(iConfig.getParameter<edm::InputTag>("TriggerObjectCollectionTag"))),
+  BeamSpotToken_(consumes<BeamSpot>(iConfig.getParameter<edm::InputTag>("BeamSpotCollectionTag"))),
+  PVToken_(consumes<VertexCollection>(iConfig.getParameter<edm::InputTag>("PVCollectionTag"))),
   sampleName(iConfig.getUntrackedParameter<std::string>("SampleName", "Higgs")),
   propagatorWithMaterial(0)
 {
@@ -237,8 +233,21 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
   string cmsswBase = (getenv ("CMSSW_BASE"));
   jecUnc = new JetCorrectionUncertainty(cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/JEC/Summer15_25nsV5_MC_Uncertainty_AK4PFchs.txt");  
 
-}//NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig)
 
+  consumes<edm::TriggerResults>(edm::InputTag("TriggerResults", "", cTriggerProcess));
+  consumes<L1GlobalTriggerReadoutRecord>(edm::InputTag("gtDigis"));
+
+  consumes<GenEventInfoProduct>(edm::InputTag("generator"));
+  consumes<vector<PileupSummaryInfo> >(edm::InputTag("slimmedAddPileupInfo"));
+
+  consumes<double>(edm::InputTag("fixedGridRhoFastjetAll"));
+  consumes<pat::JetCollection>(edm::InputTag("slimmedJets"));
+
+  for(std::vector<edm::InputTag>::iterator mit = MvaMetCollectionsTag_.begin();
+      mit != MvaMetCollectionsTag_.end(); mit++){
+    MvaMetCollectionsToken_.push_back(consumes<pat::METCollection>(*mit));
+  }
+}
 
 //destructor
 NTupleMaker::~NTupleMaker(){
@@ -578,6 +587,9 @@ void NTupleMaker::beginJob(){
     tree->Branch("tau_byLooseCombinedIsolationDeltaBetaCorr3Hits", tau_byLooseCombinedIsolationDeltaBetaCorr3Hits, "tau_byLooseCombinedIsolationDeltaBetaCorr3Hits[tau_count]/F");
     tree->Branch("tau_byMediumCombinedIsolationDeltaBetaCorr3Hits", tau_byMediumCombinedIsolationDeltaBetaCorr3Hits, "tau_byMediumCombinedIsolationDeltaBetaCorr3Hits[tau_count]/F");
     tree->Branch("tau_byTightCombinedIsolationDeltaBetaCorr3Hits", tau_byTightCombinedIsolationDeltaBetaCorr3Hits, "tau_byTightCombinedIsolationDeltaBetaCorr3Hits[tau_count]/F");
+    tree->Branch("tau_byIsolationMVArun2v1DBoldDMwLTraw", tau_byIsolationMVArun2v1DBoldDMwLTraw, "tau_byIsolationMVArun2v1DBoldDMwLTraw[tau_count]/F");
+    tree->Branch("tau_byIsolationMVArun2v1DBnewDMwLTraw", tau_byIsolationMVArun2v1DBnewDMwLTraw, "tau_byIsolationMVArun2v1DBnewDMwLTraw[tau_count]/F");
+
 
     tree->Branch("tau_chargedIsoPtSum", tau_chargedIsoPtSum, "tau_chargedIsoPtSum[tau_count]/F");
     tree->Branch("tau_neutralIsoPtSum", tau_neutralIsoPtSum, "tau_neutralIsoPtSum[tau_count]/F");
@@ -613,11 +625,12 @@ void NTupleMaker::beginJob(){
     tree->Branch("tau_isolationChargedHadrCands_size", tau_isolationChargedHadrCands_size, "tau_isolationChargedHadrCands_size[tau_count]/i");
     tree->Branch("tau_isolationNeutralHadrCands_size", tau_isolationNeutralHadrCands_size, "tau_isolationNeutralHadrCands_size[tau_count]/i");
     tree->Branch("tau_isolationGammaCands_size", tau_isolationGammaCands_size, "tau_isolationGammaCands_size[tau_count]/i");
-
+    
     tree->Branch("tau_genDecayMode_name", tau_genDecayMode_name, "tau_genDecayMode_name[tau_count]/C");
     tree->Branch("tau_genDecayMode", tau_genDecayMode, "tau_genDecayMode[tau_count]/I");
     tree->Branch("tau_decayMode_name", tau_decayMode_name, "tau_decayMode_name[tau_count]/C");
     tree->Branch("tau_decayMode", tau_decayMode, "tau_decayMode[tau_count]/I");
+    
   }
   
   // Met
@@ -1280,7 +1293,7 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   if(cbeamspot)
     {
       edm::Handle<BeamSpot> TheBeamSpot;
-      iEvent.getByLabel(BeamSpotTag_, TheBeamSpot);
+      iEvent.getByToken(BeamSpotToken_, TheBeamSpot);
       if(TheBeamSpot.isValid())
 	{
 	  beamspot_x = TheBeamSpot->x0();
@@ -1317,7 +1330,7 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   if(crecprimvertex)
     {
       edm::Handle<VertexCollection> Vertex;
-      iEvent.getByLabel(PVTag_, Vertex);
+      iEvent.getByToken(PVToken_, Vertex);
       if(Vertex.isValid()) {
 	for(unsigned i = 0 ; i < Vertex->size(); i++) {
 	  primvertex_count++;
@@ -1409,8 +1422,7 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     {
       if(doDebug)  cout<<"add PF MET"<< endl; 
       edm::Handle<pat::METCollection> patMet;
-      //iEvent.getByLabel(MetCollectionTag_, patMet);
-      iEvent.getByToken(MetCollectionTag_, patMet);
+      iEvent.getByToken(MetCollectionToken_, patMet);
 
       assert(patMet->size() > 0);
       pfmet_ex = (*patMet)[0].px();
@@ -1425,15 +1437,15 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       // 	// else cout << "  PFMet = " << pfmet_et << std::endl;
       // }
       
-      edm::Handle<ROOT::Math::SMatrix<double, 2, 2, ROOT::Math::MatRepSym<double, 2> > > metcov;
-      iEvent.getByLabel( MetCovMatrixTag_, metcov);
+      edm::Handle<CovMatrix2D> metcov;
+      iEvent.getByToken( MetCovMatrixToken_, metcov);
       pfmet_sigxx = (*metcov)(0,0);
       pfmet_sigxy = (*metcov)(0,1);
       pfmet_sigyx = (*metcov)(1,0);
       pfmet_sigyy = (*metcov)(1,1);
 
       edm::Handle<double> metsig;
-      iEvent.getByLabel( MetSigTag_, metsig);
+      iEvent.getByToken( MetSigToken_, metsig);
       assert(metsig.isValid());
       pfmet_sig = *metsig;
 
@@ -1460,8 +1472,7 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     {
       if(doDebug)  cout<<"add Corrected PF MET"<< endl; 
       edm::Handle<pat::METCollection> patMet;
-      //iEvent.getByLabel(MetCorrCollectionTag_, patMet);
-      iEvent.getByToken(MetCorrCollectionTag_, patMet);
+      iEvent.getByToken(MetCorrCollectionToken_, patMet);
 
       assert(patMet->size() > 0);
       pfmetcorr_ex = (*patMet)[0].px();
@@ -1470,15 +1481,15 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       pfmetcorr_pt = (*patMet)[0].pt();
       pfmetcorr_phi = (*patMet)[0].phi();
       
-      edm::Handle<ROOT::Math::SMatrix<double, 2, 2, ROOT::Math::MatRepSym<double, 2> > > metcov;
-      iEvent.getByLabel( MetCorrCovMatrixTag_, metcov);
+      edm::Handle<CovMatrix2D> metcov;
+      iEvent.getByToken( MetCorrCovMatrixToken_, metcov);
       pfmetcorr_sigxx = (*metcov)(0,0);
       pfmetcorr_sigxy = (*metcov)(0,1);
       pfmetcorr_sigyx = (*metcov)(1,0);
       pfmetcorr_sigyy = (*metcov)(1,1);
 
       edm::Handle<double> metsig;
-      iEvent.getByLabel( MetCorrSigTag_, metsig);
+      iEvent.getByToken( MetCorrSigToken_, metsig);
       assert(metsig.isValid());
       pfmetcorr_sig = *metsig;
 
@@ -1505,8 +1516,7 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     {
       if(doDebug)  cout<<"add Puppi MET"<< endl; 
       edm::Handle<pat::METCollection> patMet;
-      //iEvent.getByLabel(MetCorrCollectionTag_, patMet);
-      iEvent.getByToken(PuppiMetCollectionTag_, patMet);
+      iEvent.getByToken(PuppiMetCollectionToken_, patMet);
 
       assert(patMet->size() > 0);
       puppimet_ex = (*patMet)[0].px();
@@ -1820,7 +1830,7 @@ bool NTupleMaker::AddGenHt(const edm::Event& iEvent) {
 bool NTupleMaker::AddGenParticles(const edm::Event& iEvent) {
 
   edm::Handle<reco::GenParticleCollection> GenParticles;
-  iEvent.getByLabel(GenParticleCollectionTag_, GenParticles);
+  iEvent.getByToken(GenParticleCollectionToken_, GenParticles);
 
   bool passed = false;
   
@@ -2067,20 +2077,10 @@ unsigned int NTupleMaker::AddMuons(const edm::Event& iEvent)
 {
 
   edm::Handle<pat::MuonCollection> Muons;
-  //	iEvent.getByLabel(edm::InputTag("muons"), Muons);
-  iEvent.getByLabel(MuonCollectionTag_, Muons);
+  iEvent.getByToken(MuonCollectionToken_, Muons);
   
-    edm::Handle<pat::PackedCandidateCollection> pfcands;
-    iEvent.getByLabel("packedPFCandidates", pfcands);
-    //edm::Handle<pat::MuonCollection> muons;
-    //iEvent.getByLabel("slimmedMuons", muons);
-    //edm::Handle<pat::ElectronCollection> electrons;
-    //iEvent.getByLabel("slimmedElectrons", electrons);
-    //edm::Handle<pat::TauCollection> taus;
-    //iEvent.getByLabel("slimmedTaus", taus);
-    //edm::Handle<pat::METCollection> mets;
-    //iEvent.getByLabel("slimmedMETs", mets);
-
+  edm::Handle<pat::PackedCandidateCollection> pfcands;
+  iEvent.getByToken( PackedCantidateCollectionToken_, pfcands);
 
   if(Muons.isValid())
     {
@@ -2195,7 +2195,7 @@ unsigned int NTupleMaker::AddMuons(const edm::Event& iEvent)
 	muon_genmatch[muon_count] = 0;
 	if(cgen && !cdata){
 	  edm::Handle<reco::GenParticleCollection> GenParticles;
-	  iEvent.getByLabel(GenParticleCollectionTag_, GenParticles);
+	  iEvent.getByToken(GenParticleCollectionToken_, GenParticles);
 	  if(GenParticles.isValid())
 	    muon_genmatch[muon_count] = utils_genMatch::genMatch( (*Muons)[i].p4(), *GenParticles);
 	}
@@ -2255,7 +2255,7 @@ unsigned int NTupleMaker::AddTriggerObjects(const edm::Event& iEvent) {
 
   // trigger objects
   edm::Handle<pat::TriggerObjectStandAloneCollection> triggerObjects;
-  iEvent.getByLabel(TriggerObjectCollectionTag_, triggerObjects);
+  iEvent.getByToken(TriggerObjectCollectionToken_, triggerObjects);
   assert(triggerObjects.isValid());
   
   for (unsigned int iTO=0; iTO<triggerObjects->size(); ++iTO) {
@@ -2475,11 +2475,11 @@ unsigned int NTupleMaker::AddTaus(const edm::Event& iEvent, const edm::EventSetu
   edm::ESHandle<TransientTrackBuilder> transTrackBuilder;
   iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder",transTrackBuilder);
 
-  iEvent.getByLabel(edm::InputTag("l1extraParticles","Central"), l1jetsHandle);
+  iEvent.getByToken( L1JetCollectionToken_, l1jetsHandle);
   if( !l1jetsHandle.isValid() )  edm::LogError("DataNotAvailable")  << "No L1CentralJets collection available \n";
   else  l1jets = l1jetsHandle.product();
   
-  iEvent.getByLabel(edm::InputTag("l1extraParticles","Tau"), l1tausHandle);
+  iEvent.getByToken( L1TauCollectionToken_, l1tausHandle);
   if( !l1jetsHandle.isValid() )  edm::LogError("DataNotAvailable")  << "No L1TauJets collection available \n";
   else  l1taus = l1tausHandle.product(); 
  
@@ -2488,9 +2488,7 @@ unsigned int NTupleMaker::AddTaus(const edm::Event& iEvent, const edm::EventSetu
 
   //tau collection
   edm::Handle<pat::TauCollection> Taus;
-  //iEvent.getByLabel(edm::InputTag("patTaus"), Taus);
-  //iEvent.getByLabel(edm::InputTag("shrinkingConePFTauProducer"), Taus);
-  iEvent.getByLabel(TauCollectionTag_, Taus);
+  iEvent.getByToken(TauCollectionToken_, Taus);
 
   if(Taus.isValid())
     {
@@ -2555,6 +2553,9 @@ unsigned int NTupleMaker::AddTaus(const edm::Event& iEvent, const edm::EventSetu
 	  tau_byLooseCombinedIsolationDeltaBetaCorr3Hits[tau_count]  = (*Taus)[i].tauID("byLooseCombinedIsolationDeltaBetaCorr3Hits");
 	  tau_byMediumCombinedIsolationDeltaBetaCorr3Hits[tau_count]  = (*Taus)[i].tauID("byMediumCombinedIsolationDeltaBetaCorr3Hits");
 	  tau_byTightCombinedIsolationDeltaBetaCorr3Hits[tau_count]  = (*Taus)[i].tauID("byTightCombinedIsolationDeltaBetaCorr3Hits");
+	  tau_byIsolationMVArun2v1DBoldDMwLTraw[tau_count] = (*Taus)[i].tauID("byIsolationMVArun2v1DBoldDMwLTraw");
+	  tau_byIsolationMVArun2v1DBnewDMwLTraw[tau_count] = (*Taus)[i].tauID("byIsolationMVArun2v1DBnewDMwLTraw");
+
 	  // isolation sum
 	  tau_chargedIsoPtSum[tau_count]  = (*Taus)[i].tauID("chargedIsoPtSum");
 	  tau_neutralIsoPtSum[tau_count]  = (*Taus)[i].tauID("neutralIsoPtSum");
@@ -2720,7 +2721,7 @@ unsigned int NTupleMaker::AddTaus(const edm::Event& iEvent, const edm::EventSetu
 	  tau_genmatch[tau_count] = 0;
 	  if(cgen && !cdata){
 	    edm::Handle<reco::GenParticleCollection> GenParticles;
-	    iEvent.getByLabel(GenParticleCollectionTag_, GenParticles);
+	    iEvent.getByToken(GenParticleCollectionToken_, GenParticles);
 	    if(GenParticles.isValid())
 	      tau_genmatch[tau_count] = utils_genMatch::genMatch( (*Taus)[i].p4(), *GenParticles);
 	  }
@@ -2861,7 +2862,7 @@ unsigned int NTupleMaker::AddPFJets(const edm::Event& iEvent, const edm::EventSe
 {
 
   edm::Handle<pat::JetCollection> pfjets;
-  iEvent.getByLabel(JetCollectionTag_, pfjets);
+  iEvent.getByToken(JetCollectionToken_, pfjets);
   
   //	edm::Handle<std::vector<reco::SecondaryVertexTagInfo> > svInfos;
   //	iEvent.getByLabel(edm::InputTag("secondaryVertexTagInfosEI"), svInfos);
@@ -2994,10 +2995,11 @@ unsigned int NTupleMaker::AddPFJets(const edm::Event& iEvent, const edm::EventSe
 unsigned int NTupleMaker::AddElectrons(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
 
-        edm::Handle<edm::View<pat::Electron> > Electrons;
-	iEvent.getByLabel(ElectronCollectionTag_, Electrons);
+  edm::Handle<edm::View<pat::Electron> > Electrons;
+  //edm::Handle<edm:View<pat::Electron> > Electrons;
+  iEvent.getByToken(ElectronCollectionToken_, Electrons);
         edm::Handle<pat::PackedCandidateCollection> pfcands;
-        iEvent.getByLabel("packedPFCandidates", pfcands);
+        iEvent.getByToken( PackedCantidateCollectionToken_, pfcands);
 
 	// cut based
 	edm::Handle<edm::ValueMap<bool> > veto_id_decisions;
@@ -3164,7 +3166,7 @@ unsigned int NTupleMaker::AddElectrons(const edm::Event& iEvent, const edm::Even
 	  electron_genmatch[electron_count] = 0;
 	  if(cgen && !cdata){
 	    edm::Handle<reco::GenParticleCollection> GenParticles;
-	    iEvent.getByLabel(GenParticleCollectionTag_, GenParticles);
+	    iEvent.getByToken(GenParticleCollectionToken_, GenParticles);
 	    if(GenParticles.isValid())
 	      electron_genmatch[electron_count] = utils_genMatch::genMatch(  (*Electrons)[i].p4(), *GenParticles);
 	  }
