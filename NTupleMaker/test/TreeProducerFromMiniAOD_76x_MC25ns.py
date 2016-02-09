@@ -648,8 +648,8 @@ mvaTrigValuesMap     = cms.InputTag("electronMVAValueMapProducer:ElectronMVAEsti
 mvaTrigCategoriesMap = cms.InputTag("electronMVAValueMapProducer:ElectronMVAEstimatorRun2Spring15Trig25nsV1Categories"),
 
 TauCollectionTag = cms.InputTag("slimmedTaus"),
-JetCollectionTag = cms.InputTag("patJetsReapplyJEC::TreeProducer"),
-#JetCollectionTag = cms.InputTag("slimmedJets"),
+#JetCollectionTag = cms.InputTag("patJetsReapplyJEC::TreeProducer"),
+JetCollectionTag = cms.InputTag("slimmedJets"),
 MetCollectionTag = cms.InputTag("slimmedMETs"),
 MetCovMatrixTag = cms.InputTag("METSignificance:METCovariance:TreeProducer"),
 MetSigTag = cms.InputTag("METSignificance:METSignificance:TreeProducer"),
