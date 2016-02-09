@@ -382,6 +382,15 @@ void NTupleMaker::beginJob(){
     
     tree->Branch("muon_genmatch", muon_genmatch, "muon_genmatch[muon_count]/I");
 
+
+    tree->Branch("dimuon_count", &dimuon_count, "dimuon_count/i");
+    tree->Branch("dimuon_leading", dimuon_leading, "dimuon_leading[dimuon_count]/i");
+    tree->Branch("dimuon_trailing", dimuon_trailing, "dimuon_trailing[dimuon_count]/i");   
+    tree->Branch("dimuon_dist2D", dimuon_dist2D, "dimuon_dist2D[dimuon_count]/F");
+    tree->Branch("dimuon_dist2DE", dimuon_dist2DE, "dimuon_dist2DE[dimuon_count]/F");
+    tree->Branch("dimuon_dist3D", dimuon_dist3D, "dimuon_dist3D[dimuon_count]/F");
+    tree->Branch("dimuon_dist3DE", dimuon_dist3DE, "dimuon_dist3DE[dimuon_count]/F");
+    
   }
 
   // pf jets
@@ -1207,6 +1216,7 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   goodprimvertex_count = 0;
   primvertex_count = 0;
   muon_count = 0;
+  dimuon_count = 0;
   tau_count = 0;
   gentau_count = 0;
   pfjet_count = 0;
@@ -1366,7 +1376,7 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   if (crecmuon) 
     {
       if(doDebug)  cout<<"add muons"<< endl; 
-      int numberOfMuons = int(AddMuons(iEvent));
+      int numberOfMuons = int(AddMuons(iEvent, iSetup));
     } // crecmuon
   
   if (crecelectron) 
@@ -2073,8 +2083,11 @@ bool NTupleMaker::AddGenParticles(const edm::Event& iEvent) {
 
 } // bool NTupleMaker::AddGenParticles(const edm::Event& iEvent) 
 
-unsigned int NTupleMaker::AddMuons(const edm::Event& iEvent)
+unsigned int NTupleMaker::AddMuons(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
+  edm::ESHandle<TransientTrackBuilder> builder;
+  iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder",builder);  
+  const TransientTrackBuilder * transientTrackBuilder = builder.product();
 
   edm::Handle<pat::MuonCollection> Muons;
   iEvent.getByToken(MuonCollectionToken_, Muons);
@@ -2199,9 +2212,108 @@ unsigned int NTupleMaker::AddMuons(const edm::Event& iEvent)
 	  if(GenParticles.isValid())
 	    muon_genmatch[muon_count] = utils_genMatch::genMatch( (*Muons)[i].p4(), *GenParticles);
 	}
-	
+
 	muon_count++;
 	
+	if( !(*Muons)[i].innerTrack().isNull()){
+	  for(unsigned j = i+1 ; j < Muons->size() ; j++){
+	    if ((*Muons)[j].pt() < cMuPtMin) continue;
+	    if (fabs(((*Muons)[j].eta()))>cMuEtaMax) continue;
+	    if( (*Muons)[j].innerTrack().isNull()) continue;
+   
+	    dimuon_leading[dimuon_count] = i;
+	    dimuon_trailing[dimuon_count] = j;	    
+	    if ((*Muons)[i].pt() < (*Muons)[j].pt()){
+	      dimuon_leading[dimuon_count] = j;
+	      dimuon_trailing[dimuon_count] = i;
+	    }
+
+	    if (fabs( (*Muons)[i].pt() - (*Muons)[j].pt()) < 1.e-4){
+	      std::cout<<"WTF!!"<<std::endl;
+	    }
+
+	    dimuon_dist2D[dimuon_count] = -1.;
+	    dimuon_dist2DE[dimuon_count] = -1.;
+	    dimuon_dist3D[dimuon_count] = -1.;
+	    dimuon_dist3DE[dimuon_count] = -1.;	
+
+	    const pat::Muon* leading = &(*Muons)[dimuon_leading[dimuon_count]];
+	    const pat::Muon* trailing = &(*Muons)[dimuon_trailing[dimuon_count]];
+
+	    reco::TrackRef leadTrk = leading->innerTrack();
+	    reco::TrackRef trailTrk = trailing->innerTrack();
+	    
+	    TransientTrack trLeadTrk = transientTrackBuilder->build(*leadTrk);
+	    TransientTrack trTrailTrk = transientTrackBuilder->build(*trailTrk);
+	    
+	    FreeTrajectoryState leadState = trLeadTrk.impactPointTSCP().theState();
+	    FreeTrajectoryState trailState = trTrailTrk.impactPointTSCP().theState();
+
+	    if (trLeadTrk.impactPointTSCP().isValid() && trTrailTrk.impactPointTSCP().isValid()) {
+	      TwoTrackMinimumDistance minDist;
+
+	      typedef ROOT::Math::SVector<double, 3> SVector3;
+	      typedef ROOT::Math::SMatrix<double, 3, 3, ROOT::Math::MatRepSym<double, 3> > SMatrixSym3D;	   
+
+	      minDist.calculate(leadState,trailState);
+	      if (minDist.status()) {
+
+		//float dist3D = minDist.distance();
+		std::pair<GlobalPoint,GlobalPoint> pcaMuons = minDist.points();
+		//GlobalPoint posPCA = pcaMuons.first;
+		//GlobalPoint negPCA = pcaMuons.second;
+
+		ParticleMass muon_mass = 0.105658;
+		float muon_sigma = muon_mass*1.e-6;
+
+		//Creating a KinematicParticleFactory
+		KinematicParticleFactoryFromTransientTrack pFactory;
+
+		//initial chi2 and ndf before kinematic fits.
+		float chi = 0.;
+		float ndf = 0.;
+		RefCountedKinematicParticle leadPart = pFactory.particle(trLeadTrk,muon_mass,chi,ndf,muon_sigma); 
+		RefCountedKinematicParticle trailPart = pFactory.particle(trTrailTrk,muon_mass,chi,ndf,muon_sigma); 
+
+		SVector3 distanceVector(pcaMuons.first.x()-pcaMuons.second.x(),
+					pcaMuons.first.y()-pcaMuons.second.y(),
+					pcaMuons.first.z()-pcaMuons.second.z());
+
+		dimuon_dist3D[dimuon_count] = ROOT::Math::Mag(distanceVector);
+		      
+		std::vector<float> vvv(6);
+		vvv[0] = leadPart->stateAtPoint(pcaMuons.first).kinematicParametersError().matrix()(0,0);
+		vvv[1] = leadPart->stateAtPoint(pcaMuons.first).kinematicParametersError().matrix()(0,1);	   
+		vvv[2] = leadPart->stateAtPoint(pcaMuons.first).kinematicParametersError().matrix()(1,1);
+		vvv[3] = leadPart->stateAtPoint(pcaMuons.first).kinematicParametersError().matrix()(0,2);
+		vvv[4] = leadPart->stateAtPoint(pcaMuons.first).kinematicParametersError().matrix()(1,2);	   
+		vvv[5] = leadPart->stateAtPoint(pcaMuons.first).kinematicParametersError().matrix()(2,2);
+		SMatrixSym3D leadPCACov(vvv.begin(),vvv.end());
+
+		vvv[0] = trailPart->stateAtPoint(pcaMuons.second).kinematicParametersError().matrix()(0,0);
+		vvv[1] = trailPart->stateAtPoint(pcaMuons.second).kinematicParametersError().matrix()(0,1);	   
+		vvv[2] = trailPart->stateAtPoint(pcaMuons.second).kinematicParametersError().matrix()(1,1);
+		vvv[3] = trailPart->stateAtPoint(pcaMuons.second).kinematicParametersError().matrix()(0,2);
+		vvv[4] = trailPart->stateAtPoint(pcaMuons.second).kinematicParametersError().matrix()(1,2);	   
+		vvv[5] = trailPart->stateAtPoint(pcaMuons.second).kinematicParametersError().matrix()(2,2);
+		SMatrixSym3D trailPCACov(vvv.begin(),vvv.end());
+
+
+		SMatrixSym3D totCov = leadPCACov + trailPCACov;
+      
+		dimuon_dist3DE[dimuon_count] = sqrt(ROOT::Math::Similarity(totCov, distanceVector))/dimuon_dist3D[dimuon_count];
+
+		distanceVector(2) = 0.0;
+		dimuon_dist2D[dimuon_count] = ROOT::Math::Mag(distanceVector);
+		dimuon_dist2DE[dimuon_count] = sqrt(ROOT::Math::Similarity(totCov, distanceVector))/dimuon_dist2D[dimuon_count];
+		
+	      }
+	    }
+	    
+	    dimuon_count++;
+	  }
+	}
+
 	if (muon_count==M_muonmaxcount) {
 	  cerr << "number of muons > M_muonmaxcount. They are missing." << endl; errors |= 1<<1; 
 	  break;

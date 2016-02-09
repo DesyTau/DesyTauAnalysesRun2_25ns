@@ -250,7 +250,7 @@ class NTupleMaker : public edm::EDAnalyzer{
   bool AddGenHt(const edm::Event& iEvent);
   bool AddGenParticles(const edm::Event& iEvent);
   unsigned int AddElectrons(const edm::Event& iEvent, const edm::EventSetup& iSetup);
-  unsigned int AddMuons(const edm::Event& iEvent);
+  unsigned int AddMuons(const edm::Event& iEvent, const edm::EventSetup& iSetup);
   //  unsigned int AddPhotons(const edm::Event& iEvent);
   unsigned int AddTaus(const edm::Event& iEvent, const edm::EventSetup& iSetup);
   unsigned int AddPFJets(const edm::Event& iEvent, const edm::EventSetup& iSetup);
@@ -531,6 +531,14 @@ class NTupleMaker : public edm::EDAnalyzer{
   Bool_t muon_innerTrack[M_muonmaxcount];
   
   Int_t muon_genmatch[M_muonmaxcount];
+
+  UInt_t dimuon_count;
+  UInt_t dimuon_leading[M_muonmaxcount*(M_muonmaxcount - 1)/2];
+  UInt_t dimuon_trailing[M_muonmaxcount*(M_muonmaxcount - 1)/2];
+  Float_t dimuon_dist2D[M_muonmaxcount*(M_muonmaxcount - 1)/2];
+  Float_t dimuon_dist2DE[M_muonmaxcount*(M_muonmaxcount - 1)/2];
+  Float_t dimuon_dist3D[M_muonmaxcount*(M_muonmaxcount - 1)/2];
+  Float_t dimuon_dist3DE[M_muonmaxcount*(M_muonmaxcount - 1)/2];
 
   // pat jets 
   UInt_t pfjet_count;
@@ -1036,4 +1044,3 @@ class NTupleMaker : public edm::EDAnalyzer{
 DEFINE_FWK_MODULE(NTupleMaker);
 
 #endif
-

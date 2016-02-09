@@ -95,6 +95,15 @@ public :
    Bool_t          muon_isLoose[50];   //[muon_count]
    Bool_t          muon_isMedium[50];   //[muon_count]
    Int_t           muon_genmatch[50];   //[muon_count]
+
+   UInt_t          dimuon_count;
+   UInt_t          dimuon_leading[50*49/2]; // [dimuon_count]
+   UInt_t          dimuon_trailing[50*49/2]; // [dimuon_count]
+   Float_t         dimuon_dist2D[50*49/2]; // [dimuon_count]
+   Float_t         dimuon_dist2DE[50*49/2]; // [dimuon_count]
+   Float_t         dimuon_dist3D[50*49/2]; // [dimuon_count]
+   Float_t         dimuon_dist3DE[50*49/2]; // [dimuon_count]
+
    UInt_t          pfjet_count;
    Float_t         pfjet_e[100];   //[pfjet_count]
    Float_t         pfjet_px[100];   //[pfjet_count]
@@ -226,6 +235,8 @@ public :
    Float_t         tau_byLooseCombinedIsolationDeltaBetaCorr3Hits[50];   //[tau_count]
    Float_t         tau_byMediumCombinedIsolationDeltaBetaCorr3Hits[50];   //[tau_count]
    Float_t         tau_byTightCombinedIsolationDeltaBetaCorr3Hits[50];   //[tau_count]
+   Float_t         tau_byIsolationMVArun2v1DBoldDMwLTraw[50];   //[tau_count]
+   Float_t         tau_byIsolationMVArun2v1DBnewDMwLTraw[50];   //[tau_count]
    Float_t         tau_chargedIsoPtSum[50];   //[tau_count]
    Float_t         tau_neutralIsoPtSum[50];   //[tau_count]
    Float_t         tau_puCorrPtSum[50];   //[tau_count]
@@ -504,7 +515,16 @@ public :
    TBranch        *b_muon_isTight;   //!
    TBranch        *b_muon_isLoose;   //!
    TBranch        *b_muon_isMedium;   //!
-   TBranch        *b_muon_genmatch;   //! 
+   TBranch        *b_muon_genmatch;   //!
+
+   TBranch        *b_dimuon_count;   //!
+   TBranch        *b_dimuon_leading;   //!
+   TBranch        *b_dimuon_trailing;   //!
+   TBranch        *b_dimuon_dist2D;   //!
+   TBranch        *b_dimuon_dist2DE;   //! 
+   TBranch        *b_dimuon_dist3D;   //!
+   TBranch        *b_dimuon_dist3DE;   //!
+
    TBranch        *b_pfjet_count;   //!
    TBranch        *b_pfjet_e;   //!
    TBranch        *b_pfjet_px;   //!
@@ -636,6 +656,8 @@ public :
    TBranch        *b_tau_byLooseCombinedIsolationDeltaBetaCorr3Hits;   //!
    TBranch        *b_tau_byMediumCombinedIsolationDeltaBetaCorr3Hits;   //!
    TBranch        *b_tau_byTightCombinedIsolationDeltaBetaCorr3Hits;   //!
+   TBranch        *b_tau_byIsolationMVArun2v1DBoldDMwLTraw;   //!
+   TBranch        *b_tau_byIsolationMVArun2v1DBnewDMwLTraw;   //!
    TBranch        *b_tau_chargedIsoPtSum;   //!
    TBranch        *b_tau_neutralIsoPtSum;   //!
    TBranch        *b_tau_puCorrPtSum;   //!
@@ -1021,6 +1043,15 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("muon_isLoose", muon_isLoose, &b_muon_isLoose);
    fChain->SetBranchAddress("muon_isMedium", muon_isMedium, &b_muon_isMedium);
    fChain->SetBranchAddress("muon_genmatch", muon_genmatch, &b_muon_genmatch);
+
+   fChain->SetBranchAddress("dimuon_count", &dimuon_count, &b_dimuon_count);
+   fChain->SetBranchAddress("dimuon_leading", dimuon_leading, &b_dimuon_leading);
+   fChain->SetBranchAddress("dimuon_trailing", dimuon_trailing, &b_dimuon_trailing);
+   fChain->SetBranchAddress("dimuon_dist2D", dimuon_dist2D, &b_dimuon_dist2D);
+   fChain->SetBranchAddress("dimuon_dist2DE", dimuon_dist2DE, &b_dimuon_dist2DE);
+   fChain->SetBranchAddress("dimuon_dist3D", dimuon_dist3D, &b_dimuon_dist3D);
+   fChain->SetBranchAddress("dimuon_dist3DE", dimuon_dist3DE, &b_dimuon_dist3DE);
+
    fChain->SetBranchAddress("pfjet_count", &pfjet_count, &b_pfjet_count);
    fChain->SetBranchAddress("pfjet_e", pfjet_e, &b_pfjet_e);
    fChain->SetBranchAddress("pfjet_px", pfjet_px, &b_pfjet_px);
@@ -1152,6 +1183,8 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("tau_byLooseCombinedIsolationDeltaBetaCorr3Hits", tau_byLooseCombinedIsolationDeltaBetaCorr3Hits, &b_tau_byLooseCombinedIsolationDeltaBetaCorr3Hits);
    fChain->SetBranchAddress("tau_byMediumCombinedIsolationDeltaBetaCorr3Hits", tau_byMediumCombinedIsolationDeltaBetaCorr3Hits, &b_tau_byMediumCombinedIsolationDeltaBetaCorr3Hits);
    fChain->SetBranchAddress("tau_byTightCombinedIsolationDeltaBetaCorr3Hits", tau_byTightCombinedIsolationDeltaBetaCorr3Hits, &b_tau_byTightCombinedIsolationDeltaBetaCorr3Hits);
+   fChain->SetBranchAddress("tau_byIsolationMVArun2v1DBoldDMwLTraw", tau_byIsolationMVArun2v1DBoldDMwLTraw, &b_tau_byIsolationMVArun2v1DBoldDMwLTraw);
+   fChain->SetBranchAddress("tau_byIsolationMVArun2v1DBnewDMwLTraw", tau_byIsolationMVArun2v1DBnewDMwLTraw, &b_tau_byIsolationMVArun2v1DBnewDMwLTraw);
    fChain->SetBranchAddress("tau_chargedIsoPtSum", tau_chargedIsoPtSum, &b_tau_chargedIsoPtSum);
    fChain->SetBranchAddress("tau_neutralIsoPtSum", tau_neutralIsoPtSum, &b_tau_neutralIsoPtSum);
    fChain->SetBranchAddress("tau_puCorrPtSum", tau_puCorrPtSum, &b_tau_puCorrPtSum);
