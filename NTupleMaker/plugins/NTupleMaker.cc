@@ -172,6 +172,8 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
   sampleName(iConfig.getUntrackedParameter<std::string>("SampleName", "Higgs")),
   propagatorWithMaterial(0)
 {
+  setTauBranches = true;
+  
   //  propagatorWithMaterial = NULL;
   if(cYear != 2011 && cYear != 2012 && cYear != 2015)
     throw cms::Exception("NTupleMaker") << "Invalid Year, only 2011, 2012 and 2015  are allowed!";
@@ -588,38 +590,6 @@ void NTupleMaker::beginJob(){
     tree->Branch("tau_genjet_pz", tau_genjet_pz, "tau_genjet_pz[tau_count]/F");
     tree->Branch("tau_genjet_e", tau_genjet_e, "tau_genjet_e[tau_count]/F");
     tree->Branch("tau_genmatch", tau_genmatch, "tau_genmatch[tau_count]/I");
-
-    tree->Branch("tau_decayModeFinding", tau_decayModeFinding, "tau_decayModeFinding[tau_count]/F");
-    tree->Branch("tau_decayModeFindingNewDMs", tau_decayModeFindingNewDMs, "tau_decayModeFindingNewDMs[tau_count]/F");
-
-    tree->Branch("tau_byCombinedIsolationDeltaBetaCorrRaw3Hits", tau_byCombinedIsolationDeltaBetaCorrRaw3Hits, "tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[tau_count]/F");
-    tree->Branch("tau_byLooseCombinedIsolationDeltaBetaCorr3Hits", tau_byLooseCombinedIsolationDeltaBetaCorr3Hits, "tau_byLooseCombinedIsolationDeltaBetaCorr3Hits[tau_count]/F");
-    tree->Branch("tau_byMediumCombinedIsolationDeltaBetaCorr3Hits", tau_byMediumCombinedIsolationDeltaBetaCorr3Hits, "tau_byMediumCombinedIsolationDeltaBetaCorr3Hits[tau_count]/F");
-    tree->Branch("tau_byTightCombinedIsolationDeltaBetaCorr3Hits", tau_byTightCombinedIsolationDeltaBetaCorr3Hits, "tau_byTightCombinedIsolationDeltaBetaCorr3Hits[tau_count]/F");
-    tree->Branch("tau_byIsolationMVArun2v1DBoldDMwLTraw", tau_byIsolationMVArun2v1DBoldDMwLTraw, "tau_byIsolationMVArun2v1DBoldDMwLTraw[tau_count]/F");
-    tree->Branch("tau_byIsolationMVArun2v1DBnewDMwLTraw", tau_byIsolationMVArun2v1DBnewDMwLTraw, "tau_byIsolationMVArun2v1DBnewDMwLTraw[tau_count]/F");
-
-
-    tree->Branch("tau_chargedIsoPtSum", tau_chargedIsoPtSum, "tau_chargedIsoPtSum[tau_count]/F");
-    tree->Branch("tau_neutralIsoPtSum", tau_neutralIsoPtSum, "tau_neutralIsoPtSum[tau_count]/F");
-    tree->Branch("tau_puCorrPtSum", tau_puCorrPtSum, "tau_puCorrPtSum[tau_count]/F");
-
-    tree->Branch("tau_leadchargedhadrcand_px",  tau_leadchargedhadrcand_px,  "tau_leadchargedhadrcand_px[tau_count]/F");
-    tree->Branch("tau_leadchargedhadrcand_py",  tau_leadchargedhadrcand_py,  "tau_leadchargedhadrcand_py[tau_count]/F");
-    tree->Branch("tau_leadchargedhadrcand_pz",  tau_leadchargedhadrcand_pz,  "tau_leadchargedhadrcand_pz[tau_count]/F");
-    tree->Branch("tau_leadchargedhadrcand_mass",tau_leadchargedhadrcand_mass,"tau_leadchargedhadrcand_mass[tau_count]/F");
-    tree->Branch("tau_leadchargedhadrcand_id",  tau_leadchargedhadrcand_id,  "tau_leadchargedhadrcand_id[tau_count]/I");
-    tree->Branch("tau_leadchargedhadrcand_dxy", tau_leadchargedhadrcand_dxy, "tau_leadchargedhadrcand_dxy[tau_count]/F");
-    tree->Branch("tau_leadchargedhadrcand_dz",  tau_leadchargedhadrcand_dz,  "tau_leadchargedhadrcand_dz[tau_count]/F");
-
-    tree->Branch("tau_againstMuonLoose3", tau_againstMuonLoose3, "tau_againstMuonLoose3[tau_count]/F");
-    tree->Branch("tau_againstMuonTight3", tau_againstMuonTight3, "tau_againstMuonTight3[tau_count]/F");
-
-    tree->Branch("tau_againstElectronVLooseMVA5", tau_againstElectronVLooseMVA5, "tau_againstElectronVLooseMVA5[tau_count]/F");
-    tree->Branch("tau_againstElectronVTightMVA5", tau_againstElectronVTightMVA5, "tau_againstElectronVTightMVA5[tau_count]/F");
-    tree->Branch("tau_againstElectronLooseMVA5", tau_againstElectronLooseMVA5, "tau_againstElectronLooseMVA5[tau_count]/F");
-    tree->Branch("tau_againstElectronMediumMVA5", tau_againstElectronMediumMVA5, "tau_againstElectronMediumMVA5[tau_count]/F");
-    tree->Branch("tau_againstElectronTightMVA5", tau_againstElectronTightMVA5, "tau_againstElectronTightMVA5[tau_count]/F");
 
     tree->Branch("tau_ntracks_pt05", tau_ntracks_pt05, "tau_ntracks_pt05[tau_count]/i");
     tree->Branch("tau_ntracks_pt08", tau_ntracks_pt05, "tau_ntracks_pt05[tau_count]/i");
@@ -2658,29 +2628,22 @@ unsigned int NTupleMaker::AddTaus(const edm::Event& iEvent, const edm::EventSetu
           tau_isolationGammaCands_size[tau_count]                 = (*Taus)[i].isolationGammaCands().size();
 
 	  // main discriminators
-	  tau_decayModeFinding[tau_count]  = (*Taus)[i].tauID("decayModeFinding");
-	  tau_decayModeFindingNewDMs[tau_count]  = (*Taus)[i].tauID("decayModeFindingNewDMs");
-	  // isolation discriminators
-	  tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[tau_count]  = (*Taus)[i].tauID("byCombinedIsolationDeltaBetaCorrRaw3Hits");
-	  tau_byLooseCombinedIsolationDeltaBetaCorr3Hits[tau_count]  = (*Taus)[i].tauID("byLooseCombinedIsolationDeltaBetaCorr3Hits");
-	  tau_byMediumCombinedIsolationDeltaBetaCorr3Hits[tau_count]  = (*Taus)[i].tauID("byMediumCombinedIsolationDeltaBetaCorr3Hits");
-	  tau_byTightCombinedIsolationDeltaBetaCorr3Hits[tau_count]  = (*Taus)[i].tauID("byTightCombinedIsolationDeltaBetaCorr3Hits");
-	  tau_byIsolationMVArun2v1DBoldDMwLTraw[tau_count] = (*Taus)[i].tauID("byIsolationMVArun2v1DBoldDMwLTraw");
-	  tau_byIsolationMVArun2v1DBnewDMwLTraw[tau_count] = (*Taus)[i].tauID("byIsolationMVArun2v1DBnewDMwLTraw");
+	  if(setTauBranches){
+	    std::vector<std::pair<std::string, float> > idpairs = (*Taus)[i].tauIDs();
+	    for (unsigned int id = 0; id < idpairs.size(); id++){
 
-	  // isolation sum
-	  tau_chargedIsoPtSum[tau_count]  = (*Taus)[i].tauID("chargedIsoPtSum");
-	  tau_neutralIsoPtSum[tau_count]  = (*Taus)[i].tauID("neutralIsoPtSum");
-	  tau_puCorrPtSum[tau_count]  = (*Taus)[i].tauID("puCorrPtSum");
-	  // anti-muon discriminator
-	  tau_againstMuonLoose3[tau_count]  = (*Taus)[i].tauID("againstMuonLoose3");
-	  tau_againstMuonTight3[tau_count]  = (*Taus)[i].tauID("againstMuonTight3");
-	  // anti-electron discriminator
-	  tau_againstElectronVLooseMVA5[tau_count]  = (*Taus)[i].tauID("againstElectronVLooseMVA5");
-	  tau_againstElectronVTightMVA5[tau_count]  = (*Taus)[i].tauID("againstElectronVTightMVA5");
-	  tau_againstElectronLooseMVA5[tau_count]  = (*Taus)[i].tauID("againstElectronLooseMVA5");
-	  tau_againstElectronMediumMVA5[tau_count]  = (*Taus)[i].tauID("againstElectronMediumMVA5");
-	  tau_againstElectronTightMVA5[tau_count]  = (*Taus)[i].tauID("againstElectronTightMVA5");
+	      TString name1 = "tau_"; name1+=idpairs[id].first;
+	      TString name2 = name1; name2+="[tau_count]/F";
+	      tree->Branch( name1, tau_ids[id], name2);
+
+	      tauIdIndx.push_back(std::make_pair( idpairs[id].first, id));
+	    }
+
+	    setTauBranches = 0;
+	  }
+	  
+	  for(unsigned int id = 0; id < tauIdIndx.size(); id++)
+	    tau_ids[tauIdIndx[id].second][tau_count]=(*Taus)[i].tauID(tauIdIndx[id].first);
 
 	  if( ((*Taus)[i].genJet())) {
 	    std::string genTauDecayMode = JetMCTagUtils::genTauDecayMode(*((*Taus)[i].genJet()));

@@ -741,35 +741,9 @@ class NTupleMaker : public edm::EDAnalyzer{
   Int_t tau_genmatch[M_taumaxcount];
 
   // main tau discriminators
-
-  // decay mode
-  Float_t tau_decayModeFinding[M_taumaxcount];
-  Float_t tau_decayModeFindingNewDMs[M_taumaxcount];
-  
-  // isolation 
-  Float_t tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[M_taumaxcount];
-  Float_t tau_byLooseCombinedIsolationDeltaBetaCorr3Hits[M_taumaxcount];
-  Float_t tau_byMediumCombinedIsolationDeltaBetaCorr3Hits[M_taumaxcount];
-  Float_t tau_byTightCombinedIsolationDeltaBetaCorr3Hits[M_taumaxcount];
-  
-  Float_t tau_byIsolationMVArun2v1DBoldDMwLTraw[M_taumaxcount];
-  Float_t tau_byIsolationMVArun2v1DBnewDMwLTraw[M_taumaxcount];
-
-  // isolation sums
-  Float_t tau_chargedIsoPtSum[M_taumaxcount];
-  Float_t tau_neutralIsoPtSum[M_taumaxcount];
-  Float_t tau_puCorrPtSum[M_taumaxcount];
-
-  // against muon
-  Float_t tau_againstMuonLoose3[M_taumaxcount];
-  Float_t tau_againstMuonTight3[M_taumaxcount];
-
-  // against electron
-  Float_t tau_againstElectronVLooseMVA5[M_taumaxcount];
-  Float_t tau_againstElectronVTightMVA5[M_taumaxcount];
-  Float_t tau_againstElectronLooseMVA5[M_taumaxcount];
-  Float_t tau_againstElectronMediumMVA5[M_taumaxcount];
-  Float_t tau_againstElectronTightMVA5[M_taumaxcount];
+  bool setTauBranches;
+  std::vector<std::pair<std::string, unsigned int> >tauIdIndx;
+  Float_t tau_ids[100][M_taumaxcount];
   
   // number of tracks around 
   UInt_t tau_ntracks_pt05[M_taumaxcount];

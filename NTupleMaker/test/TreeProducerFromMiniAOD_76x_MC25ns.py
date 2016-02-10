@@ -696,6 +696,7 @@ HLTriggerPaths = cms.untracked.vstring(
 #'HLT_Ele32_eta2p1_WPLoose_Gsf_v', , no existing in 25ns
 'HLT_DoubleMediumIsoPFTau40_Trk1_eta2p1_Reg_v',
 'HLT_Ele32_eta2p1_WPTight_Gsf_v',
+'HLT_DoubleMediumIsoPFTau35_Trk1_eta2p1_Reg_v',
 ),
 TriggerProcess = cms.untracked.string("HLT"),
 # tracks
@@ -766,7 +767,8 @@ RecTauHLTriggerMatching = cms.untracked.vstring(
 'HLT_Ele22_eta2p1_WPLoose_Gsf_LooseIsoPFTau20_v.*:hltOverlapFilterIsoEle22WPLooseGsfLooseIsoPFTau20',
 'HLT_IsoMu17_eta2p1_LooseIsoPFTau20_v.*:hltPFTau20TrackLooseIsoAgainstMuon',
 'HLT_IsoMu17_eta2p1_LooseIsoPFTau20_v.*:hltOverlapFilterIsoMu17LooseIsoPFTau20',
-'HLT_DoubleMediumIsoPFTau40_Trk1_eta2p1_Reg_v.*:hltDoublePFTau40TrackPt1MediumIsolationDz02Reg'
+'HLT_DoubleMediumIsoPFTau40_Trk1_eta2p1_Reg_v.*:hltDoublePFTau40TrackPt1MediumIsolationDz02Reg',
+'HLT_DoubleMediumIsoPFTau35_Trk1_eta2p1_Reg_v.*:hltDoublePFTau35TrackPt1MediumIsolationDz02Reg'
 ),
 RecTauFloatDiscriminators = cms.untracked.vstring(
 #'againstElectronLoose',
