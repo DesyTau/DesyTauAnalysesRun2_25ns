@@ -560,8 +560,8 @@ int main(int argc, char * argv[]) {
       
 	for (unsigned int it=0; it<taus.size(); ++it) {
 	  unsigned int tIndex = taus.at(it);
-	  float absIsoTau = analysisTree.tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[tIndex];
-	  //float absIsoTau = analysisTree.tau_byIsolationMVArun2v1DBnewDMwLTraw[tIndex];
+	  //float absIsoTau = analysisTree.tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[tIndex];
+	  float absIsoTau = analysisTree.tau_byIsolationMVArun2v1DBnewDMwLTraw[tIndex];
 	  float relIsoTau = absIsoTau / analysisTree.tau_pt[tIndex];
 
 	  if (debug)
@@ -592,12 +592,12 @@ int main(int argc, char * argv[]) {
 	      changePair = true;
 	    }	    
 	    else if (fabs(analysisTree.electron_pt[eIndex] - analysisTree.electron_pt[electronIndex]) < 1.e-5) {
-	      if (relIsoTau < isoTauMin) {
+	      if (absIsoTau > isoTauMin) {
 		if(debug)
 		  fileOutput<<"ChangePair tau iso"<<std::endl; 
 		changePair = true;
 	      }
-	      else if ((relIsoTau - isoTauMin) < 1.e-5){
+	      else if ((absIsoTau - isoTauMin) < 1.e-5){
 		if (analysisTree.tau_pt[tIndex] > analysisTree.tau_pt[tauIndex]) {
 		  if(debug)
 		    fileOutput<<"ChangePair tau pt"<<std::endl; 
@@ -610,7 +610,7 @@ int main(int argc, char * argv[]) {
 	  if (changePair){
 	    isoEleMin  = relIsoEle;
 	    electronIndex = eIndex;
-	    isoTauMin = relIsoTau;
+	    isoTauMin = absIsoTau;
 	    tauIndex = tIndex;
 	  }
 	}
@@ -679,7 +679,7 @@ int main(int argc, char * argv[]) {
       otree->gen_match_2 = analysisTree.tau_genmatch[tauIndex];
       //if (analysisTree.tau_charge[tauIndex]>0)
       //otree->q_2 = 1;
-      otree->mva_2 = analysisTree.tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[tauIndex];
+      otree->mva_2 = analysisTree.tau_byIsolationMVArun2v1DBnewDMwLTraw[tauIndex];  //analysisTree.tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[tauIndex];
       otree->d0_2 = analysisTree.tau_leadchargedhadrcand_dxy[tauIndex];
       otree->dZ_2 = analysisTree.tau_leadchargedhadrcand_dz[tauIndex];      
       otree->iso_2 = analysisTree.tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[tauIndex];
