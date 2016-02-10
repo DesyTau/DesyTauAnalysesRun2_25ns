@@ -123,16 +123,17 @@ void synchNtuple(string sample = "GGFH125", string stream = "MuTau", bool incl=f
    float lMVAMetPhi   = 0; lOTree->Branch("mvametphi"  ,&lMVAMetPhi     ,"lMetPhi/F"   ); //mvamet Phi
    //float lPZetaVis    = 0; lOTree->Branch("pzetavis"   ,&lPZetaVis      ,"lPZetaVis/F" ); //pZeta Visible
    //float lPZetaMiss   = 0; lOTree->Branch("pzetamiss"  ,&lPZetaMiss     ,"lPZetaMiss/F"); //pZeta Missing
+
    //MET covariance matrices
-   float lMetCov00   = 0; lOTree->Branch("metcov00"   ,&lMetCov00      ,"lMetCov00/F"); //pf met covariance matrix 00 
-   float lMetCov01    = 0; lOTree->Branch("metcov01"   ,&lMetCov01      ,"lMetCov01/F"); //pf met covariance matrix 01 
-   float lMetCov10    = 0; lOTree->Branch("metcov10"   ,&lMetCov10      ,"lMetCov10/F"); //pf met covariance matrix 10 
-   float lMetCov11    = 0; lOTree->Branch("metcov11"   ,&lMetCov11      ,"lMetCov11/F"); //pf met covariance matrix 11 
+   float lMetCov00   = 0; lOTree->Branch("pfmetCov00"   ,&lMetCov00      ,"lMetCov00/F"); //pf met covariance matrix 00 
+   float lMetCov01    = 0; lOTree->Branch("pfmetCov01"   ,&lMetCov01      ,"lMetCov01/F"); //pf met covariance matrix 01 
+   float lMetCov10    = 0; lOTree->Branch("pfmetCov10"   ,&lMetCov10      ,"lMetCov10/F"); //pf met covariance matrix 10 
+   float lMetCov11    = 0; lOTree->Branch("pfmetCov11"   ,&lMetCov11      ,"lMetCov11/F"); //pf met covariance matrix 11 
    //MVAMet covariance matrices
-   float lMVACov00    = 0; lOTree->Branch("mvacov00"   ,&lMVACov00      ,"lMVACov00/F"); //mva met covariance matrix 00 
-   float lMVACov01    = 0; lOTree->Branch("mvacov01"   ,&lMVACov01      ,"lMVACov01/F"); //mva met covariance matrix 01 
-   float lMVACov10    = 0; lOTree->Branch("mvacov10"   ,&lMVACov10      ,"lMVACov10/F"); //mva met covariance matrix 10 
-   float lMVACov11    = 0; lOTree->Branch("mvacov11"   ,&lMVACov11      ,"lMVACov11/F"); //mva met covariance matrix 11 
+   float lMVACov00    = 0; lOTree->Branch("mvametCov00"   ,&lMVACov00      ,"lMVACov00/F"); //mva met covariance matrix 00 
+   float lMVACov01    = 0; lOTree->Branch("mvametCov01"   ,&lMVACov01      ,"lMVACov01/F"); //mva met covariance matrix 01 
+   float lMVACov10    = 0; lOTree->Branch("mvametCov10"   ,&lMVACov10      ,"lMVACov10/F"); //mva met covariance matrix 10 
+   float lMVACov11    = 0; lOTree->Branch("mvametCov11"   ,&lMVACov11      ,"lMVACov11/F"); //mva met covariance matrix 11 
    
 
    //First Jet   : leading jet after applying Jet energy corrections (excluding hadronic Tau)
@@ -220,9 +221,10 @@ void synchNtuple(string sample = "GGFH125", string stream = "MuTau", bool incl=f
    float iRho         ; tree->SetBranchAddress("rho"   ,&iRho         );//Rho
    
    //Event Weights
-   //float iMCWeight1    ; tree->SetBranchAddress("sampleWeight"   ,&iMCWeight1    );//MC Weight (xs/nevents * additional wieght (ie pt weight for gghiggs))
+   float iEvtWeight    ; tree->SetBranchAddress("evtweight"   ,&iEvtWeight   );//MC Weight (xs/sum(gen weights))
+   float iGenWeight    ; tree->SetBranchAddress("mcweight"   ,&iGenWeight   );//Gen MC Weight
    //float iMCWeight2    ; tree->SetBranchAddress("HqTWeight"      ,&iMCWeight2    );//MC Weight (xs/nevents * additional wieght (ie pt weight for gghiggs))
-   //float iPUWeight    ; tree->SetBranchAddress("puWeight"        ,&iPUWeight    );//Pielup Weight
+   float iPUWeight    ; tree->SetBranchAddress("puweight"        ,&iPUWeight    );//Pielup Weight
    ////SV Fit variables
    float iMSV         ; tree->SetBranchAddress("diTauNSVfitMass"       ,&iMSV            );//SV Fit using integration method
    float iMSVUp       ; tree->SetBranchAddress("diTauNSVfitMassErrUp"    ,&iMSVUp         );//High Energy scale shape
@@ -391,8 +393,8 @@ void synchNtuple(string sample = "GGFH125", string stream = "MuTau", bool incl=f
      lRho         = iRho;
    
      //Event Weights
-     //lMCWeight    = iMCWeight1*iMCWeight2 ;
-     //lPUWeight    = iPUWeight;
+     lMCWeight    = iEvtWeight*iGenWeight;
+     lPUWeight    = iPUWeight;
      /*if(sample.find("Emb") != string::npos){
        lEffWeight   = stream.find("MuTau")!=string::npos ? iHLTTau*iHLTMu*iSFMuID : iHLTTau*iHLTElec*iSFElecID;
      }

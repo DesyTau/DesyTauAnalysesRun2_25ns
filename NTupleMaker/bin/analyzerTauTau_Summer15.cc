@@ -129,7 +129,7 @@ void chooseSelection(TString variable_,
   // TauIso
   // TauIso DB3Hits cut-based //
   if(version_.Contains("HPSDB3H")) {
-    tiso   = "hpsDB3HL1<1.0 && hpsDB3HL2<1.0" ;
+    tiso   = "tightestHPSDB3HWPL1_>=3 && tightestHPSDB3HWPL2_>=3" ;
     ltiso  = "hpsDB3HL1<10.0 && hpsDB3HL2<10.0" ;
     atiso  = "hpsDB3HL1<10.0 && hpsDB3HL2<10.0 && hpsDB3HL1>1.0 && hpsDB3HL2>1.0"; 
   }
@@ -181,7 +181,7 @@ void drawHistogram(TCut sbinCat,
     TCut genMass("run>0");
 
     // Reweighting
-    TCut weight         = "run>0";
+    TCut evtweight = "run>0";
     //TCut sampleWeight   = "run>0";
     //TCut weightDY = "run>0";
     //TCut weightW  = "run>0";
@@ -189,7 +189,8 @@ void drawHistogram(TCut sbinCat,
 
     if(type.Contains("MC")) {
 
-      weight = "(weight*mcweight)";
+      evtweight = "(weight*mcweight*puweight)";
+      //evtweight = "(weight*mcweight)";
 
       /* //to be used when weight is available
 	 if(!type.Contains("SUSY"))
@@ -234,12 +235,12 @@ void drawHistogram(TCut sbinCat,
     else if(type.Contains("TTJets")) 
       weight *= "topPtWeightNom"; 
     */
-    //     if(type.Contains("SUSY")) cout<<"weight : "<<weight<<endl;
-    cout<<"weight : "<<weight<<endl;
+    //     if(type.Contains("SUSY")) cout<<"evtweight : "<<evtweight<<endl;
+    cout<<"evtweight : "<<evtweight<<endl;
     
     TCut pairIndex="pairIndex<1";
 
-    tree->Draw(variable+">>"+TString(h->GetName()),cut*weight*sbinCat*genMass*pairIndex);
+    tree->Draw(variable+">>"+TString(h->GetName()),cut*evtweight*sbinCat*genMass*pairIndex);
 
     // Scale the histogram, compute norm and err
     h->Scale(scaleFactor);
@@ -263,7 +264,7 @@ TArrayF createBins(int nBins_ = 80 ,
 		   int& nBins = *(new int()),
 		   string selection_   = "inclusive",
 		   TString variable_   = "diTauVisMass",
-		   TString location    = "/nfs/dust/cms/user/anayak/CMS/OnSLC6/CMSSW_746p6_htt/src/DesyTauAnalyses/NTupleMaker/bin/binning/"
+		   TString location    = "/nfs/dust/cms/user/anayak/CMS/OnSLC6/CMSSW_7414_htt/src/DesyTauAnalyses/NTupleMaker/bin/binning/"
 		   ){
 
   // input txt file with bins
@@ -410,7 +411,7 @@ void evaluateQCD(mapchain mapAllTrees, TString version_, TString analysis_,
   cout << "QCD in inclusive SS region is estimated to be " << SSQCDinSignalRegionDATAIncl/OStoSSRatioQCD  << "*" << OStoSSRatioQCD
        << " = " <<  SSQCDinSignalRegionDATAIncl << endl;
   SSQCDinSignalRegionDATAIncl_ = SSQCDinSignalRegionDATAIncl;
-
+  /*
   //Data OS anti-iso
   float OSQCDinSignalRegionDATAInclaIso = 0.;
   drawHistogram(sbinCat,"Data", version_,analysis_, mapAllTrees["Data"], variable, OSQCDinSignalRegionDATAInclaIso,    Error, 1.0, hExtrap, sbinAiso);
@@ -454,6 +455,8 @@ void evaluateQCD(mapchain mapAllTrees, TString version_, TString analysis_,
   if(qcdHisto!=0) qcdHisto->Add(hExtrap, -1.0);
 
   if(qcdHisto!=0)qcdHisto->Scale(SSQCDinSignalRegionDATAIncl/qcdHisto->Integral());
+  */
+  if(qcdHisto!=0)qcdHisto->Add(ssHisto, SSQCDinSignalRegionDATAIncl/ssHisto->Integral());
 
   //Do separately for VBF
 }
@@ -461,7 +464,7 @@ void evaluateQCD(mapchain mapAllTrees, TString version_, TString analysis_,
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////7
 
-void plotTauTau( Int_t mH_           = 120,
+void plotTauTau(Int_t mH_           = 125,
 		Int_t useEmbedding_ = 0,
 		string selection_   = "inclusive",
 		TString analysis_   = "",		  
@@ -490,15 +493,15 @@ void plotTauTau( Int_t mH_           = 120,
   ossiTmH << mH_ ;
   TString TmH_ = ossiTmH.str();
 
-  //const int nProd=3;
-  //const int nMasses=0;
-  //TString nameProd[nProd]={"GGFH","VBFH","VH"};
-  ////int hMasses[nMasses]={90,95,100,105,110,115,120,125,130,135,140,145,150,155,160};
-  //int hMasses[nMasses]={};
-  //TString nameMasses[nMasses];
-  //
-  //if(DEBUG) cout << "build masses string" << endl;
-  //for(int iM=0 ; iM<nMasses ; iM++) nameMasses[iM]=TString(Form("%d",hMasses[iM]));
+  const int nProd=1;
+  const int nMasses=1;
+  TString nameProd[nProd]={"GGFH"}; //,"VBFH","VH"};
+  //int hMasses[nMasses]={90,95,100,105,110,115,120,125,130,135,140,145,150,155,160};
+  int hMasses[nMasses]={125};
+  TString nameMasses[nMasses];
+  
+  if(DEBUG) cout << "build masses string" << endl;
+  for(int iM=0 ; iM<nMasses ; iM++) nameMasses[iM]=TString(Form("%d",hMasses[iM]));
 
   //const int nProdWW=2;
   //const int nMassesWW=11;
@@ -509,9 +512,9 @@ void plotTauTau( Int_t mH_           = 120,
   //if(DEBUG) cout << "build masses string" << endl;
   //for(int iM=0 ; iM<nMassesWW ; iM++) nameMassesWW[iM]=TString(Form("%d",hMassesWW[iM]));
 
-  const int nProdS=2;
+  const int nProdS=1;
   const int nMassesS=1;
-  TString nameProdS[nProdS]={"GGH","BBH"};
+  TString nameProdS[nProdS]={"GGH"};//,"BBH"};
   //int hMassesS[nMassesS]={80,90,100,110,120,130,140,160,180,200,250,300,350,400,450,500,600,700,800,900,1000};
   int hMassesS[nMassesS]={160};
   TString nameMassesS[nMassesS];
@@ -532,13 +535,13 @@ void plotTauTau( Int_t mH_           = 120,
   // LUMINOSITY //
   float Lumi;
   //
-  Lumi = 40.24;
+  Lumi = 2110.0;
 
   /////////////////
 
   float lumiCorrFactor                     = 1 ;    
   float TTxsectionRatio                    = 1.0; 
-  float OStoSSRatioQCD                     = 1.0; //1.06 at 8 TeV
+  float OStoSSRatioQCD                     = 1.06; //1.06 at 8 TeV
   float SSIsoToSSAIsoRatioQCD              = 1.0;
   float LtoTauCorrectionFactor            = 1.0;
   float JtoTauCorrectionFactor             = 1.0;
@@ -622,9 +625,9 @@ void plotTauTau( Int_t mH_           = 120,
   TH1F* hW        = new TH1F( "hW"      ,"W+jets"            , nBins , bins.GetArray());         hW->SetFillColor(kRed+2);
   TH1F* hEWK      = new TH1F( "hEWK"    ,"EWK"               , nBins , bins.GetArray());         hEWK->SetFillColor(kRed+2);
   TH1F* hZtt      = new TH1F( "hZtt"    ,"Ztautau"           , nBins , bins.GetArray());         hZtt->SetFillColor(kOrange-4);
-  TH1F* hZll      = new TH1F( "hZll"    ,"Zll"               , nBins , bins.GetArray());         hZll->SetFillColor(kBlue-2);
+  TH1F* hZl       = new TH1F( "hZl"     ,"Zl,  l to tau"     , nBins , bins.GetArray());         hZl->SetFillColor(kBlue-2);
   TH1F* hZj       = new TH1F( "hZj"    ,"Z+jets, jet to tau", nBins , bins.GetArray());         hZj->SetFillColor(kBlue-2);
-  TH1F* hZfakes   = new TH1F( "hZfakes" ,"Z+jets, jet to tau", nBins , bins.GetArray());         hZfakes->SetFillColor(kBlue-2);
+  TH1F* hZfakes   = new TH1F( "hZfakes" ,"Z+jets, l/j to tau", nBins , bins.GetArray());         hZfakes->SetFillColor(kBlue-2);
   TH1F* hTTb      = new TH1F( "hTTb"    ,"ttbar"             , nBins , bins.GetArray());         hTTb->SetFillColor(kBlue-8); 
   TH1F* hTTbUp    = new TH1F( "hTTbUp"    ,"ttbarUp"         , nBins , bins.GetArray());         hTTbUp->SetFillColor(kBlue-8); 
   TH1F* hTTbDown  = new TH1F( "hTTbDown"    ,"ttbarDown"     , nBins , bins.GetArray());         hTTbDown->SetFillColor(kBlue-8); 
@@ -647,9 +650,9 @@ void plotTauTau( Int_t mH_           = 120,
   TH1F* hTTb_fb      = new TH1F( "hTTb_fb"    ,"ttbar"             , 400, 0., 2000.); hTTb_fb->SetFillColor(kBlue-8);
   TH1F* hVV_fb       = new TH1F( "hVV_fb"     ,"Diboson"           , 400, 0., 2000.); hVV_fb->SetFillColor(kRed+2);
   TH1F* hQCD_fb      = new TH1F( "hQCD_fb"    ,"QCD full vbf"      , 400, 0., 2000.); hQCD_fb->SetFillColor(kMagenta-10);
-  TH1F* hZll_fb      = new TH1F( "hZll_fb"    ,"Zll"               , 400, 0., 2000.); hZll_fb->SetFillColor(kBlue-2);
+  TH1F* hZl_fb       = new TH1F( "hZl_fb"     ,"Z,l to tau"         , 400, 0., 2000.); hZl_fb->SetFillColor(kBlue-2);
   TH1F* hZj_fb       = new TH1F( "hZj_fb"    ,"Z+jets, jet to tau" , 400, 0., 2000.); hZj_fb->SetFillColor(kBlue-2);
-  /*
+
   TH1F* hSignal[nProd][nMasses];
   for(int iP=0 ; iP<nProd ; iP++) {
     for(int iM=0 ; iM<nMasses ; iM++) {
@@ -657,7 +660,7 @@ void plotTauTau( Int_t mH_           = 120,
       hSignal[iP][iM]->SetLineWidth(2);
     }
   }
-  //GGH Higgs pT weights up/down
+  /*//GGH Higgs pT weights up/down
   TH1F* hGGFHUp[nMasses]; TH1F* hGGFHDown[nMasses];
   for(int iM=0 ; iM<nMasses ; iM++) {
     hGGFHUp[iM] = new TH1F("hGGFH"+nameMasses[iM]+"Up", "GGFH"+nameMasses[iM]+"Up", nBins , bins.GetArray()); 
@@ -699,8 +702,8 @@ void plotTauTau( Int_t mH_           = 120,
   ///////////////////////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////////////
 
-  TString pathToFile    = "/nfs/dust/cms/user/anayak/CMS/Ntuple_HttAnalysis/ntuples74_50ns/";
-  TString pathToFileSUSY  = "/nfs/dust/cms/user/anayak/CMS/Ntuple_HttAnalysis/ntuples74/";
+  TString pathToFile    = "/nfs/dust/cms/user/anayak/CMS/Ntuple_HttAnalysis/ntuples74_25ns_v2/";
+  TString pathToFileSUSY  = "/nfs/dust/cms/user/anayak/CMS/Ntuple_HttAnalysis/ntuples74_25ns_v2/";
   cout<<"**********************************"<<endl;
   cout<<"**********************************"<<endl;
   cout<<"**********************************"<<endl;
@@ -709,7 +712,8 @@ void plotTauTau( Int_t mH_           = 120,
 
   // DATA
   TChain *data = new TChain("outTree");
-  data->Add(pathToFile+"/nTupleRun2015B-Data_TauTau.root");
+  data->Add(pathToFile+"/nTupleRun2015D-05Oct2015-Data_TauTau.root");
+  data->Add(pathToFile+"/nTupleRun2015D-PRv4-Data_TauTau.root");
   if(!data) cout << "### DATA NTUPLE NOT FOUND ###" << endl;
 
   /* // EMBEDDED //
@@ -753,14 +757,17 @@ void plotTauTau( Int_t mH_           = 120,
   //
   //backgroundOthers  ->Add(pathToFile+"nTupleSAntiTopT_TauTau_"+fileAnalysis+".root");
   backgroundOthers  ->Add(pathToFile+"nTupleSTopT_TauTau_"+fileAnalysis+".root");
+  backgroundOthers  ->Add(pathToFile+"nTupleSAntiTopT_TauTau_"+fileAnalysis+".root");
   backgroundOthers  ->Add(pathToFile+"nTupleSAntiTopTW_TauTau_"+fileAnalysis+".root");
   backgroundOthers  ->Add(pathToFile+"nTupleSTopTW_TauTau_"+fileAnalysis+".root");
-  //backgroundOthers  ->Add(pathToFile+"nTupleWWTo2L2Nu_TauTau_"+fileAnalysis+".root");
-  //backgroundOthers  ->Add(pathToFile+"nTupleWWToLNuQQ_TauTau_"+fileAnalysis+".root");
-  //backgroundOthers  ->Add(pathToFile+"nTupleWWTo4Q_TauTau_"+fileAnalysis+".root");
-  //backgroundOthers  ->Add(pathToFile+"nTupleWZTo1L1Nu2Q_TauTau_"+fileAnalysis+".root");
-  //backgroundOthers  ->Add(pathToFile+"nTupleWZTo3LNu_TauTau_"+fileAnalysis+".root");
-  //backgroundOthers  ->Add(pathToFile+"nTupleZZ_TauTau_"+fileAnalysis+".root");
+  backgroundOthers  ->Add(pathToFile+"nTupleVVTo2L2Nu_TauTau_"+fileAnalysis+".root");
+  backgroundOthers  ->Add(pathToFile+"nTupleWZJets_TauTau_"+fileAnalysis+".root");
+  backgroundOthers  ->Add(pathToFile+"nTupleWWToLNuQQ_TauTau_"+fileAnalysis+".root");
+  backgroundOthers  ->Add(pathToFile+"nTupleWZTo2L2Q_TauTau_"+fileAnalysis+".root");
+  backgroundOthers  ->Add(pathToFile+"nTupleWZTo1L1Nu2Q_TauTau_"+fileAnalysis+".root");
+  backgroundOthers  ->Add(pathToFile+"nTupleWZTo1L3Nu_TauTau_"+fileAnalysis+".root");
+  backgroundOthers  ->Add(pathToFile+"nTupleZZTo4L_TauTau_"+fileAnalysis+".root");
+  backgroundOthers  ->Add(pathToFile+"nTupleZZTo2L2Q_TauTau_"+fileAnalysis+".root");
   
   backgroundWJets   ->Add(pathToFile+"nTupleWJets_TauTau_"+fileAnalysis+".root");
 
@@ -768,7 +775,7 @@ void plotTauTau( Int_t mH_           = 120,
   if(!backgroundTTbar) cout << "###  NTUPLE TT NOT FOUND ###" << endl;  
   if(!backgroundOthers)cout << "###  NTUPLE VVt NOT FOUND ###" << endl;  
   if(!backgroundWJets) cout << "###  NTUPLE W NOT FOUND ###" << endl;  
-  /*
+  
   TChain *signal[nProd][nMasses];
   for(int iP=0 ; iP<nProd ; iP++) {
     for(int iM=0 ; iM<nMasses ; iM++) {
@@ -777,7 +784,7 @@ void plotTauTau( Int_t mH_           = 120,
       if(!signal[iP][iM])cout << "###  NTUPLE Signal " << nameProd[iP]+nameMasses[iM] << " NOT FOUND ###" << endl;  
     }
   }
-  TChain *signalWW[nProdWW][nMassesWW];
+  /*  TChain *signalWW[nProdWW][nMassesWW];
   for(int iP=0 ; iP<nProdWW ; iP++) {
     for(int iM=0 ; iM<nMassesWW ; iM++) {
       signalWW[iP][iM] = new TChain(treeMC);
@@ -806,7 +813,7 @@ void plotTauTau( Int_t mH_           = 120,
     backgroundDYTauTau = (TChain*)backgroundDY->CopyTree("isZtt==1");                 // g/Z -> tau+ tau-
     //
     cout << "Now copying g/Z -> l+l- l->tau" << endl;
-    backgroundDYLtoTau     = (TChain*)backgroundDY->CopyTree("isZll==1"); // g/Z -> ll, l->tau
+    backgroundDYLtoTau     = (TChain*)backgroundDY->CopyTree("isZl==1"); // g/Z -> ll, l->tau
     //
     cout << "Now copying g/Z, j->tau" << endl;
     backgroundDYJtoTau  = (TChain*)backgroundDY->CopyTree("isZj==1"); // g/Z -> ll, jet->tau
@@ -834,9 +841,9 @@ void plotTauTau( Int_t mH_           = 120,
   if(VERBOSE) cout << "-- gather the trees" << endl;
 
   const int nVarious = 8;
-  //const int nChainsSM = nVarious  + nProd*nMasses;
+  const int nChainsSM = nVarious  + nProd*nMasses;
   //const int nChainsSM = nChainsSM1 + nProdWW*nMassesWW;
-  const int nChains  = nVarious + nProdS*nMassesS; //nChainsSM + nProdS*nMassesS;
+  const int nChains  = nChainsSM + nProdS*nMassesS;
   TString treeNamesVarious[nVarious]={"SS", "Data", "WJets","TTbar","Others","DYToTauTau", "DYLtoTau", "DYJtoTau"};
   TChain* chainsVarious[nVarious]   ={data, data, backgroundWJets,backgroundTTbar,backgroundOthers, backgroundDYTauTau, backgroundDYLtoTau, backgroundDYJtoTau};
   TString  treeNames[nChains];
@@ -849,17 +856,17 @@ void plotTauTau( Int_t mH_           = 120,
       treeNames[iCh] = treeNamesVarious[iCh];
       chains[iCh]    = chainsVarious[iCh];
     }    
-    //else if(iCh<nChainsSM){ // fill signal names and trees
-    //  treeNames[iCh] = nameProd[ int((iCh-nVarious)/nMasses) ] + nameMasses[ int((iCh-nVarious)%nMasses) ];
-    //  chains[iCh]    = signal[ int((iCh-nVarious)/nMasses) ][ int((iCh-nVarious)%nMasses) ];
-    //}
+    else if(iCh<nChainsSM){ // fill signal names and trees
+      treeNames[iCh] = nameProd[ int((iCh-nVarious)/nMasses) ] + nameMasses[ int((iCh-nVarious)%nMasses) ];
+      chains[iCh]    = signal[ int((iCh-nVarious)/nMasses) ][ int((iCh-nVarious)%nMasses) ];
+    }
     //else if(iCh<nChainsSM){ // fill signal names and trees
     //  treeNames[iCh] = nameProdWW[ int((iCh-nChainsSM1)/nMassesWW) ] + nameMassesWW[ int((iCh-nChainsSM1)%nMassesWW) ];
     //  chains[iCh]    = signalWW[ int((iCh-nChainsSM1)/nMassesWW) ][ int((iCh-nChainsSM1)%nMassesWW) ];
     //}
     else { // fill signal names and trees
-      treeNames[iCh] = "SUSY"+nameProdS[ int((iCh-nVarious)/nMassesS) ] + nameMassesS[ int((iCh-nVarious)%nMassesS) ];
-      chains[iCh]    = signalSusy[ int((iCh-nVarious)/nMassesS) ][ int((iCh-nVarious)%nMassesS) ];
+      treeNames[iCh] = "SUSY"+nameProdS[ int((iCh-nChainsSM)/nMassesS) ] + nameMassesS[ int((iCh-nChainsSM)%nMassesS) ];
+      chains[iCh]    = signalSusy[ int((iCh-nChainsSM)/nMassesS) ][ int((iCh-nChainsSM)%nMassesS) ];
     }
     mapAllTrees[ treeNames[iCh] ] = chains[iCh]; // create an entry in the map
   }
@@ -878,7 +885,7 @@ void plotTauTau( Int_t mH_           = 120,
   TCut tpt("ptL1>45 && ptL2>45");
   TCut antimu("tightestAntiMu3WPL1>0 && tightestAntiMu3WPL2>0");
   TCut antiele("tightestAntiEMVA5WPL1 > 0 && tightestAntiEMVA5WPL2 > 0");
-  TCut tiso("hpsDB3HL1<1.0 && hpsDB3HL2<1.0");
+  TCut tiso("tightestHPSDB3HWPL1>2 && tightestHPSDB3HWPL2>2");
   TCut tdecaymode("decayModeFindingNewDML1>0.5 && decayModeFindingNewDML2>0.5");
   TCut ltiso("hpsDB3HL1<10.0 && hpsDB3HL2<10.0");
   TCut atiso("hpsDB3HL1<10.0 && hpsDB3HL2<10.0 && hpsDB3HL1>1.0 && hpsDB3HL2>1.0 ");
@@ -917,9 +924,12 @@ void plotTauTau( Int_t mH_           = 120,
 
   TCut novbf("nJets30<1 && nJets20BTagged==0");
 
+  TCut boostedZ("diTauRecoPt>100 && decayModeFindingL1>0.5 && decayModeFindingL2>0.5");
+ 
   TCut sbinCatIncl("etaL1<999");
   TCut sbinCat("");
   if(     selection_.find("inclusive")!=string::npos) sbinCat = inclusive&&TCut("etaL1<999");
+  else if(selection_.find("boostedZ")!=string::npos)    sbinCat = boostedZ;
   else if(selection_.find("oneJet")!=string::npos)    sbinCat = oneJet;
   else if(selection_.find("twoJets")!=string::npos)   sbinCat = twoJets;
   else if(selection_.find("oneJetHigh")!=string::npos)sbinCat = oneJetHigh;
@@ -1022,8 +1032,8 @@ void plotTauTau( Int_t mH_           = 120,
 	      ExtrapolationFactorZDataMC,
  	      JtoTauCorrectionFactor, LtoTauCorrectionFactor,
 	      OStoSSRatioQCD,
-	      sbinInclusive, sbinCat,
-	      sbinSSInclusive, sbinCat,
+	      sbinInclusive, sbinCatIncl,
+	      sbinSSInclusive, sbinCatIncl,
 	      sbinAtisoInclusive,
 	      true, true);
 
@@ -1247,7 +1257,7 @@ void plotTauTau( Int_t mH_           = 120,
               drawHistogram(sbinCat,"MC", version_,analysis_, currentTree, variable, NormDYLtoTau, Error,    Lumi*lumiCorrFactor*LtoTauCorrectionFactor/1000., h1, sbin, 1);
             hCleaner->Scale( hCleaner->Integral()!=0 ? h1->Integral()/hCleaner->Integral() : 1.0 );
             if(hCleaner) {
-              hZll->Add(hCleaner, 1.0);
+              hZl->Add(hCleaner, 1.0);
               hZfakes->Add(hCleaner,1.0);
               hEWK->Add(hCleaner,1.0);
             }
@@ -1258,15 +1268,15 @@ void plotTauTau( Int_t mH_           = 120,
               drawHistogram(sbinCat,"MC", version_,analysis_, currentTree, variable, NormDYLtoTau, Error,    Lumi*lumiCorrFactor*LtoTauCorrectionFactor*ExtrapolationFactorZDataMC/1000., h1, sbin, 1);
             else
               drawHistogram(sbinCat,"MC", version_,analysis_, currentTree, variable, NormDYLtoTau, Error,    Lumi*lumiCorrFactor*LtoTauCorrectionFactor/1000., h1, sbin, 1);
-            hZll->Add(h1, 1.0);
+            hZl->Add(h1, 1.0);
             hZfakes->Add(h1,1.0);
             hEWK->Add(h1,1.0);
 
             //fine binning for MSSM                                                                                                                                                
             if(selection_.find("bTag")!=string::npos){
-              hCleanerfb->Reset();hZll_fb->Reset(); float NormDYLtoTau_fb = 0.;
+              hCleanerfb->Reset();hZl_fb->Reset(); float NormDYLtoTau_fb = 0.;
               drawHistogram(sbinCat,"MC", version_,analysis_, currentTree, variable, NormDYLtoTau_fb, Error, Lumi*lumiCorrFactor*LtoTauCorrectionFactor/1000., hCleanerfb, sbin, 1);
-              if(hCleanerfb)hZll_fb->Add(hCleanerfb, h1->Integral()/hCleanerfb->Integral());
+              if(hCleanerfb)hZl_fb->Add(hCleanerfb, h1->Integral()/hCleanerfb->Integral());
             }
 	  }
 	}
@@ -1352,12 +1362,12 @@ void plotTauTau( Int_t mH_           = 120,
 	    hSgn3->Scale(magnifySgn_);
 	    hSgn->Add(hSgn3,1.0);
 	  }	   
-	  /*
+	  
 	  for(int iP=0 ; iP<nProd ; iP++)
 	    for(int iM=0 ; iM<nMasses ; iM++)
 	      if(currentName.Contains(nameProd[iP]+nameMasses[iM]))
 		hSignal[iP][iM]->Add(h1,1.0);
-	  //to be used when weight is available
+	  /*//to be used when weight is available
 	  for(int iM=0 ; iM<nMasses ; iM++){
 	    if(currentName.Contains("GGFH"+nameMasses[iM])){
 	      hCleaner->Reset(); float NormSignUp = 0.;
@@ -1496,7 +1506,7 @@ void plotTauTau( Int_t mH_           = 120,
     out<<"VBF Ztt : hZtt -> "<<hZtt->Integral()<<endl;
     out<<"VBF QCD : hDataAntiTauIsoQCD -> "<<hDataAntiTauIsoQCD->Integral()<<endl;
     out<<"VBF Z, j->t : hZj -> "<<hZj->Integral()<<endl;
-    out<<"VBF Z, l->t : hZll -> "<<hZll->Integral()<<endl;
+    out<<"VBF Z, l->t : hZl -> "<<hZl->Integral()<<endl;
     out<<"VBF TTb : hTTb -> "<<hTTb->Integral()<<endl;
     out<<"VBF VV : hVV -> "<<hVV->Integral()<<endl;
   }
@@ -1508,7 +1518,7 @@ void plotTauTau( Int_t mH_           = 120,
     out<<"oneJet QCD : hQCD -> "<<hQCD->Integral()<<endl;
     out<<"oneJet W : hW -> "<<hW->Integral()<<endl;
     out<<"oneJet Z, j->t : hZj -> "<<hZj->Integral()<<endl;
-    out<<"VBF Z, l->t : hZll -> "<<hZll->Integral()<<endl;
+    out<<"VBF Z, l->t : hZl -> "<<hZl->Integral()<<endl;
     out<<"oneJet TTb : hTTb -> "<<hTTb->Integral()<<endl;
     out<<"oneJet VV : hVV -> "<<hVV->Integral()<<endl;
   }
@@ -1520,7 +1530,7 @@ void plotTauTau( Int_t mH_           = 120,
     out<<"bTag QCD : hQCD -> "<<hQCD->Integral()<<endl;
     out<<"bTag W : hW -> "<<hW->Integral()<<endl;
     out<<"bTag Z, j->t : hZj -> "<<hZj->Integral()<<endl;
-    out<<"VBF Z, l->t : hZll -> "<<hZll->Integral()<<endl;
+    out<<"VBF Z, l->t : hZl -> "<<hZl->Integral()<<endl;
     out<<"bTag TTb : hTTb -> "<<hTTb->Integral()<<endl;
     out<<"bTag VV : hVV -> "<<hVV->Integral()<<endl;
   }
@@ -1528,11 +1538,11 @@ void plotTauTau( Int_t mH_           = 120,
     out<<"Yields for "<<selection_<<" : "<<endl;
     out<<selection_<<" data : hData -> "<<hData->Integral()<<endl;
     //out<<selection_<<" Ztt : hZttEmb -> "<<hZttEmb->Integral()<<endl;
-    out<<"VBF Ztt : hZtt -> "<<hZtt->Integral()<<endl;
+    out<<selection_<<" Ztt : hZtt -> "<<hZtt->Integral()<<endl;
     out<<selection_<<" QCD : hQCD -> "<<hQCD->Integral()<<endl;
     out<<selection_<<" W : hW -> "<<hW->Integral()<<endl;
     out<<selection_<<" Z, j->t : hZj -> "<<hZj->Integral()<<endl;
-    out<<"VBF Z, l->t : hZll -> "<<hZll->Integral()<<endl;
+    out<<selection_<<" Z, l->t : hZl -> "<<hZl->Integral()<<endl;
     out<<selection_<<" TTb : hTTb -> "<<hTTb->Integral()<<endl;
     out<<selection_<<" VV : hVV -> "<<hVV->Integral()<<endl;
   }
@@ -1559,7 +1569,7 @@ void plotTauTau( Int_t mH_           = 120,
   if(selection_.find("vbf")!=string::npos)
     hSiml->Add(hDataAntiTauIsoQCD,1.0);
   else
-    hSiml->Add(hSS,1.0); //hSiml->Add(hQCD,1.0);
+    hSiml->Add(hQCD,1.0);
 
   //VV + W + ZJ
   hSiml->Add(hEWK,1.0);
@@ -1567,7 +1577,7 @@ void plotTauTau( Int_t mH_           = 120,
   if(selection_.find("vbf")!=string::npos)
     aStack->Add(hDataAntiTauIsoQCD);
   else
-    aStack->Add(hSS); //aStack->Add(hQCD);
+    aStack->Add(hQCD);
   
   // TT
   aStack->Add(hTTb);
@@ -1767,6 +1777,7 @@ void plotTauTau( Int_t mH_           = 120,
   hQCD->Write();
   hSS->Write();
   hZj->Write();
+  hZl->Write();
   hZfakes->Write();
   hTTb->Write();
   hTTbUp->Write();
@@ -1787,11 +1798,11 @@ void plotTauTau( Int_t mH_           = 120,
   hZttEmb_fb->Write(); hW_fb->Write(); hZtt_fb->Write(); 
   hZj_fb->Write(); hTTb_fb->Write(); 
   hQCD_fb->Write(); hVV_fb->Write(); 
-  /*
+
   for(int iP=0 ; iP<nProd ; iP++)
     for(int iM=0 ; iM<nMasses ; iM++)
       if(hSignal[iP][iM]) hSignal[iP][iM]->Write();
-  for(int iM=0 ; iM<nMasses ; iM++){
+  /*for(int iM=0 ; iM<nMasses ; iM++){
     hGGFHUp[iM]->Write();
     hGGFHDown[iM]->Write();
   }
@@ -1817,18 +1828,17 @@ void plotTauTau( Int_t mH_           = 120,
   fout->Write();
   fout->Close();
   std::cout<<" before deleting histograms"<<std::endl;
-  delete hQCD; delete hSS; delete hZj; delete hZll; delete hZfakes; delete hTTb; delete hTTbUp; delete hTTbDown; delete hZtt; 
+  delete hQCD; delete hSS; delete hZj; delete hZl; delete hZfakes; delete hTTb; delete hTTbUp; delete hTTbDown; delete hZtt; 
   delete hW; delete hVV; delete hSgn; delete hSgn1; delete hSgn2; delete hSgn3; delete hData; delete hParameters;
   delete hDataAntiTauIsoQCD; delete hDataAntiTauIso;
 
-  delete hZttEmb_fb; delete hZtt_fb; delete hW_fb; delete hZj_fb; delete hZll_fb; delete hTTb_fb;
+  delete hZttEmb_fb; delete hZtt_fb; delete hW_fb; delete hZj_fb; delete hZl_fb; delete hTTb_fb;
   delete hQCD_fb; delete hVV_fb; 
   
-  /*
   for(int iP=0 ; iP<nProd ; iP++)
     for(int iM=0 ; iM<nMasses ; iM++)
       if(hSignal[iP][iM]) delete hSignal[iP][iM];
-  for(int iM=0 ; iM<nMasses ; iM++){
+  /*for(int iM=0 ; iM<nMasses ; iM++){
     delete hGGFHUp[iM]; delete hGGFHDown[iM];
     }*/
   for(int iM=0 ; iM<nMassesS ; iM++){
@@ -1849,14 +1859,14 @@ void plotTauTau( Int_t mH_           = 120,
   delete aStack;  delete hEWK; delete hSiml; delete hZttEmb;  delete hRatio; delete line;
   delete fout;
 
-  /*
+  
   for(int iP=0 ; iP<nProd ; iP++) {
     for(int iM=0 ; iM<nMasses ; iM++) {
       //signal[iP][iM]->Close();
       delete signal[iP][iM];
     }
   }
-  for(int iP=0 ; iP<nProdWW ; iP++) {
+  /*for(int iP=0 ; iP<nProdWW ; iP++) {
     for(int iM=0 ; iM<nMassesWW ; iM++) {
       delete signalWW[iP][iM];
     }
@@ -1907,7 +1917,7 @@ void plotTauTauAll( Int_t useEmbedded = 1, TString outputDir = "DiTauV1"){
   //plotTauTau(125,0,"inclusive",""   ,"MEtPhi","E_{T}^{miss}  #phi","units"              ,outputDir,32,-3.2,3.2,   5.0,0,1.5);
   //plotTauTau(125,0,"inclusive",""   ,"MtLeg1","M_{T}(#tau_{1}#nu) ","GeV" ,                  outputDir,40,0,160,5.0,0,1.2);
   //plotTauTau(125,0,"inclusive",""   ,"MtLeg2","M_{T}(#tau_{2}#nu) ","GeV" ,                  outputDir,40,0,160,5.0,0,1.2);
-  //plotTauTau(125,0,"inclusive",""   ,"diTauVisMass","visible mass","GeV"      ,outputDir,50,0,200,5.0,0,1.2); 
+  plotTauTau(125,0,"inclusive",""   ,"diTauVisMass","visible mass","GeV"      ,outputDir,35,0,350,5.0,0,1.2); 
   ////plotTauTau(125,0,"inclusive",""   ,"diTauNSVfitMass","SVfit mass","GeV"     ,outputDir,60,0,360,5.0,0,1.2);
   //plotTauTau(125,0,"inclusive",""   ,"etaL1","#tau_{1} #eta", "units"              ,outputDir,25,-2.5, 2.5,5.0,0,2.);
   //plotTauTau(125,0,"inclusive",""   ,"ptL1","#tau_{1} p_{T}", "GeV"                ,outputDir,20,40, 140,5.0,0,1.2);
@@ -1917,9 +1927,15 @@ void plotTauTauAll( Int_t useEmbedded = 1, TString outputDir = "DiTauV1"){
   //plotTauTau(125,0,"inclusive",""   ,"nJets30","jet multiplicity","units"                 ,outputDir,10,0, 10,5.0,1,10);
   //plotTauTau(125,0,"oneJet",""        ,"ptj1", "leading jet p_{T}","GeV"       ,outputDir,50,30, 330,5.0,1,100);
   //plotTauTau(125,0,"oneJet",""        ,"etaj1","leading jet #eta","units"      ,outputDir,21,-5, 5,5.0,0,2.);
-  plotTauTau(125,0,"bTag",""        ,"ptB1", "leading b-tagged jet p_{T}","GeV"       ,outputDir,50,30, 330,5.0,1,10);
+  //plotTauTau(125,0,"bTag",""        ,"ptB1", "leading b-tagged jet p_{T}","GeV"       ,outputDir,50,30, 330,5.0,1,10);
   //plotTauTau(125,0,"bTag",""        ,"etaB1","leading b-tagged jet #eta","units"      ,outputDir,21,-5, 5,5.0,0,2.);
-  
+
+  plotTauTau(125,0,"inclusive","TauUp"   ,"diTauVisMass","visible mass","GeV"      ,outputDir,35,0,350,5.0,0,1.2);
+  plotTauTau(125,0,"inclusive","TauDown"   ,"diTauVisMass","visible mass","GeV"      ,outputDir,35,0,350,5.0,0,1.2);
+  plotTauTau(125,0,"boostedZ",""   ,"diTauVisMass","visible mass","GeV"      ,outputDir,35,0,350,5.0,0,1.2);
+  plotTauTau(125,0,"boostedZ","TauUp"   ,"diTauVisMass","visible mass","GeV"      ,outputDir,35,0,350,5.0,0,1.2);
+  plotTauTau(125,0,"boostedZ","TauDown"   ,"diTauVisMass","visible mass","GeV"      ,outputDir,35,0,350,5.0,0,1.2);
+
   return;
   /*
   for(unsigned int i = 0 ; i < variables.size(); i++){

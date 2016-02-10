@@ -94,8 +94,8 @@ typedef map< int , MAPDITAU_lumi > MAPDITAU_run;
 typedef std::vector<std::string> vstring;
 typedef ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> > LV;
 
-//edm::LumiReWeighting *LumiWeights_ = new edm::LumiReWeighting("/nfs/dust/cms/user/anayak/CMS/MyHTTAnalysis/data/MC_Summer12_PU_S10-600bins.root",
-//"/nfs/dust/cms/user/anayak/CMS/MyHTTAnalysis/data/Data_Pileup_2012_ReRecoPixel-600bins.root","pileup","pileup");
+string cmsswBase = (getenv ("CMSSW_BASE"));
+edm::LumiReWeighting *LumiWeights_ = new edm::LumiReWeighting(cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/MC_Spring15_PU25_Startup.root", cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/Data_Pileup_2015D_Nov17.root","pileup","pileup");
 
 //RecoilCorrector *RecoilCorrector_;
 enum MotherNames{HIGGS=1, WBOSON, ZBOSON, TAU};
@@ -228,12 +228,12 @@ float reweightHEPNUPDYJets(int hepNUP) {
   else return 1 ;
 
 }
-/*
+
 float pileupWeight( float intimepileup){
   float weight_ = LumiWeights_->weight(intimepileup); 
   return weight_;
 }
-*/
+
 int getJetIDMVALoose(double pt, double eta, double rawMVA)
 {
   float eta_bin[] = {0,2.5,2.75,3.0,5.0};
@@ -426,11 +426,10 @@ LV TauEnergyCorrector(LV tauP4_, LV genTauP4_, int decaymode_)
   return p4S_;
 }
 
-LV TauEnergyRescaler(LV tauP4_, int decaymode_)
+LV TauEnergyRescaler(LV tauP4_, int decaymode_, double shift)
 {
-  double shift = 0.03;
   double scale = 1+shift;
-  if(decaymode_ == 1){ //1prong 0pi0
+  if(decaymode_ == 0){ //1prong 0pi0
     scale = sqrt( tauP4_.energy()*(1+shift)*tauP4_.energy()*(1+shift) - tauP4_.mass()*tauP4_.mass() )/tauP4_.P();
   }
 
@@ -486,16 +485,17 @@ bool GetTriggerResult(std::vector<std::string> hltriggerresults_, std::string pa
 }
 
 void fillTrees_TauTauStream(TChain* currentTree,
-			   TTree* outTree,
-			   double nEventsRead =0.,
-			   string analysis_ = "", 
-			   string sample_ = "",
-			   float xsec_ = 0., 
-			   float skimEff_ = 0., 
-			   int iJson_=-1,
-			   int iDiv = 0,
-			   int nDiv = 1
-			   )
+			    TTree* outTree,
+			    double nEventsRead =0.,
+			    string analysis_ = "", 
+			    string sample_ = "",
+			    int ismcatnlo_ = 0, 
+			    float xsec_ = 0., 
+			    float skimEff_ = 0., 
+			    int iJson_=-1,
+			    int iDiv = 0,
+			    int nDiv = 1
+			    )
 {
 
 
@@ -1178,17 +1178,19 @@ void fillTrees_TauTauStream(TChain* currentTree,
 
   int nEntries    = currentTree->GetEntries() ;
   float crossSection = xsec_;
-  //float scaleFactor = (crossSection != 0) ? Lumi / (  float(nEventsRead)/(crossSection*skimEff_) )  : 1.0;
+  double scaleFactor = (crossSection != 0) ? Lumi / (  double(nEventsRead)/(crossSection*skimEff_) )  : 1.0;
   //first loop over the whole events once to get the total sum of gen weights for normalization
-  float totalGenWeight_ = 0;
-  if(!isData){
+  double totalGenWeight_ = 0.;
+  if(!isData && ismcatnlo_){
     for(int n = 0 ; n < nEntries ; n++) {
       currentTree->GetEntry(n);
       
       totalGenWeight_ += genweight;
+      if(genweight <= 0)std::cout<<" genweight "<<genweight<<std::endl;
     }
+    scaleFactor = (crossSection != 0) ? (Lumi*crossSection) / totalGenWeight_  : 1.0;
   }
-  float scaleFactor = (crossSection != 0) ? (Lumi*crossSection) / float(totalGenWeight_)  : 1.0;
+  //double scaleFactor = (crossSection != 0) ? (Lumi*crossSection) / totalGenWeight_  : 1.0;
 
   int nProc,n1,n2 = nEntries;
   //cout<<"nDiv = "<<nDiv<<endl;
@@ -1208,6 +1210,7 @@ void fillTrees_TauTauStream(TChain* currentTree,
   cout<< "nEventsRead = " << nEventsRead << endl;
   cout<< "nEntries    = " << nEntries << endl;
   cout<< "crossSection " << crossSection << " pb ==> scaleFactor " << scaleFactor << endl;
+  cout<< "sum of weights "<< totalGenWeight_ << endl;
 
   //bool dyFinalState=false;
 
@@ -1230,16 +1233,16 @@ void fillTrees_TauTauStream(TChain* currentTree,
       isGoodRun = AcceptEventByRunAndLumiSection(event_run, event_luminosityblock, jsonMap[iJson_]);
     
     if(!isGoodRun) continue;
-    if(event_nr == 30706)std::cout<<"pass none: event "<<event_nr<<std::endl;
+
     //cut on PV
     if(primvertex_count <= 0)continue;
-    if(event_nr == 30706)std::cout<<"pass PV1: event "<<event_nr<<std::endl;
+
     //if(primvertex_ndof < 4)continue;
     //if(primvertex_z < -24 || primvertex_z > 24) continue;
-    if(event_nr == 30706)std::cout<<"pass PV: event "<<event_nr<<std::endl;
+
     evtweight = scaleFactor;
-    mcweight = genweight;
-    puweight = 1.0; //no Pileup weight for now
+    mcweight = (ismcatnlo_) ? genweight : 1.0;
+    puweight = pileupWeight(numtruepileupinteractions);
 
     run_ = event_run;
     event_ = event_nr;
@@ -1328,12 +1331,15 @@ void fillTrees_TauTauStream(TChain* currentTree,
       }
     }
     if(GetTriggerResult((*hltriggerresultsV), hltPath_) < 0.5) continue;
-    if(event_nr== 30706)std::cout<<"pass tigger: event "<<event_nr<<std::endl;
+
     std::vector<DiTauInfo>sortDiTauInfos; sortDiTauInfos.clear();
     //Loop over taus
     for(unsigned int it = 0; it < tau_count; it++){ //tauL1
       
       LV tauLeg1_(tau_px[it], tau_py[it], tau_pz[it], tau_e[it]);
+      if(analysis_.find("TauUp") != std::string::npos)tauLeg1_ = TauEnergyRescaler(tauLeg1_, tau_decayMode[it], 0.03);
+      else if(analysis_.find("TauDown") != std::string::npos)tauLeg1_ = TauEnergyRescaler(tauLeg1_, tau_decayMode[it], -0.03);
+      
       if(tauLeg1_.pt() < 45 || TMath::Abs(tauLeg1_.eta()) > 2.1) continue;
       //if(TMath::Abs(tau_vertexz[it] - primvertex_z) > 0.2) continue;
       //if(tau_vertexz[it] != primvertex_z) continue;
@@ -1344,7 +1350,7 @@ void fillTrees_TauTauStream(TChain* currentTree,
       //if(tau_againstElectronVLooseMVA5[it] < 0.5) continue;
       //if(tau_againstMuonLoose3[it] < 0.5) continue;
       if(TMath::Abs(tau_charge[it]) != 1) continue;
-      if(event_nr== 30706)std::cout<<" pass offline sel. Leg1: event "<<event_nr<<std::endl;
+
       //HLT match
       bool HLTmatchLeg1_ = false;
       bool matchLeg1Level1_ = false; bool matchLeg1Level2_ = false; bool matchLeg1Level3_ = false;
@@ -1357,10 +1363,13 @@ void fillTrees_TauTauStream(TChain* currentTree,
       }
       HLTmatchLeg1_ = matchLeg1Level3_; //(matchLeg1Level1_ && matchLeg1Level2_ && matchLeg1Level3_);
       if(!HLTmatchLeg1_) continue;
-      if(event_nr== 30706)std::cout<<" found HLTLeg1 : event "<<event_nr<<std::endl;
+
       for(unsigned int jt = it+1; jt < tau_count; jt++){ //tauL2   
 	    
 	LV tauLeg2_(tau_px[jt], tau_py[jt], tau_pz[jt], tau_e[jt]);
+	if(analysis_.find("TauUp") != std::string::npos)tauLeg2_ = TauEnergyRescaler(tauLeg2_, tau_decayMode[jt], 0.03);
+	else if(analysis_.find("TauDown") != std::string::npos)tauLeg2_ = TauEnergyRescaler(tauLeg2_, tau_decayMode[jt], -0.03);
+
 	if(tauLeg2_.pt() < 45 || TMath::Abs(tauLeg2_.eta()) > 2.1) continue;
 	if(TMath::Abs(tau_leadchargedhadrcand_dz[jt]) >= 0.2) continue;
 	//if(TMath::Abs(tau_vertexz[jt] - primvertex_z) > 0.2) continue;
@@ -1371,7 +1380,7 @@ void fillTrees_TauTauStream(TChain* currentTree,
 	//if(tau_againstElectronVLooseMVA5[jt] < 0.5) continue;
 	//if(tau_againstMuonLoose3[jt] < 0.5) continue;
 	if(TMath::Abs(tau_charge[jt]) != 1) continue;
-	if(event_nr== 30706)std::cout<<" pass offline sel. Leg2: event "<<event_nr<<std::endl;
+
 	//HLT match
 	bool HLTmatchLeg2_ = false;
 	bool matchLeg2Level1_ = false; bool matchLeg2Level2_ = false; bool matchLeg2Level3_ = false;
@@ -1384,9 +1393,9 @@ void fillTrees_TauTauStream(TChain* currentTree,
 	}
 	HLTmatchLeg2_ = matchLeg2Level3_; //(matchLeg2Level1_ && matchLeg2Level2_ && matchLeg2Level3_);
 	if(!HLTmatchLeg2_) continue;
-	if(event_nr== 30706)std::cout<<" found HLTLeg2 : event "<<event_nr<<std::endl;
+
 	if(ROOT::Math::VectorUtil::DeltaR(tauLeg1_, tauLeg2_) < 0.5) continue;
-	if(event_nr== 30706)std::cout<<" pass DeltaR filter : event "<<event_nr<<std::endl;
+
 	float sumPt = tauLeg1_.pt() + tauLeg2_.pt();
 	float sumIso = tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[it] + tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[jt];
 	int pairCharge = tau_charge[it]*tau_charge[jt];
@@ -1409,7 +1418,7 @@ void fillTrees_TauTauStream(TChain* currentTree,
       if(diTauCounter >= 0) continue;
       //diTauCounter++;
       //pairIndex   = diTauCounter;
-      if(event_nr== 30706)std::cout<<"pass selection: event "<<event_nr<<std::endl;
+
       int tau1 = iter->index1_;
       int tau2 = iter->index2_;
 
@@ -1434,6 +1443,14 @@ void fillTrees_TauTauStream(TChain* currentTree,
 	Leg2P4_ = temp_Leg1_; tau2 = iter->index1_;
       }
 	  
+      if(analysis_.find("TauUp") != std::string::npos){
+	Leg1P4_ = TauEnergyRescaler(Leg1P4_, tau_decayMode[tau1], 0.03);
+	Leg2P4_ = TauEnergyRescaler(Leg2P4_, tau_decayMode[tau2], 0.03);
+      }
+      else if(analysis_.find("TauDown") != std::string::npos){
+	Leg1P4_ = TauEnergyRescaler(Leg1P4_, tau_decayMode[tau1], -0.03);
+	Leg2P4_ = TauEnergyRescaler(Leg2P4_, tau_decayMode[tau2], -0.03);
+      }
 
       // FIND matched gen lepton
       LV Leg1GenP4_(0, 0, 0, 0);
@@ -1872,6 +1889,7 @@ int main(int argc, const char* argv[])
   edm::ParameterSet cfgPreAnalyzerTauTau = cfg.getParameter<edm::ParameterSet>("preAnalyzerTauTau");
 
   std::string sample = cfgPreAnalyzerTauTau.getParameter<std::string>("sample");
+  int ismcatnlo = cfgPreAnalyzerTauTau.getParameter<int>("ismcatnlo");
   std::string analysis = cfgPreAnalyzerTauTau.getParameter<std::string>("analysis");
   double xSection = cfgPreAnalyzerTauTau.getParameter<double>("xSection");
   double skimEff = cfgPreAnalyzerTauTau.getParameter<double>("skimEff");
@@ -1886,15 +1904,10 @@ int main(int argc, const char* argv[])
   fwlite::TFileService fs = fwlite::TFileService(outputFile.file().data());
 
   string analysisFileName = analysis;
-  if( !(analysis.find("Up")!=string::npos || analysis.find("Down")!=string::npos) &&  analysis.find("Raw")==string::npos)
-    analysisFileName = "Nominal";
-  if( !(analysis.find("Up")!=string::npos || analysis.find("Down")!=string::npos) &&  analysis.find("Raw")!=string::npos)
-    analysisFileName = "RawNominal";
-
   cout << "Now skimming analysis " << analysis << endl;
   if(analysis=="nominal") analysis="";
 
-  TTree* outTree = fs.make<TTree>(TString(("outTree"+analysis).c_str()),"tree jets pT-ord");
+  TTree* outTree = fs.make<TTree>(TString(("outTree"+analysis).c_str()),"tree");
 
   double nEventsRead = 0;
   /*
@@ -1917,12 +1930,6 @@ int main(int argc, const char* argv[])
   }
   cout<< "nEventsRead " << nEventsRead << endl;
   */
-  /*string anlyzerName = analysis;
-  if( analysis.find("Jet")!=string::npos && analysis.find("Raw")==string::npos)
-    anlyzerName = "";
-  if( analysis.find("Jet")!=string::npos && analysis.find("Raw")!=string::npos)
-    anlyzerName = "Raw";
-  */
   TString treeName("makeroottree/AC1B");
   TChain* currentTree = new TChain (treeName);
   bool maxEvents_processed = false;
@@ -1936,7 +1943,7 @@ int main(int argc, const char* argv[])
   cout<<"nDiv = "<<nDiv<<endl;
 
 
-  fillTrees_TauTauStream(currentTree,outTree,nEventsRead,analysis,sample,xSection,skimEff,iJson,iDiv,nDiv);
+  fillTrees_TauTauStream(currentTree,outTree,nEventsRead,analysis,sample,ismcatnlo,xSection,skimEff,iJson,iDiv,nDiv);
 
   //delete outTree;
   //delete currentTree;
