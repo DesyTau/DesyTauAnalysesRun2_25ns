@@ -605,7 +605,7 @@ process.ApplyBaselineHBHEIsoNoiseFilter = cms.EDFilter('BooleanFlagFilter',
 process.initroottree = cms.EDAnalyzer("InitAnalyzer",
 IsData = cms.untracked.bool(isData),
 #IsData = cms.untracked.bool(False),
-GenParticles = cms.untracked.bool(True)
+GenParticles = cms.untracked.bool(not isData)
 )
 
 process.makeroottree = cms.EDAnalyzer("NTupleMaker",

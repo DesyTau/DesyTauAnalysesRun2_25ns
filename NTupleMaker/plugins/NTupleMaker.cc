@@ -236,6 +236,9 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
   jecUnc = new JetCorrectionUncertainty(cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/JEC/Summer15_25nsV5_MC_Uncertainty_AK4PFchs.txt");  
 
 
+  if(cgen && !cdata)
+    consumes<LHEEventProduct>(edm::InputTag("externalLHEProducer"));
+
   consumes<edm::TriggerResults>(edm::InputTag("TriggerResults", "", cTriggerProcess));
   consumes<L1GlobalTriggerReadoutRecord>(edm::InputTag("gtDigis"));
 
