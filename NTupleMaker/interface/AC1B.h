@@ -237,6 +237,7 @@ public :
    Float_t         tau_byTightCombinedIsolationDeltaBetaCorr3Hits[50];   //[tau_count]
    Float_t         tau_byIsolationMVArun2v1DBoldDMwLTraw[50];   //[tau_count]
    Float_t         tau_byIsolationMVArun2v1DBnewDMwLTraw[50];   //[tau_count]
+
    Float_t         tau_chargedIsoPtSum[50];   //[tau_count]
    Float_t         tau_neutralIsoPtSum[50];   //[tau_count]
    Float_t         tau_puCorrPtSum[50];   //[tau_count]

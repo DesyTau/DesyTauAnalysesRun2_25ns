@@ -591,6 +591,14 @@ void NTupleMaker::beginJob(){
     tree->Branch("tau_genjet_e", tau_genjet_e, "tau_genjet_e[tau_count]/F");
     tree->Branch("tau_genmatch", tau_genmatch, "tau_genmatch[tau_count]/I");
 
+    tree->Branch("tau_leadchargedhadrcand_px",  tau_leadchargedhadrcand_px,  "tau_leadchargedhadrcand_px[tau_count]/F");
+    tree->Branch("tau_leadchargedhadrcand_py",  tau_leadchargedhadrcand_py,  "tau_leadchargedhadrcand_py[tau_count]/F");
+    tree->Branch("tau_leadchargedhadrcand_pz",  tau_leadchargedhadrcand_pz,  "tau_leadchargedhadrcand_pz[tau_count]/F");
+    tree->Branch("tau_leadchargedhadrcand_mass",tau_leadchargedhadrcand_mass,"tau_leadchargedhadrcand_mass[tau_count]/F");
+    tree->Branch("tau_leadchargedhadrcand_id",  tau_leadchargedhadrcand_id,  "tau_leadchargedhadrcand_id[tau_count]/I");
+    tree->Branch("tau_leadchargedhadrcand_dxy", tau_leadchargedhadrcand_dxy, "tau_leadchargedhadrcand_dxy[tau_count]/F");
+    tree->Branch("tau_leadchargedhadrcand_dz",  tau_leadchargedhadrcand_dz,  "tau_leadchargedhadrcand_dz[tau_count]/F");
+ 
     tree->Branch("tau_ntracks_pt05", tau_ntracks_pt05, "tau_ntracks_pt05[tau_count]/i");
     tree->Branch("tau_ntracks_pt08", tau_ntracks_pt05, "tau_ntracks_pt05[tau_count]/i");
     tree->Branch("tau_ntracks_pt1",  tau_ntracks_pt1,  "tau_ntracks_pt1[tau_count]/i");
@@ -2627,14 +2635,17 @@ unsigned int NTupleMaker::AddTaus(const edm::Event& iEvent, const edm::EventSetu
 	  tau_isolationNeutralHadrCands_size[tau_count]           = (*Taus)[i].isolationNeutrHadrCands().size();
           tau_isolationGammaCands_size[tau_count]                 = (*Taus)[i].isolationGammaCands().size();
 
-	  // main discriminators
+	  // discriminators
 	  if(setTauBranches){
 	    std::vector<std::pair<std::string, float> > idpairs = (*Taus)[i].tauIDs();
 	    for (unsigned int id = 0; id < idpairs.size(); id++){
 
 	      TString name1 = "tau_"; name1+=idpairs[id].first;
 	      TString name2 = name1; name2+="[tau_count]/F";
-	      tree->Branch( name1, tau_ids[id], name2);
+	      TBranch* nb = tree->Branch( name1, tau_ids[id], name2);
+
+	      for(Long64_t ient = 0; ient < tree->GetEntries(); ient++)
+		nb->Fill();
 
 	      tauIdIndx.push_back(std::make_pair( idpairs[id].first, id));
 	    }

@@ -560,7 +560,6 @@ int main(int argc, char * argv[]) {
       
 	for (unsigned int it=0; it<taus.size(); ++it) {
 	  unsigned int tIndex = taus.at(it);
-	  //float absIsoTau = analysisTree.tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[tIndex];
 	  float absIsoTau = analysisTree.tau_byIsolationMVArun2v1DBnewDMwLTraw[tIndex];
 	  float relIsoTau = absIsoTau / analysisTree.tau_pt[tIndex];
 
