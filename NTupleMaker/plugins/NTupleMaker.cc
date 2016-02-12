@@ -786,6 +786,7 @@ void NTupleMaker::beginJob(){
 
     // generated particles
     tree->Branch("genparticles_lheHt", &genparticles_lheHt, "genparticles_lheHt/F");
+    tree->Branch("genparticles_noutgoing", &genparticles_noutgoing, "genparticles_noutgoing/i");
     tree->Branch("genparticles_count", &genparticles_count, "genparticles_count/i");
     tree->Branch("genparticles_e", genparticles_e, "genparticles_e[genparticles_count]/F");
     tree->Branch("genparticles_px", genparticles_px, "genparticles_px[genparticles_count]/F");
@@ -1622,6 +1623,7 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   hepNUP_ = -1;
 
   genparticles_lheHt = 0.;
+  genparticles_noutgoing = 0;
 
   // generator info and generated particles 
   if(doDebug)  cout<<"add gen info"<< endl; 
@@ -1794,8 +1796,8 @@ math::XYZPoint NTupleMaker::PositionOnECalSurface(TransientTrack& trTrack)
 }
 
 bool NTupleMaker::AddGenHt(const edm::Event& iEvent) {
-
   genparticles_lheHt = 0.;
+  genparticles_noutgoing = 0;
 
   edm::Handle<LHEEventProduct> lheEventProduct;  
   iEvent.getByLabel( "externalLHEProducer", lheEventProduct);
@@ -1812,6 +1814,7 @@ bool NTupleMaker::AddGenHt(const edm::Event& iEvent) {
    int status = lheEvent.ISTUP[idxParticle];
    if ( status == 1 && ((absPdgId >= 1 && absPdgId <= 6) || absPdgId == 21) ) { // quarks and gluons
        genparticles_lheHt += TMath::Sqrt(TMath::Power(lheParticles[idxParticle][0], 2.) + TMath::Power(lheParticles[idxParticle][1], 2.)); // first entry is px, second py
+       ++genparticles_noutgoing;
    } 
   }
 
