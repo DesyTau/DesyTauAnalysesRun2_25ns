@@ -330,227 +330,45 @@ process.leptonPreSelectionSequence = cms.Sequence(process.tauPreSelectionDiTau+
                                                   process.muonPreSelectionMuEle+process.electronPreSelectionMuEle
                                                   )
 # mva MET
-''' #Default mvamet
-process.load("RecoMET.METPUSubtraction.mvaPFMET_cff")
-process.pfMVAMEt.srcPFCandidates = cms.InputTag("packedPFCandidates")
-process.pfMVAMEt.srcVertices = cms.InputTag("offlineSlimmedPrimaryVertices")
-process.pfMVAMEt.inputFileNames = cms.PSet(U     = cms.FileInPath('RecoMET/METPUSubtraction/data/gbru_7_4_X_miniAOD_25NS_July2015.root'),
-                                      DPhi  = cms.FileInPath('RecoMET/METPUSubtraction/data/gbrphi_7_4_X_miniAOD_25NS_July2015.root'),
-                                      CovU1 = cms.FileInPath('RecoMET/METPUSubtraction/data/gbru1cov_7_4_X_miniAOD_25NS_July2015.root'),
-                                      CovU2 = cms.FileInPath('RecoMET/METPUSubtraction/data/gbru2cov_7_4_X_miniAOD_25NS_July2015.root')
-                                      )
-process.pfMVAMEt.srcCorrJets = cms.InputTag('calibratedAK4PFJetsForPFMVAMEt')
-process.pfMVAMEt.srcUncorrJets = cms.InputTag('ak4PFJets')
-'''
-## pairwise mvamet
 
-from RecoMET.METPUSubtraction.mvaPFMET_cff import pfMVAMEt
+from RecoMET.METPUSubtraction.MVAMETConfiguration_cff import runMVAMET
+runMVAMET( process)
+process.MVAMET.requireOS = cms.bool(False)
 
-mvaMETTauMu = cms.EDProducer('PFMETProducerMVATauTau', 
-                        **pfMVAMEt.parameters_())#pfMVAMEt.clone()
-if usePUJetID5X:
-  mvaMETTauMu.srcCorrJets = cms.InputTag('calibratedAK4PFJetsForPFMVAMEt')
-  mvaMETTauMu.srcUncorrJets = cms.InputTag('ak4PFJets')
-else:
-  mvaMETTauMu.srcCorrJets = cms.InputTag('calibratedAK4PFJetsCHSForPFMVAMEt')
-  mvaMETTauMu.srcUncorrJets = cms.InputTag('ak4PFJetsCHS')
-
-mvaMETTauMu.srcCorrJets = cms.InputTag('calibratedAK4PFJetsForPFMVAMEt')
-mvaMETTauMu.srcUncorrJets = cms.InputTag('ak4PFJets')
-
-mvaMETTauMu.srcPFCandidates = cms.InputTag("packedPFCandidates")
-mvaMETTauMu.srcVertices = cms.InputTag("offlineSlimmedPrimaryVertices")
-mvaMETTauMu.srcLeptons = cms.VInputTag(cms.InputTag("tauPreSelectionTauMu", "", ""),
+process.mvaMETTauMu = cms.EDProducer('MVAMET',
+                                      **process.MVAMET.parameters_())
+process.mvaMETTauMu.srcLeptons = cms.VInputTag(cms.InputTag("tauPreSelectionTauMu", "", ""),
                                                cms.InputTag("muonPreSelectionTauMu", "", ""))
-mvaMETTauMu.permuteLeptons = cms.bool(True)
 
-mvaMETTauMu.inputFileNames = cms.PSet(U     = cms.FileInPath('RecoMET/METPUSubtraction/data/gbru_7_4_X_miniAOD_25NS_July2015.root'),
-                                      DPhi  = cms.FileInPath('RecoMET/METPUSubtraction/data/gbrphi_7_4_X_miniAOD_25NS_July2015.root'),
-                                      CovU1 = cms.FileInPath('RecoMET/METPUSubtraction/data/gbru1cov_7_4_X_miniAOD_25NS_July2015.root'),
-                                      CovU2 = cms.FileInPath('RecoMET/METPUSubtraction/data/gbru2cov_7_4_X_miniAOD_25NS_July2015.root')
-                                      )
-
-process.mvaMETTauMu = mvaMETTauMu
-
-
-process.mvaMETDiTau = cms.EDProducer('PFMETProducerMVATauTau',
-                                      **mvaMETTauMu.parameters_())
+process.mvaMETDiTau = cms.EDProducer('MVAMET',
+                                      **process.MVAMET.parameters_())
 process.mvaMETDiTau.srcLeptons = cms.VInputTag(cms.InputTag("tauPreSelectionDiTau", "", ""),                                      
                                                cms.InputTag("tauPreSelectionDiTau", "", ""))
 
 
-process.mvaMETMuEle = cms.EDProducer('PFMETProducerMVATauTau',
-                                     **mvaMETTauMu.parameters_())
+process.mvaMETMuEle = cms.EDProducer('MVAMET',
+                                     **process.MVAMET.parameters_())
 process.mvaMETMuEle.srcLeptons = cms.VInputTag(cms.InputTag("muonPreSelectionMuEle", "", ""),
                                                cms.InputTag("electronPreSelectionMuEle", "", ""))
 
-process.mvaMETTauEle = cms.EDProducer('PFMETProducerMVATauTau',
-                                      **mvaMETTauMu.parameters_())
+process.mvaMETTauEle = cms.EDProducer('MVAMET',
+                                      **process.MVAMET.parameters_())
 process.mvaMETTauEle.srcLeptons = cms.VInputTag(cms.InputTag("tauPreSelectionTauEle", "", ""),
                                                 cms.InputTag("electronPreSelectionTauEle", "", ""))
 
-process.mvaMETMuMu = cms.EDProducer('PFMETProducerMVATauTau',
-                                     **mvaMETTauMu.parameters_())
+process.mvaMETMuMu = cms.EDProducer('MVAMET',
+                                     **process.MVAMET.parameters_())
 process.mvaMETMuMu.srcLeptons = cms.VInputTag(cms.InputTag("muonPreSelectionMuEle", "", ""),
                                               cms.InputTag("muonPreSelectionMuEle", "", ""))
 
-process.mvaMETEleEle = cms.EDProducer('PFMETProducerMVATauTau',
-                                      **mvaMETTauMu.parameters_())
+process.mvaMETEleEle = cms.EDProducer('MVAMET',
+                                      **process.MVAMET.parameters_())
 process.mvaMETEleEle.srcLeptons = cms.VInputTag(cms.InputTag("electronPreSelectionMuEle", "", ""),
                                                 cms.InputTag("electronPreSelectionMuEle", "", ""))
 
-
-
-if usePUJetID5X:
-  process.ak4PFJets = cms.EDProducer("FastjetJetProducer",
-                                     Active_Area_Repeats = cms.int32(1),
-                                     doAreaFastjet = cms.bool(True),
-                                     voronoiRfact = cms.double(-0.9),
-                                     maxBadHcalCells = cms.uint32(9999999),
-                                     doAreaDiskApprox = cms.bool(False),
-                                     maxRecoveredEcalCells = cms.uint32(9999999),
-                                     jetType = cms.string('PFJet'),
-                                     minSeed = cms.uint32(14327),
-                                     Ghost_EtaMax = cms.double(5.0),
-                                     doRhoFastjet = cms.bool(False),
-                                     jetAlgorithm = cms.string('AntiKt'),
-                                     nSigmaPU = cms.double(1.0),
-                                     GhostArea = cms.double(0.01),
-                                     Rho_EtaMax = cms.double(4.4),
-                                     maxBadEcalCells = cms.uint32(9999999),
-                                     useDeterministicSeed = cms.bool(True),
-                                     doPVCorrection = cms.bool(False),
-                                     maxRecoveredHcalCells = cms.uint32(9999999),
-                                     rParam = cms.double(0.4),
-                                     maxProblematicHcalCells = cms.uint32(9999999),
-                                     doOutputJets = cms.bool(True),
-                                     src = cms.InputTag("packedPFCandidates"),
-                                     inputEtMin = cms.double(0.0),
-                                     srcPVs = cms.InputTag(""),
-                                     jetPtMin = cms.double(5.0),
-                                     radiusPU = cms.double(0.5),
-                                     maxProblematicEcalCells = cms.uint32(9999999),
-                                     doPUOffsetCorr = cms.bool(False),
-                                     inputEMin = cms.double(0.0)
-                                   )
-  
-
-  #process.load("JetMETCorrections.Configuration.CorrectedJetProducersDefault_cff")
-  """
-  process.ak4PFJetsL1FastL2L3 = cms.EDProducer('CorrectedPF',
-    src         = cms.InputTag('ak4PFJets'),
-    correctors  = cms.VInputTag('ak4PFL1FastL2L3')
-  )
-
-  process.ak4PFJetsL1FastL2L3Residual =  cms.EDProducer('PFJetCorrectionProducer',
-    src         = cms.InputTag('ak4PFJets'),
-    correctors  = cms.VInputTag('ak4PFL1FastL2L3Residual')
-  )
-  """
-
-  process.load("JetMETCorrections.Configuration.CorrectedJetProducersAllAlgos_cff")
-
-  if runOnData:
-    process.calibratedAK4PFJetsForPFMVAMEt = cms.EDProducer("CorrectedPFJetProducer",
-                                                            src = cms.InputTag("ak4PFJets"),
-                                                            correctors = cms.VInputTag('ak4PFL1FastL2L3ResidualCorrector')
-                                                          )
-    process.ak4PFCorrectionSequence = cms.Sequence(process.ak4PFL1FastL2L3ResidualCorrectorChain)  
-  else:
-    process.calibratedAK4PFJetsForPFMVAMEt = cms.EDProducer("CorrectedPFJetProducer",
-                                                            src = cms.InputTag("ak4PFJets"),
-                                                            correctors = cms.VInputTag('ak4PFL1FastL2L3Corrector')
-                                                          )
-    process.ak4PFCorrectionSequence = cms.Sequence(process.ak4PFL1FastL2L3CorrectorChain)
-
-  process.puJetIdForPFMVAMEt = cms.EDProducer("PileupJetIdProducer",
-                                              algos = cms.VPSet(cms.PSet(
-                                                tmvaVariables = cms.vstring('nvtx', 
-                                                                            'jetPt', 
-                                                                            'jetEta', 
-                                                                            'jetPhi', 
-                                                                            'dZ', 
-                                                                            'beta', 
-                                                                            'betaStar', 
-                                                                            'nCharged', 
-                                                                            'nNeutrals', 
-                                                                            'dR2Mean', 
-                                                                            'ptD', 
-                                                                            'frac01', 
-                                                                            'frac02', 
-                                                                            'frac03', 
-                                                                            'frac04', 
-                                                                            'frac05'),
-                                                etaBinnedWeights=cms.bool(False),
-                                                tmvaMethod = cms.string('JetID'),
-                                                cutBased = cms.bool(False),
-                                                tmvaWeights = cms.string('RecoJets/JetProducers/data/TMVAClassificationCategory_JetID_MET_53X_Dec2012.weights.xml.gz'),
-                                                tmvaSpectators = cms.vstring(),
-                                                label = cms.string('full'),
-                                                version = cms.int32(-1),
-                                                JetIdParams = cms.PSet(
-                                                  Pt2030_Tight = cms.vdouble(0.3, 0.4, 0.7, 0.8),
-                                                  Pt2030_Loose = cms.vdouble(0.0, 0.0, 0.2, 0.6),
-                                                  Pt3050_Medium = cms.vdouble(0.3, 0.2, 0.7, 0.8),
-                                                  Pt1020_Tight = cms.vdouble(-0.2, 0.2, 0.2, 0.6),
-                                                  Pt2030_Medium = cms.vdouble(0.2, 0.2, 0.5, 0.7),
-                                                  Pt010_Tight = cms.vdouble(0.5, 0.6, 0.6, 0.9),
-                                                  Pt1020_Loose = cms.vdouble(-0.4, -0.4, -0.4, 0.4),
-                                                  Pt010_Medium = cms.vdouble(0.2, 0.4, 0.2, 0.6),
-                                                  Pt1020_Medium = cms.vdouble(-0.3, 0.0, 0.0, 0.5),
-                                                  Pt010_Loose = cms.vdouble(0.0, 0.0, 0.0, 0.2),
-                                                  Pt3050_Loose = cms.vdouble(0.0, 0.0, 0.6, 0.2),
-                                                  Pt3050_Tight = cms.vdouble(0.5, 0.4, 0.8, 0.9)
-                                                ),
-                                                impactParTkThreshold = cms.double(0.0)
-                                              )),
-                                            inputIsCorrected = cms.bool(True),
-                                            vertexes = cms.InputTag("offlineSlimmedPrimaryVertices"),
-                                            produceJetIds = cms.bool(True),
-                                            jec = cms.string('AK4PF'),
-                                            residualsFromTxt = cms.bool(False),
-                                            applyJec = cms.bool(True),
-                                            jetids = cms.InputTag("pileupJetIdCalculator"),
-                                            rho = cms.InputTag("fixedGridRhoFastjetAll"),
-                                            jets = cms.InputTag("calibratedAK4PFJetsForPFMVAMEt"),
-                                            runMvas = cms.bool(True)
-                                          )
-  process.mvaMetSequence  = cms.Sequence(process.leptonPreSelectionSequence +
-                                         process.ak4PFJets + process.ak4PFCorrectionSequence + process.calibratedAK4PFJetsForPFMVAMEt +
-                                         process.puJetIdForPFMVAMEt +
-                                         process.mvaMETDiTau + process.mvaMETTauMu + process.mvaMETTauEle + process.mvaMETMuEle + 
-                                         process.mvaMETMuMu + process.mvaMETEleEle)
-  
-else:
-  from RecoJets.JetProducers.ak4PFJets_cfi import ak4PFJets
-  process.chs = cms.EDFilter("CandPtrSelector", src = cms.InputTag("packedPFCandidates"), cut = cms.string("fromPV"))
-  process.ak4PFJetsCHS = ak4PFJets.clone(src = 'chs', doAreaFastjet = True)
-
-  #process.load("JetMETCorrections.Configuration.CorrectedJetProducersDefault_cff")
-
-  if runOnData:
-    process.calibratedAK4PFJetsCHSForPFMVAMEt = cms.EDProducer("CorrectedPFJetProducer",
-                                                               src = cms.InputTag("ak4PFJetsCHS"),
-                                                               correctors = cms.VInputTag('ak4PFCHSL1FastL2L3Residual')
-                                                             )
-  else:
-    process.calibratedAK4PFJetsCHSForPFMVAMEt = cms.EDProducer("CorrectedPFJetProducer",
-                                                               src = cms.InputTag("ak4PFJetsCHS"),
-                                                               correctors = cms.VInputTag('ak4PFCHSL1FastL2L3')
-                                                             )
-
-  from RecoJets.JetProducers.PileupJetID_cfi import pileupJetId
-  process.puJetIdForPFMVAMEt = cms.EDProducer("PileupJetIdProducer",
-                                              **pileupJetId.parameters_())
-  process.puJetIdForPFMVAMEt.vertexes = cms.InputTag("offlineSlimmedPrimaryVertices")
-  process.puJetIdForPFMVAMEt.jets = cms.InputTag("calibratedAK4PFJetsCHSForPFMVAMEt")
-
-  process.mvaMetSequence  = cms.Sequence(process.leptonPreSelectionSequence +
-                                         process.chs + process.ak4PFJetsCHS + process.calibratedAK4PFJetsCHSForPFMVAMEt +
-                                         process.puJetIdForPFMVAMEt +
-                                         process.mvaMETDiTau + process.mvaMETTauMu + process.mvaMETTauEle + process.mvaMETMuEle + 
-                                         process.mvaMETMuMu + process.mvaMETEleEle)
-
+process.mvaMetSequence  = cms.Sequence(process.leptonPreSelectionSequence +
+                                       process.mvaMETDiTau + process.mvaMETTauMu + process.mvaMETTauEle +
+                                       process.mvaMETMuEle + process.mvaMETMuMu + process.mvaMETEleEle)
 
 # END Pairwise MVA MET ==============================================================
 
@@ -822,22 +640,26 @@ SampleName = cms.untracked.string("Data")
 process.load("RecoMET/METProducers.METSignificance_cfi")
 process.load("RecoMET/METProducers.METSignificanceParams_cfi")
 
+'''
 process.METCorrSignificance = process.METSignificance.clone(
   srcPfJets = cms.InputTag('patJetsReapplyJEC::TreeProducer'),
   srcMet = cms.InputTag('slimmedMETs::TreeProducer')
 )
+'''
 
 process.p = cms.Path(
   process.initroottree*
   #process.patJetCorrFactorsReapplyJEC * process.patJetsReapplyJEC *
+  process.egmGsfElectronIDSequence * 
   process.METSignificance * #process.METCorrSignificance *
   process.mvaMetSequence *
-  process.egmGsfElectronIDSequence * 
+  #process.MVAMET *
   #process.HBHENoiseFilterResultProducer* #produces HBHE bools baseline
   #process.ApplyBaselineHBHENoiseFilter*  #reject events based 
   #process.ApplyBaselineHBHEISONoiseFilter*  #reject events based -- disable the module, performance is being investigated fu
   process.makeroottree
 )
+
 
 process.TFileService = cms.Service("TFileService",
                                    #fileName = cms.string("/nfs/dust/cms/user/alkaloge/TauAnalysis/new/CMSSW_7_4_6/src/DesyTauAnalyses/NTupleMaker/test/Ntuple74.root"),
