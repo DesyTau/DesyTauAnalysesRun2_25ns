@@ -154,7 +154,7 @@ using namespace reco;
 #define M_photonmaxcount 1000
 #define M_conversionmaxcount 1000
 #define M_jetmaxcount 1000
-#define M_mvametmaxcount 200
+#define M_mvametmaxcount 2000
 #define M_genparticlesmaxcount 1000
 #define M_trigobjectmaxcount 1000
 typedef ROOT::Math::PositionVector3D<ROOT::Math::Cartesian3D<double>,ROOT::Math::DefaultCoordinateSystemTag> Point3D;

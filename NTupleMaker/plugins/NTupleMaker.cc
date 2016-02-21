@@ -235,10 +235,9 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
   string cmsswBase = (getenv ("CMSSW_BASE"));
   jecUnc = new JetCorrectionUncertainty(cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/JEC/Summer15_25nsV5_MC_Uncertainty_AK4PFchs.txt");  
 
-
   if(cgen && !cdata)
     consumes<LHEEventProduct>(edm::InputTag("externalLHEProducer"));
-
+  
   consumes<edm::TriggerResults>(edm::InputTag("TriggerResults", "", cTriggerProcess));
   consumes<L1GlobalTriggerReadoutRecord>(edm::InputTag("gtDigis"));
 
@@ -1540,20 +1539,22 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   if(crecmvamet)
     {
       for(std::vector<edm::InputTag>::iterator mit = MvaMetCollectionsTag_.begin();
-	
-         mit != MvaMetCollectionsTag_.end(); mit++){
+	    mit != MvaMetCollectionsTag_.end(); mit++){
 
 	//collect MVA Mets
 	edm::Handle<pat::METCollection> imets;
-	//edm::Handle<reco::PFMETCollection> imets;
 	iEvent.getByLabel(*mit, imets);
-        //iEvent.getByToken(*mit, imets);
 
 	if(!imets.isValid()) continue;
 	if(imets->size() == 0)continue;
-	
+
 	for(std::vector<pat::MET>::const_iterator met = imets->begin(); met != imets->end(); met++){
-	  //for(std::vector<reco::PFMET>::const_iterator met = imets->begin(); met != imets->end(); met++){
+
+	  if (mvamet_count==M_mvametmaxcount) {
+	    cerr << "number of mvamet > M_mvametmaxcount. They are missing." << endl; errors |= 1<<1; 
+	    break;
+	  }
+
 	  mvamet_ex[mvamet_count] = met->px();
 	  mvamet_ey[mvamet_count] = met->py();
 
@@ -1837,6 +1838,7 @@ bool NTupleMaker::AddGenParticles(const edm::Event& iEvent) {
 	  bool fill = false;
 	  UInt_t info = 0;
 	  UInt_t mother = 100;
+
 	  if(abs((*GenParticles)[i].pdgId()) == 13 /*&& (*GenParticles)[i].pt() > 8.*/ && (*GenParticles)[i].status()==1)
 	    {
 	      fill = true;
@@ -2062,7 +2064,7 @@ bool NTupleMaker::AddGenParticles(const edm::Event& iEvent) {
 	    }
 	} // for(unsigned i = 0 ; i < GenParticles->size() ; i++)
     } // if(GenParticles.isValid())
-  
+
   return passed;
 
 } // bool NTupleMaker::AddGenParticles(const edm::Event& iEvent) 
@@ -2083,6 +2085,11 @@ unsigned int NTupleMaker::AddMuons(const edm::Event& iEvent, const edm::EventSet
     {
       for(unsigned i = 0 ; i < Muons->size() ; i++){
 	
+	if (muon_count==M_muonmaxcount) {
+	  cerr << "number of muons > M_muonmaxcount. They are missing." << endl; errors |= 1<<1; 
+	  break;
+	}
+
 	if ((*Muons)[i].pt() < cMuPtMin) continue;
 	if (fabs(((*Muons)[i].eta()))>cMuEtaMax) continue;
 
@@ -2196,11 +2203,16 @@ unsigned int NTupleMaker::AddMuons(const edm::Event& iEvent, const edm::EventSet
 	  if(GenParticles.isValid())
 	    muon_genmatch[muon_count] = utils_genMatch::genMatch( (*Muons)[i].p4(), *GenParticles);
 	}
-
-	muon_count++;
+	
+	// Dimuons
 	
 	if( !(*Muons)[i].innerTrack().isNull()){
 	  for(unsigned j = i+1 ; j < Muons->size() ; j++){
+	    if (dimuon_count==M_muonmaxcount*(M_muonmaxcount-1)/2) {
+	      cerr << "number of dimuons > M_muonmaxcount*(M_muonmaxcount-1)/2. They are missing." << endl; errors |= 1<<1; 
+	      break;
+	    }
+
 	    if ((*Muons)[j].pt() < cMuPtMin) continue;
 	    if (fabs(((*Muons)[j].eta()))>cMuEtaMax) continue;
 	    if( (*Muons)[j].innerTrack().isNull()) continue;
@@ -2298,13 +2310,9 @@ unsigned int NTupleMaker::AddMuons(const edm::Event& iEvent, const edm::EventSet
 	  }
 	}
 
-	if (muon_count==M_muonmaxcount) {
-	  cerr << "number of muons > M_muonmaxcount. They are missing." << endl; errors |= 1<<1; 
-	  break;
-	}
+	muon_count++;
 
       }
-
     }
   return muon_count;
 }
@@ -2355,6 +2363,12 @@ unsigned int NTupleMaker::AddTriggerObjects(const edm::Event& iEvent) {
   assert(triggerObjects.isValid());
   
   for (unsigned int iTO=0; iTO<triggerObjects->size(); ++iTO) {
+    if (trigobject_count==M_trigobjectmaxcount) {
+      cerr << "number of trigger objects > M_trigobjectmaxcount. They are missing." << endl; 
+      errors |= 1<<5; 
+      break;
+    }
+
     vector<string> filterLabels = (*triggerObjects)[iTO].filterLabels();
     bool matchFound = false;
     std::vector<bool> passedFilters; passedFilters.clear();
@@ -2398,11 +2412,6 @@ unsigned int NTupleMaker::AddTriggerObjects(const edm::Event& iEvent) {
       trigobject_isJet[trigobject_count] = (*triggerObjects)[iTO].hasTriggerObjectType(trigger::TriggerJet);
       trigobject_isMET[trigobject_count] = (*triggerObjects)[iTO].hasTriggerObjectType(trigger::TriggerMET);
       trigobject_count++;
-      if (trigobject_count==M_trigobjectmaxcount) {
-	 cerr << "number of trigger objects > M_trigobjectmaxcount. They are missing." << endl; 
-	 errors |= 1<<5; 
-	 break;
-      }
     }
   }
   return trigobject_count;
@@ -2605,6 +2614,13 @@ unsigned int NTupleMaker::AddTaus(const edm::Event& iEvent, const edm::EventSetu
 
       for(unsigned i = 0 ; i < Taus->size() ; i++)
 	{
+
+	  if(tau_count == M_taumaxcount) {
+	    cerr << "number of taus > M_taumaxcount. They are missing." << endl; 
+	    errors |= 1<<3; 
+	    break;
+	  }
+
 	  // std::cout << i << " :  decayModeFinding = " << (*Taus)[i].tauID("decayModeFinding") 
 	  //  	    << "   decayModeFindingNewDMs = " << (*Taus)[i].tauID("decayModeFindingNewDMs") 
 	  //  	    << "   pt =  " << (*Taus)[i].pt() 
@@ -2819,11 +2835,7 @@ unsigned int NTupleMaker::AddTaus(const edm::Event& iEvent, const edm::EventSetu
 	  }
 	  
 	  tau_count++;
-	  if(tau_count == M_taumaxcount) {
-	    cerr << "number of taus > M_taumaxcount. They are missing." << endl; 
-	    errors |= 1<<3; 
-	    break;
-	  }
+
 	} // for(unsigned i = 0 ; i < Taus->size() ; i++)
     }
   return tau_count;
@@ -2989,6 +3001,13 @@ unsigned int NTupleMaker::AddPFJets(const edm::Event& iEvent, const edm::EventSe
       
       for(unsigned i = 0 ; i < pfjets->size() ; i++)
 	{
+
+	  if(pfjet_count == M_jetmaxcount){
+	    cerr << "number of pfjet > M_jetmaxcount. They are missing." << endl; 
+	    errors |= 1<<4; 
+	    break;
+	  }
+
 	  if((*pfjets)[i].pt() < cJetPtMin) continue;
 	  if(fabs((*pfjets)[i].eta()) > cJetEtaMax) continue;
 	  //	  std::cout << "Jet  " << i <<  ", pT=" <<  (*pfjets)[i].pt() << std::endl;
@@ -3072,11 +3091,6 @@ unsigned int NTupleMaker::AddPFJets(const edm::Event& iEvent, const edm::EventSe
 	      }
 	    }
 	  pfjet_count++;
-	  if(pfjet_count == M_jetmaxcount){
-	    cerr << "number of pfjet > M_jetmaxcount. They are missing." << endl; 
-	    errors |= 1<<4; 
-	    break;
-	  }
 	}
     }
   
@@ -3133,6 +3147,13 @@ unsigned int NTupleMaker::AddElectrons(const edm::Event& iEvent, const edm::Even
 
 	for(unsigned i = 0 ; i < Electrons->size() ; i++){
 
+	  if(electron_count == M_electronmaxcount)
+	    {
+	      cerr << "number of electron > M_electronmaxcount. They are missing." << endl;
+	      errors |= 1<<2;
+	      break;
+	    }
+
 	  const auto el = Electrons->ptrAt(i);
 
 	  if (el->pt()<cElPtMin) continue;
@@ -3152,7 +3173,7 @@ unsigned int NTupleMaker::AddElectrons(const edm::Event& iEvent, const edm::Even
 	  electron_esuperclusterovertrack[electron_count] = el->eSuperClusterOverP();
 	  electron_eseedclusterovertrack[electron_count] = el->eSeedClusterOverP();
 	  electron_deltaetasuperclustertrack[electron_count] = el->deltaEtaSuperClusterTrackAtVtx();
-	  electron_deltaphisuperclustertrack[electron_count] = el->deltaEtaSuperClusterTrackAtVtx();
+	  electron_deltaphisuperclustertrack[electron_count] = el->deltaPhiSuperClusterTrackAtVtx();
 	  electron_e1x5[electron_count] = el->e1x5();
 	  electron_e2x5[electron_count] = el->e2x5Max();
 	  electron_e5x5[electron_count] = el->e5x5();
@@ -3264,13 +3285,6 @@ unsigned int NTupleMaker::AddElectrons(const edm::Event& iEvent, const edm::Even
 	  }
 	  
 	  electron_count++;
-
-	  if(electron_count == M_electronmaxcount)
-	    {
-	      cerr << "number of electron > M_electronmaxcount. They are missing." << endl;
-	      errors |= 1<<2;
-	      break;
-	    }
 	}
 
 	return electron_count;
