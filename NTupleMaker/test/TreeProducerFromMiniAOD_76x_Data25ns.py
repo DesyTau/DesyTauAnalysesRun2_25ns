@@ -34,7 +34,7 @@ process.MessageLogger.cerr.threshold = cms.untracked.string('INFO')
 process.MessageLogger.cerr.FwkReport.reportEvery = 500
 # Set the process options -- Display summary at the end, enable unscheduled execution
 process.options = cms.untracked.PSet( 
-    allowUnscheduled = cms.untracked.bool(False),
+    allowUnscheduled = cms.untracked.bool(True),
     wantSummary = cms.untracked.bool(True) 
 )
 
@@ -291,13 +291,13 @@ process.source = cms.Source("PoolSource",
 ## ## DiTau
 process.tauPreSelectionDiTau = cms.EDFilter("PATTauSelector",
     src = cms.InputTag("slimmedTaus"),
-    cut = cms.string('pt > 35. && abs(eta) < 2.5 && tauID("decayModeFindingNewDMs") > 0.5')
+    cut = cms.string('pt > 30. && abs(eta) < 2.5')
 )
  
 ## ## TauEle
 process.tauPreSelectionTauEle = cms.EDFilter("PATTauSelector",
     src = cms.InputTag("slimmedTaus"),
-    cut = cms.string('pt > 15. && eta < 2.5 && eta > -2.5 && tauID("decayModeFindingNewDMs") > 0.5')
+    cut = cms.string('pt > 15. && eta < 2.5 && eta > -2.5')
 )
 process.electronPreSelectionTauEle = cms.EDFilter("PATElectronSelector",
     src = cms.InputTag("slimmedElectrons"),
@@ -307,7 +307,7 @@ process.electronPreSelectionTauEle = cms.EDFilter("PATElectronSelector",
 ## ## TauMu
 process.tauPreSelectionTauMu = cms.EDFilter("PATTauSelector",
     src = cms.InputTag("slimmedTaus"),
-    cut = cms.string('pt > 15. && abs(eta) < 2.5 && tauID("decayModeFindingNewDMs") > 0.5')
+    cut = cms.string('pt > 15. && abs(eta) < 2.5')
 )
 process.muonPreSelectionTauMu = cms.EDFilter("PATMuonSelector",
     src = cms.InputTag("slimmedMuons"),
@@ -448,7 +448,12 @@ MetCorrCovMatrixTag = cms.InputTag("METCorrSignificance:METCovariance:TreeProduc
 MetCorrSigTag = cms.InputTag("METCorrSignificance:METSignificance:TreeProducer"),
 MetCorrCollectionTag = cms.InputTag("slimmedMETs::TreeProducer"),
 PuppiMetCollectionTag = cms.InputTag("slimmedMETsPuppi"),
-MvaMetCollectionsTag = cms.VInputTag("mvaMETDiTau", "mvaMETTauMu", "mvaMETTauEle", "mvaMETMuEle", "mvaMETMuMu", "mvaMETEleEle"),
+MvaMetCollectionsTag = cms.VInputTag(cms.InputTag("mvaMETDiTau","MVAMET","TreeProducer"),
+                                     cms.InputTag("mvaMETTauMu","MVAMET","TreeProducer"),
+                                     cms.InputTag("mvaMETTauEle","MVAMET","TreeProducer"),
+                                     cms.InputTag("mvaMETMuEle","MVAMET","TreeProducer"),
+                                     cms.InputTag("mvaMETMuMu","MVAMET","TreeProducer"),
+                                     cms.InputTag("mvaMETEleEle","MVAMET","TreeProducer")),
 #MvaMetCollectionsTag = cms.VInputTag("pfMVAMEt"),
 TrackCollectionTag = cms.InputTag("generalTracks"),
 GenParticleCollectionTag = cms.InputTag("prunedGenParticles"),

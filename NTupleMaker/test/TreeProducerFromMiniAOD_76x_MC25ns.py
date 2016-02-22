@@ -42,7 +42,7 @@ process.options = cms.untracked.PSet(
 
 # How many events to process
 process.maxEvents = cms.untracked.PSet( 
-   input = cms.untracked.int32(3000)
+   input = cms.untracked.int32(2000)
 )
 
 
@@ -229,11 +229,6 @@ process.HBHENoiseFilterResultProducer.IgnoreTS4TS5ifJetInLowBVRegion=cms.bool(Fa
 process.HBHENoiseFilterResultProducer.defaultDecision = cms.string("HBHENoiseFilterResultRun2Loose")
 
 
-
-
-
-
-
 # Define the input source
 
 fnames = []
@@ -251,6 +246,9 @@ else:
     #fnames.append("/store/mc/RunIISpring15MiniAODv2/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/74X_mcRun2_asymptotic_v2-v1/50000/00759690-D16E-E511-B29E-00261894382D.root")    
     fnames.append('/store/mc/RunIIFall15MiniAODv2/SUSYGluGluToHToTauTau_M-160_TuneCUETP8M1_13TeV-pythia8/MINIAODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/50000/12184969-3DB8-E511-879B-001E67504A65.root')
     fnames.append('/store/mc/RunIIFall15MiniAODv2/SUSYGluGluToHToTauTau_M-160_TuneCUETP8M1_13TeV-pythia8/MINIAODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/50000/50B4676B-3DB8-E511-AA11-001E67580704.root')
+
+fnamse=["/store/mc/RunIIFall15MiniAODv2/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/70000/0232D37A-77BA-E511-B3C5-0CC47A4C8EA8.root"]
+
     
 # Define the input source
 process.source = cms.Source("PoolSource", 
@@ -316,13 +314,13 @@ process.source = cms.Source("PoolSource",
 ## ## DiTau
 process.tauPreSelectionDiTau = cms.EDFilter("PATTauSelector",
     src = cms.InputTag("slimmedTaus"),
-    cut = cms.string('pt > 35. && abs(eta) < 2.5 && tauID("decayModeFindingNewDMs") > 0.5')
+    cut = cms.string('pt > 35. && abs(eta) < 2.5')
 )
  
 ## ## TauEle
 process.tauPreSelectionTauEle = cms.EDFilter("PATTauSelector",
     src = cms.InputTag("slimmedTaus"),
-    cut = cms.string('pt > 15. && eta < 2.5 && eta > -2.5 && tauID("decayModeFindingNewDMs") > 0.5')
+    cut = cms.string('pt > 15. && eta < 2.5 && eta > -2.5')
 )
 process.electronPreSelectionTauEle = cms.EDFilter("PATElectronSelector",
     src = cms.InputTag("slimmedElectrons"),
@@ -332,7 +330,7 @@ process.electronPreSelectionTauEle = cms.EDFilter("PATElectronSelector",
 ## ## TauMu
 process.tauPreSelectionTauMu = cms.EDFilter("PATTauSelector",
     src = cms.InputTag("slimmedTaus"),
-    cut = cms.string('pt > 15. && abs(eta) < 2.5 && tauID("decayModeFindingNewDMs") > 0.5')
+    cut = cms.string('pt > 15. && abs(eta) < 2.5')
 )
 process.muonPreSelectionTauMu = cms.EDFilter("PATMuonSelector",
     src = cms.InputTag("slimmedMuons"),
@@ -359,6 +357,8 @@ process.leptonPreSelectionSequence = cms.Sequence(process.tauPreSelectionDiTau+
 from RecoMET.METPUSubtraction.MVAMETConfiguration_cff import runMVAMET
 runMVAMET( process)
 process.MVAMET.requireOS = cms.bool(False)
+process.MVAMET.srcLeptons  = cms.VInputTag("slimmedMuons", "slimmedElectrons", "slimmedTaus")
+
 
 process.mvaMETTauMu = cms.EDProducer('MVAMET',
                                       **process.MVAMET.parameters_())
@@ -369,7 +369,6 @@ process.mvaMETDiTau = cms.EDProducer('MVAMET',
                                       **process.MVAMET.parameters_())
 process.mvaMETDiTau.srcLeptons = cms.VInputTag(cms.InputTag("tauPreSelectionDiTau", "", ""),                                      
                                                cms.InputTag("tauPreSelectionDiTau", "", ""))
-
 
 process.mvaMETMuEle = cms.EDProducer('MVAMET',
                                      **process.MVAMET.parameters_())
@@ -473,7 +472,12 @@ MetCorrCovMatrixTag = cms.InputTag("METCorrSignificance:METCovariance:TreeProduc
 MetCorrSigTag = cms.InputTag("METCorrSignificance:METSignificance:TreeProducer"),
 MetCorrCollectionTag = cms.InputTag("slimmedMETs::TreeProducer"),
 PuppiMetCollectionTag = cms.InputTag("slimmedMETsPuppi"),
-MvaMetCollectionsTag = cms.VInputTag("mvaMETDiTau", "mvaMETTauMu", "mvaMETTauEle", "mvaMETMuEle", "mvaMETMuMu", "mvaMETEleEle"),
+MvaMetCollectionsTag = cms.VInputTag(cms.InputTag("mvaMETDiTau","MVAMET","TreeProducer"),
+                                     cms.InputTag("mvaMETTauMu","MVAMET","TreeProducer"),
+                                     cms.InputTag("mvaMETTauEle","MVAMET","TreeProducer"),
+                                     cms.InputTag("mvaMETMuEle","MVAMET","TreeProducer"),
+                                     cms.InputTag("mvaMETMuMu","MVAMET","TreeProducer"),
+                                     cms.InputTag("mvaMETEleEle","MVAMET","TreeProducer")),
 #MvaMetCollectionsTag = cms.VInputTag("pfMVAMEt"),
 TrackCollectionTag = cms.InputTag("generalTracks"),
 GenParticleCollectionTag = cms.InputTag("prunedGenParticles"),
@@ -691,7 +695,15 @@ process.TFileService = cms.Service("TFileService",
                                    fileName = cms.string("output.root")
                                	)
 
-#process.end = cms.EndPath(process.Out*process.TFileService)
+process.output = cms.OutputModule("PoolOutputModule",
+                                  fileName = cms.untracked.string('output_particles.root'),
+                                  outputCommands = cms.untracked.vstring(
+                                    'keep *_*_*_TreeProducer'
+                                  ),        
+                                  SelectEvents = cms.untracked.PSet(  SelectEvents = cms.vstring('p'))
+)
+
+#process.end = cms.EndPath(process.output)
 
 #processDumpFile = open('MyRootMaker.dump', 'w')
 #print >> processDumpFile, process.dumpPython()
