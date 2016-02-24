@@ -237,7 +237,7 @@ public :
    Float_t         tau_byTightCombinedIsolationDeltaBetaCorr3Hits[50];   //[tau_count]
    Float_t         tau_byIsolationMVArun2v1DBoldDMwLTraw[50];   //[tau_count]
    Float_t         tau_byIsolationMVArun2v1DBnewDMwLTraw[50];   //[tau_count]
-
+   Float_t 	   tau_byTightIsolationMVArun2v1DBoldDMwLT[50];
    Float_t         tau_chargedIsoPtSum[50];   //[tau_count]
    Float_t         tau_neutralIsoPtSum[50];   //[tau_count]
    Float_t         tau_puCorrPtSum[50];   //[tau_count]
@@ -255,6 +255,8 @@ public :
    Float_t         tau_againstElectronLooseMVA5[50];   //[tau_count]
    Float_t         tau_againstElectronMediumMVA5[50];   //[tau_count]
    Float_t         tau_againstElectronTightMVA5[50];   //[tau_count]
+   Float_t         tau_againstElectronVLooseMVA6[50];
+   Float_t   	   tau_againstElectronTightMVA6[50];
    UInt_t          tau_ntracks_pt05[50];   //[tau_count]
    UInt_t          tau_ntracks_pt08[50];   //[tau_count]
    UInt_t          tau_ntracks_pt1[50];   //[tau_count]
@@ -658,6 +660,7 @@ public :
    TBranch        *b_tau_byLooseCombinedIsolationDeltaBetaCorr3Hits;   //!
    TBranch        *b_tau_byMediumCombinedIsolationDeltaBetaCorr3Hits;   //!
    TBranch        *b_tau_byTightCombinedIsolationDeltaBetaCorr3Hits;   //!
+   TBranch 	  *b_tau_byTightIsolationMVArun2v1DBoldDMwLT;
    TBranch        *b_tau_byIsolationMVArun2v1DBoldDMwLTraw;   //!
    TBranch        *b_tau_byIsolationMVArun2v1DBnewDMwLTraw;   //!
    TBranch        *b_tau_chargedIsoPtSum;   //!
@@ -677,6 +680,8 @@ public :
    TBranch        *b_tau_againstElectronLooseMVA5;   //!
    TBranch        *b_tau_againstElectronMediumMVA5;   //!
    TBranch        *b_tau_againstElectronTightMVA5;   //!
+   TBranch 	  *b_tau_againstElectronTightMVA6;
+   TBranch        *b_tau_againstElectronVLooseMVA6;
    TBranch        *b_tau_ntracks_pt05;   //!
    TBranch        *b_tau_ntracks_pt08;   //!
    TBranch        *b_tau_ntracks_pt1;   //!
@@ -1205,6 +1210,8 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("tau_againstElectronLooseMVA5", tau_againstElectronLooseMVA5, &b_tau_againstElectronLooseMVA5);
    fChain->SetBranchAddress("tau_againstElectronMediumMVA5", tau_againstElectronMediumMVA5, &b_tau_againstElectronMediumMVA5);
    fChain->SetBranchAddress("tau_againstElectronTightMVA5", tau_againstElectronTightMVA5, &b_tau_againstElectronTightMVA5);
+   fChain->SetBranchAddress("tau_againstElectronTightMVA6", tau_againstElectronTightMVA6, &b_tau_againstElectronTightMVA6);
+   fChain->SetBranchAddress("tau_againstElectronVLooseMVA6", tau_againstElectronVLooseMVA6, &b_tau_againstElectronVLooseMVA6);
    fChain->SetBranchAddress("tau_ntracks_pt05", tau_ntracks_pt05, &b_tau_ntracks_pt05);
    fChain->SetBranchAddress("tau_ntracks_pt08", tau_ntracks_pt08, &b_tau_ntracks_pt08);
    fChain->SetBranchAddress("tau_ntracks_pt1", tau_ntracks_pt1, &b_tau_ntracks_pt1);

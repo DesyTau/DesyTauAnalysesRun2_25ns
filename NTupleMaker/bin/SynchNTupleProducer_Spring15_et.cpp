@@ -283,7 +283,7 @@ int main(int argc, char * argv[]) {
   // PU reweighting - initialization
   PileUp * PUofficial = new PileUp();
   TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/"+TString(pileUpInDataFile),"read");
-  TFile * filePUdistribution_MC = new TFile (TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/MC_Spring15_PU25_Startup.root", "read");
+  TFile * filePUdistribution_MC = new TFile (TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/MC_Fall15_PU25_V1.root", "read");
   TH1D * PU_data = (TH1D *)filePUdistribution_data->Get("pileup");
   TH1D * PU_mc = (TH1D *)filePUdistribution_MC->Get("pileup");
   PUofficial->set_h_data(PU_data);
@@ -292,11 +292,11 @@ int main(int argc, char * argv[]) {
   // Lepton Scale Factors
   // Electron Id+Iso scale factor
   ScaleFactor * SF_eleIdIso = new ScaleFactor();
-  SF_eleIdIso->init_ScaleFactor(TString(cmsswBase)+"/src/HTT-utilities/LepEffInterface/data/Electron/Electron_IdIso0p10_eff.root");
+  SF_eleIdIso->init_ScaleFactor(TString(cmsswBase)+"/src/HTT-utilities/LepEffInterface/data/Electron/Electron_IdIso0p1_fall15.root");
 
   // Electron SingleElectron trigger scale factor
   ScaleFactor * SF_eleTrigger = new ScaleFactor();
-  SF_eleTrigger->init_ScaleFactor(TString(cmsswBase)+"/src/HTT-utilities/LepEffInterface/data/Electron/Electron_SingleEle_eff.root");
+  SF_eleTrigger->init_ScaleFactor(TString(cmsswBase)+"/src/HTT-utilities/LepEffInterface/data/Electron/Electron_Ele23_fall15.root");
 
   // output fileName with histograms
   rootFileName += "_";
@@ -502,7 +502,8 @@ int main(int argc, char * argv[]) {
 	if (fabs(fabs(analysisTree.tau_charge[it])-1)>0.001) continue;
 	if (fabs(analysisTree.tau_leadchargedhadrcand_dz[it])>=dzTauCut) continue;
 	if (applyTauId &&
-	    analysisTree.tau_decayModeFindingNewDMs[it] < 0.5) continue;
+	    //analysisTree.tau_decayModeFindingNewDMs[it] < 0.5) 
+	    analysisTree.tau_decayModeFinding[it] < 0.5)  continue;
 	
 	taus.push_back(it);
       }
@@ -658,6 +659,7 @@ int main(int argc, char * argv[]) {
       otree->againstElectronTightMVA5_1 = 0;
       otree->againstElectronVLooseMVA5_1 = 0;
       otree->againstElectronVTightMVA5_1 = 0;
+
       otree->againstMuonLoose3_1 = 0;
       otree->againstMuonTight3_1 = 0;
 
@@ -678,7 +680,10 @@ int main(int argc, char * argv[]) {
       otree->gen_match_2 = analysisTree.tau_genmatch[tauIndex];
       //if (analysisTree.tau_charge[tauIndex]>0)
       //otree->q_2 = 1;
-      otree->mva_2 = analysisTree.tau_byIsolationMVArun2v1DBnewDMwLTraw[tauIndex];  //analysisTree.tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[tauIndex];
+
+      otree->mva_2 = analysisTree.tau_byIsolationMVArun2v1DBoldDMwLTraw[tauIndex];
+      //otree->mva_2 = analysisTree.tau_byIsolationMVArun2v1DBnewDMwLTraw[tauIndex];  
+     //analysisTree.tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[tauIndex];
       otree->d0_2 = analysisTree.tau_leadchargedhadrcand_dxy[tauIndex];
       otree->dZ_2 = analysisTree.tau_leadchargedhadrcand_dz[tauIndex];      
       otree->iso_2 = analysisTree.tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[tauIndex];
@@ -696,6 +701,7 @@ int main(int argc, char * argv[]) {
       otree->againstElectronVTightMVA5_2 = analysisTree.tau_againstElectronVTightMVA5[tauIndex];
       otree->againstMuonLoose3_2 = analysisTree.tau_againstMuonLoose3[tauIndex];
       otree->againstMuonTight3_2 = analysisTree.tau_againstMuonTight3[tauIndex];
+      otree->againstElectronTightMVA6_2 = analysisTree.tau_againstElectronTightMVA6[tauIndex];
 
       // ditau system
       TLorentzVector electronLV; electronLV.SetXYZM(analysisTree.electron_px[electronIndex],

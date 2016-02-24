@@ -292,11 +292,11 @@ int main(int argc, char * argv[]) {
   // Lepton Scale Factors
   // Electron Id+Iso scale factor
   ScaleFactor * SF_muIdIso = new ScaleFactor();
-  SF_muIdIso->init_ScaleFactor(TString(cmsswBase)+"/src/HTT-utilities/LepEffInterface/data/Muon/Muon_IdIso0p10_eff.root");
+  SF_muIdIso->init_ScaleFactor(TString(cmsswBase)+"/src/HTT-utilities/LepEffInterface/data/Muon/Muon_IdIso0p1_fall15.root");
 
   // Electron SingleElectron trigger scale factor
   ScaleFactor * SF_muTrigger = new ScaleFactor();
-  SF_muTrigger->init_ScaleFactor(TString(cmsswBase)+"/src/HTT-utilities/LepEffInterface/data/Muon/Muon_SingleMu_eff.root");
+  SF_muTrigger->init_ScaleFactor(TString(cmsswBase)+"/src/HTT-utilities/LepEffInterface/data/Muon/Muon_IsoMu18_fall15.root");
 
   // output fileName with histograms
   rootFileName += "_";
@@ -425,6 +425,7 @@ int main(int argc, char * argv[]) {
       otree->mcweight = 1.;
       otree->puweight = 0;
 
+
       if(!isData)
 	otree->mcweight = analysisTree.genweight;
 	otree->puweight = float(PUofficial->get_PUweight(double(analysisTree.numtruepileupinteractions)));
@@ -502,7 +503,8 @@ int main(int argc, char * argv[]) {
 	if (fabs(fabs(analysisTree.tau_charge[it])-1)>0.001) continue;
 	if (fabs(analysisTree.tau_leadchargedhadrcand_dz[it])>=dzTauCut) continue;
 	if (applyTauId &&
-	    analysisTree.tau_decayModeFindingNewDMs[it] < 0.5) continue;
+	    //analysisTree.tau_decayModeFindingNewDMs[it] < 0.5) 
+	    analysisTree.tau_decayModeFinding[it] < 0.5) continue;
 	
 	taus.push_back(it);
       }
@@ -561,7 +563,8 @@ int main(int argc, char * argv[]) {
 	for (unsigned int it=0; it<taus.size(); ++it) {
 	  unsigned int tIndex = taus.at(it);
 	  //float absIsoTau = analysisTree.tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[tIndex];
-	  float absIsoTau = analysisTree.tau_byIsolationMVArun2v1DBnewDMwLTraw[tIndex];
+	  //float absIsoTau = analysisTree.tau_byIsolationMVArun2v1DBnewDMwLTraw[tIndex];
+	  float absIsoTau = analysisTree.tau_byIsolationMVArun2v1DBoldDMwLTraw[tIndex];
 	  float relIsoTau = absIsoTau / analysisTree.tau_pt[tIndex];
 
 	  if (debug)
@@ -659,6 +662,7 @@ int main(int argc, char * argv[]) {
       otree->againstElectronTightMVA5_1 = 0;
       otree->againstElectronVLooseMVA5_1 = 0;
       otree->againstElectronVTightMVA5_1 = 0;
+      otree->againstElectronVLooseMVA6_2 = 0;
       otree->againstMuonLoose3_1 = 0;
       otree->againstMuonTight3_1 = 0;
 
@@ -679,7 +683,8 @@ int main(int argc, char * argv[]) {
       otree->gen_match_2 = analysisTree.tau_genmatch[tauIndex];
       //if (analysisTree.tau_charge[tauIndex]>0)
       //otree->q_2 = 1;
-      otree->mva_2 = log(0);
+      //otree->mva_2 = log(0);
+      otree->mva_2 = analysisTree.tau_byIsolationMVArun2v1DBoldDMwLTraw[tauIndex];
       otree->d0_2 = analysisTree.tau_leadchargedhadrcand_dxy[tauIndex];
       otree->dZ_2 = analysisTree.tau_leadchargedhadrcand_dz[tauIndex];      
       otree->iso_2 = analysisTree.tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[tauIndex];
@@ -697,6 +702,9 @@ int main(int argc, char * argv[]) {
       otree->againstElectronVTightMVA5_2 = analysisTree.tau_againstElectronVTightMVA5[tauIndex];
       otree->againstMuonLoose3_2 = analysisTree.tau_againstMuonLoose3[tauIndex];
       otree->againstMuonTight3_2 = analysisTree.tau_againstMuonTight3[tauIndex];
+      otree->againstElectronVLooseMVA6_2 = analysisTree.tau_againstElectronVLooseMVA6[tauIndex];
+
+      otree->byTightIsolationMVArun2v1DBoldDMwLT_2 = analysisTree.tau_byTightIsolationMVArun2v1DBoldDMwLT[tauIndex];
 
       // ditau system
       TLorentzVector muonLV; muonLV.SetXYZM(analysisTree.muon_px[muonIndex],

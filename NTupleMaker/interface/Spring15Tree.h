@@ -91,12 +91,17 @@ public :
   Float_t         againstElectronTightMVA5_1;
   Float_t         againstElectronVLooseMVA5_1;
   Float_t         againstElectronVTightMVA5_1;
+  Float_t 	  againstElectronVLooseMVA6_2;
+  Float_t 	  againstElectronTightMVA6_2;
   Float_t         againstMuonLoose3_1;
   Float_t         againstMuonTight3_1;
   Float_t         byCombinedIsolationDeltaBetaCorrRaw3Hits_2;
   Float_t         byLooseCombinedIsolationDeltaBetaCorr3Hits_2;
   Float_t         byMediumCombinedIsolationDeltaBetaCorr3Hits_2;
   Float_t         byTightCombinedIsolationDeltaBetaCorr3Hits_2;
+
+  Float_t 	  byTightIsolationMVArun2v1DBoldDMwLT_2;
+
   Float_t         againstElectronLooseMVA5_2;
   Float_t         againstElectronMediumMVA5_2;
   Float_t         againstElectronTightMVA5_2;
@@ -222,11 +227,14 @@ public :
   TBranch        *b_byLooseCombinedIsolationDeltaBetaCorr3Hits_2;   //!
   TBranch        *b_byMediumCombinedIsolationDeltaBetaCorr3Hits_2;   //!
   TBranch        *b_byTightCombinedIsolationDeltaBetaCorr3Hits_2;   //!
+  TBranch	 *b_byTightIsolationMVArun2v1DBoldDMwLT_2;
   TBranch        *b_againstElectronLooseMVA5_2;   //!
   TBranch        *b_againstElectronMediumMVA5_2;   //!
   TBranch        *b_againstElectronTightMVA5_2;   //!
   TBranch        *b_againstElectronVLooseMVA5_2;   //!
   TBranch        *b_againstElectronVTightMVA5_2;   //!
+  TBranch	 *b_againstElectronVLooseMVA6_2;
+  TBranch        *b_againstElectronTightMVA6_2;
   TBranch        *b_againstMuonLoose3_2;   //!
   TBranch        *b_againstMuonTight3_2;   //!
   TBranch        *b_met;   //!
