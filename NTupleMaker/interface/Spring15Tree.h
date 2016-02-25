@@ -30,7 +30,7 @@ public :
   Int_t           lumi;
   Int_t           evt;
   Int_t           npv;
-  Int_t           npu;
+  Float_t         npu;
   Float_t         rho;
   Float_t         xs;
   Float_t         mcweight;

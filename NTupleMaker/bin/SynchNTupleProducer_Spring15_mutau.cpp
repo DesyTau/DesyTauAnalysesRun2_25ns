@@ -663,6 +663,7 @@ int main(int argc, char * argv[]) {
       otree->againstElectronVLooseMVA5_1 = 0;
       otree->againstElectronVTightMVA5_1 = 0;
       otree->againstElectronVLooseMVA6_2 = 0;
+      otree->againstElectronTightMVA6_2 = 0;
       otree->againstMuonLoose3_1 = 0;
       otree->againstMuonTight3_1 = 0;
 
@@ -684,7 +685,7 @@ int main(int argc, char * argv[]) {
       //if (analysisTree.tau_charge[tauIndex]>0)
       //otree->q_2 = 1;
       //otree->mva_2 = log(0);
-      otree->mva_2 = analysisTree.tau_byIsolationMVArun2v1DBoldDMwLTraw[tauIndex];
+      otree->mva_2 = analysisTree.tau_byTightIsolationMVArun2v1DBoldDMwLT[tauIndex]; //before, tau_byIsolationMVArun2v1DBoldDMwLTraw
       otree->d0_2 = analysisTree.tau_leadchargedhadrcand_dxy[tauIndex];
       otree->dZ_2 = analysisTree.tau_leadchargedhadrcand_dz[tauIndex];      
       otree->iso_2 = analysisTree.tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[tauIndex];
@@ -703,6 +704,7 @@ int main(int argc, char * argv[]) {
       otree->againstMuonLoose3_2 = analysisTree.tau_againstMuonLoose3[tauIndex];
       otree->againstMuonTight3_2 = analysisTree.tau_againstMuonTight3[tauIndex];
       otree->againstElectronVLooseMVA6_2 = analysisTree.tau_againstElectronVLooseMVA6[tauIndex];
+      otree->againstElectronTightMVA6_2 = analysisTree.tau_againstElectronTightMVA6[tauIndex];
 
       otree->byTightIsolationMVArun2v1DBoldDMwLT_2 = analysisTree.tau_byTightIsolationMVArun2v1DBoldDMwLT[tauIndex];
 

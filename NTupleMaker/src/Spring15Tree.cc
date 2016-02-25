@@ -262,7 +262,7 @@ void Spring15Tree::WriteInit(TTree *tree) {
   fChain->Branch("lumi", &lumi, "lumi/I");
   fChain->Branch("evt", &evt, "evt/I");
   fChain->Branch("npv", &npv, "npv/I");
-  fChain->Branch("npu", &npu, "npu/I");
+  fChain->Branch("npu", &npu, "npu/F");
   fChain->Branch("rho", &rho, "rho/F");
   
   fChain->Branch("xs", &xs, "xs/F");
