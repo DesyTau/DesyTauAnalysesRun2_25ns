@@ -423,19 +423,19 @@ int main(int argc, char * argv[]) {
       
       // weights
       otree->mcweight = 1.;
-      otree->puweight = 0;
+      otree->pu_weight = 0;
 
 
       if(!isData)
 	otree->mcweight = analysisTree.genweight;
-	otree->puweight = float(PUofficial->get_PUweight(double(analysisTree.numtruepileupinteractions)));
+	otree->pu_weight = float(PUofficial->get_PUweight(double(analysisTree.numtruepileupinteractions)));
 
       otree->xs = xs;
       otree->trigweight_1 = 0;
-      otree->trigweight_2 = 0;
+      otree->trigweight_2 = 1;
       otree->idisoweight_1 = 0;
-      otree->idweight_2 = 0;
-      otree->isoweight_2 = 0;
+      otree->idisoweight_2 = 1;
+
       otree->effweight = 0;
       otree->fakeweight = 0;
       otree->embeddedWeight = 0;
@@ -674,6 +674,8 @@ int main(int argc, char * argv[]) {
 
       			// Scale Factor Id+Iso SF_eleIdIso
       otree->idisoweight_1 = (SF_muIdIso->get_ScaleFactor(double(analysisTree.muon_pt[muonIndex]),double(analysisTree.muon_eta[muonIndex])));
+
+      otree->effweight = (otree->trigweight_1)*(otree->idisoweight_1)*(otree->trigweight_2)*(otree->idisoweight_2);
       }
 
       // filling tau variables
@@ -690,7 +692,7 @@ int main(int argc, char * argv[]) {
       otree->dZ_2 = analysisTree.tau_leadchargedhadrcand_dz[tauIndex];      
       otree->iso_2 = analysisTree.tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[tauIndex];
       otree->m_2 = analysisTree.tau_mass[tauIndex];
-      otree->decayMode_2 = analysisTree.tau_decayMode[tauIndex];
+      otree->tau_decay_mode_2 = analysisTree.tau_decayMode[tauIndex];
 
       otree->byCombinedIsolationDeltaBetaCorrRaw3Hits_2 = analysisTree.tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[tauIndex];
       otree->byLooseCombinedIsolationDeltaBetaCorr3Hits_2 = analysisTree.tau_byLooseCombinedIsolationDeltaBetaCorr3Hits[tauIndex];

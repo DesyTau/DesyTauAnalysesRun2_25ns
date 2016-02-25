@@ -64,12 +64,11 @@ void Spring15Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("rho", &rho, &b_rho);
    fChain->SetBranchAddress("xs", &xs, &b_xs);
    fChain->SetBranchAddress("mcweight", &mcweight, &b_mcweight);
-   fChain->SetBranchAddress("puweight", &puweight, &b_puweight);
+   fChain->SetBranchAddress("pu_weight", &pu_weight, &b_pu_weight);
    fChain->SetBranchAddress("trigweight_1", &trigweight_1, &b_trigweight_1);
    fChain->SetBranchAddress("trigweight_2", &trigweight_2, &b_trigweight_2);
    fChain->SetBranchAddress("idisoweight_1", &idisoweight_1, &b_idisoweight_1);
-   fChain->SetBranchAddress("idweight_2", &idweight_2, &b_idweight_2);
-   fChain->SetBranchAddress("isoweight_2", &isoweight_2, &b_isoweight_2);
+   fChain->SetBranchAddress("idisoweight_2", &idisoweight_2, &b_idisoweight_2);
    fChain->SetBranchAddress("effweight", &effweight, &b_effweight);
    fChain->SetBranchAddress("fakeweight", &fakeweight, &b_fakeweight);
    fChain->SetBranchAddress("embeddedWeight", &embeddedWeight, &b_embeddedWeight);
@@ -107,7 +106,7 @@ void Spring15Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("mt_2", &mt_2, &b_mt_2);
    fChain->SetBranchAddress("pfmt_2", &pfmt_2, &b_pfmt_2);
    fChain->SetBranchAddress("puppimt_2", &puppimt_2, &b_puppimt_2);
-   fChain->SetBranchAddress("decayMode_2", &decayMode_2, &b_decayMode_2); 
+   fChain->SetBranchAddress("tau_decay_mode_2", &tau_decay_mode_2, &b_tau_decay_mode_2); 
    fChain->SetBranchAddress("os", &os, &b_os);
    fChain->SetBranchAddress("dilepton_veto", &dilepton_veto, &b_dilepton_veto);
    fChain->SetBranchAddress("extraelec_veto", &extraelec_veto, &b_extraelec_veto);
@@ -267,12 +266,11 @@ void Spring15Tree::WriteInit(TTree *tree) {
   
   fChain->Branch("xs", &xs, "xs/F");
   fChain->Branch("mcweight", &mcweight, "mcweight/F");
-  fChain->Branch("puweight", &puweight, "puweight/F");
+  fChain->Branch("pu_weight", &pu_weight, "pu_weight/F");
   fChain->Branch("trigweight_1", &trigweight_1, "trigweight_1/F");
   fChain->Branch("trigweight_2", &trigweight_2, "trigweight_2/F");
   fChain->Branch("idisoweight_1", &idisoweight_1, "idisoweight_1/F");
-  fChain->Branch("idweight_2", &idweight_2, "idweight_2/F");
-  fChain->Branch("isoweight_2", &isoweight_2, "isoweight_2/F");
+  fChain->Branch("idisoweight_2", &idisoweight_2, "idisoweight_2/F");
   fChain->Branch("effweight", &effweight, "effweight/F");
   fChain->Branch("fakeweight", &fakeweight, "fakeweight/F");
   fChain->Branch("embeddedWeight", &embeddedWeight, "embeddedWeight/F");
@@ -313,7 +311,7 @@ void Spring15Tree::WriteInit(TTree *tree) {
   fChain->Branch("mt_2", &mt_2, "mt_2/F");
   fChain->Branch("pfmt_2", &pfmt_2, "pfmt_2/F");
   fChain->Branch("puppimt_2", &puppimt_2, "puppimt_2/F");
-  fChain->Branch("decayMode_2", &decayMode_2, "decayMode_2/I");
+  fChain->Branch("tau_decay_mode_2", &tau_decay_mode_2, "tau_decay_mode_2/I");
   
   fChain->Branch("os", &os, "os/I");
   fChain->Branch("dilepton_veto", &dilepton_veto, "dilepton_veto/I");

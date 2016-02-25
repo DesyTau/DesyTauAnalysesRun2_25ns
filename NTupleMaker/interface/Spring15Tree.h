@@ -34,12 +34,11 @@ public :
   Float_t         rho;
   Float_t         xs;
   Float_t         mcweight;
-  Float_t         puweight;
+  Float_t         pu_weight;
   Float_t         trigweight_1;
   Float_t         trigweight_2;
   Float_t         idisoweight_1;
-  Float_t         idweight_2;
-  Float_t         isoweight_2;
+  Float_t         idisoweight_2;
   Float_t         effweight;
   Float_t         fakeweight;
   Float_t         embeddedWeight;
@@ -77,7 +76,7 @@ public :
   Float_t         mt_2;
   Float_t         pfmt_2;
   Float_t         puppimt_2;
-  Int_t 	  decayMode_2;
+  Int_t 	  tau_decay_mode_2;
   Int_t           os;
   Int_t           dilepton_veto;
   Int_t           extraelec_veto;
@@ -164,12 +163,11 @@ public :
   TBranch        *b_rho;   //!
   TBranch        *b_xs;   //!
   TBranch        *b_mcweight;   //!
-  TBranch        *b_puweight;   //!
+  TBranch        *b_pu_weight;   //!
   TBranch        *b_trigweight_1;   //!
   TBranch        *b_trigweight_2;   //!
   TBranch        *b_idisoweight_1;   //!
-  TBranch        *b_idweight_2;   //!
-  TBranch        *b_isoweight_2;   //!
+  TBranch        *b_idisoweight_2;   //!
   TBranch        *b_effweight;   //!
   TBranch        *b_fakeweight;   //!
   TBranch        *b_embeddedWeight;   //!
@@ -207,7 +205,7 @@ public :
   TBranch        *b_mt_2;   //!
   TBranch        *b_pfmt_2;   //!
   TBranch        *b_puppimt_2;   //!
-  TBranch        *b_decayMode_2;   //!
+  TBranch        *b_tau_decay_mode_2;   //!
   TBranch        *b_os;   //!
   TBranch        *b_dilepton_veto;   //!
   TBranch        *b_extraelec_veto;   //!

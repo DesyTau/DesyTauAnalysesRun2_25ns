@@ -423,18 +423,18 @@ int main(int argc, char * argv[]) {
       
       // weights
       otree->mcweight = 1.;
-      otree->puweight = 0;
+      otree->pu_weight = 0;
 
       if(!isData)
 	otree->mcweight = analysisTree.genweight;
-	otree->puweight = float(PUofficial->get_PUweight(double(analysisTree.numtruepileupinteractions)));
+	otree->pu_weight = float(PUofficial->get_PUweight(double(analysisTree.numtruepileupinteractions)));
 
       otree->xs = xs;
       otree->trigweight_1 = 0;
-      otree->trigweight_2 = 0;
+      otree->trigweight_2 = 1;
       otree->idisoweight_1 = 0;
-      otree->idweight_2 = 0;
-      otree->isoweight_2 = 0;
+      otree->idisoweight_2 = 1;
+
       otree->effweight = 0;
       otree->fakeweight = 0;
       otree->embeddedWeight = 0;
@@ -561,7 +561,7 @@ int main(int argc, char * argv[]) {
       
 	for (unsigned int it=0; it<taus.size(); ++it) {
 	  unsigned int tIndex = taus.at(it);
-	  float absIsoTau = analysisTree.tau_byIsolationMVArun2v1DBnewDMwLTraw[tIndex];
+	  float absIsoTau = analysisTree.tau_byIsolationMVArun2v1DBoldDMwLTraw[tIndex];
 	  float relIsoTau = absIsoTau / analysisTree.tau_pt[tIndex];
 
 	  if (debug)
@@ -670,6 +670,8 @@ int main(int argc, char * argv[]) {
 
       			// Scale Factor Id+Iso SF_eleIdIso
       otree->idisoweight_1 = (SF_eleIdIso->get_ScaleFactor(double(analysisTree.electron_pt[electronIndex]),double(analysisTree.electron_eta[electronIndex])));
+
+      otree->effweight = (otree->trigweight_1)*(otree->idisoweight_1)*(otree->trigweight_2)*(otree->idisoweight_2);
       }
 
       // filling tau variables
@@ -688,7 +690,7 @@ int main(int argc, char * argv[]) {
       otree->dZ_2 = analysisTree.tau_leadchargedhadrcand_dz[tauIndex];      
       otree->iso_2 = analysisTree.tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[tauIndex];
       otree->m_2 = analysisTree.tau_mass[tauIndex];
-      otree->decayMode_2 = analysisTree.tau_decayMode[tauIndex];
+      otree->tau_decay_mode_2 = analysisTree.tau_decayMode[tauIndex];
 
       otree->byCombinedIsolationDeltaBetaCorrRaw3Hits_2 = analysisTree.tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[tauIndex];
       otree->byLooseCombinedIsolationDeltaBetaCorr3Hits_2 = analysisTree.tau_byLooseCombinedIsolationDeltaBetaCorr3Hits[tauIndex];
@@ -702,6 +704,7 @@ int main(int argc, char * argv[]) {
       otree->againstMuonLoose3_2 = analysisTree.tau_againstMuonLoose3[tauIndex];
       otree->againstMuonTight3_2 = analysisTree.tau_againstMuonTight3[tauIndex];
       otree->againstElectronTightMVA6_2 = analysisTree.tau_againstElectronTightMVA6[tauIndex];
+      otree->againstElectronVLooseMVA6_2 = analysisTree.tau_againstElectronVLooseMVA6[tauIndex];	
 
       // ditau system
       TLorentzVector electronLV; electronLV.SetXYZM(analysisTree.electron_px[electronIndex],
