@@ -15,7 +15,6 @@
  <use name="HTT-utilities/LepEffInterface"/>
 </bin>
 
-
 <bin name="AnalysisMacro_dimuons" file="AnalysisMacro_dimuons.cpp">
  <use name="PhysicsTools/Utilities"/>
  <use name="rootgraphics"/>
@@ -26,7 +25,6 @@
  <use name="boost_program_options"/>
  <use name="DesyTauAnalyses/NTupleMaker"/>
  <use name="HTT-utilities/LepEffInterface"/>
- <use name="HTT-utilities/RecoilCorrections"/>
 </bin>
 
 <bin name="AnalysisMacro_dielectrons" file="AnalysisMacro_dielectrons.cpp">
@@ -115,6 +113,17 @@
 </bin>
 
 <bin name="SynchNTupleProducer_Spring15_et" file="SynchNTupleProducer_Spring15_et.cpp">
+ <use name="PhysicsTools/Utilities"/>
+ <use name="rootgraphics"/>
+ <use name="root"/>
+ <use name="rootmath"/>
+ <use name="roottmva"/>
+ <use name="boost" />
+ <use name="boost_program_options"/>
+ <use name="DesyTauAnalyses/NTupleMaker"/>
+</bin>
+
+<bin name="SynchNTupleProducer_Spring15_mutau" file="SynchNTupleProducer_Spring15_mutau.cpp">
  <use name="PhysicsTools/Utilities"/>
  <use name="rootgraphics"/>
  <use name="root"/>
