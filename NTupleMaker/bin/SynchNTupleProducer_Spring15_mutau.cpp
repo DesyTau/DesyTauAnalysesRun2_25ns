@@ -124,17 +124,41 @@ int main(int argc, char * argv[]) {
   
   using namespace std;
 
+  string cmsswBase = (getenv ("CMSSW_BASE"));
+
   // **** configuration analysis
   Config cfg(argv[1]);
+
+  // configuration process
+  const string sample = argv[2];
+  const bool isData = cfg.get<bool>("isData");
+  const string infiles = argv[2];
+
+  float xs = -1.;
+  lumi_json json;
+  if (isData){ 
+    const string json_name = cfg.get<string>("JSON");
+    read_json(TString(TString(cmsswBase)+"/src/"+TString(json_name)).Data(), json);
+  }
+
+  //pileup distrib
+  const string pileUpInDataFile = cfg.get<string>("pileUpInDataFile");
+  const string pileUpInMCFile = cfg.get<string>("pileUpInMCFile");
+
+  //lep eff
+  const string idIsoEffFile = cfg.get<string>("idIsoEffFile");
+  const string trigEffFile = cfg.get<string>("trigEffFile");
 
   //svfit
   const string svFitPtResFile = cfg.get<string>("svFitPtResFile");
 
-  //pileup distrib in data
-  const string pileUpInDataFile = cfg.get<string>("pileUpInDataFile");
-
   // HLT filters
-  string isoLeg;//   = cfg.get<string>("isoLegData");
+  string isoLeg;
+  if (isData){
+    isoLeg = cfg.get<string>("isoLegData");
+  }
+  else {isoLeg = cfg.get<string>("isoLegMC");}
+
   const float ptTrigObjCut  = cfg.get<float>("ptTrigObjCut");
   
   // vertex cuts
@@ -142,7 +166,7 @@ int main(int argc, char * argv[]) {
   const float zVertexCut     = cfg.get<float>("ZVertexCut");
   const float dVertexCut     = cfg.get<float>("DVertexCut");
 
-  // electron cuts
+  // muon cuts
   const float ptMuonLowCut   = cfg.get<float>("ptMuonLowCut");
   const float ptMuonHighCut  = cfg.get<float>("ptMuonHighCut");
   const float etaMuonCut     = cfg.get<float>("etaMuonCut");
@@ -211,28 +235,6 @@ int main(int argc, char * argv[]) {
   const bool debug = cfg.get<bool>("debug");
   
   // **** end of configuration analysis
-
-  // configuration process
-  Config cfg2(argv[2]);
-
-  const string sample = cfg2.get<string>("sample");
-  const bool isData = cfg2.get<bool>("isData");
-  const string infiles = cfg2.get<string>("infiles");
-  float xs = -1.;
-  lumi_json json;
-  if (isData){ 
-    const string json_name = cfg2.get<string>("JSON");
-    read_json(json_name, json);
-  }
-  else{
-    xs = cfg2.get<float>("xs");
-  }
-  if (isData){
-    isoLeg = cfg.get<string>("isoLegData");
-  }
-  else {isoLeg = cfg.get<string>("isoLegMC");}
-
-  // **** end of configuration analysis
     
   int ifile = 0;
   int jfile = -1;
@@ -277,13 +279,10 @@ int main(int argc, char * argv[]) {
   TString rootFileName(sample);
   std::string ntupleName("makeroottree/AC1B");
 
-
-  string cmsswBase = (getenv ("CMSSW_BASE"));
-
   // PU reweighting - initialization
   PileUp * PUofficial = new PileUp();
-  TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/"+TString(pileUpInDataFile),"read");
-  TFile * filePUdistribution_MC = new TFile (TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/MC_Spring15_PU25_Startup.root", "read");
+  TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/"+TString(pileUpInDataFile),"read");
+  TFile * filePUdistribution_MC = new TFile (TString(cmsswBase)+"/src/"+TString(pileUpInMCFile), "read");
   TH1D * PU_data = (TH1D *)filePUdistribution_data->Get("pileup");
   TH1D * PU_mc = (TH1D *)filePUdistribution_MC->Get("pileup");
   PUofficial->set_h_data(PU_data);
@@ -292,11 +291,11 @@ int main(int argc, char * argv[]) {
   // Lepton Scale Factors
   // Electron Id+Iso scale factor
   ScaleFactor * SF_muIdIso = new ScaleFactor();
-  SF_muIdIso->init_ScaleFactor(TString(cmsswBase)+"/src/HTT-utilities/LepEffInterface/data/Muon/Muon_IdIso0p1_fall15.root");
+  SF_muIdIso->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(idIsoEffFile));
 
   // Electron SingleElectron trigger scale factor
   ScaleFactor * SF_muTrigger = new ScaleFactor();
-  SF_muTrigger->init_ScaleFactor(TString(cmsswBase)+"/src/HTT-utilities/LepEffInterface/data/Muon/Muon_IsoMu18_fall15.root");
+  SF_muTrigger->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(trigEffFile));
 
   // output fileName with histograms
   rootFileName += "_";
