@@ -920,15 +920,15 @@ int main(int argc, char * argv[]) {
 	for (; iMet<analysisTree.mvamet_count; ++iMet) {
 	  if (analysisTree.mvamet_channel[iMet]==3){
 	    if( ((int)analysisTree.mvamet_lep1[iMet])==tauIndex && ((int)analysisTree.mvamet_lep2[iMet])==muonIndex)
-	    break;
+	      break;
 	  }
 	}
-/*
-	if ( fabs(analysisTree.mvamet_lep1_pt[iMet] - otree->pt_2) > 0.0001 )
-	  std::cout<<"tau pt does not match"<<std::endl;
-	if ( fabs(analysisTree.mvamet_lep2_pt[iMet] - otree->pt_1) > 0.0001 )
-	  std::cout<<"ele pt does not match"<<std::endl;
-*/
+	
+	if ( fabs(analysisTree.mvamet_lep1_pt[iMet] - otree->pt_2) > 0.01 )
+	  std::cout<<"tau pt does not match: tau="<<otree->pt_2<<" tau_mva="<<analysisTree.mvamet_lep1_pt[iMet]<<std::endl;
+	if ( fabs(analysisTree.mvamet_lep2_pt[iMet] - otree->pt_1) > 0.01 )
+	  std::cout<<"mu pt does not match: mu="<<otree->pt_1<<" mu_mva="<<analysisTree.mvamet_lep2_pt[iMet]<<std::endl;
+      
 	float mvamet_x = 0;
 	float mvamet_y = 0;
 	otree->mvacov00 = 0.;

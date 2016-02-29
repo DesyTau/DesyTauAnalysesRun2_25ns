@@ -72,8 +72,8 @@ Int_t NTupleMaker::find_lep(const Int_t nlep, const Float_t px[], const Float_t 
       std::cout<<"WARNING!!: Pairwise MVAMEt: duplicated lepton found!"<<std::endl;
   }
 
-  if(ilep < 0)
-    std::cout<<"WARNING!!: Pairwise MVAMEt: Lep not found, pt = "<<refp4.pt()<<std::endl;
+  //if(ilep < 0)
+  //  std::cout<<"WARNING!!: Pairwise MVAMEt: Lep not found, pt = "<<refp4.pt()<<std::endl;
   
   return ilep;
 }	
@@ -86,6 +86,7 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
   cYear(iConfig.getUntrackedParameter<unsigned int>("Year")),
   cPeriod(iConfig.getUntrackedParameter<std::string>("Period")),
   cSkim(iConfig.getUntrackedParameter<unsigned int>("Skim")),
+  cJECfile(iConfig.getUntrackedParameter<std::string>("JECfile")),
   // switches (collections)
   cgen(iConfig.getUntrackedParameter<bool>("GenParticles", false)),
   ctrigger(iConfig.getUntrackedParameter<bool>("Trigger", false)),
@@ -233,8 +234,8 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
 				 myManualCatWeigthsTrig);
 
   string cmsswBase = (getenv ("CMSSW_BASE"));
-  jecUnc = new JetCorrectionUncertainty(cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/JEC/Summer15_25nsV5_MC_Uncertainty_AK4PFchs.txt");  
-
+  jecUnc = new JetCorrectionUncertainty(cmsswBase+"/src/"+cJECfile);  
+  
   if(cgen && !cdata)
     consumes<LHEEventProduct>(edm::InputTag("externalLHEProducer"));
   
@@ -1484,12 +1485,12 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       assert(metsig.isValid());
       pfmetcorr_sig = *metsig;
 
-      /*pfmetcorr_sigxx = (*patMet)[0].getSignificanceMatrix()(0,0);
+      pfmetcorr_sigxx = (*patMet)[0].getSignificanceMatrix()(0,0);
       pfmetcorr_sigxy = (*patMet)[0].getSignificanceMatrix()(0,1);
       pfmetcorr_sigyx = (*patMet)[0].getSignificanceMatrix()(1,0);
-      pfmetcorr_sigyy = (*patMet)[0].getSignificanceMatrix()(1,1);*/
+      pfmetcorr_sigyy = (*patMet)[0].getSignificanceMatrix()(1,1);
 
-      pfmetcorr_ex_JetEnUp = (*patMet)[0].shiftedPx(pat::MET::METUncertainty::JetEnUp,pat::MET::METCorrectionLevel::Type1);
+      /*pfmetcorr_ex_JetEnUp = (*patMet)[0].shiftedPx(pat::MET::METUncertainty::JetEnUp,pat::MET::METCorrectionLevel::Type1);
       pfmetcorr_ey_JetEnUp = (*patMet)[0].shiftedPy(pat::MET::METUncertainty::JetEnUp,pat::MET::METCorrectionLevel::Type1);
 
       pfmetcorr_ex_JetEnDown = (*patMet)[0].shiftedPx(pat::MET::METUncertainty::JetEnDown,pat::MET::METCorrectionLevel::Type1);
@@ -1499,8 +1500,8 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       pfmetcorr_ey_UnclusteredEnUp = (*patMet)[0].shiftedPy(pat::MET::METUncertainty::UnclusteredEnUp,pat::MET::METCorrectionLevel::Type1);
 
       pfmetcorr_ex_UnclusteredEnDown = (*patMet)[0].shiftedPx(pat::MET::METUncertainty::UnclusteredEnDown,pat::MET::METCorrectionLevel::Type1);
-      pfmetcorr_ey_UnclusteredEnDown = (*patMet)[0].shiftedPy(pat::MET::METUncertainty::UnclusteredEnDown,pat::MET::METCorrectionLevel::Type1);
-
+      pfmetcorr_ey_UnclusteredEnDown = (*patMet)[0].shiftedPy(pat::MET::METUncertainty::UnclusteredEnDown,pat::MET::METCorrectionLevel::Type1);*/
+      
     } // crecpfmetcorr
 
   if(crecpuppimet)
@@ -1562,38 +1563,68 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	  mvamet_sigyx[mvamet_count] = met->getSignificanceMatrix()(1,0);
 	  mvamet_sigyy[mvamet_count] = met->getSignificanceMatrix()(1,1);
 
-	  mvamet_lep1_pt[mvamet_count] = met->userCand("lepton0")->pt();
-	  mvamet_lep2_pt[mvamet_count] = met->userCand("lepton1")->pt();
-
-	  if(mit->label().find("MuEle") != std::string::npos){
-	    mvamet_channel[mvamet_count] = EMU;
-	    mvamet_lep1[mvamet_count] = find_lep(muon_count, muon_px, muon_py, muon_pz, met->userCand("lepton0")->p4() );
-	    mvamet_lep2[mvamet_count] = find_lep(electron_count, electron_px, electron_py, electron_pz, met->userCand("lepton1")->p4() );
-	  }
-	  else if (mit->label().find("TauEle") != std::string::npos){
-	    mvamet_channel[mvamet_count] = ETAU;
-	    mvamet_lep1[mvamet_count] = find_lep(tau_count, tau_px, tau_py, tau_pz, met->userCand("lepton0")->p4() );
-	    mvamet_lep2[mvamet_count] = find_lep(electron_count, electron_px, electron_py, electron_pz, met->userCand("lepton1")->p4() );
-	  }
-	  else if(mit->label().find("TauMu") != std::string::npos){
-	    mvamet_channel[mvamet_count] = MUTAU;
-	    mvamet_lep1[mvamet_count] = find_lep(tau_count, tau_px, tau_py, tau_pz, met->userCand("lepton0")->p4() );
-	    mvamet_lep2[mvamet_count] = find_lep(muon_count, muon_px, muon_py, muon_pz, met->userCand("lepton1")->p4() );
-	  }
-	  else if(mit->label().find("DiTau") != std::string::npos){
-	    mvamet_channel[mvamet_count] = TAUTAU;
-	    mvamet_lep1[mvamet_count] = find_lep(tau_count, tau_px, tau_py, tau_pz, met->userCand("lepton0")->p4() );
-	    mvamet_lep2[mvamet_count] = find_lep(tau_count, tau_px, tau_py, tau_pz, met->userCand("lepton1")->p4() );
-	  }
-	  else if(mit->label().find("MuMu") != std::string::npos){
+	  if(met->userCand("lepton0")->isMuon() && (met->userCand("lepton1")->isMuon())){
 	    mvamet_channel[mvamet_count] = MUMU;
+	    mvamet_lep1_pt[mvamet_count] = met->userCand("lepton0")->pt();
+	    mvamet_lep2_pt[mvamet_count] = met->userCand("lepton1")->pt();
 	    mvamet_lep1[mvamet_count] = find_lep(muon_count, muon_px, muon_py, muon_pz, met->userCand("lepton0")->p4() );
 	    mvamet_lep2[mvamet_count] = find_lep(muon_count, muon_px, muon_py, muon_pz, met->userCand("lepton1")->p4() );
 	  }
-	  else if(mit->label().find("EleEle") != std::string::npos){
+	  else if (met->userCand("lepton0")->isMuon() && (met->userCand("lepton1")->isElectron())){
+	    mvamet_channel[mvamet_count] = EMU;
+	    mvamet_lep1_pt[mvamet_count] = met->userCand("lepton0")->pt();
+	    mvamet_lep2_pt[mvamet_count] = met->userCand("lepton1")->pt();
+	    mvamet_lep1[mvamet_count] = find_lep(muon_count, muon_px, muon_py, muon_pz, met->userCand("lepton0")->p4() );
+	    mvamet_lep2[mvamet_count] = find_lep(electron_count, electron_px, electron_py, electron_pz, met->userCand("lepton1")->p4() );
+	  }
+	  else if (met->userCand("lepton0")->isMuon() && !(met->userCand("lepton1")->isPhoton())){
+	    mvamet_channel[mvamet_count] = MUTAU;
+	    mvamet_lep1_pt[mvamet_count] = met->userCand("lepton1")->pt();
+	    mvamet_lep2_pt[mvamet_count] = met->userCand("lepton0")->pt();
+	    mvamet_lep1[mvamet_count] = find_lep(tau_count, tau_px, tau_py, tau_pz, met->userCand("lepton1")->p4() );
+	    mvamet_lep2[mvamet_count] = find_lep(muon_count, muon_px, muon_py, muon_pz, met->userCand("lepton0")->p4() );
+	  }
+	  else if (met->userCand("lepton0")->isElectron() && (met->userCand("lepton1")->isMuon())){
+	    mvamet_channel[mvamet_count] = EMU;
+	    mvamet_lep1_pt[mvamet_count] = met->userCand("lepton1")->pt();
+	    mvamet_lep2_pt[mvamet_count] = met->userCand("lepton0")->pt();
+	    mvamet_lep1[mvamet_count] = find_lep(muon_count, muon_px, muon_py, muon_pz, met->userCand("lepton1")->p4() );
+	    mvamet_lep2[mvamet_count] = find_lep(electron_count, electron_px, electron_py, electron_pz, met->userCand("lepton0")->p4() );
+	  }
+	  else if (met->userCand("lepton0")->isElectron() && (met->userCand("lepton1")->isElectron())){
 	    mvamet_channel[mvamet_count] = EE;
+	    mvamet_lep1_pt[mvamet_count] = met->userCand("lepton0")->pt();
+	    mvamet_lep2_pt[mvamet_count] = met->userCand("lepton1")->pt();
 	    mvamet_lep1[mvamet_count] = find_lep(electron_count, electron_px, electron_py, electron_pz, met->userCand("lepton0")->p4() );
 	    mvamet_lep2[mvamet_count] = find_lep(electron_count, electron_px, electron_py, electron_pz, met->userCand("lepton1")->p4() );
+	  }
+	  else if (met->userCand("lepton0")->isElectron() && !(met->userCand("lepton1")->isPhoton())){
+	    mvamet_channel[mvamet_count] = ETAU;
+	    mvamet_lep1_pt[mvamet_count] = met->userCand("lepton1")->pt();
+	    mvamet_lep2_pt[mvamet_count] = met->userCand("lepton0")->pt();
+	    mvamet_lep1[mvamet_count] = find_lep(tau_count, tau_px, tau_py, tau_pz, met->userCand("lepton1")->p4() );
+	    mvamet_lep2[mvamet_count] = find_lep(electron_count, electron_px, electron_py, electron_pz, met->userCand("lepton0")->p4() );
+	  }
+	  else if (!met->userCand("lepton0")->isPhoton() && (met->userCand("lepton1")->isMuon())){
+	    mvamet_channel[mvamet_count] = MUTAU;
+	    mvamet_lep1_pt[mvamet_count] = met->userCand("lepton0")->pt();
+	    mvamet_lep2_pt[mvamet_count] = met->userCand("lepton1")->pt();
+	    mvamet_lep1[mvamet_count] = find_lep(tau_count, tau_px, tau_py, tau_pz, met->userCand("lepton0")->p4() );
+	    mvamet_lep2[mvamet_count] = find_lep(muon_count, muon_px, muon_py, muon_pz, met->userCand("lepton1")->p4() );
+	  }
+	  else if (!met->userCand("lepton0")->isPhoton() && (met->userCand("lepton1")->isElectron())){
+	    mvamet_channel[mvamet_count] = ETAU;
+	    mvamet_lep1_pt[mvamet_count] = met->userCand("lepton0")->pt();
+	    mvamet_lep2_pt[mvamet_count] = met->userCand("lepton1")->pt();
+	    mvamet_lep1[mvamet_count] = find_lep(tau_count, tau_px, tau_py, tau_pz, met->userCand("lepton0")->p4() );
+	    mvamet_lep2[mvamet_count] = find_lep(electron_count, electron_px, electron_py, electron_pz, met->userCand("lepton1")->p4() );
+	  }
+	  else if (!met->userCand("lepton0")->isPhoton() && !(met->userCand("lepton1")->isPhoton())){
+	    mvamet_channel[mvamet_count] = ETAU;
+	    mvamet_lep1_pt[mvamet_count] = met->userCand("lepton0")->pt();
+	    mvamet_lep2_pt[mvamet_count] = met->userCand("lepton1")->pt();
+	    mvamet_lep1[mvamet_count] = find_lep(tau_count, tau_px, tau_py, tau_pz, met->userCand("lepton0")->p4() );
+	    mvamet_lep2[mvamet_count] = find_lep(tau_count, tau_px, tau_py, tau_pz, met->userCand("lepton1")->p4() );
 	  }
 	  else {
 	    mvamet_channel[mvamet_count] = UNKNOWN;

@@ -287,7 +287,8 @@ class NTupleMaker : public edm::EDAnalyzer{
   unsigned int cYear;
   std::string cPeriod;
   unsigned int cSkim;
-
+  std::string cJECfile;
+  
   bool cgen;
   bool ctrigger;
   bool cbeamspot;
