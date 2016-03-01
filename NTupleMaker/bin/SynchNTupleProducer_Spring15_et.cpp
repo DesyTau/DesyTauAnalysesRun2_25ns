@@ -523,20 +523,20 @@ int main(int argc, char * argv[]) {
       for (unsigned int ie=0; ie<electrons.size(); ++ie) {
 	unsigned int eIndex  = electrons.at(ie);
 
-	float neutralHadIsoEle = analysisTree.electron_neutralHadIso[ie];
-	float photonIsoEle = analysisTree.electron_photonIso[ie];
-	float chargedHadIsoEle = analysisTree.electron_chargedHadIso[ie];
-	float puIsoEle = analysisTree.electron_puIso[ie];
+	float neutralHadIsoEle = analysisTree.electron_neutralHadIso[eIndex];
+	float photonIsoEle = analysisTree.electron_photonIso[eIndex];
+	float chargedHadIsoEle = analysisTree.electron_chargedHadIso[eIndex];
+	float puIsoEle = analysisTree.electron_puIso[eIndex];
 	if (isIsoR03) {
-	  neutralHadIsoEle = analysisTree.electron_r03_sumNeutralHadronEt[ie];
-	  photonIsoEle = analysisTree.electron_r03_sumPhotonEt[ie];
-	  chargedHadIsoEle = analysisTree.electron_r03_sumChargedHadronPt[ie];
-	  puIsoEle = analysisTree.electron_r03_sumPUPt[ie];
+	  neutralHadIsoEle = analysisTree.electron_r03_sumNeutralHadronEt[eIndex];
+	  photonIsoEle = analysisTree.electron_r03_sumPhotonEt[eIndex];
+	  chargedHadIsoEle = analysisTree.electron_r03_sumChargedHadronPt[eIndex];
+	  puIsoEle = analysisTree.electron_r03_sumPUPt[eIndex];
 	}
 	float neutralIsoEle = neutralHadIsoEle + photonIsoEle - 0.5*puIsoEle;
 	neutralIsoEle = TMath::Max(float(0),neutralIsoEle); 
 	float absIsoEle =  chargedHadIsoEle + neutralIsoEle;
-	float relIsoEle = absIsoEle/analysisTree.electron_pt[ie];
+	float relIsoEle = absIsoEle/analysisTree.electron_pt[eIndex];
 	
 	if (debug)
 	  fileOutput << "Electron " << eIndex << " -> relIso = "<<relIsoEle<<" absIso = "<<absIsoEle<<std::endl;

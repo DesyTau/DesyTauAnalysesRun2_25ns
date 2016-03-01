@@ -466,12 +466,12 @@ int main(int argc, char * argv[]) {
 
 	bool muonMediumId = analysisTree.muon_isMedium[im];
 	
-	if (debug)
+	if (debug || otree->evt == 164493717 )
 	  fileOutput << "  " << im
 		     << " pt = " << analysisTree.muon_pt[im] 
 		     << " eta = " << analysisTree.muon_eta[im]
 		     << " dxy = " << analysisTree.muon_dxy[im]
-		     << " dz  = " << analysisTree.muon_dz[im];
+		     << " dz  = " << analysisTree.muon_dz[im] << std::endl;
 		     //<< " passConv = " << analysisTree.electron_pass_conversion[ie]
 		     //<< " nmisshits = " << int(analysisTree.electron_nmissinginnerhits[ie])
 		     //<< " mvaTight = " << electronMvaId << std::endl;
@@ -482,6 +482,13 @@ int main(int argc, char * argv[]) {
 	if (!muonMediumId&&applyMuonId) continue;
 	//if (!analysisTree.electron_pass_conversion[ie]&&applyElectronId) continue;
 	//if (analysisTree.electron_nmissinginnerhits[ie]>1&&applyElectronId) continue;
+
+	if (debug || otree->evt == 164493717 )
+	  fileOutput << "  " << im
+		     << " pt = " << analysisTree.muon_pt[im] 
+		     << " eta = " << analysisTree.muon_eta[im]
+		     << " dxy = " << analysisTree.muon_dxy[im]
+		     << " dz  = " << analysisTree.muon_dz[im] << std::endl;
 	muons.push_back(im);
       }
 
@@ -522,25 +529,27 @@ int main(int argc, char * argv[]) {
       
       float isoMuMin = 1e+10;
       float isoTauMin = 1e+10;      
+
+
       for (unsigned int im=0; im<muons.size(); ++im) {
 	unsigned int mIndex  = muons.at(im);
 
-	float neutralHadIsoMu = analysisTree.muon_neutralHadIso[im];
-	float photonIsoMu = analysisTree.muon_photonIso[im];
-	float chargedHadIsoMu = analysisTree.muon_chargedHadIso[im];
-	float puIsoMu = analysisTree.muon_puIso[im];
+	float neutralHadIsoMu = analysisTree.muon_neutralHadIso[mIndex];
+	float photonIsoMu = analysisTree.muon_photonIso[mIndex];
+	float chargedHadIsoMu = analysisTree.muon_chargedHadIso[mIndex];
+	float puIsoMu = analysisTree.muon_puIso[mIndex];
 	if (isIsoR03) {
-	  neutralHadIsoMu = analysisTree.muon_r03_sumNeutralHadronEt[im];
-	  photonIsoMu = analysisTree.muon_r03_sumPhotonEt[im];
-	  chargedHadIsoMu = analysisTree.muon_r03_sumChargedHadronPt[im];
-	  puIsoMu = analysisTree.muon_r03_sumPUPt[im];
+	  neutralHadIsoMu = analysisTree.muon_r03_sumNeutralHadronEt[mIndex];
+	  photonIsoMu = analysisTree.muon_r03_sumPhotonEt[mIndex];
+	  chargedHadIsoMu = analysisTree.muon_r03_sumChargedHadronPt[mIndex];
+	  puIsoMu = analysisTree.muon_r03_sumPUPt[mIndex];
 	}
 	float neutralIsoMu = neutralHadIsoMu + photonIsoMu - 0.5*puIsoMu;
 	neutralIsoMu = TMath::Max(float(0),neutralIsoMu); 
 	float absIsoMu =  chargedHadIsoMu + neutralIsoMu;
-	float relIsoMu = absIsoMu/analysisTree.muon_pt[im];
+	float relIsoMu = absIsoMu/analysisTree.muon_pt[mIndex];
 	
-	if (debug)
+	if (debug || fabs(otree->evt - 164493717) < 1.)
 	  fileOutput << "Muon " << mIndex << " -> relIso = "<<relIsoMu<<" absIso = "<<absIsoMu<<std::endl;
 
 	bool isSingleLepTrig = false;
@@ -553,9 +562,9 @@ int main(int argc, char * argv[]) {
 	      isSingleLepTrig = true;
 	  }
 	}
-	  
-	if (debug)
-	  fileOutput << "Muon " << mIndex << " -> isTrigMu18 = " << isSingleLepTrig << std::endl;
+	
+	if (debug  || otree->evt == 164493717 )
+	  fileOutput << "Muon " << mIndex << " -> isTrigMu = " << isSingleLepTrig << std::endl;
 
 	if (!isSingleLepTrig) continue;
       
@@ -566,13 +575,13 @@ int main(int argc, char * argv[]) {
 	  float absIsoTau = analysisTree.tau_byIsolationMVArun2v1DBoldDMwLTraw[tIndex];
 	  float relIsoTau = absIsoTau / analysisTree.tau_pt[tIndex];
 
-	  if (debug)
+	  if (debug || otree->evt == 164493717 )
 	    fileOutput << "tau" << tIndex << " -> relIso = "<<relIsoTau<<" absIso = "<<absIsoTau<<std::endl;
 	  
 	  float dR = deltaR(analysisTree.tau_eta[tIndex],analysisTree.tau_phi[tIndex],
 			    analysisTree.muon_eta[mIndex],analysisTree.muon_phi[mIndex]);
 
-	  if (debug)
+	  if (debug || otree->evt == 164493717 )
 	    fileOutput << "dR(mu,tau) = " << dR << std::endl;
 
 	  if (dR<dRleptonsCut) continue;
