@@ -47,8 +47,7 @@
 #define r2d 57.2957795130823229
 
 #define electronMass 0
-//#define muonMass 0.10565837
-#define muonMass 0.1057
+#define muonMass 0.10565837
 #define tauMass 1.77682
 #define pionMass 0.1396
 

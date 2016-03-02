@@ -1219,6 +1219,7 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   muon_count = 0;
   dimuon_count = 0;
   tau_count = 0;
+  l1isotau_count = 0;
   gentau_count = 0;
   pfjet_count = 0;
   electron_count = 0;
