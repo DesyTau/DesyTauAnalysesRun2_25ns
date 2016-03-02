@@ -297,6 +297,7 @@ class NTupleMaker : public edm::EDAnalyzer{
   bool crecmuon;
   bool crecelectron;
   bool crectau;
+  bool cl1isotau;
   bool crecphoton;
   bool crecpfjet;
   bool crecpfmet;
@@ -359,6 +360,7 @@ class NTupleMaker : public edm::EDAnalyzer{
   edm::EDGetTokenT<edm::ValueMap<int> >   mvaTrigCategoriesMapToken_;
 
   edm::EDGetTokenT<pat::TauCollection> TauCollectionToken_;
+  edm::EDGetTokenT<l1extra::L1JetParticleCollection> L1IsoTauCollectionToken_;
   edm::EDGetTokenT<pat::JetCollection> JetCollectionToken_;
 
   edm::EDGetTokenT<pat::METCollection> MetCollectionToken_;
@@ -815,6 +817,18 @@ class NTupleMaker : public edm::EDAnalyzer{
   string gentau_decayMode_name[M_taumaxcount];
   UChar_t gentau_mother[M_taumaxcount];
 
+  // L1 Iso Tau
+  UInt_t l1isotau_count;
+  Float_t l1isotau_e[M_taumaxcount];
+  Float_t l1isotau_px[M_taumaxcount];
+  Float_t l1isotau_py[M_taumaxcount];
+  Float_t l1isotau_pz[M_taumaxcount];
+  Float_t l1isotau_pt[M_taumaxcount];
+  Float_t l1isotau_eta[M_taumaxcount];
+  Float_t l1isotau_phi[M_taumaxcount];
+  Float_t l1isotau_mass[M_taumaxcount];  
+  Float_t l1isotau_charge[M_taumaxcount]; 
+  
   // rho neutral
   Float_t rhoNeutral;
 

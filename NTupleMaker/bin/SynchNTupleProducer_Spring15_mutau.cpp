@@ -47,7 +47,8 @@
 #define r2d 57.2957795130823229
 
 #define electronMass 0
-#define muonMass 0.10565837
+//#define muonMass 0.10565837
+#define muonMass 0.1057
 #define tauMass 1.77682
 #define pionMass 0.1396
 
@@ -466,7 +467,7 @@ int main(int argc, char * argv[]) {
 
 	bool muonMediumId = analysisTree.muon_isMedium[im];
 	
-	if (debug || otree->evt == 164493717 )
+	if (debug)
 	  fileOutput << "  " << im
 		     << " pt = " << analysisTree.muon_pt[im] 
 		     << " eta = " << analysisTree.muon_eta[im]
@@ -483,7 +484,7 @@ int main(int argc, char * argv[]) {
 	//if (!analysisTree.electron_pass_conversion[ie]&&applyElectronId) continue;
 	//if (analysisTree.electron_nmissinginnerhits[ie]>1&&applyElectronId) continue;
 
-	if (debug || otree->evt == 164493717 )
+	if (debug)
 	  fileOutput << "  " << im
 		     << " pt = " << analysisTree.muon_pt[im] 
 		     << " eta = " << analysisTree.muon_eta[im]
@@ -549,7 +550,7 @@ int main(int argc, char * argv[]) {
 	float absIsoMu =  chargedHadIsoMu + neutralIsoMu;
 	float relIsoMu = absIsoMu/analysisTree.muon_pt[mIndex];
 	
-	if (debug || fabs(otree->evt - 164493717) < 1.)
+	if (debug)
 	  fileOutput << "Muon " << mIndex << " -> relIso = "<<relIsoMu<<" absIso = "<<absIsoMu<<std::endl;
 
 	bool isSingleLepTrig = false;
@@ -563,7 +564,7 @@ int main(int argc, char * argv[]) {
 	  }
 	}
 	
-	if (debug  || otree->evt == 164493717 )
+	if (debug)
 	  fileOutput << "Muon " << mIndex << " -> isTrigMu = " << isSingleLepTrig << std::endl;
 
 	if (!isSingleLepTrig) continue;
@@ -575,13 +576,13 @@ int main(int argc, char * argv[]) {
 	  float absIsoTau = analysisTree.tau_byIsolationMVArun2v1DBoldDMwLTraw[tIndex];
 	  float relIsoTau = absIsoTau / analysisTree.tau_pt[tIndex];
 
-	  if (debug || otree->evt == 164493717 )
+	  if (debug)
 	    fileOutput << "tau" << tIndex << " -> relIso = "<<relIsoTau<<" absIso = "<<absIsoTau<<std::endl;
 	  
 	  float dR = deltaR(analysisTree.tau_eta[tIndex],analysisTree.tau_phi[tIndex],
 			    analysisTree.muon_eta[mIndex],analysisTree.muon_phi[mIndex]);
 
-	  if (debug || otree->evt == 164493717 )
+	  if (debug)
 	    fileOutput << "dR(mu,tau) = " << dR << std::endl;
 
 	  if (dR<dRleptonsCut) continue;

@@ -272,6 +272,16 @@ public :
    Char_t          tau_decayMode_name[50];   //[tau_count]
    Int_t           tau_decayMode[50];   //[tau_count]
    Int_t           tau_genmatch[50];   //[tau_count]
+   UInt_t          l1isotau_count;
+   Float_t         l1isotau_e[50];   //[l1isotau_count]
+   Float_t         l1isotau_px[50];   //[l1isotau_count]
+   Float_t         l1isotau_py[50];   //[l1isotau_count]
+   Float_t         l1isotau_pz[50];   //[l1isotau_count]
+   Float_t         l1isotau_mass[50];   //[l1isotau_count]
+   Float_t         l1isotau_eta[50];   //[l1isotau_count]
+   Float_t         l1isotau_phi[50];   //[l1isotau_count]
+   Float_t         l1isotau_pt[50];   //[l1isotau_count]
+   Float_t         l1isotau_charge[50];   //[l1isotau_count]  
    Float_t         pfmet_ex;
    Float_t         pfmet_ey;
    Float_t         pfmet_ez;
@@ -697,6 +707,16 @@ public :
    TBranch        *b_tau_decayMode_name;   //!
    TBranch        *b_tau_decayMode;   //!
    TBranch        *b_tau_genmatch;   //!
+   TBranch        *b_l1isotau_count;   //!
+   TBranch        *b_l1isotau_e;   //!
+   TBranch        *b_l1isotau_px;   //!
+   TBranch        *b_l1isotau_py;   //!
+   TBranch        *b_l1isotau_pz;   //!
+   TBranch        *b_l1isotau_mass;   //!
+   TBranch        *b_l1isotau_eta;   //!
+   TBranch        *b_l1isotau_phi;   //!
+   TBranch        *b_l1isotau_pt;   //!
+   TBranch        *b_l1isotau_charge;   //! 
    TBranch        *b_pfmet_ex;   //!
    TBranch        *b_pfmet_ey;   //!
    TBranch        *b_pfmet_ez;   //!
@@ -1227,6 +1247,16 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("tau_decayMode_name", tau_decayMode_name, &b_tau_decayMode_name);
    fChain->SetBranchAddress("tau_decayMode", tau_decayMode, &b_tau_decayMode);
    fChain->SetBranchAddress("tau_genmatch", tau_genmatch, &b_tau_genmatch);
+   fChain->SetBranchAddress("l1isotau_count", &l1isotau_count, &b_l1isotau_count);
+   fChain->SetBranchAddress("l1isotau_e", l1isotau_e, &b_l1isotau_e);
+   fChain->SetBranchAddress("l1isotau_px", l1isotau_px, &b_l1isotau_px);
+   fChain->SetBranchAddress("l1isotau_py", l1isotau_py, &b_l1isotau_py);
+   fChain->SetBranchAddress("l1isotau_pz", l1isotau_pz, &b_l1isotau_pz);
+   fChain->SetBranchAddress("l1isotau_mass", l1isotau_mass, &b_l1isotau_mass);
+   fChain->SetBranchAddress("l1isotau_eta", l1isotau_eta, &b_l1isotau_eta);
+   fChain->SetBranchAddress("l1isotau_phi", l1isotau_phi, &b_l1isotau_phi);
+   fChain->SetBranchAddress("l1isotau_pt", l1isotau_pt, &b_l1isotau_pt);
+   fChain->SetBranchAddress("l1isotau_charge", l1isotau_charge, &b_l1isotau_charge); 
    fChain->SetBranchAddress("pfmet_ex", &pfmet_ex, &b_pfmet_ex);
    fChain->SetBranchAddress("pfmet_ey", &pfmet_ey, &b_pfmet_ey);
    fChain->SetBranchAddress("pfmet_ez", &pfmet_ez, &b_pfmet_ez);

@@ -18,7 +18,7 @@ usePUJetID5X = True
 
 
 # Define the CMSSW process
-process = cms.Process("MVAMET")
+process = cms.Process("TreeProducer")
 
 # Load the standard set of configuration modules
 process.load('Configuration.StandardSequences.Services_cff')
@@ -40,7 +40,7 @@ process.options = cms.untracked.PSet(
 
 # How many events to process
 process.maxEvents = cms.untracked.PSet( 
-   input = cms.untracked.int32(20)
+   input = cms.untracked.int32(-1)
 )
 
 
@@ -59,9 +59,9 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condD
 from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag
 
 if runOnData:
-  process.GlobalTag.globaltag = '76X_dataRun2_v15'
+  process.GlobalTag.globaltag = '76X_dataRun2_16Dec2015_v0'
 else:
-  process.GlobalTag.globaltag = '76X_mcRun2_asymptotic_v12'
+  process.GlobalTag.globaltag = '76X_mcRun2_asymptotic_RunIIFall15DR76_v1'
 
 print 'The conditions are =======>',process.GlobalTag.globaltag
     
@@ -112,6 +112,8 @@ process.patJetsReapplyJEC = patJetsUpdated.clone(
 
 ### END ReRun JEC ======================================================================================
 
+
+"""
 ### PFMET Corrections ==================================================================================
 
 ### ---------------------------------------------------------------------------
@@ -130,13 +132,11 @@ from PhysicsTools.PatUtils.tools.runMETCorrectionsAndUncertainties import runMet
 
 #default configuration for miniAOD reprocessing, change the isData flag to run on data
 #for a full met computation, remove the pfCandColl input
-jecUncertaintyFile="DesyTauAnalyses/NTupleMaker/data/Fall15_25nsV2/Fall15_25nsV2_DATA_UncertaintySources_AK4PFchs.txt"
 
 runMetCorAndUncFromMiniAOD(process,
                            isData=runOnData,
-                           #jecUncFile=jecUncertaintyFile
                            )
-"""
+
 if not useHFCandidates:
     runMetCorAndUncFromMiniAOD(process,
                                isData=runOnData,
@@ -165,9 +165,9 @@ if not applyResiduals:
           process.shiftedPatJetEnDownNoHF.jetCorrLabelUpToL3Res = cms.InputTag("ak4PFCHSL1FastL2L3Corrector")
           process.shiftedPatJetEnUpNoHF.jetCorrLabelUpToL3Res = cms.InputTag("ak4PFCHSL1FastL2L3Corrector")
 ### ------------------------------------------------------------------
-"""
-### END PFMET CORRECTIONS ==============================================================================
 
+### END PFMET CORRECTIONS ==============================================================================
+"""
 
 # Electron ID ==========================================================================================
 
@@ -225,7 +225,7 @@ process.source = cms.Source("PoolSource",
 #####################################################
 
 # Pairwise MVA MET ================================================================================= 
-"""
+
 ## PreSelection for pairwise MVA MEt
 process.muonMVAMET = cms.EDFilter("PATMuonSelector",
     src = cms.InputTag("slimmedMuons"),
@@ -245,19 +245,22 @@ process.tauMVAMET = cms.EDFilter("PATTauSelector",
 process.leptonPreSelectionSequence = cms.Sequence(process.muonMVAMET+
                                                   process.electronMVAMET+
                                                   process.tauMVAMET)
-"""
-# mva MET
-#from RecoMET.METPUSubtraction.MVAMETConfiguration_cff import runMVAMET
-#runMVAMET( process, jetCollectionPF = "patJetsReapplyJEC"  )
-#process.MVAMET.srcLeptons  = cms.VInputTag("muonMVAMET", "electronMVAMET", "tauMVAMET")
-#process.MVAMET.requireOS = cms.bool(False)
 
+# mva MET
 from RecoMET.METPUSubtraction.MVAMETConfiguration_cff import runMVAMET
 runMVAMET( process, jetCollectionPF = "patJetsReapplyJEC"  )
-process.MVAMET.srcLeptons  = cms.VInputTag("slimmedMuons", "slimmedElectrons", "slimmedTaus")
+process.MVAMET.srcLeptons  = cms.VInputTag("muonMVAMET", "electronMVAMET", "tauMVAMET")
 process.MVAMET.requireOS = cms.bool(False)
 
-process.mvaMetSequence  = cms.Sequence(#process.leptonPreSelectionSequence +
+"""
+for i in range(len(process.MVAMET.srcMETs)):
+  met = process.MVAMET.srcMETs[i]
+  if (met.getModuleLabel() == "slimmedMETs"):
+    if (met.getProcessName() == ''):
+      process.MVAMET.srcMETs[i].setProcessName("@skipCurrentProcess")
+"""
+
+process.mvaMetSequence  = cms.Sequence(process.leptonPreSelectionSequence +
                                        process.MVAMET)
 # END Pairwise MVA MET ==============================================================
 
@@ -307,6 +310,7 @@ RecMuon = cms.untracked.bool(True),
 RecPhoton = cms.untracked.bool(False),
 RecElectron = cms.untracked.bool(True),
 RecTau = cms.untracked.bool(True),
+L1IsoTau = cms.untracked.bool(True),
 RecJet = cms.untracked.bool(True),
 # collections
 MuonCollectionTag = cms.InputTag("slimmedMuons"), 
@@ -327,23 +331,18 @@ mvaTrigValuesMap     = cms.InputTag("electronMVAValueMapProducer:ElectronMVAEsti
 mvaTrigCategoriesMap = cms.InputTag("electronMVAValueMapProducer:ElectronMVAEstimatorRun2Spring15Trig25nsV1Categories"),
 
 TauCollectionTag = cms.InputTag("slimmedTaus"),
-JetCollectionTag = cms.InputTag("patJetsReapplyJEC::MVAMET"),
+IsoTauCollectionTag = cms.InputTag("IsoTau"),
+JetCollectionTag = cms.InputTag("patJetsReapplyJEC::TreeProducer"),
 #JetCollectionTag = cms.InputTag("slimmedJets"),
 MetCollectionTag = cms.InputTag("slimmedMETs::RECO"),
-MetCovMatrixTag = cms.InputTag("METSignificance:METCovariance:MVAMET"),
-MetSigTag = cms.InputTag("METSignificance:METSignificance:MVAMET"),
-MetCorrCovMatrixTag = cms.InputTag("METCorrSignificance:METCovariance:MVAMET"),
-MetCorrSigTag = cms.InputTag("METCorrSignificance:METSignificance:MVAMET"),
-MetCorrCollectionTag = cms.InputTag("slimmedMETs::RECO"),
+MetCovMatrixTag = cms.InputTag("METSignificance:METCovariance:TreeProducer"),
+MetSigTag = cms.InputTag("METSignificance:METSignificance:TreeProducer"),
+MetCorrCovMatrixTag = cms.InputTag("METCorrSignificance:METCovariance:TreeProducer"),
+MetCorrSigTag = cms.InputTag("METCorrSignificance:METSignificance:TreeProducer"),
+#MetCorrCollectionTag = cms.InputTag("slimmedMETs::TreeProducer"),
+MetCorrCollectionTag = cms.InputTag("patpfMETT1::TreeProducer"),
 PuppiMetCollectionTag = cms.InputTag("slimmedMETsPuppi"),
-#MvaMetCollectionsTag = cms.VInputTag(cms.InputTag("mvaMETDiTau","MVAMET","TreeProducer"),
-#                                     cms.InputTag("mvaMETTauMu","MVAMET","TreeProducer"),
-#                                     cms.InputTag("mvaMETTauEle","MVAMET","TreeProducer"),
-#                                     cms.InputTag("mvaMETMuEle","MVAMET","TreeProducer"),
-#                                     cms.InputTag("mvaMETMuMu","MVAMET","TreeProducer"),
-#                                     cms.InputTag("mvaMETEleEle","MVAMET","TreeProducer")),"""
-MvaMetCollectionsTag = cms.VInputTag(cms.InputTag("MVAMET","MVAMET","MVAMET")),
-#MvaMetCollectionsTag = cms.VInputTag("pfMVAMEt"),
+MvaMetCollectionsTag = cms.VInputTag(cms.InputTag("MVAMET","MVAMET","TreeProducer")),
 TrackCollectionTag = cms.InputTag("generalTracks"),
 GenParticleCollectionTag = cms.InputTag("prunedGenParticles"),
 TriggerObjectCollectionTag = cms.InputTag("selectedPatTrigger"),
@@ -382,6 +381,13 @@ HLTriggerPaths = cms.untracked.vstring(
 'HLT_DoubleMediumIsoPFTau40_Trk1_eta2p1_Reg_v',
 'HLT_Ele32_eta2p1_WPTight_Gsf_v',
 'HLT_DoubleMediumIsoPFTau35_Trk1_eta2p1_Reg_v',
+'HLT_PFMETNoMu90_JetIdCleaned_PFMHTNoMu90_IDTight_v',
+'HLT_PFMETNoMu120_JetIdCleaned_PFMHTNoMu120_IDTight_v',
+'HLT_PFMETNoMu90_NoiseCleaned_PFMHTNoMu90_IDTight_v',
+'HLT_PFMETNoMu120_NoiseCleaned_PFMHTNoMu120_IDTight_v',
+'HLT_PFJet60_v',
+'HLT_PFJet80_v',
+'HLT_PFJet140_v'
 ),
 TriggerProcess = cms.untracked.string("HLT"),
 # tracks
@@ -521,7 +527,11 @@ RecTauNum = cms.untracked.int32(0),
 # jets
 RecJetPtMin = cms.untracked.double(18.),
 RecJetEtaMax = cms.untracked.double(5.2),
-RecJetHLTriggerMatching = cms.untracked.vstring(),
+RecJetHLTriggerMatching = cms.untracked.vstring(
+'HLT_PFJet60_v.*:hltSinglePFJet60',
+'HLT_PFJet80_v.*:hltSinglePFJet80',
+'HLT_PFJet140_v.*:hltSinglePFJet140'
+),
 RecJetBtagDiscriminators = cms.untracked.vstring(
 'pfCombinedInclusiveSecondaryVertexV2BJetTags',
 'pfJetProbabilityBJetTags'
@@ -535,8 +545,8 @@ process.load("RecoMET/METProducers.METSignificance_cfi")
 process.load("RecoMET/METProducers.METSignificanceParams_cfi")
 
 process.METCorrSignificance = process.METSignificance.clone(
-  srcPfJets = cms.InputTag('patJetsReapplyJEC::MVAMET'),
-  srcMet = cms.InputTag('patpfMETT1::MVAMET')
+  srcPfJets = cms.InputTag('patJetsReapplyJEC::TreeProducer'),
+  srcMet = cms.InputTag('patpfMETT1::TreeProducer')
 )
 
 process.p = cms.Path(
@@ -552,24 +562,23 @@ process.p = cms.Path(
 )
 
 process.TFileService = cms.Service("TFileService",
-                                   fileName = cms.string("output.root")
+                                   fileName = cms.string("output_DATA.root")
                                  )
 
 process.output = cms.OutputModule("PoolOutputModule",
-                                  fileName = cms.untracked.string('output_particles.root'),
+                                  fileName = cms.untracked.string('output_particles_DATA.root'),
                                   outputCommands = cms.untracked.vstring(
                                     'keep *_slimmedMETs_*_*',
 				    'keep *_MVAMET_*_*',
                                     'keep *_patpfMETT1_*_*'
-                                    #'keep *_*_*_TreeProducer'
                                   ),        
                                   SelectEvents = cms.untracked.PSet(  SelectEvents = cms.vstring('p'))
 )
 
-process.end = cms.EndPath(process.output)
+#process.end = cms.EndPath(process.output)
 
-processDumpFile = open('MyRootMaker.dump', 'w')
-print >> processDumpFile, process.dumpPython()
+#processDumpFile = open('MyRootMaker.dump', 'w')
+#print >> processDumpFile, process.dumpPython()
 
 
 

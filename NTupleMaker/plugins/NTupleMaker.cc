@@ -96,6 +96,7 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
   crecmuon(iConfig.getUntrackedParameter<bool>("RecMuon", false)),
   crecelectron(iConfig.getUntrackedParameter<bool>("RecElectron", false)),
   crectau(iConfig.getUntrackedParameter<bool>("RecTau", false)),
+  cl1isotau(iConfig.getUntrackedParameter<bool>("L1IsoTau", false)),
   crecphoton(iConfig.getUntrackedParameter<bool>("RecPhoton", false)),
   crecpfjet(iConfig.getUntrackedParameter<bool>("RecJet", false)),
   crecpfmet(iConfig.getUntrackedParameter<bool>("RecPFMet", false)),
@@ -252,6 +253,10 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
       mit != MvaMetCollectionsTag_.end(); mit++){
     MvaMetCollectionsToken_.push_back(consumes<pat::METCollection>(*mit));
   }
+
+  if(cl1isotau)
+    L1IsoTauCollectionToken_ = consumes<l1extra::L1JetParticleCollection>(iConfig.getParameter<edm::InputTag>("IsoTauCollectionTag"));
+
 }
 
 //destructor
@@ -621,6 +626,20 @@ void NTupleMaker::beginJob(){
     tree->Branch("tau_decayMode_name", tau_decayMode_name, "tau_decayMode_name[tau_count]/C");
     tree->Branch("tau_decayMode", tau_decayMode, "tau_decayMode[tau_count]/I");
     
+  }
+
+  // L1 IsoTau
+  if (cl1isotau){
+    tree->Branch("l1isotau_count", &l1isotau_count, "l1isotau_count/i");
+    tree->Branch("l1isotau_e", l1isotau_e, "l1isotau_e[l1isotau_count]/F");
+    tree->Branch("l1isotau_px", l1isotau_px, "l1isotau_px[l1isotau_count]/F");
+    tree->Branch("l1isotau_py", l1isotau_py, "l1isotau_py[l1isotau_count]/F");
+    tree->Branch("l1isotau_pz", l1isotau_pz, "l1isotau_pz[l1isotau_count]/F");
+    tree->Branch("l1isotau_mass", l1isotau_mass, "l1isotau_mass[l1isotau_count]/F");
+    tree->Branch("l1isotau_eta", l1isotau_eta, "l1isotau_eta[l1isotau_count]/F");
+    tree->Branch("l1isotau_phi", l1isotau_phi, "l1isotau_phi[l1isotau_count]/F");
+    tree->Branch("l1isotau_pt", l1isotau_pt, "l1isotau_pt[l1isotau_count]/F");
+    tree->Branch("l1isotau_charge", l1isotau_charge, "l1isotau_charge[l1isotau_count]/F");    
   }
   
   // Met
@@ -1390,6 +1409,34 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       // }  
     }
 
+  if (cl1isotau){
+    if (doDebug) cout<<"add L1 IsoTaus"<< endl;
+    
+    edm::Handle<l1extra::L1JetParticleCollection> l1isotaus;
+    iEvent.getByToken( L1IsoTauCollectionToken_, l1isotaus);
+    if( !l1isotaus.isValid() )
+      edm::LogError("DataNotAvailable")  << "No L1 IsoTau collection available \n";
+ 
+    for(unsigned itau = 0 ; itau < l1isotaus->size() ; itau++) {
+      if(l1isotau_count == M_taumaxcount) {
+	cerr << "number of iso taus > M_taumaxcount. They are missing." << endl; 
+	errors |= 1<<3; 
+	break;
+      }
+      l1isotau_e[l1isotau_count]        = (*l1isotaus)[itau].energy();
+      l1isotau_px[l1isotau_count]       = (*l1isotaus)[itau].px();
+      l1isotau_py[l1isotau_count]       = (*l1isotaus)[itau].py();
+      l1isotau_pz[l1isotau_count]       = (*l1isotaus)[itau].pz();
+      l1isotau_pt[l1isotau_count]       = (*l1isotaus)[itau].pt();
+      l1isotau_phi[l1isotau_count]      = (*l1isotaus)[itau].phi();
+      l1isotau_eta[l1isotau_count]      = (*l1isotaus)[itau].eta();
+      l1isotau_mass[l1isotau_count]     = (*l1isotaus)[itau].mass();
+      l1isotau_charge[l1isotau_count]   = (*l1isotaus)[itau].charge();
+
+      l1isotau_count++;
+    }
+  }
+  
   if (crecpfjet) 
     {
       if(doDebug)  cout<<"add PF jets"<< endl; 
@@ -1440,7 +1487,7 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       iEvent.getByToken( MetSigToken_, metsig);
       assert(metsig.isValid());
       pfmet_sig = *metsig;
-
+      
       pfmet_ex_JetEnUp = (*patMet)[0].shiftedPx(pat::MET::METUncertainty::JetEnUp,pat::MET::METCorrectionLevel::Type1);
       pfmet_ey_JetEnUp = (*patMet)[0].shiftedPy(pat::MET::METUncertainty::JetEnUp,pat::MET::METCorrectionLevel::Type1);
 
@@ -1485,11 +1532,11 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       assert(metsig.isValid());
       pfmetcorr_sig = *metsig;
 
-      pfmetcorr_sigxx = (*patMet)[0].getSignificanceMatrix()(0,0);
+      /*pfmetcorr_sigxx = (*patMet)[0].getSignificanceMatrix()(0,0);
       pfmetcorr_sigxy = (*patMet)[0].getSignificanceMatrix()(0,1);
       pfmetcorr_sigyx = (*patMet)[0].getSignificanceMatrix()(1,0);
-      pfmetcorr_sigyy = (*patMet)[0].getSignificanceMatrix()(1,1);
-
+      pfmetcorr_sigyy = (*patMet)[0].getSignificanceMatrix()(1,1);*/
+      
       /*pfmetcorr_ex_JetEnUp = (*patMet)[0].shiftedPx(pat::MET::METUncertainty::JetEnUp,pat::MET::METCorrectionLevel::Type1);
       pfmetcorr_ey_JetEnUp = (*patMet)[0].shiftedPy(pat::MET::METUncertainty::JetEnUp,pat::MET::METCorrectionLevel::Type1);
 
