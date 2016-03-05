@@ -40,7 +40,7 @@ process.options = cms.untracked.PSet(
 
 # How many events to process
 process.maxEvents = cms.untracked.PSet( 
-   input = cms.untracked.int32(100)
+   input = cms.untracked.int32(10)
 )
 
 
@@ -100,9 +100,13 @@ from PhysicsTools.PatAlgos.producersLayer1.jetUpdater_cff import patJetCorrFacto
 process.patJetCorrFactorsReapplyJEC = patJetCorrFactorsUpdated.clone(
   src = cms.InputTag("slimmedJets"),
   levels = ['L1FastJet', 
-        'L2Relative', 
-        'L3Absolute'],
+            'L2Relative', 
+            'L3Absolute',
+          ],
   payload = 'AK4PFchs' ) # Make sure to choose the appropriate levels and payload here!
+
+if runOnData:
+  process.patJetCorrFactorsReapplyJEC.levels.append("L2L3Residual")
 
 from PhysicsTools.PatAlgos.producersLayer1.jetUpdater_cff import patJetsUpdated
 process.patJetsReapplyJEC = patJetsUpdated.clone(

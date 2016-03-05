@@ -104,6 +104,9 @@ process.patJetCorrFactorsReapplyJEC = patJetCorrFactorsUpdated.clone(
         'L3Absolute'],
   payload = 'AK4PFchs' ) # Make sure to choose the appropriate levels and payload here!
 
+if runOnData:
+  process.patJetCorrFactorsReapplyJEC.levels.append("L2L3Residual")
+
 from PhysicsTools.PatAlgos.producersLayer1.jetUpdater_cff import patJetsUpdated
 process.patJetsReapplyJEC = patJetsUpdated.clone(
   jetSource = cms.InputTag("slimmedJets"),
