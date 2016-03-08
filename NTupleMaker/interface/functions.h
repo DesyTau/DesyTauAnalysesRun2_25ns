@@ -339,6 +339,58 @@ bool electronVetoTight(double SuperClusterEta, double eta, double phi, double fu
 }
 
 
+void ComputeMetFromHadRecoil(float Hparal,
+			     float Hperp,
+			     float genVPx, 
+			     float genVPy,
+			     float visVPx,
+			     float visVPy,
+			     float & metX,
+			     float & metY) {
+  
+  float genVPt = TMath::Sqrt(genVPx*genVPx+genVPy*genVPy);
+  float unitX = genVPx/genVPt;
+  float unitY = genVPy/genVPt;
+
+  float unitPhi = TMath::ATan2(unitY,unitX);
+  float unitPerpX = TMath::Cos(unitPhi+0.5*TMath::Pi());
+  float unitPerpY = TMath::Sin(unitPhi+0.5*TMath::Pi());
+
+  float det = unitX*unitPerpY - unitY*unitPerpX;
+  float Hx = (Hparal*unitPerpY - Hperp*unitY)/det;
+  float Hy = (Hperp*unitX - Hparal*unitPerpX)/det;
+
+  metX = -Hx - visVPx;
+  metY = -Hy - visVPy;
+
+}
+
+void ComputeHadRecoilFromMet(float metX,
+			     float metY,
+			     float genVPx, 
+			     float genVPy,
+			     float visVPx,
+			     float visVPy,
+			     float & Hparal,
+			     float & Hperp) {
+
+  float genVPt = TMath::Sqrt(genVPx*genVPx+genVPy*genVPy);
+  float unitX = genVPx/genVPt;
+  float unitY = genVPy/genVPt;
+
+  float unitPhi = TMath::ATan2(unitY,unitX);
+  float unitPerpX = TMath::Cos(unitPhi+0.5*TMath::Pi());
+  float unitPerpY = TMath::Sin(unitPhi+0.5*TMath::Pi());
+
+  float Hx = -metX - visVPx;
+  float Hy = -metY - visVPy;
+
+  Hparal = Hx*unitX + Hy*unitY;
+  Hperp = Hx*unitPerpX + Hy*unitPerpY;
+
+}
+
+
 struct myclass {
   bool operator() (int i,int j) { return (i<j);}
 } myobject, myobjectX;

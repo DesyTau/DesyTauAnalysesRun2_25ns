@@ -16,6 +16,7 @@
 </bin>
 
 <bin name="AnalysisMacro_dimuons" file="AnalysisMacro_dimuons.cpp">
+ <use name="HTT-utilities/RecoilCorrections"/>
  <use name="PhysicsTools/Utilities"/>
  <use name="rootgraphics"/>
  <use name="root"/>
@@ -28,6 +29,7 @@
 </bin>
 
 <bin name="AnalysisMacro_dielectrons" file="AnalysisMacro_dielectrons.cpp">
+ <use name="HTT-utilities/RecoilCorrections"/> 
  <use name="PhysicsTools/Utilities"/>
  <use name="rootgraphics"/>
  <use name="root"/>
