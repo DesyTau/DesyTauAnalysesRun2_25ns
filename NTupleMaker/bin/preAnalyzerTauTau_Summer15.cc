@@ -76,8 +76,8 @@ struct SortDiTauPairs
     // 1st criterion: OS 
     //if ( t1.diTauCharge_ < t2.diTauCharge_ ) return true; 
     //if ( t1.diTauCharge_ > t2.diTauCharge_ ) return false; 
-    if(t1.sumIso_ < t2.sumIso_ ) return true;
-    if(t1.sumIso_ > t2.sumIso_ ) return false;
+    if(t1.sumIso_ > t2.sumIso_ ) return true;
+    if(t1.sumIso_ < t2.sumIso_ ) return false;
     // 2nd criterion: sumPt of diTau pair 
     return (t1.sumPt_ > t2.sumPt_);  
   } 
@@ -556,9 +556,10 @@ void fillTrees_TauTauStream(TChain* currentTree,
   float tau_decayModeFinding[40], tau_decayModeFindingNewDMs[40], 
     tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[40], tau_byLooseCombinedIsolationDeltaBetaCorr3Hits[40],
     tau_byMediumCombinedIsolationDeltaBetaCorr3Hits[40], tau_byTightCombinedIsolationDeltaBetaCorr3Hits[40],
+    tau_byIsolationMVArun2v1DBoldDMwLTraw[40],
     tau_againstMuonLoose3[40], tau_againstMuonTight3[40],
-    tau_againstElectronVLooseMVA5[40], tau_againstElectronLooseMVA5[40], tau_againstElectronMediumMVA5[40],
-    tau_againstElectronTightMVA5[40];
+    tau_againstElectronVLooseMVA6[40], tau_againstElectronLooseMVA6[40], tau_againstElectronMediumMVA6[40],
+    tau_againstElectronTightMVA6[40];
   float tau_genjet_px[40], tau_genjet_py[40], tau_genjet_pz[40], tau_genjet_e[40];
   
   //Jets
@@ -683,12 +684,13 @@ void fillTrees_TauTauStream(TChain* currentTree,
   currentTree->SetBranchStatus("tau_byLooseCombinedIsolationDeltaBetaCorr3Hits"      ,1);
   currentTree->SetBranchStatus("tau_byMediumCombinedIsolationDeltaBetaCorr3Hits",   1);
   currentTree->SetBranchStatus("tau_byTightCombinedIsolationDeltaBetaCorr3Hits",   1);
+  currentTree->SetBranchStatus("tau_byIsolationMVArun2v1DBoldDMwLTraw",   1);
   currentTree->SetBranchStatus("tau_againstMuonLoose3",   1);
   currentTree->SetBranchStatus("tau_againstMuonTight3",   1);
-  currentTree->SetBranchStatus("tau_againstElectronVLooseMVA5",   1);
-  currentTree->SetBranchStatus("tau_againstElectronLooseMVA5",   1);
-  currentTree->SetBranchStatus("tau_againstElectronMediumMVA5",   1);
-  currentTree->SetBranchStatus("tau_againstElectronTightMVA5",   1);
+  currentTree->SetBranchStatus("tau_againstElectronVLooseMVA6",   1);
+  currentTree->SetBranchStatus("tau_againstElectronLooseMVA6",   1);
+  currentTree->SetBranchStatus("tau_againstElectronMediumMVA6",   1);
+  currentTree->SetBranchStatus("tau_againstElectronTightMVA6",   1);
   currentTree->SetBranchStatus("tau_genjet_e"        ,1);
   currentTree->SetBranchStatus("tau_genjet_px"        ,1);
   currentTree->SetBranchStatus("tau_genjet_py"        ,1);
@@ -842,12 +844,13 @@ void fillTrees_TauTauStream(TChain* currentTree,
   currentTree->SetBranchAddress("tau_byLooseCombinedIsolationDeltaBetaCorr3Hits"      ,tau_byLooseCombinedIsolationDeltaBetaCorr3Hits);
   currentTree->SetBranchAddress("tau_byMediumCombinedIsolationDeltaBetaCorr3Hits",   tau_byMediumCombinedIsolationDeltaBetaCorr3Hits);
   currentTree->SetBranchAddress("tau_byTightCombinedIsolationDeltaBetaCorr3Hits",   tau_byTightCombinedIsolationDeltaBetaCorr3Hits);
+  currentTree->SetBranchAddress("tau_byIsolationMVArun2v1DBoldDMwLTraw",   tau_byIsolationMVArun2v1DBoldDMwLTraw);
   currentTree->SetBranchAddress("tau_againstMuonLoose3",   tau_againstMuonLoose3);
   currentTree->SetBranchAddress("tau_againstMuonTight3",   tau_againstMuonTight3);
-  currentTree->SetBranchAddress("tau_againstElectronVLooseMVA5",   tau_againstElectronVLooseMVA5);
-  currentTree->SetBranchAddress("tau_againstElectronLooseMVA5",   tau_againstElectronLooseMVA5);
-  currentTree->SetBranchAddress("tau_againstElectronMediumMVA5",   tau_againstElectronMediumMVA5);
-  currentTree->SetBranchAddress("tau_againstElectronTightMVA5",   tau_againstElectronTightMVA5);
+  currentTree->SetBranchAddress("tau_againstElectronVLooseMVA6",   tau_againstElectronVLooseMVA6);
+  currentTree->SetBranchAddress("tau_againstElectronLooseMVA6",   tau_againstElectronLooseMVA6);
+  currentTree->SetBranchAddress("tau_againstElectronMediumMVA6",   tau_againstElectronMediumMVA6);
+  currentTree->SetBranchAddress("tau_againstElectronTightMVA6",   tau_againstElectronTightMVA6);
   currentTree->SetBranchAddress("tau_genjet_e"        ,tau_genjet_e);
   currentTree->SetBranchAddress("tau_genjet_px"        ,tau_genjet_px);
   currentTree->SetBranchAddress("tau_genjet_py"        ,tau_genjet_py);
@@ -949,16 +952,16 @@ void fillTrees_TauTauStream(TChain* currentTree,
 
   //TauID
   int decayModeL1_,decayModeFindingL1_,decayModeFindingNewDML1_,decayModeFindingOldDML1_;
-  int AntiEDeadEcalL1_,tightestAntiECutWPL1_,tightestAntiEMVA5WPL1_,AntiEMVA5categoryL1_;
+  int AntiEDeadEcalL1_,tightestAntiECutWPL1_,tightestAntiEMVA6WPL1_,AntiEMVA6categoryL1_;
   int tightestAntiMuWPL1_,tightestAntiMu2WPL1_,tightestAntiMu3WPL1_,tightestAntiMuMVAWPL1_;
-  float AntiEMVA5rawL1_,AntiMuMVArawL1_;
+  float AntiEMVA6rawL1_,AntiMuMVArawL1_;
   int tightestHPSDBWPL1_,tightestHPSDB3HWPL1_,tightestHPSMVA3newDMwLTWPL1_,tightestHPSMVA3newDMwoLTWPL1_,tightestHPSMVA3oldDMwLTWPL1_,tightestHPSMVA3oldDMwoLTWPL1_;
   float hpsDB3HL1_,hpsMVA3newDMwLTL1_,hpsMVA3newDMwoLTL1_,hpsMVA3oldDMwLTL1_,hpsMVA3oldDMwoLTL1_;
 
   int decayModeL2_,decayModeFindingL2_,decayModeFindingNewDML2_,decayModeFindingOldDML2_;
-  int AntiEDeadEcalL2_,tightestAntiECutWPL2_,tightestAntiEMVA5WPL2_,AntiEMVA5categoryL2_;
+  int AntiEDeadEcalL2_,tightestAntiECutWPL2_,tightestAntiEMVA6WPL2_,AntiEMVA6categoryL2_;
   int tightestAntiMuWPL2_,tightestAntiMu2WPL2_,tightestAntiMu3WPL2_,tightestAntiMuMVAWPL2_;
-  float AntiEMVA5rawL2_,AntiMuMVArawL2_;
+  float AntiEMVA6rawL2_,AntiMuMVArawL2_;
   int tightestHPSDBWPL2_,tightestHPSDB3HWPL2_,tightestHPSMVA3newDMwLTWPL2_,tightestHPSMVA3newDMwoLTWPL2_,tightestHPSMVA3oldDMwLTWPL2_,tightestHPSMVA3oldDMwoLTWPL2_;
   float hpsDB3HL2_,hpsMVA3newDMwLTL2_,hpsMVA3newDMwoLTL2_,hpsMVA3oldDMwLTL2_,hpsMVA3oldDMwoLTL2_;
 
@@ -1093,9 +1096,9 @@ void fillTrees_TauTauStream(TChain* currentTree,
   outTree->Branch("decayModeFindingOldDML1",&decayModeFindingOldDML1_,"decayModeFindingOldDML1/I");
   outTree->Branch("AntiEDeadEcalL1",&AntiEDeadEcalL1_,"AntiEDeadEcalL1/I");
   outTree->Branch("tightestAntiECutWPL1",&tightestAntiECutWPL1_,"tightestAntiECutWPL1/I");
-  outTree->Branch("tightestAntiEMVA5WPL1",&tightestAntiEMVA5WPL1_,"tightestAntiEMVA5WPL1/I");
-  outTree->Branch("AntiEMVA5categoryL1",&AntiEMVA5categoryL1_,"AntiEMVA5categoryL1/I");
-  outTree->Branch("AntiEMVA5rawL1",&AntiEMVA5rawL1_,"AntiEMVA5rawL1/F");
+  outTree->Branch("tightestAntiEMVA6WPL1",&tightestAntiEMVA6WPL1_,"tightestAntiEMVA6WPL1/I");
+  outTree->Branch("AntiEMVA6categoryL1",&AntiEMVA6categoryL1_,"AntiEMVA6categoryL1/I");
+  outTree->Branch("AntiEMVA6rawL1",&AntiEMVA6rawL1_,"AntiEMVA6rawL1/F");
   outTree->Branch("tightestAntiMuWPL1",&tightestAntiMuWPL1_,"tightestAntiMuWPL1/I");
   outTree->Branch("tightestAntiMu2WPL1",&tightestAntiMu2WPL1_,"tightestAntiMu2WPL1/I");
   outTree->Branch("tightestAntiMu3WPL1",&tightestAntiMu3WPL1_,"tightestAntiMu3WPL1/I");
@@ -1118,9 +1121,9 @@ void fillTrees_TauTauStream(TChain* currentTree,
   outTree->Branch("decayModeFindingOldDML2",&decayModeFindingOldDML2_,"decayModeFindingOldDML2/I");
   outTree->Branch("AntiEDeadEcalL2",&AntiEDeadEcalL2_,"AntiEDeadEcalL2/I");
   outTree->Branch("tightestAntiECutWPL2",&tightestAntiECutWPL2_,"tightestAntiECutWPL2/I");
-  outTree->Branch("tightestAntiEMVA5WPL2",&tightestAntiEMVA5WPL2_,"tightestAntiEMVA5WPL2/I");
-  outTree->Branch("AntiEMVA5categoryL2",&AntiEMVA5categoryL2_,"AntiEMVA5categoryL2/I");
-  outTree->Branch("AntiEMVA5rawL2",&AntiEMVA5rawL2_,"AntiEMVA5rawL2/F");
+  outTree->Branch("tightestAntiEMVA6WPL2",&tightestAntiEMVA6WPL2_,"tightestAntiEMVA6WPL2/I");
+  outTree->Branch("AntiEMVA6categoryL2",&AntiEMVA6categoryL2_,"AntiEMVA6categoryL2/I");
+  outTree->Branch("AntiEMVA6rawL2",&AntiEMVA6rawL2_,"AntiEMVA6rawL2/F");
   outTree->Branch("tightestAntiMuWPL2",&tightestAntiMuWPL2_,"tightestAntiMuWPL2/I");
   outTree->Branch("tightestAntiMu2WPL2",&tightestAntiMu2WPL2_,"tightestAntiMu2WPL2/I");
   outTree->Branch("tightestAntiMu3WPL2",&tightestAntiMu3WPL2_,"tightestAntiMu3WPL2/I");
@@ -1251,7 +1254,7 @@ void fillTrees_TauTauStream(TChain* currentTree,
     numPV_ = primvertex_count;
     npu_ = numtruepileupinteractions;
     rho_ = rhoNeutral;
-    
+    //if(event_ != 18500 && event_ != 186715 && event_ != 186837 && event_ != 187694) continue;
     // Get Gen boson and daughters to clasify the event
     LV genVP4_(0, 0, 0, 0); unsigned int genVType_ = 100;
     std::vector<LV> genLeptonP4_; genLeptonP4_.clear();
@@ -1259,7 +1262,7 @@ void fillTrees_TauTauStream(TChain* currentTree,
     std::vector<LV> genTauVisP4_; genTauVisP4_.clear();
     std::vector<int>genLeptonPdgId_; genLeptonPdgId_.clear();
     int nLepton_ = 0, TauLepDecay_ = 0, TauHadDecay_ = 0;
-
+    if(event_ == 185001 || event_ == 186715 || event_ == 186837 || event_ == 187694)std::cout<<"pass 1, event "<<event_<<endl;
     /* //not needed to define this way
     if(!isData){ //for mc only
 
@@ -1317,8 +1320,10 @@ void fillTrees_TauTauStream(TChain* currentTree,
     //require HLT
     string hltPath_(""); string hltFilter_("");
     if(!isData){
-      hltPath_ = "HLT_DoubleMediumIsoPFTau40_Trk1_eta2p1_Reg_v";
-      hltFilter_ = "hltDoublePFTau40TrackPt1MediumIsolationDz02Reg";
+      //hltPath_ = "HLT_DoubleMediumIsoPFTau40_Trk1_eta2p1_Reg_v"; //for Spring15
+      //hltFilter_ = "hltDoublePFTau40TrackPt1MediumIsolationDz02Reg";
+      hltPath_ = "HLT_DoubleMediumIsoPFTau35_Trk1_eta2p1_Reg_v";
+      hltFilter_ = "hltDoublePFTau35TrackPt1MediumIsolationDz02Reg";
     }
     else{
       if(sample.Contains("2015D")){
@@ -1331,6 +1336,7 @@ void fillTrees_TauTauStream(TChain* currentTree,
       }
     }
     if(GetTriggerResult((*hltriggerresultsV), hltPath_) < 0.5) continue;
+    if(event_ == 185001|| event_ == 186715 || event_ == 186837 || event_ == 187694)std::cout<<"pass 2, event "<<event_<<endl;
 
     std::vector<DiTauInfo>sortDiTauInfos; sortDiTauInfos.clear();
     //Loop over taus
@@ -1340,16 +1346,18 @@ void fillTrees_TauTauStream(TChain* currentTree,
       if(analysis_.find("TauUp") != std::string::npos)tauLeg1_ = TauEnergyRescaler(tauLeg1_, tau_decayMode[it], 0.03);
       else if(analysis_.find("TauDown") != std::string::npos)tauLeg1_ = TauEnergyRescaler(tauLeg1_, tau_decayMode[it], -0.03);
       
-      if(tauLeg1_.pt() < 45 || TMath::Abs(tauLeg1_.eta()) > 2.1) continue;
+      if(tauLeg1_.pt() < 40 || TMath::Abs(tauLeg1_.eta()) > 2.1) continue;
       //if(TMath::Abs(tau_vertexz[it] - primvertex_z) > 0.2) continue;
       //if(tau_vertexz[it] != primvertex_z) continue;
       if(TMath::Abs(tau_leadchargedhadrcand_dz[it]) >= 0.2) continue;
+      if(event_ == 185001|| event_ == 186715 || event_ == 186837 || event_ == 187694)std::cout<<"pass 3, event "<<event_<<endl;
 
-      if(tau_decayModeFindingNewDMs[it] < 0.5) continue;
+      if(tau_decayModeFinding[it] < 0.5) continue;
       //if(tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[it] > 1.0) continue;
-      //if(tau_againstElectronVLooseMVA5[it] < 0.5) continue;
+      //if(tau_againstElectronVLooseMVA6[it] < 0.5) continue;
       //if(tau_againstMuonLoose3[it] < 0.5) continue;
       if(TMath::Abs(tau_charge[it]) != 1) continue;
+      if(event_ == 185001|| event_ == 186715 || event_ == 186837 || event_ == 187694)std::cout<<"pass 4, event "<<event_<<endl;
 
       //HLT match
       bool HLTmatchLeg1_ = false;
@@ -1363,6 +1371,7 @@ void fillTrees_TauTauStream(TChain* currentTree,
       }
       HLTmatchLeg1_ = matchLeg1Level3_; //(matchLeg1Level1_ && matchLeg1Level2_ && matchLeg1Level3_);
       if(!HLTmatchLeg1_) continue;
+      if(event_ == 185001|| event_ == 186715 || event_ == 186837 || event_ == 187694)std::cout<<"pass 5, event "<<event_<<endl;
 
       for(unsigned int jt = it+1; jt < tau_count; jt++){ //tauL2   
 	    
@@ -1370,16 +1379,18 @@ void fillTrees_TauTauStream(TChain* currentTree,
 	if(analysis_.find("TauUp") != std::string::npos)tauLeg2_ = TauEnergyRescaler(tauLeg2_, tau_decayMode[jt], 0.03);
 	else if(analysis_.find("TauDown") != std::string::npos)tauLeg2_ = TauEnergyRescaler(tauLeg2_, tau_decayMode[jt], -0.03);
 
-	if(tauLeg2_.pt() < 45 || TMath::Abs(tauLeg2_.eta()) > 2.1) continue;
+	if(tauLeg2_.pt() < 40 || TMath::Abs(tauLeg2_.eta()) > 2.1) continue;
 	if(TMath::Abs(tau_leadchargedhadrcand_dz[jt]) >= 0.2) continue;
 	//if(TMath::Abs(tau_vertexz[jt] - primvertex_z) > 0.2) continue;
 	//if(tau_vertexz[jt] != primvertex_z) continue;
+	if(event_ == 185001|| event_ == 186715 || event_ == 186837 || event_ == 187694)std::cout<<"pass 6, event "<<event_<<endl;
 
-	if(tau_decayModeFindingNewDMs[jt] < 0.5) continue;
+	if(tau_decayModeFinding[jt] < 0.5) continue;
 	//if(tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[jt] > 1.0) continue;
-	//if(tau_againstElectronVLooseMVA5[jt] < 0.5) continue;
+	//if(tau_againstElectronVLooseMVA6[jt] < 0.5) continue;
 	//if(tau_againstMuonLoose3[jt] < 0.5) continue;
 	if(TMath::Abs(tau_charge[jt]) != 1) continue;
+	if(event_ == 185001|| event_ == 186715 || event_ == 186837 || event_ == 187694)std::cout<<"pass 7, event "<<event_<<endl;
 
 	//HLT match
 	bool HLTmatchLeg2_ = false;
@@ -1393,11 +1404,14 @@ void fillTrees_TauTauStream(TChain* currentTree,
 	}
 	HLTmatchLeg2_ = matchLeg2Level3_; //(matchLeg2Level1_ && matchLeg2Level2_ && matchLeg2Level3_);
 	if(!HLTmatchLeg2_) continue;
+	if(event_ == 185001|| event_ == 186715 || event_ == 186837 || event_ == 187694)std::cout<<"pass 8, event "<<event_<<endl;
 
 	if(ROOT::Math::VectorUtil::DeltaR(tauLeg1_, tauLeg2_) < 0.5) continue;
+	if(event_ == 185001|| event_ == 186715 || event_ == 186837 || event_ == 187694)std::cout<<"pass 9, event "<<event_<<endl;
 
 	float sumPt = tauLeg1_.pt() + tauLeg2_.pt();
-	float sumIso = tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[it] + tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[jt];
+	//float sumIso = tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[it] + tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[jt];
+	float sumIso = tau_byIsolationMVArun2v1DBoldDMwLTraw[it] + tau_byIsolationMVArun2v1DBoldDMwLTraw[jt];
 	int pairCharge = tau_charge[it]*tau_charge[jt];
 	DiTauInfo sortDiTauInfo; 
 	sortDiTauInfo.index1_ = it;
@@ -1425,12 +1439,12 @@ void fillTrees_TauTauStream(TChain* currentTree,
       LV temp_Leg1_(tau_px[tau1], tau_py[tau1], tau_pz[tau1], tau_e[tau1]);
       LV temp_Leg2_(tau_px[tau2], tau_py[tau2], tau_pz[tau2], tau_e[tau2]);
       LV Leg1P4_, Leg2P4_;
-      if(tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[tau1] < tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[tau2]){
-      //if(temp_Leg1_.pt() > temp_Leg2_.pt()){
+      //if(tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[tau1] < tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[tau2]){
+      if(tau_byIsolationMVArun2v1DBoldDMwLTraw[tau1] > tau_byIsolationMVArun2v1DBoldDMwLTraw[tau2]){
 	Leg1P4_ = temp_Leg1_; 
 	Leg2P4_ = temp_Leg2_;
       }
-      else if(tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[tau1] > tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[tau2]){
+      else if(tau_byIsolationMVArun2v1DBoldDMwLTraw[tau1] < tau_byIsolationMVArun2v1DBoldDMwLTraw[tau2]){
 	Leg1P4_ = temp_Leg2_; tau1 = iter->index2_;
         Leg2P4_ = temp_Leg1_; tau2 = iter->index1_;
       }
@@ -1451,7 +1465,7 @@ void fillTrees_TauTauStream(TChain* currentTree,
 	Leg1P4_ = TauEnergyRescaler(Leg1P4_, tau_decayMode[tau1], -0.03);
 	Leg2P4_ = TauEnergyRescaler(Leg2P4_, tau_decayMode[tau2], -0.03);
       }
-
+      
       // FIND matched gen lepton
       LV Leg1GenP4_(0, 0, 0, 0);
       LV Leg2GenP4_(0, 0, 0, 0);
@@ -1591,11 +1605,11 @@ void fillTrees_TauTauStream(TChain* currentTree,
       decayModeFindingL1_ = tau_decayModeFinding[tau1];
       decayModeFindingNewDML1_ = tau_decayModeFindingNewDMs[tau1];
       //decayModeFindingOldDML1_ = GetTauDiscriminator("decayModeFindingOldDMs", run_taudiscriminators, tau_dishps[tau1]);
-      tightestAntiEMVA5WPL1_ = 0;
-      if(tau_againstElectronVLooseMVA5[tau1] > 0.5)tightestAntiEMVA5WPL1_ = 1;
-      if(tau_againstElectronLooseMVA5[tau1] > 0.5)tightestAntiEMVA5WPL1_ = 2;
-      if(tau_againstElectronMediumMVA5[tau1] > 0.5)tightestAntiEMVA5WPL1_ = 3;
-      if(tau_againstElectronTightMVA5[tau1] > 0.5)tightestAntiEMVA5WPL1_ = 4;
+      tightestAntiEMVA6WPL1_ = 0;
+      if(tau_againstElectronVLooseMVA6[tau1] > 0.5)tightestAntiEMVA6WPL1_ = 1;
+      if(tau_againstElectronLooseMVA6[tau1] > 0.5)tightestAntiEMVA6WPL1_ = 2;
+      if(tau_againstElectronMediumMVA6[tau1] > 0.5)tightestAntiEMVA6WPL1_ = 3;
+      if(tau_againstElectronTightMVA6[tau1] > 0.5)tightestAntiEMVA6WPL1_ = 4;
       tightestAntiMu3WPL1_ = 0;
       if(tau_againstMuonLoose3[tau1] > 0.5)tightestAntiMu3WPL1_ = 1;
       if(tau_againstMuonTight3[tau1] > 0.5)tightestAntiMu3WPL1_ = 2;
@@ -1612,11 +1626,11 @@ void fillTrees_TauTauStream(TChain* currentTree,
       else if(tau_signalChargedHadrCands_size[tau2] == 3) decayModeL2_ = 3;
       decayModeFindingL2_ = tau_decayModeFinding[tau2];
       decayModeFindingNewDML2_ = tau_decayModeFindingNewDMs[tau2];
-      tightestAntiEMVA5WPL2_ = 0;
-      if(tau_againstElectronVLooseMVA5[tau2] > 0.5)tightestAntiEMVA5WPL2_ = 1;
-      if(tau_againstElectronLooseMVA5[tau2] > 0.5)tightestAntiEMVA5WPL2_ = 2;
-      if(tau_againstElectronMediumMVA5[tau2] > 0.5)tightestAntiEMVA5WPL2_ = 3;
-      if(tau_againstElectronTightMVA5[tau2] > 0.5)tightestAntiEMVA5WPL2_ = 4;
+      tightestAntiEMVA6WPL2_ = 0;
+      if(tau_againstElectronVLooseMVA6[tau2] > 0.5)tightestAntiEMVA6WPL2_ = 1;
+      if(tau_againstElectronLooseMVA6[tau2] > 0.5)tightestAntiEMVA6WPL2_ = 2;
+      if(tau_againstElectronMediumMVA6[tau2] > 0.5)tightestAntiEMVA6WPL2_ = 3;
+      if(tau_againstElectronTightMVA6[tau2] > 0.5)tightestAntiEMVA6WPL2_ = 4;
       tightestAntiMu3WPL2_ = 0;
       if(tau_againstMuonLoose3[tau2] > 0.5)tightestAntiMu3WPL2_ = 1;
       if(tau_againstMuonTight3[tau2] > 0.5)tightestAntiMu3WPL2_ = 2;
@@ -1776,7 +1790,7 @@ void fillTrees_TauTauStream(TChain* currentTree,
       }
 
       //Get Trigger Informations
-      HLTx =  GetTriggerResult((*hltriggerresultsV), "HLT_DoubleMediumIsoPFTau40_Trk1_eta2p1_Reg_v");
+      HLTx =  GetTriggerResult((*hltriggerresultsV), hltPath_);
       HLTmatchL1 = 0; HLTmatchL2 = 0;
       bool matchLeg1Level1_ = false; bool matchLeg1Level2_ = false; bool matchLeg1Level3_ = false;
       bool matchLeg2Level1_ = false; bool matchLeg2Level2_ = false; bool matchLeg2Level3_ = false;
@@ -1849,7 +1863,7 @@ void fillTrees_TauTauStream(TChain* currentTree,
 	diTauCounter++; 
 	pairIndex   = diTauCounter;
       }
-      
+      if(event_ == 185001|| event_ == 186715 || event_ == 186837 || event_ == 187694)std::cout<<"pass 10, event "<<event_<<endl;
       outTree->Fill(); //fill tree for each pair
 
     }//end of di-tau pair

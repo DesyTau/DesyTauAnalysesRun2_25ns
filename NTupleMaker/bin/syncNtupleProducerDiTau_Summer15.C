@@ -203,7 +203,7 @@ void synchNtuple(string sample = "GGFH125", string stream = "MuTau", bool incl=f
 
 
    TChain *tree = new TChain("outTree");
-   tree->Add(("/nfs/dust/cms/user/anayak/CMS/Ntuple_HttAnalysis/ntuples74_25ns_v2//nTuple"+sample+".root").c_str());
+   tree->Add(("/nfs/dust/cms/user/anayak/CMS/Ntuple_HttAnalysis/ntuples76_25ns_v1/nTuple"+sample+".root").c_str());
 
    int iPairIndex      ; tree->SetBranchAddress("pairIndex"     ,&iPairIndex);
    int  iHLTx          ; tree->SetBranchAddress("HLTx"        ,&iHLTx   );
@@ -366,7 +366,7 @@ void synchNtuple(string sample = "GGFH125", string stream = "MuTau", bool incl=f
      //bool passDiMuTrig = (sample.find("Emb") != string::npos) ? iHLTxMu17Mu8 > 0 : true;
 
      //if( stream.find("TauTau")!=string::npos   &&   !(iHLTx>0.5 && /*iHLTmatch1>0.5 && iHLTmatch2>0.5 && */ igenVMass>(0.7*130) && igenVMass<(1.3*130) && iPt1>45 && iPt2>45 && iPassId1>2 && iPassId2>2 && iDZ1 < 0.2 && iDZ2<0.2))
-     if(stream.find("TauTau")!=string::npos   &&   !(iHLTx>0.5 && iHLTmatch1>0.5 && iHLTmatch2>0.5 && iPt1>45 && iPt2>45))
+     if(stream.find("TauTau")!=string::npos   &&   !(iHLTx>0.5 && iHLTmatch1>0.5 && iHLTmatch2>0.5 && iPt1>40 && iPt2>40))
        continue;
      if(iPairIndex > 0) continue;
      if(incl && !(iDiTauCharge < 0)) continue; //inclusive selection
