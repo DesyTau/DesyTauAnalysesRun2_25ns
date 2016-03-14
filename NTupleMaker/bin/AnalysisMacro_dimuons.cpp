@@ -1433,6 +1433,11 @@ int main(int argc, char * argv[]) {
 	}
       }
 
+
+      // *****************************************
+      // **** Importnat part : muon pair found *** 
+      // *****************************************
+
       if (isIsoMuonsPair) {      
 	//match to genparticles
 	bool genmatch_m1 = false, genmatch_m2 = false;
@@ -1892,24 +1897,24 @@ int main(int argc, char * argv[]) {
 	  mvametSelNJets[jetBin]->Fill(mvamet,weight);
 
 	  if (!isData) {
-	    // std::cout << "GenV = (" 
-	    // 	      << genV.Px() << "," 
-	    // 	      << genV.Py() << "," 
-	    // 	      << genV.Pz() << ")   mass = "
-	    // 	      << genV.M()
-	    // 	      << std::endl;
-	    // std::cout << "GenL = (" 
-	    // 	      << genL.Px() << "," 
-	    // 	      << genL.Py() << "," 
-	    // 	      << genL.Pz() << ")   mass = "
-	    // 	      << genL.M() 
-	    //  	      << std::endl;
-	    // std::cout << "GenZ = (" 
-	    // 	      << genZ.Px() << "," 
-	    // 	      << genZ.Py() << "," 
-	    // 	      << genZ.Pz() << ")   mass = "
-	    // 	      << genZ.M() 
-	    // 	      << std::endl;
+	    std::cout << "GenV = (" 
+	     	      << genV.Px() << "," 
+	    	      << genV.Py() << "," 
+	    	      << genV.Pz() << ")   mass = "
+	    	      << genV.M()
+	    	      << std::endl;
+	    std::cout << "GenL = (" 
+	    	      << genL.Px() << "," 
+	    	      << genL.Py() << "," 
+	    	      << genL.Pz() << ")   mass = "
+	    	      << genL.M() 
+	      	      << std::endl;
+	    std::cout << "GenZ = (" 
+	     	      << genZ.Px() << "," 
+	     	      << genZ.Py() << "," 
+	     	      << genZ.Pz() << ")   mass = "
+	     	      << genZ.M() 
+	     	      << std::endl;
 
 	    int ptBinV = binNumber(TMath::Min(float(genV.Pt()),float(999)),nZPtBins,zPtBins);
 	    float Hparal = 0;

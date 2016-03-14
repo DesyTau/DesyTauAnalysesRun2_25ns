@@ -703,7 +703,8 @@ int main(int argc, char * argv[]) {
       otree->againstMuonTight3_2 = analysisTree.tau_againstMuonTight3[tauIndex];
       otree->againstElectronTightMVA6_2 = analysisTree.tau_againstElectronTightMVA6[tauIndex];
       otree->againstElectronVLooseMVA6_2 = analysisTree.tau_againstElectronVLooseMVA6[tauIndex];	
-
+      otree->byTightIsolationMVArun2v1DBoldDMwLT_2 = analysisTree.tau_byTightIsolationMVArun2v1DBoldDMwLT[tauIndex];
+      
       // ditau system
       TLorentzVector electronLV; electronLV.SetXYZM(analysisTree.electron_px[electronIndex],
 					    analysisTree.electron_py[electronIndex],
