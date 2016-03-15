@@ -93,14 +93,16 @@ void compareSync(TString myGroup,TString myPath,TString myRootFile, TString myTr
   drawHistos(&C,filename,"inclusive",Tmine,Tother,"m_2",40,0,2,selection,myGroup,myRootFile,group,groupRootFile,mySel,groupSel);
   drawHistos(&C,filename,"inclusive",Tmine,Tother,"mt_1",50,0,100,selection,myGroup,myRootFile,group,groupRootFile,mySel,groupSel);
   drawHistos(&C,filename,"inclusive",Tmine,Tother,"mt_2",50,0,100,selection,myGroup,myRootFile,group,groupRootFile,mySel,groupSel);
+  drawHistos(&C,filename,"inclusive",Tmine,Tother,"mtmva_1",50,0,100,selection,myGroup,myRootFile,group,groupRootFile,mySel,groupSel);
+  drawHistos(&C,filename,"inclusive",Tmine,Tother,"mtmva_2",50,0,100,selection,myGroup,myRootFile,group,groupRootFile,mySel,groupSel);
   drawHistos(&C,filename,"inclusive",Tmine,Tother,"decayModeFinding_1",10,0,2,selection,myGroup,myRootFile,group,groupRootFile,mySel,groupSel);
   drawHistos(&C,filename,"inclusive",Tmine,Tother,"decayModeFinding_2",10,0,2,selection,myGroup,myRootFile,group,groupRootFile,mySel,groupSel);
   drawHistos(&C,filename,"inclusive",Tmine,Tother,"decayModeFindingNewDMs_1",10,0,2,selection,myGroup,myRootFile,group,groupRootFile,mySel,groupSel);
   drawHistos(&C,filename,"inclusive",Tmine,Tother,"decayModeFindingNewDMs_2",10,0,2,selection,myGroup,myRootFile,group,groupRootFile,mySel,groupSel);
   drawHistos(&C,filename,"inclusive",Tmine,Tother,"byCombinedIsolationDeltaBetaCorrRaw3Hits_1",200,0,10,selection,myGroup,myRootFile,group,groupRootFile,mySel,groupSel);
   drawHistos(&C,filename,"inclusive",Tmine,Tother,"byCombinedIsolationDeltaBetaCorrRaw3Hits_2",200,0,10,selection,myGroup,myRootFile,group,groupRootFile,mySel,groupSel);
-  drawHistos(&C,filename,"inclusive",Tmine,Tother,"againstElectronTightMVA5_1",10,0,2,selection,myGroup,myRootFile,group,groupRootFile,mySel,groupSel);
-  drawHistos(&C,filename,"inclusive",Tmine,Tother,"againstElectronTightMVA5_2",10,0,2,selection,myGroup,myRootFile,group,groupRootFile,mySel,groupSel);
+  drawHistos(&C,filename,"inclusive",Tmine,Tother,"againstElectronTightMVA6_1",10,0,2,selection,myGroup,myRootFile,group,groupRootFile,mySel,groupSel);
+  drawHistos(&C,filename,"inclusive",Tmine,Tother,"againstElectronTightMVA6_2",10,0,2,selection,myGroup,myRootFile,group,groupRootFile,mySel,groupSel);
   drawHistos(&C,filename,"inclusive",Tmine,Tother,"againstMuonTight3_1",10,0,2,selection,myGroup,myRootFile,group,groupRootFile,mySel,groupSel);
   drawHistos(&C,filename,"inclusive",Tmine,Tother,"againstMuonTight3_2",10,0,2,selection,myGroup,myRootFile,group,groupRootFile,mySel,groupSel);
   drawHistos(&C,filename,"inclusive",Tmine,Tother,"met",20,0,200,selection,myGroup,myRootFile,group,groupRootFile,mySel,groupSel);

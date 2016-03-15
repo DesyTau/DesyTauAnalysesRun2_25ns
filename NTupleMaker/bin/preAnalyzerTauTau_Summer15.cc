@@ -579,6 +579,7 @@ void fillTrees_TauTauStream(TChain* currentTree,
   float mvamet_ex[200], mvamet_ey[200], mvamet_sigxx[200], mvamet_sigxy[200], mvamet_sigyx[200], mvamet_sigyy[200];
   UChar_t mvamet_channel[200];
   UInt_t mvamet_lep1[200], mvamet_lep2[200];
+  Float_t mvamet_lep1_pt[200], mvamet_lep2_pt[200];
 
   //GetParticles
   unsigned int genparticles_count;
@@ -600,6 +601,9 @@ void fillTrees_TauTauStream(TChain* currentTree,
   UInt_t trigobject_count;
   float trigobject_px[100], trigobject_py[100], trigobject_pz[100];
   bool trigobject_filters[100][50];
+  
+  UInt_t l1isotau_count;
+  Float_t l1isotau_e[100], l1isotau_px[100], l1isotau_py[100], l1isotau_pz[100];
 
   currentTree->SetBranchStatus("*"        ,0);
   currentTree->SetBranchStatus("event_nr"        ,1);
@@ -728,6 +732,8 @@ void fillTrees_TauTauStream(TChain* currentTree,
   currentTree->SetBranchStatus("mvamet_channel",        1);
   currentTree->SetBranchStatus("mvamet_lep1",        1);
   currentTree->SetBranchStatus("mvamet_lep2",        1);
+  currentTree->SetBranchStatus("mvamet_lep1_pt",        1);
+  currentTree->SetBranchStatus("mvamet_lep2_pt",        1);
   currentTree->SetBranchStatus("genparticles_count"      ,1);
   currentTree->SetBranchStatus("genparticles_e"      ,1);
   currentTree->SetBranchStatus("genparticles_px"      ,1);
@@ -760,6 +766,11 @@ void fillTrees_TauTauStream(TChain* currentTree,
   currentTree->SetBranchStatus("trigobject_pz",    1);
   currentTree->SetBranchStatus("trigobject_filters",    1);
   currentTree->SetBranchStatus("hltriggerresultsV"      ,1);
+  currentTree->SetBranchStatus("l1isotau_count",  1);
+  currentTree->SetBranchStatus("l1isotau_e",  1);
+  currentTree->SetBranchStatus("l1isotau_px", 1);
+  currentTree->SetBranchStatus("l1isotau_py", 1);
+  currentTree->SetBranchStatus("l1isotau_pz", 1);
   
   //Set branch address
   currentTree->SetBranchAddress("event_nr"        ,&event_nr);
@@ -888,6 +899,8 @@ void fillTrees_TauTauStream(TChain* currentTree,
   currentTree->SetBranchAddress("mvamet_channel",        mvamet_channel);
   currentTree->SetBranchAddress("mvamet_lep1",        mvamet_lep1);
   currentTree->SetBranchAddress("mvamet_lep2",        mvamet_lep2);
+  currentTree->SetBranchAddress("mvamet_lep1_pt",        mvamet_lep1_pt);
+  currentTree->SetBranchAddress("mvamet_lep2_pt",        mvamet_lep2_pt);
   currentTree->SetBranchAddress("genparticles_count"      ,&genparticles_count);
   currentTree->SetBranchAddress("genparticles_e"      ,genparticles_e);
   currentTree->SetBranchAddress("genparticles_px"      ,genparticles_px);
@@ -920,6 +933,11 @@ void fillTrees_TauTauStream(TChain* currentTree,
   currentTree->SetBranchAddress("trigobject_pz",    trigobject_pz);
   currentTree->SetBranchAddress("trigobject_filters",    trigobject_filters);
   currentTree->SetBranchAddress("hltriggerresultsV"      ,&hltriggerresultsV);
+  currentTree->SetBranchAddress("l1isotau_count", &l1isotau_count);
+  currentTree->SetBranchAddress("l1isotau_e",  l1isotau_e);
+  currentTree->SetBranchAddress("l1isotau_px", l1isotau_px);
+  currentTree->SetBranchAddress("l1isotau_py", l1isotau_py);
+  currentTree->SetBranchAddress("l1isotau_pz", l1isotau_pz);
 
   //OutTree
   // kinematical variables of first 2 jets  
@@ -1254,7 +1272,7 @@ void fillTrees_TauTauStream(TChain* currentTree,
     numPV_ = primvertex_count;
     npu_ = numtruepileupinteractions;
     rho_ = rhoNeutral;
-    //if(event_ != 18500 && event_ != 186715 && event_ != 186837 && event_ != 187694) continue;
+
     // Get Gen boson and daughters to clasify the event
     LV genVP4_(0, 0, 0, 0); unsigned int genVType_ = 100;
     std::vector<LV> genLeptonP4_; genLeptonP4_.clear();
@@ -1262,7 +1280,7 @@ void fillTrees_TauTauStream(TChain* currentTree,
     std::vector<LV> genTauVisP4_; genTauVisP4_.clear();
     std::vector<int>genLeptonPdgId_; genLeptonPdgId_.clear();
     int nLepton_ = 0, TauLepDecay_ = 0, TauHadDecay_ = 0;
-    if(event_ == 185001 || event_ == 186715 || event_ == 186837 || event_ == 187694)std::cout<<"pass 1, event "<<event_<<endl;
+
     /* //not needed to define this way
     if(!isData){ //for mc only
 
@@ -1336,7 +1354,6 @@ void fillTrees_TauTauStream(TChain* currentTree,
       }
     }
     if(GetTriggerResult((*hltriggerresultsV), hltPath_) < 0.5) continue;
-    if(event_ == 185001|| event_ == 186715 || event_ == 186837 || event_ == 187694)std::cout<<"pass 2, event "<<event_<<endl;
 
     std::vector<DiTauInfo>sortDiTauInfos; sortDiTauInfos.clear();
     //Loop over taus
@@ -1350,18 +1367,24 @@ void fillTrees_TauTauStream(TChain* currentTree,
       //if(TMath::Abs(tau_vertexz[it] - primvertex_z) > 0.2) continue;
       //if(tau_vertexz[it] != primvertex_z) continue;
       if(TMath::Abs(tau_leadchargedhadrcand_dz[it]) >= 0.2) continue;
-      if(event_ == 185001|| event_ == 186715 || event_ == 186837 || event_ == 187694)std::cout<<"pass 3, event "<<event_<<endl;
 
       if(tau_decayModeFinding[it] < 0.5) continue;
       //if(tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[it] > 1.0) continue;
       //if(tau_againstElectronVLooseMVA6[it] < 0.5) continue;
       //if(tau_againstMuonLoose3[it] < 0.5) continue;
       if(TMath::Abs(tau_charge[it]) != 1) continue;
-      if(event_ == 185001|| event_ == 186715 || event_ == 186837 || event_ == 187694)std::cout<<"pass 4, event "<<event_<<endl;
 
       //HLT match
       bool HLTmatchLeg1_ = false;
       bool matchLeg1Level1_ = false; bool matchLeg1Level2_ = false; bool matchLeg1Level3_ = false;
+      //Match to level-1 isotaus                                                                            
+      for(unsigned int il1 = 0; il1 < l1isotau_count; il1++){
+	LV l1CandP4_(l1isotau_px[il1], l1isotau_py[il1], l1isotau_pz[il1], l1isotau_e[il1]);
+	if(l1CandP4_.pt() > 28){
+	  if(ROOT::Math::VectorUtil::DeltaR(l1CandP4_, tauLeg1_) < 0.5) matchLeg1Level1_ = true;
+	}
+      }
+      //Match to HLT
       for(unsigned int it = 0; it < trigobject_count; it++){
         LV trigCandP4_(trigobject_px[it], trigobject_py[it], trigobject_pz[it], sqrt(trigobject_px[it]*trigobject_px[it] + trigobject_py[it]*trigobject_py[it] + trigobject_pz[it]*trigobject_pz[it]));
 
@@ -1369,9 +1392,8 @@ void fillTrees_TauTauStream(TChain* currentTree,
         //if(IsHLTMatched("hltDoubleL2IsoTau35eta2p1", (*run_hltfilters), trigCandP4_, trigobject_filters[it], tauLeg1_) )matchLeg1Level2_ = true;
         if(IsHLTMatched(hltFilter_, (*run_hltfilters), trigCandP4_, trigobject_filters[it], tauLeg1_) )matchLeg1Level3_ = true;
       }
-      HLTmatchLeg1_ = matchLeg1Level3_; //(matchLeg1Level1_ && matchLeg1Level2_ && matchLeg1Level3_);
+      HLTmatchLeg1_ = (matchLeg1Level1_ && matchLeg1Level3_); //(matchLeg1Level1_ && matchLeg1Level2_ && matchLeg1Level3_);
       if(!HLTmatchLeg1_) continue;
-      if(event_ == 185001|| event_ == 186715 || event_ == 186837 || event_ == 187694)std::cout<<"pass 5, event "<<event_<<endl;
 
       for(unsigned int jt = it+1; jt < tau_count; jt++){ //tauL2   
 	    
@@ -1383,18 +1405,23 @@ void fillTrees_TauTauStream(TChain* currentTree,
 	if(TMath::Abs(tau_leadchargedhadrcand_dz[jt]) >= 0.2) continue;
 	//if(TMath::Abs(tau_vertexz[jt] - primvertex_z) > 0.2) continue;
 	//if(tau_vertexz[jt] != primvertex_z) continue;
-	if(event_ == 185001|| event_ == 186715 || event_ == 186837 || event_ == 187694)std::cout<<"pass 6, event "<<event_<<endl;
 
 	if(tau_decayModeFinding[jt] < 0.5) continue;
 	//if(tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[jt] > 1.0) continue;
 	//if(tau_againstElectronVLooseMVA6[jt] < 0.5) continue;
 	//if(tau_againstMuonLoose3[jt] < 0.5) continue;
 	if(TMath::Abs(tau_charge[jt]) != 1) continue;
-	if(event_ == 185001|| event_ == 186715 || event_ == 186837 || event_ == 187694)std::cout<<"pass 7, event "<<event_<<endl;
 
 	//HLT match
 	bool HLTmatchLeg2_ = false;
 	bool matchLeg2Level1_ = false; bool matchLeg2Level2_ = false; bool matchLeg2Level3_ = false;
+	//Match to level-1 isotaus
+	for(unsigned int il1 = 0; il1 < l1isotau_count; il1++){
+	  LV l1CandP4_(l1isotau_px[il1], l1isotau_py[il1], l1isotau_pz[il1], l1isotau_e[il1]);
+	  if(l1CandP4_.pt() > 28){
+	    if(ROOT::Math::VectorUtil::DeltaR(l1CandP4_, tauLeg2_) < 0.5) matchLeg2Level1_ = true;
+	  }
+	}
 	for(unsigned int it = 0; it < trigobject_count; it++){
 	  LV trigCandP4_(trigobject_px[it], trigobject_py[it], trigobject_pz[it], sqrt(trigobject_px[it]*trigobject_px[it] + trigobject_py[it]*trigobject_py[it] + trigobject_pz[it]*trigobject_pz[it]));
 
@@ -1402,12 +1429,10 @@ void fillTrees_TauTauStream(TChain* currentTree,
 	  //if(IsHLTMatched("hltDoubleL2IsoTau35eta2p1", (*run_hltfilters), trigCandP4_, trigobject_filters[it], tauLeg2_) )matchLeg2Level2_ = true;
 	  if(IsHLTMatched(hltFilter_, (*run_hltfilters), trigCandP4_, trigobject_filters[it], tauLeg2_) )matchLeg2Level3_ = true;
 	}
-	HLTmatchLeg2_ = matchLeg2Level3_; //(matchLeg2Level1_ && matchLeg2Level2_ && matchLeg2Level3_);
+	HLTmatchLeg2_ = (matchLeg2Level1_ && matchLeg2Level3_); //(matchLeg2Level1_ && matchLeg2Level2_ && matchLeg2Level3_);
 	if(!HLTmatchLeg2_) continue;
-	if(event_ == 185001|| event_ == 186715 || event_ == 186837 || event_ == 187694)std::cout<<"pass 8, event "<<event_<<endl;
 
 	if(ROOT::Math::VectorUtil::DeltaR(tauLeg1_, tauLeg2_) < 0.5) continue;
-	if(event_ == 185001|| event_ == 186715 || event_ == 186837 || event_ == 187694)std::cout<<"pass 9, event "<<event_<<endl;
 
 	float sumPt = tauLeg1_.pt() + tauLeg2_.pt();
 	//float sumIso = tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[it] + tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[jt];
@@ -1541,7 +1566,7 @@ void fillTrees_TauTauStream(TChain* currentTree,
 	  //int jetFlavour = pfjet_flavour[ijet]; //get it from tree
 	  //bool isBtag = btsf->isbtagged(JetP4_.Pt(), JetP4_.Eta(), pfjet_btag[ijet][2], jetFlavour, isData ,kNo, kNo, true); //use CSV Medium WP
 	  float BDiscr = GetBTagDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags", (*run_btagdiscriminators), pfjet_btag[ijet]);
-	  bool isBtag = (BDiscr > 0.89); //pfCombinedInclusiveSecondaryVertexV2BJetTags
+	  bool isBtag = (BDiscr > 0.8); //pfCombinedInclusiveSecondaryVertexV2BJetTags
 	  //bool isBtag = (pfjet_btag[ijet][8] > 0.814); //pfCombinedInclusiveSecondaryVertexV2BJetTags
 
 	  if(isBtag){
@@ -1553,7 +1578,7 @@ void fillTrees_TauTauStream(TChain* currentTree,
 	    }
 	  }
 
-	  if(pfjet_btag[ijet][8] > 0.244){ //Loose WP
+	  if(pfjet_btag[ijet][0] > 0.5){ //Loose WP
 	    nJets20BTaggedLoose++;
 	  }
 	}
@@ -1565,14 +1590,14 @@ void fillTrees_TauTauStream(TChain* currentTree,
 	etaj1 = pfJetsP4_[0].eta();
 	phij1 = pfJetsP4_[0].phi();
 	pumvaj1 = pfjet_pu_jet_full_mva[pfJetsIndex_[0]];
-	csvj1 = pfjet_btag[pfJetsIndex_[0]][6];
+	csvj1 = pfjet_btag[pfJetsIndex_[0]][0];
 	ptrawj1 = pfjet_energycorr[pfJetsIndex_[0]]*ptj1;
 	if(pfJetsP4_.size() >= 2){
 	  ptj2 = pfJetsP4_[1].pt();
 	  etaj2 = pfJetsP4_[1].eta();
 	  phij2 = pfJetsP4_[1].phi();
 	  pumvaj2 = pfjet_pu_jet_full_mva[pfJetsIndex_[1]];
-	  csvj2 = pfjet_btag[pfJetsIndex_[1]][6];
+	  csvj2 = pfjet_btag[pfJetsIndex_[1]][0];
 	  ptrawj2 = pfjet_energycorr[pfJetsIndex_[1]]*ptj2;
 
 	  Detajj = TMath::Abs(pfJetsP4_[0].eta() - pfJetsP4_[1].eta());
@@ -1660,10 +1685,15 @@ void fillTrees_TauTauStream(TChain* currentTree,
       int mvamet_index = -1;
       for(UInt_t imet = 0; imet < mvamet_count; imet++){
       	//std::cout<<"mva met channel "<<mvamet_channel[imet]<<std::endl;
-      	if(mvamet_channel[imet] == TAUTAU){
+      	//if(mvamet_channel[imet] == TAUTAU){
+	if(mvamet_channel[imet] == ETAU){ //due to bug in the ntuple
 	  if((int(mvamet_lep1[imet]) == tau1 && int(mvamet_lep2[imet]) == tau2) ||
-	     (int(mvamet_lep1[imet]) == tau2 && int(mvamet_lep2[imet]) == tau1))
-	    mvamet_index = imet;
+	     (int(mvamet_lep1[imet]) == tau2 && int(mvamet_lep2[imet]) == tau1)){
+	    if((fabs(mvamet_lep1_pt[imet] - Leg1P4_.pt()) < 0.001 && fabs(mvamet_lep2_pt[imet] - Leg2P4_.pt()) < 0.001) ||
+	       (fabs(mvamet_lep1_pt[imet] - Leg2P4_.pt()) < 0.001 && fabs(mvamet_lep2_pt[imet] - Leg1P4_.pt()) < 0.001)){
+	      mvamet_index = imet;
+	    }
+	  }
 	}
       }
       if(mvamet_index < 0) { std::cout<<"mvamet_index < 0"<<std::endl; break;}
@@ -1863,7 +1893,7 @@ void fillTrees_TauTauStream(TChain* currentTree,
 	diTauCounter++; 
 	pairIndex   = diTauCounter;
       }
-      if(event_ == 185001|| event_ == 186715 || event_ == 186837 || event_ == 187694)std::cout<<"pass 10, event "<<event_<<endl;
+
       outTree->Fill(); //fill tree for each pair
 
     }//end of di-tau pair

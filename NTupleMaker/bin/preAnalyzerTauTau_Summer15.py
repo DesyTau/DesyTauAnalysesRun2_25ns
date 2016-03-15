@@ -11,9 +11,10 @@ import subprocess
 #WorkdirLoc = '/nfs/dust/cms/user/fcost/store/DataCards_MVAMEt_5X/' #'/nfs/dust/cms/user/fcost/store/DataCards/'
 WorkdirData = '/nfs/dust/cms/user/rasp/ntuples/Data2015D_MVAMEt_5X/'
 #WorkdirMC = '/nfs/dust/cms/user/fcost/store/DataCards_JECv6_SynchedMVAMEt/'
-WorkdirMC = '/nfs/dust/cms/user/fcost/store/76x_MiniAODv2/'
+#WorkdirMC = '/nfs/dust/cms/user/fcost/store/76x_MiniAODv2/'
+WorkdirMC = '/nfs/dust/cms/user/rasp/storage/76x_JECv2_MVAMET0p6/'
 #WorkdirLoc = '/nfs/dust/cms/group/susy-desy/Run2/MC/Stau/MC_Spring15_50ns_v1/'
-OutDir     = '/nfs/dust/cms/user/anayak/CMS/Ntuple_HttAnalysis/ntuples76_25ns_v1/'    
+OutDir     = '/nfs/dust/cms/user/anayak/CMS/Ntuple_HttAnalysis/ntuples76_25ns_v2/'    
 
 options = {
     ###tau+tau samples
