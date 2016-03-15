@@ -1668,7 +1668,7 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	    mvamet_lep2[mvamet_count] = find_lep(electron_count, electron_px, electron_py, electron_pz, met->userCand("lepton1")->p4() );
 	  }
 	  else if (!met->userCand("lepton0")->isPhoton() && !(met->userCand("lepton1")->isPhoton())){
-	    mvamet_channel[mvamet_count] = ETAU;
+	    mvamet_channel[mvamet_count] = TAUTAU;
 	    mvamet_lep1_pt[mvamet_count] = met->userCand("lepton0")->pt();
 	    mvamet_lep2_pt[mvamet_count] = met->userCand("lepton1")->pt();
 	    mvamet_lep1[mvamet_count] = find_lep(tau_count, tau_px, tau_py, tau_pz, met->userCand("lepton0")->p4() );
