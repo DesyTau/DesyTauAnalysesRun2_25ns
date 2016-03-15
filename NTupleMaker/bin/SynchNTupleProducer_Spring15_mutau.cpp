@@ -1082,7 +1082,7 @@ int main(int argc, char * argv[]) {
 
 	jetspt20.push_back(jet);
 
-	if (absJetEta<bJetEtaCut && analysisTree.pfjet_btag[jet][6]>btagCut) { // b-jet
+	if (absJetEta<bJetEtaCut && analysisTree.pfjet_btag[jet][0]>btagCut) { // b-jet
 	  bjets.push_back(jet);
 	  if (jetPt>ptLeadingBJet) {
 	    ptLeadingBJet = jetPt;
