@@ -3,7 +3,7 @@
 <bin name="Splitter" file="Splitter.cpp">
 </bin>
 
-<bin name="ScaleFactor_test" file="ScaleFactor_test.cpp">
+<bin name="AnalysisNTupleProducer" file="AnalysisNTupleProducer.cpp">
  <use name="PhysicsTools/Utilities"/>
  <use name="rootgraphics"/>
  <use name="root"/>
@@ -76,6 +76,7 @@
 </bin>
 
 <bin name="SynchNTupleProducer_mt" file="SynchNTupleProducer_mt.cpp">
+ <use name="HTT-utilities/RecoilCorrections"/>
  <use name="PhysicsTools/Utilities"/>
  <use name="rootgraphics"/>
  <use name="root"/>

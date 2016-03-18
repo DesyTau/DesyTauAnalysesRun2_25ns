@@ -29,6 +29,7 @@
 #include "DesyTauAnalyses/NTupleMaker/interface/Jets.h"
 #include "HTT-utilities/LepEffInterface/interface/ScaleFactor.h"
 #include "HTT-utilities/RecoilCorrections/interface/RecoilCorrector.h"
+#include "HTT-utilities/RecoilCorrections/interface/MEtSys.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/functions.h"
 
 float topPtWeight(float pt1,
@@ -59,6 +60,19 @@ float nJetsWeight(int nJets) {
 
   return weight;
 
+}
+
+void computeRecoil(float metx, float mety,
+		   float unitX,float unitY,
+		   float perpUnitX, float perpUnitY,
+		   float dimuonPt,
+		   float & recoilParal,
+		   float & recoilPerp,
+		   float & responseHad) {
+
+  recoilParal = metx*unitX + mety*unitY;
+  recoilPerp = metx*perpUnitX + mety*perpUnitY;
+  responseHad = 1 + recoilParal/dimuonPt;
 }
 
 int main(int argc, char * argv[]) {
@@ -154,6 +168,19 @@ int main(int argc, char * argv[]) {
 
   const string recoilMvaFileName   = cfg.get<string>("RecoilMvaFileName");
   TString RecoilMvaFileName(recoilMvaFileName);
+
+  // systematics
+  const string metsysFileName   = cfg.get<string>("MetSysFileName");
+  TString MetSysFileName(metsysFileName);
+
+  const string metsysPuppiFileName   = cfg.get<string>("MetSysPuppiFileName");
+  TString MetSysPuppiFileName(metsysPuppiFileName);
+
+  const string metsysMvaFileName   = cfg.get<string>("MetSysMvaFileName");
+  TString MetSysMvaFileName(metsysMvaFileName);
+
+  const int bkgdType =  cfg.get<float>("BkgdType");
+
 
   const string jsonFile = cfg.get<string>("jsonFile");
 
@@ -269,6 +296,10 @@ int main(int argc, char * argv[]) {
   TH1D * metZSelNJets[3];
   TH1D * puppimetZSelNJets[3];
   TH1D * mvametZSelNJets[3];
+
+  TH1D * metTopSelNJets[3];
+  TH1D * puppimetTopSelNJets[3];
+  TH1D * mvametTopSelNJets[3];
 
   TH1D * recoilZParalH[3];
   TH1D * recoilZPerpH[3];
@@ -553,6 +584,12 @@ int main(int argc, char * argv[]) {
   RecoilCorrector recoilPFMetCorrector(RecoilFileName);
   RecoilCorrector recoilMvaMetCorrector(RecoilMvaFileName);
   RecoilCorrector recoilPuppiMetCorrector(RecoilPuppiFileName);
+
+  // MetResponse
+  MEtSys metSys(MetSysFileName);
+  MEtSys metSysPuppi(MetSysPuppiFileName);
+  MEtSys metSysMva(MetSysMvaFileName);
+
 
   // Lepton Scale Factors 
   ScaleFactor * SF_electronIdIso;
@@ -1390,7 +1427,7 @@ int main(int argc, char * argv[]) {
 
 	    float pfmetcorr_ex = pfmet_ex;
 	    float pfmetcorr_ey = pfmet_ey;
-	    recoilPFMetCorrector.Correct(pfmet_ex,pfmet_ey,genV.Px(),genV.Py(),visiblePx,visiblePy,nJets30,pfmetcorr_ex,pfmetcorr_ey);
+	    recoilPFMetCorrector.CorrectByMeanResolution(pfmet_ex,pfmet_ey,genV.Px(),genV.Py(),visiblePx,visiblePy,nJets30,pfmetcorr_ex,pfmetcorr_ey);
 	    pfmet_phi = TMath::ATan2(pfmetcorr_ey,pfmetcorr_ex);
 	    pfmet = TMath::Sqrt(pfmetcorr_ex*pfmetcorr_ex+pfmetcorr_ey*pfmetcorr_ey);
 	    pfmet_ex = pfmetcorr_ex;
@@ -1398,7 +1435,7 @@ int main(int argc, char * argv[]) {
 	    
 	    float puppimetcorr_ex = puppimet_ex;
 	    float puppimetcorr_ey = puppimet_ey;
-	    recoilPuppiMetCorrector.Correct(puppimet_ex,puppimet_ey,genV.Px(),genV.Py(),visiblePx,visiblePy,nJets30,puppimetcorr_ex,puppimetcorr_ey);
+	    recoilPuppiMetCorrector.CorrectByMeanResolution(puppimet_ex,puppimet_ey,genV.Px(),genV.Py(),visiblePx,visiblePy,nJets30,puppimetcorr_ex,puppimetcorr_ey);
 	    puppimet_phi = TMath::ATan2(puppimetcorr_ey,puppimetcorr_ex);
 	    puppimet = TMath::Sqrt(puppimetcorr_ex*puppimetcorr_ex+puppimetcorr_ey*puppimetcorr_ey);
 	    puppimet_ex = puppimetcorr_ex;
@@ -1406,7 +1443,7 @@ int main(int argc, char * argv[]) {
 
 	    float mvametcorr_ex = mvamet_ex;
 	    float mvametcorr_ey = mvamet_ey;
-	    recoilMvaMetCorrector.Correct(mvamet_ex,mvamet_ey,genV.Px(),genV.Py(),visiblePx,visiblePy,nJets30,mvametcorr_ex,mvametcorr_ey);
+	    recoilMvaMetCorrector.CorrectByMeanResolution(mvamet_ex,mvamet_ey,genV.Px(),genV.Py(),visiblePx,visiblePy,nJets30,mvametcorr_ex,mvametcorr_ey);
 	    mvamet_phi = TMath::ATan2(mvametcorr_ey,mvametcorr_ex);
 	    mvamet = TMath::Sqrt(mvametcorr_ex*mvametcorr_ex+mvametcorr_ey*mvametcorr_ey);
 	    mvamet_ex = mvametcorr_ex;
