@@ -83,26 +83,33 @@ os.system('python preAnalyzerTauTau_Summer15.py')
     
 ###########################################
 ###########################################
-##Data
-preAnalyze("nominal","Run2015B-Data_TauTau",True)
+#Data
+#preAnalyze("nominal","Tau_Run2015D_05Oct2015",False)
+#preAnalyze("nominal","Tau_Run2015D_PRv4",False)
 
+preAnalyze("nominal","SUSYGGH160",True)
+
+#analysis = {"nominal", "TauUp", "TauDown"}
+#for ana in analysis:
 ##Signal
-#preAnalyze("nominal","GGFH125",False)
-#preAnalyze("nominal","VBFH125",False)
-#preAnalyze("nominal","SUSYGGH160",True)
-#preAnalyze("nominal","SUSYBBH160",True)
-
+#    preAnalyze(ana,"GGFH125",False)
+##preAnalyze(ana,"VBFH125",False)
+#    preAnalyze(ana,"SUSYGGH160",False)
+##preAnalyze(ana,"SUSYBBH160",False)
+#    
 ## Background
-#preAnalyze("nominal","DYJets_TauTau",True)
-#preAnalyze("nominal","WJetsToLNu",True)
-#preAnalyze("nominal","TTJets",True)
-#preAnalyze("nominal","SingleTop_t",True)
-##preAnalyze("nominal","SingleAntiTop_t",True)
-#preAnalyze("nominal","SingleTop_tW",True)
-#preAnalyze("nominal","SingleAntiTop_tW",True)
-##preAnalyze("nominal","WWTo2L2Nu",True)
-##preAnalyze("nominal","WWTo4Q",True)
-##preAnalyze("nominal","WWToLNuQQ",True)
-##preAnalyze("nominal","WZTo1L1Nu2Q",True)
-##preAnalyze("nominal","WZTo3LNu",True)
-##preAnalyze("nominal","ZZ",True)
+#    preAnalyze(ana,"DYJets_TauTau",False)
+#    preAnalyze(ana,"WJetsToLNu",False)
+#    preAnalyze(ana,"TTJets",False)
+#    preAnalyze(ana,"SingleTop_t",False)
+#    preAnalyze(ana,"SingleAntiTop_t",False)
+#    preAnalyze(ana,"SingleTop_tW",False)
+#    preAnalyze(ana,"SingleAntiTop_tW",False)
+#    preAnalyze(ana,"VVTo2L2Nu",False)
+#    preAnalyze(ana,"WZJets",False)
+#    preAnalyze(ana,"WWToLNuQQ",False)
+#    preAnalyze(ana,"WZTo1L1Nu2Q",False)
+#    preAnalyze(ana,"WZTo1L3Nu",False)
+#    preAnalyze(ana,"WZTo2L2Q",False)
+#    preAnalyze(ana,"ZZTo2L2Q",False)
+#    preAnalyze(ana,"ZZTo4L",False)

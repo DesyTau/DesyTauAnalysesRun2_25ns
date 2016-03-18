@@ -38,6 +38,9 @@
 #include "TMath.h"
 #include "TTree.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
+#include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
+
+#include "FWCore/Utilities/interface/EDGetToken.h"
 
 //
 // class declaration
@@ -60,8 +63,15 @@ class InitAnalyzer : public edm::EDAnalyzer {
 
   TTree* tree0;
   TH1D*  nEvents;
+  TH1D*  nPU_TrueNumInteractions;
+  TH1D*  nPU_NumInteractionsBX0;
+  TH1D*  nPU_NumInteractionsBXm1;
+  TH1D*  nPU_NumInteractionsBXp1;
+
   bool cdata;
   bool cgen;
+  edm::EDGetTokenT<std::vector<PileupSummaryInfo> > PUInfoToken_;
+  edm::EDGetTokenT<GenEventInfoProduct > GenToken_;
   Float_t genweight;
       //virtual void beginRun(edm::Run const&, edm::EventSetup const&) override;
       //virtual void endRun(edm::Run const&, edm::EventSetup const&) override;
@@ -84,7 +94,9 @@ class InitAnalyzer : public edm::EDAnalyzer {
 //
 InitAnalyzer::InitAnalyzer(const edm::ParameterSet& iConfig) :
   cdata(iConfig.getUntrackedParameter<bool>("IsData", false)),
-  cgen(iConfig.getUntrackedParameter<bool>("GenParticles", false))
+  cgen(iConfig.getUntrackedParameter<bool>("GenParticles", false)),
+  PUInfoToken_( consumes< std::vector<PileupSummaryInfo> >(edm::InputTag("slimmedAddPileupInfo"))),
+  GenToken_( consumes<GenEventInfoProduct>(edm::InputTag("generator")))
 {
 	
 }
@@ -107,32 +119,47 @@ void
 InitAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
    using namespace edm;
-  nEvents->Fill(0);
+   nEvents->Fill(0);
 
+  if (!cdata) {
+     edm::Handle<vector<PileupSummaryInfo> > PUInfo;
+     iEvent.getByToken( PUInfoToken_, PUInfo);
+      if(PUInfo.isValid())
+	{
+	  for(vector<PileupSummaryInfo>::const_iterator PVI = PUInfo->begin(); PVI != PUInfo->end(); ++PVI)
+	    {
+	      int BX = PVI->getBunchCrossing();
+	      if(BX == -1)
+		{ 
+		 nPU_NumInteractionsBXm1->Fill(PVI->getPU_NumInteractions());
+		}
+	      else if(BX == 0)
+		{ 
+		  nPU_NumInteractionsBX0->Fill(PVI->getPU_NumInteractions());	        
+		  nPU_TrueNumInteractions->Fill(PVI->getTrueNumInteractions());
+		}
+	      else if(BX == 1)
+		{ 
+		 nPU_NumInteractionsBXp1->Fill(PVI->getPU_NumInteractions());
+		}
+	      
+	    }
+	}
+  }
 
   genweight = 1.;
   if(cgen && !cdata)
     {
       edm::Handle<GenEventInfoProduct> HEPMC;
-      iEvent.getByLabel(edm::InputTag("generator"), HEPMC);
+      iEvent.getByToken( GenToken_, HEPMC);
       if(HEPMC.isValid())
 	{
 	  genweight = HEPMC->weight();
-	//  	  cout << "Event weight from HEPMC : " << genweight << endl;
+	  //  	  cout << "Event weight from HEPMC : " << genweight << endl;
 	}
     }
   tree0->Fill();
-#ifdef THIS_IS_AN_EVENT_EXAMPLE
-   Handle<ExampleData> pIn;
-   iEvent.getByLabel("example",pIn);
-#endif
-   
-#ifdef THIS_IS_AN_EVENTSETUP_EXAMPLE
-   ESHandle<SetupData> pSetup;
-   iSetup.get<SetupRecord>().get(pSetup);
-#endif
 }
-
 
 // ------------ method called once each job just before starting event loop  ------------
 void 
@@ -141,6 +168,12 @@ InitAnalyzer::beginJob()
   edm::Service<TFileService> FS;
   tree0 = FS->make<TTree>("AC1B", "AC1B", 1);
   nEvents = FS->make<TH1D>("nEvents", "nEvents", 2, -0.5, +1.5);
+  if (!cdata){
+    nPU_TrueNumInteractions = FS->make<TH1D>("nPU_TrueNumInteractions","nPU_TrueNumInteractions",100, 0., 100);
+    nPU_NumInteractionsBX0 = FS->make<TH1D>("nPU_NumInteractionsBX0","nPU_NumInteractionsBX0",100, 0., 100);
+    nPU_NumInteractionsBXm1 = FS->make<TH1D>("nPU_NumInteractionsBXm1","nPU_NumInteractionsBXm1",100, 0., 100);
+    nPU_NumInteractionsBXp1 = FS->make<TH1D>("nPU_NumInteractionsBXp1","nPU_NumInteractionsBXp1",100, 0., 100);
+  }
   if (cgen && !cdata) {
     tree0->Branch("genweight", &genweight, "genweight/F");
 	}

@@ -47,6 +47,8 @@ void synchNtuple(string sample = "GGFH125", string stream = "MuTau", bool incl=f
    float lTrigweight_2 = 0; lOTree->Branch("trigweight_2"     ,&lTrigweight_2        ,"lTrigweight_2/F"  ); 
    float lIdweight_2 = 0; lOTree->Branch("idweight_2"     ,&lIdweight_2        ,"lIdweight_2/F"  ); 
    float lIsoweight_2 = 0; lOTree->Branch("isoweight_2"     ,&lIsoweight_2        ,"lIsoweight_2/F"  );
+   int lgen_match_1 = 99; lOTree->Branch("gen_match_1",   &lgen_match_1,    "lgen_match_1/I");
+   int lgen_match_2 = 99; lOTree->Branch("gen_match_2",   &lgen_match_2,    "lgen_match_2/I");
 
    //SV Fit variables
    float lMSV         = 0; lOTree->Branch("m_sv"       ,&lMSV           ,"lMSV/F"     );//SV Fit using integration method
@@ -74,10 +76,10 @@ void synchNtuple(string sample = "GGFH125", string stream = "MuTau", bool incl=f
    float lMtMVA1      = 0; lOTree->Branch("mtmva_1"    ,&lMtMVA1        ,"lMtMVA1/F"     );//mT of  first lepton wrt to mva met    
 
    float lQ1          = 0; lOTree->Branch("q_1"        ,&lQ1            ,"lQ1/F"      ); //Charge
-   float lagainstElectronLooseMVA5_1  = 0; lOTree->Branch("againstElectronLooseMVA5_1",   &lagainstElectronLooseMVA5_1, "lagainstElectronLooseMVA5_1/F") ;
-   float lagainstElectronMediumMVA5_1 = 0; lOTree->Branch("againstElectronMediumMVA5_1",   &lagainstElectronMediumMVA5_1, "lagainstElectronMediumMVA5_1/F");
-   float lagainstElectronTightMVA5_1  = 0; lOTree->Branch("againstElectronTightMVA5_1",   &lagainstElectronTightMVA5_1, "lagainstElectronTightMVA5_1/F");
-   float lagainstElectronVLooseMVA5_1 = 0; lOTree->Branch("againstElectronVLooseMVA5_1",   &lagainstElectronVLooseMVA5_1, "lagainstElectronVLooseMVA5_1/F");
+   float lagainstElectronLooseMVA6_1  = 0; lOTree->Branch("againstElectronLooseMVA6_1",   &lagainstElectronLooseMVA6_1, "lagainstElectronLooseMVA6_1/F") ;
+   float lagainstElectronMediumMVA6_1 = 0; lOTree->Branch("againstElectronMediumMVA6_1",   &lagainstElectronMediumMVA6_1, "lagainstElectronMediumMVA6_1/F");
+   float lagainstElectronTightMVA6_1  = 0; lOTree->Branch("againstElectronTightMVA6_1",   &lagainstElectronTightMVA6_1, "lagainstElectronTightMVA6_1/F");
+   float lagainstElectronVLooseMVA6_1 = 0; lOTree->Branch("againstElectronVLooseMVA6_1",   &lagainstElectronVLooseMVA6_1, "lagainstElectronVLooseMVA6_1/F");
    float lagainstMuonLoose3_1         = 0; lOTree->Branch("againstMuonLoose3_1",     &lagainstMuonLoose3_1,   "lagainstMuonLoose3_1/F");
    float lagainstMuonTight3_1         = 0; lOTree->Branch("againstMuonTight3_1",     &lagainstMuonTight3_1,   "lagainstMuonTight3_1/F");
    float lbyCombinedIsolationDeltaBetaCorrRaw3Hits_1 = 0; lOTree->Branch("byCombinedIsolationDeltaBetaCorrRaw3Hits_1",   &lbyCombinedIsolationDeltaBetaCorrRaw3Hits_1,   "lbyCombinedIsolationDeltaBetaCorrRaw3Hits_1/F");
@@ -98,10 +100,10 @@ void synchNtuple(string sample = "GGFH125", string stream = "MuTau", bool incl=f
    float lMt2         = 0; lOTree->Branch("mt_2"       ,&lMt2           ,"lMt2/F"     );//mT of 2nd lepton wrt to pf met
    float lMtMVA2      = 0; lOTree->Branch("mtmva_2"    ,&lMtMVA2        ,"lMtMVA2/F"     );//mT of  first lepton wrt to mva met
    float lQ2          = 0; lOTree->Branch("q_2"        ,&lQ2            ,"lQ2/F"      ); //Charge
-   float lagainstElectronLooseMVA5_2  = 0; lOTree->Branch("againstElectronLooseMVA5_2",   &lagainstElectronLooseMVA5_2, "lagainstElectronLooseMVA5_2/F");
-   float lagainstElectronMediumMVA5_2 = 0; lOTree->Branch("againstElectronMediumMVA5_2",   &lagainstElectronMediumMVA5_2, "lagainstElectronMediumMVA5_2/F");
-   float lagainstElectronTightMVA5_2  = 0; lOTree->Branch("againstElectronTightMVA5_2",   &lagainstElectronTightMVA5_2, "lagainstElectronTightMVA5_2/F");
-   float lagainstElectronVLooseMVA5_2 = 0; lOTree->Branch("againstElectronVLooseMVA5_2",   &lagainstElectronVLooseMVA5_2, "lagainstElectronVLooseMVA5_2/F");
+   float lagainstElectronLooseMVA6_2  = 0; lOTree->Branch("againstElectronLooseMVA6_2",   &lagainstElectronLooseMVA6_2, "lagainstElectronLooseMVA6_2/F");
+   float lagainstElectronMediumMVA6_2 = 0; lOTree->Branch("againstElectronMediumMVA6_2",   &lagainstElectronMediumMVA6_2, "lagainstElectronMediumMVA6_2/F");
+   float lagainstElectronTightMVA6_2  = 0; lOTree->Branch("againstElectronTightMVA6_2",   &lagainstElectronTightMVA6_2, "lagainstElectronTightMVA6_2/F");
+   float lagainstElectronVLooseMVA6_2 = 0; lOTree->Branch("againstElectronVLooseMVA6_2",   &lagainstElectronVLooseMVA6_2, "lagainstElectronVLooseMVA6_2/F");
    float lagainstMuonLoose3_2         = 0; lOTree->Branch("againstMuonLoose3_2",     &lagainstMuonLoose3_2,   "lagainstMuonLoose3_2/F");
    float lagainstMuonTight3_2         = 0; lOTree->Branch("againstMuonTight3_2",     &lagainstMuonTight3_2,   "lagainstMuonTight3_2/F");
    float lbyCombinedIsolationDeltaBetaCorrRaw3Hits_2 = 0; lOTree->Branch("byCombinedIsolationDeltaBetaCorrRaw3Hits_2",   &lbyCombinedIsolationDeltaBetaCorrRaw3Hits_2,   "lbyCombinedIsolationDeltaBetaCorrRaw3Hits_2/F");
@@ -121,16 +123,17 @@ void synchNtuple(string sample = "GGFH125", string stream = "MuTau", bool incl=f
    float lMVAMetPhi   = 0; lOTree->Branch("mvametphi"  ,&lMVAMetPhi     ,"lMetPhi/F"   ); //mvamet Phi
    //float lPZetaVis    = 0; lOTree->Branch("pzetavis"   ,&lPZetaVis      ,"lPZetaVis/F" ); //pZeta Visible
    //float lPZetaMiss   = 0; lOTree->Branch("pzetamiss"  ,&lPZetaMiss     ,"lPZetaMiss/F"); //pZeta Missing
+
    //MET covariance matrices
-   float lMetCov00   = 0; lOTree->Branch("metcov00"   ,&lMetCov00      ,"lMetCov00/F"); //pf met covariance matrix 00 
-   float lMetCov01    = 0; lOTree->Branch("metcov01"   ,&lMetCov01      ,"lMetCov01/F"); //pf met covariance matrix 01 
-   float lMetCov10    = 0; lOTree->Branch("metcov10"   ,&lMetCov10      ,"lMetCov10/F"); //pf met covariance matrix 10 
-   float lMetCov11    = 0; lOTree->Branch("metcov11"   ,&lMetCov11      ,"lMetCov11/F"); //pf met covariance matrix 11 
+   float lMetCov00   = 0; lOTree->Branch("pfmetCov00"   ,&lMetCov00      ,"lMetCov00/F"); //pf met covariance matrix 00 
+   float lMetCov01    = 0; lOTree->Branch("pfmetCov01"   ,&lMetCov01      ,"lMetCov01/F"); //pf met covariance matrix 01 
+   float lMetCov10    = 0; lOTree->Branch("pfmetCov10"   ,&lMetCov10      ,"lMetCov10/F"); //pf met covariance matrix 10 
+   float lMetCov11    = 0; lOTree->Branch("pfmetCov11"   ,&lMetCov11      ,"lMetCov11/F"); //pf met covariance matrix 11 
    //MVAMet covariance matrices
-   float lMVACov00    = 0; lOTree->Branch("mvacov00"   ,&lMVACov00      ,"lMVACov00/F"); //mva met covariance matrix 00 
-   float lMVACov01    = 0; lOTree->Branch("mvacov01"   ,&lMVACov01      ,"lMVACov01/F"); //mva met covariance matrix 01 
-   float lMVACov10    = 0; lOTree->Branch("mvacov10"   ,&lMVACov10      ,"lMVACov10/F"); //mva met covariance matrix 10 
-   float lMVACov11    = 0; lOTree->Branch("mvacov11"   ,&lMVACov11      ,"lMVACov11/F"); //mva met covariance matrix 11 
+   float lMVACov00    = 0; lOTree->Branch("mvametCov00"   ,&lMVACov00      ,"lMVACov00/F"); //mva met covariance matrix 00 
+   float lMVACov01    = 0; lOTree->Branch("mvametCov01"   ,&lMVACov01      ,"lMVACov01/F"); //mva met covariance matrix 01 
+   float lMVACov10    = 0; lOTree->Branch("mvametCov10"   ,&lMVACov10      ,"lMVACov10/F"); //mva met covariance matrix 10 
+   float lMVACov11    = 0; lOTree->Branch("mvametCov11"   ,&lMVACov11      ,"lMVACov11/F"); //mva met covariance matrix 11 
    
 
    //First Jet   : leading jet after applying Jet energy corrections (excluding hadronic Tau)
@@ -199,14 +202,8 @@ void synchNtuple(string sample = "GGFH125", string stream = "MuTau", bool incl=f
    /////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-   //TFile *file = new TFile(("./batch/nTuple"+sample+"_Open_"+stream+"Stream.root").c_str(),"READ");
-   //TTree *tree_orig = (TTree*)file->Get("outTreePtOrd")->Clone("tree");
    TChain *tree = new TChain("outTree");
-   tree->Add(("/nfs/dust/cms/user/anayak/CMS/Ntuple_HttAnalysis/ntuples74/nTuple"+sample+".root").c_str());
-
-   //TCut sbinPair("etaL1<999.");
-   //if( stream.find("TauTau")!=string::npos)
-   //sbinPair = TCut("ptL1>45 && ptL2>45 && tightestHPSMVA3oldDMwLTWPL1>2 && tightestHPSMVA3oldDMwLTWPL2>2 && genVMass>(0.7*130) && genVMass<(1.3*130) && HLTx"); // && HLTmatchL1 && HLTmatchL2 && HLTx");
+   tree->Add(("/nfs/dust/cms/user/anayak/CMS/Ntuple_HttAnalysis/ntuples76_25ns_v2/nTuple"+sample+".root").c_str());
 
    int iPairIndex      ; tree->SetBranchAddress("pairIndex"     ,&iPairIndex);
    int  iHLTx          ; tree->SetBranchAddress("HLTx"        ,&iHLTx   );
@@ -224,9 +221,10 @@ void synchNtuple(string sample = "GGFH125", string stream = "MuTau", bool incl=f
    float iRho         ; tree->SetBranchAddress("rho"   ,&iRho         );//Rho
    
    //Event Weights
-   //float iMCWeight1    ; tree->SetBranchAddress("sampleWeight"   ,&iMCWeight1    );//MC Weight (xs/nevents * additional wieght (ie pt weight for gghiggs))
+   float iEvtWeight    ; tree->SetBranchAddress("evtweight"   ,&iEvtWeight   );//MC Weight (xs/sum(gen weights))
+   float iGenWeight    ; tree->SetBranchAddress("mcweight"   ,&iGenWeight   );//Gen MC Weight
    //float iMCWeight2    ; tree->SetBranchAddress("HqTWeight"      ,&iMCWeight2    );//MC Weight (xs/nevents * additional wieght (ie pt weight for gghiggs))
-   //float iPUWeight    ; tree->SetBranchAddress("puWeight"        ,&iPUWeight    );//Pielup Weight
+   float iPUWeight    ; tree->SetBranchAddress("puweight"        ,&iPUWeight    );//Pielup Weight
    ////SV Fit variables
    float iMSV         ; tree->SetBranchAddress("diTauNSVfitMass"       ,&iMSV            );//SV Fit using integration method
    float iMSVUp       ; tree->SetBranchAddress("diTauNSVfitMassErrUp"    ,&iMSVUp         );//High Energy scale shape
@@ -249,7 +247,7 @@ void synchNtuple(string sample = "GGFH125", string stream = "MuTau", bool incl=f
    float iQ1          ; tree->SetBranchAddress("chargeL1"        ,&iQ1 );
    int idecayModeFinding1   ; tree->SetBranchAddress("decayModeFindingL1",   &idecayModeFinding1 );
    int idecayModeFindingNewDM1  ; tree->SetBranchAddress("decayModeFindingNewDML1",  &idecayModeFindingNewDM1 );
-   int itightestAntiEMVA5WP1   ; tree->SetBranchAddress("tightestAntiEMVA5WPL1",  &itightestAntiEMVA5WP1 );
+   int itightestAntiEMVA6WP1   ; tree->SetBranchAddress("tightestAntiEMVA6WPL1",  &itightestAntiEMVA6WP1 );
    int itightestAntiMu3WP1     ; tree->SetBranchAddress("tightestAntiMu3WPL1",   &itightestAntiMu3WP1 );
    float ihpsDB3H1 ; tree->SetBranchAddress("hpsDB3HL1",    &ihpsDB3H1 );
    //int  iPassId1      ; tree->SetBranchAddress("tightestHPSMVA3oldDMwLTWPL1"   ,&iPassId1      ); 
@@ -269,7 +267,7 @@ void synchNtuple(string sample = "GGFH125", string stream = "MuTau", bool incl=f
    float iM2          ; tree->SetBranchAddress("visibleTauMassL2"        ,&iM2 );//Mass (visible mass for hadronic Tau)
    int idecayModeFinding2   ; tree->SetBranchAddress("decayModeFindingL2",   &idecayModeFinding2 );
    int idecayModeFindingNewDM2  ; tree->SetBranchAddress("decayModeFindingNewDML2",  &idecayModeFindingNewDM2);
-   int itightestAntiEMVA5WP2  ; tree->SetBranchAddress("tightestAntiEMVA5WPL2",  &itightestAntiEMVA5WP2 );
+   int itightestAntiEMVA6WP2  ; tree->SetBranchAddress("tightestAntiEMVA6WPL2",  &itightestAntiEMVA6WP2 );
    int itightestAntiMu3WP2   ; tree->SetBranchAddress("tightestAntiMu3WPL2",   &itightestAntiMu3WP2 );
    float ihpsDB3H2 ; tree->SetBranchAddress("hpsDB3HL2",    &ihpsDB3H2 );
    //int  iPassId2      ; tree->SetBranchAddress("tightestHPSMVA3oldDMwLTWPL2"   ,&iPassId2      );//Whether it passes id  (not necessarily iso)
@@ -332,7 +330,10 @@ void synchNtuple(string sample = "GGFH125", string stream = "MuTau", bool incl=f
    int   iNJets20    ; tree->SetBranchAddress("nJets20"      ,&iNJets20       );
   
    float iDiTauCharge; tree->SetBranchAddress("diTauCharge"      ,&iDiTauCharge         );
-   
+
+   int iGenMatchL1; tree->SetBranchAddress("genMatchL1",       &iGenMatchL1 );
+   int iGenMatchL2; tree->SetBranchAddress("genMatchL2",       &iGenMatchL2 );
+
    //float igenVMass = 0; tree->SetBranchAddress("genVMass",    &igenVMass);
    /*
    tree->Draw(">>+skim", sbinPair,"entrylist");   
@@ -365,7 +366,7 @@ void synchNtuple(string sample = "GGFH125", string stream = "MuTau", bool incl=f
      //bool passDiMuTrig = (sample.find("Emb") != string::npos) ? iHLTxMu17Mu8 > 0 : true;
 
      //if( stream.find("TauTau")!=string::npos   &&   !(iHLTx>0.5 && /*iHLTmatch1>0.5 && iHLTmatch2>0.5 && */ igenVMass>(0.7*130) && igenVMass<(1.3*130) && iPt1>45 && iPt2>45 && iPassId1>2 && iPassId2>2 && iDZ1 < 0.2 && iDZ2<0.2))
-     if(stream.find("TauTau")!=string::npos   &&   !(iHLTx>0.5 && iHLTmatch1>0.5 && iHLTmatch2>0.5 && iPt1>45 && iPt2>45))
+     if(stream.find("TauTau")!=string::npos   &&   !(iHLTx>0.5 && iHLTmatch1>0.5 && iHLTmatch2>0.5 && iPt1>40 && iPt2>40))
        continue;
      if(iPairIndex > 0) continue;
      if(incl && !(iDiTauCharge < 0)) continue; //inclusive selection
@@ -392,8 +393,8 @@ void synchNtuple(string sample = "GGFH125", string stream = "MuTau", bool incl=f
      lRho         = iRho;
    
      //Event Weights
-     //lMCWeight    = iMCWeight1*iMCWeight2 ;
-     //lPUWeight    = iPUWeight;
+     lMCWeight    = iEvtWeight*iGenWeight;
+     lPUWeight    = iPUWeight;
      /*if(sample.find("Emb") != string::npos){
        lEffWeight   = stream.find("MuTau")!=string::npos ? iHLTTau*iHLTMu*iSFMuID : iHLTTau*iHLTElec*iSFElecID;
      }
@@ -429,10 +430,10 @@ void synchNtuple(string sample = "GGFH125", string stream = "MuTau", bool incl=f
      //lPassId1     = stream.find("MuTau")!=string::npos ? (iPassId1L && iPassId1T) : (iPassId1L && ((TMath::Abs(iEta1)<0.80 && iPassId1T_F>0.925) || (TMath::Abs(iEta1)<1.479 && TMath::Abs(iEta1)>0.80 && iPassId1T_F>0.975) || (TMath::Abs(iEta1)>1.479 && iPassId1T_F>0.985)));
      //lPassId1     = iPassId1>2;
      //lPassIso1    = iPassId1>2;
-     lagainstElectronLooseMVA5_1  = (itightestAntiEMVA5WP1 >= 2) ? 1 : 0;
-     lagainstElectronMediumMVA5_1 = (itightestAntiEMVA5WP1 >= 3) ? 1 : 0;
-     lagainstElectronTightMVA5_1  = (itightestAntiEMVA5WP1 >= 4) ? 1 : 0;
-     lagainstElectronVLooseMVA5_1 = (itightestAntiEMVA5WP1 >= 1) ? 1 : 0;
+     lagainstElectronLooseMVA6_1  = (itightestAntiEMVA6WP1 >= 2) ? 1 : 0;
+     lagainstElectronMediumMVA6_1 = (itightestAntiEMVA6WP1 >= 3) ? 1 : 0;
+     lagainstElectronTightMVA6_1  = (itightestAntiEMVA6WP1 >= 4) ? 1 : 0;
+     lagainstElectronVLooseMVA6_1 = (itightestAntiEMVA6WP1 >= 1) ? 1 : 0;
      lagainstMuonLoose3_1 = (itightestAntiMu3WP1 >= 1) ? 1 : 0;
      lagainstMuonTight3_1 = (itightestAntiMu3WP1 >= 2) ? 1 : 0;
      lbyCombinedIsolationDeltaBetaCorrRaw3Hits_1 = ihpsDB3H1;
@@ -453,10 +454,10 @@ void synchNtuple(string sample = "GGFH125", string stream = "MuTau", bool incl=f
      //lMVA2        = iMVA2;
      //lPassId2     = iPassId2>2;
      //lPassIso2    = iPassId2>2;
-     lagainstElectronLooseMVA5_2  = (itightestAntiEMVA5WP2 >= 2)? 1 : 0;
-     lagainstElectronMediumMVA5_2 = (itightestAntiEMVA5WP2 >= 3) ? 1 : 0;
-     lagainstElectronTightMVA5_2 = (itightestAntiEMVA5WP2 >= 4) ? 1 : 0;
-     lagainstElectronVLooseMVA5_2 = (itightestAntiEMVA5WP2 >= 1) ? 1 : 0;
+     lagainstElectronLooseMVA6_2  = (itightestAntiEMVA6WP2 >= 2)? 1 : 0;
+     lagainstElectronMediumMVA6_2 = (itightestAntiEMVA6WP2 >= 3) ? 1 : 0;
+     lagainstElectronTightMVA6_2 = (itightestAntiEMVA6WP2 >= 4) ? 1 : 0;
+     lagainstElectronVLooseMVA6_2 = (itightestAntiEMVA6WP2 >= 1) ? 1 : 0;
      lagainstMuonLoose3_2 = (itightestAntiMu3WP2 >= 1) ? 1 : 0;
      lagainstMuonTight3_2 = (itightestAntiMu3WP2 >= 2) ? 1 : 0;
      lbyCombinedIsolationDeltaBetaCorrRaw3Hits_2 = ihpsDB3H2;
@@ -465,6 +466,9 @@ void synchNtuple(string sample = "GGFH125", string stream = "MuTau", bool incl=f
 
      ldiTauCharge = iDiTauCharge;
 
+     lgen_match_1 = iGenMatchL1;
+     lgen_match_2 = iGenMatchL2;
+     
      //veto lepton
      lNVetoMuon = iNVetoMuon;
      lNVetoElectron = iNVetoElectron;

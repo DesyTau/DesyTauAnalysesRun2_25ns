@@ -64,18 +64,18 @@ void Spring15Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("rho", &rho, &b_rho);
    fChain->SetBranchAddress("xs", &xs, &b_xs);
    fChain->SetBranchAddress("mcweight", &mcweight, &b_mcweight);
-   fChain->SetBranchAddress("puweight", &puweight, &b_puweight);
+   fChain->SetBranchAddress("pu_weight", &pu_weight, &b_pu_weight);
    fChain->SetBranchAddress("trigweight_1", &trigweight_1, &b_trigweight_1);
    fChain->SetBranchAddress("trigweight_2", &trigweight_2, &b_trigweight_2);
-   fChain->SetBranchAddress("idweight_1", &idweight_1, &b_idweight_1);
-   fChain->SetBranchAddress("idweight_2", &idweight_2, &b_idweight_2);
-   fChain->SetBranchAddress("isoweight_1", &isoweight_1, &b_isoweight_1);
-   fChain->SetBranchAddress("isoweight_2", &isoweight_2, &b_isoweight_2);
+   fChain->SetBranchAddress("idisoweight_1", &idisoweight_1, &b_idisoweight_1);
+   fChain->SetBranchAddress("idisoweight_2", &idisoweight_2, &b_idisoweight_2);
    fChain->SetBranchAddress("effweight", &effweight, &b_effweight);
    fChain->SetBranchAddress("fakeweight", &fakeweight, &b_fakeweight);
    fChain->SetBranchAddress("embeddedWeight", &embeddedWeight, &b_embeddedWeight);
    fChain->SetBranchAddress("signalWeight", &signalWeight, &b_signalWeight);
    fChain->SetBranchAddress("weight", &weight, &b_weight);
+   fChain->SetBranchAddress("lheHt", &lheHt, &b_lheHt);
+   fChain->SetBranchAddress("gen_noutgoing", &gen_noutgoing, &b_gen_noutgoing);   
    fChain->SetBranchAddress("m_vis", &m_vis, &b_m_vis);
    fChain->SetBranchAddress("m_sv", &m_sv, &b_m_sv);
    fChain->SetBranchAddress("pt_sv", &pt_sv, &b_pt_sv);
@@ -85,27 +85,37 @@ void Spring15Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("phi_1", &phi_1, &b_phi_1);
    fChain->SetBranchAddress("eta_1", &eta_1, &b_eta_1);
    fChain->SetBranchAddress("m_1", &m_1, &b_m_1);
+   fChain->SetBranchAddress("gen_match_1", &gen_match_1, &b_gen_match_1);
    fChain->SetBranchAddress("q_1", &q_1, &b_q_1);
    fChain->SetBranchAddress("iso_1", &iso_1, &b_iso_1);
    fChain->SetBranchAddress("mva_1", &mva_1, &b_mva_1);
    fChain->SetBranchAddress("d0_1", &d0_1, &b_d0_1);
    fChain->SetBranchAddress("dZ_1", &dZ_1, &b_dZ_1);
    fChain->SetBranchAddress("mt_1", &mt_1, &b_mt_1);
+   fChain->SetBranchAddress("pfmt_1", &pfmt_1, &b_pfmt_1);
+   fChain->SetBranchAddress("puppimt_1", &puppimt_1, &b_puppimt_1);
    fChain->SetBranchAddress("pt_2", &pt_2, &b_pt_2);
    fChain->SetBranchAddress("phi_2", &phi_2, &b_phi_2);
    fChain->SetBranchAddress("eta_2", &eta_2, &b_eta_2);
    fChain->SetBranchAddress("m_2", &m_2, &b_m_2);
+   fChain->SetBranchAddress("gen_match_2", &gen_match_2, &b_gen_match_2);
    fChain->SetBranchAddress("q_2", &q_2, &b_q_2);
    fChain->SetBranchAddress("iso_2", &iso_2, &b_iso_2);
    fChain->SetBranchAddress("d0_2", &d0_2, &b_d0_2);
    fChain->SetBranchAddress("dZ_2", &dZ_2, &b_dZ_2);
    fChain->SetBranchAddress("mva_2", &mva_2, &b_mva_2);
    fChain->SetBranchAddress("mt_2", &mt_2, &b_mt_2);
+   fChain->SetBranchAddress("pfmt_2", &pfmt_2, &b_pfmt_2);
+   fChain->SetBranchAddress("puppimt_2", &puppimt_2, &b_puppimt_2);
+   fChain->SetBranchAddress("tau_decay_mode_2", &tau_decay_mode_2, &b_tau_decay_mode_2); 
    fChain->SetBranchAddress("os", &os, &b_os);
    fChain->SetBranchAddress("dilepton_veto", &dilepton_veto, &b_dilepton_veto);
    fChain->SetBranchAddress("extraelec_veto", &extraelec_veto, &b_extraelec_veto);
    fChain->SetBranchAddress("extramuon_veto", &extramuon_veto, &b_extramuon_veto);
    fChain->SetBranchAddress("byCombinedIsolationDeltaBetaCorrRaw3Hits_1", &byCombinedIsolationDeltaBetaCorrRaw3Hits_1, &b_byCombinedIsolationDeltaBetaCorrRaw3Hits_1);
+   fChain->SetBranchAddress("byLooseCombinedIsolationDeltaBetaCorr3Hits_1", &byLooseCombinedIsolationDeltaBetaCorr3Hits_1, &b_byLooseCombinedIsolationDeltaBetaCorr3Hits_1);
+   fChain->SetBranchAddress("byMediumCombinedIsolationDeltaBetaCorr3Hits_1", &byMediumCombinedIsolationDeltaBetaCorr3Hits_1, &b_byMediumCombinedIsolationDeltaBetaCorr3Hits_1);
+   fChain->SetBranchAddress("byTightCombinedIsolationDeltaBetaCorr3Hits_1", &byTightCombinedIsolationDeltaBetaCorr3Hits_1, &b_byTightCombinedIsolationDeltaBetaCorr3Hits_1);
    fChain->SetBranchAddress("againstElectronLooseMVA5_1", &againstElectronLooseMVA5_1, &b_againstElectronLooseMVA5_1);
    fChain->SetBranchAddress("againstElectronMediumMVA5_1", &againstElectronMediumMVA5_1, &b_againstElectronMediumMVA5_1);
    fChain->SetBranchAddress("againstElectronTightMVA5_1", &againstElectronTightMVA5_1, &b_againstElectronTightMVA5_1);
@@ -114,11 +124,20 @@ void Spring15Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("againstMuonLoose3_1", &againstMuonLoose3_1, &b_againstMuonLoose3_1);
    fChain->SetBranchAddress("againstMuonTight3_1", &againstMuonTight3_1, &b_againstMuonTight3_1);
    fChain->SetBranchAddress("byCombinedIsolationDeltaBetaCorrRaw3Hits_2", &byCombinedIsolationDeltaBetaCorrRaw3Hits_2, &b_byCombinedIsolationDeltaBetaCorrRaw3Hits_2);
+   fChain->SetBranchAddress("byLooseCombinedIsolationDeltaBetaCorr3Hits_2", &byLooseCombinedIsolationDeltaBetaCorr3Hits_2, &b_byLooseCombinedIsolationDeltaBetaCorr3Hits_2);
+   fChain->SetBranchAddress("byMediumCombinedIsolationDeltaBetaCorr3Hits_2", &byMediumCombinedIsolationDeltaBetaCorr3Hits_2, &b_byMediumCombinedIsolationDeltaBetaCorr3Hits_2);
+   fChain->SetBranchAddress("byTightCombinedIsolationDeltaBetaCorr3Hits_2", &byTightCombinedIsolationDeltaBetaCorr3Hits_2, &b_byTightCombinedIsolationDeltaBetaCorr3Hits_2);
    fChain->SetBranchAddress("againstElectronLooseMVA5_2", &againstElectronLooseMVA5_2, &b_againstElectronLooseMVA5_2);
    fChain->SetBranchAddress("againstElectronMediumMVA5_2", &againstElectronMediumMVA5_2, &b_againstElectronMediumMVA5_2);
    fChain->SetBranchAddress("againstElectronTightMVA5_2", &againstElectronTightMVA5_2, &b_againstElectronTightMVA5_2);
    fChain->SetBranchAddress("againstElectronVLooseMVA5_2", &againstElectronVLooseMVA5_2, &b_againstElectronVLooseMVA5_2);
    fChain->SetBranchAddress("againstElectronVTightMVA5_2", &againstElectronVTightMVA5_2, &b_againstElectronVTightMVA5_2);
+
+   fChain->SetBranchAddress("byTightIsolationMVArun2v1DBoldDMwLT_2", &byTightIsolationMVArun2v1DBoldDMwLT_2, &b_byTightIsolationMVArun2v1DBoldDMwLT_2);
+
+   fChain->SetBranchAddress("againstElectronVLooseMVA6_2", &againstElectronVLooseMVA6_2, &b_againstElectronVLooseMVA6_2);
+   fChain->SetBranchAddress("againstElectronTightMVA6_2", &againstElectronTightMVA6_2, &b_againstElectronTightMVA6_2);
+
    fChain->SetBranchAddress("againstMuonLoose3_2", &againstMuonLoose3_2, &b_againstMuonLoose3_2);
    fChain->SetBranchAddress("againstMuonTight3_2", &againstMuonTight3_2, &b_againstMuonTight3_2);
    fChain->SetBranchAddress("met", &met, &b_met);
@@ -133,9 +152,13 @@ void Spring15Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("mvacov01", &mvacov01, &b_mvacov01);
    fChain->SetBranchAddress("mvacov10", &mvacov10, &b_mvacov10);
    fChain->SetBranchAddress("mvacov11", &mvacov11, &b_mvacov11);
+   fChain->SetBranchAddress("puppimet", &puppimet, &b_puppimet);
+   fChain->SetBranchAddress("puppimetphi", &puppimetphi, &b_puppimetphi);   
    fChain->SetBranchAddress("pt_tt", &pt_tt, &b_pt_tt);
    fChain->SetBranchAddress("pzetavis", &pzetavis, &b_pzetavis);
    fChain->SetBranchAddress("pzetamiss", &pzetamiss, &b_pzetamiss);
+   fChain->SetBranchAddress("pfpzetamiss", &pfpzetamiss, &b_pfpzetamiss);
+   fChain->SetBranchAddress("puppipzetamiss", &puppipzetamiss, &b_puppipzetamiss);
    fChain->SetBranchAddress("mva_gf", &mva_gf, &b_mva_gf);
    fChain->SetBranchAddress("njets", &njets, &b_njets);
    fChain->SetBranchAddress("njetspt20", &njetspt20, &b_njetspt20);
@@ -239,24 +262,24 @@ void Spring15Tree::WriteInit(TTree *tree) {
   fChain->Branch("lumi", &lumi, "lumi/I");
   fChain->Branch("evt", &evt, "evt/I");
   fChain->Branch("npv", &npv, "npv/I");
-  fChain->Branch("npu", &npu, "npu/I");
+  fChain->Branch("npu", &npu, "npu/F");
   fChain->Branch("rho", &rho, "rho/F");
   
   fChain->Branch("xs", &xs, "xs/F");
   fChain->Branch("mcweight", &mcweight, "mcweight/F");
-  fChain->Branch("puweight", &puweight, "puweight/F");
+  fChain->Branch("pu_weight", &pu_weight, "pu_weight/F");
   fChain->Branch("trigweight_1", &trigweight_1, "trigweight_1/F");
   fChain->Branch("trigweight_2", &trigweight_2, "trigweight_2/F");
-  fChain->Branch("idweight_1", &idweight_1, "idweight_1/F");
-  fChain->Branch("idweight_2", &idweight_2, "idweight_2/F");
-  fChain->Branch("isoweight_1", &isoweight_1, "isoweight_1/F");
-  fChain->Branch("isoweight_2", &isoweight_2, "isoweight_2/F");
+  fChain->Branch("idisoweight_1", &idisoweight_1, "idisoweight_1/F");
+  fChain->Branch("idisoweight_2", &idisoweight_2, "idisoweight_2/F");
   fChain->Branch("effweight", &effweight, "effweight/F");
   fChain->Branch("fakeweight", &fakeweight, "fakeweight/F");
   fChain->Branch("embeddedWeight", &embeddedWeight, "embeddedWeight/F");
   fChain->Branch("signalWeight", &signalWeight, "signalWeight/F");
   fChain->Branch("weight", &weight, "weight/F");
-
+  fChain->Branch("lheHt", &lheHt, "lheHt/F");
+  fChain->Branch("gen_noutgoing", &gen_noutgoing, "gen_noutgoing/I");
+  
   fChain->Branch("m_vis", &m_vis, "m_vis/F");
   fChain->Branch("m_sv", &m_sv, "m_sv/F");
   fChain->Branch("pt_sv", &pt_sv, "pt_sv/F");
@@ -267,23 +290,30 @@ void Spring15Tree::WriteInit(TTree *tree) {
   fChain->Branch("phi_1", &phi_1, "phi_1/F");
   fChain->Branch("eta_1", &eta_1, "eta_1/F");
   fChain->Branch("m_1", &m_1, "m_1/F");
+  fChain->Branch("gen_match_1", &gen_match_1, "gen_match_1/I");
   fChain->Branch("q_1", &q_1, "q_1/I");
   fChain->Branch("iso_1", &iso_1, "iso_1/F");
   fChain->Branch("mva_1", &mva_1, "mva_1/F");
   fChain->Branch("d0_1", &d0_1, "d0_1/F");
   fChain->Branch("dZ_1", &dZ_1, "dZ_1/F");
   fChain->Branch("mt_1", &mt_1, "mt_1/F");
-
+  fChain->Branch("pfmt_1", &pfmt_1, "pfmt_1/F");
+  fChain->Branch("puppimt_1", &puppimt_1, "puppimt_1/F");
+  
   fChain->Branch("pt_2", &pt_2, "pt_2/F");
   fChain->Branch("phi_2", &phi_2, "phi_2/F");
   fChain->Branch("eta_2", &eta_2, "eta_2/F");
   fChain->Branch("m_2", &m_2, "m_2/F");
+  fChain->Branch("gen_match_2", &gen_match_2, "gen_match_2/I");
   fChain->Branch("q_2", &q_2, "q_2/I");
   fChain->Branch("iso_2", &iso_2, "iso_2/F");
   fChain->Branch("d0_2", &d0_2, "d0_2/F");
   fChain->Branch("dZ_2", &dZ_2, "dZ_2/F");
   fChain->Branch("mva_2", &mva_2, "mva_2/F");
   fChain->Branch("mt_2", &mt_2, "mt_2/F");
+  fChain->Branch("pfmt_2", &pfmt_2, "pfmt_2/F");
+  fChain->Branch("puppimt_2", &puppimt_2, "puppimt_2/F");
+  fChain->Branch("tau_decay_mode_2", &tau_decay_mode_2, "tau_decay_mode_2/I");
   
   fChain->Branch("os", &os, "os/I");
   fChain->Branch("dilepton_veto", &dilepton_veto, "dilepton_veto/I");
@@ -291,6 +321,9 @@ void Spring15Tree::WriteInit(TTree *tree) {
   fChain->Branch("extramuon_veto", &extramuon_veto, "extramuon_veto/I");
   
   fChain->Branch("byCombinedIsolationDeltaBetaCorrRaw3Hits_1", &byCombinedIsolationDeltaBetaCorrRaw3Hits_1, "byCombinedIsolationDeltaBetaCorrRaw3Hits_1/F");
+  fChain->Branch("byLooseCombinedIsolationDeltaBetaCorr3Hits_1", &byLooseCombinedIsolationDeltaBetaCorr3Hits_1, "byLooseCombinedIsolationDeltaBetaCorr3Hits_1/F");
+  fChain->Branch("byMediumCombinedIsolationDeltaBetaCorr3Hits_1", &byMediumCombinedIsolationDeltaBetaCorr3Hits_1, "byMediumCombinedIsolationDeltaBetaCorr3Hits_1/F");
+  fChain->Branch("byTightCombinedIsolationDeltaBetaCorr3Hits_1", &byTightCombinedIsolationDeltaBetaCorr3Hits_1, "byTightCombinedIsolationDeltaBetaCorr3Hits_1/F");
   fChain->Branch("againstElectronLooseMVA5_1", &againstElectronLooseMVA5_1, "againstElectronLooseMVA5_1/F");
   fChain->Branch("againstElectronMediumMVA5_1", &againstElectronMediumMVA5_1, "againstElectronMediumMVA5_1/F");
   fChain->Branch("againstElectronTightMVA5_1", &againstElectronTightMVA5_1, "againstElectronTightMVA5_1/F");
@@ -300,6 +333,9 @@ void Spring15Tree::WriteInit(TTree *tree) {
   fChain->Branch("againstMuonTight3_1", &againstMuonTight3_1, "againstMuonTight3_1/F");
   
   fChain->Branch("byCombinedIsolationDeltaBetaCorrRaw3Hits_2", &byCombinedIsolationDeltaBetaCorrRaw3Hits_2, "byCombinedIsolationDeltaBetaCorrRaw3Hits_2/F");
+  fChain->Branch("byLooseCombinedIsolationDeltaBetaCorr3Hits_2", &byLooseCombinedIsolationDeltaBetaCorr3Hits_2, "byLooseCombinedIsolationDeltaBetaCorr3Hits_2/F");
+  fChain->Branch("byMediumCombinedIsolationDeltaBetaCorr3Hits_2", &byMediumCombinedIsolationDeltaBetaCorr3Hits_2, "byMediumCombinedIsolationDeltaBetaCorr3Hits_2/F");
+  fChain->Branch("byTightCombinedIsolationDeltaBetaCorr3Hits_2", &byTightCombinedIsolationDeltaBetaCorr3Hits_2, "byTightCombinedIsolationDeltaBetaCorr3Hits_2/F");
   fChain->Branch("againstElectronLooseMVA5_2", &againstElectronLooseMVA5_2, "againstElectronLooseMVA5_2/F");
   fChain->Branch("againstElectronMediumMVA5_2", &againstElectronMediumMVA5_2, "againstElectronMediumMVA5_2/F");
   fChain->Branch("againstElectronTightMVA5_2", &againstElectronTightMVA5_2, "againstElectronTightMVA5_2/F");
@@ -307,6 +343,11 @@ void Spring15Tree::WriteInit(TTree *tree) {
   fChain->Branch("againstElectronVTightMVA5_2", &againstElectronVTightMVA5_2, "againstElectronVTightMVA5_2/F");
   fChain->Branch("againstMuonLoose3_2", &againstMuonLoose3_2, "againstMuonLoose3_2/F");
   fChain->Branch("againstMuonTight3_2", &againstMuonTight3_2, "againstMuonTight3_2/F");
+
+  fChain->Branch("byTightIsolationMVArun2v1DBoldDMwLT_2", &byTightIsolationMVArun2v1DBoldDMwLT_2, "byTightIsolationMVArun2v1DBoldDMwLT_2/F");
+
+  fChain->Branch("againstElectronVLooseMVA6_2", &againstElectronVLooseMVA6_2, "againstElectronVLooseMVA6_2/F");
+  fChain->Branch("againstElectronTightMVA6_2", &againstElectronTightMVA6_2, "againstElectronTightMVA6_2/F");
     
   fChain->Branch("met", &met, "met/F");
   fChain->Branch("metphi", &metphi, "metphi/F");
@@ -321,10 +362,15 @@ void Spring15Tree::WriteInit(TTree *tree) {
   fChain->Branch("mvacov01", &mvacov01, "mvacov01/F");
   fChain->Branch("mvacov10", &mvacov10, "mvacov10/F");
   fChain->Branch("mvacov11", &mvacov11, "mvacov11/F");
+
+  fChain->Branch("puppimet", &puppimet, "puppimet/F");
+  fChain->Branch("puppimetphi", &puppimetphi, "puppimetphi/F");  
   
   fChain->Branch("pt_tt", &pt_tt, "pt_tt/F");
   fChain->Branch("pzetavis", &pzetavis, "pzetavis/F");
   fChain->Branch("pzetamiss", &pzetamiss, "pzetamiss/F");
+  fChain->Branch("pfpzetamiss", &pfpzetamiss, "pfpzetamiss/F");
+  fChain->Branch("puppipzetamiss", &puppipzetamiss, "puppipzetamiss/F");
   fChain->Branch("mva_gf", &mva_gf, "mva_gf/F");
   
   fChain->Branch("njets", &njets, "njets/I");

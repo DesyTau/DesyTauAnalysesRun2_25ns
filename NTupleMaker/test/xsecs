@@ -1,726 +1,221 @@
-TTJets 831.76
-TTJets_powheg 831.76
-TTJets_amatnlo 831.76
-TTJetsLO 831.76
-TTJetsNLO 831.76
-TTPowHeg 831.76
-ST_tW_antitop 35.6
-ST_tW_top 35.6
-ST_t-channel 103.02
-ST_t-channel_antitop 80.95
-#TToLeptons_t-channel- 136.05 0.1083 
-#TToLeptons_s-channe 7.20 0.1083
-#TBarToLeptons_t-channe 80.97 0.1083 
-#TBarToLeptons_s-channel  4.16 0.1083
-#Tbar_tW-channel-DR  35.6
-#T_tW-channel-DR   35.6
-TTWJets 0.6647
-TTZJets 0.8565
+ TTJets 831.76
+ TTJets_powheg 831.76
+ TTJets_amatnlo 831.76
+ TTJetsLO 831.76
+ TTJetsNLO 831.76
+ TTPowHeg 831.76
+ TTWJets 0.6647
+ TTZJets 0.8565
+ 
+ QCD_HT100to200 27540000
+ QCD_HT200to300 1735000
+ QCD_HT300to500 367000
+ QCD_HT500to700 29400
+ QCD_HT700to1000 6524
+ QCD_HT1000to1500 1064
+ QCD_HT1500to2000 121.5 
+ QCD_HT2000toInf 25.42
 
-QCD_HT1000to1500 1064
-QCD_HT100to200 27540000
-QCD_HT1500to2000 121.5 
-QCD_HT200to300 1735000
-QCD_HT700to1000 6524
+ ## for the ST_s we use the mc@nlo
+ ST_s-channel_4f_leptonDecays 70.69
+ ST_t-channel_4f_leptonDecays_ext1 70.69
+ ST_tW_antitop_5f_DS_inclusiveDecays_13TeV-powheg-pythia8 35.85
+ ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8 35.85
+ ST_tW_top_5f_DS_inclusiveDecays_13TeV-powheg-pythia8 35.85 
+ ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8 35.85 
 
-ST_s-channel_4f_leptonDecays 10.32 0.328
-ST_t-channel_4f_leptonDecays_ext1 216.99 0.328
-ST_tW_antitop_5f_DS_inclusiveDecays_13TeV-powheg-pythia8 35.85 0.328
-ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8 35.85 0.328
-ST_tW_top_5f_DS_inclusiveDecays_13TeV-powheg-pythia8 35.85 0.328
-ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8 35.85 0.328
-
-TTWJetsToLNu 0.2043
-TTWJetsToQQ 0.4062 
-TTZToQQ 0.5297 
-WWTo2L2Nu 2.927
-WWZ 0.1651 
-WZJets  0.4896
-WZZ 0.05565 
-ZZTo2L2Q 3.38 
-
-WJetsToLNu 61526.7 
-
-WJetsToLNu_HT-2500ToInf 0.03089 1.23 
-WJetsToLNu_HT-1200To2500 1.334 1.23
-WJetsToLNu_HT-800To1200 5.261 1.23
-WJetsToLNu_HT-600to800 12.8 1.23 
-WJetsToLNu_HT-100To200 1292.0 1.23
-WJetsToLNu_HT-200To400 385.9 1.23
-WJetsToLNu_HT-400To600 47.9 1.23
-WJetsToLNu_HT-600ToInf 19.9 1.23
-
-ZJetsToNuNu_HT-100to200 372.6 
-ZJetsToNuNu_HT-200to400 100.8 
-ZJetsToNuNu_HT-400to600g 11.9 
-ZJetsToNuNu_HT-600toInf 4.113 
-DYJetsToLL_M-10to50 18610
-DYJetsToLL_M-50 6025.2 
-DYJetsToLL_M-100to200 226 
-DYJetsToLL_M-200to400 7.67 
-DYJetsToLL_M-400to500 0.423 
-DYJetsToLL_M-500to700 0.24 
-DYJetsToLL_M-700to800 0.035 
-DYJetsToLL_M-800to1000 0.03
-DYJetsToLL_M-1000to1500 0.016 
-DYJetsToLL_M-1500to2000 0.002 
-DYJetsToLL_M-2000to3000 0.00054 
-
-QCD_HT1500to2000 121.5
-QCD_HT2000toInf 25.42
-QCD_HT300to500 366800
-QCD_HT500to700 29370
-QCD_HT700to1000 6524
-
-QCD_Pt-15to20_EMEnriched 1273000000 0.0002
-QCD_Pt-20to30_EMEnriched 557600000 0.0096
-QCD_Pt-30to50_EMEnriched 136000000 0.073
-QCD_Pt-50to80_EMEnriched 19800000 0.146
-QCD_Pt-80to120_EMEnriched 2800000 0.125
-QCD_Pt-120to170_EMEnriched 477000 0.132
-QCD_Pt-170to300_EMEnriched 114000 0.165
-QCD_Pt-300toInf_EMEnriched 9000 0.15
+ ST_tW_antitop_5f_inclusiveDecays 35.85
+ ST_tW_top_5f_inclusiveDecays 35.85
 
 
-QCD_Pt-1000toInf_MuEnrichedPt5 10.4305 0.15544
-QCD_Pt-120to170_MuEnrichedPt5 469797 0.05362
-QCD_Pt-15to20_MuEnrichedPt5 1273190000 0.003
-QCD_Pt-170to300_MuEnrichedPt5 117989 0.07335
-QCD_Pt-20to30_MuEnrichedPt5 558528000 0.0053
-QCD_Pt-300to470_MuEnrichedPt5 7820.25 0.10196
-QCD_Pt-30to50_MuEnrichedPt5 139803000 0.01182
-QCD_Pt-470to600_MuEnrichedPt5 645.528 0.12242
-QCD_Pt-50to80_MuEnrichedPt5 19222500 0.02276
-QCD_Pt-600to800_MuEnrichedPt5 187.109 0.13412
-QCD_Pt-800to1000_MuEnrichedPt5 32.3486 0.14552
-QCD_Pt-80to120_MuEnrichedPt5 2758420 0.03844
+ TTWJetsToLept 0.2043
+ TTWJetsToQQ 0.4062 
+ TTZToQQ 0.5297 
+ TTGJets 3.697
+ TGJets 2.967
+ tZqToLL 0.0758
+ tZqToNuNu 0.1379
+
+ WWZ 0.1651 
+ WZ 5.26
+ WZZ 0.05565 
+ ZZTo2L2Q 3.22
+ ZZTo2L2Nu 0.564
+ ZZTo2Q2Nu 4.04
 
 
-QCD_Pt_1000to1400 9.4183
-QCD_Pt_10to15 5887580000
-QCD_Pt_1400to1800 0.84265
-QCD_Pt_120to170 471100
-QCD_Pt_15to20_bcToE 1272980000 0.0002
-QCD_Pt_15to30 1837410000
-QCD_Pt-15TTo7000 89731000000
-QCD_Pt_170to250_bcToE 105771 0.02492
-QCD_Pt_170to300 117276
-QCD_Pt_1800to2400 0.114943
-QCD_Pt_20to30_bcToE 557627000 0.00059
-QCD_Pt_2400to3200 0.00682981
-QCD_Pt_250toInf_bcToE 21094.1 0.03375
-QCD_Pt_300to470 7823
-QCD_Pt_30to50 140932000
-QCD_Pt_30to80_bcToE 159068000 0.00255
-QCD_Pt_3200toInf 0.000165445
-QCD_Pt_470to600 648.2
-QCD_Pt_50to80 19204300
-QCD_Pt_5to10 61018300000
-QCD_Pt_800to1000 32.293 
-QCD_Pt_80to120 2762530
-QCD_Pt_80to170_bcToE 3221000 0.01183
+ WW 63.21
+ WWTo2L2Nu 12.178
+ WWTo4Q 45.20
+ WWToLNuQQ 43.53
+ WZJets 47.13 #dont use
+ WZTo1L1Nu2Q 10.96
+ WZTo3LNu 4.42965
+ ZZTo4L 1.212 
+ ZZ  16.523 
+ 
+ 
+ 
+ WJetsToLNu 61526.7 
+ WJetsToLNu_MG 61526.7 
+ wJetsToLNu_MG 61526.7 
+ 
+ WJetsToLNu_HT-2500ToInf 0.03089 1.23 
+ WJetsToLNu_HT-1200To2500 1.334 1.23
+ WJetsToLNu_HT-800To1200 5.261 1.23
+ WJetsToLNu_HT-600to800 12.8 1.23 
+ WJetsToLNu_HT-100To200 1292.0 1.23
+ WJetsToLNu_HT-200To400 385.9 1.23
+ WJetsToLNu_HT-400To600 47.9 1.23
+ WJetsToLNu_HT-600ToInf 19.9 1.23
+ 
+ ZJetsToNuNu_HT-100to200 372.6 
+ ZJetsToNuNu_HT-200to400 100.8 
+ ZJetsToNuNu_HT-400to600g 11.9 
+ ZJetsToNuNu_HT-600toInf 4.113 
+ DYJetsToLL_M-10to50 18610
+ DYJetsToLL_M-50 6025.2 
+ DYJetsToLL_M-100to200 226 
+ DYJetsToLL_M-200to400 7.67 
+ DYJetsToLL_M-400to500 0.423 
+ DYJetsToLL_M-500to700 0.24 
+ DYJetsToLL_M-700to800 0.035 
+ DYJetsToLL_M-800to1000 0.03
+ DYJetsToLL_M-1000to1500 0.016 
+ DYJetsToLL_M-1500to2000 0.002 
+ DYJetsToLL_M-2000to3000 0.00054 
+ 
+ QCD_HT100to200 27850000
+ QCD_HT200to300 1717000
+ QCD_HT300to500 351300
+ QCD_HT500to700 31630
+ QCD_HT700to1000 6802
+ QCD_HT1000to1500 1206
+ QCD_HT1500to2000 120.4
+ QCD_HT2000toInf 25.25
 
-QCD_Pt-20toInf_MuEnrichedPt15 720648000 0.00042
 
-WW 63.21
-WWTo2L2Nu 10.481
-WWTo4Q 45.20
-WWToLNuQQ 43.53
-WZ 22.82
-WZTo1L1Nu2Q 10.96
-WZTo3LNu 4.42965
-ZZTo4L 1.256 
-ZZ 10.32
-
-
-VBF_HToTauTau_M-125  3.748 0.0632
-GluGluToHToTauTau_M-125 43.92 0.0632
-ttHJetToTT_M125 0.5085 0.5085
-SingleMuon 1
-SingleElectron 1
-stau2_1 21.81 
-stau5_2 0.47
-
-SingleMuon_2015D_PRv4_0 1
-SingleMuon_2015D_PRv4_100 1
-SingleMuon_2015D_PRv4_101 1
-SingleMuon_2015D_PRv4_102 1
-SingleMuon_2015D_PRv4_103 1
-SingleMuon_2015D_PRv4_104 1
-SingleMuon_2015D_PRv4_105 1
-SingleMuon_2015D_PRv4_106 1
-SingleMuon_2015D_PRv4_107 1
-SingleMuon_2015D_PRv4_108 1
-SingleMuon_2015D_PRv4_109 1
-SingleMuon_2015D_PRv4_10 1
-SingleMuon_2015D_PRv4_110 1
-SingleMuon_2015D_PRv4_111 1
-SingleMuon_2015D_PRv4_112 1
-SingleMuon_2015D_PRv4_113 1
-SingleMuon_2015D_PRv4_114 1
-SingleMuon_2015D_PRv4_115 1
-SingleMuon_2015D_PRv4_116 1
-SingleMuon_2015D_PRv4_117 1
-SingleMuon_2015D_PRv4_118 1
-SingleMuon_2015D_PRv4_119 1
-SingleMuon_2015D_PRv4_11 1
-SingleMuon_2015D_PRv4_120 1
-SingleMuon_2015D_PRv4_121 1
-SingleMuon_2015D_PRv4_122 1
-SingleMuon_2015D_PRv4_123 1
-SingleMuon_2015D_PRv4_124 1
-SingleMuon_2015D_PRv4_125 1
-SingleMuon_2015D_PRv4_126 1
-SingleMuon_2015D_PRv4_127 1
-SingleMuon_2015D_PRv4_128 1
-SingleMuon_2015D_PRv4_129 1
-SingleMuon_2015D_PRv4_12 1
-SingleMuon_2015D_PRv4_130 1
-SingleMuon_2015D_PRv4_131 1
-SingleMuon_2015D_PRv4_132 1
-SingleMuon_2015D_PRv4_133 1
-SingleMuon_2015D_PRv4_134 1
-SingleMuon_2015D_PRv4_135 1
-SingleMuon_2015D_PRv4_136 1
-SingleMuon_2015D_PRv4_137 1
-SingleMuon_2015D_PRv4_138 1
-SingleMuon_2015D_PRv4_139 1
-SingleMuon_2015D_PRv4_13 1
-SingleMuon_2015D_PRv4_140 1
-SingleMuon_2015D_PRv4_141 1
-SingleMuon_2015D_PRv4_142 1
-SingleMuon_2015D_PRv4_143 1
-SingleMuon_2015D_PRv4_144 1
-SingleMuon_2015D_PRv4_145 1
-SingleMuon_2015D_PRv4_146 1
-SingleMuon_2015D_PRv4_147 1
-SingleMuon_2015D_PRv4_148 1
-SingleMuon_2015D_PRv4_149 1
-SingleMuon_2015D_PRv4_14 1
-SingleMuon_2015D_PRv4_150 1
-SingleMuon_2015D_PRv4_151 1
-SingleMuon_2015D_PRv4_152 1
-SingleMuon_2015D_PRv4_153 1
-SingleMuon_2015D_PRv4_154 1
-SingleMuon_2015D_PRv4_155 1
-SingleMuon_2015D_PRv4_156 1
-SingleMuon_2015D_PRv4_157 1
-SingleMuon_2015D_PRv4_158 1
-SingleMuon_2015D_PRv4_159 1
-SingleMuon_2015D_PRv4_15 1
-SingleMuon_2015D_PRv4_160 1
-SingleMuon_2015D_PRv4_161 1
-SingleMuon_2015D_PRv4_162 1
-SingleMuon_2015D_PRv4_163 1
-SingleMuon_2015D_PRv4_164 1
-SingleMuon_2015D_PRv4_16 1
-SingleMuon_2015D_PRv4_17 1
-SingleMuon_2015D_PRv4_18 1
-SingleMuon_2015D_PRv4_19 1
-SingleMuon_2015D_PRv4_1 1
-SingleMuon_2015D_PRv4_22 1
-SingleMuon_2015D_PRv4_23 1
-SingleMuon_2015D_PRv4_24 1
-SingleMuon_2015D_PRv4_25 1
-SingleMuon_2015D_PRv4_26 1
-SingleMuon_2015D_PRv4_27 1
-SingleMuon_2015D_PRv4_28 1
-SingleMuon_2015D_PRv4_29 1
-SingleMuon_2015D_PRv4_2 1
-SingleMuon_2015D_PRv4_30 1
-SingleMuon_2015D_PRv4_31 1
-SingleMuon_2015D_PRv4_32 1
-SingleMuon_2015D_PRv4_33 1
-SingleMuon_2015D_PRv4_34 1
-SingleMuon_2015D_PRv4_35 1
-SingleMuon_2015D_PRv4_36 1
-SingleMuon_2015D_PRv4_37 1
-SingleMuon_2015D_PRv4_38 1
-SingleMuon_2015D_PRv4_39 1
-SingleMuon_2015D_PRv4_3 1
-SingleMuon_2015D_PRv4_40 1
-SingleMuon_2015D_PRv4_41 1
-SingleMuon_2015D_PRv4_42 1
-SingleMuon_2015D_PRv4_43 1
-SingleMuon_2015D_PRv4_44 1
-SingleMuon_2015D_PRv4_45 1
-SingleMuon_2015D_PRv4_46 1
-SingleMuon_2015D_PRv4_47 1
-SingleMuon_2015D_PRv4_48 1
-SingleMuon_2015D_PRv4_49 1
-SingleMuon_2015D_PRv4_4 1
-SingleMuon_2015D_PRv4_50 1
-SingleMuon_2015D_PRv4_51 1
-SingleMuon_2015D_PRv4_52 1
-SingleMuon_2015D_PRv4_53 1
-SingleMuon_2015D_PRv4_54 1
-SingleMuon_2015D_PRv4_55 1
-SingleMuon_2015D_PRv4_56 1
-SingleMuon_2015D_PRv4_57 1
-SingleMuon_2015D_PRv4_58 1
-SingleMuon_2015D_PRv4_59 1
-SingleMuon_2015D_PRv4_5 1
-SingleMuon_2015D_PRv4_60 1
-SingleMuon_2015D_PRv4_61 1
-SingleMuon_2015D_PRv4_62 1
-SingleMuon_2015D_PRv4_63 1
-SingleMuon_2015D_PRv4_64 1
-SingleMuon_2015D_PRv4_65 1
-SingleMuon_2015D_PRv4_66 1
-SingleMuon_2015D_PRv4_67 1
-SingleMuon_2015D_PRv4_68 1
-SingleMuon_2015D_PRv4_69 1
-SingleMuon_2015D_PRv4_6 1
-SingleMuon_2015D_PRv4_70 1
-SingleMuon_2015D_PRv4_71 1
-SingleMuon_2015D_PRv4_72 1
-SingleMuon_2015D_PRv4_73 1
-SingleMuon_2015D_PRv4_74 1
-SingleMuon_2015D_PRv4_75 1
-SingleMuon_2015D_PRv4_76 1
-SingleMuon_2015D_PRv4_77 1
-SingleMuon_2015D_PRv4_78 1
-SingleMuon_2015D_PRv4_79 1
-SingleMuon_2015D_PRv4_7 1
-SingleMuon_2015D_PRv4_80 1
-SingleMuon_2015D_PRv4_81 1
-SingleMuon_2015D_PRv4_82 1
-SingleMuon_2015D_PRv4_83 1
-SingleMuon_2015D_PRv4_84 1
-SingleMuon_2015D_PRv4_85 1
-SingleMuon_2015D_PRv4_86 1
-SingleMuon_2015D_PRv4_87 1
-SingleMuon_2015D_PRv4_88 1
-SingleMuon_2015D_PRv4_89 1
-SingleMuon_2015D_PRv4_8 1
-SingleMuon_2015D_PRv4_90 1
-SingleMuon_2015D_PRv4_91 1
-SingleMuon_2015D_PRv4_92 1
-SingleMuon_2015D_PRv4_93 1
-SingleMuon_2015D_PRv4_94 1
-SingleMuon_2015D_PRv4_95 1
-SingleMuon_2015D_PRv4_96 1
-SingleMuon_2015D_PRv4_97 1
-SingleMuon_2015D_PRv4_98 1
-SingleMuon_2015D_PRv4_99 1
-SingleMuon_2015D_PRv4_9 1
-SingleMuon_2015D_05Oct_322 1
-SingleMuon_2015D_05Oct_323 1
-SingleMuon_2015D_05Oct_324 1
-SingleMuon_2015D_05Oct_325 1
-SingleMuon_2015D_05Oct_326 1
-SingleMuon_2015D_05Oct_327 1
-SingleMuon_2015D_05Oct_328 1
-SingleMuon_2015D_05Oct_329 1
-SingleMuon_2015D_05Oct_330 1
-SingleMuon_2015D_05Oct_331 1
-SingleMuon_2015D_05Oct_332 1
-SingleMuon_2015D_05Oct_333 1
-SingleMuon_2015D_05Oct_334 1
-SingleMuon_2015D_05Oct_335 1
-SingleMuon_2015D_05Oct_336 1
-SingleMuon_2015D_05Oct_337 1
-SingleMuon_2015D_05Oct_338 1
-SingleMuon_2015D_05Oct_339 1
-SingleMuon_2015D_05Oct_340 1
-SingleMuon_2015D_05Oct_341 1
-SingleMuon_2015D_05Oct_342 1
-SingleMuon_2015D_05Oct_343 1
-SingleMuon_2015D_05Oct_344 1
-SingleMuon_2015D_05Oct_345 1
-SingleMuon_2015D_05Oct_346 1
-SingleMuon_2015D_05Oct_347 1
-SingleMuon_2015D_05Oct_348 1
-SingleMuon_2015D_05Oct_349 1
-SingleMuon_2015D_05Oct_350 1
-SingleMuon_2015D_05Oct_351 1
-SingleMuon_2015D_05Oct_352 1
-SingleMuon_2015D_05Oct_353 1
-SingleMuon_2015D_05Oct_354 1
-SingleMuon_2015D_05Oct_355 1
-SingleMuon_2015D_05Oct_356 1
-SingleMuon_2015D_05Oct_357 1
-SingleMuon_2015D_05Oct_358 1
-SingleMuon_2015D_05Oct_359 1
-SingleMuon_2015D_05Oct_360 1
-SingleMuon_2015D_05Oct_361 1
-SingleMuon_2015D_05Oct_362 1
-SingleMuon_2015D_05Oct_363 1
-SingleMuon_2015D_05Oct_364 1
-SingleMuon_2015D_05Oct_365 1
-SingleMuon_2015D_05Oct_366 1
-SingleMuon_2015D_05Oct_367 1
-SingleMuon_2015D_05Oct_368 1
-SingleMuon_2015D_05Oct_369 1
-SingleMuon_2015D_05Oct_370 1
-SingleMuon_2015D_05Oct_371 1
-SingleMuon_2015D_05Oct_372 1
-SingleMuon_2015D_05Oct_373 1
-SingleMuon_2015D_05Oct_374 1
-SingleMuon_2015D_05Oct_375 1
-SingleMuon_2015D_05Oct_376 1
-SingleMuon_2015D_05Oct_377 1
-SingleMuon_2015D_05Oct_378 1
-SingleMuon_2015D_05Oct_379 1
-SingleMuon_2015D_05Oct_380 1
-SingleMuon_2015D_05Oct_381 1
-SingleMuon_2015D_05Oct_382 1
-SingleMuon_2015D_05Oct_383 1
-SingleMuon_2015D_05Oct_384 1
-SingleMuon_2015D_05Oct_385 1
-SingleMuon_2015D_05Oct_386 1
-SingleMuon_2015D_05Oct_387 1
-SingleMuon_2015D_05Oct_388 1
-SingleMuon_2015D_05Oct_389 1
-SingleMuon_2015D_05Oct_390 1
-SingleMuon_2015D_05Oct_391 1
-SingleMuon_2015D_05Oct_392 1
-SingleMuon_2015D_05Oct_393 1
-SingleMuon_2015D_05Oct_394 1
-SingleMuon_2015D_05Oct_395 1
-SingleMuon_2015D_05Oct_396 1
-SingleMuon_2015D_05Oct_397 1
-SingleMuon_2015D_05Oct_398 1
-SingleMuon_2015D_05Oct_399 1
-SingleMuon_2015D_05Oct_400 1
-SingleMuon_2015D_05Oct_401 1
-SingleMuon_2015D_05Oct_402 1
-SingleMuon_2015D_05Oct_403 1
-SingleMuon_2015D_05Oct_404 1
-SingleMuon_2015D_05Oct_405 1
-SingleMuon_2015D_05Oct_406 1
-SingleMuon_2015D_05Oct_407 1
-SingleMuon_2015D_05Oct_408 1
-SingleMuon_2015D_05Oct_409 1
-SingleMuon_2015D_05Oct_410 1
-SingleMuon_2015D_05Oct_411 1
-SingleMuon_2015D_05Oct_412 1
-SingleMuon_2015D_05Oct_413 1
-SingleMuon_2015D_05Oct_414 1
-SingleMuon_2015D_05Oct_415 1
-SingleMuon_2015D_05Oct_416 1
-SingleMuon_2015D_05Oct_417 1
-SingleMuon_2015D_05Oct_418 1
-SingleMuon_2015D_05Oct_419 1
-SingleMuon_2015D_05Oct_420 1
-SingleMuon_2015D_05Oct_421 1
-SingleMuon_2015D_05Oct_422 1
-SingleMuon_2015D_05Oct_423 1
-SingleMuon_2015D_05Oct_424 1
-SingleMuon_2015D_05Oct_425 1
-SingleMuon_2015D_05Oct_426 1
-SingleMuon_2015D_05Oct_427 1
-SingleMuon_2015D_05Oct_428 1
-SingleMuon_2015D_05Oct_429 1
-SingleMuon_2015D_05Oct_430 1
-SingleMuon_2015D_05Oct_431 1
-SingleMuon_2015D_05Oct_432 1
-SingleMuon_2015D_05Oct_433 1
-SingleMuon_2015D_05Oct_434 1
-SingleMuon_2015D_05Oct_435 1
-SingleMuon_2015D_05Oct_436 1
-SingleMuon_2015D_05Oct_437 1
-SingleMuon_2015D_05Oct_438 1
-SingleMuon_2015D_05Oct_439 1
-SingleMuon_2015D_05Oct_440 1
-SingleMuon_2015D_05Oct_441 1
-SingleMuon_2015D_05Oct_442 1
-SingleMuon_2015D_05Oct_443 1
-SingleMuon_2015D_05Oct_444 1
-SingleMuon_2015D_05Oct_445 1
-SingleMuon_2015D_05Oct_446 1
-SingleMuon_2015D_05Oct_447 1
-SingleMuon_2015D_05Oct_448 1
-SingleMuon_2015D_05Oct_449 1
-SingleMuon_2015D_05Oct_450 1
-SingleMuon_2015D_05Oct_451 1
-SingleMuon_2015D_05Oct_452 1
-SingleMuon_2015D_05Oct_453 1
-SingleMuon_2015D_05Oct_454 1
-SingleMuon_2015D_05Oct_455 1
-SingleMuon_2015D_05Oct_456 1
-SingleMuon_2015D_05Oct_457 1
-SingleMuon_2015D_05Oct_458 1
-SingleMuon_2015D_05Oct_459 1
-SingleMuon_2015D_05Oct_460 1
-SingleMuon_2015D_05Oct_461 1
-SingleMuon_2015D_05Oct_462 1
-SingleMuon_2015D_05Oct_463 1
-SingleMuon_2015D_05Oct_464 1
-SingleMuon_2015D_05Oct_465 1
-SingleMuon_2015D_05Oct_466 1
-SingleMuon_2015D_05Oct_467 1
-SingleMuon_2015D_05Oct_468 1
-SingleMuon_2015D_05Oct_469 1
-SingleMuon_2015D_05Oct_470 1
-SingleMuon_2015D_05Oct_471 1
-SingleMuon_2015D_05Oct_472 1
-SingleMuon_2015D_05Oct_473 1
-SingleMuon_2015D_05Oct_474 1
-SingleMuon_2015D_05Oct_475 1
-SingleMuon_2015D_05Oct_476 1
-SingleMuon_2015D_05Oct_477 1
-SingleMuon_2015D_05Oct_478 1
-SingleMuon_2015D_05Oct_479 1
-SingleMuon_2015D_05Oct_480 1
-SingleMuon_2015D_05Oct_481 1
-SingleMuon_2015D_05Oct_482 1
-SingleMuon_2015D_05Oct_483 1
-SingleMuon_2015D_05Oct_484 1
-SingleMuon_2015D_05Oct_485 1
-SingleMuon_2015D_05Oct_486 1
-SingleMuon_2015D_05Oct_487 1
-SingleMuon_2015D_05Oct_488 1
-SingleMuon_2015D_05Oct_489 1
-SingleMuon_2015D_05Oct_490 1
-SingleMuon_2015D_05Oct_491 1
-SingleMuon_2015D_05Oct_492 1
-SingleMuon_2015D_05Oct_493 1
-SingleMuon_2015D_05Oct_494 1
-SingleMuon_2015D_05Oct_495 1
-SingleMuon_2015D_05Oct_496 1
-SingleMuon_2015D_05Oct_497 1
-SingleMuon_2015D_05Oct_498 1
-SingleMuon_2015D_05Oct_499 1
-SingleMuon_2015D_05Oct_500 1
-SingleMuon_2015D_05Oct_501 1
-SingleMuon_2015D_05Oct_502 1
-SingleMuon_2015D_05Oct_503 1
-SingleMuon_2015D_05Oct_504 1
-SingleMuon_2015D_05Oct_505 1
-SingleMuon_2015D_05Oct_506 1
-SingleMuon_2015D_05Oct_507 1
-SingleMuon_2015D_05Oct_508 1
-SingleMuon_2015D_05Oct_509 1
-SingleMuon_2015D_05Oct_510 1
-SingleMuon_2015D_05Oct_511 1
-SingleMuon_2015D_05Oct_512 1
-SingleMuon_2015D_05Oct_513 1
-SingleMuon_2015D_05Oct_514 1
-SingleMuon_2015D_05Oct_515 1
-SingleMuon_2015D_05Oct_516 1
-SingleMuon_2015D_05Oct_517 1
-SingleMuon_2015D_05Oct_518 1
-SingleMuon_2015D_05Oct_519 1
-SingleMuon_2015D_05Oct_520 1
-SingleMuon_2015D_05Oct_521 1
-SingleMuon_2015D_05Oct_522 1
-SingleMuon_2015D_05Oct_523 1
-SingleMuon_2015D_05Oct_524 1
-SingleMuon_2015D_05Oct_525 1
-SingleMuon_2015D_05Oct_526 1
-SingleMuon_2015D_05Oct_527 1
-SingleMuon_2015D_05Oct_528 1
-SingleMuon_2015D_05Oct_529 1
-SingleMuon_2015D_05Oct_530 1
-SingleMuon_2015D_05Oct_531 1
-SingleMuon_2015D_05Oct_322 1
-SingleMuon_2015D_05Oct_323 1
-SingleMuon_2015D_05Oct_324 1
-SingleMuon_2015D_05Oct_325 1
-SingleMuon_2015D_05Oct_326 1
-SingleMuon_2015D_05Oct_327 1
-SingleMuon_2015D_05Oct_328 1
-SingleMuon_2015D_05Oct_329 1
-SingleMuon_2015D_05Oct_330 1
-SingleMuon_2015D_05Oct_331 1
-SingleMuon_2015D_05Oct_332 1
-SingleMuon_2015D_05Oct_333 1
-SingleMuon_2015D_05Oct_334 1
-SingleMuon_2015D_05Oct_335 1
-SingleMuon_2015D_05Oct_336 1
-SingleMuon_2015D_05Oct_337 1
-SingleMuon_2015D_05Oct_338 1
-SingleMuon_2015D_05Oct_339 1
-SingleMuon_2015D_05Oct_340 1
-SingleMuon_2015D_05Oct_341 1
-SingleMuon_2015D_05Oct_342 1
-SingleMuon_2015D_05Oct_343 1
-SingleMuon_2015D_05Oct_344 1
-SingleMuon_2015D_05Oct_345 1
-SingleMuon_2015D_05Oct_346 1
-SingleMuon_2015D_05Oct_347 1
-SingleMuon_2015D_05Oct_348 1
-SingleMuon_2015D_05Oct_349 1
-SingleMuon_2015D_05Oct_350 1
-SingleMuon_2015D_05Oct_351 1
-SingleMuon_2015D_05Oct_352 1
-SingleMuon_2015D_05Oct_353 1
-SingleMuon_2015D_05Oct_354 1
-SingleMuon_2015D_05Oct_355 1
-SingleMuon_2015D_05Oct_356 1
-SingleMuon_2015D_05Oct_357 1
-SingleMuon_2015D_05Oct_358 1
-SingleMuon_2015D_05Oct_359 1
-SingleMuon_2015D_05Oct_360 1
-SingleMuon_2015D_05Oct_361 1
-SingleMuon_2015D_05Oct_362 1
-SingleMuon_2015D_05Oct_363 1
-SingleMuon_2015D_05Oct_364 1
-SingleMuon_2015D_05Oct_365 1
-SingleMuon_2015D_05Oct_366 1
-SingleMuon_2015D_05Oct_367 1
-SingleMuon_2015D_05Oct_368 1
-SingleMuon_2015D_05Oct_369 1
-SingleMuon_2015D_05Oct_370 1
-SingleMuon_2015D_05Oct_371 1
-SingleMuon_2015D_05Oct_372 1
-SingleMuon_2015D_05Oct_373 1
-SingleMuon_2015D_05Oct_374 1
-SingleMuon_2015D_05Oct_375 1
-SingleMuon_2015D_05Oct_376 1
-SingleMuon_2015D_05Oct_377 1
-SingleMuon_2015D_05Oct_378 1
-SingleMuon_2015D_05Oct_379 1
-SingleMuon_2015D_05Oct_380 1
-SingleMuon_2015D_05Oct_381 1
-SingleMuon_2015D_05Oct_382 1
-SingleMuon_2015D_05Oct_383 1
-SingleMuon_2015D_05Oct_384 1
-SingleMuon_2015D_05Oct_385 1
-SingleMuon_2015D_05Oct_386 1
-SingleMuon_2015D_05Oct_387 1
-SingleMuon_2015D_05Oct_388 1
-SingleMuon_2015D_05Oct_389 1
-SingleMuon_2015D_05Oct_390 1
-SingleMuon_2015D_05Oct_391 1
-SingleMuon_2015D_05Oct_392 1
-SingleMuon_2015D_05Oct_393 1
-SingleMuon_2015D_05Oct_394 1
-SingleMuon_2015D_05Oct_395 1
-SingleMuon_2015D_05Oct_396 1
-SingleMuon_2015D_05Oct_397 1
-SingleMuon_2015D_05Oct_398 1
-SingleMuon_2015D_05Oct_399 1
-SingleMuon_2015D_05Oct_400 1
-SingleMuon_2015D_05Oct_401 1
-SingleMuon_2015D_05Oct_402 1
-SingleMuon_2015D_05Oct_403 1
-SingleMuon_2015D_05Oct_404 1
-SingleMuon_2015D_05Oct_405 1
-SingleMuon_2015D_05Oct_406 1
-SingleMuon_2015D_05Oct_407 1
-SingleMuon_2015D_05Oct_408 1
-SingleMuon_2015D_05Oct_409 1
-SingleMuon_2015D_05Oct_410 1
-SingleMuon_2015D_05Oct_411 1
-SingleMuon_2015D_05Oct_412 1
-SingleMuon_2015D_05Oct_413 1
-SingleMuon_2015D_05Oct_414 1
-SingleMuon_2015D_05Oct_415 1
-SingleMuon_2015D_05Oct_416 1
-SingleMuon_2015D_05Oct_417 1
-SingleMuon_2015D_05Oct_418 1
-SingleMuon_2015D_05Oct_419 1
-SingleMuon_2015D_05Oct_420 1
-SingleMuon_2015D_05Oct_421 1
-SingleMuon_2015D_05Oct_422 1
-SingleMuon_2015D_05Oct_423 1
-SingleMuon_2015D_05Oct_424 1
-SingleMuon_2015D_05Oct_425 1
-SingleMuon_2015D_05Oct_426 1
-SingleMuon_2015D_05Oct_427 1
-SingleMuon_2015D_05Oct_428 1
-SingleMuon_2015D_05Oct_429 1
-SingleMuon_2015D_05Oct_430 1
-SingleMuon_2015D_05Oct_431 1
-SingleMuon_2015D_05Oct_432 1
-SingleMuon_2015D_05Oct_433 1
-SingleMuon_2015D_05Oct_434 1
-SingleMuon_2015D_05Oct_435 1
-SingleMuon_2015D_05Oct_436 1
-SingleMuon_2015D_05Oct_437 1
-SingleMuon_2015D_05Oct_438 1
-SingleMuon_2015D_05Oct_439 1
-SingleMuon_2015D_05Oct_440 1
-SingleMuon_2015D_05Oct_441 1
-SingleMuon_2015D_05Oct_442 1
-SingleMuon_2015D_05Oct_443 1
-SingleMuon_2015D_05Oct_444 1
-SingleMuon_2015D_05Oct_445 1
-SingleMuon_2015D_05Oct_446 1
-SingleMuon_2015D_05Oct_447 1
-SingleMuon_2015D_05Oct_448 1
-SingleMuon_2015D_05Oct_449 1
-SingleMuon_2015D_05Oct_450 1
-SingleMuon_2015D_05Oct_451 1
-SingleMuon_2015D_05Oct_452 1
-SingleMuon_2015D_05Oct_453 1
-SingleMuon_2015D_05Oct_454 1
-SingleMuon_2015D_05Oct_455 1
-SingleMuon_2015D_05Oct_456 1
-SingleMuon_2015D_05Oct_457 1
-SingleMuon_2015D_05Oct_458 1
-SingleMuon_2015D_05Oct_459 1
-SingleMuon_2015D_05Oct_460 1
-SingleMuon_2015D_05Oct_461 1
-SingleMuon_2015D_05Oct_462 1
-SingleMuon_2015D_05Oct_463 1
-SingleMuon_2015D_05Oct_464 1
-SingleMuon_2015D_05Oct_465 1
-SingleMuon_2015D_05Oct_466 1
-SingleMuon_2015D_05Oct_467 1
-SingleMuon_2015D_05Oct_468 1
-SingleMuon_2015D_05Oct_469 1
-SingleMuon_2015D_05Oct_470 1
-SingleMuon_2015D_05Oct_471 1
-SingleMuon_2015D_05Oct_472 1
-SingleMuon_2015D_05Oct_473 1
-SingleMuon_2015D_05Oct_474 1
-SingleMuon_2015D_05Oct_475 1
-SingleMuon_2015D_05Oct_476 1
-SingleMuon_2015D_05Oct_477 1
-SingleMuon_2015D_05Oct_478 1
-SingleMuon_2015D_05Oct_479 1
-SingleMuon_2015D_05Oct_480 1
-SingleMuon_2015D_05Oct_481 1
-SingleMuon_2015D_05Oct_482 1
-SingleMuon_2015D_05Oct_483 1
-SingleMuon_2015D_05Oct_484 1
-SingleMuon_2015D_05Oct_485 1
-SingleMuon_2015D_05Oct_486 1
-SingleMuon_2015D_05Oct_487 1
-SingleMuon_2015D_05Oct_488 1
-SingleMuon_2015D_05Oct_489 1
-SingleMuon_2015D_05Oct_490 1
-SingleMuon_2015D_05Oct_491 1
-SingleMuon_2015D_05Oct_492 1
-SingleMuon_2015D_05Oct_493 1
-SingleMuon_2015D_05Oct_494 1
-SingleMuon_2015D_05Oct_495 1
-SingleMuon_2015D_05Oct_496 1
-SingleMuon_2015D_05Oct_497 1
-SingleMuon_2015D_05Oct_498 1
-SingleMuon_2015D_05Oct_499 1
-SingleMuon_2015D_05Oct_500 1
-SingleMuon_2015D_05Oct_501 1
-SingleMuon_2015D_05Oct_502 1
-SingleMuon_2015D_05Oct_503 1
-SingleMuon_2015D_05Oct_504 1
-SingleMuon_2015D_05Oct_505 1
-SingleMuon_2015D_05Oct_506 1
-SingleMuon_2015D_05Oct_507 1
-SingleMuon_2015D_05Oct_508 1
-SingleMuon_2015D_05Oct_509 1
-SingleMuon_2015D_05Oct_510 1
-SingleMuon_2015D_05Oct_511 1
-SingleMuon_2015D_05Oct_512 1
-SingleMuon_2015D_05Oct_513 1
-SingleMuon_2015D_05Oct_514 1
-SingleMuon_2015D_05Oct_515 1
-SingleMuon_2015D_05Oct_516 1
-SingleMuon_2015D_05Oct_517 1
-SingleMuon_2015D_05Oct_518 1
-SingleMuon_2015D_05Oct_519 1
-SingleMuon_2015D_05Oct_520 1
-SingleMuon_2015D_05Oct_521 1
-SingleMuon_2015D_05Oct_522 1
-SingleMuon_2015D_05Oct_523 1
-SingleMuon_2015D_05Oct_524 1
-SingleMuon_2015D_05Oct_525 1
-SingleMuon_2015D_05Oct_526 1
-SingleMuon_2015D_05Oct_527 1
-SingleMuon_2015D_05Oct_528 1
-SingleMuon_2015D_05Oct_529 1
-SingleMuon_2015D_05Oct_530 1
-SingleMuon_2015D_05Oct_531 1
+ QCD_Pt-15to20_EMEnriched 1273000000 0.0002
+ QCD_Pt-20to30_EMEnriched 557600000 0.0096
+ QCD_Pt-30to50_EMEnriched 136000000 0.073
+ QCD_Pt-50to80_EMEnriched 19800000 0.146
+ QCD_Pt-80to120_EMEnriched 2800000 0.125
+ QCD_Pt-120to170_EMEnriched 477000 0.132
+ QCD_Pt-170to300_EMEnriched 114000 0.165
+ QCD_Pt-300toInf_EMEnriched 9000 0.15
+ 
+ 
+ QCD_Pt-1000toInf_MuEnrichedPt5 10.4305 0.15544
+ QCD_Pt-120to170_MuEnrichedPt5 469797 0.05362
+ QCD_Pt-15to20_MuEnrichedPt5 1273190000 0.003
+ QCD_Pt-170to300_MuEnrichedPt5 117989 0.07335
+ QCD_Pt-20to30_MuEnrichedPt5 558528000 0.0053
+ QCD_Pt-300to470_MuEnrichedPt5 7820.25 0.10196
+ QCD_Pt-30to50_MuEnrichedPt5 139803000 0.01182
+ QCD_Pt-470to600_MuEnrichedPt5 645.528 0.12242
+ QCD_Pt-50to80_MuEnrichedPt5 19222500 0.02276
+ QCD_Pt-600to800_MuEnrichedPt5 187.109 0.13412
+ QCD_Pt-800to1000_MuEnrichedPt5 32.3486 0.14552
+ QCD_Pt-80to120_MuEnrichedPt5 2758420 0.03844
+ 
+ 
+ QCD_Pt_1000to1400 9.4183
+ QCD_Pt_10to15 5887580000
+ QCD_Pt_1400to1800 0.84265
+ QCD_Pt_120to170 471100
+ QCD_Pt_15to20_bcToE 1272980000 0.0002
+ QCD_Pt_15to30 1837410000
+ QCD_Pt-15TTo7000 89731000000
+ QCD_Pt_170to250_bcToE 105771 0.02492
+ QCD_Pt_170to300 117276
+ QCD_Pt_1800to2400 0.114943
+ QCD_Pt_20to30_bcToE 557627000 0.00059
+ QCD_Pt_2400to3200 0.00682981
+ QCD_Pt_250toInf_bcToE 21094.1 0.03375
+ QCD_Pt_300to470 7823
+ QCD_Pt_30to50 140932000
+ QCD_Pt_30to80_bcToE 159068000 0.00255
+ QCD_Pt_3200toInf 0.000165445
+ QCD_Pt_470to600 648.2
+ QCD_Pt_50to80 19204300
+ QCD_Pt_5to10 61018300000
+ QCD_Pt_800to1000 32.293 
+ QCD_Pt_80to120 2762530
+ QCD_Pt_80to170_bcToE 3221000 0.01183
+ 
+ QCD_Pt-20toInf_MuEnrichedPt15 720648000 0.00042
+ 
+ 
+ VBF_HToTauTau_M-125  3.748 0.0632
+ GluGluToHToTauTau_M-125 43.92 0.0632
+ ttHJetToTT_M125 0.5085 0.5085
+ SingleMuon 1
+ SingleMuon_QCD 1
+ SingleMuon_nof 1
+ SingleMuonPRv1 1
+ SingleMuonPRv4 1
+ SingleMuon05Oct 1
+ SingleElectron 1
+ MET 1
+ MET_nof 1
+ stau2_1 21.81 
+ stau2_1_max 21.81 
+ stau2_1_min 21.81 
+ stau5_2 0.47
+ stau5_1_min 0.47
+ test 1
+ stau_test 10
+ stau100_LSP1  270.79 
+ stau150_LSP100  63.34 
+ stau150_LSP1  63.34 
+ stau150_LSP50  63.34 
+ stau200_LSP100  21.81 
+ stau200_LSP150  21.81 
+ stau200_LSP1  21.81 
+ stau200_LSP50  21.81 
+ stau250_LSP100  9.21 
+ stau250_LSP150  9.21 
+ stau250_LSP1  9.21 
+ stau250_LSP200  9.21 
+ stau250_LSP50  9.21 
+ stau300_LSP100 4.43 
+ stau300_LSP150 4.43 
+ stau300_LSP1 4.43 
+ stau300_LSP200 4.43 
+ stau300_LSP250 4.43 
+ stau300_LSP50 4.43 
+ stau350_LSP100 4.43 
+ stau350_LSP150 4.43 
+ stau350_LSP1 4.43 
+ stau350_LSP200 4.43 
+ stau350_LSP250 4.43 
+ stau350_LSP300 4.43 
+ stau350_LSP50 4.43 
+ stau400_LSP100 1.31 
+ stau400_LSP150 1.31 
+ stau400_LSP1 1.31 
+ stau400_LSP200 1.31 
+ stau400_LSP250 1.31 
+ stau400_LSP300 1.31 
+ stau400_LSP350 1.31 
+ stau400_LSP50 1.31 
+ stau450_LSP100 0.77 
+ stau450_LSP150 0.77 
+ stau450_LSP1 0.77 
+ stau450_LSP200 0.77 
+ stau450_LSP250 0.77 
+ stau450_LSP300 0.77 
+ stau450_LSP350 0.77 
+ stau450_LSP400 0.77 
+ stau450_LSP50 0.77 
+ stau500_LSP100 0.47 
+ stau500_LSP150 0.47 
+ stau500_LSP1 0.47 
+ stau500_LSP200 0.47 
+ stau500_LSP250 0.47 
+ stau500_LSP300 0.47 
+ stau500_LSP350 0.47 
+ stau500_LSP400 0.47 
+ stau500_LSP450 0.47 
+ stau500_LSP50 0.47 
+ stau50_LSP1 4104.9 

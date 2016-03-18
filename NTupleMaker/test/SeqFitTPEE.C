@@ -41,7 +41,7 @@ Double_t SignalPlusPolinBackground(Double_t * x,
 
 }
 
-#include "HtoH.h"
+#include "/nfs/dust/cms/user/bottav/CMSSW_7_4_14/src/DesyTauAnalyses/NTupleMaker/test/HtoH.h"
 
 void FitTP(TString SampleName,
 	   TString Name,
@@ -54,7 +54,8 @@ void FitTP(TString SampleName,
 	   TCanvas * c1,
 	   TCanvas * c2,
 	   float scale,
-	   float * output) {
+	   float * output, 
+	   bool savePngPlot) {
 
   int nBins = histPassOld->GetNbinsX();
   float xmin = histPassOld->GetBinLowEdge(1);
@@ -142,7 +143,7 @@ void FitTP(TString SampleName,
   bkgFuncPass->SetLineStyle(2);
   if (fitPass) bkgFuncPass->Draw("lsame");
   c1->Update();
-  c1->Print(SampleName+"_"+Name+"_pass.png");
+  if (savePngPlot) c1->Print(SampleName+"_"+Name+"_pass.png");
   TF1 * sigFuncPass = new TF1("sigFuncPass",DoubleGauss,xminF,xmaxF,8);
   for (int iP=0; iP<8; ++iP)
     sigFuncPass->SetParameter(iP,fitFuncPass->GetParameter(iP));
@@ -203,7 +204,8 @@ void FitTP(TString SampleName,
   if (fitFail)
     bkgFuncFail->Draw("lsame");
   c2->Update();
-  c2->Print(SampleName+"_"+Name+"_fail.png");
+  if (savePngPlot) c2->Print(SampleName+"_"+Name+"_fail.png");
+
   TF1 * sigFuncFail = new TF1("sigFuncFail",DoubleGauss,xminF,xmaxF,8);
   for (int iP=0; iP<8; ++iP)
     sigFuncFail->SetParameter(iP,fitFuncFail->GetParameter(iP));
@@ -237,36 +239,37 @@ void FitTP(TString SampleName,
 
 }
 
-void SeqFitTPEE(TString fileName = "SingleElectron_Run2015B_New",
-		TString histBaseName = "ZMassBarrel",
+void SeqFitTPEE(//TString fileName = "SingleElectron_2015D_05Oct",
+		TString fileName = "DYJetsToLLM-50_MG",
+		TString histBaseName = "ZMassEndcap",
+		//TString histBaseName = "ZMassEle17Barrel",
 		TString xTitle = "electron p_{T} [GeV]",
 		TString yTitle = "Efficiency",
-		float scale = 1) {
+		float scale = 1, 
+		bool savePng = false // set to true if want to save all fail pass plots
+		) {
   
-
-  TString SampleName("MC");
-  if (fileName.Contains("Run2015"))
-    SampleName = "Data";
-
-  int nPtBins = 6;
-  float ptBins[7] = {10, 15, 20, 25, 30, 40, 60};
-  
-  TString PtBins[6]  = {"Pt10to15","Pt15to20","Pt20to25","Pt25to30",
-			"Pt30to40","Pt40to60"};
-
-  if (histBaseName.Contains("ZMassEle")) {
-    ptBins[1] = 13;
-    ptBins[2] = 18;
-    ptBins[3] = 24;
-    PtBins[0] = "Pt10to13";
-    PtBins[1] = "Pt13to18";
-    PtBins[2] = "Pt18to24";
-    PtBins[3] = "Pt24to30";
-  }
+  TString SampleName("_MC");
+  if (fileName.Contains("SingleElectron")) SampleName = "_Data";
 
 
+
+  // binning for ID+ISO efficiency
+  const int nPtBins = 7; float ptBins[nPtBins+1] = {10, 15, 20, 25, 30, 40, 60, 100};
+  TString PtBins[nPtBins+1]  = {"Pt10to15","Pt15to20","Pt20to25","Pt25to30","Pt30to40","Pt40to60", "PtGt60"};
   TH1F * numeratorH   = new TH1F("numeratorH","",nPtBins,ptBins);
   TH1F * denominatorH = new TH1F("denominatorH","",nPtBins,ptBins);
+
+  //binning for trigger efficiency
+  /*
+  const int nPtBinsTrig = 16; float ptBinsTrig[nPtBinsTrig+1]= {10,13,16,19,22,25,28,31,34,37,40,45,50,60,70,100,1000};
+  TString PtBinsTrig[nPtBinsTrig+1] = {"Pt10to13","Pt13to16","Pt16to19","Pt19to22","Pt22to25","Pt25to28","Pt28to31","Pt31to34","Pt34to37",
+			    "Pt37to40","Pt40to45","Pt45to50","Pt50to60","Pt60to70","Pt70to100","PtGt100"};
+  TH1F * numeratorH   = new TH1F("numeratorH","",nPtBinsTrig,ptBinsTrig);
+  TH1F * denominatorH = new TH1F("denominatorH","",nPtBinsTrig,ptBinsTrig);
+  */
+
+  
 
   TFile * file = new TFile(fileName+".root");
   TH1F * weightsH = (TH1F*)file->Get("histWeightsH");
@@ -291,7 +294,7 @@ void SeqFitTPEE(TString fileName = "SingleElectron_Run2015B_New",
     bool fitFail = true;
     bool rebinPass = false;
     bool rebinFail = true;
-    FitTP(SampleName,histBaseName+PtBins[iPt],histPassOld,histFailOld,fitPass,fitFail,rebinPass,rebinFail,c1,c2,scale,output);
+    FitTP(fileName,histBaseName+PtBins[iPt],histPassOld,histFailOld,fitPass,fitFail,rebinPass,rebinFail,c1,c2,scale,output,savePng);
     c1->cd();
     c1->Update();
     c2->cd();
@@ -300,6 +303,7 @@ void SeqFitTPEE(TString fileName = "SingleElectron_Run2015B_New",
     numeratorH->SetBinContent(iPt+1,output[0]);
     denominatorH->SetBinContent(iPt+1,output[0]+output[1]);
   }
+  // prepare output file
   TFile * outputFile = new TFile(fileName+"_"+histBaseName+".root","recreate");
   outputFile->cd();
   TGraphAsymmErrors * eff = new TGraphAsymmErrors();
@@ -313,8 +317,12 @@ void SeqFitTPEE(TString fileName = "SingleElectron_Run2015B_New",
   TCanvas * canv = new TCanvas("canv","",700,600);
   eff->Draw("APE");
   canv->Update();
-  eff->Write(histBaseName);
+  eff->Write(histBaseName+SampleName);
+
+  // copy the eta bins histogram in the output file
+  file->cd();
+  TH1F * etaBinsH = (TH1F*)file->Get("etaBinsH");
+  outputFile->cd(); 
+  etaBinsH->Write();
   outputFile->Close();
-
-
 }
