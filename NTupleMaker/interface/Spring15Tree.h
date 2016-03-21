@@ -64,6 +64,12 @@ public :
   Float_t         mt_1;
   Float_t         pfmt_1;
   Float_t         puppimt_1;
+  Float_t         mt_rcqr_1;
+  Float_t         pfmt_rcqr_1;
+  Float_t         puppimt_rcqr_1;
+  Float_t         mt_rcmr_1;
+  Float_t         pfmt_rcmr_1;
+  Float_t         puppimt_rcmr_1;  
   Float_t         pt_2;
   Float_t         phi_2;
   Float_t         eta_2;
@@ -77,6 +83,12 @@ public :
   Float_t         mt_2;
   Float_t         pfmt_2;
   Float_t         puppimt_2;
+  Float_t         mt_rcqr_2;
+  Float_t         pfmt_rcqr_2;
+  Float_t         puppimt_rcqr_2;
+  Float_t         mt_rcmr_2;
+  Float_t         pfmt_rcmr_2;
+  Float_t         puppimt_rcmr_2; 
   Int_t 	  tau_decay_mode_2;
   Int_t           os;
   Int_t           dilepton_veto;
@@ -99,9 +111,7 @@ public :
   Float_t         byLooseCombinedIsolationDeltaBetaCorr3Hits_2;
   Float_t         byMediumCombinedIsolationDeltaBetaCorr3Hits_2;
   Float_t         byTightCombinedIsolationDeltaBetaCorr3Hits_2;
-
   Float_t 	  byTightIsolationMVArun2v1DBoldDMwLT_2;
-
   Float_t         againstElectronLooseMVA5_2;
   Float_t         againstElectronMediumMVA5_2;
   Float_t         againstElectronTightMVA5_2;
@@ -110,24 +120,42 @@ public :
   Float_t         againstMuonLoose3_2;
   Float_t         againstMuonTight3_2;
   Float_t         met;
-  Float_t         metphi;
+  Float_t         metphi;  
   Float_t         metcov00;
   Float_t         metcov01;
   Float_t         metcov10;
   Float_t         metcov11;
+  Float_t         met_rcqr;
+  Float_t         metphi_rcqr;
+  Float_t         met_rcmr;
+  Float_t         metphi_rcmr;  
   Float_t         mvamet;
   Float_t         mvametphi;
   Float_t         mvacov00;
   Float_t         mvacov01;
   Float_t         mvacov10;
   Float_t         mvacov11;
+  Float_t         mvamet_rcqr;
+  Float_t         mvametphi_rcqr;
+  Float_t         mvamet_rcmr;
+  Float_t         mvametphi_rcmr;
   Float_t         puppimet;
   Float_t         puppimetphi;
+  Float_t         puppimet_rcqr;
+  Float_t         puppimetphi_rcqr;
+  Float_t         puppimet_rcmr;
+  Float_t         puppimetphi_rcmr;
   Float_t         pt_tt;
   Float_t         pzetavis;
   Float_t         pzetamiss;
   Float_t         pfpzetamiss;
   Float_t         puppipzetamiss;
+  Float_t         pzetamiss_rcqr;
+  Float_t         pfpzetamiss_rcqr;
+  Float_t         puppipzetamiss_rcqr;
+  Float_t         pzetamiss_rcmr;
+  Float_t         pfpzetamiss_rcmr;
+  Float_t         puppipzetamiss_rcmr;
   Float_t         mva_gf;
   Int_t           njets;
   Int_t           njetspt20;
@@ -194,6 +222,12 @@ public :
   TBranch        *b_mt_1;   //!
   TBranch        *b_pfmt_1;   //!
   TBranch        *b_puppimt_1;   //!
+  TBranch        *b_mt_rcqr_1;   //!
+  TBranch        *b_pfmt_rcqr_1;   //!
+  TBranch        *b_puppimt_rcqr_1;   //!
+  TBranch        *b_mt_rcmr_1;   //!
+  TBranch        *b_pfmt_rcmr_1;   //!
+  TBranch        *b_puppimt_rcmr_1;   //!  
   TBranch        *b_pt_2;   //!
   TBranch        *b_phi_2;   //!
   TBranch        *b_eta_2;   //!
@@ -207,6 +241,12 @@ public :
   TBranch        *b_mt_2;   //!
   TBranch        *b_pfmt_2;   //!
   TBranch        *b_puppimt_2;   //!
+  TBranch        *b_mt_rcqr_2;   //!
+  TBranch        *b_pfmt_rcqr_2;   //!
+  TBranch        *b_puppimt_rcqr_2;   //!
+  TBranch        *b_mt_rcmr_2;   //!
+  TBranch        *b_pfmt_rcmr_2;   //!
+  TBranch        *b_puppimt_rcmr_2;   //!  
   TBranch        *b_tau_decay_mode_2;   //!
   TBranch        *b_os;   //!
   TBranch        *b_dilepton_veto;   //!
@@ -243,19 +283,37 @@ public :
   TBranch        *b_metcov01;   //!
   TBranch        *b_metcov10;   //!
   TBranch        *b_metcov11;   //!
+  TBranch        *b_met_rcqr;   //!
+  TBranch        *b_metphi_rcqr;   //!
+  TBranch        *b_met_rcmr;   //!
+  TBranch        *b_metphi_rcmr;   //!
   TBranch        *b_mvamet;   //!
   TBranch        *b_mvametphi;   //!
   TBranch        *b_mvacov00;   //!
   TBranch        *b_mvacov01;   //!
   TBranch        *b_mvacov10;   //!
   TBranch        *b_mvacov11;   //!
+  TBranch        *b_mvamet_rcqr;   //!
+  TBranch        *b_mvametphi_rcqr;   //!
+  TBranch        *b_mvamet_rcmr;   //!
+  TBranch        *b_mvametphi_rcmr;   //!  
   TBranch        *b_puppimet;   //!
-  TBranch        *b_puppimetphi;   //!  
+  TBranch        *b_puppimetphi;   //!
+  TBranch        *b_puppimet_rcqr;   //!
+  TBranch        *b_puppimetphi_rcqr;   //!
+  TBranch        *b_puppimet_rcmr;   //!
+  TBranch        *b_puppimetphi_rcmr;   //!  
   TBranch        *b_pt_tt;   //!
   TBranch        *b_pzetavis;   //!
   TBranch        *b_pzetamiss;   //!
   TBranch        *b_pfpzetamiss;   //!
   TBranch        *b_puppipzetamiss;   //!
+  TBranch        *b_pzetamiss_rcqr;   //!
+  TBranch        *b_pfpzetamiss_rcqr;   //!
+  TBranch        *b_puppipzetamiss_rcqr;   //!
+  TBranch        *b_pzetamiss_rcmr;   //!
+  TBranch        *b_pfpzetamiss_rcmr;   //!
+  TBranch        *b_puppipzetamiss_rcmr;   //!  
   TBranch        *b_mva_gf;   //!
   TBranch        *b_njets;   //!
   TBranch        *b_njetspt20;   //!
