@@ -154,7 +154,7 @@ using namespace reco;
 #define M_photonmaxcount 1000
 #define M_conversionmaxcount 1000
 #define M_jetmaxcount 1000
-#define M_mvametmaxcount 200
+#define M_mvametmaxcount 2000
 #define M_genparticlesmaxcount 1000
 #define M_trigobjectmaxcount 1000
 typedef ROOT::Math::PositionVector3D<ROOT::Math::Cartesian3D<double>,ROOT::Math::DefaultCoordinateSystemTag> Point3D;
@@ -287,7 +287,8 @@ class NTupleMaker : public edm::EDAnalyzer{
   unsigned int cYear;
   std::string cPeriod;
   unsigned int cSkim;
-
+  std::string cJECfile;
+  
   bool cgen;
   bool ctrigger;
   bool cbeamspot;
@@ -296,6 +297,7 @@ class NTupleMaker : public edm::EDAnalyzer{
   bool crecmuon;
   bool crecelectron;
   bool crectau;
+  bool cl1isotau;
   bool crecphoton;
   bool crecpfjet;
   bool crecpfmet;
@@ -358,6 +360,7 @@ class NTupleMaker : public edm::EDAnalyzer{
   edm::EDGetTokenT<edm::ValueMap<int> >   mvaTrigCategoriesMapToken_;
 
   edm::EDGetTokenT<pat::TauCollection> TauCollectionToken_;
+  edm::EDGetTokenT<l1extra::L1JetParticleCollection> L1IsoTauCollectionToken_;
   edm::EDGetTokenT<pat::JetCollection> JetCollectionToken_;
 
   edm::EDGetTokenT<pat::METCollection> MetCollectionToken_;
@@ -741,35 +744,9 @@ class NTupleMaker : public edm::EDAnalyzer{
   Int_t tau_genmatch[M_taumaxcount];
 
   // main tau discriminators
-
-  // decay mode
-  Float_t tau_decayModeFinding[M_taumaxcount];
-  Float_t tau_decayModeFindingNewDMs[M_taumaxcount];
-  
-  // isolation 
-  Float_t tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[M_taumaxcount];
-  Float_t tau_byLooseCombinedIsolationDeltaBetaCorr3Hits[M_taumaxcount];
-  Float_t tau_byMediumCombinedIsolationDeltaBetaCorr3Hits[M_taumaxcount];
-  Float_t tau_byTightCombinedIsolationDeltaBetaCorr3Hits[M_taumaxcount];
-  
-  Float_t tau_byIsolationMVArun2v1DBoldDMwLTraw[M_taumaxcount];
-  Float_t tau_byIsolationMVArun2v1DBnewDMwLTraw[M_taumaxcount];
-
-  // isolation sums
-  Float_t tau_chargedIsoPtSum[M_taumaxcount];
-  Float_t tau_neutralIsoPtSum[M_taumaxcount];
-  Float_t tau_puCorrPtSum[M_taumaxcount];
-
-  // against muon
-  Float_t tau_againstMuonLoose3[M_taumaxcount];
-  Float_t tau_againstMuonTight3[M_taumaxcount];
-
-  // against electron
-  Float_t tau_againstElectronVLooseMVA5[M_taumaxcount];
-  Float_t tau_againstElectronVTightMVA5[M_taumaxcount];
-  Float_t tau_againstElectronLooseMVA5[M_taumaxcount];
-  Float_t tau_againstElectronMediumMVA5[M_taumaxcount];
-  Float_t tau_againstElectronTightMVA5[M_taumaxcount];
+  bool setTauBranches;
+  std::vector<std::pair<std::string, unsigned int> >tauIdIndx;
+  Float_t tau_ids[100][M_taumaxcount];
   
   // number of tracks around 
   UInt_t tau_ntracks_pt05[M_taumaxcount];
@@ -840,6 +817,18 @@ class NTupleMaker : public edm::EDAnalyzer{
   string gentau_decayMode_name[M_taumaxcount];
   UChar_t gentau_mother[M_taumaxcount];
 
+  // L1 Iso Tau
+  UInt_t l1isotau_count;
+  Float_t l1isotau_e[M_taumaxcount];
+  Float_t l1isotau_px[M_taumaxcount];
+  Float_t l1isotau_py[M_taumaxcount];
+  Float_t l1isotau_pz[M_taumaxcount];
+  Float_t l1isotau_pt[M_taumaxcount];
+  Float_t l1isotau_eta[M_taumaxcount];
+  Float_t l1isotau_phi[M_taumaxcount];
+  Float_t l1isotau_mass[M_taumaxcount];  
+  Float_t l1isotau_charge[M_taumaxcount]; 
+  
   // rho neutral
   Float_t rhoNeutral;
 
@@ -950,6 +939,7 @@ class NTupleMaker : public edm::EDAnalyzer{
   Int_t hepNUP_;
   
   Float_t genparticles_lheHt;
+  UInt_t genparticles_noutgoing;
   UInt_t genparticles_count;
   Float_t genparticles_e[M_genparticlesmaxcount];
   Float_t genparticles_px[M_genparticlesmaxcount];

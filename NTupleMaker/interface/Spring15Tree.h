@@ -30,22 +30,22 @@ public :
   Int_t           lumi;
   Int_t           evt;
   Int_t           npv;
-  Int_t           npu;
+  Float_t         npu;
   Float_t         rho;
   Float_t         xs;
   Float_t         mcweight;
-  Float_t         puweight;
+  Float_t         pu_weight;
   Float_t         trigweight_1;
   Float_t         trigweight_2;
   Float_t         idisoweight_1;
-  Float_t         idweight_2;
-  Float_t         isoweight_2;
+  Float_t         idisoweight_2;
   Float_t         effweight;
   Float_t         fakeweight;
   Float_t         embeddedWeight;
   Float_t         signalWeight;
   Float_t         weight;
   Float_t         lheHt;
+  Int_t           gen_noutgoing;
   Float_t         m_vis;
   Float_t         m_sv;
   Float_t         pt_sv;
@@ -77,7 +77,7 @@ public :
   Float_t         mt_2;
   Float_t         pfmt_2;
   Float_t         puppimt_2;
-  Int_t 	  decayMode_2;
+  Int_t 	  tau_decay_mode_2;
   Int_t           os;
   Int_t           dilepton_veto;
   Int_t           extraelec_veto;
@@ -91,12 +91,17 @@ public :
   Float_t         againstElectronTightMVA5_1;
   Float_t         againstElectronVLooseMVA5_1;
   Float_t         againstElectronVTightMVA5_1;
+  Float_t 	  againstElectronVLooseMVA6_2;
+  Float_t 	  againstElectronTightMVA6_2;
   Float_t         againstMuonLoose3_1;
   Float_t         againstMuonTight3_1;
   Float_t         byCombinedIsolationDeltaBetaCorrRaw3Hits_2;
   Float_t         byLooseCombinedIsolationDeltaBetaCorr3Hits_2;
   Float_t         byMediumCombinedIsolationDeltaBetaCorr3Hits_2;
   Float_t         byTightCombinedIsolationDeltaBetaCorr3Hits_2;
+
+  Float_t 	  byTightIsolationMVArun2v1DBoldDMwLT_2;
+
   Float_t         againstElectronLooseMVA5_2;
   Float_t         againstElectronMediumMVA5_2;
   Float_t         againstElectronTightMVA5_2;
@@ -159,18 +164,18 @@ public :
   TBranch        *b_rho;   //!
   TBranch        *b_xs;   //!
   TBranch        *b_mcweight;   //!
-  TBranch        *b_puweight;   //!
+  TBranch        *b_pu_weight;   //!
   TBranch        *b_trigweight_1;   //!
   TBranch        *b_trigweight_2;   //!
   TBranch        *b_idisoweight_1;   //!
-  TBranch        *b_idweight_2;   //!
-  TBranch        *b_isoweight_2;   //!
+  TBranch        *b_idisoweight_2;   //!
   TBranch        *b_effweight;   //!
   TBranch        *b_fakeweight;   //!
   TBranch        *b_embeddedWeight;   //!
   TBranch        *b_signalWeight;   //!
   TBranch        *b_weight;   //!
   TBranch        *b_lheHt;   //!
+  TBranch        *b_gen_noutgoing;   //!  
   TBranch        *b_m_vis;   //!
   TBranch        *b_m_sv;   //!
   TBranch        *b_pt_sv;   //!
@@ -202,7 +207,7 @@ public :
   TBranch        *b_mt_2;   //!
   TBranch        *b_pfmt_2;   //!
   TBranch        *b_puppimt_2;   //!
-  TBranch        *b_decayMode_2;   //!
+  TBranch        *b_tau_decay_mode_2;   //!
   TBranch        *b_os;   //!
   TBranch        *b_dilepton_veto;   //!
   TBranch        *b_extraelec_veto;   //!
@@ -222,11 +227,14 @@ public :
   TBranch        *b_byLooseCombinedIsolationDeltaBetaCorr3Hits_2;   //!
   TBranch        *b_byMediumCombinedIsolationDeltaBetaCorr3Hits_2;   //!
   TBranch        *b_byTightCombinedIsolationDeltaBetaCorr3Hits_2;   //!
+  TBranch	 *b_byTightIsolationMVArun2v1DBoldDMwLT_2;
   TBranch        *b_againstElectronLooseMVA5_2;   //!
   TBranch        *b_againstElectronMediumMVA5_2;   //!
   TBranch        *b_againstElectronTightMVA5_2;   //!
   TBranch        *b_againstElectronVLooseMVA5_2;   //!
   TBranch        *b_againstElectronVTightMVA5_2;   //!
+  TBranch	 *b_againstElectronVLooseMVA6_2;
+  TBranch        *b_againstElectronTightMVA6_2;
   TBranch        *b_againstMuonLoose3_2;   //!
   TBranch        *b_againstMuonTight3_2;   //!
   TBranch        *b_met;   //!

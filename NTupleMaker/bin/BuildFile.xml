@@ -3,7 +3,11 @@
 <bin name="Splitter" file="Splitter.cpp">
 </bin>
 
+<<<<<<< HEAD
 <bin name="AnalysisMacro_dimuons" file="AnalysisMacro_dimuons.cpp">
+=======
+<bin name="ScaleFactor_test" file="ScaleFactor_test.cpp">
+>>>>>>> 5cb985faf3a0e09396e6f61914613aac8273823e
  <use name="PhysicsTools/Utilities"/>
  <use name="rootgraphics"/>
  <use name="root"/>
@@ -16,7 +20,12 @@
  <use name="HTT-utilities/RecoilCorrections"/>
 </bin>
 
+<<<<<<< HEAD
 <bin name="AnalysisMacro_dielectrons" file="AnalysisMacro_dielectrons.cpp">
+=======
+<bin name="AnalysisMacro_dimuons" file="AnalysisMacro_dimuons.cpp">
+ <use name="HTT-utilities/RecoilCorrections"/>
+>>>>>>> 5cb985faf3a0e09396e6f61914613aac8273823e
  <use name="PhysicsTools/Utilities"/>
  <use name="rootgraphics"/>
  <use name="root"/>
@@ -29,6 +38,7 @@
  <use name="HTT-utilities/RecoilCorrections"/>
 </bin>
 
+<<<<<<< HEAD
 <bin name="AnalysisMacro_EMu" file="AnalysisMacro_EMu.cpp">
  <use name="PhysicsTools/Utilities"/>
  <use name="rootgraphics"/>
@@ -52,6 +62,10 @@
 </bin>
 
 <bin name="AnalysisMacro_ZTTMM" file="AnalysisMacro_ZTTMM.cpp">
+=======
+<bin name="AnalysisMacro_dielectrons" file="AnalysisMacro_dielectrons.cpp">
+ <use name="HTT-utilities/RecoilCorrections"/> 
+>>>>>>> 5cb985faf3a0e09396e6f61914613aac8273823e
  <use name="PhysicsTools/Utilities"/>
  <use name="rootgraphics"/>
  <use name="root"/>
@@ -142,6 +156,17 @@
 </bin>
 
 <bin name="SynchNTupleProducer_Spring15_et" file="SynchNTupleProducer_Spring15_et.cpp">
+ <use name="PhysicsTools/Utilities"/>
+ <use name="rootgraphics"/>
+ <use name="root"/>
+ <use name="rootmath"/>
+ <use name="roottmva"/>
+ <use name="boost" />
+ <use name="boost_program_options"/>
+ <use name="DesyTauAnalyses/NTupleMaker"/>
+</bin>
+
+<bin name="SynchNTupleProducer_Spring15_mutau" file="SynchNTupleProducer_Spring15_mutau.cpp">
  <use name="PhysicsTools/Utilities"/>
  <use name="rootgraphics"/>
  <use name="root"/>

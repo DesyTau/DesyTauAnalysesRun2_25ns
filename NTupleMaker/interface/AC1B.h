@@ -237,6 +237,7 @@ public :
    Float_t         tau_byTightCombinedIsolationDeltaBetaCorr3Hits[50];   //[tau_count]
    Float_t         tau_byIsolationMVArun2v1DBoldDMwLTraw[50];   //[tau_count]
    Float_t         tau_byIsolationMVArun2v1DBnewDMwLTraw[50];   //[tau_count]
+   Float_t 	   tau_byTightIsolationMVArun2v1DBoldDMwLT[50];
    Float_t         tau_chargedIsoPtSum[50];   //[tau_count]
    Float_t         tau_neutralIsoPtSum[50];   //[tau_count]
    Float_t         tau_puCorrPtSum[50];   //[tau_count]
@@ -254,6 +255,8 @@ public :
    Float_t         tau_againstElectronLooseMVA5[50];   //[tau_count]
    Float_t         tau_againstElectronMediumMVA5[50];   //[tau_count]
    Float_t         tau_againstElectronTightMVA5[50];   //[tau_count]
+   Float_t         tau_againstElectronVLooseMVA6[50];
+   Float_t   	   tau_againstElectronTightMVA6[50];
    UInt_t          tau_ntracks_pt05[50];   //[tau_count]
    UInt_t          tau_ntracks_pt08[50];   //[tau_count]
    UInt_t          tau_ntracks_pt1[50];   //[tau_count]
@@ -269,6 +272,16 @@ public :
    Char_t          tau_decayMode_name[50];   //[tau_count]
    Int_t           tau_decayMode[50];   //[tau_count]
    Int_t           tau_genmatch[50];   //[tau_count]
+   UInt_t          l1isotau_count;
+   Float_t         l1isotau_e[50];   //[l1isotau_count]
+   Float_t         l1isotau_px[50];   //[l1isotau_count]
+   Float_t         l1isotau_py[50];   //[l1isotau_count]
+   Float_t         l1isotau_pz[50];   //[l1isotau_count]
+   Float_t         l1isotau_mass[50];   //[l1isotau_count]
+   Float_t         l1isotau_eta[50];   //[l1isotau_count]
+   Float_t         l1isotau_phi[50];   //[l1isotau_count]
+   Float_t         l1isotau_pt[50];   //[l1isotau_count]
+   Float_t         l1isotau_charge[50];   //[l1isotau_count]  
    Float_t         pfmet_ex;
    Float_t         pfmet_ey;
    Float_t         pfmet_ez;
@@ -387,6 +400,7 @@ public :
    Char_t          gentau_decayMode_name[50];   //[gentau_count]
    UChar_t         gentau_mother[50];   //[gentau_count]
    Float_t         genparticles_lheHt;
+   UInt_t          genparticles_noutgoing;
    UInt_t          genparticles_count;
    Float_t         genparticles_e[100];   //[genparticles_count]
    Float_t         genparticles_px[100];   //[genparticles_count]
@@ -656,6 +670,7 @@ public :
    TBranch        *b_tau_byLooseCombinedIsolationDeltaBetaCorr3Hits;   //!
    TBranch        *b_tau_byMediumCombinedIsolationDeltaBetaCorr3Hits;   //!
    TBranch        *b_tau_byTightCombinedIsolationDeltaBetaCorr3Hits;   //!
+   TBranch 	  *b_tau_byTightIsolationMVArun2v1DBoldDMwLT;
    TBranch        *b_tau_byIsolationMVArun2v1DBoldDMwLTraw;   //!
    TBranch        *b_tau_byIsolationMVArun2v1DBnewDMwLTraw;   //!
    TBranch        *b_tau_chargedIsoPtSum;   //!
@@ -675,6 +690,8 @@ public :
    TBranch        *b_tau_againstElectronLooseMVA5;   //!
    TBranch        *b_tau_againstElectronMediumMVA5;   //!
    TBranch        *b_tau_againstElectronTightMVA5;   //!
+   TBranch 	  *b_tau_againstElectronTightMVA6;
+   TBranch        *b_tau_againstElectronVLooseMVA6;
    TBranch        *b_tau_ntracks_pt05;   //!
    TBranch        *b_tau_ntracks_pt08;   //!
    TBranch        *b_tau_ntracks_pt1;   //!
@@ -690,6 +707,16 @@ public :
    TBranch        *b_tau_decayMode_name;   //!
    TBranch        *b_tau_decayMode;   //!
    TBranch        *b_tau_genmatch;   //!
+   TBranch        *b_l1isotau_count;   //!
+   TBranch        *b_l1isotau_e;   //!
+   TBranch        *b_l1isotau_px;   //!
+   TBranch        *b_l1isotau_py;   //!
+   TBranch        *b_l1isotau_pz;   //!
+   TBranch        *b_l1isotau_mass;   //!
+   TBranch        *b_l1isotau_eta;   //!
+   TBranch        *b_l1isotau_phi;   //!
+   TBranch        *b_l1isotau_pt;   //!
+   TBranch        *b_l1isotau_charge;   //! 
    TBranch        *b_pfmet_ex;   //!
    TBranch        *b_pfmet_ey;   //!
    TBranch        *b_pfmet_ez;   //!
@@ -808,6 +835,7 @@ public :
    TBranch        *b_gentau_decayMode_name;   //!
    TBranch        *b_gentau_mother;   //!
    TBranch        *b_genparticles_lheHt;   //!
+   TBranch        *b_genparticles_noutgoing;   //!
    TBranch        *b_genparticles_count;   //!
    TBranch        *b_genparticles_e;   //!
    TBranch        *b_genparticles_px;   //!
@@ -1185,6 +1213,7 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("tau_byTightCombinedIsolationDeltaBetaCorr3Hits", tau_byTightCombinedIsolationDeltaBetaCorr3Hits, &b_tau_byTightCombinedIsolationDeltaBetaCorr3Hits);
    fChain->SetBranchAddress("tau_byIsolationMVArun2v1DBoldDMwLTraw", tau_byIsolationMVArun2v1DBoldDMwLTraw, &b_tau_byIsolationMVArun2v1DBoldDMwLTraw);
    fChain->SetBranchAddress("tau_byIsolationMVArun2v1DBnewDMwLTraw", tau_byIsolationMVArun2v1DBnewDMwLTraw, &b_tau_byIsolationMVArun2v1DBnewDMwLTraw);
+   fChain->SetBranchAddress("tau_byTightIsolationMVArun2v1DBoldDMwLT", tau_byTightIsolationMVArun2v1DBoldDMwLT, &b_tau_byTightIsolationMVArun2v1DBoldDMwLT); 
    fChain->SetBranchAddress("tau_chargedIsoPtSum", tau_chargedIsoPtSum, &b_tau_chargedIsoPtSum);
    fChain->SetBranchAddress("tau_neutralIsoPtSum", tau_neutralIsoPtSum, &b_tau_neutralIsoPtSum);
    fChain->SetBranchAddress("tau_puCorrPtSum", tau_puCorrPtSum, &b_tau_puCorrPtSum);
@@ -1202,6 +1231,8 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("tau_againstElectronLooseMVA5", tau_againstElectronLooseMVA5, &b_tau_againstElectronLooseMVA5);
    fChain->SetBranchAddress("tau_againstElectronMediumMVA5", tau_againstElectronMediumMVA5, &b_tau_againstElectronMediumMVA5);
    fChain->SetBranchAddress("tau_againstElectronTightMVA5", tau_againstElectronTightMVA5, &b_tau_againstElectronTightMVA5);
+   fChain->SetBranchAddress("tau_againstElectronTightMVA6", tau_againstElectronTightMVA6, &b_tau_againstElectronTightMVA6);
+   fChain->SetBranchAddress("tau_againstElectronVLooseMVA6", tau_againstElectronVLooseMVA6, &b_tau_againstElectronVLooseMVA6);
    fChain->SetBranchAddress("tau_ntracks_pt05", tau_ntracks_pt05, &b_tau_ntracks_pt05);
    fChain->SetBranchAddress("tau_ntracks_pt08", tau_ntracks_pt08, &b_tau_ntracks_pt08);
    fChain->SetBranchAddress("tau_ntracks_pt1", tau_ntracks_pt1, &b_tau_ntracks_pt1);
@@ -1217,6 +1248,16 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("tau_decayMode_name", tau_decayMode_name, &b_tau_decayMode_name);
    fChain->SetBranchAddress("tau_decayMode", tau_decayMode, &b_tau_decayMode);
    fChain->SetBranchAddress("tau_genmatch", tau_genmatch, &b_tau_genmatch);
+   fChain->SetBranchAddress("l1isotau_count", &l1isotau_count, &b_l1isotau_count);
+   fChain->SetBranchAddress("l1isotau_e", l1isotau_e, &b_l1isotau_e);
+   fChain->SetBranchAddress("l1isotau_px", l1isotau_px, &b_l1isotau_px);
+   fChain->SetBranchAddress("l1isotau_py", l1isotau_py, &b_l1isotau_py);
+   fChain->SetBranchAddress("l1isotau_pz", l1isotau_pz, &b_l1isotau_pz);
+   fChain->SetBranchAddress("l1isotau_mass", l1isotau_mass, &b_l1isotau_mass);
+   fChain->SetBranchAddress("l1isotau_eta", l1isotau_eta, &b_l1isotau_eta);
+   fChain->SetBranchAddress("l1isotau_phi", l1isotau_phi, &b_l1isotau_phi);
+   fChain->SetBranchAddress("l1isotau_pt", l1isotau_pt, &b_l1isotau_pt);
+   fChain->SetBranchAddress("l1isotau_charge", l1isotau_charge, &b_l1isotau_charge); 
    fChain->SetBranchAddress("pfmet_ex", &pfmet_ex, &b_pfmet_ex);
    fChain->SetBranchAddress("pfmet_ey", &pfmet_ey, &b_pfmet_ey);
    fChain->SetBranchAddress("pfmet_ez", &pfmet_ez, &b_pfmet_ez);
@@ -1335,6 +1376,7 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("gentau_decayMode_name", gentau_decayMode_name, &b_gentau_decayMode_name);
    fChain->SetBranchAddress("gentau_mother", gentau_mother, &b_gentau_mother);
    fChain->SetBranchAddress("genparticles_lheHt", &genparticles_lheHt, &b_genparticles_lheHt);
+   fChain->SetBranchAddress("genparticles_noutgoing", &genparticles_noutgoing, &b_genparticles_noutgoing);
    fChain->SetBranchAddress("genparticles_count", &genparticles_count, &b_genparticles_count);
    fChain->SetBranchAddress("genparticles_e", genparticles_e, &b_genparticles_e);
    fChain->SetBranchAddress("genparticles_px", genparticles_px, &b_genparticles_px);
