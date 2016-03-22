@@ -99,7 +99,11 @@ void Spring15Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("puppimt_rcqr_1", &puppimt_rcqr_1, &b_puppimt_rcqr_1);
    fChain->SetBranchAddress("mt_rcmr_1", &mt_rcmr_1, &b_mt_rcmr_1);
    fChain->SetBranchAddress("pfmt_rcmr_1", &pfmt_rcmr_1, &b_pfmt_rcmr_1);
-   fChain->SetBranchAddress("puppimt_rcmr_1", &puppimt_rcmr_1, &b_puppimt_rcmr_1);  
+   fChain->SetBranchAddress("puppimt_rcmr_1", &puppimt_rcmr_1, &b_puppimt_rcmr_1);
+   fChain->SetBranchAddress("mt_rc_njetsreco_1", &mt_rc_njetsreco_1, &b_mt_rc_njetsreco_1);
+   fChain->SetBranchAddress("pfmt_rc_njetsreco_1", &pfmt_rc_njetsreco_1, &b_pfmt_rc_njetsreco_1);
+   fChain->SetBranchAddress("mt_rc_visreco_1", &mt_rc_visreco_1, &b_mt_rc_visreco_1);
+   fChain->SetBranchAddress("pfmt_rc_visreco_1", &pfmt_rc_visreco_1, &b_pfmt_rc_visreco_1);
    fChain->SetBranchAddress("pt_2", &pt_2, &b_pt_2);
    fChain->SetBranchAddress("phi_2", &phi_2, &b_phi_2);
    fChain->SetBranchAddress("eta_2", &eta_2, &b_eta_2);
@@ -119,6 +123,10 @@ void Spring15Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("mt_rcmr_2", &mt_rcmr_2, &b_mt_rcmr_2);
    fChain->SetBranchAddress("pfmt_rcmr_2", &pfmt_rcmr_2, &b_pfmt_rcmr_2);
    fChain->SetBranchAddress("puppimt_rcmr_2", &puppimt_rcmr_2, &b_puppimt_rcmr_2);  
+   fChain->SetBranchAddress("mt_rc_njetsreco_2", &mt_rc_njetsreco_2, &b_mt_rc_njetsreco_2);
+   fChain->SetBranchAddress("pfmt_rc_njetsreco_2", &pfmt_rc_njetsreco_2, &b_pfmt_rc_njetsreco_2);
+   fChain->SetBranchAddress("mt_rc_visreco_2", &mt_rc_visreco_2, &b_mt_rc_visreco_2);
+   fChain->SetBranchAddress("pfmt_rc_visreco_2", &pfmt_rc_visreco_2, &b_pfmt_rc_visreco_2);
    fChain->SetBranchAddress("tau_decay_mode_2", &tau_decay_mode_2, &b_tau_decay_mode_2); 
    fChain->SetBranchAddress("os", &os, &b_os);
    fChain->SetBranchAddress("dilepton_veto", &dilepton_veto, &b_dilepton_veto);
@@ -162,6 +170,10 @@ void Spring15Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("metphi_rcqr", &metphi_rcqr, &b_metphi_rcqr);
    fChain->SetBranchAddress("met_rcmr", &met_rcmr, &b_met_rcmr);
    fChain->SetBranchAddress("metphi_rcmr", &metphi_rcmr, &b_metphi_rcmr);
+   fChain->SetBranchAddress("met_rc_njetsreco", &met_rc_njetsreco, &b_met_rc_njetsreco);
+   fChain->SetBranchAddress("metphi_rc_njetsreco", &metphi_rc_njetsreco, &b_metphi_rc_njetsreco);
+   fChain->SetBranchAddress("met_rc_visreco", &met_rc_visreco, &b_met_rc_visreco);
+   fChain->SetBranchAddress("metphi_rc_visreco", &metphi_rc_visreco, &b_metphi_rc_visreco);
    fChain->SetBranchAddress("mvamet", &mvamet, &b_mvamet);
    fChain->SetBranchAddress("mvametphi", &mvametphi, &b_mvametphi);
    fChain->SetBranchAddress("mvacov00", &mvacov00, &b_mvacov00);
@@ -171,7 +183,11 @@ void Spring15Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("mvamet_rcqr", &mvamet_rcqr, &b_mvamet_rcqr);
    fChain->SetBranchAddress("mvametphi_rcqr", &mvametphi_rcqr, &b_mvametphi_rcqr);
    fChain->SetBranchAddress("mvamet_rcmr", &mvamet_rcmr, &b_mvamet_rcmr);
-   fChain->SetBranchAddress("mvametphi_rcmr", &mvametphi_rcmr, &b_mvametphi_rcmr);   
+   fChain->SetBranchAddress("mvametphi_rcmr", &mvametphi_rcmr, &b_mvametphi_rcmr);
+   fChain->SetBranchAddress("mvamet_rc_njetsreco", &mvamet_rc_njetsreco, &b_mvamet_rc_njetsreco);
+   fChain->SetBranchAddress("mvametphi_rc_njetsreco", &mvametphi_rc_njetsreco, &b_mvametphi_rc_njetsreco);
+   fChain->SetBranchAddress("mvamet_rc_visreco", &mvamet_rc_visreco, &b_mvamet_rc_visreco);
+   fChain->SetBranchAddress("mvametphi_rc_visreco", &mvametphi_rc_visreco, &b_mvametphi_rc_visreco);
    fChain->SetBranchAddress("puppimet", &puppimet, &b_puppimet);
    fChain->SetBranchAddress("puppimetphi", &puppimetphi, &b_puppimetphi);
    fChain->SetBranchAddress("puppimet_rcqr", &puppimet_rcqr, &b_puppimet_rcqr);
@@ -189,9 +205,14 @@ void Spring15Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("pzetamiss_rcmr", &pzetamiss_rcmr, &b_pzetamiss_rcmr);
    fChain->SetBranchAddress("pfpzetamiss_rcmr", &pfpzetamiss_rcmr, &b_pfpzetamiss_rcmr);
    fChain->SetBranchAddress("puppipzetamiss_rcmr", &puppipzetamiss_rcmr, &b_puppipzetamiss_rcmr);
+   fChain->SetBranchAddress("pzetamiss_rc_njetsreco", &pzetamiss_rc_njetsreco, &b_pzetamiss_rc_njetsreco);
+   fChain->SetBranchAddress("pfpzetamiss_rc_njetsreco", &pfpzetamiss_rc_njetsreco, &b_pfpzetamiss_rc_njetsreco);
+   fChain->SetBranchAddress("pzetamiss_rc_visreco", &pzetamiss_rc_visreco, &b_pzetamiss_rc_visreco);
+   fChain->SetBranchAddress("pfpzetamiss_rc_visreco", &pfpzetamiss_rc_visreco, &b_pfpzetamiss_rc_visreco);
    fChain->SetBranchAddress("mva_gf", &mva_gf, &b_mva_gf);
    fChain->SetBranchAddress("njets", &njets, &b_njets);
    fChain->SetBranchAddress("njetspt20", &njetspt20, &b_njetspt20);
+   fChain->SetBranchAddress("njetshad", &njetshad, &b_njetshad);
    fChain->SetBranchAddress("jpt_1", &jpt_1, &b_jpt_1);
    fChain->SetBranchAddress("jeta_1", &jeta_1, &b_jeta_1);
    fChain->SetBranchAddress("jphi_1", &jphi_1, &b_jphi_1);
@@ -335,6 +356,10 @@ void Spring15Tree::WriteInit(TTree *tree) {
   fChain->Branch("mt_rcmr_1", &mt_rcmr_1, "mt_rcmr_1/F");
   fChain->Branch("pfmt_rcmr_1", &pfmt_rcmr_1, "pfmt_rcmr_1/F");
   fChain->Branch("puppimt_rcmr_1", &puppimt_rcmr_1, "puppimt_rcmr_1/F");
+  fChain->Branch("mt_rc_njetsreco_1", &mt_rc_njetsreco_1, "mt_rc_njetsreco_1/F");
+  fChain->Branch("pfmt_rc_njetsreco_1", &pfmt_rc_njetsreco_1, "pfmt_rc_njetsreco_1/F");
+  fChain->Branch("mt_rc_visreco_1", &mt_rc_visreco_1, "mt_rc_visreco_1/F");
+  fChain->Branch("pfmt_rc_visreco_1", &pfmt_rc_visreco_1, "pfmt_rc_visreco_1/F");
   
   fChain->Branch("pt_2", &pt_2, "pt_2/F");
   fChain->Branch("phi_2", &phi_2, "phi_2/F");
@@ -356,6 +381,10 @@ void Spring15Tree::WriteInit(TTree *tree) {
   fChain->Branch("pfmt_rcmr_2", &pfmt_rcmr_2, "pfmt_rcmr_2/F");
   fChain->Branch("puppimt_rcmr_2", &puppimt_rcmr_2, "puppimt_rcmr_2/F");  
   fChain->Branch("tau_decay_mode_2", &tau_decay_mode_2, "tau_decay_mode_2/I");
+  fChain->Branch("mt_rc_njetsreco_2", &mt_rc_njetsreco_2, "mt_rc_njetsreco_2/F");
+  fChain->Branch("pfmt_rc_njetsreco_2", &pfmt_rc_njetsreco_2, "pfmt_rc_njetsreco_2/F");
+  fChain->Branch("mt_rc_visreco_2", &mt_rc_visreco_2, "mt_rc_visreco_2/F");
+  fChain->Branch("pfmt_rc_visreco_2", &pfmt_rc_visreco_2, "pfmt_rc_visreco_2/F");
   
   fChain->Branch("os", &os, "os/I");
   fChain->Branch("dilepton_veto", &dilepton_veto, "dilepton_veto/I");
@@ -401,6 +430,10 @@ void Spring15Tree::WriteInit(TTree *tree) {
   fChain->Branch("metphi_rcqr", &metphi_rcqr, "metphi_rcqr/F");
   fChain->Branch("met_rcmr", &met_rcmr, "met_rcmr/F");
   fChain->Branch("metphi_rcmr", &metphi_rcmr, "metphi_rcmr/F");
+  fChain->Branch("met_rc_njetsreco", &met_rc_njetsreco, "met_rc_njetsreco/F");
+  fChain->Branch("metphi_rc_njetsreco", &metphi_rc_njetsreco, "metphi_rc_njetsreco/F");
+  fChain->Branch("met_rc_visreco", &met_rc_visreco, "met_rc_visreco/F");
+  fChain->Branch("metphi_rc_visreco", &metphi_rc_visreco, "metphi_rc_visreco/F");
   
   fChain->Branch("mvamet", &mvamet, "mvamet/F");
   fChain->Branch("mvametphi", &mvametphi, "mvametphi/F");
@@ -412,6 +445,10 @@ void Spring15Tree::WriteInit(TTree *tree) {
   fChain->Branch("mvametphi_rcqr", &mvametphi_rcqr, "mvametphi_rcqr/F");
   fChain->Branch("mvamet_rcmr", &mvamet_rcmr, "mvamet_rcmr/F");
   fChain->Branch("mvametphi_rcmr", &mvametphi_rcmr, "mvametphi_rcmr/F");
+  fChain->Branch("mvamet_rc_njetsreco", &mvamet_rc_njetsreco, "mvamet_rc_njetsreco/F");
+  fChain->Branch("mvametphi_rc_njetsreco", &mvametphi_rc_njetsreco, "mvametphi_rc_njetsreco/F");
+  fChain->Branch("mvamet_rc_visreco", &mvamet_rc_visreco, "mvamet_rc_visreco/F");
+  fChain->Branch("mvametphi_rc_visreco", &mvametphi_rc_visreco, "mvametphi_rc_visreco/F");
   
   fChain->Branch("puppimet", &puppimet, "puppimet/F");
   fChain->Branch("puppimetphi", &puppimetphi, "puppimetphi/F");  
@@ -430,11 +467,16 @@ void Spring15Tree::WriteInit(TTree *tree) {
   fChain->Branch("puppipzetamiss_rcqr", &puppipzetamiss_rcqr, "puppipzetamiss_rcqr/F");
   fChain->Branch("pzetamiss_rcmr", &pzetamiss_rcmr, "pzetamiss_rcmr/F");
   fChain->Branch("pfpzetamiss_rcmr", &pfpzetamiss_rcmr, "pfpzetamiss_rcmr/F");
-  fChain->Branch("puppipzetamiss_rcmr", &puppipzetamiss_rcmr, "puppipzetamiss_rcmr/F"); 
+  fChain->Branch("puppipzetamiss_rcmr", &puppipzetamiss_rcmr, "puppipzetamiss_rcmr/F");
+  fChain->Branch("pzetamiss_rc_njetsreco", &pzetamiss_rc_njetsreco, "pzetamiss_rc_njetsreco/F");
+  fChain->Branch("pfpzetamiss_rc_njetsreco", &pfpzetamiss_rc_njetsreco, "pfpzetamiss_rc_njetsreco/F");
+  fChain->Branch("pzetamiss_rc_visreco", &pzetamiss_rc_visreco, "pzetamiss_rc_visreco/F");
+  fChain->Branch("pfpzetamiss_rc_visreco", &pfpzetamiss_rc_visreco, "pfpzetamiss_rc_visreco/F");
   fChain->Branch("mva_gf", &mva_gf, "mva_gf/F");
   
   fChain->Branch("njets", &njets, "njets/I");
   fChain->Branch("njetspt20", &njetspt20, "njetspt20/I");
+  fChain->Branch("njetshad", &njetshad, "njetshad/I");
   
   fChain->Branch("jpt_1", &jpt_1, "jpt_1/F");
   fChain->Branch("jeta_1", &jeta_1, "jeta_1/F");

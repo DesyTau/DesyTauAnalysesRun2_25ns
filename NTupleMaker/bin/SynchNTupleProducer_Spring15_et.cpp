@@ -1053,7 +1053,7 @@ int main(int argc, char * argv[]) {
       vector<unsigned int> jets; jets.clear();
       vector<unsigned int> jetspt20; jetspt20.clear();
       vector<unsigned int> bjets; bjets.clear();
-
+      
       int indexLeadingJet = -1;
       float ptLeadingJet = -1;
 
@@ -1220,17 +1220,20 @@ int main(int argc, char * argv[]) {
       TLorentzVector genV( 0., 0., 0., 0.);
       TLorentzVector genL( 0., 0., 0., 0.);
 
-      if (!isData){
+      otree->njetshad = otree->njets;
+      if (!isData && applyRecoilCorrections){
 	genV = genTools::genV(analysisTree);
 	genL = genTools::genL(analysisTree);
+	otree->njetshad = genTools::nJetsHad(analysisTree);
       }
       
       // PFMET
+      // // baseline: njetshad, genVis, quantile remap
       genTools::RecoilCorrections( *recoilPFMetCorrector, (!isData && applyRecoilCorrections) * genTools::QuantileRemap,
 				   otree->met, otree->metphi,
 				   genV.Px(), genV.Py(),
 				   genL.Px(), genL.Py(),
-				   otree->njets,
+				   otree->njetshad,
 				   otree->met_rcqr, otree->metphi_rcqr
 				   );
 			 
@@ -1238,18 +1241,59 @@ int main(int argc, char * argv[]) {
       otree->pfmt_rcqr_2 = genTools::mt(otree->pt_2, otree->phi_2, otree->met_rcqr, otree->metphi_rcqr);     
       otree->pfpzetamiss_rcqr = genTools::pzetamiss( zetaX, zetaY, otree->met_rcqr, otree->metphi_rcqr);
 
+      // // njetshad, genVis, mean-resolution correction
       genTools::RecoilCorrections( *recoilPFMetCorrector, (!isData && applyRecoilCorrections) * genTools::MeanResolution,
 				   otree->met, otree->metphi,
 				   genV.Px(), genV.Py(),
 				   genL.Px(), genL.Py(),
-				   otree->njets,
+				   otree->njetshad,
 				   otree->met_rcmr, otree->metphi_rcmr
 				   );
 			 
       otree->pfmt_rcmr_1 = genTools::mt(otree->pt_1, otree->phi_1, otree->met_rcmr, otree->metphi_rcmr);
       otree->pfmt_rcmr_2 = genTools::mt(otree->pt_2, otree->phi_2, otree->met_rcmr, otree->metphi_rcmr);     
       otree->pfpzetamiss_rcmr = genTools::pzetamiss( zetaX, zetaY, otree->met_rcmr, otree->metphi_rcmr);
+      
+      // // njet reco, genVis, mean-resolution correction
+      genTools::RecoilCorrections( *recoilPFMetCorrector, (!isData && applyRecoilCorrections) * genTools::MeanResolution,
+				   otree->met, otree->metphi,
+				   genV.Px(), genV.Py(),
+				   genL.Px(), genL.Py(),
+				   otree->njets,
+				   otree->met_rc_njetsreco, otree->metphi_rc_njetsreco
+				   );
+			 
+      otree->pfmt_rc_njetsreco_1 = genTools::mt(otree->pt_1, otree->phi_1, otree->met_rc_njetsreco, otree->metphi_rc_njetsreco);
+      otree->pfmt_rc_njetsreco_2 = genTools::mt(otree->pt_2, otree->phi_2, otree->met_rc_njetsreco, otree->metphi_rc_njetsreco);     
+      otree->pfpzetamiss_rc_njetsreco = genTools::pzetamiss( zetaX, zetaY, otree->met_rc_njetsreco, otree->metphi_rc_njetsreco);
 
+      // // njethad, reco Vis, mean-resolution correction
+      float visreco_px = genL.Px();
+      float visreco_py = genL.Py();
+
+      if(isDY){
+	if(otree->gen_match_2 == 5 && otree->os > 0.5){
+	  visreco_px = otree->pt_1*cos(otree->phi_1) + otree->pt_2*cos(otree->phi_2);
+	  visreco_px = otree->pt_1*sin(otree->phi_1) + otree->pt_2*cos(otree->phi_2); 
+	}
+      }
+      else if(isWJets){
+	visreco_px = otree->pt_1*cos(otree->phi_1);
+	visreco_px = otree->pt_1*sin(otree->phi_1);
+      }
+      
+      genTools::RecoilCorrections( *recoilPFMetCorrector, (!isData && applyRecoilCorrections) * genTools::MeanResolution,
+				   otree->met, otree->metphi,
+				   genV.Px(), genV.Py(),
+				   visreco_px, visreco_py,
+				   otree->njetshad,
+				   otree->met_rc_visreco, otree->metphi_rc_visreco
+				   );
+			 
+      otree->pfmt_rc_visreco_1 = genTools::mt(otree->pt_1, otree->phi_1, otree->met_rc_visreco, otree->metphi_rc_visreco);
+      otree->pfmt_rc_visreco_2 = genTools::mt(otree->pt_2, otree->phi_2, otree->met_rc_visreco, otree->metphi_rc_visreco);     
+      otree->pfpzetamiss_rc_visreco = genTools::pzetamiss( zetaX, zetaY, otree->met_rc_visreco, otree->metphi_rc_visreco);
+      
       // PUPPI MET
       genTools::RecoilCorrections( *recoilPuppiMetCorrector, (!isData && applyRecoilCorrections) * genTools::QuantileRemap,
 				   otree->puppimet, otree->puppimetphi,
@@ -1276,11 +1320,12 @@ int main(int argc, char * argv[]) {
       otree->puppipzetamiss_rcmr = genTools::pzetamiss( zetaX, zetaY, otree->met_rcmr, otree->puppimetphi_rcmr);
 
       // MVA MET
-      genTools::RecoilCorrections( *recoilMvaMetCorrector, (!isData && applyRecoilCorrections) * genTools::QuantileRemap,
+     // // baseline: njetshad, genVis, quantile remap
+      genTools::RecoilCorrections( *recoilPFMetCorrector, (!isData && applyRecoilCorrections) * genTools::QuantileRemap,
 				   otree->mvamet, otree->mvametphi,
 				   genV.Px(), genV.Py(),
 				   genL.Px(), genL.Py(),
-				   otree->njets,
+				   otree->njetshad,
 				   otree->mvamet_rcqr, otree->mvametphi_rcqr
 				   );
 			 
@@ -1288,17 +1333,58 @@ int main(int argc, char * argv[]) {
       otree->mt_rcqr_2 = genTools::mt(otree->pt_2, otree->phi_2, otree->mvamet_rcqr, otree->mvametphi_rcqr);     
       otree->pzetamiss_rcqr = genTools::pzetamiss( zetaX, zetaY, otree->mvamet_rcqr, otree->mvametphi_rcqr);
 
-      genTools::RecoilCorrections( *recoilMvaMetCorrector, (!isData && applyRecoilCorrections) * genTools::MeanResolution,
+      // // njetshad, genVis, mean-resolution correction
+      genTools::RecoilCorrections( *recoilPFMetCorrector, (!isData && applyRecoilCorrections) * genTools::MeanResolution,
 				   otree->mvamet, otree->mvametphi,
 				   genV.Px(), genV.Py(),
 				   genL.Px(), genL.Py(),
-				   otree->njets,
+				   otree->njetshad,
 				   otree->mvamet_rcmr, otree->mvametphi_rcmr
 				   );
 			 
       otree->mt_rcmr_1 = genTools::mt(otree->pt_1, otree->phi_1, otree->mvamet_rcmr, otree->mvametphi_rcmr);
       otree->mt_rcmr_2 = genTools::mt(otree->pt_2, otree->phi_2, otree->mvamet_rcmr, otree->mvametphi_rcmr);     
       otree->pzetamiss_rcmr = genTools::pzetamiss( zetaX, zetaY, otree->mvamet_rcmr, otree->mvametphi_rcmr);
+      
+      // // njet reco, genVis, mean-resolution correction
+      genTools::RecoilCorrections( *recoilPFMetCorrector, (!isData && applyRecoilCorrections) * genTools::MeanResolution,
+				   otree->mvamet, otree->mvametphi,
+				   genV.Px(), genV.Py(),
+				   genL.Px(), genL.Py(),
+				   otree->njets,
+				   otree->mvamet_rc_njetsreco, otree->mvametphi_rc_njetsreco
+				   );
+			 
+      otree->mt_rc_njetsreco_1 = genTools::mt(otree->pt_1, otree->phi_1, otree->mvamet_rc_njetsreco, otree->mvametphi_rc_njetsreco);
+      otree->mt_rc_njetsreco_2 = genTools::mt(otree->pt_2, otree->phi_2, otree->mvamet_rc_njetsreco, otree->mvametphi_rc_njetsreco);     
+      otree->pzetamiss_rc_njetsreco = genTools::pzetamiss( zetaX, zetaY, otree->mvamet_rc_njetsreco, otree->mvametphi_rc_njetsreco);
+
+      // // njethad, reco Vis, mean-resolution correction
+      visreco_px = genL.Px();
+      visreco_py = genL.Py();
+
+      if(isDY){
+	if(otree->gen_match_2 == 5 && otree->os > 0.5){
+	  visreco_px = otree->pt_1*cos(otree->phi_1) + otree->pt_2*cos(otree->phi_2);
+	  visreco_px = otree->pt_1*sin(otree->phi_1) + otree->pt_2*cos(otree->phi_2); 
+	}
+      }
+      else if(isWJets){
+	visreco_px = otree->pt_1*cos(otree->phi_1);
+	visreco_px = otree->pt_1*sin(otree->phi_1);
+      }
+      
+      genTools::RecoilCorrections( *recoilPFMetCorrector, (!isData && applyRecoilCorrections) * genTools::MeanResolution,
+				   otree->mvamet, otree->mvametphi,
+				   genV.Px(), genV.Py(),
+				   visreco_px, visreco_py,
+				   otree->njetshad,
+				   otree->mvamet_rc_visreco, otree->mvametphi_rc_visreco
+				   );
+			 
+      otree->mt_rc_visreco_1 = genTools::mt(otree->pt_1, otree->phi_1, otree->mvamet_rc_visreco, otree->mvametphi_rc_visreco);
+      otree->mt_rc_visreco_2 = genTools::mt(otree->pt_2, otree->phi_2, otree->mvamet_rc_visreco, otree->mvametphi_rc_visreco);     
+      otree->pzetamiss_rc_visreco = genTools::pzetamiss( zetaX, zetaY, otree->mvamet_rc_visreco, otree->mvametphi_rc_visreco);      
       
       // End MET Recoil Corrections
       
