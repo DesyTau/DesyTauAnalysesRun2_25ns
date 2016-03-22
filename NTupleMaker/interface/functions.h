@@ -576,7 +576,8 @@ namespace genTools{
     for (unsigned int jet=0; jet<analysisTree.pfjet_count; ++jet) {
 
       if (analysisTree.pfjet_pt[jet]<=30.) continue;
-      if (fabs(analysisTree.pfjet_eta[jet]) >= 4.7) continue;
+      float absJetEta = fabs(analysisTree.pfjet_eta[jet]);
+      if (absJetEta >= 4.7) continue;
       
       // jetId
       float energy = analysisTree.pfjet_e[jet];
@@ -644,7 +645,7 @@ namespace genTools{
       njetshad++;
     }
 
-    return nejetshad;
+    return njetshad;
   } 
   
   enum RecoilCorrectionsMethod{QuantileRemap=1, MeanResolution};
