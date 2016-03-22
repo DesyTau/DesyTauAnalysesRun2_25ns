@@ -69,7 +69,11 @@ public :
   Float_t         puppimt_rcqr_1;
   Float_t         mt_rcmr_1;
   Float_t         pfmt_rcmr_1;
-  Float_t         puppimt_rcmr_1;  
+  Float_t         puppimt_rcmr_1;
+  Float_t         mt_rc_njetsreco_1;
+  Float_t         pfmt_rc_njetsreco_1;
+  Float_t         mt_rc_visreco_1;
+  Float_t         pfmt_rc_visreco_1;
   Float_t         pt_2;
   Float_t         phi_2;
   Float_t         eta_2;
@@ -88,6 +92,10 @@ public :
   Float_t         puppimt_rcqr_2;
   Float_t         mt_rcmr_2;
   Float_t         pfmt_rcmr_2;
+  Float_t         mt_rc_njetsreco_2;
+  Float_t         pfmt_rc_njetsreco_2;
+  Float_t         mt_rc_visreco_2;
+  Float_t         pfmt_rc_visreco_2;  
   Float_t         puppimt_rcmr_2; 
   Int_t 	  tau_decay_mode_2;
   Int_t           os;
@@ -129,6 +137,10 @@ public :
   Float_t         metphi_rcqr;
   Float_t         met_rcmr;
   Float_t         metphi_rcmr;  
+  Float_t         met_rc_njetsreco;
+  Float_t         metphi_rc_njetsreco;
+  Float_t         met_rc_visreco;
+  Float_t         metphi_rc_visreco;  
   Float_t         mvamet;
   Float_t         mvametphi;
   Float_t         mvacov00;
@@ -139,6 +151,10 @@ public :
   Float_t         mvametphi_rcqr;
   Float_t         mvamet_rcmr;
   Float_t         mvametphi_rcmr;
+  Float_t         mvamet_rc_njetsreco;
+  Float_t         mvametphi_rc_njetsreco;
+  Float_t         mvamet_rc_visreco;
+  Float_t         mvametphi_rc_visreco;  
   Float_t         puppimet;
   Float_t         puppimetphi;
   Float_t         puppimet_rcqr;
@@ -156,9 +172,14 @@ public :
   Float_t         pzetamiss_rcmr;
   Float_t         pfpzetamiss_rcmr;
   Float_t         puppipzetamiss_rcmr;
+  Float_t         pzetamiss_rc_njetsreco;
+  Float_t         pfpzetamiss_rc_njetsreco;
+  Float_t         pzetamiss_rc_visreco;
+  Float_t         pfpzetamiss_rc_visreco;  
   Float_t         mva_gf;
   Int_t           njets;
   Int_t           njetspt20;
+  Int_t           njetshad;
   Float_t         jpt_1;
   Float_t         jeta_1;
   Float_t         jphi_1;
@@ -227,7 +248,11 @@ public :
   TBranch        *b_puppimt_rcqr_1;   //!
   TBranch        *b_mt_rcmr_1;   //!
   TBranch        *b_pfmt_rcmr_1;   //!
-  TBranch        *b_puppimt_rcmr_1;   //!  
+  TBranch        *b_puppimt_rcmr_1;   //!
+  TBranch        *b_mt_rc_njetsreco_1;   //!
+  TBranch        *b_pfmt_rc_njetsreco_1;   //!
+  TBranch        *b_mt_rc_visreco_1;   //!
+  TBranch        *b_pfmt_rc_visreco_1;   //!
   TBranch        *b_pt_2;   //!
   TBranch        *b_phi_2;   //!
   TBranch        *b_eta_2;   //!
@@ -246,7 +271,11 @@ public :
   TBranch        *b_puppimt_rcqr_2;   //!
   TBranch        *b_mt_rcmr_2;   //!
   TBranch        *b_pfmt_rcmr_2;   //!
-  TBranch        *b_puppimt_rcmr_2;   //!  
+  TBranch        *b_puppimt_rcmr_2;   //!
+  TBranch        *b_mt_rc_njetsreco_2;   //!
+  TBranch        *b_pfmt_rc_njetsreco_2;   //!
+  TBranch        *b_mt_rc_visreco_2;   //!
+  TBranch        *b_pfmt_rc_visreco_2;   //!
   TBranch        *b_tau_decay_mode_2;   //!
   TBranch        *b_os;   //!
   TBranch        *b_dilepton_veto;   //!
@@ -287,6 +316,10 @@ public :
   TBranch        *b_metphi_rcqr;   //!
   TBranch        *b_met_rcmr;   //!
   TBranch        *b_metphi_rcmr;   //!
+  TBranch        *b_met_rc_njetsreco;   //!
+  TBranch        *b_metphi_rc_njetsreco;   //!
+  TBranch        *b_met_rc_visreco;   //!
+  TBranch        *b_metphi_rc_visreco;   //!
   TBranch        *b_mvamet;   //!
   TBranch        *b_mvametphi;   //!
   TBranch        *b_mvacov00;   //!
@@ -296,7 +329,11 @@ public :
   TBranch        *b_mvamet_rcqr;   //!
   TBranch        *b_mvametphi_rcqr;   //!
   TBranch        *b_mvamet_rcmr;   //!
-  TBranch        *b_mvametphi_rcmr;   //!  
+  TBranch        *b_mvametphi_rcmr;   //!
+  TBranch        *b_mvamet_rc_njetsreco;   //!
+  TBranch        *b_mvametphi_rc_njetsreco;   //!
+  TBranch        *b_mvamet_rc_visreco;   //!
+  TBranch        *b_mvametphi_rc_visreco;   //!
   TBranch        *b_puppimet;   //!
   TBranch        *b_puppimetphi;   //!
   TBranch        *b_puppimet_rcqr;   //!
@@ -313,10 +350,15 @@ public :
   TBranch        *b_puppipzetamiss_rcqr;   //!
   TBranch        *b_pzetamiss_rcmr;   //!
   TBranch        *b_pfpzetamiss_rcmr;   //!
-  TBranch        *b_puppipzetamiss_rcmr;   //!  
+  TBranch        *b_puppipzetamiss_rcmr;   //!
+  TBranch        *b_pzetamiss_rc_njetsreco;   //!
+  TBranch        *b_pfpzetamiss_rc_njetsreco;   //!
+  TBranch        *b_pzetamiss_rc_visreco;   //!
+  TBranch        *b_pfpzetamiss_rc_visreco;   //!
   TBranch        *b_mva_gf;   //!
   TBranch        *b_njets;   //!
   TBranch        *b_njetspt20;   //!
+  TBranch        *b_njetshad;   //!  
   TBranch        *b_jpt_1;   //!
   TBranch        *b_jeta_1;   //!
   TBranch        *b_jphi_1;   //!
