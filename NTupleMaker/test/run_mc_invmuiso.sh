@@ -24,18 +24,14 @@
 
 cd /nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/CMSSW_7_4_14/src/DesyTauAnalyses/NTupleMaker/test ;  eval `scramv1 runtime -sh` ;
 
-channel=$2 
-era=$3
 
-era=Htt
-era=Ttemplate
-era=eltau
+#era=Ttemplate
 
-era=25ns
 channel=mutau
-region=InvMET
-region=InvTauIso
 
+
+region=InvMuIso
+era=InvMuIso
 
 ##type MC or Data
 type=MC
@@ -51,9 +47,6 @@ then
 fi
 
 
-cp *.conf 25ns/.
-cp *.conf Htt/.
-cp *.conf Jobs/.
 
 while read line
 do
@@ -88,21 +81,17 @@ cat bss > Jobs/job${line}$channel$era${bas}_B.sh
 #echo SUSYTtemplate analysisMacroSUSY_${type}_B.conf ${bas} $era>> Jobs/job${line}$channel$era${bas}_B.sh
 
 echo SUSYmutau analysisMacroSUSY_${type}_B.conf ${bas} $era>> Jobs/job${line}$channel$era${bas}_B.sh
-#echo SUSYeltau analysisMacroSUSY_${type}_B.conf ${bas} $era>> Jobs/job${line}$channel$era${bas}_B.sh
 #echo taufakerate analysisMacroSUSY_${type}_B.conf ${bas} $era>> Jobs/job${line}$channel$era${bas}_B.sh
 
 cat bss > Jobs/job${line}$channel$era${bas}_A.sh
-#echo 	SUSYeltau analysisMacroSUSY_${type}_A.conf ${bas} $era>> Jobs/job${line}$channel$era${bas}_A.sh
 echo 	SUSYmutau analysisMacroSUSY_${type}_A.conf ${bas} $era>> Jobs/job${line}$channel$era${bas}_A.sh
 #echo 	SUSYTtemplate analysisMacroSUSY_${type}_A.conf ${bas} $era>> Jobs/job${line}$channel$era${bas}_A.sh
 
 cat bss > Jobs/job${line}$channel$era${bas}_C_${region}.sh
-#echo 	SUSYeltau analysisMacroSUSY_${type}_C_${region}.conf ${bas} $era>> Jobs/job${line}$channel$era${bas}_C_${region}.sh
 echo 	SUSYmutau analysisMacroSUSY_${type}_C_${region}.conf ${bas} $era>> Jobs/job${line}$channel$era${bas}_C_${region}.sh
 #echo 	SUSYTtemplate analysisMacroSUSY_${type}_C_${region}.conf ${bas} $era>> Jobs/job${line}$channel$era${bas}_C_${region}.sh
 
 cat bss > Jobs/job${line}$channel$era${bas}_D_${region}.sh
-#echo 	SUSYeltau analysisMacroSUSY_${type}_D_${region}.conf ${bas} $era>> Jobs/job${line}$channel$era${bas}_D_${region}.sh
 echo 	SUSYmutau analysisMacroSUSY_${type}_D_${region}.conf ${bas} $era>> Jobs/job${line}$channel$era${bas}_D_${region}.sh
 #echo 	SUSYTtemplate analysisMacroSUSY_${type}_D_${region}.conf ${bas} $era>> Jobs/job${line}$channel$era${bas}_D_${region}.sh
 
@@ -113,7 +102,7 @@ echo $bas $xsec
 if [ ! -f $era/${bas}_B_OS.root ] ;then
 
 chmod u+x Jobs/job${line}$channel$era${bas}_B.sh
-#qsub Jobs/job${line}$channel$era${bas}_B.sh 
+qsub Jobs/job${line}$channel$era${bas}_B.sh 
 fi
 
 
@@ -124,12 +113,12 @@ fi
 
 if [ ! -f $era/${bas}_A_SS.root ] ;then
 chmod u+x Jobs/job${line}$channel$era${bas}_A.sh
-#qsub Jobs/job${line}$channel$era${bas}_A.sh 
+qsub Jobs/job${line}$channel$era${bas}_A.sh 
 fi
 
 if [ ! -f $era/${bas}_${region}__D_SS.root ] ;then
 chmod u+x Jobs/job${line}$channel$era${bas}_D_${region}.sh
-#qsub Jobs/job${line}$channel$era${bas}_D_${region}.sh 
+qsub Jobs/job${line}$channel$era${bas}_D_${region}.sh 
 fi
 fi
 
