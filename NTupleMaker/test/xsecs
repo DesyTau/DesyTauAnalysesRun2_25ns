@@ -47,10 +47,12 @@
  WW 63.21
  WWTo2L2Nu 12.178
  WWTo4Q 45.20
- WWToLNuQQ 43.53
+ WWToLNuQQ 49.997
  WZJets 47.13 #dont use
  WZTo1L1Nu2Q 10.96
  WZTo3LNu 4.42965
+ WZTo1L3Nu 3.05
+ WZTo2L2Q 5.595
  ZZTo4L 1.212 
  ZZ  16.523 
  
@@ -155,9 +157,12 @@
  SingleMuonPRv1 1
  SingleMuonPRv4 1
  SingleMuon05Oct 1
+ SingleMuon_nofilters
  SingleElectron 1
+ JetsHT 1
  MET 1
  MET_nof 1
+ MET_nofilters 1
  stau2_1 21.81 
  stau2_1_max 21.81 
  stau2_1_min 21.81 
@@ -166,6 +171,7 @@
  test 1
  stau_test 10
  stau100_LSP1  270.79 
+ stau100_LSP50  270.79 
  stau150_LSP100  63.34 
  stau150_LSP1  63.34 
  stau150_LSP50  63.34 
