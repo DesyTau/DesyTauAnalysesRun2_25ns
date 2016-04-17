@@ -30,6 +30,7 @@
 #include "DesyTauAnalyses/NTupleMaker/interface/functions.h"
 #include "HTT-utilities/LepEffInterface/interface/ScaleFactor.h"
 #include "HTT-utilities/RecoilCorrections/interface/RecoilCorrector.h"
+#include "HTT-utilities/RecoilCorrections/interface/MEtSys.h"
 
 float topPtWeight(float pt1,
 		  float pt2) {
@@ -61,6 +62,20 @@ float nJetsWeight(int nJets) {
 
 }
 
+void computeRecoil(float metx, float mety,
+		   float unitX,float unitY,
+		   float perpUnitX, float perpUnitY,
+		   float dimuonPt,
+		   float & recoilParal,
+		   float & recoilPerp,
+		   float & responseHad) {
+
+  recoilParal = metx*unitX + mety*unitY;
+  recoilPerp = metx*perpUnitX + mety*perpUnitY;
+  responseHad = 1 + recoilParal/dimuonPt;
+}
+
+
 int main(int argc, char * argv[]) {
 
   // first argument - config file 
@@ -81,6 +96,8 @@ int main(int argc, char * argv[]) {
   //const bool applyPUreweighting = cfg.get<bool>("ApplyPUreweighting");
   const bool applyLeptonSF = cfg.get<bool>("ApplyLeptonSF");
   const bool applyRecoilCorrections = cfg.get<bool>("ApplyRecoilCorrections");
+  const bool applyRecoilOnGenerator = cfg.get<bool>("ApplyRecoilOnGenerator");
+  const bool applySimpleRecoilCorrections = cfg.get<bool>("ApplySimpleRecoilCorrections");
   const bool applyTopPtReweighting = cfg.get<bool>("ApplyTopPtReweighting");
   const bool applyNJetReweighting = cfg.get<bool>("ApplyNJetReweighting");
 
@@ -153,7 +170,23 @@ int main(int argc, char * argv[]) {
   const string recoilMvaFileName   = cfg.get<string>("RecoilMvaFileName");
   TString RecoilMvaFileName(recoilMvaFileName);
 
+  // systematics
+  const string metsysFileName   = cfg.get<string>("MetSysFileName");
+  TString MetSysFileName(metsysFileName);
+
+  const string metsysPuppiFileName   = cfg.get<string>("MetSysPuppiFileName");
+  TString MetSysPuppiFileName(metsysPuppiFileName);
+
+  const string metsysMvaFileName   = cfg.get<string>("MetSysMvaFileName");
+  TString MetSysMvaFileName(metsysMvaFileName);
+
   const string jsonFile = cfg.get<string>("jsonFile");
+  const int applyJES = cfg.get<int>("applyJES");
+  const float metScale = cfg.get<float>("MetScale");
+  const float metResolution = cfg.get<float>("MetResolution");
+  const float muonMomScale = cfg.get<float>("MuonMomentumScale");
+  const int bkgdType =  cfg.get<float>("BkgdType");
+
   // **** end of configuration
 
   string cmsswBase = (getenv ("CMSSW_BASE"));
@@ -254,11 +287,20 @@ int main(int argc, char * argv[]) {
   TH1D * etaTrailingMuSelH = new TH1D("etaTrailingMuSelH","",50,-2.5,2.5);
   TH1D * massSelH = new TH1D("massSelH","",200,0,200);
   TH1D * massExtendedSelH =  new TH1D("massExtendedSelH","",500,0,5000);
+
   TH1D * dimuonPtSelH = new TH1D("dimuonPtSelH","",100,0,1000);
   TH1D * dimuonEtaSelH = new TH1D("dimuonEtaSelH","",120,-6,6);
   TH1D * metSelH  = new TH1D("metSelH","",200,0,400);
   TH1D * puppimetSelH = new TH1D("puppimetSelH","",200,0,400);
   TH1D * mvametSelH = new TH1D("mvametSelH","",200,0,400);
+
+  TH1D * metZSelH  = new TH1D("metZSelH","",200,0,400);
+  TH1D * puppimetZSelH = new TH1D("puppimetZSelH","",200,0,400);
+  TH1D * mvametZSelH = new TH1D("mvametZSelH","",200,0,400);
+
+  TH1D * metTopSelH  = new TH1D("metTopSelH","",200,0,400);
+  TH1D * puppimetTopSelH = new TH1D("puppimetTopSelH","",200,0,400);
+  TH1D * mvametTopSelH = new TH1D("mvametTopSelH","",200,0,400);
 
   TString scales[21] = {"M10","M9","M8","M7","M6","M5","M4","M3","M2","M1","0",
 			"P1","P2","P3","P4","P5","P6","P7","P8","P9","P10"};
@@ -279,6 +321,17 @@ int main(int argc, char * argv[]) {
   TH1D * nJets30etaCutSelH = new TH1D("nJets30etaCutSelH","",11,-0.5,10.5);
   TH1D * nJets20SelH    = new TH1D("nJets20SelH","",11,-0.5,10.5);
   TH1D * nJets20etaCutSelH = new TH1D("nJets20etaCutSelH","",11,-0.5,10.5);
+
+  TH1D * nJets20BTagLooseSelH    = new TH1D("nJets20BTagLooseSelH","",11,-0.5,10.5);
+  TH1D * nJets20BTagMediumSelH   = new TH1D("nJets20BTagMediumSelH","",11,-0.5,10.5); 
+
+  TH1D * nJets30ZSelH    = new TH1D("nJets30ZSelH","",11,-0.5,10.5);
+  TH1D * nJets30etaCutZSelH = new TH1D("nJets30etaCutZSelH","",11,-0.5,10.5);
+  TH1D * nJets20ZSelH    = new TH1D("nJets20ZSelH","",11,-0.5,10.5);
+  TH1D * nJets20etaCutZSelH = new TH1D("nJets20etaCutZSelH","",11,-0.5,10.5);
+
+  TH1D * nJets20BTagLooseZSelH    = new TH1D("nJets20BTagLooseZSelH","",11,-0.5,10.5);
+  TH1D * nJets20BTagMediumZSelH   = new TH1D("nJets20BTagMediumZSelH","",11,-0.5,10.5); 
 
   TH1D * HT30SelH       = new TH1D("HT30SelH","",50,0,500);
   TH1D * HT30etaCutSelH = new TH1D("HT30etaCutSelH","",50,0,500);
@@ -375,7 +428,7 @@ int main(int argc, char * argv[]) {
 
   //*****  create eta histogram with eta ranges associated to their names (eg. endcap, barrel)   ***** //
 
-  TH1F * etaBinsH = new TH1F("etaBinsH", "etaBinsH", nEtaBins, etaBins);
+  TH1D * etaBinsH = new TH1D("etaBinsH", "etaBinsH", nEtaBins, etaBins);
   etaBinsH->Draw();
   etaBinsH->GetXaxis()->Set(nEtaBins, etaBins);
   for (int i=0; i<nEtaBins; i++){ etaBinsH->GetXaxis()->SetBinLabel(i+1, EtaBins[i]);}
@@ -499,6 +552,13 @@ int main(int argc, char * argv[]) {
   TString RecoilMvaZParal("recoilMvaZParal_");
   TString RecoilMvaZPerp("recoilMvaZPerp_");
 
+  TString RecoilTopParal("recoilTopParal_");
+  TString RecoilTopPerp("recoilTopPerp_");
+  TString RecoilPuppiTopParal("recoilPuppiTopParal_");
+  TString RecoilPuppiTopPerp("recoilPuppiTopPerp_");
+  TString RecoilMvaTopParal("recoilMvaTopParal_");
+  TString RecoilMvaTopPerp("recoilMvaTopPerp_");
+
   // Saving Z pt bins
   TH1D * ZPtBinsH = new TH1D("ZPtBinsH","ZPtBinsH",nZPtBins,zPtBins);
   for (int iB=0; iB<nZPtBins; ++iB) 
@@ -509,9 +569,17 @@ int main(int argc, char * argv[]) {
   for (int iB=0; iB<nJetBins; ++iB)
     JetBinsH->GetXaxis()->SetBinLabel(iB+1,NJetBins[iB]);
 
-  TH1D * metSelNJets[3];
-  TH1D * puppimetSelNJets[3];
-  TH1D * mvametSelNJets[3];
+  TH1D * metSelNJetsH[3];
+  TH1D * puppimetSelNJetsH[3];
+  TH1D * mvametSelNJetsH[3];
+
+  TH1D * metZSelNJetsH[3];
+  TH1D * puppimetZSelNJetsH[3];
+  TH1D * mvametZSelNJetsH[3];
+
+  TH1D * metTopSelNJetsH[3];
+  TH1D * puppimetTopSelNJetsH[3];
+  TH1D * mvametTopSelNJetsH[3];
 
   TH1D * recoilZParalH[3];
   TH1D * recoilZPerpH[3];
@@ -520,6 +588,13 @@ int main(int argc, char * argv[]) {
   TH1D * recoilMvaZParalH[3];
   TH1D * recoilMvaZPerpH[3];
 
+  TH1D * recoilTopParalH[3];
+  TH1D * recoilTopPerpH[3];
+  TH1D * recoilPuppiTopParalH[3];
+  TH1D * recoilPuppiTopPerpH[3];
+  TH1D * recoilMvaTopParalH[3];
+  TH1D * recoilMvaTopPerpH[3];
+
   TH1D * recoilZParal_Ptbins_nJetsH[3][5];
   TH1D * recoilZPerp_Ptbins_nJetsH[3][5];
   TH1D * recoilPuppiZParal_Ptbins_nJetsH[3][5];
@@ -527,32 +602,103 @@ int main(int argc, char * argv[]) {
   TH1D * recoilMvaZParal_Ptbins_nJetsH[3][5];
   TH1D * recoilMvaZPerp_Ptbins_nJetsH[3][5];
 
-  TH1D * recoilResponse[3];
-  TH1D * recoilResponse_Ptbins_nJetsH[3][5];
-  TH1D * recoilPuppiResponse[3];
-  TH1D * recoilPuppiResponse_Ptbins_nJetsH[3][5];
-  TH1D * recoilMvaResponse[3];
-  TH1D * recoilMvaResponse_Ptbins_nJetsH[3][5];
+  TH1D * recoilResponse_nJets[3];
+  TH1D * recoilResponse_Ptbins_nJets[3][5];
+
+  TH1D * recoilPuppiResponse_nJets[3];
+  TH1D * recoilPuppiResponse_Ptbins_nJets[3][5];
+
+  TH1D * recoilMvaResponse_nJets[3];
+  TH1D * recoilMvaResponse_Ptbins_nJets[3][5];
+
+  TH1D * recoilResponseMC_Ptbins[5];
+  TH1D * recoilResponseMC_nJets[3];
+  TH1D * recoilResponseMC_Ptbins_nJets[3][5];
+
+  TH1D * recoilPuppiResponseMC_Ptbins[5];
+  TH1D * recoilPuppiResponseMC_nJets[3];
+  TH1D * recoilPuppiResponseMC_Ptbins_nJets[3][5];
+
+  TH1D * recoilMvaResponseMC_Ptbins[5];
+  TH1D * recoilMvaResponseMC_nJets[3];
+  TH1D * recoilMvaResponseMC_Ptbins_nJets[3][5];
   
+  // systematics ===>
+
+  TH1D * recoilMvaZParalSysH[3][4][2];
+  TH1D * recoilMvaZPerpSysH[3][4][2];
+
+  TH1D * recoilMvaTopParalSysH[3][4][2];
+  TH1D * recoilMvaTopPerpSysH[3][4][2];
+
+  TH1D * mvametZSelNJetsSysH[3][4][2];
+  TH1D * mvametTopSelNJetsSysH[3][4][2];
+
+  TString sysNames[4] = {"JES","MEtScale","MEtReso","MuonMom"};
+  TString UpDown[2] = {"Up","Down"};
+
   for (int iBin=0; iBin<nJetBins; ++iBin) {
-    recoilZParalH[iBin] = new TH1D("recoilZParal"+NJetBins[iBin]+"H","",100,-200,200);
-    recoilZPerpH[iBin] = new TH1D("recoilZPerp"+NJetBins[iBin]+"H","",100,-200,200);
+    recoilZParalH[iBin] = new TH1D(RecoilZParal+NJetBins[iBin]+"H","",200,-400,400);
+    recoilZPerpH[iBin] = new TH1D(RecoilZPerp+NJetBins[iBin]+"H","",200,-400,400);
 
-    recoilPuppiZParalH[iBin] = new TH1D("recoilPuppiZParal"+NJetBins[iBin]+"H","",100,-200,200);
-    recoilPuppiZPerpH[iBin] = new TH1D("recoilPuppiZPerp"+NJetBins[iBin]+"H","",100,-200,200);
+    recoilPuppiZParalH[iBin] = new TH1D(RecoilPuppiZParal+NJetBins[iBin]+"H","",200,-400,400);
+    recoilPuppiZPerpH[iBin] = new TH1D(RecoilPuppiZPerp+NJetBins[iBin]+"H","",200,-400,400);
 
-    recoilMvaZParalH[iBin] = new TH1D("recoilMvaZParal"+NJetBins[iBin]+"H","",100,-200,200);
-    recoilMvaZPerpH[iBin] = new TH1D("recoilMvaZPerp"+NJetBins[iBin]+"H","",100,-200,200);
+    recoilMvaZParalH[iBin] = new TH1D(RecoilMvaZParal+NJetBins[iBin]+"H","",200,-400,400);
+    recoilMvaZPerpH[iBin] = new TH1D(RecoilMvaZPerp+NJetBins[iBin]+"H","",200,-400,400);
 
-    recoilResponse[iBin] = new TH1D("recoilResponse"+NJetBins[iBin]+"H","",200,-10,10);
-    recoilPuppiResponse[iBin] = new TH1D("recoilPuppiResponse"+NJetBins[iBin]+"H","",200,-10,10);
-    recoilMvaResponse[iBin] = new TH1D("recoilMvaResponse"+NJetBins[iBin]+"H","",200,-10,10);
+    recoilTopParalH[iBin] = new TH1D(RecoilTopParal+NJetBins[iBin]+"H","",200,-400,400);
+    recoilTopPerpH[iBin] = new TH1D(RecoilTopPerp+NJetBins[iBin]+"H","",200,-400,400);
 
-    metSelNJets[iBin] = new TH1D("metSel"+NJetBins[iBin]+"H","",200,0.,400.);
-    puppimetSelNJets[iBin] = new TH1D("puppimetSel"+NJetBins[iBin]+"H","",200,0.,400.);
-    mvametSelNJets[iBin] = new TH1D("mvametSel"+NJetBins[iBin]+"H","",200,0.,400.);
+    recoilPuppiTopParalH[iBin] = new TH1D(RecoilPuppiTopParal+NJetBins[iBin]+"H","",200,-400,400);
+    recoilPuppiTopPerpH[iBin] = new TH1D(RecoilPuppiTopPerp+NJetBins[iBin]+"H","",200,-400,400);
+
+    recoilMvaTopParalH[iBin] = new TH1D(RecoilMvaTopParal+NJetBins[iBin]+"H","",200,-400,400);
+    recoilMvaTopPerpH[iBin] = new TH1D(RecoilMvaTopPerp+NJetBins[iBin]+"H","",200,-400,400);
+
+    metSelNJetsH[iBin] = new TH1D("metSel"+NJetBins[iBin]+"H","",200,0.,400.);
+    puppimetSelNJetsH[iBin] = new TH1D("puppimetSel"+NJetBins[iBin]+"H","",200,0.,400.);
+    mvametSelNJetsH[iBin] = new TH1D("mvametSel"+NJetBins[iBin]+"H","",200,0.,400.);
+
+    metZSelNJetsH[iBin] = new TH1D("metZSel"+NJetBins[iBin]+"H","",200,0.,400.);
+    puppimetZSelNJetsH[iBin] = new TH1D("puppimetZSel"+NJetBins[iBin]+"H","",200,0.,400.);
+    mvametZSelNJetsH[iBin] = new TH1D("mvametZSel"+NJetBins[iBin]+"H","",200,0.,400.);
+
+    metTopSelNJetsH[iBin] = new TH1D("metTopSel"+NJetBins[iBin]+"H","",200,0.,400.);
+    puppimetTopSelNJetsH[iBin] = new TH1D("puppimetTopSel"+NJetBins[iBin]+"H","",200,0.,400.);
+    mvametTopSelNJetsH[iBin] = new TH1D("mvametTopSel"+NJetBins[iBin]+"H","",200,0.,400.);
+
+    recoilResponse_nJets[iBin] = new TH1D("recoilResponse"+NJetBins[iBin],"",400,-20,20);
+    recoilPuppiResponse_nJets[iBin] = new TH1D("recoilPuppiResponse"+NJetBins[iBin],"",400,-20,20);
+    recoilMvaResponse_nJets[iBin] = new TH1D("recoilMvaResponse"+NJetBins[iBin],"",400,-20,20);
+
+    recoilResponseMC_nJets[iBin] = new TH1D("recoilResponseMC"+NJetBins[iBin],"",400,-20,20);
+    recoilPuppiResponseMC_nJets[iBin] = new TH1D("recoilPuppiResponseMC"+NJetBins[iBin],"",400,-20,20);
+    recoilMvaResponseMC_nJets[iBin] = new TH1D("recoilMvaResponseMC"+NJetBins[iBin],"",400,-20,20);
+
+    for (int iSys=0; iSys<4; ++iSys) {
+      for (int iUD=0; iUD<2; ++iUD) {
+
+	mvametZSelNJetsSysH[iBin][iSys][iUD] = new TH1D("mvametZSel"+NJetBins[iBin]+sysNames[iSys]+UpDown[iUD]+"H","",200,0.,400.);
+	mvametTopSelNJetsSysH[iBin][iSys][iUD] = new TH1D("mvametTopSel"+NJetBins[iBin]+sysNames[iSys]+UpDown[iUD]+"H","",200,0.,400.);
+	
+	recoilMvaZParalSysH[iBin][iSys][iUD] = new TH1D(RecoilMvaZParal+NJetBins[iBin]+sysNames[iSys]+UpDown[iUD]+"H","",200,-400,400);
+	recoilMvaZPerpSysH[iBin][iSys][iUD] = new TH1D(RecoilMvaZPerp+NJetBins[iBin]+sysNames[iSys]+UpDown[iUD]+"H","",200,-400,400);
+
+	recoilMvaTopParalSysH[iBin][iSys][iUD] = new TH1D(RecoilMvaTopParal+NJetBins[iBin]+sysNames[iSys]+UpDown[iUD]+"H","",200,-400,400);
+	recoilMvaTopPerpSysH[iBin][iSys][iUD] = new TH1D(RecoilMvaTopPerp+NJetBins[iBin]+sysNames[iSys]+UpDown[iUD]+"H","",200,-400,400);
+
+      }
+    }
+
   }
-  
+
+  for (int iPtBins=0; iPtBins<nZPtBins; ++iPtBins){
+    recoilResponseMC_Ptbins[iPtBins] = new TH1D("recoilResponseMC"+ZPtBins[iPtBins],"",400,-20,20);
+    recoilPuppiResponseMC_Ptbins[iPtBins] = new TH1D("recoilPuppiResponseMC"+ZPtBins[iPtBins],"",400,-20,20);
+    recoilMvaResponseMC_Ptbins[iPtBins] = new TH1D("recoilMvaResponseMC"+ZPtBins[iPtBins],"",400,-20,20);
+  }
+
   for (int iJets=0; iJets<nJetBins; ++iJets) {
     for (int iPtBins=0; iPtBins<nZPtBins; ++iPtBins){
 
@@ -565,9 +711,13 @@ int main(int argc, char * argv[]) {
       recoilMvaZParal_Ptbins_nJetsH[iJets][iPtBins] = new TH1D(RecoilMvaZParal+NJetBins[iJets]+ZPtBins[iPtBins],"",100,-200,200);
       recoilMvaZPerp_Ptbins_nJetsH[iJets][iPtBins] = new TH1D(RecoilMvaZPerp+NJetBins[iJets]+ZPtBins[iPtBins],"",100,-200,200);
 
-      recoilResponse_Ptbins_nJetsH[iJets][iPtBins] = new TH1D("recoilResponse"+NJetBins[iJets]+ZPtBins[iPtBins],"",200,-10,10);
-      recoilPuppiResponse_Ptbins_nJetsH[iJets][iPtBins] = new TH1D("recoilPuppiResponse"+NJetBins[iJets]+ZPtBins[iPtBins],"",200,-10,10);
-      recoilMvaResponse_Ptbins_nJetsH[iJets][iPtBins] = new TH1D("recoilMvaResponse"+NJetBins[iJets]+ZPtBins[iPtBins],"",200,-10,10);
+      recoilResponse_Ptbins_nJets[iJets][iPtBins] = new TH1D("recoilResponse"+NJetBins[iJets]+ZPtBins[iPtBins],"",400,-20,20);
+      recoilPuppiResponse_Ptbins_nJets[iJets][iPtBins] = new TH1D("recoilPuppiResponse"+NJetBins[iJets]+ZPtBins[iPtBins],"",400,-20,20);
+      recoilMvaResponse_Ptbins_nJets[iJets][iPtBins] = new TH1D("recoilMvaResponse"+NJetBins[iJets]+ZPtBins[iPtBins],"",400,-20,20);
+
+      recoilResponseMC_Ptbins_nJets[iJets][iPtBins] = new TH1D("recoilResponseMC"+NJetBins[iJets]+ZPtBins[iPtBins],"",400,-20,20);
+      recoilPuppiResponseMC_Ptbins_nJets[iJets][iPtBins] = new TH1D("recoilPuppiResponseMC"+NJetBins[iJets]+ZPtBins[iPtBins],"",400,-20,20);
+      recoilMvaResponseMC_Ptbins_nJets[iJets][iPtBins] = new TH1D("recoilMvaResponseMC"+NJetBins[iJets]+ZPtBins[iPtBins],"",400,-20,20);
 
     }
   }
@@ -606,6 +756,7 @@ int main(int argc, char * argv[]) {
     PUofficial->set_h_data(PU_data); 
     PUofficial->set_h_MC(PU_mc);
   }
+
   // HTT Met recoil corrections
   //  RecoilCorrector recoilPFMetCorrector("HTT-utilities/RecoilCorrections/data/recoilPFMet.root");
   //  RecoilCorrector recoilMvaMetCorrector("HTT-utilities/RecoilCorrections/data/recoilMvaMet.root");
@@ -615,7 +766,13 @@ int main(int argc, char * argv[]) {
   RecoilCorrector recoilMvaMetCorrector(RecoilMvaFileName);
   RecoilCorrector recoilPuppiMetCorrector(RecoilPuppiFileName);
 
-// Lepton Scale Factors 
+  // MetResponse
+  MEtSys metSys(MetSysFileName);
+  MEtSys metSysPuppi(MetSysPuppiFileName);
+  MEtSys metSysMva(MetSysMvaFileName);
+
+
+  // Lepton Scale Factors 
 
   ScaleFactor * SF_muonIdIso; 
   ScaleFactor * SF_muonTrig;
@@ -709,20 +866,60 @@ int main(int argc, char * argv[]) {
       histWeightsSkimmedH->Fill(float(0),weight);
 
       TLorentzVector genZ; genZ.SetXYZM(0,0,0,91.2); 
+      TLorentzVector genV; genV.SetXYZM(0,0,0,0);
+      TLorentzVector genL; genL.SetXYZM(0,0,0,0);
       if (!isData) {
+	// for (unsigned int igen=0; igen<analysisTree.gentau_count; ++igen) {
+	//   if ( analysisTree.gentau_isPrompt[igen]&&analysisTree.gentau_isLastCopy[igen] ) {
+	//     std::cout << "vis : px=" << analysisTree.gentau_visible_px[igen] 
+	// 	      << "  py=" << analysisTree.gentau_visible_py[igen]
+	// 	      << "  pz=" << analysisTree.gentau_visible_pz[igen] 
+	// 	      << std::endl;
+	//    std::cout << "gen : px=" << analysisTree.gentau_px[igen] 
+	// 	      << "  py=" << analysisTree.gentau_py[igen]
+	// 	      << "  pz=" << analysisTree.gentau_pz[igen] 
+	// 	      << std::endl; 
+	//   }
+	// }
 	for (unsigned int igen=0; igen<analysisTree.genparticles_count; ++igen) {
 	  //	  cout << igen << "   pdgId = " << analysisTree.genparticles_pdgid[igen] << endl;
-	  if (analysisTree.genparticles_pdgid[igen]==23) {
-	    genZ.SetXYZT(analysisTree.genparticles_px[igen],
-			 analysisTree.genparticles_py[igen],
-			 analysisTree.genparticles_pz[igen],
-			 analysisTree.genparticles_e[igen]);
+	  TLorentzVector genPart; genPart.SetXYZT(analysisTree.genparticles_px[igen],
+						  analysisTree.genparticles_py[igen],
+						  analysisTree.genparticles_pz[igen],
+						  analysisTree.genparticles_e[igen]);
+	  if (analysisTree.genparticles_pdgid[igen]==23||analysisTree.genparticles_pdgid[igen]==22) {
+	    if (analysisTree.genparticles_fromHardProcess[igen])
+	      genZ.SetXYZT(analysisTree.genparticles_px[igen],
+			   analysisTree.genparticles_py[igen],
+			   analysisTree.genparticles_pz[igen],
+			   analysisTree.genparticles_e[igen]);
+	  }
+	  bool isMuon = fabs(analysisTree.genparticles_pdgid[igen])==13;
+	  bool isElectron = fabs(analysisTree.genparticles_pdgid[igen])==11;
+	  bool isLepton = isMuon || isElectron;
+	  bool isNeutrino = fabs(analysisTree.genparticles_pdgid[igen])==12||
+	    fabs(analysisTree.genparticles_pdgid[igen])==14||
+	    fabs(analysisTree.genparticles_pdgid[igen])==16;
+	  bool isPrompt = analysisTree.genparticles_isPrompt[igen]||
+	    analysisTree.genparticles_isPromptTauDecayProduct[igen];
+	  
+	  if (analysisTree.genparticles_status[igen]==1&&isPrompt) {
+	    if (isLepton&&
+		fabs(genPart.Eta())<2.4&&
+		genPart.Pt()>10) {
+	      genV += genPart;
+	      genL += genPart;
+	    }
+	    if (isNeutrino) 
+	      genV += genPart;
 	  }
 	}
+	if (genV.Pt()<0.1) genV.SetXYZM(0.1,0.1,0.,0.);
       }
-      
-      massZH->Fill(genZ.M(),weight);
-      ptZH->Fill(genZ.Pt(),weight);
+      //      std::cout << std::endl;
+
+      massZH->Fill(genV.M(),weight);
+      ptZH->Fill(genV.Pt(),weight);
 
       if (!isData) {
 
@@ -920,6 +1117,8 @@ int main(int argc, char * argv[]) {
       float pfmet_ey = analysisTree.pfmet_ey;
       float pfmet_phi = analysisTree.pfmet_phi;
       float pfmet = TMath::Sqrt(pfmet_ex*pfmet_ex+pfmet_ey*pfmet_ey);
+      //      TLorentzVector MetLV; MetLV.SetPx(pfmet_ex); MetLV.SetPy(pfmet_ey);
+      //      std::cout << "pfmet = " << pfmet << " : " << analysisTree.pfmet_pt << " : " << MetLV.Pt() << std::endl;
 
       float puppimet_ex = analysisTree.puppimet_ex;
       float puppimet_ey = analysisTree.puppimet_ey;
@@ -949,6 +1148,13 @@ int main(int argc, char * argv[]) {
       vector<bool> isMuonMatchedSingleMuFilter; isMuonMatchedSingleMuFilter.clear();
 
       for (unsigned int im = 0; im<analysisTree.muon_count; ++im) {
+	if (!isData&&fabs(muonMomScale-1.0)>0.001) {
+	  analysisTree.muon_px[im] *= muonMomScale;
+	  analysisTree.muon_py[im] *= muonMomScale;
+	  analysisTree.muon_pz[im] *= muonMomScale;
+	  analysisTree.muon_pt[im] *= muonMomScale;
+	} 
+	  
 	bool muPassed    = true;
 	bool mu23Matched = false;
 	bool mu17Matched = false;
@@ -1150,7 +1356,7 @@ int main(int argc, char * argv[]) {
 	      // number of jets
 	      int nJets30 = 0;
 	      int nJets30etaCut = 0;
-	
+
 	      for (unsigned int jet=0; jet<analysisTree.pfjet_count; ++jet) {
 		float absJetEta = fabs(analysisTree.pfjet_eta[jet]);
 		if (absJetEta>jetEtaCut) continue;
@@ -1174,6 +1380,7 @@ int main(int argc, char * argv[]) {
 		    nJets30etaCut++;
 		  }
 		}
+
 	      }	 
 
 	      int JetBin = nJets30etaCut;
@@ -1339,7 +1546,6 @@ int main(int argc, char * argv[]) {
 	    }
 	  }
 	}
-	
 
 	// accessing Mva Met
 	bool mvaMetFound = false;
@@ -1353,6 +1559,10 @@ int main(int argc, char * argv[]) {
 	    }
 	  }
 	}
+	if (!mvaMetFound)
+	  std::cout << "MVA MEt not found" << std::endl;
+	//	else
+	//	  std::cout << "MVA MEt found" << std::endl;
 	float mvamet = 0;
 	float mvamet_phi = 0;
 	float mvamet_ex = 0;
@@ -1380,8 +1590,27 @@ int main(int argc, char * argv[]) {
 	int nJets20 = 0;
 	int nJets30etaCut = 0;
 	int nJets20etaCut = 0;
+
+	int nJets30Up = 0;
+	int nJets30Down = 0;
 	
+	// number of btag jets
+	int nJets20BTagLoose = 0;
+	int nJets20BTagMedium = 0;
+
 	for (unsigned int jet=0; jet<analysisTree.pfjet_count; ++jet) {
+	  //	  std::cout << analysisTree.pfjet_jecUncertainty[jet] << std::endl;
+	  float scale = 1;
+	  if (applyJES>0) scale = 1 + analysisTree.pfjet_jecUncertainty[jet];
+	  if (applyJES<0) scale = 1 - analysisTree.pfjet_jecUncertainty[jet];
+	  if (applyJES!=0&&!isData) {
+	    analysisTree.pfjet_pt[jet] *= scale;
+	    analysisTree.pfjet_px[jet] *= scale;
+	    analysisTree.pfjet_py[jet] *= scale;
+	    analysisTree.pfjet_pz[jet] *= scale;
+	    analysisTree.pfjet_e[jet] *= scale;
+	  }
+
 	  float absJetEta = fabs(analysisTree.pfjet_eta[jet]);
 	  if (absJetEta>jetEtaCut) continue;
 	  
@@ -1391,7 +1620,6 @@ int main(int argc, char * argv[]) {
 	  
 	  float dR2 = deltaR(analysisTree.pfjet_eta[jet],analysisTree.pfjet_phi[jet],
 			     analysisTree.muon_eta[indx2],analysisTree.muon_phi[indx2]);
-	  
 	  if (dR2<dRJetLeptonCut) continue;
 	  
 	  // pfJetId
@@ -1406,6 +1634,12 @@ int main(int argc, char * argv[]) {
 	      nJets30etaCut++;
 	    }
 	  }
+	  float ptJetUp = analysisTree.pfjet_pt[jet]*(1 + analysisTree.pfjet_jecUncertainty[jet]);
+	  float ptJetDown = analysisTree.pfjet_pt[jet]*(1 - analysisTree.pfjet_jecUncertainty[jet]);
+	  if (ptJetUp>jetPtHighCut)
+	    nJets30Up++;
+	  if (ptJetDown>jetPtHighCut)
+	    nJets30Down++;
 
 	  if (analysisTree.pfjet_pt[jet]>jetPtLowCut) {
 	    nJets20++;
@@ -1413,6 +1647,11 @@ int main(int argc, char * argv[]) {
 	    if (fabs(analysisTree.pfjet_eta[jet])<jetEtaTrkCut) {
               HT20etaCut += analysisTree.pfjet_pt[jet];
               nJets20etaCut++;
+	      if (analysisTree.pfjet_btag[jet][0]>0.46) 
+		nJets20BTagLoose++;
+	      if (analysisTree.pfjet_btag[jet][0]>0.80) 
+		nJets20BTagMedium++;
+
             }
 	  }	  
 
@@ -1456,9 +1695,9 @@ int main(int argc, char * argv[]) {
 
 	  if (effTrigData>0&&effMcTrig>0) {
 	    double weightTrig = effTrigData/effMcTrig;
-	    std::cout << "mu 1 ->  pt = " << ptMu1 << "   eta = " << etaMu1 << std::endl;
-	    std::cout << "mu 2 ->  pt = " << ptMu2 << "   eta = " << etaMu2 << std::endl;
-	    std::cout << "WeightTrig = " << weightTrig << std::endl;
+	    // std::cout << "mu 1 ->  pt = " << ptMu1 << "   eta = " << etaMu1 << std::endl;
+	    // std::cout << "mu 2 ->  pt = " << ptMu2 << "   eta = " << etaMu2 << std::endl;
+	    // std::cout << "WeightTrig = " << weightTrig << std::endl;
 	    weight = weight*weightTrig;
 	  }
 
@@ -1469,45 +1708,256 @@ int main(int argc, char * argv[]) {
 	  weight *= njetWeight;
 	}
 
+	float visiblePx = dimuon.Px();
+	float visiblePy = dimuon.Py();
+	if (applyRecoilOnGenerator) {
+	  visiblePx = genL.Px();
+	  visiblePy = genL.Py();
+	}
+
 	if (!isData && applyRecoilCorrections) {
 
 	  float pfmetcorr_ex = pfmet_ex;
 	  float pfmetcorr_ey = pfmet_ey;
-	  recoilPFMetCorrector.Correct(pfmet_ex,pfmet_ey,genZ.Px(),genZ.Py(),dimuon.Px(),dimuon.Py(),nJets30,pfmetcorr_ex,pfmetcorr_ey);
+	  // float pfmetcorr_ex_1 = pfmet_ex;
+	  // float pfmetcorr_ey_1 = pfmet_ey;
+	  if (applySimpleRecoilCorrections)
+	    //	    recoilPFMetCorrector.CorrectByMeanResolution(pfmet_ex,pfmet_ey,genV.Px(),genV.Py(),visiblePx,visiblePy,nJets30,pfmetcorr_ex_1,pfmetcorr_ey_1);
+	    recoilPFMetCorrector.CorrectByMeanResolution(pfmet_ex,pfmet_ey,genV.Px(),genV.Py(),visiblePx,visiblePy,nJets30,pfmetcorr_ex,pfmetcorr_ey);
+	  else 
+	    recoilPFMetCorrector.Correct(pfmet_ex,pfmet_ey,genV.Px(),genV.Py(),visiblePx,visiblePy,nJets30,pfmetcorr_ex,pfmetcorr_ey);
 	  //	  std::cout << "PFMet : (" << pfmet_ex << "," << pfmet_ey << ")  "
-	  //		    << "  (" << pfmetcorr_ex << "," << pfmetcorr_ey << ")" << std::endl; 
+	  //		    << "  Quantile : (" << pfmetcorr_ex << "," << pfmetcorr_ey << ")" 
+	  //		    << "  MeanReso : (" << pfmetcorr_ex_1 << "," << pfmetcorr_ey_1 << ")" 
+	  //		    << std::endl; 
  	  pfmet_phi = TMath::ATan2(pfmetcorr_ey,pfmetcorr_ex);
           pfmet = TMath::Sqrt(pfmetcorr_ex*pfmetcorr_ex+pfmetcorr_ey*pfmetcorr_ey);
-
+	  pfmet_ex = pfmetcorr_ex;
+	  pfmet_ey = pfmetcorr_ey;
 	  
 	  float puppimetcorr_ex = puppimet_ex;
           float puppimetcorr_ey = puppimet_ey;
-	  recoilPuppiMetCorrector.Correct(puppimet_ex,puppimet_ey,genZ.Px(),genZ.Py(),dimuon.Px(),dimuon.Py(),nJets30,puppimetcorr_ex,puppimetcorr_ey);
+	  //	  float puppimetcorr_ex_1 = puppimet_ex;
+	  //      float puppimetcorr_ey_1 = puppimet_ey;
+	  if (applySimpleRecoilCorrections)
+	    //	    recoilPuppiMetCorrector.CorrectByMeanResolution(puppimet_ex,puppimet_ey,genV.Px(),genV.Py(),visiblePx,visiblePy,nJets30,puppimetcorr_ex_1,puppimetcorr_ey_1);
+	    recoilPuppiMetCorrector.CorrectByMeanResolution(puppimet_ex,puppimet_ey,genV.Px(),genV.Py(),visiblePx,visiblePy,nJets30,puppimetcorr_ex,puppimetcorr_ey);
+	  else 
+	    recoilPuppiMetCorrector.Correct(puppimet_ex,puppimet_ey,genV.Px(),genV.Py(),visiblePx,visiblePy,nJets30,puppimetcorr_ex,puppimetcorr_ey);
 	  //	  std::cout << "PuppiMet : (" << puppimet_ex << "," << puppimet_ey << ")  "
-	  //		    << "  (" << puppimetcorr_ex << "," << puppimetcorr_ey << ")" << std::endl; 
+	  //		    << "  Quantile = (" << puppimetcorr_ex << "," << puppimetcorr_ey << ")" 
+	  //		    << "  MeanReso = (" << puppimetcorr_ex_1 << "," << puppimetcorr_ey_1 << ")"  
+	  //		    << std::endl; 
 	  puppimet_phi = TMath::ATan2(puppimetcorr_ey,puppimetcorr_ex);
 	  puppimet = TMath::Sqrt(puppimetcorr_ex*puppimetcorr_ex+puppimetcorr_ey*puppimetcorr_ey);
 	  
+	  puppimet_ex = puppimetcorr_ex;
+	  puppimet_ey = puppimetcorr_ey;
+
           float mvametcorr_ex = mvamet_ex;
           float mvametcorr_ey = mvamet_ey;
-	  recoilMvaMetCorrector.Correct(mvamet_ex,mvamet_ey,genZ.Px(),genZ.Py(),dimuon.Px(),dimuon.Py(),nJets30,mvametcorr_ex,mvametcorr_ey);
+	  //          float mvametcorr_ex_1 = mvamet_ex;
+	  //          float mvametcorr_ey_1 = mvamet_ey;
+	  if (applySimpleRecoilCorrections)
+	    //	    recoilMvaMetCorrector.CorrectByMeanResolution(mvamet_ex,mvamet_ey,genV.Px(),genV.Py(),visiblePx,visiblePy,nJets30,mvametcorr_ex_1,mvametcorr_ey_1);
+	    recoilMvaMetCorrector.CorrectByMeanResolution(mvamet_ex,mvamet_ey,genV.Px(),genV.Py(),visiblePx,visiblePy,nJets30,mvametcorr_ex,mvametcorr_ey);
+	  else 
+	    recoilMvaMetCorrector.Correct(mvamet_ex,mvamet_ey,genV.Px(),genV.Py(),visiblePx,visiblePy,nJets30,mvametcorr_ex,mvametcorr_ey);
 	  //	  std::cout << "MvaMet : (" << mvamet_ex << "," << mvamet_ey << ")  "
-	  //                    << "  (" << mvametcorr_ex << "," << mvametcorr_ey << ")" << std::endl;
+	  //		    << "  Quantile = (" << mvametcorr_ex << "," << mvametcorr_ey << ")" 
+	  //		    << "  MeanReso = (" << mvametcorr_ex_1 << "," << mvametcorr_ey_1 << ")"
+	  //		    << std::endl;
+	  //	  std::cout << std::endl;
           mvamet_phi = TMath::ATan2(mvametcorr_ey,mvametcorr_ex);
           mvamet = TMath::Sqrt(mvametcorr_ex*mvametcorr_ex+mvametcorr_ey*mvametcorr_ey);
 
+	  mvamet_ex = mvametcorr_ex;
+	  mvamet_ey = mvametcorr_ey; 
+
 	}
 
-	
-	massSelH->Fill(massSel,weight);
-	massExtendedSelH->Fill(massSel,weight);
-	for (int iScale=0; iScale<21; ++ iScale) {
-	  float scaleFactor = 0.98 + 0.002*float(iScale);
-	  massSelScaleH[iScale]->Fill(massSel*scaleFactor,weight);
+	if (!isData&&fabs(metScale-1)>0.001) { // applying met scale systematics
+
+	  float mvametcorr_ex = mvamet_ex;
+	  float mvametcorr_ey = mvamet_ey;
+	  metSysMva.ShiftMEt(mvamet_ex,mvamet_ey,
+			     genV.Px(),genV.Py(),
+			     visiblePx,visiblePy,
+			     nJets30,
+			     bkgdType,
+			     MEtSys::SysType::Response,
+			     metScale,
+			     mvametcorr_ex,mvametcorr_ey);
+	  mvamet_phi = TMath::ATan2(mvametcorr_ey,mvametcorr_ex);
+          mvamet = TMath::Sqrt(mvametcorr_ex*mvametcorr_ex+mvametcorr_ey*mvametcorr_ey);
+	  mvamet_ex = mvametcorr_ex;
+	  mvamet_ey = mvametcorr_ey;
+	  
+	  float pfmetcorr_ex = pfmet_ex;
+	  float pfmetcorr_ey = pfmet_ey;
+	  metSys.ShiftMEt(pfmet_ex,pfmet_ey,
+			  genV.Px(),genV.Py(),
+			  visiblePx,visiblePy,
+			  nJets30,
+			  bkgdType,
+			  MEtSys::SysType::Response,
+			  metScale,
+			  pfmetcorr_ex,pfmetcorr_ey);
+	  pfmet_phi = TMath::ATan2(pfmetcorr_ey,pfmetcorr_ex);
+          pfmet = TMath::Sqrt(pfmetcorr_ex*pfmetcorr_ex+pfmetcorr_ey*pfmetcorr_ey);
+	  pfmet_ex = pfmetcorr_ex;
+	  pfmet_ey = pfmetcorr_ey;
+	  
+	  float puppimetcorr_ex = puppimet_ex;
+	  float puppimetcorr_ey = puppimet_ey;
+	  metSysPuppi.ShiftMEt(puppimet_ex,puppimet_ey,
+			       genV.Px(),genV.Py(),
+			       visiblePx,visiblePy,
+			       nJets30,
+			       bkgdType,
+			       MEtSys::SysType::Response,
+			       metScale,
+			       puppimetcorr_ex,puppimetcorr_ey);
+	  puppimet_phi = TMath::ATan2(puppimetcorr_ey,puppimetcorr_ex);
+          puppimet = TMath::Sqrt(puppimetcorr_ex*puppimetcorr_ex+puppimetcorr_ey*puppimetcorr_ey);
+	  puppimet_ex = puppimetcorr_ex;
+	  puppimet_ey = puppimetcorr_ey;
+	  
+
 	}
+
+	if (!isData&&fabs(metResolution-1)>0.001) { // applying met resolution systematics
+	  float mvametcorr_ex = mvamet_ex;
+	  float mvametcorr_ey = mvamet_ey;
+	  metSysMva.ShiftMEt(mvamet_ex,mvamet_ey,
+			     genV.Px(),genV.Py(),
+			     visiblePx,visiblePy,
+			     nJets30,
+			     bkgdType,
+			     MEtSys::SysType::Resolution,
+			     metResolution,
+			     mvametcorr_ex,mvametcorr_ey);
+	  mvamet_phi = TMath::ATan2(mvametcorr_ey,mvametcorr_ex);
+          mvamet = TMath::Sqrt(mvametcorr_ex*mvametcorr_ex+mvametcorr_ey*mvametcorr_ey);
+	  mvamet_ex = mvametcorr_ex;
+	  mvamet_ey = mvametcorr_ey;
+	  
+	  float pfmetcorr_ex = pfmet_ex;
+	  float pfmetcorr_ey = pfmet_ey;
+	  metSys.ShiftMEt(pfmet_ex,pfmet_ey,
+			  genV.Px(),genV.Py(),
+			  visiblePx,visiblePy,
+			  nJets30,
+			  bkgdType,
+			  MEtSys::SysType::Resolution,
+			  metResolution,
+			  pfmetcorr_ex,pfmetcorr_ey);
+	  pfmet_phi = TMath::ATan2(pfmetcorr_ey,pfmetcorr_ex);
+          pfmet = TMath::Sqrt(pfmetcorr_ex*pfmetcorr_ex+pfmetcorr_ey*pfmetcorr_ey);
+	  pfmet_ex = pfmetcorr_ex;
+	  pfmet_ey = pfmetcorr_ey;
+	  
+	  float puppimetcorr_ex = puppimet_ex;
+	  float puppimetcorr_ey = puppimet_ey;
+	  metSysPuppi.ShiftMEt(puppimet_ex,puppimet_ey,
+			       genV.Px(),genV.Py(),
+			       visiblePx,visiblePy,
+			       nJets30,
+			       bkgdType,
+			       MEtSys::SysType::Resolution,
+			       metResolution,
+			       puppimetcorr_ex,puppimetcorr_ey);
+	  puppimet_phi = TMath::ATan2(puppimetcorr_ey,puppimetcorr_ex);
+          puppimet = TMath::Sqrt(puppimetcorr_ex*puppimetcorr_ex+puppimetcorr_ey*puppimetcorr_ey);
+	  puppimet_ex = puppimetcorr_ex;
+	  puppimet_ey = puppimetcorr_ey;
+	}
+
+	// systematic shifts in mva met --->
+
+	float mvamet_ex_ScaleUp   = mvamet_ex;
+	float mvamet_ex_ScaleDown = mvamet_ex;
+	float mvamet_ex_ResoUp    = mvamet_ex;
+	float mvamet_ex_ResoDown  = mvamet_ex;
+	float mvamet_ex_MuonUp    = mvamet_ex - 0.01*dimuon.Px();
+	float mvamet_ex_MuonDown  = mvamet_ex + 0.01*dimuon.Px();
+	
+	float mvamet_ey_ScaleUp   = mvamet_ey;
+	float mvamet_ey_ScaleDown = mvamet_ey;
+	float mvamet_ey_ResoUp    = mvamet_ey;
+	float mvamet_ey_ResoDown  = mvamet_ey;
+	float mvamet_ey_MuonUp    = mvamet_ey - 0.01*dimuon.Py();
+	float mvamet_ey_MuonDown  = mvamet_ey + 0.01*dimuon.Py();
+
+	float dimuonPtUp   = 1.01*dimuon.Pt();
+	float dimuonPtDown = 0.99*dimuon.Pt();
+	
+
+	metSysMva.ShiftMEt(mvamet_ex,mvamet_ey,
+			   genV.Px(),genV.Py(),
+			   visiblePx,visiblePy,
+			   nJets30,
+			   bkgdType,
+			   MEtSys::SysType::Response,
+			   1.10,
+			   mvamet_ex_ScaleUp,mvamet_ey_ScaleUp);
+
+	metSysMva.ShiftMEt(mvamet_ex,mvamet_ey,
+			   genV.Px(),genV.Py(),
+			   visiblePx,visiblePy,
+			   nJets30,
+			   bkgdType,
+			   MEtSys::SysType::Response,
+			   0.90,
+			   mvamet_ex_ScaleDown,mvamet_ey_ScaleDown);
+	
+	metSysMva.ShiftMEt(mvamet_ex,mvamet_ey,
+			   genV.Px(),genV.Py(),
+			   visiblePx,visiblePy,
+			   nJets30,
+			   bkgdType,
+			   MEtSys::SysType::Resolution,
+			   1.10,
+			   mvamet_ex_ResoUp,mvamet_ey_ResoUp);
+
+	metSysMva.ShiftMEt(mvamet_ex,mvamet_ey,
+			   genV.Px(),genV.Py(),
+			   visiblePx,visiblePy,
+			   nJets30,
+			   bkgdType,
+			   MEtSys::SysType::Resolution,
+			   0.90,
+			   mvamet_ex_ResoDown,mvamet_ey_ResoDown);
+	
+	float mvamet_ScaleUp = TMath::Sqrt(mvamet_ex_ScaleUp*mvamet_ex_ScaleUp+
+					   mvamet_ey_ScaleUp*mvamet_ey_ScaleUp);
+
+	float mvamet_ScaleDown = TMath::Sqrt(mvamet_ex_ScaleDown*mvamet_ex_ScaleDown+
+					     mvamet_ey_ScaleDown*mvamet_ey_ScaleDown);
+
+	float mvamet_ResoUp = TMath::Sqrt(mvamet_ex_ResoUp*mvamet_ex_ResoUp+
+					  mvamet_ey_ResoUp*mvamet_ey_ResoUp);
+
+	float mvamet_ResoDown = TMath::Sqrt(mvamet_ex_ResoDown*mvamet_ex_ResoDown+
+					    mvamet_ey_ResoDown*mvamet_ey_ResoDown);
+
+	float mvamet_MuonUp = TMath::Sqrt(mvamet_ex_MuonUp*mvamet_ex_MuonUp+
+					    mvamet_ey_MuonUp*mvamet_ey_MuonUp);
+
+	float mvamet_MuonDown = TMath::Sqrt(mvamet_ex_MuonDown*mvamet_ex_MuonDown+
+					    mvamet_ey_MuonDown*mvamet_ey_MuonDown);
+
 
 	// selection on mass
 	if (massSel>dimuonMassCut) {
+
+	  massSelH->Fill(massSel,weight);
+	  massExtendedSelH->Fill(massSel,weight);
+	  for (int iScale=0; iScale<21; ++ iScale) {
+	    float scaleFactor = 0.98 + 0.002*float(iScale);
+	    massSelScaleH[iScale]->Fill(massSel*scaleFactor,weight);
+	  }
+
 	  ptLeadingMuSelH->Fill(analysisTree.muon_pt[indx1],weight);
 	  ptTrailingMuSelH->Fill(analysisTree.muon_pt[indx2],weight);
 	  etaLeadingMuSelH->Fill(analysisTree.muon_eta[indx1],weight);
@@ -1618,50 +2068,274 @@ int main(int argc, char * argv[]) {
 	  else if (nJets30>1)
 	    jetBin = 2;
 
-	  metSelNJets[jetBin]->Fill(pfmet,weight);
-	  puppimetSelNJets[jetBin]->Fill(puppimet,weight);
-	  mvametSelNJets[jetBin]->Fill(mvamet,weight);
+	  int jetBinUp = 0;
+	  if (nJets30Up==1)
+	    jetBinUp = 1;
+	  if (nJets30Up>1)
+	    jetBinUp = 2;
 
-	  if (massSel>70&&massSel<110) {
-	    float unitX = dimuon.Px()/dimuon.Pt();
-	    float unitY = dimuon.Py()/dimuon.Pt();
-	    float phiUnit = TMath::ATan2(unitY,unitX);
-	    float perpUnitX = TMath::Cos(phiUnit+0.5*TMath::Pi());
-	    float perpUnitY = TMath::Sin(phiUnit+0.5*TMath::Pi());
+	  int jetBinDown = 0;
+	  if (nJets30Down==1)
+	    jetBinDown = 1;
+	  if (nJets30Down>1)
+	    jetBinDown = 2;
+
+
+	  int ptBin = binNumber(TMath::Min(float(dimuonPt),float(999)),nZPtBins,zPtBins);
+
+	  metSelNJetsH[jetBin]->Fill(pfmet,weight);
+	  puppimetSelNJetsH[jetBin]->Fill(puppimet,weight);
+	  mvametSelNJetsH[jetBin]->Fill(mvamet,weight);
+
+	  if (!isData) {
+	    // std::cout << "GenV = (" 
+	    // 	      << genV.Px() << "," 
+	    // 	      << genV.Py() << "," 
+	    // 	      << genV.Pz() << ")   mass = "
+	    // 	      << genV.M()
+	    // 	      << std::endl;
+	    // std::cout << "GenL = (" 
+	    // 	      << genL.Px() << "," 
+	    // 	      << genL.Py() << "," 
+	    // 	      << genL.Pz() << ")   mass = "
+	    // 	      << genL.M() 
+	    //  	      << std::endl;
+	    // std::cout << "GenZ = (" 
+	    // 	      << genZ.Px() << "," 
+	    // 	      << genZ.Py() << "," 
+	    // 	      << genZ.Pz() << ")   mass = "
+	    // 	      << genZ.M() 
+	    // 	      << std::endl;
+
+	    int ptBinV = binNumber(TMath::Min(float(genV.Pt()),float(999)),nZPtBins,zPtBins);
+	    float Hparal = 0;
+	    float Hperp  = 0;
+
+	    // pfmet ->
+	    ComputeHadRecoilFromMet(pfmet_ex,pfmet_ey,genV.Px(),genV.Py(),genL.Px(),genL.Py(),Hparal,Hperp);
+	    float response = - Hparal/genV.Pt();
+	    recoilResponseMC_Ptbins[ptBinV]->Fill(response,weight);
+	    recoilResponseMC_nJets[jetBin]->Fill(response,weight);
+	    recoilResponseMC_Ptbins_nJets[jetBin][ptBinV]->Fill(response,weight);
+	    //	    std::cout << "PFMet : Had(paral) = " << Hparal << "  Had(perp) = " << Hperp << std::endl;
+
+	    // mvamet ->
+	    ComputeHadRecoilFromMet(mvamet_ex,mvamet_ey,genV.Px(),genV.Py(),genL.Px(),genL.Py(),Hparal,Hperp);
+	    response = - Hparal/genV.Pt();
+	    recoilMvaResponseMC_Ptbins[ptBinV]->Fill(response,weight);
+	    recoilMvaResponseMC_nJets[jetBin]->Fill(response,weight);
+	    recoilMvaResponseMC_Ptbins_nJets[jetBin][ptBinV]->Fill(response,weight);
+	    //	    std::cout << "MVAMet : Had(paral) = " << Hparal << "  Had(perp) = " << Hperp << std::endl;
+
+	    // puppi met ->
+	    ComputeHadRecoilFromMet(puppimet_ex,puppimet_ey,genV.Px(),genV.Py(),genL.Px(),genL.Py(),Hparal,Hperp);
+	    response = - Hparal/genV.Pt();
+	    recoilPuppiResponseMC_Ptbins[ptBinV]->Fill(response,weight);
+	    recoilPuppiResponseMC_nJets[jetBin]->Fill(response,weight);
+	    recoilPuppiResponseMC_Ptbins_nJets[jetBin][ptBinV]->Fill(response,weight);
+	    //	    std::cout << "PuppiMet : Had(paral) = " << Hparal << "  Had(perp) = " << Hperp << std::endl;
+
+	  }
+
+	  float unitX = dimuon.Px()/dimuon.Pt();
+	  float unitY = dimuon.Py()/dimuon.Pt();
+	  float phiUnit = TMath::ATan2(unitY,unitX);
+	  float perpUnitX = TMath::Cos(phiUnit+0.5*TMath::Pi());
+	  float perpUnitY = TMath::Sin(phiUnit+0.5*TMath::Pi());
+	  // float unitModul = unitX*unitX + unitY*unitY;
+	  // float perpUnitModul = perpUnitX*perpUnitX + perpUnitY*perpUnitY;
+	  // float dimuonParal = dimuon.Px()*unitX + dimuon.Py()*unitY;
+	  // float dimuonPerp  = dimuon.Px()*perpUnitX + dimuon.Py()*perpUnitY;
+	  //	  std::cout << "UnitVector = " << unitModul << "  PerpUnitVector = " << perpUnitModul << std::endl;
+	  //	  std::cout << "Dimuon -> Paral = " << dimuonParal << "   Perp = " << dimuonPerp << "   Pt = " << dimuonPt << std::endl;
+	  
+	  float recoilParal = 0;
+	  float recoilPerp  = 0;
+	  float responseHad = 0;
+	  computeRecoil(pfmet_ex,pfmet_ey,unitX,unitY,perpUnitX,perpUnitY,dimuonPt,recoilParal,recoilPerp,responseHad);
+
+	  float recoilPuppiParal = 0;
+	  float recoilPuppiPerp  = 0;
+	  float responsePuppiHad = 0;
+	  computeRecoil(puppimet_ex,puppimet_ey,unitX,unitY,perpUnitX,perpUnitY,dimuonPt,recoilPuppiParal,recoilPuppiPerp,responsePuppiHad);
+
+	  float recoilMvaParal = 0;
+	  float recoilMvaPerp  = 0;
+	  float responseMvaHad = 0;
+	  computeRecoil(mvamet_ex,mvamet_ey,unitX,unitY,perpUnitX,perpUnitY,dimuonPt,recoilMvaParal,recoilMvaPerp,responseMvaHad);
+
+	  float recoilMvaScaleUpParal = 0;
+	  float recoilMvaScaleUpPerp  = 0;
+	  float responseMvaScaleUpHad = 0;
+	  computeRecoil(mvamet_ex_ScaleUp,mvamet_ey_ScaleUp,unitX,unitY,perpUnitX,perpUnitY,dimuonPt,recoilMvaScaleUpParal,recoilMvaScaleUpPerp,responseMvaScaleUpHad);
+
+	  float recoilMvaScaleDownParal = 0;
+	  float recoilMvaScaleDownPerp  = 0;
+	  float responseMvaScaleDownHad = 0;
+	  computeRecoil(mvamet_ex_ScaleDown,mvamet_ey_ScaleDown,unitX,unitY,perpUnitX,perpUnitY,dimuonPt,recoilMvaScaleDownParal,recoilMvaScaleDownPerp,responseMvaScaleDownHad);
+
+	  float recoilMvaResoUpParal = 0;
+	  float recoilMvaResoUpPerp  = 0;
+	  float responseMvaResoUpHad = 0;
+	  computeRecoil(mvamet_ex_ResoUp,mvamet_ey_ResoUp,unitX,unitY,perpUnitX,perpUnitY,dimuonPt,recoilMvaResoUpParal,recoilMvaResoUpPerp,responseMvaResoUpHad);
+
+	  float recoilMvaResoDownParal = 0;
+	  float recoilMvaResoDownPerp  = 0;
+	  float responseMvaResoDownHad = 0;
+	  computeRecoil(mvamet_ex_ResoDown,mvamet_ey_ResoDown,unitX,unitY,perpUnitX,perpUnitY,dimuonPt,recoilMvaResoDownParal,recoilMvaResoDownPerp,responseMvaResoDownHad);
+
+	  float recoilMvaMuonUpParal = 0;
+	  float recoilMvaMuonUpPerp  = 0;
+	  float responseMvaMuonUpHad = 0;
+	  computeRecoil(mvamet_ex_MuonUp,mvamet_ey_MuonUp,unitX,unitY,perpUnitX,perpUnitY,dimuonPtUp,recoilMvaMuonUpParal,recoilMvaMuonUpPerp,responseMvaMuonUpHad);
+
+	  float recoilMvaMuonDownParal = 0;
+	  float recoilMvaMuonDownPerp  = 0;
+	  float responseMvaMuonDownHad = 0;
+	  computeRecoil(mvamet_ex_MuonDown,mvamet_ey_MuonDown,unitX,unitY,perpUnitX,perpUnitY,dimuonPtDown,recoilMvaMuonDownParal,recoilMvaMuonDownPerp,responseMvaMuonDownHad);
+
+	  if (massSel>70&&massSel<110) { // Z Region
+
+	    metZSelH->Fill(pfmet,weight);
+	    puppimetZSelH->Fill(puppimet,weight);
+	    mvametZSelH->Fill(mvamet,weight);
+
+	    metZSelNJetsH[jetBin]->Fill(pfmet,weight);
+	    puppimetZSelNJetsH[jetBin]->Fill(puppimet,weight);
+	    mvametZSelNJetsH[jetBin]->Fill(mvamet,weight);
 
 	    // pfmet
-	    float recoilParal = pfmet_ex*unitX + pfmet_ey*unitY;
-	    float recoilPerp = pfmet_ex*perpUnitX + pfmet_ey*perpUnitY;
-	    float responseHad = 1 + recoilParal/dimuonPt;
-	    int ptBin = binNumber(TMath::Min(float(dimuonPt),float(999)),nZPtBins,zPtBins);
 	    recoilZParalH[jetBin]->Fill(recoilParal,weight);
 	    recoilZPerpH[jetBin]->Fill(recoilPerp,weight);
 	    recoilZParal_Ptbins_nJetsH[jetBin][ptBin]->Fill(recoilParal,weight);
 	    recoilZPerp_Ptbins_nJetsH[jetBin][ptBin]->Fill(recoilPerp,weight);
-	    recoilResponse[jetBin]->Fill(responseHad,weight);
-	    recoilResponse_Ptbins_nJetsH[jetBin][ptBin]->Fill(responseHad,weight);
+	    recoilResponse_nJets[jetBin]->Fill(responseHad,weight);
+	    recoilResponse_Ptbins_nJets[jetBin][ptBin]->Fill(responseHad,weight);
 
 	    // puppimet
-	    recoilParal = puppimet_ex*unitX + puppimet_ey*unitY;
-	    recoilPerp  = puppimet_ex*perpUnitX + puppimet_ey*perpUnitY;
-	    responseHad = 1 + recoilParal/dimuonPt;
-	    recoilPuppiZParalH[jetBin]->Fill(recoilParal,weight);
-            recoilPuppiZPerpH[jetBin]->Fill(recoilPerp,weight);
-            recoilPuppiZParal_Ptbins_nJetsH[jetBin][ptBin]->Fill(recoilParal,weight);
-            recoilPuppiZPerp_Ptbins_nJetsH[jetBin][ptBin]->Fill(recoilPerp,weight);
-	    recoilPuppiResponse[jetBin]->Fill(responseHad,weight);
-	    recoilPuppiResponse_Ptbins_nJetsH[jetBin][ptBin]->Fill(responseHad,weight);
+	    recoilPuppiZParalH[jetBin]->Fill(recoilPuppiParal,weight);
+            recoilPuppiZPerpH[jetBin]->Fill(recoilPuppiPerp,weight);
+            recoilPuppiZParal_Ptbins_nJetsH[jetBin][ptBin]->Fill(recoilPuppiParal,weight);
+            recoilPuppiZPerp_Ptbins_nJetsH[jetBin][ptBin]->Fill(recoilPuppiPerp,weight);
+	    recoilPuppiResponse_nJets[jetBin]->Fill(responsePuppiHad,weight);
+	    recoilPuppiResponse_Ptbins_nJets[jetBin][ptBin]->Fill(responsePuppiHad,weight);
 
 	    // mvamet
-            recoilParal = mvamet_ex*unitX + mvamet_ey*unitY;
-            recoilPerp  = mvamet_ex*perpUnitX + mvamet_ey*perpUnitY;
-            responseHad = 1 + recoilParal/dimuonPt;
-            recoilMvaZParalH[jetBin]->Fill(recoilParal,weight);
-            recoilMvaZPerpH[jetBin]->Fill(recoilPerp,weight);
-            recoilMvaZParal_Ptbins_nJetsH[jetBin][ptBin]->Fill(recoilParal,weight);
-            recoilMvaZPerp_Ptbins_nJetsH[jetBin][ptBin]->Fill(recoilPerp,weight);
-            recoilMvaResponse[jetBin]->Fill(responseHad,weight);
-            recoilMvaResponse_Ptbins_nJetsH[jetBin][ptBin]->Fill(responseHad,weight);
+            recoilMvaZParalH[jetBin]->Fill(recoilMvaParal,weight);
+            recoilMvaZPerpH[jetBin]->Fill(recoilMvaPerp,weight);
+            recoilMvaZParal_Ptbins_nJetsH[jetBin][ptBin]->Fill(recoilMvaParal,weight);
+            recoilMvaZPerp_Ptbins_nJetsH[jetBin][ptBin]->Fill(recoilMvaPerp,weight);
+            recoilMvaResponse_nJets[jetBin]->Fill(responseMvaHad,weight);
+            recoilMvaResponse_Ptbins_nJets[jetBin][ptBin]->Fill(responseMvaHad,weight);
+
+	    // systematic changes
+
+	    // JES
+	    mvametZSelNJetsSysH[jetBinUp][0][0]->Fill(mvamet,weight);
+	    mvametZSelNJetsSysH[jetBinDown][0][1]->Fill(mvamet,weight);
+
+            recoilMvaZParalSysH[jetBinUp][0][0]->Fill(recoilMvaParal,weight);
+            recoilMvaZParalSysH[jetBinDown][0][1]->Fill(recoilMvaParal,weight);
+
+            recoilMvaZPerpSysH[jetBinUp][0][0]->Fill(recoilMvaPerp,weight);
+            recoilMvaZPerpSysH[jetBinDown][0][1]->Fill(recoilMvaPerp,weight);
+
+	    // MEt scale 
+	    mvametZSelNJetsSysH[jetBin][1][0]->Fill(mvamet_ScaleUp,weight);
+	    mvametZSelNJetsSysH[jetBin][1][1]->Fill(mvamet_ScaleDown,weight);
+
+            recoilMvaZParalSysH[jetBin][1][0]->Fill(recoilMvaScaleUpParal,weight);
+            recoilMvaZParalSysH[jetBin][1][1]->Fill(recoilMvaScaleDownParal,weight);
+
+            recoilMvaZPerpSysH[jetBin][1][0]->Fill(recoilMvaScaleUpPerp,weight);
+            recoilMvaZPerpSysH[jetBin][1][1]->Fill(recoilMvaScaleDownPerp,weight);
+
+	    // MEt resolution 
+	    mvametZSelNJetsSysH[jetBin][2][0]->Fill(mvamet_ResoUp,weight);
+	    mvametZSelNJetsSysH[jetBin][2][1]->Fill(mvamet_ResoDown,weight);
+
+            recoilMvaZParalSysH[jetBin][2][0]->Fill(recoilMvaResoUpParal,weight);
+            recoilMvaZParalSysH[jetBin][2][1]->Fill(recoilMvaResoDownParal,weight);
+
+            recoilMvaZPerpSysH[jetBin][2][0]->Fill(recoilMvaResoUpPerp,weight);
+            recoilMvaZPerpSysH[jetBin][2][1]->Fill(recoilMvaResoDownPerp,weight);
+
+	    // Muon momentum
+	    mvametZSelNJetsSysH[jetBin][3][0]->Fill(mvamet_MuonUp,weight);
+	    mvametZSelNJetsSysH[jetBin][3][1]->Fill(mvamet_MuonDown,weight);
+
+            recoilMvaZParalSysH[jetBin][3][0]->Fill(recoilMvaMuonUpParal,weight);
+            recoilMvaZParalSysH[jetBin][3][1]->Fill(recoilMvaMuonDownParal,weight);
+
+            recoilMvaZPerpSysH[jetBin][3][0]->Fill(recoilMvaMuonUpPerp,weight);
+            recoilMvaZPerpSysH[jetBin][3][1]->Fill(recoilMvaMuonDownPerp,weight);
+
+	  }
+
+	  if (massSel<70||massSel>110) { // Z-depleted region
+
+	    metTopSelH->Fill(pfmet,weight);
+	    puppimetTopSelH->Fill(puppimet,weight);
+	    mvametTopSelH->Fill(mvamet,weight);
+
+	    metTopSelNJetsH[jetBin]->Fill(pfmet,weight);
+	    puppimetTopSelNJetsH[jetBin]->Fill(puppimet,weight);
+	    mvametTopSelNJetsH[jetBin]->Fill(mvamet,weight);
+
+	    // pfmet
+	    recoilTopParalH[jetBin]->Fill(recoilParal,weight);
+	    recoilTopPerpH[jetBin]->Fill(recoilPerp,weight);
+
+	    // puppimet
+	    recoilPuppiTopParalH[jetBin]->Fill(recoilPuppiParal,weight);
+	    recoilPuppiTopPerpH[jetBin]->Fill(recoilPuppiPerp,weight);
+
+	    // mvamet
+            recoilMvaTopParalH[jetBin]->Fill(recoilMvaParal,weight);
+            recoilMvaTopPerpH[jetBin]->Fill(recoilMvaPerp,weight);
+
+
+	    // systematic changes
+
+	    // JES
+	    mvametTopSelNJetsSysH[jetBinUp][0][0]->Fill(mvamet,weight);
+	    mvametTopSelNJetsSysH[jetBinDown][0][1]->Fill(mvamet,weight);
+
+            recoilMvaTopParalSysH[jetBinUp][0][0]->Fill(recoilMvaParal,weight);
+            recoilMvaTopParalSysH[jetBinDown][0][1]->Fill(recoilMvaParal,weight);
+
+            recoilMvaTopPerpSysH[jetBinUp][0][0]->Fill(recoilMvaPerp,weight);
+            recoilMvaTopPerpSysH[jetBinDown][0][1]->Fill(recoilMvaPerp,weight);
+
+	    // MEt scale 
+	    mvametTopSelNJetsSysH[jetBin][1][0]->Fill(mvamet_ScaleUp,weight);
+	    mvametTopSelNJetsSysH[jetBin][1][1]->Fill(mvamet_ScaleDown,weight);
+
+            recoilMvaTopParalSysH[jetBin][1][0]->Fill(recoilMvaScaleUpParal,weight);
+            recoilMvaTopParalSysH[jetBin][1][1]->Fill(recoilMvaScaleDownParal,weight);
+
+            recoilMvaTopPerpSysH[jetBin][1][0]->Fill(recoilMvaScaleUpPerp,weight);
+            recoilMvaTopPerpSysH[jetBin][1][1]->Fill(recoilMvaScaleDownPerp,weight);
+
+	    // MEt resolution 
+	    mvametTopSelNJetsSysH[jetBin][2][0]->Fill(mvamet_ResoUp,weight);
+	    mvametTopSelNJetsSysH[jetBin][2][1]->Fill(mvamet_ResoDown,weight);
+
+            recoilMvaTopParalSysH[jetBin][2][0]->Fill(recoilMvaResoUpParal,weight);
+            recoilMvaTopParalSysH[jetBin][2][1]->Fill(recoilMvaResoDownParal,weight);
+
+            recoilMvaTopPerpSysH[jetBin][2][0]->Fill(recoilMvaResoUpPerp,weight);
+            recoilMvaTopPerpSysH[jetBin][2][1]->Fill(recoilMvaResoDownPerp,weight);
+
+	    // Muon momentum
+	    mvametTopSelNJetsSysH[jetBin][3][0]->Fill(mvamet_MuonUp,weight);
+	    mvametTopSelNJetsSysH[jetBin][3][1]->Fill(mvamet_MuonDown,weight);
+
+            recoilMvaTopParalSysH[jetBin][3][0]->Fill(recoilMvaMuonUpParal,weight);
+            recoilMvaTopParalSysH[jetBin][3][1]->Fill(recoilMvaMuonDownParal,weight);
+
+            recoilMvaTopPerpSysH[jetBin][3][0]->Fill(recoilMvaMuonUpPerp,weight);
+            recoilMvaTopPerpSysH[jetBin][3][1]->Fill(recoilMvaMuonDownPerp,weight);
 
 	  }
 
@@ -1700,3 +2374,6 @@ int main(int argc, char * argv[]) {
   delete file;
   
   }
+
+
+

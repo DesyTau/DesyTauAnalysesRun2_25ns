@@ -30,255 +30,49 @@
 #include "TauAnalysis/SVfitStandalone/interface/SVfitStandaloneAlgorithm.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/json.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/PileUp.h"
-//#include "DesyTauAnalyses/NTupleMaker/interface/ScaleFactor.h"
 #include "HTT-utilities/LepEffInterface/interface/ScaleFactor.h"
+#include "DesyTauAnalyses/NTupleMaker/interface/functions.h"
+#include "HTT-utilities/RecoilCorrections/interface/RecoilCorrector.h"
+#include "HTT-utilities/RecoilCorrections/interface/MEtSys.h"
+#include "DesyTauAnalyses/NTupleMaker/interface/Jets.h"
+#include "CondFormats/BTauObjects/interface/BTagCalibration.h"
+#include "CondFormats/BTauObjects/interface/BTagCalibrationReader.h"
 
-int binNumber(float x, int nbins, float * bins) {
+float totalTransverseMass(TLorentzVector l1, 
+			  TLorentzVector l2,
+			  TLorentzVector l3) {
 
-  int binN = 0;
-
-  for (int iB=0; iB<nbins; ++iB) {
-    if (x>=bins[iB]&&x<bins[iB+1]) {
-      binN = iB;
-      break;
-    }
-  }
-
-  return binN;
-
-}
-
-float effBin(float x, int nbins, float * bins, float * eff) {
-
-  int bin = binNumber(x, nbins, bins);
-
-  return eff[bin];
+  TLorentzVector totalLV = l1 + l2 + l3;
+  float    totalET = l1.Pt() +  l2.Pt() + l3.Pt();
+  float     mTtot = TMath::Sqrt(totalET*totalET-totalLV.Pt()*totalLV.Pt());
+  return    mTtot;
 
 }
 
-double cosRestFrame(TLorentzVector boost, TLorentzVector vect) {
+SVfitStandaloneAlgorithm SVFitMassComputation(svFitStandalone::MeasuredTauLepton svFitMuon,
+					      svFitStandalone::MeasuredTauLepton svFitTau,
+					      double measuredMVAMETx,
+					      double measuredMVAMETy,
+					      TMatrixD covMVAMET,
+					      int tau_decayMode,
+					      TFile * inputFile_visPtResolution
+					      ) {
 
-  double bx = -boost.Px()/boost.E();
-  double by = -boost.Py()/boost.E();
-  double bz = -boost.Pz()/boost.E();
-
-  vect.Boost(bx,by,bz);
-  double prod = -vect.Px()*bx-vect.Py()*by-vect.Pz()*bz;
-  double modBeta = TMath::Sqrt(bx*bx+by*by+bz*bz); 
-  double modVect = TMath::Sqrt(vect.Px()*vect.Px()+vect.Py()*vect.Py()+vect.Pz()*vect.Pz());
+  std::vector<svFitStandalone::MeasuredTauLepton> measuredTauLeptons;
+  measuredTauLeptons.push_back(svFitMuon);
+  measuredTauLeptons.push_back(svFitTau);
+  bool validDecayMode = tau_decayMode<=4 || tau_decayMode>=10; // excluding 2prongs
+  SVfitStandaloneAlgorithm algo(measuredTauLeptons, measuredMVAMETx, measuredMVAMETy, covMVAMET, 0);
+  algo.addLogM(false);  
+  if (validDecayMode)
+    algo.shiftVisPt(true, inputFile_visPtResolution);
+  else
+    algo.shiftVisPt(false,inputFile_visPtResolution);
+  algo.integrateMarkovChain();
   
-  double cosinus = prod/(modBeta*modVect);
-
-  return cosinus;
+  return algo;
 
 }
-
-double QToEta(double Q) {
-  double Eta = - TMath::Log(TMath::Tan(0.5*Q));  
-  return Eta;
-}
-
-double EtaToQ(double Eta) {
-  double Q = 2.0*TMath::ATan(TMath::Exp(-Eta));
-  if (Q<0.0) Q += TMath::Pi();
-  return Q;
-}
-
-double PtoEta(double Px, double Py, double Pz) {
-
-  double P = TMath::Sqrt(Px*Px+Py*Py+Pz*Pz);
-  double cosQ = Pz/P;
-  double Q = TMath::ACos(cosQ);
-  double Eta = - TMath::Log(TMath::Tan(0.5*Q));  
-  return Eta;
-
-}
-
-double PtoPhi(double Px, double Py) {
-  return TMath::ATan2(Py,Px);
-}
-
-double PtoPt(double Px, double Py) {
-  return TMath::Sqrt(Px*Px+Py*Py);
-}
-
-double dPhiFrom2P(double Px1, double Py1,
-		  double Px2, double Py2) {
-
-
-  double prod = Px1*Px2 + Py1*Py2;
-  double mod1 = TMath::Sqrt(Px1*Px1+Py1*Py1);
-  double mod2 = TMath::Sqrt(Px2*Px2+Py2*Py2);
-  
-  double cosDPhi = prod/(mod1*mod2);
-  
-  return TMath::ACos(cosDPhi);
-
-}
-
-double deltaEta(double Px1, double Py1, double Pz1,
-		double Px2, double Py2, double Pz2) {
-
-  double eta1 = PtoEta(Px1,Py1,Pz1);
-  double eta2 = PtoEta(Px2,Py2,Pz2);
-
-  double dEta = eta1 - eta2;
-
-  return dEta;
-
-}
-
-double deltaR(double Eta1, double Phi1,
-	      double Eta2, double Phi2) {
-
-  double Px1 = TMath::Cos(Phi1);
-  double Py1 = TMath::Sin(Phi1);
-
-  double Px2 = TMath::Cos(Phi2);
-  double Py2 = TMath::Sin(Phi2);
-
-  double dPhi = dPhiFrom2P(Px1,Py1,Px2,Py2);
-  double dEta = Eta1 - Eta2;
-
-  double dR = TMath::Sqrt(dPhi*dPhi+dEta*dEta);
-
-  return dR;
-
-}
-
-double PtEtaToP(double Pt, double Eta) {
-
-  //  double Q = EtaToQ(Eta);
-
-  //double P = Pt/TMath::Sin(Q);
-  double P = Pt*TMath::CosH(Eta);
-
-  return P;
-}
-double Px(double Pt, double Phi){
-
-  double Px=Pt*TMath::Cos(Phi);
-  return Px;
-}
-double Py(double Pt, double Phi){
-
-  double Py=Pt*TMath::Sin(Phi);
-  return Py;
-}
-double Pz(double Pt, double Eta){
-
-  double Pz=Pt*TMath::SinH(Eta);
-  return Pz;
-}
-double InvariantMass(double energy,double Px,double Py, double Pz){
-
-  double M_2=energy*energy-Px*Px-Py*Py-Pz*Pz;
-  double M=TMath::Sqrt(M_2);
-  return M;
-
-
-}
-double EFromPandM0(double M0,double Pt,double Eta){
-
-  double E_2=M0*M0+PtEtaToP(Pt,Eta)*PtEtaToP(Pt,Eta);
-  double E =TMath::Sqrt(E_2);
-  return E;
-
-}
-bool electronMvaIdTight(float eta, float mva) {
-
-  float absEta = fabs(eta);
-
-  bool passed = false;
-  if (absEta<0.8) {
-    if (mva>0.73) passed = true;
-  }
-  else if (absEta<1.479) {
-    if (mva>0.57) passed = true;
-  }
-  else {
-    if (mva>0.05) passed = true;
-  }
-
-  return passed;
-
-}
-bool electronMvaIdLoose(float eta, float mva) {
-
-  float absEta = fabs(eta);
-
-  bool passed = false;
-  if (absEta<0.8) {
-    if (mva>0.35) passed = true;
-  }
-  else if (absEta<1.479) {
-    if (mva>0.20) passed = true;
-  }
-  else {
-    if (mva>-0.52) passed = true;
-  }
-
-  return passed;
-
-}
-bool electronMvaIdWP80(float pt, float eta, float mva) {
-
-  float absEta = fabs(eta);
-  bool passed = false;
-  if (absEta<0.8) {
-    if (pt<10) 
-      passed = mva > -0.253;
-    else 
-      passed = mva > 0.965;
-  }
-  else if (absEta<1.479) {
-    if (pt<10)
-      passed = mva > 0.081;
-    else
-      passed = mva > 0.917;
-  }
-  else {
-    if (pt<10)
-      passed = mva > -0.081;
-    else
-      passed = mva > 0.683;
-  }
-
-  return passed;
-
-}
-bool electronMvaIdWP90(float pt, float eta, float mva) {
-
-  float absEta = fabs(eta);
-  bool passed = false;
-  if (absEta<0.8) {
-    if (pt<10) 
-      passed = mva > -0.483;
-    else 
-      passed = mva > 0.933;
-  }
-  else if (absEta<1.479) {
-    if (pt<10)
-      passed = mva > -0.267;
-    else
-      passed = mva > 0.825;
-  }
-  else {
-    if (pt<10)
-      passed = mva > -0.323;
-    else
-      passed = mva > 0.337;
-  }
-
-  return passed;
-
-}
-
-
-const float electronMass = 0.51100e-3;
-const float muonMass = 0.10565837;
-const float tauMass  = 1.7768;
-const float pionMass = 0.1396;
 
 int main(int argc, char * argv[]) {
 
@@ -291,9 +85,12 @@ int main(int argc, char * argv[]) {
   Config cfg(argv[1]);
 
   const bool isData = cfg.get<bool>("IsData");
+  const bool isDY   = cfg.get<bool>("IsDY");
+  const bool isW    = cfg.get<bool>("IsW");
+  const bool isTOP  = cfg.get<bool>("IsTOP");
+
   const bool applyGoodRunSelection = cfg.get<bool>("ApplyGoodRunSelection");
   const string jsonFile = cfg.get<string>("jsonFile");
-  const bool isDY = cfg.get<bool>("IsDY");
   const bool applyInclusiveSelection = cfg.get<bool>("ApplyInclusiveSelection");
   const bool computeDitauMass        = cfg.get<bool>("ComputeDitauMass");
 
@@ -375,6 +172,21 @@ int main(int argc, char * argv[]) {
   const string MuonIdIsoFile = cfg.get<string>("MuonIdIsoEff");
   const string MuonTriggerFile = cfg.get<string>("MuonTriggerEff");
 
+  const string recoilFileName   = cfg.get<string>("RecoilFileName");
+  TString RecoilFileName(recoilFileName);
+
+  const string recoilPuppiFileName   = cfg.get<string>("RecoilPuppiFileName");
+  TString RecoilPuppiFileName(recoilPuppiFileName);
+
+  const string recoilMvaFileName   = cfg.get<string>("RecoilMvaFileName");
+  TString RecoilMvaFileName(recoilMvaFileName);
+
+  const string metSysFileName   = cfg.get<string>("MetSysFileName");
+  TString MetSysFileName(metSysFileName);
+
+  // hard-coded for the moment
+  float tauScale = 0.03;
+
   // **** end of configuration
 
   // file name and tree name
@@ -421,11 +233,27 @@ int main(int argc, char * argv[]) {
   Float_t         embeddedWeight;
   Float_t         signalWeight;
   Float_t         weight;
+
   Float_t         m_vis;
-  Float_t         m_sv;
-  Float_t         pt_sv;
-  Float_t         eta_sv;
-  Float_t         phi_sv;
+  Float_t         m_vis_tauUp;
+  Float_t         m_vis_tauDown;
+  Float_t         m_vis_scaleUp;
+  Float_t         m_vis_scaleDown;
+  Float_t         m_vis_resoUp;
+  Float_t         m_vis_resoDown;
+
+  Float_t         mTtot;
+  Float_t         mTtot_tauUp;
+  Float_t         mTtot_tauDown;
+  Float_t         mTtot_resoUp;
+  Float_t         mTtot_resoDown;
+  Float_t         mTtot_scaleUp;
+  Float_t         mTtot_scaleDown;
+
+  //  Float_t         m_sv;
+  //  Float_t         pt_sv;
+  //  Float_t         eta_sv;
+  //  Float_t         phi_sv;
 
   Float_t         pt_1;
   Float_t         phi_1;
@@ -436,9 +264,17 @@ int main(int argc, char * argv[]) {
   Float_t         mva_1;
   Float_t         d0_1;
   Float_t         dZ_1;
+
   Float_t         mt_1;
   Float_t         mt_puppi_1;
   Float_t         mt_mva_1;
+
+  Float_t         mt_mva_uncorr_1;
+  Float_t         mt_mva_scaleUp_1;
+  Float_t         mt_mva_scaleDown_1;
+  Float_t         mt_mva_resoUp_1;
+  Float_t         mt_mva_resoDown_1;
+
   Int_t           gen_match_1; 
 
   Float_t         pt_2;
@@ -484,6 +320,9 @@ int main(int argc, char * argv[]) {
   Float_t         againstElectronVTightMVA5_2;
   Float_t         againstMuonLoose3_2;
   Float_t         againstMuonTight3_2;
+  Float_t         againstElectronVLooseMVA6_2;
+  Float_t         byIsolationMVArun2v1DBoldDMwLTraw_2;
+  Float_t         byTightIsolationMVArun2v1DBoldDMwLT_2;
 
   Float_t         met;
   Float_t         metphi;
@@ -494,17 +333,46 @@ int main(int argc, char * argv[]) {
 
   Float_t         puppimet;
   Float_t         puppimetphi;
-  Float_t         m_sv_puppi;
-  Float_t         pt_sv_puppi;
-  Float_t         eta_sv_puppi;
-  Float_t         phi_sv_puppi;
+  //  Float_t         m_sv_puppi;
+  //  Float_t         pt_sv_puppi;
+  //  Float_t         eta_sv_puppi;
+  //  Float_t         phi_sv_puppi;
 
   Float_t         mvamet;
   Float_t         mvametphi;
+
+  Float_t         mvamet_uncorr;
+  Float_t         mvametphi_uncorr;
+
+  Float_t         mvamet_scaleUp;
+  Float_t         mvametphi_scaleUp;
+
+  Float_t         mvamet_scaleDown;
+  Float_t         mvametphi_scaleDown;
+
+  Float_t         mvamet_resoUp;
+  Float_t         mvametphi_resoUp;
+
+  Float_t         mvamet_resoDown;
+  Float_t         mvametphi_resoDown;
+
   Float_t         mvacov00;
   Float_t         mvacov01;
   Float_t         mvacov10;
   Float_t         mvacov11;
+
+  Float_t         m_sv_mvamet;
+  Float_t         pt_sv_mvamet;
+  Float_t         eta_sv_mvamet;
+  Float_t         phi_sv_mvamet;
+
+  Float_t         m_sv_mvamet_uncorr;
+  Float_t         m_sv_mvamet_resoUp;
+  Float_t         m_sv_mvamet_resoDown;
+  Float_t         m_sv_mvamet_scaleUp;
+  Float_t         m_sv_mvamet_scaleDown;
+  Float_t         m_sv_mvamet_tauUp;
+  Float_t         m_sv_mvamet_tauDown;
 
   Float_t         pt_tt;
   Float_t         pzetavis;
@@ -537,7 +405,33 @@ int main(int argc, char * argv[]) {
   Float_t         bpt;
   Float_t         beta;
   Float_t         bphi;
+
+  Float_t         nuPx;
+  Float_t         nuPy;
+  Float_t         nuPz;
+
+  Float_t         lepPx;
+  Float_t         lepPy;
+  Float_t         lepPz;
   
+  Float_t         bosonPx;
+  Float_t         bosonPy;
+  Float_t         bosonPz;
+  Float_t         bosonPt;
+
+  Float_t   Hresponse;
+  Float_t   Hparal;
+  Float_t   Hperp;
+
+  Float_t   Hresponse_Fast;
+  Float_t   Hparal_Fast;
+  Float_t   Hperp_Fast;
+
+  Float_t Hresponse_Reco;
+  Float_t Hparal_Reco;
+  Float_t Hperp_Reco;
+  
+
   Bool_t isZLL;
   Bool_t isZMM;
   Bool_t isZEE;
@@ -573,7 +467,21 @@ int main(int argc, char * argv[]) {
   tree->Branch("signalWeight", &signalWeight, "signalWeight/F");
   tree->Branch("weight", &weight, "weight/F");
 
-  tree->Branch("m_vis", &m_vis, "m_vis/F");
+  tree->Branch("m_vis",         &m_vis,         "m_vis/F");
+  tree->Branch("m_vis_tauUp",   &m_vis_tauUp,   "m_vis_tauUp/F");
+  tree->Branch("m_vis_tauDown", &m_vis_tauDown, "m_vis_tauDown/F");
+  tree->Branch("m_vis_resoUp",   &m_vis_resoUp,   "m_vis_resoUp/F");
+  tree->Branch("m_vis_resoDown", &m_vis_resoDown, "m_vis_resoDown/F");
+  tree->Branch("m_vis_scaleUp",   &m_vis_scaleUp,   "m_vis_scaleUp/F");
+  tree->Branch("m_vis_scaleDown", &m_vis_scaleDown, "m_vis_scaleDown/F");
+
+  tree->Branch("mTtot",         &mTtot,         "mTtot/F");
+  tree->Branch("mTtot_tauUp",   &mTtot_tauUp,   "mTtot_tauUp/F");
+  tree->Branch("mTtot_tauDown", &mTtot_tauDown, "mTtot_tauDown/F");
+  tree->Branch("mTtot_resoUp",   &mTtot_resoUp,   "mTtot_resoUp/F");
+  tree->Branch("mTtot_resoDown", &mTtot_resoDown, "mTtot_resoDown/F");
+  tree->Branch("mTtot_scaleUp",   &mTtot_scaleUp,   "mTtot_scaleUp/F");
+  tree->Branch("mTtot_scaleDown", &mTtot_scaleDown, "mTtot_scaleDown/F");
 
   tree->Branch("pt_1", &pt_1, "pt_1/F");
   tree->Branch("phi_1", &phi_1, "phi_1/F");
@@ -587,6 +495,13 @@ int main(int argc, char * argv[]) {
   tree->Branch("mt_1", &mt_1, "mt_1/F");
   tree->Branch("mt_puppi_1",&mt_puppi_1,"mt_puppi_1/F");
   tree->Branch("mt_mva_1",&mt_mva_1,"mt_mva_1/F");
+
+  tree->Branch("mt_mva_uncorr_1",&mt_mva_uncorr_1,"mt_mva_uncorr_1/F");
+  tree->Branch("mt_mva_scaleUp_1",&mt_mva_scaleUp_1,"mt_mva_scaleUp_1/F");
+  tree->Branch("mt_mva_scaleDown_1",&mt_mva_scaleDown_1,"mt_mva_scaleDown_1/F");
+  tree->Branch("mt_mva_resoUp_1",&mt_mva_resoUp_1,"mt_mva_resoUp_1/F");
+  tree->Branch("mt_mva_resoDown_1",&mt_mva_resoDown_1,"mt_mva_resoDown_1/F");
+
   tree->Branch("gen_match_1",&gen_match_1,"gen_match_1/I");
 
   tree->Branch("pt_2", &pt_2, "pt_2/F");
@@ -612,7 +527,9 @@ int main(int argc, char * argv[]) {
   tree->Branch("byCombinedIsolationDeltaBetaCorrRaw3Hits_2", &byCombinedIsolationDeltaBetaCorrRaw3Hits_2, "byCombinedIsolationDeltaBetaCorrRaw3Hits_2/F");
   tree->Branch("byLooseCombinedIsolationDeltaBetaCorr3Hits_2",&byLooseCombinedIsolationDeltaBetaCorr3Hits_2,"byLooseCombinedIsolationDeltaBetaCorr3Hits_2/F");
   tree->Branch("byMediumCombinedIsolationDeltaBetaCorr3Hits_2",&byMediumCombinedIsolationDeltaBetaCorr3Hits_2,"byMediumCombinedIsolationDeltaBetaCorr3Hits_2/F");
+  tree->Branch("byIsolationMVArun2v1DBoldDMwLTraw_2",&byIsolationMVArun2v1DBoldDMwLTraw_2,"byIsolationMVArun2v1DBoldDMwLTraw_2/F");
   tree->Branch("byTightCombinedIsolationDeltaBetaCorr3Hits_2",&byTightCombinedIsolationDeltaBetaCorr3Hits_2,"byTightCombinedIsolationDeltaBetaCorr3Hits_2/F");
+  tree->Branch("byTightIsolationMVArun2v1DBoldDMwLT_2",&byTightIsolationMVArun2v1DBoldDMwLT_2,"byTightIsolationMVArun2v1DBoldDMwLT_2/F");
   tree->Branch("againstElectronLooseMVA5_2", &againstElectronLooseMVA5_2, "againstElectronLooseMVA5_2/F");
   tree->Branch("againstElectronMediumMVA5_2", &againstElectronMediumMVA5_2, "againstElectronMediumMVA5_2/F");
   tree->Branch("againstElectronTightMVA5_2", &againstElectronTightMVA5_2, "againstElectronTightMVA5_2/F");
@@ -620,6 +537,7 @@ int main(int argc, char * argv[]) {
   tree->Branch("againstElectronVTightMVA5_2", &againstElectronVTightMVA5_2, "againstElectronVTightMVA5_2/F");
   tree->Branch("againstMuonLoose3_2", &againstMuonLoose3_2, "againstMuonLoose3_2/F");
   tree->Branch("againstMuonTight3_2", &againstMuonTight3_2, "againstMuonTight3_2/F");
+  tree->Branch("againstElectronVLooseMVA6_2",&againstElectronVLooseMVA6_2,"againstElectronVLooseMVA6_2/F");
 
   tree->Branch("met", &met, "met/F");
   tree->Branch("metphi", &metphi, "metphi/F");
@@ -633,6 +551,21 @@ int main(int argc, char * argv[]) {
 
   tree->Branch("mvamet", &mvamet, "mvamet/F");
   tree->Branch("mvametphi", &mvametphi, "mvametphi/F");
+  tree->Branch("mvamet_uncorr", &mvamet_uncorr, "mvamet_uncorr/F");
+  tree->Branch("mvametphi_uncorr", &mvametphi_uncorr, "mvametphi_uncorr/F");
+
+  tree->Branch("mvamet_scaleUp", &mvamet_scaleUp, "mvamet_scaleUp/F");
+  tree->Branch("mvametphi_scaleUp", &mvametphi_scaleUp, "mvametphi_scaleUp/F");
+  
+  tree->Branch("mvamet_scaleDown", &mvamet_scaleDown, "mvamet_scaleDown/F");
+  tree->Branch("mvametphi_scaleDown", &mvametphi_scaleDown, "mvametphi_scaleDown/F");
+
+  tree->Branch("mvamet_resoUp", &mvamet_resoUp, "mvamet_resoUp/F");
+  tree->Branch("mvametphi_resoUp", &mvametphi_resoUp, "mvametphi_resoUp/F");
+  
+  tree->Branch("mvamet_resoDown", &mvamet_resoDown, "mvamet_resoDown/F");
+  tree->Branch("mvametphi_resoDown", &mvametphi_resoDown, "mvametphi_resoDown/F");
+
   tree->Branch("mvacov00", &mvacov00, "mvacov00/F");
   tree->Branch("mvacov01", &mvacov01, "mvacov01/F");
   tree->Branch("mvacov10", &mvacov10, "mvacov10/F");
@@ -641,15 +574,28 @@ int main(int argc, char * argv[]) {
   tree->Branch("genmet",&genmet,"genmet/F");
   tree->Branch("genmetphi",&genmetphi,"genmetphi/F");
 
-  tree->Branch("m_sv", &m_sv, "m_sv/F");
-  tree->Branch("pt_sv", &pt_sv, "pt_sv/F");
-  tree->Branch("eta_sv", &eta_sv, "eta_sv/F");
-  tree->Branch("phi_sv", &phi_sv, "phi_sv/F");
+  //  tree->Branch("m_sv", &m_sv, "m_sv/F");
+  //  tree->Branch("pt_sv", &pt_sv, "pt_sv/F");
+  //  tree->Branch("eta_sv", &eta_sv, "eta_sv/F");
+  //  tree->Branch("phi_sv", &phi_sv, "phi_sv/F");
 
-  tree->Branch("m_sv_puppi", &m_sv_puppi, "m_sv_puppi/F");
-  tree->Branch("pt_sv_puppi", &pt_sv_puppi, "pt_sv_puppi/F");
-  tree->Branch("eta_sv_puppi", &eta_sv_puppi, "eta_sv_puppi/F");
-  tree->Branch("phi_sv_puppi", &phi_sv_puppi, "phi_sv_puppi/F");
+  //  tree->Branch("m_sv_puppi", &m_sv_puppi, "m_sv_puppi/F");
+  //  tree->Branch("pt_sv_puppi", &pt_sv_puppi, "pt_sv_puppi/F");
+  //  tree->Branch("eta_sv_puppi", &eta_sv_puppi, "eta_sv_puppi/F");
+  //  tree->Branch("phi_sv_puppi", &phi_sv_puppi, "phi_sv_puppi/F");
+
+  tree->Branch("m_sv_mvamet",   &m_sv_mvamet,   "m_sv_mvamet/F");
+  tree->Branch("pt_sv_mvamet",  &pt_sv_mvamet,  "pt_sv_mvamet/F");
+  tree->Branch("eta_sv_mvamet", &eta_sv_mvamet, "eta_sv_mvamet/F");
+  tree->Branch("phi_sv_mvamet", &phi_sv_mvamet, "phi_sv_mvamet/F");
+
+  tree->Branch("m_sv_mvamet_uncorr",     &m_sv_mvamet_uncorr,    "m_sv_mvamet_uncorr/F");
+  tree->Branch("m_sv_mvamet_tauUp",      &m_sv_mvamet_tauUp,     "m_sv_mvamet_tauUp/F");
+  tree->Branch("m_sv_mvamet_tauDown",    &m_sv_mvamet_tauDown,   "m_sv_mvamet_tauDown/F");
+  tree->Branch("m_sv_mvamet_scaleUp",    &m_sv_mvamet_scaleUp,   "m_sv_mvamet_scaleUp/F");
+  tree->Branch("m_sv_mvamet_scaleDown",  &m_sv_mvamet_scaleDown, "m_sv_mvamet_scaleDown/F");
+  tree->Branch("m_sv_mvamet_resoUp",     &m_sv_mvamet_resoUp,    "m_sv_mvamet_resoUp/F");
+  tree->Branch("m_sv_mvamet_resoDown",   &m_sv_mvamet_resoDown,  "m_sv_mvamet_resoDown/F");
 
   tree->Branch("pt_tt", &pt_tt, "pt_tt/F");
   tree->Branch("pzetavis", &pzetavis, "pzetavis/F");
@@ -686,6 +632,31 @@ int main(int argc, char * argv[]) {
   tree->Branch("beta", &beta, "beta/F");
   tree->Branch("bphi", &bphi, "bphi/F");
   
+  tree->Branch("nuPx",&nuPx,"nuPx/F");
+  tree->Branch("nuPy",&nuPy,"nuPy/F");
+  tree->Branch("nuPz",&nuPz,"nuPz/F");
+  
+  tree->Branch("lepPx",&lepPx,"lepPx/F");
+  tree->Branch("lepPy",&lepPy,"lepPy/F");
+  tree->Branch("lepPz",&lepPz,"lepPz/F");
+
+  tree->Branch("bosonPx",&bosonPx,"bosonPx/F");
+  tree->Branch("bosonPy",&bosonPy,"bosonPy/F");
+  tree->Branch("bosonPz",&bosonPz,"bosonPz/F");
+  tree->Branch("bosonPt",&bosonPt,"bosonPt/F");
+
+  //  tree->Branch("Hresponse",&Hresponse,"Hresponse/F");
+  //  tree->Branch("Hparal",&Hparal,"Hparal/F");
+  //  tree->Branch("Hperp",&Hperp,"Hperp/F");
+
+  //  tree->Branch("Hresponse_Fast",&Hresponse_Fast,"Hresponse_Fast/F");
+  //  tree->Branch("Hparal_Fast",&Hparal_Fast,"Hparal_Fast/F");
+  //  tree->Branch("Hperp_Fast",&Hperp_Fast,"Hperp_Fast/F");
+
+  //  tree->Branch("Hresponse_Reco",&Hresponse_Reco,"Hresponse_Reco/F");
+  //  tree->Branch("Hparal_Reco",&Hparal_Reco,"Hparal_Reco/F");
+  //  tree->Branch("Hperp_Reco",&Hperp_Reco,"Hperp_Reco/F");
+
   int nTotalFiles = 0;
   std::string dummy;
   // count number of files --->
@@ -712,8 +683,8 @@ int main(int argc, char * argv[]) {
 
   // Official PU reweighting
   PileUp * PUofficial = new PileUp();
-  TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/Data_Pileup_2015D_Nov17.root","read");
-  TFile * filePUdistribution_MC = new TFile (TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/MC_Spring15_PU25_Startup.root","read");
+  TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/Data_Pileup_2015D_Feb02.root","read");
+  TFile * filePUdistribution_MC = new TFile (TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/MC_Fall15_PU25_V1.root","read");
   TH1D * PU_data = (TH1D *)filePUdistribution_data->Get("pileup");
   TH1D * PU_mc = (TH1D *)filePUdistribution_MC->Get("pileup");
   PUofficial->set_h_data(PU_data);
@@ -723,7 +694,38 @@ int main(int argc, char * argv[]) {
   ScaleFactor * SF_muonIdIso = new ScaleFactor();
   SF_muonIdIso->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(MuonIdIsoFile));
   ScaleFactor * SF_muonTrig = new ScaleFactor();
-  SF_muonTrig->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(MuonTriggerFile),"ZMassIsoMu");
+  SF_muonTrig->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(MuonTriggerFile));
+
+  // Recoil corrector and met systematics
+  RecoilCorrector recoilMvaMetCorrector(RecoilMvaFileName);
+  MEtSys metSys(MetSysFileName);
+
+  // SV fit mass
+  edm::FileInPath inputFileName_visPtResolution("TauAnalysis/SVfitStandalone/data/svFitVisMassAndPtResolutionPDF.root");
+  TH1::AddDirectory(false);  
+  TFile * inputFile_visPtResolution = new TFile(inputFileName_visPtResolution.fullPath().data());
+
+    // BTag scale factors
+  BTagCalibration calib("csvv2", cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/CSVv2.csv");
+  BTagCalibrationReader reader_BC(&calib,BTagEntry::OP_MEDIUM,"mujets","central");           // systematics type
+  BTagCalibrationReader reader_Light(&calib,BTagEntry::OP_MEDIUM,"incl","central");           // systematics type
+
+  //  std::cout << "SF_light (eta=0.6,pt=20.1) : " << reader_Light.eval(BTagEntry::FLAV_UDSG, 0.5, 20.1) << std::endl;
+  //  std::cout << "SF_light (eta=2.1,pt=20.1) : " << reader_Light.eval(BTagEntry::FLAV_UDSG, 2.1, 20.1) << std::endl;
+  //  std::cout << "SF_bc    (eta=0.6,pt=30.1) : " << reader_BC.eval(BTagEntry::FLAV_B, 0.5, 30.1) << std::endl;
+  //  std::cout << "SF_bc    (eta=2.1,pt=30.1) : " << reader_BC.eval(BTagEntry::FLAV_B, 2.1, 30.1) << std::endl;
+
+  TFile * fileTagging = new TFile(TString(cmsswBase)+TString("/src/DesyTauAnalyses/NTupleMaker/data/tagging_efficiencies.root"));
+  TH1F * tagEff_B = (TH1F*)fileTagging->Get("btag_eff_b");
+  TH1F * tagEff_C = (TH1F*)fileTagging->Get("btag_eff_c");
+  TH1F * tagEff_Light = (TH1F*)fileTagging->Get("btag_eff_oth");
+  TRandom3 rand;
+
+  float MaxBJetPt = 670.;
+  float MaxLJetPt = 1000.;
+  float MinLJetPt = 20.;
+  float MinBJetPt = 30.;
+
 
   int nEvents = 0;
   int selEvents = 0;
@@ -805,33 +807,225 @@ int main(int argc, char * argv[]) {
       isZMM = false;
       isZTT = false;
       bool isZfound = false;
+      bool isWfound = false;
+      bool isHfound = false;
 
-      //      cout << "Ok1" << endl;
+      nuPx = 0;
+      nuPy = 0;
+      nuPz = 0;
+
+      lepPx = 0;
+      lepPy = 0;
+      lepPz = 0;
+
+      bosonPx = 0;
+      bosonPy = 0;
+      bosonPz = 0;
+
+      std::vector<TLorentzVector> promptTausFirstCopy; promptTausFirstCopy.clear();
+      std::vector<TLorentzVector> promptTausLastCopy;  promptTausLastCopy.clear();
+      std::vector<TLorentzVector> promptElectrons; promptElectrons.clear();
+      std::vector<TLorentzVector> promptMuons; promptMuons.clear();
+      std::vector<TLorentzVector> promptNeutrinos; promptNeutrinos.clear();
+      std::vector<TLorentzVector> nonpromptNeutrinos; nonpromptNeutrinos.clear();
+      TLorentzVector promptTausLV; promptTausLV.SetXYZT(0,0,0,0);
+      TLorentzVector promptVisTausLV; promptVisTausLV.SetXYZT(0,0,0,0);
+      TLorentzVector zBosonLV; zBosonLV.SetXYZT(0,0,0,0);
+      TLorentzVector wBosonLV; wBosonLV.SetXYZT(0,0,0,0);
+      TLorentzVector hBosonLV; hBosonLV.SetXYZT(0,0,0,0);
+      TLorentzVector promptElectronsLV; promptElectronsLV.SetXYZT(0,0,0,0);
+      TLorentzVector promptMuonsLV; promptMuonsLV.SetXYZT(0,0,0,0);
+      TLorentzVector promptNeutrinosLV;  promptNeutrinosLV.SetXYZT(0,0,0,0);
+      TLorentzVector nonpromptNeutrinosLV;  nonpromptNeutrinosLV.SetXYZT(0,0,0,0);
+      TLorentzVector wDecayProductsLV; wDecayProductsLV.SetXYZT(0,0,0,0);
+      TLorentzVector fullVLV; fullVLV.SetXYZT(0,0,0,0);
+      TLorentzVector visVLV; visVLV.SetXYZT(0,0,0,0);
+      if (!isData) {
+	for (unsigned int igentau=0; igentau<analysisTree.gentau_count; ++igentau) {
+	  TLorentzVector tauLV; tauLV.SetXYZT(analysisTree.gentau_px[igentau],
+					      analysisTree.gentau_py[igentau],
+					      analysisTree.gentau_pz[igentau],
+					      analysisTree.gentau_e[igentau]);
+	  TLorentzVector tauVisLV; tauVisLV.SetXYZT(analysisTree.gentau_visible_px[igentau],
+						    analysisTree.gentau_visible_py[igentau],
+						    analysisTree.gentau_visible_pz[igentau],
+						    analysisTree.gentau_visible_e[igentau]);
+	  if (analysisTree.gentau_isPrompt[igentau]&&analysisTree.gentau_isFirstCopy[igentau]) {
+	    promptTausFirstCopy.push_back(tauLV);
+	    promptTausLV += tauLV;
+	    wDecayProductsLV += tauLV;
+	  }
+	  if (analysisTree.gentau_isPrompt[igentau]&&analysisTree.gentau_isLastCopy[igentau]) {	
+	    promptTausLastCopy.push_back(tauVisLV);
+	    promptVisTausLV += tauVisLV;
+	  }
+	}
+	
+	for (unsigned int igen=0; igen < analysisTree.genparticles_count; ++igen) {
+	  TLorentzVector genLV; genLV.SetXYZT(analysisTree.genparticles_px[igen],
+					      analysisTree.genparticles_py[igen],
+					      analysisTree.genparticles_pz[igen],
+					      analysisTree.genparticles_e[igen]);
+	  // bool isLepton =
+	  //   abs(analysisTree.genparticles_pdgid[igen])==11 ||
+	  //   abs(analysisTree.genparticles_pdgid[igen])==13;
+	  // bool isHardProcessFinalState = analysisTree.genparticles_fromHardProcess[igen]>0 && analysisTree.genparticles_status[igen]>0;
+	  // bool isNeutrino = 
+	  //   abs(analysisTree.genparticles_pdgid[igen])==12 ||
+	  //   abs(analysisTree.genparticles_pdgid[igen])==14 ||
+	  //   abs(analysisTree.genparticles_pdgid[igen])==16;
+	  // bool isDirectHardProcessTauDecayProduct = analysisTree.genparticles_isDirectHardProcessTauDecayProduct[igen]>0;
+	  // bool addFullV = ((isLepton||isNeutrino) &&isHardProcessFinalState) || isDirectHardProcessTauDecayProduct;
+	  // bool addVisV  = (isLepton && isHardProcessFinalState) || (isDirectHardProcessTauDecayProduct &&!isNeutrino);
+
+	  // if (addFullV) fullVLV += genLV;
+	  // if (addVisV) visVLV += genLV;
+
+	  if (analysisTree.genparticles_pdgid[igen]==23) { 
+	    isZfound = true;
+	    zBosonLV = genLV;
+	  }
+	  if (abs(analysisTree.genparticles_pdgid[igen])==24) { 
+	    isWfound = true;
+	    wBosonLV = genLV;
+	  }
+	  if (abs(analysisTree.genparticles_pdgid[igen])==25||
+	      abs(analysisTree.genparticles_pdgid[igen])==35||
+	      abs(analysisTree.genparticles_pdgid[igen])==36) {
+            isHfound = true;
+            hBosonLV = genLV;
+          }
+	  
+	  if (fabs(analysisTree.genparticles_pdgid[igen])==11) { 
+	    if (analysisTree.genparticles_isPrompt[igen]&&analysisTree.genparticles_status[igen]==1) {
+	      promptElectrons.push_back(genLV);
+	      promptElectronsLV += genLV;
+	      wDecayProductsLV += genLV;
+	    }
+	  }
+	  
+	  if (fabs(analysisTree.genparticles_pdgid[igen])==13) { 
+	    if (analysisTree.genparticles_isPrompt[igen]&&analysisTree.genparticles_status[igen]==1) {
+	      promptMuons.push_back(genLV);
+	      promptMuonsLV += genLV;
+	      wDecayProductsLV += genLV;
+	    }
+	  }
+	  
+	  if (fabs(analysisTree.genparticles_pdgid[igen])==12||
+	      fabs(analysisTree.genparticles_pdgid[igen])==14||
+	      fabs(analysisTree.genparticles_pdgid[igen])==16)  {
+	    if (analysisTree.genparticles_isPrompt[igen]&&
+		!analysisTree.genparticles_isDirectHardProcessTauDecayProduct[igen]&&
+		analysisTree.genparticles_status[igen]==1) {
+	      promptNeutrinos.push_back(genLV);
+	      promptNeutrinosLV += genLV;
+	      wDecayProductsLV += genLV;
+	    }
+	    if (analysisTree.genparticles_isDirectHardProcessTauDecayProduct[igen]&&
+		analysisTree.genparticles_status[igen]==1) {
+	      nonpromptNeutrinos.push_back(genLV);
+	      nonpromptNeutrinosLV += genLV;
+	    }
+	  }
+	}
+      }
+      /*      std::cout << "Taus (first copy) : " << promptTausFirstCopy.size() << std::endl;
+      std::cout << "Taus (last copy)  : " << promptTausLastCopy.size() << std::endl;
+      std::cout << "Muons             : " << promptMuons.size() << std::endl;
+      std::cout << "Electrons         : " << promptElectrons.size() << std::endl;
+      std::cout << "Neutrinos         : " << promptNeutrinos.size() << std::endl;
+      std::cout << "Neutrinos (Taus)  : " << nonpromptNeutrinos.size() << std::endl;
+      if (isZfound) 
+	std::cout << "ZBoson    px = " << zBosonLV.Px() 
+		  << "          py = " << zBosonLV.Py()
+		  << "          pz = " << zBosonLV.Pz() 
+		  << "          mass = " << zBosonLV.M() << std::endl;
+      if (isWfound) {
+	std::cout << "WBoson    px = " << wBosonLV.Px() 
+		  << "          py = " << wBosonLV.Py()
+		  << "          pz = " << wBosonLV.Pz() 
+		  << "          mass = " << wBosonLV.M() << std::endl;
+	std::cout << "W(Dec)    px = " << wDecayProductsLV.Px() 
+		  << "          py = " << wDecayProductsLV.Py()
+		  << "          pz = " << wDecayProductsLV.Pz() 
+		  << "          mass = " << wDecayProductsLV.M() << std::endl;
+      }
+      if (isHfound) 
+	std::cout << "HBoson    px = " << hBosonLV.Px()
+		  << "          py = " << hBosonLV.Py()
+		  << "          pz = " << hBosonLV.Pz() 
+		  << "          mass = " << hBosonLV.M() << std::endl;
+      std::cout << "Taus       px = " << promptTausLV.Px() 
+      		<< "           py = " << promptTausLV.Py()
+      		<< "           pz = " << promptTausLV.Pz() << std::endl;
+      std::cout << "VisTaus    px = " << promptVisTausLV.Px() 
+      		<< "           py = " << promptVisTausLV.Py()
+      		<< "           pz = " << promptVisTausLV.Pz() << std::endl;
+      std::cout << "Muons      px = " << promptMuonsLV.Px() 
+      		<< "           py = " << promptMuonsLV.Py()
+      		<< "           pz = " << promptMuonsLV.Pz() << std::endl;
+      std::cout << "Elect.     px = " << promptElectronsLV.Px() 
+      		<< "           py = " << promptElectronsLV.Py()
+      		<< "           pz = " << promptElectronsLV.Pz() << std::endl;
+      std::cout << "Neut.      pz = " << promptNeutrinosLV.Px()
+                << "           py = " << promptNeutrinosLV.Py()
+                << "           pz = " << promptNeutrinosLV.Pz() << std::endl;
+      std::cout << "Nu(tau)    px = " << nonpromptNeutrinosLV.Px()
+                << "           py = " << nonpromptNeutrinosLV.Py()
+                << "           pz = " << nonpromptNeutrinosLV.Pz() << std::endl;
+      TLorentzVector totTausLV = promptVisTausLV+nonpromptNeutrinosLV;
+      std::cout << "Taus(test) px = " << totTausLV.Px()
+		<< "           py = " << totTausLV.Py()
+		<< "           pz = " << totTausLV.Pz() << std::endl;
+      std::cout << std::endl; */
 
       if (isDY) {
-	for (unsigned int igentau=0; igentau<analysisTree.gentau_count; ++igentau) {
-	  if (analysisTree.gentau_isPrompt[igentau]) isZTT = true;
+	if (promptTausFirstCopy.size()==2) {
+	  bosonPx = promptTausLV.Px(); bosonPy = promptTausLV.Py(); bosonPz = promptTausLV.Pz();
+	  lepPx = promptVisTausLV.Px(); lepPy = promptVisTausLV.Py(); lepPz = promptVisTausLV.Pz();
 	}
-	for (unsigned int igen=0; igen < analysisTree.genparticles_count; ++igen) {
-	  if (analysisTree.genparticles_pdgid[igen]==23) isZfound = true;
-	  //	if (analysisTree.genparticles_pdgid[igen]==23 && analysisTree.genparticles_status[igen]==62) isZwithCode = true;
-	  //	if (analysisTree.genparticles_pdgid[igen]==23 && analysisTree.genparticles_info[igen]==11) isZEE = true;
-	  //	if (analysisTree.genparticles_pdgid[igen]==23 && analysisTree.genparticles_info[igen]==13) isZMM = true;
-	  //	if (analysisTree.genparticles_pdgid[igen]==23 && analysisTree.genparticles_info[igen]==15) isZTT = true;
-	  if (analysisTree.genparticles_isPrompt[igen]&&fabs(analysisTree.genparticles_pdgid[igen])==11) isZEE = true;
-	  if (analysisTree.genparticles_isPrompt[igen]&&fabs(analysisTree.genparticles_pdgid[igen])==13) isZMM = true;
+	else if (promptMuons.size()==2) {
+	  bosonPx = promptMuonsLV.Px(); bosonPy = promptMuonsLV.Py(); bosonPz = promptMuonsLV.Pz();
+	  lepPx = promptMuonsLV.Px(); lepPy = promptMuonsLV.Py(); lepPz = promptMuonsLV.Pz();
 	}
-	
-	isZLL = isZEE || isZMM;
-	
-	ALL->Fill(0.);
-	
-	if (isZEE) ZEE->Fill(0.);
-	if (isZMM) ZMM->Fill(0.);
-	if (isZTT) ZTT->Fill(0.);
-	if (!isZfound) GAM->Fill(0.);
+	else {
+	  bosonPx = promptElectronsLV.Px(); bosonPy = promptElectronsLV.Py(); bosonPz = promptElectronsLV.Pz();
+	  lepPx = promptElectronsLV.Px(); lepPy = promptElectronsLV.Py(); lepPz = promptElectronsLV.Pz();
+	}
       }
-
+      else if (isW) {
+	if (isWfound) {
+	  bosonPx = wBosonLV.Px(); bosonPy = wBosonLV.Py(); bosonPz = wBosonLV.Pz();
+	}
+	else {
+	  bosonPx = wDecayProductsLV.Px(); bosonPy = wDecayProductsLV.Py(); bosonPz = wDecayProductsLV.Pz();
+	}
+	if (promptTausLastCopy.size()==1) { 
+	  lepPx = promptVisTausLV.Px(); lepPy = promptVisTausLV.Py(); lepPz = promptVisTausLV.Pz();
+	}
+	else if (promptMuons.size()==1) { 
+	  lepPx = promptMuonsLV.Px(); lepPy = promptMuonsLV.Py(); lepPz = promptMuonsLV.Pz();
+	}
+	else { 
+	  lepPx = promptElectronsLV.Px(); lepPy = promptElectronsLV.Py(); lepPz = promptElectronsLV.Pz();
+	}
+      }
+      else {
+	TLorentzVector bosonLV = promptTausLV + promptMuonsLV + promptElectronsLV + promptNeutrinosLV;
+	bosonPx = bosonLV.Px(); bosonPy = bosonLV.Py(); bosonPz = bosonLV.Pz();
+	TLorentzVector lepLV = promptVisTausLV + promptMuonsLV + promptElectronsLV;
+	lepPx = lepLV.Px(); lepPy = lepLV.Py(); lepPz = lepLV.Pz();
+      }
+      bosonPt = TMath::Sqrt(bosonPx*bosonPx+bosonPy*bosonPy);
+      isZLL = isZEE || isZMM;
+      ALL->Fill(0.);
+	
+      if (isZEE) ZEE->Fill(0.);
+      if (isZMM) ZMM->Fill(0.);
+      if (isZTT) ZTT->Fill(0.);
+      if (!isZfound) GAM->Fill(0.);
+      
       //      cout << "Ok2" << endl;
 
       run = int(analysisTree.event_run);
@@ -912,28 +1106,14 @@ int main(int argc, char * argv[]) {
       unsigned int nBTagDiscriminant = 0;
       for (unsigned int iBTag=0; iBTag < analysisTree.run_btagdiscriminators->size(); ++iBTag) {
 	TString discr(analysisTree.run_btagdiscriminators->at(iBTag));
-	if (discr=BTagDiscriminator)
+	if (discr.Contains(BTagDiscriminator))
 	  nBTagDiscriminant = iBTag;
       }
-
-      //      std::cout << "Isomu      : " << IsoMuonLeg << " : " << nIsoMuonLeg << std::endl;
-      //      std::cout << "MuTauMuLeg   : " << MuonTauMuonLeg << " : " << nMuonTauMuonLeg << std::endl;
-      //      std::cout << "MuTauTauLeg  : " << MuonTauTauLeg << " : " << nMuonTauTauLeg << std::endl;
-      //      std::cout << "MuTauOverlap : " << MuonTauOverlap << " : " << nMuonTauOverlap << std::endl;
-      //      std::cout << std::endl;
-      //      continue;
-
-      // vertex cuts no needed
-      //      if (fabs(analysisTree.primvertex_z)>zVertexCut) continue;
-      //      if (analysisTree.primvertex_ndof<ndofVertexCut) continue;
-      //      float dVertex = (analysisTree.primvertex_x*analysisTree.primvertex_x+
-      //		       analysisTree.primvertex_y*analysisTree.primvertex_y);
-      //      if (dVertex>dVertexCut) continue;
 
       // tau selection
       vector<int> taus; taus.clear();
       for (unsigned int it = 0; it<analysisTree.tau_count; ++it) {
-	if (analysisTree.tau_decayModeFindingNewDMs[it]<=0.5) continue;
+	if (analysisTree.tau_decayModeFinding[it]<=0.5) continue;
 	if (analysisTree.tau_pt[it]<ptTauCut) continue;
 	if (fabs(analysisTree.tau_eta[it])>etaTauCut) continue;
 	if (fabs(analysisTree.tau_leadchargedhadrcand_dz[it])>dzTauCut) continue;
@@ -963,7 +1143,7 @@ int main(int argc, char * argv[]) {
       int muonIndex = -1;
 
       float isoMuMin = 1e+10;
-      float isoTauMin = 1e+10;
+      float isoTauMin = -10;
       float ptMu = 0;
       float ptTau = 0;
       //      if (muons.size()>1||electrons.size()>1)
@@ -1060,7 +1240,8 @@ int main(int argc, char * argv[]) {
 	  //          }
 	  //	  if (!isKinematicMatch) continue;
 
-	  float isoTau = analysisTree.tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[tIndex];
+	  //	  float isoTau = analysisTree.tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[tIndex];
+	  float isoTau = analysisTree.tau_byIsolationMVArun2v1DBoldDMwLTraw[tIndex];
 
 	  if (int(mIndex)!=muonIndex) {
 	    if (relIsoMu==isoMuMin) {
@@ -1090,7 +1271,7 @@ int main(int argc, char * argv[]) {
 		tauIndex = int(tIndex);
 	      }
 	    }
-	    else if (isoTau<isoTauMin) {
+	    else if (isoTau>isoTauMin) {
 	      ptTau = analysisTree.tau_pt[tIndex];
 	      isoTauMin = isoTau;
 	      tauIndex = int(tIndex);
@@ -1195,7 +1376,8 @@ int main(int argc, char * argv[]) {
  	  }
 	}
       }
-
+      //      cout << analysisTree.tau_byMediumCombinedIsolationDeltaBetaCorr3Hits[tauIndex] << endl;
+      //      cout << analysisTree.tau_byIsolationMVArun2v1DBoldDMwLTraw[tauIndex] << endl;
 
       // applying inclusive selection
       if (applyInclusiveSelection) {
@@ -1204,10 +1386,13 @@ int main(int argc, char * argv[]) {
 	if (extramuon_veto) continue;
 	if (dilepton_veto)  continue;
 
-	bool tauPass = analysisTree.tau_againstElectronVLooseMVA5[tauIndex]>0.5 &&
+	bool tauPass = 
+	  analysisTree.tau_againstElectronVLooseMVA6[tauIndex]>0.5 &&
+	  // analysisTree.tau_againstElectronVLooseMVA5[tauIndex]>0.5
 	  analysisTree.tau_againstMuonTight3[tauIndex]>0.5 &&
 	  //	  analysisTree.tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[tauIndex]<isoTauCut;
-	  analysisTree.tau_byMediumCombinedIsolationDeltaBetaCorr3Hits[tauIndex] > 0.5;
+	  //	  analysisTree.tau_byMediumCombinedIsolationDeltaBetaCorr3Hits[tauIndex] > 0.5;
+	  analysisTree.tau_byTightIsolationMVArun2v1DBoldDMwLT[tauIndex] > 0.5;
 	if (!tauPass) continue;
 	
 	bool muonPass = isoMuMin<isoMuonHighCut;
@@ -1241,8 +1426,8 @@ int main(int argc, char * argv[]) {
       metcov10 = analysisTree.pfmet_sigyx;
       metcov11 = analysisTree.pfmet_sigyy;
 
-      float mvamet_x = 0;
-      float mvamet_y = 0;
+      float mvamet_ex = 0;
+      float mvamet_ey = 0;
       mvamet = 0;
       mvametphi = 0;
       mvacov00 = 0;
@@ -1250,32 +1435,37 @@ int main(int argc, char * argv[]) {
       mvacov10 = 0;
       mvacov11 = 0;
 
-      // unsigned int metIndex = 0;
-      // bool mvaFound = false;
-      // if (analysisTree.mvamet_count>0) {
-      // 	for (unsigned int imva=0; imva<analysisTree.mvamet_count; ++imva) {
-      // 	  if (analysisTree.mvamet_channel[imva]==3) {
-      // 	    if (int(analysisTree.mvamet_lep1[imva])==tauIndex&&int(analysisTree.mvamet_lep2[imva])==muonIndex) {
-      // 	      metIndex = imva;
-      // 	      mvaFound = true;
-      // 	    }
-      // 	  }
-      // 	}
-      // }
-      
-      // if (analysisTree.mvamet_count>0) {
-      // 	mvamet_x = analysisTree.mvamet_ex[metIndex];
-      // 	mvamet_y = analysisTree.mvamet_ey[metIndex];
-      // 	float mvamet_x2 = mvamet_x * mvamet_x;
-      // 	float mvamet_y2 = mvamet_y * mvamet_y;
+      unsigned int metIndex = 0;
+      bool mvaFound = false;
+      if (analysisTree.mvamet_count>0) {
+       	for (unsigned int imva=0; imva<analysisTree.mvamet_count; ++imva) {
+       	  if (analysisTree.mvamet_channel[imva]==3) {
+       	    if (int(analysisTree.mvamet_lep1[imva])==tauIndex&&int(analysisTree.mvamet_lep2[imva])==muonIndex) {
+       	      metIndex = imva;
+       	      mvaFound = true;
+       	    }
+       	  }
+       	}
+      }
+      if (!mvaFound) {
+	cout << "Warning... mva Met is not found" << endl;
+      }
+
+      if (analysisTree.mvamet_count>0) {
+      	mvamet_ex = analysisTree.mvamet_ex[metIndex];
+      	mvamet_ey = analysisTree.mvamet_ey[metIndex];
+      	float mvamet_x2 = mvamet_ex * mvamet_ex;
+      	float mvamet_y2 = mvamet_ey * mvamet_ey;
 	
-      // 	mvamet = TMath::Sqrt(mvamet_x2+mvamet_y2);
-      // 	mvametphi = TMath::ATan2(mvamet_y,mvamet_x);
-      // 	mvacov00 = analysisTree.mvamet_sigxx[metIndex];
-      // 	mvacov01 = analysisTree.mvamet_sigxy[metIndex];
-      // 	mvacov10 = analysisTree.mvamet_sigyx[metIndex];
-      // 	mvacov11 = analysisTree.mvamet_sigyy[metIndex];
-      // }
+      	mvamet = TMath::Sqrt(mvamet_x2+mvamet_y2);
+      	mvametphi = TMath::ATan2(mvamet_ey,mvamet_ex);
+      	mvacov00 = analysisTree.mvamet_sigxx[metIndex];
+      	mvacov01 = analysisTree.mvamet_sigxy[metIndex];
+      	mvacov10 = analysisTree.mvamet_sigyx[metIndex];
+      	mvacov11 = analysisTree.mvamet_sigyy[metIndex];
+      }
+
+      //      std::cout << "Ok6" << std::endl;
 
       // filling muon variables
       pt_1 = analysisTree.muon_pt[muonIndex];
@@ -1289,17 +1479,6 @@ int main(int argc, char * argv[]) {
       dZ_1 = analysisTree.muon_dz[muonIndex];
       iso_1 = isoMuMin;
       m_1 = muonMass;
-      float dPhiMETMuon = dPhiFrom2P(analysisTree.muon_px[muonIndex],analysisTree.muon_py[muonIndex],
-				     pfmet_ex,pfmet_ey);
-      mt_1 = TMath::Sqrt(2*met*pt_1*(1-TMath::Cos(dPhiMETMuon)));
-      float dPhiPuppiMETMuon = dPhiFrom2P(analysisTree.muon_px[muonIndex],analysisTree.muon_py[muonIndex],
-					  puppimet_ex,puppimet_ey);
-      mt_puppi_1 = TMath::Sqrt(2*puppimet*pt_1*(1-TMath::Cos(dPhiPuppiMETMuon)));
-      // float dPhiMvaMETMuon = dPhiFrom2P(analysisTree.muon_px[muonIndex],analysisTree.muon_py[muonIndex],
-      // 					mvamet_x,mvamet_y);
-      // mt_mva_1 = TMath::Sqrt(2*mvamet*pt_1*(1-TMath::Cos(dPhiMvaMETMuon)));
-      mt_mva_1 = 0;
-
 
       // filling tau variables
       pt_2 = analysisTree.tau_pt[tauIndex];
@@ -1311,255 +1490,15 @@ int main(int argc, char * argv[]) {
       mva_2 = -9999;
       d0_2 = analysisTree.tau_leadchargedhadrcand_dxy[tauIndex];
       dZ_2 = analysisTree.tau_leadchargedhadrcand_dz[tauIndex];
-      iso_2 = isoTauMin;
+      iso_2 = analysisTree.tau_byTightIsolationMVArun2v1DBoldDMwLT[tauIndex];
       m_2 = analysisTree.tau_mass[tauIndex];
-      float dPhiMETTau = dPhiFrom2P(analysisTree.tau_px[tauIndex],analysisTree.tau_py[tauIndex],
-				    pfmet_ex,pfmet_ey);
-      mt_2 = TMath::Sqrt(2*met*pt_2*(1-TMath::Cos(dPhiMETTau)));
-      float dPhiPuppiMETTau = dPhiFrom2P(analysisTree.tau_px[tauIndex],analysisTree.tau_py[tauIndex],
-					 puppimet_ex,puppimet_ey);
-      mt_puppi_2 = TMath::Sqrt(2*puppimet*pt_2*(1-TMath::Cos(dPhiPuppiMETTau)));
-      // float dPhiMvaMETTau = dPhiFrom2P(analysisTree.tau_px[tauIndex],analysisTree.muon_py[tauIndex],
-      // 				       mvamet_x,mvamet_y);
-      // mt_mva_2 = TMath::Sqrt(2*mvamet*pt_2*(1-TMath::Cos(dPhiMvaMETTau)));
-      mt_mva_2 = 0;
-      decayMode_2 = analysisTree.tau_decayMode[tauIndex];
-
-      gen_match_1 = 6;
-      gen_match_2 = 6;
-
-      //      cout << "Ok7" << endl;
-
-      if (isDY) {
-
-	isZTT = false;
-	isZL  = false;
-	isZJ  = false;
-
-	float minDR_1 = 0.2;
-	float minDR_2 = 0.2;
-	for (unsigned int igen=0; igen < analysisTree.genparticles_count; ++igen) {
-	  float ptGen = PtoPt(analysisTree.genparticles_px[igen],
-			      analysisTree.genparticles_py[igen]);
-	  bool type1 = abs(analysisTree.genparticles_pdgid[igen])==11 && analysisTree.genparticles_isPrompt[igen] && ptGen>8;
-	  bool type2 = abs(analysisTree.genparticles_pdgid[igen])==13 && analysisTree.genparticles_isPrompt[igen] && ptGen>8;
-	  bool type3 = abs(analysisTree.genparticles_pdgid[igen])==11 && analysisTree.genparticles_isDirectPromptTauDecayProduct[igen] && ptGen>8;
-	  bool type4 = abs(analysisTree.genparticles_pdgid[igen])==13 && analysisTree.genparticles_isDirectPromptTauDecayProduct[igen] && ptGen>8;
-	  bool isAnyType = type1 || type2 || type3 || type4;
-	  if (isAnyType) {
-	    float etaGen = PtoEta(analysisTree.genparticles_px[igen],
-				  analysisTree.genparticles_py[igen],
-				  analysisTree.genparticles_pz[igen]);
-	    float phiGen = PtoPhi(analysisTree.genparticles_px[igen],
-				  analysisTree.genparticles_py[igen]);
-	    float deltaR_1 = deltaR(analysisTree.muon_eta[muonIndex],analysisTree.muon_phi[muonIndex],
-				    etaGen,phiGen);
-	    if (deltaR_1<minDR_1) {
-	      minDR_1 = deltaR_1;
-	      if (type1) gen_match_1 = 1;
-	      else if (type2) gen_match_1 = 2;
-	      else if (type3) gen_match_1 = 3;
-	      else if (type4) gen_match_1 = 4;
-	    }
-	    
-	    float deltaR_2 = deltaR(analysisTree.tau_eta[tauIndex],analysisTree.tau_phi[tauIndex],
-				    etaGen,phiGen);
-	    if (deltaR_2<minDR_2) {
-	      minDR_2 = deltaR_2;
-	      if (type1) gen_match_2 = 1;
-	      else if (type2) gen_match_2 = 2;
-	      else if (type3) gen_match_2 = 3;
-	      else if (type4) gen_match_2 = 4;
-	    }
-	  }
-	}
-	for (unsigned int igen=0; igen < analysisTree.gentau_count; ++igen) {
-	  if (analysisTree.gentau_visibleNoLep_pt[igen]>15.) {
-	    float deltaR_1 = deltaR(analysisTree.muon_eta[muonIndex],analysisTree.muon_phi[muonIndex],
-				    analysisTree.gentau_visibleNoLep_eta[igen],analysisTree.gentau_visibleNoLep_phi[igen]);
-	    if (deltaR_1<minDR_1) {
-	      minDR_1 = deltaR_1;
-	      gen_match_1 = 5;
-	    }
-	    float deltaR_2 = deltaR(analysisTree.tau_eta[tauIndex],analysisTree.tau_phi[tauIndex],
-				    analysisTree.gentau_visibleNoLep_eta[igen],analysisTree.gentau_visibleNoLep_phi[igen]);
-	    if (deltaR_2<minDR_2) {
-	      minDR_2 = deltaR_2;
-	      gen_match_2 = 5;
-	    }
-	  }
-	}
-	if (gen_match_2==5) isZTT = true;
-	else if (gen_match_2==6) isZJ = true;
-	else isZL = true;
-	isZLL = isZL || isZJ;
-      }
-
-      // muon scale factors
-      isoweight_1 = (float)SF_muonIdIso->get_ScaleFactor(double(pt_1),double(eta_1));
-      trigweight_1 = (float)SF_muonTrig->get_ScaleFactor(double(pt_1),double(eta_1));
-      effweight = isoweight_1*trigweight_1;
-
-      int tau_decayMode = analysisTree.tau_decayMode[tauIndex];
-
-      m_sv = -9999;
-      pt_sv = -9999;
-      eta_sv = -9999;
-      phi_sv = -9999;
-
-      m_sv_puppi = -9999;
-      pt_sv_puppi = -9999;
-      eta_sv = -9999;
-      phi_sv = -9999;
-
-
-      bool validDecayMode = tau_decayMode<=4 || tau_decayMode>=10; // excluding 2prongs
-
-      //      if (computeDitauMass && validDecayMode) {
-      if (computeDitauMass) {
-	// computing SV fit mass
-
-	// define MET
-	double measuredMETx = analysisTree.pfmet_ex;
-	double measuredMETy = analysisTree.pfmet_ey;
-	// define MET covariance
-	TMatrixD covMET(2, 2);
-	covMET[0][0] =  analysisTree.pfmet_sigxx;
-	covMET[1][0] =  analysisTree.pfmet_sigxy;
-	covMET[0][1] =  analysisTree.pfmet_sigyx;
-	covMET[1][1] =  analysisTree.pfmet_sigyy;
-	// define lepton four vectors
-	std::vector<svFitStandalone::MeasuredTauLepton> measuredTauLeptons;
-	measuredTauLeptons.push_back(svFitStandalone::MeasuredTauLepton(svFitStandalone::kTauToMuDecay, 
-									pt_1, eta_1, phi_1, muonMass)); // tau -> muon decay (Pt, eta, phi, mass)
-	//	if (tau_decayMode>11) tau_decayMode = 11;
-	//	if (tau_decayMode>2&&tau_decayMode<10) tau_decayMode = 2;
-	float tauMass = m_2;
-	if (tau_decayMode==0) tauMass = pionMass;
-	//	std::cout << "Tau decay mode = " << tau_decayMode << std::endl;
-	measuredTauLeptons.push_back(svFitStandalone::MeasuredTauLepton(svFitStandalone::kTauToHadDecay,  
-									pt_2, eta_2, phi_2, tauMass, tau_decayMode)); // tau -> hadronic decay (Pt, eta, phi, mass, pat::Tau.decayMode())
-
-	// svfit mass pfmet --->
-	SVfitStandaloneAlgorithm algo(measuredTauLeptons, measuredMETx, measuredMETy, covMET, 0);
-	algo.addLogM(false);  
-	edm::FileInPath inputFileName_visPtResolution("TauAnalysis/SVfitStandalone/data/svFitVisMassAndPtResolutionPDF.root");
-	TH1::AddDirectory(false);  
-	TFile* inputFile_visPtResolution = new TFile(inputFileName_visPtResolution.fullPath().data());
-	if (validDecayMode)
-	  algo.shiftVisPt(true, inputFile_visPtResolution);
-	else
-	  algo.shiftVisPt(false,inputFile_visPtResolution);
-	algo.integrateMarkovChain();
-	
-	m_sv = algo.getMass(); // return value is in units of GeV
-	if ( algo.isValidSolution() ) {
-	  //	  std::cout << "SVfit mass (pfmet)    = " << m_sv << std::endl;
-	} else {
-	  std::cout << "sorry -- status of NLL is not valid [" << algo.isValidSolution() << "]" << std::endl;
-	}
-	
-	pt_sv = algo.pt(); 
-	eta_sv = algo.eta();
-	phi_sv = algo.phi();
-
-	delete inputFile_visPtResolution;
-
-	// svfit mass puppimet --->
-	double measuredPuppiMETx = analysisTree.puppimet_ex;
-	double measuredPuppiMETy = analysisTree.puppimet_ey;
-	SVfitStandaloneAlgorithm algoX(measuredTauLeptons, measuredPuppiMETx, measuredPuppiMETy, covMET, 0);
-	//	SVfitStandaloneAlgorithm algoX(measuredTauLeptons, measuredMETx, measuredMETy, covMET, 0);
-	algoX.addLogM(false);  
-	//	edm::FileInPath inputFileName_visPtResolution("TauAnalysis/SVfitStandalone/data/svFitVisMassAndPtResolutionPDF.root");
-	TH1::AddDirectory(false);  
-	inputFile_visPtResolution = new TFile(inputFileName_visPtResolution.fullPath().data());
-	if (validDecayMode)
-	  algoX.shiftVisPt(true, inputFile_visPtResolution);
-	else
-	  algoX.shiftVisPt(false,inputFile_visPtResolution);
-	algoX.integrateMarkovChain();
-	
-	m_sv_puppi = algoX.getMass(); // return value is in units of GeV
-	if ( algo.isValidSolution() ) {
-	  //	  std::cout << "SVfit mass (puppimet) = " << m_sv << std::endl;
-	} else {
-	  std::cout << "sorry -- status of NLL is not valid [" << algo.isValidSolution() << "]" << std::endl;
-	}
-	
-	pt_sv_puppi = algoX.pt(); 
-	eta_sv_puppi = algoX.eta();
-	phi_sv_puppi = algoX.phi();
-
-	delete inputFile_visPtResolution;
-
-      }
-
-      byCombinedIsolationDeltaBetaCorrRaw3Hits_2 = analysisTree.tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[tauIndex];
-      byLooseCombinedIsolationDeltaBetaCorr3Hits_2 = analysisTree.tau_byLooseCombinedIsolationDeltaBetaCorr3Hits[tauIndex];
-      byMediumCombinedIsolationDeltaBetaCorr3Hits_2 = analysisTree.tau_byMediumCombinedIsolationDeltaBetaCorr3Hits[tauIndex];
-      byTightCombinedIsolationDeltaBetaCorr3Hits_2 = analysisTree.tau_byTightCombinedIsolationDeltaBetaCorr3Hits[tauIndex];
-      againstElectronLooseMVA5_2 = analysisTree.tau_againstElectronLooseMVA5[tauIndex];
-      againstElectronMediumMVA5_2 = analysisTree.tau_againstElectronMediumMVA5[tauIndex];
-      againstElectronTightMVA5_2 = analysisTree.tau_againstElectronTightMVA5[tauIndex];
-      againstElectronVLooseMVA5_2 = analysisTree.tau_againstElectronVLooseMVA5[tauIndex];
-      againstElectronVTightMVA5_2 = analysisTree.tau_againstElectronVTightMVA5[tauIndex];
-      againstMuonLoose3_2 = analysisTree.tau_againstMuonLoose3[tauIndex];
-      againstMuonTight3_2 = analysisTree.tau_againstMuonTight3[tauIndex];
-
-      TLorentzVector muonLV; muonLV.SetXYZM(analysisTree.muon_px[muonIndex],
-					    analysisTree.muon_py[muonIndex],
-					    analysisTree.muon_pz[muonIndex],
-					    muonMass);
-
-      TLorentzVector tauLV; tauLV.SetXYZT(analysisTree.tau_px[tauIndex],
-					  analysisTree.tau_py[tauIndex],
-					  analysisTree.tau_pz[tauIndex],
-					  analysisTree.tau_e[tauIndex]);
-
-      TLorentzVector dileptonLV = muonLV + tauLV;
-
-      // visible mass
-      m_vis = dileptonLV.M();
-      // visible ditau pt 
-      pt_tt = dileptonLV.Pt();
-
-      // bisector of electron and muon transverse momenta
-      float tauUnitX = tauLV.Px()/tauLV.Pt();
-      float tauUnitY = tauLV.Py()/tauLV.Pt();
-	
-      float muonUnitX = muonLV.Px()/muonLV.Pt();
-      float muonUnitY = muonLV.Py()/muonLV.Pt();
-
-      float zetaX = tauUnitX + muonUnitX;
-      float zetaY = tauUnitY + muonUnitY;
-      
-      float normZeta = TMath::Sqrt(zetaX*zetaX+zetaY*zetaY);
-
-      zetaX = zetaX/normZeta;
-      zetaY = zetaY/normZeta;
-
-      // choosing mva met
-      //      unsigned int metEMu = 0;
-      //      for (unsigned int iMet=0; iMet<analysisTree.mvamet_count; ++iMet) {
-      //	if (analysisTree.mvamet_channel[iMet]==1) metEMu = iMet;
-      //      }
-
-
-      float vectorX = analysisTree.pfmet_ex + muonLV.Px() + tauLV.Px();
-      float vectorY = analysisTree.pfmet_ey + muonLV.Py() + tauLV.Py();
-      
-      float vectorVisX = muonLV.Px() + tauLV.Px();
-      float vectorVisY = muonLV.Py() + tauLV.Py();
-
-      // computation of DZeta variable
-      pzetamiss = analysisTree.pfmet_ex*zetaX + analysisTree.pfmet_ey*zetaY;
-      pzetavis  = vectorVisX*zetaX + vectorVisY*zetaY;
 
       // counting jets
       vector<unsigned int> jets; jets.clear();
+      vector<unsigned int> jetshad; jetshad.clear();
       vector<unsigned int> jetspt20; jetspt20.clear();
       vector<unsigned int> bjets; bjets.clear();
+      vector<unsigned int> hadjets; hadjets.clear();
 
       int indexLeadingJet = -1;
       float ptLeadingJet = -1;
@@ -1572,11 +1511,17 @@ int main(int argc, char * argv[]) {
 
       for (unsigned int jet=0; jet<analysisTree.pfjet_count; ++jet) {
 
+	float jetEta = analysisTree.pfjet_eta[jet];
+
 	float absJetEta = fabs(analysisTree.pfjet_eta[jet]);
 	if (absJetEta>jetEtaCut) continue;
 
 	float jetPt = analysisTree.pfjet_pt[jet];
 	if (jetPt<jetPtLowCut) continue;
+
+	// jetId
+	bool isPFJetId = looseJetiD(analysisTree,int(jet));
+	if (!isPFJetId) continue;
 
 	float dR1 = deltaR(analysisTree.pfjet_eta[jet],analysisTree.pfjet_phi[jet],
 			   eta_1,phi_1);
@@ -1586,44 +1531,76 @@ int main(int argc, char * argv[]) {
                            eta_2,phi_2);
         if (dR2<dRJetLeptonCut) continue;
 
-	// jetId
-	float energy = analysisTree.pfjet_e[jet];
-        float chf = analysisTree.pfjet_chargedhadronicenergy[jet]/energy;
-        float nhf = analysisTree.pfjet_neutralhadronicenergy[jet]/energy;
-        float phf = analysisTree.pfjet_neutralemenergy[jet]/energy;
-        float elf = analysisTree.pfjet_chargedemenergy[jet]/energy;
-        unsigned int chm = analysisTree.pfjet_chargedmulti[jet];
-	unsigned int nem = analysisTree.pfjet_neutralmulti[jet];
-        unsigned int npr = chm + nem;
-	bool isPFJetId = (npr>1 && phf<0.99 && nhf<0.99) && (absJetEta>2.4 || (elf<0.99 && chf>0 && chm>0 && absJetEta<=2.4)) && absJetEta<=3.0;
-	if (absJetEta>3.0)
-	  isPFJetId = phf<0.90 && nem>10 && absJetEta>3.0;
-	if (!isPFJetId) continue;
-
 	jetspt20.push_back(jet);
-
-	if (absJetEta<bJetEtaCut && analysisTree.pfjet_btag[jet][nBTagDiscriminant]>btagCut) { // b-jet
-	  bjets.push_back(jet);
-	  if (jetPt>ptLeadingBJet) {
-	    ptLeadingBJet = jetPt;
-	    indexLeadingBJet = jet;
+	  
+	
+	if (absJetEta<bJetEtaCut) { // jet within b-tagging acceptance
+	  
+	  bool tagged = analysisTree.pfjet_btag[jet][nBTagDiscriminant]>btagCut; // b-jet
+	  
+	  if (!isData) {
+	    int flavor = abs(analysisTree.pfjet_flavour[jet]);
+	    
+	    double jet_scalefactor = 1;
+	    double JetPtForBTag = jetPt;
+	    double tageff = 1;
+	    
+	    if (flavor==5) {
+	      if (JetPtForBTag>MaxBJetPt) JetPtForBTag = MaxBJetPt - 0.1;
+	      if (JetPtForBTag<MinBJetPt) JetPtForBTag = MinBJetPt + 0.1;
+	      jet_scalefactor = reader_BC.eval(BTagEntry::FLAV_B, absJetEta, JetPtForBTag);
+	      tageff = tagEff_B->Interpolate(JetPtForBTag,absJetEta);
+	    }
+	    else if (flavor==4) {
+	      if (JetPtForBTag>MaxBJetPt) JetPtForBTag = MaxBJetPt - 0.1;
+	      if (JetPtForBTag<MinBJetPt) JetPtForBTag = MinBJetPt + 0.1;
+	      jet_scalefactor = reader_BC.eval(BTagEntry::FLAV_C, absJetEta, JetPtForBTag);
+	      tageff = tagEff_C->Interpolate(JetPtForBTag,absJetEta);
+	    }
+	    else {
+	      if (JetPtForBTag>MaxLJetPt) JetPtForBTag = MaxLJetPt - 0.1;
+	      if (JetPtForBTag<MinLJetPt) JetPtForBTag = MinLJetPt + 0.1;
+	      jet_scalefactor = reader_Light.eval(BTagEntry::FLAV_UDSG, absJetEta, JetPtForBTag);
+	      tageff = tagEff_Light->Interpolate(JetPtForBTag,absJetEta);
+	    }
+	    
+	    if (tageff<1e-5)      tageff = 1e-5;
+	    if (tageff>0.99999)   tageff = 0.99999;
+	    rand.SetSeed((int)((jetEta+5)*100000));
+	    double rannum = rand.Rndm();
+	    
+	    if (jet_scalefactor<1 && tagged) { // downgrade
+	      double fraction = 1-jet_scalefactor;
+	      if (rannum<fraction) {
+		tagged = false;
+		//		std::cout << "downgrading " << std::endl;
+	      }
+	    }
+	    if (jet_scalefactor>1 && !tagged) { // upgrade
+	      double fraction = (jet_scalefactor-1.0)/(1.0/tageff-1.0);
+	      if (rannum<fraction) { 
+		tagged = true;
+		//		std::cout << "upgrading " << std::endl;
+	      }
+	    }
 	  }
-	} 
+	}
 
 	if (jetPt>jetPtHighCut)
 	  jets.push_back(jet);
-
+	
 	if (indexLeadingJet>=0) {
 	  if (jetPt<ptLeadingJet&&jetPt>ptSubLeadingJet) {
 	    indexSubLeadingJet = jet;
 	    ptSubLeadingJet = jetPt;
 	  }
 	}
-
+	
 	if (jetPt>ptLeadingJet) {
 	  indexLeadingJet = jet;
 	  ptLeadingJet = jetPt;
 	}
+
       }
 	
       njets = jets.size();
@@ -1710,9 +1687,440 @@ int main(int argc, char * argv[]) {
 	  if (index!=indexLeadingJet&&index!=indexSubLeadingJet&&etaX>etamin&&etaX<etamax) 
 	    njetingap++;
 	}
-
-
       }
+      float mvamet_uncorr_ex =  mvamet_ex;
+      float mvamet_uncorr_ey =  mvamet_ey;
+      float mvamet_uncorr    =  mvamet;
+      float mvametphi_uncorr =  mvametphi;
+
+      float mvamet_corr_ex =  mvamet_ex;
+      float mvamet_corr_ey =  mvamet_ey;
+      int njetsforrecoil = njets;
+      if (isW) njetsforrecoil = njets + 1;
+      if ((isDY||isW)&&!isData)
+	recoilMvaMetCorrector.CorrectByMeanResolution(mvamet_ex,mvamet_ey,bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,mvamet_corr_ex,mvamet_corr_ey);
+
+      mvamet_ex = mvamet_corr_ex;
+      mvamet_ex = mvamet_corr_ex;
+      float mvamet_ex2 = mvamet_ex*mvamet_ex;
+      float mvamet_ey2 = mvamet_ey*mvamet_ey;
+      mvamet = TMath::Sqrt(mvamet_ex2+mvamet_ey2);
+      mvametphi = TMath::ATan2(mvamet_ey,mvamet_ex);
+
+      int bkgdType = 0;
+      if (isDY||isW)
+	bkgdType = MEtSys::ProcessType::BOSON;
+      else if (isTOP)
+	bkgdType = MEtSys::ProcessType::TOP;
+      else 
+	bkgdType = MEtSys::ProcessType::EWK; 
+
+
+      float mvamet_scaleUp_ex = mvamet_ex;
+      float mvamet_scaleUp_ey = mvamet_ey;
+      float mvamet_scaleDown_ex = mvamet_ex;
+      float mvamet_scaleDown_ey = mvamet_ey;
+      float mvamet_resoUp_ex = mvamet_ex;
+      float mvamet_resoUp_ey = mvamet_ey;
+      float mvamet_resoDown_ex = mvamet_ex;
+      float mvamet_resoDown_ey = mvamet_ey;
+
+      if (!isData) {
+	metSys.ApplyMEtSys(mvamet_ex,mvamet_ey,
+			   bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,bkgdType,
+			   MEtSys::SysType::Response,MEtSys::SysShift::Up,
+			   mvamet_scaleUp_ex,mvamet_scaleUp_ey);
+	metSys.ApplyMEtSys(mvamet_ex,mvamet_ey,
+			   bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,bkgdType,
+			   MEtSys::SysType::Response,MEtSys::SysShift::Down,
+			   mvamet_scaleDown_ex,mvamet_scaleDown_ey);
+	metSys.ApplyMEtSys(mvamet_ex,mvamet_ey,
+			   bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,bkgdType,
+			   MEtSys::SysType::Resolution,MEtSys::SysShift::Up,
+			   mvamet_resoUp_ex,mvamet_resoUp_ey);
+	metSys.ApplyMEtSys(mvamet_corr_ex,mvamet_corr_ey,
+			   bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,bkgdType,
+			   MEtSys::SysType::Resolution,MEtSys::SysShift::Down,
+			   mvamet_resoDown_ex,mvamet_resoDown_ey);
+      }
+      mvamet_scaleUp = TMath::Sqrt(mvamet_scaleUp_ex*mvamet_scaleUp_ex+
+				   mvamet_scaleUp_ey*mvamet_scaleUp_ey);
+      mvametphi_scaleUp = TMath::ATan2(mvamet_scaleUp_ey,mvamet_scaleUp_ex);
+      
+      mvamet_scaleDown = TMath::Sqrt(mvamet_scaleDown_ex*mvamet_scaleDown_ex+
+				     mvamet_scaleDown_ey*mvamet_scaleDown_ey);
+      mvametphi_scaleDown = TMath::ATan2(mvamet_scaleDown_ey,mvamet_scaleDown_ex);
+      
+      mvamet_resoUp = TMath::Sqrt(mvamet_resoUp_ex*mvamet_resoUp_ex+
+				  mvamet_resoUp_ey*mvamet_resoUp_ey);
+      mvametphi_resoUp = TMath::ATan2(mvamet_resoUp_ey,mvamet_resoUp_ex);
+      
+      mvamet_resoDown = TMath::Sqrt(mvamet_resoDown_ex*mvamet_resoDown_ex+
+				    mvamet_resoDown_ey*mvamet_resoDown_ey);
+      mvametphi_resoDown = TMath::ATan2(mvamet_resoDown_ey,mvamet_resoDown_ex);
+
+
+      // printf("Uncorrected    :  %7.2f  %7.2f\n",mvamet_ex,mvamet_ey);
+      // printf("Central        :  %7.2f  %7.2f\n",mvamet_corr_ex,mvamet_corr_ey);
+      // printf("ScaleUp        :  %7.2f  %7.2f\n",mvamet_scaleUp_ex,mvamet_scaleUp_ey);
+      // printf("ScaleDown      :  %7.2f  %7.2f\n",mvamet_scaleDown_ex,mvamet_scaleDown_ey);
+      // printf("ResoUp         :  %7.2f  %7.2f\n",mvamet_resoUp_ex,mvamet_resoUp_ey);
+      // printf("ResoDown       :  %7.2f  %7.2f\n",mvamet_resoDown_ex,mvamet_resoDown_ey);
+      // std::cout << std::endl;
+
+
+      // met related variables
+
+      float dPhiMETMuon = dPhiFrom2P(analysisTree.muon_px[muonIndex],analysisTree.muon_py[muonIndex],
+				     pfmet_ex,pfmet_ey);
+      mt_1 = TMath::Sqrt(2*met*pt_1*(1-TMath::Cos(dPhiMETMuon)));
+
+      float dPhiPuppiMETMuon = dPhiFrom2P(analysisTree.muon_px[muonIndex],analysisTree.muon_py[muonIndex],
+					  puppimet_ex,puppimet_ey);
+      mt_puppi_1 = TMath::Sqrt(2*puppimet*pt_1*(1-TMath::Cos(dPhiPuppiMETMuon)));
+
+      float dPhiMvaMETMuon = dPhiFrom2P(analysisTree.muon_px[muonIndex],analysisTree.muon_py[muonIndex],
+       					mvamet_ex,mvamet_ey);
+      mt_mva_1 = TMath::Sqrt(2*mvamet*pt_1*(1-TMath::Cos(dPhiMvaMETMuon)));
+
+      dPhiMvaMETMuon = dPhiFrom2P(analysisTree.muon_px[muonIndex],analysisTree.muon_py[muonIndex],
+				  mvamet_uncorr_ex,mvamet_uncorr_ey);
+      mt_mva_uncorr_1 = TMath::Sqrt(2*mvamet_uncorr*pt_1*(1-TMath::Cos(dPhiMvaMETMuon)));
+
+      
+      dPhiMvaMETMuon = dPhiFrom2P(analysisTree.muon_px[muonIndex],analysisTree.muon_py[muonIndex],
+				  mvamet_resoUp_ex,mvamet_resoUp_ey);
+      mt_mva_resoUp_1 = TMath::Sqrt(2*mvamet_resoUp*pt_1*(1-TMath::Cos(dPhiMvaMETMuon)));      
+
+      dPhiMvaMETMuon = dPhiFrom2P(analysisTree.muon_px[muonIndex],analysisTree.muon_py[muonIndex],
+				  mvamet_resoDown_ex,mvamet_resoDown_ey);
+      mt_mva_resoDown_1 = TMath::Sqrt(2*mvamet_resoDown*pt_1*(1-TMath::Cos(dPhiMvaMETMuon)));      
+
+      dPhiMvaMETMuon = dPhiFrom2P(analysisTree.muon_px[muonIndex],analysisTree.muon_py[muonIndex],
+				  mvamet_scaleUp_ex,mvamet_scaleUp_ey);
+      mt_mva_scaleUp_1 = TMath::Sqrt(2*mvamet_scaleUp*pt_1*(1-TMath::Cos(dPhiMvaMETMuon)));      
+
+      dPhiMvaMETMuon = dPhiFrom2P(analysisTree.muon_px[muonIndex],analysisTree.muon_py[muonIndex],
+				  mvamet_scaleDown_ex,mvamet_scaleDown_ey);
+      mt_mva_scaleDown_1 = TMath::Sqrt(2*mvamet_scaleDown*pt_1*(1-TMath::Cos(dPhiMvaMETMuon)));      
+
+
+
+      float dPhiMETTau = dPhiFrom2P(analysisTree.tau_px[tauIndex],analysisTree.tau_py[tauIndex],
+				    pfmet_ex,pfmet_ey);
+      mt_2 = TMath::Sqrt(2*met*pt_2*(1-TMath::Cos(dPhiMETTau)));
+      float dPhiPuppiMETTau = dPhiFrom2P(analysisTree.tau_px[tauIndex],analysisTree.tau_py[tauIndex],
+					 puppimet_ex,puppimet_ey);
+      mt_puppi_2 = TMath::Sqrt(2*puppimet*pt_2*(1-TMath::Cos(dPhiPuppiMETTau)));
+      float dPhiMvaMETTau = dPhiFrom2P(analysisTree.tau_px[tauIndex],analysisTree.muon_py[tauIndex],
+       				       mvamet_ex,mvamet_ey);
+      mt_mva_2 = TMath::Sqrt(2*mvamet*pt_2*(1-TMath::Cos(dPhiMvaMETTau)));
+      mt_mva_2 = 0;
+      decayMode_2 = analysisTree.tau_decayMode[tauIndex];
+
+      //      std::cout << "Ok7" << std::endl;
+
+      gen_match_1 = 6;
+      gen_match_2 = 6;
+
+      isZTT = false;
+      isZL  = false;
+      isZJ  = false;
+
+      float minDR_1 = 0.2;
+      float minDR_2 = 0.2;
+      if (!isData) {
+	for (unsigned int igen=0; igen < analysisTree.genparticles_count; ++igen) {
+	  float ptGen = PtoPt(analysisTree.genparticles_px[igen],
+			      analysisTree.genparticles_py[igen]);
+	  bool type1 = abs(analysisTree.genparticles_pdgid[igen])==11 && analysisTree.genparticles_isPrompt[igen] && ptGen>8;
+	  bool type2 = abs(analysisTree.genparticles_pdgid[igen])==13 && analysisTree.genparticles_isPrompt[igen] && ptGen>8;
+	  bool type3 = abs(analysisTree.genparticles_pdgid[igen])==11 && analysisTree.genparticles_isDirectPromptTauDecayProduct[igen] && ptGen>8;
+	  bool type4 = abs(analysisTree.genparticles_pdgid[igen])==13 && analysisTree.genparticles_isDirectPromptTauDecayProduct[igen] && ptGen>8;
+	  bool isAnyType = type1 || type2 || type3 || type4;
+	  if (isAnyType) {
+	    float etaGen = PtoEta(analysisTree.genparticles_px[igen],
+				  analysisTree.genparticles_py[igen],
+				  analysisTree.genparticles_pz[igen]);
+	    float phiGen = PtoPhi(analysisTree.genparticles_px[igen],
+				  analysisTree.genparticles_py[igen]);
+	    float deltaR_1 = deltaR(analysisTree.muon_eta[muonIndex],analysisTree.muon_phi[muonIndex],
+				    etaGen,phiGen);
+	    if (deltaR_1<minDR_1) {
+	      minDR_1 = deltaR_1;
+	      if (type1) gen_match_1 = 1;
+	      else if (type2) gen_match_1 = 2;
+	      else if (type3) gen_match_1 = 3;
+	      else if (type4) gen_match_1 = 4;
+	    }
+	    
+	    float deltaR_2 = deltaR(analysisTree.tau_eta[tauIndex],analysisTree.tau_phi[tauIndex],
+				    etaGen,phiGen);
+	    if (deltaR_2<minDR_2) {
+	      minDR_2 = deltaR_2;
+	      if (type1) gen_match_2 = 1;
+	      else if (type2) gen_match_2 = 2;
+	      else if (type3) gen_match_2 = 3;
+	      else if (type4) gen_match_2 = 4;
+	    }
+	  }
+	}
+	for (unsigned int igen=0; igen < analysisTree.gentau_count; ++igen) {
+	  if (analysisTree.gentau_visibleNoLep_pt[igen]>15.) {
+	    float deltaR_1 = deltaR(analysisTree.muon_eta[muonIndex],analysisTree.muon_phi[muonIndex],
+				    analysisTree.gentau_visibleNoLep_eta[igen],analysisTree.gentau_visibleNoLep_phi[igen]);
+	    if (deltaR_1<minDR_1) {
+	      minDR_1 = deltaR_1;
+	      gen_match_1 = 5;
+	    }
+	  float deltaR_2 = deltaR(analysisTree.tau_eta[tauIndex],analysisTree.tau_phi[tauIndex],
+				  analysisTree.gentau_visibleNoLep_eta[igen],analysisTree.gentau_visibleNoLep_phi[igen]);
+	  if (deltaR_2<minDR_2) {
+	    minDR_2 = deltaR_2;
+	    gen_match_2 = 5;
+	  }
+	  }
+	}
+	if (gen_match_2==5) isZTT = true;
+	else if (gen_match_2==6) isZJ = true;
+	else isZL = true;
+	isZLL = isZL || isZJ;
+      }
+
+      float mvamet_Reco_ex =  mvamet_ex;
+      float mvamet_Reco_ey =  mvamet_ey;
+      float lep_Reco_px = analysisTree.muon_px[muonIndex];
+      float lep_Reco_py = analysisTree.muon_py[muonIndex];
+      if (isDY&&isZTT&&!isData) {
+	lep_Reco_px += analysisTree.tau_px[tauIndex];
+	lep_Reco_py += analysisTree.tau_py[tauIndex];
+      }
+      
+      // muon scale factors
+      isoweight_1 = (float)SF_muonIdIso->get_ScaleFactor(double(pt_1),double(eta_1));
+      trigweight_1 = (float)SF_muonTrig->get_ScaleFactor(double(pt_1),double(eta_1));
+      effweight = isoweight_1*trigweight_1;
+
+      int tau_decayMode = analysisTree.tau_decayMode[tauIndex];
+
+      //      m_sv = -9999;
+      //      pt_sv = -9999;
+      //      eta_sv = -9999;
+      //     phi_sv = -9999;
+
+      //      m_sv_puppi = -9999;
+      //      pt_sv_puppi = -9999;
+      //      eta_sv = -9999;
+      //      phi_sv = -9999;
+
+      m_sv_mvamet = -9999;
+      pt_sv_mvamet = -9999;
+      eta_sv_mvamet = -9999;
+      phi_sv_mvamet = -9999;
+
+      m_sv_mvamet_uncorr    = -9999;
+      m_sv_mvamet_scaleUp   = -9999;
+      m_sv_mvamet_scaleDown = -9999;
+      m_sv_mvamet_resoUp    = -9999;
+      m_sv_mvamet_resoDown  = -9999;
+      m_sv_mvamet_tauUp     = -9999;
+      m_sv_mvamet_tauDown   = -9999;
+
+
+      bool validDecayMode = tau_decayMode<=4 || tau_decayMode>=10; // excluding 2prongs
+      float tauMass = m_2;
+      //      if (tau_decayMode==0) tauMass = pionMass;
+      //      std::cout << "MT = " << mt_mva_1 << std::endl;
+
+      if (computeDitauMass && mt_mva_1<45.0 && validDecayMode) {
+
+	if (mvaFound) {
+	  // covariance matrix MVAMET
+	  TMatrixD covMVAMET(2, 2);
+	  covMVAMET[0][0] =  mvacov00;
+	  covMVAMET[1][0] =  mvacov01;
+	  covMVAMET[0][1] =  mvacov10;
+	  covMVAMET[1][1] =  mvacov11;
+
+	  // mva met
+	  // define muon 4-vector
+	  svFitStandalone::MeasuredTauLepton svFitMuon(svFitStandalone::kTauToMuDecay, 
+						       pt_1, eta_1, phi_1, muonMass); 
+	  // define tau 4-vector
+	  svFitStandalone::MeasuredTauLepton svFitTau(svFitStandalone::kTauToHadDecay,  
+						      pt_2, eta_2, phi_2, 
+						      tauMass, tau_decayMode); 
+	  svFitStandalone::MeasuredTauLepton svFitTauUp(svFitStandalone::kTauToHadDecay,
+							(1.0+tauScale)*pt_2, eta_2, phi_2,
+							(1.0+tauScale)*tauMass, tau_decayMode); 
+	  svFitStandalone::MeasuredTauLepton svFitTauDown(svFitStandalone::kTauToHadDecay,
+							  (1.0-tauScale)*pt_2, eta_2, phi_2,
+							  (1.0-tauScale)*tauMass, tau_decayMode); 
+  
+	  // central value
+	  SVfitStandaloneAlgorithm algo = SVFitMassComputation(svFitMuon, svFitTau,
+							       mvamet_ex, mvamet_ey, 
+							       covMVAMET, tau_decayMode, inputFile_visPtResolution);
+
+	  m_sv_mvamet = algo.getMass(); // return value is in units of GeV
+	  //	  double transverse_mass = algoY.transverseMass(); // Transverse SVFit mass
+	  if ( !algo.isValidSolution() ) 
+	    std::cout << "sorry -- status of NLL is not valid [" << algo.isValidSolution() << "]" << std::endl;
+	  
+	  pt_sv_mvamet  = algo.pt(); 
+	  eta_sv_mvamet = algo.eta();
+	  phi_sv_mvamet = algo.phi();
+
+	  m_sv_mvamet_uncorr    = m_sv_mvamet;
+	  m_sv_mvamet_scaleUp   = m_sv_mvamet;
+	  m_sv_mvamet_scaleDown = m_sv_mvamet;
+	  m_sv_mvamet_resoUp   = m_sv_mvamet;
+	  m_sv_mvamet_resoDown = m_sv_mvamet;
+	  m_sv_mvamet_tauUp   = m_sv_mvamet;
+	  m_sv_mvamet_tauDown = m_sv_mvamet;
+
+	  if (!isData) { // compute m_sv_mvamet
+	    //	    if (isDY||isW) {
+	    //	      SVfitStandaloneAlgorithm algo_uncorr = SVFitMassComputation(svFitMuon, svFitTau,
+	    //									  mvamet_uncorr_ex, mvamet_uncorr_ey,
+	    //									  covMVAMET, tau_decayMode, inputFile_visPtResolution);
+	    //	      m_sv_mvamet_uncorr = algo_uncorr.getMass();
+	    //	    }
+	    // SVfitStandaloneAlgorithm aglo_scaleUp = SVFitMassComputation(svFitMuon, svFitTau,
+	    // 								 mvamet_scaleUp_ex, mvamet_scaleUp_ey,
+	    // 								 covMVAMET, tau_decayMode, inputFile_visPtResolution);
+	    // SVfitStandaloneAlgorithm aglo_resoUp = SVFitMassComputation(svFitMuon, svFitTau,
+	    // 								mvamet_resoUp_ex, mvamet_resoUp_ey,
+	    // 								covMVAMET, tau_decayMode, inputFile_visPtResolution);
+	    SVfitStandaloneAlgorithm aglo_tauUp = SVFitMassComputation(svFitMuon, svFitTauUp,
+								       mvamet_ex, mvamet_ey,
+								       covMVAMET, tau_decayMode, inputFile_visPtResolution);
+	    // SVfitStandaloneAlgorithm aglo_scaleDown = SVFitMassComputation(svFitMuon, svFitTau,
+	    // 								   mvamet_scaleDown_ex, mvamet_scaleDown_ey,
+	    // 								   covMVAMET, tau_decayMode, inputFile_visPtResolution);
+	    // SVfitStandaloneAlgorithm aglo_resoDown = SVFitMassComputation(svFitMuon, svFitTau,
+	    // 								  mvamet_resoDown_ex, mvamet_resoDown_ey,
+	    // 								  covMVAMET, tau_decayMode, inputFile_visPtResolution);
+	    SVfitStandaloneAlgorithm aglo_tauDown = SVFitMassComputation(svFitMuon, svFitTauDown,
+									 mvamet_ex, mvamet_ey,
+									 covMVAMET, tau_decayMode, inputFile_visPtResolution);
+	    
+
+	    //	    m_sv_mvamet_scaleUp = aglo_scaleUp.getMass();
+	    //	    m_sv_mvamet_resoUp  = aglo_resoUp.getMass();
+	    m_sv_mvamet_tauUp   = aglo_tauUp.getMass();
+
+	    //	    m_sv_mvamet_scaleDown = aglo_scaleDown.getMass();
+	    //	    m_sv_mvamet_resoDown  = aglo_resoDown.getMass();
+	    m_sv_mvamet_tauDown   = aglo_tauDown.getMass();
+
+	    //	    std::cout << "msv = " << m_sv_mvamet << "   uncorrected : " << m_sv_mvamet_uncorr << std::endl;
+	    //	    std::cout << "tauES    : up = " << m_sv_mvamet_tauUp << "   down = " << m_sv_mvamet_tauDown << std::endl;
+	    //	    std::cout << "metScale : up = " << m_sv_mvamet_scaleUp << "   down = " << m_sv_mvamet_scaleDown << std::endl;
+	    //	    std::cout << "metReso  : up = " << m_sv_mvamet_resoUp << "   down = " << m_sv_mvamet_resoDown << std::endl;
+
+
+	  }
+	}
+	else {
+	  std::cout << "MVA MET is not found : computation of svFit mass impossible" << std::endl;
+	}
+      }
+
+      byCombinedIsolationDeltaBetaCorrRaw3Hits_2 = analysisTree.tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[tauIndex];
+      byLooseCombinedIsolationDeltaBetaCorr3Hits_2 = analysisTree.tau_byLooseCombinedIsolationDeltaBetaCorr3Hits[tauIndex];
+      byMediumCombinedIsolationDeltaBetaCorr3Hits_2 = analysisTree.tau_byMediumCombinedIsolationDeltaBetaCorr3Hits[tauIndex];
+      byTightCombinedIsolationDeltaBetaCorr3Hits_2 = analysisTree.tau_byTightCombinedIsolationDeltaBetaCorr3Hits[tauIndex];
+      againstElectronLooseMVA5_2 = analysisTree.tau_againstElectronLooseMVA5[tauIndex];
+      againstElectronMediumMVA5_2 = analysisTree.tau_againstElectronMediumMVA5[tauIndex];
+      againstElectronTightMVA5_2 = analysisTree.tau_againstElectronTightMVA5[tauIndex];
+      againstElectronVLooseMVA5_2 = analysisTree.tau_againstElectronVLooseMVA5[tauIndex];
+      againstElectronVTightMVA5_2 = analysisTree.tau_againstElectronVTightMVA5[tauIndex];
+      againstMuonLoose3_2 = analysisTree.tau_againstMuonLoose3[tauIndex];
+      againstMuonTight3_2 = analysisTree.tau_againstMuonTight3[tauIndex];
+      againstElectronVLooseMVA6_2 = analysisTree.tau_againstElectronVLooseMVA6[tauIndex];
+      byIsolationMVArun2v1DBoldDMwLTraw_2 = analysisTree.tau_byIsolationMVArun2v1DBoldDMwLTraw[tauIndex];
+      byTightIsolationMVArun2v1DBoldDMwLT_2 = analysisTree.tau_byTightIsolationMVArun2v1DBoldDMwLT[tauIndex];
+
+      TLorentzVector muonLV; muonLV.SetXYZM(analysisTree.muon_px[muonIndex],
+					    analysisTree.muon_py[muonIndex],
+					    analysisTree.muon_pz[muonIndex],
+					    muonMass);
+
+      TLorentzVector tauLV; tauLV.SetXYZT(analysisTree.tau_px[tauIndex],
+					  analysisTree.tau_py[tauIndex],
+					  analysisTree.tau_pz[tauIndex],
+					  analysisTree.tau_e[tauIndex]);
+
+
+      TLorentzVector tauUpLV; tauUpLV.SetXYZT((1.0+tauScale)*analysisTree.tau_px[tauIndex],
+					      (1.0+tauScale)*analysisTree.tau_py[tauIndex],
+					      (1.0+tauScale)*analysisTree.tau_pz[tauIndex],
+					      (1.0+tauScale)*analysisTree.tau_e[tauIndex]);
+
+      TLorentzVector tauDownLV; tauDownLV.SetXYZT((1.0-tauScale)*analysisTree.tau_px[tauIndex],
+						  (1.0-tauScale)*analysisTree.tau_py[tauIndex],
+						  (1.0-tauScale)*analysisTree.tau_pz[tauIndex],
+						  (1.0-tauScale)*analysisTree.tau_e[tauIndex]);
+
+
+
+      TLorentzVector dileptonLV = muonLV + tauLV;
+
+      // visible mass
+      m_vis         = dileptonLV.M();
+      m_vis_tauUp   = (muonLV+tauUpLV).M();
+      m_vis_tauDown = (muonLV+tauDownLV).M();
+      m_vis_scaleUp   = dileptonLV.M();
+      m_vis_scaleDown = dileptonLV.M();
+      m_vis_resoUp    = dileptonLV.M();
+      m_vis_resoDown  = dileptonLV.M();
+
+      TLorentzVector mvametLV; mvametLV.SetXYZM(mvamet_ex,mvamet_ey,0.,0.);
+      TLorentzVector mvametResoUpLV; mvametResoUpLV.SetXYZM(mvamet_resoUp_ex,mvamet_resoUp_ey,0.,0.);
+      TLorentzVector mvametResoDownLV; mvametResoDownLV.SetXYZM(mvamet_resoDown_ex,mvamet_resoDown_ey,0.,0.);
+      TLorentzVector mvametScaleUpLV; mvametScaleUpLV.SetXYZM(mvamet_scaleUp_ex,mvamet_scaleUp_ey,0.,0.);
+      TLorentzVector mvametScaleDownLV; mvametScaleDownLV.SetXYZM(mvamet_scaleDown_ex,mvamet_scaleDown_ey,0.,0.);
+
+      // computing total transverse mass
+      mTtot = totalTransverseMass         ( muonLV ,     tauLV ,     mvametLV);
+
+      mTtot_tauUp   =  totalTransverseMass( muonLV ,     tauUpLV ,   mvametLV);
+      mTtot_tauDown =  totalTransverseMass( muonLV ,     tauDownLV , mvametLV);
+
+      mTtot_scaleUp   =  totalTransverseMass ( muonLV ,  tauLV , mvametScaleUpLV);
+      mTtot_scaleDown =  totalTransverseMass ( muonLV ,  tauLV , mvametScaleDownLV);
+
+      mTtot_resoUp    =  totalTransverseMass ( muonLV ,  tauLV , mvametResoUpLV);
+      mTtot_resoDown  =  totalTransverseMass ( muonLV ,  tauLV , mvametResoDownLV);
+
+      // visible ditau pt 
+      pt_tt = dileptonLV.Pt();
+
+      // bisector of electron and muon transverse momenta
+      float tauUnitX = tauLV.Px()/tauLV.Pt();
+      float tauUnitY = tauLV.Py()/tauLV.Pt();
+	
+      float muonUnitX = muonLV.Px()/muonLV.Pt();
+      float muonUnitY = muonLV.Py()/muonLV.Pt();
+
+      float zetaX = tauUnitX + muonUnitX;
+      float zetaY = tauUnitY + muonUnitY;
+      
+      float normZeta = TMath::Sqrt(zetaX*zetaX+zetaY*zetaY);
+
+      zetaX = zetaX/normZeta;
+      zetaY = zetaY/normZeta;
+
+      float vectorX = analysisTree.pfmet_ex + muonLV.Px() + tauLV.Px();
+      float vectorY = analysisTree.pfmet_ey + muonLV.Py() + tauLV.Py();
+      
+      float vectorVisX = muonLV.Px() + tauLV.Px();
+      float vectorVisY = muonLV.Py() + tauLV.Py();
+
+      // computation of DZeta variable
+      pzetamiss = mvamet_ex*zetaX + mvamet_ey*zetaY;
+      pzetavis  = vectorVisX*zetaX + vectorVisY*zetaY;
 
       tree->Fill();
       selEvents++;
