@@ -72,7 +72,10 @@
  <use name="boost" />
  <use name="boost_program_options"/>
  <use name="DesyTauAnalyses/NTupleMaker"/>
+ <use name="CondFormats/BTauObjects"/>
  <use name="HTT-utilities/LepEffInterface"/>
+ <use name="HTT-utilities/RecoilCorrections"/>
+ <use name="HTT-utilities/QCDModelingEMu"/>
 </bin>
 
 <bin name="SynchNTupleProducer_mt" file="SynchNTupleProducer_mt.cpp">
@@ -85,8 +88,10 @@
  <use name="boost_program_options"/>
  <use name="DesyTauAnalyses/NTupleMaker"/>
  <use name="FWCore/ParameterSet"/>
+ <use name="CondFormats/BTauObjects"/>
  <use name="TauAnalysis/SVfitStandalone"/>
  <use name="HTT-utilities/LepEffInterface"/>
+ <use name="HTT-utilities/RecoilCorrections"/>
 </bin>
 
 <bin name="SUSYmutau" file="AnalysisMacroSUSYmutau.cpp">
