@@ -35,6 +35,7 @@
 #include "DesyTauAnalyses/NTupleMaker/interface/functions.h"
 #include "HTT-utilities/LepEffInterface/interface/ScaleFactor.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/PileUp.h"
+#include "HTT-utilities/RecoilCorrections/interface/RecoilCorrector.h"
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
@@ -152,6 +153,39 @@ int main(int argc, char * argv[]) {
   //svfit
   const string svFitPtResFile = cfg.get<string>("svFitPtResFile");
 
+  // MET Recoil Corrections
+  //const bool applyRecoilCorrections = cfg.get<bool>("ApplyRecoilCorrections");
+  const bool isDY = infiles.find("DY") == infiles.rfind("/")+1;
+  const bool isWJets = infiles.find("WJets") == infiles.rfind("/")+1;
+  const bool isMG = infiles.find("madgraph") != string::npos;
+  const bool applyRecoilCorrections = isDY || isWJets;
+
+  RecoilCorrector* recoilPFMetCorrector = (RecoilCorrector*) malloc(sizeof(*recoilPFMetCorrector));
+  RecoilCorrector* recoilPuppiMetCorrector = (RecoilCorrector*) malloc(sizeof(*recoilPuppiMetCorrector));
+  RecoilCorrector* recoilMvaMetCorrector = (RecoilCorrector*) malloc(sizeof(*recoilMvaMetCorrector));
+
+  if(!isData && applyRecoilCorrections){
+    TString RecoilDir("HTT-utilities/RecoilCorrections/data/");
+
+    TString RecoilFileName = RecoilDir; RecoilFileName += "recoilPFMEt_76X";
+    if (isMG)
+      RecoilFileName += "_MG5";
+    RecoilFileName += ".root";
+    std::cout<<RecoilFileName<<std::endl;
+    recoilPFMetCorrector = new RecoilCorrector( RecoilFileName);
+        
+    RecoilFileName = RecoilDir; RecoilFileName += "recoilPuppiMet.root";
+    std::cout<<RecoilFileName<<std::endl;
+    recoilPuppiMetCorrector = new RecoilCorrector( RecoilFileName);
+
+    RecoilFileName = RecoilDir; RecoilFileName += "recoilMvaMEt_76X_newTraining";
+    if (isMG)
+      RecoilFileName += "_MG5";
+    RecoilFileName += ".root";
+    std::cout<<RecoilFileName<<std::endl;
+    recoilMvaMetCorrector = new RecoilCorrector( RecoilFileName);
+  }
+  
   // HLT filters
   string isoLeg;
   if (isData){
@@ -442,6 +476,7 @@ int main(int argc, char * argv[]) {
       otree->signalWeight = 0;
       otree->weight = 1;
       otree->lheHt = analysisTree.genparticles_lheHt;
+      otree->gen_noutgoing = analysisTree.genparticles_noutgoing;
       
       otree->npv = analysisTree.primvertex_count;
       otree->npu = analysisTree.numtruepileupinteractions;// numpileupinteractions;
@@ -1083,7 +1118,7 @@ int main(int argc, char * argv[]) {
 
 	jetspt20.push_back(jet);
 
-	if (absJetEta<bJetEtaCut && analysisTree.pfjet_btag[jet][6]>btagCut) { // b-jet
+	if (absJetEta<bJetEtaCut && analysisTree.pfjet_btag[jet][0]>btagCut) { // b-jet
 	  bjets.push_back(jet);
 	  if (jetPt>ptLeadingBJet) {
 	    ptLeadingBJet = jetPt;
@@ -1192,6 +1227,96 @@ int main(int argc, char * argv[]) {
 	    otree->njetingap++;
 	}
       }
+
+      ////////////////////////////////////////////////////////////
+      // MET Recoil Corrections
+      ////////////////////////////////////////////////////////////
+
+      TLorentzVector genV( 0., 0., 0., 0.);
+      TLorentzVector genL( 0., 0., 0., 0.);
+
+      if (!isData){
+	genV = genTools::genV(analysisTree);
+	genL = genTools::genL(analysisTree);
+      }
+      
+      // PFMET
+      genTools::RecoilCorrections( *recoilPFMetCorrector, (!isData && applyRecoilCorrections) * genTools::QuantileRemap,
+				   otree->met, otree->metphi,
+				   genV.Px(), genV.Py(),
+				   genL.Px(), genL.Py(),
+				   otree->njets,
+				   otree->met_rcqr, otree->metphi_rcqr
+				   );
+			 
+      otree->pfmt_rcqr_1 = genTools::mt(otree->pt_1, otree->phi_1, otree->met_rcqr, otree->metphi_rcqr);
+      otree->pfmt_rcqr_2 = genTools::mt(otree->pt_2, otree->phi_2, otree->met_rcqr, otree->metphi_rcqr);     
+      otree->pfpzetamiss_rcqr = genTools::pzetamiss( zetaX, zetaY, otree->met_rcqr, otree->metphi_rcqr);
+
+      genTools::RecoilCorrections( *recoilPFMetCorrector, (!isData && applyRecoilCorrections) * genTools::MeanResolution,
+				   otree->met, otree->metphi,
+				   genV.Px(), genV.Py(),
+				   genL.Px(), genL.Py(),
+				   otree->njets,
+				   otree->met_rcmr, otree->metphi_rcmr
+				   );
+			 
+      otree->pfmt_rcmr_1 = genTools::mt(otree->pt_1, otree->phi_1, otree->met_rcmr, otree->metphi_rcmr);
+      otree->pfmt_rcmr_2 = genTools::mt(otree->pt_2, otree->phi_2, otree->met_rcmr, otree->metphi_rcmr);     
+      otree->pfpzetamiss_rcmr = genTools::pzetamiss( zetaX, zetaY, otree->met_rcmr, otree->metphi_rcmr);
+
+      // PUPPI MET
+      genTools::RecoilCorrections( *recoilPuppiMetCorrector, (!isData && applyRecoilCorrections) * genTools::QuantileRemap,
+				   otree->puppimet, otree->puppimetphi,
+				   genV.Px(), genV.Py(),
+				   genL.Px(), genL.Py(),
+				   otree->njets,
+				   otree->puppimet_rcqr, otree->puppimetphi_rcqr
+				   );
+			 
+      otree->puppimt_rcqr_1 = genTools::mt(otree->pt_1, otree->phi_1, otree->puppimet_rcqr, otree->puppimetphi_rcqr);
+      otree->puppimt_rcqr_2 = genTools::mt(otree->pt_2, otree->phi_2, otree->puppimet_rcqr, otree->puppimetphi_rcqr);     
+      otree->puppipzetamiss_rcqr = genTools::pzetamiss( zetaX, zetaY, otree->puppimet_rcqr, otree->puppimetphi_rcqr);
+
+      genTools::RecoilCorrections( *recoilPuppiMetCorrector, (!isData && applyRecoilCorrections) * genTools::MeanResolution,
+				   otree->puppimet, otree->puppimetphi,
+				   genV.Px(), genV.Py(),
+				   genL.Px(), genL.Py(),
+				   otree->njets,
+				   otree->puppimet_rcmr, otree->puppimetphi_rcmr
+				   );
+			 
+      otree->puppimt_rcmr_1 = genTools::mt(otree->pt_1, otree->phi_1, otree->met_rcmr, otree->puppimetphi_rcmr);
+      otree->puppimt_rcmr_2 = genTools::mt(otree->pt_2, otree->phi_2, otree->met_rcmr, otree->puppimetphi_rcmr);     
+      otree->puppipzetamiss_rcmr = genTools::pzetamiss( zetaX, zetaY, otree->met_rcmr, otree->puppimetphi_rcmr);
+
+      // MVA MET
+      genTools::RecoilCorrections( *recoilMvaMetCorrector, (!isData && applyRecoilCorrections) * genTools::QuantileRemap,
+				   otree->mvamet, otree->mvametphi,
+				   genV.Px(), genV.Py(),
+				   genL.Px(), genL.Py(),
+				   otree->njets,
+				   otree->mvamet_rcqr, otree->mvametphi_rcqr
+				   );
+			 
+      otree->mt_rcqr_1 = genTools::mt(otree->pt_1, otree->phi_1, otree->mvamet_rcqr, otree->mvametphi_rcqr);
+      otree->mt_rcqr_2 = genTools::mt(otree->pt_2, otree->phi_2, otree->mvamet_rcqr, otree->mvametphi_rcqr);     
+      otree->pzetamiss_rcqr = genTools::pzetamiss( zetaX, zetaY, otree->mvamet_rcqr, otree->mvametphi_rcqr);
+
+      genTools::RecoilCorrections( *recoilMvaMetCorrector, (!isData && applyRecoilCorrections) * genTools::MeanResolution,
+				   otree->mvamet, otree->mvametphi,
+				   genV.Px(), genV.Py(),
+				   genL.Px(), genL.Py(),
+				   otree->njets,
+				   otree->mvamet_rcmr, otree->mvametphi_rcmr
+				   );
+			 
+      otree->mt_rcmr_1 = genTools::mt(otree->pt_1, otree->phi_1, otree->mvamet_rcmr, otree->mvametphi_rcmr);
+      otree->mt_rcmr_2 = genTools::mt(otree->pt_2, otree->phi_2, otree->mvamet_rcmr, otree->mvametphi_rcmr);     
+      otree->pzetamiss_rcmr = genTools::pzetamiss( zetaX, zetaY, otree->mvamet_rcmr, otree->mvametphi_rcmr);
+      
+      // End MET Recoil Corrections
+
       otree->Fill();
       selEvents++;
     } // end of file processing (loop over events in one file)

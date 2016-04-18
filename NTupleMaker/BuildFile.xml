@@ -6,6 +6,7 @@
 <use   name="HLTrigger/HLTcore"/>
 <use   name="DesyTauAnalyses/CandidateTools"/>
 <use   name="HTT-utilities/LepEffInterface"/>
+<use   name="HTT-utilities/RecoilCorrections"/>
 <export>
   <lib   name="1"/>
 </export>

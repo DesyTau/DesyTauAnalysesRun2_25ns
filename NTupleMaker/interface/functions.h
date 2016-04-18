@@ -1,6 +1,10 @@
+#ifndef NTupleMakerFunctions_h
+#define NTupleMakerFunctions_h
+
 #include "TMath.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/Config.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/AC1B.h"
+#include "HTT-utilities/RecoilCorrections/interface/RecoilCorrector.h"
 
 const double MuMass = 0.105658367;
 const double tauMass = 1.776;
@@ -396,4 +400,283 @@ struct myclass {
 } myobject, myobjectX;
 
 
+namespace genTools{
+  TLorentzVector genZ(const AC1B& analysisTree){
+    TLorentzVector genZ; genZ.SetXYZM(0,0,0,91.2);
+    TLorentzVector genPart; genPart.SetXYZM(0,0,0,0);
+    
+    for (unsigned int igen=0; igen<analysisTree.genparticles_count; ++igen) {
+      genPart.SetXYZT(analysisTree.genparticles_px[igen],
+		      analysisTree.genparticles_py[igen],
+		      analysisTree.genparticles_pz[igen],
+		      analysisTree.genparticles_e[igen]);
+      if (analysisTree.genparticles_pdgid[igen]==23||analysisTree.genparticles_pdgid[igen]==22) {
+	if (analysisTree.genparticles_fromHardProcess[igen])
+	  genZ.SetXYZT(analysisTree.genparticles_px[igen],
+		       analysisTree.genparticles_py[igen],
+		       analysisTree.genparticles_pz[igen],
+		       analysisTree.genparticles_e[igen]);
+      }
+    }
+    return genZ;
+  }
 
+  TLorentzVector genL(const AC1B& analysisTree){
+    TLorentzVector genL; genL.SetXYZM(0,0,0,0);
+    TLorentzVector genPart; genPart.SetXYZM(0,0,0,0);
+     
+    bool isMuon = 0;
+    bool isElectron = 0;
+    bool isChargedLepton = 0;
+    bool isNeutrino = 0;
+    bool fromHardProcessFinalState = 0;
+    bool isDirectHardProcessTauDecayProduct = 0;
+    
+    for (unsigned int igen=0; igen<analysisTree.genparticles_count; ++igen) {
+      genPart.SetXYZT(analysisTree.genparticles_px[igen],
+		      analysisTree.genparticles_py[igen],
+		      analysisTree.genparticles_pz[igen],
+		      analysisTree.genparticles_e[igen]);
+      
+      isMuon = fabs(analysisTree.genparticles_pdgid[igen])==13;
+      isElectron = fabs(analysisTree.genparticles_pdgid[igen])==11;
+      isChargedLepton = isMuon || isElectron;
+      isNeutrino = fabs(analysisTree.genparticles_pdgid[igen])==12||
+	fabs(analysisTree.genparticles_pdgid[igen])==14||
+	fabs(analysisTree.genparticles_pdgid[igen])==16;
+      fromHardProcessFinalState = analysisTree.genparticles_fromHardProcess[igen] && analysisTree.genparticles_status[igen]==1;
+      isDirectHardProcessTauDecayProduct = analysisTree.genparticles_isDirectHardProcessTauDecayProduct[igen];
+
+      /*if((fromHardProcessFinalState && isChargedLepton) || (isDirectHardProcessTauDecayProduct && (!isNeutrino)))
+	genL += genPart;
+    }
+
+    return genL;*/
+
+      if(fromHardProcessFinalState && isChargedLepton)
+	genL += genPart;
+    }
+    
+    bool fromHardProcess = 0;
+    bool isLastCopy = 0;
+    for (unsigned int itau=0; itau<analysisTree.gentau_count; ++itau) {
+      genPart.SetXYZT(analysisTree.gentau_visible_px[itau],
+		      analysisTree.gentau_visible_py[itau],
+		      analysisTree.gentau_visible_pz[itau],
+		      analysisTree.gentau_visible_e[itau]);
+      
+      fromHardProcess = analysisTree.gentau_fromHardProcess[itau];
+      isLastCopy = analysisTree.gentau_isLastCopy[itau];
+
+      if (fromHardProcess && isLastCopy)
+	genL += genPart;
+    }
+      
+    return genL;
+      
+  }
+
+  TLorentzVector genNu(const AC1B& analysisTree){
+    TLorentzVector genNu; genNu.SetXYZM(0,0,0,0);
+    TLorentzVector genPart; genPart.SetXYZM(0,0,0,0);
+    
+    bool isNeutrino = 0;
+    bool isPrompt = 0;
+    
+    for (unsigned int igen=0; igen<analysisTree.genparticles_count; ++igen) {
+      genPart.SetXYZT(analysisTree.genparticles_px[igen],
+		      analysisTree.genparticles_py[igen],
+		      analysisTree.genparticles_pz[igen],
+		      analysisTree.genparticles_e[igen]);
+      
+      isNeutrino = fabs(analysisTree.genparticles_pdgid[igen])==12||
+	fabs(analysisTree.genparticles_pdgid[igen])==14||
+	fabs(analysisTree.genparticles_pdgid[igen])==16;
+      isPrompt = analysisTree.genparticles_isPrompt[igen]||
+	analysisTree.genparticles_isPromptTauDecayProduct[igen];
+      
+      if (analysisTree.genparticles_status[igen]==1&&isPrompt) {
+	if (isNeutrino) 
+	  genNu += genPart;
+      }
+    }
+
+    return genNu;
+  }
+
+  TLorentzVector genV(const AC1B& analysisTree){
+    TLorentzVector genV; genV.SetXYZM(0,0,0,0);
+    TLorentzVector genPart; genPart.SetXYZM(0,0,0,0);
+    
+    bool isMuon = 0;
+    bool isElectron = 0;
+    bool isChargedLepton = 0;
+    bool isNeutrino = 0;
+    bool fromHardProcessFinalState = 0;
+    bool isDirectHardProcessTauDecayProduct = 0;
+    
+    for (unsigned int igen=0; igen<analysisTree.genparticles_count; ++igen) {
+      genPart.SetXYZT(analysisTree.genparticles_px[igen],
+		      analysisTree.genparticles_py[igen],
+		      analysisTree.genparticles_pz[igen],
+		      analysisTree.genparticles_e[igen]);
+      
+      isMuon = fabs(analysisTree.genparticles_pdgid[igen])==13;
+      isElectron = fabs(analysisTree.genparticles_pdgid[igen])==11;
+      isChargedLepton = isMuon || isElectron;
+      isNeutrino = fabs(analysisTree.genparticles_pdgid[igen])==12||
+	fabs(analysisTree.genparticles_pdgid[igen])==14||
+	fabs(analysisTree.genparticles_pdgid[igen])==16;
+      fromHardProcessFinalState = analysisTree.genparticles_fromHardProcess[igen] && analysisTree.genparticles_status[igen]==1;
+      isDirectHardProcessTauDecayProduct = analysisTree.genparticles_isDirectHardProcessTauDecayProduct[igen];
+
+      /*if((fromHardProcessFinalState && (isChargedLepton || isNeutrino)) || isDirectHardProcessTauDecayProduct)
+	genV += genPart;
+    }
+
+    if (genV.Pt()<0.1)
+      genV.SetXYZM(0.1,0.1,0.,0.);
+    
+      return genV;*/
+
+
+      if(fromHardProcessFinalState && (isChargedLepton || isNeutrino))
+	genV += genPart;
+    }
+    
+    bool fromHardProcess = 0;
+    bool isFirstCopy = 0;
+    for (unsigned int itau=0; itau<analysisTree.gentau_count; ++itau) {
+      genPart.SetXYZT(analysisTree.gentau_px[itau],
+		      analysisTree.gentau_py[itau],
+		      analysisTree.gentau_pz[itau],
+		      analysisTree.gentau_e[itau]);
+      
+      fromHardProcess = analysisTree.gentau_fromHardProcess[itau];
+      isFirstCopy = analysisTree.gentau_isFirstCopy[itau];
+
+      if (fromHardProcess && isFirstCopy)
+	genV += genPart;
+    }
+   
+    if (genV.Pt()<0.1)
+      genV.SetXYZM(0.1,0.1,0.,0.);
+    
+    return genV;  
+  }
+
+  int nJetsHad(const AC1B& analysisTree){
+    int njetshad = 0;
+    bool isChargedLepton = 0;
+    bool fromHardProcess = 0;
+    
+    float genEta = 0.;
+    float genPhi = 0.;
+    
+    for (unsigned int jet=0; jet<analysisTree.pfjet_count; ++jet) {
+
+      if (analysisTree.pfjet_pt[jet]<=30.) continue;
+      float absJetEta = fabs(analysisTree.pfjet_eta[jet]);
+      if (absJetEta >= 4.7) continue;
+      
+      // jetId
+      float energy = analysisTree.pfjet_e[jet];
+      energy *= analysisTree.pfjet_energycorr[jet];
+      float chf = analysisTree.pfjet_chargedhadronicenergy[jet]/energy;
+      float nhf = analysisTree.pfjet_neutralhadronicenergy[jet]/energy;
+      float phf = analysisTree.pfjet_neutralemenergy[jet]/energy;
+      float elf = analysisTree.pfjet_chargedemenergy[jet]/energy;
+      float muf = analysisTree.pfjet_muonenergy[jet]/energy;
+      float chm = analysisTree.pfjet_chargedmulti[jet];
+      float nm = analysisTree.pfjet_neutralmulti[jet];
+      float npr = analysisTree.pfjet_chargedmulti[jet] + analysisTree.pfjet_neutralmulti[jet];
+      //bool isPFJetId = (npr>1 && phf<0.99 && nhf<0.99) && (absJetEta>3.0 || (elf<0.99 && chf>0 && chm>0));
+      bool isPFJetId = false;
+      if (absJetEta<=3.0)
+	isPFJetId = (nhf < 0.99 && phf < 0.99 && npr > 1) && (absJetEta>2.4 || (chf>0 && chm > 0 && elf < 0.99));
+      else
+	isPFJetId = phf < 0.9 && nm > 10;
+      //isPFJetId = (npr>1 && phf<0.99 && nhf<0.99 && muf < 0.8) && (absJetEta>3.0 || (elf<0.99 && chf>0 && chm>0));
+      //isPFJetId = (npr>1 && phf<0.99 && nhf<0.99) && (absJetEta>3.0 || (elf<0.99 && chf>0 && chm>0));
+      
+      if (!isPFJetId) continue;
+
+      int overlap = 0;
+      
+      for (unsigned int igen=0; igen<analysisTree.genparticles_count; ++igen) {	
+	isChargedLepton = ( fabs(analysisTree.genparticles_pdgid[igen])==11 ||
+			    fabs(analysisTree.genparticles_pdgid[igen])==13);
+	fromHardProcess = analysisTree.genparticles_fromHardProcess[igen];
+
+	if (!isChargedLepton) continue;
+	if (!fromHardProcess) continue;
+
+	genEta = PtoEta( analysisTree.genparticles_px[igen], analysisTree.genparticles_py[igen], analysisTree.genparticles_pz[igen]); 
+	genPhi = PtoPhi( analysisTree.genparticles_px[igen], analysisTree.genparticles_py[igen]);
+	
+	float dR = deltaR(analysisTree.pfjet_eta[jet],analysisTree.pfjet_phi[jet],
+			  genEta, genPhi);
+	if (dR<=0.5) continue;
+	
+	overlap = 1;
+	break;
+      }
+
+      if (overlap == 1) continue;
+
+      for (unsigned int itau=0; itau<analysisTree.gentau_count; ++itau) {
+	fromHardProcess = analysisTree.gentau_fromHardProcess[itau];
+	
+      	if (!fromHardProcess) continue;
+
+	genEta = PtoEta( analysisTree.gentau_visible_px[itau], analysisTree.gentau_visible_py[itau], analysisTree.gentau_visible_pz[itau]);
+	genPhi = PtoPhi( analysisTree.gentau_visible_px[itau], analysisTree.gentau_visible_py[itau]);
+			 	
+	float dR = deltaR(analysisTree.pfjet_eta[jet],analysisTree.pfjet_phi[jet],
+			  genEta, genPhi);
+	if (dR<=0.5) continue;
+	
+	overlap = 1;
+	break;
+      }
+
+      if (overlap == 1) continue;
+      
+      njetshad++;
+    }
+
+    return njetshad;
+  } 
+  
+  enum RecoilCorrectionsMethod{QuantileRemap=1, MeanResolution};
+
+  int RecoilCorrections( RecoilCorrector& corr, int method,
+			 float met, float metphi,
+			 float vx, float vy,
+			 float lx, float ly,
+			 int njets,
+			 float& metcorr, float& metphicorr ){
+    float metx = met*TMath::Cos(metphi);
+    float mety = met*TMath::Sin(metphi);
+    float metcorrx = metx;
+    float metcorry = mety;
+    if (method == 1)
+      corr.Correct(metx, mety, vx, vy, lx, ly, njets, metcorrx, metcorry);
+    else if(method == 2)
+      corr.CorrectByMeanResolution(metx, mety, vx, vy, lx, ly, njets, metcorrx, metcorry);
+
+    metcorr = TMath::Sqrt(metcorrx * metcorrx + metcorry * metcorry);
+    metphicorr = TMath::ATan2(metcorry, metcorrx);
+            
+    return method;
+  }
+
+  float mt( float lpt, float lphi, float met, float metphi){
+    return sqrt(2*lpt*met*(1.-TMath::Cos(lphi-metphi)));
+  }
+
+  float pzetamiss( float zx, float zy, float met, float metphi){
+    return zx*met*TMath::Cos(metphi)+zy*met*TMath::Sin(metphi);
+  }
+}
+#endif
