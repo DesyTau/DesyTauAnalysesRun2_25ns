@@ -23,6 +23,7 @@
 #include "TLorentzVector.h"
 
 #include "TRandom.h"
+#include "FWCore/ParameterSet/interface/FileInPath.h"
 
 #include "DesyTauAnalyses/NTupleMaker/interface/Config.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/AC1B.h"
@@ -36,6 +37,7 @@
 #include "HTT-utilities/QCDModelingEMu/interface/QCDModelForEMu.h"
 #include "CondFormats/BTauObjects/interface/BTagCalibration.h"
 #include "CondFormats/BTauObjects/interface/BTagCalibrationReader.h"
+#include "TauAnalysis/SVfitStandalone/interface/SVfitStandaloneAlgorithm.h"
 
 float totalTransverseMass(TLorentzVector l1, 
 			  TLorentzVector l2,
@@ -63,18 +65,39 @@ void computeDzeta(float metX,  float metY,
 float topPtWeight(float pt1,
 		  float pt2) {
 
+  if (pt1>400) pt1 = 400;
+  if (pt2>400) pt2 = 400;
+
   float a = 0.156;    // Run1 a parameter
   float b = -0.00137;  // Run1 b parameter
   
   float w1 = TMath::Exp(a+b*pt1);
   float w2 = TMath::Exp(a+b*pt2);
 
-  if (pt1>400) w1 = 1;
-  if (pt2>400) w2 = 1;
-
   return TMath::Sqrt(w1*w2);
 
 }
+
+SVfitStandaloneAlgorithm SVFitMassComputation(svFitStandalone::MeasuredTauLepton svFitEle,
+					      svFitStandalone::MeasuredTauLepton svFitMu,
+					      double measuredMVAMETx,
+					      double measuredMVAMETy,
+					      TMatrixD covMVAMET,
+					      TFile * inputFile_visPtResolution
+					      ) {
+
+  std::vector<svFitStandalone::MeasuredTauLepton> measuredTauLeptons;
+  measuredTauLeptons.push_back(svFitEle);
+  measuredTauLeptons.push_back(svFitMu);
+  SVfitStandaloneAlgorithm algo(measuredTauLeptons, measuredMVAMETx, measuredMVAMETy, covMVAMET, 0);
+  algo.addLogM(false);  
+  algo.shiftVisPt(true, inputFile_visPtResolution);
+  algo.integrateMarkovChain();
+  
+  return algo;
+
+}
+
 
 //struct myclass {
 //  bool operator() (int i,int j) { return (i<j);}
@@ -184,7 +207,8 @@ int main(int argc, char * argv[]) {
   const string Electron12TriggerFile = cfg.get<string>("Electron12TriggerEff");
 
   const float muonScale = cfg.get<float>("MuonScale");
-  const float eleScale = cfg.get<float>("EleScale");
+  const float eleScaleBarrel = cfg.get<float>("EleScaleBarrel");
+  const float eleScaleEndcap = cfg.get<float>("EleScaleEndcap");
 
   const string recoilMvaFileName   = cfg.get<string>("RecoilMvaFileName");
   TString RecoilMvaFileName(recoilMvaFileName);
@@ -258,21 +282,45 @@ int main(int argc, char * argv[]) {
   Float_t         m_vis_muDown;
   Float_t         m_vis_eUp;
   Float_t         m_vis_eDown;
+  Float_t         m_vis_scaleUp;
+  Float_t         m_vis_scaleDown;
+  Float_t         m_vis_resoUp;
+  Float_t         m_vis_resoDown;
 
   Float_t         mTtot;
   Float_t         mTtot_muUp;
   Float_t         mTtot_muDown;
   Float_t         mTtot_eUp;
   Float_t         mTtot_eDown;
-  Float_t         mTtot_resoUp;
-  Float_t         mTtot_resoDown;
   Float_t         mTtot_scaleUp;
   Float_t         mTtot_scaleDown;
+  Float_t         mTtot_resoUp;
+  Float_t         mTtot_resoDown;
 
   Float_t         m_sv;
+  Float_t         mt_sv;
   Float_t         pt_sv;
   Float_t         eta_sv;
   Float_t         phi_sv;
+  
+  Float_t         m_sv_eUp;
+  Float_t         m_sv_eDown;
+  Float_t         m_sv_muUp;
+  Float_t         m_sv_muDown;
+  Float_t         m_sv_scaleUp;
+  Float_t         m_sv_scaleDown;
+  Float_t         m_sv_resoUp;
+  Float_t         m_sv_resoDown;
+
+  Float_t         mt_sv_eUp;
+  Float_t         mt_sv_eDown;
+  Float_t         mt_sv_muUp;
+  Float_t         mt_sv_muDown;
+  Float_t         mt_sv_scaleUp;
+  Float_t         mt_sv_scaleDown;
+  Float_t         mt_sv_resoUp;
+  Float_t         mt_sv_resoDown;
+
 
   Float_t         pt_1;
   Float_t         pt_Up_1;
@@ -380,6 +428,8 @@ int main(int argc, char * argv[]) {
   Float_t         jmva_1;
   Float_t         jlrm_1;
   Int_t           jctm_1;
+  Int_t           gen_match_1;
+
   Float_t         jpt_2;
   Float_t         jeta_2;
   Float_t         jphi_2;
@@ -388,6 +438,8 @@ int main(int argc, char * argv[]) {
   Float_t         jmva_2;
   Float_t         jlrm_2;
   Int_t           jctm_2;
+  Int_t           gen_match_2;
+
   Float_t         mjj;
   Float_t         jdeta;
   Int_t           njetingap;
@@ -459,6 +511,10 @@ int main(int argc, char * argv[]) {
   tree->Branch("m_vis_muDown", &m_vis_muDown, "m_vis_muDown/F");
   tree->Branch("m_vis_eUp",    &m_vis_eUp,    "m_vis_eUp/F");
   tree->Branch("m_vis_eDown",  &m_vis_eDown,  "m_vis_eDown/F");
+  tree->Branch("m_vis_scaleUp",   &m_vis_scaleUp,   "m_vis_scaleUp/F");
+  tree->Branch("m_vis_scaleDown", &m_vis_scaleDown, "m_vis_scaleDown/F");
+  tree->Branch("m_vis_resoUp",    &m_vis_resoUp,    "m_vis_resoUp/F");
+  tree->Branch("m_vis_resoDown",  &m_vis_resoDown,  "m_vis_resoDown/F"); 
 
   tree->Branch("mTtot",        &mTtot,        "mTtot/F");
   tree->Branch("mTtot_muUp",   &mTtot_muUp,   "mTtot_muUp/F");
@@ -470,11 +526,29 @@ int main(int argc, char * argv[]) {
   tree->Branch("mTtot_resoUp",    &mTtot_resoUp,    "mTtot_resoUp/F");
   tree->Branch("mTtot_resoDown",  &mTtot_resoDown,  "mTtot_resoDown/F"); 
 
+  tree->Branch("m_sv",    &m_sv,   "m_sv/F");
+  tree->Branch("mt_sv",   &mt_sv,  "mt_sv/F");
+  tree->Branch("pt_sv",   &pt_sv,  "pt_sv/F");
+  tree->Branch("eta_sv",  &eta_sv, "eta_sv/F");
+  tree->Branch("phi_sv",  &phi_sv, "phi_sv/F");
 
-  tree->Branch("m_sv", &m_sv, "m_sv/F");
-  tree->Branch("pt_sv", &pt_sv, "pt_sv/F");
-  tree->Branch("eta_sv", &eta_sv, "eta_sv/F");
-  tree->Branch("phi_sv", &phi_sv, "phi_sv/F");
+  tree->Branch("m_sv_scaleUp",   &m_sv_scaleUp,   "m_sv_scaleUp/F");
+  tree->Branch("m_sv_scaleDown", &m_sv_scaleDown, "m_sv_scaleDown/F");
+  tree->Branch("m_sv_resoUp",    &m_sv_resoUp,    "m_sv_resoUp/F");
+  tree->Branch("m_sv_resoDown",  &m_sv_resoDown,  "m_sv_resoDown/F");
+  tree->Branch("m_sv_eUp",       &m_sv_eUp,       "m_sv_eUp/F");
+  tree->Branch("m_sv_eDown",     &m_sv_eDown,     "m_sv_eDown/F");
+  tree->Branch("m_sv_muUp",      &m_sv_muUp,      "m_sv_muUp/F");
+  tree->Branch("m_sv_muDown",    &m_sv_muDown,    "m_sv_muDown/F");
+
+  tree->Branch("mt_sv_scaleUp",   &mt_sv_scaleUp,   "mt_sv_scaleUp/F");
+  tree->Branch("mt_sv_scaleDown", &mt_sv_scaleDown, "mt_sv_scaleDown/F");
+  tree->Branch("mt_sv_resoUp",    &mt_sv_resoUp,    "mt_sv_resoUp/F");
+  tree->Branch("mt_sv_resoDown",  &mt_sv_resoDown,  "mt_sv_resoDown/F");
+  tree->Branch("mt_sv_eUp",       &mt_sv_eUp,       "mt_sv_eUp/F");
+  tree->Branch("mt_sv_eDown",     &mt_sv_eDown,     "mt_sv_eDown/F");
+  tree->Branch("mt_sv_muUp",      &mt_sv_muUp,      "mt_sv_muUp/F");
+  tree->Branch("mt_sv_muDown",    &mt_sv_muDown,    "mt_sv_muDown/F");
 
   tree->Branch("pt_1", &pt_1, "pt_1/F");
   tree->Branch("pt_Up_1", &pt_Up_1, "pt_Up_1/F");
@@ -488,6 +562,7 @@ int main(int argc, char * argv[]) {
   tree->Branch("d0_1", &d0_1, "d0_1/F");
   tree->Branch("dZ_1", &dZ_1, "dZ_1/F");
   tree->Branch("mt_1", &mt_1, "mt_1/F");
+  tree->Branch("gen_match_1",&gen_match_1,"gen_match_1/I");
 
   tree->Branch("pt_2", &pt_2, "pt_2/F");
   tree->Branch("pt_Up_2", &pt_Up_2, "pt_Up_2/F");
@@ -502,6 +577,7 @@ int main(int argc, char * argv[]) {
   tree->Branch("dZ_2", &dZ_2, "dZ_2/F");
   tree->Branch("mva_2", &mva_2, "mva_2/F");
   tree->Branch("mt_2", &mt_2, "mt_2/F");
+  tree->Branch("gen_match_2",&gen_match_2,"gen_match_2/I");
 
   tree->Branch("os", &os, "os/O");
   tree->Branch("dilepton_veto", &dilepton_veto, "dilepton_veto/O");
@@ -523,7 +599,7 @@ int main(int argc, char * argv[]) {
   tree->Branch("mvacov11", &mvacov11, "mvacov11/F");
 
   tree->Branch("mvamet_uncorr", &mvamet_uncorr, "mvamet_uncorr/F");
-  tree->Branch("mvametphi_corr", &mvametphi_uncorr, "mvametphi_uncorr/F");
+  tree->Branch("mvametphi_uncorr", &mvametphi_uncorr, "mvametphi_uncorr/F");
   
   tree->Branch("mvamet_resoUp", &mvamet_resoUp, "mvamet_resoUp/F");
   tree->Branch("mvametphi_resoUp", &mvametphi_resoUp, "mvametphi_resoUp/F");
@@ -667,15 +743,25 @@ int main(int argc, char * argv[]) {
   RecoilCorrector recoilMvaMetCorrector(RecoilMvaFileName);
   MEtSys metSys(MetSysFileName);
 
+  // SV fit mass
+  edm::FileInPath inputFileName_visPtResolution("TauAnalysis/SVfitStandalone/data/svFitVisMassAndPtResolutionPDF.root");
+  TH1::AddDirectory(false);
+  TFile * inputFile_visPtResolution = new TFile(inputFileName_visPtResolution.fullPath().data());
+
   // qcd weight (dzeta cut)
   QCDModelForEMu qcdWeight("HTT-utilities/QCDModelingEMu/data/QCD_weight_emu.root");
-
   // qcd weight DZeta cut
   QCDModelForEMu qcdWeightNoDzeta("HTT-utilities/QCDModelingEMu/data/QCD_weight_emu_nodzeta.root");
 
+  // BTag scale factors
   BTagCalibration calib("csvv2", cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/CSVv2.csv");
   BTagCalibrationReader reader_BC(&calib,BTagEntry::OP_MEDIUM,"mujets","central");           // systematics type
   BTagCalibrationReader reader_Light(&calib,BTagEntry::OP_MEDIUM,"incl","central");           // systematics type
+
+  //  std::cout << "SF_light (eta=0.6,pt=20.1) : " << reader_Light.eval(BTagEntry::FLAV_UDSG, 0.5, 20.1) << std::endl;
+  //  std::cout << "SF_light (eta=2.1,pt=20.1) : " << reader_Light.eval(BTagEntry::FLAV_UDSG, 2.1, 20.1) << std::endl;
+  //  std::cout << "SF_bc    (eta=0.6,pt=30.1) : " << reader_BC.eval(BTagEntry::FLAV_B, 0.5, 30.1) << std::endl;
+  //  std::cout << "SF_bc    (eta=2.1,pt=30.1) : " << reader_BC.eval(BTagEntry::FLAV_B, 2.1, 30.1) << std::endl;
 
   TFile * fileTagging = new TFile(TString(cmsswBase)+TString("/src/DesyTauAnalyses/NTupleMaker/data/tagging_efficiencies.root"));
   TH1F * tagEff_B = (TH1F*)fileTagging->Get("btag_eff_b");
@@ -685,11 +771,8 @@ int main(int argc, char * argv[]) {
 
   float MaxBJetPt = 670.;
   float MaxLJetPt = 1000.;
+  float MinLJetPt = 20.;
   float MinBJetPt = 30.;
-
-  // reader_up.load(...)
-  // reader_down.load(...)
-
 
   //  exit(-1);
 
@@ -1415,6 +1498,8 @@ int main(int argc, char * argv[]) {
       iso_2 = isoMuMin;
       m_2 = muonMass;
       
+      float eleScale = eleScaleBarrel;
+      if (fabs(analysisTree.electron_eta[electronIndex])>1.479) eleScale = eleScaleEndcap;
       // filling electron variables
       pt_1 = analysisTree.electron_pt[electronIndex];
       pt_Up_1 = (1+eleScale)*pt_1;
@@ -1509,6 +1594,10 @@ int main(int argc, char * argv[]) {
       m_vis_muDown  = (muonDownLV+electronLV).M();
       m_vis_eUp     = (muonLV+electronUpLV).M();
       m_vis_eDown   = (muonLV+electronDownLV).M();
+      m_vis_scaleUp   = m_vis;
+      m_vis_scaleDown = m_vis;
+      m_vis_resoUp    = m_vis;
+      m_vis_resoDown  = m_vis;
 
       // std::cout << "m_vis        = " << m_vis << std::endl;
       // std::cout << "m_vis_muUp   = " << m_vis_muUp << std::endl;
@@ -1580,46 +1669,54 @@ int main(int argc, char * argv[]) {
 
 	jetspt20.push_back(jet);
 
-	if (absJetEta<bJetEtaCut) { 
+	if (absJetEta<bJetEtaCut) { // jet within b-tagging acceptance
+
 	  bool tagged = analysisTree.pfjet_btag[jet][nBTagDiscriminant]>btagCut; // b-jet
 
-	  int flavor = abs(analysisTree.pfjet_flavour[jet]);
+	  if (!isData) {
+	    int flavor = abs(analysisTree.pfjet_flavour[jet]);
 
-	  double jet_scalefactor = 1;
-	  double JetPtForBTag = jetPt;
-	  double tageff = 1;
-	  if (JetPtForBTag<30) JetPtForBTag = 31.0;
-	  if (flavor==5) {
-	    if (JetPtForBTag>MaxBJetPt) JetPtForBTag = MaxBJetPt - 1;
-	    jet_scalefactor = reader_BC.eval(BTagEntry::FLAV_B, absJetEta, JetPtForBTag);
-	    tageff = tagEff_B->Interpolate(TMath::Min(float(jetPt),float(1000)),absJetEta);
-	  }
-	  else if (flavor==4) {
-	    if (JetPtForBTag>MaxBJetPt) JetPtForBTag = MaxBJetPt - 1;
-	    jet_scalefactor = reader_BC.eval(BTagEntry::FLAV_C, absJetEta, JetPtForBTag);
-	    tageff = tagEff_C->Interpolate(TMath::Min(float(jetPt),float(1000)),absJetEta);
-	  }
-	  else {
-	    if (JetPtForBTag>MaxLJetPt) JetPtForBTag = MaxLJetPt - 1;
-	    jet_scalefactor = reader_Light.eval(BTagEntry::FLAV_UDSG, absJetEta, JetPtForBTag);
-	    tageff = tagEff_Light->Interpolate(TMath::Min(float(jetPt),float(1000)),absJetEta);
-	  }
-	  if (tageff<1e-5) tageff = 1e-5;
-	  rand.SetSeed((int)((jetEta+5)*100000));
-	  double rannum = rand.Rndm();
-	  
-	  if (jet_scalefactor<1 && tagged) { // downgrade
-	    double fraction = 1-jet_scalefactor;
-	    if (rannum<fraction) {
-	      tagged = false;
-	      std::cout << "upgrading " << std::endl;
+	    double jet_scalefactor = 1;
+	    double JetPtForBTag = jetPt;
+	    double tageff = 1;
+
+	    if (flavor==5) {
+	      if (JetPtForBTag>MaxBJetPt) JetPtForBTag = MaxBJetPt - 0.1;
+	      if (JetPtForBTag<MinBJetPt) JetPtForBTag = MinBJetPt + 0.1;
+	      jet_scalefactor = reader_BC.eval(BTagEntry::FLAV_B, absJetEta, JetPtForBTag);
+	      tageff = tagEff_B->Interpolate(JetPtForBTag,absJetEta);
 	    }
-	  }
-	  if (jet_scalefactor>1 && !tagged) { // upgrade
-	    double fraction = (jet_scalefactor-1.0)/(1.0/tageff-1.0);
-	    if (rannum<fraction) { 
-	      tagged = true;
-	      std::cout << "downgrading " << std::endl;
+	    else if (flavor==4) {
+	      if (JetPtForBTag>MaxBJetPt) JetPtForBTag = MaxBJetPt - 0.1;
+	      if (JetPtForBTag<MinBJetPt) JetPtForBTag = MinBJetPt + 0.1;
+	      jet_scalefactor = reader_BC.eval(BTagEntry::FLAV_C, absJetEta, JetPtForBTag);
+	      tageff = tagEff_C->Interpolate(JetPtForBTag,absJetEta);
+	    }
+	    else {
+	      if (JetPtForBTag>MaxLJetPt) JetPtForBTag = MaxLJetPt - 0.1;
+	      if (JetPtForBTag<MinLJetPt) JetPtForBTag = MinLJetPt + 0.1;
+	      jet_scalefactor = reader_Light.eval(BTagEntry::FLAV_UDSG, absJetEta, JetPtForBTag);
+	      tageff = tagEff_Light->Interpolate(JetPtForBTag,absJetEta);
+	    }
+	    
+	    if (tageff<1e-5)      tageff = 1e-5;
+	    if (tageff>0.99999)   tageff = 0.99999;
+	    rand.SetSeed((int)((jetEta+5)*100000));
+	    double rannum = rand.Rndm();
+	    
+	    if (jet_scalefactor<1 && tagged) { // downgrade
+	      double fraction = 1-jet_scalefactor;
+	      if (rannum<fraction) {
+		tagged = false;
+		//		std::cout << "downgrading " << std::endl;
+	      }
+	    }
+	    if (jet_scalefactor>1 && !tagged) { // upgrade
+	      double fraction = (jet_scalefactor-1.0)/(1.0/tageff-1.0);
+	      if (rannum<fraction) { 
+		tagged = true;
+		//		std::cout << "upgrading " << std::endl;
+	      }
 	    }
 	  }
 
@@ -1630,7 +1727,7 @@ int main(int argc, char * argv[]) {
 	      indexLeadingBJet = jet;
 	    }
 	  }
-	} 
+	}
 
 	if (jetPt>jetPtHighCut)
 	  jets.push_back(jet);
@@ -1829,30 +1926,25 @@ int main(int argc, char * argv[]) {
       float mvamet_resoDown_x  = mvamet_x;
       float mvamet_resoDown_y  = mvamet_y;
 
-      if (!isData)
+      if (!isData) {
 	metSys.ApplyMEtSys(mvamet_x,mvamet_y,
 			   bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,bkgdType,
 			   MEtSys::SysType::Response,MEtSys::SysShift::Up,
 			   mvamet_scaleUp_x,mvamet_scaleUp_y);
-	
-
-      if (!isData)
 	metSys.ApplyMEtSys(mvamet_x,mvamet_y,
 			   bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,bkgdType,
 			   MEtSys::SysType::Response,MEtSys::SysShift::Down,
 			   mvamet_scaleDown_x,mvamet_scaleDown_y);
-      
-      if (!isData)
 	metSys.ApplyMEtSys(mvamet_x,mvamet_y,
 			   bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,bkgdType,
 			   MEtSys::SysType::Resolution,MEtSys::SysShift::Up,
 			   mvamet_resoUp_x,mvamet_resoUp_y);
-      
-      if (!isData)
 	metSys.ApplyMEtSys(mvamet_x,mvamet_y,
 			   bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,bkgdType,
 			   MEtSys::SysType::Resolution,MEtSys::SysShift::Down,
 			   mvamet_resoDown_x,mvamet_resoDown_y);
+      }
+
       
       mvamet_scaleUp = TMath::Sqrt(mvamet_scaleUp_x*mvamet_scaleUp_x+
 				   mvamet_scaleUp_y*mvamet_scaleUp_y);
@@ -1950,12 +2042,191 @@ int main(int argc, char * argv[]) {
       mTtot_resoUp   =  totalTransverseMass ( muonLV , electronLV , mvametResoUpLV);
       mTtot_resoDown =  totalTransverseMass ( muonLV , electronLV , mvametResoDownLV);
 
-      if (dzeta_mvamet>-21.0 && computeSVFitMass) {
-	
+      m_sv           = -9999;
+      m_sv_muUp      = -9999;
+      m_sv_muDown    = -9999;
+      m_sv_eUp       = -9999;
+      m_sv_eDown     = -9999;
+      m_sv_scaleUp   = -9999;
+      m_sv_scaleDown = -9999;
+      m_sv_resoUp    = -9999;
+      m_sv_resoDown  = -9999;
 
+      mt_sv           = -9999;
+      mt_sv_muUp      = -9999;
+      mt_sv_muDown    = -9999;
+      mt_sv_eUp       = -9999;
+      mt_sv_eDown     = -9999;
+      mt_sv_scaleUp   = -9999;
+      mt_sv_scaleDown = -9999;
+      mt_sv_resoUp    = -9999;
+      mt_sv_resoDown  = -9999;
+
+      if (computeSVFitMass && dzeta_mvamet>-30) {
+
+	if (mvaMetFound) {
+	  // covariance matrix MVAMET
+	  TMatrixD covMVAMET(2, 2);
+	  covMVAMET[0][0] =  mvacov00;
+	  covMVAMET[1][0] =  mvacov01;
+	  covMVAMET[0][1] =  mvacov10;
+	  covMVAMET[1][1] =  mvacov11;
+
+	  // mva met
+	  // define electron 4-vector
+	  svFitStandalone::MeasuredTauLepton svFitEle(svFitStandalone::kTauToElecDecay, 
+						       pt_1, eta_1, phi_1, 0.51100e-3); 
+	  svFitStandalone::MeasuredTauLepton svFitEleUp(svFitStandalone::kTauToElecDecay, 
+							(1.0+eleScale)*pt_1, eta_1, phi_1, 0.51100e-3); 
+	  svFitStandalone::MeasuredTauLepton svFitEleDown(svFitStandalone::kTauToElecDecay, 
+							  (1.0-eleScale)*pt_1, eta_1, phi_1, 0.51100e-3); 
+	  // define muon 4-vector
+	  svFitStandalone::MeasuredTauLepton svFitMu(svFitStandalone::kTauToMuDecay,  
+						      pt_2, eta_2, phi_2, 105.658e-3); 
+
+  
+	  // central value
+	  SVfitStandaloneAlgorithm algo = SVFitMassComputation(svFitEle, svFitMu,
+							       mvamet_x, mvamet_y, 
+							       covMVAMET, inputFile_visPtResolution);
+
+	  m_sv = algo.getMass(); // return value of svfit mass is in units of GeV
+	  mt_sv = algo.transverseMass(); // return value of transverse svfit mass is in units of GeV
+	  if ( !algo.isValidSolution() ) 
+	    std::cout << "sorry -- status of NLL is not valid [" << algo.isValidSolution() << "]" << std::endl;
+	  
+	  pt_sv  = algo.pt(); 
+	  eta_sv = algo.eta();
+	  phi_sv = algo.phi();
+
+	  m_sv_scaleUp   = m_sv;
+	  m_sv_scaleDown = m_sv;
+	  m_sv_resoUp    = m_sv;
+	  m_sv_resoDown  = m_sv;
+	  m_sv_eUp       = m_sv;
+	  m_sv_eDown     = m_sv;
+	  m_sv_muUp      = m_sv;
+	  m_sv_muDown    = m_sv;
+
+	  mt_sv_scaleUp   = mt_sv;
+	  mt_sv_scaleDown = mt_sv;
+	  mt_sv_resoUp    = mt_sv;
+	  mt_sv_resoDown  = mt_sv;
+	  mt_sv_eUp       = mt_sv;
+	  mt_sv_eDown     = mt_sv;
+	  mt_sv_muUp      = mt_sv;
+	  mt_sv_muDown    = mt_sv;
+
+	  if (!isData) { 
+
+	    SVfitStandaloneAlgorithm algo_eUp = SVFitMassComputation(svFitEleUp, svFitMu,
+								     mvamet_x, mvamet_y,
+								     covMVAMET, inputFile_visPtResolution);
+	    SVfitStandaloneAlgorithm algo_eDown = SVFitMassComputation(svFitEleDown, svFitMu,
+								       mvamet_x, mvamet_y,
+								       covMVAMET, inputFile_visPtResolution);
+	    
+
+	    m_sv_eUp    = algo_eUp.getMass();
+	    mt_sv_eUp   = algo_eUp.transverseMass();
+	    m_sv_eDown  = algo_eDown.getMass();
+	    mt_sv_eDown = algo_eDown.transverseMass();
+
+	    if (isDY) {
+	      SVfitStandaloneAlgorithm algo_scaleUp = SVFitMassComputation(svFitEle, svFitMu,
+									   mvamet_scaleUp_x, mvamet_scaleUp_y,
+									   covMVAMET, inputFile_visPtResolution);
+
+	      SVfitStandaloneAlgorithm algo_scaleDown = SVFitMassComputation(svFitEle, svFitMu,
+									     mvamet_scaleDown_x, mvamet_scaleDown_y,
+									     covMVAMET, inputFile_visPtResolution);
+
+	      // SVfitStandaloneAlgorithm algo_resoUp = SVFitMassComputation(svFitEle, svFitMu,
+	      // 								mvamet_resoUp_x, mvamet_resoUp_y,
+	      // 								covMVAMET, inputFile_visPtResolution);
+	      
+	      // SVfitStandaloneAlgorithm algo_resoDown = SVFitMassComputation(svFitEle, svFitMu,
+	      // 								  mvamet_resoDown_x, mvamet_resoDown_y,
+	      // 								  covMVAMET, inputFile_visPtResolution);
+	      
+	      m_sv_scaleUp    = algo_scaleUp.getMass();
+	      mt_sv_scaleUp   = algo_scaleUp.transverseMass();
+	      m_sv_scaleDown  = algo_scaleDown.getMass();
+	      mt_sv_scaleDown = algo_scaleDown.transverseMass();
+
+	      // m_sv_resoUp     = algo_resoUp.getMass();
+	      // mt_sv_resoUp    = algo_resoUp.transverseMass();
+	      // m_sv_resoDown   = algo_resoDown.getMass();
+	      // mt_sv_resoDown  = algo_resoDown.transverseMass();
+
+	    }
+	  }
+	  //	  std::cout << "eta(e) = " << eta_1 << "   escale = " << eleScale << std::endl;
+	  //	  std::cout << "msv = " << m_sv << std::endl;
+	  //	  std::cout << "msv(eES)      : up = " << m_sv_eUp << "   down = " << m_sv_eDown << std::endl;
+	  //	  std::cout << "msv(metScale) : up = " << m_sv_scaleUp << "   down = " << m_sv_scaleDown << std::endl;
+	  //	  std::cout << "mtsv = " << mt_sv << std::endl;
+	  //	  std::cout << "mtsv(eES)      : up = " << mt_sv_eUp << "   down = " << mt_sv_eDown << std::endl;
+	  //	  std::cout << "mtsv(metScale) : up = " << mt_sv_scaleUp << "   down = " << mt_sv_scaleDown << std::endl;
+	  //	  std::cout << std::endl;
+	}
+      }
+      gen_match_1 = 6;
+      gen_match_2 = 6;
+
+      // isZTT = false;
+      // isZL  = false;
+      // isZJ  = false;
+
+      float minDR_1 = 0.2;
+      float minDR_2 = 0.2;
+      if (!isData && isDY) {
+	for (unsigned int igen=0; igen < analysisTree.genparticles_count; ++igen) {
+	  TLorentzVector genLV; genLV.SetXYZT(analysisTree.genparticles_px[igen],
+					      analysisTree.genparticles_py[igen],
+					      analysisTree.genparticles_pz[igen],
+					      analysisTree.genparticles_e[igen]);
+	  float ptGen = genLV.Pt();
+	  bool type1 = abs(analysisTree.genparticles_pdgid[igen])==11 && analysisTree.genparticles_isPrompt[igen] && ptGen>8;
+	  bool type2 = abs(analysisTree.genparticles_pdgid[igen])==13 && analysisTree.genparticles_isPrompt[igen] && ptGen>8;
+	  bool type3 = abs(analysisTree.genparticles_pdgid[igen])==11 && analysisTree.genparticles_isDirectPromptTauDecayProduct[igen] && ptGen>8;
+	  bool type4 = abs(analysisTree.genparticles_pdgid[igen])==13 && analysisTree.genparticles_isDirectPromptTauDecayProduct[igen] && ptGen>8;
+	  bool isAnyType = type1 || type2 || type3 || type4;
+	  if (isAnyType) {
+	    float etaGen = genLV.Eta();
+	    float phiGen = genLV.Phi();
+	    float deltaR_1 = deltaR(eta_1,phi_1,
+				    etaGen,phiGen);
+	    if (deltaR_1<minDR_1) {
+	      minDR_1 = deltaR_1;
+	      if (type1) gen_match_1 = 1;
+	      else if (type2) gen_match_1 = 2;
+	      else if (type3) gen_match_1 = 3;
+	      else if (type4) gen_match_1 = 4;
+	    }
+	    
+	    float deltaR_2 = deltaR(eta_2,phi_2,
+				    etaGen,phiGen);
+	    if (deltaR_2<minDR_2) {
+	      minDR_2 = deltaR_2;
+	      if (type1) gen_match_2 = 1;
+	      else if (type2) gen_match_2 = 2;
+	      else if (type3) gen_match_2 = 3;
+	      else if (type4) gen_match_2 = 4;
+	    }
+	  }
+	}
+
+	if (gen_match_1>2&&gen_match_2>3) { 
+	  isZTT = true;
+	  isZLL = false;
+	}
+	else {
+	  isZTT = false;
+	  isZLL = true;
+	}
 
       }
-
 
       tree->Fill();
       selEvents++;

@@ -237,6 +237,8 @@ public :
    Float_t         tau_byTightCombinedIsolationDeltaBetaCorr3Hits[50];   //[tau_count]
    Float_t         tau_byIsolationMVArun2v1DBoldDMwLTraw[50];   //[tau_count]
    Float_t         tau_byIsolationMVArun2v1DBnewDMwLTraw[50];   //[tau_count]
+   Float_t 	   tau_byLooseIsolationMVArun2v1DBoldDMwLT[50];
+   Float_t 	   tau_byMediumIsolationMVArun2v1DBoldDMwLT[50];
    Float_t 	   tau_byTightIsolationMVArun2v1DBoldDMwLT[50];
    Float_t         tau_chargedIsoPtSum[50];   //[tau_count]
    Float_t         tau_neutralIsoPtSum[50];   //[tau_count]
@@ -256,6 +258,7 @@ public :
    Float_t         tau_againstElectronMediumMVA5[50];   //[tau_count]
    Float_t         tau_againstElectronTightMVA5[50];   //[tau_count]
    Float_t         tau_againstElectronVLooseMVA6[50];
+   Float_t         tau_againstElectronLooseMVA6[50];
    Float_t   	   tau_againstElectronTightMVA6[50];
    UInt_t          tau_ntracks_pt05[50];   //[tau_count]
    UInt_t          tau_ntracks_pt08[50];   //[tau_count]
@@ -453,12 +456,16 @@ public :
    std::vector<std::string>  *run_btagdiscriminators = new std::vector<std::string>();
 
    std::map<std::string, int>* hltriggerresults = new std::map<std::string, int>() ;
-   std::vector<std::string>  hltriggerresults_first;
-   std::vector<int>          hltriggerresults_second;   //[hltriggerresults_]
+   std::vector<std::string>    hltriggerresults_first;
+   std::vector<int>            hltriggerresults_second;   //[hltriggerresults_]
    std::map<std::string, int>* hltriggerprescales = new std::map<std::string, int>();
-   std::vector<std::string>  hltriggerprescales_first;
-   std::vector<int>          hltriggerprescales_second;   //[hltriggerprescales_]
-   std::vector<std::string>  *hltriggerresultsV;
+   std::vector<std::string>    hltriggerprescales_first;
+   std::vector<int>            hltriggerprescales_second;   //[hltriggerprescales_]
+   std::vector<std::string>*   hltriggerresultsV;
+
+   std::map<std::string, int>* flags = new std::map<std::string, int>(); // [flags_]
+   std::vector<std::string>    flags_first;
+   std::vector<int>            flags_second; 
 
    // List of branches
    TBranch        *b_errors;   //!
@@ -670,6 +677,8 @@ public :
    TBranch        *b_tau_byLooseCombinedIsolationDeltaBetaCorr3Hits;   //!
    TBranch        *b_tau_byMediumCombinedIsolationDeltaBetaCorr3Hits;   //!
    TBranch        *b_tau_byTightCombinedIsolationDeltaBetaCorr3Hits;   //!
+   TBranch 	  *b_tau_byLooseIsolationMVArun2v1DBoldDMwLT;
+   TBranch 	  *b_tau_byMediumIsolationMVArun2v1DBoldDMwLT;
    TBranch 	  *b_tau_byTightIsolationMVArun2v1DBoldDMwLT;
    TBranch        *b_tau_byIsolationMVArun2v1DBoldDMwLTraw;   //!
    TBranch        *b_tau_byIsolationMVArun2v1DBnewDMwLTraw;   //!
@@ -692,6 +701,7 @@ public :
    TBranch        *b_tau_againstElectronTightMVA5;   //!
    TBranch 	  *b_tau_againstElectronTightMVA6;
    TBranch        *b_tau_againstElectronVLooseMVA6;
+   TBranch        *b_tau_againstElectronLooseMVA6;
    TBranch        *b_tau_ntracks_pt05;   //!
    TBranch        *b_tau_ntracks_pt08;   //!
    TBranch        *b_tau_ntracks_pt1;   //!
@@ -889,6 +899,7 @@ public :
    TBranch        *b_hltriggerresults;   //!
    TBranch        *b_hltriggerprescales;   //!
    TBranch        *b_hltriggerresultsV;   //!
+   TBranch        *b_flags;   //!
 
    AC1B(TTree *tree=0, bool isData = 0);
    virtual ~AC1B();
@@ -948,6 +959,14 @@ Int_t AC1B::GetEntry(Long64_t entry)
 	 hltriggerprescales_first.push_back(it->first);
 	 hltriggerprescales_second.push_back(it->second);
        }
+       flags_first.clear();
+       flags_second.clear(); 
+       //       unsigned int nprescales = hltriggerprescales->size();
+       for (std::map<std::string,int>::iterator it=flags->begin(); it!=flags->end(); ++it) {
+	 flags_first.push_back(it->first);
+	 flags_second.push_back(it->second);
+       }
+
    }
    return entryX;
 
@@ -1213,6 +1232,8 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("tau_byTightCombinedIsolationDeltaBetaCorr3Hits", tau_byTightCombinedIsolationDeltaBetaCorr3Hits, &b_tau_byTightCombinedIsolationDeltaBetaCorr3Hits);
    fChain->SetBranchAddress("tau_byIsolationMVArun2v1DBoldDMwLTraw", tau_byIsolationMVArun2v1DBoldDMwLTraw, &b_tau_byIsolationMVArun2v1DBoldDMwLTraw);
    fChain->SetBranchAddress("tau_byIsolationMVArun2v1DBnewDMwLTraw", tau_byIsolationMVArun2v1DBnewDMwLTraw, &b_tau_byIsolationMVArun2v1DBnewDMwLTraw);
+   fChain->SetBranchAddress("tau_byLooseIsolationMVArun2v1DBoldDMwLT", tau_byLooseIsolationMVArun2v1DBoldDMwLT, &b_tau_byLooseIsolationMVArun2v1DBoldDMwLT); 
+   fChain->SetBranchAddress("tau_byMediumIsolationMVArun2v1DBoldDMwLT", tau_byMediumIsolationMVArun2v1DBoldDMwLT, &b_tau_byMediumIsolationMVArun2v1DBoldDMwLT); 
    fChain->SetBranchAddress("tau_byTightIsolationMVArun2v1DBoldDMwLT", tau_byTightIsolationMVArun2v1DBoldDMwLT, &b_tau_byTightIsolationMVArun2v1DBoldDMwLT); 
    fChain->SetBranchAddress("tau_chargedIsoPtSum", tau_chargedIsoPtSum, &b_tau_chargedIsoPtSum);
    fChain->SetBranchAddress("tau_neutralIsoPtSum", tau_neutralIsoPtSum, &b_tau_neutralIsoPtSum);
@@ -1233,6 +1254,7 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("tau_againstElectronTightMVA5", tau_againstElectronTightMVA5, &b_tau_againstElectronTightMVA5);
    fChain->SetBranchAddress("tau_againstElectronTightMVA6", tau_againstElectronTightMVA6, &b_tau_againstElectronTightMVA6);
    fChain->SetBranchAddress("tau_againstElectronVLooseMVA6", tau_againstElectronVLooseMVA6, &b_tau_againstElectronVLooseMVA6);
+   fChain->SetBranchAddress("tau_againstElectronLooseMVA6", tau_againstElectronLooseMVA6, &b_tau_againstElectronLooseMVA6);
    fChain->SetBranchAddress("tau_ntracks_pt05", tau_ntracks_pt05, &b_tau_ntracks_pt05);
    fChain->SetBranchAddress("tau_ntracks_pt08", tau_ntracks_pt08, &b_tau_ntracks_pt08);
    fChain->SetBranchAddress("tau_ntracks_pt1", tau_ntracks_pt1, &b_tau_ntracks_pt1);
@@ -1430,6 +1452,7 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("hltriggerresults", &hltriggerresults, &b_hltriggerresults);
    fChain->SetBranchAddress("hltriggerprescales", &hltriggerprescales, &b_hltriggerprescales);
    fChain->SetBranchAddress("hltriggerresultsV", &hltriggerresultsV, &b_hltriggerresultsV);
+   fChain->SetBranchAddress("flags", &flags, &b_flags);
    Notify();
 }
 
