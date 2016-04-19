@@ -2109,7 +2109,6 @@ int main(int argc, char * argv[]) {
 			if (isIsoMuonsPair) selEventsIsoMuons++;
 		} // end of file processing (loop over events in one file)
 		nFiles++;
-		delete inputFile_visPtResolution;
 		delete _tree;
 		file_->Close();
 		delete file_;
@@ -2135,6 +2134,7 @@ int main(int argc, char * argv[]) {
 	file->Write();
 	file->Close();
 	delete file;
+	delete inputFile_visPtResolution;
 }
 
 
