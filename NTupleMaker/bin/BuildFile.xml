@@ -73,12 +73,33 @@
  <use name="rootgraphics"/>
  <use name="root"/>
  <use name="rootmath"/>
- <use name="roottmva"/>
- <use name="boost" />
- <use name="boost_program_options"/>
  <use name="DesyTauAnalyses/NTupleMaker"/>
 </bin>
 
+<bin name="SUSYeltau" file="AnalysisMacroSUSYeltau.cpp">
+ <use name="PhysicsTools/Utilities"/>
+ <use name="rootgraphics"/>
+ <use name="root"/>
+ <use name="rootmath"/>
+ <use name="DesyTauAnalyses/NTupleMaker"/>
+</bin>
+
+
+<bin name="SUSYWtemplate" file="AnalysisMacro_Wtemplate.cpp">
+ <use name="PhysicsTools/Utilities"/>
+ <use name="rootgraphics"/>
+ <use name="root"/>
+ <use name="rootmath"/>
+ <use name="DesyTauAnalyses/NTupleMaker"/>
+</bin>
+
+<bin name="SUSYTtemplate" file="AnalysisMacroSUSY_TopTemplateemu.cpp">
+ <use name="PhysicsTools/Utilities"/>
+ <use name="rootgraphics"/>
+ <use name="root"/>
+ <use name="rootmath"/>
+ <use name="DesyTauAnalyses/NTupleMaker"/>
+</bin>
 
 <bin   file="preAnalyzerTauTau_Summer15.cc"  name="preAnalyzerTauTau">
   <use   name="DataFormats/FWLite"/>
@@ -150,8 +171,29 @@
  <use name="DesyTauAnalyses/NTupleMaker"/>
 </bin>
 
+<bin name="taufakerateDY" file="AnalysisMacro_taufakeratedimuons.cpp">
+ <use name="PhysicsTools/Utilities"/>
+ <use name="rootgraphics"/>
+ <use name="root"/>
+ <use name="rootmath"/>
+ <use name="roottmva"/>
+ <use name="boost" />
+ <use name="boost_program_options"/>
+ <use name="DesyTauAnalyses/NTupleMaker"/>
+</bin>
 
-<bin name="taufakerate" file="AnalysisMacro_taufakerate.cpp">
+<bin name="taufakerateMu" file="AnalysisMacro_taufakerateMu.cpp">
+ <use name="PhysicsTools/Utilities"/>
+ <use name="rootgraphics"/>
+ <use name="root"/>
+ <use name="rootmath"/>
+ <use name="roottmva"/>
+ <use name="boost" />
+ <use name="boost_program_options"/>
+ <use name="DesyTauAnalyses/NTupleMaker"/>
+</bin>
+
+<bin name="taufakerateEl" file="AnalysisMacro_taufakerateEl.cpp">
  <use name="PhysicsTools/Utilities"/>
  <use name="rootgraphics"/>
  <use name="root"/>
@@ -171,4 +213,11 @@
  <use name="boost" />
  <use name="boost_program_options"/>
  <use name="DesyTauAnalyses/NTupleMaker"/>
+</bin>
+
+<bin name="RunCor" file="RunCor.cpp">
+ <use name="rootgraphics"/>
+ <use name="root"/>
+ <use name="rootmath"/>
+ <use name="roottmva"/>
 </bin>
