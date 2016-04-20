@@ -40,7 +40,7 @@ pwd
 echo ==============================================
 
 cp $dir/analyzer_h .
-cp $dir/analyzer_Wtemplate_C .
+cp $dir/analyzer_Wtemplate2_C .
 
 
 cp $dir/runme.C .
@@ -55,11 +55,13 @@ fileB=`echo $file | awk -F "_B_OS" '{print $1}'`
 echo $line , $fileA , $fileB
 if [[  $file == *"B_OS"* &&  ! -f $dir/plotsW/${fileB}.root ]]  ; then
 cp analyzer_h analyzer.h
-cp analyzer_Wtemplate_C analyzer.C
+cp analyzer_Wtemplate2_C analyzer.C
 
 echo the filein for main region : $file , the fileout : $file
 sed -i 's/FILEIN/'$file'/g' analyzer.h
 sed -i 's/FILEIN/'$file'/g' analyzer.C
+sed -i 's/LEPTONHERE/false/g' analyzer.C
+sed -i 's/SIGNHERE/OS/g' analyzer.C
 
 rm plots.root
 root -l -q -b runme.C 

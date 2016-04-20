@@ -27,7 +27,7 @@ cd /nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/CMSSW_7_4_14/src/DesyTauAnaly
 #find /nfs/dust/cms/user/alkaloge/ACD/NAFtools-RunOnProcessed/CMSSW_7_4_4/src/FastSim/Output/*/*/ -type f -name "*.root" > filesMC
 
 #ls FastSim_Stau > filesMC
-ls /nfs/dust/cms/user/alkaloge/ACD/NAFtools-RunOnProcessed/CMSSW_7_4_14/src/miniAOD/Output/StauScan > filesMC
+ls /nfs/dust/cms/user/alkaloge/ACD/NAFtools-RunOnProcessed/CMSSW_7_4_14/src/miniAOD/Output/StauScan/stau_stau50_LSP0_* > filesMC
 #ls /nfs/dust/cms/user/alkaloge/ACD/NAFtools-RunOnProcessed/CMSSW_7_4_4/src/FastSim/Output/f > filesMC
 #cat filesMC | head -1  > t 
 #mv t filesMC

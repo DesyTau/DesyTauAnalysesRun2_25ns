@@ -33,12 +33,12 @@ channel=$2
 dir=$3
 
 
-channel=mutau
-dir=eltau
-region=InvMET
-
-region=InvTauIso
 #dir=InvMuIso
+region=InvMuIso
+channel=mutau
+dir=25ns
+
+dir=Ttemplate
 
 if [ ! -d Jobs ]
 then
@@ -52,7 +52,6 @@ fi
 
 
 cp *.conf 25ns/.
-cp *.conf Htt/.
 cp *.conf Jobs/.
 
 while read line
@@ -81,10 +80,10 @@ then
 	echo $dir/${bas}_B_OS_DataDriven.root
 echo $f > $dir/$bas
 cat bss > Jobs/job$line$channel$dir${bas}_B.sh
-#echo SUSYTtemplate analysisMacroSUSY_Data_B.conf ${bas} $dir>> Jobs/job$line$channel$dir${bas}_B.sh
-echo SUSYmutau analysisMacroSUSY_Data_B.conf ${bas} $dir>> Jobs/job$line$channel$dir${bas}_B.sh
+echo SUSYTtemplate analysisMacroSUSY_Data_B.conf ${bas} $dir>> Jobs/job$line$channel$dir${bas}_B.sh
+e#cho SUSYmutau analysisMacroSUSY_Data_B.conf ${bas} $dir>> Jobs/job$line$channel$dir${bas}_B.sh
 #echo SUSYeltau analysisMacroSUSY_Data_B.conf ${bas} $dir>> Jobs/job$line$channel$dir${bas}_B.sh
-#echo taufakerate analysisMacroSUSY_Data_B.conf $bas $dir>> Jobs/job$line$channel$dir${bas}_B.sh
+#echo taufakerateMu analysisMacroSUSY_Data_B.conf $bas $dir>> Jobs/job$line$channel$dir${bas}_B.sh
 #echo taufakerateJets analysisMacroSUSY_DataJets_TauFakeRate.conf $bas $dir>> Jobs/job$line$channel$dir${bas}_B.sh
 
 chmod u+x Jobs/job$line$channel$dir${bas}_B.sh
@@ -101,7 +100,7 @@ echo 	SUSYmutau analysisMacroSUSY_Data_A.conf ${bas} $dir>> Jobs/job$line$channe
 #echo 	SUSYeltau analysisMacroSUSY_Data_A.conf ${bas} $dir>> Jobs/job$line$channel$dir${bas}_A.sh
 #echo 	SUSYTtemplate analysisMacroSUSY_Data_A.conf ${bas} $dir>> Jobs/job$line$channel$dir${bas}_A.sh
 chmod u+x Jobs/job$line$channel$dir${bas}_A.sh
-qsub Jobs/job$line$channel$dir${bas}_A.sh 
+#qsub Jobs/job$line$channel$dir${bas}_A.sh 
 fi
 
 if [ ! -f $dir/${bas}_${region}__C_OS_DataDriven.root ]
@@ -112,7 +111,7 @@ echo 	SUSYmutau analysisMacroSUSY_Data_C_${region}.conf ${bas} $dir>> Jobs/job$l
 #echo 	SUSYeltau analysisMacroSUSY_Data_C_${region}.conf ${bas} $dir>> Jobs/job$line$channel$dir${bas}_C_${region}.sh
 #echo 	SUSYTtemplate analysisMacroSUSY_Data_C_${region}.conf ${bas} $dir>> Jobs/job$line$channel$dir${bas}_C_${region}.sh
 chmod u+x Jobs/job$line$channel$dir${bas}_C_${region}.sh
-qsub Jobs/job$line$channel$dir${bas}_C_${region}.sh 
+#qsub Jobs/job$line$channel$dir${bas}_C_${region}.sh 
 fi
 
 
@@ -124,7 +123,7 @@ echo 	SUSYmutau analysisMacroSUSY_Data_D_${region}.conf ${bas} $dir>> Jobs/job$l
 #echo 	SUSYeltau analysisMacroSUSY_Data_D_${region}.conf ${bas} $dir>> Jobs/job$line$channel$dir${bas}_D_${region}.sh
 #echo 	SUSYTtemplate analysisMacroSUSY_Data_D_${region}.conf ${bas} $dir>> Jobs/job$line$channel$dir${bas}_D_${region}.sh
 chmod u+x Jobs/job$line$channel$dir${bas}_D_${region}.sh
-qsub Jobs/job$line$channel$dir${bas}_D_${region}.sh 
+#qsub Jobs/job$line$channel$dir${bas}_D_${region}.sh 
 fi
 
 

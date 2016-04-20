@@ -26,18 +26,18 @@ channel=$2
 era=$3
 
 era=25ns
-
+#era=InvMuIso
 #era=eltau
 
 channel=mutau
-channel=eltau
+#channel=eltau
 
 
 while read line
 do
 
 
-if [ ! -f $era/$line.root ] 
+if [ ! -f $era/${line}_B_OS.root ] 
 then
 SUSY$channel analysisMacroSUSY_MC_B.conf ${line} $era
 

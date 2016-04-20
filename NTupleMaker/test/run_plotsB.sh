@@ -63,6 +63,8 @@ fileA=`echo $file | awk -F "_A_SS" '{print $1}'`
 unset fileB
 fileB=`echo $file | awk -F "_B_OS" '{print $1}'`
 
+
+
 echo $line , $fileA , $fileB
 if [[  $file == *"A_SS"* &&  ! -f $dir/plots/${fileA}_A.root ]] || [[  $file == *"B_OS"* &&  ! -f $dir/plots/${fileB}_B.root ]]  ; then
 cp analyzer_h analyzer.h

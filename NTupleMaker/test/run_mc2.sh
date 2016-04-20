@@ -25,17 +25,19 @@
 cd /nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/CMSSW_7_4_14/src/DesyTauAnalyses/NTupleMaker/test ;  eval `scramv1 runtime -sh` ;
 
 channel=$2 
-era=$3
+dir=$3
 
-era=Htt
-era=Ttemplate
-era=eltau
+dir=eltau
 
-era=25ns
-channel=mutau
-region=InvMET
-region=InvTauIso
+dir=25ns
+#region=InvMET
+dir=25ns
 
+
+#dir=InvMuIso
+channel=muel
+region=InvMuIso
+dir=Ttemplate
 
 ##type MC or Data
 type=MC
@@ -60,7 +62,7 @@ do
 
 unset xsec
 xsec=`grep " ${line} " xsecs | cut -d " " -f3-4`	
-#	cp $era/${line} input$line
+#	cp $dir/${line} input$line
 #xsec=1
 echo FOUND XSEC for ${line} to be $xsec
 unset f
@@ -71,69 +73,69 @@ echo $f
 unset bas
 bas=`basename $f | awk -F ".root" '{print $1}'`
 
-if [ ! -f $era/$bas.root ] 
+if [ ! -f $dir/$bas.root ] 
 then
-echo $f > $era/$bas
+echo $f > $dir/$bas
 
 	echo " "$bas $xsec >> xsecs
 
-rm Jobs/job${line}$channel$era${bas}_B.sh
-rm Jobs/job${line}$channel$era${bas}_A.sh
-rm Jobs/job${line}$channel$era${bas}_C_${region}.sh
-rm Jobs/job${line}$channel$era${bas}_D_${region}.sh
+rm Jobs/job${line}$channel$dir${bas}_B.sh
+rm Jobs/job${line}$channel$dir${bas}_A.sh
+rm Jobs/job${line}$channel$dir${bas}_C_${region}.sh
+rm Jobs/job${line}$channel$dir${bas}_D_${region}.sh
 
 #analysisMacroSUSY_${type}_B.conf  analysisMacroSUSY_${type}_C_InvMu.conf  analysisMacroSUSY_${type}_D_InvMu.conf
 
-cat bss > Jobs/job${line}$channel$era${bas}_B.sh
-#echo SUSYTtemplate analysisMacroSUSY_${type}_B.conf ${bas} $era>> Jobs/job${line}$channel$era${bas}_B.sh
+cat bss > Jobs/job${line}$channel$dir${bas}_B.sh
+echo SUSYTtemplate analysisMacroSUSY_${type}_B.conf ${bas} $dir>> Jobs/job${line}$channel$dir${bas}_B.sh
 
-echo SUSYmutau analysisMacroSUSY_${type}_B.conf ${bas} $era>> Jobs/job${line}$channel$era${bas}_B.sh
-#echo SUSYeltau analysisMacroSUSY_${type}_B.conf ${bas} $era>> Jobs/job${line}$channel$era${bas}_B.sh
-#echo taufakerate analysisMacroSUSY_${type}_B.conf ${bas} $era>> Jobs/job${line}$channel$era${bas}_B.sh
+#echo SUSYmutau analysisMacroSUSY_${type}_B.conf ${bas} $dir>> Jobs/job${line}$channel$dir${bas}_B.sh
+#echo SUSYeltau analysisMacroSUSY_${type}_B.conf ${bas} $dir>> Jobs/job${line}$channel$dir${bas}_B.sh
+#echo taufakerateMu analysisMacroSUSY_${type}_B.conf ${bas} $dir>> Jobs/job${line}$channel$dir${bas}_B.sh
 
-cat bss > Jobs/job${line}$channel$era${bas}_A.sh
-#echo 	SUSYeltau analysisMacroSUSY_${type}_A.conf ${bas} $era>> Jobs/job${line}$channel$era${bas}_A.sh
-echo 	SUSYmutau analysisMacroSUSY_${type}_A.conf ${bas} $era>> Jobs/job${line}$channel$era${bas}_A.sh
-#echo 	SUSYTtemplate analysisMacroSUSY_${type}_A.conf ${bas} $era>> Jobs/job${line}$channel$era${bas}_A.sh
+cat bss > Jobs/job${line}$channel$dir${bas}_A.sh
+#echo 	SUSYeltau analysisMacroSUSY_${type}_A.conf ${bas} $dir>> Jobs/job${line}$channel$dir${bas}_A.sh
+echo 	SUSYmutau analysisMacroSUSY_${type}_A.conf ${bas} $dir>> Jobs/job${line}$channel$dir${bas}_A.sh
+#echo 	SUSYTtemplate analysisMacroSUSY_${type}_A.conf ${bas} $dir>> Jobs/job${line}$channel$dir${bas}_A.sh
 
-cat bss > Jobs/job${line}$channel$era${bas}_C_${region}.sh
-#echo 	SUSYeltau analysisMacroSUSY_${type}_C_${region}.conf ${bas} $era>> Jobs/job${line}$channel$era${bas}_C_${region}.sh
-echo 	SUSYmutau analysisMacroSUSY_${type}_C_${region}.conf ${bas} $era>> Jobs/job${line}$channel$era${bas}_C_${region}.sh
-#echo 	SUSYTtemplate analysisMacroSUSY_${type}_C_${region}.conf ${bas} $era>> Jobs/job${line}$channel$era${bas}_C_${region}.sh
+cat bss > Jobs/job${line}$channel$dir${bas}_C_${region}.sh
+#echo 	SUSYeltau analysisMacroSUSY_${type}_C_${region}.conf ${bas} $dir>> Jobs/job${line}$channel$dir${bas}_C_${region}.sh
+echo 	SUSYmutau analysisMacroSUSY_${type}_C_${region}.conf ${bas} $dir>> Jobs/job${line}$channel$dir${bas}_C_${region}.sh
+#echo 	SUSYTtemplate analysisMacroSUSY_${type}_C_${region}.conf ${bas} $dir>> Jobs/job${line}$channel$dir${bas}_C_${region}.sh
 
-cat bss > Jobs/job${line}$channel$era${bas}_D_${region}.sh
-#echo 	SUSYeltau analysisMacroSUSY_${type}_D_${region}.conf ${bas} $era>> Jobs/job${line}$channel$era${bas}_D_${region}.sh
-echo 	SUSYmutau analysisMacroSUSY_${type}_D_${region}.conf ${bas} $era>> Jobs/job${line}$channel$era${bas}_D_${region}.sh
-#echo 	SUSYTtemplate analysisMacroSUSY_${type}_D_${region}.conf ${bas} $era>> Jobs/job${line}$channel$era${bas}_D_${region}.sh
+cat bss > Jobs/job${line}$channel$dir${bas}_D_${region}.sh
+#echo 	SUSYeltau analysisMacroSUSY_${type}_D_${region}.conf ${bas} $dir>> Jobs/job${line}$channel$dir${bas}_D_${region}.sh
+echo 	SUSYmutau analysisMacroSUSY_${type}_D_${region}.conf ${bas} $dir>> Jobs/job${line}$channel$dir${bas}_D_${region}.sh
+#echo 	SUSYTtemplate analysisMacroSUSY_${type}_D_${region}.conf ${bas} $dir>> Jobs/job${line}$channel$dir${bas}_D_${region}.sh
 
 
 #echo $bas $xsec >> xsecs
 echo $bas $xsec 
 
-if [ ! -f $era/${bas}_B_OS.root ] ;then
+if [ ! -f $dir/${bas}_B_OS.root ] ;then
 
-chmod u+x Jobs/job${line}$channel$era${bas}_B.sh
-#qsub Jobs/job${line}$channel$era${bas}_B.sh 
+chmod u+x Jobs/job${line}$channel$dir${bas}_B.sh
+qsub Jobs/job${line}$channel$dir${bas}_B.sh 
 fi
 
 
-if [ ! -f $era/${bas}_${region}__C_OS.root ] ;then
-chmod u+x Jobs/job${line}$channel$era${bas}_C_${region}.sh
-qsub Jobs/job${line}$channel$era${bas}_C_${region}.sh 
+if [ ! -f $dir/${bas}_${region}__C_OS.root ] ;then
+chmod u+x Jobs/job${line}$channel$dir${bas}_C_${region}.sh
+#qsub Jobs/job${line}$channel$dir${bas}_C_${region}.sh 
 fi
 
-if [ ! -f $era/${bas}_A_SS.root ] ;then
-chmod u+x Jobs/job${line}$channel$era${bas}_A.sh
-#qsub Jobs/job${line}$channel$era${bas}_A.sh 
+if [ ! -f $dir/${bas}_A_SS.root ] ;then
+chmod u+x Jobs/job${line}$channel$dir${bas}_A.sh
+#qsub Jobs/job${line}$channel$dir${bas}_A.sh 
 fi
 
-if [ ! -f $era/${bas}_${region}__D_SS.root ] ;then
-chmod u+x Jobs/job${line}$channel$era${bas}_D_${region}.sh
-#qsub Jobs/job${line}$channel$era${bas}_D_${region}.sh 
+if [ ! -f $dir/${bas}_${region}__D_SS.root ] ;then
+chmod u+x Jobs/job${line}$channel$dir${bas}_D_${region}.sh
+#qsub Jobs/job${line}$channel$dir${bas}_D_${region}.sh 
 fi
 fi
 
-done<$era/${line}
+done<$dir/${line}
 rm input${line}
 done<$1
 
