@@ -30,7 +30,254 @@
 #include "TauAnalysis/SVfitStandalone/interface/SVfitStandaloneAlgorithm.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/json.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/PileUp.h"
-#include "DesyTauAnalyses/NTupleMaker/interface/functions.h"
+#include "DesyTauAnalyses/NTupleMaker/interface/ScaleFactor.h"
+
+int binNumber(float x, int nbins, float * bins) {
+
+  int binN = 0;
+
+  for (int iB=0; iB<nbins; ++iB) {
+    if (x>=bins[iB]&&x<bins[iB+1]) {
+      binN = iB;
+      break;
+    }
+  }
+
+  return binN;
+
+}
+
+float effBin(float x, int nbins, float * bins, float * eff) {
+
+  int bin = binNumber(x, nbins, bins);
+
+  return eff[bin];
+
+}
+
+double cosRestFrame(TLorentzVector boost, TLorentzVector vect) {
+
+  double bx = -boost.Px()/boost.E();
+  double by = -boost.Py()/boost.E();
+  double bz = -boost.Pz()/boost.E();
+
+  vect.Boost(bx,by,bz);
+  double prod = -vect.Px()*bx-vect.Py()*by-vect.Pz()*bz;
+  double modBeta = TMath::Sqrt(bx*bx+by*by+bz*bz); 
+  double modVect = TMath::Sqrt(vect.Px()*vect.Px()+vect.Py()*vect.Py()+vect.Pz()*vect.Pz());
+  
+  double cosinus = prod/(modBeta*modVect);
+
+  return cosinus;
+
+}
+
+double QToEta(double Q) {
+  double Eta = - TMath::Log(TMath::Tan(0.5*Q));  
+  return Eta;
+}
+
+double EtaToQ(double Eta) {
+  double Q = 2.0*TMath::ATan(TMath::Exp(-Eta));
+  if (Q<0.0) Q += TMath::Pi();
+  return Q;
+}
+
+double PtoEta(double Px, double Py, double Pz) {
+
+  double P = TMath::Sqrt(Px*Px+Py*Py+Pz*Pz);
+  double cosQ = Pz/P;
+  double Q = TMath::ACos(cosQ);
+  double Eta = - TMath::Log(TMath::Tan(0.5*Q));  
+  return Eta;
+
+}
+
+double PtoPhi(double Px, double Py) {
+  return TMath::ATan2(Py,Px);
+}
+
+double PtoPt(double Px, double Py) {
+  return TMath::Sqrt(Px*Px+Py*Py);
+}
+
+double dPhiFrom2P(double Px1, double Py1,
+		  double Px2, double Py2) {
+
+
+  double prod = Px1*Px2 + Py1*Py2;
+  double mod1 = TMath::Sqrt(Px1*Px1+Py1*Py1);
+  double mod2 = TMath::Sqrt(Px2*Px2+Py2*Py2);
+  
+  double cosDPhi = prod/(mod1*mod2);
+  
+  return TMath::ACos(cosDPhi);
+
+}
+
+double deltaEta(double Px1, double Py1, double Pz1,
+		double Px2, double Py2, double Pz2) {
+
+  double eta1 = PtoEta(Px1,Py1,Pz1);
+  double eta2 = PtoEta(Px2,Py2,Pz2);
+
+  double dEta = eta1 - eta2;
+
+  return dEta;
+
+}
+
+double deltaR(double Eta1, double Phi1,
+	      double Eta2, double Phi2) {
+
+  double Px1 = TMath::Cos(Phi1);
+  double Py1 = TMath::Sin(Phi1);
+
+  double Px2 = TMath::Cos(Phi2);
+  double Py2 = TMath::Sin(Phi2);
+
+  double dPhi = dPhiFrom2P(Px1,Py1,Px2,Py2);
+  double dEta = Eta1 - Eta2;
+
+  double dR = TMath::Sqrt(dPhi*dPhi+dEta*dEta);
+
+  return dR;
+
+}
+
+double PtEtaToP(double Pt, double Eta) {
+
+  //  double Q = EtaToQ(Eta);
+
+  //double P = Pt/TMath::Sin(Q);
+  double P = Pt*TMath::CosH(Eta);
+
+  return P;
+}
+double Px(double Pt, double Phi){
+
+  double Px=Pt*TMath::Cos(Phi);
+  return Px;
+}
+double Py(double Pt, double Phi){
+
+  double Py=Pt*TMath::Sin(Phi);
+  return Py;
+}
+double Pz(double Pt, double Eta){
+
+  double Pz=Pt*TMath::SinH(Eta);
+  return Pz;
+}
+double InvariantMass(double energy,double Px,double Py, double Pz){
+
+  double M_2=energy*energy-Px*Px-Py*Py-Pz*Pz;
+  double M=TMath::Sqrt(M_2);
+  return M;
+
+
+}
+double EFromPandM0(double M0,double Pt,double Eta){
+
+  double E_2=M0*M0+PtEtaToP(Pt,Eta)*PtEtaToP(Pt,Eta);
+  double E =TMath::Sqrt(E_2);
+  return E;
+
+}
+bool electronMvaIdTight(float eta, float mva) {
+
+  float absEta = fabs(eta);
+
+  bool passed = false;
+  if (absEta<0.8) {
+    if (mva>0.73) passed = true;
+  }
+  else if (absEta<1.479) {
+    if (mva>0.57) passed = true;
+  }
+  else {
+    if (mva>0.05) passed = true;
+  }
+
+  return passed;
+
+}
+bool electronMvaIdLoose(float eta, float mva) {
+
+  float absEta = fabs(eta);
+
+  bool passed = false;
+  if (absEta<0.8) {
+    if (mva>0.35) passed = true;
+  }
+  else if (absEta<1.479) {
+    if (mva>0.20) passed = true;
+  }
+  else {
+    if (mva>-0.52) passed = true;
+  }
+
+  return passed;
+
+}
+bool electronMvaIdWP80(float pt, float eta, float mva) {
+
+  float absEta = fabs(eta);
+  bool passed = false;
+  if (absEta<0.8) {
+    if (pt<10) 
+      passed = mva > -0.253;
+    else 
+      passed = mva > 0.965;
+  }
+  else if (absEta<1.479) {
+    if (pt<10)
+      passed = mva > 0.081;
+    else
+      passed = mva > 0.917;
+  }
+  else {
+    if (pt<10)
+      passed = mva > -0.081;
+    else
+      passed = mva > 0.683;
+  }
+
+  return passed;
+
+}
+bool electronMvaIdWP90(float pt, float eta, float mva) {
+
+  float absEta = fabs(eta);
+  bool passed = false;
+  if (absEta<0.8) {
+    if (pt<10) 
+      passed = mva > -0.483;
+    else 
+      passed = mva > 0.933;
+  }
+  else if (absEta<1.479) {
+    if (pt<10)
+      passed = mva > -0.267;
+    else
+      passed = mva > 0.825;
+  }
+  else {
+    if (pt<10)
+      passed = mva > -0.323;
+    else
+      passed = mva > 0.337;
+  }
+
+  return passed;
+
+}
+
+
+const float electronMass = 0.51100e-3;
+const float muonMass = 0.10565837;
+const float tauMass  = 1.7768;
+const float pionMass = 0.1396;
 
 int main(int argc, char * argv[]) {
 
@@ -118,14 +365,14 @@ int main(int argc, char * argv[]) {
   const bool applyJetPfId = cfg.get<bool>("ApplyJetPfId");
   const bool applyJetPuId = cfg.get<bool>("ApplyJetPuId");
 
-  // check overlap
-  const bool checkOverlap = cfg.get<bool>("CheckOverlap");
-  
   TString IsoMuonLeg(isoMuonLeg);
   TString MuonTauMuonLeg(muonTauMuonLeg);
   TString MuonTauOverlap(muonTauOverlap);
   TString MuonTauTauLeg(muonTauTauLeg);
   TString BTagDiscriminator(bTagDiscriminator);
+
+  const string MuonIdIsoFile = cfg.get<string>("MuonIdIsoEff");
+  const string MuonTriggerFile = cfg.get<string>("MuonTriggerEff");
 
   // **** end of configuration
 
@@ -361,15 +608,6 @@ int main(int argc, char * argv[]) {
   tree->Branch("extraelec_veto", &extraelec_veto, "extraelec_veto/O");
   tree->Branch("extramuon_veto", &extramuon_veto, "extramuon_veto/O");
 
-  tree->Branch("byCombinedIsolationDeltaBetaCorrRaw3Hits_1", &byCombinedIsolationDeltaBetaCorrRaw3Hits_1, "byCombinedIsolationDeltaBetaCorrRaw3Hits_1/F");
-  tree->Branch("againstElectronLooseMVA5_1", &againstElectronLooseMVA5_1, "againstElectronLooseMVA5_1/F");
-  tree->Branch("againstElectronMediumMVA5_1", &againstElectronMediumMVA5_1, "againstElectronMediumMVA5_1/F");
-  tree->Branch("againstElectronTightMVA5_1", &againstElectronTightMVA5_1, "againstElectronTightMVA5_1/F");
-  tree->Branch("againstElectronVLooseMVA5_1", &againstElectronVLooseMVA5_1, "againstElectronVLooseMVA5_1/F");
-  tree->Branch("againstElectronVTightMVA5_1", &againstElectronVTightMVA5_1, "againstElectronVTightMVA5_1/F");
-  tree->Branch("againstMuonLoose3_1", &againstMuonLoose3_1, "againstMuonLoose3_1/F");
-  tree->Branch("againstMuonTight3_1", &againstMuonTight3_1, "againstMuonTight3_1/F");
-
   tree->Branch("byCombinedIsolationDeltaBetaCorrRaw3Hits_2", &byCombinedIsolationDeltaBetaCorrRaw3Hits_2, "byCombinedIsolationDeltaBetaCorrRaw3Hits_2/F");
   tree->Branch("byLooseCombinedIsolationDeltaBetaCorr3Hits_2",&byLooseCombinedIsolationDeltaBetaCorr3Hits_2,"byLooseCombinedIsolationDeltaBetaCorr3Hits_2/F");
   tree->Branch("byMediumCombinedIsolationDeltaBetaCorr3Hits_2",&byMediumCombinedIsolationDeltaBetaCorr3Hits_2,"byMediumCombinedIsolationDeltaBetaCorr3Hits_2/F");
@@ -471,37 +709,26 @@ int main(int argc, char * argv[]) {
     }
    }
 
+  // Official PU reweighting
   PileUp * PUofficial = new PileUp();
-
   TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/Data_Pileup_2015D_Nov17.root","read");
-  TFile * filePUdistribution_MC = new TFile (TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/MC_Spring15_PU25_Startup.root", "read");
+  TFile * filePUdistribution_MC = new TFile (TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/MC_Spring15_PU25_Startup.root","read");
   TH1D * PU_data = (TH1D *)filePUdistribution_data->Get("pileup");
   TH1D * PU_mc = (TH1D *)filePUdistribution_MC->Get("pileup");
   PUofficial->set_h_data(PU_data);
   PUofficial->set_h_MC(PU_mc);
 
+  // Muon scale factors
+  ScaleFactor * SF_muonIdIso = new ScaleFactor();
+  SF_muonIdIso->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(MuonIdIsoFile));
+  ScaleFactor * SF_muonTrig = new ScaleFactor();
+  SF_muonTrig->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(MuonTriggerFile),"ZMassIsoMu");
+
   int nEvents = 0;
   int selEvents = 0;
   int nFiles = 0;
   
-  int nonOverlap = 0;
-
-  vector<int> runList; runList.clear();
-  vector<int> eventList; eventList.clear();
-
-  if (checkOverlap) {
-    std::ifstream fileEvents("overlap.txt");
-    int Run, Event, Lumi;
-    std::cout << "Non-overlapping events ->" << std::endl;
-    while (fileEvents >> Run >> Event >> Lumi) {
-      runList.push_back(Run);
-      eventList.push_back(Event);
-      std::cout << Run << ":" << Event << std::endl;
-    }
-    std::cout << std::endl;
-  }
-  std::ofstream fileOutput("overlap.out");
-
+  // Looping over RooT files 
   for (int iF=0; iF<nTotalFiles; ++iF) {
 
     std::string filen;
@@ -991,64 +1218,63 @@ int main(int argc, char * argv[]) {
       //      cout << "Ok5" << endl;
 
       // met
-      met = TMath::Sqrt(analysisTree.pfmet_ex*analysisTree.pfmet_ex + analysisTree.pfmet_ey*analysisTree.pfmet_ey);
-      metphi = TMath::ATan2(analysisTree.pfmet_ey,analysisTree.pfmet_ex);
+      float pfmet_ex = analysisTree.pfmet_ex;
+      float pfmet_ey = analysisTree.pfmet_ey;
+      met = TMath::Sqrt(pfmet_ex*pfmet_ex + pfmet_ey*pfmet_ey);
+      metphi = TMath::ATan2(pfmet_ey,pfmet_ex);
 
       // puppimet
-      puppimet = TMath::Sqrt(analysisTree.puppimet_ex*analysisTree.puppimet_ex + analysisTree.puppimet_ey*analysisTree.puppimet_ey);
-      puppimetphi = TMath::ATan2(analysisTree.puppimet_ey,analysisTree.puppimet_ex);
+      float puppimet_ex = analysisTree.puppimet_ex;
+      float puppimet_ey = analysisTree.puppimet_ey;
+      puppimet = TMath::Sqrt(puppimet_ex*puppimet_ex + puppimet_ey*puppimet_ey);
+      puppimetphi = TMath::ATan2(puppimet_ey,puppimet_ex);
+
+      // genmet
+      float genmet_x = analysisTree.genmet_ex;
+      float genmet_y = analysisTree.genmet_ey;
+      genmet = TMath::Sqrt(genmet_x*genmet_x+genmet_y*genmet_y);
+      genmetphi = TMath::ATan2(genmet_y,genmet_x);
 
       metcov00 = analysisTree.pfmet_sigxx;
       metcov01 = analysisTree.pfmet_sigxy;
       metcov10 = analysisTree.pfmet_sigyx;
       metcov11 = analysisTree.pfmet_sigyy;
 
-      float mvamet_x = -999999;
-      float mvamet_y = -999999;
-      mvamet = -999999;
-      mvametphi = -999999;
-      mvacov00 = -999999;
-      mvacov01 = -999999;
-      mvacov10 = -999999;
-      mvacov11 = -999999;
+      float mvamet_x = 0;
+      float mvamet_y = 0;
+      mvamet = 0;
+      mvametphi = 0;
+      mvacov00 = 0;
+      mvacov01 = 0;
+      mvacov10 = 0;
+      mvacov11 = 0;
 
-      unsigned int metIndex = 0;
-      bool mvaFound = false;
-      if (analysisTree.mvamet_count>0) {
-      	for (unsigned int imva=0; imva<analysisTree.mvamet_count; ++imva) {
-      	  if (analysisTree.mvamet_channel[imva]==3) {
-      	    if (int(analysisTree.mvamet_lep1[imva])==tauIndex&&int(analysisTree.mvamet_lep2[imva])==muonIndex) {
-      	      metIndex = imva;
-      	      mvaFound = true;
-      	    }
-      	  }
-      	}
-      }
+      // unsigned int metIndex = 0;
+      // bool mvaFound = false;
+      // if (analysisTree.mvamet_count>0) {
+      // 	for (unsigned int imva=0; imva<analysisTree.mvamet_count; ++imva) {
+      // 	  if (analysisTree.mvamet_channel[imva]==3) {
+      // 	    if (int(analysisTree.mvamet_lep1[imva])==tauIndex&&int(analysisTree.mvamet_lep2[imva])==muonIndex) {
+      // 	      metIndex = imva;
+      // 	      mvaFound = true;
+      // 	    }
+      // 	  }
+      // 	}
+      // }
       
-      float genmet_x = analysisTree.genmet_ex;
-      float genmet_y = analysisTree.genmet_ey;
-      genmet = TMath::Sqrt(genmet_x*genmet_x+genmet_y*genmet_y);
-      genmetphi = TMath::ATan2(genmet_y,genmet_x);
-
-      //      if (analysisTree.mvamet_count>0) {
-      //	mvamet_x = analysisTree.mvamet_ex[metIndex];
-      //	mvamet_y = analysisTree.mvamet_ey[metIndex];
-      //	float mvamet_x2 = mvamet_x * mvamet_x;
-      //	float mvamet_y2 = mvamet_y * mvamet_y;
-      //
-      //	mvamet = TMath::Sqrt(mvamet_x2+mvamet_y2);
-      //	mvametphi = TMath::ATan2(mvamet_y,mvamet_x);
-      //	mvacov00 = analysisTree.mvamet_sigxx[metIndex];
-      //	mvacov01 = analysisTree.mvamet_sigxy[metIndex];
-      //	mvacov10 = analysisTree.mvamet_sigyx[metIndex];
-      //	mvacov11 = analysisTree.mvamet_sigyy[metIndex];
-      //	std::cout << "MVA MET found" << std::endl;
-      //      }
-      //      else {
-      //	std::cout << "No MVA MET found" << std::endl;
-      //      }
-
-      //      cout << "Ok6" << endl;
+      // if (analysisTree.mvamet_count>0) {
+      // 	mvamet_x = analysisTree.mvamet_ex[metIndex];
+      // 	mvamet_y = analysisTree.mvamet_ey[metIndex];
+      // 	float mvamet_x2 = mvamet_x * mvamet_x;
+      // 	float mvamet_y2 = mvamet_y * mvamet_y;
+	
+      // 	mvamet = TMath::Sqrt(mvamet_x2+mvamet_y2);
+      // 	mvametphi = TMath::ATan2(mvamet_y,mvamet_x);
+      // 	mvacov00 = analysisTree.mvamet_sigxx[metIndex];
+      // 	mvacov01 = analysisTree.mvamet_sigxy[metIndex];
+      // 	mvacov10 = analysisTree.mvamet_sigyx[metIndex];
+      // 	mvacov11 = analysisTree.mvamet_sigyy[metIndex];
+      // }
 
       // filling muon variables
       pt_1 = analysisTree.muon_pt[muonIndex];
@@ -1063,15 +1289,15 @@ int main(int argc, char * argv[]) {
       iso_1 = isoMuMin;
       m_1 = muonMass;
       float dPhiMETMuon = dPhiFrom2P(analysisTree.muon_px[muonIndex],analysisTree.muon_py[muonIndex],
-				     analysisTree.pfmet_ex,analysisTree.pfmet_ey);
+				     pfmet_ex,pfmet_ey);
       mt_1 = TMath::Sqrt(2*met*pt_1*(1-TMath::Cos(dPhiMETMuon)));
       float dPhiPuppiMETMuon = dPhiFrom2P(analysisTree.muon_px[muonIndex],analysisTree.muon_py[muonIndex],
-					  analysisTree.puppimet_ex,analysisTree.puppimet_ey);
+					  puppimet_ex,puppimet_ey);
       mt_puppi_1 = TMath::Sqrt(2*puppimet*pt_1*(1-TMath::Cos(dPhiPuppiMETMuon)));
-      //      float dPhiMvaMETMuon = dPhiFrom2P(analysisTree.muon_px[muonIndex],analysisTree.muon_py[muonIndex],
-      //					mvamet_x,mvamet_y);
-      //      mt_mva_1 = TMath::Sqrt(2*mvamet*pt_1*(1-TMath::Cos(dPhiMvaMETMuon)));
-
+      // float dPhiMvaMETMuon = dPhiFrom2P(analysisTree.muon_px[muonIndex],analysisTree.muon_py[muonIndex],
+      // 					mvamet_x,mvamet_y);
+      // mt_mva_1 = TMath::Sqrt(2*mvamet*pt_1*(1-TMath::Cos(dPhiMvaMETMuon)));
+      mt_mva_1 = 0;
 
 
       // filling tau variables
@@ -1087,14 +1313,15 @@ int main(int argc, char * argv[]) {
       iso_2 = isoTauMin;
       m_2 = analysisTree.tau_mass[tauIndex];
       float dPhiMETTau = dPhiFrom2P(analysisTree.tau_px[tauIndex],analysisTree.tau_py[tauIndex],
-				    analysisTree.pfmet_ex,analysisTree.pfmet_ey);
+				    pfmet_ex,pfmet_ey);
       mt_2 = TMath::Sqrt(2*met*pt_2*(1-TMath::Cos(dPhiMETTau)));
       float dPhiPuppiMETTau = dPhiFrom2P(analysisTree.tau_px[tauIndex],analysisTree.tau_py[tauIndex],
-					 analysisTree.puppimet_ex,analysisTree.puppimet_ey);
+					 puppimet_ex,puppimet_ey);
       mt_puppi_2 = TMath::Sqrt(2*puppimet*pt_2*(1-TMath::Cos(dPhiPuppiMETTau)));
-      //      float dPhiMvaMETTau = dPhiFrom2P(analysisTree.tau_px[tauIndex],analysisTree.muon_py[tauIndex],
-      //				       mvamet_x,mvamet_y);
-      //      mt_mva_2 = TMath::Sqrt(2*mvamet*pt_2*(1-TMath::Cos(dPhiMvaMETTau)));
+      // float dPhiMvaMETTau = dPhiFrom2P(analysisTree.tau_px[tauIndex],analysisTree.muon_py[tauIndex],
+      // 				       mvamet_x,mvamet_y);
+      // mt_mva_2 = TMath::Sqrt(2*mvamet*pt_2*(1-TMath::Cos(dPhiMvaMETTau)));
+      mt_mva_2 = 0;
       decayMode_2 = analysisTree.tau_decayMode[tauIndex];
 
       gen_match_1 = 6;
@@ -1166,6 +1393,11 @@ int main(int argc, char * argv[]) {
 	else isZL = true;
 	isZLL = isZL || isZJ;
       }
+
+      // muon scale factors
+      isoweight_1 = (float)SF_muonIdIso->get_ScaleFactor(double(pt_1),double(eta_1));
+      trigweight_1 = (float)SF_muonTrig->get_ScaleFactor(double(pt_1),double(eta_1));
+      effweight = isoweight_1*trigweight_1;
 
       int tau_decayMode = analysisTree.tau_decayMode[tauIndex];
 

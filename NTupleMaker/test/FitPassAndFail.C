@@ -389,7 +389,7 @@ void FitPassAndFail(TString SampleName,
     nFail = sigFuncFail->Integral(xminInt,xmaxInt)/width2;
   else
     nFail = histFail->Integral(histFail->FindBin(minMass),histFail->FindBin(maxMass));
-
+    if (nPass<0.1 && nFail<0.1) nFail = 0.1; 
   std::cout << "Eff = " << int(nPass) << "/" << int(nPass+nFail) << " = " << nPass/(nPass+nFail) << std::endl;
 
   TH1F * numH = new TH1F("numH","",1,-0.5,0.5);
