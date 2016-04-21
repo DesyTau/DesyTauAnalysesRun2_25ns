@@ -80,13 +80,14 @@ int main(int argc, char * argv[]) {
   const double etaMuonCutmtau = cfg.get<double>("etaMuonCutmtau"); 
 
 
-  string TrigLeg  ;
-   if (!isData) TrigLeg  = cfg.get<string>("Mu17LegMC");
-   if (isData) TrigLeg  = cfg.get<string>("Mu18LegData");
-  const string Mu17Tau20MuLegA  = cfg.get<string>("Mu17Tau20MuLegA");
-  const string Mu17Tau20MuLegB  = cfg.get<string>("Mu17Tau20MuLegB");
-  const string Mu17Tau20TauLegA  = cfg.get<string>("Mu17Tau20TauLegA");
-  const string Mu17Tau20TauLegB  = cfg.get<string>("Mu17Tau20TauLegB");
+  string TrigLeg , Filter1,Filter2,Filter3,Filter4 ;
+   //if (!isData) TrigLeg  = cfg.get<string>("MainFilterName");
+   //if (isData) 
+    TrigLeg  = cfg.get<string>("Filter1");
+    Filter1 =  cfg.get<string>("Filter1");
+    Filter2 =  cfg.get<string>("Filter2");
+    Filter3 =  cfg.get<string>("Filter3");
+    Filter4 =  cfg.get<string>("Filter4");
 
   const string Region  = cfg.get<string>("Region");
   const string Sign  = cfg.get<string>("Sign");
@@ -160,17 +161,35 @@ int main(int argc, char * argv[]) {
           }
   }
 
-  TString MainTrigger(TrigLeg);
-  TString Muon17Tau20MuLegA (Mu17Tau20MuLegA );
-  TString Muon17Tau20MuLegB (Mu17Tau20MuLegB );
-  TString Muon17Tau20TauLegA (Mu17Tau20TauLegA );
-  TString Muon17Tau20TauLegB (Mu17Tau20TauLegB );
+  TString Filt1(Filter1);
+  TString Filt2(Filter2);
+  TString Filt3(Filter3);
+  TString Filt4(Filter4);
+
 
 
 
   const double Lumi   = cfg.get<double>("Lumi");
   const double bTag   = cfg.get<double>("bTag");
   const double metcut = cfg.get<double>("metcut");
+
+  CutList.clear();
+  CutList.push_back("No cut");
+  CutList.push_back("No cut after PU");
+  CutList.push_back("Trigger");
+  CutList.push_back("$ $>$1 PFJet$");
+  CutList.push_back("$ $>$1 PFJet in dR$<$0.5$");
+  CutList.push_back("$ Loose tau $");
+  CutList.push_back("$ Tight tau $");
+  CutList.push_back("$ dPhi $>2$ , Sum $<$ 0.25");
+ 
+
+  int CutNumb = int(CutList.size());
+  
+    for(int cj = 0; cj < CutNumb; cj++)     
+      	    CutFlow->GetXaxis()->SetBinLabel(cj+1,CutList[cj].c_str());
+
+
   
   xs=1;fact=1;fact2=1;
   unsigned int RunMin = 9999999;
@@ -293,33 +312,53 @@ int main(int argc, char * argv[]) {
   TH1D * hMT = new TH1D("hMT","",20,0,200);
   TH1D * hRatioSum = new TH1D("hRatioSum","",10,0,1);
   TH1D * hDPhi = new TH1D("hDPhi","",70,0,3.5);
+  TH1D * hDPhiJets = new TH1D("hDPhiJets","",70,0,3.5);
+  TH2D * RatiovsDPhi = new TH2D("h2","",10,0,1,70,0,3.5);
   TH1D * hxsec = new TH1D("xsec","",1,0,10e+20);
+  TH1D * hmass = new TH1D("mass","",100,0,1000);
+  TH1D * hRatioPtJ2J1_0 = new TH1D("hRatioPtJ2J1_0","",20,0,2);
+  TH1D * hRatioPttauJ1_0 = new TH1D("hRatioPttauJ1_0","",20,0,2);
+  TH1D * hRatioPtJ2J1_1 = new TH1D("hRatioPtJ2J1_1","",20,0,2);
+  TH1D * hRatioPttauJ1_1 = new TH1D("hRatioPttauJ1_1","",20,0,2);
+  TH1D * hdRtauJet1 = new TH1D("hdRtauJet1","",50,0,5);
+  TH1D * hdRtauJet2 = new TH1D("hdRtauJet2","",50,0,5);
+  
+  TH1D * hPtJ1 = new TH1D("hPtJ1","",100,0,1000);
+  TH1D * hPtJ2 = new TH1D("hPtJ2","",100,0,1000);
 
-  int nPtBins = 7;
-  float ptBins[8] = {20,25,30,40,60,100,150,200};
+  TH1D  * hTrig = new TH1D("hTrig","",4,1,5);
+  hTrig->GetXaxis()->SetBinLabel(1,Filter1.c_str());
+  hTrig->GetXaxis()->SetBinLabel(2,Filter2.c_str());
+  hTrig->GetXaxis()->SetBinLabel(3,Filter3.c_str());
+  hTrig->GetXaxis()->SetBinLabel(4,Filter4.c_str());
+
+  int nPtBins = 5;
+  float ptBins[6] = {19,25,30,40,60,1000};
 
   
-  int nEtaBins = 3;
-  float etaBins[4] = {0,0.9,1.2,2.4}; 
   
-  TString PtBins[8] = {"Pt20to25",
+  TString PtBins[5] = {"Pt19to25",
 		       "Pt25to30",
 		       "Pt30to40",
 		       "Pt40to60",
-		       "Pt60to100",
-		       "Pt100to150",
-		       "Pt150to200",
-		        "PtGt200"};
+		       "PtGt60"};//,		       "Pt100to150",		       "Pt150to200",		        "PtGt200"};
   
+  //int nEtaBins = 3;
+  //float etaBins[4] = {0,0.9,1.2,2.4}; 
+  int nEtaBins = 2;
+  float etaBins[3] = {0,1.479,2.4}; 
 
-  TString EtaBins[3] = {"EtaLt0p9",
-			"Eta0p9to1p2",
-		        "EtaGt1p2"};
+  //TString EtaBins[3] = {"EtaLt0p9",
+  TString EtaBins[2] = {"EtaLt1p479",
+			//"Eta0p9to1p2",
+		        "EtaGt1p479"};
 
 
 
-  TH1D * FakeRatePtIncLoose[3];
-  TH1D * FakeRatePtIncTight[3];
+  TH1D * FakeRatePtIncLoose[2];
+  TH1D * FakeRatePtIncTight[2];
+  TH1D * FakeRatePtIncLooseRatioCut[2];
+  TH1D * FakeRatePtIncTightRatioCut[2];
   //TH1D * FakeRatePt[3][7];
   //TH1D * FakeRateNV[3][7];
   //TH1D * FakeRateEta[3][7];
@@ -334,6 +373,8 @@ int main(int argc, char * argv[]) {
   	for (int iEta=0; iEta<nEtaBins; ++iEta) {
       FakeRatePtIncLoose[iEta] = new TH1D("FakeRatePtIncLoose"+EtaBins[iEta],"",nPtBins,ptBins);
       FakeRatePtIncTight[iEta] = new TH1D("FakeRatePtIncTight"+EtaBins[iEta],"",nPtBins,ptBins);
+      FakeRatePtIncLooseRatioCut[iEta] = new TH1D("FakeRatePtIncLooseRatioCut"+EtaBins[iEta],"",nPtBins,ptBins);
+      FakeRatePtIncTightRatioCut[iEta] = new TH1D("FakeRatePtIncTightRatioCut"+EtaBins[iEta],"",nPtBins,ptBins);
     //for (int iPt=0; iPt<nPtBins; ++iPt) {
     //  FakeRatePt[iEta][iPt] = new TH1D("FakeRatePt"+EtaBins[iEta]+PtBins[iPt],"",100,0,1000);
     //  FakeRateNV[iEta][iPt] = new TH1D("FakeRateNV"+EtaBins[iEta]+PtBins[iPt],"",50,0,50);
@@ -350,6 +391,19 @@ int main(int argc, char * argv[]) {
   int selEventsIdMuons = 0;
   int selEventsIsoMuons = 0;
   int iCut=0;
+  int iCutTri1 = 0;
+  int iCutTri2 = 0;
+  int iCutTri3 = 0;
+  int iCutTri4 = 0;
+
+  double CFCounter[CutNumb];
+  double statUnc[CutNumb];
+  int iCFCounter[CutNumb];
+  for (int i=0;i < CutNumb; i++){
+    CFCounter[i] = 0;
+    iCFCounter[i] = 0;
+    //statUnc[i] =0;
+  }
       bool lumi=false;
       bool isLowIsoMu=false;
       bool isHighIsoMu = false;
@@ -412,7 +466,6 @@ int main(int argc, char * argv[]) {
       analysisTree.GetEntry(iEntry);
       nEvents++;
     
-      iCut = 0;
       
     //std::cout << "      number of entries in Tree = " << numberOfEntries <<" starting weight "<<weight<< std::endl;
      
@@ -434,6 +487,11 @@ int main(int argc, char * argv[]) {
       isHighIsoMu = false;
       isLowIsoTau=false;
       isHighIsoTau = false;
+ 	iCut=0;
+
+      CFCounter[iCut]+= weight;
+      iCFCounter[iCut]++;
+      iCut++;
 
 
       if (!isData )  { 
@@ -534,10 +592,11 @@ int main(int argc, char * argv[]) {
       MuMV.clear();
       LeptMV.clear();
       mu_index=-1;
-      tau_index=-1;
+      tau_tight=-1;
       el_index=-1;
       
-      //if(fillplots)
+      CFCounter[iCut]+= weight;
+      iCFCounter[iCut]++;
       iCut++;
 	
       bool trigAccept = false;
@@ -549,29 +608,37 @@ int main(int argc, char * argv[]) {
       unsigned int nfilters = analysisTree.run_hltfilters->size();
       //  std::cout << "nfiltres = " << nfilters << std::endl;
       for (unsigned int i=0; i<nfilters; ++i) {
-	//	std::cout << "HLT Filter : " << i << " = " << analysisTree.run_hltfilters->at(i) << std::endl;
 	TString HLTFilter(analysisTree.run_hltfilters->at(i));
-	if (HLTFilter==MainTrigger) {
+	if (HLTFilter==Filt1 || HLTFilter==Filt2 || HLTFilter==Filt3 || HLTFilter==Filt4) {
+		//std::cout << "HLT Filter : " << i << " = " << analysisTree.run_hltfilters->at(i) << std::endl;
 	  nMainTrigger = i;
 	  isMainTrigger = true;
-	}
       
+	if (HLTFilter==Filt1) iCutTri1+=weight;
+	if (HLTFilter==Filt2) iCutTri2+=weight;
+	if (HLTFilter==Filt3) iCutTri3+=weight;
+	if (HLTFilter==Filt4) iCutTri4+=weight;
 
+	}
       
       }
 
+      CFCounter[iCut]+= weight;
+      iCFCounter[iCut]++;
+      iCut++;
 
       if (!isMainTrigger) {
-	std::cout << "HLT filter for Mu20 " << MainTrigger << " not found" << std::endl;
+	std::cout << "HLT filter for MainTrigger  not found" << std::endl;
 	return(-1);
       }
        ////////// first make a jets collection from pfjet candidates
 
-      	if (analysisTree.pfjet_count<1) continue;
+      	//if (analysisTree.pfjet_count<1 || analysisTree.pfjet_count>1 ) continue;
 
 	      for (unsigned int jet=0; jet<analysisTree.pfjet_count; ++jet) {
 		float absJetEta = fabs(analysisTree.pfjet_eta[jet]);
 	
+		if (analysisTree.pfjet_pt[jet] < 19) continue;
 		if (absJetEta > etaJetCut) continue;
                 if (fabs(analysisTree.pfjet_pt[jet])<ptJetCut) continue;
 		bool  looseJetID = looseJetiD(analysisTree,jet);
@@ -582,12 +649,16 @@ int main(int argc, char * argv[]) {
 	      }
 
 		sort(JetsMV.begin(), JetsMV.end(),ComparePt);
-		if (JetsMV.size()==0) continue;
+		if (JetsMV.size()!=2) continue;
+
+      CFCounter[iCut]+= weight;
+      iCFCounter[iCut]++;
+      iCut++;
 
 		//////make sure that has fired the trigger
 		//
 	for (unsigned int iT=0; iT<analysisTree.trigobject_count; ++iT) {
-	  if (analysisTree.trigobject_filters[iT][nMainTrigger]) { // Mu17 Leg
+	  if (analysisTree.trigobject_filters[iT][nMainTrigger]) { 
 	    double dRtrig = deltaR(JetsMV.at(0).Eta(),JetsMV.at(0).Phi(),
 				  analysisTree.trigobject_eta[iT],analysisTree.trigobject_phi[iT]);
 	    if (dRtrig>deltaRTrigMatch) continue;
@@ -599,92 +670,158 @@ int main(int argc, char * argv[]) {
 	}
 	
 	if (!isMainTrigger) continue;
-
+      CFCounter[iCut]+= weight;
+      iCFCounter[iCut]++;
       iCut++;
+
 	//////find tau candidates
       double isoTauMin = 999;
       bool tau_iso = false;
       bool isTight = false;
       bool isLoose = false;
-      unsigned tau_loose=-1;
+      tau_loose = -1;
+      tau_tight = -1;
       vector<int> tau; tau.clear();
       for (unsigned  int it = 0; it<analysisTree.tau_count; ++it) {
 
 	if (analysisTree.tau_pt[it] < ptMuonLowCutmtau || fabs(analysisTree.tau_eta[it])> etaMuonCutmtau) continue;
 	if (analysisTree.tau_decayModeFindingNewDMs[it]<decayModeFindingNewDMs) continue;
+	if ( fabs(analysisTree.tau_leadchargedhadrcand_dz[it])> leadchargedhadrcand_dz) continue;
 	/*if ( fabs(analysisTree.tau_leadchargedhadrcand_dz[it])> leadchargedhadrcand_dz) continue;
 	if (analysisTree.tau_againstElectronVLooseMVA5[it]<againstElectronVLooseMVA5) continue;
 	if (analysisTree.tau_againstMuonTight3[it]<againstMuonTight3) continue;
 */
 	double  tauIso = analysisTree.tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[it];
 
-	if (tauIso < byCombinedIsolationDeltaBetaCorrRaw3Hits && fabs(analysisTree.tau_leadchargedhadrcand_dz[it])< leadchargedhadrcand_dz && analysisTree.tau_againstElectronVLooseMVA5[it]>againstElectronVLooseMVA5 
-			&& analysisTree.tau_againstMuonTight3[it]>againstMuonTight3) isTight = true;
+	isLoose  = true;
+	tau_loose = int(it);
+        CFCounter[iCut]+= weight;
+        iCFCounter[iCut]++;
+        iCut++;
 
-	if (tauIso > byCombinedIsolationDeltaBetaCorrRaw3Hits && tauIso < 3*byCombinedIsolationDeltaBetaCorrRaw3Hits) {isLoose = true; tau_loose = int(it);}
+	if (analysisTree.tau_byMediumCombinedIsolationDeltaBetaCorr3Hits [it]> 0.5  && analysisTree.tau_againstElectronVLooseMVA5[it]>againstElectronVLooseMVA5 
+			&& analysisTree.tau_againstMuonTight3[it]>againstMuonTight3) {isTight = true;	  tau_tight = int(it);}
+	
+	//if ( analysisTree.tau_byLooseCombinedIsolationDeltaBetaCorr3Hits[it] < 0.5 ) {isLoose = true; tau_loose = int(it);}
 
-	if (isTight){
+
+	//if (isTight && isLoose) cout<<" =============================== "<<isTight<<"  "<<isLoose<<endl;
+	//cout<<analysisTree.tau_byMediumCombinedIsolationDeltaBetaCorr3Hits [it]<<"   "<<analysisTree.tau_byLooseCombinedIsolationDeltaBetaCorr3Hits[it]<<endl;
+
+/*	if (isTight){
 
 		
 	if (tauIso<isoTauMin ) {
 	  isoTauMin  = tauIso;
 	  tau_iso=true;
-	  tau_index = int(it);
-	  tau.push_back(tau_index);
-	  TauV.SetPtEtaPhiM(analysisTree.tau_pt[tau_index], analysisTree.tau_eta[tau_index], analysisTree.tau_phi[tau_index], tauMass);
+	  tau_tight = int(it);
+	  tau.push_back(tau_tight);
+	  TauV.SetPtEtaPhiM(analysisTree.tau_pt[tau_tight], analysisTree.tau_eta[tau_tight], analysisTree.tau_phi[tau_tight], tauMass);
 	  TauMV.push_back(TauV);
 
 	}
 
-	if (tauIso==isoTauMin && it != tau_index) {
-	  analysisTree.tau_pt[it] > analysisTree.tau_pt[tau_index] ? tau_index = it : tau_index = tau_index;
+	if (tauIso==isoTauMin && it != tau_tight) {
+	  analysisTree.tau_pt[it] > analysisTree.tau_pt[tau_tight] ? tau_tight = it : tau_tight = tau_tight;
 	}
 
 	}
-
+*/
       }
 
-	//if (!isLoose && !isTight) continue;
 	if (!isLoose) continue;
 
+      CFCounter[iCut]+= weight;
+      iCFCounter[iCut]++;
+      iCut++;
 
-	double dPhi=0;double MT=0 ; double RatioSums=0;
+	double dPhi=-1;double MT=-1 ; double RatioSums=-1;double dPhiJets=-1.;
 
-	if (isLoose && int(tau_loose) !=-1 && JetsMV.size()!=0){
+//	if (isLoose && int(tau_loose) !=-1 && JetsMV.size()!=0){
 
       double met = sqrt ( analysisTree.pfmet_ex*analysisTree.pfmet_ex + analysisTree.pfmet_ey*analysisTree.pfmet_ey);
 	
-      double SumPtJetTau = sqrt ( (analysisTree.tau_px[tau_loose]+JetsMV.at(0).Px())*(analysisTree.tau_px[tau_loose]+JetsMV.at(0).Px()) + 
-	      		 (analysisTree.tau_py[tau_loose]+JetsMV.at(0).Py())*(analysisTree.tau_py[tau_loose]+JetsMV.at(0).Py()));
+      //double SumPtJetTau = sqrt ( (analysisTree.tau_px[tau_loose]+JetsMV.at(0).Px())*(analysisTree.tau_px[tau_loose]+JetsMV.at(0).Px()) + 
+	//      		 (analysisTree.tau_py[tau_loose]+JetsMV.at(0).Py())*(analysisTree.tau_py[tau_loose]+JetsMV.at(0).Py()));
+	
+	    double dRtauJet = deltaR(JetsMV.at(0).Eta(),JetsMV.at(0).Phi(),
+				  analysisTree.tau_eta[tau_loose],analysisTree.tau_phi[tau_loose]);
 
-      RatioSums = (SumPtJetTau - met )/ (SumPtJetTau + met );
-      	
+	    hdRtauJet1->Fill(dRtauJet,weight);
+	    dRtauJet = -1; dRtauJet = deltaR(JetsMV.at(1).Eta(),JetsMV.at(1).Phi(),
+				  analysisTree.tau_eta[tau_loose],analysisTree.tau_phi[tau_loose]);
+	    hdRtauJet2->Fill(dRtauJet,weight);
+
+   bool dRLepton = false;
+      for (unsigned k=0;k<JetsMV.size();k++){
+
+	   dRtauJet = -1;dRtauJet = deltaR(JetsMV.at(k).Eta(),JetsMV.at(k).Phi(),
+				  analysisTree.tau_eta[tau_loose],analysisTree.tau_phi[tau_loose]);
+      	if (dRtauJet > 0.5) dRLepton  = true;
+
+      }
+
+	    if (!dRLepton)  continue;
+
+
+     // double SumPtJetTau =  fabs((analysisTree.tau_pt[tau_loose] - JetsMV.at(0).Pt())) / fabs(analysisTree.tau_pt[tau_loose] + JetsMV.at(0).Pt());
+      double SumPtJetTau =  fabs((JetsMV.at(0).Pt() - JetsMV.at(1).Pt())) / fabs(JetsMV.at(1).Pt() + JetsMV.at(0).Pt());
+
+      //RatioSums = (SumPtJetTau - met )/ (SumPtJetTau + met );
+      RatioSums =  SumPtJetTau ;
+
+
 
       TLorentzVector MetV; 
       MetV.SetPx(analysisTree.pfmet_ex); 
       MetV.SetPy(analysisTree.pfmet_ey);
       
       TLorentzVector tauV;  tauV.SetPtEtaPhiM(analysisTree.tau_pt[tau_loose], analysisTree.tau_eta[tau_loose], analysisTree.tau_phi[tau_loose], tauMass);
-
+//	cout<< "  "<<analysisTree.tau_eta[tau_loose]<<"  "<<analysisTree.tau_eta[int(tau_loose)]<<endl;
       
+
        dPhi = dPhiFrom2P( JetsMV.at(0).Px(), JetsMV.at(0).Py(), analysisTree.tau_px[tau_loose], analysisTree.tau_py[tau_loose] );
+       if (JetsMV.size()>1) dPhiJets = dPhiFrom2P( JetsMV.at(0).Px(), JetsMV.at(0).Py(),JetsMV.at(1).Px(), JetsMV.at(1).Py() );
 
+       RatiovsDPhi->Fill(SumPtJetTau,dPhi,weight);
 
-	hRatioSum->Fill(RatioSums,weight);
-	hDPhi->Fill(dPhi, weight);
-	}
+	if (RatioSums > 0.) 
+		hRatioSum->Fill(SumPtJetTau,weight);
+	if (dPhi>0.) 
+		hDPhi->Fill(dPhi, weight);
+	if (dPhiJets>0.) 
+		hDPhiJets->Fill(dPhiJets, weight);
 
+	hPtJ1->Fill(JetsMV.at(0).Pt(),weight);
+	hPtJ2->Fill(JetsMV.at(1).Pt(),weight);
 
-       if (dPhi < 2 || RatioSums > 0.25) continue;
+      if (JetsMV.size()>1) hRatioPtJ2J1_0 ->Fill(JetsMV.at(1).Pt()/JetsMV.at(0).Pt(),weight);
+      hRatioPttauJ1_0 ->Fill(analysisTree.tau_pt[tau_loose]/JetsMV.at(0).Pt(),weight);
+
+       if (dPhi < 2 ) continue;
+       //if (RatioSums > 0.25) continue;
+
+       //if (dPhi < 2 ) continue;
+   
+      if (JetsMV.size()>1) hRatioPtJ2J1_1 ->Fill(JetsMV.at(1).Pt()/JetsMV.at(0).Pt(),weight);
+       hRatioPttauJ1_1 ->Fill(analysisTree.tau_pt[tau_loose]/JetsMV.at(0).Pt(),weight);
+ 
+      CFCounter[iCut]+= weight;
+      iCFCounter[iCut]++;
+      iCut++;
 
       //if (tau.size()==0 || !tau_iso ) continue;
 
-      //cout<< " Lets check  "<<mu_index <<"  "<<int(tau_index) <<"  "<<isTight<<"  "<<isLoose<<endl;
+      //cout<< " Lets check  "<<mu_index <<"  "<<int(tau_tight) <<"  "<<isTight<<"  "<<isLoose<<endl;
       //cout<<"  "<<endl;
 	if (isLoose) denominator++;
 	if (isTight) nominator++;
+	 
+	TLorentzVector InvM ; 
+	InvM = tauV + JetsMV.at(0);
+	hmass->Fill(InvM.M(),weight);
 
-	      if (int(tau_loose)!=-1){
+	      if (isLoose){
 	      float ptProbe = TMath::Min(float(analysisTree.tau_pt[tau_loose]),float(ptBins[nPtBins]-0.1));
 	      float absEtaProbe = fabs(analysisTree.tau_eta[tau_loose]);
 	      int ptBin = binNumber(ptProbe,nPtBins,ptBins);
@@ -695,22 +832,23 @@ int main(int argc, char * argv[]) {
 //cout<< "filling here  "<<analysisTree.tau_pt[tau_loose]<<"  "<<ptBin<<"  "<<etaBin<<"  "<<weight<<endl;
 		//FakeRatePt[etaBin][ptBin]->Fill(analysisTree.tau_pt[tau_loose],weight);
 		
-		if (int(tau_loose)!=-1) FakeRatePtIncLoose[etaBin]->Fill(analysisTree.tau_pt[tau_loose],weight);
-		if (int(tau_index)!=-1) FakeRatePtIncTight[etaBin]->Fill(analysisTree.tau_pt[tau_index],weight);
-
+		if (isLoose) FakeRatePtIncLoose[etaBin]->Fill(analysisTree.tau_pt[tau_loose],weight);
+		if (isTight) FakeRatePtIncTight[etaBin]->Fill(analysisTree.tau_pt[tau_tight],weight);
+		
+		if (isLoose && RatioSums < 0.25) FakeRatePtIncLooseRatioCut[etaBin]->Fill(analysisTree.tau_pt[tau_loose],weight);
+		if (isTight && RatioSums < 0.25 ) FakeRatePtIncTightRatioCut[etaBin]->Fill(analysisTree.tau_pt[tau_tight],weight);
 		//FakeRateEta[etaBin][ptBin]->Fill(analysisTree.tau_eta[tau_loose],weight);
 		//FakeRateNV[etaBin][ptBin]->Fill(analysisTree.tau_vertexz[tau_loose],weight);
 
 	      }
 	      
 
-      	      // double q = analysisTree.tau_charge[tau_index] * analysisTree.muon_charge[mu_index];
+      	      // double q = analysisTree.tau_charge[tau_tight] * analysisTree.muon_charge[mu_index];
   
         // if (q>0 && Sign=="OS" ) continue;
         // if (q<0 && Sign=="SS" ) continue;
 
 
-      iCut++;
 
 
       selEvents++;
@@ -722,12 +860,26 @@ int main(int argc, char * argv[]) {
     delete file_;
   }
   cout<<"done"<<endl;
-	double fr =  double(nominator/denominator) ;
+	double fr = 1; if (denominator>0) fr = nominator/denominator ;
   if (denominator>0) cout <<" the tau fake rate "<<fr<<endl;
     cout <<" the tau fake rate "<<nominator<<"  "<<denominator<<endl;
   cout<<" Total events  "<<nEvents<<"  Will use weight  "<<histWeightsH->GetSumOfWeights()<<" Norm Factor "<<XSec*Lumi/( histWeightsH->GetSumOfWeights())<<endl;
   cout<<" Run range from -----> "<<RunMin<<" to  "<<RunMax<<endl;
 
+
+  for(int ci = 0; ci < CutNumb; ci++)
+    {
+      CutFlow->SetBinContent(1+ci,0);
+      CutFlow->SetBinContent(1+ci,float(CFCounter[ci]) );
+      
+  }
+
+  hTrig->SetBinContent(1,iCutTri1);
+  hTrig->SetBinContent(2,iCutTri2);
+  hTrig->SetBinContent(3,iCutTri3);
+  hTrig->SetBinContent(4,iCutTri4);
+
+  cout<<" Triggered events  "<<iCutTri1<<"  "<<iCutTri2<<"  "<<iCutTri3<<"  "<<iCutTri4<<endl;
 
   int allEvents = int(inputEventsH->GetEntries());
   std::cout << "Total number of input events    = " << allEvents << std::endl;
@@ -736,6 +888,9 @@ int main(int argc, char * argv[]) {
   std::cout << std::endl;
   file->cd();
   hxsec->Fill(XSec);
+  CutFlow->Write();
+  //hmass->Write();
+  //hTrig->Write();
  // hxsec->Write();
   file->Write();
   file->Close();

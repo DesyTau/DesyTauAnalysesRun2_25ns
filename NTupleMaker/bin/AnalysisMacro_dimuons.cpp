@@ -875,6 +875,7 @@ int main(int argc, char * argv[]) {
       //      std::cout << "GenParticles = " << analysisTree.genparticles_count << std::endl;
       if (!isData) {
 	for (unsigned int igen=0; igen<analysisTree.genparticles_count; ++igen) {
+	    		    cout<< "  info = " << analysisTree.genparticles_pdgid[igen] << std::endl;
 	  if (fabs(analysisTree.genparticles_pdgid[igen])==13&&analysisTree.genparticles_status[igen]==1) {
 	    //	  float pxGen = analysisTree.genparticles_px[igen];
 	    //	  float pyGen = analysisTree.genparticles_py[igen];
@@ -885,6 +886,7 @@ int main(int argc, char * argv[]) {
 	    //		    << "  pt = " << ptGen
 	    //		    << "  eta = " << etaGen
 	    //		    << "  info = " << analysisTree.genparticles_info[igen] << std::endl;
+	    		    cout<< "  info = " << analysisTree.genparticles_pdgid[igen] << std::endl;
 	    if (analysisTree.genparticles_info[igen]==1)
 	      promptMuons.push_back(igen);
 	    if (analysisTree.genparticles_info[igen]==5)
