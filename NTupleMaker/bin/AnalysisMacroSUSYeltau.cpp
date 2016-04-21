@@ -426,21 +426,6 @@ int main(int argc, char * argv[]) {
 	  histWeightsH->Fill(0.,genweights);
 	}
 
-	//topPt reweigtin
-	/*
-	for (unsigned int igen=0; igen < analysisTree.genparticles_count; ++igen) {
-
-	  if (analysisTree.genparticles_pdgid[igen]==6)
-	    topPt = TMath::Sqrt(analysisTree.genparticles_px[igen]*analysisTree.genparticles_px[igen]+
-				analysisTree.genparticles_py[igen]*analysisTree.genparticles_py[igen]);
-
-	  if (analysisTree.genparticles_pdgid[igen]==-6)
-	    antitopPt = TMath::Sqrt(analysisTree.genparticles_px[igen]*analysisTree.genparticles_px[igen]+
-				    analysisTree.genparticles_py[igen]*analysisTree.genparticles_py[igen]);
-
-
-	}    
-	*/
 
       }
 

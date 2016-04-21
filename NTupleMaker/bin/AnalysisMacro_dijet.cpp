@@ -216,14 +216,17 @@ int main(int argc, char * argv[]) {
  lumi_.clear();
  event_.clear();
  
+
     std::vector<Event> EventList;
     std::string line;
     std::ifstream EventsFile;
     TString file_events=argv[4]; //eventlist_csc2015.txt
     //EventsFile.open("MET_filters/eventlist_"+file_events+".txt");
-    EventsFile.open("MET_filters/"+file_events+".txt");
- 
-    cout<<" The file that will be used will be  MET_filters/"<<file_events<<endl;
+    EventsFile.open(era+"/"+file_events+".txt");
+    //cout<<"  limits  int -> "<<std::numeric_limits<int>::max()<<"  long int -> "<<std::numeric_limits<long int>::max()<<"  unsigned int -> "<<std::numeric_limits<unsigned int>::max()<<endl;
+    cout<<" The file that will be used will be "<<era<<"/"<<file_events<<".txt"<<endl;
+
+
     while (getline(EventsFile, line))
     {
         std::vector<std::string> columns = split(line,':');
@@ -240,6 +243,7 @@ int main(int argc, char * argv[]) {
         EventList.push_back(events_);
   */
       	}
+
   cout<<" In total there are "<<run_.size()<< " entries for "<<file_events<<" filter "<<endl;
     EventsFile.close();
 
