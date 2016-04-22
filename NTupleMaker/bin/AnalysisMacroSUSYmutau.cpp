@@ -147,7 +147,6 @@ int main(int argc, char * argv[]) {
     }
 
     for(std::string s; std::getline(inputFileStream, s); ) {
-      //std::fstream inputFileStream("temp", std::ios::in);
       periods.push_back(Period());
       std::stringstream ss(s);
       ss >> periods.back();
@@ -155,12 +154,6 @@ int main(int argc, char * argv[]) {
   }
 
   TString MainTrigger(TrigLeg);
-  /*
-    TString Muon17Tau20MuLegA (Mu17Tau20MuLegA );
-    TString Muon17Tau20MuLegB (Mu17Tau20MuLegB );
-    TString Muon17Tau20TauLegA (Mu17Tau20TauLegA );
-    TString Muon17Tau20TauLegB (Mu17Tau20TauLegB );
-  */
 
 
   const double Lumi   = cfg.get<double>("Lumi");
@@ -212,8 +205,6 @@ int main(int argc, char * argv[]) {
       //ifs >> dt >> xs; // no need to read further
       //cout<< " "<<dt<<"  "<<endl;
       //cout<< "For sample ========================"<<dt<<" xsecs is "<<xs<<" XSec "<<XSec<<"  "<<fact<<"  "<<fact2<<endl;
-      //if (dt==argv[2]) {
-      //if (std::string::npos != dt.find(argv[2])) {
       if (  dt == argv[2]) {
 	XSec= xs*fact*fact2;
 	cout<<" Found the correct cross section "<<xs<<" for Dataset "<<dt<<" XSec "<<XSec<<endl;
@@ -302,8 +293,9 @@ int main(int argc, char * argv[]) {
   ScaleFactor * SF_muonTrigger = new ScaleFactor();
   SF_muonTrigger->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(SingleMuonTriggerFile));
 
-
-  ////////
+  //////////////////////////////////////
+  //////// Initialized TauFakeRates here
+  //////////////////////////////////////
   cout<<" Will try to initialize the TFR now.... "<<endl;
   ScaleFactor * SF_TFR; 
   bool applyTFR = true;
@@ -433,12 +425,7 @@ int main(int argc, char * argv[]) {
       }
 
 
-    //	    if (std::string::npos != rootFileName.find("TTJetsLO") || std::string::npos != rootFileName.find("TTPow"))
 
-
-    //numberOfEntries = 1000;
-
-    // numberOfEntries = 1000;
     for (Long64_t iEntry=0; iEntry<numberOfEntries; ++iEntry) { 
 
       Float_t weight = 1;
@@ -624,7 +611,6 @@ int main(int argc, char * argv[]) {
 	  }
 	}
 
-      // vector <string> ss; ss.push_back(.c_str());
       if(fillplots)
 	FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, Channel, mu_index,el_index,tau_index);
       CFCounter[iCut]+= weight;
@@ -664,7 +650,8 @@ int main(int argc, char * argv[]) {
       ElMV.clear();
       TauMV.clear();
       LeptMV.clear();
-
+	
+      int countmuons=0;
       double isoMuMin = 9999;
       bool mu_iso=false;
       vector<int> muons; muons.clear();
@@ -701,6 +688,7 @@ int main(int argc, char * argv[]) {
 
       }
       if (!mu_iso || muons.size()==0) continue;
+	  countmuons++;
 
 	  MuV.SetPtEtaPhiM(analysisTree.muon_pt[mu_index], analysisTree.muon_eta[mu_index], analysisTree.muon_phi[mu_index], muonMass);
 	  MuMV.push_back(MuV);
@@ -850,7 +838,8 @@ int main(int argc, char * argv[]) {
 	  double dRtrig = deltaR(analysisTree.muon_eta[mu_index],analysisTree.muon_phi[mu_index],
 				 analysisTree.trigobject_eta[iT],analysisTree.trigobject_phi[iT]);
 
-	  if (analysisTree.trigobject_pt[iT]>singleMuonTriggerPtCut &&  fabs( analysisTree.trigobject_eta[iT])<singleMuonTriggerEtaCut && dRtrig<deltaRTrigMatch)
+	  //if (analysisTree.trigobject_pt[iT]>singleMuonTriggerPtCut &&  fabs( analysisTree.trigobject_eta[iT])<singleMuonTriggerEtaCut && dRtrig<deltaRTrigMatch)
+	  if (analysisTree.trigobject_pt[iT]>singleMuonTriggerPtCut && dRtrig<deltaRTrigMatch)
 	    isdRLeptonMatched = true;
 
 	  //if (isData && dRtrig<deltaRTrigMatch) isdRLeptonMatched=true;
@@ -906,8 +895,9 @@ int main(int argc, char * argv[]) {
 	      if ( imv != mu_index  && analysisTree.muon_charge[imv] != analysisTree.muon_charge[mu_index] ) OSCharge=true;
 
 	      //if ( analysisTree.muon_charge[imv] != analysisTree.muon_charge[mu_index] &&  analysisTree.muon_isGlobal[imv] && analysisTree.muon_isTracker[imv] && analysisTree.muon_isPF[imv]  
-	      if ( analysisTree.muon_charge[imv] != analysisTree.muon_charge[mu_index] &&  analysisTree.muon_isGlobal[imv] && analysisTree.muon_isTracker[imv] && analysisTree.muon_isPF[imv]  
-		   &&  analysisTree.muon_pt[imv]> 15 &&  fabs(analysisTree.muon_eta[imv])< 2.4 && fabs(analysisTree.muon_dxy[imv])<0.045 
+	      if ( analysisTree.muon_charge[imv] != analysisTree.muon_charge[mu_index] &&  analysisTree.muon_isGlobal[imv] 
+			      && analysisTree.muon_isTracker[imv] && analysisTree.muon_isPF[imv]   &&  analysisTree.muon_pt[imv]> 15 
+			      &&  fabs(analysisTree.muon_eta[imv])< 2.4 && fabs(analysisTree.muon_dxy[imv])<0.045 
 		   && fabs(analysisTree.muon_dz[imv] < 0.2 && relIso< 0.3 && analysisTree.muon_isMedium[imv]) && dRr > 0.15 && OSCharge) //removed from last recipe
 		MuVeto=true;
 	    }
@@ -972,8 +962,9 @@ int main(int argc, char * argv[]) {
 	event_thirdLeptonVeto = ThirdLeptVeto;
        if (ThirdLeptVeto) continue;
 
-
-  
+	countmuons++;
+	//if (countmuons>1)
+	//cout<<" muons here "<<muons.size()<<"  "<<countmuons<<"  "<<analysisTree.muon_count<<endl;  
     	if(fillplots)
 	FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, Channel, mu_index,el_index,tau_index);
       CFCounter[iCut]+= weight;
@@ -1139,13 +1130,10 @@ int main(int argc, char * argv[]) {
 
       /////////////////////////////////////////////////////////
 
-      //	for (unsigned int j=0;j<LeptMV.size();++j) cout<<" j "<<j<<"  "<<LeptMV.at(j).Pt()<<endl;
-      //	cout<<""<<endl;
       ////////jets cleaning 
       vector<int> jets; jets.clear();
       TLorentzVector leptonsV, muonJ, jetsLV;
 
-      //      continue;
 
       //JetsV.SetPxPyPzE(analysisTree.pfjet_px[ij], analysisTree.pfjet_py[ij], analysisTree.pfjet_pz[ij], analysisTree.pfjet_e[ij]);
 
@@ -1195,126 +1183,6 @@ int main(int argc, char * argv[]) {
 
       continue;
       /////////////////////////////////////////////////
-      //
-      if(fillplots)
-	FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, Channel, mu_index,el_index,tau_index);
-      CFCounter[iCut]+= weight;
-      CFCounter_[iCut]+= weight;
-      iCFCounter[iCut]++;
-      iCut++;
-
-      if (btagged) continue;
-
-      if(fillplots)
-	FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, Channel, mu_index,el_index,tau_index);
-      CFCounter[iCut]+= weight;
-      CFCounter_[iCut]+= weight;
-      iCFCounter[iCut]++;
-      iCut++;
-
-
-      double ETmiss = TMath::Sqrt(analysisTree.pfmet_ex*analysisTree.pfmet_ex + analysisTree.pfmet_ey*analysisTree.pfmet_ey);
-
-      if (InvertMET && ETmiss > 50.) continue;
-      if (!InvertMET && ETmiss < 50.) continue;
-
-      if(fillplots)
-	FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, Channel, mu_index,el_index,tau_index);
-      CFCounter[iCut]+= weight;
-      CFCounter_[iCut]+= weight;
-      iCFCounter[iCut]++;
-      iCut++;
-
-      if (InvertMET && ETmiss > 100.) continue;
-      if (!InvertMET && ETmiss < 100.) continue;
-
-      if(fillplots)
-	FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, Channel, mu_index,el_index,tau_index);
-      CFCounter[iCut]+= weight;
-      CFCounter_[iCut]+= weight;
-
-      iCFCounter[iCut]++;
-      iCut++;
-
-      if (InvertMET && ETmiss > 150.) continue;
-      if (!InvertMET && ETmiss < 150.) continue;
-
-      if(fillplots)
-	FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, Channel, mu_index,el_index,tau_index);
-      CFCounter[iCut]+= weight;
-      CFCounter_[iCut]+= weight;
-      iCFCounter[iCut]++;
-      iCut++;
-
-
-      if (InvertMET && ETmiss > 200.) continue;
-      if (!InvertMET && ETmiss < 200.) continue;
-
-      if(fillplots)
-	FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, Channel, mu_index,el_index,tau_index);
-      CFCounter[iCut]+= weight;
-      CFCounter_[iCut]+= weight;
-      iCFCounter[iCut]++;
-      iCut++;
-
-      //if (dRmuJet || dRtauJet || countjets >2) continue;
-
-      // pt Scalar
-
-      //cout<<"  "<<mu_index<<"  "<<tau_index<<"   "<<MuMV.at(mu_index).M()<<"  "<<TauMV.at(tau_index).M()<<endl;
-
-      TLorentzVector muVc ;  muVc.SetPtEtaPhiM(analysisTree.muon_pt[mu_index], analysisTree.muon_eta[mu_index], analysisTree.muon_phi[mu_index], muonMass);
-      TLorentzVector tauVc;  tauVc.SetPtEtaPhiM(analysisTree.tau_pt[tau_index], analysisTree.tau_eta[tau_index], analysisTree.tau_phi[tau_index], tauMass);
-
-      TLorentzVector diL = muVc + tauVc;
-      if ( diL.M() <100 ) continue;
-      if(fillplots)
-	FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, Channel, mu_index,el_index,tau_index);
-      CFCounter[iCut]+= weight;
-      CFCounter_[iCut]+= weight;
-      iCFCounter[iCut]++;
-      iCut++;
-
-
-      double MTv = mT(diL,METV);
-      /* if (ETmiss < 100) continue;
-      //if (MTv>80 && MTv<120) continue;
-      FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, Channel, mu_index,el_index,tau_index);
-      CFCounter[iCut]+= weight;
-      CFCounter_[iCut]+= weight;
-      iCFCounter[iCut]++;
-      iCut++;
-
-      if (ETmiss < 120) continue;
-      FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, Channel, mu_index,el_index,tau_index);
-      CFCounter[iCut]+= weight;
-      CFCounter_[iCut]+= weight;
-      iCFCounter[iCut]++;
-      iCut++;
-      // topological cut
-      //if (DZeta<dZetaCut) continue;
-      */
-
-
-      double dRr = deltaR(muVc.Eta(), muVc.Phi(), tauVc.Eta(), tauVc.Phi());
-
-      if (dRr>3) continue;
-
-      if(fillplots)
-	FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, Channel, mu_index,el_index,tau_index);
-      CFCounter[iCut]+= weight;
-      CFCounter_[iCut]+= weight;
-      iCFCounter[iCut]++;
-      iCut++;
-
-
-      if (countjets >2) continue;
-      if(fillplots)
-	FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, Channel, mu_index,el_index,tau_index);
-      CFCounter[iCut]+= weight;
-      CFCounter_[iCut]+= weight;
-      iCFCounter[iCut]++;
-      iCut++;
 
 
       selEvents++;
@@ -1339,7 +1207,6 @@ int main(int argc, char * argv[]) {
 
   //write out cutflow
   ofstream tfile;
-  // TString outname = argv[argc-1];
   TString outname=argv[2];
   TString textfilename = "cutflow_"+outname+"_"+Channel+"_"+argv[3]+".txt";
   //  tfile.open(textfilename);
@@ -1353,16 +1220,14 @@ int main(int argc, char * argv[]) {
       CutFlowUnW->SetBinContent(1+ci,0);
       CutFlow->SetBinContent(1+ci,0);
       CutFlowUnW->SetBinContent(1+ci,float(CFCounter[ci]) );
-      //CFCounter_->Fill();
 
 
       CFCounter[ci] *= float(XSec*Lumi/( histWeightsH->GetSumOfWeights()));
 
       CutFlow->SetBinContent(1+ci,float(CFCounter[ci]));
 
-      cout << " i "<<ci<<" iCFCounter "<<iCFCounter[ci]<<" CFCounter  "<<CFCounter[ci]<<" CFCounter_ " <<CFCounter_[ci]<<"  "<<XSec*Lumi/( histWeightsH->GetSumOfWeights())<<" UnWBinContent "<<CutFlowUnW->GetBinContent(1+ci)<<" Norm to Lumi Content "<<CutFlow->GetBinContent(1+ci)<<endl;   
+      cout << " i "<<ci<<" iCFCounter "<<iCFCounter[ci]<<" CFCounter  "<<CFCounter[ci]<<" CFCounter_ " <<CFCounter_[ci]<<"  "<<XSec*Lumi/( histWeightsH->GetSumOfWeights())<<" UnWBinContent "<<CutFlowUnW->GetBinContent(1+ci)<<" Norm to Lumi Content "<<CutFlow->GetBinContent(1+ci)<<" Cut "<<CutList[ci]<<endl;   
       if (iCFCounter[ci] <0.2) statUnc[ci] =0;
-      //else statUnc[i] = CFCounter[i]/sqrt(iCFCounter[i]);
       else statUnc[ci] = sqrt(CFCounter[ci]);
     }
 
@@ -1377,7 +1242,6 @@ int main(int argc, char * argv[]) {
 
 
   file->cd(Channel.c_str());
-  //WriteTree();
   hxsec->Fill(XSec);
   hxsec->Write();
   inputEventsH->Write();
