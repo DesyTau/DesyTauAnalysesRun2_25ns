@@ -405,8 +405,8 @@ int main(int argc, char * argv[]) {
   	const string recoilFileName   = cfg.get<string>("RecoilFileName");
 	TString RecoilFileName(recoilFileName);
 	
-    const string recoilMvaFileName   = cfg.get<string>("RecoilMvaFileName");
-    TString RecoilMvaFileName(recoilMvaFileName);		
+	const string recoilMvaFileName   = cfg.get<string>("RecoilMvaFileName");
+	TString RecoilMvaFileName(recoilMvaFileName);		
 	
 	//const string recoilPuppiFileName   = cfg.get<string>("RecoilPuppiFileName");	
 	//TString RecoilPuppiFileName(recoilPuppiFileName);
@@ -525,7 +525,7 @@ int main(int argc, char * argv[]) {
 	TH1D * h_dimuonPt = new TH1D ("dimuonPt","",100,0,200);
    	TH1D * massSelH = new TH1D("massSelH","",200,0,200);
 	TH1D * massSelGenH = new TH1D("massSelGenH","",200,0,200);
-	TH1D * massSelGen1H = new TH1D("massSelGenH","",200,0,200);
+	TH1D * massSelGen1H = new TH1D("massSelGen1H","",200,0,200);
 	TH1D * dimuonMass_dca = new TH1D ("dimuonMass_dca","",200,0,200);
    	TH1D * metSelH  = new TH1D("metSelH","",200,0,400);
 	TH1D * mvametSelH = new TH1D("mvametSelH","",200,0,400);
@@ -1666,7 +1666,7 @@ int main(int argc, char * argv[]) {
 					  float mvametcorr_ex = mvamet_ex;
 					  float mvametcorr_ey = mvamet_ey;
 					  recoilMvaMetCorrector.CorrectByMeanResolution(mvamet_ex,mvamet_ey,genV.Px(),genV.Py(),genL.Px(),genL.Py(),nJets30,mvametcorr_ex,mvametcorr_ey);
-					  // 	  std::cout << "MvaMet : (" << mvamet_ex << "," << mvamet_ey << ")  "
+					  // std::cout << "MvaMet : (" << mvamet_ex << "," << mvamet_ey << ")  "
 					  //	                      << "  (" << mvametcorr_ex << "," << mvametcorr_ey << ")" << std::endl;
 					  mvamet_phi = TMath::ATan2(mvametcorr_ey,mvametcorr_ex);
 					  mvamet = TMath::Sqrt(mvametcorr_ex*mvametcorr_ex+mvametcorr_ey*mvametcorr_ey);
