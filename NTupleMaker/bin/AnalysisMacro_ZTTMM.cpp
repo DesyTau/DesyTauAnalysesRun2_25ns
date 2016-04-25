@@ -34,7 +34,6 @@
 #include "HTT-utilities/RecoilCorrections/interface/RecoilCorrector.h"
 
 #include "DesyTauAnalyses/NTupleMaker/interface/rochcor2015.h"
-#include "DesyTauAnalyses/NTupleMaker/interface/RoccoR.h"
 
 const float electronMass = 0;
 const float muonMass = 0.10565837;
@@ -330,10 +329,8 @@ int main(int argc, char * argv[]) {
 	const bool applyLeptonSF = cfg.get<bool>("ApplyLeptonSF");
 
 	const bool applyTopPtReweighting = cfg.get<bool>("ApplyTopPtReweighting");
-	
 	const bool applyRochCorr = cfg.get<bool>("ApplyRochCorr");
- 	
-	
+ 
 	//ztotautautomumu selection
 	const bool  applyTauTauSelection = cfg.get<bool>("ApplyTauTauSelection");
 	const bool  selectZToTauTauMuMu = cfg.get<bool>("SelectZToTauTauMuMu");
@@ -346,6 +343,19 @@ int main(int argc, char * argv[]) {
  	const float dxyMuonCut     = cfg.get<float>("dxyMuonCut");
  	const float dzMuonCut      = cfg.get<float>("dzMuonCut");
 	const float isoMuonCut     = cfg.get<float>("isoMuonCut");
+	//const float isoMuonLowCut  = cfg.get<float>("isoMuonLowCut");
+	//const float isoMuonHighCut = cfg.get<float>("isoMuonHighCut");
+	//const bool applyMuonId     = cfg.get<bool>("ApplyMuonId");
+	//const string lowPtLegMuon  = cfg.get<string>("LowPtLegMuon");
+	//const string highPtLegMuon = cfg.get<string>("HighPtLegMuon"); 
+	
+	// veto muons
+	// const float ptVetoMuonCut   = cfg.get<float>("ptVetoMuonCut");
+	// const float etaVetoMuonCut  = cfg.get<float>("etaVetoMuonCut");
+	//const float dxyVetoMuonCut   = cfg.get<float>("dxyVetoMuonCut");
+	//const float dzVetoMuonCut   = cfg.get<float>("dzVetoMuonCut");
+	//const float isoVetoMuonCut   = cfg.get<float>("isoVetoMuonCut");
+	//const bool applyVetoMuonId     = cfg.get<bool>("ApplyVetoMuonId");
 	
 	// vertex cuts
  	const float ndofVertexCut  = cfg.get<float>("NdofVertexCut");   
@@ -368,6 +378,8 @@ int main(int argc, char * argv[]) {
   	const bool applyJetPfId = cfg.get<bool>("ApplyJetPfId");
 	const bool applyJetPuId = cfg.get<bool>("ApplyJetPuId");
   	const float jetEtaTrkCut   = cfg.get<float>("JetEtaTrkCut");
+ 	// TString LowPtLegMuon(lowPtLegMuon);
+ 	// TString HighPtLegMuon(highPtLegMuon);
 
 	TString BTagDiscriminator(bTagDiscriminator);
   
@@ -512,8 +524,8 @@ int main(int argc, char * argv[]) {
    	TH1D * etaTrailingMuSelH = new TH1D("etaTrailingMuSelH","",50,-2.5,2.5);
 	TH1D * h_dimuonPt = new TH1D ("dimuonPt","",100,0,200);
    	TH1D * massSelH = new TH1D("massSelH","",200,0,200);
-	//TH1D * massGenSelH = new TH1D("massGenSelH","",200,0,200);
-	TH1D * massSelGen1H = new TH1D("massSelGen1H","",200,0,200);
+	TH1D * massSelGenH = new TH1D("massSelGenH","",200,0,200);
+	TH1D * massSelGen1H = new TH1D("massSelGenH","",200,0,200);
 	TH1D * dimuonMass_dca = new TH1D ("dimuonMass_dca","",200,0,200);
    	TH1D * metSelH  = new TH1D("metSelH","",200,0,400);
 	TH1D * mvametSelH = new TH1D("mvametSelH","",200,0,400);
@@ -537,7 +549,17 @@ int main(int argc, char * argv[]) {
    	TH1D * h_dxy_muon2 =new TH1D ("dxy_muon2","",50,-0.02,0.02);
    	TH1D * h_dz_muon1 = new TH1D ("dz_muon1","",50,-0.1,0.1);
    	TH1D * h_dz_muon2 = new TH1D ("dz_muon2","",50,-0.1,0.1);
+ 
+   	TH1D * h_dxy_mu1_mlt70 =new TH1D ("dxy_m1_mlt70","",50,-0.02,0.02);
+   	TH1D * h_dxy_mu2_mlt70 =new TH1D ("dxy_mu2_mlt70","",50,-0.02,0.02);
+   	TH1D * h_dz_mu1_mlt70 = new TH1D ("dz_mu1_mlt70","",50,-0.1,0.1);
+   	TH1D * h_dz_mu2_mlt70 = new TH1D ("dz_mu2_mlt70","",50,-0.1,0.1);
   
+   	TH1D * h_dxy_mu1_mgt70 =new TH1D ("dxy_m1_mgt70","",50,-0.02,0.02);
+   	TH1D * h_dxy_mu2_mgt70 =new TH1D ("dxy_mu2_mgt70","",50,-0.02,0.02);
+   	TH1D * h_dz_mu1_mgt70 = new TH1D ("dz_mu1_mgt70","",50,-0.1,0.1);
+   	TH1D * h_dz_mu2_mgt70 = new TH1D ("dz_mu2_mgt70","",50,-0.1,0.1);
+
    	TH1D * h_dcaSigdxy_muon1 = new TH1D ("dcaSigdxy_muon1","",50,-4,4);
    	TH1D * h_dcaSigdxy_muon2 = new TH1D ("dcaSigdxy_muon2","",50,-4,4);
    	TH1D * h_dcaSigdz_muon1 = new TH1D ("dcaSigdz_muon1","",50,-4,4);
@@ -600,21 +622,13 @@ int main(int argc, char * argv[]) {
    	Float_t n_dimuonMass;
    	Float_t n_met;
 	Float_t n_mvamet;
-	Float_t n_mvamet_ex;
-	Float_t n_mvamet_ey;
-	Float_t n_covmet_xx;
-	Float_t n_covmet_xy;
-	Float_t n_covmet_yy;
 	Float_t n_leadingPt;
 	Float_t n_trailingPt;
 	Float_t n_leadingEta;
 	Float_t n_trailingEta;
-	Float_t n_leadingPhi;
-	Float_t n_trailingPhi;
 	Float_t n_jets;
 	Float_t n_noOfvertices;
 	Bool_t n_genAccept;
-	Float_t n_genZ;
 
 	TTree * TW = new TTree("TW","Weights");
    	TW->Branch("genWeight",&n_genWeight,"n_genWeight/F");
@@ -630,6 +644,10 @@ int main(int argc, char * argv[]) {
    	T->Branch("dcaSigdxy_muon2",&n_dcaSigdxy2,"n_dcaSigdxy2/F");
    	T->Branch("dcaSigdz_muon1",&n_dcaSigdz1,"n_dcaSigdz1/F");
    	T->Branch("dcaSigdz_muon2",&n_dcaSigdz2,"n_dcaSigdz2/F");
+	// T->Branch("dcaSigdxy_m1",&n_dcaSigdxy_mu1,"n_dcaSigdxy_mu1/F");
+	// T->Branch("dcaSigdxy_mu2",&n_dcaSigdxy_mu2,"n_dcaSigdxy_mu2/F");
+   	//T->Branch("dcaSigdz_m1",&n_dcaSigdz_mu1,"n_dcaSigdz_mu1/F");
+   	//T->Branch("dcaSigdz_mu2",&n_dcaSigdz_mu2,"n_dcaSigdz_mu2/F");
 	T->Branch("dcaSig2Mu2D", &n_dcaSig2Mu2D, "n_dcaSig2Mu2D/F");
 	T->Branch("dcaSig2Mu3D", &n_dcaSig2Mu3D, "n_dcaSig2Mu3D/F");
 	T->Branch("sig2Mu2D", &n_sig2Mu2D, "n_sig2Mu2D/F");
@@ -641,22 +659,14 @@ int main(int argc, char * argv[]) {
    	T->Branch("genWeight",&n_genWeight,"n_genWeight/F");
    	T->Branch("dimuonMass",&n_dimuonMass,"n_dimuonMass/F");
    	T->Branch("met",&n_met,"n_met/F");
-	T->Branch("mvamet_ex",&n_mvamet_ex,"n_mvamet_ex/F");
-	T->Branch("mvamet_ey",&n_mvamet_ey,"n_mvamet_ey/F");
 	T->Branch("mvamet",&n_mvamet,"n_mvamet/F");
-	T->Branch("covmetxx",&n_covmet_xx,"n_covmet_xx/F");
-	T->Branch("covmetxy",&n_covmet_xy,"n_covmet_xy/F");
-	T->Branch("covmetyy",&n_covmet_yy,"n_covmet_yy/F");
 	T->Branch("leadingPt", &n_leadingPt, "n_leadingPt/F");
 	T->Branch("trailingPt", &n_trailingPt, "n_trailingPt/F");
 	T->Branch("leadingEta", &n_leadingEta, "n_leadingEta/F");
 	T->Branch("trailingEta", &n_trailingEta, "n_trailingEta/F");
-	T->Branch("leadingPhi", &n_leadingPhi, "n_leadingPhi/F");
-	T->Branch("trailingPhi", &n_trailingPhi, "n_trailingPhi/F");
 	T->Branch("jets", &n_jets,"n_jets/F");
 	T->Branch("noOfvertices", &n_noOfvertices, " n_noOfvertices/F");
 	T->Branch("genAccept", &n_genAccept, "genAccept/O");
-	T->Branch("genZ", &n_genZ, "n_genZ/F");
 	
 	TH1D * ZMassEtaPtPass[3][7];
    	TH1D * ZMassEtaPtFail[3][7];
@@ -878,7 +888,6 @@ int main(int argc, char * argv[]) {
 			    analysisTree.muon_eta[iM] = mu.Eta();
 			    analysisTree.muon_phi[iM] = mu.Phi();
 			    //			    analysisTree.muon_e[iM] = mu.E();
-			    
 			  }
 			}
 
@@ -954,7 +963,12 @@ int main(int argc, char * argv[]) {
 				genV += genPart;
 			    }
 			  }
-			  if (genV.Pt()<0.1) genV.SetXYZM(0.1,0.1,0.,0.);
+			
+
+			  
+    			  if (genV.Pt()<0.1) genV.SetXYZM(0.1,0.1,0.,0.);
+
+			  massSelGenH->Fill(genV.M(),weight);
 			  
 			  for (unsigned int igen=0; igen<analysisTree.genparticles_count; ++igen) {
 			    if (analysisTree.genparticles_pdgid[igen]==23 &&  analysisTree.genparticles_status[igen]==62)
@@ -1191,6 +1205,15 @@ int main(int argc, char * argv[]) {
 				exit(-1);
 			}
 			
+			// vertex cuts
+			
+			//if (fabs(analysisTree.primvertex_z)>zVertexCut) continue;
+			//if (analysisTree.primvertex_ndof<ndofVertexCut) continue;
+			//float dVertex = (analysisTree.primvertex_x*analysisTree.primvertex_x+
+			//analysisTree.primvertex_y*analysisTree.primvertex_y);
+			//if (dVertex>dVertexCut) continue;
+			//according to new code these cuts no longer required
+			
 			// muon selection
 			vector<unsigned int> allMuons; allMuons.clear();
 			vector<unsigned int> idMuons; idMuons.clear();
@@ -1422,13 +1445,6 @@ int main(int argc, char * argv[]) {
 				  mvamet_ey = analysisTree.mvamet_ey[metMuMu];
 				  float mvamet_ex2 = mvamet_ex * mvamet_ex;
 				  float mvamet_ey2 = mvamet_ey * mvamet_ey;
-				  n_covmet_xx = analysisTree.mvamet_sigxx[metMuMu];
-				  n_covmet_xy = analysisTree.mvamet_sigxy[metMuMu];
-				  n_covmet_yy = analysisTree.mvamet_sigyy[metMuMu];
-				  
-				  // std::cout << "xx = " << n_covmet_xx 
-				  //	    << "   xy = " << n_covmet_xy
-				  //	    << "   yy = " << n_covmet_yy << std::endl;
 
 				  mvamet = TMath::Sqrt(mvamet_ex2+mvamet_ey2);
 				  mvamet_phi = TMath::ATan2(mvamet_ey,mvamet_ex);
@@ -1695,7 +1711,6 @@ int main(int argc, char * argv[]) {
 						float scaleFactor = 0.98 + 0.002*float(iScale);
 						massSelScaleH[iScale]->Fill(massSel*scaleFactor,weight);
 						}*/
-					massSelGen1H->Fill(genZ.M(),weight);
 					
 					ptLeadingMuSelH->Fill(analysisTree.muon_pt[indx1],weight);
 					ptTrailingMuSelH->Fill(analysisTree.muon_pt[indx2],weight);
@@ -1731,10 +1746,18 @@ int main(int argc, char * argv[]) {
 					float dcaSigdxy_muon2 = 0.0;
 					float dcaSigdz_muon1  = 0.0;
 					float dcaSigdz_muon2  =0.0;
+					//float dcaSigdxy_mu1 = 0.0;
+					//float dcaSigdxy_mu2 = 0.0;
+					//float dcaSigdz_mu1  = 0.0;
+					//float dcaSigdz_mu2  =0.0;
 					float dcaSig2Mu2D = 0.0;
 					float dcaSig2Mu3D = 0.0;
 					float sig2Mu2D = 0.0;
 					float sig2Mu3D = 0.0;
+					//float dcaSigdxy_mu1_genMuMatch = 0.0;
+					//float dcaSigdxy_mu2_genMuMatch = 0.0;
+					//float dcaSigdz_mu1_genMuMatch  = 0.0;
+					//float dcaSigdz_mu2_genMuMatch  =0.0;
 					float phi_LeadingMu_MET= 0.0;
 					float phi_TrailingMu_MET =0.0;
 					float phi_PosMu_MET =0.0;
@@ -1809,6 +1832,27 @@ int main(int argc, char * argv[]) {
 					//dzMu1[iEta][iPt]->Fill(analysisTree.muon_dz[indx1],weight);
 					//dzMu2[iEta][iPt]->Fill(analysisTree.muon_dz[indx2],weight);
 					
+					//if (massSel>70&&massSel<110){
+					//dxyMu1_m70to110[iEta][iPt]->Fill(analysisTree.muon_dxy[indx1],weight);
+					//dxyMu2_m70to110[iEta][iPt]->Fill(analysisTree.muon_dxy[indx2],weight);
+					//dzMu1_m70to110[iEta][iPt]->Fill(analysisTree.muon_dz[indx1],weight);
+					//dzMu2_m70to110[iEta][iPt]->Fill(analysisTree.muon_dz[indx2],weight);
+					//}
+					/*
+					if (massSel< 70){
+						h_dxy_mu1_mlt70->Fill(analysisTree.muon_dxy[indx1],weight);
+						h_dxy_mu2_mlt70->Fill(analysisTree.muon_dxy[indx2],weight);
+						h_dz_mu1_mlt70->Fill(analysisTree.muon_dz[indx1],weight);
+						h_dz_mu2_mlt70->Fill(analysisTree.muon_dz[indx2],weight);
+					}
+					
+					if (massSel> 70){
+						h_dxy_mu1_mgt70->Fill(analysisTree.muon_dxy[indx1],weight);
+						h_dxy_mu2_mgt70->Fill(analysisTree.muon_dxy[indx2],weight);
+						h_dz_mu1_mgt70->Fill(analysisTree.muon_dz[indx1],weight);
+						h_dz_mu2_mgt70->Fill(analysisTree.muon_dz[indx2],weight);
+					}
+					*/
 					h_dcaSigdxy_muon1->Fill(dcaSigdxy_muon1,weight);
 					h_dcaSigdxy_muon2->Fill(dcaSigdxy_muon2,weight);
 					h_dcaSigdz_muon1->Fill(dcaSigdz_muon1,weight);
@@ -1894,26 +1938,11 @@ int main(int argc, char * argv[]) {
 					n_trailingPt = analysisTree.muon_pt[indx2];
 					n_leadingEta = analysisTree.muon_eta[indx1];
 					n_trailingEta = analysisTree.muon_eta[indx2];
-					n_leadingPhi = analysisTree.muon_phi[indx1];
-					n_trailingPhi = analysisTree.muon_phi[indx2];
-					if (analysisTree.muon_pt[indx1]<analysisTree.muon_pt[indx2]) {
-					  n_leadingPt = analysisTree.muon_pt[indx2];
-					  n_trailingPt = analysisTree.muon_pt[indx1];
-					  n_leadingEta = analysisTree.muon_eta[indx2];
-					  n_trailingEta = analysisTree.muon_eta[indx1];
-					  n_leadingPhi = analysisTree.muon_phi[indx2];
-					  n_trailingPhi = analysisTree.muon_phi[indx1];
-					}
 					n_jets = double(nJets30);
 					n_noOfvertices = analysisTree.primvertex_count;
-					n_genZ = genZ.M();
 					
-					if (fillBDTNTuple) {
-					  n_mvamet = mvamet;
-					  n_mvamet_ex = mvamet_ex;
-					  n_mvamet_ey = mvamet_ey;
-					  T->Fill();
-					}
+					if (fillBDTNTuple)
+						T->Fill();
 					
 					if (massSel>70&&massSel<110) {
 						float unitX = dimuon.Px()/dimuon.Pt();
