@@ -97,6 +97,8 @@ int main(int argc, char * argv[]) {
   const bool applyRecoilOnGenerator = cfg.get<bool>("ApplyRecoilOnGenerator");
   const bool applyTopPtReweighting = cfg.get<bool>("ApplyTopPtReweighting");
   const bool applyNJetReweighting = cfg.get<bool>("ApplyNJetReweighting");
+  const bool applyZMassPtReweighting = cfg.get<bool>("ApplyZMassPtReweighting");
+  const bool interpolateZMassPtWeight = cfg.get<bool>("InterpolateZMassPtWeight");
 
   // kinematic cuts on electron
   const float ptElectronLowCut   = cfg.get<float>("ptElectronLowCut");
@@ -179,8 +181,13 @@ int main(int argc, char * argv[]) {
   const string metsysMvaFileName   = cfg.get<string>("MetSysMvaFileName");
   TString MetSysMvaFileName(metsysMvaFileName);
 
-  const int bkgdType =  cfg.get<float>("BkgdType");
+  const string zMassPtWeightsFileName   = cfg.get<string>("ZMassPtWeightsFileName");
+  TString ZMassPtWeightsFileName(zMassPtWeightsFileName);
 
+  const string zMassPtWeightsHistName   = cfg.get<string>("ZMassPtWeightsHistName");
+  TString ZMassPtWeightsHistName(zMassPtWeightsHistName);
+
+  const int bkgdType =  cfg.get<float>("BkgdType");
 
   const string jsonFile = cfg.get<string>("jsonFile");
 
@@ -227,6 +234,11 @@ int main(int argc, char * argv[]) {
   TH1D * histWeightsH = new TH1D("histWeightsH","",1,-0.5,0.5);
   TH1D * inputEventsH = new TH1D("inputEventsH","",1,-0.5,0.5);
   TH1D * histWeightsSkimmedH = new TH1D("histWeightsSkimmedH","",1,-0.5,0.5);
+
+  TH1D * massZH = new TH1D("massZH","",1000,0,1000);
+  TH1D * ptZH = new TH1D("ptZH","",1000,0,1000);
+  TH2D * massPtZH = new TH2D("massPtZH","",100,0,1000,100,0,1000);
+
 
   TH1D * massSelH = new TH1D("massSelH","",200,0,200);
   TH1D * massExtendedSelH = new TH1D("massExtendedSelH","",500,0,5000);
@@ -658,6 +670,17 @@ int main(int argc, char * argv[]) {
     SF_electronTrig->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(ElectronTrigFile));
     
   }
+  // Z mass pt weights
+  TFile * fileZMassPtWeights = new TFile(TString(cmsswBase)+"/src/"+ZMassPtWeightsFileName); 
+  if (fileZMassPtWeights->IsZombie()) {
+    std::cout << "File " << TString(cmsswBase) << "/src/" << ZMassPtWeightsFileName << "  does not exist!" << std::endl;
+    exit(-1);
+  }
+  TH2D * histZMassPtWeights = (TH2D*)fileZMassPtWeights->Get(ZMassPtWeightsHistName); 
+  if (histZMassPtWeights==NULL) {
+    std::cout << "histogram " << ZMassPtWeightsHistName << " is not found in file " << TString(cmsswBase) << "/src/DesyTauAnalyses/NTupleMaker/data/" << ZMassPtWeightsFileName << std::endl;
+    exit(-1);
+  }
   
   int nFiles = 0;
   int nEvents = 0;
@@ -743,14 +766,43 @@ int main(int argc, char * argv[]) {
       TLorentzVector genZ; genZ.SetXYZM(0,0,0,91.2); 
       TLorentzVector genV; genV.SetXYZM(0,0,0,0);
       TLorentzVector genL; genL.SetXYZM(0,0,0,0);
+      TLorentzVector genMuonsLV; genMuonsLV.SetXYZT(0,0,0,0);
+      TLorentzVector genElectronsLV; genElectronsLV.SetXYZT(0,0,0,0);
+      TLorentzVector genTausLV; genTausLV.SetXYZT(0,0,0,0);
+      TLorentzVector genVisTausLV; genVisTausLV.SetXYZT(0,0,0,0);
+      std::vector<unsigned int> genMuons; genMuons.clear();
+      std::vector<unsigned int> genElectrons; genElectrons.clear();
+      std::vector<unsigned int> genTaus; genTaus.clear();
+      std::vector<unsigned int> genVisTaus; genVisTaus.clear();
       if (!isData) {
+
+	for (unsigned int igentau=0; igentau < analysisTree.gentau_count; ++igentau) {
+	  TLorentzVector tauLV; tauLV.SetXYZT(analysisTree.gentau_px[igentau],
+					      analysisTree.gentau_py[igentau],
+					      analysisTree.gentau_pz[igentau],
+					      analysisTree.gentau_e[igentau]);
+	  TLorentzVector tauVisLV; tauVisLV.SetXYZT(analysisTree.gentau_visible_px[igentau],
+						    analysisTree.gentau_visible_py[igentau],
+						    analysisTree.gentau_visible_pz[igentau],
+						    analysisTree.gentau_visible_e[igentau]);
+	  if (analysisTree.gentau_isPrompt[igentau]&&analysisTree.gentau_isFirstCopy[igentau]) {
+	    genTaus.push_back(igentau);
+	    genTausLV += tauLV;
+	  }
+	  if (analysisTree.gentau_isPrompt[igentau]&&analysisTree.gentau_isLastCopy[igentau]) {	
+	    genVisTaus.push_back(igentau);
+	    genVisTausLV += tauVisLV;
+	  }
+	  
+	}
+
 	for (unsigned int igen=0; igen<analysisTree.genparticles_count; ++igen) {
 	  //	  cout << igen << "   pdgId = " << analysisTree.genparticles_pdgid[igen] << endl;
 	  TLorentzVector genPart; genPart.SetXYZT(analysisTree.genparticles_px[igen],
 						  analysisTree.genparticles_py[igen],
 						  analysisTree.genparticles_pz[igen],
 						  analysisTree.genparticles_e[igen]);
-	  if (analysisTree.genparticles_pdgid[igen]==23||analysisTree.genparticles_pdgid[igen]==22) {
+	  if (analysisTree.genparticles_pdgid[igen]==23) {
 	    if (analysisTree.genparticles_fromHardProcess[igen])
 	      genZ.SetXYZT(analysisTree.genparticles_px[igen],
 			   analysisTree.genparticles_py[igen],
@@ -765,6 +817,20 @@ int main(int argc, char * argv[]) {
 	    fabs(analysisTree.genparticles_pdgid[igen])==16;
 	  bool isPrompt = analysisTree.genparticles_isPrompt[igen]||
 	    analysisTree.genparticles_isPromptTauDecayProduct[igen];
+
+	  if (fabs(analysisTree.genparticles_pdgid[igen])==11) { 
+	    if (analysisTree.genparticles_fromHardProcess[igen]&&analysisTree.genparticles_status[igen]==1) {
+	      genElectrons.push_back(igen);
+	      genElectronsLV += genPart;
+	    }
+	  }
+	  
+	  if (fabs(analysisTree.genparticles_pdgid[igen])==13) { 
+	    if (analysisTree.genparticles_fromHardProcess[igen]&&analysisTree.genparticles_status[igen]==1) {
+	      genMuons.push_back(igen);
+	      genMuonsLV += genPart;
+	    }
+	  }
 	  
 	  if (analysisTree.genparticles_status[igen]==1&&isPrompt) {
 	    if (isLepton&&
@@ -777,12 +843,57 @@ int main(int argc, char * argv[]) {
 	      genV += genPart;
 	  }
 	}
-	if (genV.Pt()<0.1) genV.SetXYZM(0.1,0.1,0.,0.);
-      }
 
-      // PU reweighting 
-      if (!isData) {  
-	
+
+	if (genV.Pt()<0.1) genV.SetXYZM(0.1,0.1,0.,0.);
+
+		/*      
+	std::cout << "Prompt electrons = " << genElectrons.size() << std::endl;
+	std::cout << "Prompt muons     = " << genMuons.size() << std::endl;
+	std::cout << "Prompt taus      = " << genTaus.size() << std::endl;
+	std::cout << "Prompt vis taus  = " << genVisTaus.size() << std::endl;
+	printf("gen Z Boson   -> px = %7.1f  py = %7.1f  pz = %7.1f\n",genZ.Px(),genZ.Py(),genZ.Pz());
+	printf("gen muons     -> px = %7.1f  py = %7.1f  pz = %7.1f\n",genMuonsLV.Px(),genMuonsLV.Py(),genMuonsLV.Pz());
+	printf("gen electrons -> px = %7.1f  py = %7.1f  pz = %7.1f\n",genElectronsLV.Px(),genElectronsLV.Py(),genElectronsLV.Pz());
+	printf("gen taus      -> px = %7.1f  py = %7.1f  pz = %7.1f\n",genTausLV.Px(),genTausLV.Py(),genTausLV.Pz());
+	printf("gen vis taus  -> px = %7.1f  py = %7.1f  pz = %7.1f\n",genVisTausLV.Px(),genVisTausLV.Py(),genVisTausLV.Pz());
+	std::cout << std::endl;
+	*/
+	float genZPt = -1.0;
+	float genZMass = -1.0;
+
+	if (genElectrons.size()==2) {
+	  genZPt   = genElectronsLV.Pt();
+	  genZMass = genElectronsLV.M();
+	}
+	else if (genMuons.size()==2) {
+	  genZPt   = genMuonsLV.Pt();
+          genZMass = genMuonsLV.M();
+	}
+	else if (genTaus.size()==2) {
+          genZPt   = genTausLV.Pt();
+          genZMass = genTausLV.M();
+        }
+
+	massZH->Fill(genZMass,weight);
+	ptZH->Fill(genZPt,weight);
+	massPtZH->Fill(genZMass,genZPt,weight);
+
+	if (applyZMassPtReweighting) {
+	  if (genZMass>1000) genZMass=999;
+	  if (genZPt>1000) genZPt=999;
+	  if (genZMass>50.0&&genZPt>0.0) {
+	    float dyWeight = 1;
+	    if (interpolateZMassPtWeight) 
+	      dyWeight = histZMassPtWeights->Interpolate(genZMass,genZPt);
+	    else 
+	      dyWeight *= histZMassPtWeights->GetBinContent(histZMassPtWeights->FindBin(genZMass,genZPt));
+	    
+	    //	    std::cout << "Z mass = " << genZMass << "   Z Pt = " << genZPt << "   weight = " << dyWeight << std::endl;
+	    weight *= dyWeight;
+	  }
+	  
+	}
 
 	if (applyPUreweighting_vertices) {
 	

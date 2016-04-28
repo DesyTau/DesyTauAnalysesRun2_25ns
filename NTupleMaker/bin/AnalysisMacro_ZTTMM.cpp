@@ -33,6 +33,8 @@
 //#include "DesyTauAnalyses/NTupleMaker/interface/functions.h"
 #include "HTT-utilities/RecoilCorrections/interface/RecoilCorrector.h"
 
+#include "DesyTauAnalyses/NTupleMaker/interface/rochcor2015.h"
+
 const float electronMass = 0;
 const float muonMass = 0.10565837;
 const float pionMass = 0.1396;
@@ -327,6 +329,7 @@ int main(int argc, char * argv[]) {
 	const bool applyLeptonSF = cfg.get<bool>("ApplyLeptonSF");
 
 	const bool applyTopPtReweighting = cfg.get<bool>("ApplyTopPtReweighting");
+	const bool applyRochCorr = cfg.get<bool>("ApplyRochCorr");
  
 	//ztotautautomumu selection
 	const bool  applyTauTauSelection = cfg.get<bool>("ApplyTauTauSelection");
@@ -402,8 +405,8 @@ int main(int argc, char * argv[]) {
   	const string recoilFileName   = cfg.get<string>("RecoilFileName");
 	TString RecoilFileName(recoilFileName);
 	
-    const string recoilMvaFileName   = cfg.get<string>("RecoilMvaFileName");
-    TString RecoilMvaFileName(recoilMvaFileName);		
+	const string recoilMvaFileName   = cfg.get<string>("RecoilMvaFileName");
+	TString RecoilMvaFileName(recoilMvaFileName);		
 	
 	//const string recoilPuppiFileName   = cfg.get<string>("RecoilPuppiFileName");	
 	//TString RecoilPuppiFileName(recoilPuppiFileName);
@@ -519,7 +522,10 @@ int main(int argc, char * argv[]) {
    	TProfile2D *hprof2D_pt = new TProfile2D("hprof2D_pt","",100,0,200,100,0,200);
    	TH1D * etaLeadingMuSelH = new TH1D("etaLeadingMuSelH","",50,-2.5,2.5);
    	TH1D * etaTrailingMuSelH = new TH1D("etaTrailingMuSelH","",50,-2.5,2.5);
+	TH1D * h_dimuonPt = new TH1D ("dimuonPt","",100,0,200);
    	TH1D * massSelH = new TH1D("massSelH","",200,0,200);
+	TH1D * massSelGenH = new TH1D("massSelGenH","",200,0,200);
+	TH1D * massSelGen1H = new TH1D("massSelGen1H","",200,0,200);
 	TH1D * dimuonMass_dca = new TH1D ("dimuonMass_dca","",200,0,200);
    	TH1D * metSelH  = new TH1D("metSelH","",200,0,400);
 	TH1D * mvametSelH = new TH1D("mvametSelH","",200,0,400);
@@ -622,7 +628,8 @@ int main(int argc, char * argv[]) {
 	Float_t n_trailingEta;
 	Float_t n_jets;
 	Float_t n_noOfvertices;
-	
+	Bool_t n_genAccept;
+
 	TTree * TW = new TTree("TW","Weights");
    	TW->Branch("genWeight",&n_genWeight,"n_genWeight/F");
 	
@@ -659,6 +666,7 @@ int main(int argc, char * argv[]) {
 	T->Branch("trailingEta", &n_trailingEta, "n_trailingEta/F");
 	T->Branch("jets", &n_jets,"n_jets/F");
 	T->Branch("noOfvertices", &n_noOfvertices, " n_noOfvertices/F");
+	T->Branch("genAccept", &n_genAccept, "genAccept/O");
 	
 	TH1D * ZMassEtaPtPass[3][7];
    	TH1D * ZMassEtaPtFail[3][7];
@@ -767,6 +775,10 @@ int main(int argc, char * argv[]) {
 	RecoilCorrector recoilMvaMetCorrector("HTT-utilities/RecoilCorrections/data/"+RecoilMvaFileName);
 	//   	RecoilCorrector recoilPuppiMetCorrector("HTT-utilities/RecoilCorrections/data/recoilPuppiMEt_amcatnlo.root");
 	
+	//Rochester Correction Z mass
+	rochcor2015 *rmcor = new rochcor2015();
+	//	rmcor->init(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/RoccoR_13TeV.txt");
+	
    	//std::cout<<"test14"<<std::endl;
    	int nFiles = 0;
    	int nEvents = 0;
@@ -834,8 +846,52 @@ int main(int argc, char * argv[]) {
 			float pfmet = TMath::Sqrt(pfmet_ex*pfmet_ex+pfmet_ey*pfmet_ey);
 			float  pfmetcorr_ex =0.0;
 			float  pfmetcorr_ey = 0.0;
-			//------------------------------------------------
 			
+			
+			if (applyRochCorr){
+			  for (unsigned int iM = 0; iM<analysisTree.muon_count; ++iM){
+			    TLorentzVector mu; //TLorentzVeccor object of the reconstructed muon.
+			    mu.SetPtEtaPhiM(analysisTree.muon_pt[iM],
+					 analysisTree.muon_eta[iM],
+					 analysisTree.muon_phi[iM],
+					 muonMass);
+
+			    float charge = analysisTree.muon_charge[iM];
+			    float qter = 1.0;
+			    
+			    if (charge > 0.5) {
+			      qter = 1.0;
+			      // std::cout<< "charge = "<<charge<< "/t qter =" << qter<<std::endl;
+			    }
+			    else{ 
+			      qter = -1.0;
+			      // std::cout<< "charge = "<<charge<< "/t qter =" << qter<<std::endl;
+			    }
+			    float ntrk =0.0;
+			    float runopt = 0.0;
+			    //			    std::cout << "Uncorrected : " << mu.Px() << "  "  
+			    //				      << mu.Py() << "  "
+			    //				      << mu.Pz() << "  " << std::endl;
+			    if (!isData){
+			      rmcor->momcor_mc(mu,charge,ntrk=0, qter);
+			    }
+			    if (isData){
+			      rmcor->momcor_data(mu, charge, runopt=0, qter); 
+			    }
+			    //			    std::cout << "Corrected : " << mu.Px() << "  "  
+			    //				      << mu.Py() << "  "
+			    //				      << mu.Pz() << "  " << std::endl;
+			    analysisTree.muon_px[iM] = mu.Px();
+			    analysisTree.muon_py[iM] = mu.Py();
+			    analysisTree.muon_pz[iM] = mu.Pz();
+			    analysisTree.muon_pt[iM] = mu.Pt();
+			    analysisTree.muon_eta[iM] = mu.Eta();
+			    analysisTree.muon_phi[iM] = mu.Phi();
+			    //			    analysisTree.muon_e[iM] = mu.E();
+			  }
+			}
+
+			//------------------------------------------------
 			if (!isData) {
 				n_genWeight = 1;
 				
@@ -866,9 +922,9 @@ int main(int argc, char * argv[]) {
 			Float_t signalWeight = 1;
 			//Float_t weight = 1;
 			
-			TLorentzVector genZ; genZ.SetXYZM(0,0,0,91.2); 
-			TLorentzVector genV; genV.SetXYZM(0,0,0,0);
-			TLorentzVector genL; genL.SetXYZM(0,0,0,0);
+			TLorentzVector genZ; genZ.SetXYZT(0,0,0,91.2); 
+			TLorentzVector genV; genV.SetXYZT(0,0,0,0);
+			TLorentzVector genL; genL.SetXYZT(0,0,0,0);
 			if (!isData) {
 			  for (unsigned int igen=0; igen<analysisTree.genparticles_count; ++igen) {
 			    //	  cout << igen << "   pdgId = " << analysisTree.genparticles_pdgid[igen] << endl;
@@ -876,12 +932,11 @@ int main(int argc, char * argv[]) {
 								    analysisTree.genparticles_py[igen],
 								    analysisTree.genparticles_pz[igen],
 								    analysisTree.genparticles_e[igen]);
-			    if (analysisTree.genparticles_pdgid[igen]==23||analysisTree.genparticles_pdgid[igen]==22) {
-			      if (analysisTree.genparticles_fromHardProcess[igen])
-				genZ.SetXYZT(analysisTree.genparticles_px[igen],
-					     analysisTree.genparticles_py[igen],
-					     analysisTree.genparticles_pz[igen],
-					     analysisTree.genparticles_e[igen]);
+			    if (analysisTree.genparticles_pdgid[igen]==23) {
+			      genZ.SetXYZT(analysisTree.genparticles_px[igen],
+					   analysisTree.genparticles_py[igen],
+					   analysisTree.genparticles_pz[igen],
+					   analysisTree.genparticles_e[igen]);
 			    }
 			    bool isMuon = fabs(analysisTree.genparticles_pdgid[igen])==13;
 			    bool isElectron = fabs(analysisTree.genparticles_pdgid[igen])==11;
@@ -894,16 +949,57 @@ int main(int argc, char * argv[]) {
 			    
 			    if (analysisTree.genparticles_status[igen]==1&&isPrompt) {
 			      if (isLepton&&
-				  fabs(genPart.Eta())<2.4&&
-				  genPart.Pt()>10) {
-				genV += genPart;
-				genL += genPart;
+			     	  fabs(genPart.Eta())<2.4&&
+			     	  genPart.Pt()>10) {
+			     	genV += genPart;
+			     	genL += genPart;
 			      }
+			      //			      if(isMuon) {
+			      //				genV += genPart;
+			      //				genL += genPart;
+			      //			      }
+			      
 			      if (isNeutrino) 
 				genV += genPart;
 			    }
 			  }
-			  if (genV.Pt()<0.1) genV.SetXYZM(0.1,0.1,0.,0.);
+			
+
+			  
+    			  if (genV.Pt()<0.1) genV.SetXYZM(0.1,0.1,0.,0.);
+
+			  massSelGenH->Fill(genV.M(),weight);
+			  
+			  for (unsigned int igen=0; igen<analysisTree.genparticles_count; ++igen) {
+			    if (analysisTree.genparticles_pdgid[igen]==23 &&  analysisTree.genparticles_status[igen]==62)
+			      TLorentzVector genZ; genZ.SetXYZT(analysisTree.genparticles_px[igen],
+					   analysisTree.genparticles_py[igen],
+					   analysisTree.genparticles_pz[igen],
+					   analysisTree.genparticles_e[igen]);
+			    float  visZPx= genZ.Px();
+			    float visZPy= genZ.Py();
+						
+			    if (fabs(analysisTree.genparticles_pdgid[igen])==13 && 
+				analysisTree.genparticles_status[igen]==1) {
+							
+			      TLorentzVector gen_mu1; gen_mu1.SetPxPyPzE(analysisTree.genparticles_px[igen],
+									 analysisTree.genparticles_py[igen],
+									 analysisTree.genparticles_pz[igen],
+									 analysisTree.genparticles_e[igen]);
+							
+			      TLorentzVector gen_mu2; gen_mu2.SetPxPyPzE(analysisTree.genparticles_px[igen],
+									 analysisTree.genparticles_py[igen],
+									 analysisTree.genparticles_pz[igen],
+									 analysisTree.genparticles_e[igen]);
+			      // TLorentzVector TwoMu = gen_mu1 +gen_mu2;
+			      if ((gen_mu1.Pt()> 10 && gen_mu2.Pt()> 20)||(gen_mu1.Pt()> 20 && gen_mu2.Pt()> 10))
+				massSelGen1H->Fill(genZ.M(),weight);
+			    }
+			  }
+			  
+			 
+						  
+			  
 				
 				if (applyPUreweighting_vertices) {
 					int binNvert = vertexDataH->FindBin(analysisTree.primvertex_count);
@@ -1270,33 +1366,64 @@ int main(int argc, char * argv[]) {
 			
 			if (isIsoMuonsPair) {
 				//match to genparticles
-				TLorentzVector genZ;// genZ.SetXYZM(0,0,0,91.2);
+				TLorentzVector mu1; mu1.SetXYZM(analysisTree.muon_px[indx1],
+								analysisTree.muon_py[indx1],
+								analysisTree.muon_pz[indx1],
+								muonMass);
 				
+				TLorentzVector mu2; mu2.SetXYZM(analysisTree.muon_px[indx2],
+								analysisTree.muon_py[indx2],
+								analysisTree.muon_pz[indx2],
+								muonMass);
+
+				TLorentzVector genZ;// genZ.SetXYZM(0,0,0,91.2);
+				TLorentzVector gen_mu1;
+				TLorentzVector gen_mu2;
 				if (!isData) {
 					for (unsigned int igen=0; igen<analysisTree.genparticles_count; ++igen) {
 						if (analysisTree.genparticles_pdgid[igen]==23 &&  analysisTree.genparticles_status[igen]==62)
 							genZ.SetXYZT(analysisTree.genparticles_px[igen],
-						analysisTree.genparticles_py[igen],
-						analysisTree.genparticles_pz[igen],
-						analysisTree.genparticles_e[igen]);
-						float  visZPx= genZ.Px();
+								     analysisTree.genparticles_py[igen],
+								     analysisTree.genparticles_pz[igen],
+								     analysisTree.genparticles_e[igen]);
+						float visZPx= genZ.Px();
 						float visZPy= genZ.Py();
+						
 						if (fabs(analysisTree.genparticles_pdgid[igen])==13 && 
-						analysisTree.genparticles_status[igen]==1) {
+						    analysisTree.genparticles_status[igen]==1) {
 							
-							TLorentzVector gen_mu1; gen_mu1.SetPxPyPzE(analysisTree.genparticles_px[igen],
-							analysisTree.genparticles_py[igen],
-							analysisTree.genparticles_pz[igen],
-							analysisTree.genparticles_e[igen]);
+						  TLorentzVector genPart; genPart.SetPxPyPzE(analysisTree.genparticles_px[igen],
+											     analysisTree.genparticles_py[igen],
+											     analysisTree.genparticles_pz[igen],
+											     analysisTree.genparticles_e[igen]);
+
+						  float dRmu1 = deltaR(mu1.Eta(),mu1.Phi(),
+								       genPart.Eta(),genPart.Phi());
+						  if (dRmu1<0.5)
+						    gen_mu1 = genPart;
 							
-							TLorentzVector gen_mu2; gen_mu2.SetPxPyPzE(analysisTree.genparticles_px[igen],
-							analysisTree.genparticles_py[igen],
-							analysisTree.genparticles_pz[igen],
-							analysisTree.genparticles_e[igen]);
+
+						  float dRmu2 = deltaR(mu2.Eta(),mu2.Phi(),
+								       genPart.Eta(),genPart.Phi()); 
+
+						  if (dRmu2<0.5)
+						    gen_mu2 = genPart;
+
 						}
 					}
 				}
 				
+
+				n_genAccept = genV.M()>60 && genV.M()<120;
+				float ptLeadGen = TMath::Max(gen_mu1.Pt(),gen_mu2.Pt());
+				float ptTrailGen = TMath::Min(gen_mu1.Pt(),gen_mu2.Pt());
+				n_genAccept = n_genAccept && ptLeadGen>20;
+				n_genAccept = n_genAccept && ptTrailGen>10;
+				n_genAccept = n_genAccept && fabs(gen_mu1.Eta())<2.4;
+				n_genAccept = n_genAccept && fabs(gen_mu2.Eta())<2.4;
+
+
+
 			// accessing Mva Met
 				bool mvaMetFound = false;
 				unsigned int metMuMu = 0; 
@@ -1384,15 +1511,6 @@ int main(int argc, char * argv[]) {
 					
 				}
 				
-				TLorentzVector mu1; mu1.SetXYZM(analysisTree.muon_px[indx1],
-				analysisTree.muon_py[indx1],
-				analysisTree.muon_pz[indx1],
-				muonMass);
-				
-				TLorentzVector mu2; mu2.SetXYZM(analysisTree.muon_px[indx2],
-				analysisTree.muon_py[indx2],
-				analysisTree.muon_pz[indx2],
-				muonMass);
 				
 				TLorentzVector dimuon = mu1 + mu2;
 				float visZPx=dimuon.Px();
@@ -1510,8 +1628,21 @@ int main(int argc, char * argv[]) {
 					
 					if (applyMEtRecoilCorrections) {
 					  float pfmetcorr_ex = pfmet_ex;
+					  // std::cout << "V : px = " << genV.Px()
+					  // 	    << "    py = " << genV.Py()
+					  // 	    << "    pz = " << genV.Pz() 
+					  // 	    << "    mass = " << genV.M() << std::endl;
+					  // std::cout << "Z : px = " << genZ.Px()
+					  // 	    << "    py = " << genZ.Py()
+					  // 	    << "    pz = " << genZ.Pz() 
+					  // 	    << "    mass = " << genZ.M() << std::endl;
+					  // std::cout << "L : px = " << genL.Px()
+					  // 	    << "    py = " << genL.Py()
+					  // 	    << "    pz = " << genL.Pz() 
+					  // 	    << "    mass = " << genL.M() << std::endl;
+					  // std::cout << std::endl;
 					  float pfmetcorr_ey = pfmet_ey;
-					  recoilPFMetCorrector.Correct(pfmet_ex,pfmet_ey,genV.Px(),genV.Py(),genL.Px(),genL.Py(),nJets30,pfmetcorr_ex,pfmetcorr_ey);
+					  recoilPFMetCorrector.CorrectByMeanResolution(pfmet_ex,pfmet_ey,genV.Px(),genV.Py(),genL.Px(),genL.Py(),nJets30,pfmetcorr_ex,pfmetcorr_ey);
 					  //					  std::cout << "PFMet : (" << pfmet_ex << "," << pfmet_ey << ")  "
 					  //						    << "  (" << pfmetcorr_ex << "," << pfmetcorr_ey << ")" << std::endl; 
 					  pfmet_phi = TMath::ATan2(pfmetcorr_ey,pfmetcorr_ex);
@@ -1534,8 +1665,8 @@ int main(int argc, char * argv[]) {
 					  
 					  float mvametcorr_ex = mvamet_ex;
 					  float mvametcorr_ey = mvamet_ey;
-					  recoilMvaMetCorrector.Correct(mvamet_ex,mvamet_ey,genV.Px(),genV.Py(),genL.Px(),genL.Py(),nJets30,mvametcorr_ex,mvametcorr_ey);
-					  // 	  std::cout << "MvaMet : (" << mvamet_ex << "," << mvamet_ey << ")  "
+					  recoilMvaMetCorrector.CorrectByMeanResolution(mvamet_ex,mvamet_ey,genV.Px(),genV.Py(),genL.Px(),genL.Py(),nJets30,mvametcorr_ex,mvametcorr_ey);
+					  // std::cout << "MvaMet : (" << mvamet_ex << "," << mvamet_ey << ")  "
 					  //	                      << "  (" << mvametcorr_ex << "," << mvametcorr_ey << ")" << std::endl;
 					  mvamet_phi = TMath::ATan2(mvametcorr_ey,mvametcorr_ex);
 					  mvamet = TMath::Sqrt(mvametcorr_ex*mvametcorr_ex+mvametcorr_ey*mvametcorr_ey);
@@ -1672,6 +1803,7 @@ int main(int argc, char * argv[]) {
 					
 					//filling the histograms for discriminators
 					h_dimuonEta->Fill(dimuonEta,weight);
+					h_dimuonPt->Fill(dimuonPt,weight);
 					// if (genmatch_m1 && genmatch_m2) h_dimuonEta_genMuMatch->Fill(dimuonEta,weight);
 					h_ptRatio->Fill(ptRatio,weight);
 					h_dxy_muon1->Fill(analysisTree.muon_dxy[indx1],weight);
