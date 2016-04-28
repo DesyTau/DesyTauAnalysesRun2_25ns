@@ -1210,23 +1210,8 @@ int main(int argc, char * argv[]) {
 
 
 
-			// computation of DZeta variable
-			// pfmet
-			/*     pzetamiss = analysisTree.pfmet_ex*zetaX + analysisTree.pfmet_ey*zetaY;
-			       pzetavis = vectorVisX*zetaX + vectorVisY*zetaY;
-			       dzeta = pzetamiss - 0.85*pzetavis;
-			       */
 
 			double ETmiss = TMath::Sqrt(analysisTree.pfmet_ex*analysisTree.pfmet_ex + analysisTree.pfmet_ey*analysisTree.pfmet_ey);
-/*
-			if (ETmiss < 100.) continue;
-
-			if(fillplots)
-				FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, Channel, mu_index,el_index,tau_index);
-			CFCounter[iCut]+= weight;
-			iCFCounter[iCut]++;
-			iCut++;
-*/
 
 			double ptScalarSum = -1;
 
@@ -1256,8 +1241,6 @@ int main(int argc, char * argv[]) {
 				if (!isPFJetId) continue;
 				jet_isLoose[jet] = isPFJetId;
 
-				//for (unsigned int lep=0;LeptMV.size();lep++){
-				//double Dr=(LeptMV.at(lep).Eta(),LeptMV.at(lep).Phi(),
 				double Drmu=deltaR(analysisTree.muon_eta[mu_index],analysisTree.muon_phi[mu_index],
 						analysisTree.pfjet_eta[jet],analysisTree.pfjet_phi[jet]);
 				double Drel=deltaR(analysisTree.electron_eta[el_index],analysisTree.electron_phi[el_index],
@@ -1276,50 +1259,6 @@ int main(int argc, char * argv[]) {
 
 				continue;
 
-			if (countjets <2) continue;
-			if(fillplots)
-				FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, Channel, mu_index,el_index,tau_index);
-			CFCounter[iCut]+= weight;
-			iCFCounter[iCut]++;
-			iCut++;
-
-			if (!btagged) continue;
-
-			if(fillplots)
-				FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, Channel, mu_index,el_index,tau_index);
-			CFCounter[iCut]+= weight;
-			iCFCounter[iCut]++;
-			iCut++;
-
-
-			// pt Scalar
-
-			//cout<<"  "<<mu_index<<"  "<<tau_index<<"   "<<MuMV.at(mu_index).M()<<"  "<<TauMV.at(tau_index).M()<<endl;
-			TLorentzVector muVc ;  muVc.SetPtEtaPhiM(analysisTree.muon_pt[mu_index], analysisTree.muon_eta[mu_index], analysisTree.muon_phi[mu_index], muonMass);
-			TLorentzVector elVc;  elVc.SetPtEtaPhiM(analysisTree.electron_pt[el_index], analysisTree.electron_eta[el_index], analysisTree.electron_phi[el_index], electronMass);
-
-			TLorentzVector diL = muVc + elVc;
-			/*
-			   if ( diL.M() <80 && diL.M()>40 ) continue;
-			   if(fillplots)
-			   FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, Channel, mu_index,el_index,tau_index);
-			   CFCounter[iCut]+= weight;
-			   iCFCounter[iCut]++;
-			   iCut++;
-
-*/     
-			double MTv = mT(diL,METV);
-
-
-			double dRr = deltaR(diL.Eta(), diL.Phi(), METV.Eta(), METV.Phi());
-
-			if (dRr<1.5 || dRr>4) continue;
-
-			if(fillplots)
-				FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, Channel, mu_index,el_index,tau_index);
-			CFCounter[iCut]+= weight;
-			iCFCounter[iCut]++;
-			iCut++;
 			selEvents++;
 
 			} // end of file processing (loop over events in one file)
