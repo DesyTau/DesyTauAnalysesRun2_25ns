@@ -706,6 +706,11 @@ int main(int argc, char * argv[]) {
 			vector<int> tau; tau.clear();
 
 
+			if ( fabs(analysisTree.muon_charge[mu_index]) !=1) continue;
+			if ( fabs(analysisTree.tau_charge[tau_index]) !=1) continue;
+			double q = analysisTree.tau_charge[tau_index] * analysisTree.muon_charge[mu_index];
+			if (q > 0) continue;
+
 			for (unsigned  int it = 0; it<analysisTree.tau_count; ++it) {
 
 				if (analysisTree.tau_pt[it] < ptMuonLowCut || fabs(analysisTree.tau_eta[it])> etaMuonCut) continue;

@@ -169,7 +169,6 @@ int main(int argc, char * argv[]) {
   CutList.push_back("2nd lepV");
   CutList.push_back("3rd lepV");
   CutList.push_back("Lepton SF");
- ////
   CutList.push_back("TauFakeRate");
   CutList.push_back("topPtRwgt");
   CutList.push_back("Cleaned jets");
@@ -396,7 +395,7 @@ int main(int argc, char * argv[]) {
       if (isData)
 	histWeightsH->Fill(0.,1.);
       //else
-	//histWeightsH->Fill(0.,genweight);
+      //histWeightsH->Fill(0.,genweight);
     }
 
     TTree * _tree = NULL;
@@ -688,11 +687,11 @@ int main(int argc, char * argv[]) {
 
       }
       if (!mu_iso || muons.size()==0) continue;
-	  countmuons++;
+      countmuons++;
 
-	  MuV.SetPtEtaPhiM(analysisTree.muon_pt[mu_index], analysisTree.muon_eta[mu_index], analysisTree.muon_phi[mu_index], muonMass);
-	  MuMV.push_back(MuV);
-	  LeptMV.push_back(MuV);
+      MuV.SetPtEtaPhiM(analysisTree.muon_pt[mu_index], analysisTree.muon_eta[mu_index], analysisTree.muon_phi[mu_index], muonMass);
+      MuMV.push_back(MuV);
+      LeptMV.push_back(MuV);
 
       double absIso= analysisTree.muon_r03_sumChargedHadronPt[mu_index]
 	+ max(analysisTree.muon_r03_sumNeutralHadronEt[mu_index] + analysisTree.muon_r03_sumPhotonEt[mu_index]
@@ -701,30 +700,29 @@ int main(int argc, char * argv[]) {
 
       double relIso = absIso/analysisTree.muon_pt[mu_index];
 
-	mu_relIso[0]=relIso;
+      mu_relIso[0]=relIso;
 
-	////////Control the RelIso cut
-	//
-   //   if (relIso>isoMuonHighCut && !InvertLeptonIso) continue;
-/*
-      if (relIso>isoMuonHighCut ) { 
+      ////////Control the RelIso cut
+      //
+      //   if (relIso>isoMuonHighCut && !InvertLeptonIso) continue;
+      /*
+	if (relIso>isoMuonHighCut ) { 
 	isHighIsoMu=true ;isLowIsoMu=false;
-      }
-      else    { 
+	}
+	else    { 
 	isHighIsoMu = false;isLowIsoMu=true;
-      }
+	}
 
-*/
+      */
       sort(LeptMV.begin(), LeptMV.end(),ComparePt); 
       if (LeptMV.size() == 0 ) continue; 
-/*
-      if (InvertLeptonIso && !isHighIsoMu) continue;
-      //if (InvertLeptonIso && isLowIsoMu) continue;
+      /*
+	if (InvertLeptonIso && !isHighIsoMu) continue;
+	//if (InvertLeptonIso && isLowIsoMu) continue;
 
-      if (!InvertLeptonIso && isHighIsoMu) continue;
-*/
+	if (!InvertLeptonIso && isHighIsoMu) continue;
+      */
 
-      //cout<<"  Iso check  "<<relIso<<" InvertLeptonIso "<<InvertLeptonIso<<" isHighIsoMu "<<isHighIsoMu<<" isLowIsoMu "<<isLowIsoMu<<" cutQCD "<<isoMuonHighCutQCD<<endl;
 
       //cout<<" after muIso index "<<int(mu_index)<<" pT "<<analysisTree.muon_pt[mu_index]<<" relIso "<<relIso<<" isoMuMin "<<isoMuMin<<" muon_count "<<analysisTree.muon_count<<" im "<<int(mu_index)<<" event "<<iEntry<<endl;
       double ptMu1 = (double)analysisTree.muon_pt[mu_index];
@@ -738,6 +736,7 @@ int main(int argc, char * argv[]) {
       if (!isData) {
 	if (Mu17EffMC>1e-6)
 	  trigweight = Mu17EffData / Mu17EffMC;
+	if (!isData &&  string::npos != filen.find("stau") )  trigweight = Mu17EffData;
 	weight *= trigweight;
 	trig_weight = trigweight;
 	//	cout<<" Trigger weight "<<trigweight<<endl;
@@ -755,8 +754,9 @@ int main(int argc, char * argv[]) {
       vector<int> tau; tau.clear();
       for (unsigned int it = 0; it<analysisTree.tau_count; ++it) {
 
-	if (analysisTree.tau_pt[it] < ptTauLowCut || fabs(analysisTree.tau_eta[it])> etaTauCut) continue;
-	if (analysisTree.tau_decayModeFindingNewDMs[it]<decayModeFindingNewDMs) continue;
+	if (analysisTree.tau_pt[it] < ptTauLowCut ) continue; 
+	if (fabs(analysisTree.tau_eta[it])> etaTauCut) continue;
+	if (analysisTree.tau_decayModeFinding[it]<decayModeFindingNewDMs) continue;
 	if ( fabs(analysisTree.tau_leadchargedhadrcand_dz[it])> leadchargedhadrcand_dz) continue;
 
 	if (analysisTree.tau_againstElectronVLooseMVA5[it]<againstElectronVLooseMVA5) continue;
@@ -766,6 +766,8 @@ int main(int argc, char * argv[]) {
 	
 	////if (!InvertTauIso && analysisTree.tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[it] > byCombinedIsolationDeltaBetaCorrRaw3Hits ) continue;
 	if (!InvertTauIso && analysisTree.tau_byMediumCombinedIsolationDeltaBetaCorr3Hits[it] < 0.5 ) continue;
+	//if (!InvertTauIso && analysisTree.tau_byTightIsolationMVArun2v1DBoldDMwLT[it] < 0.5 ) continue;
+
 
 	ta_IsoFlag=analysisTree.tau_byMediumCombinedIsolationDeltaBetaCorr3Hits[it];
 	double  tauIso = analysisTree.tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[it];
@@ -776,12 +778,10 @@ int main(int argc, char * argv[]) {
 	  tau_iso=true;
 	  tau_index = (int)it;
 	  tau.push_back(tau_index);
-	  TauV.SetPtEtaPhiM(analysisTree.tau_pt[tau_index], analysisTree.tau_eta[tau_index], analysisTree.tau_phi[tau_index], tauMass);
-	  TauMV.push_back(TauV);
 
 	}
 
-	if (tauIso==isoTauMin && it != tau_index) {
+	if (tauIso==isoTauMin && (int)it != (int)tau_index) {
 	  //analysisTree.tau_pt[it] > analysisTree.tau_pt[tau_index] ? tau_index = it : tau_index = tau_index;
 	  if (analysisTree.tau_pt[it] > analysisTree.tau_pt[tau_index] ) tau_index = (int)it ;
 	  //cout<<" found a pair  " <<tauIso <<"  "<<tau_index<<"  "<<it<<endl;
@@ -789,26 +789,29 @@ int main(int argc, char * argv[]) {
       }
       if (tau.size()==0 || !tau_iso ) continue;
 
+       TauV.SetPtEtaPhiM(analysisTree.tau_pt[tau_index], analysisTree.tau_eta[tau_index], analysisTree.tau_phi[tau_index], tauMass);
+       TauMV.push_back(TauV);
+
       //double tauIsoI = analysisTree.tau_byMediumCombinedIsolationDeltaBetaCorr3Hits[tau_index];
       //if (tauIsoI > 0.5  && InvertTauIso) {isHighIsoTau =true;} 
  
-	ta_relIso[0]=isoTauMin;
+      ta_relIso[0]=isoTauMin;
 
       // cout<< " Lets check  "<<mu_index <<"  "<<tau_index <<"  "<<endl;
       //cout<<"  "<<endl;
-////////////////////change to new tau inverted definition 
-/*      double tauIsoI = analysisTree.tau_byMediumCombinedIsolationDeltaBetaCorr3Hits[tau_index];
-      if (tauIsoI > 0.5  && InvertTauIso) {isHighIsoTau =true;} 
-      //else {isHighIsoTau =false ; isLowIsoTau=true;} 
-      //if (isHighIsoTau && tauIso > 2*byCombinedIsolationDeltaBetaCorrRaw3Hits ) continue; 
+      ////////////////////change to new tau inverted definition 
+      /*      double tauIsoI = analysisTree.tau_byMediumCombinedIsolationDeltaBetaCorr3Hits[tau_index];
+	      if (tauIsoI > 0.5  && InvertTauIso) {isHighIsoTau =true;} 
+	      //else {isHighIsoTau =false ; isLowIsoTau=true;} 
+	      //if (isHighIsoTau && tauIso > 2*byCombinedIsolationDeltaBetaCorrRaw3Hits ) continue; 
 
-      if (InvertTauIso && !isHighIsoTau) continue;
-      if (!InvertTauIso && isHighIsoTau) continue;
-      //if (InvertTauIso && isLowIsoTau) continue;
-*/
+	      if (InvertTauIso && !isHighIsoTau) continue;
+	      if (!InvertTauIso && isHighIsoTau) continue;
+	      //if (InvertTauIso && isLowIsoTau) continue;
+	      */
 
-      if ( abs(analysisTree.tau_charge[tau_index]) != 1) continue;
-      if ( abs(analysisTree.muon_charge[mu_index]) != 1) continue;
+      if ( fabs(analysisTree.tau_charge[tau_index]) !=1 ) continue;
+      if ( fabs(analysisTree.muon_charge[mu_index]) != 1) continue;
 
       double q = analysisTree.tau_charge[tau_index] * analysisTree.muon_charge[mu_index];
 
@@ -816,12 +819,12 @@ int main(int argc, char * argv[]) {
 
       //if (q>0 && Sign=="OS" ) continue;
       //if (q<0 && Sign=="SS" ) continue;
-/*
-      bool regionB = (q<0 && isLowIsoMu);
-      bool regionA = (q>0 && isLowIsoMu);
-      bool regionC = (q<0 && isHighIsoMu);
-      bool regionD = (q>0 && isHighIsoMu);
-*/
+      /*
+	bool regionB = (q<0 && isLowIsoMu);
+	bool regionA = (q>0 && isLowIsoMu);
+	bool regionC = (q<0 && isHighIsoMu);
+	bool regionD = (q>0 && isHighIsoMu);
+      */
 
       if(fillplots)
 	FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, Channel, mu_index,el_index,tau_index);
@@ -830,7 +833,7 @@ int main(int argc, char * argv[]) {
       iCFCounter[iCut]++;
       iCut++;
 
- //     cout<<" here before "<<analysisTree.trigobject_count<<endl;
+      //     cout<<" here before "<<analysisTree.trigobject_count<<endl;
 
       bool isdRLeptonMatched = false;
       for (unsigned int iT=0; iT<analysisTree.trigobject_count; ++iT) {
@@ -838,16 +841,18 @@ int main(int argc, char * argv[]) {
 	  double dRtrig = deltaR(analysisTree.muon_eta[mu_index],analysisTree.muon_phi[mu_index],
 				 analysisTree.trigobject_eta[iT],analysisTree.trigobject_phi[iT]);
 
-	  //if (analysisTree.trigobject_pt[iT]>singleMuonTriggerPtCut &&  fabs( analysisTree.trigobject_eta[iT])<singleMuonTriggerEtaCut && dRtrig<deltaRTrigMatch)
-	  if (analysisTree.trigobject_pt[iT]>singleMuonTriggerPtCut && dRtrig<deltaRTrigMatch)
+	  if (analysisTree.trigobject_pt[iT]>singleMuonTriggerPtCut &&  fabs( analysisTree.trigobject_eta[iT])<singleMuonTriggerEtaCut && dRtrig<deltaRTrigMatch)
+	  //if (analysisTree.trigobject_pt[iT]>singleMuonTriggerPtCut && dRtrig<deltaRTrigMatch)
 	    isdRLeptonMatched = true;
 
 	  //if (isData && dRtrig<deltaRTrigMatch) isdRLeptonMatched=true;
-      //cout<<"  HOW MANY MUONS DO I HAVE ??  "<<muons.size()<<"   "<<Sign<<"  "<<q<<"   "<<isdRLeptonMatched<<"  "<<"  "<<analysisTree.trigobject_pt[iT]<<" "<<analysisTree.trigobject_filters[iT][nMainTrigger]<<endl;
+	  //cout<<"  HOW MANY MUONS DO I HAVE ??  "<<muons.size()<<"   "<<Sign<<"  "<<q<<"   "<<isdRLeptonMatched<<"  "<<"  "<<analysisTree.trigobject_pt[iT]<<" "<<analysisTree.trigobject_filters[iT][nMainTrigger]<<endl;
 
 	}
       }
-	event_leptonDrTrigger = isdRLeptonMatched;
+      //      if (!isData && ( string::npos != filen.find("stau")  ) ) isdRLeptonMatched = true; 
+      if (!isData &&  string::npos != filen.find("stau") )  isdRLeptonMatched = true;
+      event_leptonDrTrigger = isdRLeptonMatched;
 
       if (!isdRLeptonMatched) continue;
 
@@ -878,9 +883,9 @@ int main(int argc, char * argv[]) {
 
       if (doMuVeto){
 
-	if (muons.size()>1){
+	if (analysisTree.muon_count>0){
 	  for (unsigned int imv = 0; imv<analysisTree.muon_count; ++imv) {
-	    if ( imv != mu_index ){
+	    if ( (int)imv != (int)mu_index ){
 	      double absIso= analysisTree.muon_r03_sumChargedHadronPt[imv]
 		+ max(analysisTree.muon_r03_sumNeutralHadronEt[imv] + analysisTree.muon_r03_sumPhotonEt[imv]
 		      - 0.5 * analysisTree.muon_r03_sumPUPt[imv],0.0);
@@ -892,12 +897,12 @@ int main(int argc, char * argv[]) {
 	      double dRr = deltaR(analysisTree.muon_eta[mu_index],analysisTree.muon_phi[mu_index],
 				  analysisTree.muon_eta[imv],analysisTree.muon_phi[imv]);
 	      bool OSCharge = false;  
-	      if ( imv != mu_index  && analysisTree.muon_charge[imv] != analysisTree.muon_charge[mu_index] ) OSCharge=true;
+	      if ( analysisTree.muon_charge[imv] != analysisTree.muon_charge[mu_index] ) OSCharge=true;
 
 	      //if ( analysisTree.muon_charge[imv] != analysisTree.muon_charge[mu_index] &&  analysisTree.muon_isGlobal[imv] && analysisTree.muon_isTracker[imv] && analysisTree.muon_isPF[imv]  
-	      if ( analysisTree.muon_charge[imv] != analysisTree.muon_charge[mu_index] &&  analysisTree.muon_isGlobal[imv] 
-			      && analysisTree.muon_isTracker[imv] && analysisTree.muon_isPF[imv]   &&  analysisTree.muon_pt[imv]> 15 
-			      &&  fabs(analysisTree.muon_eta[imv])< 2.4 && fabs(analysisTree.muon_dxy[imv])<0.045 
+	      if ( analysisTree.muon_isGlobal[imv]    && analysisTree.muon_isTracker[imv] && analysisTree.muon_isPF[imv]   
+			      &&  analysisTree.muon_isGlobal[mu_index] && analysisTree.muon_isTracker[mu_index] && analysisTree.muon_isPF[mu_index]
+		   &&  analysisTree.muon_pt[imv]> 15    &&  fabs(analysisTree.muon_eta[imv])< 2.4 && fabs(analysisTree.muon_dxy[imv])<0.045 
 		   && fabs(analysisTree.muon_dz[imv] < 0.2 && relIso< 0.3 && analysisTree.muon_isMedium[imv]) && dRr > 0.15 && OSCharge) //removed from last recipe
 		MuVeto=true;
 	    }
@@ -905,8 +910,8 @@ int main(int argc, char * argv[]) {
 	}
       }
 
-	event_secondLeptonVeto = MuVeto;
-       if (MuVeto) continue;
+      event_secondLeptonVeto = MuVeto;
+      if (MuVeto) continue;
 
       if(fillplots)
 	FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, Channel, mu_index,el_index,tau_index);
@@ -933,7 +938,7 @@ int main(int argc, char * argv[]) {
 	    bool electronMvaId = electronMvaIdWP90(analysisTree.electron_pt[iev], analysisTree.electron_superclusterEta[iev], analysisTree.electron_mva_id_nontrigPhys14[iev]);
 
 
-	    if ( iev != el_index && analysisTree.electron_pt[iev] > 10 &&  fabs(analysisTree.electron_eta[iev]) < 2.5 && fabs(analysisTree.electron_dxy[iev])<0.045
+	    if ( analysisTree.electron_pt[iev] > 10 &&  fabs(analysisTree.electron_eta[iev]) < 2.5 && fabs(analysisTree.electron_dxy[iev])<0.045
 		 && fabs(analysisTree.electron_dz[iev]) < 0.2 && relIsoV< 0.3 && electronMvaId && analysisTree.electron_pass_conversion[iev] 
 		 && analysisTree.electron_nmissinginnerhits[iev] <=1) ThirdLeptVeto=true;
 
@@ -953,19 +958,19 @@ int main(int argc, char * argv[]) {
 	    double relIso = absIso/analysisTree.muon_pt[imvv];
 
 
-	    if ( imvv != mu_index &&  analysisTree.muon_isMedium[imvv] &&  analysisTree.muon_pt[imvv]> 10 &&  fabs(analysisTree.muon_eta[imvv])< 2.4 && fabs(analysisTree.muon_dxy[imvv])<0.045 
+	    if ( (int)imvv != (int)mu_index &&  analysisTree.muon_isMedium[imvv] &&  analysisTree.muon_pt[imvv]> 10 &&  fabs(analysisTree.muon_eta[imvv])< 2.4 && fabs(analysisTree.muon_dxy[imvv])<0.045 
 		 && fabs(analysisTree.muon_dz[imvv] < 0.2 && relIso< 0.3 && analysisTree.muon_isMedium[imvv]) ) ThirdLeptVeto=true;
 	  }
 	}
       }
 
-	event_thirdLeptonVeto = ThirdLeptVeto;
-       if (ThirdLeptVeto) continue;
+      event_thirdLeptonVeto = ThirdLeptVeto;
+      if (ThirdLeptVeto) continue;
 
-	countmuons++;
-	//if (countmuons>1)
-	//cout<<" muons here "<<muons.size()<<"  "<<countmuons<<"  "<<analysisTree.muon_count<<endl;  
-    	if(fillplots)
+      countmuons++;
+      //if (countmuons>1)
+      //cout<<" muons here "<<muons.size()<<"  "<<countmuons<<"  "<<analysisTree.muon_count<<endl;  
+      if(fillplots)
 	FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, Channel, mu_index,el_index,tau_index);
       CFCounter[iCut]+= weight;
       CFCounter_[iCut]+= weight;
@@ -1003,35 +1008,37 @@ int main(int argc, char * argv[]) {
       iCFCounter[iCut]++;
       iCut++;
 
-	bool isTauMatched = false;
-	if (!isData){
-      TLorentzVector genTauV;  
+      bool isTauMatched = false;
+      if (!isData){
+	TLorentzVector genTauV;  
 
-      for (unsigned int gt = 0 ; gt < analysisTree.gentau_count;++gt){
+	for (unsigned int gt = 0 ; gt < analysisTree.gentau_count;++gt){
 
-      genTauV.SetXYZT(0.,0.,0.,0.);
-      genTauV.SetXYZT(analysisTree.gentau_px[gt], analysisTree.gentau_py[gt], analysisTree.gentau_pz[gt], analysisTree.gentau_e[gt]);
+	 // genTauV.SetXYZT(0.,0.,0.,0.);
+	  genTauV.SetXYZT(analysisTree.gentau_px[gt], analysisTree.gentau_py[gt], analysisTree.gentau_pz[gt], analysisTree.gentau_e[gt]);
 
 
-	double Drr=deltaR(analysisTree.tau_eta[tau_index],analysisTree.tau_phi[tau_index],
-				genTauV.Eta(), genTauV.Phi());
-	if (Drr < 0.3) isTauMatched = true;
+	  double Drr=deltaR(analysisTree.tau_eta[tau_index],analysisTree.tau_phi[tau_index],
+			    genTauV.Eta(), genTauV.Phi());
+	  if (Drr < 0.3) isTauMatched = true;
 
-      }
-      if (applyTFR && !isTauMatched) {
+	}
+      }//!isData
 
-	//leptonSFweight = SF_yourScaleFactor->get_ScaleFactor(pt, eta)	
+	genTauMatched = isTauMatched;
+	if (!isData && applyTFR && !isTauMatched) {
 
-	double ptTau1 = (double)analysisTree.tau_pt[tau_index];
-	double etaTau1 = (double)analysisTree.tau_eta[tau_index];
-	double TFRSF_mu1 = SF_TFR->get_ScaleFactor(ptTau1, etaTau1);
+	  //leptonSFweight = SF_yourScaleFactor->get_ScaleFactor(pt, eta)	
 
-	MuSF_IdIso_Mu1H->Fill(TFRSF_mu1);
-	weight *= TFRSF_mu1;
-	TFR_weight  = TFRSF_mu1;
-	//cout<<"  "<<TFRSF_mu1<<"  for  eta  "<<etaTau1<<  " pT  "<< ptTau1<<endl;
-      		}//apply TFR
-	}//!isData
+	  double ptTau1 = (double)analysisTree.tau_pt[tau_index];
+	  double etaTau1 = (double)analysisTree.tau_eta[tau_index];
+	  double TFRSF_mu1 = SF_TFR->get_ScaleFactor(ptTau1, etaTau1);
+
+	  MuSF_IdIso_Mu1H->Fill(TFRSF_mu1);
+	  //weight *= TFRSF_mu1;
+	  TFR_weight  = TFRSF_mu1;
+	  //cout<<"  "<<TFRSF_mu1<<"  for  eta  "<<etaTau1<<  " pT  "<< ptTau1<<endl;
+	}//apply TFR
 
       if(fillplots)
 	FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, Channel, mu_index,el_index,tau_index);
