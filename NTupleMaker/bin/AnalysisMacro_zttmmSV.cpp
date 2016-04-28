@@ -42,6 +42,8 @@
 #include "DesyTauAnalyses/NTupleMaker/interface/EventWeight.h"
 #include "HTT-utilities/RecoilCorrections/interface/RecoilCorrector.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/rochcor2015.h"
+#include "FWCore/ParameterSet/interface/FileInPath.h"
+#include "TauAnalysis/SVfitStandalone/interface/SVfitStandaloneAlgorithm.h"
 
 const float electronMass = 0;
 const float muonMass = 0.10565837;
@@ -531,7 +533,9 @@ int main(int argc, char * argv[]) {
    	TH1D * etaLeadingMuSelH = new TH1D("etaLeadingMuSelH","",50,-2.5,2.5);
    	TH1D * etaTrailingMuSelH = new TH1D("etaTrailingMuSelH","",50,-2.5,2.5);
 	TH1D * h_dimuonPt = new TH1D ("dimuonPt","",100,0,200);
-   	TH1D * massSelH = new TH1D("massSelH","",200,0,200);
+   	TH1D * massSelH = new TH1D("massSelH","",200,0,200);	
+	TH1D * mass_sv = new TH1D("mass_sv","",200,0,200);
+	TH1D * mass_sv_bdt = new TH1D("mass_sv_bdt","",200,0,200);
 	TH1D * massSelGenH = new TH1D("massSelGenH","",200,0,200);
 	TH1D * massSelGen1H = new TH1D("massSelGen1H","",200,0,200);
 	TH1D * dimuonMass_dca = new TH1D ("dimuonMass_dca","",200,0,200);
@@ -648,11 +652,19 @@ int main(int argc, char * argv[]) {
 	Float_t n_trailingPt;
 	Float_t n_leadingEta;
 	Float_t n_trailingEta;
+	Float_t n_leadingPhi;
+	Float_t n_trailingPhi;
 	Float_t n_jets;
 	Float_t n_noOfvertices;
 	Float_t n_mva_BDT;
 	Bool_t n_genAccept;
-	
+	Float_t n_m_sv;
+	Float_t n_pt_sv; 
+	Float_t	n_eta_sv;
+	Float_t	n_phi_sv;
+	Float_t n_covmet_xx;
+	Float_t n_covmet_xy;
+	Float_t n_covmet_yy;
 
 	TTree * TW = new TTree("TW","Weights");
    	TW->Branch("genWeight",&n_genWeight,"n_genWeight/F");
@@ -688,30 +700,39 @@ int main(int argc, char * argv[]) {
 	T->Branch("trailingPt", &n_trailingPt, "n_trailingPt/F");
 	T->Branch("leadingEta", &n_leadingEta, "n_leadingEta/F");
 	T->Branch("trailingEta", &n_trailingEta, "n_trailingEta/F");
+	T->Branch("leadingPhi", &n_leadingPhi, "n_leadingPhi/F");
+	T->Branch("trailingPhi", &n_trailingPhi, "n_trailingPhi/F");
 	T->Branch("jets", &n_jets,"n_jets/F");
 	T->Branch("noOfvertices", &n_noOfvertices, " n_noOfvertices/F");
 	T->Branch("genAccept", &n_genAccept, "genAccept/O");
 	T->Branch("mva_BDT", &n_mva_BDT, "n_mva_BDT/F");
+	T->Branch("m_sv", &n_m_sv, "n_m_sv/F");
+	T->Branch("pt_sv", &n_pt_sv, "n_pt_sv/F");
+	T->Branch("eta_sv", &n_eta_sv, "n_eta_sv/F");
+	T->Branch("phi_sv", &n_phi_sv, "n_phi_sv/F");
+	T->Branch("covmetxx",&n_covmet_xx,"n_covmet_xx/F");
+	T->Branch("covmetxy",&n_covmet_xy,"n_covmet_xy/F");
+	T->Branch("covmetyy",&n_covmet_yy,"n_covmet_yy/F");
+	  
+	//This loads the library
+	TMVA::Tools::Instance();
 	
-    //This loads the library
-    TMVA::Tools::Instance();
+	//Create TMVA Reader Object
+	TMVA::Reader *reader = new TMVA::Reader("!V:!Color");
 	
-    //Create TMVA Reader Object
-    TMVA::Reader *reader = new TMVA::Reader("!V:!Color");
-  
-    //create set of variables as declared in weight file and declared them to reader
-    reader->AddVariable( "dimuonEta",&n_dimuonEta);
-    // reader->AddVariable( "ptRatio",&n_ptRatio );
-    // reader->AddVariable( "dxy_muon1",&n_dcaSigdxy1);
-    //  reader->AddVariable( "dxy_muon2",&n_dcaSigdxy2);
-    reader->AddVariable( "phi_PosMu_MET",&n_phiangle);
-    //reader->AddVariable( "dz_muon1",&n_dcaSigdz1);
-    //reader->AddVariable( "dz_muon2",&n_dcaSigdz2);
-    reader->AddVariable("DZeta",&n_DZeta);
-    reader->AddVariable( "mvamet",&n_mvamet);
+	//create set of variables as declared in weight file and declared them to reader
+	reader->AddVariable( "dimuonEta",&n_dimuonEta);
+	// reader->AddVariable( "ptRatio",&n_ptRatio );
+	// reader->AddVariable( "dxy_muon1",&n_dcaSigdxy1);
+	//  reader->AddVariable( "dxy_muon2",&n_dcaSigdxy2);
+	reader->AddVariable( "phi_PosMu_MET",&n_phiangle);
+	//reader->AddVariable( "dz_muon1",&n_dcaSigdz1);
+	//reader->AddVariable( "dz_muon2",&n_dcaSigdz2);
+	reader->AddVariable("DZeta",&n_DZeta);
+	reader->AddVariable( "mvamet",&n_mvamet);
 	
-    //BookMethod
-    reader->BookMVA("BDT", "TMVA/weights/TMVA_Roch_22032016_BDT.weights.xml");
+	//BookMethod
+	reader->BookMVA("BDT", "TMVA/weights/TMVA_Roch_22032016_BDT.weights.xml");
 	
 	
 	TH1D * ZMassEtaPtPass[3][7];
@@ -824,7 +845,11 @@ int main(int argc, char * argv[]) {
 	//Rochester Correction Z mass
 	rochcor2015 *rmcor = new rochcor2015();
 	//	rmcor->init(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/RoccoR_13TeV.txt");
-	
+
+	//**SVFit**
+	edm::FileInPath inputFileName_visPtResolution("TauAnalysis/SVfitStandalone/data/svFitVisMassAndPtResolutionPDF.root");
+	TH1::AddDirectory(false);  
+	TFile* inputFile_visPtResolution = new TFile(inputFileName_visPtResolution.fullPath().data());
     
    	//std::cout<<"test14"<<std::endl;
    	int nFiles = 0;
@@ -881,6 +906,7 @@ int main(int argc, char * argv[]) {
 		for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) {
 			
 			analysisTree.GetEntry(iEntry);
+			//std::cout << "number of events   = "<< nEvents<<std::endl; 
 			nEvents++;
 			if (nEvents%10000==0) 
 				cout << "      processed " << nEvents << " events" << endl;
@@ -1487,12 +1513,21 @@ int main(int argc, char * argv[]) {
 				float mvamet_phi = 0;
 				float mvamet_ex = 0;
 				float mvamet_ey = 0;
+				float n_covmet_xx =0;
+				float n_covmet_xy =0;
+				float n_covmet_yy =0;
 				if (analysisTree.mvamet_count>0) {
 				  mvamet_ex = analysisTree.mvamet_ex[metMuMu];
 				  mvamet_ey = analysisTree.mvamet_ey[metMuMu];
 				  float mvamet_ex2 = mvamet_ex * mvamet_ex;
 				  float mvamet_ey2 = mvamet_ey * mvamet_ey;
-
+				  n_covmet_xx = analysisTree.mvamet_sigxx[metMuMu];
+				  n_covmet_xy = analysisTree.mvamet_sigxy[metMuMu];
+				  n_covmet_yy = analysisTree.mvamet_sigyy[metMuMu];
+				  
+				   // std::cout << "xx = " << n_covmet_xx 
+				   // 	    << "   xy = " << n_covmet_xy
+				   // 	    << "   yy = " << n_covmet_yy << std::endl;
 				  mvamet = TMath::Sqrt(mvamet_ex2+mvamet_ey2);
 				  mvamet_phi = TMath::ATan2(mvamet_ey,mvamet_ex);
 				}
@@ -1982,24 +2017,85 @@ int main(int argc, char * argv[]) {
 					n_dimuonMass = massSel;
 					n_met= pfmet;
 					n_mvamet= mvamet;
-					n_leadingPt = analysisTree.muon_pt[indx1];
-					n_trailingPt = analysisTree.muon_pt[indx2];
-					n_leadingEta = analysisTree.muon_eta[indx1];
-					n_trailingEta = analysisTree.muon_eta[indx2];
+					if(analysisTree.muon_pt[indx1]>analysisTree.muon_pt[indx2]){
+					  n_leadingPt = analysisTree.muon_pt[indx1];
+					  n_trailingPt = analysisTree.muon_pt[indx2];
+					  n_leadingEta = analysisTree.muon_eta[indx1];
+					  n_trailingEta = analysisTree.muon_eta[indx2];
+					  n_leadingPhi = analysisTree.muon_phi[indx1];
+					  n_leadingPhi = analysisTree.muon_phi[indx2];
+					}
+					else{
+					  n_leadingPt = analysisTree.muon_pt[indx2];
+					  n_trailingPt = analysisTree.muon_pt[indx1];
+					  n_leadingEta = analysisTree.muon_eta[indx2];
+					  n_trailingEta = analysisTree.muon_eta[indx1];
+					  n_leadingPhi = analysisTree.muon_phi[indx2];
+					  n_leadingPhi = analysisTree.muon_phi[indx1];
+					}
 					n_jets = double(nJets30);
 					n_noOfvertices = analysisTree.primvertex_count;
 					
-				    float mvaValue_ =  reader->EvaluateMVA("BDT");
-				    histMva->Fill(mvaValue_, weight);
-				    if(n_dimuonMass > 20 && n_dimuonMass < 70)histMva_massCut->Fill(mvaValue_, weight);
-				    double cut = 0.0;
-				    for (int j=-20,k=0 ;k<iCut; j++,k++){
-				      cut = j*0.05;
-				      // std::cout<<"for k = " << k << "  cut = " << cut <<std::endl;
-				      if(mvaValue_ > cut) InvMass[k]->Fill(n_dimuonMass, weight);
-				    }
+					float mvaValue_ =  reader->EvaluateMVA("BDT");
+					histMva->Fill(mvaValue_, weight);
+					if(n_dimuonMass > 20 && n_dimuonMass < 70)histMva_massCut->Fill(mvaValue_, weight);
+					double cut = 0.0;
+					for (int j=-20,k=0 ;k<iCut; j++,k++){
+					  cut = j*0.05;
+					  // std::cout<<"for k = " << k << "  cut = " << cut <<std::endl;
+					  if(mvaValue_ > cut) InvMass[k]->Fill(n_dimuonMass, weight);
+					}
 					n_mva_BDT =mvaValue_;
-					
+
+					/////*****svFit*******
+					if (mvaValue_ > 0.5 && massSel < 80){
+					  //define MET
+					  double measuredMETx = mvamet_ex;
+					  double measuredMETy = mvamet_ey;
+					  
+					  // define MET covariance
+					  TMatrixD covMET(2, 2);
+					  
+					  // std::cout << "covmetxx " << n_covmet_xx << "\t covmetxy " << n_covmet_xy  << "\t covmetyy " << n_covmet_yy <<std::endl;
+					  
+					  covMET[0][0] = n_covmet_xx;
+					  covMET[1][0] = n_covmet_xy;
+					  covMET[0][1] = n_covmet_xy;
+					  covMET[1][1] = n_covmet_yy;
+					  
+					  // define lepton four vectors
+					  std::vector<svFitStandalone::MeasuredTauLepton> measuredTauLeptons;
+					  
+					  measuredTauLeptons.push_back(svFitStandalone::MeasuredTauLepton(svFitStandalone::kTauToMuDecay, n_leadingPt, n_leadingEta, n_leadingPhi, 105.658e-3)); 
+					  measuredTauLeptons.push_back(svFitStandalone::MeasuredTauLepton(svFitStandalone::kTauToMuDecay, n_trailingPt ,n_trailingEta, n_trailingPhi, 105.658e-3));
+					  
+					  SVfitStandaloneAlgorithm algo(measuredTauLeptons, measuredMETx, measuredMETy, covMET, 0);
+					  algo.addLogM(false);  
+					  
+					  
+					  algo.shiftVisPt(true, inputFile_visPtResolution);
+					  
+					  algo.integrateMarkovChain();
+					  n_m_sv = algo.getMass(); // return value is in units of GeV
+					  
+					  mass_sv->Fill(n_m_sv,weight);
+					  if(mvaValue_ > 0.5) mass_sv_bdt->Fill(n_m_sv,weight);
+					  
+					  bool algoVerify = false;
+					  algoVerify = algo.isValidSolution();
+					  if ( algoVerify ) {
+					    //std::cout << "SVfit mass (pfmet)    = " << n_m_sv << std::endl;
+					  } else {
+					    std::cout << "sorry -- status of NLL is not valid [" << algoVerify << "]" << std::endl;
+					  }
+					  
+					  n_pt_sv = algo.pt(); 
+					  n_eta_sv = algo.eta();
+					  n_phi_sv = algo.phi();
+					  
+					  
+					}
+										
 					if (fillBDTNTuple)
 						T->Fill();
 					
