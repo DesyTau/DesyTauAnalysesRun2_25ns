@@ -1011,7 +1011,7 @@ int main(int argc, char * argv[]) {
 	    if (interpolateZMassPtWeight) 
 	      dyWeight = histZMassPtWeights->Interpolate(genZMass,genZPt);
 	    else 
-	      dyWeight *= histZMassPtWeights->GetBinContent(histZMassPtWeights->FindBin(genZMass,genZPt));
+	      dyWeight = histZMassPtWeights->GetBinContent(histZMassPtWeights->FindBin(genZMass,genZPt));
 
 	    //	    std::cout << "Z mass = " << genZMass << "   Z Pt = " << genZPt << "   weight = " << dyWeight << std::endl;
 	    weight *= dyWeight;
