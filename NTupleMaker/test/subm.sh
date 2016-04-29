@@ -8,34 +8,12 @@ lt=`echo $line`
 echo $line > $lt
 
 
-	if [ $flag == "eltau" ]
 
-	then
 
-		echo $line > dt
+	echo $line > dt
 	
-	echo submitting  run_mc.sh $line
-	qsub run_mc_eltau.sh $line
+	echo submitting  run_mc.sh $line for $2 channel
+	qsub run_mc2.sh $line $2
 
-	fi
-
-	if [ $flag == "mutau" ]
-	then
-
-		echo $line > dt
-	
-	echo submitting  run_mc.sh $line
-	qsub run_mc2.sh $line
-
-fi
-	if [ $flag == "signal" ]
-	then
-
-		echo $line > dt
-	
-	echo submitting  run_stau.sh $line
-	qsub run_stau.sh $line
-
-fi
 done<$1
 

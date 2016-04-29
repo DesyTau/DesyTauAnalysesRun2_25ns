@@ -27,23 +27,32 @@ cd /nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/CMSSW_7_4_14/src/DesyTauAnaly
 
 dir="/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/CMSSW_7_4_14/src/DesyTauAnalyses/NTupleMaker/test"
 
-channel=$2
-
 while read line
 do
 
 unset file
 file=`echo $line | cut -d '/' -f2`
 	
-mkdir dirW_$file
-cd dirW_$file
+mkdir dir_$file
+cd dir_$file
 echo ==============================================
 pwd
 echo ==============================================
 
-cp $dir/analyzer_h .
-cp $dir/analyzer_Wtemplate2_C .
+if [[ $line == *"stau"* ]] ; then
+lsp=`echo $line | awk -F "_LSP" '{print $2}' | cut -d '_' -f1`
+else
+lsp=0
 
+fi
+
+
+cp $dir/analyzer_top_h .
+
+cp $dir/analyzer_top_C .
+
+
+sed -i 's/CHIMASSS/'$lsp'/g' analyzer*C
 
 cp $dir/runme.C .
 cp $dir/plots.h .
@@ -52,27 +61,26 @@ cp $dir/plots.h .
 unset fileA
 fileA=`echo $file | awk -F "_A_SS" '{print $1}'`
 unset fileB
-fileB=`echo $file | awk -F "_B_OS" '{print $1}'`
+fileB=`echo $file | awk -F "_B" '{print $1}'`
 
 echo $line , $fileA , $fileB
-if [[  $file == *"B_OS"* &&  ! -f $dir/plotsW/${fileB}.root ]]  ; then
-cp analyzer_h analyzer.h
-cp analyzer_Wtemplate2_C analyzer.C
+if [[  $file == *"_B"* &&  ! -f $dir/plotsT/${fileB}_B.root ]]  ; then
+cp analyzer_top_h analyzer.h
+cp analyzer_top_C analyzer.C
 
 echo the filein for main region : $file , the fileout : $file
 sed -i 's/FILEIN/'$file'/g' analyzer.h
 sed -i 's/FILEIN/'$file'/g' analyzer.C
-sed -i 's/LEPTONHERE/false/g' analyzer.C
-sed -i 's/SIGNHERE/OS/g' analyzer.C
-sed -i 's/CHANNELHERE/'$channel'/g' analyzer*
 
 rm plots.root
 root -l -q -b runme.C 
 
-mv plots.root $dir/plotsW/${fileB}.root
+mv plots.root $dir/plotsT/${fileB}_B.root
+
 fi
 
 
+
 cd $dir
-rm -fr dirW_$line
+#rm -fr dir_$line
 done<$1
