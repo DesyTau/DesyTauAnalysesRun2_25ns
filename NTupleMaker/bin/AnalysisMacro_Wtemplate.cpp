@@ -637,55 +637,6 @@ int main(int argc, char * argv[]) {
       iCFCounter[iCut]++;
       iCut++;
 
-      //cout<<"  CFCounter  "<<CFCounter[0]<<"  "<<weight<<endl;
-      //continue;
-      // hnJets[->Fill(pfjet_count);
-
-      //      std::cout << "Entry : " << iEntry << std::endl;
-      //      std::cout << "Number of gen particles = " << analysisTree.genparticles_count << std::endl;
-      //      std::cout << "Number of taus  = " << analysisTree.tau_count << std::endl;
-      //      std::cout << "Number of jets  = " << analysisTree.pfjet_count << std::endl;
-      //      std::cout << "Number of muons = " << analysisTree.muon_count << std::endl;
-      
-      // **** Analysis of generator info
-      // int indexW  = -1;
-      // int indexNu = -1; 
-      // int indexMu = -1;
-      // int indexE  = -1;
-      // int nGenMuons = 0;
-      // int nGenElectrons = 0;
-      // for (unsigned int igen=0; igen<analysisTree.genparticles_count; ++igen) {
-
-      // 	double pxGen = analysisTree.genparticles_px[igen];
-      // 	double pyGen = analysisTree.genparticles_py[igen];
-      // 	double pzGen = analysisTree.genparticles_pz[igen];
-      // 	double etaGen = PtoEta(pxGen,pyGen,pzGen);
-      // 	double ptGen  = PtoPt(pxGen,pyGen);
-
-      // 	if (fabs(analysisTree.genparticles_pdgid[igen])==24 && analysisTree.genparticles_status[igen]==62) 
-      // 	  indexW = igen;
-      // 	if ((fabs(analysisTree.genparticles_pdgid[igen])==12 
-      // 	     ||fabs(analysisTree.genparticles_pdgid[igen])==14
-      // 	     ||fabs(analysisTree.genparticles_pdgid[igen])==16) 
-      // 	    && analysisTree.genparticles_info[igen]== (1<<1) )
-      // 	  indexNu = igen;
-
-      // 	if (fabs(analysisTree.genparticles_pdgid[igen])==13) {
-      // 	  if ( analysisTree.genparticles_info[igen]== (1<<1) ) {
-      // 	    indexMu = igen;
-      // 	    if (fabs(etaGen)<2.3 && ptGen>10.)
-      // 	      nGenMuons++;
-      // 	  }
-      // 	}
-      // 	if (fabs(analysisTree.genparticles_pdgid[igen])==11) {
-      // 	  if ( analysisTree.genparticles_info[igen]== (1<<1) ) {
-      // 	    indexE = igen;
-      // 	    if (fabs(etaGen)<2.3 && ptGen>10.)
-      // 	      nGenElectrons++;
-      // 	  }
-      // 	}
-      // }
-
  
       //selecTable.Fill(1,0, weight );      
       bool trigAccept = false;
@@ -930,63 +881,6 @@ continue;
 
       	if (dR<dRleptonsCutmutau) continue;
 
-	//if ((!isMainTrigger && !isMu27) || (!isMuTau_MuLegA && !isMuTau_MuLegB) ) continue;
-     	//if ((!isMainTrigger ) && (!isMuTau_MuLegA && !isMuTau_MuLegB) ) continue;
-
-	/*
-        for (unsigned int it=0; it<tau.size(); ++it) {
-	  isMuTau_TauLegA = false;
-	  isMuTau_TauLegB = false;
-	  unsigned int tIndex  = tau.at(it);
-	  for (unsigned int iT=0; iT<analysisTree.trigobject_count; ++iT) {
-	    if (analysisTree.trigobject_filters[iT][nMuon17Tau20TauLegA] ) { 
-	      double dRtrig = deltaR(analysisTree.tau_eta[tIndex],analysisTree.tau_phi[tIndex],
-				    analysisTree.trigobject_eta[iT],analysisTree.trigobject_phi[iT]);
-	      if (dRtrig>deltaRTrigMatch) continue;
-	      if (analysisTree.trigobject_filters[iT][nMuon17Tau20TauLegA] && analysisTree.trigobject_pt[iT]>20) 
-		isMuTau_TauLegA = true;
-	      
-	    }
-
-	    if (analysisTree.trigobject_filters[iT][nMuon17Tau20TauLegB]) { 
-	      double dRtrig = deltaR(analysisTree.tau_eta[tIndex],analysisTree.tau_phi[tIndex],
-				    analysisTree.trigobject_eta[iT],analysisTree.trigobject_phi[iT]);
-	      if (dRtrig>deltaRTrigMatch) continue;
-	      if (analysisTree.trigobject_filters[iT][nMuon17Tau20TauLegA] && analysisTree.trigobject_pt[iT]>20) 
-		isMuTau_TauLegB = true;
-	      
-	    } 
-	  }
-	
-
-	//if (   ( (isMainTrigger) || (isMu27) )  || ( (isMuTau_MuLegA && isMuTau_MuLegB) && (isMuTau_TauLegA && isMuTau_TauLegB) ) ) trigAccept=true;
-     	//if ((!isMainTrigger ) && (!isMuTau_MuLegA || !isMuTau_MuLegB) ) continue;
-  
-   	bool passedMuTauTriggerMuLeg	= isMuTau_MuLegA && isMuTau_MuLegB;
-   	bool passedMuTauTriggerTauLeg   = isMuTau_TauLegA && isMuTau_TauLegB;
-	bool OnlyMuTrigger = isMainTrigger && (!passedMuTauTriggerMuLeg && !passedMuTauTriggerTauLeg);
-
-      	//if ( (isMainTrigger || isMu27) && ( (!isMuTau_MuLegA && !isMuTau_MuLegB) && (!isMuTau_TauLegA && !isMuTau_TauLegB) )  && 
-//         if ( (isMainTrigger ) && ( (!isMuTau_MuLegA && !isMuTau_MuLegB) && (!isMuTau_TauLegA && !isMuTau_TauLegB) )  && 
-	if (OnlyMuTrigger  && ( analysisTree.muon_pt[mu_index] < ptMuonHighCut || fabs(analysisTree.muon_eta[mu_index]) > 2.1) ) continue;
-	
-	
-//	trigAccept=true;
-
-//	if (!trigAccept) continue;
-	
-	}//taus
-
-      }//muons 
-      	*/
-	
-	//cout<<" mu_index "<<mu_index<<"  "<<isMainTrigger<<"  "<<isMu27<<"  "<<isMuTau_MuLegA<<"  "<<isMuTau_MuLegB<<"  "<<isMuTau_TauLegA<<"  "<<isMuTau_TauLegB<<endl;
-
-  
-
-      //Trigger
-      //FillMainHists(iCut, weight, ElMV, MuMV, JetsMV,METV,analysisTree, Channel, mu_index,el_index,tau_index);
- 
    
 			double ptMu1 = (double)analysisTree.muon_pt[mu_index];
 			double etaMu1 = (double)analysisTree.muon_eta[mu_index];
@@ -1013,9 +907,6 @@ continue;
       iCut++;
 
 
-
-
-
       //Set this flag if there is an opposite-charge muon pair in the event with muons separated by DR>0.15 and both passing the loose selection: 
 	
 
@@ -1027,15 +918,6 @@ continue;
      	if (muons.size()>1){
 	  for (unsigned  int imv = 0; imv<analysisTree.muon_count; ++imv) {
 	    if ( imv != mu_index ){
-/*
-	      double neutralIso = 
-		analysisTree.muon_neutralHadIso[imv] + 
-		analysisTree.muon_photonIso[imv] - 
-		0.5*analysisTree.muon_puIso[imv];
-	      neutralIso = TMath::Max(double(0),neutralIso); 
-	      double absIso = analysisTree.muon_chargedHadIso[imv] + neutralIso;
-	      double relIso = absIso/analysisTree.muon_pt[imv];
-  */    
               double absIso= analysisTree.muon_r03_sumChargedHadronPt[imv]
 	            + max(analysisTree.muon_r03_sumNeutralHadronEt[imv] + analysisTree.muon_r03_sumPhotonEt[imv]
 	            - 0.5 * analysisTree.muon_r03_sumPUPt[imv],0.0);
@@ -1135,17 +1017,6 @@ continue;
 
 	
 	  MuSF_IdIso_Mu1H->Fill(IdIsoSF_mu1);
-	  //	  if (ptMu1<20||ptMu2<20) {
-	  //	    std::cout << "mu 1 ->  pt = " << ptMu1 << "   eta = " << etaMu1 << std::endl;
-	  //	    std::cout << "eff data mu 1 = " << SF_muonIdIso->get_EfficiencyData(ptMu1, etaMu1)<< " |  eff mc mu 1 = " << SF_muonIdIso->get_EfficiencyMC(ptMu1, etaMu1)<<std::endl;
-	  //	    std::cout << "mu 2 ->  pt = " << ptMu2 << "   eta = " << etaMu2 << std::endl;
-	  //	    std::cout << "eff data mu 2 = " << SF_muonIdIso->get_EfficiencyData(ptMu2, etaMu2)<< " |  eff mc mu 2 = " << SF_muonIdIso->get_EfficiencyMC(ptMu2, etaMu2)<<std::endl;
-	  //	    std::cout << "SF mu1 = " << IdIsoSF_mu1 << std::endl;
-	  //	    std::cout << "SF mu2 = " << IdIsoSF_mu2 << std::endl;
-	  //	    
-	  //	    std::cout << " mass = " << massSel << std::endl;
-	  //	    std::cout << std::endl;
-	  //	  }
 	  weight = weight*IdIsoSF_mu1;
 	}
       if(fillplots)
