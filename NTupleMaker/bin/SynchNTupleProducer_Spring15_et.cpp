@@ -48,7 +48,7 @@
 #define d2r 1.74532925199432955e-02
 #define r2d 57.2957795130823229
 
-#define electronMass  0.51100e-3
+#define electronMass 0.51100e-3
 #define muonMass 0.10565837
 #define tauMass 1.77682
 #define pionMass 0.1396
@@ -134,6 +134,7 @@ int main(int argc, char * argv[]) {
   // configuration process
   const string sample = argv[2];
   const bool isData = cfg.get<bool>("isData");
+  const bool Synch = cfg.get<bool>("Synch");
   const string infiles = argv[2];
   
   float xs = -1.;
@@ -1441,6 +1442,51 @@ int main(int argc, char * argv[]) {
 		    TMath::Sqrt( otree->mvamet*TMath::Sin(otree->mvametphi)*otree->mvamet*TMath::Sin(otree->mvametphi) +
 				 otree->mvamet*TMath::Cos(otree->mvametphi)*otree->mvamet*TMath::Cos(otree->mvametphi)));
       otree->pt_tt = (dileptonLV+metLV).Pt();   
+
+
+      
+      bool passSkim = (otree->iso_1 < 0.1 &&
+		       otree->againstElectronVLooseMVA6_2>0.5 &&
+		       otree->againstMuonTight3_2>0.5 &&
+		       otree->byTightIsolationMVArun2v1DBoldDMwLT_2>0.5 &&
+		       otree->dilepton_veto == 0 &&
+		       otree->extraelec_veto == 0 &&
+		       otree->extramuon_veto == 0 &&
+		       otree->mt_1 < 50);
+      
+      if (!Synch && !passSkim)
+	continue;
+
+      ///////////////////////////////////
+      // SV fit 
+      ///////////////////////////////////
+
+      std::vector<svFitStandalone::MeasuredTauLepton> measuredTauLeptons;
+      measuredTauLeptons.push_back(svFitStandalone::MeasuredTauLepton(svFitStandalone::kTauToElecDecay,
+								      otree->pt_1,
+								      otree->eta_1,
+								      otree->phi_1,
+								      electronMass)); 
+      measuredTauLeptons.push_back(svFitStandalone::MeasuredTauLepton(svFitStandalone::kTauToHadDecay,
+								      otree->pt_2,
+								      otree->eta_2,
+								      otree->phi_2,
+								      otree->m_2,
+								      otree->tau_decay_mode_2));
+
+      SVfitStandaloneAlgorithm algo(measuredTauLeptons, otree->mvamet * cos(otree->mvametphi), otree->mvamet * sin(otree->mvametphi), covMET, 0);
+      algo.addLogM(false);  
+      algo.shiftVisPt(true, inputFile_visPtResolution);
+      algo.integrateMarkovChain();
+
+      otree->m_sv = algo.mass();
+      otree->pt_sv = algo.pt();
+      otree->eta_sv = algo.eta();
+      otree->phi_sv = algo.phi();      
+      otree->met_sv = algo.fittedMET().Rho();
+      otree->mt_sv = algo.transverseMass();
+      
+      otree->Fill();
 
       if(!isData){
 	eleEBScaleSys->Eval(utils::ETAU);  
