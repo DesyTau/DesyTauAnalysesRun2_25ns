@@ -40,7 +40,7 @@ process.options = cms.untracked.PSet(
 
 # How many events to process
 process.maxEvents = cms.untracked.PSet( 
-   input = cms.untracked.int32(10)
+   input = cms.untracked.int32(1000)
 )
 
 
@@ -215,7 +215,8 @@ process.HBHENoiseFilterResultProducer.defaultDecision = cms.string("HBHENoiseFil
 
 fnames = []
 if runOnData:
-  fnames.append('/store/data/Run2015D/SingleMuon/MINIAOD/16Dec2015-v1/10000/00006301-CAA8-E511-AD39-549F35AD8BC9.root')
+  #fnames.append('/store/data/Run2015D/SingleMuon/MINIAOD/16Dec2015-v1/10000/00006301-CAA8-E511-AD39-549F35AD8BC9.root')
+  fnames.append('/store/data/Run2015D/MET/MINIAOD/16Dec2015-v1/50000/00EA1DB2-90AA-E511-AEEE-0025905C2CE6.root')
 else:
   fnames.append('/store/mc/RunIIFall15MiniAODv2/SUSYGluGluToHToTauTau_M-160_TuneCUETP8M1_13TeV-pythia8/MINIAODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/50000/12184969-3DB8-E511-879B-001E67504A65.root')
   fnames.append('/store/mc/RunIIFall15MiniAODv2/SUSYGluGluToHToTauTau_M-160_TuneCUETP8M1_13TeV-pythia8/MINIAODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/50000/50B4676B-3DB8-E511-AA11-001E67580704.root')
@@ -392,8 +393,19 @@ HLTriggerPaths = cms.untracked.vstring(
 'HLT_PFJet60_v',
 'HLT_PFJet80_v',
 'HLT_PFJet140_v'
-),
+  ),
 TriggerProcess = cms.untracked.string("HLT"),
+Flags = cms.untracked.vstring(
+  'Flag_HBHENoiseFilter',
+  'Flag_HBHENoiseIsoFilter',
+  'Flag_CSCTightHalo2015Filter',
+  'Flag_EcalDeadCellTriggerPrimitiveFilter',
+  'Flag_goodVertices',
+  'Flag_eeBadScFilter',
+  'Flag_chargedHadronTrackResolutionFilter',
+  'Flag_muonBadTrackFilter'
+),
+FlagsProcess = cms.untracked.string("RECO"),
 # tracks
 RecTrackPtMin = cms.untracked.double(0.5),
 RecTrackEtaMax = cms.untracked.double(2.4),
