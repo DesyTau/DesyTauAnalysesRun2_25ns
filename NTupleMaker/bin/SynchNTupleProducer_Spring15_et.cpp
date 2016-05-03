@@ -1495,7 +1495,6 @@ int main(int argc, char * argv[]) {
 	topPtWeightSys->Eval();
       }
       
-      otree->Fill();
       selEvents++;
     } // end of file processing (loop over events in one file)
     nFiles++;
@@ -1509,6 +1508,9 @@ int main(int argc, char * argv[]) {
   std::cout << "Total number of events in Tree  = " << nEvents << std::endl;
   std::cout << "Total number of selected events = " << selEvents << std::endl;
   std::cout << std::endl;
+
+  file->cd("");
+  file->Write();
   
   if(eleEBScaleSys != 0){
     eleEBScaleSys->Write();
@@ -1530,9 +1532,6 @@ int main(int argc, char * argv[]) {
     delete topPtWeightSys;
   }
 
-  
-  file->cd("");
-  file->Write();
   file->Close();
   delete file;
   
