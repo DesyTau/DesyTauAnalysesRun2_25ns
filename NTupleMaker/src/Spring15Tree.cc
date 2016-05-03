@@ -69,18 +69,30 @@ void Spring15Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("trigweight_2", &trigweight_2, &b_trigweight_2);
    fChain->SetBranchAddress("idisoweight_1", &idisoweight_1, &b_idisoweight_1);
    fChain->SetBranchAddress("idisoweight_2", &idisoweight_2, &b_idisoweight_2);
-   fChain->SetBranchAddress("effweight", &effweight, &b_effweight);
+   fChain->SetBranchAddress("topptweight", &topptweight, &b_topptweight);
+   fChain->SetBranchAddress("effweight", &effweight, &b_effweight); 
    fChain->SetBranchAddress("fakeweight", &fakeweight, &b_fakeweight);
    fChain->SetBranchAddress("embeddedWeight", &embeddedWeight, &b_embeddedWeight);
    fChain->SetBranchAddress("signalWeight", &signalWeight, &b_signalWeight);
    fChain->SetBranchAddress("weight", &weight, &b_weight);
    fChain->SetBranchAddress("lheHt", &lheHt, &b_lheHt);
    fChain->SetBranchAddress("gen_noutgoing", &gen_noutgoing, &b_gen_noutgoing);   
+   fChain->SetBranchAddress("njetshad", &njetshad, &b_njetshad);
+   fChain->SetBranchAddress("genV_px", &genV_px, &b_genV_px);
+   fChain->SetBranchAddress("genV_py", &genV_py, &b_genV_py);
+   fChain->SetBranchAddress("genV_pz", &genV_pz, &b_genV_pz);   
+   fChain->SetBranchAddress("genV_e", &genV_e, &b_genV_e);
+   fChain->SetBranchAddress("genL_px", &genL_px, &b_genL_px);
+   fChain->SetBranchAddress("genL_py", &genL_py, &b_genL_py);
+   fChain->SetBranchAddress("genL_pz", &genL_pz, &b_genL_pz);   
+   fChain->SetBranchAddress("genL_e", &genL_e, &b_genL_e);
    fChain->SetBranchAddress("m_vis", &m_vis, &b_m_vis);
    fChain->SetBranchAddress("m_sv", &m_sv, &b_m_sv);
    fChain->SetBranchAddress("pt_sv", &pt_sv, &b_pt_sv);
    fChain->SetBranchAddress("eta_sv", &eta_sv, &b_eta_sv);
    fChain->SetBranchAddress("phi_sv", &phi_sv, &b_phi_sv);
+   fChain->SetBranchAddress("met_sv", &met_sv, &b_met_sv);
+   fChain->SetBranchAddress("mt_sv", &mt_sv, &b_mt_sv);   
    fChain->SetBranchAddress("pt_1", &pt_1, &b_pt_1);
    fChain->SetBranchAddress("phi_1", &phi_1, &b_phi_1);
    fChain->SetBranchAddress("eta_1", &eta_1, &b_eta_1);
@@ -104,6 +116,7 @@ void Spring15Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("pfmt_rc_njetsreco_1", &pfmt_rc_njetsreco_1, &b_pfmt_rc_njetsreco_1);
    fChain->SetBranchAddress("mt_rc_visreco_1", &mt_rc_visreco_1, &b_mt_rc_visreco_1);
    fChain->SetBranchAddress("pfmt_rc_visreco_1", &pfmt_rc_visreco_1, &b_pfmt_rc_visreco_1);
+   fChain->SetBranchAddress("tau_decay_mode_1", &tau_decay_mode_1, &b_tau_decay_mode_1); 
    fChain->SetBranchAddress("pt_2", &pt_2, &b_pt_2);
    fChain->SetBranchAddress("phi_2", &phi_2, &b_phi_2);
    fChain->SetBranchAddress("eta_2", &eta_2, &b_eta_2);
@@ -212,7 +225,6 @@ void Spring15Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("mva_gf", &mva_gf, &b_mva_gf);
    fChain->SetBranchAddress("njets", &njets, &b_njets);
    fChain->SetBranchAddress("njetspt20", &njetspt20, &b_njetspt20);
-   fChain->SetBranchAddress("njetshad", &njetshad, &b_njetshad);
    fChain->SetBranchAddress("jpt_1", &jpt_1, &b_jpt_1);
    fChain->SetBranchAddress("jeta_1", &jeta_1, &b_jeta_1);
    fChain->SetBranchAddress("jphi_1", &jphi_1, &b_jphi_1);
@@ -323,6 +335,7 @@ void Spring15Tree::WriteInit(TTree *tree) {
   fChain->Branch("trigweight_2", &trigweight_2, "trigweight_2/F");
   fChain->Branch("idisoweight_1", &idisoweight_1, "idisoweight_1/F");
   fChain->Branch("idisoweight_2", &idisoweight_2, "idisoweight_2/F");
+  fChain->Branch("topptweight", &topptweight, "topptweight/F"); 
   fChain->Branch("effweight", &effweight, "effweight/F");
   fChain->Branch("fakeweight", &fakeweight, "fakeweight/F");
   fChain->Branch("embeddedWeight", &embeddedWeight, "embeddedWeight/F");
@@ -330,13 +343,24 @@ void Spring15Tree::WriteInit(TTree *tree) {
   fChain->Branch("weight", &weight, "weight/F");
   fChain->Branch("lheHt", &lheHt, "lheHt/F");
   fChain->Branch("gen_noutgoing", &gen_noutgoing, "gen_noutgoing/I");
+  fChain->Branch("njetshad", &njetshad, "njetshad/I");
+  fChain->Branch("genV_px", &genV_px, "genV_px/F");
+  fChain->Branch("genV_py", &genV_py, "genV_py/F");  
+  fChain->Branch("genV_pz", &genV_pz, "genV_pz/F");
+  fChain->Branch("genV_e", &genV_e, "genV_e/F");
+  fChain->Branch("genL_px", &genL_px, "genL_px/F");
+  fChain->Branch("genL_py", &genL_py, "genL_py/F");  
+  fChain->Branch("genL_pz", &genL_pz, "genL_pz/F");
+  fChain->Branch("genL_e", &genL_e, "genL_e/F");
   
   fChain->Branch("m_vis", &m_vis, "m_vis/F");
   fChain->Branch("m_sv", &m_sv, "m_sv/F");
   fChain->Branch("pt_sv", &pt_sv, "pt_sv/F");
   fChain->Branch("eta_sv", &eta_sv, "eta_sv/F");
   fChain->Branch("phi_sv", &phi_sv, "phi_sv/F");
-
+  fChain->Branch("met_sv", &met_sv, "met_sv/F");
+  fChain->Branch("mt_sv", &mt_sv, "mt_sv/F");  
+  
   fChain->Branch("pt_1", &pt_1, "pt_1/F");
   fChain->Branch("phi_1", &phi_1, "phi_1/F");
   fChain->Branch("eta_1", &eta_1, "eta_1/F");
@@ -360,6 +384,7 @@ void Spring15Tree::WriteInit(TTree *tree) {
   fChain->Branch("pfmt_rc_njetsreco_1", &pfmt_rc_njetsreco_1, "pfmt_rc_njetsreco_1/F");
   fChain->Branch("mt_rc_visreco_1", &mt_rc_visreco_1, "mt_rc_visreco_1/F");
   fChain->Branch("pfmt_rc_visreco_1", &pfmt_rc_visreco_1, "pfmt_rc_visreco_1/F");
+  fChain->Branch("tau_decay_mode_1", &tau_decay_mode_1, "tau_decay_mode_1/I");
   
   fChain->Branch("pt_2", &pt_2, "pt_2/F");
   fChain->Branch("phi_2", &phi_2, "phi_2/F");
@@ -476,7 +501,6 @@ void Spring15Tree::WriteInit(TTree *tree) {
   
   fChain->Branch("njets", &njets, "njets/I");
   fChain->Branch("njetspt20", &njetspt20, "njetspt20/I");
-  fChain->Branch("njetshad", &njetshad, "njetshad/I");
   
   fChain->Branch("jpt_1", &jpt_1, "jpt_1/F");
   fChain->Branch("jeta_1", &jeta_1, "jeta_1/F");

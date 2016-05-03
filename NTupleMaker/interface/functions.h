@@ -5,6 +5,8 @@
 #include "DesyTauAnalyses/NTupleMaker/interface/Config.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/AC1B.h"
 #include "HTT-utilities/RecoilCorrections/interface/RecoilCorrector.h"
+#include "TauAnalysis/SVfitStandalone/interface/SVfitStandaloneAlgorithm.h"
+
 
 const double MuMass = 0.105658367;
 const double tauMass = 1.776;
@@ -39,10 +41,7 @@ split(const std::string &s, char delim = ':')
     return elems;
 }
   
-
-
 bool ComparePt(TLorentzVector a, TLorentzVector b) { return a.Pt() > b.Pt(); }
-
 
 int binNumber(float x, int nbins, float * bins) {
 
@@ -401,6 +400,41 @@ struct myclass {
 
 
 namespace genTools{
+  float topPtWeight(float pt1,
+		    float pt2) {
+    
+    if (pt1>400) pt1 = 400;
+    if (pt2>400) pt2 = 400;
+    
+    float a = 0.156;    // Run1 a parameter
+    float b = -0.00137;  // Run1 b parameter
+    
+    float w1 = TMath::Exp(a+b*pt1);
+    float w2 = TMath::Exp(a+b*pt2);
+    
+    return TMath::Sqrt(w1*w2);  
+  }
+
+  float topPtWeight(const AC1B& analysisTree){
+    float topPt = -1;
+    float antitopPt = -1;
+    
+    for (unsigned int igen=0; igen < analysisTree.genparticles_count; ++igen) { 
+      if (analysisTree.genparticles_pdgid[igen]==6)
+	topPt = TMath::Sqrt(analysisTree.genparticles_px[igen]*analysisTree.genparticles_px[igen]+
+			    analysisTree.genparticles_py[igen]*analysisTree.genparticles_py[igen]);
+      
+      if (analysisTree.genparticles_pdgid[igen]==-6)
+	antitopPt = TMath::Sqrt(analysisTree.genparticles_px[igen]*analysisTree.genparticles_px[igen]+
+				analysisTree.genparticles_py[igen]*analysisTree.genparticles_py[igen]);
+    }
+
+    if(topPt > 0. && antitopPt > 0.)
+      return topPtWeight(topPt, antitopPt);
+
+    return 1.;
+  };
+  
   TLorentzVector genZ(const AC1B& analysisTree){
     TLorentzVector genZ; genZ.SetXYZM(0,0,0,91.2);
     TLorentzVector genPart; genPart.SetXYZM(0,0,0,0);
@@ -616,7 +650,7 @@ namespace genTools{
 	
 	float dR = deltaR(analysisTree.pfjet_eta[jet],analysisTree.pfjet_phi[jet],
 			  genEta, genPhi);
-	if (dR<=0.5) continue;
+	if (dR>0.5) continue;
 	
 	overlap = 1;
 	break;
@@ -634,7 +668,7 @@ namespace genTools{
 			 	
 	float dR = deltaR(analysisTree.pfjet_eta[jet],analysisTree.pfjet_phi[jet],
 			  genEta, genPhi);
-	if (dR<=0.5) continue;
+	if (dR>0.5) continue;
 	
 	overlap = 1;
 	break;
@@ -670,13 +704,93 @@ namespace genTools{
             
     return method;
   }
+};
 
+namespace utils{
+  enum channel{UNKNOWN = 0, ETAU, MUTAU, TAUTAU, EE, MUMU, EMU};
+}
+
+namespace calc{
   float mt( float lpt, float lphi, float met, float metphi){
     return sqrt(2*lpt*met*(1.-TMath::Cos(lphi-metphi)));
   }
 
+  float pzetavis( float zx, float zy, float visx, float visy){
+    return zx*visx+zy*visy;
+  }
+
+  float pzetavis(const TLorentzVector& v1, const TLorentzVector& v2){
+    float v1ux = v1.Px()/v1.Pt();
+    float v1uy = v1.Py()/v1.Pt();
+
+    float v2ux = v2.Px()/v2.Pt();
+    float v2uy = v2.Py()/v2.Pt();    
+    
+    float zx = v1ux + v2ux;
+    float zy = v1uy + v2uy;
+      
+    float modz = TMath::Sqrt(zx*zx+zy*zy);
+    zx = zx/modz;
+    zy = zy/modz;
+    
+    return pzetavis( zx, zy, v1.Px()+v2.Px(), v1.Py()+v2.Py());
+  }
+
   float pzetamiss( float zx, float zy, float met, float metphi){
     return zx*met*TMath::Cos(metphi)+zy*met*TMath::Sin(metphi);
+  }
+
+  float pzetamiss(const TLorentzVector& v1, const TLorentzVector& v2, const TLorentzVector& met){
+    float v1ux = v1.Px()/v1.Pt();
+    float v1uy = v1.Py()/v1.Pt();
+
+    float v2ux = v2.Px()/v2.Pt();
+    float v2uy = v2.Py()/v2.Pt();    
+    
+    float zx = v1ux + v2ux;
+    float zy = v1uy + v2uy;
+      
+    float modz = TMath::Sqrt(zx*zx+zy*zy);
+    zx = zx/modz;
+    zy = zy/modz;
+    
+    return pzetamiss( zx, zy, met.Pt(), met.Phi()); 
+  }
+
+  std::shared_ptr<SVfitStandaloneAlgorithm> svFit(const TLorentzVector& v1, int dm_1,
+						  const TLorentzVector& v2, int dm_2,
+						  const TLorentzVector& met, const TMatrixD& covMET,
+						  utils::channel ch, TFile* visPtRes){
+    
+    using namespace utils;
+    
+    if(ch == UNKNOWN){
+      return 0;
+    }
+
+    svFitStandalone::kDecayType t1_decay = svFitStandalone::kTauToHadDecay;
+    svFitStandalone::kDecayType t2_decay = svFitStandalone::kTauToHadDecay;
+
+    if (ch == ETAU || ch == EE || ch == EMU)
+      t1_decay = svFitStandalone::kTauToElecDecay;
+    if (ch == EE)
+      t2_decay = svFitStandalone::kTauToElecDecay;
+
+    if (ch == MUTAU || ch == MUMU)
+      t1_decay = svFitStandalone::kTauToMuDecay;
+    if (ch == EMU || ch == MUMU)
+      t2_decay = svFitStandalone::kTauToMuDecay;
+    
+    std::vector<svFitStandalone::MeasuredTauLepton> measuredTauLeptons;
+    measuredTauLeptons.push_back(svFitStandalone::MeasuredTauLepton( t1_decay, v1.Pt(), v1.Eta(), v1.Phi(), v1.M(), dm_1));
+    measuredTauLeptons.push_back(svFitStandalone::MeasuredTauLepton( t2_decay, v2.Pt(), v2.Eta(), v2.Phi(), v2.M(), dm_2));    
+
+    std::shared_ptr<SVfitStandaloneAlgorithm> algo = std::make_shared<SVfitStandaloneAlgorithm>(measuredTauLeptons, met.Px(), met.Py(), covMET, 0);
+    algo->addLogM(false);
+    algo->shiftVisPt(true,visPtRes);
+    algo->integrateMarkovChain();
+
+    return algo;
   }
 }
 #endif
