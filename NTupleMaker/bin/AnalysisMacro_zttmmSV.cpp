@@ -431,6 +431,8 @@ int main(int argc, char * argv[]) {
   	const unsigned int RunRangeMax = cfg.get<unsigned int>("RunRangeMax");
 	
 	const bool fillBDTNTuple = cfg.get<bool>("FillBDTNTuple");
+
+	const float muonScale = cfg.get<float>("MuonScale");
 	// **** end of configuration
 	
   	string cmsswBase = (getenv ("CMSSW_BASE"));
@@ -646,10 +648,20 @@ int main(int argc, char * argv[]) {
    	Float_t n_MissingEt;
    	Float_t n_DZeta;
    	Float_t n_dimuonMass;
+	Float_t n_dimuonMass_Up;
+	Float_t n_dimuonMass_Down;
+	Float_t n_dimuonMass_scaleUp;
+	Float_t n_dimuonMass_scaleDown;
+	Float_t n_dimuonMass_resoUp;
+	Float_t n_dimuonMass_resoDown;
    	Float_t n_met;
 	Float_t n_mvamet;
 	Float_t n_leadingPt;
+	Float_t n_leadingPt_Up;
+	Float_t n_leadingPt_Down;
 	Float_t n_trailingPt;
+	Float_t n_trailingPt_Up;
+	Float_t n_trailingPt_Down;
 	Float_t n_leadingEta;
 	Float_t n_trailingEta;
 	Float_t n_leadingPhi;
@@ -657,14 +669,36 @@ int main(int argc, char * argv[]) {
 	Float_t n_jets;
 	Float_t n_noOfvertices;
 	Float_t n_mva_BDT;
-	Bool_t n_genAccept;
+	Bool_t 	n_genAccept;
 	Float_t n_m_sv;
+	Float_t n_m_sv_Up;
+	Float_t n_m_sv_Down;
+	Float_t n_m_sv_scaleUp;
+	Float_t n_m_sv_scaleDown;
+	Float_t n_m_sv_resoUp;
+	Float_t n_m_sv_resoDown;
 	Float_t n_pt_sv; 
 	Float_t	n_eta_sv;
 	Float_t	n_phi_sv;
 	Float_t n_covmet_xx;
 	Float_t n_covmet_xy;
 	Float_t n_covmet_yy;
+	Float_t	n_mcweight;
+	Float_t n_puweight;
+	Float_t n_trigweight_1;
+	Float_t n_trigweight_2;
+	Float_t n_trigweight;
+	Float_t n_weightTrig;
+	Float_t n_idweight_1;
+	Float_t n_idweight_2;
+	Float_t n_isoweight_1;
+	Float_t n_isoweight_2;
+	Float_t n_effweight;
+	//Float_t n_fakeweight;
+	//Float_t n_embeddedWeight;
+	//Float_t n_signalWeight;
+	Float_t n_topptweight;
+	Float_t n_weight;	
 
 	TTree * TW = new TTree("TW","Weights");
    	TW->Branch("genWeight",&n_genWeight,"n_genWeight/F");
@@ -694,10 +728,20 @@ int main(int argc, char * argv[]) {
    	T->Branch("DZeta",&n_DZeta,"n_DZeta/F");
    	T->Branch("genWeight",&n_genWeight,"n_genWeight/F");
    	T->Branch("dimuonMass",&n_dimuonMass,"n_dimuonMass/F");
+	T->Branch("dimuonMass_Up",&n_dimuonMass_Up,"n_dimuonMass_Up/F");
+	T->Branch("dimuonMass_Down",&n_dimuonMass_Down,"n_dimuonMass_Down/F");
+	T->Branch("dimuonMass_scaleUp",&n_dimuonMass_scaleUp,"n_dimuonMass_scaleUp/F");
+	T->Branch("dimuonMass_scaleDown",&n_dimuonMass_scaleDown,"n_dimuonMass_scaleDown/F");
+	T->Branch("dimuonMass_resoUp",&n_dimuonMass_resoUp,"n_dimuonMass_resoUp/F");
+	T->Branch("dimuonMass_resoDown",&n_dimuonMass_resoDown,"n_dimuonMass_resoDown/F");
    	T->Branch("met",&n_met,"n_met/F");
 	T->Branch("mvamet",&n_mvamet,"n_mvamet/F");
 	T->Branch("leadingPt", &n_leadingPt, "n_leadingPt/F");
+	T->Branch("leadingPt_Up", &n_leadingPt_Up, "n_leadingPt_Up/F");
+	T->Branch("leadingPt_Down", &n_leadingPt_Down, "n_leadingPt_Down/F");
 	T->Branch("trailingPt", &n_trailingPt, "n_trailingPt/F");
+	T->Branch("trailingPt_Up", &n_trailingPt_Up, "n_trailingPt_Up/F");
+	T->Branch("trailingPt_Down", &n_trailingPt_Down, "n_trailingPt_Down/F");
 	T->Branch("leadingEta", &n_leadingEta, "n_leadingEta/F");
 	T->Branch("trailingEta", &n_trailingEta, "n_trailingEta/F");
 	T->Branch("leadingPhi", &n_leadingPhi, "n_leadingPhi/F");
@@ -707,13 +751,35 @@ int main(int argc, char * argv[]) {
 	T->Branch("genAccept", &n_genAccept, "genAccept/O");
 	T->Branch("mva_BDT", &n_mva_BDT, "n_mva_BDT/F");
 	T->Branch("m_sv", &n_m_sv, "n_m_sv/F");
+	T->Branch("m_sv_Up", &n_m_sv_Up, "n_m_sv_Up/F");
+	T->Branch("m_sv_Down", &n_m_sv_Down, "n_m_sv_Down/F");
+	T->Branch("m_sv_scaleUp", &n_m_sv_scaleUp, "n_m_sv_scaleUp/F");
+	T->Branch("m_sv_scaleDown", &n_m_sv_scaleDown, "n_m_sv_scaleDown/F");
+	T->Branch("m_sv_resoUp", &n_m_sv_resoUp, "n_m_sv_resoUp/F");
+	T->Branch("m_sv_resoDown", &n_m_sv_resoDown, "n_m_sv_resoDown/F");
 	T->Branch("pt_sv", &n_pt_sv, "n_pt_sv/F");
 	T->Branch("eta_sv", &n_eta_sv, "n_eta_sv/F");
 	T->Branch("phi_sv", &n_phi_sv, "n_phi_sv/F");
 	T->Branch("covmetxx",&n_covmet_xx,"n_covmet_xx/F");
 	T->Branch("covmetxy",&n_covmet_xy,"n_covmet_xy/F");
 	T->Branch("covmetyy",&n_covmet_yy,"n_covmet_yy/F");
-	  
+	T->Branch("mcweight", &n_mcweight, "n_mcweight/F");
+	T->Branch("puweight", &n_puweight, "n_puweight/F");
+	T->Branch("trigweight_1", &n_trigweight_1, "n_trigweight_1/F");
+	T->Branch("trigweight_2", &n_trigweight_2, "n_trigweight_1/F");
+	T->Branch("trigweight", &n_trigweight, "n_trigweight/F");
+	T->Branch("weightTrig", &n_weightTrig, "n_weightTrig/F");
+	T->Branch("idweight_1", &n_idweight_1, "n_idweight_1/F");
+	T->Branch("idweight_2", &n_idweight_2, "n_idweight_2/F");
+	T->Branch("isoweight_1", &n_isoweight_1, "n_isoweight_1/F");
+	T->Branch("isoweight_2", &n_isoweight_2, "n_isoweight_2/F");
+	T->Branch("effweight", &n_effweight, "n_effweight/F");
+	//T->Branch("fakeweight", &n_fakeweight, "n_fakeweight/F");
+	//T->Branch("embeddedWeight", &n_embeddedWeight, "n_embeddedWeight/F");
+	//T->Branch("signalWeight", &n_signalWeight, "n_signalWeight/F");
+	T->Branch("topptweight", &n_topptweight, "n_topptweight/F");
+	T->Branch("weight", &n_weight, "n_weight/F");
+	
 	//This loads the library
 	TMVA::Tools::Instance();
 	
@@ -980,20 +1046,33 @@ int main(int argc, char * argv[]) {
 			
 			//weights
 			
-			//Float_t mcweight = analysisTree.genweight;
+		    n_mcweight = analysisTree.genweight;
 			Float_t PUweight = 1;
+			//n_puweight = 1;
+			//n_trigweight_1 = 1;
 			Float_t trigweight_1 = 1;
+			//n_trigweight_2 = 1;
 			Float_t trigweight_2 = 1;
+			//n_trigweight = 1;
 			Float_t trigweight = 1;
+			//n_weightTrig = 1;
+			Float_t weightTrig = 1;
+			//n_idweight_1 = 1;
 			Float_t idweight_1 = 1;
+			//n_idweight_2 = 1;
 			Float_t idweight_2 = 1;
+			//n_isoweight_1 = 1;
 			Float_t isoweight_1 = 1;
+			//n_isoweight_2 = 1;
 			Float_t isoweight_2 = 1;
+			//n_effweight = 1;
 			Float_t effweight = 1;
-			Float_t fakeweight = 1;
-			Float_t embeddedWeight = 1;
-			Float_t signalWeight = 1;
-			//Float_t weight = 1;
+			//n_fakeweight = 1;
+			//n_embeddedWeight = 1;
+			//n_signalWeight = 1;
+			//n_topptweight = 1;
+			Float_t topptweight = 1;
+			//n_weight = 1;
 			
 			TLorentzVector genZ; genZ.SetXYZT(0,0,0,91.2); 
 			TLorentzVector genV; genV.SetXYZT(0,0,0,0);
@@ -1086,6 +1165,10 @@ int main(int argc, char * argv[]) {
 				if (applyPUreweighting_official) {
 					nTruePUInteractionsH->Fill(analysisTree.numtruepileupinteractions,weight);
 					PUweight = float(PUofficial->get_PUweight(double(analysisTree.numtruepileupinteractions)));
+					
+					n_puweight = float(PUweight);
+					//std::cout << "puweight = "<< n_puweight << std::endl;
+					 
 					weight *= float(PUweight);
 					PUweightsOfficialH->Fill(PUweight);
 				}
@@ -1144,8 +1227,10 @@ int main(int argc, char * argv[]) {
 	    
 				  }
 				  if (topPt>0&&antitopPt>0) {
-				    float topptweight = topPtWeight(topPt,antitopPt);
-				    //	    cout << "toppt = " << topPt << "   antitoppt = " << antitopPt << "   weight = " << topptweight << endl;
+				    topptweight = topPtWeight(topPt,antitopPt);
+				    cout << "toppt = " << topPt << "   antitoppt = " << antitopPt << "   weight = " << topptweight << endl;
+					n_topptweight = topptweight;
+					//std::cout << "n_topptweight = " << n_topptweight << std::endl;
 				    weight *= topptweight;
 				  }
 				}
@@ -1443,12 +1528,28 @@ int main(int argc, char * argv[]) {
 								analysisTree.muon_py[indx1],
 								analysisTree.muon_pz[indx1],
 								muonMass);
-				
+				TLorentzVector mu1_Up; mu1_Up.SetXYZM((1.00 + muonScale)*analysisTree.muon_px[indx1],
+								(1.00 + muonScale)*analysisTree.muon_py[indx1],
+								(1.00 + muonScale)*analysisTree.muon_pz[indx1],
+								muonMass);
+				TLorentzVector mu1_Down; mu1_Down.SetXYZM((1.00 - muonScale)*analysisTree.muon_px[indx1],
+								(1.00 - muonScale)*analysisTree.muon_py[indx1],
+							    (1.00 - muonScale)*analysisTree.muon_pz[indx1],
+								muonMass);
+								
 				TLorentzVector mu2; mu2.SetXYZM(analysisTree.muon_px[indx2],
 								analysisTree.muon_py[indx2],
 								analysisTree.muon_pz[indx2],
 								muonMass);
-
+				TLorentzVector mu2_Up; mu2_Up.SetXYZM((1.00 + muonScale)*analysisTree.muon_px[indx2],
+								(1.00 + muonScale)*analysisTree.muon_py[indx2],
+								(1.00 + muonScale)*analysisTree.muon_pz[indx2],
+								muonMass);
+				TLorentzVector mu2_Down; mu2_Down.SetXYZM((1.00 - muonScale)*analysisTree.muon_px[indx2],
+								(1.00 - muonScale)*analysisTree.muon_py[indx2],
+								(1.00 - muonScale)*analysisTree.muon_pz[indx2],
+								muonMass);				
+												
 				TLorentzVector genZ;// genZ.SetXYZM(0,0,0,91.2);
 				TLorentzVector gen_mu1;
 				TLorentzVector gen_mu2;
@@ -1595,6 +1696,8 @@ int main(int argc, char * argv[]) {
 				
 				
 				TLorentzVector dimuon = mu1 + mu2;
+				TLorentzVector dimuon_Up = mu1_Up + mu2_Up;
+				TLorentzVector dimuon_Down = mu1_Down + mu2_Down;
 				float visZPx=dimuon.Px();
 				float visZPy=dimuon.Py();
 				
@@ -1621,22 +1724,31 @@ int main(int argc, char * argv[]) {
 						//double IdIsoSF_mu2 = SF_muonIdIso->get_ScaleFactor(ptMu2, etaMu2);
 						
 						isoweight_1=(float)SF_muonIdIso->get_ScaleFactor(ptMu1, etaMu1);
+						n_isoweight_1 = isoweight_1;
+						//std::cout << "isoweight_1 = "<< n_isoweight_1 <<std::endl;
 						isoweight_2=(float)SF_muonIdIso->get_ScaleFactor(ptMu2, etaMu2);
+						n_isoweight_2 = isoweight_2;
+						//std::cout << "isoweight_2 = "<< n_isoweight_2 <<std::endl;
 						
 						MuSF_IdIso_Mu1H->Fill(isoweight_1);
 						MuSF_IdIso_Mu2H->Fill(isoweight_2);
 						
 						weight = weight*isoweight_1*isoweight_2;
 						
-						double effDataTrig1 = SF_muonTrig->get_EfficiencyData(ptMu1, etaMu1);  
-						double effDataTrig2 = SF_muonTrig->get_EfficiencyData(ptMu2, etaMu2);  
+						//double effDataTrig1 = SF_muonTrig->get_EfficiencyData(ptMu1, etaMu1);  
+						float effDataTrig1 = SF_muonTrig->get_EfficiencyData(ptMu1, etaMu1); 
+						//double effDataTrig2 = SF_muonTrig->get_EfficiencyData(ptMu2, etaMu2);
+						float effDataTrig2 = SF_muonTrig->get_EfficiencyData(ptMu2, etaMu2);  
 
-						double effMcTrig1 = SF_muonTrig->get_EfficiencyMC(ptMu1, etaMu1);  
-						double effMcTrig2 = SF_muonTrig->get_EfficiencyMC(ptMu2, etaMu2);  
-
-						double effTrigData = 1 - (1-effDataTrig1)*(1-effDataTrig2);
-						double effMcTrig = 1 - (1-effMcTrig1)*(1-effMcTrig2);
-
+						//double effMcTrig1 = SF_muonTrig->get_EfficiencyMC(ptMu1, etaMu1);  
+						float effMcTrig1 = SF_muonTrig->get_EfficiencyMC(ptMu1, etaMu1);
+						//double effMcTrig2 = SF_muonTrig->get_EfficiencyMC(ptMu2, etaMu2);  
+						float effMcTrig2 = SF_muonTrig->get_EfficiencyMC(ptMu2, etaMu2);
+						
+						//double effTrigData = 1 - (1-effDataTrig1)*(1-effDataTrig2);
+						float effTrigData = 1 - (1-effDataTrig1)*(1-effDataTrig2);
+						//double effMcTrig = 1 - (1-effMcTrig1)*(1-effMcTrig2);
+						float effMcTrig = 1 - (1-effMcTrig1)*(1-effMcTrig2);
 						
 						float Mu17EffData1 = (float)SF_muon17->get_EfficiencyData(ptMu1,etaMu1);
 						float Mu17EffMC1   = (float)SF_muon17->get_EfficiencyMC(ptMu1,etaMu1);
@@ -1657,28 +1769,37 @@ int main(int argc, char * argv[]) {
 							if (isMu1LowPtmatched && isMu2HighPtmatched) {
 								trigweight_1 = (float)SF_muon17->get_ScaleFactor(ptMu1,etaMu1);
 								trigweight_2 = (float)SF_muon8->get_ScaleFactor(ptMu2,etaMu2);
+								n_trigweight_1= trigweight_1;
+								n_trigweight_2= trigweight_2;
 							}
 							
 							else if (isMu2LowPtmatched && isMu1HighPtmatched){
 								trigweight_1 = (float)SF_muon17->get_ScaleFactor(ptMu1,etaMu1);
 								trigweight_2 = (float)SF_muon8->get_ScaleFactor(ptMu2,etaMu2);
+								n_trigweight_1= trigweight_1;
+								n_trigweight_2= trigweight_2;
 							}
 							
-							if (trigWeightMC>1e-6)
+							if (trigWeightMC>1e-6){
 								trigweight = trigWeightData / trigWeightMC;
+								n_trigweight = trigweight;
+							}
 							
 							effweight = isoweight_1*isoweight_2*trigweight;
+							n_effweight = effweight;
 							weight = weight*effweight;
 						}
 						
 						else
 						  if (effTrigData>0 && effMcTrig>0) {
-						  double weightTrig = effTrigData/effMcTrig;
+						  	//double weightTrig = effTrigData/effMcTrig;
+							  weightTrig = effTrigData/effMcTrig;
+							  n_weightTrig = weightTrig;
 						  // std::cout << "mu 1 ->  pt = " << ptMu1 << "   eta = " << etaMu1 << std::endl;
 						  // std::cout << "mu 2 ->  pt = " << ptMu2 << "   eta = " << etaMu2 << std::endl;
 						  // std::cout << "WeightTrig = " << weightTrig << std::endl;
-						  weight = weight*weightTrig;
-						}
+							  weight = weight*weightTrig;
+						  }	
 						
 						
 						
@@ -1759,6 +1880,8 @@ int main(int argc, char * argv[]) {
 					//	std::cout << "After  corrections : MetX = " << pfmet_ex << "   MetY = " << pfmet_ey << "   Met_Phi = " << pfmet_phi << std::endl;
 				}
 				float massSel = dimuon.M();
+				float massSel_Up = dimuon_Up.M();
+				float massSel_Down = dimuon_Down.M();
 				
 				//bisector of dimuon transerve momenta for defining the dzeta variables
 				float mu1UnitX = mu1.Px()/mu1.Pt();
@@ -2015,11 +2138,24 @@ int main(int argc, char * argv[]) {
 					n_DZeta = DZeta;
 					n_genWeight = weight;
 					n_dimuonMass = massSel;
+					n_dimuonMass_Up = massSel_Up;
+					n_dimuonMass_Down = massSel_Down;
+					n_dimuonMass_scaleUp = massSel;
+					n_dimuonMass_scaleDown = massSel;
+					n_dimuonMass_resoUp = massSel;
+					n_dimuonMass_resoDown = massSel;
 					n_met= pfmet;
 					n_mvamet= mvamet;
+					n_weight = weight;
 					if(analysisTree.muon_pt[indx1]>analysisTree.muon_pt[indx2]){
 					  n_leadingPt = analysisTree.muon_pt[indx1];
+					  n_leadingPt_Up = (1+muonScale)* n_leadingPt;
+					  n_leadingPt_Down = (1-muonScale)* n_leadingPt;
+					  
 					  n_trailingPt = analysisTree.muon_pt[indx2];
+					  n_trailingPt_Up =(1+muonScale)*n_trailingPt;
+					  n_trailingPt_Down = (1-muonScale)*n_trailingPt;
+					  
 					  n_leadingEta = analysisTree.muon_eta[indx1];
 					  n_trailingEta = analysisTree.muon_eta[indx2];
 					  n_leadingPhi = analysisTree.muon_phi[indx1];
@@ -2027,7 +2163,12 @@ int main(int argc, char * argv[]) {
 					}
 					else{
 					  n_leadingPt = analysisTree.muon_pt[indx2];
+					  n_leadingPt_Up = (1+muonScale)* n_leadingPt;
+					  n_leadingPt_Down = (1-muonScale)* n_leadingPt;
+					 
 					  n_trailingPt = analysisTree.muon_pt[indx1];
+					  n_trailingPt_Up =(1+muonScale)*n_trailingPt;
+					  n_trailingPt_Down = (1-muonScale)*n_trailingPt;
 					  n_leadingEta = analysisTree.muon_eta[indx2];
 					  n_trailingEta = analysisTree.muon_eta[indx1];
 					  n_leadingPhi = analysisTree.muon_phi[indx2];
@@ -2092,6 +2233,13 @@ int main(int argc, char * argv[]) {
 					  n_pt_sv = algo.pt(); 
 					  n_eta_sv = algo.eta();
 					  n_phi_sv = algo.phi();
+					  	
+					  n_m_sv_Up = n_m_sv;
+					  n_m_sv_Down = n_m_sv;
+					  n_m_sv_scaleUp = n_m_sv;
+					  n_m_sv_scaleDown = n_m_sv;
+					  n_m_sv_resoUp = n_m_sv;
+					  n_m_sv_resoDown = n_m_sv;
 					  
 					  
 					}
