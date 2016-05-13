@@ -2159,7 +2159,7 @@ int main(int argc, char * argv[]) {
 					  n_leadingEta = analysisTree.muon_eta[indx1];
 					  n_trailingEta = analysisTree.muon_eta[indx2];
 					  n_leadingPhi = analysisTree.muon_phi[indx1];
-					  n_leadingPhi = analysisTree.muon_phi[indx2];
+					  n_trailingPhi = analysisTree.muon_phi[indx2];
 					}
 					else{
 					  n_leadingPt = analysisTree.muon_pt[indx2];
@@ -2172,7 +2172,7 @@ int main(int argc, char * argv[]) {
 					  n_leadingEta = analysisTree.muon_eta[indx2];
 					  n_trailingEta = analysisTree.muon_eta[indx1];
 					  n_leadingPhi = analysisTree.muon_phi[indx2];
-					  n_leadingPhi = analysisTree.muon_phi[indx1];
+					  n_trailingPhi = analysisTree.muon_phi[indx1];
 					}
 					n_jets = double(nJets30);
 					n_noOfvertices = analysisTree.primvertex_count;
