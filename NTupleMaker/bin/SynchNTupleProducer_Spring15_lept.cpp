@@ -85,7 +85,7 @@ void counting_jets(const AC1B *analysisTree, Spring15Tree *otree, const Config *
 int main(int argc, char * argv[]){
 
   // first argument - config file for analysis
-  // second argument - config file for process
+  // second argument - file list 
   // third argument - channel ("et" or "mt")
   // third argument - index of first file to run on (optional, ignored if only one file is used)
   // fourth argument - index of last file to run on (optional, ignored if only one file is used)
@@ -511,12 +511,10 @@ int main(int argc, char * argv[]){
 
         float lep_pt, lep_pt_max, lep_eta, lep_phi;
         if(ch=="mt"){
-          lep_pt_max =  analysisTree.muon_pt[leptonIndex];
           lep_pt =      analysisTree.muon_pt[lIndex]; 
           lep_eta =     analysisTree.muon_eta[lIndex]; 
           lep_phi =     analysisTree.muon_phi[lIndex];}
-        if(ch=="et"){
-          lep_pt_max =  analysisTree.electron_pt[leptonIndex];          
+        if(ch=="et"){         
           lep_pt =      analysisTree.electron_pt[lIndex];
           lep_eta =     analysisTree.electron_eta[lIndex]; 
           lep_phi =     analysisTree.electron_phi[lIndex];}
@@ -538,6 +536,9 @@ int main(int argc, char * argv[]){
           float absIsoTau = analysisTree.tau_byIsolationMVArun2v1DBoldDMwLTraw[tIndex];
           float relIsoTau = absIsoTau / analysisTree.tau_pt[tIndex];
 
+          if(ch=="mt"){lep_pt_max =  analysisTree.muon_pt[leptonIndex];}
+          if(ch=="et"){lep_pt_max =  analysisTree.electron_pt[leptonIndex];}
+
           float dR = deltaR(analysisTree.tau_eta[tIndex],analysisTree.tau_phi[tIndex],
                 lep_eta, lep_phi);
 
@@ -548,28 +549,38 @@ int main(int argc, char * argv[]){
           if (lep_pt<=ptLeptonHighCut) continue;
           
           // change pair
-
+//        cout<<iEntry<<". "<<lIndex<<", "<<tauIndex<<". "<<lep_pt<<" - "<<lep_pt_max;
           bool changePair =  false;
           if (relIsoLep<isoLepMin) {
+//          cout<<"ele iso - ";
+
             changePair = true;
           }
           else if (fabs(relIsoLep - isoLepMin) < 1.e-5) {
             if (lep_pt > lep_pt_max) {
+//            cout<<"ele pt - "; 
+
               changePair = true;
             }     
             else if (fabs(lep_pt - lep_pt_max) < 1.e-5) {
               if (absIsoTau > isoTauMin) {    // -->>> changed here, before was "<" 
+//                cout<<"tau iso - "; 
+
                 changePair = true;
               }
               else if ((absIsoTau - isoTauMin) < 1.e-5){
                 if (analysisTree.tau_pt[tIndex] > analysisTree.tau_pt[tauIndex]) {
+//                cout<<"tau pt"; 
+
                   changePair = true;
                 }
               }
             }
           }
-          
+//        cout<<endl;
+
           if (changePair){
+
             isoLepMin  = relIsoLep;
             leptonIndex = lIndex;
             isoTauMin = absIsoTau;
@@ -580,7 +591,7 @@ int main(int argc, char * argv[]){
       
       if (leptonIndex<0) continue;
       if (tauIndex<0) continue;
-
+//      cout << "Selected Pair (e,tau) = "<<leptonIndex<<", "<<tauIndex<<std::endl;
 
       //filling variables
       TLorentzVector leptonLV;
