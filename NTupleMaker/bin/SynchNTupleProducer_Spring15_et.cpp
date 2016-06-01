@@ -573,7 +573,7 @@ int main(int argc, char * argv[]) {
 	fileOutput << " # selected electron = " << electrons.size() << std::endl;
 	fileOutput << " # selected taus = " << taus.size() << std::endl;	
       }
-      
+
       if (electrons.size()==0) continue;
       if (taus.size()==0) continue;
 
@@ -583,6 +583,7 @@ int main(int argc, char * argv[]) {
       
       float isoEleMin = 1e+10;
       float isoTauMin = 1e+10;      
+
       for (unsigned int ie=0; ie<electrons.size(); ++ie) {
 	unsigned int eIndex  = electrons.at(ie);
 
@@ -638,36 +639,33 @@ int main(int argc, char * argv[]) {
 
 	  // kinematic match
 	  if (analysisTree.electron_pt[eIndex]<=ptElectronHighCut) continue;
-
+//    cout<<iEntry<<". "<<eIndex<<", "<<tauIndex<<". "<<analysisTree.electron_pt[eIndex]<<" - "<<analysisTree.electron_pt[electronIndex];
 	  // change pair
 	  bool changePair =  false;
 	  if (relIsoEle<isoEleMin) {
-	    if(debug)
-	      fileOutput<<"ChangePair ele iso"<<std::endl;
+//	    cout<<"ele iso - ";
 	    changePair = true;
 	  }
 	  else if (fabs(relIsoEle - isoEleMin) < 1.e-5) {
 	    if (analysisTree.electron_pt[eIndex] > analysisTree.electron_pt[electronIndex]) {
-	      if(debug)
-		fileOutput<<"ChangePair ele pt"<<std::endl; 
+//	      cout<<"ele pt - "; 
 	      changePair = true;
 	    }	    
 	    else if (fabs(analysisTree.electron_pt[eIndex] - analysisTree.electron_pt[electronIndex]) < 1.e-5) {
 	      if (absIsoTau > isoTauMin) {
-		if(debug)
-		  fileOutput<<"ChangePair tau iso"<<std::endl; 
+//		cout<<"tau iso - "; 
 		changePair = true;
 	      }
 	      else if ((absIsoTau - isoTauMin) < 1.e-5){
 		if (analysisTree.tau_pt[tIndex] > analysisTree.tau_pt[tauIndex]) {
-		  if(debug)
-		    fileOutput<<"ChangePair tau pt"<<std::endl; 
+//		 cout<<"tau pt"; 
 		  changePair = true;
 		}
 	      }
 	    }
 	  }
-	  
+//  cout<<endl;
+
 	  if (changePair){
 	    isoEleMin  = relIsoEle;
 	    electronIndex = eIndex;
@@ -676,12 +674,10 @@ int main(int argc, char * argv[]) {
 	  }
 	}
       }
-    
       if (electronIndex<0) continue;
       if (tauIndex<0) continue;
       
-      if(debug)
-	fileOutput << "Selected Pair (e,tau) = "<<electronIndex<<", "<<tauIndex<<std::endl;
+//    	cout << "Selected Pair (e,tau) = "<<electronIndex<<", "<<tauIndex<<std::endl;
 
       // filling electron variables
       otree->pt_1 = analysisTree.electron_pt[electronIndex];
