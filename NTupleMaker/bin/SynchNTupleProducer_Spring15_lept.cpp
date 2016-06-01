@@ -117,6 +117,9 @@ int main(int argc, char * argv[]){
     read_json(TString(TString(cmsswBase)+"/src/"+TString(json_name)).Data(), json);
   }
 
+  const bool ApplyPUweight = cfg.get<bool>("ApplyPUweight"); 
+  const bool ApplyLepSF = cfg.get<bool>("ApplyLepSF"); 
+
   //pileup distrib
   const string pileUpInDataFile = cfg.get<string>("pileUpInDataFile");
   const string pileUpInMCFile = cfg.get<string>("pileUpInMCFile");
@@ -124,6 +127,7 @@ int main(int argc, char * argv[]){
   //lep eff
   const string idIsoEffFile = cfg.get<string>("idIsoEffFile");
   const string trigEffFile = cfg.get<string>("trigEffFile");
+  
 
   //svfit
   const string svFitPtResFile = cfg.get<string>("svFitPtResFile");
@@ -292,21 +296,26 @@ int main(int argc, char * argv[]){
 
   // PU reweighting - initialization
   PileUp * PUofficial = new PileUp();
-  TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/"+TString(pileUpInDataFile),"read");
-  TFile * filePUdistribution_MC = new TFile (TString(cmsswBase)+"/src/"+TString(pileUpInMCFile), "read");
-  TH1D * PU_data = (TH1D *)filePUdistribution_data->Get("pileup");
-  TH1D * PU_mc = (TH1D *)filePUdistribution_MC->Get("pileup");
-  PUofficial->set_h_data(PU_data);
-  PUofficial->set_h_MC(PU_mc);
+  if(ApplyPUweight){
+    TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/"+TString(pileUpInDataFile),"read");
+    TFile * filePUdistribution_MC = new TFile (TString(cmsswBase)+"/src/"+TString(pileUpInMCFile), "read");
+    TH1D * PU_data = (TH1D *)filePUdistribution_data->Get("pileup");
+    TH1D * PU_mc = (TH1D *)filePUdistribution_MC->Get("pileup");
+    PUofficial->set_h_data(PU_data);
+    PUofficial->set_h_MC(PU_mc);
+  }  
 
   // Lepton Scale Factors
   // Lepton Id+Iso scale factor
   ScaleFactor * SF_lepIdIso = new ScaleFactor();
-  SF_lepIdIso->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(idIsoEffFile));
-
-  // Electron SingleElectron trigger scale factor
   ScaleFactor * SF_lepTrigger = new ScaleFactor();
-  SF_lepTrigger->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(trigEffFile));
+
+  if(ApplyLepSF){
+    SF_lepIdIso->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(idIsoEffFile));
+  
+    // Electron SingleElectron trigger scale factor
+    SF_lepTrigger->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(trigEffFile));
+  }
 
   // output fileName with histograms
   rootFileName += "_";
@@ -432,7 +441,7 @@ int main(int argc, char * argv[]){
       	continue;
       
       // weights
-      fill_weight(&analysisTree, otree, PUofficial, isData);
+      if(ApplyPUweight) fill_weight(&analysisTree, otree, PUofficial, isData);
       
       otree->npv = analysisTree.primvertex_count;
       otree->npu = analysisTree.numtruepileupinteractions;// numpileupinteractions;
@@ -604,7 +613,7 @@ int main(int argc, char * argv[]){
 					    analysisTree.muon_pz[leptonIndex],
 					    muonMass);
 
-        if (!isData) {
+        if (!isData && ApplyLepSF) {
               // Scale Factor SingleEle trigger SF_eleTrigger
           otree->trigweight_1 = (SF_lepTrigger->get_ScaleFactor(double(analysisTree.muon_pt[leptonIndex]),double(analysisTree.muon_eta[leptonIndex])));
               // Scale Factor Id+Iso SF_eleIdIso
@@ -620,7 +629,7 @@ int main(int argc, char * argv[]){
 						    analysisTree.electron_pz[leptonIndex],
 						    electronMass);
 
-        if (!isData) {
+        if (!isData && ApplyLepSF) {
                 // Scale Factor SingleEle trigger SF_eleTrigger
           otree->trigweight_1 = (SF_lepTrigger->get_ScaleFactor(double(analysisTree.electron_pt[leptonIndex]),double(analysisTree.electron_eta[leptonIndex])));
                 // Scale Factor Id+Iso SF_eleIdIso
