@@ -1,0 +1,4 @@
+{
+"mvis" : {"var":"m_vis", "nbins":35, "xmin":0, "xmax":350, "xtit":"m_{vis} [GeV]", "ytit": "Events / 10 GeV"},
+"msv" : {"var":"m_sv", "nbins":35, "xmin":0, "xmax":350, "xtit":"m_{SV} [GeV]", "ytit": "Events / 10 GeV"}
+}

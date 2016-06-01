@@ -307,7 +307,10 @@ class NTupleMaker : public edm::EDAnalyzer{
 
   vector<string> cHLTriggerPaths;
   string cTriggerProcess;
-
+  
+  vector<string> cFlags;
+  string cFlagsProcess;
+  
   double cMuPtMin;
   double cMuEtaMax;
   vector<string> cMuHLTriggerMatching;
@@ -408,7 +411,9 @@ class NTupleMaker : public edm::EDAnalyzer{
   vector<int> HLTriggerIndexSelection;
   vector<int> tauIndexSelection;
   vector<int> DiTauIndex;
-
+  
+  edm::Handle<edm::TriggerResults> Flags;  
+  
   math::XYZPoint pv_position;
   Vertex primvertex;
 
@@ -1023,6 +1028,9 @@ class NTupleMaker : public edm::EDAnalyzer{
   std::map<std::string, int>* hltriggerresults_;
   std::map<std::string, int>* hltriggerprescales_;
   std::vector<std::string>hltriggerresultsV_;
+  
+  std::map<std::string, int>* flags_;
+  
   float embeddingWeight_;
   //std::vector< double > embeddingWeights_; //for RhEmb
   //float TauSpinnerWeight_;

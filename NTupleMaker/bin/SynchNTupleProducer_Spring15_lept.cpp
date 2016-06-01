@@ -741,9 +741,9 @@ int main(int argc, char * argv[]){
 			                     otree->mvamet_rcmr, otree->mvametphi_rcmr
 			                     );
 			             
-			otree->mt_rcmr_1 = genTools::mt(otree->pt_1, otree->phi_1, otree->mvamet_rcmr, otree->mvametphi_rcmr);
-			otree->mt_rcmr_2 = genTools::mt(otree->pt_2, otree->phi_2, otree->mvamet_rcmr, otree->mvametphi_rcmr);     
-			otree->pzetamiss_rcmr = genTools::pzetamiss( zetaX, zetaY, otree->mvamet_rcmr, otree->mvametphi_rcmr);
+			otree->mt_rcmr_1 = calc::mt(otree->pt_1, otree->phi_1, otree->mvamet_rcmr, otree->mvametphi_rcmr);
+			otree->mt_rcmr_2 = calc::mt(otree->pt_2, otree->phi_2, otree->mvamet_rcmr, otree->mvametphi_rcmr);     
+			otree->pzetamiss_rcmr = calc::pzetamiss( zetaX, zetaY, otree->mvamet_rcmr, otree->mvametphi_rcmr);
 
 			//end MET Recoil Corrections
 

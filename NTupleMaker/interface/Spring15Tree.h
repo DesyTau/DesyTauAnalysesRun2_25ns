@@ -39,6 +39,7 @@ public :
   Float_t         trigweight_2;
   Float_t         idisoweight_1;
   Float_t         idisoweight_2;
+  Float_t         topptweight;
   Float_t         effweight;
   Float_t         fakeweight;
   Float_t         embeddedWeight;
@@ -46,11 +47,22 @@ public :
   Float_t         weight;
   Float_t         lheHt;
   Int_t           gen_noutgoing;
+  Int_t           njetshad;
+  Float_t         genV_px;
+  Float_t         genV_py; 
+  Float_t         genV_pz;
+  Float_t         genV_e;
+  Float_t         genL_px;
+  Float_t         genL_py; 
+  Float_t         genL_pz;
+  Float_t         genL_e;
   Float_t         m_vis;
   Float_t         m_sv;
   Float_t         pt_sv;
   Float_t         eta_sv;
   Float_t         phi_sv;
+  Float_t         met_sv;
+  Float_t         mt_sv;
   Float_t         pt_1;
   Float_t         phi_1;
   Float_t         eta_1;
@@ -74,6 +86,7 @@ public :
   Float_t         pfmt_rc_njetsreco_1;
   Float_t         mt_rc_visreco_1;
   Float_t         pfmt_rc_visreco_1;
+  Int_t 	  tau_decay_mode_1;
   Float_t         pt_2;
   Float_t         phi_2;
   Float_t         eta_2;
@@ -179,7 +192,6 @@ public :
   Float_t         mva_gf;
   Int_t           njets;
   Int_t           njetspt20;
-  Int_t           njetshad;
   Float_t         jpt_1;
   Float_t         jeta_1;
   Float_t         jphi_1;
@@ -218,18 +230,30 @@ public :
   TBranch        *b_trigweight_2;   //!
   TBranch        *b_idisoweight_1;   //!
   TBranch        *b_idisoweight_2;   //!
-  TBranch        *b_effweight;   //!
+  TBranch        *b_topptweight;   //! 
+  TBranch        *b_effweight;   //! 
   TBranch        *b_fakeweight;   //!
   TBranch        *b_embeddedWeight;   //!
   TBranch        *b_signalWeight;   //!
   TBranch        *b_weight;   //!
   TBranch        *b_lheHt;   //!
   TBranch        *b_gen_noutgoing;   //!  
+  TBranch        *b_njetshad;   //!  
+  TBranch        *b_genV_px;    //!
+  TBranch        *b_genV_py;    //!  
+  TBranch        *b_genV_pz;    //!
+  TBranch        *b_genV_e;    //!
+  TBranch        *b_genL_px;    //!
+  TBranch        *b_genL_py;    //!  
+  TBranch        *b_genL_pz;    //!
+  TBranch        *b_genL_e;    //!
   TBranch        *b_m_vis;   //!
   TBranch        *b_m_sv;   //!
   TBranch        *b_pt_sv;   //!
   TBranch        *b_eta_sv;   //!
   TBranch        *b_phi_sv;   //!
+  TBranch        *b_met_sv;   //!
+  TBranch        *b_mt_sv;   //!  
   TBranch        *b_pt_1;   //!
   TBranch        *b_phi_1;   //!
   TBranch        *b_eta_1;   //!
@@ -253,6 +277,7 @@ public :
   TBranch        *b_pfmt_rc_njetsreco_1;   //!
   TBranch        *b_mt_rc_visreco_1;   //!
   TBranch        *b_pfmt_rc_visreco_1;   //!
+  TBranch        *b_tau_decay_mode_1;   //!
   TBranch        *b_pt_2;   //!
   TBranch        *b_phi_2;   //!
   TBranch        *b_eta_2;   //!
@@ -358,7 +383,6 @@ public :
   TBranch        *b_mva_gf;   //!
   TBranch        *b_njets;   //!
   TBranch        *b_njetspt20;   //!
-  TBranch        *b_njetshad;   //!  
   TBranch        *b_jpt_1;   //!
   TBranch        *b_jeta_1;   //!
   TBranch        *b_jphi_1;   //!

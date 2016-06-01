@@ -1,0 +1,4 @@
+{
+    "inclusivemt30" : "pt_1>19 && pt_2>20 && iso_1 < 0.1 && againstElectronVLooseMVA6_2>0.5 && againstMuonTight3_2>0.5 && byTightIsolationMVArun2v1DBoldDMwLT_2>0.5 && dilepton_veto == 0 && extraelec_veto == 0 && extramuon_veto == 0 && mt_1<30",
+	"inclusivemt40" :  "pt_1>19 && pt_2>20 && iso_1 < 0.1 && againstElectronVLooseMVA6_2>0.5 && againstMuonTight3_2>0.5 && byTightIsolationMVArun2v1DBoldDMwLT_2>0.5 && dilepton_veto == 0 && extraelec_veto == 0 && extramuon_veto == 0 && mt_1<40"
+}

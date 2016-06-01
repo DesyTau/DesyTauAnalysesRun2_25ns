@@ -106,6 +106,11 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
   // triggers
   cHLTriggerPaths(iConfig.getUntrackedParameter<vector<string> >("HLTriggerPaths")),
   cTriggerProcess(iConfig.getUntrackedParameter<string>("TriggerProcess", "HLT")),
+
+  //Flags
+  cFlags(iConfig.getUntrackedParameter<vector<string> >("Flags")),
+  cFlagsProcess(iConfig.getUntrackedParameter<string>("FlagsProcess", "HLT")),
+  
   // muons
   cMuPtMin(iConfig.getUntrackedParameter<double>("RecMuonPtMin", 10.)),
   cMuEtaMax(iConfig.getUntrackedParameter<double>("RecMuonEtaMax", 2.4)),
@@ -243,6 +248,8 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
   consumes<edm::TriggerResults>(edm::InputTag("TriggerResults", "", cTriggerProcess));
   consumes<L1GlobalTriggerReadoutRecord>(edm::InputTag("gtDigis"));
 
+  consumes<edm::TriggerResults>(edm::InputTag("TriggerResults", "", cFlagsProcess));
+  
   consumes<GenEventInfoProduct>(edm::InputTag("generator"));
   consumes<vector<PileupSummaryInfo> >(edm::InputTag("slimmedAddPileupInfo"));
 
@@ -871,6 +878,10 @@ void NTupleMaker::beginJob(){
   tree->Branch("hltriggerprescales", "std::map<std::string, int>", &hltriggerprescales_);
   tree->Branch("hltriggerresultsV", "std::vector<std::string>", &hltriggerresultsV_);
   // tree->Branch("embeddingWeight", &embeddingWeight_, "embeddingWeight/F");
+
+  // add flags
+  flags_ = new std::map<std::string, int>();
+  tree->Branch("flags", "std::map<std::string, int>", &flags_);
   
   lumitree = FS->make<TTree>("AC1Blumi", "AC1Blumi", 1);
   lumitree->Branch("lumi_run", &lumi_run, "lumi_run/i");
@@ -1302,6 +1313,27 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     }
   //  std::cout << std::endl;
 
+  iEvent.getByLabel(edm::InputTag("TriggerResults", "", cFlagsProcess), Flags);
+  assert(Flags.isValid());
+  flags_->clear();
+  const edm::TriggerNames& FlagNames_ = iEvent.triggerNames(*Flags);
+  for(unsigned i = 0 ; i < Flags->size(); i++)
+    {
+      if(!Flags->wasrun(i) )continue;
+      std::string flagName=FlagNames_.triggerName(i);
+      if(cFlags.size() > 0){
+  	for(size_t ip = 0; ip < cFlags.size(); ip++){
+  	  if(flagName.find(cFlags[ip]) != string::npos){
+	    
+  	    flags_->insert(std::pair<string, int>(flagName, Flags->accept(i)));
+	    TString TriggerName(flagName);
+	    	    std::cout << flagName << " : " 
+	    		      << Flags->accept(i) << std::endl;
+  	  }
+  	}
+      }
+    }
+  
   if(cbeamspot)
     {
       edm::Handle<BeamSpot> TheBeamSpot;
@@ -2064,12 +2096,19 @@ bool NTupleMaker::AddGenParticles(const edm::Event& iEvent) {
 	      //		 	  << "   phi = " << (*GenParticles)[i].phi() 
 	      //		 	  << "   status = " << (*GenParticles)[i].status() << std::endl;
 	    }
-	  // Save partons (gluons) 
-	  else if(abs((*GenParticles)[i].pdgId()) == 21)
+	  // Save partons (gluons)
+  	  else if(abs((*GenParticles)[i].pdgId()) == 21)
 	    {
 	      if ((*GenParticles)[i].status()==3 && count_partons)
 		fill = true;
 	    }
+	  // Save photons
+	  else if(abs((*GenParticles)[i].pdgId()) == 22)
+	    {
+	      if ((*GenParticles)[i].status()==44)
+		fill = true;
+	    }
+
 	  // Save all W/Z bosons from Madgraph
 	  else if(abs((*GenParticles)[i].pdgId()) == 23 || abs((*GenParticles)[i].pdgId()) == 24 )
 	    {

@@ -405,6 +405,17 @@ HLTriggerPaths = cms.untracked.vstring(
 'HLT_PFJet140_v'
 ),
 TriggerProcess = cms.untracked.string("HLT"),
+Flags = cms.untracked.vstring(
+  'Flag_HBHENoiseFilter',
+  'Flag_HBHENoiseIsoFilter',
+  'Flag_CSCTightHalo2015Filter',
+  'Flag_EcalDeadCellTriggerPrimitiveFilter',
+  'Flag_goodVertices',
+  'Flag_eeBadScFilter',
+  'Flag_chargedHadronTrackResolutionFilter',
+  'Flag_muonBadTrackFilter'
+),
+FlagsProcess = cms.untracked.string("RECO"),
 # tracks
 RecTrackPtMin = cms.untracked.double(0.5),
 RecTrackEtaMax = cms.untracked.double(2.4),
