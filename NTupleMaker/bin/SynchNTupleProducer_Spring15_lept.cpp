@@ -21,6 +21,8 @@
 #include "TH1D.h"
 #include "TChain.h"
 #include "TMath.h"
+#include "TCanvas.h"
+#include "TError.h"
 
 #include "TLorentzVector.h"
 
@@ -85,12 +87,14 @@ void counting_jets(const AC1B *analysisTree, Spring15Tree *otree, const Config *
 int main(int argc, char * argv[]){
 
   // first argument - config file for analysis
-  // second argument - file list 
+  // second argument - file list (MUST BE IN THE SAME DIRECTORY OF THE EXECUTABLE)
   // third argument - channel ("et" or "mt")
   // third argument - index of first file to run on (optional, ignored if only one file is used)
   // fourth argument - index of last file to run on (optional, ignored if only one file is used)
 
   using namespace std;
+
+  gErrorIgnoreLevel = kFatal;
 
   string cmsswBase = (getenv ("CMSSW_BASE"));
 
@@ -1171,7 +1175,7 @@ void fillMET(TString ch, int leptonIndex, int tauIndex, const AC1B * analysisTre
   otree->puppimetphi = TMath::ATan2(analysisTree->puppimet_ey,analysisTree->puppimet_ex);
 
   // choosing mva met
-  int mva_break;
+/*  int mva_break;
   if (ch=="mt") mva_break = 3;
   	else if (ch=="et") mva_break = 2;
 
@@ -1204,13 +1208,6 @@ void fillMET(TString ch, int leptonIndex, int tauIndex, const AC1B * analysisTre
 		  }
 		}
 
-/*		
-		if ( fabs(analysisTree->mvamet_lep1_pt[iMet] - otree->pt_2) > 0.01 )
-		  std::cout<<"tau pt does not match: tau="<<otree->pt_2<<" tau_mva="<<analysisTree->mvamet_lep1_pt[iMet]<<std::endl;
-		if ( fabs(analysisTree->mvamet_lep2_pt[iMet] - otree->pt_1) > 0.01 )
-		  std::cout<<"lepton pt does not match: lepton="<<otree->pt_1<<" lepton_mva="<<analysisTree->mvamet_lep2_pt[iMet]<<std::endl;
-*/
-
 		float mvamet_x = 0;
 		float mvamet_y = 0;
 		otree->mvacov00 = 0.;
@@ -1240,7 +1237,7 @@ void fillMET(TString ch, int leptonIndex, int tauIndex, const AC1B * analysisTre
 		float mvamet_y2 = mvamet_y * mvamet_y;
 		otree->mvamet = TMath::Sqrt(mvamet_x2+mvamet_y2);
 		otree->mvametphi = TMath::ATan2(mvamet_y,mvamet_x);
-  }
+  }*/
 
 }
 
