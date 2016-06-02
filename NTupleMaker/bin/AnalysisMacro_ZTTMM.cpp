@@ -1283,22 +1283,25 @@ int main(int argc, char * argv[]) {
 			  n_gen_mutaus = muTausLV.size(); 
 
 			  if (n_gen_taus==2&&n_gen_mutaus==2&&n_genZTT_mass>60&&n_genZTT_mass<120) {
-			    float weight1 = (float)SF_muonIdIso->get_ScaleFactor(n_gen_mu1_Pt,fabs(n_gen_mu1_Eta));
-			    float weight2 = (float)SF_muonIdIso->get_ScaleFactor(n_gen_mu2_Pt,fabs(n_gen_mu2_Eta));
-			    float effDataTrig1 = SF_muonTrig->get_EfficiencyData(n_gen_mu1_Pt,fabs(n_gen_mu1_Eta));
-			    float effDataTrig2 = SF_muonTrig->get_EfficiencyData(n_gen_mu2_Pt,fabs(n_gen_mu2_Eta));
-			    float effMcTrig1 = SF_muonTrig->get_EfficiencyMC(n_gen_mu1_Pt,fabs(n_gen_mu1_Eta));
-			    float effMcTrig2 = SF_muonTrig->get_EfficiencyMC(n_gen_mu2_Pt,fabs(n_gen_mu2_Eta));
-
-			    float effTrigData = 1 - (1-effDataTrig1)*(1-effDataTrig2);
-			    float effMcTrig = 1 - (1-effMcTrig1)*(1-effMcTrig2);
-			    float weightTrig = 0;
-			    if (effTrigData>0 && effMcTrig>0) weightTrig = effTrigData/effMcTrig;
-			    float effWeight = weight1*weight2*weightTrig;
+			    //			    std::cout << "Here we are" << std::endl;
 
 			    histZTTGenWeightsH->Fill(0.,n_genWeight);
 			    bool accept = n_gen_mu1_Pt>20 && n_gen_mu2_Pt>10 && fabs(n_gen_mu1_Eta)<2.4 && fabs(n_gen_mu2_Eta)<2.4;
 			    if (accept) {
+
+			      float weight1 = (float)SF_muonIdIso->get_ScaleFactor(n_gen_mu1_Pt,fabs(n_gen_mu1_Eta));
+			      float weight2 = (float)SF_muonIdIso->get_ScaleFactor(n_gen_mu2_Pt,fabs(n_gen_mu2_Eta));
+			      float effDataTrig1 = SF_muonTrig->get_EfficiencyData(n_gen_mu1_Pt,fabs(n_gen_mu1_Eta));
+			      float effDataTrig2 = SF_muonTrig->get_EfficiencyData(n_gen_mu2_Pt,fabs(n_gen_mu2_Eta));
+			      float effMcTrig1 = SF_muonTrig->get_EfficiencyMC(n_gen_mu1_Pt,fabs(n_gen_mu1_Eta));
+			      float effMcTrig2 = SF_muonTrig->get_EfficiencyMC(n_gen_mu2_Pt,fabs(n_gen_mu2_Eta));
+			      
+			      float effTrigData = 1 - (1-effDataTrig1)*(1-effDataTrig2);
+			      float effMcTrig = 1 - (1-effMcTrig1)*(1-effMcTrig2);
+			      float weightTrig = 0;
+			      if (effTrigData>0 && effMcTrig>0) weightTrig = effTrigData/effMcTrig;
+			      float effWeight = weight1*weight2*weightTrig;
+			      
 			      histGenCutsGenWeightsH->Fill(0.,n_genWeight);
 			      histGenCutsWeightsH->Fill(0.,n_genWeight*effWeight);
 			    }
