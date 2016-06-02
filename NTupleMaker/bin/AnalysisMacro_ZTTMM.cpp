@@ -526,6 +526,12 @@ int main(int argc, char * argv[]) {
 	
 	TH1D * inputEventsH = new TH1D("inputEventsH","",1,-0.5,0.5);
    	TH1D * histWeightsH = new TH1D("histWeightsH","",1,-0.5,0.5);
+	TH1D * histZTTWeightsH = new TH1D("histZTTWeightsH","",1,-0.5,0.5);
+	TH1D * histGenCutsWeightsH = new TH1D("histGenCutsWeightsH","",1,-0.5,0.5);
+	TH1D * histRecCutsGenWeightsH = new TH1D("histRecCutsGenWeightsH","",1,-0.5,0.5);
+	TH1D * histRecCutsWeightsH = new TH1D("histRecCutsWeightsH","",1,-0.5,0.5);
+	TH1D * histBDTCutGenWeightsH = new TH1D("histBDTCutGenWeightsH","",1,-0.5,0.5);
+	TH1D * histBDTCutWeightsH = new TH1D("histBDTCutWeightsH","",1,-0.5,0.5);
 	TH1D * histGenWeightH = new TH1D("histGenWeightH","",1,-0.5,0.5);
 	// Histograms after selecting unique dimuon pair
    	TH1D * ptLeadingMuSelH = new TH1D("ptLeadingMuSelH","",100,0,200);
@@ -703,6 +709,10 @@ int main(int argc, char * argv[]) {
 	Float_t n_genZ_Pt;
 	Float_t n_genZ_Eta;
 	Float_t n_genZ_Phi;
+	Float_t n_genZTT_mass;
+	Float_t n_genZTT_Pt;
+	Float_t n_genZTT_Eta;
+	Float_t n_genZTT_Phi;
 	Float_t n_genV_mass;
 	Float_t n_genV_Pt;
 	Float_t n_genV_Eta;
@@ -713,9 +723,32 @@ int main(int argc, char * argv[]) {
 	Float_t n_gen_mu2_Pt;
 	Float_t n_gen_mu2_Eta;
 	Float_t n_gen_mu2_Phi;
+	UInt_t  n_gen_taus;
+	UInt_t  n_gen_mutaus;
 	
 	TTree * TW = new TTree("TW","Weights");
    	TW->Branch("genWeight",&n_genWeight,"n_genWeight/F");
+	TW->Branch("genZ_mass", &n_genZ_mass, "n_genZ_mass/F");
+	TW->Branch("genZ_Pt", &n_genZ_Pt, "n_genZ_Pt/F");
+	TW->Branch("genZ_Eta", &n_genZ_Eta, "n_genZ_Eta/F");
+	TW->Branch("genZ_Phi", &n_genZ_Phi, "n_genZ_Phi/F");
+	TW->Branch("genZTT_mass", &n_genZTT_mass, "n_genZTT_mass/F");
+	TW->Branch("genZTT_Pt", &n_genZTT_Pt, "n_genZTT_Pt/F");
+	TW->Branch("genZTT_Eta", &n_genZTT_Eta, "n_genZTT_Eta/F");
+	TW->Branch("genZTT_Phi", &n_genZTT_Phi, "n_genZTT_Phi/F");
+	TW->Branch("genV_mass", &n_genV_mass, "n_genV_mass/F");
+	TW->Branch("genV_Pt", &n_genV_Pt, "n_genV_Pt/F");
+	TW->Branch("genV_Eta", &n_genV_Eta, "n_genV_Eta/F");
+	TW->Branch("genV_Phi", &n_genV_Phi, "n_genV_Phi/F");
+	TW->Branch("gen_mu1_Pt", &n_gen_mu1_Pt, "n_gen_mu1_Pt/F");
+	TW->Branch("gen_mu1_Eta", &n_gen_mu1_Eta, "n_gen_mu1_Eta/F");
+	TW->Branch("gen_mu1_Phi", &n_gen_mu1_Phi, "n_gen_mu1_Phi/F");
+	TW->Branch("gen_mu2_Pt", &n_gen_mu2_Pt, "n_gen_mu2_Pt/F");
+	TW->Branch("gen_mu2_Eta", &n_gen_mu2_Eta, "n_gen_mu2_Eta/F");
+	TW->Branch("gen_mu2_Phi", &n_gen_mu2_Phi, "n_gen_mu2_Phi/F");
+	TW->Branch("gen_taus",&n_gen_taus,"n_gen_taus/i");
+	TW->Branch("gen_mutaus",&n_gen_mutaus,"n_gen_mutaus/i");
+
 	
 	TTree * T = new TTree("T","Discriminant variables for BDT");
    	T->Branch("dimuonEta",&n_dimuonEta,"n_dimuonEta/F");
@@ -797,6 +830,10 @@ int main(int argc, char * argv[]) {
 	T->Branch("genZ_Pt", &n_genZ_Pt, "n_genZ_Pt/F");
 	T->Branch("genZ_Eta", &n_genZ_Eta, "n_genZ_Eta/F");
 	T->Branch("genZ_Phi", &n_genZ_Phi, "n_genZ_Phi/F");
+	T->Branch("genZTT_mass", &n_genZTT_mass, "n_genZTT_mass/F");
+	T->Branch("genZTT_Pt", &n_genZTT_Pt, "n_genZTT_Pt/F");
+	T->Branch("genZTT_Eta", &n_genZTT_Eta, "n_genZTT_Eta/F");
+	T->Branch("genZTT_Phi", &n_genZTT_Phi, "n_genZTT_Phi/F");
 	T->Branch("genV_mass", &n_genV_mass, "n_genV_mass/F");
 	T->Branch("genV_Pt", &n_genV_Pt, "n_genV_Pt/F");
 	T->Branch("genV_Eta", &n_genV_Eta, "n_genV_Eta/F");
@@ -807,6 +844,8 @@ int main(int argc, char * argv[]) {
 	T->Branch("gen_mu2_Pt", &n_gen_mu2_Pt, "n_gen_mu2_Pt/F");
 	T->Branch("gen_mu2_Eta", &n_gen_mu2_Eta, "n_gen_mu2_Eta/F");
 	T->Branch("gen_mu2_Phi", &n_gen_mu2_Phi, "n_gen_mu2_Phi/F");
+	T->Branch("gen_taus",&n_gen_taus,"n_gen_taus/i");
+	T->Branch("gen_mutaus",&n_gen_mutaus,"n_gen_mutaus/i");
 	//This loads the library
 	TMVA::Tools::Instance();
 	
@@ -825,7 +864,7 @@ int main(int argc, char * argv[]) {
 	reader->AddVariable( "mvamet",&n_mvamet);
 	
 	//BookMethod
-	reader->BookMVA("BDT", "TMVA/weights/TMVA_Roch_22032016_BDT.weights.xml");
+	reader->BookMVA("BDT", cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/test/TMVA_Roch_22032016_BDT.weights.xml");
 	
 	
 	TH1D * ZMassEtaPtPass[3][7];
@@ -1057,23 +1096,23 @@ int main(int argc, char * argv[]) {
 			  }
 			}
 
+			n_genWeight = 1;
 			//------------------------------------------------
 			if (!isData) {
-				n_genWeight = 1;
+			  n_genWeight = 1;
 				
-				if (analysisTree.genweight<0)
-					n_genWeight = -1;
-				
-				//	std::cout << "GenWeight = " << analysisTree.genweight << std::endl;
-				weight *= n_genWeight;
-				TW->Fill();
+			  if (analysisTree.genweight<0)
+			    n_genWeight = -1;
+			  
+			  //	std::cout << "GenWeight = " << analysisTree.genweight << std::endl;
+			  weight *= n_genWeight;
 			}
 			
 			histWeightsH->Fill(float(0),weight);
 			
 			//weights
 			
-		    n_mcweight = analysisTree.genweight;
+			n_mcweight = analysisTree.genweight;
 			Float_t PUweight = 1;
 			//n_puweight = 1;
 			//n_trigweight_1 = 1;
@@ -1101,10 +1140,28 @@ int main(int argc, char * argv[]) {
 			Float_t topptweight = 1;
 			//n_weight = 1;
 			
-			TLorentzVector genZ; genZ.SetXYZT(0,0,0,91.2); 
+			TLorentzVector genZ; genZ.SetXYZT(0,0,0,0); 
+			TLorentzVector genZTT; genZTT.SetXYZT(0,0,0,0); 
 			TLorentzVector genV; genV.SetXYZT(0,0,0,0);
 			TLorentzVector genL; genL.SetXYZT(0,0,0,0);
+			std::vector<unsigned int> muTaus; muTaus.clear();
+			std::vector<TLorentzVector> muTausLV; muTausLV.clear(); 
+			std::vector<TLorentzVector> promptTausLV; promptTausLV.clear(); 
+			TLorentzVector gen_mu1; gen_mu1.SetXYZM(0.01,0,0,muonMass);
+			TLorentzVector gen_mu2; gen_mu2.SetXYZM(0.01,0,0,muonMass);
+
 			if (!isData) {
+			  for (unsigned int igentau=0; igentau<analysisTree.gentau_count; ++igentau) {
+			    TLorentzVector tauLV; tauLV.SetXYZT(analysisTree.gentau_px[igentau],
+								analysisTree.gentau_py[igentau],
+								analysisTree.gentau_pz[igentau],
+								analysisTree.gentau_e[igentau]);
+			    if (analysisTree.gentau_isPrompt[igentau]&&analysisTree.gentau_isFirstCopy[igentau]) {
+			      promptTausLV.push_back(tauLV);
+			    }
+
+			  }
+
 			  for (unsigned int igen=0; igen<analysisTree.genparticles_count; ++igen) {
 			    //	  cout << igen << "   pdgId = " << analysisTree.genparticles_pdgid[igen] << endl;
 			    TLorentzVector genPart; genPart.SetXYZT(analysisTree.genparticles_px[igen],
@@ -1131,6 +1188,10 @@ int main(int argc, char * argv[]) {
                                 genV += genPart;
                                 genL += genPart;
 			      }
+			      if (isMuon&&analysisTree.genparticles_isPromptTauDecayProduct[igen]) {
+				muTaus.push_back(igen);
+				muTausLV.push_back(genPart);
+			      }
 
 			      //if (isLepton&&
 			      //  fabs(genPart.Eta())<2.4&&
@@ -1147,134 +1208,166 @@ int main(int argc, char * argv[]) {
 				genV += genPart;
 			    }
 			  }
-			
+			  /*
+			  printf("muons from tau : %2i\n",int(muTaus.size()));
+			  if (muTaus.size()==2) {
+			    unsigned int mu1 = muTaus[0];
+			    unsigned int mu2 = muTaus[1];
+			    printf(" mu(tau) 1  ->   Px = %8.1f   Py = %8.1f   Pz = %8.1f    Id = %3i\n",
+				   muTausLV[0].Px(),muTausLV[0].Py(),muTausLV[0].Pz(),analysisTree.genparticles_pdgid[mu1]);
+			    printf(" mu(tau) 1  ->   Px = %8.1f   Py = %8.1f   Pz = %8.1f    Id = %3i\n",
+				   muTausLV[1].Px(),muTausLV[1].Py(),muTausLV[1].Pz(),analysisTree.genparticles_pdgid[mu2]);
 
+			  }
+			  printf("prompt taus : %2i\n",int(promptTausLV.size()));
+			  if (promptTausLV.size()==2) {
+			    genZTT = promptTausLV[0] + promptTausLV[1];
+			    printf(" GenZTT  ->   Px = %8.1f   Py = %8.1f   Pz = %8.1f   Mass = %5.1f\n",
+				   genZTT.Px(),genZTT.Py(),genZTT.Pz(),genZTT.M());
+			  }
+			  printf(" GenV    ->   Px = %8.1f   Py = %8.1f   Pz = %8.1f   Mass = %5.1f\n",
+				 genV.Px(),genV.Py(),genV.Pz(),genV.M());
+			  printf(" GenZ    ->   Px = %8.1f   Py = %8.1f   Pz = %8.1f   Mass = %5.1f\n",
+				 genZ.Px(),genZ.Py(),genZ.Pz(),genZ.M());
+			  std::cout << std::endl;
+			  */
+
+			  if (promptTausLV.size()==2)
+			    genZTT = promptTausLV[0] + promptTausLV[1];
 			  
-    			  if (genV.Pt()<0.1) genV.SetXYZM(0.1,0.1,0.,0.);
+			  // protection against vanishing 
+    			  if (genV.Pt()<0.005)   genV.SetXYZM(0.03,0.04,0.,91.2);
+			  if (genZTT.Pt()<0.005) genZTT.SetXYZM(0.03,0.04,0.,91.2);
+			  if (genZ.Pt()<0.005)   genZ.SetXYZM(0.03,0.04,0.,91.2);
 
 			  massSelGenH->Fill(genV.M(),weight);
 			  n_genZ_mass = genZ.M();
-			  n_genZ_Pt = genZ.Pt();
-			  n_genZ_Eta = genZ.Eta();
-			  n_genZ_Phi = genZ.Phi();
+			  n_genZ_Pt   = genZ.Pt();
+			  n_genZ_Eta  = genZ.Eta();
+			  n_genZ_Phi  = genZ.Phi();
 
 			  n_genV_mass = genV.M();
-			  n_genV_Pt =genV.Pt();
-			  n_genV_Eta = genV.Eta();
-			  n_genV_Phi = genV.Phi();
+			  n_genV_Pt   = genV.Pt();
+			  n_genV_Eta  = genV.Eta();
+			  n_genV_Phi  = genV.Phi();
 
-			  for (unsigned int igen=0; igen<analysisTree.genparticles_count; ++igen) {
-			    if (analysisTree.genparticles_pdgid[igen]==23 &&  analysisTree.genparticles_status[igen]==62)
-			      TLorentzVector genZ; genZ.SetXYZT(analysisTree.genparticles_px[igen],
-					   analysisTree.genparticles_py[igen],
-					   analysisTree.genparticles_pz[igen],
-					   analysisTree.genparticles_e[igen]);
-			    float  visZPx= genZ.Px();
-			    float visZPy= genZ.Py();
-						
-			    if (fabs(analysisTree.genparticles_pdgid[igen])==13 && 
-				analysisTree.genparticles_status[igen]==1) {
-							
-			      TLorentzVector gen_mu1; gen_mu1.SetPxPyPzE(analysisTree.genparticles_px[igen],
-									 analysisTree.genparticles_py[igen],
-									 analysisTree.genparticles_pz[igen],
-									 analysisTree.genparticles_e[igen]);
-							
-			      TLorentzVector gen_mu2; gen_mu2.SetPxPyPzE(analysisTree.genparticles_px[igen],
-									 analysisTree.genparticles_py[igen],
-									 analysisTree.genparticles_pz[igen],
-									 analysisTree.genparticles_e[igen]);
-			      // TLorentzVector TwoMu = gen_mu1 +gen_mu2;
-			      if ((gen_mu1.Pt()> 10 && gen_mu2.Pt()> 20)||(gen_mu1.Pt()> 20 && gen_mu2.Pt()> 10))
-				massSelGen1H->Fill(genZ.M(),weight);
+			  n_genZTT_mass = genZTT.M();
+                          n_genZTT_Pt   = genZTT.Pt();
+                          n_genZTT_Eta  = genZTT.Eta();
+                          n_genZTT_Phi  = genZTT.Phi();
+			  
+
+			  if (muTausLV.size()==2) {
+			    if (muTausLV[0].Pt()>muTausLV[1].Pt()) {
+			      gen_mu1 = muTausLV[0];
+			      gen_mu2 = muTausLV[1];
+			    }
+			    else {
+			      gen_mu1 = muTausLV[1];
+			      gen_mu2 = muTausLV[0];
 			    }
 			  }
+
+			  n_gen_mu1_Pt  = gen_mu1.Pt();
+			  n_gen_mu1_Eta = gen_mu1.Eta();
+			  n_gen_mu1_Phi = gen_mu1.Phi();
+			  n_gen_mu2_Pt  = gen_mu2.Pt();
+			  n_gen_mu2_Eta = gen_mu2.Eta();
+			  n_gen_mu2_Phi = gen_mu2.Phi();
 			  
-			 
-						  
-			  
+			  n_gen_taus = promptTausLV.size();
+			  n_gen_mutaus = muTausLV.size(); 
+
+			  if (n_gen_taus==2&&n_gen_mutaus==2&&n_genZTT_mass>60&&n_genZTT_mass<120) {
+			    histZTTWeightsH->Fill(0.,n_genWeight);
+			    bool accept = n_gen_mu1_Pt>20 && n_gen_mu2_Pt>10 && fabs(n_gen_mu1_Eta)<2.4 && fabs(n_gen_mu2_Eta)<2.4;
+			    if (accept)
+			      histGenCutsWeightsH->Fill(0.,n_genWeight);
+			  }
+
+			  TW->Fill();
 				
-				if (applyPUreweighting_vertices) {
-					int binNvert = vertexDataH->FindBin(analysisTree.primvertex_count);
-					float_t dataNvert = vertexDataH->GetBinContent(binNvert);
-	   				float_t mcNvert = vertexMcH->GetBinContent(binNvert);
-					if (mcNvert < 1e-10){mcNvert=1e-10;}
-					float_t vertWeight = dataNvert/mcNvert;
-					weight *= vertWeight;
-				}
+			  if (applyPUreweighting_vertices) {
+			    int binNvert = vertexDataH->FindBin(analysisTree.primvertex_count);
+			    float_t dataNvert = vertexDataH->GetBinContent(binNvert);
+			    float_t mcNvert = vertexMcH->GetBinContent(binNvert);
+			    if (mcNvert < 1e-10){mcNvert=1e-10;}
+			    float_t vertWeight = dataNvert/mcNvert;
+			    weight *= vertWeight;
+			  }
 				
-				if (applyPUreweighting_official) {
-					nTruePUInteractionsH->Fill(analysisTree.numtruepileupinteractions,weight);
-					PUweight = float(PUofficial->get_PUweight(double(analysisTree.numtruepileupinteractions)));
-					
-					n_puweight = float(PUweight);
-					//std::cout << "puweight = "<< n_puweight << std::endl;
-					 
-					weight *= float(PUweight);
-					PUweightsOfficialH->Fill(PUweight);
-				}
+			  if (applyPUreweighting_official) {
+			    nTruePUInteractionsH->Fill(analysisTree.numtruepileupinteractions,weight);
+			    PUweight = float(PUofficial->get_PUweight(double(analysisTree.numtruepileupinteractions)));
+			    
+			    n_puweight = float(PUweight);
+			    //std::cout << "puweight = "<< n_puweight << std::endl;
+			    
+			    weight *= float(PUweight);
+			    PUweightsOfficialH->Fill(PUweight);
+			  }
 				
-				if (applyTauTauSelection) {
-					unsigned int nTaus = 0;
-					if (analysisTree.gentau_count>0) {
-						//	  cout << "Generated taus present" << endl;
-						for (unsigned int itau = 0; itau < analysisTree.gentau_count; ++itau) {
-							// cout << itau << endl; "  : pt = " 
-							//		 << analysisTree.gentau_visible_pt[itau] 
-							//		 << "   eta = " <<  analysisTree.gentau_visible_eta[itau]
-							//		 << "   mother = " << int(analysisTree.gentau_mother[itau]) << endl;
-							if (int(analysisTree.gentau_mother[itau])==3) nTaus++;
-						}
-						// std::cout << "nTaus = " << nTaus << std::endl;//check
-					}
-					bool notTauTau = nTaus < 2;
-					
-					if (selectZToTauTauMuMu&&notTauTau) {
-						//	    std::cout << "Skipping event..." << std::endl;
-						//	    cout << endl;
-						continue;
-					}
-					
-					if (!selectZToTauTauMuMu&&!notTauTau) {
-						//	    std::cout << "Skipping event..." << std::endl;
-						//	    cout << endl;
-						continue;
-					}
-					//	  cout << endl;
-					
-					// Number muons from tau decays
-					unsigned int nMuons = 0;
-					for (unsigned int iMu=0; iMu<analysisTree.genparticles_count; ++iMu) {
-						
-						if (fabs(analysisTree.genparticles_pdgid[iMu])==13 && 
-							analysisTree.genparticles_status[iMu]==1 && fabs(analysisTree.genparticles_mother[iMu]==5)) nMuons++;
-						//selEventsAllMuons+=nMuons;
-					} 
-				}
+			  if (applyTauTauSelection) {
+			    unsigned int nTaus = 0;
+			    if (analysisTree.gentau_count>0) {
+			      //	  cout << "Generated taus present" << endl;
+			      for (unsigned int itau = 0; itau < analysisTree.gentau_count; ++itau) {
+				// cout << itau << endl; "  : pt = " 
+				//		 << analysisTree.gentau_visible_pt[itau] 
+				//		 << "   eta = " <<  analysisTree.gentau_visible_eta[itau]
+				//		 << "   mother = " << int(analysisTree.gentau_mother[itau]) << endl;
+				if (int(analysisTree.gentau_mother[itau])==3) nTaus++;
+			      }
+			      // std::cout << "nTaus = " << nTaus << std::endl;//check
+			    }
+			    bool notTauTau = nTaus < 2;
+			    
+			    if (selectZToTauTauMuMu&&notTauTau) {
+			      //	    std::cout << "Skipping event..." << std::endl;
+			      //	    cout << endl;
+			      continue;
+			    }
+			    
+			    if (!selectZToTauTauMuMu&&!notTauTau) {
+			      //	    std::cout << "Skipping event..." << std::endl;
+			      //	    cout << endl;
+			      continue;
+			    }
+			    //	  cout << endl;
+			    
+			    // Number muons from tau decays
+			    unsigned int nMuons = 0;
+			    for (unsigned int iMu=0; iMu<analysisTree.genparticles_count; ++iMu) {
+			      
+			      if (fabs(analysisTree.genparticles_pdgid[iMu])==13 && 
+				  analysisTree.genparticles_status[iMu]==1 && fabs(analysisTree.genparticles_mother[iMu]==5)) nMuons++;
+			      //selEventsAllMuons+=nMuons;
+			    } 
+			  }
 				
-				if (applyTopPtReweighting) {
-				  float topPt = -1;
-				  float antitopPt = -1;
-				  for (unsigned int igen=0; igen < analysisTree.genparticles_count; ++igen) {
-				    
-				    if (analysisTree.genparticles_pdgid[igen]==6)
-				      topPt = TMath::Sqrt(analysisTree.genparticles_px[igen]*analysisTree.genparticles_px[igen]+
-				  analysisTree.genparticles_py[igen]*analysisTree.genparticles_py[igen]);
-	    
-				    if (analysisTree.genparticles_pdgid[igen]==-6)
-	      antitopPt = TMath::Sqrt(analysisTree.genparticles_px[igen]*analysisTree.genparticles_px[igen]+
-				      analysisTree.genparticles_py[igen]*analysisTree.genparticles_py[igen]);
-	    
-	    
-				  }
-				  if (topPt>0&&antitopPt>0) {
-				    topptweight = topPtWeight(topPt,antitopPt);
-				    cout << "toppt = " << topPt << "   antitoppt = " << antitopPt << "   weight = " << topptweight << endl;
-					n_topptweight = topptweight;
-					//std::cout << "n_topptweight = " << n_topptweight << std::endl;
-				    weight *= topptweight;
-				  }
-				}
+			  if (applyTopPtReweighting) {
+			    float topPt = -1;
+			    float antitopPt = -1;
+			    for (unsigned int igen=0; igen < analysisTree.genparticles_count; ++igen) {
+			      
+			      if (analysisTree.genparticles_pdgid[igen]==6)
+				topPt = TMath::Sqrt(analysisTree.genparticles_px[igen]*analysisTree.genparticles_px[igen]+
+						    analysisTree.genparticles_py[igen]*analysisTree.genparticles_py[igen]);
+			      
+			      if (analysisTree.genparticles_pdgid[igen]==-6)
+				antitopPt = TMath::Sqrt(analysisTree.genparticles_px[igen]*analysisTree.genparticles_px[igen]+
+							analysisTree.genparticles_py[igen]*analysisTree.genparticles_py[igen]);
+			      
+			      
+			    }
+			    if (topPt>0&&antitopPt>0) {
+			      topptweight = topPtWeight(topPt,antitopPt);
+			      cout << "toppt = " << topPt << "   antitoppt = " << antitopPt << "   weight = " << topptweight << endl;
+			      n_topptweight = topptweight;
+			      //std::cout << "n_topptweight = " << n_topptweight << std::endl;
+			      weight *= topptweight;
+			    }
+			  }
 			}
 			
 			std:: vector<Period> periods;
@@ -1590,70 +1683,31 @@ int main(int argc, char * argv[]) {
 								(1.00 - muonScale)*analysisTree.muon_py[indx2],
 								(1.00 - muonScale)*analysisTree.muon_pz[indx2],
 								muonMass);				
-												
-				TLorentzVector genZ;// genZ.SetXYZM(0,0,0,91.2);
-				TLorentzVector gen_mu1;
-				TLorentzVector gen_mu2;
-				if (!isData) {
-					for (unsigned int igen=0; igen<analysisTree.genparticles_count; ++igen) {
-						if (analysisTree.genparticles_pdgid[igen]==23 &&  analysisTree.genparticles_status[igen]==62)
-							genZ.SetXYZT(analysisTree.genparticles_px[igen],
-								     analysisTree.genparticles_py[igen],
-								     analysisTree.genparticles_pz[igen],
-								     analysisTree.genparticles_e[igen]);
-						float visZPx= genZ.Px();
-						float visZPy= genZ.Py();
 						
-						if (fabs(analysisTree.genparticles_pdgid[igen])==13 && analysisTree.genparticles_status[igen]==1) {
-							
-							TLorentzVector genPart; genPart.SetPxPyPzE(analysisTree.genparticles_px[igen],
-											     analysisTree.genparticles_py[igen],
-											     analysisTree.genparticles_pz[igen],
-											     analysisTree.genparticles_e[igen]);
-												 
-							float dRmu1 = deltaR(mu1.Eta(),mu1.Phi(),genPart.Eta(),genPart.Phi());
-							
-							if (dRmu1<0.5)
-								gen_mu1 = genPart;
-							
-							float dRmu2 = deltaR(mu2.Eta(),mu2.Phi(),genPart.Eta(),genPart.Phi()); 
-							
-							if (dRmu2<0.5)
-								gen_mu2 = genPart;
-						}
-					}
-				}
-				
-				//n_genZ_mass = genZ.M();
-				//n_genZ_Pt = genZ.Pt();
-				//n_genZ_Eta = genZ.Eta();
-				//n_genZ_Phi = genZ.Phi();
-				
-				//n_genV_mass = genV.M();
-				//n_genV_Pt =genV.Pt();
-				//n_genV_Eta = genV.Eta();
-				//n_genV_Phi = genV.Phi();
-				
-				n_gen_mu1_Pt = gen_mu1.Pt();
-				n_gen_mu1_Eta = gen_mu1.Eta();
-				n_gen_mu1_Phi = gen_mu1.Phi();
-				
-				n_gen_mu2_Pt = gen_mu2.Pt();
-				n_gen_mu2_Eta = gen_mu2.Eta();
-				n_gen_mu2_Phi = gen_mu2.Phi();
-				
-				n_genAccept = genV.M()>60 && genV.M()<120;
-				float ptLeadGen = TMath::Max(gen_mu1.Pt(),gen_mu2.Pt());
-				float ptTrailGen = TMath::Min(gen_mu1.Pt(),gen_mu2.Pt());
+				/*
+				std::cout << "we are about to fill ntuple -->" << std::endl;
+				std::cout << "genV   mass = " << genV.M() << std::endl;
+				std::cout << "genZ   mass = " << genZ.M() << std::endl;
+				std::cout << "genZTT mass = " << genZTT.M() << std::endl;
+				printf("mu1 : pt = %7.1f   eta = %7.1f   phi = %7.1f\n",
+				       n_gen_mu1_Pt,n_gen_mu1_Eta,n_gen_mu1_Phi);
+				printf("mu2 : pt = %7.1f   eta = %7.1f   phi = %7.1f\n",
+				       n_gen_mu2_Pt,n_gen_mu2_Eta,n_gen_mu2_Phi);
+				std::cout << std::endl;
+				*/
+				n_genAccept = n_gen_taus==2 && n_gen_mutaus==2;
+				n_genAccept = n_genAccept && genZTT.M()>60 && genZTT.M()<120;
+				float ptLeadGen = TMath::Max(n_gen_mu1_Pt,n_gen_mu2_Pt);
+				float ptTrailGen = TMath::Min(n_gen_mu1_Pt,n_gen_mu2_Pt);
 				n_genAccept = n_genAccept && ptLeadGen>20;
 				n_genAccept = n_genAccept && ptTrailGen>10;
-				n_genAccept = n_genAccept && fabs(gen_mu1.Eta())<2.4;
-				n_genAccept = n_genAccept && fabs(gen_mu2.Eta())<2.4;
+				n_genAccept = n_genAccept && fabs(n_gen_mu1_Eta)<2.4;
+				n_genAccept = n_genAccept && fabs(n_gen_mu2_Eta)<2.4;
 				
 				if(n_genAccept) histGenWeightH->Fill(1.,n_genWeight);
 
 
-			// accessing Mva Met
+				// accessing Mva Met
 				bool mvaMetFound = false;
 				unsigned int metMuMu = 0; 
 				for (unsigned int iMet=0; iMet<analysisTree.mvamet_count; ++iMet) {
@@ -2242,8 +2296,7 @@ int main(int argc, char * argv[]) {
 					  if(mvaValue_ > cut) InvMass[k]->Fill(n_dimuonMass, weight);
 					}
 					n_mva_BDT =mvaValue_;
-					/*
-					/////*****svFit*******
+					/* *****svFit*******
 					
 					//define MET
 					double measuredMETx = mvamet_ex;
@@ -2297,10 +2350,25 @@ int main(int argc, char * argv[]) {
 					n_m_sv_resoDown = n_m_sv;
 					*/
 					
-					
-					
-					if (fillBDTNTuple)
+					// filling ntuple
+					if (n_genAccept) {
+					  bool recAccept = n_leadingPt>20 && n_trailingPt>10;
+					  recAccept = recAccept && fabs(n_leadingEta)<2.4 && fabs(n_trailingEta)<2.4;
+					  if (recAccept) {
+					    histRecCutsWeightsH->Fill(0.,weight);
+					    histRecCutsGenWeightsH->Fill(0.,n_genWeight);
+					    if (n_mva_BDT>0.5) {
+					      histBDTCutWeightsH->Fill(0.,weight);
+					      histBDTCutGenWeightsH->Fill(0.,n_genWeight);
+					    }
+					  }
+					}
+
+					if (fillBDTNTuple) {
+
 					  T->Fill();
+
+					}
 					
 					if (massSel>70&&massSel<110) {
 					  float unitX = dimuon.Px()/dimuon.Pt();
