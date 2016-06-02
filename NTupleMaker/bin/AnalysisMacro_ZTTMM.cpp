@@ -537,6 +537,15 @@ int main(int argc, char * argv[]) {
 	TH1D * histBDTCutGenWeightsH = new TH1D("histBDTCutGenWeightsH","",1,-0.5,0.5);
 	TH1D * histBDTCutWeightsH = new TH1D("histBDTCutWeightsH","",1,-0.5,0.5);
 	TH1D * histGenWeightH = new TH1D("histGenWeightH","",1,-0.5,0.5);
+	// fout
+	TH1D * noutDenRecCutsWeightsH = new TH1D("noutDenRecCutsWeightsH","",1,-0.5,0.5);
+	TH1D * noutNumRecCutsWeightsH = new TH1D("noutNumRecCutsWeightsH","",1,-0.5,0.5);
+	TH1D * noutDenBDTCutWeightsH = new TH1D("noutDenBDTCutWeightsH","",1,-0.5,0.5);
+	TH1D * noutNumBDTCutWeightsH = new TH1D("noutNumBDTCutWeightsH","",1,-0.5,0.5);
+	TH1D * noutDenRecCutsGenWeightsH = new TH1D("noutDenRecCutsGenWeightsH","",1,-0.5,0.5);
+	TH1D * noutNumRecCutsGenWeightsH = new TH1D("noutNumRecCutsGenWeightsH","",1,-0.5,0.5);
+	TH1D * noutDenBDTCutGenWeightsH = new TH1D("noutDenBDTCutGenWeightsH","",1,-0.5,0.5);
+	TH1D * noutNumBDTCutGenWeightsH = new TH1D("noutNumBDTCutGenWeightsH","",1,-0.5,0.5);
 	// Histograms after selecting unique dimuon pair
    	TH1D * ptLeadingMuSelH = new TH1D("ptLeadingMuSelH","",100,0,200);
    	TH1D * ptTrailingMuSelH = new TH1D("ptTrailingMuSelH","",100,0,200);
@@ -2372,16 +2381,35 @@ int main(int argc, char * argv[]) {
 					n_m_sv_resoDown = n_m_sv;
 					*/
 					
+					bool recAccept = n_leadingPt>20 && n_trailingPt>10;
+					recAccept = recAccept && fabs(n_leadingEta)<2.4 && fabs(n_trailingEta)<2.4;
 					// filling ntuple
 					if (n_genAccept) {
-					  bool recAccept = n_leadingPt>20 && n_trailingPt>10;
-					  recAccept = recAccept && fabs(n_leadingEta)<2.4 && fabs(n_trailingEta)<2.4;
 					  if (recAccept) {
 					    histRecCutsWeightsH->Fill(0.,weight);
 					    histRecCutsGenWeightsH->Fill(0.,n_genWeight);
 					    if (n_mva_BDT>0.5) {
 					      histBDTCutWeightsH->Fill(0.,weight);
 					      histBDTCutGenWeightsH->Fill(0.,n_genWeight);
+					    }
+
+					  }
+					}
+					
+					bool isZTTMM = n_gen_taus==2&&n_gen_mutaus==2;
+					if (recAccept&&isZTTMM) {
+					  noutDenRecCutsWeightsH->Fill(0.,weight);
+					  noutDenRecCutsGenWeightsH->Fill(0.,n_genWeight);
+					  if (n_genAccept) {
+					    noutNumRecCutsWeightsH->Fill(0.,weight);
+					    noutNumRecCutsGenWeightsH->Fill(0.,n_genWeight);
+					  }
+					  if (n_mva_BDT>0.5) {
+					    noutDenBDTCutWeightsH->Fill(0.,weight);
+					    noutDenBDTCutGenWeightsH->Fill(0.,n_genWeight);
+					    if (n_genAccept) {
+					      noutNumBDTCutWeightsH->Fill(0.,weight);
+					      noutNumBDTCutGenWeightsH->Fill(0.,n_genWeight);
 					    }
 					  }
 					}
