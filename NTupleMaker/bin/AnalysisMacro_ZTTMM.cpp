@@ -322,6 +322,9 @@ int main(int argc, char * argv[]) {
 	
 	using namespace std;
 
+	TH1::SetDefaultSumw2(true);
+	TH2::SetDefaultSumw2(true);
+
  	// **** configuration
  	Config cfg(argv[1]);
  	//const bool applyInclusiveSelection = cfg.get<bool>("ApplyInclusiveSelection");
@@ -526,8 +529,9 @@ int main(int argc, char * argv[]) {
 	
 	TH1D * inputEventsH = new TH1D("inputEventsH","",1,-0.5,0.5);
    	TH1D * histWeightsH = new TH1D("histWeightsH","",1,-0.5,0.5);
-	TH1D * histZTTWeightsH = new TH1D("histZTTWeightsH","",1,-0.5,0.5);
+	TH1D * histZTTGenWeightsH = new TH1D("histZTTGenWeightsH","",1,-0.5,0.5);
 	TH1D * histGenCutsWeightsH = new TH1D("histGenCutsWeightsH","",1,-0.5,0.5);
+	TH1D * histGenCutsGenWeightsH = new TH1D("histGenCutsGenWeightsH","",1,-0.5,0.5);
 	TH1D * histRecCutsGenWeightsH = new TH1D("histRecCutsGenWeightsH","",1,-0.5,0.5);
 	TH1D * histRecCutsWeightsH = new TH1D("histRecCutsWeightsH","",1,-0.5,0.5);
 	TH1D * histBDTCutGenWeightsH = new TH1D("histBDTCutGenWeightsH","",1,-0.5,0.5);
@@ -1279,10 +1283,25 @@ int main(int argc, char * argv[]) {
 			  n_gen_mutaus = muTausLV.size(); 
 
 			  if (n_gen_taus==2&&n_gen_mutaus==2&&n_genZTT_mass>60&&n_genZTT_mass<120) {
-			    histZTTWeightsH->Fill(0.,n_genWeight);
+			    float weight1 = (float)SF_muonIdIso->get_ScaleFactor(n_gen_mu1_Pt,fabs(n_gen_mu1_Eta));
+			    float weight2 = (float)SF_muonIdIso->get_ScaleFactor(n_gen_mu2_Pt,fabs(n_gen_mu2_Eta));
+			    float effDataTrig1 = SF_muonTrig->get_EfficiencyData(n_gen_mu1_Pt,fabs(n_gen_mu1_Eta));
+			    float effDataTrig2 = SF_muonTrig->get_EfficiencyData(n_gen_mu2_Pt,fabs(n_gen_mu2_Eta));
+			    float effMcTrig1 = SF_muonTrig->get_EfficiencyMC(n_gen_mu1_Pt,fabs(n_gen_mu1_Eta));
+			    float effMcTrig2 = SF_muonTrig->get_EfficiencyMC(n_gen_mu2_Pt,fabs(n_gen_mu2_Eta));
+
+			    float effTrigData = 1 - (1-effDataTrig1)*(1-effDataTrig2);
+			    float effMcTrig = 1 - (1-effMcTrig1)*(1-effMcTrig2);
+			    float weightTrig = 0;
+			    if (effTrigData>0 && effMcTrig>0) weightTrig = effTrigData/effMcTrig;
+			    float effWeight = weight1*weight2*weightTrig;
+
+			    histZTTGenWeightsH->Fill(0.,n_genWeight);
 			    bool accept = n_gen_mu1_Pt>20 && n_gen_mu2_Pt>10 && fabs(n_gen_mu1_Eta)<2.4 && fabs(n_gen_mu2_Eta)<2.4;
-			    if (accept)
-			      histGenCutsWeightsH->Fill(0.,n_genWeight);
+			    if (accept) {
+			      histGenCutsGenWeightsH->Fill(0.,n_genWeight);
+			      histGenCutsWeightsH->Fill(0.,n_genWeight*effWeight);
+			    }
 			  }
 
 			  TW->Fill();
