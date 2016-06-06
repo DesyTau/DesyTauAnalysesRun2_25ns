@@ -3,7 +3,7 @@
 //
 //    Author: Alberto Bragagnolo alberto.bragagnolo.3@studenti.unipd.it
 //
-////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 
 #include <string>
 #include <iostream>
@@ -197,7 +197,8 @@ int main(int argc, char * argv[]){
   rootFileName += "_";
   rootFileName += ifile;
   if(TP_Jpsi) rootFileName += "_Jpsi";
-  rootFileName += "_mumu_TagProbe.root";
+  rootFileName += "_mumu_TagProbe";
+  rootFileName += ".root";
 
   TFile * file = new TFile( rootFileName ,"recreate");
   file->cd("");
@@ -223,7 +224,6 @@ int main(int argc, char * argv[]){
   int Run, Event, Lumi;
 
   for (int iF=ifile; iF<jfile; ++iF) {  //FILE LOOP
-
     TFile * file_ = TFile::Open(fileList[iF].data());
     
     TTree * _tree = NULL;
@@ -281,6 +281,7 @@ int main(int argc, char * argv[]){
       otree->run = int(analysisTree.event_run);
       otree->lumi = int(analysisTree.event_luminosityblock);
       otree->evt = int(analysisTree.event_nr); 
+      
 
       if (isData && !isGoodLumi(otree->run, otree->lumi, json))
       	continue;
@@ -392,7 +393,7 @@ int main(int argc, char * argv[]){
             for(unsigned int i=0; i<nhlt_check; ++i) {if(hlt_probe[i] == 1) p_pass_hlt[i]++;}
             for(unsigned int i=0; i<nhlt_check; ++i) {
               if((hlt_probe[i] != 1)&&(hlt_probe[i] != 0)) {
-                cout<<"!!!! hlt_probe["<<i<<"]="<<hlt_probe[i]<<endl;
+                //cout<<"!!!! hlt_probe["<<i<<"]="<<hlt_probe[i]<<endl;
               }
             }
             otree->hlt_1_probe = hlt_probe[0];
