@@ -58,7 +58,7 @@ void TagProbeTree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("eta_probe", &eta_probe, &b_eta_probe); 
    fChain->SetBranchAddress("phi_probe", &phi_probe, &b_phi_probe); 
 
-    fChain->SetBranchAddress("m_vis", &m_vis, &b_m_vis); 
+   fChain->SetBranchAddress("m_vis", &m_vis, &b_m_vis); 
 
    fChain->SetBranchAddress("id_probe", &id_probe, &b_id_probe);
    fChain->SetBranchAddress("iso_probe", &iso_probe, &b_iso_probe);
@@ -69,6 +69,9 @@ void TagProbeTree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("hlt_4_probe", &hlt_4_probe, &b_hlt_4_probe);
    fChain->SetBranchAddress("hlt_5_probe", &hlt_5_probe, &b_hlt_5_probe);
    fChain->SetBranchAddress("hlt_6_probe", &hlt_6_probe, &b_hlt_6_probe);
+
+   fChain->SetBranchAddress("mcweight", &mcweight, &b_mcweight); 
+   fChain->SetBranchAddress("PUweight", &PUweight, &b_PUweight); 
 
 
    lock=true;
@@ -165,6 +168,10 @@ void TagProbeTree::WriteInit(TTree *tree) {
   fChain->Branch("hlt_4_probe", &hlt_4_probe, "hlt_4_probe/I");
   fChain->Branch("hlt_5_probe", &hlt_5_probe, "hlt_5_probe/I");
   fChain->Branch("hlt_6_probe", &hlt_6_probe, "hlt_6_probe/I");
+
+  fChain->Branch("mcweight", &mcweight, "mcweight/F");
+  fChain->Branch("PUweight", &PUweight, "PUweight/F");
+
 }
 
 void TagProbeTree::Fill(){

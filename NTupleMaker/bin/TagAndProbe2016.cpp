@@ -305,6 +305,7 @@ int main(int argc, char * argv[]){
         otree->eta_tag = analysisTree.muon_eta[it];
         otree->phi_tag = analysisTree.muon_phi[it];
 
+
         //probe selection
         for (ip = 0; ip<analysisTree.muon_count; ip++){
           if (it == ip) continue;
@@ -343,6 +344,10 @@ int main(int argc, char * argv[]){
           otree->eta_probe = analysisTree.muon_eta[ip];
           otree->phi_probe = analysisTree.muon_phi[ip];
           otree->m_vis = m_vis;
+          otree->mcweight = 1.;
+          if(!isData)
+            otree->mcweight = analysisTree.genweight;
+
 
           bool id_probe= false, iso_probe=false;
 

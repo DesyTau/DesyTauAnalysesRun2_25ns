@@ -37,6 +37,9 @@ public :
   Int_t          hlt_5_probe;
   Int_t          hlt_6_probe;
 
+  Float_t        mcweight;
+  Float_t        PUweight;
+
     // List of branches
   TBranch         *b_run;
   TBranch         *b_lumi;
@@ -62,6 +65,9 @@ public :
   TBranch          *b_hlt_4_probe;
   TBranch          *b_hlt_5_probe;
   TBranch          *b_hlt_6_probe;
+
+  TBranch          *b_mcweight;
+  TBranch          *b_PUweight;
 
 
   TagProbeTree(TTree *tree=0);
