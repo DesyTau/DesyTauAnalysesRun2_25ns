@@ -409,9 +409,10 @@ int main(int argc, char * argv[]){
       else
 	       nWeightedEventsH->Fill(0., analysisTree.genweight);
 
+      unsigned int nIsoLeg = 0;
+      bool checkIsoLeg = false;
       if(isData || ApplyTrigger){
-            unsigned int nIsoLeg = 0;
-            bool checkIsoLeg = false;
+            
       
             unsigned int nfilters = analysisTree.run_hltfilters->size();
             for (unsigned int i=0; i<nfilters; ++i) {
