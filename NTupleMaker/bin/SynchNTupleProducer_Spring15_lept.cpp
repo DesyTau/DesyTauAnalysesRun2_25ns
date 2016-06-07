@@ -123,6 +123,7 @@ int main(int argc, char * argv[]){
 
   const bool ApplyPUweight = cfg.get<bool>("ApplyPUweight"); 
   const bool ApplyLepSF = cfg.get<bool>("ApplyLepSF"); 
+  const bool ApplyTrigger = cfg.get<bool>("ApplyTrigger"); 
 
   //pileup distrib
   const string pileUpInDataFile = cfg.get<string>("pileUpInDataFile");
@@ -174,7 +175,7 @@ int main(int argc, char * argv[]){
   if (isData){
     isoLeg = cfg.get<string>("isoLegData");
   }
-  else {isoLeg = cfg.get<string>("isoLegMC");}
+  else {if(ApplyTrigger) isoLeg = cfg.get<string>("isoLegMC");}
 
   const float ptTrigObjCut  = cfg.get<float>("ptTrigObjCut");
   
@@ -408,22 +409,25 @@ int main(int argc, char * argv[]){
       else
 	       nWeightedEventsH->Fill(0., analysisTree.genweight);
 
-      unsigned int nIsoLeg = 0;
-      bool checkIsoLeg = false;
-
-      unsigned int nfilters = analysisTree.run_hltfilters->size();
-      for (unsigned int i=0; i<nfilters; ++i) {
-      	TString HLTFilter(analysisTree.run_hltfilters->at(i));
-      	if (HLTFilter==isoLeg) {
-      	  nIsoLeg = i;
-      	  checkIsoLeg = true;
-      	}
-      }
-      if (!checkIsoLeg) {
-      	std::cout << "HLT filter " << isoLeg << " not found" << std::endl;
-      	exit(-1);
-      }
+      if(isData || ApplyTrigger){
+            unsigned int nIsoLeg = 0;
+            bool checkIsoLeg = false;
       
+            unsigned int nfilters = analysisTree.run_hltfilters->size();
+            for (unsigned int i=0; i<nfilters; ++i) {
+              TString HLTFilter(analysisTree.run_hltfilters->at(i));
+              if (HLTFilter==isoLeg) {
+                nIsoLeg = i;
+                checkIsoLeg = true;
+              }
+            }
+            if (!checkIsoLeg) {
+              std::cout << "HLT filter " << isoLeg << " not found" << std::endl;
+              exit(-1);
+            }
+      }
+
+
       if (nEvents%10000==0) 
       	cout << "      processed " << nEvents << " events" << endl; 
 
@@ -532,16 +536,18 @@ int main(int argc, char * argv[]){
           lep_eta =     analysisTree.electron_eta[lIndex]; 
           lep_phi =     analysisTree.electron_phi[lIndex];}
 
-        for (unsigned int iT=0; iT<analysisTree.trigobject_count; ++iT) {
-          float dRtrig = deltaR(lep_eta, lep_phi, analysisTree.trigobject_eta[iT],analysisTree.trigobject_phi[iT]);
-
-          if (dRtrig < deltaRTrigMatch){
-            if (analysisTree.trigobject_filters[iT][nIsoLeg] && ( isData || analysisTree.trigobject_pt[iT] > ptTrigObjCut)) // Ele23 Leg
-              isSingleLepTrig = true;
-          }
-        }
+        if(isData || ApplyTrigger){  
+                for (unsigned int iT=0; iT<analysisTree.trigobject_count; ++iT) {
+                  float dRtrig = deltaR(lep_eta, lep_phi, analysisTree.trigobject_eta[iT],analysisTree.trigobject_phi[iT]);
         
-        if (!isSingleLepTrig) continue;
+                  if (dRtrig < deltaRTrigMatch){
+                    if (analysisTree.trigobject_filters[iT][nIsoLeg] && ( isData || analysisTree.trigobject_pt[iT] > ptTrigObjCut)) // Ele23 Leg
+                      isSingleLepTrig = true;
+                  }
+                }
+                
+                if (!isSingleLepTrig) continue;
+        }
         
         for (unsigned int it=0; it<taus.size(); ++it) {
           unsigned int tIndex = taus.at(it);
