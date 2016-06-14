@@ -138,11 +138,11 @@ int main(int argc, char * argv[]){
   const string svFitPtResFile = cfg.get<string>("svFitPtResFile");
 
   // MET Recoil Corrections
-  //const bool applyRecoilCorrections = cfg.get<bool>("ApplyRecoilCorrections");
+  const bool applyRecoilCorrections = cfg.get<bool>("ApplyRecoilCorrections");
   const bool isDY = infiles.find("DY") == infiles.rfind("/")+1;
   const bool isWJets = infiles.find("WJets") == infiles.rfind("/")+1;
   const bool isMG = infiles.find("madgraph") != string::npos;
-  const bool applyRecoilCorrections = isDY || isWJets;
+  //const bool applyRecoilCorrections = isDY || isWJets;
 
   RecoilCorrector* recoilPFMetCorrector = (RecoilCorrector*) malloc(sizeof(*recoilPFMetCorrector));
   RecoilCorrector* recoilPuppiMetCorrector = (RecoilCorrector*) malloc(sizeof(*recoilPuppiMetCorrector));
@@ -230,10 +230,6 @@ int main(int argc, char * argv[]){
   const float isoDiLeptonVeto    = cfg.get<float>("isoDi"+lep+"Veto");
   const float drDiLeptonVeto     = cfg.get<float>("drDi"+lep+"Veto"); 
 
-    // topological cuts
-//  const float dZetaCut       = cfg.get<float>("dZetaCut");
-//  const bool oppositeSign    = cfg.get<bool>("oppositeSign");
-
   const float deltaRTrigMatch = cfg.get<float>("DRTrigMatch");
   const bool isIsoR03 = cfg.get<bool>("IsIsoR03");
   
@@ -241,8 +237,6 @@ int main(int argc, char * argv[]){
   const float jetPtLowCut = cfg.get<float>("JetPtLowCut");
   const float jetPtHighCut = cfg.get<float>("JetPtHighCut");
   const float dRJetLeptonCut = cfg.get<float>("dRJetLeptonCut");
-  const bool applyJetPfId = cfg.get<bool>("ApplyJetPfId");
-  const bool applyJetPuId = cfg.get<bool>("ApplyJetPuId");
 
   const float bJetEtaCut = cfg.get<float>("bJetEtaCut");
   const float btagCut = cfg.get<float>("btagCut");
