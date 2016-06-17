@@ -343,6 +343,7 @@ int main(int argc, char * argv[]) {
 
 	const bool applyTopPtReweighting = cfg.get<bool>("ApplyTopPtReweighting");
 	const bool applyRochCorr = cfg.get<bool>("ApplyRochCorr");
+	const bool applyBDT = cfg.get<bool>("ApplyBDT");
  
 	//ztotautautomumu selection
 	const bool  applyTauTauSelection = cfg.get<bool>("ApplyTauTauSelection");
@@ -628,19 +629,20 @@ int main(int argc, char * argv[]) {
    	TH1D * PUweightsOfficialH = new TH1D("PUweightsOfficialH","PU weights w/ official reweighting",1000, 0, 10);
    	TH1D * nTruePUInteractionsH = new TH1D("nTruePUInteractionsH","",50,-0.5,49.5);
 	
-    //BDT histos
-    TH1F * histMva =  new TH1F("MVA_BDT", "MVA_BDT",100 , -1.0, 1.0);
-    TH1F * histMva_massCut =  new TH1F("MVA_BDT_massCut", "MVA_BDT",100 , -1.0, 1.0);
-    
-    //Booking Invariant mass for different BDT cutt
-    const int iCut =40;
-    const char Nname = 100;
-    TH1F* InvMass[iCut];
-    char name[Nname];
-    for (int i=0;i<iCut;i++){
-		sprintf(name,"InvMass_%i",i);
-	  	InvMass[i]=new TH1F(name,"",100,20,200);
-    }
+	
+	//BDT histos
+	TH1F * histMva =  new TH1F("MVA_BDT", "MVA_BDT",100 , -1.0, 1.0);
+	TH1F * histMva_massCut =  new TH1F("MVA_BDT_massCut", "MVA_BDT",100 , -1.0, 1.0);
+	
+	//Booking Invariant mass for different BDT cutt
+	const int iCut =40;
+	const char Nname = 100;
+	TH1F* InvMass[iCut];
+	char name[Nname];
+	for (int i=0;i<iCut;i++){
+	  sprintf(name,"InvMass_%i",i);
+	  InvMass[i]=new TH1F(name,"",100,20,200);
+	}
 	
 	//Booking variables in Tree for BDT training  
    	Float_t n_genWeight;
@@ -859,27 +861,29 @@ int main(int argc, char * argv[]) {
 	T->Branch("gen_mu2_Phi", &n_gen_mu2_Phi, "n_gen_mu2_Phi/F");
 	T->Branch("gen_taus",&n_gen_taus,"n_gen_taus/i");
 	T->Branch("gen_mutaus",&n_gen_mutaus,"n_gen_mutaus/i");
-	//This loads the library
-	TMVA::Tools::Instance();
+	/*
+	if(applyBDT){
+	  //This loads the library
+	  TMVA::Tools::Instance();
 	
-	//Create TMVA Reader Object
-	TMVA::Reader *reader = new TMVA::Reader("!V:!Color");
-	
-	//create set of variables as declared in weight file and declared them to reader
-	reader->AddVariable( "dimuonEta",&n_dimuonEta);
-	// reader->AddVariable( "ptRatio",&n_ptRatio );
-	// reader->AddVariable( "dxy_muon1",&n_dcaSigdxy1);
-	//  reader->AddVariable( "dxy_muon2",&n_dcaSigdxy2);
-	reader->AddVariable( "phi_PosMu_MET",&n_phiangle);
-	//reader->AddVariable( "dz_muon1",&n_dcaSigdz1);
-	//reader->AddVariable( "dz_muon2",&n_dcaSigdz2);
-	reader->AddVariable("DZeta",&n_DZeta);
-	reader->AddVariable( "mvamet",&n_mvamet);
-	
-	//BookMethod
-	reader->BookMVA("BDT", cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/test/TMVA_Roch_22032016_BDT.weights.xml");
-	
-	
+	  //Create TMVA Reader Object
+	  TMVA::Reader *reader = new TMVA::Reader("!V:!Color");
+	  
+	  //create set of variables as declared in weight file and declared them to reader
+	  reader->AddVariable( "dimuonEta",&n_dimuonEta);
+	  // reader->AddVariable( "ptRatio",&n_ptRatio );
+	  // reader->AddVariable( "dxy_muon1",&n_dcaSigdxy1);
+	  //  reader->AddVariable( "dxy_muon2",&n_dcaSigdxy2);
+	  reader->AddVariable( "phi_PosMu_MET",&n_phiangle);
+	  //reader->AddVariable( "dz_muon1",&n_dcaSigdz1);
+	  //reader->AddVariable( "dz_muon2",&n_dcaSigdz2);
+	  reader->AddVariable("DZeta",&n_DZeta);
+	  reader->AddVariable( "mvamet",&n_mvamet);
+	  
+	  //BookMethod
+	  reader->BookMVA("BDT", cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/test/TMVA_Roch_22032016_BDT.weights.xml");
+	}
+	*/
 	TH1D * ZMassEtaPtPass[3][7];
    	TH1D * ZMassEtaPtFail[3][7];
 	
@@ -968,19 +972,19 @@ int main(int argc, char * argv[]) {
 	
 	// Lepton Scale Factors 
 	
-   	ScaleFactor * SF_muonIdIso = new ScaleFactor(); 
-   	SF_muonIdIso = new ScaleFactor();
-   	//std::cout<<"test1"<<std::endl;
-   	SF_muonIdIso->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(MuonIdIsoFile));
+	ScaleFactor * SF_muonIdIso = new ScaleFactor(); 
+	SF_muonIdIso = new ScaleFactor();
+	//std::cout<<"test1"<<std::endl;
+	SF_muonIdIso->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(MuonIdIsoFile));
 	ScaleFactor * SF_muonTrig;
 	SF_muonTrig = new ScaleFactor();
 	SF_muonTrig->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(MuonTrigFile));
-   	ScaleFactor *SF_muon17 = new ScaleFactor();
-   	//std::cout<<"test12"<<std::endl;
-   	SF_muon17->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(Muon17TriggerFile));
-   	ScaleFactor *SF_muon8 = new ScaleFactor();
-   	//std::cout<<"test13"<<std::endl;
-   	SF_muon8->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(Muon8TriggerFile));
+	ScaleFactor *SF_muon17 = new ScaleFactor();
+	//std::cout<<"test12"<<std::endl;
+	SF_muon17->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(Muon17TriggerFile));
+	ScaleFactor *SF_muon8 = new ScaleFactor();
+	//std::cout<<"test13"<<std::endl;
+	SF_muon8->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(Muon8TriggerFile));
 	
 	//loading recoil resolution
 	RecoilCorrector recoilPFMetCorrector("HTT-utilities/RecoilCorrections/data/"+RecoilFileName);
@@ -1302,13 +1306,14 @@ int main(int argc, char * argv[]) {
 			      float weight2 = (float)SF_muonIdIso->get_ScaleFactor(n_gen_mu2_Pt,fabs(n_gen_mu2_Eta));
 			      float effDataTrig1 = SF_muonTrig->get_EfficiencyData(n_gen_mu1_Pt,fabs(n_gen_mu1_Eta));
 			      float effDataTrig2 = SF_muonTrig->get_EfficiencyData(n_gen_mu2_Pt,fabs(n_gen_mu2_Eta));
-			      float effMcTrig1 = SF_muonTrig->get_EfficiencyMC(n_gen_mu1_Pt,fabs(n_gen_mu1_Eta));
-			      float effMcTrig2 = SF_muonTrig->get_EfficiencyMC(n_gen_mu2_Pt,fabs(n_gen_mu2_Eta));
+			      //float effMcTrig1 = SF_muonTrig->get_EfficiencyMC(n_gen_mu1_Pt,fabs(n_gen_mu1_Eta));
+			      //float effMcTrig2 = SF_muonTrig->get_EfficiencyMC(n_gen_mu2_Pt,fabs(n_gen_mu2_Eta));
 			      
 			      float effTrigData = 1 - (1-effDataTrig1)*(1-effDataTrig2);
-			      float effMcTrig = 1 - (1-effMcTrig1)*(1-effMcTrig2);
+			      // float effMcTrig = 1 - (1-effMcTrig1)*(1-effMcTrig2);
 			      float weightTrig = 0;
-			      if (effTrigData>0 && effMcTrig>0) weightTrig = effTrigData/effMcTrig;
+			      //if (effTrigData>0 && effMcTrig>0) weightTrig = effTrigData/effMcTrig;
+			      if (effTrigData>0) weightTrig = effTrigData;
 			      float effWeight = weight1*weight2*weightTrig;
 			      
 			      histGenCutsGenWeightsH->Fill(0.,n_genWeight);
@@ -1431,11 +1436,11 @@ int main(int argc, char * argv[]) {
 				{
 					
 					if ( num.c_str() ==  a.name ) {
-						//  std::cout<< " Eureka "<<num<<"  "<<a.name<<" ";
-						//   std::cout <<"min "<< last->lower << "- max last " << last->bigger << std::endl;
+					  // std::cout<< " Eureka "<<num<<"  "<<a.name<<" ";
+					  //	   std::cout <<"min "<< last->lower << "- max last " << last->bigger << std::endl;
 						for(auto b = a.ranges.begin(); b != std::prev(a.ranges.end()); ++b) {
 							
-							//	cout<<b->lower<<"  "<<b->bigger<<endl;
+						  //			cout<<b->lower<<"  "<<b->bigger<<endl;
 							if (lum  >= b->lower && lum <= b->bigger ) lumi = true;
 						}
 						auto last = std::prev(a.ranges.end());
@@ -1863,7 +1868,7 @@ int main(int argc, char * argv[]) {
 						//double IdIsoSF_mu1 = SF_muonIdIso->get_ScaleFactor(ptMu1, etaMu1);
 						//double IdIsoSF_mu2 = SF_muonIdIso->get_ScaleFactor(ptMu2, etaMu2);
 						
-						isoweight_1=(float)SF_muonIdIso->get_ScaleFactor(ptMu1, etaMu1);
+					        isoweight_1=(float)SF_muonIdIso->get_ScaleFactor(ptMu1, etaMu1);						
 						n_isoweight_1 = isoweight_1;
 						//std::cout << "isoweight_1 = "<< n_isoweight_1 <<std::endl;
 						isoweight_2=(float)SF_muonIdIso->get_ScaleFactor(ptMu2, etaMu2);
@@ -1881,29 +1886,29 @@ int main(int argc, char * argv[]) {
 						float effDataTrig2 = SF_muonTrig->get_EfficiencyData(ptMu2, etaMu2);  
 
 						//double effMcTrig1 = SF_muonTrig->get_EfficiencyMC(ptMu1, etaMu1);  
-						float effMcTrig1 = SF_muonTrig->get_EfficiencyMC(ptMu1, etaMu1);
+						//float effMcTrig1 = SF_muonTrig->get_EfficiencyMC(ptMu1, etaMu1);
 						//double effMcTrig2 = SF_muonTrig->get_EfficiencyMC(ptMu2, etaMu2);  
-						float effMcTrig2 = SF_muonTrig->get_EfficiencyMC(ptMu2, etaMu2);
+						//float effMcTrig2 = SF_muonTrig->get_EfficiencyMC(ptMu2, etaMu2);
 						
 						//double effTrigData = 1 - (1-effDataTrig1)*(1-effDataTrig2);
 						float effTrigData = 1 - (1-effDataTrig1)*(1-effDataTrig2);
 						//double effMcTrig = 1 - (1-effMcTrig1)*(1-effMcTrig2);
-						float effMcTrig = 1 - (1-effMcTrig1)*(1-effMcTrig2);
+						//float effMcTrig = 1 - (1-effMcTrig1)*(1-effMcTrig2);
 						
 						float Mu17EffData1 = (float)SF_muon17->get_EfficiencyData(ptMu1,etaMu1);
-						float Mu17EffMC1   = (float)SF_muon17->get_EfficiencyMC(ptMu1,etaMu1);
+						//float Mu17EffMC1   = (float)SF_muon17->get_EfficiencyMC(ptMu1,etaMu1);
 						
 						float Mu8EffData1 = (float)SF_muon8->get_EfficiencyData(ptMu1,etaMu1);
-						float Mu8EffMC1   = (float)SF_muon8->get_EfficiencyMC(ptMu1,etaMu1);
+						//float Mu8EffMC1   = (float)SF_muon8->get_EfficiencyMC(ptMu1,etaMu1);
 						
 						float Mu17EffData2 = (float)SF_muon17->get_EfficiencyData(ptMu2,etaMu2);
-						float Mu17EffMC2   = (float)SF_muon17->get_EfficiencyMC(ptMu2,etaMu2);
+						//float Mu17EffMC2   = (float)SF_muon17->get_EfficiencyMC(ptMu2,etaMu2);
 						
 						float Mu8EffData2 = (float)SF_muon8->get_EfficiencyData(ptMu2,etaMu2);
-						float Mu8EffMC2   = (float)SF_muon8->get_EfficiencyMC(ptMu2,etaMu2);
+						//float Mu8EffMC2   = (float)SF_muon8->get_EfficiencyMC(ptMu2,etaMu2);
 						
 						float trigWeightData = Mu17EffData1*Mu8EffData2 + Mu8EffData1*Mu17EffData2 - Mu17EffData1*Mu17EffData2;
-						float trigWeightMC = Mu17EffMC1*Mu8EffMC2 + Mu8EffMC1*Mu17EffMC2 - Mu17EffMC1*Mu17EffMC2;
+						//float trigWeightMC = Mu17EffMC1*Mu8EffMC2 + Mu8EffMC1*Mu17EffMC2 - Mu17EffMC1*Mu17EffMC2;
 						
 						if (doubleMuonTrigger){
 							if (isMu1LowPtmatched && isMu2HighPtmatched) {
@@ -1920,9 +1925,10 @@ int main(int argc, char * argv[]) {
 								n_trigweight_2= trigweight_2;
 							}
 							
-							if (trigWeightMC>1e-6){
-								trigweight = trigWeightData / trigWeightMC;
-								n_trigweight = trigweight;
+							if (trigWeightData>0){
+							  //trigweight = trigWeightData / trigWeightMC;
+							  trigweight = trigWeightData;
+							  n_trigweight = trigweight;
 							}
 							
 							effweight = isoweight_1*isoweight_2*trigweight;
@@ -1931,14 +1937,16 @@ int main(int argc, char * argv[]) {
 						}
 						
 						else
-						  if (effTrigData>0 && effMcTrig>0) {
-						  	//double weightTrig = effTrigData/effMcTrig;
-							  weightTrig = effTrigData/effMcTrig;
-							  n_weightTrig = weightTrig;
-						  // std::cout << "mu 1 ->  pt = " << ptMu1 << "   eta = " << etaMu1 << std::endl;
-						  // std::cout << "mu 2 ->  pt = " << ptMu2 << "   eta = " << etaMu2 << std::endl;
-						  // std::cout << "WeightTrig = " << weightTrig << std::endl;
-							  weight = weight*weightTrig;
+						  //if (effTrigData>0 && effMcTrig>0) {
+						  if (effTrigData>0) {
+						    //double weightTrig = effTrigData/effMcTrig;
+						    //  weightTrig = effTrigData/effMcTrig;
+						    weightTrig = effTrigData;
+						    n_weightTrig = weightTrig;
+						    // std::cout << "mu 1 ->  pt = " << ptMu1 << "   eta = " << etaMu1 << std::endl;
+						    // std::cout << "mu 2 ->  pt = " << ptMu2 << "   eta = " << etaMu2 << std::endl;
+						    // std::cout << "WeightTrig = " << weightTrig << std::endl;
+						    weight = weight*weightTrig;
 						  }	
 						
 						
@@ -2317,17 +2325,37 @@ int main(int argc, char * argv[]) {
 					n_jets = double(nJets30);
 					n_noOfvertices = analysisTree.primvertex_count;
 					
-					float mvaValue_ =  reader->EvaluateMVA("BDT");
-					histMva->Fill(mvaValue_, weight);
-					if(n_dimuonMass > 20 && n_dimuonMass < 70)histMva_massCut->Fill(mvaValue_, weight);
-					double cut = 0.0;
-					for (int j=-20,k=0 ;k<iCut; j++,k++){
-					  cut = j*0.05;
-					  // std::cout<<"for k = " << k << "  cut = " << cut <<std::endl;
-					  if(mvaValue_ > cut) InvMass[k]->Fill(n_dimuonMass, weight);
+					if(applyBDT){
+					  //This loads the library
+					  TMVA::Tools::Instance();
+					  //Create TMVA Reader Object                                                                                           
+					  TMVA::Reader *reader = new TMVA::Reader("!V:!Color");
+					  //create set of variables as declared in weight file and declared them to reader                                      
+					  reader->AddVariable( "dimuonEta",&n_dimuonEta);
+					  // reader->AddVariable( "ptRatio",&n_ptRatio );                                                                      
+					  // reader->AddVariable( "dxy_muon1",&n_dcaSigdxy1);                                                                   
+					  //  reader->AddVariable( "dxy_muon2",&n_dcaSigdxy2);                                                                  
+					  reader->AddVariable( "phi_PosMu_MET",&n_phiangle);
+					  //reader->AddVariable( "dz_muon1",&n_dcaSigdz1);                                                                      
+					  //reader->AddVariable( "dz_muon2",&n_dcaSigdz2);                                                                      
+					  reader->AddVariable("DZeta",&n_DZeta);
+					  reader->AddVariable( "mvamet",&n_mvamet);
+
+					  //BookMethod                                                                                                        
+					  reader->BookMVA("BDT", cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/test/TMVA_Roch_22032016_BDT.weights.xml");
+
+					  float mvaValue_ =  reader->EvaluateMVA("BDT");
+					  histMva->Fill(mvaValue_, weight);
+					  if(n_dimuonMass > 20 && n_dimuonMass < 70)histMva_massCut->Fill(mvaValue_, weight);
+					  double cut = 0.0;
+					  for (int j=-20,k=0 ;k<iCut; j++,k++){
+					    cut = j*0.05;
+					    // std::cout<<"for k = " << k << "  cut = " << cut <<std::endl;
+					    if(mvaValue_ > cut) InvMass[k]->Fill(n_dimuonMass, weight);
+					  }
+					  n_mva_BDT =mvaValue_;
 					}
-					n_mva_BDT =mvaValue_;
-					/* *****svFit*******
+					  /* *****svFit*******
 					
 					//define MET
 					double measuredMETx = mvamet_ex;
