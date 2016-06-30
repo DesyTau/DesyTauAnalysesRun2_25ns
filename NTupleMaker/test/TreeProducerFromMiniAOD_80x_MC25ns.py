@@ -51,7 +51,7 @@ from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag
 if runOnData:
   process.GlobalTag.globaltag = '80X_dataRun2_Prompt_v8'
 else:
-  process.GlobalTag.globaltag = '80X_mcRun2_asymptotic_2016_v3'
+  process.GlobalTag.globaltag = '80X_mcRun2_asymptotic_2016_miniAODv2'
 
 print 'The conditions are =======>',process.GlobalTag.globaltag
     
