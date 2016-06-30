@@ -9,7 +9,7 @@ period = 'Spring16'
 runOnData=isData #data/MC switch
 usePrivateSQlite=False #use external JECs (sqlite file) /// OUTDATED for 25ns
 useHFCandidates=True #create an additionnal NoHF slimmed MET collection if the option is set to false  == existing as slimmedMETsNoHF
-applyResiduals=isData #application of residual corrections. Have to be set to True once the 13 TeV residual corrections are available. False to be kept meanwhile. Can be kept to False later for private tests or for analysis checks and developments (not the official recommendation!).
+applyResiduals=True #application of residual corrections. Have to be set to True once the 13 TeV residual corrections are available. False to be kept meanwhile. Can be kept to False later for private tests or for analysis checks and developments (not the official recommendation!).
 #===================================================================
 
 ### External JECs =====================================================================================================
@@ -274,7 +274,8 @@ MetCovMatrixTag = cms.InputTag("METSignificance:METCovariance:TreeProducer"),
 MetSigTag = cms.InputTag("METSignificance:METSignificance:TreeProducer"),
 MetCorrCovMatrixTag = cms.InputTag("METCorrSignificance:METCovariance:TreeProducer"),
 MetCorrSigTag = cms.InputTag("METCorrSignificance:METSignificance:TreeProducer"),
-MetCorrCollectionTag = cms.InputTag("patpfMETT1::TreeProducer"),
+#MetCorrCollectionTag = cms.InputTag("patpfMETT1::TreeProducer"),
+MetCorrCollectionTag = cms.InputTag("slimmedMETs::@skipCurrentProcess"),
 PuppiMetCollectionTag = cms.InputTag("slimmedMETsPuppi"),
 MvaMetCollectionsTag = cms.VInputTag(cms.InputTag("MVAMET","MVAMET","TreeProducer")),
 TrackCollectionTag = cms.InputTag("generalTracks"),
@@ -491,7 +492,8 @@ process.load("RecoMET/METProducers.METSignificanceParams_cfi")
 
 process.METCorrSignificance = process.METSignificance.clone(
   srcPfJets = cms.InputTag('patJetsReapplyJEC::TreeProducer'),
-  srcMet = cms.InputTag('patpfMETT1::TreeProducer')
+  #srcMet = cms.InputTag('patpfMETT1::TreeProducer')
+  srcMet = cms.InputTag('slimmedMETs::@skipCurrentProcess')
 )
 
 process.p = cms.Path(
