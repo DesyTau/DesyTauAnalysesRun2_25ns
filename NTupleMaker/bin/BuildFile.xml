@@ -132,6 +132,7 @@
  <use name="FWCore/ParameterSet"/>
  <use name="TauAnalysis/SVfitStandalone"/>
  <use name="CondFormats/BTauObjects"/>
+ <use name="CondTools/BTau"/>
  <use name="TauAnalysis/SVfitStandalone"/>
  <use name="HTT-utilities/LepEffInterface"/>
  <use name="HTT-utilities/RecoilCorrections"/>
