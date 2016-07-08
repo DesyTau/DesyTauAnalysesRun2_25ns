@@ -132,7 +132,6 @@ int main(int argc, char * argv[]){
   //lep eff
   const string idIsoEffFile = cfg.get<string>("idIsoEffFile");
   const string trigEffFile = cfg.get<string>("trigEffFile");
-  
 
   //svfit
   const string svFitPtResFile = cfg.get<string>("svFitPtResFile");
