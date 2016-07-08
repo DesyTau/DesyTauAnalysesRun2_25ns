@@ -386,9 +386,9 @@ class NTupleMaker : public edm::EDAnalyzer{
   edm::EDGetTokenT<pat::PackedCandidateCollection> PackedCantidateCollectionToken_;
   edm::EDGetTokenT<pat::TriggerObjectStandAloneCollection> TriggerObjectCollectionToken_;
   edm::EDGetTokenT<BeamSpot> BeamSpotToken_;
-  edm::EDGetTokenT<VertexCollection> PVToken_;
   edm::EDGetTokenT<double> SusyMotherMassToken_;
   edm::EDGetTokenT<double> SusyLSPMassToken_;
+  edm::EDGetTokenT<VertexCollection> PVToken_;
   std::string sampleName;
 
   PropagatorWithMaterial*               propagatorWithMaterial; 
