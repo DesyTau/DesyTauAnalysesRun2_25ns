@@ -1,6 +1,6 @@
 import FWCore.ParameterSet.Config as cms
 
-isData = False
+isData = True
 is25ns = True
 year = 2016
 period = 'Spring16'

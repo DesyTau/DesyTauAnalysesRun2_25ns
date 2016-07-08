@@ -1,6 +1,10 @@
 import re
-from grid_control import datasets, DatasetError
-from grid_control.datasets import NickNameProducer
+try:
+	from hpfwk import Plugin
+	NickNameProducer = Plugin.getClass('NickNameProducer')
+except:
+	from grid_control import datasets # FIXME: this line should be unnecessary
+	from grid_control.datasets import NickNameProducer
 
 def lookup(data, keyMap, default = None):
 	for key in keyMap:
@@ -107,3 +111,5 @@ class signalNicks(NickNameProducer):
 Summer12SignalNicks=signalNicks
 Summer11SignalNicks=signalNicks
 Fall11SignalNicks=signalNicks
+
+
