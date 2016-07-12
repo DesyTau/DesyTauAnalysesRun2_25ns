@@ -2,42 +2,37 @@
 // See http://www.hep.phy.cam.ac.uk/~lester/mt2/index.html
 // Authors: Christopher Lester and Alan Barr
 
-#ifndef Basic_Mt2_332_Calculator_H
-#define Basic_Mt2_332_Calculator_H
+#ifndef Basic_Nt2_332_Calculator_H
+#define Basic_Nt2_332_Calculator_H
 
-#include "Mt2_332_Calculator.h"
+#include "Mt2/Nt2_332_Calculator.h"
+#include "Mt2/Mt2Vectors.h"
 #include "Minuit2/FCNBase.h"
 #include <vector>
 
 namespace Mt2 {
 
-  class Basic_Mt2_332_Calculator : public Mt2_332_Calculator {
+  class Basic_Nt2_332_Calculator : public Nt2_332_Calculator {
   public:
-    double mt2_332(const LorentzTransverseVector& visibleA, // 3 d.o.f. 
+    double nt2_332(const LorentzTransverseVector& visibleA, // 3 d.o.f. 
 		   const LorentzTransverseVector& visibleB, // 3 d.o.f.
 		   const TwoVector& ptmiss,                 // 2 d.o.f.
-		   const double mInvisible);
-    double mt2_332_Sq(const LorentzTransverseVector& visibleA, // 3 d.o.f. 
+		   const double massParent1,
+		   const double massParent2);
+    double nt2_332_Sq(const LorentzTransverseVector& visibleA, // 3 d.o.f. 
 		      const LorentzTransverseVector& visibleB, // 3 d.o.f.
 		      const TwoVector& ptmiss,                 // 2 d.o.f.
-		      const double mInvisible);
-    Basic_Mt2_332_Calculator() : Mt2_332_Calculator("Basic_Mt2_332") {};
-
-      double getPXInvisA_atMt2Solution() const {return etxAt;}
-      double getPYInvisA_atMt2Solution() const {return etyAt;}
-      double getPXInvisB_atMt2Solution() const {return etxBt;}
-      double getPYInvisB_atMt2Solution() const {return etyBt;}
+		      const double massParent1,
+		      const double massParent2);
+    Basic_Nt2_332_Calculator() : Nt2_332_Calculator("Basic_Nt2_332") {};
     
   private:
-      double etxAt;
-      double etyAt;
-      double etxBt;
-      double etyBt;
     class mT2Fcn : public ROOT::Minuit2::FCNBase {
     public:
       mT2Fcn(const double exmiss, 
 	     const double eymiss, 
-	     const double mchi,
+	     const double mParent1,
+	     const double mParent2,
 	     const double pT1x,
 	     const double pT1y,
 	     const double mass1,
@@ -46,7 +41,8 @@ namespace Mt2 {
 	     const double mass2) : 
 	theExmiss(exmiss),
 	theEymiss(eymiss),
-	theMchi(mchi),
+	theParent1(mParent1),
+	theParent2(mParent2),
 	thePT1x(pT1x),
 	thePT1y(pT1y),
 	theMass1(mass1),
@@ -62,7 +58,8 @@ namespace Mt2 {
       
       const double exMiss() const {return theExmiss;}
       const double eyMiss() const {return theEymiss;}
-      const double mChi() const {return theMchi;}
+      const double mParent1() const {return theParent1;}
+      const double mParent2() const {return theParent2;}
       const double pT1x() const {return thePT1x;}
       const double pT1y() const {return thePT1y;}
       const double pT2x() const {return thePT2x;}
@@ -74,7 +71,8 @@ namespace Mt2 {
       
       double theExmiss;
       double theEymiss;
-      double theMchi;
+      double theParent1;
+      double theParent2;
       
       double thePT1x;
       double thePT1y;
@@ -85,8 +83,6 @@ namespace Mt2 {
       double theMass2;
       
       double theErrorDef;
-
-
     };
   };
 

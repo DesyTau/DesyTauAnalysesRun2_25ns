@@ -1,127 +1,26 @@
 
-//#include "DesyTauAnalyses/NTupleMaker/interface/Config.h"
-//#include "DesyTauAnalyses/NTupleMaker/interface/AC1B.h"
-//#include "DesyTauAnalyses/NTupleMaker/interface/Basic_Mt2_332_Calculator.h"
-//#include "DesyTauAnalyses/NTupleMaker/interface/Basic_MPairProd_Calculator.h"
-
-#include "DesyTauAnalyses/NTupleMaker/interface/functions.h"
-#include "DesyTauAnalyses/NTupleMaker/interface/lester_mt2_bisect.h"
-#include "DesyTauAnalyses/NTupleMaker/interface/mTBound.h"
+#include "/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/CMSSW_8_0_12/src/DesyTauAnalyses/NTupleMaker/interface/functions.h"
+#include "/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/CMSSW_8_0_12/src/DesyTauAnalyses/NTupleMaker/interface/lester_mt2_bisect.h"
+#include "/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/CMSSW_8_0_12/src/DesyTauAnalyses/NTupleMaker/interface/Basic_Mt2_332_Calculator.h"
+#include "/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/CMSSW_8_0_12/src/DesyTauAnalyses/NTupleMaker/interface/mTBound.h"
+#include "/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/CMSSW_8_0_12/src/DesyTauAnalyses/NTupleMaker/interface/TMctLib.h"
+#include "/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/CMSSW_8_0_12/src/DesyTauAnalyses/NTupleMaker/interface/mctlib.h"
 #include "TTree.h"
+#include <iostream>
+
+//#include <ScaleFactor.h>
+#include <TLorentzVector.h>
+#include <TVector2.h>
 using namespace std;
 
 
-const  int CutN=21;
+const  int CutN=25;
 
 
 
 unsigned int RunMin = 9999999;
 unsigned int RunMax = 0;
      
-int tau_index=-1;
-int tau_loose=-1;
-int tau_tight=-1;
-int mu_index=-1;
-int el_index=-1;
-
-
-
-
-   Int_t          primvert_count;
-   Float_t         primvert_x;
-   Float_t         primvert_y;
-   Float_t         primvert_z;
-   Float_t 	   SusyMother;
-   Float_t 	   SusyLSP;
-
-
-   Float_t 	   CFCounter_[30];
-   Int_t	   muon_index;
-   Int_t	   electron_index;
-   Int_t	   taus_index;
-   Int_t           mu_count;
-   Int_t	   nbtag;
-   Int_t	   njets;
-   Float_t         mu_px[20];   //[mu_count]
-   Float_t         mu_py[20];   //[mu_count]
-   Float_t         mu_pz[20];   //[mu_count]
-   Float_t         mu_pt[20];   //[mu_count]
-   Float_t         mu_eta[20];   //[mu_count]
-   Float_t         mu_phi[20];   //[mu_count]
-   Float_t         mu_charge[20];   //[mu_count]
-   Float_t         mu_miniISO[20];   //[mu_count]
-   Float_t         mu_dxy[20];   //[mu_count]
-   Float_t         mu_dz[20];   //[mu_count]
-   Float_t         mu_relIso[20];   //[mu_count]
-   Int_t          jet_count;
-   Int_t          jets_cleaned[30];
-   Float_t         jet_e[30];   //[jet_count]
-   Float_t         jet_px[30];   //[jet_count]
-   Float_t         jet_py[30];   //[jet_count]
-   Float_t         jet_pz[30];   //[jet_count]
-   Float_t         jet_pt[30];   //[jet_count]
-   Float_t         jet_eta[30];   //[jet_count]
-   Float_t         jet_phi[30];   //[jet_count]
-   Int_t           jet_flavour[30];   //[jet_count]
-   Float_t         jet_btag[30];   //[jet_count]
-   Int_t	   jet_isLoose[30];
-   string	   datasetName;
-   string	   regionName;
-   Int_t          el_count;
-   Float_t         el_px[20];   //[el_count]
-   Float_t         el_py[20];   //[el_count]
-   Float_t         el_pz[20];   //[el_count]
-   Float_t         el_pt[20];   //[el_count]
-   Float_t         el_eta[20];   //[el_count]
-   Float_t         el_phi[20];   //[el_count]
-   Float_t         el_miniISO[20];   //[el_count]
-   Float_t         el_dxy[20];   //[el_count]
-   Float_t         el_dz[20];   //[el_count]
-   Float_t         el_charge[20];   //[el_count]
-   Float_t         el_relIso[20];   //[el_count]
-
-
-   Int_t          ta_count;
-   Float_t         ta_px[30];   //[ta_count]
-   Float_t         ta_py[30];   //[ta_count]
-   Float_t         ta_pz[30];   //[ta_count]
-   Float_t         ta_mass[30];   //[ta_count]
-   Float_t         ta_eta[30];   //[ta_count]
-   Float_t         ta_phi[30];   //[ta_count]
-   Float_t         ta_pt[30];   //[ta_count]
-   Float_t         ta_dxy[30];   //[ta_count]
-   Float_t         ta_dz[30];   //[ta_count]
-   Float_t         ta_charge[30];   //[ta_count]
-   Float_t         ta_IsoFlag;   //[ta_count]
-   Float_t         ta_relIso[30];   //[ta_count]
-
-
-
-   Float_t         met_ex;
-   Float_t         met_ey;
-   Float_t         met_ez;
-   Float_t         met_pt;
-   Float_t         met_phi;
-
-   Float_t         gen_weight;
-   Float_t 	   pu_weight;
-   Float_t 	   LSF_weight;
-   Float_t 	   TFR_weight;
-   Float_t 	   top_weight;
-   Float_t 	   all_weight;
-   Float_t 	   trig_weight;
-   Float_t 	   xsecs;
-   Float_t 	   event_sign;
-   Float_t 	   event_secondLeptonVeto;
-   Float_t 	   event_thirdLeptonVeto;
-   Float_t 	   event_leptonDrTrigger;
-   Float_t	   genTauMatched;
-   Float_t	   qcdweight;
-   Float_t	   qcdweightup;
-   Float_t	   qcdweightdown;
-   Int_t 	   npartons;
-
-
 
 //bool isData = false;
 
@@ -131,7 +30,154 @@ double mIntermediate = tauMass;
 double sumpT = 0;
 double XSec=-1;
 double xs,fact,fact2;
-  
+ 
+vector<TLorentzVector> AllJets_Lepton_noMet;
+vector<TLorentzVector> JetsMV;
+vector<TLorentzVector>  ElMV;
+vector<TLorentzVector>  MuMV;
+vector<TLorentzVector>  TauMV;
+vector<TLorentzVector>  LeptMV;
+
+
+double TauFakeRate(float pt,float eta, string sel){
+
+float SF = 1;
+
+
+
+/*
+if (sel =="mutau"){
+if (  fabs(eta) < 0.9 ) 
+	{
+		if (pt>20 && pt<30) SF = 1.1257;
+		if (pt>30 && pt<50) SF = 1.1772;
+		if (pt>50 && pt<60) SF = 1.11066;
+		if (pt>60 )	    SF = 0.929049;
+	}
+if (  fabs(eta) > 0.9 && fabs(eta) < 1.2 ) 
+	{
+
+		if (pt>20 && pt<30) SF = 1.12178;
+		if (pt>30 && pt<50) SF = 1.14515;
+		if (pt>50 && pt<60) SF = 1.13192;
+		if (pt>60 )	    SF = 0.803613;
+	}
+
+if (  fabs(eta) > 1.2 && fabs(eta) < 2.4 ) 
+	{
+
+		if (pt>20 && pt<30) SF = 1.19204;
+		if (pt>30 && pt<50) SF = 1.3671;
+		if (pt>50 && pt<60) SF = 0.822663;
+		if (pt>60 )	    SF = 0.935905;
+	}
+}
+*/
+/*  76 with 74 tauID
+if (sel =="mutau" || sel == "eltau"){
+
+if (  fabs(eta) < 0.9 ) 
+	{
+		if (pt>20 && pt<30) SF = 0.954958;
+		if (pt>30 && pt<50) SF = 0.953136;
+		if (pt>50 && pt<60) SF = 1.02731;
+		if (pt>60 )	    SF = 0.607123;
+	}
+if (  fabs(eta) > 0.9 && fabs(eta) < 1.2 ) 
+	{
+
+		if (pt>20 && pt<30) SF = 1.16147;
+		if (pt>30 && pt<50) SF = 1.0232;
+		if (pt>50 && pt<60) SF = 0.832163;
+		if (pt>60 )	    SF = 0.282185;
+	}
+
+if (  fabs(eta) > 1.2 && fabs(eta) < 2.4 ) 
+	{
+
+		if (pt>20 && pt<30) SF = 1.15245;
+		if (pt>30 && pt<50) SF = 1.3188;
+		if (pt>50 && pt<60) SF = 1.42863;
+		if (pt>60 )	    SF = 1.25883;
+	}
+}
+*/
+
+
+if (sel =="mutau" || sel == "eltau"){
+
+if (  fabs(eta) < 0.9 ) 
+	{
+		if (pt>20 && pt<30) SF = 0.951389;
+		if (pt>30 && pt<50) SF = 1.02132;
+		if (pt>50 && pt<60) SF = 1.01055;
+		if (pt>60 )	    SF = 1.23687;
+	}
+if (  fabs(eta) > 0.9 && fabs(eta) < 1.2 ) 
+	{
+
+		if (pt>20 && pt<30) SF = 1.13632;
+		if (pt>30 && pt<50) SF = 0.893702;
+		if (pt>50 && pt<60) SF = 0.641584;
+		if (pt>60 )	    SF = 0.734287;
+	}
+
+if (  fabs(eta) > 1.2 && fabs(eta) < 2.4 ) 
+	{
+
+		if (pt>20 && pt<30) SF = 1.26976;
+		if (pt>30 && pt<50) SF = 1.37512;
+		if (pt>50 && pt<60) SF = 1.2002;
+		if (pt>60 )	    SF = 1.24742;
+	}
+}
+
+
+
+return SF;
+
+
+}
+
+
+
+
+
+float Dzeta(TLorentzVector LV, TLorentzVector muV, TLorentzVector MetV)
+	{
+				float LUnitX = LV.Px()/LV.Pt();
+				float LUnitY = LV.Py()/LV.Pt();
+
+				//	cout<<" CHECK =========== "<<tauV.Pt()<<"  "<<ta_pt[tIndex]<<endl;	
+				float muonUnitX = muV.Px()/muV.Pt();
+				float muonUnitY = muV.Py()/muV.Pt();
+
+				float zetaX = LUnitX + muonUnitX;
+				float zetaY = LUnitY + muonUnitY;
+
+				float normZeta = TMath::Sqrt(zetaX*zetaX+zetaY*zetaY);
+
+				zetaX = zetaX/normZeta;
+				zetaY = zetaY/normZeta;
+
+				float vectorX = MetV.Px() + muV.Px() + LV.Px();
+				float vectorY = MetV.Py() + muV.Py() + LV.Py();
+
+				float vectorVisX = muV.Px() + LV.Px();
+				float vectorVisY = muV.Py() + LV.Py();
+
+				// computation of DZeta variable
+				// pfmet
+				float pzetamiss = MetV.Px()*zetaX + MetV.Py()*zetaY;
+				float pzetavis = vectorVisX*zetaX + vectorVisY*zetaY;
+				float dzeta = pzetamiss - 0.85*pzetavis;
+
+
+				return dzeta;
+}
+
+
+
 
   int nPtBins = 8;
   float ptBins[9] = {10,13,16,20,25,30,40,60,1000};
@@ -188,60 +234,6 @@ double xs,fact,fact2;
 			"Eta0p9to1p2",
 			"EtaGt1p2"};
 
-float topPtWeight(float pt1,
-		  float pt2) {
-
-  float a = 0.156;    // Run1 a parameter
-  float b = -0.00137;  // Run1 b parameter
- //   float a =  0.159; //l+jets
- //   float b =  -0.00141;
-  
-  float w1 = TMath::Exp(a+b*pt1);
-  float w2 = TMath::Exp(a+b*pt2);
-    
-  if (pt1>400) w1 = 1;
-  if (pt2>400) w2 = 1;
-//cout<<" w1  "<<w1<<"  "<<w2<<endl;
-  return TMath::Sqrt(w1*w2);
-
-}
-
-double TauFakeRate(float pt,float eta){
-
-float SF = 1;
-
-if (  fabs(eta) < 0.9 ) 
-	{
-		if (pt>20 && pt<30) SF = 1.12569;
-		if (pt>30 && pt<50) SF = 1.17716;
-		if (pt>50 && pt<60) SF = 1.1107;
-		if (pt>60 )	    SF = 0.929284;
-	}
-if (  fabs(eta) > 0.9 && fabs(eta) < 1.2 ) 
-	{
-
-		if (pt>20 && pt<30) SF = 1.12176;
-		if (pt>30 && pt<50) SF = 1.14511;
-		if (pt>50 && pt<60) SF = 1.13235;
-		if (pt>60 )	    SF = 0.803793;
-	}
-
-if (  fabs(eta) > 1.2 && fabs(eta) < 2.4 ) 
-	{
-
-		if (pt>20 && pt<30) SF = 1.19201;
-		if (pt>30 && pt<50) SF = 1.36684;
-		if (pt>50 && pt<60) SF = 0.822642;
-		if (pt>60 )	    SF = 0.935916;
-	}
-
-return SF;
-
-
-}
-
-
-
 //string CutList[10];
 vector<string> var;
 vector < string > vec;
@@ -257,8 +249,6 @@ TH1D * hWeights [CutN];
 
 TH1D * hmu_dxy [CutN];
 TH1D * hmu_dz [CutN];
-
-
 
 TH1D * hel_dxy [CutN];
 TH1D * hel_dz [CutN];
@@ -292,6 +282,10 @@ TH1D *hPtJ0[CutN];
 TH1D *hPtJ1[CutN];
 TH1D *hPtJ2[CutN];
 TH1D *hPtJ3[CutN];
+
+TH1D *hIsoMu[CutN];
+TH1D *hIsoEl[CutN];
+TH1D *hIsoTau[CutN];
 
 TH1D *hInvMassMuTau[CutN];
 TH1D *hInvMassMuEl[CutN];
@@ -333,12 +327,14 @@ TH1D *hTaueta[CutN];
 
 
 TH1D *hMET[CutN];
+TH1D *hMETphi[CutN];
 //TH1D *hnOver[CutN];
 TH1D *hdPhiMETLep[CutN];
 TH1D *hdPhiMETMu[CutN];
 TH1D *hdPhiMETEl[CutN];
 TH1D *hdPhiMETTau[CutN];
 TH1D *hdPhiJMET[CutN];
+TH1D *hdPhiJ0Tau[CutN];
 TH1D *hdPhiJ0MET[CutN];
 TH1D *hdPhiJ1MET[CutN];
 TH1D *hdPhiJ2MET[CutN];
@@ -348,47 +344,47 @@ TH1D *hdPhiElMET[CutN];
 TH1D *hdPhiTauMET[CutN];
 
 TH1D *hMT[CutN];
+TH1D *hMTsum[CutN];
+TH1D *hMTtot[CutN];
 TH1D *hMTel[CutN];
 TH1D *hMTmu[CutN];
 TH1D *hMTtau[CutN];
 TH1D *hDZeta[CutN];
 
+TH1D *hMTmutau[CutN];
+TH1D *hMTmuel[CutN];
+TH1D *hMTeltau[CutN];
 TH1D *hMTtautau[CutN];
 
-
-/////////// mutau
-TH1D *hMTmutau[CutN];
 TH1D *hMt2lestermutau[CutN];
 TH1D *hMt2mutau[CutN];
 TH1D *hMCTmutau[CutN];
 TH1D *hMCTxmutau[CutN];
 TH1D *hMCTymutau[CutN];
 TH1D *hMCTbmutau[CutN];
-TH1D *hTBoundmutau[CutN];
-TH1D *hdR_mutau[CutN];
 
-TH1D *hMTmuel[CutN];
+
 TH1D *hMt2lestermuel[CutN];
 TH1D *hMt2muel[CutN];
 TH1D *hMCTmuel[CutN];
 TH1D *hMCTxmuel[CutN];
 TH1D *hMCTymuel[CutN];
 TH1D *hMCTbmuel[CutN];
-TH1D *hTBoundmuel[CutN];
-TH1D *hdR_muel[CutN];
 
-TH1D *hMTeltau[CutN];
 TH1D *hMt2lestereltau[CutN];
 TH1D *hMt2eltau[CutN];
 TH1D *hMCTeltau[CutN];
 TH1D *hMCTxeltau[CutN];
 TH1D *hMCTyeltau[CutN];
 TH1D *hMCTbeltau[CutN];
+
+TH1D *hTBoundmutau[CutN];
+
+TH1D *hdR_mutau[CutN];
 TH1D *hdR_eltau[CutN];
-TH1D *hTBoundeltau[CutN];
-
-
 TH1D *hdR_tautau[CutN];
+TH1D *hdR_muel[CutN];
+TH1D *hdR_taujet[CutN];
 
 
 TH1D *hnpv[CutN];
@@ -397,6 +393,18 @@ TH1D *hnrho[CutN];
 
 
 TH2D *hmet_MT[CutN];
+TH2D *hmet_MTsum[CutN];
+TH2D *hmet_MTtot[CutN];
+TH2D *hmet_DZeta[CutN];
+TH2D *hmet_MCTb[CutN];
+TH2D *hDZeta_MTsum[CutN];
+TH2D *hDZeta_MTtot[CutN];
+
+TH2D *hDZeta_MCTb[CutN];
+
+TH2D *hMTsum_MCTb[CutN];
+TH2D *hMTtot_MCTb[CutN];
+
 TH2D *hmet_MTel[CutN];
 TH2D *hmet_MTmu[CutN];
 TH2D *hmet_MTtau[CutN];
@@ -417,9 +425,15 @@ TH2D *hMT_dPhiel[CutN];
 TH2D *hMT_dPhimu[CutN];
 TH2D *hMT_dPhitau[CutN];
 
-
 TH2D *hIso_sign[CutN];
-  
+ 
+     
+
+TH2D *hMT2lester_MCTb[CutN];
+TH2D *hMT2lester_met[CutN];
+TH2D *hMT2lester_DZeta[CutN];
+
+
 TH1D *CutFlow= new TH1D("CutFlow","Cut Flow",CutN,1,CutN+1);
 TH1D *CutFlowUnW= new TH1D("CutFlowUnW","Cut Flow",CutN,1,CutN+1);
 TH1D *CutFlowUnWNorm= new TH1D("CutFlowUnWNorm","Cut Flow",CutN,1,CutN+1);
@@ -460,7 +474,7 @@ TH1D * dileptondRSelH = new TH1D("dileptondRSelH","",60,0,6);
 TH1D * ETmissSelH = new TH1D("ETmissSelH","",10,0,200);
 TH1D * MtSelH = new TH1D("MtSelH_2l","",10,0,200);
 TH1D * DZetaSelH = new TH1D("DZetaSelH","",60,-400,200);
-
+/*
 TLorentzVector ElV, MuV, TauV, JetsV, METV;
 
 vector<TLorentzVector> AllJets_Lepton_noMet;
@@ -469,7 +483,7 @@ vector<TLorentzVector>  ElMV;
 vector<TLorentzVector>  MuMV;
 vector<TLorentzVector>  TauMV;
 vector<TLorentzVector>  LeptMV;
-
+*/
 
 std::vector<pair<string,float> > variables_;
 std::vector<pair<string,float> > variablesMC_;
@@ -488,195 +502,55 @@ void WriteHists(int CutNer, TFile *in, TString dir){
 }
 
 
-//void SetupTree(string & fout_,string &Sel){
-void SetupTree(){
-/*
-TFile * filetree = new TFile(fout_.c_str(),"recreate");
-	
-filetree->mkdir(Sel.c_str());
-filetree->cd(Sel.c_str());
-*/
-T  = new TTree("T","T");
 
-  T->Branch("met_ex", &met_ex, "met_ex/F");
-  T->Branch("met_ey", &met_ey, "met_ey/F");
-  T->Branch("met_ez", &met_ez, "met_ez/F");
-  T->Branch("met_pt", &met_pt, "met_pt/F");
-  T->Branch("met_phi", &met_phi, "met_phi/F");
- 
-  T->Branch("gen_weight", &gen_weight, "gen_weight/F");
-  T->Branch("pu_weight", &pu_weight, "pu_weight/F");
-  T->Branch("LSF_weight", &LSF_weight, "LSF_weight/F");
-  T->Branch("TFR_weight", &TFR_weight, "TFR_weight/F");
-  T->Branch("top_weight", &top_weight, "top_weight/F");
-  T->Branch("all_weight", &all_weight, "all_weight/F");
-  T->Branch("trig_weight", &trig_weight, "trig_weight/F");
-
-  T->Branch("xsecs", &xsecs, "xsecs/F");
-  T->Branch("event_sign", &event_sign, "event_sign/F");
-  T->Branch("event_secondLeptonVeto", &event_secondLeptonVeto, "event_secondLeptonVeto/F");
-  T->Branch("event_thirdLeptonVeto", &event_thirdLeptonVeto, "event_thirdLeptonVeto/F");
-  T->Branch("event_leptonDrTrigger", &event_leptonDrTrigger, "event_leptonDrTrigger/F");
-
-  T->Branch("muon_index", &muon_index, "muon_index/I");
-  T->Branch("electron_index", &electron_index, "electron_index/I");
-  T->Branch("taus_index", &taus_index, "taus_index/I");
-
-  T->Branch("primvert_count", &primvert_count, "primvert_count/I");
-  T->Branch("primvert_x", &primvert_x, "primvert_x/F");
-  T->Branch("primvert_y", &primvert_x, "primvert_y/F");
-  T->Branch("primvert_z", &primvert_x, "primvert_z/F");
-
-  T->Branch("mu_count", &mu_count, "mu_count/I");
-  T->Branch("mu_px", mu_px, "mu_px[20]/F");
-  T->Branch("mu_py", mu_py, "mu_py[20]/F");
-  T->Branch("mu_pz", mu_pz, "mu_pz[20]/F");
-  T->Branch("mu_pt", mu_pt, "mu_pt[20]/F");
-  T->Branch("mu_eta", mu_eta, "mu_eta[20]/F");
-  T->Branch("mu_phi", mu_phi, "mu_phi[20]/F");
-  T->Branch("mu_charge", mu_charge, "mu_charge[20]/F");
-  T->Branch("mu_miniISO", mu_miniISO, "mu_miniISO[20]/F");
-  T->Branch("mu_dxy", mu_dxy, "mu_dxy[20]/F");
-  T->Branch("mu_dz", mu_dz, "mu_dz[20]/F");
-  T->Branch("mu_relIso", mu_relIso, "mu_relIso[20]/F");
-
-
-  T->Branch("jet_count", &jet_count, "jet_count/I");
-  T->Branch("njets", &njets, "njets/I");
-  T->Branch("jets_cleaned", &jets_cleaned, "jets_cleaned[30]/I");
-  T->Branch("jet_e", jet_e, "jet_e[30]/F");
-  T->Branch("jet_px", jet_px, "jet_px[30]/F");
-  T->Branch("jet_py", jet_py, "jet_py[30]/F");
-  T->Branch("jet_pz", jet_pz, "jet_pz[30]/F");
-  T->Branch("jet_pt", jet_pt, "jet_pt[30]/F");
-  T->Branch("jet_eta", jet_eta, "jet_eta[30]/F");
-  T->Branch("jet_phi", jet_phi, "jet_phi[30]/F");
-  T->Branch("jet_flavour", jet_flavour, "jet_flavour[30]/F");
-  T->Branch("jet_btag", jet_btag, "jet_btag[30]/F");
-  T->Branch("jet_isLoose", jet_isLoose, "jet_isLoose[30]/I");
-  
-  T->Branch("CFCounter_", CFCounter_, "CFCounter_[30]/F");
-
-
-  T->Branch("el_count", &el_count, "el_count/I");
-  T->Branch("el_px", el_px, "el_px[20]/F");
-  T->Branch("el_py", el_py, "el_py[20]/F");
-  T->Branch("el_pz", el_pz, "el_pz[20]/F");
-  T->Branch("el_pt", el_pt, "el_pt[20]/F");
-  T->Branch("el_eta", el_eta, "el_eta[20]/F");
-  T->Branch("el_phi", el_phi, "el_phi[20]/F");
-  T->Branch("el_miniISO", el_miniISO, "el_miniISO[20]/F");
-  T->Branch("el_dxy", el_dxy, "el_dxy[20]/F");
-  T->Branch("el_dz", el_dz, "el_dz[20]/F");
-  T->Branch("el_charge", el_charge, "el_charge[20]/F");
-  T->Branch("el_relIso", el_relIso, "el_relIso[20]/F");
-
-
-  T->Branch("ta_count", &ta_count, "ta_count/I");
-  T->Branch("ta_px", ta_px, "ta_px[20]/F");
-  T->Branch("ta_py", ta_py, "ta_py[20]/F");
-  T->Branch("ta_pz", ta_pz, "ta_pz[20]/F");
-  T->Branch("ta_mass", ta_mass, "ta_mass[20]/F");
-  T->Branch("ta_eta", ta_eta, "ta_eta[20]/F");
-  T->Branch("ta_phi", ta_phi, "ta_phi[20]/F");
-  T->Branch("ta_pt", ta_pt, "ta_pt[20]/F");
-  T->Branch("ta_dxy", ta_dxy, "ta_dxy[20]/F");
-  T->Branch("ta_dz", ta_dz, "ta_dz[20]/F");
-  T->Branch("ta_charge", ta_charge, "ta_charge[20]/F");
-  T->Branch("ta_relIso", ta_relIso, "ta_relIso[20]/F");
-  T->Branch("ta_IsoFlag", &ta_IsoFlag, "ta_IsoFlag/F");
-  T->Branch("qcdweight", &qcdweight, "qcdweight/F");
-  T->Branch("qcdweightup", &qcdweightup, "qcdweightup/F");
-  T->Branch("qcdweightdown", &qcdweightdown, "qcdweightdown/F");
-  T->Branch("nbtag", &nbtag, "nbtag/I");
-
-  T->Branch("datasetName", &datasetName);
-  T->Branch("regionName", &regionName);
-  T->Branch("genTauMatched", &genTauMatched);
-  T->Branch("npartons",&npartons,"npartons/I");
-  T->Branch("SusyMother",&SusyMother,"SusyMother/F");
-  T->Branch("SusyLSP",&SusyLSP,"SusyLSP/F");
-
-
-
-      char arg[100];
-     for (unsigned int i = 0; i < vec.size (); i++)
-    {
-      var_[i] = -8888.;
-      //string name = vec[i].c_str()+"_"+ds;
-      sprintf (arg, "%s/F", vec[i].c_str ());
-      T->Branch (vec[i].c_str (), &var_[i], arg);
-      //T->Branch("pt_tt", &pt_tt, "pt_tt/F");
-      //cout << " creating the TTree. " << vec[i].c_str()<< "  "<<i<<endl;
-    }
-     //T->Fill();
-     //T->Write();
-     
-}
-
-/*
-void SetupHistsCut(int CutNer){
-
-
-for(int cj = 0; cj < CutNer; cj++)
-    {
-      CutFlow->GetXaxis()->SetBinLabel(cj+1,CutList[cj].c_str());
-      CutFlowUnW->GetXaxis()->SetBinLabel(cj+1,CutList[cj].c_str());
-    }
-}
-*/
 //string CutList[CutN];// ={"No cut","Trigger","2- l", "dR < "};
 void SetupHists(int CutNer){
 
-
 for(int cj = 0; cj < CutNer; cj++)
     {
       CutFlow->GetXaxis()->SetBinLabel(cj+1,CutList[cj].c_str());
       CutFlowUnW->GetXaxis()->SetBinLabel(cj+1,CutList[cj].c_str());
-    }
-}
-/*
- 
- 
+  //  }
+
+//for(int cj = 0; cj < CutNer; cj++)
+  //  {
       TString cutName=CutList[cj];
       TString nCut;
       nCut.Form("%i",cj);
       ///generic variables
       
-      //T->Branch("hHT_"+nCut,"TH1D", &hHT[cj], 32000,0);
+      hmu_dxy[cj] = new TH1D ("hmu_dxy_"+nCut,"hmu_dxy "+cutName,20,-.2,.2);
       
-      hmu_dxy[cj] = new TH1D ("hmu_dxy_"+nCut,"hmu_dxy "+cutName,100,-5.,5.);
+      hel_dxy[cj] = new TH1D ("hel_dxy_"+nCut,"hel_dxy "+cutName,20,-0.2,.2);
+      htau_dxy[cj] = new TH1D ("htau_dxy_"+nCut,"htau_dxy "+cutName,20,-.2,.2);
       
-      hel_dxy[cj] = new TH1D ("hel_dxy_"+nCut,"hel_dxy "+cutName,100,-5.,5.);
-      htau_dxy[cj] = new TH1D ("htau_dxy_"+nCut,"htau_dxy "+cutName,100,-5.,5.);
-      
-      htau_dz[cj] = new TH1D ("htau_dz_"+nCut,"htau_dz "+cutName,100,-50.,50.);
-      hel_dz[cj] = new TH1D ("hel_dz_"+nCut,"hel_dz "+cutName,100,-50.,50.);
-      hmu_dz[cj] = new TH1D ("hmu_dz_"+nCut,"hmu_dz "+cutName,100,-50.,50.);
+      htau_dz[cj] = new TH1D ("htau_dz_"+nCut,"htau_dz "+cutName,20,-.2,.2);
+      hel_dz[cj] = new TH1D ("hel_dz_"+nCut,"hel_dz "+cutName,20,-.2,.2);
+      hmu_dz[cj] = new TH1D ("hmu_dz_"+nCut,"hmu_dz "+cutName,20,-.2,.2);
 
-      hHTOsqrMET[cj] = new TH1D ("hHTOsqrMET_"+nCut,"hHTOsqrMET "+cutName,60,0.0,1600.0);
+      hHTOsqrMET[cj] = new TH1D ("hHTOsqrMET_"+nCut,"hHTOsqrMET "+cutName,10,0.0,100.0);
       hHTOsqrMET[cj]->Sumw2();
       hPtOHT[cj] = new TH1D ("hPtOHT_"+nCut,"hPtOHT "+cutName,10,0.0,10.0);
       hPtOHT[cj]->Sumw2();
       
-      hMeffMuonOsqrMET[cj] = new TH1D ("hMeffMuonOsqrMET_"+nCut,"hMeffMuonOsqrMET "+cutName,60,0.0,1600.0);
+      hMeffMuonOsqrMET[cj] = new TH1D ("hMeffMuonOsqrMET_"+nCut,"hMeffMuonOsqrMET "+cutName,10,0.0,100.0);
       hMeffMuonOsqrMET[cj]->Sumw2();
-      hMeffElOsqrMET[cj] = new TH1D ("hMeffElOsqrMET_"+nCut,"hMeffElOsqrMET "+cutName,60,0.0,1600.0);
+      hMeffElOsqrMET[cj] = new TH1D ("hMeffElOsqrMET_"+nCut,"hMeffElOsqrMET "+cutName,10,0.0,100.0);
       hMeffElOsqrMET[cj]->Sumw2();
-      hMeffTauOsqrMET[cj] = new TH1D ("hMeffTauOsqrMET_"+nCut,"hMeffTauOsqrMET "+cutName,60,0.0,1600.0);
+      hMeffTauOsqrMET[cj] = new TH1D ("hMeffTauOsqrMET_"+nCut,"hMeffTauOsqrMET "+cutName,10,0.0,100.0);
       hMeffTauOsqrMET[cj]->Sumw2();
 
-      hMeffMuon[cj] = new TH1D ("hMeffMuon_"+nCut,"hMeffMuon "+cutName,60,0.0,1600.0);
+      hMeffMuon[cj] = new TH1D ("hMeffMuon_"+nCut,"hMeffMuon "+cutName,50,0.0,500.0);
       hMeffMuon[cj]->Sumw2();
-      hMeffEl[cj] = new TH1D ("hMeffEl_"+nCut,"hMeffEl "+cutName,60,0.0,1600.0); 
+      hMeffEl[cj] = new TH1D ("hMeffEl_"+nCut,"hMeffEl "+cutName,50,0.0,500.0); 
       hMeffEl[cj]->Sumw2();
-      hMeffTau[cj] = new TH1D ("hMeffTau_"+nCut,"hMeffTau "+cutName,60,0.0,1600.0); 
+      hMeffTau[cj] = new TH1D ("hMeffTau_"+nCut,"hMeffTau "+cutName,50,0.0,500.0); 
       hMeffTau[cj]->Sumw2();
 
-      hCentrality[cj]  = new TH1D ("hCentrality_"+nCut,"hCentrality "+cutName,20,0.,2.);
+      hCentrality[cj]  = new TH1D ("hCentrality_"+nCut,"hCentrality "+cutName,20,0.,1.);
       hCentrality[cj]->Sumw2();
 
-      hHT[cj] = new TH1D ("HT_"+nCut,"HT "+cutName,60,0.0,1600.0);
+      hHT[cj] = new TH1D ("HT_"+nCut,"HT "+cutName,10,0.0,1000.0);
       hHT[cj]->Sumw2();
  
       hRht[cj] = new TH1D ("Rht_"+nCut,"Rht "+cutName,10,0.0,2.0);
@@ -763,6 +637,12 @@ for(int cj = 0; cj < CutNer; cj++)
       hEleta[cj] = new TH1D ("Eleta_"+nCut,"El eta "+cutName,40,-4,4);
       hEleta[cj]->Sumw2();
        
+      hIsoMu[cj] = new TH1D ("IsoMu_"+nCut,"Mu Iso "+cutName,100,0,5);
+      hIsoMu[cj]->Sumw2();
+      hIsoEl[cj] = new TH1D ("IsoEl_"+nCut,"El Iso "+cutName,100,0,5);
+      hIsoEl[cj]->Sumw2();
+      hIsoTau[cj] = new TH1D ("IsoTau_"+nCut,"Tau Iso "+cutName,100,0,5);
+      hIsoTau[cj]->Sumw2();
        
       hMET[cj] = new TH1D("MET_"+nCut,"MET "+cutName,40.0,0.0,800.0);
       hMET[cj]->Sumw2();
@@ -771,6 +651,9 @@ for(int cj = 0; cj < CutNer; cj++)
       //dPhi
       //
       //
+      hMETphi[cj] = new TH1D("METphi_"+nCut,"METphi "+cutName,64,0.0,3.2);
+      hMETphi[cj]->Sumw2();
+
       hdPhiMETLep[cj] = new TH1D("dPhiMETLep_"+nCut,"dPhiMETLep "+cutName,64,0.0,3.2);
       hdPhiMETLep[cj]->Sumw2();
     
@@ -792,6 +675,8 @@ for(int cj = 0; cj < CutNer; cj++)
       hdPhiJ3MET[cj] = new TH1D("dPhiJ3MET_"+nCut,"dPhiJ3MET "+cutName,64,0.0,3.2);
       hdPhiJ3MET[cj]->Sumw2();
 
+      hdPhiJ0Tau[cj] = new TH1D("dPhiJ0Tau_"+nCut,"dPhiJ0Tau "+cutName,64,0.0,3.2);
+      hdPhiJ0Tau[cj]->Sumw2();
       hdPhiMuMET[cj] = new TH1D("dPhiMuMET_"+nCut,"dPhiMuMET "+cutName,64,0.0,3.2);
       hdPhiMuMET[cj]->Sumw2();
 
@@ -804,78 +689,86 @@ for(int cj = 0; cj < CutNer; cj++)
       //MT
       //
       //
-      hMT[cj] = new TH1D ("MT_"+nCut,"MT "+cutName,10,0,200);
+      hMTsum[cj] = new TH1D ("MTsum_"+nCut,"MTsum "+cutName,30,0,300);
+      hMTsum[cj]->Sumw2();
+      hMTtot[cj] = new TH1D ("MTtot_"+nCut,"MTtot "+cutName,30,0,300);
+      hMTtot[cj]->Sumw2();
+      hMT[cj] = new TH1D ("MT_"+nCut,"MT "+cutName,30,0,300);
       hMT[cj]->Sumw2();
-      hMTel[cj] = new TH1D ("MTel_"+nCut,"MTel "+cutName,10,0,200);
+      hMTel[cj] = new TH1D ("MTel_"+nCut,"MTel "+cutName,30,0,300);
       hMTel[cj]->Sumw2();
-      hMTmu[cj] = new TH1D ("MTmu_"+nCut,"MTmu "+cutName,10,0,200);
+      hMTmu[cj] = new TH1D ("MTmu_"+nCut,"MTmu "+cutName,30,0,300);
       hMTmu[cj]->Sumw2();
 
-      hMTtau[cj] = new TH1D ("MTtau_"+nCut,"MTtau "+cutName,10,0,200);
+      hMTtau[cj] = new TH1D ("MTtau_"+nCut,"MTtau "+cutName,30,0,300);
       hMTtau[cj]->Sumw2();
 
-      hMTmutau[cj] = new TH1D ("MTmutau_"+nCut,"MTmutau "+cutName,10,0,200);
+      hMTmutau[cj] = new TH1D ("MTmutau_"+nCut,"MTmutau "+cutName,30,0,300);
       hMTmutau[cj]->Sumw2();
+     
+      hMTmuel[cj] = new TH1D ("MTmuel_"+nCut,"MTmuel "+cutName,30,0,300);
+      hMTmuel[cj]->Sumw2();
+       
+      hMTeltau[cj] = new TH1D ("MTeltau_"+nCut,"MTeltau "+cutName,30,0,300);
+      hMTeltau[cj]->Sumw2();
+      
+      hMTtautau[cj] = new TH1D ("MTtautau_"+nCut,"MTtautau "+cutName,50,0,1000);
+      hMTtautau[cj]->Sumw2();
+
       hMt2mutau[cj] = new TH1D ("Mt2mutau_"+nCut,"Mt2mutau "+cutName,50,0,1000);
       hMt2mutau[cj]->Sumw2();
+      
       hMt2lestermutau[cj] = new TH1D ("Mt2lestermutau_"+nCut,"Mt2lestermutau "+cutName,30,0,600);
       hMt2lestermutau[cj]->Sumw2();
+
       hMCTmutau[cj] = new TH1D ("MCTmutau_"+nCut,"MCTmutau "+cutName,25,0,500);
       hMCTmutau[cj]->Sumw2();
       hMCTxmutau[cj] = new TH1D ("MCTxmutau_"+nCut,"MCTxmutau "+cutName,25,0,500);
       hMCTxmutau[cj]->Sumw2();
       hMCTymutau[cj] = new TH1D ("MCTymutau_"+nCut,"MCTymutau "+cutName,25,0,500);
       hMCTymutau[cj]->Sumw2();
+      
       hMCTbmutau[cj] = new TH1D ("MCTbmutau_"+nCut,"MCTbmutau "+cutName,25,0,500);
       hMCTbmutau[cj]->Sumw2();
-      hTBoundmutau[cj] = new TH1D ("TBoundmutau_"+nCut,"TBoundmutau "+cutName,100,0,2000);
-      hTBoundmutau[cj] ->Sumw2();
-      hdR_mutau[cj]= new TH1D ("dR_mutau_"+nCut,"dR_mutau "+cutName,60,0,6);;
-      hdR_mutau[cj]->Sumw2();
 
-
-      hMTeltau[cj] = new TH1D ("MTeltau_"+nCut,"MTeltau "+cutName,10,0,200);
-      hMTeltau[cj]->Sumw2();
-      hMt2eltau[cj] = new TH1D ("Mt2eltau_"+nCut,"Mt2eltau "+cutName,50,0,1000);
-      hMt2eltau[cj]->Sumw2();
-      hMt2lestereltau[cj] = new TH1D ("Mt2lestereltau_"+nCut,"Mt2lestereltau "+cutName,30,0,600);
-      hMt2lestereltau[cj]->Sumw2();
-      hMCTeltau[cj] = new TH1D ("MCTeltau_"+nCut,"MCTeltau "+cutName,25,0,500);
-      hMCTeltau[cj]->Sumw2();
-      hMCTxeltau[cj] = new TH1D ("MCTxeltau_"+nCut,"MCTxeltau "+cutName,25,0,500);
-      hMCTxeltau[cj]->Sumw2();
-      hMCTyeltau[cj] = new TH1D ("MCTyeltau_"+nCut,"MCTyeltau "+cutName,25,0,500);
-      hMCTyeltau[cj]->Sumw2();
-      hMCTbeltau[cj] = new TH1D ("MCTbeltau_"+nCut,"MCTbeltau "+cutName,25,0,500);
-      hMCTbeltau[cj]->Sumw2();
-      hTBoundeltau[cj] = new TH1D ("TBoundeltau_"+nCut,"TBoundeltau "+cutName,100,0,2000);
-      hTBoundeltau[cj] ->Sumw2();
-      hdR_eltau[cj]= new TH1D ("dR_eltau_"+nCut,"dR_eltau "+cutName,60,0,6);;
-      hdR_eltau[cj]->Sumw2();
-
-
-      hMTmuel[cj] = new TH1D ("MTmuel_"+nCut,"MTmuel "+cutName,10,0,200);
-      hMTmuel[cj]->Sumw2();
       hMt2muel[cj] = new TH1D ("Mt2muel_"+nCut,"Mt2muel "+cutName,50,0,1000);
       hMt2muel[cj]->Sumw2();
+      
       hMt2lestermuel[cj] = new TH1D ("Mt2lestermuel_"+nCut,"Mt2lestermuel "+cutName,30,0,600);
       hMt2lestermuel[cj]->Sumw2();
+
       hMCTmuel[cj] = new TH1D ("MCTmuel_"+nCut,"MCTmuel "+cutName,25,0,500);
       hMCTmuel[cj]->Sumw2();
       hMCTxmuel[cj] = new TH1D ("MCTxmuel_"+nCut,"MCTxmuel "+cutName,25,0,500);
       hMCTxmuel[cj]->Sumw2();
       hMCTymuel[cj] = new TH1D ("MCTymuel_"+nCut,"MCTymuel "+cutName,25,0,500);
       hMCTymuel[cj]->Sumw2();
+      
       hMCTbmuel[cj] = new TH1D ("MCTbmuel_"+nCut,"MCTbmuel "+cutName,25,0,500);
       hMCTbmuel[cj]->Sumw2();
-      hTBoundmuel[cj] = new TH1D ("TBoundmuel_"+nCut,"TBoundmuel "+cutName,100,0,2000);
-      hTBoundmuel[cj] ->Sumw2();
-      hdR_muel[cj]= new TH1D ("dR_muel_"+nCut,"dR_muel "+cutName,60,0,6);;
-      hdR_muel[cj]->Sumw2();
 
 
 
+      hTBoundmutau[cj] = new TH1D ("TBoundmutau_"+nCut,"TBoundmutau "+cutName,100,0,2000);
+      hTBoundmutau[cj] ->Sumw2();
+      hMt2eltau[cj] = new TH1D ("Mt2eltau_"+nCut,"Mt2eltau "+cutName,25,0,500);
+      hMt2eltau[cj]->Sumw2();
+      hMt2lestereltau[cj] = new TH1D ("Mt2lestereltau_"+nCut,"Mt2lestereltau "+cutName,30,0,600);
+      hMt2lestereltau[cj]->Sumw2();
+ 
+      hMCTeltau[cj] = new TH1D ("MCTeltau_"+nCut,"MCTeltau "+cutName,25,0,500);
+      hMCTeltau[cj]->Sumw2();
+      hMCTxeltau[cj] = new TH1D ("MCTxeltau_"+nCut,"MCTxeltau "+cutName,25,0,500);
+      hMCTxeltau[cj]->Sumw2();
+      hMCTyeltau[cj] = new TH1D ("MCTyeltau_"+nCut,"MCTyeltau "+cutName,25,0,500);
+      hMCTyeltau[cj]->Sumw2();
+      
+      hMCTbeltau[cj] = new TH1D ("MCTbeltau_"+nCut,"MCTbeltau "+cutName,25,0,500);
+      hMCTbeltau[cj]->Sumw2();
 
+      /*       hDZeta[CutN]= new TH1D ("DZeta_"+nCut,"DZeta "+cutName,300,-400,200);
+	       hDZeta[cj]->Sumw2();
+      */
       htau_ISOL[cj]= new TH1D ("tauISOL_"+nCut,"tauISOL "+cutName,50,0,5);;
       htau_ISO[cj]= new TH1D ("tauISO_"+nCut,"tauISO "+cutName,50,0,5);;
       htau_ISO[cj] ->Sumw2(); 
@@ -902,12 +795,20 @@ for(int cj = 0; cj < CutNer; cj++)
       hmu_relISOL[cj]= new TH1D ("murelISOL_"+nCut,"murelISOL "+cutName,50,0,5);;
       hmu_relISOL[cj]->Sumw2();
  
+      hdR_eltau[cj]= new TH1D ("dR_eltau_"+nCut,"dR_eltau "+cutName,60,0,6);;
+      hdR_eltau[cj]->Sumw2();
         
+      hdR_mutau[cj]= new TH1D ("dR_mutau_"+nCut,"dR_mutau "+cutName,60,0,6);;
+      hdR_mutau[cj]->Sumw2();
+
+      hdR_taujet[cj]= new TH1D ("dR_taujet_"+nCut,"dR_taujet "+cutName,60,0,6);;
+      hdR_taujet[cj]->Sumw2();
 
       hdR_tautau[cj]= new TH1D ("dR_tautau_"+nCut,"dR_tautau "+cutName,60,0,6);;
       hdR_tautau[cj]->Sumw2();
 	
-      
+      hdR_muel[cj]= new TH1D ("dR_muel_"+nCut,"dR_muel "+cutName,60,0,6);;
+      hdR_muel[cj]->Sumw2();
 
       hnpv[cj]= new TH1D ("npv_"+nCut,"npv "+cutName,100,-0.5,99.5);;
       hnpv[cj]->Sumw2();
@@ -916,6 +817,61 @@ for(int cj = 0; cj < CutNer; cj++)
       hnrho[cj]= new TH1D ("nrho_"+nCut,"nrho "+cutName,100,-0.5,99.5);;
       hnrho[cj]->Sumw2();
  
+
+
+   int nBinsmet = 3;
+   double binsmet[4] = {0, 50,100,1000};
+
+   int nBinsMTsum = 3;
+   double binsMTsum[4] = {0, 150,300,1000};
+
+   int nBinsMCTb = 3;
+   double binsMCTb[4] = {0, 50,100,1000};
+
+   int nBinsMT = 3;
+   double binsMT[4] = {0, 50,100,1000};
+
+   int nBinsDZeta = 4;
+   double binsDZeta[5] = {-500, -150,-100,100,1000};
+
+
+      //hmet_MT[cj] = new TH2D ("met_MT_"+nCut,"met_MT "+cutName,40.0,0.0,800.0,10,0,200);
+      hmet_MT[cj] = new TH2D ("met_MT_"+nCut,"met_MT "+cutName, nBinsmet, binsmet ,nBinsMT,binsMT);
+      hmet_MT[cj]->Sumw2();
+
+      hmet_MTsum[cj] = new TH2D ("met_MTsum_"+nCut,"met_MTsum "+cutName, nBinsmet, binsmet , nBinsMTsum,binsMTsum);
+      hmet_MTsum[cj]->Sumw2();
+
+      hmet_MTtot[cj] = new TH2D ("met_MTtot_"+nCut,"met_MTtot "+cutName, nBinsmet, binsmet , nBinsMTsum,binsMTsum);
+      hmet_MTtot[cj]->Sumw2();
+      
+      hmet_DZeta[cj] = new TH2D ("met_DZeta_"+nCut,"met_DZeta "+cutName, nBinsmet, binsmet , nBinsDZeta,binsDZeta);
+      hmet_DZeta[cj] -> Sumw2();
+     
+      hmet_MCTb[cj] = new TH2D ("met_MCTb_"+nCut,"met_MCTb "+cutName, nBinsmet, binsmet , nBinsMCTb,binsMCTb);
+      hmet_MCTb[cj] ->Sumw2();
+      
+       hMT2lester_MCTb[cj] = new TH2D ("MT2lester_MCTb_"+nCut,"MT2lester_MCTb "+cutName, nBinsmet, binsmet , nBinsMCTb,binsMCTb);
+       hMT2lester_MCTb[cj]->Sumw2();
+
+       hMT2lester_met[cj] = new TH2D ("MT2lester_met_"+nCut,"MT2lester_met "+cutName, nBinsmet, binsmet , nBinsmet, binsmet);
+       hMT2lester_met[cj]->Sumw2();
+
+       hMT2lester_DZeta[cj] = new TH2D ("MT2lester_DZeta_"+nCut,"MT2lester_DZeta "+cutName, nBinsmet, binsmet , nBinsDZeta,binsDZeta);
+	hMT2lester_DZeta[cj]->Sumw2();
+     
+      hDZeta_MCTb[cj] = new TH2D ("DZeta_MCTb_"+nCut,"DZeta_MCTb "+cutName, nBinsDZeta, binsDZeta , nBinsMCTb,binsMCTb);
+      hDZeta_MCTb[cj] ->Sumw2();
+  
+      hDZeta_MTsum[cj] = new TH2D ("DZeta_MTsum_"+nCut,"DZeta_MTsum "+cutName, nBinsDZeta, binsDZeta , nBinsMTsum,binsMTsum);
+      hDZeta_MTsum[cj] ->Sumw2();
+      hDZeta_MTtot[cj] = new TH2D ("DZeta_MTtot_"+nCut,"DZeta_MTtot "+cutName, nBinsDZeta, binsDZeta , nBinsMTsum,binsMTsum);
+      hDZeta_MTtot[cj] ->Sumw2();
+
+      hMTsum_MCTb[cj] = new TH2D ("MTsum_MCTb_"+nCut,"MTsum_MCTb "+cutName, nBinsMTsum, binsMTsum , nBinsMCTb,binsMCTb);
+      hMTsum_MCTb[cj] ->Sumw2();
+      hMTtot_MCTb[cj] = new TH2D ("MTtot_MCTb_"+nCut,"MTtot_MCTb "+cutName, nBinsMTsum, binsMTsum , nBinsMCTb,binsMCTb);
+      hMTtot_MCTb[cj] ->Sumw2();
       
       hdRmt_dPhi[cj] = new TH2D ("dRm_dPhi_"+nCut,"dRm_dPhi "+cutName,60,0.0,6.0,64,0.0,3.2);
       hdRmt_dPhi[cj]->Sumw2();
@@ -928,8 +884,6 @@ for(int cj = 0; cj < CutNer; cj++)
  
       hmet_dPhi[cj] = new TH2D ("met_dPhi_"+nCut,"met_dPhi "+cutName,40.0,0.0,800.0,64,0.0,3.2);
       hmet_dPhi[cj]->Sumw2();
-      hmet_MT[cj] = new TH2D ("met_MT_"+nCut,"met_MT "+cutName,40.0,0.0,800.0,10,0,200);
-      hmet_MT[cj]->Sumw2();
 
       hmet_dPhiel[cj] = new TH2D ("met_dPhiel_"+nCut,"met_dPhiel "+cutName,40.0,0.0,800.0,64,0.0,3.2);
       hmet_dPhiel[cj]->Sumw2();
@@ -962,22 +916,24 @@ for(int cj = 0; cj < CutNer; cj++)
       hIso_sign[cj]->GetYaxis()->SetBinLabel(2,"OS");
       hIso_sign[cj]->Sumw2();
 
-
-
-
-
-
     }
 
-}
+  /*
+      char arg[100];
+     for (unsigned int i = 0; i < vec.size (); i++)
+    {
+      var_[i] = -8888.;
+      //string name = vec[i].c_str()+"_"+ds;
+      sprintf (arg, "%s/F", vec[i].c_str ());
+      T->Branch (vec[i].c_str (), &var_[i], arg);
+
+      //cout << " creating the TTree. " << vec[i].c_str()<< "  "<<i<<endl;
+    }
 */
-void FillMainHists(int CutIndex, Double_t EvWeight, vector<TLorentzVector>  ElV, vector<TLorentzVector>  MuV,vector<TLorentzVector>  JetsV, TLorentzVector  MetV, AC1B &tree_){}
+}
 
 
-void FillMainHists(int CutIndex, Double_t EvWeight, vector<TLorentzVector>  ElV, vector<TLorentzVector>  MuV, vector<TLorentzVector>  TauV, vector<TLorentzVector>  JetsV, TLorentzVector  MetV, AC1B &tree_, string & Sel){}
-
-void FillMainHists(int CutIndex, Double_t EvWeight, vector<TLorentzVector>  ElV, vector<TLorentzVector>  MuV, vector<TLorentzVector>  TauV, vector<TLorentzVector>  JetsV, TLorentzVector  MetV, AC1B &tree_, string & Sel, int  mIndex, int eIndex, int  tIndex){};
-
+//void FillHists(int CutIndex, Double_t EvWeight, TLorentzVector  &ElV, TLorentzVector  &MuV, TLorentzVector  &TauV, vector<TLorentzVector>  &JetsV, TLorentzVector  &MetV, double Chimass, double mintermediate, string & Sel, int  mIndex, int eIndex, int  tIndex){}
 
 double Centrality (vector < TLorentzVector > AllJets_Lepton_noMet_){
     // Centrality
@@ -1008,7 +964,4 @@ void FillTree() {
 
 	  T->Fill();
 }
-
-void FillMainHists(int CutIndex, Double_t EvWeight, vector<TLorentzVector>  ElV, vector<TLorentzVector>  MuV, vector<TLorentzVector>  TauV, vector<TLorentzVector>  JetsV, TLorentzVector  MetV, double Chimass, double mintermediate,AC1B &tree_, string & Sel, int  mIndex, int eIndex, int  tIndex){
-  }
 
