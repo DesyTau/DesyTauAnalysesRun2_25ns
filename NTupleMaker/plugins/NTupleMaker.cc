@@ -1376,8 +1376,8 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	    
   	    flags_->insert(std::pair<string, int>(flagName, Flags->accept(i)));
 	    TString TriggerName(flagName);
-	    	    std::cout << flagName << " : " 
-	    		      << Flags->accept(i) << std::endl;
+	//    	    std::cout << flagName << " : " 
+	//    		      << Flags->accept(i) << std::endl;
   	  }
   	}
       }

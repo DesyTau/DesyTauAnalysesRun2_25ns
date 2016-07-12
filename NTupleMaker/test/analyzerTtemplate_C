@@ -1,0 +1,425 @@
+#define analyzer_cxx
+#include "analyzer.h"
+#include <TH2.h>
+#include <TStyle.h>
+#include <TCanvas.h>
+#include <TString.h>
+//#include "plots.h"
+#include <cmath>
+#include <sstream>
+#include <iomanip>
+#include "TChain.h"
+#include "TH1.h"
+#include "TTree.h"
+#include "TKey.h"
+#include "Riostream.h"
+#include "TCanvas.h"
+#include "TFile.h"
+#include "TLegend.h"
+#include "TROOT.h"
+#include "TFrame.h"
+#include "TGaxis.h"
+#include "TStyle.h"
+#include <vector>
+#include <iostream>
+#include <algorithm>
+#include "TList.h"
+#include <string>
+#include "TObject.h"
+#include "TBranch.h"
+#include <functional>
+#include "TAxis.h"
+#include "TChain.h"
+#include "TMath.h"
+#include "Riostream.h"
+#include <iostream>
+#include <fstream>
+
+
+
+
+using namespace std;
+
+
+
+void analyzer::Loop(){
+
+
+	//   In a ROOT session, you can do:
+	//      root> .L analyzer.C
+	//      root> analyzer t
+	//      root> t.GetEntry(12); // Fill t data members with entry number 12
+	//
+	//    fChain->SetBranchStatus("*",0);  // disable all branches
+	//    fChain->SetBranchStatus("branchname",1);  // activate branchname
+	// METHOD2: replace line
+	//    fChain->GetEntry(jentry);       //read all branches
+	//by  b_branchname->GetEntry(ientry); //read only this branch
+	if (fChain == 0) return;
+
+
+	CutList.clear();
+	CutList.push_back("No cut");
+	CutList.push_back("No cut after PU");
+	CutList.push_back("mu-el");
+	CutList.push_back("3rd lepV");
+	CutList.push_back("Trigger SF");
+	CutList.push_back("Lepton SF");
+	CutList.push_back("topPtRwgt");
+	//CutList.push_back("Cleaned jets");
+	CutList.push_back("Jets gt 1");
+	CutList.push_back("btag gt 0");
+	CutList.push_back("MET gt 30");
+	CutList.push_back("MET gt 50");
+	CutList.push_back("MCTb gt 60");
+	CutList.push_back("MT gt 130");
+/*
+	CutList.push_back("DZeta gt 30");
+	CutList.push_back("MET gt 160");
+	CutList.push_back("dR lt 3. gt 1.5");
+	CutList.push_back("MT gt 250 ");
+	CutList.push_back("InvMass gt 250");
+	//CutList.push_back("dR lt 3. gt 1.5");
+	//CutList.push_back("PtMuonOHT gt 2");
+	//CutList.push_back("HTOsrtMET lt 10");
+*/
+	//ChiMass = CHIMASSS;
+	ChiMass = 0.;
+	//cout<<" THE MASS IS ========================= "<<ChiMass<<endl;
+
+	 int CutNumb = int(CutList.size());
+         int iCFCounter[CutNumb];
+	 double CFCounter[CutNumb];
+	 for (int i=0;i < CutNumb; i++){
+                        CFCounter[i] = 0;
+           if (i>1)     CFCounter_[i] = 0;
+                        iCFCounter[i] = 0;
+        }
+	fChain->GetEntry(0);  
+	string old = datasetName->c_str();
+	int counter = 0;
+		
+	//char hist_[100];
+	bool isData = false;
+	bool isSignal = false;
+	bool cut_btag = true;
+	bool cut_met30 = true;
+	bool cut_met50 = true;
+	bool cut_met80 = true;
+	bool cut_met100 = true;
+	bool cut_met120 = true;
+	
+	bool t = true;
+	bool f = false;
+	bool InvertLeptonIso = LEPTONHERE;
+	string Sign = "SIGNHERE";
+	
+	string cut = to_string(t);
+	cout <<"  "<<cut.c_str()<<endl;
+	char plots_[100];
+	string data = "Single";
+	string signal = "stau";
+	if (string::npos != old.find(data)) isData= true;
+	if (string::npos != old.find(signal)) isSignal= true;
+	
+	if (isSignal) cout<<" YOU HAVE FOUND ITTTTTTTTT "<<endl;
+	if (isData) cout<<" YOU HAVE FOUND a DATA "<<endl;
+
+	string channel = "CHANNELHERE";
+
+	TFile * filein = new TFile("/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/CMSSW_8_0_12/src/DesyTauAnalyses/NTupleMaker/test/CHANNELHERE/FILEIN","read");
+
+	TH1D * histW = (TH1D*)filein->Get("muel/histWeightsH");
+	TH1D * hxsecW = (TH1D*)filein->Get("muel/xsec");
+	TH1D * CutFlow = (TH1D*)filein->Get("muel/CutFlowUnW");
+	TFile * file = new TFile("plots.root","recreate");
+	//TFile * file = new TFile(hist_,"update");
+
+	//cout<<"  "<<old<<"  "<<datasetName->c_str()<<"  "<<hist_<<"  "<<CutFlow->GetName()<<"  "<<CutFlow->GetBinContent(1)<<endl;
+		
+	//filein->ls();
+	string Channel = "muel";
+	file->mkdir(Channel.c_str());
+	file->cd(Channel.c_str());
+	//histW->Write();
+	//CutFlow->Draw();
+	SetupHists(CutNumb);
+	Long64_t nentries = fChain->GetEntriesFast();
+
+
+	//for (int ci = 2 ; ci < CutNumb;++ci) { CFCounter_[ci] = 0; CFCounter[ci] = 0;}
+
+	Long64_t nbytes = 0, nb = 0;
+	for (Long64_t jentry=0; jentry<nentries;jentry++) {
+		Long64_t ientry = LoadTree(jentry);
+		if (ientry < 0) break;
+		nb = fChain->GetEntry(jentry);   nbytes += nb;
+		float all_weights = 1.;
+
+		if ( jentry%100000 ==0 ) cout<<" working for you...processed " <<jentry<<" events from "<<nentries<<" dataset "<<datasetName->c_str()<<" xsec  "<<hxsecW->GetMean()<< endl;
+
+		  //   cout<<"  ================================================= "<<fChain->GetTreeNumber()<<"  "<<xsecs<<"  "<<jentry<<" dataset "<<datasetName->c_str()<<endl;
+		/*
+		   Long64_t* offset = fChain->GetTreeOffset();
+		   for (int i = 0; i < fChain->GetNTrees();i++) {
+		//chain.GetEntry(offset[i]j);
+		cout<<" we are in the i-th Tree "<<i<<endl;
+		}
+		*/
+	
+        //        histWeightsH->Fill(0.,gen_weight);
+		JetsMV.clear();
+		MuMV.clear();
+		ElMV.clear();
+		TauMV.clear();
+		btag_index.clear();
+
+			JetsV.SetPxPyPzE(0.,0.,0.,0.);
+			MuV.SetPxPyPzE(0.,0.,0.,0.);
+			ElV.SetPxPyPzE(0.,0.,0.,0.);
+			TauV.SetPxPyPzE(0.,0.,0.,0.);
+			METV.SetPx(met_ex);
+			METV.SetPy(met_ey);
+		float met = sqrt(met_ex*met_ex + met_ey*met_ey);      
+		//if (int(jet_count)>0){
+		for ( unsigned int ijj = 0; ijj<int(jet_count); ++ijj) {
+			JetsV.SetPxPyPzE(jet_px[ijj], jet_py[ijj], jet_pz[ijj], jet_e[ijj]);
+			JetsMV.push_back(JetsV);
+		}
+		//}
+
+	
+
+			MuV.SetPxPyPzE(0.,0.,0.,0.);
+			ElV.SetPxPyPzE(0.,0.,0.,0.);
+			TauV.SetPxPyPzE(0.,0.,0.,0.);
+
+if(muon_index>-1)			MuV.SetPtEtaPhiM(mu_pt[muon_index], mu_eta[muon_index], mu_phi[muon_index], muonMass);
+if(electron_index>-1)			ElV.SetPtEtaPhiM(el_pt[electron_index], el_eta[electron_index], el_phi[electron_index],electronMass);
+if (taus_index>-1)			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], ta_phi[taus_index], tauMass);
+
+
+		//cout<<"  "<<all_weight<<endl;
+	//	cout<<" e " <<jentry<<" from "<<nentries<<"  weights "<<all_weights<<" same ? "<< gen_weight*trig_weight*pu_weight*top_weight*LSF_weight*TFR_weight <<" PU "<<pu_weight<<" top "<<top_weight<<" LSF "<<LSF_weight<<" TFR "<<TFR_weight<<" gen "<<gen_weight<<" trig  "<<trig_weight<<endl;
+		int iCut = 2;
+		if(muon_index<0 || electron_index<0) continue;
+
+		if ( (el_relIso[0] > 0.15 || mu_relIso[0] >0.15  )&& !InvertLeptonIso) continue;
+		if ( (el_relIso[0] < 0.15 || mu_relIso[0] < 0.15 )&& InvertLeptonIso) continue;
+
+		//if ( fabs(el_dxy[muon_index]) > 0.01) continue;
+		//if ( fabs(el_dz[muon_index]) > 0.01) continue;
+
+		///remove from the all_weight the LSF  + TFR + top +trig_weig
+		all_weights = pu_weight * gen_weight ;
+
+		//if (ta_IsoFlag < 0.5) continue;
+		//if (event_leptonDrTrigger<0.5) continue;
+
+		if ( abs(el_charge[electron_index]) !=1 ) continue;
+		if ( abs(mu_charge[muon_index]) !=1 ) continue;
+
+		float charge_ =el_charge[electron_index]  * mu_charge[muon_index];
+
+		if ( charge_ < 0. && Sign == "SS") continue;
+		if ( charge_ > 0. && Sign == "OS") continue;
+	
+
+		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
+		CFCounter[iCut]+= all_weights;
+		CFCounter_[iCut]+= all_weights;
+                iCFCounter[iCut]++;
+		iCut++;
+
+		if (event_secondLeptonVeto >0.5) continue;
+
+		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
+		CFCounter[iCut]+= all_weights;
+		CFCounter_[iCut]+= all_weights;
+                iCFCounter[iCut]++;
+		iCut++;
+		
+		all_weights *= trig_weight;
+		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
+		CFCounter[iCut]+= all_weights;
+		CFCounter_[iCut]+= all_weights;
+                iCFCounter[iCut]++;
+		iCut++;
+
+		all_weights *= LSF_weight;
+		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
+		CFCounter[iCut]+= all_weights;
+		CFCounter_[iCut]+= all_weights;
+                iCFCounter[iCut]++;
+		iCut++;
+
+
+		all_weights *= top_weight;
+		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
+		CFCounter[iCut]+= all_weights;
+		CFCounter_[iCut]+= all_weights;
+                iCFCounter[iCut]++;
+		iCut++;
+
+
+			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		
+		if (njets<2) continue;
+		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
+		CFCounter[iCut]+= all_weights;
+		CFCounter_[iCut]+= all_weights;
+                iCFCounter[iCut]++;
+		iCut++;
+
+		if (nbtag==0) continue;
+		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
+		CFCounter[iCut]+= all_weights;
+		CFCounter_[iCut]+= all_weights;
+                iCFCounter[iCut]++;
+		iCut++;
+
+	
+		if (cut_met30 && met<30.) continue;
+		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
+		CFCounter[iCut]+= all_weights;
+		CFCounter_[iCut]+= all_weights;
+                iCFCounter[iCut]++;
+		iCut++;
+	
+		if (cut_met50 && met<50.) continue;
+		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
+		CFCounter[iCut]+= all_weights;
+		CFCounter_[iCut]+= all_weights;
+                iCFCounter[iCut]++;
+		iCut++;
+
+		 TLorentzVector DiL = MuV + ElV ;
+     		double dPhi=dPhiFrom2P( DiL.Px(), DiL.Py(), METV.Px(),  METV.Py() );
+         	double MT = TMath::Sqrt(2*DiL.Pt()*METV.Pt()*(1-TMath::Cos(dPhi)));
+
+		double mcta = sqrt( 2*el_pt[electron_index]*mu_pt[muon_index]*(1+cos(el_phi[electron_index]-mu_phi[muon_index])) );
+		//cout<<"  "<<mcta<<endl;
+		if (mcta<60) continue;
+		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
+		CFCounter[iCut]+= all_weights;
+		CFCounter_[iCut]+= all_weights;
+                iCFCounter[iCut]++;
+		iCut++;
+
+		if (MT < 130. ) continue;
+		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
+		CFCounter[iCut]+= all_weights;
+		CFCounter_[iCut]+= all_weights;
+                iCFCounter[iCut]++;
+		iCut++;
+
+		continue;
+
+		float dzeta = Dzeta(ElV,MuV,METV);
+		if (dzeta<30.) continue;
+		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
+		CFCounter[iCut]+= all_weights;
+		CFCounter_[iCut]+= all_weights;
+                iCFCounter[iCut]++;
+		iCut++;
+
+
+
+                 double Dr=deltaR(el_eta[electron_index],el_phi[electron_index],
+                                        mu_eta[muon_index],mu_phi[muon_index]);
+		if (Dr>3.5 || Dr<3) continue;
+
+		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
+		CFCounter[iCut]+= all_weights;
+		CFCounter_[iCut]+= all_weights;
+                iCFCounter[iCut]++;
+		iCut++;
+
+
+
+		if (MT  < 250. ) continue;
+		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
+		CFCounter[iCut]+= all_weights;
+		CFCounter_[iCut]+= all_weights;
+                iCFCounter[iCut]++;
+		iCut++;
+		
+		 TLorentzVector DiLL = MuV  + TauV;
+		if (DiLL.M()<250.) continue;
+		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
+		CFCounter[iCut]+= all_weights;
+		CFCounter_[iCut]+= all_weights;
+                iCFCounter[iCut]++;
+		iCut++;
+
+
+		
+
+	
+/*		double HText =sumpT;
+    	        HText += el_pt[electron_index];
+		double RhT = el_pt[electron_index]/HText;
+                double PtOHT =  el_pt[electron_index]/sumpT;
+		double HTOMET  = sumpT/sqrt(METV.Pt());
+		//cout<<" RHT "<< RhT<<endl;
+		
+		if (  fabs(el_dxy[electron_index])> 0.02) continue;
+		if (  fabs(el_dz[electron_index])> 0.02) continue;
+		if (met <100) continue;
+		//if (PtOHT<2.) continue;
+		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
+		CFCounter[iCut]+= all_weights;
+		CFCounter_[iCut]+= all_weights;
+                iCFCounter[iCut]++;
+		iCut++;
+		
+		
+		if (HTOMET > 10.)continue;		
+		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
+		CFCounter[iCut]+= all_weights;
+		CFCounter_[iCut]+= all_weights;
+                iCFCounter[iCut]++;
+		iCut++;
+*/
+
+		
+
+
+  }
+
+
+
+
+
+	float Lumi = 2320.;
+
+	if (isData) Lumi = 1;
+
+		 for(int ci = 0; ci < CutNumb; ci++)
+                        {
+                                // tfile << CutList[ci]<<"\t & \t"
+                                //          << CFCounter[ci]  <<"\t & \t"<< statUnc[ci] <<"\t & \t"<< iCFCounter[ci] << endl;
+                                		CutFlowUnW->SetBinContent(1+ci,0);
+                        if (CutNumb < 2)       CutFlowUnW->SetBinContent(1+ci,hxsecW->GetMean()*Lumi);
+                           else  
+ 					CutFlowUnW->SetBinContent(1+ci,float(CFCounter[ci]) );
+				
+
+					cout<<" Count "<<ci<<" binContent "<<CutFlow->GetBinContent(1+ci)<<"  CFCounter_ "<<CFCounter_[ci]<<" CFCounter "<<CFCounter[ci]<<" iCFCounter "<<iCFCounter[ci]<<" Name "<<CutFlowUnW->GetXaxis()->GetBinLabel(1+ci)<<" entry  "<<CutFlowUnW->GetBinContent(1+ci)<<" for Lumi " <<Lumi<<"  "<<float (CutFlowUnW->GetBinContent(1+ci))*hxsecW->GetMean()*Lumi/histW->GetSumOfWeights()<<endl;			
+
+}
+
+
+			cout<<"  end from TH1D "<<endl;
+
+		//hcount->Draw();
+		CutFlowUnW->Write();
+		//histWeightsH->Write();
+		histW->Write();
+		hxsecW->Write();
+		file->Write();
+		file->Close();
+		cout<<" Failed events  "<<counter<<endl;
+	}
+/////////////////////////////////////////////
+

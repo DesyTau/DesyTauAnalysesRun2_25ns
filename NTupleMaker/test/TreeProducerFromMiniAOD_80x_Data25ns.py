@@ -562,11 +562,11 @@ process.METCorrSignificance = process.METSignificance.clone(
 
 process.BadChargedCandidateFilter.muons = cms.InputTag("slimmedMuons")
 process.BadChargedCandidateFilter.PFCandidates = cms.InputTag("packedPFCandidates")
-process.BadChargedCandidateFilter.debug = cms.bool(True)
+process.BadChargedCandidateFilter.debug = cms.bool(False)
 process.BadPFMuonFilter.muons = cms.InputTag("slimmedMuons")
 process.BadPFMuonFilter.PFCandidates = cms.InputTag("packedPFCandidates")
 
-process.BadPFMuonFilter.debug = cms.bool(True)
+process.BadPFMuonFilter.debug = cms.bool(False)
 
 process.p = cms.Path(
   process.initroottree*
