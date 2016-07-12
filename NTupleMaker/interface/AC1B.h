@@ -94,6 +94,7 @@ public :
    Bool_t          muon_isTight[50];   //[muon_count]
    Bool_t          muon_isLoose[50];   //[muon_count]
    Bool_t          muon_isMedium[50];   //[muon_count]
+   Bool_t          muon_isICHEP[50];   //[muon_count] 
    Int_t           muon_genmatch[50];   //[muon_count]
    Float_t 	   SusyMotherMass;
    Float_t         SusyLSPMass;
@@ -541,6 +542,7 @@ public :
    TBranch        *b_muon_isTight;   //!
    TBranch        *b_muon_isLoose;   //!
    TBranch        *b_muon_isMedium;   //!
+   TBranch        *b_muon_isICHEP;   //!
    TBranch        *b_muon_genmatch;   //!
 
    TBranch        *b_dimuon_count;   //!
@@ -1099,6 +1101,7 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("muon_isTight", muon_isTight, &b_muon_isTight);
    fChain->SetBranchAddress("muon_isLoose", muon_isLoose, &b_muon_isLoose);
    fChain->SetBranchAddress("muon_isMedium", muon_isMedium, &b_muon_isMedium);
+   fChain->SetBranchAddress("muon_isICHEP", muon_isICHEP, &b_muon_isICHEP);
    fChain->SetBranchAddress("muon_genmatch", muon_genmatch, &b_muon_genmatch);
 
    fChain->SetBranchAddress("dimuon_count", &dimuon_count, &b_dimuon_count);

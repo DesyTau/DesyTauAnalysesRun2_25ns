@@ -546,7 +546,8 @@ class NTupleMaker : public edm::EDAnalyzer{
   Bool_t muon_isTight[M_muonmaxcount];
   Bool_t muon_isLoose[M_muonmaxcount];
   Bool_t muon_isMedium[M_muonmaxcount];
-
+  Bool_t muon_isICHEP[M_muonmaxcount];
+  
   Bool_t muon_globalTrack[M_muonmaxcount];
   Bool_t muon_innerTrack[M_muonmaxcount];
   

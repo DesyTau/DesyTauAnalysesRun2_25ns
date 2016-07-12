@@ -34,6 +34,7 @@
 #include "DataFormats/PatCandidates/interface/PackedCandidate.h"
 #include "DataFormats/JetReco/interface/PFJetCollection.h"
 #include "DesyTauAnalyses/CandidateTools/interface/candidateAuxFunctions.h"
+#include "DesyTauAnalyses/NTupleMaker/interface/idAlgos.h"
 
 #include <TString.h>
 
@@ -1376,8 +1377,7 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	    
   	    flags_->insert(std::pair<string, int>(flagName, Flags->accept(i)));
 	    TString TriggerName(flagName);
-	//    	    std::cout << flagName << " : " 
-	//    		      << Flags->accept(i) << std::endl;
+	    //std::cout << flagName << " : " << Flags->accept(i) << std::endl;
   	  }
   	}
       }
@@ -2401,6 +2401,7 @@ unsigned int NTupleMaker::AddMuons(const edm::Event& iEvent, const edm::EventSet
 	muon_isLoose[muon_count] = (*Muons)[i].isLooseMuon();
 	muon_isGlobal[muon_count] = (*Muons)[i].isGlobalMuon();
 	muon_isMedium[muon_count] = (*Muons)[i].isMediumMuon();
+	muon_isICHEP[muon_count] = idAlgos::isICHEPMuon((*Muons)[i]);	
 
 	muon_chargedHadIso[muon_count] = (*Muons)[i].chargedHadronIso();
 	muon_neutralHadIso[muon_count] = (*Muons)[i].neutralHadronIso();
