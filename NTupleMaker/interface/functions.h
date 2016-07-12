@@ -7,7 +7,6 @@
 #include "HTT-utilities/RecoilCorrections/interface/RecoilCorrector.h"
 #include "TauAnalysis/SVfitStandalone/interface/SVfitStandaloneAlgorithm.h"
 
-
 const double MuMass = 0.105658367;
 const double tauMass = 1.776;
 const double electronMass = 0;
@@ -1075,17 +1074,6 @@ double mcx(const double v1[4],const double v2[4]
     return sqrt(fmax(pow(vex1+vex2,2)-pow(vb1[1]-vb2[1],2),0.0));
   }
 }
-
-
-
-
-
-
-
-
-
-
-
 
 
 #endif
