@@ -249,6 +249,7 @@
 
 
 <bin name="SUSYmutau" file="AnalysisMacroSUSYmutau.cpp">
+ <use name="HTT-utilities/RecoilCorrections"/>
  <use name="PhysicsTools/Utilities"/>
  <use name="rootgraphics"/>
  <use name="root"/>
@@ -258,6 +259,8 @@
  <use name="HTT-utilities/LepEffInterface"/>
  <use name="roottmva"/>
  <use name="DesyTauAnalyses/NTupleMaker"/>
+ <use name="CondFormats/BTauObjects"/>
+ <use name="CondTools/BTau"/>
 </bin>
 
 <bin name="SUSYeltau" file="AnalysisMacroSUSYeltau.cpp">
@@ -269,7 +272,10 @@
  <use name="FWCore/ParameterSet"/>
  <use name="CondFormats/BTauObjects"/>
  <use name="HTT-utilities/LepEffInterface"/>
+ <use name="HTT-utilities/RecoilCorrections"/>
  <use name="DesyTauAnalyses/NTupleMaker"/>
+ <use name="CondFormats/BTauObjects"/>
+ <use name="CondTools/BTau"/>
 </bin>
 
 <bin name="SUSYmuel" file="AnalysisMacroSUSYmuel.cpp">
@@ -282,7 +288,10 @@
  <use name="FWCore/ParameterSet"/>
  <use name="CondFormats/BTauObjects"/>
  <use name="HTT-utilities/LepEffInterface"/>
+ <use name="HTT-utilities/RecoilCorrections"/>
  <use name="HTT-utilities/QCDModelingEMu"/>
+ <use name="CondFormats/BTauObjects"/>
+ <use name="CondTools/BTau"/>
 </bin>
 
 <bin name="SUSYWtemplate" file="AnalysisMacro_Wtemplate.cpp">
@@ -291,6 +300,8 @@
  <use name="root"/>
  <use name="rootmath"/>
  <use name="DesyTauAnalyses/NTupleMaker"/>
+ <use name="CondFormats/BTauObjects"/>
+ <use name="CondTools/BTau"/>
 </bin>
 
 <bin name="SUSYTtemplate" file="AnalysisMacroSUSY_TopTemplateemu.cpp">
@@ -299,6 +310,8 @@
  <use name="root"/>
  <use name="rootmath"/>
  <use name="DesyTauAnalyses/NTupleMaker"/>
+ <use name="CondFormats/BTauObjects"/>
+ <use name="CondTools/BTau"/>
 </bin>
 
 

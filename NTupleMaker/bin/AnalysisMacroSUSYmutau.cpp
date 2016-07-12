@@ -28,8 +28,7 @@
 #include "DesyTauAnalyses/NTupleMaker/interface/Jets.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/AnalysisMacro.h"
 #include "CondFormats/BTauObjects/interface/BTagCalibration.h"
-#include "CondFormats/BTauObjects/interface/BTagCalibrationReader.h"
-
+#include "CondTools/BTau/interface/BTagCalibrationReader.h"
 int main(int argc, char * argv[]) {
 
   // first argument - config file 
@@ -109,11 +108,10 @@ int main(int argc, char * argv[]) {
 
   const string dataBaseDir = cfg.get<string>("DataBaseDir");
 
-  const string TrigLeg  = cfg.get<string>("SingleMuonFilterName") ;
 
 
-  const string idIsoEffFile = cfg.get<string>("idIsoEffFile");
-  const string trigEffFile = cfg.get<string>("trigEffFile");
+  const string MuonidIsoEffFile = cfg.get<string>("MuonidIsoEffFile");
+  const string MuontrigEffFile = cfg.get<string>("MuontrigEffFile");
 
 
   const string Region  = cfg.get<string>("Region");
@@ -128,33 +126,36 @@ int main(int argc, char * argv[]) {
   // kinematic cuts on Jets
   const double etaJetCut   = cfg.get<double>("etaJetCut");
   const double ptJetCut   = cfg.get<double>("ptJetCut");
+
   // topSingleMuonTriggerFile
   const double dRleptonsCutmutau   = cfg.get<double>("dRleptonsCutmutau");
   const double dZetaCut       = cfg.get<double>("dZetaCut");
   const double deltaRTrigMatch = cfg.get<double>("DRTrigMatch");
   const bool oppositeSign    = cfg.get<bool>("oppositeSign");
   const bool isIsoR03 = cfg.get<bool>("IsIsoR03");
-  const double PtMuonTriggerCut = cfg.get<double>("PtMuonTriggerCut");
+  const string TrigLeg  = cfg.get<string>("SingleMuonFilterName") ;
+  const double SingleMuonTriggerPtCut = cfg.get<double>("SingleMuonTriggerPtCut");
 
 
 
-  const unsigned int RunRangeMin = cfg.get<unsigned int>("RunRangeMin");
-  const unsigned int RunRangeMax = cfg.get<unsigned int>("RunRangeMax");
+  //const unsigned int RunRangeMin = cfg.get<unsigned int>("RunRangeMin");
+  //const unsigned int RunRangeMax = cfg.get<unsigned int>("RunRangeMax");
 
   // vertex distributions filenames and histname
 
   // lepton scale factors
-  const string muonSfDataBarrel = cfg.get<string>("MuonSfDataBarrel");
+ /* const string muonSfDataBarrel = cfg.get<string>("MuonSfDataBarrel");
   const string muonSfDataEndcap = cfg.get<string>("MuonSfDataEndcap");
   const string muonSfMcBarrel = cfg.get<string>("MuonSfMcBarrel");
   const string muonSfMcEndcap = cfg.get<string>("MuonSfMcEndcap");
+*/
 
   const string jsonFile = cfg.get<string>("jsonFile");
 
   string cmsswBase = (getenv ("CMSSW_BASE"));
   string fullPathToJsonFile = cmsswBase + "/src/DesyTauAnalyses/NTupleMaker/test/json/" + jsonFile;
  
-  const string TauFakeRateFile = cfg.get<string>("TauFakeRateEff");
+//  const string TauFakeRateFile = cfg.get<string>("TauFakeRateEff");
 
   // Run-lumi selector
   std::vector<Period> periods;  
@@ -267,8 +268,21 @@ cout <<"xsecs" << xsecs<< endl;
 
   // BTag scale factors
   BTagCalibration calib("csvv2", cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/CSVv2.csv");
-  BTagCalibrationReader reader_BC(&calib,BTagEntry::OP_MEDIUM,"mujets","central");           // systematics type
-  BTagCalibrationReader reader_Light(&calib,BTagEntry::OP_MEDIUM,"incl","central");           // systematics type
+  //BTagCalibrationReader reader_BC(&calib,BTagEntry::OP_MEDIUM,"mujets","central");           // systematics type
+  //BTagCalibrationReader reader_Light(&calib,BTagEntry::OP_MEDIUM,"incl","central");           // systematics type
+  BTagCalibrationReader reader(BTagEntry::OP_MEDIUM,  // operating point
+			       "central");            // systematics type
+  reader.load(calib,               // calibration instance
+	      BTagEntry::FLAV_B,    // btag flavour
+	      "mujets");            // measurement type
+  
+  reader.load(calib,               // calibration instance
+	      BTagEntry::FLAV_C,    // btag flavour
+	      "mujets");             // measurement type
+
+  reader.load(calib,               // calibration instance
+	      BTagEntry::FLAV_UDSG,    // btag flavour
+	      "incl");             // measurement type
 
   //  std::cout << "SF_light (eta=0.6,pt=20.1) : " << reader_Light.eval(BTagEntry::FLAV_UDSG, 0.5, 20.1) << std::endl;
   //  std::cout << "SF_light (eta=2.1,pt=20.1) : " << reader_Light.eval(BTagEntry::FLAV_UDSG, 2.1, 20.1) << std::endl;
@@ -286,7 +300,7 @@ cout <<"xsecs" << xsecs<< endl;
   float MinLJetPt = 20.;
   float MinBJetPt = 30.;
 
-
+/*
   TFile *f10= new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/"+muonSfDataBarrel);  // mu SF barrel data
   TFile *f11 = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/"+muonSfDataEndcap); // mu SF endcap data
   TFile *f12= new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/"+muonSfMcBarrel);  // mu SF barrel MC
@@ -306,7 +320,7 @@ cout <<"xsecs" << xsecs<< endl;
   dataEffEndcap = hEffEndcapData->GetY();
   mcEffBarrel = hEffBarrelMC->GetY();
   mcEffEndcap = hEffEndcapMC->GetY();
-
+*/
 
   // Lepton Scale Factors 
 
@@ -315,11 +329,11 @@ cout <<"xsecs" << xsecs<< endl;
   ScaleFactor * SF_muonIdIso; 
   if (applyLeptonSF) {
     SF_muonIdIso = new ScaleFactor();
-    SF_muonIdIso->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(idIsoEffFile));
+    SF_muonIdIso->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(MuonidIsoEffFile));
   }
 
   ScaleFactor * SF_muonTrigger = new ScaleFactor();
-  SF_muonTrigger->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(trigEffFile));
+  SF_muonTrigger->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(MuontrigEffFile));
 
   //////////////////////////////////////
   //////// Initialized TauFakeRates here
@@ -845,7 +859,7 @@ cout<< "analysisTree.SusyLSPMass  "<< analysisTree.SusyLSPMass<<endl;}
 	{	for (unsigned int iT=0; iT<analysisTree.trigobject_count; ++iT) {
 	  	if (analysisTree.trigobject_filters[iT][nMainTrigger]
 	      	&&analysisTree.muon_pt[mIndex]>ptMuonHighCut&&
-	      	analysisTree.trigobject_pt[iT]>PtMuonTriggerCut) { // IsoMu Leg
+	      	analysisTree.trigobject_pt[iT]>SingleMuonTriggerPtCut) { // IsoMu Leg
 	    	float dRtrig = deltaR(analysisTree.muon_eta[mIndex],analysisTree.muon_phi[mIndex],
 				  analysisTree.trigobject_eta[iT],analysisTree.trigobject_phi[iT]);
 	    	if (dRtrig<deltaRTrigMatch) {
@@ -1409,21 +1423,22 @@ cout<< "analysisTree.SusyLSPMass  "<< analysisTree.SusyLSPMass<<endl;}
 	    if (flavor==5) {
 	      if (JetPtForBTag>MaxBJetPt) JetPtForBTag = MaxBJetPt - 0.1;
 	      if (JetPtForBTag<MinBJetPt) JetPtForBTag = MinBJetPt + 0.1;
-	      jet_scalefactor = reader_BC.eval(BTagEntry::FLAV_B, absJetEta, JetPtForBTag);
+	      jet_scalefactor = reader.eval_auto_bounds("central", BTagEntry::FLAV_B, absJetEta, JetPtForBTag);
 	      tageff = tagEff_B->Interpolate(JetPtForBTag,absJetEta);
 	    }
 	    else if (flavor==4) {
 	      if (JetPtForBTag>MaxBJetPt) JetPtForBTag = MaxBJetPt - 0.1;
 	      if (JetPtForBTag<MinBJetPt) JetPtForBTag = MinBJetPt + 0.1;
-	      jet_scalefactor = reader_BC.eval(BTagEntry::FLAV_C, absJetEta, JetPtForBTag);
+	      jet_scalefactor = reader.eval_auto_bounds("central", BTagEntry::FLAV_C, absJetEta, JetPtForBTag);
 	      tageff = tagEff_C->Interpolate(JetPtForBTag,absJetEta);
 	    }
 	    else {
 	      if (JetPtForBTag>MaxLJetPt) JetPtForBTag = MaxLJetPt - 0.1;
 	      if (JetPtForBTag<MinLJetPt) JetPtForBTag = MinLJetPt + 0.1;
-	      jet_scalefactor = reader_Light.eval(BTagEntry::FLAV_UDSG, absJetEta, JetPtForBTag);
+	      jet_scalefactor = reader.eval_auto_bounds("central", BTagEntry::FLAV_UDSG, absJetEta, JetPtForBTag);
 	      tageff = tagEff_Light->Interpolate(JetPtForBTag,absJetEta);
 	    }
+
 	    
 	    if (tageff<1e-5)      tageff = 1e-5;
 	    if (tageff>0.99999)   tageff = 0.99999;

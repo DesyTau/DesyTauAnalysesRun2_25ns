@@ -29,7 +29,7 @@
 #include "DesyTauAnalyses/NTupleMaker/interface/Jets.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/AnalysisMacro.h"
 #include "CondFormats/BTauObjects/interface/BTagCalibration.h"
-#include "CondFormats/BTauObjects/interface/BTagCalibrationReader.h"
+#include "CondTools/BTau/interface/BTagCalibrationReader.h"
 
 int main(int argc, char * argv[]) {
 
@@ -106,17 +106,16 @@ int main(int argc, char * argv[]) {
   const string dataBaseDir = cfg.get<string>("DataBaseDir");
 
   string TrigLeg  ;
-  TrigLeg  = cfg.get<string>("ElectronLeg");
+  TrigLeg  = cfg.get<string>("SingleElectronFilterName");
   //if (isData) TrigLeg  = cfg.get<string>("El23LegData");
  // const float singleElectronTriggerPtCut = cfg.get<float>("SingleElectronTriggerPtCuteltau");
  // const float singleElectronTriggerEtaCut = cfg.get<float>("SingleElectronTriggerEtaCuteltau");
-//  const float ptElectronTriggerCut = cfg.get<float>("SingleElectronTriggerPtCuteltau");
-    const float ptElectronTriggerCut = cfg.get<float>("PtElectronTriggerCuteltau");
+    const float SingleElectronTriggerPtCut = cfg.get<float>("SingleElectronTriggerPtCut");
 
   const string Region  = cfg.get<string>("Region");
   const string Sign  = cfg.get<string>("Sign");
 
-  const string SingleElectronTriggerFile  = cfg.get<string>("trigEffFileEl");
+  const string SingleElectronTriggerFile  = cfg.get<string>("ElectrontrigEffFile");
 
   const double leadchargedhadrcand_dz = cfg.get<double>("leadchargedhadrcand_dz");
   const double leadchargedhadrcand_dxy = cfg.get<double>("leadchargedhadrcand_dxy");
@@ -136,24 +135,24 @@ int main(int argc, char * argv[]) {
 
 
 
-  const unsigned int RunRangeMin = cfg.get<unsigned int>("RunRangeMin");
-  const unsigned int RunRangeMax = cfg.get<unsigned int>("RunRangeMax");
+ // const unsigned int RunRangeMin = cfg.get<unsigned int>("RunRangeMin");
+//  const unsigned int RunRangeMax = cfg.get<unsigned int>("RunRangeMax");
 
   // vertex distributions filenames and histname
-
+/*
   // lepton scale factors
   const string muonSfDataBarrel = cfg.get<string>("MuonSfDataBarrel");
   const string muonSfDataEndcap = cfg.get<string>("MuonSfDataEndcap");
   const string muonSfMcBarrel = cfg.get<string>("MuonSfMcBarrel");
   const string muonSfMcEndcap = cfg.get<string>("MuonSfMcEndcap");
-
+*/
   const string jsonFile = cfg.get<string>("jsonFile");
 
   string cmsswBase = (getenv ("CMSSW_BASE"));
   string fullPathToJsonFile = cmsswBase + "/src/DesyTauAnalyses/NTupleMaker/test/json/" + jsonFile;
 
-  const string ElectronIdIsoFile = cfg.get<string>("ElectronIdIsoEffElTau");
-  const string TauFakeRateFile = cfg.get<string>("TauFakeRateEff");
+  const string ElectronIdIsoFile = cfg.get<string>("ElectronIdIsoEffFile");
+//  const string TauFakeRateFile = cfg.get<string>("TauFakeRateEff");
 
   // Run-lumi selector
   std::vector<Period> periods;  
@@ -257,8 +256,21 @@ int main(int argc, char * argv[]) {
 
   // BTag scale factors
   BTagCalibration calib("csvv2", cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/CSVv2.csv");
-  BTagCalibrationReader reader_BC(&calib,BTagEntry::OP_MEDIUM,"mujets","central");           // systematics type
-  BTagCalibrationReader reader_Light(&calib,BTagEntry::OP_MEDIUM,"incl","central");           // systematics type
+//  BTagCalibrationReader reader_BC(&calib,BTagEntry::OP_MEDIUM,"mujets","central");           // systematics type
+  //BTagCalibrationReader reader_Light(&calib,BTagEntry::OP_MEDIUM,"incl","central");           // systematics type
+  BTagCalibrationReader reader(BTagEntry::OP_MEDIUM,  // operating point
+			       "central");            // systematics type
+  reader.load(calib,               // calibration instance
+	      BTagEntry::FLAV_B,    // btag flavour
+	      "mujets");            // measurement type
+  
+  reader.load(calib,               // calibration instance
+	      BTagEntry::FLAV_C,    // btag flavour
+	      "mujets");             // measurement type
+
+  reader.load(calib,               // calibration instance
+	      BTagEntry::FLAV_UDSG,    // btag flavour
+	      "incl");             // measurement type
 
   //  std::cout << "SF_light (eta=0.6,pt=20.1) : " << reader_Light.eval(BTagEntry::FLAV_UDSG, 0.5, 20.1) << std::endl;
   //  std::cout << "SF_light (eta=2.1,pt=20.1) : " << reader_Light.eval(BTagEntry::FLAV_UDSG, 2.1, 20.1) << std::endl;
@@ -278,7 +290,7 @@ int main(int argc, char * argv[]) {
 
 
 
-
+/*
   TFile *f10= new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/"+muonSfDataBarrel);  // mu SF barrel data
   TFile *f11 = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/"+muonSfDataEndcap); // mu SF endcap data
   TFile *f12= new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/"+muonSfMcBarrel);  // mu SF barrel MC
@@ -298,7 +310,7 @@ int main(int argc, char * argv[]) {
   dataEffEndcap = hEffEndcapData->GetY();
   mcEffBarrel = hEffBarrelMC->GetY();
   mcEffEndcap = hEffEndcapMC->GetY();
-
+*/
 
   // Lepton Scale Factors 
 
@@ -314,6 +326,7 @@ int main(int argc, char * argv[]) {
   ScaleFactor * SF_electronTrigger = new ScaleFactor();
   SF_electronTrigger->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(SingleElectronTriggerFile));
 
+ /*
   cout<<" Will try to initialize the TFR now.... "<<endl;
   ScaleFactor * SF_TFR; 
   bool applyTFR = true;
@@ -321,7 +334,7 @@ int main(int argc, char * argv[]) {
     SF_TFR = new ScaleFactor();
     SF_TFR->init_ScaleFactorb(TString(cmsswBase)+"/src/"+TString(TauFakeRateFile),applyTFR);
   }
-
+*/
 
 
   double Weight=0;
@@ -733,8 +746,8 @@ int main(int argc, char * argv[]) {
       //      if (electrons.size()>1||electrons.size()>1)
       //      std::cout << "electrons = " << electrons.size() << "  taus = " << taus.size() << std::endl;
       for (unsigned int im=0; im<electrons.size(); ++im) {
-	bool isElectronLegMatch = false;
-	//	bool isElectronTauElectronLegMatch = false;
+	bool isSingleElectronFilterNameMatch = false;
+	//	bool isElectronTauSingleElectronFilterNameMatch = false;
 	//	bool isElectronTauOverlapElectronMatch = false;
 	unsigned int mIndex  = electrons.at(im);
 	float neutralHadIsoElec = analysisTree.electron_neutralHadIso[mIndex];
@@ -754,15 +767,15 @@ int main(int argc, char * argv[]) {
 	for (unsigned int iT=0; iT<analysisTree.trigobject_count; ++iT) {
 	  if (analysisTree.trigobject_filters[iT][nMainTrigger]
 	      &&analysisTree.electron_pt[mIndex]>ptElectronHighCut&&
-	      analysisTree.trigobject_pt[iT]>ptElectronTriggerCut) { // IsoElec Leg
+	      analysisTree.trigobject_pt[iT]>SingleElectronTriggerPtCut) { // IsoElec Leg
 	    float dRtrig = deltaR(analysisTree.electron_eta[mIndex],analysisTree.electron_phi[mIndex],
 				  analysisTree.trigobject_eta[iT],analysisTree.trigobject_phi[iT]);
 	    if (dRtrig<deltaRTrigMatch) {
-	      isElectronLegMatch = true;
+	      isSingleElectronFilterNameMatch = true;
 	    }
 	  }
 	}
-      if (!isData &&  ( string::npos != filen.find("stau") || string::npos != filen.find("C1")) )  isElectronLegMatch = true;
+      if (!isData &&  ( string::npos != filen.find("stau") || string::npos != filen.find("C1")) )  isSingleElectronFilterNameMatch = true;
 
 	for (unsigned int it=0; it<taus.size(); ++it) {
 
@@ -773,7 +786,7 @@ int main(int argc, char * argv[]) {
 
 	  if (dR<dRleptonsCuteltau) continue;
 
-	  bool trigMatch = isElectronLegMatch;
+	  bool trigMatch = isSingleElectronFilterNameMatch;
 	
 	  if (!trigMatch) continue;
 	  
@@ -1080,7 +1093,8 @@ int main(int argc, char * argv[]) {
 	genTauMatched = isTauMatched;
 
 	/////////TFR
-      if (!isData && applyTFR && !isTauMatched) {
+	/*
+        if (!isData && applyTFR && !isTauMatched) {
 
 
 	//leptonSFweight = SF_yourScaleFactor->get_ScaleFactor(pt, eta)	
@@ -1094,6 +1108,7 @@ int main(int argc, char * argv[]) {
 	TFR_weight  = TFRSF_el1;
 	//cout<<"  "<<TFRSF_mu1<<"  for  eta  "<<etaTau1<<  " pT  "<< ptTau1<<endl;
       	}
+*/
       CFCounter[iCut]+= weight;
       CFCounter_[iCut]+= weight;
       iCFCounter[iCut]++;
@@ -1264,21 +1279,22 @@ int main(int argc, char * argv[]) {
 	    if (flavor==5) {
 	      if (JetPtForBTag>MaxBJetPt) JetPtForBTag = MaxBJetPt - 0.1;
 	      if (JetPtForBTag<MinBJetPt) JetPtForBTag = MinBJetPt + 0.1;
-	      jet_scalefactor = reader_BC.eval(BTagEntry::FLAV_B, absJetEta, JetPtForBTag);
+	      jet_scalefactor = reader.eval_auto_bounds("central", BTagEntry::FLAV_B, absJetEta, JetPtForBTag);
 	      tageff = tagEff_B->Interpolate(JetPtForBTag,absJetEta);
 	    }
 	    else if (flavor==4) {
 	      if (JetPtForBTag>MaxBJetPt) JetPtForBTag = MaxBJetPt - 0.1;
 	      if (JetPtForBTag<MinBJetPt) JetPtForBTag = MinBJetPt + 0.1;
-	      jet_scalefactor = reader_BC.eval(BTagEntry::FLAV_C, absJetEta, JetPtForBTag);
+	      jet_scalefactor = reader.eval_auto_bounds("central", BTagEntry::FLAV_C, absJetEta, JetPtForBTag);
 	      tageff = tagEff_C->Interpolate(JetPtForBTag,absJetEta);
 	    }
 	    else {
 	      if (JetPtForBTag>MaxLJetPt) JetPtForBTag = MaxLJetPt - 0.1;
 	      if (JetPtForBTag<MinLJetPt) JetPtForBTag = MinLJetPt + 0.1;
-	      jet_scalefactor = reader_Light.eval(BTagEntry::FLAV_UDSG, absJetEta, JetPtForBTag);
+	      jet_scalefactor = reader.eval_auto_bounds("central", BTagEntry::FLAV_UDSG, absJetEta, JetPtForBTag);
 	      tageff = tagEff_Light->Interpolate(JetPtForBTag,absJetEta);
 	    }
+
 	    
 	    if (tageff<1e-5)      tageff = 1e-5;
 	    if (tageff>0.99999)   tageff = 0.99999;
