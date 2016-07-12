@@ -2,48 +2,39 @@
 // See http://www.hep.phy.cam.ac.uk/~lester/mt2/index.html
 // Authors: Christopher Lester and Alan Barr
 
-#ifndef Basic_Mt2_332_Calculator_H
-#define Basic_Mt2_332_Calculator_H
+#ifndef Basic_MCT2_332_Calculator_H
+#define Basic_MCT2_332_Calculator_H
 
-#include "Mt2_332_Calculator.h"
+#include "Mt2/MCT2_332_Calculator.h"
 #include "Minuit2/FCNBase.h"
 #include <vector>
 
 namespace Mt2 {
 
-  class Basic_Mt2_332_Calculator : public Mt2_332_Calculator {
+  class Basic_MCT2_332_Calculator : public MCT2_332_Calculator {
   public:
-    double mt2_332(const LorentzTransverseVector& visibleA, // 3 d.o.f. 
-		   const LorentzTransverseVector& visibleB, // 3 d.o.f.
-		   const TwoVector& ptmiss,                 // 2 d.o.f.
-		   const double mInvisible);
-    double mt2_332_Sq(const LorentzTransverseVector& visibleA, // 3 d.o.f. 
-		      const LorentzTransverseVector& visibleB, // 3 d.o.f.
-		      const TwoVector& ptmiss,                 // 2 d.o.f.
-		      const double mInvisible);
-    Basic_Mt2_332_Calculator() : Mt2_332_Calculator("Basic_Mt2_332") {};
-
-      double getPXInvisA_atMt2Solution() const {return etxAt;}
-      double getPYInvisA_atMt2Solution() const {return etyAt;}
-      double getPXInvisB_atMt2Solution() const {return etxBt;}
-      double getPYInvisB_atMt2Solution() const {return etyBt;}
+    double mct2_332(const LorentzTransverseVector& visibleA, // 3 d.o.f. 
+		    const LorentzTransverseVector& visibleB, // 3 d.o.f.
+		    const TwoVector& ptmiss,                 // 2 d.o.f.
+		    const double mInvisible);
+    double mct2_332_Sq(const LorentzTransverseVector& visibleA, // 3 d.o.f. 
+		       const LorentzTransverseVector& visibleB, // 3 d.o.f.
+		       const TwoVector& ptmiss,                 // 2 d.o.f.
+		       const double mInvisible);
+    Basic_MCT2_332_Calculator() : MCT2_332_Calculator("Basic_MCT2_332") {};
     
   private:
-      double etxAt;
-      double etyAt;
-      double etxBt;
-      double etyBt;
-    class mT2Fcn : public ROOT::Minuit2::FCNBase {
+    class mCT2Fcn : public ROOT::Minuit2::FCNBase {
     public:
-      mT2Fcn(const double exmiss, 
-	     const double eymiss, 
-	     const double mchi,
-	     const double pT1x,
-	     const double pT1y,
-	     const double mass1,
-	     const double pT2x,
-	     const double pT2y,
-	     const double mass2) : 
+      mCT2Fcn(const double exmiss, 
+	      const double eymiss, 
+	      const double mchi,
+	      const double pT1x,
+	      const double pT1y,
+	      const double mass1,
+	      const double pT2x,
+	      const double pT2y,
+	      const double mass2) : 
 	theExmiss(exmiss),
 	theEymiss(eymiss),
 	theMchi(mchi),
@@ -55,7 +46,7 @@ namespace Mt2 {
 	theMass2(mass2),
 	theErrorDef(1.) {}
       
-      ~mT2Fcn() {}
+      ~mCT2Fcn() {}
       
       virtual double Up() const {return theErrorDef;}
       virtual double operator()(const std::vector<double>&) const;
@@ -85,8 +76,6 @@ namespace Mt2 {
       double theMass2;
       
       double theErrorDef;
-
-
     };
   };
 
