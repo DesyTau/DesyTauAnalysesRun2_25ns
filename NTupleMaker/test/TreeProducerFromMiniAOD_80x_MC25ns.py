@@ -49,9 +49,9 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condD
 from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag
 
 if runOnData:
-  process.GlobalTag.globaltag = '80X_dataRun2_Prompt_v8'
+  process.GlobalTag.globaltag = '80X_dataRun2_Prompt_ICHEP16JEC_v0'
 else:
-  process.GlobalTag.globaltag = '80X_mcRun2_asymptotic_2016_miniAODv2'
+  process.GlobalTag.globaltag = '80X_mcRun2_asymptotic_2016_miniAODv2_v1'
 
 print 'The conditions are =======>',process.GlobalTag.globaltag
     
@@ -268,9 +268,9 @@ IsData = cms.untracked.bool(isData),
 GenParticles = cms.untracked.bool(not isData)
 )
 
-JECfile = "DesyTauAnalyses/NTupleMaker/data/JEC/Spring16_25nsV3/Spring16_25nsV3_MC_Uncertainty_AK4PFchs.txt"
+JECfile = "DesyTauAnalyses/NTupleMaker/data/JEC/Spring16_25nsV6/Spring16_25nsV6_MC_Uncertainty_AK4PFchs.txt"
 if isData:
-  JECfile = "DesyTauAnalyses/NTupleMaker/data/JEC/Spring16_25nsV3/Spring16_25nsV3_DATA_Uncertainty_AK4PFchs.txt"
+  JECfile = "DesyTauAnalyses/NTupleMaker/data/JEC/Spring16_25nsV6/Spring16_25nsV6_DATA_Uncertainty_AK4PFchs.txt"
 
 process.makeroottree = cms.EDAnalyzer("NTupleMaker",
 # data, year, period, skim
@@ -323,8 +323,7 @@ MetCovMatrixTag = cms.InputTag("METSignificance:METCovariance:TreeProducer"),
 MetSigTag = cms.InputTag("METSignificance:METSignificance:TreeProducer"),
 MetCorrCovMatrixTag = cms.InputTag("METCorrSignificance:METCovariance:TreeProducer"),
 MetCorrSigTag = cms.InputTag("METCorrSignificance:METSignificance:TreeProducer"),
-#MetCorrCollectionTag = cms.InputTag("patpfMETT1::TreeProducer"),
-MetCorrCollectionTag = cms.InputTag("slimmedMETs::@skipCurrentProcess"),
+MetCorrCollectionTag = cms.InputTag("patpfMETT1::TreeProducer"),
 PuppiMetCollectionTag = cms.InputTag("slimmedMETsPuppi"),
 MvaMetCollectionsTag = cms.VInputTag(cms.InputTag("MVAMET","MVAMET","TreeProducer")),
 TrackCollectionTag = cms.InputTag("generalTracks"),
@@ -400,7 +399,7 @@ RecTrackDxyMax = cms.untracked.double(1.0),
 RecTrackDzMax = cms.untracked.double(1.0),
 RecTrackNum = cms.untracked.int32(0),
 # muons
-RecMuonPtMin = cms.untracked.double(8.),
+RecMuonPtMin = cms.untracked.double(50.),
 RecMuonEtaMax = cms.untracked.double(2.5),
 RecMuonHLTriggerMatching = cms.untracked.vstring(
 
@@ -431,7 +430,7 @@ RecPhotonHLTriggerMatching = cms.untracked.vstring(),
 RecPhotonNum = cms.untracked.int32(0),
 # electrons
 RecElectronPtMin = cms.untracked.double(8.),
-RecElectronEtaMax = cms.untracked.double(2.5),
+RecElectronEtaMax = cms.untracked.double(2.6),
 RecElectronHLTriggerMatching = cms.untracked.vstring(
 'HLT_Ele25_eta2p1_WPTight_Gsf_v.*:hltEle25erWPTightGsfTrackIsoFilter',
 'HLT_Ele25_eta2p1_WPLoose_Gsf_v.*:hltEle25erWPLooseGsfTrackIsoFilter',
@@ -471,67 +470,7 @@ RecTauHLTriggerMatching = cms.untracked.vstring(
 'HLT_DoubleMediumIsoPFTau40_Trk1_eta2p1_Reg_v.*:hltDoublePFTau40TrackPt1MediumIsolationDz02Reg',
 'HLT_DoubleMediumIsoPFTau35_Trk1_eta2p1_Reg_v.*:hltDoublePFTau35TrackPt1MediumIsolationDz02Reg'
 ),
-RecTauFloatDiscriminators = cms.untracked.vstring(
-#'againstElectronLoose',
-#'againstElectronLooseMVA5',
-#'againstElectronMVA5category',
-#'againstElectronMVA5raw',
-#'againstElectronMedium',
-#'againstElectronMediumMVA5',
-#'againstElectronTight',
-#'againstElectronTightMVA5',
-#'againstElectronVLooseMVA5',
-#'againstElectronVTightMVA5',
-#'againstMuonLoose',
-#'againstMuonLoose2',
-#'againstMuonLoose3',
-#'againstMuonLooseMVA',
-#'againstMuonMVAraw',
-#'againstMuonMedium',
-#'againstMuonMedium2',
-#'againstMuonMediumMVA',
-#'againstMuonTight',
-#'againstMuonTight2',
-#'againstMuonTight3',
-#'againstMuonTightMVA',
-#'byCombinedIsolationDeltaBetaCorrRaw3Hits',
-#'byIsolationMVA3newDMwLTraw',
-#'byIsolationMVA3newDMwoLTraw',
-#'byIsolationMVA3oldDMwLTraw',
-#'byIsolationMVA3oldDMwoLTraw',
-#'byLooseCombinedIsolationDeltaBetaCorr3Hits',
-#'byLooseIsolationMVA3newDMwLT',
-#'byLooseIsolationMVA3newDMwoLT',
-#'byLooseIsolationMVA3oldDMwLT',
-#'byLooseIsolationMVA3oldDMwoLT',
-#'byMediumCombinedIsolationDeltaBetaCorr3Hits',
-#'byMediumIsolationMVA3newDMwLT',
-#'byMediumIsolationMVA3newDMwoLT',
-#'byMediumIsolationMVA3oldDMwLT',
-#'byMediumIsolationMVA3oldDMwoLT',
-#'byTightCombinedIsolationDeltaBetaCorr3Hits',
-#'byTightIsolationMVA3newDMwLT',
-#'byTightIsolationMVA3newDMwoLT',
-#'byTightIsolationMVA3oldDMwLT',
-#'byTightIsolationMVA3oldDMwoLT',
-#'byVLooseIsolationMVA3newDMwLT',
-#'byVLooseIsolationMVA3newDMwoLT',
-#'byVLooseIsolationMVA3oldDMwLT',
-#'byVLooseIsolationMVA3oldDMwoLT',
-#'byVTightIsolationMVA3newDMwLT',
-#'byVTightIsolationMVA3newDMwoLT',
-#'byVTightIsolationMVA3oldDMwLT',
-#'byVTightIsolationMVA3oldDMwoLT',
-#'byVVTightIsolationMVA3newDMwLT',
-#'byVVTightIsolationMVA3newDMwoLT',
-#'byVVTightIsolationMVA3oldDMwLT',
-#'byVVTightIsolationMVA3oldDMwoLT',
-#'chargedIsoPtSum',
-#'decayModeFinding',
-#'decayModeFindingNewDMs',
-#'neutralIsoPtSum',
-#'puCorrPtSum'
-),
+RecTauFloatDiscriminators = cms.untracked.vstring(),
 RecTauBinaryDiscriminators = cms.untracked.vstring(),
 RecTauNum = cms.untracked.int32(0),
 # jets
@@ -556,17 +495,16 @@ process.load("RecoMET/METProducers.METSignificanceParams_cfi")
 
 process.METCorrSignificance = process.METSignificance.clone(
   srcPfJets = cms.InputTag('patJetsReapplyJEC::TreeProducer'),
-  #srcMet = cms.InputTag('patpfMETT1::TreeProducer')
-  srcMet = cms.InputTag('slimmedMETs::@skipCurrentProcess')
+  srcMet = cms.InputTag('patpfMETT1::TreeProducer')
 )
 
 process.BadChargedCandidateFilter.muons = cms.InputTag("slimmedMuons")
 process.BadChargedCandidateFilter.PFCandidates = cms.InputTag("packedPFCandidates")
-process.BadChargedCandidateFilter.debug = cms.bool(True)
+process.BadChargedCandidateFilter.debug = cms.bool(False)
 process.BadPFMuonFilter.muons = cms.InputTag("slimmedMuons")
 process.BadPFMuonFilter.PFCandidates = cms.InputTag("packedPFCandidates")
 
-process.BadPFMuonFilter.debug = cms.bool(True)
+process.BadPFMuonFilter.debug = cms.bool(False)
 
 process.p = cms.Path(
   process.initroottree*
