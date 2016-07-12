@@ -2,40 +2,34 @@
 // See http://www.hep.phy.cam.ac.uk/~lester/mt2/index.html
 // Authors: Christopher Lester and Alan Barr
 
-#ifndef Basic_Mt2_332_Calculator_H
-#define Basic_Mt2_332_Calculator_H
+#ifndef Basic_Mt2_Asymmetric332_Calculator_H
+#define Basic_Mt2_Asymmetric332_Calculator_H
 
-#include "Mt2_332_Calculator.h"
+#include "Mt2/Mt2_Asymmetric332_Calculator.h"
 #include "Minuit2/FCNBase.h"
 #include <vector>
 
 namespace Mt2 {
 
-  class Basic_Mt2_332_Calculator : public Mt2_332_Calculator {
+  class Basic_Mt2_Asymmetric332_Calculator : public Mt2_Asymmetric332_Calculator {
   public:
-    double mt2_332(const LorentzTransverseVector& visibleA, // 3 d.o.f. 
+    double mt2_Asymmetric332(const double theta,//tan(theta)=mHeavyA/mHeavyB
+                   const LorentzTransverseVector& visibleA, // 3 d.o.f. 
 		   const LorentzTransverseVector& visibleB, // 3 d.o.f.
 		   const TwoVector& ptmiss,                 // 2 d.o.f.
 		   const double mInvisible);
-    double mt2_332_Sq(const LorentzTransverseVector& visibleA, // 3 d.o.f. 
+    double mt2_Asymmetric332_Sq(const double theta,//tan(theta)=mHeavyA/mHeavyB
+                       const LorentzTransverseVector& visibleA, // 3 d.o.f. 
 		      const LorentzTransverseVector& visibleB, // 3 d.o.f.
 		      const TwoVector& ptmiss,                 // 2 d.o.f.
 		      const double mInvisible);
-    Basic_Mt2_332_Calculator() : Mt2_332_Calculator("Basic_Mt2_332") {};
-
-      double getPXInvisA_atMt2Solution() const {return etxAt;}
-      double getPYInvisA_atMt2Solution() const {return etyAt;}
-      double getPXInvisB_atMt2Solution() const {return etxBt;}
-      double getPYInvisB_atMt2Solution() const {return etyBt;}
+    Basic_Mt2_Asymmetric332_Calculator() : Mt2_Asymmetric332_Calculator("Basic_Mt2_Asymmetric332") {};
     
   private:
-      double etxAt;
-      double etyAt;
-      double etxBt;
-      double etyBt;
     class mT2Fcn : public ROOT::Minuit2::FCNBase {
     public:
-      mT2Fcn(const double exmiss, 
+      mT2Fcn(const double theta,//tan(theta)=mHeavyA/mHeavyB
+             const double exmiss, 
 	     const double eymiss, 
 	     const double mchi,
 	     const double pT1x,
@@ -44,7 +38,9 @@ namespace Mt2 {
 	     const double pT2x,
 	     const double pT2y,
 	     const double mass2) : 
-	theExmiss(exmiss),
+	theTheta(theta),
+	theMHeavyAOnMHeavyB(tan(theta)),
+        theExmiss(exmiss),
 	theEymiss(eymiss),
 	theMchi(mchi),
 	thePT1x(pT1x),
@@ -72,6 +68,9 @@ namespace Mt2 {
       
     private:
       
+      const double theTheta;
+      const double theMHeavyAOnMHeavyB;
+
       double theExmiss;
       double theEymiss;
       double theMchi;
@@ -85,8 +84,6 @@ namespace Mt2 {
       double theMass2;
       
       double theErrorDef;
-
-
     };
   };
 
