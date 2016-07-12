@@ -1416,6 +1416,7 @@ cout<< "analysisTree.SusyLSPMass  "<< analysisTree.SusyLSPMass<<endl;}
 	  if (!isData) {
 	    int flavor = abs(analysisTree.pfjet_flavour[jet]);
 
+
 	    double jet_scalefactor = 1;
 	    double JetPtForBTag = ptJetCut;
 	    double tageff = 1;
