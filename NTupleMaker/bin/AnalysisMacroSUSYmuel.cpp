@@ -31,7 +31,8 @@
 #include "DesyTauAnalyses/NTupleMaker/interface/AnalysisMacro.h"
 #include "HTT-utilities/QCDModelingEMu/interface/QCDModelForEMu.h"
 #include "CondFormats/BTauObjects/interface/BTagCalibration.h"
-#include "CondFormats/BTauObjects/interface/BTagCalibrationReader.h"
+#include "CondTools/BTau/interface/BTagCalibrationReader.h"
+
 
 int main(int argc, char * argv[]) {
 
@@ -125,23 +126,24 @@ int main(int argc, char * argv[]) {
 
 
 
-  const unsigned int RunRangeMin = cfg.get<unsigned int>("RunRangeMin");
-  const unsigned int RunRangeMax = cfg.get<unsigned int>("RunRangeMax");
+  //const unsigned int RunRangeMin = cfg.get<unsigned int>("RunRangeMin");
+  //const unsigned int RunRangeMax = cfg.get<unsigned int>("RunRangeMax");
 
   // vertex distributions filenames and histname
-
+/*
   // lepton scale factors
   const string muonSfDataBarrel = cfg.get<string>("MuonSfDataBarrel");
   const string muonSfDataEndcap = cfg.get<string>("MuonSfDataEndcap");
   const string muonSfMcBarrel = cfg.get<string>("MuonSfMcBarrel");
   const string muonSfMcEndcap = cfg.get<string>("MuonSfMcEndcap");
+*/
 
   const string jsonFile = cfg.get<string>("jsonFile");
 
   string cmsswBase = (getenv ("CMSSW_BASE"));
   string fullPathToJsonFile = cmsswBase + "/src/DesyTauAnalyses/NTupleMaker/test/json/" + jsonFile;
  
-  const string TauFakeRateFile = cfg.get<string>("TauFakeRateEff");
+//  const string TauFakeRateFile = cfg.get<string>("TauFakeRateEff");
 
 ////////// Triggers 
   TString LowPtLegElectron(lowPtLegElectron);
@@ -271,8 +273,21 @@ int main(int argc, char * argv[]) {
 
   // BTag scale factors
   BTagCalibration calib("csvv2", cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/CSVv2.csv");
-  BTagCalibrationReader reader_BC(&calib,BTagEntry::OP_MEDIUM,"mujets","central");           // systematics type
-  BTagCalibrationReader reader_Light(&calib,BTagEntry::OP_MEDIUM,"incl","central");           // systematics type
+ // BTagCalibrationReader reader_BC(&calib,BTagEntry::OP_MEDIUM,"mujets","central");           // systematics type
+  //BTagCalibrationReader reader_Light(&calib,BTagEntry::OP_MEDIUM,"incl","central");           // systematics type
+  BTagCalibrationReader reader(BTagEntry::OP_MEDIUM,  // operating point
+			       "central");            // systematics type
+  reader.load(calib,               // calibration instance
+	      BTagEntry::FLAV_B,    // btag flavour
+	      "mujets");            // measurement type
+  
+  reader.load(calib,               // calibration instance
+	      BTagEntry::FLAV_C,    // btag flavour
+	      "mujets");             // measurement type
+
+  reader.load(calib,               // calibration instance
+	      BTagEntry::FLAV_UDSG,    // btag flavour
+	      "incl");             // measurement type
 
   //  std::cout << "SF_light (eta=0.6,pt=20.1) : " << reader_Light.eval(BTagEntry::FLAV_UDSG, 0.5, 20.1) << std::endl;
   //  std::cout << "SF_light (eta=2.1,pt=20.1) : " << reader_Light.eval(BTagEntry::FLAV_UDSG, 2.1, 20.1) << std::endl;
@@ -1283,19 +1298,19 @@ int main(int argc, char * argv[]) {
 	    if (flavor==5) {
 	      if (JetPtForBTag>MaxBJetPt) JetPtForBTag = MaxBJetPt - 0.1;
 	      if (JetPtForBTag<MinBJetPt) JetPtForBTag = MinBJetPt + 0.1;
-	      jet_scalefactor = reader_BC.eval(BTagEntry::FLAV_B, absJetEta, JetPtForBTag);
+	      jet_scalefactor = reader.eval_auto_bounds("central", BTagEntry::FLAV_B, absJetEta, JetPtForBTag);
 	      tageff = tagEff_B->Interpolate(JetPtForBTag,absJetEta);
 	    }
 	    else if (flavor==4) {
 	      if (JetPtForBTag>MaxBJetPt) JetPtForBTag = MaxBJetPt - 0.1;
 	      if (JetPtForBTag<MinBJetPt) JetPtForBTag = MinBJetPt + 0.1;
-	      jet_scalefactor = reader_BC.eval(BTagEntry::FLAV_C, absJetEta, JetPtForBTag);
+	      jet_scalefactor = reader.eval_auto_bounds("central", BTagEntry::FLAV_C, absJetEta, JetPtForBTag);
 	      tageff = tagEff_C->Interpolate(JetPtForBTag,absJetEta);
 	    }
 	    else {
 	      if (JetPtForBTag>MaxLJetPt) JetPtForBTag = MaxLJetPt - 0.1;
 	      if (JetPtForBTag<MinLJetPt) JetPtForBTag = MinLJetPt + 0.1;
-	      jet_scalefactor = reader_Light.eval(BTagEntry::FLAV_UDSG, absJetEta, JetPtForBTag);
+	      jet_scalefactor = reader.eval_auto_bounds("central", BTagEntry::FLAV_UDSG, absJetEta, JetPtForBTag);
 	      tageff = tagEff_Light->Interpolate(JetPtForBTag,absJetEta);
 	    }
 	    
