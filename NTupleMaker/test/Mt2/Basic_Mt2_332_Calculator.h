@@ -5,7 +5,7 @@
 #ifndef Basic_Mt2_332_Calculator_H
 #define Basic_Mt2_332_Calculator_H
 
-#include "Mt2/Mt2_332_Calculator.h"
+#include "Mt2_332_Calculator.h"
 #include "Minuit2/FCNBase.h"
 #include <vector>
 

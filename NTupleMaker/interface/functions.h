@@ -7,7 +7,6 @@
 #include "HTT-utilities/RecoilCorrections/interface/RecoilCorrector.h"
 #include "TauAnalysis/SVfitStandalone/interface/SVfitStandaloneAlgorithm.h"
 
-
 const double MuMass = 0.105658367;
 const double tauMass = 1.776;
 const double electronMass = 0;
@@ -1077,15 +1076,25 @@ double mcx(const double v1[4],const double v2[4]
 }
 
 
+bool metFiltersPasses2(AC1B &tree_, std::vector<TString> metFlags) {
 
+  bool passed = true;
+  unsigned int nFlags = metFlags.size();
+  //  std::cout << "MEt filters : " << std::endl;
+  for (std::map<string,int>::iterator it=tree_.flags->begin(); it!=tree_.flags->end(); ++it) {
+    TString flagName(it->first);
+    //    std::cout << it->first << " : " << it->second << std::endl;
+    for (unsigned int iFilter=0; iFilter<nFlags; ++iFilter) {
+      if (flagName.Contains(metFlags[iFilter])) {
+	if (it->second==0) {
+	  passed = false;
+	  break;
+	}
+      }
+    }
+  }
+  //  std::cout << "Passed : " << passed << std::endl;
+  return passed;
 
-
-
-
-
-
-
-
-
-
+}
 #endif

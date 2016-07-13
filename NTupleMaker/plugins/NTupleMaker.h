@@ -253,9 +253,11 @@ class NTupleMaker : public edm::EDAnalyzer{
   unsigned int AddMuons(const edm::Event& iEvent, const edm::EventSetup& iSetup);
   //  unsigned int AddPhotons(const edm::Event& iEvent);
   unsigned int AddTaus(const edm::Event& iEvent, const edm::EventSetup& iSetup);
+  unsigned int AddPFCand(const edm::Event& iEvent, const edm::EventSetup& iSetup);
   unsigned int AddPFJets(const edm::Event& iEvent, const edm::EventSetup& iSetup);
   unsigned int AddTriggerObjects(const edm::Event& iEvent);
   bool foundCompatibleInnerHits(const reco::HitPattern& hitPatA, const reco::HitPattern& hitPatB);
+  bool AddSusyInfo(const edm::Event& iEvent);
   
   UInt_t GenParticleInfo(const GenParticle* particle);
   bool GetL1ExtraTriggerMatch(const l1extra::L1JetParticleCollection* l1jets,  const l1extra::L1JetParticleCollection* l1taus, const LeafCandidate& leg2);
@@ -290,6 +292,7 @@ class NTupleMaker : public edm::EDAnalyzer{
   std::string cJECfile;
   
   bool cgen;
+  bool csusyinfo;
   bool ctrigger;
   bool cbeamspot;
   bool crectrack;
@@ -330,6 +333,8 @@ class NTupleMaker : public edm::EDAnalyzer{
 
   double cTrackPtMin;
   double cTrackEtaMax;
+  double cTrackDxyMax;
+  double cTrackDzMax;
   int cTrackNum;
 
   double cPhotonPtMin;
@@ -382,6 +387,8 @@ class NTupleMaker : public edm::EDAnalyzer{
   edm::EDGetTokenT<pat::TriggerObjectStandAloneCollection> TriggerObjectCollectionToken_;
   edm::EDGetTokenT<BeamSpot> BeamSpotToken_;
   edm::EDGetTokenT<VertexCollection> PVToken_;
+  edm::EDGetTokenT<double> SusyMotherMassToken_;
+  edm::EDGetTokenT<double> SusyLSPMassToken_;
   std::string sampleName;
 
   PropagatorWithMaterial*               propagatorWithMaterial; 
@@ -413,7 +420,6 @@ class NTupleMaker : public edm::EDAnalyzer{
   vector<int> DiTauIndex;
   
   edm::Handle<edm::TriggerResults> Flags;  
-  
   math::XYZPoint pv_position;
   Vertex primvertex;
 
@@ -456,6 +462,11 @@ class NTupleMaker : public edm::EDAnalyzer{
   Float_t track_px[M_trackmaxcount];
   Float_t track_py[M_trackmaxcount];
   Float_t track_pz[M_trackmaxcount];
+  Float_t track_pt[M_trackmaxcount];
+  Float_t track_eta[M_trackmaxcount];
+  Float_t track_phi[M_trackmaxcount];
+  Float_t track_mass[M_trackmaxcount];
+  Float_t track_charge[M_trackmaxcount];
   Float_t track_outerx[M_trackmaxcount];
   Float_t track_outery[M_trackmaxcount];
   Float_t track_outerz[M_trackmaxcount];
@@ -469,12 +480,13 @@ class NTupleMaker : public edm::EDAnalyzer{
   Float_t track_dz[M_trackmaxcount];
   Float_t track_dzerr[M_trackmaxcount];
   Float_t track_dedxharmonic2[M_trackmaxcount];
-  Int_t track_charge[M_trackmaxcount];
   UChar_t track_nhits[M_trackmaxcount];
   UChar_t track_nmissinghits[M_trackmaxcount];
   UChar_t track_npixelhits[M_trackmaxcount];
   UChar_t track_npixellayers[M_trackmaxcount];
   UChar_t track_nstriplayers[M_trackmaxcount];
+  Int_t track_ID[M_trackmaxcount];
+  Bool_t track_highPurity[M_trackmaxcount];
   
   
   // pat muons
@@ -534,7 +546,8 @@ class NTupleMaker : public edm::EDAnalyzer{
   Bool_t muon_isTight[M_muonmaxcount];
   Bool_t muon_isLoose[M_muonmaxcount];
   Bool_t muon_isMedium[M_muonmaxcount];
-
+  Bool_t muon_isICHEP[M_muonmaxcount];
+  
   Bool_t muon_globalTrack[M_muonmaxcount];
   Bool_t muon_innerTrack[M_muonmaxcount];
   
@@ -1025,12 +1038,14 @@ class NTupleMaker : public edm::EDAnalyzer{
   UInt_t run_l1techprescaletablescount;
   UInt_t run_l1techprescaletables[10000];		
 
+  // susy info
+  Float_t SusyMotherMass;
+  Float_t SusyLSPMass;
+
   std::map<std::string, int>* hltriggerresults_;
   std::map<std::string, int>* hltriggerprescales_;
   std::vector<std::string>hltriggerresultsV_;
-  
   std::map<std::string, int>* flags_;
-  
   float embeddingWeight_;
   //std::vector< double > embeddingWeights_; //for RhEmb
   //float TauSpinnerWeight_;
