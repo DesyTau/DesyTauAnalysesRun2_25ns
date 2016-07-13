@@ -26,7 +26,7 @@ void SF_e(TString fileName_Data = "SingleElectron_Run2016B_TP", // RooT file wit
 
   // output inizialization 
   TString lepton = "Electron";
-	TString OutFileName = lepton + "_" + what + "_eff_Spring16";
+	TString OutFileName = lepton + "_" + what + "_IsoLt" + Form("%.2f", iso) + "_eff_Spring16";
 	TFile * outputFile = new TFile(OutFileName+".root","recreate");
 
 	// Title of axis in plots  

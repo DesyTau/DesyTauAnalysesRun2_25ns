@@ -26,7 +26,7 @@ void SF_mu(TString fileName_Data = "SingleMuon_Run2016B_TP",
 
   // output inizialization 
   TString lepton = "Muon";
-	TString OutFileName = lepton + "_" + what + "_eff_Spring16";
+	TString OutFileName = lepton + "_" + what + "_IsoLt" + Form("%.2f", iso) + "_eff_Spring16";
 	TFile * outputFile = new TFile(OutFileName+".root","recreate");
 
 	//open input file

@@ -156,8 +156,8 @@ void FitPassAndFail(TString SampleName,
   const Float_t maxMass = 105;
   const Float_t xminF = 55;
   const Float_t xmaxF = 120;
-  const Float_t xminInt = 80;
-  const Float_t xmaxInt = 102;
+  const Float_t xminInt = 75;
+  const Float_t xmaxInt = 105;
   
   SetStyle();
 
