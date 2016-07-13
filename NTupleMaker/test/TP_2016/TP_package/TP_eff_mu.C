@@ -4,8 +4,8 @@
 //    Author: Alberto Bragagnolo alberto.bragagnolo.3@studenti.unipd.it
 //
 //    This code uses the root files produced by the TagAndProbe code and computes the efficiencies fitting the Z peak 
-//		with the plotting tool. In this code the eta and pt bins are defined. Root files with scale factor (for IdIso) or
-//		efficiencies (for triggers) will be produces. The plots with the various fits will be stored in dedicated directories.
+//		with the fitting tool. In this code the eta and pt bins are defined. Root files with will be produced. 
+//		The plots with the various fits will be stored in dedicated directories.
 //		This code is for muon.
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
