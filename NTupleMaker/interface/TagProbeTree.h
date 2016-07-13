@@ -28,7 +28,7 @@ public :
   Float_t         m_vis;
 
   Bool_t          id_probe;
-  Bool_t          iso_probe;
+  Float_t         iso_probe;
 
   Int_t          hlt_1_probe;
   Int_t          hlt_2_probe;
@@ -36,9 +36,13 @@ public :
   Int_t          hlt_4_probe;
   Int_t          hlt_5_probe;
   Int_t          hlt_6_probe;
+  Int_t          hlt_7_probe;
+  Int_t          hlt_8_probe;
+  Int_t          hlt_9_probe;
+  Int_t          hlt_10_probe;
 
   Float_t        mcweight;
-  Float_t        PUweight;
+  Float_t        pu_weight;
 
     // List of branches
   TBranch         *b_run;
@@ -65,9 +69,13 @@ public :
   TBranch          *b_hlt_4_probe;
   TBranch          *b_hlt_5_probe;
   TBranch          *b_hlt_6_probe;
+  TBranch          *b_hlt_7_probe;
+  TBranch          *b_hlt_8_probe;
+  TBranch          *b_hlt_9_probe;
+  TBranch          *b_hlt_10_probe;
 
   TBranch          *b_mcweight;
-  TBranch          *b_PUweight;
+  TBranch          *b_pu_weight;
 
 
   TagProbeTree(TTree *tree=0);
