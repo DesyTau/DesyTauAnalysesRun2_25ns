@@ -1022,6 +1022,11 @@ void AddTriggerList(const edm::Run& run,
 		  {
 		    for(std::size_t k = 0; k < saveTagsModules.size() && !foundFilter; ++k)
 		      std::cout << saveTagsModules[k] << std::endl;
+
+		    std::cout<<std::endl;
+		    for(std::size_t l = 0; l < strs.size() && !foundFilter; ++l)
+		      std::cout << strs[l] << std::endl;
+		    
 		    throw cms::Exception("NTupleMaker") << "Did not find filter for trigger " << hltConfig.triggerName(i) << " in run " << run.run() << std::endl;
 		  }
 		
@@ -1110,7 +1115,7 @@ void NTupleMaker::beginRun(const edm::Run& iRun, const edm::EventSetup& iSetup)
 	std::cout << TrigName << " --> " << std::endl;
 	const std::vector<std::string> saveTagsModules = HLTConfiguration.moduleLabels(i);
 	for (unsigned k = 0; k<cHLTriggerPaths.size(); ++k) {
-	  std::cout << "    " << k << " " << saveTagsModules[k] << std::endl; 
+	  //std::cout << "    " << k << " " << saveTagsModules[k] << std::endl; 
 	}
       }
     }
@@ -1176,11 +1181,11 @@ void NTupleMaker::beginRun(const edm::Run& iRun, const edm::EventSetup& iSetup)
   for (unsigned int i=0; i<cHLTriggerPaths.size(); ++i)
     run_hltnames.push_back(cHLTriggerPaths.at(i));
 	
-  if(muontriggers.size() > 32) throw cms::Exception("NTupleMaker") << "Too many muon triggers!" << std::endl;
-  if(electrontriggers.size() > 32) throw cms::Exception("NTupleMaker") << "Too many electron triggers!" << std::endl;
-  if(tautriggers.size() > 32) throw cms::Exception("NTupleMaker") << "Too many tau triggers!" << std::endl;
-  if(photontriggers.size() > 32) throw cms::Exception("NTupleMaker") << "Too many photon triggers!" << std::endl;
-  if(jettriggers.size() > 32) throw cms::Exception("NTupleMaker") << "Too many jet triggers!" << std::endl;
+  if(muontriggers.size() > 100) throw cms::Exception("NTupleMaker") << "Too many muon triggers!" << std::endl;
+  if(electrontriggers.size() > 100) throw cms::Exception("NTupleMaker") << "Too many electron triggers!" << std::endl;
+  if(tautriggers.size() > 100) throw cms::Exception("NTupleMaker") << "Too many tau triggers!" << std::endl;
+  if(photontriggers.size() > 100) throw cms::Exception("NTupleMaker") << "Too many photon triggers!" << std::endl;
+  if(jettriggers.size() > 100) throw cms::Exception("NTupleMaker") << "Too many jet triggers!" << std::endl;
 
   // adding all filters
   run_hltfilters.clear();
@@ -1209,8 +1214,8 @@ void NTupleMaker::beginRun(const edm::Run& iRun, const edm::EventSetup& iSetup)
     run_hltfilters.push_back(jettriggers.at(i).second);
     run_hltjetfilters.push_back(jettriggers.at(i).second);
   }
-  
-  if (run_hltfilters.size()>50) throw cms::Exception("NTupleMaker") << "Too many HLT filters!" << std::endl;
+
+  if (run_hltfilters.size()>200) throw cms::Exception("NTupleMaker") << "Too many HLT filters!" << std::endl;
 
   run_hltprescaletablescount = HLTConfiguration.prescaleSize()*HLTConfiguration.size();
 

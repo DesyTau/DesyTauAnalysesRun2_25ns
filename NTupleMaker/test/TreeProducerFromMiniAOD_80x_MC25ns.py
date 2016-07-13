@@ -334,50 +334,7 @@ PVCollectionTag = cms.InputTag("offlineSlimmedPrimaryVertices"),
 SusyMotherMassTag = cms.InputTag("susyInfo","SusyMotherMass"),
 SusyLSPMassTag = cms.InputTag("susyInfo","SusyLSPMass"),
 # trigger info
-HLTriggerPaths = cms.untracked.vstring(
-'HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v', #new
-'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v', 
-'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v',
-'HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v',
-'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v',
-'HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v',
-'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v',  #exact hlt filters not available
-'HLT_IsoMu17_eta2p1_v',
-'HLT_IsoMu24_eta2p1_v',
-'HLT_IsoMu18_v',  #new
-'HLT_IsoMu20_v', #new
-'HLT_IsoMu22_v', #new
-'HLT_IsoMu27_v',
-'HLT_IsoMu17_eta2p1_LooseIsoPFTau20_v',
-#'HLT_IsoMuTk24_eta2p1_v', no existing in 25ns
-#'HLT_IsoMuTk18_v', #new #exact hlt filters not available
-#'HLT_IsoMuTk20_v', #new #exact hlt filters not available
-#'HLT_IsoMuTk22_v', #new #exact hlt filters not available
-#'HLT_IsoMuTk27_v', #new #exact hlt filters not available
-'HLT_Ele22_eta2p1_WPLoose_Gsf_LooseIsoPFTau20_SingleL1_v', #new
-'HLT_Ele22_eta2p1_WPLoose_Gsf_LooseIsoPFTau20_v',
-'HLT_Ele22_eta2p1_WPLoose_Gsf_v', ##exact hlt filters not available
-#'HLT_Ele22_eta2p1_WPTight_Gsf_v', 
-'HLT_Ele23_WPLoose_Gsf_v',
-'HLT_Ele27_eta2p1_WPLoose_Gsf_v',
-#'HLT_Ele22_eta2p1_WP75_Gsf_v',
-#'HLT_Ele27_eta2p1_WP75_Gsf_v',
-'HLT_Ele25_eta2p1_WPTight_Gsf_v',
-'HLT_Ele25_eta2p1_WPLoose_Gsf_v',
-#'HLT_Ele32_eta2p1_WPLoose_Gsf_v', , no existing in 25ns
-'HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_v', ##########filters
-'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v', ########## filters no prescales
-'HLT_DoubleMediumIsoPFTau40_Trk1_eta2p1_Reg_v',
-'HLT_Ele32_eta2p1_WPTight_Gsf_v',
-'HLT_DoubleMediumIsoPFTau35_Trk1_eta2p1_Reg_v',
-'HLT_PFMETNoMu90_JetIdCleaned_PFMHTNoMu90_IDTight_v',
-'HLT_PFMETNoMu120_JetIdCleaned_PFMHTNoMu120_IDTight_v',
-'HLT_PFMETNoMu90_NoiseCleaned_PFMHTNoMu90_IDTight_v',
-'HLT_PFMETNoMu120_NoiseCleaned_PFMHTNoMu120_IDTight_v',
-'HLT_PFJet60_v',
-'HLT_PFJet80_v',
-'HLT_PFJet140_v'
-),
+HLTriggerPaths = cms.untracked.vstring(),
 TriggerProcess = cms.untracked.string("HLT"),
 Flags = cms.untracked.vstring(
 #  'Flag_HBHENoiseFilter',
@@ -401,27 +358,7 @@ RecTrackNum = cms.untracked.int32(0),
 # muons
 RecMuonPtMin = cms.untracked.double(50.),
 RecMuonEtaMax = cms.untracked.double(2.5),
-RecMuonHLTriggerMatching = cms.untracked.vstring(
-
-'HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_v.*:hltMu23TrkIsoVVLEle8CaloIdLTrackIdLIsoVLElectronlegTrackIsoFilter',
-'HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v.*:hltMu8TrkIsoVVLEle17CaloIdLTrackIdLIsoVLMuonlegL3IsoFiltered8',
-'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v.*:hltMu8TrkIsoVVLEle23CaloIdLTrackIdLIsoVLMuonlegL3IsoFiltered8',
-'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v.*:hltMu23TrkIsoVVLEle12CaloIdLTrackIdLIsoVLMuonlegL3IsoFiltered23',
-'HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v.*:hltMu17TrkIsoVVLEle12CaloIdLTrackIdLIsoVLMuonlegL3IsoFiltered17',
-#'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v.*:hltL3pfL1sDoubleMu114ORDoubleMu125L1f0L2pf0L3PreFiltered8',
-#'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v.*:hltL3fL1sDoubleMu114L1f0L2f10OneMuL3Filtered17',
-'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v.*:hltDiMuonGlb17Glb8RelTrkIsoFiltered0p4',
-'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v.*:hltDiMuonGlb17Glb8RelTrkIsoFiltered0p4DzFiltered0p2',
-'HLT_IsoMu18_v.*:hltL3crIsoL1sMu16L1f0L2f10QL3f18QL3trkIsoFiltered0p09',
-'HLT_IsoMu20_v.*:hltL3crIsoL1sMu18L1f0L2f10QL3f20QL3trkIsoFiltered0p09',
-'HLT_IsoMu22_v.*:hltL3crIsoL1sMu20L1f0L2f10QL3f22QL3trkIsoFiltered0p09',
-'HLT_IsoMu27_v.*:hltL3crIsoL1sMu22Or25L1f0L2f10QL3f27QL3trkIsoFiltered0p09', 
-'HLT_IsoMu17_eta2p1_v.*:hltL3crIsoL1sSingleMu16erL1f0L2f10QL3f17QL3trkIsoFiltered0p09',
-'HLT_IsoMu24_eta2p1_v.*:hltL3crIsoL1sMu20Eta2p1L1f0L2f10QL3f24QL3trkIsoFiltered0p09', 
-'HLT_IsoMu17_eta2p1_LooseIsoPFTau20_v.*:hltL3crIsoL1sMu16erTauJet20erL1f0L2f10QL3f17QL3trkIsoFiltered0p09',
-#'HLT_IsoMu17_eta2p1_LooseIsoPFTau20_v.*:hltL3fL1sMu16erTauJet20erL1f0L2f10QL3Filtered17Q',  #new
-'HLT_IsoMu17_eta2p1_LooseIsoPFTau20_v.*:hltOverlapFilterIsoMu17LooseIsoPFTau20',
-),
+RecMuonHLTriggerMatching = cms.untracked.vstring(),
 RecMuonNum = cms.untracked.int32(0),
 # photons
 RecPhotonPtMin = cms.untracked.double(20.),
@@ -431,56 +368,19 @@ RecPhotonNum = cms.untracked.int32(0),
 # electrons
 RecElectronPtMin = cms.untracked.double(8.),
 RecElectronEtaMax = cms.untracked.double(2.6),
-RecElectronHLTriggerMatching = cms.untracked.vstring(
-'HLT_Ele25_eta2p1_WPTight_Gsf_v.*:hltEle25erWPTightGsfTrackIsoFilter',
-'HLT_Ele25_eta2p1_WPLoose_Gsf_v.*:hltEle25erWPLooseGsfTrackIsoFilter',
-'HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_v.*:hltMu23TrkIsoVVLEle8CaloIdLTrackIdLIsoVLMuonlegL3IsoFiltered23',
-'HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v.*:hltMu8TrkIsoVVLEle17CaloIdLTrackIdLIsoVLElectronlegTrackIsoFilter',
-'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v.*:hltMu23TrkIsoVVLEle12CaloIdLTrackIdLIsoVLElectronlegTrackIsoFilter', 
-'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v.*:hltMu8TrkIsoVVLEle23CaloIdLTrackIdLIsoVLElectronlegTrackIsoFilter',
-'HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v.*:hltMu17TrkIsoVVLEle12CaloIdLTrackIdLIsoVLElectronlegTrackIsoFilter',
-'HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v.*:hltEle17Ele12CaloIdLTrackIdLIsoVLTrackIsoLeg1Filter',
-'HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v.*:hltEle17Ele12CaloIdLTrackIdLIsoVLTrackIsoLeg2Filter',
-'HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v.*:hltEle17Ele12CaloIdLTrackIdLIsoVLDZFilter',
-'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v.*:hltEle23Ele12CaloIdLTrackIdLIsoVLTrackIsoLeg1Filter',
-'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v.*:hltEle23Ele12CaloIdLTrackIdLIsoVLTrackIsoLeg2Filter',
-'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v.*:hltEle23Ele12CaloIdLTrackIdLIsoVLDZFilter',
-'HLT_Ele22_eta2p1_WPLoose_Gsf_LooseIsoPFTau20_SingleL1_v.*:hltOverlapFilterSingleIsoEle22WPLooseGsfLooseIsoPFTau20',
-'HLT_Ele22_eta2p1_WPLoose_Gsf_LooseIsoPFTau20_v.*:hltOverlapFilterIsoEle22WPLooseGsfLooseIsoPFTau20', #check this
-'HLT_Ele22_eta2p1_WPLoose_Gsf_LooseIsoPFTau20_v.*:hltOverlapFilterIsoEle22WPLooseGsfCaloJet5', #check this
-'HLT_Ele22_eta2p1_WPLoose_Gsf_v.*:hltSingleEle22WPLooseGsfTrackIsoFilter',
-#'HLT_Ele22_eta2p1_WPTight_Gsf_v.*:hltSingleEle22WPTightGsfTrackIsoFilter',
-'HLT_Ele23_WPLoose_Gsf_v.*:hltEle23WPLooseGsfTrackIsoFilter',
-#'HLT_Ele22_eta2p1_WP75_Gsf_v.*:hltSingleEle22WP75GsfTrackIsoFilter',
-#'HLT_Ele27_eta2p1_WP75_Gsf_v.*:hltEle27WP75GsfTrackIsoFilter',
-'HLT_Ele27_eta2p1_WPLoose_Gsf_v.*:hltEle27erWPLooseGsfTrackIsoFilter',
-#'HLT_Ele32_eta2p1_WPLoose_Gsf_v.*:hltEle32WPLooseGsfTrackIsoFilter', 
-'HLT_Ele32_eta2p1_WPTight_Gsf_v.*:hltEle32WPTightGsfTrackIsoFilter'
-),
+RecElectronHLTriggerMatching = cms.untracked.vstring(),
 RecElectronNum = cms.untracked.int32(0),
 # taus
 RecTauPtMin = cms.untracked.double(15),
 RecTauEtaMax = cms.untracked.double(2.5),                                      
-RecTauHLTriggerMatching = cms.untracked.vstring(
-'HLT_Ele22_eta2p1_WPLoose_Gsf_LooseIsoPFTau20_SingleL1_v.*:hltAK4PFJetsForTaus', #need to check
-'HLT_Ele22_eta2p1_WPLoose_Gsf_LooseIsoPFTau20_v.*:hltPFTau20TrackLooseIso',
-'HLT_Ele22_eta2p1_WPLoose_Gsf_LooseIsoPFTau20_v.*:hltOverlapFilterIsoEle22WPLooseGsfLooseIsoPFTau20',
-'HLT_IsoMu17_eta2p1_LooseIsoPFTau20_v.*:hltPFTau20TrackLooseIsoAgainstMuon',
-'HLT_IsoMu17_eta2p1_LooseIsoPFTau20_v.*:hltOverlapFilterIsoMu17LooseIsoPFTau20',
-'HLT_DoubleMediumIsoPFTau40_Trk1_eta2p1_Reg_v.*:hltDoublePFTau40TrackPt1MediumIsolationDz02Reg',
-'HLT_DoubleMediumIsoPFTau35_Trk1_eta2p1_Reg_v.*:hltDoublePFTau35TrackPt1MediumIsolationDz02Reg'
-),
+RecTauHLTriggerMatching = cms.untracked.vstring(),
 RecTauFloatDiscriminators = cms.untracked.vstring(),
 RecTauBinaryDiscriminators = cms.untracked.vstring(),
 RecTauNum = cms.untracked.int32(0),
 # jets
 RecJetPtMin = cms.untracked.double(18.),
 RecJetEtaMax = cms.untracked.double(5.2),
-RecJetHLTriggerMatching = cms.untracked.vstring(
-'HLT_PFJet60_v.*:hltSinglePFJet60',
-'HLT_PFJet80_v.*:hltSinglePFJet80',
-'HLT_PFJet140_v.*:hltSinglePFJet140'
-),
+RecJetHLTriggerMatching = cms.untracked.vstring(),
 RecJetBtagDiscriminators = cms.untracked.vstring(
 'pfCombinedInclusiveSecondaryVertexV2BJetTags',
 'pfJetProbabilityBJetTags'
