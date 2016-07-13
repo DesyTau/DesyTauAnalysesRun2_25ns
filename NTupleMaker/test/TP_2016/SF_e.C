@@ -5,7 +5,7 @@
 //
 //    This code uses the root files produced by the TagAndProbe code, both Data and MC at the same time, and computes
 //		the efficiencies fitting the Z peak with the fitting tool.
-//		In this code the eta and pt bins are defined. Root files with scale factor and efficiencies (for triggers) will be produced. 
+//		In this code the eta and pt bins are defined. Root files with scale factor and efficiencies will be produced. 
 //		The plots with the various fits will be stored in dedicated directories.
 //		This code is for electron.
 //

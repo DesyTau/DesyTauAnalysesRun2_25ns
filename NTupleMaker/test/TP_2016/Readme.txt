@@ -1,4 +1,4 @@
-						TAG&PROBE AND EFFICIENCIES EXTRACTION PACKAGE 
+		TAG&PROBE AND EFFICIENCIES EXTRACTION PACKAGE 
 
 Author: 	Alberto Bragagnolo 		alberto.bragagnolo.3@studenti.unipd.it
 
@@ -7,44 +7,44 @@ Description: this package can be used to compute efficiencies (identification&is
 			 Tag&Probe technique on the Z peak.
 
 
-						COMPONENTS
+		COMPONENTS
 
 MAIN COMPONENTS
 
-	1. bin/TagAndProbe2016_mumu.cpp, bin/TagAndProbe2016_ee.cpp			[T&P otree producer source codes]
-	2.1 TP_eff_mu.C, TP_eff_e.C 										[efficiencies extraction macros for trigger]
-	2.2 SF_mu.C, SF_e.C 												[efficiencies and scale facrorss extraction macros for IdIso]
-	3. FitPassAndFail.C 												[fitting tool, Author: Alexei Raspereza 	rasp@mail.desy.de]
+	1. bin/TagAndProbe2016_mumu.cpp, bin/TagAndProbe2016_ee.cpp 	[T&P otree producer source codes]
+	2.1 TP_eff_mu.C, TP_eff_e.C 	[efficiencies extraction macros for trigger]
+	2.2 SF_mu.C, SF_e.C 	[efficiencies and scale facrorss extraction macros for IdIso]
+	3. FitPassAndFail.C 	[fitting tool, Author: Alexei Raspereza 	rasp@mail.desy.de]
 
 AUXILIARIES COMPONENTS
 
-	a.1 interface/TagProbeTree.h	[.h that defines the otree structure]
-	a.2 src/TagProbeTree.cc			[.cc that defines the otree structure]
+	a.1 interface/TagProbeTree.h 	[.h that defines the otree structure]
+	a.2 src/TagProbeTree.cc	 	[.cc that defines the otree structure]
 
 CONFIGURATION FILES
 
 	b.1.1 TagAndProbe_mu.conf 		[config file for muons]
 	b.1.2 TagAndProbe_mu_MC.conf 	[config file for muons - MC]
-	b.2.1 TagAndProbe_e.conf 		[config file for electrons]
+	b.2.1 TagAndProbe_e.conf 			[config file for electrons]
 	b.2.2 TagAndProbe_e_MC.conf 	[config file for electrons - MC]					
 
 EXTRA
-	c.1 plot_eff.C 	[plotting tool])
+	c.1 plot_eff.C 	[plotting tool]
 
 
 
-						DESCRIPTION
+		DESCRIPTION
 
 1. bin/TagAndProbe2016_mumu.cpp
    bin/TagAndProbe2016_ee.cpp
 
-    -These codes are in NTupleMaker/bin and they are already committed on github
+  -These codes are in NTupleMaker/bin and they are already committed on github
 	-These codes have to be compiled within the CMSSW enviroment
 	-These codes use a.1, a.2 and a lot of other CMSSW components
 	-One code is for electrons T&P, the other for muons
 	-This code is the slow part of the process 
 	-The ID criterias are hard coded in the two codes. 
-	-The trigger path to be evaluated can be changed (under hlt_1, hlt_2, ...., hlt_10)
+	-The trigger path to be evaluated can be changed in the config files (under entries hlt_1, hlt_2, ...., hlt_10)
 
 
 	These codes run on events ntuples (data or MC), find the T&P pairs, evaluate id and trigger criterias,
@@ -100,7 +100,7 @@ EXTRA
 2.2 SF_mu.C
 	SF_e.C
 	
-	Same as 2.1 but these macros are meant to be used on Data and MC at the same time to produce a scale factor root file with both Data and MC efficiencies. This code is not commented
+	Same as 2.1 but these macros are meant to be used on Data and MC otree at the same time to produce a scale factor root file with both Data and MC efficiencies. This code is not commented
 	but it's very similar to 2.1.
 
 	Arguments:
@@ -116,9 +116,9 @@ EXTRA
 
 	This plotting tool (written by Alexei Raspereza) performs the actual fits on the Z peak and compute the number 
 	of passing and failing probes. Fitting intervals and the functions to be used are hard coded but some options 
-	are passed by arguments. See the code and 2. for more informations. This tool is not used standalone, and it's integrated in 2. 
+	are passed by arguments. See the code and 2.x.x for more informations. This tool is not used standalone, and it's integrated as a function in 2.x.x codes. 
 	However if one want to change (or, better, improve) the fitting procedures (intervals, functions or other things) 
-	this is the code that hase to be modified. 
+	this is the code that has to be modified. 
 
 4. plot_eff.C
 
