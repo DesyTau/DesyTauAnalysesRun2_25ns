@@ -408,9 +408,8 @@ void NTupleMaker::beginJob(){
     tree->Branch("muon_isTight",muon_isTight,"muon_isTight[muon_count]/O");
     tree->Branch("muon_isLoose",muon_isLoose,"muon_isLoose[muon_count]/O");
     tree->Branch("muon_isMedium",muon_isMedium,"muon_isMedium[muon_count]/O");
-    
+    tree->Branch("muon_isICHEP",muon_isICHEP,"muon_isICHEP[muon_count]/O");
     tree->Branch("muon_genmatch", muon_genmatch, "muon_genmatch[muon_count]/I");
-
 
     tree->Branch("dimuon_count", &dimuon_count, "dimuon_count/i");
     tree->Branch("dimuon_leading", dimuon_leading, "dimuon_leading[dimuon_count]/i");

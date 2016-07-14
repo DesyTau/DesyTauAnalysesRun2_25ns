@@ -337,16 +337,16 @@ SusyLSPMassTag = cms.InputTag("susyInfo","SusyLSPMass"),
 HLTriggerPaths = cms.untracked.vstring(),
 TriggerProcess = cms.untracked.string("HLT"),
 Flags = cms.untracked.vstring(
-#  'Flag_HBHENoiseFilter',
-#  'Flag_HBHENoiseIsoFilter',
-#  'Flag_CSCTightHalo2015Filter',
-#  'Flag_EcalDeadCellTriggerPrimitiveFilter',
-#  'Flag_goodVertices',
-#  'Flag_eeBadScFilter',
-#  'Flag_chargedHadronTrackResolutionFilter',
-#  'Flag_muonBadTrackFilter'
-   'Flag_METFilters'
-#   'allMetFilterPaths'
+  'Flag_HBHENoiseFilter',
+  'Flag_HBHENoiseIsoFilter',
+  'Flag_CSCTightHalo2015Filter',
+  'Flag_EcalDeadCellTriggerPrimitiveFilter',
+  'Flag_goodVertices',
+  'Flag_eeBadScFilter',
+  'Flag_chargedHadronTrackResolutionFilter',
+  'Flag_muonBadTrackFilter',
+  'Flag_METFilters',
+  'allMetFilterPaths'
 ),
 FlagsProcess = cms.untracked.string("RECO"),
 # tracks
@@ -356,7 +356,7 @@ RecTrackDxyMax = cms.untracked.double(1.0),
 RecTrackDzMax = cms.untracked.double(1.0),
 RecTrackNum = cms.untracked.int32(0),
 # muons
-RecMuonPtMin = cms.untracked.double(50.),
+RecMuonPtMin = cms.untracked.double(5.),
 RecMuonEtaMax = cms.untracked.double(2.5),
 RecMuonHLTriggerMatching = cms.untracked.vstring(),
 RecMuonNum = cms.untracked.int32(0),
@@ -421,11 +421,11 @@ process.p = cms.Path(
 )
 
 process.TFileService = cms.Service("TFileService",
-                                   fileName = cms.string("output.root")
+                                   fileName = cms.string("output_MC.root")
                                  )
 
 process.output = cms.OutputModule("PoolOutputModule",
-                                  fileName = cms.untracked.string('output.root'),
+                                  fileName = cms.untracked.string('output_particles_MC.root'),
                                   outputCommands = cms.untracked.vstring(
                                     'keep *_slimmedMETs_*_*',
 				    'keep *_MVAMET_*_*',
