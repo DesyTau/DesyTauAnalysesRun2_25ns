@@ -409,6 +409,7 @@ void NTupleMaker::beginJob(){
     tree->Branch("muon_isLoose",muon_isLoose,"muon_isLoose[muon_count]/O");
     tree->Branch("muon_isMedium",muon_isMedium,"muon_isMedium[muon_count]/O");
     
+    tree->Branch("muon_isICHEP",muon_isICHEP,"muon_isICHEP[muon_count]/O");
     tree->Branch("muon_genmatch", muon_genmatch, "muon_genmatch[muon_count]/I");
 
 
@@ -1384,7 +1385,7 @@ if (!cFastSim){
 	    
   	    flags_->insert(std::pair<string, int>(flagName, Flags->accept(i)));
 	    TString TriggerName(flagName);
-	    //std::cout << flagName << " : " << Flags->accept(i) << std::endl;
+//	    std::cout << flagName << " : " << Flags->accept(i) << std::endl;
   	  }
   	}
       }
