@@ -620,7 +620,7 @@ int main(int argc, char * argv[]){
 
         if (!isData && ApplyLepSF) {
               // Scale Factor SingleEle trigger SF_eleTrigger
-          otree->trigweight_1 = (SF_lepTrigger->get_ScaleFactor(double(analysisTree.muon_pt[leptonIndex]),double(analysisTree.muon_eta[leptonIndex])));
+          otree->trigweight_1 = (SF_lepTrigger->get_EfficiencyData(double(analysisTree.muon_pt[leptonIndex]),double(analysisTree.muon_eta[leptonIndex])));
               // Scale Factor Id+Iso SF_eleIdIso
           otree->idisoweight_1 = (SF_lepIdIso->get_ScaleFactor(double(analysisTree.muon_pt[leptonIndex]),double(analysisTree.muon_eta[leptonIndex])));
           otree->effweight = (otree->trigweight_1)*(otree->idisoweight_1)*(otree->trigweight_2)*(otree->idisoweight_2);
@@ -636,7 +636,7 @@ int main(int argc, char * argv[]){
 
         if (!isData && ApplyLepSF) {
                 // Scale Factor SingleEle trigger SF_eleTrigger
-          otree->trigweight_1 = (SF_lepTrigger->get_ScaleFactor(double(analysisTree.electron_pt[leptonIndex]),double(analysisTree.electron_eta[leptonIndex])));
+          otree->trigweight_1 = (SF_lepTrigger->get_EfficiencyData(double(analysisTree.electron_pt[leptonIndex]),double(analysisTree.electron_eta[leptonIndex])));
                 // Scale Factor Id+Iso SF_eleIdIso
           otree->idisoweight_1 = (SF_lepIdIso->get_ScaleFactor(double(analysisTree.electron_pt[leptonIndex]),double(analysisTree.electron_eta[leptonIndex])));
           otree->effweight = (otree->trigweight_1)*(otree->idisoweight_1)*(otree->trigweight_2)*(otree->idisoweight_2);
