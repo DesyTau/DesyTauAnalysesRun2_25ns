@@ -15,6 +15,8 @@
 //#include "DataFormats/METReco/interface/PFMEtSignCovMatrix.h"
 //#include "DataFormats/JetReco/interface/PileupJetIdentifier.h"
 #include "RecoBTag/BTagTools/interface/SignedImpactParameter3D.h"
+#include <DataFormats/TrackReco/interface/Track.h>
+
 
 #include "TrackingTools/PatternTools/interface/TwoTrackMinimumDistance.h"
 #include "RecoVertex/KinematicFitPrimitives/interface/KinematicParticleFactoryFromTransientTrack.h"
@@ -32,6 +34,7 @@
 #include "DataFormats/PatCandidates/interface/PackedCandidate.h"
 #include "DataFormats/JetReco/interface/PFJetCollection.h"
 #include "DesyTauAnalyses/CandidateTools/interface/candidateAuxFunctions.h"
+#include "DesyTauAnalyses/NTupleMaker/interface/idAlgos.h"
 
 #include <TString.h>
 
@@ -83,12 +86,14 @@ Int_t NTupleMaker::find_lep(const Int_t nlep, const Float_t px[], const Float_t 
 NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :  
   // data, year, period, skim
   cdata(iConfig.getUntrackedParameter<bool>("IsData", false)),
+  cFastSim(iConfig.getUntrackedParameter<bool>("IsFastSim", false)),
   cYear(iConfig.getUntrackedParameter<unsigned int>("Year")),
   cPeriod(iConfig.getUntrackedParameter<std::string>("Period")),
   cSkim(iConfig.getUntrackedParameter<unsigned int>("Skim")),
   cJECfile(iConfig.getUntrackedParameter<std::string>("JECfile")),
   // switches (collections)
   cgen(iConfig.getUntrackedParameter<bool>("GenParticles", false)),
+  csusyinfo(iConfig.getUntrackedParameter<bool>("SusyInfo", false)),
   ctrigger(iConfig.getUntrackedParameter<bool>("Trigger", false)),
   cbeamspot(iConfig.getUntrackedParameter<bool>("BeamSpot", false)),
   crectrack(iConfig.getUntrackedParameter<bool>("RecTrack", false)),
@@ -108,6 +113,7 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
   cTriggerProcess(iConfig.getUntrackedParameter<string>("TriggerProcess", "HLT")),
 
   //Flags
+
   cFlags(iConfig.getUntrackedParameter<vector<string> >("Flags")),
   cFlagsProcess(iConfig.getUntrackedParameter<string>("FlagsProcess", "HLT")),
   
@@ -131,6 +137,8 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
   // tracks
   cTrackPtMin(iConfig.getUntrackedParameter<double>("RecTrackPtMin", 0.5)),
   cTrackEtaMax(iConfig.getUntrackedParameter<double>("RecTrackEtaMax", 2.4)),
+  cTrackDxyMax(iConfig.getUntrackedParameter<double>("RecTrackDxyMax", 2.0)),
+  cTrackDzMax(iConfig.getUntrackedParameter<double>("RecTrackDzMax", 2.0)),
   cTrackNum(iConfig.getUntrackedParameter<int>("RecTrackNum", 0)),
   // photons
   cPhotonPtMin(iConfig.getUntrackedParameter<double>("RecPhotonPtMin", 20.)),
@@ -176,6 +184,8 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
   TriggerObjectCollectionToken_(consumes<pat::TriggerObjectStandAloneCollection>(iConfig.getParameter<edm::InputTag>("TriggerObjectCollectionTag"))),
   BeamSpotToken_(consumes<BeamSpot>(iConfig.getParameter<edm::InputTag>("BeamSpotCollectionTag"))),
   PVToken_(consumes<VertexCollection>(iConfig.getParameter<edm::InputTag>("PVCollectionTag"))),
+  SusyMotherMassToken_(consumes<double>(iConfig.getParameter<edm::InputTag>("SusyMotherMassTag"))),
+  SusyLSPMassToken_(consumes<double>(iConfig.getParameter<edm::InputTag>("SusyLSPMassTag"))),
   sampleName(iConfig.getUntrackedParameter<std::string>("SampleName", "Higgs")),
   propagatorWithMaterial(0)
 {
@@ -264,6 +274,7 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
   if(cl1isotau)
     L1IsoTauCollectionToken_ = consumes<l1extra::L1JetParticleCollection>(iConfig.getParameter<edm::InputTag>("IsoTauCollectionTag"));
 
+  HLTPrescaleConfig = new HLTPrescaleProvider(iConfig, consumesCollector(), *this);
 }
 
 //destructor
@@ -273,6 +284,7 @@ NTupleMaker::~NTupleMaker(){
   delete myMVAnonTrigPhys14;
 
 }
+
 
 
 void NTupleMaker::beginJob(){
@@ -635,6 +647,24 @@ void NTupleMaker::beginJob(){
     
   }
 
+  if (crectrack) { 
+    tree->Branch("track_count", &track_count, "track_count/i");
+    tree->Branch("track_px", track_px, "track_px[track_count]/F");
+    tree->Branch("track_py", track_py, "track_py[track_count]/F");
+    tree->Branch("track_pz", track_pz, "track_pz[track_count]/F");
+    tree->Branch("track_pt", track_pt, "track_pt[track_count]/F");
+    tree->Branch("track_eta", track_eta, "track_eta[track_count]/F");
+    tree->Branch("track_phi", track_phi, "track_phi[track_count]/F");
+    tree->Branch("track_charge", track_charge, "track_charge[track_count]/F");
+    tree->Branch("track_mass", track_mass, "track_mass[track_count]/F");
+    tree->Branch("track_dxy", track_dxy, "track_dxy[track_count]/F");
+    tree->Branch("track_dxyerr", track_dxyerr, "track_dxyerr[track_count]/F");
+    tree->Branch("track_dz", track_dz, "track_dz[track_count]/F");
+    tree->Branch("track_dzerr", track_dzerr, "track_dzerr[track_count]/F");
+    tree->Branch("track_ID", track_ID, "track_ID[track_count]/I");
+    tree->Branch("track_highPurity", track_highPurity, "track_highPurity[track_count]/O");
+  }
+
   // L1 IsoTau
   if (cl1isotau){
     tree->Branch("l1isotau_count", &l1isotau_count, "l1isotau_count/i");
@@ -843,6 +873,11 @@ void NTupleMaker::beginJob(){
  
     tree->Branch("genparticles_mother", genparticles_mother, "genparticles_mother[genparticles_count]/b");
   }    
+  // SUSY Info
+  if (csusyinfo) {
+    tree->Branch("SusyMotherMass",&SusyMotherMass,"SusyMotherMass/F");
+    tree->Branch("SusyLSPMass",&SusyLSPMass,"SusyLSPMass/F");
+  }
 
   // trigger objects
   if (ctrigger) {
@@ -989,6 +1024,11 @@ void AddTriggerList(const edm::Run& run,
 		  {
 		    for(std::size_t k = 0; k < saveTagsModules.size() && !foundFilter; ++k)
 		      std::cout << saveTagsModules[k] << std::endl;
+
+		    std::cout<<std::endl;
+		    for(std::size_t l = 0; l < strs.size() && !foundFilter; ++l)
+		      std::cout << strs[l] << std::endl;
+		    
 		    throw cms::Exception("NTupleMaker") << "Did not find filter for trigger " << hltConfig.triggerName(i) << " in run " << run.run() << std::endl;
 		  }
 		
@@ -1067,7 +1107,22 @@ void NTupleMaker::beginRun(const edm::Run& iRun, const edm::EventSetup& iSetup)
   
   bool changed = true;
   HLTConfiguration.init(iRun, iSetup, cTriggerProcess, changed);
-  //HLTPrescaleConfig->init(iRun, iSetup, cTriggerProcess, changed);
+  HLTPrescaleConfig->init(iRun, iSetup, cTriggerProcess, changed);
+
+  for(std::size_t i = 0; i < HLTConfiguration.size(); ++i) {
+    TString TrigName(HLTConfiguration.triggerName(i));
+    for (unsigned j = 0; j<cHLTriggerPaths.size(); ++j) {
+      TString TrigNameConf(cHLTriggerPaths[j]);
+      if (TrigName.Contains(TrigNameConf)) {
+	std::cout << TrigName << " --> " << std::endl;
+	const std::vector<std::string> saveTagsModules = HLTConfiguration.moduleLabels(i);
+	for (unsigned k = 0; k<cHLTriggerPaths.size(); ++k) {
+	  //std::cout << "    " << k << " " << saveTagsModules[k] << std::endl; 
+	}
+      }
+    }
+  }
+  std::cout << std::endl;
 
   vector<pair<boost::regex, string> > muonregexes;
   for(unsigned i = 0 ; i < cMuHLTriggerMatching.size() ; i++)
@@ -1128,11 +1183,11 @@ void NTupleMaker::beginRun(const edm::Run& iRun, const edm::EventSetup& iSetup)
   for (unsigned int i=0; i<cHLTriggerPaths.size(); ++i)
     run_hltnames.push_back(cHLTriggerPaths.at(i));
 	
-  if(muontriggers.size() > 32) throw cms::Exception("NTupleMaker") << "Too many muon triggers!" << std::endl;
-  if(electrontriggers.size() > 32) throw cms::Exception("NTupleMaker") << "Too many electron triggers!" << std::endl;
-  if(tautriggers.size() > 32) throw cms::Exception("NTupleMaker") << "Too many tau triggers!" << std::endl;
-  if(photontriggers.size() > 32) throw cms::Exception("NTupleMaker") << "Too many photon triggers!" << std::endl;
-  if(jettriggers.size() > 32) throw cms::Exception("NTupleMaker") << "Too many jet triggers!" << std::endl;
+  if(muontriggers.size() > 100) throw cms::Exception("NTupleMaker") << "Too many muon triggers!" << std::endl;
+  if(electrontriggers.size() > 100) throw cms::Exception("NTupleMaker") << "Too many electron triggers!" << std::endl;
+  if(tautriggers.size() > 100) throw cms::Exception("NTupleMaker") << "Too many tau triggers!" << std::endl;
+  if(photontriggers.size() > 100) throw cms::Exception("NTupleMaker") << "Too many photon triggers!" << std::endl;
+  if(jettriggers.size() > 100) throw cms::Exception("NTupleMaker") << "Too many jet triggers!" << std::endl;
 
   // adding all filters
   run_hltfilters.clear();
@@ -1161,8 +1216,8 @@ void NTupleMaker::beginRun(const edm::Run& iRun, const edm::EventSetup& iSetup)
     run_hltfilters.push_back(jettriggers.at(i).second);
     run_hltjetfilters.push_back(jettriggers.at(i).second);
   }
-  
-  if (run_hltfilters.size()>50) throw cms::Exception("NTupleMaker") << "Too many HLT filters!" << std::endl;
+
+  if (run_hltfilters.size()>200) throw cms::Exception("NTupleMaker") << "Too many HLT filters!" << std::endl;
 
   run_hltprescaletablescount = HLTConfiguration.prescaleSize()*HLTConfiguration.size();
 
@@ -1300,7 +1355,9 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   	for(size_t ip = 0; ip < cHLTriggerPaths.size(); ip++){
   	  if(trigName.find(cHLTriggerPaths[ip]) != string::npos){
 	    
-	    hltriggerprescales_->insert(std::pair<string, int>(trigName, 1.));// FIXME HLTPrescaleConfig->prescaleValue(iEvent,iSetup,trigName)));
+	    //hltriggerprescales_->insert(std::pair<string, int>(trigName, 1.));// FIXME HLTPrescaleConfig->prescaleValue(iEvent,iSetup,trigName)));
+	    hltriggerprescales_->insert(std::pair<string, int>(trigName, 
+							       int(HLTPrescaleConfig->prescaleValue(iEvent,iSetup,trigName))));
   	    hltriggerresults_->insert(std::pair<string, int>(trigName, HLTrigger->accept(i)));
 	    TString TriggerName(trigName);
 	    //	    std::cout << trigName << " : " 
@@ -1311,8 +1368,8 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   	}
       }
     }
-  //  std::cout << std::endl;
 
+if (!cFastSim){
   iEvent.getByLabel(edm::InputTag("TriggerResults", "", cFlagsProcess), Flags);
   assert(Flags.isValid());
   flags_->clear();
@@ -1327,13 +1384,13 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	    
   	    flags_->insert(std::pair<string, int>(flagName, Flags->accept(i)));
 	    TString TriggerName(flagName);
-	    	    std::cout << flagName << " : " 
-	    		      << Flags->accept(i) << std::endl;
+	    //std::cout << flagName << " : " << Flags->accept(i) << std::endl;
   	  }
   	}
       }
     }
-  
+ }
+
   if(cbeamspot)
     {
       edm::Handle<BeamSpot> TheBeamSpot;
@@ -1407,6 +1464,16 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       }
     }
 
+  if (csusyinfo) {
+    if(doDebug)  cout<<"add SUSY info"<< endl;
+    AddSusyInfo(iEvent);
+    //    std::cout << "Run = " << event_run << "   Lumi = " << event_luminosityblock << "   Event = " << event_nr << std::endl;
+    //    std::cout << "SUSY Mother Mass = " << SusyMotherMass << std::endl;
+    //    std::cout << "SUSY LSP Mass = " << SusyLSPMass << std::endl;
+    //    std::cout << std::endl;
+  }
+
+
   if (crecmuon) 
     {
       if(doDebug)  cout<<"add muons"<< endl; 
@@ -1441,6 +1508,9 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       // 	if (!goodTaus) return;
       // }  
     }
+
+  if (crectrack)
+    AddPFCand(iEvent, iSetup);
 
   if (cl1isotau){
     if (doDebug) cout<<"add L1 IsoTaus"<< endl;
@@ -1751,7 +1821,7 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	  genweight = HEPMC->weight();
 	  //	  cout << "Event weight from HEPMC : " << genweight << endl;
 	  genid1 = HEPMC->pdf()->id.first;
-	  genx1 = HEPMC->pdf()->x.second;
+	  genx1 = HEPMC->pdf()->x.first;
 	  genid2 = HEPMC->pdf()->id.first;
 	  genx2 = HEPMC->pdf()->x.second;
 	  genScale = HEPMC->qScale();
@@ -1904,6 +1974,33 @@ math::XYZPoint NTupleMaker::PositionOnECalSurface(TransientTrack& trTrack)
 		ecalPosition = stateAtECal.globalPosition();
 	}
 	return(ecalPosition);
+}
+
+bool NTupleMaker::AddSusyInfo(const edm::Event& iEvent) {
+
+  SusyMotherMass = -1;
+  SusyLSPMass = -1;
+
+  bool success = true;
+  edm::Handle<double> susyMotherMass;
+  iEvent.getByToken(SusyMotherMassToken_,susyMotherMass);
+  if (susyMotherMass.isValid()) {
+    SusyMotherMass = *susyMotherMass;
+  }
+  else {
+    success = false;
+  }
+  edm::Handle<double> susyLSPMass;
+  iEvent.getByToken(SusyLSPMassToken_,susyLSPMass);
+  if (susyLSPMass.isValid()) {
+    SusyLSPMass = *susyLSPMass;
+  }
+  else {
+    success = false;
+  }
+
+  return success;
+
 }
 
 bool NTupleMaker::AddGenHt(const edm::Event& iEvent) {
@@ -2146,6 +2243,21 @@ bool NTupleMaker::AddGenParticles(const edm::Event& iEvent) {
 		  abs((*GenParticles)[i].pdgId()) == 36){
 	    fill = true;
 	  }
+	  if((HasAnyMother(&(*GenParticles)[i], 23) > 0 ||
+	      HasAnyMother(&(*GenParticles)[i], 25) > 0 ||
+	      HasAnyMother(&(*GenParticles)[i], 35) > 0 ||
+	      HasAnyMother(&(*GenParticles)[i], 36) > 0)&&
+	     HasAnyMother(&(*GenParticles)[i], 15) > 0 && 
+	     (*GenParticles)[i].status()==1 && abs((*GenParticles)[i].pdgId())!=15) {
+	    if(HasAnyMother(&(*GenParticles)[i], 23) > 0) {info |= 1<<0;mother=ZBOSON;}
+	    if(HasAnyMother(&(*GenParticles)[i], 24) > 0) {info |= 1<<1;mother=WBOSON;}
+	    if(HasAnyMother(&(*GenParticles)[i], 15) > 0) {info |= 1<<2;mother=TAU;}
+	    if(HasAnyMother(&(*GenParticles)[i], 25) > 0||
+	       HasAnyMother(&(*GenParticles)[i], 35) > 0||
+	       HasAnyMother(&(*GenParticles)[i], 36) > 0) {info |= 1<<3;mother=HIGGS;}
+	    fill = true;
+	  }
+
 	  if(fill)
 	    {
 	      genparticles_e[genparticles_count] = (*GenParticles)[i].energy();
@@ -2185,6 +2297,51 @@ bool NTupleMaker::AddGenParticles(const edm::Event& iEvent) {
   return passed;
 
 } // bool NTupleMaker::AddGenParticles(const edm::Event& iEvent) 
+
+unsigned int NTupleMaker::AddPFCand(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
+
+  edm::Handle<pat::PackedCandidateCollection> Tracks;
+  iEvent.getByToken( PackedCantidateCollectionToken_, Tracks);
+
+  if(Tracks.isValid())
+    {
+      for(unsigned i = 0 ; i < Tracks->size() ; i++){
+        if ((*Tracks)[i].pt() < cTrackPtMin) continue;
+        if (fabs((*Tracks)[i].eta()) > cTrackEtaMax) continue;
+        if (fabs((*Tracks)[i].charge()) < 0.5) continue;
+	if (fabs((*Tracks)[i].dxy()) > cTrackDxyMax) continue;
+	if (fabs((*Tracks)[i].dz()) > cTrackDzMax) continue;
+        track_px[track_count] = (*Tracks)[i].px();
+        track_py[track_count] = (*Tracks)[i].py();
+        track_pz[track_count] = (*Tracks)[i].pz();
+        track_pt[track_count] = (*Tracks)[i].pt();
+        track_eta[track_count] = (*Tracks)[i].eta();
+        track_phi[track_count] = (*Tracks)[i].phi();
+        track_charge[track_count] = (*Tracks)[i].charge();
+        track_mass[track_count] = (*Tracks)[i].mass();
+        track_dxy[track_count] = (*Tracks)[i].dxy();
+        track_dz[track_count] = (*Tracks)[i].dz();
+        track_dxyerr[track_count] = (*Tracks)[i].dxyError();
+        track_dzerr[track_count] = (*Tracks)[i].dzError();
+        track_ID[track_count] = (*Tracks)[i].pdgId();
+	const reco::Track * trkRef = (*Tracks)[i].bestTrack();
+	track_highPurity[track_count] = false;
+	if (trkRef != NULL) 
+	  track_highPurity[track_count] = trkRef->quality(reco::Track::highPurity);
+
+        track_count++;
+
+        if (track_count==M_trackmaxcount) {
+          cerr << "number of tracks > M_trackmaxcount. They are missing." << endl; errors |= 1<<1;
+          break;
+        }
+      }
+
+    }
+
+  return track_count;
+
+}
 
 unsigned int NTupleMaker::AddMuons(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
@@ -2252,6 +2409,7 @@ unsigned int NTupleMaker::AddMuons(const edm::Event& iEvent, const edm::EventSet
 	muon_isLoose[muon_count] = (*Muons)[i].isLooseMuon();
 	muon_isGlobal[muon_count] = (*Muons)[i].isGlobalMuon();
 	muon_isMedium[muon_count] = (*Muons)[i].isMediumMuon();
+	muon_isICHEP[muon_count] = idAlgos::isICHEPMuon((*Muons)[i]);	
 
 	muon_chargedHadIso[muon_count] = (*Muons)[i].chargedHadronIso();
 	muon_neutralHadIso[muon_count] = (*Muons)[i].neutralHadronIso();

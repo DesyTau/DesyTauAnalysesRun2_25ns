@@ -49,9 +49,9 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condD
 from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag
 
 if runOnData:
-  process.GlobalTag.globaltag = '80X_dataRun2_Prompt_v8'
+  process.GlobalTag.globaltag = '80X_dataRun2_Prompt_ICHEP16JEC_v0'
 else:
-  process.GlobalTag.globaltag = '80X_mcRun2_asymptotic_2016_miniAODv2'
+  process.GlobalTag.globaltag = '80X_mcRun2_asymptotic_2016_miniAODv2_v1'
 
 print 'The conditions are =======>',process.GlobalTag.globaltag
     
@@ -208,7 +208,55 @@ process.ApplyBaselineHBHEIsoNoiseFilter = cms.EDFilter('BooleanFlagFilter',
 )
 
 
+# MET Filters ==============================================================================================
 
+process.load('Configuration.StandardSequences.Services_cff')
+process.load('RecoMET.METFilters.BadChargedCandidateFilter_cfi')
+process.load('RecoMET.METFilters.BadPFMuonFilter_cfi')
+
+from RecoMET.METFilters.metFilters_cff import HBHENoiseFilterResultProducer, HBHENoiseFilter, HBHENoiseIsoFilter, hcalLaserEventFilter
+from RecoMET.METFilters.metFilters_cff import EcalDeadCellTriggerPrimitiveFilter, eeBadScFilter, ecalLaserCorrFilter, EcalDeadCellBoundaryEnergyFilter
+from RecoMET.METFilters.metFilters_cff import primaryVertexFilter, CSCTightHaloFilter, CSCTightHaloTrkMuUnvetoFilter, CSCTightHalo2015Filter, globalTightHalo2016Filter, globalSuperTightHalo2016Filter, HcalStripHaloFilter
+from RecoMET.METFilters.metFilters_cff import goodVertices, trackingFailureFilter, trkPOGFilters, manystripclus53X, toomanystripclus53X, logErrorTooManyClusters
+from RecoMET.METFilters.metFilters_cff import chargedHadronTrackResolutionFilter, muonBadTrackFilter
+from RecoMET.METFilters.metFilters_cff import metFilters
+
+# individual filters
+Flag_HBHENoiseFilter = cms.Path(HBHENoiseFilterResultProducer * HBHENoiseFilter)
+Flag_HBHENoiseIsoFilter = cms.Path(HBHENoiseFilterResultProducer * HBHENoiseIsoFilter)
+Flag_CSCTightHaloFilter = cms.Path(CSCTightHaloFilter)
+Flag_CSCTightHaloTrkMuUnvetoFilter = cms.Path(CSCTightHaloTrkMuUnvetoFilter)
+Flag_CSCTightHalo2015Filter = cms.Path(CSCTightHalo2015Filter)
+Flag_globalTightHalo2016Filter = cms.Path(globalTightHalo2016Filter)
+Flag_globalSuperTightHalo2016Filter = cms.Path(globalSuperTightHalo2016Filter)
+Flag_HcalStripHaloFilter = cms.Path(HcalStripHaloFilter)
+Flag_hcalLaserEventFilter = cms.Path(hcalLaserEventFilter)
+Flag_EcalDeadCellTriggerPrimitiveFilter = cms.Path(EcalDeadCellTriggerPrimitiveFilter)
+Flag_EcalDeadCellBoundaryEnergyFilter = cms.Path(EcalDeadCellBoundaryEnergyFilter)
+Flag_goodVertices = cms.Path(primaryVertexFilter)
+Flag_trackingFailureFilter = cms.Path(goodVertices + trackingFailureFilter)
+Flag_eeBadScFilter = cms.Path(eeBadScFilter)
+Flag_ecalLaserCorrFilter = cms.Path(ecalLaserCorrFilter)
+Flag_trkPOGFilters = cms.Path(trkPOGFilters)
+Flag_chargedHadronTrackResolutionFilter = cms.Path(chargedHadronTrackResolutionFilter)
+Flag_muonBadTrackFilter = cms.Path(muonBadTrackFilter)
+# and the sub-filters
+Flag_trkPOG_manystripclus53X = cms.Path(~manystripclus53X)
+Flag_trkPOG_toomanystripclus53X = cms.Path(~toomanystripclus53X)
+Flag_trkPOG_logErrorTooManyClusters = cms.Path(~logErrorTooManyClusters)
+
+Flag_METFilters = cms.Path(metFilters)
+
+
+allMetFilterPaths=['HBHENoiseFilter','HBHENoiseIsoFilter','CSCTightHaloFilter','CSCTightHaloTrkMuUnvetoFilter','CSCTightHalo2015Filter','globalTightHalo2016Filter','globalSuperTightHalo2016Filter','HcalStripHaloFilter','hcalLaserEventFilter','EcalDeadCellTriggerPrimitiveFilter','EcalDeadCellBoundaryEnergyFilter','goodVertices','eeBadScFilter',
+                   'ecalLaserCorrFilter','trkPOGFilters','chargedHadronTrackResolutionFilter','muonBadTrackFilter','trkPOG_manystripclus53X','trkPOG_toomanystripclus53X','trkPOG_logErrorTooManyClusters','METFilters']
+
+
+#ICHEPMetFilterPaths=['HBHENoiseFilter','HBHENoiseIsoFilter','globalTightHalo2016Filter','EcalDeadCellTriggerPrimitiveFilter','goodVertices','eeBadScFilter']
+
+#Flag_allMETFilters = cms.Path(allMetFilterPaths)
+
+#Flag_ICHEPMETFilters = cms.Path(ICHEPMetFilterPaths)
 
 #####################################################################################
 
@@ -220,9 +268,9 @@ IsData = cms.untracked.bool(isData),
 GenParticles = cms.untracked.bool(not isData)
 )
 
-JECfile = "DesyTauAnalyses/NTupleMaker/data/JEC/Spring16_25nsV3/Spring16_25nsV3_MC_Uncertainty_AK4PFchs.txt"
+JECfile = "DesyTauAnalyses/NTupleMaker/data/JEC/Spring16_25nsV6/Spring16_25nsV6_MC_Uncertainty_AK4PFchs.txt"
 if isData:
-  JECfile = "DesyTauAnalyses/NTupleMaker/data/JEC/Spring16_25nsV3/Spring16_25nsV3_DATA_Uncertainty_AK4PFchs.txt"
+  JECfile = "DesyTauAnalyses/NTupleMaker/data/JEC/Spring16_25nsV6/Spring16_25nsV6_DATA_Uncertainty_AK4PFchs.txt"
 
 process.makeroottree = cms.EDAnalyzer("NTupleMaker",
 # data, year, period, skim
@@ -233,6 +281,7 @@ Skim = cms.untracked.uint32(0),
 JECfile = cms.untracked.string(JECfile),
 # switches of collections
 GenParticles = cms.untracked.bool(not isData),
+SusyInfo = cms.untracked.bool(True),
 Trigger = cms.untracked.bool(True),
 RecPrimVertex = cms.untracked.bool(True),
 RecBeamSpot = cms.untracked.bool(True),
@@ -274,8 +323,7 @@ MetCovMatrixTag = cms.InputTag("METSignificance:METCovariance:TreeProducer"),
 MetSigTag = cms.InputTag("METSignificance:METSignificance:TreeProducer"),
 MetCorrCovMatrixTag = cms.InputTag("METCorrSignificance:METCovariance:TreeProducer"),
 MetCorrSigTag = cms.InputTag("METCorrSignificance:METSignificance:TreeProducer"),
-#MetCorrCollectionTag = cms.InputTag("patpfMETT1::TreeProducer"),
-MetCorrCollectionTag = cms.InputTag("slimmedMETs::@skipCurrentProcess"),
+MetCorrCollectionTag = cms.InputTag("patpfMETT1::TreeProducer"),
 PuppiMetCollectionTag = cms.InputTag("slimmedMETsPuppi"),
 MvaMetCollectionsTag = cms.VInputTag(cms.InputTag("MVAMET","MVAMET","TreeProducer")),
 TrackCollectionTag = cms.InputTag("generalTracks"),
@@ -283,85 +331,34 @@ GenParticleCollectionTag = cms.InputTag("prunedGenParticles"),
 TriggerObjectCollectionTag = cms.InputTag("selectedPatTrigger"),
 BeamSpotCollectionTag =  cms.InputTag("offlineBeamSpot"),
 PVCollectionTag = cms.InputTag("offlineSlimmedPrimaryVertices"),
+SusyMotherMassTag = cms.InputTag("susyInfo","SusyMotherMass"),
+SusyLSPMassTag = cms.InputTag("susyInfo","SusyLSPMass"),
 # trigger info
-HLTriggerPaths = cms.untracked.vstring(
-'HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v', #new
-'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v', 
-'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v',
-'HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v',
-'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v',
-'HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v',
-'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v',  #exact hlt filters not available
-'HLT_IsoMu17_eta2p1_v',
-'HLT_IsoMu24_eta2p1_v',
-'HLT_IsoMu18_v',  #new
-'HLT_IsoMu20_v', #new
-'HLT_IsoMu22_v', #new
-'HLT_IsoMu27_v',
-'HLT_IsoMu17_eta2p1_LooseIsoPFTau20_v',
-#'HLT_IsoMuTk24_eta2p1_v', no existing in 25ns
-#'HLT_IsoMuTk18_v', #new #exact hlt filters not available
-#'HLT_IsoMuTk20_v', #new #exact hlt filters not available
-#'HLT_IsoMuTk22_v', #new #exact hlt filters not available
-#'HLT_IsoMuTk27_v', #new #exact hlt filters not available
-'HLT_Ele22_eta2p1_WPLoose_Gsf_LooseIsoPFTau20_SingleL1_v', #new
-'HLT_Ele22_eta2p1_WPLoose_Gsf_LooseIsoPFTau20_v',
-'HLT_Ele22_eta2p1_WPLoose_Gsf_v', ##exact hlt filters not available
-'HLT_Ele22_eta2p1_WPTight_Gsf_v', 
-'HLT_Ele23_WPLoose_Gsf_v',
-'HLT_Ele27_eta2p1_WPLoose_Gsf_v',
-'HLT_Ele22_eta2p1_WP75_Gsf_v',
-'HLT_Ele27_eta2p1_WP75_Gsf_v',
-#'HLT_Ele32_eta2p1_WPLoose_Gsf_v', , no existing in 25ns
-'HLT_DoubleMediumIsoPFTau40_Trk1_eta2p1_Reg_v',
-'HLT_Ele32_eta2p1_WPTight_Gsf_v',
-'HLT_DoubleMediumIsoPFTau35_Trk1_eta2p1_Reg_v',
-'HLT_PFMETNoMu90_JetIdCleaned_PFMHTNoMu90_IDTight_v',
-'HLT_PFMETNoMu120_JetIdCleaned_PFMHTNoMu120_IDTight_v',
-'HLT_PFMETNoMu90_NoiseCleaned_PFMHTNoMu90_IDTight_v',
-'HLT_PFMETNoMu120_NoiseCleaned_PFMHTNoMu120_IDTight_v',
-'HLT_PFJet60_v',
-'HLT_PFJet80_v',
-'HLT_PFJet140_v'
-),
+HLTriggerPaths = cms.untracked.vstring(),
 TriggerProcess = cms.untracked.string("HLT"),
 Flags = cms.untracked.vstring(
-  'Flag_HBHENoiseFilter',
-  'Flag_HBHENoiseIsoFilter',
-  'Flag_CSCTightHalo2015Filter',
-  'Flag_EcalDeadCellTriggerPrimitiveFilter',
-  'Flag_goodVertices',
-  'Flag_eeBadScFilter',
-  'Flag_chargedHadronTrackResolutionFilter',
-  'Flag_muonBadTrackFilter'
+#  'Flag_HBHENoiseFilter',
+#  'Flag_HBHENoiseIsoFilter',
+#  'Flag_CSCTightHalo2015Filter',
+#  'Flag_EcalDeadCellTriggerPrimitiveFilter',
+#  'Flag_goodVertices',
+#  'Flag_eeBadScFilter',
+#  'Flag_chargedHadronTrackResolutionFilter',
+#  'Flag_muonBadTrackFilter'
+   'Flag_METFilters'
+#   'allMetFilterPaths'
 ),
 FlagsProcess = cms.untracked.string("RECO"),
 # tracks
 RecTrackPtMin = cms.untracked.double(0.5),
 RecTrackEtaMax = cms.untracked.double(2.4),
+RecTrackDxyMax = cms.untracked.double(1.0),
+RecTrackDzMax = cms.untracked.double(1.0),
 RecTrackNum = cms.untracked.int32(0),
 # muons
-RecMuonPtMin = cms.untracked.double(8.),
+RecMuonPtMin = cms.untracked.double(50.),
 RecMuonEtaMax = cms.untracked.double(2.5),
-RecMuonHLTriggerMatching = cms.untracked.vstring(
-'HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v.*:hltMu8TrkIsoVVLEle17CaloIdLTrackIdLIsoVLMuonlegL3IsoFiltered8',
-'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v.*:hltMu8TrkIsoVVLEle23CaloIdLTrackIdLIsoVLMuonlegL3IsoFiltered8',
-'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v.*:hltMu23TrkIsoVVLEle12CaloIdLTrackIdLIsoVLMuonlegL3IsoFiltered23',
-'HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v.*:hltMu17TrkIsoVVLEle12CaloIdLTrackIdLIsoVLMuonlegL3IsoFiltered17',
-'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v.*:hltL3pfL1sDoubleMu103p5L1f0L2pf0L3PreFiltered8',
-'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v.*:hltL3fL1sDoubleMu103p5L1f0L2f10OneMuL3Filtered17',
-'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v.*:hltDiMuonGlb17Glb8RelTrkIsoFiltered0p4', #new
-'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v.*:hltDiMuonGlb17Glb8RelTrkIsoFiltered0p4DzFiltered0p2',
-'HLT_IsoMu18_v.*:hltL3crIsoL1sMu16L1f0L2f10QL3f18QL3trkIsoFiltered0p09',
-'HLT_IsoMu20_v.*:hltL3crIsoL1sMu16L1f0L2f10QL3f20QL3trkIsoFiltered0p09',
-'HLT_IsoMu22_v.*:hltL3crIsoL1sMu20L1f0L2f10QL3f22QL3trkIsoFiltered0p09',
-'HLT_IsoMu27_v.*:hltL3crIsoL1sMu25L1f0L2f10QL3f27QL3trkIsoFiltered0p09', 
-'HLT_IsoMu17_eta2p1_v.*:hltL3crIsoL1sSingleMu16erL1f0L2f10QL3f17QL3trkIsoFiltered0p09',
-'HLT_IsoMu24_eta2p1_v.*:hltL3crIsoL1sMu20Eta2p1L1f0L2f10QL3f24QL3trkIsoFiltered0p09', 
-'HLT_IsoMu17_eta2p1_LooseIsoPFTau20_v.*:hltL3crIsoL1sMu16erTauJet20erL1f0L2f10QL3f17QL3trkIsoFiltered0p09',
-#'HLT_IsoMu17_eta2p1_LooseIsoPFTau20_v.*:hltL3fL1sMu16erTauJet20erL1f0L2f10QL3Filtered17Q',  #new
-'HLT_IsoMu17_eta2p1_LooseIsoPFTau20_v.*:hltOverlapFilterIsoMu17LooseIsoPFTau20',
-),
+RecMuonHLTriggerMatching = cms.untracked.vstring(),
 RecMuonNum = cms.untracked.int32(0),
 # photons
 RecPhotonPtMin = cms.untracked.double(20.),
@@ -370,114 +367,20 @@ RecPhotonHLTriggerMatching = cms.untracked.vstring(),
 RecPhotonNum = cms.untracked.int32(0),
 # electrons
 RecElectronPtMin = cms.untracked.double(8.),
-RecElectronEtaMax = cms.untracked.double(2.5),
-RecElectronHLTriggerMatching = cms.untracked.vstring(
-'HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v.*:hltMu8TrkIsoVVLEle17CaloIdLTrackIdLIsoVLElectronlegTrackIsoFilter',
-'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v.*:hltMu23TrkIsoVVLEle12CaloIdLTrackIdLIsoVLElectronlegTrackIsoFilter', 
-'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v.*:hltMu8TrkIsoVVLEle23CaloIdLTrackIdLIsoVLElectronlegTrackIsoFilter',
-'HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v.*:hltMu17TrkIsoVVLEle12CaloIdLTrackIdLIsoVLElectronlegTrackIsoFilter',
-'HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v.*:hltEle17Ele12CaloIdLTrackIdLIsoVLTrackIsoLeg1Filter',
-'HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v.*:hltEle17Ele12CaloIdLTrackIdLIsoVLTrackIsoLeg2Filter',
-'HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v.*:hltEle17Ele12CaloIdLTrackIdLIsoVLDZFilter',
-'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v.*:hltEle23Ele12CaloIdLTrackIdLIsoVLTrackIsoLeg1Filter',
-'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v.*:hltEle23Ele12CaloIdLTrackIdLIsoVLTrackIsoLeg2Filter',
-'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v.*:hltEle23Ele12CaloIdLTrackIdLIsoVLDZFilter',
-'HLT_Ele22_eta2p1_WPLoose_Gsf_LooseIsoPFTau20_SingleL1_v.*:hltOverlapFilterSingleIsoEle22WPLooseGsfLooseIsoPFTau20',
-'HLT_Ele22_eta2p1_WPLoose_Gsf_LooseIsoPFTau20_v.*:hltOverlapFilterIsoEle22WPLooseGsfLooseIsoPFTau20', #check this
-'HLT_Ele22_eta2p1_WPLoose_Gsf_LooseIsoPFTau20_v.*:hltOverlapFilterIsoEle22WPLooseGsfCaloJet5', #check this
-'HLT_Ele22_eta2p1_WPLoose_Gsf_v.*:hltSingleEle22WPLooseGsfTrackIsoFilter',
-'HLT_Ele22_eta2p1_WPTight_Gsf_v.*:hltSingleEle22WPTightGsfTrackIsoFilter',
-'HLT_Ele23_WPLoose_Gsf_v.*:hltEle23WPLooseGsfTrackIsoFilter',
-'HLT_Ele22_eta2p1_WP75_Gsf_v.*:hltSingleEle22WP75GsfTrackIsoFilter',
-'HLT_Ele27_eta2p1_WP75_Gsf_v.*:hltEle27WP75GsfTrackIsoFilter',
-'HLT_Ele27_eta2p1_WPLoose_Gsf_v.*:hltEle27WPLooseGsfTrackIsoFilter',
-#'HLT_Ele32_eta2p1_WPLoose_Gsf_v.*:hltEle32WPLooseGsfTrackIsoFilter', 
-'HLT_Ele32_eta2p1_WPTight_Gsf_v.*:hltEle32WPTightGsfTrackIsoFilter'
-),
+RecElectronEtaMax = cms.untracked.double(2.6),
+RecElectronHLTriggerMatching = cms.untracked.vstring(),
 RecElectronNum = cms.untracked.int32(0),
 # taus
 RecTauPtMin = cms.untracked.double(15),
 RecTauEtaMax = cms.untracked.double(2.5),                                      
-RecTauHLTriggerMatching = cms.untracked.vstring(
-'HLT_Ele22_eta2p1_WPLoose_Gsf_LooseIsoPFTau20_SingleL1_v.*:hltAK4PFJetsForTaus', #need to check
-'HLT_Ele22_eta2p1_WPLoose_Gsf_LooseIsoPFTau20_v.*:hltPFTau20TrackLooseIso',
-'HLT_Ele22_eta2p1_WPLoose_Gsf_LooseIsoPFTau20_v.*:hltOverlapFilterIsoEle22WPLooseGsfLooseIsoPFTau20',
-'HLT_IsoMu17_eta2p1_LooseIsoPFTau20_v.*:hltPFTau20TrackLooseIsoAgainstMuon',
-'HLT_IsoMu17_eta2p1_LooseIsoPFTau20_v.*:hltOverlapFilterIsoMu17LooseIsoPFTau20',
-'HLT_DoubleMediumIsoPFTau40_Trk1_eta2p1_Reg_v.*:hltDoublePFTau40TrackPt1MediumIsolationDz02Reg',
-'HLT_DoubleMediumIsoPFTau35_Trk1_eta2p1_Reg_v.*:hltDoublePFTau35TrackPt1MediumIsolationDz02Reg'
-),
-RecTauFloatDiscriminators = cms.untracked.vstring(
-#'againstElectronLoose',
-#'againstElectronLooseMVA5',
-#'againstElectronMVA5category',
-#'againstElectronMVA5raw',
-#'againstElectronMedium',
-#'againstElectronMediumMVA5',
-#'againstElectronTight',
-#'againstElectronTightMVA5',
-#'againstElectronVLooseMVA5',
-#'againstElectronVTightMVA5',
-#'againstMuonLoose',
-#'againstMuonLoose2',
-#'againstMuonLoose3',
-#'againstMuonLooseMVA',
-#'againstMuonMVAraw',
-#'againstMuonMedium',
-#'againstMuonMedium2',
-#'againstMuonMediumMVA',
-#'againstMuonTight',
-#'againstMuonTight2',
-#'againstMuonTight3',
-#'againstMuonTightMVA',
-#'byCombinedIsolationDeltaBetaCorrRaw3Hits',
-#'byIsolationMVA3newDMwLTraw',
-#'byIsolationMVA3newDMwoLTraw',
-#'byIsolationMVA3oldDMwLTraw',
-#'byIsolationMVA3oldDMwoLTraw',
-#'byLooseCombinedIsolationDeltaBetaCorr3Hits',
-#'byLooseIsolationMVA3newDMwLT',
-#'byLooseIsolationMVA3newDMwoLT',
-#'byLooseIsolationMVA3oldDMwLT',
-#'byLooseIsolationMVA3oldDMwoLT',
-#'byMediumCombinedIsolationDeltaBetaCorr3Hits',
-#'byMediumIsolationMVA3newDMwLT',
-#'byMediumIsolationMVA3newDMwoLT',
-#'byMediumIsolationMVA3oldDMwLT',
-#'byMediumIsolationMVA3oldDMwoLT',
-#'byTightCombinedIsolationDeltaBetaCorr3Hits',
-#'byTightIsolationMVA3newDMwLT',
-#'byTightIsolationMVA3newDMwoLT',
-#'byTightIsolationMVA3oldDMwLT',
-#'byTightIsolationMVA3oldDMwoLT',
-#'byVLooseIsolationMVA3newDMwLT',
-#'byVLooseIsolationMVA3newDMwoLT',
-#'byVLooseIsolationMVA3oldDMwLT',
-#'byVLooseIsolationMVA3oldDMwoLT',
-#'byVTightIsolationMVA3newDMwLT',
-#'byVTightIsolationMVA3newDMwoLT',
-#'byVTightIsolationMVA3oldDMwLT',
-#'byVTightIsolationMVA3oldDMwoLT',
-#'byVVTightIsolationMVA3newDMwLT',
-#'byVVTightIsolationMVA3newDMwoLT',
-#'byVVTightIsolationMVA3oldDMwLT',
-#'byVVTightIsolationMVA3oldDMwoLT',
-#'chargedIsoPtSum',
-#'decayModeFinding',
-#'decayModeFindingNewDMs',
-#'neutralIsoPtSum',
-#'puCorrPtSum'
-),
+RecTauHLTriggerMatching = cms.untracked.vstring(),
+RecTauFloatDiscriminators = cms.untracked.vstring(),
 RecTauBinaryDiscriminators = cms.untracked.vstring(),
 RecTauNum = cms.untracked.int32(0),
 # jets
 RecJetPtMin = cms.untracked.double(18.),
 RecJetEtaMax = cms.untracked.double(5.2),
-RecJetHLTriggerMatching = cms.untracked.vstring(
-'HLT_PFJet60_v.*:hltSinglePFJet60',
-'HLT_PFJet80_v.*:hltSinglePFJet80',
-'HLT_PFJet140_v.*:hltSinglePFJet140'
-),
+RecJetHLTriggerMatching = cms.untracked.vstring(),
 RecJetBtagDiscriminators = cms.untracked.vstring(
 'pfCombinedInclusiveSecondaryVertexV2BJetTags',
 'pfJetProbabilityBJetTags'
@@ -492,12 +395,21 @@ process.load("RecoMET/METProducers.METSignificanceParams_cfi")
 
 process.METCorrSignificance = process.METSignificance.clone(
   srcPfJets = cms.InputTag('patJetsReapplyJEC::TreeProducer'),
-  #srcMet = cms.InputTag('patpfMETT1::TreeProducer')
-  srcMet = cms.InputTag('slimmedMETs::@skipCurrentProcess')
+  srcMet = cms.InputTag('patpfMETT1::TreeProducer')
 )
+
+process.BadChargedCandidateFilter.muons = cms.InputTag("slimmedMuons")
+process.BadChargedCandidateFilter.PFCandidates = cms.InputTag("packedPFCandidates")
+process.BadChargedCandidateFilter.debug = cms.bool(False)
+process.BadPFMuonFilter.muons = cms.InputTag("slimmedMuons")
+process.BadPFMuonFilter.PFCandidates = cms.InputTag("packedPFCandidates")
+
+process.BadPFMuonFilter.debug = cms.bool(False)
 
 process.p = cms.Path(
   process.initroottree*
+  process.BadChargedCandidateFilter *
+  process.BadPFMuonFilter *
   process.patJetCorrFactorsReapplyJEC * process.patJetsReapplyJEC *
   process.egmGsfElectronIDSequence * 
   process.mvaMetSequence *
@@ -509,11 +421,11 @@ process.p = cms.Path(
 )
 
 process.TFileService = cms.Service("TFileService",
-                                   fileName = cms.string("output_MC.root")
+                                   fileName = cms.string("output.root")
                                  )
 
 process.output = cms.OutputModule("PoolOutputModule",
-                                  fileName = cms.untracked.string('output_particles_MC.root'),
+                                  fileName = cms.untracked.string('output.root'),
                                   outputCommands = cms.untracked.vstring(
                                     'keep *_slimmedMETs_*_*',
 				    'keep *_MVAMET_*_*',
@@ -527,6 +439,16 @@ process.output = cms.OutputModule("PoolOutputModule",
 
 #processDumpFile = open('MyRootMaker.dump', 'w')
 #print >> processDumpFile, process.dumpPython()
+
+def miniAOD_customizeMETFiltersFastSim(process):
+    """Replace some MET filters that don't work in FastSim with trivial bools"""
+    for X in 'CSCTightHaloFilter', 'CSCTightHaloTrkMuUnvetoFilter','CSCTightHalo2015Filter','globalTightHalo2016Filter','globalSuperTightHalo2016Filter','HcalStripHaloFilter':
+        process.globalReplace(X, cms.EDFilter("HLTBool", result=cms.bool(True)))    
+    for X in 'manystripclus53X', 'toomanystripclus53X', 'logErrorTooManyClusters':
+        process.globalReplace(X, cms.EDFilter("HLTBool", result=cms.bool(False)))
+    return process
+
+
 
 def customise_for_gc(process):
 	import FWCore.ParameterSet.Config as cms

@@ -69,9 +69,18 @@ void TagProbeTree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("hlt_4_probe", &hlt_4_probe, &b_hlt_4_probe);
    fChain->SetBranchAddress("hlt_5_probe", &hlt_5_probe, &b_hlt_5_probe);
    fChain->SetBranchAddress("hlt_6_probe", &hlt_6_probe, &b_hlt_6_probe);
+   fChain->SetBranchAddress("hlt_7_probe", &hlt_7_probe, &b_hlt_7_probe);
+   fChain->SetBranchAddress("hlt_8_probe", &hlt_8_probe, &b_hlt_8_probe);
+   fChain->SetBranchAddress("hlt_9_probe", &hlt_9_probe, &b_hlt_9_probe);
+   fChain->SetBranchAddress("hlt_10_probe", &hlt_10_probe, &b_hlt_10_probe);
+   fChain->SetBranchAddress("hlt_11_probe", &hlt_11_probe, &b_hlt_11_probe);
+   fChain->SetBranchAddress("hlt_12_probe", &hlt_12_probe, &b_hlt_12_probe);
+   fChain->SetBranchAddress("hlt_13_probe", &hlt_13_probe, &b_hlt_13_probe);
+   fChain->SetBranchAddress("hlt_14_probe", &hlt_14_probe, &b_hlt_14_probe);
+   fChain->SetBranchAddress("hlt_15_probe", &hlt_15_probe, &b_hlt_15_probe);
 
    fChain->SetBranchAddress("mcweight", &mcweight, &b_mcweight); 
-   fChain->SetBranchAddress("PUweight", &PUweight, &b_PUweight); 
+   fChain->SetBranchAddress("pu_weight", &pu_weight, &b_pu_weight); 
 
 
    lock=true;
@@ -160,7 +169,7 @@ void TagProbeTree::WriteInit(TTree *tree) {
 
 
   fChain->Branch("id_probe", &id_probe, "id_probe/B");
-  fChain->Branch("iso_probe", &iso_probe, "iso_probe/B");
+  fChain->Branch("iso_probe", &iso_probe, "iso_probe/F");
 
   fChain->Branch("hlt_1_probe", &hlt_1_probe, "hlt_1_probe/I");
   fChain->Branch("hlt_2_probe", &hlt_2_probe, "hlt_2_probe/I");
@@ -168,9 +177,18 @@ void TagProbeTree::WriteInit(TTree *tree) {
   fChain->Branch("hlt_4_probe", &hlt_4_probe, "hlt_4_probe/I");
   fChain->Branch("hlt_5_probe", &hlt_5_probe, "hlt_5_probe/I");
   fChain->Branch("hlt_6_probe", &hlt_6_probe, "hlt_6_probe/I");
+  fChain->Branch("hlt_7_probe", &hlt_7_probe, "hlt_7_probe/I");
+  fChain->Branch("hlt_8_probe", &hlt_8_probe, "hlt_8_probe/I");
+  fChain->Branch("hlt_9_probe", &hlt_9_probe, "hlt_9_probe/I");
+  fChain->Branch("hlt_10_probe", &hlt_10_probe, "hlt_10_probe/I");
+  fChain->Branch("hlt_11_probe", &hlt_11_probe, "hlt_11_probe/I");
+  fChain->Branch("hlt_12_probe", &hlt_12_probe, "hlt_12_probe/I");
+  fChain->Branch("hlt_13_probe", &hlt_13_probe, "hlt_13_probe/I");
+  fChain->Branch("hlt_14_probe", &hlt_14_probe, "hlt_14_probe/I");
+  fChain->Branch("hlt_15_probe", &hlt_15_probe, "hlt_15_probe/I");
 
   fChain->Branch("mcweight", &mcweight, "mcweight/F");
-  fChain->Branch("PUweight", &PUweight, "PUweight/F");
+  fChain->Branch("pu_weight", &pu_weight, "pu_weight/F");
 
 }
 
