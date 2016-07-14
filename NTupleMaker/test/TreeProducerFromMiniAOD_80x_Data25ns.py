@@ -664,11 +664,11 @@ process.p = cms.Path(
 )
 
 process.TFileService = cms.Service("TFileService",
-                                   fileName = cms.string("output.root")
+                                   fileName = cms.string("output_DATA.root")
                                  )
 
 process.output = cms.OutputModule("PoolOutputModule",
-                                  fileName = cms.untracked.string('output.root'),
+                                  fileName = cms.untracked.string('output_particles_DATA.root'),
                                   outputCommands = cms.untracked.vstring(
                                     'keep *_slimmedMETs_*_*',
 				    'keep *_MVAMET_*_*',
