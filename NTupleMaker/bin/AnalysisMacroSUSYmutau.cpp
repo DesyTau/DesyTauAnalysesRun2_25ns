@@ -463,8 +463,19 @@ if (iF+1 != nTotalFiles) continue;}
       inputEventsH->Fill(0.);
     std::cout << "      number of input events         = " << NE << std::endl;
 
+
+/*TObject* br = file->FindObjectAny("initroottree");*/
+
+bool WithInit = true;
+
+if (WithInit) cout << "With initroottree"<<endl;
+if (!WithInit) cout << "Without initroottree"<<endl;
+
+
     TTree * _inittree = NULL;
-    _inittree = (TTree*)file_->Get(TString(ntupleName));
+if (!WithInit)  _inittree = (TTree*)file_->Get(TString(ntupleName));
+if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
+
     if (_inittree==NULL) continue;
     Float_t genweight;
     if (!isData)
@@ -486,7 +497,7 @@ if (iF+1 != nTotalFiles) continue;}
     std::cout << "      number of entries in Tree      = " << numberOfEntries << std::endl;
     AC1B analysisTree(_tree);
 
-	if (!isData)
+	if (!isData && !WithInit)
 		{    
 		for (Long64_t iEntry=0; iEntry<numberOfEntries; ++iEntry) 
 			{
@@ -500,9 +511,26 @@ if (iF+1 != nTotalFiles) continue;}
 			}
 		}
 
-
-
     float genweights=1;
+    if(!isData && WithInit) 
+      {
+
+	TTree *genweightsTree = (TTree*)file_->Get("initroottree/AC1B");
+	     
+	genweightsTree->SetBranchAddress("genweight",&genweights);
+	Long64_t numberOfEntriesInit = genweightsTree->GetEntries();
+	for (Long64_t iEntryInit=0; iEntryInit<numberOfEntriesInit; ++iEntryInit) { 
+	  genweightsTree->GetEntry(iEntryInit);
+			if (SUSY)
+			{
+			if (!(SusyMotherMassF < (analysisTree.SusyMotherMass+1) && SusyMotherMassF > (analysisTree.SusyMotherMass - 1) 
+			&& SusyLSPMassF <(analysisTree.SusyLSPMass + 1) && SusyLSPMassF > (analysisTree.SusyLSPMass - 1))) continue;
+			}
+	  histWeightsH->Fill(0.,genweights);
+	}
+    
+      }
+
     float topPt = -1;
     float antitopPt = -1;
     bool isZTT = false;

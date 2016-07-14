@@ -115,7 +115,7 @@ int main(int argc, char * argv[]) {
   const string Region  = cfg.get<string>("Region");
   const string Sign  = cfg.get<string>("Sign");
 
-  const string SingleElectronTriggerFile  = cfg.get<string>("ElectrontrigEffFile");
+ const string SingleElectronTriggerFile = cfg.get<string>("ElectrontrigEffFile");
 
   const double leadchargedhadrcand_dz = cfg.get<double>("leadchargedhadrcand_dz");
   const double leadchargedhadrcand_dxy = cfg.get<double>("leadchargedhadrcand_dxy");
@@ -136,7 +136,7 @@ int main(int argc, char * argv[]) {
 
 
  // const unsigned int RunRangeMin = cfg.get<unsigned int>("RunRangeMin");
-//  const unsigned int RunRangeMax = cfg.get<unsigned int>("RunRangeMax");
+  //const unsigned int RunRangeMax = cfg.get<unsigned int>("RunRangeMax");
 
   // vertex distributions filenames and histname
 /*
@@ -152,7 +152,7 @@ int main(int argc, char * argv[]) {
   string fullPathToJsonFile = cmsswBase + "/src/DesyTauAnalyses/NTupleMaker/test/json/" + jsonFile;
 
   const string ElectronIdIsoFile = cfg.get<string>("ElectronIdIsoEffFile");
-//  const string TauFakeRateFile = cfg.get<string>("TauFakeRateEff");
+  //const string TauFakeRateFile = cfg.get<string>("TauFakeRateEff");
 
   // Run-lumi selector
   std::vector<Period> periods;  
@@ -228,7 +228,7 @@ int main(int argc, char * argv[]) {
       ChiMass=0.0;
     }
 
-  if (XSec<0&& !isData) {cout<<" Something probably wrong with the xsecs...please check  - the input was "<<argv[2]<<endl;return 0;}
+  if (XSec<0&& !isData) {cout<<" Something probably wrong with the xsecs...please check  - the input was "<<argv[2]<<endl;XSec = 1;/*return 0;*/}
 	
   xsecs=XSec;
 
@@ -245,19 +245,27 @@ int main(int argc, char * argv[]) {
   sprintf(ff,"%s/%s",argv[3],argv[2]);
 
 
-  PileUp * PUofficial = new PileUp();
+  /*PileUp * PUofficial = new PileUp();
+  TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/pileUp_data_2016B_Cert_271036-274421.root","read");
+  TFile * filePUdistribution_MC = new TFile (TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/MC_Spring16_PU.root","read");
+  TH1D * PU_data = (TH1D *)filePUdistribution_data->Get("pileup");
+  TH1D * PU_mc = (TH1D *)filePUdistribution_MC->Get("pileup");
+  PUofficial->set_h_data(PU_data);
+  PUofficial->set_h_MC(PU_mc);*/
 
-  TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/Data_Pileup_2015D_Feb02.root","read");
-  TFile * filePUdistribution_MC = new TFile (TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/MC_Fall15_PU25_V1.root","read");
+
+ // PU reweighting
+  PileUp * PUofficial = new PileUp();
+  TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/Data_Run2016B_pileup.root","read");
+  TFile * filePUdistribution_MC = new TFile (TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/MC_Spring2016_pileup.root", "read");
   TH1D * PU_data = (TH1D *)filePUdistribution_data->Get("pileup");
   TH1D * PU_mc = (TH1D *)filePUdistribution_MC->Get("pileup");
   PUofficial->set_h_data(PU_data);
   PUofficial->set_h_MC(PU_mc);
 
-
-  // BTag scale factors
+   // BTag scale factors
   BTagCalibration calib("csvv2", cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/CSVv2.csv");
-//  BTagCalibrationReader reader_BC(&calib,BTagEntry::OP_MEDIUM,"mujets","central");           // systematics type
+  //BTagCalibrationReader reader_BC(&calib,BTagEntry::OP_MEDIUM,"mujets","central");           // systematics type
   //BTagCalibrationReader reader_Light(&calib,BTagEntry::OP_MEDIUM,"incl","central");           // systematics type
   BTagCalibrationReader reader(BTagEntry::OP_MEDIUM,  // operating point
 			       "central");            // systematics type
@@ -272,7 +280,6 @@ int main(int argc, char * argv[]) {
   reader.load(calib,               // calibration instance
 	      BTagEntry::FLAV_UDSG,    // btag flavour
 	      "incl");             // measurement type
-
   //  std::cout << "SF_light (eta=0.6,pt=20.1) : " << reader_Light.eval(BTagEntry::FLAV_UDSG, 0.5, 20.1) << std::endl;
   //  std::cout << "SF_light (eta=2.1,pt=20.1) : " << reader_Light.eval(BTagEntry::FLAV_UDSG, 2.1, 20.1) << std::endl;
   //  std::cout << "SF_bc    (eta=0.6,pt=30.1) : " << reader_BC.eval(BTagEntry::FLAV_B, 0.5, 30.1) << std::endl;
@@ -327,8 +334,7 @@ int main(int argc, char * argv[]) {
   ScaleFactor * SF_electronTrigger = new ScaleFactor();
   SF_electronTrigger->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(SingleElectronTriggerFile));
 
- /*
-  cout<<" Will try to initialize the TFR now.... "<<endl;
+/*  cout<<" Will try to initialize the TFR now.... "<<endl;
   ScaleFactor * SF_TFR; 
   bool applyTFR = true;
   if (applyTFR) {
@@ -352,6 +358,7 @@ int main(int argc, char * argv[]) {
   }
   // file name and tree name
   std::string rootFileName(argv[2]);
+  std::string NrootFile(argv[4]);
   //std::ifstream fileList(argv[2]);
   std::ifstream fileList(ff);
   //std::ifstream fileList0(argv[2]);
@@ -370,9 +377,40 @@ int main(int argc, char * argv[]) {
   regionName = invMuStr+invTauStr+invMETStr+"_"+Region.c_str()+"_"+Sign.c_str();
   std::cout <<" The filename will be "<<TStrName <<std::endl;  
   // output fileName with histograms
+std::string st1,st2;
+bool SUSY = false;
+float SusyMotherMassF;
+float SusyLSPMassF;
+if (string::npos != rootFileName.find("stau"))
+	{
+	st1 =  rootFileName.substr(4,3);
+	SusyMotherMassF = stof(st1);
+	st2 =  rootFileName.substr(11);
+	SusyLSPMassF = stof(st2);
+	SUSY = true;
+	  std::cout <<" SUSY "<< " SusyMotherMassF= "<<SusyMotherMassF <<" SusyLSPMassF= "<<SusyLSPMassF <<std::endl;  
+	}
+if (string::npos != rootFileName.find("C1"))
+	{
+	st1 =  rootFileName.substr(5,3);
+	SusyMotherMassF = stof(st1);
+	st2 =  rootFileName.substr(12);
+	SusyLSPMassF = stof(st2);
+	SUSY = true;
+	  std::cout <<" SUSY "<< " SusyMotherMassF= "<<SusyMotherMassF <<" SusyLSPMassF= "<<SusyLSPMassF <<std::endl;  
+	}
+
+
+
   TFile * file;
   if (isData) file = new TFile(era+"/"+TStrName+TString("_DataDriven.root"),"update");
-  if (!isData) file = new TFile(era+"/"+TStrName+TString(".root"),"update");
+  if (!isData && !SUSY) file = new TFile(era+"/"+TStrName+TString(".root"),"update");
+  if (SUSY)
+	{  
+	TString TStrNameS(rootFileName+invMuStr+invTauStr+invMETStr+"_"+Region+"_"+Sign+"_"+NrootFile);
+	file = new TFile(era+"/"+TStrNameS+TString(".root"),"update");
+
+	}
   file->mkdir(Channel.c_str());
   file->cd(Channel.c_str());
 
@@ -392,22 +430,31 @@ int main(int argc, char * argv[]) {
 
   std::string dummy;
   // count number of files --->
-  while (fileList0 >> dummy) nTotalFiles++;
-  //string treename = rootFileName+"_tree.root";
 
+
+
+
+
+ while (fileList0 >> dummy) nTotalFiles++;
+  //string treename = rootFileName+"_tree.root";
+  
   SetupTree(); 
+  SetupHists(CutNumb); 
   if (argv[4] != NULL  && atoi(argv[4])< nTotalFiles) nTotalFiles=atoi(argv[4]);
   //if (nTotalFiles>50) nTotalFiles=50;
   //nTotalFiles = 10;
-  for (int iF=0; iF<nTotalFiles; ++iF) {
+ 
+for (int iF=0; iF<nTotalFiles; ++iF) {
 
     std::string filen;
     fileList >> filen;
 
     std::cout << "file " << iF+1 << " out of " << nTotalFiles << " filename : " << filen << std::endl;
+//////////// for SUSY!!!
+if (SUSY){
+if (iF+1 != nTotalFiles) continue;}
     TFile * file_ = TFile::Open(TString(filen));
-    ///Start reading the ntuple
-    //
+
     TH1D * histoInputEvents = NULL;
     histoInputEvents = (TH1D*)file_->Get("makeroottree/nEvents");
     if (histoInputEvents==NULL) continue;
@@ -416,8 +463,19 @@ int main(int argc, char * argv[]) {
       inputEventsH->Fill(0.);
     std::cout << "      number of input events         = " << NE << std::endl;
 
+
+/*TObject* br = file->FindObjectAny("initroottree");*/
+
+bool WithInit = true;
+
+if (WithInit) cout << "With initroottree"<<endl;
+if (!WithInit) cout << "Without initroottree"<<endl;
+
+
     TTree * _inittree = NULL;
-    _inittree = (TTree*)file_->Get(TString(initNtupleName));
+if (!WithInit)  _inittree = (TTree*)file_->Get(TString(ntupleName));
+if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
+
     if (_inittree==NULL) continue;
     Float_t genweight;
     if (!isData)
@@ -439,39 +497,77 @@ int main(int argc, char * argv[]) {
     std::cout << "      number of entries in Tree      = " << numberOfEntries << std::endl;
     AC1B analysisTree(_tree);
 
+	if (!isData && !WithInit)
+		{    
+		for (Long64_t iEntry=0; iEntry<numberOfEntries; ++iEntry) 
+			{
+			analysisTree.GetEntry(iEntry);
+			if (SUSY)
+			{
+			if (!(SusyMotherMassF < (analysisTree.SusyMotherMass+1) && SusyMotherMassF > (analysisTree.SusyMotherMass - 1) 
+			&& SusyLSPMassF <(analysisTree.SusyLSPMass + 1) && SusyLSPMassF > (analysisTree.SusyLSPMass - 1))) continue;
+			}
+			histWeightsH->Fill(0.,analysisTree.genweight);
+			}
+		}
 
     float genweights=1;
-    float topPt = -1;
-    float antitopPt = -1;
-    bool isZTT = false;
-    if(!isData) 
+    if(!isData && WithInit) 
       {
 
 	TTree *genweightsTree = (TTree*)file_->Get("initroottree/AC1B");
-
+	     
 	genweightsTree->SetBranchAddress("genweight",&genweights);
 	Long64_t numberOfEntriesInit = genweightsTree->GetEntries();
 	for (Long64_t iEntryInit=0; iEntryInit<numberOfEntriesInit; ++iEntryInit) { 
 	  genweightsTree->GetEntry(iEntryInit);
+			if (SUSY)
+			{
+			if (!(SusyMotherMassF < (analysisTree.SusyMotherMass+1) && SusyMotherMassF > (analysisTree.SusyMotherMass - 1) 
+			&& SusyLSPMassF <(analysisTree.SusyLSPMass + 1) && SusyLSPMassF > (analysisTree.SusyLSPMass - 1))) continue;
+			}
 	  histWeightsH->Fill(0.,genweights);
 	}
-
-
+    
       }
 
+    float topPt = -1;
+    float antitopPt = -1;
+    bool isZTT = false;
 
-    //	    if (std::string::npos != rootFileName.find("TTJetsLO") || std::string::npos != rootFileName.find("TTPow"))
+/*
+	TTree *genweightsTree = (TTree*)file_->Get("makeroottree/AC1B");
+	     
+	genweightsTree->SetBranchAddress("genweight",&genweights);
+	Long64_t numberOfEntriesInit = genweightsTree->GetEntries();
+    if(!isData) 
+      {
+	for (Long64_t iEntryInit=0; iEntryInit<numberOfEntriesInit; ++iEntryInit) { 
+	  genweightsTree->GetEntry(iEntryInit);
+	  histWeightsH->Fill(0.,genweights);
+		//std::cout <<"genweights "<< genweights << std::endl;
+	}
+
+      }
+*/
 
 
-    //numberOfEntries = 1000;
 
-    //numberOfEntries = 1000;
+
+
+
     for (Long64_t iEntry=0; iEntry<numberOfEntries; ++iEntry) { 
 
       Float_t weight = 1;
       Float_t puweight = 1;
       Float_t topptweight = 1;
       analysisTree.GetEntry(iEntry);
+
+	if (SUSY)////FOR SUSY!!!!!!!!
+		{
+		if (!(SusyMotherMassF < (analysisTree.SusyMotherMass+1) && SusyMotherMassF > (analysisTree.SusyMotherMass - 1) 
+		&& SusyLSPMassF <(analysisTree.SusyLSPMass + 1) && SusyLSPMassF > (analysisTree.SusyLSPMass - 1))) continue;
+		}
       nEvents++;
 
       iCut = 0;
@@ -615,6 +711,7 @@ int main(int argc, char * argv[]) {
       tau_index=-1;
       el_index=-1;
 
+     
       CFCounter[iCut]+= weight;
       CFCounter_[iCut]+= weight;
       iCFCounter[iCut]++;
@@ -633,44 +730,42 @@ int main(int argc, char * argv[]) {
 	JetsV.SetPxPyPzE(analysisTree.pfjet_px[ijj], analysisTree.pfjet_py[ijj], analysisTree.pfjet_pz[ijj], analysisTree.pfjet_e[ijj]);
 	JetsMV.push_back(JetsV);
       } 
-
-
       for (unsigned int imm = 0; imm<analysisTree.muon_count; ++imm) {
 	MuV.SetPtEtaPhiM(analysisTree.muon_pt[imm], analysisTree.muon_eta[imm], analysisTree.muon_phi[imm], muonMass);
 	MuMV.push_back(MuV);
 	//	mu_index=0;
       }
-
       for (unsigned int ie = 0; ie<analysisTree.electron_count; ++ie) {
 	ElV.SetPtEtaPhiM(analysisTree.electron_pt[ie], analysisTree.electron_eta[ie], analysisTree.electron_phi[ie], electronMass);
 	ElMV.push_back(ElV);
 	//	el_index=0;
       }
-
       for (unsigned int itt = 0; itt<analysisTree.tau_count; ++itt) {
 	TauV.SetPtEtaPhiM(analysisTree.tau_pt[itt], analysisTree.tau_eta[itt], analysisTree.tau_phi[itt], tauMass);
 	TauMV.push_back(TauV);
 	//	tau_index=0;
       }
-
 */
 
       if (!isData) 
 	{
 	  if (applyPUreweighting)	 {
-	    puweight = float(PUofficial->get_PUweight(double(analysisTree.numtruepileupinteractions)));
+	   /* puweight = float(PUofficial->get_PUweight(double(analysisTree.numtruepileupinteractions)));*/
+		puweight = float(PUofficial->get_PUweight(double(analysisTree.primvertex_count)));
 	    weight *=puweight;      
 	    pu_weight = puweight;
 	  }
 
 	}
 
+  
       CFCounter[iCut]+= weight;
       CFCounter_[iCut]+= weight;
       iCFCounter[iCut]++;
       iCut++;
 
       bool trigAccept = false;
+	
 
       unsigned int nMainTrigger = 0;
       bool isMainTrigger = false;
@@ -689,7 +784,7 @@ int main(int argc, char * argv[]) {
 
       }
 
-      if (!isData && ( string::npos != filen.find("stau") || string::npos != filen.find("C1")) ) isMainTrigger = true;
+      if (!isData /*&& ( string::npos != filen.find("stau") || string::npos != filen.find("C1"))*/ ) isMainTrigger = true;
 
 
       if (!isMainTrigger) {
@@ -765,6 +860,8 @@ int main(int argc, char * argv[]) {
 	neutralIsoElec = TMath::Max(float(0),neutralIsoElec); 
 	float absIsoElec = chargedHadIsoElec + neutralIsoElec;
 	float relIsoElec = absIsoElec/analysisTree.electron_pt[mIndex];
+	if (isData)
+	{
 	for (unsigned int iT=0; iT<analysisTree.trigobject_count; ++iT) {
 	  if (analysisTree.trigobject_filters[iT][nMainTrigger]
 	      &&analysisTree.electron_pt[mIndex]>ptElectronHighCut&&
@@ -775,8 +872,9 @@ int main(int argc, char * argv[]) {
 	      isSingleElectronFilterNameMatch = true;
 	    }
 	  }
+	 }
 	}
-      if (!isData &&  ( string::npos != filen.find("stau") || string::npos != filen.find("C1")) )  isSingleElectronFilterNameMatch = true;
+      if (!isData/* &&  ( string::npos != filen.find("stau") || string::npos != filen.find("C1"))*/ )  isSingleElectronFilterNameMatch = true;
 
 	for (unsigned int it=0; it<taus.size(); ++it) {
 
@@ -787,7 +885,7 @@ int main(int argc, char * argv[]) {
 
 	  if (dR<dRleptonsCuteltau) continue;
 
-	  bool trigMatch = isSingleElectronFilterNameMatch;
+	bool trigMatch = isSingleElectronFilterNameMatch;
 	
 	  if (!trigMatch) continue;
 	  
@@ -916,6 +1014,7 @@ int main(int argc, char * argv[]) {
       double q = analysisTree.tau_charge[tau_index] * analysisTree.electron_charge[el_index];
       event_sign  = q;
 
+
       CFCounter[iCut]+= weight;
       CFCounter_[iCut]+= weight;
       iCFCounter[iCut]++;
@@ -1018,6 +1117,7 @@ int main(int argc, char * argv[]) {
 	if (dilepton_veto)  continue;
 
 
+
       CFCounter[iCut]+= weight;
       CFCounter_[iCut]+= weight;
       iCFCounter[iCut]++;
@@ -1026,6 +1126,7 @@ int main(int argc, char * argv[]) {
         if(extraelec_veto || extramuon_veto)   event_secondLeptonVeto = true;
 	if (extraelec_veto) continue;
 	if (extramuon_veto) continue;
+
 
 
       CFCounter[iCut]+= weight;
@@ -1045,15 +1146,20 @@ int main(int argc, char * argv[]) {
 
 
       float El22EffData = (float)SF_electronTrigger->get_EfficiencyData(double(ptEl1),double(etaEl1));
-      float El22EffMC   = (float)SF_electronTrigger->get_EfficiencyMC(double(ptEl1),double(etaEl1));
+      /*float El22EffMC   = (float)SF_electronTrigger->get_EfficiencyMC(double(ptEl1),double(etaEl1));*/
 
-      if (!isData) {
+     /* if (!isData) {
 	if (El22EffMC>1e-6)
 	  trigweight = El22EffData / El22EffMC;
 	if (!isData &&  ( string::npos != filen.find("stau") || string::npos != filen.find("C1")) )  trigweight = El22EffData;
 	weight *= trigweight;
 	trig_weight = trigweight;
       }
+	*/
+
+	if (!isData) trigweight = El22EffData;
+	weight *= trigweight;
+	trig_weight = trigweight;
 
 
       CFCounter[iCut]+= weight;
@@ -1071,6 +1177,7 @@ int main(int argc, char * argv[]) {
 	weight *= IdIsoSF_el1;
 	LSF_weight = IdIsoSF_el1;
       }
+
       CFCounter[iCut]+= weight;
       CFCounter_[iCut]+= weight;
       iCFCounter[iCut]++;
@@ -1094,8 +1201,7 @@ int main(int argc, char * argv[]) {
 	genTauMatched = isTauMatched;
 
 	/////////TFR
-	/*
-        if (!isData && applyTFR && !isTauMatched) {
+ /*     if (!isData && applyTFR && !isTauMatched) {
 
 
 	//leptonSFweight = SF_yourScaleFactor->get_ScaleFactor(pt, eta)	
@@ -1108,8 +1214,8 @@ int main(int argc, char * argv[]) {
 	//weight *= TFRSF_el1;
 	TFR_weight  = TFRSF_el1;
 	//cout<<"  "<<TFRSF_mu1<<"  for  eta  "<<etaTau1<<  " pT  "<< ptTau1<<endl;
-      	}
-*/
+      	}*/
+
       CFCounter[iCut]+= weight;
       CFCounter_[iCut]+= weight;
       iCFCounter[iCut]++;
@@ -1126,6 +1232,7 @@ int main(int argc, char * argv[]) {
 	    top_weight = topptweight;
 	  }
 	}
+
 
       CFCounter[iCut]+= weight;
       CFCounter_[iCut]+= weight;
@@ -1295,7 +1402,6 @@ int main(int argc, char * argv[]) {
 	      jet_scalefactor = reader.eval_auto_bounds("central", BTagEntry::FLAV_UDSG, absJetEta, JetPtForBTag);
 	      tageff = tagEff_Light->Interpolate(JetPtForBTag,absJetEta);
 	    }
-
 	    
 	    if (tageff<1e-5)      tageff = 1e-5;
 	    if (tageff>0.99999)   tageff = 0.99999;
@@ -1438,6 +1544,5 @@ int main(int argc, char * argv[]) {
   delete file;
 
 }
-
 
 
