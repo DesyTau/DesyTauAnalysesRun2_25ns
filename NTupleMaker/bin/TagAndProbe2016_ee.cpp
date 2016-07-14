@@ -436,6 +436,15 @@ int main(int argc, char * argv[]){
           otree->hlt_4_probe = -1;
           otree->hlt_5_probe = -1;
           otree->hlt_6_probe = -1;
+          otree->hlt_7_probe = -1;
+          otree->hlt_8_probe = -1;
+          otree->hlt_9_probe = -1;
+          otree->hlt_10_probe = -1;
+          otree->hlt_11_probe = -1;
+          otree->hlt_12_probe = -1;
+          otree->hlt_13_probe = -1;
+          otree->hlt_14_probe = -1;
+          otree->hlt_15_probe = -1;
 
           //TRIGGER
           p_pass_1++;
@@ -470,6 +479,15 @@ int main(int argc, char * argv[]){
           otree->hlt_4_probe = hlt_probe[3];
           otree->hlt_5_probe = hlt_probe[4];
           otree->hlt_6_probe = hlt_probe[5];
+          otree->hlt_7_probe = hlt_probe[6];
+          otree->hlt_8_probe = hlt_probe[7];
+          otree->hlt_9_probe = hlt_probe[8];
+          otree->hlt_10_probe = hlt_probe[9];
+          otree->hlt_11_probe = hlt_probe[10];
+          otree->hlt_12_probe = hlt_probe[11];
+          otree->hlt_13_probe = hlt_probe[12];
+          otree->hlt_14_probe = hlt_probe[13];
+          otree->hlt_15_probe = hlt_probe[14];
 
           otree->Fill();
         }
