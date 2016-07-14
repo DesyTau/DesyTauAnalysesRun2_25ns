@@ -496,7 +496,7 @@ int main(int argc, char * argv[]){
 
 float rel_Iso(int Index, TString lep, const AC1B * analysisTree, float dRCone){
   if(lep=="m")  return(abs_Iso(Index, lep, analysisTree, dRCone) / analysisTree->muon_pt[Index] );
-  else if(lep="e")   return(abs_Iso(Index, lep, analysisTree, dRCone) / analysisTree->electron_pt[Index] );
+  else if(lep=="e")   return(abs_Iso(Index, lep, analysisTree, dRCone) / analysisTree->electron_pt[Index] );
     else return(-1.);
 }
 

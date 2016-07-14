@@ -78,7 +78,8 @@ int read_json(std::string filename, lumi_json& json);
 bool isGoodLumi(const std::pair<int, int>& lumi, const lumi_json& json);
 bool isGoodLumi(int run, int lumi, const lumi_json& json);
 float abs_Iso(int Index, TString lep, const AC1B * analysisTree, float dRCone);
-float rel_Iso(int Index, TString lep, const AC1B * analysisTree, float dRCone);//dr cone 0.3 OR 0.4  
+float rel_Iso(int Index, TString lep, const AC1B * analysisTree, float dRCone);//dr cone 0.3 OR 0.4 
+bool isICHEPmed(int Index, const AC1B * analysisTree); 
 
 int main(int argc, char * argv[]){
 
@@ -343,7 +344,11 @@ int main(int argc, char * argv[]){
       TLorentzVector tagLV, probeLV, pairLV;
 
       for (it = 0; it<analysisTree.muon_count; it++){
-        bool TagmuonMediumId = analysisTree.muon_isMedium[it]; 
+
+//        bool TagmuonMediumId = analysisTree.muon_isMedium[it]; 
+
+        bool TagmuonMediumId = isICHEPmed(it, &analysisTree);
+
         if (analysisTree.muon_pt[it]<=ptMuonCut) continue;
         if (rel_Iso(it, "m", &analysisTree, dRCone)>=isoMuonCut) continue;
         if (fabs(analysisTree.muon_eta[it])>=etaMuonCut) continue;
@@ -414,7 +419,7 @@ int main(int argc, char * argv[]){
           //id evaluating for the probes
           bool id_probe= false;
 
-          if (analysisTree.muon_isMedium[ip]) {
+          if (isICHEPmed(ip, &analysisTree)) {
             if (analysisTree.muon_dxy[ip]<dxyPassingCut){
               if (analysisTree.muon_dz[ip]<dxyPassingCut){
                 id_probe = true;
@@ -507,7 +512,7 @@ int main(int argc, char * argv[]){
 //compute the relative isolation for a given lepton labeled by Index in channel ch with dR 0.3 or 0.4
 float rel_Iso(int Index, TString lep, const AC1B * analysisTree, float dRCone){
   if(lep=="m")  return(abs_Iso(Index, lep, analysisTree, dRCone) / analysisTree->muon_pt[Index] );
-  else if(lep="e")   return(abs_Iso(Index, lep, analysisTree, dRCone) / analysisTree->electron_pt[Index] );
+  else if(lep=="e")   return(abs_Iso(Index, lep, analysisTree, dRCone) / analysisTree->electron_pt[Index] );
     else return(-1.);
 }
 
@@ -548,6 +553,16 @@ float abs_Iso (int Index, TString lep, const AC1B * analysisTree, float dRCone){
   float neutralIso = neutralHadIso + photonIso -0.5*puIso;
   neutralIso = TMath::Max(float(0), neutralIso);
   return(chargedHadIso + neutralIso);
+}
+
+bool isICHEPmed(int Index, const AC1B * analysisTree) {
+        bool goodGlob = analysisTree->muon_isGlobal[Index] && analysisTree->muon_normChi2[Index] < 3 && analysisTree->muon_combQ_chi2LocalPosition[Index] < 12
+                                   && analysisTree->muon_combQ_trkKink[Index] < 20;
+
+        bool isICHEPmedium  = analysisTree->muon_isLoose[Index] &&
+                                          analysisTree->muon_validFraction[Index] >0.49 &&
+                                          analysisTree->muon_segmentComp[Index] > (goodGlob ? 0.303 : 0.451);
+        return isICHEPmedium;
 }
 
 
