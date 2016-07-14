@@ -14,11 +14,12 @@
 #include "DesyTauAnalyses/NTupleMaker/test/HttStylesNew.cc"
 #include "DesyTauAnalyses/NTupleMaker/test/TP_2016/FitPassAndFail.C"
 
-void TP_eff_mu(TString fileName = "SingleMuon_Run2016B_TP", // RooT file with tag-&-probe histograms 
- 	   TString what = "IdIso", //what do you want to evaluated
- 	   float iso = 0.1, //isolation cut to be used
-	   float norm = 1 // luminosity normalization factor (1 for data) 
-	   ) 
+void TP_eff_mu(TString fileName = "SingleMuon_Run2016_TP", // RooT file with TP otree for data 
+
+ 	  TString what = "IdIso", //what do you want to evaluated
+ 	  float iso = 0.1, //isolation cut to be used
+	  float norm = 1 // luminosity normalization factor (1 for data) 
+	  ) 
 {
 
 	gErrorIgnoreLevel = kFatal;
@@ -165,11 +166,10 @@ void TP_eff_mu(TString fileName = "SingleMuon_Run2016B_TP", // RooT file with ta
 
   //definition of the passing and failing criterias
 
-  TCut cut_flag_idiso_pass, cut_flag_idiso_fail, cut_flag_hlt_pass, cut_flag_hlt_fail, cut_pt, cut_eta;
+  TCut cut_flag_idiso_pass, cut_flag_hlt_pass, cut_flag_hlt_fail, cut_pt, cut_eta;
 
   if (what == "IdIso") {
   	cut_flag_idiso_pass = Form("id_probe == 1 && iso_probe < %f", iso);
-  	cut_flag__idiso_fail = Form("id_probe == 0 || iso_probe >= %f", iso);
   } else{
   		if(what == "hlt_1") {cut_flag_hlt_pass = "hlt_1_probe == 1"; cut_flag_hlt_fail = "hlt_1_probe == 0"; }
   		if(what == "hlt_2") {cut_flag_hlt_pass = "hlt_2_probe == 1"; cut_flag_hlt_fail = "hlt_2_probe == 0"; }
@@ -181,6 +181,16 @@ void TP_eff_mu(TString fileName = "SingleMuon_Run2016B_TP", // RooT file with ta
   		if(what == "hlt_8") {cut_flag_hlt_pass = "hlt_8_probe == 1"; cut_flag_hlt_fail = "hlt_8_probe == 0"; }
   		if(what == "hlt_9") {cut_flag_hlt_pass = "hlt_9_probe == 1"; cut_flag_hlt_fail = "hlt_9_probe == 0"; }
   		if(what == "hlt_10") {cut_flag_hlt_pass = "hlt_10_probe == 1"; cut_flag_hlt_fail = "hlt_10_probe == 0"; }
+  		if(what == "hlt_11") {cut_flag_hlt_pass = "hlt_11_probe == 1"; cut_flag_hlt_fail = "hlt_11_probe == 0"; }
+  		if(what == "hlt_12") {cut_flag_hlt_pass = "hlt_12_probe == 1"; cut_flag_hlt_fail = "hlt_12_probe == 0"; }
+  		if(what == "hlt_13") {cut_flag_hlt_pass = "hlt_13_probe == 1"; cut_flag_hlt_fail = "hlt_13_probe == 0"; }
+  		if(what == "hlt_14") {cut_flag_hlt_pass = "hlt_14_probe == 1"; cut_flag_hlt_fail = "hlt_14_probe == 0"; }
+  		if(what == "hlt_15") {cut_flag_hlt_pass = "hlt_15_probe == 1"; cut_flag_hlt_fail = "hlt_15_probe == 0"; }
+  		if(what == "hlt_16") {cut_flag_hlt_pass = "hlt_16_probe == 1"; cut_flag_hlt_fail = "hlt_16_probe == 0"; }
+  		if(what == "hlt_17") {cut_flag_hlt_pass = "hlt_17_probe == 1"; cut_flag_hlt_fail = "hlt_17_probe == 0"; }
+  		if(what == "hlt_18") {cut_flag_hlt_pass = "hlt_18_probe == 1"; cut_flag_hlt_fail = "hlt_18_probe == 0"; }
+  		if(what == "hlt_19") {cut_flag_hlt_pass = "hlt_19_probe == 1"; cut_flag_hlt_fail = "hlt_19_probe == 0"; }
+  		if(what == "hlt_20") {cut_flag_hlt_pass = "hlt_20_probe == 1"; cut_flag_hlt_fail = "hlt_20_probe == 0"; }
   	}
 
   //Definition of the output directory names and creation of it
@@ -196,7 +206,7 @@ void TP_eff_mu(TString fileName = "SingleMuon_Run2016B_TP", // RooT file with ta
 		histBaseName = prefix+which+EtaBins[iEta];
 
 		//eta cuts
-		cut_eta = Form("abs(eta_probe)>= %f && (eta_probe)< %f", etaBins[iEta], etaBins[iEta+1]);
+		cut_eta = Form("abs(eta_probe)>= %f && abs(eta_probe)< %f", etaBins[iEta], etaBins[iEta+1]);
 
 		TH1F * numeratorH   = new TH1F("numeratorH","",nPtBins,ptBins_edges);
 		TH1F * denominatorH = new TH1F("denominatorH","",nPtBins,ptBins_edges);
@@ -211,11 +221,11 @@ void TP_eff_mu(TString fileName = "SingleMuon_Run2016B_TP", // RooT file with ta
 	  	
 	  	//Drawing histogram of passing and failing probes
 	  	if (what == "IdIso") {
-		  	t->Draw("m_vis>>histPassOld", "pu_weight"*"mcweight"*(cut_eta && cut_pt && cut_flag_idiso_pass));
-		  	t->Draw("m_vis>>histFailOld", "pu_weight"*"mcweight"*(cut_eta && cut_pt && cut_flag_idiso_fail));
+		  	t->Draw("m_vis>>histPassOld", "pu_weight*mcweight" + (cut_eta && cut_pt && cut_flag_idiso_pass));
+		  	t->Draw("m_vis>>histFailOld", "pu_weight*mcweight" + (cut_eta && cut_pt && !cut_flag_idiso_pass));
 		  }else{
-		  	t->Draw("m_vis>>histPassOld", "pu_weight"*"mcweight"*(cut_eta && cut_pt && cut_flag_hlt_pass && cut_flag_idiso_pass));
-		  	t->Draw("m_vis>>histFailOld", "pu_weight"*"mcweight"*(cut_eta && cut_pt && cut_flag_hlt_fail && cut_flag_idiso_pass));
+		  	t->Draw("m_vis>>histPassOld", "pu_weight*mcweight" + (cut_eta && cut_pt && cut_flag_hlt_pass && cut_flag_idiso_pass));
+		  	t->Draw("m_vis>>histFailOld", "pu_weight*mcweight" + (cut_eta && cut_pt && cut_flag_hlt_fail && cut_flag_idiso_pass));
 		  }
 
 	  	int nBinsX = histPassOld->GetNbinsX();
