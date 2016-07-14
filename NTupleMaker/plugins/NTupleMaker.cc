@@ -86,6 +86,7 @@ Int_t NTupleMaker::find_lep(const Int_t nlep, const Float_t px[], const Float_t 
 NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :  
   // data, year, period, skim
   cdata(iConfig.getUntrackedParameter<bool>("IsData", false)),
+  cFastSim(iConfig.getUntrackedParameter<bool>("IsFastSim", false)),
   cYear(iConfig.getUntrackedParameter<unsigned int>("Year")),
   cPeriod(iConfig.getUntrackedParameter<std::string>("Period")),
   cSkim(iConfig.getUntrackedParameter<unsigned int>("Skim")),
@@ -112,6 +113,7 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
   cTriggerProcess(iConfig.getUntrackedParameter<string>("TriggerProcess", "HLT")),
 
   //Flags
+
   cFlags(iConfig.getUntrackedParameter<vector<string> >("Flags")),
   cFlagsProcess(iConfig.getUntrackedParameter<string>("FlagsProcess", "HLT")),
   
@@ -1366,7 +1368,7 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       }
     }
 
-
+if (!cFastSim){
   iEvent.getByLabel(edm::InputTag("TriggerResults", "", cFlagsProcess), Flags);
   assert(Flags.isValid());
   flags_->clear();
@@ -1386,7 +1388,8 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   	}
       }
     }
-  
+ }
+
   if(cbeamspot)
     {
       edm::Handle<BeamSpot> TheBeamSpot;
