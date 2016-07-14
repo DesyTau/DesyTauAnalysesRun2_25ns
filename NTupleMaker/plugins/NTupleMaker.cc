@@ -115,7 +115,7 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
   //Flags
 
   cFlags(iConfig.getUntrackedParameter<vector<string> >("Flags")),
-  cFlagsProcess(iConfig.getUntrackedParameter<string>("FlagsProcess", "HLT")),
+  cFlagsProcesses(iConfig.getUntrackedParameter<vector<string> >("FlagsProcesses")),
   
   // muons
   cMuPtMin(iConfig.getUntrackedParameter<double>("RecMuonPtMin", 10.)),
@@ -258,7 +258,10 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
   consumes<edm::TriggerResults>(edm::InputTag("TriggerResults", "", cTriggerProcess));
   consumes<L1GlobalTriggerReadoutRecord>(edm::InputTag("gtDigis"));
 
-  consumes<edm::TriggerResults>(edm::InputTag("TriggerResults", "", cFlagsProcess));
+  for(std::vector<string>::iterator it = cFlagsProcesses.begin();
+      it != cFlagsProcesses.end(); it++){
+    consumes<edm::TriggerResults>(edm::InputTag("TriggerResults", "", it->data()));
+  }
   
   consumes<GenEventInfoProduct>(edm::InputTag("generator"));
   consumes<vector<PileupSummaryInfo> >(edm::InputTag("slimmedAddPileupInfo"));
@@ -1368,28 +1371,15 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       }
     }
 
-if (!cFastSim){
-  iEvent.getByLabel(edm::InputTag("TriggerResults", "", cFlagsProcess), Flags);
-  assert(Flags.isValid());
-  flags_->clear();
-  const edm::TriggerNames& FlagNames_ = iEvent.triggerNames(*Flags);
-  for(unsigned i = 0 ; i < Flags->size(); i++)
-    {
-      if(!Flags->wasrun(i) )continue;
-      std::string flagName=FlagNames_.triggerName(i);
-      if(cFlags.size() > 0){
-  	for(size_t ip = 0; ip < cFlags.size(); ip++){
-  	  if(flagName.find(cFlags[ip]) != string::npos){
-	    
-  	    flags_->insert(std::pair<string, int>(flagName, Flags->accept(i)));
-	    TString TriggerName(flagName);
-	    //std::cout << flagName << " : " << Flags->accept(i) << std::endl;
-  	  }
-  	}
-      }
+  if (!cFastSim){
+    flags_->clear();
+    for(std::vector<string>::iterator it = cFlagsProcesses.begin();
+	it != cFlagsProcesses.end(); it++){
+      //std::cout<<it->data()<<std::endl;
+      AddFlags(iEvent,"TriggerResults", "", it->data());
     }
- }
-
+  }
+  
   if(cbeamspot)
     {
       edm::Handle<BeamSpot> TheBeamSpot;
@@ -2000,6 +1990,30 @@ bool NTupleMaker::AddSusyInfo(const edm::Event& iEvent) {
 
   return success;
 
+}
+
+bool NTupleMaker::AddFlags(const edm::Event& iEvent, const char* module, const char* label, const char* process) {
+  iEvent.getByLabel(edm::InputTag( module, label, process), Flags);
+  if (!Flags.isValid())
+    return false;
+    
+  const edm::TriggerNames& FlagNames_ = iEvent.triggerNames(*Flags);
+  for(unsigned i = 0 ; i < Flags->size(); i++){
+    if(!Flags->wasrun(i) )continue;
+    std::string flagName=FlagNames_.triggerName(i);
+    if(cFlags.size() > 0){
+      for(size_t ip = 0; ip < cFlags.size(); ip++){
+	if(flagName.find(cFlags[ip]) != string::npos){
+	  
+	  flags_->insert(std::pair<string, int>(flagName, Flags->accept(i)));
+	  TString TriggerName(flagName);
+	  //std::cout << flagName << " : " << Flags->accept(i) << std::endl;
+	}
+      }
+    }
+  }
+
+  return true;
 }
 
 bool NTupleMaker::AddGenHt(const edm::Event& iEvent) {

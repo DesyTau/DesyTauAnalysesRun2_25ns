@@ -258,6 +258,7 @@ class NTupleMaker : public edm::EDAnalyzer{
   unsigned int AddTriggerObjects(const edm::Event& iEvent);
   bool foundCompatibleInnerHits(const reco::HitPattern& hitPatA, const reco::HitPattern& hitPatB);
   bool AddSusyInfo(const edm::Event& iEvent);
+  bool AddFlags(const edm::Event& iEvent, const char* module, const char* label, const char* process);
   
   UInt_t GenParticleInfo(const GenParticle* particle);
   bool GetL1ExtraTriggerMatch(const l1extra::L1JetParticleCollection* l1jets,  const l1extra::L1JetParticleCollection* l1taus, const LeafCandidate& leg2);
@@ -313,7 +314,7 @@ class NTupleMaker : public edm::EDAnalyzer{
   string cTriggerProcess;
   
   vector<string> cFlags;
-  string cFlagsProcess;
+  vector<string> cFlagsProcesses;
   
   double cMuPtMin;
   double cMuEtaMax;
