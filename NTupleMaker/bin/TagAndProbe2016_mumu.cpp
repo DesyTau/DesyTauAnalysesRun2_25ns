@@ -314,6 +314,7 @@ int main(int argc, char * argv[]){
       	TString HLTFilter(analysisTree.run_hltfilters->at(i));
         for(unsigned int i2=0; i2<nhlt_check; ++i2){
           if (HLTFilter==hlt[i2]) nHLT[i2] = i;
+//          if((i2==11) && (nHLT[i2]!=-1)) cout<<"debug "<<hlt[i2]<<": "<<nHLT[i2]<<endl; //OK
         }
       }
 
@@ -450,12 +451,20 @@ int main(int argc, char * argv[]){
           otree->hlt_13_probe = -1;
           otree->hlt_14_probe = -1;
           otree->hlt_15_probe = -1;
+          otree->hlt_16_probe = -1;
+          otree->hlt_17_probe = -1;
+          otree->hlt_18_probe = -1;
+          otree->hlt_19_probe = -1;
+          otree->hlt_20_probe = -1;
 
           
           p_pass_1++;
 
           int *hlt_probe = new int[nhlt_check];
-          for(unsigned int i=0; i<nhlt_check; ++i) {hlt_probe[i] = 0;}
+          for(unsigned int i=0; i<nhlt_check; ++i) {
+            hlt_probe[i] = 0;
+            if(nHLT[i] == -1) hlt_probe[i] = -1;
+          }
 
           for (unsigned int iTr=0; iTr<analysisTree.trigobject_count; ++iTr){
 
@@ -466,12 +475,16 @@ int main(int argc, char * argv[]){
               for(unsigned int i=0; i<nhlt_check; ++i){
                 if(nHLT[i] == -1){
                   hlt_probe[i] = -1;
-                } else if (analysisTree.trigobject_filters[iTr][nHLT[i]]){
-                  hlt_probe[i] = 1;
+                } else{
+                  if (analysisTree.trigobject_filters[iTr][nHLT[i]]){
+                    hlt_probe[i] = 1;
+                  }
                 }
               }
             }
           }
+
+
           for(unsigned int i=0; i<nhlt_check; ++i) {if(hlt_probe[i] == 1) p_pass_hlt[i]++;}
           for(unsigned int i=0; i<nhlt_check; ++i) {
             if((hlt_probe[i] != 1)&&(hlt_probe[i] != 0)) {
@@ -493,6 +506,11 @@ int main(int argc, char * argv[]){
           otree->hlt_13_probe = hlt_probe[12];
           otree->hlt_14_probe = hlt_probe[13];
           otree->hlt_15_probe = hlt_probe[14];
+          otree->hlt_16_probe = hlt_probe[15];
+          otree->hlt_17_probe = hlt_probe[16];
+          otree->hlt_18_probe = hlt_probe[17];
+          otree->hlt_19_probe = hlt_probe[18];
+          otree->hlt_20_probe = hlt_probe[19];
 
           otree->Fill();
         }
