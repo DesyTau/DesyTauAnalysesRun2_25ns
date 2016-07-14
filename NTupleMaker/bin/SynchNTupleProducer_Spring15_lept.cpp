@@ -899,7 +899,7 @@ float abs_Iso (int Index, TString ch, const AC1B * analysisTree, bool isIsoR03){
 //compute the relative isolation for a given lepton labeled by Index in channel ch
 float rel_Iso(int Index, TString ch, const AC1B * analysisTree, bool isIsoR03){
   if(ch=="mt")  return(abs_Iso(Index, ch, analysisTree, isIsoR03) / analysisTree->muon_pt[Index] );
-  else if(ch="et")   return(abs_Iso(Index, ch, analysisTree, isIsoR03) / analysisTree->electron_pt[Index] );
+  else if(ch=="et")   return(abs_Iso(Index, ch, analysisTree, isIsoR03) / analysisTree->electron_pt[Index] );
     else return(-1.);
 }
 

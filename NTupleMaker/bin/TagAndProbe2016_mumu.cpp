@@ -78,7 +78,8 @@ int read_json(std::string filename, lumi_json& json);
 bool isGoodLumi(const std::pair<int, int>& lumi, const lumi_json& json);
 bool isGoodLumi(int run, int lumi, const lumi_json& json);
 float abs_Iso(int Index, TString lep, const AC1B * analysisTree, float dRCone);
-float rel_Iso(int Index, TString lep, const AC1B * analysisTree, float dRCone);//dr cone 0.3 OR 0.4  
+float rel_Iso(int Index, TString lep, const AC1B * analysisTree, float dRCone);//dr cone 0.3 OR 0.4 
+bool isICHEPmed(int Index, const AC1B * analysisTree); 
 
 int main(int argc, char * argv[]){
 
@@ -313,6 +314,7 @@ int main(int argc, char * argv[]){
       	TString HLTFilter(analysisTree.run_hltfilters->at(i));
         for(unsigned int i2=0; i2<nhlt_check; ++i2){
           if (HLTFilter==hlt[i2]) nHLT[i2] = i;
+//          if((i2==11) && (nHLT[i2]!=-1)) cout<<"debug "<<hlt[i2]<<": "<<nHLT[i2]<<endl; //OK
         }
       }
 
@@ -343,7 +345,11 @@ int main(int argc, char * argv[]){
       TLorentzVector tagLV, probeLV, pairLV;
 
       for (it = 0; it<analysisTree.muon_count; it++){
-        bool TagmuonMediumId = analysisTree.muon_isMedium[it]; 
+
+//        bool TagmuonMediumId = analysisTree.muon_isMedium[it]; 
+
+        bool TagmuonMediumId = isICHEPmed(it, &analysisTree);
+
         if (analysisTree.muon_pt[it]<=ptMuonCut) continue;
         if (rel_Iso(it, "m", &analysisTree, dRCone)>=isoMuonCut) continue;
         if (fabs(analysisTree.muon_eta[it])>=etaMuonCut) continue;
@@ -414,7 +420,7 @@ int main(int argc, char * argv[]){
           //id evaluating for the probes
           bool id_probe= false;
 
-          if (analysisTree.muon_isMedium[ip]) {
+          if (isICHEPmed(ip, &analysisTree)) {
             if (analysisTree.muon_dxy[ip]<dxyPassingCut){
               if (analysisTree.muon_dz[ip]<dxyPassingCut){
                 id_probe = true;
@@ -440,12 +446,25 @@ int main(int argc, char * argv[]){
           otree->hlt_8_probe = -1;
           otree->hlt_9_probe = -1;
           otree->hlt_10_probe = -1;
+          otree->hlt_11_probe = -1;
+          otree->hlt_12_probe = -1;
+          otree->hlt_13_probe = -1;
+          otree->hlt_14_probe = -1;
+          otree->hlt_15_probe = -1;
+          otree->hlt_16_probe = -1;
+          otree->hlt_17_probe = -1;
+          otree->hlt_18_probe = -1;
+          otree->hlt_19_probe = -1;
+          otree->hlt_20_probe = -1;
 
           
           p_pass_1++;
 
           int *hlt_probe = new int[nhlt_check];
-          for(unsigned int i=0; i<nhlt_check; ++i) {hlt_probe[i] = 0;}
+          for(unsigned int i=0; i<nhlt_check; ++i) {
+            hlt_probe[i] = 0;
+            if(nHLT[i] == -1) hlt_probe[i] = -1;
+          }
 
           for (unsigned int iTr=0; iTr<analysisTree.trigobject_count; ++iTr){
 
@@ -456,12 +475,16 @@ int main(int argc, char * argv[]){
               for(unsigned int i=0; i<nhlt_check; ++i){
                 if(nHLT[i] == -1){
                   hlt_probe[i] = -1;
-                } else if (analysisTree.trigobject_filters[iTr][nHLT[i]]){
-                  hlt_probe[i] = 1;
+                } else{
+                  if (analysisTree.trigobject_filters[iTr][nHLT[i]]){
+                    hlt_probe[i] = 1;
+                  }
                 }
               }
             }
           }
+
+
           for(unsigned int i=0; i<nhlt_check; ++i) {if(hlt_probe[i] == 1) p_pass_hlt[i]++;}
           for(unsigned int i=0; i<nhlt_check; ++i) {
             if((hlt_probe[i] != 1)&&(hlt_probe[i] != 0)) {
@@ -474,10 +497,20 @@ int main(int argc, char * argv[]){
           otree->hlt_4_probe = hlt_probe[3];
           otree->hlt_5_probe = hlt_probe[4];
           otree->hlt_6_probe = hlt_probe[5];
-          otree->hlt_7_probe = hlt_probe[5];
-          otree->hlt_8_probe = hlt_probe[5];
-          otree->hlt_9_probe = hlt_probe[5];
-          otree->hlt_10_probe = hlt_probe[5];
+          otree->hlt_7_probe = hlt_probe[6];
+          otree->hlt_8_probe = hlt_probe[7];
+          otree->hlt_9_probe = hlt_probe[8];
+          otree->hlt_10_probe = hlt_probe[9];
+          otree->hlt_11_probe = hlt_probe[10];
+          otree->hlt_12_probe = hlt_probe[11];
+          otree->hlt_13_probe = hlt_probe[12];
+          otree->hlt_14_probe = hlt_probe[13];
+          otree->hlt_15_probe = hlt_probe[14];
+          otree->hlt_16_probe = hlt_probe[15];
+          otree->hlt_17_probe = hlt_probe[16];
+          otree->hlt_18_probe = hlt_probe[17];
+          otree->hlt_19_probe = hlt_probe[18];
+          otree->hlt_20_probe = hlt_probe[19];
 
           otree->Fill();
         }
@@ -507,7 +540,7 @@ int main(int argc, char * argv[]){
 //compute the relative isolation for a given lepton labeled by Index in channel ch with dR 0.3 or 0.4
 float rel_Iso(int Index, TString lep, const AC1B * analysisTree, float dRCone){
   if(lep=="m")  return(abs_Iso(Index, lep, analysisTree, dRCone) / analysisTree->muon_pt[Index] );
-  else if(lep="e")   return(abs_Iso(Index, lep, analysisTree, dRCone) / analysisTree->electron_pt[Index] );
+  else if(lep=="e")   return(abs_Iso(Index, lep, analysisTree, dRCone) / analysisTree->electron_pt[Index] );
     else return(-1.);
 }
 
@@ -548,6 +581,16 @@ float abs_Iso (int Index, TString lep, const AC1B * analysisTree, float dRCone){
   float neutralIso = neutralHadIso + photonIso -0.5*puIso;
   neutralIso = TMath::Max(float(0), neutralIso);
   return(chargedHadIso + neutralIso);
+}
+
+bool isICHEPmed(int Index, const AC1B * analysisTree) {
+        bool goodGlob = analysisTree->muon_isGlobal[Index] && analysisTree->muon_normChi2[Index] < 3 && analysisTree->muon_combQ_chi2LocalPosition[Index] < 12
+                                   && analysisTree->muon_combQ_trkKink[Index] < 20;
+
+        bool isICHEPmedium  = analysisTree->muon_isLoose[Index] &&
+                                          analysisTree->muon_validFraction[Index] >0.49 &&
+                                          analysisTree->muon_segmentComp[Index] > (goodGlob ? 0.303 : 0.451);
+        return isICHEPmedium;
 }
 
 

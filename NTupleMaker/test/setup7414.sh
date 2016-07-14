@@ -2,8 +2,8 @@ export USERNAME=$USER
 
 export CMSSW_GIT_REFERENCE=/nfs/dust/cms/user/${USERNAME}/.cmsgit-cache
 
-cmsrel CMSSW_7_4_14
-cd CMSSW_7_4_14/src
+cmsrel CMSSW_8_0_12
+cd CMSSW_8_0_12/src
 cmsenv
 
 git cms-init

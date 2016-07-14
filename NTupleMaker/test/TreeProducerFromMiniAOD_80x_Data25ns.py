@@ -39,7 +39,7 @@ process.options = cms.untracked.PSet(
 
 # How many events to process
 process.maxEvents = cms.untracked.PSet( 
-   input = cms.untracked.int32(50000)
+   input = cms.untracked.int32(1000)
 )
 
 ### External JECs =====================================================================================================
@@ -426,18 +426,18 @@ HLTriggerPaths = cms.untracked.vstring(
 ),
 TriggerProcess = cms.untracked.string("HLT"),
 Flags = cms.untracked.vstring(
-#  'Flag_HBHENoiseFilter',
-#  'Flag_HBHENoiseIsoFilter',
-#  'Flag_CSCTightHalo2015Filter',
-#  'Flag_EcalDeadCellTriggerPrimitiveFilter',
-#  'Flag_goodVertices',
-#  'Flag_eeBadScFilter',
-#  'Flag_chargedHadronTrackResolutionFilter',
-#  'Flag_muonBadTrackFilter'
-   'Flag_METFilters'
-#   'allMetFilterPaths'
+  'Flag_HBHENoiseFilter',
+  'Flag_HBHENoiseIsoFilter',
+  'Flag_CSCTightHalo2015Filter',
+  'Flag_EcalDeadCellTriggerPrimitiveFilter',
+  'Flag_goodVertices',
+  'Flag_eeBadScFilter',
+  'Flag_chargedHadronTrackResolutionFilter',
+  'Flag_muonBadTrackFilter',
+  'Flag_METFilters',
+  'allMetFilterPaths'
 ),
-FlagsProcess = cms.untracked.string("RECO"),
+FlagsProcesses = cms.untracked.vstring("RECO","PAT"),
 # tracks
 RecTrackPtMin = cms.untracked.double(0.5),
 RecTrackEtaMax = cms.untracked.double(2.4),
@@ -664,11 +664,11 @@ process.p = cms.Path(
 )
 
 process.TFileService = cms.Service("TFileService",
-                                   fileName = cms.string("output.root")
+                                   fileName = cms.string("output_DATA.root")
                                  )
 
 process.output = cms.OutputModule("PoolOutputModule",
-                                  fileName = cms.untracked.string('output.root'),
+                                  fileName = cms.untracked.string('output_particles_DATA.root'),
                                   outputCommands = cms.untracked.vstring(
                                     'keep *_slimmedMETs_*_*',
 				    'keep *_MVAMET_*_*',

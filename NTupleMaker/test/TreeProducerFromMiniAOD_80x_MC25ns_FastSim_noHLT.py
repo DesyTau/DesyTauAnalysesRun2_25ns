@@ -360,7 +360,7 @@ RecTrackDxyMax = cms.untracked.double(1.0),
 RecTrackDzMax = cms.untracked.double(1.0),
 RecTrackNum = cms.untracked.int32(0),
 # muons
-RecMuonPtMin = cms.untracked.double(50.),
+RecMuonPtMin = cms.untracked.double(5.0),
 RecMuonEtaMax = cms.untracked.double(2.5),
 RecMuonHLTriggerMatching = cms.untracked.vstring(
 'HLT_IsoMu20_v.*:hltL3crIsoL1sMu18L1f0L2f10QL3f20QL3trkIsoFiltered0p09'
@@ -427,11 +427,11 @@ process.p = cms.Path(
 )
 
 process.TFileService = cms.Service("TFileService",
-                                   fileName = cms.string("output.root")
+                                   fileName = cms.string("output_MC.root")
                                  )
 
 process.output = cms.OutputModule("PoolOutputModule",
-                                  fileName = cms.untracked.string('output.root'),
+                                  fileName = cms.untracked.string('output_MC.root'),
                                   outputCommands = cms.untracked.vstring(
                                     'keep *_slimmedMETs_*_*',
 				    'keep *_MVAMET_*_*',
