@@ -196,7 +196,7 @@ void TP_eff_mu(TString fileName = "SingleMuon_Run2016_TP", // RooT file with TP 
   //Definition of the output directory names and creation of it
 	TString dir_name = "Muon_";
 	dir_name += what;
-	dir_name += Form("%.2f", iso);
+	dir_name += Form("_IsoLt%.2f", iso);
 	if (!isData) dir_name += "_MC";
 	dir_name += "_eff";
 	gSystem->mkdir(dir_name, kTRUE);
