@@ -81,6 +81,8 @@ bool extra_muon_veto(int leptonIndex, TString ch, const Config *cfg, const AC1B 
 void fillMET(TString ch, int leptonIndex, int tauIndex, const AC1B * analysisTree, Spring15Tree *otree);
 void mt_calculation(Spring15Tree *otree);
 void counting_jets(const AC1B *analysisTree, Spring15Tree *otree, const Config *cfg);
+bool isICHEPmuon(const AC1B *analysisTree, int Index);
+bool isICHEPmuon(AC1B analysisTree, int Index);
 
 
 
@@ -95,6 +97,7 @@ int main(int argc, char * argv[]){
   using namespace std;
 
   gErrorIgnoreLevel = kFatal;
+  gDebug = 2;
 
   string cmsswBase = (getenv ("CMSSW_BASE"));
 
@@ -489,7 +492,8 @@ int main(int argc, char * argv[]){
       if(ch == "mt"){
         for (unsigned int im = 0; im<analysisTree.muon_count; ++im) {
 
-          bool muonMediumId = analysisTree.muon_isMedium[im];
+          //bool muonMediumId = analysisTree.muon_isMedium[im];
+		  bool muonMediumId = isICHEPmuon(&analysisTree, im);
   
           if (analysisTree.muon_pt[im]<=ptLeptonLowCut) continue;
           if (fabs(analysisTree.muon_eta[im])>=etaLeptonCut) continue;
@@ -862,6 +866,20 @@ void fill_weight(const AC1B * analysisTree, Spring15Tree *otree, PileUp *PUoffic
   otree->gen_noutgoing = analysisTree->genparticles_noutgoing;
 }
 
+
+//compute medium ID adjusted for ICHEP
+bool isICHEPmuon(const AC1B * analysisTree, int Index) {
+        bool goodGlob = analysisTree->muon_isGlobal[Index] && analysisTree->muon_normChi2[Index] < 3 && analysisTree->muon_combQ_chi2LocalPosition[Index] < 12
+                                   && analysisTree->muon_combQ_trkKink[Index] < 20;
+
+        bool isICHEPmedium  = analysisTree->muon_isLoose[Index] &&
+                                          analysisTree->muon_validFraction[Index] >0.49 &&
+                                          analysisTree->muon_segmentComp[Index] > (goodGlob ? 0.303 : 0.451);
+        return isICHEPmedium;
+}
+
+
+
 //compute the absolute isolation for a given lepton labeled by Index in channel ch
 float abs_Iso (int Index, TString ch, const AC1B * analysisTree, bool isIsoR03){
   float neutralHadIso, photonIso, chargedHadIso, puIso;
@@ -1022,7 +1040,8 @@ bool dilepton_veto_mt(const Config *cfg,const  AC1B *analysisTree){
 
 		if(relIsoMu >= cfg->get<float>("isoDiMuonVeto")) continue;
 		
-		bool passedVetoId =  analysisTree->muon_isMedium[im]; 
+		//bool passedVetoId =  analysisTree->muon_isMedium[im]; 
+		bool passedVetoId = isICHEPmuon(analysisTree, im);
 		if (!passedVetoId && cfg->get<bool>("applyDiMuonVetoId")) continue;
 		
 		for (unsigned int je = im+1; je<analysisTree->muon_count; ++je) {
@@ -1039,7 +1058,8 @@ bool dilepton_veto_mt(const Config *cfg,const  AC1B *analysisTree){
 
 		  if(relIsoMu >= cfg->get<float>("isoDiMuonVeto")) continue;	
 
-		  passedVetoId =  analysisTree->muon_isMedium[je];
+		  //passedVetoId =  analysisTree->muon_isMedium[je];
+		  passedVetoId =  isICHEPmuon(analysisTree, je);
 		  if (!passedVetoId && cfg->get<bool>("applyDiMuonVetoId")) continue;
 		  
 		  float dr = deltaR(analysisTree->muon_eta[im],analysisTree->muon_phi[im],
@@ -1134,8 +1154,8 @@ bool extra_muon_veto(int leptonIndex, TString ch, const Config *cfg, const AC1B 
 		if (fabs(analysisTree->muon_eta[im])>cfg->get<float>("etaVetoMuonCut")) continue;
 		if (fabs(analysisTree->muon_dxy[im])>cfg->get<float>("dxyVetoMuonCut")) continue;
 		if (fabs(analysisTree->muon_dz[im])>cfg->get<float>("dzVetoMuonCut")) continue;
-		if (cfg->get<bool>("applyVetoMuonId") && !analysisTree->muon_isMedium[im]) continue;
-
+		//if (cfg->get<bool>("applyVetoMuonId") && !analysisTree->muon_isMedium[im]) continue;
+		if (cfg->get<bool>("applyVetoMuonId") && !(isICHEPmuon(analysisTree,im)) ) continue;
 		float relIsoMu = rel_Iso(im, ch, analysisTree, cfg->get<bool>("IsIsoR03"));
 		if (relIsoMu>cfg->get<float>("isoVetoMuonCut")) continue;
 
