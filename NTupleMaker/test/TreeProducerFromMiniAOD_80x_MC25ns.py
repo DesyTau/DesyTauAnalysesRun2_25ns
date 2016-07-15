@@ -348,7 +348,7 @@ Flags = cms.untracked.vstring(
   'Flag_METFilters',
   'allMetFilterPaths'
 ),
-FlagsProcess = cms.untracked.string("RECO"),
+FlagsProcesses = cms.untracked.vstring("RECO","PAT"),
 # tracks
 RecTrackPtMin = cms.untracked.double(0.5),
 RecTrackEtaMax = cms.untracked.double(2.4),
