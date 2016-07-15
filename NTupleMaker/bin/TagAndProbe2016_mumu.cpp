@@ -291,18 +291,17 @@ int main(int argc, char * argv[]){
       unsigned int nIsoLeg = 0;
       bool checkIsoLeg = false;
       if(isData || ApplyTrigger){  
-      
-            for (unsigned int i=0; i<nfilters; ++i) {
-              TString HLTFilter(analysisTree.run_hltfilters->at(i));
-              if (HLTFilter==isoLeg) {
-                nIsoLeg = i;
-                checkIsoLeg = true;
-              }
-            }
-            if (!checkIsoLeg) {
-              std::cout << "HLT filter " << isoLeg << " not found" << std::endl;
-              exit(-1);
-            }
+        for (unsigned int i=0; i<nfilters; ++i) {
+          TString HLTFilter(analysisTree.run_hltfilters->at(i));
+          if (HLTFilter==isoLeg) {
+            nIsoLeg = i;
+            checkIsoLeg = true;
+          }
+        }
+        if (!checkIsoLeg) {
+          std::cout << "HLT filter " << isoLeg << " not found" << std::endl;
+          exit(-1);
+        }
       }
 
       //hlt filters to be evaluated indices finding
@@ -359,19 +358,25 @@ int main(int argc, char * argv[]){
 
         //trigger match
         bool isSingleLepTrig = false;
+
         
-        if(isData || ApplyTrigger){  
+        if(isData || ApplyTrigger){
+          if(debug) cout<<"analysisTree.trigobject_count: "<<analysisTree.trigobject_count<<endl;
           for (unsigned int iT=0; iT<analysisTree.trigobject_count; ++iT) {
             float dRtrig = deltaR(analysisTree.muon_eta[it], analysisTree.muon_phi[it], 
                                   analysisTree.trigobject_eta[iT],analysisTree.trigobject_phi[iT]);
   
             if (dRtrig < deltaRTrigMatch){
+              if(debug) cout<<"[iT][nIsoLeg] = "<<iT<<" - "<<nIsoLeg<<" = "<<analysisTree.trigobject_filters[iT][nIsoLeg]<<endl;
               if (analysisTree.trigobject_filters[iT][nIsoLeg] && ( isData || analysisTree.trigobject_pt[iT] > ptTrigObjCut)) // Ele23 Leg
                 isSingleLepTrig = true;
             }
           }
           
-          if (!isSingleLepTrig) continue;
+          if (!isSingleLepTrig) {
+            if(debug) {cout<<"debug: tag trigger match failed"<<endl;}
+            continue;}
+          if(debug) {cout<<"debug: tag trigger match OK"<<endl;}
         }
 
         
