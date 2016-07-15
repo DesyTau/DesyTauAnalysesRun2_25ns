@@ -325,14 +325,17 @@ void SF_mu(TString fileName_Data = "SingleMuon__Run2016-PromptReco-v2.root", //d
 
 	  	TH1F * histPassOld = new TH1F("histPassOld","",250,50,300);
 	  	TH1F * histFailOld = new TH1F("histFailOld","",250,50,300);
+
 	  	
+	  	//Drawing histogram of passing and failing probes
 	  	if (what == "IdIso") {
-		  	t2->Draw("m_vis>>histPassOld", "pu_weight*mcweight" + (cut_eta && cut_pt && cut_flag_idiso_pass));
-		  	t2->Draw("m_vis>>histFailOld", "pu_weight*mcweight" + (cut_eta && cut_pt && !cut_flag_idiso_pass));
+		  	t1->Draw("m_vis>>histPassOld", "pu_weight*mcweight" + (cut_eta && cut_pt && cut_flag_idiso_pass));
+		  	t1->Draw("m_vis>>histFailOld", "pu_weight*mcweight" + (cut_eta && cut_pt && !cut_flag_idiso_pass));
 		  }else{
-		  	t2->Draw("m_vis>>histPassOld", "pu_weight*mcweight" + (cut_eta && cut_pt && cut_flag_hlt_pass && cut_flag_idiso_pass));
-		  	t2->Draw("m_vis>>histFailOld", "pu_weight*mcweight" + (cut_eta && cut_pt && cut_flag_hlt_fail && cut_flag_idiso_pass));
+		  	t1->Draw("m_vis>>histPassOld", "pu_weight*mcweight" + (cut_eta && cut_pt && cut_flag_hlt_pass && cut_flag_idiso_pass));
+		  	t1->Draw("m_vis>>histFailOld", "pu_weight*mcweight" + (cut_eta && cut_pt && cut_flag_hlt_fail && cut_flag_idiso_pass));
 		  }
+
 
 	  	int nBinsX = histPassOld->GetNbinsX();
 
