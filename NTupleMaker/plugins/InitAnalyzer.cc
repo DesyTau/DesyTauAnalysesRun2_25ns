@@ -69,6 +69,7 @@ class InitAnalyzer : public edm::EDAnalyzer {
   TH1D*  nPU_NumInteractionsBXp1;
 
   bool cdata;
+  bool cFastSim;
   bool cgen;
   edm::EDGetTokenT<std::vector<PileupSummaryInfo> > PUInfoToken_;
   edm::EDGetTokenT<GenEventInfoProduct > GenToken_;
@@ -94,6 +95,7 @@ class InitAnalyzer : public edm::EDAnalyzer {
 //
 InitAnalyzer::InitAnalyzer(const edm::ParameterSet& iConfig) :
   cdata(iConfig.getUntrackedParameter<bool>("IsData", false)),
+  cFastSim(iConfig.getUntrackedParameter<bool>("IsFastSim", false)),
   cgen(iConfig.getUntrackedParameter<bool>("GenParticles", false)),
   PUInfoToken_( consumes< std::vector<PileupSummaryInfo> >(edm::InputTag("slimmedAddPileupInfo"))),
   GenToken_( consumes<GenEventInfoProduct>(edm::InputTag("generator")))

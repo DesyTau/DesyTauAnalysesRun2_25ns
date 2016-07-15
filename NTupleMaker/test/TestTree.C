@@ -4,7 +4,7 @@
 void TestTree(int numberOfEvents = 10) {
 
  // //  TFile * file = new TFile("/nfs/dust/cms/user/anayak/CMS/Ntuple_HttAnalysis/Sync2015/HiggsSM/GluGluToHToTauTau_M-125_MC_TauTau_v1/ntuple_GGF125_13TeV_Phys14_v1.root");
-  TFile * file = new TFile("/nfs/dust/cms/user/rasp/ntuples/Run2015B/SingleElectron_Run2015B/SingleE.root");
+  TFile * file = new TFile("output.root");
 
   TTree * tree = (TTree*)file->Get("makeroottree/AC1B");
 

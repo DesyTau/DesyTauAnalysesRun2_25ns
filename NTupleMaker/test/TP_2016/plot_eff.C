@@ -1,7 +1,7 @@
 #include <TH1.h>
 
-void plot_eff(TString fileName1 = "SingleMuon_Run2016B_TP_Muon_IdIso_eff.root",
-							TString fileName2 = "DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_0_mumu_TagProbe_Muon_IdIso_eff.root"
+void plot_eff(TString fileName1 = "SingleMuon__Run2016-PromptReco-v2_Muon_IdIso_IsoLt0.15_eff_Spring16.root",
+							TString fileName2 = "DYJetsToLL_TP_Muon_Muon_IdIso_IsoLt0.15_eff_Spring16.root"
 	) {
 	TFile * file1 = new TFile(fileName1);
 	TFile * file2 = new TFile(fileName2);

@@ -45,6 +45,11 @@ public :
   Int_t          hlt_13_probe;
   Int_t          hlt_14_probe;
   Int_t          hlt_15_probe;
+  Int_t          hlt_16_probe;
+  Int_t          hlt_17_probe;
+  Int_t          hlt_18_probe;
+  Int_t          hlt_19_probe;
+  Int_t          hlt_20_probe;
 
   Float_t        mcweight;
   Float_t        pu_weight;
@@ -83,6 +88,11 @@ public :
   TBranch          *b_hlt_13_probe;
   TBranch          *b_hlt_14_probe;
   TBranch          *b_hlt_15_probe;
+  TBranch          *b_hlt_16_probe;
+  TBranch          *b_hlt_17_probe;
+  TBranch          *b_hlt_18_probe;
+  TBranch          *b_hlt_19_probe;
+  TBranch          *b_hlt_20_probe;
 
   TBranch          *b_mcweight;
   TBranch          *b_pu_weight;
