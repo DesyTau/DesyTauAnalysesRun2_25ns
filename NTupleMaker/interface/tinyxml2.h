@@ -1830,6 +1830,7 @@ public:
 
     /// Add a text node.
     void PushText( const char* text, bool cdata=false );
+    void PushText( const char* text, bool cFastSim=false );
     /// Add a text node from an integer.
     void PushText( int value );
     /// Add a text node from an unsigned.
