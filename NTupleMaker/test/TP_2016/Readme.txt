@@ -90,36 +90,35 @@ EXTRA
 	Arguments:
 		-root file name to be used (without the extension)
 		-name of the efficiency to be extracted ("IdIso" or "hlt_1", "hlt_2" ....)
-		-Isolation cut to be evaluated/used (normally 0.1 or 0.15)
+		-Isolation cut to be evaluated/used
 
 	More informations in the code for muons (the one for electrons is nearly identical and is
 	not commented).
 
 	Example of use: 
-		root -l -b -q ' TP_eff_mu.C("SingleMuon_Run2016B_TP", "IdIso", 0.1)'
+		root -l -b -q ' TP_eff_mu.C("SingleMuon_Run2016B_TP", "IdIso", 0.15)'
 
 2.2 SF_mu.C
 	SF_e.C
 	
-	Same as 2.1 but these macros are meant to be used on Data and MC otree at the same time to produce a scale factor root file with both Data and MC efficiencies. This code is not commented
-	but it's very similar to 2.1.
+	Same as 2.1 but these macros are meant to be used on Data and MC otree at the same time to produce a scale factor root file with both Data and MC efficiencies. 
+	This code is not commented but it's very similar to 2.1.
 
 	Arguments:
-		-Data root file name to be used (without the extension)
-		-MC root file name to be used (without the extension)
+		-Data root file name to be used (with the extension)
+		-MC root file name to be used (with the extension)
 		-name of the efficiency to be extracted (only "IdIso" at the moment)
-		-Isolation cut to be evaluated/used (normally 0.1 or 0.15)
+		-Isolation cut to be evaluated/used
 
 	Example of use:
-		root -l -b -q ' SF_mu.C("SingleMuon_Run2016B_TP", "DYJetsToLL_TP_mu", IdIso", 0.1)'
+		root -l -b -q ' SF_mu.C("SingleMuon_Run2016B_TP", "DYJetsToLL_TP_mu", IdIso", 0.15)'
 
 3. FitPassAndFail.C
 
-	This plotting tool (written by Alexei Raspereza) performs the actual fits on the Z peak and compute the number 
-	of passing and failing probes. Fitting intervals and the functions to be used are hard coded but some options 
-	are passed by arguments. See the code and 2.x.x for more informations. This tool is not used standalone, and it's integrated as a function in 2.x.x codes. 
-	However if one want to change (or, better, improve) the fitting procedures (intervals, functions or other things) 
-	this is the code that has to be modified. 
+	This plotting tool (written by Alexei Raspereza) performs the actual fits on the Z peak and compute the number of passing and failing probes. 
+	Fitting intervals and the functions to be used are hard coded but some options are passed by arguments. 
+	See the code and 2.x.x for more informations on the passing parametes. This tool is not used standalone, and it's integrated as a function in 2.x.x codes. 
+	However if one want to change (or, better, improve) the fitting procedures (intervals, functions or other things) this is the code that has to be modified. 
 
 4. plot_eff.C
 
