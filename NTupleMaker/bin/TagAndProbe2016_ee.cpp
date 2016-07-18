@@ -556,13 +556,13 @@ float abs_Iso (int Index, TString lep, const AC1B * analysisTree, float dRiso){
     photonIso =     analysisTree->muon_photonIso[Index];
     chargedHadIso = analysisTree->muon_chargedHadIso[Index];
     puIso =         analysisTree->muon_puIso[Index];
-    if (dRiso == 0.3) {
+    if (dRiso > 0.25) {
       neutralHadIso =     analysisTree->muon_r03_sumNeutralHadronEt[Index];
       photonIso =         analysisTree->muon_r03_sumPhotonEt[Index];
       chargedHadIso =     analysisTree->muon_r03_sumChargedHadronPt[Index];
       puIso =             analysisTree->muon_r03_sumPUPt[Index];
     }
-    if (dRiso == 0.4) {
+    if (dRiso > 0.35) {
       neutralHadIso =     analysisTree->muon_r04_sumNeutralHadronEt[Index];
       photonIso =         analysisTree->muon_r04_sumPhotonEt[Index];
       chargedHadIso =     analysisTree->muon_r04_sumChargedHadronPt[Index];
@@ -574,7 +574,7 @@ float abs_Iso (int Index, TString lep, const AC1B * analysisTree, float dRiso){
     photonIso =     analysisTree->electron_photonIso[Index];
     chargedHadIso = analysisTree->electron_chargedHadIso[Index];
     puIso =         analysisTree->electron_puIso[Index];
-    if (dRiso == 0.3) {
+    if (dRiso > 0.25) {
       neutralHadIso =     analysisTree->electron_r03_sumNeutralHadronEt[Index];
       photonIso =         analysisTree->electron_r03_sumPhotonEt[Index];
       chargedHadIso =     analysisTree->electron_r03_sumChargedHadronPt[Index];
