@@ -178,15 +178,9 @@ int main(int argc, char * argv[]){
   else {if(ApplyTrigger) isoLeg = cfg.get<string>("isoLegMC");}
 
   const float ptTrigObjCut  = cfg.get<float>("ptTrigObjCut");
-  
-  // vertex cuts
-  const float ndofVertexCut  = cfg.get<float>("NdofVertexCut");   
-  const float zVertexCut     = cfg.get<float>("ZVertexCut");
-  const float dVertexCut     = cfg.get<float>("DVertexCut");
 
   // tau cuts
   const float ptTauLowCut    = cfg.get<float>("ptTauLowCut");
-  const float ptTauHighCut   = cfg.get<float>("ptTauHighCut");  
   const float etaTauCut      = cfg.get<float>("etaTauCut");
   const float dzTauCut        = cfg.get<float>("dzTauCut");
   const bool applyTauId      = cfg.get<bool>("ApplyTauId");
@@ -216,8 +210,7 @@ int main(int argc, char * argv[]){
   const float etaLeptonCut     = cfg.get<float>("eta"+lep+"Cut");
   const float dxyLeptonCut     = cfg.get<float>("dxy"+lep+"Cut");
   const float dzLeptonCut      = cfg.get<float>("dz"+lep+"Cut");
-  const float isoLeptonLowCut  = cfg.get<float>("iso"+lep+"LowCut");
-  const float isoLeptonHighCut = cfg.get<float>("iso"+lep+"HighCut");
+
   const bool  applyLeptonId    = cfg.get<bool>("Apply"+lep+"Id");
 
   //dilepton veto
@@ -491,7 +484,7 @@ int main(int argc, char * argv[]){
         for (unsigned int im = 0; im<analysisTree.muon_count; ++im) {
 
 //          bool muonMediumId = analysisTree.muon_isMedium[im];
-          bool muonMediumId = isICHEPmedium(im, &analysisTree);
+          bool muonMediumId = isICHEPmed(im, &analysisTree);
   
           if (analysisTree.muon_pt[im]<=ptLeptonLowCut) continue;
           if (fabs(analysisTree.muon_eta[im])>=etaLeptonCut) continue;
@@ -560,7 +553,6 @@ int main(int argc, char * argv[]){
           if (dR<dRleptonsCut) continue;
 
           // kinematic match
-          //std::cout<<lep_pt<<"   "<<ptLeptonHighCut<<endl;
           if (lep_pt<=ptLeptonHighCut) continue;
           
           // change pair
@@ -1040,7 +1032,7 @@ bool dilepton_veto_mt(const Config *cfg,const  AC1B *analysisTree){
 		if(relIsoMu >= cfg->get<float>("isoDiMuonVeto")) continue;
 		
 		//bool passedVetoId =  analysisTree->muon_isMedium[im]; 
-    bool passedVetoId = isICHEPmedium(im, analysisTree);
+    bool passedVetoId = isICHEPmed(im, analysisTree);
 		if (!passedVetoId && cfg->get<bool>("applyDiMuonVetoId")) continue;
 		
 		for (unsigned int je = im+1; je<analysisTree->muon_count; ++je) {
@@ -1058,7 +1050,7 @@ bool dilepton_veto_mt(const Config *cfg,const  AC1B *analysisTree){
 		  if(relIsoMu >= cfg->get<float>("isoDiMuonVeto")) continue;	
 
 		  //passedVetoId =  analysisTree->muon_isMedium[je];
-      passedVetoId = isICHEPmedium(im, analysisTree);
+      passedVetoId = isICHEPmed(je, analysisTree);
 
 		  if (!passedVetoId && cfg->get<bool>("applyDiMuonVetoId")) continue;
 		  
@@ -1155,7 +1147,7 @@ bool extra_muon_veto(int leptonIndex, TString ch, const Config *cfg, const AC1B 
 		if (fabs(analysisTree->muon_dxy[im])>cfg->get<float>("dxyVetoMuonCut")) continue;
 		if (fabs(analysisTree->muon_dz[im])>cfg->get<float>("dzVetoMuonCut")) continue;
 		//if (cfg->get<bool>("applyVetoMuonId") && !analysisTree->muon_isMedium[im]) continue;
-    if (cfg->get<bool>("applyVetoMuonId") && !isICHEPmedium(im, analysisTree)) continue;
+    if (cfg->get<bool>("applyVetoMuonId") && !(isICHEPmed(im, analysisTree))) continue;
 
 		float relIsoMu = rel_Iso(im, ch, analysisTree, cfg->get<float>("dRiso"));
 		if (relIsoMu>cfg->get<float>("isoVetoMuonCut")) continue;
