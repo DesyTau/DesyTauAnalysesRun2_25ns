@@ -32,7 +32,7 @@ CONFIGURATION FILES
 	b.2.2 TagAndProbe_e_MC.conf 	[config file for electrons - MC]					
 
 EXTRA
-	c.1 plot_eff.C 	[plotting tool for scale factors]
+	c.1 plotSF.C 	[plotting tool for scale factors]
 
 
 
@@ -122,4 +122,4 @@ EXTRA
 
 4. plot_eff.C
 
-	A simple plotting tool for scale factors, more informations in the code.
+	A simple plotting tool for scale factors.
