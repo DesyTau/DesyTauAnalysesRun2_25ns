@@ -79,8 +79,8 @@ struct compare_lumi { //accepts two pairs, return 1 if left.first < right.first 
 int read_json(std::string filename, lumi_json& json);
 bool isGoodLumi(const std::pair<int, int>& lumi, const lumi_json& json);
 bool isGoodLumi(int run, int lumi, const lumi_json& json);
-float abs_Iso(int Index, TString lep, const AC1B * analysisTree, float dRCone);
-float rel_Iso(int Index, TString lep, const AC1B * analysisTree, float dRCone); //dr cone 0.3 OR 0.4 
+float abs_Iso(int Index, TString lep, const AC1B * analysisTree, float dRiso);
+float rel_Iso(int Index, TString lep, const AC1B * analysisTree, float dRiso); //dr cone 0.3 OR 0.4 
 
 int main(int argc, char * argv[]){
 
@@ -121,7 +121,7 @@ int main(int argc, char * argv[]){
   const float etaElectronCut = cfg.get<float>("etaElectronCut");
   const float dxyElectronCut = cfg.get<float>("dxyElectronCut");
   const float dzElectronCut = cfg.get<float>("dzElectronCut");
-  const float dRCone = cfg.get<float>("dRCone");
+  const float dRiso = cfg.get<float>("dRiso");
 
 
   const float massCut = cfg.get<float>("massCut");
@@ -360,7 +360,7 @@ int main(int argc, char * argv[]){
         if (fabs(analysisTree.electron_dxy[it])>=dxyElectronCut) continue;
         if (fabs(analysisTree.electron_dz[it])>=dzElectronCut) continue;
 
-        if (rel_Iso(it, "e", &analysisTree, dRCone)>=isoElectronCut) continue;
+        if (rel_Iso(it, "e", &analysisTree, dRiso)>=isoElectronCut) continue;
         if (!electronMvaId) continue;
         if (analysisTree.electron_nmissinginnerhits[it]>1) continue;
         if (!analysisTree.electron_pass_conversion[it]) continue;
@@ -440,7 +440,7 @@ int main(int argc, char * argv[]){
             }
           }
 
-          float iso_probe = rel_Iso(ip, "e", &analysisTree, dRCone);
+          float iso_probe = rel_Iso(ip, "e", &analysisTree, dRiso);
 
           otree->id_probe = id_probe;
           otree->iso_probe = iso_probe;
@@ -542,13 +542,13 @@ int main(int argc, char * argv[]){
 //////////////FUNCTION DEFINITION//////////////
 ///////////////////////////////////////////////
 
-float rel_Iso(int Index, TString lep, const AC1B * analysisTree, float dRCone){
-  if(lep=="m")  return(abs_Iso(Index, lep, analysisTree, dRCone) / analysisTree->muon_pt[Index] );
-  else if(lep=="e")   return(abs_Iso(Index, lep, analysisTree, dRCone) / analysisTree->electron_pt[Index] );
+float rel_Iso(int Index, TString lep, const AC1B * analysisTree, float dRiso){
+  if(lep=="m")  return(abs_Iso(Index, lep, analysisTree, dRiso) / analysisTree->muon_pt[Index] );
+  else if(lep=="e")   return(abs_Iso(Index, lep, analysisTree, dRiso) / analysisTree->electron_pt[Index] );
     else return(-1.);
 }
 
-float abs_Iso (int Index, TString lep, const AC1B * analysisTree, float dRCone){
+float abs_Iso (int Index, TString lep, const AC1B * analysisTree, float dRiso){
   float neutralHadIso, photonIso, chargedHadIso, puIso;
 
   if(lep=="m"){
@@ -556,13 +556,13 @@ float abs_Iso (int Index, TString lep, const AC1B * analysisTree, float dRCone){
     photonIso =     analysisTree->muon_photonIso[Index];
     chargedHadIso = analysisTree->muon_chargedHadIso[Index];
     puIso =         analysisTree->muon_puIso[Index];
-    if (dRCone == 0.3) {
+    if (dRiso > 0.25) {
       neutralHadIso =     analysisTree->muon_r03_sumNeutralHadronEt[Index];
       photonIso =         analysisTree->muon_r03_sumPhotonEt[Index];
       chargedHadIso =     analysisTree->muon_r03_sumChargedHadronPt[Index];
       puIso =             analysisTree->muon_r03_sumPUPt[Index];
     }
-    if (dRCone == 0.4) {
+    if (dRiso > 0.35) {
       neutralHadIso =     analysisTree->muon_r04_sumNeutralHadronEt[Index];
       photonIso =         analysisTree->muon_r04_sumPhotonEt[Index];
       chargedHadIso =     analysisTree->muon_r04_sumChargedHadronPt[Index];
@@ -574,7 +574,7 @@ float abs_Iso (int Index, TString lep, const AC1B * analysisTree, float dRCone){
     photonIso =     analysisTree->electron_photonIso[Index];
     chargedHadIso = analysisTree->electron_chargedHadIso[Index];
     puIso =         analysisTree->electron_puIso[Index];
-    if (dRCone == 0.3) {
+    if (dRiso > 0.25) {
       neutralHadIso =     analysisTree->electron_r03_sumNeutralHadronEt[Index];
       photonIso =         analysisTree->electron_r03_sumPhotonEt[Index];
       chargedHadIso =     analysisTree->electron_r03_sumChargedHadronPt[Index];

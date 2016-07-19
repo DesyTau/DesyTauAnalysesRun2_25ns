@@ -50,7 +50,7 @@ void TP_eff_mu(TString fileName = "SingleMuon_Run2016_TP", // RooT file with TP 
   //binning inizialization
 
   int nEtaBins = 3;
-	float etaBins[4] = {0,0.9,1.2,2.4};
+	float etaBins[4] = {0,0.9,1.2,2.1};
 
 	TString EtaBins[3] = {"EtaLt0p9",
 				"Eta0p9to1p2",

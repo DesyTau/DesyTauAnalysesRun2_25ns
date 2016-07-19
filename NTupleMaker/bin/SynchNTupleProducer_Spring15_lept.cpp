@@ -69,10 +69,10 @@ int read_json(std::string filename, lumi_json& json);
 bool isGoodLumi(const std::pair<int, int>& lumi, const lumi_json& json);
 bool isGoodLumi(int run, int lumi, const lumi_json& json);
 void fill_weight(const AC1B * analysisTree, Spring15Tree *otree, PileUp *PUofficial, bool isData);
-float abs_Iso(int Index, TString ch, const AC1B * analysisTree, bool isIsoR03);
-float rel_Iso(int Index, TString ch, const AC1B * analysisTree, bool isIsoR03);
-void FillMuTau(const AC1B * analysisTree, Spring15Tree *otree, int leptonIndex, bool isIsoR03);
-void FillETau(const AC1B * analysisTree, Spring15Tree *otree, int leptonIndex, bool isIsoR03);
+float abs_Iso(int Index, TString ch, const AC1B * analysisTree, float dRiso);
+float rel_Iso(int Index, TString ch, const AC1B * analysisTree, float dRiso);
+void FillMuTau(const AC1B * analysisTree, Spring15Tree *otree, int leptonIndex, float dRiso);
+void FillETau(const AC1B * analysisTree, Spring15Tree *otree, int leptonIndex, float dRiso);
 void FillTau(const AC1B * analysisTree, Spring15Tree *otree, int tauIndex);
 bool dilepton_veto_mt(const Config *cfg, const AC1B *analysisTree);
 bool dilepton_veto_et(const Config *cfg, const AC1B *analysisTree);
@@ -81,8 +81,7 @@ bool extra_muon_veto(int leptonIndex, TString ch, const Config *cfg, const AC1B 
 void fillMET(TString ch, int leptonIndex, int tauIndex, const AC1B * analysisTree, Spring15Tree *otree);
 void mt_calculation(Spring15Tree *otree);
 void counting_jets(const AC1B *analysisTree, Spring15Tree *otree, const Config *cfg);
-bool isICHEPmuon(const AC1B *analysisTree, int Index);
-bool isICHEPmuon(AC1B analysisTree, int Index);
+bool isICHEPmed(int Index, const AC1B * analysisTree);
 
 
 
@@ -180,15 +179,9 @@ int main(int argc, char * argv[]){
   else {if(ApplyTrigger) isoLeg = cfg.get<string>("isoLegMC");}
 
   const float ptTrigObjCut  = cfg.get<float>("ptTrigObjCut");
-  
-  // vertex cuts
-  const float ndofVertexCut  = cfg.get<float>("NdofVertexCut");   
-  const float zVertexCut     = cfg.get<float>("ZVertexCut");
-  const float dVertexCut     = cfg.get<float>("DVertexCut");
 
   // tau cuts
   const float ptTauLowCut    = cfg.get<float>("ptTauLowCut");
-  const float ptTauHighCut   = cfg.get<float>("ptTauHighCut");  
   const float etaTauCut      = cfg.get<float>("etaTauCut");
   const float dzTauCut        = cfg.get<float>("dzTauCut");
   const bool applyTauId      = cfg.get<bool>("ApplyTauId");
@@ -218,8 +211,7 @@ int main(int argc, char * argv[]){
   const float etaLeptonCut     = cfg.get<float>("eta"+lep+"Cut");
   const float dxyLeptonCut     = cfg.get<float>("dxy"+lep+"Cut");
   const float dzLeptonCut      = cfg.get<float>("dz"+lep+"Cut");
-  const float isoLeptonLowCut  = cfg.get<float>("iso"+lep+"LowCut");
-  const float isoLeptonHighCut = cfg.get<float>("iso"+lep+"HighCut");
+
   const bool  applyLeptonId    = cfg.get<bool>("Apply"+lep+"Id");
 
   //dilepton veto
@@ -233,7 +225,7 @@ int main(int argc, char * argv[]){
   const float drDiLeptonVeto     = cfg.get<float>("drDi"+lep+"Veto"); 
 
   const float deltaRTrigMatch = cfg.get<float>("DRTrigMatch");
-  const bool isIsoR03 = cfg.get<bool>("IsIsoR03");
+  const float dRiso = cfg.get<float>("dRiso");
   
   const float jetEtaCut = cfg.get<float>("JetEtaCut");
   const float jetPtLowCut = cfg.get<float>("JetPtLowCut");
@@ -492,8 +484,8 @@ int main(int argc, char * argv[]){
       if(ch == "mt"){
         for (unsigned int im = 0; im<analysisTree.muon_count; ++im) {
 
-          //bool muonMediumId = analysisTree.muon_isMedium[im];
-		  bool muonMediumId = isICHEPmuon(&analysisTree, im);
+//          bool muonMediumId = analysisTree.muon_isMedium[im];
+          bool muonMediumId = isICHEPmed(im, &analysisTree);
   
           if (analysisTree.muon_pt[im]<=ptLeptonLowCut) continue;
           if (fabs(analysisTree.muon_eta[im])>=etaLeptonCut) continue;
@@ -520,7 +512,7 @@ int main(int argc, char * argv[]){
       for (unsigned int il=0; il<leptons.size(); ++il) {
         unsigned int lIndex  = leptons.at(il);
 
-        float relIsoLep = rel_Iso(lIndex, ch, &analysisTree, isIsoR03);
+        float relIsoLep = rel_Iso(lIndex, ch, &analysisTree, dRiso);
 
         bool isSingleLepTrig = false;
 
@@ -562,7 +554,6 @@ int main(int argc, char * argv[]){
           if (dR<dRleptonsCut) continue;
 
           // kinematic match
-          //std::cout<<lep_pt<<"   "<<ptLeptonHighCut<<endl;
           if (lep_pt<=ptLeptonHighCut) continue;
           
           // change pair
@@ -614,7 +605,7 @@ int main(int argc, char * argv[]){
       TLorentzVector leptonLV;
 
       if(ch=="mt") {
-      	FillMuTau(&analysisTree, otree, leptonIndex, isIsoR03);
+      	FillMuTau(&analysisTree, otree, leptonIndex, dRiso);
       	
         leptonLV.SetXYZM(analysisTree.muon_px[leptonIndex],
 					    analysisTree.muon_py[leptonIndex],
@@ -625,12 +616,12 @@ int main(int argc, char * argv[]){
               // Scale Factor SingleEle trigger SF_eleTrigger
           otree->trigweight_1 = (SF_lepTrigger->get_EfficiencyData(double(analysisTree.muon_pt[leptonIndex]),double(analysisTree.muon_eta[leptonIndex])));
               // Scale Factor Id+Iso SF_eleIdIso
-          otree->idisoweight_1 = (SF_lepIdIso->get_ScaleFactor(double(analysisTree.muon_pt[leptonIndex]),double(analysisTree.muon_eta[leptonIndex])));
+          otree->idisoweight_1 = (SF_lepIdIso->get_EfficiencyData(double(analysisTree.muon_pt[leptonIndex]),double(analysisTree.muon_eta[leptonIndex])));
           otree->effweight = (otree->trigweight_1)*(otree->idisoweight_1)*(otree->trigweight_2)*(otree->idisoweight_2);
         }
 
       } else if(ch=="et"){
-	      FillETau(&analysisTree, otree, leptonIndex, isIsoR03);
+	      FillETau(&analysisTree, otree, leptonIndex, dRiso);
 	      
         leptonLV.SetXYZM(analysisTree.electron_px[leptonIndex],
 						    analysisTree.electron_py[leptonIndex],
@@ -787,6 +778,15 @@ int main(int argc, char * argv[]){
 //////////////FUNCTION DEFINITION//////////////
 ///////////////////////////////////////////////
 
+bool isICHEPmed(int Index, const AC1B * analysisTree) {
+        bool goodGlob = analysisTree->muon_isGlobal[Index] && analysisTree->muon_normChi2[Index] < 3 && analysisTree->muon_combQ_chi2LocalPosition[Index] < 12
+                                   && analysisTree->muon_combQ_trkKink[Index] < 20;
+
+        bool isICHEPmedium  = analysisTree->muon_isLoose[Index] &&
+                                          analysisTree->muon_validFraction[Index] >0.49 &&
+                                          analysisTree->muon_segmentComp[Index] > (goodGlob ? 0.303 : 0.451);
+        return isICHEPmedium;
+}
 
 int read_json(std::string filename, lumi_json& json){
 
@@ -881,7 +881,7 @@ bool isICHEPmuon(const AC1B * analysisTree, int Index) {
 
 
 //compute the absolute isolation for a given lepton labeled by Index in channel ch
-float abs_Iso (int Index, TString ch, const AC1B * analysisTree, bool isIsoR03){
+float abs_Iso (int Index, TString ch, const AC1B * analysisTree, float dRiso){
   float neutralHadIso, photonIso, chargedHadIso, puIso;
 
   if(ch=="mt"){
@@ -889,11 +889,17 @@ float abs_Iso (int Index, TString ch, const AC1B * analysisTree, bool isIsoR03){
     photonIso =     analysisTree->muon_photonIso[Index];
     chargedHadIso = analysisTree->muon_chargedHadIso[Index];
     puIso =         analysisTree->muon_puIso[Index];
-    if (isIsoR03) {
+    if (dRiso>0.29) {
       neutralHadIso =     analysisTree->muon_r03_sumNeutralHadronEt[Index];
       photonIso =         analysisTree->muon_r03_sumPhotonEt[Index];
       chargedHadIso =     analysisTree->muon_r03_sumChargedHadronPt[Index];
       puIso =             analysisTree->muon_r03_sumPUPt[Index];
+    }
+    if (dRiso>0.39) {
+      neutralHadIso =     analysisTree->muon_r04_sumNeutralHadronEt[Index];
+      photonIso =         analysisTree->muon_r04_sumPhotonEt[Index];
+      chargedHadIso =     analysisTree->muon_r04_sumChargedHadronPt[Index];
+      puIso =             analysisTree->muon_r04_sumPUPt[Index];
     }
   }
   if(ch=="et"){
@@ -901,7 +907,7 @@ float abs_Iso (int Index, TString ch, const AC1B * analysisTree, bool isIsoR03){
     photonIso =     analysisTree->electron_photonIso[Index];
     chargedHadIso = analysisTree->electron_chargedHadIso[Index];
     puIso =         analysisTree->electron_puIso[Index];
-    if (isIsoR03) {
+    if (dRiso>0.29) {
       neutralHadIso =     analysisTree->electron_r03_sumNeutralHadronEt[Index];
       photonIso =         analysisTree->electron_r03_sumPhotonEt[Index];
       chargedHadIso =     analysisTree->electron_r03_sumChargedHadronPt[Index];
@@ -915,9 +921,9 @@ float abs_Iso (int Index, TString ch, const AC1B * analysisTree, bool isIsoR03){
 }
 
 //compute the relative isolation for a given lepton labeled by Index in channel ch
-float rel_Iso(int Index, TString ch, const AC1B * analysisTree, bool isIsoR03){
-  if(ch=="mt")  return(abs_Iso(Index, ch, analysisTree, isIsoR03) / analysisTree->muon_pt[Index] );
-  else if(ch=="et")   return(abs_Iso(Index, ch, analysisTree, isIsoR03) / analysisTree->electron_pt[Index] );
+float rel_Iso(int Index, TString ch, const AC1B * analysisTree, float dRiso){
+  if(ch=="mt")  return(abs_Iso(Index, ch, analysisTree, dRiso) / analysisTree->muon_pt[Index] );
+  else if(ch=="et")   return(abs_Iso(Index, ch, analysisTree, dRiso) / analysisTree->electron_pt[Index] );
     else return(-1.);
 }
 
@@ -925,7 +931,7 @@ float rel_Iso(int Index, TString ch, const AC1B * analysisTree, bool isIsoR03){
 ////FILLING FUNCTIONS//////
 
 //fill the otree with the muon variables in channel mutau
-void FillMuTau(const AC1B * analysisTree, Spring15Tree *otree, int leptonIndex, bool isIsoR03){
+void FillMuTau(const AC1B * analysisTree, Spring15Tree *otree, int leptonIndex, float dRiso){
 	otree->pt_1 = 	analysisTree->muon_pt[leptonIndex];
   otree->eta_1 = 	analysisTree->muon_eta[leptonIndex];
   otree->phi_1 = 	analysisTree->muon_phi[leptonIndex];
@@ -935,7 +941,7 @@ void FillMuTau(const AC1B * analysisTree, Spring15Tree *otree, int leptonIndex, 
     otree->q_1 = 1;
   otree->gen_match_1 = analysisTree->muon_genmatch[leptonIndex];
 
-	otree->iso_1 = abs_Iso(leptonIndex, "mt", analysisTree, isIsoR03) / analysisTree->muon_pt[leptonIndex];
+	otree->iso_1 = abs_Iso(leptonIndex, "mt", analysisTree, dRiso) / analysisTree->muon_pt[leptonIndex];
 
 	otree->d0_1 = analysisTree->muon_dxy[leptonIndex];
 	otree->dZ_1 = analysisTree->muon_dz[leptonIndex];
@@ -957,7 +963,7 @@ void FillMuTau(const AC1B * analysisTree, Spring15Tree *otree, int leptonIndex, 
 }
 
 //fill the otree with the electron variables in channel etau
-void FillETau(const AC1B * analysisTree, Spring15Tree *otree, int leptonIndex, bool isIsoR03){
+void FillETau(const AC1B * analysisTree, Spring15Tree *otree, int leptonIndex, float dRiso){
 	otree->pt_1 = 	analysisTree->electron_pt[leptonIndex];
   otree->eta_1 = 	analysisTree->electron_eta[leptonIndex];
   otree->phi_1 = 	analysisTree->electron_phi[leptonIndex];
@@ -967,7 +973,7 @@ void FillETau(const AC1B * analysisTree, Spring15Tree *otree, int leptonIndex, b
     otree->q_1 = 1;
   otree->gen_match_1 = analysisTree->electron_genmatch[leptonIndex];
 
-  otree->iso_1 =  abs_Iso(leptonIndex, "et", analysisTree, isIsoR03) /analysisTree->electron_pt[leptonIndex];
+  otree->iso_1 =  abs_Iso(leptonIndex, "et", analysisTree, dRiso) /analysisTree->electron_pt[leptonIndex];
   otree->mva_1 = analysisTree->electron_mva_value_nontrig_Spring15_v1[leptonIndex];
 
 	otree->d0_1 = analysisTree->electron_dxy[leptonIndex];
@@ -1035,13 +1041,14 @@ bool dilepton_veto_mt(const Config *cfg,const  AC1B *analysisTree){
 		if (fabs(analysisTree->muon_dxy[im])>=cfg->get<float>("dxyDiMuonVeto")) continue;
 		if (fabs(analysisTree->muon_dz[im])>=cfg->get<float>("dzDiMuonVeto")) continue;
 
-		float absIsoMu =  abs_Iso(im, "mt", analysisTree, cfg->get<bool>("IsIsoR03"));
-		float relIsoMu = 	rel_Iso(im, "mt", analysisTree, cfg->get<bool>("IsIsoR03"));
+		float absIsoMu =  abs_Iso(im, "mt", analysisTree, cfg->get<float>("dRiso"));
+		float relIsoMu = 	rel_Iso(im, "mt", analysisTree, cfg->get<float>("dRiso"));
 
 		if(relIsoMu >= cfg->get<float>("isoDiMuonVeto")) continue;
 		
 		//bool passedVetoId =  analysisTree->muon_isMedium[im]; 
-		bool passedVetoId = isICHEPmuon(analysisTree, im);
+		bool passedVetoId = isICHEPmed(im, analysisTree);
+
 		if (!passedVetoId && cfg->get<bool>("applyDiMuonVetoId")) continue;
 		
 		for (unsigned int je = im+1; je<analysisTree->muon_count; ++je) {
@@ -1053,13 +1060,14 @@ bool dilepton_veto_mt(const Config *cfg,const  AC1B *analysisTree){
 		  
 		  if (analysisTree->muon_charge[im] * analysisTree->muon_charge[je] > 0. && cfg->get<bool>("applyDiMuonOS")) continue;
 
-		  float absIsoMu =  abs_Iso(je, "mt", analysisTree, cfg->get<bool>("IsIsoR03"));
-			float relIsoMu = 	rel_Iso(je, "mt", analysisTree, cfg->get<bool>("IsIsoR03"));
+		  float absIsoMu =  abs_Iso(je, "mt", analysisTree, cfg->get<float>("dRiso"));
+			float relIsoMu = 	rel_Iso(je, "mt", analysisTree, cfg->get<float>("dRiso"));
 
 		  if(relIsoMu >= cfg->get<float>("isoDiMuonVeto")) continue;	
 
 		  //passedVetoId =  analysisTree->muon_isMedium[je];
-		  passedVetoId =  isICHEPmuon(analysisTree, je);
+	      passedVetoId = isICHEPmed(je, analysisTree);
+
 		  if (!passedVetoId && cfg->get<bool>("applyDiMuonVetoId")) continue;
 		  
 		  float dr = deltaR(analysisTree->muon_eta[im],analysisTree->muon_phi[im],
@@ -1084,8 +1092,8 @@ bool dilepton_veto_et(const Config *cfg,const  AC1B *analysisTree){
 		if (fabs(analysisTree->electron_dxy[ie])>=cfg->get<float>("dxyDiElectronVeto")) continue;
 		if (fabs(analysisTree->electron_dz[ie])>=cfg->get<float>("dzDiElectronVeto")) continue;
 
-		float absIsoEle =   abs_Iso(ie, "et", analysisTree, cfg->get<bool>("IsIsoR03"));
-		float relIsoEle =   rel_Iso(ie, "et", analysisTree, cfg->get<bool>("IsIsoR03"));
+		float absIsoEle =   abs_Iso(ie, "et", analysisTree, cfg->get<float>("dRiso"));
+		float relIsoEle =   rel_Iso(ie, "et", analysisTree, cfg->get<float>("dRiso"));
 
 
 		if(relIsoEle >= cfg->get<float>("isoDiElectronVeto")) continue;
@@ -1102,8 +1110,8 @@ bool dilepton_veto_et(const Config *cfg,const  AC1B *analysisTree){
 		  
 		  if (analysisTree->electron_charge[ie] * analysisTree->electron_charge[je] > 0. && cfg->get<bool>("applyDiElectronOS")) continue;
 
-			float absIsoEle =  abs_Iso(ie, "et", analysisTree, cfg->get<bool>("IsIsoR03"));
-			float relIsoEle = 	rel_Iso(ie, "et", analysisTree, cfg->get<bool>("IsIsoR03"));
+			float absIsoEle =  abs_Iso(ie, "et", analysisTree, cfg->get<float>("dRiso"));
+			float relIsoEle = 	rel_Iso(ie, "et", analysisTree, cfg->get<float>("dRiso"));
 
 		  if(relIsoEle >= cfg->get<float>("isoDiElectronVeto")) continue;	
 
@@ -1137,7 +1145,7 @@ bool extra_electron_veto(int leptonIndex, TString ch, const Config *cfg, const A
 		if (!analysisTree->electron_pass_conversion[ie] && cfg->get<bool>("applyVetoElectronId")) continue;
 		if (analysisTree->electron_nmissinginnerhits[ie]>1 && cfg->get<bool>("applyVetoElectronId")) continue;
 
-		float relIsoEle = rel_Iso(ie, ch, analysisTree, cfg->get<bool>("IsIsoR03"));
+		float relIsoEle = rel_Iso(ie, ch, analysisTree, cfg->get<float>("dRiso"));
 
 		if (relIsoEle>=cfg->get<float>("isoVetoElectronCut")) continue;
 
@@ -1155,10 +1163,9 @@ bool extra_muon_veto(int leptonIndex, TString ch, const Config *cfg, const AC1B 
 		if (fabs(analysisTree->muon_dxy[im])>cfg->get<float>("dxyVetoMuonCut")) continue;
 		if (fabs(analysisTree->muon_dz[im])>cfg->get<float>("dzVetoMuonCut")) continue;
 		//if (cfg->get<bool>("applyVetoMuonId") && !analysisTree->muon_isMedium[im]) continue;
-		if (cfg->get<bool>("applyVetoMuonId") && !(isICHEPmuon(analysisTree,im)) ) continue;
-		float relIsoMu = rel_Iso(im, ch, analysisTree, cfg->get<bool>("IsIsoR03"));
+	    if (cfg->get<bool>("applyVetoMuonId") && !(isICHEPmed(im, analysisTree))) continue;
+		float relIsoMu = rel_Iso(im, ch, analysisTree, cfg->get<float>("dRiso"));
 		if (relIsoMu>cfg->get<float>("isoVetoMuonCut")) continue;
-
 		return(1);
   }
   return(0);
