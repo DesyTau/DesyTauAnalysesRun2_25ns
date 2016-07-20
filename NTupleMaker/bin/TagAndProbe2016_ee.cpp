@@ -79,8 +79,8 @@ struct compare_lumi { //accepts two pairs, return 1 if left.first < right.first 
 int read_json(std::string filename, lumi_json& json);
 bool isGoodLumi(const std::pair<int, int>& lumi, const lumi_json& json);
 bool isGoodLumi(int run, int lumi, const lumi_json& json);
-float abs_Iso(int Index, TString lep, const AC1B * analysisTree, float dRCone);
-float rel_Iso(int Index, TString lep, const AC1B * analysisTree, float dRCone); //dr cone 0.3 OR 0.4 
+float abs_Iso(int Index, TString lep, const AC1B * analysisTree, float dRiso);
+float rel_Iso(int Index, TString lep, const AC1B * analysisTree, float dRiso); //dr cone 0.3 OR 0.4 
 
 int main(int argc, char * argv[]){
 
@@ -121,7 +121,7 @@ int main(int argc, char * argv[]){
   const float etaElectronCut = cfg.get<float>("etaElectronCut");
   const float dxyElectronCut = cfg.get<float>("dxyElectronCut");
   const float dzElectronCut = cfg.get<float>("dzElectronCut");
-  const float dRCone = cfg.get<float>("dRCone");
+  const float dRiso = cfg.get<float>("dRiso");
 
 
   const float massCut = cfg.get<float>("massCut");
@@ -160,6 +160,10 @@ int main(int argc, char * argv[]){
     hlt.push_back(cfg.get<string>("hlt_" + std::to_string(i)));
   }
 
+  if(0){
+    for(unsigned int i=1; i<=nhlt_check; i++){
+    cout<<cfg.get<string>("hlt_" + std::to_string(i))<<" - "<<hlt[i-1]<<endl;}
+  }
 
   int ifile = 0;
   int jfile = -1;
@@ -291,18 +295,17 @@ int main(int argc, char * argv[]){
       unsigned int nIsoLeg = 0;
       bool checkIsoLeg = false;
       if(isData || ApplyTrigger){  
-      
-            for (unsigned int i=0; i<nfilters; ++i) {
-              TString HLTFilter(analysisTree.run_hltfilters->at(i));
-              if (HLTFilter==isoLeg) {
-                nIsoLeg = i;
-                checkIsoLeg = true;
-              }
-            }
-            if (!checkIsoLeg) {
-              std::cout << "HLT filter " << isoLeg << " not found" << std::endl;
-              exit(-1);
-            }
+        for (unsigned int i=0; i<nfilters; ++i) {
+          TString HLTFilter(analysisTree.run_hltfilters->at(i));
+          if (HLTFilter==isoLeg) {
+            nIsoLeg = i;
+            checkIsoLeg = true;
+          }
+        }
+        if (!checkIsoLeg) {
+          std::cout << "HLT filter " << isoLeg << " not found" << std::endl;
+          exit(-1);
+        }
       }
 
       //hlt filters indices
@@ -317,6 +320,12 @@ int main(int argc, char * argv[]){
         }
       }
 
+      if(0){
+        cout<<endl<<endl;
+        for(unsigned int i2=0; i2<nhlt_check; ++i2){
+          cout<<i2<<" -> "<<nHLT[i2]<<endl;
+        }
+      }
 
       if (nEvents%10000==0) 
       	cout << "      processed " << nEvents << " events" << endl; 
@@ -351,27 +360,33 @@ int main(int argc, char * argv[]){
         if (fabs(analysisTree.electron_dxy[it])>=dxyElectronCut) continue;
         if (fabs(analysisTree.electron_dz[it])>=dzElectronCut) continue;
 
-        if (rel_Iso(it, "e", &analysisTree, dRCone)>=isoElectronCut) continue;
+        if (rel_Iso(it, "e", &analysisTree, dRiso)>=isoElectronCut) continue;
         if (!electronMvaId) continue;
         if (analysisTree.electron_nmissinginnerhits[it]>1) continue;
         if (!analysisTree.electron_pass_conversion[it]) continue;
 
         //trigger match
         bool isSingleLepTrig = false;
-
+/*
         if(isData || ApplyTrigger){  
+          if(debug) cout<<"analysisTree.trigobject_count: "<<analysisTree.trigobject_count<<endl;
           for (unsigned int iT=0; iT<analysisTree.trigobject_count; ++iT) {
             float dRtrig = deltaR(analysisTree.electron_eta[it], analysisTree.electron_phi[it], 
                                   analysisTree.trigobject_eta[iT],analysisTree.trigobject_phi[iT]);
-  
+
             if (dRtrig < deltaRTrigMatch){
-              if (analysisTree.trigobject_filters[iT][nIsoLeg] && ( isData || analysisTree.trigobject_pt[iT] > ptTrigObjCut)) // Ele23 Leg
+              if(debug) cout<<"[iT][nIsoLeg] = "<<iT<<" - "<<nIsoLeg<<" = "<<analysisTree.trigobject_filters[iT][nIsoLeg]<<endl;
+              if (analysisTree.trigobject_filters[iT][nIsoLeg] && ( isData || analysisTree.trigobject_pt[iT] > ptTrigObjCut)){
                 isSingleLepTrig = true;
+              }
             }
           }
           
-          if (!isSingleLepTrig) continue;
-        }
+          if (!isSingleLepTrig) {
+            if(debug) {cout<<"debug: tag trigger match failed"<<endl;}
+            continue;}
+          if(debug) {cout<<"debug: tag trigger match OK"<<endl;}
+        }*/
         
         otree->pt_tag = analysisTree.electron_pt[it]; 
         otree->eta_tag = analysisTree.electron_eta[it];
@@ -425,7 +440,7 @@ int main(int argc, char * argv[]){
             }
           }
 
-          float iso_probe = rel_Iso(ip, "e", &analysisTree, dRCone);
+          float iso_probe = rel_Iso(ip, "e", &analysisTree, dRiso);
 
           otree->id_probe = id_probe;
           otree->iso_probe = iso_probe;
@@ -527,13 +542,13 @@ int main(int argc, char * argv[]){
 //////////////FUNCTION DEFINITION//////////////
 ///////////////////////////////////////////////
 
-float rel_Iso(int Index, TString lep, const AC1B * analysisTree, float dRCone){
-  if(lep=="m")  return(abs_Iso(Index, lep, analysisTree, dRCone) / analysisTree->muon_pt[Index] );
-  else if(lep=="e")   return(abs_Iso(Index, lep, analysisTree, dRCone) / analysisTree->electron_pt[Index] );
+float rel_Iso(int Index, TString lep, const AC1B * analysisTree, float dRiso){
+  if(lep=="m")  return(abs_Iso(Index, lep, analysisTree, dRiso) / analysisTree->muon_pt[Index] );
+  else if(lep=="e")   return(abs_Iso(Index, lep, analysisTree, dRiso) / analysisTree->electron_pt[Index] );
     else return(-1.);
 }
 
-float abs_Iso (int Index, TString lep, const AC1B * analysisTree, float dRCone){
+float abs_Iso (int Index, TString lep, const AC1B * analysisTree, float dRiso){
   float neutralHadIso, photonIso, chargedHadIso, puIso;
 
   if(lep=="m"){
@@ -541,13 +556,13 @@ float abs_Iso (int Index, TString lep, const AC1B * analysisTree, float dRCone){
     photonIso =     analysisTree->muon_photonIso[Index];
     chargedHadIso = analysisTree->muon_chargedHadIso[Index];
     puIso =         analysisTree->muon_puIso[Index];
-    if (dRCone == 0.3) {
+    if (dRiso > 0.25) {
       neutralHadIso =     analysisTree->muon_r03_sumNeutralHadronEt[Index];
       photonIso =         analysisTree->muon_r03_sumPhotonEt[Index];
       chargedHadIso =     analysisTree->muon_r03_sumChargedHadronPt[Index];
       puIso =             analysisTree->muon_r03_sumPUPt[Index];
     }
-    if (dRCone == 0.4) {
+    if (dRiso > 0.35) {
       neutralHadIso =     analysisTree->muon_r04_sumNeutralHadronEt[Index];
       photonIso =         analysisTree->muon_r04_sumPhotonEt[Index];
       chargedHadIso =     analysisTree->muon_r04_sumChargedHadronPt[Index];
@@ -559,7 +574,7 @@ float abs_Iso (int Index, TString lep, const AC1B * analysisTree, float dRCone){
     photonIso =     analysisTree->electron_photonIso[Index];
     chargedHadIso = analysisTree->electron_chargedHadIso[Index];
     puIso =         analysisTree->electron_puIso[Index];
-    if (dRCone == 0.3) {
+    if (dRiso > 0.25) {
       neutralHadIso =     analysisTree->electron_r03_sumNeutralHadronEt[Index];
       photonIso =         analysisTree->electron_r03_sumPhotonEt[Index];
       chargedHadIso =     analysisTree->electron_r03_sumChargedHadronPt[Index];
