@@ -24,7 +24,8 @@
 
 #include "DesyTauAnalyses/NTupleMaker/interface/json.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/PileUp.h"
-#include "DesyTauAnalyses/NTupleMaker/interface/ScaleFactor.h"
+//#include "DesyTauAnalyses/NTupleMaker/interface/ScaleFactor.h"
+#include "HTT-utilities/LepEffInterface/interface/ScaleFactor.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/Jets.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/AnalysisMacro.h"
 #include "CondFormats/BTauObjects/interface/BTagCalibration.h"
@@ -203,7 +204,7 @@ int main(int argc, char * argv[]) {
 
   ifstream ifs("xsecs");
   string line;
-
+/*
   while(std::getline(ifs, line)) // read one line from ifs
     {
 
@@ -221,18 +222,21 @@ int main(int argc, char * argv[]) {
 	XSec= xs*fact*fact2;
 	cout<<" Found the correct cross section "<<xs<<" for Dataset "<<dt<<" XSec "<<XSec<<" number of expected events for Lumi "<<Lumi <<" /pb  = " <<XSec*Lumi<<endl;
       }
-      /*
+      
 	if ( argv[2] == st1) {ChiMass=100;mIntermediate=200;}
 	else if (argv[2] == st2) {ChiMass=200;mIntermediate=500;}
-      */
-      if (isData) XSec=1.;
+      
+      XSec=1.;
       ChiMass=0.0;
     }
 
-  if (XSec<0&& !isData) {cout<<" Something probably wrong with the xsecs...please check  - the input was "<<argv[2]<<endl;XSec = 1;/*return 0;*/}
-	
-  xsecs=XSec;
-cout <<"xsecs" << xsecs<< endl;
+  if (XSec<0&& !isData) {cout<<" Something probably wrong with the xsecs...please check  - the input was "<<argv[2]<<endl;XSec = 1;}
+*/	
+
+      XSec=1.;
+      ChiMass=0.0;
+   xsecs=XSec;
+  //cout <<"xsecs" << xsecs<< endl;
   std::vector<unsigned int> allRuns; allRuns.clear();
 
   cout<<" ChiMass is "<<ChiMass<<"  "<<mIntermediate<<endl;
@@ -300,38 +304,20 @@ cout <<"xsecs" << xsecs<< endl;
   float MinLJetPt = 20.;
   float MinBJetPt = 30.;
 
-/*
-  TFile *f10= new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/"+muonSfDataBarrel);  // mu SF barrel data
-  TFile *f11 = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/"+muonSfDataEndcap); // mu SF endcap data
-  TFile *f12= new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/"+muonSfMcBarrel);  // mu SF barrel MC
-  TFile *f13 = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/"+muonSfMcEndcap); // mu SF endcap MC 
-
-  TGraphAsymmErrors *hEffBarrelData = (TGraphAsymmErrors*)f10->Get("ZMassBarrel");
-  TGraphAsymmErrors *hEffEndcapData = (TGraphAsymmErrors*)f11->Get("ZMassEndcap");
-  TGraphAsymmErrors *hEffBarrelMC = (TGraphAsymmErrors*)f12->Get("ZMassBarrel");
-  TGraphAsymmErrors *hEffEndcapMC = (TGraphAsymmErrors*)f13->Get("ZMassEndcap");
-
-  double * dataEffBarrel = new double[10];
-  double * dataEffEndcap = new double[10];
-  double * mcEffBarrel = new double[10];
-  double * mcEffEndcap = new double[10];
-
-  dataEffBarrel = hEffBarrelData->GetY();
-  dataEffEndcap = hEffEndcapData->GetY();
-  mcEffBarrel = hEffBarrelMC->GetY();
-  mcEffEndcap = hEffEndcapMC->GetY();
-*/
 
   // Lepton Scale Factors 
 
   TH1D * MuSF_IdIso_Mu1H = new TH1D("MuIdIsoSF_Mu1H", "MuIdIsoSF_Mu1", 100, 0.5,1.5);
 
+  cout<<"  Initializing iD SF files....."<<endl;
   ScaleFactor * SF_muonIdIso; 
   if (applyLeptonSF) {
     SF_muonIdIso = new ScaleFactor();
     SF_muonIdIso->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(MuonidIsoEffFile));
   }
 
+
+  cout<<"  Initializing Trigger SF files....."<<endl;
   ScaleFactor * SF_muonTrigger = new ScaleFactor();
   SF_muonTrigger->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(MuontrigEffFile));
 
@@ -346,7 +332,7 @@ cout <<"xsecs" << xsecs<< endl;
     SF_TFR->init_ScaleFactorb(TString(cmsswBase)+"/src/"+TString(TauFakeRateFile),applyTFR);
   }
 */
-
+cout<<" ended initialization here "<<endl;
   double Weight=0;
   int nTotalFiles = 0;
   int iCut=0;
@@ -385,16 +371,23 @@ std::string st1,st2;
 bool SUSY = false;
 float SusyMotherMassF;
 float SusyLSPMassF;
-if (string::npos != rootFileName.find("stau"))
+
+//SMS-TChiSlepSnu_x0p5_TuneCUETP8M1_13TeV-madgraphMLM-pythia8   SMS-TChiStauStau_x0p5_TuneCUETP8M1_13TeV-madgraphMLM-pythia8  SMS-TStauStau_TuneCUETP8M1_13TeV-madgraphMLM-pythia8
+
+if (string::npos != rootFileName.find("SMS-"))
 	{
-	st1 =  rootFileName.substr(4,3);
-	SusyMotherMassF = stof(st1);
-	st2 =  rootFileName.substr(11);
-	SusyLSPMassF = stof(st2);
+	//st1 =  rootFileName.substr(4,3);
+	SusyMotherMassF = stof(argv[5]);
+	st1=string(argv[5]);
+	//st2 =  rootFileName.substr(11);
+	st2=string(argv[6]);
+	SusyLSPMassF = stof(argv[6]);
+	cout<<" st1 "<<st1<<"  "<<st2<<" "<<endl;
 	SUSY = true;
 	  std::cout <<" SUSY "<< " SusyMotherMassF= "<<SusyMotherMassF <<" SusyLSPMassF= "<<SusyLSPMassF <<std::endl;  
 	}
-if (string::npos != rootFileName.find("C1"))
+/*
+if (string::npos != rootFileName.find("SMS-TChiStauStau"))
 	{
 	st1 =  rootFileName.substr(5,3);
 	SusyMotherMassF = stof(st1);
@@ -403,7 +396,7 @@ if (string::npos != rootFileName.find("C1"))
 	SUSY = true;
 	  std::cout <<" SUSY "<< " SusyMotherMassF= "<<SusyMotherMassF <<" SusyLSPMassF= "<<SusyLSPMassF <<std::endl;  
 	}
-
+*/
 
 
   TFile * file;
@@ -411,7 +404,7 @@ if (string::npos != rootFileName.find("C1"))
   if (!isData && !SUSY) file = new TFile(era+"/"+TStrName+TString(".root"),"update");
   if (SUSY)
 	{  
-	TString TStrNameS(rootFileName+invMuStr+invTauStr+invMETStr+"_"+Region+"_"+Sign+"_"+NrootFile);
+	TString TStrNameS(rootFileName+invMuStr+invTauStr+invMETStr+"_"+Region+"_"+Sign+"_"+st1+"_"+st2);
 	file = new TFile(era+"/"+TStrNameS+TString(".root"),"update");
 
 	}
@@ -697,18 +690,23 @@ cout<< "analysisTree.SusyLSPMass  "<< analysisTree.SusyLSPMass<<endl;}
       if (!lumi) continue;
 
 	std::vector<TString> metFlags; metFlags.clear();
-
      //////////////MET filters flag
-      if (isData){
+      if (!SUSY){
 
+	/* 
 	 metFlags.push_back("Flag_HBHENoiseFilter");
 	 metFlags.push_back("Flag_HBHENoiseIsoFilter");
 	 metFlags.push_back("Flag_CSCTightHalo2015Filter");
-	 metFlags.push_back("Flag_EcalDeadCellTriggerPrimitiveFilter");
 	 metFlags.push_back("Flag_goodVertices");
-	 metFlags.push_back("Flag_eeBadScFilter");
+	 metFlags.push_back("Flag_eeBadScFilter");*/
+	 metFlags.push_back("Flag_METFilters");
+	 //metFlags.push_back("Flag_CSCTightHalo2015Filter");
+	// metFlags.push_back("Flag_EcalDeadCellTriggerPrimitiveFilter");
+	// metFlags.push_back("Flag_HBHENoiseFilter");
+	// metFlags.push_back("Flag_HBHENoiseIsoFilter");
 
       }
+
 
 
 	bool METflag = metFiltersPasses2(analysisTree, metFlags);
@@ -825,7 +823,8 @@ cout<< "analysisTree.SusyLSPMass  "<< analysisTree.SusyLSPMass<<endl;}
 	if (fabs(analysisTree.muon_eta[im])>etaMuonCut) continue;
 	if (fabs(analysisTree.muon_dxy[im])>dxyMuonCut) continue;
 	if (fabs(analysisTree.muon_dz[im])>dzMuonCut) continue;
-	if (applyMuonId && !analysisTree.muon_isMedium[im]) continue;
+	//if (applyMuonId && !analysisTree.muon_isMedium[im]) continue;
+	if (applyMuonId && !analysisTree.muon_isICHEP[im]) continue;
         if ( fabs(analysisTree.muon_charge[im]) != 1) continue;
 	muons.push_back((int)im);
 
@@ -1139,7 +1138,8 @@ cout<< "analysisTree.SusyLSPMass  "<< analysisTree.SusyLSPMass<<endl;}
 	if (fabs(analysisTree.muon_eta[im])>etaVetoMuonCut) continue;
 	if (fabs(analysisTree.muon_dxy[im])>dxyVetoMuonCut) continue;
 	if (fabs(analysisTree.muon_dz[im])>dzVetoMuonCut) continue;
-	if (applyVetoMuonId && !analysisTree.muon_isMedium[im]) continue;
+	//if (applyVetoMuonId && !analysisTree.muon_isMedium[im]) continue;
+	if (applyVetoMuonId && !analysisTree.muon_isICHEP[im]) continue;
 	if (relIsoMu>isoVetoMuonCut) continue;
 	foundExtraMuon = true;
       }
@@ -1198,7 +1198,7 @@ cout<< "analysisTree.SusyLSPMass  "<< analysisTree.SusyLSPMass<<endl;}
       double etaMu1 = (double)analysisTree.muon_eta[mu_index];
       float trigweight=1.;
 
-      float Mu17EffData = (float)SF_muonTrigger->get_EfficiencyData(double(ptMu1),double(etaMu1));
+      float EffFromData = (float)SF_muonTrigger->get_EfficiencyData(double(ptMu1),double(etaMu1));
       /*float Mu17EffMC   = (float)SF_muonTrigger->get_EfficiencyMC(double(ptMu1),double(etaMu1));*/
 	
       bool Signal = true;
@@ -1206,13 +1206,13 @@ cout<< "analysisTree.SusyLSPMass  "<< analysisTree.SusyLSPMass<<endl;}
 	//if (!isData && (   string::npos != filen.find("stau") || string::npos != filen.find("C1")) ) Signal=true;
      /* if (!isData) {
 	if (Mu17EffMC>1e-6)
-	  trigweight = Mu17EffData / Mu17EffMC;
-	if (!isData && (   string::npos != filen.find("stau") || string::npos != filen.find("C1")) ) trigweight = Mu17EffData;
+	  trigweight = EffFromData / Mu17EffMC;
+	if (!isData && (   string::npos != filen.find("stau") || string::npos != filen.find("C1")) ) trigweight = EffFromData;
 	weight *= trigweight;
 	trig_weight = trigweight;
 	//	cout<<" Trigger weight "<<trigweight<<endl;
       }*/
-	if (!isData) trigweight = Mu17EffData;
+	if (!isData) trigweight = EffFromData;
 	weight *= trigweight;
 	trig_weight = trigweight;
       if(fillplots)
@@ -1523,6 +1523,7 @@ cout<< "analysisTree.SusyLSPMass  "<< analysisTree.SusyLSPMass<<endl;}
 	JetsMV.push_back(JetsV);
       }
       njets = jets.size();
+      npv =  analysisTree.primvertex_count;
       countjets = jets.size();
       jet_count = jets.size();
       //njetspt20 = jetspt20.size();
