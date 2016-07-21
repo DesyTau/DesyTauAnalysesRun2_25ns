@@ -948,7 +948,7 @@ void NTupleMaker::beginJob(){
     tree->Branch("trigobject_pt",trigobject_pt,"trigobject_pt[trigobject_count]/F");
     tree->Branch("trigobject_eta",trigobject_eta,"trigobject_eta[trigobject_count]/F");
     tree->Branch("trigobject_phi",trigobject_phi,"trigobject_phi[trigobject_count]/F");
-    tree->Branch("trigobject_filters",trigobject_filters,TString("trigobject_filters[trigobject_count][")+(Long64_t)200+"]/O");
+    tree->Branch("trigobject_filters",trigobject_filters,TString("trigobject_filters[trigobject_count][")+(Long64_t)M_hltfiltersmax+"]/O");
     tree->Branch("trigobject_isMuon",trigobject_isMuon,"trigobject_isMuon[trigobject_count]/O");
     tree->Branch("trigobject_isElectron",trigobject_isElectron,"trigobject_isElectron[trigobject_count]/O");
     tree->Branch("trigobject_isTau",trigobject_isTau,"trigobject_isTau[trigobject_count]/O");
