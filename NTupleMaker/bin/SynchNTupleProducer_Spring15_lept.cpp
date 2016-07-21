@@ -1191,9 +1191,9 @@ void fillMET(TString ch, int leptonIndex, int tauIndex, const AC1B * analysisTre
   otree->puppimetphi = TMath::ATan2(analysisTree->puppimet_ey,analysisTree->puppimet_ex);
 
   // choosing mva met
-/*  int mva_break;
+  int mva_break;
   if (ch=="mt") mva_break = 3;
-  	else if (ch=="et") mva_break = 2;
+  else if (ch=="et") mva_break = 2;
 
   unsigned int iMet = 0;
   float mvamet_x = 0;
@@ -1204,56 +1204,56 @@ void fillMET(TString ch, int leptonIndex, int tauIndex, const AC1B * analysisTre
   otree->mvacov11 = 0.;
 
   for (; iMet<analysisTree->mvamet_count; ++iMet) {
-		if ((int)analysisTree->mvamet_channel[iMet]==mva_break) break;
+    if ((int)analysisTree->mvamet_channel[iMet]==mva_break) break;
+  }
+
+  if (iMet>=analysisTree->mvamet_count){
+    otree->mvamet = log(0);
+    otree->mvametphi = log(0);
+    otree->mvacov00 = log(0);
+    otree->mvacov01 = log(0);
+    otree->mvacov10 = log(0);
+    otree->mvacov11 = log(0);
+  }
+  else {
+    // choosing mva met
+    unsigned int iMet = 0;
+    for (; iMet<analysisTree->mvamet_count; ++iMet) {
+      if (analysisTree->mvamet_channel[iMet]==mva_break){
+	if( ((int)analysisTree->mvamet_lep1[iMet])==tauIndex && ((int)analysisTree->mvamet_lep2[iMet])==leptonIndex)
+	  break;
       }
-
-  if (iMet>=analysisTree->mvamet_count){		
-		otree->mvamet = 	log(0);
-		otree->mvametphi = log(0);
-	 	otree->mvacov00 = log(0);
-		otree->mvacov01 = log(0);
-		otree->mvacov10 = log(0);
-		otree->mvacov11 = log(0);
-  } else {
-		// choosing mva met
-		unsigned int iMet = 0;
-		for (; iMet<analysisTree->mvamet_count; ++iMet) {
-		  if (analysisTree->mvamet_channel[iMet]==mva_break){
-		    if( ((int)analysisTree->mvamet_lep1[iMet])==tauIndex && ((int)analysisTree->mvamet_lep2[iMet])==leptonIndex)
-		      break;
-		  }
-		}
-
-		float mvamet_x = 0;
-		float mvamet_y = 0;
-		otree->mvacov00 = 0.;
-		otree->mvacov01 = 0.;
-		otree->mvacov10 = 0.;
-		otree->mvacov11 = 0.;
+    }
+    
+    float mvamet_x = 0;
+    float mvamet_y = 0;
+    otree->mvacov00 = 0.;
+    otree->mvacov01 = 0.;
+    otree->mvacov10 = 0.;
+    otree->mvacov11 = 0.;
 		
-		if(iMet < analysisTree->mvamet_count){
-		  mvamet_x = analysisTree->mvamet_ex[iMet];
-		  mvamet_y = analysisTree->mvamet_ey[iMet];
-		  otree->mvacov00 = analysisTree->mvamet_sigxx[iMet];
-		  otree->mvacov01 = analysisTree->mvamet_sigxy[iMet];
-		  otree->mvacov10 = analysisTree->mvamet_sigyx[iMet];
-		  otree->mvacov11 = analysisTree->mvamet_sigyy[iMet];
-		}
-		else{
-		  std::cout<<"MVA MET not found! :: "<< analysisTree->mvamet_count << std::endl;
-		  iMet = 0;
-		  //std::cout<<"tau = "<<tauIndex<<" mu = "<<muonIndex<<std::endl;
-		  //for (; iMet<analysisTree->mvamet_count; ++iMet) {
-		    //std::cout<<"imet = "<<analysisTree->mvamet_channel[iMet]<<" itau = "<<analysisTree->mvamet_lep1[iMet]<<" imu = "<<analysisTree->mvamet_lep2[iMet]<<std::endl;
-		  //}
-		  
-		}
+    if(iMet < analysisTree->mvamet_count){
+      mvamet_x = analysisTree->mvamet_ex[iMet];
+      mvamet_y = analysisTree->mvamet_ey[iMet];
+      otree->mvacov00 = analysisTree->mvamet_sigxx[iMet];
+      otree->mvacov01 = analysisTree->mvamet_sigxy[iMet];
+      otree->mvacov10 = analysisTree->mvamet_sigyx[iMet];
+      otree->mvacov11 = analysisTree->mvamet_sigyy[iMet];
+    }
+    else{
+      std::cout<<"MVA MET not found! :: "<< analysisTree->mvamet_count << std::endl;
+      iMet = 0;
+      //std::cout<<"tau = "<<tauIndex<<" mu = "<<muonIndex<<std::endl;
+      //for (; iMet<analysisTree->mvamet_count; ++iMet) {
+      //std::cout<<"imet = "<<analysisTree->mvamet_channel[iMet]<<" itau = "<<analysisTree->mvamet_lep1[iMet]<<" imu = "<<analysisTree->mvamet_lep2[iMet]<<std::endl;
+      //}
+    }
 		
-		float mvamet_x2 = mvamet_x * mvamet_x;
-		float mvamet_y2 = mvamet_y * mvamet_y;
-		otree->mvamet = TMath::Sqrt(mvamet_x2+mvamet_y2);
-		otree->mvametphi = TMath::ATan2(mvamet_y,mvamet_x);
-  }*/
+    float mvamet_x2 = mvamet_x * mvamet_x;
+    float mvamet_y2 = mvamet_y * mvamet_y;
+    otree->mvamet = TMath::Sqrt(mvamet_x2+mvamet_y2);
+    otree->mvametphi = TMath::ATan2(mvamet_y,mvamet_x);
+  }
 
 }
 
