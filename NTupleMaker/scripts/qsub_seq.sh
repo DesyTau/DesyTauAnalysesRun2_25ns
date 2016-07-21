@@ -69,6 +69,10 @@ let "n = 0"
 rm -rf ${SAMPLE}_files
 mkdir ${SAMPLE}_files
 
+cp $LIST .
+Splitter $SAMPLE $NFILES
+
+cp $CONFIGFILE ${SAMPLE}_files/
 if [ -z "$SCRIPT" ]
 then
     echo "No script template provided. Using default."
@@ -77,17 +81,12 @@ else
     cp $SCRIPT ${SAMPLE}_files/
 fi
 
-cp $CONFIGFILE ${SAMPLE}_files/
-cp $LIST .
-Splitter $SAMPLE $NFILES
-rm $SAMPLE
-
 cd ${SAMPLE}_files/
-for i in `ls $SAMPLE_*`
- do
- echo submitting job $n for file $i from list $LIST
- ./qsub.sh $EXECUTABLE $CONFIGFILE $i $CHANNEL
- let "n = n + 1"
+for i in `ls ${SAMPLE}_*`
+do
+  echo submitting job $n for file $i from list $LIST
+  ./qsub.sh $EXECUTABLE $CONFIGFILE $i $CHANNEL
+  let "n = n + 1"
 done
 echo Total $n jobs submitted
 cd ../

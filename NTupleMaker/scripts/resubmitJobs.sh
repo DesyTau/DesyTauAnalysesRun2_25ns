@@ -3,7 +3,7 @@
 for dir in `ls | grep _files` 
 do
     cd $dir
-    if [ -z $1 ]
+    if [ ! -z $1 ]
        then
        cp $1 ./qsub.sh
     fi
@@ -21,6 +21,6 @@ do
 	   ./qsub.sh $params
 	fi
     done
-    cd $main
+    cd ../
 done
    
