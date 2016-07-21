@@ -63,7 +63,7 @@ then
     exit
 fi
 
-SAMPLE=${SAMPLE##*/}
+SAMPLE=${LIST##*/}
 
 let "n = 0"
 rm -rf ${SAMPLE}_files
