@@ -3,6 +3,9 @@
 <bin name="Splitter" file="Splitter.cpp">
 </bin>
 
+<bin name="checkRoot" file="checkRoot.C">
+  <use name="root"/>
+</bin>
 
 <bin name="AnalysisNTupleProducer" file="AnalysisNTupleProducer.cpp">
  <use name="PhysicsTools/Utilities"/>

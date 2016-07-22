@@ -96,6 +96,7 @@ int main(int argc, char * argv[]){
   using namespace std;
 
   gErrorIgnoreLevel = kFatal;
+  gDebug = 2;
 
   string cmsswBase = (getenv ("CMSSW_BASE"));
 
@@ -868,6 +869,20 @@ void fill_weight(const AC1B * analysisTree, Spring15Tree *otree, PileUp *PUoffic
   otree->gen_noutgoing = analysisTree->genparticles_noutgoing;
 }
 
+
+//compute medium ID adjusted for ICHEP
+bool isICHEPmuon(const AC1B * analysisTree, int Index) {
+        bool goodGlob = analysisTree->muon_isGlobal[Index] && analysisTree->muon_normChi2[Index] < 3 && analysisTree->muon_combQ_chi2LocalPosition[Index] < 12
+                                   && analysisTree->muon_combQ_trkKink[Index] < 20;
+
+        bool isICHEPmedium  = analysisTree->muon_isLoose[Index] &&
+                                          analysisTree->muon_validFraction[Index] >0.49 &&
+                                          analysisTree->muon_segmentComp[Index] > (goodGlob ? 0.303 : 0.451);
+        return isICHEPmedium;
+}
+
+
+
 //compute the absolute isolation for a given lepton labeled by Index in channel ch
 float abs_Iso (int Index, TString ch, const AC1B * analysisTree, float dRiso){
   float neutralHadIso, photonIso, chargedHadIso, puIso;
@@ -1035,7 +1050,8 @@ bool dilepton_veto_mt(const Config *cfg,const  AC1B *analysisTree){
 		if(relIsoMu >= cfg->get<float>("isoDiMuonVeto")) continue;
 		
 		//bool passedVetoId =  analysisTree->muon_isMedium[im]; 
-    bool passedVetoId = isICHEPmed(im, analysisTree);
+		bool passedVetoId = isICHEPmed(im, analysisTree);
+
 		if (!passedVetoId && cfg->get<bool>("applyDiMuonVetoId")) continue;
 		
 		for (unsigned int je = im+1; je<analysisTree->muon_count; ++je) {
@@ -1053,7 +1069,7 @@ bool dilepton_veto_mt(const Config *cfg,const  AC1B *analysisTree){
 		  if(relIsoMu >= cfg->get<float>("isoDiMuonVeto")) continue;	
 
 		  //passedVetoId =  analysisTree->muon_isMedium[je];
-      passedVetoId = isICHEPmed(je, analysisTree);
+	      passedVetoId = isICHEPmed(je, analysisTree);
 
 		  if (!passedVetoId && cfg->get<bool>("applyDiMuonVetoId")) continue;
 		  
@@ -1150,11 +1166,9 @@ bool extra_muon_veto(int leptonIndex, TString ch, const Config *cfg, const AC1B 
 		if (fabs(analysisTree->muon_dxy[im])>cfg->get<float>("dxyVetoMuonCut")) continue;
 		if (fabs(analysisTree->muon_dz[im])>cfg->get<float>("dzVetoMuonCut")) continue;
 		//if (cfg->get<bool>("applyVetoMuonId") && !analysisTree->muon_isMedium[im]) continue;
-    if (cfg->get<bool>("applyVetoMuonId") && !(isICHEPmed(im, analysisTree))) continue;
-
+	    if (cfg->get<bool>("applyVetoMuonId") && !(isICHEPmed(im, analysisTree))) continue;
 		float relIsoMu = rel_Iso(im, ch, analysisTree, cfg->get<float>("dRiso"));
 		if (relIsoMu>cfg->get<float>("isoVetoMuonCut")) continue;
-
 		return(1);
   }
   return(0);
@@ -1191,9 +1205,9 @@ void fillMET(TString ch, int leptonIndex, int tauIndex, const AC1B * analysisTre
   otree->puppimetphi = TMath::ATan2(analysisTree->puppimet_ey,analysisTree->puppimet_ex);
 
   // choosing mva met
-/*  int mva_break;
+  int mva_break;
   if (ch=="mt") mva_break = 3;
-  	else if (ch=="et") mva_break = 2;
+  else if (ch=="et") mva_break = 2;
 
   unsigned int iMet = 0;
   float mvamet_x = 0;
@@ -1204,56 +1218,56 @@ void fillMET(TString ch, int leptonIndex, int tauIndex, const AC1B * analysisTre
   otree->mvacov11 = 0.;
 
   for (; iMet<analysisTree->mvamet_count; ++iMet) {
-		if ((int)analysisTree->mvamet_channel[iMet]==mva_break) break;
+    if ((int)analysisTree->mvamet_channel[iMet]==mva_break) break;
+  }
+
+  if (iMet>=analysisTree->mvamet_count){
+    otree->mvamet = log(0);
+    otree->mvametphi = log(0);
+    otree->mvacov00 = log(0);
+    otree->mvacov01 = log(0);
+    otree->mvacov10 = log(0);
+    otree->mvacov11 = log(0);
+  }
+  else {
+    // choosing mva met
+    unsigned int iMet = 0;
+    for (; iMet<analysisTree->mvamet_count; ++iMet) {
+      if (analysisTree->mvamet_channel[iMet]==mva_break){
+	if( ((int)analysisTree->mvamet_lep1[iMet])==tauIndex && ((int)analysisTree->mvamet_lep2[iMet])==leptonIndex)
+	  break;
       }
-
-  if (iMet>=analysisTree->mvamet_count){		
-		otree->mvamet = 	log(0);
-		otree->mvametphi = log(0);
-	 	otree->mvacov00 = log(0);
-		otree->mvacov01 = log(0);
-		otree->mvacov10 = log(0);
-		otree->mvacov11 = log(0);
-  } else {
-		// choosing mva met
-		unsigned int iMet = 0;
-		for (; iMet<analysisTree->mvamet_count; ++iMet) {
-		  if (analysisTree->mvamet_channel[iMet]==mva_break){
-		    if( ((int)analysisTree->mvamet_lep1[iMet])==tauIndex && ((int)analysisTree->mvamet_lep2[iMet])==leptonIndex)
-		      break;
-		  }
-		}
-
-		float mvamet_x = 0;
-		float mvamet_y = 0;
-		otree->mvacov00 = 0.;
-		otree->mvacov01 = 0.;
-		otree->mvacov10 = 0.;
-		otree->mvacov11 = 0.;
+    }
+    
+    float mvamet_x = 0;
+    float mvamet_y = 0;
+    otree->mvacov00 = 0.;
+    otree->mvacov01 = 0.;
+    otree->mvacov10 = 0.;
+    otree->mvacov11 = 0.;
 		
-		if(iMet < analysisTree->mvamet_count){
-		  mvamet_x = analysisTree->mvamet_ex[iMet];
-		  mvamet_y = analysisTree->mvamet_ey[iMet];
-		  otree->mvacov00 = analysisTree->mvamet_sigxx[iMet];
-		  otree->mvacov01 = analysisTree->mvamet_sigxy[iMet];
-		  otree->mvacov10 = analysisTree->mvamet_sigyx[iMet];
-		  otree->mvacov11 = analysisTree->mvamet_sigyy[iMet];
-		}
-		else{
-		  std::cout<<"MVA MET not found! :: "<< analysisTree->mvamet_count << std::endl;
-		  iMet = 0;
-		  //std::cout<<"tau = "<<tauIndex<<" mu = "<<muonIndex<<std::endl;
-		  //for (; iMet<analysisTree->mvamet_count; ++iMet) {
-		    //std::cout<<"imet = "<<analysisTree->mvamet_channel[iMet]<<" itau = "<<analysisTree->mvamet_lep1[iMet]<<" imu = "<<analysisTree->mvamet_lep2[iMet]<<std::endl;
-		  //}
-		  
-		}
+    if(iMet < analysisTree->mvamet_count){
+      mvamet_x = analysisTree->mvamet_ex[iMet];
+      mvamet_y = analysisTree->mvamet_ey[iMet];
+      otree->mvacov00 = analysisTree->mvamet_sigxx[iMet];
+      otree->mvacov01 = analysisTree->mvamet_sigxy[iMet];
+      otree->mvacov10 = analysisTree->mvamet_sigyx[iMet];
+      otree->mvacov11 = analysisTree->mvamet_sigyy[iMet];
+    }
+    else{
+      std::cout<<"MVA MET not found! :: "<< analysisTree->mvamet_count << std::endl;
+      iMet = 0;
+      //std::cout<<"tau = "<<tauIndex<<" mu = "<<muonIndex<<std::endl;
+      //for (; iMet<analysisTree->mvamet_count; ++iMet) {
+      //std::cout<<"imet = "<<analysisTree->mvamet_channel[iMet]<<" itau = "<<analysisTree->mvamet_lep1[iMet]<<" imu = "<<analysisTree->mvamet_lep2[iMet]<<std::endl;
+      //}
+    }
 		
-		float mvamet_x2 = mvamet_x * mvamet_x;
-		float mvamet_y2 = mvamet_y * mvamet_y;
-		otree->mvamet = TMath::Sqrt(mvamet_x2+mvamet_y2);
-		otree->mvametphi = TMath::ATan2(mvamet_y,mvamet_x);
-  }*/
+    float mvamet_x2 = mvamet_x * mvamet_x;
+    float mvamet_y2 = mvamet_y * mvamet_y;
+    otree->mvamet = TMath::Sqrt(mvamet_x2+mvamet_y2);
+    otree->mvametphi = TMath::ATan2(mvamet_y,mvamet_x);
+  }
 
 }
 
