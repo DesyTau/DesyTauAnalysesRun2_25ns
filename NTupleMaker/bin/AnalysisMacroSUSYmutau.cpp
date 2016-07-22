@@ -144,12 +144,6 @@ int main(int argc, char * argv[]) {
 
   // vertex distributions filenames and histname
 
-  // lepton scale factors
- /* const string muonSfDataBarrel = cfg.get<string>("MuonSfDataBarrel");
-  const string muonSfDataEndcap = cfg.get<string>("MuonSfDataEndcap");
-  const string muonSfMcBarrel = cfg.get<string>("MuonSfMcBarrel");
-  const string muonSfMcEndcap = cfg.get<string>("MuonSfMcEndcap");
-*/
 
   const string jsonFile = cfg.get<string>("jsonFile");
 
@@ -251,15 +245,6 @@ int main(int argc, char * argv[]) {
 
   // reweighting with vertices
 
-
- /* PileUp * PUofficial = new PileUp();
-  TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/pileUp_data_2016B_Cert_271036-274421.root","read");
-  TFile * filePUdistribution_MC = new TFile (TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/MC_Spring16_PU.root","read");
-  TH1D * PU_data = (TH1D *)filePUdistribution_data->Get("pileup");
-  TH1D * PU_mc = (TH1D *)filePUdistribution_MC->Get("pileup");
-  PUofficial->set_h_data(PU_data);
-  PUofficial->set_h_MC(PU_mc);*/
-
 // PU reweighting
   PileUp * PUofficial = new PileUp();
   TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/Data_Run2016B_pileup.root","read");
@@ -271,7 +256,7 @@ int main(int argc, char * argv[]) {
 
 
   // BTag scale factors
-  BTagCalibration calib("csvv2", cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/CSVv2.csv");
+  BTagCalibration calib("csvv2", cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/CSVv2_ichep.csv");
   //BTagCalibrationReader reader_BC(&calib,BTagEntry::OP_MEDIUM,"mujets","central");           // systematics type
   //BTagCalibrationReader reader_Light(&calib,BTagEntry::OP_MEDIUM,"incl","central");           // systematics type
   BTagCalibrationReader reader(BTagEntry::OP_MEDIUM,  // operating point
@@ -444,8 +429,8 @@ for (int iF=0; iF<nTotalFiles; ++iF) {
 
     std::cout << "file " << iF+1 << " out of " << nTotalFiles << " filename : " << filen << std::endl;
 //////////// for SUSY!!!
-if (SUSY){
-if (iF+1 != nTotalFiles) continue;}
+//if (SUSY){
+//if (iF+1 != nTotalFiles) continue;}
     TFile * file_ = TFile::Open(TString(filen));
 
     TH1D * histoInputEvents = NULL;
@@ -526,7 +511,6 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
     float topPt = -1;
     float antitopPt = -1;
-    bool isZTT = false;
 
 /*
 	TTree *genweightsTree = (TTree*)file_->Get("makeroottree/AC1B");
@@ -593,7 +577,6 @@ cout<< "analysisTree.SusyLSPMass  "<< analysisTree.SusyLSPMass<<endl;}
       Float_t genweight;
       float topPt = 0;
       float antitopPt = 0;
-      bool isZTT = false;
       LSF_weight = 1.;
       TFR_weight = 1.;
       top_weight = 1.;
@@ -723,8 +706,6 @@ cout<< "analysisTree.SusyLSPMass  "<< analysisTree.SusyLSPMass<<endl;}
       tau_index=-1;
       el_index=-1;
 
-      if(fillplots)
-	FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, Channel, mu_index,el_index,tau_index);
       CFCounter[iCut]+= weight;
       CFCounter_[iCut]+= weight;
       iCFCounter[iCut]++;
@@ -776,8 +757,6 @@ cout<< "analysisTree.SusyLSPMass  "<< analysisTree.SusyLSPMass<<endl;}
 	}
 
 
-      if(fillplots)
-	FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, Channel, mu_index,el_index,tau_index);
       CFCounter[iCut]+= weight;
       CFCounter_[iCut]+= weight;
       iCFCounter[iCut]++;
@@ -804,10 +783,10 @@ cout<< "analysisTree.SusyLSPMass  "<< analysisTree.SusyLSPMass<<endl;}
 
       }
 
-      if (!isData /*&& (   string::npos != filen.find("stau") || string::npos != filen.find("C1"))*/ ) isMainTrigger = true;
+      if (!isData )/*|| (   string::npos != filen.find("stau") || string::npos != filen.find("C1") || string::npos != filen.find("SMS")) )*/ isMainTrigger = true;
 
       if (!isMainTrigger) {
-	std::cout << "HLT filter for Mu18 " << MainTrigger << " not found" << std::endl;
+	std::cout << "HLT filter for Mu Trigger " << MainTrigger << " not found" << std::endl;
 	return(-1);
       }
 
@@ -873,10 +852,10 @@ cout<< "analysisTree.SusyLSPMass  "<< analysisTree.SusyLSPMass<<endl;}
 	float chargedHadIsoMu = analysisTree.muon_chargedHadIso[mIndex];
 	float puIsoMu = analysisTree.muon_puIso[mIndex];
 	if (isIsoR03) {
-	  neutralHadIsoMu = analysisTree.muon_r03_sumNeutralHadronEt[mIndex];
-	  photonIsoMu = analysisTree.muon_r03_sumPhotonEt[mIndex];
-	  chargedHadIsoMu = analysisTree.muon_r03_sumChargedHadronPt[mIndex];
-	  puIsoMu = analysisTree.muon_r03_sumPUPt[mIndex];
+	  neutralHadIsoMu = analysisTree.muon_r04_sumNeutralHadronEt[mIndex];
+	  photonIsoMu = analysisTree.muon_r04_sumPhotonEt[mIndex];
+	  chargedHadIsoMu = analysisTree.muon_r04_sumChargedHadronPt[mIndex];
+	  puIsoMu = analysisTree.muon_r04_sumPUPt[mIndex];
 	}
 	float neutralIsoMu = neutralHadIsoMu + photonIsoMu - 0.5*puIsoMu;
 	neutralIsoMu = TMath::Max(float(0),neutralIsoMu); 
@@ -885,7 +864,7 @@ cout<< "analysisTree.SusyLSPMass  "<< analysisTree.SusyLSPMass<<endl;}
 	if (isData)
 	{	for (unsigned int iT=0; iT<analysisTree.trigobject_count; ++iT) {
 	  	if (analysisTree.trigobject_filters[iT][nMainTrigger]
-	      	&&analysisTree.muon_pt[mIndex]>ptMuonHighCut&&
+	      	&& analysisTree.muon_pt[mIndex]>ptMuonHighCut&&
 	      	analysisTree.trigobject_pt[iT]>SingleMuonTriggerPtCut) { // IsoMu Leg
 	    	float dRtrig = deltaR(analysisTree.muon_eta[mIndex],analysisTree.muon_phi[mIndex],
 				  analysisTree.trigobject_eta[iT],analysisTree.trigobject_phi[iT]);
@@ -924,7 +903,6 @@ cout<< "analysisTree.SusyLSPMass  "<< analysisTree.SusyLSPMass<<endl;}
 	  if (dR<dRleptonsCutmutau) continue;
 
 	  bool trigMatch = isIsoMuonLegMatch;
-
 	  if (!trigMatch) continue;
 	  
 
@@ -1062,8 +1040,6 @@ cout<< "analysisTree.SusyLSPMass  "<< analysisTree.SusyLSPMass<<endl;}
       double q = analysisTree.tau_charge[tau_index] * analysisTree.muon_charge[mu_index];
       event_sign  = q;
 
-      if(fillplots)
-	FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, Channel, mu_index,el_index,tau_index);
       CFCounter[iCut]+= weight;
       CFCounter_[iCut]+= weight;
       iCFCounter[iCut]++;
@@ -1113,10 +1089,10 @@ cout<< "analysisTree.SusyLSPMass  "<< analysisTree.SusyLSPMass<<endl;}
 	float chargedHadIsoMu = analysisTree.muon_chargedHadIso[im];
 	float puIsoMu = analysisTree.muon_puIso[im];
 	if (isIsoR03) {
-	  neutralHadIsoMu = analysisTree.muon_r03_sumNeutralHadronEt[im];
-	  photonIsoMu = analysisTree.muon_r03_sumPhotonEt[im];
-	  chargedHadIsoMu = analysisTree.muon_r03_sumChargedHadronPt[im];
-	  puIsoMu = analysisTree.muon_r03_sumPUPt[im];
+	  neutralHadIsoMu = analysisTree.muon_r04_sumNeutralHadronEt[im];
+	  photonIsoMu = analysisTree.muon_r04_sumPhotonEt[im];
+	  chargedHadIsoMu = analysisTree.muon_r04_sumChargedHadronPt[im];
+	  puIsoMu = analysisTree.muon_r04_sumPUPt[im];
 	}
 	float neutralIsoMu = neutralHadIsoMu + photonIsoMu - 0.5*puIsoMu;
 	neutralIsoMu = TMath::Max(float(0),neutralIsoMu); 
@@ -1170,8 +1146,6 @@ cout<< "analysisTree.SusyLSPMass  "<< analysisTree.SusyLSPMass<<endl;}
    	event_secondLeptonVeto = dilepton_veto;
 	if (dilepton_veto)  continue;
 
-      if(fillplots)
-	FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, Channel, mu_index,el_index,tau_index);
       CFCounter[iCut]+= weight;
       CFCounter_[iCut]+= weight;
       iCFCounter[iCut]++;
@@ -1182,8 +1156,6 @@ cout<< "analysisTree.SusyLSPMass  "<< analysisTree.SusyLSPMass<<endl;}
 	if (extramuon_veto) continue;
 
 
-      if(fillplots)
-	FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, Channel, mu_index,el_index,tau_index);
       CFCounter[iCut]+= weight;
       CFCounter_[iCut]+= weight;
       iCFCounter[iCut]++;
@@ -1215,8 +1187,6 @@ cout<< "analysisTree.SusyLSPMass  "<< analysisTree.SusyLSPMass<<endl;}
 	if (!isData) trigweight = EffFromData;
 	weight *= trigweight;
 	trig_weight = trigweight;
-      if(fillplots)
-	FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, Channel, mu_index,el_index,tau_index);
       CFCounter[iCut]+= weight;
       CFCounter_[iCut]+= weight;
       iCFCounter[iCut]++;
@@ -1237,8 +1207,6 @@ cout<< "analysisTree.SusyLSPMass  "<< analysisTree.SusyLSPMass<<endl;}
       }
 
 
-      if(fillplots)
-	FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, Channel, mu_index,el_index,tau_index);
       CFCounter[iCut]+= weight;
       CFCounter_[iCut]+= weight;
       iCFCounter[iCut]++;
@@ -1276,15 +1244,13 @@ cout<< "analysisTree.SusyLSPMass  "<< analysisTree.SusyLSPMass<<endl;}
 	  //cout<<"  "<<TFRSF_mu1<<"  for  eta  "<<etaTau1<<  " pT  "<< ptTau1<<endl;
 	}//apply TFR*/
 
-      if(fillplots)
-	FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, Channel, mu_index,el_index,tau_index);
       CFCounter[iCut]+= weight;
       CFCounter_[iCut]+= weight;
       iCFCounter[iCut]++;
       iCut++;
 
 
-      if (!isData && ( string::npos != filen.find("TTJets")  || string::npos != filen.find("TTPowHeg") || string::npos != filen.find("TT_")) ) 
+      if (!isData && ( string::npos != filen.find("TTJets")  || string::npos != filen.find("TTPowHeg") || string::npos != filen.find("TT_TuneCUETP8M1_13TeV-powheg-pythia8")) ) 
 	{
 
 	  if (topPt>0.&&antitopPt>0.) {
@@ -1295,8 +1261,6 @@ cout<< "analysisTree.SusyLSPMass  "<< analysisTree.SusyLSPMass<<endl;}
 	  }
 	}
 
-      if(fillplots)
-	FillMainHists(iCut, weight, ElMV, MuMV, TauMV,JetsMV,METV, ChiMass,mIntermediate,analysisTree, Channel, mu_index,el_index,tau_index);
       CFCounter[iCut]+= weight;
       CFCounter_[iCut]+= weight;
       iCFCounter[iCut]++;
