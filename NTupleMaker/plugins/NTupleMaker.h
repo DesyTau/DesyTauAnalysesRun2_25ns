@@ -140,6 +140,10 @@
 #include "FWCore/Utilities/interface/EDGetToken.h"
 #include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
 
+#include "DataFormats/L1Trigger/interface/Muon.h"
+#include "DataFormats/L1Trigger/interface/EGamma.h"
+#include "DataFormats/L1Trigger/interface/Tau.h"
+
 using namespace std;
 using namespace reco;
 
@@ -157,6 +161,7 @@ using namespace reco;
 #define M_mvametmaxcount 2000
 #define M_genparticlesmaxcount 1000
 #define M_trigobjectmaxcount 1000
+#define M_hltfiltersmax 200
 typedef ROOT::Math::PositionVector3D<ROOT::Math::Cartesian3D<double>,ROOT::Math::DefaultCoordinateSystemTag> Point3D;
 typedef ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> > LorentzVector;
 typedef ROOT::Math::SMatrix<double, 2, 2, ROOT::Math::MatRepSym<double, 2> > CovMatrix2D;
@@ -303,6 +308,7 @@ class NTupleMaker : public edm::EDAnalyzer{
   bool crecelectron;
   bool crectau;
   bool cl1isotau;
+  bool cl1objects;
   bool crecphoton;
   bool crecpfjet;
   bool crecpfmet;
@@ -368,11 +374,8 @@ class NTupleMaker : public edm::EDAnalyzer{
   edm::EDGetTokenT<edm::ValueMap<int> >   mvaNonTrigCategoriesMapToken_;
   edm::EDGetTokenT<edm::ValueMap<float> > mvaTrigValuesMapToken_;
   edm::EDGetTokenT<edm::ValueMap<int> >   mvaTrigCategoriesMapToken_;
-
   edm::EDGetTokenT<pat::TauCollection> TauCollectionToken_;
-  edm::EDGetTokenT<l1extra::L1JetParticleCollection> L1IsoTauCollectionToken_;
   edm::EDGetTokenT<pat::JetCollection> JetCollectionToken_;
-
   edm::EDGetTokenT<pat::METCollection> MetCollectionToken_;
   edm::EDGetTokenT<CovMatrix2D> MetCovMatrixToken_;
   edm::EDGetTokenT<double> MetSigToken_;
@@ -384,7 +387,10 @@ class NTupleMaker : public edm::EDAnalyzer{
   std::vector<edm::EDGetTokenT<pat::METCollection> > MvaMetCollectionsToken_;
   edm::EDGetTokenT<reco::GenParticleCollection> GenParticleCollectionToken_;
   edm::EDGetTokenT<l1extra::L1JetParticleCollection> L1JetCollectionToken_;
-  edm::EDGetTokenT<l1extra::L1JetParticleCollection> L1TauCollectionToken_;
+  edm::EDGetTokenT<l1extra::L1JetParticleCollection> L1IsoTauCollectionToken_;
+  edm::EDGetTokenT<BXVector<l1t::Muon> > L1MuonCollectionToken_;
+  edm::EDGetTokenT<BXVector<l1t::EGamma> > L1EGammaCollectionToken_;
+  edm::EDGetTokenT<BXVector<l1t::Tau> > L1TauCollectionToken_;
   edm::EDGetTokenT<pat::PackedCandidateCollection> PackedCantidateCollectionToken_;
   edm::EDGetTokenT<pat::TriggerObjectStandAloneCollection> TriggerObjectCollectionToken_;
   edm::EDGetTokenT<BeamSpot> BeamSpotToken_;
@@ -837,7 +843,62 @@ class NTupleMaker : public edm::EDAnalyzer{
   string gentau_decayMode_name[M_taumaxcount];
   UChar_t gentau_mother[M_taumaxcount];
 
-  // L1 Iso Tau
+  // L1 Objects
+  UInt_t  l1muon_count;
+  Float_t l1muon_px[M_muonmaxcount];
+  Float_t l1muon_py[M_muonmaxcount];
+  Float_t l1muon_pz[M_muonmaxcount];
+  Float_t l1muon_pt[M_muonmaxcount];
+  Int_t   l1muon_ipt[M_muonmaxcount];
+  Int_t   l1muon_eta[M_muonmaxcount];
+  Int_t   l1muon_phi[M_muonmaxcount];
+  Int_t   l1muon_iso[M_muonmaxcount];
+  Int_t   l1muon_qual[M_muonmaxcount];
+  Int_t   l1muon_charge[M_muonmaxcount];
+  Int_t   l1muon_chargeValid[M_muonmaxcount];  
+  Int_t   l1muon_muonIndex[M_muonmaxcount];
+  Int_t   l1muon_tag[M_muonmaxcount];
+  Int_t   l1muon_isoSum[M_muonmaxcount];
+  Int_t   l1muon_dPhiExtra[M_muonmaxcount];
+  Int_t   l1muon_dEtaExtra[M_muonmaxcount];
+  Int_t   l1muon_rank[M_muonmaxcount];
+
+  UInt_t  l1egamma_count;
+  Float_t l1egamma_px[M_electronmaxcount];
+  Float_t l1egamma_py[M_electronmaxcount];
+  Float_t l1egamma_pz[M_electronmaxcount];
+  Float_t l1egamma_pt[M_electronmaxcount];
+  Int_t   l1egamma_ipt[M_electronmaxcount];
+  Int_t   l1egamma_eta[M_electronmaxcount];
+  Int_t   l1egamma_phi[M_electronmaxcount];
+  Int_t   l1egamma_iso[M_electronmaxcount];
+  Int_t   l1egamma_qual[M_electronmaxcount];
+  Int_t   l1egamma_towerIEta[M_electronmaxcount];
+  Int_t   l1egamma_towerIPhi[M_electronmaxcount];
+  Int_t   l1egamma_rawEt[M_electronmaxcount];
+  Int_t   l1egamma_isoEt[M_electronmaxcount];
+  Int_t   l1egamma_footprintEt[M_electronmaxcount];
+  Int_t   l1egamma_nTT[M_electronmaxcount];
+  Int_t   l1egamma_shape[M_electronmaxcount];
+  
+  UInt_t  l1tau_count;
+  Float_t l1tau_px[M_taumaxcount];
+  Float_t l1tau_py[M_taumaxcount];
+  Float_t l1tau_pz[M_taumaxcount];
+  Float_t l1tau_pt[M_taumaxcount];
+  Int_t   l1tau_ipt[M_taumaxcount];
+  Int_t   l1tau_eta[M_taumaxcount];
+  Int_t   l1tau_phi[M_taumaxcount];
+  Int_t   l1tau_iso[M_taumaxcount];
+  Int_t   l1tau_qual[M_taumaxcount];
+  Int_t   l1tau_towerIEta[M_taumaxcount];
+  Int_t   l1tau_towerIPhi[M_taumaxcount];
+  Int_t   l1tau_rawEt[M_taumaxcount];
+  Int_t   l1tau_isoEt[M_taumaxcount];
+  Int_t   l1tau_nTT[M_taumaxcount];
+  Int_t   l1tau_hasEM[M_taumaxcount];
+  Int_t   l1tau_isMerged[M_taumaxcount];
+    
   UInt_t l1isotau_count;
   Float_t l1isotau_e[M_taumaxcount];
   Float_t l1isotau_px[M_taumaxcount];
@@ -997,7 +1058,7 @@ class NTupleMaker : public edm::EDAnalyzer{
   Float_t trigobject_pt[M_trigobjectmaxcount];
   Float_t trigobject_eta[M_trigobjectmaxcount];
   Float_t trigobject_phi[M_trigobjectmaxcount];
-  Bool_t  trigobject_filters[M_trigobjectmaxcount][50];
+  Bool_t  trigobject_filters[M_trigobjectmaxcount][M_hltfiltersmax];
   Bool_t trigobject_isMuon[M_trigobjectmaxcount];
   Bool_t trigobject_isElectron[M_trigobjectmaxcount];
   Bool_t trigobject_isTau[M_trigobjectmaxcount];

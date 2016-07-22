@@ -993,7 +993,6 @@ int main(int argc, char * argv[]) {
       }
       
       if (iMet>=analysisTree.mvamet_count){
-	//if (true) {
 	if(debug)
 	  fileOutput<<"MVA MET channel ploblems.."<<std::endl;
 

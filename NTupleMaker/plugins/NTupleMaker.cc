@@ -101,7 +101,7 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
   crecmuon(iConfig.getUntrackedParameter<bool>("RecMuon", false)),
   crecelectron(iConfig.getUntrackedParameter<bool>("RecElectron", false)),
   crectau(iConfig.getUntrackedParameter<bool>("RecTau", false)),
-  cl1isotau(iConfig.getUntrackedParameter<bool>("L1IsoTau", false)),
+  cl1objects(iConfig.getUntrackedParameter<bool>("L1Objects", false)), 
   crecphoton(iConfig.getUntrackedParameter<bool>("RecPhoton", false)),
   crecpfjet(iConfig.getUntrackedParameter<bool>("RecJet", false)),
   crecpfmet(iConfig.getUntrackedParameter<bool>("RecPFMet", false)),
@@ -179,7 +179,7 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
 
   GenParticleCollectionToken_(consumes<reco::GenParticleCollection>(iConfig.getParameter<edm::InputTag>("GenParticleCollectionTag"))),
   L1JetCollectionToken_(consumes<l1extra::L1JetParticleCollection>(edm::InputTag("l1extraParticles","Central"))),
-  L1TauCollectionToken_(consumes<l1extra::L1JetParticleCollection>(edm::InputTag("l1extraParticles","Tau"))),
+  L1IsoTauCollectionToken_(consumes<l1extra::L1JetParticleCollection>(edm::InputTag("l1extraParticles","Tau"))),
   PackedCantidateCollectionToken_(consumes<pat::PackedCandidateCollection>(edm::InputTag("packedPFCandidates"))),
   TriggerObjectCollectionToken_(consumes<pat::TriggerObjectStandAloneCollection>(iConfig.getParameter<edm::InputTag>("TriggerObjectCollectionTag"))),
   BeamSpotToken_(consumes<BeamSpot>(iConfig.getParameter<edm::InputTag>("BeamSpotCollectionTag"))),
@@ -274,9 +274,14 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
     MvaMetCollectionsToken_.push_back(consumes<pat::METCollection>(*mit));
   }
 
-  if(cl1isotau)
-    L1IsoTauCollectionToken_ = consumes<l1extra::L1JetParticleCollection>(iConfig.getParameter<edm::InputTag>("IsoTauCollectionTag"));
+  if(cl1objects){
+    L1MuonCollectionToken_   = consumes<BXVector<l1t::Muon> >(iConfig.getParameter<edm::InputTag>("L1MuonCollectionTag"));
+    L1EGammaCollectionToken_ = consumes<BXVector<l1t::EGamma> >(iConfig.getParameter<edm::InputTag>("L1EGammaCollectionTag"));
+    L1TauCollectionToken_    = consumes<BXVector<l1t::Tau> >(iConfig.getParameter<edm::InputTag>("L1TauCollectionTag"));    
+    L1IsoTauCollectionToken_ = consumes<l1extra::L1JetParticleCollection>(iConfig.getParameter<edm::InputTag>("L1IsoTauCollectionTag"));
+  }
 
+  
   HLTPrescaleConfig = new HLTPrescaleProvider(iConfig, consumesCollector(), *this);
 }
 
@@ -667,20 +672,6 @@ void NTupleMaker::beginJob(){
     tree->Branch("track_highPurity", track_highPurity, "track_highPurity[track_count]/O");
   }
 
-  // L1 IsoTau
-  if (cl1isotau){
-    tree->Branch("l1isotau_count", &l1isotau_count, "l1isotau_count/i");
-    tree->Branch("l1isotau_e", l1isotau_e, "l1isotau_e[l1isotau_count]/F");
-    tree->Branch("l1isotau_px", l1isotau_px, "l1isotau_px[l1isotau_count]/F");
-    tree->Branch("l1isotau_py", l1isotau_py, "l1isotau_py[l1isotau_count]/F");
-    tree->Branch("l1isotau_pz", l1isotau_pz, "l1isotau_pz[l1isotau_count]/F");
-    tree->Branch("l1isotau_mass", l1isotau_mass, "l1isotau_mass[l1isotau_count]/F");
-    tree->Branch("l1isotau_eta", l1isotau_eta, "l1isotau_eta[l1isotau_count]/F");
-    tree->Branch("l1isotau_phi", l1isotau_phi, "l1isotau_phi[l1isotau_count]/F");
-    tree->Branch("l1isotau_pt", l1isotau_pt, "l1isotau_pt[l1isotau_count]/F");
-    tree->Branch("l1isotau_charge", l1isotau_charge, "l1isotau_charge[l1isotau_count]/F");    
-  }
-  
   // Met
   if (crecpfmet) {
     tree->Branch("pfmet_ex", &pfmet_ex, "pfmet_ex/F");
@@ -881,6 +872,73 @@ void NTupleMaker::beginJob(){
     tree->Branch("SusyLSPMass",&SusyLSPMass,"SusyLSPMass/F");
   }
 
+  // L1 objects
+  tree->Branch("l1muon_count",       &l1muon_count,       "l1muon_count/i");
+  tree->Branch("l1muon_px",           l1muon_px,          "l1muon_px[l1muon_count]/F");
+  tree->Branch("l1muon_py",           l1muon_py,          "l1muon_py[l1muon_count]F");
+  tree->Branch("l1muon_pz",           l1muon_pz,          "l1muon_pz[l1muon_count]/F");
+  tree->Branch("l1muon_pt",           l1muon_pt,          "l1muon_pt[l1muon_count]/F");
+  tree->Branch("l1muon_ipt",          l1muon_ipt,         "l1muon_ipt[l1muon_count]/I");
+  tree->Branch("l1muon_eta",          l1muon_eta,         "l1muon_eta[l1muon_count]/I");
+  tree->Branch("l1muon_phi",          l1muon_phi,         "l1muon_phi[l1muon_count]/I");   
+  tree->Branch("l1muon_qual",         l1muon_qual,        "l1muon_qual[l1muon_count]/I");
+  tree->Branch("l1muon_iso",          l1muon_iso,         "l1muon_iso[l1muon_count]/I");
+  tree->Branch("l1muon_charge",       l1muon_charge,      "l1muon_charge[l1muon_count]/I");
+  tree->Branch("l1muon_chargeValid",  l1muon_chargeValid, "l1muon_chargeValid[l1muon_count]/I");
+  tree->Branch("l1muon_muonIndex",    l1muon_muonIndex,   "l1muon_muonIndex[l1muon_count]/I");   
+  tree->Branch("l1muon_tag",          l1muon_tag,         "l1muon_tag[l1muon_count]/I");
+  tree->Branch("l1muon_isoSum",       l1muon_isoSum,      "l1muon_isoSum[l1muon_count]/I");   
+  tree->Branch("l1muon_dPhiExtra",    l1muon_dPhiExtra,   "l1muon_dPhiExtra[l1muon_count]/I");
+  tree->Branch("l1muon_dEtaExtra",    l1muon_dEtaExtra,   "l1muon_dEtaExtra[l1muon_count]/I");
+  tree->Branch("l1muon_rank",         l1muon_rank,        "l1muon_rank[l1muon_count]/I");
+
+  tree->Branch("l1egamma_count",       &l1egamma_count,       "l1egamma_count/i");
+  tree->Branch("l1egamma_px",           l1egamma_px,          "l1egamma_px[l1egamma_count]/F");
+  tree->Branch("l1egamma_py",           l1egamma_py,          "l1egamma_py[l1egamma_count]F");
+  tree->Branch("l1egamma_pz",           l1egamma_pz,          "l1egamma_pz[l1egamma_count]/F");
+  tree->Branch("l1egamma_pt",           l1egamma_pt,          "l1egamma_pt[l1egamma_count]/F");
+  tree->Branch("l1egamma_ipt",          l1egamma_ipt,         "l1egamma_ipt[l1egamma_count]/I");
+  tree->Branch("l1egamma_eta",          l1egamma_eta,         "l1egamma_eta[l1egamma_count]/I");
+  tree->Branch("l1egamma_phi",          l1egamma_phi,         "l1egamma_phi[l1egamma_count]/I");   
+  tree->Branch("l1egamma_qual",         l1egamma_qual,        "l1egamma_qual[l1egamma_count]/I");   
+  tree->Branch("l1egamma_iso",          l1egamma_iso,         "l1egamma_iso[l1egamma_count]/I");
+  tree->Branch("l1egamma_towerIEta",    l1egamma_towerIEta,   "l1egamma_towerIEta[l1egamma_count]/I");
+  tree->Branch("l1egamma_towerIPhi",    l1egamma_towerIPhi,   "l1egamma_towerIPhi[l1egamma_count]/I");
+  tree->Branch("l1egamma_rawEt",        l1egamma_rawEt,       "l1egamma_rawEt[l1egamma_count]/I");
+  tree->Branch("l1egamma_isoEt",        l1egamma_isoEt,       "l1egamma_isoEt[l1egamma_count]/I");
+  tree->Branch("l1egamma_footprintEt",  l1egamma_footprintEt, "l1egamma_footprintEt[l1egamma_count]/I");
+  tree->Branch("l1egamma_nTT",          l1egamma_nTT,         "l1egamma_nTT[l1egamma_count]/I");    
+  tree->Branch("l1egamma_shape",        l1egamma_shape,       "l1egamma_shape[l1egamma_count]/I");
+
+  tree->Branch("l1tau_count",       &l1tau_count,       "l1tau_count/i");
+  tree->Branch("l1tau_px",           l1tau_px,          "l1tau_px[l1tau_count]/F");
+  tree->Branch("l1tau_py",           l1tau_py,          "l1tau_py[l1tau_count]F");
+  tree->Branch("l1tau_pz",           l1tau_pz,          "l1tau_pz[l1tau_count]/F");
+  tree->Branch("l1tau_pt",           l1tau_pt,          "l1tau_pt[l1tau_count]/F");
+  tree->Branch("l1tau_ipt",          l1tau_ipt,         "l1tau_ipt[l1tau_count]/I");
+  tree->Branch("l1tau_eta",          l1tau_eta,         "l1tau_eta[l1tau_count]/I");
+  tree->Branch("l1tau_phi",          l1tau_phi,         "l1tau_phi[l1tau_count]/I");   
+  tree->Branch("l1tau_qual",         l1tau_qual,        "l1tau_qual[l1tau_count]/I");   
+  tree->Branch("l1tau_iso",          l1tau_iso,         "l1tau_iso[l1tau_count]/I");
+  tree->Branch("l1tau_towerIEta",    l1tau_towerIEta,   "l1tau_towerIEta[l1tau_count]/I");
+  tree->Branch("l1tau_towerIPhi",    l1tau_towerIPhi,   "l1tau_towerIPhi[l1tau_count]/I");
+  tree->Branch("l1tau_rawEt",        l1tau_rawEt,       "l1tau_rawEt[l1tau_count]/I");
+  tree->Branch("l1tau_isoEt",        l1tau_isoEt,       "l1tau_isoEt[l1tau_count]/I");
+  tree->Branch("l1tau_nTT",          l1tau_nTT,         "l1tau_nTT[l1tau_count]/I");    
+  tree->Branch("l1tau_hasEM",        l1tau_hasEM,       "l1tau_hasEM[l1tau_count]/I");
+  tree->Branch("l1tau_isMerged",     l1tau_isMerged,    "l1tau_isMerged[l1tau_count]/I");
+  
+  tree->Branch("l1isotau_count", &l1isotau_count, "l1isotau_count/i");
+  tree->Branch("l1isotau_e", l1isotau_e, "l1isotau_e[l1isotau_count]/F");
+  tree->Branch("l1isotau_px", l1isotau_px, "l1isotau_px[l1isotau_count]/F");
+  tree->Branch("l1isotau_py", l1isotau_py, "l1isotau_py[l1isotau_count]/F");
+  tree->Branch("l1isotau_pz", l1isotau_pz, "l1isotau_pz[l1isotau_count]/F");
+  tree->Branch("l1isotau_mass", l1isotau_mass, "l1isotau_mass[l1isotau_count]/F");
+  tree->Branch("l1isotau_eta", l1isotau_eta, "l1isotau_eta[l1isotau_count]/F");
+  tree->Branch("l1isotau_phi", l1isotau_phi, "l1isotau_phi[l1isotau_count]/F");
+  tree->Branch("l1isotau_pt", l1isotau_pt, "l1isotau_pt[l1isotau_count]/F");
+  tree->Branch("l1isotau_charge", l1isotau_charge, "l1isotau_charge[l1isotau_count]/F");    
+  
   // trigger objects
   if (ctrigger) {
     tree->Branch("trigobject_count",&trigobject_count,"trigobject_count/i");
@@ -890,14 +948,14 @@ void NTupleMaker::beginJob(){
     tree->Branch("trigobject_pt",trigobject_pt,"trigobject_pt[trigobject_count]/F");
     tree->Branch("trigobject_eta",trigobject_eta,"trigobject_eta[trigobject_count]/F");
     tree->Branch("trigobject_phi",trigobject_phi,"trigobject_phi[trigobject_count]/F");
-    tree->Branch("trigobject_filters",trigobject_filters,"trigobject_filters[trigobject_count][50]/O");
+    tree->Branch("trigobject_filters",trigobject_filters,TString("trigobject_filters[trigobject_count][")+(Long64_t)M_hltfiltersmax+"]/O");
     tree->Branch("trigobject_isMuon",trigobject_isMuon,"trigobject_isMuon[trigobject_count]/O");
     tree->Branch("trigobject_isElectron",trigobject_isElectron,"trigobject_isElectron[trigobject_count]/O");
     tree->Branch("trigobject_isTau",trigobject_isTau,"trigobject_isTau[trigobject_count]/O");
     tree->Branch("trigobject_isJet",trigobject_isJet,"trigobject_isJet[trigobject_count]/O");
     tree->Branch("trigobject_isMET",trigobject_isMET,"trigobject_isMET[trigobject_count]/O");
   }
-
+  
   //add these branches to main tree as well
   tree->Branch("run_hltnames", "std::vector<std::string>", &run_hltnames);
   tree->Branch("run_hltfilters", "std::vector<std::string>",&run_hltfilters);
@@ -1287,6 +1345,9 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   muon_count = 0;
   dimuon_count = 0;
   tau_count = 0;
+  l1muon_count = 0;
+  l1egamma_count = 0;
+  l1tau_count = 0;
   l1isotau_count = 0;
   gentau_count = 0;
   pfjet_count = 0;
@@ -1501,14 +1562,118 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   if (crectrack)
     AddPFCand(iEvent, iSetup);
 
-  if (cl1isotau){
-    if (doDebug) cout<<"add L1 IsoTaus"<< endl;
+  if (cl1objects){
+    if (doDebug) cout<<"add L1 Objects"<< endl;
+
+    edm::Handle<BXVector<l1t::Muon> > l1muons;
+    iEvent.getByToken( L1MuonCollectionToken_, l1muons);
+    if( !l1muons.isValid() )
+      edm::LogError("DataNotAvailable")  << "No L1 Muons collection available \n";
+    for(unsigned imu = 0 ; imu < l1muons->size() ; imu++) {
+      if(l1muon_count == M_muonmaxcount) {
+	cerr << "number of L1 Muons > M_muonmaxcount. They are missing." << endl; 
+	errors |= 1<<3; 
+	break;
+      }
+
+      if((*l1muons)[imu].pt() < cMuPtMin ) continue;
+      
+      l1muon_px[l1muon_count]       = (*l1muons)[imu].px();
+      l1muon_py[l1muon_count]       = (*l1muons)[imu].py();
+      l1muon_pz[l1muon_count]       = (*l1muons)[imu].pz();
+      l1muon_pt[l1muon_count]       = (*l1muons)[imu].pt();
+      l1muon_ipt[l1muon_count]      = (*l1muons)[imu].hwPt();
+      l1muon_eta[l1muon_count]      = (*l1muons)[imu].hwEta();
+      l1muon_phi[l1muon_count]      = (*l1muons)[imu].hwPhi();
+      l1muon_iso[l1muon_count]      = (*l1muons)[imu].hwIso();
+      l1muon_qual[l1muon_count]     = (*l1muons)[imu].hwQual();
+
+      l1muon_charge[l1muon_count]      = (*l1muons)[imu].hwCharge();
+      l1muon_chargeValid[l1muon_count] = (*l1muons)[imu].hwChargeValid();
+      l1muon_muonIndex[l1muon_count]   = (*l1muons)[imu].tfMuonIndex();
+      l1muon_tag[l1muon_count]         = (*l1muons)[imu].hwTag();
+      l1muon_isoSum[l1muon_count]      = (*l1muons)[imu].hwIsoSum();
+      l1muon_dPhiExtra[l1muon_count]   = (*l1muons)[imu].hwDPhiExtra();
+      l1muon_dEtaExtra[l1muon_count]   = (*l1muons)[imu].hwDEtaExtra();
+      l1muon_rank[l1muon_count]        = (*l1muons)[imu].hwRank();
+      
+      l1muon_count++;
+    }
+         
+    edm::Handle<BXVector<l1t::EGamma> > l1egammas;
+    iEvent.getByToken( L1EGammaCollectionToken_, l1egammas);
+    if( !l1egammas.isValid() )
+      edm::LogError("DataNotAvailable")  << "No L1 EGamma collection available \n";
+    for(unsigned ieg = 0 ; ieg < l1egammas->size() ; ieg++) {
+      if(l1egamma_count == M_electronmaxcount) {
+	cerr << "number of L1 Electrons > M_electronmaxcount. They are missing." << endl; 
+	errors |= 1<<3; 
+	break;
+      }
+
+      if((*l1egammas)[ieg].pt() < cElPtMin ) continue;
+      
+      l1egamma_px[l1egamma_count]       = (*l1egammas)[ieg].px();
+      l1egamma_py[l1egamma_count]       = (*l1egammas)[ieg].py();
+      l1egamma_pz[l1egamma_count]       = (*l1egammas)[ieg].pz();
+      l1egamma_pt[l1egamma_count]       = (*l1egammas)[ieg].pt();
+      l1egamma_ipt[l1egamma_count]      = (*l1egammas)[ieg].hwPt();
+      l1egamma_eta[l1egamma_count]      = (*l1egammas)[ieg].hwEta();
+      l1egamma_phi[l1egamma_count]      = (*l1egammas)[ieg].hwPhi();
+      l1egamma_iso[l1egamma_count]      = (*l1egammas)[ieg].hwIso();
+      l1egamma_qual[l1egamma_count]     = (*l1egammas)[ieg].hwQual();
+
+      //l1egamma_towerIEta[l1egamma_count]   = (*l1egammas)[ieg].towerIEta();
+      //l1egamma_towerIPhi[l1egamma_count]   = (*l1egammas)[ieg].towerIPhi();
+      //l1egamma_rawEt[l1egamma_count]       = (*l1egammas)[ieg].rawEt();
+      //l1egamma_isoEt[l1egamma_count]       = (*l1egammas)[ieg].isoEt();
+      //l1egamma_footprintEt[l1egamma_count] = (*l1egammas)[ieg].footprintEt();
+      //l1egamma_nTT[l1egamma_count]         = (*l1egammas)[ieg].nTT();
+      //l1egamma_shape[l1egamma_count]       = (*l1egammas)[ieg].shape();
+         
+      l1egamma_count++;
     
+    }
+    
+    edm::Handle<BXVector<l1t::Tau> > l1taus;
+    iEvent.getByToken( L1TauCollectionToken_, l1taus);
+    if( !l1taus.isValid() )
+      edm::LogError("DataNotAvailable")  << "No L1 Tau collection available \n";
+    for(unsigned itau = 0 ; itau < l1taus->size() ; itau++) {
+      if(l1tau_count == M_taumaxcount) {
+	cerr << "number of L1 Taus > M_taumaxcount. They are missing." << endl; 
+	errors |= 1<<3; 
+	break;
+      }
+
+      if((*l1taus)[itau].pt() < cTauPtMin ) continue;
+      
+      l1tau_px[l1tau_count]       = (*l1taus)[itau].px();
+      l1tau_py[l1tau_count]       = (*l1taus)[itau].py();
+      l1tau_pz[l1tau_count]       = (*l1taus)[itau].pz();
+      l1tau_pt[l1tau_count]       = (*l1taus)[itau].pt();
+      l1tau_ipt[l1tau_count]      = (*l1taus)[itau].hwPt();
+      l1tau_eta[l1tau_count]      = (*l1taus)[itau].hwEta();
+      l1tau_phi[l1tau_count]      = (*l1taus)[itau].hwPhi();
+      l1tau_iso[l1tau_count]      = (*l1taus)[itau].hwIso();
+      l1tau_qual[l1tau_count]     = (*l1taus)[itau].hwQual();
+
+      l1tau_towerIEta[l1tau_count]  = (*l1taus)[itau].towerIEta();
+      l1tau_towerIPhi[l1tau_count]  = (*l1taus)[itau].towerIPhi();
+      l1tau_rawEt[l1tau_count]      = (*l1taus)[itau].rawEt();
+      l1tau_isoEt[l1tau_count]      = (*l1taus)[itau].isoEt();
+      l1tau_nTT[l1tau_count]        = (*l1taus)[itau].nTT();
+      l1tau_hasEM[l1tau_count]      = (*l1taus)[itau].hasEM();
+      l1tau_isMerged[l1tau_count]   = (*l1taus)[itau].isMerged();
+      
+      l1tau_count++;
+      
+    }
+
     edm::Handle<l1extra::L1JetParticleCollection> l1isotaus;
     iEvent.getByToken( L1IsoTauCollectionToken_, l1isotaus);
     if( !l1isotaus.isValid() )
       edm::LogError("DataNotAvailable")  << "No L1 IsoTau collection available \n";
- 
     for(unsigned itau = 0 ; itau < l1isotaus->size() ; itau++) {
       if(l1isotau_count == M_taumaxcount) {
 	cerr << "number of iso taus > M_taumaxcount. They are missing." << endl; 
@@ -1528,6 +1693,12 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       l1isotau_count++;
     }
   }
+
+  
+
+
+
+  //l1EGammas, l1EGammaLabel  = Handle("BXVector<l1t::EGamma>"), "caloStage2Digis:EGamma";
   
   if (crecpfjet) 
     {
@@ -2682,7 +2853,7 @@ unsigned int NTupleMaker::AddTriggerObjects(const edm::Event& iEvent) {
       //		<< "   phi = " << (*triggerObjects)[iTO].phi() << std::endl;
       //      for (unsigned int ifilter=0; ifilter<matchedFilters.size(); ++ifilter)
       //	std::cout << "    " << matchedFilters[ifilter] << std::endl;
-      for (unsigned int n=0; n < 50; ++n) {
+      for (unsigned int n=0; n < M_hltfiltersmax; ++n) {
 	if (n<passedFilters.size())
 	  trigobject_filters[trigobject_count][n] = passedFilters.at(n);
 	else
@@ -2872,7 +3043,7 @@ unsigned int NTupleMaker::AddTaus(const edm::Event& iEvent, const edm::EventSetu
   if( !l1jetsHandle.isValid() )  edm::LogError("DataNotAvailable")  << "No L1CentralJets collection available \n";
   else  l1jets = l1jetsHandle.product();
   
-  iEvent.getByToken( L1TauCollectionToken_, l1tausHandle);
+  iEvent.getByToken( L1IsoTauCollectionToken_, l1tausHandle);
   if( !l1jetsHandle.isValid() )  edm::LogError("DataNotAvailable")  << "No L1TauJets collection available \n";
   else  l1taus = l1tausHandle.product(); 
  
