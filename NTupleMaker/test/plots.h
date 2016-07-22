@@ -1,10 +1,10 @@
 
-#include "/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/CMSSW_8_0_12/src/DesyTauAnalyses/NTupleMaker/interface/functions.h"
+#include "/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/CMSSW_8_0_12/src/DesyTauAnalyses/NTupleMaker/interface/functionsSUSY.h"
 #include "/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/CMSSW_8_0_12/src/DesyTauAnalyses/NTupleMaker/interface/lester_mt2_bisect.h"
-#include "/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/CMSSW_8_0_12/src/DesyTauAnalyses/NTupleMaker/interface/Basic_Mt2_332_Calculator.h"
-#include "/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/CMSSW_8_0_12/src/DesyTauAnalyses/NTupleMaker/interface/mTBound.h"
-#include "/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/CMSSW_8_0_12/src/DesyTauAnalyses/NTupleMaker/interface/TMctLib.h"
-#include "/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/CMSSW_8_0_12/src/DesyTauAnalyses/NTupleMaker/interface/mctlib.h"
+//#include "/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/CMSSW_8_0_12/src/DesyTauAnalyses/NTupleMaker/interface/Basic_Mt2_332_Calculator.h"
+//#include "/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/CMSSW_8_0_12/src/DesyTauAnalyses/NTupleMaker/interface/mTBound.h"
+//#include "/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/CMSSW_8_0_12/src/DesyTauAnalyses/NTupleMaker/interface/TMctLib.h"
+//#include "/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/CMSSW_8_0_12/src/DesyTauAnalyses/NTupleMaker/interface/mctlib.h"
 #include "TTree.h"
 #include <iostream>
 
@@ -298,10 +298,10 @@ TH1D *hInvMassMuMu[CutN];
 TH1D *hnEl[CutN];
 TH1D *hElpt[CutN];
 TH1D *hEleta[CutN];
-TH1D *hel_relISO[CutN];
-TH1D *hel_relISOL[CutN];
-TH1D *hel_miniISO[CutN];
-TH1D *hel_miniISOL[CutN];
+//TH1D *hel_relISO[CutN];
+//TH1D *hel_relISOL[CutN];
+//TH1D *hel_miniISO[CutN];
+//TH1D *hel_miniISOL[CutN];
 
 TH1D *hnLep[CutN];
 TH1D *hLeppt[CutN];
@@ -311,10 +311,10 @@ TH1D *hnMu[CutN];
 TH1D *hMupt[CutN];
 TH1D *hMueta[CutN];
 
-TH1D *hmu_relISO[CutN];
-TH1D *hmu_relISOL[CutN];
-TH1D *hmu_miniISO[CutN];
-TH1D *hmu_miniISOL[CutN];
+//TH1D *hmu_relISO[CutN];
+//TH1D *hmu_relISOL[CutN];
+//TH1D *hmu_miniISO[CutN];
+//TH1D *hmu_miniISOL[CutN];
 
 TH1D *htau_ISO[CutN];
 TH1D *htau_ISOL[CutN];
@@ -774,7 +774,7 @@ for(int cj = 0; cj < CutNer; cj++)
       htau_ISO[cj] ->Sumw2(); 
       htau_ISOL[cj] ->Sumw2(); 
 
-      hel_miniISO[cj]= new TH1D ("elminiISO_"+nCut,"elminiISO "+cutName,50,0,5);;
+/*      hel_miniISO[cj]= new TH1D ("elminiISO_"+nCut,"elminiISO "+cutName,50,0,5);;
       hel_miniISO[cj]->Sumw2();
       hel_miniISOL[cj]= new TH1D ("elminiISOL_"+nCut,"elminiISOL "+cutName,50,0,5);;
       hel_miniISOL[cj]->Sumw2();
@@ -789,11 +789,11 @@ for(int cj = 0; cj < CutNer; cj++)
       hmu_miniISO[cj]->Sumw2();
       hmu_miniISOL[cj]= new TH1D ("muminiISOL_"+nCut,"muminiISOL "+cutName,50,0,5);;
       hmu_miniISOL[cj]->Sumw2();
-
       hmu_relISO[cj]= new TH1D ("murelISO_"+nCut,"murelISO "+cutName,50,0,5);;
       hmu_relISO[cj]->Sumw2();
       hmu_relISOL[cj]= new TH1D ("murelISOL_"+nCut,"murelISOL "+cutName,50,0,5);;
       hmu_relISOL[cj]->Sumw2();
+*/
  
       hdR_eltau[cj]= new TH1D ("dR_eltau_"+nCut,"dR_eltau "+cutName,60,0,6);;
       hdR_eltau[cj]->Sumw2();

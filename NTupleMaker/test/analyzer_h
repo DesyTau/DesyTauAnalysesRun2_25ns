@@ -20,7 +20,7 @@
 #include <string>
 
 
-using namespace Mt2;
+//using namespace Mt2;
 // Header file for the classes stored in the TTree if any.
 
 class analyzer {
@@ -89,6 +89,7 @@ class analyzer {
 		Float_t         mu_dz[20];
 		Float_t         mu_relIso[20];
 		Int_t           jet_count;
+		Int_t           npv;
 		Int_t           jets_cleaned[30];
 		Float_t         jet_e[30];
 		Float_t         jet_px[30];
@@ -173,6 +174,7 @@ class analyzer {
 		TBranch        *b_mu_dz;   //!
 		TBranch        *b_mu_relIso;   //!
 		TBranch        *b_jet_count;   //!
+		TBranch        *b_npv;   //!
 		TBranch        *b_jets_cleaned;   //!
 		TBranch        *b_jet_e;   //!
 		TBranch        *b_jet_px;   //!
@@ -264,6 +266,7 @@ class analyzer {
 			hnLep[CutIndex]->Fill(el_count+mu_count,EvWeight);
 
 			hWeights[CutIndex]->Fill(EvWeight);
+			hnpv[CutIndex]->Fill(npv,EvWeight);
 
 
 			//Float_T mT  = double Lester::mTBound(...)
@@ -934,6 +937,7 @@ class analyzer {
 			fChain->SetBranchAddress("mu_dz", mu_dz, &b_mu_dz);
 			fChain->SetBranchAddress("mu_relIso", mu_relIso, &b_mu_relIso);
 			fChain->SetBranchAddress("jet_count", &jet_count, &b_jet_count);
+			fChain->SetBranchAddress("npv", &npv, &b_npv);
 			fChain->SetBranchAddress("jets_cleaned", &jets_cleaned, &b_jets_cleaned);
   			fChain->SetBranchAddress("njets", &njets, &b_njets);
 			fChain->SetBranchAddress("jet_e", jet_e, &b_jet_e);
