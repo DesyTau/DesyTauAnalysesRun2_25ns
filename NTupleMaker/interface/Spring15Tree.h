@@ -115,6 +115,7 @@ public :
   Int_t           dilepton_veto;
   Int_t           extraelec_veto;
   Int_t           extramuon_veto;
+  Float_t 		  chargedIsoPtSum_2;
   Float_t         byCombinedIsolationDeltaBetaCorrRaw3Hits_1;
   Float_t         byLooseCombinedIsolationDeltaBetaCorr3Hits_1;
   Float_t         byMediumCombinedIsolationDeltaBetaCorr3Hits_1;
@@ -132,6 +133,7 @@ public :
   Float_t         byLooseCombinedIsolationDeltaBetaCorr3Hits_2;
   Float_t         byMediumCombinedIsolationDeltaBetaCorr3Hits_2;
   Float_t         byTightCombinedIsolationDeltaBetaCorr3Hits_2;
+  Float_t 		  byIsolationMVArun2v1DBoldDMwLTraw_2;
   Float_t 	  byTightIsolationMVArun2v1DBoldDMwLT_2;
   Float_t         againstElectronLooseMVA5_2;
   Float_t         againstElectronMediumMVA5_2;
@@ -306,6 +308,7 @@ public :
   TBranch        *b_dilepton_veto;   //!
   TBranch        *b_extraelec_veto;   //!
   TBranch        *b_extramuon_veto;   //!
+  TBranch 		 *b_chargedIsoPtSum_2; 
   TBranch        *b_byCombinedIsolationDeltaBetaCorrRaw3Hits_1;   //!
   TBranch        *b_byLooseCombinedIsolationDeltaBetaCorr3Hits_1;   //!
   TBranch        *b_byMediumCombinedIsolationDeltaBetaCorr3Hits_1;   //!
@@ -321,6 +324,7 @@ public :
   TBranch        *b_byLooseCombinedIsolationDeltaBetaCorr3Hits_2;   //!
   TBranch        *b_byMediumCombinedIsolationDeltaBetaCorr3Hits_2;   //!
   TBranch        *b_byTightCombinedIsolationDeltaBetaCorr3Hits_2;   //!
+  TBranch 		 *b_byIsolationMVArun2v1DBoldDMwLTraw_2;
   TBranch	 *b_byTightIsolationMVArun2v1DBoldDMwLT_2;
   TBranch        *b_againstElectronLooseMVA5_2;   //!
   TBranch        *b_againstElectronMediumMVA5_2;   //!
