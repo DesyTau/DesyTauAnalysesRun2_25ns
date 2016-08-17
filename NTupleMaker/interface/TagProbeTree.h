@@ -16,6 +16,7 @@ public :
   Int_t           run;
   Int_t           lumi;
   Int_t           evt;
+  Int_t 		  npv;
 
   Float_t         pt_tag;
   Float_t         eta_tag;
@@ -29,6 +30,9 @@ public :
 
   Bool_t          id_probe;
   Float_t         iso_probe;
+
+  Int_t 		 tag_isoLeg;
+  //Int_t 		 tag_isoLeg2;
 
   Int_t          hlt_1_probe;
   Int_t          hlt_2_probe;
@@ -51,6 +55,8 @@ public :
   Int_t          hlt_19_probe;
   Int_t          hlt_20_probe;
 
+  Float_t 		 trigobjpt_probe;
+
   Float_t        mcweight;
   Float_t        pu_weight;
 
@@ -58,6 +64,7 @@ public :
   TBranch         *b_run;
   TBranch         *b_lumi;
   TBranch         *b_evt;
+  TBranch 		  *b_npv;
 
   TBranch         *b_pt_tag;
   TBranch         *b_eta_tag;
@@ -72,6 +79,11 @@ public :
   TBranch         *b_id_probe;
   TBranch         *b_iso_probe;
   TBranch         *b_hlt_probe;
+
+  TBranch 		  *b_tag_isoLeg;
+  //TBranch 		  *b_tag_isoLeg2;
+
+  TBranch 		 *b_trigobjpt_probe;
 
   TBranch          *b_hlt_1_probe;
   TBranch          *b_hlt_2_probe;

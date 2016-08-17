@@ -151,6 +151,11 @@ int main(int argc, char * argv[]){
     isoLeg = cfg.get<string>("isoLeg");
   }
 
+  //string isoLeg2;
+  //if (isData || ApplyTrigger) {
+  // isoLeg2 = cfg.get<string>("isoLeg2");
+  //}
+
   //hlt filters to be evaluated inizialization
   vector<string> hlt;
 
@@ -213,7 +218,7 @@ int main(int argc, char * argv[]){
 
   TH1D * inputEventsH = new TH1D("inputEventsH","",1,-0.5,0.5);
 
-  int p_total=0, p_pass_1=0;
+  int p_total=0, p_pass_1=0; 
   int *p_pass_hlt = new int[nhlt_check];
   int *p_tot_hlt = new int[nhlt_check];
   for(unsigned int i2=0; i2<nhlt_check; ++i2) {
@@ -304,6 +309,26 @@ int main(int argc, char * argv[]){
         }
       }
 
+
+      //check isoleg2
+	  /*
+      unsigned int nIsoLeg2 = 0;
+      bool checkIsoLeg2 = false;
+      if(isData || ApplyTrigger){  
+        for (unsigned int i=0; i<nfilters; ++i) {
+          TString HLTFilter(analysisTree.run_hltfilters->at(i));
+          if (HLTFilter==isoLeg2) {
+            nIsoLeg2 = i;
+            checkIsoLeg2 = true;
+          }
+        }
+        if (!checkIsoLeg2) {
+          std::cout << "HLT filter " << isoLeg2 << " not found" << std::endl;
+          exit(-1);
+        }
+      }
+	 */
+
       //hlt filters to be evaluated indices finding
       int *nHLT = new int[nhlt_check];
 
@@ -324,7 +349,7 @@ int main(int argc, char * argv[]){
       otree->run = int(analysisTree.event_run);
       otree->lumi = int(analysisTree.event_luminosityblock);
       otree->evt = int(analysisTree.event_nr); 
-      
+      otree->npv = int(analysisTree.primvertex_count);
 
       if (isData && !isGoodLumi(otree->run, otree->lumi, json))
       	continue;
@@ -348,6 +373,7 @@ int main(int argc, char * argv[]){
 //        bool TagmuonMediumId = analysisTree.muon_isMedium[it]; 
 
         bool TagmuonMediumId = isICHEPmed(it, &analysisTree);
+		//bool isTightMuon = analysisTree.muon_isTight[it];
 
         if (analysisTree.muon_pt[it]<=ptMuonCut) continue;
         if (rel_Iso(it, "m", &analysisTree, dRiso)>=isoMuonCut) continue;
@@ -355,9 +381,12 @@ int main(int argc, char * argv[]){
         if (fabs(analysisTree.muon_dxy[it])>=dxyMuonCut) continue;
         if (fabs(analysisTree.muon_dz[it])>=dzMuonCut) continue;
         if (!TagmuonMediumId) continue;
+		//if (!isTightMuon) continue;
 
         //trigger match
         bool isSingleLepTrig = false;
+		otree->tag_isoLeg = -1;
+		//otree->tag_isoLeg2 = -1;
 
         
         if(isData || ApplyTrigger){
@@ -368,9 +397,18 @@ int main(int argc, char * argv[]){
   
             if (dRtrig < deltaRTrigMatch){
               if(debug) cout<<"[iT][nIsoLeg] = "<<iT<<" - "<<nIsoLeg<<" = "<<analysisTree.trigobject_filters[iT][nIsoLeg]<<endl;
-              if (analysisTree.trigobject_filters[iT][nIsoLeg] && ( isData || analysisTree.trigobject_pt[iT] > ptTrigObjCut)) // Ele23 Leg
+              if (analysisTree.trigobject_filters[iT][nIsoLeg] && ( isData || analysisTree.trigobject_pt[iT] > ptTrigObjCut)){
                 isSingleLepTrig = true;
-            }
+				otree->tag_isoLeg = 1;
+
+				//check second trigger
+				/*
+				if (analysisTree.trigobject_filters[iT][nIsoLeg2] && ( isData || analysisTree.trigobject_pt[iT] > ptTrigObjCut)){
+					otree->tag_isoLeg2 = 1;
+              	} 
+				else otree->tag_isoLeg2 = 0; */
+			  } 
+            } 
           }
           
           if (!isSingleLepTrig) {
@@ -427,7 +465,7 @@ int main(int argc, char * argv[]){
 
           if (isICHEPmed(ip, &analysisTree)) {
             if (analysisTree.muon_dxy[ip]<dxyPassingCut){
-              if (analysisTree.muon_dz[ip]<dxyPassingCut){
+              if (analysisTree.muon_dz[ip]<dzPassingCut){
                 id_probe = true;
               }
             }
@@ -462,6 +500,7 @@ int main(int argc, char * argv[]){
           otree->hlt_19_probe = -1;
           otree->hlt_20_probe = -1;
 
+		  otree->trigobjpt_probe = -999;
           
           p_pass_1++;
 
@@ -470,32 +509,36 @@ int main(int argc, char * argv[]){
             hlt_probe[i] = 0;
             if(nHLT[i] == -1) hlt_probe[i] = -1;
           }
-
+	  
           for (unsigned int iTr=0; iTr<analysisTree.trigobject_count; ++iTr){
 
             float dRtrig = deltaR(analysisTree.muon_eta[ip],analysisTree.muon_phi[ip],
                                   analysisTree.trigobject_eta[iTr],analysisTree.trigobject_phi[iTr]);
 
             if (dRtrig < deltaRTrigMatch){
+
+			  otree->trigobjpt_probe = (float)analysisTree.trigobject_pt[iTr];
+
               for(unsigned int i=0; i<nhlt_check; ++i){
-                if(nHLT[i] == -1){
-                  hlt_probe[i] = -1;
-                } else{
+
+                //if(nHLT[i] == -1){
+                //  hlt_probe[i] = -1;
+                //} else{
                   if (analysisTree.trigobject_filters[iTr][nHLT[i]]){
                     hlt_probe[i] = 1;
                   }
-                }
+                //}
               }
-            }
+            } 
           }
-
-
+			
           for(unsigned int i=0; i<nhlt_check; ++i) {if(hlt_probe[i] == 1) p_pass_hlt[i]++;}
           for(unsigned int i=0; i<nhlt_check; ++i) {
             if((hlt_probe[i] != 1)&&(hlt_probe[i] != 0)) {
               //cout<<"!!!! hlt_probe["<<i<<"]="<<hlt_probe[i]<<endl;
             }
           }
+
           otree->hlt_1_probe = hlt_probe[0];
           otree->hlt_2_probe = hlt_probe[1];
           otree->hlt_3_probe = hlt_probe[2];

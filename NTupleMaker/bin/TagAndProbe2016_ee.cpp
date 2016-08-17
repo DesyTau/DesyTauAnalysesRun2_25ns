@@ -153,6 +153,10 @@ int main(int argc, char * argv[]){
     isoLeg = cfg.get<string>("isoLeg");
   }
 
+  //string isoLeg2;
+  //if (isData || ApplyTrigger) {
+  //  isoLeg2 = cfg.get<string>("isoLeg2");
+  //}
 
   vector<string> hlt;
 
@@ -210,7 +214,7 @@ int main(int argc, char * argv[]){
   TString rootFileName(sample);
   rootFileName += "_";
   rootFileName += ifile;
-  rootFileName += "_TP_Electron.root";
+  rootFileName += "_TP_xtrig_Electron.root";
 
   std::string ntupleName("makeroottree/AC1B");
 
@@ -308,6 +312,25 @@ int main(int argc, char * argv[]){
         }
       }
 
+      //check isoleg2
+	  /*
+      unsigned int nIsoLeg2 = 0;
+      bool checkIsoLeg2 = false;
+      if(isData || ApplyTrigger){  
+        for (unsigned int i=0; i<nfilters; ++i) {
+          TString HLTFilter(analysisTree.run_hltfilters->at(i));
+          if (HLTFilter==isoLeg2) {
+            nIsoLeg2 = i;
+            checkIsoLeg2 = true;
+          }
+        }
+        if (!checkIsoLeg2) {
+          std::cout << "HLT filter " << isoLeg2 << " not found" << std::endl;
+          exit(-1);
+        }
+      } */
+
+
       //hlt filters indices
       int *nHLT = new int[nhlt_check];
 
@@ -333,6 +356,7 @@ int main(int argc, char * argv[]){
       otree->run = int(analysisTree.event_run);
       otree->lumi = int(analysisTree.event_luminosityblock);
       otree->evt = int(analysisTree.event_nr); 
+	  otree->npv = int(analysisTree.primvertex_count);
       
 
       if (isData && !isGoodLumi(otree->run, otree->lumi, json))
@@ -367,7 +391,11 @@ int main(int argc, char * argv[]){
 
         //trigger match
         bool isSingleLepTrig = false;
-/*
+		otree->tag_isoLeg = -1;
+
+		//otree->tag_isoLeg2 =-1;
+
+		// check first trigger
         if(isData || ApplyTrigger){  
           if(debug) cout<<"analysisTree.trigobject_count: "<<analysisTree.trigobject_count<<endl;
           for (unsigned int iT=0; iT<analysisTree.trigobject_count; ++iT) {
@@ -378,16 +406,25 @@ int main(int argc, char * argv[]){
               if(debug) cout<<"[iT][nIsoLeg] = "<<iT<<" - "<<nIsoLeg<<" = "<<analysisTree.trigobject_filters[iT][nIsoLeg]<<endl;
               if (analysisTree.trigobject_filters[iT][nIsoLeg] && ( isData || analysisTree.trigobject_pt[iT] > ptTrigObjCut)){
                 isSingleLepTrig = true;
-              }
+				otree->tag_isoLeg = 1;
+
+			  	// check second trigger 
+				/*
+			  	if (analysisTree.trigobject_filters[iT][nIsoLeg2] && ( isData || analysisTree.trigobject_pt[iT] > ptTrigObjCut)){
+					otree->tag_isoLeg2 = 1;
+              	}
+				else otree->tag_isoLeg2 = 0; */
+			  }
             }
           }
           
           if (!isSingleLepTrig) {
+			otree->tag_isoLeg = 0;
             if(debug) {cout<<"debug: tag trigger match failed"<<endl;}
             continue;}
           if(debug) {cout<<"debug: tag trigger match OK"<<endl;}
-        }*/
-        
+        }
+
         otree->pt_tag = analysisTree.electron_pt[it]; 
         otree->eta_tag = analysisTree.electron_eta[it];
         otree->phi_tag = analysisTree.electron_phi[it];
@@ -434,7 +471,7 @@ int main(int argc, char * argv[]){
 
           if ((analysisTree.electron_nmissinginnerhits[ip]<=1) && analysisTree.electron_pass_conversion[ip] && analysisTree.electron_mva_wp80_nontrig_Spring15_v1[ip]) {
             if (analysisTree.electron_dxy[ip]<dxyPassingCut){
-              if (analysisTree.electron_dz[ip]<dxyPassingCut){
+              if (analysisTree.electron_dz[ip]<dzPassingCut){
                 id_probe = true;
               }
             }
@@ -481,6 +518,7 @@ int main(int argc, char * argv[]){
                                   analysisTree.trigobject_eta[iTr],analysisTree.trigobject_phi[iTr]);
 
             if (dRtrig < deltaRTrigMatch){
+			 
               for(unsigned int i=0; i<nhlt_check; ++i){
                 if(nHLT[i] == -1){
                   hlt_probe[i] = -1;
