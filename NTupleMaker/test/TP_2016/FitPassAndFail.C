@@ -452,8 +452,11 @@ void FitPassAndFail(TString SampleName,
     nFail = histFail->Integral(histFail->FindBin(minMass),histFail->FindBin(maxMass))
                     -histFail->Integral(histFail->FindBin(60),histFail->FindBin(75))
                     -histFail->Integral(histFail->FindBin(105),histFail->FindBin(120));
-                    
-  if (nPass<0.1 && nFail<0.1) nFail = 0.1; 
+
+//sanity check for low stat bins
+  if (nPass<=0 ) nPass = 0.;
+  if (nFail<=0 ) nFail = 0.;                  
+//  if (nPass<0.1 && nFail<0.1) nFail = 0.1; 
 //  sigFuncFail->SetLineWidth(5);
 //  sigFuncFail->SetLineColor(kGreen);
 //  sigFuncFail->Draw("lsame");
@@ -475,11 +478,11 @@ void FitPassAndFail(TString SampleName,
   output[1] = nFail;
   EFF *= 100;
 
-  TGraphAsymmErrors * eff = new TGraphAsymmErrors();
-  eff->Divide(numH,denH);
+  TGraphAsymmErrors * __eff = new TGraphAsymmErrors();
+  __eff->Divide(numH,denH);
   
-  float errUp   = float(100*eff->GetErrorYhigh(0));
-  float errDown = float(100*eff->GetErrorYlow(0));
+  float errUp   = float(100*__eff->GetErrorYhigh(0));
+  float errDown = float(100*__eff->GetErrorYlow(0));
   printf("Eff = %5.2f + %4.2f - %4.2f\n",EFF,errUp,errDown);
 
 }

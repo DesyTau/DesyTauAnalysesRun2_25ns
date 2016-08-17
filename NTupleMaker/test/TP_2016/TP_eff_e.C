@@ -22,6 +22,7 @@ void TP_eff_e(TString fileName = "SingleElectron_Run2016B_TP", // RooT file with
 {
 
 	gErrorIgnoreLevel = kFatal;
+	TH1::SetDefaultSumw2(kTRUE);
 
   // output inizialization 
   TString lepton = "Electron";
@@ -48,13 +49,24 @@ void TP_eff_e(TString fileName = "SingleElectron_Run2016B_TP", // RooT file with
 
   //binning inizialization
 
+//for triggers up to 2.5
+
+  int nEtaBins = 3;
+  float etaBins[4] = {0,1.48,2.1,2.5};
+
+  TString EtaBins[3] = {"EtaLt1p48","Eta1p48to2p1",
+				"EtaGt2p1"};
+
+//for triggers up to 2.1
+/*
   int nEtaBins = 2;
-	float etaBins[3] = {0,1.48,2.5};
+  float etaBins[3] = {0,1.48,2.1};
 
-	TString EtaBins[2] = {"EtaLt1p48",
-				"EtaGt1p48"};
+  TString EtaBins[3] = {"EtaLt1p48","Eta1p48to2p1"};
+*/
+//-------------------//
 
-	float ptBins_def[8] = {10,15,20,25,30,40,60,1000};
+  float ptBins_def[8] = {10,15,20,25,30,40,60,1000};
 
 	TString PtBins_def[7] = {"Pt10to15",
        "Pt15to20",
@@ -64,7 +76,7 @@ void TP_eff_e(TString fileName = "SingleElectron_Run2016B_TP", // RooT file with
        "Pt40to60",
        "PtGt60"};
 
-  float ptBinsTrig_def[17] = {10,
+  float ptBinsTrig_def[18] = {10,
 			  13,
 			  16,
 			  19,
@@ -80,9 +92,10 @@ void TP_eff_e(TString fileName = "SingleElectron_Run2016B_TP", // RooT file with
 			  60,
 			  70,
 			  100,
-				1000};
+			200,
+			10000};
 
-	TString PtBinsTrig_def[16] = {"Pt10to13",
+	TString PtBinsTrig_def[17] = {"Pt10to13",
 		    "Pt13to16",
 		    "Pt16to19",
 		    "Pt19to22",
@@ -97,9 +110,10 @@ void TP_eff_e(TString fileName = "SingleElectron_Run2016B_TP", // RooT file with
 		    "Pt50to60",
 		    "Pt60to70",
 		    "Pt70to100",
-		    "PtGt100"};
+			"Pt100to200",
+			"PtGt200"};
 
-	int nPtBins = 16; if(what == "IdIso") nPtBins = 7;
+	int nPtBins = 17; if(what == "IdIso") nPtBins = 7;
 	float * ptBins = new float[nPtBins+1];
 	TString * PtBins = new TString[nPtBins];
 
@@ -159,32 +173,35 @@ void TP_eff_e(TString fileName = "SingleElectron_Run2016B_TP", // RooT file with
   which = "";
   TString histBaseName; 
 
-  TCut cut_flag_idiso_pass, cut_flag_hlt_pass, cut_flag_hlt_fail, cut_pt, cut_eta;
 
-  if (what == "IdIso") {
-  	cut_flag_idiso_pass = Form("id_probe == 1 && iso_probe < %f", iso);
-  } else{
-  		if(what == "hlt_1") {cut_flag_hlt_pass = "hlt_1_probe == 1"; cut_flag_hlt_fail = "hlt_1_probe == 0"; }
-  		if(what == "hlt_2") {cut_flag_hlt_pass = "hlt_2_probe == 1"; cut_flag_hlt_fail = "hlt_2_probe == 0"; }
-  		if(what == "hlt_3") {cut_flag_hlt_pass = "hlt_3_probe == 1"; cut_flag_hlt_fail = "hlt_3_probe == 0"; }
-  		if(what == "hlt_4") {cut_flag_hlt_pass = "hlt_4_probe == 1"; cut_flag_hlt_fail = "hlt_4_probe == 0"; }
-  		if(what == "hlt_5") {cut_flag_hlt_pass = "hlt_5_probe == 1"; cut_flag_hlt_fail = "hlt_5_probe == 0"; }
-  		if(what == "hlt_6") {cut_flag_hlt_pass = "hlt_6_probe == 1"; cut_flag_hlt_fail = "hlt_6_probe == 0"; }
-  		if(what == "hlt_7") {cut_flag_hlt_pass = "hlt_7_probe == 1"; cut_flag_hlt_fail = "hlt_7_probe == 0"; }
-  		if(what == "hlt_8") {cut_flag_hlt_pass = "hlt_8_probe == 1"; cut_flag_hlt_fail = "hlt_8_probe == 0"; }
-  		if(what == "hlt_9") {cut_flag_hlt_pass = "hlt_9_probe == 1"; cut_flag_hlt_fail = "hlt_9_probe == 0"; }
-  		if(what == "hlt_10") {cut_flag_hlt_pass = "hlt_10_probe == 1"; cut_flag_hlt_fail = "hlt_10_probe == 0"; }
-  		if(what == "hlt_11") {cut_flag_hlt_pass = "hlt_11_probe == 1"; cut_flag_hlt_fail = "hlt_11_probe == 0"; }
-  		if(what == "hlt_12") {cut_flag_hlt_pass = "hlt_12_probe == 1"; cut_flag_hlt_fail = "hlt_12_probe == 0"; }
-  		if(what == "hlt_13") {cut_flag_hlt_pass = "hlt_13_probe == 1"; cut_flag_hlt_fail = "hlt_13_probe == 0"; }
-  		if(what == "hlt_14") {cut_flag_hlt_pass = "hlt_14_probe == 1"; cut_flag_hlt_fail = "hlt_14_probe == 0"; }
-  		if(what == "hlt_15") {cut_flag_hlt_pass = "hlt_15_probe == 1"; cut_flag_hlt_fail = "hlt_15_probe == 0"; }
-  		if(what == "hlt_16") {cut_flag_hlt_pass = "hlt_16_probe == 1"; cut_flag_hlt_fail = "hlt_16_probe == 0"; }
-  		if(what == "hlt_17") {cut_flag_hlt_pass = "hlt_17_probe == 1"; cut_flag_hlt_fail = "hlt_17_probe == 0"; }
-  		if(what == "hlt_18") {cut_flag_hlt_pass = "hlt_18_probe == 1"; cut_flag_hlt_fail = "hlt_18_probe == 0"; }
-  		if(what == "hlt_19") {cut_flag_hlt_pass = "hlt_19_probe == 1"; cut_flag_hlt_fail = "hlt_19_probe == 0"; }
-  		if(what == "hlt_20") {cut_flag_hlt_pass = "hlt_20_probe == 1"; cut_flag_hlt_fail = "hlt_20_probe == 0"; }
-  	}
+  TCut cut_flag_idiso_pass = Form("id_probe == 1 && iso_probe < %f", iso);
+  
+  TCut cut_flag_hlt_pass, cut_flag_hlt_fail, cut_pt, cut_eta;
+
+
+  if(what == "hlt_1") {cut_flag_hlt_pass = "fabs(eta_tag)<2 && hlt_1_probe == 1"; cut_flag_hlt_fail = "fabs(eta_tag)<2 && hlt_1_probe == 0"; }
+  if(what == "hlt_2") {cut_flag_hlt_pass = "fabs(eta_tag)<2 && hlt_2_probe == 1"; cut_flag_hlt_fail = "fabs(eta_tag)<2 && hlt_2_probe == 0"; }
+  if(what == "hlt_3") {cut_flag_hlt_pass = "fabs(eta_tag)<2 && hlt_3_probe == 1"; cut_flag_hlt_fail = "fabs(eta_tag)<2 && hlt_3_probe == 0"; }
+  if(what == "hlt_4") {cut_flag_hlt_pass = "fabs(eta_tag)<2 && hlt_4_probe == 1"; cut_flag_hlt_fail = "fabs(eta_tag)<2 && hlt_4_probe == 0"; }
+  if(what == "hlt_5") {cut_flag_hlt_pass = "hlt_5_probe == 1"; cut_flag_hlt_fail = "hlt_5_probe == 0"; }
+  if(what == "hlt_6") {cut_flag_hlt_pass = "hlt_6_probe == 1"; cut_flag_hlt_fail = "hlt_6_probe == 0"; }
+  if(what == "hlt_7") {cut_flag_hlt_pass = "hlt_7_probe == 1"; cut_flag_hlt_fail = "hlt_7_probe == 0"; }
+  if(what == "hlt_8") {cut_flag_hlt_pass = "hlt_8_probe == 1"; cut_flag_hlt_fail = "hlt_8_probe == 0"; }
+  if(what == "hlt_9") {cut_flag_hlt_pass = "hlt_9_probe == 1"; cut_flag_hlt_fail = "hlt_9_probe == 0"; }
+  if(what == "hlt_10") {cut_flag_hlt_pass = "hlt_10_probe == 1"; cut_flag_hlt_fail = "hlt_10_probe == 0"; }
+  if(what == "hlt_11") {cut_flag_hlt_pass = "hlt_11_probe == 1"; cut_flag_hlt_fail = "hlt_11_probe == 0"; }
+  if(what == "hlt_12") {cut_flag_hlt_pass = "hlt_12_probe == 1"; cut_flag_hlt_fail = "hlt_12_probe == 0"; }
+  if(what == "hlt_13") {cut_flag_hlt_pass = "hlt_13_probe == 1"; cut_flag_hlt_fail = "hlt_13_probe == 0"; }
+  if(what == "hlt_14") {cut_flag_hlt_pass = "hlt_14_probe == 1"; cut_flag_hlt_fail = "hlt_14_probe == 0"; }
+  if(what == "hlt_15") {cut_flag_hlt_pass = "hlt_15_probe == 1"; cut_flag_hlt_fail = "hlt_15_probe == 0"; }
+  if(what == "hlt_16") {cut_flag_hlt_pass = "hlt_16_probe == 1"; cut_flag_hlt_fail = "hlt_16_probe == 0"; }
+  if(what == "hlt_17") {cut_flag_hlt_pass = "hlt_17_probe == 1"; cut_flag_hlt_fail = "hlt_17_probe == 0"; }
+  if(what == "hlt_18") {cut_flag_hlt_pass = "hlt_18_probe == 1"; cut_flag_hlt_fail = "hlt_18_probe == 0"; }
+  //if(what == "hlt_19") {cut_flag_hlt_pass = "hlt_19_probe == 1"; cut_flag_hlt_fail = "hlt_19_probe == 0"; }
+
+  if(what == "hlt_19") {cut_flag_hlt_pass = "(fabs(eta_tag)<2 && hlt_19_probe == 1)"; cut_flag_hlt_fail = "(fabs(eta_tag)<2 && hlt_19_probe == 0 )"; }
+  if(what == "hlt_20") {cut_flag_hlt_pass = "(fabs(eta_tag)<2 && hlt_20_probe == 1 )"; cut_flag_hlt_fail = "(fabs(eta_tag)<2 && hlt_20_probe == 0 )"; }
+
 	TString dir_name = "Electron_";
 	dir_name += what;
 	dir_name += Form("%.2f", iso);
@@ -200,6 +217,7 @@ void TP_eff_e(TString fileName = "SingleElectron_Run2016B_TP", // RooT file with
 
 		TH1F * numeratorH   = new TH1F("numeratorH","",nPtBins,ptBins_edges);
 		TH1F * denominatorH = new TH1F("denominatorH","",nPtBins,ptBins_edges);
+		TH1F * ratioH   = new TH1F("ratioH","",nPtBins,ptBins_edges);
 	
 	  for (int iPt=0; iPt<nPtBins; ++iPt) {
 
@@ -256,12 +274,25 @@ void TP_eff_e(TString fileName = "SingleElectron_Run2016B_TP", // RooT file with
 	    numeratorH->SetBinContent(iPt+1,output[0]);
 	    denominatorH->SetBinContent(iPt+1,output[0]+output[1]);
 
+		if (output[0] == 0. and output[1] ==0.) ratioH->SetBinContent(iPt+1,1.);
+		else ratioH->SetBinContent(iPt+1,output[0]/(output[0]+output[1]));
+
+		std::cout << "iPt+1 : " << iPt+1 << " num: " << output[0] << " bin content : " << numeratorH->GetBinContent(iPt+1) << std::endl;
+		std::cout << "iPt+1 : " << iPt+1 << " den: " << output[0]+output[1] << " bin content : " << denominatorH->GetBinContent(iPt+1) << std::endl;
+		std::cout << "ratio : " <<   output[0]/(output[0]+output[1]) << std::endl;
 	  }
 
 	  outputFile->cd();
 
-	  TGraphAsymmErrors * eff = new TGraphAsymmErrors();
-	  eff->Divide(numeratorH,denominatorH);
+
+	  //produce efficiencies plot
+	  TGraphAsymmErrors * eff = new TGraphAsymmErrors(ratioH);
+	  
+	  //eff->Divide(numeratorH, denominatorH,"v");
+	  std:cout << "eff->GetN() : " << eff->GetN() << std::endl;
+
+	  //TGraphAsymmErrors * eff = new TGraphAsymmErrors();
+	  //eff->Divide(numeratorH,denominatorH);
 
 	  eff->GetXaxis()->SetTitle(xTitle);
 	  //  eff->GetXaxis()->SetRangeUser(10.01,59.99);
@@ -291,6 +322,7 @@ void TP_eff_e(TString fileName = "SingleElectron_Run2016B_TP", // RooT file with
 	  canv->SaveAs(dir_name + "/" + fileName+"_" + histBaseName + ".png");
 	  eff->Write(histBaseName+SampleName);
 
+ 	  std::cout << histBaseName+SampleName<< " : eff->GetN() " << eff->GetN() << std::endl;
 //	  for(int ip=0; ip<nPtBins; ++ip){
 //		cout<<"PtBins "<<ip<<" content: "<<numeratorH->GetBinContent(ip)/ denominatorH->GetBinContent(ip)<<endl;
 //		}
