@@ -144,7 +144,7 @@
   <use   name="rootgraphics"/>
 </bin>
 
-<bin name="SynchNTupleProducer_Spring15_et" file="SynchNTupleProducer_Spring15_et.cp">
+<bin name="SynchNTupleProducer_Spring15_et" file="SynchNTupleProducer_Spring15_et.cpp">
  <use name="PhysicsTools/Utilities"/>
  <use name="rootgraphics"/>
  <use name="root"/>
@@ -156,7 +156,7 @@
  <use name="TauAnalysis/SVfitStandalone"/> 
 </bin>
 
-<bin name="SynchNTupleProducer_Spring15_mutau" file="SynchNTupleProducer_Spring15_mutau.cp">
+<bin name="SynchNTupleProducer_Spring15_mutau" file="SynchNTupleProducer_Spring15_mutau.cpp">
  <use name="PhysicsTools/Utilities"/>
  <use name="rootgraphics"/>
  <use name="root"/>
@@ -168,7 +168,7 @@
  <use name="HTT-utilities/LepEffInterface"/>
 </bin>
 
-<bin name="SynchNTupleProducer_Spring15_lept" file="SynchNTupleProducer_Spring15_lept.cp">
+<bin name="SynchNTupleProducer_Spring15_lept" file="SynchNTupleProducer_Spring15_lept.cpp">
  <use name="PhysicsTools/Utilities"/>
  <use name="rootgraphics"/>
  <use name="root"/>
