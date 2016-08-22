@@ -23,6 +23,7 @@ void TP_eff_mu(TString fileName = "SingleMuon_Run2016_TP", // RooT file with TP 
 {
 
 	gErrorIgnoreLevel = kFatal;
+	TH1::SetDefaultSumw2(kTRUE);
 
   // output inizialization 
   TString lepton = "Muon";
@@ -43,22 +44,23 @@ void TP_eff_mu(TString fileName = "SingleMuon_Run2016_TP", // RooT file with TP 
 
   //open input file
 	TFile * file = new TFile(fileName+".root");
+	if (file->IsZombie()) {std::cout << "File " << fileName << ".root does not exist. Please check. " <<std::endl; exit(1);}
   file->cd();
   TTree *t = (TTree*)(file->Get("TagProbe"));
 
 
   //binning inizialization
 
-  int nEtaBins = 3;
-	float etaBins[4] = {0,0.9,1.2,2.1};
+  int nEtaBins = 4;
+  float etaBins[5] = {0,0.9,1.2,2.1,2.4};
 
-	TString EtaBins[3] = {"EtaLt0p9",
+  TString EtaBins[4] = {"EtaLt0p9",
 				"Eta0p9to1p2",
-				"EtaGt1p2"};
+				"Eta1p2to2p1","EtaGt2p1"};
 
-	float ptBins_def[8] = {10,15,20,25,30,40,60,1000};
+  float ptBins_def[8] = {10,15,20,25,30,40,60,1000};
 
-	TString PtBins_def[7] = {"Pt10to15",
+  TString PtBins_def[7] = {"Pt10to15",
        "Pt15to20",
        "Pt20to25",
        "Pt25to30",
@@ -66,7 +68,7 @@ void TP_eff_mu(TString fileName = "SingleMuon_Run2016_TP", // RooT file with TP 
        "Pt40to60",
        "PtGt60"};
 
-  float ptBinsTrig_def[17] = {10,
+  float ptBinsTrig_def[18] = {10,
 			  13,
 			  16,
 			  19,
@@ -82,9 +84,10 @@ void TP_eff_mu(TString fileName = "SingleMuon_Run2016_TP", // RooT file with TP 
 			  60,
 			  70,
 			  100,
-				1000};
+			  200,
+			  1000};
 
-	TString PtBinsTrig_def[16] = {"Pt10to13",
+	TString PtBinsTrig_def[17] = {"Pt10to13",
 		    "Pt13to16",
 		    "Pt16to19",
 		    "Pt19to22",
@@ -99,9 +102,16 @@ void TP_eff_mu(TString fileName = "SingleMuon_Run2016_TP", // RooT file with TP 
 		    "Pt50to60",
 		    "Pt60to70",
 		    "Pt70to100",
-		    "PtGt100"};
+			"Pt100to200",
+			"PtGt200"};
 
-	int nPtBins = 16; if(what == "IdIso") nPtBins = 7;
+	int nPtBins = 17; if(what == "IdIso") nPtBins = 7;
+
+	//float ptBinsTrig_def[8] = {24,30,40,50,60,120,200,500};
+	//TString PtBinsTrig_def[7] = {"Pt24to30","Pt30to40",
+	//"Pt40to50","Pt50to60","Pt60to120","Pt120to200","Pt200to500"};
+	//int nPtBins = 7; if(what == "IdIso") nPtBins = 7;
+
 	float * ptBins = new float[nPtBins+1];
 	TString * PtBins = new TString[nPtBins];
 
@@ -166,33 +176,32 @@ void TP_eff_mu(TString fileName = "SingleMuon_Run2016_TP", // RooT file with TP 
 
   //definition of the passing and failing criterias
 
-  TCut cut_flag_idiso_pass, cut_flag_hlt_pass, cut_flag_hlt_fail, cut_pt, cut_eta;
+  TCut cut_flag_idiso_pass = Form("id_probe == 1 && iso_probe < %f", iso);
+  
+  TCut cut_flag_hlt_pass, cut_flag_hlt_fail, cut_pt, cut_eta;
 
-  if (what == "IdIso") {
-  	cut_flag_idiso_pass = Form("id_probe == 1 && iso_probe < %f", iso);
-  } else{
-  		if(what == "hlt_1") {cut_flag_hlt_pass = "hlt_1_probe == 1"; cut_flag_hlt_fail = "hlt_1_probe == 0"; }
-  		if(what == "hlt_2") {cut_flag_hlt_pass = "hlt_2_probe == 1"; cut_flag_hlt_fail = "hlt_2_probe == 0"; }
-  		if(what == "hlt_3") {cut_flag_hlt_pass = "hlt_3_probe == 1"; cut_flag_hlt_fail = "hlt_3_probe == 0"; }
-  		if(what == "hlt_4") {cut_flag_hlt_pass = "hlt_4_probe == 1"; cut_flag_hlt_fail = "hlt_4_probe == 0"; }
-  		if(what == "hlt_5") {cut_flag_hlt_pass = "hlt_5_probe == 1"; cut_flag_hlt_fail = "hlt_5_probe == 0"; }
-  		if(what == "hlt_6") {cut_flag_hlt_pass = "hlt_6_probe == 1"; cut_flag_hlt_fail = "hlt_6_probe == 0"; }
-  		if(what == "hlt_7") {cut_flag_hlt_pass = "hlt_7_probe == 1"; cut_flag_hlt_fail = "hlt_7_probe == 0"; }
-  		if(what == "hlt_8") {cut_flag_hlt_pass = "hlt_8_probe == 1"; cut_flag_hlt_fail = "hlt_8_probe == 0"; }
-  		if(what == "hlt_9") {cut_flag_hlt_pass = "hlt_9_probe == 1"; cut_flag_hlt_fail = "hlt_9_probe == 0"; }
-  		if(what == "hlt_10") {cut_flag_hlt_pass = "hlt_10_probe == 1"; cut_flag_hlt_fail = "hlt_10_probe == 0"; }
-  		if(what == "hlt_11") {cut_flag_hlt_pass = "hlt_11_probe == 1"; cut_flag_hlt_fail = "hlt_11_probe == 0"; }
-  		if(what == "hlt_12") {cut_flag_hlt_pass = "hlt_12_probe == 1"; cut_flag_hlt_fail = "hlt_12_probe == 0"; }
-  		if(what == "hlt_13") {cut_flag_hlt_pass = "hlt_13_probe == 1"; cut_flag_hlt_fail = "hlt_13_probe == 0"; }
-  		if(what == "hlt_14") {cut_flag_hlt_pass = "hlt_14_probe == 1"; cut_flag_hlt_fail = "hlt_14_probe == 0"; }
-  		if(what == "hlt_15") {cut_flag_hlt_pass = "hlt_15_probe == 1"; cut_flag_hlt_fail = "hlt_15_probe == 0"; }
-  		if(what == "hlt_16") {cut_flag_hlt_pass = "hlt_16_probe == 1"; cut_flag_hlt_fail = "hlt_16_probe == 0"; }
-  		if(what == "hlt_17") {cut_flag_hlt_pass = "hlt_17_probe == 1"; cut_flag_hlt_fail = "hlt_17_probe == 0"; }
-  		if(what == "hlt_18") {cut_flag_hlt_pass = "hlt_18_probe == 1"; cut_flag_hlt_fail = "hlt_18_probe == 0"; }
-  		if(what == "hlt_19") {cut_flag_hlt_pass = "hlt_19_probe == 1"; cut_flag_hlt_fail = "hlt_19_probe == 0"; }
-  		if(what == "hlt_20") {cut_flag_hlt_pass = "hlt_20_probe == 1"; cut_flag_hlt_fail = "hlt_20_probe == 0"; }
-  	}
-
+  if(what == "hlt_1") {cut_flag_hlt_pass = "hlt_1_probe == 1"; cut_flag_hlt_fail = "hlt_1_probe == 0"; }
+  if(what == "hlt_2") {cut_flag_hlt_pass = "hlt_2_probe == 1"; cut_flag_hlt_fail = "hlt_2_probe == 0"; }
+  if(what == "hlt_3") {cut_flag_hlt_pass = "hlt_3_probe == 1"; cut_flag_hlt_fail = "hlt_3_probe == 0"; }
+  if(what == "hlt_4") {cut_flag_hlt_pass = "hlt_4_probe == 1"; cut_flag_hlt_fail = "hlt_4_probe == 0"; }
+  //if(what == "hlt_4") {cut_flag_hlt_pass = "(hlt_4_probe == 1 && hlt_14_probe ==1)"; cut_flag_hlt_fail = "(hlt_4_probe == 0 && hlt_14_probe==1)"; }
+  if(what == "hlt_5") {cut_flag_hlt_pass = "hlt_5_probe == 1"; cut_flag_hlt_fail = "hlt_5_probe == 0"; }
+  if(what == "hlt_6") {cut_flag_hlt_pass = "hlt_6_probe == 1"; cut_flag_hlt_fail = "hlt_6_probe == 0"; }
+  if(what == "hlt_7") {cut_flag_hlt_pass = "(hlt_7_probe == 1 && hlt_12_probe ==1)"; cut_flag_hlt_fail = "(hlt_7_probe == 0 && hlt_12_probe==1)"; }
+  if(what == "hlt_8") {cut_flag_hlt_pass = "hlt_8_probe == 1"; cut_flag_hlt_fail = "hlt_8_probe == 0"; }
+  if(what == "hlt_9") {cut_flag_hlt_pass = "(hlt_9_probe == 1 && hlt_13_probe ==1)"; cut_flag_hlt_fail = "(hlt_9_probe == 0 && hlt_13_probe ==1)"; }
+  if(what == "hlt_10") {cut_flag_hlt_pass = "hlt_10_probe == 1"; cut_flag_hlt_fail = "hlt_10_probe == 0"; }
+  if(what == "hlt_11") {cut_flag_hlt_pass = "hlt_11_probe == 1"; cut_flag_hlt_fail = "hlt_11_probe == 0"; }
+  if(what == "hlt_12") {cut_flag_hlt_pass = "hlt_12_probe == 1 "; cut_flag_hlt_fail = "hlt_12_probe == 0"; } //&& trigobjpt_probe>23
+  if(what == "hlt_13") {cut_flag_hlt_pass = "hlt_13_probe == 1 || hlt_14_probe == 1"; cut_flag_hlt_fail = "hlt_13_probe != 1 && hlt_14_probe != 1"; }
+  if(what == "hlt_14") {cut_flag_hlt_pass = "(hlt_14_probe == 1 && hlt_4_probe==1)"; cut_flag_hlt_fail = "(hlt_14_probe == 1 && hlt_4_probe==0)"; }
+  if(what == "hlt_15") {cut_flag_hlt_pass = "(hlt_15_probe == 1 || hlt_1_probe ==1)"; cut_flag_hlt_fail = "(hlt_15_probe == 0 && hlt_1_probe==0)"; }
+  if(what == "hlt_16") {cut_flag_hlt_pass = "hlt_16_probe == 1"; cut_flag_hlt_fail = "hlt_16_probe == 0"; }
+  if(what == "hlt_17") {cut_flag_hlt_pass = "hlt_17_probe == 1"; cut_flag_hlt_fail = "hlt_17_probe == 0"; }
+  if(what == "hlt_18") {cut_flag_hlt_pass = "hlt_18_probe == 1"; cut_flag_hlt_fail = "hlt_18_probe == 0"; }
+  if(what == "hlt_19") {cut_flag_hlt_pass = "hlt_19_probe == 1"; cut_flag_hlt_fail = "hlt_19_probe == 0"; }
+  if(what == "hlt_20") {cut_flag_hlt_pass = "hlt_20_probe == 1"; cut_flag_hlt_fail = "hlt_20_probe == 0"; }
+ 
   //Definition of the output directory names and creation of it
 	TString dir_name = "Muon_";
 	dir_name += what;
@@ -201,28 +210,34 @@ void TP_eff_mu(TString fileName = "SingleMuon_Run2016_TP", // RooT file with TP 
 	dir_name += "_eff";
 	gSystem->mkdir(dir_name, kTRUE);
 
+	//std::cout << "--- before eta bins loop" << std::endl;
+
 	for (int iEta = 0; iEta < nEtaBins; iEta++) { //loop on eta bins
 
+		std::cout << " ----- eta bin : " << EtaBins[iEta] << std::endl;
 		histBaseName = prefix+which+EtaBins[iEta];
+		//std::cout << "histBaseName : " << histBaseName << std::endl;
 
 		//eta cuts
-		cut_eta = Form("abs(eta_probe)>= %f && abs(eta_probe)< %f", etaBins[iEta], etaBins[iEta+1]);
-
+		cut_eta = Form("fabs(eta_probe)>= %f && fabs(eta_probe)< %f", etaBins[iEta], etaBins[iEta+1]);
+		//std::cout << "eta cut " << cut_eta << std::endl;
 		TH1F * numeratorH   = new TH1F("numeratorH","",nPtBins,ptBins_edges);
-		TH1F * denominatorH = new TH1F("denominatorH","",nPtBins,ptBins_edges);
+	    TH1F * denominatorH = new TH1F("denominatorH","",nPtBins,ptBins_edges);
+		TH1F * ratioH   = new TH1F("ratioH","",nPtBins,ptBins_edges);
 	
 	  for (int iPt=0; iPt<nPtBins; ++iPt) { //loop on pt bins
 
 	  	//pt cuts
 	  	cut_pt = Form("pt_probe > %f && pt_probe < %f", ptBins[iPt], ptBins[iPt+1]);
+		//std::cout << "cut pt: " << cut_pt << std::endl;
 
 	  	TH1F * histPassOld = new TH1F("histPassOld","",250,50,300);
 	  	TH1F * histFailOld = new TH1F("histFailOld","",250,50,300);
 	  	
 	  	//Drawing histogram of passing and failing probes
 	  	if (what == "IdIso") {
-		  	t->Draw("m_vis>>histPassOld", "pu_weight*mcweight" + (cut_eta && cut_pt && cut_flag_idiso_pass));
-		  	t->Draw("m_vis>>histFailOld", "pu_weight*mcweight" + (cut_eta && cut_pt && !cut_flag_idiso_pass));
+		  	 t->Draw("m_vis>>histPassOld", "pu_weight*mcweight" + (cut_eta && cut_pt && cut_flag_idiso_pass));
+		     t->Draw("m_vis>>histFailOld", "pu_weight*mcweight" + (cut_eta && cut_pt && !cut_flag_idiso_pass));
 		  }else{
 		  	t->Draw("m_vis>>histPassOld", "pu_weight*mcweight" + (cut_eta && cut_pt && cut_flag_hlt_pass && cut_flag_idiso_pass));
 		  	t->Draw("m_vis>>histFailOld", "pu_weight*mcweight" + (cut_eta && cut_pt && cut_flag_hlt_fail && cut_flag_idiso_pass));
@@ -273,15 +288,30 @@ void TP_eff_mu(TString fileName = "SingleMuon_Run2016_TP", // RooT file with TP 
 	    c2->Update();
 	    numeratorH->SetBinContent(iPt+1,output[0]);
 	    denominatorH->SetBinContent(iPt+1,output[0]+output[1]);
+		/*
+		if (output[0]<=0) output[0]=0.000001;
+		numeratorH->SetBinContent(iPt+1,output[0]);
+		// check for efficiency > 1,set it to 1 by hand
+		if ( output[0]/(output[0]+output[1])>1 ) denominatorH->SetBinContent(iPt+1,output[0]);
+		else denominatorH->SetBinContent(iPt+1,output[0]+output[1]); 
+		*/
+		if (output[0] == 0. and output[1] ==0.) ratioH->SetBinContent(iPt+1,1.);
+		else ratioH->SetBinContent(iPt+1,output[0]/(output[0]+output[1]));
 
+		std::cout << "iPt+1 : " << iPt+1 << " num: " << output[0] << " bin content : " << numeratorH->GetBinContent(iPt+1) << std::endl;
+		std::cout << "iPt+1 : " << iPt+1 << " den: " << output[0]+output[1] << " bin content : " << denominatorH->GetBinContent(iPt+1) << std::endl;
+		std::cout << "ratio : " <<   output[0]/(output[0]+output[1]) << std::endl;
 	  }
 
 	  outputFile->cd();
 
 	  //produce efficiencies plot
-	  TGraphAsymmErrors * eff = new TGraphAsymmErrors();
-	  eff->Divide(numeratorH,denominatorH);
+	  TGraphAsymmErrors * eff = new TGraphAsymmErrors(ratioH);
+	  
+	  //eff->Divide(numeratorH, denominatorH,"v");
+	  std:cout << "eff->GetN() : " << eff->GetN() << std::endl;
 
+	  
 	  eff->GetXaxis()->SetTitle(xTitle);
 	  //  eff->GetXaxis()->SetRangeUser(10.01,59.99);
 	  eff->GetYaxis()->SetRangeUser(0,1.0);
@@ -309,6 +339,8 @@ void TP_eff_mu(TString fileName = "SingleMuon_Run2016_TP", // RooT file with TP 
 
 	  canv->SaveAs(dir_name + "/" + fileName+"_" + histBaseName + ".png");
 	  eff->Write(histBaseName+SampleName);
+
+	  std::cout << histBaseName+SampleName<< " : eff->GetN() " << eff->GetN() << std::endl;
 
 /*	  for(int ip=0; ip<nPtBins; ++ip){
 		cout<<"PtBins "<<ip<<" content: "<<numeratorH->GetBinContent(ip)/ denominatorH->GetBinContent(ip)<<endl;

@@ -1,6 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 
 isData = False
+isFastSim = False
 is25ns = True
 year = 2016
 period = 'Spring16'
@@ -158,7 +159,7 @@ if runOnData:
   fnames.append('/store/data/Run2016B/SingleMuon/MINIAOD/PromptReco-v2/000/273/448/00000/CECFFCBE-CE1C-E611-8660-02163E011A4E.root')
 else:
   fnames.append('/store/mc/RunIISpring16MiniAODv2/WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14_ext1-v1/40000/0002BEE4-D55B-E611-B35D-0017A4770C08.root')
-    
+
 # Define the input source
 process.source = cms.Source("PoolSource", 
                             fileNames = cms.untracked.vstring( fnames ),

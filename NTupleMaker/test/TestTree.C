@@ -3,8 +3,10 @@
 #include <vector>
 void TestTree(int numberOfEvents = 10) {
 
- // //  TFile * file = new TFile("/nfs/dust/cms/user/anayak/CMS/Ntuple_HttAnalysis/Sync2015/HiggsSM/GluGluToHToTauTau_M-125_MC_TauTau_v1/ntuple_GGF125_13TeV_Phys14_v1.root");
-  TFile * file = new TFile("output.root");
+  TFile * file = new TFile("/nfs/dust/cms/group/higgs-kit/80x_v3/SingleElectron__Run2016B-PromptReco-v2/SingleElectron__Run2016B-PromptReco-v2_489.root");
+
+//"/nfs/dust/cms/group/higgs-kit/80x_v2/SingleElectron__Run2016B-PromptReco-v2/SingleElectron__Run2016B-PromptReco-v2_3000.root");
+  //TFile * file = new TFile("output.root");
 
   TTree * tree = (TTree*)file->Get("makeroottree/AC1B");
 
@@ -56,7 +58,7 @@ void TestTree(int numberOfEvents = 10) {
     unsigned int nfilters = hltfilters->size();
     std::cout << "nfiltres = " << nfilters << std::endl;
     for (unsigned int i=0; i<nfilters; ++i)
-      std::cout << "HLT Filter : " << hltfilters->at(i) << std::endl;
+      std::cout << "HLT Filter : " << hltfilters->at(i) << " i: " << i << std::endl;
     std::cout << std::endl;
 
     unsigned int nbtag = btagdiscriminators->size();

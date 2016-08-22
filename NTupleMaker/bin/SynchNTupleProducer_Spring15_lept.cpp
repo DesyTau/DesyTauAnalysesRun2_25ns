@@ -96,6 +96,7 @@ int main(int argc, char * argv[]){
   using namespace std;
 
   gErrorIgnoreLevel = kFatal;
+  //gDebug = 2;
 
   string cmsswBase = (getenv ("CMSSW_BASE"));
 
@@ -176,6 +177,12 @@ int main(int argc, char * argv[]){
     isoLeg = cfg.get<string>("isoLegData");
   }
   else {if(ApplyTrigger) isoLeg = cfg.get<string>("isoLegMC");}
+
+  //for mutau, add another isoLeg
+  string isoLeg2;
+  if (isData && ch =="mt"){
+	isoLeg2 = cfg.get<string>("isoLegData2");
+	}
 
   const float ptTrigObjCut  = cfg.get<float>("ptTrigObjCut");
 
@@ -399,9 +406,9 @@ int main(int argc, char * argv[]){
 
       unsigned int nIsoLeg = 0;
       bool checkIsoLeg = false;
+      unsigned int nIsoLeg2 =0;
+	  bool checkIsoLeg2 = false; 
       if(isData || ApplyTrigger){
-            
-      
             unsigned int nfilters = analysisTree.run_hltfilters->size();
             for (unsigned int i=0; i<nfilters; ++i) {
               TString HLTFilter(analysisTree.run_hltfilters->at(i));
@@ -412,6 +419,21 @@ int main(int argc, char * argv[]){
             }
             if (!checkIsoLeg) {
               std::cout << "HLT filter " << isoLeg << " not found" << std::endl;
+              exit(-1);
+            }
+      }
+	  //check second trigger for mutau. FIX code duplication!
+	  if (isData && ch == "mt"){
+            unsigned int nfilters = analysisTree.run_hltfilters->size();
+            for (unsigned int i=0; i<nfilters; ++i) {
+              TString HLTFilter(analysisTree.run_hltfilters->at(i));
+              if (HLTFilter==isoLeg2) {
+                nIsoLeg2 = i;
+                checkIsoLeg2 = true;
+              }
+            }
+            if (!checkIsoLeg2) {
+              std::cout << "HLT filter " << isoLeg2 << " not found" << std::endl;
               exit(-1);
             }
       }
@@ -466,7 +488,7 @@ int main(int argc, char * argv[]){
       if(ch == "et"){
         
         for (unsigned int ie = 0; ie<analysisTree.electron_count; ++ie) {
-
+			
           bool electronMvaId = analysisTree.electron_mva_wp80_nontrig_Spring15_v1[ie];
     
           if (analysisTree.electron_pt[ie]<=ptLeptonLowCut) continue;
@@ -531,11 +553,13 @@ int main(int argc, char * argv[]){
                   float dRtrig = deltaR(lep_eta, lep_phi, analysisTree.trigobject_eta[iT],analysisTree.trigobject_phi[iT]);
         
                   if (dRtrig < deltaRTrigMatch){
-                    if (analysisTree.trigobject_filters[iT][nIsoLeg] && ( isData || analysisTree.trigobject_pt[iT] > ptTrigObjCut)) // Ele23 Leg
-                      isSingleLepTrig = true;
+                    	if (analysisTree.trigobject_filters[iT][nIsoLeg] && ( isData || analysisTree.trigobject_pt[iT] > ptTrigObjCut)) // Ele23 Leg
+                      		isSingleLepTrig = true;
+						if (ch=="mt" && analysisTree.trigobject_filters[iT][nIsoLeg2] && ( isData || analysisTree.trigobject_pt[iT] > ptTrigObjCut))
+							isSingleLepTrig = true;
                   }
                 }
-                
+               
                 if (!isSingleLepTrig) continue;
         }
         
@@ -868,6 +892,20 @@ void fill_weight(const AC1B * analysisTree, Spring15Tree *otree, PileUp *PUoffic
   otree->gen_noutgoing = analysisTree->genparticles_noutgoing;
 }
 
+
+//compute medium ID adjusted for ICHEP
+bool isICHEPmuon(const AC1B * analysisTree, int Index) {
+        bool goodGlob = analysisTree->muon_isGlobal[Index] && analysisTree->muon_normChi2[Index] < 3 && analysisTree->muon_combQ_chi2LocalPosition[Index] < 12
+                                   && analysisTree->muon_combQ_trkKink[Index] < 20;
+
+        bool isICHEPmedium  = analysisTree->muon_isLoose[Index] &&
+                                          analysisTree->muon_validFraction[Index] >0.49 &&
+                                          analysisTree->muon_segmentComp[Index] > (goodGlob ? 0.303 : 0.451);
+        return isICHEPmedium;
+}
+
+
+
 //compute the absolute isolation for a given lepton labeled by Index in channel ch
 float abs_Iso (int Index, TString ch, const AC1B * analysisTree, float dRiso){
   float neutralHadIso, photonIso, chargedHadIso, puIso;
@@ -1014,6 +1052,8 @@ void FillTau(const AC1B * analysisTree, Spring15Tree *otree, int tauIndex){
   otree->againstElectronTightMVA6_2 = analysisTree->tau_againstElectronTightMVA6[tauIndex];
 
   otree->byTightIsolationMVArun2v1DBoldDMwLT_2 = analysisTree->tau_byTightIsolationMVArun2v1DBoldDMwLT[tauIndex];
+  otree-> byIsolationMVArun2v1DBoldDMwLTraw_2 = analysisTree->tau_byIsolationMVArun2v1DBoldDMwLTraw[tauIndex];
+  otree->chargedIsoPtSum_2 = analysisTree->tau_chargedIsoPtSum[tauIndex];
 
 }
 
@@ -1035,7 +1075,8 @@ bool dilepton_veto_mt(const Config *cfg,const  AC1B *analysisTree){
 		if(relIsoMu >= cfg->get<float>("isoDiMuonVeto")) continue;
 		
 		//bool passedVetoId =  analysisTree->muon_isMedium[im]; 
-    bool passedVetoId = isICHEPmed(im, analysisTree);
+		bool passedVetoId = isICHEPmed(im, analysisTree);
+
 		if (!passedVetoId && cfg->get<bool>("applyDiMuonVetoId")) continue;
 		
 		for (unsigned int je = im+1; je<analysisTree->muon_count; ++je) {
@@ -1053,7 +1094,7 @@ bool dilepton_veto_mt(const Config *cfg,const  AC1B *analysisTree){
 		  if(relIsoMu >= cfg->get<float>("isoDiMuonVeto")) continue;	
 
 		  //passedVetoId =  analysisTree->muon_isMedium[je];
-      passedVetoId = isICHEPmed(je, analysisTree);
+	      passedVetoId = isICHEPmed(je, analysisTree);
 
 		  if (!passedVetoId && cfg->get<bool>("applyDiMuonVetoId")) continue;
 		  
@@ -1150,11 +1191,9 @@ bool extra_muon_veto(int leptonIndex, TString ch, const Config *cfg, const AC1B 
 		if (fabs(analysisTree->muon_dxy[im])>cfg->get<float>("dxyVetoMuonCut")) continue;
 		if (fabs(analysisTree->muon_dz[im])>cfg->get<float>("dzVetoMuonCut")) continue;
 		//if (cfg->get<bool>("applyVetoMuonId") && !analysisTree->muon_isMedium[im]) continue;
-    if (cfg->get<bool>("applyVetoMuonId") && !(isICHEPmed(im, analysisTree))) continue;
-
+	    if (cfg->get<bool>("applyVetoMuonId") && !(isICHEPmed(im, analysisTree))) continue;
 		float relIsoMu = rel_Iso(im, ch, analysisTree, cfg->get<float>("dRiso"));
 		if (relIsoMu>cfg->get<float>("isoVetoMuonCut")) continue;
-
 		return(1);
   }
   return(0);
