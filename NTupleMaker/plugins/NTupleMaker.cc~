@@ -3631,7 +3631,7 @@ unsigned int NTupleMaker::AddElectrons(const edm::Event& iEvent, const edm::Even
 	  electron_phi[electron_count] = el->phi(); 
 	  electron_charge[electron_count] = el->charge();
 	  
-//	  cout<<" lets check this one  "<<el->charge()<<"  "<< (*Electrons)[i].charge()<<endl;
+	  cout<<" lets check this one  "<<el->charge()<<"  "<< (*Electrons)[i].charge()<<endl;
 
 	  const pat::Electron &lep = (*Electrons)[i];
           electron_miniISO[electron_count]=getPFIsolation(pfcands, dynamic_cast<const reco::Candidate *>(&lep), 0.05, 0.2, 10., false);
