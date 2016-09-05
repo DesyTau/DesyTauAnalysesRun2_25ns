@@ -36,17 +36,20 @@ region=InvElIso
 type=MC
 
 
-
 cp *.conf Jobs/.
 
 while read line
 do
 
-unset xsec
-xsec=`grep " ${line} " xsecs | cut -d " " -f3-4`	
-#	cp $dir/${line} input$line
-#xsec=1
-echo FOUND XSEC for ${line} to be $xsec
+
+while read line2
+do
+
+	unset mass
+	unset lsp
+mass=`echo $line2 | awk -F " " '{print $1}'`
+lsp=`echo $line2 | awk -F " " '{print $2}'`
+
 unset f
 while read f
 	do
@@ -59,24 +62,23 @@ if [ ! -f $dir/$bas.root ]
 then
 echo $f > $dir/$bas
 
-#	echo " "$bas $xsec >> xsecs
 
 	if [ -f Jobs/job${line}$channel$dir${bas}_B.sh ] ; then
 rm Jobs/job${line}$channel$dir${bas}_B.sh
 fi
 
 
+
 cat bss > Jobs/job${line}$channel$dir${bas}_B.sh
-
-echo SUSY$channel analysisMacroSUSY_${type}_B.conf ${bas} $dir 1 1 1 1>> Jobs/job${line}$channel$dir${bas}_B.sh
-#echo SUSY${channel} analysisMacroSUSY_${type}_B.conf ${bas} $dir>> Jobs/job${line}$channel$dir${bas}_B.sh
+#echo SUSYTtemplate analysisMacroSUSY_${type}_B.conf ${bas} $dir>> Jobs/job${line}$channel$dir${bas}_B.sh
 
 
+#echo SUSY$channel analysisMacroSUSY_${type}_B.conf ${bas} $dir 1 $mass $lsp
 
-#echo $bas $xsec >> xsecs
-echo $bas $xsec 
+echo SUSY$channel analysisMacroSUSY_${type}_B.conf ${bas} $dir 1 $mass $lsp>> Jobs/job${line}$channel$dir${bas}_B.sh
 
-if [ ! -f $dir/${bas}_B_OS.root ] ;then
+
+if [ ! -f $dir/${bas}_B_OS_${mass}_${lsp}.root ] ;then
 
 chmod u+x Jobs/job${line}$channel$dir${bas}_B.sh
 qsub Jobs/job${line}$channel$dir${bas}_B.sh 
@@ -85,8 +87,9 @@ fi
 
 fi
 
+
 done<$dir/${line}
-rm input${line}
+done<$3
 done<$1
 
 

@@ -256,7 +256,7 @@ if runOnData:
           fnames.append('/store/data/Run2015D/SingleMuon/MINIAOD/05Oct2015-v1/10000/021FD3F0-876F-E511-99D2-0025905A6060.root')
 else:
   if is25ns:
-    fnames.append('file:/nfs/dust/cms/user/alkaloge/ACD/NAFtools-RunOnProcessed/CMSSW_7_4_14/src/miniAOD/Output/RootFiles/$1')
+    fnames.append('file:/nfs/dust/cms/user/alkaloge/ACD/NAFtools-RunOnProcessed/CMSSW_8_0_12/src/miniAOD/Output/RootFiles/$1')
   else:
     fnames.append('/store/mc/RunIISpring15DR74/TTJets_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/AsymptNoPU_MCRUN2_74_V9A-v2/00000/02AD5DBB-1C0C-E511-8C41-00A0D1EE8E64.root')
     
@@ -725,7 +725,7 @@ process.p = cms.Path(
 
 process.TFileService = cms.Service("TFileService",
                                    #fileName = cms.string("/nfs/dust/cms/user/alkaloge/TauAnalysis/new/CMSSW_7_4_6/src/DesyTauAnalyses/NTupleMaker/test/Ntuple74.root"),
-                                   fileName = cms.string("file:/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/new/CMSSW_7_4_14/src/DesyTauAnalyses/NTupleMaker/test/StausNew/${1}_NTuple.root")
+                                   fileName = cms.string("file:/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/new/CMSSW_8_0_12/src/DesyTauAnalyses/NTupleMaker/test/StausNew/${1}_NTuple.root")
                                	)
 
 
@@ -839,7 +839,7 @@ cat > stauNTupler_$1.zsh <<EOF
 ##mkdir $1
 
 
-#cd /nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/new/CMSSW_7_4_14/src/DesyTauAnalyses/NTupleMaker/test;cmsenv
+#cd /nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/new/CMSSW_8_0_12/src/DesyTauAnalyses/NTupleMaker/test;cmsenv
 
 
 

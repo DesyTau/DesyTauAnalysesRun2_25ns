@@ -781,7 +781,7 @@ process.p = cms.Path(
 
 process.TFileService = cms.Service("TFileService",
                                    #fileName = cms.string("/nfs/dust/cms/user/alkaloge/TauAnalysis/new/CMSSW_7_4_6/src/DesyTauAnalyses/NTupleMaker/test/Ntuple74.root"),
-                                   fileName = cms.string("/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/CMSSW_7_4_14/src/DesyTauAnalyses/NTupleMaker/test/Staus/${1}_NTuple.root")
+                                   fileName = cms.string("/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/CMSSW_8_0_12/src/DesyTauAnalyses/NTupleMaker/test/Staus/${1}_NTuple.root")
                                	)
 
 
@@ -890,7 +890,7 @@ cat > stauNTupler_$1.zsh <<EOF
 ##mkdir $1
 
 
-#cd /nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/CMSSW_7_4_14/src/DesyTauAnalyses/NTupleMaker/test;cmsenv
+#cd /nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/CMSSW_8_0_12/src/DesyTauAnalyses/NTupleMaker/test;cmsenv
 
 
 
