@@ -716,7 +716,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       LeptMV.clear();
 
 
-      vector<int> electrons; electrons.clear();
+    vector<int> electrons; electrons.clear();
       for (unsigned int ie = 0; ie<analysisTree.electron_count; ++ie) {
 	if (analysisTree.electron_pt[ie]<ptElectronCut) continue;
 	if (fabs(analysisTree.electron_eta[ie])>etaElectronCut) continue;
@@ -726,7 +726,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	if (applyElectronId && !analysisTree.electron_pass_conversion[ie]) continue;
 	if (applyElectronId && analysisTree.electron_nmissinginnerhits[ie]>1) continue;
 	if (fabs(analysisTree.electron_charge[ie]) !=1) continue;
-	 electrons.push_back(ie);
+	 electrons.push_back((int)ie);
 
       }
       if (electrons.size()==0 ) continue;
@@ -946,6 +946,10 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       event_sign  = q;
 
 
+	double dRmutau = deltaR(analysisTree.tau_eta[(int)tau_index],analysisTree.tau_phi[(int)tau_index],
+				analysisTree.electron_eta[(int)el_index],analysisTree.electron_phi[(int)el_index]);
+	if (dRmutau < 0.5) continue;
+
       CFCounter[iCut]+= weight;
       CFCounter_[iCut]+= weight;
       iCFCounter[iCut]++;
@@ -1115,6 +1119,8 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       if (!isData && applyLeptonSF) {
 
 	//leptonSFweight = SF_yourScaleFactor->get_ScaleFactor(pt, eta)	
+      double ptEl1 = analysisTree.electron_pt[el_index];
+      double etaEl1 = analysisTree.electron_eta[el_index];
 	double IdIsoSF_el1 = SF_elIdIso->get_ScaleFactor(ptEl1, etaEl1);
 
 	ElSF_IdIso_El1H->Fill(IdIsoSF_el1);
@@ -1239,10 +1245,10 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	el_dxy[ie]=analysisTree.electron_dxy[ie];
 	el_dz[ie]=analysisTree.electron_dz[ie];
 
-        el_neutralHadIso[ie] = analysisTree.muon_r04_sumNeutralHadronEt[ie];
-        el_photonIso[ie] = analysisTree.muon_r04_sumPhotonEt[ie];
-        el_chargedHadIso[ie] = analysisTree.muon_r04_sumChargedHadronPt[ie];
-        el_puIso[ie] = analysisTree.muon_r04_sumPUPt[ie];
+        el_neutralHadIso[ie] = analysisTree.electron_r03_sumNeutralHadronEt[ie];
+        el_photonIso[ie] = analysisTree.electron_r03_sumPhotonEt[ie];
+        el_chargedHadIso[ie] = analysisTree.electron_r03_sumChargedHadronPt[ie];
+        el_puIso[ie] = analysisTree.electron_r03_sumPUPt[ie];
  
         double neutralIso = el_neutralHadIso[ie] + el_photonIso[ie] - 0.5*el_puIso[ie];
         neutralIso = max(double(0),neutralIso);

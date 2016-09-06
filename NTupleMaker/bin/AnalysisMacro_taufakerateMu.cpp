@@ -77,45 +77,45 @@ return SF;
 double TauFakeRate(float pt,float eta, string sel,string working_point){
 
 
-
-
 float SF = 1;
 
 //80x MVAid
 
 if ( working_point == "MVA"){
+
+	
 if ( sel =="mutau"){
 
 if (  fabs(eta) < 0.9 )
         {
-                if (pt>20 && pt<30) SF = 0.935778;
-                if (pt>30 && pt<50) SF = 1.02675;
-                if (pt>50 ) SF = 1.429;
+                if (pt>20 && pt<30) SF = 1.06656;
+                if (pt>30 && pt<50) SF = 1.30091;
+                if (pt>50 ) SF = 1.54372;
         }
 if (  fabs(eta) > 0.9 && fabs(eta) < 1.2 )
         {
 
-                if (pt>20 && pt<30) SF = 1.29421;
-                if (pt>30 && pt<50) SF = 1.41551;
-                if (pt>50 ) SF = 1.00103;
+                if (pt>20 && pt<30) SF = 1.131;
+                if (pt>30 && pt<50) SF = 1.16127;
+                if (pt>50 ) SF = 1.69678;
         }
 
 if (  fabs(eta) > 1.2 && fabs(eta) < 2.1 )
         {
 
-                if (pt>20 && pt<30) SF = 1.07304;
-                if (pt>30 && pt<50) SF = 1.08091;
-                if (pt>50) SF = 1.31379;
+                if (pt>20 && pt<30) SF = 1.16437;
+                if (pt>30 && pt<50) SF = 1.00203;
+                if (pt>50) SF = 1.22279;
         }
 if (  fabs(eta) > 2.1 && fabs(eta) < 2.4 )
         {
 
-                if (pt>20 && pt<30) SF = 1.18811;
-                if (pt>30 && pt<50) SF = 0.865594;
-                if (pt>50) SF = 0.568148;
+                if (pt>20 && pt<30) SF = 1.04318;
+                if (pt>30 && pt<50) SF = 0.858538;
+                if (pt>50) SF = 0.507904;
         }
 
-}
+}//mutau MVA
 
 
 if ( sel =="eltau"){

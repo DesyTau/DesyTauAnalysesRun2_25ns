@@ -1233,10 +1233,10 @@ if (!CutBasedTauId){
 	el_dxy[ie]=analysisTree.electron_dxy[ie];
 	el_dz[ie]=analysisTree.electron_dz[ie];
 
-        el_neutralHadIso[ie] = analysisTree.muon_r03_sumNeutralHadronEt[ie];
-        el_photonIso[ie] = analysisTree.muon_r03_sumPhotonEt[ie];
-        el_chargedHadIso[ie] = analysisTree.muon_r03_sumChargedHadronPt[ie];
-        el_puIso[ie] = analysisTree.muon_r03_sumPUPt[ie];
+        el_neutralHadIso[ie] = analysisTree.electron_r03_sumNeutralHadronEt[ie];
+        el_photonIso[ie] = analysisTree.electron_r03_sumPhotonEt[ie];
+        el_chargedHadIso[ie] = analysisTree.electron_r03_sumChargedHadronPt[ie];
+        el_puIso[ie] = analysisTree.electron_r03_sumPUPt[ie];
  
         double neutralIso = el_neutralHadIso[ie] + el_photonIso[ie] - 0.5*el_puIso[ie];
         neutralIso = max(double(0),neutralIso);
