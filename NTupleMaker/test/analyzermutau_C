@@ -57,8 +57,8 @@ void analyzer::Loop(){
 	CutList.push_back("Trigger SF");
 	CutList.push_back("Lepton SF");
 
-	CutList.push_back("TauFakeRate");
 	CutList.push_back("Tau-id");
+	CutList.push_back("TauFakeRate");
 //	CutList.push_back("Iso lt 0.5");
 	CutList.push_back("topPtRwgt");
 	CutList.push_back("TTJets norm");
@@ -173,7 +173,8 @@ void analyzer::Loop(){
 		if ( jentry%100000 ==0 ) cout<<" working for you...processed " <<jentry<<" events from "<<nentries<<" dataset "<<datasetName->c_str()<<" weight "<<all_weights<< endl;
 
 
-		if (isData && met_flag<0.5) continue;	
+		//if (isData && met_flag<0.5) continue;	
+		if (met_flag<0.5) continue;	
 
 		JetsMV.clear();
 		MuMV.clear();
@@ -189,45 +190,49 @@ void analyzer::Loop(){
 
 	float met = 0.;
 
+		METV.SetPx(met_ex);
+		METV.SetPy(met_ey);
+		met = sqrt(met_ex*met_ex + met_ey*met_ey);  
+/*
 	if (pfmet_usual)
 		{
 		METV.SetPx(met_ex);
 		METV.SetPy(met_ey);
-		float met = sqrt(met_ex*met_ex + met_ey*met_ey);  
+		met = sqrt(met_ex*met_ex + met_ey*met_ey);  
 		}
-
+*/
 
 	if (pfmet_JetEn && EnUp && !pfmet_usual)
 		{
 		METV.SetPx(met_ex_JetEnUp);
 		METV.SetPy(met_ey_JetEnUp);
-		float met = sqrt(met_ex_JetEnUp*met_ex_JetEnUp + met_ey_JetEnUp*met_ey_JetEnUp);      
+		met = sqrt(met_ex_JetEnUp*met_ex_JetEnUp + met_ey_JetEnUp*met_ey_JetEnUp);      
 		}
 
 	if (pfmet_JetEn && !EnUp && !pfmet_usual)
 		{
 		METV.SetPy(met_ey_JetEnDown);
-		float met = sqrt(met_ex_JetEnDown*met_ex_JetEnDown + met_ey_JetEnDown*met_ey_JetEnDown);     
+		met = sqrt(met_ex_JetEnDown*met_ex_JetEnDown + met_ey_JetEnDown*met_ey_JetEnDown);     
 		}
 
 	if (!pfmet_JetEn && EnUp && !pfmet_usual)
 		{
 		METV.SetPx(met_ex_UnclusteredEnUp);
 		METV.SetPy(met_ey_UnclusteredEnUp);
-		float met = sqrt(met_ex_UnclusteredEnUp*met_ex_UnclusteredEnUp + met_ey_UnclusteredEnUp*met_ey_UnclusteredEnUp);     
+		met = sqrt(met_ex_UnclusteredEnUp*met_ex_UnclusteredEnUp + met_ey_UnclusteredEnUp*met_ey_UnclusteredEnUp);     
 		}
 
 	if (!pfmet_JetEn && !EnUp && !pfmet_usual)
 		{
 		METV.SetPx(met_ex_UnclusteredEnDown);
 		METV.SetPy(met_ey_UnclusteredEnDown);
-		float met = sqrt(met_ex_UnclusteredEnDown*met_ex_UnclusteredEnDown + met_ey_UnclusteredEnDown*met_ey_UnclusteredEnDown);
+		met = sqrt(met_ex_UnclusteredEnDown*met_ex_UnclusteredEnDown + met_ey_UnclusteredEnDown*met_ey_UnclusteredEnDown);
 		}
 
 
 		//cout<<" size "<<JetsMV.size()<<"  "<<gen_weight<<"  "<<jentry<<"  "<<nentries<<"  "<<int(mu_count)<<"  "<<int(muon_index)<<endl;
 
-		if (abs(mu_count) > 10 || abs(el_count) > 10 || abs(ta_count) >10) continue;
+		if (abs(mu_count) > 8 || abs(el_count) > 8 || abs(ta_count) >8) continue;
 
 if(muon_index>-1 && muon_index<8)			MuV.SetPtEtaPhiM(mu_pt[muon_index], mu_eta[muon_index], mu_phi[muon_index], muonMass);
 if(electron_index>-1 && electron_index<8)		ElV.SetPtEtaPhiM(el_pt[electron_index], el_eta[electron_index], el_phi[electron_index],electronMass);
@@ -248,10 +253,10 @@ if (taus_index>-1 && taus_index<8)			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta
 		if (mu_relIso[0] < 0.15 && InvertLeptonIso) continue;
 		
 		//if (mu_relIso[0] > 0.5 && InvertLeptonIso && HighInvertLeptonIso) continue;
+		if (mu_relIso[0] > 0.3) continue;
 
 		if ( fabs(mu_dz[muon_index]) > 0.2) continue;
 		if ( fabs(mu_dxy[muon_index]) > 0.045) continue;
-
 
 		if ( fabs(mu_charge[muon_index]) !=1 ) continue;
 		if ( fabs(ta_charge[taus_index]) !=1 ) continue;
@@ -296,14 +301,17 @@ if (taus_index>-1 && taus_index<8)			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta
                 iCFCounter[iCut]++;
 		iCut++;
 
-
 		double ptTau1 = (double)ta_pt[taus_index];
 		double etaTau1 = (double)ta_eta[taus_index];
 		//ChargedIso CutBased MVA
-		string WP = "MVA";
-		double tfr  = TauFakeRate(ptTau1,etaTau1,channel,WP);
-		if (genTauMatched<0.5 && genLeptonMatched < 0.5 && !isData) all_weights *= tfr;
 
+
+
+
+		//string tID="CutBased_Medium";
+		string tID="MVA_Tight";
+		double tauId = TauiD(channel,tID);
+		if (genTauMatched>0.5 && genLeptonMatched < 0.5 && !isData) all_weights *= tauId;
 		
                 FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
 		CFCounter[iCut]+= all_weights;
@@ -311,15 +319,16 @@ if (taus_index>-1 && taus_index<8)			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta
                 iCFCounter[iCut]++;
 		iCut++;
 
-		//string tID="CutBased_Medium";
-		string tID="MVA_Tight";
-		double tauId = TauiD(channel,tID);
-		if (genTauMatched>0.5 && genLeptonMatched < 0.5 && !isData) all_weights *= tauId;
+
+		string WP = "MVA";
+		double tfr  = TauFakeRate(ptTau1,etaTau1,channel,WP);
+		//if (genTauMatched<0.5 && genLeptonMatched < 0.5 && !isData) all_weights *= tfr;
 		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
 		CFCounter[iCut]+= all_weights;
 		CFCounter_[iCut]+= all_weights;
                 iCFCounter[iCut]++;
 		iCut++;
+
 
 
 		all_weights *= top_weight;
@@ -343,13 +352,14 @@ if (taus_index>-1 && taus_index<8)			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta
 
 			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		if (njets>0) continue;
+		if (njets!=0) continue;
 		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
 		CFCounter[iCut]+= all_weights;
 		CFCounter_[iCut]+= all_weights;
                 iCFCounter[iCut]++;
 		iCut++;
-		if (nbtag>0) continue;
+
+		if (nbtag!=0) continue;
 		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
 		CFCounter[iCut]+= all_weights;
 		CFCounter_[iCut]+= all_weights;
@@ -358,7 +368,7 @@ if (taus_index>-1 && taus_index<8)			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta
 
 		 TLorentzVector DiL = MuV  ;
      		double dPhi=dPhiFrom2P( DiL.Px(), DiL.Py(), METV.Px(),  METV.Py() );
-         	double MT = TMath::Sqrt(2*DiL.Pt()*METV.Pt()*(1-TMath::Cos(dPhi)));
+         	double MT = TMath::Sqrt(2*DiL.Pt()*met*(1-TMath::Cos(dPhi)));
 	     	
 		if (MT > 60. && MT < 120. ) continue;
 		if (MT < 20) continue;

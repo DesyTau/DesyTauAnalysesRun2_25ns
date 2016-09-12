@@ -782,7 +782,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	double neutralIsoElecN = neutralHadIsoElec + photonIsoElec - 0.5*puIsoElec;
 	double neutralIsoElec = max(double(0),neutralIsoElecN); 
 	float absIsoElec = chargedHadIsoElec + neutralIsoElec;
-	float relIsoElec = float(absIsoElec)/float(analysisTree.electron_pt[eIndex]);
+	float relIsoElec = absIsoElec/float(analysisTree.electron_pt[eIndex]);
 
 
 	if (isData)
@@ -906,7 +906,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
       bool TauId = false;
 
-            if ( analysisTree.tau_againstElectronVLooseMVA6[tau_index]>0.5 &&   analysisTree.tau_againstMuonLoose3[tau_index]>0.5) TauId = true;
+            if ( analysisTree.tau_againstElectronTightMVA6[tau_index]>0.5 &&   analysisTree.tau_againstMuonLoose3[tau_index]>0.5) TauId = true;
 
 	if (!TauId) continue;
 
@@ -946,9 +946,9 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       event_sign  = q;
 
 
-	double dRmutau = deltaR(analysisTree.tau_eta[(int)tau_index],analysisTree.tau_phi[(int)tau_index],
+	double dReltau = deltaR(analysisTree.tau_eta[(int)tau_index],analysisTree.tau_phi[(int)tau_index],
 				analysisTree.electron_eta[(int)el_index],analysisTree.electron_phi[(int)el_index]);
-	if (dRmutau < 0.5) continue;
+	if (dReltau < 0.5) continue;
 
       CFCounter[iCut]+= weight;
       CFCounter_[iCut]+= weight;

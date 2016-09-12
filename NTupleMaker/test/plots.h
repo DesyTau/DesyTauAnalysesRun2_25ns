@@ -39,6 +39,36 @@ vector<TLorentzVector>  TauMV;
 vector<TLorentzVector>  LeptMV;
 
 
+
+
+double ScaleFactor(double pt = 80,
+	double eta = 0.5,
+	TString inputRootFile = "/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/CMSSW_8_0_12/src/DesyTauAnalyses/NTupleMaker/data/HIP_mediumID.root")
+
+{
+TFile * fileIn = new TFile(inputRootFile, "read");
+	if (fileIn->IsZombie() ) { std::cout << "ERROR in ScaleFactor::init_ScaleFactor(TString inputRootFile) " <<inputRootFile << " does not exist. Please check. " <<std::endl; exit(1); };
+
+
+TIter nextkey (fileIn->GetListOfKeys ());
+TKey *key = 0;
+key = (TKey *) nextkey ();
+TObject *obj = key->ReadObj ();
+cout << "2D histos name for SF = " << obj->GetName() << endl;
+TH2D *histo = (TH2D*) obj;
+//TH2D *histo = (TH2D*)fileIn->Get("histo2D");
+double ptN = histo->GetXaxis()->FindBin(pt);
+double etaN = histo->GetYaxis()->FindBin(eta);
+double result = histo->GetBinContent(ptN,etaN);
+
+cout << result << endl; 
+return result;
+
+
+
+
+
+
 double TauFakeRate(float pt,float eta, string sel,string working_point){
 float SF = 1.;
 
@@ -54,37 +84,100 @@ if ( sel =="mutau"){
 
 if (  fabs(eta) < 0.9 )
         {
-                if (pt>20 && pt<30) SF = 1.06668;
-                if (pt>30 && pt<50) SF = 1.30105;
-                if (pt>50 ) SF = 1.54661;
+                if (pt>20 && pt<30) SF = 1.17285;
+                if (pt>30 && pt<40) SF = 1.12899;
+                if (pt>40 ) SF = 1.19492;
         }
 if (  fabs(eta) > 0.9 && fabs(eta) < 1.2 )
         {
 
-                if (pt>20 && pt<30) SF = 1.13348;
-                if (pt>30 && pt<50) SF = 1.16054;
-                if (pt>50 ) SF = 1.69478;
+                if (pt>20 && pt<30) SF = 1.11631;
+                if (pt>30 && pt<40) SF = 1.04866;
+                if (pt>40 ) SF = 1.36044;
         }
 
 if (  fabs(eta) > 1.2 && fabs(eta) < 2.1 )
         {
 
-                if (pt>20 && pt<30) SF = 1.16457;
-                if (pt>30 && pt<50) SF = 1.0027;
-                if (pt>50) SF = 1.22012;
+                if (pt>20 && pt<30) SF = 1.08863;
+                if (pt>30 && pt<40) SF = 1.13749;
+                if (pt>40) SF = 1.21236;
         }
 if (  fabs(eta) > 2.1 && fabs(eta) < 2.4 )
         {
 
-                if (pt>20 && pt<30) SF = 1.04168;
-                if (pt>30 && pt<50) SF = 0.858883;
-                if (pt>50) SF = 0.506557;
+                if (pt>20 && pt<30) SF = 0.986986;
+                if (pt>30 && pt<40) SF = 0.982437;
+                if (pt>40) SF = 0.995135;
         }
 
 }//mutau MVA
+//////////////
+//
 
 
+
+if ( sel =="eltau"){
+
+if (  fabs(eta) < 0.8 )
+        {
+                if (pt>20 && pt<30) SF = 1.04111;
+                if (pt>30 && pt<50) SF = 1.34817;
+                if (pt>50 ) SF = 1.60973;
+        }
+if (  fabs(eta) > 0.8 && fabs(eta) < 1.44 )
+        {
+
+                if (pt>20 && pt<30) SF = 1.04158;
+                if (pt>30 && pt<50) SF = 1.56632;
+                if (pt>50 ) SF = 1.08038;
+        }
+
+if (  fabs(eta) > 1.44 && fabs(eta) < 1.566 )
+	{
+
+
+		if (pt>20 && pt<30) SF = 1.15617;
+		if (pt>30 && pt<50) SF = 1.30554;
+		if (pt>50) SF = 1.;
+	}
+if (  fabs(eta) > 1.566 && fabs(eta) < 2.1 )
+	{
+
+
+		if (pt>20 && pt<30) SF = 1.01365;
+		if (pt>30 && pt<50) SF = 1.00284;
+		if (pt>50) SF = 1.20248;
+	}
+}//eltau MVA
+
+
+/*
 //eltau from 15invfb
+if ( sel =="eltau"){
+
+        {
+                if (pt>20 && pt<30) SF = 1.08763;
+                if (pt>30 && pt<50) SF = 1.52724;
+                if (pt>50 ) SF = 1.70454;
+        }
+if (  fabs(eta) > 1.48 && fabs(eta) < 2.1 )
+        {
+
+                if (pt>20 && pt<30) SF = 1.05136;
+                if (pt>30 && pt<50) SF = 1.09525;
+                if (pt>50 ) SF = 1.29595;
+        }
+
+if (  fabs(eta) > 2.1 && fabs(eta) < 2.4 )
+	{
+
+
+		if (pt>20 && pt<30) SF = 0.752314;
+		if (pt>30 && pt<50) SF = 1.41862;
+		if (pt>50) SF = 1.26267;
+	}
+}//eltau MVA
 if ( sel =="eltau"){
 
 if (  fabs(eta) < 1.48 )
@@ -110,7 +203,57 @@ if (  fabs(eta) > 2.1 && fabs(eta) < 2.4 )
 		if (pt>50) SF = 1.26267;
 	}
 }//eltau MVA
+if ( sel =="eltau"){
 
+if (  fabs(eta) < 1.48 )
+        {
+                if (pt>20 && pt<30) SF = 1.08763;
+                if (pt>30 && pt<50) SF = 1.52724;
+                if (pt>50 ) SF = 1.70454;
+        }
+if (  fabs(eta) > 1.48 && fabs(eta) < 2.1 )
+        {
+
+                if (pt>20 && pt<30) SF = 1.05136;
+                if (pt>30 && pt<50) SF = 1.09525;
+                if (pt>50 ) SF = 1.29595;
+        }
+
+if (  fabs(eta) > 2.1 && fabs(eta) < 2.4 )
+	{
+
+
+		if (pt>20 && pt<30) SF = 0.752314;
+		if (pt>30 && pt<50) SF = 1.41862;
+		if (pt>50) SF = 1.26267;
+	}
+}//eltau MVA
+if ( sel =="eltau"){
+
+if (  fabs(eta) < 1.48 )
+        {
+                if (pt>20 && pt<30) SF = 1.08763;
+                if (pt>30 && pt<50) SF = 1.52724;
+                if (pt>50 ) SF = 1.70454;
+        }
+if (  fabs(eta) > 1.48 && fabs(eta) < 2.1 )
+        {
+
+                if (pt>20 && pt<30) SF = 1.05136;
+                if (pt>30 && pt<50) SF = 1.09525;
+                if (pt>50 ) SF = 1.29595;
+        }
+
+if (  fabs(eta) > 2.1 && fabs(eta) < 2.4 )
+	{
+
+
+		if (pt>20 && pt<30) SF = 0.752314;
+		if (pt>30 && pt<50) SF = 1.41862;
+		if (pt>50) SF = 1.26267;
+	}
+}//eltau MVA
+*/
 }
 
 
@@ -331,8 +474,17 @@ TH1D * hEventSign [CutN];
 TH1D * hMudxy [CutN];
 TH1D * hMudz [CutN];
 
+TH1D * hMudxyerr [CutN];
+TH1D * hMudzerr [CutN];
+TH1D * hMuIPsigxy [CutN];
+TH1D * hMuIPsigz [CutN];
 
 
+TH1D * hEldxyerr [CutN];
+TH1D * hEldzerr [CutN];
+
+TH1D * hElIPsigxy [CutN];
+TH1D * hElIPsigz [CutN];
 
 TH1D *hElneutralHadIso[CutN]; 
 TH1D *hElphotonIso[CutN];
@@ -655,9 +807,13 @@ for(int cj = 0; cj < CutNer; cj++)
 
       hMudxy[cj] = new TH1D ("mu_dxy_"+nCut,"mu_dxy "+cutName,20,-.2,.2);
       hMudxy[cj]->Sumw2();
+      hMudxyerr[cj] = new TH1D ("mu_dxyerr_"+nCut,"mu_dxyerr "+cutName,20,-.2,.2);
+      hMudxyerr[cj]->Sumw2();
  
       hEldxy[cj] = new TH1D ("el_dxy_"+nCut,"el_dxy "+cutName,20,-.2,.2);
       hEldxy[cj]->Sumw2();
+      hEldxyerr[cj] = new TH1D ("el_dxyerr_"+nCut,"el_dxyerr "+cutName,20,-.2,.2);
+      hEldxyerr[cj]->Sumw2();
 
       htau_dxy[cj] = new TH1D ("tau_dxy_"+nCut,"tau_dxy "+cutName,20,-.2,.2);
       htau_dxy[cj]->Sumw2();
@@ -668,6 +824,17 @@ for(int cj = 0; cj < CutNer; cj++)
       hMudz[cj]->Sumw2();
       hEldz[cj] = new TH1D ("el_dz_"+nCut,"el_dz "+cutName,20,-.2,.2);
       hEldz[cj]->Sumw2();
+
+      hMudzerr[cj] = new TH1D ("mu_dzerr_"+nCut,"mu_dzerr "+cutName,20,-.2,.2);
+      hMudzerr[cj]->Sumw2();
+      hEldzerr[cj] = new TH1D ("el_dzerr_"+nCut,"el_dzerr "+cutName,20,-.2,.2);
+      hEldzerr[cj]->Sumw2();
+	
+      hMuIPsigxy[cj] = new TH1D ("muIPsigxy_"+nCut,"muIPsigxy "+cutName,50,0,10);
+      hMuIPsigz[cj] = new TH1D ("muIPsigz_"+nCut,"muIPsigz "+cutName,50,0,10);
+ 
+      hElIPsigxy[cj] = new TH1D ("elIPsigxy_"+nCut,"elIPsigxy "+cutName,50,0,10);
+      hElIPsigz[cj] = new TH1D ("elIPsigz_"+nCut,"elIPsigz "+cutName,50,0,10);
 
       hHTOsqrMET[cj] = new TH1D ("hHTOsqrMET_"+nCut,"hHTOsqrMET "+cutName,10,0.0,100.0);
       hHTOsqrMET[cj]->Sumw2();

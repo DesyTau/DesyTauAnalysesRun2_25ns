@@ -95,6 +95,8 @@ class analyzer {
 		Float_t         mu_miniISO[10];
 		Float_t         mu_dxy[10];
 		Float_t         mu_dz[10];
+		Float_t         mu_dzerr[10];
+		Float_t         mu_dxyerr[10];
 		Float_t         mu_relIso[10];
 		
   		Float_t     mu_neutralHadIso[10]; 
@@ -137,7 +139,9 @@ class analyzer {
 		Float_t         el_phi[10];
 		Float_t         el_miniISO[10];
 		Float_t         el_dxy[10];
+		Float_t         el_dxyerr[10];
 		Float_t         el_dz[10];
+		Float_t         el_dzerr[10];
 		Float_t         el_charge[10];
 		Float_t         el_relIso[10];
 		Int_t           ta_count;
@@ -208,6 +212,8 @@ class analyzer {
 		TBranch        *b_mu_miniISO;   //!
 		TBranch        *b_mu_dxy;   //!
 		TBranch        *b_mu_dz;   //!
+		TBranch        *b_mu_dxyerr;   //!
+		TBranch        *b_mu_dzerr;   //!
    		TBranch     *b_mu_neutralHadIso; 
    		TBranch     *b_mu_photonIso; 
    		TBranch     *b_mu_chargedHadIso; 
@@ -248,6 +254,8 @@ class analyzer {
 		TBranch        *b_el_miniISO;   //!
 		TBranch        *b_el_dxy;   //!
 		TBranch        *b_el_dz;   //!
+		TBranch        *b_el_dxyerr;   //!
+		TBranch        *b_el_dzerr;   //!
 		TBranch        *b_el_charge;   //!
 		TBranch        *b_el_relIso;   //!
 		TBranch        *b_ta_count;   //!
@@ -744,6 +752,11 @@ class analyzer {
 				hEleta[CutIndex]->Fill(el_eta[eIndex],EvWeight);
 				hEldxy[CutIndex]->Fill(el_dxy[eIndex],EvWeight);
 				hEldz[CutIndex]->Fill(el_dz[eIndex],EvWeight);
+				hEldxyerr[CutIndex]->Fill(el_dxyerr[eIndex],EvWeight);
+				hEldzerr[CutIndex]->Fill(el_dzerr[eIndex],EvWeight);
+
+				hElIPsigxy[CutIndex]->Fill(fabs(el_dxy[eIndex]/el_dxyerr[eIndex]),EvWeight);
+				hElIPsigz[CutIndex]->Fill(fabs(el_dz[eIndex]/el_dzerr[eIndex]),EvWeight);
 
 				double dPhiJ=dPhiFrom2P( el_px[eIndex], el_py[eIndex], MetV.Px(),  MetV.Py() );
 				hdPhiElMET[CutIndex]->Fill(dPhiJ,EvWeight);
@@ -774,6 +787,11 @@ class analyzer {
 				hMueta[CutIndex]->Fill(mu_eta[mIndex],EvWeight);
 				hMudxy[CutIndex]->Fill(mu_dxy[mIndex],EvWeight);
 				hMudz[CutIndex]->Fill(mu_dz[mIndex],EvWeight);
+				hMudxyerr[CutIndex]->Fill(mu_dxyerr[mIndex],EvWeight);
+				hMudzerr[CutIndex]->Fill(mu_dzerr[mIndex],EvWeight);
+
+				hMuIPsigxy[CutIndex]->Fill(fabs(mu_dxy[mIndex]/mu_dxyerr[mIndex]),EvWeight);
+				hMuIPsigz[CutIndex]->Fill(fabs(mu_dz[mIndex]/mu_dzerr[mIndex]),EvWeight);
 
 				double dPhiJ=dPhiFrom2P( mu_px[mIndex], mu_py[mIndex], MetV.Px(),  MetV.Py() );
 				hdPhiMuMET[CutIndex]->Fill(dPhiJ,EvWeight);
@@ -1015,6 +1033,8 @@ class analyzer {
 			fChain->SetBranchAddress("mu_miniISO", mu_miniISO, &b_mu_miniISO);
 			fChain->SetBranchAddress("mu_dxy", mu_dxy, &b_mu_dxy);
 			fChain->SetBranchAddress("mu_dz", mu_dz, &b_mu_dz);
+			fChain->SetBranchAddress("mu_dxyerr", mu_dxyerr, &b_mu_dxyerr);
+			fChain->SetBranchAddress("mu_dzerr", mu_dzerr, &b_mu_dzerr);
 
 			fChain->SetBranchAddress("mu_neutralHadIso", mu_neutralHadIso, &b_mu_neutralHadIso);
 			fChain->SetBranchAddress("mu_photonIso", mu_photonIso, &b_mu_photonIso);
@@ -1057,6 +1077,8 @@ class analyzer {
 			fChain->SetBranchAddress("el_miniISO", el_miniISO, &b_el_miniISO);
 			fChain->SetBranchAddress("el_dxy", el_dxy, &b_el_dxy);
 			fChain->SetBranchAddress("el_dz", el_dz, &b_el_dz);
+			fChain->SetBranchAddress("el_dxyerr", el_dxyerr, &b_el_dxyerr);
+			fChain->SetBranchAddress("el_dzerr", el_dzerr, &b_el_dzerr);
 			fChain->SetBranchAddress("el_charge", el_charge, &b_el_charge);
 			fChain->SetBranchAddress("el_relIso", el_relIso, &b_el_relIso);
 			fChain->SetBranchAddress("ta_count", &ta_count, &b_ta_count);
