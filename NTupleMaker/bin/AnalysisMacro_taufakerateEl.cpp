@@ -553,7 +553,7 @@ int main(int argc, char * argv[]) {
 
 const    int nEtaBins = 4;
     //float etaBins[4] = {0,1.48, 2.1, 2.4}; 
-    float etaBins[5] = {0, 0.8, 1.44, 1.566,2.1}; 
+    float etaBins[5] = {0, 0.8, 1.44, 1.566, 2.1}; 
 
     TString EtaBins[4] = {"EtaLt0p8",
     "Eta0p8to1p44",
@@ -1084,7 +1084,8 @@ const    int nEtaBins = 4;
       //
       bool TauId = false;
 
-            if ( analysisTree.tau_againstElectronVLooseMVA6[tau_index]>0.5 &&   analysisTree.tau_againstMuonTight3[tau_index]>0.5) TauId = true;
+            //if ( analysisTree.tau_againstElectronVLooseMVA6[tau_index]>0.5 &&   analysisTree.tau_againstMuonTight3[tau_index]>0.5) TauId = true;
+            if ( analysisTree.tau_againstElectronTightMVA6[tau_index]>0.5 &&   analysisTree.tau_againstMuonLoose3[tau_index]>0.5) TauId = true;
 
 	if (!TauId) continue;
 
@@ -1108,9 +1109,9 @@ const    int nEtaBins = 4;
       double q = analysisTree.tau_charge[tau_loose] * analysisTree.electron_charge[(int)el_index];
       if (q > 0) continue;
 
-	double dRmutau = deltaR(analysisTree.tau_eta[tau_loose],analysisTree.tau_phi[tau_loose],
+	double dReltau = deltaR(analysisTree.tau_eta[tau_loose],analysisTree.tau_phi[tau_loose],
 				analysisTree.electron_eta[(int)el_index],analysisTree.electron_phi[(int)el_index]);
-	if (dRmutau < 0.5) continue;
+	if (dReltau < 0.5) continue;
 
     LooseCFCounter[iCutL]+= weight;
       TightCFCounter[iCutT]+= weight;

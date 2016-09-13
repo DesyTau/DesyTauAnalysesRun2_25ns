@@ -41,11 +41,11 @@ vector<TLorentzVector>  LeptMV;
 
 
 
-double ScaleFactor(double pt = 80,
-	double eta = 0.5,
-	TString inputRootFile = "/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/CMSSW_8_0_12/src/DesyTauAnalyses/NTupleMaker/data/HIP_mediumID.root")
+double HIP_SF(double pt,double eta)
 
 {
+
+	TString inputRootFile = "/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/CMSSW_8_0_12/src/DesyTauAnalyses/NTupleMaker/data/HIP_mediumID.root";
 TFile * fileIn = new TFile(inputRootFile, "read");
 	if (fileIn->IsZombie() ) { std::cout << "ERROR in ScaleFactor::init_ScaleFactor(TString inputRootFile) " <<inputRootFile << " does not exist. Please check. " <<std::endl; exit(1); };
 
@@ -54,16 +54,16 @@ TIter nextkey (fileIn->GetListOfKeys ());
 TKey *key = 0;
 key = (TKey *) nextkey ();
 TObject *obj = key->ReadObj ();
-cout << "2D histos name for SF = " << obj->GetName() << endl;
+//cout << "2D histos name for SF = " << obj->GetName() << endl;
 TH2D *histo = (TH2D*) obj;
 //TH2D *histo = (TH2D*)fileIn->Get("histo2D");
 double ptN = histo->GetXaxis()->FindBin(pt);
 double etaN = histo->GetYaxis()->FindBin(eta);
 double result = histo->GetBinContent(ptN,etaN);
-
-cout << result << endl; 
+delete histo;
+delete fileIn;
 return result;
-
+}
 
 
 

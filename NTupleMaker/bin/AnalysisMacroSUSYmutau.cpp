@@ -1411,7 +1411,8 @@ if (!CutBasedTauId){
       SusyLSP = SusyLSPMassF;
 
       T->Fill();
-
+	
+      selEvents++;
       continue;
       /////////////////////////////////////////////////
 
