@@ -78,7 +78,41 @@ float SF = 1.;
 if ( working_point == "MVA"){
 
 
+if ( sel =="mutau"){
 
+if (  fabs(eta) < 0.9 )
+        {
+                if (pt>20 && pt<30) SF = 1.07968;
+                if (pt>30 && pt<40) SF = 0.847355;
+                if (pt>40 ) SF = 0.833833;
+        }
+if (  fabs(eta) > 0.9 && fabs(eta) < 1.2 )
+        {
+
+                if (pt>20 && pt<30) SF = 1.03273;
+                if (pt>30 && pt<40) SF = 0.943387;
+                if (pt>40 ) SF = 1.07113;
+        }
+
+if (  fabs(eta) > 1.2 && fabs(eta) < 2.1 )
+        {
+
+                if (pt>20 && pt<30) SF = 1.08635;
+                if (pt>30 && pt<40) SF = 1.13754;
+                if (pt>40) SF = 1.0387;
+        }
+if (  fabs(eta) > 2.1 && fabs(eta) < 2.4 )
+        {
+
+                if (pt>20 && pt<30) SF = 0.977868;
+                if (pt>30 && pt<40) SF = 0.974665;
+                if (pt>40) SF = 0.902185;
+        }
+
+}//mutau MVA
+
+
+/*
 ///mutau for 15invfb
 if ( sel =="mutau"){
 
@@ -114,7 +148,7 @@ if (  fabs(eta) > 2.1 && fabs(eta) < 2.4 )
 }//mutau MVA
 //////////////
 //
-
+*/
 
 
 if ( sel =="eltau"){
@@ -528,6 +562,7 @@ TH1D *hHT4[CutN];
 //TH1D *hST[CutN];
 //TH1D *h0JetpT[CutN];
 TH1D *hnJet[CutN];
+TH1D *hnpartons[CutN];
 TH1D *hnBJet[CutN];
 
 TH1D *hCentrality[CutN];
@@ -887,6 +922,8 @@ for(int cj = 0; cj < CutNer; cj++)
       //h0JetpT[cj]->Sumw2();
       hnJet[cj] = new TH1D ("nJet_"+nCut,"nJet "+cutName,25,-0.5,24.5);
       hnJet[cj]->Sumw2();
+      hnpartons[cj] = new TH1D ("npartons_"+nCut,"npartons "+cutName,6,-0.5,5.5);
+      hnpartons[cj]->Sumw2();
       hnBJet[cj] = new TH1D ("nBJet_"+nCut,"nBJet "+cutName,10,-0.5,9.5);
       hnBJet[cj]->Sumw2();
 

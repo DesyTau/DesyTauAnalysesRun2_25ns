@@ -327,6 +327,7 @@ class analyzer {
 			double sumTaupT=0;  
 
 			hnJet[CutIndex]->Fill(njets,EvWeight);
+			hnpartons[CutIndex]->Fill(npartons,EvWeight);
 			hnMu[CutIndex]->Fill(mu_count,EvWeight);
 			hnTau[CutIndex]->Fill(ta_count,EvWeight);
 			hnEl[CutIndex]->Fill(el_count,EvWeight);

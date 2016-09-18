@@ -83,6 +83,10 @@ cp $dir/analyzer${channel}_C .
 sed -i 's/CHIMASSS/'$lsp'/g' analyzer*C
 sed -i 's/CHANNELHERE/'$channel2'/g' analyzer*
 
+sed -i 's/IS_PFMET_USUAL/'$IS_PFMET_USUAL'/g' analyzer.C
+sed -i 's/IS_PFMET_JETEN/'$IS_PFMET_JETEN'/g' analyzer.C
+sed -i 's/IS_PFMET_UP/'$IS_PFMET_UP'/g' analyzer.C
+
 
 cp $dir/runme.C .
 cp $dir/plots.h .
@@ -115,6 +119,9 @@ sed -i 's/CHANNELHERE/'$channel2'/g' analyzer*
 sed -i 's/BTAGCUT/0.800/g' analyzer*
 
 
+sed -i 's/IS_PFMET_USUAL/'$IS_PFMET_USUAL'/g' analyzer.C
+sed -i 's/IS_PFMET_JETEN/'$IS_PFMET_JETEN'/g' analyzer.C
+sed -i 's/IS_PFMET_UP/'$IS_PFMET_UP'/g' analyzer.C
 
 rm plots.root
 root -l -q -b runme.C 

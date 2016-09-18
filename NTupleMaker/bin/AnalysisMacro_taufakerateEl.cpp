@@ -373,7 +373,7 @@ int main(int argc, char * argv[]) {
   TH1D *CutFlowUnWLoose= new TH1D("CutFlowUnWLoose","Cut Flow",CutN,1,CutN+1);
   TH1D *CutFlowUnWTight= new TH1D("CutFlowUnWTight","Cut Flow",CutN,1,CutN+1);
 
-  for(int cj = 0; cj < CutNumb; cj++)    {
+  for(int cj = 0; cj < CutNumb; ++cj)    {
     CutFlowUnWLoose->GetXaxis()->SetBinLabel(cj+1,CutList[cj].c_str());
     CutFlowUnWTight->GetXaxis()->SetBinLabel(cj+1,CutList[cj].c_str());
   }
@@ -541,13 +541,13 @@ int main(int argc, char * argv[]) {
     "EtaGt1p2"};
   */
  const int nPtBins = 3;
-  float ptBins[4] = {20,30,50,1000};
+  float ptBins[4] = {20,30,40,1000};
 	
 
   TString PtBins[3] = {
     "Pt20to30",
-    "Pt30to50",
-    "PtGt50"};//,
+    "Pt30to40",
+    "PtGt40"};//,
     //"PtGt60"};//,		       "Pt100to150",		       "Pt150to200",		        "PtGt200"};
 
 
@@ -575,12 +575,12 @@ const    int nEtaBins = 4;
   TH1D * etaBinsH = new TH1D("etaBinsH", "etaBinsH", nEtaBins, etaBins);
  // etaBinsH->Draw();
   etaBinsH->GetXaxis()->Set(nEtaBins, etaBins);
-  for (int i=0; i<nEtaBins; i++){ etaBinsH->GetXaxis()->SetBinLabel(i+1, EtaBins[i]);}
+  for (int i=0; i<nEtaBins; ++i){ etaBinsH->GetXaxis()->SetBinLabel(i+1, EtaBins[i]);}
   
   TH1D * PtBinsH = new TH1D("PtBinsH", "PtBinsH", nPtBins, ptBins);
  // PtBinsH->Draw();
   PtBinsH->GetXaxis()->Set(nPtBins, ptBins);
-  for (int i=0; i<nPtBins; i++){ PtBinsH->GetXaxis()->SetBinLabel(i+1, PtBins[i]);}
+  for (int i=0; i<nPtBins; ++i){ PtBinsH->GetXaxis()->SetBinLabel(i+1, PtBins[i]);}
 
 
   for (int iEta=0; iEta<nEtaBins; ++iEta) {
@@ -609,7 +609,7 @@ const    int nEtaBins = 4;
   double TightCFCounter[CutNumb];
   double statUnc[CutNumb];
   int iCFCounter[CutNumb];
-  for (int i=0;i < CutNumb; i++){
+  for (int i=0;i < CutNumb; ++i){
   LooseCFCounter[i] = 0;
   TightCFCounter[i] = 0;
     iCFCounter[i] = 0;
@@ -638,7 +638,7 @@ const    int nEtaBins = 4;
     histoInputEvents = (TH1D*)file_->Get("makeroottree/nEvents");
     if (histoInputEvents==NULL) continue;
     int NE = int(histoInputEvents->GetEntries());
-    for (int iE=0;iE<NE;++iE)
+    for (int iE=0;iE<NE; ++iE)
       inputEventsH->Fill(0.);
     std::cout << "      number of input events         = " << NE << std::endl;
 
@@ -650,7 +650,7 @@ const    int nEtaBins = 4;
       _inittree->SetBranchAddress("genweight",&genweight);
     Long64_t numberOfEntriesInitTree = _inittree->GetEntries();
     std::cout << "      number of entries in Init Tree = " << numberOfEntriesInitTree << std::endl;
-    for (Long64_t iEntry=0; iEntry<numberOfEntriesInitTree; iEntry++) {
+    for (Long64_t iEntry=0; iEntry<numberOfEntriesInitTree; ++iEntry) {
       _inittree->GetEntry(iEntry);
       if (isData)
 	histWeightsH->Fill(0.,1.);
@@ -694,11 +694,22 @@ const    int nEtaBins = 4;
       iCutT = 0;
       iCutL = 0;
 
+      if ( !isData && ( string::npos != filen.find("WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8") && analysisTree.genparticles_noutgoing >0 && analysisTree.genparticles_noutgoing <5)) continue;
+
+      if ( !isData && ( string::npos != filen.find("DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8") && analysisTree.genparticles_noutgoing >0 && analysisTree.genparticles_noutgoing <5)) continue;
 
       //std::cout << "      number of entries in Tree = " << numberOfEntries <<" starting weight "<<weight<< std::endl;
 
       if (nEvents%50000==0) 
 	cout << "      processed " << nEvents << " events" << endl; 
+
+      if (fabs(analysisTree.primvertex_z)>zVertexCut) continue;
+      if (analysisTree.primvertex_ndof<ndofVertexCut) continue;
+      double dVertex = (analysisTree.primvertex_x*analysisTree.primvertex_x+
+			analysisTree.primvertex_y*analysisTree.primvertex_y);
+      if (dVertex>dVertexCut) continue;
+      if (analysisTree.primvertex_count<2) continue;  
+
 
       bool lumi=false;
 
@@ -1595,7 +1606,7 @@ const    int nEtaBins = 4;
   cout<<" Total events  "<<nEvents<<"  Will use weight  "<<histWeightsH->GetSumOfWeights()<<" Norm Factor "<<XSec*Lumi/( histWeightsH->GetSumOfWeights())<<endl;
   cout<<" Run range from -----> "<<RunMin<<" to  "<<RunMax<<endl;
 
-  for(int ci = 0; ci < CutNumb; ci++)
+  for(int ci = 0; ci < CutNumb; ++ci)
     {
       CutFlowUnWLoose->SetBinContent(1+ci,0);
       CutFlowUnWTight->SetBinContent(1+ci,0);

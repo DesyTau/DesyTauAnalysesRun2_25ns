@@ -433,6 +433,7 @@ int main(int argc, char * argv[]) {
 //  TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/pileUp_data_2016_Cert_271036-275783.root","read");
   //TFile * filePUdistribution_MC = new TFile (TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/MC_Spring2016_pileup.root", "read");
   //TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/pileUp_data_2016_Cert_Cert_271036-276811_NoL1T_xsec63mb.root","read");
+
   TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/pileUp_data_Cert_271036-276811_13TeV_PromptReco_Collisions16_xsec69p2mb.root","read");
 
   TFile * filePUdistribution_MC = new TFile (TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/MC_Spring16_PU.root", "read");
@@ -751,6 +752,10 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
 
 
+
+      if ( !isData && ( string::npos != filen.find("WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8") && analysisTree.genparticles_noutgoing >0 && analysisTree.genparticles_noutgoing <5)) continue;
+
+      if ( !isData && ( string::npos != filen.find("DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8") && analysisTree.genparticles_noutgoing >0 && analysisTree.genparticles_noutgoing <5)) continue;
 
       if (nEvents%50000==0) 
 	cout << "      processed " << nEvents << " events" << endl; 
