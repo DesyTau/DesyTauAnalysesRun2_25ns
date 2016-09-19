@@ -24,7 +24,6 @@
 
 #include "DesyTauAnalyses/NTupleMaker/interface/json.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/PileUp.h"
-//#include "DesyTauAnalyses/NTupleMaker/interface/ScaleFactor.h"
 #include "HTT-utilities/LepEffInterface/interface/ScaleFactor.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/Jets.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/AnalysisMacro.h"
@@ -1264,7 +1263,7 @@ if (!CutBasedTauId){
       float DRmax = 0.5;
       bool dRmuJet = false;
       bool dRtauJet = false;
-      float bJetEtaCut = ptJetCut;
+      float bJetEtaCut = etaJetCut;
 
       vector<unsigned int> jets; jets.clear();
       vector<unsigned int> jetspt20; jetspt20.clear();
@@ -1317,7 +1316,7 @@ if (!CutBasedTauId){
 
 	if (analysisTree.pfjet_btag[jet][0]  > bTag) btagged = true;
 	
-/*
+
 	  if (!isData) {
 	    int flavor = abs(analysisTree.pfjet_flavour[jet]);
 
@@ -1364,7 +1363,7 @@ if (!CutBasedTauId){
 	      }
 	    }
 	  } //is Data
-	  */
+	  
 //if (btagged)
 //	cout<<"  what here "<<btagged<<"  "<<cleanedJet<<endl;
 	  if (btagged && cleanedJet) { 

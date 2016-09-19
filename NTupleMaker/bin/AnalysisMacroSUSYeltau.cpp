@@ -1332,7 +1332,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       int countjets = 0;
       bool dRmuJet = false;
       bool dRtauJet = false;
-      float bJetEtaCut = ptJetCut;
+      float bJetEtaCut = etaJetCut;
 
       vector<unsigned int> jets; jets.clear();
       vector<unsigned int> jetspt20; jetspt20.clear();

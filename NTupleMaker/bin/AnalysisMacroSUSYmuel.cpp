@@ -22,11 +22,9 @@
 #include "TGraphAsymmErrors.h"
 #include <stdlib.h>
 #include "TRandom.h"
-//#include "FWCore/ParameterSet/interface/FileInPath.h"
 
 #include "DesyTauAnalyses/NTupleMaker/interface/json.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/PileUp.h"
-//#include "DesyTauAnalyses/NTupleMaker/interface/ScaleFactor.h"
 #include "HTT-utilities/LepEffInterface/interface/ScaleFactor.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/Jets.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/AnalysisMacro.h"
@@ -36,11 +34,6 @@
 
 int main(int argc, char * argv[]) {
 
-  // first argument - config file 
-  // second argument - filelist
-
-
-
   // **** configuration
   Config cfg(argv[1]);
   string Channel="muel";
@@ -49,7 +42,6 @@ int main(int argc, char * argv[]) {
   bool fillplots= false;
   const bool isData = cfg.get<bool>("IsData");
   const bool applyPUreweighting = cfg.get<bool>("ApplyPUreweighting");
-  
   
   const bool applyLeptonSF = cfg.get<bool>("ApplyLeptonSF");
 
@@ -218,40 +210,30 @@ int main(int argc, char * argv[]) {
 	cout<<" Found the correct cross section "<<xs<<" for Dataset "<<dt<<" XSec "<<XSec<<" number of expected events for Lumi "<<Lumi <<" /pb  = " <<XSec*Lumi<<endl;
       }
       
-	if ( argv[2] == st1) {ChiMass=100;mIntermediate=200;}
-	else if (argv[2] == st2) {ChiMass=200;mIntermediate=500;}
       
       if (isData) XSec=1.;
-      ChiMass=0.0;
     }
 
   if (XSec<0&& !isData) {cout<<" Something probably wrong with the xsecs...please check  - the input was "<<argv[2]<<endl;XSec = 1;}*/
 
 
 	XSec=1.;
-	ChiMass=0.0;	
   xsecs=XSec;
-
   std::vector<unsigned int> allRuns; allRuns.clear();
 
-  cout<<" ChiMass is "<<ChiMass<<"  "<<mIntermediate<<endl;
   bool doThirdLeptVeto=true;
   bool doMuVeto=true;
 
   //CutList[CutNumb]=CutListt[CutNumb];
   char ff[100];
 
-
   sprintf(ff,"%s/%s",argv[3],argv[2]);
-
-  // reweighting with vertices
 
 
 // PU reweighting
   PileUp * PUofficial = new PileUp();
-  //TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/pileUp_data_2016_Cert_Cert_271036-276811_NoL1T_xsec63mb.root","read");
-  TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/pileUp_data_Cert_271036-276811_13TeV_PromptReco_Collisions16_xsec69p2mb.root","read");
-  TFile * filePUdistribution_MC = new TFile (TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/MC_Spring16_PU.root", "read");
+  TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/pileUp_data_Cert_271036-277148_13TeV_PromptReco_Collisions16_xsec69p2mb.root","read");
+  TFile * filePUdistribution_MC = new TFile (TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/MC_Spring16_PU25ns_V1.root", "read");
 
   TH1D * PU_data = (TH1D *)filePUdistribution_data->Get("pileup");
   TH1D * PU_mc = (TH1D *)filePUdistribution_MC->Get("pileup");
@@ -493,7 +475,6 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
 
 
-
     for (Long64_t iEntry=0; iEntry<numberOfEntries; ++iEntry) { 
 
 
@@ -570,10 +551,6 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	  lumi=true;
 	  }
 					
-				
-
-
-
       if (isData)  {
 	XSec = 1.;
 	histRuns->Fill(analysisTree.event_run);
@@ -602,7 +579,6 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	    }
 
 	  }
-	if (analysisTree.event_run == 254833) lumi = false;
 	if (!lumi) continue;
 	//if (lumi ) cout<<"  =============  Found good run"<<"  "<<n<<"  "<<lum<<endl;
       }
@@ -635,7 +611,6 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
 	std::vector<TString> metFlags; metFlags.clear();
      //////////////MET filters flag
-      if (!SUSY && isData){
 
 	 
 	 metFlags.push_back("Flag_HBHENoiseFilter");
@@ -645,10 +620,6 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	 metFlags.push_back("Flag_globalSuperTightHalo2016Filter");
 	// metFlags.push_back("Flag_METFilters");
 	 metFlags.push_back("Flag_eeBadScFilter");
-
-      }
-	
-
 
 
 	bool METflag = metFiltersPasses2(analysisTree, metFlags);
@@ -1016,7 +987,6 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
 
 
-
 ///////////////Trigger weight 
 //
 //
@@ -1077,7 +1047,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
 
  	float     isoweight_1 = (float)SF_electronIdIso->get_ScaleFactor(double(pt_1),double(eta_1));
-      	float isoweight_2 = (float)SF_muonIdIso->get_ScaleFactor(double(pt_2),double(eta_2));
+      	float 	  isoweight_2 = (float)SF_muonIdIso->get_ScaleFactor(double(pt_2),double(eta_2));
 
 
 	weight *= isoweight_1 * isoweight_1;
@@ -1232,7 +1202,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       float DRmax = 0.5;
       bool dRmuJet = false;
       bool dRtauJet = false;
-      float bJetEtaCut = ptJetCut;
+      float bJetEtaCut = etaJetCut;
 
       vector<unsigned int> jets; jets.clear();
       vector<unsigned int> jetspt20; jetspt20.clear();
@@ -1287,7 +1257,6 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
 	if (analysisTree.pfjet_btag[jet][0]  > bTag) btagged = true;
 	
-/*
 	  if (!isData) {
 	    int flavor = abs(analysisTree.pfjet_flavour[jet]);
 
@@ -1334,7 +1303,6 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	      }
 	    }
 	  } //is Data
-	  */
 //if (btagged)
 //	cout<<"  what here "<<btagged<<"  "<<cleanedJet<<endl;
 	  if (btagged && cleanedJet) { 
