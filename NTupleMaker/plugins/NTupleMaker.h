@@ -143,6 +143,7 @@
 #include "DataFormats/L1Trigger/interface/Muon.h"
 #include "DataFormats/L1Trigger/interface/EGamma.h"
 #include "DataFormats/L1Trigger/interface/Tau.h"
+#include "DataFormats/L1Trigger/interface/Jet.h"
 
 using namespace std;
 using namespace reco;
@@ -266,7 +267,7 @@ class NTupleMaker : public edm::EDAnalyzer{
   bool AddFlags(const edm::Event& iEvent, const char* module, const char* label, const char* process);
   
   UInt_t GenParticleInfo(const GenParticle* particle);
-  bool GetL1ExtraTriggerMatch(const l1extra::L1JetParticleCollection* l1jets,  const l1extra::L1JetParticleCollection* l1taus, const LeafCandidate& leg2);
+  bool GetL1ExtraTriggerMatch(const BXVector<l1t::Jet>* l1jets, const BXVector<l1t::Tau>* l1taus, const LeafCandidate& leg2);
   Int_t HasAnyMother(const GenParticle* particle, int id);
   math::XYZPoint PositionOnECalSurface(reco::TransientTrack&);
   double ComputeDiTauMass(LorentzVector leg1, LorentzVector leg2, LorentzVector met, TMatrixD cov);
@@ -386,8 +387,8 @@ class NTupleMaker : public edm::EDAnalyzer{
   std::vector<edm::InputTag> MvaMetCollectionsTag_;
   std::vector<edm::EDGetTokenT<pat::METCollection> > MvaMetCollectionsToken_;
   edm::EDGetTokenT<reco::GenParticleCollection> GenParticleCollectionToken_;
-  edm::EDGetTokenT<l1extra::L1JetParticleCollection> L1JetCollectionToken_;
-  edm::EDGetTokenT<l1extra::L1JetParticleCollection> L1IsoTauCollectionToken_;
+  edm::EDGetTokenT<BXVector<l1t::Jet> > L1JetCollectionToken_;
+  edm::EDGetTokenT<BXVector<l1t::Tau> > L1IsoTauCollectionToken_;
   edm::EDGetTokenT<BXVector<l1t::Muon> > L1MuonCollectionToken_;
   edm::EDGetTokenT<BXVector<l1t::EGamma> > L1EGammaCollectionToken_;
   edm::EDGetTokenT<BXVector<l1t::Tau> > L1TauCollectionToken_;

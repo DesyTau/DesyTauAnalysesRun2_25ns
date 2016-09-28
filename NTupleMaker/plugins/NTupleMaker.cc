@@ -178,8 +178,6 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
   MvaMetCollectionsTag_(iConfig.getParameter<std::vector<edm::InputTag> >("MvaMetCollectionsTag")),
 
   GenParticleCollectionToken_(consumes<reco::GenParticleCollection>(iConfig.getParameter<edm::InputTag>("GenParticleCollectionTag"))),
-  L1JetCollectionToken_(consumes<l1extra::L1JetParticleCollection>(edm::InputTag("l1extraParticles","Central"))),
-  L1IsoTauCollectionToken_(consumes<l1extra::L1JetParticleCollection>(edm::InputTag("l1extraParticles","Tau"))),
   PackedCantidateCollectionToken_(consumes<pat::PackedCandidateCollection>(edm::InputTag("packedPFCandidates"))),
   TriggerObjectCollectionToken_(consumes<pat::TriggerObjectStandAloneCollection>(iConfig.getParameter<edm::InputTag>("TriggerObjectCollectionTag"))),
   BeamSpotToken_(consumes<BeamSpot>(iConfig.getParameter<edm::InputTag>("BeamSpotCollectionTag"))),
@@ -278,7 +276,7 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
     L1MuonCollectionToken_   = consumes<BXVector<l1t::Muon> >(iConfig.getParameter<edm::InputTag>("L1MuonCollectionTag"));
     L1EGammaCollectionToken_ = consumes<BXVector<l1t::EGamma> >(iConfig.getParameter<edm::InputTag>("L1EGammaCollectionTag"));
     L1TauCollectionToken_    = consumes<BXVector<l1t::Tau> >(iConfig.getParameter<edm::InputTag>("L1TauCollectionTag"));    
-    L1IsoTauCollectionToken_ = consumes<l1extra::L1JetParticleCollection>(iConfig.getParameter<edm::InputTag>("L1IsoTauCollectionTag"));
+    L1JetCollectionToken_    = consumes<BXVector<l1t::Jet> >(iConfig.getParameter<edm::InputTag>("L1JetCollectionTag"));
   }
 
   
@@ -1377,61 +1375,60 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   // https://cmssdt.cern.ch/SDT/lxr/source/DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerReadoutSetupFwd.h?v=CMSSW_6_2_0_SLHC2#04
   edm::Handle<L1GlobalTriggerReadoutRecord> L1trigger;
   iEvent.getByLabel(edm::InputTag("gtDigis"), L1trigger);
-  assert(L1trigger.isValid());
+  if (L1trigger.isValid()){
   
-  const TechnicalTriggerWord& L1triggerbits = L1trigger->technicalTriggerWord();
-  for(int i  = 0  ; i < 8 ; i++) trigger_level1bits[i] = 0;
-  
-  for(unsigned i = 0 ; i < min(unsigned(L1triggerbits.size()), unsigned(64)) ; i++)
-    trigger_level1bits[i/8] |= (Byte_t)L1triggerbits[i] << (i % 8);  // bitwise OR -> | 
-  
-  //trigger_level1bits[i/8] = trigger_level1bits[i/8]  | (Byte_t) L1triggerbits[i] << (i % 8);  // bitwise OR -> | 
-  
-  
-  //L1TriggerAlgos
-  const DecisionWord& L1triggeralgos = L1trigger->decisionWord();
-  for(int i = 0  ; i < 128 ; i++){trigger_level1[i] = 0;}
-  for(unsigned i = 0 ; i < min(unsigned(L1triggeralgos.size()), unsigned(1024)) ; i++)
-    {
-      trigger_level1[i/8] |= (Byte_t)L1triggeralgos[i] << (i%8);
-    }
-  lumi_l1techprescaletable = (L1trigger->gtFdlWord()).gtPrescaleFactorIndexTech();
-  lumi_l1algoprescaletable = (L1trigger->gtFdlWord()).gtPrescaleFactorIndexAlgo();	
+    const TechnicalTriggerWord& L1triggerbits = L1trigger->technicalTriggerWord();
+    for(int i  = 0  ; i < 8 ; i++) trigger_level1bits[i] = 0;
+    
+    for(unsigned i = 0 ; i < min(unsigned(L1triggerbits.size()), unsigned(64)) ; i++)
+      trigger_level1bits[i/8] |= (Byte_t)L1triggerbits[i] << (i % 8);  // bitwise OR -> | 
+    
+    //trigger_level1bits[i/8] = trigger_level1bits[i/8]  | (Byte_t) L1triggerbits[i] << (i % 8);  // bitwise OR -> | 
+    
+    
+    //L1TriggerAlgos
+    const DecisionWord& L1triggeralgos = L1trigger->decisionWord();
+    for(int i = 0  ; i < 128 ; i++){trigger_level1[i] = 0;}
+    for(unsigned i = 0 ; i < min(unsigned(L1triggeralgos.size()), unsigned(1024)) ; i++)
+      {
+	trigger_level1[i/8] |= (Byte_t)L1triggeralgos[i] << (i%8);
+      }
+    lumi_l1techprescaletable = (L1trigger->gtFdlWord()).gtPrescaleFactorIndexTech();
+    lumi_l1algoprescaletable = (L1trigger->gtFdlWord()).gtPrescaleFactorIndexAlgo();
+  }
   lumi_hltprescaletable = -1;
   
   //HLTriggerResults
   iEvent.getByLabel(edm::InputTag("TriggerResults", "", cTriggerProcess), HLTrigger);
-  assert(HLTrigger.isValid());
-  for(int i = 0  ; i < 128 ; i++){trigger_HLT[i] = 0;}
-  
-
-  //store trigger bits for selected trigger paths
-  hltriggerresults_->clear();
-  hltriggerprescales_->clear();
-  hltriggerresultsV_.clear();
-  const edm::TriggerNames& TrigNames_ = iEvent.triggerNames(*HLTrigger);
-  for(unsigned i = 0 ; i < HLTrigger->size(); i++)
-    {
-      if(!HLTrigger->wasrun(i) )continue;
-      std::string trigName=TrigNames_.triggerName(i);
-      if(cHLTriggerPaths.size() > 0){
-  	for(size_t ip = 0; ip < cHLTriggerPaths.size(); ip++){
-  	  if(trigName.find(cHLTriggerPaths[ip]) != string::npos){
+  if(HLTrigger.isValid()){
+    for(int i = 0  ; i < 128 ; i++){trigger_HLT[i] = 0;}
+    //store trigger bits for selected trigger paths
+    hltriggerresults_->clear();
+    hltriggerprescales_->clear();
+    hltriggerresultsV_.clear();
+    const edm::TriggerNames& TrigNames_ = iEvent.triggerNames(*HLTrigger);
+    for(unsigned i = 0 ; i < HLTrigger->size(); i++)
+      {
+	if(!HLTrigger->wasrun(i) )continue;
+	std::string trigName=TrigNames_.triggerName(i);
+	if(cHLTriggerPaths.size() > 0){
+	  for(size_t ip = 0; ip < cHLTriggerPaths.size(); ip++){
+	    if(trigName.find(cHLTriggerPaths[ip]) != string::npos){
 	    
-	    //hltriggerprescales_->insert(std::pair<string, int>(trigName, 1.));// FIXME HLTPrescaleConfig->prescaleValue(iEvent,iSetup,trigName)));
-	    hltriggerprescales_->insert(std::pair<string, int>(trigName, 
-							       int(HLTPrescaleConfig->prescaleValue(iEvent,iSetup,trigName))));
-  	    hltriggerresults_->insert(std::pair<string, int>(trigName, HLTrigger->accept(i)));
-	    TString TriggerName(trigName);
-	    //	    std::cout << trigName << " : " 
-	    //		      << HLTrigger->accept(i) << " ; prescale : " 
-	    //		      << HLTConfiguration.prescaleValue(iEvent,iSetup,trigName) << std::endl;
-  	    if(HLTrigger->accept(i)) hltriggerresultsV_.push_back(trigName);
-  	  }
-  	}
+	      //hltriggerprescales_->insert(std::pair<string, int>(trigName, 1.));// FIXME HLTPrescaleConfig->prescaleValue(iEvent,iSetup,trigName)));
+	      hltriggerprescales_->insert(std::pair<string, int>(trigName, 
+								 int(HLTPrescaleConfig->prescaleValue(iEvent,iSetup,trigName))));
+	      hltriggerresults_->insert(std::pair<string, int>(trigName, HLTrigger->accept(i)));
+	      TString TriggerName(trigName);
+	      //	    std::cout << trigName << " : " 
+	      //		      << HLTrigger->accept(i) << " ; prescale : " 
+	      //		      << HLTConfiguration.prescaleValue(iEvent,iSetup,trigName) << std::endl;
+	      if(HLTrigger->accept(i)) hltriggerresultsV_.push_back(trigName);
+	    }
+	  }
+	}
       }
-    }
-
+  }
   if (!cFastSim){
     flags_->clear();
     for(std::vector<string>::iterator it = cFlagsProcesses.begin();
@@ -1670,10 +1667,10 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       
     }
 
-    edm::Handle<l1extra::L1JetParticleCollection> l1isotaus;
-    iEvent.getByToken( L1IsoTauCollectionToken_, l1isotaus);
+    edm::Handle<BXVector<l1t::Tau> > l1isotaus;
+    iEvent.getByToken( L1TauCollectionToken_, l1isotaus);
     if( !l1isotaus.isValid() )
-      edm::LogError("DataNotAvailable")  << "No L1 IsoTau collection available \n";
+      edm::LogError("DataNotAvailable")  << "No L1 Tau collection available \n";
     for(unsigned itau = 0 ; itau < l1isotaus->size() ; itau++) {
       if(l1isotau_count == M_taumaxcount) {
 	cerr << "number of iso taus > M_taumaxcount. They are missing." << endl; 
@@ -2777,9 +2774,9 @@ unsigned int NTupleMaker::AddMuons(const edm::Event& iEvent, const edm::EventSet
 }
 
 
-bool NTupleMaker::GetL1ExtraTriggerMatch(const l1extra::L1JetParticleCollection* l1jets,  
-						    const l1extra::L1JetParticleCollection* l1taus, 
-						    const LeafCandidate& leg2) 
+bool NTupleMaker::GetL1ExtraTriggerMatch(const BXVector<l1t::Jet>* l1jets,  
+					 const BXVector<l1t::Tau>* l1taus, 
+					 const LeafCandidate& leg2) 
 {
   bool matched = false;
   //check matching to l1tau 44 or l1jet 64
@@ -3027,11 +3024,11 @@ unsigned int NTupleMaker::AddTriggerObjects(const edm::Event& iEvent) {
 unsigned int NTupleMaker::AddTaus(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
   if(doDebug) cout<<"inside the AddTaus()"<< endl;
-  edm::Handle<l1extra::L1JetParticleCollection> l1jetsHandle;
-  const l1extra::L1JetParticleCollection* l1jets = 0;
-  
-  edm::Handle<l1extra::L1JetParticleCollection> l1tausHandle;
-  const l1extra::L1JetParticleCollection* l1taus = 0;
+  edm::Handle<BXVector<l1t::Jet> > l1jetsHandle;
+  const BXVector<l1t::Jet>* l1jets = 0;
+
+  edm::Handle<BXVector<l1t::Tau> > l1tausHandle;
+  const BXVector<l1t::Tau>* l1taus = 0;
 
   //  edm::Handle<pat::PackedCandidateCollection> packedPFCandidates;
 
@@ -3043,8 +3040,8 @@ unsigned int NTupleMaker::AddTaus(const edm::Event& iEvent, const edm::EventSetu
   if( !l1jetsHandle.isValid() )  edm::LogError("DataNotAvailable")  << "No L1CentralJets collection available \n";
   else  l1jets = l1jetsHandle.product();
   
-  iEvent.getByToken( L1IsoTauCollectionToken_, l1tausHandle);
-  if( !l1jetsHandle.isValid() )  edm::LogError("DataNotAvailable")  << "No L1TauJets collection available \n";
+  iEvent.getByToken( L1TauCollectionToken_, l1tausHandle);
+  if( !l1tausHandle.isValid() )  edm::LogError("DataNotAvailable")  << "No L1TauJets collection available \n";
   else  l1taus = l1tausHandle.product(); 
  
   //  iEvent.getByLabel(edm::InputTag("packedPFCandidates"),packedPFCandidates);
