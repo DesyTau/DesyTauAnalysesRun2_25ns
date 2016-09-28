@@ -1090,6 +1090,7 @@ void AddTriggerList(const edm::Run& run,
 		      std::cout << strs[l] << std::endl;
 		    
 		    throw cms::Exception("NTupleMaker") << "Did not find filter for trigger " << hltConfig.triggerName(i) << " in run " << run.run() << std::endl;
+		    //cout << "Did not find filter for trigger " << hltConfig.triggerName(i) << " in run " << run.run() << std::endl;
 		  }
 		
 		if(leg.empty())
