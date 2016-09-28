@@ -27,7 +27,7 @@ void TP_eff_mu(TString fileName = "SingleMuon_Run2016_TP", // RooT file with TP 
 
   // output inizialization 
   TString lepton = "Muon";
-	TString OutFileName = fileName + "_" + lepton + "_" + what + "_IsoLt" + Form("%.2f", iso) + "_eff_Spring16";
+	TString OutFileName = fileName + "_" + lepton + "_" + what + "_IsoLt" + Form("%.2f", iso) + "_eff_mutauxtrig";
 	TFile * outputFile = new TFile(OutFileName+".root","recreate");
 
 	// Title of axis in plots  
@@ -68,11 +68,15 @@ void TP_eff_mu(TString fileName = "SingleMuon_Run2016_TP", // RooT file with TP 
        "Pt40to60",
        "PtGt60"};
 
-  float ptBinsTrig_def[18] = {10,
+  float ptBinsTrig_def[22] = {10,
 			  13,
 			  16,
 			  19,
+			  20, 
+			  21,
 			  22,
+			  23,
+			  24,
 			  25,
 			  28,
 			  31,
@@ -87,11 +91,11 @@ void TP_eff_mu(TString fileName = "SingleMuon_Run2016_TP", // RooT file with TP 
 			  200,
 			  1000};
 
-	TString PtBinsTrig_def[17] = {"Pt10to13",
+	TString PtBinsTrig_def[21] = {"Pt10to13",
 		    "Pt13to16",
 		    "Pt16to19",
-		    "Pt19to22",
-		    "Pt22to25",
+		    "Pt19to20","Pt20to21","Pt21to22",
+		    "Pt22to23","Pt23to24","Pt24to25",
 		    "Pt25to28",
 		    "Pt28to31",
 		    "Pt31to34",
@@ -105,7 +109,7 @@ void TP_eff_mu(TString fileName = "SingleMuon_Run2016_TP", // RooT file with TP 
 			"Pt100to200",
 			"PtGt200"};
 
-	int nPtBins = 17; if(what == "IdIso") nPtBins = 7;
+	int nPtBins = 21; if(what == "IdIso") nPtBins = 7;
 
 	//float ptBinsTrig_def[8] = {24,30,40,50,60,120,200,500};
 	//TString PtBinsTrig_def[7] = {"Pt24to30","Pt30to40",
@@ -187,7 +191,7 @@ void TP_eff_mu(TString fileName = "SingleMuon_Run2016_TP", // RooT file with TP 
   //if(what == "hlt_4") {cut_flag_hlt_pass = "(hlt_4_probe == 1 && hlt_14_probe ==1)"; cut_flag_hlt_fail = "(hlt_4_probe == 0 && hlt_14_probe==1)"; }
   if(what == "hlt_5") {cut_flag_hlt_pass = "hlt_5_probe == 1"; cut_flag_hlt_fail = "hlt_5_probe == 0"; }
   if(what == "hlt_6") {cut_flag_hlt_pass = "hlt_6_probe == 1"; cut_flag_hlt_fail = "hlt_6_probe == 0"; }
-  if(what == "hlt_7") {cut_flag_hlt_pass = "(hlt_7_probe == 1 && hlt_12_probe ==1)"; cut_flag_hlt_fail = "(hlt_7_probe == 0 && hlt_12_probe==1)"; }
+  if(what == "hlt_7") {cut_flag_hlt_pass = "(hlt_7_probe == 1 && hlt_3_probe ==1)"; cut_flag_hlt_fail = "(hlt_7_probe == 0 && hlt_3_probe==1)"; }
   if(what == "hlt_8") {cut_flag_hlt_pass = "hlt_8_probe == 1"; cut_flag_hlt_fail = "hlt_8_probe == 0"; }
   if(what == "hlt_9") {cut_flag_hlt_pass = "(hlt_9_probe == 1 && hlt_13_probe ==1)"; cut_flag_hlt_fail = "(hlt_9_probe == 0 && hlt_13_probe ==1)"; }
   if(what == "hlt_10") {cut_flag_hlt_pass = "hlt_10_probe == 1"; cut_flag_hlt_fail = "hlt_10_probe == 0"; }

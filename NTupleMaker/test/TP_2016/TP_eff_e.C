@@ -76,12 +76,12 @@ void TP_eff_e(TString fileName = "SingleElectron_Run2016B_TP", // RooT file with
        "Pt40to60",
        "PtGt60"};
 
-  float ptBinsTrig_def[18] = {10,
+  float ptBinsTrig_def[22] = {10,
 			  13,
 			  16,
 			  19,
-			  22,
-			  25,
+			  22, 23, 24,
+			  25, 26, 27,
 			  28,
 			  31,
 			  34,
@@ -95,12 +95,12 @@ void TP_eff_e(TString fileName = "SingleElectron_Run2016B_TP", // RooT file with
 			200,
 			10000};
 
-	TString PtBinsTrig_def[17] = {"Pt10to13",
+	TString PtBinsTrig_def[21] = {"Pt10to13",
 		    "Pt13to16",
 		    "Pt16to19",
 		    "Pt19to22",
-		    "Pt22to25",
-		    "Pt25to28",
+		    "Pt22to23",		    "Pt23to24",		    "Pt24to25",
+		    "Pt25to26",		    "Pt26to27",		    "Pt27to28",
 		    "Pt28to31",
 		    "Pt31to34",
 		    "Pt34to37",
@@ -113,7 +113,7 @@ void TP_eff_e(TString fileName = "SingleElectron_Run2016B_TP", // RooT file with
 			"Pt100to200",
 			"PtGt200"};
 
-	int nPtBins = 17; if(what == "IdIso") nPtBins = 7;
+	int nPtBins = 21; if(what == "IdIso") nPtBins = 7;
 	float * ptBins = new float[nPtBins+1];
 	TString * PtBins = new TString[nPtBins];
 
