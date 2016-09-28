@@ -28,6 +28,9 @@
 
 #include "TRandom.h"
 
+#include "RooRealVar.h"
+#include "RooWorkspace.h"
+
 #include "DesyTauAnalyses/NTupleMaker/interface/Config.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/AC1B.h"
 
@@ -141,32 +144,33 @@ int main(int argc, char * argv[]){
   // MET Recoil Corrections
   const bool applyRecoilCorrections = cfg.get<bool>("ApplyRecoilCorrections");
   const bool isDY = infiles.find("DY") == infiles.rfind("/")+1;
-  const bool isWJets = infiles.find("WJets") == infiles.rfind("/")+1;
+  const bool isWJets = (infiles.find("WJets") == infiles.rfind("/")+1) || (infiles.find("W1Jets") == infiles.rfind("/")+1) || (infiles.find("W2Jets") == infiles.rfind("/")+1) || (infiles.find("W3Jets") == infiles.rfind("/")+1) || (infiles.find("W4Jets") == infiles.rfind("/")+1) ;
   const bool isMG = infiles.find("madgraph") != string::npos;
   //const bool applyRecoilCorrections = isDY || isWJets;
+  
 
   RecoilCorrector* recoilPFMetCorrector = (RecoilCorrector*) malloc(sizeof(*recoilPFMetCorrector));
-  RecoilCorrector* recoilPuppiMetCorrector = (RecoilCorrector*) malloc(sizeof(*recoilPuppiMetCorrector));
+  //RecoilCorrector* recoilPuppiMetCorrector = (RecoilCorrector*) malloc(sizeof(*recoilPuppiMetCorrector));
   RecoilCorrector* recoilMvaMetCorrector = (RecoilCorrector*) malloc(sizeof(*recoilMvaMetCorrector));
 
-  if(!isData && applyRecoilCorrections){
+  if(!isData && applyRecoilCorrections && (isDY || isWJets) ){
     TString RecoilDir("HTT-utilities/RecoilCorrections/data/");
 
-    TString RecoilFileName = RecoilDir; RecoilFileName += "recoilPFMEt_76X";
+    TString RecoilFileName = RecoilDir; RecoilFileName += "PFMET";
     if (isMG)
-      RecoilFileName += "_MG5";
-    RecoilFileName += ".root";
+      RecoilFileName += "_MG_";
+    RecoilFileName += "2016BCD.root";
     std::cout<<RecoilFileName<<std::endl;
     recoilPFMetCorrector = new RecoilCorrector( RecoilFileName);
         
-    RecoilFileName = RecoilDir; RecoilFileName += "recoilPuppiMet.root";
-    std::cout<<RecoilFileName<<std::endl;
-    recoilPuppiMetCorrector = new RecoilCorrector( RecoilFileName);
+    //RecoilFileName = RecoilDir; RecoilFileName += "recoilPuppiMet.root";
+    //std::cout<<RecoilFileName<<std::endl;
+    //recoilPuppiMetCorrector = new RecoilCorrector( RecoilFileName);
 
-    RecoilFileName = RecoilDir; RecoilFileName += "recoilMvaMEt_76X_newTraining";
+    RecoilFileName = RecoilDir; RecoilFileName += "MvaMET";
     if (isMG)
-      RecoilFileName += "_MG5";
-    RecoilFileName += ".root";
+      RecoilFileName += "_MG_";
+    RecoilFileName += "2016BCD.root";
     std::cout<<RecoilFileName<<std::endl;
     recoilMvaMetCorrector = new RecoilCorrector( RecoilFileName);
   }
@@ -316,6 +320,17 @@ int main(int argc, char * argv[]){
     SF_lepTrigger->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(trigEffFile));
   }
 
+
+  // tau ID scale factors 
+  TString workspace_filename = TString(cmsswBase)+"/src/HTT-utilities/CorrectionsWorkspace/htt_scalefactors_v4.root";
+  TFile *f_workspace = new TFile(workspace_filename,"read");
+  if (f_workspace->IsZombie()) {std::cout << " workspace file " << workspace_filename << " not found. Please check. " << std::endl; exit(1);}
+  RooWorkspace *w = (RooWorkspace*)f_workspace->Get("w");
+  //f.Close();
+
+  // Zpt reweighting for LO DY samples
+  TFile * f_zptweight = new TFile("/afs/cern.ch/user/r/rlane/public/HIG16037/zpt_weights/zpt_weights_2016.root","read");
+  TH2D * h_zptweight = (TH2D*)f_zptweight->Get("zptmass_histo");
 
   // output fileName with histograms
   rootFileName += "_";
@@ -553,7 +568,7 @@ int main(int argc, char * argv[]){
                   float dRtrig = deltaR(lep_eta, lep_phi, analysisTree.trigobject_eta[iT],analysisTree.trigobject_phi[iT]);
         
                   if (dRtrig < deltaRTrigMatch){
-                    	if (analysisTree.trigobject_filters[iT][nIsoLeg] && ( isData || analysisTree.trigobject_pt[iT] > ptTrigObjCut)) // Ele23 Leg
+                    	if (analysisTree.trigobject_filters[iT][nIsoLeg] && ( isData || analysisTree.trigobject_pt[iT] > ptTrigObjCut))
                       		isSingleLepTrig = true;
 						if (ch=="mt" && analysisTree.trigobject_filters[iT][nIsoLeg2] && ( isData || analysisTree.trigobject_pt[iT] > ptTrigObjCut))
 							isSingleLepTrig = true;
@@ -636,14 +651,15 @@ int main(int argc, char * argv[]){
 					    analysisTree.muon_pz[leptonIndex],
 					    muonMass);
 
-
-
         if (!isData && ApplyLepSF) {
               // Scale Factor SingleEle trigger SF_eleTrigger
           otree->trigweight_1 = (SF_lepTrigger->get_EfficiencyData(double(analysisTree.muon_pt[leptonIndex]),double(analysisTree.muon_eta[leptonIndex])));
               // Scale Factor Id+Iso SF_eleIdIso
           otree->idisoweight_1 = (SF_lepIdIso->get_ScaleFactor(double(analysisTree.muon_pt[leptonIndex]),double(analysisTree.muon_eta[leptonIndex])));
-          otree->effweight = (otree->trigweight_1)*(otree->idisoweight_1)*(otree->trigweight_2)*(otree->idisoweight_2);
+
+	         // tracking efficiency weight
+		   w->var("m_eta")->setVal(analysisTree.muon_eta[leptonIndex]); 
+		   otree->trkeffweight_1 = (double)( w->function("m_trk_ratio")->getVal());
         }
 
       } else if(ch=="et"){
@@ -659,11 +675,32 @@ int main(int argc, char * argv[]){
           otree->trigweight_1 = (SF_lepTrigger->get_EfficiencyData(double(analysisTree.electron_pt[leptonIndex]),double(analysisTree.electron_eta[leptonIndex])));
                 // Scale Factor Id+Iso SF_eleIdIso
           otree->idisoweight_1 = (SF_lepIdIso->get_ScaleFactor(double(analysisTree.electron_pt[leptonIndex]),double(analysisTree.electron_eta[leptonIndex])));
-          otree->effweight = (otree->trigweight_1)*(otree->idisoweight_1)*(otree->trigweight_2)*(otree->idisoweight_2);
+
+	            // tracking efficiency weight
+		  w->var("e_eta")->setVal(analysisTree.electron_eta[leptonIndex]); 
+		  w->var("e_pt")->setVal(analysisTree.electron_pt[leptonIndex]); 	
+		  otree->trkeffweight_1 = (double)( w->function("e_trk_ratio")->getVal());
         }
-	    }
+	  }
 
       FillTau(&analysisTree, otree, tauIndex);
+	  
+      // tauID weight
+      if (!isData && analysisTree.tau_genmatch[tauIndex]==5) otree->idisoweight_2 = 0.83; 
+
+	  // taking tau ID weight from the workspace
+	  //if (!isData) {
+	  //w->var("t_pt")->setVal(analysisTree.tau_pt[tauIndex]); //tau pt
+	  //w->var("t_eta")->setVal(analysisTree.tau_eta[tauIndex]); // tau eta
+	  //w->var("t_dm")->setVal(analysisTree.tau_genmatch[tauIndex]); // tau decay mode
+	  //double tauIDweight =  w->function("t_iso_mva_m_pt30_sf")->getVal();
+	  //otree->idisoweight_2 = (double)( w->function("t_iso_mva_m_pt30_sf")->getVal());
+	  //}
+
+      otree->effweight = (otree->trigweight_1)*(otree->idisoweight_1)*(otree->trigweight_2)*(otree->idisoweight_2);
+
+      //MET
+      fillMET(ch, leptonIndex, tauIndex, &analysisTree, otree);
 
       //ditau sytem
       TLorentzVector tauLV; tauLV.SetXYZM(analysisTree.tau_px[tauIndex],
@@ -671,41 +708,51 @@ int main(int argc, char * argv[]){
 					  analysisTree.tau_pz[tauIndex],
 					  tauMass);
 
-      TLorentzVector metLV; metLV.SetXYZT(analysisTree.pfmet_ex,
-					  analysisTree.pfmet_ey,
-					  0,
-					  TMath::Sqrt(analysisTree.pfmet_ex*analysisTree.pfmet_ex + analysisTree.pfmet_ey*analysisTree.pfmet_ey));
+	  // using MVA MET
+      TLorentzVector metLV; metLV.SetXYZT(otree->mvamet*TMath::Cos(otree->mvametphi),
+                						 otree->mvamet*TMath::Sin(otree->mvametphi),
+               							 0,
+                						 TMath::Sqrt( otree->mvamet*TMath::Sin(otree->mvametphi)*otree->mvamet*TMath::Sin(otree->mvametphi) +
+                         				 otree->mvamet*TMath::Cos(otree->mvametphi)*otree->mvamet*TMath::Cos(otree->mvametphi)));
+
+      //if want to switch to pfMET 
+	  /*TLorentzVector metLV; metLV.SetXYZT(analysisTree.pfmet_ex,analysisTree.pfmet_ey,0,
+      TMath::Sqrt(analysisTree.pfmet_ex*analysisTree.pfmet_ex + analysisTree.pfmet_ey*analysisTree.pfmet_ey));*/
 
       TLorentzVector dileptonLV = leptonLV + tauLV;
 
       // visible mass
       otree->m_vis = dileptonLV.M();
-      // visible ditau pt 
-      otree->pt_tt = (dileptonLV+metLV).Pt();
+
+	  // ditau pt
+      otree->pt_tt = (dileptonLV+metLV).Pt();   
+
+	  // mt TOT
+	  float mtTOT = 2*(otree->pt_1)*metLV.Pt()*(1-cos(otree->phi_1 - otree->mvametphi));
+	  mtTOT += 2*(otree->pt_2)*metLV.Pt()*(1-cos(otree->phi_2 - otree->mvametphi)); 
+	  mtTOT += 2*(otree->pt_1)*(otree->pt_2)*(1-cos(otree->phi_1-otree->phi_2)); 
+	  otree->mt_tot = TMath::Sqrt(mtTOT);
 
       // opposite charge
       otree->os = (otree->q_1 * otree->q_2) < 0.;
 
       // dilepton veto
       if(ch=="mt") otree->dilepton_veto = dilepton_veto_mt(&cfg, &analysisTree);
-			if(ch=="et") otree->dilepton_veto = dilepton_veto_et(&cfg, &analysisTree);
+	  if(ch=="et") otree->dilepton_veto = dilepton_veto_et(&cfg, &analysisTree);
 
-			//extra letpn veto
-			otree->extraelec_veto = extra_electron_veto(leptonIndex, ch, &cfg, &analysisTree);
+	  //extra letpn veto
+	  otree->extraelec_veto = extra_electron_veto(leptonIndex, ch, &cfg, &analysisTree);
       otree->extramuon_veto = extra_muon_veto(leptonIndex, ch, &cfg, &analysisTree);
 
-      //MET
-
-      fillMET(ch, leptonIndex, tauIndex, &analysisTree, otree);
 
       // define MET covariance
-/*      TMatrixD covMET(2, 2);
+	  /*TMatrixD covMET(2, 2);
       covMET[0][0] = otree->mvacov00;
       covMET[1][0] = otree->mvacov10;
       covMET[0][1] = otree->mvacov01;
       covMET[1][1] = otree->mvacov11;*/
 
-      // mt calculation and filling
+      // mt calculation and filling. MVA MET is used. 
       mt_calculation(otree);
 
       // bisector of lepton and tau transverse momenta
@@ -732,13 +779,6 @@ int main(int argc, char * argv[]){
       otree->pfpzetamiss = analysisTree.pfmet_ex*zetaX + analysisTree.pfmet_ey*zetaY;      
       otree->puppipzetamiss = analysisTree.puppimet_ex*zetaX + analysisTree.puppimet_ey*zetaY;
 
-      metLV.SetXYZT(otree->mvamet*TMath::Cos(otree->mvametphi),
-                otree->mvamet*TMath::Sin(otree->mvametphi),
-                0,
-                TMath::Sqrt( otree->mvamet*TMath::Sin(otree->mvametphi)*otree->mvamet*TMath::Sin(otree->mvametphi) +
-                         otree->mvamet*TMath::Cos(otree->mvametphi)*otree->mvamet*TMath::Cos(otree->mvametphi)));
-      otree->pt_tt = (dileptonLV+metLV).Pt();   
-
       //counting jet
       counting_jets(&analysisTree, otree, &cfg);
 
@@ -750,7 +790,7 @@ int main(int argc, char * argv[]){
       TLorentzVector genL( 0., 0., 0., 0.);
 
       otree->njetshad = otree->njets;
-      if (!isData && applyRecoilCorrections){
+      if (!isData && applyRecoilCorrections && (isDY || isWJets) ){
 				genV = genTools::genV(analysisTree);
 				genL = genTools::genL(analysisTree);
 				otree->njetshad = genTools::nJetsHad(analysisTree);
@@ -758,7 +798,7 @@ int main(int argc, char * argv[]){
 
       // MVA MET      
 			// // njetshad, genVis, mean-resolution correction
-			genTools::RecoilCorrections( *recoilMvaMetCorrector, (!isData && applyRecoilCorrections) * genTools::MeanResolution,
+			genTools::RecoilCorrections( *recoilMvaMetCorrector, (!isData && applyRecoilCorrections && (isDY || isWJets)) * genTools::QuantileRemap,
 			                     otree->mvamet, otree->mvametphi,
 			                     genV.Px(), genV.Py(),
 			                     genL.Px(), genL.Py(),
@@ -772,9 +812,17 @@ int main(int argc, char * argv[]){
 
 			//end MET Recoil Corrections
 
+      // Zpt weight
+	  otree->zptweight = 1.;
+      if (!isData && isDY && isMG ) {
+        genV = genTools::genV(analysisTree); // gen Z boson ?
+        otree->zptweight = h_zptweight->GetBinContent(h_zptweight->GetXaxis()->FindBin(genV.M()),h_zptweight->GetYaxis()->FindBin(genV.Pt()));
+	  }
+
       otree->Fill();
       selEvents++;
     } // end of file processing (loop over events in one file)
+
     nFiles++;
     delete _tree;
     file_->Close();
@@ -882,7 +930,7 @@ void fill_weight(const AC1B * analysisTree, Spring15Tree *otree, PileUp *PUoffic
   otree->trigweight_2 = 1;
   otree->idisoweight_1 = 0;
   otree->idisoweight_2 = 1;
-
+  otree->trkeffweight_1=1;
   otree->effweight = 0;
   otree->fakeweight = 0;
   otree->embeddedWeight = 0;
@@ -1308,9 +1356,6 @@ void mt_calculation(Spring15Tree *otree){
   otree->puppimt_1 = sqrt(2*otree->pt_1*otree->puppimet*(1.-cos(otree->phi_1-otree->puppimetphi)));
   otree->puppimt_2 = sqrt(2*otree->pt_2*otree->puppimet*(1.-cos(otree->phi_2-otree->puppimetphi)));
 }
-
-//filling otree with bisector variables
-
 
 void counting_jets(const AC1B *analysisTree, Spring15Tree *otree, const Config *cfg){
 
