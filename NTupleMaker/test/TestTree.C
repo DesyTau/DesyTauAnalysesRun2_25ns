@@ -3,10 +3,10 @@
 #include <vector>
 void TestTree(int numberOfEvents = 10) {
 
-  TFile * file = new TFile("/nfs/dust/cms/group/higgs-kit/80x_v3/SingleElectron__Run2016B-PromptReco-v2/SingleElectron__Run2016B-PromptReco-v2_489.root");
+ // TFile * file = new TFile("/nfs/dust/cms/group/higgs-kit/80x_v3/SingleElectron__Run2016B-PromptReco-v2/SingleElectron__Run2016B-PromptReco-v2_489.root");
 
 //"/nfs/dust/cms/group/higgs-kit/80x_v2/SingleElectron__Run2016B-PromptReco-v2/SingleElectron__Run2016B-PromptReco-v2_3000.root");
-  //TFile * file = new TFile("output.root");
+  TFile * file = new TFile("output_MC.root");
 
   TTree * tree = (TTree*)file->Get("makeroottree/AC1B");
 
@@ -15,6 +15,7 @@ void TestTree(int numberOfEvents = 10) {
   vector<string> * btagdiscriminators = new vector<string>();
   std::map<std::string, int>* hltriggerresults = new std::map<std::string, int>();
   std::map<std::string, int>* hltprescales = new std::map<std::string, int>();
+  std::map<std::string, int>* flags = new std::map<std::string, int>();
 
   tree->SetBranchAddress("run_hltnames",&hltpaths);
   tree->SetBranchAddress("run_hltfilters",&hltfilters);
@@ -22,6 +23,7 @@ void TestTree(int numberOfEvents = 10) {
 
   tree->SetBranchAddress("hltriggerresults",&hltriggerresults); 
   tree->SetBranchAddress("hltriggerprescales",&hltprescales); 
+  tree->SetBranchAddress("flags",&flags);
 
   int nEntries = tree->GetEntries();
 
@@ -37,6 +39,13 @@ void TestTree(int numberOfEvents = 10) {
     std::cout << std::endl;
     std::cout << "event number = " << nEvents << std::endl;
     std::cout << std::endl;
+
+    unsigned int nf = flags->size();
+    std::cout << "nf = " << nf << std::endl;
+    for (std::map<string,int>::iterator it=flags->begin(); it!=flags->end(); ++it)
+      std::cout << it->first << "  :  "  << it->second << std::endl;
+    std::cout << std::endl;
+
     unsigned int nhlt = hltpaths->size();
     std::cout << "nhlt = " << nhlt << std::endl;
     for (unsigned int i=0; i<nhlt; ++i)

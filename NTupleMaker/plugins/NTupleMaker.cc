@@ -116,7 +116,9 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
 
   cFlags(iConfig.getUntrackedParameter<vector<string> >("Flags")),
   cFlagsProcesses(iConfig.getUntrackedParameter<vector<string> >("FlagsProcesses")),
-  
+  BadChCandFilterToken_(consumes<bool>(iConfig.getParameter<edm::InputTag>("BadChargedCandidateFilter"))),
+  BadPFMuonFilterToken_(consumes<bool>(iConfig.getParameter<edm::InputTag>("BadPFMuonFilter"))),
+
   // muons
   cMuPtMin(iConfig.getUntrackedParameter<double>("RecMuonPtMin", 10.)),
   cMuEtaMax(iConfig.getUntrackedParameter<double>("RecMuonEtaMax", 2.4)),
@@ -1436,6 +1438,14 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       //std::cout<<it->data()<<std::endl;
       AddFlags(iEvent,"TriggerResults", "", it->data());
     }
+
+    edm::Handle<bool> ifilterbadChCand;
+    iEvent.getByToken(BadChCandFilterToken_, ifilterbadChCand);
+    flags_->insert(std::pair<string, int>("Flag_BadChargedCandidateFilter", *ifilterbadChCand));
+
+    edm::Handle<bool> ifilterbadPFMuon;
+    iEvent.getByToken(BadPFMuonFilterToken_, ifilterbadPFMuon);
+    flags_->insert(std::pair<string, int>("Flag_BadPFMuonFilter", *ifilterbadPFMuon));
   }
   
   if(cbeamspot)

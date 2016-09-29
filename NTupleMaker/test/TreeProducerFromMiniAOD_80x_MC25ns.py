@@ -443,10 +443,13 @@ Flags = cms.untracked.vstring(
   'Flag_eeBadScFilter',
   'Flag_chargedHadronTrackResolutionFilter',
   'Flag_muonBadTrackFilter',
+  'Flag_globalTightHalo2016Filter',
   'Flag_METFilters',
   'allMetFilterPaths'
 ),
 FlagsProcesses = cms.untracked.vstring("RECO","PAT"),
+BadChargedCandidateFilter =  cms.InputTag("BadChargedCandidateFilter"),
+BadPFMuonFilter = cms.InputTag("BadPFMuonFilter"),
 # tracks
 RecTrackPtMin = cms.untracked.double(0.5),
 RecTrackEtaMax = cms.untracked.double(2.4),
