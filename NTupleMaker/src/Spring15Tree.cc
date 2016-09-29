@@ -234,6 +234,7 @@ void Spring15Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("jeta_1", &jeta_1, &b_jeta_1);
    fChain->SetBranchAddress("jphi_1", &jphi_1, &b_jphi_1);
    fChain->SetBranchAddress("jptraw_1", &jptraw_1, &b_jptraw_1);
+   fChain->SetBranchAddress("jrawf_1", &jrawf_1, &b_jrawf_1);
    fChain->SetBranchAddress("jptunc_1", &jptunc_1, &b_jptunc_1);
    fChain->SetBranchAddress("jmva_1", &jmva_1, &b_jmva_1);
    fChain->SetBranchAddress("jlrm_1", &jlrm_1, &b_jlrm_1);
@@ -242,6 +243,7 @@ void Spring15Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("jeta_2", &jeta_2, &b_jeta_2);
    fChain->SetBranchAddress("jphi_2", &jphi_2, &b_jphi_2);
    fChain->SetBranchAddress("jptraw_2", &jptraw_2, &b_jptraw_2);
+   fChain->SetBranchAddress("jrawf_2", &jrawf_2, &b_jrawf_2);
    fChain->SetBranchAddress("jptunc_2", &jptunc_2, &b_jptunc_2);
    fChain->SetBranchAddress("jmva_2", &jmva_2, &b_jlrm_2);
    fChain->SetBranchAddress("jlrm_2", &jlrm_2, &b_jlrm_2);
@@ -253,9 +255,15 @@ void Spring15Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("bpt_1", &bpt_1, &b_bpt_1);
    fChain->SetBranchAddress("beta_1", &beta_1, &b_beta_1);
    fChain->SetBranchAddress("bphi_1", &bphi_1, &b_bphi_1);
+   fChain->SetBranchAddress("brawf_1", &brawf_1, &b_brawf_1);
+   fChain->SetBranchAddress("bmva_1", &bmva_1, &b_bmva_1);
+   fChain->SetBranchAddress("bcsv_1", &bcsv_1, &b_bcsv_1);
    fChain->SetBranchAddress("bpt_2", &bpt_2, &b_bpt_2);
    fChain->SetBranchAddress("beta_2", &beta_2, &b_beta_2);
    fChain->SetBranchAddress("bphi_2", &bphi_2, &b_bphi_2);
+   fChain->SetBranchAddress("brawf_2", &brawf_2, &b_brawf_2);
+   fChain->SetBranchAddress("bmva_2", &bmva_2, &b_bmva_2);
+   fChain->SetBranchAddress("bcsv_2", &bcsv_2, &b_bcsv_2);
 
    lock=true;
 }
@@ -519,6 +527,7 @@ void Spring15Tree::WriteInit(TTree *tree) {
   fChain->Branch("jeta_1", &jeta_1, "jeta_1/F");
   fChain->Branch("jphi_1", &jphi_1, "jphi_1/F");
   fChain->Branch("jptraw_1", &jptraw_1, "jptraw_1/F");
+  fChain->Branch("jrawf_1", &jrawf_1, "jrawf_1/F");
   fChain->Branch("jptunc_1", &jptunc_1, "jptunc_1/F");
   fChain->Branch("jmva_1", &jmva_1, "jmva_1/F");
   fChain->Branch("jlrm_1", &jlrm_1, "jlrm_1/F");
@@ -528,6 +537,7 @@ void Spring15Tree::WriteInit(TTree *tree) {
   fChain->Branch("jeta_2", &jeta_2, "jeta_2/F");
   fChain->Branch("jphi_2", &jphi_2, "jphi_2/F");
   fChain->Branch("jptraw_2", &jptraw_2, "jptraw_2/F");
+  fChain->Branch("jrawf_2", &jrawf_2, "jrawf_2/F");
   fChain->Branch("jptunc_2", &jptunc_2, "jptunc_2/F");
   fChain->Branch("jmva_2", &jmva_2, "jlrm_2/F");
   fChain->Branch("jlrm_2", &jlrm_2, "jlrm_2/F");
@@ -541,9 +551,16 @@ void Spring15Tree::WriteInit(TTree *tree) {
   fChain->Branch("bpt_1", &bpt_1, "bpt_1/F");
   fChain->Branch("beta_1", &beta_1, "beta_1/F");
   fChain->Branch("bphi_1", &bphi_1, "bphi_1/F");    
+  fChain->Branch("brawf_1", &brawf_1, "brawf_1/F");
+  fChain->Branch("bmva_1", &bmva_1, "bmva_1/F");
+  fChain->Branch("bcsv_1", &bcsv_1, "bcsv_1/F");    
   fChain->Branch("bpt_2", &bpt_2, "bpt_2/F");
   fChain->Branch("beta_2", &beta_2, "beta_2/F");
   fChain->Branch("bphi_2", &bphi_2, "bphi_2/F");    
+  fChain->Branch("brawf_2", &brawf_2, "brawf_2/F");
+  fChain->Branch("bmva_2", &bmva_2, "bmva_2/F");
+  fChain->Branch("bcsv_2", &bcsv_2, "bcsv_2/F");    
+
 }
 
 void Spring15Tree::Fill(){
