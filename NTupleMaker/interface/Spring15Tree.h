@@ -201,6 +201,7 @@ public :
   Float_t         jeta_1;
   Float_t         jphi_1;
   Float_t         jptraw_1;
+  Float_t         jrawf_1;
   Float_t         jptunc_1;
   Float_t         jmva_1;
   Float_t         jlrm_1;
@@ -209,6 +210,7 @@ public :
   Float_t         jeta_2;
   Float_t         jphi_2;
   Float_t         jptraw_2;
+  Float_t         jrawf_2;
   Float_t         jptunc_2;
   Float_t         jmva_2;
   Float_t         jlrm_2;
@@ -220,9 +222,15 @@ public :
   Float_t         bpt_1;
   Float_t         beta_1;
   Float_t         bphi_1;
+  Float_t         brawf_1;
+  Float_t         bmva_1;
+  Float_t         bcsv_1;
   Float_t         bpt_2;
   Float_t         beta_2;
   Float_t         bphi_2;
+  Float_t         brawf_2;
+  Float_t         bmva_2;
+  Float_t         bcsv_2;
   
   // List of branches
   TBranch        *b_run;   //!
@@ -400,6 +408,7 @@ public :
   TBranch        *b_jeta_1;   //!
   TBranch        *b_jphi_1;   //!
   TBranch        *b_jptraw_1;   //!
+  TBranch        *b_jrawf_1;   //!
   TBranch        *b_jptunc_1;   //!
   TBranch        *b_jmva_1;   //!
   TBranch        *b_jlrm_1;   //!
@@ -408,6 +417,7 @@ public :
   TBranch        *b_jeta_2;   //!
   TBranch        *b_jphi_2;   //!
   TBranch        *b_jptraw_2;   //!
+  TBranch        *b_jrawf_2;   //!
   TBranch        *b_jptunc_2;   //!
   TBranch        *b_jlrm_2;   //!
   TBranch        *b_jctm_2;   //!
@@ -418,9 +428,15 @@ public :
   TBranch        *b_bpt_1;   //!
   TBranch        *b_beta_1;   //!
   TBranch        *b_bphi_1;   //!
+  TBranch        *b_brawf_1;   //!
+  TBranch        *b_bmva_1;   //!
+  TBranch        *b_bcsv_1;   //!
   TBranch        *b_bpt_2;   //!
   TBranch        *b_beta_2;   //!
   TBranch        *b_bphi_2;   //!
+  TBranch        *b_brawf_2;   //!
+  TBranch        *b_bmva_2;   //!
+  TBranch        *b_bcsv_2;   //!
 
   
   Spring15Tree(TTree *tree=0);
