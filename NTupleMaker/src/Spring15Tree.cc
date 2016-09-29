@@ -70,6 +70,8 @@ void Spring15Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("idisoweight_1", &idisoweight_1, &b_idisoweight_1);
    fChain->SetBranchAddress("idisoweight_2", &idisoweight_2, &b_idisoweight_2);
    fChain->SetBranchAddress("topptweight", &topptweight, &b_topptweight);
+   fChain->SetBranchAddress("zptweight", &zptweight, &b_zptweight);
+   fChain->SetBranchAddress("trkeffweight_1", &trkeffweight_1, &b_trkeffweight_1);
    fChain->SetBranchAddress("effweight", &effweight, &b_effweight); 
    fChain->SetBranchAddress("fakeweight", &fakeweight, &b_fakeweight);
    fChain->SetBranchAddress("embeddedWeight", &embeddedWeight, &b_embeddedWeight);
@@ -87,6 +89,7 @@ void Spring15Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("genL_pz", &genL_pz, &b_genL_pz);   
    fChain->SetBranchAddress("genL_e", &genL_e, &b_genL_e);
    fChain->SetBranchAddress("m_vis", &m_vis, &b_m_vis);
+   fChain->SetBranchAddress("mt_tot", &mt_tot, &b_mt_tot);
    fChain->SetBranchAddress("m_sv", &m_sv, &b_m_sv);
    fChain->SetBranchAddress("pt_sv", &pt_sv, &b_pt_sv);
    fChain->SetBranchAddress("eta_sv", &eta_sv, &b_eta_sv);
@@ -341,6 +344,8 @@ void Spring15Tree::WriteInit(TTree *tree) {
   fChain->Branch("idisoweight_1", &idisoweight_1, "idisoweight_1/F");
   fChain->Branch("idisoweight_2", &idisoweight_2, "idisoweight_2/F");
   fChain->Branch("topptweight", &topptweight, "topptweight/F"); 
+  fChain->Branch("zptweight", &zptweight, "zptweight/D"); 
+  fChain->Branch("trkeffweight_1", &trkeffweight_1, "trkeffweight_1/D"); 
   fChain->Branch("effweight", &effweight, "effweight/F");
   fChain->Branch("fakeweight", &fakeweight, "fakeweight/F");
   fChain->Branch("embeddedWeight", &embeddedWeight, "embeddedWeight/F");
@@ -359,6 +364,7 @@ void Spring15Tree::WriteInit(TTree *tree) {
   fChain->Branch("genL_e", &genL_e, "genL_e/F");
   
   fChain->Branch("m_vis", &m_vis, "m_vis/F");
+  fChain->Branch("mt_tot", &mt_tot, "mt_tot/F");
   fChain->Branch("m_sv", &m_sv, "m_sv/F");
   fChain->Branch("pt_sv", &pt_sv, "pt_sv/F");
   fChain->Branch("eta_sv", &eta_sv, "eta_sv/F");

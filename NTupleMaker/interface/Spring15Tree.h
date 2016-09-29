@@ -40,6 +40,8 @@ public :
   Float_t         idisoweight_1;
   Float_t         idisoweight_2;
   Float_t         topptweight;
+  Double_t 		  zptweight;
+  Double_t        trkeffweight_1;
   Float_t         effweight;
   Float_t         fakeweight;
   Float_t         embeddedWeight;
@@ -57,6 +59,7 @@ public :
   Float_t         genL_pz;
   Float_t         genL_e;
   Float_t         m_vis;
+  Float_t         mt_tot;
   Float_t         m_sv;
   Float_t         pt_sv;
   Float_t         eta_sv;
@@ -86,7 +89,7 @@ public :
   Float_t         pfmt_rc_njetsreco_1;
   Float_t         mt_rc_visreco_1;
   Float_t         pfmt_rc_visreco_1;
-  Int_t 	  tau_decay_mode_1;
+  Int_t 	      tau_decay_mode_1;
   Float_t         pt_2;
   Float_t         phi_2;
   Float_t         eta_2;
@@ -110,7 +113,7 @@ public :
   Float_t         mt_rc_visreco_2;
   Float_t         pfmt_rc_visreco_2;  
   Float_t         puppimt_rcmr_2; 
-  Int_t 	  tau_decay_mode_2;
+  Int_t 	      tau_decay_mode_2;
   Int_t           os;
   Int_t           dilepton_veto;
   Int_t           extraelec_veto;
@@ -236,6 +239,8 @@ public :
   TBranch        *b_idisoweight_1;   //!
   TBranch        *b_idisoweight_2;   //!
   TBranch        *b_topptweight;   //! 
+  TBranch        *b_zptweight;
+  TBranch        *b_trkeffweight_1;
   TBranch        *b_effweight;   //! 
   TBranch        *b_fakeweight;   //!
   TBranch        *b_embeddedWeight;   //!
@@ -253,6 +258,7 @@ public :
   TBranch        *b_genL_pz;    //!
   TBranch        *b_genL_e;    //!
   TBranch        *b_m_vis;   //!
+  TBranch 		 *b_mt_tot;
   TBranch        *b_m_sv;   //!
   TBranch        *b_pt_sv;   //!
   TBranch        *b_eta_sv;   //!
@@ -328,13 +334,13 @@ public :
   TBranch        *b_byMediumCombinedIsolationDeltaBetaCorr3Hits_2;   //!
   TBranch        *b_byTightCombinedIsolationDeltaBetaCorr3Hits_2;   //!
   TBranch 		 *b_byIsolationMVArun2v1DBoldDMwLTraw_2;
-  TBranch	 *b_byTightIsolationMVArun2v1DBoldDMwLT_2;
+  TBranch	     *b_byTightIsolationMVArun2v1DBoldDMwLT_2;
   TBranch        *b_againstElectronLooseMVA5_2;   //!
   TBranch        *b_againstElectronMediumMVA5_2;   //!
   TBranch        *b_againstElectronTightMVA5_2;   //!
   TBranch        *b_againstElectronVLooseMVA5_2;   //!
   TBranch        *b_againstElectronVTightMVA5_2;   //!
-  TBranch	 *b_againstElectronVLooseMVA6_2;
+  TBranch	     *b_againstElectronVLooseMVA6_2;
   TBranch        *b_againstElectronTightMVA6_2;
   TBranch        *b_againstMuonLoose3_2;   //!
   TBranch        *b_againstMuonTight3_2;   //!
