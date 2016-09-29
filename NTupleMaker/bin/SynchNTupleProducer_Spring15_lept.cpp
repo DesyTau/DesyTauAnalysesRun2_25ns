@@ -1452,29 +1452,44 @@ void counting_jets(const AC1B *analysisTree, Spring15Tree *otree, const Config *
   otree->njetspt20 = jetspt20.size();
   otree->nbtag = bjets.size();
   
-  otree->bpt_1  = -9999;
-  otree->beta_1 = -9999;
-  otree->bphi_1 = -9999;
-  otree->bpt_2  = -9999;
-  otree->beta_2 = -9999;
-  otree->bphi_2 = -9999;
+  otree->bpt_1   = -9999;
+  otree->beta_1  = -9999;
+  otree->bphi_1  = -9999;
+  otree->brawf_1 = -9999;
+  otree->bmva_1  = -9999;
+  otree->bcsv_1  = -9999;
   
   if (indexLeadingBJet>=0) {
-    otree->bpt_1  = analysisTree->pfjet_pt[indexLeadingBJet];
-    otree->beta_1 = analysisTree->pfjet_eta[indexLeadingBJet];
-    otree->bphi_1 = analysisTree->pfjet_phi[indexLeadingBJet];
+    otree->bpt_1   = analysisTree->pfjet_pt[indexLeadingBJet];
+    otree->beta_1  = analysisTree->pfjet_eta[indexLeadingBJet];
+    otree->bphi_1  = analysisTree->pfjet_phi[indexLeadingBJet];
+    otree->brawf_1 = analysisTree->pfjet_energycorr[indexLeadingBJet];
+    otree->bmva_1  = analysisTree->pfjet_pu_jet_full_mva[indexLeadingBJet];
+    otree->bcsv_1  = analysisTree->pfjet_btag[indexLeadingBJet][0];
   }
 
+  otree->bpt_2   = -9999;
+  otree->beta_2  = -9999;
+  otree->bphi_2  = -9999;
+  otree->brawf_2 = -9999;
+  otree->bmva_2  = -9999;
+  otree->bcsv_2  = -9999;
+  
+
   if (indexSubLeadingBJet>=0) {
-    otree->bpt_2  = analysisTree->pfjet_pt[indexSubLeadingBJet];
-    otree->beta_2 = analysisTree->pfjet_eta[indexSubLeadingBJet];
-    otree->bphi_2 = analysisTree->pfjet_phi[indexSubLeadingBJet];
+    otree->bpt_2   = analysisTree->pfjet_pt[indexSubLeadingBJet];
+    otree->beta_2  = analysisTree->pfjet_eta[indexSubLeadingBJet];
+    otree->bphi_2  = analysisTree->pfjet_phi[indexSubLeadingBJet];
+    otree->brawf_2 = analysisTree->pfjet_energycorr[indexSubLeadingBJet];
+    otree->bmva_2  = analysisTree->pfjet_pu_jet_full_mva[indexSubLeadingBJet];
+    otree->bcsv_2  = analysisTree->pfjet_btag[indexSubLeadingBJet][0];
+
   }
 
   otree->jpt_1 = -9999;
   otree->jeta_1 = -9999;
   otree->jphi_1 = -9999;
-  otree->jptraw_1 = -9999;
+  otree->jrawf_1 = -9999;
   otree->jptunc_1 = -9999;
   otree->jmva_1 = -9999;
   otree->jlrm_1 = -9999;
@@ -1487,14 +1502,14 @@ cout << "warning : indexLeadingJet ==indexSubLeadingJet = " << indexSubLeadingJe
     otree->jpt_1 = analysisTree->pfjet_pt[indexLeadingJet];
     otree->jeta_1 = analysisTree->pfjet_eta[indexLeadingJet];
     otree->jphi_1 = analysisTree->pfjet_phi[indexLeadingJet];
-    otree->jptraw_1 = analysisTree->pfjet_pt[indexLeadingJet]*analysisTree->pfjet_energycorr[indexLeadingJet];
+    otree->jrawf_1 = analysisTree->pfjet_energycorr[indexLeadingJet];
     otree->jmva_1 = analysisTree->pfjet_pu_jet_full_mva[indexLeadingJet];
   }
 
   otree->jpt_2 = -9999;
   otree->jeta_2 = -9999;
   otree->jphi_2 = -9999;
-  otree->jptraw_2 = -9999;
+  otree->jrawf_2 = -9999;
   otree->jptunc_2 = -9999;
   otree->jmva_2 = -9999;
   otree->jlrm_2 = -9999;
@@ -1504,7 +1519,7 @@ cout << "warning : indexLeadingJet ==indexSubLeadingJet = " << indexSubLeadingJe
     otree->jpt_2 = analysisTree->pfjet_pt[indexSubLeadingJet];
     otree->jeta_2 = analysisTree->pfjet_eta[indexSubLeadingJet];
     otree->jphi_2 = analysisTree->pfjet_phi[indexSubLeadingJet];
-    otree->jptraw_2 = analysisTree->pfjet_pt[indexSubLeadingJet]*analysisTree->pfjet_energycorr[indexSubLeadingJet];
+    otree->jrawf_2 = analysisTree->pfjet_energycorr[indexSubLeadingJet];
     otree->jmva_2 = analysisTree->pfjet_pu_jet_full_mva[indexSubLeadingJet];
   }
 
