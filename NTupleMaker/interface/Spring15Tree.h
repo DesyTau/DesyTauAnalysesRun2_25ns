@@ -214,9 +214,12 @@ public :
   Float_t         jdeta;
   Int_t           njetingap;
   Int_t           nbtag;
-  Float_t         bpt;
-  Float_t         beta;
-  Float_t         bphi;
+  Float_t         bpt_1;
+  Float_t         beta_1;
+  Float_t         bphi_1;
+  Float_t         bpt_2;
+  Float_t         beta_2;
+  Float_t         bphi_2;
   
   // List of branches
   TBranch        *b_run;   //!
@@ -406,9 +409,13 @@ public :
   TBranch        *b_jdeta;   //!
   TBranch        *b_njetingap;   //!
   TBranch        *b_nbtag;   //!
-  TBranch        *b_bpt;   //!
-  TBranch        *b_beta;   //!
-  TBranch        *b_bphi;   //!
+  TBranch        *b_bpt_1;   //!
+  TBranch        *b_beta_1;   //!
+  TBranch        *b_bphi_1;   //!
+  TBranch        *b_bpt_2;   //!
+  TBranch        *b_beta_2;   //!
+  TBranch        *b_bphi_2;   //!
+
   
   Spring15Tree(TTree *tree=0);
   virtual ~Spring15Tree();
