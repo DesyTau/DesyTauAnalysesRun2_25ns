@@ -1280,6 +1280,9 @@ int main(int argc, char * argv[]) {
       int indexLeadingBJet = -1;
       float ptLeadingBJet = -1;
 
+      int indexSubLeadingBJet = -1;
+      float ptSubLeadingBJet = -1;
+
       for (unsigned int jet=0; jet<analysisTree.pfjet_count; ++jet) {
 
 	float absJetEta = fabs(analysisTree.pfjet_eta[jet]);
@@ -1322,6 +1325,14 @@ int main(int argc, char * argv[]) {
 
 	if (absJetEta<bJetEtaCut && analysisTree.pfjet_btag[jet][0]>btagCut) { // b-jet
 	  bjets.push_back(jet);
+
+	  if (indexLeadingBJet>=0) {
+	    if (jetPt<ptLeadingBJet&&jetPt>ptSubLeadingBJet) {
+	      indexSubLeadingBJet = jet;
+	      ptSubLeadingBJet = jetPt;
+	    }
+	  }
+
 	  if (jetPt>ptLeadingBJet) {
 	    ptLeadingBJet = jetPt;
 	    indexLeadingBJet = jet;
@@ -1348,14 +1359,23 @@ int main(int argc, char * argv[]) {
       otree->njetspt20 = jetspt20.size();
       otree->nbtag = bjets.size();
       
-      otree->bpt = -9999;
-      otree->beta = -9999;
-      otree->bphi = -9999;
+      otree->bpt_1  = -9999;
+      otree->beta_1 = -9999;
+      otree->bphi_1 = -9999;
+      otree->bpt_2  = -9999;
+      otree->beta_2 = -9999;
+      otree->bphi_2 = -9999;
       
       if (indexLeadingBJet>=0) {
-	otree->bpt = analysisTree.pfjet_pt[indexLeadingBJet];
-	otree->beta = analysisTree.pfjet_eta[indexLeadingBJet];
-	otree->bphi = analysisTree.pfjet_phi[indexLeadingBJet];
+	otree->bpt_1 = analysisTree.pfjet_pt[indexLeadingBJet];
+	otree->beta_1 = analysisTree.pfjet_eta[indexLeadingBJet];
+	otree->bphi_1 = analysisTree.pfjet_phi[indexLeadingBJet];
+      }
+
+      if (indexSubLeadingBJet>=0) {
+	otree->bpt_2 = analysisTree.pfjet_pt[indexSubLeadingBJet];
+	otree->beta_2 = analysisTree.pfjet_eta[indexSubLeadingBJet];
+	otree->bphi_2 = analysisTree.pfjet_phi[indexSubLeadingBJet];
       }
 
       otree->jpt_1 = -9999;
