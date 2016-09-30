@@ -1383,33 +1383,31 @@ void counting_jets(const AC1B *analysisTree, Spring15Tree *otree, const Config *
     float jetPt = analysisTree->pfjet_pt[jet];
     if (jetPt<=cfg->get<float>("JetPtLowCut")) continue;
 
-    float dR1 = deltaR(analysisTree->pfjet_eta[jet],analysisTree->pfjet_phi[jet],
-                             otree->eta_1,otree->phi_1);
+    float dR1 = deltaR(analysisTree->pfjet_eta[jet],analysisTree->pfjet_phi[jet],otree->eta_1,otree->phi_1);
     if (dR1<=cfg->get<float>("dRJetLeptonCut")) continue;
 
-    float dR2 = deltaR(analysisTree->pfjet_eta[jet],analysisTree->pfjet_phi[jet],
-                             otree->eta_2,otree->phi_2);
+    float dR2 = deltaR(analysisTree->pfjet_eta[jet],analysisTree->pfjet_phi[jet],otree->eta_2,otree->phi_2);
     if (dR2<=cfg->get<float>("dRJetLeptonCut")) continue;
 
     // jetId
     float energy = analysisTree->pfjet_e[jet];
-          energy *= analysisTree->pfjet_energycorr[jet];
-          float chf = analysisTree->pfjet_chargedhadronicenergy[jet]/energy;
-          float nhf = analysisTree->pfjet_neutralhadronicenergy[jet]/energy;
-          float phf = analysisTree->pfjet_neutralemenergy[jet]/energy;
-          float elf = analysisTree->pfjet_chargedemenergy[jet]/energy;
+    energy *= analysisTree->pfjet_energycorr[jet];
+    float chf = analysisTree->pfjet_chargedhadronicenergy[jet]/energy;
+    float nhf = analysisTree->pfjet_neutralhadronicenergy[jet]/energy;
+    float phf = analysisTree->pfjet_neutralemenergy[jet]/energy;
+    float elf = analysisTree->pfjet_chargedemenergy[jet]/energy;
     float muf = analysisTree->pfjet_muonenergy[jet]/energy;
-          float chm = analysisTree->pfjet_chargedmulti[jet];
-    float nm = analysisTree->pfjet_neutralmulti[jet];
-          float npr = analysisTree->pfjet_chargedmulti[jet] + analysisTree->pfjet_neutralmulti[jet];
-    //bool isPFJetId = (npr>1 && phf<0.99 && nhf<0.99) && (absJetEta>3.0 || (elf<0.99 && chf>0 && chm>0));
+    float chm = analysisTree->pfjet_chargedmulti[jet];
+    float nm  = analysisTree->pfjet_neutralmulti[jet];
+    float npr = analysisTree->pfjet_chargedmulti[jet] + analysisTree->pfjet_neutralmulti[jet];
+    
     bool isPFJetId = false;
-    if (absJetEta<=3.0)
+    if (absJetEta<=2.7)
       isPFJetId = (nhf < 0.99 && phf < 0.99 && npr > 1) && (absJetEta>2.4 || (chf>0 && chm > 0 && elf < 0.99));
+    else if (absJetEta<=3.0)
+      isPFJetId = (phf < 0.9 && nm > 2);
     else
       isPFJetId = phf < 0.9 && nm > 10;
-    //isPFJetId = (npr>1 && phf<0.99 && nhf<0.99 && muf < 0.8) && (absJetEta>3.0 || (elf<0.99 && chf>0 && chm>0));
-    //isPFJetId = (npr>1 && phf<0.99 && nhf<0.99) && (absJetEta>3.0 || (elf<0.99 && chf>0 && chm>0));
     
     if (!isPFJetId) continue;
 
