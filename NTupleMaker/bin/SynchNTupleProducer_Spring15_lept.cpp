@@ -553,7 +553,11 @@ int main(int argc, char * argv[]){
 
         bool isSingleLepTrig = false;
 
-        float lep_pt, lep_pt_max, lep_eta, lep_phi;
+        float lep_pt     = -9999.;
+	float lep_pt_max = -9999.;
+	float lep_eta    = -9999.;
+	float lep_phi    = -9999.;
+
         if(ch=="mt"){
           lep_pt =      analysisTree.muon_pt[lIndex]; 
           lep_eta =     analysisTree.muon_eta[lIndex]; 
@@ -961,7 +965,11 @@ bool isICHEPmuon(const AC1B * analysisTree, int Index) {
 
 //compute the absolute isolation for a given lepton labeled by Index in channel ch
 float abs_Iso (int Index, TString ch, const AC1B * analysisTree, float dRiso){
-  float neutralHadIso, photonIso, chargedHadIso, puIso;
+
+  float neutralHadIso = -9999.;
+  float photonIso     = -9999.;
+  float chargedHadIso = -9999.;
+  float puIso         = -9999.;
 
   if(ch=="mt"){
     neutralHadIso = analysisTree->muon_neutralHadIso[Index];
@@ -1286,7 +1294,7 @@ void fillMET(TString ch, int leptonIndex, int tauIndex, const AC1B * analysisTre
   otree->puppimetphi = TMath::ATan2(analysisTree->puppimet_ey,analysisTree->puppimet_ex);
 
   // choosing mva met
-  int mva_break;
+  int mva_break = -1;
   if (ch=="mt") mva_break = 3;
   else if (ch=="et") mva_break = 2;
 
