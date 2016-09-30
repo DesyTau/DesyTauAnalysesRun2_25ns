@@ -322,7 +322,9 @@ class NTupleMaker : public edm::EDAnalyzer{
   
   vector<string> cFlags;
   vector<string> cFlagsProcesses;
-  
+  edm::EDGetTokenT<bool> BadChCandFilterToken_;
+  edm::EDGetTokenT<bool> BadPFMuonFilterToken_;  
+
   double cMuPtMin;
   double cMuEtaMax;
   vector<string> cMuHLTriggerMatching;
