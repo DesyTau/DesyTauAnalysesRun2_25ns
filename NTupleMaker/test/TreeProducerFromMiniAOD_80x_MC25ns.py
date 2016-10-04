@@ -650,6 +650,7 @@ RecTauBinaryDiscriminators = cms.untracked.vstring(),
 RecTauNum = cms.untracked.int32(0),
 # jets
 RecJetPtMin = cms.untracked.double(18.),
+RecJetEtaMin = cms.untracked.double(4.9),
 RecJetHLTriggerMatching = cms.untracked.vstring(
 'HLT_PFJet60_v.*:hltSinglePFJet60',
 'HLT_PFJet80_v.*:hltSinglePFJet80',
