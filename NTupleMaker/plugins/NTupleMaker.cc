@@ -121,35 +121,35 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
 
   // muons
   cMuPtMin(iConfig.getUntrackedParameter<double>("RecMuonPtMin", 10.)),
-  cMuEtaMax(iConfig.getUntrackedParameter<double>("RecMuonEtaMax", 2.4)),
+  cMuEtaMax(iConfig.getUntrackedParameter<double>("RecMuonEtaMax", 2.5)),
   cMuHLTriggerMatching(iConfig.getUntrackedParameter<vector<string> >("RecMuonHLTriggerMatching")),
   cMuNum(iConfig.getUntrackedParameter<int>("RecMuonNum", 0)),
   // electrons
   cElPtMin(iConfig.getUntrackedParameter<double>("RecElectronPtMin", 10.)),
-  cElEtaMax(iConfig.getUntrackedParameter<double>("RecElectronEtaMax", 2.4)),
+  cElEtaMax(iConfig.getUntrackedParameter<double>("RecElectronEtaMax", 2.5)),
   cElHLTriggerMatching(iConfig.getUntrackedParameter<vector<string> >("RecElectronHLTriggerMatching")),
   cElNum(iConfig.getUntrackedParameter<int>("RecElectronNum", 0)),
   // taus
   cTauPtMin(iConfig.getUntrackedParameter<double>("RecTauPtMin", 20.)),
-  cTauEtaMax(iConfig.getUntrackedParameter<double>("RecTauEtaMax", 2.3)),
+  cTauEtaMax(iConfig.getUntrackedParameter<double>("RecTauEtaMax", 2.5)),
   cTauHLTriggerMatching(iConfig.getUntrackedParameter<vector<string> >("RecTauHLTriggerMatching")),
   cTauFloatDiscriminators(iConfig.getUntrackedParameter<vector<string> >("RecTauFloatDiscriminators")),
   cTauBinaryDiscriminators(iConfig.getUntrackedParameter<vector<string> >("RecTauBinaryDiscriminators")),
   cTauNum(iConfig.getUntrackedParameter<int>("RecTauNum", 0)),
   // tracks
   cTrackPtMin(iConfig.getUntrackedParameter<double>("RecTrackPtMin", 0.5)),
-  cTrackEtaMax(iConfig.getUntrackedParameter<double>("RecTrackEtaMax", 2.4)),
+  cTrackEtaMax(iConfig.getUntrackedParameter<double>("RecTrackEtaMax", 2.5)),
   cTrackDxyMax(iConfig.getUntrackedParameter<double>("RecTrackDxyMax", 2.0)),
   cTrackDzMax(iConfig.getUntrackedParameter<double>("RecTrackDzMax", 2.0)),
   cTrackNum(iConfig.getUntrackedParameter<int>("RecTrackNum", 0)),
   // photons
-  cPhotonPtMin(iConfig.getUntrackedParameter<double>("RecPhotonPtMin", 20.)),
-  cPhotonEtaMax(iConfig.getUntrackedParameter<double>("RecPhotonEtaMax", 1000000.)),
+  cPhotonPtMin(iConfig.getUntrackedParameter<double>("RecPhotonPtMin", 10.)),
+  cPhotonEtaMax(iConfig.getUntrackedParameter<double>("RecPhotonEtaMax", 2.5)),
   cPhotonHLTriggerMatching(iConfig.getUntrackedParameter<vector<string> >("RecPhotonHLTriggerMatching")),
   cPhotonNum(iConfig.getUntrackedParameter<int>("RecPhotonNum", 0)),
   // jets
-  cJetPtMin(iConfig.getUntrackedParameter<double>("RecJetPtMin", 30.)),
-  cJetEtaMax(iConfig.getUntrackedParameter<double>("RecJetEtaMax", 4.5)),
+  cJetPtMin(iConfig.getUntrackedParameter<double>("RecJetPtMin", 10.)),
+  cJetEtaMax(iConfig.getUntrackedParameter<double>("RecJetEtaMax", 5.0)),
   cBtagDiscriminators(iConfig.getUntrackedParameter<vector<string> >("RecJetBtagDiscriminators")),
   cJetHLTriggerMatching(iConfig.getUntrackedParameter<vector<string> >("RecJetHLTriggerMatching")),
   cJetNum(iConfig.getUntrackedParameter<int>("RecJetNum", 0)),
