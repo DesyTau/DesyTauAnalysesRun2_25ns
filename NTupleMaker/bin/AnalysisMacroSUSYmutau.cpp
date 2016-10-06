@@ -29,6 +29,8 @@
 #include "DesyTauAnalyses/NTupleMaker/interface/AnalysisMacro.h"
 #include "CondFormats/BTauObjects/interface/BTagCalibration.h"
 #include "CondTools/BTau/interface/BTagCalibrationReader.h"
+#include "HTT-utilities/RecoilCorrections/interface/RecoilCorrector.h"
+#include "HTT-utilities/RecoilCorrections/interface/MEtSys.h"
 int main(int argc, char * argv[]) {
 
 
@@ -132,6 +134,10 @@ int main(int argc, char * argv[]) {
   string cmsswBase = (getenv ("CMSSW_BASE"));
   string fullPathToJsonFile = cmsswBase + "/src/DesyTauAnalyses/NTupleMaker/test/json/" + jsonFile;
  
+  RecoilCorrector recoilMetCorrector("HTT-utilities/RecoilCorrections/data/PFMET_MG_2016BCD.root");
+
+  MEtSys metSys("HTT-utilities/RecoilCorrections/data/MEtSys.root");
+
 //  const string TauFakeRateFile = cfg.get<string>("TauFakeRateEff");
 
   // Run-lumi selector
@@ -498,7 +504,235 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       pu_weight = 1.;
       gen_weight = 1.;
       trig_weight = 1.;
+
+      bool isW = false;
+      bool isDY = false;
+      bool isZTT = false;
+      bool isZMM = false;
+      bool isZEE = false;
+      bool isTOP = false;
+      if (!isData &&  string::npos != filen.find("JetsToLNu") ) isW=true;
+      if (!isData &&  string::npos != filen.find("JetsToLL_M") )  isDY=true;
+      if (!isData &&  string::npos != filen.find("TT_TuneCUETP8M1_13TeV-powheg-pythia8") ) isTOP=true;
+
+      float nuPx = 0;
+      float nuPy = 0;
+      float nuPz = 0;
+      float nuPt = 0;
+      float nuPhi = 0;
+      
+      float nuPx_msv = 0;
+      float nuPy_msv = 0;
+      float nuPz_msv = 0;
+      float nuPt_msv = 0;
+      float nuPhi_msv = 0;
+      
+      float lepPx = 0;
+      float lepPy = 0;
+      float lepPz = 0;
+      float bosonPx = 0;
+      float bosonPy = 0;
+      float bosonPz = 0;
+      float bosonPt = 0;
+      float bosonEta = 0;
+      float bosonMass = -1;
 	  
+      bool isZfound = false;
+      bool isWfound = false;
+      bool isHfound = false;
+      bool isGSfound = false;
+      std::vector<TLorentzVector> promptTausFirstCopy; promptTausFirstCopy.clear();
+      std::vector<TLorentzVector> promptTausLastCopy;  promptTausLastCopy.clear();
+      std::vector<TLorentzVector> promptElectrons; promptElectrons.clear();
+      std::vector<TLorentzVector> promptMuons; promptMuons.clear();
+      std::vector<TLorentzVector> promptNeutrinos; promptNeutrinos.clear();
+      std::vector<TLorentzVector> tauNeutrinos; tauNeutrinos.clear();
+
+      TLorentzVector promptTausLV; promptTausLV.SetXYZT(0.001,0.001,0,0);
+      TLorentzVector promptVisTausLV; promptVisTausLV.SetXYZT(0.001,0.001,0,0);
+      TLorentzVector zBosonLV; zBosonLV.SetXYZT(0,0,0,0);
+      TLorentzVector wBosonLV; wBosonLV.SetXYZT(0,0,0,0);
+      TLorentzVector hBosonLV; hBosonLV.SetXYZT(0,0,0,0);
+      TLorentzVector promptElectronsLV; promptElectronsLV.SetXYZT(0.001,0.001,0,0);
+      TLorentzVector promptMuonsLV; promptMuonsLV.SetXYZT(0.001,0.001,0,0);
+      TLorentzVector promptNeutrinosLV;  promptNeutrinosLV.SetXYZT(0,0,0,0);
+      TLorentzVector tauNeutrinosLV;  tauNeutrinosLV.SetXYZT(0,0,0,0);
+      TLorentzVector wDecayProductsLV; wDecayProductsLV.SetXYZT(0,0,0,0);
+      TLorentzVector fullVLV; fullVLV.SetXYZT(0,0,0,0);
+      TLorentzVector visVLV; visVLV.SetXYZT(0,0,0,0);
+
+      if (!isData) {
+
+	for (unsigned int igentau=0; igentau < analysisTree.gentau_count; ++igentau) {
+	  TLorentzVector tauLV; tauLV.SetXYZT(analysisTree.gentau_px[igentau],
+					      analysisTree.gentau_py[igentau],
+					      analysisTree.gentau_pz[igentau],
+					      analysisTree.gentau_e[igentau]);
+	  TLorentzVector tauVisLV; tauVisLV.SetXYZT(analysisTree.gentau_visible_px[igentau],
+						    analysisTree.gentau_visible_py[igentau],
+						    analysisTree.gentau_visible_pz[igentau],
+						    analysisTree.gentau_visible_e[igentau]);
+	  if (analysisTree.gentau_isPrompt[igentau]&&analysisTree.gentau_isFirstCopy[igentau]) {
+	    promptTausFirstCopy.push_back(tauLV);
+	    promptTausLV += tauLV;
+	    wDecayProductsLV += tauLV;
+	  }
+	  if (analysisTree.gentau_isPrompt[igentau]&&analysisTree.gentau_isLastCopy[igentau]) {	
+	    promptTausLastCopy.push_back(tauVisLV);
+	    promptVisTausLV += tauVisLV;
+	  }
+	  
+	}
+
+	for (unsigned int igen=0; igen < analysisTree.genparticles_count; ++igen) {
+
+	  TLorentzVector genLV; genLV.SetXYZT(analysisTree.genparticles_px[igen],
+					      analysisTree.genparticles_py[igen],
+					      analysisTree.genparticles_pz[igen],
+					      analysisTree.genparticles_e[igen]);
+
+	  if (analysisTree.genparticles_pdgid[igen]==6)
+	    topPt = TMath::Sqrt(analysisTree.genparticles_px[igen]*analysisTree.genparticles_px[igen]+
+				analysisTree.genparticles_py[igen]*analysisTree.genparticles_py[igen]);
+
+	  if (analysisTree.genparticles_pdgid[igen]==-6)
+	    antitopPt = TMath::Sqrt(analysisTree.genparticles_px[igen]*analysisTree.genparticles_px[igen]+
+				    analysisTree.genparticles_py[igen]*analysisTree.genparticles_py[igen]);
+
+	  if (analysisTree.genparticles_pdgid[igen]==22 && analysisTree.genparticles_status[igen]==44)
+	    isGSfound = true;
+
+	  if (analysisTree.genparticles_pdgid[igen]==23) { 
+	    isZfound = true;
+	    zBosonLV = genLV;
+	  }
+	  if (analysisTree.genparticles_pdgid[igen]==25||
+	      analysisTree.genparticles_pdgid[igen]==35||
+	      analysisTree.genparticles_pdgid[igen]==36) { 
+	    isHfound = true;
+	    hBosonLV = genLV;
+	  }
+	  if (abs(analysisTree.genparticles_pdgid[igen])==24) { 
+	    isWfound = true;
+	    wBosonLV = genLV;
+	  }
+
+	  if (fabs(analysisTree.genparticles_pdgid[igen])==11) { 
+	    if (analysisTree.genparticles_fromHardProcess[igen]&&analysisTree.genparticles_status[igen]==1) {
+	      promptElectrons.push_back(genLV);
+	      promptElectronsLV += genLV;
+	      wDecayProductsLV += genLV;
+	    }
+	  }
+	  
+	  if (fabs(analysisTree.genparticles_pdgid[igen])==13) { 
+	    if (analysisTree.genparticles_fromHardProcess[igen]&&analysisTree.genparticles_status[igen]==1) {
+	      promptMuons.push_back(genLV);
+	      promptMuonsLV += genLV;
+	      wDecayProductsLV += genLV;
+	    }
+	  }
+	  
+	  if (fabs(analysisTree.genparticles_pdgid[igen])==12||
+	      fabs(analysisTree.genparticles_pdgid[igen])==14||
+	      fabs(analysisTree.genparticles_pdgid[igen])==16)  {
+	    if ((analysisTree.genparticles_fromHardProcess[igen]||analysisTree.genparticles_isPrompt[igen])&&
+		!analysisTree.genparticles_isDirectHardProcessTauDecayProduct[igen]&&
+		analysisTree.genparticles_status[igen]==1) {
+	      promptNeutrinos.push_back(genLV);
+	      promptNeutrinosLV += genLV;
+	      wDecayProductsLV += genLV;
+	    }
+	    if (analysisTree.genparticles_isDirectHardProcessTauDecayProduct[igen]&&
+		analysisTree.genparticles_status[igen]==1) {
+	      tauNeutrinos.push_back(genLV);
+	      tauNeutrinosLV += genLV;
+	    }
+	  }
+	  
+
+/////////Matching ISR Jets
+
+
+
+
+
+
+	}
+
+/*	if (isGSfound) {
+	  //	  std::cout << "gamma* found : " << std::endl;
+	  if (removeGammaStar) continue;
+	}
+*/
+	if (isDY) {
+	  
+	  if (promptTausFirstCopy.size()==2) {
+	    isZTT = true; isZMM = false; isZEE = false;
+	    bosonPx = promptTausLV.Px(); bosonPy = promptTausLV.Py(); bosonPz = promptTausLV.Pz(); 
+	    bosonMass = promptTausLV.M();
+	    bosonEta  = promptTausLV.Eta();
+	    lepPx = promptVisTausLV.Px(); lepPy = promptVisTausLV.Py(); lepPz = promptVisTausLV.Pz();
+	    //mtBoson_gen = mT(promptTausFirstCopy[0],promptTausFirstCopy[1]);
+	  }
+	  else if (promptMuons.size()==2) {
+	    isZTT = false; isZMM = true; isZEE = false;
+	    bosonPx = promptMuonsLV.Px(); bosonPy = promptMuonsLV.Py(); bosonPz = promptMuonsLV.Pz(); 
+	    bosonMass = promptMuonsLV.M(); 
+	    bosonEta = promptMuonsLV.Eta();
+	    lepPx = promptMuonsLV.Px(); lepPy = promptMuonsLV.Py(); lepPz = promptMuonsLV.Pz();
+	    //mtBoson_gen = mT(promptMuons[0],promptMuons[1]);
+	  }
+	  else {
+	    isZTT = false; isZMM = false; isZEE = true;
+	    bosonPx = promptElectronsLV.Px(); bosonPy = promptElectronsLV.Py(); bosonPz = promptElectronsLV.Pz(); 
+	    bosonMass = promptElectronsLV.M();
+	    bosonEta = promptElectronsLV.Eta();
+	    lepPx = promptElectronsLV.Px(); lepPy = promptElectronsLV.Py(); lepPz = promptElectronsLV.Pz();
+	    //if (promptElectrons.size()==2)
+	    //  mtBoson_gen = mT(promptElectrons[0],promptElectrons[1]);
+	  }
+	  nuPx = tauNeutrinosLV.Px(); nuPy = tauNeutrinosLV.Py(); nuPz = tauNeutrinosLV.Pz();
+	}
+
+	else if (isW) {
+	  bosonPx = wDecayProductsLV.Px(); bosonPy = wDecayProductsLV.Py(); bosonPz = wDecayProductsLV.Pz();
+	  bosonMass = wDecayProductsLV.M();
+	  if (promptTausLastCopy.size()==1) { 
+	    lepPx = promptVisTausLV.Px(); lepPy = promptVisTausLV.Py(); lepPz = promptVisTausLV.Pz();
+	  }
+	  else if (promptMuons.size()==1) { 
+	    lepPx = promptMuonsLV.Px(); lepPy = promptMuonsLV.Py(); lepPz = promptMuonsLV.Pz();
+	  }
+	  else { 
+	    lepPx = promptElectronsLV.Px(); lepPy = promptElectronsLV.Py(); lepPz = promptElectronsLV.Pz();
+	  }
+	  nuPx = promptNeutrinosLV.Px(); nuPy = promptNeutrinosLV.Py(); nuPz = promptNeutrinosLV.Pz();
+	}
+	else {
+	  TLorentzVector bosonLV = promptTausLV + promptMuonsLV + promptElectronsLV + promptNeutrinosLV;
+	  bosonPx = bosonLV.Px(); bosonPy = bosonLV.Py(); bosonPz = bosonLV.Pz();
+	  TLorentzVector lepLV = promptVisTausLV + promptMuonsLV + promptElectronsLV;
+	  lepPx = lepLV.Px(); lepPy = lepLV.Py(); lepPz = lepLV.Pz();
+	  nuPx = promptNeutrinosLV.Px(); nuPy = promptNeutrinosLV.Py(); nuPz = promptNeutrinosLV.Pz();
+	}
+      
+	nuPt = TMath::Sqrt(nuPx*nuPx+nuPy*nuPy);
+	nuPhi = TMath::ATan2(nuPy,nuPx);
+
+	bosonPt = TMath::Sqrt(bosonPx*bosonPx+bosonPy*bosonPy);
+
+
+
+
+
+      }
+
+
+
+
+
+
 
       if (!isData && ( string::npos != filen.find("TTJets")  || string::npos != filen.find("TTPowHeg") || string::npos != filen.find("TT_TuneCUETP8M1_13TeV-powheg-pythia8")) ) 
 	{
@@ -662,8 +896,8 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	if (fabs(analysisTree.muon_eta[im])>etaMuonCut) continue;
 	if (fabs(analysisTree.muon_dxy[im])>dxyMuonCut) continue;
 	if (fabs(analysisTree.muon_dz[im])>dzMuonCut) continue;
-	//if (applyMuonId && !analysisTree.muon_isMedium[im]) continue;
-	if (applyMuonId && !analysisTree.muon_isICHEP[im]) continue;
+	if (applyMuonId && !analysisTree.muon_isMedium[im]) continue;
+	//if (applyMuonId && !analysisTree.muon_isICHEP[im]) continue;
         if ( fabs(analysisTree.muon_charge[im]) != 1) continue;
 	muons.push_back((int)im);
 
@@ -1215,38 +1449,8 @@ if (!CutBasedTauId){
 	jet_flavour[jj] = analysisTree.pfjet_flavour[jj];
 	jet_btag[jj] = analysisTree.pfjet_btag[jj][0];
       }
-      met_ex = analysisTree.pfmet_ex;
-      met_ey = analysisTree.pfmet_ey;
-      met_ez = analysisTree.pfmet_ez;
-      met_pt = analysisTree.pfmet_pt;
-      met_phi = analysisTree.pfmet_phi;
-
-      if (!isData) npartons = analysisTree.genparticles_noutgoing;
-      all_weight = weight;
 
 
-//systematics and other 
-
-     met_ex_JetEnUp = analysisTree.pfmet_ex_JetEnUp;
-     met_ey_JetEnUp = analysisTree.pfmet_ey_JetEnUp;
-
-     met_ex_JetEnDown = analysisTree.pfmet_ex_JetEnDown;
-     met_ey_JetEnDown = analysisTree.pfmet_ey_JetEnDown;
-
-     met_ex_UnclusteredEnUp = analysisTree.pfmet_ex_UnclusteredEnUp;
-     met_ey_UnclusteredEnUp = analysisTree.pfmet_ey_UnclusteredEnUp;
-   
-     met_ex_UnclusteredEnDown = analysisTree.pfmet_ex_UnclusteredEnDown;
-     met_ey_UnclusteredEnDown = analysisTree.pfmet_ey_UnclusteredEnDown;
-
-
-
-
-
-
-      //cout<<" weight here ->>>>>>>>>>>>>>>>>>> "<<weight<<"  "<<all_weight<<endl;
-
-      /////////////////////////////////////////////////////////
 
       ////////jets cleaning 
       TLorentzVector leptonsV, muonJ, jetsLV;
@@ -1363,7 +1567,17 @@ if (!CutBasedTauId){
 	      }
 	    }
 	  } //is Data
-	  
+/*
+	  if (!isData){
+	bool matched=false;
+	  if (analysisTree.genparticles_status[igen]!=23 || abs(analysisTree.genparticles_pdgid[igen])>5){
+		  int momid = abs(genparticles_mother[igen]);
+			if(!(momid==6 || momid==23 || momid==24 || momid==25 || momid>1e6)) continue; 
+	  }
+
+
+	  }//isData for ISR tagging
+*/	  
 //if (btagged)
 //	cout<<"  what here "<<btagged<<"  "<<cleanedJet<<endl;
 	  if (btagged && cleanedJet) { 
@@ -1409,6 +1623,119 @@ if (!CutBasedTauId){
 	
       SusyMother = SusyMotherMassF;
       SusyLSP = SusyLSPMassF;
+
+
+/////////////////// Recoil corrections
+
+      int njetsforrecoil = njets;
+      if (isW) njetsforrecoil = njets + 1;
+
+      float pfmet_corr_x = analysisTree.pfmet_ex;
+      float pfmet_corr_y = analysisTree.pfmet_ey;
+      float met_x = analysisTree.pfmet_ex;
+      float met_y = analysisTree.pfmet_ey;
+
+      if ((isW||isDY) && !isData) {
+
+	  recoilMetCorrector.CorrectByMeanResolution(analysisTree.pfmet_ex,analysisTree.pfmet_ey,bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,pfmet_corr_x,pfmet_corr_y);
+ 
+        met_x = pfmet_corr_x;
+        met_y = pfmet_corr_y;
+ 
+      // MEt related systematic uncertainties
+      int bkgdType = 0;
+      if (isDY||isW)
+	bkgdType = MEtSys::ProcessType::BOSON;
+      else if (isTOP)
+	bkgdType = MEtSys::ProcessType::TOP;
+      else 
+	bkgdType = MEtSys::ProcessType::EWK; 
+
+      float met_scaleUp_x   = met_x;
+      float met_scaleUp_y   = met_y;
+      float met_scaleDown_x = met_x;
+      float met_scaleDown_y = met_y;
+      float met_resoUp_x    = met_x;
+      float met_resoUp_y    = met_y;
+      float met_resoDown_x  = met_x;
+      float met_resoDown_y  = met_y;
+
+	metSys.ApplyMEtSys(met_x,met_y,
+			   bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,bkgdType,
+			   MEtSys::SysType::Response,MEtSys::SysShift::Up,
+			   met_scaleUp_x,met_scaleUp_y);
+	metSys.ApplyMEtSys(met_x,met_y,
+			   bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,bkgdType,
+			   MEtSys::SysType::Response,MEtSys::SysShift::Down,
+			   met_scaleDown_x,met_scaleDown_y);
+	metSys.ApplyMEtSys(met_x,met_y,
+			   bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,bkgdType,
+			   MEtSys::SysType::Resolution,MEtSys::SysShift::Up,
+			   met_resoUp_x,met_resoUp_y);
+	metSys.ApplyMEtSys(met_x,met_y,
+			   bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,bkgdType,
+			   MEtSys::SysType::Resolution,MEtSys::SysShift::Down,
+			   met_resoDown_x,met_resoDown_y);
+
+      
+      met_scaleUp = TMath::Sqrt(met_scaleUp_x*met_scaleUp_x+
+				   met_scaleUp_y*met_scaleUp_y);
+      metphi_scaleUp = TMath::ATan2(met_scaleUp_y,met_scaleUp_x);
+      
+      met_scaleDown = TMath::Sqrt(met_scaleDown_x*met_scaleDown_x+
+				     met_scaleDown_y*met_scaleDown_y);
+      metphi_scaleDown = TMath::ATan2(met_scaleDown_y,met_scaleDown_x);
+      
+      met_resoUp = TMath::Sqrt(met_resoUp_x*met_resoUp_x+
+				  met_resoUp_y*met_resoUp_y);
+      metphi_resoUp = TMath::ATan2(met_resoUp_y,met_resoUp_x);
+      
+      met_resoDown = TMath::Sqrt(met_resoDown_x*met_resoDown_x+
+				    met_resoDown_y*met_resoDown_y);
+      metphi_resoDown = TMath::ATan2(met_resoDown_y,met_resoDown_x);
+ 
+ 
+ 
+	
+//	float met_recoil = sqrt(pfmet_corr_x*pfmet_corr_x + pfmet_corr_y*pfmet_corr_y);
+//	float met_ = sqrt(analysisTree.pfmet_ex*analysisTree.pfmet_ex + analysisTree.pfmet_ey*analysisTree.pfmet_ey);
+//cout<< " recoil correction  "<<met_recoil<<"  "<<met_<<endl;
+
+      met_ex_recoil = pfmet_corr_x;
+      met_ey_recoil = pfmet_corr_y;
+
+      }//if isW, isDY !isData
+
+      met_ex = analysisTree.pfmet_ex;
+      met_ey = analysisTree.pfmet_ey;
+      met_ez = 0;//analysisTree.pfmet_ez;
+      //met_pt = analysisTree.pfmet_pt;
+      met_pt = TMath::Sqrt(analysisTree.pfmet_ex*analysisTree.pfmet_ex+analysisTree.pfmet_ey*analysisTree.pfmet_ey);
+      //met_phi = analysisTree.pfmet_phi;
+      met_phi = TMath::ATan2(analysisTree.pfmet_ey,analysisTree.pfmet_ex);
+
+     met_ex_JetEnUp = analysisTree.pfmet_ex_JetEnUp;
+     met_ey_JetEnUp = analysisTree.pfmet_ey_JetEnUp;
+
+     met_ex_JetEnDown = analysisTree.pfmet_ex_JetEnDown;
+     met_ey_JetEnDown = analysisTree.pfmet_ey_JetEnDown;
+
+     met_ex_UnclusteredEnUp = analysisTree.pfmet_ex_UnclusteredEnUp;
+     met_ey_UnclusteredEnUp = analysisTree.pfmet_ey_UnclusteredEnUp;
+   
+     met_ex_UnclusteredEnDown = analysisTree.pfmet_ex_UnclusteredEnDown;
+     met_ey_UnclusteredEnDown = analysisTree.pfmet_ey_UnclusteredEnDown;
+
+
+      float genmet_ex = analysisTree.genmet_ex;
+      float genmet_ey = analysisTree.genmet_ey;
+
+      genmet = TMath::Sqrt(genmet_ex*genmet_ex + genmet_ey*genmet_ey);
+      genmetphi = TMath::ATan2(genmet_ey,genmet_ex);
+
+      if (!isData) npartons = analysisTree.genparticles_noutgoing;
+
+      all_weight = weight;
 
       T->Fill();
 	
