@@ -102,6 +102,14 @@ int main(int argc, char * argv[]){
   //gDebug = 2;
 
   string cmsswBase = (getenv ("CMSSW_BASE"));
+  
+  // Load CrystalBallEfficiency class
+  TString pathToCrystalLib = (TString) cmsswBase + "/src/HTT-utilities/CorrectionsWorkspace/CrystalBallEfficiency_cxx.so";
+  int openSuccessful = gSystem->Load( pathToCrystalLib );
+  if (openSuccessful !=0 ) {
+    cout<<pathToCrystalLib<<" does not exists. Please create this file by running \"root -l -q CrystalBallEfficiency.cxx++\" in src/HTT-utilities/CorrectionsWorkspace/. "<<endl;
+    exit( -1 );
+  }
 
   // **** configuration analysis
 
