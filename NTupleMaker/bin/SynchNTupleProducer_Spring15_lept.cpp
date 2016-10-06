@@ -46,6 +46,8 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/foreach.hpp>
 
+#include "FWCore/ParameterSet/interface/FileInPath.h"
+
 #define pi 	3.14159265358979312
 #define d2r 1.74532925199432955e-02
 #define r2d 57.2957795130823229
@@ -84,6 +86,7 @@ bool extra_muon_veto(int leptonIndex, TString ch, const Config *cfg, const AC1B 
 void fillMET(TString ch, int leptonIndex, int tauIndex, const AC1B * analysisTree, Spring15Tree *otree);
 void mt_calculation(Spring15Tree *otree);
 void counting_jets(const AC1B *analysisTree, Spring15Tree *otree, const Config *cfg);
+void svfit_variables(const AC1B *analysisTree, Spring15Tree *otree, const Config *cfg);
 bool isICHEPmed(int Index, const AC1B * analysisTree);
 
 
@@ -135,8 +138,9 @@ int main(int argc, char * argv[]){
   }
 
   const bool ApplyPUweight = cfg.get<bool>("ApplyPUweight"); 
-  const bool ApplyLepSF = cfg.get<bool>("ApplyLepSF"); 
-  const bool ApplyTrigger = cfg.get<bool>("ApplyTrigger"); 
+  const bool ApplyLepSF    = cfg.get<bool>("ApplyLepSF"); 
+  const bool ApplyTrigger  = cfg.get<bool>("ApplyTrigger"); 
+  const bool ApplySVFit    = cfg.get<bool>("ApplySVFit");
 
   //pileup distrib
   const string pileUpInDataFile = cfg.get<string>("pileUpInDataFile");
@@ -793,6 +797,8 @@ int main(int argc, char * argv[]){
 
       //counting jet
       counting_jets(&analysisTree, otree, &cfg);
+      // svfit
+      if(ApplySVFit) svfit_variables(&analysisTree, otree, &cfg);
 
       ////////////////////////////////////////////////////////////
       // MET Recoil Corrections
@@ -1278,8 +1284,8 @@ bool extra_muon_veto(int leptonIndex, TString ch, const Config *cfg, const AC1B 
 void fillMET(TString ch, int leptonIndex, int tauIndex, const AC1B * analysisTree, Spring15Tree *otree){
 
   // svfit variables
-  otree->m_sv = -9999;
-  otree->pt_sv = -9999;
+  otree->m_sv   = -9999;
+  otree->pt_sv  = -9999;
   otree->eta_sv = -9999;
   otree->phi_sv = -9999;
 
@@ -1582,4 +1588,55 @@ cout << "warning : indexLeadingJet ==indexSubLeadingJet = " << indexSubLeadingJe
 
   }
 
+}
+
+///////////////////////////////////
+// SV fit 
+///////////////////////////////////
+
+void svfit_variables(const AC1B *analysisTree, Spring15Tree *otree, const Config *cfg){
+
+  // define MET covariance
+  TMatrixD covMET(2, 2);
+  covMET[0][0] = otree->mvacov00;
+  covMET[1][0] = otree->mvacov10;
+  covMET[0][1] = otree->mvacov01;
+  covMET[1][1] = otree->mvacov11;
+
+  // define lepton four vectors
+  std::vector<svFitStandalone::MeasuredTauLepton> measuredTauLeptons;
+  measuredTauLeptons.push_back(svFitStandalone::MeasuredTauLepton(svFitStandalone::kTauToMuDecay,
+								  otree->pt_1,
+								  otree->eta_1,
+								  otree->phi_1,
+								  105.658e-3)); 
+  measuredTauLeptons.push_back(svFitStandalone::MeasuredTauLepton(svFitStandalone::kTauToHadDecay,
+								  otree->pt_2,
+								  otree->eta_2,
+								  otree->phi_2,
+								  otree->m_2,
+								  otree->tau_decay_mode_2));
+
+  SVfitStandaloneAlgorithm algo(measuredTauLeptons, otree->mvamet * cos(otree->mvametphi), otree->mvamet * sin(otree->mvametphi), covMET, 0);
+  edm::FileInPath inputFileName_visPtResolution("TauAnalysis/SVfitStandalone/data/svFitVisMassAndPtResolutionPDF.root");
+  TH1::AddDirectory(false);  
+  TFile* inputFile_visPtResolution = new TFile(inputFileName_visPtResolution.fullPath().data());
+  //algo.addLogM(false);  
+  algo.shiftVisPt(true, inputFile_visPtResolution);
+  algo.integrateMarkovChain();
+
+  otree->m_sv   = algo.mass();
+  otree->pt_sv  = algo.pt();
+  otree->eta_sv = algo.eta();
+  otree->phi_sv = algo.phi();      
+  otree->met_sv = algo.fittedMET().Rho();
+  otree->mt_sv  = algo.transverseMass();
+
+  //if ( algo.isValidSolution() ) {
+  //  std::cout << "found mass = " << mass << std::endl;
+  //} else {
+  //  std::cout << "sorry -- status of NLL is not valid [" << algo.isValidSolution() << "]" << std::endl;
+  //}
+
+  delete inputFile_visPtResolution;
 }
