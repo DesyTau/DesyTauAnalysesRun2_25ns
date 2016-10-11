@@ -93,7 +93,15 @@ if usePrivateSQlite:
 ### =====================================================================================================
 
 
-### ReRun JEC ===========================================================================================
+### ReRun JEC + Pileup Jet ID ===========================================================================
+
+process.load("RecoJets.JetProducers.PileupJetID_cfi")
+process.pileupJetIdUpdated = process.pileupJetId.clone(
+  jets=cms.InputTag("slimmedJets"),
+  inputIsCorrected=True,
+  applyJec=True,
+  vertexes=cms.InputTag("offlineSlimmedPrimaryVertices")
+  )
 
 from PhysicsTools.PatAlgos.producersLayer1.jetUpdater_cff import updatedPatJetCorrFactors
 process.patJetCorrFactorsReapplyJEC = updatedPatJetCorrFactors.clone(
@@ -112,7 +120,10 @@ process.patJetsReapplyJEC = updatedPatJets.clone(
   jetCorrFactorsSource = cms.VInputTag(cms.InputTag("patJetCorrFactorsReapplyJEC"))
   )
 
-### END ReRun JEC ======================================================================================
+process.patJetsReapplyJEC.userData.userFloats.src += ['pileupJetIdUpdated:fullDiscriminant']
+process.patJetsReapplyJEC.userData.userInts.src += ['pileupJetIdUpdated:fullId']
+
+### END ReRun JEC + Pileup Jet ID ======================================================================
 
 # Electron ID ==========================================================================================
 
@@ -158,7 +169,7 @@ fnames = []
 if runOnData:
   fnames.append('/store/data/Run2016B/SingleMuon/MINIAOD/PromptReco-v2/000/273/448/00000/CECFFCBE-CE1C-E611-8660-02163E011A4E.root')
 else:
-  fnames.append('/store/mc/RunIISpring16MiniAODv2/WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14_ext1-v1/40000/0002BEE4-D55B-E611-B35D-0017A4770C08.root')
+  fnames.append('/store/mc/RunIISpring16MiniAODv2/SUSYGluGluToHToTauTau_M-120_TuneCUETP8M1_13TeV-pythia8/MINIAODSIM/PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14-v1/00000/6AE671C2-0849-E611-878E-28924A33B062.root')
 
 # Define the input source
 process.source = cms.Source("PoolSource", 
@@ -650,7 +661,7 @@ RecTauBinaryDiscriminators = cms.untracked.vstring(),
 RecTauNum = cms.untracked.int32(0),
 # jets
 RecJetPtMin = cms.untracked.double(18.),
-RecJetEtaMin = cms.untracked.double(4.9),
+RecJetEtaMax = cms.untracked.double(4.9),
 RecJetHLTriggerMatching = cms.untracked.vstring(
 'HLT_PFJet60_v.*:hltSinglePFJet60',
 'HLT_PFJet80_v.*:hltSinglePFJet80',
@@ -685,7 +696,7 @@ process.p = cms.Path(
   process.initroottree*
   process.BadChargedCandidateFilter *
   process.BadPFMuonFilter *
-  process.patJetCorrFactorsReapplyJEC * process.patJetsReapplyJEC *
+  process.pileupJetIdUpdated * process.patJetCorrFactorsReapplyJEC * process.patJetsReapplyJEC *
   process.egmGsfElectronIDSequence * 
   process.mvaMetSequence *
   process.METSignificance * process.METCorrSignificance *
