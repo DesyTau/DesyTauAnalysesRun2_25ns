@@ -597,21 +597,14 @@ class NTupleMaker : public edm::EDAnalyzer{
   Float_t pfjet_energycorr_l2relative[M_jetmaxcount];
   Float_t pfjet_energycorr_l3absolute[M_jetmaxcount];
   Float_t pfjet_energycorr_l2l3residual[M_jetmaxcount];
-  Bool_t pfjet_pu_jet_cut_loose[M_jetmaxcount];
-  Bool_t pfjet_pu_jet_cut_medium[M_jetmaxcount];
-  Bool_t pfjet_pu_jet_cut_tight[M_jetmaxcount];
-  Float_t pfjet_pu_jet_cut_mva[M_jetmaxcount];
-  Bool_t pfjet_pu_jet_simple_loose[M_jetmaxcount];
-  Bool_t pfjet_pu_jet_simple_medium[M_jetmaxcount];
-  Bool_t pfjet_pu_jet_simple_tight[M_jetmaxcount];
-  Float_t pfjet_pu_jet_simple_mva[M_jetmaxcount];
-  Bool_t pfjet_pu_jet_full_loose[M_jetmaxcount];
-  Bool_t pfjet_pu_jet_full_medium[M_jetmaxcount];
-  Bool_t pfjet_pu_jet_full_tight[M_jetmaxcount];
-  Float_t pfjet_pu_jet_full_mva[M_jetmaxcount];
   Int_t pfjet_flavour[M_jetmaxcount];
   Float_t pfjet_btag[M_jetmaxcount][10];
   Float_t pfjet_jecUncertainty[M_jetmaxcount];
+  Bool_t pfjet_pu_jet_fullId_loose[M_jetmaxcount];
+  Bool_t pfjet_pu_jet_fullId_medium[M_jetmaxcount];
+  Bool_t pfjet_pu_jet_fullId_tight[M_jetmaxcount];
+  Float_t pfjet_pu_jet_fullDisc_mva[M_jetmaxcount];
+
 
   // pat electrons 
   UInt_t electron_count;
