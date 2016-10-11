@@ -38,6 +38,8 @@ int el_index=-1;
 
    Float_t 	   CFCounter_[30];
    Int_t	   muon_index;
+   Int_t	   muon_index_1;
+   Int_t	   muon_index_2;
    Int_t	   electron_index;
    Int_t	   taus_index;
    Int_t           mu_count;
@@ -165,6 +167,7 @@ int el_index=-1;
    Float_t 	   top_weight;
    Float_t 	   all_weight;
    Float_t 	   trig_weight;
+   Float_t 	   zptmassweight;
    Float_t 	   xsecs;
    Float_t 	   event_sign;
    Float_t 	   event_secondLeptonVeto;
@@ -519,7 +522,7 @@ TH1D * ETmissSelH = new TH1D("ETmissSelH","",10,0,200);
 TH1D * MtSelH = new TH1D("MtSelH_2l","",10,0,200);
 TH1D * DZetaSelH = new TH1D("DZetaSelH","",60,-400,200);
 
-TLorentzVector ElV, MuV, TauV, JetsV, METV;
+TLorentzVector ElV, MuV, TauV, JetsV, METV, LeptV1, LeptV2;
 
 vector<TLorentzVector> AllJets_Lepton_noMet;
 vector<TLorentzVector> JetsMV;
@@ -527,6 +530,8 @@ vector<TLorentzVector>  ElMV;
 vector<TLorentzVector>  MuMV;
 vector<TLorentzVector>  TauMV;
 vector<TLorentzVector>  LeptMV;
+vector<TLorentzVector>  LeptMV1;
+vector<TLorentzVector>  LeptMV2;
 
 
 std::vector<pair<string,float> > variables_;
@@ -610,6 +615,7 @@ T  = new TTree("T","T");
   T->Branch("top_weight", &top_weight, "top_weight/F");
   T->Branch("all_weight", &all_weight, "all_weight/F");
   T->Branch("trig_weight", &trig_weight, "trig_weight/F");
+  T->Branch("zptmassweight", &zptmassweight, "zptmassweight/F");
 
   T->Branch("xsecs", &xsecs, "xsecs/F");
   T->Branch("event_sign", &event_sign, "event_sign/F");
@@ -619,6 +625,8 @@ T  = new TTree("T","T");
   T->Branch("event_leptonDrTrigger", &event_leptonDrTrigger, "event_leptonDrTrigger/F");
 
   T->Branch("muon_index", &muon_index, "muon_index/I");
+  T->Branch("muon_index_1", &muon_index_1, "muon_index_1/I");
+  T->Branch("muon_index_2", &muon_index_2, "muon_index_2/I");
   T->Branch("electron_index", &electron_index, "electron_index/I");
   T->Branch("taus_index", &taus_index, "taus_index/I");
 

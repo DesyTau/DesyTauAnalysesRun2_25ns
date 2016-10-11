@@ -128,7 +128,7 @@ int main(int argc, char * argv[]) {
   string fullPathToJsonFile = cmsswBase + "/src/DesyTauAnalyses/NTupleMaker/test/json/" + jsonFile;
  
 
-  RecoilCorrector recoilMetCorrector("HTT-utilities/RecoilCorrections/data/PFMET_MG_2016BCD.root");
+  RecoilCorrector recoilMetCorrector("HTT-utilities/RecoilCorrections/data/PFMET_MG_2016BCD_RooT_5.2.root");
 
   MEtSys metSys("HTT-utilities/RecoilCorrections/data/MEtSys.root");
 
@@ -258,26 +258,51 @@ int main(int argc, char * argv[]) {
 
 
   BTagCalibration calib("csvv2", cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/CSVv2_ichep.csv");
-  BTagCalibrationReader reader_BC(BTagEntry::OP_MEDIUM,"central");
+  BTagCalibrationReader reader_B(BTagEntry::OP_MEDIUM,"central");
+  BTagCalibrationReader reader_C(BTagEntry::OP_MEDIUM,"central");
   BTagCalibrationReader reader_Light(BTagEntry::OP_MEDIUM,"central");
-  reader_BC.load(calib,BTagEntry::FLAV_B,"mujets");
+  reader_B.load(calib,BTagEntry::FLAV_B,"comb");
+  reader_C.load(calib,BTagEntry::FLAV_C,"comb");
   reader_Light.load(calib,BTagEntry::FLAV_UDSG,"incl");
 
-  //  std::cout << "SF_light (eta=0.6,pt=20.1) : " << reader_Light.eval(BTagEntry::FLAV_UDSG, 0.5, 20.1) << std::endl;
-  //  std::cout << "SF_light (eta=2.1,pt=20.1) : " << reader_Light.eval(BTagEntry::FLAV_UDSG, 2.1, 20.1) << std::endl;
-  //  std::cout << "SF_bc    (eta=0.6,pt=30.1) : " << reader_BC.eval(BTagEntry::FLAV_B, 0.5, 30.1) << std::endl;
-  //  std::cout << "SF_bc    (eta=2.1,pt=30.1) : " << reader_BC.eval(BTagEntry::FLAV_B, 2.1, 30.1) << std::endl;
 
-  TFile * fileTagging = new TFile(TString(cmsswBase)+TString("/src/DesyTauAnalyses/NTupleMaker/data/tagging_efficiencies.root"));
+  float etaBTAG[2] = {0.5,2.1};
+  float ptBTAG[5] = {25.,35.,50.,100.,200.};
+
+  std::cout << std::endl;
+  for (int iEta=0; iEta<2; ++iEta) {
+    for (int iPt=0; iPt<5; ++iPt) {
+      float sfB = reader_B.eval_auto_bounds("central",BTagEntry::FLAV_B, etaBTAG[iEta], ptBTAG[iPt]);
+      float sfC = reader_C.eval_auto_bounds("central",BTagEntry::FLAV_C, etaBTAG[iEta], ptBTAG[iPt]);
+      float sfLight = reader_Light.eval_auto_bounds("central",BTagEntry::FLAV_UDSG, etaBTAG[iEta], ptBTAG[iPt]);
+      printf("pT = %3.0f   eta = %3.1f  ->  SFb = %5.3f   SFc = %5.3f   SFl = %5.3f\n",ptBTAG[iPt],etaBTAG[iEta],sfB,sfC,sfLight);
+    }
+  }
+  std::cout << std::endl;
+
+  TFile * fileTagging = new TFile(TString(cmsswBase)+TString("/src/DesyTauAnalyses/NTupleMaker/data/tagging_efficiencies_ichep2016.root"));
   TH1F * tagEff_B = (TH1F*)fileTagging->Get("btag_eff_b");
   TH1F * tagEff_C = (TH1F*)fileTagging->Get("btag_eff_c");
   TH1F * tagEff_Light = (TH1F*)fileTagging->Get("btag_eff_oth");
   TRandom3 rand;
 	
-  float MaxBJetPt = 670.;
+  float MaxBJetPt = 1000.;
   float MaxLJetPt = 1000.;
   float MinLJetPt = 20.;
   float MinBJetPt = 20.;
+
+
+  // Z pt mass weights
+  TFile * fileZMassPtWeights = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/zpt_weights_2016.root"); 
+  if (fileZMassPtWeights->IsZombie()) {
+    std::cout << "File " << TString(cmsswBase) << "src/DesyTauAnalyses/NTupleMaker/data/zpt_weights_2016.root" << "  does not exist!" << std::endl;
+    exit(-1);
+  }
+  TH2D * histZMassPtWeights = (TH2D*)fileZMassPtWeights->Get("zptmass_histo"); 
+  if (histZMassPtWeights==NULL) {
+    std::cout << " ZMassPT Weights histogram cannot found in file " << TString(cmsswBase) << "/src/DesyTauAnalyses/NTupleMaker/data/" << std::endl;
+    exit(-1);
+  }
 
 
 
@@ -526,7 +551,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       pu_weight = 1.;
       gen_weight = 1.;
       trig_weight = 1.;
-	////////////needed for recoil  
+
       bool isW = false;
       bool isDY = false;
       bool isZTT = false;
@@ -746,18 +771,20 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
 
 
-
-
       }
 
-
-
-
-
-
-
-
-
+	if (isDY) { // applying Z pt mass weights
+	  zptmassweight = 1;
+	  if (bosonMass>50.0) {
+	    float bosonMassX = bosonMass;
+	    float bosonPtX = bosonPt;
+	    if (bosonMassX>1000.) bosonMassX = 1000.;
+	    if (bosonPtX<1.)      bosonPtX = 1.;
+	    if (bosonPtX>1000.)   bosonPtX = 1000.;
+	    zptmassweight = histZMassPtWeights->GetBinContent(histZMassPtWeights->GetXaxis()->FindBin(bosonMassX),
+							      histZMassPtWeights->GetYaxis()->FindBin(bosonPtX));
+	  }
+	}
 
 
 
@@ -1245,16 +1272,16 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
   //   float trigweight_1=1.;
   //   float trigweight_2=1.;
 
-      float Ele23EffData = 1;//(float)SF_electron23->get_EfficiencyData(double(pt_1),double(eta_1));
+      float Ele23EffData = (float)SF_electron23->get_EfficiencyData(double(pt_1),double(eta_1));
  /*     float Ele23EffMC   = (float)SF_electron23->get_EfficiencyMC(double(pt_1),double(eta_1));*/
 
-      float Ele12EffData = 1;//(float)SF_electron12->get_EfficiencyData(double(pt_1),double(eta_1));
+      float Ele12EffData = (float)SF_electron12->get_EfficiencyData(double(pt_1),double(eta_1));
  /*     float Ele12EffMC   = (float)SF_electron12->get_EfficiencyMC(double(pt_1),double(eta_1));*/
 
-      float Mu23EffData = 1;//(float)SF_muon23->get_EfficiencyData(double(pt_2),double(eta_2));
+      float Mu23EffData = (float)SF_muon23->get_EfficiencyData(double(pt_2),double(eta_2));
   /*    float Mu23EffMC   = (float)SF_muon23->get_EfficiencyMC(double(pt_2),double(eta_2));*/
 
-      float Mu8EffData = 1;//(float)SF_muon8->get_EfficiencyData(double(pt_2),double(eta_2));
+      float Mu8EffData = (float)SF_muon8->get_EfficiencyData(double(pt_2),double(eta_2));
   /*    float Mu8EffMC   = (float)SF_muon8->get_EfficiencyMC(double(pt_2),double(eta_2));*/
 
       float trigWeightData = Mu23EffData*Ele12EffData + Mu8EffData*Ele23EffData - Mu23EffData*Ele23EffData;
@@ -1290,7 +1317,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	//double IdIsoSF_mu1 = 1;//SF_muonIdIso->get_ScaleFactor(ptMu1, etaMu1);
 
 
- 	float     isoweight_1 = 1;//SF_electronIdIso->get_ScaleFactor(pt_1,eta_1);
+ 	float     isoweight_1 = SF_electronIdIso->get_ScaleFactor(pt_1,eta_1);
       	float 	  isoweight_2 = SF_muonIdIso->get_ScaleFactor(pt_2,eta_2);
 
 
@@ -1404,7 +1431,6 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       qcdweight     = qcdWeightNoDzeta.getWeight(pt_1,pt_2,dr_tt);
       qcdweightup   = qcdWeightNoDzeta.getWeightUp(pt_1,pt_2,dr_tt);
       qcdweightdown = qcdWeightNoDzeta.getWeightDown(pt_1,pt_2,dr_tt);
-      all_weight = weight;
 
 
       TLorentzVector leptonsV, muonJ, jetsLV;
@@ -1413,16 +1439,14 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
 
 
-      bool btagged= false;
 
 
 
-      float jetEtaCut = 2.4;
       float jetEta = 2.4;
       float DRmax = 0.5;
       bool dRmuJet = false;
       bool dRtauJet = false;
-      float bJetEtaCut = etaJetCut;
+      float bJetEtaCut = jetEta;
 
       vector<unsigned int> jets; jets.clear();
       vector<unsigned int> jetspt20; jetspt20.clear();
@@ -1436,29 +1460,26 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       float ptSubLeadingJet = -1;
       
       int indexLeadingBJet = -1;
-      float ptLeadingBJet = -1;
 
 	int counter_cleaned_jets = 0;
 
 
       for (unsigned int jet=0; jet<analysisTree.pfjet_count; ++jet) {
-	float absJetEta = fabs(analysisTree.pfjet_eta[jet]);
 
-	if (absJetEta > etaJetCut) continue;
 	if (fabs(analysisTree.pfjet_pt[jet])<ptJetCut) continue;
+        float absJetEta = fabs(analysisTree.pfjet_eta[jet]);
+	if (absJetEta > etaJetCut) continue;
 
 	float jetPt = analysisTree.pfjet_pt[jet];
 
 
 	bool isPFJetId = false ; 
+      	bool btagged= false;
 	isPFJetId =looseJetiD(analysisTree,jet);
 	//isPFJetId =tightLepVetoJetiD(analysisTree,jet);
 
-	//				cout<<" 1- jet is Loose "<<isPFJetId<<"  "<<jet_isLoose[jet]<<"  iEntry "<<iEntry<<endl;
 	if (!isPFJetId) continue;
-	jet_isLoose[jet] = isPFJetId;
 	bool cleanedJet = true;
-	//				cout<<"  jet is Loose "<<isPFJetId<<"  "<<jet_isLoose[jet]<<"  "<<iEntry<<endl;
 
 
 	double Dr=deltaR(analysisTree.muon_eta[mu_index],analysisTree.muon_phi[mu_index],
@@ -1470,13 +1491,13 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
 	if (  Dre  < DRmax )  cleanedJet=false;
 
-
 	if (!cleanedJet) continue;
 
 	if (absJetEta<bJetEtaCut) { // jet within b-tagging acceptance
 
 	if (analysisTree.pfjet_btag[jet][0]  > bTag) btagged = true;
 	
+/*
 	  if (!isData) {
 	    int flavor = abs(analysisTree.pfjet_flavour[jet]);
 
@@ -1487,13 +1508,13 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	    if (flavor==5) {
 	      if (JetPtForBTag>MaxBJetPt) JetPtForBTag = MaxBJetPt - 0.1;
 	      if (JetPtForBTag<MinBJetPt) JetPtForBTag = MinBJetPt + 0.1;
-	      jet_scalefactor = reader_BC.eval_auto_bounds("central",BTagEntry::FLAV_B, absJetEta, JetPtForBTag);
+	      jet_scalefactor = reader_B.eval_auto_bounds("central",BTagEntry::FLAV_B, absJetEta, JetPtForBTag);
 	      tageff = tagEff_B->Interpolate(JetPtForBTag,absJetEta);
 	    }
 	    else if (flavor==4) {
 	      if (JetPtForBTag>MaxBJetPt) JetPtForBTag = MaxBJetPt - 0.1;
 	      if (JetPtForBTag<MinBJetPt) JetPtForBTag = MinBJetPt + 0.1;
-	      jet_scalefactor = reader_BC.eval_auto_bounds("central",BTagEntry::FLAV_C, absJetEta, JetPtForBTag);
+	      jet_scalefactor = reader_C.eval_auto_bounds("central",BTagEntry::FLAV_C, absJetEta, JetPtForBTag);
 	      tageff = tagEff_C->Interpolate(JetPtForBTag,absJetEta);
 	    }
 	    else {
@@ -1523,15 +1544,8 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	      }
 	    }
 	  } //is Data
-//if (btagged)
-//	cout<<"  what here "<<btagged<<"  "<<cleanedJet<<endl;
-	  if (btagged && cleanedJet) { 
-	      bjets.push_back(jet);
-	      if (ptJetCut>ptLeadingBJet) {
-		ptLeadingBJet = ptJetCut;
-		indexLeadingBJet = jet;
-	      }
-	  }
+*/
+	  if (btagged && cleanedJet) bjets.push_back(jet);
 	}
 
 
@@ -1540,22 +1554,12 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	  jets.push_back(jet);
 	  jets_cleaned[counter_cleaned_jets]=jet;
 
-	if (indexLeadingJet>=0) {
-	  if (ptJetCut<ptLeadingJet&&ptJetCut>ptSubLeadingJet) {
-	    indexSubLeadingJet = jet;
-	    ptSubLeadingJet = ptJetCut;
-	  }
-	}
-
-	if (ptJetCut>ptLeadingJet) {
-	  indexLeadingJet = jet;
-	  ptLeadingJet = ptJetCut;
-	}
 
 	//jet jetc
 	jet_jecUn[counter_cleaned_jets++] = analysisTree.pfjet_jecUncertainty[jet];
 
       }///loop in all jets
+
 
       njets = jets.size();
       jet_count = jets.size();
@@ -1640,7 +1644,6 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       metphi_resoDown = TMath::ATan2(met_resoDown_y,met_resoDown_x);
  
  
- 
 	
 //	float met_recoil = sqrt(pfmet_corr_x*pfmet_corr_x + pfmet_corr_y*pfmet_corr_y);
 //	float met_ = sqrt(analysisTree.pfmet_ex*analysisTree.pfmet_ex + analysisTree.pfmet_ey*analysisTree.pfmet_ey);
@@ -1683,20 +1686,10 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       all_weight = weight;
 
 
-
-
-
-
-
-
-
-
-
-
-
       T->Fill();
 
 
+      selEvents++;
       continue;
       /////////////////////////////////////////////////
 
