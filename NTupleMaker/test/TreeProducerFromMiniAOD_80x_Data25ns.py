@@ -86,7 +86,15 @@ if usePrivateSQlite:
 ### =====================================================================================================
 
 
-### ReRun JEC ===========================================================================================
+### ReRun JEC + Pileup Jet ID ===========================================================================
+
+process.load("RecoJets.JetProducers.PileupJetID_cfi")
+process.pileupJetIdUpdated = process.pileupJetId.clone(
+  jets=cms.InputTag("slimmedJets"),
+  inputIsCorrected=True,
+  applyJec=True,
+  vertexes=cms.InputTag("offlineSlimmedPrimaryVertices")
+  )
 
 from PhysicsTools.PatAlgos.producersLayer1.jetUpdater_cff import updatedPatJetCorrFactors
 process.patJetCorrFactorsReapplyJEC = updatedPatJetCorrFactors.clone(
@@ -105,7 +113,10 @@ process.patJetsReapplyJEC = updatedPatJets.clone(
   jetCorrFactorsSource = cms.VInputTag(cms.InputTag("patJetCorrFactorsReapplyJEC"))
   )
 
-### END ReRun JEC ======================================================================================
+process.patJetsReapplyJEC.userData.userFloats.src += ['pileupJetIdUpdated:fullDiscriminant']
+process.patJetsReapplyJEC.userData.userInts.src += ['pileupJetIdUpdated:fullId']
+
+### END ReRun JEC + Pileup Jet ID ======================================================================
 
 # Electron ID ==========================================================================================
 
@@ -444,6 +455,8 @@ Flags = cms.untracked.vstring(
   'allMetFilterPaths'
 ),
 FlagsProcesses = cms.untracked.vstring("RECO","PAT"),
+BadChargedCandidateFilter =  cms.InputTag("BadChargedCandidateFilter"),
+BadPFMuonFilter = cms.InputTag("BadPFMuonFilter"),
 # tracks
 RecTrackPtMin = cms.untracked.double(0.5),
 RecTrackEtaMax = cms.untracked.double(2.4),
