@@ -178,6 +178,7 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
   MvaMetCollectionsTag_(iConfig.getParameter<std::vector<edm::InputTag> >("MvaMetCollectionsTag")),
 
   GenParticleCollectionToken_(consumes<reco::GenParticleCollection>(iConfig.getParameter<edm::InputTag>("GenParticleCollectionTag"))),
+  GenJetCollectionToken_(consumes<reco::GenJetCollection>(iConfig.getParameter<edm::InputTag>("GenJetCollectionTag"))),
   PackedCantidateCollectionToken_(consumes<pat::PackedCandidateCollection>(edm::InputTag("packedPFCandidates"))),
   TriggerObjectCollectionToken_(consumes<pat::TriggerObjectStandAloneCollection>(iConfig.getParameter<edm::InputTag>("TriggerObjectCollectionTag"))),
   BeamSpotToken_(consumes<BeamSpot>(iConfig.getParameter<edm::InputTag>("BeamSpotCollectionTag"))),
@@ -853,8 +854,23 @@ void NTupleMaker::beginJob(){
     tree->Branch("genparticles_isPrompt", genparticles_isPrompt, "genparticles_isPrompt[genparticles_count]/I");
     tree->Branch("genparticles_isPromptTauDecayProduct", genparticles_isPromptTauDecayProduct, "genparticles_isPromptTauDecayProduct[genparticles_count]/I");
     tree->Branch("genparticles_isTauDecayProduct", genparticles_isTauDecayProduct, "genparticles_isTauDecayProduct[genparticles_count]/I");
- 
     tree->Branch("genparticles_mother", genparticles_mother, "genparticles_mother[genparticles_count]/b");
+
+    tree->Branch("genjets_count", &genjets_count, "genjets_count/i");
+    tree->Branch("genjets_e", genjets_e, "genjets_e[genjets_count]/F");
+    tree->Branch("genjets_px", genjets_px, "genjets_px[genjets_count]/F");
+    tree->Branch("genjets_py", genjets_py, "genjets_py[genjets_count]/F");
+    tree->Branch("genjets_pz", genjets_pz, "genjets_pz[genjets_count]/F");
+    tree->Branch("genjets_pt", genjets_pt, "genjets_pt[genjets_count]/F");
+    tree->Branch("genjets_eta", genjets_eta, "genjets_eta[genjets_count]/F");
+    tree->Branch("genjets_phi", genjets_phi, "genjets_phi[genjets_count]/F");
+    tree->Branch("genjets_pdgid", genjets_pdgid, "genjets_pdgid[genjets_count]/I");
+    tree->Branch("genjets_status", genjets_status, "genjets_status[genjets_count]/I");
+    tree->Branch("genjets_em_energy", genjets_em_energy, "genjets_em_energy[genjets_count]/F");
+    tree->Branch("genjets_had_energy", genjets_had_energy, "genjets_had_energy[genjets_count]/F");
+    tree->Branch("genjets_invisible_energy", genjets_invisible_energy, "genjets_invisible_energy[genjets_count]/F");
+    tree->Branch("genjets_auxiliary_energy", genjets_auxiliary_energy, "genjets_auxiliary_energy[genjets_count]/F");
+
   }    
   // SUSY Info
   if (csusyinfo) {
@@ -1344,6 +1360,7 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   electron_count = 0;
   photon_count = 0;
   genparticles_count = 0;
+  genjets_count = 0;
   errors = 0;
   trigobject_count = 0;
   mvamet_count = 0;
@@ -1970,6 +1987,7 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       AddGenHt(iEvent);
 
       bool haveGenParticles = AddGenParticles(iEvent);
+      bool haveGenJets      = AddGenJets(iEvent);
 
       edm::Handle<GenEventInfoProduct> HEPMC;
       iEvent.getByLabel(edm::InputTag("generator"), HEPMC);
@@ -2478,6 +2496,49 @@ bool NTupleMaker::AddGenParticles(const edm::Event& iEvent) {
   return passed;
 
 } // bool NTupleMaker::AddGenParticles(const edm::Event& iEvent) 
+
+
+bool NTupleMaker::AddGenJets(const edm::Event& iEvent)
+{
+  edm::Handle<reco::GenJetCollection> genjets;
+  iEvent.getByToken(GenJetCollectionToken_, genjets);
+
+  bool passed = false;
+  
+  if(genjets.isValid())
+    {
+      bool passed = true;
+
+      for(unsigned i = 0 ; i < genjets->size() ; i++)
+	{
+	  if(genjets_count == M_genjetsmaxcount){
+	    cerr << "number of genjets_count > M_genjetsmaxcount. They are missing." << endl; 
+	    errors |= 1<<4; 
+	    break;
+	  }
+
+	  if(fabs((*genjets)[i].eta()) > 5.2) continue;
+
+	  genjets_e[genjets_count]  = (*genjets)[i].energy();
+	  genjets_px[genjets_count] = (*genjets)[i].px();
+	  genjets_py[genjets_count] = (*genjets)[i].py();
+	  genjets_pz[genjets_count] = (*genjets)[i].pz();
+	  genjets_pt[genjets_count] = (*genjets)[i].pt();
+	  genjets_eta[genjets_count] = (*genjets)[i].eta();
+	  genjets_phi[genjets_count] = (*genjets)[i].phi();
+	  genjets_pdgid[genjets_count]  = (*genjets)[i].pdgId();
+	  genjets_status[genjets_count] = (*genjets)[i].status();
+         
+	  genjets_em_energy[genjets_count]        = (*genjets)[i].emEnergy();
+	  genjets_had_energy[genjets_count]       = (*genjets)[i].hadEnergy();
+	  genjets_invisible_energy[genjets_count] = (*genjets)[i].invisibleEnergy();
+	  genjets_auxiliary_energy[genjets_count] = (*genjets)[i].auxiliaryEnergy();
+	  genjets_count++;
+	}
+    }
+  return  passed;
+}
+
 
 unsigned int NTupleMaker::AddPFCand(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
