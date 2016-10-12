@@ -23,9 +23,7 @@
 #include "TMath.h"
 #include "TCanvas.h"
 #include "TError.h"
-
 #include "TLorentzVector.h"
-
 #include "TRandom.h"
 
 #include "RooRealVar.h"
@@ -47,6 +45,9 @@
 #include <boost/foreach.hpp>
 
 #include "FWCore/ParameterSet/interface/FileInPath.h"
+
+#include "CondFormats/BTauObjects/interface/BTagCalibration.h"
+#include "CondTools/BTau/interface/BTagCalibrationReader.h"
 
 #define pi 	3.14159265358979312
 #define d2r 1.74532925199432955e-02
@@ -70,6 +71,16 @@ struct compare_lumi { //accepts two pairs, return 1 if left.first < right.first 
   }
 };
 
+struct btag_scaling_inputs{
+  BTagCalibrationReader reader_B;
+  BTagCalibrationReader reader_C;
+  BTagCalibrationReader reader_Light;
+  TH1F *tagEff_B;
+  TH1F *tagEff_C;
+  TH1F *tagEff_Light;
+  TRandom3 *rand;
+};
+
 int read_json(std::string filename, lumi_json& json);
 bool isGoodLumi(const std::pair<int, int>& lumi, const lumi_json& json);
 bool isGoodLumi(int run, int lumi, const lumi_json& json);
@@ -85,7 +96,7 @@ bool extra_electron_veto(int leptonIndex, TString ch, const Config *cfg, const A
 bool extra_muon_veto(int leptonIndex, TString ch, const Config *cfg, const AC1B *analysisTree);
 void fillMET(TString ch, int leptonIndex, int tauIndex, const AC1B * analysisTree, Spring15Tree *otree);
 void mt_calculation(Spring15Tree *otree);
-void counting_jets(const AC1B *analysisTree, Spring15Tree *otree, const Config *cfg);
+void counting_jets(const AC1B *analysisTree, Spring15Tree *otree, const Config *cfg, const btag_scaling_inputs *inputs);
 void svfit_variables(const AC1B *analysisTree, Spring15Tree *otree, const Config *cfg);
 bool isICHEPmed(int Index, const AC1B * analysisTree);
 
@@ -152,6 +163,24 @@ int main(int argc, char * argv[]){
 
   //svfit
   const string svFitPtResFile = cfg.get<string>("svFitPtResFile");
+
+  //b-tag scale factors
+  BTagCalibration calib("csvv2", cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/CSVv2_ichep.csv");
+  BTagCalibrationReader reader_B(BTagEntry::OP_MEDIUM,"central");
+  BTagCalibrationReader reader_C(BTagEntry::OP_MEDIUM,"central");
+  BTagCalibrationReader reader_Light(BTagEntry::OP_MEDIUM,"central");
+  reader_B.load(calib,BTagEntry::FLAV_B,"comb");
+  reader_C.load(calib,BTagEntry::FLAV_C,"comb");
+  reader_Light.load(calib,BTagEntry::FLAV_UDSG,"incl");
+
+  TFile *fileTagging  = new TFile(TString(cmsswBase)+TString("/src/DesyTauAnalyses/NTupleMaker/data/tagging_efficiencies_ichep2016.root"));
+
+  TH1F  *tagEff_B     = (TH1F*)fileTagging->Get("btag_eff_b");
+  TH1F  *tagEff_C     = (TH1F*)fileTagging->Get("btag_eff_c");
+  TH1F  *tagEff_Light = (TH1F*)fileTagging->Get("btag_eff_oth");
+  TRandom3 *rand = new TRandom3();
+
+  const struct btag_scaling_inputs inputs_btag_scaling_medium = { reader_B, reader_C, reader_Light, tagEff_B, tagEff_C, tagEff_Light, rand };
 
   // MET Recoil Corrections
   const bool applyRecoilCorrections = cfg.get<bool>("ApplyRecoilCorrections");
@@ -717,7 +746,7 @@ int main(int argc, char * argv[]){
       otree->effweight = (otree->trigweight_1)*(otree->idisoweight_1)*(otree->trigweight_2)*(otree->idisoweight_2);
 
       //counting jet
-      counting_jets(&analysisTree, otree, &cfg);
+      counting_jets(&analysisTree, otree, &cfg, &inputs_btag_scaling_medium);
       //MET
       fillMET(ch, leptonIndex, tauIndex, &analysisTree, otree);
 
@@ -1424,7 +1453,7 @@ void mt_calculation(Spring15Tree *otree){
   otree->puppimt_2 = sqrt(2*otree->pt_2*otree->puppimet*(1.-cos(otree->phi_2-otree->puppimetphi)));
 }
 
-void counting_jets(const AC1B *analysisTree, Spring15Tree *otree, const Config *cfg){
+void counting_jets(const AC1B *analysisTree, Spring15Tree *otree, const Config *cfg, const btag_scaling_inputs *inputs_btag_scaling){
 
   vector<unsigned int> jets; jets.clear();
   vector<unsigned int> jetspt20; jetspt20.clear();
@@ -1444,6 +1473,7 @@ void counting_jets(const AC1B *analysisTree, Spring15Tree *otree, const Config *
 
   for (unsigned int jet=0; jet<analysisTree->pfjet_count; ++jet) {
 
+    float jetEta    = analysisTree->pfjet_eta[jet];
     float absJetEta = fabs(analysisTree->pfjet_eta[jet]);
     if (absJetEta>=cfg->get<float>("JetEtaCut")) continue;
 
@@ -1480,22 +1510,65 @@ void counting_jets(const AC1B *analysisTree, Spring15Tree *otree, const Config *
 
     jetspt20.push_back(jet);
 
-    if (absJetEta<cfg->get<float>("bJetEtaCut") && analysisTree->pfjet_btag[jet][0]>cfg->get<float>("btagCut")) { // b-jet
-      bjets.push_back(jet);
+    if (absJetEta < cfg->get<float>("bJetEtaCut")) { // jet within b-tagging acceptance
+      
+      bool tagged = ( analysisTree->pfjet_btag[jet][0]>cfg->get<float>("btagCut") );
 
-      if (indexLeadingBJet>=0) {
-	if (jetPt<ptLeadingBJet && jetPt>ptSubLeadingBJet) {
-	  indexSubLeadingBJet = jet;
-	  ptSubLeadingBJet = jetPt;
+      if(!cfg->get<bool>("isData")  && cfg->get<bool>("ApplyBTagScaling")) {
+
+	int flavor = abs(analysisTree->pfjet_flavour[jet]);
+	double jet_scalefactor = 1;
+	double JetPtForBTag    = jetPt;
+	double tageff          = 1;
+
+	if (flavor==5) {
+	  if (JetPtForBTag>cfg->get<float>("MaxBJetPt")) JetPtForBTag = cfg->get<float>("MaxBJetPt") - 0.1;
+	  if (JetPtForBTag<cfg->get<float>("MinBJetPt")) JetPtForBTag = cfg->get<float>("MinBJetPt") + 0.1;
+	  jet_scalefactor = inputs_btag_scaling->reader_B.eval_auto_bounds("central",BTagEntry::FLAV_B, absJetEta, JetPtForBTag);
+	  tageff = inputs_btag_scaling->tagEff_B->Interpolate(JetPtForBTag,absJetEta);
+	}
+	else if (flavor==4) {
+	  if (JetPtForBTag>cfg->get<float>("MaxBJetPt")) JetPtForBTag = cfg->get<float>("MaxBJetPt") - 0.1;
+	  if (JetPtForBTag<cfg->get<float>("MinBJetPt")) JetPtForBTag = cfg->get<float>("MinBJetPt") + 0.1;
+	  jet_scalefactor = inputs_btag_scaling->reader_C.eval_auto_bounds("central",BTagEntry::FLAV_C, absJetEta, JetPtForBTag);
+	  tageff = inputs_btag_scaling->tagEff_C->Interpolate(JetPtForBTag,absJetEta);
+	}
+	else {
+	  if (JetPtForBTag>cfg->get<float>("MaxLJetPt")) JetPtForBTag = cfg->get<float>("MaxLJetPt") - 0.1;
+	  if (JetPtForBTag<cfg->get<float>("MinLJetPt")) JetPtForBTag = cfg->get<float>("MinLJetPt") + 0.1;
+	  jet_scalefactor = inputs_btag_scaling->reader_Light.eval_auto_bounds("central",BTagEntry::FLAV_UDSG, absJetEta, JetPtForBTag);
+	  tageff = inputs_btag_scaling->tagEff_Light->Interpolate(JetPtForBTag,absJetEta);
+	}
+
+	if (tageff<1e-5)      tageff = 1e-5;
+	if (tageff>0.99999)   tageff = 0.99999;
+	inputs_btag_scaling->rand->SetSeed((int)((jetEta+5)*100000));
+	double rannum = inputs_btag_scaling->rand->Rndm();
+
+	if (jet_scalefactor<1 && tagged)  { // downgrade
+	  if (rannum>jet_scalefactor)  tagged = false;
+	}
+	if (jet_scalefactor>1 && !tagged) { // upgrade
+	  double fraction = (1.0-jet_scalefactor)/(1.0-1.0/tageff);
+	  if (rannum<fraction) tagged = true;
 	}
       }
-      
-      if (jetPt>ptLeadingBJet) {
-        ptLeadingBJet = jetPt;
-        indexLeadingBJet = jet;
-      }
+      if (tagged) {
 
-    } 
+	bjets.push_back(jet);
+
+	if (indexLeadingBJet>=0) {
+	  if (jetPt<ptLeadingBJet && jetPt>ptSubLeadingBJet) {
+	    indexSubLeadingBJet = jet;
+	    ptSubLeadingBJet = jetPt;
+	  }
+	}
+	if (jetPt>ptLeadingBJet) {
+	  ptLeadingBJet = jetPt;
+	  indexLeadingBJet = jet;
+	}
+      }
+    } //if (absJetEta < cfg->get<float>("bJetEtaCut"))
 
     if (indexLeadingJet>=0) {
       if (jetPt<ptLeadingJet && jetPt>ptSubLeadingJet) {
