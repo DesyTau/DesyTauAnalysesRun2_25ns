@@ -1320,7 +1320,7 @@ bool extra_electron_veto(int leptonIndex, TString ch, const Config *cfg, const A
     if (!analysisTree->electron_pass_conversion[ie] && cfg->get<bool>("applyVetoElectronId")) continue;
     if (analysisTree->electron_nmissinginnerhits[ie]>1 && cfg->get<bool>("applyVetoElectronId")) continue;
 
-    float relIsoEle = rel_Iso(ie, ch, analysisTree, cfg->get<float>("dRisoVetoElectronCut"));
+    float relIsoEle = rel_Iso(ie, "et", analysisTree, cfg->get<float>("dRisoVetoElectronCut"));
     if (relIsoEle>=cfg->get<float>("isoVetoElectronCut")) continue;
 
     return(1);		
@@ -1341,7 +1341,7 @@ bool extra_muon_veto(int leptonIndex, TString ch, const Config *cfg, const AC1B 
     if (fabs(analysisTree->muon_dz[im])>cfg->get<float>("dzVetoMuonCut")) continue;
 
     if (cfg->get<bool>("applyVetoMuonId") && !(isICHEPmed(im, analysisTree))) continue;
-    float relIsoMu = rel_Iso(im, ch, analysisTree, cfg->get<float>("dRiso"));
+    float relIsoMu = rel_Iso(im, "mt", analysisTree, cfg->get<float>("dRiso"));
     if (relIsoMu>cfg->get<float>("isoVetoMuonCut")) continue;
 
     return(1);
