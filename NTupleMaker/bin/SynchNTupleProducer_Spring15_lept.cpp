@@ -157,6 +157,7 @@ int main(int argc, char * argv[]){
   const bool applyRecoilCorrections = cfg.get<bool>("ApplyRecoilCorrections");
   const bool isDY = infiles.find("DY") == infiles.rfind("/")+1;
   const bool isWJets = (infiles.find("WJets") == infiles.rfind("/")+1) || (infiles.find("W1Jets") == infiles.rfind("/")+1) || (infiles.find("W2Jets") == infiles.rfind("/")+1) || (infiles.find("W3Jets") == infiles.rfind("/")+1) || (infiles.find("W4Jets") == infiles.rfind("/")+1) ;
+  const bool isVBForGGHiggs = (infiles.find("VBFHToTauTau")== infiles.rfind("/")+1) || (infiles.find("GluGluHToTauTau")== infiles.rfind("/")+1);
   const bool isMG = infiles.find("madgraph") != string::npos;
   //const bool applyRecoilCorrections = isDY || isWJets;
   
@@ -715,8 +716,63 @@ int main(int argc, char * argv[]){
 
       otree->effweight = (otree->trigweight_1)*(otree->idisoweight_1)*(otree->trigweight_2)*(otree->idisoweight_2);
 
+      //counting jet
+      counting_jets(&analysisTree, otree, &cfg);
       //MET
       fillMET(ch, leptonIndex, tauIndex, &analysisTree, otree);
+
+      TLorentzVector genV( 0., 0., 0., 0.);
+      TLorentzVector genL( 0., 0., 0., 0.);
+
+      // Zpt weight
+	  otree->zptweight = 1.;
+      if (!isData && isDY && isMG ) {
+        genV = genTools::genV(analysisTree); // gen Z boson ?
+        otree->zptweight = h_zptweight->GetBinContent(h_zptweight->GetXaxis()->FindBin(genV.M()),h_zptweight->GetYaxis()->FindBin(genV.Pt()));
+	  }
+
+      ////////////////////////////////////////////////////////////
+      // MET Recoil Corrections
+      ////////////////////////////////////////////////////////////
+
+      otree->njetshad = otree->njets;
+      if (!isData && applyRecoilCorrections && (isDY || isWJets) ){
+				genV = genTools::genV(analysisTree);
+				genL = genTools::genL(analysisTree);
+				otree->njetshad = genTools::nJetsHad(analysisTree);
+      }
+
+      // MVA MET      
+      // // njetshad, genVis, quantile map correction
+	  genTools::RecoilCorrections( *recoilMvaMetCorrector, (!isData && applyRecoilCorrections && (isDY || isWJets)) * genTools::QuantileRemap,
+			                     otree->mvamet, otree->mvametphi,
+			                     genV.Px(), genV.Py(),
+			                     genL.Px(), genL.Py(),
+			                     otree->njetshad,
+			                     otree->mvamet_rcmr, otree->mvametphi_rcmr
+			                     );
+
+      // overwriting with recoil-corrected values 
+      otree->mvamet = otree->mvamet_rcmr;
+      otree->mvametphi = otree->mvametphi_rcmr;            
+	  //otree->mt_rcmr_1 = calc::mt(otree->pt_1, otree->phi_1, otree->mvamet_rcmr, otree->mvametphi_rcmr);
+	  //otree->mt_rcmr_2 = calc::mt(otree->pt_2, otree->phi_2, otree->mvamet_rcmr, otree->mvametphi_rcmr);     
+      //otree->pzetamiss_rcmr = calc::pzetamiss( zetaX, zetaY, otree->mvamet_rcmr, otree->mvametphi_rcmr);
+
+      // PF MET
+	  genTools::RecoilCorrections( *recoilPFMetCorrector, (!isData && applyRecoilCorrections && (isDY || isWJets)) * genTools::QuantileRemap,
+			                     otree->met, otree->metphi,
+			                     genV.Px(), genV.Py(),
+			                     genL.Px(), genL.Py(),
+			                     otree->njetshad,
+			                     otree->met_rcmr, otree->metphi_rcmr
+			                     );
+
+      // overwriting with recoil-corrected values 
+      otree->met = otree->met_rcmr;
+      otree->metphi = otree->metphi_rcmr;   
+
+      //end MET Recoil Corrections
 
       //ditau sytem
       TLorentzVector tauLV; tauLV.SetXYZM(analysisTree.tau_px[tauIndex],
@@ -792,50 +848,37 @@ int main(int argc, char * argv[]){
 
       otree->pzetavis  = vectorVisX*zetaX + vectorVisY*zetaY;
       otree->pzetamiss = otree->mvamet*TMath::Cos(otree->mvametphi)*zetaX + otree->mvamet*TMath::Sin(otree->mvametphi)*zetaY;
-      otree->pfpzetamiss = analysisTree.pfmet_ex*zetaX + analysisTree.pfmet_ey*zetaY;      
-      otree->puppipzetamiss = analysisTree.puppimet_ex*zetaX + analysisTree.puppimet_ey*zetaY;
+      //otree->pfpzetamiss = analysisTree.pfmet_ex*zetaX + analysisTree.pfmet_ey*zetaY; // this is not recoil-corrected  
+      otree->pfpzetamiss = calc::pzetamiss( zetaX, zetaY, otree->met, otree->metphi);   
+      otree->puppipzetamiss = analysisTree.puppimet_ex*zetaX + analysisTree.puppimet_ey*zetaY;  // this is not recoil-corrected  
 
-      //counting jet
-      counting_jets(&analysisTree, otree, &cfg);
-      // svfit
-      if(ApplySVFit) svfit_variables(&analysisTree, otree, &cfg);
+      // svfit variables
+  	  otree->m_sv   = -9999;
+      otree->pt_sv  = -9999;
+      otree->eta_sv = -9999;
+      otree->phi_sv = -9999;
 
-      ////////////////////////////////////////////////////////////
-      // MET Recoil Corrections
-      ////////////////////////////////////////////////////////////
-
-      TLorentzVector genV( 0., 0., 0., 0.);
-      TLorentzVector genL( 0., 0., 0., 0.);
-
-      otree->njetshad = otree->njets;
-      if (!isData && applyRecoilCorrections && (isDY || isWJets) ){
-				genV = genTools::genV(analysisTree);
-				genL = genTools::genL(analysisTree);
-				otree->njetshad = genTools::nJetsHad(analysisTree);
+      //calculate SV fit only for events passing baseline selection and mt cut
+      // for synchronisation, take all events
+      const bool Synch = cfg.get<bool>("Synch"); 
+	  bool calculateSVFit = false; 
+	  if (Synch) calculateSVFit = true;       
+	  else if (ApplySVFit && ch=="mt"){
+          calculateSVFit = (otree->mt_1<60 && otree->iso_1<0.15 && otree->byTightIsolationMVArun2v1DBoldDMwLT_2>0.5 && 
+                            otree->againstElectronVLooseMVA6_2>0.5 && otree->againstMuonTight3_2>0.5  &&
+                            otree->dilepton_veto == 0 && otree->extraelec_veto == 0 && otree->extramuon_veto == 0);
       }
 
-      // MVA MET      
-			// // njetshad, genVis, mean-resolution correction
-			genTools::RecoilCorrections( *recoilMvaMetCorrector, (!isData && applyRecoilCorrections && (isDY || isWJets)) * genTools::QuantileRemap,
-			                     otree->mvamet, otree->mvametphi,
-			                     genV.Px(), genV.Py(),
-			                     genL.Px(), genL.Py(),
-			                     otree->njetshad,
-			                     otree->mvamet_rcmr, otree->mvametphi_rcmr
-			                     );
-			             
-			otree->mt_rcmr_1 = calc::mt(otree->pt_1, otree->phi_1, otree->mvamet_rcmr, otree->mvametphi_rcmr);
-			otree->mt_rcmr_2 = calc::mt(otree->pt_2, otree->phi_2, otree->mvamet_rcmr, otree->mvametphi_rcmr);     
-			otree->pzetamiss_rcmr = calc::pzetamiss( zetaX, zetaY, otree->mvamet_rcmr, otree->mvametphi_rcmr);
+      else if (ApplySVFit && ch == "et"){
+          calculateSVFit = (otree->mt_1<60 && otree->iso_1<0.1 && otree->byTightIsolationMVArun2v1DBoldDMwLT_2>0.5 && 
+                            otree->againstMuonLoose3_2>0.5 && otree->againstElectronTightMVA6_2>0.5 && 
+                            otree->dilepton_veto == 0 && otree->extraelec_veto == 0 && otree->extramuon_veto == 0);
+      }
 
-			//end MET Recoil Corrections
 
-      // Zpt weight
-	  otree->zptweight = 1.;
-      if (!isData && isDY && isMG ) {
-        genV = genTools::genV(analysisTree); // gen Z boson ?
-        otree->zptweight = h_zptweight->GetBinContent(h_zptweight->GetXaxis()->FindBin(genV.M()),h_zptweight->GetYaxis()->FindBin(genV.Pt()));
-	  }
+
+      // svfit
+      if(ApplySVFit && calculateSVFit) svfit_variables(&analysisTree, otree, &cfg);
 
       otree->Fill();
       selEvents++;
@@ -1282,12 +1325,6 @@ bool extra_muon_veto(int leptonIndex, TString ch, const Config *cfg, const AC1B 
 
 //fill the otree with the met variables
 void fillMET(TString ch, int leptonIndex, int tauIndex, const AC1B * analysisTree, Spring15Tree *otree){
-
-  // svfit variables
-  otree->m_sv   = -9999;
-  otree->pt_sv  = -9999;
-  otree->eta_sv = -9999;
-  otree->phi_sv = -9999;
 
    // pfmet variables
   otree->met = TMath::Sqrt(analysisTree->pfmet_ex*analysisTree->pfmet_ex + analysisTree->pfmet_ey*analysisTree->pfmet_ey);
