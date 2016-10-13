@@ -1220,10 +1220,9 @@ bool dilepton_veto_mt(const Config *cfg,const  AC1B *analysisTree){
     float relIsoMu = rel_Iso(im, "mt", analysisTree, cfg->get<float>("dRiso"));
     if(relIsoMu >= cfg->get<float>("isoDiMuonVeto")) continue;
 		
-    //bool passedVetoId =  analysisTree->muon_isMedium[im]; 
-    bool passedVetoId = isICHEPmed(im, analysisTree);
-    if (!passedVetoId && cfg->get<bool>("applyDiMuonVetoId")) continue;
-    //if (!analysisTree->muon_isGlobal[im] && !analysisTree->muon_isTracker[im] && !analysisTree->muon_isPF[im]) continue;
+    //bool passedVetoId = isICHEPmed(im, analysisTree);
+    //if (!passedVetoId && cfg->get<bool>("applyDiMuonVetoId")) continue;
+    if ( !(analysisTree->muon_isGlobal[im] && analysisTree->muon_isTracker[im] && analysisTree->muon_isPF[im]) ) continue;
     
     for (unsigned int je = im+1; je<analysisTree->muon_count; ++je) {
       
@@ -1238,10 +1237,9 @@ bool dilepton_veto_mt(const Config *cfg,const  AC1B *analysisTree){
       float relIsoMu = 	rel_Iso(je, "mt", analysisTree, cfg->get<float>("dRiso"));
       if(relIsoMu >= cfg->get<float>("isoDiMuonVeto")) continue;	
 
-      //passedVetoId =  analysisTree->muon_isMedium[je];
-      passedVetoId = isICHEPmed(je, analysisTree);
-      if (!passedVetoId && cfg->get<bool>("applyDiMuonVetoId")) continue;
-      //if (!analysisTree->muon_isGlobal[je] && !analysisTree->muon_isTracker[je] && !analysisTree->muon_isPF[je]) continue;
+      //passedVetoId = isICHEPmed(je, analysisTree);
+      //if (!passedVetoId && cfg->get<bool>("applyDiMuonVetoId")) continue;
+      if ( ! (analysisTree->muon_isGlobal[je] && analysisTree->muon_isTracker[je] && analysisTree->muon_isPF[je]) ) continue;
 		  
       float dr = deltaR(analysisTree->muon_eta[im],analysisTree->muon_phi[im],analysisTree->muon_eta[je],analysisTree->muon_phi[je]);
 
