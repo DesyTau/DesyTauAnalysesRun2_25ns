@@ -933,7 +933,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	bool isMu1matched = false;
       for (unsigned int im = 0; im<analysisTree.muon_count; ++im) {
 	allMuons.push_back(im);
-	if (analysisTree.muon_pt[im]<20.) continue;
+	if (analysisTree.muon_pt[im]<10.) continue;
 	if (fabs(analysisTree.muon_eta[im])>etaMuonCut) continue;
 	if (fabs(analysisTree.muon_dxy[im])>dxyMuonCut) continue;
 	if (fabs(analysisTree.muon_dz[im])>dzMuonCut) continue;
@@ -1036,7 +1036,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	      if (q1*q2>0) continue;
 	    bool isMu2matched = false;
 
-
+	if (isData){
 		for (unsigned int iT=0; iT<analysisTree.trigobject_count; ++iT) {
 	  	if (analysisTree.trigobject_filters[iT][nMainTrigger]
 	      	&& analysisTree.muon_pt[index2]>ptMuonCut &&  	analysisTree.trigobject_pt[iT]>SingleMuonTriggerPtCut) { // IsoMu Leg
@@ -1046,9 +1046,12 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	      	isMu2matched = true;
 	  		}
 		}
+	}
 
 
 	    bool isTriggerMatch = (isMu1matched || isMu2matched);
+		if (!isData) isTriggerMatch=true;
+
 	    float dRmumu = deltaR(analysisTree.muon_eta[index1],analysisTree.muon_phi[index1],
 				  analysisTree.muon_eta[index2],analysisTree.muon_phi[index2]);
 	    if (isTriggerMatch && dRmumu>dRleptonsCut) {
@@ -1126,13 +1129,11 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
 
       extraelec_veto = foundExtraElectron;
-    
-
-
 
 
       if(extraelec_veto)   event_thirdLeptonVeto = true;
 
+      if (event_thirdLeptonVeto) continue;
 
 
       if (isIsoMuonsPair) {      

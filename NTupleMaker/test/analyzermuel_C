@@ -38,6 +38,10 @@
 
 
 using namespace std;
+
+
+
+
 void analyzer::Loop(){
 
 	if (fChain == 0) return;
@@ -51,15 +55,15 @@ void analyzer::Loop(){
 	CutList.push_back("topPtRwgt");
 	CutList.push_back("TTJets norm");
 	CutList.push_back("WJets norm");
+	CutList.push_back("MET recoil");
+	CutList.push_back("ZpT correction");
 	CutList.push_back("Jets lt 1");
 	CutList.push_back("0btag");
 	CutList.push_back("Mass window");
 	CutList.push_back("dR lt 3.5");	
+        CutList.push_back("MET gt 20");
         CutList.push_back("MET gt 30");
-	CutList.push_back("MET gt 30");
 	CutList.push_back("MET gt 40");
-	CutList.push_back("MET gt 50");
-	CutList.push_back("MCTb gt 60");
 
 
 
@@ -81,8 +85,17 @@ void analyzer::Loop(){
 	//char hist_[100];
 	bool isData = false;
 	bool isTT = false;
+	bool isWJ = false;
+	bool isDY = false;
+	bool isDYhigh = false;
+	bool isDYlow = false;
+	bool isDYNJ = false;
+	bool isWNJ = false;
+	bool isNJ = false;
 	bool isSignal = false;
-	
+	bool cut_btag = true;
+
+
 	bool t = true;
 	bool f = false;
 	bool InvertLeptonIso = LEPTONHERE;
@@ -99,20 +112,42 @@ void analyzer::Loop(){
 	
 	string cut = to_string(t);
 	cout <<"  "<<cut.c_str()<<endl;
+
 	char plots_[100];
 	string data = "Single";
 	string tt = "TT_TuneCUETP8M1_13TeV-powheg-pythia8";
+	string wj = "WJetsToLNu";
+	string wj1 = "W1JetsToLNu";
+	string wj2 = "W2JetsToLNu";
+	string wj3 = "W3JetsToLNu";
+	string wj4 = "W4JetsToLNu";
+	string dyj = "DYJetsToLL";
+	string dyjhigh = "DYJetsToLL_M-50";
+	string dyjlow = "DYJetsToLL_M-5to";
+	string dyjlow2 = "DYJetsToLL_M-10to";
+	string dyj1 = "DY1JetsToLL";
+	string dyj2 = "DY2JetsToLL";
+	string dyj3 = "DY3JetsToLL";
+	string dyj4 = "DY4JetsToLL";
 	string signal = "stau";
+	string signalC1 = "C1";
 	if (string::npos != old.find(data)) isData= true;
 	if (string::npos != old.find(signal)) isSignal= true;
+	if (string::npos != old.find(signalC1)) isSignal= true;
 	if (string::npos != old.find(tt)) isTT= true;
+	if (string::npos != old.find(wj)) isWJ= true;
+	if (string::npos != old.find(dyj)) isDY= true;
+	if (string::npos != old.find(dyjhigh)) isDYhigh= true;
+	if (string::npos != old.find(dyjlow) || string::npos != old.find(dyjlow2)) isDYlow= true;
+	if (string::npos != old.find(dyj1) || string::npos != old.find(dyj2) || string::npos != old.find(dyj3) || string::npos != old.find(dyj4)) isDYNJ = true;
+	if (string::npos != old.find(wj1) || string::npos != old.find(wj2) || string::npos != old.find(wj3) || string::npos != old.find(wj4)) isWNJ= true;
+	if (string::npos != old.find(dyj1) || string::npos != old.find(dyj2) || string::npos != old.find(dyj3) || string::npos != old.find(dyj4) || 
+	string::npos != old.find(wj1) || string::npos != old.find(wj2) || string::npos != old.find(wj3) || string::npos != old.find(wj4)) isNJ= true;
 	
 	if (isSignal) cout<<" YOU HAVE FOUND ITTTTTTTTT "<<endl;
 	if (isData) cout<<" YOU HAVE FOUND a DATA "<<endl;
 
 	string channel = "CHANNELHERE";
-
-
 
 	TString inputRootFile = "/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/CMSSW_8_0_12/src/DesyTauAnalyses/NTupleMaker/data/HIP_mediumID.root";
 	TFile * fileInHIP = new TFile(inputRootFile, "read");
@@ -121,13 +156,18 @@ TGraphAsymmErrors * TGr_hip;
 TGr_hip = new TGraphAsymmErrors();
 TGr_hip = (TGraphAsymmErrors*)fileInHIP->Get("ratio_eta");
 
-/*
-TIter nextkey (fileInHIP->GetListOfKeys ());
+
+	TString inputRootFile2 = "/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/CMSSW_8_0_12/src/DesyTauAnalyses/NTupleMaker/data/sf_mu_medium.root";
+
+	TFile * fileInFast = new TFile(inputRootFile2, "read");
+
+
+TIter nextkey (fileInFast->GetListOfKeys ());
 TKey *key = 0;
 key = (TKey *) nextkey ();
 TObject *obj = key->ReadObj ();
 TH2D *histo = (TH2D*) obj;
-*/
+
 
 
 	TFile * filein = new TFile("/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/CMSSW_8_0_12/src/DesyTauAnalyses/NTupleMaker/test/CHANNELHERE/FILEIN","read");
@@ -160,6 +200,11 @@ TH2D *histo = (TH2D*) obj;
 
 		if ( jentry%100000 ==0 ) cout<<" working for you...processed " <<jentry<<" events from "<<nentries<<" dataset "<<datasetName->c_str()<<" weight "<<all_weights<< endl;
 
+		if (isWJ && (npartons>0 && npartons<5)) continue;
+
+		//if (isDY && (npartons>0 && npartons<5)) continue;
+		if ( (isDYhigh || isDYNJ)  && !isDYlow && (npartons>0 && npartons<5)) continue;
+
 		if (isData && met_flag<0.5) continue;	
 
 		JetsMV.clear();
@@ -172,46 +217,47 @@ TH2D *histo = (TH2D*) obj;
 			MuV.SetPxPyPzE(0.,0.,0.,0.);
 			ElV.SetPxPyPzE(0.,0.,0.,0.);
 			TauV.SetPxPyPzE(0.,0.,0.,0.);
-float met = 0.;
-		METV.SetPx(met_ex);
-		METV.SetPy(met_ey);
-		met = sqrt(met_ex*met_ex + met_ey*met_ey);  
-/*
+	for (int nj=0;nj<njets;++nj) {JetsV.SetPxPyPzE(jet_px[jets_cleaned[nj]], jet_py[jets_cleaned[nj]],jet_pz[jets_cleaned[nj]],jet_e[jets_cleaned[nj]]);
+	JetsMV.push_back(JetsV);
+
+
+float met = -1.;
+
+  
 	if (pfmet_usual)
 		{
 		METV.SetPx(met_ex);
 		METV.SetPy(met_ey);
-		float met = sqrt(met_ex*met_ex + met_ey*met_ey);  
+		met = sqrt(met_ex*met_ex + met_ey*met_ey);  
 		}
-*/
+
 
 	if (pfmet_JetEn && EnUp && !pfmet_usual)
 		{
 		METV.SetPx(met_ex_JetEnUp);
 		METV.SetPy(met_ey_JetEnUp);
-		float met = sqrt(met_ex_JetEnUp*met_ex_JetEnUp + met_ey_JetEnUp*met_ey_JetEnUp);      
+		met = sqrt(met_ex_JetEnUp*met_ex_JetEnUp + met_ey_JetEnUp*met_ey_JetEnUp);      
 		}
 
 	if (pfmet_JetEn && !EnUp && !pfmet_usual)
 		{
 		METV.SetPy(met_ey_JetEnDown);
-		float met = sqrt(met_ex_JetEnDown*met_ex_JetEnDown + met_ey_JetEnDown*met_ey_JetEnDown);     
+		met = sqrt(met_ex_JetEnDown*met_ex_JetEnDown + met_ey_JetEnDown*met_ey_JetEnDown);     
 		}
 
 	if (!pfmet_JetEn && EnUp && !pfmet_usual)
 		{
 		METV.SetPx(met_ex_UnclusteredEnUp);
 		METV.SetPy(met_ey_UnclusteredEnUp);
-		float met = sqrt(met_ex_UnclusteredEnUp*met_ex_UnclusteredEnUp + met_ey_UnclusteredEnUp*met_ey_UnclusteredEnUp);     
+		met = sqrt(met_ex_UnclusteredEnUp*met_ex_UnclusteredEnUp + met_ey_UnclusteredEnUp*met_ey_UnclusteredEnUp);     
 		}
 
 	if (!pfmet_JetEn && !EnUp && !pfmet_usual)
 		{
 		METV.SetPx(met_ex_UnclusteredEnDown);
 		METV.SetPy(met_ey_UnclusteredEnDown);
-		float met = sqrt(met_ex_UnclusteredEnDown*met_ex_UnclusteredEnDown + met_ey_UnclusteredEnDown*met_ey_UnclusteredEnDown);
+		met = sqrt(met_ex_UnclusteredEnDown*met_ex_UnclusteredEnDown + met_ey_UnclusteredEnDown*met_ey_UnclusteredEnDown);
 		}
-  
 
 
 		if (abs(mu_count) > 8 || abs(el_count) > 8 || abs(ta_count) >8) continue;
@@ -220,7 +266,9 @@ if(muon_index>-1 && muon_index<8)			MuV.SetPtEtaPhiM(mu_pt[muon_index], mu_eta[m
 if(electron_index>-1 && electron_index<8)		ElV.SetPtEtaPhiM(el_pt[electron_index], el_eta[electron_index], el_phi[electron_index],electronMass);
 if (taus_index>-1 && taus_index<8)			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], ta_phi[taus_index], tauMass);
 
+///////false means that you use Ele_0.15 and Muon_0.2 like the reccommended muel selection  ; true means like the nominal 1lepton channel selection
 
+bool El0p1Mu0p15 = false;
 
 		int iCut = 1;
 
@@ -234,19 +282,21 @@ if (taus_index>-1 && taus_index<8)			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta
 
 		if(muon_index<0 || electron_index<0) continue;
 
-		if ( fabs(mu_dz[muon_index]) > 0.05) continue;
-		if ( fabs(el_dz[electron_index]) > 0.05) continue;
+		//if ( fabs(mu_dz[muon_index]) > 0.05) continue;
+		//if ( fabs(el_dz[electron_index]) > 0.05) continue;
 
 		//if ( (el_relIso[0] < 0.15  && mu_relIso[0] > 0.15) && InvertLeptonIso) continue;
 		//if ( (el_relIso[0] > 0.15  && mu_relIso[0] < 0.15) && InvertLeptonIso) continue;
 		//if (el_relIso[0] > 0.5 && !InvertLeptonIso) continue;
  		//if (mu_relIso[0] > 0.5 && !InvertLeptonIso) continue;
 
-		if ( (el_relIso[0] > 0.15  || mu_relIso[0] > 0.2) && !InvertLeptonIso) continue;
-		if ( (el_relIso[0] < 0.15  && mu_relIso[0] < 0.2) && InvertLeptonIso) continue;
+		if ( !El0p1Mu0p15 && (el_relIso[0] > 0.15  || mu_relIso[0] > 0.2) && !InvertLeptonIso) continue;
+		if ( !El0p1Mu0p15 && (el_relIso[0] < 0.15  && mu_relIso[0] < 0.2) && InvertLeptonIso) continue;
+		if ( !El0p1Mu0p15 && (el_relIso[0] > 0.3 || mu_relIso[0] > 0.4) ) continue;
 
-		if ( el_relIso[0] > 0.3 ) continue;
-		if ( mu_relIso[0] > 0.4 ) continue;
+		if ( El0p1Mu0p15 && (el_relIso[0] > 0.1  || mu_relIso[0] > 0.15) && !InvertLeptonIso) continue;
+		if ( El0p1Mu0p15 && (el_relIso[0] < 0.1  && mu_relIso[0] < 0.15) && InvertLeptonIso) continue;
+		if ( El0p1Mu0p15 && (el_relIso[0] > 0.2 || mu_relIso[0] > 0.3) ) continue;
 
 		///remove from the all_weight the LSF  + TFR + top +trig_weig
 
@@ -270,27 +320,33 @@ if (taus_index>-1 && taus_index<8)			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta
                 iCFCounter[iCut]++;
 		iCut++;
 
-		all_weights *= trig_weight;
+		if (El0p1Mu0p15 )all_weights *= trig_weight_2;
+		if (!El0p1Mu0p15 )all_weights *= trig_weight_1;
 		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
 		CFCounter[iCut]+= all_weights;
 		CFCounter_[iCut]+= all_weights;
                 iCFCounter[iCut]++;
 		iCut++;
 
-		all_weights *= LSF_weight;
+		if (El0p1Mu0p15) all_weights *= LSF_weight_2;
+		if (!El0p1Mu0p15) all_weights *= LSF_weight_1;
+
 		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
 		CFCounter[iCut]+= all_weights;
 		CFCounter_[iCut]+= all_weights;
                 iCFCounter[iCut]++;
 		iCut++;
 
+		double ptN=0;double etaN=0;double FastSF=0;
 
-		//double hip  = HIP_SF(mu_pt[muon_index],mu_eta[muon_index]);
-		//double ptN = histo->GetXaxis()->FindBin(mu_pt[muon_index]);
-		//double etaN = histo->GetYaxis()->FindBin(fabs(mu_eta[muon_index]));
-		//int binNumber = TGr_hip->GetXaxis()->FindBin(mu_eta[muon_index]);
+		ptN = histo->GetXaxis()->FindBin(mu_pt[muon_index]);
+		etaN = histo->GetYaxis()->FindBin(fabs(mu_eta[muon_index]));
+		FastSF = histo->GetBinContent(ptN,etaN);
+	
+	if (isSignal) all_weights *= FastSF;
 		double hip = TGr_hip->Eval(float(mu_eta[muon_index]));
 		all_weights *= hip;
+
 
 		all_weights *= top_weight;
 		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
@@ -321,7 +377,35 @@ if (taus_index>-1 && taus_index<8)			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta
                 iCFCounter[iCut]++;
 		iCut++;
 
-		if (njets!=0 ) continue;
+
+
+		if (isWJ || isDY || isNJ) {
+		
+		METV.SetPx(0.);
+		METV.SetPy(0.);
+		METV.SetPx(met_ex_recoil);
+		METV.SetPy(met_ey_recoil);
+		met=sqrt(met_ex_recoil*met_ex_recoil+met_ey_recoil*met_ey_recoil);
+		}
+
+		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
+		CFCounter[iCut]+= all_weights;
+		CFCounter_[iCut]+= all_weights;
+                iCFCounter[iCut]++;
+		iCut++;
+
+		if (isDY || isDYNJ) all_weights *=zptmassweight;
+		
+
+		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
+		CFCounter[iCut]+= all_weights;
+		CFCounter_[iCut]+= all_weights;
+                iCFCounter[iCut]++;
+		iCut++;
+
+
+
+		if (njets>1 ) continue;
 		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
 		CFCounter[iCut]+= all_weights;
 		CFCounter_[iCut]+= all_weights;
@@ -339,14 +423,13 @@ if (taus_index>-1 && taus_index<8)			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta
      		double dPhi=dPhiFrom2P( DiL.Px(), DiL.Py(), METV.Px(),  METV.Py() );
          	double MT = TMath::Sqrt(2*DiL.Pt()*METV.Pt()*(1-TMath::Cos(dPhi)));
          	double Mass = DiL.M();
-		if (Mass > 20. && Mass < 80. ) continue;
+		if (Mass > 30. && Mass < 100. ) continue;
 		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
 		CFCounter[iCut]+= all_weights;
 		CFCounter_[iCut]+= all_weights;
                 iCFCounter[iCut]++;
 		iCut++;
 
-	
                  double Dr=deltaR(el_eta[electron_index],el_phi[electron_index],
                                         mu_eta[muon_index],mu_phi[muon_index]);
 		if (Dr>3.5) continue;
@@ -356,6 +439,12 @@ if (taus_index>-1 && taus_index<8)			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta
                 iCFCounter[iCut]++;
 		iCut++;
 
+		if (met<20.) continue;
+		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
+		CFCounter[iCut]+= all_weights;
+		CFCounter_[iCut]+= all_weights;
+                iCFCounter[iCut]++;
+		iCut++;
 
 		if (met<30.) continue;
 		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
@@ -371,33 +460,10 @@ if (taus_index>-1 && taus_index<8)			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta
                 iCFCounter[iCut]++;
 		iCut++;
 	
-		if (met<50.) continue;
-		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
-		CFCounter[iCut]+= all_weights;
-		CFCounter_[iCut]+= all_weights;
-                iCFCounter[iCut]++;
-		iCut++;
-		continue;
-
-		double mcta = sqrt( 2*el_pt[electron_index]*mu_pt[muon_index]*(1+cos(el_phi[electron_index]-mu_phi[muon_index])) );
-
-		//cout<<"  "<<mcta<<endl;
-		if (mcta<60) continue;
-		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
-		CFCounter[iCut]+= all_weights;
-		CFCounter_[iCut]+= all_weights;
-                iCFCounter[iCut]++;
-		iCut++;
-		float dzeta = Dzeta(ElV,MuV,METV);
-		if (dzeta<30.) continue;
-		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
-		CFCounter[iCut]+= all_weights;
-		CFCounter_[iCut]+= all_weights;
-                iCFCounter[iCut]++;
-		iCut++;
-		continue;
-		
+	
   }
+
+}
 	float Lumi = 12889.;
 	if (isData) Lumi = 1;
 		 for(int ci = 0; ci < CutNumb; ci++)
