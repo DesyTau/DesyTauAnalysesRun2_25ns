@@ -1260,45 +1260,42 @@ bool dilepton_veto_mt(const Config *cfg,const  AC1B *analysisTree){
 bool dilepton_veto_et(const Config *cfg,const  AC1B *analysisTree){
 
   for (unsigned int ie = 0; ie<analysisTree->electron_count; ++ie) {
-		if (analysisTree->electron_pt[ie]<=cfg->get<float>("ptDiElectronVeto")) continue;
-		if (fabs(analysisTree->electron_eta[ie])>=cfg->get<float>("etaDiElectronVeto")) continue;	
+
+    if (analysisTree->electron_pt[ie]<=cfg->get<float>("ptDiElectronVeto")) continue;
+    if (fabs(analysisTree->electron_eta[ie])>=cfg->get<float>("etaDiElectronVeto")) continue;	
+    if (fabs(analysisTree->electron_dxy[ie])>=cfg->get<float>("dxyDiElectronVeto")) continue;
+    if (fabs(analysisTree->electron_dz[ie])>=cfg->get<float>("dzDiElectronVeto")) continue;
+
+    float absIsoEle =   abs_Iso(ie, "et", analysisTree, cfg->get<float>("dRiso"));
+    float relIsoEle =   rel_Iso(ie, "et", analysisTree, cfg->get<float>("dRiso"));
+    if(relIsoEle >= cfg->get<float>("isoDiElectronVeto")) continue;
 		
-		if (fabs(analysisTree->electron_dxy[ie])>=cfg->get<float>("dxyDiElectronVeto")) continue;
-		if (fabs(analysisTree->electron_dz[ie])>=cfg->get<float>("dzDiElectronVeto")) continue;
-
-		float absIsoEle =   abs_Iso(ie, "et", analysisTree, cfg->get<float>("dRiso"));
-		float relIsoEle =   rel_Iso(ie, "et", analysisTree, cfg->get<float>("dRiso"));
-
-
-		if(relIsoEle >= cfg->get<float>("isoDiElectronVeto")) continue;
+    bool passedVetoId =  analysisTree->electron_cutId_veto_Spring15[ie];
+    if (!passedVetoId && cfg->get<bool>("applyDiElectronVetoId")) continue;
 		
-		bool passedVetoId =  analysisTree->electron_cutId_veto_Spring15[ie];
-		if (!passedVetoId && cfg->get<bool>("applyDiElectronVetoId")) continue;
-		
-		for (unsigned int je = ie+1; je<analysisTree->electron_count; ++je) {
-		  if (analysisTree->electron_pt[je]<=cfg->get<float>("ptDiElectronVeto")) continue;
-		  if (fabs(analysisTree->electron_eta[je])>=cfg->get<float>("etaDiElectronVeto")) continue;	
+    for (unsigned int je = ie+1; je<analysisTree->electron_count; ++je) {
+
+      if (analysisTree->electron_pt[je]<=cfg->get<float>("ptDiElectronVeto")) continue;
+      if (fabs(analysisTree->electron_eta[je])>=cfg->get<float>("etaDiElectronVeto")) continue;	
+      if (fabs(analysisTree->electron_dxy[je])>=cfg->get<float>("dxyDiElectronVeto")) continue;
+      if (fabs(analysisTree->electron_dz[je])>=cfg->get<float>("dzDiElectronVeto")) continue;
 		  
-		  if (fabs(analysisTree->electron_dxy[je])>=cfg->get<float>("dxyDiElectronVeto")) continue;
-		  if (fabs(analysisTree->electron_dz[je])>=cfg->get<float>("dzDiElectronVeto")) continue;
+      float absIsoEle =  abs_Iso(je, "et", analysisTree, cfg->get<float>("dRiso"));
+      float relIsoEle =  rel_Iso(je, "et", analysisTree, cfg->get<float>("dRiso"));
+      if(relIsoEle >= cfg->get<float>("isoDiElectronVeto")) continue;	
+
+      passedVetoId =  analysisTree->electron_cutId_veto_Spring15[je];
+      if (!passedVetoId && cfg->get<bool>("applyDiElectronVetoId")) continue;
+
+      if (analysisTree->electron_charge[ie] * analysisTree->electron_charge[je] > 0. && cfg->get<bool>("applyDiElectronOS")) continue;
 		  
-		  if (analysisTree->electron_charge[ie] * analysisTree->electron_charge[je] > 0. && cfg->get<bool>("applyDiElectronOS")) continue;
+      float dr = deltaR(analysisTree->electron_eta[ie],analysisTree->electron_phi[ie],
+                        analysisTree->electron_eta[je],analysisTree->electron_phi[je]);
 
-			float absIsoEle =  abs_Iso(ie, "et", analysisTree, cfg->get<float>("dRiso"));
-			float relIsoEle = 	rel_Iso(ie, "et", analysisTree, cfg->get<float>("dRiso"));
+      if(dr<=cfg->get<float>("drDiElectronVeto")) continue;
 
-		  if(relIsoEle >= cfg->get<float>("isoDiElectronVeto")) continue;	
-
-		  passedVetoId =  analysisTree->electron_cutId_veto_Spring15[je];
-		  if (!passedVetoId && cfg->get<bool>("applyDiElectronVetoId")) continue;
-		  
-		  float dr = deltaR(analysisTree->electron_eta[ie],analysisTree->electron_phi[ie],
-				    analysisTree->electron_eta[je],analysisTree->electron_phi[je]);
-
-		  if(dr<=cfg->get<float>("drDiElectronVeto")) continue;
-
-		  return(1);
-		}
+      return(1);
+    }
   }
   return(0);
 }
