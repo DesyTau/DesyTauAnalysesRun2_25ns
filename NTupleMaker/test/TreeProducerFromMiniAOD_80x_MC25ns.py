@@ -283,7 +283,8 @@ allMetFilterPaths=['HBHENoiseFilter','HBHENoiseIsoFilter','CSCTightHaloFilter','
 process.initroottree = cms.EDAnalyzer("InitAnalyzer",
 IsData = cms.untracked.bool(isData),
 #IsData = cms.untracked.bool(False),
-GenParticles = cms.untracked.bool(not isData)
+GenParticles = cms.untracked.bool(not isData),
+GenJets = cms.untracked.bool(not isData)
 )
 
 JECfile = "DesyTauAnalyses/NTupleMaker/data/JEC/Spring16_25nsV6/Spring16_25nsV6_MC_Uncertainty_AK4PFchs.txt"
@@ -299,6 +300,7 @@ Skim = cms.untracked.uint32(0),
 JECfile = cms.untracked.string(JECfile),
 # switches of collections
 GenParticles = cms.untracked.bool(not isData),
+GenJets = cms.untracked.bool(not isData),
 SusyInfo = cms.untracked.bool(True),
 Trigger = cms.untracked.bool(True),
 RecPrimVertex = cms.untracked.bool(True),
@@ -349,6 +351,7 @@ PuppiMetCollectionTag = cms.InputTag("slimmedMETsPuppi"),
 MvaMetCollectionsTag = cms.VInputTag(cms.InputTag("MVAMET","MVAMET","TreeProducer")),
 TrackCollectionTag = cms.InputTag("generalTracks"),
 GenParticleCollectionTag = cms.InputTag("prunedGenParticles"),
+GenJetCollectionTag = cms.InputTag("slimmedGenJets"),
 TriggerObjectCollectionTag = cms.InputTag("selectedPatTrigger"),
 BeamSpotCollectionTag =  cms.InputTag("offlineBeamSpot"),
 PVCollectionTag = cms.InputTag("offlineSlimmedPrimaryVertices"),

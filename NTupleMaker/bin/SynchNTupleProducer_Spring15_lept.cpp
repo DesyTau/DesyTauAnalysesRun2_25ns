@@ -79,6 +79,10 @@ struct btag_scaling_inputs{
   TH1F *tagEff_C;
   TH1F *tagEff_Light;
   TRandom3 *rand;
+  int MinBJetPt; 
+  int MaxBJetPt;
+  int MinLJetPt;
+  int MaxLJetPt;
 };
 
 int read_json(std::string filename, lumi_json& json);
@@ -180,7 +184,7 @@ int main(int argc, char * argv[]){
   TH1F  *tagEff_Light = (TH1F*)fileTagging->Get("btag_eff_oth");
   TRandom3 *rand = new TRandom3();
 
-  const struct btag_scaling_inputs inputs_btag_scaling_medium = { reader_B, reader_C, reader_Light, tagEff_B, tagEff_C, tagEff_Light, rand };
+  const struct btag_scaling_inputs inputs_btag_scaling_medium = { reader_B, reader_C, reader_Light, tagEff_B, tagEff_C, tagEff_Light, rand , 30, 670, 20, 1000};
 
   // MET Recoil Corrections
   const bool applyRecoilCorrections = cfg.get<bool>("ApplyRecoilCorrections");
@@ -1222,10 +1226,9 @@ bool dilepton_veto_mt(const Config *cfg,const  AC1B *analysisTree){
     float relIsoMu = rel_Iso(im, "mt", analysisTree, cfg->get<float>("dRiso"));
     if(relIsoMu >= cfg->get<float>("isoDiMuonVeto")) continue;
 		
-    //bool passedVetoId =  analysisTree->muon_isMedium[im]; 
-    bool passedVetoId = isICHEPmed(im, analysisTree);
-    if (!passedVetoId && cfg->get<bool>("applyDiMuonVetoId")) continue;
-    //if (!analysisTree->muon_isGlobal[im] && !analysisTree->muon_isTracker[im] && !analysisTree->muon_isPF[im]) continue;
+    //bool passedVetoId = isICHEPmed(im, analysisTree);
+    //if (!passedVetoId && cfg->get<bool>("applyDiMuonVetoId")) continue;
+    if ( !(analysisTree->muon_isGlobal[im] && analysisTree->muon_isTracker[im] && analysisTree->muon_isPF[im]) ) continue;
     
     for (unsigned int je = im+1; je<analysisTree->muon_count; ++je) {
       
@@ -1240,10 +1243,9 @@ bool dilepton_veto_mt(const Config *cfg,const  AC1B *analysisTree){
       float relIsoMu = 	rel_Iso(je, "mt", analysisTree, cfg->get<float>("dRiso"));
       if(relIsoMu >= cfg->get<float>("isoDiMuonVeto")) continue;	
 
-      //passedVetoId =  analysisTree->muon_isMedium[je];
-      passedVetoId = isICHEPmed(je, analysisTree);
-      if (!passedVetoId && cfg->get<bool>("applyDiMuonVetoId")) continue;
-      //if (!analysisTree->muon_isGlobal[je] && !analysisTree->muon_isTracker[je] && !analysisTree->muon_isPF[je]) continue;
+      //passedVetoId = isICHEPmed(je, analysisTree);
+      //if (!passedVetoId && cfg->get<bool>("applyDiMuonVetoId")) continue;
+      if ( ! (analysisTree->muon_isGlobal[je] && analysisTree->muon_isTracker[je] && analysisTree->muon_isPF[je]) ) continue;
 		  
       float dr = deltaR(analysisTree->muon_eta[im],analysisTree->muon_phi[im],analysisTree->muon_eta[je],analysisTree->muon_phi[je]);
 
@@ -1260,45 +1262,42 @@ bool dilepton_veto_mt(const Config *cfg,const  AC1B *analysisTree){
 bool dilepton_veto_et(const Config *cfg,const  AC1B *analysisTree){
 
   for (unsigned int ie = 0; ie<analysisTree->electron_count; ++ie) {
-		if (analysisTree->electron_pt[ie]<=cfg->get<float>("ptDiElectronVeto")) continue;
-		if (fabs(analysisTree->electron_eta[ie])>=cfg->get<float>("etaDiElectronVeto")) continue;	
+
+    if (analysisTree->electron_pt[ie]<=cfg->get<float>("ptDiElectronVeto")) continue;
+    if (fabs(analysisTree->electron_eta[ie])>=cfg->get<float>("etaDiElectronVeto")) continue;	
+    if (fabs(analysisTree->electron_dxy[ie])>=cfg->get<float>("dxyDiElectronVeto")) continue;
+    if (fabs(analysisTree->electron_dz[ie])>=cfg->get<float>("dzDiElectronVeto")) continue;
+
+    float absIsoEle =   abs_Iso(ie, "et", analysisTree, cfg->get<float>("dRiso"));
+    float relIsoEle =   rel_Iso(ie, "et", analysisTree, cfg->get<float>("dRiso"));
+    if(relIsoEle >= cfg->get<float>("isoDiElectronVeto")) continue;
 		
-		if (fabs(analysisTree->electron_dxy[ie])>=cfg->get<float>("dxyDiElectronVeto")) continue;
-		if (fabs(analysisTree->electron_dz[ie])>=cfg->get<float>("dzDiElectronVeto")) continue;
-
-		float absIsoEle =   abs_Iso(ie, "et", analysisTree, cfg->get<float>("dRiso"));
-		float relIsoEle =   rel_Iso(ie, "et", analysisTree, cfg->get<float>("dRiso"));
-
-
-		if(relIsoEle >= cfg->get<float>("isoDiElectronVeto")) continue;
+    bool passedVetoId =  analysisTree->electron_cutId_veto_Spring15[ie];
+    if (!passedVetoId && cfg->get<bool>("applyDiElectronVetoId")) continue;
 		
-		bool passedVetoId =  analysisTree->electron_cutId_veto_Spring15[ie];
-		if (!passedVetoId && cfg->get<bool>("applyDiElectronVetoId")) continue;
-		
-		for (unsigned int je = ie+1; je<analysisTree->electron_count; ++je) {
-		  if (analysisTree->electron_pt[je]<=cfg->get<float>("ptDiElectronVeto")) continue;
-		  if (fabs(analysisTree->electron_eta[je])>=cfg->get<float>("etaDiElectronVeto")) continue;	
+    for (unsigned int je = ie+1; je<analysisTree->electron_count; ++je) {
+
+      if (analysisTree->electron_pt[je]<=cfg->get<float>("ptDiElectronVeto")) continue;
+      if (fabs(analysisTree->electron_eta[je])>=cfg->get<float>("etaDiElectronVeto")) continue;	
+      if (fabs(analysisTree->electron_dxy[je])>=cfg->get<float>("dxyDiElectronVeto")) continue;
+      if (fabs(analysisTree->electron_dz[je])>=cfg->get<float>("dzDiElectronVeto")) continue;
 		  
-		  if (fabs(analysisTree->electron_dxy[je])>=cfg->get<float>("dxyDiElectronVeto")) continue;
-		  if (fabs(analysisTree->electron_dz[je])>=cfg->get<float>("dzDiElectronVeto")) continue;
+      float absIsoEle =  abs_Iso(je, "et", analysisTree, cfg->get<float>("dRiso"));
+      float relIsoEle =  rel_Iso(je, "et", analysisTree, cfg->get<float>("dRiso"));
+      if(relIsoEle >= cfg->get<float>("isoDiElectronVeto")) continue;	
+
+      passedVetoId =  analysisTree->electron_cutId_veto_Spring15[je];
+      if (!passedVetoId && cfg->get<bool>("applyDiElectronVetoId")) continue;
+
+      if (analysisTree->electron_charge[ie] * analysisTree->electron_charge[je] > 0. && cfg->get<bool>("applyDiElectronOS")) continue;
 		  
-		  if (analysisTree->electron_charge[ie] * analysisTree->electron_charge[je] > 0. && cfg->get<bool>("applyDiElectronOS")) continue;
+      float dr = deltaR(analysisTree->electron_eta[ie],analysisTree->electron_phi[ie],
+                        analysisTree->electron_eta[je],analysisTree->electron_phi[je]);
 
-			float absIsoEle =  abs_Iso(ie, "et", analysisTree, cfg->get<float>("dRiso"));
-			float relIsoEle = 	rel_Iso(ie, "et", analysisTree, cfg->get<float>("dRiso"));
+      if(dr<=cfg->get<float>("drDiElectronVeto")) continue;
 
-		  if(relIsoEle >= cfg->get<float>("isoDiElectronVeto")) continue;	
-
-		  passedVetoId =  analysisTree->electron_cutId_veto_Spring15[je];
-		  if (!passedVetoId && cfg->get<bool>("applyDiElectronVetoId")) continue;
-		  
-		  float dr = deltaR(analysisTree->electron_eta[ie],analysisTree->electron_phi[ie],
-				    analysisTree->electron_eta[je],analysisTree->electron_phi[je]);
-
-		  if(dr<=cfg->get<float>("drDiElectronVeto")) continue;
-
-		  return(1);
-		}
+      return(1);
+    }
   }
   return(0);
 }
@@ -1322,7 +1321,7 @@ bool extra_electron_veto(int leptonIndex, TString ch, const Config *cfg, const A
     if (!analysisTree->electron_pass_conversion[ie] && cfg->get<bool>("applyVetoElectronId")) continue;
     if (analysisTree->electron_nmissinginnerhits[ie]>1 && cfg->get<bool>("applyVetoElectronId")) continue;
 
-    float relIsoEle = rel_Iso(ie, "et", analysisTree, cfg->get<float>("dRisoVetoElectronCut"));
+    float relIsoEle = rel_Iso(ie, "et", analysisTree, cfg->get<float>("dRisoExtraElecVeto"));
     if (relIsoEle>=cfg->get<float>("isoVetoElectronCut")) continue;
 
     return(1);		
@@ -1343,7 +1342,7 @@ bool extra_muon_veto(int leptonIndex, TString ch, const Config *cfg, const AC1B 
     if (fabs(analysisTree->muon_dz[im])>cfg->get<float>("dzVetoMuonCut")) continue;
 
     if (cfg->get<bool>("applyVetoMuonId") && !(isICHEPmed(im, analysisTree))) continue;
-    float relIsoMu = rel_Iso(im, "mt", analysisTree, cfg->get<float>("dRiso"));
+    float relIsoMu = rel_Iso(im, "mt", analysisTree, cfg->get<float>("dRisoExtraMuonVeto"));
     if (relIsoMu>cfg->get<float>("isoVetoMuonCut")) continue;
 
     return(1);
@@ -1524,20 +1523,20 @@ void counting_jets(const AC1B *analysisTree, Spring15Tree *otree, const Config *
 	double tageff          = 1;
 
 	if (flavor==5) {
-	  if (JetPtForBTag>cfg->get<float>("MaxBJetPt")) JetPtForBTag = cfg->get<float>("MaxBJetPt") - 0.1;
-	  if (JetPtForBTag<cfg->get<float>("MinBJetPt")) JetPtForBTag = cfg->get<float>("MinBJetPt") + 0.1;
+	  if (JetPtForBTag>inputs_btag_scaling->MaxBJetPt) JetPtForBTag = inputs_btag_scaling->MaxBJetPt - 0.1;
+	  if (JetPtForBTag<inputs_btag_scaling->MinBJetPt) JetPtForBTag = inputs_btag_scaling->MinBJetPt + 0.1;
 	  jet_scalefactor = inputs_btag_scaling->reader_B.eval_auto_bounds("central",BTagEntry::FLAV_B, absJetEta, JetPtForBTag);
 	  tageff = inputs_btag_scaling->tagEff_B->Interpolate(JetPtForBTag,absJetEta);
 	}
 	else if (flavor==4) {
-	  if (JetPtForBTag>cfg->get<float>("MaxBJetPt")) JetPtForBTag = cfg->get<float>("MaxBJetPt") - 0.1;
-	  if (JetPtForBTag<cfg->get<float>("MinBJetPt")) JetPtForBTag = cfg->get<float>("MinBJetPt") + 0.1;
+	  if (JetPtForBTag>inputs_btag_scaling->MaxBJetPt) JetPtForBTag = inputs_btag_scaling->MaxBJetPt - 0.1;
+	  if (JetPtForBTag<inputs_btag_scaling->MinBJetPt) JetPtForBTag = inputs_btag_scaling->MinBJetPt + 0.1;
 	  jet_scalefactor = inputs_btag_scaling->reader_C.eval_auto_bounds("central",BTagEntry::FLAV_C, absJetEta, JetPtForBTag);
 	  tageff = inputs_btag_scaling->tagEff_C->Interpolate(JetPtForBTag,absJetEta);
 	}
 	else {
-	  if (JetPtForBTag>cfg->get<float>("MaxLJetPt")) JetPtForBTag = cfg->get<float>("MaxLJetPt") - 0.1;
-	  if (JetPtForBTag<cfg->get<float>("MinLJetPt")) JetPtForBTag = cfg->get<float>("MinLJetPt") + 0.1;
+	  if (JetPtForBTag>inputs_btag_scaling->MaxLJetPt) JetPtForBTag = inputs_btag_scaling->MaxLJetPt - 0.1;
+	  if (JetPtForBTag<inputs_btag_scaling->MinLJetPt) JetPtForBTag = inputs_btag_scaling->MinLJetPt + 0.1;
 	  jet_scalefactor = inputs_btag_scaling->reader_Light.eval_auto_bounds("central",BTagEntry::FLAV_UDSG, absJetEta, JetPtForBTag);
 	  tageff = inputs_btag_scaling->tagEff_Light->Interpolate(JetPtForBTag,absJetEta);
 	}
