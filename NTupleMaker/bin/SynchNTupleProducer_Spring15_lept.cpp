@@ -886,6 +886,8 @@ int main(int argc, char * argv[]){
       otree->pt_sv  = -9999;
       otree->eta_sv = -9999;
       otree->phi_sv = -9999;
+	  otree->met_sv = -9999;
+	  otree->mt_sv = -9999;
 
       //calculate SV fit only for events passing baseline selection and mt cut
       // for synchronisation, take all events
