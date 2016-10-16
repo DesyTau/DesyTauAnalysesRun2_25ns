@@ -198,12 +198,17 @@ TH2D *histo = (TH2D*) obj;
 		nb = fChain->GetEntry(jentry);   nbytes += nb;
 		float all_weights = 1.;
 
+		float charge_ =el_charge[electron_index]  * mu_charge[muon_index];
+
+		if ( charge_ < 0. && Sign == "SS") continue;
+		if ( charge_ > 0. && Sign == "OS") continue;
+
 		if ( jentry%100000 ==0 ) cout<<" working for you...processed " <<jentry<<" events from "<<nentries<<" dataset "<<datasetName->c_str()<<" weight "<<all_weights<< endl;
 
 		if (isWJ && (npartons>0 && npartons<5)) continue;
 
 		//if (isDY && (npartons>0 && npartons<5)) continue;
-		if ( (isDYhigh || isDYNJ)  && !isDYlow && (npartons>0 && npartons<5)) continue;
+		if ( isDYhigh && npartons>0 && npartons<5) continue;
 
 		if (isData && met_flag<0.5) continue;	
 
@@ -268,7 +273,7 @@ if (taus_index>-1 && taus_index<8)			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta
 
 ///////false means that you use Ele_0.15 and Muon_0.2 like the reccommended muel selection  ; true means like the nominal 1lepton channel selection
 
-bool El0p1Mu0p15 = false;
+bool El0p1Mu0p15 = true;
 
 		int iCut = 1;
 
@@ -303,10 +308,6 @@ bool El0p1Mu0p15 = false;
 		if ( fabs(el_charge[electron_index]) !=1 ) continue;
 		if ( fabs(mu_charge[muon_index]) !=1 ) continue;
 
-		float charge_ =el_charge[electron_index]  * mu_charge[muon_index];
-
-		if ( charge_ < 0. && Sign == "SS") continue;
-		if ( charge_ > 0. && Sign == "OS") continue;
 
 		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
 		CFCounter[iCut]+= all_weights;
@@ -322,6 +323,7 @@ bool El0p1Mu0p15 = false;
 
 		if (El0p1Mu0p15 )all_weights *= trig_weight_2;
 		if (!El0p1Mu0p15 )all_weights *= trig_weight_1;
+
 		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
 		CFCounter[iCut]+= all_weights;
 		CFCounter_[iCut]+= all_weights;

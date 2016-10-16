@@ -535,8 +535,8 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       bool isZMM = false;
       bool isZEE = false;
       bool isTOP = false;
-      if (!isData &&  string::npos != filen.find("JetsToLNu") ) isW=true;
-      if (!isData &&  string::npos != filen.find("JetsToLL_M") )  isDY=true;
+      if (!isData &&  string::npos != filen.find("ToLNu") ) isW=true;
+      if (!isData &&  string::npos != filen.find("ToLL_M") )  isDY=true;
       if (!isData &&  string::npos != filen.find("TT_TuneCUETP8M1_13TeV-powheg-pythia8") ) isTOP=true;
 
       float nuPx = 0;
@@ -1328,7 +1328,6 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       float bJetEtaCut = jetEta;
 
       vector<unsigned int> jets; jets.clear();
-      vector<unsigned int> jetspt20; jetspt20.clear();
       vector<unsigned int> bjets; bjets.clear();
       vector<unsigned int> bjets_nocleaned; bjets_nocleaned.clear();
 
@@ -1472,7 +1471,6 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
       njets = jets.size();
       jet_count = jets.size();
-      //njetspt20 = jetspt20.size();
       nbtag = bjets.size();
       //nbtag_nocleaned = bjets_nocleaned.size();
 

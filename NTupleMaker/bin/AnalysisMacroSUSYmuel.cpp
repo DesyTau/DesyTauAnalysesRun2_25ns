@@ -1290,6 +1290,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	
 	if(extraelec_veto || extramuon_veto)   event_thirdLeptonVeto = true;
 
+	if (event_thirdLeptonVeto) continue;
 
 
 ///////////////Trigger weight 
@@ -1334,7 +1335,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	/*if(!isData && trigWeightMC>1e-6){
 	trigweight = trigWeightData / trigWeightMC;*/
 	if (!isData){
-	trigweight_1 = trigWeightData1;
+	trig_weight_1 = trigWeightData1;
 
 //	weight *= trigweight_1;
 	}
@@ -1356,7 +1357,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
 
 	if (!isData){
-	trigweight_2 = trigWeightData2;
+	trig_weight_2 = trigWeightData2;
 
 //	weight *= trigweight_1;
 	}

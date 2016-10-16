@@ -213,11 +213,15 @@ TH2D *histo = (TH2D*) obj;
 		nb = fChain->GetEntry(jentry);   nbytes += nb;
 		float all_weights = 1.;
 
+		float charge_ =mu_charge[muon_index_1]  * mu_charge[muon_index_2];
+
+		if ( charge_ < 0. && Sign == "SS") continue;
+		if ( charge_ > 0. && Sign == "OS") continue;
 		if ( jentry%100000 ==0 ) cout<<" working for you...processed " <<jentry<<" events from "<<nentries<<" dataset "<<datasetName->c_str()<<" weight "<<all_weights<< endl;
 
 		if (isWJ && (npartons>0 && npartons<5)) continue;
 
-		if ( (isDYhigh || isDYNJ)  && !isDYlow && (npartons>0 && npartons<5)) continue;
+		if ( isDYhigh && (npartons>0 && npartons<5)) continue;
 
 		if (isData && met_flag<0.5) continue;	
 
@@ -228,8 +232,14 @@ TH2D *histo = (TH2D*) obj;
 			JetsV.SetPxPyPzE(0.,0.,0.,0.);
 			LeptV1.SetPxPyPzE(0.,0.,0.,0.);
 			LeptV2.SetPxPyPzE(0.,0.,0.,0.);
-	for (int nj=0;nj<njets;++nj) {JetsV.SetPxPyPzE(jet_px[jets_cleaned[nj]], jet_py[jets_cleaned[nj]],jet_pz[jets_cleaned[nj]],jet_e[jets_cleaned[nj]]);
+
+	for (int nj=0;nj<njets;++nj) {
+
+	int jet_index = jets_cleaned[nj+1];
+
+	JetsV.SetPxPyPzE(jet_px[jet_index], jet_py[jet_index],jet_pz[jet_index],jet_e[jet_index]);
 	JetsMV.push_back(JetsV);
+
 }
 
 
@@ -311,10 +321,6 @@ if(muon_index_2>-1 && muon_index_2<8)			LeptV2.SetPtEtaPhiM(mu_pt[muon_index_2],
 		if ( fabs(mu_charge[muon_index_1]) !=1 ) continue;
 		if ( fabs(mu_charge[muon_index_2]) !=1 ) continue;
 
-		float charge_ =mu_charge[muon_index_1]  * mu_charge[muon_index_2];
-
-		if ( charge_ < 0. && Sign == "SS") continue;
-		if ( charge_ > 0. && Sign == "OS") continue;
 
 		FillHistsDiL(iCut, all_weights, LeptV2, LeptV1, JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index_1,muon_index_2);
 		CFCounter[iCut]+= all_weights;
