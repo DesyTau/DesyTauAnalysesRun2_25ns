@@ -248,7 +248,11 @@ void ModTDRStyle(int width, int height, double t, double b, double l,
 //  gStyle->SetLegendFillColor(0);
 //  gStyle->SetFillColor(0);
 
+<<<<<<< HEAD
 //  gROOT->ForceStyle();
+=======
+  gROOT->ForceStyle();
+>>>>>>> f982da348b2eceb30a76da0b42c4fb9b24c4d26d
 }
 
 void ModTDRStyle() { ModTDRStyle(600, 600, 0.06, 0.12, 0.16, 0.04); }

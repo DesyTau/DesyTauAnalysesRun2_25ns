@@ -23,9 +23,7 @@
 #include "TMath.h"
 #include "TCanvas.h"
 #include "TError.h"
-
 #include "TLorentzVector.h"
-
 #include "TRandom.h"
 
 #include "RooRealVar.h"
@@ -47,6 +45,9 @@
 #include <boost/foreach.hpp>
 
 #include "FWCore/ParameterSet/interface/FileInPath.h"
+
+#include "CondFormats/BTauObjects/interface/BTagCalibration.h"
+#include "CondTools/BTau/interface/BTagCalibrationReader.h"
 
 #define pi 	3.14159265358979312
 #define d2r 1.74532925199432955e-02
@@ -70,6 +71,20 @@ struct compare_lumi { //accepts two pairs, return 1 if left.first < right.first 
   }
 };
 
+struct btag_scaling_inputs{
+  BTagCalibrationReader reader_B;
+  BTagCalibrationReader reader_C;
+  BTagCalibrationReader reader_Light;
+  TH1F *tagEff_B;
+  TH1F *tagEff_C;
+  TH1F *tagEff_Light;
+  TRandom3 *rand;
+  int MinBJetPt; 
+  int MaxBJetPt;
+  int MinLJetPt;
+  int MaxLJetPt;
+};
+
 int read_json(std::string filename, lumi_json& json);
 bool isGoodLumi(const std::pair<int, int>& lumi, const lumi_json& json);
 bool isGoodLumi(int run, int lumi, const lumi_json& json);
@@ -85,7 +100,7 @@ bool extra_electron_veto(int leptonIndex, TString ch, const Config *cfg, const A
 bool extra_muon_veto(int leptonIndex, TString ch, const Config *cfg, const AC1B *analysisTree);
 void fillMET(TString ch, int leptonIndex, int tauIndex, const AC1B * analysisTree, Spring15Tree *otree);
 void mt_calculation(Spring15Tree *otree);
-void counting_jets(const AC1B *analysisTree, Spring15Tree *otree, const Config *cfg);
+void counting_jets(const AC1B *analysisTree, Spring15Tree *otree, const Config *cfg, const btag_scaling_inputs *inputs);
 void svfit_variables(const AC1B *analysisTree, Spring15Tree *otree, const Config *cfg);
 bool isICHEPmed(int Index, const AC1B * analysisTree);
 
@@ -153,10 +168,29 @@ int main(int argc, char * argv[]){
   //svfit
   const string svFitPtResFile = cfg.get<string>("svFitPtResFile");
 
+  //b-tag scale factors
+  BTagCalibration calib("csvv2", cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/CSVv2_ichep.csv");
+  BTagCalibrationReader reader_B(BTagEntry::OP_MEDIUM,"central");
+  BTagCalibrationReader reader_C(BTagEntry::OP_MEDIUM,"central");
+  BTagCalibrationReader reader_Light(BTagEntry::OP_MEDIUM,"central");
+  reader_B.load(calib,BTagEntry::FLAV_B,"comb");
+  reader_C.load(calib,BTagEntry::FLAV_C,"comb");
+  reader_Light.load(calib,BTagEntry::FLAV_UDSG,"incl");
+
+  TFile *fileTagging  = new TFile(TString(cmsswBase)+TString("/src/DesyTauAnalyses/NTupleMaker/data/tagging_efficiencies_ichep2016.root"));
+
+  TH1F  *tagEff_B     = (TH1F*)fileTagging->Get("btag_eff_b");
+  TH1F  *tagEff_C     = (TH1F*)fileTagging->Get("btag_eff_c");
+  TH1F  *tagEff_Light = (TH1F*)fileTagging->Get("btag_eff_oth");
+  TRandom3 *rand = new TRandom3();
+
+  const struct btag_scaling_inputs inputs_btag_scaling_medium = { reader_B, reader_C, reader_Light, tagEff_B, tagEff_C, tagEff_Light, rand , 30, 670, 20, 1000};
+
   // MET Recoil Corrections
   const bool applyRecoilCorrections = cfg.get<bool>("ApplyRecoilCorrections");
   const bool isDY = infiles.find("DY") == infiles.rfind("/")+1;
   const bool isWJets = (infiles.find("WJets") == infiles.rfind("/")+1) || (infiles.find("W1Jets") == infiles.rfind("/")+1) || (infiles.find("W2Jets") == infiles.rfind("/")+1) || (infiles.find("W3Jets") == infiles.rfind("/")+1) || (infiles.find("W4Jets") == infiles.rfind("/")+1) ;
+  const bool isVBForGGHiggs = (infiles.find("VBFHToTauTau")== infiles.rfind("/")+1) || (infiles.find("GluGluHToTauTau")== infiles.rfind("/")+1);
   const bool isMG = infiles.find("madgraph") != string::npos;
   //const bool applyRecoilCorrections = isDY || isWJets;
   
@@ -715,8 +749,63 @@ int main(int argc, char * argv[]){
 
       otree->effweight = (otree->trigweight_1)*(otree->idisoweight_1)*(otree->trigweight_2)*(otree->idisoweight_2);
 
+      //counting jet
+      counting_jets(&analysisTree, otree, &cfg, &inputs_btag_scaling_medium);
       //MET
       fillMET(ch, leptonIndex, tauIndex, &analysisTree, otree);
+
+      TLorentzVector genV( 0., 0., 0., 0.);
+      TLorentzVector genL( 0., 0., 0., 0.);
+
+      // Zpt weight
+	  otree->zptweight = 1.;
+      if (!isData && isDY && isMG ) {
+        genV = genTools::genV(analysisTree); // gen Z boson ?
+        otree->zptweight = h_zptweight->GetBinContent(h_zptweight->GetXaxis()->FindBin(genV.M()),h_zptweight->GetYaxis()->FindBin(genV.Pt()));
+	  }
+
+      ////////////////////////////////////////////////////////////
+      // MET Recoil Corrections
+      ////////////////////////////////////////////////////////////
+
+      otree->njetshad = otree->njets;
+      if (!isData && applyRecoilCorrections && (isDY || isWJets) ){
+				genV = genTools::genV(analysisTree);
+				genL = genTools::genL(analysisTree);
+				otree->njetshad = genTools::nJetsHad(analysisTree);
+      }
+
+      // MVA MET      
+      // // njetshad, genVis, quantile map correction
+	  genTools::RecoilCorrections( *recoilMvaMetCorrector, (!isData && applyRecoilCorrections && (isDY || isWJets)) * genTools::QuantileRemap,
+			                     otree->mvamet, otree->mvametphi,
+			                     genV.Px(), genV.Py(),
+			                     genL.Px(), genL.Py(),
+			                     otree->njetshad,
+			                     otree->mvamet_rcmr, otree->mvametphi_rcmr
+			                     );
+
+      // overwriting with recoil-corrected values 
+      otree->mvamet = otree->mvamet_rcmr;
+      otree->mvametphi = otree->mvametphi_rcmr;            
+	  //otree->mt_rcmr_1 = calc::mt(otree->pt_1, otree->phi_1, otree->mvamet_rcmr, otree->mvametphi_rcmr);
+	  //otree->mt_rcmr_2 = calc::mt(otree->pt_2, otree->phi_2, otree->mvamet_rcmr, otree->mvametphi_rcmr);     
+      //otree->pzetamiss_rcmr = calc::pzetamiss( zetaX, zetaY, otree->mvamet_rcmr, otree->mvametphi_rcmr);
+
+      // PF MET
+	  genTools::RecoilCorrections( *recoilPFMetCorrector, (!isData && applyRecoilCorrections && (isDY || isWJets)) * genTools::QuantileRemap,
+			                     otree->met, otree->metphi,
+			                     genV.Px(), genV.Py(),
+			                     genL.Px(), genL.Py(),
+			                     otree->njetshad,
+			                     otree->met_rcmr, otree->metphi_rcmr
+			                     );
+
+      // overwriting with recoil-corrected values 
+      otree->met = otree->met_rcmr;
+      otree->metphi = otree->metphi_rcmr;   
+
+      //end MET Recoil Corrections
 
       //ditau sytem
       TLorentzVector tauLV; tauLV.SetXYZM(analysisTree.tau_px[tauIndex],
@@ -792,50 +881,39 @@ int main(int argc, char * argv[]){
 
       otree->pzetavis  = vectorVisX*zetaX + vectorVisY*zetaY;
       otree->pzetamiss = otree->mvamet*TMath::Cos(otree->mvametphi)*zetaX + otree->mvamet*TMath::Sin(otree->mvametphi)*zetaY;
-      otree->pfpzetamiss = analysisTree.pfmet_ex*zetaX + analysisTree.pfmet_ey*zetaY;      
-      otree->puppipzetamiss = analysisTree.puppimet_ex*zetaX + analysisTree.puppimet_ey*zetaY;
+      //otree->pfpzetamiss = analysisTree.pfmet_ex*zetaX + analysisTree.pfmet_ey*zetaY; // this is not recoil-corrected  
+      otree->pfpzetamiss = calc::pzetamiss( zetaX, zetaY, otree->met, otree->metphi);   
+      otree->puppipzetamiss = analysisTree.puppimet_ex*zetaX + analysisTree.puppimet_ey*zetaY;  // this is not recoil-corrected  
 
-      //counting jet
-      counting_jets(&analysisTree, otree, &cfg);
-      // svfit
-      if(ApplySVFit) svfit_variables(&analysisTree, otree, &cfg);
+      // svfit variables
+  	  otree->m_sv   = -9999;
+      otree->pt_sv  = -9999;
+      otree->eta_sv = -9999;
+      otree->phi_sv = -9999;
+	  otree->met_sv = -9999;
+	  otree->mt_sv = -9999;
 
-      ////////////////////////////////////////////////////////////
-      // MET Recoil Corrections
-      ////////////////////////////////////////////////////////////
-
-      TLorentzVector genV( 0., 0., 0., 0.);
-      TLorentzVector genL( 0., 0., 0., 0.);
-
-      otree->njetshad = otree->njets;
-      if (!isData && applyRecoilCorrections && (isDY || isWJets) ){
-				genV = genTools::genV(analysisTree);
-				genL = genTools::genL(analysisTree);
-				otree->njetshad = genTools::nJetsHad(analysisTree);
+      //calculate SV fit only for events passing baseline selection and mt cut
+      // for synchronisation, take all events
+      const bool Synch = cfg.get<bool>("Synch"); 
+	  bool calculateSVFit = false; 
+	  if (Synch) calculateSVFit = true;       
+	  else if (ApplySVFit && ch=="mt"){
+          calculateSVFit = (otree->mt_1<60 && otree->iso_1<0.15 && otree->byTightIsolationMVArun2v1DBoldDMwLT_2>0.5 && 
+                            otree->againstElectronVLooseMVA6_2>0.5 && otree->againstMuonTight3_2>0.5  &&
+                            otree->dilepton_veto == 0 && otree->extraelec_veto == 0 && otree->extramuon_veto == 0);
       }
 
-      // MVA MET      
-			// // njetshad, genVis, mean-resolution correction
-			genTools::RecoilCorrections( *recoilMvaMetCorrector, (!isData && applyRecoilCorrections && (isDY || isWJets)) * genTools::QuantileRemap,
-			                     otree->mvamet, otree->mvametphi,
-			                     genV.Px(), genV.Py(),
-			                     genL.Px(), genL.Py(),
-			                     otree->njetshad,
-			                     otree->mvamet_rcmr, otree->mvametphi_rcmr
-			                     );
-			             
-			otree->mt_rcmr_1 = calc::mt(otree->pt_1, otree->phi_1, otree->mvamet_rcmr, otree->mvametphi_rcmr);
-			otree->mt_rcmr_2 = calc::mt(otree->pt_2, otree->phi_2, otree->mvamet_rcmr, otree->mvametphi_rcmr);     
-			otree->pzetamiss_rcmr = calc::pzetamiss( zetaX, zetaY, otree->mvamet_rcmr, otree->mvametphi_rcmr);
+      else if (ApplySVFit && ch == "et"){
+          calculateSVFit = (otree->mt_1<60 && otree->iso_1<0.1 && otree->byTightIsolationMVArun2v1DBoldDMwLT_2>0.5 && 
+                            otree->againstMuonLoose3_2>0.5 && otree->againstElectronTightMVA6_2>0.5 && 
+                            otree->dilepton_veto == 0 && otree->extraelec_veto == 0 && otree->extramuon_veto == 0);
+      }
 
-			//end MET Recoil Corrections
 
-      // Zpt weight
-	  otree->zptweight = 1.;
-      if (!isData && isDY && isMG ) {
-        genV = genTools::genV(analysisTree); // gen Z boson ?
-        otree->zptweight = h_zptweight->GetBinContent(h_zptweight->GetXaxis()->FindBin(genV.M()),h_zptweight->GetYaxis()->FindBin(genV.Pt()));
-	  }
+
+      // svfit
+      if(ApplySVFit && calculateSVFit) svfit_variables(&analysisTree, otree, &cfg);
 
       otree->Fill();
       selEvents++;
@@ -1148,10 +1226,9 @@ bool dilepton_veto_mt(const Config *cfg,const  AC1B *analysisTree){
     float relIsoMu = rel_Iso(im, "mt", analysisTree, cfg->get<float>("dRiso"));
     if(relIsoMu >= cfg->get<float>("isoDiMuonVeto")) continue;
 		
-    //bool passedVetoId =  analysisTree->muon_isMedium[im]; 
-    bool passedVetoId = isICHEPmed(im, analysisTree);
-    if (!passedVetoId && cfg->get<bool>("applyDiMuonVetoId")) continue;
-    //if (!analysisTree->muon_isGlobal[im] && !analysisTree->muon_isTracker[im] && !analysisTree->muon_isPF[im]) continue;
+    //bool passedVetoId = isICHEPmed(im, analysisTree);
+    //if (!passedVetoId && cfg->get<bool>("applyDiMuonVetoId")) continue;
+    if ( !(analysisTree->muon_isGlobal[im] && analysisTree->muon_isTracker[im] && analysisTree->muon_isPF[im]) ) continue;
     
     for (unsigned int je = im+1; je<analysisTree->muon_count; ++je) {
       
@@ -1166,10 +1243,9 @@ bool dilepton_veto_mt(const Config *cfg,const  AC1B *analysisTree){
       float relIsoMu = 	rel_Iso(je, "mt", analysisTree, cfg->get<float>("dRiso"));
       if(relIsoMu >= cfg->get<float>("isoDiMuonVeto")) continue;	
 
-      //passedVetoId =  analysisTree->muon_isMedium[je];
-      passedVetoId = isICHEPmed(je, analysisTree);
-      if (!passedVetoId && cfg->get<bool>("applyDiMuonVetoId")) continue;
-      //if (!analysisTree->muon_isGlobal[je] && !analysisTree->muon_isTracker[je] && !analysisTree->muon_isPF[je]) continue;
+      //passedVetoId = isICHEPmed(je, analysisTree);
+      //if (!passedVetoId && cfg->get<bool>("applyDiMuonVetoId")) continue;
+      if ( ! (analysisTree->muon_isGlobal[je] && analysisTree->muon_isTracker[je] && analysisTree->muon_isPF[je]) ) continue;
 		  
       float dr = deltaR(analysisTree->muon_eta[im],analysisTree->muon_phi[im],analysisTree->muon_eta[je],analysisTree->muon_phi[je]);
 
@@ -1186,45 +1262,42 @@ bool dilepton_veto_mt(const Config *cfg,const  AC1B *analysisTree){
 bool dilepton_veto_et(const Config *cfg,const  AC1B *analysisTree){
 
   for (unsigned int ie = 0; ie<analysisTree->electron_count; ++ie) {
-		if (analysisTree->electron_pt[ie]<=cfg->get<float>("ptDiElectronVeto")) continue;
-		if (fabs(analysisTree->electron_eta[ie])>=cfg->get<float>("etaDiElectronVeto")) continue;	
+
+    if (analysisTree->electron_pt[ie]<=cfg->get<float>("ptDiElectronVeto")) continue;
+    if (fabs(analysisTree->electron_eta[ie])>=cfg->get<float>("etaDiElectronVeto")) continue;	
+    if (fabs(analysisTree->electron_dxy[ie])>=cfg->get<float>("dxyDiElectronVeto")) continue;
+    if (fabs(analysisTree->electron_dz[ie])>=cfg->get<float>("dzDiElectronVeto")) continue;
+
+    float absIsoEle =   abs_Iso(ie, "et", analysisTree, cfg->get<float>("dRiso"));
+    float relIsoEle =   rel_Iso(ie, "et", analysisTree, cfg->get<float>("dRiso"));
+    if(relIsoEle >= cfg->get<float>("isoDiElectronVeto")) continue;
 		
-		if (fabs(analysisTree->electron_dxy[ie])>=cfg->get<float>("dxyDiElectronVeto")) continue;
-		if (fabs(analysisTree->electron_dz[ie])>=cfg->get<float>("dzDiElectronVeto")) continue;
-
-		float absIsoEle =   abs_Iso(ie, "et", analysisTree, cfg->get<float>("dRiso"));
-		float relIsoEle =   rel_Iso(ie, "et", analysisTree, cfg->get<float>("dRiso"));
-
-
-		if(relIsoEle >= cfg->get<float>("isoDiElectronVeto")) continue;
+    bool passedVetoId =  analysisTree->electron_cutId_veto_Spring15[ie];
+    if (!passedVetoId && cfg->get<bool>("applyDiElectronVetoId")) continue;
 		
-		bool passedVetoId =  analysisTree->electron_cutId_veto_Spring15[ie];
-		if (!passedVetoId && cfg->get<bool>("applyDiElectronVetoId")) continue;
-		
-		for (unsigned int je = ie+1; je<analysisTree->electron_count; ++je) {
-		  if (analysisTree->electron_pt[je]<=cfg->get<float>("ptDiElectronVeto")) continue;
-		  if (fabs(analysisTree->electron_eta[je])>=cfg->get<float>("etaDiElectronVeto")) continue;	
+    for (unsigned int je = ie+1; je<analysisTree->electron_count; ++je) {
+
+      if (analysisTree->electron_pt[je]<=cfg->get<float>("ptDiElectronVeto")) continue;
+      if (fabs(analysisTree->electron_eta[je])>=cfg->get<float>("etaDiElectronVeto")) continue;	
+      if (fabs(analysisTree->electron_dxy[je])>=cfg->get<float>("dxyDiElectronVeto")) continue;
+      if (fabs(analysisTree->electron_dz[je])>=cfg->get<float>("dzDiElectronVeto")) continue;
 		  
-		  if (fabs(analysisTree->electron_dxy[je])>=cfg->get<float>("dxyDiElectronVeto")) continue;
-		  if (fabs(analysisTree->electron_dz[je])>=cfg->get<float>("dzDiElectronVeto")) continue;
+      float absIsoEle =  abs_Iso(je, "et", analysisTree, cfg->get<float>("dRiso"));
+      float relIsoEle =  rel_Iso(je, "et", analysisTree, cfg->get<float>("dRiso"));
+      if(relIsoEle >= cfg->get<float>("isoDiElectronVeto")) continue;	
+
+      passedVetoId =  analysisTree->electron_cutId_veto_Spring15[je];
+      if (!passedVetoId && cfg->get<bool>("applyDiElectronVetoId")) continue;
+
+      if (analysisTree->electron_charge[ie] * analysisTree->electron_charge[je] > 0. && cfg->get<bool>("applyDiElectronOS")) continue;
 		  
-		  if (analysisTree->electron_charge[ie] * analysisTree->electron_charge[je] > 0. && cfg->get<bool>("applyDiElectronOS")) continue;
+      float dr = deltaR(analysisTree->electron_eta[ie],analysisTree->electron_phi[ie],
+                        analysisTree->electron_eta[je],analysisTree->electron_phi[je]);
 
-			float absIsoEle =  abs_Iso(ie, "et", analysisTree, cfg->get<float>("dRiso"));
-			float relIsoEle = 	rel_Iso(ie, "et", analysisTree, cfg->get<float>("dRiso"));
+      if(dr<=cfg->get<float>("drDiElectronVeto")) continue;
 
-		  if(relIsoEle >= cfg->get<float>("isoDiElectronVeto")) continue;	
-
-		  passedVetoId =  analysisTree->electron_cutId_veto_Spring15[je];
-		  if (!passedVetoId && cfg->get<bool>("applyDiElectronVetoId")) continue;
-		  
-		  float dr = deltaR(analysisTree->electron_eta[ie],analysisTree->electron_phi[ie],
-				    analysisTree->electron_eta[je],analysisTree->electron_phi[je]);
-
-		  if(dr<=cfg->get<float>("drDiElectronVeto")) continue;
-
-		  return(1);
-		}
+      return(1);
+    }
   }
   return(0);
 }
@@ -1248,7 +1321,7 @@ bool extra_electron_veto(int leptonIndex, TString ch, const Config *cfg, const A
     if (!analysisTree->electron_pass_conversion[ie] && cfg->get<bool>("applyVetoElectronId")) continue;
     if (analysisTree->electron_nmissinginnerhits[ie]>1 && cfg->get<bool>("applyVetoElectronId")) continue;
 
-    float relIsoEle = rel_Iso(ie, ch, analysisTree, cfg->get<float>("dRisoVetoElectronCut"));
+    float relIsoEle = rel_Iso(ie, "et", analysisTree, cfg->get<float>("dRisoExtraElecVeto"));
     if (relIsoEle>=cfg->get<float>("isoVetoElectronCut")) continue;
 
     return(1);		
@@ -1269,7 +1342,7 @@ bool extra_muon_veto(int leptonIndex, TString ch, const Config *cfg, const AC1B 
     if (fabs(analysisTree->muon_dz[im])>cfg->get<float>("dzVetoMuonCut")) continue;
 
     if (cfg->get<bool>("applyVetoMuonId") && !(isICHEPmed(im, analysisTree))) continue;
-    float relIsoMu = rel_Iso(im, ch, analysisTree, cfg->get<float>("dRiso"));
+    float relIsoMu = rel_Iso(im, "mt", analysisTree, cfg->get<float>("dRisoExtraMuonVeto"));
     if (relIsoMu>cfg->get<float>("isoVetoMuonCut")) continue;
 
     return(1);
@@ -1282,12 +1355,6 @@ bool extra_muon_veto(int leptonIndex, TString ch, const Config *cfg, const AC1B 
 
 //fill the otree with the met variables
 void fillMET(TString ch, int leptonIndex, int tauIndex, const AC1B * analysisTree, Spring15Tree *otree){
-
-  // svfit variables
-  otree->m_sv   = -9999;
-  otree->pt_sv  = -9999;
-  otree->eta_sv = -9999;
-  otree->phi_sv = -9999;
 
    // pfmet variables
   otree->met = TMath::Sqrt(analysisTree->pfmet_ex*analysisTree->pfmet_ex + analysisTree->pfmet_ey*analysisTree->pfmet_ey);
@@ -1387,7 +1454,7 @@ void mt_calculation(Spring15Tree *otree){
   otree->puppimt_2 = sqrt(2*otree->pt_2*otree->puppimet*(1.-cos(otree->phi_2-otree->puppimetphi)));
 }
 
-void counting_jets(const AC1B *analysisTree, Spring15Tree *otree, const Config *cfg){
+void counting_jets(const AC1B *analysisTree, Spring15Tree *otree, const Config *cfg, const btag_scaling_inputs *inputs_btag_scaling){
 
   vector<unsigned int> jets; jets.clear();
   vector<unsigned int> jetspt20; jetspt20.clear();
@@ -1407,6 +1474,7 @@ void counting_jets(const AC1B *analysisTree, Spring15Tree *otree, const Config *
 
   for (unsigned int jet=0; jet<analysisTree->pfjet_count; ++jet) {
 
+    float jetEta    = analysisTree->pfjet_eta[jet];
     float absJetEta = fabs(analysisTree->pfjet_eta[jet]);
     if (absJetEta>=cfg->get<float>("JetEtaCut")) continue;
 
@@ -1443,22 +1511,65 @@ void counting_jets(const AC1B *analysisTree, Spring15Tree *otree, const Config *
 
     jetspt20.push_back(jet);
 
-    if (absJetEta<cfg->get<float>("bJetEtaCut") && analysisTree->pfjet_btag[jet][0]>cfg->get<float>("btagCut")) { // b-jet
-      bjets.push_back(jet);
+    if (absJetEta < cfg->get<float>("bJetEtaCut")) { // jet within b-tagging acceptance
+      
+      bool tagged = ( analysisTree->pfjet_btag[jet][0]>cfg->get<float>("btagCut") );
 
-      if (indexLeadingBJet>=0) {
-	if (jetPt<ptLeadingBJet && jetPt>ptSubLeadingBJet) {
-	  indexSubLeadingBJet = jet;
-	  ptSubLeadingBJet = jetPt;
+      if(!cfg->get<bool>("isData")  && cfg->get<bool>("ApplyBTagScaling")) {
+
+	int flavor = abs(analysisTree->pfjet_flavour[jet]);
+	double jet_scalefactor = 1;
+	double JetPtForBTag    = jetPt;
+	double tageff          = 1;
+
+	if (flavor==5) {
+	  if (JetPtForBTag>inputs_btag_scaling->MaxBJetPt) JetPtForBTag = inputs_btag_scaling->MaxBJetPt - 0.1;
+	  if (JetPtForBTag<inputs_btag_scaling->MinBJetPt) JetPtForBTag = inputs_btag_scaling->MinBJetPt + 0.1;
+	  jet_scalefactor = inputs_btag_scaling->reader_B.eval_auto_bounds("central",BTagEntry::FLAV_B, absJetEta, JetPtForBTag);
+	  tageff = inputs_btag_scaling->tagEff_B->Interpolate(JetPtForBTag,absJetEta);
+	}
+	else if (flavor==4) {
+	  if (JetPtForBTag>inputs_btag_scaling->MaxBJetPt) JetPtForBTag = inputs_btag_scaling->MaxBJetPt - 0.1;
+	  if (JetPtForBTag<inputs_btag_scaling->MinBJetPt) JetPtForBTag = inputs_btag_scaling->MinBJetPt + 0.1;
+	  jet_scalefactor = inputs_btag_scaling->reader_C.eval_auto_bounds("central",BTagEntry::FLAV_C, absJetEta, JetPtForBTag);
+	  tageff = inputs_btag_scaling->tagEff_C->Interpolate(JetPtForBTag,absJetEta);
+	}
+	else {
+	  if (JetPtForBTag>inputs_btag_scaling->MaxLJetPt) JetPtForBTag = inputs_btag_scaling->MaxLJetPt - 0.1;
+	  if (JetPtForBTag<inputs_btag_scaling->MinLJetPt) JetPtForBTag = inputs_btag_scaling->MinLJetPt + 0.1;
+	  jet_scalefactor = inputs_btag_scaling->reader_Light.eval_auto_bounds("central",BTagEntry::FLAV_UDSG, absJetEta, JetPtForBTag);
+	  tageff = inputs_btag_scaling->tagEff_Light->Interpolate(JetPtForBTag,absJetEta);
+	}
+
+	if (tageff<1e-5)      tageff = 1e-5;
+	if (tageff>0.99999)   tageff = 0.99999;
+	inputs_btag_scaling->rand->SetSeed((int)((jetEta+5)*100000));
+	double rannum = inputs_btag_scaling->rand->Rndm();
+
+	if (jet_scalefactor<1 && tagged)  { // downgrade
+	  if (rannum>jet_scalefactor)  tagged = false;
+	}
+	if (jet_scalefactor>1 && !tagged) { // upgrade
+	  double fraction = (1.0-jet_scalefactor)/(1.0-1.0/tageff);
+	  if (rannum<fraction) tagged = true;
 	}
       }
-      
-      if (jetPt>ptLeadingBJet) {
-        ptLeadingBJet = jetPt;
-        indexLeadingBJet = jet;
-      }
+      if (tagged) {
 
-    } 
+	bjets.push_back(jet);
+
+	if (indexLeadingBJet>=0) {
+	  if (jetPt<ptLeadingBJet && jetPt>ptSubLeadingBJet) {
+	    indexSubLeadingBJet = jet;
+	    ptSubLeadingBJet = jetPt;
+	  }
+	}
+	if (jetPt>ptLeadingBJet) {
+	  ptLeadingBJet = jetPt;
+	  indexLeadingBJet = jet;
+	}
+      }
+    } //if (absJetEta < cfg->get<float>("bJetEtaCut"))
 
     if (indexLeadingJet>=0) {
       if (jetPt<ptLeadingJet && jetPt>ptSubLeadingJet) {

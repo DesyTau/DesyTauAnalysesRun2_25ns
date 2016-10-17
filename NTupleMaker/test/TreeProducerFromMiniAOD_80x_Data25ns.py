@@ -86,7 +86,15 @@ if usePrivateSQlite:
 ### =====================================================================================================
 
 
-### ReRun JEC ===========================================================================================
+### ReRun JEC + Pileup Jet ID ===========================================================================
+
+process.load("RecoJets.JetProducers.PileupJetID_cfi")
+process.pileupJetIdUpdated = process.pileupJetId.clone(
+  jets=cms.InputTag("slimmedJets"),
+  inputIsCorrected=True,
+  applyJec=True,
+  vertexes=cms.InputTag("offlineSlimmedPrimaryVertices")
+  )
 
 from PhysicsTools.PatAlgos.producersLayer1.jetUpdater_cff import updatedPatJetCorrFactors
 process.patJetCorrFactorsReapplyJEC = updatedPatJetCorrFactors.clone(
@@ -105,7 +113,10 @@ process.patJetsReapplyJEC = updatedPatJets.clone(
   jetCorrFactorsSource = cms.VInputTag(cms.InputTag("patJetCorrFactorsReapplyJEC"))
   )
 
-### END ReRun JEC ======================================================================================
+process.patJetsReapplyJEC.userData.userFloats.src += ['pileupJetIdUpdated:fullDiscriminant']
+process.patJetsReapplyJEC.userData.userInts.src += ['pileupJetIdUpdated:fullId']
+
+### END ReRun JEC + Pileup Jet ID ======================================================================
 
 # Electron ID ==========================================================================================
 
@@ -269,7 +280,8 @@ allMetFilterPaths=['HBHENoiseFilter','HBHENoiseIsoFilter','CSCTightHaloFilter','
 process.initroottree = cms.EDAnalyzer("InitAnalyzer",
 IsData = cms.untracked.bool(isData),
 #IsData = cms.untracked.bool(False),
-GenParticles = cms.untracked.bool(not isData)
+GenParticles = cms.untracked.bool(not isData),
+GenJets = cms.untracked.bool(not isData)
 )
 
 JECfile = "DesyTauAnalyses/NTupleMaker/data/JEC/Spring16_25nsV6/Spring16_25nsV6_MC_Uncertainty_AK4PFchs.txt"
@@ -285,6 +297,7 @@ Skim = cms.untracked.uint32(0),
 JECfile = cms.untracked.string(JECfile),
 # switches of collections
 GenParticles = cms.untracked.bool(not isData),
+GenJets = cms.untracked.bool(not isData),
 SusyInfo = cms.untracked.bool(True),
 Trigger = cms.untracked.bool(True),
 RecPrimVertex = cms.untracked.bool(True),
@@ -334,6 +347,7 @@ PuppiMetCollectionTag = cms.InputTag("slimmedMETsPuppi"),
 MvaMetCollectionsTag = cms.VInputTag(cms.InputTag("MVAMET","MVAMET","TreeProducer")),
 TrackCollectionTag = cms.InputTag("generalTracks"),
 GenParticleCollectionTag = cms.InputTag("prunedGenParticles"),
+GenJetCollectionTag = cms.InputTag("slimmedGenJets"),
 TriggerObjectCollectionTag = cms.InputTag("selectedPatTrigger"),
 BeamSpotCollectionTag =  cms.InputTag("offlineBeamSpot"),
 PVCollectionTag = cms.InputTag("offlineSlimmedPrimaryVertices"),
@@ -444,6 +458,8 @@ Flags = cms.untracked.vstring(
   'allMetFilterPaths'
 ),
 FlagsProcesses = cms.untracked.vstring("RECO","PAT"),
+BadChargedCandidateFilter =  cms.InputTag("BadChargedCandidateFilter"),
+BadPFMuonFilter = cms.InputTag("BadPFMuonFilter"),
 # tracks
 RecTrackPtMin = cms.untracked.double(0.5),
 RecTrackEtaMax = cms.untracked.double(2.4),

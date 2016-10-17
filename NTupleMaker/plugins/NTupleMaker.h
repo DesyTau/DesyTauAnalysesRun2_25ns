@@ -161,6 +161,7 @@ using namespace reco;
 #define M_jetmaxcount 1000
 #define M_mvametmaxcount 2000
 #define M_genparticlesmaxcount 1000
+#define M_genjetsmaxcount 1000
 #define M_trigobjectmaxcount 1000
 #define M_hltfiltersmax 200
 typedef ROOT::Math::PositionVector3D<ROOT::Math::Cartesian3D<double>,ROOT::Math::DefaultCoordinateSystemTag> Point3D;
@@ -255,6 +256,7 @@ class NTupleMaker : public edm::EDAnalyzer{
 
   bool AddGenHt(const edm::Event& iEvent);
   bool AddGenParticles(const edm::Event& iEvent);
+  bool AddGenJets(const edm::Event& iEvent);
   unsigned int AddElectrons(const edm::Event& iEvent, const edm::EventSetup& iSetup);
   unsigned int AddMuons(const edm::Event& iEvent, const edm::EventSetup& iSetup);
   //  unsigned int AddPhotons(const edm::Event& iEvent);
@@ -389,6 +391,7 @@ class NTupleMaker : public edm::EDAnalyzer{
   std::vector<edm::InputTag> MvaMetCollectionsTag_;
   std::vector<edm::EDGetTokenT<pat::METCollection> > MvaMetCollectionsToken_;
   edm::EDGetTokenT<reco::GenParticleCollection> GenParticleCollectionToken_;
+  edm::EDGetTokenT<reco::GenJetCollection> GenJetCollectionToken_;
   edm::EDGetTokenT<BXVector<l1t::Jet> > L1JetCollectionToken_;
   edm::EDGetTokenT<BXVector<l1t::Tau> > L1IsoTauCollectionToken_;
   edm::EDGetTokenT<BXVector<l1t::Muon> > L1MuonCollectionToken_;
@@ -597,21 +600,14 @@ class NTupleMaker : public edm::EDAnalyzer{
   Float_t pfjet_energycorr_l2relative[M_jetmaxcount];
   Float_t pfjet_energycorr_l3absolute[M_jetmaxcount];
   Float_t pfjet_energycorr_l2l3residual[M_jetmaxcount];
-  Bool_t pfjet_pu_jet_cut_loose[M_jetmaxcount];
-  Bool_t pfjet_pu_jet_cut_medium[M_jetmaxcount];
-  Bool_t pfjet_pu_jet_cut_tight[M_jetmaxcount];
-  Float_t pfjet_pu_jet_cut_mva[M_jetmaxcount];
-  Bool_t pfjet_pu_jet_simple_loose[M_jetmaxcount];
-  Bool_t pfjet_pu_jet_simple_medium[M_jetmaxcount];
-  Bool_t pfjet_pu_jet_simple_tight[M_jetmaxcount];
-  Float_t pfjet_pu_jet_simple_mva[M_jetmaxcount];
-  Bool_t pfjet_pu_jet_full_loose[M_jetmaxcount];
-  Bool_t pfjet_pu_jet_full_medium[M_jetmaxcount];
-  Bool_t pfjet_pu_jet_full_tight[M_jetmaxcount];
-  Float_t pfjet_pu_jet_full_mva[M_jetmaxcount];
   Int_t pfjet_flavour[M_jetmaxcount];
   Float_t pfjet_btag[M_jetmaxcount][10];
   Float_t pfjet_jecUncertainty[M_jetmaxcount];
+  Bool_t pfjet_pu_jet_fullId_loose[M_jetmaxcount];
+  Bool_t pfjet_pu_jet_fullId_medium[M_jetmaxcount];
+  Bool_t pfjet_pu_jet_fullId_tight[M_jetmaxcount];
+  Float_t pfjet_pu_jet_fullDisc_mva[M_jetmaxcount];
+
 
   // pat electrons 
   UInt_t electron_count;
@@ -1052,6 +1048,23 @@ class NTupleMaker : public edm::EDAnalyzer{
   Int_t genparticles_isPrompt[M_genparticlesmaxcount];
   Int_t genparticles_isPromptTauDecayProduct[M_genparticlesmaxcount];
   Int_t genparticles_isTauDecayProduct[M_genparticlesmaxcount];
+
+  // GenJets
+  UInt_t genjets_count;
+  Float_t genjets_e[M_genjetsmaxcount];
+  Float_t genjets_px[M_genjetsmaxcount];
+  Float_t genjets_py[M_genjetsmaxcount];
+  Float_t genjets_pz[M_genjetsmaxcount];
+  Float_t genjets_pt[M_genjetsmaxcount];
+  Float_t genjets_eta[M_genjetsmaxcount];
+  Float_t genjets_phi[M_genjetsmaxcount];
+  Int_t genjets_pdgid[M_genjetsmaxcount];
+  Int_t genjets_status[M_genjetsmaxcount];
+
+  Float_t genjets_em_energy[M_genjetsmaxcount];
+  Float_t genjets_had_energy[M_genjetsmaxcount];
+  Float_t genjets_invisible_energy[M_genjetsmaxcount];
+  Float_t genjets_auxiliary_energy[M_genjetsmaxcount];
 
   // trigger objects
   UInt_t trigobject_count;

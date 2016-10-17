@@ -11,9 +11,7 @@
 #include <DataFormats/METReco/interface/GenMET.h>
 #include <DataFormats/HLTReco/interface/TriggerTypeDefs.h>
 //#include "AnalysisDataFormats/TauAnalysis/interface/PFMEtSignCovMatrix.h"
-//#include "RecoJets/JetProducers/interface/PileupJetIdentifier.h"
 //#include "DataFormats/METReco/interface/PFMEtSignCovMatrix.h"
-//#include "DataFormats/JetReco/interface/PileupJetIdentifier.h"
 #include "RecoBTag/BTagTools/interface/SignedImpactParameter3D.h"
 #include <DataFormats/TrackReco/interface/Track.h>
 
@@ -180,6 +178,7 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
   MvaMetCollectionsTag_(iConfig.getParameter<std::vector<edm::InputTag> >("MvaMetCollectionsTag")),
 
   GenParticleCollectionToken_(consumes<reco::GenParticleCollection>(iConfig.getParameter<edm::InputTag>("GenParticleCollectionTag"))),
+  GenJetCollectionToken_(consumes<reco::GenJetCollection>(iConfig.getParameter<edm::InputTag>("GenJetCollectionTag"))),
   PackedCantidateCollectionToken_(consumes<pat::PackedCandidateCollection>(edm::InputTag("packedPFCandidates"))),
   TriggerObjectCollectionToken_(consumes<pat::TriggerObjectStandAloneCollection>(iConfig.getParameter<edm::InputTag>("TriggerObjectCollectionTag"))),
   BeamSpotToken_(consumes<BeamSpot>(iConfig.getParameter<edm::InputTag>("BeamSpotCollectionTag"))),
@@ -453,21 +452,13 @@ void NTupleMaker::beginJob(){
     tree->Branch("pfjet_energycorr_l2relative", pfjet_energycorr_l2relative, "pfjet_energycorr_l2relative[pfjet_count]/F");
     tree->Branch("pfjet_energycorr_l3absolute", pfjet_energycorr_l3absolute, "pfjet_energycorr_l3absolute[pfjet_count]/F");
     tree->Branch("pfjet_energycorr_l2l3residual", pfjet_energycorr_l2l3residual, "pfjet_energycorr_l2l3residual[pfjet_count]/F");
-    // tree->Branch("pfjet_pu_jet_cut_loose", pfjet_pu_jet_cut_loose, "pfjet_pu_jet_cut_loose[pfjet_count]/O");
-    // tree->Branch("pfjet_pu_jet_cut_medium", pfjet_pu_jet_cut_medium, "pfjet_pu_jet_cut_medium[pfjet_count]/O");
-    // tree->Branch("pfjet_pu_jet_cut_tight", pfjet_pu_jet_cut_tight, "pfjet_pu_jet_cut_tight[pfjet_count]/O");
-    // tree->Branch("pfjet_pu_jet_cut_mva", pfjet_pu_jet_cut_mva, "pfjet_pu_jet_cut_mva[pfjet_count]/F");
-    // tree->Branch("pfjet_pu_jet_simple_loose", pfjet_pu_jet_simple_loose, "pfjet_pu_jet_simple_loose[pfjet_count]/O");
-    // tree->Branch("pfjet_pu_jet_simple_medium", pfjet_pu_jet_simple_medium, "pfjet_pu_jet_simple_medium[pfjet_count]/O");
-    // tree->Branch("pfjet_pu_jet_simple_tight", pfjet_pu_jet_simple_tight, "pfjet_pu_jet_simple_tight[pfjet_count]/O");
-    // tree->Branch("pfjet_pu_jet_simple_mva", pfjet_pu_jet_simple_mva, "pfjet_pu_jet_simple_mva[pfjet_count]/F");
-    // tree->Branch("pfjet_pu_jet_full_loose", pfjet_pu_jet_full_loose, "pfjet_pu_jet_full_loose[pfjet_count]/O");
-    // tree->Branch("pfjet_pu_jet_full_medium", pfjet_pu_jet_full_medium, "pfjet_pu_jet_full_medium[pfjet_count]/O");
-    // tree->Branch("pfjet_pu_jet_full_tight", pfjet_pu_jet_full_tight, "pfjet_pu_jet_full_tight[pfjet_count]/O");
-    tree->Branch("pfjet_pu_jet_full_mva", pfjet_pu_jet_full_mva, "pfjet_pu_jet_full_mva[pfjet_count]/F");
     tree->Branch("pfjet_flavour", pfjet_flavour, "pfjet_flavour[pfjet_count]/I");
     tree->Branch("pfjet_btag", pfjet_btag,"pfjet_btag[pfjet_count][10]/F");
     tree->Branch("pfjet_jecUncertainty",pfjet_jecUncertainty,"pfjet_jecUncertainty[pfjet_count]/F");
+    tree->Branch("pfjet_pu_jet_fullId_loose", pfjet_pu_jet_fullId_loose, "pfjet_pu_jet_fullId_loose[pfjet_count]/O");
+    tree->Branch("pfjet_pu_jet_fullId_medium", pfjet_pu_jet_fullId_medium, "pfjet_pu_jet_fullId_medium[pfjet_count]/O");
+    tree->Branch("pfjet_pu_jet_fullId_tight", pfjet_pu_jet_fullId_tight, "pfjet_pu_jet_fullId_tight[pfjet_count]/O");
+    tree->Branch("pfjet_pu_jet_fullDisc_mva", pfjet_pu_jet_fullDisc_mva, "pfjet_pu_jet_fullDisc_mva[pfjet_count]/F");
   }    
 
   // electrons
@@ -863,8 +854,23 @@ void NTupleMaker::beginJob(){
     tree->Branch("genparticles_isPrompt", genparticles_isPrompt, "genparticles_isPrompt[genparticles_count]/I");
     tree->Branch("genparticles_isPromptTauDecayProduct", genparticles_isPromptTauDecayProduct, "genparticles_isPromptTauDecayProduct[genparticles_count]/I");
     tree->Branch("genparticles_isTauDecayProduct", genparticles_isTauDecayProduct, "genparticles_isTauDecayProduct[genparticles_count]/I");
- 
     tree->Branch("genparticles_mother", genparticles_mother, "genparticles_mother[genparticles_count]/b");
+
+    tree->Branch("genjets_count", &genjets_count, "genjets_count/i");
+    tree->Branch("genjets_e", genjets_e, "genjets_e[genjets_count]/F");
+    tree->Branch("genjets_px", genjets_px, "genjets_px[genjets_count]/F");
+    tree->Branch("genjets_py", genjets_py, "genjets_py[genjets_count]/F");
+    tree->Branch("genjets_pz", genjets_pz, "genjets_pz[genjets_count]/F");
+    tree->Branch("genjets_pt", genjets_pt, "genjets_pt[genjets_count]/F");
+    tree->Branch("genjets_eta", genjets_eta, "genjets_eta[genjets_count]/F");
+    tree->Branch("genjets_phi", genjets_phi, "genjets_phi[genjets_count]/F");
+    tree->Branch("genjets_pdgid", genjets_pdgid, "genjets_pdgid[genjets_count]/I");
+    tree->Branch("genjets_status", genjets_status, "genjets_status[genjets_count]/I");
+    tree->Branch("genjets_em_energy", genjets_em_energy, "genjets_em_energy[genjets_count]/F");
+    tree->Branch("genjets_had_energy", genjets_had_energy, "genjets_had_energy[genjets_count]/F");
+    tree->Branch("genjets_invisible_energy", genjets_invisible_energy, "genjets_invisible_energy[genjets_count]/F");
+    tree->Branch("genjets_auxiliary_energy", genjets_auxiliary_energy, "genjets_auxiliary_energy[genjets_count]/F");
+
   }    
   // SUSY Info
   if (csusyinfo) {
@@ -1354,6 +1360,7 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   electron_count = 0;
   photon_count = 0;
   genparticles_count = 0;
+  genjets_count = 0;
   errors = 0;
   trigobject_count = 0;
   mvamet_count = 0;
@@ -1980,6 +1987,7 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       AddGenHt(iEvent);
 
       bool haveGenParticles = AddGenParticles(iEvent);
+      bool haveGenJets      = AddGenJets(iEvent);
 
       edm::Handle<GenEventInfoProduct> HEPMC;
       iEvent.getByLabel(edm::InputTag("generator"), HEPMC);
@@ -2488,6 +2496,49 @@ bool NTupleMaker::AddGenParticles(const edm::Event& iEvent) {
   return passed;
 
 } // bool NTupleMaker::AddGenParticles(const edm::Event& iEvent) 
+
+
+bool NTupleMaker::AddGenJets(const edm::Event& iEvent)
+{
+  edm::Handle<reco::GenJetCollection> genjets;
+  iEvent.getByToken(GenJetCollectionToken_, genjets);
+
+  bool passed = false;
+  
+  if(genjets.isValid())
+    {
+      bool passed = true;
+
+      for(unsigned i = 0 ; i < genjets->size() ; i++)
+	{
+	  if(genjets_count == M_genjetsmaxcount){
+	    cerr << "number of genjets_count > M_genjetsmaxcount. They are missing." << endl; 
+	    errors |= 1<<4; 
+	    break;
+	  }
+
+	  if(fabs((*genjets)[i].eta()) > 5.2) continue;
+
+	  genjets_e[genjets_count]  = (*genjets)[i].energy();
+	  genjets_px[genjets_count] = (*genjets)[i].px();
+	  genjets_py[genjets_count] = (*genjets)[i].py();
+	  genjets_pz[genjets_count] = (*genjets)[i].pz();
+	  genjets_pt[genjets_count] = (*genjets)[i].pt();
+	  genjets_eta[genjets_count] = (*genjets)[i].eta();
+	  genjets_phi[genjets_count] = (*genjets)[i].phi();
+	  genjets_pdgid[genjets_count]  = (*genjets)[i].pdgId();
+	  genjets_status[genjets_count] = (*genjets)[i].status();
+         
+	  genjets_em_energy[genjets_count]        = (*genjets)[i].emEnergy();
+	  genjets_had_energy[genjets_count]       = (*genjets)[i].hadEnergy();
+	  genjets_invisible_energy[genjets_count] = (*genjets)[i].invisibleEnergy();
+	  genjets_auxiliary_energy[genjets_count] = (*genjets)[i].auxiliaryEnergy();
+	  genjets_count++;
+	}
+    }
+  return  passed;
+}
+
 
 unsigned int NTupleMaker::AddPFCand(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
@@ -3516,37 +3567,20 @@ unsigned int NTupleMaker::AddPFJets(const edm::Event& iEvent, const edm::EventSe
 	  // std::cout << "    L3Absolute   = " << pfjet_energycorr_l3absolute[pfjet_count] << std::endl;
 	  // std::cout << "    L2L3Residual = " << pfjet_energycorr_l2l3residual[pfjet_count] << std::endl;
 	  // std::cout << "    Total (Uncor)= " << pfjet_energycorr[pfjet_count] << std::endl;
-	  
-	  
-	  //pfjet_pu_jet_simple_loose[pfjet_count] = false;
-	  //pfjet_pu_jet_simple_medium[pfjet_count] = false;
-	  //pfjet_pu_jet_simple_tight[pfjet_count] = false;
-	  //pfjet_pu_jet_simple_mva[pfjet_count] = (*puJetIdMVAFull)[(*pfjets)[i].originalObjectRef()];
-	  
-	  
-	  //		    pfjet_pu_jet_full_loose[pfjet_count] = PileupJetIdentifier::passJetId( (*puJetIdFlagFull)[(*pfjets)[i].originalObjectRef()], PileupJetIdentifier::kLoose);
-	  //		    pfjet_pu_jet_full_medium[pfjet_count] = PileupJetIdentifier::passJetId( (*puJetIdFlagFull)[(*pfjets)[i].originalObjectRef()], PileupJetIdentifier::kMedium);
-	  //		    pfjet_pu_jet_full_tight[pfjet_count] = PileupJetIdentifier::passJetId( (*puJetIdFlagFull)[(*pfjets)[i].originalObjectRef()], PileupJetIdentifier::kTight);
-	  //                pfjet_pu_jet_full_mva[pfjet_count] = (*puJetIdMVAFull)[(*pfjets)[i].originalObjectRef()];
-	  
-	  //get MVA Id
-          //for(reco::PFJetCollection::const_iterator iak4jets = ak4jets->begin(); iak4jets != ak4jets->end(); iak4jets++){
-	  //	  pfjet_pu_jet_full_mva[pfjet_count] = -9999;
-	  //	  if (puJetIdMVAFull.isValid()&&ak4jets.isValid()) {
-	  //	    for(size_t ij = 0; ij < ak4jets->size(); ij++){
-	  //	      reco::PFJetRef jetRef (ak4jets, ij);
-	  //	      if(deltaR((*pfjets)[i].p4(), jetRef->p4()) < 0.3){
-	  //		if(deltaR((*pfjets)[i].p4(), jetRef->p4()) > 0.1)
-	  //		  std::cout<<"original jet pt "<<(*pfjets)[i].pt()<<" re-recoed jet pt "<<jetRef->pt()<<" pu mva value "<<(*puJetIdMVAFull)[jetRef]<<std::endl;
-	  //		pfjet_pu_jet_full_mva[pfjet_count] = (*puJetIdMVAFull)[jetRef];
-	  //	      }
-	  //	    }
-	  //	  }	  
-	  pfjet_pu_jet_full_mva[pfjet_count] = (*pfjets)[i].userFloat("pileupJetId:fullDiscriminant");
+	  	  
 	  jecUnc->setJetEta(pfjet_eta[pfjet_count]);
 	  jecUnc->setJetPt(pfjet_pt[pfjet_count]);
 	  pfjet_jecUncertainty[pfjet_count] = jecUnc->getUncertainty(true);
 	  pfjet_flavour[pfjet_count] = (*pfjets)[i].partonFlavour();
+
+	  //pileup jet id
+	  pfjet_pu_jet_fullId_loose[pfjet_count]  = false;
+	  pfjet_pu_jet_fullId_medium[pfjet_count] = false;
+	  pfjet_pu_jet_fullId_tight[pfjet_count]  = false;
+	  pfjet_pu_jet_fullDisc_mva[pfjet_count]  = (*pfjets)[i].userFloat("pileupJetIdUpdated:fullDiscriminant");
+	  pfjet_pu_jet_fullId_loose[pfjet_count]  = ( (*pfjets)[i].userInt("pileupJetIdUpdated:fullId") & (1<<2) );
+	  pfjet_pu_jet_fullId_medium[pfjet_count] = ( (*pfjets)[i].userInt("pileupJetIdUpdated:fullId") & (1<<1) );
+	  pfjet_pu_jet_fullId_tight[pfjet_count]  = ( (*pfjets)[i].userInt("pileupJetIdUpdated:fullId") & (1<<0) );
 		
 	  for(unsigned n = 0 ; n < cBtagDiscriminators.size() ; n++)
 	    {
