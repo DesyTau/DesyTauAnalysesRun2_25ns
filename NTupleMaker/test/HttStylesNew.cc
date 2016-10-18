@@ -156,16 +156,20 @@ void InitSubPad(TPad* pad, int i)
   return;
 }
 
-void InitSignal(TH1 *hist)
+void InitSignal(TH1 *hist, int color)
 {
-  hist->SetFillStyle(0.);
-  hist->SetLineStyle(11);
-  hist->SetLineWidth(3.);
-  hist->SetLineColor(kBlue+3);
+    hist->SetFillStyle(1001);
+    gStyle->SetLineStyleString(11,"20 10");
+    hist->SetLineStyle(11);
+    hist->SetFillColor(0);
+    hist->SetLineColor(color);
+    hist->SetLineWidth(3);
+    return;
 }
 
-void InitHist(TH1 *hist, const char *xtit, const char *ytit, int color, int style)
+void InitHist(TH1 *hist, int color)
 {
+  /*
   hist->SetXTitle(xtit);
   hist->SetYTitle(ytit);
   hist->SetLineColor(kBlack);
@@ -187,7 +191,17 @@ void InitHist(TH1 *hist, const char *xtit, const char *ytit, int color, int styl
   hist->SetMarkerSize (0.6);
   hist->GetYaxis()->SetTitleFont(42);
   hist->GetXaxis()->SetTitleFont(42);
-  hist->SetTitle("");  
+  hist->SetTitle("");  */
+    hist->SetFillColor(color);
+    hist->SetFillStyle(1001);
+    hist->SetLineColor(1);
+    hist->SetLineStyle(1);
+    hist->SetLineWidth(2);
+    hist->SetMarkerColor(1);
+    hist->SetMarkerStyle(21);
+    hist->SetMarkerSize(0.8);
+    hist->SetStats(false);
+    
   return;
 }
 
