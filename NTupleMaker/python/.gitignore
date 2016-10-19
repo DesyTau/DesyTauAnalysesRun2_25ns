@@ -1,1 +1,1 @@
-*.pyc
+*.pyc # ignore generated pyc files
