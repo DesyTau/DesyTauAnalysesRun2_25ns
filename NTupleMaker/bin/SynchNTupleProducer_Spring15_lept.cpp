@@ -199,11 +199,11 @@ int main(int argc, char * argv[]){
   //RecoilCorrector* recoilPuppiMetCorrector = (RecoilCorrector*) malloc(sizeof(*recoilPuppiMetCorrector));
   RecoilCorrector* recoilMvaMetCorrector = (RecoilCorrector*) malloc(sizeof(*recoilMvaMetCorrector));
 
-  if(!isData && applyRecoilCorrections && (isDY || isWJets) ){
+  if(!isData && applyRecoilCorrections && (isDY || isWJets || isVBForGGHiggs) ){
     TString RecoilDir("HTT-utilities/RecoilCorrections/data/");
 
     TString RecoilFileName = RecoilDir; RecoilFileName += "PFMET";
-    if (isMG)
+    if (isMG || isVBForGGHiggs )
       RecoilFileName += "_MG_";
     RecoilFileName += "2016BCD.root";
     std::cout<<RecoilFileName<<std::endl;
@@ -214,7 +214,7 @@ int main(int argc, char * argv[]){
     //recoilPuppiMetCorrector = new RecoilCorrector( RecoilFileName);
 
     RecoilFileName = RecoilDir; RecoilFileName += "MvaMET";
-    if (isMG)
+    if (isMG || isVBForGGHiggs)
       RecoilFileName += "_MG_";
     RecoilFileName += "2016BCD.root";
     std::cout<<RecoilFileName<<std::endl;
@@ -764,12 +764,15 @@ int main(int argc, char * argv[]){
         otree->zptweight = h_zptweight->GetBinContent(h_zptweight->GetXaxis()->FindBin(genV.M()),h_zptweight->GetYaxis()->FindBin(genV.Pt()));
 	  }
 
+      // topPt weight
+      if(!isData)
+	    otree->topptweight = genTools::topPtWeight(analysisTree);
       ////////////////////////////////////////////////////////////
       // MET Recoil Corrections
       ////////////////////////////////////////////////////////////
 
       otree->njetshad = otree->njets;
-      if (!isData && applyRecoilCorrections && (isDY || isWJets) ){
+      if (!isData && applyRecoilCorrections && (isDY || isWJets || isVBForGGHiggs) ){
 				genV = genTools::genV(analysisTree);
 				genL = genTools::genL(analysisTree);
 				otree->njetshad = genTools::nJetsHad(analysisTree);
@@ -777,7 +780,7 @@ int main(int argc, char * argv[]){
 
       // MVA MET      
       // // njetshad, genVis, quantile map correction
-	  genTools::RecoilCorrections( *recoilMvaMetCorrector, (!isData && applyRecoilCorrections && (isDY || isWJets)) * genTools::QuantileRemap,
+	  genTools::RecoilCorrections( *recoilMvaMetCorrector, (!isData && applyRecoilCorrections && (isDY || isWJets || isVBForGGHiggs)) * genTools::QuantileRemap,
 			                     otree->mvamet, otree->mvametphi,
 			                     genV.Px(), genV.Py(),
 			                     genL.Px(), genL.Py(),
@@ -793,7 +796,7 @@ int main(int argc, char * argv[]){
       //otree->pzetamiss_rcmr = calc::pzetamiss( zetaX, zetaY, otree->mvamet_rcmr, otree->mvametphi_rcmr);
 
       // PF MET
-	  genTools::RecoilCorrections( *recoilPFMetCorrector, (!isData && applyRecoilCorrections && (isDY || isWJets)) * genTools::QuantileRemap,
+	  genTools::RecoilCorrections( *recoilPFMetCorrector, (!isData && applyRecoilCorrections && (isDY || isWJets || isVBForGGHiggs)) * genTools::QuantileRemap,
 			                     otree->met, otree->metphi,
 			                     genV.Px(), genV.Py(),
 			                     genL.Px(), genL.Py(),
@@ -894,28 +897,39 @@ int main(int argc, char * argv[]){
 	  otree->mt_sv = -9999;
 
       //calculate SV fit only for events passing baseline selection and mt cut
+      // fill otree only for events passing baseline selection 
       // for synchronisation, take all events
       const bool Synch = cfg.get<bool>("Synch"); 
+
+      bool passedBaselineSel = false;
+      if (ch=="mt") 
+        passedBaselineSel = (otree->iso_1<0.15 && otree->byTightIsolationMVArun2v1DBoldDMwLT_2>0.5 && 
+                            otree->againstElectronVLooseMVA6_2>0.5 && otree->againstMuonTight3_2>0.5  &&
+                            otree->dilepton_veto == 0 && otree->extraelec_veto == 0 && otree->extramuon_veto == 0);
+      if (ch=="et") 
+        passedBaselineSel = (otree->iso_1<0.1 && otree->byTightIsolationMVArun2v1DBoldDMwLT_2>0.5 && 
+                            otree->againstMuonLoose3_2>0.5 && otree->againstElectronTightMVA6_2>0.5 && 
+                            otree->dilepton_veto == 0 && otree->extraelec_veto == 0 && otree->extramuon_veto == 0);
+
 	  bool calculateSVFit = false; 
 	  if (Synch) calculateSVFit = true;       
 	  else if (ApplySVFit && ch=="mt"){
-          calculateSVFit = (otree->mt_1<60 && otree->iso_1<0.15 && otree->byTightIsolationMVArun2v1DBoldDMwLT_2>0.5 && 
-                            otree->againstElectronVLooseMVA6_2>0.5 && otree->againstMuonTight3_2>0.5  &&
-                            otree->dilepton_veto == 0 && otree->extraelec_veto == 0 && otree->extramuon_veto == 0);
+        calculateSVFit = (otree->mt_1<60 && passedBaselineSel);
       }
 
       else if (ApplySVFit && ch == "et"){
-          calculateSVFit = (otree->mt_1<60 && otree->iso_1<0.1 && otree->byTightIsolationMVArun2v1DBoldDMwLT_2>0.5 && 
-                            otree->againstMuonLoose3_2>0.5 && otree->againstElectronTightMVA6_2>0.5 && 
-                            otree->dilepton_veto == 0 && otree->extraelec_veto == 0 && otree->extramuon_veto == 0);
+        calculateSVFit = (otree->mt_1<60 && passedBaselineSel);
       }
-
-
 
       // svfit
       if(ApplySVFit && calculateSVFit) svfit_variables(&analysisTree, otree, &cfg);
 
-      otree->Fill();
+      // fill tree
+	  if (!Synch && passedBaselineSel)
+        otree->Fill();
+      else if (Synch)
+        otree->Fill();
+
       selEvents++;
     } // end of file processing (loop over events in one file)
 
