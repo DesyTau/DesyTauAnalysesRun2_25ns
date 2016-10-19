@@ -132,6 +132,10 @@ public :
    Int_t           pfjet_flavour[100];   //[pfjet_count]
    Float_t         pfjet_btag[100][10];   //[pfjet_count]
    Float_t         pfjet_jecUncertainty[100];   //[pfjet_count]
+   Bool_t          pfjet_pu_jet_fullId_loose[100];
+   Bool_t          pfjet_pu_jet_fullId_medium[100];
+   Bool_t          pfjet_pu_jet_fullId_tight[100];
+   Float_t         pfjet_pu_jet_fullDisc_mva[100];
    UInt_t          electron_count;
    Float_t         electron_px[50];   //[electron_count]
    Float_t         electron_py[50];   //[electron_count]
@@ -624,6 +628,10 @@ public :
    TBranch        *b_pfjet_flavour;   //!
    TBranch        *b_pfjet_btag;   //!
    TBranch        *b_pfjet_jecUncertainty;   //!
+   TBranch        *b_pfjet_pu_jet_fullId_loose;
+   TBranch        *b_pfjet_pu_jet_fullId_medium;
+   TBranch        *b_pfjet_pu_jet_fullId_tight;
+   TBranch        *b_pfjet_pu_jet_fullDisc_mva;
    TBranch        *b_electron_count;   //!
    TBranch        *b_electron_px;   //!
    TBranch        *b_electron_py;   //!
@@ -1228,6 +1236,10 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("pfjet_flavour", pfjet_flavour, &b_pfjet_flavour);
    fChain->SetBranchAddress("pfjet_btag", pfjet_btag, &b_pfjet_btag);
    fChain->SetBranchAddress("pfjet_jecUncertainty", pfjet_jecUncertainty, &b_pfjet_jecUncertainty);
+   fChain->SetBranchAddress("pfjet_pu_jet_fullId_loose", pfjet_pu_jet_fullId_loose, &b_pfjet_pu_jet_fullId_loose);
+   fChain->SetBranchAddress("pfjet_pu_jet_fullId_medium", pfjet_pu_jet_fullId_medium, &b_pfjet_pu_jet_fullId_medium);
+   fChain->SetBranchAddress("pfjet_pu_jet_fullId_tight", pfjet_pu_jet_fullId_tight, &b_pfjet_pu_jet_fullId_tight);
+   fChain->SetBranchAddress("pfjet_pu_jet_fullDisc_mva", pfjet_pu_jet_fullDisc_mva, &b_pfjet_pu_jet_fullDisc_mva);
    fChain->SetBranchAddress("electron_count", &electron_count, &b_electron_count);
    fChain->SetBranchAddress("electron_px", electron_px, &b_electron_px);
    fChain->SetBranchAddress("electron_py", electron_py, &b_electron_py);

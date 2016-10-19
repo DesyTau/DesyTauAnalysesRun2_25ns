@@ -206,6 +206,10 @@ public :
   Float_t         jmva_1;
   Float_t         jlrm_1;
   Int_t           jctm_1;
+  Bool_t          jpuid_loose_1;
+  Bool_t          jpuid_medium_1;
+  Bool_t          jpuid_tight_1;
+  Float_t         jpuid_mva_1;
   Float_t         jpt_2;
   Float_t         jeta_2;
   Float_t         jphi_2;
@@ -215,6 +219,10 @@ public :
   Float_t         jmva_2;
   Float_t         jlrm_2;
   Int_t           jctm_2;
+  Bool_t          jpuid_loose_2;
+  Bool_t          jpuid_medium_2;
+  Bool_t          jpuid_tight_2;
+  Float_t         jpuid_mva_2;
   Float_t         mjj;
   Float_t         jdeta;
   Int_t           njetingap;
@@ -413,6 +421,10 @@ public :
   TBranch        *b_jmva_1;   //!
   TBranch        *b_jlrm_1;   //!
   TBranch        *b_jctm_1;   //!
+  TBranch        *b_jpuid_loose_1;
+  TBranch        *b_jpuid_medium_1;
+  TBranch        *b_jpuid_tight_1;
+  TBranch        *b_jpuid_mva_1;
   TBranch        *b_jpt_2;   //!
   TBranch        *b_jeta_2;   //!
   TBranch        *b_jphi_2;   //!
@@ -421,6 +433,10 @@ public :
   TBranch        *b_jptunc_2;   //!
   TBranch        *b_jlrm_2;   //!
   TBranch        *b_jctm_2;   //!
+  TBranch        *b_jpuid_loose_2;
+  TBranch        *b_jpuid_medium_2;
+  TBranch        *b_jpuid_tight_2;
+  TBranch        *b_jpuid_mva_2;
   TBranch        *b_mjj;   //!
   TBranch        *b_jdeta;   //!
   TBranch        *b_njetingap;   //!
