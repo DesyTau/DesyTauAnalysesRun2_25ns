@@ -61,8 +61,13 @@ reco::Candidate::LorentzVector utils_genMatch::getVisMomentumNoLep(const std::ve
 	daughter != daughters.end(); ++daughter ) {
     if (status != -1 && (*daughter)->status() != status) continue;
     if (isNeutrino(*daughter)) continue;
-    if (TMath::Abs((*daughter)->pdgId()) == 11) continue;
-    if (TMath::Abs((*daughter)->pdgId()) == 13) continue;
+    if (TMath::Abs((*daughter)->pdgId()) == 11 || TMath::Abs((*daughter)->pdgId()) == 13){
+      if((*daughter)->statusFlags().isDirectPromptTauDecayProduct()){ // make sure that the tau really decays hadronically
+	p4Vis.SetPxPyPzE(0,0,0,0);
+	return p4Vis;
+      } 
+      continue;
+    }
     //std::cout << "adding daughter: pdgId = " << (*daughter)->pdgId() << ", Pt = " << (*daughter)->pt() << ","
     //	  << " eta = " << (*daughter)->eta() << ", phi = " << (*daughter)->phi()*180./TMath::Pi() << std::endl;
     p4Vis += (*daughter)->p4();

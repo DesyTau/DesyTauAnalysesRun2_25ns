@@ -3347,8 +3347,7 @@ unsigned int NTupleMaker::AddTaus(const edm::Event& iEvent, const edm::EventSetu
 	  if(cgen && !cdata){
 	    edm::Handle<reco::GenParticleCollection> GenParticles;
 	    iEvent.getByToken(GenParticleCollectionToken_, GenParticles);
-	    if(GenParticles.isValid())
-	      tau_genmatch[tau_count] = utils_genMatch::genMatch( (*Taus)[i].p4(), *GenParticles);
+	    if(GenParticles.isValid()) tau_genmatch[tau_count] = utils_genMatch::genMatch( (*Taus)[i].p4(), *GenParticles);
 	  }
 	  
 	  tau_count++;
