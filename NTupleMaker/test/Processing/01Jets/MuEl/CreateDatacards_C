@@ -1,0 +1,51 @@
+void CreateDatacards() {
+
+
+
+  TFile * file = new TFile("FILE");
+  //file->cd("CHANNEL");
+  TH1D * data_obs = (TH1D*)file->Get("data_obs");
+  //TH1D * data_obs = (TH1D*)file->Get("data_obs");
+  TH1D * signal = (TH1D*)file->Get("1D_SIGNAL_B_VARIABLE");
+  TH1D * all_bkg = (TH1D*)file->Get("1D_rest_bkg_VARIABLE");
+  TH1D * tt = (TH1D*)file->Get("1D_tt_VARIABLE");
+  TH1D * dib = (TH1D*)file->Get("1D_dib_VARIABLE");
+//  TH1D * wj = (TH1D*)file->Get("1D_wj_VARIABLE");
+//  TH1D * dyj = (TH1D*)file->Get("1D_dyj_VARIABLE");
+
+  std::ofstream textFile("cards_CHANNEL/SIGNAL_VARIABLE_CHANNEL_LUMIinvfb.txt");
+  textFile << "imax 1   number of channels" << std::endl;
+  textFile << "jmax *   number of backgrounds" << std::endl;
+  textFile << "kmax *   number of nuisance parameters" << std::endl;
+  textFile << "-----------------" << std::endl;
+  textFile << "observation " << data_obs->GetSumOfWeights() << std::endl;
+//  textFile << "observation " << data_obs->Integral() << std::endl;
+  textFile << "-----------------" << std::endl;
+  textFile << "shapes * *  FILE  $PROCESS    $PROCESS_$SYSTEMATIC " << std::endl;
+  textFile << "-----------------" << std::endl;
+  textFile << "bin                  CHANNEL	CHANNEL	CHANNEL	CHANNEL" << std::endl;
+  textFile << "process              1D_SIGNAL_B_VARIABLE 1D_tt_VARIABLE 1D_dib_VARIABLE 1D_rest_bkg_VARIABLE" << std::endl;
+  textFile << "process              0	1	2	3" << std::endl;
+  textFile << "rate    "
+	   << signal->GetSumOfWeights() << " " 
+	   << tt->GetSumOfWeights() << " " 
+	   << dib->GetSumOfWeights() << " " 
+	   << all_bkg->GetSumOfWeights() << std::endl; 
+
+ 
+  textFile << "-----------------------------" << std::endl;
+  textFile << "lumi            lnN   	1.062   1.062	1.062	1.062" << std::endl;
+  textFile << "sign_xsec       lnN      1.20     -      -       -       -" << std::endl;
+  textFile << "tt_norm         lnN   	-       1.05	-	-" << std::endl;
+  textFile << "dib_norm         lnN   	-       -	1.20	-" << std::endl;
+  textFile << "bkg_norm        lnN   	-       -	-	1.20" << std::endl;
+//  textFile << "CMS_btag        lnN      1.04  1.04	1.04	1.04"<< std::endl;
+  textFile << "CMS_eff_e       lnN      1.04  1.04	1.04	1.04"<< std::endl;
+  textFile << "CMS_eff_m       lnN      1.02  1.02	1.02	1.02"<< std::endl;
+  textFile << "CMS_met         lnN      1.04  1.04	1.04	1.04"<< std::endl;
+  textFile << std::endl;
+//	   cout<< all_bkg->Integral() << "  "<<all_bkg->GetSumOfWeights()<<endl;
+
+}
+
+ 
