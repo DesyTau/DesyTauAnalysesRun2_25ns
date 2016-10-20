@@ -27,28 +27,35 @@ bool tightJetiD(AC1B &tree_ ,int jet){
 
 }
 
-bool looseJetiD(AC1B &tree_, int jet){
+bool looseJetiD(AC1B &tree_, int jet){  // updated recipe for 74x,76x,80x
 
-	bool looseJetID = false;
-		float energy = tree_.pfjet_e[jet];
-		float eta = tree_.pfjet_eta[jet];
-                float nhf = tree_.pfjet_neutralhadronicenergy[jet]/energy;
-                float nem = tree_.pfjet_neutralemenergy[jet]/energy;
-                float npr = tree_.pfjet_chargedmulti[jet] + tree_.pfjet_neutralmulti[jet];
-                float chm = tree_.pfjet_chargedmulti[jet] ;
-                float muf = tree_.pfjet_muonenergy[jet]/energy;
-                float chf = tree_.pfjet_chargedhadronicenergy[jet]/energy;
-                float elf = tree_.pfjet_chargedemenergy[jet]/energy;
-		float nnpart = tree_.pfjet_neutralmulti[jet];
-		if (fabs(eta)<=3.)
-                
-			looseJetID = (nhf<0.99 && nem<0.99 && npr>1) && ((fabs(eta)<=2.4 && chf>0 && chm>0 && elf<0.99) || fabs(eta)>2.4) && fabs(eta)<=3.0; ///
-		
-		else  
-			looseJetID = (nem<0.90 && nnpart>10 && fabs(eta)>3.0 ) ;
+        bool looseJetID = false;
+	float energy = tree_.pfjet_e[jet];
+	energy *= tree_.pfjet_energycorr[jet]; // uncorrected energy must be used
+	float eta = tree_.pfjet_eta[jet];
+	float chf = tree_.pfjet_chargedhadronicenergy[jet]/energy;
+	float nhf = tree_.pfjet_neutralhadronicenergy[jet]/energy;
+	float nem = tree_.pfjet_neutralemenergy[jet]/energy;
+	float elf = tree_.pfjet_chargedemenergy[jet]/energy;
+	float muf = tree_.pfjet_muonenergy[jet]/energy;
+	float chm = tree_.pfjet_chargedmulti[jet] ;
+	float nm  = tree_.pfjet_neutralmulti[jet];
+	float npr = tree_.pfjet_chargedmulti[jet] + tree_.pfjet_neutralmulti[jet];
+
+	if (abs(eta)<=2.7)
+	  {
+	    looseJetID = (nhf < 0.99 && nem < 0.99 && npr > 1) && (abs(eta)>2.4 || (chf>0 && chm > 0 && elf < 0.99));
+	  }
+	else if (abs(eta)<=3.0)
+	  {
+	    looseJetID = (nem < 0.9 && nm > 2);
+	  }
+	else
+	  {
+	    looseJetID = nem < 0.9 && nm > 10;
+	  }
 
 	return looseJetID;
-
 }
 
 
