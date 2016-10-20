@@ -212,20 +212,23 @@ TH2D *histo = (TH2D*) obj;
 			ElV.SetPxPyPzE(0.,0.,0.,0.);
 			TauV.SetPxPyPzE(0.,0.,0.,0.);
 
+	for (int nj=0;nj<njets;++nj) {
 
-	float met = 0.;
+	int jet_index = jets_cleaned[nj+1];
 
-		METV.SetPx(met_ex);
-		METV.SetPy(met_ey);
-		met = sqrt(met_ex*met_ex + met_ey*met_ey);  
-/*
+	JetsV.SetPxPyPzE(jet_px[jet_index], jet_py[jet_index],jet_pz[jet_index],jet_e[jet_index]);
+	JetsMV.push_back(JetsV);
+	}
+
+	float met = -1.;
+
 	if (pfmet_usual)
 		{
 		METV.SetPx(met_ex);
 		METV.SetPy(met_ey);
 		met = sqrt(met_ex*met_ex + met_ey*met_ey);  
 		}
-*/
+
 
 	if (pfmet_JetEn && EnUp && !pfmet_usual)
 		{

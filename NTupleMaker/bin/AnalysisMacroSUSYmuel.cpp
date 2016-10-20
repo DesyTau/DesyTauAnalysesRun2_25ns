@@ -1610,15 +1610,16 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	  if (btagged && cleanedJet) bjets.push_back(jet);
 	}
 
+	if (cleanedJet){
+		
+	//	cout<<"  will push to save now cleaned jet  "<<(int)jet<<"  for counter_cleaned_jet "<<(int)counter_cleaned_jets<<" event "<<iEntry<<endl;
 
-	   counter_cleaned_jets++;
+	jets.push_back((int)jet);
+	jets_cleaned[counter_cleaned_jets]=(int)jet;
+	jet_jecUn[counter_cleaned_jets] = analysisTree.pfjet_jecUncertainty[jet];
+	counter_cleaned_jets++;
+	}
 
-	  jets.push_back(jet);
-	  jets_cleaned[counter_cleaned_jets]=jet;
-
-
-	//jet jetc
-	jet_jecUn[counter_cleaned_jets++] = analysisTree.pfjet_jecUncertainty[jet];
 
       }///loop in all jets
 

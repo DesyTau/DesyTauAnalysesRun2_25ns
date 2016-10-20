@@ -222,9 +222,14 @@ TH2D *histo = (TH2D*) obj;
 			MuV.SetPxPyPzE(0.,0.,0.,0.);
 			ElV.SetPxPyPzE(0.,0.,0.,0.);
 			TauV.SetPxPyPzE(0.,0.,0.,0.);
-	for (int nj=0;nj<njets;++nj) {JetsV.SetPxPyPzE(jet_px[jets_cleaned[nj]], jet_py[jets_cleaned[nj]],jet_pz[jets_cleaned[nj]],jet_e[jets_cleaned[nj]]);
-	JetsMV.push_back(JetsV);
 
+	for (int nj=0;nj<njets;++nj) {
+
+	int jet_index = jets_cleaned[nj+1];
+
+	JetsV.SetPxPyPzE(jet_px[jet_index], jet_py[jet_index],jet_pz[jet_index],jet_e[jet_index]);
+	JetsMV.push_back(JetsV);
+	}
 
 float met = -1.;
 

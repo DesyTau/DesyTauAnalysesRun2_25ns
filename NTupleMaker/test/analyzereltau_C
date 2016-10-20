@@ -94,8 +94,8 @@ void analyzer::Loop(){
 	bool isTT = false;
 	bool isWJ = false;
 	bool isDY = false;
+	bool isDYhigh = false;
 	bool isDYlow = false;
-	bool isDYNJ = false;
 	bool isDYNJ = false;
 	bool isWNJ = false;
 	bool isNJ = false;
@@ -216,12 +216,17 @@ TH2D *histo = (TH2D*) obj;
 		nb = fChain->GetEntry(jentry);   nbytes += nb;
 		float all_weights = 1.;
 
+		float charge_ =el_charge[electron_index]  * ta_charge[taus_index];
+
+		if ( charge_ < 0. && Sign == "SS") continue;
+		if ( charge_ > 0. && Sign == "OS") continue;
+
 		if ( jentry%100000 ==0 ) cout<<" working for you...processed " <<jentry<<" events from "<<nentries<<" dataset "<<datasetName->c_str()<<" weight "<<all_weights<< endl;
 
 		if (isWJ && (npartons>0 && npartons<5)) continue;
 
 		//if (isDY && (npartons>0 && npartons<5)) continue;
-		if ( (isDYhigh || isDYNJ)  && !isDYlow && (npartons>0 && npartons<5)) continue;
+		if ( isDYhigh && npartons>0 && npartons<5) continue;
 
 		if (isData && met_flag<0.5) continue;	
 
@@ -235,9 +240,14 @@ TH2D *histo = (TH2D*) obj;
 			MuV.SetPxPyPzE(0.,0.,0.,0.);
 			ElV.SetPxPyPzE(0.,0.,0.,0.);
 			TauV.SetPxPyPzE(0.,0.,0.,0.);
-	for (int nj=0;nj<njets;++nj) {JetsV.SetPxPyPzE(jet_px[jets_cleaned[nj]], jet_py[jets_cleaned[nj]],jet_pz[jets_cleaned[nj]],jet_e[jets_cleaned[nj]]);
+
+	for (int nj=0;nj<njets;++nj) {
+
+	int jet_index = jets_cleaned[nj+1];
+
+	JetsV.SetPxPyPzE(jet_px[jet_index], jet_py[jet_index],jet_pz[jet_index],jet_e[jet_index]);
 	JetsMV.push_back(JetsV);
-}
+	}
 
 float met= -1.;
 		METV.SetPx(met_ex);
@@ -322,10 +332,6 @@ if (taus_index>-1 && taus_index<8)			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta
 		if ( fabs(el_charge[electron_index]) !=1 ) continue;
 		if ( fabs(ta_charge[taus_index]) !=1 ) continue;
 
-		float charge_ =el_charge[electron_index]  * ta_charge[taus_index];
-
-		if ( charge_ < 0. && Sign == "SS") continue;
-		if ( charge_ > 0. && Sign == "OS") continue;
 
 		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
 		CFCounter[iCut]+= all_weights;

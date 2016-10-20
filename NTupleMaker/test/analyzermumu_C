@@ -64,9 +64,8 @@ void analyzer::Loop(){
 	CutList.push_back("ZpT correction");
 	CutList.push_back("Jets gt 1 ");
 	CutList.push_back("0 btag");
-	CutList.push_back("MET gt 20");
-	CutList.push_back("MET gt 30");
-	CutList.push_back("MET gt 40");
+	CutList.push_back("DiJet Mass gt 200");
+	CutList.push_back("DiJet dEta gt 4");
 
 	ChiMass = 0.;
 	//cout<<" THE MASS IS ========================= "<<ChiMass<<endl;
@@ -190,28 +189,14 @@ TH2D *histo = (TH2D*) obj;
 	SetupHists(CutNumb);
 
 	Long64_t nbytes = 0, nb = 0;
-/*	if (isTT){
-	TH1D * histTopPt = new TH1D("histTopPt","",1,0,0);
-		for (Long64_t jen=0; jen<nentries;jen++) {
-
-			Long64_t ientry = LoadTree(jen);
-			nb = fChain->GetEntry(jen);  
-//			cout<<"  "<<top_weight<<endl;
-			histTopPt->Fill(0.,top_weight);
-		}	
-		
-
-			top_w = histTopPt->GetMean();
-	cout<<" there is a TTbar sample and the Mean weight from topPt is "<<top_w<<"  "<<histTopPt->GetSumOfWeights()<<endl;
-	}
-*/
-
 
 
 	for (Long64_t jentry=0; jentry<nentries;jentry++) {
 		Long64_t ientry = LoadTree(jentry);
 		nb = fChain->GetEntry(jentry);   nbytes += nb;
 		float all_weights = 1.;
+	
+if (muon_index_1 <0 || muon_index_2 <0) continue;
 
 		float charge_ =mu_charge[muon_index_1]  * mu_charge[muon_index_2];
 
@@ -229,30 +214,17 @@ TH2D *histo = (TH2D*) obj;
 
                		JetsMV.clear();
 
-			JetsV.SetPxPyPzE(0.,0.,0.,0.);
 			LeptV1.SetPxPyPzE(0.,0.,0.,0.);
 			LeptV2.SetPxPyPzE(0.,0.,0.,0.);
-
-	for (int nj=0;nj<njets;++nj) {
-
-	int jet_index = jets_cleaned[nj+1];
-
-	JetsV.SetPxPyPzE(jet_px[jet_index], jet_py[jet_index],jet_pz[jet_index],jet_e[jet_index]);
-	JetsMV.push_back(JetsV);
-
-}
-
-
-
-
-
                         JetsV.SetPxPyPzE(0.,0.,0.,0.);
                         MuV.SetPxPyPzE(0.,0.,0.,0.);
-                        ElV.SetPxPyPzE(0.,0.,0.,0.);
-                        TauV.SetPxPyPzE(0.,0.,0.,0.);
-        for (int nj=0;nj<njets;++nj) {JetsV.SetPxPyPzE(jet_px[jets_cleaned[nj]], jet_py[jets_cleaned[nj]],jet_pz[jets_cleaned[nj]],jet_e[jets_cleaned[nj]]);
-        JetsMV.push_back(JetsV);
-}
+
+	for (int nj=0;nj<njets;++nj) {
+	int jet_index = jets_cleaned[nj];
+	JetsV.SetPxPyPzE(0.,0.,0.,0.);
+	JetsV.SetPxPyPzE(jet_px[jet_index], jet_py[jet_index],jet_pz[jet_index],jet_e[jet_index]);
+	JetsMV.push_back(JetsV);
+	}
 
 
 	float met = -1;
@@ -317,6 +289,8 @@ if(muon_index_2>-1 && muon_index_2<8)			LeptV2.SetPtEtaPhiM(mu_pt[muon_index_2],
 
 		if ( fabs(mu_dz[muon_index_1]) >0.2 ) continue;
 		if ( fabs(mu_dxy[muon_index_1]) >0.045) continue;
+		if ( fabs(mu_dz[muon_index_2]) >0.2 ) continue;
+		if ( fabs(mu_dxy[muon_index_2]) >0.045) continue;
 
 		if ( fabs(mu_charge[muon_index_1]) !=1 ) continue;
 		if ( fabs(mu_charge[muon_index_2]) !=1 ) continue;
@@ -360,7 +334,8 @@ if(muon_index_2>-1 && muon_index_2<8)			LeptV2.SetPtEtaPhiM(mu_pt[muon_index_2],
 	if (isSignal) all_weights *= FastSF;
 		//int binNumber = TGr_hip->GetXaxis()->FindBin(mu_eta[muon_index_1]);
 		double hip = TGr_hip->Eval(float(mu_eta[muon_index_1]));
-		all_weights *= hip;
+		double hip2 = TGr_hip->Eval(float(mu_eta[muon_index_2]));
+		all_weights *= hip*hip2;
 //		cout<<"  "<<hip<<"  "<<ptN<<"  "<<etaN<<"  "<<mu_pt[muon_index_1]<<"  "<<endl;
 
 
@@ -419,7 +394,7 @@ if(muon_index_2>-1 && muon_index_2<8)			LeptV2.SetPtEtaPhiM(mu_pt[muon_index_2],
                 iCFCounter[iCut]++;
 		iCut++;
 
-		if (nbtag!=0) continue;
+		//if (nbtag!=0) continue;
 		FillHistsDiL(iCut, all_weights, LeptV2, LeptV1, JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index_1,muon_index_2);
 		CFCounter[iCut]+= all_weights;
 		CFCounter_[iCut]+= all_weights;
@@ -427,35 +402,24 @@ if(muon_index_2>-1 && muon_index_2<8)			LeptV2.SetPtEtaPhiM(mu_pt[muon_index_2],
 		iCut++;
 
 
-		 TLorentzVector DiL = LeptV1  ;
-     		double dPhi=dPhiFrom2P( DiL.Px(), DiL.Py(), METV.Px(),  METV.Py() );
-         	double MT = 0;MT=sqrt(2*DiL.Pt()*met*(1-TMath::Cos(dPhi)));
+		 TLorentzVector DiJet = JetsMV.at(0) + JetsMV.at(1)  ;
+		 TLorentzVector DiL = LeptV1 + LeptV2  ;
+		
 
-
-		if (met<20.) continue;
+		if (DiJet.M()<200.) continue;
 		FillHistsDiL(iCut, all_weights, LeptV2, LeptV1, JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index_1,muon_index_2);
 		CFCounter[iCut]+= all_weights;
 		CFCounter_[iCut]+= all_weights;
                 iCFCounter[iCut]++;
 		iCut++;
 
-		if (met<30.) continue;
+		double dEta = JetsMV.at(0).Eta() - JetsMV.at(1).Eta();
+		if (fabs(dEta)>4.) continue;
 		FillHistsDiL(iCut, all_weights, LeptV2, LeptV1, JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index_1,muon_index_2);
 		CFCounter[iCut]+= all_weights;
 		CFCounter_[iCut]+= all_weights;
                 iCFCounter[iCut]++;
 		iCut++;
-
-		if (met<40.) continue;
-		FillHistsDiL(iCut, all_weights, LeptV2, LeptV1, JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index_1,muon_index_2);
-		CFCounter[iCut]+= all_weights;
-		CFCounter_[iCut]+= all_weights;
-                iCFCounter[iCut]++;
-		iCut++;
-
-
-
-
 		
 
 	
