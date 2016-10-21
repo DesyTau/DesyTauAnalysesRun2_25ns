@@ -79,10 +79,6 @@ struct btag_scaling_inputs{
   TH1F *tagEff_C;
   TH1F *tagEff_Light;
   TRandom3 *rand;
-  int MinBJetPt; 
-  int MaxBJetPt;
-  int MinLJetPt;
-  int MaxLJetPt;
 };
 
 int read_json(std::string filename, lumi_json& json);
@@ -184,7 +180,7 @@ int main(int argc, char * argv[]){
   TH1F  *tagEff_Light = (TH1F*)fileTagging->Get("btag_eff_oth");
   TRandom3 *rand = new TRandom3();
 
-  const struct btag_scaling_inputs inputs_btag_scaling_medium = { reader_B, reader_C, reader_Light, tagEff_B, tagEff_C, tagEff_Light, rand , 30, 670, 20, 1000};
+  const struct btag_scaling_inputs inputs_btag_scaling_medium = { reader_B, reader_C, reader_Light, tagEff_B, tagEff_C, tagEff_Light, rand };
 
   // MET Recoil Corrections
   const bool applyRecoilCorrections = cfg.get<bool>("ApplyRecoilCorrections");
@@ -1537,21 +1533,15 @@ void counting_jets(const AC1B *analysisTree, Spring15Tree *otree, const Config *
 	double tageff          = 1;
 
 	if (flavor==5) {
-	  if (JetPtForBTag>inputs_btag_scaling->MaxBJetPt) JetPtForBTag = inputs_btag_scaling->MaxBJetPt - 0.1;
-	  if (JetPtForBTag<inputs_btag_scaling->MinBJetPt) JetPtForBTag = inputs_btag_scaling->MinBJetPt + 0.1;
-	  jet_scalefactor = inputs_btag_scaling->reader_B.eval_auto_bounds("central",BTagEntry::FLAV_B, absJetEta, JetPtForBTag);
+	  jet_scalefactor = inputs_btag_scaling->reader_B.eval_auto_bounds("central",BTagEntry::FLAV_B, jetEta, JetPtForBTag);
 	  tageff = inputs_btag_scaling->tagEff_B->Interpolate(JetPtForBTag,absJetEta);
 	}
 	else if (flavor==4) {
-	  if (JetPtForBTag>inputs_btag_scaling->MaxBJetPt) JetPtForBTag = inputs_btag_scaling->MaxBJetPt - 0.1;
-	  if (JetPtForBTag<inputs_btag_scaling->MinBJetPt) JetPtForBTag = inputs_btag_scaling->MinBJetPt + 0.1;
-	  jet_scalefactor = inputs_btag_scaling->reader_C.eval_auto_bounds("central",BTagEntry::FLAV_C, absJetEta, JetPtForBTag);
+	  jet_scalefactor = inputs_btag_scaling->reader_C.eval_auto_bounds("central",BTagEntry::FLAV_C, jetEta, JetPtForBTag);
 	  tageff = inputs_btag_scaling->tagEff_C->Interpolate(JetPtForBTag,absJetEta);
 	}
 	else {
-	  if (JetPtForBTag>inputs_btag_scaling->MaxLJetPt) JetPtForBTag = inputs_btag_scaling->MaxLJetPt - 0.1;
-	  if (JetPtForBTag<inputs_btag_scaling->MinLJetPt) JetPtForBTag = inputs_btag_scaling->MinLJetPt + 0.1;
-	  jet_scalefactor = inputs_btag_scaling->reader_Light.eval_auto_bounds("central",BTagEntry::FLAV_UDSG, absJetEta, JetPtForBTag);
+	  jet_scalefactor = inputs_btag_scaling->reader_Light.eval_auto_bounds("central",BTagEntry::FLAV_UDSG, jetEta, JetPtForBTag);
 	  tageff = inputs_btag_scaling->tagEff_Light->Interpolate(JetPtForBTag,absJetEta);
 	}
 
