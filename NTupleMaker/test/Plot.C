@@ -15,12 +15,12 @@
 #include "TColor.h"
 #include "TEfficiency.h"
 #include "TMath.h"
-void Plot(TString directory = "/nfs/dust/cms/user/rasp/Run/Run2016/EMu_2016BCD/Met_Uncorr/",
+void Plot(TString directory = "/nfs/dust/cms/user/rasp/Run/Run2016/EMu_2016BCD/",
 	  TString suffix = "",
 	  TString DataFile = "MuonEG_Run2016",
 	  TString Variable = "mTtot",
 	  TString MA =  "300",
-	  TString Suffix = "",
+	  TString Suffix = "_mttot_0jetlow",
 	  int nBins  =   30,
 	  float xmin =    0,
 	  float xmax =  300,
@@ -29,22 +29,24 @@ void Plot(TString directory = "/nfs/dust/cms/user/rasp/Run/Run2016/EMu_2016BCD/M
       TString Cuts = "&&dzeta_mvamet>-20&&iso_1<0.15&&iso_2<0.2&&extraelec_veto<0.5&&extramuon_veto<0.5&&pt_1>13&&pt_2>10&&TMath::Max(pt_1,pt_2)>24",
 	  //	  TString Cuts = "&&dzeta_mvamet<-60&&mvamet>80&&iso_1<0.15&&iso_2<0.2&&extraelec_veto<0.5&&extramuon_veto<0.5&&pt_1>13&&pt_2>10&&TMath::Max(pt_1,pt_2)>24",
 	  TString xtitle = "m_{T}^{tot} [GeV]",
-	  TString ytitle = "Events"){
-
+	  TString ytitle = "Events",
+      TString category = "inclusive",
+      bool logY = false
+          )
+{
   //ModTDRStyle();
 
-  bool logY = false;
   bool blindData = true;
-  int nbMin = 10;
-  int nbMax = 30;
+  int nbMin = 4;
+  int nbMax = 11;
   bool plotLeg = true;
   int position = 0; // 0 - right, 1 - left, 2 - central
-  bool showSignal = false;
+  bool showSignal = true;
 
   TH1::SetDefaultSumw2();
   TH2::SetDefaultSumw2();
 
-  double lumi = 12892*0.97;
+  double lumi = 12892;
   double TTnorm = 1.0;
   double Wnorm  = 1.0;
 
@@ -55,13 +57,14 @@ void Plot(TString directory = "/nfs/dust/cms/user/rasp/Run/Run2016/EMu_2016BCD/M
 
   //  TString qcdweight("2.02*");
   TString qcdweight("qcdweight*");
+  TString zptmassweight("zptmassweight*");
   //  TString qcdweight("(qcdweight*qcdweight/qcdweightup)*");
   //  TString qcdweight("qcdweight_nodzeta*");
 
-  TString sampleNames[22] = {
+  TString sampleNames[30] = {
     DataFile, // data (0)
-    "DYJetsToLL_M-50_13TeV-madgraphMLM",     // isZTT  (1)
-    "DYJetsToLL_M-50_13TeV-madgraphMLM",     // !isZTT (2)
+    "DYJetsToLL_M-50_13TeV-madgraphMLM_ext",     // isZTT  (1)
+    "DYJetsToLL_M-50_13TeV-madgraphMLM_ext",     // !isZTT (2)
     "DYJetsToLL_M-10to50_13TeV-madgraphMLM", // isZTT  (3)
     "DYJetsToLL_M-10to50_13TeV-madgraphMLM", // !isZTT (4)
     "WJetsToLNu_13TeV-madgraphMLM",      // (5)
@@ -78,17 +81,20 @@ void Plot(TString directory = "/nfs/dust/cms/user/rasp/Run/Run2016/EMu_2016BCD/M
     "WZTo3LNu_13TeV-powheg",           // (16)
     "ZZTo4L_13TeV_powheg",             // (17)
     "ZZTo2L2Q_13TeV_amcatnloFXFX",     // (18)
-    "SUSYGluGluToHToTauTau_M-"+MA+"_13TeV-pythia8",    // (19)
-    "SUSYGluGluToBBHToTauTau_M-"+MA+"_13TeV-pythia8", // (20)
-    ""    // (21);
+    "WGToLNuG_13TeV-madgraphMLM",             // (19)
+    "WGstarToLNuMuMu_012Jets_13TeV-madgraph", // (20)
+    "WGstarToLNuEE_012Jets_13TeV-madgraph",   // (21)
+    "GluGluHToTauTau_M125_13TeV_powheg",    // (22)
+    "VBFHToTauTau_M125_13TeV_powheg", // (23)
+    ""    // (24);
   };
 
 
-  double xsec[22] = {1, // data (0)
-		     6025.2,  // DY(10to50) (1)
-		     6025.2,  // DY(10to50) (2)
-		     18610,   // DY(50)     (3)
-		     18610,   // DY(50)     (4)
+  double xsec[30] = {1, // data (0)
+		     5765,  // DY(50) (1)
+		     5765,  // DY(50) (2)
+		     18610,   // DY(10to50)     (3)
+		     18610,   // DY(10to50)     (4)
 		     Wnorm*61526.7,// WJets (5)
 		     TTnorm*831.76,  // TT  (6)
 		     136.95*3*0.108, // ST_t-channel_top (7)
@@ -103,39 +109,72 @@ void Plot(TString directory = "/nfs/dust/cms/user/rasp/Run/Run2016/EMu_2016BCD/M
 		     5.26,   // WZTo3L1Nu   (16)
 		     1.212,  // ZZTo4L      (17)
 		     3.22,   // ZZTo2L2Q    (18)
-		     100,  // gg->H (19)
-		     100,  // bbH   (20)
+             489.0,  // WGToLNuG        (19)
+             2.793,  // WGstarToLNuMuMu (20)
+             3.526,  // WGstarToLNuEE   (21)
+		     43.92*0.0632,  // gg->H (22)
+		     3.748*0.0632,  // VBF H   (23)
 		     0   // dummy 
   };     
   
-  TString cuts[22];
-  TString cutsSS[22];
+  TString cuts[30];
+  TString cutsSS[30];
+  
+  if(category=="0jet_low")
+  {
+      Cuts += "&&pt_2>15 && pt_2<35 && njets==0 && dzeta>-35";
+  }
+    
+  if(category=="0jet_high")
+  {
+      Cuts += "&&pt_2>35 && njets==0 && dzeta>-35";
+  }
+  
+  if(category=="1jet_low")
+  {
+      Cuts += "&&pt_2>15 && pt_2<35 && (njets==1 || (njets==2 && mjj<500)) && dzeta>-35";
+  }
+    
+  if(category=="1jet_high")
+  {
+      Cuts += "&&pt_2>35 && (njets==1 || (njets==2 && mjj<500)) && dzeta>-35";
+  }
 
-  for (int i=0; i<22; ++i) {
+  if(category=="vbf_low")
+  {
+      Cuts += "&&pt_2>15 && njets==2 && mjj>500 && mjj<800 && dzeta>-10";
+  }
+    
+  if(category=="vbf_high")
+  {
+      Cuts += "&&pt_2>15 && njets==2 && mjj>800 && dzeta>-10";
+  }
+
+  for (int i=0; i<30; ++i) {
     cuts[i] = Weight+"(os>0.5"+Cuts+")";
     cutsSS[i] = Weight+qcdweight+"(os<0.5"+Cuts+")";
   }
-  cuts[0] = "(os>0.5"+Cuts+")";
-  cuts[1] = Weight+"(os>0.5"+Cuts+"&&isZTT)";
-  cuts[2] = Weight+"(os>0.5"+Cuts+"&&!isZTT)";
+  cuts[0] = "(os>0.5"+Cuts+"&&metFilters>0.5)";
+  cuts[1] = Weight+zptmassweight+"(os>0.5"+Cuts+"&&isZTT)";
+  cuts[2] = Weight+zptmassweight+"(os>0.5"+Cuts+"&&!isZTT)";
   cuts[3] = Weight+"(os>0.5"+Cuts+"&&isZTT)";
   cuts[4] = Weight+"(os>0.5"+Cuts+"&&!isZTT)";
 
   cuts[6]  = Weight+topweight+"(os>0.5"+Cuts+")";
 
-  cutsSS[0] = qcdweight+"(os<0.5"+Cuts+")";
-  cutsSS[1] = Weight+qcdweight+"(os<0.5"+Cuts+"&&isZTT)";
-  cutsSS[2] = Weight+qcdweight+"(os<0.5"+Cuts+"&&!isZTT)";
+  cutsSS[0] = qcdweight+"(os<0.5"+Cuts+"&&metFilters>0.5)";
+  cutsSS[1] = Weight+zptmassweight+qcdweight+"(os<0.5"+Cuts+"&&isZTT)";
+  cutsSS[2] = Weight+zptmassweight+qcdweight+"(os<0.5"+Cuts+"&&!isZTT)";
   cutsSS[3] = Weight+qcdweight+"(os<0.5"+Cuts+"&&isZTT)";
   cutsSS[4] = Weight+qcdweight+"(os<0.5"+Cuts+"&&!isZTT)";
 
   cutsSS[6]  = Weight+topweight+qcdweight+"(os<0.5"+Cuts+")";
 
 
-  TH1D * hist[22];
-  TH1D * histSS[22];
+  TH1D * hist[30];
+  TH1D * histSS[30];
 
-  int nSamples = 21;
+  int nSamples = 24;
 
   TCanvas * dummyCanv = new TCanvas("dummy","",500,500);
   
@@ -170,6 +209,253 @@ void Plot(TString directory = "/nfs/dust/cms/user/rasp/Run/Run2016/EMu_2016BCD/M
   }
 
   delete dummyCanv;
+    
+    
+    
+    // *******************************
+    // ***** W+Jets samples *******
+    // *******************************
+    
+    TH1D * histW[10];
+    TH1D * histWSS[10];
+    int nSamplesDY = 9;
+    
+    TString npartonCuts[9] = {"&&(npartons==0||npartons>4)",
+        "&&npartons==1",
+        "&&npartons==2",
+        "&&npartons==3",
+        "&&npartons==4",
+        "",
+        "",
+        "",
+        ""
+    };
+    
+    TString refSamples[5];
+    double refXSec[5];
+    double refEvents[5] = {0,0,0,0,0};
+    // redefine reference cross sections
+    // and reference samples
+    refSamples[0] = "WJetsToLNu_13TeV-madgraphMLM";
+    refSamples[1] = "W1JetsToLNu_13TeV-madgraphMLM";
+    refSamples[2] = "W2JetsToLNu_13TeV-madgraphMLM";
+    refSamples[3] = "W3JetsToLNu_13TeV-madgraphMLM";
+    refSamples[4] = "W4JetsToLNu_13TeV-madgraphMLM";
+    
+    refXSec[0] = 61527;
+    refXSec[1] = 1.221*9644.5;
+    refXSec[2] = 1.221*3144.5;
+    refXSec[3] = 1.221*954.8;
+    refXSec[4] = 1.221*485.6;
+    
+    refEvents[0] = 0;
+    refEvents[1] = 0;
+    refEvents[2] = 0;
+    refEvents[3] = 0;
+    refEvents[4] = 0;
+    
+    for (int iDY=0; iDY<5; ++iDY) {
+        TFile * file = new TFile(directory+refSamples[iDY]+".root");
+        TH1D * histWeightsH = (TH1D*)file->Get("histWeightsH");
+        refEvents[iDY] = histWeightsH->GetSumOfWeights();
+    }
+    TString wSampleNames[9] = {"WJetsToLNu_13TeV-madgraphMLM",
+			     "WJetsToLNu_13TeV-madgraphMLM",
+			     "WJetsToLNu_13TeV-madgraphMLM",
+			     "WJetsToLNu_13TeV-madgraphMLM",
+			     "WJetsToLNu_13TeV-madgraphMLM",
+			     "W1JetsToLNu_13TeV-madgraphMLM",
+			     "W2JetsToLNu_13TeV-madgraphMLM",
+			     "W3JetsToLNu_13TeV-madgraphMLM",
+			     "W4JetsToLNu_13TeV-madgraphMLM"
+    };
+
+    double wNorm[9];
+    wNorm[0] = lumi*refXSec[0]/refEvents[0];
+    wNorm[1] = lumi/(refEvents[0]/refXSec[0]+refEvents[1]/refXSec[1]);
+    wNorm[2] = lumi/(refEvents[0]/refXSec[0]+refEvents[2]/refXSec[2]);
+    wNorm[3] = lumi/(refEvents[0]/refXSec[0]+refEvents[3]/refXSec[3]);
+    wNorm[4] = lumi/(refEvents[0]/refXSec[0]+refEvents[4]/refXSec[4]);
+    wNorm[5] = lumi/(refEvents[0]/refXSec[0]+refEvents[1]/refXSec[1]);
+    wNorm[6] = lumi/(refEvents[0]/refXSec[0]+refEvents[2]/refXSec[2]);
+    wNorm[7] = lumi/(refEvents[0]/refXSec[0]+refEvents[3]/refXSec[3]);
+    wNorm[8] = lumi/(refEvents[0]/refXSec[0]+refEvents[4]/refXSec[4]);
+    
+    TString cutsW[9];
+    TString cutsWSS[9];
+    
+    for (int iDY=0; iDY<9; ++iDY) {
+        cutsW[iDY]   = Weight+"(os>0.5"+Cuts+npartonCuts[iDY]+")";
+        cutsWSS[iDY] = Weight+qcdweight+"(os<0.5"+Cuts+npartonCuts[iDY]+")";
+
+    }
+    
+    // filling histograms for WJets samples
+    for (int i=0; i<nSamplesDY; ++i) { // run over samples
+        TFile * file = new TFile(directory+wSampleNames[i]+".root");
+        TTree * tree = (TTree*)file->Get("TauCheck");
+        double norm = wNorm[i];
+        TString histNameW   = wSampleNames[i] + Variable + "_w_os";
+        TString histNameWSS = wSampleNames[i] + Variable + "_w_ss";
+        histW[i]   = new TH1D(histNameW,"",nBins,xmin,xmax);
+        histWSS[i] = new TH1D(histNameWSS,"",nBins,xmin,xmax);
+        histW[i]->Sumw2();
+        histWSS[i]->Sumw2();
+        tree->Draw(Variable+">>"+histNameW,  cutsW[i]);
+        tree->Draw(Variable+">>"+histNameWSS,cutsWSS[i]);
+        
+        for (int iB=1; iB<=nBins; ++iB)
+        {
+            double x = histW[i]->GetBinContent(iB);
+            double e = histW[i]->GetBinError(iB);
+            histW[i]->SetBinContent(iB,norm*x);
+            histW[i]->SetBinError(iB,norm*e);
+            x = histWSS[i]->GetBinContent(iB);
+            e = histWSS[i]->GetBinError(iB);
+            histWSS[i]->SetBinContent(iB,norm*x);
+            histWSS[i]->SetBinError(iB,norm*e);
+        }
+        std::cout << wSampleNames[i] << " -> W = " << histW[i]->GetEntries() << " : " << histW[i]->GetSumOfWeights() 
+        << std::endl;
+        //    delete file;
+    }
+    hist[5]   = histW[0];
+    histSS[5] = histWSS[0];
+    for (int iDY=1; iDY<9; ++iDY)
+    {
+        hist[5]->Add(hist[5],histW[iDY]);
+        histSS[5]->Add(histSS[5],histWSS[iDY]);
+    }
+    
+    
+    
+    // *******************************
+    // ***** Drell-Yan samples *******
+    // *******************************
+    
+    TH1D * histZtt[10];
+    TH1D * histZttSS[10];
+    
+    TH1D * histZll[10];
+    TH1D * histZllSS[10];
+    
+    refSamples[0] = "DYJetsToLL_M-50_13TeV-madgraphMLM_ext";
+    refSamples[1] = "DY1JetsToLL_M-50_13TeV-madgraphMLM";
+    refSamples[2] = "DY2JetsToLL_M-50_13TeV-madgraphMLM";
+    refSamples[3] = "DY3JetsToLL_M-50_13TeV-madgraphMLM";
+    refSamples[4] = "DY4JetsToLL_M-50_13TeV-madgraphMLM";
+
+    refXSec[0] = 5765;
+    refXSec[1] = 1.164*1012.5;
+    refXSec[2] = 1.164*332.8;
+    refXSec[3] = 1.164*101.8;
+    refXSec[4] = 1.164*54.8;
+    
+    for (int iDY=0; iDY<5; ++iDY) {
+        TFile * file = new TFile(directory+refSamples[iDY]+".root");
+        TH1D * histWeightsH = (TH1D*)file->Get("histWeightsH");
+        refEvents[iDY] = histWeightsH->GetSumOfWeights();
+    }
+    TString dySampleNames[9] = {"DYJetsToLL_M-50_13TeV-madgraphMLM_ext",
+        "DYJetsToLL_M-50_13TeV-madgraphMLM_ext",
+        "DYJetsToLL_M-50_13TeV-madgraphMLM_ext",
+        "DYJetsToLL_M-50_13TeV-madgraphMLM_ext",
+        "DYJetsToLL_M-50_13TeV-madgraphMLM_ext",
+        "DY1JetsToLL_M-50_13TeV-madgraphMLM",
+        "DY2JetsToLL_M-50_13TeV-madgraphMLM",
+        "DY3JetsToLL_M-50_13TeV-madgraphMLM",
+        "DY4JetsToLL_M-50_13TeV-madgraphMLM"
+    };
+    
+    double dyNorm[9];
+    dyNorm[0] = lumi*refXSec[0]/refEvents[0];
+    dyNorm[1] = lumi/(refEvents[0]/refXSec[0]+refEvents[1]/refXSec[1]);
+    dyNorm[2] = lumi/(refEvents[0]/refXSec[0]+refEvents[2]/refXSec[2]);
+    dyNorm[3] = lumi/(refEvents[0]/refXSec[0]+refEvents[3]/refXSec[3]);
+    dyNorm[4] = lumi/(refEvents[0]/refXSec[0]+refEvents[4]/refXSec[4]);
+    dyNorm[5] = lumi/(refEvents[0]/refXSec[0]+refEvents[1]/refXSec[1]);
+    dyNorm[6] = lumi/(refEvents[0]/refXSec[0]+refEvents[2]/refXSec[2]);
+    dyNorm[7] = lumi/(refEvents[0]/refXSec[0]+refEvents[3]/refXSec[3]);
+    dyNorm[8] = lumi/(refEvents[0]/refXSec[0]+refEvents[4]/refXSec[4]);
+    
+    
+    TString cutsZtt[9];
+    TString cutsZttSS[9];
+    
+    TString cutsZll[9];
+    TString cutsZllSS[9];
+    
+    for (int iDY=0; iDY<9; ++iDY) {
+        cutsZtt[iDY]   = Weight+zptmassweight+"(os>0.5"+Cuts+npartonCuts[iDY]+"&&isZTT>0.5)";
+        cutsZttSS[iDY] = Weight+zptmassweight+qcdweight+"(os<0.5"+Cuts+npartonCuts[iDY]+"&&isZTT>0.5)";
+        cutsZll[iDY]   = Weight+zptmassweight+"(os>0.5"+Cuts+npartonCuts[iDY]+"&&isZTT<0.5)";
+        cutsZllSS[iDY] = Weight+zptmassweight+qcdweight+"(os<0.5"+Cuts+npartonCuts[iDY]+"&&isZTT<0.5)";
+    }
+    
+    nSamplesDY = 9;
+    
+    // filling histograms for DY samples
+    for (int i=0; i<nSamplesDY; ++i) { // run over samples
+        TFile * file = new TFile(directory+dySampleNames[i]+".root");
+        TTree * tree = (TTree*)file->Get("TauCheck");
+        double norm = dyNorm[i];
+        TString histNameZtt   = dySampleNames[i] + Variable + "_ztt_os";
+        TString histNameZttSS = dySampleNames[i] + Variable + "_ztt_ss";
+        TString histNameZll   = dySampleNames[i] + Variable + "_zll_os";
+        TString histNameZllSS = dySampleNames[i] + Variable + "_zll_ss";
+        histZtt[i]   = new TH1D(histNameZtt,"",nBins,xmin,xmax);
+        histZttSS[i] = new TH1D(histNameZttSS,"",nBins,xmin,xmax);
+        histZll[i]   = new TH1D(histNameZll,"",nBins,xmin,xmax);
+        histZllSS[i] = new TH1D(histNameZllSS,"",nBins,xmin,xmax);
+        histZtt[i]->Sumw2();
+        histZttSS[i]->Sumw2();
+        histZll[i]->Sumw2();
+        histZllSS[i]->Sumw2();
+        tree->Draw(Variable+">>"+histNameZtt,  cutsZtt[i]);
+        tree->Draw(Variable+">>"+histNameZttSS,cutsZttSS[i]);
+        tree->Draw(Variable+">>"+histNameZll,  cutsZll[i]);
+        tree->Draw(Variable+">>"+histNameZllSS,cutsZllSS[i]);
+        
+        for (int iB=1; iB<=nBins; ++iB) {
+            
+            double x = histZtt[i]->GetBinContent(iB);
+            double e = histZtt[i]->GetBinError(iB);
+            histZtt[i]->SetBinContent(iB,norm*x);
+            histZtt[i]->SetBinError(iB,norm*e);
+            x = histZttSS[i]->GetBinContent(iB);
+            e = histZttSS[i]->GetBinError(iB);
+            histZttSS[i]->SetBinContent(iB,norm*x);
+            histZttSS[i]->SetBinError(iB,norm*e);
+            
+            x = histZll[i]->GetBinContent(iB);
+            e = histZll[i]->GetBinError(iB);
+            histZll[i]->SetBinContent(iB,norm*x);
+            histZll[i]->SetBinError(iB,norm*e);
+            x = histZllSS[i]->GetBinContent(iB);
+            e = histZllSS[i]->GetBinError(iB);
+            histZllSS[i]->SetBinContent(iB,norm*x);
+            histZllSS[i]->SetBinError(iB,norm*e);
+
+        }
+        std::cout << dySampleNames[i] << " -> ZTT = " << histZtt[i]->GetEntries() << " : " << histZtt[i]->GetSumOfWeights()
+        << "    ZLL = " << histZll[i]->GetEntries() << " : " << histZll[i]->GetSumOfWeights() << std::endl;
+        //    delete file;
+    }
+    
+    hist[1]   = histZtt[0];
+    histSS[1] = histZttSS[0];
+    hist[2]   = histZll[0];
+    histSS[2] = histZllSS[0];
+    
+    
+    for (int iDY=1; iDY<9; ++iDY) {
+        hist[1]->Add(hist[1],histZtt[iDY]);
+        hist[2]->Add(hist[2],histZll[iDY]);
+        histSS[1]->Add(histSS[1],histZttSS[iDY]);
+        histSS[2]->Add(histSS[2],histZllSS[iDY]);
+    }
+
+    
 
   hist[1]->Add(hist[1],hist[3]);
   hist[2]->Add(hist[2],hist[4]);
@@ -180,6 +466,22 @@ void Plot(TString directory = "/nfs/dust/cms/user/rasp/Run/Run2016/EMu_2016BCD/M
     histSS[7]->Add(histSS[7],histSS[iH]);
   }
 
+  // adding up WJets and WGamma samples
+    for (int iH = 19; iH < 22; ++iH)
+    {
+        hist[5]->Add(hist[5],hist[iH]);
+        histSS[5]->Add(histSS[5],histSS[iH]);
+    }
+  // adding up SM Higgs!
+ 
+    hist[22]->Add(hist[22],hist[23]);
+    
+    for (int iB=1; iB<=nBins; ++iB)
+    {
+        double x = hist[22]->GetBinContent(iB);
+        hist[22]->SetBinContent(iB,10*x);
+    }
+    
   for (int iH=2; iH<5; ++iH)
     histSS[1]->Add(histSS[1],histSS[iH]);
 
@@ -228,8 +530,7 @@ void Plot(TString directory = "/nfs/dust/cms/user/rasp/Run/Run2016/EMu_2016BCD/M
   TH1D * W   = (TH1D*)hist[5]->Clone("W");
   TH1D * TT  = (TH1D*)hist[6]->Clone("TT");
   TH1D * VV  = (TH1D*)hist[7]->Clone("VV");
-  TH1D * ggH = (TH1D*)hist[19]->Clone("ggH");
-  TH1D * bbH = (TH1D*)hist[20]->Clone("bbH");
+  TH1D * SMH = (TH1D*)hist[22]->Clone("SMH");
 
   std::cout << "QCD : " << QCD->GetSumOfWeights() << " : " << QCD->Integral(1,nBins+1) << std::endl;
   std::cout << "VV  : " << VV->GetSumOfWeights() << " : " << VV->Integral(1,nBins+1) << std::endl;
@@ -271,9 +572,10 @@ void Plot(TString directory = "/nfs/dust/cms/user/rasp/Run/Run2016/EMu_2016BCD/M
     float err2 = eQCD*eQCD + eVV*eVV + eW*eW + eTT*eTT;
     float errTot = TMath::Sqrt(err2);
     dummy->SetBinError(iB,errTot);
-    ggH->SetBinError(iB,0);
-    bbH->SetBinError(iB,0);
+    SMH->SetBinError(iB,0);
   }
+    
+  
 
   VV->Add(VV,QCD);
   W->Add(W,VV);
@@ -318,7 +620,7 @@ void Plot(TString directory = "/nfs/dust/cms/user/rasp/Run/Run2016/EMu_2016BCD/M
     h[0]->GetYaxis()->SetTitleOffset(2.0);
     pads[1]->SetGrid(0,1);
     //it complains if the minimum is set to 0 and you try to set log y scale
-    if(logY) h[0]->SetMinimum(0.1);
+    if(logY) h[0]->SetMinimum(1);
     pads[0]->cd();
     
     // Setup legend
@@ -359,19 +661,17 @@ void Plot(TString directory = "/nfs/dust/cms/user/rasp/Run/Run2016/EMu_2016BCD/M
     
     canv1->Update();
     
-    InitSignal(bbH,2);
-    InitSignal(ggH,4);
+   // InitSignal(vbfH,2);
+    InitSignal(SMH,2);
     
     if (showSignal)
     {
-        legend->AddEntry(bbH,"bb#Phi (500)","f");
-        legend->AddEntry(ggH,"gg#rightarrow#Phi (500)","f");
+        legend->AddEntry(SMH,"SM Higgs(125) #times 10","f");
     }
     
     if (showSignal)
     {
-        bbH->Draw("hsame");
-        ggH->Draw("hsame");
+        SMH->Draw("hsame");
     }
     
     canv1->Update();
@@ -460,7 +760,4 @@ void Plot(TString directory = "/nfs/dust/cms/user/rasp/Run/Run2016/EMu_2016BCD/M
     pads[0]->GetFrame()->Draw();
     
     canv1->Print("/nfs/dust/cms/user/ywen/Taus2EMu_80X/workSpacev2/figures/"+Variable+Suffix+suffix+".pdf");
-
-
-
 }
