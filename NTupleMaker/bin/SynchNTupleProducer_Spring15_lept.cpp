@@ -75,9 +75,9 @@ struct btag_scaling_inputs{
   BTagCalibrationReader reader_B;
   BTagCalibrationReader reader_C;
   BTagCalibrationReader reader_Light;
-  TH1F *tagEff_B;
-  TH1F *tagEff_C;
-  TH1F *tagEff_Light;
+  TH2F *tagEff_B;
+  TH2F *tagEff_C;
+  TH2F *tagEff_Light;
   TRandom3 *rand;
 };
 
@@ -175,9 +175,9 @@ int main(int argc, char * argv[]){
 
   TFile *fileTagging  = new TFile(TString(cmsswBase)+TString("/src/DesyTauAnalyses/NTupleMaker/data/tagging_efficiencies_ichep2016.root"));
 
-  TH1F  *tagEff_B     = (TH1F*)fileTagging->Get("btag_eff_b");
-  TH1F  *tagEff_C     = (TH1F*)fileTagging->Get("btag_eff_c");
-  TH1F  *tagEff_Light = (TH1F*)fileTagging->Get("btag_eff_oth");
+  TH2F  *tagEff_B     = (TH2F*)fileTagging->Get("btag_eff_b");
+  TH2F  *tagEff_C     = (TH2F*)fileTagging->Get("btag_eff_c");
+  TH2F  *tagEff_Light = (TH2F*)fileTagging->Get("btag_eff_oth");
   TRandom3 *rand = new TRandom3();
 
   const struct btag_scaling_inputs inputs_btag_scaling_medium = { reader_B, reader_C, reader_Light, tagEff_B, tagEff_C, tagEff_Light, rand };
@@ -1482,6 +1482,8 @@ void counting_jets(const AC1B *analysisTree, Spring15Tree *otree, const Config *
   int indexSubLeadingBJet = -1;
   float ptSubLeadingBJet = -1;
 
+  TH2F* histo_tageff_ = 0;
+
   for (unsigned int jet=0; jet<analysisTree->pfjet_count; ++jet) {
 
     float jetEta    = analysisTree->pfjet_eta[jet];
@@ -1534,15 +1536,23 @@ void counting_jets(const AC1B *analysisTree, Spring15Tree *otree, const Config *
 
 	if (flavor==5) {
 	  jet_scalefactor = inputs_btag_scaling->reader_B.eval_auto_bounds("central",BTagEntry::FLAV_B, jetEta, JetPtForBTag);
-	  tageff = inputs_btag_scaling->tagEff_B->Interpolate(JetPtForBTag,absJetEta);
+	  histo_tageff_=inputs_btag_scaling->tagEff_B;
 	}
 	else if (flavor==4) {
 	  jet_scalefactor = inputs_btag_scaling->reader_C.eval_auto_bounds("central",BTagEntry::FLAV_C, jetEta, JetPtForBTag);
-	  tageff = inputs_btag_scaling->tagEff_C->Interpolate(JetPtForBTag,absJetEta);
+	  histo_tageff_=inputs_btag_scaling->tagEff_C;
+
 	}
 	else {
 	  jet_scalefactor = inputs_btag_scaling->reader_Light.eval_auto_bounds("central",BTagEntry::FLAV_UDSG, jetEta, JetPtForBTag);
-	  tageff = inputs_btag_scaling->tagEff_Light->Interpolate(JetPtForBTag,absJetEta);
+	  histo_tageff_=inputs_btag_scaling->tagEff_Light;
+	}
+	
+	if(JetPtForBTag > histo_tageff_->GetXaxis()->GetBinLowEdge(histo_tageff_->GetNbinsX()+1)){
+	  tageff = histo_tageff_->GetBinContent(histo_tageff_->GetNbinsX(),histo_tageff_->GetYaxis()->FindBin(absJetEta));
+	}
+	else{
+	  tageff = histo_tageff_->GetBinContent(histo_tageff_->GetXaxis()->FindBin(JetPtForBTag), histo_tageff_->GetYaxis()->FindBin(absJetEta));
 	}
 
 	if (tageff<1e-5)      tageff = 1e-5;
@@ -1550,10 +1560,10 @@ void counting_jets(const AC1B *analysisTree, Spring15Tree *otree, const Config *
 	inputs_btag_scaling->rand->SetSeed((int)((jetEta+5)*100000));
 	double rannum = inputs_btag_scaling->rand->Rndm();
 
-	if (jet_scalefactor<1 && tagged)  { // downgrade
-	  if (rannum>jet_scalefactor)  tagged = false;
+	if (jet_scalefactor<1 && tagged)  { // downgrade - demote
+	  if (rannum<1-jet_scalefactor)  tagged = false;
 	}
-	if (jet_scalefactor>1 && !tagged) { // upgrade
+	if (jet_scalefactor>1 && !tagged) { // upgrade - promote
 	  double fraction = (1.0-jet_scalefactor)/(1.0-1.0/tageff);
 	  if (rannum<fraction) tagged = true;
 	}
