@@ -813,15 +813,18 @@ int main(int argc, char * argv[]){
 					  tauMass);
 
 	  // using MVA MET
-      TLorentzVector metLV; metLV.SetXYZT(otree->mvamet*TMath::Cos(otree->mvametphi),
+      /*TLorentzVector metLV; metLV.SetXYZT(otree->mvamet*TMath::Cos(otree->mvametphi),
                 						 otree->mvamet*TMath::Sin(otree->mvametphi),
                							 0,
                 						 TMath::Sqrt( otree->mvamet*TMath::Sin(otree->mvametphi)*otree->mvamet*TMath::Sin(otree->mvametphi) +
-                         				 otree->mvamet*TMath::Cos(otree->mvametphi)*otree->mvamet*TMath::Cos(otree->mvametphi)));
+                         				 otree->mvamet*TMath::Cos(otree->mvametphi)*otree->mvamet*TMath::Cos(otree->mvametphi)));*/
 
-      //if want to switch to pfMET 
-	  /*TLorentzVector metLV; metLV.SetXYZT(analysisTree.pfmet_ex,analysisTree.pfmet_ey,0,
-      TMath::Sqrt(analysisTree.pfmet_ex*analysisTree.pfmet_ex + analysisTree.pfmet_ey*analysisTree.pfmet_ey));*/
+      // using PF MET
+      TLorentzVector metLV; metLV.SetXYZT(otree->met*TMath::Cos(otree->metphi),
+                						 otree->met*TMath::Sin(otree->metphi),
+               							 0,
+                						 TMath::Sqrt( otree->met*TMath::Sin(otree->metphi)*otree->met*TMath::Sin(otree->metphi) +
+                         				 otree->met*TMath::Cos(otree->metphi)*otree->met*TMath::Cos(otree->metphi)));
 
       TLorentzVector dileptonLV = leptonLV + tauLV;
 
@@ -1214,7 +1217,12 @@ void FillTau(const AC1B * analysisTree, Spring15Tree *otree, int tauIndex){
   otree->againstElectronVLooseMVA6_2 = analysisTree->tau_againstElectronVLooseMVA6[tauIndex];
   otree->againstElectronTightMVA6_2 = analysisTree->tau_againstElectronTightMVA6[tauIndex];
 
+  otree->byVLooseIsolationMVArun2v1DBoldDMwLT_2 = analysisTree->tau_byVLooseIsolationMVArun2v1DBoldDMwLT[tauIndex];
+  otree->byLooseIsolationMVArun2v1DBoldDMwLT_2 = analysisTree->tau_byLooseIsolationMVArun2v1DBoldDMwLT[tauIndex];
+  otree->byMediumIsolationMVArun2v1DBoldDMwLT_2 = analysisTree->tau_byMediumIsolationMVArun2v1DBoldDMwLT[tauIndex];
   otree->byTightIsolationMVArun2v1DBoldDMwLT_2 = analysisTree->tau_byTightIsolationMVArun2v1DBoldDMwLT[tauIndex];
+  otree->byVTightIsolationMVArun2v1DBoldDMwLT_2 = analysisTree->tau_byVTightIsolationMVArun2v1DBoldDMwLT[tauIndex];
+  otree->byVVTightIsolationMVArun2v1DBoldDMwLT_2 = analysisTree->tau_byVVTightIsolationMVArun2v1DBoldDMwLT[tauIndex];
   otree-> byIsolationMVArun2v1DBoldDMwLTraw_2 = analysisTree->tau_byIsolationMVArun2v1DBoldDMwLTraw[tauIndex];
   otree->chargedIsoPtSum_2 = analysisTree->tau_chargedIsoPtSum[tauIndex];
 
@@ -1739,10 +1747,17 @@ void svfit_variables(const AC1B *analysisTree, Spring15Tree *otree, const Config
 
   // define MET covariance
   TMatrixD covMET(2, 2);
-  covMET[0][0] = otree->mvacov00;
+  // using MVA MET
+  /*covMET[0][0] = otree->mvacov00;
   covMET[1][0] = otree->mvacov10;
   covMET[0][1] = otree->mvacov01;
-  covMET[1][1] = otree->mvacov11;
+  covMET[1][1] = otree->mvacov11;*/
+
+  // using PF MET
+  covMET[0][0] = otree->metcov00;
+  covMET[1][0] = otree->metcov10;
+  covMET[0][1] = otree->metcov01;
+  covMET[1][1] = otree->metcov11;
 
   // define lepton four vectors
   std::vector<svFitStandalone::MeasuredTauLepton> measuredTauLeptons;
@@ -1758,7 +1773,8 @@ void svfit_variables(const AC1B *analysisTree, Spring15Tree *otree, const Config
 								  otree->m_2,
 								  otree->tau_decay_mode_2));
 
-  SVfitStandaloneAlgorithm algo(measuredTauLeptons, otree->mvamet * cos(otree->mvametphi), otree->mvamet * sin(otree->mvametphi), covMET, 0);
+  //SVfitStandaloneAlgorithm algo(measuredTauLeptons, otree->mvamet * cos(otree->mvametphi), otree->mvamet * sin(otree->mvametphi), covMET, 0); // using MVA MET
+  SVfitStandaloneAlgorithm algo(measuredTauLeptons, otree->met * cos(otree->metphi), otree->met * sin(otree->metphi), covMET, 0); // using PF MET
   edm::FileInPath inputFileName_visPtResolution("TauAnalysis/SVfitStandalone/data/svFitVisMassAndPtResolutionPDF.root");
   TH1::AddDirectory(false);  
   TFile* inputFile_visPtResolution = new TFile(inputFileName_visPtResolution.fullPath().data());
