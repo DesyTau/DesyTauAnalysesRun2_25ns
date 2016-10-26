@@ -244,10 +244,12 @@ public :
    Float_t         tau_byTightCombinedIsolationDeltaBetaCorr3Hits[50];   //[tau_count]
    Float_t         tau_byIsolationMVArun2v1DBoldDMwLTraw[50];   //[tau_count]
    Float_t         tau_byIsolationMVArun2v1DBnewDMwLTraw[50];   //[tau_count]
+   Float_t 	   tau_byVLooseIsolationMVArun2v1DBoldDMwLT[50];
    Float_t 	   tau_byLooseIsolationMVArun2v1DBoldDMwLT[50];
    Float_t 	   tau_byMediumIsolationMVArun2v1DBoldDMwLT[50];
    Float_t 	   tau_byTightIsolationMVArun2v1DBoldDMwLT[50];
    Float_t 	   tau_byVTightIsolationMVArun2v1DBoldDMwLT[50];
+   Float_t 	   tau_byVVTightIsolationMVArun2v1DBoldDMwLT[50];   
    Float_t         tau_chargedIsoPtSum[50];   //[tau_count]
    Float_t         tau_neutralIsoPtSum[50];   //[tau_count]
    Float_t         tau_puCorrPtSum[50];   //[tau_count]
@@ -738,10 +740,12 @@ public :
    TBranch        *b_tau_byLooseCombinedIsolationDeltaBetaCorr3Hits;   //!
    TBranch        *b_tau_byMediumCombinedIsolationDeltaBetaCorr3Hits;   //!
    TBranch        *b_tau_byTightCombinedIsolationDeltaBetaCorr3Hits;   //!
+   TBranch 	  *b_tau_byVLooseIsolationMVArun2v1DBoldDMwLT;
    TBranch 	  *b_tau_byLooseIsolationMVArun2v1DBoldDMwLT;
    TBranch 	  *b_tau_byMediumIsolationMVArun2v1DBoldDMwLT;
    TBranch 	  *b_tau_byTightIsolationMVArun2v1DBoldDMwLT;
    TBranch 	  *b_tau_byVTightIsolationMVArun2v1DBoldDMwLT;
+   TBranch 	  *b_tau_byVVTightIsolationMVArun2v1DBoldDMwLT;
    TBranch        *b_tau_byIsolationMVArun2v1DBoldDMwLTraw;   //!
    TBranch        *b_tau_byIsolationMVArun2v1DBnewDMwLTraw;   //!
    TBranch        *b_tau_chargedIsoPtSum;   //!
@@ -1348,9 +1352,12 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("tau_byTightCombinedIsolationDeltaBetaCorr3Hits", tau_byTightCombinedIsolationDeltaBetaCorr3Hits, &b_tau_byTightCombinedIsolationDeltaBetaCorr3Hits);
    fChain->SetBranchAddress("tau_byIsolationMVArun2v1DBoldDMwLTraw", tau_byIsolationMVArun2v1DBoldDMwLTraw, &b_tau_byIsolationMVArun2v1DBoldDMwLTraw);
    fChain->SetBranchAddress("tau_byIsolationMVArun2v1DBnewDMwLTraw", tau_byIsolationMVArun2v1DBnewDMwLTraw, &b_tau_byIsolationMVArun2v1DBnewDMwLTraw);
+   fChain->SetBranchAddress("tau_byVLooseIsolationMVArun2v1DBoldDMwLT", tau_byVLooseIsolationMVArun2v1DBoldDMwLT, &b_tau_byVLooseIsolationMVArun2v1DBoldDMwLT); 
    fChain->SetBranchAddress("tau_byLooseIsolationMVArun2v1DBoldDMwLT", tau_byLooseIsolationMVArun2v1DBoldDMwLT, &b_tau_byLooseIsolationMVArun2v1DBoldDMwLT); 
    fChain->SetBranchAddress("tau_byMediumIsolationMVArun2v1DBoldDMwLT", tau_byMediumIsolationMVArun2v1DBoldDMwLT, &b_tau_byMediumIsolationMVArun2v1DBoldDMwLT); 
    fChain->SetBranchAddress("tau_byTightIsolationMVArun2v1DBoldDMwLT", tau_byTightIsolationMVArun2v1DBoldDMwLT, &b_tau_byTightIsolationMVArun2v1DBoldDMwLT); 
+   fChain->SetBranchAddress("tau_byVTightIsolationMVArun2v1DBoldDMwLT", tau_byVTightIsolationMVArun2v1DBoldDMwLT, &b_tau_byVTightIsolationMVArun2v1DBoldDMwLT); 
+   fChain->SetBranchAddress("tau_byVVTightIsolationMVArun2v1DBoldDMwLT", tau_byVVTightIsolationMVArun2v1DBoldDMwLT, &b_tau_byVVTightIsolationMVArun2v1DBoldDMwLT); 
    fChain->SetBranchAddress("tau_chargedIsoPtSum", tau_chargedIsoPtSum, &b_tau_chargedIsoPtSum);
    fChain->SetBranchAddress("tau_neutralIsoPtSum", tau_neutralIsoPtSum, &b_tau_neutralIsoPtSum);
    fChain->SetBranchAddress("tau_puCorrPtSum", tau_puCorrPtSum, &b_tau_puCorrPtSum);
