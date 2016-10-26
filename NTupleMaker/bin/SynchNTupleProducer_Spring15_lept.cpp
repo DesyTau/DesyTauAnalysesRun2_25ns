@@ -54,7 +54,7 @@
 #define r2d 57.2957795130823229
 
 #define electronMass 	 0.000511
-#define muonMass 		   0.10565837
+#define muonMass 		   0.105658
 #define tauMass 		   1.77682
 #define pionMass 		   0.1396
 
@@ -807,12 +807,12 @@ int main(int argc, char * argv[]){
       //end MET Recoil Corrections
 
       //ditau sytem
-      TLorentzVector tauLV; tauLV.SetXYZM(analysisTree.tau_px[tauIndex],
-					  analysisTree.tau_py[tauIndex],
-					  analysisTree.tau_pz[tauIndex],
-					  tauMass);
+      TLorentzVector tauLV; tauLV.SetPxPyPzE(analysisTree.tau_px[tauIndex],
+					     analysisTree.tau_py[tauIndex],
+					     analysisTree.tau_pz[tauIndex],
+					     analysisTree.tau_e[tauIndex]);
 
-	  // using MVA MET
+      // using MVA MET
       TLorentzVector metLV; metLV.SetXYZT(otree->mvamet*TMath::Cos(otree->mvametphi),
                 						 otree->mvamet*TMath::Sin(otree->mvametphi),
                							 0,
