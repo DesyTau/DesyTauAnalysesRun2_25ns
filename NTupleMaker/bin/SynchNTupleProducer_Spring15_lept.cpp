@@ -148,11 +148,11 @@ int main(int argc, char * argv[]){
     read_json(TString(TString(cmsswBase)+"/src/"+TString(json_name)).Data(), json);
   }
 
-  const bool ApplyPUweight = cfg.get<bool>("ApplyPUweight"); 
-  const bool ApplyLepSF    = cfg.get<bool>("ApplyLepSF"); 
-  const bool ApplyTrigger  = cfg.get<bool>("ApplyTrigger"); 
-  const bool ApplySVFit    = cfg.get<bool>("ApplySVFit");
-
+  const bool ApplyPUweight    = cfg.get<bool>("ApplyPUweight"); 
+  const bool ApplyLepSF       = cfg.get<bool>("ApplyLepSF"); 
+  const bool ApplyTrigger     = cfg.get<bool>("ApplyTrigger"); 
+  const bool ApplySVFit       = cfg.get<bool>("ApplySVFit");
+  const bool ApplyBTagScaling = cfg.get<bool>("ApplyBTagScaling");
   //pileup distrib
   const string pileUpInDataFile = cfg.get<string>("pileUpInDataFile");
   const string pileUpInMCFile = cfg.get<string>("pileUpInMCFile");
@@ -165,19 +165,35 @@ int main(int argc, char * argv[]){
   const string svFitPtResFile = cfg.get<string>("svFitPtResFile");
 
   //b-tag scale factors
-  BTagCalibration calib("csvv2", cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/CSVv2_ichep.csv");
+  TString pathToBtagScaleFactors = (TString) cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/CSVv2_ichep.csv";
+  if( ApplyBTagScaling && gSystem->AccessPathName(pathToBtagScaleFactors) ){
+    cout<<pathToBtagScaleFactors<<" does not exists. Please check."<<endl;
+    exit( -1 );
+  }//cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/CSVv2_ichep.csv"
+  BTagCalibration calib("csvv2", (string) pathToBtagScaleFactors );
   BTagCalibrationReader reader_B(BTagEntry::OP_MEDIUM,"central");
   BTagCalibrationReader reader_C(BTagEntry::OP_MEDIUM,"central");
   BTagCalibrationReader reader_Light(BTagEntry::OP_MEDIUM,"central");
-  reader_B.load(calib,BTagEntry::FLAV_B,"comb");
-  reader_C.load(calib,BTagEntry::FLAV_C,"comb");
-  reader_Light.load(calib,BTagEntry::FLAV_UDSG,"incl");
-
-  TFile *fileTagging  = new TFile(TString(cmsswBase)+TString("/src/DesyTauAnalyses/NTupleMaker/data/tagging_efficiencies_ichep2016.root"));
-
-  TH2F  *tagEff_B     = (TH2F*)fileTagging->Get("btag_eff_b");
-  TH2F  *tagEff_C     = (TH2F*)fileTagging->Get("btag_eff_c");
-  TH2F  *tagEff_Light = (TH2F*)fileTagging->Get("btag_eff_oth");
+  if( ApplyBTagScaling ){
+    reader_B.load(calib,BTagEntry::FLAV_B,"comb");
+    reader_C.load(calib,BTagEntry::FLAV_C,"comb");
+    reader_Light.load(calib,BTagEntry::FLAV_UDSG,"incl");
+  }
+  TString pathToTaggingEfficiencies = (TString) cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/tagging_efficiencies_ichep2016.root";
+  if ( ApplyBTagScaling && gSystem->AccessPathName(pathToTaggingEfficiencies) ){
+    cout<<pathToTaggingEfficiencies<<" does not exists. Please check."<<endl;
+    exit( -1 );
+  }
+  TFile *fileTagging  = new TFile( pathToTaggingEfficiencies );
+  TH2F  *tagEff_B     = 0;
+  TH2F  *tagEff_C     = 0;
+  TH2F  *tagEff_Light = 0;
+  
+  if( ApplyBTagScaling ){
+    tagEff_B     = (TH2F*)fileTagging->Get("btag_eff_b");
+    tagEff_C     = (TH2F*)fileTagging->Get("btag_eff_c");
+    tagEff_Light = (TH2F*)fileTagging->Get("btag_eff_oth");
+  }
   TRandom3 *rand = new TRandom3();
 
   const struct btag_scaling_inputs inputs_btag_scaling_medium = { reader_B, reader_C, reader_Light, tagEff_B, tagEff_C, tagEff_Light, rand };
