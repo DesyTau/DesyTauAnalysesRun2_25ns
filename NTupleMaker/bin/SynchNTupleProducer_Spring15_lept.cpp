@@ -214,10 +214,7 @@ int main(int argc, char * argv[]){
   if(!isData && applyRecoilCorrections && (isDY || isWJets || isVBForGGHiggs) ){
     TString RecoilDir("HTT-utilities/RecoilCorrections/data/");
 
-    TString RecoilFileName = RecoilDir; RecoilFileName += "PFMET";
-    if (isMG || isVBForGGHiggs )
-      RecoilFileName += "_MG_";
-    RecoilFileName += "2016BCD.root";
+    TString RecoilFileName = RecoilDir; RecoilFileName += "TypeIPFMET_2016BCD.root";
     std::cout<<RecoilFileName<<std::endl;
     recoilPFMetCorrector = new RecoilCorrector( RecoilFileName);
         
@@ -225,10 +222,7 @@ int main(int argc, char * argv[]){
     //std::cout<<RecoilFileName<<std::endl;
     //recoilPuppiMetCorrector = new RecoilCorrector( RecoilFileName);
 
-    RecoilFileName = RecoilDir; RecoilFileName += "MvaMET";
-    if (isMG || isVBForGGHiggs)
-      RecoilFileName += "_MG_";
-    RecoilFileName += "2016BCD.root";
+    RecoilFileName = RecoilDir; RecoilFileName += "MvaMET_2016BCD.root";
     std::cout<<RecoilFileName<<std::endl;
     recoilMvaMetCorrector = new RecoilCorrector( RecoilFileName);
   }
@@ -791,8 +785,7 @@ int main(int argc, char * argv[]){
       }
 
       // MVA MET      
-      // // njetshad, genVis, quantile map correction
-	  genTools::RecoilCorrections( *recoilMvaMetCorrector, (!isData && applyRecoilCorrections && (isDY || isWJets || isVBForGGHiggs)) * genTools::QuantileRemap,
+      genTools::RecoilCorrections( *recoilMvaMetCorrector, (!isData && applyRecoilCorrections && (isDY || isWJets || isVBForGGHiggs)) * genTools::MeanResolution,
 			                     otree->mvamet, otree->mvametphi,
 			                     genV.Px(), genV.Py(),
 			                     genL.Px(), genL.Py(),
@@ -803,12 +796,12 @@ int main(int argc, char * argv[]){
       // overwriting with recoil-corrected values 
       otree->mvamet = otree->mvamet_rcmr;
       otree->mvametphi = otree->mvametphi_rcmr;            
-	  //otree->mt_rcmr_1 = calc::mt(otree->pt_1, otree->phi_1, otree->mvamet_rcmr, otree->mvametphi_rcmr);
-	  //otree->mt_rcmr_2 = calc::mt(otree->pt_2, otree->phi_2, otree->mvamet_rcmr, otree->mvametphi_rcmr);     
+      //otree->mt_rcmr_1 = calc::mt(otree->pt_1, otree->phi_1, otree->mvamet_rcmr, otree->mvametphi_rcmr);
+      //otree->mt_rcmr_2 = calc::mt(otree->pt_2, otree->phi_2, otree->mvamet_rcmr, otree->mvametphi_rcmr);     
       //otree->pzetamiss_rcmr = calc::pzetamiss( zetaX, zetaY, otree->mvamet_rcmr, otree->mvametphi_rcmr);
 
       // PF MET
-	  genTools::RecoilCorrections( *recoilPFMetCorrector, (!isData && applyRecoilCorrections && (isDY || isWJets || isVBForGGHiggs)) * genTools::QuantileRemap,
+      genTools::RecoilCorrections( *recoilPFMetCorrector, (!isData && applyRecoilCorrections && (isDY || isWJets || isVBForGGHiggs)) * genTools::MeanResolution,
 			                     otree->met, otree->metphi,
 			                     genV.Px(), genV.Py(),
 			                     genL.Px(), genL.Py(),
@@ -899,7 +892,7 @@ int main(int argc, char * argv[]){
 
       otree->pzetavis  = vectorVisX*zetaX + vectorVisY*zetaY;
       otree->pzetamiss = otree->mvamet*TMath::Cos(otree->mvametphi)*zetaX + otree->mvamet*TMath::Sin(otree->mvametphi)*zetaY;
-      //otree->pfpzetamiss = analysisTree.pfmet_ex*zetaX + analysisTree.pfmet_ey*zetaY; // this is not recoil-corrected  
+      //otree->pfpzetamiss = analysisTree.pfmetcorr_ex*zetaX + analysisTree.pfmetcorr_ey*zetaY; // this is not recoil-corrected  
       otree->pfpzetamiss = calc::pzetamiss( zetaX, zetaY, otree->met, otree->metphi);   
       otree->puppipzetamiss = analysisTree.puppimet_ex*zetaX + analysisTree.puppimet_ey*zetaY;  // this is not recoil-corrected  
 
@@ -1391,15 +1384,15 @@ bool extra_muon_veto(int leptonIndex, TString ch, const Config *cfg, const AC1B 
 void fillMET(TString ch, int leptonIndex, int tauIndex, const AC1B * analysisTree, Spring15Tree *otree){
 
    // pfmet variables
-  otree->met = TMath::Sqrt(analysisTree->pfmet_ex*analysisTree->pfmet_ex + analysisTree->pfmet_ey*analysisTree->pfmet_ey);
-  otree->metphi = TMath::ATan2(analysisTree->pfmet_ey,analysisTree->pfmet_ex);
-  otree->metcov00 = analysisTree->pfmet_sigxx;
-  otree->metcov01 = analysisTree->pfmet_sigxy;
-  otree->metcov10 = analysisTree->pfmet_sigyx;
-  otree->metcov11 = analysisTree->pfmet_sigyy;
+  otree->met = TMath::Sqrt(analysisTree->pfmetcorr_ex*analysisTree->pfmetcorr_ex + analysisTree->pfmetcorr_ey*analysisTree->pfmetcorr_ey);
+  otree->metphi = TMath::ATan2(analysisTree->pfmetcorr_ey,analysisTree->pfmetcorr_ex);
+  otree->metcov00 = analysisTree->pfmetcorr_sigxx;
+  otree->metcov01 = analysisTree->pfmetcorr_sigxy;
+  otree->metcov10 = analysisTree->pfmetcorr_sigyx;
+  otree->metcov11 = analysisTree->pfmetcorr_sigyy;
 
-  float met_x = analysisTree->pfmet_ex;
-  float met_y = analysisTree->pfmet_ey;
+  float met_x = analysisTree->pfmetcorr_ex;
+  float met_y = analysisTree->pfmetcorr_ey;
   float met_x2 = met_x * met_x;
   float met_y2 = met_y * met_y;
 
