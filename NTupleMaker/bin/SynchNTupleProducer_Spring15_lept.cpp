@@ -121,7 +121,7 @@ int main(int argc, char * argv[]){
   TString pathToCrystalLib = (TString) cmsswBase + "/src/HTT-utilities/CorrectionsWorkspace/CrystalBallEfficiency_cxx.so";
   int openSuccessful = gSystem->Load( pathToCrystalLib );
   if (openSuccessful !=0 ) {
-    cout<<pathToCrystalLib<<" does not exists. Please create this file by running \"root -l -q CrystalBallEfficiency.cxx++\" in src/HTT-utilities/CorrectionsWorkspace/. "<<endl;
+    cout<<pathToCrystalLib<<" not found. Please create this file by running \"root -l -q CrystalBallEfficiency.cxx++\" in src/HTT-utilities/CorrectionsWorkspace/. "<<endl;
     exit( -1 );
   }
 
@@ -167,7 +167,7 @@ int main(int argc, char * argv[]){
   //b-tag scale factors
   TString pathToBtagScaleFactors = (TString) cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/CSVv2_ichep.csv";
   if( ApplyBTagScaling && gSystem->AccessPathName(pathToBtagScaleFactors) ){
-    cout<<pathToBtagScaleFactors<<" does not exists. Please check."<<endl;
+    cout<<pathToBtagScaleFactors<<" not found. Please check."<<endl;
     exit( -1 );
   }//cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/CSVv2_ichep.csv"
   BTagCalibration calib("csvv2", (string) pathToBtagScaleFactors );
@@ -181,7 +181,7 @@ int main(int argc, char * argv[]){
   }
   TString pathToTaggingEfficiencies = (TString) cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/tagging_efficiencies_ichep2016.root";
   if ( ApplyBTagScaling && gSystem->AccessPathName(pathToTaggingEfficiencies) ){
-    cout<<pathToTaggingEfficiencies<<" does not exists. Please check."<<endl;
+    cout<<pathToTaggingEfficiencies<<" not found. Please check."<<endl;
     exit( -1 );
   }
   TFile *fileTagging  = new TFile( pathToTaggingEfficiencies );
