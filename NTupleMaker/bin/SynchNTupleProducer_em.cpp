@@ -128,8 +128,6 @@ bool metFiltersPasses(AC1B &tree_, std::vector<TString> metFlags) {
     
 }
 
-
-
 //struct myclass {
 //  bool operator() (int i,int j) { return (i<j);}
 //} myobject, myobjectX;
@@ -2259,12 +2257,15 @@ int main(int argc, char * argv[]) {
             }
             
             // METs
-            met = TMath::Sqrt(analysisTree.pfmet_ex*analysisTree.pfmet_ex + analysisTree.pfmet_ey*analysisTree.pfmet_ey);
-            metphi = TMath::ATan2(analysisTree.pfmet_ey,analysisTree.pfmet_ex);
-            metcov00 = analysisTree.pfmet_sigxx;
-            metcov01 = analysisTree.pfmet_sigxy;
-            metcov10 = analysisTree.pfmet_sigyx;
-            metcov11 = analysisTree.pfmet_sigyy;
+            met = TMath::Sqrt(analysisTree.pfmetcorr_ex*analysisTree.pfmetcorr_ex + analysisTree.pfmetcorr_ey*analysisTree.pfmetcorr_ey);
+            metphi = TMath::ATan2(analysisTree.pfmetcorr_ey,analysisTree.pfmetcorr_ex);
+            metcov00 = analysisTree.pfmetcorr_sigxx;
+            metcov01 = analysisTree.pfmetcorr_sigxy;
+            metcov10 = analysisTree.pfmetcorr_sigyx;
+            metcov11 = analysisTree.pfmetcorr_sigyy;
+            
+            float met_x = analysisTree.pfmetcorr_ex;
+            float met_y = analysisTree.pfmetcorr_ey;
             
             //      choosing mva met
             unsigned int metEMu = 0;
@@ -2323,23 +2324,23 @@ int main(int argc, char * argv[]) {
             met_uncorr = met;
             metphi_uncorr = metphi;
             
-            float pfmet_corr_x = analysisTree.pfmet_ex;
-            float pfmet_corr_y = analysisTree.pfmet_ey;
+            float pfmet_corr_x = analysisTree.pfmetcorr_ex;
+            float pfmet_corr_y = analysisTree.pfmetcorr_ey;
             
             if ((isW||isDY)&&!isData) {
                 if (applySimpleRecoilCorrections) {
                     recoilMvaMetCorrector.CorrectByMeanResolution(mvamet_x,mvamet_y,bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,mvamet_corr_x,mvamet_corr_y);
-                    recoilMetCorrector.CorrectByMeanResolution(analysisTree.pfmet_ex,analysisTree.pfmet_ey,bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,pfmet_corr_x,pfmet_corr_y);
+                    recoilMetCorrector.CorrectByMeanResolution(analysisTree.pfmetcorr_ex,analysisTree.pfmetcorr_ey,bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,pfmet_corr_x,pfmet_corr_y);
                 }
                 else {
                     recoilMvaMetCorrector.Correct(mvamet_x,mvamet_y,bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,mvamet_corr_x,mvamet_corr_y);
-                    recoilMetCorrector.Correct(analysisTree.pfmet_ex,analysisTree.pfmet_ey,bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,pfmet_corr_x,pfmet_corr_y);
+                    recoilMetCorrector.Correct(analysisTree.pfmetcorr_ex,analysisTree.pfmetcorr_ey,bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,pfmet_corr_x,pfmet_corr_y);
                 }
             }
-            analysisTree.pfmet_ex = pfmet_corr_x;
-            analysisTree.pfmet_ey = pfmet_corr_y;
-            met = TMath::Sqrt(analysisTree.pfmet_ex*analysisTree.pfmet_ex+analysisTree.pfmet_ey*analysisTree.pfmet_ey);
-            metphi = TMath::ATan2(analysisTree.pfmet_ey,analysisTree.pfmet_ex);
+            analysisTree.pfmetcorr_ex = pfmet_corr_x;
+            analysisTree.pfmetcorr_ey = pfmet_corr_y;
+            met = TMath::Sqrt(analysisTree.pfmetcorr_ex*analysisTree.pfmetcorr_ex+analysisTree.pfmetcorr_ey*analysisTree.pfmetcorr_ey);
+            metphi = TMath::ATan2(analysisTree.pfmetcorr_ey,analysisTree.pfmetcorr_ex);
             
             //      printf("Before correction : mvamet_x = %7.2f   mvamet_y = %7.2f\n",mvamet_x,mvamet_y);
             //      printf("After correction  : mvamet_x = %7.2f   mvamet_y = %7.2f\n",mvamet_corr_x,mvamet_corr_y);
@@ -2435,8 +2436,8 @@ int main(int argc, char * argv[]) {
             zetaX = zetaX/normZeta;
             zetaY = zetaY/normZeta;
             
-            float vectorX = analysisTree.pfmet_ex + muonLV.Px() + electronLV.Px();
-            float vectorY = analysisTree.pfmet_ey + muonLV.Py() + electronLV.Py();
+            float vectorX = analysisTree.pfmetcorr_ex + muonLV.Px() + electronLV.Px();
+            float vectorY = analysisTree.pfmetcorr_ey + muonLV.Py() + electronLV.Py();
             
             float vectorVisX = muonLV.Px() + electronLV.Px();
             float vectorVisY = muonLV.Py() + electronLV.Py();
@@ -2445,7 +2446,7 @@ int main(int argc, char * argv[]) {
             
             // computation of DZeta variable
             // pfmet
-            computeDzeta(analysisTree.pfmet_ex,analysisTree.pfmet_ey,
+            computeDzeta(analysisTree.pfmetcorr_ex,analysisTree.pfmetcorr_ey,
                          zetaX,zetaY,pzetavis,pzetamiss,dzeta);
             
             // mvamet
@@ -2468,27 +2469,27 @@ int main(int argc, char * argv[]) {
             
             float ETmis = TMath::Sqrt(mvamet_x*mvamet_x+mvamet_y*mvamet_y);
             TLorentzVector mvametLV; mvametLV.SetXYZT(mvamet_x,mvamet_y,0.,ETmis);
-            float PFETmis = analysisTree.pfmet_ex*analysisTree.pfmet_ex+analysisTree.pfmet_ey*analysisTree.pfmet_ey;
-            TLorentzVector metLV; metLV.SetXYZT(analysisTree.pfmet_ex,analysisTree.pfmet_ey,0.,PFETmis);
+            float PFETmis = analysisTree.pfmetcorr_ex*analysisTree.pfmetcorr_ex+analysisTree.pfmetcorr_ey*analysisTree.pfmetcorr_ey;
+            TLorentzVector metLV; metLV.SetXYZT(analysisTree.pfmetcorr_ex,analysisTree.pfmetcorr_ey,0.,PFETmis);
             TLorentzVector mvametResoUpLV; mvametResoUpLV.SetXYZT(mvamet_resoUp_x,mvamet_resoUp_y,0.,ETmis);
             TLorentzVector mvametResoDownLV; mvametResoDownLV.SetXYZT(mvamet_resoDown_x,mvamet_resoDown_y,0.,ETmis);
             TLorentzVector mvametScaleUpLV; mvametScaleUpLV.SetXYZT(mvamet_scaleUp_x,mvamet_scaleUp_y,0.,ETmis);
             TLorentzVector mvametScaleDownLV; mvametScaleDownLV.SetXYZT(mvamet_scaleDown_x,mvamet_scaleDown_y,0.,ETmis);
             
-            mt_1 = mT(electronLV,mvametLV);
-            mt_2 = mT(muonLV,mvametLV);
+            mt_1 = mT(electronLV,metLV);
+            mt_2 = mT(muonLV,metLV);
             mtmax = TMath::Max(float(mt_1),float(mt_2));
             
-            mCDF = (muonLV+electronLV+mvametLV).M();
+            mCDF = (muonLV+electronLV+metLV).M();
             
             // computing total transverse mass
-            mTtot = totalTransverseMass        ( muonLV ,     electronLV , mvametLV);
+            mTtot = totalTransverseMass        ( muonLV ,     electronLV , metLV);
             
-            mTtot_muUp   =  totalTransverseMass( muonUpLV ,   electronLV , mvametLV);
-            mTtot_muDown =  totalTransverseMass( muonDownLV , electronLV , mvametLV);
+            mTtot_muUp   =  totalTransverseMass( muonUpLV ,   electronLV , metLV);
+            mTtot_muDown =  totalTransverseMass( muonDownLV , electronLV , metLV);
             
-            mTtot_eUp   =  totalTransverseMass ( muonLV , electronUpLV   , mvametLV);
-            mTtot_eDown =  totalTransverseMass ( muonLV , electronDownLV , mvametLV);
+            mTtot_eUp   =  totalTransverseMass ( muonLV , electronUpLV   , metLV);
+            mTtot_eDown =  totalTransverseMass ( muonLV , electronDownLV , metLV);
             
             mTtot_scaleUp   =  totalTransverseMass ( muonLV , electronLV , mvametScaleUpLV);
             mTtot_scaleDown =  totalTransverseMass ( muonLV , electronLV , mvametScaleDownLV);
@@ -2497,8 +2498,8 @@ int main(int argc, char * argv[]) {
             mTtot_resoDown =  totalTransverseMass ( muonLV , electronLV , mvametResoDownLV);
             
             mTemu   = mT(electronLV,muonLV);
-            mTemet  = mT(electronLV,mvametLV);
-            mTmumet = mT(muonLV,mvametLV);
+            mTemet  = mT(electronLV,metLV);
+            mTmumet = mT(muonLV,metLV);
             
             dphi_mumet = dPhiFrom2P(muonLV.Px(),muonLV.Py(),
                                     metLV.Px(),metLV.Py());
@@ -2533,15 +2534,15 @@ int main(int argc, char * argv[]) {
             mt_sv_resoUp    = -9999;
             mt_sv_resoDown  = -9999;
             
-            if (computeSVFitMass && dzeta_mvamet>-30) {
+            if (computeSVFitMass && dzeta>-30) {
                 
                 if (mvaMetFound) {
-                    // covariance matrix MVAMET
-                    TMatrixD covMVAMET(2, 2);
-                    covMVAMET[0][0] =  mvacov00;
-                    covMVAMET[1][0] =  mvacov01;
-                    covMVAMET[0][1] =  mvacov10;
-                    covMVAMET[1][1] =  mvacov11;
+                    // covariance matrix MET
+                    TMatrixD covMET(2, 2);
+                    covMET[0][0] =  metcov00;
+                    covMET[1][0] =  metcov10;
+                    covMET[0][1] =  metcov01;
+                    covMET[1][1] =  metcov11;
                     
                     // mva met
                     // define electron 4-vector
@@ -2558,8 +2559,8 @@ int main(int argc, char * argv[]) {
                     
                     // central value
                     SVfitStandaloneAlgorithm algo = SVFitMassComputation(svFitEle, svFitMu,
-                                                                         mvamet_x, mvamet_y, 
-                                                                         covMVAMET, inputFile_visPtResolution);
+                                                                         met_x, met_y,
+                                                                         covMET, inputFile_visPtResolution);
                     
                     m_sv = algo.getMass(); // return value of svfit mass is in units of GeV
                     mt_sv = algo.transverseMass(); // return value of transverse svfit mass is in units of GeV
@@ -2627,11 +2628,11 @@ int main(int argc, char * argv[]) {
                     if (!isData && applyMSVvariations) { 
                         
                         SVfitStandaloneAlgorithm algo_eUp = SVFitMassComputation(svFitEleUp, svFitMu,
-                                                                                 mvamet_x, mvamet_y,
-                                                                                 covMVAMET, inputFile_visPtResolution);
+                                                                                 met_x, met_y,
+                                                                                 covMET, inputFile_visPtResolution);
                         SVfitStandaloneAlgorithm algo_eDown = SVFitMassComputation(svFitEleDown, svFitMu,
-                                                                                   mvamet_x, mvamet_y,
-                                                                                   covMVAMET, inputFile_visPtResolution);
+                                                                                   met_x, met_y,
+                                                                                   covMET, inputFile_visPtResolution);
                         
                         
                         m_sv_eUp    = algo_eUp.getMass();
@@ -2642,11 +2643,11 @@ int main(int argc, char * argv[]) {
                         if (isDY || isW) {
                             SVfitStandaloneAlgorithm algo_scaleUp = SVFitMassComputation(svFitEle, svFitMu,
                                                                                          mvamet_scaleUp_x, mvamet_scaleUp_y,
-                                                                                         covMVAMET, inputFile_visPtResolution);
+                                                                                         covMET, inputFile_visPtResolution);
                             
                             SVfitStandaloneAlgorithm algo_scaleDown = SVFitMassComputation(svFitEle, svFitMu,
                                                                                            mvamet_scaleDown_x, mvamet_scaleDown_y,
-                                                                                           covMVAMET, inputFile_visPtResolution);
+                                                                                           covMET, inputFile_visPtResolution);
                             
                             // SVfitStandaloneAlgorithm algo_resoUp = SVFitMassComputation(svFitEle, svFitMu,
                             // 								mvamet_resoUp_x, mvamet_resoUp_y,
