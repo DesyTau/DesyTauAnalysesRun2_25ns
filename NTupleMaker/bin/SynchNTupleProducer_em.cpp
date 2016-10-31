@@ -288,9 +288,11 @@ int main(int argc, char * argv[]) {
     TH1D * histWeightsH = new TH1D("histWeightsH","",1,-0.5,0.5);
     TH1D * histWeightsSkimH = new TH1D("histWeightsSkimH","",1,-0.5,0.5);
     TH1D * histWeightsTTH = new TH1D("histWeightsTTH","",1,-0.5,0.5);
-    
+
+    /*    
     TTree * treeGen = new TTree("GenHiggs","GenHiggs");
-    
+    */    
+
     Float_t higgsMass;
     Float_t higgsPt;
     Float_t higgsEta;
@@ -840,7 +842,8 @@ int main(int argc, char * argv[]) {
     tree->Branch("bosonMass",&bosonMass,"bosonMass/F");
     
     tree->Branch("npartons",&npartons,"npartons/i");
-    
+
+    /*    
     treeGen->Branch("bosonPt",&bosonPt,"bosonPt/F");
     treeGen->Branch("bosonMass",&bosonMass,"bosonMass/F");
     treeGen->Branch("bosonEta",&bosonEta,"bosonEta/F");
@@ -848,7 +851,7 @@ int main(int argc, char * argv[]) {
     treeGen->Branch("higgsPt",&higgsPt,"higgsPt/F");
     treeGen->Branch("higgsMass",&higgsMass,"higgsMass/F");
     treeGen->Branch("higgsEta",&higgsEta,"higgsEta/F");
-    
+    */
     
     int nTotalFiles = 0;
     std::string dummy;
@@ -1333,7 +1336,7 @@ int main(int argc, char * argv[]) {
                  higgsEta = -9999;
                  }
                  */
-                treeGen->Fill();
+		//                treeGen->Fill();
                 
                 /*
                  std::cout << "Taus (first copy) : " << promptTausFirstCopy.size() << std::endl;
@@ -2013,7 +2016,7 @@ int main(int argc, char * argv[]) {
             // std::cout << "m_vis_eDown  = " << m_vis_eDown << std::endl;
             // std::cout << std::endl;
             
-            pt_tt = dileptonLV.Pt();
+	    //            pt_tt = dileptonLV.Pt();
             
             dphi_tt = dPhiFrom2P(muonLV.Px(),muonLV.Py(),
                                  electronLV.Px(),electronLV.Py());
@@ -2339,6 +2342,8 @@ int main(int argc, char * argv[]) {
             }
             analysisTree.pfmetcorr_ex = pfmet_corr_x;
             analysisTree.pfmetcorr_ey = pfmet_corr_y;
+	    met_x = pfmet_corr_x;
+	    met_y = pfmet_corr_y;
             met = TMath::Sqrt(analysisTree.pfmetcorr_ex*analysisTree.pfmetcorr_ex+analysisTree.pfmetcorr_ey*analysisTree.pfmetcorr_ey);
             metphi = TMath::ATan2(analysisTree.pfmetcorr_ey,analysisTree.pfmetcorr_ex);
             
@@ -2481,6 +2486,8 @@ int main(int argc, char * argv[]) {
             mtmax = TMath::Max(float(mt_1),float(mt_2));
             
             mCDF = (muonLV+electronLV+metLV).M();
+
+	    pt_tt = (muonLV+electronLV+metLV).Pt();
             
             // computing total transverse mass
             mTtot = totalTransverseMass        ( muonLV ,     electronLV , metLV);
@@ -2639,7 +2646,8 @@ int main(int argc, char * argv[]) {
                         mt_sv_eUp   = algo_eUp.transverseMass();
                         m_sv_eDown  = algo_eDown.getMass();
                         mt_sv_eDown = algo_eDown.transverseMass();
-                        
+
+			/*                        
                         if (isDY || isW) {
                             SVfitStandaloneAlgorithm algo_scaleUp = SVFitMassComputation(svFitEle, svFitMu,
                                                                                          mvamet_scaleUp_x, mvamet_scaleUp_y,
@@ -2668,6 +2676,7 @@ int main(int argc, char * argv[]) {
                             // mt_sv_resoDown  = algo_resoDown.transverseMass();
                             
                         }
+			*/
                     }
                     //	  std::cout << "eta(e) = " << eta_1 << "   escale = " << eleScale << std::endl;
                     //	  std::cout << "msv = " << m_sv << std::endl;

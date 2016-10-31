@@ -95,6 +95,7 @@ int main(int argc, char * argv[]) {
   const bool applyLeptonSF = cfg.get<bool>("ApplyLeptonSF");
   const bool applyRecoilCorrections =  cfg.get<bool>("ApplyRecoilCorrections");
   const bool applyRecoilOnGenerator = cfg.get<bool>("ApplyRecoilOnGenerator");
+  const bool applySimpleRecoilCorrections = cfg.get<bool>("ApplySimpleRecoilCorrections");
   const bool applyTopPtReweighting = cfg.get<bool>("ApplyTopPtReweighting");
   const bool applyNJetReweighting = cfg.get<bool>("ApplyNJetReweighting");
   const bool applyZMassPtReweighting = cfg.get<bool>("ApplyZMassPtReweighting");
@@ -161,6 +162,8 @@ int main(int argc, char * argv[]) {
 
   const string ElectronIdIsoFile = cfg.get<string>("ElectronIdIsoEff");
   const string ElectronTrigFile  = cfg.get<string>("ElectronTrigEff"); 
+  const string trackingSFFile = cfg.get<string>("TrackingSFFile");
+  
 
   const string recoilFileName   = cfg.get<string>("RecoilFileName");
   TString RecoilFileName(recoilFileName);
@@ -192,6 +195,15 @@ int main(int argc, char * argv[]) {
   const string jsonFile = cfg.get<string>("jsonFile");
 
   const int applyJES = cfg.get<int>("applyJES");
+
+  const float eleMomScaleBarrel = cfg.get<float>("EleMomScaleBarrel");
+  const float eleMomScaleEndcap = cfg.get<float>("EleMomScaleEndcap");
+
+  const string pileUpDataFile = cfg.get<string>("PileUpDataFileName");
+  const string pileUpMCFile = cfg.get<string>("PileUpMCFileName");
+
+  TString PileUpDataFile(pileUpDataFile);
+  TString PileUpMCFile(pileUpMCFile);
 
   // **** end of configuration
   
@@ -472,8 +484,8 @@ int main(int argc, char * argv[]) {
 			  100,
 			  1000};  
   
-  int nEtaBins = 2;
-  float etaBins[3] = {0,1.48,2.5}; 
+  int nEtaBins = 3;
+  float etaBins[4] = {0,1.48,2.1,2.5}; 
   
   TString PtBins[6] = {"Pt13to20",
 		       "Pt20to25",
@@ -483,8 +495,9 @@ int main(int argc, char * argv[]) {
 		       "PtGt60"};
   
 
-  TString EtaBins[2] = {"EtaLt1p48",
-			"EtaGt1p48"};
+  TString EtaBins[3] = {"EtaLt1p48",
+			"Eta1p48to2p1",
+			"EtaGt2p1"};
 
   TString PtBinsTrig[16] = {"Pt10to13",
 			    "Pt13to16",
@@ -539,41 +552,41 @@ int main(int argc, char * argv[]) {
   TH1D * ZMassPass = new TH1D("ZMassPass","",80,50,130);
   TH1D * ZMassFail = new TH1D("ZMassFail","",80,50,130);
 
-  TH1F * ZMassJetEtaPtPass[2][3][6];
-  TH1F * ZMassJetEtaPtFail[2][3][6];
+  TH1F * ZMassJetEtaPtPass[3][3][6];
+  TH1F * ZMassJetEtaPtFail[3][3][6];
 
-  TH1F * ZMassEtaPtPass[2][6];
-  TH1F * ZMassEtaPtFail[2][6];
+  TH1F * ZMassEtaPtPass[3][6];
+  TH1F * ZMassEtaPtFail[3][6];
 
-  TH1F * PromptPtPass[2];
-  TH1F * PromptPtFail[2];
+  TH1F * PromptPtPass[3];
+  TH1F * PromptPtFail[3];
 
-  TH1F * NonPromptPtPass[2];
-  TH1F * NonPromptPtFail[2];
+  TH1F * NonPromptPtPass[3];
+  TH1F * NonPromptPtFail[3];
 
-  TH1F * PromptSelPtPass[2];
-  TH1F * PromptSelPtFail[2];
+  TH1F * PromptSelPtPass[3];
+  TH1F * PromptSelPtFail[3];
 
-  TH1F * NonPromptSelPtPass[2];
-  TH1F * NonPromptSelPtFail[2];
+  TH1F * NonPromptSelPtPass[3];
+  TH1F * NonPromptSelPtFail[3];
 
-  TH1F * PromptSelJetPtPass[2][3];
-  TH1F * PromptSelJetPtFail[2][3];
+  TH1F * PromptSelJetPtPass[3][3];
+  TH1F * PromptSelJetPtFail[3][3];
 
-  TH1F * NonPromptSelJetPtPass[2][3];
-  TH1F * NonPromptSelJetPtFail[2][3];
+  TH1F * NonPromptSelJetPtPass[3][3];
+  TH1F * NonPromptSelJetPtFail[3][3];
 
-  TH1F * ZMassEle23EtaPtPass[2][16];
-  TH1F * ZMassEle23EtaPtFail[2][16];
+  TH1F * ZMassEle23EtaPtPass[3][16];
+  TH1F * ZMassEle23EtaPtFail[3][16];
 
-  TH1F * ZMassEle17EtaPtPass[2][16];
-  TH1F * ZMassEle17EtaPtFail[2][16];
+  TH1F * ZMassEle17EtaPtPass[3][16];
+  TH1F * ZMassEle17EtaPtFail[3][16];
 
-  TH1F * ZMassEle12EtaPtPass[2][16];
-  TH1F * ZMassEle12EtaPtFail[2][16];
+  TH1F * ZMassEle12EtaPtPass[3][16];
+  TH1F * ZMassEle12EtaPtFail[3][16];
 
-  TH1F * ZMassIsoEleEtaPtPass[2][16];
-  TH1F * ZMassIsoEleEtaPtFail[2][16];
+  TH1F * ZMassIsoEleEtaPtPass[3][16];
+  TH1F * ZMassIsoEleEtaPtFail[3][16];
 
   for (int iEta=0; iEta<nEtaBins; ++iEta) {
     PromptPtPass[iEta] = new TH1F("PromptPt"+EtaBins[iEta]+"Pass","",nPtBins,ptBins);
@@ -614,6 +627,70 @@ int main(int argc, char * argv[]) {
 
   TH1D * PUweightsOfficialH = new TH1D("PUweightsOfficialH","PU weights w/ official reweighting",1000, 0, 10);
 
+  ULong64_t evt;
+  float pt_1;
+  float pt_2;
+  float eta_1;
+  float eta_2;
+  float phi_1;
+  float phi_2;
+
+  float dilepton_pt;
+  float dilepton_eta;
+  float dilepton_phi;
+
+  float mvametX;
+  float metX;
+  float metuncorrX;
+  float puppimetX;
+
+  float u1_mvametX;
+  float u1_metX;
+  float u1_metuncorrX;
+
+  float u2_mvametX;
+  float u2_metX;
+  float u2_metuncorrX;
+
+  int njets;
+  bool match_1;
+  bool match_2;
+
+  TTree * synch_tree = new TTree("TauCheck","TauChek");
+
+  synch_tree->Branch("evt", &evt, "evt/I");
+
+  synch_tree->Branch("dilepton_pt",&dilepton_pt,"dilepton_pt/F");
+  synch_tree->Branch("dilepton_eta",&dilepton_eta,"dilepton_eta/F");
+  synch_tree->Branch("dilepton_phi",&dilepton_phi,"dilepton_phi/F");
+
+  synch_tree->Branch("pt_1",&pt_1,"pt_1/F");
+  synch_tree->Branch("pt_2",&pt_2,"pt_2/F");
+
+  synch_tree->Branch("eta_1",&eta_1,"eta_1/F");
+  synch_tree->Branch("eta_2",&eta_2,"eta_2/F");
+
+  synch_tree->Branch("phi_1",&phi_1,"phi_1/F");
+  synch_tree->Branch("phi_2",&phi_2,"phi_2/F");
+  
+  synch_tree->Branch("match_1",&match_1,"match_1/O");
+  synch_tree->Branch("match_2",&match_2,"match_2/O");
+
+  synch_tree->Branch("mvamet",&mvametX,"mvamet/F");
+  synch_tree->Branch("met",&metX,"met/F");
+  synch_tree->Branch("metuncorr",&metuncorrX,"metuncorr/F");
+  synch_tree->Branch("puppimet",&puppimetX,"puppimet/F");
+
+  synch_tree->Branch("u1_mvamet",&u1_mvametX,"u1_mvamet/F");
+  synch_tree->Branch("u1_met",&u1_metX,"u1_met/F");
+  synch_tree->Branch("u1_metuncorr",&u1_metuncorrX,"u1_metuncorr/F");
+
+  synch_tree->Branch("u2_mvamet",&u2_mvametX,"u2_mvamet/F");
+  synch_tree->Branch("u2_met",&u2_metX,"u2_met/F");
+  synch_tree->Branch("u2_metuncorr",&u2_metuncorrX,"u2_metuncorr/F");
+
+  synch_tree->Branch("njets", &njets, "njets/I");
+
   // PILE UP REWEIGHTING - OPTIONS
 
   if (applyPUreweighting_vertices and applyPUreweighting_official) 
@@ -641,8 +718,8 @@ int main(int argc, char * argv[]) {
   PileUp * PUofficial = new PileUp();
   
   if (applyPUreweighting_official) {
-    TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/Data_Pileup_2015D_Feb02.root","read"); 
-    TFile * filePUdistribution_MC = new TFile (TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/MC_Fall15_PU25_V1.root", "read"); 
+    TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/"+PileUpDataFile,"read"); 
+    TFile * filePUdistribution_MC = new TFile (TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/"+PileUpMCFile, "read"); 
     TH1D * PU_data = (TH1D *)filePUdistribution_data->Get("pileup");
     TH1D * PU_mc = (TH1D *)filePUdistribution_MC->Get("pileup");
     PUofficial->set_h_data(PU_data); 
@@ -670,6 +747,12 @@ int main(int argc, char * argv[]) {
     SF_electronTrig->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(ElectronTrigFile));
     
   }
+  // tracking efficiency SF                                                                                                                                                           
+  TFile * fileTrackingSF = new TFile(TString(cmsswBase)+"/src/"+TString(trackingSFFile));
+  TH1D * trackEffEleH = (TH1D*)fileTrackingSF->Get("effTrackingE");
+
+
+
   // Z mass pt weights
   TFile * fileZMassPtWeights = new TFile(TString(cmsswBase)+"/src/"+ZMassPtWeightsFileName); 
   if (fileZMassPtWeights->IsZombie()) {
@@ -847,7 +930,7 @@ int main(int argc, char * argv[]) {
 
 	if (genV.Pt()<0.1) genV.SetXYZM(0.1,0.1,0.,0.);
 
-		/*      
+	/*
 	std::cout << "Prompt electrons = " << genElectrons.size() << std::endl;
 	std::cout << "Prompt muons     = " << genMuons.size() << std::endl;
 	std::cout << "Prompt taus      = " << genTaus.size() << std::endl;
@@ -858,7 +941,8 @@ int main(int argc, char * argv[]) {
 	printf("gen taus      -> px = %7.1f  py = %7.1f  pz = %7.1f\n",genTausLV.Px(),genTausLV.Py(),genTausLV.Pz());
 	printf("gen vis taus  -> px = %7.1f  py = %7.1f  pz = %7.1f\n",genVisTausLV.Px(),genVisTausLV.Py(),genVisTausLV.Pz());
 	std::cout << std::endl;
-	*/
+	*/	
+
 	float genZPt = -1.0;
 	float genZMass = -1.0;
 
@@ -1042,35 +1126,39 @@ int main(int argc, char * argv[]) {
 	}
       }
 
-      if (!isElectronFilter) {
-	cout << "Filter " << ElectronHLTFilterName << " not found" << endl;
-	exit(-1);
+      if (applyTrigger) {
+	if (!isElectronFilter) {
+	  cout << "Filter " << ElectronHLTFilterName << " not found" << endl;
+	  exit(-1);
+	}
+	if (!isEle23Filter) {
+	  cout << "Filter " << ElectronEle23FilterName << " not found" << endl;
+	  exit(-1);
+	}
+	if (!isEle17Filter) {
+	  cout << "Filter " << ElectronEle17FilterName << " not found" << endl;
+	  exit(-1);
+	}
+	if (!isEle12Filter) {
+	  cout << "Filter " << ElectronEle12FilterName << " not found" << endl;
+	  exit(-1);
+	}
+	if (!isSingleEleFilter) {
+	  cout << "Filter " << ElectronSingleEleFilterName << " not found" << endl;
+	  exit(-1);
+	}
       }
-      if (!isEle23Filter) {
-	cout << "Filter " << ElectronEle23FilterName << " not found" << endl;
-	exit(-1);
-      }
-      if (!isEle17Filter) {
-	cout << "Filter " << ElectronEle17FilterName << " not found" << endl;
-	exit(-1);
-      }
-      if (!isEle12Filter) {
-	cout << "Filter " << ElectronEle12FilterName << " not found" << endl;
-	exit(-1);
-      }
-      if (!isSingleEleFilter) {
-	cout << "Filter " << ElectronSingleEleFilterName << " not found" << endl;
-	exit(-1);
-      }
+      //      std::cout << "Filters detected..." << std::endl;
 
-      float pfmet_ex = analysisTree.pfmet_ex;
-      float pfmet_ey = analysisTree.pfmet_ey;
-      float pfmet_phi = analysisTree.pfmet_phi;
+      float pfmet_ex = analysisTree.pfmetcorr_ex;
+      float pfmet_ey = analysisTree.pfmetcorr_ey;
+      float pfmet_phi = analysisTree.pfmetcorr_phi;
       float pfmet = TMath::Sqrt(pfmet_ex*pfmet_ex+pfmet_ey*pfmet_ey);
       float puppimet_ex = analysisTree.puppimet_ex;
       float puppimet_ey = analysisTree.puppimet_ey;
       float puppimet_phi = analysisTree.puppimet_phi;
       float puppimet = TMath::Sqrt(puppimet_ex*puppimet_ex+puppimet_ey*puppimet_ey);
+      //      std::cout << "Mets..." << std::endl;
 
       // vertex cuts
       //      if (fabs(analysisTree.primvertex_z)>zVertexCut) continue;
@@ -1097,6 +1185,17 @@ int main(int argc, char * argv[]) {
       vector<bool> isElectronPassedIdIso; isElectronPassedIdIso.clear();
 
       for (unsigned int im = 0; im<analysisTree.electron_count; ++im) {
+
+	float absEta = fabs(analysisTree.electron_eta[im]);
+	float momScale = eleMomScaleBarrel;
+	if (absEta>1.48) momScale = eleMomScaleEndcap;
+
+	if (!isData) {
+	  analysisTree.electron_px[im] *= momScale;
+	  analysisTree.electron_py[im] *= momScale;
+	  analysisTree.electron_pz[im] *= momScale;
+	  analysisTree.electron_pt[im] *= momScale;
+	}
 
 	// selecting sample of probes
 	if (analysisTree.electron_pt[im]<ptBins[0]) continue;
@@ -1129,7 +1228,14 @@ int main(int argc, char * argv[]) {
 	    electronSingleEleMatch = true;
 	    
 	}
-
+	if (!applyTrigger) {
+	  electronTriggerMatch = true;
+	  electronEle23Match = true;
+	  electronEle17Match = true;
+	  electronEle12Match = true;
+	  electronSingleEleMatch = true;
+	}
+	
         allElectrons.push_back(im);
 	allElectronsIsTriggerMatched.push_back(electronTriggerMatch);
 	allElectronsIsLeg23Matched.push_back(electronEle23Match);
@@ -1190,6 +1296,8 @@ int main(int argc, char * argv[]) {
       }
 
       // end of electron selection
+
+      //      std::cout << "Electrons..." << std::endl;
 
       // Monte Carlo analysis
       vector<unsigned int> promptElectrons; promptElectrons.clear();
@@ -1269,6 +1377,7 @@ int main(int argc, char * argv[]) {
       }
 
       bool isElectronsPair = false;
+      bool firstTrigger = true;
       if (isoIdElectrons.size()>0) {
 	unsigned int iE1 = 0;
 	unsigned int iE2 = 0;
@@ -1277,9 +1386,7 @@ int main(int argc, char * argv[]) {
 	for (unsigned int im1=0; im1<isoIdElectrons.size(); ++im1) {
 	  unsigned int index1 = isoIdElectrons[im1];
 	  bool isTriggerMatched = isoIdElectronsIsTriggerMatched[im1];
-	  if (isTriggerMatched &&
-	      analysisTree.electron_pt[index1]>ptElectronHighCut&&
-	      fabs(analysisTree.electron_eta[index1])<etaElectronHighCut) {
+	  if (isTriggerMatched && analysisTree.electron_pt[index1]>ptElectronHighCut && fabs(analysisTree.electron_eta[index1])<etaElectronHighCut) {
 	    for (unsigned int iE=0; iE<allElectrons.size(); ++iE) {
 	      unsigned int indexProbe = allElectrons[iE];
 	      if (index1==indexProbe) continue;
@@ -1405,13 +1512,23 @@ int main(int argc, char * argv[]) {
 	    bool isTriggerMatched2 = isoIdElectronsIsTriggerMatched[im2]&& 
 	      analysisTree.electron_pt[index2]>ptElectronHighCut &&
 	      fabs(analysisTree.electron_eta[index2])<etaElectronHighCut; 
-	    bool isTriggerMatched = 
+	    /*	    bool isTriggerMatched = 
 	      (isTriggerMatched1 
 	       && analysisTree.electron_pt[index2]>ptElectronLowCut 
 	       && fabs(analysisTree.electron_eta[index2])<etaElectronCut) ||
 	      (isTriggerMatched2 
 	       && analysisTree.electron_pt[index1]>ptElectronLowCut
 	       && fabs(analysisTree.electron_eta[index1])<etaElectronCut);
+	    */
+	    bool isTriggerMatched = false;
+	    if (analysisTree.electron_pt[index1]>analysisTree.electron_pt[index2]) {
+	      isTriggerMatched = isTriggerMatched1;
+	      firstTrigger = true;
+	    }
+	    else {
+	      isTriggerMatched = isTriggerMatched2;
+              firstTrigger = true;
+	    }
 	    bool sign = q1*q2>0;
 	    float deltaREE = deltaR(analysisTree.electron_eta[index1],analysisTree.electron_phi[index1],
 				    analysisTree.electron_eta[index2],analysisTree.electron_phi[index2]);
@@ -1429,7 +1546,11 @@ int main(int argc, char * argv[]) {
 	    }
 	  }
 	}
+
+	//	std::cout << "Pair found : " << isPairFound << std::endl;
+	
 	if (isPairFound) {
+	  
 	  TLorentzVector electron1; electron1.SetXYZM(analysisTree.electron_px[iE1],
 						      analysisTree.electron_py[iE1],
 						      analysisTree.electron_pz[iE1],
@@ -1450,6 +1571,7 @@ int main(int argc, char * argv[]) {
 		  analysisTree.mvamet_lep2[iMet]==iE2) {
 		metMuMu = iMet;
 		mvaMetFound = true;
+		break;
 	      }
 	    }
 	  }
@@ -1466,7 +1588,14 @@ int main(int argc, char * argv[]) {
 	    mvamet = TMath::Sqrt(mvamet_ex2+mvamet_ey2);
 	    mvamet_phi = TMath::ATan2(mvamet_ey,mvamet_ex);
 	  }
-	  
+	  else {
+	    std::cout << "mva_count = " << analysisTree.mvamet_count << std::endl;
+	  }
+	  //	  if (!mvaMetFound)
+	  //	    std::cout << "MVA MEt not found" << std::endl;
+
+	  //	  std::cout << "pfmet = " << pfmet << "   mvamet = " << mvamet << std::endl;
+
 	  // applying electron scale factors
 	  if (!isData&&applyLeptonSF) {
 	    // insert code for leptons SF here
@@ -1486,6 +1615,11 @@ int main(int argc, char * argv[]) {
 	
 	    EleSF_IdIso_Ele1H->Fill(IdIsoSF_ele1);
 	    EleSF_IdIso_Ele2H->Fill(IdIsoSF_ele2);
+	    
+	    double trkSF1 = trackEffEleH->GetBinContent(trackEffEleH->FindBin(etaEle1));
+	    double trkSF2 = trackEffEleH->GetBinContent(trackEffEleH->FindBin(etaEle2));
+	    
+
 	    //	    if (ptEle1<20||ptEle2<20) {
 	    //	      std::cout << "ele 1 ->  pt = " << ptEle1 << "   eta = " << etaEle1 << std::endl;
 	    //	      std::cout << "eff data ele 1 = " << SF_electronIdIso->get_EfficiencyData(ptEle1, etaEle1)<< " |  eff mc ele 1 = " << SF_electronIdIso->get_EfficiencyMC(ptEle1, etaEle1)<<std::endl;
@@ -1497,25 +1631,35 @@ int main(int argc, char * argv[]) {
 	    //	      std::cout << " mass = " << mass << std::endl;
 	    //	      std::cout << std::endl;
 	    //	    }
-	    weight = weight*IdIsoSF_ele1*IdIsoSF_ele2;
+	    weight = weight*IdIsoSF_ele1*IdIsoSF_ele2*trkSF1*trkSF2;
 
 	    double effDataTrig1 = SF_electronTrig->get_EfficiencyData(ptEle1, etaEle1);  
 	    double effDataTrig2 = SF_electronTrig->get_EfficiencyData(ptEle2, etaEle2);  
-	    
-	    double effMcTrig1 = SF_electronTrig->get_EfficiencyMC(ptEle1, etaEle1);  
-	    double effMcTrig2 = SF_electronTrig->get_EfficiencyMC(ptEle2, etaEle2);  
-	    
-	    double effTrigData = 1 - (1-effDataTrig1)*(1-effDataTrig2);
-	    double effMcTrig = 1 - (1-effMcTrig1)*(1-effMcTrig2);
-	    
-	    if (effTrigData>0&&effMcTrig>0) {
-	      double weightTrig = effTrigData/effMcTrig;
-	      // std::cout << "ele 1 ->  pt = " << ptEle1 << "   eta = " << etaEle1 << std::endl;
-	      // std::cout << "ele 2 ->  pt = " << ptEle2 << "   eta = " << etaEle2 << std::endl;
-	      // std::cout << "WeightTrig = " << weightTrig << std::endl;
-	      weight = weight*weightTrig;
-	    }
+	    //	    double effTrigData = 1 - (1-effDataTrig1)*(1-effDataTrig2);
+	    double effTrigData = 1;
+	    if (firstTrigger) 
+	      effTrigData = effDataTrig1;
+	    else
+	      effTrigData = effDataTrig2;
 
+	    if (applyTrigger) {
+
+	      double effMcTrig1 = SF_electronTrig->get_EfficiencyMC(ptEle1, etaEle1);  
+	      double effMcTrig2 = SF_electronTrig->get_EfficiencyMC(ptEle2, etaEle2);  
+	      double effMcTrig = 1 - (1-effMcTrig1)*(1-effMcTrig2);
+	    
+	      if (effTrigData>0&&effMcTrig>0) {
+		double weightTrig = effTrigData/effMcTrig;
+		// std::cout << "ele 1 ->  pt = " << ptEle1 << "   eta = " << etaEle1 << std::endl;
+		// std::cout << "ele 2 ->  pt = " << ptEle2 << "   eta = " << etaEle2 << std::endl;
+		// std::cout << "WeightTrig = " << weightTrig << std::endl;
+		weight = weight*weightTrig;
+	      }
+	    }
+	    else {
+	      weight = weight*effTrigData;
+	    }
+	    
 	  }
 	   
 	  // selecting good jets --->
@@ -1603,9 +1747,14 @@ int main(int argc, char * argv[]) {
 
 	  if (!isData && applyRecoilCorrections) {
 	    
+	    //	    std::cout << "applying recoil corrections " << std::endl;
+
 	    float pfmetcorr_ex = pfmet_ex;
 	    float pfmetcorr_ey = pfmet_ey;
-	    recoilPFMetCorrector.CorrectByMeanResolution(pfmet_ex,pfmet_ey,genV.Px(),genV.Py(),visiblePx,visiblePy,nJets30,pfmetcorr_ex,pfmetcorr_ey);
+	    if (applySimpleRecoilCorrections)
+	      recoilPFMetCorrector.CorrectByMeanResolution(pfmet_ex,pfmet_ey,genV.Px(),genV.Py(),visiblePx,visiblePy,nJets30,pfmetcorr_ex,pfmetcorr_ey);
+	    else 
+	      recoilPFMetCorrector.Correct(pfmet_ex,pfmet_ey,genV.Px(),genV.Py(),visiblePx,visiblePy,nJets30,pfmetcorr_ex,pfmetcorr_ey);
 	    pfmet_phi = TMath::ATan2(pfmetcorr_ey,pfmetcorr_ex);
 	    pfmet = TMath::Sqrt(pfmetcorr_ex*pfmetcorr_ex+pfmetcorr_ey*pfmetcorr_ey);
 	    pfmet_ex = pfmetcorr_ex;
@@ -1613,7 +1762,10 @@ int main(int argc, char * argv[]) {
 	    
 	    float puppimetcorr_ex = puppimet_ex;
 	    float puppimetcorr_ey = puppimet_ey;
-	    recoilPuppiMetCorrector.CorrectByMeanResolution(puppimet_ex,puppimet_ey,genV.Px(),genV.Py(),visiblePx,visiblePy,nJets30,puppimetcorr_ex,puppimetcorr_ey);
+	    if (applySimpleRecoilCorrections)
+	      recoilPuppiMetCorrector.CorrectByMeanResolution(puppimet_ex,puppimet_ey,genV.Px(),genV.Py(),visiblePx,visiblePy,nJets30,puppimetcorr_ex,puppimetcorr_ey);
+	    else
+	      recoilPuppiMetCorrector.Correct(puppimet_ex,puppimet_ey,genV.Px(),genV.Py(),visiblePx,visiblePy,nJets30,puppimetcorr_ex,puppimetcorr_ey);
 	    puppimet_phi = TMath::ATan2(puppimetcorr_ey,puppimetcorr_ex);
 	    puppimet = TMath::Sqrt(puppimetcorr_ex*puppimetcorr_ex+puppimetcorr_ey*puppimetcorr_ey);
 	    puppimet_ex = puppimetcorr_ex;
@@ -1621,7 +1773,10 @@ int main(int argc, char * argv[]) {
 
 	    float mvametcorr_ex = mvamet_ex;
 	    float mvametcorr_ey = mvamet_ey;
-	    recoilMvaMetCorrector.CorrectByMeanResolution(mvamet_ex,mvamet_ey,genV.Px(),genV.Py(),visiblePx,visiblePy,nJets30,mvametcorr_ex,mvametcorr_ey);
+	    if (applySimpleRecoilCorrections)
+	      recoilMvaMetCorrector.CorrectByMeanResolution(mvamet_ex,mvamet_ey,genV.Px(),genV.Py(),visiblePx,visiblePy,nJets30,mvametcorr_ex,mvametcorr_ey);
+	    else
+	      recoilMvaMetCorrector.Correct(mvamet_ex,mvamet_ey,genV.Px(),genV.Py(),visiblePx,visiblePy,nJets30,mvametcorr_ex,mvametcorr_ey);
 	    mvamet_phi = TMath::ATan2(mvametcorr_ey,mvametcorr_ex);
 	    mvamet = TMath::Sqrt(mvametcorr_ex*mvametcorr_ex+mvametcorr_ey*mvametcorr_ey);
 	    mvamet_ex = mvametcorr_ex;
@@ -1629,10 +1784,15 @@ int main(int argc, char * argv[]) {
 
 	  }
 
+	    
           float ptLeadingE = analysisTree.electron_pt[iE1];
 	  float etaLeadingE = analysisTree.electron_eta[iE1];
+	  float phiLeadingE = analysisTree.electron_phi[iE1];
+
 	  float ptTrailingE = analysisTree.electron_pt[iE2];
 	  float etaTrailingE = analysisTree.electron_eta[iE2];
+	  float phiTrailingE = analysisTree.electron_phi[iE2];
+
 	  if (ptTrailingE>ptLeadingE) {
 	    float temp = ptLeadingE;
 	    ptLeadingE = ptTrailingE;
@@ -1640,6 +1800,9 @@ int main(int argc, char * argv[]) {
 	    temp = etaLeadingE;
 	    etaLeadingE = etaTrailingE;
 	    etaTrailingE = temp;
+	    temp = phiLeadingE;
+	    phiLeadingE = phiTrailingE;
+	    phiTrailingE = temp;
 	    float itemp = iE1;
 	    iE1 = iE2;
 	    iE2 = itemp;
@@ -1668,6 +1831,78 @@ int main(int argc, char * argv[]) {
 	    metSelH->Fill(pfmet,weight);
 	    puppimetSelH->Fill(puppimet,weight);
 	    mvametSelH->Fill(mvamet,weight);
+
+	    // ************************
+	    // ** Filling MET NTuple **
+	    // ************************
+
+	    evt = analysisTree.event_nr;
+	    pt_1 = ptLeadingE;
+	    eta_1 = etaLeadingE;
+	    phi_1 = phiLeadingE;
+	    match_1 = false;
+	    pt_2 = ptTrailingE;
+	    eta_2 = etaTrailingE;
+	    phi_2 = phiTrailingE;
+	    match_2 = false;
+	    njets = nJets30;
+	    mvametX = mvamet;
+	    metX = pfmet;
+	    metuncorrX = TMath::Sqrt(analysisTree.pfmet_ex*analysisTree.pfmet_ex+analysisTree.pfmet_ey*analysisTree.pfmet_ey);
+	    puppimetX = puppimet;
+	    if (genElectrons.size()==2) {
+	      for (unsigned int iGen=0; iGen<genElectrons.size(); ++iGen) {
+		unsigned int igen = genElectrons[iGen];
+		TLorentzVector genLV; genLV.SetXYZT(analysisTree.genparticles_px[igen],
+						    analysisTree.genparticles_py[igen],
+						    analysisTree.genparticles_pz[igen],
+						    analysisTree.genparticles_e[igen]);
+		float deltaRLeading = deltaR(etaLeadingE,phiLeadingE,
+					     genLV.Eta(),genLV.Phi());
+		float deltaRTrailing = deltaR(etaTrailingE,phiTrailingE,
+					     genLV.Eta(),genLV.Phi());
+		if (deltaRLeading<0.2)
+		  match_1 = true;
+		if (deltaRTrailing<0.2)
+		  match_2 = true;
+
+	      }
+	    }
+
+	    float dielectronPt = dielectron.Pt();
+	    float dielectronEta = dielectron.Eta();
+	    float dielectronPhi = dielectron.Phi();
+
+	    dilepton_pt = dielectronPt;
+	    dilepton_eta = dielectronEta;
+	    dilepton_phi = dielectronPhi;
+
+	    float unitX = dielectron.Px()/dielectron.Pt();
+	    float unitY = dielectron.Py()/dielectron.Pt();
+	    float phiUnit = TMath::ATan2(unitY,unitX);
+	    float perpUnitX = TMath::Cos(phiUnit+0.5*TMath::Pi());
+	    float perpUnitY = TMath::Sin(phiUnit+0.5*TMath::Pi());
+	    
+	    float pfmetcorr_ex = analysisTree.pfmetcorr_ex;
+	    float pfmetcorr_ey = analysisTree.pfmetcorr_ey;
+
+	    float u1 = 0;
+	    float u2  = 0;
+	    float rH = 0;
+
+	    computeRecoil(pfmet_ex,pfmet_ey,unitX,unitY,perpUnitX,perpUnitY,dielectronPt,u1,u2,rH);
+	    u1_metuncorrX = u1;
+	    u2_metuncorrX = u2;
+
+	    computeRecoil(pfmetcorr_ex,pfmetcorr_ey,unitX,unitY,perpUnitX,perpUnitY,dielectronPt,u1,u2,rH);
+            u1_metX = u1;
+            u2_metX = u2;
+
+	    computeRecoil(mvamet_ex,mvamet_ey,unitX,unitY,perpUnitX,perpUnitY,dielectronPt,u1,u2,rH);
+            u1_mvametX = u1;
+            u2_mvametX = u2;
+
+	    synch_tree->Fill();
 
 	    // jet pt bin
 	    int jetBin = 0;
@@ -1699,14 +1934,7 @@ int main(int argc, char * argv[]) {
 	      mvametSelScaleH[iScale]->Fill(mvamet*scaleFactor,weight);
 	    }
 
-	    float dielectronPt = dielectron.Pt();
-	    float dielectronEta = dielectron.Eta();
 
-	    float unitX = dielectron.Px()/dielectron.Pt();
-	    float unitY = dielectron.Py()/dielectron.Pt();
-	    float phiUnit = TMath::ATan2(unitY,unitX);
-	    float perpUnitX = TMath::Cos(phiUnit+0.5*TMath::Pi());
-	    float perpUnitY = TMath::Sin(phiUnit+0.5*TMath::Pi());
 	    
 	    // systematic shifts in mva met --->
 
