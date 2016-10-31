@@ -508,12 +508,13 @@ namespace genTools{
       fromHardProcessFinalState = analysisTree.genparticles_fromHardProcess[igen] && analysisTree.genparticles_status[igen]==1;
       isDirectHardProcessTauDecayProduct = analysisTree.genparticles_isDirectHardProcessTauDecayProduct[igen];
 
-      /*if((fromHardProcessFinalState && isChargedLepton) || (isDirectHardProcessTauDecayProduct && (!isNeutrino)))
+      if((fromHardProcessFinalState && isChargedLepton) || (isDirectHardProcessTauDecayProduct && (!isNeutrino)))
 	genL += genPart;
     }
 
-    return genL;*/
+    return genL;
 
+    /*
       if(fromHardProcessFinalState && isChargedLepton)
 	genL += genPart;
     }
@@ -534,7 +535,7 @@ namespace genTools{
     }
       
     return genL;
-      
+    */
   }
 
   TLorentzVector genNu(const AC1B& analysisTree){
@@ -586,21 +587,22 @@ namespace genTools{
       isElectron = fabs(analysisTree.genparticles_pdgid[igen])==11;
       isChargedLepton = isMuon || isElectron;
       isNeutrino = fabs(analysisTree.genparticles_pdgid[igen])==12||
-	fabs(analysisTree.genparticles_pdgid[igen])==14||
-	fabs(analysisTree.genparticles_pdgid[igen])==16;
+	           fabs(analysisTree.genparticles_pdgid[igen])==14||
+	           fabs(analysisTree.genparticles_pdgid[igen])==16;
       fromHardProcessFinalState = analysisTree.genparticles_fromHardProcess[igen] && analysisTree.genparticles_status[igen]==1;
       isDirectHardProcessTauDecayProduct = analysisTree.genparticles_isDirectHardProcessTauDecayProduct[igen];
 
-      /*if((fromHardProcessFinalState && (isChargedLepton || isNeutrino)) || isDirectHardProcessTauDecayProduct)
+      if((fromHardProcessFinalState && (isChargedLepton || isNeutrino)) || isDirectHardProcessTauDecayProduct)
 	genV += genPart;
     }
 
-    if (genV.Pt()<0.1)
+    if (genV.Pt()<0.1){
       genV.SetXYZM(0.1,0.1,0.,0.);
+    }
     
-      return genV;*/
+    return genV;
 
-
+    /*
       if(fromHardProcessFinalState && (isChargedLepton || isNeutrino))
 	genV += genPart;
     }
@@ -624,6 +626,7 @@ namespace genTools{
       genV.SetXYZM(0.1,0.1,0.,0.);
     
     return genV;  
+    */
   }
 
   int nJetsHad(const AC1B& analysisTree){
