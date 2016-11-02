@@ -26,7 +26,6 @@
 #include "DesyTauAnalyses/NTupleMaker/interface/AC1B.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/json.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/PileUp.h"
-#include "DesyTauAnalyses/NTupleMaker/interface/Jets.h"
 #include "TGraphAsymmErrors.h"
 
 int main(int argc, char * argv[]) {
@@ -295,34 +294,38 @@ int main(int argc, char * argv[]) {
   TH1D * hDPhi = new TH1D("hDPhi","",70,0,3.5);
   TH1D * hxsec = new TH1D("xsec","",1,0,10e+20);
 
-  int nPtBins = 7;
-  float ptBins[8] = {20,25,30,40,60,100,150,200};
+  int nPtBins = 11;
+  float ptBins[12] = {20,25,30,40,60,100,150,200,300,400,500,1000};
 
   
   int nEtaBins = 3;
   float etaBins[4] = {0,0.9,1.2,2.4}; 
   
-  TString PtBins[8] = {"Pt20to25",
+  TString PtBins[12] = {"Pt20to25",
 		       "Pt25to30",
 		       "Pt30to40",
 		       "Pt40to60",
 		       "Pt60to100",
 		       "Pt100to150",
 		       "Pt150to200",
-		        "PtGt200"};
+		        "Pt200to300",
+			"Pt300to400",
+			"Pt400to500",
+			"Pt500to1000",
+			"PtGt100"};
   
 
   TString EtaBins[3] = {"EtaLt0p9",
 			"Eta0p9to1p2",
-		        "EtaGt1p2"};
+		         "EtaGt1p2"};
 
 
 
   TH1D * FakeRatePtIncLoose[3];
   TH1D * FakeRatePtIncTight[3];
-  //TH1D * FakeRatePt[3][7];
-  //TH1D * FakeRateNV[3][7];
-  //TH1D * FakeRateEta[3][7];
+  TH1D * FakeRatePt[3][11];
+  TH1D * FakeRateNV[3][11];
+  TH1D * FakeRateEta[3][11];
 
   
   TH1D * etaBinsH = new TH1D("etaBinsH", "etaBinsH", nEtaBins, etaBins);
@@ -334,11 +337,11 @@ int main(int argc, char * argv[]) {
   	for (int iEta=0; iEta<nEtaBins; ++iEta) {
       FakeRatePtIncLoose[iEta] = new TH1D("FakeRatePtIncLoose"+EtaBins[iEta],"",nPtBins,ptBins);
       FakeRatePtIncTight[iEta] = new TH1D("FakeRatePtIncTight"+EtaBins[iEta],"",nPtBins,ptBins);
-    //for (int iPt=0; iPt<nPtBins; ++iPt) {
-    //  FakeRatePt[iEta][iPt] = new TH1D("FakeRatePt"+EtaBins[iEta]+PtBins[iPt],"",100,0,1000);
-    //  FakeRateNV[iEta][iPt] = new TH1D("FakeRateNV"+EtaBins[iEta]+PtBins[iPt],"",50,0,50);
-    //  FakeRateEta[iEta][iPt] = new TH1D("FakeRateEta"+EtaBins[iEta]+PtBins[iPt],"",80,-4,4);
-   // }
+    for (int iPt=0; iPt<nPtBins; ++iPt) {
+      FakeRatePt[iEta][iPt] = new TH1D("FakeRatePt"+EtaBins[iEta]+PtBins[iPt],"",100,0,1000);
+      FakeRateNV[iEta][iPt] = new TH1D("FakeRateNV"+EtaBins[iEta]+PtBins[iPt],"",50,0,50);
+      FakeRateEta[iEta][iPt] = new TH1D("FakeRateEta"+EtaBins[iEta]+PtBins[iPt],"",80,-4,4);
+    }
   
   }
 
@@ -468,6 +471,10 @@ int main(int argc, char * argv[]) {
       }
 
 
+
+
+
+
       if (isData)  {
 	XSec = 1.;
 
@@ -565,30 +572,63 @@ int main(int argc, char * argv[]) {
 	std::cout << "HLT filter for Mu20 " << MainTrigger << " not found" << std::endl;
 	return(-1);
       }
-       ////////// first make a jets collection from pfjet candidates
 
-      	if (analysisTree.pfjet_count<1) continue;
+      /////now clear the Mu.El.Jets again to fill them again after cleaning
 
-	      for (unsigned int jet=0; jet<analysisTree.pfjet_count; ++jet) {
-		float absJetEta = fabs(analysisTree.pfjet_eta[jet]);
-	
-		if (absJetEta > etaJetCut) continue;
-                if (fabs(analysisTree.pfjet_pt[jet])<ptJetCut) continue;
-		bool  looseJetID = looseJetiD(analysisTree,jet);
-	          if (!looseJetID) continue;	  
-	
-		JetsV.SetPxPyPzE(analysisTree.pfjet_px[jet], analysisTree.pfjet_py[jet], analysisTree.pfjet_pz[jet], analysisTree.pfjet_e[jet]);
-		JetsMV.push_back(JetsV);
-	      }
+      double isoMuMin = 9999;
+      bool mu_iso=false;
+      vector<int> muons; muons.clear();
+      for (unsigned int im = 0; im<analysisTree.muon_count; ++im) {
+	if (analysisTree.muon_pt[im]<ptMuonLowCuT) continue;
+	if (fabs(analysisTree.muon_eta[im])>etaMuonCut) continue;
+	if (fabs(analysisTree.muon_dxy[im])>dxyMuonCut) continue;
+	if (fabs(analysisTree.muon_dz[im])>dzMuonCut) continue;
 
-		sort(JetsMV.begin(), JetsMV.end(),ComparePt);
-		if (JetsMV.size()==0) continue;
 
-		//////make sure that has fired the trigger
-		//
+         double absIso= analysisTree.muon_r03_sumChargedHadronPt[im]
+	            + max(analysisTree.muon_r03_sumNeutralHadronEt[im] + analysisTree.muon_r03_sumPhotonEt[im]
+	            - 0.5 * analysisTree.muon_r03_sumPUPt[im],0.0);
+
+
+	double relIso = absIso/analysisTree.muon_pt[im];
+ 
+	if (relIso<isoMuonLowCut) continue;
+
+	if (applyMuonId && !analysisTree.muon_isMedium[im]) continue;
+
+	if (double(relIso)<double(isoMuMin)) {
+	  isoMuMin  = relIso;
+	  mu_index = int(im);
+	  mu_iso=true;
+	  muons.push_back(im);
+	  MuV.SetPtEtaPhiM(analysisTree.muon_pt[mu_index], analysisTree.muon_eta[mu_index], analysisTree.muon_phi[mu_index], muonMass);
+	  MuMV.push_back(MuV);
+          LeptMV.push_back(MuV);
+	}
+
+	if (relIso == isoMuMin && im != mu_index) {
+	  //cout<<" found a pair  for muons " <<relIso <<" mu_index  "<<mu_index<<"  pT "<<analysisTree.muon_pt[int(mu_index)]<<" new  index "<<im<<"  pT  "<<analysisTree.muon_pt[int(im)]<<" event "<<iEntry<<endl;
+	  analysisTree.muon_pt[im] > analysisTree.muon_pt[mu_index] ? mu_index = int(im) : mu_index = mu_index;
+	}
+   
+      }
+         if (muons.size()==0 || !mu_iso ) continue;
+
+         double absIso= analysisTree.muon_r03_sumChargedHadronPt[mu_index]
+	            + max(analysisTree.muon_r03_sumNeutralHadronEt[mu_index] + analysisTree.muon_r03_sumPhotonEt[mu_index]
+	            - 0.5 * analysisTree.muon_r03_sumPUPt[mu_index],0.0);
+
+
+	double relIso = absIso/analysisTree.muon_pt[mu_index];
+
+	 if (relIso>isoMuonHighCut) continue;
+
+       sort(LeptMV.begin(), LeptMV.end(),ComparePt); 
+
+
 	for (unsigned int iT=0; iT<analysisTree.trigobject_count; ++iT) {
 	  if (analysisTree.trigobject_filters[iT][nMainTrigger]) { // Mu17 Leg
-	    double dRtrig = deltaR(JetsMV.at(0).Eta(),JetsMV.at(0).Phi(),
+	    double dRtrig = deltaR(analysisTree.muon_eta[mu_index],analysisTree.muon_phi[mu_index],
 				  analysisTree.trigobject_eta[iT],analysisTree.trigobject_phi[iT]);
 	    if (dRtrig>deltaRTrigMatch) continue;
 	 //cout<< " "<<analysisTree.muon_pt[mu_index]<<"   "<<analysisTree.trigobject_pt[iT]<<endl;
@@ -600,8 +640,37 @@ int main(int argc, char * argv[]) {
 	
 	if (!isMainTrigger) continue;
 
+//	double dR = deltaR(analysisTree.tau_eta[tau_index],analysisTree.tau_phi[tau_index],
+//			analysisTree.muon_eta[mu_index],analysisTree.muon_phi[mu_index]);
+
+//      	if (dR<dRleptonsCutmutau) continue;
+
+	/*
+	//cout<<" mu_index "<<mu_index<<"  "<<isMainTrigger<<"  "<<isMu27<<"  "<<isMuTau_MuLegA<<"  "<<isMuTau_MuLegB<<"  "<<isMuTau_TauLegA<<"  "<<isMuTau_TauLegB<<endl;
+	  float ptMu1 = TMath::Min(float(59),float(analysisTree.muon_pt[mu_index]));
+	  int ptBinMu1 = binNumber(ptMu1,nPtBins,ptBins);
+	  float absEtaMu1 = fabs(analysisTree.muon_eta[mu_index]);
+	  float dataMu1 = 1;
+	  float mcMu1 = 1;
+	  if(absEtaMu1 < 1.48){
+	    dataMu1 = dataEffBarrel[ptBinMu1];
+	    mcMu1 = mcEffBarrel[ptBinMu1];
+	  }
+	  else {
+	    dataMu1 = dataEffEndcap[ptBinMu1];
+	    mcMu1 = mcEffEndcap[ptBinMu1];
+	  }
+	  float wMu1 = dataMu1/mcMu1;
+	  //	  cout << "Muons SF : Mu1 = " << wMu1 << "   Mu2 = " << wMu2 << endl;
+	  //weight = weight*wMu1;
+      */
+      
+
+//cout<<"  Iso check  "<<relIso<<" InvertMuIso "<<InvertMuIso<<" isHighIsoMu "<<isHighIsoMu<<" isLowIsoMu "<<isLowIsoMu<<" cutQCD "<<isoMuonHighCutQCD<<endl;
+
+ //     if(fillplots)
       iCut++;
-	//////find tau candidates
+
       double isoTauMin = 999;
       bool tau_iso = false;
       bool isTight = false;
@@ -644,38 +713,35 @@ int main(int argc, char * argv[]) {
 
       }
 
-	//if (!isLoose && !isTight) continue;
-	if (!isLoose) continue;
+	if (!isLoose && !isTight) continue;
 
-
-	double dPhi=0;double MT=0 ; double RatioSums=0;
-
-	if (isLoose && int(tau_loose) !=-1 && JetsMV.size()!=0){
-
+	if (isLoose && int(tau_loose) !=-1 && int(mu_index) !=-1){
       double met = sqrt ( analysisTree.pfmet_ex*analysisTree.pfmet_ex + analysisTree.pfmet_ey*analysisTree.pfmet_ey);
 	
-      double SumPtJetTau = sqrt ( (analysisTree.tau_px[tau_loose]+JetsMV.at(0).Px())*(analysisTree.tau_px[tau_loose]+JetsMV.at(0).Px()) + 
-	      		 (analysisTree.tau_py[tau_loose]+JetsMV.at(0).Py())*(analysisTree.tau_py[tau_loose]+JetsMV.at(0).Py()));
+      double SumPtMuTau = sqrt ( (analysisTree.tau_px[tau_loose]+analysisTree.muon_px[mu_index])*(analysisTree.tau_px[tau_loose]+analysisTree.muon_px[mu_index]) + 
+		      		 (analysisTree.tau_py[tau_loose]+analysisTree.muon_py[mu_index])*(analysisTree.tau_py[tau_loose]+analysisTree.muon_py[mu_index]));
 
-      RatioSums = (SumPtJetTau - met )/ (SumPtJetTau + met );
+      double RatioSums = (SumPtMuTau - met )/ (SumPtMuTau + met );
       	
 
       TLorentzVector MetV; 
       MetV.SetPx(analysisTree.pfmet_ex); 
       MetV.SetPy(analysisTree.pfmet_ey);
       
+      TLorentzVector muV ;  muV.SetPtEtaPhiM(analysisTree.muon_pt[mu_index], analysisTree.muon_eta[mu_index], analysisTree.muon_phi[mu_index], muonMass);
       TLorentzVector tauV;  tauV.SetPtEtaPhiM(analysisTree.tau_pt[tau_loose], analysisTree.tau_eta[tau_loose], analysisTree.tau_phi[tau_loose], tauMass);
 
+       TLorentzVector DiL = muV  + tauV;
       
-       dPhi = dPhiFrom2P( JetsMV.at(0).Px(), JetsMV.at(0).Py(), analysisTree.tau_px[tau_loose], analysisTree.tau_py[tau_loose] );
+       double dPhi=dPhiFrom2P( DiL.Px(), DiL.Py(), MetV.Px(),  MetV.Py() );
+       double MT = TMath::Sqrt(2*DiL.Pt()*MetV.Pt()*(1-TMath::Cos(dPhi)));
 
 
 	hRatioSum->Fill(RatioSums,weight);
+	hMT->Fill(MT,weight);
 	hDPhi->Fill(dPhi, weight);
 	}
 
-
-       if (dPhi < 2 || RatioSums > 0.25) continue;
 
       //if (tau.size()==0 || !tau_iso ) continue;
 
@@ -693,13 +759,13 @@ int main(int argc, char * argv[]) {
 	      if (etaBin<0) continue;
 
 //cout<< "filling here  "<<analysisTree.tau_pt[tau_loose]<<"  "<<ptBin<<"  "<<etaBin<<"  "<<weight<<endl;
-		//FakeRatePt[etaBin][ptBin]->Fill(analysisTree.tau_pt[tau_loose],weight);
+		FakeRatePt[etaBin][ptBin]->Fill(analysisTree.tau_pt[tau_loose],weight);
 		
-		if (int(tau_loose)!=-1) FakeRatePtIncLoose[etaBin]->Fill(analysisTree.tau_pt[tau_loose],weight);
+		if (int(tau_loose)!=-1)FakeRatePtIncLoose[etaBin]->Fill(analysisTree.tau_pt[tau_loose],weight);
 		if (int(tau_index)!=-1) FakeRatePtIncTight[etaBin]->Fill(analysisTree.tau_pt[tau_index],weight);
 
-		//FakeRateEta[etaBin][ptBin]->Fill(analysisTree.tau_eta[tau_loose],weight);
-		//FakeRateNV[etaBin][ptBin]->Fill(analysisTree.tau_vertexz[tau_loose],weight);
+		FakeRateEta[etaBin][ptBin]->Fill(analysisTree.tau_eta[tau_loose],weight);
+		FakeRateNV[etaBin][ptBin]->Fill(analysisTree.tau_vertexz[tau_loose],weight);
 
 	      }
 	      
@@ -712,6 +778,44 @@ int main(int argc, char * argv[]) {
 
       iCut++;
 
+
+
+
+
+    /*
+      if (analysisTree.pfjet_count <2) continue;
+    //  if(fillplots)
+      iCFCounter[iCut]++;
+      iCut++;
+      		JetsMV.clear();
+	        float jetEtaCut = 2.4;
+      		float DRmax = 0.5;
+	      for (unsigned int jet=0; jet<analysisTree.pfjet_count; ++jet) {
+		float absJetEta = fabs(analysisTree.pfjet_eta[jet]);
+	
+		if (absJetEta > etaJetCut) continue;
+                if (fabs(analysisTree.pfjet_pt[jet])<ptJetCut) continue;
+		bool  looseJetID = looseJetiD(analysisTree,jet);
+	          if (!looseJetID) continue;	  
+
+
+	  	//double Dr= deltaR(LeptMV.at(il).Eta(), LeptMV.at(il).Phi(),
+	  	double Dr1= deltaR(analysisTree.muon_eta[mu_index],analysisTree.muon_phi[mu_index],
+		     analysisTree.pfjet_eta[jet],analysisTree.pfjet_phi[jet]);
+		if (  Dr1  < DRmax)  continue;
+	  
+		// pfJetId
+	  	double Dr2= deltaR(analysisTree.tau_eta[tau_index],analysisTree.tau_phi[tau_index],
+		     analysisTree.pfjet_eta[jet],analysisTree.pfjet_phi[jet]);
+		
+		if (Dr2 < 0.5) denominator++;
+
+		JetsV.SetPxPyPzE(analysisTree.pfjet_px[jet], analysisTree.pfjet_py[jet], analysisTree.pfjet_pz[jet], analysisTree.pfjet_e[jet]);
+		JetsMV.push_back(JetsV);
+		
+
+	      }	 
+*/
 
       selEvents++;
     } // end of file processing (loop over events in one file)

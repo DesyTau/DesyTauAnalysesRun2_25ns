@@ -4,10 +4,10 @@
 #$ -S /bin/sh
 #
 #(the cpu time for this job)
-#$ -l h_cpu=1:29:00
+#$ -l h_rt=0:45:00
 #
 #(the maximum memory usage of this job)
-#$ -l h_vmem=6000M
+#$ -l h_vmem=3000M
 #
 #(use hh site)
 #$ -l site=hh
@@ -24,13 +24,12 @@
 
 cd /nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/CMSSW_8_0_12/src/DesyTauAnalyses/NTupleMaker/test ;  eval `scramv1 runtime -sh` ;
 
+wdir="/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/CMSSW_8_0_12/src/DesyTauAnalyses/NTupleMaker/test"
 channel=$2 
 dir=$2
 
 
 
-#dir=InvMuIso
-region=InvElIso
 
 ##type MC or Data
 type=MC
@@ -44,7 +43,6 @@ do
 
 unset xsec
 xsec=`grep " ${line} " xsecs | cut -d " " -f3-4`	
-#	cp $dir/${line} input$line
 #xsec=1
 echo FOUND XSEC for ${line} to be $xsec
 unset f
@@ -78,15 +76,14 @@ echo $bas $xsec
 
 if [ ! -f $dir/${bas}_B_OS.root ] ;then
 
-chmod u+x Jobs/job${line}$channel$dir${bas}_B.sh
-qsub Jobs/job${line}$channel$dir${bas}_B.sh 
+chmod u+x $wdir/Jobs/job${line}$channel$dir${bas}_B.sh
+qsub $wdir/Jobs/job${line}$channel$dir${bas}_B.sh 
 fi
 
 
 fi
 
 done<$dir/${line}
-rm input${line}
 done<$1
 
 

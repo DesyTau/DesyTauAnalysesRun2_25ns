@@ -146,8 +146,8 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
   cPhotonHLTriggerMatching(iConfig.getUntrackedParameter<vector<string> >("RecPhotonHLTriggerMatching")),
   cPhotonNum(iConfig.getUntrackedParameter<int>("RecPhotonNum", 0)),
   // jets
-  cJetPtMin(iConfig.getUntrackedParameter<double>("RecJetPtMin", 30.)),
-  cJetEtaMax(iConfig.getUntrackedParameter<double>("RecJetEtaMax", 4.5)),
+  cJetPtMin(iConfig.getUntrackedParameter<double>("RecJetPtMin", 10.)),
+  cJetEtaMax(iConfig.getUntrackedParameter<double>("RecJetEtaMax", 5.0)),
   cBtagDiscriminators(iConfig.getUntrackedParameter<vector<string> >("RecJetBtagDiscriminators")),
   cJetHLTriggerMatching(iConfig.getUntrackedParameter<vector<string> >("RecJetHLTriggerMatching")),
   cJetNum(iConfig.getUntrackedParameter<int>("RecJetNum", 0)),

@@ -85,7 +85,7 @@ void Overlap2D()
 	Float_t value=0;
 	vector<float> xsecs_;
 	signal_names.clear();
-	ifstream ifs("datasets2D_stau-stau");
+	ifstream ifs("datasets2D_C1C1");
 	string line;
 	while(std::getline(ifs, line)) // read one line from ifs
 	{
@@ -135,41 +135,57 @@ void Overlap2D()
 
 	string np_title = titles[0];
 	vector <string>  variables;
-/*
-	variables.push_back("met_MT_17");
-	variables.push_back("met_MTsum_17");
-	variables.push_back("met_MTtot_17");
-	variables.push_back("met_MCTb_17");
-	variables.push_back("met_MT2lester_17");
-	variables.push_back("met_TauPt_17");
-	variables.push_back("met_DZeta_17");
 
-	variables.push_back("MT_MTsum_17");
-	variables.push_back("MT_MTtot_17");
-	variables.push_back("MT_MCTb_17");
-	variables.push_back("MT_MT2lester_17");
-	variables.push_back("MT_TauPt_17");
-	variables.push_back("MT_DZeta_17");
+	variables.push_back("met_MT_18");
+	variables.push_back("met_MTsum_18");
+	variables.push_back("met_MTtot_18");
+	variables.push_back("met_MCTb_18");
+	variables.push_back("met_MT2lester_18");
+	variables.push_back("met_TauPt_18");
+	variables.push_back("met_DZeta_18");
+	variables.push_back("met_dR_18");
+	variables.push_back("met_MTDil_18");
 
-	variables.push_back("MTsum_MTtot_17");
-	variables.push_back("MTsum_MCTb_17");
-	variables.push_back("MTsum_MT2lester_17");
-	variables.push_back("MTsum_TauPt_17");
-	variables.push_back("MTsum_DZeta_17");
+	variables.push_back("MT_MTsum_18");
+	variables.push_back("MT_MTtot_18");
+	variables.push_back("MT_MCTb_18");
+	variables.push_back("MT_MT2lester_18");
+	variables.push_back("MT_TauPt_18");
+	variables.push_back("MT_DZeta_18");
+	variables.push_back("MT_dR_18");
+	variables.push_back("MT_MTDil_18");
 
-	variables.push_back("MTtot_MCTb_17");
-	variables.push_back("MTtot_MT2lester_17");
-	variables.push_back("MTtot_TauPt_17");
-	variables.push_back("MTtot_DZeta_17");
+	variables.push_back("MTsum_MTtot_18");
+	variables.push_back("MTsum_MCTb_18");
+	variables.push_back("MTsum_MT2lester_18");
+	variables.push_back("MTsum_TauPt_18");
+	variables.push_back("MTsum_DZeta_18");
+	variables.push_back("MTsum_dR_18");
+	variables.push_back("MTsum_MTDil_18");
 
-	variables.push_back("MCTb_MT2lester_17");
-	variables.push_back("MCTb_TauPt_17");
-	variables.push_back("MCTb_DZeta_17");
+	variables.push_back("MTtot_MCTb_18");
+	variables.push_back("MTtot_MT2lester_18");
+	variables.push_back("MTtot_TauPt_18");
+	variables.push_back("MTtot_DZeta_18");
+	variables.push_back("MTtot_dR_18");
+	variables.push_back("MTtot_MTDil_18");
 
-	variables.push_back("MT2lester_TauPt_17");
-	variables.push_back("MT2lester_DZeta_17");
-*/
-	variables.push_back("TauPt_DZeta_17");
+	variables.push_back("MCTb_MT2lester_18");
+	variables.push_back("MCTb_TauPt_18");
+	variables.push_back("MCTb_DZeta_18");
+	variables.push_back("MCTb_dR_18");
+	variables.push_back("MCTb_MTDil_18");
+
+	variables.push_back("MT2lester_TauPt_18");
+	variables.push_back("MT2lester_DZeta_18");
+	variables.push_back("MT2lester_dR_18");
+	variables.push_back("MT2lester_MTDil_18");
+
+	variables.push_back("TauPt_DZeta_18");
+	variables.push_back("TauPt_dR_18");
+	variables.push_back("TauPt_MTDil_18");
+
+	variables.push_back("dR_MTDil_18");
 
 
 
@@ -259,7 +275,7 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 		string nn = obj->GetName();
 		bool flcont = true;
 		bool NormTT = false;
-		if (string::npos != nn.find("_9") || string::npos != nn.find("_10") || string::npos != nn.find("_11") || string::npos != nn.find("_12") || string::npos != nn.find("_13") || string::npos != nn.find("_14") || string::npos != nn.find("_15") || string::npos != nn.find("_16") || string::npos != nn.find("_17") || string::npos != nn.find("_18") || string::npos != nn.find("_19")) NormTT = true;
+		if (string::npos != nn.find("_9") || string::npos != nn.find("_10") || string::npos != nn.find("_11") || string::npos != nn.find("_12") || string::npos != nn.find("_13") || string::npos != nn.find("_14") || string::npos != nn.find("_15") || string::npos != nn.find("_16") || string::npos != nn.find("_18") || string::npos != nn.find("_18") || string::npos != nn.find("_18")) NormTT = true;
 		//if ( string::npos != nn.find("_11") || string::npos != nn.find("_12") || string::npos != nn.find("_13") || string::npos != nn.find("_14")) NormTT = true;
 		NormTT=true;
 		//if ( string::npos == nn.find("CutFlowUnW")) flcont=false;
@@ -422,7 +438,7 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 
 	
 				TString lumistring = "40invfb";
-				TString smFilename = "Templates_"+variable+"_"+lumistring+"_et_stau-stau.root";
+				TString smFilename = "Templates_"+variable+"_"+lumistring+"_et_C1C1.root";
 				//TString smFilename = "Templates_mt.root";
 				TFile *smFile = TFile::Open (smFilename, "recreate");
 

@@ -20,8 +20,12 @@ unsigned int RunMin = 9999999;
 unsigned int RunMax = 0;
      
 int tau_index=-1;
+int tau_index1=-1;
+int tau_index2=-1;
 int tau_loose=-1;
 int tau_tight=-1;
+int tau_loose2=-1;
+int tau_tight2=-1;
 int mu_index=-1;
 int el_index=-1;
 
@@ -42,6 +46,7 @@ int el_index=-1;
    Int_t	   muon_index_2;
    Int_t	   electron_index;
    Int_t	   taus_index;
+   Int_t	   taus_index2;
    Int_t           mu_count;
    Int_t	   nbtag;
    Int_t	   njets;
@@ -131,6 +136,10 @@ int el_index=-1;
    Float_t         ta_chargedIsoPtSum[30];   //[ta_count]
    Float_t         ta_neutralIsoPtSum[30];   //[ta_count]
 
+   Float_t 	   ta_IsoFlagVTight[30];
+   Float_t 	   ta_IsoFlagLoose[30];
+   Float_t 	   ta_IsoFlagMedium[30];
+
 
 
    Float_t         genmet;
@@ -179,7 +188,9 @@ int el_index=-1;
    Float_t 	   event_thirdLeptonVeto;
    Float_t 	   event_leptonDrTrigger;
    Float_t	   genTauMatched;
+   Float_t	   genTauMatched2;
    Float_t	   genLeptonMatched;
+   Float_t	   genLeptonMatched2;
    Float_t	   qcdweight;
    Float_t	   qcdweightup;
    Float_t	   qcdweightdown;
@@ -637,6 +648,7 @@ T  = new TTree("T","T");
   T->Branch("muon_index_2", &muon_index_2, "muon_index_2/I");
   T->Branch("electron_index", &electron_index, "electron_index/I");
   T->Branch("taus_index", &taus_index, "taus_index/I");
+  T->Branch("taus_index2", &taus_index2, "taus_index2/I");
 
   T->Branch("primvert_count", &primvert_count, "primvert_count/I");
   T->Branch("primvert_x", &primvert_x, "primvert_x/F");
@@ -726,6 +738,12 @@ T  = new TTree("T","T");
   T->Branch("ta_chargedIsoPtSum", &ta_chargedIsoPtSum, "ta_chargedIsoPtSum/F");
   T->Branch("ta_neutralIsoPtSum", &ta_neutralIsoPtSum, "ta_neutralIsoPtSum/F");
   T->Branch("ta_puCorrPtSum", &ta_puCorrPtSum, "ta_puCorrPtSum/F");
+
+  T->Branch("ta_IsoFlagVTight", &ta_IsoFlagVTight, "ta_IsoFlagVTight/F");
+  T->Branch("ta_IsoFlagLoose", &ta_IsoFlagLoose, "ta_IsoFlagLoose/F");
+  T->Branch("ta_IsoFlagMedium", &ta_IsoFlagMedium, "ta_IsoFlagMedium/F");
+
+
   T->Branch("qcdweight", &qcdweight, "qcdweight/F");
   T->Branch("qcdweightup", &qcdweightup, "qcdweightup/F");
   T->Branch("qcdweightdown", &qcdweightdown, "qcdweightdown/F");
@@ -734,7 +752,9 @@ T  = new TTree("T","T");
   T->Branch("datasetName", &datasetName);
   T->Branch("regionName", &regionName);
   T->Branch("genTauMatched", &genTauMatched);
+  T->Branch("genTauMatched", &genTauMatched2);
   T->Branch("genLeptonMatched", &genLeptonMatched);
+  T->Branch("genLeptonMatched2", &genLeptonMatched2);
   T->Branch("npartons",&npartons,"npartons/I");
   T->Branch("SusyMother",&SusyMother,"SusyMother/F");
   T->Branch("SusyLSP",&SusyLSP,"SusyLSP/F");

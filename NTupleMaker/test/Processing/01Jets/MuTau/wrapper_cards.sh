@@ -5,8 +5,9 @@ model=$1
 
 
 for i in `ls Templ*${model}*.root`
-#for i in `ls Templates_MT2lester_met_*_${model}*.root`
-#for i in `ls Templates_met_MCTb_*_${model}*.root`
+#for i in `ls Templates_MTtot_MT2lester_*_${model}*.root`
+#for i in `ls Templates_met_MT2lester_*_${model}*.root`
+#for i in `ls Templates_MTtot_MT2lester_*_${model}*.root`
 do
 
 ln=`echo $i  | cut -d '.' -f1`

@@ -68,6 +68,10 @@ lt=`echo $line | cut -d '/' -f2`
 	if [[ $2 == *"new"* ]] ;then
 		echo  plots for new workflow 
 	 	qsub -N p$3 run_plots_new.sh list_$lt $3
+	 	#qsub -N pA$3 run_plots_A.sh list_$lt $3
+	 	#qsub -N pB$3 run_plots_B.sh list_$lt $3
+	 	#qsub -N pC$3 run_plots_C.sh list_$lt $3
+	 	#qsub -N pD$3 run_plots_D.sh list_$lt $3
 
 	fi
 

@@ -535,8 +535,8 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       bool isZMM = false;
       bool isZEE = false;
       bool isTOP = false;
-      if (!isData &&  string::npos != filen.find("ToLNu") ) isW=true;
-      if (!isData &&  string::npos != filen.find("ToLL_M") )  isDY=true;
+      if (!isData &&  string::npos != filen.find("JetsToLNu") ) isW=true;
+      if (!isData &&  string::npos != filen.find("JetsToLL") )  isDY=true;
       if (!isData &&  string::npos != filen.find("TT_TuneCUETP8M1_13TeV-powheg-pythia8") ) isTOP=true;
 
       float nuPx = 0;
@@ -933,7 +933,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	bool isMu1matched = false;
       for (unsigned int im = 0; im<analysisTree.muon_count; ++im) {
 	allMuons.push_back(im);
-	if (analysisTree.muon_pt[im]<10.) continue;
+	if (analysisTree.muon_pt[im]<23.) continue;
 	if (fabs(analysisTree.muon_eta[im])>etaMuonCut) continue;
 	if (fabs(analysisTree.muon_dxy[im])>dxyMuonCut) continue;
 	if (fabs(analysisTree.muon_dz[im])>dzMuonCut) continue;
@@ -1087,7 +1087,8 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       
       double q = analysisTree.muon_charge[mu_index_1] * analysisTree.muon_charge[mu_index_2];
       event_sign  = q;
-
+	
+      if (event_sign >0) continue;
 
 
 
@@ -1133,7 +1134,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
       if(extraelec_veto)   event_thirdLeptonVeto = true;
 
-      if (event_thirdLeptonVeto) continue;
+      if (foundExtraElectron) continue;
 
 
       if (isIsoMuonsPair) {      
@@ -1171,7 +1172,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       double etaMu1 = (double)analysisTree.muon_eta[mu_index_1];
       double ptMu2 = (double)analysisTree.muon_pt[mu_index_2];
       double etaMu2 = (double)analysisTree.muon_eta[mu_index_2];
-      float trigweight=1.;
+      float trigweight = 1.;
 
 
       //cout<<" for the eff "<<mu_index_1<<"  "<<mu_index_2<<"  "<<ptMu1<<"  "<<etaMu1<<endl;
@@ -1191,7 +1192,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	trig_weight = trigweight;
 	//	cout<<" Trigger weight "<<trigweight<<endl;
       }*/
-	if (!isData) trigweight =1-  (1-EffFromData1)*(1 -EffFromData2);
+	if (!isData) trigweight = 1 -  (1-EffFromData1) * (1 -EffFromData2);
       weight *= trigweight;
       trig_weight = trigweight;
 
@@ -1296,7 +1297,9 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
 
       }
+
       jet_count=(int)analysisTree.pfjet_count;
+
       for (unsigned int jj=0;jj<analysisTree.pfjet_count; ++jj){
 
 	jet_e[jj] = analysisTree.pfjet_e[jj];
@@ -1329,16 +1332,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
       vector<unsigned int> jets; jets.clear();
       vector<unsigned int> bjets; bjets.clear();
-      vector<unsigned int> bjets_nocleaned; bjets_nocleaned.clear();
 
-      int indexLeadingJet = -1;
-      float ptLeadingJet = -1;
-
-      int indexSubLeadingJet = -1;
-      float ptSubLeadingJet = -1;
-      
-      int indexLeadingBJet = -1;
-      float ptLeadingBJet = -1;
 
 	int counter_cleaned_jets = 0;
 
@@ -1424,62 +1418,34 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	      }
 	    }
 	  } //is Data
-/*
-	  if (!isData){
-	bool matched=false;
-	  if (analysisTree.genparticles_status[igen]!=23 || abs(analysisTree.genparticles_pdgid[igen])>5){
-		  int momid = abs(genparticles_mother[igen]);
-			if(!(momid==6 || momid==23 || momid==24 || momid==25 || momid>1e6)) continue; 
-	  }
 
-
-	  }//isData for ISR tagging
-*/	  
-//if (btagged)
 //	cout<<"  what here "<<btagged<<"  "<<cleanedJet<<endl;
 	  if (btagged && cleanedJet) { 
 	      bjets.push_back(jet);
-	      if (jetPt>ptLeadingBJet) {
-		ptLeadingBJet = ptJetCut;
-		indexLeadingBJet = jet;
-	      }
 	  }
+	}//jets with bJet Eta range
+
+	if (cleanedJet){
+		
+	//	cout<<"  will push to save now cleaned jet  "<<(int)jet<<"  for counter_cleaned_jet "<<(int)counter_cleaned_jets<<" event "<<iEntry<<endl;
+
+	jets.push_back((int)jet);
+	jets_cleaned[counter_cleaned_jets]=(int)jet;
+	jet_jecUn[counter_cleaned_jets] = analysisTree.pfjet_jecUncertainty[jet];
+	counter_cleaned_jets++;
 	}
-
-
-	   counter_cleaned_jets++;
-
-	  jets.push_back(jet);
-	  jets_cleaned[counter_cleaned_jets]=jet;
-
-	if (indexLeadingJet>=0) {
-	  if (ptJetCut<ptLeadingJet&&ptJetCut>ptSubLeadingJet) {
-	    indexSubLeadingJet = jet;
-	    ptSubLeadingJet = ptJetCut;
-	  }
-	}
-
-	if (jetPt>ptLeadingJet) {
-	  indexLeadingJet = jet;
-	  ptLeadingJet = ptJetCut;
-	}
-
-	//jet jetc
-	jet_jecUn[counter_cleaned_jets++] = analysisTree.pfjet_jecUncertainty[jet];
 
       }///loop in all jets
 
       njets = jets.size();
       jet_count = jets.size();
       nbtag = bjets.size();
-      //nbtag_nocleaned = bjets_nocleaned.size();
 
       npv =  analysisTree.primvertex_count;
       npu = analysisTree.numtruepileupinteractions;
 	
       SusyMother = SusyMotherMassF;
       SusyLSP = SusyLSPMassF;
-
 
 /////////////////// Recoil corrections
 
@@ -1491,7 +1457,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       float met_x = analysisTree.pfmet_ex;
       float met_y = analysisTree.pfmet_ey;
 
-      if ((isW||isDY) && !isData) {
+      if ((isW || isDY) && !isData) {
 
 	  recoilMetCorrector.CorrectByMeanResolution(analysisTree.pfmet_ex,analysisTree.pfmet_ey,bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,pfmet_corr_x,pfmet_corr_y);
  
@@ -1500,7 +1466,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
  
       // MEt related systematic uncertainties
       int bkgdType = 0;
-      if (isDY||isW)
+      if (isDY || isW)
 	bkgdType = MEtSys::ProcessType::BOSON;
       else if (isTOP)
 	bkgdType = MEtSys::ProcessType::TOP;
@@ -1596,7 +1562,6 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       T->Fill();
 	
       selEvents++;
-      continue;
       /////////////////////////////////////////////////
 
 
