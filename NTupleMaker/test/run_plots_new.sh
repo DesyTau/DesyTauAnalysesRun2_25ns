@@ -166,7 +166,8 @@ fi
 
 ######### A region non inverted SS
 
-if [[ ! -f $dir/plots_$channel/${fileB}_A.root ]]  && [[ $file != *"stau"* && $file != *"C1"*  ]] && [[ $2 != "Ttemplate" ]]; then
+if [[ ! -f $dir/plots_$channel/${fileB}_A.root ]]  && [[ $file != *"stau"* && $file != *"C1"*  ]] && [[ $2 != "Ttemplate" ]] && [[ $2 != "mumu" ]]; then
+#if [[ ! -f $dir/plots_$channel/${fileB}_A.root ]]  &&  [[ $2 != "Ttemplate" ]] && [[ $2 != "mumu" ]]  && [[ $file == *"stau"*  || $file == *"C1"* ]]; then
 cp analyzer_h analyzer.h
 cp analyzer${channel}_C analyzer.C
 
@@ -196,7 +197,7 @@ fi
 
 
 ######## D region
-if [[ ! -f $dir/plots_$channel/${fileB}_D.root  ]] &&  [[ $file != *"stau"*  && $file != *"C1"* ]] && [[ $2 != "Ttemplate" ]]; then
+if [[ ! -f $dir/plots_$channel/${fileB}_D.root  ]] &&  [[ $file != *"stau"*  && $file != *"C1"* ]] && [[ $2 != "Ttemplate" ]] && [[ $2 != "mumu" ]]; then
 cp analyzer${channel}_C analyzer.C
 cp analyzer_h analyzer.h
 
@@ -222,7 +223,7 @@ fi
 
 
 ####### C region
-if [[ ! -f $dir/plots_$channel/${fileB}_C.root  ]] &&  [[ $file != *"stau"* && $file != *"C1"*  ]] && [[ $2 != "Ttemplate" ]]; then
+if [[ ! -f $dir/plots_$channel/${fileB}_C.root  ]] &&  [[ $file != *"stau"* && $file != *"C1"*  ]] && [[ $2 != "Ttemplate" ]] && [[ $2 != "mumu" ]]; then
 cp analyzer${channel}_C analyzer.C
 cp analyzer_h analyzer.h
 

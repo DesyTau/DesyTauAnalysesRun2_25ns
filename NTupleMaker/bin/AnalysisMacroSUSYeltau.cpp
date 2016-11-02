@@ -918,11 +918,6 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
 
 
-      double MET = sqrt ( analysisTree.pfmet_ex*analysisTree.pfmet_ex + analysisTree.pfmet_ey*analysisTree.pfmet_ey);
-
-      METV.SetPx(analysisTree.pfmet_ex);	      
-      METV.SetPy(analysisTree.pfmet_ey);
-
 
       if (!isData) 
 	{
@@ -1524,6 +1519,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 				
       ta_count=(int)analysisTree.tau_count;
       for (unsigned int it=0;it<analysisTree.tau_count;it++){
+	ta_mass[it]=analysisTree.tau_mass[it];
 	ta_px[it]=analysisTree.tau_px[it];
 	ta_py[it]=analysisTree.tau_py[it];
 	ta_pz[it]=analysisTree.tau_pz[it];
@@ -1708,14 +1704,14 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       int njetsforrecoil = njets;
       if (isW) njetsforrecoil = njets + 1;
 
-      float pfmet_corr_x = analysisTree.pfmet_ex;
-      float pfmet_corr_y = analysisTree.pfmet_ey;
-      float met_x = analysisTree.pfmet_ex;
-      float met_y = analysisTree.pfmet_ey;
+      float pfmet_corr_x = analysisTree.pfmetcorr_ex;
+      float pfmet_corr_y = analysisTree.pfmetcorr_ey;
+      float met_x = analysisTree.pfmetcorr_ex;
+      float met_y = analysisTree.pfmetcorr_ey;
 
       if ((isW||isDY) && !isData) {
 
-	  recoilMetCorrector.CorrectByMeanResolution(analysisTree.pfmet_ex,analysisTree.pfmet_ey,bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,pfmet_corr_x,pfmet_corr_y);
+	  recoilMetCorrector.CorrectByMeanResolution(analysisTree.pfmetcorr_ex,analysisTree.pfmetcorr_ey,bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,pfmet_corr_x,pfmet_corr_y);
  
         met_x = pfmet_corr_x;
         met_y = pfmet_corr_y;
@@ -1775,34 +1771,31 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
  
  
 	
-//	float met_recoil = sqrt(pfmet_corr_x*pfmet_corr_x + pfmet_corr_y*pfmet_corr_y);
-//	float met_ = sqrt(analysisTree.pfmet_ex*analysisTree.pfmet_ex + analysisTree.pfmet_ey*analysisTree.pfmet_ey);
-//cout<< " recoil correction  "<<met_recoil<<"  "<<met_<<endl;
 
       met_ex_recoil = pfmet_corr_x;
       met_ey_recoil = pfmet_corr_y;
 
       }//if isW, isDY !isData
 
-      met_ex = analysisTree.pfmet_ex;
-      met_ey = analysisTree.pfmet_ey;
+      met_ex = pfmet_corr_x;
+      met_ey = pfmet_corr_y;
       met_ez = 0;//analysisTree.pfmet_ez;
       //met_pt = analysisTree.pfmet_pt;
-      met_pt = TMath::Sqrt(analysisTree.pfmet_ex*analysisTree.pfmet_ex+analysisTree.pfmet_ey*analysisTree.pfmet_ey);
+      met_pt = TMath::Sqrt(pfmet_corr_x*pfmet_corr_x+pfmet_corr_y*pfmet_corr_y);
       //met_phi = analysisTree.pfmet_phi;
-      met_phi = TMath::ATan2(analysisTree.pfmet_ey,analysisTree.pfmet_ex);
+      met_phi = TMath::ATan2(pfmet_corr_y,pfmet_corr_x);
 
-     met_ex_JetEnUp = analysisTree.pfmet_ex_JetEnUp;
-     met_ey_JetEnUp = analysisTree.pfmet_ey_JetEnUp;
+     met_ex_JetEnUp = analysisTree.pfmetcorr_ex_JetEnUp;
+     met_ey_JetEnUp = analysisTree.pfmetcorr_ey_JetEnUp;
 
-     met_ex_JetEnDown = analysisTree.pfmet_ex_JetEnDown;
-     met_ey_JetEnDown = analysisTree.pfmet_ey_JetEnDown;
+     met_ex_JetEnDown = analysisTree.pfmetcorr_ex_JetEnDown;
+     met_ey_JetEnDown = analysisTree.pfmetcorr_ey_JetEnDown;
 
-     met_ex_UnclusteredEnUp = analysisTree.pfmet_ex_UnclusteredEnUp;
-     met_ey_UnclusteredEnUp = analysisTree.pfmet_ey_UnclusteredEnUp;
+     met_ex_UnclusteredEnUp = analysisTree.pfmetcorr_ex_UnclusteredEnUp;
+     met_ey_UnclusteredEnUp = analysisTree.pfmetcorr_ey_UnclusteredEnUp;
    
-     met_ex_UnclusteredEnDown = analysisTree.pfmet_ex_UnclusteredEnDown;
-     met_ey_UnclusteredEnDown = analysisTree.pfmet_ey_UnclusteredEnDown;
+     met_ex_UnclusteredEnDown = analysisTree.pfmetcorr_ex_UnclusteredEnDown;
+     met_ey_UnclusteredEnDown = analysisTree.pfmetcorr_ey_UnclusteredEnDown;
 
 
       float genmet_ex = analysisTree.genmet_ex;
