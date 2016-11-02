@@ -2161,7 +2161,7 @@ int main(int argc, char * argv[]) {
                 float jetPt = analysisTree.pfjet_pt[jet];
 		float jetPtDown = analysisTree.pfjet_pt[jet]*(1.0-analysisTree.pfjet_jecUncertainty[jet]);
 		float jetPtUp   = analysisTree.pfjet_pt[jet]*(1.0+analysisTree.pfjet_jecUncertainty[jet]);
-		std::cout << jet << " : uncertainty = " << analysisTree.pfjet_jecUncertainty[jet] << std::endl;
+		//std::cout << jet << " : uncertainty = " << analysisTree.pfjet_jecUncertainty[jet] << std::endl;
                 if (jetPtDown<jetPtLowCut) continue;
                 
                 bool isPFJetId = looseJetiD(analysisTree,int(jet));
@@ -3009,5 +3009,4 @@ int main(int argc, char * argv[]) {
     delete file;
     
 }
-
 
