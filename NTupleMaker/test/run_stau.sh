@@ -23,13 +23,15 @@
 
 
 channel=$2 
-era=$3
+era=$2
 
-era=25ns
+#era=25ns
 #era=InvMuIso
 #era=eltau
 
-channel=mutau
+#era=eltau
+#channel=mutau
+#era=mutau
 #channel=eltau
 
 

@@ -4,8 +4,9 @@
 #$ -S /bin/sh
 #
 #(the cpu time for this job)
-#$ -l h_cpu=0:10:00
+#$ -l h_rt=0:45:00
 #
+
 #(the maximum memory usage of this job)
 #$ -l h_vmem=2000M
 #
@@ -14,6 +15,7 @@
 #(stderr and stdout are merged together to stdout)
 #$ -j y
 #
+#$ -l site=hh 
 # use SL5
 #$ -l os=sld6
 #
@@ -22,5 +24,6 @@
 #$ -V
 #
 
-cd /nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/CMSSW_7_4_14/src/DesyTauAnalyses/NTupleMaker/test;eval `scramv1 runtime -sh` ;
+
+cd /nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/CMSSW_8_0_12/src/DesyTauAnalyses/NTupleMaker/test;eval `scramv1 runtime -sh` ;
 
