@@ -2417,6 +2417,11 @@ int main(int argc, char * argv[]) {
             // METs
             float met_x = analysisTree.pfmetcorr_ex;
             float met_y = analysisTree.pfmetcorr_ey;
+            if (!isData) {
+                met_x = analysisTree.pfmet_ex;
+                met_y = analysisTree.pfmet_ey;
+            }
+            
             met = TMath::Sqrt(met_x*met_x + met_y*met_y);
             metphi = TMath::ATan2(met_y,met_x);
             metcov00 = analysisTree.pfmetcorr_sigxx;
