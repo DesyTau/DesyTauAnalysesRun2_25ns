@@ -34,15 +34,9 @@ channel2=$2
 btag="0.800"
 
 
-IS_PFMET_USUAL="true" # for usual met
-#IS_PFMET_USUAL="false" #for systematick
 
+systematics="Nominal JetEnUp JetEnDown UnclEnUp UnclEnDown"
 
-#IS_PFMET_JETEN="true" #for  met_Jet
-IS_PFMET_JETEN="false" #for  met_Unclustered
-
-#IS_PFMET_UP="true" #for met 1 sigma up
-IS_PFMET_UP="false" #for met 1 sigma down
 
 if [[ $2 == "Ttemplate" ]] 
 then
@@ -54,14 +48,19 @@ then
 	channel2="mutau"
 fi
 
+
+###########start looking 
 while read line
+do
+
+for syst in $systematics
 do
 
 unset file
 file=`echo $line | cut -d '/' -f2`
 	
-mkdir dir_${file}_${channel}
-cd dir_${file}_${channel}
+mkdir dir_${file}_${channel}_$syst
+cd dir_${file}_${channel}_$syst
 echo ==============================================
 pwd
 echo ==============================================
@@ -83,10 +82,7 @@ cp $dir/analyzer${channel}_C .
 sed -i 's/CHIMASSS/'$lsp'/g' analyzer*C
 sed -i 's/CHANNELHERE/'$channel2'/g' analyzer*
 
-sed -i 's/IS_PFMET_USUAL/'$IS_PFMET_USUAL'/g' analyzer.C
-sed -i 's/IS_PFMET_JETEN/'$IS_PFMET_JETEN'/g' analyzer.C
-sed -i 's/IS_PFMET_UP/'$IS_PFMET_UP'/g' analyzer.C
-
+sed -i 's/SYSTEMATICHERE/'$syst'/g' analyzer.C
 
 cp $dir/runme.C .
 cp $dir/plots.h .
@@ -109,7 +105,7 @@ echo Signal file here .....
 ls
 
 
-if [[ ! -f $dir/plots_$channel/${fileB}_B.root ]] ; then
+if [[ ! -f $dir/plots_$channel/${fileB}_${syst}_B.root ]] ; then
 echo the signal filein : $file , the fileout : ${fileB}_B.root
 
 sed -i 's/FILEIN/'$file'/g' analyzer*
@@ -119,14 +115,12 @@ sed -i 's/CHANNELHERE/'$channel2'/g' analyzer*
 sed -i 's/BTAGCUT/0.800/g' analyzer*
 
 
-sed -i 's/IS_PFMET_USUAL/'$IS_PFMET_USUAL'/g' analyzer.C
-sed -i 's/IS_PFMET_JETEN/'$IS_PFMET_JETEN'/g' analyzer.C
-sed -i 's/IS_PFMET_UP/'$IS_PFMET_UP'/g' analyzer.C
+sed -i 's/SYSTEMATICHERE/'$syst'/g' analyzer.C
 
 rm plots.root
 root -l -q -b runme.C 
 # g++ `$ROOTSYS/bin/root-config --cflags --glibs` analyzer.C -o a;./a
-mv plots.root $dir/plots_$channel/${fileB}_B.root
+mv plots.root $dir/plots_$channel/${fileB}_${syst}_B.root
 fi
 
 fi
@@ -140,7 +134,7 @@ cp analyzer_h analyzer.h
 
 ######### B region non inverted OS
 
-if [[ ! -f $dir/plots_$channel/${fileB}_B.root  ]] &&  [[ $file != *"stau"* && $file != *"C1"* ]]; then
+if [[ ! -f $dir/plots_$channel/${fileB}_${syst}_B.root  ]] &&  [[ $file != *"stau"* && $file != *"C1"* ]]; then
 cp analyzer_h analyzer.h
 cp analyzer${channel}_C analyzer.C
 
@@ -152,21 +146,19 @@ sed -i 's/CHANNELHERE/'$channel2'/g' analyzer*
 sed -i 's/BTAGCUT/'$btag'/g' analyzer*
 
 
-sed -i 's/IS_PFMET_USUAL/'$IS_PFMET_USUAL'/g' analyzer.C
-sed -i 's/IS_PFMET_JETEN/'$IS_PFMET_JETEN'/g' analyzer.C
-sed -i 's/IS_PFMET_UP/'$IS_PFMET_UP'/g' analyzer.C
+sed -i 's/SYSTEMATICHERE/'$syst'/g' analyzer.C
 
 
 rm plots.root
 root -l -q -b runme.C 
-mv plots.root $dir/plots_$channel/${fileB}_B.root
+mv plots.root $dir/plots_$channel/${fileB}_${syst}_B.root
 
 fi
 
 
 ######### A region non inverted SS
 
-if [[ ! -f $dir/plots_$channel/${fileB}_A.root ]]  && [[ $file != *"stau"* && $file != *"C1"*  ]] && [[ $2 != "Ttemplate" ]] && [[ $2 != "mumu" ]]; then
+if [[ ! -f $dir/plots_$channel/${fileB}_${syst}_A.root ]]  && [[ $file != *"stau"* && $file != *"C1"*  ]] && [[ $2 != "Ttemplate" ]] && [[ $2 != "mumu" ]]; then
 #if [[ ! -f $dir/plots_$channel/${fileB}_A.root ]]  &&  [[ $2 != "Ttemplate" ]] && [[ $2 != "mumu" ]]  && [[ $file == *"stau"*  || $file == *"C1"* ]]; then
 cp analyzer_h analyzer.h
 cp analyzer${channel}_C analyzer.C
@@ -179,9 +171,7 @@ sed -i 's/CHANNELHERE/'$channel2'/g' analyzer*
 sed -i 's/BTAGCUT/'$btag'/g' analyzer*
 
 
-sed -i 's/IS_PFMET_USUAL/'$IS_PFMET_USUAL'/g' analyzer.C
-sed -i 's/IS_PFMET_JETEN/'$IS_PFMET_JETEN'/g' analyzer.C
-sed -i 's/IS_PFMET_UP/'$IS_PFMET_UP'/g' analyzer.C
+sed -i 's/SYSTEMATICHERE/'$syst'/g' analyzer.C
 #if [[ $channel == "muel" ]] ; then
 
 #sed -i '217 a            bqcd=true;' analyzer.C
@@ -189,7 +179,7 @@ sed -i 's/IS_PFMET_UP/'$IS_PFMET_UP'/g' analyzer.C
 
 rm plots.root
 root -l -q -b runme.C 
-mv plots.root $dir/plots_$channel/${fileB}_A.root
+mv plots.root $dir/plots_$channel/${fileB}_${syst}_A.root
 
 fi
 
@@ -197,7 +187,7 @@ fi
 
 
 ######## D region
-if [[ ! -f $dir/plots_$channel/${fileB}_D.root  ]] &&  [[ $file != *"stau"*  && $file != *"C1"* ]] && [[ $2 != "Ttemplate" ]] && [[ $2 != "mumu" ]]; then
+if [[ ! -f $dir/plots_$channel/${fileB}_${syst}_D.root  ]] &&  [[ $file != *"stau"*  && $file != *"C1"* ]] && [[ $2 != "Ttemplate" ]] && [[ $2 != "mumu" ]]; then
 cp analyzer${channel}_C analyzer.C
 cp analyzer_h analyzer.h
 
@@ -211,19 +201,16 @@ sed -i 's/CHANNELHERE/'$channel2'/g' analyzer*
 sed -i 's/BTAGCUT/'$btag'/g' analyzer*
 
 
-sed -i 's/IS_PFMET_USUAL/'$IS_PFMET_USUAL'/g' analyzer.C
-sed -i 's/IS_PFMET_JETEN/'$IS_PFMET_JETEN'/g' analyzer.C
-sed -i 's/IS_PFMET_UP/'$IS_PFMET_UP'/g' analyzer.C
+sed -i 's/SYSTEMATICHERE/'$syst'/g' analyzer.C
 rm plots.root
 root -l -q -b runme.C 
-mv plots.root $dir/plots_$channel/${fileB}_D.root
-
+mv plots.root $dir/plots_$channel/${fileB}_${syst}_D.root
 
 fi
 
 
 ####### C region
-if [[ ! -f $dir/plots_$channel/${fileB}_C.root  ]] &&  [[ $file != *"stau"* && $file != *"C1"*  ]] && [[ $2 != "Ttemplate" ]] && [[ $2 != "mumu" ]]; then
+if [[ ! -f $dir/plots_$channel/${fileB}_${syst}_C.root  ]] &&  [[ $file != *"stau"* && $file != *"C1"*  ]] && [[ $2 != "Ttemplate" ]] && [[ $2 != "mumu" ]]; then
 cp analyzer${channel}_C analyzer.C
 cp analyzer_h analyzer.h
 
@@ -237,13 +224,12 @@ sed -i 's/CHANNELHERE/'$channel2'/g' analyzer*
 sed -i 's/BTAGCUT/'$btag'/g' analyzer*
 
 
-sed -i 's/IS_PFMET_USUAL/'$IS_PFMET_USUAL'/g' analyzer.C
-sed -i 's/IS_PFMET_JETEN/'$IS_PFMET_JETEN'/g' analyzer.C
-sed -i 's/IS_PFMET_UP/'$IS_PFMET_UP'/g' analyzer.C
+sed -i 's/SYSTEMATICHERE/'$syst'/g' analyzer.C
+
 rm plots.root
 root -l -q -b runme.C 
 
-mv plots.root $dir/plots_$channel/${fileB}_C.root
+mv plots.root $dir/plots_$channel/${fileB}_${syst}_C.root
 
 
 fi
@@ -252,5 +238,6 @@ fi
 
 cd ${dir}
 
-rm -fr dir_$line
+rm -fr dir_${file}_${channel}_$syst
+done
 done<$1

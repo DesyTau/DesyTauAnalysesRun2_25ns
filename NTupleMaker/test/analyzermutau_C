@@ -108,13 +108,8 @@ void analyzer::Loop(){
 	//bool HighInvertLeptonIso = HIGHISO;
 	string Sign = "SIGNHERE";
 	
-	bool pfmet_JetEn = IS_PFMET_JETEN;
-	bool EnUp = IS_PFMET_UP;
-	bool pfmet_usual = IS_PFMET_USUAL;
-
-	cout<<"pfmet_usual  "<<pfmet_usual<<endl;
-	cout<<"pfmet_JetEn  "<<pfmet_JetEn<<endl;
-	cout<<"EnUp  "<<EnUp<<endl;
+	
+	string systematic="SYSTEMATICHERE";
 
 
 	string cut = to_string(t);
@@ -236,36 +231,39 @@ TH2D *histo = (TH2D*) obj;
 
 	float met = -1;
 
+		METV.SetPx(met_ex);
+		METV.SetPy(met_ey);
+		met= sqrt(met_ex*met_ex + met_ey*met_ey);  
 
-	if (pfmet_usual)
+	if (systematic =="nominal")
 		{
 		METV.SetPx(met_ex);
 		METV.SetPy(met_ey);
 		met = sqrt(met_ex*met_ex + met_ey*met_ey);  
 		}
 
-
-	if (pfmet_JetEn && EnUp && !pfmet_usual)
+//JetEnUp JetEnDown UnclEnUp UnclEnDown
+	if (systematic =="JetEnUp")
 		{
 		METV.SetPx(met_ex_JetEnUp);
 		METV.SetPy(met_ey_JetEnUp);
 		met = sqrt(met_ex_JetEnUp*met_ex_JetEnUp + met_ey_JetEnUp*met_ey_JetEnUp);      
 		}
 
-	if (pfmet_JetEn && !EnUp && !pfmet_usual)
+	if (systematic =="JetEnDown")
 		{
 		METV.SetPy(met_ey_JetEnDown);
 		met = sqrt(met_ex_JetEnDown*met_ex_JetEnDown + met_ey_JetEnDown*met_ey_JetEnDown);     
 		}
 
-	if (!pfmet_JetEn && EnUp && !pfmet_usual)
+	if (systematic =="UnclEnUp")
 		{
 		METV.SetPx(met_ex_UnclusteredEnUp);
 		METV.SetPy(met_ey_UnclusteredEnUp);
 		met = sqrt(met_ex_UnclusteredEnUp*met_ex_UnclusteredEnUp + met_ey_UnclusteredEnUp*met_ey_UnclusteredEnUp);     
 		}
 
-	if (!pfmet_JetEn && !EnUp && !pfmet_usual)
+	if (systematic =="UnclEnDown")
 		{
 		METV.SetPx(met_ex_UnclusteredEnDown);
 		METV.SetPy(met_ey_UnclusteredEnDown);
