@@ -2429,6 +2429,13 @@ int main(int argc, char * argv[]) {
             metcov10 = analysisTree.pfmetcorr_sigyx;
             metcov11 = analysisTree.pfmetcorr_sigyy;
             
+            if(!isData)
+            {
+                metcov00 = analysisTree.pfmet_sigxx;
+                metcov01 = analysisTree.pfmet_sigxy;
+                metcov10 = analysisTree.pfmet_sigyx;
+                metcov11 = analysisTree.pfmet_sigyy;
+            }
             
             //      choosing mva met
             unsigned int metEMu = 0;
