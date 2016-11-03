@@ -49,6 +49,12 @@
 #include "CondFormats/BTauObjects/interface/BTagCalibration.h"
 #include "CondTools/BTau/interface/BTagCalibrationReader.h"
 
+
+#include "DesyTauAnalyses/NTupleMaker/interface/Systematics.h"
+#include "DesyTauAnalyses/NTupleMaker/interface/LeptonScaleSys.h"
+#include "DesyTauAnalyses/NTupleMaker/interface/ZPtWeightSys.h"
+#include "DesyTauAnalyses/NTupleMaker/interface/TopPtWeightSys.h"
+
 #define pi 	3.14159265358979312
 #define d2r 1.74532925199432955e-02
 #define r2d 57.2957795130823229
@@ -94,10 +100,10 @@ bool dilepton_veto_mt(const Config *cfg, const AC1B *analysisTree);
 bool dilepton_veto_et(const Config *cfg, const AC1B *analysisTree);
 bool extra_electron_veto(int leptonIndex, TString ch, const Config *cfg, const AC1B *analysisTree);
 bool extra_muon_veto(int leptonIndex, TString ch, const Config *cfg, const AC1B *analysisTree);
-void fillMET(TString ch, int leptonIndex, int tauIndex, const AC1B * analysisTree, Spring15Tree *otree);
+void fillMET(TString ch, int leptonIndex, int tauIndex, const AC1B * analysisTree, Spring15Tree *otree, bool isData);
 void mt_calculation(Spring15Tree *otree);
 void counting_jets(const AC1B *analysisTree, Spring15Tree *otree, const Config *cfg, const btag_scaling_inputs *inputs);
-void svfit_variables(const AC1B *analysisTree, Spring15Tree *otree, const Config *cfg);
+void svfit_variables(const AC1B *analysisTree, Spring15Tree *otree, const Config *cfg, TFile *inputFile_visPtResolution);
 bool isICHEPmed(int Index, const AC1B * analysisTree);
 
 
@@ -153,6 +159,7 @@ int main(int argc, char * argv[]){
   const bool ApplyTrigger     = cfg.get<bool>("ApplyTrigger"); 
   const bool ApplySVFit       = cfg.get<bool>("ApplySVFit");
   const bool ApplyBTagScaling = cfg.get<bool>("ApplyBTagScaling");
+  const bool ApplySystShift   = cfg.get<bool>("ApplySystShift");
   //pileup distrib
   const string pileUpInDataFile = cfg.get<string>("pileUpInDataFile");
   const string pileUpInMCFile = cfg.get<string>("pileUpInMCFile");
@@ -162,7 +169,8 @@ int main(int argc, char * argv[]){
   const string trigEffFile = cfg.get<string>("trigEffFile");
 
   //svfit
-  const string svFitPtResFile = cfg.get<string>("svFitPtResFile");
+  //const string svFitPtResFile = cfg.get<string>("svFitPtResFile");
+  const string svFitPtResFile = TString(TString(cmsswBase)+"/src/"+TString(cfg.get<string>("svFitPtResFile"))).Data();
 
   //b-tag scale factors
   TString pathToBtagScaleFactors = (TString) cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/CSVv2_ichep.csv";
@@ -201,7 +209,7 @@ int main(int argc, char * argv[]){
   // MET Recoil Corrections
   const bool applyRecoilCorrections = cfg.get<bool>("ApplyRecoilCorrections");
   const bool isDY = infiles.find("DY") == infiles.rfind("/")+1;
-  const bool isWJets = (infiles.find("WJets") == infiles.rfind("/")+1) || (infiles.find("W1Jets") == infiles.rfind("/")+1) || (infiles.find("W2Jets") == infiles.rfind("/")+1) || (infiles.find("W3Jets") == infiles.rfind("/")+1) || (infiles.find("W4Jets") == infiles.rfind("/")+1) ;
+  const bool isWJets = (infiles.find("WJets") == infiles.rfind("/")+1) || (infiles.find("W1Jets") == infiles.rfind("/")+1) || (infiles.find("W2Jets") == infiles.rfind("/")+1) || (infiles.find("W3Jets") == infiles.rfind("/")+1) || (infiles.find("W4Jets") == infiles.rfind("/")+1) || (infiles.find("EWK") == infiles.rfind("/")+1);
   const bool isVBForGGHiggs = (infiles.find("VBFHToTauTau")== infiles.rfind("/")+1) || (infiles.find("GluGluHToTauTau")== infiles.rfind("/")+1);
   const bool isMG = infiles.find("madgraph") != string::npos;
   //const bool applyRecoilCorrections = isDY || isWJets;
@@ -428,7 +436,18 @@ int main(int argc, char * argv[]){
 
   //svFit
   TH1::AddDirectory(false);  
-  //TFile* inputFile_visPtResolution = new TFile(svFitPtResFile.data());
+  TFile* inputFile_visPtResolution = new TFile(svFitPtResFile.data());
+
+  //Systematics init
+  TauScaleSys* tauScaleSys = 0;
+  ZPtWeightSys* zPtWeightSys = 0;
+  TopPtWeightSys* topPtWeightSys = 0;
+  if(!isData && ApplySystShift){
+    tauScaleSys = new TauScaleSys(otree);
+    tauScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);
+    zPtWeightSys = new ZPtWeightSys(otree);
+    topPtWeightSys = new TopPtWeightSys(otree);
+  }
 
 
   ///////////////FILE LOOP///////////////
@@ -742,7 +761,7 @@ int main(int argc, char * argv[]){
       FillTau(&analysisTree, otree, tauIndex);
 	  
       // tauID weight
-      if (!isData && analysisTree.tau_genmatch[tauIndex]==5) otree->idisoweight_2 = 0.83; 
+      if (!isData && analysisTree.tau_genmatch[tauIndex]==5) otree->idisoweight_2 = 0.90; 
 
 	  // taking tau ID weight from the workspace
 	  //if (!isData) {
@@ -758,7 +777,7 @@ int main(int argc, char * argv[]){
       //counting jet
       counting_jets(&analysisTree, otree, &cfg, &inputs_btag_scaling_medium);
       //MET
-      fillMET(ch, leptonIndex, tauIndex, &analysisTree, otree);
+      fillMET(ch, leptonIndex, tauIndex, &analysisTree, otree, isData);
 
       TLorentzVector genV( 0., 0., 0., 0.);
       TLorentzVector genL( 0., 0., 0., 0.);
@@ -771,6 +790,7 @@ int main(int argc, char * argv[]){
 	  }
 
       // topPt weight
+	  otree->topptweight =1.;
       if(!isData)
 	    otree->topptweight = genTools::topPtWeight(analysisTree);
       ////////////////////////////////////////////////////////////
@@ -911,32 +931,29 @@ int main(int argc, char * argv[]){
 
       bool passedBaselineSel = false;
       if (ch=="mt") 
-        passedBaselineSel = (otree->iso_1<0.15 && otree->byTightIsolationMVArun2v1DBoldDMwLT_2>0.5 && 
+        passedBaselineSel = ( otree->iso_1<0.35 && otree->byLooseIsolationMVArun2v1DBoldDMwLT_2>0.5 && 
                             otree->againstElectronVLooseMVA6_2>0.5 && otree->againstMuonTight3_2>0.5  &&
                             otree->dilepton_veto == 0 && otree->extraelec_veto == 0 && otree->extramuon_veto == 0);
       if (ch=="et") 
-        passedBaselineSel = (otree->iso_1<0.1 && otree->byTightIsolationMVArun2v1DBoldDMwLT_2>0.5 && 
+        passedBaselineSel = ( otree->iso_1<0.35 && otree->byLooseIsolationMVArun2v1DBoldDMwLT_2>0.5 && 
                             otree->againstMuonLoose3_2>0.5 && otree->againstElectronTightMVA6_2>0.5 && 
                             otree->dilepton_veto == 0 && otree->extraelec_veto == 0 && otree->extramuon_veto == 0);
 
-	  bool calculateSVFit = false; 
-	  if (Synch) calculateSVFit = true;       
-	  else if (ApplySVFit && ch=="mt"){
-        calculateSVFit = (otree->mt_1<60 && passedBaselineSel);
-      }
 
-      else if (ApplySVFit && ch == "et"){
-        calculateSVFit = (otree->mt_1<60 && passedBaselineSel);
-      }
+      if (!Synch && !passedBaselineSel)
+        continue;
 
-      // svfit
-      if(ApplySVFit && calculateSVFit) svfit_variables(&analysisTree, otree, &cfg);
+      if (ApplySVFit) svfit_variables(&analysisTree, otree, &cfg, inputFile_visPtResolution);
 
-      // fill tree
-	  if (!Synch && passedBaselineSel)
-        otree->Fill();
-      else if (Synch)
-        otree->Fill();
+      otree->Fill();
+
+	  // evaluate systematics for MC 
+      if(!isData && ApplySystShift){
+       zPtWeightSys->Eval(); 
+	   topPtWeightSys->Eval();
+	   //if (ch=="mt") tauScaleSys->Eval(utils::MUTAU);
+	   //if (ch=="et") tauScaleSys->Eval(utils::ETAU);
+	  }
 
       selEvents++;
     } // end of file processing (loop over events in one file)
@@ -956,10 +973,27 @@ int main(int argc, char * argv[]){
   
   file->cd("");
   file->Write();
+
+  // delete systematics objects
+
+  if(tauScaleSys != 0){
+    tauScaleSys->Write();
+    delete tauScaleSys;
+  }
+
+  if(zPtWeightSys != 0){
+    zPtWeightSys->Write();
+    delete zPtWeightSys;
+  }
+
+  if(topPtWeightSys != 0){
+    topPtWeightSys->Write();
+    delete topPtWeightSys;
+  }
+
   file->Close();
   delete file;
     
-
 
 }
 
@@ -1381,24 +1415,40 @@ bool extra_muon_veto(int leptonIndex, TString ch, const Config *cfg, const AC1B 
 //////MET FUNCTIONS
 
 //fill the otree with the met variables
-void fillMET(TString ch, int leptonIndex, int tauIndex, const AC1B * analysisTree, Spring15Tree *otree){
+void fillMET(TString ch, int leptonIndex, int tauIndex, const AC1B * analysisTree, Spring15Tree *otree, bool isData){
 
    // pfmet variables
-  otree->met = TMath::Sqrt(analysisTree->pfmetcorr_ex*analysisTree->pfmetcorr_ex + analysisTree->pfmetcorr_ey*analysisTree->pfmetcorr_ey);
-  otree->metphi = TMath::ATan2(analysisTree->pfmetcorr_ey,analysisTree->pfmetcorr_ex);
-  otree->metcov00 = analysisTree->pfmetcorr_sigxx;
-  otree->metcov01 = analysisTree->pfmetcorr_sigxy;
-  otree->metcov10 = analysisTree->pfmetcorr_sigyx;
-  otree->metcov11 = analysisTree->pfmetcorr_sigyy;
+	// back to pfmet instead of pfmetcorr for MC 
 
-  float met_x = analysisTree->pfmetcorr_ex;
-  float met_y = analysisTree->pfmetcorr_ey;
+  float met_x = -9999;
+  float met_y = -9999;
+  if (!isData){
+    otree->met = TMath::Sqrt(analysisTree->pfmet_ex*analysisTree->pfmet_ex + analysisTree->pfmet_ey*analysisTree->pfmet_ey);
+    otree->metphi = TMath::ATan2(analysisTree->pfmet_ey,analysisTree->pfmet_ex);
+    otree->metcov00 = analysisTree->pfmet_sigxx;
+    otree->metcov01 = analysisTree->pfmet_sigxy;
+    otree->metcov10 = analysisTree->pfmet_sigyx;
+    otree->metcov11 = analysisTree->pfmet_sigyy;
+    float met_x = analysisTree->pfmet_ex;
+    float met_y = analysisTree->pfmet_ey;
+  }
+  else {
+    otree->met = TMath::Sqrt(analysisTree->pfmetcorr_ex*analysisTree->pfmetcorr_ex + analysisTree->pfmetcorr_ey*analysisTree->pfmetcorr_ey);
+    otree->metphi = TMath::ATan2(analysisTree->pfmetcorr_ey,analysisTree->pfmetcorr_ex);
+    otree->metcov00 = analysisTree->pfmetcorr_sigxx;
+    otree->metcov01 = analysisTree->pfmetcorr_sigxy;
+    otree->metcov10 = analysisTree->pfmetcorr_sigyx;
+    otree->metcov11 = analysisTree->pfmetcorr_sigyy;
+    float met_x = analysisTree->pfmetcorr_ex;
+    float met_y = analysisTree->pfmetcorr_ey;
+  }
+
   float met_x2 = met_x * met_x;
   float met_y2 = met_y * met_y;
 
   // puppimet variables
   otree->puppimet = TMath::Sqrt(analysisTree->puppimet_ex*analysisTree->puppimet_ex +
-		    analysisTree->puppimet_ey*analysisTree->puppimet_ey);
+		 analysisTree->puppimet_ey*analysisTree->puppimet_ey);
   otree->puppimetphi = TMath::ATan2(analysisTree->puppimet_ey,analysisTree->puppimet_ex);
 
   // choosing mva met
@@ -1752,7 +1802,7 @@ cout << "warning : indexLeadingJet ==indexSubLeadingJet = " << indexSubLeadingJe
 // SV fit 
 ///////////////////////////////////
 
-void svfit_variables(const AC1B *analysisTree, Spring15Tree *otree, const Config *cfg){
+void svfit_variables(const AC1B *analysisTree, Spring15Tree *otree, const Config *cfg, TFile * inputFile_visPtResolution){
 
   // define MET covariance
   TMatrixD covMET(2, 2);
@@ -1784,9 +1834,9 @@ void svfit_variables(const AC1B *analysisTree, Spring15Tree *otree, const Config
 
   //SVfitStandaloneAlgorithm algo(measuredTauLeptons, otree->mvamet * cos(otree->mvametphi), otree->mvamet * sin(otree->mvametphi), covMET, 0); // using MVA MET
   SVfitStandaloneAlgorithm algo(measuredTauLeptons, otree->met * cos(otree->metphi), otree->met * sin(otree->metphi), covMET, 0); // using PF MET
-  edm::FileInPath inputFileName_visPtResolution("TauAnalysis/SVfitStandalone/data/svFitVisMassAndPtResolutionPDF.root");
-  TH1::AddDirectory(false);  
-  TFile* inputFile_visPtResolution = new TFile(inputFileName_visPtResolution.fullPath().data());
+  //edm::FileInPath inputFileName_visPtResolution("TauAnalysis/SVfitStandalone/data/svFitVisMassAndPtResolutionPDF.root");
+  //TH1::AddDirectory(false);  
+  //TFile* inputFile_visPtResolution = new TFile(inputFileName_visPtResolution.fullPath().data());
   //algo.addLogM(false);  
   algo.shiftVisPt(true, inputFile_visPtResolution);
   algo.integrateMarkovChain();
@@ -1804,5 +1854,5 @@ void svfit_variables(const AC1B *analysisTree, Spring15Tree *otree, const Config
   //  std::cout << "sorry -- status of NLL is not valid [" << algo.isValidSolution() << "]" << std::endl;
   //}
 
-  delete inputFile_visPtResolution;
+  //delete inputFile_visPtResolution;
 }

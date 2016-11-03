@@ -137,10 +137,10 @@ protected:
 							   cenTree->mvamet * sin(cenTree->mvametphi) * cenTree->mvamet * sin(cenTree->mvametphi) ) ) ;    
     
     TMatrixD covMET(2, 2);
-    covMET[0][0] = cenTree->mvacov00;
-    covMET[1][0] = cenTree->mvacov10;
-    covMET[0][1] = cenTree->mvacov01;
-    covMET[1][1] = cenTree->mvacov11;
+    covMET[0][0] = cenTree->metcov00;
+    covMET[1][0] = cenTree->metcov10;
+    covMET[0][1] = cenTree->metcov01;
+    covMET[1][1] = cenTree->metcov11;
 
     TLorentzVector dileptonLV = lep1_scaled + lep2_scaled;
     
@@ -161,7 +161,7 @@ protected:
     if(ch != UNKNOWN){
       std::shared_ptr<SVfitStandaloneAlgorithm> algo = calc::svFit(lep1_scaled, cenTree->tau_decay_mode_1, 
 								   lep2_scaled, cenTree->tau_decay_mode_2, 
-								   mvametLV, covMET, 
+								   pfmetLV, covMET, 
 								   ch, 
 								   svFit_visPtResolution); 
       if (algo != 0){
@@ -491,7 +491,7 @@ public:
   
   TauScaleSys(Spring15Tree* c){
     cenTree = c;
-    label = "CMS_scale_t_13TeV";
+    label = "CMS_shape_t_13TeV";
     
     this->Init(cenTree);
   };
@@ -517,8 +517,8 @@ protected:
     sf_up = new TH2D(label+"_sf_up", label+"_sf_up", pt_bins, pt_edges, eta_bins, eta_edges);
     sf_down = new TH2D(label+"_sf_down", label+"_sf_down", pt_bins, pt_edges, eta_bins, eta_edges);
 
-    sf_up->SetBinContent( sf_up->FindBin( pt_central[0], eta_central[0] ), 0.025);
-    sf_down->SetBinContent( sf_down->FindBin( pt_central[0], eta_central[0] ), 0.025);
+    sf_up->SetBinContent( sf_up->FindBin( pt_central[0], eta_central[0] ), 0.03);
+    sf_down->SetBinContent( sf_down->FindBin( pt_central[0], eta_central[0] ), 0.03);
   };
 
   virtual void ScaleUp(utils::channel ch){
@@ -529,29 +529,29 @@ protected:
     float absEta1 = fabs(lep1.Eta());
     float pt2 = lep2.Pt();
     float absEta2 = fabs(lep2.Eta());
-    
-    if (ch == ETAU)
-      lep2_scaled.SetXYZM(lep2.Px() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))),
+    if (cenTree->gen_match_2==5){
+      if (ch == ETAU)
+        lep2_scaled.SetXYZM(lep2.Px() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))),
 			  lep2.Py() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))),
 			  lep2.Pz() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))),
 			  lep2.M()  * (1. + sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))));
-    else if (ch == MUTAU)
-      lep2_scaled.SetXYZM(lep2.Px() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))),
+      else if (ch == MUTAU)
+        lep2_scaled.SetXYZM(lep2.Px() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))),
 			  lep2.Py() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))),
 			  lep2.Pz() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))),
 			  lep2.M()  * (1. + sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))));
-    else if (ch == TAUTAU){
-      lep1_scaled.SetXYZM(lep1.Px() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt1, absEta1))),
+      else if (ch == TAUTAU){
+        lep1_scaled.SetXYZM(lep1.Px() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt1, absEta1))),
 			  lep1.Py() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt1, absEta1))),
 			  lep1.Pz() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt1, absEta1))),
 			  lep1.M()  * (1. + sf_up->GetBinContent( sf_up->FindBin(pt1, absEta1))));
       
-      lep2_scaled.SetXYZM(lep2.Px() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))),
+        lep2_scaled.SetXYZM(lep2.Px() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))),
 			  lep2.Py() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))),
 			  lep2.Pz() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))),
 			  lep2.M()  * (1. + sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))));
+      }
     }
-
     this->Fill(ch, "Up");
   };
   
@@ -563,29 +563,29 @@ protected:
     float absEta1 = fabs(lep1.Eta());
     float pt2 = lep2.Pt();
     float absEta2 = fabs(lep2.Eta());
-    
-    if (ch == ETAU)
-      lep2_scaled.SetXYZM(lep2.Px() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt2, absEta2))),
+    if (cenTree->gen_match_2==5){
+      if (ch == ETAU)
+        lep2_scaled.SetXYZM(lep2.Px() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt2, absEta2))),
 			  lep2.Py() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt2, absEta2))),
 			  lep2.Pz() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt2, absEta2))),
 			  lep2.M()  * (1. - sf_down->GetBinContent( sf_down->FindBin(pt2, absEta2))));
-    else if (ch == MUTAU)
-      lep2_scaled.SetXYZM(lep2.Px() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt2, absEta2))),
+      else if (ch == MUTAU)
+        lep2_scaled.SetXYZM(lep2.Px() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt2, absEta2))),
 			  lep2.Py() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt2, absEta2))),
 			  lep2.Pz() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt2, absEta2))),
 			  lep2.M()  * (1. - sf_down->GetBinContent( sf_down->FindBin(pt2, absEta2))));
-    else if (ch == TAUTAU){
-      lep1_scaled.SetXYZM(lep1.Px() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt1, absEta1))),
+      else if (ch == TAUTAU){
+        lep1_scaled.SetXYZM(lep1.Px() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt1, absEta1))),
 			  lep1.Py() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt1, absEta1))),
 			  lep1.Pz() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt1, absEta1))),
 			  lep1.M()  * (1. - sf_down->GetBinContent( sf_down->FindBin(pt1, absEta1))));
 			  
-      lep2_scaled.SetXYZM(lep2.Px() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt2, absEta2))),
+        lep2_scaled.SetXYZM(lep2.Px() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt2, absEta2))),
 			  lep2.Py() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt2, absEta2))),
 			  lep2.Pz() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt2, absEta2))),
 			  lep2.M()  * (1. - sf_down->GetBinContent( sf_down->FindBin(pt2, absEta2))));
+      }
     }
-    
     this->Fill(ch, "Down");
   };
 };
