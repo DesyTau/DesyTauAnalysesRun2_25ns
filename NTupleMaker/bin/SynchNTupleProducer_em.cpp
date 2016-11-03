@@ -288,9 +288,11 @@ int main(int argc, char * argv[]) {
     TH1D * histWeightsH = new TH1D("histWeightsH","",1,-0.5,0.5);
     TH1D * histWeightsSkimH = new TH1D("histWeightsSkimH","",1,-0.5,0.5);
     TH1D * histWeightsTTH = new TH1D("histWeightsTTH","",1,-0.5,0.5);
-    
+
+    /*    
     TTree * treeGen = new TTree("GenHiggs","GenHiggs");
-    
+    */    
+
     Float_t higgsMass;
     Float_t higgsPt;
     Float_t higgsEta;
@@ -358,9 +360,18 @@ int main(int argc, char * argv[]) {
     
     Float_t         m_sv;
     Float_t         mt_sv;
+
     Float_t         pt_sv;
     Float_t         eta_sv;
     Float_t         phi_sv;
+
+    Float_t         pt_sv_eUp;
+    Float_t         eta_sv_eUp;
+    Float_t         phi_sv_eUp;
+
+    Float_t         pt_sv_eDown;
+    Float_t         eta_sv_eDown;
+    Float_t         phi_sv_eDown;
     
     Float_t         pt_sv_gen;
     Float_t         eta_sv_gen;
@@ -430,6 +441,17 @@ int main(int argc, char * argv[]) {
     Float_t         met_uncorr;
     Float_t         metphi_uncorr;
     
+    Float_t         met_resoUp;
+    Float_t         metphi_resoUp;
+    
+    Float_t         met_resoDown;
+    Float_t         metphi_resoDown;
+    
+    Float_t         met_scaleUp;
+    Float_t         metphi_scaleUp;
+    
+    Float_t         met_scaleDown;
+    Float_t         metphi_scaleDown;
     
     Float_t         mvamet;
     Float_t         mvametphi;
@@ -484,6 +506,18 @@ int main(int argc, char * argv[]) {
     
     Float_t         pzetamiss_mvamet_resoDown;
     Float_t         dzeta_mvamet_resoDown;
+
+    Float_t         pzetamiss_scaleUp;
+    Float_t         dzeta_scaleUp;
+    
+    Float_t         pzetamiss_scaleDown;
+    Float_t         dzeta_scaleDown;
+    
+    Float_t         pzetamiss_resoUp;
+    Float_t         dzeta_resoUp;
+    
+    Float_t         pzetamiss_resoDown;
+    Float_t         dzeta_resoDown;
     
     Float_t         pzetamiss_genmet;
     Float_t         dzeta_genmet;
@@ -491,8 +525,16 @@ int main(int argc, char * argv[]) {
     Float_t         mva_gf;
     
     Int_t           njets;
+    Int_t           njets_Up;
+    Int_t           njets_Down;
+
     Int_t           njetspt20;
+
+
     Float_t         jpt_1;
+    Float_t         jpt_1_Up;
+    Float_t         jpt_1_Down;
+
     Float_t         jeta_1;
     Float_t         jphi_1;
     Float_t         jptraw_1;
@@ -503,6 +545,10 @@ int main(int argc, char * argv[]) {
     Int_t           gen_match_1;
     
     Float_t         jpt_2;
+    Float_t         jpt_2_Up;
+    Float_t         jpt_2_Down;
+
+
     Float_t         jeta_2;
     Float_t         jphi_2;
     Float_t         jptraw_2;
@@ -513,6 +559,9 @@ int main(int argc, char * argv[]) {
     Int_t           gen_match_2;
     
     Float_t         mjj;
+    Float_t         mjj_Up;
+    Float_t         mjj_Down;
+
     Float_t         jdeta;
     Int_t           njetingap;
     
@@ -639,9 +688,18 @@ int main(int argc, char * argv[]) {
     
     tree->Branch("m_sv",    &m_sv,   "m_sv/F");
     tree->Branch("mt_sv",   &mt_sv,  "mt_sv/F");
+
     tree->Branch("pt_sv",   &pt_sv,  "pt_sv/F");
     tree->Branch("eta_sv",  &eta_sv, "eta_sv/F");
     tree->Branch("phi_sv",  &phi_sv, "phi_sv/F");
+    
+    tree->Branch("pt_sv_eUp",   &pt_sv_eUp,  "pt_sv_eUp/F");
+    tree->Branch("eta_sv_eUp",  &eta_sv_eUp, "eta_sv_eUp/F");
+    tree->Branch("phi_sv_eUp",  &phi_sv_eUp, "phi_sv_eUp/F");
+    
+    tree->Branch("pt_sv_eDown",   &pt_sv_eDown,  "pt_sv_eDown/F");
+    tree->Branch("eta_sv_eDown",  &eta_sv_eDown, "eta_sv_eDown/F");
+    tree->Branch("phi_sv_eDown",  &phi_sv_eDown, "phi_sv_eDown/F");
     
     tree->Branch("pt_sv_gen",   &pt_sv_gen,  "pt_sv_gen/F");
     tree->Branch("eta_sv_gen",  &eta_sv_gen, "eta_sv_gen/F");
@@ -711,6 +769,18 @@ int main(int argc, char * argv[]) {
     tree->Branch("met_uncorr", &met_uncorr, "met_uncorr/F");
     tree->Branch("metphi_uncorr", &metphi_uncorr, "metphi_uncorr/F");
     
+    tree->Branch("met_resoUp", &met_resoUp, "met_resoUp/F");
+    tree->Branch("metphi_resoUp", &metphi_resoUp, "metphi_resoUp/F");
+    
+    tree->Branch("met_resoDown", &met_resoDown, "met_resoDown/F");
+    tree->Branch("metphi_resoDown", &metphi_resoDown, "metphi_resoDown/F");
+    
+    tree->Branch("met_scaleUp", &met_scaleUp, "met_scaleUp/F");
+    tree->Branch("metphi_scaleUp", &metphi_scaleUp, "metphi_scaleUp/F");
+    
+    tree->Branch("met_scaleDown", &met_scaleDown, "met_scaleDown/F");
+    tree->Branch("metphi_scaleDown", &metphi_scaleDown, "metphi_scaleDown/F");
+    
     tree->Branch("mvamet", &mvamet, "mvamet/F");
     tree->Branch("mvametphi", &mvametphi, "mvametphi/F");
     tree->Branch("mvacov00", &mvacov00, "mvacov00/F");
@@ -756,9 +826,24 @@ int main(int argc, char * argv[]) {
     
     tree->Branch("pzetavis", &pzetavis, "pzetavis/F");
     
+
     tree->Branch("pzetamiss", &pzetamiss, "pzetamiss/F");
     tree->Branch("dzeta",&dzeta,"dzeta/F");
     
+    tree->Branch("pzetamiss_resoUp", &pzetamiss_resoUp, "pzetamiss_resoUp/F");
+    tree->Branch("dzeta_resoUp",&dzeta_resoUp,"dzeta_resoUp/F");
+    
+    tree->Branch("pzetamiss_resoDown", &pzetamiss_resoDown, "pzetamiss_resoDown/F");
+    tree->Branch("dzeta_resoDown",&dzeta_resoDown,"dzeta_resoDown/F");
+    
+    tree->Branch("pzetamiss_scaleUp", &pzetamiss_scaleUp, "pzetamiss_scaleUp/F");
+    tree->Branch("dzeta_scaleUp",&dzeta_scaleUp,"dzeta_scaleUp/F");
+    
+    tree->Branch("pzetamiss_scaleDown", &pzetamiss_scaleDown, "pzetamiss_scaleDown/F");
+    tree->Branch("dzeta_scaleDown",&dzeta_scaleDown,"dzeta_scaleDown/F");
+    
+
+
     tree->Branch("pzetamiss_mvamet", &pzetamiss_mvamet, "pzetamiss_mvamet/F");
     tree->Branch("dzeta_mvamet",&dzeta_mvamet,"dzeta_mvamet/F");
     
@@ -777,19 +862,27 @@ int main(int argc, char * argv[]) {
     tree->Branch("pzetamiss_mvamet_scaleDown", &pzetamiss_mvamet_scaleDown, "pzetamiss_mvamet_scaleDown/F");
     tree->Branch("dzeta_mvamet_scaleDown",&dzeta_mvamet_scaleDown,"dzeta_mvamet_scaleDown/F");
     
+
     tree->Branch("pzetamiss_genmet", &pzetamiss_genmet, "pzetamiss_genmet/F");
     tree->Branch("dzeta_genmet",&dzeta_genmet,"dzeta_genmet/F");
     
     tree->Branch("mva_gf", &mva_gf, "mva_gf/F");
     
     tree->Branch("njets", &njets, "njets/I");
+    tree->Branch("njets_Up", &njets_Up, "njets_Up/I");
+    tree->Branch("njets_Down", &njets_Down, "njets_Down/I");
+
+
     tree->Branch("njetspt20", &njetspt20, "njetspt20/I");
-    
+
     tree->Branch("bdt",&bdt,"bdt/F");
     tree->Branch("bdt_bbh",&bdt_bbh,"bdt_bbh/F");
     tree->Branch("bdt_ggh",&bdt_ggh,"bdt_ggh/F");
     
     tree->Branch("jpt_1", &jpt_1, "jpt_1/F");
+    tree->Branch("jpt_1_Up", &jpt_1_Up, "jpt_1_Up/F");
+    tree->Branch("jpt_1_Down",&jpt_1_Down, "jpt_1_Down/F");
+
     tree->Branch("jeta_1", &jeta_1, "jeta_1/F");
     tree->Branch("jphi_1", &jphi_1, "jphi_1/F");
     tree->Branch("jptraw_1", &jptraw_1, "jptraw_1/F");
@@ -799,6 +892,9 @@ int main(int argc, char * argv[]) {
     tree->Branch("jctm_1", &jctm_1, "jctm_1/I");
     
     tree->Branch("jpt_2", &jpt_2, "jpt_2/F");
+    tree->Branch("jpt_2_Up", &jpt_2_Up, "jpt_2_Up/F");
+    tree->Branch("jpt_2_Down", &jpt_2_Down, "jpt_2_Down/F");
+
     tree->Branch("jeta_2", &jeta_2, "jeta_2/F");
     tree->Branch("jphi_2", &jphi_2, "jphi_2/F");
     tree->Branch("jptraw_2", &jptraw_2, "jptraw_2/F");
@@ -808,6 +904,9 @@ int main(int argc, char * argv[]) {
     tree->Branch("jctm_2", &jctm_2, "jctm_2/I");
     
     tree->Branch("mjj", &mjj, "mjj/F");
+    tree->Branch("mjj_Up", &mjj_Up, "mjj_Up/F");
+    tree->Branch("mjj_Down", &mjj_Down, "mjj_Down/F");
+
     tree->Branch("jdeta", &jdeta, "jdeta/F");
     tree->Branch("njetingap", &njetingap, "njetingap/I");
     
@@ -840,7 +939,8 @@ int main(int argc, char * argv[]) {
     tree->Branch("bosonMass",&bosonMass,"bosonMass/F");
     
     tree->Branch("npartons",&npartons,"npartons/i");
-    
+
+    /*    
     treeGen->Branch("bosonPt",&bosonPt,"bosonPt/F");
     treeGen->Branch("bosonMass",&bosonMass,"bosonMass/F");
     treeGen->Branch("bosonEta",&bosonEta,"bosonEta/F");
@@ -848,7 +948,7 @@ int main(int argc, char * argv[]) {
     treeGen->Branch("higgsPt",&higgsPt,"higgsPt/F");
     treeGen->Branch("higgsMass",&higgsMass,"higgsMass/F");
     treeGen->Branch("higgsEta",&higgsEta,"higgsEta/F");
-    
+    */
     
     int nTotalFiles = 0;
     std::string dummy;
@@ -1333,7 +1433,7 @@ int main(int argc, char * argv[]) {
                  higgsEta = -9999;
                  }
                  */
-                treeGen->Fill();
+		//                treeGen->Fill();
                 
                 /*
                  std::cout << "Taus (first copy) : " << promptTausFirstCopy.size() << std::endl;
@@ -1842,13 +1942,8 @@ int main(int argc, char * argv[]) {
             extraelec_veto = foundExtraElectron;
             extramuon_veto = foundExtraMuon;
             
-            if (applyInclusiveSelection) {
-                if (extraelec_veto) continue;
-                if (extramuon_veto) continue;
-                if (isoMuMin>isoMuonHighCut) continue;
-                if (isoEleMin>isoElectronHighCut) continue;
-                //	if (!os) continue;
-            }
+	    if (extraelec_veto) continue;
+	    if (extramuon_veto) continue;
             
             //      cout << "dilepton_veto : " << dilepton_veto
             //	   << "   extraelec_veto : " << extraelec_veto
@@ -2013,7 +2108,7 @@ int main(int argc, char * argv[]) {
             // std::cout << "m_vis_eDown  = " << m_vis_eDown << std::endl;
             // std::cout << std::endl;
             
-            pt_tt = dileptonLV.Pt();
+	    //            pt_tt = dileptonLV.Pt();
             
             dphi_tt = dPhiFrom2P(muonLV.Px(),muonLV.Py(),
                                  electronLV.Px(),electronLV.Py());
@@ -2042,6 +2137,8 @@ int main(int argc, char * argv[]) {
             
             // counting jets
             vector<unsigned int> jets; jets.clear();
+	    vector<unsigned int> jetsUp; jetsUp.clear();
+	    vector<unsigned int> jetsDown; jetsDown.clear();
             vector<unsigned int> jetspt20; jetspt20.clear();
             vector<unsigned int> bjets; bjets.clear();
             vector<unsigned int> bjets_nocleaned; bjets_nocleaned.clear();
@@ -2062,7 +2159,10 @@ int main(int argc, char * argv[]) {
                 if (absJetEta>jetEtaCut) continue;
                 
                 float jetPt = analysisTree.pfjet_pt[jet];
-                if (jetPt<jetPtLowCut) continue;
+		float jetPtDown = analysisTree.pfjet_pt[jet]*(1.0-analysisTree.pfjet_jecUncertainty[jet]);
+		float jetPtUp   = analysisTree.pfjet_pt[jet]*(1.0+analysisTree.pfjet_jecUncertainty[jet]);
+		//std::cout << jet << " : uncertainty = " << analysisTree.pfjet_jecUncertainty[jet] << std::endl;
+                if (jetPtDown<jetPtLowCut) continue;
                 
                 bool isPFJetId = looseJetiD(analysisTree,int(jet));
                 if (!isPFJetId) continue;
@@ -2080,8 +2180,12 @@ int main(int argc, char * argv[]) {
                 // jetId
                 
                 
-                if (cleanedJet) jetspt20.push_back(jet);
+                if (cleanedJet) { 
+		  if (jetPt>jetPtLowCut)
+		    jetspt20.push_back(jet);
                 
+		}
+
                 if (absJetEta<bJetEtaCut) { // jet within b-tagging acceptance
                     
                     bool tagged = analysisTree.pfjet_btag[jet][nBTagDiscriminant]>btagCut; // b-jet
@@ -2147,7 +2251,13 @@ int main(int argc, char * argv[]) {
                 }
                 
                 if (!cleanedJet) continue;
-                
+
+		if (jetPtUp>jetPtHighCut)
+		  jetsUp.push_back(jet);
+
+		if (jetPtDown>jetPtHighCut)
+		  jetsDown.push_back(jet);
+
                 if (jetPt>jetPtHighCut)
                     jets.push_back(jet);
                 
@@ -2165,6 +2275,11 @@ int main(int argc, char * argv[]) {
             }
             
             njets = jets.size();
+	    njets_Up = jetsUp.size();
+	    njets_Down = jetsDown.size();
+
+	    //	    std::cout << "njets = " << njets << " + " << njets_Up << " - " << njets_Down << std::endl;
+
             njetspt20 = jetspt20.size();
             nbtag = bjets.size();
             nbtag_nocleaned = bjets_nocleaned.size();
@@ -2183,6 +2298,9 @@ int main(int argc, char * argv[]) {
             }
             
             jpt_1 = -9999;
+	    jpt_1_Up = -9999;
+	    jpt_1_Down = -9999;
+
             jeta_1 = -9999;
             jphi_1 = -9999;
             jptraw_1 = -9999;
@@ -2196,6 +2314,8 @@ int main(int argc, char * argv[]) {
             
             if (indexLeadingJet>=0) {
                 jpt_1 = analysisTree.pfjet_pt[indexLeadingJet];
+		jpt_1_Up = analysisTree.pfjet_pt[indexLeadingJet]*(1+analysisTree.pfjet_jecUncertainty[indexLeadingJet]);
+		jpt_1_Down = analysisTree.pfjet_pt[indexLeadingJet]*(1-analysisTree.pfjet_jecUncertainty[indexLeadingJet]);
                 jeta_1 = analysisTree.pfjet_eta[indexLeadingJet];
                 jphi_1 = analysisTree.pfjet_phi[indexLeadingJet];
                 jptraw_1 = analysisTree.pfjet_pt[indexLeadingJet]*analysisTree.pfjet_energycorr[indexLeadingJet];
@@ -2203,6 +2323,9 @@ int main(int argc, char * argv[]) {
             }
             
             jpt_2 = -9999;
+	    jpt_2_Up = -9999;
+	    jpt_2_Down = -9999;
+
             jeta_2 = -9999;
             jphi_2 = -9999;
             jptraw_2 = -9999;
@@ -2213,6 +2336,8 @@ int main(int argc, char * argv[]) {
             
             if (indexSubLeadingJet>=0) {
                 jpt_2 = analysisTree.pfjet_pt[indexSubLeadingJet];
+		jpt_2_Up = analysisTree.pfjet_pt[indexSubLeadingJet]*(1+analysisTree.pfjet_jecUncertainty[indexSubLeadingJet]);
+		jpt_2_Down = analysisTree.pfjet_pt[indexSubLeadingJet]*(1-analysisTree.pfjet_jecUncertainty[indexSubLeadingJet]);
                 jeta_2 = analysisTree.pfjet_eta[indexSubLeadingJet];
                 jphi_2 = analysisTree.pfjet_phi[indexSubLeadingJet];
                 jptraw_2 = analysisTree.pfjet_pt[indexSubLeadingJet]*analysisTree.pfjet_energycorr[indexSubLeadingJet];
@@ -2225,47 +2350,92 @@ int main(int argc, char * argv[]) {
             
             if (indexLeadingJet>=0 && indexSubLeadingJet>=0) {
                 
-                TLorentzVector jet1; jet1.SetPxPyPzE(analysisTree.pfjet_px[indexLeadingJet],
-                                                     analysisTree.pfjet_py[indexLeadingJet],
-                                                     analysisTree.pfjet_pz[indexLeadingJet],
-                                                     analysisTree.pfjet_e[indexLeadingJet]);
+	      float unc1Up   = 1 + analysisTree.pfjet_jecUncertainty[indexLeadingJet]; 
+	      float unc1Down = 1 - analysisTree.pfjet_jecUncertainty[indexLeadingJet];
+
+	      float unc2Up   = 1 + analysisTree.pfjet_jecUncertainty[indexSubLeadingJet];
+	      float unc2Down = 1 - analysisTree.pfjet_jecUncertainty[indexSubLeadingJet];
+
+	      TLorentzVector jet1; jet1.SetPxPyPzE(analysisTree.pfjet_px[indexLeadingJet],
+						   analysisTree.pfjet_py[indexLeadingJet],
+						   analysisTree.pfjet_pz[indexLeadingJet],
+						   analysisTree.pfjet_e[indexLeadingJet]);
                 
-                TLorentzVector jet2; jet2.SetPxPyPzE(analysisTree.pfjet_px[indexSubLeadingJet],
-                                                     analysisTree.pfjet_py[indexSubLeadingJet],
-                                                     analysisTree.pfjet_pz[indexSubLeadingJet],
-                                                     analysisTree.pfjet_e[indexSubLeadingJet]);
+	      TLorentzVector jet1Up; jet1Up.SetPxPyPzE(analysisTree.pfjet_px[indexLeadingJet]*unc1Up,
+						       analysisTree.pfjet_py[indexLeadingJet]*unc1Up,
+						       analysisTree.pfjet_pz[indexLeadingJet]*unc1Up,
+						       analysisTree.pfjet_e[indexLeadingJet]*unc1Up);
+	      
+	      TLorentzVector jet1Down; jet1Down.SetPxPyPzE(analysisTree.pfjet_px[indexLeadingJet]*unc1Down,
+							   analysisTree.pfjet_py[indexLeadingJet]*unc1Down,
+							   analysisTree.pfjet_pz[indexLeadingJet]*unc1Down,
+							   analysisTree.pfjet_e[indexLeadingJet]*unc1Down);
+
+	      TLorentzVector jet2; jet2.SetPxPyPzE(analysisTree.pfjet_px[indexSubLeadingJet],
+						   analysisTree.pfjet_py[indexSubLeadingJet],
+						   analysisTree.pfjet_pz[indexSubLeadingJet],
+						   analysisTree.pfjet_e[indexSubLeadingJet]);
                 
-                mjj = (jet1+jet2).M();
-                jdeta = abs(analysisTree.pfjet_eta[indexLeadingJet]-
-                            analysisTree.pfjet_eta[indexSubLeadingJet]);
+	      
+	      TLorentzVector jet2Up; jet2Up.SetPxPyPzE(analysisTree.pfjet_px[indexSubLeadingJet]*unc2Up,
+						     analysisTree.pfjet_py[indexSubLeadingJet]*unc2Up,
+						     analysisTree.pfjet_pz[indexSubLeadingJet]*unc2Up,
+						     analysisTree.pfjet_e[indexSubLeadingJet]*unc2Up);
                 
-                float etamax = analysisTree.pfjet_eta[indexLeadingJet];
-                float etamin = analysisTree.pfjet_eta[indexSubLeadingJet];
-                if (etamax<etamin) {
-                    float tmp = etamax;
-                    etamax = etamin;
-                    etamin = tmp;
-                }
-                for (unsigned int jet=0; jet<jetspt20.size(); ++jet) {
-                    int index = jetspt20.at(jet);
-                    float etaX = analysisTree.pfjet_eta[index];
-                    if (index!=indexLeadingJet&&index!=indexSubLeadingJet&&etaX>etamin&&etaX<etamax)
-                        njetingap++;
-                }
+	      TLorentzVector jet2Down; jet2Down.SetPxPyPzE(analysisTree.pfjet_px[indexSubLeadingJet]*unc2Down,
+						       analysisTree.pfjet_py[indexSubLeadingJet]*unc2Down,
+						       analysisTree.pfjet_pz[indexSubLeadingJet]*unc2Down,
+						       analysisTree.pfjet_e[indexSubLeadingJet]*unc2Down);
                 
-                
+	      mjj = (jet1+jet2).M();
+	      mjj_Up = (jet1Up+jet2Up).M();
+	      mjj_Down = (jet1Down+jet2Down).M();
+
+	      //	      std::cout << "mjj = " << mjj << " + " << mjj_Up << " - " << mjj_Down << std::endl;
+
+	      jdeta = abs(analysisTree.pfjet_eta[indexLeadingJet]-
+			  analysisTree.pfjet_eta[indexSubLeadingJet]);
+	      
+	      float etamax = analysisTree.pfjet_eta[indexLeadingJet];
+	      float etamin = analysisTree.pfjet_eta[indexSubLeadingJet];
+	      if (etamax<etamin) {
+		float tmp = etamax;
+		etamax = etamin;
+		etamin = tmp;
+	      }
+	      for (unsigned int jet=0; jet<jetspt20.size(); ++jet) {
+		int index = jetspt20.at(jet);
+		float etaX = analysisTree.pfjet_eta[index];
+		if (index!=indexLeadingJet&&index!=indexSubLeadingJet&&etaX>etamin&&etaX<etamax)
+		  njetingap++;
+	      }
+	      
+              
+            }
+	    //	    std::cout << std::endl;
+
+            // METs
+            float met_x = analysisTree.pfmetcorr_ex;
+            float met_y = analysisTree.pfmetcorr_ey;
+            if (!isData) {
+                met_x = analysisTree.pfmet_ex;
+                met_y = analysisTree.pfmet_ey;
             }
             
-            // METs
-            met = TMath::Sqrt(analysisTree.pfmetcorr_ex*analysisTree.pfmetcorr_ex + analysisTree.pfmetcorr_ey*analysisTree.pfmetcorr_ey);
-            metphi = TMath::ATan2(analysisTree.pfmetcorr_ey,analysisTree.pfmetcorr_ex);
+            met = TMath::Sqrt(met_x*met_x + met_y*met_y);
+            metphi = TMath::ATan2(met_y,met_x);
             metcov00 = analysisTree.pfmetcorr_sigxx;
             metcov01 = analysisTree.pfmetcorr_sigxy;
             metcov10 = analysisTree.pfmetcorr_sigyx;
             metcov11 = analysisTree.pfmetcorr_sigyy;
             
-            float met_x = analysisTree.pfmetcorr_ex;
-            float met_y = analysisTree.pfmetcorr_ey;
+            if(!isData)
+            {
+                metcov00 = analysisTree.pfmet_sigxx;
+                metcov01 = analysisTree.pfmet_sigxy;
+                metcov10 = analysisTree.pfmet_sigyx;
+                metcov11 = analysisTree.pfmet_sigyy;
+            }
             
             //      choosing mva met
             unsigned int metEMu = 0;
@@ -2324,23 +2494,23 @@ int main(int argc, char * argv[]) {
             met_uncorr = met;
             metphi_uncorr = metphi;
             
-            float pfmet_corr_x = analysisTree.pfmetcorr_ex;
-            float pfmet_corr_y = analysisTree.pfmetcorr_ey;
+            float pfmet_corr_x = met_x;
+            float pfmet_corr_y = met_y;
             
             if ((isW||isDY)&&!isData) {
                 if (applySimpleRecoilCorrections) {
                     recoilMvaMetCorrector.CorrectByMeanResolution(mvamet_x,mvamet_y,bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,mvamet_corr_x,mvamet_corr_y);
-                    recoilMetCorrector.CorrectByMeanResolution(analysisTree.pfmetcorr_ex,analysisTree.pfmetcorr_ey,bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,pfmet_corr_x,pfmet_corr_y);
+                    recoilMetCorrector.CorrectByMeanResolution(met_x,met_y,bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,pfmet_corr_x,pfmet_corr_y);
                 }
                 else {
                     recoilMvaMetCorrector.Correct(mvamet_x,mvamet_y,bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,mvamet_corr_x,mvamet_corr_y);
-                    recoilMetCorrector.Correct(analysisTree.pfmetcorr_ex,analysisTree.pfmetcorr_ey,bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,pfmet_corr_x,pfmet_corr_y);
+                    recoilMetCorrector.Correct(met_x,met_y,bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,pfmet_corr_x,pfmet_corr_y);
                 }
             }
-            analysisTree.pfmetcorr_ex = pfmet_corr_x;
-            analysisTree.pfmetcorr_ey = pfmet_corr_y;
-            met = TMath::Sqrt(analysisTree.pfmetcorr_ex*analysisTree.pfmetcorr_ex+analysisTree.pfmetcorr_ey*analysisTree.pfmetcorr_ey);
-            metphi = TMath::ATan2(analysisTree.pfmetcorr_ey,analysisTree.pfmetcorr_ex);
+	    met_x = pfmet_corr_x;
+	    met_y = pfmet_corr_y;
+            met = TMath::Sqrt(met_x*met_x+met_y*met_y);
+            metphi = TMath::ATan2(met_y,met_x);
             
             //      printf("Before correction : mvamet_x = %7.2f   mvamet_y = %7.2f\n",mvamet_x,mvamet_y);
             //      printf("After correction  : mvamet_x = %7.2f   mvamet_y = %7.2f\n",mvamet_corr_x,mvamet_corr_y);
@@ -2369,8 +2539,18 @@ int main(int argc, char * argv[]) {
             float mvamet_resoUp_y    = mvamet_y;
             float mvamet_resoDown_x  = mvamet_x;
             float mvamet_resoDown_y  = mvamet_y;
+
+            float met_scaleUp_x   = met_x;
+            float met_scaleUp_y   = met_y;
+            float met_scaleDown_x = met_x;
+            float met_scaleDown_y = met_y;
+            float met_resoUp_x    = met_x;
+            float met_resoUp_y    = met_y;
+            float met_resoDown_x  = met_x;
+            float met_resoDown_y  = met_y;
             
             if (!isData) {
+
                 metSys.ApplyMEtSys(mvamet_x,mvamet_y,
                                    bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,bkgdType,
                                    MEtSys::SysType::Response,MEtSys::SysShift::Up,
@@ -2387,6 +2567,23 @@ int main(int argc, char * argv[]) {
                                    bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,bkgdType,
                                    MEtSys::SysType::Resolution,MEtSys::SysShift::Down,
                                    mvamet_resoDown_x,mvamet_resoDown_y);
+
+                metSys.ApplyMEtSys(met_x,met_y,
+                                   bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,bkgdType,
+                                   MEtSys::SysType::Response,MEtSys::SysShift::Up,
+                                   met_scaleUp_x,met_scaleUp_y);
+                metSys.ApplyMEtSys(met_x,met_y,
+                                   bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,bkgdType,
+                                   MEtSys::SysType::Response,MEtSys::SysShift::Down,
+                                   met_scaleDown_x,met_scaleDown_y);
+                metSys.ApplyMEtSys(met_x,met_y,
+                                   bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,bkgdType,
+                                   MEtSys::SysType::Resolution,MEtSys::SysShift::Up,
+                                   met_resoUp_x,met_resoUp_y);
+                metSys.ApplyMEtSys(met_x,met_y,
+                                   bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,bkgdType,
+                                   MEtSys::SysType::Resolution,MEtSys::SysShift::Down,
+                                   met_resoDown_x,met_resoDown_y);
             }
             
             
@@ -2405,6 +2602,23 @@ int main(int argc, char * argv[]) {
             mvamet_resoDown = TMath::Sqrt(mvamet_resoDown_x*mvamet_resoDown_x+
                                           mvamet_resoDown_y*mvamet_resoDown_y);
             mvametphi_resoDown = TMath::ATan2(mvamet_resoDown_y,mvamet_resoDown_x);
+            
+ 
+	    met_scaleUp = TMath::Sqrt(met_scaleUp_x*met_scaleUp_x+
+				      met_scaleUp_y*met_scaleUp_y);
+            metphi_scaleUp = TMath::ATan2(met_scaleUp_y,met_scaleUp_x);
+            
+            met_scaleDown = TMath::Sqrt(met_scaleDown_x*met_scaleDown_x+
+					met_scaleDown_y*met_scaleDown_y);
+            metphi_scaleDown = TMath::ATan2(met_scaleDown_y,met_scaleDown_x);
+            
+            met_resoUp = TMath::Sqrt(met_resoUp_x*met_resoUp_x+
+				     met_resoUp_y*met_resoUp_y);
+            metphi_resoUp = TMath::ATan2(met_resoUp_y,met_resoUp_x);
+            
+            met_resoDown = TMath::Sqrt(met_resoDown_x*met_resoDown_x+
+				       met_resoDown_y*met_resoDown_y);
+            metphi_resoDown = TMath::ATan2(met_resoDown_y,met_resoDown_x);
             
             
             //      printf("Uncorrected    :  %7.2f  %7.2f\n",mvamet_uncorr_x,mvamet_uncorr_y);
@@ -2436,8 +2650,8 @@ int main(int argc, char * argv[]) {
             zetaX = zetaX/normZeta;
             zetaY = zetaY/normZeta;
             
-            float vectorX = analysisTree.pfmetcorr_ex + muonLV.Px() + electronLV.Px();
-            float vectorY = analysisTree.pfmetcorr_ey + muonLV.Py() + electronLV.Py();
+            float vectorX = met_x + muonLV.Px() + electronLV.Px();
+            float vectorY = met_y + muonLV.Py() + electronLV.Py();
             
             float vectorVisX = muonLV.Px() + electronLV.Px();
             float vectorVisY = muonLV.Py() + electronLV.Py();
@@ -2446,8 +2660,18 @@ int main(int argc, char * argv[]) {
             
             // computation of DZeta variable
             // pfmet
-            computeDzeta(analysisTree.pfmetcorr_ex,analysisTree.pfmetcorr_ey,
+            computeDzeta(met_x,met_y,
                          zetaX,zetaY,pzetavis,pzetamiss,dzeta);
+
+            computeDzeta(met_scaleUp_x,met_scaleUp_y,
+                         zetaX,zetaY,pzetavis,pzetamiss_scaleUp,dzeta_scaleUp); // scaleUp
+            computeDzeta(met_scaleDown_x,met_scaleDown_y,
+                         zetaX,zetaY,pzetavis,pzetamiss_scaleDown,dzeta_scaleDown); // scaleDown
+            computeDzeta(met_resoUp_x,met_resoUp_y,
+                         zetaX,zetaY,pzetavis,pzetamiss_resoUp,dzeta_resoUp); // resoUp
+            computeDzeta(met_resoDown_x,met_resoDown_y,
+                         zetaX,zetaY,pzetavis,pzetamiss_resoDown,dzeta_resoDown); // resoDown
+
             
             // mvamet
             computeDzeta(mvamet_x,mvamet_y,
@@ -2467,21 +2691,23 @@ int main(int argc, char * argv[]) {
             computeDzeta(analysisTree.genmet_ex,analysisTree.genmet_ey,
                          zetaX,zetaY,pzetavis,pzetamiss_genmet,dzeta_genmet);
             
-            float ETmis = TMath::Sqrt(mvamet_x*mvamet_x+mvamet_y*mvamet_y);
-            TLorentzVector mvametLV; mvametLV.SetXYZT(mvamet_x,mvamet_y,0.,ETmis);
-            float PFETmis = analysisTree.pfmetcorr_ex*analysisTree.pfmetcorr_ex+analysisTree.pfmetcorr_ey*analysisTree.pfmetcorr_ey;
-            TLorentzVector metLV; metLV.SetXYZT(analysisTree.pfmetcorr_ex,analysisTree.pfmetcorr_ey,0.,PFETmis);
-            TLorentzVector mvametResoUpLV; mvametResoUpLV.SetXYZT(mvamet_resoUp_x,mvamet_resoUp_y,0.,ETmis);
-            TLorentzVector mvametResoDownLV; mvametResoDownLV.SetXYZT(mvamet_resoDown_x,mvamet_resoDown_y,0.,ETmis);
-            TLorentzVector mvametScaleUpLV; mvametScaleUpLV.SetXYZT(mvamet_scaleUp_x,mvamet_scaleUp_y,0.,ETmis);
-            TLorentzVector mvametScaleDownLV; mvametScaleDownLV.SetXYZT(mvamet_scaleDown_x,mvamet_scaleDown_y,0.,ETmis);
+	    //            float ETmis = TMath::Sqrt(mvamet_x*mvamet_x+mvamet_y*mvamet_y);
+            TLorentzVector mvametLV; mvametLV.SetXYZT(mvamet_x,mvamet_y,0.,mvamet);
+	    //            float PFETmis = TMath::Sqrt(met_x*met_x+met_y*met_y);
+            TLorentzVector metLV; metLV.SetXYZT(met_x,met_y,0.,met);
             
             mt_1 = mT(electronLV,metLV);
             mt_2 = mT(muonLV,metLV);
             mtmax = TMath::Max(float(mt_1),float(mt_2));
             
             mCDF = (muonLV+electronLV+metLV).M();
+
+	    pt_tt = (muonLV+electronLV+metLV).Pt();
             
+            TLorentzVector metResoUpLV; metResoUpLV.SetXYZT(met_resoUp_x,met_resoUp_y,0.,met_resoUp);
+            TLorentzVector metResoDownLV; metResoDownLV.SetXYZT(met_resoDown_x,met_resoDown_y,0.,met_resoDown);
+            TLorentzVector metScaleUpLV; metScaleUpLV.SetXYZT(met_scaleUp_x,met_scaleUp_y,0.,met_scaleUp);
+            TLorentzVector metScaleDownLV; metScaleDownLV.SetXYZT(met_scaleDown_x,met_scaleDown_y,0.,met_scaleDown);
             // computing total transverse mass
             mTtot = totalTransverseMass        ( muonLV ,     electronLV , metLV);
             
@@ -2491,11 +2717,11 @@ int main(int argc, char * argv[]) {
             mTtot_eUp   =  totalTransverseMass ( muonLV , electronUpLV   , metLV);
             mTtot_eDown =  totalTransverseMass ( muonLV , electronDownLV , metLV);
             
-            mTtot_scaleUp   =  totalTransverseMass ( muonLV , electronLV , mvametScaleUpLV);
-            mTtot_scaleDown =  totalTransverseMass ( muonLV , electronLV , mvametScaleDownLV);
+            mTtot_scaleUp   =  totalTransverseMass ( muonLV , electronLV , metScaleUpLV);
+            mTtot_scaleDown =  totalTransverseMass ( muonLV , electronLV , metScaleDownLV);
             
-            mTtot_resoUp   =  totalTransverseMass ( muonLV , electronLV , mvametResoUpLV);
-            mTtot_resoDown =  totalTransverseMass ( muonLV , electronLV , mvametResoDownLV);
+            mTtot_resoUp   =  totalTransverseMass ( muonLV , electronLV , metResoUpLV);
+            mTtot_resoDown =  totalTransverseMass ( muonLV , electronLV , metResoDownLV);
             
             mTemu   = mT(electronLV,muonLV);
             mTemet  = mT(electronLV,metLV);
@@ -2534,9 +2760,9 @@ int main(int argc, char * argv[]) {
             mt_sv_resoUp    = -9999;
             mt_sv_resoDown  = -9999;
             
-            if (computeSVFitMass && dzeta>-30) {
+            if (computeSVFitMass && dzeta>-40 && iso_1<0.5 && iso_2<0.5) {
                 
-                if (mvaMetFound) {
+	      //                if (mvaMetFound) {
                     // covariance matrix MET
                     TMatrixD covMET(2, 2);
                     covMET[0][0] =  metcov00;
@@ -2639,7 +2865,16 @@ int main(int argc, char * argv[]) {
                         mt_sv_eUp   = algo_eUp.transverseMass();
                         m_sv_eDown  = algo_eDown.getMass();
                         mt_sv_eDown = algo_eDown.transverseMass();
-                        
+
+			pt_sv_eUp  = algo_eUp.pt(); 
+			eta_sv_eUp = algo_eUp.eta();
+			phi_sv_eUp = algo_eUp.phi();
+
+			pt_sv_eDown  = algo_eDown.pt(); 
+			eta_sv_eDown = algo_eDown.eta();
+			phi_sv_eDown = algo_eDown.phi();
+
+			/*                        
                         if (isDY || isW) {
                             SVfitStandaloneAlgorithm algo_scaleUp = SVFitMassComputation(svFitEle, svFitMu,
                                                                                          mvamet_scaleUp_x, mvamet_scaleUp_y,
@@ -2668,7 +2903,8 @@ int main(int argc, char * argv[]) {
                             // mt_sv_resoDown  = algo_resoDown.transverseMass();
                             
                         }
-                    }
+			*/
+			//                    }
                     //	  std::cout << "eta(e) = " << eta_1 << "   escale = " << eleScale << std::endl;
                     //	  std::cout << "msv = " << m_sv << std::endl;
                     //	  std::cout << "msv(eES)      : up = " << m_sv_eUp << "   down = " << m_sv_eDown << std::endl;
@@ -2677,7 +2913,7 @@ int main(int argc, char * argv[]) {
                     //	  std::cout << "mtsv(eES)      : up = " << mt_sv_eUp << "   down = " << mt_sv_eDown << std::endl;
                     //	  std::cout << "mtsv(metScale) : up = " << mt_sv_scaleUp << "   down = " << mt_sv_scaleDown << std::endl;
                     //	  std::cout << std::endl;
-                }
+		    }
             }
             gen_match_1 = 6;
             gen_match_2 = 6;
@@ -2785,5 +3021,4 @@ int main(int argc, char * argv[]) {
     delete file;
     
 }
-
 
