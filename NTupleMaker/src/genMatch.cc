@@ -28,11 +28,11 @@ int utils_genMatch::genMatch( const reco::Candidate::LorentzVector& p4, const st
       }
       else if (TMath::Abs(genp->pdgId()) == 13) {
 	if (genp->pt() > 8) {
-	  if (genp->isPromptFinalState()){
+	  if (genp->statusFlags().isPrompt()){
 	    match = 2;
 	    dr = dr_new;
 	  }
-	  if (genp->isDirectPromptTauDecayProductFinalState()){
+	  if (genp->statusFlags().isDirectPromptTauDecayProduct()){
 	    match = 4;
 	    dr = dr_new;
 	  }
