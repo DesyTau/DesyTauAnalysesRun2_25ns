@@ -911,7 +911,8 @@ int main(int argc, char * argv[]){
       float vectorVisY = leptonLV.Py() + tauLV.Py();
 
       otree->pzetavis  = vectorVisX*zetaX + vectorVisY*zetaY;
-      otree->pzetamiss = otree->mvamet*TMath::Cos(otree->mvametphi)*zetaX + otree->mvamet*TMath::Sin(otree->mvametphi)*zetaY;
+      //otree->pzetamiss = otree->mvamet*TMath::Cos(otree->mvametphi)*zetaX + otree->mvamet*TMath::Sin(otree->mvametphi)*zetaY;
+      otree->pzetamiss = otree->met*TMath::Cos(otree->metphi)*zetaX + otree->met*TMath::Sin(otree->metphi)*zetaY;
       //otree->pfpzetamiss = analysisTree.pfmetcorr_ex*zetaX + analysisTree.pfmetcorr_ey*zetaY; // this is not recoil-corrected  
       otree->pfpzetamiss = calc::pzetamiss( zetaX, zetaY, otree->met, otree->metphi);   
       otree->puppipzetamiss = analysisTree.puppimet_ex*zetaX + analysisTree.puppimet_ey*zetaY;  // this is not recoil-corrected  
@@ -1521,8 +1522,11 @@ void fillMET(TString ch, int leptonIndex, int tauIndex, const AC1B * analysisTre
 
 //caltulates and fill the otree with the MT variables
 void mt_calculation(Spring15Tree *otree){
-  otree->mt_1 = sqrt(2*otree->pt_1*otree->mvamet*(1.-cos(otree->phi_1-otree->mvametphi)));
-  otree->mt_2 = sqrt(2*otree->pt_2*otree->mvamet*(1.-cos(otree->phi_2-otree->mvametphi)));
+  //otree->mt_1 = sqrt(2*otree->pt_1*otree->mvamet*(1.-cos(otree->phi_1-otree->mvametphi)));
+  //otree->mt_2 = sqrt(2*otree->pt_2*otree->mvamet*(1.-cos(otree->phi_2-otree->mvametphi)));
+  otree->mt_1 = sqrt(2*otree->pt_1*otree->met*(1.-cos(otree->phi_1-otree->metphi)));
+  otree->mt_2 = sqrt(2*otree->pt_2*otree->met*(1.-cos(otree->phi_2-otree->metphi)));
+
   
   otree->pfmt_1 = sqrt(2*otree->pt_1*otree->met*(1.-cos(otree->phi_1-otree->metphi)));
   otree->pfmt_2 = sqrt(2*otree->pt_2*otree->met*(1.-cos(otree->phi_2-otree->metphi)));
