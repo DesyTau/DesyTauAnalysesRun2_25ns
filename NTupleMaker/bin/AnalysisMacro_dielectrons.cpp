@@ -1153,6 +1153,11 @@ int main(int argc, char * argv[]) {
       float pfmet_ex = analysisTree.pfmetcorr_ex;
       float pfmet_ey = analysisTree.pfmetcorr_ey;
       float pfmet_phi = analysisTree.pfmetcorr_phi;
+      if (!isData) {
+	pfmet_ex = analysisTree.pfmet_ex;
+	pfmet_ey = analysisTree.pfmet_ey;
+	pfmet_phi = analysisTree.pfmet_phi;
+      }
       float pfmet = TMath::Sqrt(pfmet_ex*pfmet_ex+pfmet_ey*pfmet_ey);
       float puppimet_ex = analysisTree.puppimet_ex;
       float puppimet_ey = analysisTree.puppimet_ey;
