@@ -39,7 +39,7 @@ process.options = cms.untracked.PSet(
 
 # How many events to process
 process.maxEvents = cms.untracked.PSet( 
-   input = cms.untracked.int32(1000)
+   input = cms.untracked.int32(20)
 )
 
 ### External JECs =====================================================================================================
@@ -87,6 +87,41 @@ if usePrivateSQlite:
 
 
 ### ReRun JEC + Pileup Jet ID ===========================================================================
+#PFMET
+from PhysicsTools.PatUtils.tools.runMETCorrectionsAndUncertainties import runMetCorAndUncFromMiniAOD
+    
+# If you only want to re-correct and get the proper uncertainties
+runMetCorAndUncFromMiniAOD(process,
+                           isData=runOnData
+                           )
+
+"""# If you would like to re-cluster and get the proper uncertainties
+runMetCorAndUncFromMiniAOD(process,
+                           isData=runOnData,
+                           pfCandColl=cms.InputTag("packedPFCandidates"),
+                           recoMetFromPFCs=True,
+                           )"""
+
+#PuppiMET
+from PhysicsTools.PatAlgos.slimming.puppiForMET_cff import makePuppiesFromMiniAOD
+makePuppiesFromMiniAOD( process, True );
+
+# If you only want to re-correct and get the proper uncertainties
+"""runMetCorAndUncFromMiniAOD(process,
+                           isData=runOnData,
+                           metType="Puppi",
+                           postfix="Puppi"
+                           )"""
+
+# If you only want to re-cluster and get the proper uncertainties
+runMetCorAndUncFromMiniAOD(process,
+                           isData=runOnData,
+                           metType="Puppi",
+                           pfCandColl=cms.InputTag("puppiForMET"),
+                           recoMetFromPFCs=True,
+                           jetFlavor="AK4PFPuppi",
+                           postfix="Puppi"
+                           )
 
 process.load("RecoJets.JetProducers.PileupJetID_cfi")
 process.pileupJetIdUpdated = process.pileupJetId.clone(
@@ -160,7 +195,15 @@ process.HBHENoiseFilterResultProducer.defaultDecision = cms.string("HBHENoiseFil
 
 fnames = []
 if runOnData:
-  fnames.append('/store/data/Run2016F/DoubleMuon/MINIAOD/PromptReco-v1/000/278/366/00000/CA97888F-935F-E611-9B92-FA163E6FCC86.root')
+  fnames.append('/store/data/Run2016B/JetHT/MINIAOD/PromptReco-v2/000/273/503/00000/069FE912-3E1F-E611-8EE4-02163E011DF3.root')
+  fnames.append('/store/data/Run2016E/MET/MINIAOD/PromptReco-v2/000/276/824/00000/34F13DEA-AA4C-E611-8F1E-02163E014776.root')
+  fnames.append('/store/data/Run2016F/MET/MINIAOD/PromptReco-v1/000/277/816/00000/BE90C25C-CF57-E611-99E4-02163E011BB4.root')
+  fnames.append('/store/data/Run2016E/JetHT/MINIAOD/PromptReco-v2/000/276/830/00000/4C58611A-AB4C-E611-B46A-FA163EA2EAEF.root') 
+  fnames.append('/store/data/Run2016F/JetHT/MINIAOD/PromptReco-v1/000/277/816/00000/A08F2285-CF57-E611-A68B-FA163E0BB18C.root') 
+  fnames.append('/store/data/Run2016G/MET/MINIAOD/PromptReco-v1/000/278/816/00000/E8C5126D-9F63-E611-AB51-02163E011DA2.root')
+  fnames.append('/store/data/Run2016G/JetHT/MINIAOD/PromptReco-v1/000/278/816/00000/4A7806DC-9B63-E611-A827-FA163E3C7DC7.root')
+  #bfnames.append('/store/data/Run2016H/SingleMuon/MINIAOD/PromptReco-v2/000/281/207/00000/C01B8838-6282-E611-9884-02163E01414B.root')    
+  #fnames.append('/store/data/Run2016F/DoubleMuon/MINIAOD/PromptReco-v1/000/278/366/00000/CA97888F-935F-E611-9B92-FA163E6FCC86.root')
   #fnames.append('/store/data/Run2016F/DoubleMuon/MINIAOD/PromptReco-v1/000/277/932/00000/0C541DE0-1A59-E611-BB0D-FA163EDB8B04.root')
   #fnames.append('/store/data/Run2016D/SingleMuon/MINIAOD/PromptReco-v2/000/276/361/00000/80259AB7-7145-E611-A817-02163E014382.root')
   #fnames.append('/store/data/Run2016B/SingleMuon/MINIAOD/PromptReco-v2/000/274/250/00000/D8870457-3829-E611-8B7D-02163E014567.root')
@@ -342,8 +385,8 @@ MetCovMatrixTag = cms.InputTag("METSignificance:METCovariance:TreeProducer"),
 MetSigTag = cms.InputTag("METSignificance:METSignificance:TreeProducer"),
 MetCorrCovMatrixTag = cms.InputTag("METCorrSignificance:METCovariance:TreeProducer"),
 MetCorrSigTag = cms.InputTag("METCorrSignificance:METSignificance:TreeProducer"),
-MetCorrCollectionTag = cms.InputTag("patpfMETT1::TreeProducer"),
-PuppiMetCollectionTag = cms.InputTag("slimmedMETsPuppi"),
+MetCorrCollectionTag = cms.InputTag("slimmedMETs::TreeProducer"),
+PuppiMetCollectionTag = cms.InputTag("slimmedMETsPuppi::TreeProducer"),
 MvaMetCollectionsTag = cms.VInputTag(cms.InputTag("MVAMET","MVAMET","TreeProducer")),
 TrackCollectionTag = cms.InputTag("generalTracks"),
 GenParticleCollectionTag = cms.InputTag("prunedGenParticles"),
@@ -438,6 +481,10 @@ HLTriggerPaths = cms.untracked.vstring(
 'HLT_PFMETNoMu120_JetIdCleaned_PFMHTNoMu120_IDTight_v',
 'HLT_PFMETNoMu90_NoiseCleaned_PFMHTNoMu90_IDTight_v',
 'HLT_PFMETNoMu120_NoiseCleaned_PFMHTNoMu120_IDTight_v',
+'HLT_PFMETNoMu90_PFMHTNoMu90_IDTight_v',
+'HLT_PFMETNoMu100_PFMHTNoMu100_IDTight_v',
+'HLT_PFMETNoMu110_PFMHTNoMu110_IDTight_v',
+'HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_v',
 #JetHT
 'HLT_PFJet60_v',
 'HLT_PFJet80_v',
@@ -454,7 +501,7 @@ Flags = cms.untracked.vstring(
   'Flag_chargedHadronTrackResolutionFilter',
   'Flag_muonBadTrackFilter',
   'Flag_globalTightHalo2016Filter',
-  'Flag_METFilters', 
+  'Flag_METFilters',
   'allMetFilterPaths'
 ),
 FlagsProcesses = cms.untracked.vstring("RECO","PAT"),
@@ -680,7 +727,7 @@ process.load("RecoMET/METProducers.METSignificanceParams_cfi")
 
 process.METCorrSignificance = process.METSignificance.clone(
   srcPfJets = cms.InputTag('patJetsReapplyJEC::TreeProducer'),
-  srcMet = cms.InputTag('patpfMETT1::TreeProducer')
+  srcMet = cms.InputTag('slimmedMETs::TreeProducer')
 )
 
 process.BadChargedCandidateFilter.muons = cms.InputTag("slimmedMuons")
@@ -695,7 +742,11 @@ process.p = cms.Path(
   process.initroottree*
   process.BadChargedCandidateFilter *
   process.BadPFMuonFilter *
+  process.pileupJetIdUpdated * 
   process.patJetCorrFactorsReapplyJEC * process.patJetsReapplyJEC *
+  process.fullPatMetSequence * 
+  process.puppiMETSequence *
+  process.fullPatMetSequencePuppi *
   process.egmGsfElectronIDSequence * 
   process.mvaMetSequence *
   process.METSignificance * process.METCorrSignificance *

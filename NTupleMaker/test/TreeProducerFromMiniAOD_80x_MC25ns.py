@@ -94,6 +94,41 @@ if usePrivateSQlite:
 
 
 ### ReRun JEC + Pileup Jet ID ===========================================================================
+#PFMET
+from PhysicsTools.PatUtils.tools.runMETCorrectionsAndUncertainties import runMetCorAndUncFromMiniAOD
+    
+# If you only want to re-correct and get the proper uncertainties
+runMetCorAndUncFromMiniAOD(process,
+                           isData=runOnData
+                           )
+
+"""# If you would like to re-cluster and get the proper uncertainties
+runMetCorAndUncFromMiniAOD(process,
+                           isData=runOnData,
+                           pfCandColl=cms.InputTag("packedPFCandidates"),
+                           recoMetFromPFCs=True,
+                           )"""
+
+#PuppiMET
+from PhysicsTools.PatAlgos.slimming.puppiForMET_cff import makePuppiesFromMiniAOD
+makePuppiesFromMiniAOD( process, True );
+
+# If you only want to re-correct and get the proper uncertainties
+"""runMetCorAndUncFromMiniAOD(process,
+                           isData=runOnData,
+                           metType="Puppi",
+                           postfix="Puppi"
+                           )"""
+
+# If you only want to re-cluster and get the proper uncertainties
+runMetCorAndUncFromMiniAOD(process,
+                           isData=runOnData,
+                           metType="Puppi",
+                           pfCandColl=cms.InputTag("puppiForMET"),
+                           recoMetFromPFCs=True,
+                           jetFlavor="AK4PFPuppi",
+                           postfix="Puppi"
+                           )
 
 process.load("RecoJets.JetProducers.PileupJetID_cfi")
 process.pileupJetIdUpdated = process.pileupJetId.clone(
@@ -169,6 +204,7 @@ fnames = []
 if runOnData:
   fnames.append('/store/data/Run2016B/SingleMuon/MINIAOD/PromptReco-v2/000/273/448/00000/CECFFCBE-CE1C-E611-8660-02163E011A4E.root')
 else:
+  #fnames.append('/store/mc/RunIISpring16MiniAODv2/TT_TuneCUETP8M1_13TeV-powheg-pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext3-v2/70000/041A166C-B53F-E611-BF34-5CB90179CCC0.root')
   fnames.append('/store/mc/RunIISpring16MiniAODv2/SUSYGluGluToHToTauTau_M-120_TuneCUETP8M1_13TeV-pythia8/MINIAODSIM/PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14-v1/00000/6AE671C2-0849-E611-878E-28924A33B062.root')
 
 # Define the input source
@@ -338,7 +374,7 @@ TauCollectionTag = cms.InputTag("slimmedTaus"),
 L1MuonCollectionTag = cms.InputTag("gmtStage2Digis:Muon"),
 L1EGammaCollectionTag = cms.InputTag("caloStage2Digis:EGamma"),
 L1TauCollectionTag = cms.InputTag("caloStage2Digis:Tau"),
-L1JetCollectionTag = cms.InputTag("caloStage2Digis:Jet"),                                      
+L1JetCollectionTag = cms.InputTag("caloStage2Digis:Jet"),
 JetCollectionTag = cms.InputTag("patJetsReapplyJEC::TreeProducer"),
 #JetCollectionTag = cms.InputTag("slimmedJets"),
 MetCollectionTag = cms.InputTag("slimmedMETs::@skipCurrentProcess"),
@@ -346,8 +382,8 @@ MetCovMatrixTag = cms.InputTag("METSignificance:METCovariance:TreeProducer"),
 MetSigTag = cms.InputTag("METSignificance:METSignificance:TreeProducer"),
 MetCorrCovMatrixTag = cms.InputTag("METCorrSignificance:METCovariance:TreeProducer"),
 MetCorrSigTag = cms.InputTag("METCorrSignificance:METSignificance:TreeProducer"),
-MetCorrCollectionTag = cms.InputTag("patpfMETT1::TreeProducer"),
-PuppiMetCollectionTag = cms.InputTag("slimmedMETsPuppi"),
+MetCorrCollectionTag = cms.InputTag("slimmedMETs::TreeProducer"),
+PuppiMetCollectionTag = cms.InputTag("slimmedMETsPuppi::TreeProducer"),
 MvaMetCollectionsTag = cms.VInputTag(cms.InputTag("MVAMET","MVAMET","TreeProducer")),
 TrackCollectionTag = cms.InputTag("generalTracks"),
 GenParticleCollectionTag = cms.InputTag("prunedGenParticles"),
@@ -442,6 +478,10 @@ HLTriggerPaths = cms.untracked.vstring(
 'HLT_PFMETNoMu120_JetIdCleaned_PFMHTNoMu120_IDTight_v',
 'HLT_PFMETNoMu90_NoiseCleaned_PFMHTNoMu90_IDTight_v',
 'HLT_PFMETNoMu120_NoiseCleaned_PFMHTNoMu120_IDTight_v',
+'HLT_PFMETNoMu90_PFMHTNoMu90_IDTight_v',
+'HLT_PFMETNoMu100_PFMHTNoMu100_IDTight_v',
+'HLT_PFMETNoMu110_PFMHTNoMu110_IDTight_v',
+'HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_v',
 #JetHT
 'HLT_PFJet60_v',
 'HLT_PFJet80_v',
@@ -510,13 +550,13 @@ RecMuonHLTriggerMatching = cms.untracked.vstring(
 #MuonEG
 'HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v.*:hltL1sMu12EG10',
 'HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v.*:hltMu17TrkIsoVVLEle12CaloIdLTrackIdLIsoVLMuonlegL3IsoFiltered17',
-'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v.*:hltL1sMu20EG10',
+'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v.*:hltL1sMu20EG10,hltL1sMu20EG10IorMu23EG10',
 'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v.*:hltMu23TrkIsoVVLEle12CaloIdLTrackIdLIsoVLMuonlegL3IsoFiltered23',
-'HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_v.*:hltL1sSingleMu20erIorSingleMu22IorSingleMu25,hltL1sSingleMu20erlorSingleMu22lorSingleMu25',
+'HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_v.*:hltL1sSingleMu20erIorSingleMu22IorSingleMu25,hltL1sSingleMu20erlorSingleMu22lorSingleMu25,hltL1sSingleMu20erIorSingleMu22IorSingleMu25IorMu20IsoEG6',
 'HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_v.*:hltMu23TrkIsoVVLEle8CaloIdLTrackIdLIsoVLMuonlegL3IsoFiltered23',
 'HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v.*:hltL1sMu5EG15',
 'HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v.*:hltMu8TrkIsoVVLEle17CaloIdLTrackIdLIsoVLMuonlegL3IsoFiltered8',
-'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v.*:hltL1sMu5EG20IorMu5IsoEG18',
+'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v.*:hltL1sMu5EG20IorMu5IsoEG18,hltL1sMu5EG20IorMu5IsoEG18IorMu5IsoEG20IorMu5EG23',
 'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v.*:hltMu8TrkIsoVVLEle23CaloIdLTrackIdLIsoVLMuonlegL3IsoFiltered8', 
 #MuonEG
 'HLT_Mu17_Mu8_DZ_v.*:hltL3pfL1sDoubleMu114ORDoubleMu125L1f0L2pf0L3PreFiltered8,hltL3pfL1sDoubleMu114L1f0L2pf0L3PreFiltered8',
@@ -556,8 +596,8 @@ RecMuonHLTriggerMatching = cms.untracked.vstring(
 'HLT_TripleMu_12_10_5_v.*:hltL1TripleMu553L2TriMuFiltered3L3TriMuFiltered5',
 'HLT_TripleMu_12_10_5_v.*:hltL1TripleMu553L2TriMuFiltered3L3TriMuFiltered10105',
 'HLT_TripleMu_12_10_5_v.*:hltL1TripleMu553L2TriMuFiltered3L3TriMuFiltered12105',
-'HLT_TripleMu_5_3_3_v.*:hltL1TripleMu0L2TriMuFiltered0L3TriMuFiltered533',
-'HLT_TripleMu_5_3_3_v.*:hltL1TripleMu0L2TriMuFiltered0L3TriMuFiltered3',
+'HLT_TripleMu_5_3_3_v.*:hltL1TripleMu0L2TriMuFiltered0L3TriMuFiltered533,hltL1TripleMu500L2TriMuFiltered0L3TriMuFiltered533',
+'HLT_TripleMu_5_3_3_v.*:hltL1TripleMu0L2TriMuFiltered0L3TriMuFiltered3,hltL1TripleMu500L2TriMuFiltered0L3TriMuFiltered3',
 ),
 RecMuonNum = cms.untracked.int32(0),
 # photons
@@ -601,13 +641,13 @@ RecElectronHLTriggerMatching = cms.untracked.vstring(
 #MuonEG
 'HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v.*:hltL1sMu12EG10',
 'HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v.*:hltMu17TrkIsoVVLEle12CaloIdLTrackIdLIsoVLElectronlegTrackIsoFilter',
-'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v.*:hltL1sMu20EG10',
+'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v.*:hltL1sMu20EG10,hltL1sMu20EG10IorMu23EG10',
 'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v.*:hltMu23TrkIsoVVLEle12CaloIdLTrackIdLIsoVLElectronlegTrackIsoFilter',
-'HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_v.*:hltL1sSingleMu20erIorSingleMu22IorSingleMu25,hltL1sSingleMu20erlorSingleMu22lorSingleMu25',
+'HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_v.*:hltL1sSingleMu20erIorSingleMu22IorSingleMu25,hltL1sSingleMu20erlorSingleMu22lorSingleMu25,hltL1sSingleMu20erIorSingleMu22IorSingleMu25IorMu20IsoEG6',
 'HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_v.*:hltMu23TrkIsoVVLEle8CaloIdLTrackIdLIsoVLElectronlegTrackIsoFilter',
 'HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v.*:hltL1sMu5EG15',
 'HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v.*:hltMu8TrkIsoVVLEle17CaloIdLTrackIdLIsoVLElectronlegTrackIsoFilter',
-'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v.*:hltL1sMu5EG20IorMu5IsoEG18',
+'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v.*:hltL1sMu5EG20IorMu5IsoEG18,hltL1sMu5EG20IorMu5IsoEG18IorMu5IsoEG20IorMu5EG23',
 'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v.*:hltMu8TrkIsoVVLEle23CaloIdLTrackIdLIsoVLElectronlegTrackIsoFilter', 
 #DoubleEG
 'HLT_DoubleEle24_22_eta2p1_WPLoose_Gsf_v.*:hltEle24Ele22WPLooseGsfleg1TrackIsoFilter',
@@ -664,7 +704,7 @@ RecTauBinaryDiscriminators = cms.untracked.vstring(),
 RecTauNum = cms.untracked.int32(0),
 # jets
 RecJetPtMin = cms.untracked.double(18.),
-RecJetEtaMax = cms.untracked.double(4.9),
+RecJetEtaMax = cms.untracked.double(5.2),
 RecJetHLTriggerMatching = cms.untracked.vstring(
 'HLT_PFJet60_v.*:hltSinglePFJet60',
 'HLT_PFJet80_v.*:hltSinglePFJet80',
@@ -684,7 +724,7 @@ process.load("RecoMET/METProducers.METSignificanceParams_cfi")
 
 process.METCorrSignificance = process.METSignificance.clone(
   srcPfJets = cms.InputTag('patJetsReapplyJEC::TreeProducer'),
-  srcMet = cms.InputTag('patpfMETT1::TreeProducer')
+  srcMet = cms.InputTag('slimmedMETs::TreeProducer')
 )
 
 process.BadChargedCandidateFilter.muons = cms.InputTag("slimmedMuons")
@@ -699,7 +739,11 @@ process.p = cms.Path(
   process.initroottree*
   process.BadChargedCandidateFilter *
   process.BadPFMuonFilter *
-  process.pileupJetIdUpdated * process.patJetCorrFactorsReapplyJEC * process.patJetsReapplyJEC *
+  process.pileupJetIdUpdated * 
+  process.patJetCorrFactorsReapplyJEC * process.patJetsReapplyJEC *
+  process.fullPatMetSequence * 
+  process.puppiMETSequence *
+  process.fullPatMetSequencePuppi *
   process.egmGsfElectronIDSequence * 
   process.mvaMetSequence *
   process.METSignificance * process.METCorrSignificance *
