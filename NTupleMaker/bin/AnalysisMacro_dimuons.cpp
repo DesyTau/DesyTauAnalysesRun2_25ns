@@ -1316,6 +1316,12 @@ int main(int argc, char * argv[]) {
       float pfmet_ex = analysisTree.pfmetcorr_ex;
       float pfmet_ey = analysisTree.pfmetcorr_ey;
       float pfmet_phi = analysisTree.pfmetcorr_phi;
+      if (!isData) {
+	pfmet_ex = analysisTree.pfmet_ex;
+	pfmet_ey = analysisTree.pfmet_ey;
+	pfmet_phi = analysisTree.pfmet_phi;
+      }
+
       float pfmet = TMath::Sqrt(pfmet_ex*pfmet_ex+pfmet_ey*pfmet_ey);
       //      TLorentzVector MetLV; MetLV.SetPx(pfmet_ex); MetLV.SetPy(pfmet_ey);
       //      std::cout << "pfmet = " << pfmet << " : " << analysisTree.pfmet_pt << " : " << MetLV.Pt() << std::endl;
@@ -1995,6 +2001,7 @@ int main(int argc, char * argv[]) {
 
 	  float pfmetcorr_ex = pfmet_ex;
 	  float pfmetcorr_ey = pfmet_ey;
+
 	  // float pfmetcorr_ex_1 = pfmet_ex;
 	  // float pfmetcorr_ey_1 = pfmet_ey;
 	  if (applySimpleRecoilCorrections)
@@ -2386,8 +2393,8 @@ int main(int argc, char * argv[]) {
 	  float perpUnitX = TMath::Cos(phiUnit+0.5*TMath::Pi());
 	  float perpUnitY = TMath::Sin(phiUnit+0.5*TMath::Pi());
 	  
-	  float pfmetcorr_ex = analysisTree.pfmetcorr_ex;
-	  float pfmetcorr_ey = analysisTree.pfmetcorr_ey;
+	  //	  float pfmetcorr_ex = analysisTree.pfmetcorr_ex;
+	  //	  float pfmetcorr_ey = analysisTree.pfmetcorr_ey;
 	  
 	  float u1 = 0;
 	  float u2  = 0;
@@ -2397,7 +2404,7 @@ int main(int argc, char * argv[]) {
 	  u1_metuncorrX = u1;
 	  u2_metuncorrX = u2;
 	  
-	  computeRecoil(pfmetcorr_ex,pfmetcorr_ey,unitX,unitY,perpUnitX,perpUnitY,dimuonPt,u1,u2,rH);
+	  computeRecoil(pfmet_ex,pfmet_ey,unitX,unitY,perpUnitX,perpUnitY,dimuonPt,u1,u2,rH);
 	  u1_metX = u1;
 	  u2_metX = u2;
 	  
