@@ -43,6 +43,7 @@ public :
   Double_t 		  zptweight;
   Double_t        trkeffweight_1;
   Float_t         effweight;
+  Float_t         leptaufakeweight;
   Float_t         fakeweight;
   Float_t         embeddedWeight;
   Float_t         signalWeight;
@@ -263,6 +264,7 @@ public :
   TBranch        *b_zptweight;
   TBranch        *b_trkeffweight_1;
   TBranch        *b_effweight;   //! 
+  TBranch        *b_leptaufakeweight;   //!
   TBranch        *b_fakeweight;   //!
   TBranch        *b_embeddedWeight;   //!
   TBranch        *b_signalWeight;   //!

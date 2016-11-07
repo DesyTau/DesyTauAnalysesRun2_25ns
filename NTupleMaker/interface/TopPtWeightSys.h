@@ -63,14 +63,15 @@ protected:
 
   virtual void ScaleUp(){
     w_scaled = cenTree->topptweight * cenTree->topptweight;
-
+    this->Fill("Up");
   };
   
   virtual void ScaleDown(){
     w_scaled = 1.;
+    this->Fill("Down");
   };
   
-  virtual void Fill(utils::channel ch, const char* shift){
+  virtual void Fill(const char* shift){
     cenTree->topptweight = w_scaled;
     outTree[shift]->Fill();
 

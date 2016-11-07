@@ -49,11 +49,12 @@
 #include "CondFormats/BTauObjects/interface/BTagCalibration.h"
 #include "CondTools/BTau/interface/BTagCalibrationReader.h"
 
-
 #include "DesyTauAnalyses/NTupleMaker/interface/Systematics.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/LeptonScaleSys.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/ZPtWeightSys.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/TopPtWeightSys.h"
+
+#include "DesyTauAnalyses/NTupleMaker/interface/LepTauFakeRate.h"
 
 #define pi 	3.14159265358979312
 #define d2r 1.74532925199432955e-02
@@ -143,7 +144,10 @@ int main(int argc, char * argv[]){
   TString ch = argv[3];
   std::string lep;
 
-  if ((ch != "mt" ) && (ch != "et")) exit(0);
+  if ((ch != "mt" ) && (ch != "et")) {
+	std::cout << " Channel " << ch << "is not a valid choice. Please try again with 'mt' or 'et'.Exiting. " << std::endl;
+    exit(0);
+  }
 
   if (ch=="mt") lep = "Muon"; 
     else if (ch=="et") lep = "Electron";
@@ -392,6 +396,10 @@ int main(int argc, char * argv[]){
   TFile * f_zptweight = new TFile("/afs/cern.ch/user/r/rlane/public/HIG16037/zpt_weights/zpt_weights_2016.root","read");
   TH2D * h_zptweight = (TH2D*)f_zptweight->Get("zptmass_histo");
 
+  // lepton to tau fake init
+  LepTauFakeRate *leptauFR = new LepTauFakeRate();
+  leptauFR->Init(ch);
+
   // output fileName with histograms
   rootFileName += "_";
   rootFileName += ifile;
@@ -625,9 +633,9 @@ int main(int argc, char * argv[]){
         bool isSingleLepTrig = false;
 
         float lep_pt     = -9999.;
-	float lep_pt_max = -9999.;
-	float lep_eta    = -9999.;
-	float lep_phi    = -9999.;
+	    float lep_pt_max = -9999.;
+	    float lep_eta    = -9999.;
+	    float lep_phi    = -9999.;
 
         if(ch=="mt"){
           lep_pt =      analysisTree.muon_pt[lIndex]; 
@@ -787,12 +795,20 @@ int main(int argc, char * argv[]){
       if (!isData && isDY && isMG ) {
         genV = genTools::genV(analysisTree); // gen Z boson ?
         otree->zptweight = h_zptweight->GetBinContent(h_zptweight->GetXaxis()->FindBin(genV.M()),h_zptweight->GetYaxis()->FindBin(genV.Pt()));
-	  }
+	  } 
 
       // topPt weight
 	  otree->topptweight =1.;
       if(!isData)
 	    otree->topptweight = genTools::topPtWeight(analysisTree);
+
+
+      // lepton tau fakerate
+      otree->leptaufakeweight = 1.;
+	  if (!isData){
+	  	if (ch == "et") otree->leptaufakeweight = leptauFR->get_fakerate(ch, "Tight", otree->eta_2, otree->gen_match_2);
+		if (ch == "mt") otree->leptaufakeweight = leptauFR->get_fakerate(ch, "Tight", otree->eta_2, otree->gen_match_2);
+	  }
       ////////////////////////////////////////////////////////////
       // MET Recoil Corrections
       ////////////////////////////////////////////////////////////
@@ -952,8 +968,8 @@ int main(int argc, char * argv[]){
       if(!isData && ApplySystShift){
        zPtWeightSys->Eval(); 
 	   topPtWeightSys->Eval();
-	   //if (ch=="mt") tauScaleSys->Eval(utils::MUTAU);
-	   //if (ch=="et") tauScaleSys->Eval(utils::ETAU);
+	   if (ch=="mt") tauScaleSys->Eval(utils::MUTAU);
+	   if (ch=="et") tauScaleSys->Eval(utils::ETAU);
 	  }
 
       selEvents++;
@@ -1090,7 +1106,7 @@ void fill_weight(const AC1B * analysisTree, Spring15Tree *otree, PileUp *PUoffic
   otree->idisoweight_2 = 1;
   otree->trkeffweight_1=1;
   otree->effweight = 0;
-  otree->fakeweight = 0;
+  //otree->fakeweight = 0;
   otree->embeddedWeight = 0;
   otree->signalWeight = 0;
   otree->weight = 1;
@@ -1269,7 +1285,6 @@ void FillTau(const AC1B * analysisTree, Spring15Tree *otree, int tauIndex){
   otree->byVVTightIsolationMVArun2v1DBoldDMwLT_2 = analysisTree->tau_byVVTightIsolationMVArun2v1DBoldDMwLT[tauIndex];
   otree-> byIsolationMVArun2v1DBoldDMwLTraw_2 = analysisTree->tau_byIsolationMVArun2v1DBoldDMwLTraw[tauIndex];
   otree->chargedIsoPtSum_2 = analysisTree->tau_chargedIsoPtSum[tauIndex];
-
 }
 
 //////DILEPTON FUNCTIONS

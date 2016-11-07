@@ -118,11 +118,13 @@ protected:
     cenTree->pt_1 = lep1_scaled.Pt();
     cenTree->pt_2 = lep2_scaled.Pt();
     
-    cenTree->mt_1 = sqrt(2*lep1_scaled.Pt()*cenTree->mvamet*(1.-cos(lep1_scaled.Phi()-cenTree->mvametphi)));
+    //cenTree->mt_1 = sqrt(2*lep1_scaled.Pt()*cenTree->mvamet*(1.-cos(lep1_scaled.Phi()-cenTree->mvametphi)));
     cenTree->pfmt_1 = sqrt(2*lep1_scaled.Pt()*cenTree->met*(1.-cos(lep1_scaled.Phi()-cenTree->metphi)));
-    cenTree->mt_2 = sqrt(2*lep2_scaled.Pt()*cenTree->mvamet*(1.-cos(lep2_scaled.Phi()-cenTree->mvametphi)));
+    //cenTree->mt_2 = sqrt(2*lep2_scaled.Pt()*cenTree->mvamet*(1.-cos(lep2_scaled.Phi()-cenTree->mvametphi)));
     cenTree->pfmt_2 = sqrt(2*lep2_scaled.Pt()*cenTree->met*(1.-cos(lep2_scaled.Phi()-cenTree->metphi)));
-    
+    cenTree->mt_1 = sqrt(2*lep1_scaled.Pt()*cenTree->met*(1.-cos(lep1_scaled.Phi()-cenTree->metphi)));
+    cenTree->mt_2 = sqrt(2*lep2_scaled.Pt()*cenTree->met*(1.-cos(lep2_scaled.Phi()-cenTree->metphi)));
+
     
     TLorentzVector pfmetLV; pfmetLV.SetXYZT(cenTree->met * cos(cenTree->metphi),
 					    cenTree->met * sin(cenTree->metphi),
@@ -146,7 +148,8 @@ protected:
     
     cenTree->pt_tt = (lep1_scaled+lep2_scaled+pfmetLV).Pt();
     cenTree->pzetavis = calc::pzetavis(lep1_scaled, lep2_scaled);
-    cenTree->pzetamiss = calc::pzetamiss( lep1_scaled, lep2_scaled, mvametLV);
+    //cenTree->pzetamiss = calc::pzetamiss( lep1_scaled, lep2_scaled, mvametLV);
+    cenTree->pzetamiss = calc::pzetamiss( lep1_scaled, lep2_scaled, pfmetLV);
     cenTree->pfpzetamiss = calc::pzetamiss( lep1_scaled, lep2_scaled, pfmetLV);    
     
     cenTree->m_vis = dileptonLV.M();
