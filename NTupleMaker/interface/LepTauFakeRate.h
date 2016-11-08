@@ -49,7 +49,7 @@ public:
 	}
 
     float get_fakerate(TString channel, string AntiLeptonDiscriminatorWP, float tauEta, int tau_gen_match ){
-		float fakerate;
+		float fakerate = 1;
 		if (tau_gen_match != 1 )
 			fakerate = 1.;
 	    else {
