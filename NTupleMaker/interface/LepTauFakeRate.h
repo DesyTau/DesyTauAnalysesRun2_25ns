@@ -34,7 +34,7 @@ public:
 			LTAUfakerates.insert(std::make_pair("VTight", FakeRates_VTight));			 
 	    }
 
-        if (channel == "mt") {
+        else if (channel == "mt") {
 	    	// Scale Factor values corresponding to eta={0, 0.4, 0.8, 1.2, 1.7, >1.7} 
 			std::vector<float> FakeRates_Loose = {1.137, 1.067, 1.221, 1.460, 1.609};
 			std::vector<float> FakeRates_Tight = {1.418, 1.134, 1.260, 1.660, 1.205};
