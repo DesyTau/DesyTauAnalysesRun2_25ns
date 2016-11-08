@@ -327,6 +327,7 @@ int main(int argc, char * argv[]){
   
   // create input files list
   std::vector<std::string> fileList;  
+  int NumberOfFiles = 0;
   if (infiles.find(".root") != std::string::npos){
     ifile = 0;
     jfile = 1;
@@ -342,8 +343,10 @@ int main(int argc, char * argv[]){
     while(true){
       input>>infile;
       if(!input.eof()){
-	if (infile.length() > 0)
+	if (infile.length() > 0){
 	  fileList.push_back(infile);
+	  NumberOfFiles +=1 ;
+	}
       }
       else
 	break;
@@ -352,6 +355,8 @@ int main(int argc, char * argv[]){
     if(jfile < 0)
       jfile = fileList.size();   
   }
+
+  if(NumberOfFiles < jfile) jfile = NumberOfFiles;
 
   for (int iF=ifile; iF<jfile; ++iF) {
     std::cout<<fileList[iF]<<std::endl;
