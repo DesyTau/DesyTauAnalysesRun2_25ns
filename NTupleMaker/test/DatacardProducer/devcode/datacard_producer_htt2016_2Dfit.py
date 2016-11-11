@@ -123,12 +123,16 @@ def unroll(histo2D):
 		htitle = histo2D.GetTitle()
 		hname = histo2D.GetName()
 		n_bins_x = (histo2D.GetNbinsX())*(histo2D.GetNbinsY())
-		histo1D = TH1D(hname, htitle, n_bins_x, 0, n_bins_x)	
-		for i in xrange(1,n_bins_x+1):
-			histo1D.SetBinContent(i, histo2D.GetBinContent(i))
-			histo1D.SetBinError(i, histo2D.GetBinError(i))
+		histo1D = TH1D(hname, htitle, n_bins_x, 0, n_bins_x)
+		k =1 
+		for i in xrange(1, histo2D.GetNbinsX()+1):
+			for j in xrange(1, histo2D.GetNbinsY()+1):
+				histo1D.SetBinContent(k, histo2D.GetBinContent(histo2D.GetBin(i,j)))
+				histo1D.SetBinError(k, histo2D.GetBinError(histo2D.GetBin(i,j)))
+				k+=1
+		histo1D.GetXaxis().SetTitle("2D bin number")
+		histo1D.GetYaxis().SetTitle("Events / bin width")
 		return histo1D
-		#histo2D = histo1D #unrolled result
 	else:
 		pass
 
@@ -160,14 +164,15 @@ lumi = 12900
 #directory with input root files (synch ntuples) with conventional names!
 
 if channel == "mt":
-	indir = "/nfs/dust/cms/user/bottav/CMSSW_8_0_12/src/DesyTauAnalyses/NTupleMaker/test/NTuple_Nov/mutau/final"
+	#indir = "/nfs/dust/cms/user/bottav/CMSSW_8_0_12/src/DesyTauAnalyses/NTupleMaker/test/NTuple_Nov/mutau/final"
+	indir = "/afs/cern.ch/work/v/vbotta/NTuple_Nov/mutau/final"
 	indirData = indir
 
 if channel == "et":
 	indir = "/nfs/dust/cms/user/bottav/CMSSW_8_0_12/src/DesyTauAnalyses/NTupleMaker/test/NTuple_Nov/etau/final"
 	indirData = indir
 
-isBlinded = False 
+isBlinded = True 
 datacardFor2Dfit = True
 
 ROOT.TH1.SetDefaultSumw2(True)
@@ -343,6 +348,8 @@ for wkey, wvalue in weighting.iteritems():
 				print "used for hdummy: nbinsX = ", nbinsX, " |  binsX = " , binsX, " | nbinsY = ", nbinsY, " | binsY ", binsY 
 				hdummy = TH2F("hdummy","hdummy"+axisTit,nbinsX,binsX,nbinsY,binsY)
 				var = varY+":"+varX
+
+				blindingCut = defineBlinding(isBlinded,varY,ckey)
 
 			print "plotting ", hkey, ": var ", var, " | bins ", nbins, " | xmin ", xmin, " | xmax ", xmax
 
