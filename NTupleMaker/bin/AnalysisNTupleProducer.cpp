@@ -30,6 +30,7 @@
 #include "DesyTauAnalyses/NTupleMaker/interface/PileUp.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/Jets.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/functions.h"
+#include "HTT-utilities/LepEffInterface/interface/ScaleFactor.h"
 
 bool metFiltersPasses(AC1B &tree_, std::vector<TString> metFlags) {
 
@@ -60,26 +61,53 @@ double dPhiFromLV(TLorentzVector v1, TLorentzVector v2) {
 }
 void FakeRateMva(float pt, float * mean, float * error, int &iso) {
 
-  // 76X MEt filters + pt(leadtrk) > 4 GeV (EWK background remeasured)
+  // 80X Run2016BCD
   if (pt<150) {
-    mean[0]  = 0.072; error[0] = 0.008;
-    mean[1]  = 0.043; error[1] = 0.006;
-    mean[2]  = 0.030; error[2] = 0.005;
+    mean[0]  = 0.0725; error[0] = 0.0033;
+    mean[1]  = 0.0422; error[1] = 0.0024;
+    mean[2]  = 0.0271; error[2] = 0.0020;
+    mean[3]  = 0.019; error[3] = 0.004;
     iso = 0;
   }
   else if (pt>=150&&pt<200) {
-    mean[0]  = 0.059; error[0] = 0.017;
-    mean[1]  = 0.046; error[1] = 0.017;
-    mean[2]  = 0.018; error[2] = 0.010;
+    mean[0]  = 0.0818; error[0] = 0.0090;
+    mean[1]  = 0.0492; error[1] = 0.0065;
+    mean[2]  = 0.0290; error[2] = 0.0051;
+    mean[3]  = 0.009; error[3] = 0.008;
     iso = 1;
   }
   else {
-    mean[0]  = 0.078; error[0] = 0.035;
-    mean[1]  = 0.072; error[1] = 0.035;
-    mean[2]  = 0.032; error[2] = 0.027;
+    mean[0]  = 0.0640; error[0] = 0.0101;
+    mean[1]  = 0.0369; error[1] = 0.0079;
+    mean[2]  = 0.0217; error[2] = 0.0065;
+    mean[3]  = 0.029; error[3] = 0.027;
     iso = 2;
   }
 
+  // 80X Run2016B
+  /*
+  if (pt<150) {
+    mean[0]  = 0.072; error[0] = 0.004;
+    mean[1]  = 0.043; error[1] = 0.003;
+    mean[2]  = 0.026; error[2] = 0.003;
+    mean[3]  = 0.019; error[3] = 0.004;
+    iso = 0;
+  }
+  else if (pt>=150&&pt<200) {
+    mean[0]  = 0.065; error[0] = 0.011;
+    mean[1]  = 0.037; error[1] = 0.008;
+    mean[2]  = 0.021; error[2] = 0.006;
+    mean[3]  = 0.009; error[3] = 0.008;
+    iso = 1;
+  }
+  else {
+    mean[0]  = 0.069; error[0] = 0.014;
+    mean[1]  = 0.042; error[1] = 0.012;
+    mean[2]  = 0.026; error[2] = 0.011;
+    mean[3]  = 0.029; error[3] = 0.027;
+    iso = 2;
+  }
+  */
   // 76X MEt filters + pt(leadtrk) > 4 GeV
   //  if (pt<150) {
   //    mean[0]  = 0.080; error[0] = 0.009;
@@ -104,27 +132,47 @@ void FakeRateMva(float pt, float * mean, float * error, int &iso) {
 
 void FakeRate(float pt, float * mean, float * error, int &iso) {
 
-
-  // 76X MEt filters + pt(leadtrk) > 4 GeV (EWK background remeasured)
-   if (pt<150) {
-    mean[0]  = 0.091; error[0] = 0.009;
-    mean[1]  = 0.055; error[1] = 0.007;
-    mean[2]  = 0.036; error[2] = 0.006;
+  // 80X Run2016BCD
+  if (pt<150) {
+    mean[0]  = 0.0949; error[0] = 0.0037;
+    mean[1]  = 0.0596; error[1] = 0.0029;
+    mean[2]  = 0.0376; error[2] = 0.0024;
     iso = 0;
   }
   else if (pt>=150&&pt<200) {
-    mean[0]  = 0.092; error[0] = 0.021;
-    mean[1]  = 0.076; error[1] = 0.019;
-    mean[2]  = 0.044; error[2] = 0.015;
+    mean[0]  = 0.1153; error[0] = 0.0096;
+    mean[1]  = 0.0735; error[1] = 0.0075;
+    mean[2]  = 0.0508; error[2] = 0.0071;
     iso = 1;
   }
   else {
-    mean[0]  = 0.072; error[0] = 0.035;
-    mean[1]  = 0.066; error[1] = 0.035;
-    mean[2]  = 0.049; error[2] = 0.031;
+    mean[0]  = 0.0924; error[0] = 0.0121;
+    mean[1]  = 0.0629; error[1] = 0.0102;
+    mean[2]  = 0.0453; error[2] = 0.0092;
     iso = 2;
   } 
 
+  // 80X Run2016B
+  /*
+  if (pt<150) {
+    mean[0]  = 0.092; error[0] = 0.004;
+    mean[1]  = 0.056; error[1] = 0.004;
+    mean[2]  = 0.035; error[2] = 0.003;
+    iso = 0;
+  }
+  else if (pt>=150&&pt<200) {
+    mean[0]  = 0.103; error[0] = 0.013;
+    mean[1]  = 0.060; error[1] = 0.010;
+    mean[2]  = 0.041; error[2] = 0.009;
+    iso = 1;
+  }
+  else {
+    mean[0]  = 0.109; error[0] = 0.019;
+    mean[1]  = 0.076; error[1] = 0.017;
+    mean[2]  = 0.058; error[2] = 0.015;
+    iso = 2;
+  } 
+  */
    // 76X MEt filters + pt(leadtrk) > 4 GeV
    //   if (pt<150) {
    //    mean[0]  = 0.100; error[0] = 0.010;
@@ -238,6 +286,8 @@ int main(int argc, char * argv[]) {
   const float isoSelMuCut   = cfg.get<float>("IsoSelMuCut");
   const float ptSelMuCut    = cfg.get<float>("PtSelMuCut");
   const float ptTrigMuCut   = cfg.get<float>("PtTrigMuCut");
+  const bool  isDRIso03 = cfg.get<bool>("IsDRIso03");
+  const bool  isMuonIdICHEP = cfg.get<bool>("IsMuonIdICHEP"); 
 
   // electron selection
   const float ptEleCut   = cfg.get<float>("PtEleCut");
@@ -301,6 +351,14 @@ int main(int argc, char * argv[]) {
   const int unclusteredES = cfg.get<int>("UnclusteredES");
   const int jetES = cfg.get<int>("JetES");
 
+  const string MuonIdIsoFile = cfg.get<string>("MuonIdIsoEff");
+  const string MuonTrigFile  = cfg.get<string>("MuonTrigEff");
+
+  const string puDataFile = cfg.get<string>("PileUpDataFile");
+  const string puMCFile = cfg.get<string>("PileUpMCFile");
+
+  TString PUDataFile(puDataFile);
+  TString PUMCFile(puMCFile);
   // **** end of configuration
 
   // file name and tree name
@@ -399,18 +457,22 @@ int main(int argc, char * argv[]) {
   Float_t fakeAntiLLooseMva_;
   Float_t fakeAntiLMediumMva_;
   Float_t fakeAntiLTightMva_;
+  Float_t fakeAntiLVTightMva_;
 
   Float_t fakeAntiLLooseMvaUp1_;
   Float_t fakeAntiLMediumMvaUp1_;
   Float_t fakeAntiLTightMvaUp1_;
+  Float_t fakeAntiLVTightMvaUp1_;
 
   Float_t fakeAntiLLooseMvaUp2_;
   Float_t fakeAntiLMediumMvaUp2_;
   Float_t fakeAntiLTightMvaUp2_;
+  Float_t fakeAntiLVTightMvaUp2_;
 
   Float_t fakeAntiLLooseMvaUp3_;
   Float_t fakeAntiLMediumMvaUp3_;
   Float_t fakeAntiLTightMvaUp3_;
+  Float_t fakeAntiLVTightMvaUp3_;
  
 
   Float_t met_;
@@ -459,6 +521,7 @@ int main(int argc, char * argv[]) {
   Bool_t  tauLooseMvaIso_;
   Bool_t  tauMediumMvaIso_;
   Bool_t  tauTightMvaIso_;
+  Bool_t  tauVTightMvaIso_;
 
   Bool_t tauAntiMuonLoose3_;
   Bool_t tauAntiMuonTight3_;
@@ -505,7 +568,8 @@ int main(int argc, char * argv[]) {
   Float_t jet2NeutralEMEnergyFraction_;
   Float_t jet2NeutralHadEnergyFraction_;
 
-
+  Float_t mueffweight;
+  Float_t mutrigweight;
 
   UInt_t nSelTaus_;
   UInt_t nTaus20_;
@@ -583,6 +647,8 @@ int main(int argc, char * argv[]) {
   ntuple_->Branch("trigWeight",&trigWeight_,"trigWeight/F");
   ntuple_->Branch("trigWeight74X",&trigWeight74X_,"trigWeight74X/F");
   ntuple_->Branch("weight",    &weight_,    "weight/F");
+  ntuple_->Branch("mueffweight", &mueffweight, "mueffweight/F");
+  ntuple_->Branch("mutrigweight",&mutrigweight,"mutrigweight/F");
 
   ntuple_->Branch("NVert",&nVert_,"NVert/i");
   ntuple_->Branch("trigger",&trig_,"trigger/O");
@@ -622,18 +688,22 @@ int main(int argc, char * argv[]) {
   ntuple_->Branch("fakeAntiLLooseMva", &fakeAntiLLooseMva_, "fakeAntiLLooseMva/F");
   ntuple_->Branch("fakeAntiLMediumMva",&fakeAntiLMediumMva_,"fakeAntiLMediumMva/F");
   ntuple_->Branch("fakeAntiLTightMva", &fakeAntiLTightMva_, "fakeAntiLTightMva/F");
+  ntuple_->Branch("fakeAntiLVTightMva", &fakeAntiLVTightMva_, "fakeAntiLVTightMva/F");
 
   ntuple_->Branch("fakeAntiLLooseMvaUp1", &fakeAntiLLooseMvaUp1_, "fakeAntiLLooseMvaUp1/F");
   ntuple_->Branch("fakeAntiLMediumMvaUp1",&fakeAntiLMediumMvaUp1_,"fakeAntiLMediumMvaUp1/F");
   ntuple_->Branch("fakeAntiLTightMvaUp1", &fakeAntiLTightMvaUp1_, "fakeAntiLTightMvaUp1/F");
+  ntuple_->Branch("fakeAntiLVTightMvaUp1", &fakeAntiLVTightMvaUp1_, "fakeAntiLVTightMvaUp1/F");
 
   ntuple_->Branch("fakeAntiLLooseMvaUp2", &fakeAntiLLooseMvaUp2_, "fakeAntiLLooseMvaUp2/F");
   ntuple_->Branch("fakeAntiLMediumMvaUp2",&fakeAntiLMediumMvaUp2_,"fakeAntiLMediumMvaUp2/F");
   ntuple_->Branch("fakeAntiLTightMvaUp2" ,&fakeAntiLTightMvaUp2_, "fakeAntiLTightMvaUp2/F");
+  ntuple_->Branch("fakeAntiLVTightMvaUp2" ,&fakeAntiLVTightMvaUp2_, "fakeAntiLVTightMvaUp2/F");
 
   ntuple_->Branch("fakeAntiLLooseMvaUp3", &fakeAntiLLooseMvaUp3_, "fakeAntiLLooseMvaUp3/F");
   ntuple_->Branch("fakeAntiLMediumMvaUp3",&fakeAntiLMediumMvaUp3_,"fakeAntiLMediumMvaUp3/F");
   ntuple_->Branch("fakeAntiLTightMvaUp3", &fakeAntiLTightMvaUp3_, "fakeAntiLTightMvaUp3/F");
+  ntuple_->Branch("fakeAntiLVTightMvaUp3", &fakeAntiLVTightMvaUp3_, "fakeAntiLVTightMvaUp3/F");
 
   ntuple_->Branch("met",    &met_,   "met/F");
   ntuple_->Branch("metphi", &metphi_,"metphi/F");
@@ -688,6 +758,7 @@ int main(int argc, char * argv[]) {
   ntuple_->Branch("tauLooseMvaIso", &tauLooseMvaIso_, "tauLooseMvaIso/O");
   ntuple_->Branch("tauMediumMvaIso",&tauMediumMvaIso_,"tauMediumMvaIso/O");
   ntuple_->Branch("tauTightMvaIso", &tauTightMvaIso_, "tauTightMvaIso/O");
+  ntuple_->Branch("tauVTightMvaIso", &tauVTightMvaIso_, "tauVTightMvaIso/O");
 
   ntuple_->Branch("tauAntiMuonLoose3",&tauAntiMuonLoose3_,"tauAntiMuonLoose3/O");
   ntuple_->Branch("tauAntiMuonTight3",&tauAntiMuonTight3_,"tauAntiMuonTight3/O");
@@ -804,14 +875,19 @@ int main(int argc, char * argv[]) {
   
   // Official PU reweighting
   PileUp * PUofficial = new PileUp();
-  TFile * filePUOfficial_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/Data_Pileup_2015D_Feb02.root","read");
-  TFile * filePUOfficial_MC = new TFile (TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/MC_Fall15_PU25_V1.root", "read");
+  TFile * filePUOfficial_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/"+PUDataFile,"read");
+  TFile * filePUOfficial_MC = new TFile (TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/"+PUMCFile, "read");
   TH1D * PUOfficial_data = (TH1D *)filePUOfficial_data->Get("pileup");
   TH1D * PUOfficial_mc = (TH1D *)filePUOfficial_MC->Get("pileup");
   PUofficial->set_h_data(PUOfficial_data);
   PUofficial->set_h_MC(PUOfficial_mc);
 
-  // Trigger efficiencies
+  ScaleFactor * SF_muonIdIso = new ScaleFactor();
+  ScaleFactor * SF_muonTrig = new ScaleFactor();
+  SF_muonIdIso->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(MuonIdIsoFile));
+  SF_muonTrig->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(MuonTrigFile));
+
+ // Trigger efficiencies
   TFile * trigEffFile = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/"+trigEffFileName);
   TF1 * trigEffDataLowerMt = (TF1*)trigEffFile->Get("MhtLt100_data");
   TF1 * trigEffDataUpperMt = (TF1*)trigEffFile->Get("MhtGt100_data");
@@ -828,10 +904,12 @@ int main(int argc, char * argv[]) {
   std::vector<TString> metFlags; metFlags.clear();
   metFlags.push_back("Flag_HBHENoiseFilter");
   metFlags.push_back("Flag_HBHENoiseIsoFilter");
-  metFlags.push_back("Flag_CSCTightHalo2015Filter");
+  metFlags.push_back("Flag_globalTightHalo2016Filter");
   metFlags.push_back("Flag_EcalDeadCellTriggerPrimitiveFilter");
   metFlags.push_back("Flag_goodVertices");
   metFlags.push_back("Flag_eeBadScFilter");
+  metFlags.push_back("Flag_muonBadTrackFilter");
+  metFlags.push_back("Flag_chargedHadronTrackResolutionFilter");
 
   int nFiles = 0;
   int nEvents = 0;
@@ -887,10 +965,10 @@ int main(int argc, char * argv[]) {
       event_ = analysisTree.event_nr;
       nVert_ = analysisTree.primvertex_count;
 
-      //      if (event_<=0) {
-      //	std::cout << "Event : " << event_ << std::endl;
-      //	std::cout << "From NTuple = " << analysisTree.event_nr << std::endl;
-      //      }
+      if (event_<=0) {
+	std::cout << "Event : " << event_ << std::endl;
+	std::cout << "From NTuple = " << analysisTree.event_nr << std::endl;
+      }
 
       weight_ = 1;
       genWeight_ = 1;
@@ -939,18 +1017,22 @@ int main(int argc, char * argv[]) {
       fakeAntiLLooseMvaUp1_ = 1.;
       fakeAntiLMediumMvaUp1_ = 1.;
       fakeAntiLTightMvaUp1_ = 1.;
+      fakeAntiLVTightMvaUp1_ = 1.;
 
       fakeAntiLLooseMvaUp2_ = 1.;
       fakeAntiLMediumMvaUp2_ = 1.;
       fakeAntiLTightMvaUp2_ = 1.;
+      fakeAntiLVTightMvaUp2_ = 1.;
 
       fakeAntiLLooseMvaUp3_ = 1.;
       fakeAntiLMediumMvaUp3_ = 1.;
       fakeAntiLTightMvaUp3_ = 1.;
+      fakeAntiLVTightMvaUp3_ = 1.;
 
       fakeAntiLLooseMva_ = 1.;
       fakeAntiLMediumMva_ = 1.;
       fakeAntiLTightMva_ = 1.;
+      fakeAntiLVTightMva_ = 1.;
 
       met_ =  -1;
       metphi_ =  0;
@@ -1005,6 +1087,7 @@ int main(int argc, char * argv[]) {
       tauLooseMvaIso_ = false;
       tauMediumMvaIso_ = false;
       tauTightMvaIso_ = false;
+      tauVTightMvaIso_ = false;
 
       tauAntiMuonLoose3_ = false;
       tauAntiMuonTight3_ = false;
@@ -1071,6 +1154,9 @@ int main(int argc, char * argv[]) {
       pf2Jet60_ = false;
       pf2Jet80_ = false;
       pf2Jet140_ = false;
+
+      mueffweight = 1;
+      mutrigweight = 1;
 
       // booleans 
       bool isZJet = false;
@@ -1256,7 +1342,8 @@ int main(int argc, char * argv[]) {
       if (!isData) { 
 	puWeight_ =  float(PUofficial->get_PUweight(double(analysisTree.numtruepileupinteractions)));
       	weight_ *= puWeight_; 
-	//	cout << "nPU = " << analysisTree.numtruepileupinteractions << " --> puweight = " << puWeight_ << endl;
+	if (debug)
+	  cout << "nPU = " << analysisTree.numtruepileupinteractions << " --> puweight = " << puWeight_ << endl;
       }
 
       // ***********************************
@@ -1342,10 +1429,29 @@ int main(int argc, char * argv[]) {
 	  isPFJet140HLTFilter = true;
 	}
       }
-      if (!isSingleMuonHLTFilter) {
-	std::cout << "HLT filter " << SingleMuonHLTFilterName << " not found" << std::endl;
-        exit(-1);
+      if (isData) {
+	if (!isSingleMuonHLTFilter) {
+	  std::cout << "HLT filter " << SingleMuonHLTFilterName << " not found" << std::endl;
+	  exit(-1);
+	}
+	if (!isPFJet40HLTFilter) {
+	  std::cout << "HLT filter " << PFJet40HLTFilterName << " not found" << std::endl;
+	  exit(-1);
+	}
+	if (!isPFJet60HLTFilter) {
+	  std::cout << "HLT filter " << PFJet60HLTFilterName << " not found" << std::endl;
+	  exit(-1);
+	}
+	if (!isPFJet80HLTFilter) {
+	  std::cout << "HLT filter " << PFJet80HLTFilterName << " not found" << std::endl;
+	  exit(-1);
+	}
+	if (!isPFJet140HLTFilter) {
+	  std::cout << "HLT filter " << PFJet140HLTFilterName << " not found" << std::endl;
+	  exit(-1);
+	}
       }
+
       // ************************************
       // **** end accessing trigger info ****
       // ************************************
@@ -1395,7 +1501,6 @@ int main(int argc, char * argv[]) {
       metphi_ = TMath::ATan2(pfmet_ey,pfmet_ex);
       TLorentzVector lorentzVectorMet; lorentzVectorMet.SetXYZM(pfmet_ex,pfmet_ey,0,0);
 
-
       // *************************
       // **** accessing muons ****
       // *************************
@@ -1407,6 +1512,7 @@ int main(int argc, char * argv[]) {
       std::vector<TLorentzVector>  lorentzVectorSelMuons; lorentzVectorSelMuons.clear();
       int indexTriggerMu = -1;
       float ptTriggerMu  = -1;
+      float etaTriggerMu = -1; 
       float muonHt = 0;
       for (unsigned int imuon=0; imuon<analysisTree.muon_count; ++imuon) {
 	analysisTree.muon_px[imuon] *= muonMomScale;
@@ -1416,16 +1522,38 @@ int main(int argc, char * argv[]) {
 	if (analysisTree.muon_pt[imuon]<ptMuCut) continue;
 	if (fabs(analysisTree.muon_eta[imuon])>etaMuCut) continue;
 	bool passedId = analysisTree.muon_isMedium[imuon];
+	if (isMuonIdICHEP) {
+	  bool goodGlob =
+	    analysisTree.muon_isGlobal[imuon] &&
+	    analysisTree.muon_normChi2[imuon] < 3 &&
+	    analysisTree.muon_combQ_chi2LocalPosition[imuon] < 12 &&
+	    analysisTree.muon_combQ_trkKink[imuon] < 20;
+	  passedId =
+	    analysisTree.muon_isLoose[imuon] &&
+	    analysisTree.muon_validFraction[imuon] >0.49 &&
+	    analysisTree.muon_segmentComp[imuon] > (goodGlob ? 0.303 : 0.451);
+	}
 	if (!passedId) continue;
 	bool passedIpCuts = 
 	  fabs(analysisTree.muon_dxy[imuon]) < dxyMuCut &&
 	  fabs(analysisTree.muon_dz[imuon]) < dzMuCut;
 	if (!passedIpCuts) continue;
-	float absIso = analysisTree.muon_r03_sumChargedHadronPt[imuon];
-	float neutralIso = analysisTree.muon_r03_sumNeutralHadronEt[imuon] + 
-	  analysisTree.muon_r03_sumPhotonEt[imuon] - 0.5*analysisTree.muon_r03_sumPUPt[imuon];
-	neutralIso = TMath::Max(float(0),neutralIso);
-	absIso += neutralIso;
+	float absIso = 0; 
+	if (isDRIso03) {
+	  absIso = analysisTree.muon_r03_sumChargedHadronPt[imuon];
+	  float neutralIso = analysisTree.muon_r03_sumNeutralHadronEt[imuon] + 
+	    analysisTree.muon_r03_sumPhotonEt[imuon] - 0.5*analysisTree.muon_r03_sumPUPt[imuon];
+	  neutralIso = TMath::Max(float(0),neutralIso);
+	  absIso += neutralIso;
+	}
+	else {
+	  absIso = analysisTree.muon_chargedHadIso[imuon];
+          float neutralIso = analysisTree.muon_neutralHadIso[imuon] +
+            analysisTree.muon_photonIso[imuon] -
+            0.5*analysisTree.muon_puIso[imuon];
+          neutralIso = TMath::Max(float(0),neutralIso);
+          absIso += neutralIso;
+	} 
 	float relIso = absIso/analysisTree.muon_pt[imuon];
 	bool passedIso = relIso < isoMuCut;
 	if (!passedIso) continue;
@@ -1464,8 +1592,10 @@ int main(int argc, char * argv[]) {
 	    if (analysisTree.trigobject_filters[iT][nSingleMuonHLTFilter]) trigMatch = true;
 
 	  }
+	  if (!isData) trigMatch = true;
 	  if (trigMatch&&analysisTree.muon_pt[imuon]>ptTriggerMu) {
 	    ptTriggerMu = analysisTree.muon_pt[imuon];
+	    etaTriggerMu = analysisTree.muon_eta[imuon];
 	    indexTriggerMu = int(imuon);
 	  }
 	}
@@ -1480,6 +1610,7 @@ int main(int argc, char * argv[]) {
       nSelMuonTrig_ = nSelMuon_;
 
       float ptSecondMu  = -1;
+      float etaSecondMu = -1;
       int indexSecondMu = -1;
       TLorentzVector lorentzVectorTriggerMu; lorentzVectorTriggerMu.SetXYZT(0,0,0,0);
       TLorentzVector lorentzVectorSecondMu;  lorentzVectorSecondMu.SetXYZT(0,0,0,0);
@@ -1503,6 +1634,7 @@ int main(int argc, char * argv[]) {
 	  if (netcharge>0) continue;
 	  if (analysisTree.muon_pt[indexMu]>ptSecondMu) {
 	    ptSecondMu = analysisTree.muon_pt[indexMu];
+	    etaSecondMu = analysisTree.muon_eta[indexMu];
 	    indexSecondMu = int(indexMu);
 	  }
 	}
@@ -1524,14 +1656,21 @@ int main(int argc, char * argv[]) {
       }
       float ptLeadingMu = ptTriggerMu;
       float ptTrailingMu = ptSecondMu;
+      float etaLeadingMu = etaTriggerMu;
+      float etaTrailingMu = etaSecondMu;
+
       if (ptTrailingMu>ptLeadingMu) {
 	ptLeadingMu = ptSecondMu;
 	ptTrailingMu = ptTriggerMu;
+	etaLeadingMu = etaSecondMu;
+	etaTrailingMu = etaTriggerMu;
       }
       // *****************************
       // **** end accessing muons ****
       // *****************************
 
+      if (debug)
+	std::cout << "end accessing muons " << std::endl;
 
       // *****************************
       // **** accessing electrons ****
@@ -1576,6 +1715,8 @@ int main(int argc, char * argv[]) {
       // **** end accessing electrons ****
       // *********************************     
 
+      if (debug)
+	std::cout << "end accessing electrons " << std::endl;
 
       // ************************
       // **** accessing jets ****
@@ -1713,6 +1854,12 @@ int main(int argc, char * argv[]) {
 	  if ((analysisTree.trigobject_filters[iT][nPFJet140HLTFilter]&&isPFJet140HLTFilter)) trigMatch140 = true;
 	  
 	}
+	if (!isData) {
+	  trigMatch40 = true;
+	  trigMatch60 = true;
+	  trigMatch80 = true;
+	  trigMatch140 = true;
+	}
 	triggerJetsIndexes.push_back(ijet);
 	jets40trigger.push_back(trigMatch40);
 	jets60trigger.push_back(trigMatch60);
@@ -1793,6 +1940,8 @@ int main(int argc, char * argv[]) {
       // **** end accessing jets ****
       // ****************************
 
+      if (debug)
+	std::cout << "end accessing jets" << std::endl;
 
       // ************************
       // **** accessing taus ****
@@ -1968,6 +2117,12 @@ int main(int argc, char * argv[]) {
 	tauLooseMvaIso_ = analysisTree.tau_byLooseIsolationMVArun2v1DBoldDMwLT[indexTau] > 0.5;
 	tauMediumMvaIso_ = analysisTree.tau_byMediumIsolationMVArun2v1DBoldDMwLT[indexTau] > 0.5;
 	tauTightMvaIso_ = analysisTree.tau_byTightIsolationMVArun2v1DBoldDMwLT[indexTau] > 0.5;
+	tauVTightMvaIso_ = analysisTree.tau_byVTightIsolationMVArun2v1DBoldDMwLT[indexTau] > 0.5;
+
+	//	std::cout << "TauMva : Loose = " << tauLooseMvaIso_
+	//		  << "  Medium = " << tauMediumMvaIso_
+	//		  << "  Tight = " << tauTightMvaIso_ 
+	//		  << "  VTight = " << tauVTightMvaIso_ << std::endl;
 
 	tauAntiMuonLoose3_ = analysisTree.tau_againstMuonLoose3[indexTau] > 0.5;
 	tauAntiMuonTight3_ = analysisTree.tau_againstMuonTight3[indexTau] > 0.5;
@@ -1978,8 +2133,8 @@ int main(int argc, char * argv[]) {
 	tauAntiElectronVLooseMVA6_ = analysisTree.tau_againstElectronVLooseMVA6[indexTau] > 0.5;
 	tauAntiElectronLooseMVA6_ = analysisTree.tau_againstElectronLooseMVA6[indexTau] > 0.5;
 
-	float fake[3]; 
-	float efake[3];
+	float fake[4]; 
+	float efake[4];
 	int iso;
 
 	FakeRate(tauPt_,fake, efake,iso);
@@ -2019,36 +2174,43 @@ int main(int argc, char * argv[]) {
 	// MVA
 	FakeRateMva(tauPt_,fake, efake,iso);
 
-	fakeAntiLLooseMva_  = fake[0]; 
-	fakeAntiLMediumMva_ = fake[1];
-	fakeAntiLTightMva_  = fake[2];
+	fakeAntiLLooseMva_   = fake[0]; 
+	fakeAntiLMediumMva_  = fake[1];
+	fakeAntiLTightMva_   = fake[2];
+	fakeAntiLVTightMva_  = fake[3];
 	
-	fakeAntiLLooseMvaUp1_  = fake[0]; 
-	fakeAntiLMediumMvaUp1_ = fake[1];
-	fakeAntiLTightMvaUp1_  = fake[2];
+	fakeAntiLLooseMvaUp1_   = fake[0]; 
+	fakeAntiLMediumMvaUp1_  = fake[1];
+	fakeAntiLTightMvaUp1_   = fake[2];
+	fakeAntiLVTightMvaUp1_  = fake[3];
 
-	fakeAntiLLooseMvaUp2_  = fake[0];
-	fakeAntiLMediumMvaUp2_ = fake[1];
-	fakeAntiLTightMvaUp2_  = fake[2];
+	fakeAntiLLooseMvaUp2_   = fake[0];
+	fakeAntiLMediumMvaUp2_  = fake[1];
+	fakeAntiLTightMvaUp2_   = fake[2];
+	fakeAntiLVTightMvaUp2_  = fake[3];
 
-	fakeAntiLLooseMvaUp3_  = fake[0];
-	fakeAntiLMediumMvaUp3_ = fake[1];
-	fakeAntiLTightMvaUp3_  = fake[2];
+	fakeAntiLLooseMvaUp3_   = fake[0];
+	fakeAntiLMediumMvaUp3_  = fake[1];
+	fakeAntiLTightMvaUp3_   = fake[2];
+	fakeAntiLVTightMvaUp3_  = fake[3];
 
 	if (iso==0) {
 	  fakeAntiLLooseMvaUp1_  = fake[0] + efake[0]; 
 	  fakeAntiLMediumMvaUp1_ = fake[1] + efake[1];
 	  fakeAntiLTightMvaUp1_  = fake[2] + efake[2];
+	  fakeAntiLVTightMvaUp1_ = fake[3] + efake[3];
 	}
 	else if (iso==1) {
 	  fakeAntiLLooseMvaUp2_  = fake[0] + efake[0]; 
 	  fakeAntiLMediumMvaUp2_ = fake[1] + efake[1];
 	  fakeAntiLTightMvaUp2_  = fake[2] + efake[2];
+	  fakeAntiLVTightMvaUp2_ = fake[3] + efake[3];
 	}
 	else {
 	  fakeAntiLLooseMvaUp3_  = fake[0] + efake[0]; 
 	  fakeAntiLMediumMvaUp3_ = fake[1] + efake[1];
 	  fakeAntiLTightMvaUp3_  = fake[2] + efake[2];
+	  fakeAntiLVTightMvaUp3_ = fake[3] + efake[3];
 	}
 	
 
@@ -2060,6 +2222,9 @@ int main(int argc, char * argv[]) {
       // ****************************
       // **** end accessing taus ****
       // ****************************
+      
+      if (debug)
+	std::cout << "end of accessing taus" << std::endl;
 
       // ****************************
       // ****** trigger weight ******
@@ -2084,15 +2249,16 @@ int main(int argc, char * argv[]) {
 	}
 	
       }
-      trigWeight_ = trigEffData/trigEffMC;
-      trigWeight74X_ = trigEffData_74X/trigEffMC_74X;
-      //      if (trigWeight_!=1) {
-      //	cout << "MetNoMu = " << metNoMu_ 
-      //	     << "  MhtNoMu = " << mhtNoMu_ 
-      //	     << "  trigWeight = " << trigWeight_ << endl;
-      //      }
+      if (trigEffData<0) trigEffData = 0;
+      if (trigEffData_74X<0) trigEffData_74X = 0;
+      trigWeight_ = trigEffData;
+      trigWeight74X_ = trigEffData_74X;
+      if (debug) {
+	cout << "MetNoMu = " << metNoMu_ 
+	     << "  MhtNoMu = " << mhtNoMu_ 
+	     << "  trigWeight = " << trigWeight_ << endl;
+      }
       weight_ *= trigWeight_;
-
 
       // ********************************
       // **** filling trigger ntuple ****
@@ -2106,6 +2272,7 @@ int main(int argc, char * argv[]) {
       // ******************************
       // ********* ZJet selection *****
       // ******************************
+      /*
       if (lorentzVectorZ.Pt()>1e-4) {
 	recoilRatio_ = tauPt_ / lorentzVectorZ.Pt();
 	recoilDPhi_  = dPhiFromLV(lorentzVectorZ,lorentzVectorTau);
@@ -2115,6 +2282,13 @@ int main(int argc, char * argv[]) {
 	isZJet = isZJet && recoilRatio_>ptJetZRatioLowerCut_ZJet && recoilRatio_<ptJetZRatioUpperCut_ZJet;
 	isZJet = isZJet && recoilDPhi_>deltaPhiZJetCut_ZJet;
 	if (isZJet) { 
+	  float leadMuIso = SF_muonIdIso->get_ScaleFactor(ptLeadingMu, etaLeadingMu);
+	  float trailMuIso = SF_muonIdIso->get_ScaleFactor(ptTrailingMu, etaTrailingMu);
+	  mueffweight = leadMuIso*trailMuIso;
+	  //	  float leadMuTrig = SF_muonTrig->get_EfficiencyData(ptLeadingMu, etaLeadingMu);
+	  //	  float trailMuTrig = SF_muonTrig->get_EfficiencyData(ptTrailingMu, etaTrailingMu);
+	  //	  mutrigweight = 1 - (1-leadMuTrig)*(1-trailMuTrig);
+	  mutrigweight = SF_muonTrig->get_EfficiencyData(ptTriggerMu, etaTriggerMu);
 	  HtNoRecoil_     = Ht_     - ptTriggerMu - ptSecondMu;
 	  SoftHtNoRecoil_ = SoftHt_ - ptTriggerMu - ptSecondMu;
 	  recoilM_   = lorentzVectorZ.M();
@@ -2126,7 +2300,7 @@ int main(int argc, char * argv[]) {
 	  ZJetEvents++;
 	}
       }
-
+      */
       // ***************************
       // ******* WJet selection ****
       // ***************************
@@ -2138,6 +2312,8 @@ int main(int argc, char * argv[]) {
 	isWJet = isWJet && recoilRatio_>ptJetWRatioLowerCut_WJet && recoilRatio_<ptJetWRatioUpperCut_WJet;
 	isWJet = isWJet && recoilDPhi_>deltaPhiWJetCut_WJet;
 	if (isWJet) {
+	  mueffweight  = SF_muonIdIso->get_ScaleFactor(ptTriggerMu, etaTriggerMu);
+          mutrigweight = SF_muonTrig->get_EfficiencyData(ptTriggerMu, etaTriggerMu);
 	  HtNoRecoil_     = Ht_     - ptTriggerMu;
 	  SoftHtNoRecoil_ = SoftHt_ - ptTriggerMu;
 	  recoilM_   = lorentzVectorW.M();
@@ -2153,6 +2329,7 @@ int main(int argc, char * argv[]) {
       // ***************************
       // ******* W+Jet selection ****
       // ***************************
+      /*
       if (lorentzVectorW.Pt()>1e-4&&nJetsCentral30_>=1) {
 	recoilRatio_ = jetPt_ / lorentzVectorW.Pt();
 	recoilDPhi_  = dPhiFromLV(lorentzVectorW,lorentzVectorJet);
@@ -2161,6 +2338,8 @@ int main(int argc, char * argv[]) {
 	isWJet = isWJet && recoilRatio_>ptJetWRatioLowerCut_WJet && recoilRatio_<ptJetWRatioUpperCut_WJet;
 	isWJet = isWJet && recoilDPhi_>deltaPhiWJetCut_WJet;
 	if (isWJet) {
+	  mueffweight  = SF_muonIdIso->get_ScaleFactor(ptTriggerMu, etaTriggerMu);
+          mutrigweight = SF_muonTrig->get_EfficiencyData(ptTriggerMu, etaTriggerMu);
 	  HtNoRecoil_     = Ht_     - ptTriggerMu;
 	  SoftHtNoRecoil_ = SoftHt_ - ptTriggerMu;
 	  recoilM_   = lorentzVectorW.M();
@@ -2172,14 +2351,17 @@ int main(int argc, char * argv[]) {
 	  WJetEvents++;
 	}
       }
-      
+      */
       // ********************************
       // ****** W->mu+v selection *******
       // ********************************
+      /*
       if (lorentzVectorW.Pt()>1e-4) {
 	bool isWprod = ptTriggerMu>ptMuCut_WJet;
         isWprod = isWprod && mtmuon_ > mtCut_WJet;
 	if (isWprod) {
+	  mueffweight  = SF_muonIdIso->get_ScaleFactor(ptTriggerMu, etaTriggerMu);
+          mutrigweight = SF_muonTrig->get_EfficiencyData(ptTriggerMu, etaTriggerMu);
 	  recoilRatio_ = lorentzVectorTriggerMu.Pt() / lorentzVectorMet.Pt();
 	  recoilDPhi_  = dPhiFromLV(lorentzVectorTriggerMu,lorentzVectorMet);
 	  HtNoRecoil_     = Ht_     - ptTriggerMu;
@@ -2193,7 +2375,7 @@ int main(int argc, char * argv[]) {
 	  WProdEvents++;
 	}
       }
-
+      */
       // ********************************
       // ******* W*->MuNu selection *****
       // ********************************
@@ -2205,6 +2387,8 @@ int main(int argc, char * argv[]) {
 	isWMuNu = isWMuNu && recoilRatio_>ptMuMetRatioLowerCut_WMuNu && recoilRatio_<ptMuMetRatioUpperCut_WMuNu;
 	isWMuNu = isWMuNu && recoilDPhi_>deltaPhiMuMetCut_WMuNu;
 	if (isWMuNu) {
+	  mueffweight  = SF_muonIdIso->get_ScaleFactor(ptTriggerMu, etaTriggerMu);
+          mutrigweight = SF_muonTrig->get_EfficiencyData(ptTriggerMu, etaTriggerMu);
 	  HtNoRecoil_     = Ht_;
 	  SoftHtNoRecoil_ = SoftHt_;
 	  recoilM_   = lorentzVectorMet.M();
@@ -2220,6 +2404,7 @@ int main(int argc, char * argv[]) {
       // *********************************
       // ** Single JET + MET selection ***
       // *********************************
+      /*
       if (lorentzVectorMet.Pt()>1e-4&&nJetsCentral30_==1) {
 	recoilRatio_ = jetPt_/lorentzVectorMet.Pt();
 	recoilDPhi_  = dPhiFromLV(lorentzVectorJet,lorentzVectorMet);
@@ -2236,10 +2421,11 @@ int main(int argc, char * argv[]) {
 	}
 
       }
-
+      */
       // *************************
       // **** Dijet selection ****
       // *************************
+      /*
       if (nJetsCentral30_>=2) {
 	recoilRatio_ = jet2Pt_/jetPt_;
 	recoilDPhi_  = dPhiFromLV(lorentzVectorJet,lorentzVectorJet2);	
@@ -2255,7 +2441,7 @@ int main(int argc, char * argv[]) {
 	  DiJetEvents++;
 	}
       }
-
+      */
 
       // 
 
@@ -2426,6 +2612,7 @@ int main(int argc, char * argv[]) {
 	    tauLooseMvaIso_ = analysisTree.tau_byLooseIsolationMVArun2v1DBoldDMwLT[indexTau] > 0.5;
 	    tauMediumMvaIso_ = analysisTree.tau_byMediumIsolationMVArun2v1DBoldDMwLT[indexTau] > 0.5;
 	    tauTightMvaIso_ = analysisTree.tau_byTightIsolationMVArun2v1DBoldDMwLT[indexTau] > 0.5;
+	    tauVTightMvaIso_ = analysisTree.tau_byVTightIsolationMVArun2v1DBoldDMwLT[indexTau] > 0.5;
 
 	    tauAntiMuonLoose3_ = analysisTree.tau_againstMuonLoose3[indexTau] > 0.5;
 	    tauAntiMuonTight3_ = analysisTree.tau_againstMuonTight3[indexTau] > 0.5;
