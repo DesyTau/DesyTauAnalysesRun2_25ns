@@ -822,7 +822,7 @@ int main(int argc, char * argv[]){
       if (!isData && applyRecoilCorrections && (isDY || isWJets || isVBForGGHiggs) ){
 				genV = genTools::genV(analysisTree);
 				genL = genTools::genL(analysisTree);
-				otree->njetshad = genTools::nJetsHad(analysisTree);
+				if(isWJets) otree->njetshad += 1;
       }
 
       // MVA MET      
