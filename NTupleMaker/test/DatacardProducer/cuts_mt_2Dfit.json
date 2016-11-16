@@ -1,0 +1,5 @@
+{
+"0jet":"pt_2 > 30 && njets==0 && pt_1>23 && iso_1 < 0.15 && byTightIsolationMVArun2v1DBoldDMwLT_2>0.5 && againstElectronVLooseMVA6_2>0.5 && againstMuonTight3_2>0.5  && dilepton_veto == 0 && extraelec_veto == 0 && extramuon_veto == 0",
+"boosted":"pt_2>30 &&(njets==1 || (njets==2 && mjj<300) || njets>2) && pt_1>23 && iso_1 < 0.15 && byTightIsolationMVArun2v1DBoldDMwLT_2>0.5 && againstElectronVLooseMVA6_2>0.5 && againstMuonTight3_2>0.5  && dilepton_veto == 0 && extraelec_veto == 0 && extramuon_veto == 0",
+"vbf":"pt_2>30 && njets==2 && mjj>300  && pt_1>23 && iso_1 < 0.15 && byTightIsolationMVArun2v1DBoldDMwLT_2>0.5 && againstElectronVLooseMVA6_2>0.5 && againstMuonTight3_2>0.5  && dilepton_veto == 0 && extraelec_veto == 0 && extramuon_veto == 0 "
+}
