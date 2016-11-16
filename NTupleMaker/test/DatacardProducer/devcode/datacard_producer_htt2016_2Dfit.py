@@ -47,8 +47,16 @@ def defineBlinding(blind,var,category):
 	"m_sv":"(m_sv<100 || m_sv>150)",
 	"mt_tot":"(mt_tot<80 || mt_tot>130)"
 	}
+	blinding_2Dfit = {
+	"0jet":"(m_vis<65 || m_vis>110)", 
+	"boosted":"(m_sv<100 || m_sv>150)",
+	"vbf":"(m_sv<95 || m_sv > 155)"
+	}	
 	if (blind and (var in blinding) and ("inclusive" not in category)):
-		blindingCut = blinding[var]
+		if (datacardFor2Dfit):
+			blindingCut = blinding_2Dfit[ckey]
+		else:
+			blindingCut = blinding[var]
 		print "applying blinding for " , var , " : " , blindingCut
 	else:
 		blindingCut = " 1 "
@@ -56,15 +64,15 @@ def defineBlinding(blind,var,category):
 	
 
 def makeDatacard_ssos(treeName, files, cut, weight, histo, histo_ss):
-	print "opposite sign"
+	#print "opposite sign"
 	makeDatacard_category(treeName, files, cut, "q_1 * q_2 < 0.", weight, "_os", histo)
-	print "same sign"
+	#print "same sign"
 	makeDatacard_category(treeName, files, cut, "q_1 * q_2 > 0.", weight, "_ss", histo_ss)
 
 def makeDatacard_sample_inc(treeName, sampleKey,sampleDict, catName, weight, cut, additionalCut):
 	hsample = hdummy.Clone(sampleKey+catName)
 	for fileName in sampleDict["files"]:
-		print "file name", fileName
+		#print "file name", fileName
 		f=TFile(indir+"/"+fileName+".root", "read")
 		t = f.Get(treeName)
 		h = hdummy.Clone(fileName+catName)
@@ -112,12 +120,7 @@ def makeBinString(weightsDict, binVar):
 	htwstr = htwstr[0:-2]
 	htwstr += ")"
 	return htwstr
-'''
-def unroll_all(histo_list, out_list):
-	#out_list = []
-	for h in histo_list:
-		out_list.append(unroll(h))
-'''
+
 def unroll(histo2D):			
 	if histo2D is not None:
 		htitle = histo2D.GetTitle()
@@ -136,6 +139,112 @@ def unroll(histo2D):
 	else:
 		pass
 
+#histo_list should contain tuples of (histogram, factor)
+def add_all(result, histo_list):
+	for h in histo_list:
+		result.Add(h[0],h[1])
+
+
+def Wjets_dataMC_sf(SSOSratio, hw): #hw contains the result of the calculation, should be the w histogram as it comes from MC, nominal selection
+
+	print "Wjets data-driven normalisation from high mt region"
+	print "using SS/OS QCD  = ", SSOSratio
+
+	hdata_os_highmt = hdummy.Clone("hdata_os_highmt")
+	hdata_ss_highmt = hdummy.Clone("hdata_ss_highmt")
+	tdata.Draw(var+" >> hdata_os_highmt", cvalue+"&&"+highMTcut+" && q_1 * q_2 < 0. ")
+	tdata.Draw(var + " >> hdata_ss_highmt", cvalue+"&&"+highMTcut+" && q_1 * q_2 > 0. " )
+
+	hvv_os_highmt = hdummy.Clone("hvv_os_highmt")
+	hvv_ss_highmt = hdummy.Clone("hvv_ss_highmt")
+	makeDatacard_ssos(treeName, lvv, cvalue+"&&"+highMTcut, wvalue, hvv_os_highmt, hvv_ss_highmt)
+	hewkz_os_highmt = hdummy.Clone("hewkz_os_highmt")
+	hewkz_ss_highmt = hdummy.Clone("hewkz_ss_highmt")
+	makeDatacard_ssos(treeName, lewkz, cvalue+"&&"+highMTcut, wvalue, hewkz_os_highmt, hewkz_ss_highmt)
+	htt_os_highmt = hdummy.Clone("htt_os_highmt")
+	htt_ss_highmt = hdummy.Clone("htt_ss_highmt")
+	makeDatacard_ssos(treeName, ltt, cvalue+"&&"+highMTcut, wvalue, htt_os_highmt, htt_ss_highmt)
+	hdy_os_highmt = hdummy.Clone("hdy_os_highmt")
+	hdy_ss_highmt = hdummy.Clone("hdy_ss_highmt")
+	makeDatacard_ssos(treeName, ldy, cvalue+"&&"+highMTcut, wvalue, hdy_os_highmt, hdy_ss_highmt)
+	hw_os_highmt = hdummy.Clone("hw_os_highmt")
+	hw_ss_highmt = hdummy.Clone("hw_ss_highmt")		
+	makeDatacard_ssos(treeName, lw, cvalue+"&&"+highMTcut, wvalue, hw_os_highmt, hw_ss_highmt)
+
+	hqcd_ss_highmt = hdummy.Clone("hqcd_ss_highmt")
+	add_all(hqcd_ss_highmt, [(hdata_ss_highmt,1),(hvv_ss_highmt,-1),(htt_ss_highmt,-1),(hdy_ss_highmt,-1),(hw_ss_highmt,-1),(hewkz_ss_highmt,-1)])	
+			
+	#if relaxed selection, 
+	# 1. define and fill histograms with ss + highmt + relaxed selection
+	# 2. calculate qcd ss relaxed by subtracting data ss - all other MC
+	# 3. normalise qcd ss relaxed to the yield of qcd ss w/o relaxed selection.
+	
+	#1
+
+	if (relaxedSel is not None):
+		print "relaxed sel in QCD in Wjets:" , relaxedSel+"&&"+highMTcut+"&& q_1*q_2>0"
+
+		hdata_ss_highmt_rel = hdummy.Clone("hdata_ss_highmt_rel")
+		tdata.Draw(var+">> hdata_ss_highmt_rel", relaxedSel+"&&"+highMTcut+"&& q_1*q_2>0")
+		hvv_ss_highmt_rel = hdummy.Clone("hvv_ss_highmt_rel")
+		makeDatacard_category(treeName, lvv, relaxedSel+"&&"+highMTcut, "q_1*q_2>0", wvalue, "_highmt_ss_rel", hvv_ss_highmt_rel )
+		hewkz_ss_highmt_rel = hdummy.Clone("hewkz_ss_highmt_rel")
+		makeDatacard_category(treeName, lewkz, relaxedSel+"&&"+highMTcut, "q_1*q_2>0", wvalue, "_highmt_ss_rel", hewkz_ss_highmt_rel )
+		htt_ss_highmt_rel = hdummy.Clone("htt_ss_highmt_rel")
+		makeDatacard_category(treeName, ltt, relaxedSel+"&&"+highMTcut, "q_1*q_2>0", wvalue, "_highmt_ss_rel", htt_ss_highmt_rel )
+		hdy_ss_highmt_rel = hdummy.Clone("hdy_ss_highmt_rel")
+		makeDatacard_category(treeName, ldy, relaxedSel+"&&"+highMTcut, "q_1*q_2>0", wvalue, "_highmt_ss_rel", hdy_ss_highmt_rel )
+		hw_ss_highmt_rel = hdummy.Clone("hw_ss_highmt_rel")
+		makeDatacard_category(treeName, lw, relaxedSel+"&&"+highMTcut, "q_1*q_2>0",  wvalue, "_highmt_ss_rel", hw_ss_highmt_rel )
+	#2
+		hqcd_ss_highmt_rel = hdummy.Clone("hqcd_ss_highmt_rel")
+		add_all(hqcd_ss_highmt_rel, [(hdata_ss_highmt_rel,1),(hvv_ss_highmt_rel,-1),(htt_ss_highmt_rel,-1),(hdy_ss_highmt_rel,-1),(hw_ss_highmt_rel,-1),(hewkz_ss_highmt_rel,-1)])	
+	#3
+		hqcd_ss_highmt_rel.Scale(hqcd_ss_highmt.Integral()/(hqcd_ss_highmt_rel.Integral()))
+		hqcd_ss_highmt = hqcd_ss_highmt_rel
+
+	hw_os_highmt_datadriven = hdummy.Clone("hw_os_highmt_datadriven") 
+	add_all(hw_os_highmt_datadriven, [(hdata_os_highmt,1),(hvv_os_highmt,-1),(htt_os_highmt,-1),(hdy_os_highmt,-1),(hewkz_os_highmt,-1),(hqcd_ss_highmt, -1*SSOSratio)] )
+
+	# apply some relaxed selection. check which. For now taking the usual one. 
+	relaxed_cuts_w_MC = {
+	"mt_boosted":"pt_2>30 &&(njets==1 || (njets==2 && mjj<300) || njets>2) && pt_1>23 && iso_1 < 0.3 && byMediumIsolationMVArun2v1DBoldDMwLT_2>0.5 && againstElectronVLooseMVA6_2>0.5 && againstMuonTight3_2>0.5  && dilepton_veto == 0 && extraelec_veto == 0 && extramuon_veto == 0", 
+	"mt_vbf":"pt_2>30 && njets==2 && mjj>300  && pt_1>23 && iso_1 < 0.3 && byMediumIsolationMVArun2v1DBoldDMwLT_2>0.5 && againstElectronVLooseMVA6_2>0.5 && againstMuonTight3_2>0.5  && dilepton_veto == 0 && extraelec_veto == 0 && extramuon_veto == 0 ", 
+	"mt_0jet": "pt_2 > 30 && njets==0 && pt_1>23 && iso_1 < 0.3 && byMediumIsolationMVArun2v1DBoldDMwLT_2>0.5 && againstElectronVLooseMVA6_2>0.5 && againstMuonTight3_2>0.5  && dilepton_veto == 0 && extraelec_veto == 0 && extramuon_veto == 0",
+	"et_boosted":"pt_2>30 && (njets==1 || (njets==2 && mjj<300) || njets>2) && pt_1>26 && fabs(eta_1)<2.1 && iso_1 < 0.3 && againstMuonLoose3_2>0.5 && againstElectronTightMVA6_2>0.5 && byMediumIsolationMVArun2v1DBoldDMwLT_2>0.5 && dilepton_veto == 0 && extraelec_veto == 0 && extramuon_veto == 0 ", 
+	"et_vbf":"pt_2>30 && njets==2 && mjj>300 && pt_1>26 && fabs(eta_1)<2.1 && iso_1 < 0.3 && againstMuonLoose3_2>0.5 && againstElectronTightMVA6_2>0.5 && byMediumIsolationMVArun2v1DBoldDMwLT_2>0.5 && dilepton_veto == 0 && extraelec_veto == 0 && extramuon_veto == 0" , 
+	"et_0jet":"pt_2>30 && njets==0 && pt_1>26 && fabs(eta_1)<2.1 && iso_1 < 0.3 && againstMuonLoose3_2>0.5 && againstElectronTightMVA6_2>0.5 && byMediumIsolationMVArun2v1DBoldDMwLT_2>0.5 && dilepton_veto == 0 && extraelec_veto == 0 && extramuon_veto == 0"		
+	}
+
+	hw_os_MC = hdummy.Clone("hw_os_MC")
+	hw_os_highmt_MC = hdummy.Clone("hw_os_highmt_MC")
+	makeDatacard_category(treeName, lw, relaxed_cuts_w_MC[channel+"_"+ckey], "q_1*q_2<0"+lowMTcut,       wvalue, "hw_os_MC", hw_os_MC )
+	makeDatacard_category(treeName, lw, relaxed_cuts_w_MC[channel+"_"+ckey], "q_1*q_2<0"+"&&"+highMTcut, wvalue, "hw_os_highmt_MC", hw_os_highmt_MC)
+
+	# W scale factor 
+	W_sf =  hw_os_highmt_datadriven.Integral()/hw_os_highmt_MC.Integral()
+	hw.Scale(hw_os_MC.Integral()/hw.Integral()) 
+	#adjust yield to norm_w = W_sf*hw_os_MC.Integral()
+	print " --- W SF = ", W_sf
+	return W_sf
+
+
+
+def QCD_datadriven(SSOSratio, W_sf, hqcd): #hqcd contains the result of the QCD calculation
+	hqcd_ss = hdummy.Clone("QCD_ss")
+	add_all(hqcd_ss, [(hdata_ss,1),(hvv_ss,-1),(htt_ss,-1),(hdy_ss,-1),(hw_ss,-1*W_sf),(hewkz_ss,-1)])
+	hqcd.Add(hqcd_ss, SSOSratio)
+
+	if (relaxedSel is not None): 
+		print "QCD relaxed selection"
+		hqcd_rel_ss = hdummy.Clone("QCD_rel_ss")
+		add_all(hqcd_rel_ss, [(hdata_rel_ss,1),(hvv_rel_ss,-1),(htt_rel_ss,-1),(hdy_rel_ss,-1),(hw_rel_ss,-1*W_sf),(hewkz_rel_ss,-1)])
+		norm_nom = hqcd_ss.Integral()
+		norm_rel = hqcd_rel_ss.Integral()
+		hqcd_rel_ss.Scale(SSOSratio*norm_nom/norm_rel)
+		hqcd = hqcd_rel_ss
+
+
 ##########################
 # read arguments 
 ##########################
@@ -152,8 +261,9 @@ if mode == "datacard":
 		systName = sys.argv[6] #name of the tree with the systematic
 
 #eg:
-#"_CMS_scale_t_13TeVUp"
-#"_topPtWeightUp"
+#"_CMS_shape_t_13TeVUp" Down --> _CMS_shape_t_mt_13TeVUp
+#"_topPtWeightUp" Down --> CMS_shape_dyShape_13TeVUP (Down)
+#"_CMS_shape_dyShape_13TeVUp" Down
 
 
 ##########################################
@@ -172,7 +282,7 @@ if channel == "et":
 	indir = "/nfs/dust/cms/user/bottav/CMSSW_8_0_12/src/DesyTauAnalyses/NTupleMaker/test/NTuple_Nov/etau/final"
 	indirData = indir
 
-isBlinded = True 
+isBlinded = False 
 datacardFor2Dfit = True
 
 ROOT.TH1.SetDefaultSumw2(True)
@@ -194,10 +304,30 @@ tdata = fdata.Get(treeName)
 #redefine tree name for MC
 treeName = "TauCheck"+systName
 
+
+####################################################
+# scale factors and up/down variations
+# other selection cuts
+# NB: more selection cuts in relaxed selections
+####################################################
+
+ssosvalues = {"et_0jet": 0.74, "et_boosted": 1.00, "et_vbf": 1.15, 
+			  "mt_0jet": 1.02, "mt_boosted": 1.22, "mt_vbf": 1.13}
+
+SSOS_variations = {"mt_0jet":{"up":1.10, "down":0.90}, "mt_boosted":{"up":1.20, "down":0.80}, "mt_vbf":{"up":1.20, "down":0.80}, 
+				   "et_0jet":{"up":1.15, "down":0.85}, "et_boosted":{"up":1.35, "down":0.65}, "et_vbf":{"up":1.40, "down":0.60}}
+
+Wsf_variations = {"0jet":{"up":1.05, "down":0.95}, "boosted":{"up":1.05, "down":0.95}, "vbf":{"up":1.25, "down":0.75}}
+
+renorm_weights = {"et_0jet":"(0.9730+0.00034*pt_2)", "et_boosted":"(0.9857-0.000027787*pt_sv)", "et_vbf":"(0.9708+0.0003266*mjj)", 
+				  "mt_0jet":"(0.9289+0.00017022*pt_2)", "mt_boosted":"(0.9195+0.0010055*pt_sv)", "mt_vbf":"(1.0258+0.00006596*mjj)"}
+
+lowMTcut = "&& mt_1<50"
+highMTcut = "mt_1>80"
+
 ##########################
 # define file lists
 ##########################
-
 
 lvv={"ST_t-channel_top_4f_leptonDecays" : {"xsec": 136.95*3*0.108, "isBinned": False, "binVar": "", "files": ["ST_t-channel_top_4f_leptonDecays"]},
      "ST_t-channel_antitop_4f_leptonDecays" : {"xsec": 80.95*3*0.108, "isBinned": False, "binVar": "", "files": ["ST_t-channel_antitop_4f_leptonDecays"]},
@@ -225,7 +355,7 @@ ldy = {"DYJetsToLL_M-50": { "isBinned": True, "binVar": "gen_noutgoing",
                                         (0.5, 1.5) :  0.000015831,
                                         (1.5, 2.5) :  0.0000169775,
                                         (2.5, 3.5) :  0.0000169091,
-                                        (3.5, 100.5) : 0.0000131252
+                                        (3.5, 100.5) : 0.0000131252	
                               }
                     },
        "DYJetsToLL_M-10to50" : {"xsec": 18610, "isBinned": False, "binVar": "", "files": ["DYJetsToLL_M-10to50_MG"]}
@@ -283,24 +413,19 @@ for wkey, wvalue in weighting.iteritems():
 		#########################################
 		# relaxed selection for some categories #
 		#########################################
-		#applyRelaxedSel = False
-		#print "ckey : ", ckey
-		#if ckey in ["1jet_high","vbf_low","vbf_high","vbf","1jet"]:
-		#	applyRelaxedSel = True
-		#	relaxedSel = "njets==2 && mjj>500 && (mjj<800 || pt_sv<100) && mt_1<50 && pt_1>23 && pt_2>20 && iso_1 < 0.15 && byTightIsolationMVArun2v1DBoldDMwLT_2>0.5 && againstElectronVLooseMVA6_2>0.5 && againstMuonTight3_2>0.5  && dilepton_veto == 0 && extraelec_veto == 0 && extramuon_veto == 0 "
-		#print " applyRelaxedSel : " , applyRelaxedSel
 
-		if (applyRelaxedSelection(ckey)):
-			relaxed_cuts = {
-			"boosted":"pt_2>30 && mt_1<50 &&(njets==1 || (njets==2 && mjj<300) || njets>2) && pt_1>23 && iso_1 < 0.3 && byMediumIsolationMVArun2v1DBoldDMwLT_2>0.5 && againstElectronVLooseMVA6_2>0.5 && againstMuonTight3_2>0.5  && dilepton_veto == 0 && extraelec_veto == 0 && extramuon_veto == 0", 
-			"vbf":"pt_2>30 && mt_1<50 && njets==2 && mjj>300  && pt_1>23 && iso_1 < 0.3 && byMediumIsolationMVArun2v1DBoldDMwLT_2>0.5 && againstElectronVLooseMVA6_2>0.5 && againstMuonTight3_2>0.5  && dilepton_veto == 0 && extraelec_veto == 0 && extramuon_veto == 0 "
+		relaxed_cuts = {
+			"mt_boosted":"pt_2>30 &&(njets==1 || (njets==2 && mjj<300) || njets>2) && pt_1>23 && iso_1 < 0.3 && byMediumIsolationMVArun2v1DBoldDMwLT_2>0.5 && againstElectronVLooseMVA6_2>0.5 && againstMuonTight3_2>0.5  && dilepton_veto == 0 && extraelec_veto == 0 && extramuon_veto == 0", 
+			"mt_vbf":"pt_2>30 && njets==2 && mjj>300  && pt_1>23 && iso_1 < 0.3 && byMediumIsolationMVArun2v1DBoldDMwLT_2>0.5 && againstElectronVLooseMVA6_2>0.5 && againstMuonTight3_2>0.5  && dilepton_veto == 0 && extraelec_veto == 0 && extramuon_veto == 0 ", 
+			"et_boosted":"pt_2>30 && (njets==1 || (njets==2 && mjj<300) || njets>2) && pt_1>26 && fabs(eta_1)<2.1 && iso_1 < 0.3 && againstMuonLoose3_2>0.5 && againstElectronTightMVA6_2>0.5 && byMediumIsolationMVArun2v1DBoldDMwLT_2>0.5 && dilepton_veto == 0 && extraelec_veto == 0 && extramuon_veto == 0 ", 
+			"et_vbf":"pt_2>30 && njets==2 && mjj>300 && pt_1>26 && fabs(eta_1)<2.1 && iso_1 < 0.3 && againstMuonLoose3_2>0.5 && againstElectronTightMVA6_2>0.5 && byMediumIsolationMVArun2v1DBoldDMwLT_2>0.5 && dilepton_veto == 0 && extraelec_veto == 0 && extramuon_veto == 0"
 			}
-			relaxedSel =  relaxed_cuts[ckey]
+		if (applyRelaxedSelection(ckey)):
+			relaxedSel =  relaxed_cuts[channel+"_"+ckey]
 		else: 
 			relaxedSel = None
 		print " applyRelaxedSel : " , applyRelaxedSelection(ckey)
 
- 
 		for hkey, hvalue in histos.iteritems():
 
 			var = hvalue["var"]	
@@ -322,7 +447,7 @@ for wkey, wvalue in weighting.iteritems():
 			if (datacardFor2Dfit==False):	
 				print "Entered in datacardFor2Dfit==False "		
 				hdummy = TH1F("hdummy","hdummy"+axisTit, nbins, xmin, xmax)
-
+				print "plotting ", hkey, ": var ", var, " | bins ", nbins, " | xmin ", xmin, " | xmax ", xmax
 			if (datacardFor2Dfit==True):
 				print "Entered in datacardFor2Dfit==True "		
 				bins_2Dfit = {
@@ -351,40 +476,39 @@ for wkey, wvalue in weighting.iteritems():
 
 				blindingCut = defineBlinding(isBlinded,varY,ckey)
 
-			print "plotting ", hkey, ": var ", var, " | bins ", nbins, " | xmin ", xmin, " | xmax ", xmax
-
+				print "plotting ", var	
 			# data
 			hdata = hdummy.Clone("hdata")
 			hdata_ss = hdummy.Clone("hdata_ss")
-			tdata.Draw(var+" >> hdata_ss", cvalue + " && q_1 * q_2 > 0.")
+			tdata.Draw(var+" >> hdata_ss", cvalue+ lowMTcut + " && q_1 * q_2 > 0.")
 			if (relaxedSel is not None):
 				hdata_rel = hdummy.Clone("hdata_rel")
 				hdata_rel_ss = hdummy.Clone("hdata_rel_ss")
-				tdata.Draw(var+" >> hdata_rel",  relaxedSel + " && q_1 * q_2 < 0. ")
-				tdata.Draw(var+" >> hdata_rel_ss",  relaxedSel + " && q_1 * q_2 > 0. ")
+				tdata.Draw(var+" >> hdata_rel",  relaxedSel + lowMTcut +" && q_1 * q_2 < 0. ")
+				tdata.Draw(var+" >> hdata_rel_ss",  relaxedSel + lowMTcut +" && q_1 * q_2 > 0. ")
 
-			print "cut data: ", cvalue, "&&" , blindingCut , "&& q_1 * q_2 < 0."
-			print "Data OS: ", tdata.Draw(var+" >> hdata", cvalue + "&&" + blindingCut + "&& q_1 * q_2 < 0.")
-			print "Data, done"
+			print "cut data: ", cvalue +lowMTcut + "&&" , blindingCut , "&& q_1 * q_2 < 0."
+			print "Data OS: ", tdata.Draw(var+" >> hdata", cvalue +lowMTcut + "&&" + blindingCut + "&& q_1 * q_2 < 0.")
+			#print "Data, done"
 
 			### SIGNAL ###
 
 			#ggH
 			hggHtt = hdummy.Clone("ggH125")
 			hggHtt.SetDirectory(0)
-			makeDatacard_category(treeName, lgghtt, cvalue, "q_1 * q_2 < 0.", wvalue, "_os", hggHtt)
+			makeDatacard_category(treeName, lgghtt, cvalue + lowMTcut , "q_1 * q_2 < 0.", wvalue, "_os", hggHtt)
 			#VBF 
 			hvbfHtt = hdummy.Clone("qqH125")
 			hvbfHtt.SetDirectory(0)
-			makeDatacard_category(treeName, lvbfhtt, cvalue, "q_1 * q_2 < 0.", wvalue, "_os", hvbfHtt)
+			makeDatacard_category(treeName, lvbfhtt, cvalue + lowMTcut , "q_1 * q_2 < 0.", wvalue, "_os", hvbfHtt)
 			#WH
 			hWHtt = hdummy.Clone("hWHtt")
 			hWHtt.SetDirectory(0)
-			makeDatacard_category(treeName, lwhtt, cvalue, "q_1 * q_2 < 0.", wvalue, "_os", hWHtt)
+			makeDatacard_category(treeName, lwhtt, cvalue + lowMTcut , "q_1 * q_2 < 0.", wvalue, "_os", hWHtt)
 			#ZH
 			hZHtt = hdummy.Clone("hZHtt")
 			hZHtt.SetDirectory(0)
-			makeDatacard_category(treeName, lzhtt, cvalue, "q_1 * q_2 < 0.", wvalue, "_os", hZHtt)
+			makeDatacard_category(treeName, lzhtt, cvalue + lowMTcut , "q_1 * q_2 < 0.", wvalue, "_os", hZHtt)
 			#no need for SS for signal
 
 			#estimating renormalization uncertainty for ggH process. done when running the nominal datacard (systName = "")
@@ -392,16 +516,14 @@ for wkey, wvalue in weighting.iteritems():
 			hggHtt_Down = None
 			if (mode == "datacard" and systName == ""):
 				print "calculating renormalisation uncertainty"
-				renorm_weights = {"et_0jet":"(0.9730+0.00034*pt_2)", "et_boosted":"(0.9857-0.000027787*pt_sv)", "et_vbf":"(0.9708+0.0003266*mjj)", 
-								  "mt_0jet":"(0.9289+0.00017022*pt_2)", "mt_boosted":"(0.9195+0.0010055*pt_sv)", "mt_vbf":"(1.0258+0.00006596*mjj)"}
 				renorm_weight_up = renorm_weights[channel+"_"+ckey]
 				renorm_weight_down = "(1./ "+renorm_weight_up+")"
 				hggHtt_Up = hdummy.Clone("hggHtt_Up")
 				hggHtt_Down = hdummy.Clone("hggHtt_Down")
 				hggHtt_Up.SetDirectory(0)
 				hggHtt_Down.SetDirectory(0)
-				makeDatacard_category(treeName, lgghtt, cvalue,  "q_1 * q_2 < 0.", wvalue+"*"+renorm_weight_up, "_os", hggHtt_Up )
-				makeDatacard_category(treeName, lgghtt, cvalue,  "q_1 * q_2 < 0.", wvalue+"*"+renorm_weight_down, "_os", hggHtt_Down )
+				makeDatacard_category(treeName, lgghtt, cvalue+lowMTcut,  "q_1 * q_2 < 0.", wvalue+"*"+renorm_weight_up, "_os", hggHtt_Up )
+				makeDatacard_category(treeName, lgghtt, cvalue+lowMTcut,  "q_1 * q_2 < 0.", wvalue+"*"+renorm_weight_down, "_os", hggHtt_Down )
 
 
 
@@ -413,11 +535,11 @@ for wkey, wvalue in weighting.iteritems():
 			hvv_ss = hdummy.Clone("VV_ss")
 			hvv.SetDirectory(0)
 			hvv_ss.SetDirectory(0)
-			makeDatacard_ssos(treeName, lvv, cvalue, wvalue, hvv, hvv_ss)
+			makeDatacard_ssos(treeName, lvv, cvalue+lowMTcut, wvalue, hvv, hvv_ss)
 			if (relaxedSel is not None):
 				hvv_rel = hdummy.Clone("VV_rel")
 				hvv_rel_ss = hdummy.Clone("VV_rel_ss")
-				makeDatacard_ssos(treeName, lvv, relaxedSel, wvalue, hvv_rel, hvv_rel_ss)
+				makeDatacard_ssos(treeName, lvv, relaxedSel+lowMTcut, wvalue, hvv_rel, hvv_rel_ss)
 			print "VV, done"
 
 			#EWKZ
@@ -425,11 +547,11 @@ for wkey, wvalue in weighting.iteritems():
 			hewkz_ss = hdummy.Clone("EWKZ_ss")
 			hewkz.SetDirectory(0)
 			hewkz_ss.SetDirectory(0)
-			makeDatacard_ssos(treeName, lewkz, cvalue, wvalue, hewkz, hewkz_ss)
+			makeDatacard_ssos(treeName, lewkz, cvalue+lowMTcut, wvalue, hewkz, hewkz_ss)
 			if (relaxedSel is not None):
 				hewkz_rel = hdummy.Clone("EWKZ_rel")
 				hewkz_rel_ss = hdummy.Clone("EWKZ_rel_ss")
-				makeDatacard_ssos(treeName, lewkz, relaxedSel, wvalue, hewkz_rel, hewkz_rel_ss)
+				makeDatacard_ssos(treeName, lewkz, relaxedSel+lowMTcut, wvalue, hewkz_rel, hewkz_rel_ss)
 			print "EWKZ, done"
 
 			#TT section. Split in TTT and TTJ
@@ -440,61 +562,71 @@ for wkey, wvalue in weighting.iteritems():
 			httt.SetDirectory(0)
 			httj.SetDirectory(0)
 			htt_ss.SetDirectory(0)
-			makeDatacard_ssos(treeName, ltt, cvalue, wvalue, htt, htt_ss)
-			makeDatacard_category(treeName, ltt, cvalue, "gen_match_2 == 5 && q_1*q_2 < 0", wvalue, "TTT", httt)
-			makeDatacard_category(treeName, ltt, cvalue, "gen_match_2 == 5 && q_1*q_2 < 0", wvalue, "TTJ", httj)
+			makeDatacard_ssos(treeName, ltt, cvalue+lowMTcut, wvalue, htt, htt_ss)
+			makeDatacard_category(treeName, ltt, cvalue+lowMTcut, "gen_match_2 == 5 && q_1*q_2 < 0", wvalue, "TTT", httt)
+			makeDatacard_category(treeName, ltt, cvalue+lowMTcut, "gen_match_2 != 5 && q_1*q_2 < 0", wvalue, "TTJ", httj)
 			if (relaxedSel is not None):
 				htt_rel = hdummy.Clone("TT_rel")
 				htt_rel_ss = hdummy.Clone("TT_rel_ss")
-				makeDatacard_ssos(treeName, ltt, relaxedSel, wvalue, htt_rel, htt_rel_ss)
+				makeDatacard_ssos(treeName, ltt, relaxedSel+lowMTcut, wvalue, htt_rel, htt_rel_ss)
 			print "TT, done"
-
-			#Wjets
-			hw = hdummy.Clone("W")
-			hw_ss = hdummy.Clone("WW_ss")
-			hw.SetDirectory(0)
-			hw_ss.SetDirectory(0)
-			makeDatacard_ssos(treeName, lw, cvalue, wvalue, hw, hw_ss)
-			if (relaxedSel is not None):
-				hw_rel = hdummy.Clone("W_rel")
-				hw_rel_ss = hdummy.Clone("W_rel_ss")
-				makeDatacard_ssos(treeName, lw, relaxedSel, wvalue, hw_rel, hw_rel_ss)
 
 			#DY
 			hdy = hdummy.Clone("DY")
 			hdy_ss = hdummy.Clone("DY_ss")
 			hdy.SetDirectory(0)
 			hdy_ss.SetDirectory(0)
-			makeDatacard_ssos(treeName, ldy, cvalue, wvalue, hdy, hdy_ss)
+			makeDatacard_ssos(treeName, ldy, cvalue+lowMTcut, wvalue, hdy, hdy_ss)
 			if (relaxedSel is not None):
 				hdy_rel = hdummy.Clone("DY_rel")
 				hdy_rel_ss = hdummy.Clone("DY_rel_ss")				
-				makeDatacard_ssos(treeName, ldy, relaxedSel, wvalue, hdy_rel, hdy_rel_ss)
+				makeDatacard_ssos(treeName, ldy, relaxedSel+lowMTcut, wvalue, hdy_rel, hdy_rel_ss)
 
-			#ZTT , ZL, ZJ, ZLL 
+			#ZTT , ZL, ZJ
 			hztt = hdummy.Clone("ztt")
 			hzl = hdummy.Clone("zl")
 			hzj = hdummy.Clone("zj")
-			#hzll = hdummy.Clone("zll")
 
 			hztt.SetDirectory(0)
 			hzl.SetDirectory(0)		
 			hzj.SetDirectory(0)		
-			#hzll.SetDirectory(0)
 
-			#looping on different cuts that define categories 
-			#for now, done by hand here with additional cut string
 			ZTTcut = "gen_match_2 == 5 && q_1 * q_2 < 0." 
 			ZLcut = "gen_match_2 < 5 && q_1 * q_2 < 0." 
 			ZJcut = "gen_match_2 == 6 && q_1 * q_2 < 0." 
-			#ZLLcut = "gen_match_2 != 5 && q_1 * q_2 < 0."
 
-			makeDatacard_category(treeName, ldy, cvalue, ZTTcut, wvalue, "ZTT", hztt)
-			makeDatacard_category(treeName, ldy, cvalue, ZLcut, wvalue, "ZL", hzl)
-			makeDatacard_category(treeName, ldy, cvalue, ZJcut, wvalue, "ZJ", hzj)
-			#makeDatacard_category(treeName, ldy, cvalue, ZLLcut, wvalue, "ZLL", hzll)
+			makeDatacard_category(treeName, ldy, cvalue+lowMTcut, ZTTcut, wvalue, "ZTT", hztt)
+			makeDatacard_category(treeName, ldy, cvalue+lowMTcut, ZLcut, wvalue, "ZL", hzl)
+			makeDatacard_category(treeName, ldy, cvalue+lowMTcut, ZJcut, wvalue, "ZJ", hzj)
 
 			print "DY all done"
+
+			#Wjets
+			hw = hdummy.Clone("W")
+			hw_ss = hdummy.Clone("WW_ss")
+			hw.SetDirectory(0)
+			hw_ss.SetDirectory(0)
+			makeDatacard_ssos(treeName, lw, cvalue+lowMTcut, wvalue, hw, hw_ss)
+			if (relaxedSel is not None):
+				hw_rel = hdummy.Clone("W_rel")
+				hw_rel_ss = hdummy.Clone("W_rel_ss")
+				makeDatacard_ssos(treeName, lw, relaxedSel+lowMTcut, wvalue, hw_rel, hw_rel_ss)
+
+			#Wjets shape from relaxed selection
+			if (relaxedSel is not None):
+				print "Wjets relaxed selection "
+				norm_nom = hw.Integral()
+				norm_rel = hw_rel.Integral()
+				hw_rel.Scale(norm_nom/norm_rel)
+				hw = hw_rel 
+			
+
+			####### Wjets data-driven normalisation from high mt region
+
+			SSOSratio = ssosvalues.get(channel+"_"+ckey, 1.06)
+			hw_corrected = hw.Clone("hw_corrected")
+			W_sf = Wjets_dataMC_sf(SSOSratio, hw_corrected)
+			hw_corrected.Scale(W_sf)
 			
 			##########################
 			# QCD estimate
@@ -502,65 +634,40 @@ for wkey, wvalue in weighting.iteritems():
 
 			print "qcd calculation..."
 
-			ssosvalues = {"et_0jet": 0.74, "et_boosted": 1.00 , "et_vbf": 1.15, 
-						  "mt_0jet": 1.02, "mt_boosted": 1.22, "mt_vbf": 1.13}
-			SSOSratio = ssosvalues.get(channel+"_"+ckey, 1.06)
-			print "using SS/OS QCD  = ", SSOSratio
-		
-			#histograms to put the *total* MC yield 
-			#hMC = TH1F("hMC", "hMC"+axisTit, nbins, xmin, xmax)
-			#hMC_ss = TH1F("hMC_ss", "hMC_ss"+axisTit, nbins, xmin, xmax)
-			hMC = hdummy.Clone("hMC")
-			hMC_ss = hdummy.Clone("hMC_ss")	
-	
-			hMC.Add(hvv)
-			hMC.Add(htt)
-			hMC.Add(hdy)
-			hMC.Add(hw)
-			hMC.Add(hewkz)
-
-			hMC_ss.Add(hvv_ss)
-			hMC_ss.Add(htt_ss)		
-			hMC_ss.Add(hdy_ss)
-			hMC_ss.Add(hw_ss)
-			hMC_ss.Add(hewkz_ss)
-
-			#hqcd = TH1F("QCD", "QCD"+axisTit, nbins, xmin, xmax)
-			#hqcd_ss = TH1F("QCD_ss", "QCD_ss"+axisTit, nbins, xmin, xmax)
 			hqcd = hdummy.Clone("QCD")
-			hqcd_ss = hdummy.Clone("QCD_ss")
-		
-			hqcd_ss.Add(hdata_ss)
-			hqcd_ss.Add(hMC_ss,-1)
-			hqcd.Add(hqcd_ss, SSOSratio)
+			QCD_datadriven(SSOSratio, W_sf, hqcd)
 
 			print " ... done"
 
-			if (relaxedSel is not None): 
-				print "QCD relaxed selection"
-				hqcd_rel_ss = hdummy.Clone("QCD_rel_ss")
-				hqcd_rel_ss.Add(hdata_rel_ss)
-				hqcd_rel_ss.Add(hvv_rel_ss,-1)
-				hqcd_rel_ss.Add(htt_rel_ss,-1)
-				hqcd_rel_ss.Add(hdy_rel_ss,-1)
-				hqcd_rel_ss.Add(hw_rel_ss,-1)
-				hqcd_rel_ss.Add(hewkz_rel_ss,-1)
-				norm_nom = hqcd_ss.Integral()
-				norm_rel = hqcd_rel_ss.Integral()
-				hqcd_rel_ss.Scale(SSOSratio*norm_nom/norm_rel)
-				hqcd = hqcd_rel_ss
+			####################################
+			# shape uncertainties on QCD and W
+			####################################
 
-			#Wjets from control region 
-			#if (relaxedSel!=None):
-			if (relaxedSel is not None):
-				print "Wjets relaxed selection "
-				norm_nom = hw.Integral()
-				norm_rel = hw_rel.Integral()
-				hw_rel.Scale(norm_nom/norm_rel)
-				hw = hw_rel 
+			if (mode=="datacard" and systName ==""):
+				W_sf_up = Wsf_variations.get(ckey, 1).get("up",1)		
+				W_sf_down = Wsf_variations.get(ckey, 1).get("down",1)			
+				hw_wsf_up = hw.Clone("hw_wsf_up")
+				hw_wsf_up.Scale(W_sf_up)
+				hw_wsf_down = hw.Clone("hw_wsf_down")
+				hw_wsf_down.Scale(W_sf_down)	
+				hqcd_wsf_up = hdummy.Clone("hqcd_wsf_up")
+				hqcd_wsf_down = hdummy.Clone("hqcd_wsf_down")
+				QCD_datadriven(SSOSratio, W_sf*W_sf_up, hqcd_wsf_up)
+				QCD_datadriven(SSOSratio, W_sf*W_sf_down, hqcd_wsf_down)
 
-
-
+			if (mode=="datacard" and systName ==""):				
+				SSOS_up = SSOS_variations.get(channel+"_"+ckey, 1).get("up",1)
+				SSOS_down = SSOS_variations.get(channel+"_"+ckey, 1).get("down",1)
+				hqcd_ssos_up = hdummy.Clone("hqcd_ssos_up")
+				hqcd_ssos_down = hdummy.Clone("hqcd_ssos_down")
+				QCD_datadriven(SSOSratio*SSOS_up, W_sf, hqcd_ssos_up)
+				QCD_datadriven(SSOSratio*SSOS_down, W_sf, hqcd_ssos_down)
+				hw_ssos_up = hw.Clone("hw_ssos_up")
+				hw_ssos_down = hw.Clone("hw_ssos_down")
+				W_sf = Wjets_dataMC_sf(SSOSratio*SSOS_up, hw_ssos_up)
+				hw_ssos_up.Scale(W_sf)
+				W_sf = Wjets_dataMC_sf(SSOSratio*SSOS_down, hw_ssos_down)
+				hw_ssos_down.Scale(W_sf)
 
 			##########################
 			#writing to output file
@@ -583,8 +690,6 @@ for wkey, wvalue in weighting.iteritems():
 			if (datacardFor2Dfit):
 				hdata = unroll(hdata)	
 				hggHtt = unroll(hggHtt)
-				hggHtt_Up = unroll(hggHtt_Up)
-				hggHtt_Down = unroll(hggHtt_Down)
 				hvbfHtt = unroll(hvbfHtt)
 				hWHtt = unroll(hWHtt)
 				hZHtt = unroll(hZHtt)
@@ -594,9 +699,23 @@ for wkey, wvalue in weighting.iteritems():
 				httt = unroll(httt)
 				httj = unroll(httj)
 				hw = unroll(hw)
+				hw_corrected = unroll(hw_corrected)
 				hewkz = unroll(hewkz)
 				hvv = unroll(hvv)
 				hqcd = unroll(hqcd)
+				if (mode=="datacard" and systName == ""):
+					hggHtt_Up = unroll(hggHtt_Up)
+					hggHtt_Down = unroll(hggHtt_Down)
+					hw_wsf_up = unroll(hw_wsf_up)
+					hw_wsf_down = unroll(hw_wsf_down)
+					hqcd_wsf_up = unroll(hqcd_wsf_up)
+					hqcd_wsf_down = unroll(hqcd_wsf_down)
+					hqcd_ssos_up = unroll(hqcd_ssos_up)
+					hqcd_ssos_down = unroll(hqcd_ssos_down)
+					hw_ssos_up = unroll(hw_ssos_up)
+					hw_ssos_down = unroll(hw_ssos_down)
+
+
 			
 			if (mode == "histos"):
 				hdata.Write("data_obs")
@@ -606,6 +725,14 @@ for wkey, wvalue in weighting.iteritems():
 				hdata.Write("data_obs")
 				hggHtt_Up.Write("ggH125_CMS_scale_gg_13TeVUp")
 				hggHtt_Down.Write("ggH125_CMS_scale_gg_13TeVDown")
+				hw_wsf_up.Write("W_WSFUncert_"+channel+"_"+ckey+"_13TeV"+"Up")
+				hw_wsf_down.Write("W_WSFUncert_"+channel+"_"+ckey+"_13TeV"+"Down")
+				hqcd_wsf_up.Write("QCD_WSFUncert_"+channel+"_"+ckey+"_13TeV"+"Up")
+				hqcd_wsf_down.Write("QCD_WSFUncert_"+channel+"_"+ckey+"_13TeV"+"Down")
+				hqcd_ssos_up.Write("QCD_QCDSFUncert_"+channel+"_"+ckey+"_13TeV"+"Up")
+				hqcd_ssos_down.Write("QCD_QCDSFUncert_"+channel+"_"+ckey+"_13TeV"+"Down")
+				hw_ssos_up.Write("W_QCDSFUncert_"+channel+"_"+ckey+"_13TeV"+"Up")
+				hw_ssos_down.Write("W_QCDSFUncert_"+channel+"_"+ckey+"_13TeV"+"Down")
 				
 			print "writing to out file..."
 
@@ -617,10 +744,10 @@ for wkey, wvalue in weighting.iteritems():
 			hztt.Write("ZTT"+systName)
 			hzl.Write("ZL"+systName)
 			hzj.Write("ZJ"+systName)
-			#hzll.Write("ZLL"+systName)
 			httt.Write("TTT"+systName)
 			httj.Write("TTJ"+systName)
-			hw.Write("W"+systName)
+			hw.Write("W_noWSF"+systName)
+			hw_corrected.Write("W"+systName)
 			hewkz.Write("EWKZ"+systName)
 			hvv.Write("VV"+systName)
 			hqcd.Write("QCD"+systName)
