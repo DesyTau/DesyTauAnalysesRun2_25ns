@@ -1702,14 +1702,20 @@ void counting_jets(const AC1B *analysisTree, Spring15Tree *otree, const Config *
   otree->brawf_1 = -9999;
   otree->bmva_1  = -9999;
   otree->bcsv_1  = -9999;
+  otree->bpuid_loose_1 = -9999;
+  otree->bpuid_medium_1 = -9999;
+  otree->bpuid_tight_1 = -9999;
   
   if (indexLeadingBJet>=0) {
     otree->bpt_1   = analysisTree->pfjet_pt[indexLeadingBJet];
     otree->beta_1  = analysisTree->pfjet_eta[indexLeadingBJet];
     otree->bphi_1  = analysisTree->pfjet_phi[indexLeadingBJet];
     otree->brawf_1 = analysisTree->pfjet_energycorr[indexLeadingBJet];
-    otree->bmva_1  = analysisTree->pfjet_pu_jet_full_mva[indexLeadingBJet];
+    otree->bmva_1  = analysisTree->pfjet_pu_jet_fullDisc_mva[indexLeadingBJet];
     otree->bcsv_1  = analysisTree->pfjet_btag[indexLeadingBJet][0];
+    otree->bpuid_loose_1  = analysisTree->pfjet_pu_jet_fullId_loose[indexLeadingBJet];
+    otree->bpuid_medium_1 = analysisTree->pfjet_pu_jet_fullId_medium[indexLeadingBJet];
+    otree->bpuid_tight_1  = analysisTree->pfjet_pu_jet_fullId_tight[indexLeadingBJet];
   }
 
   otree->bpt_2   = -9999;
@@ -1718,16 +1724,20 @@ void counting_jets(const AC1B *analysisTree, Spring15Tree *otree, const Config *
   otree->brawf_2 = -9999;
   otree->bmva_2  = -9999;
   otree->bcsv_2  = -9999;
+  otree->bpuid_loose_2 = -9999;
+  otree->bpuid_medium_2 = -9999;
+  otree->bpuid_tight_2 = -9999;
   
-
   if (indexSubLeadingBJet>=0) {
     otree->bpt_2   = analysisTree->pfjet_pt[indexSubLeadingBJet];
     otree->beta_2  = analysisTree->pfjet_eta[indexSubLeadingBJet];
     otree->bphi_2  = analysisTree->pfjet_phi[indexSubLeadingBJet];
     otree->brawf_2 = analysisTree->pfjet_energycorr[indexSubLeadingBJet];
-    otree->bmva_2  = analysisTree->pfjet_pu_jet_full_mva[indexSubLeadingBJet];
+    otree->bmva_2  = analysisTree->pfjet_pu_jet_fullDisc_mva[indexSubLeadingBJet];
     otree->bcsv_2  = analysisTree->pfjet_btag[indexSubLeadingBJet][0];
-
+    otree->bpuid_loose_2  = analysisTree->pfjet_pu_jet_fullId_loose[indexSubLeadingBJet];
+    otree->bpuid_medium_2 = analysisTree->pfjet_pu_jet_fullId_medium[indexSubLeadingBJet];
+    otree->bpuid_tight_2  = analysisTree->pfjet_pu_jet_fullId_tight[indexSubLeadingBJet];
   }
 
   otree->jpt_1 = -9999;
@@ -1741,7 +1751,6 @@ void counting_jets(const AC1B *analysisTree, Spring15Tree *otree, const Config *
   otree->jpuid_loose_1 = -9999;
   otree->jpuid_medium_1 = -9999;
   otree->jpuid_tight_1 = -9999;
-  otree->jpuid_mva_1 = -9999;
 
   if ( indexLeadingJet>=0 && indexSubLeadingJet>=0 && indexLeadingJet==indexSubLeadingJet )
 cout << "warning : indexLeadingJet ==indexSubLeadingJet = " << indexSubLeadingJet << endl;
@@ -1751,11 +1760,10 @@ cout << "warning : indexLeadingJet ==indexSubLeadingJet = " << indexSubLeadingJe
     otree->jeta_1 = analysisTree->pfjet_eta[indexLeadingJet];
     otree->jphi_1 = analysisTree->pfjet_phi[indexLeadingJet];
     otree->jrawf_1 = analysisTree->pfjet_energycorr[indexLeadingJet];
-    otree->jmva_1 = analysisTree->pfjet_pu_jet_full_mva[indexLeadingJet];
+    otree->jmva_1 = analysisTree->pfjet_pu_jet_fullDisc_mva[indexLeadingJet];
     otree->jpuid_loose_1 = analysisTree->pfjet_pu_jet_fullId_loose[indexLeadingJet];
     otree->jpuid_medium_1 = analysisTree->pfjet_pu_jet_fullId_medium[indexLeadingJet];
     otree->jpuid_tight_1 = analysisTree->pfjet_pu_jet_fullId_tight[indexLeadingJet];
-    otree->jpuid_mva_1 = analysisTree->pfjet_pu_jet_fullDisc_mva[indexLeadingJet];
   }
 
   otree->jpt_2 = -9999;
@@ -1769,18 +1777,16 @@ cout << "warning : indexLeadingJet ==indexSubLeadingJet = " << indexSubLeadingJe
   otree->jpuid_loose_2 = -9999;
   otree->jpuid_medium_2 = -9999;
   otree->jpuid_tight_2 = -9999;
-  otree->jpuid_mva_2 = -9999;
 
   if (indexSubLeadingJet>=0) {
     otree->jpt_2 = analysisTree->pfjet_pt[indexSubLeadingJet];
     otree->jeta_2 = analysisTree->pfjet_eta[indexSubLeadingJet];
     otree->jphi_2 = analysisTree->pfjet_phi[indexSubLeadingJet];
     otree->jrawf_2 = analysisTree->pfjet_energycorr[indexSubLeadingJet];
-    otree->jmva_2 = analysisTree->pfjet_pu_jet_full_mva[indexSubLeadingJet];
+    otree->jmva_2 = analysisTree->pfjet_pu_jet_fullDisc_mva[indexSubLeadingJet];
     otree->jpuid_loose_2 = analysisTree->pfjet_pu_jet_fullId_loose[indexSubLeadingJet];
     otree->jpuid_medium_2 = analysisTree->pfjet_pu_jet_fullId_medium[indexSubLeadingJet];
     otree->jpuid_tight_2 = analysisTree->pfjet_pu_jet_fullId_tight[indexSubLeadingJet];
-    otree->jpuid_mva_2 = analysisTree->pfjet_pu_jet_fullDisc_mva[indexSubLeadingJet];
   }
 
   otree->mjj =  -9999;

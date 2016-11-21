@@ -215,7 +215,6 @@ public :
   Bool_t          jpuid_loose_1;
   Bool_t          jpuid_medium_1;
   Bool_t          jpuid_tight_1;
-  Float_t         jpuid_mva_1;
   Float_t         jpt_2;
   Float_t         jeta_2;
   Float_t         jphi_2;
@@ -228,7 +227,6 @@ public :
   Bool_t          jpuid_loose_2;
   Bool_t          jpuid_medium_2;
   Bool_t          jpuid_tight_2;
-  Float_t         jpuid_mva_2;
   Float_t         mjj;
   Float_t         jdeta;
   Int_t           njetingap;
@@ -239,12 +237,18 @@ public :
   Float_t         brawf_1;
   Float_t         bmva_1;
   Float_t         bcsv_1;
+  Bool_t          bpuid_loose_1;
+  Bool_t          bpuid_medium_1;
+  Bool_t          bpuid_tight_1;
   Float_t         bpt_2;
   Float_t         beta_2;
   Float_t         bphi_2;
   Float_t         brawf_2;
   Float_t         bmva_2;
   Float_t         bcsv_2;
+  Bool_t          bpuid_loose_2;
+  Bool_t          bpuid_medium_2;
+  Bool_t          bpuid_tight_2;
   
   // List of branches
   TBranch        *b_run;   //!
@@ -436,7 +440,6 @@ public :
   TBranch        *b_jpuid_loose_1;
   TBranch        *b_jpuid_medium_1;
   TBranch        *b_jpuid_tight_1;
-  TBranch        *b_jpuid_mva_1;
   TBranch        *b_jpt_2;   //!
   TBranch        *b_jeta_2;   //!
   TBranch        *b_jphi_2;   //!
@@ -448,7 +451,6 @@ public :
   TBranch        *b_jpuid_loose_2;
   TBranch        *b_jpuid_medium_2;
   TBranch        *b_jpuid_tight_2;
-  TBranch        *b_jpuid_mva_2;
   TBranch        *b_mjj;   //!
   TBranch        *b_jdeta;   //!
   TBranch        *b_njetingap;   //!
@@ -459,12 +461,18 @@ public :
   TBranch        *b_brawf_1;   //!
   TBranch        *b_bmva_1;   //!
   TBranch        *b_bcsv_1;   //!
+  TBranch        *b_bpuid_loose_1;
+  TBranch        *b_bpuid_medium_1;
+  TBranch        *b_bpuid_tight_1;
   TBranch        *b_bpt_2;   //!
   TBranch        *b_beta_2;   //!
   TBranch        *b_bphi_2;   //!
   TBranch        *b_brawf_2;   //!
   TBranch        *b_bmva_2;   //!
   TBranch        *b_bcsv_2;   //!
+  TBranch        *b_bpuid_loose_2;
+  TBranch        *b_bpuid_medium_2;
+  TBranch        *b_bpuid_tight_2;
 
   
   Spring15Tree(TTree *tree=0);

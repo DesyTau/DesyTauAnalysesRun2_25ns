@@ -248,7 +248,6 @@ void Spring15Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("jpuid_loose_1", &jpuid_loose_1, &b_jpuid_loose_1);
    fChain->SetBranchAddress("jpuid_medium_1", &jpuid_medium_1, &b_jpuid_medium_1);
    fChain->SetBranchAddress("jpuid_tight_1", &jpuid_tight_1, &b_jpuid_tight_1);
-   fChain->SetBranchAddress("jpuid_mva_1", &jpuid_mva_1, &b_jpuid_mva_1);
    fChain->SetBranchAddress("jpt_2", &jpt_2, &b_jpt_2);
    fChain->SetBranchAddress("jeta_2", &jeta_2, &b_jeta_2);
    fChain->SetBranchAddress("jphi_2", &jphi_2, &b_jphi_2);
@@ -261,7 +260,6 @@ void Spring15Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("jpuid_loose_2", &jpuid_loose_2, &b_jpuid_loose_2);
    fChain->SetBranchAddress("jpuid_medium_2", &jpuid_medium_2, &b_jpuid_medium_2);
    fChain->SetBranchAddress("jpuid_tight_2", &jpuid_tight_2, &b_jpuid_tight_2);
-   fChain->SetBranchAddress("jpuid_mva_2", &jpuid_mva_2, &b_jpuid_mva_2);
    fChain->SetBranchAddress("mjj", &mjj, &b_mjj);
    fChain->SetBranchAddress("jdeta", &jdeta, &b_jdeta);
    fChain->SetBranchAddress("njetingap", &njetingap, &b_njetingap);
@@ -272,12 +270,18 @@ void Spring15Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("brawf_1", &brawf_1, &b_brawf_1);
    fChain->SetBranchAddress("bmva_1", &bmva_1, &b_bmva_1);
    fChain->SetBranchAddress("bcsv_1", &bcsv_1, &b_bcsv_1);
+   fChain->SetBranchAddress("bpuid_loose_1", &bpuid_loose_1, &b_bpuid_loose_1);
+   fChain->SetBranchAddress("bpuid_medium_1", &bpuid_medium_1, &b_bpuid_medium_1);
+   fChain->SetBranchAddress("bpuid_tight_1",  &bpuid_tight_1, &b_bpuid_tight_1);
    fChain->SetBranchAddress("bpt_2", &bpt_2, &b_bpt_2);
    fChain->SetBranchAddress("beta_2", &beta_2, &b_beta_2);
    fChain->SetBranchAddress("bphi_2", &bphi_2, &b_bphi_2);
    fChain->SetBranchAddress("brawf_2", &brawf_2, &b_brawf_2);
    fChain->SetBranchAddress("bmva_2", &bmva_2, &b_bmva_2);
    fChain->SetBranchAddress("bcsv_2", &bcsv_2, &b_bcsv_2);
+   fChain->SetBranchAddress("bpuid_loose_2", &bpuid_loose_2, &b_bpuid_loose_2);
+   fChain->SetBranchAddress("bpuid_medium_2", &bpuid_medium_2, &b_bpuid_medium_2);
+   fChain->SetBranchAddress("bpuid_tight_2",  &bpuid_tight_2, &b_bpuid_tight_2);
 
    lock=true;
 }
@@ -555,7 +559,6 @@ void Spring15Tree::WriteInit(TTree *tree) {
   fChain->Branch("jpuid_loose_1", &jpuid_loose_1, "jpuid_loose_1/O");
   fChain->Branch("jpuid_medium_1", &jpuid_medium_1, "jpuid_medium_1/O");
   fChain->Branch("jpuid_tight_1", &jpuid_tight_1, "jpuid_tight_1/O");
-  fChain->Branch("jpuid_mva_1", &jpuid_mva_1, "jpuid_mva_1/F");
   
   fChain->Branch("jpt_2", &jpt_2, "jpt_2/F");
   fChain->Branch("jeta_2", &jeta_2, "jeta_2/F");
@@ -569,7 +572,6 @@ void Spring15Tree::WriteInit(TTree *tree) {
   fChain->Branch("jpuid_loose_2", &jpuid_loose_2, "jpuid_loose_2/O");
   fChain->Branch("jpuid_medium_2", &jpuid_medium_2, "jpuid_medium_2/O");
   fChain->Branch("jpuid_tight_2", &jpuid_tight_2, "jpuid_tight_2/O");
-  fChain->Branch("jpuid_mva_2", &jpuid_mva_2, "jpuid_mva_2/F");
   
   fChain->Branch("mjj", &mjj, "mjj/F");
   fChain->Branch("jdeta", &jdeta, "jdeta/F");
@@ -582,13 +584,18 @@ void Spring15Tree::WriteInit(TTree *tree) {
   fChain->Branch("brawf_1", &brawf_1, "brawf_1/F");
   fChain->Branch("bmva_1", &bmva_1, "bmva_1/F");
   fChain->Branch("bcsv_1", &bcsv_1, "bcsv_1/F");    
+  fChain->Branch("bpuid_loose_1", &bpuid_loose_1, "bpuid_loose_1/O");
+  fChain->Branch("bpuid_medium_1", &bpuid_medium_1, "bpuid_medium_1/O");
+  fChain->Branch("bpuid_tight_1", &bpuid_tight_1, "bpuid_tight_1/O");
   fChain->Branch("bpt_2", &bpt_2, "bpt_2/F");
   fChain->Branch("beta_2", &beta_2, "beta_2/F");
   fChain->Branch("bphi_2", &bphi_2, "bphi_2/F");    
   fChain->Branch("brawf_2", &brawf_2, "brawf_2/F");
   fChain->Branch("bmva_2", &bmva_2, "bmva_2/F");
   fChain->Branch("bcsv_2", &bcsv_2, "bcsv_2/F");    
-
+  fChain->Branch("bpuid_loose_2", &bpuid_loose_2, "bpuid_loose_2/O");
+  fChain->Branch("bpuid_medium_2", &bpuid_medium_2, "bpuid_medium_2/O");
+  fChain->Branch("bpuid_tight_2", &bpuid_tight_2, "bpuid_tight_2/O");
 }
 
 void Spring15Tree::Fill(){
