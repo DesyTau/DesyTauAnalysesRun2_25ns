@@ -36,6 +36,7 @@
 
 #include "TauAnalysis/SVfitStandalone/interface/SVfitStandaloneAlgorithm.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/functions.h"
+#include "DesyTauAnalyses/NTupleMaker/interface/leptau_jets.h"
 #include "HTT-utilities/LepEffInterface/interface/ScaleFactor.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/PileUp.h"
 #include "HTT-utilities/RecoilCorrections/interface/RecoilCorrector.h"
@@ -46,14 +47,14 @@
 
 #include "FWCore/ParameterSet/interface/FileInPath.h"
 
-#include "CondFormats/BTauObjects/interface/BTagCalibration.h"
-#include "CondTools/BTau/interface/BTagCalibrationReader.h"
+//#include "CondFormats/BTauObjects/interface/BTagCalibration.h"
+//#include "CondTools/BTau/interface/BTagCalibrationReader.h"
 
 #include "DesyTauAnalyses/NTupleMaker/interface/Systematics.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/LeptonScaleSys.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/ZPtWeightSys.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/TopPtWeightSys.h"
-
+#include "DesyTauAnalyses/NTupleMaker/interface/JetEnergyScaleSys.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/LepTauFakeRate.h"
 
 #define pi 	3.14159265358979312
@@ -78,7 +79,7 @@ struct compare_lumi { //accepts two pairs, return 1 if left.first < right.first 
   }
 };
 
-struct btag_scaling_inputs{
+/*struct btag_scaling_inputs{
   BTagCalibrationReader reader_B;
   BTagCalibrationReader reader_C;
   BTagCalibrationReader reader_Light;
@@ -86,7 +87,7 @@ struct btag_scaling_inputs{
   TH2F *tagEff_C;
   TH2F *tagEff_Light;
   TRandom3 *rand;
-};
+};*/
 
 int read_json(std::string filename, lumi_json& json);
 bool isGoodLumi(const std::pair<int, int>& lumi, const lumi_json& json);
@@ -103,7 +104,7 @@ bool extra_electron_veto(int leptonIndex, TString ch, const Config *cfg, const A
 bool extra_muon_veto(int leptonIndex, TString ch, const Config *cfg, const AC1B *analysisTree);
 void fillMET(TString ch, int leptonIndex, int tauIndex, const AC1B * analysisTree, Spring15Tree *otree, bool isData);
 void mt_calculation(Spring15Tree *otree);
-void counting_jets(const AC1B *analysisTree, Spring15Tree *otree, const Config *cfg, const btag_scaling_inputs *inputs);
+//void counting_jets(const AC1B *analysisTree, Spring15Tree *otree, const Config *cfg, const btag_scaling_inputs *inputs);
 void svfit_variables(const AC1B *analysisTree, Spring15Tree *otree, const Config *cfg, TFile *inputFile_visPtResolution);
 bool isICHEPmed(int Index, const AC1B * analysisTree);
 
@@ -145,7 +146,7 @@ int main(int argc, char * argv[]){
   std::string lep;
 
   if ((ch != "mt" ) && (ch != "et")) {
-	std::cout << " Channel " << ch << "is not a valid choice. Please try again with 'mt' or 'et'.Exiting. " << std::endl;
+	std::cout << " Channel " << ch << " is not a valid choice. Please try again with 'mt' or 'et'.Exiting. " << std::endl;
     exit(0);
   }
 
@@ -455,11 +456,15 @@ int main(int argc, char * argv[]){
   TauScaleSys* tauScaleSys = 0;
   ZPtWeightSys* zPtWeightSys = 0;
   TopPtWeightSys* topPtWeightSys = 0;
+  JetEnergyScaleSys* jetEnergyScaleSys = 0;
   if(!isData && ApplySystShift){
     tauScaleSys = new TauScaleSys(otree);
     tauScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);
     zPtWeightSys = new ZPtWeightSys(otree);
     topPtWeightSys = new TopPtWeightSys(otree);
+	jetEnergyScaleSys = new JetEnergyScaleSys(otree);
+	jetEnergyScaleSys->SetConfig(&cfg);
+    jetEnergyScaleSys->SetBtagScaling(&inputs_btag_scaling_medium);
   }
 
 
@@ -489,6 +494,11 @@ int main(int argc, char * argv[]){
       inputEventsH->Fill(0.);
 
     AC1B analysisTree(_tree, isData);
+
+	// set AC1B for JES systematics
+	if (!isData && ApplySystShift && jetEnergyScaleSys !=0){
+		jetEnergyScaleSys->SetAC1B(&analysisTree);
+	}
     
     Long64_t numberOfEntries = analysisTree.GetEntries();
     
@@ -788,7 +798,7 @@ int main(int argc, char * argv[]){
       otree->effweight = (otree->trigweight_1)*(otree->idisoweight_1)*(otree->trigweight_2)*(otree->idisoweight_2);
 
       //counting jet
-      counting_jets(&analysisTree, otree, &cfg, &inputs_btag_scaling_medium);
+      jets::counting_jets(&analysisTree, otree, &cfg, &inputs_btag_scaling_medium);
       //MET
       fillMET(ch, leptonIndex, tauIndex, &analysisTree, otree, isData);
 
@@ -973,8 +983,9 @@ int main(int argc, char * argv[]){
       if(!isData && ApplySystShift){
        zPtWeightSys->Eval(); 
 	   topPtWeightSys->Eval();
-	   if (ch=="mt") tauScaleSys->Eval(utils::MUTAU);
-	   if (ch=="et") tauScaleSys->Eval(utils::ETAU);
+	   jetEnergyScaleSys->Eval();
+	   //if (ch=="mt") tauScaleSys->Eval(utils::MUTAU);
+	   //if (ch=="et") tauScaleSys->Eval(utils::ETAU);
 	  }
 
       selEvents++;
@@ -1011,6 +1022,11 @@ int main(int argc, char * argv[]){
   if(topPtWeightSys != 0){
     topPtWeightSys->Write();
     delete topPtWeightSys;
+  }
+
+  if(jetEnergyScaleSys != 0){
+    jetEnergyScaleSys->Write();
+    delete jetEnergyScaleSys;
   }
 
   file->Close();
@@ -1554,7 +1570,7 @@ void mt_calculation(Spring15Tree *otree){
   otree->puppimt_1 = sqrt(2*otree->pt_1*otree->puppimet*(1.-cos(otree->phi_1-otree->puppimetphi)));
   otree->puppimt_2 = sqrt(2*otree->pt_2*otree->puppimet*(1.-cos(otree->phi_2-otree->puppimetphi)));
 }
-
+/*
 void counting_jets(const AC1B *analysisTree, Spring15Tree *otree, const Config *cfg, const btag_scaling_inputs *inputs_btag_scaling){
 
   vector<unsigned int> jets; jets.clear();
@@ -1764,6 +1780,7 @@ cout << "warning : indexLeadingJet ==indexSubLeadingJet = " << indexSubLeadingJe
     otree->jpuid_loose_1 = analysisTree->pfjet_pu_jet_fullId_loose[indexLeadingJet];
     otree->jpuid_medium_1 = analysisTree->pfjet_pu_jet_fullId_medium[indexLeadingJet];
     otree->jpuid_tight_1 = analysisTree->pfjet_pu_jet_fullId_tight[indexLeadingJet];
+    otree->jptunc_1 = analysisTree->pfjet_jecUncertainty[indexLeadingJet];
   }
 
   otree->jpt_2 = -9999;
@@ -1787,6 +1804,7 @@ cout << "warning : indexLeadingJet ==indexSubLeadingJet = " << indexSubLeadingJe
     otree->jpuid_loose_2 = analysisTree->pfjet_pu_jet_fullId_loose[indexSubLeadingJet];
     otree->jpuid_medium_2 = analysisTree->pfjet_pu_jet_fullId_medium[indexSubLeadingJet];
     otree->jpuid_tight_2 = analysisTree->pfjet_pu_jet_fullId_tight[indexSubLeadingJet];
+    otree->jptunc_2 = analysisTree->pfjet_jecUncertainty[indexSubLeadingJet];
   }
 
   otree->mjj =  -9999;
@@ -1827,7 +1845,7 @@ cout << "warning : indexLeadingJet ==indexSubLeadingJet = " << indexSubLeadingJe
   }
 
 }
-
+*/
 ///////////////////////////////////
 // SV fit 
 ///////////////////////////////////
