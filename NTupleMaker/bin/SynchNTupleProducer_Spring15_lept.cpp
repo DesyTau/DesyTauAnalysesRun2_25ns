@@ -89,7 +89,7 @@ bool dilepton_veto_mt(const Config *cfg, const AC1B *analysisTree);
 bool dilepton_veto_et(const Config *cfg, const AC1B *analysisTree);
 bool extra_electron_veto(int leptonIndex, TString ch, const Config *cfg, const AC1B *analysisTree);
 bool extra_muon_veto(int leptonIndex, TString ch, const Config *cfg, const AC1B *analysisTree);
-void fillMET(TString ch, int leptonIndex, int tauIndex, const AC1B * analysisTree, Spring15Tree *otree, bool isData);
+void fillMET(TString ch, int leptonIndex, int tauIndex, const AC1B * analysisTree, Spring15Tree *otree);
 void mt_calculation(Spring15Tree *otree);
 //void counting_jets(const AC1B *analysisTree, Spring15Tree *otree, const Config *cfg, const btag_scaling_inputs *inputs);
 void svfit_variables(const AC1B *analysisTree, Spring15Tree *otree, const Config *cfg, TFile *inputFile_visPtResolution);
@@ -787,7 +787,7 @@ int main(int argc, char * argv[]){
       //counting jet
       jets::counting_jets(&analysisTree, otree, &cfg, &inputs_btag_scaling_medium);
       //MET
-      fillMET(ch, leptonIndex, tauIndex, &analysisTree, otree, isData);
+      fillMET(ch, leptonIndex, tauIndex, &analysisTree, otree);
 
       TLorentzVector genV( 0., 0., 0., 0.);
       TLorentzVector genL( 0., 0., 0., 0.);
@@ -1439,33 +1439,18 @@ bool extra_muon_veto(int leptonIndex, TString ch, const Config *cfg, const AC1B 
 //////MET FUNCTIONS
 
 //fill the otree with the met variables
-void fillMET(TString ch, int leptonIndex, int tauIndex, const AC1B * analysisTree, Spring15Tree *otree, bool isData){
+void fillMET(TString ch, int leptonIndex, int tauIndex, const AC1B * analysisTree, Spring15Tree *otree){
 
    // pfmet variables
-	// back to pfmet instead of pfmetcorr for MC 
-
-  float met_x = -9999;
-  float met_y = -9999;
-  if (!isData){
-    otree->met = TMath::Sqrt(analysisTree->pfmet_ex*analysisTree->pfmet_ex + analysisTree->pfmet_ey*analysisTree->pfmet_ey);
-    otree->metphi = TMath::ATan2(analysisTree->pfmet_ey,analysisTree->pfmet_ex);
-    otree->metcov00 = analysisTree->pfmet_sigxx;
-    otree->metcov01 = analysisTree->pfmet_sigxy;
-    otree->metcov10 = analysisTree->pfmet_sigyx;
-    otree->metcov11 = analysisTree->pfmet_sigyy;
-    float met_x = analysisTree->pfmet_ex;
-    float met_y = analysisTree->pfmet_ey;
-  }
-  else {
-    otree->met = TMath::Sqrt(analysisTree->pfmetcorr_ex*analysisTree->pfmetcorr_ex + analysisTree->pfmetcorr_ey*analysisTree->pfmetcorr_ey);
-    otree->metphi = TMath::ATan2(analysisTree->pfmetcorr_ey,analysisTree->pfmetcorr_ex);
-    otree->metcov00 = analysisTree->pfmetcorr_sigxx;
-    otree->metcov01 = analysisTree->pfmetcorr_sigxy;
-    otree->metcov10 = analysisTree->pfmetcorr_sigyx;
-    otree->metcov11 = analysisTree->pfmetcorr_sigyy;
-    float met_x = analysisTree->pfmetcorr_ex;
-    float met_y = analysisTree->pfmetcorr_ey;
-  }
+  
+  otree->met = TMath::Sqrt(analysisTree->pfmetcorr_ex*analysisTree->pfmetcorr_ex + analysisTree->pfmetcorr_ey*analysisTree->pfmetcorr_ey);
+  otree->metphi = TMath::ATan2(analysisTree->pfmetcorr_ey,analysisTree->pfmetcorr_ex);
+  otree->metcov00 = analysisTree->pfmetcorr_sigxx;
+  otree->metcov01 = analysisTree->pfmetcorr_sigxy;
+  otree->metcov10 = analysisTree->pfmetcorr_sigyx;
+  otree->metcov11 = analysisTree->pfmetcorr_sigyy;
+  float met_x = analysisTree->pfmetcorr_ex;
+  float met_y = analysisTree->pfmetcorr_ey;
 
   float met_x2 = met_x * met_x;
   float met_y2 = met_y * met_y;
