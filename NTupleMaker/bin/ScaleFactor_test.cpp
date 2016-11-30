@@ -19,24 +19,52 @@ float tauEta [3]= {0.1, 1.5, 2.0};
 std::string WP [6] = {"VLoose","Loose","Medium","Tight","VTight"};
 
 LepTauFakeRate *LepTauFakeRate_test = new LepTauFakeRate();
-string channel = "et";
-LepTauFakeRate_test->Init(channel);
+LepTauFakeRate_test->Init();
 
-// float get_fakerate( char* channel, string AntiLeptonDiscriminatorWP, float tauEta, int tau_gen_match )
+
+std::cout << " --------------------------------------- " << std::endl;
 std::cout << "putting gen_match == 1" << std::endl;
+std::cout << " --------------------------------------- " << std::endl;
 
 for (int i=0; i<3; i++){
 	for (int j=0; j<5; j++){ 
-		float SF = LepTauFakeRate_test->get_fakerate("et",WP[j],tauEta[i],1);
+		float SF = LepTauFakeRate_test->get_fakerate("electron",WP[j],tauEta[i],1);
 		std::cout<<"WP : "<< WP[j] << " | eta " << tauEta[i] << " | SF " <<  SF << std::endl;
 	}
 }
 
-std::cout << "putting gen_match == 2" << std::endl;
+std::cout << " --------------------------------------- " << std::endl;
+std::cout << "putting gen_match == 3" << std::endl;
+std::cout << " --------------------------------------- " << std::endl;
+
 for (int i=0; i<3; i++){
 	for (int j=0; j<5; j++){ 
-		float SF = LepTauFakeRate_test->get_fakerate("et",WP[j],tauEta[i],2);
+		float SF = LepTauFakeRate_test->get_fakerate("electron",WP[j],tauEta[i],3);
 		std::cout<<"WP : "<< WP[j] << " | eta " << tauEta[i] << " | SF " <<  SF << std::endl;
+	}
+}
+
+
+std::string WP_mu [2] = {"Loose","Tight"};
+
+std::cout << " --------------------------------------- " << std::endl;
+std::cout << "putting gen_match == 2" << std::endl;
+std::cout << " --------------------------------------- " << std::endl;
+for (int i=0; i<3; i++){
+	for (int j=0; j<2; j++){ 
+		float SF = LepTauFakeRate_test->get_fakerate("muon",WP_mu[j],tauEta[i],2);
+		std::cout<<"WP : "<< WP_mu[j] << " | eta " << tauEta[i] << " | SF " <<  SF << std::endl;
+	}
+}
+
+
+std::cout << " --------------------------------------- " << std::endl;
+std::cout << "putting gen_match == 4" << std::endl;
+std::cout << " --------------------------------------- " << std::endl;
+for (int i=0; i<3; i++){
+	for (int j=0; j<2; j++){ 
+		float SF = LepTauFakeRate_test->get_fakerate("muon",WP_mu[j],tauEta[i],4);
+		std::cout<<"WP : "<< WP_mu[j] << " | eta " << tauEta[i] << " | SF " <<  SF << std::endl;
 	}
 }
 

@@ -391,7 +391,7 @@ int main(int argc, char * argv[]){
 
   // lepton to tau fake init
   LepTauFakeRate *leptauFR = new LepTauFakeRate();
-  leptauFR->Init(ch);
+  leptauFR->Init();
 
   // output fileName with histograms
   rootFileName += "_";
@@ -805,12 +805,19 @@ int main(int argc, char * argv[]){
 	    otree->topptweight = genTools::topPtWeight(analysisTree);
 
 
-      // lepton tau fakerate
-      otree->leptaufakeweight = 1.;
+      // lepton tau fakerates
+      otree->mutaufakeweight = 1.;
+      otree->etaufakeweight = 1.;
 	  if (!isData){
-	  	if (ch == "et") otree->leptaufakeweight = leptauFR->get_fakerate(ch, "Tight", otree->eta_2, otree->gen_match_2);
-		if (ch == "mt") otree->leptaufakeweight = leptauFR->get_fakerate(ch, "Tight", otree->eta_2, otree->gen_match_2);
-	  }
+	  	if (ch == "et") {
+			otree->etaufakeweight = leptauFR->get_fakerate("electron", "Tight", otree->eta_2, otree->gen_match_2);
+			otree->mutaufakeweight = leptauFR->get_fakerate("muon", "Loose", otree->eta_2, otree->gen_match_2);
+		}
+		else if (ch == "mt") {
+			otree->etaufakeweight = leptauFR->get_fakerate("electron", "VLoose", otree->eta_2, otree->gen_match_2);
+			otree->mutaufakeweight = leptauFR->get_fakerate("muon", "Tight", otree->eta_2, otree->gen_match_2);
+	    }
+      }
       ////////////////////////////////////////////////////////////
       // MET Recoil Corrections
       ////////////////////////////////////////////////////////////

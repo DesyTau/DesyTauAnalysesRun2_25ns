@@ -73,7 +73,8 @@ void Spring15Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("zptweight", &zptweight, &b_zptweight);
    fChain->SetBranchAddress("trkeffweight_1", &trkeffweight_1, &b_trkeffweight_1);
    fChain->SetBranchAddress("effweight", &effweight, &b_effweight); 
-   fChain->SetBranchAddress("leptaufakeweight", &leptaufakeweight, &b_leptaufakeweight);
+   fChain->SetBranchAddress("etaufakeweight", &etaufakeweight, &b_etaufakeweight);
+   fChain->SetBranchAddress("mutaufakeweight", &mutaufakeweight, &b_mutaufakeweight);
    fChain->SetBranchAddress("fakeweight", &fakeweight, &b_fakeweight);
    fChain->SetBranchAddress("embeddedWeight", &embeddedWeight, &b_embeddedWeight);
    fChain->SetBranchAddress("signalWeight", &signalWeight, &b_signalWeight);
@@ -373,7 +374,8 @@ void Spring15Tree::WriteInit(TTree *tree) {
   fChain->Branch("zptweight", &zptweight, "zptweight/D"); 
   fChain->Branch("trkeffweight_1", &trkeffweight_1, "trkeffweight_1/D"); 
   fChain->Branch("effweight", &effweight, "effweight/F");
-  fChain->Branch("leptaufakeweight", &leptaufakeweight, "leptaufakeweight/F");
+  fChain->Branch("etaufakeweight", &etaufakeweight, "etaufakeweight/F");
+  fChain->Branch("mutaufakeweight", &mutaufakeweight, "mutaufakeweight/F");
   fChain->Branch("fakeweight", &fakeweight, "fakeweight/F");
   fChain->Branch("embeddedWeight", &embeddedWeight, "embeddedWeight/F");
   fChain->Branch("signalWeight", &signalWeight, "signalWeight/F");
