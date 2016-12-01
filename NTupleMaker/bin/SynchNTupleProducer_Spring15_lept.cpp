@@ -997,11 +997,11 @@ int main(int argc, char * argv[]){
 	   topPtWeightSys->Eval();
 	   jetEnergyScaleSys->Eval();
 	   if (ch=="mt") {
-         //tauScaleSys->Eval(utils::MUTAU);
+         tauScaleSys->Eval(utils::MUTAU);
 		 lepTauFakeScaleSys->Eval(utils::MUTAU);
          }
 	   else if (ch=="et") {
-         //tauScaleSys->Eval(utils::ETAU);
+         tauScaleSys->Eval(utils::ETAU);
 		 lepTauFakeScaleSys->Eval(utils::ETAU);
        }
 	  }
