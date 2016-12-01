@@ -160,6 +160,9 @@ int main(int argc, char * argv[]){
   const string idIsoEffFile = cfg.get<string>("idIsoEffFile");
   const string trigEffFile = cfg.get<string>("trigEffFile");
 
+  const string idIsoEffFile_antiiso = cfg.get<string>("idIsoEffFile_antiiso");
+  const string trigEffFile_antiiso = cfg.get<string>("trigEffFile_antiiso");
+  	
   //svfit
   //const string svFitPtResFile = cfg.get<string>("svFitPtResFile");
   const string svFitPtResFile = TString(TString(cmsswBase)+"/src/"+TString(cfg.get<string>("svFitPtResFile"))).Data();
@@ -370,11 +373,19 @@ int main(int argc, char * argv[]){
   ScaleFactor * SF_lepIdIso = new ScaleFactor();
   ScaleFactor * SF_lepTrigger = new ScaleFactor();
 
+  // Scale factors for anti-isolated control regions
+  ScaleFactor * SF_lepIdIso_antiiso = new ScaleFactor();
+  ScaleFactor * SF_lepTrigger_antiiso = new ScaleFactor();
+
   if(ApplyLepSF){
     SF_lepIdIso->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(idIsoEffFile));
-  
+
     // Electron SingleElectron trigger scale factor
     SF_lepTrigger->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(trigEffFile));
+
+    SF_lepIdIso_antiiso->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(idIsoEffFile_antiiso));
+    SF_lepTrigger_antiiso->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(trigEffFile_antiiso));
+
   }
 
 
@@ -444,6 +455,7 @@ int main(int argc, char * argv[]){
   ZPtWeightSys* zPtWeightSys = 0;
   TopPtWeightSys* topPtWeightSys = 0;
   JetEnergyScaleSys* jetEnergyScaleSys = 0;
+  LepTauFakeScaleSys * lepTauFakeScaleSys = 0;
   if(!isData && ApplySystShift){
     tauScaleSys = new TauScaleSys(otree);
     tauScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);
@@ -452,6 +464,8 @@ int main(int argc, char * argv[]){
 	jetEnergyScaleSys = new JetEnergyScaleSys(otree);
 	jetEnergyScaleSys->SetConfig(&cfg);
     jetEnergyScaleSys->SetBtagScaling(&inputs_btag_scaling_medium);
+    lepTauFakeScaleSys = new LepTauFakeScaleSys(otree);
+    lepTauFakeScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);
   }
 
 
@@ -741,6 +755,8 @@ int main(int argc, char * argv[]){
           otree->trigweight_1 = (SF_lepTrigger->get_EfficiencyData(double(analysisTree.muon_pt[leptonIndex]),double(analysisTree.muon_eta[leptonIndex])));
               // Scale Factor Id+Iso SF_eleIdIso
           otree->idisoweight_1 = (SF_lepIdIso->get_ScaleFactor(double(analysisTree.muon_pt[leptonIndex]),double(analysisTree.muon_eta[leptonIndex])));
+          otree->trigweight_antiiso_1 = (SF_lepTrigger_antiiso->get_EfficiencyData(double(analysisTree.muon_pt[leptonIndex]),double(analysisTree.muon_eta[leptonIndex])));
+          otree->idisoweight_antiiso_1 =  (SF_lepIdIso_antiiso->get_ScaleFactor(double(analysisTree.muon_pt[leptonIndex]),double(analysisTree.muon_eta[leptonIndex])));
 
 	         // tracking efficiency weight
 		   w->var("m_eta")->setVal(analysisTree.muon_eta[leptonIndex]); 
@@ -760,6 +776,8 @@ int main(int argc, char * argv[]){
           otree->trigweight_1 = (SF_lepTrigger->get_EfficiencyData(double(analysisTree.electron_pt[leptonIndex]),double(analysisTree.electron_eta[leptonIndex])));
                 // Scale Factor Id+Iso SF_eleIdIso
           otree->idisoweight_1 = (SF_lepIdIso->get_ScaleFactor(double(analysisTree.electron_pt[leptonIndex]),double(analysisTree.electron_eta[leptonIndex])));
+          otree->trigweight_antiiso_1 = (SF_lepTrigger_antiiso->get_EfficiencyData(double(analysisTree.electron_pt[leptonIndex]),double(analysisTree.electron_eta[leptonIndex])));
+          otree->idisoweight_antiiso_1 =  (SF_lepIdIso_antiiso->get_ScaleFactor(double(analysisTree.electron_pt[leptonIndex]),double(analysisTree.electron_eta[leptonIndex])));
 
 	            // tracking efficiency weight
 		  w->var("e_eta")->setVal(analysisTree.electron_eta[leptonIndex]); 
@@ -978,8 +996,14 @@ int main(int argc, char * argv[]){
        zPtWeightSys->Eval(); 
 	   topPtWeightSys->Eval();
 	   jetEnergyScaleSys->Eval();
-	   if (ch=="mt") tauScaleSys->Eval(utils::MUTAU);
-	   if (ch=="et") tauScaleSys->Eval(utils::ETAU);
+	   if (ch=="mt") {
+         //tauScaleSys->Eval(utils::MUTAU);
+		 lepTauFakeScaleSys->Eval(utils::MUTAU);
+         }
+	   else if (ch=="et") {
+         //tauScaleSys->Eval(utils::ETAU);
+		 lepTauFakeScaleSys->Eval(utils::ETAU);
+       }
 	  }
 
       selEvents++;
@@ -1021,6 +1045,11 @@ int main(int argc, char * argv[]){
   if(jetEnergyScaleSys != 0){
     jetEnergyScaleSys->Write();
     delete jetEnergyScaleSys;
+  }
+
+  if(lepTauFakeScaleSys != 0){
+    lepTauFakeScaleSys->Write();
+    delete lepTauFakeScaleSys;
   }
 
   file->Close();
@@ -1119,6 +1148,8 @@ void fill_weight(const AC1B * analysisTree, Spring15Tree *otree, PileUp *PUoffic
   otree->trigweight_2 = 1;
   otree->idisoweight_1 = 0;
   otree->idisoweight_2 = 1;
+  otree->trigweight_antiiso_1 = 0;
+  otree->idisoweight_antiiso_1 = 0;
   otree->trkeffweight_1=1;
   otree->effweight = 0;
   //otree->fakeweight = 0;

@@ -284,16 +284,8 @@ cout << "warning : indexLeadingJet ==indexSubLeadingJet = " << indexSubLeadingJe
   if (indexLeadingJet>=0 && indexSubLeadingJet>=0) {
     otree->njetingap = 0;
     TLorentzVector jet1; 
-				 /*jet1.SetPxPyPzE(analysisTree->pfjet_px[indexLeadingJet],
-                 analysisTree->pfjet_py[indexLeadingJet],
-                 analysisTree->pfjet_pz[indexLeadingJet],
-                 analysisTree->pfjet_e[indexLeadingJet]);*/
-
     TLorentzVector jet2; 
-				 /*jet2.SetPxPyPzE(analysisTree->pfjet_px[indexSubLeadingJet],
-                 analysisTree->pfjet_py[indexSubLeadingJet],
-                 analysisTree->pfjet_pz[indexSubLeadingJet],
-                 analysisTree->pfjet_e[indexSubLeadingJet]);*/
+
 	jet1.SetPtEtaPhiE(otree->jpt_1, otree->jeta_1, otree->jphi_1, get_jetE(analysisTree, indexLeadingJet, JESshift));
 	jet2.SetPtEtaPhiE(otree->jpt_2, otree->jeta_2, otree->jphi_2, get_jetE(analysisTree, indexSubLeadingJet, JESshift));
 

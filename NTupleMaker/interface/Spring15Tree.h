@@ -36,8 +36,10 @@ public :
   Float_t         mcweight;
   Float_t         pu_weight;
   Float_t         trigweight_1;
+  Float_t         trigweight_antiiso_1;
   Float_t         trigweight_2;
   Float_t         idisoweight_1;
+  Float_t         idisoweight_antiiso_1;
   Float_t         idisoweight_2;
   Float_t         topptweight;
   Double_t 		  zptweight;
@@ -262,8 +264,10 @@ public :
   TBranch        *b_mcweight;   //!
   TBranch        *b_pu_weight;   //!
   TBranch        *b_trigweight_1;   //!
+  TBranch        *b_trigweight_antiiso_1;   //!
   TBranch        *b_trigweight_2;   //!
   TBranch        *b_idisoweight_1;   //!
+  TBranch        *b_idisoweight_antiiso_1;   //!
   TBranch        *b_idisoweight_2;   //!
   TBranch        *b_topptweight;   //! 
   TBranch        *b_zptweight;
