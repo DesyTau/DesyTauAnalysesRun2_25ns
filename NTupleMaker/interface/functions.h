@@ -433,9 +433,12 @@ namespace genTools{
     if (pt1>400) pt1 = 400;
     if (pt2>400) pt2 = 400;
     
-    float a = 0.156;    // Run1 a parameter
-    float b = -0.00137;  // Run1 b parameter
-    
+    //float a = 0.156;    // Run1 a parameter
+    //float b = -0.00137;  // Run1 b parameter
+    // new values for 13 TeV
+    float a = 0.0615;    
+    float b = -0.0005;  
+
     float w1 = TMath::Exp(a+b*pt1);
     float w2 = TMath::Exp(a+b*pt2);
     
