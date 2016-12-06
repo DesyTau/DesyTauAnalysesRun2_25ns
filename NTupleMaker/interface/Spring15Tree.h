@@ -26,9 +26,9 @@ public :
   Int_t fCurrent;  //!current Tree number in a TChain
   
   // Declaration of leaf types
-  Int_t           run;
-  Int_t           lumi;
-  Int_t           evt;
+  UInt_t          run;
+  UInt_t          lumi;
+  UInt_t          evt;
   Int_t           npv;
   Float_t         npu;
   Float_t         rho;
