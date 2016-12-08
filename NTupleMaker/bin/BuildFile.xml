@@ -141,6 +141,10 @@
  <use name="DesyTauAnalyses/NTupleMaker"/>
  <use name="HTT-utilities/LepEffInterface"/>
  <use name="HTT-utilities/RecoilCorrections"/>
+ <use name="HTT-utilities/TrackEff"/>
+ <use name="TauAnalysis/SVfitStandalone"/>
+ <use name="CondFormats/BTauObjects"/>
+ <use name="CondTools/BTau"/>
 </bin>
 
 <bin name="SynchNTupleProducer_mt" file="SynchNTupleProducer_mt.cpp">
