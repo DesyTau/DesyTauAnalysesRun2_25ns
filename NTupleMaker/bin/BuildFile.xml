@@ -19,7 +19,7 @@
  <use name="HTT-utilities/LepEffInterface"/>
 </bin>
 
-<bin name="AnalysisMacro_dimuons" file="AnalysisMacro_dimuons.cp">
+<bin name="AnalysisMacro_dimuons" file="AnalysisMacro_dimuons.cpp">
  <use name="HTT-utilities/RecoilCorrections"/>
  <use name="PhysicsTools/Utilities"/>
  <use name="rootgraphics"/>
@@ -57,7 +57,7 @@
  <use name="DesyTauAnalyses/NTupleMaker"/>
 </bin>
 
-<bin name="AnalysisMacro_ZTauTauMuMu" file="AnalysisMacro_ZTauTauMuMu.cp">
+<bin name="AnalysisMacro_ZTauTauMuMu" file="AnalysisMacro_ZTauTauMuMu.cpp">
  <use name="PhysicsTools/Utilities"/>
  <use name="rootgraphics"/>
  <use name="root"/>
@@ -73,7 +73,7 @@
  <use name="HTT-utilities/QCDModelingEMu"/>
 </bin>
 
-<bin name="AnalysisMacro_ZTTMM" file="AnalysisMacro_ZTTMM.cp">
+<bin name="AnalysisMacro_ZTTMM" file="AnalysisMacro_ZTTMM.cpp">
  <use name="PhysicsTools/Utilities"/>
  <use name="rootgraphics"/>
  <use name="root"/>
@@ -86,7 +86,7 @@
  <use name="HTT-utilities/RecoilCorrections"/>
 </bin>
 
-<bin name="AnalysisMacro_SV" file="AnalysisMacro_zttmmSV.cp">
+<bin name="AnalysisMacro_SV" file="AnalysisMacro_zttmmSV.cpp">
  <use name="PhysicsTools/Utilities"/>
  <use name="rootgraphics"/>
  <use name="root"/>
@@ -100,7 +100,7 @@
  <use name="HTT-utilities/RecoilCorrections"/>
 </bin>
 
-<bin name="SynchNTupleProducer_mt" file="SynchNTupleProducer_mt.cp">
+<bin name="SynchNTupleProducer_mt" file="SynchNTupleProducer_mt.cpp">
  <use name="PhysicsTools/Utilities"/>
  <use name="rootgraphics"/>
  <use name="root"/>
@@ -133,7 +133,7 @@
 </bin>
 
 
-<bin name="TagAndProbe2016_mumu" file="TagAndProbe2016_mumu.cp">
+<bin name="TagAndProbe2016_mumu" file="TagAndProbe2016_mumu.cpp">
  <use name="PhysicsTools/Utilities"/>
  <use name="rootgraphics"/>
  <use name="root"/>
@@ -144,7 +144,7 @@
  <use name="DesyTauAnalyses/NTupleMaker"/>
 </bin>
 
-<bin name="TagAndProbe2016_ee" file="TagAndProbe2016_ee.cp">
+<bin name="TagAndProbe2016_ee" file="TagAndProbe2016_ee.cpp">
  <use name="PhysicsTools/Utilities"/>
  <use name="rootgraphics"/>
  <use name="root"/>
@@ -156,7 +156,7 @@
  <use name="TauAnalysis/SVfitStandalone"/> 
 </bin>
 
-<bin name="diMuon2016" file="diMuon2016.cp">
+<bin name="diMuon2016" file="diMuon2016.cpp">
  <use name="PhysicsTools/Utilities"/>
  <use name="rootgraphics"/>
  <use name="root"/>
@@ -182,7 +182,7 @@
   <use   name="rootgraphics"/>
 </bin>
 
-<bin name="AnalysisMacro_dimuonsMET" file="AnalysisMacro_dimuonsMET.cp">
+<bin name="AnalysisMacro_dimuonsMET" file="AnalysisMacro_dimuonsMET.cpp">
  <use name="PhysicsTools/Utilities"/>
  <use name="rootgraphics"/>
  <use name="root"/>
