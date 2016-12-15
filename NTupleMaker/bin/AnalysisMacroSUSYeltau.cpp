@@ -240,7 +240,8 @@ int main(int argc, char * argv[]) {
   PileUp * PUofficial = new PileUp();
    //TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/pileUp_data_2016_Cert_Cert_271036-276811_NoL1T_xsec63mb.root","read");
 
-  TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/pileUp_data_Cert_271036-277148_13TeV_PromptReco_Collisions16_xsec69p2mb.root","read");
+//  TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/pileUp_data_Cert_271036-277148_13TeV_PromptReco_Collisions16_xsec69p2mb.root","read");
+  TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/pileUp_data_RunBCDE_ReReco.root","read");
   TFile * filePUdistribution_MC = new TFile (TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/MC_Spring16_PU25ns_V1.root", "read");
 
 
@@ -943,7 +944,6 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       bool isMainTrigger = false;
 
 
-
       if (isData){
       unsigned int nfilters = analysisTree.run_hltfilters->size();
       //  std::cout << "nfiltres = " << nfilters << std::endl;
@@ -1023,7 +1023,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       //      std::cout << "electrons = " << electrons.size() << "  taus = " << taus.size() << std::endl;
       //
       for (unsigned int im=0; im<electrons.size(); ++im) {
-	bool isEleLegMatch = false;
+	bool isLegMatch = false;
 	//	bool isElectronTauSingleElectronFilterNameMatch = false;
 	//	bool isElectronTauOverlapElectronMatch = false;
 	unsigned int eIndex  = electrons.at(im);
@@ -1051,14 +1051,14 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	    float dRtrig = deltaR(analysisTree.electron_eta[eIndex],analysisTree.electron_phi[eIndex],
 				  analysisTree.trigobject_eta[iT],analysisTree.trigobject_phi[iT]);
 	    if (dRtrig<deltaRTrigMatch) 
-	      isEleLegMatch = true;
+	      isLegMatch = true;
 	    
 	  }
 	 }
 	}
-      if (!isData) isEleLegMatch = true;
+      if (!isData) isLegMatch = true;
 
-      if (!isEleLegMatch) continue;
+      if (!isLegMatch) continue;
 
 	for (unsigned int it=0; it<taus.size(); ++it) {
 

@@ -7,7 +7,7 @@
 #$ -l h_rt=0:45:00
 #
 #(the maximum memory usage of this job)
-#$ -l h_vmem=3000M
+#$ -l h_vmem=2000M
 #
 #(use hh site)
 #$ -l site=hh
@@ -22,9 +22,9 @@
 #$ -V
 #
 
-cd /nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/CMSSW_8_0_12/src/DesyTauAnalyses/NTupleMaker/test ;  eval `scramv1 runtime -sh` ;
+cd /nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/CMSSW_8_0_20/src/DesyTauAnalyses/NTupleMaker/test;  eval `scramv1 runtime -sh` ;
 
-wdir="/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/CMSSW_8_0_12/src/DesyTauAnalyses/NTupleMaker/test"
+wdir="/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/CMSSW_8_0_20/src/DesyTauAnalyses/NTupleMaker/test"
 channel=$2 
 dir=$2
 

@@ -82,78 +82,42 @@ float SF = 1.;
 
 if ( working_point == "MVA"){
 
-/*
-if ( sel =="mutau"){
 
-if (  fabs(eta) < 0.9 )
-        {
-                if (pt>20 && pt<30) SF = 1.07968;
-                if (pt>30 && pt<40) SF = 0.847355;
-                if (pt>40 ) SF = 0.833833;
-        }
-if (  fabs(eta) > 0.9 && fabs(eta) < 1.2 )
-        {
-
-                if (pt>20 && pt<30) SF = 1.03273;
-                if (pt>30 && pt<40) SF = 0.943387;
-                if (pt>40 ) SF = 1.07113;
-        }
-
-if (  fabs(eta) > 1.2 && fabs(eta) < 2.1 )
-        {
-
-                if (pt>20 && pt<30) SF = 1.08635;
-                if (pt>30 && pt<40) SF = 1.13754;
-                if (pt>40) SF = 1.0387;
-        }
-if (  fabs(eta) > 2.1 && fabs(eta) < 2.4 )
-        {
-
-                if (pt>20 && pt<30) SF = 0.977868;
-                if (pt>30 && pt<40) SF = 0.974665;
-                if (pt>40) SF = 0.902185;
-        }
-
-}//mutau MVA
-*/
-
-if ( sel =="mutau"){
-
+//if ( sel =="mutau"){
+	{
 if (  fabs(eta) < 0.8 )
         {
-                if (pt>20 && pt<30) SF = 1.06985;
-                if (pt>30 && pt<40) SF = 0.916968;
-                if (pt>40 ) SF = 0.811926;
+                if (pt>20 && pt<30) SF = 1.00935;
+                if (pt>30 && pt<40) SF = 0.936345;
+                if (pt>40 ) SF = 0.807783;
         }
-if (  fabs(eta) > 0.9 && fabs(eta) < 1.44 )
+if (  fabs(eta) > 0.8 && fabs(eta) < 1.44 )
         {
 
-                if (pt>20 && pt<30) SF = 1.10921;
-                if (pt>30 && pt<40) SF = 0.88544;
-                if (pt>40 ) SF = 1.08596;
+                if (pt>20 && pt<30) SF = 1.11317;
+                if (pt>30 && pt<40) SF = 1.10086;
+                if (pt>40 ) SF = 1.00452;
         }
 
 if (  fabs(eta) > 1.44 && fabs(eta) < 1.566 )
         {
 
-                if (pt>20 && pt<30) SF = 1.28118;
-                if (pt>30 && pt<40) SF = 1.1486;
-                if (pt>40) SF = 0.91935;
+                if (pt>20 && pt<40) SF = 1.12201;
+                if (pt>40 ) SF =  1.34582;
         }
 if (  fabs(eta) > 1.566 && fabs(eta) < 2.3 )
         {
 
-                if (pt>20 && pt<30) SF = 0.991456;
-                if (pt>30 && pt<40) SF = 1.06501;
-                if (pt>40) SF = 0.976065;
+                if (pt>20 && pt<30) SF = 1.13738;
+                if (pt>30 && pt<40) SF = 1.17215;
+                if (pt>40) SF = 0.991638;
         }
 
 }//mutau MVA
 
 
 
-
-
+/*
 if ( sel =="eltau"){
 
 if (  fabs(eta) < 0.8 )
@@ -187,7 +151,7 @@ if (  fabs(eta) > 1.566 && fabs(eta) < 2.3 )
 		if (pt>40) SF = 0.871699;
 	}
 }//eltau MVA
-
+*/
 
 
 /*

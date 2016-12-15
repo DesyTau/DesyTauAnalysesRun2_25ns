@@ -106,7 +106,7 @@ echo Signal file here .....
 ls
 
 
-if [[ ! -f $dir/plots_$channel/${fileB}_${syst}_B.root ]] ; then
+if [[ ! -f $dir/plots_$channel/${fileB}_${syst}_B.root ]] && [[ ! -f $dir/plots_$channel/${fileB}_B.root ]] ; then
 echo the signal filein : $file , the fileout : ${fileB}_B.root
 
 sed -i 's/FILEIN/'$file'/g' analyzer*
@@ -135,7 +135,7 @@ cp analyzer_h analyzer.h
 
 ######### B region non inverted OS
 
-if [[ ! -f $dir/plots_$channel/${fileB}_${syst}_B.root  ]] &&  [[ $file != *"stau"* && $file != *"C1"* ]]; then
+if [[ ! -f $dir/plots_$channel/${fileB}_${syst}_B.root  ]] && [[ ! -f $dir/plots_$channel/${fileB}_B.root ]]  &&  [[ $file != *"stau"* && $file != *"C1"* ]]; then
 cp analyzer_h analyzer.h
 cp analyzer${channel}_C analyzer.C
 
@@ -159,7 +159,7 @@ fi
 
 ######### A region non inverted SS
 
-if [[ ! -f $dir/plots_$channel/${fileB}_${syst}_A.root ]]  && [[ $file != *"stau"* && $file != *"C1"*  ]] && [[ $2 != "Ttemplate" ]] && [[ $2 != "mumu" ]]; then
+if [[ ! -f $dir/plots_$channel/${fileB}_${syst}_A.root ]]  && [[ ! -f $dir/plots_$channel/${fileB}_A.root ]] && [[ $file != *"stau"* && $file != *"C1"*  ]] && [[ $2 != "Ttemplate" ]] && [[ $2 != "mumu" ]]; then
 #if [[ ! -f $dir/plots_$channel/${fileB}_A.root ]]  &&  [[ $2 != "Ttemplate" ]] && [[ $2 != "mumu" ]]  && [[ $file == *"stau"*  || $file == *"C1"* ]]; then
 cp analyzer_h analyzer.h
 cp analyzer${channel}_C analyzer.C
@@ -188,7 +188,7 @@ fi
 
 
 ######## D region
-if [[ ! -f $dir/plots_$channel/${fileB}_${syst}_D.root  ]] &&  [[ $file != *"stau"*  && $file != *"C1"* ]] && [[ $2 != "Ttemplate" ]] && [[ $2 != "mumu" ]]; then
+if [[ ! -f $dir/plots_$channel/${fileB}_${syst}_D.root  ]]  && [[ ! -f $dir/plots_$channel/${fileB}_D.root ]] &&  [[ $file != *"stau"*  && $file != *"C1"* ]] && [[ $2 != "Ttemplate" ]] && [[ $2 != "mumu" ]]; then
 cp analyzer${channel}_C analyzer.C
 cp analyzer_h analyzer.h
 
@@ -211,7 +211,7 @@ fi
 
 
 ####### C region
-if [[ ! -f $dir/plots_$channel/${fileB}_${syst}_C.root  ]] &&  [[ $file != *"stau"* && $file != *"C1"*  ]] && [[ $2 != "Ttemplate" ]] && [[ $2 != "mumu" ]]; then
+if [[ ! -f $dir/plots_$channel/${fileB}_${syst}_C.root  ]] && [[ ! -f $dir/plots_$channel/${fileB}_C.root ]] &&  [[ $file != *"stau"* && $file != *"C1"*  ]] && [[ $2 != "Ttemplate" ]] && [[ $2 != "mumu" ]]; then
 cp analyzer${channel}_C analyzer.C
 cp analyzer_h analyzer.h
 

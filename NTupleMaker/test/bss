@@ -4,10 +4,10 @@
 #$ -S /bin/sh
 #
 #(the cpu time for this job)
-#$ -l h_cpu=0:10:00
+#$ -l h_cpu=0:25:00
 #
 #(the maximum memory usage of this job)
-#$ -l h_vmem=1000M
+#$ -l h_vmem=1500M
 #
 #(use hh site)
 #$ -l site=hh

@@ -152,7 +152,7 @@ void analyzer::Loop(){
 
 
 /*
-	TString inputRootFile2 = "/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/CMSSW_8_0_12/src/DesyTauAnalyses/NTupleMaker/data/sf_mu_medium.root";
+	TString inputRootFile2 = "/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/CMSSW_8_0_20/src/DesyTauAnalyses/NTupleMaker/data/sf_mu_medium.root";
 
 	TFile * fileInFast = new TFile(inputRootFile2, "read");
 
@@ -166,7 +166,7 @@ TH2D *histo = (TH2D*) obj;
 */
 
 
-	TFile * filein = new TFile("/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/CMSSW_8_0_12/src/DesyTauAnalyses/NTupleMaker/test/CHANNELHERE/FILEIN","read");
+	TFile * filein = new TFile("/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/CMSSW_8_0_20/src/DesyTauAnalyses/NTupleMaker/test/CHANNELHERE/FILEIN","read");
 
 	TH1D * histW = (TH1D*)filein->Get("eltau/histWeightsH");
 	TH1D * histTop ;

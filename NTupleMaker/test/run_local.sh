@@ -5,7 +5,7 @@ dir=$2
 
 
 ##type MC or Data
-type=MC
+type=Data
 
 
 
@@ -51,7 +51,7 @@ echo $bas $xsec
 if [ ! -f $dir/${bas}_B_OS.root ] ;then
 
 chmod u+x Jobs/job${line}$channel$dir${bas}_B.sh
-. Jobs/job${line}$channel$dir${bas}_B.sh 
+echo . Jobs/job${line}$channel$dir${bas}_B.sh 
 rm Jobs/job${line}$channel$dir${bas}_B.sh 
 
 fi

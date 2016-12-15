@@ -70,7 +70,15 @@ echo SUSY$channel analysisMacroSUSY_Data_B.conf ${bas} $dir 1 >> Jobs/job$line$c
 #echo SUSYeltau analysisMacroSUSY_Data_B.conf ${bas} $dir>> Jobs/job$line$channel$dir${bas}_B.sh
 
 chmod u+x Jobs/job$line$channel$dir${bas}_B.sh
-qsub Jobs/job$line$channel$dir${bas}_B.sh 
+
+wr=$3
+if [[ ${wr} == grid ]] ; 
+then
+	qsub Jobs/job$line$channel$dir${bas}_B.sh 
+else
+	. Jobs/job$line$channel$dir${bas}_B.sh 
+fi
+
 fi
 
 
