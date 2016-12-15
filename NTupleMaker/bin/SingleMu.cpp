@@ -53,7 +53,7 @@
 #include "FWCore/ParameterSet/interface/FileInPath.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/functions.h"
 #include "TauAnalysis/SVfitStandalone/interface/SVfitStandaloneAlgorithm.h"
-#include "HTT-utilities/TrackEff/interface/TrackEff.h"
+//#include "HTT-utilities/TrackEff/interface/TrackEff.h"
 #include "CondFormats/BTauObjects/interface/BTagCalibration.h"
 #include "CondTools/BTau/interface/BTagCalibrationReader.h"
 
@@ -115,21 +115,21 @@ bool isICHEPmed(unsigned int Index, AC1B analysisTree) {
 }
 //------tracking eff--------------------->
 
-double eff(double eta){
-    static const double eff[10] = {0.982399, 0.991747, 0.995945, 0.993413, 0.991461, 0.99468, 0.996666, 0.994934, 0.991187,0.976812};
-    int region = 0;
+// double eff(double eta){
+//     static const double eff[10] = {0.982399, 0.991747, 0.995945, 0.993413, 0.991461, 0.99468, 0.996666, 0.994934, 0.991187,0.976812};
+//     int region = 0;
     
-    if (eta > -2.2309) region++;
-    if (eta > -1.827) region++;
-    if (eta > -1.34607 ) region++;
-    if (eta > -0.843046) region++;
-    if (eta > -0.297941) region++;
-    if (eta > 0.298253) region++;
-    if (eta > 0.843136) region++;
-    if (eta > 1.34753) region++;
-    if (eta > 1.82701) region++;
-    if (eta > 2.2333) region++;
-    return eff[region];
+//     if (eta > -2.2309) region++;
+//     if (eta > -1.827) region++;
+//     if (eta > -1.34607 ) region++;
+//     if (eta > -0.843046) region++;
+//     if (eta > -0.297941) region++;
+//     if (eta > 0.298253) region++;
+//     if (eta > 0.843136) region++;
+//     if (eta > 1.34753) region++;
+//     if (eta > 1.82701) region++;
+//     if (eta > 2.2333) region++;
+//     return eff[region];
 }
 //-------------main function starts here---------------->
 
@@ -158,7 +158,7 @@ int main(int argc, char * argv[]) {
     
     const bool applyMEtRecoilCorrections = cfg.get<bool>("ApplyMEtRecoilCorrections");
     const bool applyLeptonSF = cfg.get<bool>("ApplyLeptonSF");
-    const bool applyTrackEff = cfg.get<bool>("ApplyTrackEff");
+    //const bool applyTrackEff = cfg.get<bool>("ApplyTrackEff");
 
     const bool applyTopPtReweighting = cfg.get<bool>("ApplyTopPtReweighting");
     const bool applyRochCorr = cfg.get<bool>("ApplyRochCorr");
@@ -223,8 +223,8 @@ int main(int argc, char * argv[]) {
     const float singleMuonTriggerPtCut = cfg.get<float>("SingleMuonTriggerPtCut");
     const float singleMuonTriggerEtaCut = cfg.get<float>("SingleMuonTriggerEtaCut");
 
-    const string trackEffFileName = cfg.get<string>("TrackEffFileName");
-    TString TrackEffFileName(trackEffFileName);
+    // const string trackEffFileName = cfg.get<string>("TrackEffFileName");
+    // TString TrackEffFileName(trackEffFileName);
 
     const string recoilFileName   = cfg.get<string>("RecoilFileName");
     TString RecoilFileName(recoilFileName);
@@ -780,13 +780,14 @@ int main(int argc, char * argv[]) {
 
     //------------Tracking Eff scale factor--------->
 
-   // TrackEffSF * SF_trk = new TrackEffSF();
-   // SF_trk = new TrackEffSF();
-   // std::cout<< "test4"<< std::endl;
-   // SF_trk->init_TrackEffSF(TString(cmsswBase)+"/src/"+TString(TrackEffFileName));
-    std::cout<< "test5"<<std::endl;
-    TFile * fileIn = new TFile("ratios.root", "read");
-    TGraphAsymmErrors * ratio_eta = (TGraphAsymmErrors*)fileIn->Get("ratio_eta");
+   // // TrackEffSF * SF_trk = new TrackEffSF();
+   // // SF_trk = new TrackEffSF();
+   // // std::cout<< "test4"<< std::endl;
+   // // SF_trk->init_TrackEffSF(TString(cmsswBase)+"/src/"+TString(TrackEffFileName));
+
+   //  std::cout<< "test5"<<std::endl;
+   //  TFile * fileIn = new TFile("ratios.root", "read");
+   //  TGraphAsymmErrors * ratio_eta = (TGraphAsymmErrors*)fileIn->Get("ratio_eta");
 
     //------------loading recoil resolution----------->
     
@@ -1348,10 +1349,10 @@ int main(int argc, char * argv[]) {
             float pfmet_ex = analysisTree.pfmetcorr_ex;
             float pfmet_ey = analysisTree.pfmetcorr_ey;
             float pfmet_phi = analysisTree.pfmetcorr_phi;
-            if (!isData){
-                pfmet_ex = analysisTree.pfmet_ex;
-                pfmet_ey = analysisTree.pfmet_ey;
-            }
+            //if (!isData){
+            //    pfmet_ex = analysisTree.pfmet_ex;
+            //    pfmet_ey = analysisTree.pfmet_ey;
+            //}
             
             float pfmet = TMath::Sqrt(pfmet_ex*pfmet_ex+pfmet_ey*pfmet_ey);
             pfmet_phi = TMath::ATan2(pfmet_ex,pfmet_ey);
@@ -1988,75 +1989,75 @@ int main(int argc, char * argv[]) {
                             weight = weight*weightTrig;
                         }
                     }
-                    
-		    if (applyTrackEff) {
-		       //std:: cout<< "applying tracking efficiency scale factors \n" << std::endl;
-		      double etaMu1 = (double)analysisTree.muon_eta[indx1];
-		      double etaMu2 = (double)analysisTree.muon_eta[indx2];
+                   / 
+		      //    if (applyTrackEff) // {
+	       // 	       //std:: cout<< "applying tracking efficiency scale factors \n" << std::endl;
+	       // 	      double etaMu1 = (double)analysisTree.muon_eta[indx1];
+	       // 	      double etaMu2 = (double)analysisTree.muon_eta[indx2];
 		      
-		      //std::cout << "etaMu1 = " << etaMu1  << "\t etaMu2 = " << etaMu2 <<std::endl;
+	       // 	      //std::cout << "etaMu1 = " << etaMu1  << "\t etaMu2 = " << etaMu2 <<std::endl;
 		      
-		      //double trackeff1 = SF_trk->get_TrackEffSF(etaMu1);
-		      //double trackeff2 = SF_trk->get_TrackEffSF(etaMu2);
-		      //double trackeff = 1 - (1-trackeff1)*(1-trackeff2);
-                /*
-                Double_t x[10], y[10], eff1=0, eff2 =0;
-                int n = ratio_eta->GetN();
-                std::cout << n << std::endl;
-                int i;
-                std::cout << "etaMu1 = " << etaMu1  << std::endl;
+	       // 	      //double trackeff1 = SF_trk->get_TrackEffSF(etaMu1);
+	       // 	      //double trackeff2 = SF_trk->get_TrackEffSF(etaMu2);
+	       // 	      //double trackeff = 1 - (1-trackeff1)*(1-trackeff2);
+               //  /*
+               //  Double_t x[10], y[10], eff1=0, eff2 =0;
+               //  int n = ratio_eta->GetN();
+               //  std::cout << n << std::endl;
+               //  int i;
+               //  std::cout << "etaMu1 = " << etaMu1  << std::endl;
                 
-                for (i=0; i< n; i++){
-                    ratio_eta->TGraph::GetPoint(i,x[i],y[i]);
-                    std::cout<<i<<" element of X array: "<<x[i]<<std::endl;
-                    std::cout<<i<<" element of Y array: "<<y[i]<<std::endl;
-                    if (etaMu1 < x[i]) break;
+               //  for (i=0; i< n; i++){
+               //      ratio_eta->TGraph::GetPoint(i,x[i],y[i]);
+               //      std::cout<<i<<" element of X array: "<<x[i]<<std::endl;
+               //      std::cout<<i<<" element of Y array: "<<y[i]<<std::endl;
+               //      if (etaMu1 < x[i]) break;
                     
-                    std::cout << "i =" << i << " and " << x[i] << std::endl;
+               //      std::cout << "i =" << i << " and " << x[i] << std::endl;
             
-                }
-                std::cout << "i = " << i << std::endl;
-                eff1 = y[i];
-                std::cout<< "eff is equal to " << i << "th element to y array " << y[i] << std::endl;
-                std::cout << "-----------------------------------------------"<<std::endl;
+               //  }
+               //  std::cout << "i = " << i << std::endl;
+               //  eff1 = y[i];
+               //  std::cout<< "eff is equal to " << i << "th element to y array " << y[i] << std::endl;
+               //  std::cout << "-----------------------------------------------"<<std::endl;
                 
-                std::cout << "etaMu2 = " << etaMu2  << std::endl;
+               //  std::cout << "etaMu2 = " << etaMu2  << std::endl;
                 
-                for (i=0; i< n; i++){
-                    ratio_eta->TGraph::GetPoint(i,x[i],y[i]);
-                    std::cout<<i<<" element of X array: "<<x[i]<<std::endl;
-                    std::cout<<i<<" element of Y array: "<<y[i]<<std::endl;
-                    if (etaMu2 < x[i]) break;
+               //  for (i=0; i< n; i++){
+               //      ratio_eta->TGraph::GetPoint(i,x[i],y[i]);
+               //      std::cout<<i<<" element of X array: "<<x[i]<<std::endl;
+               //      std::cout<<i<<" element of Y array: "<<y[i]<<std::endl;
+               //      if (etaMu2 < x[i]) break;
                     
-                    std::cout << "i =" << i << " and " << x[i] << std::endl;
+               //      std::cout << "i =" << i << " and " << x[i] << std::endl;
                     
-                }
-                std::cout << "i = " << i << std::endl;
-                eff2 = y[i];
-                std::cout<< "eff is equal to " << i << "th element to y array " << y[i] << std::endl;
-                std::cout << "-----------------------------------------------"<<std::endl;
-                */
+               //  }
+               //  std::cout << "i = " << i << std::endl;
+               //  eff2 = y[i];
+               //  std::cout<< "eff is equal to " << i << "th element to y array " << y[i] << std::endl;
+               //  std::cout << "-----------------------------------------------"<<std::endl;
+               //  */
                 
-                //Another method for checking eff--------------------------------
-                //std::cout << "second methd for calculating eff" << std::endl;
-                double efficiency1 = eff(etaMu1);
-                //std::cout << "efficiency for eta1 is =   "<< efficiency1 << std::endl;
-                double efficiency2 = eff(etaMu2);
-                //std::cout << "efficiency for eta2 is =   "<< efficiency2 << std::endl;
-                //std::cout << "-----------------------------------------------"<<std::endl;
+               //  //Another method for checking eff--------------------------------
+               //  //std::cout << "second methd for calculating eff" << std::endl;
+               //  double efficiency1 = eff(etaMu1);
+               //  //std::cout << "efficiency for eta1 is =   "<< efficiency1 << std::endl;
+               //  double efficiency2 = eff(etaMu2);
+               //  //std::cout << "efficiency for eta2 is =   "<< efficiency2 << std::endl;
+               //  //std::cout << "-----------------------------------------------"<<std::endl;
                 
-                double trackeff = 1 - (1-efficiency1)*(1-efficiency2);
-                //std::cout << "trackeff = " << trackeff << std::endl;
+               //  double trackeff = 1 - (1-efficiency1)*(1-efficiency2);
+               //  //std::cout << "trackeff = " << trackeff << std::endl;
                 
 
 		      
-                if (trackeff > 0){
-                    double trkeffweight = trackeff;
-                    n_trkeffweight = trkeffweight;
-                    weight = weight*trkeffweight;
-                }
-               // std::cout << "-----------------End of the Trackeff------------------------------"<<std::endl;
-		    }
+               //  if (trackeff > 0){
+               //      double trkeffweight = trackeff;
+               //      n_trkeffweight = trkeffweight;
+               //      weight = weight*trkeffweight;
+               //  }
+               // // std::cout << "-----------------End of the Trackeff------------------------------"<<std::endl;
+	       // 	    }
                     if (applyMEtRecoilCorrections) {
                         //-----pfmet------
                         float pfmetcorr_ex = pfmet_ex;
