@@ -76,9 +76,10 @@ float topPtWeight(float pt1,
     if (pt1>400) pt1 = 400;
     if (pt2>400) pt2 = 400;
     
-    float a = 0.156;    // Run1 a parameter
-    float b = -0.00137;  // Run1 b parameter
-    
+    //float a = 0.156;    // Run1 a parameter
+    //float b = -0.00137;  // Run1 b parameter
+    float a = 0.0615;    // Run1 a parameter
+    float b = -0.0005;  // Run1 b parameter
     float w1 = TMath::Exp(a+b*pt1);
     float w2 = TMath::Exp(a+b*pt2);
     
@@ -321,6 +322,9 @@ int main(int argc, char * argv[]) {
     Float_t         embeddedWeight;
     Float_t         signalWeight;
     Float_t         topptweight;
+    Float_t         zmumu0jetweight;
+    Float_t         zmumuboostedweight;
+    Float_t         zmumuvbfweight;
     
     Float_t         qcdweight;
     Float_t         qcdweightup;
@@ -646,6 +650,9 @@ int main(int argc, char * argv[]) {
     tree->Branch("embeddedWeight", &embeddedWeight, "embeddedWeight/F");
     tree->Branch("signalWeight", &signalWeight, "signalWeight/F");
     tree->Branch("topptweight", &topptweight, "topptweight/F");
+    tree->Branch("zmumu0jetweight",&zmumu0jetweight,"zmumu0jetweight/F");
+    tree->Branch("zmumuboostedweight",&zmumuboostedweight,"zmumuboostedweight/F");
+    tree->Branch("zmumuvbfweight",&zmumuvbfweight,"zmumuvbfweight/F");
     
     tree->Branch("qcdweight", &qcdweight, "qcdweight/F");
     tree->Branch("qcdweightup", &qcdweightup, "qcdweightup/F");
@@ -1204,6 +1211,9 @@ int main(int argc, char * argv[]) {
             embeddedWeight = 1;
             signalWeight = 1;
             topptweight = 1;
+            zmumu0jetweight = 1 ;
+            zmumuboostedweight = 1;
+            zmumuvbfweight = 1;
             qcdweight = 1;
             qcdweightup = 1;
             qcdweightdown = 1;
@@ -2347,7 +2357,6 @@ int main(int argc, char * argv[]) {
             mjj =  -9999;
             jdeta =  -9999;
             njetingap = 0;
-            
             if (indexLeadingJet>=0 && indexSubLeadingJet>=0) {
                 
 	      float unc1Up   = 1 + analysisTree.pfjet_jecUncertainty[indexLeadingJet]; 
@@ -2390,6 +2399,15 @@ int main(int argc, char * argv[]) {
 	      mjj = (jet1+jet2).M();
 	      mjj_Up = (jet1Up+jet2Up).M();
 	      mjj_Down = (jet1Down+jet2Down).M();
+          
+          if(mjj<700 && mjj>300)
+              zmumuvbfweight = 1.043;
+          if(mjj<1100 && mjj>700)
+                zmumuvbfweight = 0.965;
+          if(mjj<1500 && mjj>1100)
+                zmumuvbfweight = 0.901;
+          if(mjj>1500)
+                zmumuvbfweight = 0.888;
 
 	      //	      std::cout << "mjj = " << mjj << " + " << mjj_Up << " - " << mjj_Down << std::endl;
 
@@ -2507,8 +2525,8 @@ int main(int argc, char * argv[]) {
                     recoilMetCorrector.Correct(met_x,met_y,bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,pfmet_corr_x,pfmet_corr_y);
                 }
             }
-	    met_x = pfmet_corr_x;
-	    met_y = pfmet_corr_y;
+            met_x = pfmet_corr_x;
+            met_y = pfmet_corr_y;
             met = TMath::Sqrt(met_x*met_x+met_y*met_y);
             metphi = TMath::ATan2(met_y,met_x);
             
@@ -2848,7 +2866,26 @@ int main(int argc, char * argv[]) {
                     mt_sv_eDown     = mt_sv;
                     mt_sv_muUp      = mt_sv;
                     mt_sv_muDown    = mt_sv;
-                    
+                
+                
+                    if(pt_sv<100 && pt_sv>0)
+                    zmumuboostedweight = 0.971;
+                
+                    if(pt_sv<150 && pt_sv>100)
+                    zmumuboostedweight = 0.975;
+                
+                    if(pt_sv<200 && pt_sv>150)
+                    zmumuboostedweight = 0.960;
+                
+                    if(pt_sv<250 && pt_sv>200)
+                    zmumuboostedweight = 0.964;
+                
+                    if(pt_sv<300 && pt_sv>250)
+                    zmumuboostedweight = 0.934;
+                
+                    if(pt_sv>300)
+                    zmumuboostedweight = 0.942;
+                
                     bool applyMSVvariations = true;
                     
                     if (!isData && applyMSVvariations) { 
