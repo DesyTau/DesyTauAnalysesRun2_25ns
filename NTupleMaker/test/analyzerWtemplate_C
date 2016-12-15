@@ -64,9 +64,12 @@ void analyzer::Loop(){
 	CutList.push_back("WJets norm");
 	CutList.push_back("MET recoil");
 	CutList.push_back("ZpT correction");
-	CutList.push_back("Jets gt 1 ");
 	CutList.push_back("0 btag");
 	CutList.push_back("MT window");
+	CutList.push_back("Jets le 3 ");
+	CutList.push_back("Jets le 2");
+	CutList.push_back("Jets le 1 ");
+	CutList.push_back("Jets eq 0 ");
 	CutList.push_back("dR lt 3");
 	CutList.push_back("Extra");
 	CutList.push_back("StauCuts");
@@ -424,12 +427,6 @@ if (taus_index>-1 && taus_index<8)			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta
 
 			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		if (njets>1) continue;
-		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
-		CFCounter[iCut]+= all_weights;
-		CFCounter_[iCut]+= all_weights;
-                iCFCounter[iCut]++;
-		iCut++;
 
 		if (nbtag!=0) continue;
 		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
@@ -437,7 +434,6 @@ if (taus_index>-1 && taus_index<8)			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta
 		CFCounter_[iCut]+= all_weights;
                 iCFCounter[iCut]++;
 		iCut++;
-
 
 
 		 TLorentzVector DiL = MuV  ;
@@ -455,6 +451,33 @@ if (taus_index>-1 && taus_index<8)			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta
                 iCFCounter[iCut]++;
 		iCut++;
 
+		if (njets>3) continue;
+		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
+		CFCounter[iCut]+= all_weights;
+		CFCounter_[iCut]+= all_weights;
+                iCFCounter[iCut]++;
+		iCut++;
+
+		if (njets>2) continue;
+		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
+		CFCounter[iCut]+= all_weights;
+		CFCounter_[iCut]+= all_weights;
+                iCFCounter[iCut]++;
+		iCut++;
+
+		if (njets>1) continue;
+		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
+		CFCounter[iCut]+= all_weights;
+		CFCounter_[iCut]+= all_weights;
+                iCFCounter[iCut]++;
+		iCut++;
+
+		if (njets!=0) continue;
+		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
+		CFCounter[iCut]+= all_weights;
+		CFCounter_[iCut]+= all_weights;
+                iCFCounter[iCut]++;
+		iCut++;
                  
                 double Dr=deltaR(mu_eta[muon_index],mu_phi[muon_index],
                                         ta_eta[taus_index],ta_phi[taus_index]);
