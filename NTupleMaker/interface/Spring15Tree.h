@@ -123,6 +123,10 @@ public :
   Int_t           extraelec_veto;
   Int_t           extramuon_veto;
   Float_t 		  chargedIsoPtSum_2;
+  Float_t         neutralIsoPtSum_2;
+  Float_t         puCorrPtSum_2;
+  UInt_t          isolationGammaCands_size_2;
+  UInt_t          signalGammaCands_size_2;
   Float_t         byCombinedIsolationDeltaBetaCorrRaw3Hits_1;
   Float_t         byLooseCombinedIsolationDeltaBetaCorr3Hits_1;
   Float_t         byMediumCombinedIsolationDeltaBetaCorr3Hits_1;
@@ -351,6 +355,10 @@ public :
   TBranch        *b_extraelec_veto;   //!
   TBranch        *b_extramuon_veto;   //!
   TBranch 		 *b_chargedIsoPtSum_2; 
+  TBranch        *b_neutralIsoPtSum_2;
+  TBranch        *b_puCorrPtSum_2;
+  TBranch        *b_isolationGammaCands_size_2;
+  TBranch        *b_signalGammaCands_size_2;
   TBranch        *b_byCombinedIsolationDeltaBetaCorrRaw3Hits_1;   //!
   TBranch        *b_byLooseCombinedIsolationDeltaBetaCorr3Hits_1;   //!
   TBranch        *b_byMediumCombinedIsolationDeltaBetaCorr3Hits_1;   //!

@@ -1331,6 +1331,10 @@ void FillTau(const AC1B * analysisTree, Spring15Tree *otree, int tauIndex){
   otree->byVVTightIsolationMVArun2v1DBoldDMwLT_2 = analysisTree->tau_byVVTightIsolationMVArun2v1DBoldDMwLT[tauIndex];
   otree-> byIsolationMVArun2v1DBoldDMwLTraw_2 = analysisTree->tau_byIsolationMVArun2v1DBoldDMwLTraw[tauIndex];
   otree->chargedIsoPtSum_2 = analysisTree->tau_chargedIsoPtSum[tauIndex];
+  otree->neutralIsoPtSum_2 = analysisTree->tau_neutralIsoPtSum[tauIndex];
+  otree->puCorrPtSum_2 = analysisTree->tau_puCorrPtSum[tauIndex];
+  otree->isolationGammaCands_size_2 = analysisTree->tau_isolationGammaCands_size[tauIndex];
+  otree->signalGammaCands_size_2 = analysisTree->tau_signalGammaCands_size[tauIndex];
 }
 
 //////DILEPTON FUNCTIONS
