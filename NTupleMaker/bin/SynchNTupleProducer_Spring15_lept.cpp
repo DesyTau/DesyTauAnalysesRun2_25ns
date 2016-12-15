@@ -427,8 +427,8 @@ int main(int argc, char * argv[]){
   int selEvents = 0;
   int nFiles = 0;
   
-  vector<int> runList; runList.clear();
-  vector<int> eventList; eventList.clear();
+  vector<unsigned int> runList; runList.clear();
+  vector<unsigned int> eventList; eventList.clear();
 
   int nonOverlap = 0;
 
@@ -552,9 +552,9 @@ int main(int argc, char * argv[]){
       if (nEvents%10000==0) 
       	cout << "      processed " << nEvents << " events" << endl; 
 
-      otree->run = int(analysisTree.event_run);
-      otree->lumi = int(analysisTree.event_luminosityblock);
-      otree->evt = int(analysisTree.event_nr);
+      otree->run  = analysisTree.event_run;
+      otree->lumi = analysisTree.event_luminosityblock;
+      otree->evt  = analysisTree.event_nr;
       
       bool overlapEvent = true;
       for (unsigned int iEvent=0; iEvent<runList.size(); ++iEvent) {
