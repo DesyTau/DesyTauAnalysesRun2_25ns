@@ -1276,6 +1276,8 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	if (analysisTree.tau_decayModeFinding[it]<decayModeFinding) continue;
 	if ( fabs(analysisTree.tau_leadchargedhadrcand_dz[it])> leadchargedhadrcand_dz) continue;
         if ( fabs(analysisTree.tau_charge[it]) != 1 ) continue;
+        if ( analysisTree.tau_againstElectronVLooseMVA6[it]<0.5) continue;
+        if ( analysisTree.tau_againstMuonTight3[it]<0.5) continue;
 	  taus.push_back((int)it);
 
 	}
@@ -1437,13 +1439,13 @@ if (!CutBasedTauId){
 
       }
  }
-      bool TauId = false;
+      /*bool TauId = false;
 
       if ( analysisTree.tau_againstElectronVLooseMVA6[tau_index]>0.5 && analysisTree.tau_againstMuonTight3[tau_index]>0.5) TauId = true;
 
       if (!TauId) continue;
 	  //cout<<"made it to pass the TauId "<<endl;
-
+*/
       if ((int)tau_index<0) continue;
       if ((int)mu_index<0) continue;
 
@@ -1617,6 +1619,10 @@ if (!CutBasedTauId){
        isoTau = analysisTree.tau_byIsolationMVArun2v1DBoldDMwLTraw[tau_index];
        //ta_IsoFlag=analysisTree.tau_byTightIsolationMVArun2v1DBoldDMwLT[tau_index];
        //isoTau = analysisTree.tau_chargedIsoPtSum[tau_index];
+
+
+
+
 
 	 }
 
