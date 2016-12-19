@@ -250,8 +250,7 @@ int main(int argc, char * argv[]) {
 
 // PU reweighting
   PileUp * PUofficial = new PileUp();
-//  TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/pileUp_data_Cert_271036-277148_13TeV_PromptReco_Collisions16_xsec69p2mb.root","read");
-  TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/pileUp_data_RunBCDE_ReReco.root","read");
+  TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/pileUp_data_Cert_271036-277148_13TeV_PromptReco_Collisions16_xsec69p2mb.root","read");
   TFile * filePUdistribution_MC = new TFile (TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/MC_Spring16_PU25ns_V1.root", "read");
 
   TH1D * PU_data = (TH1D *)filePUdistribution_data->Get("pileup");
@@ -1032,8 +1031,8 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	if (fabs(analysisTree.muon_eta[im])>etaMuonCut) continue;
 	if (fabs(analysisTree.muon_dxy[im])>dxyMuonCut) continue;
 	if (fabs(analysisTree.muon_dz[im])>dzMuonCut) continue;
-	if (applyMuonId && !analysisTree.muon_isMedium[im]) continue;
-	//if (applyMuonId && !analysisTree.muon_isICHEP[im]) continue;
+	//if (applyMuonId && !analysisTree.muon_isMedium[im]) continue;
+	if (applyMuonId && !analysisTree.muon_isICHEP[im]) continue;
 	muons.push_back(im);
       }
 
@@ -1259,8 +1258,8 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	if (fabs(analysisTree.muon_eta[im])>etaVetoMuonCut) continue;
 	if (fabs(analysisTree.muon_dxy[im])>dxyVetoMuonCut) continue;
 	if (fabs(analysisTree.muon_dz[im])>dzVetoMuonCut) continue;
-	if (applyVetoMuonId && !analysisTree.muon_isMedium[im]) continue;
-	//if (applyVetoMuonId && !analysisTree.muon_isICHEP[im]) continue;
+	//if (applyVetoMuonId && !analysisTree.muon_isMedium[im]) continue;
+	if (applyVetoMuonId && !analysisTree.muon_isICHEP[im]) continue;
 	float neutralHadIsoMu = analysisTree.muon_neutralHadIso[im];
 	float photonIsoMu = analysisTree.muon_photonIso[im];
 	float chargedHadIsoMu = analysisTree.muon_chargedHadIso[im];

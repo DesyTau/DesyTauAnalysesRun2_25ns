@@ -8,6 +8,7 @@
 #include "DesyTauAnalyses/NTupleMaker/interface/lester_mt2_bisect.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/mTBound.h"
 #include "TTree.h"
+#include <algorithm>
 using namespace std;
 
 
@@ -19,8 +20,12 @@ unsigned int RunMin = 9999999;
 unsigned int RunMax = 0;
      
 int tau_index=-1;
+int tau_index1=-1;
+int tau_index2=-1;
 int tau_loose=-1;
 int tau_tight=-1;
+int tau_loose2=-1;
+int tau_tight2=-1;
 int mu_index=-1;
 int el_index=-1;
 
@@ -37,12 +42,16 @@ int el_index=-1;
 
    Float_t 	   CFCounter_[30];
    Int_t	   muon_index;
+   Int_t	   muon_index_1;
+   Int_t	   muon_index_2;
    Int_t	   electron_index;
    Int_t	   taus_index;
+   Int_t	   taus_index2;
    Int_t           mu_count;
    Int_t	   nbtag;
    Int_t	   njets;
    Int_t	   npv;
+   Int_t 	   npu;
    Float_t         mu_px[20];   //[mu_count]
    Float_t         mu_py[20];   //[mu_count]
    Float_t         mu_pz[20];   //[mu_count]
@@ -52,10 +61,36 @@ int el_index=-1;
    Float_t         mu_charge[20];   //[mu_count]
    Float_t         mu_miniISO[20];   //[mu_count]
    Float_t         mu_dxy[20];   //[mu_count]
+   Float_t         mu_dxyerr[20];   //[mu_count]
    Float_t         mu_dz[20];   //[mu_count]
+   Float_t         mu_dzerr[20];   //[mu_count]
    Float_t         mu_relIso[20];   //[mu_count]
-   Int_t          jet_count;
-   Int_t          jets_cleaned[30];
+ 
+   Float_t     mu_neutralHadIso[20]; 
+   Float_t     mu_photonIso[20]; 
+   Float_t     mu_chargedHadIso[20]; 
+   Float_t     mu_puIso[20]; 
+   Float_t     mu_neutralIso[20];
+   Float_t     mu_absIsoMu[20]; 
+   Float_t     mu_relIsoMu[20]; 
+
+   Float_t     el_neutralHadIso[20]; 
+   Float_t     el_photonIso[20]; 
+   Float_t     el_chargedHadIso[20]; 
+   Float_t     el_puIso[20]; 
+   Float_t     el_neutralIso[20];
+   Float_t     el_absIsoEl[20]; 
+   Float_t     el_relIsoEl[20]; 
+
+
+
+
+
+
+
+   Int_t           jet_count;
+   Int_t           jets_cleaned[30];
+   Float_t 	   jet_jecUn[30];
    Float_t         jet_e[30];   //[jet_count]
    Float_t         jet_px[30];   //[jet_count]
    Float_t         jet_py[30];   //[jet_count]
@@ -68,7 +103,7 @@ int el_index=-1;
    Int_t	   jet_isLoose[30];
    string	   datasetName;
    string	   regionName;
-   Int_t          el_count;
+   Int_t           el_count;
    Float_t         el_px[20];   //[el_count]
    Float_t         el_py[20];   //[el_count]
    Float_t         el_pz[20];   //[el_count]
@@ -77,12 +112,14 @@ int el_index=-1;
    Float_t         el_phi[20];   //[el_count]
    Float_t         el_miniISO[20];   //[el_count]
    Float_t         el_dxy[20];   //[el_count]
+   Float_t         el_dxyerr[20];   //[el_count]
    Float_t         el_dz[20];   //[el_count]
+   Float_t         el_dzerr[20];   //[el_count]
    Float_t         el_charge[20];   //[el_count]
    Float_t         el_relIso[20];   //[el_count]
 
 
-   Int_t          ta_count;
+   Int_t           ta_count;
    Float_t         ta_px[30];   //[ta_count]
    Float_t         ta_py[30];   //[ta_count]
    Float_t         ta_pz[30];   //[ta_count]
@@ -94,29 +131,66 @@ int el_index=-1;
    Float_t         ta_dz[30];   //[ta_count]
    Float_t         ta_charge[30];   //[ta_count]
    Float_t         ta_IsoFlag;   //[ta_count]
-   Float_t         ta_relIso[30];   //[ta_count]
+   Float_t         ta_relIso[20];   //[ta_count]
+   Float_t         ta_puCorrPtSum[30];   //[ta_count]
+   Float_t         ta_chargedIsoPtSum[30];   //[ta_count]
+   Float_t         ta_neutralIsoPtSum[30];   //[ta_count]
+
+   Float_t 	   ta_IsoFlagVTight[30];
+   Float_t 	   ta_IsoFlagLoose[30];
+   Float_t 	   ta_IsoFlagMedium[30];
 
 
+
+   Float_t         genmet;
+   Float_t         genmetphi;
+   Float_t         met_scaleUp;
+   Float_t         metphi_scaleUp;
+   Float_t         met_scaleDown;
+   Float_t         metphi_scaleDown;
+   Float_t         met_resoUp;
+   Float_t         met_resoDown;
+   Float_t         metphi_resoUp;
+   Float_t         metphi_resoDown;
 
    Float_t         met_ex;
    Float_t         met_ey;
+   Float_t         met_ex_recoil;
+   Float_t         met_ey_recoil;
    Float_t         met_ez;
+   Float_t         met_ex_JetEnUp;
+   Float_t         met_ey_JetEnUp;
+   Float_t         met_ex_JetEnDown;
+   Float_t         met_ey_JetEnDown;
+   Float_t         met_ex_UnclusteredEnUp;
+   Float_t         met_ey_UnclusteredEnUp;
+   Float_t         met_ex_UnclusteredEnDown;
+   Float_t         met_ey_UnclusteredEnDown;
    Float_t         met_pt;
    Float_t         met_phi;
 
    Float_t         gen_weight;
    Float_t 	   pu_weight;
    Float_t 	   LSF_weight;
+   Float_t 	   LSF_weight_1;
+   Float_t 	   LSF_weight_2;
    Float_t 	   TFR_weight;
    Float_t 	   top_weight;
    Float_t 	   all_weight;
    Float_t 	   trig_weight;
+   Float_t 	   trig_weight_1;
+   Float_t 	   trig_weight_2;
+   Float_t 	   zptmassweight;
    Float_t 	   xsecs;
    Float_t 	   event_sign;
    Float_t 	   event_secondLeptonVeto;
+   Float_t 	   met_flag;
    Float_t 	   event_thirdLeptonVeto;
    Float_t 	   event_leptonDrTrigger;
    Float_t	   genTauMatched;
+   Float_t	   genTauMatched2;
+   Float_t	   genLeptonMatched;
+   Float_t	   genLeptonMatched2;
    Float_t	   qcdweight;
    Float_t	   qcdweightup;
    Float_t	   qcdweightdown;
@@ -133,7 +207,7 @@ double sumpT = 0;
 double XSec=-1;
 double xs,fact,fact2;
   
-
+/*
   int nPtBins = 8;
   float ptBins[9] = {10,13,16,20,25,30,40,60,1000};
 
@@ -188,7 +262,7 @@ double xs,fact,fact2;
   TString EtaBins[3] = {"EtaLt0p9",
 			"Eta0p9to1p2",
 			"EtaGt1p2"};
-
+*/
 float topPtWeight(float pt1,
 		  float pt2) {
 
@@ -200,14 +274,14 @@ float topPtWeight(float pt1,
   float w1 = TMath::Exp(a+b*pt1);
   float w2 = TMath::Exp(a+b*pt2);
     
-  if (pt1>400) w1 = 1;
-  if (pt2>400) w2 = 1;
+  if (pt1>400) w1 = 1.;
+  if (pt2>400) w2 = 1.;
 //cout<<" w1  "<<w1<<"  "<<w2<<endl;
   return TMath::Sqrt(w1*w2);
 
 }
 
-double TauFakeRate(float pt,float eta){
+double TauFakeRateOld(float pt,float eta){
 
 float SF = 1;
 
@@ -243,16 +317,17 @@ return SF;
 
 
 
-//string CutList[10];
+//string CutList[20];
 vector<string> var;
 vector < string > vec;
-double var_[1000];
+double var_[2000];
 
 vector<string> CutList;
 
 TH1D * histRuns = new TH1D("histRuns","",6000,24000,30000);
 
 TH1D * histWeightsH = new TH1D("histWeightsH","",1,-0.5,0.5);
+TH1D * histTopPt = new TH1D("histTopPt","",1,-0.5,0.5);
 
 TH1D * hWeights [CutN];
 
@@ -462,7 +537,7 @@ TH1D * ETmissSelH = new TH1D("ETmissSelH","",10,0,200);
 TH1D * MtSelH = new TH1D("MtSelH_2l","",10,0,200);
 TH1D * DZetaSelH = new TH1D("DZetaSelH","",60,-400,200);
 
-TLorentzVector ElV, MuV, TauV, JetsV, METV;
+TLorentzVector ElV, MuV, TauV, JetsV, METV, LeptV1, LeptV2;
 
 vector<TLorentzVector> AllJets_Lepton_noMet;
 vector<TLorentzVector> JetsMV;
@@ -470,6 +545,8 @@ vector<TLorentzVector>  ElMV;
 vector<TLorentzVector>  MuMV;
 vector<TLorentzVector>  TauMV;
 vector<TLorentzVector>  LeptMV;
+vector<TLorentzVector>  LeptMV1;
+vector<TLorentzVector>  LeptMV2;
 
 
 std::vector<pair<string,float> > variables_;
@@ -499,29 +576,79 @@ filetree->cd(Sel.c_str());
 */
 T  = new TTree("T","T");
 
+  T->Branch("genmet", &genmet, "genmet/F");
+  T->Branch("genmetphi", &genmetphi, "genmetphi/F");
+
+
+   Float_t         genmet;
+   Float_t         genmetphi;
+   Float_t         met_scaleUp;
+   Float_t         metphi_scaleUp;
+   Float_t         met_scaleDown;
+   Float_t         metphi_scaleDown;
+   Float_t         met_resoUp;
+   Float_t         met_resoDown;
+   Float_t         metphi_resoUp;
+   Float_t         metphi_resoDown;
+
+  T->Branch("genmet", &genmet, "genmet/F");
+  T->Branch("genmetphi", &genmetphi, "genmetphi/F");
+
+  T->Branch("met_scaleUp", &met_scaleUp, "met_scaleUp/F");
+  T->Branch("met_scaleDown", &met_scaleDown, "met_scaleDown/F");
+  T->Branch("metphi_scaleUp", &metphi_scaleUp, "metphi_scaleUp/F");
+  T->Branch("metphi_scaleDown", &metphi_scaleDown, "metphi_scaleDown/F");
+  T->Branch("met_resoUp", &met_resoUp, "met_resoUp/F");
+  T->Branch("met_resoDown", &met_resoDown, "met_resoDown/F");
+  T->Branch("metphi_resoUp", &metphi_resoUp, "metphi_resoUp/F");
+  T->Branch("metphi_resoDown", &metphi_resoDown, "metphi_resoDown/F");
+
   T->Branch("met_ex", &met_ex, "met_ex/F");
   T->Branch("met_ey", &met_ey, "met_ey/F");
+  T->Branch("met_ex_recoil", &met_ex_recoil, "met_ex_recoil/F");
+  T->Branch("met_ey_recoil", &met_ey_recoil, "met_ey_recoil/F");
   T->Branch("met_ez", &met_ez, "met_ez/F");
+
+  T->Branch("met_ex_JetEnUp", &met_ex_JetEnUp, "met_ex_JetEnUp/F");
+  T->Branch("met_ey_JetEnUp", &met_ey_JetEnUp, "met_ey_JetEnUp/F");
+
+  T->Branch("met_ex_JetEnDown", &met_ex_JetEnDown, "met_ex_JetEnDown/F");
+  T->Branch("met_ey_JetEnDown", &met_ey_JetEnDown, "met_ey_JetEnDown/F");
+
+  T->Branch("met_ex_UnclusteredEnDown", &met_ex_UnclusteredEnDown, "met_ex_UnclusteredEnDown/F");
+  T->Branch("met_ey_UnclusteredEnDown", &met_ey_UnclusteredEnDown, "met_ey_UnclusteredEnDown/F");
+
+  T->Branch("met_ex_UnclusteredEnUp", &met_ex_UnclusteredEnUp, "met_ex_UnclusteredEnUp/F");
+  T->Branch("met_ey_UnclusteredEnUp", &met_ey_UnclusteredEnUp, "met_ey_UnclusteredEnUp/F");
   T->Branch("met_pt", &met_pt, "met_pt/F");
   T->Branch("met_phi", &met_phi, "met_phi/F");
  
   T->Branch("gen_weight", &gen_weight, "gen_weight/F");
   T->Branch("pu_weight", &pu_weight, "pu_weight/F");
   T->Branch("LSF_weight", &LSF_weight, "LSF_weight/F");
+  T->Branch("LSF_weight_1", &LSF_weight_1, "LSF_weight_1/F");
+  T->Branch("LSF_weight_2", &LSF_weight_2, "LSF_weight_2/F");
   T->Branch("TFR_weight", &TFR_weight, "TFR_weight/F");
   T->Branch("top_weight", &top_weight, "top_weight/F");
   T->Branch("all_weight", &all_weight, "all_weight/F");
   T->Branch("trig_weight", &trig_weight, "trig_weight/F");
+  T->Branch("trig_weight_1", &trig_weight_1, "trig_weight_1/F");
+  T->Branch("trig_weight_2", &trig_weight_2, "trig_weight_2/F");
+  T->Branch("zptmassweight", &zptmassweight, "zptmassweight/F");
 
   T->Branch("xsecs", &xsecs, "xsecs/F");
   T->Branch("event_sign", &event_sign, "event_sign/F");
+  T->Branch("met_flag", &met_flag, "met_flag/F");
   T->Branch("event_secondLeptonVeto", &event_secondLeptonVeto, "event_secondLeptonVeto/F");
   T->Branch("event_thirdLeptonVeto", &event_thirdLeptonVeto, "event_thirdLeptonVeto/F");
   T->Branch("event_leptonDrTrigger", &event_leptonDrTrigger, "event_leptonDrTrigger/F");
 
   T->Branch("muon_index", &muon_index, "muon_index/I");
+  T->Branch("muon_index_1", &muon_index_1, "muon_index_1/I");
+  T->Branch("muon_index_2", &muon_index_2, "muon_index_2/I");
   T->Branch("electron_index", &electron_index, "electron_index/I");
   T->Branch("taus_index", &taus_index, "taus_index/I");
+  T->Branch("taus_index2", &taus_index2, "taus_index2/I");
 
   T->Branch("primvert_count", &primvert_count, "primvert_count/I");
   T->Branch("primvert_x", &primvert_x, "primvert_x/F");
@@ -539,13 +666,32 @@ T  = new TTree("T","T");
   T->Branch("mu_miniISO", mu_miniISO, "mu_miniISO[20]/F");
   T->Branch("mu_dxy", mu_dxy, "mu_dxy[20]/F");
   T->Branch("mu_dz", mu_dz, "mu_dz[20]/F");
+  T->Branch("mu_dxyerr", mu_dxyerr, "mu_dxyerr[20]/F");
+  T->Branch("mu_dzerr", mu_dzerr, "mu_dzerr[20]/F");
   T->Branch("mu_relIso", mu_relIso, "mu_relIso[20]/F");
+ 
+  T->Branch("mu_neutralHadIso", mu_neutralHadIso, "mu_neutralHadIso[20]/F");
+  T->Branch("mu_photonIso", mu_photonIso, "mu_photonIso[20]/F");
+  T->Branch("mu_chargedHadIso", mu_chargedHadIso, "mu_chargedHadIso[20]/F");
+  T->Branch("mu_puIso", mu_puIso, "mu_puIso[20]/F");
+  T->Branch("mu_neutralIso", mu_neutralIso, "mu_neutralIso[20]/F");
+  T->Branch("mu_absIsoMu", mu_absIsoMu, "mu_absIsoMu[20]/F");
+  T->Branch("mu_relIsoMu", mu_relIsoMu, "mu_relIsoMu[20]/F");
 
+  T->Branch("el_neutralHadIso", el_neutralHadIso, "el_neutralHadIso[20]/F");
+  T->Branch("el_photonIso", el_photonIso, "el_photonIso[20]/F");
+  T->Branch("el_chargedHadIso", el_chargedHadIso, "el_chargedHadIso[20]/F");
+  T->Branch("el_puIso", el_puIso, "el_puIso[20]/F");
+  T->Branch("el_neutralIso", el_neutralIso, "el_neutralIso[20]/F");
+  T->Branch("el_absIsoEl", el_absIsoEl, "el_absIsoEl[20]/F");
+  T->Branch("el_relIsoEl", el_relIsoEl, "el_relIsoEl[20]/F");
 
   T->Branch("jet_count", &jet_count, "jet_count/I");
   T->Branch("njets", &njets, "njets/I");
   T->Branch("npv", &npv, "npv/I");
+  T->Branch("npu", &npu, "npu/I");
   T->Branch("jets_cleaned", &jets_cleaned, "jets_cleaned[30]/I");
+  T->Branch("jet_jecUn", jet_jecUn, "jet_jecUn[30]/F");
   T->Branch("jet_e", jet_e, "jet_e[30]/F");
   T->Branch("jet_px", jet_px, "jet_px[30]/F");
   T->Branch("jet_py", jet_py, "jet_py[30]/F");
@@ -570,6 +716,8 @@ T  = new TTree("T","T");
   T->Branch("el_miniISO", el_miniISO, "el_miniISO[20]/F");
   T->Branch("el_dxy", el_dxy, "el_dxy[20]/F");
   T->Branch("el_dz", el_dz, "el_dz[20]/F");
+  T->Branch("el_dxyerr", el_dxyerr, "el_dxyerr[20]/F");
+  T->Branch("el_dzerr", el_dzerr, "el_dzerr[20]/F");
   T->Branch("el_charge", el_charge, "el_charge[20]/F");
   T->Branch("el_relIso", el_relIso, "el_relIso[20]/F");
 
@@ -587,6 +735,15 @@ T  = new TTree("T","T");
   T->Branch("ta_charge", ta_charge, "ta_charge[20]/F");
   T->Branch("ta_relIso", ta_relIso, "ta_relIso[20]/F");
   T->Branch("ta_IsoFlag", &ta_IsoFlag, "ta_IsoFlag/F");
+  T->Branch("ta_chargedIsoPtSum", &ta_chargedIsoPtSum, "ta_chargedIsoPtSum/F");
+  T->Branch("ta_neutralIsoPtSum", &ta_neutralIsoPtSum, "ta_neutralIsoPtSum/F");
+  T->Branch("ta_puCorrPtSum", &ta_puCorrPtSum, "ta_puCorrPtSum/F");
+
+  T->Branch("ta_IsoFlagVTight", &ta_IsoFlagVTight, "ta_IsoFlagVTight/F");
+  T->Branch("ta_IsoFlagLoose", &ta_IsoFlagLoose, "ta_IsoFlagLoose/F");
+  T->Branch("ta_IsoFlagMedium", &ta_IsoFlagMedium, "ta_IsoFlagMedium/F");
+
+
   T->Branch("qcdweight", &qcdweight, "qcdweight/F");
   T->Branch("qcdweightup", &qcdweightup, "qcdweightup/F");
   T->Branch("qcdweightdown", &qcdweightdown, "qcdweightdown/F");
@@ -595,13 +752,16 @@ T  = new TTree("T","T");
   T->Branch("datasetName", &datasetName);
   T->Branch("regionName", &regionName);
   T->Branch("genTauMatched", &genTauMatched);
+  T->Branch("genTauMatched", &genTauMatched2);
+  T->Branch("genLeptonMatched", &genLeptonMatched);
+  T->Branch("genLeptonMatched2", &genLeptonMatched2);
   T->Branch("npartons",&npartons,"npartons/I");
   T->Branch("SusyMother",&SusyMother,"SusyMother/F");
   T->Branch("SusyLSP",&SusyLSP,"SusyLSP/F");
 
 
 
-      char arg[100];
+      char arg[200];
      for (unsigned int i = 0; i < vec.size (); i++)
     {
       var_[i] = -8888.;
