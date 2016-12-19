@@ -240,7 +240,8 @@ int main(int argc, char * argv[]) {
   PileUp * PUofficial = new PileUp();
    //TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/pileUp_data_2016_Cert_Cert_271036-276811_NoL1T_xsec63mb.root","read");
 
-  TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/pileUp_data_Cert_271036-277148_13TeV_PromptReco_Collisions16_xsec69p2mb.root","read");
+//  TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/pileUp_data_Cert_271036-277148_13TeV_PromptReco_Collisions16_xsec69p2mb.root","read");
+  TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/pileUp_data_RunBCDE_ReReco.root","read");
   TFile * filePUdistribution_MC = new TFile (TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/MC_Spring16_PU25ns_V1.root", "read");
 
 
@@ -884,7 +885,38 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
 	std::vector<TString> metFlags; metFlags.clear();
      //////////////MET filters flag
-//      if (isData){
+
+	bool Run2016A, Run2016B, Run2016C, Run2016D, Run2016E, Run2016F, Run2016G,Run2016H;
+	bool RunBCDEF = false;
+	bool RunGH = false;
+	Run2016A=false;
+	Run2016B=false;
+	Run2016C=false;
+	Run2016D=false;
+	Run2016E=false;
+	Run2016F=false;
+	Run2016G=false;
+	Run2016H=false;
+
+
+	int RunNo = analysisTree.event_run;
+	if (isData){
+	if (RunNo >  271036-1 &&  RunNo < 271658+1 ) Run2016A = true;
+	if (RunNo >  272007-1 &&  RunNo < 275376+1 ) Run2016B = true;
+	if (RunNo >  275657-1 &&  RunNo < 276283+1 ) Run2016C = true;
+	if (RunNo >  276315-1 &&  RunNo < 276811+1 ) Run2016D = true;
+	if (RunNo >  276831-1 &&  RunNo < 277420+1 ) Run2016E = true;
+	if (RunNo >  277772-1 &&  RunNo < 278808+1 ) Run2016F = true;
+	if (RunNo >  278820-1 &&  RunNo < 280385+1 ) Run2016G = true;
+	if (RunNo >  280919-1 &&  RunNo < 284044+1 ) Run2016H = true;
+	//cout<<Run2016A<<"  "<<Run2016B<<"  "<<Run2016E<<endl;
+
+	if (Run2016B || Run2016C || Run2016D || Run2016E || Run2016F) RunBCDEF = true;
+	if (Run2016G || Run2016H) RunGH = true;
+	}
+     
+     
+     //      if (isData){
 
 	 
 	 metFlags.push_back("Flag_HBHENoiseFilter");
@@ -941,7 +973,6 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
       unsigned int nMainTrigger = 0;
       bool isMainTrigger = false;
-
 
 
       if (isData){
@@ -1023,7 +1054,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       //      std::cout << "electrons = " << electrons.size() << "  taus = " << taus.size() << std::endl;
       //
       for (unsigned int im=0; im<electrons.size(); ++im) {
-	bool isEleLegMatch = false;
+	bool isLegMatch = false;
 	//	bool isElectronTauSingleElectronFilterNameMatch = false;
 	//	bool isElectronTauOverlapElectronMatch = false;
 	unsigned int eIndex  = electrons.at(im);
@@ -1051,14 +1082,14 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	    float dRtrig = deltaR(analysisTree.electron_eta[eIndex],analysisTree.electron_phi[eIndex],
 				  analysisTree.trigobject_eta[iT],analysisTree.trigobject_phi[iT]);
 	    if (dRtrig<deltaRTrigMatch) 
-	      isEleLegMatch = true;
+	      isLegMatch = true;
 	    
 	  }
 	 }
 	}
-      if (!isData) isEleLegMatch = true;
+      if (!isData) isLegMatch = true;
 
-      if (!isEleLegMatch) continue;
+      if (!isLegMatch) continue;
 
 	for (unsigned int it=0; it<taus.size(); ++it) {
 
@@ -1230,8 +1261,11 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	if (fabs(analysisTree.muon_eta[ie])>etaVetoMuonCut) continue;
 	if (fabs(analysisTree.muon_dxy[ie])>dxyVetoMuonCut) continue;
 	if (fabs(analysisTree.muon_dz[ie])>dzVetoMuonCut) continue;
-	//if (applyVetoMuonId && !analysisTree.muon_isMedium[ie]) continue;
-	if (applyVetoMuonId && !analysisTree.muon_isICHEP[ie]) continue;
+
+	if (!isData && !analysisTree.muon_isMedium[ie]) continue;
+	if (isData && RunBCDEF && !RunGH && !analysisTree.muon_isICHEP[ie]) continue;
+	if (isData && !RunBCDEF && RunGH && !analysisTree.muon_isMedium[ie]) continue;
+
 	float neutralHadIsoMu = analysisTree.muon_neutralHadIso[ie];
         float photonIsoMu = analysisTree.muon_photonIso[ie];
         float chargedHadIsoMu = analysisTree.muon_chargedHadIso[ie];

@@ -17,22 +17,25 @@
 #include "TChain.h"
 #include "TMath.h"
 #include "Riostream.h"
-
+#include "TCanvas.h"
+#include "TPaveText.h"
 #include "TRandom.h"
+#include "TRandom3.h"
+#include "TGraphAsymmErrors.h"
+#include <stdlib.h>
 
-//#include "DesyTauAnalyses/NTupleMaker/interface/Config.h"
-//#include "DesyTauAnalyses/NTupleMaker/interface/functions.h"
-//#include "DesyTauAnalyses/NTupleMaker/interface/AC1B.h"
+
 
 #include "DesyTauAnalyses/NTupleMaker/interface/json.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/PileUp.h"
-//#include "DesyTauAnalyses/NTupleMaker/interface/ScaleFactor.h"
 #include "HTT-utilities/LepEffInterface/interface/ScaleFactor.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/Jets.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/AnalysisMacro.h"
+#include "CondFormats/BTauObjects/interface/BTagCalibration.h"
+#include "CondTools/BTau/interface/BTagCalibrationReader.h"
+#include "HTT-utilities/RecoilCorrections/interface/RecoilCorrector.h"
+#include "HTT-utilities/RecoilCorrections/interface/MEtSys.h"
 
-
-#include "TGraphAsymmErrors.h"
   
 using namespace std;
 
@@ -226,12 +229,10 @@ int main(int argc, char * argv[]) {
 
   // **** configuration
   Config cfg(argv[1]);
+
   string Channel="mutau";
 
   // kinematic cuts on electrons
-  
-  // kinematic cuts on electrons
-  bool fillplots= false;
   const bool isData = cfg.get<bool>("IsData");
   const bool applyPUreweighting = cfg.get<bool>("ApplyPUreweighting");
   
@@ -289,7 +290,6 @@ int main(int argc, char * argv[]) {
 
 
 
-
   const string dataBaseDir = cfg.get<string>("DataBaseDir");
 
 
@@ -318,6 +318,9 @@ int main(int argc, char * argv[]) {
   const string TrigLeg  = cfg.get<string>("SingleMuonFilterName") ;
   const double SingleMuonTriggerPtCut = cfg.get<double>("SingleMuonTriggerPtCut");
 
+  const string TrigLegIsoMu24  = cfg.get<string>("SingleMuonFilterNameIsoMu24") ;
+  const double SingleMuonTriggerPtCutIsoMu24 = cfg.get<double>("SingleMuonTriggerPtCutIsoMu24");
+
 
   // vertex distributions filenames and histname
 
@@ -327,8 +330,11 @@ int main(int argc, char * argv[]) {
   string cmsswBase = (getenv ("CMSSW_BASE"));
   string fullPathToJsonFile = cmsswBase + "/src/DesyTauAnalyses/NTupleMaker/test/json/" + jsonFile;
  
+  RecoilCorrector recoilMetCorrector("HTT-utilities/RecoilCorrections/data/TypeIPFMET_2016BCD.root");
 
+  MEtSys metSys("HTT-utilities/RecoilCorrections/data/MEtSys.root");
 
+//  const string TauFakeRateFile = cfg.get<string>("TauFakeRateEff");
 
   // Run-lumi selector
   std::vector<Period> periods;  
@@ -342,15 +348,13 @@ int main(int argc, char * argv[]) {
     }
 
     for(std::string s; std::getline(inputFileStream, s); ) {
-      //std::fstream inputFileStream("temp", std::ios::in);
       periods.push_back(Period());
       std::stringstream ss(s);
       ss >> periods.back();
     }
   }
-
   TString MainTrigger(TrigLeg);
-
+  TString MainTriggerIsoMu24(TrigLegIsoMu24);
 
 
   const double bTag   = cfg.get<double>("bTag");
@@ -405,14 +409,64 @@ int main(int argc, char * argv[]) {
   cout<<"  Initializing PU files....."<<endl;
 
   PileUp * PUofficial = new PileUp();
-  TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/pileUp_data_Cert_271036-276811_13TeV_PromptReco_Collisions16_xsec69p2mb.root","read");
+  //TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/pileUp_data_Cert_271036-276811_13TeV_PromptReco_Collisions16_xsec69p2mb.root","read");
+  
 
-  TFile * filePUdistribution_MC = new TFile (TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/MC_Spring16_PU.root", "read");
-
+  TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/pileUp_data_RunBCDE_ReReco.root","read");
+  TFile * filePUdistribution_MC = new TFile (TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/MC_Spring16_PU25ns_V1.root", "read");
   TH1D * PU_data = (TH1D *)filePUdistribution_data->Get("pileup");
   TH1D * PU_mc = (TH1D *)filePUdistribution_MC->Get("pileup");
   PUofficial->set_h_data(PU_data);
   PUofficial->set_h_MC(PU_mc);
+
+  cout<<" done with PU...."<<endl;
+
+  BTagCalibration calib("csvv2", cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/CSVv2_ichep.csv");
+  BTagCalibrationReader reader_B(BTagEntry::OP_MEDIUM,"central");
+  BTagCalibrationReader reader_C(BTagEntry::OP_MEDIUM,"central");
+  BTagCalibrationReader reader_Light(BTagEntry::OP_MEDIUM,"central");
+  reader_B.load(calib,BTagEntry::FLAV_B,"comb");
+  reader_C.load(calib,BTagEntry::FLAV_C,"comb");
+  reader_Light.load(calib,BTagEntry::FLAV_UDSG,"incl");
+
+
+  float etaBTAG[2] = {0.5,2.1};
+  float ptBTAG[5] = {25.,35.,50.,100.,200.};
+
+  std::cout << std::endl;
+  for (int iEta=0; iEta<2; ++iEta) {
+    for (int iPt=0; iPt<5; ++iPt) {
+      float sfB = reader_B.eval_auto_bounds("central",BTagEntry::FLAV_B, etaBTAG[iEta], ptBTAG[iPt]);
+      float sfC = reader_C.eval_auto_bounds("central",BTagEntry::FLAV_C, etaBTAG[iEta], ptBTAG[iPt]);
+      float sfLight = reader_Light.eval_auto_bounds("central",BTagEntry::FLAV_UDSG, etaBTAG[iEta], ptBTAG[iPt]);
+      printf("pT = %3.0f   eta = %3.1f  ->  SFb = %5.3f   SFc = %5.3f   SFl = %5.3f\n",ptBTAG[iPt],etaBTAG[iEta],sfB,sfC,sfLight);
+    }
+  }
+  std::cout << std::endl;
+
+  TFile * fileTagging = new TFile(TString(cmsswBase)+TString("/src/DesyTauAnalyses/NTupleMaker/data/tagging_efficiencies_ichep2016.root"));
+  TH1F * tagEff_B = (TH1F*)fileTagging->Get("btag_eff_b");
+  TH1F * tagEff_C = (TH1F*)fileTagging->Get("btag_eff_c");
+  TH1F * tagEff_Light = (TH1F*)fileTagging->Get("btag_eff_oth");
+  TRandom3 rand;
+	
+  float MaxBJetPt = 1000.;
+  float MaxLJetPt = 1000.;
+  float MinLJetPt = 20.;
+  float MinBJetPt = 20.;
+
+  // Z pt mass weights
+  TFile * fileZMassPtWeights = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/zpt_weights_2016.root"); 
+  if (fileZMassPtWeights->IsZombie()) {
+    std::cout << "File " << TString(cmsswBase) << "src/DesyTauAnalyses/NTupleMaker/data/zpt_weights_2016.root" << "  does not exist!" << std::endl;
+    exit(-1);
+  }
+  TH2D * histZMassPtWeights = (TH2D*)fileZMassPtWeights->Get("zptmass_histo"); 
+  if (histZMassPtWeights==NULL) {
+    std::cout << " ZMassPT Weights histogram cannot found in file " << TString(cmsswBase) << "/src/DesyTauAnalyses/NTupleMaker/data/" << std::endl;
+    exit(-1);
+  }
+
 
   cout<<"  Initializing iD SF files....."<<endl;
   ScaleFactor * SF_muonIdIso; 
@@ -424,6 +478,7 @@ int main(int argc, char * argv[]) {
   cout<<"  Initializing Trigger SF files....."<<endl;
   ScaleFactor * SF_muonTrigger = new ScaleFactor();
   SF_muonTrigger->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(MuontrigEffFile));
+
 
   int nTotalFiles = 0;
   int nominator=-1;int denominator = -1;
@@ -465,6 +520,7 @@ int main(int argc, char * argv[]) {
   TH1D * hDPhi = new TH1D("hDPhi","",70,0,3.5);
   TH1D * hMET = new TH1D("hMET","",10,0,200);
   TH1D * hnJets = new TH1D("hnJets","",15,-0.5,14.5);
+  TH1D * hnbJets = new TH1D("hnbJets","",15,-0.5,14.5);
   TH1D * hIsoMu = new TH1D("hIsoMu","",100,0,0.5);
   TH1D * hIsoMuSel = new TH1D("hIsoMuSel","",100,0,0.5);
 
@@ -730,16 +786,6 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       Float_t weight = 1.;
       Float_t puweight = 1.;
       Float_t topptweight = 1.;
-      float topPt = -1;
-      float antitopPt = -1;
-      LSF_weight = 1.;
-      TFR_weight = 1.;
-      top_weight = 1.;
-      all_weight = 1.;
-      pu_weight = 1.;
-      gen_weight = 1.;
-      trig_weight = 1.;
-
       analysisTree.GetEntry(iEntry);
       nEvents++;
 
@@ -752,8 +798,6 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       if (isWJ && (nparton>0 && nparton<5)) continue;
       if ( isDYhigh  && (nparton>0 && nparton<5)) continue;
 
-
-
       if (nEvents%50000==0) 
 	cout << "      processed " << nEvents << " events" << endl; 
 
@@ -763,9 +807,254 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 			analysisTree.primvertex_y*analysisTree.primvertex_y);
       if (dVertex>dVertexCut) continue;
       if (analysisTree.primvertex_count<2) continue;  
-
-
       bool lumi=false;
+
+
+      float topPt = 0;
+      float antitopPt = 0;
+      LSF_weight = 1.;
+      TFR_weight = 1.;
+      top_weight = 1.;
+      all_weight = 1.;
+      pu_weight = 1.;
+      gen_weight = 1.;
+      trig_weight = 1.;
+
+
+      bool isW = false;
+      bool isDY = false;
+      bool isZTT = false;
+      bool isZMM = false;
+      bool isZEE = false;
+      bool isTOP = false;
+      if (!isData &&  string::npos != filen.find("JetsToLNu") ) isW=true;
+      if (!isData &&  string::npos != filen.find("JetsToLL_M") )  isDY=true;
+      if (!isData &&  string::npos != filen.find("TT_TuneCUETP8M1_13TeV-powheg-pythia8") ) isTOP=true;
+
+      float nuPx = 0;
+      float nuPy = 0;
+      float nuPz = 0;
+      float nuPt = 0;
+      float nuPhi = 0;
+      
+      float nuPx_msv = 0;
+      float nuPy_msv = 0;
+      float nuPz_msv = 0;
+      float nuPt_msv = 0;
+      float nuPhi_msv = 0;
+      
+      float lepPx = 0;
+      float lepPy = 0;
+      float lepPz = 0;
+      float bosonPx = 0;
+      float bosonPy = 0;
+      float bosonPz = 0;
+      float bosonPt = 0;
+      float bosonEta = 0;
+      float bosonMass = -1;
+	  
+      bool isZfound = false;
+      bool isWfound = false;
+      bool isHfound = false;
+      bool isGSfound = false;
+      std::vector<TLorentzVector> promptTausFirstCopy; promptTausFirstCopy.clear();
+      std::vector<TLorentzVector> promptTausLastCopy;  promptTausLastCopy.clear();
+      std::vector<TLorentzVector> promptElectrons; promptElectrons.clear();
+      std::vector<TLorentzVector> promptMuons; promptMuons.clear();
+      std::vector<TLorentzVector> promptNeutrinos; promptNeutrinos.clear();
+      std::vector<TLorentzVector> tauNeutrinos; tauNeutrinos.clear();
+
+      TLorentzVector promptTausLV; promptTausLV.SetXYZT(0.001,0.001,0,0);
+      TLorentzVector promptVisTausLV; promptVisTausLV.SetXYZT(0.001,0.001,0,0);
+      TLorentzVector zBosonLV; zBosonLV.SetXYZT(0,0,0,0);
+      TLorentzVector wBosonLV; wBosonLV.SetXYZT(0,0,0,0);
+      TLorentzVector hBosonLV; hBosonLV.SetXYZT(0,0,0,0);
+      TLorentzVector promptElectronsLV; promptElectronsLV.SetXYZT(0.001,0.001,0,0);
+      TLorentzVector promptMuonsLV; promptMuonsLV.SetXYZT(0.001,0.001,0,0);
+      TLorentzVector promptNeutrinosLV;  promptNeutrinosLV.SetXYZT(0,0,0,0);
+      TLorentzVector tauNeutrinosLV;  tauNeutrinosLV.SetXYZT(0,0,0,0);
+      TLorentzVector wDecayProductsLV; wDecayProductsLV.SetXYZT(0,0,0,0);
+      TLorentzVector fullVLV; fullVLV.SetXYZT(0,0,0,0);
+      TLorentzVector visVLV; visVLV.SetXYZT(0,0,0,0);
+
+      if (!isData) {
+
+	for (unsigned int igentau=0; igentau < analysisTree.gentau_count; ++igentau) {
+	  TLorentzVector tauLV; tauLV.SetXYZT(analysisTree.gentau_px[igentau],
+					      analysisTree.gentau_py[igentau],
+					      analysisTree.gentau_pz[igentau],
+					      analysisTree.gentau_e[igentau]);
+	  TLorentzVector tauVisLV; tauVisLV.SetXYZT(analysisTree.gentau_visible_px[igentau],
+						    analysisTree.gentau_visible_py[igentau],
+						    analysisTree.gentau_visible_pz[igentau],
+						    analysisTree.gentau_visible_e[igentau]);
+	  if (analysisTree.gentau_isPrompt[igentau]&&analysisTree.gentau_isFirstCopy[igentau]) {
+	    promptTausFirstCopy.push_back(tauLV);
+	    promptTausLV += tauLV;
+	    wDecayProductsLV += tauLV;
+	  }
+	  if (analysisTree.gentau_isPrompt[igentau]&&analysisTree.gentau_isLastCopy[igentau]) {	
+	    promptTausLastCopy.push_back(tauVisLV);
+	    promptVisTausLV += tauVisLV;
+	  }
+	  
+	}
+
+	for (unsigned int igen=0; igen < analysisTree.genparticles_count; ++igen) {
+
+	  TLorentzVector genLV; genLV.SetXYZT(analysisTree.genparticles_px[igen],
+					      analysisTree.genparticles_py[igen],
+					      analysisTree.genparticles_pz[igen],
+					      analysisTree.genparticles_e[igen]);
+
+	  if (analysisTree.genparticles_pdgid[igen]==6)
+	    topPt = TMath::Sqrt(analysisTree.genparticles_px[igen]*analysisTree.genparticles_px[igen]+
+				analysisTree.genparticles_py[igen]*analysisTree.genparticles_py[igen]);
+
+	  if (analysisTree.genparticles_pdgid[igen]==-6)
+	    antitopPt = TMath::Sqrt(analysisTree.genparticles_px[igen]*analysisTree.genparticles_px[igen]+
+				    analysisTree.genparticles_py[igen]*analysisTree.genparticles_py[igen]);
+
+	  if (analysisTree.genparticles_pdgid[igen]==22 && analysisTree.genparticles_status[igen]==44)
+	    isGSfound = true;
+
+	  if (analysisTree.genparticles_pdgid[igen]==23) { 
+	    isZfound = true;
+	    zBosonLV = genLV;
+	  }
+	  if (analysisTree.genparticles_pdgid[igen]==25||
+	      analysisTree.genparticles_pdgid[igen]==35||
+	      analysisTree.genparticles_pdgid[igen]==36) { 
+	    isHfound = true;
+	    hBosonLV = genLV;
+	  }
+	  if (abs(analysisTree.genparticles_pdgid[igen])==24) { 
+	    isWfound = true;
+	    wBosonLV = genLV;
+	  }
+
+	  if (fabs(analysisTree.genparticles_pdgid[igen])==11) { 
+	    if (analysisTree.genparticles_fromHardProcess[igen]&&analysisTree.genparticles_status[igen]==1) {
+	      promptElectrons.push_back(genLV);
+	      promptElectronsLV += genLV;
+	      wDecayProductsLV += genLV;
+	    }
+	  }
+	  
+	  if (fabs(analysisTree.genparticles_pdgid[igen])==13) { 
+	    if (analysisTree.genparticles_fromHardProcess[igen]&&analysisTree.genparticles_status[igen]==1) {
+	      promptMuons.push_back(genLV);
+	      promptMuonsLV += genLV;
+	      wDecayProductsLV += genLV;
+	    }
+	  }
+	  
+	  if (fabs(analysisTree.genparticles_pdgid[igen])==12||
+	      fabs(analysisTree.genparticles_pdgid[igen])==14||
+	      fabs(analysisTree.genparticles_pdgid[igen])==16)  {
+	    if ((analysisTree.genparticles_fromHardProcess[igen]||analysisTree.genparticles_isPrompt[igen])&&
+		!analysisTree.genparticles_isDirectHardProcessTauDecayProduct[igen]&&
+		analysisTree.genparticles_status[igen]==1) {
+	      promptNeutrinos.push_back(genLV);
+	      promptNeutrinosLV += genLV;
+	      wDecayProductsLV += genLV;
+	    }
+	    if (analysisTree.genparticles_isDirectHardProcessTauDecayProduct[igen]&&
+		analysisTree.genparticles_status[igen]==1) {
+	      tauNeutrinos.push_back(genLV);
+	      tauNeutrinosLV += genLV;
+	    }
+	  }
+	  
+
+/////////Matching ISR Jets
+
+
+
+
+
+
+	}
+
+/*	if (isGSfound) {
+	  //	  std::cout << "gamma* found : " << std::endl;
+	  if (removeGammaStar) continue;
+	}
+*/
+	if (isDY) {
+	  
+	  if (promptTausFirstCopy.size()==2) {
+	    isZTT = true; isZMM = false; isZEE = false;
+	    bosonPx = promptTausLV.Px(); bosonPy = promptTausLV.Py(); bosonPz = promptTausLV.Pz(); 
+	    bosonMass = promptTausLV.M();
+	    bosonEta  = promptTausLV.Eta();
+	    lepPx = promptVisTausLV.Px(); lepPy = promptVisTausLV.Py(); lepPz = promptVisTausLV.Pz();
+	    //mtBoson_gen = mT(promptTausFirstCopy[0],promptTausFirstCopy[1]);
+	  }
+	  else if (promptMuons.size()==2) {
+	    isZTT = false; isZMM = true; isZEE = false;
+	    bosonPx = promptMuonsLV.Px(); bosonPy = promptMuonsLV.Py(); bosonPz = promptMuonsLV.Pz(); 
+	    bosonMass = promptMuonsLV.M(); 
+	    bosonEta = promptMuonsLV.Eta();
+	    lepPx = promptMuonsLV.Px(); lepPy = promptMuonsLV.Py(); lepPz = promptMuonsLV.Pz();
+	    //mtBoson_gen = mT(promptMuons[0],promptMuons[1]);
+	  }
+	  else {
+	    isZTT = false; isZMM = false; isZEE = true;
+	    bosonPx = promptElectronsLV.Px(); bosonPy = promptElectronsLV.Py(); bosonPz = promptElectronsLV.Pz(); 
+	    bosonMass = promptElectronsLV.M();
+	    bosonEta = promptElectronsLV.Eta();
+	    lepPx = promptElectronsLV.Px(); lepPy = promptElectronsLV.Py(); lepPz = promptElectronsLV.Pz();
+	    //if (promptElectrons.size()==2)
+	    //  mtBoson_gen = mT(promptElectrons[0],promptElectrons[1]);
+	  }
+	  nuPx = tauNeutrinosLV.Px(); nuPy = tauNeutrinosLV.Py(); nuPz = tauNeutrinosLV.Pz();
+	}
+
+	else if (isW) {
+	  bosonPx = wDecayProductsLV.Px(); bosonPy = wDecayProductsLV.Py(); bosonPz = wDecayProductsLV.Pz();
+	  bosonMass = wDecayProductsLV.M();
+	  if (promptTausLastCopy.size()==1) { 
+	    lepPx = promptVisTausLV.Px(); lepPy = promptVisTausLV.Py(); lepPz = promptVisTausLV.Pz();
+	  }
+	  else if (promptMuons.size()==1) { 
+	    lepPx = promptMuonsLV.Px(); lepPy = promptMuonsLV.Py(); lepPz = promptMuonsLV.Pz();
+	  }
+	  else { 
+	    lepPx = promptElectronsLV.Px(); lepPy = promptElectronsLV.Py(); lepPz = promptElectronsLV.Pz();
+	  }
+	  nuPx = promptNeutrinosLV.Px(); nuPy = promptNeutrinosLV.Py(); nuPz = promptNeutrinosLV.Pz();
+	}
+	else {
+	  TLorentzVector bosonLV = promptTausLV + promptMuonsLV + promptElectronsLV + promptNeutrinosLV;
+	  bosonPx = bosonLV.Px(); bosonPy = bosonLV.Py(); bosonPz = bosonLV.Pz();
+	  TLorentzVector lepLV = promptVisTausLV + promptMuonsLV + promptElectronsLV;
+	  lepPx = lepLV.Px(); lepPy = lepLV.Py(); lepPz = lepLV.Pz();
+	  nuPx = promptNeutrinosLV.Px(); nuPy = promptNeutrinosLV.Py(); nuPz = promptNeutrinosLV.Pz();
+	}
+      
+	nuPt = TMath::Sqrt(nuPx*nuPx+nuPy*nuPy);
+	nuPhi = TMath::ATan2(nuPy,nuPx);
+
+	bosonPt = TMath::Sqrt(bosonPx*bosonPx+bosonPy*bosonPy);
+
+
+      }
+
+
+	if (isDY) { // applying Z pt mass weights
+	  zptmassweight = 1;
+	  if (bosonMass>50.0) {
+	    float bosonMassX = bosonMass;
+	    float bosonPtX = bosonPt;
+	    if (bosonMassX>1000.) bosonMassX = 1000.;
+	    if (bosonPtX<1.)      bosonPtX = 1.;
+	    if (bosonPtX>1000.)   bosonPtX = 1000.;
+	    zptmassweight = histZMassPtWeights->GetBinContent(histZMassPtWeights->GetXaxis()->FindBin(bosonMassX),
+							      histZMassPtWeights->GetYaxis()->FindBin(bosonPtX));
+	  }
+	}
+
 
 
     LooseCFCounter[iCutL]+= weight;
@@ -778,7 +1067,6 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	weight *= analysisTree.genweight;
 	gen_weight *=analysisTree.genweight;
 	lumi=true;
-	//cout<<"  weight from init "<<genweights<< "  "<<analysisTree.genweight<<"  "<<weight<<endl;
 
 
 	if (applyPUreweighting)	 {
@@ -924,23 +1212,27 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       bool trigAccept = false;
 
       unsigned int nMainTrigger = 0;
+      unsigned int nMainTriggerIsoMu24 = 0;
       bool isMainTrigger = false;
 
 
-	if (isData){
+      if (isData){
       unsigned int nfilters = analysisTree.run_hltfilters->size();
       //  std::cout << "nfiltres = " << nfilters << std::endl;
       for (unsigned int i=0; i<nfilters; ++i) {
 	//	std::cout << "HLT Filter : " << i << " = " << analysisTree.run_hltfilters->at(i) << std::endl;
 	TString HLTFilter(analysisTree.run_hltfilters->at(i));
-	if (HLTFilter==MainTrigger) {
-	  nMainTrigger = i;
+//	if (HLTFilter==MainTrigger) {
+//	  nMainTrigger = i;
+//	  isMainTrigger = true;
+//	}
+	if (HLTFilter==MainTriggerIsoMu24) {
+	  nMainTriggerIsoMu24 = i;
 	  isMainTrigger = true;
 	}
 
-
       }
-	}//if is data
+	}//if isData check for filters
 
 	if (!isData) isMainTrigger = true;
 
@@ -957,12 +1249,13 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
       vector<int> muons; muons.clear();
       for (unsigned int im = 0; im<analysisTree.muon_count; ++im) {
-	if (analysisTree.muon_pt[im]<ptMuonCut) continue;
+	//if (analysisTree.muon_pt[im]<ptMuonCut) continue;
+	if (analysisTree.muon_pt[im]<SingleMuonTriggerPtCutIsoMu24) continue;
 	if (fabs(analysisTree.muon_eta[im])>etaMuonCut) continue;
 	if (fabs(analysisTree.muon_dxy[im])>dxyMuonCut) continue;
 	if (fabs(analysisTree.muon_dz[im])>dzMuonCut) continue;
-	//if (applyMuonId && !analysisTree.muon_isMedium[im]) continue;
-	if (applyMuonId && !analysisTree.muon_isICHEP[im]) continue;
+	if (applyMuonId && !analysisTree.muon_isMedium[im]) continue;
+	//if (applyMuonId && !analysisTree.muon_isICHEP[im]) continue;
         if ( fabs(analysisTree.muon_charge[im]) != 1) continue;
 	muons.push_back((int)im);
 
@@ -983,6 +1276,8 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	if (analysisTree.tau_decayModeFinding[it]<decayModeFinding) continue;
 	if ( fabs(analysisTree.tau_leadchargedhadrcand_dz[it])> leadchargedhadrcand_dz) continue;
         if ( fabs(analysisTree.tau_charge[it]) != 1 ) continue;
+        if ( analysisTree.tau_againstElectronVLooseMVA6[it]<0.5) continue;
+        if ( analysisTree.tau_againstMuonTight3[it]<0.5) continue;
 	  taus.push_back((int)it);
 
 	}
@@ -1005,9 +1300,10 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       float isoTau = 1.; 
       if (CutBasedTauId) isoTauMin = 1e+10;
       if (!CutBasedTauId) isoTauMin = -10;
+	bool isLegMatch = false;
       
 	for (unsigned int im=0; im<muons.size(); ++im) {
-	bool isLegMatch = false;
+	isLegMatch = false;
 	unsigned int mIndex  = muons.at(im);
 	float neutralHadIsoMu = analysisTree.muon_neutralHadIso[mIndex];
 	float photonIsoMu = analysisTree.muon_photonIso[mIndex];
@@ -1028,21 +1324,22 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
 	if (relIsoMu > 0.15) continue;
 
-
 	if (isData)
 	{	for (unsigned int iT=0; iT<analysisTree.trigobject_count; ++iT) {
-	  	if (analysisTree.trigobject_filters[iT][nMainTrigger]
-	      	&& analysisTree.muon_pt[mIndex]>ptMuonCut&&
-	      	analysisTree.trigobject_pt[iT]>SingleMuonTriggerPtCut) { // IsoMu Leg
+	  	if (analysisTree.trigobject_filters[iT][nMainTriggerIsoMu24]
+	      	&& analysisTree.muon_pt[mIndex]>SingleMuonTriggerPtCutIsoMu24 &&
+	      	analysisTree.trigobject_pt[iT]>SingleMuonTriggerPtCutIsoMu24) { // IsoMu Leg
 	    	float dRtrig = deltaR(analysisTree.muon_eta[mIndex],analysisTree.muon_phi[mIndex],
 				  analysisTree.trigobject_eta[iT],analysisTree.trigobject_phi[iT]);
-	    	if (dRtrig<deltaRTrigMatch) 
+	    	if (dRtrig<deltaRTrigMatch){
 	      	isLegMatch = true;
-	    	
-	  	}
+		}
+
 	  	}
 
-		}
+	   }
+	}
+
 
         if (!isData) isLegMatch = true; 
 
@@ -1057,6 +1354,8 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
 	  if (dR<dRleptonsCutmutau) continue;
 
+
+	  //cout<<"made it to pass the trigger "<<endl;
 
 if (CutBasedTauId){
   isoTau= analysisTree.tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[tIndex];
@@ -1140,12 +1439,13 @@ if (!CutBasedTauId){
 
       }
  }
-      bool TauId = false;
+      /*bool TauId = false;
 
       if ( analysisTree.tau_againstElectronVLooseMVA6[tau_index]>0.5 && analysisTree.tau_againstMuonTight3[tau_index]>0.5) TauId = true;
 
       if (!TauId) continue;
-
+	  //cout<<"made it to pass the TauId "<<endl;
+*/
       if ((int)tau_index<0) continue;
       if ((int)mu_index<0) continue;
 
@@ -1168,6 +1468,7 @@ if (!CutBasedTauId){
 	double dRmutau = deltaR(analysisTree.tau_eta[tau_loose],analysisTree.tau_phi[tau_loose],
 				analysisTree.muon_eta[(int)mu_index],analysisTree.muon_phi[(int)mu_index]);
 	if (dRmutau < 0.5) continue;
+	  //cout<<"made it to pass the dR "<<endl;
 
     LooseCFCounter[iCutL]+= weight;
       TightCFCounter[iCutT]+= weight;
@@ -1249,8 +1550,8 @@ if (!CutBasedTauId){
 	if (fabs(analysisTree.muon_eta[im])>etaVetoMuonCut) continue;
 	if (fabs(analysisTree.muon_dxy[im])>dxyVetoMuonCut) continue;
 	if (fabs(analysisTree.muon_dz[im])>dzVetoMuonCut) continue;
-	//if (applyVetoMuonId && !analysisTree.muon_isMedium[im]) continue;
-	if (applyVetoMuonId && !analysisTree.muon_isICHEP[im]) continue;
+	if (applyVetoMuonId && !analysisTree.muon_isMedium[im]) continue;
+	//if (applyVetoMuonId && !analysisTree.muon_isICHEP[im]) continue;
 	if (relIsoMu>isoVetoMuonCut) continue;
 	foundExtraMuon = true;
       }
@@ -1261,16 +1562,17 @@ if (!CutBasedTauId){
 
 
 
-
 ///////////////Trigger weight 
       double ptMu1 = (double)analysisTree.muon_pt[mu_index];
       double etaMu1 = (double)analysisTree.muon_eta[mu_index];
       float trigweight = 1.;
-	//cout<<" this is what goes for trigger  "<<ptMu1<<"  "<<etaMu1<<endl;
-      float EffFromData = (float)SF_muonTrigger->get_EfficiencyData(double(ptMu1),double(etaMu1));
+
+      float EffFromData = 0.;
+      
+      if (isLegMatch) EffFromData = (float)SF_muonTrigger->get_EfficiencyData(double(ptMu1),double(etaMu1));
+      
       /*float Mu22EffMC   = (float)SF_muonTrigger->get_EfficiencyMC(double(ptMu1),double(etaMu1));*/
 	
-
 	//if (!isData && (   string::npos != filen.find("stau") || string::npos != filen.find("C1")) ) Signal=true;
      /* if (!isData) {
 	if (Mu22EffMC>1e-6)
@@ -1318,6 +1620,10 @@ if (!CutBasedTauId){
        //ta_IsoFlag=analysisTree.tau_byTightIsolationMVArun2v1DBoldDMwLT[tau_index];
        //isoTau = analysisTree.tau_chargedIsoPtSum[tau_index];
 
+
+
+
+
 	 }
 
 	if (CutBasedTauId){
@@ -1332,6 +1638,7 @@ if (isTight)
 
       JetsMV.clear();
       int countjets=0;
+      int countbjets=0;
       float DRmax = 0.5;
 
 
@@ -1339,16 +1646,16 @@ if (isTight)
 	float absJetEta = fabs(analysisTree.pfjet_eta[jet]);
 
 	if (absJetEta > etaJetCut) continue;
-	if (fabs(analysisTree.pfjet_pt[jet])<20.) continue;
+	if (fabs(analysisTree.pfjet_pt[jet])<ptJetCut) continue;
 
 	float jetPt = analysisTree.pfjet_pt[jet];
 
 
 	bool isPFJetId = false ; 
+      	bool btagged= false;
 	isPFJetId =looseJetiD(analysisTree,jet);
 	//isPFJetId =tightLepVetoJetiD(analysisTree,jet);
 
-	//				cout<<" 1- jet is Loose "<<isPFJetId<<"  "<<jet_isLoose[jet]<<"  iEntry "<<iEntry<<endl;
 	if (!isPFJetId) continue;
 	jet_isLoose[jet] = isPFJetId;
 	bool cleanedJet = true;
@@ -1373,6 +1680,10 @@ if (isTight)
 	JetsMV.push_back(JetsV);	
 
 	countjets++;
+	if (analysisTree.pfjet_btag[jet][0]  > bTag) {
+	btagged = true;
+	countbjets++;
+	}//bjets
 
       }
 
@@ -1383,6 +1694,7 @@ if (isTight)
       iCutL++;
       iCutT++;
       hnJets->Fill(countjets,weight);
+      hnbJets->Fill(countbjets,weight);
       hIsoMuSel->Fill(isoMuMin,weight);
 
       if (fabs(analysisTree.tau_charge[tau_loose]) !=1) continue;
@@ -1395,24 +1707,114 @@ if (isTight)
       if (isTight)  hTightIndex->Fill((int)tau_tight,weight);
 	
 
+/////////////////// Recoil corrections
+
+      int njetsforrecoil = njets;
+      if (isW) njetsforrecoil = njets + 1;
+
+      float pfmet_corr_x = analysisTree.pfmetcorr_ex;
+      float pfmet_corr_y = analysisTree.pfmetcorr_ey;
+      float met_x = analysisTree.pfmetcorr_ex;
+      float met_y = analysisTree.pfmetcorr_ey;
+
+      if ((isW||isDY) && !isData) {
+
+	  recoilMetCorrector.CorrectByMeanResolution(analysisTree.pfmetcorr_ex,analysisTree.pfmetcorr_ey,bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,pfmet_corr_x,pfmet_corr_y);
+ 
+        met_x = pfmet_corr_x;
+        met_y = pfmet_corr_y;
+ 
+      // MEt related systematic uncertainties
+      int bkgdType = 0;
+      if (isDY||isW)
+	bkgdType = MEtSys::ProcessType::BOSON;
+      else if (isTOP)
+	bkgdType = MEtSys::ProcessType::TOP;
+      else 
+	bkgdType = MEtSys::ProcessType::EWK; 
+
+      float met_scaleUp_x   = met_x;
+      float met_scaleUp_y   = met_y;
+      float met_scaleDown_x = met_x;
+      float met_scaleDown_y = met_y;
+      float met_resoUp_x    = met_x;
+      float met_resoUp_y    = met_y;
+      float met_resoDown_x  = met_x;
+      float met_resoDown_y  = met_y;
+
+	metSys.ApplyMEtSys(met_x,met_y,
+			   bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,bkgdType,
+			   MEtSys::SysType::Response,MEtSys::SysShift::Up,
+			   met_scaleUp_x,met_scaleUp_y);
+	metSys.ApplyMEtSys(met_x,met_y,
+			   bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,bkgdType,
+			   MEtSys::SysType::Response,MEtSys::SysShift::Down,
+			   met_scaleDown_x,met_scaleDown_y);
+	metSys.ApplyMEtSys(met_x,met_y,
+			   bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,bkgdType,
+			   MEtSys::SysType::Resolution,MEtSys::SysShift::Up,
+			   met_resoUp_x,met_resoUp_y);
+	metSys.ApplyMEtSys(met_x,met_y,
+			   bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,bkgdType,
+			   MEtSys::SysType::Resolution,MEtSys::SysShift::Down,
+			   met_resoDown_x,met_resoDown_y);
+
+      
+      met_scaleUp = TMath::Sqrt(met_scaleUp_x*met_scaleUp_x+
+				   met_scaleUp_y*met_scaleUp_y);
+      metphi_scaleUp = TMath::ATan2(met_scaleUp_y,met_scaleUp_x);
+      
+      met_scaleDown = TMath::Sqrt(met_scaleDown_x*met_scaleDown_x+
+				     met_scaleDown_y*met_scaleDown_y);
+      metphi_scaleDown = TMath::ATan2(met_scaleDown_y,met_scaleDown_x);
+      
+      met_resoUp = TMath::Sqrt(met_resoUp_x*met_resoUp_x+
+				  met_resoUp_y*met_resoUp_y);
+      metphi_resoUp = TMath::ATan2(met_resoUp_y,met_resoUp_x);
+      
+      met_resoDown = TMath::Sqrt(met_resoDown_x*met_resoDown_x+
+				    met_resoDown_y*met_resoDown_y);
+      metphi_resoDown = TMath::ATan2(met_resoDown_y,met_resoDown_x);
+ 
+ 
+ 
+	
+
+      met_ex_recoil = pfmet_corr_x;
+      met_ey_recoil = pfmet_corr_y;
+
+      }//if isW, isDY !isData
+
+      met_ex = pfmet_corr_x;
+      met_ey = pfmet_corr_y;
+      met_ez = 0;//analysisTree.pfmet_ez;
+      //met_pt = analysisTree.pfmet_pt;
+      met_pt = TMath::Sqrt(pfmet_corr_x*pfmet_corr_x+pfmet_corr_y*pfmet_corr_y);
+      //met_phi = analysisTree.pfmet_phi;
+      met_phi = TMath::ATan2(pfmet_corr_y,pfmet_corr_x);
+
+
+
+
 
 
 
       double dPhi=-1;double MT=-1 ; double RatioSums=-1;
 
 
-      double met = sqrt ( analysisTree.pfmet_ex*analysisTree.pfmet_ex + analysisTree.pfmet_ey*analysisTree.pfmet_ey);
+      double met = sqrt ( met_ex*met_ex + met_ey*met_ey);
       // w = mu+MET
       // ptW - ptJ/ptW+ptJ      
-      double SumPtMuMET = sqrt ( ( analysisTree.pfmet_ex +analysisTree.muon_px[mu_index])*(analysisTree.pfmet_ex+analysisTree.muon_px[mu_index]) + 
-				 (analysisTree.pfmet_ey+analysisTree.muon_py[mu_index])*(analysisTree.pfmet_ey+analysisTree.muon_py[mu_index]));
+      double SumPtMuMET = sqrt ( ( met_ex +analysisTree.electron_px[el_index])*(met_ex+analysisTree.electron_px[el_index]) + 
+				 (met_ey+analysisTree.electron_py[el_index])*(met_ey+analysisTree.electron_py[el_index]));
 
       RatioSums = (SumPtMuMET - JetsMV.at(0).Pt() )/ (SumPtMuMET +JetsMV.at(0).Pt() );
 
 
       TLorentzVector MetV; 
-      MetV.SetPx(analysisTree.pfmet_ex); 
-      MetV.SetPy(analysisTree.pfmet_ey);
+      MetV.SetPx(met_ex); 
+      MetV.SetPy(met_ey);
+
 
       TLorentzVector muV ;  muV.SetPtEtaPhiM(analysisTree.muon_pt[mu_index], analysisTree.muon_eta[mu_index], analysisTree.muon_phi[mu_index], muonMass);
       TLorentzVector tauV;  tauV.SetPtEtaPhiM(analysisTree.tau_pt[tau_loose], analysisTree.tau_eta[tau_loose], analysisTree.tau_phi[tau_loose], tauMass);
@@ -1656,6 +2058,7 @@ if (isTight)
   histWeightsH->Write();
   histTopPt->Write();
   hnJets->Write();
+  hnbJets->Write();
   CutFlowUnWTight->Write();
   CutFlowUnWLoose->Write();
   file->Write();
