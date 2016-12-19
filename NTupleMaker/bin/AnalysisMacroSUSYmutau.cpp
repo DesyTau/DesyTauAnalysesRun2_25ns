@@ -14,6 +14,7 @@
 #include "TLorentzVector.h"
 #include "TVector3.h"
 #include "TRFIOFile.h"
+#include "TH1D.h"
 #include "TChain.h"
 #include "TCanvas.h"
 #include "TPaveText.h"
@@ -102,7 +103,10 @@ int main(int argc, char * argv[]) {
 
 
   const string MuonidIsoEffFile = cfg.get<string>("MuonidIsoEffFile");
+  const string MuonidIsoEffFileRunGIso = cfg.get<string>("MuonidIsoEffFileRunGIso");
   const string MuontrigEffFile = cfg.get<string>("MuontrigEffFile");
+  const string MuontrigEffFileRunGIsoMu22 = cfg.get<string>("MuontrigEffFileRunGIsoMu22");
+  const string MuontrigEffFileRunGIsoMu24 = cfg.get<string>("MuontrigEffFileRunGIsoMu24");
 
 
   const string Region  = cfg.get<string>("Region");
@@ -226,8 +230,10 @@ int main(int argc, char * argv[]) {
 
 // PU reweighting
   PileUp * PUofficial = new PileUp();
-  //TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/pileUp_data_Cert_271036-277148_13TeV_PromptReco_Collisions16_xsec69p2mb.root","read");
-  TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/pileUp_data_RunBCDE_ReReco.root","read");
+  //TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/Data_Run2016B_pileup.root","read");
+  //TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/pileUp_data_2016_Cert_Cert_271036-276811_NoL1T_xsec63mb.root","read");
+  //TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/pileUp_data_Cert_271036-276811_13TeV_PromptReco_Collisions16_xsec69p2mb.root","read");
+  TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/pileUp_data_Cert_271036-277148_13TeV_PromptReco_Collisions16_xsec69p2mb.root","read");
   TFile * filePUdistribution_MC = new TFile (TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/MC_Spring16_PU25ns_V1.root", "read");
   TH1D * PU_data = (TH1D *)filePUdistribution_data->Get("pileup");
   TH1D * PU_mc = (TH1D *)filePUdistribution_MC->Get("pileup");
@@ -292,13 +298,19 @@ int main(int argc, char * argv[]) {
   ScaleFactor * SF_muonIdIso; 
   if (applyLeptonSF) {
     SF_muonIdIso = new ScaleFactor();
-    SF_muonIdIso->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(MuonidIsoEffFile));
+    //SF_muonIdIso->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(MuonidIsoEffFile));
+    //special for RunG
+    SF_muonIdIso->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(MuonidIsoEffFileRunGIso));
   }
 
 
   cout<<"  Initializing Trigger SF files....."<<endl;
   ScaleFactor * SF_muonTrigger = new ScaleFactor();
-  SF_muonTrigger->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(MuontrigEffFile));
+  //SF_muonTrigger->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(MuontrigEffFile));
+//special for RunG
+  SF_muonTrigger->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(MuontrigEffFileRunGIsoMu22));
+  ScaleFactor * SF_muonTriggerIsoMu24 = new ScaleFactor();
+  SF_muonTriggerIsoMu24->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(MuontrigEffFileRunGIsoMu24));
 
   //////////////////////////////////////
   //////// Initialized TauFakeRates here
@@ -903,10 +915,10 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       for (unsigned int i=0; i<nfilters; ++i) {
 	//	std::cout << "HLT Filter : " << i << " = " << analysisTree.run_hltfilters->at(i) << std::endl;
 	TString HLTFilter(analysisTree.run_hltfilters->at(i));
-//	if (HLTFilter==MainTrigger) {
-//	  nMainTrigger = i;
-//	  isMainTrigger = true;
-//	}
+	if (HLTFilter==MainTrigger) {
+	  nMainTrigger = i;
+	  isMainTrigger = true;
+	}
 	if (HLTFilter==MainTriggerIsoMu24) {
 	  nMainTriggerIsoMu24 = i;
 	  isMainTrigger = true;
@@ -1309,10 +1321,11 @@ if (!CutBasedTauId){
       double etaMu1 = (double)analysisTree.muon_eta[mu_index];
       float trigweight=1.;
 
-      float EffFromData = 0.;
+      float EffFromData = 1.;
       
+     // if (isLegMatch ) EffFromData = (float)SF_muonTrigger->get_EfficiencyData(double(ptMu1),double(etaMu1));
       
-      if (isLegMatchIsoMu24) EffFromData = (float)SF_muonTrigger->get_EfficiencyData(double(ptMu1),double(etaMu1));
+      if (isLegMatchIsoMu24) EffFromData = (float)SF_muonTriggerIsoMu24->get_EfficiencyData(double(ptMu1),double(etaMu1));
 
 
       /*float Mu17EffMC   = (float)SF_muonTrigger->get_EfficiencyMC(double(ptMu1),double(etaMu1));*/
