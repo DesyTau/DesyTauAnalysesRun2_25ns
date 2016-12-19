@@ -861,7 +861,34 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	std::vector<TString> metFlags; metFlags.clear();
      //////////////MET filters flag
 
-	 
+	bool Run2016A, Run2016B, Run2016C, Run2016D, Run2016E, Run2016F, Run2016G,Run2016H;
+	bool RunBCDEF = false;
+	bool RunGH = false;
+	Run2016A=false;
+	Run2016B=false;
+	Run2016C=false;
+	Run2016D=false;
+	Run2016E=false;
+	Run2016F=false;
+	Run2016G=false;
+	Run2016H=false;
+
+
+	int RunNo = analysisTree.event_run;
+	if (isData){
+	if (RunNo >  271036-1 &&  RunNo < 271658+1 ) Run2016A = true;
+	if (RunNo >  272007-1 &&  RunNo < 275376+1 ) Run2016B = true;
+	if (RunNo >  275657-1 &&  RunNo < 276283+1 ) Run2016C = true;
+	if (RunNo >  276315-1 &&  RunNo < 276811+1 ) Run2016D = true;
+	if (RunNo >  276831-1 &&  RunNo < 277420+1 ) Run2016E = true;
+	if (RunNo >  277772-1 &&  RunNo < 278808+1 ) Run2016F = true;
+	if (RunNo >  278820-1 &&  RunNo < 280385+1 ) Run2016G = true;
+	if (RunNo >  280919-1 &&  RunNo < 284044+1 ) Run2016H = true;
+	//cout<<Run2016A<<"  "<<Run2016B<<"  "<<Run2016E<<endl;
+
+	if (Run2016B || Run2016C || Run2016D || Run2016E || Run2016F) RunBCDEF = true;
+	if (Run2016G || Run2016H) RunGH = true;
+	}
 	 metFlags.push_back("Flag_HBHENoiseFilter");
 	 metFlags.push_back("Flag_HBHENoiseIsoFilter");
 	 metFlags.push_back("Flag_EcalDeadCellTriggerPrimitiveFilter");
@@ -933,9 +960,12 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	if (fabs(analysisTree.muon_eta[im])>etaMuonCut) continue;
 	if (fabs(analysisTree.muon_dxy[im])>dxyMuonCut) continue;
 	if (fabs(analysisTree.muon_dz[im])>dzMuonCut) continue;
-	if (applyMuonId && !analysisTree.muon_isMedium[im]) continue;
-	//if (applyMuonId && !analysisTree.muon_isICHEP[im]) continue;
-        if ( fabs(analysisTree.muon_charge[im]) != 1) continue;
+	if (!isData && applyMuonId && !analysisTree.muon_isMedium[im]) continue;
+
+	if (isData && applyMuonId && RunBCDEF && !RunGH && !analysisTree.muon_isICHEP[im]) continue;
+	if (isData && applyMuonId && !RunBCDEF && RunGH && !analysisTree.muon_isMedium[im]) continue;
+
+	if ( fabs(analysisTree.muon_charge[im]) != 1) continue;
 	muons.push_back((int)im);
 
 
@@ -1263,8 +1293,11 @@ if (!CutBasedTauId){
 	if (fabs(analysisTree.muon_eta[im])>etaVetoMuonCut) continue;
 	if (fabs(analysisTree.muon_dxy[im])>dxyVetoMuonCut) continue;
 	if (fabs(analysisTree.muon_dz[im])>dzVetoMuonCut) continue;
-	if (applyVetoMuonId && !analysisTree.muon_isMedium[im]) continue;
+	if (!isData && applyVetoMuonId && !analysisTree.muon_isMedium[im]) continue;
 	//if (applyVetoMuonId && !analysisTree.muon_isICHEP[im]) continue;
+	if (isData && applyMuonId && RunBCDEF && !RunGH && !analysisTree.muon_isICHEP[im]) continue;
+	if (isData && applyMuonId && !RunBCDEF && RunGH && !analysisTree.muon_isMedium[im]) continue;
+	
 	if (relIsoMu>isoVetoMuonCut) continue;
 	foundExtraMuon = true;
       }

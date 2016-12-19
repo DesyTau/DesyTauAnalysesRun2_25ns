@@ -885,7 +885,38 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
 	std::vector<TString> metFlags; metFlags.clear();
      //////////////MET filters flag
-//      if (isData){
+
+	bool Run2016A, Run2016B, Run2016C, Run2016D, Run2016E, Run2016F, Run2016G,Run2016H;
+	bool RunBCDEF = false;
+	bool RunGH = false;
+	Run2016A=false;
+	Run2016B=false;
+	Run2016C=false;
+	Run2016D=false;
+	Run2016E=false;
+	Run2016F=false;
+	Run2016G=false;
+	Run2016H=false;
+
+
+	int RunNo = analysisTree.event_run;
+	if (isData){
+	if (RunNo >  271036-1 &&  RunNo < 271658+1 ) Run2016A = true;
+	if (RunNo >  272007-1 &&  RunNo < 275376+1 ) Run2016B = true;
+	if (RunNo >  275657-1 &&  RunNo < 276283+1 ) Run2016C = true;
+	if (RunNo >  276315-1 &&  RunNo < 276811+1 ) Run2016D = true;
+	if (RunNo >  276831-1 &&  RunNo < 277420+1 ) Run2016E = true;
+	if (RunNo >  277772-1 &&  RunNo < 278808+1 ) Run2016F = true;
+	if (RunNo >  278820-1 &&  RunNo < 280385+1 ) Run2016G = true;
+	if (RunNo >  280919-1 &&  RunNo < 284044+1 ) Run2016H = true;
+	//cout<<Run2016A<<"  "<<Run2016B<<"  "<<Run2016E<<endl;
+
+	if (Run2016B || Run2016C || Run2016D || Run2016E || Run2016F) RunBCDEF = true;
+	if (Run2016G || Run2016H) RunGH = true;
+	}
+     
+     
+     //      if (isData){
 
 	 
 	 metFlags.push_back("Flag_HBHENoiseFilter");
@@ -1230,8 +1261,11 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	if (fabs(analysisTree.muon_eta[ie])>etaVetoMuonCut) continue;
 	if (fabs(analysisTree.muon_dxy[ie])>dxyVetoMuonCut) continue;
 	if (fabs(analysisTree.muon_dz[ie])>dzVetoMuonCut) continue;
-	//if (applyVetoMuonId && !analysisTree.muon_isMedium[ie]) continue;
-	if (applyVetoMuonId && !analysisTree.muon_isICHEP[ie]) continue;
+
+	if (!isData && !analysisTree.muon_isMedium[ie]) continue;
+	if (isData && RunBCDEF && !RunGH && !analysisTree.muon_isICHEP[ie]) continue;
+	if (isData && !RunBCDEF && RunGH && !analysisTree.muon_isMedium[ie]) continue;
+
 	float neutralHadIsoMu = analysisTree.muon_neutralHadIso[ie];
         float photonIsoMu = analysisTree.muon_photonIso[ie];
         float chargedHadIsoMu = analysisTree.muon_chargedHadIso[ie];
