@@ -99,6 +99,9 @@ int main(int argc, char * argv[]) {
 
 
 
+  //const string MuonidIsoEffFileBCDEFGH = cfg.get<string>("MuonidIsoEffFileBCDEFGH");
+  //const string MuontrigEffFileBCDEFGH = cfg.get<string>("MuontrigEffFileBCDEFGH");
+
   const string MuonidIsoEffFileBCDEF = cfg.get<string>("MuonidIsoEffFileBCDEF");
   const string MuontrigEffFileBCDEF = cfg.get<string>("MuontrigEffFileBCDEF");
   
@@ -291,8 +294,8 @@ int main(int argc, char * argv[]) {
   TH1D * MuSF_IdIso_Mu1H = new TH1D("MuIdIsoSF_Mu1H", "MuIdIsoSF_Mu1", 100, 0.5,1.5);
 
   cout<<"  Initializing iD SF files....."<<endl;
-  ScaleFactor * SF_muonIdIsoBCDEF; 
-  ScaleFactor * SF_muonIdIsoGH; 
+    ScaleFactor * SF_muonIdIsoBCDEF; 
+    ScaleFactor * SF_muonIdIsoGH; 
     SF_muonIdIsoBCDEF = new ScaleFactor();
     SF_muonIdIsoGH = new ScaleFactor();
     SF_muonIdIsoBCDEF->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(MuonidIsoEffFileBCDEF));
@@ -301,8 +304,10 @@ int main(int argc, char * argv[]) {
 
   cout<<"  Initializing Trigger SF files....."<<endl;
   ScaleFactor * SF_muonTriggerBCDEF = new ScaleFactor();
+//  ScaleFactor * SF_muonTriggerBCDEFGH = new ScaleFactor();
   ScaleFactor * SF_muonTriggerGH = new ScaleFactor();
   SF_muonTriggerBCDEF->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(MuontrigEffFileBCDEF));
+  //SF_muonTriggerBCDEFGH->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(MuontrigEffFileBCDEF));
   SF_muonTriggerGH->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(MuontrigEffFileGH));
 
   //////////////////////////////////////
@@ -863,8 +868,6 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
       if (!lumi) continue;
 
-	std::vector<TString> metFlags; metFlags.clear();
-     //////////////MET filters flag
 
 	bool Run2016A, Run2016B, Run2016C, Run2016D, Run2016E, Run2016F, Run2016G,Run2016H;
 	bool RunBCDEF = false;
@@ -895,6 +898,8 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	if (Run2016G || Run2016H) RunGH = true;
 	}
 
+	std::vector<TString> metFlags; metFlags.clear();
+     //////////////MET filters flag
 
 	 metFlags.push_back("Flag_HBHENoiseFilter");
 	 metFlags.push_back("Flag_HBHENoiseIsoFilter");
@@ -967,7 +972,9 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	if (fabs(analysisTree.muon_eta[im])>etaMuonCut) continue;
 	if (fabs(analysisTree.muon_dxy[im])>dxyMuonCut) continue;
 	if (fabs(analysisTree.muon_dz[im])>dzMuonCut) continue;
-	if (!isData && applyMuonId && !analysisTree.muon_isMedium[im]) continue;
+	//if (!isData && applyMuonId && !analysisTree.muon_isMedium[im]) continue;
+	if (!isData && applyMuonId && iEntry%2==0 && !analysisTree.muon_isMedium[im]) continue;
+	if (!isData && applyMuonId && iEntry%1==0 && !analysisTree.muon_isICHEP[im]) continue;
 	if (isData && applyMuonId && RunBCDEF && !RunGH && !analysisTree.muon_isICHEP[im]) continue;
 	if (isData && applyMuonId && !RunBCDEF && RunGH && !analysisTree.muon_isMedium[im]) continue;
 
@@ -1300,7 +1307,9 @@ if (!CutBasedTauId){
 	if (fabs(analysisTree.muon_dxy[im])>dxyVetoMuonCut) continue;
 	if (fabs(analysisTree.muon_dz[im])>dzVetoMuonCut) continue;
 	//if (applyVetoMuonId && !analysisTree.muon_isICHEP[im]) continue;
-	if (!isData && applyVetoMuonId && !analysisTree.muon_isMedium[im]) continue;
+	//if (!isData && applyVetoMuonId && !analysisTree.muon_isMedium[im]) continue;
+	if (!isData && applyMuonId && iEntry%2==0 && !analysisTree.muon_isMedium[im]) continue;
+	if (!isData && applyMuonId && iEntry%1==0 && !analysisTree.muon_isICHEP[im]) continue;
 	if (isData && applyMuonId && RunBCDEF && !RunGH && !analysisTree.muon_isICHEP[im]) continue;
 	if (isData && applyMuonId && !RunBCDEF && RunGH && !analysisTree.muon_isMedium[im]) continue;
 	
@@ -1348,13 +1357,15 @@ if (!CutBasedTauId){
       double etaMu1 = (double)analysisTree.muon_eta[mu_index];
       float trigweight=1.;
 
-      float EffFromData = 0.;
+      float EffFromData = 1.;
       
       
-      if (isLegMatchIsoMu24) { 
+      if (isLegMatchIsoMu24 && !isData) { 
 	      
-	if (RunBCDEF)	      EffFromData = (float)SF_muonTriggerBCDEF->get_EfficiencyData(double(ptMu1),double(etaMu1));
-	  else	      EffFromData = (float)SF_muonTriggerGH->get_EfficiencyData(double(ptMu1),double(etaMu1));
+//	if (RunBCDEF)	      EffFromData = (float)SF_muonTriggerBCDEF->get_EfficiencyData(double(ptMu1),double(etaMu1));
+//	if (RunGH)	      EffFromData = (float)SF_muonTriggerGH->get_EfficiencyData(double(ptMu1),double(etaMu1));
+	if (iEntry%1==0)      EffFromData = (float)SF_muonTriggerBCDEF->get_EfficiencyData(double(ptMu1),double(etaMu1));
+	if (iEntry%2==0)      EffFromData = (float)SF_muonTriggerGH->get_EfficiencyData(double(ptMu1),double(etaMu1));
 
       }
 
@@ -1382,8 +1393,8 @@ if (!CutBasedTauId){
 	//leptonSFweight = SF_yourScaleFactor->get_ScaleFactor(pt, eta)	
 	double IdIsoSF_mu1 = 1;
 		
-	if (RunBCDEF)	IdIsoSF_mu1=  SF_muonIdIsoBCDEF->get_ScaleFactor(ptMu1, etaMu1);
-	if (RunGH) 	IdIsoSF_mu1 = SF_muonIdIsoGH->get_ScaleFactor(ptMu1, etaMu1);
+	if (iEntry%1==0) IdIsoSF_mu1=  SF_muonIdIsoBCDEF->get_ScaleFactor(ptMu1, etaMu1);
+	if (iEntry%2==0) IdIsoSF_mu1 = SF_muonIdIsoGH->get_ScaleFactor(ptMu1, etaMu1);
 
 
 	MuSF_IdIso_Mu1H->Fill(IdIsoSF_mu1);
@@ -1700,7 +1711,6 @@ if (!CutBasedTauId){
 
 	  recoilMetCorrector.CorrectByMeanResolution(analysisTree.pfmetcorr_ex,analysisTree.pfmetcorr_ey,bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,pfmet_corr_x,pfmet_corr_y);
  
-//	  cout<<" without correction  "<<sqrt(met_x*met_x+met_y*met_y)<<" with "<<sqrt(pfmet_corr_x*pfmet_corr_x+pfmet_corr_y*pfmet_corr_y)<<endl;
         met_x = pfmet_corr_x;
         met_y = pfmet_corr_y;
  
@@ -1766,8 +1776,6 @@ if (!CutBasedTauId){
       met_ez = analysisTree.pfmetcorr_ez;
       met_pt = TMath::Sqrt(met_ex*met_ex + met_ey*met_ey);
       met_phi = TMath::ATan2(met_y,met_x);
-
-      //cout<<" old "<<sqrt(met_ex*met_ex + met_ey*met_ey)<<"  new  "<<sqrt(pfmet_corr_x*pfmet_corr_x + pfmet_corr_y*pfmet_corr_y)<<endl;
 
      met_ex_JetEnUp = analysisTree.pfmetcorr_ex_JetEnUp;
      met_ey_JetEnUp = analysisTree.pfmetcorr_ey_JetEnUp;
