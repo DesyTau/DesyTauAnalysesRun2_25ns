@@ -973,8 +973,8 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	if (fabs(analysisTree.muon_dxy[im])>dxyMuonCut) continue;
 	if (fabs(analysisTree.muon_dz[im])>dzMuonCut) continue;
 	//if (!isData && applyMuonId && !analysisTree.muon_isMedium[im]) continue;
-	if (!isData && applyMuonId && iEntry%2==0 && !analysisTree.muon_isMedium[im]) continue;
-	if (!isData && applyMuonId && iEntry%1==0 && !analysisTree.muon_isICHEP[im]) continue;
+	if (!isData && applyMuonId && iEntry%2!=0 && !analysisTree.muon_isMedium[im]) continue;
+	if (!isData && applyMuonId && iEntry%2==0 && !analysisTree.muon_isICHEP[im]) continue;
 	if (isData && applyMuonId && RunBCDEF && !RunGH && !analysisTree.muon_isICHEP[im]) continue;
 	if (isData && applyMuonId && !RunBCDEF && RunGH && !analysisTree.muon_isMedium[im]) continue;
 
@@ -1308,8 +1308,8 @@ if (!CutBasedTauId){
 	if (fabs(analysisTree.muon_dz[im])>dzVetoMuonCut) continue;
 	//if (applyVetoMuonId && !analysisTree.muon_isICHEP[im]) continue;
 	//if (!isData && applyVetoMuonId && !analysisTree.muon_isMedium[im]) continue;
-	if (!isData && applyMuonId && iEntry%2==0 && !analysisTree.muon_isMedium[im]) continue;
-	if (!isData && applyMuonId && iEntry%1==0 && !analysisTree.muon_isICHEP[im]) continue;
+	if (!isData && applyMuonId && iEntry%2!=0 && !analysisTree.muon_isMedium[im]) continue;
+	if (!isData && applyMuonId && iEntry%2==0 && !analysisTree.muon_isICHEP[im]) continue;
 	if (isData && applyMuonId && RunBCDEF && !RunGH && !analysisTree.muon_isICHEP[im]) continue;
 	if (isData && applyMuonId && !RunBCDEF && RunGH && !analysisTree.muon_isMedium[im]) continue;
 	
@@ -1364,8 +1364,8 @@ if (!CutBasedTauId){
 	      
 //	if (RunBCDEF)	      EffFromData = (float)SF_muonTriggerBCDEF->get_EfficiencyData(double(ptMu1),double(etaMu1));
 //	if (RunGH)	      EffFromData = (float)SF_muonTriggerGH->get_EfficiencyData(double(ptMu1),double(etaMu1));
-	if (iEntry%1==0)      EffFromData = (float)SF_muonTriggerBCDEF->get_EfficiencyData(double(ptMu1),double(etaMu1));
-	if (iEntry%2==0)      EffFromData = (float)SF_muonTriggerGH->get_EfficiencyData(double(ptMu1),double(etaMu1));
+	if (iEntry%2==0)      EffFromData = (float)SF_muonTriggerBCDEF->get_EfficiencyData(double(ptMu1),double(etaMu1));
+	if (iEntry%2!=0)      EffFromData = (float)SF_muonTriggerGH->get_EfficiencyData(double(ptMu1),double(etaMu1));
 
       }
 
@@ -1393,8 +1393,8 @@ if (!CutBasedTauId){
 	//leptonSFweight = SF_yourScaleFactor->get_ScaleFactor(pt, eta)	
 	double IdIsoSF_mu1 = 1;
 		
-	if (iEntry%1==0) IdIsoSF_mu1=  SF_muonIdIsoBCDEF->get_ScaleFactor(ptMu1, etaMu1);
-	if (iEntry%2==0) IdIsoSF_mu1 = SF_muonIdIsoGH->get_ScaleFactor(ptMu1, etaMu1);
+	if (iEntry%2==0) IdIsoSF_mu1=  SF_muonIdIsoBCDEF->get_ScaleFactor(ptMu1, etaMu1);
+	if (iEntry%2!=0) IdIsoSF_mu1 = SF_muonIdIsoGH->get_ScaleFactor(ptMu1, etaMu1);
 
 
 	MuSF_IdIso_Mu1H->Fill(IdIsoSF_mu1);
