@@ -48,7 +48,6 @@ int main(int argc, char * argv[]) {
   const bool applyPUreweighting = cfg.get<bool>("ApplyPUreweighting");
 
 
-  const bool applyLeptonSF = cfg.get<bool>("ApplyLeptonSF");
 
   // kinematics electrons
   const float  ptElectronCut       = cfg.get<float>("ptElectronCuteltau");
@@ -308,10 +307,8 @@ int main(int argc, char * argv[]) {
 	cout<<" Initializing iD SF files....."<<endl;
 
   ScaleFactor * SF_elIdIso; 
-  if (applyLeptonSF) {
     SF_elIdIso = new ScaleFactor();
     SF_elIdIso->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(ElectronIdIsoFile));
-  }
 
 	cout<<" Initializing Trigger SF files....."<<endl;
   ScaleFactor * SF_electronTrigger = new ScaleFactor();
@@ -1262,7 +1259,9 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	if (fabs(analysisTree.muon_dxy[ie])>dxyVetoMuonCut) continue;
 	if (fabs(analysisTree.muon_dz[ie])>dzVetoMuonCut) continue;
 
-	if (!isData && !analysisTree.muon_isMedium[ie]) continue;
+	//if (!isData && !analysisTree.muon_isMedium[ie]) continue;
+	if (!isData && iEntry%2!=0 && !analysisTree.muon_isMedium[ie]) continue;
+	if (!isData && iEntry%2==0 && !analysisTree.muon_isICHEP[ie]) continue;
 	if (isData && RunBCDEF && !RunGH && !analysisTree.muon_isICHEP[ie]) continue;
 	if (isData && !RunBCDEF && RunGH && !analysisTree.muon_isMedium[ie]) continue;
 
@@ -1408,7 +1407,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       iCut++;
 
 	///////////Lepton SF
-      if (!isData && applyLeptonSF) {
+      if (!isData) {
 
 	//leptonSFweight = SF_yourScaleFactor->get_ScaleFactor(pt, eta)	
       double ptEl1 = analysisTree.electron_pt[el_index];
@@ -1428,6 +1427,8 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       ///////////////Check if the selected tau has a gen matched - if not, apply Tau Fake Rate
       bool isTauMatched = false;
       bool isGenLeptonMatched = false;
+      bool isGenLeptonMatchedMu = false;
+      bool isGenLeptonMatchedEl = false;
 	if (!isData){
       TLorentzVector genTauV;  
 	TLorentzVector genLepV;  
@@ -1457,6 +1458,8 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 			  genLepV.Eta(),genLepV.Phi());
 
 		if (Drm < 0.2 && genLepV.Pt() > 8. ) isGenLeptonMatched = true;
+		if (Drm < 0.2 && genLepV.Pt() > 8. && abs(analysisTree.genparticles_pdgid[igen])==11 ) isGenLeptonMatchedEl = true;
+		if (Drm < 0.2 && genLepV.Pt() > 8. && abs(analysisTree.genparticles_pdgid[igen])==13 ) isGenLeptonMatchedMu = true;
 
 		}
       
@@ -1467,6 +1470,8 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
 	genTauMatched = isTauMatched;
 	genLeptonMatched = isGenLeptonMatched;
+	genLeptonMatchedEl = isGenLeptonMatchedEl;
+	genLeptonMatchedMu = isGenLeptonMatchedMu;
 
 	/////////TFR
  /*     if (!isData && applyTFR && !isTauMatched) {
@@ -1802,22 +1807,16 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 				    met_resoDown_y*met_resoDown_y);
       metphi_resoDown = TMath::ATan2(met_resoDown_y,met_resoDown_x);
  
- 
- 
-	
-
       met_ex_recoil = pfmet_corr_x;
       met_ey_recoil = pfmet_corr_y;
 
       }//if isW, isDY !isData
 
-      met_ex = pfmet_corr_x;
-      met_ey = pfmet_corr_y;
-      met_ez = 0;//analysisTree.pfmet_ez;
-      //met_pt = analysisTree.pfmet_pt;
-      met_pt = TMath::Sqrt(pfmet_corr_x*pfmet_corr_x+pfmet_corr_y*pfmet_corr_y);
-      //met_phi = analysisTree.pfmet_phi;
-      met_phi = TMath::ATan2(pfmet_corr_y,pfmet_corr_x);
+      met_ex = analysisTree.pfmetcorr_ex;
+      met_ey = analysisTree.pfmetcorr_ey;
+      met_ez = analysisTree.pfmetcorr_ez;
+      met_pt = TMath::Sqrt(met_ex*met_ex + met_ey*met_ey);
+      met_phi = TMath::ATan2(met_y,met_x);
 
      met_ex_JetEnUp = analysisTree.pfmetcorr_ex_JetEnUp;
      met_ey_JetEnUp = analysisTree.pfmetcorr_ey_JetEnUp;
@@ -1838,20 +1837,18 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       genmet = TMath::Sqrt(genmet_ex*genmet_ex + genmet_ey*genmet_ey);
       genmetphi = TMath::ATan2(genmet_ey,genmet_ex);
 
-
       if (!isData) npartons = analysisTree.genparticles_noutgoing;
 
       all_weight = weight;
 
       T->Fill();
 
-
+      selEvents++;
       continue;
       /////////////////////////////////////////////////
 
 
 
-      selEvents++;
     } // end of file processing (loop over events in one file)
 
 

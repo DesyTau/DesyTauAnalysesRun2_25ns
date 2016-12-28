@@ -59,7 +59,6 @@ void analyzer::Loop(){
 	CutList.push_back("Tau-id");
 	CutList.push_back("TauFakeRate");
 	CutList.push_back("MuTauFakeRate");
-//	CutList.push_back("Iso lt 0.5");
 	CutList.push_back("topPtRwgt");
 	CutList.push_back("TTJets norm");
 	CutList.push_back("WJets norm");

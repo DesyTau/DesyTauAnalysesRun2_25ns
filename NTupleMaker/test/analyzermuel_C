@@ -144,7 +144,7 @@ void analyzer::Loop(){
 
 	string channel = "CHANNELHERE";
 
-	TString inputRootFile = "/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/CMSSW_8_0_12/src/DesyTauAnalyses/NTupleMaker/data/HIP_mediumID.root";
+	TString inputRootFile = "/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/CMSSW_8_0_20/src/DesyTauAnalyses/NTupleMaker/data/HIP_mediumID.root";
 	TFile * fileInHIP = new TFile(inputRootFile, "read");
 
 TGraphAsymmErrors * TGr_hip;
@@ -152,7 +152,7 @@ TGr_hip = new TGraphAsymmErrors();
 TGr_hip = (TGraphAsymmErrors*)fileInHIP->Get("ratio_eta");
 
 
-	TString inputRootFile2 = "/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/CMSSW_8_0_12/src/DesyTauAnalyses/NTupleMaker/data/sf_mu_medium.root";
+	TString inputRootFile2 = "/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/CMSSW_8_0_20/src/DesyTauAnalyses/NTupleMaker/data/sf_mu_medium.root";
 
 	TFile * fileInFast = new TFile(inputRootFile2, "read");
 
@@ -165,7 +165,7 @@ TH2D *histo = (TH2D*) obj;
 
 
 
-	TFile * filein = new TFile("/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/CMSSW_8_0_12/src/DesyTauAnalyses/NTupleMaker/test/CHANNELHERE/FILEIN","read");
+	TFile * filein = new TFile("/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/CMSSW_8_0_20/src/DesyTauAnalyses/NTupleMaker/test/CHANNELHERE/FILEIN","read");
 
 
 	TH1D * histW = (TH1D*)filein->Get("muel/histWeightsH");
@@ -386,7 +386,7 @@ bool El0p1Mu0p15 = true;
 
 
 
-		if (isWJ || isDY || isNJ) {
+		if (isWJ || isDY || isDYNJ || isWNJ) {
 		
 		METV.SetPx(0.);
 		METV.SetPy(0.);
@@ -498,7 +498,7 @@ bool El0p1Mu0p15 = true;
 	
 
 }
-	float Lumi = 12889.;
+	float Lumi = 35501.;
 	if (isData) Lumi = 1;
 		 for(int ci = 0; ci < CutNumb; ci++)
                         {
