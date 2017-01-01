@@ -87,6 +87,8 @@ class analyzer {
 		Float_t         gen_weight;
 		Float_t         pu_weight;
 		Float_t         LSF_weight;
+		Float_t         LSF_weight_el;
+		Float_t         LSF_weight_mu;
 		Float_t         LSF_weight_2;
 		Float_t         LSF_weight_1;
 		Float_t         TFR_weight;
@@ -189,6 +191,8 @@ class analyzer {
 		string          *regionName;
 		Float_t 	genTauMatched;
 		Float_t 	genLeptonMatched;
+		Float_t 	genLeptonMatchedEl;
+		Float_t 	genLeptonMatchedMu;
    		Float_t	   qcdweight;
 		Float_t	   qcdweightup;
    		Float_t	   qcdweightdown;
@@ -224,6 +228,8 @@ class analyzer {
 		TBranch        *b_gen_weight;   //!
 		TBranch        *b_pu_weight;   //!
 		TBranch        *b_LSF_weight;   //!
+		TBranch        *b_LSF_weight_mu;   //!
+		TBranch        *b_LSF_weight_el;   //!
 		TBranch        *b_LSF_weight_1;   //!
 		TBranch        *b_LSF_weight_2;   //!
 		TBranch        *b_TFR_weight;   //!
@@ -324,6 +330,8 @@ class analyzer {
 		TBranch        *b_event_leptonDrTrigger;   //!
 		TBranch        *b_genTauMatched;   //!
 		TBranch        *b_genLeptonMatched;   //!
+		TBranch        *b_genLeptonMatchedEl;   //!
+		TBranch        *b_genLeptonMatchedMu;   //!
 		TBranch        *b_qcdweight;   //!
 		TBranch        *b_qcdweightup;   //!
 		TBranch        *b_qcdweightdown;   //!
@@ -1530,6 +1538,8 @@ class analyzer {
 			fChain->SetBranchAddress("gen_weight", &gen_weight, &b_gen_weight);
 			fChain->SetBranchAddress("pu_weight", &pu_weight, &b_pu_weight);
 			fChain->SetBranchAddress("LSF_weight", &LSF_weight, &b_LSF_weight);
+			fChain->SetBranchAddress("LSF_weight_mu", &LSF_weight_mu, &b_LSF_weight_mu);
+			fChain->SetBranchAddress("LSF_weight_el", &LSF_weight_el, &b_LSF_weight_el);
 			fChain->SetBranchAddress("LSF_weight_1", &LSF_weight_1, &b_LSF_weight_1);
 			fChain->SetBranchAddress("LSF_weight_2", &LSF_weight_2, &b_LSF_weight_2);
 			fChain->SetBranchAddress("TFR_weight", &TFR_weight, &b_TFR_weight);
@@ -1631,6 +1641,8 @@ class analyzer {
 			fChain->SetBranchAddress("event_leptonDrTrigger", &event_leptonDrTrigger, &b_event_leptonDrTrigger);
 			fChain->SetBranchAddress("genTauMatched", &genTauMatched, &b_genTauMatched);
 			fChain->SetBranchAddress("genLeptonMatched", &genLeptonMatched, &b_genLeptonMatched);
+			fChain->SetBranchAddress("genLeptonMatchedEl", &genLeptonMatchedEl, &b_genLeptonMatchedEl);
+			fChain->SetBranchAddress("genLeptonMatchedMu", &genLeptonMatchedMu, &b_genLeptonMatchedMu);
 
 			
    			fChain->SetBranchAddress("qcdweight", &qcdweight, &b_qcdweight);
