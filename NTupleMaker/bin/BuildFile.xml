@@ -100,23 +100,6 @@
  <use name="HTT-utilities/RecoilCorrections"/>
 </bin>
 
-<bin name="SingleMu" file="SingleMu.cpp">
- <use name="PhysicsTools/Utilities"/>
- <use name="rootgraphics"/>
- <use name="root"/>
- <use name="rootmath"/>
- <use name="roottmva"/>
- <use name="boost" />
- <use name="boost_program_options"/>
- <use name="DesyTauAnalyses/NTupleMaker"/>
- <use name="HTT-utilities/LepEffInterface"/>
- <use name="HTT-utilities/RecoilCorrections"/>
- <use name="HTT-utilities/TrackEff"/>
- <use name="TauAnalysis/SVfitStandalone"/>
- <use name="CondFormats/BTauObjects"/>
- <use name="CondTools/BTau"/>
-</bin>
-
 <bin name="SynchNTupleProducer_mt" file="SynchNTupleProducer_mt.cpp">
  <use name="PhysicsTools/Utilities"/>
  <use name="rootgraphics"/>

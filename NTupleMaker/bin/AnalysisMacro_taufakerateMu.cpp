@@ -87,134 +87,36 @@ float SF = 1;
 if ( working_point == "MVA"){
 
 
-if ( sel =="mutau"){
-
-if (  fabs(eta) < 0.9 )
-        {
-                if (pt>20 && pt<30) SF = 1.07968;
-                if (pt>30 && pt<40) SF = 0.847355;
-                if (pt>40 ) SF = 0.833833;
-        }
-if (  fabs(eta) > 0.9 && fabs(eta) < 1.2 )
-        {
-
-                if (pt>20 && pt<30) SF = 1.03273;
-                if (pt>30 && pt<40) SF = 0.943387;
-                if (pt>40 ) SF = 1.07113;
-        }
-
-if (  fabs(eta) > 1.2 && fabs(eta) < 2.1 )
-        {
-
-                if (pt>20 && pt<30) SF = 1.08635;
-                if (pt>30 && pt<40) SF = 1.13754;
-                if (pt>40) SF = 1.0387;
-        }
-if (  fabs(eta) > 2.1 && fabs(eta) < 2.4 )
-        {
-
-                if (pt>20 && pt<30) SF = 0.977868;
-                if (pt>30 && pt<40) SF = 0.974665;
-                if (pt>40) SF = 0.902185;
-        }
-
-}//mutau MVA
-
-if ( sel =="eltau"){
-
 if (  fabs(eta) < 0.8 )
         {
-                if (pt>20 && pt<30) SF = 1.05966;
-                if (pt>30 && pt<40) SF = 0.91867;
-                if (pt>40 ) SF = 0.800276;
+                if (pt>20 && pt<30) SF = 0.931787;
+                if (pt>30 && pt<40) SF = 0.888445;
+                if (pt>40 ) SF = 0.874478;
         }
 if (  fabs(eta) > 0.8 && fabs(eta) < 1.44 )
         {
 
-                if (pt>20 && pt<30) SF = 1.02955;
-                if (pt>30 && pt<40) SF = 1.00145;
-                if (pt>40 ) SF = 0.874349;
+                if (pt>20 && pt<30) SF = 1.05807;
+                if (pt>30 && pt<40) SF = 1.05726;
+                if (pt>40 ) SF = 1.07394;
         }
 
 if (  fabs(eta) > 1.44 && fabs(eta) < 1.566 )
-	{
+        {
 
+                if (pt>20 && pt<40) SF = 1.15015;
+                if (pt>40 ) SF =  1.48409;
+        }
+if (  fabs(eta) > 1.566 && fabs(eta) < 2.3 )
+        {
 
-		if (pt>20 && pt<30) SF = 1.20397;
-		if (pt>30 && pt<40) SF = 0.514959;
-		if (pt>40) SF = 0.690121;
-	}
-if (  fabs(eta) > 1.566 && fabs(eta) < 2.1 )
-	{
+                if (pt>20 && pt<30) SF = 1.07711;
+                if (pt>30 && pt<40) SF = 1.1334;
+                if (pt>40) SF = 1.01408;
+        }
 
-
-		if (pt>20 && pt<30) SF = 0.960575;
-		if (pt>30 && pt<40) SF = 1.09704;
-		if (pt>40) SF = 0.839154;
-	}
-}//eltau MVA
-
+	
 }
-
-
-
-
-
-
-// Charged
-if ( (sel =="mutau" || sel == "eltau") && working_point == "ChargedIso" ){
-
-if (  fabs(eta) < 0.9 ) 
-	{
-		if (pt>20 && pt<30) SF = 1.26544;
-		if (pt>30 && pt<50) SF = 1.25239;
-		if (pt>50 ) SF = 1.38857;
-	}
-if (  fabs(eta) > 0.9 && fabs(eta) < 1.2 ) 
-	{
-
-		if (pt>20 && pt<30) SF = 1.21749;
-		if (pt>30 && pt<50) SF = 1.10979;
-		if (pt>50 ) SF = 1.60393;
-	}
-
-if (  fabs(eta) > 1.2 && fabs(eta) < 2.4 ) 
-	{
-
-		if (pt>20 && pt<30) SF = 1.27961;
-		if (pt>30 && pt<50) SF = 1.14411;
-		if (pt>50) SF = 1.2188;
-	}
-}
-
-
-//CutBased
-if ((sel =="mutau" || sel == "eltau")  && working_point == "CutBased" ){
-
-if (  fabs(eta) < 0.9 ) 
-	{
-		if (pt>20 && pt<30) SF = 0.898437;
-		if (pt>30 && pt<50) SF = 0.946704;
-		if (pt>50 ) SF = 0.96842;
-	}
-if (  fabs(eta) > 0.9 && fabs(eta) < 1.2 ) 
-	{
-
-		if (pt>20 && pt<30) SF = 1.27757;
-		if (pt>30 && pt<50) SF = 1.26811;
-		if (pt>50 ) SF = 0.75345;
-	}
-
-if (  fabs(eta) > 1.2 && fabs(eta) < 2.4 ) 
-	{
-
-		if (pt>20 && pt<30) SF = 1.0773;
-		if (pt>30 && pt<50) SF = 1.00049;
-		if (pt>50) SF = 0.820108;
-	}
-}
-
-
 return SF;
 
 }
@@ -234,10 +136,7 @@ int main(int argc, char * argv[]) {
 
   // kinematic cuts on electrons
   const bool isData = cfg.get<bool>("IsData");
-  const bool applyPUreweighting = cfg.get<bool>("ApplyPUreweighting");
   
-  
-  const bool applyLeptonSF = cfg.get<bool>("ApplyLeptonSF");
 
 ////////////muons
 
@@ -293,9 +192,14 @@ int main(int argc, char * argv[]) {
   const string dataBaseDir = cfg.get<string>("DataBaseDir");
 
 
+//  const string MuonidIsoEffFileBCDEFGH = cfg.get<string>("MuonidIsoEffFileBCDEFGH");
+//  const string MuontrigEffFileBCDEFGH = cfg.get<string>("MuontrigEffFileBCDEFGH");
 
-  const string MuonidIsoEffFile = cfg.get<string>("MuonidIsoEffFile");
-  const string MuontrigEffFile = cfg.get<string>("MuontrigEffFile");
+  const string MuonidIsoEffFileBCDEF = cfg.get<string>("MuonidIsoEffFileBCDEF");
+  const string MuontrigEffFileBCDEF = cfg.get<string>("MuontrigEffFileBCDEF");
+  
+  const string MuonidIsoEffFileGH = cfg.get<string>("MuonidIsoEffFileGH");
+  const string MuontrigEffFileGH = cfg.get<string>("MuontrigEffFileGH");
 
 
   const string Region  = cfg.get<string>("Region");
@@ -412,7 +316,7 @@ int main(int argc, char * argv[]) {
   //TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/pileUp_data_Cert_271036-276811_13TeV_PromptReco_Collisions16_xsec69p2mb.root","read");
   
 
-  TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/pileUp_data_RunBCDE_ReReco.root","read");
+  TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/pileUp_data_RunBCDEFGH_ReReco.root","read");
   TFile * filePUdistribution_MC = new TFile (TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/MC_Spring16_PU25ns_V1.root", "read");
   TH1D * PU_data = (TH1D *)filePUdistribution_data->Get("pileup");
   TH1D * PU_mc = (TH1D *)filePUdistribution_MC->Get("pileup");
@@ -469,15 +373,21 @@ int main(int argc, char * argv[]) {
 
 
   cout<<"  Initializing iD SF files....."<<endl;
-  ScaleFactor * SF_muonIdIso; 
-  if (applyLeptonSF) {
-    SF_muonIdIso = new ScaleFactor();
-    SF_muonIdIso->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(MuonidIsoEffFile));
-  }
+//  ScaleFactor * SF_muonIdIsoBCDEFGH = new ScaleFactor(); 
+  ScaleFactor * SF_muonIdIsoBCDEF = new ScaleFactor();
+  ScaleFactor * SF_muonIdIsoGH = new ScaleFactor();
+//  SF_muonIdIsoBCDEFGH->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(MuonidIsoEffFileBCDEFGH));
+  SF_muonIdIsoBCDEF->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(MuonidIsoEffFileBCDEF));
+  SF_muonIdIsoGH->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(MuonidIsoEffFileGH));
+
 
   cout<<"  Initializing Trigger SF files....."<<endl;
-  ScaleFactor * SF_muonTrigger = new ScaleFactor();
-  SF_muonTrigger->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(MuontrigEffFile));
+//  ScaleFactor * SF_muonTriggerBCDEFGH = new ScaleFactor();
+  ScaleFactor * SF_muonTriggerBCDEF = new ScaleFactor();
+  ScaleFactor * SF_muonTriggerGH = new ScaleFactor();
+//  SF_muonTriggerBCDEFGH->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(MuontrigEffFileBCDEFGH));
+  SF_muonTriggerBCDEF->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(MuontrigEffFileBCDEF));
+  SF_muonTriggerGH->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(MuontrigEffFileGH));
 
 
   int nTotalFiles = 0;
@@ -520,11 +430,35 @@ int main(int argc, char * argv[]) {
   TH1D * hDPhi = new TH1D("hDPhi","",70,0,3.5);
   TH1D * hMET = new TH1D("hMET","",10,0,200);
   TH1D * hnJets = new TH1D("hnJets","",15,-0.5,14.5);
+  TH1D * hnMatchedJets = new TH1D("hnMatchedJets","",15,-0.5,14.5);
+  TH1D * hnMatchedJetsT = new TH1D("hnMatchedJetsT","",15,-0.5,14.5);
   TH1D * hnbJets = new TH1D("hnbJets","",15,-0.5,14.5);
   TH1D * hIsoMu = new TH1D("hIsoMu","",100,0,0.5);
   TH1D * hIsoMuSel = new TH1D("hIsoMuSel","",100,0,0.5);
 
   TH1D * hxsec = new TH1D("xsec","",1,0,10e+20);
+
+  TH1D * hnJets1L = new TH1D("hnJets1L","",15,-0.5,14.5);
+  TH1D * hnbJets1L = new TH1D("hnbJets1L","",15,-0.5,14.5);
+  TH1D * hnJets2L = new TH1D("hnJets2L","",15,-0.5,14.5);
+  TH1D * hnbJets2L = new TH1D("hnbJets2L","",15,-0.5,14.5);
+  TH1D * hnJets3L = new TH1D("hnJets3L","",15,-0.5,14.5);
+  TH1D * hnbJets3L = new TH1D("hnbJets3L","",15,-0.5,14.5);
+  TH1D * hnJets4L = new TH1D("hnJets4L","",15,-0.5,14.5);
+  TH1D * hnbJets4L = new TH1D("hnbJets4L","",15,-0.5,14.5);
+  TH1D * hnJets1T = new TH1D("hnJets1T","",15,-0.5,14.5);
+  TH1D * hnbJets1T = new TH1D("hnbJets1T","",15,-0.5,14.5);
+  TH1D * hnJets2T = new TH1D("hnJets2T","",15,-0.5,14.5);
+  TH1D * hnbJets2T = new TH1D("hnbJets2T","",15,-0.5,14.5);
+  TH1D * hnJets3T = new TH1D("hnJets3T","",15,-0.5,14.5);
+  TH1D * hnbJets3T = new TH1D("hnbJets3T","",15,-0.5,14.5);
+  TH1D * hnJets4T = new TH1D("hnJets4T","",15,-0.5,14.5);
+  TH1D * hnbJets4T = new TH1D("hnbJets4T","",15,-0.5,14.5);
+  TH1D * hnJetsTFRL = new TH1D("hnJetsTFRL","",15,-0.5,14.5);
+  TH1D * hnbJetsTFRL = new TH1D("hnbJetsTFRL","",15,-0.5,14.5);
+  TH1D * hnJetsTFRT = new TH1D("hnJetsTFRT","",15,-0.5,14.5);
+  TH1D * hnbJetsTFRT = new TH1D("hnbJetsTFRT","",15,-0.5,14.5);
+
   TH1D * hMTCut1L = new TH1D("hMTCut1L","",20,0,200);
   TH1D * hMTCut2L = new TH1D("hMTCut2L","",20,0,200);
   TH1D * hMTCut3L = new TH1D("hMTCut3L","",20,0,200);
@@ -787,7 +721,6 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       Float_t puweight = 1.;
       Float_t topptweight = 1.;
       analysisTree.GetEntry(iEntry);
-      nEvents++;
 
       iCutT = 0;
       iCutL = 0;
@@ -798,7 +731,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       if (isWJ && (nparton>0 && nparton<5)) continue;
       if ( isDYhigh  && (nparton>0 && nparton<5)) continue;
 
-      if (nEvents%50000==0) 
+      if (iEntry%50000==0) 
 	cout << "      processed " << nEvents << " events" << endl; 
 
       if (fabs(analysisTree.primvertex_z)>zVertexCut) continue;
@@ -819,7 +752,6 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       pu_weight = 1.;
       gen_weight = 1.;
       trig_weight = 1.;
-
 
       bool isW = false;
       bool isDY = false;
@@ -1069,11 +1001,11 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	lumi=true;
 
 
-	if (applyPUreweighting)	 {
+//	if (applyPUreweighting)	 {
 	  puweight = float(PUofficial->get_PUweight(double(analysisTree.numtruepileupinteractions)));
 	  weight *=puweight; 
 	  //pu_weight = puweight;
-	}
+//	}
 
       }
 
@@ -1117,7 +1049,6 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       if (isData)  {
 	XSec = 1.;
 	histRuns->Fill(analysisTree.event_run);
-	///////////////according to dimuons
 	int n=analysisTree.event_run;
 	int lum = analysisTree.event_luminosityblock;
 
@@ -1166,12 +1097,41 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	}
       }
 
+
       if (isNewRun) 
 	allRuns.push_back(analysisTree.event_run);
 
-
-      //lumi=true;
       if (!lumi) continue;
+
+
+	bool Run2016A, Run2016B, Run2016C, Run2016D, Run2016E, Run2016F, Run2016G,Run2016H;
+	bool RunBCDEF = false;
+	bool RunGH = false;
+	Run2016A=false;
+	Run2016B=false;
+	Run2016C=false;
+	Run2016D=false;
+	Run2016E=false;
+	Run2016F=false;
+	Run2016G=false;
+	Run2016H=false;
+
+
+	int RunNo = analysisTree.event_run;
+	if (isData){
+	if (RunNo >  271036-1 &&  RunNo < 271658+1 ) Run2016A = true;
+	if (RunNo >  272007-1 &&  RunNo < 275376+1 ) Run2016B = true;
+	if (RunNo >  275657-1 &&  RunNo < 276283+1 ) Run2016C = true;
+	if (RunNo >  276315-1 &&  RunNo < 276811+1 ) Run2016D = true;
+	if (RunNo >  276831-1 &&  RunNo < 277420+1 ) Run2016E = true;
+	if (RunNo >  277772-1 &&  RunNo < 278808+1 ) Run2016F = true;
+	if (RunNo >  278820-1 &&  RunNo < 280385+1 ) Run2016G = true;
+	if (RunNo >  280919-1 &&  RunNo < 284044+1 ) Run2016H = true;
+	//cout<<Run2016A<<"  "<<Run2016B<<"  "<<Run2016E<<endl;
+
+	if (Run2016B || Run2016C || Run2016D || Run2016E || Run2016F) RunBCDEF = true;
+	if (Run2016G || Run2016H) RunGH = true;
+	}
 
 
 	std::vector<TString> metFlags; metFlags.clear();
@@ -1245,17 +1205,18 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       TightCFCounter[iCutT]+= weight;
       iCutL++;
       iCutT++;
-      /////now clear the Mu.El.Jets again to fill them again after cleaning
 
       vector<int> muons; muons.clear();
       for (unsigned int im = 0; im<analysisTree.muon_count; ++im) {
-	//if (analysisTree.muon_pt[im]<ptMuonCut) continue;
 	if (analysisTree.muon_pt[im]<SingleMuonTriggerPtCutIsoMu24) continue;
 	if (fabs(analysisTree.muon_eta[im])>etaMuonCut) continue;
 	if (fabs(analysisTree.muon_dxy[im])>dxyMuonCut) continue;
 	if (fabs(analysisTree.muon_dz[im])>dzMuonCut) continue;
-	if (applyMuonId && !analysisTree.muon_isMedium[im]) continue;
-	//if (applyMuonId && !analysisTree.muon_isICHEP[im]) continue;
+	if (!isData && applyMuonId && iEntry%2!=0 && !analysisTree.muon_isMedium[im]) continue;
+	if (!isData && applyMuonId && iEntry%2==0 && !analysisTree.muon_isICHEP[im]) continue;
+	if (isData && applyMuonId && RunBCDEF && !RunGH && !analysisTree.muon_isICHEP[im]) continue;
+	if (isData && applyMuonId && !RunBCDEF && RunGH && !analysisTree.muon_isMedium[im]) continue;
+
         if ( fabs(analysisTree.muon_charge[im]) != 1) continue;
 	muons.push_back((int)im);
 
@@ -1276,8 +1237,9 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	if (analysisTree.tau_decayModeFinding[it]<decayModeFinding) continue;
 	if ( fabs(analysisTree.tau_leadchargedhadrcand_dz[it])> leadchargedhadrcand_dz) continue;
         if ( fabs(analysisTree.tau_charge[it]) != 1 ) continue;
-        if ( analysisTree.tau_againstElectronVLooseMVA6[it]<0.5) continue;
-        if ( analysisTree.tau_againstMuonTight3[it]<0.5) continue;
+      	if ( analysisTree.tau_againstElectronVLooseMVA6[it]<0.5) continue; 
+      	if ( analysisTree.tau_againstMuonTight3[it]<0.5) continue;
+
 	  taus.push_back((int)it);
 
 	}
@@ -1341,7 +1303,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	}
 
 
-        if (!isData) isLegMatch = true; 
+        if (!isData && analysisTree.muon_pt[mIndex]>SingleMuonTriggerPtCutIsoMu24) isLegMatch = true;
 
 	if (!isLegMatch) continue;
 
@@ -1439,17 +1401,17 @@ if (!CutBasedTauId){
 
       }
  }
-      /*bool TauId = false;
+ /*     bool TauId = false;
 
       if ( analysisTree.tau_againstElectronVLooseMVA6[tau_index]>0.5 && analysisTree.tau_againstMuonTight3[tau_index]>0.5) TauId = true;
 
       if (!TauId) continue;
-	  //cout<<"made it to pass the TauId "<<endl;
 */
+	  //cout<<"made it to pass the TauId "<<endl;
+
       if ((int)tau_index<0) continue;
       if ((int)mu_index<0) continue;
 
-      //      std::cout << "Ok4 " << std::endl;
       bool isLoose = false;
       unsigned int tau_loose=-1;
       unsigned int tau_tight=-1;
@@ -1550,8 +1512,13 @@ if (!CutBasedTauId){
 	if (fabs(analysisTree.muon_eta[im])>etaVetoMuonCut) continue;
 	if (fabs(analysisTree.muon_dxy[im])>dxyVetoMuonCut) continue;
 	if (fabs(analysisTree.muon_dz[im])>dzVetoMuonCut) continue;
-	if (applyVetoMuonId && !analysisTree.muon_isMedium[im]) continue;
-	//if (applyVetoMuonId && !analysisTree.muon_isICHEP[im]) continue;
+	//if (!isData && applyMuonId && !analysisTree.muon_isMedium[im]) continue;
+
+	if (!isData && applyMuonId && iEntry%2!=0 && !analysisTree.muon_isMedium[im]) continue;
+	if (!isData && applyMuonId && iEntry%2==0 && !analysisTree.muon_isICHEP[im]) continue;
+	if (isData && applyMuonId && RunBCDEF && !RunGH && !analysisTree.muon_isICHEP[im]) continue;
+	if (isData && applyMuonId && !RunBCDEF && RunGH && !analysisTree.muon_isMedium[im]) continue;
+
 	if (relIsoMu>isoVetoMuonCut) continue;
 	foundExtraMuon = true;
       }
@@ -1567,23 +1534,26 @@ if (!CutBasedTauId){
       double etaMu1 = (double)analysisTree.muon_eta[mu_index];
       float trigweight = 1.;
 
-      float EffFromData = 0.;
+      float EffFromDataA = 1.;
+      float EffFromDataB = 1.;
+      float Lumi,LumiA,LumiB;
+      Lumi = 36590.;
+      LumiA = 16357.;
+      LumiB = 20233.;
       
-      if (isLegMatch) EffFromData = (float)SF_muonTrigger->get_EfficiencyData(double(ptMu1),double(etaMu1));
+      if (isLegMatch && !isData) {
+	//if (iEntry%1==0)	      EffFromData = (float)SF_muonTriggerBCDEF->get_EfficiencyData(double(ptMu1),double(etaMu1));
+	//if (iEntry%2==0)	      EffFromData = (float)SF_muonTriggerGH->get_EfficiencyData(double(ptMu1),double(etaMu1));
+	EffFromDataA = (float)SF_muonTriggerBCDEF->get_EfficiencyData(double(ptMu1),double(etaMu1));
+	EffFromDataB = (float)SF_muonTriggerGH->get_EfficiencyData(double(ptMu1),double(etaMu1));
       
-      /*float Mu22EffMC   = (float)SF_muonTrigger->get_EfficiencyMC(double(ptMu1),double(etaMu1));*/
-	
-	//if (!isData && (   string::npos != filen.find("stau") || string::npos != filen.find("C1")) ) Signal=true;
-     /* if (!isData) {
-	if (Mu22EffMC>1e-6)
-	  trigweight = EffFromData / Mu22EffMC;
-	if (!isData && (   string::npos != filen.find("stau") || string::npos != filen.find("C1")) ) trigweight = EffFromData;
-	weight *= trigweight;
-	trig_weight = trigweight;
-	//	cout<<" Trigger weight "<<trigweight<<endl;
-      }*/
-	if (!isData) trigweight = EffFromData;
-	weight *= trigweight;
+
+//	if (!isData) trigweight = EffFromData;
+
+      trigweight = EffFromDataA * LumiA/Lumi + EffFromDataB * LumiB/Lumi;
+
+      weight *= trigweight;
+      }
 
     LooseCFCounter[iCutL]+= weight;
       TightCFCounter[iCutT]+= weight;
@@ -1591,14 +1561,23 @@ if (!CutBasedTauId){
       iCutT++;
 
 	///LSF 
-      if (!isData && applyLeptonSF) {
+      if (!isData) {
+/*
 
-	//leptonSFweight = SF_yourScaleFactor->get_ScaleFactor(pt, eta)	
-	double ptMu1 = (double)analysisTree.muon_pt[mu_index];
-	double etaMu1 = (double)analysisTree.muon_eta[mu_index];
-//	cout<<" this is what goes for muonID  "<<ptMu1<<"  "<<etaMu1<<endl;
-	double IdIsoSF_mu1 = SF_muonIdIso->get_ScaleFactor(ptMu1, etaMu1);
+	if (iEntry%1==0)	IdIsoSF_mu1=  SF_muonIdIsoBCDEF->get_ScaleFactor(ptMu1, etaMu1);
+	if (iEntry%2==0) 	IdIsoSF_mu1 = SF_muonIdIsoGH->get_ScaleFactor(ptMu1, etaMu1);
+
 	weight *= IdIsoSF_mu1;
+*/
+	double IdIsoSF_mu1 = 1;
+	double IdIsoSF_mu2 = 1;
+		
+	IdIsoSF_mu1=  SF_muonIdIsoBCDEF->get_ScaleFactor(ptMu1, etaMu1);
+	IdIsoSF_mu2 = SF_muonIdIsoGH->get_ScaleFactor(ptMu1, etaMu1);
+
+	LSF_weight = IdIsoSF_mu1 * LumiA/Lumi + IdIsoSF_mu2 * LumiB/Lumi;
+	weight *= LSF_weight;
+
       }
 
     LooseCFCounter[iCutL]+= weight;
@@ -1621,9 +1600,6 @@ if (!CutBasedTauId){
        //isoTau = analysisTree.tau_chargedIsoPtSum[tau_index];
 
 
-
-
-
 	 }
 
 	if (CutBasedTauId){
@@ -1639,6 +1615,7 @@ if (isTight)
       JetsMV.clear();
       int countjets=0;
       int countbjets=0;
+      int matchedJets=0;
       float DRmax = 0.5;
 
 
@@ -1671,7 +1648,7 @@ if (isTight)
 	double Drr=deltaR(analysisTree.tau_eta[tau_index],analysisTree.tau_phi[tau_index],
 						  analysisTree.pfjet_eta[jet],analysisTree.pfjet_phi[jet]);
 
-	if ( Drr > 0.2) cleanedJet=false;
+	if ( Drr < 0.2) matchedJets++;
 
 	if (!cleanedJet) continue;
 
@@ -1688,12 +1665,15 @@ if (isTight)
       }
 
       if (countjets==0) continue;
+  //    if (countbjets ==0) continue;
 
       LooseCFCounter[iCutL]+= weight;
       TightCFCounter[iCutT]+= weight;
       iCutL++;
       iCutT++;
       hnJets->Fill(countjets,weight);
+      hnMatchedJets->Fill(matchedJets,weight);
+  if( isTight)    hnMatchedJetsT->Fill(matchedJets,weight);
       hnbJets->Fill(countbjets,weight);
       hIsoMuSel->Fill(isoMuMin,weight);
 
@@ -1708,7 +1688,7 @@ if (isTight)
 	
 
 /////////////////// Recoil corrections
-
+	njets = countjets;
       int njetsforrecoil = njets;
       if (isW) njetsforrecoil = njets + 1;
 
@@ -1776,8 +1756,6 @@ if (isTight)
 				    met_resoDown_y*met_resoDown_y);
       metphi_resoDown = TMath::ATan2(met_resoDown_y,met_resoDown_x);
  
- 
- 
 	
 
       met_ex_recoil = pfmet_corr_x;
@@ -1788,13 +1766,9 @@ if (isTight)
       met_ex = pfmet_corr_x;
       met_ey = pfmet_corr_y;
       met_ez = 0;//analysisTree.pfmet_ez;
-      //met_pt = analysisTree.pfmet_pt;
-      met_pt = TMath::Sqrt(pfmet_corr_x*pfmet_corr_x+pfmet_corr_y*pfmet_corr_y);
-      //met_phi = analysisTree.pfmet_phi;
       met_phi = TMath::ATan2(pfmet_corr_y,pfmet_corr_x);
-
-
-
+      met_pt = TMath::Sqrt(met_ex*met_ex + met_ey*met_ey);
+      met_phi = TMath::ATan2(met_y,met_x);
 
 
 
@@ -1805,11 +1779,7 @@ if (isTight)
       double met = sqrt ( met_ex*met_ex + met_ey*met_ey);
       // w = mu+MET
       // ptW - ptJ/ptW+ptJ      
-      double SumPtMuMET = sqrt ( ( met_ex +analysisTree.electron_px[el_index])*(met_ex+analysisTree.electron_px[el_index]) + 
-				 (met_ey+analysisTree.electron_py[el_index])*(met_ey+analysisTree.electron_py[el_index]));
-
-      RatioSums = (SumPtMuMET - JetsMV.at(0).Pt() )/ (SumPtMuMET +JetsMV.at(0).Pt() );
-
+      
 
       TLorentzVector MetV; 
       MetV.SetPx(met_ex); 
@@ -1820,6 +1790,12 @@ if (isTight)
       TLorentzVector tauV;  tauV.SetPtEtaPhiM(analysisTree.tau_pt[tau_loose], analysisTree.tau_eta[tau_loose], analysisTree.tau_phi[tau_loose], tauMass);
 
       TLorentzVector Wb = muV  + MetV;
+
+      double SumPtMuMET = sqrt ( ( met_ex +analysisTree.muon_px[mu_index])*(met_ex+analysisTree.muon_px[mu_index]) + 
+				 (met_ey+analysisTree.muon_py[mu_index])*(met_ey+analysisTree.muon_py[mu_index]));
+
+      RatioSums = (Wb.Pt() - JetsMV.at(0).Pt() )/ (Wb.Pt() +JetsMV.at(0).Pt() );
+
 
       dPhi = dPhiFrom2P( muV.Px(), muV.Py(), MetV.Px(),  MetV.Py() );
       MT = TMath::Sqrt(2*muV.Pt()*MetV.Pt()*(1-TMath::Cos(dPhi)));
@@ -1876,7 +1852,8 @@ if (isTight)
 	
 	double tauId = TauiD("mutau","MVA_Tight");
 		
-	if (isTauMatched && !isGenLeptonMatched) weight *= tauId;
+//	if (!isData && isTauMatched) continue;
+//	if (isTauMatched && !isGenLeptonMatched) weight *= 0.9;
 
       //cout<<"  "<<endl;
       if (isTight) nominator++;
@@ -1905,13 +1882,15 @@ if (isTight)
       {
       LooseCFCounter[iCutL]+= weight;
       iCutL++;
-	      if (met>40){
+	      if (met>20){
 
 	    FakeRatePtIncLoose[etaBin][0]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
 	    hRatioSum1L->Fill(RatioSums,weight);
 	    hMTCut1L->Fill(MT,weight);
 	    hDPhiCut1L->Fill(dPhiW, weight);
 	    hMETCut1L->Fill(met, weight);
+      	    hnJets1L->Fill(countjets,weight);
+	    hnbJets1L->Fill(countbjets,weight);
       LooseCFCounter[iCutL]+= weight;
       iCutL++;
 
@@ -1921,6 +1900,8 @@ if (isTight)
 	    hMTCut2L->Fill(MT,weight);
 	    hDPhiCut2L->Fill(dPhiW, weight);
 	    hMETCut2L->Fill(met, weight);
+      	    hnJets2L->Fill(countjets,weight);
+	    hnbJets2L->Fill(countbjets,weight);
 
       LooseCFCounter[iCutL]+= weight;
       iCutL++;
@@ -1931,15 +1912,20 @@ if (isTight)
 	    hMTCut3L->Fill(MT,weight);
 	    hDPhiCut3L->Fill(dPhiW, weight);
 	    hMETCut3L->Fill(met, weight);
+      	    hnJets3L->Fill(countjets,weight);
+	    hnbJets3L->Fill(countbjets,weight);
       LooseCFCounter[iCutL]+= weight;
       iCutL++;
 
-	if (RatioSums < 0.3 ) {
+	//if (RatioSums < 0.3 ) {
+	if (countjets<3 ) {
 	    FakeRatePtIncLoose[etaBin][3]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
 	    hRatioSum4L->Fill(RatioSums,weight);
 	    hMTCut4L->Fill(MT,weight);
 	    hDPhiCut4L->Fill(dPhiW, weight);
 	    hMETCut4L->Fill(met, weight);
+      	    hnJets4L->Fill(countjets,weight);
+	    hnbJets4L->Fill(countbjets,weight);
 
       LooseCFCounter[iCutL]+= weight;
       iCutL++;
@@ -1949,6 +1935,8 @@ if (isTight)
 	    hMTCutTFRL->Fill(MT,tfr*weight);
 	    hDPhiCutTFRL->Fill(dPhiW, tfr*weight);
 	    hMETCutTFRL->Fill(met, tfr*weight);
+      	    hnJetsTFRL->Fill(countjets,weight);
+	    hnbJetsTFRL->Fill(countbjets,weight);
 
 	      }//met<80
 
@@ -1965,12 +1953,14 @@ if (isTight)
       TightCFCounter[iCutT]+= weight;
       iCutT++;
 
-		if (met>40){
+		if (met>20){
 	    FakeRatePtIncTight[etaBin][0]->Fill(analysisTree.tau_pt[(int)tau_loose],weight);
 	    hRatioSum1T->Fill(RatioSums,weight);
 	    hMTCut1T->Fill(MT,weight);
 	    hDPhiCut1T->Fill(dPhiW, weight);
 	    hMETCut1T->Fill(met, weight);
+      	    hnJets1T->Fill(countjets,weight);
+	    hnbJets1T->Fill(countbjets,weight);
 
       TightCFCounter[iCutT]+= weight;
       iCutT++;
@@ -1981,6 +1971,8 @@ if (isTight)
 	    hMTCut2T->Fill(MT,weight);
 	    hDPhiCut2T->Fill(dPhiW, weight);
 	    hMETCut2T->Fill(met, weight);
+      	    hnJets2T->Fill(countjets,weight);
+	    hnbJets2T->Fill(countbjets,weight);
     
       TightCFCounter[iCutT]+= weight;
       iCutT++;
@@ -1991,17 +1983,22 @@ if (isTight)
 	    hMTCut3T->Fill(MT,weight);
 	    hDPhiCut3T->Fill(dPhiW, weight);
 	    hMETCut3T->Fill(met, weight);
+      	    hnJets3T->Fill(countjets,weight);
+	    hnbJets3T->Fill(countbjets,weight);
 
       TightCFCounter[iCutT]+= weight;
       iCutT++;
 
-	  if (RatioSums < 0.3 ) {
+	//  if (RatioSums < 0.3 ) {
+	if (countjets<3 ) {
 
 	    FakeRatePtIncTight[etaBin][3]->Fill(analysisTree.tau_pt[(int)tau_loose],weight);
 	    hRatioSum4T->Fill(RatioSums,weight);
 	    hMTCut4T->Fill(MT,weight);
 	    hDPhiCut4T->Fill(dPhiW, weight);
 	    hMETCut4T->Fill(met, weight);
+      	    hnJets4T->Fill(countjets,weight);
+	    hnbJets4T->Fill(countbjets,weight);
 
       TightCFCounter[iCutT]+= weight;
       iCutT++;
@@ -2010,6 +2007,8 @@ if (isTight)
 	    hMTCutTFRT->Fill(MT,tfr*weight);
 	    hDPhiCutTFRT->Fill(dPhiW, tfr*weight);
 	    hMETCutTFRT->Fill(met, tfr*weight);
+      	    hnJetsTFRT->Fill(countjets,weight);
+	    hnbJetsTFRT->Fill(countbjets,weight);
 
 
 		}//met<80
@@ -2057,8 +2056,30 @@ if (isTight)
   inputEventsH->Write();
   histWeightsH->Write();
   histTopPt->Write();
+  hnMatchedJets->Write();
+  hnMatchedJetsT->Write();
   hnJets->Write();
   hnbJets->Write();
+  hnJets1L->Write();
+  hnbJets1L->Write();
+  hnJets2L->Write();
+  hnbJets2L->Write();
+  hnJets3L->Write();
+  hnbJets3L->Write();
+  hnJets4L->Write();
+  hnbJets4L->Write();
+  hnJets1T->Write();
+  hnbJets1T->Write();
+  hnJets2T->Write();
+  hnbJets2T->Write();
+  hnJets3T->Write();
+  hnbJets3T->Write();
+  hnJets4T->Write();
+  hnbJetsTFRL->Write();
+  hnJetsTFRL->Write();
+  hnbJetsTFRT->Write();
+  hnJetsTFRT->Write();
+  hnbJets4T->Write();
   CutFlowUnWTight->Write();
   CutFlowUnWLoose->Write();
   file->Write();
