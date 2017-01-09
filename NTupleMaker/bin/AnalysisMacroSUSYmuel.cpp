@@ -126,7 +126,7 @@ int main(int argc, char * argv[]) {
   string fullPathToJsonFile = cmsswBase + "/src/DesyTauAnalyses/NTupleMaker/test/json/" + jsonFile;
  
 
-  RecoilCorrector recoilMetCorrector("HTT-utilities/RecoilCorrections/data/TypeIPFMET_2016BCD.root");
+  RecoilCorrector recoilMetCorrector("HTT-utilities/RecoilCorrections/data/PFMET_MG_2016BCD_RooT_5.2.root");
 
   MEtSys metSys("HTT-utilities/RecoilCorrections/data/MEtSys.root");
 
@@ -1717,10 +1717,24 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       int njetsforrecoil = njets;
       if (isW) njetsforrecoil = njets + 1;
 
-      float pfmet_corr_x = analysisTree.pfmetcorr_ex;
-      float pfmet_corr_y = analysisTree.pfmetcorr_ey;
-      float met_x = analysisTree.pfmetcorr_ex;
-      float met_y = analysisTree.pfmetcorr_ey;
+      float pfmet_corr_x = 1.;
+      float pfmet_corr_y = 1.;
+      float met_x = 1.;
+      float met_y = 1.;
+
+      if (isData){
+      pfmet_corr_x = analysisTree.pfmetcorr_ex;
+      pfmet_corr_y = analysisTree.pfmetcorr_ey;
+      met_x = analysisTree.pfmetcorr_ex;
+      met_y = analysisTree.pfmetcorr_ey;
+      }
+      else {
+      pfmet_corr_x = analysisTree.pfmet_ex;
+      pfmet_corr_y = analysisTree.pfmet_ey;
+      met_x = analysisTree.pfmet_ex;
+      met_y = analysisTree.pfmet_ey;
+      }
+
 
       if ((isW||isDY) && !isData) {
 

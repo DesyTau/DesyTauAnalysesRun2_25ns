@@ -219,7 +219,7 @@
  <use name="CondTools/BTau"/>
 </bin>
 
-<bin name="SUSYmumu" file="AnalysisMacroVBFmumu.cpp">
+<bin name="SUSYmumu" file="AnalysisMacroSUSYmumu.cpp">
  <use name="PhysicsTools/Utilities"/>
  <use name="rootgraphics"/>
  <use name="root"/>
