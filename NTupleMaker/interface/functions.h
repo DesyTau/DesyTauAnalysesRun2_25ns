@@ -433,12 +433,9 @@ namespace genTools{
     if (pt1>400) pt1 = 400;
     if (pt2>400) pt2 = 400;
     
-    //float a = 0.156;    // Run1 a parameter
-    //float b = -0.00137;  // Run1 b parameter
-    // new values for 13 TeV
-    float a = 0.0615;    
-    float b = -0.0005;  
-
+    float a = 0.0615;    // Run2 a parameter
+    float b = -0.0005;  // Run2 b parameter
+    
     float w1 = TMath::Exp(a+b*pt1);
     float w2 = TMath::Exp(a+b*pt2);
     
@@ -511,13 +508,12 @@ namespace genTools{
       fromHardProcessFinalState = analysisTree.genparticles_fromHardProcess[igen] && analysisTree.genparticles_status[igen]==1;
       isDirectHardProcessTauDecayProduct = analysisTree.genparticles_isDirectHardProcessTauDecayProduct[igen];
 
-      if((fromHardProcessFinalState && isChargedLepton) || (isDirectHardProcessTauDecayProduct && (!isNeutrino)))
+      /*if((fromHardProcessFinalState && isChargedLepton) || (isDirectHardProcessTauDecayProduct && (!isNeutrino)))
 	genL += genPart;
     }
 
-    return genL;
+    return genL;*/
 
-    /*
       if(fromHardProcessFinalState && isChargedLepton)
 	genL += genPart;
     }
@@ -538,7 +534,7 @@ namespace genTools{
     }
       
     return genL;
-    */
+      
   }
 
   TLorentzVector genNu(const AC1B& analysisTree){
@@ -590,22 +586,21 @@ namespace genTools{
       isElectron = fabs(analysisTree.genparticles_pdgid[igen])==11;
       isChargedLepton = isMuon || isElectron;
       isNeutrino = fabs(analysisTree.genparticles_pdgid[igen])==12||
-	           fabs(analysisTree.genparticles_pdgid[igen])==14||
-	           fabs(analysisTree.genparticles_pdgid[igen])==16;
+	fabs(analysisTree.genparticles_pdgid[igen])==14||
+	fabs(analysisTree.genparticles_pdgid[igen])==16;
       fromHardProcessFinalState = analysisTree.genparticles_fromHardProcess[igen] && analysisTree.genparticles_status[igen]==1;
       isDirectHardProcessTauDecayProduct = analysisTree.genparticles_isDirectHardProcessTauDecayProduct[igen];
 
-      if((fromHardProcessFinalState && (isChargedLepton || isNeutrino)) || isDirectHardProcessTauDecayProduct)
+      /*if((fromHardProcessFinalState && (isChargedLepton || isNeutrino)) || isDirectHardProcessTauDecayProduct)
 	genV += genPart;
     }
 
-    if (genV.Pt()<0.1){
+    if (genV.Pt()<0.1)
       genV.SetXYZM(0.1,0.1,0.,0.);
-    }
     
-    return genV;
+      return genV;*/
 
-    /*
+
       if(fromHardProcessFinalState && (isChargedLepton || isNeutrino))
 	genV += genPart;
     }
@@ -629,8 +624,90 @@ namespace genTools{
       genV.SetXYZM(0.1,0.1,0.,0.);
     
     return genV;  
-    */
   }
+
+  int nJetsHad(const AC1B& analysisTree){
+    int njetshad = 0;
+    bool isChargedLepton = 0;
+    bool fromHardProcess = 0;
+    
+    float genEta = 0.;
+    float genPhi = 0.;
+    
+    for (unsigned int jet=0; jet<analysisTree.pfjet_count; ++jet) {
+
+      if (analysisTree.pfjet_pt[jet]<=30.) continue;
+      float absJetEta = fabs(analysisTree.pfjet_eta[jet]);
+      if (absJetEta >= 4.7) continue;
+      
+      // jetId
+      float energy = analysisTree.pfjet_e[jet];
+      energy *= analysisTree.pfjet_energycorr[jet];
+      float chf = analysisTree.pfjet_chargedhadronicenergy[jet]/energy;
+      float nhf = analysisTree.pfjet_neutralhadronicenergy[jet]/energy;
+      float phf = analysisTree.pfjet_neutralemenergy[jet]/energy;
+      float elf = analysisTree.pfjet_chargedemenergy[jet]/energy;
+      float muf = analysisTree.pfjet_muonenergy[jet]/energy;
+      float chm = analysisTree.pfjet_chargedmulti[jet];
+      float nm = analysisTree.pfjet_neutralmulti[jet];
+      float npr = analysisTree.pfjet_chargedmulti[jet] + analysisTree.pfjet_neutralmulti[jet];
+      //bool isPFJetId = (npr>1 && phf<0.99 && nhf<0.99) && (absJetEta>3.0 || (elf<0.99 && chf>0 && chm>0));
+      bool isPFJetId = false;
+      if (absJetEta<=3.0)
+	isPFJetId = (nhf < 0.99 && phf < 0.99 && npr > 1) && (absJetEta>2.4 || (chf>0 && chm > 0 && elf < 0.99));
+      else
+	isPFJetId = phf < 0.9 && nm > 10;
+      //isPFJetId = (npr>1 && phf<0.99 && nhf<0.99 && muf < 0.8) && (absJetEta>3.0 || (elf<0.99 && chf>0 && chm>0));
+      //isPFJetId = (npr>1 && phf<0.99 && nhf<0.99) && (absJetEta>3.0 || (elf<0.99 && chf>0 && chm>0));
+      
+      if (!isPFJetId) continue;
+
+      int overlap = 0;
+      
+      for (unsigned int igen=0; igen<analysisTree.genparticles_count; ++igen) {	
+	isChargedLepton = ( fabs(analysisTree.genparticles_pdgid[igen])==11 ||
+			    fabs(analysisTree.genparticles_pdgid[igen])==13);
+	fromHardProcess = analysisTree.genparticles_fromHardProcess[igen];
+
+	if (!isChargedLepton) continue;
+	if (!fromHardProcess) continue;
+
+	genEta = PtoEta( analysisTree.genparticles_px[igen], analysisTree.genparticles_py[igen], analysisTree.genparticles_pz[igen]); 
+	genPhi = PtoPhi( analysisTree.genparticles_px[igen], analysisTree.genparticles_py[igen]);
+	
+	float dR = deltaR(analysisTree.pfjet_eta[jet],analysisTree.pfjet_phi[jet],
+			  genEta, genPhi);
+	if (dR>0.5) continue;
+	
+	overlap = 1;
+	break;
+      }
+
+      if (overlap == 1) continue;
+
+      for (unsigned int itau=0; itau<analysisTree.gentau_count; ++itau) {
+	fromHardProcess = analysisTree.gentau_fromHardProcess[itau];
+	
+      	if (!fromHardProcess) continue;
+
+	genEta = PtoEta( analysisTree.gentau_visible_px[itau], analysisTree.gentau_visible_py[itau], analysisTree.gentau_visible_pz[itau]);
+	genPhi = PtoPhi( analysisTree.gentau_visible_px[itau], analysisTree.gentau_visible_py[itau]);
+			 	
+	float dR = deltaR(analysisTree.pfjet_eta[jet],analysisTree.pfjet_phi[jet],
+			  genEta, genPhi);
+	if (dR>0.5) continue;
+	
+	overlap = 1;
+	break;
+      }
+
+      if (overlap == 1) continue;
+      
+      njetshad++;
+    }
+
+    return njetshad;
+  } 
   
   enum RecoilCorrectionsMethod{QuantileRemap=1, MeanResolution};
 
