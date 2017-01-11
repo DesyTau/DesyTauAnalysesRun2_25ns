@@ -380,13 +380,6 @@ class NTupleMaker : public edm::EDAnalyzer{
   edm::EDGetTokenT<edm::ValueMap<int> >   mvaNonTrigCategoriesMapToken_;
   edm::EDGetTokenT<edm::ValueMap<float> > mvaTrigValuesMapToken_;
   edm::EDGetTokenT<edm::ValueMap<int> >   mvaTrigCategoriesMapToken_;
-  //// New for Spring16
-  edm::EDGetTokenT<edm::ValueMap<float> > mvaValuesMapSpring16MapToken_;
-  edm::EDGetTokenT<edm::ValueMap<int> >   mvaCategoriesMapSpring16MapToken_;
-  //// New for Spring16
-  edm::EDGetTokenT<edm::ValueMap<bool> >  eleMvaWP90GeneralMapToken_;
-  edm::EDGetTokenT<edm::ValueMap<bool> >  eleMvaWP80GeneralMapToken_;
-  //// New for Spring16
   edm::EDGetTokenT<pat::TauCollection> TauCollectionToken_;
   edm::EDGetTokenT<pat::JetCollection> JetCollectionToken_;
   edm::EDGetTokenT<pat::METCollection> MetCollectionToken_;
@@ -697,11 +690,6 @@ class NTupleMaker : public edm::EDAnalyzer{
   Float_t electron_mva_value_trig_Spring15_v1[M_electronmaxcount];
   Int_t electron_mva_category_nontrig_Spring15_v1[M_electronmaxcount];
   Int_t electron_mva_category_trig_Spring15_v1[M_electronmaxcount];
-
-  Float_t electron_mva_value_Spring16_v1[M_electronmaxcount];
-  Float_t electron_mva_wp80_general_Spring16_v1[M_electronmaxcount];
-  Float_t electron_mva_wp90_general_Spring16_v1[M_electronmaxcount];
-  Int_t electron_mva_category_Spring16_v1[M_electronmaxcount];
 
   Bool_t electron_mva_wp80_nontrig_Spring15_v1[M_electronmaxcount];
   Bool_t electron_mva_wp90_nontrig_Spring15_v1[M_electronmaxcount];
