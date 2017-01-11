@@ -378,10 +378,6 @@ L1JetCollectionTag = cms.InputTag("caloStage2Digis:Jet"),
 JetCollectionTag = cms.InputTag("patJetsReapplyJEC::TreeProducer"),
 #JetCollectionTag = cms.InputTag("slimmedJets"),
 MetCollectionTag = cms.InputTag("slimmedMETs::@skipCurrentProcess"),
-MetCovMatrixTag = cms.InputTag("METSignificance:METCovariance:TreeProducer"),
-MetSigTag = cms.InputTag("METSignificance:METSignificance:TreeProducer"),
-MetCorrCovMatrixTag = cms.InputTag("METCorrSignificance:METCovariance:TreeProducer"),
-MetCorrSigTag = cms.InputTag("METCorrSignificance:METSignificance:TreeProducer"),
 MetCorrCollectionTag = cms.InputTag("slimmedMETs::TreeProducer"),
 PuppiMetCollectionTag = cms.InputTag("slimmedMETsPuppi::TreeProducer"),
 MvaMetCollectionsTag = cms.VInputTag(cms.InputTag("MVAMET","MVAMET","TreeProducer")),
@@ -719,14 +715,6 @@ SampleName = cms.untracked.string("Data")
 )
 #process.patJets.addBTagInfo = cms.bool(True)
 
-process.load("RecoMET/METProducers.METSignificance_cfi")
-process.load("RecoMET/METProducers.METSignificanceParams_cfi")
-
-process.METCorrSignificance = process.METSignificance.clone(
-  srcPfJets = cms.InputTag('patJetsReapplyJEC::TreeProducer'),
-  srcMet = cms.InputTag('slimmedMETs::TreeProducer')
-)
-
 process.BadChargedCandidateFilter.muons = cms.InputTag("slimmedMuons")
 process.BadChargedCandidateFilter.PFCandidates = cms.InputTag("packedPFCandidates")
 process.BadChargedCandidateFilter.debug = cms.bool(False)
@@ -746,7 +734,6 @@ process.p = cms.Path(
   process.fullPatMetSequencePuppi *
   process.egmGsfElectronIDSequence * 
   process.mvaMetSequence *
-  process.METSignificance * process.METCorrSignificance *
   #process.HBHENoiseFilterResultProducer* #produces HBHE bools baseline
   #process.ApplyBaselineHBHENoiseFilter*  #reject events based 
   #process.ApplyBaselineHBHEISONoiseFilter*  #reject events based -- disable the module, performance is being investigated fu
