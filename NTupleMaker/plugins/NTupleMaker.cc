@@ -166,6 +166,13 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
   mvaNonTrigCategoriesMapToken_(consumes<edm::ValueMap<int> >(iConfig.getParameter<edm::InputTag>("mvaNonTrigCategoriesMap"))),
   mvaTrigValuesMapToken_(consumes<edm::ValueMap<float> >(iConfig.getParameter<edm::InputTag>("mvaTrigValuesMap"))),
   mvaTrigCategoriesMapToken_(consumes<edm::ValueMap<int> >(iConfig.getParameter<edm::InputTag>("mvaTrigCategoriesMap"))),
+  mvaValuesMapSpring16MapToken_(consumes<edm::ValueMap<float> >(iConfig.getParameter<edm::InputTag>("mvaValuesMapSpring16"))),
+  mvaCategoriesMapSpring16MapToken_(consumes<edm::ValueMap<int> >(iConfig.getParameter<edm::InputTag>("mvaCategoriesMapSpring16"))),
+
+  eleMvaWP90GeneralMapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleMvaWP90GeneralMap"))),
+  eleMvaWP80GeneralMapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleMvaWP80GeneralMap"))),
+
+
   TauCollectionToken_(consumes<pat::TauCollection>(iConfig.getParameter<edm::InputTag>("TauCollectionTag"))),
   JetCollectionToken_(consumes<pat::JetCollection>(iConfig.getParameter<edm::InputTag>("JetCollectionTag"))),
   MetCollectionToken_(consumes<pat::METCollection>(iConfig.getParameter<edm::InputTag>("MetCollectionTag"))),
@@ -539,6 +546,14 @@ void NTupleMaker::beginJob(){
 
     tree->Branch("electron_mva_id_nontrigPhys14", electron_mva_id_nontrigPhys14, "electron_mva_id_nontrigPhys14[electron_count]/F");
     tree->Branch("electron_mva_value_nontrig_Spring15_v1", electron_mva_value_nontrig_Spring15_v1, "electron_mva_value_nontrig_Spring15_v1[electron_count]/F");
+    
+    tree->Branch("electron_mva_value_Spring16_v1", electron_mva_value_Spring16_v1, "electron_mva_value_Spring16_v1[electron_count]/F");
+    tree->Branch("electron_mva_category_Spring16_v1", electron_mva_category_Spring16_v1, "electron_mva_category_Spring16_v1[electron_count]/I");
+    tree->Branch("electron_mva_wp90_general_Spring16_v1", electron_mva_wp90_general_Spring16_v1, "electron_mva_wp90_general_Spring16_v1[electron_count]/F");
+    tree->Branch("electron_mva_wp80_general_Spring16_v1", electron_mva_wp80_general_Spring16_v1, "electron_mva_wp80_general_Spring16_v1[electron_count]/F");
+
+
+    tree->Branch("electron_mva_category_nontrig_Spring15_v1", electron_mva_category_nontrig_Spring15_v1, "electron_mva_category_nontrig_Spring15_v1[electron_count]/I");
     tree->Branch("electron_mva_value_trig_Spring15_v1", electron_mva_value_trig_Spring15_v1, "electron_mva_value_trig_Spring15_v1[electron_count]/F");
     tree->Branch("electron_mva_category_nontrig_Spring15_v1", electron_mva_category_nontrig_Spring15_v1, "electron_mva_category_nontrig_Spring15_v1[electron_count]/I");
     tree->Branch("electron_mva_category_trig_Spring15_v1", electron_mva_category_trig_Spring15_v1, "electron_mva_category_trig_Spring15_v1[electron_count]/I");
@@ -3661,7 +3676,6 @@ unsigned int NTupleMaker::AddElectrons(const edm::Event& iEvent, const edm::Even
   iEvent.getByToken(ElectronCollectionToken_, Electrons);
         edm::Handle<pat::PackedCandidateCollection> pfcands;
         iEvent.getByToken( PackedCantidateCollectionToken_, pfcands);
-
 	// cut based
 	edm::Handle<edm::ValueMap<bool> > veto_id_decisions;
 	edm::Handle<edm::ValueMap<bool> > loose_id_decisions;
@@ -3677,20 +3691,34 @@ unsigned int NTupleMaker::AddElectrons(const edm::Event& iEvent, const edm::Even
 	edm::Handle<edm::ValueMap<bool> > nontrig_wp90_decisions;
 	edm::Handle<edm::ValueMap<bool> > trig_wp80_decisions;
 	edm::Handle<edm::ValueMap<bool> > trig_wp90_decisions;
-        iEvent.getByToken(eleMvaNonTrigWP80MapToken_,nontrig_wp80_decisions);
-        iEvent.getByToken(eleMvaNonTrigWP90MapToken_,nontrig_wp90_decisions);
+
+
         iEvent.getByToken(eleMvaTrigWP80MapToken_,trig_wp80_decisions);
         iEvent.getByToken(eleMvaTrigWP90MapToken_,trig_wp90_decisions);
+	iEvent.getByToken(eleMvaNonTrigWP80MapToken_,nontrig_wp80_decisions);
+        iEvent.getByToken(eleMvaNonTrigWP90MapToken_,nontrig_wp90_decisions);
 
 	edm::Handle<edm::ValueMap<float> > mvaNonTrigValues;
 	edm::Handle<edm::ValueMap<int> > mvaNonTrigCategories;
         iEvent.getByToken(mvaNonTrigValuesMapToken_,mvaNonTrigValues);
         iEvent.getByToken(mvaNonTrigCategoriesMapToken_,mvaNonTrigCategories);
 
+
 	edm::Handle<edm::ValueMap<float> > mvaTrigValues;
 	edm::Handle<edm::ValueMap<int> > mvaTrigCategories;
         iEvent.getByToken(mvaTrigValuesMapToken_,mvaTrigValues);
         iEvent.getByToken(mvaTrigCategoriesMapToken_,mvaTrigCategories);
+
+	edm::Handle<edm::ValueMap<float> > mvaValuesMapSpring16;
+	edm::Handle<edm::ValueMap<int> > mvaCategoriesMapSpring16;
+        iEvent.getByToken(mvaValuesMapSpring16MapToken_,mvaValuesMapSpring16);
+        iEvent.getByToken(mvaCategoriesMapSpring16MapToken_,mvaCategoriesMapSpring16);
+      
+	//mva general Spring16
+	edm::Handle<edm::ValueMap<bool> > mva_wp80_general_decisions;
+	edm::Handle<edm::ValueMap<bool> > mva_wp90_general_decisions;
+      	iEvent.getByToken(eleMvaWP90GeneralMapToken_,mva_wp90_general_decisions);
+        iEvent.getByToken(eleMvaWP80GeneralMapToken_,mva_wp80_general_decisions);          
 
 	/*if(crecelectrontrigger)
 	{
@@ -3814,6 +3842,9 @@ unsigned int NTupleMaker::AddElectrons(const edm::Event& iEvent, const edm::Even
 
 	  electron_mva_value_nontrig_Spring15_v1[electron_count] = (*mvaNonTrigValues)[el];
 	  electron_mva_category_nontrig_Spring15_v1[electron_count] = (*mvaNonTrigCategories)[el];
+	  electron_mva_value_Spring16_v1[electron_count] = (*mvaValuesMapSpring16)[el];
+	  electron_mva_category_Spring16_v1[electron_count] = (*mvaCategoriesMapSpring16)[el];
+
 	  electron_mva_value_trig_Spring15_v1[electron_count] = (*mvaTrigValues)[el];
 	  electron_mva_category_trig_Spring15_v1[electron_count] = (*mvaTrigCategories)[el];
 
@@ -3822,6 +3853,8 @@ unsigned int NTupleMaker::AddElectrons(const edm::Event& iEvent, const edm::Even
           electron_cutId_medium_Spring15[electron_count] = (*medium_id_decisions)[el];
           electron_cutId_tight_Spring15[electron_count] = (*tight_id_decisions)[el];
 
+	  electron_mva_wp90_general_Spring16_v1[electron_count] = (*mva_wp90_general_decisions)[el];
+	  electron_mva_wp80_general_Spring16_v1[electron_count] = (*mva_wp80_general_decisions)[el];
 	  electron_mva_wp80_nontrig_Spring15_v1[electron_count] = (*nontrig_wp80_decisions)[el];
 	  electron_mva_wp90_nontrig_Spring15_v1[electron_count] = (*nontrig_wp90_decisions)[el];
 	  electron_mva_wp80_trig_Spring15_v1[electron_count] = (*trig_wp80_decisions)[el];
