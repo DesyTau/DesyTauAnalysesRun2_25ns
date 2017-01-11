@@ -128,11 +128,9 @@ int main(int argc, char * argv[]) {
   const double dRleptonsCutmutau   = cfg.get<double>("dRleptonsCutmutau");
   const double deltaRTrigMatch = cfg.get<double>("DRTrigMatch");
   const bool isIsoR03 = cfg.get<bool>("IsIsoR03");
+
   const string TrigLeg  = cfg.get<string>("SingleMuonFilterName") ;
   const double SingleMuonTriggerPtCut = cfg.get<double>("SingleMuonTriggerPtCut");
-
-  const string TrigLegIsoMu24  = cfg.get<string>("SingleMuonFilterNameIsoMu24") ;
-  const double SingleMuonTriggerPtCutIsoMu24 = cfg.get<double>("SingleMuonTriggerPtCutIsoMu24");
 
 
   // vertex distributions filenames and histname
@@ -143,7 +141,8 @@ int main(int argc, char * argv[]) {
   string cmsswBase = (getenv ("CMSSW_BASE"));
   string fullPathToJsonFile = cmsswBase + "/src/DesyTauAnalyses/NTupleMaker/test/json/" + jsonFile;
  
-  RecoilCorrector recoilMetCorrector("HTT-utilities/RecoilCorrections/data/PFMET_MG_2016BCD_RooT_5.2.root");
+ //RecoilCorrector recoilMetCorrector("HTT-utilities/RecoilCorrections/data/PFMET_MG_2016BCD_RooT_5.2.root");
+  RecoilCorrector recoilMetCorrector("DesyTauAnalyses/NTupleMaker/data/PFMET_Run2016BCDEFGH_Spring16.root");
 
   MEtSys metSys("HTT-utilities/RecoilCorrections/data/MEtSys.root");
 
@@ -168,7 +167,6 @@ int main(int argc, char * argv[]) {
     }
   }
   TString MainTrigger(TrigLeg);
-  TString MainTriggerIsoMu24(TrigLegIsoMu24);
 
 
   const double bTag   = cfg.get<double>("bTag");
@@ -927,7 +925,6 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       bool trigAccept = false;
 
       unsigned int nMainTrigger = 0;
-      unsigned int nMainTriggerIsoMu24 = 0;
       bool isMainTrigger = false;
 
 
@@ -937,12 +934,8 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       for (unsigned int i=0; i<nfilters; ++i) {
 	//	std::cout << "HLT Filter : " << i << " = " << analysisTree.run_hltfilters->at(i) << std::endl;
 	TString HLTFilter(analysisTree.run_hltfilters->at(i));
-//	if (HLTFilter==MainTrigger) {
-//	  nMainTrigger = i;
-//	  isMainTrigger = true;
-//	}
-	if (HLTFilter==MainTriggerIsoMu24) {
-	  nMainTriggerIsoMu24 = i;
+	if (HLTFilter==MainTrigger) {
+	  nMainTrigger = i;
 	  isMainTrigger = true;
 	}
 
@@ -957,10 +950,10 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       }
 
 	
-//      ptMuonCut = SingleMuonTriggerPtCutIsoMu24;
+//      ptMuonCut = SingleMuonTriggerPtCut;
       vector<int> muons; muons.clear();
       for (unsigned int im = 0; im<analysisTree.muon_count; ++im) {
-	if (analysisTree.muon_pt[im]<SingleMuonTriggerPtCutIsoMu24) continue;
+	if (analysisTree.muon_pt[im]<SingleMuonTriggerPtCut) continue;
 	if (fabs(analysisTree.muon_eta[im])>etaMuonCut) continue;
 	if (fabs(analysisTree.muon_dxy[im])>dxyMuonCut) continue;
 	if (fabs(analysisTree.muon_dz[im])>dzMuonCut) continue;
@@ -1030,9 +1023,9 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
 	if (isData)
 	{	for (unsigned int iT=0; iT<analysisTree.trigobject_count; ++iT) {
-	  	if (analysisTree.trigobject_filters[iT][nMainTriggerIsoMu24]
-	      	&& analysisTree.muon_pt[mIndex]>SingleMuonTriggerPtCutIsoMu24 &&
-	      	analysisTree.trigobject_pt[iT]>SingleMuonTriggerPtCutIsoMu24) { // IsoMu Leg
+	  	if (analysisTree.trigobject_filters[iT][nMainTrigger]
+	      	&& analysisTree.muon_pt[mIndex]>SingleMuonTriggerPtCut &&
+	      	analysisTree.trigobject_pt[iT]>SingleMuonTriggerPtCut) { // IsoMu Leg
 	    	float dRtrig = deltaR(analysisTree.muon_eta[mIndex],analysisTree.muon_phi[mIndex],
 				  analysisTree.trigobject_eta[iT],analysisTree.trigobject_phi[iT]);
 	    	if (dRtrig<deltaRTrigMatch) 
@@ -1059,7 +1052,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
         //if (!isData /*&& ( string::npos != filen.find("stau")  || string::npos != filen.find("C1") )*/ ) isLegMatch = true; 
        // if (!isData && analysisTree.muon_pt[mIndex]>ptMuonCut) isLegMatch = true;
-        if (!isData && analysisTree.muon_pt[mIndex]>SingleMuonTriggerPtCutIsoMu24) isLegMatch = true;
+        if (!isData && analysisTree.muon_pt[mIndex]>SingleMuonTriggerPtCut) isLegMatch = true;
 
 	if (!isLegMatch) continue;
 

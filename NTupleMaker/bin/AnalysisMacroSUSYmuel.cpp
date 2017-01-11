@@ -115,21 +115,16 @@ int main(int argc, char * argv[]) {
 
 
 
-  //const unsigned int RunRangeMin = cfg.get<unsigned int>("RunRangeMin");
-  //const unsigned int RunRangeMax = cfg.get<unsigned int>("RunRangeMax");
-
-  // vertex distributions filenames and histname
-
   const string jsonFile = cfg.get<string>("jsonFile");
 
   string cmsswBase = (getenv ("CMSSW_BASE"));
   string fullPathToJsonFile = cmsswBase + "/src/DesyTauAnalyses/NTupleMaker/test/json/" + jsonFile;
  
 
-  RecoilCorrector recoilMetCorrector("HTT-utilities/RecoilCorrections/data/PFMET_MG_2016BCD_RooT_5.2.root");
+  //RecoilCorrector recoilMetCorrector("HTT-utilities/RecoilCorrections/data/PFMET_MG_2016BCD_RooT_5.2.root");
+  RecoilCorrector recoilMetCorrector("DesyTauAnalyses/NTupleMaker/data/PFMET_Run2016BCDEFGH_Spring16.root");
 
   MEtSys metSys("HTT-utilities/RecoilCorrections/data/MEtSys.root");
-
 
 
   //const string TauFakeRateFile = cfg.get<string>("TauFakeRateEff");
@@ -143,29 +138,19 @@ int main(int argc, char * argv[]) {
   TString LowPtLegMuon(lowPtLegMuon);
   TString HighPtLegMuon(highPtLegMuon);
 
-  //const string Muon23TriggerFile0p15 = cfg.get<string>("Muon23TriggerEff0p15");
-  //const string Muon8TriggerFile0p15 = cfg.get<string>("Muon8TriggerEff0p15");
   
-  const string Muon8TriggerFile0p15RunBCDE = cfg.get<string>("Muon8TriggerEff0p15RunBCDE");
-  const string Muon8TriggerFile0p15RunF = cfg.get<string>("Muon8TriggerEff0p15RunF");
+  const string Muon8TriggerFile0p15RunBCDEF = cfg.get<string>("Muon8TriggerEff0p15RunBCDEF");
   const string Muon8TriggerFile0p15RunGH = cfg.get<string>("Muon8TriggerEff0p15RunGH");
-  const string Muon23TriggerFile0p15RunBCDE = cfg.get<string>("Muon23TriggerEff0p15RunBCDE");
-  const string Muon23TriggerFile0p15RunF = cfg.get<string>("Muon23TriggerEff0p15RunF");
+  const string Muon23TriggerFile0p15RunBCDEF = cfg.get<string>("Muon23TriggerEff0p15RunBCDEF");
   const string Muon23TriggerFile0p15RunGH = cfg.get<string>("Muon23TriggerEff0p15RunGH");
 
-//  const string Electron23TriggerFile0p1 = cfg.get<string>("Electron23TriggerEff0p1");
-  const string Electron12TriggerFile0p1RunBCDE = cfg.get<string>("Electron12TriggerEff0p1RunBCDE");
-  const string Electron12TriggerFile0p1RunF = cfg.get<string>("Electron12TriggerEff0p1RunF");
+  const string Electron12TriggerFile0p1RunBCDEF = cfg.get<string>("Electron12TriggerEff0p1RunBCDEF");
   const string Electron12TriggerFile0p1RunGH = cfg.get<string>("Electron12TriggerEff0p1RunGH");
-  const string Electron23TriggerFile0p1RunBCDE = cfg.get<string>("Electron23TriggerEff0p1RunBCDE");
-  const string Electron23TriggerFile0p1RunF = cfg.get<string>("Electron23TriggerEff0p1RunF");
+  const string Electron23TriggerFile0p1RunBCDEF = cfg.get<string>("Electron23TriggerEff0p1RunBCDEF");
   const string Electron23TriggerFile0p1RunGH = cfg.get<string>("Electron23TriggerEff0p1RunGH");
 
-//  const string MuonidIsoEffFileBCDEF = cfg.get<string>("MuonidIsoEffFileBCDEF");
-//  const string MuonidIsoEffFileGH = cfg.get<string>("MuonidIsoEffFileGH");
   const string MuonidIsoEffFile = cfg.get<string>("MuonidIsoEffFile");
-  const string ElectronIdIsoFile0p1 = cfg.get<string>("ElectronIdIsoEffMuEl0p1");
-//  const string MuonIdIsoFile0p15 = cfg.get<string>("MuonIdIsoEffMuEl0p15");
+  const string ElectronIdIsoFile = cfg.get<string>("ElectronIdIsoEffFile");
 
   /////////////////////////////////////////////
 
@@ -329,53 +314,24 @@ int main(int argc, char * argv[]) {
   TH1D * MuSF_IdIso_Mu1H = new TH1D("MuIdIsoSF_Mu1H", "MuIdIsoSF_Mu1", 100, 0.5,1.5);
 	cout<<" Initializing iD SF files....."<<endl;
 
-/*
-  cout<<" Initializing iD SF files....."<<endl;
-  ScaleFactor * SF_muonIdIso0p15 = new ScaleFactor();
-  SF_muonIdIso0p15->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(MuonIdIsoFile0p15));
-  ScaleFactor * SF_electronIdIso0p1 = new ScaleFactor();
-  SF_electronIdIso0p1->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(ElectronIdIsoFile0p1));
-
-
-  cout<<" Initializing Trigger SF files....."<<endl;
-  ScaleFactor * SF_muon230p15 = new ScaleFactor();
-  SF_muon230p15->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(Muon23TriggerFile0p15));
-  ScaleFactor * SF_muon80p15 = new ScaleFactor();
-  SF_muon80p15->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(Muon8TriggerFile0p15));
-*/
-
-  /*ScaleFactor * SF_electron230p1 = new ScaleFactor();
-  SF_electron230p1->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(Electron23TriggerFile0p1));
-  ScaleFactor * SF_electron120p1 = new ScaleFactor();
-  SF_electron120p1->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(Electron12TriggerFile0p1));
-*/
-
-  ScaleFactor * SF_muon80p15RunBCDE = new ScaleFactor();
-  ScaleFactor * SF_muon80p15RunF = new ScaleFactor();
+  ScaleFactor * SF_muon80p15RunBCDEF = new ScaleFactor();
   ScaleFactor * SF_muon80p15RunGH = new ScaleFactor();
-  ScaleFactor * SF_muon230p15RunBCDE = new ScaleFactor();
-  ScaleFactor * SF_muon230p15RunF = new ScaleFactor();
+  ScaleFactor * SF_muon230p15RunBCDEF = new ScaleFactor();
   ScaleFactor * SF_muon230p15RunGH = new ScaleFactor();
 
-  SF_muon80p15RunBCDE->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(Muon8TriggerFile0p15RunBCDE));
-  SF_muon80p15RunF->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(Muon8TriggerFile0p15RunF));
+  SF_muon80p15RunBCDEF->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(Muon8TriggerFile0p15RunBCDEF));
   SF_muon80p15RunGH->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(Muon8TriggerFile0p15RunGH));
-  SF_muon230p15RunBCDE->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(Muon23TriggerFile0p15RunBCDE));
-  SF_muon230p15RunF->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(Muon23TriggerFile0p15RunF));
+  SF_muon230p15RunBCDEF->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(Muon23TriggerFile0p15RunBCDEF));
   SF_muon230p15RunGH->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(Muon23TriggerFile0p15RunGH));
 
-  ScaleFactor * SF_electron120p1RunBCDE = new ScaleFactor();
-  ScaleFactor * SF_electron120p1RunF = new ScaleFactor();
+  ScaleFactor * SF_electron120p1RunBCDEF = new ScaleFactor();
   ScaleFactor * SF_electron120p1RunGH = new ScaleFactor();
-  ScaleFactor * SF_electron230p1RunBCDE = new ScaleFactor();
-  ScaleFactor * SF_electron230p1RunF = new ScaleFactor();
+  ScaleFactor * SF_electron230p1RunBCDEF = new ScaleFactor();
   ScaleFactor * SF_electron230p1RunGH = new ScaleFactor();
 
-  SF_electron230p1RunBCDE->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(Electron23TriggerFile0p1RunBCDE));
-  SF_electron230p1RunF->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(Electron23TriggerFile0p1RunF));
+  SF_electron230p1RunBCDEF->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(Electron23TriggerFile0p1RunBCDEF));
   SF_electron230p1RunGH->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(Electron23TriggerFile0p1RunGH));
-  SF_electron120p1RunBCDE->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(Electron12TriggerFile0p1RunBCDE));
-  SF_electron120p1RunF->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(Electron12TriggerFile0p1RunF));
+  SF_electron120p1RunBCDEF->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(Electron12TriggerFile0p1RunBCDEF));
   SF_electron120p1RunGH->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(Electron12TriggerFile0p1RunGH));
 
 
@@ -387,10 +343,9 @@ int main(int argc, char * argv[]) {
 //    SF_muonIdIso0p15RunBCDEF->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(MuonidIsoEffFileBCDEF));
 //    SF_muonIdIso0p15RunGH->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(MuonidIsoEffFileGH));
     SF_muonIdIso0p15->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(MuonidIsoEffFile));
-
   
     ScaleFactor * SF_electronIdIso0p1 = new ScaleFactor();
-    SF_electronIdIso0p1->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(ElectronIdIsoFile0p1));
+    SF_electronIdIso0p1->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(ElectronIdIsoFile));
 
   //////////////////////////////////////
   //////// Initialized TauFakeRates here
@@ -1424,11 +1379,11 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
      //// Ele_0p1 Muon_0p15
      //if (!isData && iEntry%2==0){
 
-      Ele12EffData0p1A = (float)SF_electron120p1RunBCDE->get_EfficiencyData(double(pt_1),double(eta_1));
-      Ele23EffData0p1A = (float)SF_electron230p1RunBCDE->get_EfficiencyData(double(pt_1),double(eta_1));
+      Ele12EffData0p1A = (float)SF_electron120p1RunBCDEF->get_EfficiencyData(double(pt_1),double(eta_1));
+      Ele23EffData0p1A = (float)SF_electron230p1RunBCDEF->get_EfficiencyData(double(pt_1),double(eta_1));
 
-      Mu8EffData0p15A = (float)SF_muon80p15RunBCDE->get_EfficiencyData(double(pt_2),double(eta_2));
-      Mu23EffData0p15A = (float)SF_muon230p15RunBCDE->get_EfficiencyData(double(pt_2),double(eta_2));
+      Mu8EffData0p15A = (float)SF_muon80p15RunBCDEF->get_EfficiencyData(double(pt_2),double(eta_2));
+      Mu23EffData0p15A = (float)SF_muon230p15RunBCDEF->get_EfficiencyData(double(pt_2),double(eta_2));
 
      //}
 
@@ -1444,8 +1399,10 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       float trigWeightDataA = Mu23EffData0p15A*Ele12EffData0p1A + Mu8EffData0p15A*Ele23EffData0p1A - Mu23EffData0p15A*Ele23EffData0p1A;
       float trigWeightDataB = Mu23EffData0p15B*Ele12EffData0p1B + Mu8EffData0p15B*Ele23EffData0p1B - Mu23EffData0p15B*Ele23EffData0p1B;
 
-	trig_weight = trigWeightDataA * LumiA/Lumi + trigWeightDataB * LumiB/Lumi;
-//	weight *= trigweight_1;
+	trig_weight = (trigWeightDataA * LumiA)/Lumi + 0.953 * (trigWeightDataB * LumiB)/Lumi;
+	trig_weight_1 = (trigWeightDataA * LumiA)/Lumi ;
+	trig_weight_2 =  (trigWeightDataB * LumiB)/Lumi;
+	weight *= trig_weight;
 
 
 
@@ -1453,19 +1410,16 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
  	float  isoweight_1 = 1;
       	float  isoweight_2 = 1;
-      	float  isoweight_3 = 1;
 
 //     if (!isData && iEntry%2==0) isoweight_1 = SF_muonIdIso0p15RunBCDEF->get_ScaleFactor(pt_2,eta_2);
 //     if (!isData && iEntry%2!=0) isoweight_2 = SF_muonIdIso0p15RunGH->get_ScaleFactor(pt_2,eta_2);
 
-        //isoweight_1 = SF_muonIdIso0p15RunBCDEF->get_ScaleFactor(pt_2,eta_2);
         isoweight_1 = SF_muonIdIso0p15->get_ScaleFactor(pt_2,eta_2);
-        //isoweight_2 = SF_muonIdIso0p15RunGH->get_ScaleFactor(pt_2,eta_2);
-        isoweight_3 = SF_electronIdIso0p1->get_ScaleFactor(pt_1,eta_1);
+        isoweight_2 = SF_electronIdIso0p1->get_ScaleFactor(pt_1,eta_1);
 
 	//LSF_weight_mu = isoweight_1 *LumiA/Lumi + isoweight_2 * LumiB/Lumi;
 	LSF_weight_mu = isoweight_1 ;
-	LSF_weight_el = isoweight_3 ;
+	LSF_weight_el = isoweight_2 ;
 	LSF_weight = LSF_weight_mu * LSF_weight_el;
       }
 

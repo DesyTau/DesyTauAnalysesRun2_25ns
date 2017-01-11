@@ -101,11 +101,11 @@ void analyzer::Loop(){
 	bool t = true;
 	bool f = false;
 	bool InvertLeptonIso = LEPTONHERE;
-//	bool HighInvertLeptonIso = HIGHISO;
 	string Sign = "SIGNHERE";
+	
+
 	string systematic="SYSTEMATICHERE";
 
-	
 
 	string cut = to_string(t);
 	cout <<"  "<<cut.c_str()<<endl;
@@ -167,14 +167,14 @@ TH2D *histo = (TH2D*) obj;
 
 	TFile * filein = new TFile("/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/CMSSW_8_0_20/src/DesyTauAnalyses/NTupleMaker/test/CHANNELHERE/FILEIN","read");
 
-
 	TH1D * histW = (TH1D*)filein->Get("muel/histWeightsH");
 	TH1D * histTop ;
 	if (isTT) histTop = (TH1D*)filein->Get("muel/histTopPt");
 
-	TH1D * hxsecW = (TH1D*)filein->Get("muel/xsec");
+//	TH1D * hxsecW = (TH1D*)filein->Get("muel/xsec");
 	TH1D * CutFlow = (TH1D*)filein->Get("muel/CutFlowUnW");
 	TFile * file = new TFile("plots.root","recreate");
+
 	//cout<<"  "<<old<<"  "<<datasetName->c_str()<<"  "<<hist_<<"  "<<CutFlow->GetName()<<"  "<<CutFlow->GetBinContent(1)<<endl;
 		
 	string Channel = "muel";
@@ -186,9 +186,9 @@ TH2D *histo = (TH2D*) obj;
 
 	Long64_t nbytes = 0, nb = 0;
 
+
 	for (Long64_t jentry=0; jentry<nentries;jentry++) {
 		Long64_t ientry = LoadTree(jentry);
-		if (ientry < 0) break;
 		nb = fChain->GetEntry(jentry);   nbytes += nb;
 		float all_weights = 1.;
 
@@ -229,7 +229,6 @@ float met = -1.;
 		METV.SetPx(met_ex);
 		METV.SetPy(met_ey);
 		met= sqrt(met_ex*met_ex + met_ey*met_ey);  
-
    
 	if (systematic =="nominal")
 		{
@@ -248,6 +247,7 @@ float met = -1.;
 
 	if (systematic =="JetEnDown")
 		{
+		METV.SetPx(met_ex_JetEnDown);
 		METV.SetPy(met_ey_JetEnDown);
 		met = sqrt(met_ex_JetEnDown*met_ex_JetEnDown + met_ey_JetEnDown*met_ey_JetEnDown);     
 		}
@@ -326,8 +326,9 @@ bool El0p1Mu0p15 = true;
                 iCFCounter[iCut]++;
 		iCut++;
 
-		if (El0p1Mu0p15) all_weights *= trig_weight_2;
-		if (!El0p1Mu0p15) all_weights *= trig_weight_1;
+		//if (El0p1Mu0p15) 
+		all_weights *= trig_weight;
+		//if (!El0p1Mu0p15) all_weights *= trig_weight_1;
 
 		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
 		CFCounter[iCut]+= all_weights;
@@ -335,8 +336,9 @@ bool El0p1Mu0p15 = true;
                 iCFCounter[iCut]++;
 		iCut++;
 
-		if (El0p1Mu0p15) all_weights *= LSF_weight_2;
-		if (!El0p1Mu0p15) all_weights *= LSF_weight_1;
+		//if (El0p1Mu0p15) 
+		all_weights *= LSF_weight;
+		//if (!El0p1Mu0p15) all_weights *= LSF_weight_1;
 
 		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
 		CFCounter[iCut]+= all_weights;
@@ -352,7 +354,7 @@ bool El0p1Mu0p15 = true;
 	
 	if (isSignal) all_weights *= FastSF;
 		double hip = TGr_hip->Eval(float(mu_eta[muon_index]));
-		all_weights *= hip;
+		//all_weights *= hip;
 
 
 		all_weights *= top_weight;
@@ -498,8 +500,9 @@ bool El0p1Mu0p15 = true;
 	
 
 }
-	float Lumi = 35501.;
-	if (isData) Lumi = 1;
+	float Lumi = 36600.;
+
+	if (isData) Lumi = 1.;
 		 for(int ci = 0; ci < CutNumb; ci++)
                         {
                                 // tfile << CutList[ci]<<"\t & \t"
@@ -509,17 +512,23 @@ bool El0p1Mu0p15 = true;
                            else  
  					CutFlowUnW->SetBinContent(1+ci,float(CFCounter[ci]) );
 				
-					cout<<" Count "<<ci<<" binContent "<<CutFlow->GetBinContent(1+ci)<<"  CFCounter_ "<<CFCounter_[ci]<<" CFCounter "<<CFCounter[ci]<<" iCFCounter "<<iCFCounter[ci]<<" Name "<<CutFlowUnW->GetXaxis()->GetBinLabel(1+ci)<<" entry  "<<CutFlowUnW->GetBinContent(1+ci)<<" for Lumi " <<Lumi<<"  "<<float (CutFlowUnW->GetBinContent(1+ci))*hxsecW->GetMean()*Lumi/histW->GetSumOfWeights()<<endl;			
+
+					//cout<<" Count "<<ci<<" binContent "<<CutFlowUnW->GetBinContent(1+ci)<<"  CFCounter_ "<<CFCounter_[ci]<<" CFCounter "<<CFCounter[ci]<<" iCFCounter "<<iCFCounter[ci]<<" Name "<<CutFlowUnW->GetXaxis()->GetBinLabel(1+ci)<<" entry  "<<CutFlowUnW->GetBinContent(1+ci)<<" prediction for Lumi " <<Lumi<<"  "<<float (CutFlowUnW->GetBinContent(1+ci))*hxsecW->GetMean()*Lumi/histW->GetSumOfWeights()<<endl;			
+					cout<<" Count "<<ci<<" binContent "<<CutFlowUnW->GetBinContent(1+ci)<<"  CFCounter_ "<<CFCounter_[ci]<<" CFCounter "<<CFCounter[ci]<<" iCFCounter "<<iCFCounter[ci]<<" Name "<<CutFlowUnW->GetXaxis()->GetBinLabel(1+ci)<<" entry  "<<CutFlowUnW->GetBinContent(1+ci)<<endl;			
+
 }
+
+
 			cout<<"  end from TH1D "<<endl;
+
 		//hcount->Draw();
 		CutFlowUnW->Write();
-		//histWeightsH->Write();
 		histW->Write();
 	if (isTT) histTop->Write();
-		hxsecW->Write();
+	//	hxsecW->Write();
 		file->Write();
 		file->Close();
 		cout<<" Failed events  "<<counter<<endl;
 	}
 /////////////////////////////////////////////
+

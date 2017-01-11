@@ -19,7 +19,7 @@
 using namespace std;
 
 
-const  int CutN=25;
+const  int CutN=35;
 
 
 
@@ -81,257 +81,74 @@ float SF = 1.;
 //80x MVAid
 
 if ( working_point == "MVA"){
-
-
-//if ( sel =="mutau"){
 	{
+
+/*
+	{
+
 if (  fabs(eta) < 0.8 )
         {
-                if (pt>20 && pt<30) SF = 1.00935;
-                if (pt>30 && pt<40) SF = 0.936345;
-                if (pt>40 ) SF = 0.807783;
+                if (pt>20 && pt<30) SF = 0.93083;
+                if (pt>30 && pt<40) SF = 0.889074;
+                if (pt>40 ) SF = 0.875068;
         }
 if (  fabs(eta) > 0.8 && fabs(eta) < 1.44 )
         {
 
-                if (pt>20 && pt<30) SF = 1.11317;
-                if (pt>30 && pt<40) SF = 1.10086;
-                if (pt>40 ) SF = 1.00452;
+                if (pt>20 && pt<30) SF = 1.05732;
+                if (pt>30 && pt<40) SF = 1.05508;
+                if (pt>40 ) SF = 1.07035;
         }
 
 if (  fabs(eta) > 1.44 && fabs(eta) < 1.566 )
         {
 
-                if (pt>20 && pt<40) SF = 1.12201;
-                if (pt>40 ) SF =  1.34582;
+                if (pt>20 && pt<40) SF = 1.14885;
+                if (pt>40 ) SF =  1.48367;
         }
 if (  fabs(eta) > 1.566 && fabs(eta) < 2.3 )
         {
 
-                if (pt>20 && pt<30) SF = 1.13738;
-                if (pt>30 && pt<40) SF = 1.17215;
-                if (pt>40) SF = 0.991638;
+                if (pt>20 && pt<30) SF = 1.07422;
+                if (pt>30 && pt<40) SF = 1.13037;
+                if (pt>40) SF = 1.01381;
+        }
+
+}//mutau MVA
+*/
+
+if (  fabs(eta) < 0.8 )
+        {
+                if (pt>20 && pt<30) SF = 0.965212;
+                if (pt>30 && pt<40) SF = 0.934714;
+                if (pt>40 ) SF = 0.833209;
+        }
+if (  fabs(eta) > 0.8 && fabs(eta) < 1.44 )
+        {
+
+                if (pt>20 && pt<30) SF = 1.0795;
+                if (pt>30 && pt<40) SF = 1.0543;
+                if (pt>40 ) SF = 0.999562;
+        }
+
+if (  fabs(eta) > 1.44 && fabs(eta) < 1.566 )
+        {
+
+                if (pt>20 && pt<40) SF = 1.17946;
+                if (pt>40) SF = 1.18639;
+        }
+if (  fabs(eta) > 1.566 && fabs(eta) < 2.3 )
+        {
+
+                if (pt>20 && pt<30) SF = 1.07492;
+                if (pt>30 && pt<40) SF = 1.0993;
+                if (pt>40) SF = 1.04831;
         }
 
 }//mutau MVA
 
 
-
-/*
-if ( sel =="eltau"){
-
-if (  fabs(eta) < 0.8 )
-        {
-                if (pt>20 && pt<30) SF = 1.06051;
-                if (pt>30 && pt<40) SF = 0.920655;
-                if (pt>40 ) SF = 0.804852;
-        }
-if (  fabs(eta) > 0.8 && fabs(eta) < 1.44 )
-        {
-
-                if (pt>20 && pt<30) SF = 1.03031;
-                if (pt>30 && pt<40) SF = 1.00293;
-                if (pt>40 ) SF = 0.87865;
-        }
-
-if (  fabs(eta) > 1.44 && fabs(eta) < 1.566 )
-	{
-
-
-		if (pt>20 && pt<30) SF = 1.2041;
-		if (pt>30 && pt<40) SF = 0.516369;
-		if (pt>40) SF = 0.695692;
-	}
-if (  fabs(eta) > 1.566 && fabs(eta) < 2.3 )
-	{
-
-
-		if (pt>20 && pt<30) SF = 0.932817;
-		if (pt>30 && pt<40) SF = 1.0093;
-		if (pt>40) SF = 0.871699;
-	}
-}//eltau MVA
-*/
-
-
-/*
-///mutau for 15invfb
-if ( sel =="mutau"){
-
-if (  fabs(eta) < 0.9 )
-        {
-                if (pt>20 && pt<30) SF = 1.17285;
-                if (pt>30 && pt<40) SF = 1.12899;
-                if (pt>40 ) SF = 1.19492;
-        }
-if (  fabs(eta) > 0.9 && fabs(eta) < 1.2 )
-        {
-
-                if (pt>20 && pt<30) SF = 1.11631;
-                if (pt>30 && pt<40) SF = 1.04866;
-                if (pt>40 ) SF = 1.36044;
-        }
-
-if (  fabs(eta) > 1.2 && fabs(eta) < 2.1 )
-        {
-
-                if (pt>20 && pt<30) SF = 1.08863;
-                if (pt>30 && pt<40) SF = 1.13749;
-                if (pt>40) SF = 1.21236;
-        }
-if (  fabs(eta) > 2.1 && fabs(eta) < 2.4 )
-        {
-
-                if (pt>20 && pt<30) SF = 0.986986;
-                if (pt>30 && pt<40) SF = 0.982437;
-                if (pt>40) SF = 0.995135;
-        }
-
-}//mutau MVA
-//////////////
-//
-
-
-if ( sel =="eltau"){
-
-if (  fabs(eta) < 0.8 )
-        {
-                if (pt>20 && pt<30) SF = 1.04111;
-                if (pt>30 && pt<50) SF = 1.34817;
-                if (pt>50 ) SF = 1.60973;
-        }
-if (  fabs(eta) > 0.8 && fabs(eta) < 1.44 )
-        {
-
-                if (pt>20 && pt<30) SF = 1.04158;
-                if (pt>30 && pt<50) SF = 1.56632;
-                if (pt>50 ) SF = 1.08038;
-        }
-
-if (  fabs(eta) > 1.44 && fabs(eta) < 1.566 )
-	{
-
-
-		if (pt>20 && pt<30) SF = 1.15617;
-		if (pt>30 && pt<50) SF = 1.30554;
-		if (pt>50) SF = 1.;
-	}
-if (  fabs(eta) > 1.566 && fabs(eta) < 2.1 )
-	{
-
-
-		if (pt>20 && pt<30) SF = 1.01365;
-		if (pt>30 && pt<50) SF = 1.00284;
-		if (pt>50) SF = 1.20248;
-	}
-}//eltau MVA
-
-*/
-
-/*
-//eltau from 15invfb
-if ( sel =="eltau"){
-
-        {
-                if (pt>20 && pt<30) SF = 1.08763;
-                if (pt>30 && pt<50) SF = 1.52724;
-                if (pt>50 ) SF = 1.70454;
-        }
-if (  fabs(eta) > 1.48 && fabs(eta) < 2.1 )
-        {
-
-                if (pt>20 && pt<30) SF = 1.05136;
-                if (pt>30 && pt<50) SF = 1.09525;
-                if (pt>50 ) SF = 1.29595;
-        }
-
-if (  fabs(eta) > 2.1 && fabs(eta) < 2.4 )
-	{
-
-
-		if (pt>20 && pt<30) SF = 0.752314;
-		if (pt>30 && pt<50) SF = 1.41862;
-		if (pt>50) SF = 1.26267;
-	}
-}//eltau MVA
-if ( sel =="eltau"){
-
-if (  fabs(eta) < 1.48 )
-        {
-                if (pt>20 && pt<30) SF = 1.08763;
-                if (pt>30 && pt<50) SF = 1.52724;
-                if (pt>50 ) SF = 1.70454;
-        }
-if (  fabs(eta) > 1.48 && fabs(eta) < 2.1 )
-        {
-
-                if (pt>20 && pt<30) SF = 1.05136;
-                if (pt>30 && pt<50) SF = 1.09525;
-                if (pt>50 ) SF = 1.29595;
-        }
-
-if (  fabs(eta) > 2.1 && fabs(eta) < 2.4 )
-	{
-
-
-		if (pt>20 && pt<30) SF = 0.752314;
-		if (pt>30 && pt<50) SF = 1.41862;
-		if (pt>50) SF = 1.26267;
-	}
-}//eltau MVA
-if ( sel =="eltau"){
-
-if (  fabs(eta) < 1.48 )
-        {
-                if (pt>20 && pt<30) SF = 1.08763;
-                if (pt>30 && pt<50) SF = 1.52724;
-                if (pt>50 ) SF = 1.70454;
-        }
-if (  fabs(eta) > 1.48 && fabs(eta) < 2.1 )
-        {
-
-                if (pt>20 && pt<30) SF = 1.05136;
-                if (pt>30 && pt<50) SF = 1.09525;
-                if (pt>50 ) SF = 1.29595;
-        }
-
-if (  fabs(eta) > 2.1 && fabs(eta) < 2.4 )
-	{
-
-
-		if (pt>20 && pt<30) SF = 0.752314;
-		if (pt>30 && pt<50) SF = 1.41862;
-		if (pt>50) SF = 1.26267;
-	}
-}//eltau MVA
-if ( sel =="eltau"){
-
-if (  fabs(eta) < 1.48 )
-        {
-                if (pt>20 && pt<30) SF = 1.08763;
-                if (pt>30 && pt<50) SF = 1.52724;
-                if (pt>50 ) SF = 1.70454;
-        }
-if (  fabs(eta) > 1.48 && fabs(eta) < 2.1 )
-        {
-
-                if (pt>20 && pt<30) SF = 1.05136;
-                if (pt>30 && pt<50) SF = 1.09525;
-                if (pt>50 ) SF = 1.29595;
-        }
-
-if (  fabs(eta) > 2.1 && fabs(eta) < 2.4 )
-	{
-
-
-		if (pt>20 && pt<30) SF = 0.752314;
-		if (pt>30 && pt<50) SF = 1.41862;
-		if (pt>50) SF = 1.26267;
-	}
-}//eltau MVA
-*/
 }
-
 
 
 
@@ -407,6 +224,28 @@ if (  fabs(eta) > 2.1 && fabs(eta) < 2.4 )
 return SF;
 
 }
+
+double MuonFakeRate(float pt, float eta){
+float muonfake = 1.;
+
+if (  fabs(eta) < 1.2 ) muonfake = 1.04;
+if (  fabs(eta) > 1.2 && fabs(eta) < 1.7 ) muonfake = 1.54;
+if (  fabs(eta) > 1.7 && fabs(eta) < 2.3 ) muonfake = 1.42;
+	
+return muonfake;
+}
+
+
+double ElectronFakeRate(float pt, float eta){
+float elefake = 1.;
+
+if (  fabs(eta) < 1.460 ) elefake = 1.80;
+if (  fabs(eta) > 1.460 ) elefake = 1.30;
+	
+return elefake;
+}
+
+
 
 double TauiD(string sel,string working_point){
 
@@ -743,6 +582,7 @@ TH1D *hMTlept1[CutN];
 TH1D *hMTlept2[CutN];
 TH1D *hdR_Dil[CutN];
 TH1D *hInvMassDil[CutN];
+TH1D *hInvMassDilFineBin[CutN];
 TH1D *hPtDil[CutN];
 TH1D *hDiJetMass_J0J1[CutN];
 
@@ -864,7 +704,7 @@ TH1D * tauEtaAllH = new TH1D("tauEtaAllH","",50,-2.5,2.5);
 TH1D * dileptonMassH = new TH1D("dileptonMassH","",10,0,200);
 TH1D * dileptonPtH = new TH1D("dileptonPtH","",10,0,200);
 TH1D * dileptonEtaH = new TH1D("dileptonEtaH","",100,-5,5);
-TH1D * dileptondRH = new TH1D("dileptondRH","",120,-6,6);
+TH1D * dileptondRH = new TH1D("dileptondRH","",60,0,6);
 TH1D * ETmissH = new TH1D("ETmissH","",10,0,200);
 TH1D * MtH = new TH1D("MtH_2l","",10,0,200);
 TH1D * DZetaH = new TH1D("DZetaH","",60,-400,200);
@@ -878,7 +718,7 @@ TH1D * muonEtaSelH = new TH1D("muonEtaSelH","",50,-2.5,2.5);
 TH1D * dileptonMassSelH = new TH1D("dileptonMassSelH","",10,0,200);
 TH1D * dileptonPtSelH = new TH1D("dileptonPtSelH","",10,0,200);
 TH1D * dileptonEtaSelH = new TH1D("dileptonEtaSelH","",100,-5,5);
-TH1D * dileptondRSelH = new TH1D("dileptondRSelH","",120,-6,6);
+TH1D * dileptondRSelH = new TH1D("dileptondRSelH","",60,0,6);
 TH1D * ETmissSelH = new TH1D("ETmissSelH","",10,0,200);
 TH1D * MtSelH = new TH1D("MtSelH_2l","",10,0,200);
 TH1D * DZetaSelH = new TH1D("DZetaSelH","",60,-400,200);
@@ -1127,7 +967,7 @@ for(int cj = 0; cj < CutNer; cj++)
 
       //h0JetpT[cj] = new TH1D ("0JetpT_"+nCut,"0JetpT "+cutName,80,0.0,800.0);
       //h0JetpT[cj]->Sumw2();
-      hnJet[cj] = new TH1D ("nJet_"+nCut,"nJet "+cutName,25,-0.5,24.5);
+      hnJet[cj] = new TH1D ("nJet_"+nCut,"nJet "+cutName, 25,-0.5,24.5);
       hnJet[cj]->Sumw2();
       hnpartons[cj] = new TH1D ("npartons_"+nCut,"npartons "+cutName,6,-0.5,5.5);
       hnpartons[cj]->Sumw2();
@@ -1155,6 +995,8 @@ for(int cj = 0; cj < CutNer; cj++)
       hInvMassTauTau[cj]->Sumw2();
       hInvMassDil[cj] = new TH1D ("hInvMassDil_"+nCut,"hInvMassDil "+cutName,50,0,500);
       hInvMassDil[cj]->Sumw2();
+      hInvMassDilFineBin[cj] = new TH1D ("hInvMassDilFineBin_"+nCut,"hInvMassDilFineBin "+cutName,250,0,500);
+      hInvMassDilFineBin[cj]->Sumw2();
       hDiJetMass_J0J1[cj] = new TH1D ("hDiJetMass_J0J1_"+nCut,"hDiJetMass_J0J1 "+cutName,50,0,500);
       hDiJetMass_J0J1[cj]->Sumw2();
         
@@ -1412,21 +1254,21 @@ TH1D *hdEtaTauMET[CutN];
       hMCTbeltau[cj]->Sumw2();
 
  
-      hdR_eltau[cj]= new TH1D ("dR_eltau_"+nCut,"dR_eltau "+cutName,120,-6,6);;
+      hdR_eltau[cj]= new TH1D ("dR_eltau_"+nCut,"dR_eltau "+cutName,60,0,6);;
       hdR_eltau[cj]->Sumw2();
         
-      hdR_mutau[cj]= new TH1D ("dR_mutau_"+nCut,"dR_mutau "+cutName,120,-6,6);;
+      hdR_mutau[cj]= new TH1D ("dR_mutau_"+nCut,"dR_mutau "+cutName,60,0,6);;
       hdR_mutau[cj]->Sumw2();
 
-      hdR_taujet[cj]= new TH1D ("dR_taujet_"+nCut,"dR_taujet "+cutName,120,-6,6);;
+      hdR_taujet[cj]= new TH1D ("dR_taujet_"+nCut,"dR_taujet "+cutName,60,0,6);;
       hdR_taujet[cj]->Sumw2();
 
-      hdR_tautau[cj]= new TH1D ("dR_tautau_"+nCut,"dR_tautau "+cutName,120,-6,6);;
+      hdR_tautau[cj]= new TH1D ("dR_tautau_"+nCut,"dR_tautau "+cutName,60,0,6);;
       hdR_tautau[cj]->Sumw2();
 	
-      hdR_muel[cj]= new TH1D ("dR_muel_"+nCut,"dR_muel "+cutName,120,-6,6);;
+      hdR_muel[cj]= new TH1D ("dR_muel_"+nCut,"dR_muel "+cutName,60,0,6);;
       hdR_muel[cj]->Sumw2();
-      hdR_Dil[cj]= new TH1D ("dR_Dil_"+nCut,"dR_Dil "+cutName,120,-6,6);;
+      hdR_Dil[cj]= new TH1D ("dR_Dil_"+nCut,"dR_Dil "+cutName,60,0,6);;
       hdR_Dil[cj]->Sumw2();
 
       hnpv[cj]= new TH1D ("npv_"+nCut,"npv "+cutName,100,-0.5,99.5);;

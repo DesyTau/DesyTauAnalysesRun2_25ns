@@ -193,6 +193,8 @@ class analyzer {
 		Float_t 	genLeptonMatched;
 		Float_t 	genLeptonMatchedEl;
 		Float_t 	genLeptonMatchedMu;
+		Float_t 	genTauDecayedMuMatched;
+		Float_t 	genTauDecayedElMatched;
    		Float_t	   qcdweight;
 		Float_t	   qcdweightup;
    		Float_t	   qcdweightdown;
@@ -332,6 +334,8 @@ class analyzer {
 		TBranch        *b_genLeptonMatched;   //!
 		TBranch        *b_genLeptonMatchedEl;   //!
 		TBranch        *b_genLeptonMatchedMu;   //!
+		TBranch        *b_genTauDecayedMuMatched;   //!
+		TBranch        *b_genTauDecayedElMatched;   //!
 		TBranch        *b_qcdweight;   //!
 		TBranch        *b_qcdweightup;   //!
 		TBranch        *b_qcdweightdown;   //!
@@ -1222,6 +1226,7 @@ class analyzer {
 				float MT = TMath::Sqrt(2*DiL.Pt()*MetV.Pt()*(1-TMath::Cos(dPhi)));
 				hMTDil[CutIndex]->Fill(MT,EvWeight);
 				hInvMassDil[CutIndex]->Fill(DiL.M(),EvWeight);
+				hInvMassDilFineBin[CutIndex]->Fill(DiL.M(),EvWeight);
 				hdR_Dil[CutIndex]->Fill(Dr,EvWeight);
 				hPtDil[CutIndex]->Fill(DiL.Pt(),EvWeight);
 
@@ -1643,7 +1648,8 @@ class analyzer {
 			fChain->SetBranchAddress("genLeptonMatched", &genLeptonMatched, &b_genLeptonMatched);
 			fChain->SetBranchAddress("genLeptonMatchedEl", &genLeptonMatchedEl, &b_genLeptonMatchedEl);
 			fChain->SetBranchAddress("genLeptonMatchedMu", &genLeptonMatchedMu, &b_genLeptonMatchedMu);
-
+			fChain->SetBranchAddress("genTauDecayedMuMatched", &genTauDecayedMuMatched, &b_genTauDecayedMuMatched);
+			fChain->SetBranchAddress("genTauDecayedElMatched", &genTauDecayedElMatched, &b_genTauDecayedElMatched);
 			
    			fChain->SetBranchAddress("qcdweight", &qcdweight, &b_qcdweight);
 			fChain->SetBranchAddress("qcdweightup", &qcdweightup, &b_qcdweightup);

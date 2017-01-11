@@ -209,8 +209,6 @@ int main(int argc, char * argv[]) {
   const double leadchargedhadrcand_dz = cfg.get<double>("leadchargedhadrcand_dz");
   const double leadchargedhadrcand_dxy = cfg.get<double>("leadchargedhadrcand_dxy");
 
-
-
   // kinematic cuts on Jets
   const double etaJetCut   = cfg.get<double>("etaJetCut");
   const double ptJetCut   = cfg.get<double>("ptJetCut");
@@ -219,22 +217,16 @@ int main(int argc, char * argv[]) {
   const double dRleptonsCutmutau   = cfg.get<double>("dRleptonsCutmutau");
   const double deltaRTrigMatch = cfg.get<double>("DRTrigMatch");
   const bool isIsoR03 = cfg.get<bool>("IsIsoR03");
+
   const string TrigLeg  = cfg.get<string>("SingleMuonFilterName") ;
   const double SingleMuonTriggerPtCut = cfg.get<double>("SingleMuonTriggerPtCut");
-
-  const string TrigLegIsoMu24  = cfg.get<string>("SingleMuonFilterNameIsoMu24") ;
-  const double SingleMuonTriggerPtCutIsoMu24 = cfg.get<double>("SingleMuonTriggerPtCutIsoMu24");
-
-
-  // vertex distributions filenames and histname
-
 
   const string jsonFile = cfg.get<string>("jsonFile");
 
   string cmsswBase = (getenv ("CMSSW_BASE"));
   string fullPathToJsonFile = cmsswBase + "/src/DesyTauAnalyses/NTupleMaker/test/json/" + jsonFile;
  
-  RecoilCorrector recoilMetCorrector("HTT-utilities/RecoilCorrections/data/TypeIPFMET_2016BCD.root");
+  RecoilCorrector recoilMetCorrector("DesyTauAnalyses/NTupleMaker/data/PFMET_Run2016BCDEFGH_Spring16.root");
 
   MEtSys metSys("HTT-utilities/RecoilCorrections/data/MEtSys.root");
 
@@ -258,7 +250,6 @@ int main(int argc, char * argv[]) {
     }
   }
   TString MainTrigger(TrigLeg);
-  TString MainTriggerIsoMu24(TrigLegIsoMu24);
 
 
   const double bTag   = cfg.get<double>("bTag");
@@ -1213,7 +1204,6 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       bool trigAccept = false;
 
       unsigned int nMainTrigger = 0;
-      unsigned int nMainTriggerIsoMu24 = 0;
       bool isMainTrigger = false;
 
 
@@ -1227,8 +1217,8 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 //	  nMainTrigger = i;
 //	  isMainTrigger = true;
 //	}
-	if (HLTFilter==MainTriggerIsoMu24) {
-	  nMainTriggerIsoMu24 = i;
+	if (HLTFilter==MainTrigger) {
+	  nMainTrigger = i;
 	  isMainTrigger = true;
 	}
 
@@ -1249,7 +1239,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
       vector<int> muons; muons.clear();
       for (unsigned int im = 0; im<analysisTree.muon_count; ++im) {
-	if (analysisTree.muon_pt[im]<SingleMuonTriggerPtCutIsoMu24) continue;
+	if (analysisTree.muon_pt[im]<SingleMuonTriggerPtCut) continue;
 	if (fabs(analysisTree.muon_eta[im])>etaMuonCut) continue;
 	if (fabs(analysisTree.muon_dxy[im])>dxyMuonCut) continue;
 	if (fabs(analysisTree.muon_dz[im])>dzMuonCut) continue;
@@ -1329,9 +1319,9 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
 	if (isData)
 	{	for (unsigned int iT=0; iT<analysisTree.trigobject_count; ++iT) {
-	  	if (analysisTree.trigobject_filters[iT][nMainTriggerIsoMu24]
-	      	&& analysisTree.muon_pt[mIndex]>SingleMuonTriggerPtCutIsoMu24 &&
-	      	analysisTree.trigobject_pt[iT]>SingleMuonTriggerPtCutIsoMu24) { // IsoMu Leg
+	  	if (analysisTree.trigobject_filters[iT][nMainTrigger]
+	      	&& analysisTree.muon_pt[mIndex]>SingleMuonTriggerPtCut &&
+	      	analysisTree.trigobject_pt[iT]>SingleMuonTriggerPtCut) { // IsoMu Leg
 	    	float dRtrig = deltaR(analysisTree.muon_eta[mIndex],analysisTree.muon_phi[mIndex],
 				  analysisTree.trigobject_eta[iT],analysisTree.trigobject_phi[iT]);
 	    	if (dRtrig<deltaRTrigMatch){
@@ -1344,7 +1334,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	}
 
 
-        if (!isData && analysisTree.muon_pt[mIndex]>SingleMuonTriggerPtCutIsoMu24) isLegMatch = true;
+        if (!isData && analysisTree.muon_pt[mIndex]>SingleMuonTriggerPtCut) isLegMatch = true;
 
 	if (!isLegMatch) continue;
 
