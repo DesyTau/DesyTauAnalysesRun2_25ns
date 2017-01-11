@@ -10,8 +10,6 @@
 #include <DataFormats/RecoCandidate/interface/IsoDepositVetos.h>
 #include <DataFormats/METReco/interface/GenMET.h>
 #include <DataFormats/HLTReco/interface/TriggerTypeDefs.h>
-//#include "AnalysisDataFormats/TauAnalysis/interface/PFMEtSignCovMatrix.h"
-//#include "DataFormats/METReco/interface/PFMEtSignCovMatrix.h"
 #include "RecoBTag/BTagTools/interface/SignedImpactParameter3D.h"
 #include <DataFormats/TrackReco/interface/Track.h>
 
@@ -169,10 +167,6 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
   TauCollectionToken_(consumes<pat::TauCollection>(iConfig.getParameter<edm::InputTag>("TauCollectionTag"))),
   JetCollectionToken_(consumes<pat::JetCollection>(iConfig.getParameter<edm::InputTag>("JetCollectionTag"))),
   MetCollectionToken_(consumes<pat::METCollection>(iConfig.getParameter<edm::InputTag>("MetCollectionTag"))),
-  MetCovMatrixToken_(consumes<CovMatrix2D>(iConfig.getParameter<edm::InputTag>("MetCovMatrixTag"))),
-  MetSigToken_(consumes<double>(iConfig.getParameter<edm::InputTag>("MetSigTag"))),
-  MetCorrCovMatrixToken_(consumes<CovMatrix2D>(iConfig.getParameter<edm::InputTag>("MetCorrCovMatrixTag"))),
-  MetCorrSigToken_(consumes<double>(iConfig.getParameter<edm::InputTag>("MetCorrSigTag"))),  
   MetCorrCollectionToken_(consumes<pat::METCollection>(iConfig.getParameter<edm::InputTag>("MetCorrCollectionTag"))),
   PuppiMetCollectionToken_(consumes<pat::METCollection>(iConfig.getParameter<edm::InputTag>("PuppiMetCollectionTag"))),
   MvaMetCollectionsTag_(iConfig.getParameter<std::vector<edm::InputTag> >("MvaMetCollectionsTag")),
@@ -1746,23 +1740,11 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       pfmet_pt = (*patMet)[0].pt();
       pfmet_phi = (*patMet)[0].phi();
 
-      // if (cSkim>0) {
-      // 	float pfmet_et = sqrt(pfmet_ex*pfmet_ex+pfmet_ey*pfmet_ey);
-      // 	if (pfmet_et<100.) return;
-      // 	// else cout << "  PFMet = " << pfmet_et << std::endl;
-      // }
-      
-      edm::Handle<CovMatrix2D> metcov;
-      iEvent.getByToken( MetCovMatrixToken_, metcov);
-      pfmet_sigxx = (*metcov)(0,0);
-      pfmet_sigxy = (*metcov)(0,1);
-      pfmet_sigyx = (*metcov)(1,0);
-      pfmet_sigyy = (*metcov)(1,1);
-
-      edm::Handle<double> metsig;
-      iEvent.getByToken( MetSigToken_, metsig);
-      assert(metsig.isValid());
-      pfmet_sig = *metsig;
+      pfmet_sigxx = (*patMet)[0].getSignificanceMatrix()(0,0);
+      pfmet_sigxy = (*patMet)[0].getSignificanceMatrix()(0,1);
+      pfmet_sigyx = (*patMet)[0].getSignificanceMatrix()(1,0);
+      pfmet_sigyy = (*patMet)[0].getSignificanceMatrix()(1,1);
+      pfmet_sig   = (*patMet)[0].significance();
       
       pfmet_ex_JetEnUp = (*patMet)[0].shiftedPx(pat::MET::METUncertainty::JetEnUp,pat::MET::METCorrectionLevel::Type1);
       pfmet_ey_JetEnUp = (*patMet)[0].shiftedPy(pat::MET::METUncertainty::JetEnUp,pat::MET::METCorrectionLevel::Type1);
@@ -1796,22 +1778,11 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       pfmetcorr_pt = (*patMet)[0].pt();
       pfmetcorr_phi = (*patMet)[0].phi();
       
-      edm::Handle<CovMatrix2D> metcov;
-      iEvent.getByToken( MetCorrCovMatrixToken_, metcov);
-      pfmetcorr_sigxx = (*metcov)(0,0);
-      pfmetcorr_sigxy = (*metcov)(0,1);
-      pfmetcorr_sigyx = (*metcov)(1,0);
-      pfmetcorr_sigyy = (*metcov)(1,1);
-
-      edm::Handle<double> metsig;
-      iEvent.getByToken( MetCorrSigToken_, metsig);
-      assert(metsig.isValid());
-      pfmetcorr_sig = *metsig;
-
-      /*pfmetcorr_sigxx = (*patMet)[0].getSignificanceMatrix()(0,0);
+      pfmetcorr_sigxx = (*patMet)[0].getSignificanceMatrix()(0,0);
       pfmetcorr_sigxy = (*patMet)[0].getSignificanceMatrix()(0,1);
       pfmetcorr_sigyx = (*patMet)[0].getSignificanceMatrix()(1,0);
-      pfmetcorr_sigyy = (*patMet)[0].getSignificanceMatrix()(1,1);*/
+      pfmetcorr_sigyy = (*patMet)[0].getSignificanceMatrix()(1,1);
+      pfmetcorr_sig   = (*patMet)[0].significance();
       
       pfmetcorr_ex_JetEnUp = (*patMet)[0].shiftedPx(pat::MET::METUncertainty::JetEnUp,pat::MET::METCorrectionLevel::Type1);
       pfmetcorr_ey_JetEnUp = (*patMet)[0].shiftedPy(pat::MET::METUncertainty::JetEnUp,pat::MET::METCorrectionLevel::Type1);
