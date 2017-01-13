@@ -1131,9 +1131,44 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       }
 
 
-      event_thirdLeptonVeto = foundExtraElectron;
+      // looking for extra muon
+      bool foundExtraMuon = false;
+      for (unsigned int im = 0; im<analysisTree.muon_count; ++im) {
+	if (int(im)==(int)mu_index_1) continue;
+	if (int(im)==(int)mu_index_2) continue;
+	if (analysisTree.muon_pt[im]<ptVetoMuonCut) continue;
+	if (fabs(analysisTree.muon_eta[im])>etaVetoMuonCut) continue;
+	if (fabs(analysisTree.muon_dxy[im])>dxyVetoMuonCut) continue;
+	if (fabs(analysisTree.muon_dz[im])>dzVetoMuonCut) continue;
+	if (applyVetoMuonId && !analysisTree.muon_isMedium[im]) continue;
+	float neutralHadIsoMu = analysisTree.muon_neutralHadIso[im];
+	float photonIsoMu = analysisTree.muon_photonIso[im];
+	float chargedHadIsoMu = analysisTree.muon_chargedHadIso[im];
+	float puIsoMu = analysisTree.muon_puIso[im];
+	if (isIsoR03) {
+	  neutralHadIsoMu = analysisTree.muon_r04_sumNeutralHadronEt[im];
+	  photonIsoMu = analysisTree.muon_r04_sumPhotonEt[im];
+	  chargedHadIsoMu = analysisTree.muon_r04_sumChargedHadronPt[im];
+	  puIsoMu = analysisTree.muon_r04_sumPUPt[im];
+	}
+	float neutralIsoMu = neutralHadIsoMu + photonIsoMu - 0.5*puIsoMu;
+	neutralIsoMu = TMath::Max(float(0),neutralIsoMu); 
+	float absIsoMu = chargedHadIsoMu + neutralIsoMu;
+	float relIsoMu = absIsoMu/analysisTree.muon_pt[im];
+	if (relIsoMu>isoVetoMuonCut) continue;
+	foundExtraMuon = true;
+      }
 
-      if (event_thirdLeptonVeto) continue;
+
+      extraelec_veto = foundExtraElectron;
+      extramuon_veto = foundExtraMuon;
+
+
+      // applying inclusive selection
+	
+	if(extraelec_veto || extramuon_veto)   event_thirdLeptonVeto = true;
+
+	if (event_thirdLeptonVeto) continue;
 
 
       if (isIsoMuonsPair) {      
