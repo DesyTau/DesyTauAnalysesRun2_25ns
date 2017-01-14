@@ -88,7 +88,7 @@ void analyzer::Loop(){
 	//CutList.push_back("PtMuonOHT gt 2");
 	//CutList.push_back("HTOsrtMET lt 10");
 */
-	//ChiMass = CHIMASSS;
+	//ChiMass = 25;
 	ChiMass = 0.;
 	//cout<<" THE MASS IS ========================= "<<ChiMass<<endl;
 
@@ -130,9 +130,9 @@ void analyzer::Loop(){
 	if (isSignal) cout<<" YOU HAVE FOUND ITTTTTTTTT "<<endl;
 	if (isData) cout<<" YOU HAVE FOUND a DATA "<<endl;
 
-	string channel = "CHANNELHERE";
+	string channel = "Î";
 
-	TFile * filein = new TFile("/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/CMSSW_8_0_12/src/DesyTauAnalyses/NTupleMaker/test/CHANNELHERE/FILEIN","read");
+	TFile * filein = new TFile("/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/CMSSW_8_0_12/src/DesyTauAnalyses/NTupleMaker/test/Î/FILEIN","read");
 
 	TH1D * histW = (TH1D*)filein->Get("mutau/histWeightsH");
 	TH1D * hxsecW = (TH1D*)filein->Get("mutau/xsec");

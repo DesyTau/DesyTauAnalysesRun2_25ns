@@ -53,8 +53,6 @@ void analyzer::Loop(){
 	CutList.push_back("Trigger SF");
 	CutList.push_back("Lepton SF");
 	CutList.push_back("topPtRwgt");
-	CutList.push_back("TTJets norm");
-	CutList.push_back("WJets norm");
 	CutList.push_back("MET recoil");
 	CutList.push_back("ZpT correction");
 	CutList.push_back("Jets gt 1");
@@ -66,7 +64,7 @@ void analyzer::Loop(){
 
 
 
-	//ChiMass = CHIMASSS;
+	//ChiMass = 25;
 	ChiMass = 0.;
 	//cout<<" THE MASS IS ========================= "<<ChiMass<<endl;
 	 int CutNumb = int(CutList.size());
@@ -139,7 +137,7 @@ void analyzer::Loop(){
 	if (isSignal) cout<<" YOU HAVE FOUND ITTTTTTTTT "<<endl;
 	if (isData) cout<<" YOU HAVE FOUND a DATA "<<endl;
 
-	string channel = "CHANNELHERE";
+	string channel = "Î";
 
 	TString inputRootFile = "/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/CMSSW_8_0_20/src/DesyTauAnalyses/NTupleMaker/data/HIP_mediumID.root";
 	TFile * fileInHIP = new TFile(inputRootFile, "read");
@@ -364,19 +362,6 @@ bool El0p1Mu0p15 = true;
 
 			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		//TT norm     	
-		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
-		CFCounter[iCut]+= all_weights;
-		CFCounter_[iCut]+= all_weights;
-                iCFCounter[iCut]++;
-		iCut++;
-
-		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
-		CFCounter[iCut]+= all_weights;
-		CFCounter_[iCut]+= all_weights;
-                iCFCounter[iCut]++;
-		iCut++;
-
 
 
 		if (isWJ || isDY || isDYNJ || isWNJ) {

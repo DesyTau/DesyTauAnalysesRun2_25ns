@@ -86,7 +86,7 @@ void analyzer::Loop(){
 	CutList.push_back("HTOsrtMET lt 10");
 	CutList.push_back("MCTb lt 20");
 	CutList.push_back("MET gt 50");
-	//ChiMass = CHIMASSS;
+	//ChiMass = 25;
 	ChiMass = 0.;
 	//cout<<" THE MASS IS ========================= "<<ChiMass<<endl;
 

@@ -53,7 +53,6 @@ int main(int argc, char * argv[]) {
   const double dxyMuonCut     = cfg.get<double>("dxyMuonCut");
   const double dzMuonCut      = cfg.get<double>("dzMuonCut");
   const double isoMuonHighCut = cfg.get<double>("isoMuonHighCutmuel");
-  const bool applyMuonId     = cfg.get<bool>("ApplyMuonId");
 
   // kinematic cuts on electrons
   const float ptElectronLowCut   = cfg.get<float>("ptElectronLowCutmuel");
@@ -429,8 +428,6 @@ if (string::npos != rootFileName.find("SMS-TChiStauStau"))
   SetupTree(); 
   SetupHists(CutNumb); 
   if (argv[4] != NULL  && atoi(argv[4])< nTotalFiles) nTotalFiles=atoi(argv[4]);
-  //if (nTotalFiles>50) nTotalFiles=50;
-  //nTotalFiles = 10;
  
 for (int iF=0; iF<nTotalFiles; ++iF) {
 
@@ -524,8 +521,6 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       }
 
 
-
-
     for (Long64_t iEntry=0; iEntry<numberOfEntries; ++iEntry) { 
 
 
@@ -580,7 +575,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       bool isZEE = false;
       bool isTOP = false;
       if (!isData &&  string::npos != filen.find("JetsToLNu") ) isW=true;
-      if (!isData &&  string::npos != filen.find("DYJets") ) isDY=true;
+      if (!isData &&  string::npos != filen.find("JetsToLL_M") ) isDY=true;
       if (!isData &&  string::npos != filen.find("TT_TuneCUETP8M1_13TeV-powheg-pythia8") ) isTOP=true;
 
       float nuPx = 0;
@@ -957,15 +952,11 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
       if (!isData) 
 	{
-	  if (applyPUreweighting)	 {
 	    puweight = float(PUofficial->get_PUweight(double(analysisTree.numtruepileupinteractions)));
 	//	puweight = float(PUofficial->get_PUweight(double(analysisTree.primvertex_count)));
 	    weight *=puweight; 
 	    pu_weight = puweight;
-	  }
 	}
-
-
 
 
       bool trigAccept = false;
@@ -1081,12 +1072,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	if (fabs(analysisTree.muon_eta[im])>etaMuonCut) continue;
 	if (fabs(analysisTree.muon_dxy[im])>dxyMuonCut) continue;
 	if (fabs(analysisTree.muon_dz[im])>dzMuonCut) continue;
-	if (applyMuonId && !analysisTree.muon_isMedium[im]) continue;
-	//if (applyMuonId && !analysisTree.muon_isICHEP[im]) continue;
-	//if (!isData && applyMuonId && iEntry%2!=0 && !analysisTree.muon_isMedium[im]) continue;
-	//if (!isData && applyMuonId && iEntry%2==0 && !analysisTree.muon_isICHEP[im]) continue;
-	//if (isData && applyMuonId && RunBCDEF && !RunGH && !analysisTree.muon_isICHEP[im]) continue;
-	//if (isData && applyMuonId && !RunBCDEF && RunGH && !analysisTree.muon_isMedium[im]) continue;
+	if (!analysisTree.muon_isMedium[im]) continue;
 	muons.push_back(im);
       }
 
@@ -1530,8 +1516,6 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
       float jetEta = 2.4;
       float DRmax = 0.5;
-      bool dRmuJet = false;
-      bool dRtauJet = false;
       float bJetEtaCut = jetEta;
 
       vector<unsigned int> jets; jets.clear();
