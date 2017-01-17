@@ -908,7 +908,6 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	}
 
 
-
       bool trigAccept = false;
 
       unsigned int nMainTrigger = 0;
@@ -1260,7 +1259,7 @@ if (!CutBasedTauId){
 	if (fabs(analysisTree.muon_eta[im])>etaVetoMuonCut) continue;
 	if (fabs(analysisTree.muon_dxy[im])>dxyVetoMuonCut) continue;
 	if (fabs(analysisTree.muon_dz[im])>dzVetoMuonCut) continue;
-	if (!isData && applyVetoMuonId && !analysisTree.muon_isMedium[im]) continue;
+	if (applyVetoMuonId && !analysisTree.muon_isMedium[im]) continue;
 	if (relIsoMu>isoVetoMuonCut) continue;
 	foundExtraMuon = true;
       }
@@ -1316,8 +1315,6 @@ if (!CutBasedTauId){
       
       if (!isData) { 
 	      
-	//EffFromDataA = (float)SF_muonTriggerBCDEF->get_EfficiencyData(double(ptMu1),double(etaMu1));
-	//EffFromDataB = (float)SF_muonTriggerGH->get_EfficiencyData(double(ptMu1),double(etaMu1));
 	EffFromData = (float)SF_muonTrigger->get_EfficiencyData(double(ptMu1),double(etaMu1));
 
 
@@ -1334,7 +1331,6 @@ if (!CutBasedTauId){
 	trig_weight = trigweight;
 	//	cout<<" Trigger weight "<<trigweight<<endl;
       }*/
-	//if (!isData) trigweight = EffFromDataA * LumiA/Lumi + EffFromDataB * LumiB/Lumi;
       trigweight = EffFromData;
       weight *= trigweight;
       trig_weight = trigweight;
@@ -1343,12 +1339,8 @@ if (!CutBasedTauId){
 	///LSF 
 
 	//leptonSFweight = SF_yourScaleFactor->get_ScaleFactor(pt, eta)	
-	float IdIsoSF_mu = 1;
-	float IdIsoSF_mu1 = 1;
-	float IdIsoSF_mu2 = 1;
+	double IdIsoSF_mu = 1;
 		
-	//if (iEntry%2==0) IdIsoSF_mu1=  SF_muonIdIsoBCDEF->get_ScaleFactor(ptMu1, etaMu1);
-	//if (iEntry%2!=0) IdIsoSF_mu1 = SF_muonIdIsoGH->get_ScaleFactor(ptMu1, etaMu1);
 	 IdIsoSF_mu =  SF_muonIdIso->get_ScaleFactor(ptMu1, etaMu1);
 	 //IdIsoSF_mu1 =  SF_muonIdIsoBCDEF->get_ScaleFactor(ptMu1, etaMu1);
 	 //IdIsoSF_mu2 = SF_muonIdIsoGH->get_ScaleFactor(ptMu1, etaMu1);
@@ -1356,7 +1348,7 @@ if (!CutBasedTauId){
 	//LSF_weight = IdIsoSF_mu1 * LumiA/Lumi + IdIsoSF_mu2 * LumiB/Lumi;
 	LSF_weight = IdIsoSF_mu;
 
-	MuSF_IdIso_Mu1H->Fill(IdIsoSF_mu1);
+	MuSF_IdIso_Mu1H->Fill(IdIsoSF_mu);
 	weight *= LSF_weight;
       }
 
@@ -1658,6 +1650,7 @@ if (!CutBasedTauId){
 
       int njetsforrecoil = njets;
       if (isW) njetsforrecoil = njets + 1;
+
 ////while using old MC ntuples, need to use proper MET collection
       float pfmet_corr_x = 1.;
       float pfmet_corr_y = 1.;
@@ -1773,7 +1766,6 @@ if (!CutBasedTauId){
       T->Fill();
 	
       selEvents++;
-      continue;
       /////////////////////////////////////////////////
 
 

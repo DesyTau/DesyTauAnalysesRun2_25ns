@@ -385,11 +385,8 @@ if(muon_index_2>-1 )			LeptV2.SetPtEtaPhiM(mu_pt[muon_index_2], mu_eta[muon_inde
 		iCut++;
 
 
-	//	 TLorentzVector DiJet = JetsMV.at(0) + JetsMV.at(1)  ;
 		 TLorentzVector DiL = LeptV1 + LeptV2  ;
 
-//		double dEta = JetsMV.at(0).Eta() - JetsMV.at(1).Eta();
-//		if (fabs(dEta)>4.) continue;
 		if (DiL.M()>105) continue;
 		if (DiL.M()<75) continue;
 		FillHistsDiL(iCut, all_weights, LeptV2, LeptV1, JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index_1,muon_index_2);
@@ -397,6 +394,8 @@ if(muon_index_2>-1 )			LeptV2.SetPtEtaPhiM(mu_pt[muon_index_2], mu_eta[muon_inde
 		CFCounter_[iCut]+= all_weights;
                 iCFCounter[iCut]++;
 		iCut++;
+
+
 
 		if (LeptV1.Pt()<30 || LeptV2.Pt()<30) continue;
 		FillHistsDiL(iCut, all_weights, LeptV2, LeptV1, JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index_1,muon_index_2);

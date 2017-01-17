@@ -72,7 +72,7 @@ void analyzer::Loop(){
 	CutList.push_back("MET gt 30");
 	CutList.push_back("MET gt 40");
 
-	//ChiMass = CHIMASSS;
+	//ChiMass = 0;
 	ChiMass = 0.;
 	//cout<<" THE MASS IS ========================= "<<ChiMass<<endl;
 	 int CutNumb = int(CutList.size());
@@ -189,6 +189,8 @@ TH2D *histo = (TH2D*) obj;
 
 	Long64_t nbytes = 0, nb = 0;
 
+
+		float all_weights2 = 0.;
 
 	for (Long64_t jentry=0; jentry<nentries;jentry++) {
 		Long64_t ientry = LoadTree(jentry);
@@ -368,7 +370,7 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
 
 		string WP = "MVA";
 		double tfr  = TauFakeRate(ptTau1,etaTau1,channel,WP);
-		if (genTauMatched<0.5 && genLeptonMatched < 0.5 && genTauDecayedMuMatched <0.5 && !isData) all_weights *= tfr;
+		if (genTauMatched<0.5 && genLeptonMatched < 0.5 && genTauDecayedElMatched <0.5 && !isData) all_weights *= tfr;
 		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
 		CFCounter[iCut]+= all_weights;
 		CFCounter_[iCut]+= all_weights;
@@ -378,7 +380,8 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
 		//reco tau to matched genmu but not matched tau which is decayed hadronically or electron
 
 		double tfrmu  = MuonFakeRate(ptMu1,etaMu1);
-		if (genTauMatched<0.5 && genLeptonMatchedMu > 0.5 && genTauDecayedMuMatched < 0.5 && !isData) all_weights *= tfrmu;
+	//	if (genTauMatched<0.5 && genLeptonMatchedMu > 0.5 && genTauDecayedMuMatched < 0.5 && !isData) all_weights *= tfrmu;
+		if ( (genLeptonMatched > 0.5 || genTauDecayedMuMatched > 0.5) && !isData) all_weights *= tfrmu;
 		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
 		CFCounter[iCut]+= all_weights;
 		CFCounter_[iCut]+= all_weights;
@@ -471,6 +474,10 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
                 iCFCounter[iCut]++;
 		iCut++;
 
+	//cout<<pu_weight<<"  "<<gen_weight<<"  "<<LSF_weight<<"  "<<trig_weight<<"  "<<tfrmu<<"  "<<tfr<<"  "<<zptmassweight<<endl;
+
+		all_weights2 +=all_weights;
+
 		if (fabs(dEtaJTau)>3.) continue;
 		if (JetsMV.size()>0 && Dr2>4.) continue;
 		//if (JetsMV.size()>0 && JetsMV.at(0).Pt()>200) continue; 
@@ -514,13 +521,14 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
 		CFCounter_[iCut]+= all_weights;
                 iCFCounter[iCut]++;
 		iCut++;
-
+	
 		
-
+	
+	//	cout<<" at the end  " <<jentry<<" events from "<<nentries<<" dataset "<<datasetName->c_str()<<" weight "<<all_weights<<"  "<<all_weights2<< endl;
 	
   }
 
-
+	cout<<" Checking "<<all_weights2<<"  "<<CFCounter[16]<<endl;
 
 	float Lumi = 36600.;
 

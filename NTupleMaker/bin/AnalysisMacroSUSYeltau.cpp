@@ -1398,14 +1398,13 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
 
       ///////////////////////////////////////////////////////////
-      //////////////////////////////////////////////
       muon_index = (int)mu_index;
       electron_index = (int)el_index;
       taus_index = (int)tau_index;
 
       mu_count= (int)analysisTree.muon_count;
       //cout<<" here ============================> "<<iEntry<<"  "<<mu_count<<"  "<<(int)analysisTree.muon_count<<"  "<<analysisTree.muon_count<<endl;
-      for (unsigned int im=0;im<analysisTree.muon_count;im++){
+      for (unsigned int im=0;im<analysisTree.muon_count; ++im){
 	mu_px[im]=analysisTree.muon_px[im];
 	mu_py[im]=analysisTree.muon_py[im];
 	mu_pz[im]=analysisTree.muon_pz[im];
@@ -1415,6 +1414,8 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	mu_charge[im]=analysisTree.muon_charge[im];
 	mu_dxy[im]=analysisTree.muon_dxy[im];
 	mu_dz[im]=analysisTree.muon_dz[im];
+	mu_dxyerr[im]=analysisTree.muon_dxyerr[im];
+	mu_dzerr[im]=analysisTree.muon_dzerr[im];
 
         mu_neutralHadIso[im] = analysisTree.muon_r04_sumNeutralHadronEt[im];
         mu_photonIso[im] = analysisTree.muon_r04_sumPhotonEt[im];
@@ -1427,13 +1428,12 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
         mu_absIsoMu[im] = mu_chargedHadIso[im] + neutralIso;
 	mu_relIsoMu[im]  = mu_absIsoMu[im]/mu_pt[im] ;
    
+     	}
 
 
-      }
-				
 
       el_count=(int)analysisTree.electron_count;
-      for (unsigned int ie=0;ie<analysisTree.electron_count;ie++){
+      for (unsigned int ie=0;ie<analysisTree.electron_count; ++ie){
 	el_px[ie]=analysisTree.electron_px[ie];
 	el_py[ie]=analysisTree.electron_py[ie];
 	el_pz[ie]=analysisTree.electron_pz[ie];
@@ -1443,6 +1443,8 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	el_charge[ie]=analysisTree.electron_charge[ie];
 	el_dxy[ie]=analysisTree.electron_dxy[ie];
 	el_dz[ie]=analysisTree.electron_dz[ie];
+	el_dxyerr[ie]=analysisTree.electron_dxyerr[ie];
+	el_dzerr[ie]=analysisTree.electron_dzerr[ie];
 
         el_neutralHadIso[ie] = analysisTree.electron_r03_sumNeutralHadronEt[ie];
         el_photonIso[ie] = analysisTree.electron_r03_sumPhotonEt[ie];
@@ -1452,14 +1454,14 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
         double neutralIso = el_neutralHadIso[ie] + el_photonIso[ie] - 0.5*el_puIso[ie];
         neutralIso = max(double(0),neutralIso);
         el_neutralIso[ie] = neutralIso ;
-        el_absIsoEl[ie] = el_chargedHadIso[ie] + mu_neutralIso[ie];
+        el_absIsoEl[ie] = el_chargedHadIso[ie] + el_neutralIso[ie];
 	el_relIsoEl[ie]  = el_absIsoEl[ie]/el_pt[ie] ;
 
-    	}
+      }
 
 				
       ta_count=(int)analysisTree.tau_count;
-      for (unsigned int it=0;it<analysisTree.tau_count;it++){
+      for (unsigned int it=0;it<analysisTree.tau_count; ++it){
 	ta_mass[it]=analysisTree.tau_mass[it];
 	ta_px[it]=analysisTree.tau_px[it];
 	ta_py[it]=analysisTree.tau_py[it];
@@ -1470,14 +1472,16 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	ta_charge[it]=analysisTree.tau_charge[it];
 	ta_dxy[it]=analysisTree.tau_dxy[it];
 	ta_dz[it]=analysisTree.tau_dz[it];
+	//
      	ta_puCorrPtSum[it] = analysisTree.tau_puCorrPtSum[it];
      	ta_chargedIsoPtSum[it] = analysisTree.tau_chargedIsoPtSum[it];
      	ta_neutralIsoPtSum[it] = analysisTree.tau_neutralIsoPtSum[it];
+
+
+
       }
-
-
       jet_count=(int)analysisTree.pfjet_count;
-      for (unsigned int jj=0;jj<analysisTree.pfjet_count;jj++){
+      for (unsigned int jj=0;jj<analysisTree.pfjet_count; ++jj){
 
 	jet_e[jj] = analysisTree.pfjet_e[jj];
 	jet_px[jj] = analysisTree.pfjet_px[jj];
@@ -1492,12 +1496,6 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
 
       TLorentzVector leptonsV, muonJ, jetsLV;
-
-      //      continue;
-
-      //JetsV.SetPxPyPzE(analysisTree.pfjet_px[ij], analysisTree.pfjet_py[ij], analysisTree.pfjet_pz[ij], analysisTree.pfjet_e[ij]);
-
-
 
 
       float jetEta = 2.4;
@@ -1624,9 +1622,6 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       //njetspt20 = jetspt20.size();
       nbtag = bjets.size();
       //nbtag_nocleaned = bjets_nocleaned.size();
-
-
-
 
       npv =  analysisTree.primvertex_count;
       npu = analysisTree.numtruepileupinteractions;
@@ -1769,6 +1764,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
     delete file_;
   }
 
+  cout<<"done"<<endl;
   cout<<" Run range from -----> "<<RunMin<<" to  "<<RunMax<<endl;
 
 

@@ -625,6 +625,8 @@ TH1D *hnpu[CutN];
 TH1D *hnrho[CutN];
 
 TH3D *hmet_DZeta_MT2lester[CutN];
+TH3D *hmet_DZeta_MT2lester_0Jets[CutN];
+TH3D *hmet_DZeta_MT2lester_1Jets[CutN];
 
 TH2D *hmet_MT[CutN];
 TH2D *hmet_MTsum[CutN];
@@ -1343,8 +1345,14 @@ double binsMT2lester[4] = {0, 40,80,1000};
 
    //met 
 
-      hmet_DZeta_MT2lester[cj] = new TH3D ("met_DZeta_MT2lester"+nCut,"met_DZeta_MT2lester "+cutName, nBinsmet, binsmet ,nBinsDZeta,binsDZeta, nBinsMT2lester,binsMT2lester);
+      hmet_DZeta_MT2lester[cj] = new TH3D ("met_DZeta_MT2lester_"+nCut,"met_DZeta_MT2lester "+cutName, nBinsmet, binsmet ,nBinsDZeta,binsDZeta, nBinsMT2lester,binsMT2lester);
       hmet_DZeta_MT2lester[cj]->Sumw2();
+      
+      hmet_DZeta_MT2lester_0Jets[cj] = new TH3D ("met_DZeta_MT2lester_0Jets_"+nCut,"met_DZeta_MT2lester 0Jets "+cutName, nBinsmet, binsmet ,nBinsDZeta,binsDZeta, nBinsMT2lester,binsMT2lester);
+      hmet_DZeta_MT2lester_0Jets[cj]->Sumw2();
+
+      hmet_DZeta_MT2lester_1Jets[cj] = new TH3D ("met_DZeta_MT2lester_1Jets_"+nCut,"met_DZeta_MT2lester 1Jets "+cutName, nBinsmet, binsmet ,nBinsDZeta,binsDZeta, nBinsMT2lester,binsMT2lester);
+      hmet_DZeta_MT2lester_1Jets[cj]->Sumw2();
 
       hmet_MT[cj] = new TH2D ("met_MT_"+nCut,"met_MT "+cutName, nBinsmet, binsmet ,nBinsMT,binsMT);
       hmet_MT[cj]->Sumw2();

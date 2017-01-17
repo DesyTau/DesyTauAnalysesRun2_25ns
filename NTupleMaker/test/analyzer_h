@@ -542,6 +542,8 @@ class analyzer {
 
 
 				hmet_DZeta_MT2lester[CutIndex]->Fill(MetV.Pt(),dzeta,Mt2as,EvWeight);
+			if (JetsV.size()==0) hmet_DZeta_MT2lester_0Jets[CutIndex]->Fill(MetV.Pt(),dzeta,Mt2as,EvWeight);
+			if (JetsV.size()==1) hmet_DZeta_MT2lester_1Jets[CutIndex]->Fill(MetV.Pt(),dzeta,Mt2as,EvWeight);
 
 				hmet_MT[CutIndex]->Fill(MetV.Pt(),MT,EvWeight);
 				hmet_MTsum[CutIndex]->Fill(MetV.Pt(),MT+MTt,EvWeight);
@@ -714,6 +716,8 @@ class analyzer {
 				hDZeta[CutIndex]->Fill(dzeta,EvWeight);
 
 				hmet_DZeta_MT2lester[CutIndex]->Fill(MetV.Pt(),dzeta,Mt2as,EvWeight);
+			if (JetsV.size()==0) hmet_DZeta_MT2lester_0Jets[CutIndex]->Fill(MetV.Pt(),dzeta,Mt2as,EvWeight);
+			if (JetsV.size()==1) hmet_DZeta_MT2lester_1Jets[CutIndex]->Fill(MetV.Pt(),dzeta,Mt2as,EvWeight);
 
 				hmet_MT[CutIndex]->Fill(MetV.Pt(),MT,EvWeight);
 				hmet_MTsum[CutIndex]->Fill(MetV.Pt(),MT+MTt,EvWeight);
@@ -901,6 +905,8 @@ class analyzer {
 
 
 				hmet_DZeta_MT2lester[CutIndex]->Fill(MetV.Pt(),dzeta,Mt2as,EvWeight);
+			if (JetsV.size()==0) hmet_DZeta_MT2lester_0Jets[CutIndex]->Fill(MetV.Pt(),dzeta,Mt2as,EvWeight);
+			if (JetsV.size()==1) hmet_DZeta_MT2lester_1Jets[CutIndex]->Fill(MetV.Pt(),dzeta,Mt2as,EvWeight);
 
 				hmet_MT[CutIndex]->Fill(MetV.Pt(),MT,EvWeight);
 				hmet_MTsum[CutIndex]->Fill(MetV.Pt(),MT+MTel,EvWeight);

@@ -190,19 +190,23 @@ TH2D *histo = (TH2D*) obj;
 		nb = fChain->GetEntry(jentry);   nbytes += nb;
 		float all_weights = 1.;
 
+if(muon_index<0) continue;
+if(electron_index<0) continue;
+
 		float charge_ =el_charge[electron_index]  * mu_charge[muon_index];
 
+
+		if ( jentry%100000 ==0 ) cout<<" working for you...processed " <<jentry<<" events from "<<nentries<<" dataset "<<datasetName->c_str()<<" weight "<<all_weights<< endl;
 		if ( charge_ < 0. && Sign == "SS") continue;
 		if ( charge_ > 0. && Sign == "OS") continue;
 
-		if ( jentry%100000 ==0 ) cout<<" working for you...processed " <<jentry<<" events from "<<nentries<<" dataset "<<datasetName->c_str()<<" weight "<<all_weights<< endl;
 
-		if (isWJ && (npartons>0 && npartons<5)) continue;
+ 		if (isWJ && (npartons>0 && npartons<5)) continue;
 
-		//if (isDY && (npartons>0 && npartons<5)) continue;
-		if ( isDYhigh && npartons>0 && npartons<5) continue;
+                if ( isDYhigh  && (npartons>0 && npartons<5)) continue;
 
-		if (isData && met_flag<0.5) continue;	
+                if (isData && met_flag<0.5) continue;
+
 
 		JetsMV.clear();
 		MuMV.clear();
@@ -266,7 +270,6 @@ float met = -1.;
 
 
 
-		if (abs(mu_count) > 8 || abs(el_count) > 8 || abs(ta_count) >8) continue;
 
 
 
@@ -276,11 +279,9 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
 
 
 
-bool El0p1Mu0p15 = true;
-
 		int iCut = 1;
 
-		all_weights = pu_weight * gen_weight ;
+	       all_weights = pu_weight * gen_weight ;
 
 		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
 		CFCounter[iCut]+= all_weights;
@@ -290,27 +291,20 @@ bool El0p1Mu0p15 = true;
 
 		if(muon_index<0 || electron_index<0) continue;
 
-		//if ( fabs(mu_dz[muon_index]) > 0.05) continue;
-		//if ( fabs(el_dz[electron_index]) > 0.05) continue;
 
-		//if ( (el_relIso[0] < 0.15  && mu_relIso[0] > 0.15) && InvertLeptonIso) continue;
-		//if ( (el_relIso[0] > 0.15  && mu_relIso[0] < 0.15) && InvertLeptonIso) continue;
-		//if (el_relIso[0] > 0.5 && !InvertLeptonIso) continue;
- 		//if (mu_relIso[0] > 0.5 && !InvertLeptonIso) continue;
-
-		if ( !El0p1Mu0p15 && (el_relIso[0] > 0.15  || mu_relIso[0] > 0.2) && !InvertLeptonIso) continue;
-		if ( !El0p1Mu0p15 && (el_relIso[0] < 0.15  && mu_relIso[0] < 0.2) && InvertLeptonIso) continue;
-		if ( !El0p1Mu0p15 && (el_relIso[0] > 0.3 || mu_relIso[0] > 0.4) ) continue;
-
-		if ( El0p1Mu0p15 && (el_relIso[0] > 0.1  || mu_relIso[0] > 0.15) && !InvertLeptonIso) continue;
-		if ( El0p1Mu0p15 && (el_relIso[0] < 0.1  && mu_relIso[0] < 0.15) && InvertLeptonIso) continue;
-		if ( El0p1Mu0p15 && (el_relIso[0] > 0.2 || mu_relIso[0] > 0.3) ) continue;
+		if ( (el_relIso[0] > 0.1 || mu_relIso[0] > 0.15) && !InvertLeptonIso) continue;
+		if ( (el_relIso[0] < 0.1 || mu_relIso[0] < 0.15) && InvertLeptonIso) continue;
+		//if ( (el_relIso[0] > 0.3 || mu_relIso[0] > 0.4) ) continue;
+		if ( mu_relIso[0] > 0.3 || mu_relIso[0] > 0.2) continue;
 
 		///remove from the all_weight the LSF  + TFR + top +trig_weig
 
 		if ( fabs(el_charge[electron_index]) !=1 ) continue;
 		if ( fabs(mu_charge[muon_index]) !=1 ) continue;
 
+	//	if (float(mu_relIso[0])  != float(mu_relIsoMu[muon_index])) cout<<" Problem with muIso "<<mu_relIso[0]<<"  "<<mu_relIsoMu[muon_index]<<"  "<<muon_index<<endl;
+
+	//	if (el_relIso[0]  != el_relIsoEl[electron_index]) cout <<" Problem with eleIso "<<el_relIso[0]<<"  "<<el_relIsoEl[electron_index]<<"  "<<electron_index<<endl;
 
 		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
 		CFCounter[iCut]+= all_weights;
@@ -318,7 +312,7 @@ bool El0p1Mu0p15 = true;
                 iCFCounter[iCut]++;
 		iCut++;
 
-		if (event_secondLeptonVeto >0.5) continue;
+		if (event_thirdLeptonVeto >0.5) continue;
 		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
 		CFCounter[iCut]+= all_weights;
 		CFCounter_[iCut]+= all_weights;
@@ -326,7 +320,7 @@ bool El0p1Mu0p15 = true;
 		iCut++;
 	
 
-		float trigw =  trig_weight_1 + 0.953 * trig_weight_2 ;
+		float trigw =   ( (20233)*trig_weight_1+ (0.953 * 16357 )* trig_weight_2)/float(36590.) ;
 		if (!isData) all_weights *= trigw;
 
 		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
