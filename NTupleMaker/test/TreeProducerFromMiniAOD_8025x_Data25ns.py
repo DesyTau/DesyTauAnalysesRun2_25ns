@@ -220,7 +220,7 @@ process.source = cms.Source("PoolSource",
 #####################################################
   
 # Pairwise MVA MET ================================================================================= 
-
+'''
 ## PreSelection for pairwise MVA MEt
 process.muonMVAMET = cms.EDFilter("PATMuonSelector",
     src = cms.InputTag("slimmedMuons"),
@@ -250,7 +250,7 @@ process.MVAMET.requireOS = cms.bool(False)
 process.mvaMetSequence  = cms.Sequence(process.leptonPreSelectionSequence +
                                        process.MVAMET)
 # END Pairwise MVA MET ==============================================================
-
+'''
 ########### HBHE
 
 
@@ -751,7 +751,7 @@ process.p = cms.Path(
   process.puppiMETSequence *
   process.fullPatMetSequencePuppi *
   process.egmGsfElectronIDSequence * 
-  process.mvaMetSequence *
+  #process.mvaMetSequence *
   #process.HBHENoiseFilterResultProducer* #produces HBHE bools baseline
   #process.ApplyBaselineHBHENoiseFilter*  #reject events based 
   #process.ApplyBaselineHBHEISONoiseFilter*  #reject events based -- disable the module, performance is being investigated fu

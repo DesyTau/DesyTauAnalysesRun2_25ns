@@ -451,7 +451,7 @@ class NTupleMaker : public edm::EDAnalyzer{
   Int_t njets4RC;
 
   UInt_t errors;
-  UInt_t event_nr;
+  ULong64_t event_nr;
   UInt_t event_luminosityblock;
   UInt_t event_run;
   UInt_t event_timeunix;
@@ -766,6 +766,7 @@ class NTupleMaker : public edm::EDAnalyzer{
   Int_t   tau_leadchargedhadrcand_id[M_taumaxcount];
   Float_t tau_leadchargedhadrcand_dxy[M_taumaxcount];
   Float_t tau_leadchargedhadrcand_dz[M_taumaxcount];
+  Float_t tau_photonPtSumOutsideSignalCone[M_taumaxcount];
 
 
   Float_t tau_vertexx[M_taumaxcount];
