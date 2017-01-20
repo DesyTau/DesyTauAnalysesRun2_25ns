@@ -70,8 +70,7 @@ int main(int argc, char * argv[]) {
     const bool applyTrigger = cfg.get<bool>("ApplyTrigger");
     const string muonTriggerName  = cfg.get<string>("MuonTriggerName");
     const string muonFilterName   = cfg.get<string>("MuonFilterName");
-    const string muon17FilterName = cfg.get<string>("Muon17FilterName");
-    const string muon8FilterName = cfg.get<string>("Muon8FilterName");
+
     const string singleMuonFilterName = cfg.get<string>("SingleMuonFilterName");
     const float singleMuonTriggerPtCut = cfg.get<float>("SingleMuonTriggerPtCut");
     const float singleMuonTriggerEtaCut = cfg.get<float>("SingleMuonTriggerEtaCut");
@@ -79,8 +78,6 @@ int main(int argc, char * argv[]) {
     TString MuonTriggerName(muonTriggerName);
     TString MuonFilterName(muonFilterName);
 
-    TString Muon17FilterName(muon17FilterName);
-    TString Muon8FilterName(muon8FilterName);
     TString SingleMuonFilterName(singleMuonFilterName);
 
     // vertex cuts
@@ -195,6 +192,7 @@ int main(int argc, char * argv[]) {
     Float_t EtaTag;
     Float_t PtProbe;
     Float_t EtaProbe;
+    Float_t met;
     
     muonTree->Branch("isZLL",&isZLL,"isZLL/O");
     muonTree->Branch("isZEE",&isZEE,"isZEE/O");
@@ -231,6 +229,8 @@ int main(int argc, char * argv[]) {
     muonTree->Branch("EtaTag",&EtaTag,"EtaTag/F");
     muonTree->Branch("PtProbe",&PtProbe,"PtProbe/F");
     muonTree->Branch("EtaProbe",&EtaProbe,"EtaProbe/F");
+    muonTree->Branch("met",&met,"met/F");
+
 
   TH1D * PUweightsOfficialH = new TH1D("PUweightsOfficialH","PU weights w/ official reweighting",1000, 0, 10);
   TH1D * nTruePUInteractionsH = new TH1D("nTruePUInteractionsH","",50,-0.5,49.5);
@@ -240,7 +240,7 @@ int main(int argc, char * argv[]) {
   PileUp * PUofficial = new PileUp();
   
   if (applyPUreweighting) {
-    TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/pileUp_data_2016_Cert_Cert_271036-276811_NoL1T_xsec63mb.root","read");
+    TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/pileUp_data_RunBCDEFGH_ReReco.root","read");
     TFile * filePUdistribution_MC = new TFile (TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/MC_Spring16_PU.root", "read");
     TH1D * PU_data = (TH1D *)filePUdistribution_data->Get("pileup");
     TH1D * PU_mc = (TH1D *)filePUdistribution_MC->Get("pileup");
@@ -450,13 +450,6 @@ int main(int argc, char * argv[]) {
 	cout << "Filter " << SingleMuonFilterName << " not found " << endl;
         exit(-1);
       }
-
-      float pfmet_ex = analysisTree.pfmet_ex;
-      float pfmet_ey = analysisTree.pfmet_ey;
-      float pfmet_phi = analysisTree.pfmet_phi;
-      float pfmet = TMath::Sqrt(pfmet_ex*pfmet_ex+pfmet_ey*pfmet_ey);
-      //      TLorentzVector MetLV; MetLV.SetPx(pfmet_ex); MetLV.SetPy(pfmet_ey);
-      //      std::cout << "pfmet = " << pfmet << " : " << analysisTree.pfmet_pt << " : " << MetLV.Pt() << std::endl;
       
         // vertex cuts
         if (fabs(analysisTree.primvertex_z)>zVertexCut) continue;
@@ -482,7 +475,7 @@ int main(int argc, char * argv[]) {
 	allMuons.push_back(im);
 	if (fabs(analysisTree.muon_dxy[im])>dxyMuonTagCut) muPassed = false;
 	if (fabs(analysisTree.muon_dz[im])>dzMuonTagCut) muPassed = false;
-	if (!analysisTree.muon_isICHEP[im]) muPassed = false;
+	if (!analysisTree.muon_isMedium[im]) muPassed = false;
 	if (muPassed) idMuons.push_back(im);
 	float absIso = 0;
 	if (isoDR03) { 
@@ -719,9 +712,18 @@ int main(int argc, char * argv[]) {
                         float mvamet_ex = analysisTree.mvamet_ex[metMuTau];
                         float mvamet_ey = analysisTree.mvamet_ey[metMuTau];
                         float mvamet = TMath::Sqrt(mvamet_ex*mvamet_ex+mvamet_ey*mvamet_ey);
+                        
+                        met = TMath::Sqrt(analysisTree.pfmetcorr_ex*analysisTree.pfmetcorr_ex + analysisTree.pfmetcorr_ey*analysisTree.pfmetcorr_ey);
+                        float dPhiMETMuon = dPhiFrom2P(analysisTree.muon_px[index1],analysisTree.muon_py[index1],analysisTree.pfmetcorr_ex,analysisTree.pfmetcorr_ey);
+                        
+                        if(!isData)//only temporary for these round's MC
+                        {
+                            met = TMath::Sqrt(analysisTree.pfmet_ex*analysisTree.pfmet_ex + analysisTree.pfmet_ey*analysisTree.pfmet_ey);
+                            dPhiMETMuon = dPhiFrom2P(analysisTree.muon_px[index1],analysisTree.muon_py[index1],analysisTree.pfmet_ex,analysisTree.pfmet_ey);
+                        }
         
-                        float dPhiMvaMETMuon = dPhiFrom2P(analysisTree.muon_px[index1],analysisTree.muon_py[index1],mvamet_ex,mvamet_ey);
-                        float mt_mva_1 = TMath::Sqrt(2*mvamet*analysisTree.muon_pt[index1]*(1-TMath::Cos(dPhiMvaMETMuon)));
+                        
+                        mt_1 = TMath::Sqrt(2*met*analysisTree.muon_pt[index1]*(1-TMath::Cos(dPhiMETMuon)));
             
                         TLorentzVector muon1;
                         muon1.SetXYZM(analysisTree.muon_px[index1],analysisTree.muon_py[index1],analysisTree.muon_pz[index1],muonMass);
@@ -804,7 +806,6 @@ int main(int argc, char * argv[]) {
                         
                         //cout <<"----------" << endl;
                         
-                        mt_1 = mt_mva_1;
                         tauagainstMuonLoose = analysisTree.tau_againstMuonLoose3[indexProbe];
                         tauagainstMuonTight = analysisTree.tau_againstMuonTight3[indexProbe];
                         taubyLooseCombinedIsolationDeltaBetaCorr3Hits = analysisTree.tau_byLooseCombinedIsolationDeltaBetaCorr3Hits[indexProbe];
