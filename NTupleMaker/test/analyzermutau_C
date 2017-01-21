@@ -351,9 +351,6 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
 	
 	if (isSignal) all_weights *= FastSF;
 		//int binNumber = TGr_hip->GetXaxis()->FindBin(mu_eta[muon_index]);
-		double hip = TGr_hip->Eval(float(mu_eta[muon_index]));
-//		all_weights *= hip;
-//		cout<<"  "<<hip<<"  "<<ptN<<"  "<<etaN<<"  "<<mu_pt[muon_index]<<"  "<<endl;
 
 		//string tID="CutBased_Medium";
 		string tID="MVA_Tight";

@@ -1466,10 +1466,15 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 				    met_resoDown_y*met_resoDown_y);
       metphi_resoDown = TMath::ATan2(met_resoDown_y,met_resoDown_x);
 
+      }//if isW, isDY !isData
       met_ex_recoil = pfmet_corr_x;
       met_ey_recoil = pfmet_corr_y;
 
-      }//if isW, isDY !isData
+      //revert back to uncorrected met
+	if(!isData)
+	{      met_x = analysisTree.pfmet_ex;
+	       met_y = analysisTree.pfmet_ey;
+	}
 
 
       met_ex = met_x;

@@ -317,22 +317,7 @@ if(muon_index_2>-1 )			LeptV2.SetPtEtaPhiM(mu_pt[muon_index_2], mu_eta[muon_inde
 		CFCounter_[iCut]+= all_weights;
                 iCFCounter[iCut]++;
 		iCut++;
-
-
-		double ptN=0;double etaN=0;double FastSF=0;
-
-		ptN = histo->GetXaxis()->FindBin(mu_pt[muon_index_1]);
-		etaN = histo->GetYaxis()->FindBin(fabs(mu_eta[muon_index_1]));
-		FastSF = histo->GetBinContent(ptN,etaN);
 	
-	if (isSignal) all_weights *= FastSF;
-/*		//int binNumber = TGr_hip->GetXaxis()->FindBin(mu_eta[muon_index_1]);
-		double hip = TGr_hip->Eval(float(mu_eta[muon_index_1]));
-		double hip2 = TGr_hip->Eval(float(mu_eta[muon_index_2]));
-//		all_weights *= hip*hip2;
-//		cout<<"  "<<hip<<"  "<<ptN<<"  "<<etaN<<"  "<<mu_pt[muon_index_1]<<"  "<<endl;
-
-*/
 
 		all_weights *= top_weight;
 		FillHistsDiL(iCut, all_weights, LeptV2, LeptV1, JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index_1,muon_index_2);

@@ -562,6 +562,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       trig_weight_2 = 1.;
       trig_weight = 1.;
 
+//needed for Recoil
       bool isW = false;
       bool isDY = false;
       bool isZTT = false;
@@ -794,7 +795,6 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
 
 
-//needed for Recoil
       if (!isData && ( string::npos != filen.find("TTJets")  || string::npos != filen.find("TTPowHeg") || string::npos != filen.find("TT_TuneCUETP8M1_13TeV-powheg-pythia8")) ) 
 	{
 	  for (unsigned int igen=0; igen<analysisTree.genparticles_count; ++igen) {
@@ -1641,7 +1641,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       }
 
 
-      if ((isW||isDY) && !isData) {
+      if ((isW || isDY) && !isData) {
 
 	  recoilMetCorrector.CorrectByMeanResolution(met_x,met_y,bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,pfmet_corr_x,pfmet_corr_y);
  
@@ -1700,10 +1700,17 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 				    met_resoDown_y*met_resoDown_y);
       metphi_resoDown = TMath::ATan2(met_resoDown_y,met_resoDown_x);
  
+      }//if isW, isDY !isData
+
       met_ex_recoil = pfmet_corr_x;
       met_ey_recoil = pfmet_corr_y;
 
-      }//if isW, isDY !isData
+      //revert back to uncorrected met
+
+	if(!isData)
+	{      met_x = analysisTree.pfmet_ex;
+	       met_y = analysisTree.pfmet_ey;
+	}
 
       met_ex = met_x;
       met_ey = met_y;
@@ -1733,9 +1740,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
       all_weight = weight;
 
-
       T->Fill();
-
 
       selEvents++;
       continue;
