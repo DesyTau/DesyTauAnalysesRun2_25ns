@@ -979,6 +979,36 @@ class NTupleMaker : public edm::EDAnalyzer{
   Float_t pfmetcorr_ex_UnclusteredEnDown;
   Float_t pfmetcorr_ey_UnclusteredEnDown;
 
+  Float_t      pfmetcorr_ex_JetResDown;
+  Float_t      pfmetcorr_ey_JetResDown;
+  Float_t      pfmetcorr_ex_JetResUp;
+  Float_t      pfmetcorr_ey_JetResUp;
+
+  Float_t      pfmetcorr_ex_smeared;
+  Float_t      pfmetcorr_ey_smeared;
+  Float_t      pfmetcorr_ez_smeared;
+  Float_t      pfmetcorr_pt_smeared;
+  Float_t      pfmetcorr_phi_smeared;
+
+
+   Float_t     pfmetcorr_ex_JetEnUp_smeared;
+   Float_t     pfmetcorr_ey_JetEnUp_smeared;
+
+  Float_t      pfmetcorr_ex_JetEnDown_smeared;
+  Float_t      pfmetcorr_ey_JetEnDown_smeared;
+
+  Float_t      pfmetcorr_ex_UnclusteredEnUp_smeared;
+  Float_t      pfmetcorr_ey_UnclusteredEnUp_smeared;
+
+  Float_t      pfmetcorr_ex_UnclusteredEnDown_smeared;
+  Float_t      pfmetcorr_ey_UnclusteredEnDown_smeared;
+
+  Float_t      pfmetcorr_ex_JetResUp_smeared;
+  Float_t      pfmetcorr_ey_JetResUp_smeared;
+
+  Float_t      pfmetcorr_ex_JetResDown_smeared;
+  Float_t      pfmetcorr_ey_JetResDown_smeared;
+
   Float_t puppimet_ex;
   Float_t puppimet_ey;
   Float_t puppimet_ez;
@@ -997,6 +1027,12 @@ class NTupleMaker : public edm::EDAnalyzer{
 
   Float_t puppimet_ex_UnclusteredEnDown;
   Float_t puppimet_ey_UnclusteredEnDown;
+
+  Float_t puppimet_ex_JetResUp;
+  Float_t puppimet_ey_JetResUp;
+
+  Float_t puppimet_ex_JetResDown;
+  Float_t puppimet_ey_JetResDown;
 
   Float_t puppimet_sigxx;
   Float_t puppimet_sigxy;
@@ -1152,4 +1188,5 @@ class NTupleMaker : public edm::EDAnalyzer{
 DEFINE_FWK_MODULE(NTupleMaker);
 
 #endif
+
 

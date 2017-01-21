@@ -727,6 +727,37 @@ void NTupleMaker::beginJob(){
     tree->Branch("pfmetcorr_ex_UnclusteredEnDown", &pfmetcorr_ex_UnclusteredEnDown, "pfmetcorr_ex_UnclusteredEnDown/F");
     tree->Branch("pfmetcorr_ey_UnclusteredEnDown", &pfmetcorr_ey_UnclusteredEnDown, "pfmetcorr_ey_UnclusteredEnDown/F");
 
+    tree->Branch("pfmetcorr_ex_JetResUp", &pfmetcorr_ex_JetResUp, "pfmetcorr_ex_JetResUp/F");
+    tree->Branch("pfmetcorr_ey_JetResUp", &pfmetcorr_ey_JetResUp, "pfmetcorr_ey_JetResUp/F");
+
+    tree->Branch("pfmetcorr_ex_JetResDown", &pfmetcorr_ex_JetResDown, "pfmetcorr_ex_JetResDown/F");
+    tree->Branch("pfmetcorr_ey_JetResDown", &pfmetcorr_ey_JetResDown, "pfmetcorr_ey_JetResDown/F");
+
+
+
+    tree->Branch("pfmetcorr_ex_smeared", &pfmetcorr_ex_smeared, "pfmetcorr_ex_smeared/F");
+    tree->Branch("pfmetcorr_ey_smeared", &pfmetcorr_ey_smeared, "pfmetcorr_ey_smeared/F");
+    tree->Branch("pfmetcorr_ez_smeared", &pfmetcorr_ey_smeared, "pfmetcorr_ez_smeared/F");
+    tree->Branch("pfmetcorr_pt_smeared", &pfmetcorr_pt_smeared, "pfmetcorr_pt_smeared/F");
+    tree->Branch("pfmetcorr_phi_smeared", &pfmetcorr_phi_smeared, "pfmetcorr_phi_smeared/F");
+    tree->Branch("pfmetcorr_ex_JetEnUp_smeared", &pfmetcorr_ex_JetEnUp_smeared, "pfmetcorr_ex_JetEnUp_smeared/F");
+    tree->Branch("pfmetcorr_ey_JetEnUp_smeared", &pfmetcorr_ey_JetEnUp_smeared, "pfmetcorr_ey_JetEnUp_smeared/F");
+
+    tree->Branch("pfmetcorr_ex_JetEnDown_smeared", &pfmetcorr_ex_JetEnDown_smeared, "pfmetcorr_ex_JetEnDown_smeared/F");
+    tree->Branch("pfmetcorr_ey_JetEnDown_smeared", &pfmetcorr_ey_JetEnDown_smeared, "pfmetcorr_ey_JetEnDown_smeared/F");
+
+    tree->Branch("pfmetcorr_ex_UnclusteredEnUp_smeared", &pfmetcorr_ex_UnclusteredEnUp_smeared, "pfmetcorr_ex_UnclusteredEnUp_smeared/F");
+    tree->Branch("pfmetcorr_ey_UnclusteredEnUp_smeared", &pfmetcorr_ey_UnclusteredEnUp_smeared, "pfmetcorr_ey_UnclusteredEnUp_smeared/F");
+
+    tree->Branch("pfmetcorr_ex_UnclusteredEnDown_smeared", &pfmetcorr_ex_UnclusteredEnDown_smeared, "pfmetcorr_ex_UnclusteredEnDown_smeared/F");
+    tree->Branch("pfmetcorr_ey_UnclusteredEnDown_smeared", &pfmetcorr_ey_UnclusteredEnDown_smeared, "pfmetcorr_ey_UnclusteredEnDown_smeared/F");
+
+    tree->Branch("pfmetcorr_ex_JetResUp_smeared", &pfmetcorr_ex_JetResUp_smeared, "pfmetcorr_ex_JetResUp_smeared/F");
+    tree->Branch("pfmetcorr_ey_JetResUp_smeared", &pfmetcorr_ey_JetResUp_smeared, "pfmetcorr_ey_JetResUp_smeared/F");
+
+    tree->Branch("pfmetcorr_ex_JetResDown_smeared", &pfmetcorr_ex_JetResDown_smeared, "pfmetcorr_ex_JetResDown_smeared/F");
+    tree->Branch("pfmetcorr_ey_JetResDown_smeared", &pfmetcorr_ey_JetResDown_smeared, "pfmetcorr_ey_JetResDown_smeared/F"); 
+
   }
 
   
@@ -752,6 +783,13 @@ void NTupleMaker::beginJob(){
 
     tree->Branch("puppimet_ex_UnclusteredEnDown", &puppimet_ex_UnclusteredEnDown, "puppimet_ex_UnclusteredEnDown/F");
     tree->Branch("puppimet_ey_UnclusteredEnDown", &puppimet_ey_UnclusteredEnDown, "puppimet_ey_UnclusteredEnDown/F");
+
+
+    tree->Branch("puppimet_ex_JetResUp", &puppimet_ex_JetResUp, "puppimet_ex_JetResUp/F");
+    tree->Branch("puppimet_ey_JetResUp", &puppimet_ey_JetResUp, "puppimet_ey_JetResUp/F");
+
+    tree->Branch("puppimet_ex_JetResDown", &puppimet_ex_JetResDown, "puppimet_ex_JetResDown/F");
+    tree->Branch("puppimet_ey_JetResDown", &puppimet_ey_JetResDown, "puppimet_ey_JetResDown/F");
 
   }
 
@@ -1809,6 +1847,36 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       pfmetcorr_ex_UnclusteredEnDown = (*patMet)[0].shiftedPx(pat::MET::METUncertainty::UnclusteredEnDown,pat::MET::METCorrectionLevel::Type1);
       pfmetcorr_ey_UnclusteredEnDown = (*patMet)[0].shiftedPy(pat::MET::METUncertainty::UnclusteredEnDown,pat::MET::METCorrectionLevel::Type1);
       
+      pfmetcorr_ex_JetResUp = (*patMet)[0].shiftedPx(pat::MET::METUncertainty::JetResUp,pat::MET::METCorrectionLevel::Type1);
+      pfmetcorr_ey_JetResUp = (*patMet)[0].shiftedPy(pat::MET::METUncertainty::JetResUp,pat::MET::METCorrectionLevel::Type1);
+
+      pfmetcorr_ex_JetResDown = (*patMet)[0].shiftedPx(pat::MET::METUncertainty::JetResDown,pat::MET::METCorrectionLevel::Type1);
+      pfmetcorr_ey_JetResDown = (*patMet)[0].shiftedPy(pat::MET::METUncertainty::JetResDown,pat::MET::METCorrectionLevel::Type1);
+
+
+      pfmetcorr_ex_smeared = (*patMet)[0].corPx(pat::MET::METCorrectionLevel::Type1Smear);
+      pfmetcorr_ey_smeared = (*patMet)[0].corPy(pat::MET::METCorrectionLevel::Type1Smear);
+      pfmetcorr_pt_smeared = (*patMet)[0].corPt(pat::MET::METCorrectionLevel::Type1Smear);
+      pfmetcorr_phi_smeared = (*patMet)[0].corPhi(pat::MET::METCorrectionLevel::Type1Smear);
+
+
+      pfmetcorr_ex_JetEnUp_smeared = (*patMet)[0].shiftedPx(pat::MET::METUncertainty::JetEnUp,pat::MET::METCorrectionLevel::Type1Smear);
+      pfmetcorr_ey_JetEnUp_smeared = (*patMet)[0].shiftedPy(pat::MET::METUncertainty::JetEnUp,pat::MET::METCorrectionLevel::Type1Smear);
+
+      pfmetcorr_ex_JetEnDown_smeared = (*patMet)[0].shiftedPx(pat::MET::METUncertainty::JetEnDown,pat::MET::METCorrectionLevel::Type1Smear);
+      pfmetcorr_ey_JetEnDown_smeared = (*patMet)[0].shiftedPy(pat::MET::METUncertainty::JetEnDown,pat::MET::METCorrectionLevel::Type1Smear);
+
+      pfmetcorr_ex_UnclusteredEnUp_smeared = (*patMet)[0].shiftedPx(pat::MET::METUncertainty::UnclusteredEnUp,pat::MET::METCorrectionLevel::Type1Smear);
+      pfmetcorr_ey_UnclusteredEnUp_smeared = (*patMet)[0].shiftedPy(pat::MET::METUncertainty::UnclusteredEnUp,pat::MET::METCorrectionLevel::Type1Smear);
+
+      pfmetcorr_ex_UnclusteredEnDown_smeared = (*patMet)[0].shiftedPx(pat::MET::METUncertainty::UnclusteredEnDown,pat::MET::METCorrectionLevel::Type1Smear);
+      pfmetcorr_ey_UnclusteredEnDown_smeared = (*patMet)[0].shiftedPy(pat::MET::METUncertainty::UnclusteredEnDown,pat::MET::METCorrectionLevel::Type1Smear);
+
+      pfmetcorr_ex_JetResUp_smeared = (*patMet)[0].shiftedPx(pat::MET::METUncertainty::JetResUp,pat::MET::METCorrectionLevel::Type1Smear);
+      pfmetcorr_ey_JetResUp_smeared = (*patMet)[0].shiftedPy(pat::MET::METUncertainty::JetResUp,pat::MET::METCorrectionLevel::Type1Smear);
+
+      pfmetcorr_ex_JetResDown_smeared = (*patMet)[0].shiftedPx(pat::MET::METUncertainty::JetResDown,pat::MET::METCorrectionLevel::Type1Smear);
+      pfmetcorr_ey_JetResDown_smeared = (*patMet)[0].shiftedPy(pat::MET::METUncertainty::JetResDown,pat::MET::METCorrectionLevel::Type1Smear);
     } // crecpfmetcorr
 
   if(crecpuppimet)
@@ -1841,6 +1909,11 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       puppimet_ex_UnclusteredEnDown = (*patMet)[0].shiftedPx(pat::MET::METUncertainty::UnclusteredEnDown,pat::MET::METCorrectionLevel::Type1);
       puppimet_ey_UnclusteredEnDown = (*patMet)[0].shiftedPy(pat::MET::METUncertainty::UnclusteredEnDown,pat::MET::METCorrectionLevel::Type1);
 
+      puppimet_ex_JetResUp = (*patMet)[0].shiftedPx(pat::MET::METUncertainty::JetResUp,pat::MET::METCorrectionLevel::Type1);
+      puppimet_ey_JetResUp = (*patMet)[0].shiftedPy(pat::MET::METUncertainty::JetResUp,pat::MET::METCorrectionLevel::Type1);
+
+      puppimet_ex_JetResDown = (*patMet)[0].shiftedPx(pat::MET::METUncertainty::JetResDown,pat::MET::METCorrectionLevel::Type1);
+      puppimet_ey_JetResDown = (*patMet)[0].shiftedPy(pat::MET::METUncertainty::JetResDown,pat::MET::METCorrectionLevel::Type1);
     } // crecpuppimet
   
   if(doDebug)  cout<<"add MVA MET"<< endl; 
