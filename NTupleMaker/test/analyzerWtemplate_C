@@ -65,6 +65,7 @@ void analyzer::Loop(){
 	CutList.push_back("Jets gt 1 ");
 	CutList.push_back("0 btag");
 	CutList.push_back("MT window");
+	CutList.push_back("MTmutau");
 	CutList.push_back("Cuts");
 	CutList.push_back("Cuts2");
 	CutList.push_back("StauCuts");
@@ -378,7 +379,8 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
 		//reco tau to matched genmu but not matched tau which is decayed hadronically or electron
 
 		double tfrmu  = MuonFakeRate(ptMu1,etaMu1);
-		if (genTauMatched<0.5 && genLeptonMatchedMu > 0.5 && genTauDecayedMuMatched < 0.5 && !isData) all_weights *= tfrmu;
+//		if (genTauMatched<0.5 && genLeptonMatchedMu > 0.5 && genTauDecayedMuMatched < 0.5 && !isData) all_weights *= tfrmu;
+		if ( (genLeptonMatched > 0.5 || genTauDecayedMuMatched > 0.5) && !isData) all_weights *= tfrmu;
 		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
 		CFCounter[iCut]+= all_weights;
 		CFCounter_[iCut]+= all_weights;
@@ -450,6 +452,15 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
                 iCFCounter[iCut]++;
 		iCut++;
 
+		 TLorentzVector DiLL = MuV +TauV ;
+     		double dPhi2=dPhiFrom2P( DiLL.Px(), DiLL.Py(), METV.Px(),  METV.Py() );
+         	double MT2 = 0;MT2=sqrt(2*DiLL.Pt()*met*(1-TMath::Cos(dPhi2)));
+		if (MT2 < 60. ) continue;
+		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
+		CFCounter[iCut]+= all_weights;
+		CFCounter_[iCut]+= all_weights;
+                iCFCounter[iCut]++;
+		iCut++;
                  
                 double Dr=deltaR(MuV.Eta(), MuV.Phi(),
 					TauV.Eta(),TauV.Phi());
@@ -459,7 +470,6 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
                 double Dr2=-1; if  (JetsMV.size()>0) {Dr2=deltaR(JetsMV.at(0).Eta(),JetsMV.at(0).Phi(), TauV.Eta(),TauV.Phi());}
 		double dPhiDiL=dPhiFrom2P( MuV.Px(), MuV.Py(), TauV.Px(),  TauV.Py() );
 
-		 TLorentzVector DiLL = MuV +TauV ;
 
 		if (Dr>3.5) continue;
 		if (fabs(dEta)>2) continue;

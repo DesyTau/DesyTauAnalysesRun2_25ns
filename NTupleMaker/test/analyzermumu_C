@@ -136,7 +136,7 @@ void analyzer::Loop(){
 	if (isSignal) cout<<" YOU HAVE FOUND ITTTTTTTTT "<<endl;
 	if (isData) cout<<" YOU HAVE FOUND a DATA "<<endl;
 
-	string channel = "Î";
+	string channel = "mumu";
 
 	TString inputRootFile = "/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/CMSSW_8_0_12/src/DesyTauAnalyses/NTupleMaker/data/HIP_mediumID.root";
 	TFile * fileInHIP = new TFile(inputRootFile, "read");
@@ -159,7 +159,7 @@ TH2D *histo = (TH2D*) obj;
 
 
 
-	TFile * filein = new TFile("/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/CMSSW_8_0_20/src/DesyTauAnalyses/NTupleMaker/test/Î/FILEIN","read");
+	TFile * filein = new TFile("/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/CMSSW_8_0_20/src/DesyTauAnalyses/NTupleMaker/test/mumu/FILEIN","read");
 
 	TH1D * histW = (TH1D*)filein->Get("mumu/histWeightsH");
 	TH1D * histTop ;
@@ -276,8 +276,6 @@ if(muon_index_2>-1 )			LeptV2.SetPtEtaPhiM(mu_pt[muon_index_2], mu_eta[muon_inde
                 iCFCounter[iCut]++;
 		iCut++;
 		
-		//if (mu_relIso[0] > 0.15 && !InvertLeptonIso) continue;
-		//if (mu_relIso[0] < 0.15 && InvertLeptonIso) continue;
 		
 		if (mu_relIso[0] > 0.15) continue;
 		if (mu_relIso[1] > 0.15) continue;

@@ -1643,7 +1643,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
       if ((isW||isDY) && !isData) {
 
-	recoilMetCorrector.CorrectByMeanResolution(analysisTree.pfmetcorr_ex,analysisTree.pfmetcorr_ey,bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,pfmet_corr_x,pfmet_corr_y);
+	  recoilMetCorrector.CorrectByMeanResolution(met_x,met_y,bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,pfmet_corr_x,pfmet_corr_y);
  
         met_x = pfmet_corr_x;
         met_y = pfmet_corr_y;
@@ -1705,11 +1705,10 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
       }//if isW, isDY !isData
 
-      met_ex = analysisTree.pfmetcorr_ex;
-      met_ey = analysisTree.pfmetcorr_ey;
-      met_ez = analysisTree.pfmetcorr_ez;
+      met_ex = met_x;
+      met_ey = met_y;
       met_pt = TMath::Sqrt(met_ex*met_ex + met_ey*met_ey);
-      met_phi = TMath::ATan2(met_y,met_x);
+      met_phi = TMath::ATan2(met_ey,met_ex);
 
      met_ex_JetEnUp = analysisTree.pfmetcorr_ex_JetEnUp;
      met_ey_JetEnUp = analysisTree.pfmetcorr_ey_JetEnUp;
