@@ -151,6 +151,8 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
   cJetNum(iConfig.getUntrackedParameter<int>("RecJetNum", 0)),
   // collections
   MuonCollectionToken_(consumes<pat::MuonCollection>(iConfig.getParameter<edm::InputTag>("MuonCollectionTag"))),
+  BadGlobalMuonsToken_(consumes<edm::PtrVector<reco::Muon>>(iConfig.getParameter<edm::InputTag>("BadGlobalMuons"))),
+  BadDuplicateMuonsToken_(consumes<edm::PtrVector<reco::Muon>>(iConfig.getParameter<edm::InputTag>("BadDuplicateMuons"))),
   ElectronCollectionToken_(consumes<edm::View<pat::Electron> >(iConfig.getParameter<edm::InputTag>("ElectronCollectionTag"))),
   eleVetoIdMapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleVetoIdMap"))),
   eleLooseIdMapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleLooseIdMap"))),
@@ -418,6 +420,7 @@ void NTupleMaker::beginJob(){
     tree->Branch("muon_isMedium",muon_isMedium,"muon_isMedium[muon_count]/O");
     tree->Branch("muon_isICHEP",muon_isICHEP,"muon_isICHEP[muon_count]/O");
     tree->Branch("muon_genmatch", muon_genmatch, "muon_genmatch[muon_count]/I");
+    tree->Branch("muon_isDuplicateMuon",muon_isDuplicateMuon,"muon_isDuplicateMuon[muon_count]/O");
 
     tree->Branch("dimuon_count", &dimuon_count, "dimuon_count/i");
     tree->Branch("dimuon_leading", dimuon_leading, "dimuon_leading[dimuon_count]/i");
@@ -1501,6 +1504,14 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     edm::Handle<bool> ifilterbadPFMuon;
     iEvent.getByToken(BadPFMuonFilterToken_, ifilterbadPFMuon);
     flags_->insert(std::pair<string, int>("Flag_BadPFMuonFilter", *ifilterbadPFMuon));
+
+    // Bad global muons
+    bool ifilterBadGlobalMuon;
+    edm::Handle<edm::PtrVector<reco::Muon>> BadGlobalMuons;
+    iEvent.getByToken(BadGlobalMuonsToken_, BadGlobalMuons);
+    if(BadGlobalMuons->size() == 0 ) ifilterBadGlobalMuon = false;
+    else                             ifilterBadGlobalMuon = true;
+    flags_->insert(std::pair<string, int>("Flag_BadGlobalMuonFilter", ifilterBadGlobalMuon));
   }
   
   if(cbeamspot)
@@ -2651,6 +2662,9 @@ unsigned int NTupleMaker::AddMuons(const edm::Event& iEvent, const edm::EventSet
   edm::Handle<pat::PackedCandidateCollection> pfcands;
   iEvent.getByToken( PackedCantidateCollectionToken_, pfcands);
 
+  edm::Handle<edm::PtrVector<reco::Muon>> BadDuplicateMuons;
+  iEvent.getByToken(BadDuplicateMuonsToken_, BadDuplicateMuons);
+
   if(Muons.isValid())
     {
       for(unsigned i = 0 ; i < Muons->size() ; i++){
@@ -2774,9 +2788,14 @@ unsigned int NTupleMaker::AddMuons(const edm::Event& iEvent, const edm::EventSet
 	  if(GenParticles.isValid())
 	    muon_genmatch[muon_count] = utils_genMatch::genMatch( (*Muons)[i].p4(), *GenParticles);
 	}
-	
+
+	// Duplicate muons
+	muon_isDuplicateMuon[muon_count] = false;
+	for(unsigned j = 0; j < BadDuplicateMuons->size(); j++){
+	  if((*BadDuplicateMuons)[j]->pt() == muon_pt[muon_count]) muon_isDuplicateMuon[muon_count] = true;
+	}
+
 	// Dimuons
-	
 	if( !(*Muons)[i].innerTrack().isNull()){
 	  for(unsigned j = i+1 ; j < Muons->size() ; j++){
 	    if (dimuon_count==M_muonmaxcount*(M_muonmaxcount-1)/2) {

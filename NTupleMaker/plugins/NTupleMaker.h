@@ -363,6 +363,8 @@ class NTupleMaker : public edm::EDAnalyzer{
   int cJetNum;
 
   edm::EDGetTokenT<pat::MuonCollection> MuonCollectionToken_;
+  edm::EDGetTokenT<edm::PtrVector<reco::Muon>> BadGlobalMuonsToken_;
+  edm::EDGetTokenT<edm::PtrVector<reco::Muon>> BadDuplicateMuonsToken_;
   
   // Electron Configuration
   edm::EDGetTokenT<edm::View<pat::Electron> > ElectronCollectionToken_;
@@ -571,6 +573,7 @@ class NTupleMaker : public edm::EDAnalyzer{
   Bool_t muon_isLoose[M_muonmaxcount];
   Bool_t muon_isMedium[M_muonmaxcount];
   Bool_t muon_isICHEP[M_muonmaxcount];
+  Bool_t muon_isDuplicateMuon[M_muonmaxcount];
   
   Bool_t muon_globalTrack[M_muonmaxcount];
   Bool_t muon_innerTrack[M_muonmaxcount];

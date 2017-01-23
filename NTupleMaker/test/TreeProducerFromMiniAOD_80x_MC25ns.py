@@ -46,7 +46,7 @@ process.options = cms.untracked.PSet(
 
 # How many events to process
 process.maxEvents = cms.untracked.PSet( 
-   input = cms.untracked.int32(1000)
+   input = cms.untracked.int32(10)
 )
 
 ### External JECs =====================================================================================================
@@ -58,7 +58,7 @@ from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag
 if runOnData:
   process.GlobalTag.globaltag = '80X_dataRun2_Prompt_ICHEP16JEC_v0'
 else:
-  process.GlobalTag.globaltag = '80X_mcRun2_asymptotic_2016_miniAODv2_v1'
+  process.GlobalTag.globaltag = '80X_mcRun2_asymptotic_2016_TrancheIV_v6'
 
 print 'The conditions are =======>',process.GlobalTag.globaltag
     
@@ -177,14 +177,13 @@ switchOnVIDElectronIdProducer(process, dataFormat)
 # define which IDs we want to produce
 my_id_modules = ['RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_Spring15_25ns_V1_cff',
                  'RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Spring15_25ns_Trig_V1_cff',
-                 'RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Spring15_25ns_nonTrig_V1_cff']
+                 'RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Spring15_25ns_nonTrig_V1_cff',
+                 'RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Spring16_GeneralPurpose_V1_cff']
 
 
 #add them to the VID producer
 for idmod in my_id_modules:
     setupAllVIDIdsInModule(process,idmod,setupVIDElectronSelection)
-
-
 
 ### END Electron ID ====================================================================================
 
@@ -216,7 +215,7 @@ process.source = cms.Source("PoolSource",
 #####################################################
   
 # Pairwise MVA MET ================================================================================= 
-
+'''
 ## PreSelection for pairwise MVA MEt
 process.muonMVAMET = cms.EDFilter("PATMuonSelector",
     src = cms.InputTag("slimmedMuons"),
@@ -246,7 +245,7 @@ process.MVAMET.requireOS = cms.bool(False)
 process.mvaMetSequence  = cms.Sequence(process.leptonPreSelectionSequence +
                                        process.MVAMET)
 # END Pairwise MVA MET ==============================================================
-
+'''
 ########### HBHE
 
 
@@ -267,6 +266,33 @@ process.ApplyBaselineHBHEIsoNoiseFilter = cms.EDFilter('BooleanFlagFilter',
 process.load('Configuration.StandardSequences.Services_cff')
 process.load('RecoMET.METFilters.BadChargedCandidateFilter_cfi')
 process.load('RecoMET.METFilters.BadPFMuonFilter_cfi')
+
+process.BadChargedCandidateFilter.muons = cms.InputTag("slimmedMuons")
+process.BadChargedCandidateFilter.PFCandidates = cms.InputTag("packedPFCandidates")
+process.BadChargedCandidateFilter.debug = cms.bool(False)
+process.BadPFMuonFilter.muons = cms.InputTag("slimmedMuons")
+process.BadPFMuonFilter.PFCandidates = cms.InputTag("packedPFCandidates")
+
+process.BadPFMuonFilter.debug = cms.bool(False)
+
+########### Bad Muons Filter ##############################################
+process.load('RecoMET.METFilters.badGlobalMuonTaggersMiniAOD_cff')
+
+process.badGlobalMuonTagger = cms.EDFilter("BadGlobalMuonTagger",
+                                           muons = cms.InputTag("slimmedMuons"),
+                                           vtx   = cms.InputTag("offlineSlimmedPrimaryVertices"),
+                                           muonPtCut = cms.double(20),
+                                           selectClones = cms.bool(False),
+                                           verbose = cms.untracked.bool(False),
+                                           taggingMode = cms.bool(True)
+                                           )
+
+process.cloneGlobalMuonTagger = process.badGlobalMuonTagger.clone(
+  selectClones = True
+  )
+
+process.BadGlobalMuonFilter = cms.Sequence(process.cloneGlobalMuonTagger + process.badGlobalMuonTagger)
+########### End: Bad Muons Filter ##############################################
 
 from RecoMET.METFilters.metFilters_cff import HBHENoiseFilterResultProducer, HBHENoiseFilter, HBHENoiseIsoFilter, hcalLaserEventFilter
 from RecoMET.METFilters.metFilters_cff import EcalDeadCellTriggerPrimitiveFilter, eeBadScFilter, ecalLaserCorrFilter, EcalDeadCellBoundaryEnergyFilter
@@ -355,6 +381,12 @@ RecJet = cms.untracked.bool(True),
 # collections
 MuonCollectionTag = cms.InputTag("slimmedMuons"), 
 ElectronCollectionTag = cms.InputTag("slimmedElectrons"),
+#######new in 8.0.25
+eleMvaWP90GeneralMap = cms.InputTag("egmGsfElectronIDs:mvaEleID-Spring16-GeneralPurpose-V1-wp90"),
+eleMvaWP80GeneralMap = cms.InputTag("egmGsfElectronIDs:mvaEleID-Spring16-GeneralPurpose-V1-wp80"),
+mvaValuesMapSpring16     = cms.InputTag("electronMVAValueMapProducer:ElectronMVAEstimatorRun2Spring16GeneralPurposeV1Values"),
+mvaCategoriesMapSpring16 = cms.InputTag("electronMVAValueMapProducer:ElectronMVAEstimatorRun2Spring16GeneralPurposeV1Categories"),
+###############
 #eleMediumIdMap = cms.InputTag("egmGsfElectronIDs:mvaEleID-Spring15-25ns-nonTrig-V1-wp90"),
 #eleTightIdMap = cms.InputTag("egmGsfElectronIDs:mvaEleID-Spring15-25ns-nonTrig-V1-wp80"),
 eleVetoIdMap = cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-Spring15-25ns-V1-standalone-veto"),
@@ -500,6 +532,8 @@ Flags = cms.untracked.vstring(
 FlagsProcesses = cms.untracked.vstring("RECO","PAT"),
 BadChargedCandidateFilter =  cms.InputTag("BadChargedCandidateFilter"),
 BadPFMuonFilter = cms.InputTag("BadPFMuonFilter"),
+BadGlobalMuons    = cms.InputTag("badGlobalMuonTagger","bad","TreeProducer"),
+BadDuplicateMuons = cms.InputTag("cloneGlobalMuonTagger","bad","TreeProducer"),
 # tracks
 RecTrackPtMin = cms.untracked.double(0.5),
 RecTrackEtaMax = cms.untracked.double(2.4),
@@ -715,25 +749,19 @@ SampleName = cms.untracked.string("Data")
 )
 #process.patJets.addBTagInfo = cms.bool(True)
 
-process.BadChargedCandidateFilter.muons = cms.InputTag("slimmedMuons")
-process.BadChargedCandidateFilter.PFCandidates = cms.InputTag("packedPFCandidates")
-process.BadChargedCandidateFilter.debug = cms.bool(False)
-process.BadPFMuonFilter.muons = cms.InputTag("slimmedMuons")
-process.BadPFMuonFilter.PFCandidates = cms.InputTag("packedPFCandidates")
-
-process.BadPFMuonFilter.debug = cms.bool(False)
-
 process.p = cms.Path(
   process.initroottree*
   process.BadChargedCandidateFilter *
   process.BadPFMuonFilter *
+  process.BadGlobalMuonFilter *
   process.pileupJetIdUpdated * 
   process.patJetCorrFactorsReapplyJEC * process.patJetsReapplyJEC *
   process.fullPatMetSequence * 
+  process.egmPhotonIDSequence *
   process.puppiMETSequence *
   process.fullPatMetSequencePuppi *
   process.egmGsfElectronIDSequence * 
-  process.mvaMetSequence *
+  #process.mvaMetSequence *
   #process.HBHENoiseFilterResultProducer* #produces HBHE bools baseline
   #process.ApplyBaselineHBHENoiseFilter*  #reject events based 
   #process.ApplyBaselineHBHEISONoiseFilter*  #reject events based -- disable the module, performance is being investigated fu

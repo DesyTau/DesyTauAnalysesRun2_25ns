@@ -39,7 +39,7 @@ process.options = cms.untracked.PSet(
 
 # How many events to process
 process.maxEvents = cms.untracked.PSet( 
-   input = cms.untracked.int32(20)
+   input = cms.untracked.int32(10)
 )
 
 ### External JECs =====================================================================================================
@@ -49,7 +49,7 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condD
 from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag
 
 if runOnData:
-  process.GlobalTag.globaltag = '80X_dataRun2_Prompt_ICHEP16JEC_v0'
+  process.GlobalTag.globaltag = '80X_dataRun2_2016SeptRepro_v6'
 else:
   process.GlobalTag.globaltag = '80X_mcRun2_asymptotic_2016_miniAODv2_v1'
 
@@ -170,14 +170,13 @@ switchOnVIDElectronIdProducer(process, dataFormat)
 # define which IDs we want to produce
 my_id_modules = ['RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_Spring15_25ns_V1_cff',
                  'RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Spring15_25ns_Trig_V1_cff',
-                 'RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Spring15_25ns_nonTrig_V1_cff']
+                 'RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Spring15_25ns_nonTrig_V1_cff',
+                 'RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Spring16_GeneralPurpose_V1_cff']
 
 
 #add them to the VID producer
 for idmod in my_id_modules:
     setupAllVIDIdsInModule(process,idmod,setupVIDElectronSelection)
-
-
 
 ### END Electron ID ====================================================================================
 
@@ -195,13 +194,14 @@ process.HBHENoiseFilterResultProducer.defaultDecision = cms.string("HBHENoiseFil
 
 fnames = []
 if runOnData:
-  fnames.append('/store/data/Run2016B/JetHT/MINIAOD/PromptReco-v2/000/273/503/00000/069FE912-3E1F-E611-8EE4-02163E011DF3.root')
-  fnames.append('/store/data/Run2016E/MET/MINIAOD/PromptReco-v2/000/276/824/00000/34F13DEA-AA4C-E611-8F1E-02163E014776.root')
-  fnames.append('/store/data/Run2016F/MET/MINIAOD/PromptReco-v1/000/277/816/00000/BE90C25C-CF57-E611-99E4-02163E011BB4.root')
-  fnames.append('/store/data/Run2016E/JetHT/MINIAOD/PromptReco-v2/000/276/830/00000/4C58611A-AB4C-E611-B46A-FA163EA2EAEF.root') 
-  fnames.append('/store/data/Run2016F/JetHT/MINIAOD/PromptReco-v1/000/277/816/00000/A08F2285-CF57-E611-A68B-FA163E0BB18C.root') 
-  fnames.append('/store/data/Run2016G/MET/MINIAOD/PromptReco-v1/000/278/816/00000/E8C5126D-9F63-E611-AB51-02163E011DA2.root')
-  fnames.append('/store/data/Run2016G/JetHT/MINIAOD/PromptReco-v1/000/278/816/00000/4A7806DC-9B63-E611-A827-FA163E3C7DC7.root')
+  fnames.append('/store/data/Run2016B/SingleMuon/MINIAOD/23Sep2016-v3/00000/00AE0629-1F98-E611-921A-008CFA1112CC.root')
+  #fnames.append('/store/data/Run2016B/JetHT/MINIAOD/PromptReco-v2/000/273/503/00000/069FE912-3E1F-E611-8EE4-02163E011DF3.root')
+  #fnames.append('/store/data/Run2016E/MET/MINIAOD/PromptReco-v2/000/276/824/00000/34F13DEA-AA4C-E611-8F1E-02163E014776.root')
+  #fnames.append('/store/data/Run2016F/MET/MINIAOD/PromptReco-v1/000/277/816/00000/BE90C25C-CF57-E611-99E4-02163E011BB4.root')
+  #fnames.append('/store/data/Run2016E/JetHT/MINIAOD/PromptReco-v2/000/276/830/00000/4C58611A-AB4C-E611-B46A-FA163EA2EAEF.root') 
+  #fnames.append('/store/data/Run2016F/JetHT/MINIAOD/PromptReco-v1/000/277/816/00000/A08F2285-CF57-E611-A68B-FA163E0BB18C.root') 
+  #fnames.append('/store/data/Run2016G/MET/MINIAOD/PromptReco-v1/000/278/816/00000/E8C5126D-9F63-E611-AB51-02163E011DA2.root')
+  #fnames.append('/store/data/Run2016G/JetHT/MINIAOD/PromptReco-v1/000/278/816/00000/4A7806DC-9B63-E611-A827-FA163E3C7DC7.root')
   #bfnames.append('/store/data/Run2016H/SingleMuon/MINIAOD/PromptReco-v2/000/281/207/00000/C01B8838-6282-E611-9884-02163E01414B.root')    
   #fnames.append('/store/data/Run2016F/DoubleMuon/MINIAOD/PromptReco-v1/000/278/366/00000/CA97888F-935F-E611-9B92-FA163E6FCC86.root')
   #fnames.append('/store/data/Run2016F/DoubleMuon/MINIAOD/PromptReco-v1/000/277/932/00000/0C541DE0-1A59-E611-BB0D-FA163EDB8B04.root')
@@ -220,7 +220,7 @@ process.source = cms.Source("PoolSource",
 #####################################################
   
 # Pairwise MVA MET ================================================================================= 
-
+'''
 ## PreSelection for pairwise MVA MEt
 process.muonMVAMET = cms.EDFilter("PATMuonSelector",
     src = cms.InputTag("slimmedMuons"),
@@ -250,9 +250,8 @@ process.MVAMET.requireOS = cms.bool(False)
 process.mvaMetSequence  = cms.Sequence(process.leptonPreSelectionSequence +
                                        process.MVAMET)
 # END Pairwise MVA MET ==============================================================
-
+'''
 ########### HBHE
-
 
 
 process.ApplyBaselineHBHENoiseFilter = cms.EDFilter('BooleanFlagFilter',
@@ -271,6 +270,33 @@ process.ApplyBaselineHBHEIsoNoiseFilter = cms.EDFilter('BooleanFlagFilter',
 process.load('Configuration.StandardSequences.Services_cff')
 process.load('RecoMET.METFilters.BadChargedCandidateFilter_cfi')
 process.load('RecoMET.METFilters.BadPFMuonFilter_cfi')
+
+process.BadChargedCandidateFilter.muons = cms.InputTag("slimmedMuons")
+process.BadChargedCandidateFilter.PFCandidates = cms.InputTag("packedPFCandidates")
+process.BadChargedCandidateFilter.debug = cms.bool(False)
+process.BadPFMuonFilter.muons = cms.InputTag("slimmedMuons")
+process.BadPFMuonFilter.PFCandidates = cms.InputTag("packedPFCandidates")
+
+process.BadPFMuonFilter.debug = cms.bool(False)
+
+########### Bad Muons Filter ##############################################
+process.load('RecoMET.METFilters.badGlobalMuonTaggersMiniAOD_cff')
+
+process.badGlobalMuonTagger = cms.EDFilter("BadGlobalMuonTagger",
+                                           muons = cms.InputTag("slimmedMuons"),
+                                           vtx   = cms.InputTag("offlineSlimmedPrimaryVertices"),
+                                           muonPtCut = cms.double(20),
+                                           selectClones = cms.bool(False),
+                                           verbose = cms.untracked.bool(False),
+                                           taggingMode = cms.bool(True)
+                                           )
+
+process.cloneGlobalMuonTagger = process.badGlobalMuonTagger.clone(
+  selectClones = True
+  )
+
+process.BadGlobalMuonFilter = cms.Sequence(process.cloneGlobalMuonTagger + process.badGlobalMuonTagger)
+########### End: Bad Muons Filter ##############################################
 
 from RecoMET.METFilters.metFilters_cff import HBHENoiseFilterResultProducer, HBHENoiseFilter, HBHENoiseIsoFilter, hcalLaserEventFilter
 from RecoMET.METFilters.metFilters_cff import EcalDeadCellTriggerPrimitiveFilter, eeBadScFilter, ecalLaserCorrFilter, EcalDeadCellBoundaryEnergyFilter
@@ -359,6 +385,12 @@ RecJet = cms.untracked.bool(True),
 # collections
 MuonCollectionTag = cms.InputTag("slimmedMuons"), 
 ElectronCollectionTag = cms.InputTag("slimmedElectrons"),
+#######new in 8.0.25
+eleMvaWP90GeneralMap = cms.InputTag("egmGsfElectronIDs:mvaEleID-Spring16-GeneralPurpose-V1-wp90"),
+eleMvaWP80GeneralMap = cms.InputTag("egmGsfElectronIDs:mvaEleID-Spring16-GeneralPurpose-V1-wp80"),
+mvaValuesMapSpring16     = cms.InputTag("electronMVAValueMapProducer:ElectronMVAEstimatorRun2Spring16GeneralPurposeV1Values"),
+mvaCategoriesMapSpring16 = cms.InputTag("electronMVAValueMapProducer:ElectronMVAEstimatorRun2Spring16GeneralPurposeV1Categories"),
+###############
 #eleMediumIdMap = cms.InputTag("egmGsfElectronIDs:mvaEleID-Spring15-25ns-nonTrig-V1-wp90"),
 #eleTightIdMap = cms.InputTag("egmGsfElectronIDs:mvaEleID-Spring15-25ns-nonTrig-V1-wp80"),
 eleVetoIdMap = cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-Spring15-25ns-V1-standalone-veto"),
@@ -503,6 +535,8 @@ Flags = cms.untracked.vstring(
 FlagsProcesses = cms.untracked.vstring("RECO","PAT"),
 BadChargedCandidateFilter =  cms.InputTag("BadChargedCandidateFilter"),
 BadPFMuonFilter = cms.InputTag("BadPFMuonFilter"),
+BadGlobalMuons    = cms.InputTag("badGlobalMuonTagger","bad","TreeProducer"),
+BadDuplicateMuons = cms.InputTag("cloneGlobalMuonTagger","bad","TreeProducer"),
 # tracks
 RecTrackPtMin = cms.untracked.double(0.5),
 RecTrackEtaMax = cms.untracked.double(2.4),
@@ -718,25 +752,19 @@ SampleName = cms.untracked.string("Data")
 )
 #process.patJets.addBTagInfo = cms.bool(True)
 
-process.BadChargedCandidateFilter.muons = cms.InputTag("slimmedMuons")
-process.BadChargedCandidateFilter.PFCandidates = cms.InputTag("packedPFCandidates")
-process.BadChargedCandidateFilter.debug = cms.bool(False)
-process.BadPFMuonFilter.muons = cms.InputTag("slimmedMuons")
-process.BadPFMuonFilter.PFCandidates = cms.InputTag("packedPFCandidates")
-
-process.BadPFMuonFilter.debug = cms.bool(False)
-
 process.p = cms.Path(
   process.initroottree*
   process.BadChargedCandidateFilter *
   process.BadPFMuonFilter *
+  process.BadGlobalMuonFilter *
   process.pileupJetIdUpdated * 
   process.patJetCorrFactorsReapplyJEC * process.patJetsReapplyJEC *
   process.fullPatMetSequence * 
+  process.egmPhotonIDSequence *
   process.puppiMETSequence *
   process.fullPatMetSequencePuppi *
   process.egmGsfElectronIDSequence * 
-  process.mvaMetSequence *
+  #process.mvaMetSequence *
   #process.HBHENoiseFilterResultProducer* #produces HBHE bools baseline
   #process.ApplyBaselineHBHENoiseFilter*  #reject events based 
   #process.ApplyBaselineHBHEISONoiseFilter*  #reject events based -- disable the module, performance is being investigated fu
@@ -750,10 +778,11 @@ process.TFileService = cms.Service("TFileService",
 process.output = cms.OutputModule("PoolOutputModule",
                                   fileName = cms.untracked.string('output_particles_DATA.root'),
                                   outputCommands = cms.untracked.vstring(
-                                    'keep *_slimmedMETs_*_*',
-				    'keep *_MVAMET_*_*',
-                                    'keep *_patpfMETT1_*_*',
-                                    'keep *_*MET*_*_*'
+                                    'keep *_*_bad_TreeProducer'#,
+                                    #'drop patJets*_*_*_*'
+                                    #'keep *_slimmedMuons_*_*',
+                                    #'drop *_selectedPatJetsForMetT1T2Corr_*_*',
+                                    #'drop patJets_*_*_*'
                                   ),        
                                   SelectEvents = cms.untracked.PSet(  SelectEvents = cms.vstring('p'))
 )
