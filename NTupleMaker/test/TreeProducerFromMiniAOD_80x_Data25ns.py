@@ -39,7 +39,7 @@ process.options = cms.untracked.PSet(
 
 # How many events to process
 process.maxEvents = cms.untracked.PSet( 
-   input = cms.untracked.int32(10)
+   input = cms.untracked.int32(100)
 )
 
 ### External JECs =====================================================================================================
@@ -199,8 +199,9 @@ process.HBHENoiseFilterResultProducer.defaultDecision = cms.string("HBHENoiseFil
 
 fnames = []
 if runOnData:
-  fnames.append('/store/data/Run2016B/SingleMuon/MINIAOD/23Sep2016-v3/00000/00AE0629-1F98-E611-921A-008CFA1112CC.root')
+  #fnames.append('/store/data/Run2016B/SingleMuon/MINIAOD/23Sep2016-v3/00000/00AE0629-1F98-E611-921A-008CFA1112CC.root')
   #fnames.append('/store/data/Run2016G/SingleMuon/MINIAOD/23Sep2016-v1/1110000/F019E8FE-B19C-E611-8FAD-6CC2173BC7B0.root')
+  fnames.append('/store/data/Run2016H/SingleMuon/MINIAOD/PromptReco-v3/000/284/036/00000/0E02D50E-989F-E611-A962-FA163EE15C80.root')
 else:
   fnames.append('/store/mc/RunIISpring16MiniAODv2/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/00000/00F0B3DC-211B-E611-A6A0-001E67248A39.root')
     
@@ -577,8 +578,10 @@ RecMuonHLTriggerMatching = cms.untracked.vstring(
 'HLT_Mu27_v.*:hltL3fL1sMu22Or25L1f0L2f10QL3Filtered27Q',
 'HLT_Mu45_eta2p1_v.*:hltL3fL1sMu22Or25L1f0L2f10QL3Filtered45e2p1Q',
 'HLT_Mu50_v.*:hltL3fL1sMu22Or25L1f0L2f10QL3Filtered50Q',
-'HLT_Mu17_TrkIsoVVL_v.*:hltL3fL1sMu1lqL1f0L2f10L3Filtered17TkIsoFiltered0p4, hltL3fL1sMu10lqL1f0L2f10L3Filtered17',
-'HLT_Mu8_TrkIsoVVL_v.*:hltL3fL1sMu5L1f0L2f5L3Filtered8TkIsoFiltered0p4, hltL3fL1sMu5L1f0L2f5L3Filtered8',
+'HLT_Mu17_TrkIsoVVL_v.*:hltL3fL1sMu1lqL1f0L2f10L3Filtered17TkIsoFiltered0p4',
+'HLT_Mu17_TrkIsoVVL_v.*:hltL3fL1sMu10lqL1f0L2f10L3Filtered17',
+'HLT_Mu8_TrkIsoVVL_v.*:hltL3fL1sMu5L1f0L2f5L3Filtered8TkIsoFiltered0p4',
+'HLT_Mu8_TrkIsoVVL_v.*:hltL3fL1sMu5L1f0L2f5L3Filtered8',
 #MuonEG
 'HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v.*:hltL1sMu12EG10',
 'HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v.*:hltMu17TrkIsoVVLEle12CaloIdLTrackIdLIsoVLMuonlegL3IsoFiltered17',
@@ -676,7 +679,7 @@ RecElectronHLTriggerMatching = cms.untracked.vstring(
 'HLT_Ele27_eta2p1_WPLoose_Gsf_LooseIsoPFTau20_SingleL1_v.*:hltEle27erWPLooseGsfTrackIsoFilter',
 'HLT_Ele27_eta2p1_WPLoose_Gsf_LooseIsoPFTau20_SingleL1_v.*:hltOverlapFilterIsoEle27WPLooseGsfLooseIsoPFTau20',
 'HLT_Ele32_eta2p1_WPLoose_Gsf_LooseIsoPFTau20_SingleL1_v.*:hltL1sSingleEG40IorSingleIsoEG22erIorSingleIsoEG24er,hltL1sSingleEGor',
-'HLT_Ele32_eta2p1_WPLoose_Gsf_LooseIsoPFTau20_SingleL1_v.*:hltEle32WPLooseGsfTrackIsoFilter',
+'HLT_Ele32_eta2p1_WPLoose_Gsf_LooseIsoPFTau20_SingleL1_v.*:hltEle32WPLooseGsfTrackIsoFilter,hltEle32erWPLooseGsfTrackIsoFilter',
 'HLT_Ele32_eta2p1_WPLoose_Gsf_LooseIsoPFTau20_SingleL1_v.*:hltOverlapFilterIsoEle32WPLooseGsfLooseIsoPFTau20',
 'HLT_Ele23_CaloIdL_TrackIdL_IsoVL_v.*:hltEle23CaloIdLTrackIdLIsoVLTrackIsoFilter',
 'HLT_Ele12_CaloIdL_TrackIdL_IsoVL_v.*:hltEle12CaloIdLTrackIdLIsoVLTrackIsoFilter',
