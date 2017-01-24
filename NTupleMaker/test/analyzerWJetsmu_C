@@ -191,6 +191,7 @@ TH2D *histo = (TH2D*) obj;
 
 		float charge_ =mu_charge[muon_index] ;
 
+
 		if ( jentry%100000 ==0 ) cout<<" working for you...processed " <<float(jentry/nentries)<<" and "<<jentry<<" events from "<<nentries<<" dataset "<<datasetName->c_str()<<" weight "<<all_weights<< endl;
 
 		if (isWJ && (npartons>0 && npartons<5)) continue;
@@ -266,6 +267,8 @@ if(electron_index>-1 )		ElV.SetPtEtaPhiM(el_pt[electron_index], el_eta[electron_
 if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], ta_phi[taus_index], ta_mass[taus_index]);
 
 
+		if ( met > 40. && Sign == "SS") continue;
+		if ( met < 40. && Sign == "OS") continue;
 
 		int iCut = 1;
 

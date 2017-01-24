@@ -138,7 +138,7 @@ int main(int argc, char * argv[]) {
 
   string cmsswBase = (getenv ("CMSSW_BASE"));
   string fullPathToJsonFile = cmsswBase + "/src/DesyTauAnalyses/NTupleMaker/test/json/" + jsonFile;
-//RecoilCorrector recoilMetCorrector("HTT-utilities/RecoilCorrections/data/PFMET_MG_2016BCD_RooT_5.2.root");
+
   RecoilCorrector recoilMetCorrector("DesyTauAnalyses/NTupleMaker/data/PFMET_Run2016BCDEFGH_Spring16.root");
 
   MEtSys metSys("HTT-utilities/RecoilCorrections/data/MEtSys.root");
@@ -1635,6 +1635,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       int njetsforrecoil = njets;
       if (isW) njetsforrecoil = njets + 1;
 
+////while using old MC ntuples, need to use proper MET collection
       float pfmet_corr_x = 1.;
       float pfmet_corr_y = 1.;
       float met_x = 1.;
@@ -1653,7 +1654,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       met_y = analysisTree.pfmet_ey;
       }
 
-      if ((isW||isDY) && !isData) {
+      if ((isW || isDY) && !isData) {
 
 	  recoilMetCorrector.CorrectByMeanResolution(met_x,met_y,bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,pfmet_corr_x,pfmet_corr_y);
  
@@ -1711,8 +1712,9 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       met_resoDown = TMath::Sqrt(met_resoDown_x*met_resoDown_x+
 				    met_resoDown_y*met_resoDown_y);
       metphi_resoDown = TMath::ATan2(met_resoDown_y,met_resoDown_x);
- 
+
       }//if isW, isDY !isData
+
       met_ex_recoil = pfmet_corr_x;
       met_ey_recoil = pfmet_corr_y;
 
@@ -1722,6 +1724,8 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	       met_y = analysisTree.pfmet_ey;
 	}
 
+      //cout<<" corrected "<<sqrt(met_ex_recoil*met_ex_recoil+met_ey_recoil*met_ey_recoil)<<" uncorrected "<<sqrt(met_x*met_x+met_y*met_y)<<endl;
+      //cout<<""<<endl;
 
       met_ex = met_x;
       met_ey = met_y;
@@ -1740,12 +1744,6 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
      met_ex_UnclusteredEnDown = analysisTree.pfmetcorr_ex_UnclusteredEnDown;
      met_ey_UnclusteredEnDown = analysisTree.pfmetcorr_ey_UnclusteredEnDown;
 
-
-      float genmet_ex = analysisTree.genmet_ex;
-      float genmet_ey = analysisTree.genmet_ey;
-
-      genmet = TMath::Sqrt(genmet_ex*genmet_ex + genmet_ey*genmet_ey);
-      genmetphi = TMath::ATan2(genmet_ey,genmet_ex);
 
       if (!isData) npartons = analysisTree.genparticles_noutgoing;
 

@@ -976,7 +976,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	double neutralIsoMu = max(double(0),neutralIsoMuN); 
 	float absIsoMu = chargedHadIsoMu + neutralIsoMu;
 	float relIsoMu = absIsoMu/analysisTree.muon_pt[mIndex];
-	if (relIsoMu > 0.15) continue;
+	if (relIsoMu > 0.3) continue;
 
 	if (isData)
 	{	for (unsigned int iT=0; iT<analysisTree.trigobject_count; ++iT) {
@@ -1503,8 +1503,12 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
       if (!isData) npartons = analysisTree.genparticles_noutgoing;
 	
-      double met = sqrt(met_ex*met_ex + met_ey*met_ey);
-      if (met<40) continue;
+      double met = 0.;
+
+       met=sqrt(met_ex*met_ex + met_ey*met_ey);
+      if (isW || isDY) met = sqrt(met_ex_recoil*met_ex_recoil+met_ey_recoil*met_ey_recoil);
+
+      //if (met<20) continue;
 
       all_weight = weight;
 

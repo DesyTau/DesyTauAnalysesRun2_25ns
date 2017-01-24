@@ -289,7 +289,7 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
 
 		if ( (el_relIso[0] > 0.1 || mu_relIso[0] > 0.15) && !InvertLeptonIso) continue;
 		if ( (el_relIso[0] < 0.1 || mu_relIso[0] < 0.15) && InvertLeptonIso) continue;
-		if ( mu_relIso[0] > 0.3 || mu_relIso[0] > 0.2) continue;
+		if ( el_relIso[0] > 0.3 || mu_relIso[0] > 0.2) continue;
 
 
 		///remove from the all_weight the LSF  + TFR + top +trig_weig

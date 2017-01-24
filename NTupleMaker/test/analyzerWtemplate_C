@@ -64,7 +64,7 @@ void analyzer::Loop(){
 	CutList.push_back("ZpT correction");
 	CutList.push_back("Jets gt 1 ");
 	CutList.push_back("0 btag");
-	CutList.push_back("MT window");
+	CutList.push_back("MT window met>20");
 	CutList.push_back("MTmutau");
 	CutList.push_back("Cuts");
 	CutList.push_back("Cuts2");
@@ -446,6 +446,7 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
 		if (MT < 20.) continue;
 		if (MT < 60.) continue;
 		if (MT >120.) continue;
+	//	if (met<20.) continue;
 		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
 		CFCounter[iCut]+= all_weights;
 		CFCounter_[iCut]+= all_weights;

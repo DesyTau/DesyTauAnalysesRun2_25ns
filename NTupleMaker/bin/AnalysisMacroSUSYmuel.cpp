@@ -1622,6 +1622,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       int njetsforrecoil = njets;
       if (isW) njetsforrecoil = njets + 1;
 
+////while using old MC ntuples, need to use proper MET collection
       float pfmet_corr_x = 1.;
       float pfmet_corr_y = 1.;
       float met_x = 1.;
@@ -1639,7 +1640,6 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       met_x = analysisTree.pfmet_ex;
       met_y = analysisTree.pfmet_ey;
       }
-
 
       if ((isW || isDY) && !isData) {
 
@@ -1699,18 +1699,20 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       met_resoDown = TMath::Sqrt(met_resoDown_x*met_resoDown_x+
 				    met_resoDown_y*met_resoDown_y);
       metphi_resoDown = TMath::ATan2(met_resoDown_y,met_resoDown_x);
- 
+
       }//if isW, isDY !isData
 
       met_ex_recoil = pfmet_corr_x;
       met_ey_recoil = pfmet_corr_y;
 
       //revert back to uncorrected met
-
 	if(!isData)
 	{      met_x = analysisTree.pfmet_ex;
 	       met_y = analysisTree.pfmet_ey;
 	}
+
+      //cout<<" corrected "<<sqrt(met_ex_recoil*met_ex_recoil+met_ey_recoil*met_ey_recoil)<<" uncorrected "<<sqrt(met_x*met_x+met_y*met_y)<<endl;
+      //cout<<""<<endl;
 
       met_ex = met_x;
       met_ey = met_y;
@@ -1735,6 +1737,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
       genmet = TMath::Sqrt(genmet_ex*genmet_ex + genmet_ey*genmet_ey);
       genmetphi = TMath::ATan2(genmet_ey,genmet_ex);
+
 
       if (!isData) npartons = analysisTree.genparticles_noutgoing;
 
