@@ -208,8 +208,7 @@ fnames = []
 if runOnData:
   fnames.append('/store/data/Run2016B/SingleMuon/MINIAOD/PromptReco-v2/000/273/448/00000/CECFFCBE-CE1C-E611-8660-02163E011A4E.root')
 else:
-  #fnames.append('/store/mc/RunIISpring16MiniAODv2/TT_TuneCUETP8M1_13TeV-powheg-pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext3-v2/70000/041A166C-B53F-E611-BF34-5CB90179CCC0.root')
-  fnames.append('/store/mc/RunIISpring16MiniAODv2/SUSYGluGluToHToTauTau_M-120_TuneCUETP8M1_13TeV-pythia8/MINIAODSIM/PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14-v1/00000/6AE671C2-0849-E611-878E-28924A33B062.root')
+  fnames.append('/store/mc/RunIISummer16MiniAODv2/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v2/50000/7C434F1C-82C4-E611-B0D3-008CFA0518D4.root')
 
 # Define the input source
 process.source = cms.Source("PoolSource", 
@@ -446,6 +445,8 @@ HLTriggerPaths = cms.untracked.vstring(
 'HLT_Mu27_v',
 'HLT_Mu45_eta2p1_v',
 'HLT_Mu50_v',
+'HLT_Mu17_TrkIsoVVL_v',
+'HLT_Mu8_TrkIsoVVL_v', 
 #SingleElectron
 'HLT_Ele22_eta2p1_WPLoose_Gsf_v',
 'HLT_Ele23_WPLoose_Gsf_v',
@@ -465,12 +466,17 @@ HLTriggerPaths = cms.untracked.vstring(
 'HLT_Ele24_eta2p1_WPLoose_Gsf_LooseIsoPFTau20_v',
 'HLT_Ele27_eta2p1_WPLoose_Gsf_LooseIsoPFTau20_SingleL1_v',
 'HLT_Ele32_eta2p1_WPLoose_Gsf_LooseIsoPFTau20_SingleL1_v',
+'HLT_Ele23_CaloIdL_TrackIdL_IsoVL_v',
+'HLT_Ele12_CaloIdL_TrackIdL_IsoVL_v',
+'HLT_Ele24_eta2p1_WPLoose_Gsf_LooseIsoPFTau30_v', # for RunG-H
 #MuonEG
 'HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v',
 'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v',
 'HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_v',
 'HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v',
 'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v', 
+'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v',
+'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v',
 #DoubleMuon
 'HLT_Mu17_Mu8_DZ_v',
 'HLT_Mu17_Mu8_SameSign_DZ_v',
@@ -488,6 +494,8 @@ HLTriggerPaths = cms.untracked.vstring(
 'HLT_DoubleMu38NoFiltersNoVtx_v',
 'HLT_TripleMu_12_10_5_v',
 'HLT_TripleMu_5_3_3_v',
+'HLT_DoubleIsoMu17_eta2p1_noDzCut_v',
+'HLT_DoubleIsoMu17_eta2p1_v',
 #DoubleElectron
 'HLT_DoubleEle24_22_eta2p1_WPLoose_Gsf_v',
 'HLT_DoubleEle33_CaloIdL_GsfTrkIdVL_MW_v',
@@ -515,7 +523,7 @@ HLTriggerPaths = cms.untracked.vstring(
 'HLT_PFJet80_v',
 'HLT_PFJet140_v'
 ),
-TriggerProcess = cms.untracked.string("HLT2"),
+TriggerProcess = cms.untracked.string("HLT"),
 Flags = cms.untracked.vstring(
   'Flag_HBHENoiseFilter',
   'Flag_HBHENoiseIsoFilter',
@@ -577,6 +585,10 @@ RecMuonHLTriggerMatching = cms.untracked.vstring(
 'HLT_Mu27_v.*:hltL3fL1sMu22Or25L1f0L2f10QL3Filtered27Q',
 'HLT_Mu45_eta2p1_v.*:hltL3fL1sMu22Or25L1f0L2f10QL3Filtered45e2p1Q',
 'HLT_Mu50_v.*:hltL3fL1sMu22Or25L1f0L2f10QL3Filtered50Q',
+'HLT_Mu17_TrkIsoVVL_v.*:hltL3fL1sMu1lqL1f0L2f10L3Filtered17TkIsoFiltered0p4',
+'HLT_Mu17_TrkIsoVVL_v.*:hltL3fL1sMu10lqL1f0L2f10L3Filtered17',
+'HLT_Mu8_TrkIsoVVL_v.*:hltL3fL1sMu5L1f0L2f5L3Filtered8TkIsoFiltered0p4',
+'HLT_Mu8_TrkIsoVVL_v.*:hltL3fL1sMu5L1f0L2f5L3Filtered8',
 #MuonEG
 'HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v.*:hltL1sMu12EG10',
 'HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v.*:hltMu17TrkIsoVVLEle12CaloIdLTrackIdLIsoVLMuonlegL3IsoFiltered17',
@@ -588,7 +600,13 @@ RecMuonHLTriggerMatching = cms.untracked.vstring(
 'HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v.*:hltMu8TrkIsoVVLEle17CaloIdLTrackIdLIsoVLMuonlegL3IsoFiltered8',
 'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v.*:hltL1sMu5EG20IorMu5IsoEG18,hltL1sMu5EG20IorMu5IsoEG18IorMu5IsoEG20IorMu5EG23',
 'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v.*:hltMu8TrkIsoVVLEle23CaloIdLTrackIdLIsoVLMuonlegL3IsoFiltered8', 
-#MuonEG
+'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v.*:hltL1sMu20EG10IorMu23EG10',
+'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v.*:hltMu23TrkIsoVVLEle12CaloIdLTrackIdLIsoVLMuonlegL3IsoFiltered23',
+'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v.*:hltMu23TrkIsoVVLEle12CaloIdLTrackIdLIsoVLDZFilter',
+'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v.*:hltMu8TrkIsoVVLEle23CaloIdLTrackIdLIsoVLDZFilter',
+'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v.*:hltL1sMu5EG20IorMu5IsoEG18IorMu5IsoEG20IorMu5EG23',
+'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v.*:hltMu8TrkIsoVVLEle23CaloIdLTrackIdLIsoVLMuonlegL3IsoFiltered8',
+#DoubleMuon
 'HLT_Mu17_Mu8_DZ_v.*:hltL3pfL1sDoubleMu114ORDoubleMu125L1f0L2pf0L3PreFiltered8,hltL3pfL1sDoubleMu114L1f0L2pf0L3PreFiltered8',
 'HLT_Mu17_Mu8_DZ_v.*:hltL3fL1sDoubleMu114L1f0L2f10OneMuL3Filtered17',
 'HLT_Mu17_Mu8_DZ_v.*:hltDiMuonGlb17Glb8DzFiltered0p2',
@@ -628,6 +646,8 @@ RecMuonHLTriggerMatching = cms.untracked.vstring(
 'HLT_TripleMu_12_10_5_v.*:hltL1TripleMu553L2TriMuFiltered3L3TriMuFiltered12105',
 'HLT_TripleMu_5_3_3_v.*:hltL1TripleMu0L2TriMuFiltered0L3TriMuFiltered533,hltL1TripleMu500L2TriMuFiltered0L3TriMuFiltered533',
 'HLT_TripleMu_5_3_3_v.*:hltL1TripleMu0L2TriMuFiltered0L3TriMuFiltered3,hltL1TripleMu500L2TriMuFiltered0L3TriMuFiltered3',
+'HLT_DoubleIsoMu17_eta2p1_noDzCut_v.*:hltL3crIsoL1sDoubleMu125L1f16erL2f10QL3f17QL3L3crIsoRhoFiltered0p15IterTrk02',
+'HLT_DoubleIsoMu17_eta2p1_v.*:hltL3crIsoL1sDoubleMu125L1f16erL2f10QL3f17QL3Dz0p2L3crIsoRhoFiltered0p15IterTrk02'
 ),
 RecMuonNum = cms.untracked.int32(0),
 # photons
@@ -666,8 +686,10 @@ RecElectronHLTriggerMatching = cms.untracked.vstring(
 'HLT_Ele27_eta2p1_WPLoose_Gsf_LooseIsoPFTau20_SingleL1_v.*:hltEle27erWPLooseGsfTrackIsoFilter',
 'HLT_Ele27_eta2p1_WPLoose_Gsf_LooseIsoPFTau20_SingleL1_v.*:hltOverlapFilterIsoEle27WPLooseGsfLooseIsoPFTau20',
 'HLT_Ele32_eta2p1_WPLoose_Gsf_LooseIsoPFTau20_SingleL1_v.*:hltL1sSingleEG40IorSingleIsoEG22erIorSingleIsoEG24er,hltL1sSingleEGor',
-'HLT_Ele32_eta2p1_WPLoose_Gsf_LooseIsoPFTau20_SingleL1_v.*:hltEle32WPLooseGsfTrackIsoFilter',
+'HLT_Ele32_eta2p1_WPLoose_Gsf_LooseIsoPFTau20_SingleL1_v.*:hltEle32WPLooseGsfTrackIsoFilter,hltEle32erWPLooseGsfTrackIsoFilter',
 'HLT_Ele32_eta2p1_WPLoose_Gsf_LooseIsoPFTau20_SingleL1_v.*:hltOverlapFilterIsoEle32WPLooseGsfLooseIsoPFTau20',
+'HLT_Ele23_CaloIdL_TrackIdL_IsoVL_v.*:hltEle23CaloIdLTrackIdLIsoVLTrackIsoFilter',
+'HLT_Ele12_CaloIdL_TrackIdL_IsoVL_v.*:hltEle12CaloIdLTrackIdLIsoVLTrackIsoFilter',
 #MuonEG
 'HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v.*:hltL1sMu12EG10',
 'HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v.*:hltMu17TrkIsoVVLEle12CaloIdLTrackIdLIsoVLElectronlegTrackIsoFilter',
@@ -679,6 +701,12 @@ RecElectronHLTriggerMatching = cms.untracked.vstring(
 'HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v.*:hltMu8TrkIsoVVLEle17CaloIdLTrackIdLIsoVLElectronlegTrackIsoFilter',
 'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v.*:hltL1sMu5EG20IorMu5IsoEG18,hltL1sMu5EG20IorMu5IsoEG18IorMu5IsoEG20IorMu5EG23',
 'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v.*:hltMu8TrkIsoVVLEle23CaloIdLTrackIdLIsoVLElectronlegTrackIsoFilter', 
+'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v.*:hltL1sMu20EG10IorMu23EG10',
+'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v.*:hltMu23TrkIsoVVLEle12CaloIdLTrackIdLIsoVLElectronlegTrackIsoFilter',
+'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v.*:hltMu23TrkIsoVVLEle12CaloIdLTrackIdLIsoVLDZFilter',
+'HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_DZ_v.*:hltL1sMu5EG20IorMu5IsoEG18IorMu5IsoEG20IorMu5EG23',
+'HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_DZ_v.*:hltMu8TrkIsoVVLEle23CaloIdLTrackIdLIsoVLElectronlegTrackIsoFilter',
+'HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_DZ_v.*:hltMu8TrkIsoVVLEle23CaloIdLTrackIdLIsoVLDZFilter',
 #DoubleEG
 'HLT_DoubleEle24_22_eta2p1_WPLoose_Gsf_v.*:hltEle24Ele22WPLooseGsfleg1TrackIsoFilter',
 'HLT_DoubleEle24_22_eta2p1_WPLoose_Gsf_v.*:hltEle24Ele22WPLooseGsfleg2TrackIsoFilter',
@@ -700,7 +728,7 @@ RecElectronHLTriggerMatching = cms.untracked.vstring(
 RecElectronNum = cms.untracked.int32(0),
 # taus
 RecTauPtMin = cms.untracked.double(15),
-RecTauEtaMax = cms.untracked.double(2.5),                                      
+RecTauEtaMax = cms.untracked.double(2.5),
 RecTauHLTriggerMatching = cms.untracked.vstring(
 #SingleMuon
 'HLT_IsoMu17_eta2p1_LooseIsoPFTau20_SingleL1_v.*:hltPFTau20TrackLooseIsoAgainstMuon',
@@ -724,6 +752,8 @@ RecTauHLTriggerMatching = cms.untracked.vstring(
 'HLT_Ele27_eta2p1_WPLoose_Gsf_LooseIsoPFTau20_SingleL1_v.*:hltOverlapFilterIsoEle27WPLooseGsfLooseIsoPFTau20',
 'HLT_Ele32_eta2p1_WPLoose_Gsf_LooseIsoPFTau20_SingleL1_v.*:hltPFTau20TrackLooseIso',
 'HLT_Ele32_eta2p1_WPLoose_Gsf_LooseIsoPFTau20_SingleL1_v.*:hltOverlapFilterIsoEle32WPLooseGsfLooseIsoPFTau20',
+'HLT_Ele24_eta2p1_WPLoose_Gsf_LooseIsoPFTau30_v.*:hltOverlapFilterIsoEle24WPLooseGsfLooseIsoPFTau30', # for RunG-H
+'HLT_Ele24_eta2p1_WPLoose_Gsf_LooseIsoPFTau30_v.*:hltPFTau30TrackLooseIso',# for RunG-H
 #Tau
 'HLT_DoubleMediumIsoPFTau32_Trk1_eta2p1_Reg_v.*:hltDoublePFTau32TrackPt1MediumIsolationDz02Reg',
 'HLT_DoubleMediumIsoPFTau35_Trk1_eta2p1_Reg_v.*:hltDoublePFTau35TrackPt1MediumIsolationDz02Reg',
