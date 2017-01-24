@@ -12,7 +12,8 @@
 #include <DataFormats/HLTReco/interface/TriggerTypeDefs.h>
 #include "RecoBTag/BTagTools/interface/SignedImpactParameter3D.h"
 #include <DataFormats/TrackReco/interface/Track.h>
-
+#include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
+#include "JetMETCorrections/Objects/interface/JetCorrectionsRecord.h"
 
 #include "TrackingTools/PatternTools/interface/TwoTrackMinimumDistance.h"
 #include "RecoVertex/KinematicFitPrimitives/interface/KinematicParticleFactoryFromTransientTrack.h"
@@ -86,7 +87,6 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
   cYear(iConfig.getUntrackedParameter<unsigned int>("Year")),
   cPeriod(iConfig.getUntrackedParameter<std::string>("Period")),
   cSkim(iConfig.getUntrackedParameter<unsigned int>("Skim")),
-  cJECfile(iConfig.getUntrackedParameter<std::string>("JECfile")),
   // switches (collections)
   cgen(iConfig.getUntrackedParameter<bool>("GenParticles", false)),
   csusyinfo(iConfig.getUntrackedParameter<bool>("SusyInfo", false)),
@@ -251,7 +251,6 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
 				 myManualCatWeigthsTrig);
 
   string cmsswBase = (getenv ("CMSSW_BASE"));
-  jecUnc = new JetCorrectionUncertainty(cmsswBase+"/src/"+cJECfile);  
   
   if(cgen && !cdata)
     consumes<LHEEventProduct>(edm::InputTag("externalLHEProducer"));
@@ -3615,37 +3614,20 @@ unsigned int NTupleMaker::AddPFJets(const edm::Event& iEvent, const edm::EventSe
 
   edm::Handle<pat::JetCollection> pfjets;
   iEvent.getByToken(JetCollectionToken_, pfjets);
-  
-  //	edm::Handle<std::vector<reco::SecondaryVertexTagInfo> > svInfos;
-  //	iEvent.getByLabel(edm::InputTag("secondaryVertexTagInfosEI"), svInfos);
-  //	assert(svInfos.isValid());
+
+  edm::ESHandle<JetCorrectorParametersCollection> JetCorParColl;
+  iSetup.get<JetCorrectionsRecord>().get("AK4PFchs",JetCorParColl); 
+  JetCorrectorParameters const & JetCorPar = (*JetCorParColl)["Uncertainty"];
+  JetCorrectionUncertainty *jecUnc = new JetCorrectionUncertainty(JetCorPar);
   
   edm::Handle<edm::ValueMap<float> > puJetIdMVAFull;
-  //iEvent.getByLabel(edm::InputTag("puJetIdForPFMVAMEt","fullDiscriminant"), puJetIdMVAFull);
   iEvent.getByLabel(edm::InputTag("pileupJetIdFull","full53xDiscriminant"), puJetIdMVAFull);
 
   edm::Handle<reco::PFJetCollection> ak4jets;
-  //iEvent.getByLabel(edm::InputTag("calibratedAK4PFJetsForPFMVAMEt"), ak4jets);
-  //iEvent.getByLabel(edm::InputTag("ak4PFJets"), ak4jets);
-  //iEvent.getByLabel(edm::InputTag("AK4PFCHS"), ak4jets);
   iEvent.getByLabel(edm::InputTag("slimmedJets"), ak4jets);
   
-  //	edm::Handle<edm::ValueMap<int> > puJetIdFlagFull;
-  //	iEvent.getByLabel(edm::InputTag("pileupJetIdProducer","fullId"), puJetIdFlagFull);
-
   if(pfjets.isValid())
     {
-      // if (pfjets->size()>0) {
-      // 	const std::vector< std::pair< std::string, float > > pairDiscriVector = (*pfjets)[0].getPairDiscri();
-      // 	int nDiscri = pairDiscriVector.size();
-      // 	std::cout << "Number of discriminators = " << nDiscri << std::endl;
-      // 	for (int iD=0;iD<nDiscri;++iD) {
-      // 	  std::pair<std::string, float> pairDiscri = pairDiscriVector[iD];
-      // 	  std::cout << "Dicsr = " << pairDiscriVector[iD].first << std::endl;
-      // 	}
-      // }
-      // std::cout << std::endl;
-      
       
       for(unsigned i = 0 ; i < pfjets->size() ; i++)
 	{
@@ -3658,7 +3640,6 @@ unsigned int NTupleMaker::AddPFJets(const edm::Event& iEvent, const edm::EventSe
 
 	  if((*pfjets)[i].pt() < cJetPtMin) continue;
 	  if(fabs((*pfjets)[i].eta()) > cJetEtaMax) continue;
-	  //	  std::cout << "Jet  " << i <<  ", pT=" <<  (*pfjets)[i].pt() << std::endl;
 	  
 	  pfjet_e[pfjet_count] = (*pfjets)[i].energy();
 	  pfjet_px[pfjet_count] = (*pfjets)[i].px();
@@ -3692,13 +3673,6 @@ unsigned int NTupleMaker::AddPFJets(const edm::Event& iEvent, const edm::EventSe
 	      if (cdata) pfjet_energycorr_l2l3residual[pfjet_count] = (*pfjets)[i].jecFactor("L2L3Residual");
 	    }
 		    
-	  // std::cout << "Jet Energy corrections : " << std::endl;
-	  // std::cout << "    L1FastJet    = " << pfjet_energycorr_l1fastjet[pfjet_count] << std::endl;
-	  // std::cout << "    L2Relative   = " << pfjet_energycorr_l2relative[pfjet_count] << std::endl;
-	  // std::cout << "    L3Absolute   = " << pfjet_energycorr_l3absolute[pfjet_count] << std::endl;
-	  // std::cout << "    L2L3Residual = " << pfjet_energycorr_l2l3residual[pfjet_count] << std::endl;
-	  // std::cout << "    Total (Uncor)= " << pfjet_energycorr[pfjet_count] << std::endl;
-	  	  
 	  jecUnc->setJetEta(pfjet_eta[pfjet_count]);
 	  jecUnc->setJetPt(pfjet_pt[pfjet_count]);
 	  pfjet_jecUncertainty[pfjet_count] = jecUnc->getUncertainty(true);
