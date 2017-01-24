@@ -419,7 +419,8 @@ void NTupleMaker::beginJob(){
     tree->Branch("muon_isMedium",muon_isMedium,"muon_isMedium[muon_count]/O");
     tree->Branch("muon_isICHEP",muon_isICHEP,"muon_isICHEP[muon_count]/O");
     tree->Branch("muon_genmatch", muon_genmatch, "muon_genmatch[muon_count]/I");
-    tree->Branch("muon_isDuplicateMuon",muon_isDuplicateMuon,"muon_isDuplicateMuon[muon_count]/O");
+    tree->Branch("muon_isDuplicate",muon_isDuplicate,"muon_isDuplicate[muon_count]/O");
+    tree->Branch("muon_isBad",muon_isBad,"muon_isBad[muon_count]/O");
 
     tree->Branch("dimuon_count", &dimuon_count, "dimuon_count/i");
     tree->Branch("dimuon_leading", dimuon_leading, "dimuon_leading[dimuon_count]/i");
@@ -1508,8 +1509,8 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     bool ifilterBadGlobalMuon;
     edm::Handle<edm::PtrVector<reco::Muon>> BadGlobalMuons;
     iEvent.getByToken(BadGlobalMuonsToken_, BadGlobalMuons);
-    if(BadGlobalMuons->size() == 0 ) ifilterBadGlobalMuon = false;
-    else                             ifilterBadGlobalMuon = true;
+    if(BadGlobalMuons->size() == 0 ) ifilterBadGlobalMuon = true;
+    else                             ifilterBadGlobalMuon = false;
     flags_->insert(std::pair<string, int>("Flag_BadGlobalMuonFilter", ifilterBadGlobalMuon));
   }
   
@@ -2664,6 +2665,9 @@ unsigned int NTupleMaker::AddMuons(const edm::Event& iEvent, const edm::EventSet
   edm::Handle<edm::PtrVector<reco::Muon>> BadDuplicateMuons;
   iEvent.getByToken(BadDuplicateMuonsToken_, BadDuplicateMuons);
 
+  edm::Handle<edm::PtrVector<reco::Muon>> BadGlobalMuons;
+  iEvent.getByToken(BadGlobalMuonsToken_, BadGlobalMuons);
+
   if(Muons.isValid())
     {
       for(unsigned i = 0 ; i < Muons->size() ; i++){
@@ -2788,10 +2792,14 @@ unsigned int NTupleMaker::AddMuons(const edm::Event& iEvent, const edm::EventSet
 	    muon_genmatch[muon_count] = utils_genMatch::genMatch( (*Muons)[i].p4(), *GenParticles);
 	}
 
-	// Duplicate muons
-	muon_isDuplicateMuon[muon_count] = false;
+	// Duplicate & bad muons
+	muon_isDuplicate[muon_count] = false;
 	for(unsigned j = 0; j < BadDuplicateMuons->size(); j++){
-	  if((*BadDuplicateMuons)[j]->pt() == muon_pt[muon_count]) muon_isDuplicateMuon[muon_count] = true;
+	  if((*BadDuplicateMuons)[j]->pt() == muon_pt[muon_count]) muon_isDuplicate[muon_count] = true;
+	}
+	muon_isBad[muon_count] = false;
+	for(unsigned j = 0; j < BadGlobalMuons->size(); j++){
+	  if((*BadGlobalMuons)[j]->pt() == muon_pt[muon_count]) muon_isBad[muon_count] = true;
 	}
 
 	// Dimuons
