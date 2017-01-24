@@ -8,7 +8,7 @@ period = 'Spring16'
 
 #configurable options =======================================================================
 runOnData=isData #data/MC switch
-usePrivateSQlite=False #use external JECs (sqlite file) /// OUTDATED for 25ns
+usePrivateSQlite=True #use external JECs (sqlite file) /// OUTDATED for 25ns
 useHFCandidates=True #create an additionnal NoHF slimmed MET collection if the option is set to false  == existing as slimmedMETsNoHF
 applyResiduals=True #application of residual corrections. Have to be set to True once the 13 TeV residual corrections are available. False to be kept meanwhile. Can be kept to False later for private tests or for analysis checks and developments (not the official recommendation!).
 #===================================================================
@@ -70,7 +70,7 @@ if usePrivateSQlite:
     if runOnData:
       era="Spring16_25nsV3_DATA"
     else:
-      era="Spring16_25nsV3_MC"
+      era="Spring16_23Sep2016V2_MC"
     
     dBFile = os.path.expandvars("$CMSSW_BASE/src/DesyTauAnalyses/NTupleMaker/data/JEC/"+era+".db")
     process.jec = cms.ESSource("PoolDBESSource",CondDBSetup,
@@ -85,6 +85,11 @@ if usePrivateSQlite:
                 record = cms.string("JetCorrectionsRecord"),
                 tag = cms.string("JetCorrectorParametersCollection_"+era+"_AK4PFchs"),
                 label= cms.untracked.string("AK4PFchs")
+                ),
+            cms.PSet(
+                record = cms.string("JetCorrectionsRecord"),
+                tag = cms.string("JetCorrectorParametersCollection_"+era+"_AK4PFPuppi"),
+                label= cms.untracked.string("AK4PFPuppi")
                 ),
             )
                                )
@@ -349,17 +354,12 @@ GenParticles = cms.untracked.bool(not isData),
 GenJets = cms.untracked.bool(not isData)
 )
 
-JECfile = "DesyTauAnalyses/NTupleMaker/data/JEC/Spring16_25nsV6/Spring16_25nsV6_MC_Uncertainty_AK4PFchs.txt"
-if isData:
-  JECfile = "DesyTauAnalyses/NTupleMaker/data/JEC/Spring16_25nsV6/Spring16_25nsV6_DATA_Uncertainty_AK4PFchs.txt"
-
 process.makeroottree = cms.EDAnalyzer("NTupleMaker",
 # data, year, period, skim
 IsData = cms.untracked.bool(isData),
 Year = cms.untracked.uint32(year),
 Period = cms.untracked.string(period),
 Skim = cms.untracked.uint32(0),
-JECfile = cms.untracked.string(JECfile),
 # switches of collections
 GenParticles = cms.untracked.bool(not isData),
 GenJets = cms.untracked.bool(not isData),
