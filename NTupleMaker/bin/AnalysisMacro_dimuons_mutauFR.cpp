@@ -40,11 +40,15 @@ int main(int argc, char * argv[]) {
   Config cfg(argv[1]);
 
     const bool isData = cfg.get<bool>("IsData");
+    const bool isData2016BCDEF = cfg.get<bool>("IsData2016BCDEF");
+    const bool isData2016GH = cfg.get<bool>("IsData2016GH");
     const bool isDY = cfg.get<bool>("IsDY");
     const bool applyGoodRunSelection = cfg.get<bool>("ApplyGoodRunSelection");
 
     const string jsonFile = cfg.get<string>("jsonFile");
-    
+    const string dataPUFile = cfg.get<string>("DataPUFile");
+    const string mcPUFile = cfg.get<string>("MCPUFile");
+
     // pile up reweighting
     const bool applyPUreweighting = cfg.get<bool>("ApplyPUreweighting");
 
@@ -240,8 +244,12 @@ int main(int argc, char * argv[]) {
   PileUp * PUofficial = new PileUp();
   
   if (applyPUreweighting) {
-    TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/pileUp_data_RunBCDEFGH_ReReco.root","read");
-    TFile * filePUdistribution_MC = new TFile (TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/MC_Spring16_PU.root", "read");
+    //Temprory DY MC Summer16, other MCs are Spring16, need to switch mannually, won't need this when all the Summer16 samples come
+    //TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/pileUp_data_runBCDEFGH_Rereco_xsec69p2mb_bin50.root","read");
+    //TFile * filePUdistribution_MC = new TFile (TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/MC_Spring16_PU.root", "read");
+
+    TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/"+TString(dataPUFile),"read");
+    TFile * filePUdistribution_MC = new TFile (TString(cmsswBase)+"/src/"+TString(mcPUFile), "read");
     TH1D * PU_data = (TH1D *)filePUdistribution_data->Get("pileup");
     TH1D * PU_mc = (TH1D *)filePUdistribution_MC->Get("pileup");
     PUofficial->set_h_data(PU_data); 
@@ -475,8 +483,20 @@ int main(int argc, char * argv[]) {
 	allMuons.push_back(im);
 	if (fabs(analysisTree.muon_dxy[im])>dxyMuonTagCut) muPassed = false;
 	if (fabs(analysisTree.muon_dz[im])>dzMuonTagCut) muPassed = false;
-	if (!analysisTree.muon_isMedium[im]) muPassed = false;
-	if (muPassed) idMuons.push_back(im);
+    // Muon POG suggestions for Muon ID for Moriond17
+    if(isData && isData2016BCDEF)
+    {
+        if (!analysisTree.muon_isICHEP[im]) muPassed = false;
+    }
+    if(isData && isData2016GH)
+    {
+        if (!analysisTree.muon_isMedium[im]) muPassed = false;
+    }
+    if(!isData)
+    {
+        if (!analysisTree.muon_isMedium[im]) muPassed = false;
+    }
+    if (muPassed) idMuons.push_back(im);
 	float absIso = 0;
 	if (isoDR03) { 
         absIso = analysisTree.muon_r03_sumChargedHadronPt[im];
@@ -751,12 +771,18 @@ int main(int argc, char * argv[]) {
                         {
                             mcweight = analysisTree.genweight;
                             isoweight_1 = (float)SF_muonIdIso->get_ScaleFactor(double(analysisTree.muon_pt[index1]),double(analysisTree.muon_eta[index1]));
+                            //FIX ME next time for all Summer16 MC
                             trigweight_1 = (float)SF_muonTrig->get_EfficiencyData(double(analysisTree.muon_pt[index1]),double(analysisTree.muon_eta[index1]));
+                            if(isDY)
+                            {
+                                trigweight_1 = (float)SF_muonTrig->get_ScaleFactor(double(analysisTree.muon_pt[index1]),double(analysisTree.muon_eta[index1]));
+   
+                            }
                             //      cout << "isoweight_1 = " << isoweight_1 << endl;
                             effweight = isoweight_1*trigweight_1;
-                            puweight = float(PUofficial->get_PUweight(double(analysisTree.numtruepileupinteractions)));
+                            puweight = float (PUofficial->get_PUweight(double(analysisTree.numtruepileupinteractions)));
                         }
-                       
+                        //cout << "Pile up weight: " << puweight<< endl;
                         float absIso = analysisTree.muon_r04_sumChargedHadronPt[index1];
                         float neutralIso = analysisTree.muon_r04_sumNeutralHadronEt[index1] + analysisTree.muon_r04_sumPhotonEt[index1] - 0.5*analysisTree.muon_r04_sumPUPt[index1];
                         neutralIso = TMath::Max(float(0),neutralIso);
