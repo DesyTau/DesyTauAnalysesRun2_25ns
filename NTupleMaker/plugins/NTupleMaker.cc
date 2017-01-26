@@ -281,7 +281,6 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
     L1JetCollectionToken_    = consumes<BXVector<l1t::Jet> >(iConfig.getParameter<edm::InputTag>("L1JetCollectionTag"));
     
   }
-
   
   HLTPrescaleConfig = new HLTPrescaleProvider(iConfig, consumesCollector(), *this);
 }
@@ -299,6 +298,7 @@ NTupleMaker::~NTupleMaker(){
 void NTupleMaker::beginJob(){
   edm::Service<TFileService> FS;
   tree = FS->make<TTree>("AC1B", "AC1B", 1);
+  tree->SetMaxVirtualSize(300000000);
   nEvents = FS->make<TH1D>("nEvents", "nEvents", 2, -0.5, +1.5);
   
   tree->Branch("errors", &errors, "errors/i");
@@ -3623,17 +3623,17 @@ unsigned int NTupleMaker::AddPFJets(const edm::Event& iEvent, const edm::EventSe
   edm::Handle<pat::JetCollection> pfjets;
   iEvent.getByToken(JetCollectionToken_, pfjets);
 
-  edm::ESHandle<JetCorrectorParametersCollection> JetCorParColl;
-  iSetup.get<JetCorrectionsRecord>().get("AK4PFchs",JetCorParColl); 
-  JetCorrectorParameters const & JetCorPar = (*JetCorParColl)["Uncertainty"];
-  JetCorrectionUncertainty *jecUnc = new JetCorrectionUncertainty(JetCorPar);
-  
   edm::Handle<edm::ValueMap<float> > puJetIdMVAFull;
   iEvent.getByLabel(edm::InputTag("pileupJetIdFull","full53xDiscriminant"), puJetIdMVAFull);
 
   edm::Handle<reco::PFJetCollection> ak4jets;
   iEvent.getByLabel(edm::InputTag("slimmedJets"), ak4jets);
   
+  edm::ESHandle<JetCorrectorParametersCollection> JetCorParColl;
+  iSetup.get<JetCorrectionsRecord>().get("AK4PFchs",JetCorParColl);
+  JetCorrectorParameters const & JetCorPar = (*JetCorParColl)["Uncertainty"];
+  jecUnc = new JetCorrectionUncertainty(JetCorPar); 
+
   if(pfjets.isValid())
     {
       
@@ -3707,6 +3707,8 @@ unsigned int NTupleMaker::AddPFJets(const edm::Event& iEvent, const edm::EventSe
 	}
     }
   
+  delete jecUnc;
+
   return  pfjet_count;
 }
 
