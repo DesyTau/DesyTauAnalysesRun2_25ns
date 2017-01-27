@@ -1365,6 +1365,18 @@ void NTupleMaker::beginRun(const edm::Run& iRun, const edm::EventSetup& iSetup)
 	}
     }	
   runtree->Fill();
+
+  // JEC
+  edm::ESHandle<JetCorrectorParametersCollection> JetCorParColl;
+  iSetup.get<JetCorrectionsRecord>().get("AK4PFchs",JetCorParColl);
+  JetCorrectorParameters const & JetCorPar = (*JetCorParColl)["Uncertainty"];
+  jecUnc = new JetCorrectionUncertainty(JetCorPar); 
+
+}
+
+void NTupleMaker::endRun()
+{
+  delete jecUnc;
 }
 
 void NTupleMaker::beginLuminosityBlock(const edm::LuminosityBlock& iLumiBlock, const edm::EventSetup& iSetup)
@@ -3628,11 +3640,6 @@ unsigned int NTupleMaker::AddPFJets(const edm::Event& iEvent, const edm::EventSe
 
   edm::Handle<reco::PFJetCollection> ak4jets;
   iEvent.getByLabel(edm::InputTag("slimmedJets"), ak4jets);
-  
-  edm::ESHandle<JetCorrectorParametersCollection> JetCorParColl;
-  iSetup.get<JetCorrectionsRecord>().get("AK4PFchs",JetCorParColl);
-  JetCorrectorParameters const & JetCorPar = (*JetCorParColl)["Uncertainty"];
-  jecUnc = new JetCorrectionUncertainty(JetCorPar); 
 
   if(pfjets.isValid())
     {
@@ -3706,9 +3713,6 @@ unsigned int NTupleMaker::AddPFJets(const edm::Event& iEvent, const edm::EventSe
 	  pfjet_count++;
 	}
     }
-  
-  delete jecUnc;
-
   return  pfjet_count;
 }
 

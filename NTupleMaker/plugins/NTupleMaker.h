@@ -250,6 +250,7 @@ class NTupleMaker : public edm::EDAnalyzer{
   virtual void beginJob();
   virtual void endJob();
   virtual void beginRun(const edm::Run& iRun, const edm::EventSetup& iSetup);
+  virtual void endRun();
   virtual void beginLuminosityBlock(const edm::LuminosityBlock& iLumiBlock, const edm::EventSetup& iSetup);
   virtual void endLuminosityBlock(const edm::LuminosityBlock& iLumiBlock, const edm::EventSetup& iSetup);
   virtual void analyze( const edm::Event& iEvent, const edm::EventSetup& iSetup );
