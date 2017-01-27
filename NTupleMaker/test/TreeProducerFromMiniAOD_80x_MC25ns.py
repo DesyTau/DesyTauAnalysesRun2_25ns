@@ -68,9 +68,9 @@ if usePrivateSQlite:
     CondDBSetup.__delattr__('connect')
     import os
     if runOnData:
-      era="Spring16_25nsV3_DATA"
+      era="Summer16_23Sep2016AllV3_DATA"
     else:
-      era="Spring16_23Sep2016V2_MC"
+      era="Summer16_23Sep2016V3_MC"
     
     dBFile = os.path.expandvars("$CMSSW_BASE/src/DesyTauAnalyses/NTupleMaker/data/JEC/"+era+".db")
     process.jec = cms.ESSource("PoolDBESSource",CondDBSetup,
