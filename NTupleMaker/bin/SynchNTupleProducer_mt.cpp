@@ -301,11 +301,6 @@ int main(int argc, char * argv[]) {
   Bool_t          extramuon_veto;
 
   Float_t         byCombinedIsolationDeltaBetaCorrRaw3Hits_1;
-  Float_t         againstElectronLooseMVA5_1;
-  Float_t         againstElectronMediumMVA5_1;
-  Float_t         againstElectronTightMVA5_1;
-  Float_t         againstElectronVLooseMVA5_1;
-  Float_t         againstElectronVTightMVA5_1;
   Float_t         againstMuonLoose3_1;
   Float_t         againstMuonTight3_1;
 
@@ -313,11 +308,6 @@ int main(int argc, char * argv[]) {
   Float_t         byLooseCombinedIsolationDeltaBetaCorr3Hits_2;
   Float_t         byMediumCombinedIsolationDeltaBetaCorr3Hits_2;
   Float_t         byTightCombinedIsolationDeltaBetaCorr3Hits_2;
-  Float_t         againstElectronLooseMVA5_2;
-  Float_t         againstElectronMediumMVA5_2;
-  Float_t         againstElectronTightMVA5_2;
-  Float_t         againstElectronVLooseMVA5_2;
-  Float_t         againstElectronVTightMVA5_2;
   Float_t         againstMuonLoose3_2;
   Float_t         againstMuonTight3_2;
   Float_t         againstElectronVLooseMVA6_2;
@@ -530,11 +520,6 @@ int main(int argc, char * argv[]) {
   tree->Branch("byIsolationMVArun2v1DBoldDMwLTraw_2",&byIsolationMVArun2v1DBoldDMwLTraw_2,"byIsolationMVArun2v1DBoldDMwLTraw_2/F");
   tree->Branch("byTightCombinedIsolationDeltaBetaCorr3Hits_2",&byTightCombinedIsolationDeltaBetaCorr3Hits_2,"byTightCombinedIsolationDeltaBetaCorr3Hits_2/F");
   tree->Branch("byTightIsolationMVArun2v1DBoldDMwLT_2",&byTightIsolationMVArun2v1DBoldDMwLT_2,"byTightIsolationMVArun2v1DBoldDMwLT_2/F");
-  tree->Branch("againstElectronLooseMVA5_2", &againstElectronLooseMVA5_2, "againstElectronLooseMVA5_2/F");
-  tree->Branch("againstElectronMediumMVA5_2", &againstElectronMediumMVA5_2, "againstElectronMediumMVA5_2/F");
-  tree->Branch("againstElectronTightMVA5_2", &againstElectronTightMVA5_2, "againstElectronTightMVA5_2/F");
-  tree->Branch("againstElectronVLooseMVA5_2", &againstElectronVLooseMVA5_2, "againstElectronVLooseMVA5_2/F");
-  tree->Branch("againstElectronVTightMVA5_2", &againstElectronVTightMVA5_2, "againstElectronVTightMVA5_2/F");
   tree->Branch("againstMuonLoose3_2", &againstMuonLoose3_2, "againstMuonLoose3_2/F");
   tree->Branch("againstMuonTight3_2", &againstMuonTight3_2, "againstMuonTight3_2/F");
   tree->Branch("againstElectronVLooseMVA6_2",&againstElectronVLooseMVA6_2,"againstElectronVLooseMVA6_2/F");
@@ -1402,7 +1387,6 @@ int main(int argc, char * argv[]) {
 
 	bool tauPass = 
 	  analysisTree.tau_againstElectronVLooseMVA6[tauIndex]>0.5 &&
-	  // analysisTree.tau_againstElectronVLooseMVA5[tauIndex]>0.5
 	  analysisTree.tau_againstMuonTight3[tauIndex]>0.5 &&
 	  //	  analysisTree.tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[tauIndex]<isoTauCut;
 	  //	  analysisTree.tau_byMediumCombinedIsolationDeltaBetaCorr3Hits[tauIndex] > 0.5;
@@ -2045,11 +2029,6 @@ int main(int argc, char * argv[]) {
       byLooseCombinedIsolationDeltaBetaCorr3Hits_2 = analysisTree.tau_byLooseCombinedIsolationDeltaBetaCorr3Hits[tauIndex];
       byMediumCombinedIsolationDeltaBetaCorr3Hits_2 = analysisTree.tau_byMediumCombinedIsolationDeltaBetaCorr3Hits[tauIndex];
       byTightCombinedIsolationDeltaBetaCorr3Hits_2 = analysisTree.tau_byTightCombinedIsolationDeltaBetaCorr3Hits[tauIndex];
-      againstElectronLooseMVA5_2 = analysisTree.tau_againstElectronLooseMVA5[tauIndex];
-      againstElectronMediumMVA5_2 = analysisTree.tau_againstElectronMediumMVA5[tauIndex];
-      againstElectronTightMVA5_2 = analysisTree.tau_againstElectronTightMVA5[tauIndex];
-      againstElectronVLooseMVA5_2 = analysisTree.tau_againstElectronVLooseMVA5[tauIndex];
-      againstElectronVTightMVA5_2 = analysisTree.tau_againstElectronVTightMVA5[tauIndex];
       againstMuonLoose3_2 = analysisTree.tau_againstMuonLoose3[tauIndex];
       againstMuonTight3_2 = analysisTree.tau_againstMuonTight3[tauIndex];
       againstElectronVLooseMVA6_2 = analysisTree.tau_againstElectronVLooseMVA6[tauIndex];
