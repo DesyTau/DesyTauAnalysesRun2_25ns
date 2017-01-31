@@ -10,11 +10,10 @@
 #include <DataFormats/RecoCandidate/interface/IsoDepositVetos.h>
 #include <DataFormats/METReco/interface/GenMET.h>
 #include <DataFormats/HLTReco/interface/TriggerTypeDefs.h>
-//#include "AnalysisDataFormats/TauAnalysis/interface/PFMEtSignCovMatrix.h"
-//#include "DataFormats/METReco/interface/PFMEtSignCovMatrix.h"
 #include "RecoBTag/BTagTools/interface/SignedImpactParameter3D.h"
 #include <DataFormats/TrackReco/interface/Track.h>
-
+#include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
+#include "JetMETCorrections/Objects/interface/JetCorrectionsRecord.h"
 
 #include "TrackingTools/PatternTools/interface/TwoTrackMinimumDistance.h"
 #include "RecoVertex/KinematicFitPrimitives/interface/KinematicParticleFactoryFromTransientTrack.h"
@@ -88,7 +87,6 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
   cYear(iConfig.getUntrackedParameter<unsigned int>("Year")),
   cPeriod(iConfig.getUntrackedParameter<std::string>("Period")),
   cSkim(iConfig.getUntrackedParameter<unsigned int>("Skim")),
-  cJECfile(iConfig.getUntrackedParameter<std::string>("JECfile")),
   // switches (collections)
   cgen(iConfig.getUntrackedParameter<bool>("GenParticles", false)),
   csusyinfo(iConfig.getUntrackedParameter<bool>("SusyInfo", false)),
@@ -153,6 +151,8 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
   cJetNum(iConfig.getUntrackedParameter<int>("RecJetNum", 0)),
   // collections
   MuonCollectionToken_(consumes<pat::MuonCollection>(iConfig.getParameter<edm::InputTag>("MuonCollectionTag"))),
+  BadGlobalMuonsToken_(consumes<edm::PtrVector<reco::Muon>>(iConfig.getParameter<edm::InputTag>("BadGlobalMuons"))),
+  BadDuplicateMuonsToken_(consumes<edm::PtrVector<reco::Muon>>(iConfig.getParameter<edm::InputTag>("BadDuplicateMuons"))),
   ElectronCollectionToken_(consumes<edm::View<pat::Electron> >(iConfig.getParameter<edm::InputTag>("ElectronCollectionTag"))),
   eleVetoIdMapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleVetoIdMap"))),
   eleLooseIdMapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleLooseIdMap"))),
@@ -166,13 +166,13 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
   mvaNonTrigCategoriesMapToken_(consumes<edm::ValueMap<int> >(iConfig.getParameter<edm::InputTag>("mvaNonTrigCategoriesMap"))),
   mvaTrigValuesMapToken_(consumes<edm::ValueMap<float> >(iConfig.getParameter<edm::InputTag>("mvaTrigValuesMap"))),
   mvaTrigCategoriesMapToken_(consumes<edm::ValueMap<int> >(iConfig.getParameter<edm::InputTag>("mvaTrigCategoriesMap"))),
+  mvaValuesMapSpring16MapToken_(consumes<edm::ValueMap<float> >(iConfig.getParameter<edm::InputTag>("mvaValuesMapSpring16"))),
+  mvaCategoriesMapSpring16MapToken_(consumes<edm::ValueMap<int> >(iConfig.getParameter<edm::InputTag>("mvaCategoriesMapSpring16"))),
+  eleMvaWP90GeneralMapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleMvaWP90GeneralMap"))),
+  eleMvaWP80GeneralMapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleMvaWP80GeneralMap"))),
   TauCollectionToken_(consumes<pat::TauCollection>(iConfig.getParameter<edm::InputTag>("TauCollectionTag"))),
   JetCollectionToken_(consumes<pat::JetCollection>(iConfig.getParameter<edm::InputTag>("JetCollectionTag"))),
   MetCollectionToken_(consumes<pat::METCollection>(iConfig.getParameter<edm::InputTag>("MetCollectionTag"))),
-  MetCovMatrixToken_(consumes<CovMatrix2D>(iConfig.getParameter<edm::InputTag>("MetCovMatrixTag"))),
-  MetSigToken_(consumes<double>(iConfig.getParameter<edm::InputTag>("MetSigTag"))),
-  MetCorrCovMatrixToken_(consumes<CovMatrix2D>(iConfig.getParameter<edm::InputTag>("MetCorrCovMatrixTag"))),
-  MetCorrSigToken_(consumes<double>(iConfig.getParameter<edm::InputTag>("MetCorrSigTag"))),  
   MetCorrCollectionToken_(consumes<pat::METCollection>(iConfig.getParameter<edm::InputTag>("MetCorrCollectionTag"))),
   PuppiMetCollectionToken_(consumes<pat::METCollection>(iConfig.getParameter<edm::InputTag>("PuppiMetCollectionTag"))),
   MvaMetCollectionsTag_(iConfig.getParameter<std::vector<edm::InputTag> >("MvaMetCollectionsTag")),
@@ -251,7 +251,6 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
 				 myManualCatWeigthsTrig);
 
   string cmsswBase = (getenv ("CMSSW_BASE"));
-  jecUnc = new JetCorrectionUncertainty(cmsswBase+"/src/"+cJECfile);  
   
   if(cgen && !cdata)
     consumes<LHEEventProduct>(edm::InputTag("externalLHEProducer"));
@@ -282,7 +281,6 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
     L1JetCollectionToken_    = consumes<BXVector<l1t::Jet> >(iConfig.getParameter<edm::InputTag>("L1JetCollectionTag"));
     
   }
-
   
   HLTPrescaleConfig = new HLTPrescaleProvider(iConfig, consumesCollector(), *this);
 }
@@ -300,6 +298,7 @@ NTupleMaker::~NTupleMaker(){
 void NTupleMaker::beginJob(){
   edm::Service<TFileService> FS;
   tree = FS->make<TTree>("AC1B", "AC1B", 1);
+  tree->SetMaxVirtualSize(300000000);
   nEvents = FS->make<TH1D>("nEvents", "nEvents", 2, -0.5, +1.5);
   
   tree->Branch("errors", &errors, "errors/i");
@@ -420,6 +419,8 @@ void NTupleMaker::beginJob(){
     tree->Branch("muon_isMedium",muon_isMedium,"muon_isMedium[muon_count]/O");
     tree->Branch("muon_isICHEP",muon_isICHEP,"muon_isICHEP[muon_count]/O");
     tree->Branch("muon_genmatch", muon_genmatch, "muon_genmatch[muon_count]/I");
+    tree->Branch("muon_isDuplicate",muon_isDuplicate,"muon_isDuplicate[muon_count]/O");
+    tree->Branch("muon_isBad",muon_isBad,"muon_isBad[muon_count]/O");
 
     tree->Branch("dimuon_count", &dimuon_count, "dimuon_count/i");
     tree->Branch("dimuon_leading", dimuon_leading, "dimuon_leading[dimuon_count]/i");
@@ -553,6 +554,14 @@ void NTupleMaker::beginJob(){
     tree->Branch("electron_cutId_medium_Spring15", electron_cutId_medium_Spring15, "electron_cutId_medium_Spring15[electron_count]/O");
     tree->Branch("electron_cutId_tight_Spring15", electron_cutId_tight_Spring15, "electron_cutId_tight_Spring15[electron_count]/O");
 
+    tree->Branch("electron_mva_value_Spring16_v1", electron_mva_value_Spring16_v1, "electron_mva_value_Spring16_v1[electron_count]/F");
+    tree->Branch("electron_mva_category_Spring16_v1", electron_mva_category_Spring16_v1, "electron_mva_category_Spring16_v1[electron_count]/I");
+    tree->Branch("electron_mva_wp90_general_Spring16_v1", electron_mva_wp90_general_Spring16_v1, "electron_mva_wp90_general_Spring16_v1[electron_count]/F");
+    tree->Branch("electron_mva_wp80_general_Spring16_v1", electron_mva_wp80_general_Spring16_v1, "electron_mva_wp80_general_Spring16_v1[electron_count]/F");
+
+
+
+
     tree->Branch("electron_pass_conversion", electron_pass_conversion, "electron_pass_conversion[electron_count]/O");
 
     tree->Branch("electron_genmatch", electron_genmatch, "electron_genmatch[electron_count]/I");
@@ -626,6 +635,7 @@ void NTupleMaker::beginJob(){
     tree->Branch("tau_leadchargedhadrcand_id",  tau_leadchargedhadrcand_id,  "tau_leadchargedhadrcand_id[tau_count]/I");
     tree->Branch("tau_leadchargedhadrcand_dxy", tau_leadchargedhadrcand_dxy, "tau_leadchargedhadrcand_dxy[tau_count]/F");
     tree->Branch("tau_leadchargedhadrcand_dz",  tau_leadchargedhadrcand_dz,  "tau_leadchargedhadrcand_dz[tau_count]/F");
+    tree->Branch("tau_photonPtSumOutsideSignalCone", tau_photonPtSumOutsideSignalCone, "tau_photonPtSumOutsideSignalCone[tau_count]/F");
  
     tree->Branch("tau_ntracks_pt05", tau_ntracks_pt05, "tau_ntracks_pt05[tau_count]/i");
     tree->Branch("tau_ntracks_pt08", tau_ntracks_pt05, "tau_ntracks_pt05[tau_count]/i");
@@ -720,6 +730,37 @@ void NTupleMaker::beginJob(){
     tree->Branch("pfmetcorr_ex_UnclusteredEnDown", &pfmetcorr_ex_UnclusteredEnDown, "pfmetcorr_ex_UnclusteredEnDown/F");
     tree->Branch("pfmetcorr_ey_UnclusteredEnDown", &pfmetcorr_ey_UnclusteredEnDown, "pfmetcorr_ey_UnclusteredEnDown/F");
 
+    tree->Branch("pfmetcorr_ex_JetResUp", &pfmetcorr_ex_JetResUp, "pfmetcorr_ex_JetResUp/F");
+    tree->Branch("pfmetcorr_ey_JetResUp", &pfmetcorr_ey_JetResUp, "pfmetcorr_ey_JetResUp/F");
+
+    tree->Branch("pfmetcorr_ex_JetResDown", &pfmetcorr_ex_JetResDown, "pfmetcorr_ex_JetResDown/F");
+    tree->Branch("pfmetcorr_ey_JetResDown", &pfmetcorr_ey_JetResDown, "pfmetcorr_ey_JetResDown/F");
+
+
+
+    tree->Branch("pfmetcorr_ex_smeared", &pfmetcorr_ex_smeared, "pfmetcorr_ex_smeared/F");
+    tree->Branch("pfmetcorr_ey_smeared", &pfmetcorr_ey_smeared, "pfmetcorr_ey_smeared/F");
+    tree->Branch("pfmetcorr_ez_smeared", &pfmetcorr_ey_smeared, "pfmetcorr_ez_smeared/F");
+    tree->Branch("pfmetcorr_pt_smeared", &pfmetcorr_pt_smeared, "pfmetcorr_pt_smeared/F");
+    tree->Branch("pfmetcorr_phi_smeared", &pfmetcorr_phi_smeared, "pfmetcorr_phi_smeared/F");
+    tree->Branch("pfmetcorr_ex_JetEnUp_smeared", &pfmetcorr_ex_JetEnUp_smeared, "pfmetcorr_ex_JetEnUp_smeared/F");
+    tree->Branch("pfmetcorr_ey_JetEnUp_smeared", &pfmetcorr_ey_JetEnUp_smeared, "pfmetcorr_ey_JetEnUp_smeared/F");
+
+    tree->Branch("pfmetcorr_ex_JetEnDown_smeared", &pfmetcorr_ex_JetEnDown_smeared, "pfmetcorr_ex_JetEnDown_smeared/F");
+    tree->Branch("pfmetcorr_ey_JetEnDown_smeared", &pfmetcorr_ey_JetEnDown_smeared, "pfmetcorr_ey_JetEnDown_smeared/F");
+
+    tree->Branch("pfmetcorr_ex_UnclusteredEnUp_smeared", &pfmetcorr_ex_UnclusteredEnUp_smeared, "pfmetcorr_ex_UnclusteredEnUp_smeared/F");
+    tree->Branch("pfmetcorr_ey_UnclusteredEnUp_smeared", &pfmetcorr_ey_UnclusteredEnUp_smeared, "pfmetcorr_ey_UnclusteredEnUp_smeared/F");
+
+    tree->Branch("pfmetcorr_ex_UnclusteredEnDown_smeared", &pfmetcorr_ex_UnclusteredEnDown_smeared, "pfmetcorr_ex_UnclusteredEnDown_smeared/F");
+    tree->Branch("pfmetcorr_ey_UnclusteredEnDown_smeared", &pfmetcorr_ey_UnclusteredEnDown_smeared, "pfmetcorr_ey_UnclusteredEnDown_smeared/F");
+
+    tree->Branch("pfmetcorr_ex_JetResUp_smeared", &pfmetcorr_ex_JetResUp_smeared, "pfmetcorr_ex_JetResUp_smeared/F");
+    tree->Branch("pfmetcorr_ey_JetResUp_smeared", &pfmetcorr_ey_JetResUp_smeared, "pfmetcorr_ey_JetResUp_smeared/F");
+
+    tree->Branch("pfmetcorr_ex_JetResDown_smeared", &pfmetcorr_ex_JetResDown_smeared, "pfmetcorr_ex_JetResDown_smeared/F");
+    tree->Branch("pfmetcorr_ey_JetResDown_smeared", &pfmetcorr_ey_JetResDown_smeared, "pfmetcorr_ey_JetResDown_smeared/F"); 
+
   }
 
   
@@ -745,6 +786,13 @@ void NTupleMaker::beginJob(){
 
     tree->Branch("puppimet_ex_UnclusteredEnDown", &puppimet_ex_UnclusteredEnDown, "puppimet_ex_UnclusteredEnDown/F");
     tree->Branch("puppimet_ey_UnclusteredEnDown", &puppimet_ey_UnclusteredEnDown, "puppimet_ey_UnclusteredEnDown/F");
+
+
+    tree->Branch("puppimet_ex_JetResUp", &puppimet_ex_JetResUp, "puppimet_ex_JetResUp/F");
+    tree->Branch("puppimet_ey_JetResUp", &puppimet_ey_JetResUp, "puppimet_ey_JetResUp/F");
+
+    tree->Branch("puppimet_ex_JetResDown", &puppimet_ex_JetResDown, "puppimet_ex_JetResDown/F");
+    tree->Branch("puppimet_ey_JetResDown", &puppimet_ey_JetResDown, "puppimet_ey_JetResDown/F");
 
   }
 
@@ -1317,6 +1365,18 @@ void NTupleMaker::beginRun(const edm::Run& iRun, const edm::EventSetup& iSetup)
 	}
     }	
   runtree->Fill();
+
+  // JEC
+  edm::ESHandle<JetCorrectorParametersCollection> JetCorParColl;
+  iSetup.get<JetCorrectionsRecord>().get("AK4PFchs",JetCorParColl);
+  JetCorrectorParameters const & JetCorPar = (*JetCorParColl)["Uncertainty"];
+  jecUnc = new JetCorrectionUncertainty(JetCorPar); 
+
+}
+
+void NTupleMaker::endRun()
+{
+  delete jecUnc;
 }
 
 void NTupleMaker::beginLuminosityBlock(const edm::LuminosityBlock& iLumiBlock, const edm::EventSetup& iSetup)
@@ -1456,6 +1516,14 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     edm::Handle<bool> ifilterbadPFMuon;
     iEvent.getByToken(BadPFMuonFilterToken_, ifilterbadPFMuon);
     flags_->insert(std::pair<string, int>("Flag_BadPFMuonFilter", *ifilterbadPFMuon));
+
+    // Bad global muons
+    bool ifilterBadGlobalMuon;
+    edm::Handle<edm::PtrVector<reco::Muon>> BadGlobalMuons;
+    iEvent.getByToken(BadGlobalMuonsToken_, BadGlobalMuons);
+    if(BadGlobalMuons->size() == 0 ) ifilterBadGlobalMuon = true;
+    else                             ifilterBadGlobalMuon = false;
+    flags_->insert(std::pair<string, int>("Flag_BadGlobalMuonFilter", ifilterBadGlobalMuon));
   }
   
   if(cbeamspot)
@@ -1746,23 +1814,11 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       pfmet_pt = (*patMet)[0].pt();
       pfmet_phi = (*patMet)[0].phi();
 
-      // if (cSkim>0) {
-      // 	float pfmet_et = sqrt(pfmet_ex*pfmet_ex+pfmet_ey*pfmet_ey);
-      // 	if (pfmet_et<100.) return;
-      // 	// else cout << "  PFMet = " << pfmet_et << std::endl;
-      // }
-      
-      edm::Handle<CovMatrix2D> metcov;
-      iEvent.getByToken( MetCovMatrixToken_, metcov);
-      pfmet_sigxx = (*metcov)(0,0);
-      pfmet_sigxy = (*metcov)(0,1);
-      pfmet_sigyx = (*metcov)(1,0);
-      pfmet_sigyy = (*metcov)(1,1);
-
-      edm::Handle<double> metsig;
-      iEvent.getByToken( MetSigToken_, metsig);
-      assert(metsig.isValid());
-      pfmet_sig = *metsig;
+      pfmet_sigxx = (*patMet)[0].getSignificanceMatrix()(0,0);
+      pfmet_sigxy = (*patMet)[0].getSignificanceMatrix()(0,1);
+      pfmet_sigyx = (*patMet)[0].getSignificanceMatrix()(1,0);
+      pfmet_sigyy = (*patMet)[0].getSignificanceMatrix()(1,1);
+      pfmet_sig   = (*patMet)[0].significance();
       
       pfmet_ex_JetEnUp = (*patMet)[0].shiftedPx(pat::MET::METUncertainty::JetEnUp,pat::MET::METCorrectionLevel::Type1);
       pfmet_ey_JetEnUp = (*patMet)[0].shiftedPy(pat::MET::METUncertainty::JetEnUp,pat::MET::METCorrectionLevel::Type1);
@@ -1796,22 +1852,11 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       pfmetcorr_pt = (*patMet)[0].pt();
       pfmetcorr_phi = (*patMet)[0].phi();
       
-      edm::Handle<CovMatrix2D> metcov;
-      iEvent.getByToken( MetCorrCovMatrixToken_, metcov);
-      pfmetcorr_sigxx = (*metcov)(0,0);
-      pfmetcorr_sigxy = (*metcov)(0,1);
-      pfmetcorr_sigyx = (*metcov)(1,0);
-      pfmetcorr_sigyy = (*metcov)(1,1);
-
-      edm::Handle<double> metsig;
-      iEvent.getByToken( MetCorrSigToken_, metsig);
-      assert(metsig.isValid());
-      pfmetcorr_sig = *metsig;
-
-      /*pfmetcorr_sigxx = (*patMet)[0].getSignificanceMatrix()(0,0);
+      pfmetcorr_sigxx = (*patMet)[0].getSignificanceMatrix()(0,0);
       pfmetcorr_sigxy = (*patMet)[0].getSignificanceMatrix()(0,1);
       pfmetcorr_sigyx = (*patMet)[0].getSignificanceMatrix()(1,0);
-      pfmetcorr_sigyy = (*patMet)[0].getSignificanceMatrix()(1,1);*/
+      pfmetcorr_sigyy = (*patMet)[0].getSignificanceMatrix()(1,1);
+      pfmetcorr_sig   = (*patMet)[0].significance();
       
       pfmetcorr_ex_JetEnUp = (*patMet)[0].shiftedPx(pat::MET::METUncertainty::JetEnUp,pat::MET::METCorrectionLevel::Type1);
       pfmetcorr_ey_JetEnUp = (*patMet)[0].shiftedPy(pat::MET::METUncertainty::JetEnUp,pat::MET::METCorrectionLevel::Type1);
@@ -1825,6 +1870,36 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       pfmetcorr_ex_UnclusteredEnDown = (*patMet)[0].shiftedPx(pat::MET::METUncertainty::UnclusteredEnDown,pat::MET::METCorrectionLevel::Type1);
       pfmetcorr_ey_UnclusteredEnDown = (*patMet)[0].shiftedPy(pat::MET::METUncertainty::UnclusteredEnDown,pat::MET::METCorrectionLevel::Type1);
       
+      pfmetcorr_ex_JetResUp = (*patMet)[0].shiftedPx(pat::MET::METUncertainty::JetResUp,pat::MET::METCorrectionLevel::Type1);
+      pfmetcorr_ey_JetResUp = (*patMet)[0].shiftedPy(pat::MET::METUncertainty::JetResUp,pat::MET::METCorrectionLevel::Type1);
+
+      pfmetcorr_ex_JetResDown = (*patMet)[0].shiftedPx(pat::MET::METUncertainty::JetResDown,pat::MET::METCorrectionLevel::Type1);
+      pfmetcorr_ey_JetResDown = (*patMet)[0].shiftedPy(pat::MET::METUncertainty::JetResDown,pat::MET::METCorrectionLevel::Type1);
+
+
+      pfmetcorr_ex_smeared = (*patMet)[0].corPx(pat::MET::METCorrectionLevel::Type1Smear);
+      pfmetcorr_ey_smeared = (*patMet)[0].corPy(pat::MET::METCorrectionLevel::Type1Smear);
+      pfmetcorr_pt_smeared = (*patMet)[0].corPt(pat::MET::METCorrectionLevel::Type1Smear);
+      pfmetcorr_phi_smeared = (*patMet)[0].corPhi(pat::MET::METCorrectionLevel::Type1Smear);
+
+
+      pfmetcorr_ex_JetEnUp_smeared = (*patMet)[0].shiftedPx(pat::MET::METUncertainty::JetEnUp,pat::MET::METCorrectionLevel::Type1Smear);
+      pfmetcorr_ey_JetEnUp_smeared = (*patMet)[0].shiftedPy(pat::MET::METUncertainty::JetEnUp,pat::MET::METCorrectionLevel::Type1Smear);
+
+      pfmetcorr_ex_JetEnDown_smeared = (*patMet)[0].shiftedPx(pat::MET::METUncertainty::JetEnDown,pat::MET::METCorrectionLevel::Type1Smear);
+      pfmetcorr_ey_JetEnDown_smeared = (*patMet)[0].shiftedPy(pat::MET::METUncertainty::JetEnDown,pat::MET::METCorrectionLevel::Type1Smear);
+
+      pfmetcorr_ex_UnclusteredEnUp_smeared = (*patMet)[0].shiftedPx(pat::MET::METUncertainty::UnclusteredEnUp,pat::MET::METCorrectionLevel::Type1Smear);
+      pfmetcorr_ey_UnclusteredEnUp_smeared = (*patMet)[0].shiftedPy(pat::MET::METUncertainty::UnclusteredEnUp,pat::MET::METCorrectionLevel::Type1Smear);
+
+      pfmetcorr_ex_UnclusteredEnDown_smeared = (*patMet)[0].shiftedPx(pat::MET::METUncertainty::UnclusteredEnDown,pat::MET::METCorrectionLevel::Type1Smear);
+      pfmetcorr_ey_UnclusteredEnDown_smeared = (*patMet)[0].shiftedPy(pat::MET::METUncertainty::UnclusteredEnDown,pat::MET::METCorrectionLevel::Type1Smear);
+
+      pfmetcorr_ex_JetResUp_smeared = (*patMet)[0].shiftedPx(pat::MET::METUncertainty::JetResUp,pat::MET::METCorrectionLevel::Type1Smear);
+      pfmetcorr_ey_JetResUp_smeared = (*patMet)[0].shiftedPy(pat::MET::METUncertainty::JetResUp,pat::MET::METCorrectionLevel::Type1Smear);
+
+      pfmetcorr_ex_JetResDown_smeared = (*patMet)[0].shiftedPx(pat::MET::METUncertainty::JetResDown,pat::MET::METCorrectionLevel::Type1Smear);
+      pfmetcorr_ey_JetResDown_smeared = (*patMet)[0].shiftedPy(pat::MET::METUncertainty::JetResDown,pat::MET::METCorrectionLevel::Type1Smear);
     } // crecpfmetcorr
 
   if(crecpuppimet)
@@ -1857,6 +1932,11 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       puppimet_ex_UnclusteredEnDown = (*patMet)[0].shiftedPx(pat::MET::METUncertainty::UnclusteredEnDown,pat::MET::METCorrectionLevel::Type1);
       puppimet_ey_UnclusteredEnDown = (*patMet)[0].shiftedPy(pat::MET::METUncertainty::UnclusteredEnDown,pat::MET::METCorrectionLevel::Type1);
 
+      puppimet_ex_JetResUp = (*patMet)[0].shiftedPx(pat::MET::METUncertainty::JetResUp,pat::MET::METCorrectionLevel::Type1);
+      puppimet_ey_JetResUp = (*patMet)[0].shiftedPy(pat::MET::METUncertainty::JetResUp,pat::MET::METCorrectionLevel::Type1);
+
+      puppimet_ex_JetResDown = (*patMet)[0].shiftedPx(pat::MET::METUncertainty::JetResDown,pat::MET::METCorrectionLevel::Type1);
+      puppimet_ey_JetResDown = (*patMet)[0].shiftedPy(pat::MET::METUncertainty::JetResDown,pat::MET::METCorrectionLevel::Type1);
     } // crecpuppimet
   
   if(doDebug)  cout<<"add MVA MET"<< endl; 
@@ -2594,6 +2674,12 @@ unsigned int NTupleMaker::AddMuons(const edm::Event& iEvent, const edm::EventSet
   edm::Handle<pat::PackedCandidateCollection> pfcands;
   iEvent.getByToken( PackedCantidateCollectionToken_, pfcands);
 
+  edm::Handle<edm::PtrVector<reco::Muon>> BadDuplicateMuons;
+  iEvent.getByToken(BadDuplicateMuonsToken_, BadDuplicateMuons);
+
+  edm::Handle<edm::PtrVector<reco::Muon>> BadGlobalMuons;
+  iEvent.getByToken(BadGlobalMuonsToken_, BadGlobalMuons);
+
   if(Muons.isValid())
     {
       for(unsigned i = 0 ; i < Muons->size() ; i++){
@@ -2717,9 +2803,18 @@ unsigned int NTupleMaker::AddMuons(const edm::Event& iEvent, const edm::EventSet
 	  if(GenParticles.isValid())
 	    muon_genmatch[muon_count] = utils_genMatch::genMatch( (*Muons)[i].p4(), *GenParticles);
 	}
-	
+
+	// Duplicate & bad muons
+	muon_isDuplicate[muon_count] = false;
+	for(unsigned j = 0; j < BadDuplicateMuons->size(); j++){
+	  if((*BadDuplicateMuons)[j]->pt() == muon_pt[muon_count]) muon_isDuplicate[muon_count] = true;
+	}
+	muon_isBad[muon_count] = false;
+	for(unsigned j = 0; j < BadGlobalMuons->size(); j++){
+	  if((*BadGlobalMuons)[j]->pt() == muon_pt[muon_count]) muon_isBad[muon_count] = true;
+	}
+
 	// Dimuons
-	
 	if( !(*Muons)[i].innerTrack().isNull()){
 	  for(unsigned j = i+1 ; j < Muons->size() ; j++){
 	    if (dimuon_count==M_muonmaxcount*(M_muonmaxcount-1)/2) {
@@ -3539,37 +3634,15 @@ unsigned int NTupleMaker::AddPFJets(const edm::Event& iEvent, const edm::EventSe
 
   edm::Handle<pat::JetCollection> pfjets;
   iEvent.getByToken(JetCollectionToken_, pfjets);
-  
-  //	edm::Handle<std::vector<reco::SecondaryVertexTagInfo> > svInfos;
-  //	iEvent.getByLabel(edm::InputTag("secondaryVertexTagInfosEI"), svInfos);
-  //	assert(svInfos.isValid());
-  
+
   edm::Handle<edm::ValueMap<float> > puJetIdMVAFull;
-  //iEvent.getByLabel(edm::InputTag("puJetIdForPFMVAMEt","fullDiscriminant"), puJetIdMVAFull);
   iEvent.getByLabel(edm::InputTag("pileupJetIdFull","full53xDiscriminant"), puJetIdMVAFull);
 
   edm::Handle<reco::PFJetCollection> ak4jets;
-  //iEvent.getByLabel(edm::InputTag("calibratedAK4PFJetsForPFMVAMEt"), ak4jets);
-  //iEvent.getByLabel(edm::InputTag("ak4PFJets"), ak4jets);
-  //iEvent.getByLabel(edm::InputTag("AK4PFCHS"), ak4jets);
   iEvent.getByLabel(edm::InputTag("slimmedJets"), ak4jets);
-  
-  //	edm::Handle<edm::ValueMap<int> > puJetIdFlagFull;
-  //	iEvent.getByLabel(edm::InputTag("pileupJetIdProducer","fullId"), puJetIdFlagFull);
 
   if(pfjets.isValid())
     {
-      // if (pfjets->size()>0) {
-      // 	const std::vector< std::pair< std::string, float > > pairDiscriVector = (*pfjets)[0].getPairDiscri();
-      // 	int nDiscri = pairDiscriVector.size();
-      // 	std::cout << "Number of discriminators = " << nDiscri << std::endl;
-      // 	for (int iD=0;iD<nDiscri;++iD) {
-      // 	  std::pair<std::string, float> pairDiscri = pairDiscriVector[iD];
-      // 	  std::cout << "Dicsr = " << pairDiscriVector[iD].first << std::endl;
-      // 	}
-      // }
-      // std::cout << std::endl;
-      
       
       for(unsigned i = 0 ; i < pfjets->size() ; i++)
 	{
@@ -3582,7 +3655,6 @@ unsigned int NTupleMaker::AddPFJets(const edm::Event& iEvent, const edm::EventSe
 
 	  if((*pfjets)[i].pt() < cJetPtMin) continue;
 	  if(fabs((*pfjets)[i].eta()) > cJetEtaMax) continue;
-	  //	  std::cout << "Jet  " << i <<  ", pT=" <<  (*pfjets)[i].pt() << std::endl;
 	  
 	  pfjet_e[pfjet_count] = (*pfjets)[i].energy();
 	  pfjet_px[pfjet_count] = (*pfjets)[i].px();
@@ -3616,13 +3688,6 @@ unsigned int NTupleMaker::AddPFJets(const edm::Event& iEvent, const edm::EventSe
 	      if (cdata) pfjet_energycorr_l2l3residual[pfjet_count] = (*pfjets)[i].jecFactor("L2L3Residual");
 	    }
 		    
-	  // std::cout << "Jet Energy corrections : " << std::endl;
-	  // std::cout << "    L1FastJet    = " << pfjet_energycorr_l1fastjet[pfjet_count] << std::endl;
-	  // std::cout << "    L2Relative   = " << pfjet_energycorr_l2relative[pfjet_count] << std::endl;
-	  // std::cout << "    L3Absolute   = " << pfjet_energycorr_l3absolute[pfjet_count] << std::endl;
-	  // std::cout << "    L2L3Residual = " << pfjet_energycorr_l2l3residual[pfjet_count] << std::endl;
-	  // std::cout << "    Total (Uncor)= " << pfjet_energycorr[pfjet_count] << std::endl;
-	  	  
 	  jecUnc->setJetEta(pfjet_eta[pfjet_count]);
 	  jecUnc->setJetPt(pfjet_pt[pfjet_count]);
 	  pfjet_jecUncertainty[pfjet_count] = jecUnc->getUncertainty(true);
@@ -3648,7 +3713,6 @@ unsigned int NTupleMaker::AddPFJets(const edm::Event& iEvent, const edm::EventSe
 	  pfjet_count++;
 	}
     }
-  
   return  pfjet_count;
 }
 
@@ -3691,6 +3755,17 @@ unsigned int NTupleMaker::AddElectrons(const edm::Event& iEvent, const edm::Even
 	edm::Handle<edm::ValueMap<int> > mvaTrigCategories;
         iEvent.getByToken(mvaTrigValuesMapToken_,mvaTrigValues);
         iEvent.getByToken(mvaTrigCategoriesMapToken_,mvaTrigCategories);
+
+        edm::Handle<edm::ValueMap<float> > mvaValuesMapSpring16;
+	edm::Handle<edm::ValueMap<int> > mvaCategoriesMapSpring16;
+        iEvent.getByToken(mvaValuesMapSpring16MapToken_,mvaValuesMapSpring16);
+        iEvent.getByToken(mvaCategoriesMapSpring16MapToken_,mvaCategoriesMapSpring16);
+      
+	//mva general Spring16
+	edm::Handle<edm::ValueMap<bool> > mva_wp80_general_decisions;
+	edm::Handle<edm::ValueMap<bool> > mva_wp90_general_decisions;
+      	iEvent.getByToken(eleMvaWP90GeneralMapToken_,mva_wp90_general_decisions);
+        iEvent.getByToken(eleMvaWP80GeneralMapToken_,mva_wp80_general_decisions); 
 
 	/*if(crecelectrontrigger)
 	{
@@ -3816,12 +3891,16 @@ unsigned int NTupleMaker::AddElectrons(const edm::Event& iEvent, const edm::Even
 	  electron_mva_category_nontrig_Spring15_v1[electron_count] = (*mvaNonTrigCategories)[el];
 	  electron_mva_value_trig_Spring15_v1[electron_count] = (*mvaTrigValues)[el];
 	  electron_mva_category_trig_Spring15_v1[electron_count] = (*mvaTrigCategories)[el];
+ 	  electron_mva_value_Spring16_v1[electron_count] = (*mvaValuesMapSpring16)[el];
+	  electron_mva_category_Spring16_v1[electron_count] = (*mvaCategoriesMapSpring16)[el];
 
           electron_cutId_veto_Spring15[electron_count] = (*veto_id_decisions)[el];
           electron_cutId_loose_Spring15[electron_count] = (*loose_id_decisions)[el];
           electron_cutId_medium_Spring15[electron_count] = (*medium_id_decisions)[el];
           electron_cutId_tight_Spring15[electron_count] = (*tight_id_decisions)[el];
 
+	   electron_mva_wp90_general_Spring16_v1[electron_count] = (*mva_wp90_general_decisions)[el];
+	  electron_mva_wp80_general_Spring16_v1[electron_count] = (*mva_wp80_general_decisions)[el];
 	  electron_mva_wp80_nontrig_Spring15_v1[electron_count] = (*nontrig_wp80_decisions)[el];
 	  electron_mva_wp90_nontrig_Spring15_v1[electron_count] = (*nontrig_wp90_decisions)[el];
 	  electron_mva_wp80_trig_Spring15_v1[electron_count] = (*trig_wp80_decisions)[el];

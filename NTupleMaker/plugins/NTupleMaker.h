@@ -250,6 +250,7 @@ class NTupleMaker : public edm::EDAnalyzer{
   virtual void beginJob();
   virtual void endJob();
   virtual void beginRun(const edm::Run& iRun, const edm::EventSetup& iSetup);
+  virtual void endRun();
   virtual void beginLuminosityBlock(const edm::LuminosityBlock& iLumiBlock, const edm::EventSetup& iSetup);
   virtual void endLuminosityBlock(const edm::LuminosityBlock& iLumiBlock, const edm::EventSetup& iSetup);
   virtual void analyze( const edm::Event& iEvent, const edm::EventSetup& iSetup );
@@ -363,6 +364,8 @@ class NTupleMaker : public edm::EDAnalyzer{
   int cJetNum;
 
   edm::EDGetTokenT<pat::MuonCollection> MuonCollectionToken_;
+  edm::EDGetTokenT<edm::PtrVector<reco::Muon>> BadGlobalMuonsToken_;
+  edm::EDGetTokenT<edm::PtrVector<reco::Muon>> BadDuplicateMuonsToken_;
   
   // Electron Configuration
   edm::EDGetTokenT<edm::View<pat::Electron> > ElectronCollectionToken_;
@@ -380,6 +383,13 @@ class NTupleMaker : public edm::EDAnalyzer{
   edm::EDGetTokenT<edm::ValueMap<int> >   mvaNonTrigCategoriesMapToken_;
   edm::EDGetTokenT<edm::ValueMap<float> > mvaTrigValuesMapToken_;
   edm::EDGetTokenT<edm::ValueMap<int> >   mvaTrigCategoriesMapToken_;
+  //// New for Spring16
+  edm::EDGetTokenT<edm::ValueMap<float> > mvaValuesMapSpring16MapToken_;
+  edm::EDGetTokenT<edm::ValueMap<int> >   mvaCategoriesMapSpring16MapToken_;
+  //// New for Spring16
+  edm::EDGetTokenT<edm::ValueMap<bool> >  eleMvaWP90GeneralMapToken_;
+  edm::EDGetTokenT<edm::ValueMap<bool> >  eleMvaWP80GeneralMapToken_;
+  //// New for Spring16
   edm::EDGetTokenT<pat::TauCollection> TauCollectionToken_;
   edm::EDGetTokenT<pat::JetCollection> JetCollectionToken_;
   edm::EDGetTokenT<pat::METCollection> MetCollectionToken_;
@@ -444,7 +454,7 @@ class NTupleMaker : public edm::EDAnalyzer{
   Int_t njets4RC;
 
   UInt_t errors;
-  UInt_t event_nr;
+  ULong64_t event_nr;
   UInt_t event_luminosityblock;
   UInt_t event_run;
   UInt_t event_timeunix;
@@ -564,6 +574,8 @@ class NTupleMaker : public edm::EDAnalyzer{
   Bool_t muon_isLoose[M_muonmaxcount];
   Bool_t muon_isMedium[M_muonmaxcount];
   Bool_t muon_isICHEP[M_muonmaxcount];
+  Bool_t muon_isDuplicate[M_muonmaxcount];
+  Bool_t muon_isBad[M_muonmaxcount];
   
   Bool_t muon_globalTrack[M_muonmaxcount];
   Bool_t muon_innerTrack[M_muonmaxcount];
@@ -691,6 +703,11 @@ class NTupleMaker : public edm::EDAnalyzer{
   Int_t electron_mva_category_nontrig_Spring15_v1[M_electronmaxcount];
   Int_t electron_mva_category_trig_Spring15_v1[M_electronmaxcount];
 
+  Float_t electron_mva_value_Spring16_v1[M_electronmaxcount];
+  Float_t electron_mva_wp80_general_Spring16_v1[M_electronmaxcount];
+  Float_t electron_mva_wp90_general_Spring16_v1[M_electronmaxcount];
+  Int_t electron_mva_category_Spring16_v1[M_electronmaxcount];
+
   Bool_t electron_mva_wp80_nontrig_Spring15_v1[M_electronmaxcount];
   Bool_t electron_mva_wp90_nontrig_Spring15_v1[M_electronmaxcount];
   Bool_t electron_mva_wp80_trig_Spring15_v1[M_electronmaxcount];
@@ -754,6 +771,7 @@ class NTupleMaker : public edm::EDAnalyzer{
   Int_t   tau_leadchargedhadrcand_id[M_taumaxcount];
   Float_t tau_leadchargedhadrcand_dxy[M_taumaxcount];
   Float_t tau_leadchargedhadrcand_dz[M_taumaxcount];
+  Float_t tau_photonPtSumOutsideSignalCone[M_taumaxcount];
 
 
   Float_t tau_vertexx[M_taumaxcount];
@@ -966,6 +984,36 @@ class NTupleMaker : public edm::EDAnalyzer{
   Float_t pfmetcorr_ex_UnclusteredEnDown;
   Float_t pfmetcorr_ey_UnclusteredEnDown;
 
+  Float_t      pfmetcorr_ex_JetResDown;
+  Float_t      pfmetcorr_ey_JetResDown;
+  Float_t      pfmetcorr_ex_JetResUp;
+  Float_t      pfmetcorr_ey_JetResUp;
+
+  Float_t      pfmetcorr_ex_smeared;
+  Float_t      pfmetcorr_ey_smeared;
+  Float_t      pfmetcorr_ez_smeared;
+  Float_t      pfmetcorr_pt_smeared;
+  Float_t      pfmetcorr_phi_smeared;
+
+
+   Float_t     pfmetcorr_ex_JetEnUp_smeared;
+   Float_t     pfmetcorr_ey_JetEnUp_smeared;
+
+  Float_t      pfmetcorr_ex_JetEnDown_smeared;
+  Float_t      pfmetcorr_ey_JetEnDown_smeared;
+
+  Float_t      pfmetcorr_ex_UnclusteredEnUp_smeared;
+  Float_t      pfmetcorr_ey_UnclusteredEnUp_smeared;
+
+  Float_t      pfmetcorr_ex_UnclusteredEnDown_smeared;
+  Float_t      pfmetcorr_ey_UnclusteredEnDown_smeared;
+
+  Float_t      pfmetcorr_ex_JetResUp_smeared;
+  Float_t      pfmetcorr_ey_JetResUp_smeared;
+
+  Float_t      pfmetcorr_ex_JetResDown_smeared;
+  Float_t      pfmetcorr_ey_JetResDown_smeared;
+
   Float_t puppimet_ex;
   Float_t puppimet_ey;
   Float_t puppimet_ez;
@@ -984,6 +1032,12 @@ class NTupleMaker : public edm::EDAnalyzer{
 
   Float_t puppimet_ex_UnclusteredEnDown;
   Float_t puppimet_ey_UnclusteredEnDown;
+
+  Float_t puppimet_ex_JetResUp;
+  Float_t puppimet_ey_JetResUp;
+
+  Float_t puppimet_ex_JetResDown;
+  Float_t puppimet_ey_JetResDown;
 
   Float_t puppimet_sigxx;
   Float_t puppimet_sigxy;
@@ -1139,6 +1193,5 @@ class NTupleMaker : public edm::EDAnalyzer{
 DEFINE_FWK_MODULE(NTupleMaker);
 
 #endif
-
 
 

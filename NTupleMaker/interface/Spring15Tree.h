@@ -42,7 +42,7 @@ public :
   Float_t         idisoweight_antiiso_1;
   Float_t         idisoweight_2;
   Float_t         topptweight;
-  Double_t 		  zptweight;
+  Double_t 	  zptweight;
   Double_t        trkeffweight_1;
   Float_t         effweight;
   Float_t         etaufakeweight;
@@ -93,7 +93,7 @@ public :
   Float_t         pfmt_rc_njetsreco_1;
   Float_t         mt_rc_visreco_1;
   Float_t         pfmt_rc_visreco_1;
-  Int_t 	      tau_decay_mode_1;
+  Int_t 	  tau_decay_mode_1;
   Float_t         pt_2;
   Float_t         phi_2;
   Float_t         eta_2;

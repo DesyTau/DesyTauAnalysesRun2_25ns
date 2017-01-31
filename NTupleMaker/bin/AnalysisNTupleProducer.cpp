@@ -526,9 +526,6 @@ int main(int argc, char * argv[]) {
   Bool_t tauAntiMuonLoose3_;
   Bool_t tauAntiMuonTight3_;
 
-  Bool_t tauAntiElectronVLooseMVA5_;
-  Bool_t tauAntiElectronLooseMVA5_;
-
   Bool_t tauAntiElectronVLooseMVA6_;
   Bool_t tauAntiElectronLooseMVA6_;
 
@@ -762,9 +759,6 @@ int main(int argc, char * argv[]) {
 
   ntuple_->Branch("tauAntiMuonLoose3",&tauAntiMuonLoose3_,"tauAntiMuonLoose3/O");
   ntuple_->Branch("tauAntiMuonTight3",&tauAntiMuonTight3_,"tauAntiMuonTight3/O");
-
-  ntuple_->Branch("tauAntiElectronVLooseMVA5",&tauAntiElectronVLooseMVA5_,"tauAntiElectronVLooseMVA5/O");
-  ntuple_->Branch("tauAntiElectronLooseMVA5", &tauAntiElectronLooseMVA5_, "tauAntiElectronLooseMVA5/O");
 
   ntuple_->Branch("tauAntiElectronVLooseMVA6",&tauAntiElectronVLooseMVA6_,"tauAntiElectronVLooseMVA6/O");
   ntuple_->Branch("tauAntiElectronLooseMVA6", &tauAntiElectronLooseMVA6_, "tauAntiElectronLooseMVA6/O");
@@ -1092,9 +1086,6 @@ int main(int argc, char * argv[]) {
       tauAntiMuonLoose3_ = false;
       tauAntiMuonTight3_ = false;
 
-      tauAntiElectronVLooseMVA5_ = false;
-      tauAntiElectronLooseMVA5_ = false;
-      
       tauAntiElectronVLooseMVA6_ = false;
       tauAntiElectronLooseMVA6_ = false;
       
@@ -2127,9 +2118,6 @@ int main(int argc, char * argv[]) {
 	tauAntiMuonLoose3_ = analysisTree.tau_againstMuonLoose3[indexTau] > 0.5;
 	tauAntiMuonTight3_ = analysisTree.tau_againstMuonTight3[indexTau] > 0.5;
 
-	tauAntiElectronVLooseMVA5_ = analysisTree.tau_againstElectronVLooseMVA5[indexTau] > 0.5;
-	tauAntiElectronLooseMVA5_ = analysisTree.tau_againstElectronLooseMVA5[indexTau] > 0.5;
-
 	tauAntiElectronVLooseMVA6_ = analysisTree.tau_againstElectronVLooseMVA6[indexTau] > 0.5;
 	tauAntiElectronLooseMVA6_ = analysisTree.tau_againstElectronLooseMVA6[indexTau] > 0.5;
 
@@ -2479,7 +2467,7 @@ int main(int argc, char * argv[]) {
 	  //   tauDM_>0.5 && 
 	  //   tauLooseIso_>0.5 && 
 	  //   tauAntiMuonLoose3_>0.5 && 
-	  //   tauAntiElectronLooseMVA5_>0.5 && 
+	  //   tauAntiElectronLooseMVA6_>0.5 && 
 	  //   tauPt_>100 && met_>110 && 
 	  //   trigger_>0.5 && 
 	  //   nJetsCentral30_ <= 1 && 
@@ -2616,8 +2604,6 @@ int main(int argc, char * argv[]) {
 
 	    tauAntiMuonLoose3_ = analysisTree.tau_againstMuonLoose3[indexTau] > 0.5;
 	    tauAntiMuonTight3_ = analysisTree.tau_againstMuonTight3[indexTau] > 0.5;
-	    tauAntiElectronVLooseMVA5_ = analysisTree.tau_againstElectronVLooseMVA5[indexTau] > 0.5;
-	    tauAntiElectronLooseMVA5_ = analysisTree.tau_againstElectronLooseMVA5[indexTau] > 0.5;
 
 	    recoilRatio_ = tauPt_/recoilJetLV.Pt();
 	    recoilDPhi_ = dPhiFromLV(tauLV,recoilJetLV);
