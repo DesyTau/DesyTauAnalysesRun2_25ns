@@ -49,6 +49,9 @@ int main(int argc, char * argv[]) {
     
     // pile up reweighting
     const bool applyPUreweighting_official = cfg.get<bool>("ApplyPUreweighting_official");
+    const string dataPUFile = cfg.get<string>("DataPUFile");
+    const string mcPUFile = cfg.get<string>("MCPUFile");
+
 
     // kinematic cuts on electrons
     const float ptEleTagCut  = cfg.get<float>("ptEleTagCut");
@@ -86,11 +89,6 @@ int main(int argc, char * argv[]) {
     const float ndofVertexCut  = cfg.get<float>("NdofVertexCut");
     const float zVertexCut     = cfg.get<float>("ZVertexCut");
     const float dVertexCut     = cfg.get<float>("DVertexCut");
-
-    // vertex distributions filenames and histname
-    const string vertDataFileName = cfg.get<string>("VertexDataFileName");
-    const string vertMcFileName   = cfg.get<string>("VertexMcFileName");
-    const string vertHistName     = cfg.get<string>("VertexHistName");
     
     //Perform eles Gen-Level matching
     //const bool genMatching = cfg.get<bool>("genMatching");
@@ -211,6 +209,7 @@ int main(int argc, char * argv[]) {
     Float_t EtaTag;
     Float_t PtProbe;
     Float_t EtaProbe;
+    Float_t met;
     
     Bool_t tagAndProbeGenMatched;
     Bool_t tagAndProbeGenTauMatched;
@@ -257,7 +256,8 @@ int main(int argc, char * argv[]) {
     eleTree->Branch("EtaTag",&EtaTag,"EtaTag/F");
     eleTree->Branch("PtProbe",&PtProbe,"PtProbe/F");
     eleTree->Branch("EtaProbe",&EtaProbe,"EtaProbe/F");
-    
+    eleTree->Branch("met",&met,"met/F");
+
     eleTree->Branch("tagAndProbeGenMatched",&tagAndProbeGenMatched,"tagAndProbeGenMatched/O");
     eleTree->Branch("tagAndProbeGenTauMatched",&tagAndProbeGenTauMatched,"tagAndProbeGenTauMatched/O");
 
@@ -300,29 +300,14 @@ int main(int argc, char * argv[]) {
 
   // PILE UP REWEIGHTING - OPTIONS
 
-// reweighting with vertices
-
-  // reading vertex weights
-  TFile * fileDataNVert = new TFile(TString(cmsswBase)+"/src/"+vertDataFileName);
-  TFile * fileMcNVert   = new TFile(TString(cmsswBase)+"/src/"+vertMcFileName);
-
-  TH1D * vertexDataH = (TH1D*)fileDataNVert->Get(TString(vertHistName));
-  TH1D * vertexMcH   = (TH1D*)fileMcNVert->Get(TString(vertHistName));
-
-  float normVertexData = vertexDataH->GetSumOfWeights();
-  float normVertexMc   = vertexMcH->GetSumOfWeights();
-
-  vertexDataH->Scale(1/normVertexData);
-  vertexMcH->Scale(1/normVertexMc);
-
 
   // reweighting official recipe 
   // initialize pile up object
   PileUp * PUofficial = new PileUp();
   
   if (applyPUreweighting_official) {
-    TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/pileUp_data_2016_Cert_Cert_271036-276811_NoL1T_xsec63mb.root","read");
-    TFile * filePUdistribution_MC = new TFile (TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/MC_Spring16_PU.root", "read");
+    TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/"+TString(dataPUFile),"read");
+    TFile * filePUdistribution_MC = new TFile (TString(cmsswBase)+"/src/"+TString(mcPUFile), "read");
     TH1D * PU_data = (TH1D *)filePUdistribution_data->Get("pileup");
     TH1D * PU_mc = (TH1D *)filePUdistribution_MC->Get("pileup");
     PUofficial->set_h_data(PU_data); 
@@ -536,13 +521,6 @@ int main(int argc, char * argv[]) {
         exit(-1);
       }
 
-      float pfmet_ex = analysisTree.pfmet_ex;
-      float pfmet_ey = analysisTree.pfmet_ey;
-      float pfmet_phi = analysisTree.pfmet_phi;
-      float pfmet = TMath::Sqrt(pfmet_ex*pfmet_ex+pfmet_ey*pfmet_ey);
-      //      TLorentzVector MetLV; MetLV.SetPx(pfmet_ex); MetLV.SetPy(pfmet_ey);
-      //      std::cout << "pfmet = " << pfmet << " : " << analysisTree.pfmet_pt << " : " << MetLV.Pt() << std::endl;
-      
         // vertex cuts
         if (fabs(analysisTree.primvertex_z)>zVertexCut) continue;
         if (analysisTree.primvertex_ndof<ndofVertexCut) continue;
@@ -809,12 +787,11 @@ int main(int argc, char * argv[]) {
                                 }
                             }
                         }
-                        float mvamet_ex = analysisTree.mvamet_ex[metEleTau];
-                        float mvamet_ey = analysisTree.mvamet_ey[metEleTau];
-                        float mvamet = TMath::Sqrt(mvamet_ex*mvamet_ex+mvamet_ey*mvamet_ey);
-        
-                        float dPhiMvaMETEle = dPhiFrom2P(analysisTree.electron_px[index1],analysisTree.electron_py[index1],mvamet_ex,mvamet_ey);
-                        float mt_mva_1 = TMath::Sqrt(2*mvamet*analysisTree.electron_pt[index1]*(1-TMath::Cos(dPhiMvaMETEle)));
+                        
+                        met = TMath::Sqrt(analysisTree.pfmetcorr_ex*analysisTree.pfmetcorr_ex + analysisTree.pfmetcorr_ey*analysisTree.pfmetcorr_ey);
+                        float dPhiMETEle = dPhiFrom2P(analysisTree.electron_px[index1],analysisTree.electron_py[index1],analysisTree.pfmetcorr_ex,analysisTree.pfmetcorr_ey);
+
+                        mt_1 = TMath::Sqrt(2*met*analysisTree.electron_pt[index1]*(1-TMath::Cos(dPhiMETEle)));
             
                         TLorentzVector ele1;
                         ele1.SetXYZM(analysisTree.electron_px[index1],analysisTree.electron_py[index1],analysisTree.electron_pz[index1],electronMass);
@@ -857,8 +834,10 @@ int main(int argc, char * argv[]) {
                         {
                             mcweight = analysisTree.genweight;
                             isoweight_1 = (float)SF_eleIdIso->get_ScaleFactor(double(analysisTree.electron_pt[index1]),double(analysisTree.electron_eta[index1]));
-                            trigweight_1 = (float)SF_eleTrig->get_EfficiencyData(double(analysisTree.electron_pt[index1]),double(analysisTree.electron_eta[index1]));
+                            //trigweight_1 = (float)SF_eleTrig->get_EfficiencyData(double(analysisTree.electron_pt[index1]),double(analysisTree.electron_eta[index1]));
                             //      cout << "isoweight_1 = " << isoweight_1 << endl;
+
+                            trigweight_1 = (float)SF_eleTrig->get_ScaleFactor(double(analysisTree.electron_pt[index1]),double(analysisTree.electron_eta[index1]));
                             effweight = isoweight_1*trigweight_1;
                             puweight = float(PUofficial->get_PUweight(double(analysisTree.numtruepileupinteractions)));
                         }
@@ -932,7 +911,6 @@ int main(int argc, char * argv[]) {
                         
                         //cout <<"----------" << endl;
                         
-                        mt_1 = mt_mva_1;
                         tauagainstEleVLoose = analysisTree.tau_againstElectronVLooseMVA6[indexProbe];
                         tauagainstEleLoose = analysisTree.tau_againstElectronLooseMVA6[indexProbe];
                         tauagainstEleMedium = analysisTree.tau_againstElectronMediumMVA6[indexProbe];
