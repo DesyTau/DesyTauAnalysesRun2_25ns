@@ -133,6 +133,7 @@ int main(int argc, char * argv[]){
 
   const unsigned int nhlt_check =  cfg.get<unsigned int>("nhlt_check");
 
+  const int nEventsMax = cfg.get<int>("nEventsMax");
   const unsigned int nRunMin = cfg.get<unsigned int>("nRunMin");
   const unsigned int nRunMax = cfg.get<unsigned int>("nRunMax");
   const bool checkRun = cfg.get<bool>("checkRun");
@@ -214,7 +215,7 @@ int main(int argc, char * argv[]){
   TString rootFileName(sample);
   rootFileName += "_";
   rootFileName += ifile;
-  rootFileName += "_TP_xtrig_Electron.root";
+  rootFileName += "_TP_Electron.root";
 
   std::string ntupleName("makeroottree/AC1B");
 
@@ -503,6 +504,8 @@ int main(int argc, char * argv[]){
           otree->hlt_19_probe = -1;
           otree->hlt_20_probe = -1;
 
+		  otree->trigobjpt_probe = -999;
+
           //TRIGGER
           p_pass_1++;
 
@@ -518,7 +521,7 @@ int main(int argc, char * argv[]){
                                   analysisTree.trigobject_eta[iTr],analysisTree.trigobject_phi[iTr]);
 
             if (dRtrig < deltaRTrigMatch){
-			 
+			  otree->trigobjpt_probe = (float)analysisTree.trigobject_pt[iTr];			 
               for(unsigned int i=0; i<nhlt_check; ++i){
                 if(nHLT[i] == -1){
                   hlt_probe[i] = -1;

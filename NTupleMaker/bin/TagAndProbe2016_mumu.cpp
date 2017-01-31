@@ -80,6 +80,7 @@ bool isGoodLumi(int run, int lumi, const lumi_json& json);
 float abs_Iso(int Index, TString lep, const AC1B * analysisTree, float dRiso);
 float rel_Iso(int Index, TString lep, const AC1B * analysisTree, float dRiso);//dr cone 0.3 OR 0.4 
 bool isICHEPmed(int Index, const AC1B * analysisTree); 
+bool isIdentifiedMediumMuon(int Index, const AC1B * analysisTree, bool isData); // select medium id or ICHEP medium id for different runs
 
 int main(int argc, char * argv[]){
 
@@ -137,6 +138,7 @@ int main(int argc, char * argv[]){
 
 
   const bool debug = cfg.get<bool>("debug");
+  const int nEventsMax = cfg.get<int>("nEventsMax");
 
   const bool ApplyTrigger = cfg.get<bool>("ApplyTrigger"); 
   const float ptTrigObjCut = cfg.get<float>("ptTrigObjCut");
@@ -150,11 +152,6 @@ int main(int argc, char * argv[]){
   if (isData || ApplyTrigger){
     isoLeg = cfg.get<string>("isoLeg");
   }
-
-  //string isoLeg2;
-  //if (isData || ApplyTrigger) {
-  // isoLeg2 = cfg.get<string>("isoLeg2");
-  //}
 
   //hlt filters to be evaluated inizialization
   vector<string> hlt;
@@ -242,12 +239,11 @@ int main(int argc, char * argv[]){
   TagProbeTree *otree = new TagProbeTree(tree);
 
   int nTotalFiles = 0;
-
   int nEvents = 0;
   int nFiles = 0;
 
 
-  int Run, Event, Lumi;
+  // int Run, Event, Lumi;
 
   for (int iF=ifile; iF<jfile; ++iF) {  //FILEs LOOP
 
@@ -288,7 +284,7 @@ int main(int argc, char * argv[]){
       }
 
       nEvents++;
-
+	  if (nEvents>nEventsMax && nEventsMax !=-1) break; 
       //filters
       unsigned int nfilters = analysisTree.run_hltfilters->size();
 
@@ -308,26 +304,6 @@ int main(int argc, char * argv[]){
           exit(-1);
         }
       }
-
-
-      //check isoleg2
-	  /*
-      unsigned int nIsoLeg2 = 0;
-      bool checkIsoLeg2 = false;
-      if(isData || ApplyTrigger){  
-        for (unsigned int i=0; i<nfilters; ++i) {
-          TString HLTFilter(analysisTree.run_hltfilters->at(i));
-          if (HLTFilter==isoLeg2) {
-            nIsoLeg2 = i;
-            checkIsoLeg2 = true;
-          }
-        }
-        if (!checkIsoLeg2) {
-          std::cout << "HLT filter " << isoLeg2 << " not found" << std::endl;
-          exit(-1);
-        }
-      }
-	 */
 
       //hlt filters to be evaluated indices finding
       int *nHLT = new int[nhlt_check];
@@ -370,9 +346,7 @@ int main(int argc, char * argv[]){
 
       for (it = 0; it<analysisTree.muon_count; it++){
 
-//        bool TagmuonMediumId = analysisTree.muon_isMedium[it]; 
-
-        bool TagmuonMediumId = isICHEPmed(it, &analysisTree);
+        bool TagmuonMediumId = isIdentifiedMediumMuon(it, &analysisTree, isData);
 		//bool isTightMuon = analysisTree.muon_isTight[it];
 
         if (analysisTree.muon_pt[it]<=ptMuonCut) continue;
@@ -386,7 +360,6 @@ int main(int argc, char * argv[]){
         //trigger match
         bool isSingleLepTrig = false;
 		otree->tag_isoLeg = -1;
-		//otree->tag_isoLeg2 = -1;
 
         
         if(isData || ApplyTrigger){
@@ -400,13 +373,6 @@ int main(int argc, char * argv[]){
               if (analysisTree.trigobject_filters[iT][nIsoLeg] && ( isData || analysisTree.trigobject_pt[iT] > ptTrigObjCut)){
                 isSingleLepTrig = true;
 				otree->tag_isoLeg = 1;
-
-				//check second trigger
-				/*
-				if (analysisTree.trigobject_filters[iT][nIsoLeg2] && ( isData || analysisTree.trigobject_pt[iT] > ptTrigObjCut)){
-					otree->tag_isoLeg2 = 1;
-              	} 
-				else otree->tag_isoLeg2 = 0; */
 			  } 
             } 
           }
@@ -417,8 +383,6 @@ int main(int argc, char * argv[]){
           if(debug) {cout<<"debug: tag trigger match OK"<<endl;}
         }
 
-        
-        
         otree->pt_tag = analysisTree.muon_pt[it]; 
         otree->eta_tag = analysisTree.muon_eta[it];
         otree->phi_tag = analysisTree.muon_phi[it];
@@ -463,7 +427,7 @@ int main(int argc, char * argv[]){
           //id evaluating for the probes
           bool id_probe= false;
 
-          if (isICHEPmed(ip, &analysisTree)) {
+		  if (isIdentifiedMediumMuon(ip, &analysisTree, isData)){
             if (analysisTree.muon_dxy[ip]<dxyPassingCut){
               if (analysisTree.muon_dz[ip]<dzPassingCut){
                 id_probe = true;
@@ -574,10 +538,17 @@ int main(int argc, char * argv[]){
 //  cout<<endl<<"Total P: "<<p_total<<endl<<"Passing Id&Iso P: "<<p_pass_1<<" eff: "<<(float)p_pass_1/(float)p_total<<endl;
 //  for(unsigned int i=0; i<nhlt_check; ++i) {cout<<"Passing P for hlt: "<<hlt[i]<<" : "<<p_pass_hlt[i]<<" eff: "<<(float)p_pass_hlt[i]/(float)p_pass_1<<endl;}
   cout<<endl;
+  //std::cout << "-- after end of loop --" << std::endl;
   file->cd("");
+  //std::cout << "-- after file->cd() --" << std::endl;
   file->Write();
+  //std::cout << "-- after file->write() --" << std::endl;
   file->Close();
+  //std::cout << "-- after file->close() --" << std::endl;
   delete file;
+  //std::cout << "-- after delete file --" << std::endl;
+
+  return 0;
 }
 
 ///////////////////////////////////////////////
@@ -641,6 +612,18 @@ bool isICHEPmed(int Index, const AC1B * analysisTree) {
         return isICHEPmedium;
 }
 
+// select medium id or ICHEP medium id for different runs, in data
+// use ICHEP medium ID fro runs up to 278808 (end of Run2016F)
+// on MC, always apply medium ID
+bool isIdentifiedMediumMuon(int Index, const AC1B * analysisTree, bool isData){
+  bool isGoodMuon;
+  if (isData){
+	if (analysisTree->event_run<=278808) isGoodMuon= isICHEPmed(Index, analysisTree);
+    else isGoodMuon=analysisTree->muon_isMedium[Index]; 
+	}
+  else isGoodMuon=analysisTree->muon_isMedium[Index]; 
+  return isGoodMuon;
+}
 
 int read_json(std::string filename, lumi_json& json){
 
