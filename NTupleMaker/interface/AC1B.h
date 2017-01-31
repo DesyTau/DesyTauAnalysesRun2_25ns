@@ -1295,6 +1295,8 @@ void AC1B::Init(TTree *tree, bool isData)
    // Init() will be called many times when running on PROOF
    // (once per file to be processed).
 
+  tree->SetMaxVirtualSize(3000000);
+
    // Set object pointer
    run_hltnames = 0;
    run_hltfilters = 0;
