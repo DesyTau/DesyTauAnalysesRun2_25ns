@@ -77,7 +77,7 @@ lt=`echo $line | cut -d '/' -f2`
 
 	if [[ $2 == *"Ttemplate"* ]] ;then
 		echo inv region
-	 	qsub run_plots_Ttemplate.sh list_$lt $3
+	 	qsub -l h_cpu=2000M -l h_rt=02:00:00 run_plots_Ttemplate.sh list_$lt $3
 
 	fi
 

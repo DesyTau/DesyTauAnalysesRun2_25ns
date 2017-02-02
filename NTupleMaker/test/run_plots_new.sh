@@ -31,11 +31,13 @@ dir="/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/CMSSW_8_0_20/s
 
 channel=$2
 channel2=$2
-btag="0.800"
-
+btag="0.8484"
 
 
 systematics="Nominal JetEnUp JetEnDown UnclEnUp UnclEnDown"
+systematics="Nominal"
+###### NOminal should be separate!!!!!!!!!!!!
+systematics="Nominal JetEnUp JetEnDown UnclEnUp UnclEnDown TopPt ZPt TauEnUp TauEnDown ElEnUp ElEnDown MuEnUp MuEnDown"
 systematics="Nominal"
 
 
@@ -45,6 +47,11 @@ then
 fi
 
 if [[ $2 == "Wtemplate" ]]
+then
+	channel2="mutau"
+fi
+
+if [[ $2 == "WJetsmu" ]]
 then
 	channel2="mutau"
 fi
@@ -83,7 +90,7 @@ cp $dir/analyzer${channel}_C .
 sed -i 's/CHIMASSS/'$lsp'/g' analyzer*C
 sed -i 's/CHANNELHERE/'$channel2'/g' analyzer*
 
-sed -i 's/SYSTEMATICHERE/'$syst'/g' analyzer.C
+sed -i 's/SYSTEMATICHERE/'$syst'/g' analyzer*
 
 cp $dir/runme.C .
 cp $dir/plots.h .
@@ -113,10 +120,10 @@ sed -i 's/FILEIN/'$file'/g' analyzer*
 sed -i 's/LEPTONHERE/false/g' analyzer.C
 sed -i 's/SIGNHERE/OS/g' analyzer.C
 sed -i 's/CHANNELHERE/'$channel2'/g' analyzer*
-sed -i 's/BTAGCUT/0.800/g' analyzer*
+sed -i 's/BTAGCUT/0.8484/g' analyzer*
 
 
-sed -i 's/SYSTEMATICHERE/'$syst'/g' analyzer.C
+sed -i 's/SYSTEMATICHERE/'$syst'/g' analyzer*
 
 rm plots.root
 root -l -q -b runme.C 
@@ -147,7 +154,7 @@ sed -i 's/CHANNELHERE/'$channel2'/g' analyzer*
 sed -i 's/BTAGCUT/'$btag'/g' analyzer*
 
 
-sed -i 's/SYSTEMATICHERE/'$syst'/g' analyzer.C
+sed -i 's/SYSTEMATICHERE/'$syst'/g' analyzer*
 
 
 rm plots.root
@@ -159,8 +166,8 @@ fi
 
 ######### A region non inverted SS
 
-if [[ ! -f $dir/plots_$channel/${fileB}_${syst}_A.root ]]  && [[ ! -f $dir/plots_$channel/${fileB}_A.root ]] && [[ $file != *"stau"* && $file != *"C1"*  ]] && [[ $2 != "Ttemplate" ]] && [[ $2 != "mumu" ]]; then
-#if [[ ! -f $dir/plots_$channel/${fileB}_A.root ]]  &&  [[ $2 != "Ttemplate" ]] && [[ $2 != "mumu" ]]  && [[ $file == *"stau"*  || $file == *"C1"* ]]; then
+if [[ ! -f $dir/plots_$channel/${fileB}_${syst}_A.root ]]  && [[ ! -f $dir/plots_$channel/${fileB}_A.root ]] && [[ $file != *"stau"* && $file != *"C1"*  ]] && [[ $2 != "TTemplate" ]] && [[ $2 != "mumu" ]] && [[ $2 != "WJETSMU" ]]; then
+#if [[ ! -f $dir/plots_$channel/${fileB}_A.root ]]  &&  [[ $2 != "TTemplate" ]] && [[ $2 != "mumu" ]]  && [[ $file == *"stau"*  || $file == *"C1"* ]]; then
 cp analyzer_h analyzer.h
 cp analyzer${channel}_C analyzer.C
 
@@ -172,7 +179,7 @@ sed -i 's/CHANNELHERE/'$channel2'/g' analyzer*
 sed -i 's/BTAGCUT/'$btag'/g' analyzer*
 
 
-sed -i 's/SYSTEMATICHERE/'$syst'/g' analyzer.C
+sed -i 's/SYSTEMATICHERE/'$syst'/g' analyzer*
 #if [[ $channel == "muel" ]] ; then
 
 #sed -i '217 a            bqcd=true;' analyzer.C
@@ -188,7 +195,7 @@ fi
 
 
 ######## D region
-if [[ ! -f $dir/plots_$channel/${fileB}_${syst}_D.root  ]]  && [[ ! -f $dir/plots_$channel/${fileB}_D.root ]] &&  [[ $file != *"stau"*  && $file != *"C1"* ]] && [[ $2 != "Ttemplate" ]] && [[ $2 != "mumu" ]]; then
+if [[ ! -f $dir/plots_$channel/${fileB}_${syst}_D.root  ]]  && [[ ! -f $dir/plots_$channel/${fileB}_D.root ]] &&  [[ $file != *"stau"*  && $file != *"C1"* ]] && [[ $2 != "TTemplate" ]] && [[ $2 != "mumu" ]] && [[ $2 != "WJETSMU" ]]; then
 cp analyzer${channel}_C analyzer.C
 cp analyzer_h analyzer.h
 
@@ -202,7 +209,7 @@ sed -i 's/CHANNELHERE/'$channel2'/g' analyzer*
 sed -i 's/BTAGCUT/'$btag'/g' analyzer*
 
 
-sed -i 's/SYSTEMATICHERE/'$syst'/g' analyzer.C
+sed -i 's/SYSTEMATICHERE/'$syst'/g' analyzer*
 rm plots.root
 root -l -q -b runme.C 
 mv plots.root $dir/plots_$channel/${fileB}_${syst}_D.root
@@ -211,7 +218,7 @@ fi
 
 
 ####### C region
-if [[ ! -f $dir/plots_$channel/${fileB}_${syst}_C.root  ]] && [[ ! -f $dir/plots_$channel/${fileB}_C.root ]] &&  [[ $file != *"stau"* && $file != *"C1"*  ]] && [[ $2 != "Ttemplate" ]] && [[ $2 != "mumu" ]]; then
+if [[ ! -f $dir/plots_$channel/${fileB}_${syst}_C.root  ]] && [[ ! -f $dir/plots_$channel/${fileB}_C.root ]] &&  [[ $file != *"stau"* && $file != *"C1"*  ]] && [[ $2 != "TTemplate" ]] && [[ $2 != "mumu" ]] && [[ $2 != "WJETSMU" ]]; then
 cp analyzer${channel}_C analyzer.C
 cp analyzer_h analyzer.h
 
@@ -225,7 +232,7 @@ sed -i 's/CHANNELHERE/'$channel2'/g' analyzer*
 sed -i 's/BTAGCUT/'$btag'/g' analyzer*
 
 
-sed -i 's/SYSTEMATICHERE/'$syst'/g' analyzer.C
+sed -i 's/SYSTEMATICHERE/'$syst'/g' analyzer*
 
 rm plots.root
 root -l -q -b runme.C 

@@ -71,6 +71,15 @@ class analyzer {
 		Float_t		met_ey_UnclusteredEnUp;
 		Float_t		met_ex_UnclusteredEnDown;
 		Float_t		met_ey_UnclusteredEnDown;
+
+   		Float_t         met_ex_JetEnUp_recoil;
+   		Float_t         met_ey_JetEnUp_recoil;
+   		Float_t         met_ex_JetEnDown_recoil;
+   		Float_t         met_ey_JetEnDown_recoil;
+   		Float_t         met_ex_UnclusteredEnUp_recoil;
+   		Float_t         met_ey_UnclusteredEnUp_recoil;
+   		Float_t         met_ex_UnclusteredEnDown_recoil;
+   		Float_t         met_ey_UnclusteredEnDown_recoil;
    		Float_t         met_ex_recoil;
    		Float_t         met_ey_recoil;
    		Float_t         genmet;
@@ -214,6 +223,14 @@ class analyzer {
 		TBranch	       *b_met_ey_UnclusteredEnUp;
 		TBranch	       *b_met_ex_UnclusteredEnDown;
 		TBranch	       *b_met_ey_UnclusteredEnDown;
+		TBranch        *b_met_ex_JetEnUp_recoil;
+		TBranch        *b_met_ey_JetEnUp_recoil;
+		TBranch        *b_met_ex_JetEnDown_recoil;
+		TBranch        *b_met_ey_JetEnDown_recoil;
+		TBranch	       *b_met_ex_UnclusteredEnUp_recoil;
+		TBranch	       *b_met_ey_UnclusteredEnUp_recoil;
+		TBranch	       *b_met_ex_UnclusteredEnDown_recoil;
+		TBranch	       *b_met_ey_UnclusteredEnDown_recoil;
    		TBranch        *b_met_ex_recoil;
    		TBranch        *b_met_ey_recoil;
    		TBranch        *b_genmet;
@@ -395,11 +412,10 @@ class analyzer {
 			double met = MetV.Pt();
 			double dzeta=-9999;
 
+///////////////////mutau
+////////////////////
 
 			if (Sel=="mutau" && mIndex >-1 && tIndex>-1 ){
-
- 
-
 
 
 				tauMass = tauV.M();
@@ -419,8 +435,6 @@ class analyzer {
 				//   Mt2::LorentzTransverseVector  vis_B(Mt2::TwoVector(tauV.Px(), tauV.Py()), tauMass);
 				//   Mt2::TwoVector                pT_Miss(MetV.Px(), MetV.Py());    
 				//double mt2  = mt2Calculator.mt2_332(vis_A, vis_B, pT_Miss, Chimass);
-				 
-
 
 				double v1[4] = {muV.Px(),muV.Py(),muV.Pz(),muonMass};
 				double v2[4] = {tauV.Px(),tauV.Py(),tauV.Pz(),tauMass};
@@ -496,11 +510,12 @@ class analyzer {
 
 
 
-				dPhi=dPhiFrom2P( mu_px[muon_index], mu_py[muon_index], MetV.Px(),  MetV.Py() );
+
+				dPhi=dPhiFrom2P( mu_px[mIndex], mu_py[mIndex], MetV.Px(),  MetV.Py() );
 				//dPhi=dPhiFrom2P( muV.Px(), muV.Py(), MetV.Px(),  MetV.Py() );
 				hdPhiMuMET[CutIndex]->Fill(dPhi,EvWeight);
 
-				float MT = TMath::Sqrt(2*mu_pt[muon_index]*MetV.Pt()*(1-TMath::Cos(dPhi)));
+				float MT = TMath::Sqrt(2*mu_pt[mIndex]*MetV.Pt()*(1-TMath::Cos(dPhi)));
 				hMT[CutIndex]->Fill(MT,EvWeight);
 				hMTmu[CutIndex]->Fill(MT,EvWeight);
 					dPhi=dPhiFrom2P( tauV.Px(), tauV.Py(), MetV.Px(),  MetV.Py() );
@@ -538,15 +553,15 @@ class analyzer {
 				// pfmet
 				float pzetamiss = MetV.Px()*zetaX + MetV.Py()*zetaY;
 				float pzetavis = vectorVisX*zetaX + vectorVisY*zetaY;
-				dzeta = pzetamiss - 0.85*pzetavis;
+				dzeta = pzetamiss - 1.85*pzetavis;
 			
 
 				hDZeta[CutIndex]->Fill(dzeta,EvWeight);
 
 
 
+/*
 				hmet_DZeta_MT2lester[CutIndex]->Fill(MetV.Pt(),dzeta,Mt2as,EvWeight);
-
 				hmet_MT[CutIndex]->Fill(MetV.Pt(),MT,EvWeight);
 				hmet_MTsum[CutIndex]->Fill(MetV.Pt(),MT+MTt,EvWeight);
 				hmet_MTtot[CutIndex]->Fill(MetV.Pt(),mttotal,EvWeight);
@@ -597,7 +612,7 @@ class analyzer {
 				hTauPt_MTDil[CutIndex]->Fill(tauV.Pt(),MTDil,EvWeight);
 
 				hdR_MTDil[CutIndex]->Fill(Dr,MTDil,EvWeight);
-
+*/
 
 			if (JetsV.size()>0){
 				double dPhiJT=dPhiFrom2P( JetsV.at(0).Px(), JetsV.at(0).Py(), tauV.Px(),  tauV.Py() );
@@ -610,6 +625,9 @@ class analyzer {
 
 				double deta2 = tauV.Eta()-JetsV.at(0).Eta();
 				hdEtaJ0Tau[CutIndex]->Fill(deta2,EvWeight);
+
+				double Drtj = tauV.DeltaR(JetsV.at(0));
+				hdR_taujet[CutIndex]->Fill(Drtj,EvWeight);
 				}
 
 			}
@@ -713,10 +731,10 @@ class analyzer {
 				// pfmet
 				float pzetamiss = MetV.Px()*zetaX + MetV.Py()*zetaY;
 				float pzetavis = vectorVisX*zetaX + vectorVisY*zetaY;
-				dzeta = pzetamiss - 0.85*pzetavis;
+				dzeta = pzetamiss - 1.85*pzetavis;
 
 				hDZeta[CutIndex]->Fill(dzeta,EvWeight);
-
+/*
 				hmet_DZeta_MT2lester[CutIndex]->Fill(MetV.Pt(),dzeta,Mt2as,EvWeight);
 
 				hmet_MT[CutIndex]->Fill(MetV.Pt(),MT,EvWeight);
@@ -769,8 +787,7 @@ class analyzer {
 				hTauPt_MTDil[CutIndex]->Fill(tauV.Pt(),MTDil,EvWeight);
 
 				hdR_MTDil[CutIndex]->Fill(Dr,MTDil,EvWeight);
-
-
+*/
 
 
 
@@ -785,9 +802,12 @@ class analyzer {
 
 				double deta2 = tauV.Eta()-JetsV.at(0).Eta();
 				hdEtaJ0Tau[CutIndex]->Fill(deta2,EvWeight);
+
+				double Drtj = tauV.DeltaR(JetsV.at(0));
+				hdR_taujet[CutIndex]->Fill(Drtj,EvWeight);
 				}
 
-			}
+			}////////////end of eltau channe
 
 
 			if (Sel=="muel"){
@@ -795,6 +815,7 @@ class analyzer {
 			
 				double deta=deltaEta(muV.Px(),  muV.Py(),muV.Pz(), elV.Px(),  elV.Py(),elV.Pz() );
 				hdEtaDil[CutIndex]->Fill(deta,EvWeight);
+
 	// of course the following variables do not make any sense....
 			TLorentzVector t1 ; t1 = MetV+muV;
 				double detaM= muV.Eta()-t1.Eta();
@@ -853,10 +874,10 @@ class analyzer {
 				hdR_muel[CutIndex]->Fill(Dr,EvWeight);
 
 
-				dPhi=dPhiFrom2P( mu_px[muon_index], mu_py[muon_index], MetV.Px(),  MetV.Py() );
+				dPhi=dPhiFrom2P( mu_px[mIndex], mu_py[mIndex], MetV.Px(),  MetV.Py() );
 				hdPhiMuMET[CutIndex]->Fill(dPhi,EvWeight);
 
-				float MT = TMath::Sqrt(2*mu_pt[muon_index]*MetV.Pt()*(1-TMath::Cos(dPhi)));
+				float MT = TMath::Sqrt(2*mu_pt[mIndex]*MetV.Pt()*(1-TMath::Cos(dPhi)));
 				hMTmu[CutIndex]->Fill(MT,EvWeight);
 					dPhi=dPhiFrom2P( elV.Px(), elV.Py(), MetV.Px(),  MetV.Py() );
 					float MTel = TMath::Sqrt(2*elV.Pt()*MetV.Pt()*(1-TMath::Cos(dPhi)));
@@ -899,11 +920,11 @@ class analyzer {
 				// pfmet
 				float pzetamiss = MetV.Px()*zetaX + MetV.Py()*zetaY;
 				float pzetavis = vectorVisX*zetaX + vectorVisY*zetaY;
-				dzeta = pzetamiss - 0.85*pzetavis;
+				dzeta = pzetamiss - 1.85*pzetavis;
 
 				hDZeta[CutIndex]->Fill(dzeta,EvWeight);
 
-
+/*
 				hmet_DZeta_MT2lester[CutIndex]->Fill(MetV.Pt(),dzeta,Mt2as,EvWeight);
 
 				hmet_MT[CutIndex]->Fill(MetV.Pt(),MT,EvWeight);
@@ -949,9 +970,7 @@ class analyzer {
 
 
 				hdR_MTDil[CutIndex]->Fill(Dr,MTDil,EvWeight);
-
-
-
+*/
 
 
 
@@ -977,7 +996,8 @@ class analyzer {
 /////////////////////////////////////////////
 ////////////////////////////////////////////////
 
-			if (met<40){
+			if (dzeta > -9999){
+			if (met<40 ){
 				
 				if (Mt2as<40) 	{
 					if (dzeta<-150) {hmet_MT2lester_DZeta_1D[CutIndex]->Fill(1,EvWeight); }
@@ -985,33 +1005,28 @@ class analyzer {
 					if (dzeta>-100 && dzeta<0) {hmet_MT2lester_DZeta_1D[CutIndex]->Fill(3,EvWeight); }
 					if (dzeta>0) {hmet_MT2lester_DZeta_1D[CutIndex]->Fill(4,EvWeight); }
 				}
-				if (Mt2as>40 && Mt2as<80) 	{
+				if (Mt2as>40) 	{
 					if (dzeta<-150) {hmet_MT2lester_DZeta_1D[CutIndex]->Fill(5,EvWeight); }
-					if (dzeta>-150 && dzeta<-100) {hmet_MT2lester_DZeta_1D[CutIndex]->Fill(6,EvWeight); }
-					if (dzeta>-100) {hmet_MT2lester_DZeta_1D[CutIndex]->Fill(7,EvWeight); }
+					if (dzeta>-150) {hmet_MT2lester_DZeta_1D[CutIndex]->Fill(6,EvWeight); }
 				}
 
 
 			}//////met < 40 bin
 			if (met>40 && met<80){
 				if (Mt2as<40) 	{
-					if (dzeta<-150) {hmet_MT2lester_DZeta_1D[CutIndex]->Fill(8,EvWeight); }
-					if (dzeta>-150 && dzeta<-100) {hmet_MT2lester_DZeta_1D[CutIndex]->Fill(9,EvWeight); }
-					if (dzeta>-100 && dzeta<50) {hmet_MT2lester_DZeta_1D[CutIndex]->Fill(10,EvWeight); }
-					if (dzeta>50) {hmet_MT2lester_DZeta_1D[CutIndex]->Fill(11,EvWeight); }
+					if (dzeta<-150) {hmet_MT2lester_DZeta_1D[CutIndex]->Fill(7,EvWeight); }
+					if (dzeta>-150 && dzeta<-100) {hmet_MT2lester_DZeta_1D[CutIndex]->Fill(8,EvWeight); }
+					if (dzeta>-100 && dzeta<50) {hmet_MT2lester_DZeta_1D[CutIndex]->Fill(9,EvWeight); }
+					if (dzeta>50) {hmet_MT2lester_DZeta_1D[CutIndex]->Fill(10,EvWeight); }
 				}
 				if (Mt2as>40 && Mt2as<80) 	{
-					if (dzeta<-150) {hmet_MT2lester_DZeta_1D[CutIndex]->Fill(12,EvWeight); }
-					if (dzeta>-150 && dzeta<-100) {hmet_MT2lester_DZeta_1D[CutIndex]->Fill(13,EvWeight); }
-					if (dzeta>-100) {hmet_MT2lester_DZeta_1D[CutIndex]->Fill(14,EvWeight); }
+					if (dzeta<-150) {hmet_MT2lester_DZeta_1D[CutIndex]->Fill(11,EvWeight); }
+					if (dzeta>-150 && dzeta<-100) {hmet_MT2lester_DZeta_1D[CutIndex]->Fill(12,EvWeight); }
+					if (dzeta>-100) {hmet_MT2lester_DZeta_1D[CutIndex]->Fill(13,EvWeight); }
 				}
 
-				if (Mt2as>80 && Mt2as<120) 	{
-					if (dzeta<-150) {hmet_MT2lester_DZeta_1D[CutIndex]->Fill(15,EvWeight); }
-					if (dzeta>-150 ) {hmet_MT2lester_DZeta_1D[CutIndex]->Fill(16,EvWeight); }
-				}
-				if (Mt2as>120) 	{
-					{hmet_MT2lester_DZeta_1D[CutIndex]->Fill(17,EvWeight); }
+				if (Mt2as>80 ) 	{
+					{hmet_MT2lester_DZeta_1D[CutIndex]->Fill(14,EvWeight); }
 				}
 
 
@@ -1019,21 +1034,20 @@ class analyzer {
 
 			if (met>80 && met<120){
 				if (Mt2as<40) 	{
-					if (dzeta<-100) {hmet_MT2lester_DZeta_1D[CutIndex]->Fill(18,EvWeight); }
-					if (dzeta>-100) {hmet_MT2lester_DZeta_1D[CutIndex]->Fill(19,EvWeight); }
+					if (dzeta<-100) {hmet_MT2lester_DZeta_1D[CutIndex]->Fill(15,EvWeight); }
+					if (dzeta>-100) {hmet_MT2lester_DZeta_1D[CutIndex]->Fill(16,EvWeight); }
 				}
 				if (Mt2as>40 && Mt2as<80) 	{
-					if (dzeta<-150) {hmet_MT2lester_DZeta_1D[CutIndex]->Fill(20,EvWeight); }
-					if (dzeta>-150 && dzeta<-100) {hmet_MT2lester_DZeta_1D[CutIndex]->Fill(21,EvWeight); }
-					if (dzeta>-100) {hmet_MT2lester_DZeta_1D[CutIndex]->Fill(22,EvWeight); }
+					if (dzeta<-150) {hmet_MT2lester_DZeta_1D[CutIndex]->Fill(17,EvWeight); }
+					if (dzeta>-150 && dzeta<-100) {hmet_MT2lester_DZeta_1D[CutIndex]->Fill(18,EvWeight); }
+					if (dzeta>-100) {hmet_MT2lester_DZeta_1D[CutIndex]->Fill(19,EvWeight); }
 				}
 
 				if (Mt2as>80 && Mt2as<120) 	{
-					if (dzeta<-150) {hmet_MT2lester_DZeta_1D[CutIndex]->Fill(23,EvWeight); }
-					if (dzeta>-150) {hmet_MT2lester_DZeta_1D[CutIndex]->Fill(24,EvWeight); }
+					{hmet_MT2lester_DZeta_1D[CutIndex]->Fill(20,EvWeight); }
 				}
 				if (Mt2as>120) 	{
-					{hmet_MT2lester_DZeta_1D[CutIndex]->Fill(25,EvWeight); }
+					{hmet_MT2lester_DZeta_1D[CutIndex]->Fill(21,EvWeight); }
 				}
 
 
@@ -1042,23 +1056,21 @@ class analyzer {
 			if (met>120){
 							
 				if (Mt2as<40) 	{
-					if (dzeta<-150) {hmet_MT2lester_DZeta_1D[CutIndex]->Fill(26,EvWeight); }
-					if (dzeta>-150 && dzeta<-100) {hmet_MT2lester_DZeta_1D[CutIndex]->Fill(27,EvWeight); }
-					if (dzeta>-100) {hmet_MT2lester_DZeta_1D[CutIndex]->Fill(28,EvWeight); }
+					if (dzeta<-150) {hmet_MT2lester_DZeta_1D[CutIndex]->Fill(22,EvWeight); }
+					if (dzeta>-150 && dzeta<-100) {hmet_MT2lester_DZeta_1D[CutIndex]->Fill(23,EvWeight); }
+					if (dzeta>-100) {hmet_MT2lester_DZeta_1D[CutIndex]->Fill(24,EvWeight); }
 				}
 				if (Mt2as>40 && Mt2as<80) 	{
-					if (dzeta<-150) {hmet_MT2lester_DZeta_1D[CutIndex]->Fill(29,EvWeight); }
-					if (dzeta>-150 && dzeta<-100) {hmet_MT2lester_DZeta_1D[CutIndex]->Fill(30,EvWeight); }
-					if (dzeta>-100) {hmet_MT2lester_DZeta_1D[CutIndex]->Fill(31,EvWeight); }
+					if (dzeta<-150) {hmet_MT2lester_DZeta_1D[CutIndex]->Fill(25,EvWeight); }
+					if (dzeta>-150 && dzeta<-100) {hmet_MT2lester_DZeta_1D[CutIndex]->Fill(26,EvWeight); }
+					if (dzeta>-100) {hmet_MT2lester_DZeta_1D[CutIndex]->Fill(27,EvWeight); }
 				}
 
 				if (Mt2as>80 && Mt2as<120) 	{
-					if (dzeta<-150) {hmet_MT2lester_DZeta_1D[CutIndex]->Fill(32,EvWeight); }
-					if (dzeta>-150 && dzeta<-100) {hmet_MT2lester_DZeta_1D[CutIndex]->Fill(33,EvWeight); }
-					if (dzeta>-100) {hmet_MT2lester_DZeta_1D[CutIndex]->Fill(34,EvWeight); }
+					{hmet_MT2lester_DZeta_1D[CutIndex]->Fill(28,EvWeight); }
 				}
 				if (Mt2as>120) 	{
-					hmet_MT2lester_DZeta_1D[CutIndex]->Fill(35,EvWeight); 
+					hmet_MT2lester_DZeta_1D[CutIndex]->Fill(29,EvWeight); 
 				}
 
 
@@ -1076,33 +1088,28 @@ class analyzer {
 					if (dzeta>-100 && dzeta<0) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(3,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(3,EvWeight);}
 					if (dzeta>0) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(4,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(4,EvWeight);}
 				}
-				if (Mt2as>40 && Mt2as<80) 	{
+				if (Mt2as>40) 	{
 					if (dzeta<-150) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(5,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(5,EvWeight);}
-					if (dzeta>-150 && dzeta<-100) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(6,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(6,EvWeight);}
-					if (dzeta>-100) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(7,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(7,EvWeight);}
+					if (dzeta>-150) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(6,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(6,EvWeight);}
 				}
 
 
 			}//////met < 40 bin
 			if (met>40 && met<80){
 				if (Mt2as<40) 	{
-					if (dzeta<-150) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(8,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(8,EvWeight);}
-					if (dzeta>-150 && dzeta<-100) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(9,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(9,EvWeight);}
-					if (dzeta>-100 && dzeta<50) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(10,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(10,EvWeight);}
-					if (dzeta>50) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(11,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(11,EvWeight);}
+					if (dzeta<-150) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(7,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(7,EvWeight);}
+					if (dzeta>-150 && dzeta<-100) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(8,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(8,EvWeight);}
+					if (dzeta>-100 && dzeta<50) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(9,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(9,EvWeight);}
+					if (dzeta>50) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(10,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(10,EvWeight);}
 				}
 				if (Mt2as>40 && Mt2as<80) 	{
-					if (dzeta<-150) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(12,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(12,EvWeight);}
-					if (dzeta>-150 && dzeta<-100) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(13,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(13,EvWeight);}
-					if (dzeta>-100) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(14,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(14,EvWeight);}
+					if (dzeta<-150) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(11,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(11,EvWeight);}
+					if (dzeta>-150 && dzeta<-100) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(12,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(12,EvWeight);}
+					if (dzeta>-100) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(13,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(13,EvWeight);}
 				}
 
-				if (Mt2as>80 && Mt2as<120) 	{
-					if (dzeta<-150) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(15,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(15,EvWeight);}
-					if (dzeta>-150 ) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(16,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(16,EvWeight);}
-				}
-				if (Mt2as>120) 	{
-					{hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(17,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(17,EvWeight);}
+				if (Mt2as>80 ) 	{
+					{hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(14,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(14,EvWeight);}
 				}
 
 
@@ -1110,21 +1117,20 @@ class analyzer {
 
 			if (met>80 && met<120){
 				if (Mt2as<40) 	{
-					if (dzeta<-100) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(18,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(18,EvWeight);}
-					if (dzeta>-100) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(19,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(19,EvWeight);}
+					if (dzeta<-100) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(15,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(15,EvWeight);}
+					if (dzeta>-100) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(16,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(16,EvWeight);}
 				}
 				if (Mt2as>40 && Mt2as<80) 	{
-					if (dzeta<-150) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(20,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(20,EvWeight);}
-					if (dzeta>-150 && dzeta<-100) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(21,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(21,EvWeight);}
-					if (dzeta>-100) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(22,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(22,EvWeight);}
+					if (dzeta<-150) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(17,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(17,EvWeight);}
+					if (dzeta>-150 && dzeta<-100) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(18,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(18,EvWeight);}
+					if (dzeta>-100) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(19,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(19,EvWeight);}
 				}
 
 				if (Mt2as>80 && Mt2as<120) 	{
-					if (dzeta<-150) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(23,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(23,EvWeight);}
-					if (dzeta>-150) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(24,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(24,EvWeight);}
+					{hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(20,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(20,EvWeight);}
 				}
 				if (Mt2as>120) 	{
-					{hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(25,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(25,EvWeight);}
+					{hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(21,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(21,EvWeight);}
 				}
 
 
@@ -1133,23 +1139,21 @@ class analyzer {
 			if (met>120){
 							
 				if (Mt2as<40) 	{
-					if (dzeta<-150) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(26,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(26,EvWeight);}
-					if (dzeta>-150 && dzeta<-100) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(27,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(27,EvWeight);}
-					if (dzeta>-100) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(28,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(28,EvWeight);}
+					if (dzeta<-150) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(22,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(22,EvWeight);}
+					if (dzeta>-150 && dzeta<-100) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(23,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(23,EvWeight);}
+					if (dzeta>-100) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(24,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(24,EvWeight);}
 				}
 				if (Mt2as>40 && Mt2as<80) 	{
-					if (dzeta<-150) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(29,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(29,EvWeight);}
-					if (dzeta>-150 && dzeta<-100) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(30,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(30,EvWeight);}
-					if (dzeta>-100) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(31,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(31,EvWeight);}
+					if (dzeta<-150) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(25,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(25,EvWeight);}
+					if (dzeta>-150 && dzeta<-100) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(26,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(26,EvWeight);}
+					if (dzeta>-100) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(27,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(27,EvWeight);}
 				}
 
 				if (Mt2as>80 && Mt2as<120) 	{
-					if (dzeta<-150) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(32,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(32,EvWeight);}
-					if (dzeta>-150 && dzeta<-100) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(33,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(33,EvWeight);}
-					if (dzeta>-100) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(34,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(34,EvWeight);}
+					{hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(28,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(28,EvWeight);}
 				}
 				if (Mt2as>120) 	{
-					hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(35,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(35,EvWeight);
+					hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(29,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(29,EvWeight);
 				}
 
 
@@ -1157,7 +1161,7 @@ class analyzer {
 	
 }///////////////JetsVsize = 0
 
-			int nB=35;
+			int nB=29;
 ///////////////////////
 			if (JetsV.size()==1){
 			if (met<40){
@@ -1168,33 +1172,28 @@ class analyzer {
 					if (dzeta>-100 && dzeta<0) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(3,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(3+nB,EvWeight);}
 					if (dzeta>0) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(4,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(4+nB,EvWeight);}
 				}
-				if (Mt2as>40 && Mt2as<80) 	{
+				if (Mt2as>40) 	{
 					if (dzeta<-150) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(5,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(5+nB,EvWeight);}
-					if (dzeta>-150 && dzeta<-100) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(6,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(6+nB,EvWeight);}
-					if (dzeta>-100) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(7,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(7+nB,EvWeight);}
+					if (dzeta>-150)	{hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(6,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(6+nB,EvWeight);}
 				}
 
 
 			}//////met < 40 bin
 			if (met>40 && met<80){
 				if (Mt2as<40) 	{
-					if (dzeta<-150) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(8,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(8+nB,EvWeight);}
-					if (dzeta>-150 && dzeta<-100) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(9,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(9+nB,EvWeight);}
-					if (dzeta>-100 && dzeta<50) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(10,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(10+nB,EvWeight);}
-					if (dzeta>50) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(11,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(11+nB,EvWeight);}
+					if (dzeta<-150) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(7,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(7+nB,EvWeight);}
+					if (dzeta>-150 && dzeta<-100) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(8,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(8+nB,EvWeight);}
+					if (dzeta>-100 && dzeta<50) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(9,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(9+nB,EvWeight);}
+					if (dzeta>50) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(10,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(10+nB,EvWeight);}
 				}
 				if (Mt2as>40 && Mt2as<80) 	{
-					if (dzeta<-150) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(12,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(12+nB,EvWeight);}
-					if (dzeta>-150 && dzeta<-100) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(13,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(13+nB,EvWeight);}
-					if (dzeta>-100) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(14,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(14+nB,EvWeight);}
+					if (dzeta<-150) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(11,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(11+nB,EvWeight);}
+					if (dzeta>-150 && dzeta<-100) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(12,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(12+nB,EvWeight);}
+					if (dzeta>-100) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(13,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(13+nB,EvWeight);}
 				}
 
-				if (Mt2as>80 && Mt2as<120) 	{
-					if (dzeta<-150) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(15,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(15+nB,EvWeight);}
-					if (dzeta>-150 ) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(16,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(16+nB,EvWeight);}
-				}
-				if (Mt2as>120) 	{
-					{hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(17,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(17+nB,EvWeight);}
+				if (Mt2as>80) 	{
+					{hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(14,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(14+nB,EvWeight);}
 				}
 
 
@@ -1202,21 +1201,20 @@ class analyzer {
 
 			if (met>80 && met<120){
 				if (Mt2as<40) 	{
-					if (dzeta<-100) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(18,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(18+nB,EvWeight);}
-					if (dzeta>-100) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(19,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(19+nB,EvWeight);}
+					if (dzeta<-100) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(15,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(15+nB,EvWeight);}
+					if (dzeta>-100) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(16,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(16+nB,EvWeight);}
 				}
 				if (Mt2as>40 && Mt2as<80) 	{
-					if (dzeta<-150) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(20,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(20+nB,EvWeight);}
-					if (dzeta>-150 && dzeta<-100) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(21,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(21+nB,EvWeight);}
-					if (dzeta>-100) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(22,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(22+nB,EvWeight);}
+					if (dzeta<-150) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(17,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(17+nB,EvWeight);}
+					if (dzeta>-150 && dzeta<-100) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(18,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(18+nB,EvWeight);}
+					if (dzeta>-100) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(19,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(19+nB,EvWeight);}
 				}
 
 				if (Mt2as>80 && Mt2as<120) 	{
-					if (dzeta<-150) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(23,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(23+nB,EvWeight);}
-					if (dzeta>-150) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(24,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(24+nB,EvWeight);}
+					{hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(20,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(20+nB,EvWeight);}
 				}
 				if (Mt2as>120) 	{
-					{hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(25,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(25+nB,EvWeight);}
+					{hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(21,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(21+nB,EvWeight);}
 				}
 
 
@@ -1225,46 +1223,32 @@ class analyzer {
 			if (met>120){
 							
 				if (Mt2as<40) 	{
-					if (dzeta<-150) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(26,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(26+nB,EvWeight);}
-					if (dzeta>-150 && dzeta<-100) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(27,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(27+nB,EvWeight);}
-					if (dzeta>-100) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(28,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(28+nB,EvWeight);}
+					if (dzeta<-150) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(22,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(22+nB,EvWeight);}
+					if (dzeta>-150 && dzeta<-100) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(23,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(23+nB,EvWeight);}
+					if (dzeta>-100) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(24,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(24+nB,EvWeight);}
 				}
 				if (Mt2as>40 && Mt2as<80) 	{
-					if (dzeta<-150) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(29,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(29+nB,EvWeight);}
-					if (dzeta>-150 && dzeta<-100) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(30,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(30+nB,EvWeight);}
-					if (dzeta>-100) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(31,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(31+nB,EvWeight);}
+					if (dzeta<-150) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(25,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(25+nB,EvWeight);}
+					if (dzeta>-150 && dzeta<-100) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(26,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(26+nB,EvWeight);}
+					if (dzeta>-100) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(27,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(27+nB,EvWeight);}
 				}
 
 				if (Mt2as>80 && Mt2as<120) 	{
-					if (dzeta<-150) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(32,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(32+nB,EvWeight);}
-					if (dzeta>-150 && dzeta<-100) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(33,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(33+nB,EvWeight);}
-					if (dzeta>-100) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(34,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(34+nB,EvWeight);}
+					{hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(28,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(28+nB,EvWeight);}
 				}
 				if (Mt2as>120) 	{
-					hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(35,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(35+nB,EvWeight);
+					hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(29,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(29+nB,EvWeight);
 				}
 
 
 			}///met 120 bin
 	
-}///////////////JetsVsize = 1
+	}///////////////JetsVsize = 1
+
+}/////////dzeta>-9999
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-			if (Sel=="WJetsmu" && mIndex >-1 ){
+			if ( (Sel=="WJetsmu" || Sel=="Channel") && mIndex >-1 ){
 
 
 				TLorentzVector t1 ; t1 = MetV+muV;
@@ -1276,11 +1260,11 @@ class analyzer {
 				hCentrality[CutIndex]->Fill(Centr,EvWeight);
 
 
-				double dPhi=dPhiFrom2P( mu_px[muon_index], mu_py[muon_index], MetV.Px(),  MetV.Py() );
+				double dPhi=dPhiFrom2P( mu_px[mIndex], mu_py[mIndex], MetV.Px(),  MetV.Py() );
 				//dPhi=dPhiFrom2P( muV.Px(), muV.Py(), MetV.Px(),  MetV.Py() );
 				hdPhiMuMET[CutIndex]->Fill(dPhi,EvWeight);
 
-				float MT = TMath::Sqrt(2*mu_pt[muon_index]*MetV.Pt()*(1-TMath::Cos(dPhi)));
+				float MT = TMath::Sqrt(2*mu_pt[mIndex]*MetV.Pt()*(1-TMath::Cos(dPhi)));
 				hMT[CutIndex]->Fill(MT,EvWeight);
 				hMTmu[CutIndex]->Fill(MT,EvWeight);
 					dPhi=dPhiFrom2P( tauV.Px(), tauV.Py(), MetV.Px(),  MetV.Py() );
@@ -1297,9 +1281,9 @@ class analyzer {
 				hdEtaJ0Tau[CutIndex]->Fill(deta2,EvWeight);
 				}
 
-			}
+			}////////////WJetsmu
 ///////////End of 
-
+////////////////////////// fill generic variables
 			if (eIndex != -1)
 			{
 
@@ -1320,10 +1304,6 @@ class analyzer {
 
 				hElIPsigxy[CutIndex]->Fill(fabs(el_dxy[eIndex]/el_dxyerr[eIndex]),EvWeight);
 				hElIPsigz[CutIndex]->Fill(fabs(el_dz[eIndex]/el_dzerr[eIndex]),EvWeight);
-
-				double dPhiJ=dPhiFrom2P( el_px[eIndex], el_py[eIndex], MetV.Px(),  MetV.Py() );
-				hdPhiElMET[CutIndex]->Fill(dPhiJ,EvWeight);
-
 
 				sumElpT +=elV.Pt();
 				hIsoEl[CutIndex]->Fill(el_relIso[0],EvWeight);
@@ -1354,26 +1334,16 @@ class analyzer {
 				hMuIPsigxy[CutIndex]->Fill(fabs(mu_dxy[mIndex]/mu_dxyerr[mIndex]),EvWeight);
 				hMuIPsigz[CutIndex]->Fill(fabs(mu_dz[mIndex]/mu_dzerr[mIndex]),EvWeight);
 
-				double dPhiJ=dPhiFrom2P( mu_px[mIndex], mu_py[mIndex], MetV.Px(),  MetV.Py() );
-				hdPhiMuMET[CutIndex]->Fill(dPhiJ,EvWeight);
-
-
 				sumMuonpT +=muV.Pt();
 				hIsoMu[CutIndex]->Fill(mu_relIso[0],EvWeight);
 
-
-				//cout<<" Inside  "<<relIsoL<<"  Cut"<<"  "<<CutIndex<<endl;
-
-				if (tIndex>-1 && ta_count > 0){
-					double q = ta_charge[tIndex] * mu_charge[mIndex];
-				}
 
 			}
 
 
 			if (tIndex !=-1)
 			{
-
+			//cout<< "  taus "<<tIndex<<endl;
 				hTaupt[CutIndex]->Fill(ta_pt[tIndex],EvWeight);
 				hTaueta[CutIndex]->Fill(ta_eta[tIndex],EvWeight);
 				htau_dxy[CutIndex]->Fill(ta_dxy[tIndex],EvWeight);
@@ -1395,8 +1365,6 @@ class analyzer {
 				hdPhiJ0MET[CutIndex]->Fill(dPhiJ,EvWeight);
 
 				hPtJ0[CutIndex]->Fill(JetsV.at(0).Pt(),EvWeight);
-				double Dr = tauV.DeltaR(JetsV.at(0));
-				hdR_taujet[CutIndex]->Fill(Dr,EvWeight);
 
 
 			}
@@ -1410,9 +1378,6 @@ class analyzer {
 				double dPhiJ0J1=dPhiFrom2P( JetsV.at(0).Px(), JetsV.at(0).Py(), JetsV.at(1).Px(), JetsV.at(1).Py() );
 				hdPhiJ0J1[CutIndex]->Fill(dPhiJ0J1,EvWeight);
 
-
-				//double mct = sqrt( 2*JetsV.at(0).Pt()*JetsV.at(1).Pt()*(1+cos(JetsV.at(0).Phi()-JetsV.at(1).Phi())) )
-				//hMCTJ0J1[CutIndex]->Fill(mct,EvWeight);
 
 			}
 			if (JetsV.size()>2){
@@ -1484,7 +1449,7 @@ class analyzer {
 
 
 
-		void FillHistsDiL(int CutIndex, Double_t EvWeight, TLorentzVector  LeptV1, TLorentzVector  LeptV2,  vector<TLorentzVector>  &JetsV, TLorentzVector  &MetV, double Chimass, double mintermediate, string & Sel, int  mIndex_1, int mIndex_2){
+void FillHistsDiL(int CutIndex, Double_t EvWeight, TLorentzVector  LeptV1, TLorentzVector  LeptV2,  vector<TLorentzVector>  &JetsV, TLorentzVector  &MetV, double Chimass, double mintermediate, string & Sel, int  mIndex_1, int mIndex_2){
 			AllJets_Lepton_noMet.clear();
 			for (unsigned int i = 0; i <   JetsV.size(); i++) AllJets_Lepton_noMet.push_back (JetsV.at(i));
 
@@ -1594,7 +1559,7 @@ class analyzer {
 				// pfmet
 				float pzetamiss = MetV.Px()*zetaX + MetV.Py()*zetaY;
 				float pzetavis = vectorVisX*zetaX + vectorVisY*zetaY;
-				float dzeta = pzetamiss - 0.85*pzetavis;
+				dzeta = pzetamiss - 1.85*pzetavis;
 			
 
 				hDZeta[CutIndex]->Fill(dzeta,EvWeight);
@@ -1611,7 +1576,6 @@ class analyzer {
 
 			if (mIndex_1 !=-1 )
 			{
-
 
 
 				int mIndex = mIndex_1;
@@ -1649,8 +1613,6 @@ class analyzer {
 			if (mIndex_2 !=-1 )
 			{
 
-
-
 				int mIndex = mIndex_2;
 				hLept2neutralHadIso[CutIndex]->Fill(mu_neutralHadIso[mIndex],EvWeight);
 				hLept2photonIso[CutIndex]->Fill(mu_photonIso[mIndex],EvWeight);
@@ -1684,6 +1646,7 @@ class analyzer {
 			}
 
 
+/////////////global variables
 
 			if (JetsV.size()>0){
 
@@ -1744,7 +1707,6 @@ class analyzer {
 			hHText[CutIndex]->Fill(HText,EvWeight);
 
 
-/////////////global variables
 
 			hMeffMuon[CutIndex]->Fill(sumMuonpT+sumpT+ MetV.Pt(),EvWeight);
 			if (MetV.Pt()>0. ) {
@@ -1789,7 +1751,13 @@ class analyzer {
 					// of trees.
 					TChain * chain = new TChain("CHANNELHERE/T","");
 
-					chain->Add("/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/CMSSW_8_0_20/src/DesyTauAnalyses/NTupleMaker/test/CHANNELHERE/FILEIN/CHANNELHERE/T");
+					TString ChainName = "/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/CMSSW_8_0_20/src/DesyTauAnalyses/NTupleMaker/test/CHANNELHERE/FILEIN/CHANNELHERE/T";
+					TString Tsystematic="SYSTEMATICHERE";
+					if (Tsystematic == "JetEnUp" || Tsystematic == "JetEnDown" || Tsystematic == "TauEnUp" || Tsystematic == "TauEnDown" || Tsystematic == "ElEnUp" || Tsystematic == "ElEnDown" || Tsystematic == "MuEnUp" || Tsystematic == "MuEnDown") 
+					{ChainName ="/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/CMSSW_8_0_20/src/DesyTauAnalyses/NTupleMaker/test/CHANNELHERE_"+Tsystematic+"/FILEIN/CHANNELHERE/T";}
+
+					 chain->Add(ChainName);
+
 					tree = chain;
 #endif // SINGLE_TREE
 
@@ -1862,6 +1830,31 @@ class analyzer {
 			fChain->SetBranchAddress("met_resoDown", &met_resoDown, &b_met_resoDown);
 			fChain->SetBranchAddress("metphi_resoUp", &metphi_resoUp, &b_metphi_resoUp);
 			fChain->SetBranchAddress("metphi_resoDown", &metphi_resoDown, &b_metphi_resoDown);
+
+			fChain->SetBranchAddress("met_ex_JetEnUp_recoil", &met_ex_JetEnUp_recoil, &b_met_ex_JetEnUp_recoil);
+			fChain->SetBranchAddress("met_ey_JetEnUp_recoil", &met_ey_JetEnUp_recoil, &b_met_ey_JetEnUp_recoil);
+
+			fChain->SetBranchAddress("met_ex_JetEnDown_recoil", &met_ex_JetEnDown_recoil, &b_met_ex_JetEnDown_recoil);
+			fChain->SetBranchAddress("met_ey_JetEnDown_recoil", &met_ey_JetEnDown_recoil, &b_met_ey_JetEnDown_recoil);
+
+			fChain->SetBranchAddress("met_ex_UnclusteredEnDown_recoil", &met_ex_UnclusteredEnDown_recoil, &b_met_ex_UnclusteredEnDown_recoil);
+			fChain->SetBranchAddress("met_ey_UnclusteredEnDown_recoil", &met_ey_UnclusteredEnDown_recoil, &b_met_ey_UnclusteredEnDown_recoil);
+
+			fChain->SetBranchAddress("met_ex_UnclusteredEnUp_recoil", &met_ex_UnclusteredEnUp_recoil, &b_met_ex_UnclusteredEnUp_recoil);
+			fChain->SetBranchAddress("met_ey_UnclusteredEnUp_recoil", &met_ey_UnclusteredEnUp_recoil, &b_met_ey_UnclusteredEnUp_recoil);
+
+			fChain->SetBranchAddress("met_ex_JetEnUp", &met_ex_JetEnUp, &b_met_ex_JetEnUp);
+			fChain->SetBranchAddress("met_ey_JetEnUp", &met_ey_JetEnUp, &b_met_ey_JetEnUp);
+
+			fChain->SetBranchAddress("met_ex_JetEnDown", &met_ex_JetEnDown, &b_met_ex_JetEnDown);
+			fChain->SetBranchAddress("met_ey_JetEnDown", &met_ey_JetEnDown, &b_met_ey_JetEnDown);
+
+			fChain->SetBranchAddress("met_ex_UnclusteredEnDown", &met_ex_UnclusteredEnDown, &b_met_ex_UnclusteredEnDown);
+			fChain->SetBranchAddress("met_ey_UnclusteredEnDown", &met_ey_UnclusteredEnDown, &b_met_ey_UnclusteredEnDown);
+
+			fChain->SetBranchAddress("met_ex_UnclusteredEnUp", &met_ex_UnclusteredEnUp, &b_met_ex_UnclusteredEnUp);
+			fChain->SetBranchAddress("met_ey_UnclusteredEnUp", &met_ey_UnclusteredEnUp, &b_met_ey_UnclusteredEnUp);
+
 
 			fChain->SetBranchAddress("gen_weight", &gen_weight, &b_gen_weight);
 			fChain->SetBranchAddress("pu_weight", &pu_weight, &b_pu_weight);

@@ -42,7 +42,56 @@ int main(int argc, char * argv[]) {
   // kinematic cuts on electrons
   const bool isData = cfg.get<bool>("IsData");
   
-  
+//////////systematics
+  /*
+  const bool ApplyTauEnergyScaleUnc     = cfg.get<bool>("ApplyTauEnergyScaleUnc");
+  const double TauEnergyScaleUnc   = cfg.get<double>("TauEnergyScaleUnc");
+  const bool ApplyTauCorrectionUncSignPositive     = cfg.get<bool>("ApplyTauCorrectionUncSignPositive");
+
+  const bool ApplyMuEnergyScaleUnc     = cfg.get<bool>("ApplyMuEnergyScaleUnc");
+  const double MuEnergyScaleUnc   = cfg.get<double>("MuEnergyScaleUnc");
+  const bool ApplyMuonCorrectionUncSignPositive     = cfg.get<bool>("ApplyMuonCorrectionUncSignPositive");
+
+  const bool ApplyElEnergyScaleUnc     = cfg.get<bool>("ApplyElEnergyScaleUnc");
+  const double ElEnergyScaleUncBarrel   = cfg.get<double>("ElEnergyScaleUncBarrel");
+  const double ElEnergyScaleUncEndcaps   = cfg.get<double>("ElEnergyScaleUncEndcaps");
+  const bool ApplyElectronCorrectionUncSignPositive     = cfg.get<bool>("ApplyElectronCorrectionUncSignPositive");
+
+  const bool ApplyJetEnergyCorrectionUnc     = cfg.get<bool>("ApplyJetEnergyCorrectionUnc");
+  const bool ApplyJetEnergyCorrectionUncSignPositive     = cfg.get<bool>("ApplyJetEnergyCorrectionUncSignPositive");
+*/
+
+  bool ApplyTauEnergyScaleUnc = false;
+  bool ApplyTauCorrectionUncSignPositive = false;
+  bool ApplyElEnergyScaleUnc = false;
+  bool ApplyElectronCorrectionUncSignPositive = false;
+  bool ApplyMuEnergyScaleUnc = false;
+  bool ApplyMuonCorrectionUncSignPositive = false;
+  bool ApplyJetEnergyCorrectionUnc = false;
+  bool ApplyJetEnergyCorrectionUncSignPositive = false;
+
+  const double TauEnergyScaleUnc   = cfg.get<double>("TauEnergyScaleUnc");
+  const double MuEnergyScaleUnc   = cfg.get<double>("MuEnergyScaleUnc");
+  const double ElEnergyScaleUncBarrel   = cfg.get<double>("ElEnergyScaleUncBarrel");
+  const double ElEnergyScaleUncEndcaps   = cfg.get<double>("ElEnergyScaleUncEndcaps");
+//_Nominal _JetEnUp _JetEnDown  _ElEnUp _ElEnDown _MuEnUp _MuEnDown
+
+
+  	string Systematic=argv[5];
+	if (Systematic=="1" || Systematic=="" || isData) Systematic = "Nominal";
+
+	if (string::npos != Systematic.find("TauEnUp")){ ApplyTauEnergyScaleUnc = true; ApplyTauCorrectionUncSignPositive = true;}
+	if (string::npos != Systematic.find("TauEnDown")){ ApplyTauEnergyScaleUnc = true; ApplyTauCorrectionUncSignPositive = false;}
+
+	if (string::npos != Systematic.find("ElEnUp")){ ApplyElEnergyScaleUnc = true; ApplyElectronCorrectionUncSignPositive = true;}
+	if (string::npos != Systematic.find("ElEnDown")){ ApplyElEnergyScaleUnc = true; ApplyElectronCorrectionUncSignPositive = false;}
+
+	if (string::npos != Systematic.find("MuEnUp")){ ApplyMuEnergyScaleUnc = true; ApplyMuonCorrectionUncSignPositive = true;}
+	if (string::npos != Systematic.find("MuEnDown")){ ApplyMuEnergyScaleUnc = true; ApplyMuonCorrectionUncSignPositive = false;}
+
+	if (string::npos != Systematic.find("JetEnUp")){ ApplyJetEnergyCorrectionUnc = true; ApplyJetEnergyCorrectionUncSignPositive = true;}
+	if (string::npos != Systematic.find("JetEnDown")){ ApplyJetEnergyCorrectionUnc = true; ApplyJetEnergyCorrectionUncSignPositive = false;}
+
 
 ////////////muons
 
@@ -141,6 +190,7 @@ int main(int argc, char * argv[]) {
   string cmsswBase = (getenv ("CMSSW_BASE"));
   string fullPathToJsonFile = cmsswBase + "/src/DesyTauAnalyses/NTupleMaker/test/json/" + jsonFile;
  
+ //RecoilCorrector recoilMetCorrector("HTT-utilities/RecoilCorrections/data/PFMET_MG_2016BCD_RooT_5.2.root");
   RecoilCorrector recoilMetCorrector("DesyTauAnalyses/NTupleMaker/data/PFMET_Run2016BCDEFGH_Spring16.root");
 
   MEtSys metSys("HTT-utilities/RecoilCorrections/data/MEtSys.root");
@@ -230,6 +280,7 @@ int main(int argc, char * argv[]) {
 
 // PU reweighting
   PileUp * PUofficial = new PileUp();
+  //TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/pileUp_data_Cert_271036-277148_13TeV_PromptReco_Collisions16_xsec69p2mb.root","read");
   TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/pileUp_data_RunBCDEFGH_ReReco.root","read");
   TFile * filePUdistribution_MC = new TFile (TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/MC_Spring16_PU25ns_V1.root", "read");
   TH1D * PU_data = (TH1D *)filePUdistribution_data->Get("pileup");
@@ -237,7 +288,7 @@ int main(int argc, char * argv[]) {
   PUofficial->set_h_data(PU_data);
   PUofficial->set_h_MC(PU_mc);
 
-  BTagCalibration calib("csvv2", cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/CSVv2_ichep.csv");
+  BTagCalibration calib("csvv2", cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/CSVv2Moriond17_2017_1_26_BtoH.csv");
   BTagCalibrationReader reader_B(BTagEntry::OP_MEDIUM,"central");
   BTagCalibrationReader reader_C(BTagEntry::OP_MEDIUM,"central");
   BTagCalibrationReader reader_Light(BTagEntry::OP_MEDIUM,"central");
@@ -284,20 +335,36 @@ int main(int argc, char * argv[]) {
   }
 
 
-
+ // ScaleFactor * SF_HIP; 
+//    SF_HIP = new ScaleFactor();
+//    SF_HIP->init_ScaleFactor(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker//test/HIP.root");
   // Lepton Scale Factors 
 
   TH1D * MuSF_IdIso_Mu1H = new TH1D("MuIdIsoSF_Mu1H", "MuIdIsoSF_Mu1", 100, 0.5,1.5);
 
   cout<<"  Initializing iD SF files....."<<endl;
     ScaleFactor * SF_muonIdIso = new ScaleFactor();
+    //ScaleFactor * SF_muonIdIsoBCDEF = new ScaleFactor();
+    //ScaleFactor * SF_muonIdIsoGH = new ScaleFactor();
+    //SF_muonIdIsoBCDEF->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(MuonidIsoEffFileBCDEF));
+    //SF_muonIdIsoGH->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(MuonidIsoEffFileGH));
     SF_muonIdIso->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(MuonidIsoEffFile));
+
 
   cout<<"  Initializing Trigger SF files....."<<endl;
   ScaleFactor * SF_muonTrigger = new ScaleFactor();
+  /*ScaleFactor * SF_muonTriggerBCDEF = new ScaleFactor();
+  ScaleFactor * SF_muonTriggerGH = new ScaleFactor();
+  SF_muonTriggerBCDEF->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(MuontrigEffFileBCDEF));
+  SF_muonTriggerGH->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(MuontrigEffFileGH));
+  */
   SF_muonTrigger->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(MuontrigEffFile));
 
+  //////////////////////////////////////
+  //////// Initialized TauFakeRates here
+  //////////////////////////////////////
 
+  cout<<" ended initialization here "<<endl;
   char ff[100];
   sprintf(ff,"%s/%s",argv[3],argv[2]);
 
@@ -313,11 +380,15 @@ int main(int argc, char * argv[]) {
   std::string ntupleName("makeroottree/AC1B");
   std::string initNtupleName("initroottree/AC1B");
 
-  TString era=argv[3];
+  string era=argv[3];
+  
+
+  if (string::npos == Systematic.find("Nominal")) {era.append("_");era.append(argv[5]);}
+  //if (string::npos == Systematic.find("Nominal")) era=argv[3];
 
   TString TStrName(rootFileName+"_"+Region+"_"+Sign);
   datasetName = rootFileName.c_str();
-  std::cout <<" The filename will be "<<TStrName <<"  "<<datasetName<<std::endl;  
+  std::cout <<" The filename will be "<<TStrName <<"  "<<datasetName<<"  The systematic will be "<<Systematic<<"  and save dir will be  "<<era<<endl;
   // output fileName with histograms
 
 std::string st1,st2;
@@ -325,7 +396,9 @@ bool SUSY = false;
 float SusyMotherMassF;
 float SusyLSPMassF;
 
+//SMS-TChiSlepSnu_x0p5_TuneCUETP8M1_13TeV-madgraphMLM-pythia8   SMS-TChiStauStau_x0p5_TuneCUETP8M1_13TeV-madgraphMLM-pythia8  SMS-TStauStau_TuneCUETP8M1_13TeV-madgraphMLM-pythia8
 
+/*
 if (string::npos != rootFileName.find("SMS-") || string::npos != rootFileName.find("stau") || string::npos != rootFileName.find("C1"))
 	{
 	//st1 =  rootFileName.substr(4,3);
@@ -337,7 +410,6 @@ if (string::npos != rootFileName.find("SMS-") || string::npos != rootFileName.fi
 	SUSY = true;
 	  std::cout <<" SUSY "<< " SusyMotherMassF= "<<SusyMotherMassF <<" SusyLSPMassF= "<<SusyLSPMassF <<std::endl;  
 	}
-/*
 if (string::npos != rootFileName.find("SMS-TChiStauStau"))
 	{
 	st1 =  rootFileName.substr(5,3);
@@ -376,6 +448,8 @@ if (string::npos != rootFileName.find("SMS-TChiStauStau"))
   
   SetupTree(); 
   SetupHists(CutNumb); 
+
+
   if (argv[4] != NULL  && atoi(argv[4])< nTotalFiles) nTotalFiles=atoi(argv[4]);
  
 for (int iF=0; iF<nTotalFiles; ++iF) {
@@ -474,6 +548,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
     for (Long64_t iEntry=0; iEntry<numberOfEntries; ++iEntry) { 
 
+
       Float_t weight = 1.;
       Float_t puweight = 1.;
       Float_t topptweight = 1.;
@@ -500,6 +575,82 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       
       bool lumi=false;
       bool CutBasedTauId = false;
+
+///////////////////////////////////////////////////////////////////////////// systematic study
+	if (ApplyTauEnergyScaleUnc && !isData)
+		{
+			double ApplyTauCorrectionUncSign=1;
+			if (!ApplyTauCorrectionUncSignPositive) ApplyTauCorrectionUncSign = -1;
+
+		for (unsigned int it = 0; it<analysisTree.tau_count; ++it) 
+			{
+
+			analysisTree.tau_pt[it] *= (1 +ApplyTauCorrectionUncSign*TauEnergyScaleUnc);
+			analysisTree.tau_px[it] *= (1 +ApplyTauCorrectionUncSign*TauEnergyScaleUnc);
+			analysisTree.tau_py[it] *= (1 +ApplyTauCorrectionUncSign*TauEnergyScaleUnc);
+			analysisTree.tau_pz[it] *= (1 +ApplyTauCorrectionUncSign*TauEnergyScaleUnc);
+			analysisTree.tau_e[it] *= (1 +ApplyTauCorrectionUncSign*TauEnergyScaleUnc);
+
+			//analysisTree.pfmet_ex = analysisTree.pfmet_ex+((analysisTree.tau_px[it]/TauEnergyScaleUnc)-analysisTree.tau_px[it]);
+			//analysisTree.pfmet_ey = analysisTree.pfmet_ey+((analysisTree.tau_py[it]/TauEnergyScaleUnc)-analysisTree.tau_py[it]);
+			}
+		
+		} 
+
+	if (ApplyJetEnergyCorrectionUnc && !isData)
+		{
+		double ApplyJetEnergyCorrectionUncSign=1;
+		for (unsigned int it = 0; it<analysisTree.pfjet_count; ++it) 
+			{
+			if (!ApplyJetEnergyCorrectionUncSignPositive) ApplyJetEnergyCorrectionUncSign = -1;
+			analysisTree.pfjet_pt[it] *=(1 + ApplyJetEnergyCorrectionUncSign*analysisTree.pfjet_jecUncertainty[it]);
+			analysisTree.pfjet_px[it] *=(1 + ApplyJetEnergyCorrectionUncSign*analysisTree.pfjet_jecUncertainty[it]);
+			analysisTree.pfjet_py[it] *=(1 + ApplyJetEnergyCorrectionUncSign*analysisTree.pfjet_jecUncertainty[it]);
+			analysisTree.pfjet_pz[it] *=(1 + ApplyJetEnergyCorrectionUncSign*analysisTree.pfjet_jecUncertainty[it]);
+			analysisTree.pfjet_e[it] *=(1 + ApplyJetEnergyCorrectionUncSign*analysisTree.pfjet_jecUncertainty[it]);
+			}
+		
+		} 
+
+	if (ApplyElEnergyScaleUnc && !isData)
+		{
+		double ElEnergyScaleUnc=1;
+			double ApplyElectronCorrectionUncSign=1;
+			if (!ApplyElectronCorrectionUncSignPositive) ApplyElectronCorrectionUncSign = -1;
+
+		for (unsigned int it = 0; it<analysisTree.electron_count; ++it) 
+			{
+
+			if (analysisTree.electron_eta[it] < 1.48)  ElEnergyScaleUnc = ElEnergyScaleUncBarrel;
+			if (analysisTree.electron_eta[it] > 1.48)  ElEnergyScaleUnc = ElEnergyScaleUncEndcaps;
+
+			analysisTree.electron_pt[it] *=(1 + ApplyElectronCorrectionUncSign*ElEnergyScaleUnc);
+			analysisTree.electron_px[it] *=(1 + ApplyElectronCorrectionUncSign*ElEnergyScaleUnc);
+			analysisTree.electron_py[it] *=(1 + ApplyElectronCorrectionUncSign*ElEnergyScaleUnc);
+			analysisTree.electron_pz[it] *=(1 + ApplyElectronCorrectionUncSign*ElEnergyScaleUnc);
+
+			}
+		
+		} 
+
+	if (ApplyMuEnergyScaleUnc && !isData)
+		{
+			double ApplyMuonCorrectionUncSign=1;
+			if (!ApplyMuonCorrectionUncSignPositive) ApplyMuonCorrectionUncSign = -1;
+
+		for (unsigned int it = 0; it<analysisTree.muon_count; ++it) 
+			{
+
+			analysisTree.muon_pt[it] *= (1 + ApplyMuonCorrectionUncSign*MuEnergyScaleUnc);
+			analysisTree.muon_px[it] *= (1 + ApplyMuonCorrectionUncSign*MuEnergyScaleUnc);
+			analysisTree.muon_py[it] *= (1 + ApplyMuonCorrectionUncSign*MuEnergyScaleUnc);
+			analysisTree.muon_pz[it] *= (1 + ApplyMuonCorrectionUncSign*MuEnergyScaleUnc);
+			}
+		
+		} 
+
+///////////////////////////////////////////////////////////////////////////// systematic study end
+
 
       float topPt = 0;
       float antitopPt = 0;
@@ -805,6 +956,8 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	if (!lumi) continue;
 	//if (lumi ) cout<<"  =============  Found good run"<<"  "<<n<<"  "<<lum<<endl;
       }
+
+
       if (analysisTree.event_run<RunMin)
 	RunMin = analysisTree.event_run;
 
@@ -826,7 +979,9 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       if (isNewRun) 
 	allRuns.push_back(analysisTree.event_run);
 
+
       if (!lumi) continue;
+
 
 	bool Run2016A, Run2016B, Run2016C, Run2016D, Run2016E, Run2016F, Run2016G,Run2016H;
 	bool RunBCDEF = false;
@@ -1012,6 +1167,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
 	if (!isLegMatch) continue;
 
+
 	for (unsigned int it=0; it<taus.size(); ++it) {
 
 	  unsigned int tIndex = taus.at(it);
@@ -1114,8 +1270,11 @@ if (!CutBasedTauId){
 
 	if (!TauId) continue;
 
+        //    std::cout << "mIndex = " << mu_index << "   tau_index = " << tau_index << std::endl;
+
       if ((int)tau_index<0) continue;
       if ((int)mu_index<0) continue;
+
 	
 	bool tauPass =false;
 
@@ -1312,15 +1471,19 @@ if (!CutBasedTauId){
 
 	//leptonSFweight = SF_yourScaleFactor->get_ScaleFactor(pt, eta)	
 	double IdIsoSF_mu = 1;
+	double IdIsoSF_mu1 = 1;
+	double IdIsoSF_mu2 = 1;
 		
+	//if (iEntry%2==0) IdIsoSF_mu1=  SF_muonIdIsoBCDEF->get_ScaleFactor(ptMu1, etaMu1);
+	//if (iEntry%2!=0) IdIsoSF_mu1 = SF_muonIdIsoGH->get_ScaleFactor(ptMu1, etaMu1);
 	 IdIsoSF_mu =  SF_muonIdIso->get_ScaleFactor(ptMu1, etaMu1);
 	 //IdIsoSF_mu1 =  SF_muonIdIsoBCDEF->get_ScaleFactor(ptMu1, etaMu1);
 	 //IdIsoSF_mu2 = SF_muonIdIsoGH->get_ScaleFactor(ptMu1, etaMu1);
 
 	//LSF_weight = IdIsoSF_mu1 * LumiA/Lumi + IdIsoSF_mu2 * LumiB/Lumi;
+	LSF_weight = IdIsoSF_mu;
 
 	MuSF_IdIso_Mu1H->Fill(IdIsoSF_mu);
-	LSF_weight = IdIsoSF_mu;
 	weight *= LSF_weight;
       }
 
@@ -1477,7 +1640,14 @@ if (!CutBasedTauId){
       }
 
 
+
+      ////////jets cleaning 
       TLorentzVector leptonsV, muonJ, jetsLV;
+
+
+      //JetsV.SetPxPyPzE(analysisTree.pfjet_px[ij], analysisTree.pfjet_py[ij], analysisTree.pfjet_pz[ij], analysisTree.pfjet_e[ij]);
+
+
 
 
       float jetEta = 2.4;
@@ -1510,7 +1680,6 @@ if (!CutBasedTauId){
 
 
 	bool isPFJetId = false ; 
-      	bool btagged= false;
 	isPFJetId =looseJetiD(analysisTree,jet);
 	//isPFJetId =tightLepVetoJetiD(analysisTree,jet);
 
@@ -1524,15 +1693,15 @@ if (!CutBasedTauId){
 
 	double Drr=deltaR(analysisTree.tau_eta[tau_index],analysisTree.tau_phi[tau_index],
 						  analysisTree.pfjet_eta[jet],analysisTree.pfjet_phi[jet]);
+
 	if ( Drr < DRmax) cleanedJet=false;
 
 	if (!cleanedJet) continue;
 
 	if (absJetEta<bJetEtaCut) { // jet within b-tagging acceptance
 
-	if (analysisTree.pfjet_btag[jet][0]  > bTag) btagged = true;
+      	bool btagged  (analysisTree.pfjet_btag[jet][0]  > bTag) ;
 	
-/*
 	  if (!isData) {
 	    int flavor = abs(analysisTree.pfjet_flavour[jet]);
 
@@ -1579,7 +1748,7 @@ if (!CutBasedTauId){
 	      }
 	    }
 	  } //is Data
-*/
+
 	  if (btagged && cleanedJet) bjets.push_back(jet);
 	}
 
@@ -1638,6 +1807,45 @@ if (!CutBasedTauId){
 
 	  recoilMetCorrector.CorrectByMeanResolution(met_x,met_y,bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,pfmet_corr_x,pfmet_corr_y);
  
+	float met_corr_x=1.;
+	float met_corr_y=1.;		
+	met_x= analysisTree.pfmet_ex_JetEnUp;
+	met_y= analysisTree.pfmet_ey_JetEnUp;
+	met_corr_x= analysisTree.pfmet_ex_JetEnUp;
+	met_corr_y= analysisTree.pfmet_ey_JetEnUp;
+	
+	recoilMetCorrector.CorrectByMeanResolution(met_x,met_y,bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,met_corr_x,met_corr_y);
+     met_ex_JetEnUp_recoil = met_corr_x;
+     met_ey_JetEnUp_recoil = met_corr_y;
+
+
+	met_x= analysisTree.pfmet_ex_JetEnDown;
+	met_y= analysisTree.pfmet_ey_JetEnDown;
+	met_corr_x= analysisTree.pfmet_ex_JetEnDown;
+	met_corr_y= analysisTree.pfmet_ey_JetEnDown;
+	recoilMetCorrector.CorrectByMeanResolution(met_x,met_y,bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,met_corr_x,met_corr_y);
+     met_ex_JetEnDown_recoil = met_corr_x;
+     met_ey_JetEnDown_recoil = met_corr_y;
+
+
+	met_x=analysisTree.pfmet_ex_UnclusteredEnUp;
+	met_y=analysisTree.pfmet_ey_UnclusteredEnUp;
+	met_corr_x=analysisTree.pfmet_ex_UnclusteredEnUp;
+	met_corr_y=analysisTree.pfmet_ey_UnclusteredEnUp;
+	recoilMetCorrector.CorrectByMeanResolution(met_x,met_y,bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,met_corr_x,met_corr_y);
+     met_ex_UnclusteredEnUp_recoil = met_corr_x;
+     met_ey_UnclusteredEnUp_recoil = met_corr_y;
+
+
+	met_x=analysisTree.pfmet_ex_UnclusteredEnDown;
+	met_y=analysisTree.pfmet_ey_UnclusteredEnDown;
+	met_corr_x=analysisTree.pfmet_ex_UnclusteredEnDown;
+	met_corr_y=analysisTree.pfmet_ey_UnclusteredEnDown;
+   	recoilMetCorrector.CorrectByMeanResolution(met_x,met_y,bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,met_corr_x,met_corr_y);
+     met_ex_UnclusteredEnDown_recoil = met_corr_x;
+     met_ey_UnclusteredEnDown_recoil = met_corr_y;
+
+
         met_x = pfmet_corr_x;
         met_y = pfmet_corr_y;
  
@@ -1693,25 +1901,24 @@ if (!CutBasedTauId){
 				    met_resoDown_y*met_resoDown_y);
       metphi_resoDown = TMath::ATan2(met_resoDown_y,met_resoDown_x);
 
-      }//if isW, isDY !isData
-
       met_ex_recoil = pfmet_corr_x;
       met_ey_recoil = pfmet_corr_y;
-
       //revert back to uncorrected met
-	if(!isData)
-	{      met_x = analysisTree.pfmet_ex;
-	       met_y = analysisTree.pfmet_ey;
-	}
+      if(!isData)
+       {      met_x = analysisTree.pfmet_ex;
+              met_y = analysisTree.pfmet_ey;
+       }
 
-      //cout<<" corrected "<<sqrt(met_ex_recoil*met_ex_recoil+met_ey_recoil*met_ey_recoil)<<" uncorrected "<<sqrt(met_x*met_x+met_y*met_y)<<endl;
-      //cout<<""<<endl;
+
+      }//if isW, isDY !isData
 
       met_ex = met_x;
       met_ey = met_y;
+      met_ez = analysisTree.pfmet_ez;
       met_pt = TMath::Sqrt(met_ex*met_ex + met_ey*met_ey);
-      met_phi = TMath::ATan2(met_ey,met_ex);
+      met_phi = TMath::ATan2(met_y,met_x);
 
+/*
      met_ex_JetEnUp = analysisTree.pfmetcorr_ex_JetEnUp;
      met_ey_JetEnUp = analysisTree.pfmetcorr_ey_JetEnUp;
 
@@ -1723,6 +1930,19 @@ if (!CutBasedTauId){
    
      met_ex_UnclusteredEnDown = analysisTree.pfmetcorr_ex_UnclusteredEnDown;
      met_ey_UnclusteredEnDown = analysisTree.pfmetcorr_ey_UnclusteredEnDown;
+*/
+
+     met_ex_JetEnUp = analysisTree.pfmet_ex_JetEnUp;
+     met_ey_JetEnUp = analysisTree.pfmet_ey_JetEnUp;
+
+     met_ex_JetEnDown = analysisTree.pfmet_ex_JetEnDown;
+     met_ey_JetEnDown = analysisTree.pfmet_ey_JetEnDown;
+
+     met_ex_UnclusteredEnUp = analysisTree.pfmet_ex_UnclusteredEnUp;
+     met_ey_UnclusteredEnUp = analysisTree.pfmet_ey_UnclusteredEnUp;
+   
+     met_ex_UnclusteredEnDown = analysisTree.pfmet_ex_UnclusteredEnDown;
+     met_ey_UnclusteredEnDown = analysisTree.pfmet_ey_UnclusteredEnDown;
 
 
       float genmet_ex = analysisTree.genmet_ex;
