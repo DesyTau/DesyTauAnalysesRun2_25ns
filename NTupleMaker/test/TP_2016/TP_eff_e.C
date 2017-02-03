@@ -16,7 +16,8 @@
 void TP_eff_e(TString fileName = "SingleElectron_Run2016B_TP", // RooT file with tag-&-probe histograms 
 
  	   TString what = "IdIso", //what do you want to evaluated
- 	   float iso = 0.1, //isolation cut to be used
+ 	   float iso_max = 0.1, //isolation cut to be used
+	   float iso_min = 0.0,
 	   float norm = 1 // luminosity normalization factor (1 for data) 
 	   ) 
 {
@@ -25,8 +26,8 @@ void TP_eff_e(TString fileName = "SingleElectron_Run2016B_TP", // RooT file with
 	TH1::SetDefaultSumw2(kTRUE);
 
   // output inizialization 
-  TString lepton = "Electron";
-	TString OutFileName = fileName + "_" + lepton + "_" + what + "_IsoLt" + Form("%.2f", iso) + "_eff_Spring16";
+    TString lepton = "Electron";
+	TString OutFileName = fileName + "_" + lepton + "_" + what + "_IsoGt" + Form("%.2f", iso_min)  + "_IsoLt" + Form("%.2f", iso_max) + "_eff_full2016";
 	TFile * outputFile = new TFile(OutFileName+".root","recreate");
 
 	// Title of axis in plots  
@@ -56,32 +57,32 @@ void TP_eff_e(TString fileName = "SingleElectron_Run2016B_TP", // RooT file with
 
   TString EtaBins[3] = {"EtaLt1p48","Eta1p48to2p1",
 				"EtaGt2p1"};
-
-//for triggers up to 2.1
-/*
-  int nEtaBins = 2;
-  float etaBins[3] = {0,1.48,2.1};
-
-  TString EtaBins[3] = {"EtaLt1p48","Eta1p48to2p1"};
-*/
-//-------------------//
-
-  float ptBins_def[8] = {10,15,20,25,30,40,60,1000};
-
-	TString PtBins_def[7] = {"Pt10to15",
+  float ptBins_def[11] = {10,15,20,25,30,40,50,60,70,100,1000};
+  TString PtBins_def[10] = {"Pt10to15",
        "Pt15to20",
        "Pt20to25",
        "Pt25to30",
        "Pt30to40",
-       "Pt40to60",
-       "PtGt60"};
+       "Pt40to50",
+       "Pt50to60",
+       "Pt60to70",
+       "Pt70to100",
+       "PtGt100"};
 
-  float ptBinsTrig_def[22] = {10,
+  float ptBinsTrig_def[26] = {10,
 			  13,
 			  16,
+              17, 
+              18,
 			  19,
-			  22, 23, 24,
-			  25, 26, 27,
+              20,
+              21,
+			  22, 
+			  23,
+			  24,
+			  25,
+			  26,
+			  27,
 			  28,
 			  31,
 			  34,
@@ -92,15 +93,15 @@ void TP_eff_e(TString fileName = "SingleElectron_Run2016B_TP", // RooT file with
 			  60,
 			  70,
 			  100,
-			200,
-			10000};
+			  200,
+			  1000};
 
-	TString PtBinsTrig_def[21] = {"Pt10to13",
-		    "Pt13to16",
-		    "Pt16to19",
-		    "Pt19to22",
-		    "Pt22to23",		    "Pt23to24",		    "Pt24to25",
-		    "Pt25to26",		    "Pt26to27",		    "Pt27to28",
+	TString PtBinsTrig_def[25] = {"Pt10to13",
+		    "Pt13to16","Pt16to17","Pt17to18",
+		    "Pt18to19","Pt19to20","Pt20to21",
+		    "Pt21to22","Pt22to23","Pt23to24",
+		    "Pt24to25","Pt25to26","Pt26to27",
+		    "Pt27to28",
 		    "Pt28to31",
 		    "Pt31to34",
 		    "Pt34to37",
@@ -113,7 +114,54 @@ void TP_eff_e(TString fileName = "SingleElectron_Run2016B_TP", // RooT file with
 			"Pt100to200",
 			"PtGt200"};
 
-	int nPtBins = 21; if(what == "IdIso") nPtBins = 7;
+	int nPtBins = 25; if(what == "IdIso") nPtBins = 10;
+
+/*  int nEtaBins = 5;
+  float etaBins[6] = {0, 1.0, 1.4442, 1.56, 2.1, 2.5};
+
+  TString EtaBins[5] = {"EtaLt1p0","Eta1p0to1p44", "Eta1p44to1p56", "Eta1p56to2p1","EtaGt2p1"};
+
+  float ptBins_def[9] = {10,20,25,30,40,50,100,200,1000};
+//pt binning for the triggers: 10., 20., 22., 24., 26., 28., 30., 40., 50., 100., 200., 1000.
+
+
+  TString PtBins_def[8] = {"Pt10to20",
+       "Pt20to25",
+       "Pt25to30",
+       "Pt30to40",
+       "Pt40to50",
+       "Pt50to100",
+       "Pt100to200",
+       "PtGt200"};
+
+  float ptBinsTrig_def[13] = {10,
+              20,
+			  22, 
+			  24,
+			  26,
+			  27,
+			  28,
+			  30,
+			  40,
+			  50,
+			  100,
+			  200,
+			  1000};
+
+	TString PtBinsTrig_def[12] = {"Pt10to20",
+			"Pt20to22","Pt22to24",
+		    "Pt24to26","Pt26to27",
+		    "Pt27to28",
+		    "Pt28to30",
+		    "Pt30to40",
+		    "Pt40to50",
+		    "Pt50to100",
+			"Pt100to200",
+			"PtGt200"};
+
+	int nPtBins = 12; if(what == "IdIso") nPtBins = 8;*/
+
+
 	float * ptBins = new float[nPtBins+1];
 	TString * PtBins = new TString[nPtBins];
 
@@ -174,7 +222,7 @@ void TP_eff_e(TString fileName = "SingleElectron_Run2016B_TP", // RooT file with
   TString histBaseName; 
 
 
-  TCut cut_flag_idiso_pass = Form("id_probe == 1 && iso_probe < %f", iso);
+  TCut cut_flag_idiso_pass = Form("id_probe == 1 && iso_probe < %f && iso_probe >=%f", iso_max, iso_min );
   
   TCut cut_flag_hlt_pass, cut_flag_hlt_fail, cut_pt, cut_eta;
 
@@ -183,10 +231,10 @@ void TP_eff_e(TString fileName = "SingleElectron_Run2016B_TP", // RooT file with
   if(what == "hlt_2") {cut_flag_hlt_pass = "fabs(eta_tag)<2 && hlt_2_probe == 1"; cut_flag_hlt_fail = "fabs(eta_tag)<2 && hlt_2_probe == 0"; }
   if(what == "hlt_3") {cut_flag_hlt_pass = "fabs(eta_tag)<2 && hlt_3_probe == 1"; cut_flag_hlt_fail = "fabs(eta_tag)<2 && hlt_3_probe == 0"; }
   if(what == "hlt_4") {cut_flag_hlt_pass = "fabs(eta_tag)<2 && hlt_4_probe == 1"; cut_flag_hlt_fail = "fabs(eta_tag)<2 && hlt_4_probe == 0"; }
-  if(what == "hlt_5") {cut_flag_hlt_pass = "hlt_5_probe == 1"; cut_flag_hlt_fail = "hlt_5_probe == 0"; }
-  if(what == "hlt_6") {cut_flag_hlt_pass = "hlt_6_probe == 1"; cut_flag_hlt_fail = "hlt_6_probe == 0"; }
-  if(what == "hlt_7") {cut_flag_hlt_pass = "hlt_7_probe == 1"; cut_flag_hlt_fail = "hlt_7_probe == 0"; }
-  if(what == "hlt_8") {cut_flag_hlt_pass = "hlt_8_probe == 1"; cut_flag_hlt_fail = "hlt_8_probe == 0"; }
+  if(what == "hlt_5") {cut_flag_hlt_pass = "fabs(eta_tag)<2 && hlt_5_probe == 1"; cut_flag_hlt_fail = "fabs(eta_tag)<2 && hlt_5_probe == 0"; }
+  if(what == "hlt_6") {cut_flag_hlt_pass = "fabs(eta_tag)<2 && hlt_6_probe == 1"; cut_flag_hlt_fail = "fabs(eta_tag)<2 && hlt_6_probe == 0"; }
+  if(what == "hlt_7") {cut_flag_hlt_pass = "fabs(eta_tag)<2 && hlt_7_probe == 1"; cut_flag_hlt_fail = "fabs(eta_tag)<2 && hlt_7_probe == 0"; }
+  if(what == "hlt_8") {cut_flag_hlt_pass = "fabs(eta_tag)<2 && hlt_8_probe == 1"; cut_flag_hlt_fail = "fabs(eta_tag)<2 && hlt_8_probe == 0"; }
   if(what == "hlt_9") {cut_flag_hlt_pass = "hlt_9_probe == 1"; cut_flag_hlt_fail = "hlt_9_probe == 0"; }
   if(what == "hlt_10") {cut_flag_hlt_pass = "hlt_10_probe == 1"; cut_flag_hlt_fail = "hlt_10_probe == 0"; }
   if(what == "hlt_11") {cut_flag_hlt_pass = "hlt_11_probe == 1"; cut_flag_hlt_fail = "hlt_11_probe == 0"; }
@@ -204,7 +252,8 @@ void TP_eff_e(TString fileName = "SingleElectron_Run2016B_TP", // RooT file with
 
 	TString dir_name = "Electron_";
 	dir_name += what;
-	dir_name += Form("%.2f", iso);
+	//dir_name += Form("%.2f", iso); // "_IsoGt" + Form("%.2f", iso_min)  + "_IsoLt" + Form("%.2f", iso_max) 
+    dir_name += Form("_Iso%.2fto%.2f", iso_min, iso_max);
 	if (!isData) dir_name += "_MC";
 	dir_name += "_eff";
 	gSystem->mkdir(dir_name, kTRUE);
@@ -221,7 +270,7 @@ void TP_eff_e(TString fileName = "SingleElectron_Run2016B_TP", // RooT file with
 	
 	  for (int iPt=0; iPt<nPtBins; ++iPt) {
 
-	  	cut_pt = Form("pt_probe > %f && pt_probe < %f", ptBins[iPt], ptBins[iPt+1]);
+	  	cut_pt = Form("pt_probe >= %f && pt_probe < %f", ptBins[iPt], ptBins[iPt+1]);
 
 	  	TH1F * histPassOld = new TH1F("histPassOld","",250,50,300);
 	  	TH1F * histFailOld = new TH1F("histFailOld","",250,50,300);

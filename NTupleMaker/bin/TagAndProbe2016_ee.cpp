@@ -378,7 +378,7 @@ int main(int argc, char * argv[]){
 
       for (it = 0; it<analysisTree.electron_count; it++){
 
-        bool electronMvaId = analysisTree.electron_mva_wp80_nontrig_Spring15_v1[it];
+ 		bool electronMvaId = analysisTree.electron_mva_wp80_general_Spring16_v1[it];
 
         if (analysisTree.electron_pt[it]<=ptElectronCut) continue;
         if (fabs(analysisTree.electron_eta[it])>=etaElectronCut) continue;
@@ -470,7 +470,7 @@ int main(int argc, char * argv[]){
 
           bool id_probe= false;
 
-          if ((analysisTree.electron_nmissinginnerhits[ip]<=1) && analysisTree.electron_pass_conversion[ip] && analysisTree.electron_mva_wp80_nontrig_Spring15_v1[ip]) {
+          if ((analysisTree.electron_nmissinginnerhits[ip]<=1) && analysisTree.electron_pass_conversion[ip] && analysisTree.electron_mva_wp80_general_Spring16_v1[ip]) {
             if (analysisTree.electron_dxy[ip]<dxyPassingCut){
               if (analysisTree.electron_dz[ip]<dzPassingCut){
                 id_probe = true;
