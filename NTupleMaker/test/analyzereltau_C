@@ -59,9 +59,9 @@ void analyzer::Loop(){
 	CutList.push_back("Tau-id");
 	CutList.push_back("TauFakeRate");
 	CutList.push_back("ElTauFakeRate");
-	CutList.push_back("topPtRwgt");
 	CutList.push_back("MET recoil");
 	CutList.push_back("ZpT correction");
+	CutList.push_back("topPtRwgt");
 	CutList.push_back("Jets gt 1 ");
 	CutList.push_back("0 btag");
 	CutList.push_back("MT window");
@@ -165,19 +165,21 @@ TH2D *histo = (TH2D*) obj;
 */
 
 
-	TFile * filein = new TFile("/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/CMSSW_8_0_20/src/DesyTauAnalyses/NTupleMaker/test/CHANNELHERE/FILEIN","read");
+	TString fileinName = "/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/CMSSW_8_0_20/src/DesyTauAnalyses/NTupleMaker/test/CHANNELHERE/FILEIN";
+	if (systematic == "JetEnUp" || systematic == "JetEnDown" || systematic == "TauEnUp" || systematic == "TauEnDown" || systematic == "ElEnUp" || systematic == "ElEnDown" || systematic == "MuEnUp" || systematic == "MuEnDown") 
+	{fileinName ="/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/CMSSW_8_0_20/src/DesyTauAnalyses/NTupleMaker/test/CHANNELHERE_"+systematic+"/FILEIN";}
+
+	TFile * filein = new TFile(fileinName,"read");
 
 	TH1D * histW = (TH1D*)filein->Get("eltau/histWeightsH");
 	TH1D * histTop ;
 	if (isTT) histTop = (TH1D*)filein->Get("eltau/histTopPt");
 	
-//	TH1D * hxsecW = (TH1D*)filein->Get("eltau/xsec");
 	TH1D * CutFlow = (TH1D*)filein->Get("eltau/CutFlowUnW");
 	TFile * file = new TFile("plots.root","recreate");
 
 	//cout<<"  "<<old<<"  "<<datasetName->c_str()<<"  "<<hist_<<"  "<<CutFlow->GetName()<<"  "<<CutFlow->GetBinContent(1)<<endl;
 		
-	//filein->ls();
 	string Channel = "eltau";
 	file->mkdir(Channel.c_str());
 	file->cd(Channel.c_str());
@@ -301,20 +303,23 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
 		if (el_relIso[0] > 0.1 && !InvertLeptonIso) continue;
 		if (el_relIso[0] < 0.1 && InvertLeptonIso) continue;
 
-		if (el_relIso[0] > 0.3) continue;	
-
-		//if ( el_relIso[0]  != el_relIsoEl[electron_index]) cout <<" Problem with eleIso "<<el_relIso[0]<<"  "<<el_relIsoEl[electron_index]<<"  "<<electron_index<<endl;
+		if (el_relIso[0] > 0.2) continue;	
 		
-		
-		if ( fabs(el_dxy[electron_index]) > 0.045) continue;
 		if ( fabs(el_dz[electron_index]) > 0.2) continue;
+		if ( fabs(el_dxy[electron_index]) > 0.045) continue;
 		
+//		cout <<"  "<<el_isMVA[electron_index]<<"  "<<eleMVA<<endl;
 
-                //double Dr=deltaR(el_eta[electron_index],el_phi[electron_index],
-                //                        ta_eta[taus_index],ta_phi[taus_index]);
+		if ( !el_isMVA[electron_index]  && !InvertLeptonIso) continue;
 
 		if ( fabs(el_charge[electron_index]) !=1 ) continue;
 		if ( fabs(ta_charge[taus_index]) !=1 ) continue;
+
+                double Dr=deltaR(ElV.Eta(), ElV.Phi(),
+					TauV.Eta(),TauV.Phi());
+
+		if (Dr>3.5 && !InvertLeptonIso) continue;
+		if (Dr<3.5 && InvertLeptonIso) continue;
 
 		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
 		CFCounter[iCut]+= all_weights;
@@ -395,13 +400,6 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
                 iCFCounter[iCut]++;
 		iCut++;
 
-		all_weights *= top_weight;
-		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
-		CFCounter[iCut]+= all_weights;
-		CFCounter_[iCut]+= all_weights;
-                iCFCounter[iCut]++;
-		iCut++;
-
 
 		if (isWJ || isDY || isWNJ || isDYNJ) {
 		
@@ -412,15 +410,57 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
 		met=sqrt(met_ex_recoil*met_ex_recoil+met_ey_recoil*met_ey_recoil);
 		}
 
+	if (systematic =="JetEnUp")
+		{
+		METV.SetPx(met_ex_JetEnUp_recoil);
+		METV.SetPy(met_ey_JetEnUp_recoil);
+		met = sqrt(met_ex_JetEnUp_recoil*met_ex_JetEnUp_recoil + met_ey_JetEnUp_recoil*met_ey_JetEnUp_recoil);      
+		}
+
+	if (systematic =="JetEnDown")
+		{
+		METV.SetPx(met_ex_JetEnDown_recoil);
+		METV.SetPy(met_ey_JetEnDown_recoil);
+		met = sqrt(met_ex_JetEnDown_recoil*met_ex_JetEnDown_recoil + met_ey_JetEnDown_recoil*met_ey_JetEnDown_recoil);     
+		}
+
+	if (systematic =="UnclEnUp")
+		{
+		METV.SetPx(met_ex_UnclusteredEnUp_recoil);
+		METV.SetPy(met_ey_UnclusteredEnUp_recoil);
+		met = sqrt(met_ex_UnclusteredEnUp_recoil*met_ex_UnclusteredEnUp_recoil + met_ey_UnclusteredEnUp_recoil*met_ey_UnclusteredEnUp_recoil);     
+		}
+
+	if (systematic =="UnclEnDown")
+		{
+		METV.SetPx(met_ex_UnclusteredEnDown_recoil);
+		METV.SetPy(met_ey_UnclusteredEnDown_recoil);
+		met = sqrt(met_ex_UnclusteredEnDown_recoil*met_ex_UnclusteredEnDown_recoil + met_ey_UnclusteredEnDown_recoil*met_ey_UnclusteredEnDown_recoil);
+		}
+
+
+
 		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
 		CFCounter[iCut]+= all_weights;
 		CFCounter_[iCut]+= all_weights;
                 iCFCounter[iCut]++;
 		iCut++;
 
-		if (isDY || isDYNJ) all_weights *=zptmassweight;
+	if (isDY || isDYNJ){
+		if (systematic !="ZPtUp" && systematic !="ZPtDown" ) all_weights *= zptmassweight;
+		if (systematic =="ZPtUp") all_weights *= zptmassweight*zptmassweight;
+		}
 		
 
+		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
+		CFCounter[iCut]+= all_weights;
+		CFCounter_[iCut]+= all_weights;
+                iCFCounter[iCut]++;
+		iCut++;
+
+		if (systematic !="TopPtUp" && systematic !="TopPtDown" ) all_weights *= top_weight;
+		if (systematic =="TopPtUp") all_weights *= top_weight*top_weight;
+		if (systematic =="TopPtDown") all_weights *= 1;
 		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
 		CFCounter[iCut]+= all_weights;
 		CFCounter_[iCut]+= all_weights;
@@ -462,8 +502,6 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
 
                 
 		TLorentzVector DiLL = ElV +TauV ;
-                double Dr=deltaR(ElV.Eta(), ElV.Phi(),
-					TauV.Eta(),TauV.Phi());
 
 		double dEta = ElV.Eta() - TauV.Eta();
 		double dEtaJEl = -1.; if (JetsMV.size()>0) dEtaJEl = JetsMV.at(0).Eta() - ElV.Eta();
@@ -472,8 +510,7 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
 		double dPhiDiL=dPhiFrom2P( ElV.Px(), ElV.Py(), TauV.Px(),  TauV.Py() );
 
 
-		if (Dr>3.5) continue;
-		if (fabs(dEta)>2) continue;
+		if (fabs(dEta)>2 &&  !InvertLeptonIso) continue;
 		if (DiLL.M()<20.) continue;
 		if (MTsum<30.) continue;
 
@@ -498,11 +535,13 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
 		if ( fabs(el_dxy[electron_index]) > 0.02) continue;
 		if (ta_relIso[0] < 0.85) continue;
 
-		if (fabs(dEta)>1.5) continue;
+		if (fabs(dEta)>1.5 && !InvertLeptonIso) continue;
+		if (fabs(dEta)<2 && InvertLeptonIso) continue;
 		if (dPhiDiL<1.5) continue;
 		if (dPhiDiL>3.2) continue;
 		if (Dr<2.) continue;
-		if (Dr>3.2) continue;
+		if (Dr>3.2 && !InvertLeptonIso) continue;
+		if (Dr<3.5 && InvertLeptonIso) continue;
 
 		if (DiLL.M()<50.) continue;
 		if (MTsum<50.) continue;
@@ -549,7 +588,7 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
 
 
 
-	float Lumi = 12890.;
+	float Lumi = 36589.;
 
 	if (isData) Lumi = 1.;
 

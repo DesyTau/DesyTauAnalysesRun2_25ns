@@ -1051,7 +1051,8 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	if (fabs(analysisTree.electron_eta[ie])>etaElectronCut) continue;
 	if (fabs(analysisTree.electron_dxy[ie])>dxyElectronCut) continue;
 	if (fabs(analysisTree.electron_dz[ie])>dzElectronCut) continue;
-	if (applyElectronId && !analysisTree.electron_mva_wp80_nontrig_Spring15_v1[ie]) eleMVA=true;
+	if (applyElectronId && !analysisTree.electron_mva_wp80_nontrig_Spring15_v1[ie]) eleMVA=false;
+	if (applyElectronId && !analysisTree.electron_mva_wp80_nontrig_Spring15_v1[ie]) continue;
 	if (applyElectronId && !analysisTree.electron_pass_conversion[ie]) continue;
 	if (applyElectronId && analysisTree.electron_nmissinginnerhits[ie]>1) continue;
 	if (fabs(analysisTree.electron_charge[ie]) !=1) continue;
@@ -1528,7 +1529,10 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
         el_neutralIso[ie] = neutralIso ;
         el_absIsoEl[ie] = el_chargedHadIso[ie] + el_neutralIso[ie];
 	el_relIsoEl[ie]  = el_absIsoEl[ie]/el_pt[ie] ;
-	el_isMVA[ie]  = analysisTree.electron_mva_wp80_nontrig_Spring15_v1[ie] ;
+	el_isnotrig_MVA80[ie]  = analysisTree.electron_mva_wp80_nontrig_Spring15_v1[ie] ;
+	el_isnotrig_MVA90[ie]  = analysisTree.electron_mva_wp90_nontrig_Spring15_v1[ie] ;
+	el_istrig_MVA80[ie]  = analysisTree.electron_mva_wp80_trig_Spring15_v1[ie] ;
+	el_istrig_MVA90[ie]  = analysisTree.electron_mva_wp90_trig_Spring15_v1[ie] ;
 
       }
 

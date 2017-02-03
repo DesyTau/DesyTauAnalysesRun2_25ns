@@ -6,11 +6,11 @@ rm datasets${dir}
 #sources="/nfs/dust/cms/user/rasp/storage/76x_JECv2_MVAMET0p6/"
 
 #sources="/nfs/dust/cms/group/higgs-kit/80x_v1 /nfs/dust/cms/group/higgs-kit/80x_v2 /nfs/dust/cms/group/higgs-kit/80x_SUSY_v1 80x_wMETFilters_v1"
-sources="/nfs/dust/cms/group/higgs-kit/80x_wMETFilters_v1"
+sources="/nfs/dust/cms/group/higgs-kit/80x_wMETFilters_v1 /nfs/dust/cms/user/alkaloge/80x_wMETFilters_v1/"
 
-source2="/nfs/dust/cms/group/higgs-kit/8020_23SeptReReco"
-source3="/nfs/dust/cms/group/higgs-kit/8020_23SeptReReco_v2"
-source3="/nfs/dust/cms/group/susy-desy/Run2/Stau/Data/25ns/8020_23SeptReReco"
+source2="/nfs/dust/cms/group/higgs-kit/8020_23SeptReReco_v3"
+source3="/nfs/dust/cms/group/higgs-kit/8020_23SeptReReco_v3"
+#source3="/nfs/dust/cms/group/susy-desy/Run2/Stau/Data/25ns/8020_23SeptReReco"
 
 
 alias ls='ls'

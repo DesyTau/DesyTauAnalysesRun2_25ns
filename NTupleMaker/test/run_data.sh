@@ -43,6 +43,21 @@ cp *.conf Jobs/.
 while read line
 do
 
+
+	ct=`ls ${dir}/${line}*.root | wc -l`
+	ctt=`cat ${dir}/${line} | wc -l`
+
+
+	echo There are  $ct out of $ctt for $line in $dir dir 
+
+	if [[ $ct -ge $ctt ]] ;then
+		     
+	     	continue;
+
+		
+	fi
+
+
 unset xsec
 #xsec=`grep " $line " xsecs | cut -d " " -f2-3`	
 #	cp $dir/$line input$line
@@ -58,7 +73,7 @@ bas=`basename $f | awk -F ".root" '{print $1}'`
 
 
 #echo $bas $xsec >> xsecs
-echo $bas $xsec 
+#echo $bas $xsec 
 
 if [ ! -f $dir/${bas}_B_OS_DataDriven.root ]
 then

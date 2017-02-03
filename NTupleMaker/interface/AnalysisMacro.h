@@ -117,6 +117,11 @@ int el_index=-1;
    Float_t         el_dzerr[20];   //[el_count]
    Float_t         el_charge[20];   //[el_count]
    Float_t         el_relIso[20];   //[el_count]
+   Float_t         el_isMVA[20];   //[el_count]
+   Float_t         el_isnotrig_MVA80[20];   //[el_count]
+   Float_t         el_isnotrig_MVA90[20];   //[el_count]
+   Float_t         el_istrig_MVA80[20];   //[el_count]
+   Float_t         el_istrig_MVA90[20];   //[el_count]
 
 
    Int_t           ta_count;
@@ -186,6 +191,7 @@ int el_index=-1;
    Float_t 	   xsecs;
    Float_t 	   event_sign;
    Float_t 	   event_secondLeptonVeto;
+   Float_t 	   eleMVA;
    Float_t 	   met_flag;
    Float_t 	   event_thirdLeptonVeto;
    Float_t 	   event_leptonDrTrigger;
@@ -201,6 +207,18 @@ int el_index=-1;
    Float_t	   qcdweightup;
    Float_t	   qcdweightdown;
    Int_t 	   npartons;
+
+
+   Float_t         met_ex_JetEnUp_recoil;
+   Float_t         met_ey_JetEnUp_recoil;
+   Float_t         met_ex_JetEnDown_recoil;
+   Float_t         met_ey_JetEnDown_recoil;
+   Float_t         met_ex_UnclusteredEnUp_recoil;
+   Float_t         met_ey_UnclusteredEnUp_recoil;
+   Float_t         met_ex_UnclusteredEnDown_recoil;
+   Float_t         met_ey_UnclusteredEnDown_recoil;
+
+
 
 
 
@@ -626,6 +644,20 @@ T  = new TTree("T","T");
 
   T->Branch("met_ex_UnclusteredEnUp", &met_ex_UnclusteredEnUp, "met_ex_UnclusteredEnUp/F");
   T->Branch("met_ey_UnclusteredEnUp", &met_ey_UnclusteredEnUp, "met_ey_UnclusteredEnUp/F");
+
+  T->Branch("met_ex_JetEnUp_recoil", &met_ex_JetEnUp_recoil, "met_ex_JetEnUp/F_recoil");
+  T->Branch("met_ey_JetEnUp_recoil", &met_ey_JetEnUp_recoil, "met_ey_JetEnUp/F_recoil");
+
+  T->Branch("met_ex_JetEnDown_recoil", &met_ex_JetEnDown_recoil, "met_ex_JetEnDown/F_recoil");
+  T->Branch("met_ey_JetEnDown_recoil", &met_ey_JetEnDown_recoil, "met_ey_JetEnDown/F_recoil");
+
+  T->Branch("met_ex_UnclusteredEnDown_recoil", &met_ex_UnclusteredEnDown_recoil, "met_ex_UnclusteredEnDown/F_recoil");
+  T->Branch("met_ey_UnclusteredEnDown_recoil", &met_ey_UnclusteredEnDown_recoil, "met_ey_UnclusteredEnDown/F_recoil");
+
+  T->Branch("met_ex_UnclusteredEnUp_recoil", &met_ex_UnclusteredEnUp_recoil, "met_ex_UnclusteredEnUp/F_recoil");
+  T->Branch("met_ey_UnclusteredEnUp_recoil", &met_ey_UnclusteredEnUp_recoil, "met_ey_UnclusteredEnUp/F_recoil");
+
+
   T->Branch("met_pt", &met_pt, "met_pt/F");
   T->Branch("met_phi", &met_phi, "met_phi/F");
  
@@ -650,6 +682,7 @@ T  = new TTree("T","T");
   T->Branch("event_secondLeptonVeto", &event_secondLeptonVeto, "event_secondLeptonVeto/F");
   T->Branch("event_thirdLeptonVeto", &event_thirdLeptonVeto, "event_thirdLeptonVeto/F");
   T->Branch("event_leptonDrTrigger", &event_leptonDrTrigger, "event_leptonDrTrigger/F");
+  T->Branch("eleMVA", &eleMVA, "eleMVA/F");
 
   T->Branch("muon_index", &muon_index, "muon_index/I");
   T->Branch("muon_index_1", &muon_index_1, "muon_index_1/I");
@@ -728,6 +761,11 @@ T  = new TTree("T","T");
   T->Branch("el_dzerr", el_dzerr, "el_dzerr[20]/F");
   T->Branch("el_charge", el_charge, "el_charge[20]/F");
   T->Branch("el_relIso", el_relIso, "el_relIso[20]/F");
+  T->Branch("el_isMVA", el_isMVA, "el_isMVA[20]/F");
+  T->Branch("el_isnotrig_MVA80", el_isnotrig_MVA80, "el_isnotrig_MVA80[20]/F");
+  T->Branch("el_isnotrig_MVA90", el_isnotrig_MVA90, "el_isnotrig_MVA90[20]/F");
+  T->Branch("el_istrig_MVA80", el_istrig_MVA80, "el_istrig_MVA80[20]/F");
+  T->Branch("el_istrig_MVA90", el_istrig_MVA90, "el_istrig_MVA90[20]/F");
 
 
   T->Branch("ta_count", &ta_count, "ta_count/I");

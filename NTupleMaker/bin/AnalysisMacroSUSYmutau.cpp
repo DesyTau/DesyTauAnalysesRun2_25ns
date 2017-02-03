@@ -1115,8 +1115,6 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	bool isLegMatch = false;
 	for (unsigned int im=0; im<muons.size(); ++im) {
 	isLegMatch = false;
-	//	bool isMuonTauMuonLegMatch = false;
-	//	bool isMuonTauOverlapMuonMatch = false;
 	unsigned int mIndex  = muons.at(im);
 	float neutralHadIsoMu = analysisTree.muon_neutralHadIso[mIndex];
 	float photonIsoMu = analysisTree.muon_photonIso[mIndex];
@@ -1145,24 +1143,8 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	    	
 	  	}
 
-	  //	  if (analysisTree.trigobject_filters[iT][nMuonTauMuonLeg]) { // MuonTau Muon Leg
-	  //	    float dRtrig = deltaR(analysisTree.muon_eta[mIndex],analysisTree.muon_phi[mIndex],
-	  //				  analysisTree.trigobject_eta[iT],analysisTree.trigobject_phi[iT]);
-	  //	    if (dRtrig<deltaRTrigMatch) {
-	  //	      isMuonTauMuonLegMatch = true;
-	  //	    }
-	  //	  }
-	  //	  if (analysisTree.trigobject_filters[iT][nMuonTauOverlap]&&analysisTree.trigobject_isMuon[iT]) { // MuonTau Overlap Muon 
-	  //	    float dRtrig = deltaR(analysisTree.muon_eta[mIndex],analysisTree.muon_phi[mIndex],
-	  //				  analysisTree.trigobject_eta[iT],analysisTree.trigobject_phi[iT]);
-	  //	    if (dRtrig<deltaRTrigMatch) {
-	  //	      isMuonTauOverlapMuonMatch = true;
-	  //	    }
-	  //	  }
 		}
 	}
-
-        //if (!isData /*&& ( string::npos != filen.find("stau")  || string::npos != filen.find("C1") )*/ ) isLegMatch = true; 
         if (!isData && analysisTree.muon_pt[mIndex]>SingleMuonTriggerPtCut) isLegMatch = true;
 
 	if (!isLegMatch) continue;
@@ -1176,7 +1158,6 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 			    analysisTree.muon_eta[mIndex],analysisTree.muon_phi[mIndex]);
 
 	  if (dR<dRleptonsCutmutau) continue;
-
 
 
 
@@ -1275,7 +1256,6 @@ if (!CutBasedTauId){
       if ((int)tau_index<0) continue;
       if ((int)mu_index<0) continue;
 
-	
 	bool tauPass =false;
 
 	if (!CutBasedTauId){

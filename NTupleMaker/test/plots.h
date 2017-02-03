@@ -629,6 +629,10 @@ TH1D *hmet_MT2lester_DZeta_0J1D[CutN];
 TH1D *hmet_MT2lester_DZeta_1J1D[CutN];
 TH1D *hmet_MT2lester_DZeta_01J1D[CutN];
 
+TH1D *hmet_MT2lester1D[CutN];
+TH1D *hmet_DZeta1D[CutN];
+TH1D *hMT2lester_DZeta1D[CutN];
+/*
 TH3D *hmet_DZeta_MT2lester[CutN];
 TH3D *hmet_DZeta_MT2lester0Jets[CutN];
 TH3D *hmet_DZeta_MT2lester1Jets[CutN];
@@ -645,9 +649,6 @@ TH2D *hmet_DZeta[CutN];
 TH2D *hmet_dR[CutN];
 TH2D *hmet_MTDil[CutN];
 
-TH1D *hmet_MT2lester1D[CutN];
-TH1D *hmet_DZeta1D[CutN];
-TH1D *hMT2lester_DZeta1D[CutN];
 
 
 TH2D *hMT_MTsum[CutN];
@@ -691,6 +692,7 @@ TH2D *hTauPt_MTDil[CutN];
 
 TH2D *hdR_MTDil[CutN];
 
+*/
  
      
 
@@ -1296,16 +1298,16 @@ TH1D *hdEtaTauMET[CutN];
 /////////////////////////////////////////1D histos
 //
 //
-      hmet_MT2lester_DZeta_1D[cj]= new TH1D ("met_MT2lester_DZeta1D_"+nCut,"met_MT2lester_DZeta1D "+cutName,35,0.5,35.5);;
+      hmet_MT2lester_DZeta_1D[cj]= new TH1D ("met_MT2lester_DZeta1D_"+nCut,"met_MT2lester_DZeta1D "+cutName,29,0.5,29.5);;
       hmet_MT2lester_DZeta_1D[cj]->Sumw2();
 
-      hmet_MT2lester_DZeta_0J1D[cj]= new TH1D ("met_MT2lester_DZeta0J1D_"+nCut,"met_MT2lester_DZeta0J1D "+cutName,35,0.5,35.5);;
+      hmet_MT2lester_DZeta_0J1D[cj]= new TH1D ("met_MT2lester_DZeta0J1D_"+nCut,"met_MT2lester_DZeta0J1D "+cutName,29,0.5,29.5);;
       hmet_MT2lester_DZeta_0J1D[cj]->Sumw2();
       
-      hmet_MT2lester_DZeta_1J1D[cj]= new TH1D ("met_MT2lester_DZeta1J1D_"+nCut,"met_MT2lester_DZeta1J1D "+cutName,35,0.5,35.5);;
+      hmet_MT2lester_DZeta_1J1D[cj]= new TH1D ("met_MT2lester_DZeta1J1D_"+nCut,"met_MT2lester_DZeta1J1D "+cutName,29,0.5,29.5);;
       hmet_MT2lester_DZeta_1J1D[cj]->Sumw2();
       
-      hmet_MT2lester_DZeta_01J1D[cj]= new TH1D ("met_MT2lester_DZeta01J1D_"+nCut,"met_MT2lester_DZeta01J1D "+cutName,70,0.5,70.5);;
+      hmet_MT2lester_DZeta_01J1D[cj]= new TH1D ("met_MT2lester_DZeta01J1D_"+nCut,"met_MT2lester_DZeta01J1D "+cutName,58,0.5,58.5);;
       hmet_MT2lester_DZeta_01J1D[cj]->Sumw2();
 
       hmet_MT2lester1D[cj]= new TH1D ("met_MT2lester1D_"+nCut,"met_MT2lester1D "+cutName,6,0.5,6.5);;
@@ -1387,7 +1389,7 @@ double binsMT2lester[4] = {0, 40,80,1000};
    double binsDr[6] = {0,1,2,3,4,7};
 
    //met 
-
+/*
       hmet_DZeta_MT2lester[cj] = new TH3D ("met_DZeta_MT2lester_"+nCut,"met_DZeta_MT2lester "+cutName, nBinsmet, binsmet ,nBinsDZeta,binsDZeta, nBinsMT2lester,binsMT2lester);
       hmet_DZeta_MT2lester[cj]->Sumw2();
       
@@ -1546,7 +1548,7 @@ double binsMT2lester[4] = {0, 40,80,1000};
       hdR_MTDil[cj] = new TH2D ("dR_MTDil_"+nCut,"dR_MTDil "+cutName, nBinsDr, binsDr, nBinsMTDil,binsMTDil);
       hdR_MTDil[cj] -> Sumw2();
 
- 
+ */
 
     }
 

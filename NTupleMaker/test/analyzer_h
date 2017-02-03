@@ -147,6 +147,7 @@ class analyzer {
    		Float_t     el_neutralIso[20];
    		Float_t     el_absIsoEl[20]; 
    		Float_t     el_relIsoEl[20]; 
+   		Float_t     el_isMVA[20]; 
                
 		Int_t           jet_count;
 		Int_t           npv;
@@ -193,6 +194,7 @@ class analyzer {
 		Float_t         event_sign;
 		Float_t         met_flag;
 		Float_t         event_secondLeptonVeto;
+		Float_t         eleMVA;
 		Float_t         event_thirdLeptonVeto;
 		Float_t         event_leptonDrTrigger;
 		//   string 	   datasetName;
@@ -296,6 +298,7 @@ class analyzer {
    		TBranch     *b_el_neutralIso;
    		TBranch     *b_el_absIsoEl; 
    		TBranch     *b_el_relIsoEl; 
+   		TBranch     *b_el_isMVA; 
 		TBranch        *b_mu_relIso;   //!
 		TBranch        *b_jet_count;   //!
 		TBranch        *b_npv;   //!
@@ -345,6 +348,7 @@ class analyzer {
 		TBranch        *b_event_sign;   //!
 		TBranch        *b_met_flag;   //!
 		TBranch        *b_event_secondLeptonVeto;   //!
+		TBranch        *b_eleMVA;   //!
 		TBranch        *b_event_thirdLeptonVeto;   //!
 		TBranch        *b_event_leptonDrTrigger;   //!
 		TBranch        *b_genTauMatched;   //!
@@ -1755,7 +1759,8 @@ void FillHistsDiL(int CutIndex, Double_t EvWeight, TLorentzVector  LeptV1, TLore
 					TString Tsystematic="SYSTEMATICHERE";
 					if (Tsystematic == "JetEnUp" || Tsystematic == "JetEnDown" || Tsystematic == "TauEnUp" || Tsystematic == "TauEnDown" || Tsystematic == "ElEnUp" || Tsystematic == "ElEnDown" || Tsystematic == "MuEnUp" || Tsystematic == "MuEnDown") 
 					{ChainName ="/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/CMSSW_8_0_20/src/DesyTauAnalyses/NTupleMaker/test/CHANNELHERE_"+Tsystematic+"/FILEIN/CHANNELHERE/T";}
-
+				
+					cout<<"  Will now chain "<<ChainName<<endl;
 					 chain->Add(ChainName);
 
 					tree = chain;
@@ -1908,6 +1913,7 @@ void FillHistsDiL(int CutIndex, Double_t EvWeight, TLorentzVector  LeptV1, TLore
 			fChain->SetBranchAddress("el_neutralIso", el_neutralIso, &b_el_neutralIso);
 			fChain->SetBranchAddress("el_absIsoEl", el_absIsoEl, &b_el_absIsoEl);
 			fChain->SetBranchAddress("el_relIsoEl", el_relIsoEl, &b_el_relIsoEl);
+			fChain->SetBranchAddress("el_isMVA", el_isMVA, &b_el_isMVA);
 
 			fChain->SetBranchAddress("mu_relIso", mu_relIso, &b_mu_relIso);
 			fChain->SetBranchAddress("jet_count", &jet_count, &b_jet_count);
@@ -1957,6 +1963,7 @@ void FillHistsDiL(int CutIndex, Double_t EvWeight, TLorentzVector  LeptV1, TLore
 			fChain->SetBranchAddress("regionName", &regionName, &b_regionName);
 			fChain->SetBranchAddress("event_sign", &event_sign, &b_event_sign);
 			fChain->SetBranchAddress("met_flag", &met_flag, &b_met_flag);
+			fChain->SetBranchAddress("eleMVA", &eleMVA, &b_eleMVA);
 			fChain->SetBranchAddress("event_secondLeptonVeto", &event_secondLeptonVeto, &b_event_secondLeptonVeto);
 			fChain->SetBranchAddress("event_thirdLeptonVeto", &event_thirdLeptonVeto, &b_event_thirdLeptonVeto);
 			fChain->SetBranchAddress("event_leptonDrTrigger", &event_leptonDrTrigger, &b_event_leptonDrTrigger);
