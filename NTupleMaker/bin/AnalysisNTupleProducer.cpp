@@ -1498,59 +1498,29 @@ int main(int argc, char * argv[]) {
       // ***************************************************
 
 
-      float pfmet_ex = analysisTree.pfmet_ex;
-      float pfmet_ey = analysisTree.pfmet_ey;
-      float absMetX = TMath::Abs(pfmet_ex);
-      float absMetY = TMath::Abs(pfmet_ey);
+      float pfmet_ex = analysisTree.pfmetcorr_ex;
+      float pfmet_ey = analysisTree.pfmetcorr_ey;
 
-      /*
-      if (absMetX<0.01||absMetY<0.01) { 
-	float pxJets = 0; 
-	float pyJets = 0;
-	for (unsigned int ijet=0; ijet<analysisTree.pfjet_count; ++ijet) {
-	  pxJets -= analysisTree.pfjet_px[ijet];
-	  pyJets -= analysisTree.pfjet_py[ijet];
-	}
-	pfmet_ex = pxJets;
-	pfmet_ey = pyJets;
-	std::cout << "PFMEt (raw) ->  Px = " << analysisTree.pfmet_ex
-		  << "   Py = " << analysisTree.pfmet_ey 
-		  << "   Phi = " << analysisTree.pfmet_phi 
-		  << "   njets = " << analysisTree.pfjet_count
-		  << "   Px(j) = " << pxJets
-		  << "   Py(j) = " << pyJets << std::endl;
-
-	
-		  std::cout << "PFMEt (cor) ->  Px = " <<analysisTree.pfmetcorr_ex
-		  << "   Py = " << analysisTree.pfmetcorr_ey << std::endl;
-      std::cout << std::endl; */
-      
-      /*
-      if (isData) {
-	pfmet_ex = analysisTree.pfmetcorr_ex;
-	pfmet_ey = analysisTree.pfmetcorr_ey;
-      }
-      */
       if (!isData) {
 	if (jetES<0) {
-	  pfmet_ex = analysisTree.pfmet_ex_JetEnDown;
-	  pfmet_ey = analysisTree.pfmet_ey_JetEnDown;
+	  pfmet_ex = analysisTree.pfmetcorr_ex_JetEnDown;
+	  pfmet_ey = analysisTree.pfmetcorr_ey_JetEnDown;
 	}
 	else if (jetES>0) {
-	  pfmet_ex = analysisTree.pfmet_ex_JetEnUp;
-	  pfmet_ey = analysisTree.pfmet_ey_JetEnUp;
+	  pfmet_ex = analysisTree.pfmetcorr_ex_JetEnUp;
+	  pfmet_ey = analysisTree.pfmetcorr_ey_JetEnUp;
 	}
 	else if (unclusteredES<0) {
-	  pfmet_ex = analysisTree.pfmet_ex_UnclusteredEnDown;
-	  pfmet_ey = analysisTree.pfmet_ey_UnclusteredEnDown;
+	  pfmet_ex = analysisTree.pfmetcorr_ex_UnclusteredEnDown;
+	  pfmet_ey = analysisTree.pfmetcorr_ey_UnclusteredEnDown;
 	}
 	else if (unclusteredES>0) {
-	  pfmet_ex = analysisTree.pfmet_ex_UnclusteredEnUp;
-	  pfmet_ey = analysisTree.pfmet_ey_UnclusteredEnUp;
+	  pfmet_ex = analysisTree.pfmetcorr_ex_UnclusteredEnUp;
+	  pfmet_ey = analysisTree.pfmetcorr_ey_UnclusteredEnUp;
 	}
 	else {
-	  pfmet_ex = analysisTree.pfmet_ex;
-	  pfmet_ey = analysisTree.pfmet_ey;
+	  pfmet_ex = analysisTree.pfmetcorr_ex;
+	  pfmet_ey = analysisTree.pfmetcorr_ey;
 	}
       }
       //      cout << endl;
