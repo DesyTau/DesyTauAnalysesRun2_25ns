@@ -163,7 +163,7 @@ void TagProbeTree::WriteInit(TTree *tree) {
   fChain = tree;
   fCurrent = -1;
 
-  fChain->Branch("run", &run, "run/I");
+  fChain->Branch("run", &run, "run/l");
   fChain->Branch("lumi", &lumi, "lumi/I");
   fChain->Branch("evt", &evt, "evt/I");
   fChain->Branch("npv", &npv, "npv/I");
