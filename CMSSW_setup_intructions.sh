@@ -43,6 +43,9 @@ cd $CMSSW_BASE/src
 git cms-merge-topic ikrav:egm_id_80X_v3_photons
 cd $CMSSW_BASE/src
 
+### Tau MVA ID (https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePFTauID#Rerunning_of_the_tau_ID_on_MiniA)
+git cms-merge-topic -u cms-tau-pog:CMSSW_8_0_X_tau-pog_miniAOD-backport-tauID
+
 ### SVfit
 git clone https://github.com/veelken/SVfit_standalone.git ${CMSSW_BASE}/src/TauAnalysis/SVfitStandalone
 cd ${CMSSW_BASE}/src/TauAnalysis/SVfitStandalone
