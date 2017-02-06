@@ -192,8 +192,61 @@ for idmod in my_id_modules:
 
 ### END Electron ID ====================================================================================
 
+### MVA Tau ID =========================================================================================
 
-## HBHE noise Filter
+from RecoTauTag.RecoTau.TauDiscriminatorTools import noPrediscriminants
+process.load('RecoTauTag.Configuration.loadRecoTauTagMVAsFromPrepDB_cfi')
+from RecoTauTag.RecoTau.PATTauDiscriminationByMVAIsolationRun2_cff import *
+
+process.rerunDiscriminationByIsolationMVArun2v1raw = patDiscriminationByIsolationMVArun2v1raw.clone(
+	PATTauProducer = cms.InputTag('slimmedTaus'),
+	Prediscriminants = noPrediscriminants,
+	loadMVAfromDB = cms.bool(True),
+	mvaName = cms.string("RecoTauTag_tauIdMVAIsoDBoldDMwLT2016v1"),
+	mvaOpt = cms.string("DBoldDMwLT"),
+	requireDecayMode = cms.bool(True),
+	verbosity = cms.int32(0)
+)
+
+process.rerunDiscriminationByIsolationMVArun2v1VLoose = patDiscriminationByIsolationMVArun2v1VLoose.clone(
+	PATTauProducer = cms.InputTag('slimmedTaus'),    
+	Prediscriminants = noPrediscriminants,
+	toMultiplex = cms.InputTag('rerunDiscriminationByIsolationMVArun2v1raw'),
+	key = cms.InputTag('rerunDiscriminationByIsolationMVArun2v1raw:category'),
+	loadMVAfromDB = cms.bool(True),
+	mvaOutput_normalization = cms.string("RecoTauTag_tauIdMVAIsoDBoldDMwLT2016v1_mvaOutput_normalization"),
+	mapping = cms.VPSet(
+		cms.PSet(
+			category = cms.uint32(0),
+			cut = cms.string("RecoTauTag_tauIdMVAIsoDBoldDMwLT2016v1_WPEff90"),
+			variable = cms.string("pt"),
+		)
+	)
+)
+
+process.rerunDiscriminationByIsolationMVArun2v1Loose = process.rerunDiscriminationByIsolationMVArun2v1VLoose.clone()
+process.rerunDiscriminationByIsolationMVArun2v1Loose.mapping[0].cut = cms.string("RecoTauTag_tauIdMVAIsoDBoldDMwLT2016v1_WPEff80")
+process.rerunDiscriminationByIsolationMVArun2v1Medium = process.rerunDiscriminationByIsolationMVArun2v1VLoose.clone()
+process.rerunDiscriminationByIsolationMVArun2v1Medium.mapping[0].cut = cms.string("RecoTauTag_tauIdMVAIsoDBoldDMwLT2016v1_WPEff70")
+process.rerunDiscriminationByIsolationMVArun2v1Tight = process.rerunDiscriminationByIsolationMVArun2v1VLoose.clone()
+process.rerunDiscriminationByIsolationMVArun2v1Tight.mapping[0].cut = cms.string("RecoTauTag_tauIdMVAIsoDBoldDMwLT2016v1_WPEff60")
+process.rerunDiscriminationByIsolationMVArun2v1VTight = process.rerunDiscriminationByIsolationMVArun2v1VLoose.clone()
+process.rerunDiscriminationByIsolationMVArun2v1VTight.mapping[0].cut = cms.string("RecoTauTag_tauIdMVAIsoDBoldDMwLT2016v1_WPEff50")
+process.rerunDiscriminationByIsolationMVArun2v1VVTight = process.rerunDiscriminationByIsolationMVArun2v1VLoose.clone()
+process.rerunDiscriminationByIsolationMVArun2v1VVTight.mapping[0].cut = cms.string("RecoTauTag_tauIdMVAIsoDBoldDMwLT2016v1_WPEff40")
+
+process.rerunMvaIsolation2SeqRun2 = cms.Sequence(
+	process.rerunDiscriminationByIsolationMVArun2v1raw
+	*process.rerunDiscriminationByIsolationMVArun2v1VLoose
+	*process.rerunDiscriminationByIsolationMVArun2v1Loose
+	*process.rerunDiscriminationByIsolationMVArun2v1Medium
+	*process.rerunDiscriminationByIsolationMVArun2v1Tight
+	*process.rerunDiscriminationByIsolationMVArun2v1VTight
+	*process.rerunDiscriminationByIsolationMVArun2v1VVTight
+)
+
+### END MVA Tau ID =========================================================================================
+
 
 ##___________________________HCAL_Noise_Filter________________________________||
 process.load('CommonTools.RecoAlgos.HBHENoiseFilterResultProducer_cfi')
@@ -791,6 +844,7 @@ process.p = cms.Path(
   process.puppiMETSequence *
   process.fullPatMetSequencePuppi *
   process.egmGsfElectronIDSequence * 
+  process.rerunMvaIsolation2SeqRun2 * 
   #process.mvaMetSequence *
   #process.HBHENoiseFilterResultProducer* #produces HBHE bools baseline
   #process.ApplyBaselineHBHENoiseFilter*  #reject events based 

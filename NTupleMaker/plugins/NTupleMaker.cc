@@ -171,6 +171,13 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
   eleMvaWP90GeneralMapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleMvaWP90GeneralMap"))),
   eleMvaWP80GeneralMapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleMvaWP80GeneralMap"))),
   TauCollectionToken_(consumes<pat::TauCollection>(iConfig.getParameter<edm::InputTag>("TauCollectionTag"))),
+  TauMVAIsolationRawToken_(consumes<pat::PATTauDiscriminator>(edm::InputTag("rerunDiscriminationByIsolationMVArun2v1raw","","TreeProducer"))),
+  TauMVAIsolationVLooseToken_(consumes<pat::PATTauDiscriminator>(edm::InputTag("rerunDiscriminationByIsolationMVArun2v1VLoose","","TreeProducer"))),
+  TauMVAIsolationLooseToken_(consumes<pat::PATTauDiscriminator>(edm::InputTag("rerunDiscriminationByIsolationMVArun2v1Loose","","TreeProducer"))),
+  TauMVAIsolationMediumToken_(consumes<pat::PATTauDiscriminator>(edm::InputTag("rerunDiscriminationByIsolationMVArun2v1Medium","","TreeProducer"))),
+  TauMVAIsolationTightToken_(consumes<pat::PATTauDiscriminator>(edm::InputTag("rerunDiscriminationByIsolationMVArun2v1Tight","","TreeProducer"))),
+  TauMVAIsolationVTightToken_(consumes<pat::PATTauDiscriminator>(edm::InputTag("rerunDiscriminationByIsolationMVArun2v1VTight","","TreeProducer"))),
+  TauMVAIsolationVVTightToken_(consumes<pat::PATTauDiscriminator>(edm::InputTag("rerunDiscriminationByIsolationMVArun2v1VVTight","","TreeProducer"))),
   JetCollectionToken_(consumes<pat::JetCollection>(iConfig.getParameter<edm::InputTag>("JetCollectionTag"))),
   MetCollectionToken_(consumes<pat::METCollection>(iConfig.getParameter<edm::InputTag>("MetCollectionTag"))),
   MetCorrCollectionToken_(consumes<pat::METCollection>(iConfig.getParameter<edm::InputTag>("MetCorrCollectionTag"))),
@@ -627,6 +634,13 @@ void NTupleMaker::beginJob(){
     tree->Branch("tau_genjet_pz", tau_genjet_pz, "tau_genjet_pz[tau_count]/F");
     tree->Branch("tau_genjet_e", tau_genjet_e, "tau_genjet_e[tau_count]/F");
     tree->Branch("tau_genmatch", tau_genmatch, "tau_genmatch[tau_count]/I");
+    tree->Branch("tau_byIsolationMVArun2v1Raw", tau_byIsolationMVArun2v1Raw, "tau_byIsolationMVArun2v1Raw[tau_count]/F");
+    tree->Branch("tau_byIsolationMVArun2v1VLoose", tau_byIsolationMVArun2v1VLoose, "tau_byIsolationMVArun2v1VLoose[tau_count]/F");
+    tree->Branch("tau_byIsolationMVArun2v1Loose", tau_byIsolationMVArun2v1Loose, "tau_byIsolationMVArun2v1Loose[tau_count]/F");
+    tree->Branch("tau_byIsolationMVArun2v1Medium", tau_byIsolationMVArun2v1Medium, "tau_byIsolationMVArun2v1Medium[tau_count]/F");
+    tree->Branch("tau_byIsolationMVArun2v1Tight", tau_byIsolationMVArun2v1Tight, "tau_byIsolationMVArun2v1Tight[tau_count]/F");
+    tree->Branch("tau_byIsolationMVArun2v1VTight", tau_byIsolationMVArun2v1VTight, "tau_byIsolationMVArun2v1VTight[tau_count]/F");
+    tree->Branch("tau_byIsolationMVArun2v1VVTight", tau_byIsolationMVArun2v1VVTight, "tau_byIsolationMVArun2v1VVTight[tau_count]/F");
 
     tree->Branch("tau_leadchargedhadrcand_px",  tau_leadchargedhadrcand_px,  "tau_leadchargedhadrcand_px[tau_count]/F");
     tree->Branch("tau_leadchargedhadrcand_py",  tau_leadchargedhadrcand_py,  "tau_leadchargedhadrcand_py[tau_count]/F");
@@ -3260,23 +3274,24 @@ unsigned int NTupleMaker::AddTaus(const edm::Event& iEvent, const edm::EventSetu
   edm::Handle<pat::TauCollection> Taus;
   iEvent.getByToken(TauCollectionToken_, Taus);
 
+  edm::Handle<pat::PATTauDiscriminator> mvaIsoRaw;
+  iEvent.getByToken(TauMVAIsolationRawToken_,mvaIsoRaw);
+  edm::Handle<pat::PATTauDiscriminator> mvaIsoVLoose;
+  iEvent.getByToken(TauMVAIsolationVLooseToken_,mvaIsoVLoose);
+  edm::Handle<pat::PATTauDiscriminator> mvaIsoLoose;
+  iEvent.getByToken(TauMVAIsolationLooseToken_,mvaIsoLoose);
+  edm::Handle<pat::PATTauDiscriminator> mvaIsoMedium;
+  iEvent.getByToken(TauMVAIsolationMediumToken_,mvaIsoMedium);
+  edm::Handle<pat::PATTauDiscriminator> mvaIsoTight;
+  iEvent.getByToken(TauMVAIsolationTightToken_,mvaIsoTight);
+  edm::Handle<pat::PATTauDiscriminator> mvaIsoVTight;
+  iEvent.getByToken(TauMVAIsolationVTightToken_,mvaIsoVTight);
+  edm::Handle<pat::PATTauDiscriminator> mvaIsoVVTight;
+  iEvent.getByToken(TauMVAIsolationVVTightToken_,mvaIsoVVTight);
+
   if(Taus.isValid())
     {
       
-      // std::cout << "size of tau collection : " << Taus->size() << std::endl;
-
-      // if (Taus->size()>0) {
-
-      // 	std::vector<pat::Tau::IdPair> tauDiscriminatorPairs = (*Taus)[0].tauIDs();
-      
-      // 	unsigned tauIdSize = tauDiscriminatorPairs.size();
-      
-      // 	for (unsigned nId = 0; nId < tauIdSize; ++nId) {
-      // 	  std::cout << tauDiscriminatorPairs[nId].first << "  :  " << tauDiscriminatorPairs[nId].second << std::endl;
-      // 	}
-
-      // }
-
       for(unsigned i = 0 ; i < Taus->size() ; i++)
 	{
 
@@ -3285,12 +3300,6 @@ unsigned int NTupleMaker::AddTaus(const edm::Event& iEvent, const edm::EventSetu
 	    errors |= 1<<3; 
 	    break;
 	  }
-
-	  // std::cout << i << " :  decayModeFinding = " << (*Taus)[i].tauID("decayModeFinding") 
-	  //  	    << "   decayModeFindingNewDMs = " << (*Taus)[i].tauID("decayModeFindingNewDMs") 
-	  //  	    << "   pt =  " << (*Taus)[i].pt() 
-	  // 	    << "  eta = " << (*Taus)[i].eta() 
-	  // 	    << "  phi = " << (*Taus)[i].phi() << std::endl;
 
 	  if( (*Taus)[i].pt() < cTauPtMin) continue;
 	  if(fabs((*Taus)[i].eta()) > cTauEtaMax ) continue;
@@ -3308,11 +3317,6 @@ unsigned int NTupleMaker::AddTaus(const edm::Event& iEvent, const edm::EventSetu
 	  tau_eta[tau_count]                                      = (*Taus)[i].eta();
 	  tau_mass[tau_count]                                     = (*Taus)[i].mass();
 	  tau_charge[tau_count]                                   = (*Taus)[i].charge();
-
-	  // std::cout << "Tau " << i 
-	  // 	    << "   pt = "  << tau_pt[tau_count]
-	  //  	    << "   eta = " << tau_eta[tau_count] 
-	  //  	    << "   phi = " << tau_phi[tau_count];
 
 	  tau_signalChargedHadrCands_size[tau_count]              = (*Taus)[i].signalChargedHadrCands().size();   
 	  tau_signalNeutralHadrCands_size[tau_count]              = (*Taus)[i].signalNeutrHadrCands().size();   
@@ -3343,6 +3347,16 @@ unsigned int NTupleMaker::AddTaus(const edm::Event& iEvent, const edm::EventSetu
 	  for(unsigned int id = 0; id < tauIdIndx.size(); id++)
 	    tau_ids[tauIdIndx[id].second][tau_count]=(*Taus)[i].tauID(tauIdIndx[id].first);
 
+	  pat::TauRef tau(Taus,i);
+	  tau_byIsolationMVArun2v1Raw[tau_count]     = (*mvaIsoRaw)[tau];
+	  tau_byIsolationMVArun2v1VLoose[tau_count]  = (*mvaIsoVLoose)[tau];
+	  tau_byIsolationMVArun2v1Loose[tau_count]   = (*mvaIsoLoose)[tau];
+	  tau_byIsolationMVArun2v1Medium[tau_count]  = (*mvaIsoMedium)[tau];
+	  tau_byIsolationMVArun2v1Tight[tau_count]   = (*mvaIsoTight)[tau];
+	  tau_byIsolationMVArun2v1VTight[tau_count]  = (*mvaIsoVTight)[tau];
+	  tau_byIsolationMVArun2v1VVTight[tau_count] = (*mvaIsoVVTight)[tau];
+
+
 	  if( ((*Taus)[i].genJet())) {
 	    std::string genTauDecayMode = JetMCTagUtils::genTauDecayMode(*((*Taus)[i].genJet()));
 	    if( genTauDecayMode.find("oneProng0Pi0")!=string::npos )          tau_genDecayMode[tau_count] = 0;
@@ -3361,9 +3375,6 @@ unsigned int NTupleMaker::AddTaus(const edm::Event& iEvent, const edm::EventSetu
 	    tau_genjet_py[tau_count]        = (*Taus)[i].genJet()->py();
 	    tau_genjet_pz[tau_count]        = (*Taus)[i].genJet()->pz();
 	    tau_genjet_e[tau_count]         = (*Taus)[i].genJet()->energy();
-
-	    //	    std::cout << "   GenDecayMode = " << genTauDecayMode;
-
 	  }
 	  else {
 	    tau_genDecayMode[tau_count]              = -99;
@@ -3372,12 +3383,7 @@ unsigned int NTupleMaker::AddTaus(const edm::Event& iEvent, const edm::EventSetu
             tau_genjet_py[tau_count]                 = 0;
             tau_genjet_pz[tau_count]                 = 0;
             tau_genjet_e[tau_count]                  = 0;
-
-	    //	    std::cout << "   Missing genTau " << std::endl;
-
 	  }
-
-	  //	  std::cout << std::endl;
 
 	  //add reco decay mode
 	  tau_decayMode[tau_count] = (*Taus)[i].decayMode();
@@ -3401,15 +3407,9 @@ unsigned int NTupleMaker::AddTaus(const edm::Event& iEvent, const edm::EventSetu
 	      tau_leadchargedhadrcand_mass[tau_count] = (*Taus)[i].leadChargedHadrCand()->mass();
 	      tau_leadchargedhadrcand_id[tau_count]   = (*Taus)[i].leadChargedHadrCand()->pdgId();
 
-	      //	      std::cout << "leading charged hadron : dxy = " << (*Taus)[i].leadChargedHadrCand()->dxy() 
-	      //       		<< "   dz = " << (*Taus)[i].leadChargedHadrCand()->dz() << std::endl;
 	      pat::PackedCandidate const* packedLeadTauCand = dynamic_cast<pat::PackedCandidate const*>((*Taus)[i].leadChargedHadrCand().get());
-	      //	      std::cout << "leading charged hadron : dxy = " << packedLeadTauCand->dxy()
-	      //			<< "   dz = " << packedLeadTauCand->dz() << std::endl;
-
 	      tau_leadchargedhadrcand_dxy[tau_count]   = packedLeadTauCand->dxy();
 	      tau_leadchargedhadrcand_dz[tau_count]   = packedLeadTauCand->dz();
-
 
 	    }
 	  else
@@ -3421,44 +3421,8 @@ unsigned int NTupleMaker::AddTaus(const edm::Event& iEvent, const edm::EventSetu
 	      tau_leadchargedhadrcand_id[tau_count]   = -999;
 	      tau_leadchargedhadrcand_dxy[tau_count]  = -999;
 	      tau_leadchargedhadrcand_dz[tau_count]   = -999;
-
 	    }
 	  
-	  // TrackRef track = (*Taus)[i].leadTrack();
-
-	  // std::cout << "Tau dxy = " << (*Taus)[i].dxy() << std::endl;
-	  // std::cout << "PV : x = " << pv_position.x() 
-	  // 	    << "  y = " << pv_position.y() 
-	  // 	    << "  z = " << pv_position.z() << std::endl;
-	  // std::cout << "Tau vertex : x = " <<  (*Taus)[i].vertex().x() 
-	  //  	    << "  y = " << (*Taus)[i].vertex().y()
-	  //  	    << "  z = " << (*Taus)[i].vertex().z() << std::endl;
-	  // std::cout << "Leading ch.cand. : x = " << (*Taus)[i].leadChargedHadrCand()->vx()
-	  // 	    << "  y = " << (*Taus)[i].leadChargedHadrCand()->vy()
-	  // 	    << "  z = " << (*Taus)[i].leadChargedHadrCand()->vz() << std::endl;
-
-	  // if(track.isNonnull())
-	  //   {
-	  //     const reco::TransientTrack transientTrack = TTrackBuilder->build(*track);
-	  //     const Measurement1D meas = signed_ip3D.apply(transientTrack, GlobalVector(track->px(), track->py(), track->pz()), primvertex).second;
-	      
-	  //     tau_dxy[tau_count] = track->dxy(pv_position);
-	  //     tau_dz[tau_count] = track->dz(pv_position);
-	  //     tau_ip3d[tau_count] = meas.value();
-	  //     tau_ip3dSig[tau_count] = meas.significance();
-
-	  //     //	      std::cout << "Track is present !" << std::endl;
-
-	  //   }
-	  // else
-	  //   {
-	  //     tau_dxy[tau_count]     = -100.0f;
-	  //     tau_dz[tau_count]      = -100.0f;
-	  //     tau_ip3d[tau_count]    = -1.0f;
-	  //     tau_ip3dSig[tau_count] = -1.0f;
-	  //     tau_dxy[tau_count] = (*Taus)[i].dxy();
-	  //   }
-
 	  tau_dxy[tau_count]     = -100.0f;
 	  tau_dz[tau_count]      = -100.0f;
 	  tau_ip3d[tau_count]    = -1.0f;
@@ -3480,19 +3444,6 @@ unsigned int NTupleMaker::AddTaus(const edm::Event& iEvent, const edm::EventSetu
 	  tau_ntracks_pt05[tau_count] = 0;
 	  tau_ntracks_pt08[tau_count] = 0;
 	  tau_ntracks_pt1[tau_count]  = 0;
-	  // for (unsigned int ipf=0; ipf<packedPFCandidates->size(); ++ipf) {
-	  //   if (fabs((*packedPFCandidates)[ipf].dz((*Taus)[i].vertex()))<0.2 && 
-	  // 	fabs((*packedPFCandidates)[ipf].dxy((*Taus)[i].vertex()))<0.05 ) {
-	  //     if(ROOT::Math::VectorUtil::DeltaR((*Taus)[i].p4(),(*packedPFCandidates)[ipf].p4()) < 0.5) {
-	  // 	if ((*packedPFCandidates)[ipf].pt()>0.5) tau_ntracks_pt05[tau_count]++; 
-	  // 	if ((*packedPFCandidates)[ipf].pt()>0.8) tau_ntracks_pt08[tau_count]++; 	
-	  // 	if ((*packedPFCandidates)[ipf].pt()>1.0) tau_ntracks_pt1[tau_count]++; 	
-	  //     }
-	  //   }
-	  // }
-	  //	  std::cout << " tracks around :  pt>0.5 = " << tau_ntracks_pt05[tau_count]
-	  //		    << "  pt>0.8 = " << tau_ntracks_pt08[tau_count]
-	  //		    << "  pt>1.0 = " << tau_ntracks_pt1[tau_count] << std::endl;
 
 	  tau_genmatch[tau_count] = 0;
 	  if(cgen && !cdata){

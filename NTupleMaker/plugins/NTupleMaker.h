@@ -81,6 +81,7 @@
 #include "DataFormats/Candidate/interface/VertexCompositeCandidate.h"
 #include "DataFormats/Candidate/interface/VertexCompositeCandidateFwd.h"
 #include "DataFormats/RecoCandidate/interface/RecoChargedCandidate.h"
+#include "DataFormats/PatCandidates/interface/PATTauDiscriminator.h"
 
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
@@ -391,6 +392,14 @@ class NTupleMaker : public edm::EDAnalyzer{
   edm::EDGetTokenT<edm::ValueMap<bool> >  eleMvaWP80GeneralMapToken_;
   //// New for Spring16
   edm::EDGetTokenT<pat::TauCollection> TauCollectionToken_;
+  edm::EDGetTokenT<pat::PATTauDiscriminator> TauMVAIsolationRawToken_;
+  edm::EDGetTokenT<pat::PATTauDiscriminator> TauMVAIsolationVLooseToken_;
+  edm::EDGetTokenT<pat::PATTauDiscriminator> TauMVAIsolationLooseToken_;
+  edm::EDGetTokenT<pat::PATTauDiscriminator> TauMVAIsolationMediumToken_;
+  edm::EDGetTokenT<pat::PATTauDiscriminator> TauMVAIsolationTightToken_;
+  edm::EDGetTokenT<pat::PATTauDiscriminator> TauMVAIsolationVTightToken_;
+  edm::EDGetTokenT<pat::PATTauDiscriminator> TauMVAIsolationVVTightToken_;
+
   edm::EDGetTokenT<pat::JetCollection> JetCollectionToken_;
   edm::EDGetTokenT<pat::METCollection> MetCollectionToken_;
   edm::EDGetTokenT<CovMatrix2D> MetCovMatrixToken_;
@@ -788,6 +797,15 @@ class NTupleMaker : public edm::EDAnalyzer{
   Float_t tau_genjet_py[M_taumaxcount];
   Float_t tau_genjet_pz[M_taumaxcount];
   Int_t tau_genmatch[M_taumaxcount];
+
+  Float_t tau_byIsolationMVArun2v1Raw[M_taumaxcount];
+  Float_t tau_byIsolationMVArun2v1VLoose[M_taumaxcount];
+  Float_t tau_byIsolationMVArun2v1Loose[M_taumaxcount];
+  Float_t tau_byIsolationMVArun2v1Medium[M_taumaxcount];
+  Float_t tau_byIsolationMVArun2v1Tight[M_taumaxcount];
+  Float_t tau_byIsolationMVArun2v1VTight[M_taumaxcount];
+  Float_t tau_byIsolationMVArun2v1VVTight[M_taumaxcount];
+
 
   // main tau discriminators
   bool setTauBranches;
