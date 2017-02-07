@@ -94,6 +94,7 @@ void mt_calculation(Spring15Tree *otree);
 //void counting_jets(const AC1B *analysisTree, Spring15Tree *otree, const Config *cfg, const btag_scaling_inputs *inputs);
 void svfit_variables(const AC1B *analysisTree, Spring15Tree *otree, const Config *cfg, TFile *inputFile_visPtResolution);
 bool isICHEPmed(int Index, const AC1B * analysisTree);
+bool isIdentifiedMediumMuon(int Index, const AC1B * analysisTree, bool isData);
 
 
 
@@ -152,6 +153,10 @@ int main(int argc, char * argv[]){
   const bool ApplySVFit       = cfg.get<bool>("ApplySVFit");
   const bool ApplyBTagScaling = cfg.get<bool>("ApplyBTagScaling");
   const bool ApplySystShift   = cfg.get<bool>("ApplySystShift");
+
+  bool checkDuplicateMuons = false;
+  if (isData && ch == "mt") checkDuplicateMuons = cfg.get<bool>("checkDuplicateMuons");
+
   //pileup distrib
   const string pileUpInDataFile = cfg.get<string>("pileUpInDataFile");
   const string pileUpInMCFile = cfg.get<string>("pileUpInMCFile");
@@ -239,8 +244,9 @@ int main(int argc, char * argv[]){
 
   //for mutau, add another isoLeg
   string isoLeg2;
-  if (isData && ch =="mt"){
-	isoLeg2 = cfg.get<string>("isoLegData2");
+  if (ch =="mt"){
+	if (isData) isoLeg2 = cfg.get<string>("isoLegData2");
+	else isoLeg2= cfg.get<string>("isoLegMC2");
 	}
 
   const float ptTrigObjCut  = cfg.get<float>("ptTrigObjCut");
@@ -469,6 +475,7 @@ int main(int argc, char * argv[]){
   }
 
 
+
   ///////////////FILE LOOP///////////////
 
   for (int iF=ifile; iF<jfile; ++iF) {
@@ -518,7 +525,7 @@ int main(int argc, char * argv[]){
       bool checkIsoLeg = false;
       unsigned int nIsoLeg2 =0;
 	  bool checkIsoLeg2 = false; 
-      if(isData || ApplyTrigger){
+      if(ApplyTrigger){
             unsigned int nfilters = analysisTree.run_hltfilters->size();
             for (unsigned int i=0; i<nfilters; ++i) {
               TString HLTFilter(analysisTree.run_hltfilters->at(i));
@@ -533,7 +540,7 @@ int main(int argc, char * argv[]){
             }
       }
 	  //check second trigger for mutau. FIX code duplication!
-	  if (isData && ch == "mt"){
+	  if (ch == "mt"){
             unsigned int nfilters = analysisTree.run_hltfilters->size();
             for (unsigned int i=0; i<nfilters; ++i) {
               TString HLTFilter(analysisTree.run_hltfilters->at(i));
@@ -592,6 +599,9 @@ int main(int argc, char * argv[]){
         taus.push_back(it);
       }
 
+	  otree->n_badmuons=0;
+	  otree->n_duplicatemuons =0;
+	  vector<int> duplicatemuons; duplicatemuons.clear();
 
       //selecting leptons 
       vector<int> leptons; leptons.clear();
@@ -599,7 +609,7 @@ int main(int argc, char * argv[]){
         
         for (unsigned int ie = 0; ie<analysisTree.electron_count; ++ie) {
 			
-          bool electronMvaId = analysisTree.electron_mva_wp80_nontrig_Spring15_v1[ie];
+          bool electronMvaId = analysisTree.electron_mva_wp80_general_Spring16_v1[ie];//analysisTree.electron_mva_wp80_nontrig_Spring15_v1[ie];
     
           if (analysisTree.electron_pt[ie]<=ptLeptonLowCut) continue;
           if (fabs(analysisTree.electron_eta[ie])>=etaLeptonCut) continue;
@@ -616,9 +626,14 @@ int main(int argc, char * argv[]){
       if(ch == "mt"){
         for (unsigned int im = 0; im<analysisTree.muon_count; ++im) {
 
+		  // check for duplicates and bad muons
+         // check for duplicate muons, save their IDs in a vector and add to the Met later.
+
+		  if (analysisTree.muon_isDuplicate[im]) {otree->n_duplicatemuons +=1; duplicatemuons.push_back(im);}
+		  if (analysisTree.muon_isBad[im]) otree->n_badmuons+=1;
 //          bool muonMediumId = analysisTree.muon_isMedium[im];
-          bool muonMediumId = isICHEPmed(im, &analysisTree);
-  
+          bool muonMediumId = isIdentifiedMediumMuon(im, &analysisTree, isData);
+  			
           if (analysisTree.muon_pt[im]<=ptLeptonLowCut) continue;
           if (fabs(analysisTree.muon_eta[im])>=etaLeptonCut) continue;
           if (fabs(analysisTree.muon_dxy[im])>=dxyLeptonCut) continue;
@@ -662,14 +677,14 @@ int main(int argc, char * argv[]){
           lep_eta =     analysisTree.electron_eta[lIndex]; 
           lep_phi =     analysisTree.electron_phi[lIndex];}
 
-        if(isData || ApplyTrigger){  
+        if(ApplyTrigger){  
                 for (unsigned int iT=0; iT<analysisTree.trigobject_count; ++iT) {
                   float dRtrig = deltaR(lep_eta, lep_phi, analysisTree.trigobject_eta[iT],analysisTree.trigobject_phi[iT]);
         
                   if (dRtrig < deltaRTrigMatch){
-                    	if (analysisTree.trigobject_filters[iT][nIsoLeg] && ( isData || analysisTree.trigobject_pt[iT] > ptTrigObjCut))
+                    	if (analysisTree.trigobject_filters[iT][nIsoLeg] && ( analysisTree.trigobject_pt[iT] > ptTrigObjCut))
                       		isSingleLepTrig = true;
-						if (ch=="mt" && analysisTree.trigobject_filters[iT][nIsoLeg2] && ( isData || analysisTree.trigobject_pt[iT] > ptTrigObjCut))
+						if (ch=="mt" && analysisTree.trigobject_filters[iT][nIsoLeg2] && (analysisTree.trigobject_pt[iT] > ptTrigObjCut))
 							isSingleLepTrig = true;
                   }
                 }
@@ -773,7 +788,7 @@ int main(int argc, char * argv[]){
 
         if (!isData && ApplyLepSF) {
                 // Scale Factor SingleEle trigger SF_eleTrigger
-          otree->trigweight_1 = (SF_lepTrigger->get_EfficiencyData(double(analysisTree.electron_pt[leptonIndex]),double(analysisTree.electron_eta[leptonIndex])));
+          otree->trigweight_1 = (SF_lepTrigger->get_ScaleFactor(double(analysisTree.electron_pt[leptonIndex]),double(analysisTree.electron_eta[leptonIndex])));
                 // Scale Factor Id+Iso SF_eleIdIso
           otree->idisoweight_1 = (SF_lepIdIso->get_ScaleFactor(double(analysisTree.electron_pt[leptonIndex]),double(analysisTree.electron_eta[leptonIndex])));
           otree->trigweight_antiiso_1 = (SF_lepTrigger_antiiso->get_EfficiencyData(double(analysisTree.electron_pt[leptonIndex]),double(analysisTree.electron_eta[leptonIndex])));
@@ -789,7 +804,7 @@ int main(int argc, char * argv[]){
       FillTau(&analysisTree, otree, tauIndex);
 	  
       // tauID weight
-      if (!isData && analysisTree.tau_genmatch[tauIndex]==5) otree->idisoweight_2 = 0.90; 
+      if (!isData && analysisTree.tau_genmatch[tauIndex]==5) otree->idisoweight_2 = 0.95; 
 
 	  // taking tau ID weight from the workspace
 	  //if (!isData) {
@@ -897,6 +912,25 @@ int main(int argc, char * argv[]){
                							 0,
                 						 TMath::Sqrt( otree->met*TMath::Sin(otree->metphi)*otree->met*TMath::Sin(otree->metphi) +
                          				 otree->met*TMath::Cos(otree->metphi)*otree->met*TMath::Cos(otree->metphi)));
+
+	  if (ch == "mt" && checkDuplicateMuons && duplicatemuons.size()!=0 && isData){
+		// add to the MET LV the duplicate muons pt
+		TLorentzVector duplicateMuonsLV;
+		float duplicatemu_px = 0; 
+		float duplicatemu_py = 0; 
+		for (unsigned int i=0; i<duplicatemuons.size(); i++){
+			duplicatemu_px += analysisTree.muon_px[duplicatemuons[i]];
+			duplicatemu_py += analysisTree.muon_py[duplicatemuons[i]];
+			}
+	    // add duplicate muons pT to MET
+		float tot_px = metLV.Px()+ duplicatemu_px;
+		float tot_py = metLV.Py() + duplicatemu_py;
+		metLV.SetPx(tot_px);
+		metLV.SetPy(tot_py);
+		// save to otree
+		otree->met= metLV.Pt();
+		otree->metphi = metLV.Phi();
+	  }
 
       TLorentzVector dileptonLV = leptonLV + tauLV;
 
@@ -1161,18 +1195,18 @@ void fill_weight(const AC1B * analysisTree, Spring15Tree *otree, PileUp *PUoffic
 }
 
 
-//compute medium ID adjusted for ICHEP
-bool isICHEPmuon(const AC1B * analysisTree, int Index) {
-        bool goodGlob = analysisTree->muon_isGlobal[Index] && analysisTree->muon_normChi2[Index] < 3 && analysisTree->muon_combQ_chi2LocalPosition[Index] < 12
-                                   && analysisTree->muon_combQ_trkKink[Index] < 20;
-
-        bool isICHEPmedium  = analysisTree->muon_isLoose[Index] &&
-                                          analysisTree->muon_validFraction[Index] >0.49 &&
-                                          analysisTree->muon_segmentComp[Index] > (goodGlob ? 0.303 : 0.451);
-        return isICHEPmedium;
+// select medium id or ICHEP medium id for different runs, in data
+// use ICHEP medium ID fro runs up to 278808 (end of Run2016F)
+// on MC, always apply medium ID
+bool isIdentifiedMediumMuon(int Index, const AC1B * analysisTree, bool isData){
+  bool isGoodMuon;
+  if (isData){
+	if (analysisTree->event_run<=278808) isGoodMuon= isICHEPmed(Index, analysisTree);
+    else isGoodMuon=analysisTree->muon_isMedium[Index]; 
+	}
+  else isGoodMuon=analysisTree->muon_isMedium[Index]; 
+  return isGoodMuon;
 }
-
-
 
 //compute the absolute isolation for a given lepton labeled by Index in channel ch
 float abs_Iso (int Index, TString ch, const AC1B * analysisTree, float dRiso){
@@ -1272,7 +1306,7 @@ void FillETau(const AC1B * analysisTree, Spring15Tree *otree, int leptonIndex, f
   otree->gen_match_1 = analysisTree->electron_genmatch[leptonIndex];
 
   otree->iso_1 =  abs_Iso(leptonIndex, "et", analysisTree, dRiso) /analysisTree->electron_pt[leptonIndex];
-  otree->mva_1 = analysisTree->electron_mva_value_nontrig_Spring15_v1[leptonIndex];
+  otree->mva_1 = analysisTree->electron_mva_value_Spring16_v1[leptonIndex];//analysisTree->electron_mva_value_nontrig_Spring15_v1[leptonIndex];
 
 	otree->d0_1 = analysisTree->electron_dxy[leptonIndex];
 	otree->dZ_1 = analysisTree->electron_dz[leptonIndex];
@@ -1443,7 +1477,7 @@ bool extra_electron_veto(int leptonIndex, TString ch, const Config *cfg, const A
     if (fabs(analysisTree->electron_dxy[ie])>=cfg->get<float>("dxyVetoElectronCut")) continue;
     if (fabs(analysisTree->electron_dz[ie])>=cfg->get<float>("dzVetoElectronCut")) continue;
 
-    bool electronMvaId = analysisTree->electron_mva_wp90_nontrig_Spring15_v1[ie];
+    bool electronMvaId = analysisTree->electron_mva_wp90_general_Spring16_v1[ie]; //analysisTree->electron_mva_wp90_nontrig_Spring15_v1[ie];
     if (!electronMvaId && cfg->get<bool>("applyVetoElectronId")) continue;
     if (!analysisTree->electron_pass_conversion[ie] && cfg->get<bool>("applyVetoElectronId")) continue;
     if (analysisTree->electron_nmissinginnerhits[ie]>1 && cfg->get<bool>("applyVetoElectronId")) continue;

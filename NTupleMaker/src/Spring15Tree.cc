@@ -168,6 +168,9 @@ void Spring15Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("againstElectronVTightMVA5_1", &againstElectronVTightMVA5_1, &b_againstElectronVTightMVA5_1);
    fChain->SetBranchAddress("againstMuonLoose3_1", &againstMuonLoose3_1, &b_againstMuonLoose3_1);
    fChain->SetBranchAddress("againstMuonTight3_1", &againstMuonTight3_1, &b_againstMuonTight3_1);
+   fChain->SetBranchAddress("n_badmuons", &n_badmuons, &b_n_badmuons);
+   fChain->SetBranchAddress("n_duplicatemuons", &n_duplicatemuons, &b_n_duplicatemuons);
+
    fChain->SetBranchAddress("byCombinedIsolationDeltaBetaCorrRaw3Hits_2", &byCombinedIsolationDeltaBetaCorrRaw3Hits_2, &b_byCombinedIsolationDeltaBetaCorrRaw3Hits_2);
    fChain->SetBranchAddress("byLooseCombinedIsolationDeltaBetaCorr3Hits_2", &byLooseCombinedIsolationDeltaBetaCorr3Hits_2, &b_byLooseCombinedIsolationDeltaBetaCorr3Hits_2);
    fChain->SetBranchAddress("byMediumCombinedIsolationDeltaBetaCorr3Hits_2", &byMediumCombinedIsolationDeltaBetaCorr3Hits_2, &b_byMediumCombinedIsolationDeltaBetaCorr3Hits_2);
@@ -480,6 +483,9 @@ void Spring15Tree::WriteInit(TTree *tree) {
   fChain->Branch("againstElectronVTightMVA5_1", &againstElectronVTightMVA5_1, "againstElectronVTightMVA5_1/F");
   fChain->Branch("againstMuonLoose3_1", &againstMuonLoose3_1, "againstMuonLoose3_1/F");
   fChain->Branch("againstMuonTight3_1", &againstMuonTight3_1, "againstMuonTight3_1/F");
+
+  fChain->Branch("n_badmuons", &n_badmuons, "n_badmuons/i");
+  fChain->Branch("n_duplicatemuons", &n_duplicatemuons, "n_duplicatemuons/i");
   
   fChain->Branch("byCombinedIsolationDeltaBetaCorrRaw3Hits_2", &byCombinedIsolationDeltaBetaCorrRaw3Hits_2, "byCombinedIsolationDeltaBetaCorrRaw3Hits_2/F");
   fChain->Branch("byLooseCombinedIsolationDeltaBetaCorr3Hits_2", &byLooseCombinedIsolationDeltaBetaCorr3Hits_2, "byLooseCombinedIsolationDeltaBetaCorr3Hits_2/F");

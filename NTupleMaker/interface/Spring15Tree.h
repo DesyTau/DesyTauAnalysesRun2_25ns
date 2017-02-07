@@ -140,6 +140,8 @@ public :
   Float_t 	  againstElectronTightMVA6_2;
   Float_t         againstMuonLoose3_1;
   Float_t         againstMuonTight3_1;
+  UInt_t          n_badmuons;
+  UInt_t          n_duplicatemuons;
   Float_t         byCombinedIsolationDeltaBetaCorrRaw3Hits_2;
   Float_t         byLooseCombinedIsolationDeltaBetaCorr3Hits_2;
   Float_t         byMediumCombinedIsolationDeltaBetaCorr3Hits_2;
@@ -370,6 +372,8 @@ public :
   TBranch        *b_againstElectronVTightMVA5_1;   //!
   TBranch        *b_againstMuonLoose3_1;   //!
   TBranch        *b_againstMuonTight3_1;   //!
+  TBranch        *b_n_badmuons;
+  TBranch        *b_n_duplicatemuons;
   TBranch        *b_byCombinedIsolationDeltaBetaCorrRaw3Hits_2;   //!
   TBranch        *b_byLooseCombinedIsolationDeltaBetaCorr3Hits_2;   //!
   TBranch        *b_byMediumCombinedIsolationDeltaBetaCorr3Hits_2;   //!
