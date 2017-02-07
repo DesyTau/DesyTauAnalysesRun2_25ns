@@ -430,18 +430,18 @@ float SusyLSPMassF;
 
 //SMS-TChiSlepSnu_x0p5_TuneCUETP8M1_13TeV-madgraphMLM-pythia8   SMS-TChiStauStau_x0p5_TuneCUETP8M1_13TeV-madgraphMLM-pythia8  SMS-TStauStau_TuneCUETP8M1_13TeV-madgraphMLM-pythia8
 
-/*
 if (string::npos != rootFileName.find("SMS-") || string::npos != rootFileName.find("stau") || string::npos != rootFileName.find("C1"))
 	{
 	//st1 =  rootFileName.substr(4,3);
-	SusyMotherMassF = stof(argv[5]);
+	//SusyMotherMassF = stof(argv[5]);
 	//st1=string(argv[5]);
 	//st2 =  rootFileName.substr(11);
 	//st2=string(argv[6]);
-	SusyLSPMassF = stof(argv[6]);
+	//SusyLSPMassF = stof(argv[6]);
 	SUSY = true;
 	  std::cout <<" SUSY "<< " SusyMotherMassF= "<<SusyMotherMassF <<" SusyLSPMassF= "<<SusyLSPMassF <<std::endl;  
 	}
+/*
 if (string::npos != rootFileName.find("SMS-TChiStauStau"))
 	{
 	st1 =  rootFileName.substr(5,3);
@@ -947,6 +947,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
 
       histTopPt->Fill(0.,topptweight);
+      histTopPtSq->Fill(0.,topptweight*topptweight);
 
 	}
 	  if (!isData ) {
@@ -1196,8 +1197,6 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
       float isoMuMin = 1e+10;
       float isoEleMin = 1e+10;
-      //      if (muons.size()>1 && electrons.size()>1)
-      //      std::cout << "muons = " << muons.size() << "  electrons = " << electrons.size() << std::endl;
 
       bool isMuon23matched = false;
       bool isMuon8matched  = false;
@@ -1350,14 +1349,13 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
       if ((int)el_index<0) continue;
       if ((int)mu_index<0) continue;
-      //      std::cout << "Post synch selection " << std::endl;
-      //      std::cout << std::endl;
 
 
-     // if (isoEleMin>0.3 || isoMuMin>0.4) continue;
 
       el_relIso[0]=isoEleMin;
       mu_relIso[0]=isoMuMin;
+
+      if (isoEleMin>0.4 || isoMuMin>0.4) continue;
       
       double q = analysisTree.electron_charge[el_index] * analysisTree.muon_charge[mu_index];
       event_sign  = q;
@@ -1666,7 +1664,6 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       	
 	bool btagged= (analysisTree.pfjet_btag[jet][0]  > bTag);
 	
-/*
 	  if (!isData) {
 	    int flavor = abs(analysisTree.pfjet_flavour[jet]);
 
@@ -1713,7 +1710,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	      }
 	    }
 	  } //is Data
-*/
+
 	  if (btagged && cleanedJet) bjets.push_back(jet);
 	}
 
@@ -1954,6 +1951,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
   inputEventsH->Write();
   histWeightsH->Write();
   histTopPt->Write();
+  histTopPtSq->Write();
   histRuns->Write();
   CutFlowUnW->Write();
   CutFlow->Write();

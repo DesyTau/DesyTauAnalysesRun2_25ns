@@ -398,18 +398,18 @@ float SusyLSPMassF;
 
 //SMS-TChiSlepSnu_x0p5_TuneCUETP8M1_13TeV-madgraphMLM-pythia8   SMS-TChiStauStau_x0p5_TuneCUETP8M1_13TeV-madgraphMLM-pythia8  SMS-TStauStau_TuneCUETP8M1_13TeV-madgraphMLM-pythia8
 
-/*
 if (string::npos != rootFileName.find("SMS-") || string::npos != rootFileName.find("stau") || string::npos != rootFileName.find("C1"))
 	{
 	//st1 =  rootFileName.substr(4,3);
-	SusyMotherMassF = stof(argv[5]);
+	//SusyMotherMassF = stof(argv[5]);
 	//st1=string(argv[5]);
 	//st2 =  rootFileName.substr(11);
 	//st2=string(argv[6]);
-	SusyLSPMassF = stof(argv[6]);
+	//SusyLSPMassF = stof(argv[6]);
 	SUSY = true;
 	  std::cout <<" SUSY "<< " SusyMotherMassF= "<<SusyMotherMassF <<" SusyLSPMassF= "<<SusyLSPMassF <<std::endl;  
 	}
+/*
 if (string::npos != rootFileName.find("SMS-TChiStauStau"))
 	{
 	st1 =  rootFileName.substr(5,3);
@@ -748,13 +748,6 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 					      analysisTree.genparticles_pz[igen],
 					      analysisTree.genparticles_e[igen]);
 
-	  if (analysisTree.genparticles_pdgid[igen]==6)
-	    topPt = TMath::Sqrt(analysisTree.genparticles_px[igen]*analysisTree.genparticles_px[igen]+
-				analysisTree.genparticles_py[igen]*analysisTree.genparticles_py[igen]);
-
-	  if (analysisTree.genparticles_pdgid[igen]==-6)
-	    antitopPt = TMath::Sqrt(analysisTree.genparticles_px[igen]*analysisTree.genparticles_px[igen]+
-				    analysisTree.genparticles_py[igen]*analysisTree.genparticles_py[igen]);
 
 	  if (analysisTree.genparticles_pdgid[igen]==22 && analysisTree.genparticles_status[igen]==44)
 	    isGSfound = true;
@@ -915,6 +908,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
 
       histTopPt->Fill(0.,topptweight);
+      histTopPtSq->Fill(0.,topptweight*topptweight);
 
 	}
 	  if (!isData ) {
@@ -1969,6 +1963,7 @@ if (!CutBasedTauId){
   inputEventsH->Write();
   histWeightsH->Write();
   histTopPt->Write();
+  histTopPtSq->Write();
   histRuns->Write();
   CutFlowUnW->Write();
   MuSF_IdIso_Mu1H->Write();

@@ -166,14 +166,15 @@ TH2D *histo = (TH2D*) obj;
 
 
 	TString fileinName = "/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/CMSSW_8_0_20/src/DesyTauAnalyses/NTupleMaker/test/CHANNELHERE/FILEIN";
-	if (systematic == "JetEnUp" || systematic == "JetEnDown" || systematic == "TauEnUp" || systematic == "TauEnDown" || systematic == "ElEnUp" || systematic == "ElEnDown" || systematic == "MuEnUp" || systematic == "MuEnDown") 
+	if (systematic == "JetEnUp" || systematic == "JetEnDown" || systematic == "UnclEnDown" || systematic == "UnclEnDown" || systematic == "TauEnUp" || systematic == "TauEnDown" || systematic == "ElEnUp" || systematic == "ElEnDown" || systematic == "MuEnUp" || systematic == "MuEnDown") 
 	{fileinName ="/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/CMSSW_8_0_20/src/DesyTauAnalyses/NTupleMaker/test/CHANNELHERE_"+systematic+"/FILEIN";}
 
 	TFile * filein = new TFile(fileinName,"read");
 
 	TH1D * histW = (TH1D*)filein->Get("eltau/histWeightsH");
-	TH1D * histTop ;
-	if (isTT) histTop = (TH1D*)filein->Get("eltau/histTopPt");
+	TH1D * histTop , *histTopSq;
+	if (isTT) histTop = (TH1D*)filein->Get("mutau/histTopPt");
+	if (isTT && systematic == "TopPtUp" ) histTopSq = (TH1D*)filein->Get("mutau/histTopPtSq");
 	
 	TH1D * CutFlow = (TH1D*)filein->Get("eltau/CutFlowUnW");
 	TFile * file = new TFile("plots.root","recreate");
@@ -190,21 +191,6 @@ TH2D *histo = (TH2D*) obj;
 	SetupHists(CutNumb);
 
 	Long64_t nbytes = 0, nb = 0;
-/*	if (isTT){
-	TH1D * histTopPt = new TH1D("histTopPt","",1,0,0);
-		for (Long64_t jen=0; jen<nentries;jen++) {
-
-			Long64_t ientry = LoadTree(jen);
-			nb = fChain->GetEntry(jen);  
-//			cout<<"  "<<top_weight<<endl;
-			histTopPt->Fill(0.,top_weight);
-		}	
-		
-
-			top_w = histTopPt->GetMean();
-	cout<<" there is a TTbar sample and the Mean weight from topPt is "<<top_w<<"  "<<histTopPt->GetSumOfWeights()<<endl;
-	}
-*/
 
 
 	for (Long64_t jentry=0; jentry<nentries;jentry++) {
@@ -310,7 +296,7 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
 		
 //		cout <<"  "<<el_isMVA[electron_index]<<"  "<<eleMVA<<endl;
 
-		if ( !el_isMVA[electron_index]  && !InvertLeptonIso) continue;
+//		if ( !el_isMVA[electron_index]  && !InvertLeptonIso) continue;
 
 		if ( fabs(el_charge[electron_index]) !=1 ) continue;
 		if ( fabs(ta_charge[taus_index]) !=1 ) continue;
@@ -614,6 +600,7 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
 		CutFlowUnW->Write();
 		histW->Write();
 	if (isTT) histTop->Write();
+	if (isTT && systematic == "TopPtUp"  ) histTopSq->Write();
 	//	hxsecW->Write();
 		file->Write();
 		file->Close();

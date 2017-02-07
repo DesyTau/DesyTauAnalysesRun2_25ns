@@ -522,6 +522,7 @@ class analyzer {
 				float MT = TMath::Sqrt(2*mu_pt[mIndex]*MetV.Pt()*(1-TMath::Cos(dPhi)));
 				hMT[CutIndex]->Fill(MT,EvWeight);
 				hMTmu[CutIndex]->Fill(MT,EvWeight);
+				hMTmuFineBin[CutIndex]->Fill(MT,EvWeight);
 					dPhi=dPhiFrom2P( tauV.Px(), tauV.Py(), MetV.Px(),  MetV.Py() );
 					float MTt = TMath::Sqrt(2*tauV.Pt()*MetV.Pt()*(1-TMath::Cos(dPhi)));
 					hMTsum[CutIndex]->Fill(MT+MTt,EvWeight);
@@ -883,6 +884,7 @@ class analyzer {
 
 				float MT = TMath::Sqrt(2*mu_pt[mIndex]*MetV.Pt()*(1-TMath::Cos(dPhi)));
 				hMTmu[CutIndex]->Fill(MT,EvWeight);
+				hMTmuFineBin[CutIndex]->Fill(MT,EvWeight);
 					dPhi=dPhiFrom2P( elV.Px(), elV.Py(), MetV.Px(),  MetV.Py() );
 					float MTel = TMath::Sqrt(2*elV.Pt()*MetV.Pt()*(1-TMath::Cos(dPhi)));
 					
@@ -1271,7 +1273,8 @@ class analyzer {
 				float MT = TMath::Sqrt(2*mu_pt[mIndex]*MetV.Pt()*(1-TMath::Cos(dPhi)));
 				hMT[CutIndex]->Fill(MT,EvWeight);
 				hMTmu[CutIndex]->Fill(MT,EvWeight);
-					dPhi=dPhiFrom2P( tauV.Px(), tauV.Py(), MetV.Px(),  MetV.Py() );
+				hMTmuFineBin[CutIndex]->Fill(MT,EvWeight);
+
 
 
 			if (JetsV.size()>0){
@@ -1487,7 +1490,10 @@ void FillHistsDiL(int CutIndex, Double_t EvWeight, TLorentzVector  LeptV1, TLore
 
 
 			if (Sel=="mumu"){
-
+           		
+				double Mt2as = 0;
+				double met = MetV.Pt();
+				double dzeta=-9999;
 				
 
 				double v1[4] = {LeptV1.Px(),LeptV1.Py(),LeptV1.Pz(),muonMass};
@@ -1757,9 +1763,9 @@ void FillHistsDiL(int CutIndex, Double_t EvWeight, TLorentzVector  LeptV1, TLore
 
 					TString ChainName = "/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/CMSSW_8_0_20/src/DesyTauAnalyses/NTupleMaker/test/CHANNELHERE/FILEIN/CHANNELHERE/T";
 					TString Tsystematic="SYSTEMATICHERE";
-					if (Tsystematic == "JetEnUp" || Tsystematic == "JetEnDown" || Tsystematic == "TauEnUp" || Tsystematic == "TauEnDown" || Tsystematic == "ElEnUp" || Tsystematic == "ElEnDown" || Tsystematic == "MuEnUp" || Tsystematic == "MuEnDown") 
-					{ChainName ="/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/CMSSW_8_0_20/src/DesyTauAnalyses/NTupleMaker/test/CHANNELHERE_"+Tsystematic+"/FILEIN/CHANNELHERE/T";}
-				
+					if (Tsystematic == "JetEnUp" || Tsystematic == "JetEnDown" || Tsystematic == "UnclEnDown" || Tsystematic == "UnclEnDown" || Tsystematic == "TauEnUp" || Tsystematic == "TauEnDown" || Tsystematic == "ElEnUp" || Tsystematic == "ElEnDown" || Tsystematic == "MuEnUp" || Tsystematic == "MuEnDown") 
+					ChainName ="/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/CMSSW_8_0_20/src/DesyTauAnalyses/NTupleMaker/test/CHANNELHERE_"+Tsystematic+"/FILEIN/CHANNELHERE/T";				
+
 					cout<<"  Will now chain "<<ChainName<<endl;
 					 chain->Add(ChainName);
 
@@ -1813,6 +1819,7 @@ void FillHistsDiL(int CutIndex, Double_t EvWeight, TLorentzVector  LeptV1, TLore
 
 			// Set branch addresses and branch pointers
 			if (!tree) return;
+	//		tree->SetMaxVirtualSize(1000000);
 			fChain = tree;
 			fCurrent = -1;
 			fChain->SetMakeClass(1);

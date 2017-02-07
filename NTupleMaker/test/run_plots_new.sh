@@ -34,9 +34,19 @@ channel2=$2
 btag="0.8484"
 
 
-systematics="Nominal JetEnUp JetEnDown UnclEnUp UnclEnDown TopPt ZPt TauEnUp TauEnDown ElEnUp ElEnDown MuEnUp MuEnDown"
-systematics="Nominal"
-#systematics="JetEnUp"
+#systematics="Nominal JetEnUp JetEnDown UnclEnUp UnclEnDown TopPt ZPtUp  ZPtDown TauEnUp TauEnDown ElEnUp ElEnDown MuEnUp MuEnDown"
+#systematics="Nominal"
+#systematics="TopPtUp TopPtDown"
+#systematics="Nominal  ZPtUp  ZPtDown"
+#systematics="Nominal JetEnUp JetEnDown UnclEnUp UnclEnDown TopPt ZPtUp  ZPtDown TauEnUp TauEnDown ElEnUp ElEnDown MuEnUp MuEnDown"
+#systematics="Nominal JetEnUp JetEnDown"
+
+
+systematics="$3"
+
+if [[  $3 == "list" ||  $3 == "all" ]];then
+systematics="Nominal JetEnUp JetEnDown TopPtUp TopPtDown ZPtUp ZPtDown TauEnUp TauEnDown ElEnUp ElEnDown MuEnUp MuEnDown UnclEnUp UnclEnDown"
+fi
 
 
 if [[ -z $3 ]];then
@@ -64,12 +74,18 @@ fi
 while read line
 do
 
+unset isDataSyst
+export isDataSyst=0
+
+unset isSystTopZpt
+export isSystTopZPt=0
+
+
 for syst in $systematics
 do
 
 unset file
 file=`echo $line | cut -d '/' -f2`
-
 unset fileB
 fileB=`echo $file | awk -F "_B_OS" '{print $1}'`
 	
@@ -78,6 +94,26 @@ cd dir_${file}_${channel}_$syst
 echo ==============================================
 pwd
 echo ==============================================
+
+
+if [[ $file == *"Single"* || $file == *"MuonEG"* ]] && [[ $syst != "Nominal" ]]; then
+
+	echo For data we dont run systematics....
+isDataSyst=1
+fi
+
+
+#######Do something is systematic is the TopPt or ZPt Up/Down
+
+if [[  $syst -eq "TopPtUp" || $syst -eq "TopPtDown" || $syst -eq "ZPtUp" || $syst -eq "ZPtDown" ]]; then
+
+isSystTopZPt=1
+
+fi
+
+
+
+if [[ ${isDataSyst} != 1 ]] ; then
 
 if [[ $line == *"stau"* || $line == *"C1"* ]] ; then
 lsp=`echo $line | awk -F "_LSP" '{print $2}' | cut -d '_' -f1`
@@ -102,9 +138,6 @@ cp $dir/runme.C .
 cp $dir/plots.h .
 
 
-
-
-#if [[ $syst != "Nominal" ]]; then
 
 export fileB=${fileB}_${syst}
 #fi
@@ -179,8 +212,8 @@ fi
 
 ######### A region non inverted SS
 
-if [[ ! -f $dir/plots_$channel/${fileB}_A.root ]] && [[ $file != *"stau"* && $file != *"C1"*  ]] && [[ $2 != "TTemplate" ]] && [[ $2 != "mumu" ]] && [[ $2 != "WJETSMU" ]]; then
-#if [[ ! -f $dir/plots_$channel/${fileB}_A.root ]]  &&  [[ $2 != "TTemplate" ]] && [[ $2 != "mumu" ]]  && [[ $file == *"stau"*  || $file == *"C1"* ]]; then
+if [[ ! -f $dir/plots_$channel/${fileB}_A.root ]] && [[ $file != *"stau"* && $file != *"C1"*  ]] && [[ $2 != "Ttemplate" ]] && [[ $2 != "mumu" ]] && [[ $2 != "WJETSMU" ]]; then
+#if [[ ! -f $dir/plots_$channel/${fileB}_A.root ]]  &&  [[ $2 != "Ttemplate" ]] && [[ $2 != "mumu" ]]  && [[ $file == *"stau"*  || $file == *"C1"* ]]; then
 cp analyzer_h analyzer.h
 cp analyzer${channel}_C analyzer.C
 
@@ -208,7 +241,7 @@ fi
 
 
 ######## D region
-if [[ ! -f $dir/plots_$channel/${fileB}_D.root ]] &&  [[ $file != *"stau"*  && $file != *"C1"* ]] && [[ $2 != "TTemplate" ]] && [[ $2 != "mumu" ]] && [[ $2 != "WJETSMU" ]]; then
+if [[ ! -f $dir/plots_$channel/${fileB}_D.root ]] &&  [[ $file != *"stau"*  && $file != *"C1"* ]] && [[ $2 != "Ttemplate" ]] && [[ $2 != "mumu" ]] && [[ $2 != "WJETSMU" ]]; then
 cp analyzer${channel}_C analyzer.C
 cp analyzer_h analyzer.h
 
@@ -231,7 +264,7 @@ fi
 
 
 ####### C region
-if [[ ! -f $dir/plots_$channel/${fileB}_C.root ]] &&  [[ $file != *"stau"* && $file != *"C1"*  ]] && [[ $2 != "TTemplate" ]] && [[ $2 != "mumu" ]] && [[ $2 != "WJETSMU" ]]; then
+if [[ ! -f $dir/plots_$channel/${fileB}_C.root ]] &&  [[ $file != *"stau"* && $file != *"C1"*  ]] && [[ $2 != "Ttemplate" ]] && [[ $2 != "mumu" ]] && [[ $2 != "WJETSMU" ]]; then
 cp analyzer${channel}_C analyzer.C
 cp analyzer_h analyzer.h
 
@@ -259,6 +292,8 @@ fi
 
 cd ${dir}
 
-#rm -fr dir_${file}_${channel}_$syst
+rm -fr dir_${file}_${channel}_$syst
+
+fi
 done
 done<$1

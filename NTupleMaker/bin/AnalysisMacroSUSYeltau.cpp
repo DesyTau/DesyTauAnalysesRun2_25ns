@@ -372,18 +372,18 @@ bool SUSY = false;
 float SusyMotherMassF;
 float SusyLSPMassF;
 
-/*
 if (string::npos != rootFileName.find("SMS-") || string::npos != rootFileName.find("stau") || string::npos != rootFileName.find("C1"))
 	{
 	//st1 =  rootFileName.substr(4,3);
-	SusyMotherMassF = stof(argv[5]);
+	//SusyMotherMassF = stof(argv[5]);
 	//st1=string(argv[5]);
 	//st2 =  rootFileName.substr(11);
 	//st2=string(argv[6]);
-	SusyLSPMassF = stof(argv[6]);
+	//SusyLSPMassF = stof(argv[6]);
 	SUSY = true;
 	  std::cout <<" SUSY "<< " SusyMotherMassF= "<<SusyMotherMassF <<" SusyLSPMassF= "<<SusyLSPMassF <<std::endl;  
 	}
+/*
 if (string::npos != rootFileName.find("SMS-TChiStauStau"))
 	{
 	st1 =  rootFileName.substr(5,3);
@@ -896,6 +896,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
 
       histTopPt->Fill(0.,topptweight);
+      histTopPtSq->Fill(0.,topptweight*topptweight);
 
 	}
 	  if (!isData ) {
@@ -1913,6 +1914,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
   inputEventsH->Write();
   histWeightsH->Write();
   histTopPt->Write();
+  histTopPtSq->Write();
   histRuns->Write();
   CutFlowUnW->Write();
   ElSF_IdIso_El1H->Write();

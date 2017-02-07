@@ -22,6 +22,9 @@
 #$ -V
 #
 
+systematics="Nominal JetEnUp JetEnDown TauEnUp TauEnDown ElEnUp ElEnDown MuEnUp MuEnDown UnclEnUp UnclEnDown"
+systematics="Nominal JetEnUp JetEnDown TauEnUp TauEnDown ElEnUp ElEnDown MuEnUp MuEnDown UnclEnUp UnclEnDown TopPtUp TopPtDown ZPtUp ZPtDown"
+#systematics="TauEnUp TauEnDown ElEnUp ElEnDown MuEnUp MuEnDown"
 
 cd /nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/CMSSW_8_0_20/src/DesyTauAnalyses/NTupleMaker/test;eval `scramv1 runtime -sh` ;
 
@@ -36,23 +39,28 @@ channel=$2
 while read line
 do
 
+if [[  -z "$3" || $3 == "Nominal" ]] ;then
+systematics="Nominal"
+fi
 
-	
+if [[  $3 == "list" ]] ;then
+systematics="list"
+fi
+
+
 lt=`echo $line | cut -d '/' -f2`
 
 
 	echo $lt > list_$lt
 	
+	for syst in $systematics
+	do
 	
 
-		echo  plots for channel $3 
-	 	qsub -N p$2 -l h_rt=1:30:00 -l h_cpu=2000M run_plots_new.sh list_$lt $2 
-	 	#qsub -N pA$3 run_plots_A.sh list_$lt $3
-	 	#qsub -N pB$3 run_plots_B.sh list_$lt $3
-	 	#qsub -N pC$3 run_plots_C.sh list_$lt $3
-	 	#qsub -N pD$3 run_plots_D.sh list_$lt $3
+		echo  plots for channel $2 and syst $syst and $lt 
+	 	qsub -N p$2 -l h_rt=1:30:00 -l h_cpu=2000M run_plots_new.sh list_$lt $2 $syst
 
 
-
+	done
 done<$1
 

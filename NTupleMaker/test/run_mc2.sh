@@ -13,19 +13,29 @@ channel=$2
 
 ##type MC or Data
 type=MC
-
-systematics="Nominal JetEnUp JetEnDown TauEnUp TauEnDown ElEnUp ElEnDown MuEnUp MuEnDown"
-
-systematics="Nominal"
+#systematics="Nominal"
+#systematics="Nominal"
 
 syst=$3
 
+if [[ $3 == "all" || $3 == "All"  ]];then
+systematics="Nominal JetEnUp JetEnDown TauEnUp TauEnDown ElEnUp ElEnDown MuEnUp MuEnDown UnclEnUp UnclEnDown"
 
-export dir=${2}_${3}
+fi
 
 if [[ -z $3  ]];then
 systematics="Nominal"
+syst="1"
 fi
+
+cp *.conf Jobs/.
+
+for syst in $systematics
+do
+
+
+export dir=${2}_${syst}
+
 
 if [[ $syst == "Nominal" ]] || [[ -z $3  ]];then
 export	dir=${channel}
@@ -33,12 +43,11 @@ fi
 
 
 
-cp *.conf Jobs/.
 
 while read line
 do
 
-ct=`ls ${dir}/${line}*.root | wc -l`
+ct=`ls ${dir}/${line}_*.root | wc -l`
 ctt=`cat ${dir}/${line} | wc -l`
 
 
@@ -90,4 +99,4 @@ fi
 
 done<$dir/${line}
 done<$1
-
+done

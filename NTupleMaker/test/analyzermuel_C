@@ -46,24 +46,24 @@ void analyzer::Loop(){
 
 	if (fChain == 0) return;
 	CutList.clear();
-	CutList.push_back("No cut");
-	CutList.push_back("No cut after PU");
-	CutList.push_back("mu-el");
-	CutList.push_back("3rd lepV");
-	CutList.push_back("Trigger SF");
-	CutList.push_back("Lepton SF");
-	CutList.push_back("MET recoil");
-	CutList.push_back("ZpT correction");
+	CutList.push_back("Nocut");
+	CutList.push_back("PU");
+	CutList.push_back("e#mu");
+	CutList.push_back("3rdlepV");
+	CutList.push_back("TriggerSF");
+	CutList.push_back("LeptonSF");
+	CutList.push_back("METrecoil");
+	CutList.push_back("ZpTcorrection");
 	CutList.push_back("topPtRwgt");
-	CutList.push_back("Jets lt 1");
-	CutList.push_back("0btag");
-	CutList.push_back("Mass window");
-	CutList.push_back("Cuts");	
-	CutList.push_back("Cuts2");	
-	CutList.push_back("Stau Cuts");	
-        CutList.push_back("MET gt 20");
-        CutList.push_back("MET gt 30");
-	CutList.push_back("MET gt 40");
+	CutList.push_back("Jets<2");
+	CutList.push_back("btag=0");
+	CutList.push_back("Masswindow");
+	CutList.push_back("SRCuts");	
+	CutList.push_back("JetsCuts");	
+	CutList.push_back("StauCuts");	
+        CutList.push_back("MET>20");
+        CutList.push_back("MET>30");
+        CutList.push_back("MET>40");
 	CutList.push_back("MTsum>120");
 
 
@@ -165,7 +165,7 @@ TH2D *histo = (TH2D*) obj;
 
 
 	TString fileinName = "/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/CMSSW_8_0_20/src/DesyTauAnalyses/NTupleMaker/test/CHANNELHERE/FILEIN";
-	if (systematic == "JetEnUp" || systematic == "JetEnDown" || systematic == "TauEnUp" || systematic == "TauEnDown" || systematic == "ElEnUp" || systematic == "ElEnDown" || systematic == "MuEnUp" || systematic == "MuEnDown") 
+	if (systematic == "JetEnUp" || systematic == "JetEnDown" || systematic == "UnclEnDown" || systematic == "UnclEnDown" || systematic == "TauEnUp" || systematic == "TauEnDown" || systematic == "ElEnUp" || systematic == "ElEnDown" || systematic == "MuEnUp" || systematic == "MuEnDown") 
 	{fileinName ="/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/CMSSW_8_0_20/src/DesyTauAnalyses/NTupleMaker/test/CHANNELHERE_"+systematic+"/FILEIN";}
 
 
@@ -294,14 +294,22 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
 
 
 		if ( (el_relIso[0] > 0.1 || mu_relIso[0] > 0.15) && !InvertLeptonIso) continue;
-		if ( (el_relIso[0] < 0.1 || mu_relIso[0] < 0.15) && InvertLeptonIso) continue;
-		if ( el_relIso[0] > 0.2 || mu_relIso[0] > 0.3) continue;
+		if ( (el_relIso[0] < 0.1 ||  mu_relIso[0] < 0.15) && InvertLeptonIso) continue;
+	//	if ( el_relIso[0] > 0.1 && !InvertLeptonIso) continue;
+	//	if ( mu_relIso[0] < 0.15 && InvertLeptonIso) continue;
+		
+		if ( el_relIso[0] > 0.2 ) continue;
+		if ( mu_relIso[0] > 0.3) continue;
 
 		///remove from the all_weight the LSF  + TFR + top +trig_weig
 
 		if ( fabs(el_charge[electron_index]) !=1 ) continue;
 		if ( fabs(mu_charge[muon_index]) !=1 ) continue;
 
+                 double Dr=deltaR(ElV.Eta(),ElV.Phi(),
+					MuV.Eta(), MuV.Phi());
+	//	if (Dr>3.5 && !InvertLeptonIso) continue;
+		if (Dr<3.5 && InvertLeptonIso) continue;
 
 		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
 		CFCounter[iCut]+= all_weights;
@@ -435,15 +443,13 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
 		iCut++;
 
 		 TLorentzVector DiLL = MuV + ElV ;
-		if (DiLL.M() > 30. && DiLL.M() < 100. ) continue;
+		if (DiLL.M() > 30. && DiLL.M() < 90. ) continue;
 		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
 		CFCounter[iCut]+= all_weights;
 		CFCounter_[iCut]+= all_weights;
                 iCFCounter[iCut]++;
 		iCut++;
 
-                 double Dr=deltaR(ElV.Eta(),ElV.Phi(),
-					MuV.Eta(), MuV.Phi());
 
 		double dEta = MuV.Eta() - ElV.Eta();
 
@@ -459,12 +465,12 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
 		double dEtaJMu = -1.; if (JetsMV.size()>0) dEtaJMu = JetsMV.at(0).Eta() - MuV.Eta();
 		double dEtaJEl = -1.; if (JetsMV.size()>0) dEtaJEl = JetsMV.at(0).Eta() - ElV.Eta();
 
-		if (Dr>3.5) continue;
-		if (fabs(dEta)>2) continue;
+		if (fabs(dEta)>2 &&  !InvertLeptonIso) continue;
 		if (DiLL.M()<20.) continue;
 		if (MTsum<30.) continue;
 		if (MuV.Pt()>200) continue;
 		if (ElV.Pt()>200) continue;
+		if (Dr>3.5 && !InvertLeptonIso) continue;
 
 		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
 		CFCounter[iCut]+= all_weights;
@@ -486,11 +492,14 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
 		if ( fabs(el_dxy[electron_index]) > 0.02) continue;
 		if ( fabs(mu_dz[muon_index]) > 0.04) continue;
 		if ( fabs(mu_dxy[muon_index]) > 0.02) continue;
-		if (fabs(dEta)>1.5) continue;
+
+		if (fabs(dEta)>1.5 && !InvertLeptonIso) continue;
+		if (fabs(dEta)<2 && InvertLeptonIso) continue;
 		if (dPhiDiL<1.5) continue;
 		if (dPhiDiL>3.2) continue;
 		if (Dr<2.) continue;
-		if (Dr>3.2) continue;
+		if (Dr>3.2 && !InvertLeptonIso) continue;
+		if (Dr<3.5 && InvertLeptonIso) continue;
 
 		if (DiLL.M()<50.) continue;
 		if (MTsum<50.) continue;
