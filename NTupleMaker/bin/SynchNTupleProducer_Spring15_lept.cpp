@@ -88,7 +88,7 @@ void FillTau(const AC1B * analysisTree, Spring15Tree *otree, int tauIndex);
 bool dilepton_veto_mt(const Config *cfg, const AC1B *analysisTree);
 bool dilepton_veto_et(const Config *cfg, const AC1B *analysisTree);
 bool extra_electron_veto(int leptonIndex, TString ch, const Config *cfg, const AC1B *analysisTree);
-bool extra_muon_veto(int leptonIndex, TString ch, const Config *cfg, const AC1B *analysisTree);
+bool extra_muon_veto(int leptonIndex, TString ch, const Config *cfg, const AC1B *analysisTree, bool isData);
 void fillMET(TString ch, int leptonIndex, int tauIndex, const AC1B * analysisTree, Spring15Tree *otree);
 void mt_calculation(Spring15Tree *otree);
 //void counting_jets(const AC1B *analysisTree, Spring15Tree *otree, const Config *cfg, const btag_scaling_inputs *inputs);
@@ -955,7 +955,7 @@ int main(int argc, char * argv[]){
 
 	  //extra letpn veto
 	  otree->extraelec_veto = extra_electron_veto(leptonIndex, ch, &cfg, &analysisTree);
-      otree->extramuon_veto = extra_muon_veto(leptonIndex, ch, &cfg, &analysisTree);
+      otree->extramuon_veto = extra_muon_veto(leptonIndex, ch, &cfg, &analysisTree, isData);
 
 
       // define MET covariance
@@ -1491,7 +1491,7 @@ bool extra_electron_veto(int leptonIndex, TString ch, const Config *cfg, const A
 }			
 
 //returns the extra muon veto
-bool extra_muon_veto(int leptonIndex, TString ch, const Config *cfg, const AC1B *analysisTree){
+bool extra_muon_veto(int leptonIndex, TString ch, const Config *cfg, const AC1B *analysisTree, bool isData){
 
   for (unsigned int im = 0; im<analysisTree->muon_count; ++im) {
 
@@ -1502,7 +1502,7 @@ bool extra_muon_veto(int leptonIndex, TString ch, const Config *cfg, const AC1B 
     if (fabs(analysisTree->muon_dxy[im])>cfg->get<float>("dxyVetoMuonCut")) continue;
     if (fabs(analysisTree->muon_dz[im])>cfg->get<float>("dzVetoMuonCut")) continue;
 
-    if (cfg->get<bool>("applyVetoMuonId") && !(isICHEPmed(im, analysisTree))) continue;
+    if (cfg->get<bool>("applyVetoMuonId") && !(isIdentifiedMediumMuon(im,analysisTree,isData)) ) continue;
     float relIsoMu = rel_Iso(im, "mt", analysisTree, cfg->get<float>("dRisoExtraMuonVeto"));
     if (relIsoMu>cfg->get<float>("isoVetoMuonCut")) continue;
 
