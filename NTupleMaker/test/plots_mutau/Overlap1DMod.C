@@ -56,7 +56,7 @@ int mycolordyj=TColor::GetColor("#ffcc66");
 int col = -1;
 
 void Impose( TDirectory *ttarget, TList *ssourcelist, string &np_legend , vector<string> titles_ ,vector<float> xsecs);
-void Impose (TList * sourcel, string & np_title, vector<string> title,vector<float> xsecs, TString &variable, TString &syst);
+void Impose (TList * sourcel, string & np_title, vector<string> title,vector<float> xsecs, TString &variable, string &syst);
 	
 void ModifyHist (TH1D* &h1, int cl ,float & lumi_,float & weight_,string & title, bool norm=false);
 void OverFlow (TH1D* &h, int bin);
@@ -97,14 +97,15 @@ void Overlap1DMod(string syst="Nominal")
 		xs=0;fact=1;fact2=1;fact3=1;
 		iss >> dataname >> xs >> fact >> fact2 >> fact3;
 		if (std::string::npos != dataname.find("Single") || std::string::npos != dataname.find("MuonEG") || syst=="Nominal" ) {titles.push_back(dataname+"_B.root");}
-		else { titles.push_back(dataname+"_"+syst+"_B.root"); cout<<dataname+"_"+syst+"_B.root"<<endl;}
+		else { titles.push_back(dataname+"_"+syst+"_B.root"); //cout<<dataname+"_"+syst+"_B.root"<<endl;
+		}
 		
 		//titles.push_back(dirr+dataname+"_"+syst+"_B.root"); 
 		//cout<<dataname+"_"+syst+"_B.root"<<endl;
 
 		//titles.push_back(dataname+"_B.root");
 		XSec= xs*fact*fact2*fact3;
-		cout<<" Found the correct cross section "<<xs<<" for Dataset "<<dataname<<" XSec "<<XSec<<"  "<<fact<<"  "<<fact2<<endl;
+		//cout<<" Found the correct cross section "<<xs<<" for Dataset "<<dataname<<" XSec "<<XSec<<"  "<<fact<<"  "<<fact2<<endl;
 		xsecs_.push_back(XSec);
 	}
 
@@ -142,8 +143,8 @@ void Overlap1DMod(string syst="Nominal")
 
 	string np_title = titles[0];
 	vector <string>  variables;
-	variables.push_back("met_MT2lester_DZeta0J1D_17");
-	variables.push_back("met_MT2lester_DZeta1J1D_17");
+	//variables.push_back("met_MT2lester_DZeta0J1D_17");
+	//variables.push_back("met_MT2lester_DZeta1J1D_17");
 	variables.push_back("met_MT2lester_DZeta01J1D_17");
 
 	syst_= syst.c_str();
@@ -153,7 +154,7 @@ void Overlap1DMod(string syst="Nominal")
 	variable=variables[vr].c_str();
 
 	cout<< " the variable name  "<<variable<<" syst "<<syst<<endl;
-	Impose (FileList, np_title,titles,xsecs_, variable,syst_);
+	Impose (FileList, np_title,titles,xsecs_, variable,syst);
 	}
 //	delete FileList;
 //	delete Target;
@@ -161,7 +162,7 @@ void Overlap1DMod(string syst="Nominal")
 
 
 void
-Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<float> xsecs, TString &variable, TString &syst)
+Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<float> xsecs, TString &variable, string &syst)
 {
 	cout << "	" << "========================================================" << endl;
 	cout << "	" << "This is a macro to superimpose plots of different root files." << endl;
@@ -345,16 +346,18 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 						if (!flagg)
 						{
 			if (std::string::npos != title_.find("JetsToLNu"))  { col=mycolorwj ; hwj->Add(h2,1); hwj->SetLineColor(col);}
-			if (std::string::npos != title_.find("TT_TuneCUETP8M1_13TeV-powheg-pythia8") || std::string::npos != title_.find("TTPow")) { col=kBlue;col= mycolortt;htt->Add(h2,1); htt->SetLineColor(col) ;}
+			if (std::string::npos != title_.find("TT_TuneCUETP8M1_13TeV-powheg-pythia8") || std::string::npos != title_.find("TTPow")) { col=kBlue;col= mycolortt;htt->Add(h2); htt->SetLineColor(col) ;}
 			if (std::string::npos != title_.find("QCD"))  {col= mycolorqcd;hqcd->Add(h2,1); hqcd->SetLineColor(col); cout<<" QCD ======================== "<<hqcd->GetSumOfWeights()<<endl;}
-			if (std::string::npos != title_.find("JetsToLL"))  {col= mycolordyj;hdyj->Add(h2,1); hdyj->SetLineColor(col);}
-			if (std::string::npos != title_.find("ST_") || std::string::npos != title_.find("channel") )  {col= mycolortt; hstop->Add(h2,1);hstop->SetLineColor(col);}
-			if ( std::string::npos != title_.find("WW") || std::string::npos != title_.find("ZZ") ||  std::string::npos != title_.find("WZ") || std::string::npos != title_.find("WG") || std::string::npos != title_.find("ZG") ) {col=mycolorvv; hdib->Add(h2,1); hdib->SetLineColor(col);}
-			if ( std::string::npos != title_.find("TTW") || std::string::npos != title_.find("TTZ") || std::string::npos != title_.find("tZq") || std::string::npos != title_.find("TG") || std::string::npos != title_.find("tG") || std::string::npos != title_.find("TTG") || std::string::npos != title_.find("ttW") || std::string::npos != title_.find("ttZ") || std::string::npos != title_.find("tZ") || std::string::npos != title_.find("TTT_") ) {col=mycolorttx ;httx->Add(h2,1);   httx->SetLineColor(col);}
+			if (std::string::npos != title_.find("JetsToLL"))  {col= mycolordyj;hdyj->Add(h2); hdyj->SetLineColor(col);}
+			if (std::string::npos != title_.find("ST_") || std::string::npos != title_.find("channel") )  {col= mycolortt; hstop->Add(h2);hstop->SetLineColor(col);}
+			if ( std::string::npos != title_.find("WW") || std::string::npos != title_.find("ZZ") ||  std::string::npos != title_.find("WZ") || std::string::npos != title_.find("WG") || std::string::npos != title_.find("ZG") ) {col=mycolorvv; hdib->Add(h2); hdib->SetLineColor(col);}
+			if ( std::string::npos != title_.find("TTW") || std::string::npos != title_.find("TTZ") || std::string::npos != title_.find("tZq") || std::string::npos != title_.find("TG") || std::string::npos != title_.find("tG") || std::string::npos != title_.find("TTG") || std::string::npos != title_.find("ttW") || std::string::npos != title_.find("ttZ") || std::string::npos != title_.find("tZ") || std::string::npos != title_.find("TTT_") ) {col=mycolorttx ;httx->Add(h2);   httx->SetLineColor(col);}
+
 
 
 							//cout<<" will add histogram "<<h2->GetName()<< " for "<<titles[cl-1]<<"  "<<fname<<"  cl  "<<cl<<endl;
 							hs->Add(h2);
+							hrest->Add(h2);
 							//allbkg->Add(h2,1);
 						}
 
@@ -393,11 +396,15 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 				float scale = float(scales[sc])/float(Lumi);
 
 				//stringstream ss (stringstream::in | stringstream::out);
+				string var ;
+				TString lumistring = "35invfb";
+				TString smFilename ; 
+				if (syst!="Nominal") smFilename =  "Templates_"+variable+"_"+lumistring+"_mt_C1N2_"+syst+".root";
+					else smFilename =  "Templates_"+variable+"_"+lumistring+"_mt_C1N2.root";
 
 				if (syst!="Nominal") 
 					variable=variable+"_"+syst;
-				TString lumistring = "35invfb";
-				TString smFilename = "Templates_"+variable+"_"+lumistring+"_mt_C1N2.root";
+
 				//TString smFilename = "Templates_mt.root";
 				TFile *smFile = TFile::Open (smFilename, "recreate");
 				
@@ -419,7 +426,7 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 				allbkg->SetName(s1);
 				cout<<" Total Integral before scaling up - "<<allbkg->GetSumOfWeights()<<"  "<<variable<<" data "<<hh[1]->GetSumOfWeights()<<" tt "<<
 					htt->GetSumOfWeights()<<" dy "<<hdyj->GetSumOfWeights()<<" wj "<<hwj->GetSumOfWeights()<<" stop "<<hstop->GetSumOfWeights()<<
-					" vv "<<hdib->GetSumOfWeights()<<" qcd "<<hqcd->GetSumOfWeights()<<endl;
+					" vv "<<hdib->GetSumOfWeights()<<" qcd "<<hqcd->GetSumOfWeights()<<" ttx "<<httx->GetSumOfWeights()<<endl;
 	if(b_scale)		allbkg->Scale(scale);
 				cout<<" Total Integral after scaling up - "<<allbkg->GetSumOfWeights()<<"  "<<variable<<endl;
 				allbkg->Write();
@@ -430,8 +437,8 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 
 				float bc_ = all_->GetBinContent(nb);
 
-				if (bc_<100000 &&  bc_>0) {
-					cout<<" will keep this bin "<<nb<<"  "<<all_->GetBinContent(nb)<<"  "<<keep_bin.size()<<endl;
+				if (bc_<100000 &&  bc_>0.) {
+				//	cout<<" will keep this bin "<<nb<<"  "<<all_->GetBinContent(nb)<<"  "<<keep_bin.size()<<endl;
 					keep_bin.push_back(nb);
 				}
 					}
@@ -466,6 +473,7 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 				hstop->Reset();
 				hdib->Reset();
 				hqcd->Reset();
+				hrest->Reset();
 				httx->Reset();
 				hh[1]->Reset();
 
@@ -476,6 +484,8 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 				hdib = (TH1D* )htest_dib->Clone();
 				hqcd = (TH1D* )htest_qcd->Clone();
 				httx = (TH1D* )htest_ttx->Clone();
+				hrest = (TH1D* )htest_dib->Clone();
+				hrest ->Add(httx,1);;
 				hh[1] = (TH1D* )htest_data->Clone();
 				
 				htt->SetLineColor(mycolortt);
@@ -485,6 +495,7 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 				hdib->SetLineColor(mycolorvv);
 				hqcd->SetLineColor(mycolorqcd);
 				httx->SetLineColor(mycolortt);
+				hrest->SetLineColor(kMagenta);
 				hh[1]->SetLineColor(kBlack);
 
 				TH1D* allnew_ = (TH1D* )htt->Clone();
@@ -508,10 +519,10 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 				
 				ss += htt->GetBinContent(nbb+1);
 
-					cout<<" new histos allnew_ "<<allnew_->GetNbinsX()<<"  "<<allnew_->GetBinContent(nbb+1)<<" sum "<<sum_<<"  "<<ss<<endl;
+	//				cout<<" new histos allnew_ "<<allnew_->GetNbinsX()<<"  "<<allnew_->GetBinContent(nbb+1)<<" sum "<<sum_<<"  "<<ss<<endl;
 			
 				}
-
+	
 				histbkg = allbkg;
 				
 				//hh[1] = allbkg;
@@ -529,6 +540,7 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 				hdib->Scale(scale);
 				hqcd->Scale(scale);
 				httx->Scale(scale);
+				hrest->Scale(scale);
 	 }
 
 				htt->SetMinimum(0.1);
@@ -538,10 +550,10 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 				hstop->SetMinimum(0.1);
 				hdib->SetMinimum(0.1);
 				hqcd->SetMinimum(0.1);
+				hrest->SetMinimum(0.1);
 
 				s1 = "tt_"+variable;
 				htt->SetLineColor(kBlue);
-				cout<<" color======================================================================== "<<mycolortt<<"  "<<col<<endl;
 				htt->SetName(s1);
 				htt->Write();
 				histbkg->Reset();
@@ -550,7 +562,6 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 				histbkg->SetLineColor(mycolortt);
 				histbkg->SetName(s1);
 				histbkg->Write();
-				cout<<" writing the histo tt "<<histbkg->Integral()<<endl;
 
 				s1 = "wj_"+variable;
 				hwj->SetLineColor(mycolorwj);
@@ -617,25 +628,28 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 				histbkg->SetLineColor(mycolorqcd);
 				histbkg->SetName(s1);
 				histbkg->Write();
+				cout<<" Adding htt ================= "<<hqcd->GetSumOfWeights()<<"  "<<histbkg->GetSumOfWeights()<<endl;
 
 				//rest of bkg hold all but ttjets and wjets background	
 				s1 = "rest_bkg_"+variable;
+				hrest->Reset();
+				hrest  = (TH1D*) hstop->Clone();
 				//hrest->Add(hdyj,1);
 				//hrest->Add(httj,1);
 				//hrest->Add(hwj,1);
-				hrest->Reset();
-				hrest = (TH1D* )hstop->Clone();
-				hrest->Add(hdib,1);
 				//hrest->Add(hqcd,1);
-				hrest->Add(httx,1);
-				hrest->SetName(s1);
+				//hrest->Add(hdib,1);
+				//hrest->Add(httx,1);
 				hrest->SetLineColor(kMagenta);
+				hrest->SetName(s1);
+				hrest->Write();
 				histbkg->Reset();
-				histbkg =(TH1D* )hrest->Clone();
+				histbkg =hrest;
 				s1 = "1D_rest_bkg_"+variable;
-				histbkg->SetName(s1);
 				histbkg->SetLineColor(kMagenta);
+				histbkg->SetName(s1);
 				histbkg->Write();
+				cout<<" Adding htt ================= "<<hrest->GetSumOfWeights()<<"  "<<histbkg->GetSumOfWeights()<<endl;
 				
 				hh[1] = allnew_;
 				hh[1]->SetMinimum(0.1);
@@ -647,12 +661,23 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 				hh[1]->SetName(s1);
 				hh[1]->Write();
 
-				cout<<" comparing MC to data  "<<allnew_->GetSumOfWeights()<<"  data  "<<hh[1]->GetSumOfWeights()<<endl;
+				cout<<" comparing MC to data  "<<allnew_->GetSumOfWeights()<<"  data  "<<hh[1]->GetSumOfWeights()<<" tt "<<htt->GetSumOfWeights()<<"  "<<" wj "<<hwj->GetSumOfWeights()<<" dyj "<<hdyj->GetSumOfWeights()<<" qcd "<<hqcd->GetSumOfWeights()<<" rest "<<hrest->GetSumOfWeights()<<endl;
 
 				for (unsigned int ij=0;ij<signal_names.size();++ij){
 					//cout<<" again  "<<signal_names[ij]<<endl;
 					//cout<<" again  "<<hh[ij+2]->GetName()<<"  "<<ij<<"  "<<signal_names[ij].c_str()<<endl;
-					TString ss1 = signal_names[ij].c_str();
+					string str = signal_names[ij];
+					string pattern = "_"+syst;
+					 std::string::size_type i = str.find(pattern);
+   					while (i != std::string::npos) {
+					str.erase(i, pattern.length());
+					     i = str.find(pattern, i);
+  					 }
+
+	//				cout<< " was  like ======= "<<signal_names[ij].c_str()<<" will be "<<str<<endl;
+
+
+					TString ss1 = str.c_str();
 					s1 = "1D_"+ss1 +"_"+variable;
 	if(b_scale)			hh[ij+2]->Scale(scale);
 					hh[ij+2]->SetLineColor(kBlue);
@@ -752,7 +777,7 @@ ModifyHist (TH1D* &h, int cl_ ,float & lumi,float & weight,string & title_, bool
 			for (int nb=1;nb<=h->GetNbinsX();++nb)
 			{
 				float bc_ = h->GetBinContent(nb);
-			if (bc_ > 0. && bc_ <0.1) h->SetBinContent(nb,0.1);
+			if (bc_ > 0. && bc_ <0.001) h->SetBinContent(nb,0.001);
 			}
 
 

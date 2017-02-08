@@ -392,7 +392,6 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
 		METV.SetPx(met_ex_recoil);
 		METV.SetPy(met_ey_recoil);
 		met=sqrt(met_ex_recoil*met_ex_recoil+met_ey_recoil*met_ey_recoil);
-		}
 
 	if (systematic =="JetEnUp")
 		{
@@ -420,6 +419,8 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
 		METV.SetPx(met_ex_UnclusteredEnDown_recoil);
 		METV.SetPy(met_ey_UnclusteredEnDown_recoil);
 		met = sqrt(met_ex_UnclusteredEnDown_recoil*met_ex_UnclusteredEnDown_recoil + met_ey_UnclusteredEnDown_recoil*met_ey_UnclusteredEnDown_recoil);
+		}
+
 		}
 
 
