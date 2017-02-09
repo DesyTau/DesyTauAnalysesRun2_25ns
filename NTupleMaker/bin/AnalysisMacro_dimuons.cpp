@@ -384,7 +384,7 @@ int main(int argc, char * argv[]) {
   TH1D * dimuonPtBoostedBvetoH = new TH1D("dimuonPtBoostedBvetoH","",100,0,1000);
 
   TH1D * leadingJetPtH  = new TH1D("leadingJetPtH","",50,0,500);
-  TH1D * leadingJetEtaH = new TH1D("leadingJetPtH","",100,-5,5);
+  TH1D * leadingJetEtaH = new TH1D("leadingJetEtaH","",100,-5,5);
   TH1D * leadingJetPhiH = new TH1D("leadingJetPhiH","",100,-TMath::Pi(),TMath::Pi());
   
   TString scales[21] = {"M10","M9","M8","M7","M6","M5","M4","M3","M2","M1","0",
@@ -1905,7 +1905,7 @@ int main(int argc, char * argv[]) {
 	}
 
 	// accessing Mva Met
-	
+	/*
 	bool mvaMetFound = false;
 	unsigned int metMuMu = 0; 
 	for (unsigned int iMet=0; iMet<analysisTree.mvamet_count; ++iMet) {
@@ -1934,11 +1934,11 @@ int main(int argc, char * argv[]) {
 	  mvamet = TMath::Sqrt(mvamet_ex2+mvamet_ey2);
 	  mvamet_phi = TMath::ATan2(mvamet_ey,mvamet_ex);
 	}
-	
-	//	float mvamet     = analysisTree.pfmet_pt;
-	//	float mvamet_ex  = analysisTree.pfmet_ex;
-	//	float mvamet_ey  = analysisTree.pfmet_ey;
-	//	float mvamet_phi = TMath::ATan2(analysisTree.pfmet_ey,analysisTree.pfmet_ex);
+	*/
+	float mvamet     = analysisTree.pfmet_pt;
+	float mvamet_ex  = analysisTree.pfmet_ex;
+	float mvamet_ey  = analysisTree.pfmet_ey;
+	float mvamet_phi = TMath::ATan2(analysisTree.pfmet_ey,analysisTree.pfmet_ex);
 
 	// selecting good jets --->
 
@@ -2155,7 +2155,8 @@ int main(int argc, char * argv[]) {
 		  std::cout << std::endl;
 		  } 
 	  */
-	  weight = weight*IdIsoSF_mu1*IdIsoSF_mu2*trackSF_mu1*trackSF_mu2;
+	  //	  weight = weight*IdIsoSF_mu1*IdIsoSF_mu2*trackSF_mu1*trackSF_mu2;
+	  weight = weight*IdIsoSF_mu1*IdIsoSF_mu2;
 
 	  double effDataTrig1 = SF_muonTrig->get_EfficiencyData(ptMu1, etaMu1);  
 	  double effDataTrig2 = SF_muonTrig->get_EfficiencyData(ptMu2, etaMu2);  
@@ -2170,7 +2171,12 @@ int main(int argc, char * argv[]) {
 	  if (applyTrigger) {
 	    double effMcTrig1 = SF_muonTrig->get_EfficiencyMC(ptMu1, etaMu1);
 	    double effMcTrig2 = SF_muonTrig->get_EfficiencyMC(ptMu2, etaMu2);
-	    double effMcTrig = 1 - (1-effMcTrig1)*(1-effMcTrig2);
+	    //	    double effMcTrig = 1 - (1-effMcTrig1)*(1-effMcTrig2);
+	    double effMcTrig = 1;
+	    if (firstTrigger)
+	      effMcTrig = effMcTrig1;
+	    else
+	      effMcTrig = effMcTrig2;
 	    if (effTrigData>0&&effMcTrig>0) {
 	      weightTrig = effTrigData/effMcTrig;
 	      weight = weight*weightTrig;
