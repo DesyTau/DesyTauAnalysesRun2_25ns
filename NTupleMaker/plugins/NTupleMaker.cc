@@ -649,7 +649,6 @@ void NTupleMaker::beginJob(){
     tree->Branch("tau_leadchargedhadrcand_id",  tau_leadchargedhadrcand_id,  "tau_leadchargedhadrcand_id[tau_count]/I");
     tree->Branch("tau_leadchargedhadrcand_dxy", tau_leadchargedhadrcand_dxy, "tau_leadchargedhadrcand_dxy[tau_count]/F");
     tree->Branch("tau_leadchargedhadrcand_dz",  tau_leadchargedhadrcand_dz,  "tau_leadchargedhadrcand_dz[tau_count]/F");
-    tree->Branch("tau_photonPtSumOutsideSignalCone", tau_photonPtSumOutsideSignalCone, "tau_photonPtSumOutsideSignalCone[tau_count]/F");
  
     tree->Branch("tau_ntracks_pt05", tau_ntracks_pt05, "tau_ntracks_pt05[tau_count]/i");
     tree->Branch("tau_ntracks_pt08", tau_ntracks_pt05, "tau_ntracks_pt05[tau_count]/i");
