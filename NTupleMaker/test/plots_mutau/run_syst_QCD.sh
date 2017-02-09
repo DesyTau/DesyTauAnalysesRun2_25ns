@@ -2,7 +2,9 @@
 channel=$1
 
 unset systematics
-systematics="JetEnUp JetEnDown ZPtUp ZPtDown TopPtUp TopPtDown TauEnUp TauEnDown MuEnUp MuEnDown ElEnUp ElEnDown UnclEnUp UnclEnDown"
+systematics="JetEnUp JetEnDown ZPtUp ZPtDown TopPtUp TopPtDown TauEnUp TauEnDown MuEnUp MuEnDown ElEnUp ElEnDown UnclEnUp UnclEnDown Nominal"
+#systematics="ZPtUp ZPtDown"
+#systematics="JetEnUp JetEnDown UnclEnUp UnclEnDown"
 unset syst
 
 for syst in $systematics
@@ -24,6 +26,6 @@ do
 	cat bss > run_QCD${syst}.sh
 	echo root -l -q -b OverlapQCD${syst}.C >> run_QCD${syst}.sh
 	echo mv QCD_${syst}_B.root QCD_DataDriven_${syst}_B.root >> run_QCD${syst}.sh
-	
+	echo "echo done" >> run_QCD${syst}.sh
 	qsub run_QCD${syst}.sh
 done

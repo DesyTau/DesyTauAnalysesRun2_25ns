@@ -59,6 +59,7 @@ void Impose( TDirectory *ttarget, TList *ssourcelist, string &np_legend , vector
 void Impose (TList * sourcel, string & np_title, vector<string> title,vector<float> xsecs, TString &variable, string &syst);
 	
 void ModifyHist (TH1D* &h1, int cl ,float & lumi_,float & weight_,string & title, bool norm=false);
+void CheckHist (TH1D* &h1);
 void OverFlow (TH1D* &h, int bin);
 void Unroll(TH1D *&hist,TH2D *& hist2D,char *& histName);
 
@@ -170,7 +171,7 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 
 	float Lumi = 36590.;
 	bool norm_=false;
-        int MaxEventsBin = 0;
+        int MaxEventsBin = 100000;
 	//cout<<titles[0]<<"   "<<titles.size()<<endl;
 
 	vector <float > lumiweights;
@@ -351,7 +352,7 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 			if (std::string::npos != title_.find("JetsToLL"))  {col= mycolordyj;hdyj->Add(h2); hdyj->SetLineColor(col);}
 			if (std::string::npos != title_.find("ST_") || std::string::npos != title_.find("channel") )  {col= mycolortt; hstop->Add(h2);hstop->SetLineColor(col);}
 			if ( std::string::npos != title_.find("WW") || std::string::npos != title_.find("ZZ") ||  std::string::npos != title_.find("WZ") || std::string::npos != title_.find("WG") || std::string::npos != title_.find("ZG") ) {col=mycolorvv; hdib->Add(h2); hdib->SetLineColor(col);}
-			if ( std::string::npos != title_.find("TTW") || std::string::npos != title_.find("TTZ") || std::string::npos != title_.find("tZq") || std::string::npos != title_.find("TG") || std::string::npos != title_.find("tG") || std::string::npos != title_.find("TTG") || std::string::npos != title_.find("ttW") || std::string::npos != title_.find("ttZ") || std::string::npos != title_.find("tZ") || std::string::npos != title_.find("TTT_") ) {col=mycolorttx ;httx->Add(h2);   httx->SetLineColor(col);}
+			if ( std::string::npos != title_.find("TTW") || std::string::npos != title_.find("TTZ") || std::string::npos != title_.find("tZ") || std::string::npos != title_.find("TG") || std::string::npos != title_.find("tG")  || std::string::npos != title_.find("ttW")  || std::string::npos != title_.find("TTT_") ) {col=mycolorttx ;httx->Add(h2);   httx->SetLineColor(col);}
 
 
 
@@ -399,6 +400,10 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 				string var ;
 				TString lumistring = "35invfb";
 				TString smFilename ; 
+				stringstream ssB;
+				ssB << MaxEventsBin;
+				string str = ssB.str();
+				//if (MaxEventsBin<10000) lumistring = lumistring+"_"+str+"MaxEvntsBin_";
 				if (syst!="Nominal") smFilename =  "Templates_"+variable+"_"+lumistring+"_mt_C1N2_"+syst+".root";
 					else smFilename =  "Templates_"+variable+"_"+lumistring+"_mt_C1N2.root";
 
@@ -430,19 +435,42 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 	if(b_scale)		allbkg->Scale(scale);
 				cout<<" Total Integral after scaling up - "<<allbkg->GetSumOfWeights()<<"  "<<variable<<endl;
 				allbkg->Write();
-					
-				vector <int> keep_bin;
-
+			
+				CheckHist(all_);
+				ofstream tfile;
+				TString textfilename ="bins";
+				vector <int> keep_bin;keep_bin.clear();
+			 if (syst=="Nominal"){
+				tfile.open(textfilename);
 				for (int nb=1;nb<=all_->GetNbinsX();++nb){
 
 				float bc_ = all_->GetBinContent(nb);
-
-				if (bc_<100000 &&  bc_>0.) {
-				//	cout<<" will keep this bin "<<nb<<"  "<<all_->GetBinContent(nb)<<"  "<<keep_bin.size()<<endl;
+				
+				if (bc_<MaxEventsBin ) {
+					cout<<" will keep this bin "<<nb<<"  "<<all_->GetBinContent(nb)<<"  "<<keep_bin.size()<<endl;
 					keep_bin.push_back(nb);
+					tfile <<nb<<endl;
 				}
 					}
-				
+				tfile.close();
+			 }
+
+			 if (syst!="Nominal"){
+				 ifstream ifs("bins");
+
+				 string line;
+			        while(std::getline(ifs, line)) // read one line from ifs
+        				{
+			                istringstream iss(line); // access line as a stream
+			                int bin_;
+			                iss >> bin_;
+					keep_bin.push_back(bin_);
+					cout<<" Read in for "<<syst<<" nbin "<<bin_<<endl;
+        				}
+
+
+				 }
+
 				const int sb_ = keep_bin.size();
 				cout<<" in total "<<sb_<<" bins "<<endl;
 
@@ -467,6 +495,8 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 				htest_data->SetBinContent(nbb+1,hh[1]->GetBinContent(keep_bin[nbb]));
 			
 				}
+
+
 				htt->Reset();
 				hwj->Reset();
 				hdyj->Reset();
@@ -487,6 +517,16 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 				hrest = (TH1D* )htest_dib->Clone();
 				hrest ->Add(httx,1);;
 				hh[1] = (TH1D* )htest_data->Clone();
+
+				CheckHist(htt);
+				CheckHist(hdyj);
+				CheckHist(hwj);
+				CheckHist(hstop);
+				CheckHist(hdib);
+				CheckHist(hqcd);
+				CheckHist(httx);
+				CheckHist(hrest);
+				CheckHist(hh[1]);
 				
 				htt->SetLineColor(mycolortt);
 				hwj->SetLineColor(mycolorwj);
@@ -628,7 +668,7 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 				histbkg->SetLineColor(mycolorqcd);
 				histbkg->SetName(s1);
 				histbkg->Write();
-				cout<<" Adding htt ================= "<<hqcd->GetSumOfWeights()<<"  "<<histbkg->GetSumOfWeights()<<endl;
+				cout<<" Adding qcd ================= "<<hqcd->GetSumOfWeights()<<"  "<<histbkg->GetSumOfWeights()<<endl;
 
 				//rest of bkg hold all but ttjets and wjets background	
 				s1 = "rest_bkg_"+variable;
@@ -649,7 +689,7 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 				histbkg->SetLineColor(kMagenta);
 				histbkg->SetName(s1);
 				histbkg->Write();
-				cout<<" Adding htt ================= "<<hrest->GetSumOfWeights()<<"  "<<histbkg->GetSumOfWeights()<<endl;
+				cout<<" Adding rest ================= "<<hrest->GetSumOfWeights()<<"  "<<histbkg->GetSumOfWeights()<<endl;
 				
 				hh[1] = allnew_;
 				hh[1]->SetMinimum(0.1);
@@ -690,9 +730,12 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 				
 					htest_signal = new TH1D (histbkg->GetName(),histbkg->GetTitle(),sb_,1,sb_+1);
 
-				for (int nbb=0;nbb<keep_bin.size();++nbb)
+				for (int nbb=0;nbb<keep_bin.size();++nbb){
 					htest_signal->SetBinContent(nbb+1,histbkg->GetBinContent(keep_bin[nbb]));
 
+//			float sing =  htest_signal->GetSumOfWeights()/sqrt(hh[1]->GetSumOfWeights());
+//				cout<<"  sign "<<sing<<" nb "<<nbb<<endl;
+				}
 				htest_signal->SetName(s1);
 				htest_signal->SetMarkerColor(kBlue);
 				htest_signal->SetLineColor(kBlue);
@@ -777,12 +820,25 @@ ModifyHist (TH1D* &h, int cl_ ,float & lumi,float & weight,string & title_, bool
 			for (int nb=1;nb<=h->GetNbinsX();++nb)
 			{
 				float bc_ = h->GetBinContent(nb);
-			if (bc_ > 0. && bc_ <0.001) h->SetBinContent(nb,0.001);
+	//		if (bc_ > 0. && bc_ <0.001) h->SetBinContent(nb,0.001);
 			}
 
 
 }
 
+void
+CheckHist (TH1D* &h)
+{
+
+
+			for (int nb=0;nb<=h->GetNbinsX();++nb)
+			{
+				float bc_ = h->GetBinContent(nb);
+			if (bc_ <0.01) h->SetBinContent(nb,0.01);
+			}
+
+
+}
 
 
 
