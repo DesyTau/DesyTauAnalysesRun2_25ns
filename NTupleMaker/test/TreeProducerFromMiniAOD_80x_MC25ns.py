@@ -329,10 +329,11 @@ process.load('RecoMET.METFilters.BadPFMuonFilter_cfi')
 process.BadChargedCandidateFilter.muons = cms.InputTag("slimmedMuons")
 process.BadChargedCandidateFilter.PFCandidates = cms.InputTag("packedPFCandidates")
 process.BadChargedCandidateFilter.debug = cms.bool(False)
+process.BadChargedCandidateFilter.taggingMode = cms.bool(True)
 process.BadPFMuonFilter.muons = cms.InputTag("slimmedMuons")
 process.BadPFMuonFilter.PFCandidates = cms.InputTag("packedPFCandidates")
-
 process.BadPFMuonFilter.debug = cms.bool(False)
+process.BadPFMuonFilter.taggingMode = cms.bool(True)
 
 ########### Bad Muons Filter ##############################################
 process.load('RecoMET.METFilters.badGlobalMuonTaggersMiniAOD_cff')
