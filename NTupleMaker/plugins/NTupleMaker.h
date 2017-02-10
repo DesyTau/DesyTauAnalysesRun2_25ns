@@ -175,6 +175,19 @@ class NTupleMaker : public edm::EDAnalyzer{
   explicit NTupleMaker( const edm::ParameterSet& iConfig );
   ~NTupleMaker();
 
+  float getEffectiveArea(float eta) {
+    float effArea = 0.2393;
+    float absEta = fabs(eta);
+    if (absEta<1.0) effArea = 0.1703;
+    else if (absEta < 1.4790) effArea = 0.1715;
+    else if (absEta < 2.0) effArea = 0.1213;
+    else if (absEta < 2.2) effArea = 0.1230;
+    else if (absEta < 2.3) effArea = 0.1635;
+    else if (absEta < 2.4) effArea = 0.1937;
+    return effArea;
+
+  } 
+
  double getPFIsolation(edm::Handle<pat::PackedCandidateCollection> pfcands,
                         const reco::Candidate* ptcl,  
                         double r_iso_min, double r_iso_max, double kt_scale,
@@ -663,6 +676,10 @@ class NTupleMaker : public edm::EDAnalyzer{
   Float_t electron_ehcaloverecaldepth2[M_electronmaxcount];
   Float_t electron_full5x5_sigmaietaieta[M_electronmaxcount];
   Float_t electron_ooemoop[M_electronmaxcount];
+
+  Float_t electron_detaInSeed[M_electronmaxcount];
+  Float_t electron_he[M_electronmaxcount];
+  Float_t electron_eaIsolation[M_electronmaxcount];
 
   Float_t electron_superClusterEta[M_electronmaxcount];
   Float_t electron_superClusterPhi[M_electronmaxcount];

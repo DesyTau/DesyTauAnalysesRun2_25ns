@@ -309,7 +309,7 @@ void NTupleMaker::beginJob(){
   nEvents = FS->make<TH1D>("nEvents", "nEvents", 2, -0.5, +1.5);
   
   tree->Branch("errors", &errors, "errors/i");
-  tree->Branch("event_nr", &event_nr, "event_nr/i");
+  tree->Branch("event_nr", &event_nr, "event_nr/l");
   tree->Branch("event_run", &event_run, "event_run/i");
   tree->Branch("event_timeunix", &event_timeunix, "event_timeunix/i");
   tree->Branch("event_timemicrosec", &event_timemicrosec, "event_timemicrosec/i");
@@ -511,7 +511,10 @@ void NTupleMaker::beginJob(){
     tree->Branch("electron_superclusterY", electron_superClusterY, "electron_superclusterY[electron_count]/F");
     tree->Branch("electron_superclusterZ", electron_superClusterZ, "electron_superclusterZ[electron_count]/F");
 
-    
+    tree->Branch("electron_detaInSeed", electron_detaInSeed, "electron_detaInSeed[electron_count]/F");
+    tree->Branch("electron_he", electron_he, "electron_he[electron_count]/F");
+    tree->Branch("electron_eaIsolation", electron_eaIsolation, "electron_eaIsolation[electron_count]/F");
+
     tree->Branch("electron_chargedHadIso", electron_chargedHadIso,"electron_chargedHadIso[electron_count]/F");
     tree->Branch("electron_neutralHadIso", electron_neutralHadIso,"electron_neutralHadIso[electron_count]/F");
     tree->Branch("electron_photonIso",     electron_photonIso,    "electron_photonIso[electron_count]/F");
@@ -565,8 +568,6 @@ void NTupleMaker::beginJob(){
     tree->Branch("electron_mva_category_Spring16_v1", electron_mva_category_Spring16_v1, "electron_mva_category_Spring16_v1[electron_count]/I");
     tree->Branch("electron_mva_wp90_general_Spring16_v1", electron_mva_wp90_general_Spring16_v1, "electron_mva_wp90_general_Spring16_v1[electron_count]/F");
     tree->Branch("electron_mva_wp80_general_Spring16_v1", electron_mva_wp80_general_Spring16_v1, "electron_mva_wp80_general_Spring16_v1[electron_count]/F");
-
-
 
 
     tree->Branch("electron_pass_conversion", electron_pass_conversion, "electron_pass_conversion[electron_count]/O");
@@ -3772,6 +3773,12 @@ unsigned int NTupleMaker::AddElectrons(const edm::Event& iEvent, const edm::Even
 	  electron_superClusterX[electron_count] = el->superCluster()->x();
 	  electron_superClusterY[electron_count] = el->superCluster()->y();
 	  electron_superClusterZ[electron_count] = el->superCluster()->z();
+	  
+	  electron_detaInSeed[electron_count] = el->deltaEtaSuperClusterTrackAtVtx() 
+	    - el->superCluster()->eta() 
+	    + el->superCluster()->seed()->eta(); 
+
+	  electron_he[electron_count] = el->hadronicOverEm();
 
 	  electron_chargedHadIso[electron_count] = el->chargedHadronIso();
 	  electron_neutralHadIso[electron_count] = el->neutralHadronIso();
@@ -3786,6 +3793,9 @@ unsigned int NTupleMaker::AddElectrons(const edm::Event& iEvent, const edm::Even
 	  electron_r03_sumPhotonEtHighThreshold[electron_count] = el->pfIsolationVariables().sumPhotonEtHighThreshold;
 	  electron_r03_sumPUPt[electron_count] = el->pfIsolationVariables().sumPUPt;
 
+	  float  eA = getEffectiveArea( fabs(electron_superClusterEta[electron_count]) );
+	  electron_eaIsolation[electron_count] = electron_r03_sumChargedHadronPt[electron_count] +
+	    TMath::Max(0.0f,electron_r03_sumNeutralHadronEt[electron_count]+electron_r03_sumPhotonEt[electron_count]-eA*rhoNeutral);
 	  
 	  electron_gapinfo[electron_count] = 0;
 	  electron_gapinfo[electron_count] |= el->isEB() << 0;
