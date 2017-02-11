@@ -4,7 +4,6 @@
 #include <TStyle.h>
 #include <TCanvas.h>
 #include <TString.h>
-//#include "plots.h"
 #include <cmath>
 #include <sstream>
 #include <iomanip>
@@ -300,13 +299,11 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
 		if (Dr>3.5 && !InvertLeptonIso) continue;
 		if (Dr<3.5 && InvertLeptonIso) continue;
 
-
 		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
 		CFCounter[iCut]+= all_weights;
 		CFCounter_[iCut]+= all_weights;
                 iCFCounter[iCut]++;
 		iCut++;
-
 
 		if (event_secondLeptonVeto >0.5) continue;
 		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
@@ -340,7 +337,6 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
 		double etaTau1 = (double)ta_eta[taus_index];
 		double ptMu1 = (double)mu_pt[muon_index];
 		double etaMu1 = (double)mu_eta[muon_index];
-		//ChargedIso CutBased MVA
 
 		double ptN=0;double etaN=0;double FastSF=0;
 
@@ -385,6 +381,8 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
 		iCut++;
 
 
+cout<<" met before "<<met<<endl;
+
 		if (isWJ || isDY || isWNJ || isDYNJ) {
 		
 		METV.SetPx(0.);
@@ -424,6 +422,7 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
 		}
 
 
+cout<<" met after "<<met<<endl;
 
 
 		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
@@ -456,7 +455,6 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
 			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		//if (njets!=0 && JetsMV.at(0).Pt()<30) continue;
 		if (njets>1) continue;
 		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
 		CFCounter[iCut]+= all_weights;
@@ -571,7 +569,7 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
   }
 
 
-	float Lumi = 36600.;
+	float Lumi = 36590.;
 
 	if (isData) Lumi = 1.;
 		 for(int ci = 0; ci < CutNumb; ci++)
