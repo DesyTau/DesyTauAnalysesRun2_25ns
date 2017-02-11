@@ -206,6 +206,8 @@ class analyzer {
 		Float_t 	genLeptonMatchedMu;
 		Float_t 	genTauDecayedMuMatched;
 		Float_t 	genTauDecayedElMatched;
+		Float_t 	genLeptonPromptElMatched;
+		Float_t 	genLeptonPromptMuMatched;
    		Float_t	   qcdweight;
 		Float_t	   qcdweightup;
    		Float_t	   qcdweightdown;
@@ -357,6 +359,8 @@ class analyzer {
 		TBranch        *b_genLeptonMatchedMu;   //!
 		TBranch        *b_genTauDecayedMuMatched;   //!
 		TBranch        *b_genTauDecayedElMatched;   //!
+		TBranch        *b_genLeptonPromptElMatched;   //!
+		TBranch        *b_genLeptonPromptMuMatched;   //!
 		TBranch        *b_qcdweight;   //!
 		TBranch        *b_qcdweightup;   //!
 		TBranch        *b_qcdweightdown;   //!
@@ -381,6 +385,118 @@ class analyzer {
 		histTopPt->Fill(0.,EvWeight);
 		}
 */
+
+
+
+		void FillHists(int CutIndex, Double_t EvWeight, TLorentzVector  elV, TLorentzVector  muV, TLorentzVector tauV, vector<TLorentzVector>  &JetsV, TLorentzVector  &MetV, double Chimass, double mintermediate, string & Sel, int  mIndex, int eIndex, int  tIndex, int category){
+
+
+//cout<<" check out  "<<Sel<<"  "<<CutIndex<<"  "<<mIndex<<"  "<<tIndex<<"  "<<category<<endl;
+
+			hnJetFake[CutIndex][category]->Fill(njets,EvWeight);
+			
+			double Mt2as = 0.;
+			double met = MetV.Pt();
+			double dzeta=-9999;
+
+///////////////////mutau
+
+			if (Sel=="mutau" && mIndex >-1 && tIndex>-1 ){
+
+				tauMass = tauV.M();
+
+				TLorentzVector t1 ; t1 = MetV+muV;
+
+				double v1[4] = {muV.Px(),muV.Py(),muV.Pz(),muonMass};
+				double v2[4] = {tauV.Px(),tauV.Py(),tauV.Pz(),tauMass};
+				double ecm = 13000.0;
+				double mxlo = Chimass;
+				double ptm[2] = {MetV.Px(),MetV.Py()};
+				double vds[4] = {0,0,0,0};
+
+				Mt2as = asymm_mt2_lester_bisect::get_mT2(muonMass, muV.Px(), muV.Py(),tauMass,tauV.Px(),tauV.Py(),MetV.Px(),MetV.Py(),Chimass,Chimass,0);
+				double mcta = sqrt( 2*muV.Pt()*tauV.Pt()*(1+cos(muV.Phi()-tauV.Phi())) );
+
+				double pa[3] ={muonMass, muV.Px(),muV.Py()};
+				double pb[3] ={tauMass, tauV.Px(),tauV.Py()};
+				double pmiss[3] ={0., MetV.Px(),MetV.Py()};
+				 
+				hMt2lesterFake[CutIndex][category]->Fill(Mt2as,EvWeight);
+
+				float tauUnitX = tauV.Px()/tauV.Pt();
+				float tauUnitY = tauV.Py()/tauV.Pt();
+
+				float muonUnitX = muV.Px()/muV.Pt();
+				float muonUnitY = muV.Py()/muV.Pt();
+
+				float zetaX = tauUnitX + muonUnitX;
+				float zetaY = tauUnitY + muonUnitY;
+
+				float normZeta = TMath::Sqrt(zetaX*zetaX+zetaY*zetaY);
+
+				zetaX = zetaX/normZeta;
+				zetaY = zetaY/normZeta;
+
+				float vectorX = MetV.Px() + muV.Px() + tauV.Px();
+				float vectorY = MetV.Py() + muV.Py() + tauV.Py();
+
+				float vectorVisX = muV.Px() + tauV.Px();
+				float vectorVisY = muV.Py() + tauV.Py();
+
+				// computation of DZeta variable
+				// pfmet
+				float pzetamiss = MetV.Px()*zetaX + MetV.Py()*zetaY;
+				float pzetavis = vectorVisX*zetaX + vectorVisY*zetaY;
+				dzeta = pzetamiss - 0.85*pzetavis;
+			
+
+				hDZetaFake[CutIndex][category]->Fill(dzeta,EvWeight);
+
+
+			}
+
+
+			if (mIndex !=-1 )
+			{
+
+
+				hMuptFake[CutIndex][category]->Fill(mu_pt[mIndex],EvWeight);
+				hMuetaFake[CutIndex][category]->Fill(mu_eta[mIndex],EvWeight);
+				hIsoMuFake[CutIndex][category]->Fill(mu_relIso[0],EvWeight);
+
+
+			}
+
+
+			if (tIndex !=-1)
+			{
+				hTauptFake[CutIndex][category]->Fill(ta_pt[tIndex],EvWeight);
+				hTauetaFake[CutIndex][category]->Fill(ta_eta[tIndex],EvWeight);
+				hIsoTauFake[CutIndex][category]->Fill(ta_relIso[0],EvWeight);
+
+			}
+
+
+
+
+/////////////global variables
+
+			if (MetV.Pt()>0. ) {
+
+				hMETFake[CutIndex][category]->Fill(MetV.Pt(),EvWeight);
+			}
+
+
+
+
+		}
+
+
+
+
+
+
+
 		void FillHists(int CutIndex, Double_t EvWeight, TLorentzVector  elV, TLorentzVector  muV, TLorentzVector tauV, vector<TLorentzVector>  &JetsV, TLorentzVector  &MetV, double Chimass, double mintermediate, string & Sel, int  mIndex, int eIndex, int  tIndex){
 
 			AllJets_Lepton_noMet.clear();
@@ -536,7 +652,6 @@ class analyzer {
 				float tauUnitX = tauV.Px()/tauV.Pt();
 				float tauUnitY = tauV.Py()/tauV.Pt();
 
-				//	cout<<" CHECK =========== "<<tauV.Pt()<<"  "<<ta_pt[tIndex]<<endl;	
 				float muonUnitX = muV.Px()/muV.Pt();
 				float muonUnitY = muV.Py()/muV.Pt();
 
@@ -558,7 +673,7 @@ class analyzer {
 				// pfmet
 				float pzetamiss = MetV.Px()*zetaX + MetV.Py()*zetaY;
 				float pzetavis = vectorVisX*zetaX + vectorVisY*zetaY;
-				dzeta = pzetamiss - 1.85*pzetavis;
+				dzeta = pzetamiss - 0.85*pzetavis;
 			
 
 				hDZeta[CutIndex]->Fill(dzeta,EvWeight);
@@ -736,7 +851,7 @@ class analyzer {
 				// pfmet
 				float pzetamiss = MetV.Px()*zetaX + MetV.Py()*zetaY;
 				float pzetavis = vectorVisX*zetaX + vectorVisY*zetaY;
-				dzeta = pzetamiss - 1.85*pzetavis;
+				dzeta = pzetamiss - 0.85*pzetavis;
 
 				hDZeta[CutIndex]->Fill(dzeta,EvWeight);
 /*
@@ -926,7 +1041,7 @@ class analyzer {
 				// pfmet
 				float pzetamiss = MetV.Px()*zetaX + MetV.Py()*zetaY;
 				float pzetavis = vectorVisX*zetaX + vectorVisY*zetaY;
-				dzeta = pzetamiss - 1.85*pzetavis;
+				dzeta = pzetamiss - 0.85*pzetavis;
 
 				hDZeta[CutIndex]->Fill(dzeta,EvWeight);
 
@@ -1569,7 +1684,7 @@ void FillHistsDiL(int CutIndex, Double_t EvWeight, TLorentzVector  LeptV1, TLore
 				// pfmet
 				float pzetamiss = MetV.Px()*zetaX + MetV.Py()*zetaY;
 				float pzetavis = vectorVisX*zetaX + vectorVisY*zetaY;
-				dzeta = pzetamiss - 1.85*pzetavis;
+				dzeta = pzetamiss - 0.85*pzetavis;
 			
 
 				hDZeta[CutIndex]->Fill(dzeta,EvWeight);
@@ -1980,6 +2095,8 @@ void FillHistsDiL(int CutIndex, Double_t EvWeight, TLorentzVector  LeptV1, TLore
 			fChain->SetBranchAddress("genLeptonMatchedMu", &genLeptonMatchedMu, &b_genLeptonMatchedMu);
 			fChain->SetBranchAddress("genTauDecayedMuMatched", &genTauDecayedMuMatched, &b_genTauDecayedMuMatched);
 			fChain->SetBranchAddress("genTauDecayedElMatched", &genTauDecayedElMatched, &b_genTauDecayedElMatched);
+			fChain->SetBranchAddress("genLeptonPromptElMatched", &genLeptonPromptElMatched, &b_genLeptonPromptElMatched);
+			fChain->SetBranchAddress("genLeptonPromptMuMatched", &genLeptonPromptMuMatched, &b_genLeptonPromptMuMatched);
 			
    			fChain->SetBranchAddress("qcdweight", &qcdweight, &b_qcdweight);
 			fChain->SetBranchAddress("qcdweightup", &qcdweightup, &b_qcdweightup);
