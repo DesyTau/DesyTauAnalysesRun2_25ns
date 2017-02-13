@@ -388,12 +388,15 @@ class analyzer {
 
 
 
-		void FillHists(int CutIndex, Double_t EvWeight, TLorentzVector  elV, TLorentzVector  muV, TLorentzVector tauV, vector<TLorentzVector>  &JetsV, TLorentzVector  &MetV, double Chimass, double mintermediate, string & Sel, int  mIndex, int eIndex, int  tIndex, int category){
+
+		void FillHists(int CutIndex, Double_t EvWeight, TLorentzVector  elV, TLorentzVector  muV, TLorentzVector tauV, vector<TLorentzVector>  &JetsV, TLorentzVector  &MetV, double Chimass, double mintermediate, string & Sel, int  mIndex, int eIndex, int  tIndex, int category, bool isdata){
 
 
 //cout<<" check out  "<<Sel<<"  "<<CutIndex<<"  "<<mIndex<<"  "<<tIndex<<"  "<<category<<endl;
 
-			hnJetFake[CutIndex][category]->Fill(njets,EvWeight);
+
+			     hnJetFake[CutIndex][0]->Fill(njets,EvWeight);
+		if (!isdata)  hnJetFake[CutIndex][category]->Fill(njets,EvWeight);
 			
 			double Mt2as = 0.;
 			double met = MetV.Pt();
@@ -421,7 +424,8 @@ class analyzer {
 				double pb[3] ={tauMass, tauV.Px(),tauV.Py()};
 				double pmiss[3] ={0., MetV.Px(),MetV.Py()};
 				 
-				hMt2lesterFake[CutIndex][category]->Fill(Mt2as,EvWeight);
+				hMt2lesterFake[CutIndex][0]->Fill(Mt2as,EvWeight);
+			if (!isdata)	hMt2lesterFake[CutIndex][category]->Fill(Mt2as,EvWeight);
 
 				float tauUnitX = tauV.Px()/tauV.Pt();
 				float tauUnitY = tauV.Py()/tauV.Pt();
@@ -450,7 +454,8 @@ class analyzer {
 				dzeta = pzetamiss - 0.85*pzetavis;
 			
 
-				hDZetaFake[CutIndex][category]->Fill(dzeta,EvWeight);
+				hDZetaFake[CutIndex][0]->Fill(dzeta,EvWeight);
+		if (!isdata)		hDZetaFake[CutIndex][category]->Fill(dzeta,EvWeight);
 
 
 			}
@@ -460,20 +465,28 @@ class analyzer {
 			{
 
 
-				hMuptFake[CutIndex][category]->Fill(mu_pt[mIndex],EvWeight);
+				hMuptFake[CutIndex][0]->Fill(mu_pt[mIndex],EvWeight);
+				hMuetaFake[CutIndex][0]->Fill(mu_eta[mIndex],EvWeight);
+				hIsoMuFake[CutIndex][0]->Fill(mu_relIso[0],EvWeight);
+
+		if (!isdata){	hMuptFake[CutIndex][category]->Fill(mu_pt[mIndex],EvWeight);
 				hMuetaFake[CutIndex][category]->Fill(mu_eta[mIndex],EvWeight);
 				hIsoMuFake[CutIndex][category]->Fill(mu_relIso[0],EvWeight);
-
+			}
 
 			}
 
 
 			if (tIndex !=-1)
 			{
+				hTauptFake[CutIndex][0]->Fill(ta_pt[tIndex],EvWeight);
+				hTauetaFake[CutIndex][0]->Fill(ta_eta[tIndex],EvWeight);
+				hIsoTauFake[CutIndex][0]->Fill(ta_relIso[0],EvWeight);
+		if (!isdata){
 				hTauptFake[CutIndex][category]->Fill(ta_pt[tIndex],EvWeight);
 				hTauetaFake[CutIndex][category]->Fill(ta_eta[tIndex],EvWeight);
 				hIsoTauFake[CutIndex][category]->Fill(ta_relIso[0],EvWeight);
-
+		}
 			}
 
 
@@ -483,14 +496,15 @@ class analyzer {
 
 			if (MetV.Pt()>0. ) {
 
-				hMETFake[CutIndex][category]->Fill(MetV.Pt(),EvWeight);
+					hMETFake[CutIndex][0]->Fill(MetV.Pt(),EvWeight);
+		if (!isdata)		hMETFake[CutIndex][category]->Fill(MetV.Pt(),EvWeight);
 			}
 
 
 
 
-		}
 
+		}
 
 
 
