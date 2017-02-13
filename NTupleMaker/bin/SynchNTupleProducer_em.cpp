@@ -80,12 +80,12 @@ float topPtWeight(float pt1,
     
   float a = 0.156;    // Run1 a parameter
   float b = -0.00137;  // Run1 b parameter
-  //    float a = 0.0615;    // Run2 a parameter
-  //    float b = -0.0005;  // Run2 b parameter
-    float w1 = TMath::Exp(a+b*pt1);
-    float w2 = TMath::Exp(a+b*pt2);
-    
-    return TMath::Sqrt(w1*w2);
+  //  float a = 0.0615;    // Run2 a parameter
+  //  float b = -0.0005;  // Run2 b parameter
+  float w1 = TMath::Exp(a+b*pt1);
+  float w2 = TMath::Exp(a+b*pt2);
+  
+  return TMath::Sqrt(w1*w2);
     
 }
 
@@ -1743,7 +1743,7 @@ int main(int argc, char * argv[]) {
             
             // electron selection
             vector<int> electrons; electrons.clear();
-	    cout << "Number of electrons = " << analysisTree.electron_count << endl;
+	    //	    cout << "Number of electrons = " << analysisTree.electron_count << endl;
             for (unsigned int ie = 0; ie<analysisTree.electron_count; ++ie) {
                 if (analysisTree.electron_pt[ie]<ptElectronLowCut) continue;
                 if (fabs(analysisTree.electron_eta[ie])>etaElectronCut) continue;
@@ -1762,7 +1762,7 @@ int main(int argc, char * argv[]) {
             
             // muon selection
             vector<int> muons; muons.clear();
-	    cout << "Number of muons = " << analysisTree.muon_count << std::endl;
+	    //	    cout << "Number of muons = " << analysisTree.muon_count << std::endl;
             for (unsigned int im = 0; im<analysisTree.muon_count; ++im) {
                 if (analysisTree.muon_pt[im]<ptMuonLowCut) continue;
                 if (fabs(analysisTree.muon_eta[im])>etaMuonCut) continue;
@@ -1786,8 +1786,8 @@ int main(int argc, char * argv[]) {
                 muons.push_back(im);
             }
             
-	    cout << "  SelEle=" << electrons.size()
-		 << "  SelMu=" << muons.size() << std::endl;
+	    //	    cout << "  SelEle=" << electrons.size()
+	    //		 << "  SelMu=" << muons.size() << std::endl;
             
             if (electrons.size()==0) continue;
             if (muons.size()==0) continue;
@@ -1852,11 +1852,11 @@ int main(int argc, char * argv[]) {
                     isMu8 = true;
                 }
 
-		cout << "muon " << im
-		     << "   pt = " << analysisTree.muon_pt[im] << "   eta = " << analysisTree.muon_eta[im]
-		     << " : isMu23 = " << isMu23 << "  isMu8 = " << isMu8 << std::endl;
+		//		cout << "muon " << im
+		//		     << "   pt = " << analysisTree.muon_pt[im] << "   eta = " << analysisTree.muon_eta[im]
+		//		     << " : isMu23 = " << isMu23 << "  isMu8 = " << isMu8 << std::endl;
                 
-		//                if (applyTriggerMatch && (!isMu23) && (!isMu8)) continue;
+		if (applyTriggerMatch && (!isMu23) && (!isMu8)) continue;
                 
                 for (unsigned int ie=0; ie<electrons.size(); ++ie) {
                     
@@ -1866,7 +1866,7 @@ int main(int argc, char * argv[]) {
                                       analysisTree.muon_eta[mIndex],analysisTree.muon_phi[mIndex]);
                     
 
-		    std::cout << "deltaR = " << dR << std::endl; 
+		    //		    std::cout << "deltaR = " << dR << std::endl; 
 
                     if (dR<dRleptonsCut) continue;
                     
@@ -1904,9 +1904,9 @@ int main(int argc, char * argv[]) {
                         isEle12 = true;
                     }
                     
-		    cout << "electron " << ie 
-			 << "   pt = " << analysisTree.electron_pt[ie] << "   eta = " << analysisTree.electron_eta[ie]
-			 << " : isEle23 = " << isEle23 << "  isEle12 = " << isEle12 << std::endl;
+		    //		    cout << "electron " << ie 
+		    //			 << "   pt = " << analysisTree.electron_pt[ie] << "   eta = " << analysisTree.electron_eta[ie]
+		    //			 << " : isEle23 = " << isEle23 << "  isEle12 = " << isEle12 << std::endl;
 
 
                     bool trigMatch =
@@ -1985,14 +1985,11 @@ int main(int argc, char * argv[]) {
                     
                 }
             }
-	    //            
-	    cout << "mIndex = " << muonIndex << "   eIndex = " << electronIndex << std::endl;
+
+	    //	    cout << "mIndex = " << muonIndex << "   eIndex = " << electronIndex << std::endl;
             
             if (electronIndex<0) continue;
             if (muonIndex<0) continue;
-	    std::cout << "Post synch selection " << std::endl;
-	    std::cout << std::endl;
-            
             
             
             os = (analysisTree.muon_charge[muonIndex]*analysisTree.electron_charge[electronIndex]) < 0;
