@@ -80,12 +80,12 @@ float topPtWeight(float pt1,
     
   float a = 0.156;    // Run1 a parameter
   float b = -0.00137;  // Run1 b parameter
-  //    float a = 0.0615;    // Run2 a parameter
-  //    float b = -0.0005;  // Run2 b parameter
-    float w1 = TMath::Exp(a+b*pt1);
-    float w2 = TMath::Exp(a+b*pt2);
-    
-    return TMath::Sqrt(w1*w2);
+  //  float a = 0.0615;    // Run2 a parameter
+  //  float b = -0.0005;  // Run2 b parameter
+  float w1 = TMath::Exp(a+b*pt1);
+  float w2 = TMath::Exp(a+b*pt2);
+  
+  return TMath::Sqrt(w1*w2);
     
 }
 
@@ -994,6 +994,15 @@ int main(int argc, char * argv[]) {
             ss >> periods.back();
         }
     }
+
+    unsigned int eventList[6] = {
+      442804,
+      960917,
+      1051894,
+      1401399,
+      52391,
+      12728
+    };
     
     //*****************
     //****** BDT ******
@@ -1144,6 +1153,9 @@ int main(int argc, char * argv[]) {
     int selEvents = 0;
     int nFiles = 0;
     
+    
+
+    
     for (int iF=0; iF<nTotalFiles; ++iF) {
         
         std::string filen;
@@ -1199,7 +1211,22 @@ int main(int argc, char * argv[]) {
             
             if (nEvents%10000==0)
                 cout << "      processed " << nEvents << " events" << endl;
-            
+
+
+	    /*	    
+	    bool cecileEvFound = false;
+	    for (int ievt=0; ievt<6; ++ievt) {
+	      if (analysisTree.event_nr==eventList[ievt]) {     
+		cecileEvFound = true;
+		break;
+	      }
+	    }	      
+	    	    
+
+	    if (!cecileEvFound) continue;
+	    cout << " Event " << analysisTree.event_nr << "  found " << endl;
+	    */
+
             isZLL = false;
             isZEE = false;
             isZMM = false;
@@ -1716,6 +1743,7 @@ int main(int argc, char * argv[]) {
             
             // electron selection
             vector<int> electrons; electrons.clear();
+	    //	    cout << "Number of electrons = " << analysisTree.electron_count << endl;
             for (unsigned int ie = 0; ie<analysisTree.electron_count; ++ie) {
                 if (analysisTree.electron_pt[ie]<ptElectronLowCut) continue;
                 if (fabs(analysisTree.electron_eta[ie])>etaElectronCut) continue;
@@ -1725,7 +1753,7 @@ int main(int argc, char * argv[]) {
                 //					       analysisTree.electron_superclusterEta[ie],
                 //					       analysisTree.electron_mva_id_nontrigPhys14[ie]);
                 bool electronMvaId = analysisTree.electron_mva_wp80_nontrig_Spring15_v1[ie];
-		if (electronMvaId&&applySpring16ElectronId) electronMvaId = analysisTree.electron_mva_wp80_general_Spring16_v1[ie]>0.5;
+		if (applySpring16ElectronId) electronMvaId = analysisTree.electron_mva_wp80_general_Spring16_v1[ie]>0.5;
                 if (!electronMvaId) continue;
                 if (!analysisTree.electron_pass_conversion[ie]) continue;
                 if (analysisTree.electron_nmissinginnerhits[ie]>1) continue;
@@ -1734,6 +1762,7 @@ int main(int argc, char * argv[]) {
             
             // muon selection
             vector<int> muons; muons.clear();
+	    //	    cout << "Number of muons = " << analysisTree.muon_count << std::endl;
             for (unsigned int im = 0; im<analysisTree.muon_count; ++im) {
                 if (analysisTree.muon_pt[im]<ptMuonLowCut) continue;
                 if (fabs(analysisTree.muon_eta[im])>etaMuonCut) continue;
@@ -1757,8 +1786,8 @@ int main(int argc, char * argv[]) {
                 muons.push_back(im);
             }
             
-            //      cout << "  SelEle=" << electrons.size()
-            //	   << "  SelMu=" << muons.size() << std::endl;
+	    //	    cout << "  SelEle=" << electrons.size()
+	    //		 << "  SelMu=" << muons.size() << std::endl;
             
             if (electrons.size()==0) continue;
             if (muons.size()==0) continue;
@@ -1822,8 +1851,12 @@ int main(int argc, char * argv[]) {
                     isMu23 = true;
                     isMu8 = true;
                 }
+
+		//		cout << "muon " << im
+		//		     << "   pt = " << analysisTree.muon_pt[im] << "   eta = " << analysisTree.muon_eta[im]
+		//		     << " : isMu23 = " << isMu23 << "  isMu8 = " << isMu8 << std::endl;
                 
-                if (applyTriggerMatch && (!isMu23) && (!isMu8)) continue;
+		if (applyTriggerMatch && (!isMu23) && (!isMu8)) continue;
                 
                 for (unsigned int ie=0; ie<electrons.size(); ++ie) {
                     
@@ -1832,6 +1865,9 @@ int main(int argc, char * argv[]) {
                     float dR = deltaR(analysisTree.electron_eta[eIndex],analysisTree.electron_phi[eIndex],
                                       analysisTree.muon_eta[mIndex],analysisTree.muon_phi[mIndex]);
                     
+
+		    //		    std::cout << "deltaR = " << dR << std::endl; 
+
                     if (dR<dRleptonsCut) continue;
                     
                     bool isEle23 = false;
@@ -1868,6 +1904,11 @@ int main(int argc, char * argv[]) {
                         isEle12 = true;
                     }
                     
+		    //		    cout << "electron " << ie 
+		    //			 << "   pt = " << analysisTree.electron_pt[ie] << "   eta = " << analysisTree.electron_eta[ie]
+		    //			 << " : isEle23 = " << isEle23 << "  isEle12 = " << isEle12 << std::endl;
+
+
                     bool trigMatch =
                     (isMu23&&isEle12&&analysisTree.muon_pt[mIndex]>ptMuonHighCut) ||
                     (isMu8&&isEle23&&analysisTree.electron_pt[eIndex]>ptElectronHighCut);
@@ -1944,14 +1985,11 @@ int main(int argc, char * argv[]) {
                     
                 }
             }
-            
-            //      cout << "mIndex = " << muonIndex << "   eIndex = " << electronIndex << std::endl;
+
+	    //	    cout << "mIndex = " << muonIndex << "   eIndex = " << electronIndex << std::endl;
             
             if (electronIndex<0) continue;
             if (muonIndex<0) continue;
-            //      std::cout << "Post synch selection " << std::endl;
-            //      std::cout << std::endl;
-            
             
             
             os = (analysisTree.muon_charge[muonIndex]*analysisTree.electron_charge[electronIndex]) < 0;
@@ -2020,8 +2058,8 @@ int main(int argc, char * argv[]) {
             extraelec_veto = foundExtraElectron;
             extramuon_veto = foundExtraMuon;
             
-	    if (extraelec_veto) continue;
-	    if (extramuon_veto) continue;
+	    //	    if (extraelec_veto) continue;
+	    //	    if (extramuon_veto) continue;
             
             //      cout << "dilepton_veto : " << dilepton_veto
             //	   << "   extraelec_veto : " << extraelec_veto
@@ -2091,8 +2129,8 @@ int main(int argc, char * argv[]) {
                 isoweight_1 *= idweight_1;
                 isoweight_2 *= idweight_2;
                 */
-                //      cout << "isoweight_1 = " << isoweight_1
-                //	   << "isoweight_2 = " << isoweight_2 << endl;
+		//		cout << "isoweight_1 = " << isoweight_1
+		//		     << "isoweight_2 = " << isoweight_2 << endl;
                 
                 float Ele23EffData = (float)SF_electron23->get_EfficiencyData(double(pt_1),double(eta_1));
                 float Ele12EffData = (float)SF_electron12->get_EfficiencyData(double(pt_1),double(eta_1));
