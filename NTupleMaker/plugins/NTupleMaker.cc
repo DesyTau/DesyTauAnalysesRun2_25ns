@@ -158,6 +158,10 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
   eleLooseIdMapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleLooseIdMap"))),
   eleMediumIdMapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleMediumIdMap"))),
   eleTightIdMapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleTightIdMap"))),
+  eleVetoIdSummer16MapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleVetoIdSummer16Map"))),
+  eleLooseIdSummer16MapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleLooseIdSummer16Map"))),
+  eleMediumIdSummer16MapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleMediumIdSummer16Map"))),
+  eleTightIdSummer16MapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleTightIdSummer16Map"))),
   eleMvaNonTrigWP80MapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleMvaNonTrigIdWP80Map"))),
   eleMvaNonTrigWP90MapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleMvaNonTrigIdWP90Map"))),
   eleMvaTrigWP80MapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleMvaTrigIdWP80Map"))),
@@ -563,6 +567,11 @@ void NTupleMaker::beginJob(){
     tree->Branch("electron_cutId_loose_Spring15", electron_cutId_loose_Spring15, "electron_cutId_loose_Spring15[electron_count]/O");
     tree->Branch("electron_cutId_medium_Spring15", electron_cutId_medium_Spring15, "electron_cutId_medium_Spring15[electron_count]/O");
     tree->Branch("electron_cutId_tight_Spring15", electron_cutId_tight_Spring15, "electron_cutId_tight_Spring15[electron_count]/O");
+
+    tree->Branch("electron_cutId_veto_Summer16", electron_cutId_veto_Summer16, "electron_cutId_veto_Summer16[electron_count]/O");
+    tree->Branch("electron_cutId_loose_Summer16", electron_cutId_loose_Summer16, "electron_cutId_loose_Summer16[electron_count]/O");
+    tree->Branch("electron_cutId_medium_Summer16", electron_cutId_medium_Summer16, "electron_cutId_medium_Summer16[electron_count]/O");
+    tree->Branch("electron_cutId_tight_Summer16", electron_cutId_tight_Summer16, "electron_cutId_tight_Summer16[electron_count]/O");
 
     tree->Branch("electron_mva_value_Spring16_v1", electron_mva_value_Spring16_v1, "electron_mva_value_Spring16_v1[electron_count]/F");
     tree->Branch("electron_mva_category_Spring16_v1", electron_mva_category_Spring16_v1, "electron_mva_category_Spring16_v1[electron_count]/I");
@@ -3686,6 +3695,15 @@ unsigned int NTupleMaker::AddElectrons(const edm::Event& iEvent, const edm::Even
         iEvent.getByToken(eleLooseIdMapToken_,loose_id_decisions);
         iEvent.getByToken(eleMediumIdMapToken_,medium_id_decisions);
         iEvent.getByToken(eleTightIdMapToken_,tight_id_decisions);
+	// cut-based (Summer16)
+	edm::Handle<edm::ValueMap<bool> > veto_id_summer16_decisions;
+	edm::Handle<edm::ValueMap<bool> > loose_id_summer16_decisions;
+	edm::Handle<edm::ValueMap<bool> > medium_id_summer16_decisions;
+	edm::Handle<edm::ValueMap<bool> > tight_id_summer16_decisions;
+        iEvent.getByToken(eleVetoIdSummer16MapToken_,veto_id_summer16_decisions);
+        iEvent.getByToken(eleLooseIdSummer16MapToken_,loose_id_summer16_decisions);
+        iEvent.getByToken(eleMediumIdSummer16MapToken_,medium_id_summer16_decisions);
+        iEvent.getByToken(eleTightIdSummer16MapToken_,tight_id_summer16_decisions);
 
 	// mva
 	edm::Handle<edm::ValueMap<bool> > nontrig_wp80_decisions;
@@ -3859,7 +3877,12 @@ unsigned int NTupleMaker::AddElectrons(const edm::Event& iEvent, const edm::Even
           electron_cutId_medium_Spring15[electron_count] = (*medium_id_decisions)[el];
           electron_cutId_tight_Spring15[electron_count] = (*tight_id_decisions)[el];
 
-	   electron_mva_wp90_general_Spring16_v1[electron_count] = (*mva_wp90_general_decisions)[el];
+          electron_cutId_veto_Summer16[electron_count] = (*veto_id_summer16_decisions)[el];
+          electron_cutId_loose_Summer16[electron_count] = (*loose_id_summer16_decisions)[el];
+          electron_cutId_medium_Summer16[electron_count] = (*medium_id_summer16_decisions)[el];
+          electron_cutId_tight_Summer16[electron_count] = (*tight_id_summer16_decisions)[el];
+
+	  electron_mva_wp90_general_Spring16_v1[electron_count] = (*mva_wp90_general_decisions)[el];
 	  electron_mva_wp80_general_Spring16_v1[electron_count] = (*mva_wp80_general_decisions)[el];
 	  electron_mva_wp80_nontrig_Spring15_v1[electron_count] = (*nontrig_wp80_decisions)[el];
 	  electron_mva_wp90_nontrig_Spring15_v1[electron_count] = (*nontrig_wp90_decisions)[el];

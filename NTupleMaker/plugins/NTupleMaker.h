@@ -388,6 +388,10 @@ class NTupleMaker : public edm::EDAnalyzer{
   edm::EDGetTokenT<edm::ValueMap<bool> > eleLooseIdMapToken_;
   edm::EDGetTokenT<edm::ValueMap<bool> > eleMediumIdMapToken_;
   edm::EDGetTokenT<edm::ValueMap<bool> > eleTightIdMapToken_;
+  edm::EDGetTokenT<edm::ValueMap<bool> > eleVetoIdSummer16MapToken_;
+  edm::EDGetTokenT<edm::ValueMap<bool> > eleLooseIdSummer16MapToken_;
+  edm::EDGetTokenT<edm::ValueMap<bool> > eleMediumIdSummer16MapToken_;
+  edm::EDGetTokenT<edm::ValueMap<bool> > eleTightIdSummer16MapToken_;
   edm::EDGetTokenT<edm::ValueMap<bool> > eleMvaNonTrigWP80MapToken_;
   edm::EDGetTokenT<edm::ValueMap<bool> > eleMvaNonTrigWP90MapToken_;
   edm::EDGetTokenT<edm::ValueMap<bool> > eleMvaTrigWP80MapToken_;
@@ -743,6 +747,11 @@ class NTupleMaker : public edm::EDAnalyzer{
   Bool_t electron_cutId_loose_Spring15[M_electronmaxcount];
   Bool_t electron_cutId_medium_Spring15[M_electronmaxcount];
   Bool_t electron_cutId_tight_Spring15[M_electronmaxcount];
+
+  Bool_t electron_cutId_veto_Summer16[M_electronmaxcount];
+  Bool_t electron_cutId_loose_Summer16[M_electronmaxcount];
+  Bool_t electron_cutId_medium_Summer16[M_electronmaxcount];
+  Bool_t electron_cutId_tight_Summer16[M_electronmaxcount];
 
   Bool_t electron_pass_conversion[M_electronmaxcount];
 
