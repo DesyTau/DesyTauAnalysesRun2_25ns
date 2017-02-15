@@ -1,0 +1,78 @@
+ WWTo2L2Nu_13TeV-powheg 12.178
+ WWTo4Q_13TeV-powheg 51.723
+
+ WWToLNuQQ_13TeV-powheg 49.997 or 1.212(? Higgs twiki)
+ WWToLNuQQ_13TeV-powheg_ext 49.997 or 1.212(? Higgs twiki)
+
+ WW_DoubleScattering_13TeV-pythia8 1.64 (no Ntuple!)
+
+ WZTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8 10.71
+ WZTo1L3Nu_13TeV_amcatnloFXFX_madspin_pythia8 3.033
+ WZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8 5.595
+ WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8 4.42965
+
+ WGToLNuG_TuneCUETP8M1_13TeV-madgraphMLM-pythia8 405.271 (another xsec! Wrong was 489 )
+ WGToLNuG_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_ext 405.271 (ext!)
+ WGToLNuG_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_ext2 405.271 (ext!)
+
+ WWG_TuneCUETP8M1_13TeV-amcatnlo-pythia8 0.2147
+
+ ZGTo2LG_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_ext 117.864 (ext!)
+
+ ZGGJets_ZToHadOrNu_5f_LO_madgraph_pythia8 0.3729
+ ZZTo2L2Nu_13TeV_powheg_pythia8 0.564
+ ZZTo4L_13TeV_powheg_pythia8 1.256
+ ZZTo4Q_13TeV_amcatnloFXFX_madspin_pythia8 6.929
+ ZZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8 3.22
+ ZZTo2Q2Nu_13TeV_amcatnloFXFX_madspin_pythia8 4.04
+ WWW_4F_TuneCUETP8M1_13TeV-amcatnlo-pythia8 0.2086
+ WWZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8 0.1651
+ WZZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8 0.05565
+ ZZZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8 0.01398
+
+ DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8 18610. 0.9457
+ DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_ext 18610. 0.9457
+ DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8 5765.4 0.9457
+
+ DY1JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8 1.1637 1012.5 0.9457
+ DY2JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8 1.1637 332.8 0.9457 
+ DY3JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8 1.1637 101.8 0.9457
+ DY4JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8 1.1637 54.8 0.9457
+
+
+ QCD_DataDriven 1.
+ WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8 61526.7 0.956
+ W1JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8  1.221 9644.5 0.956
+ W2JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8  1.221 3144.5 0.956
+ W3JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8  1.221 954.8 0.956
+ W4JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8  1.221 485.6 0.956
+ W3JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_ext  1.221 954.8 0.956 (ext!)
+ W4JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_ext  1.221 485.6 0.956 (ext!)
+ W4JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_ext2  1.221 485.6 0.956 (ext!)
+
+
+ TGJets_TuneCUETP8M1_13TeV_amcatnlo_madspin_pythia8 2.967
+ TGJets_TuneCUETP8M1_13TeV_amcatnlo_madspin_pythia8_ext 2.967 (ext!)
+
+ TTGJets_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8 3.697
+ TTGJets_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8_ext 3.697 (ext!)
+
+ ttWJets_13TeV_madgraphMLM 0.4853 (no Ntuple!)
+ ttZJets_13TeV_madgraphMLM 0.5124 (no Ntuple!)
+ tZq_ll_4f_13TeV-amcatnlo-pythia8 0.0758 (no Ntuple!)
+
+ ST_s-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1 3.36
+
+ ST_t-channel_antitop_4f_inclusiveDecays_13TeV-powhegV2-madspin-pythia8 80.95 (another name and xsec!)
+ ST_t-channel_top_4f_inclusiveDecays_13TeV-powhegV2-madspin-pythia8 136.02 (another name and xsec!)
+ ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8 35.6 (another name and xsec!)
+ ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8 35.6 (another name and xsec!)
+ TT_TuneCUETP8M2T4_13TeV-powheg-pythia8 831.76 0.975 (another name!)
+
+Old:
+ ST_t-channel_antitop_4f_leptonDecays_13TeV-powheg-pythia8_TuneCUETP8M1 26.38
+ ST_t-channel_top_4f_leptonDecays_13TeV-powheg-pythia8_TuneCUETP8M1 44.33
+ ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1 35.85
+ ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1 35.85
+ TT_TuneCUETP8M1_13TeV-powheg-pythia8 831.76 0.975
+
