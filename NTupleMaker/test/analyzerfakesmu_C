@@ -48,32 +48,28 @@ void analyzer::Loop(){
 
 
 	FakeList.clear();
-
 	FakeList.push_back("Unknown");
+	FakeList.push_back("#tau-#tau #rightarrow l");
+	FakeList.push_back("#tau-r(l)");
+	FakeList.push_back("#tau-G #rightarrow l");
+	FakeList.push_back("#tau-HFQ #rightarrow l");
+	FakeList.push_back("#tau-LFQ #rightarrow l");
+	FakeList.push_back("J #rightarrow #tau-#tau #rightarrow l");
+	FakeList.push_back("J #rightarrow #tau-r(l)");
+	FakeList.push_back("J #rightarrow #tau-G #rightarrow l");
+	FakeList.push_back("J #rightarrow #tau-HFQ #rightarrow l");
+	FakeList.push_back("J #rightarrow #tau-LFQ #rightarrow l");
+	FakeList.push_back("#mu #rightarrow #tau-#tau #rightarrow l");
+	FakeList.push_back("#mu #rightarrow #tau-r(l)");
+	FakeList.push_back("#mu #rightarrow #tau-G #rightarrow l");
+	FakeList.push_back("#mu #rightarrow #tau-HFQ #rightarrow l");
+	FakeList.push_back("#mu #rightarrow #tau-LFQ #rightarrow l");
+	FakeList.push_back("e #rightarrow #tau-#tau #rightarrow l");
+	FakeList.push_back("e #rightarrow #tau-r(l)");
+	FakeList.push_back("e #rightarrow #tau-G #rightarrow l");
+	FakeList.push_back("e #rightarrow #tau-HFQ #rightarrow l");
+	FakeList.push_back("e #rightarrow #tau-LFQ #rightarrow l");
 
-	FakeList.push_back("r(#tau) r(l)");
-	FakeList.push_back("r(#tau) f(l G)");
-	FakeList.push_back("r(#tau) f(l HFQ)");
-	FakeList.push_back("r(#tau) f(l LFQ)");
-	FakeList.push_back("f(#tau) r(l)");
-	FakeList.push_back("f(#tau) f(l G)");
-	FakeList.push_back("f(#tau) f(l HFQ)");
-	FakeList.push_back("f(#tau) f(l LFQ)");
-	FakeList.push_back("f(#tau J) r(l)");
-	FakeList.push_back("f(#tau #mu) r(l)");
-	FakeList.push_back("f(#tau e) r(l)");
-
-	FakeList.push_back("f(#tau J) f(l G)");
-	FakeList.push_back("f(#tau J) f(l HFQ)");
-	FakeList.push_back("f(#tau J) f(l LFQ)");
-
-	FakeList.push_back("f(#tau #mu) f(l G)");
-	FakeList.push_back("f(#tau #mu) f(l HFQ)");
-	FakeList.push_back("f(#tau #mu) f(l LFQ)");
-
-	FakeList.push_back("f(#tau e) f(l G)");
-	FakeList.push_back("f(#tau e) f(l HFQ)");
-	FakeList.push_back("f(#tau e) f(l LFQ)");
 
 	CutList.clear();
 	CutList.push_back("Nocut");
@@ -107,8 +103,10 @@ void analyzer::Loop(){
 	ChiMass = 0.;
 	//cout<<" THE MASS IS ========================= "<<ChiMass<<endl;
 	 int CutNumb = int(CutList.size());
+	 int CutNumbF = int(FakeList.size());
          int iCFCounter[CutNumb];
 	 double CFCounter[CutNumb];
+
 	 for (int i=0;i < CutNumb; i++){
                         CFCounter[i] = 0;
 			CFCounter_[i] = 0;
@@ -215,7 +213,7 @@ TH2D *histo = (TH2D*) obj;
 	float top_w = 1.;
 	Long64_t nentries = fChain->GetEntriesFast();
 	SetupHists(CutNumb);
-	SetupHistsFake(20);
+	SetupHistsFake(CutNumbF);
 
 		cout<<" will process "<<nentries<<" dataset "<<datasetName->c_str()<< endl;
 
@@ -301,12 +299,13 @@ if(electron_index>-1 )		ElV.SetPtEtaPhiM(el_pt[electron_index], el_eta[electron_
 if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], ta_phi[taus_index], ta_mass[taus_index]);
 
 		int iCut = 1;
-		int category = -1;
+		int category = 0;
 
-		bool isRealTau  = (genTauMatched>0.5 && genLeptonMatched < 0.5 && !isData) ;
+		bool isRealTau  = (genTauMatched>0.5 && !isData) ;
 		bool isMuPromptLepton =  (genLeptonMatchedPromptMu >0.5 && genLeptonMatchedPromptEl<0.5 && !isData);
 		bool isElPromptLepton =  (genLeptonMatchedPromptEl >0.5 && genLeptonMatchedPromptMu<0.5 && !isData);
 
+		bool isMuFromTau =  (genMuMatchedToTauDecay > 0.5 && !isData);
 
 		bool isfakeTauFromMu =  ( genTauMatched < 0.5 && genLeptonMatchedPromptMu > 0.5 && genLeptonMatchedPromptEl <0.5 && !isData) ;
 		bool isfakeTauFromEl =  ( genTauMatched < 0.5 && genLeptonMatchedPromptEl > 0.5 && genLeptonMatchedPromptMu < 0.5 && !isData) ;
@@ -321,34 +320,30 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
 		//category 1 : gen tau gen lepton		
 		if (isRealTau) {
 
-			if (isMuPromptLepton ) category = 1;
-			if (isfakeMuFromGluon) category = 2;
-			if (isfakeMuFromHFQ) category = 3;
-			if (isfakeMuFromLFQ) category = 4;
+			if (isMuFromTau) category = 1;
+
+			if (isMuPromptLepton ) category = 2;
+			if (isfakeMuFromGluon) category = 3;
+			if (isfakeMuFromHFQ) category = 4;
+			if (isfakeMuFromLFQ) category = 5;
 
 		}
 
-		else if (!isRealTau) {
+		if (!isRealTau) {
 
+		if (isfakeTauFromJet && isMuFromTau) category = 6;
+		if (isfakeTauFromJet && isMuPromptLepton) category = 7;
+		if (isfakeTauFromJet && isfakeMuFromGluon) category = 8;
+		if (isfakeTauFromJet && isfakeMuFromHFQ) category = 9;
+		if (isfakeTauFromJet && isfakeMuFromLFQ) category = 10;
 
-			if (isMuPromptLepton ) category = 5;
-			if (isfakeMuFromGluon) category = 6;
-			if (isfakeMuFromHFQ) category = 7;
-			if (isfakeMuFromLFQ) category = 8;
-
-
-
-		if (isfakeTauFromJet && isMuPromptLepton) category = 9;
-		if (isfakeTauFromMu && isMuPromptLepton) category = 10;
-		if (isfakeTauFromEl && isMuPromptLepton) category = 11;
-
-		if (isfakeTauFromJet && isfakeMuFromGluon) category = 12;
-		if (isfakeTauFromJet && isfakeMuFromHFQ) category = 13;
-		if (isfakeTauFromJet && isfakeMuFromLFQ) category = 14;
-
-		if (isfakeTauFromMu && isfakeMuFromGluon) category = 15;
-		if (isfakeTauFromMu && isfakeMuFromHFQ) category = 16;
-		if (isfakeTauFromMu && isfakeMuFromLFQ) category = 17;
+		if (isfakeTauFromMu && isMuFromTau) category = 11;
+		if (isfakeTauFromMu && isMuPromptLepton) category = 12;
+		if (isfakeTauFromMu && isfakeMuFromGluon) category = 13;
+		if (isfakeTauFromMu && isfakeMuFromHFQ) category = 14;
+		if (isfakeTauFromMu && isfakeMuFromLFQ) category = 15;
+		if (isfakeTauFromEl && isMuFromTau) category = 16;
+		if (isfakeTauFromEl && isMuPromptLepton) category = 17;
 		if (isfakeTauFromEl && isfakeMuFromGluon) category = 18;
 		if (isfakeTauFromEl && isfakeMuFromHFQ) category = 19;
 		if (isfakeTauFromEl && isfakeMuFromLFQ) category = 20;
@@ -356,11 +351,9 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
 
 		}
 
-		else 
-		     category = 0;
-
+		//if (genMuMatchedToTauDecay > 0.5 || genMuMatchedHadrDecay > 0.5  )
+		//cout<< " Found the correct one  "<<"   "<<category<<"  "<<genMuMatchedToTauDecay<<"  "<<genMuMatchedHadrDecay<<"  "<<genTauMatched<<endl;
 		// fake tau fake lepton
-
 		
 		if (isData) category = 0;
 
@@ -656,7 +649,18 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
 			cout<<"  end from TH1D "<<endl;
 
 		CutFlowUnW->Write();
-for (int j=0;j<25;++j)
+/*
+for(int cj = 0; cj < CutF; ++cj)
+    {
+      TString nCut;
+      nCut.Form("%i",cj);
+      //CutFlowUnWFakeRate[cj]->GetXaxis()->SetBinLabel(cj+1,FakeList[cj].c_str());
+      CutFlowUnWFakeRate[cj]->GetXaxis()->SetBinLabel(cj+1,nCut);
+//      CutFlowUnWFakeRate[cj]->Write();
+    }
+*/
+
+for (int j=0;j<20;++j)
 		CutFlowUnWFakeRate[j]->Write();
 
 		histW->Write();
