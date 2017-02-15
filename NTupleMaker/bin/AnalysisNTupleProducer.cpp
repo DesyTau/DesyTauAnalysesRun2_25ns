@@ -1236,11 +1236,11 @@ int main(int argc, char * argv[]) {
       // *** Analysis of generator info ***
       // **********************************
       int indexW  = -1;
-      int indexNu = -1; // nu from W
+      //int indexNu = -1; // nu from W
       int indexMu = -1; // muon from W
       int indexE  = -1; // elec from W
       int indexTau = -1; // tau from W
-      int indexTauE = -1; // W->tau->e
+      //int indexTauE = -1; // W->tau->e
       int indexTauMu = -1; // W->tau->mu
       vector<TLorentzVector> gentauLV; gentauLV.clear();
       vector<int> gentauDecay; gentauDecay.clear();
@@ -1275,7 +1275,7 @@ int main(int argc, char * argv[]) {
 	      TMath::Abs(analysisTree.genparticles_pdgid[igen])==16) { 
 
 	    if (analysisTree.genparticles_info[igen]==(1<<1)) {
-	      indexNu = igen;
+	      //indexNu = igen;
 	      wnuLV = genPartLV;
 	    }
 	    if (analysisTree.genparticles_info[igen]==(1<<1) ||
@@ -1311,8 +1311,8 @@ int main(int argc, char * argv[]) {
               indexE = igen;
 	      welecLV = genPartLV;
 	    }
-            if ( analysisTree.genparticles_info[igen]==((1<<1)|(1<<2)) ) // W->tau->e
-	      indexTauE = igen;
+            //if ( analysisTree.genparticles_info[igen]==((1<<1)|(1<<2)) ) // W->tau->e
+	    //  indexTauE = igen;
 	  }
 	}
 
@@ -1523,19 +1523,6 @@ int main(int argc, char * argv[]) {
 	  pfmet_ey = analysisTree.pfmetcorr_ey;
 	}
       }
-      //      cout << endl;
-      //      cout << "metx            = " << pfmet_ex << endl;
-      //      cout << "metx(JetEnUp)   = " << analysisTree.pfmet_ex_JetEnUp << endl; 
-      //      cout << "metx(JetEnDown) = " << analysisTree.pfmet_ex_JetEnDown << endl; 
-      //      cout << "metx(UncEnUp)   = " << analysisTree.pfmet_ex_UnclusteredEnUp << endl; 
-      //      cout << "metx(UncEnDown) = " << analysisTree.pfmet_ex_UnclusteredEnDown << endl; 
-      //      cout << endl;
-      //      cout << "mety            = " << pfmet_ey << endl;
-      //      cout << "mety(JetEnUp)   = " << analysisTree.pfmet_ey_JetEnUp << endl; 
-      //      cout << "mety(JetEnDown) = " << analysisTree.pfmet_ey_JetEnDown << endl; 
-      //      cout << "mety(UncEnUp)   = " << analysisTree.pfmet_ey_UnclusteredEnUp << endl; 
-      //      cout << "mety(UncEnDown) = " << analysisTree.pfmet_ey_UnclusteredEnDown << endl; 
-      //      cout << endl;
 
       met_ = TMath::Sqrt(pfmet_ex*pfmet_ex+pfmet_ey*pfmet_ey);
       if (met_<1e-4) met_ = 1e-4;
@@ -2258,7 +2245,7 @@ int main(int argc, char * argv[]) {
 	// finding matching jet
 	bool jetFound = false;
 	float dRmin = 1;
-	unsigned int indexMatchingJet = 0;
+	//unsigned int indexMatchingJet = 0;
 	for (unsigned int ijet=0; ijet<analysisTree.pfjet_count; ++ijet) {
 	  TLorentzVector lorentzVectorJ; lorentzVectorJ.SetXYZT(analysisTree.pfjet_px[ijet],
 								analysisTree.pfjet_py[ijet],
@@ -2270,7 +2257,7 @@ int main(int argc, char * argv[]) {
 	  if (drJetTau<dRmin) {
 	    dRmin = drJetTau;
 	    jetFound = true;
-	    indexMatchingJet = ijet;
+	    //indexMatchingJet = ijet;
 	    lorentzVectorTauJet = lorentzVectorJ;
 	  }
 
@@ -2397,56 +2384,6 @@ int main(int argc, char * argv[]) {
 	}
       }
       
-      // ***************************
-      // ******* W+Jet selection ****
-      // ***************************
-      /*
-      if (lorentzVectorW.Pt()>1e-4&&nJetsCentral30_>=1) {
-	recoilRatio_ = jetPt_ / lorentzVectorW.Pt();
-	recoilDPhi_  = dPhiFromLV(lorentzVectorW,lorentzVectorJet);
-	isWJet = ptTriggerMu>ptMuCut_WJet; 
-	isWJet = isWJet && mtmuon_ > mtCut_WJet;
-	isWJet = isWJet && recoilRatio_>ptJetWRatioLowerCut_WJet && recoilRatio_<ptJetWRatioUpperCut_WJet;
-	isWJet = isWJet && recoilDPhi_>deltaPhiWJetCut_WJet;
-	if (isWJet) {
-	  mueffweight  = SF_muonIdIso->get_ScaleFactor(ptTriggerMu, etaTriggerMu);
-          mutrigweight = SF_muonTrig->get_EfficiencyData(ptTriggerMu, etaTriggerMu);
-	  HtNoRecoil_     = Ht_     - ptTriggerMu;
-	  SoftHtNoRecoil_ = SoftHt_ - ptTriggerMu;
-	  recoilM_   = lorentzVectorW.M();
-          recoilPt_  = lorentzVectorW.Pt();
-          recoilEta_ = lorentzVectorW.Eta();
-          recoilPhi_ = lorentzVectorW.Phi();
-	  selection_ = 13;
-	  ntuple_->Fill();
-	  WJetEvents++;
-	}
-      }
-      */
-      // ********************************
-      // ****** W->mu+v selection *******
-      // ********************************
-      /*
-      if (lorentzVectorW.Pt()>1e-4) {
-	bool isWprod = ptTriggerMu>ptMuCut_WJet;
-        isWprod = isWprod && mtmuon_ > mtCut_WJet;
-	if (isWprod) {
-	  mueffweight  = SF_muonIdIso->get_ScaleFactor(ptTriggerMu, etaTriggerMu);
-          mutrigweight = SF_muonTrig->get_EfficiencyData(ptTriggerMu, etaTriggerMu);
-	  recoilRatio_ = lorentzVectorTriggerMu.Pt() / lorentzVectorMet.Pt();
-	  recoilDPhi_  = dPhiFromLV(lorentzVectorTriggerMu,lorentzVectorMet);
-	  HtNoRecoil_     = Ht_     - ptTriggerMu;
-	  SoftHtNoRecoil_ = SoftHt_ - ptTriggerMu;
-	  recoilM_   = lorentzVectorW.M();
-          recoilPt_  = lorentzVectorW.Pt();
-          recoilEta_ = lorentzVectorW.Eta();
-          recoilPhi_ = lorentzVectorW.Phi();
-	  selection_ = 10;
-	  ntuple_->Fill();
-	  WProdEvents++;
-	}
-      }
-      */
       // ********************************
       // ******* W*->MuNu selection *****
       // ********************************
@@ -2472,50 +2409,6 @@ int main(int argc, char * argv[]) {
 	}
       }
 
-      // *********************************
-      // ** Single JET + MET selection ***
-      // *********************************
-      /*
-      if (lorentzVectorMet.Pt()>1e-4&&nJetsCentral30_==1) {
-	recoilRatio_ = jetPt_/lorentzVectorMet.Pt();
-	recoilDPhi_  = dPhiFromLV(lorentzVectorJet,lorentzVectorMet);
-	if (recoilRatio_>0.7&&recoilRatio_<1.3&&recoilDPhi_>2.4) {
-	  HtNoRecoil_     = Ht_;
-	  SoftHtNoRecoil_ = SoftHt_;
-	  recoilM_   = lorentzVectorMet.M();
-	  recoilPt_  = lorentzVectorMet.Pt();
-	  recoilEta_ = lorentzVectorMet.Eta();
-	  recoilPhi_ = lorentzVectorMet.Phi();
-	  selection_ = 11;
-	  ntuple_->Fill();
-	  SingleJetEvents++;
-	}
-
-      }
-      */
-      // *************************
-      // **** Dijet selection ****
-      // *************************
-      /*
-      if (nJetsCentral30_>=2) {
-	recoilRatio_ = jet2Pt_/jetPt_;
-	recoilDPhi_  = dPhiFromLV(lorentzVectorJet,lorentzVectorJet2);	
-	if (recoilRatio_>0.7&&recoilRatio_<1.3&&recoilDPhi_>2.4) {
-	  HtNoRecoil_     = Ht_;
-	  SoftHtNoRecoil_ = SoftHt_;
-	  recoilM_   = lorentzVectorMet.M();
-	  recoilPt_  = lorentzVectorMet.Pt();
-	  recoilEta_ = lorentzVectorMet.Eta();
-	  recoilPhi_ = lorentzVectorMet.Phi();
-	  selection_ = 12;
-	  ntuple_->Fill();
-	  DiJetEvents++;
-	}
-      }
-      */
-
-      // 
-
       // ********************************
       // ****** W*->TauNu selection *****
       // ******************************** 
@@ -2535,62 +2428,6 @@ int main(int argc, char * argv[]) {
 	  selection_ = 3;
 	  ntuple_->Fill();
 	  WTauNuEvents++;
-	  // filling special ntuple ->
-	  // bool fillWNTuple = nMuon_==0 && nElec_==0 && isSingleJet && wMass_>0;
-	  // fillWNTuple = fillWNTuple && tauDM_>0.5 && tauLooseIso_>0.5 && tauAntiMuonLoose3_>0.5 && tauAntiElectronLooseMVA6_>0.5;
-	  // fillWNTuple = fillWNTuple && tauGenMatchDecay_<0;
-	  // if (fillWNTuple) wntuple_->Fill();
-	  // end filling special ntuple 
-
-	  // bool isInterestingEvent =  
-	  //   nMuon_==0 && 
-	  //   nElec_==0 && 
-	  //   nSelTaus_==1 && 
-	  //   tauDM_>0.5 && 
-	  //   tauLooseIso_>0.5 && 
-	  //   tauAntiMuonLoose3_>0.5 && 
-	  //   tauAntiElectronLooseMVA5_>0.5 && 
-	  //   tauPt_>100 && met_>110 && 
-	  //   trigger_>0.5 && 
-	  //   nJetsCentral30_ <= 1 && 
-	  //   nJetsForward30_ == 0;
-	  // if (isInterestingEvent) {
-	  //   ntuple_->Fill();
-	  // std::cout << "Selected taus = " << nSelTaus_
-	  // 	      << "  tauPt = " << tauPt_
-	  // 	      << "  tauEta = " << tauEta_
-	  // 	      << "  Forward jets (30) = " << nJetsForward30_
-	  // 	      << "  Central jets (30) = " << nJetsCentral30_ << std::endl;
-	  // for (unsigned int iF=0; iF<centralJets30Indexes.size();++iF) {
-	  //   unsigned int indexJet = centralJets30Indexes.at(iF);
-	  //   float deltaRJetTau = deltaR(analysisTree.pfjet_eta[indexJet],
-	  // 				  analysisTree.pfjet_phi[indexJet],
-	  // 				  tauEta_,
-	  // 				  tauPhi_);
-	  
-	  //   std::cout << "  Central jet " << iF 
-	  // 		<< "   pT = " << analysisTree.pfjet_pt[indexJet] 
-	  // 		<< "   eta = " << analysisTree.pfjet_eta[indexJet] 
-	  // 		<< " dR(jet,tau) = " << deltaRJetTau << std::endl;
-	  
-	  
-	  // }
-	  // for (unsigned int iF=0; iF<forwardJets30Indexes.size();++iF) {
-	  //   unsigned int indexJet = forwardJets30Indexes.at(iF);
-	  //   float deltaRJetTau = deltaR(analysisTree.pfjet_eta[indexJet],
-	  // 				  analysisTree.pfjet_phi[indexJet],
-	  // 				  tauEta_,
-	  // 				  tauPhi_);
-	  
-	  //   std::cout << "  Forward jet " << iF 
-	  // 		<< "   pT = " << analysisTree.pfjet_pt[indexJet] 
-	  // 		<< "   eta = " << analysisTree.pfjet_eta[indexJet] 
-	  // 		<< " dR(jet,tau) = " << deltaRJetTau << std::endl;
-	  
-	  
-	  // }
-	  // std::cout << std::endl;
-	  //	  }
 	}
       }
 
@@ -2602,7 +2439,15 @@ int main(int argc, char * argv[]) {
       bool foundJetTauPair = false;
       if (isDiJet) {
 	for (unsigned int iTau=0; iTau<tauIndexes.size(); ++iTau) { // loop over taus
+	  
 	  unsigned int indexTau = tauIndexes.at(iTau);
+
+	  if(nMuon_!=0)          continue;
+	  if(nElec_!=0)          continue;
+	  if(nSelTaus_!=1)       continue;
+	  if(nJetsCentral30_!=2) continue;
+	  if(analysisTree.tau_pt[indexTau]<100.) continue;
+
 	  TLorentzVector tauLV; tauLV.SetXYZM(analysisTree.tau_px[indexTau],
 					      analysisTree.tau_py[indexTau],
 					      analysisTree.tau_pz[indexTau],
@@ -2700,7 +2545,7 @@ int main(int argc, char * argv[]) {
 	    selection_ = 4;
 	    ntuple_->Fill();
 	  }
-	}
+	} // END: loop over tau
       }
       if (foundJetTauPair) JetTauEvents++;
 
