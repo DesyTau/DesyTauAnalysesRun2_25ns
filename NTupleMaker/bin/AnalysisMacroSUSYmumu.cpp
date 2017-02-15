@@ -134,7 +134,6 @@ int main(int argc, char * argv[]) {
   string cmsswBase = (getenv ("CMSSW_BASE"));
   string fullPathToJsonFile = cmsswBase + "/src/DesyTauAnalyses/NTupleMaker/test/json/" + jsonFile;
  
-  //RecoilCorrector recoilMetCorrector("HTT-utilities/RecoilCorrections/data/PFMET_MG_2016BCD_RooT_5.2.root");
   RecoilCorrector recoilMetCorrector("DesyTauAnalyses/NTupleMaker/data/PFMET_Run2016BCDEFGH_Spring16.root");
 
   MEtSys metSys("HTT-utilities/RecoilCorrections/data/MEtSys.root");
@@ -521,7 +520,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       trig_weight = 1.;
       trig_weight_1 = 1.;
       trig_weight_2 = 1.;
-
+/////////needed for Recoil
       bool isW = false;
       bool isDY = false;
       bool isZTT = false;
@@ -529,7 +528,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       bool isZEE = false;
       bool isTOP = false;
       if (!isData &&  string::npos != filen.find("JetsToLNu") ) isW=true;
-      if (!isData &&  string::npos != filen.find("JetsToLL") )  isDY=true;
+      if (!isData &&  string::npos != filen.find("JetsToLL_M") )  isDY=true;
       if (!isData &&  string::npos != filen.find("TT_TuneCUETP8M1_13TeV-powheg-pythia8") ) isTOP=true;
 
       float nuPx = 0;
@@ -1306,7 +1305,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
         double neutralIso = el_neutralHadIso[ie] + el_photonIso[ie] - 0.5*el_puIso[ie];
         neutralIso = max(double(0),neutralIso);
         el_neutralIso[ie] = neutralIso ;
-        el_absIsoEl[ie] = el_chargedHadIso[ie] + mu_neutralIso[ie];
+        el_absIsoEl[ie] = el_chargedHadIso[ie] + el_neutralIso[ie];
 	el_relIsoEl[ie]  = el_absIsoEl[ie]/el_pt[ie] ;
 
       }
@@ -1504,11 +1503,12 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       }
 
 
-      if ((isW || isDY) && !isData) {
+      if ( (isW || isDY) && !isData) {
 
-	  recoilMetCorrector.CorrectByMeanResolution(analysisTree.pfmet_ex,analysisTree.pfmet_ey,bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,pfmet_corr_x,pfmet_corr_y);
+	  recoilMetCorrector.CorrectByMeanResolution(met_x,met_y,bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,pfmet_corr_x,pfmet_corr_y);
  
-        met_x = pfmet_corr_x;
+
+  	met_x = pfmet_corr_x;
         met_y = pfmet_corr_y;
  
       // MEt related systematic uncertainties
@@ -1563,28 +1563,37 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 				    met_resoDown_y*met_resoDown_y);
       metphi_resoDown = TMath::ATan2(met_resoDown_y,met_resoDown_x);
 
+      }//if isW, isDY !isData
+
       met_ex_recoil = pfmet_corr_x;
       met_ey_recoil = pfmet_corr_y;
 
-      }//if isW, isDY !isData
 
-      met_ex = analysisTree.pfmetcorr_ex;
-      met_ey = analysisTree.pfmetcorr_ey;
-      met_ez = analysisTree.pfmetcorr_ez;
+      //revert back to uncorrected met
+	if(!isData)
+	{      met_x = analysisTree.pfmet_ex;
+	       met_y = analysisTree.pfmet_ey;
+	}
+
+
+
+      met_ex = met_x;
+      met_ey = met_y;
       met_pt = TMath::Sqrt(met_ex*met_ex + met_ey*met_ey);
-      met_phi = TMath::ATan2(met_y,met_x);
+      met_phi = TMath::ATan2(met_ey,met_ex);
 
-     met_ex_JetEnUp = analysisTree.pfmet_ex_JetEnUp;
-     met_ey_JetEnUp = analysisTree.pfmet_ey_JetEnUp;
+     met_ex_JetEnUp = analysisTree.pfmetcorr_ex_JetEnUp;
+     met_ey_JetEnUp = analysisTree.pfmetcorr_ey_JetEnUp;
 
-     met_ex_JetEnDown = analysisTree.pfmet_ex_JetEnDown;
-     met_ey_JetEnDown = analysisTree.pfmet_ey_JetEnDown;
+     met_ex_JetEnDown = analysisTree.pfmetcorr_ex_JetEnDown;
+     met_ey_JetEnDown = analysisTree.pfmetcorr_ey_JetEnDown;
 
-     met_ex_UnclusteredEnUp = analysisTree.pfmet_ex_UnclusteredEnUp;
-     met_ey_UnclusteredEnUp = analysisTree.pfmet_ey_UnclusteredEnUp;
+     met_ex_UnclusteredEnUp = analysisTree.pfmetcorr_ex_UnclusteredEnUp;
+     met_ey_UnclusteredEnUp = analysisTree.pfmetcorr_ey_UnclusteredEnUp;
    
-     met_ex_UnclusteredEnDown = analysisTree.pfmet_ex_UnclusteredEnDown;
-     met_ey_UnclusteredEnDown = analysisTree.pfmet_ey_UnclusteredEnDown;
+     met_ex_UnclusteredEnDown = analysisTree.pfmetcorr_ex_UnclusteredEnDown;
+     met_ey_UnclusteredEnDown = analysisTree.pfmetcorr_ey_UnclusteredEnDown;
+
 
 
       float genmet_ex = analysisTree.genmet_ex;

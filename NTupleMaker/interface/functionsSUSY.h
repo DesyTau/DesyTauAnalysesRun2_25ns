@@ -501,6 +501,20 @@ double mcx(const double v1[4],const double v2[4]
 }
 
 
+void computeDzeta(float metX,  float metY,
+                  float zetaX, float zetaY,
+                  float pzetavis,
+                  float & pzetamiss,
+                  float & dzeta) {
+    
+    pzetamiss = metX*zetaX + metY*zetaY;
+    dzeta = pzetamiss - 0.85*pzetavis;
+    
+}
+
+
+
+
 
 
 #endif

@@ -81,7 +81,7 @@ void analyzer::Loop()
 	CutList.push_back("InvMass gt 90");
 	CutList.push_back("dR lt 3.5 gt 1.5");
 
-	//ChiMass = CHIMASSS;
+	//ChiMass = 25;
 	ChiMass = 0.;
 
 	 int CutNumb = int(CutList.size());

@@ -13,7 +13,7 @@ public :
 
 
   // Declaration of leaf types
-  ULong64_t       run;
+  Int_t           run;
   Int_t           lumi;
   Int_t           evt;
   Int_t 		  npv;

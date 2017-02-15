@@ -72,7 +72,7 @@ void analyzer::Loop(){
 //	CutList.push_back("MET gt 50");
 //	CutList.push_back("tau pT gt 50");
 
-	//ChiMass = CHIMASSS;
+	//ChiMass = 25;
 	ChiMass = 0.;
 	//cout<<" THE MASS IS ========================= "<<ChiMass<<endl;
 
@@ -122,7 +122,7 @@ void analyzer::Loop(){
 	if (isSignal) cout<<" YOU HAVE FOUND ITTTTTTTTT "<<endl;
 	if (isData) cout<<" YOU HAVE FOUND a DATA "<<endl;
 
-	string channel = "CHANNELHERE";
+	string channel = "Î";
 
 	TString inputRootFile = "/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/CMSSW_8_0_12/src/DesyTauAnalyses/NTupleMaker/data/HIP_mediumID.root";
 	TFile * fileInHIP = new TFile(inputRootFile, "read");
@@ -139,7 +139,7 @@ TObject *obj = key->ReadObj ();
 TH2D *histo = (TH2D*) obj;
 */
 
-	TFile * filein = new TFile("/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/CMSSW_8_0_12/src/DesyTauAnalyses/NTupleMaker/test/CHANNELHERE/FILEIN","read");
+	TFile * filein = new TFile("/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/CMSSW_8_0_12/src/DesyTauAnalyses/NTupleMaker/test/Î/FILEIN","read");
 
 
 	TH1D * histW = (TH1D*)filein->Get("mutau/histWeightsH");

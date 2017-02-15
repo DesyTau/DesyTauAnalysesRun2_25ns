@@ -26,9 +26,9 @@ public :
   Int_t fCurrent;  //!current Tree number in a TChain
   
   // Declaration of leaf types
-  UInt_t          run;
-  UInt_t          lumi;
-  UInt_t          evt;
+  Int_t           run;
+  Int_t           lumi;
+  Int_t           evt;
   Int_t           npv;
   Float_t         npu;
   Float_t         rho;
@@ -42,7 +42,7 @@ public :
   Float_t         idisoweight_antiiso_1;
   Float_t         idisoweight_2;
   Float_t         topptweight;
-  Double_t 	  zptweight;
+  Double_t 		  zptweight;
   Double_t        trkeffweight_1;
   Float_t         effweight;
   Float_t         etaufakeweight;
@@ -93,7 +93,7 @@ public :
   Float_t         pfmt_rc_njetsreco_1;
   Float_t         mt_rc_visreco_1;
   Float_t         pfmt_rc_visreco_1;
-  Int_t 	  tau_decay_mode_1;
+  Int_t 	      tau_decay_mode_1;
   Float_t         pt_2;
   Float_t         phi_2;
   Float_t         eta_2;
@@ -123,10 +123,6 @@ public :
   Int_t           extraelec_veto;
   Int_t           extramuon_veto;
   Float_t 		  chargedIsoPtSum_2;
-  Float_t         neutralIsoPtSum_2;
-  Float_t         puCorrPtSum_2;
-  UInt_t          isolationGammaCands_size_2;
-  UInt_t          signalGammaCands_size_2;
   Float_t         byCombinedIsolationDeltaBetaCorrRaw3Hits_1;
   Float_t         byLooseCombinedIsolationDeltaBetaCorr3Hits_1;
   Float_t         byMediumCombinedIsolationDeltaBetaCorr3Hits_1;
@@ -140,8 +136,6 @@ public :
   Float_t 	  againstElectronTightMVA6_2;
   Float_t         againstMuonLoose3_1;
   Float_t         againstMuonTight3_1;
-  UInt_t          n_badmuons;
-  UInt_t          n_duplicatemuons;
   Float_t         byCombinedIsolationDeltaBetaCorrRaw3Hits_2;
   Float_t         byLooseCombinedIsolationDeltaBetaCorr3Hits_2;
   Float_t         byMediumCombinedIsolationDeltaBetaCorr3Hits_2;
@@ -357,10 +351,6 @@ public :
   TBranch        *b_extraelec_veto;   //!
   TBranch        *b_extramuon_veto;   //!
   TBranch 		 *b_chargedIsoPtSum_2; 
-  TBranch        *b_neutralIsoPtSum_2;
-  TBranch        *b_puCorrPtSum_2;
-  TBranch        *b_isolationGammaCands_size_2;
-  TBranch        *b_signalGammaCands_size_2;
   TBranch        *b_byCombinedIsolationDeltaBetaCorrRaw3Hits_1;   //!
   TBranch        *b_byLooseCombinedIsolationDeltaBetaCorr3Hits_1;   //!
   TBranch        *b_byMediumCombinedIsolationDeltaBetaCorr3Hits_1;   //!
@@ -372,8 +362,6 @@ public :
   TBranch        *b_againstElectronVTightMVA5_1;   //!
   TBranch        *b_againstMuonLoose3_1;   //!
   TBranch        *b_againstMuonTight3_1;   //!
-  TBranch        *b_n_badmuons;
-  TBranch        *b_n_duplicatemuons;
   TBranch        *b_byCombinedIsolationDeltaBetaCorrRaw3Hits_2;   //!
   TBranch        *b_byLooseCombinedIsolationDeltaBetaCorr3Hits_2;   //!
   TBranch        *b_byMediumCombinedIsolationDeltaBetaCorr3Hits_2;   //!

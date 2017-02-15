@@ -4,10 +4,10 @@
 #$ -S /bin/sh
 #
 #(the cpu time for this job)
-#$ -l h_cpu=2:29:00
+#$ -l h_cpu=1:29:00
 #
 #(the maximum memory usage of this job)
-#$ -l h_vmem=1000M
+#$ -l h_vmem=2000M
 #
 #(use hh site)
 #$ -l site=hh
@@ -43,6 +43,21 @@ cp *.conf Jobs/.
 while read line
 do
 
+
+	ct=`ls ${dir}/${line}*.root | wc -l`
+	ctt=`cat ${dir}/${line} | wc -l`
+
+
+	echo There are  $ct out of $ctt for $line in $dir dir 
+
+	if [[ $ct -ge $ctt ]] ;then
+		     
+	     	continue;
+
+		
+	fi
+
+
 unset xsec
 #xsec=`grep " $line " xsecs | cut -d " " -f2-3`	
 #	cp $dir/$line input$line
@@ -58,7 +73,7 @@ bas=`basename $f | awk -F ".root" '{print $1}'`
 
 
 #echo $bas $xsec >> xsecs
-echo $bas $xsec 
+#echo $bas $xsec 
 
 if [ ! -f $dir/${bas}_B_OS_DataDriven.root ]
 then
@@ -66,7 +81,7 @@ then
 echo $f > $dir/$bas
 cat bss > Jobs/job$line$channel$dir${bas}_B.sh
 #echo SUSYTtemplate analysisMacroSUSY_Data_B.conf ${bas} $dir>> Jobs/job$line$channel$dir${bas}_B.sh
-echo SUSY$channel analysisMacroSUSY_Data_B.conf ${bas} $dir 1 >> Jobs/job$line$channel$dir${bas}_B.sh
+echo SUSY$channel analysisMacroSUSY_Data_B.conf ${bas} $dir 1 1 1>> Jobs/job$line$channel$dir${bas}_B.sh
 #echo SUSYeltau analysisMacroSUSY_Data_B.conf ${bas} $dir>> Jobs/job$line$channel$dir${bas}_B.sh
 
 chmod u+x Jobs/job$line$channel$dir${bas}_B.sh
@@ -74,7 +89,7 @@ chmod u+x Jobs/job$line$channel$dir${bas}_B.sh
 wr=$3
 if [[ ${wr} == grid ]] ; 
 then
-	qsub Jobs/job$line$channel$dir${bas}_B.sh 
+	qsub -l h_rt=02:30:00 -l h_vmem=1500M Jobs/job$line$channel$dir${bas}_B.sh 
 else
 	. Jobs/job$line$channel$dir${bas}_B.sh 
 fi
