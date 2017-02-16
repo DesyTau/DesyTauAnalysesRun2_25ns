@@ -1241,7 +1241,7 @@ int main(int argc, char * argv[]) {
       int indexE  = -1; // elec from W
       int indexTau = -1; // tau from W
       //int indexTauE = -1; // W->tau->e
-      int indexTauMu = -1; // W->tau->mu
+      //int indexTauMu = -1; // W->tau->mu
       vector<TLorentzVector> gentauLV; gentauLV.clear();
       vector<int> gentauDecay; gentauDecay.clear();
       vector<TLorentzVector> genmuonLV; genmuonLV.clear();
@@ -1296,8 +1296,8 @@ int main(int argc, char * argv[]) {
 	      indexMu = igen;
 	      wmuonLV = genPartLV;
 	    }
-	    if ( analysisTree.genparticles_info[igen]==((1<<1)|(1<<2)) ) // W->tau->mu
-	      indexTauMu = igen;
+	    //if ( analysisTree.genparticles_info[igen]==((1<<1)|(1<<2)) ) // W->tau->mu
+	    //  indexTauMu = igen;
 	  }
 
 	  if (TMath::Abs(analysisTree.genparticles_pdgid[igen])==11) { // electron
@@ -1638,7 +1638,7 @@ int main(int argc, char * argv[]) {
       nSelMuonTrig_ = nSelMuon_;
 
       float ptSecondMu  = -1;
-      float etaSecondMu = -1;
+      //float etaSecondMu = -1;
       int indexSecondMu = -1;
       TLorentzVector lorentzVectorTriggerMu; lorentzVectorTriggerMu.SetXYZT(0,0,0,0);
       TLorentzVector lorentzVectorSecondMu;  lorentzVectorSecondMu.SetXYZT(0,0,0,0);
@@ -1662,7 +1662,7 @@ int main(int argc, char * argv[]) {
 	  if (netcharge>0) continue;
 	  if (analysisTree.muon_pt[indexMu]>ptSecondMu) {
 	    ptSecondMu = analysisTree.muon_pt[indexMu];
-	    etaSecondMu = analysisTree.muon_eta[indexMu];
+	    //etaSecondMu = analysisTree.muon_eta[indexMu];
 	    indexSecondMu = int(indexMu);
 	  }
 	}
@@ -1684,14 +1684,14 @@ int main(int argc, char * argv[]) {
       }
       float ptLeadingMu = ptTriggerMu;
       float ptTrailingMu = ptSecondMu;
-      float etaLeadingMu = etaTriggerMu;
-      float etaTrailingMu = etaSecondMu;
+      //float etaLeadingMu = etaTriggerMu;
+      //float etaTrailingMu = etaSecondMu;
 
       if (ptTrailingMu>ptLeadingMu) {
 	ptLeadingMu = ptSecondMu;
 	ptTrailingMu = ptTriggerMu;
-	etaLeadingMu = etaSecondMu;
-	etaTrailingMu = etaTriggerMu;
+	//etaLeadingMu = etaSecondMu;
+	//etaTrailingMu = etaTriggerMu;
       }
       // *****************************
       // **** end accessing muons ****
@@ -2366,6 +2366,13 @@ int main(int argc, char * argv[]) {
 	isWJet = isWJet && mtmuon_ > mtCut_WJet;
 	isWJet = isWJet && recoilRatio_>ptJetWRatioLowerCut_WJet && recoilRatio_<ptJetWRatioUpperCut_WJet;
 	isWJet = isWJet && recoilDPhi_>deltaPhiWJetCut_WJet;
+	isWJet = isWJet && nMuon_ == 1;
+	isWJet = isWJet && nElec_ == 0;
+	isWJet = isWJet && nSelTaus_ == 1;
+	isWJet = isWJet && nJetsCentral30_ == 1;
+	isWJet = isWJet && nJetsForward30_ == 0;
+	isWJet = isWJet && tauPt_>100.;
+
 	if (isWJet) {
 	  mueffweight  = SF_muonIdIso->get_ScaleFactor(ptTriggerMu, etaTriggerMu);
           mutrigweight = SF_muonTrig->get_EfficiencyData(ptTriggerMu, etaTriggerMu);
@@ -2394,6 +2401,12 @@ int main(int argc, char * argv[]) {
 	isWMuNu = isWMuNu && met_>metCut_WMuNu;
 	isWMuNu = isWMuNu && recoilRatio_>ptMuMetRatioLowerCut_WMuNu && recoilRatio_<ptMuMetRatioUpperCut_WMuNu;
 	isWMuNu = isWMuNu && recoilDPhi_>deltaPhiMuMetCut_WMuNu;
+	isWMuNu = isWMuNu && nMuon_ == 0;
+	isWMuNu = isWMuNu && nElec_ == 0;
+	isWMuNu = isWMuNu && nSelTaus_ == 1;
+	isWMuNu = isWMuNu && nJetsCentral30_ <= 1;
+	isWMuNu = isWMuNu && nJetsForward30_ == 0;
+
 	if (isWMuNu) {
 	  mueffweight  = SF_muonIdIso->get_ScaleFactor(ptTriggerMu, etaTriggerMu);
           mutrigweight = SF_muonTrig->get_EfficiencyData(ptTriggerMu, etaTriggerMu);
