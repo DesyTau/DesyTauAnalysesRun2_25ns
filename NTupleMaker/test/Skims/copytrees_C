@@ -1,0 +1,70 @@
+void copytreesMODEL_SUSYMASS_LSPN1MASS_NUMBER() {
+// Example of Root macro to copy a subset of a Tree to a new Tree
+   
+
+   //Get old file, old tree and set top branch address
+   TFile *oldfile = new TFile("/nfs/dust/cms/group/susy-desy/Run2/Stau/8025_MC_SUSY_v1/SMS-MODEL/FILEIN","read");
+
+   TTree *maketreeold = (TTree*)oldfile->Get("makeroottree/AC1B");
+   TTree *inittreeold = (TTree*)oldfile->Get("initroottree/AC1B");
+ 
+   Long64_t nentriesinit = inittreeold->GetEntries();
+   Long64_t nentriesmake = maketreeold->GetEntries();
+
+   inittreeold->SetBranchStatus("*",1);
+   maketreeold->SetBranchStatus("*",1);
+
+
+     Float_t         SusyMotherMass;
+     Float_t         SusyLSPMass;
+     Float_t         genweight;
+     TBranch        *b_genweight;   //!
+     TBranch        *b_SusyMotherMass;   //!
+     TBranch        *b_SusyLSPMass;   //!
+
+    maketreeold->SetBranchAddress("SusyMotherMass",&SusyMotherMass,&b_SusyMotherMass);
+    maketreeold->SetBranchAddress("SusyLSPMass",&SusyLSPMass,&b_SusyLSPMass);
+    maketreeold->SetBranchAddress("genweight", &genweight, &b_genweight);
+   //Create a new file + a clone of old tree in new file
+
+  TFile *newfile = new TFile("MODEL_SUSYMASS_LSPN1MASS_NUMBER.root","recreate");
+
+
+   newfile->mkdir("initroottree");
+   newfile->cd("initroottree");
+   TTree *inittreenew = inittreeold->CloneTree(0);
+ //  inittreenew->SetName("AC1B_init");
+
+/* 
+   for (Long64_t i=0;i< nentriesinit; ++i) {
+      inittreeold->GetEntry(i);
+      inittreenew->Fill();
+   }
+*/
+
+   newfile->cd();
+   newfile->mkdir("makeroottree");
+   newfile->cd("makeroottree");
+   TTree *maketreenew = maketreeold->CloneTree(0);
+ //  maketreenew->SetName("AC1B_make");
+
+
+   for (Long64_t i=0;i<nentriesmake; ++i) {
+      maketreeold->GetEntry(i);
+if (SusyMotherMass == SUSYMASS && SusyLSPMass == N1MASS){
+      //cout<<" the points  "<<SusyMotherMass<<"   "<<SusyLSPMass<<endl;
+      maketreenew->Fill();
+      inittreenew->Fill();
+	}
+   }
+
+
+  
+
+   inittreenew->AutoSave();
+   maketreenew->AutoSave();
+
+   delete oldfile;
+   delete newfile;
+
+}
