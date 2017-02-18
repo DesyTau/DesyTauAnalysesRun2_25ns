@@ -222,7 +222,7 @@ int main(int argc, char * argv[]){
   if(!isData && applyRecoilCorrections && (isDY || isWJets || isVBForGGHiggs) ){
     TString RecoilDir("HTT-utilities/RecoilCorrections/data/");
 
-    TString RecoilFileName = RecoilDir; RecoilFileName += "TypeIPFMET_2016BCD.root";
+    TString RecoilFileName = RecoilDir; RecoilFileName += "TypeI-PFMet_Run2016BtoH.root";
     std::cout<<RecoilFileName<<std::endl;
     recoilPFMetCorrector = new RecoilCorrector( RecoilFileName);
         
