@@ -368,6 +368,8 @@ int main(int argc, char * argv[]) {
     Float_t         mTtot_resoUp;
     Float_t         mTtot_resoDown;
     Float_t         mCDF;
+
+    Float_t         mTdileptonMET;
     
     Float_t         mTemu;
     Float_t         mTemet;
@@ -633,8 +635,16 @@ int main(int argc, char * argv[]) {
     Bool_t isZTT;
     
     Bool_t metFilters_;
-    Bool_t metXFilters_;
-    
+
+    Bool_t badChargedCandidateFilter_;
+    Bool_t badPFMuonFilter_;
+    Bool_t badGlobalMuonFilter_;
+    Bool_t muonBadTrackFilter_;
+    Bool_t chargedHadronTrackResolutionFilter_;
+
+    Bool_t badMuonFilter_;
+    Bool_t duplicateMuonFilter_;
+
     tree->Branch("run", &run, "run/I");
     tree->Branch("lumi", &lumi, "lumi/I");
     tree->Branch("evt", &evt, "evt/I");
@@ -680,7 +690,15 @@ int main(int argc, char * argv[]) {
     tree->Branch("weight", &weight, "weight/F");
     
     tree->Branch("metFilters",&metFilters_,"metFilters/O");
-    tree->Branch("metXFilters",&metXFilters_,"metXFilters/O");
+
+    tree->Branch("badChargedCandidateFilter",&badChargedCandidateFilter_,"badChargedCandidateFilter/O");
+    tree->Branch("badPFMuonFilter",&badPFMuonFilter_,"badPFMuonFilter/O");
+    tree->Branch("badGlobalMuonFilter",&badGlobalMuonFilter_,"badGlobalMuonFilter/O");
+    tree->Branch("muonBadTrackFilter",&muonBadTrackFilter_,"muonBadTrackFilter/O");
+    tree->Branch("chargedHadronTrackResolutionFilter",&chargedHadronTrackResolutionFilter_,"chargedHadronTrackResolutionFilter/O");
+
+    tree->Branch("badMuonFilter",&badMuonFilter_,"badMuonFilter/O");
+    tree->Branch("duplicateMuonFilter",&duplicateMuonFilter_,"duplicateMuonFilter/O");
     
     tree->Branch("m_vis",        &m_vis,        "m_vis/F");
     tree->Branch("m_vis_muUp",   &m_vis_muUp,   "m_vis_muUp/F");
@@ -703,6 +721,8 @@ int main(int argc, char * argv[]) {
     tree->Branch("mTtot_resoUp",    &mTtot_resoUp,    "mTtot_resoUp/F");
     tree->Branch("mTtot_resoDown",  &mTtot_resoDown,  "mTtot_resoDown/F");
     
+    tree->Branch("mTdileptonMET", &mTdileptonMET, "mTdileptonMET/F");
+
     tree->Branch("mTemu",        &mTemu,        "mTemu/F");
     tree->Branch("mTemet",       &mTemet,       "mTemet/F");
     tree->Branch("mTmumet",      &mTmumet,      "mTmumet/F");
@@ -1082,9 +1102,17 @@ int main(int argc, char * argv[]) {
     metFlags.push_back("Flag_goodVertices");
     metFlags.push_back("Flag_eeBadScFilter");
     
-    std::vector<TString> metXFlag; metXFlag.clear();
-    metXFlag.push_back("Flag_METFilters");
-    
+    std::vector<TString> badChargedCandidateFlag; badChargedCandidateFlag.clear();
+    badChargedCandidateFlag.push_back("Flag_BadChargedCandidateFilter");
+    std::vector<TString> badPFMuonFlag; badPFMuonFlag.clear();
+    badPFMuonFlag.push_back("Flag_BadPFMuonFilter");
+    std::vector<TString> badGlobalMuonFlag; badGlobalMuonFlag.clear();
+    badGlobalMuonFlag.push_back("Flag_BadGlobalMuonFilter");
+    std::vector<TString> muonBadTrackFlag; muonBadTrackFlag.clear();
+    muonBadTrackFlag.push_back("Flag_muonBadTrackFilter");
+    std::vector<TString> chargedHadronTrackResolutionFlag; chargedHadronTrackResolutionFlag.clear();
+    chargedHadronTrackResolutionFlag.push_back("Flag_chargedHadronTrackResolutionFilter");
+
     RecoilCorrector recoilMvaMetCorrector(RecoilMvaFileName);
     MEtSys metSys(MetSysFileName);
     
@@ -1152,10 +1180,7 @@ int main(int argc, char * argv[]) {
     int nEvents = 0;
     int selEvents = 0;
     int nFiles = 0;
-    
-    
-
-    
+        
     for (int iF=0; iF<nTotalFiles; ++iF) {
         
         std::string filen;
@@ -1293,8 +1318,16 @@ int main(int argc, char * argv[]) {
             higgsMass = -1;
             
             metFilters_ = true;
-            metXFilters_ = true;
-            
+
+	    badChargedCandidateFilter_ = true;
+            badPFMuonFilter_ = true;
+	    badGlobalMuonFilter_ = true;
+	    muonBadTrackFilter_ = true;
+	    chargedHadronTrackResolutionFilter_ = true;
+
+	    badMuonFilter_ = true;
+	    duplicateMuonFilter_ = true;
+
             float topPt = -1;
             float antitopPt = -1;
             
@@ -1712,7 +1745,11 @@ int main(int argc, char * argv[]) {
             // MET Filters
             if (isData) {
                 metFilters_ = metFiltersPasses(analysisTree,metFlags);
-                metXFilters_ = metFiltersPasses(analysisTree,metXFlag);
+		badChargedCandidateFilter_ = metFiltersPasses(analysisTree,badChargedCandidateFlag);
+		badPFMuonFilter_ = metFiltersPasses(analysisTree,badPFMuonFlag);
+		badGlobalMuonFilter_ = metFiltersPasses(analysisTree,badGlobalMuonFlag);
+		muonBadTrackFilter_ = metFiltersPasses(analysisTree,muonBadTrackFlag);
+		chargedHadronTrackResolutionFilter_ = metFiltersPasses(analysisTree,chargedHadronTrackResolutionFlag);
             }
             
             /*
@@ -1779,6 +1816,8 @@ int main(int argc, char * argv[]) {
                 analysisTree.muon_validFraction[im] >0.49 &&
                 analysisTree.muon_segmentComp[im] > (goodGlobal ? 0.303 : 0.451);
 		*/
+		if (analysisTree.muon_isBad[im]) badMuonFilter_ = false;
+		if (analysisTree.muon_isDuplicate[im]) duplicateMuonFilter_ = false;
 		bool muonId = analysisTree.muon_isMedium[im];
 		if (applyICHEPMuonId) muonId = analysisTree.muon_isICHEP[im];
                 //	if (applyMuonId && !analysisTree.muon_isMedium[im]) continue;
@@ -2237,12 +2276,12 @@ int main(int argc, char * argv[]) {
             // qcd scale factor
             // no dzeta cut
             qcdweight     = qcdWeight.getWeight(pt_1,pt_2,dr_tt);
-            qcdweightup   = qcdWeight.getWeightUp(pt_1,pt_2,dr_tt);
-            qcdweightdown = qcdWeight.getWeightDown(pt_1,pt_2,dr_tt);
+            qcdweightup   = qcdWeight.getWeight(pt_1,pt_2,dr_tt);
+            qcdweightdown = qcdWeight.getWeight(pt_1,pt_2,dr_tt);
             // dzeta cut
             qcdweight_nodzeta     = qcdWeightNoDzeta.getWeight(pt_1,pt_2,dr_tt);
-            qcdweightup_nodzeta   = qcdWeightNoDzeta.getWeightUp(pt_1,pt_2,dr_tt);
-            qcdweightdown_nodzeta = qcdWeightNoDzeta.getWeightDown(pt_1,pt_2,dr_tt);
+            qcdweightup_nodzeta   = qcdWeightNoDzeta.getWeight(pt_1,pt_2,dr_tt);
+            qcdweightdown_nodzeta = qcdWeightNoDzeta.getWeight(pt_1,pt_2,dr_tt);
             
             //      if (os<0.5) {
             //	printf("QCD weights  : pt_1 = %6.1f ; pt_2 = %6.1f ; dr_tt = %4.2f\n",pt_1,pt_2,dr_tt);
