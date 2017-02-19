@@ -25,7 +25,7 @@ class JESUncertainties {
   float getMjj();
   float getJdeta(std::string uncName, bool Up);
   float getJdeta();
-  
+  float getUncertainty(std::string uncName, float pt, float eta);
 
  private:
 

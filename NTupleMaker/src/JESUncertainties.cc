@@ -27,6 +27,15 @@ std::vector<std::string> JESUncertainties::getUncertNames() {
 
 }
 
+float JESUncertainties::getUncertainty(std::string name, float pt, float eta) {
+
+  JetUncMap[name]->setJetEta(eta);
+  JetUncMap[name]->setJetPt(pt);
+  float unc = JetUncMap[name]->getUncertainty(true);
+  return unc;
+
+}
+
 int JESUncertainties::getNJets(std::string uncName, bool Up) {
 
   int result = njetsDown[uncName];
