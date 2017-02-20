@@ -25,7 +25,7 @@ public :
 
    // Declaration of leaf types
    UInt_t          errors;
-   UInt_t          event_nr;
+   ULong64_t       event_nr;
    UInt_t          event_run;
    UInt_t          event_timeunix;
    UInt_t          event_timemicrosec;
