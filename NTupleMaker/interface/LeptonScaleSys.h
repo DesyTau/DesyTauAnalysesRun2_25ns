@@ -332,7 +332,7 @@ protected:
       pt_central[ibin] = (pt_edges[ibin+1] + pt_edges[ibin])/2.; 
 
     const int eta_bins = 2;
-    double eta_edges[eta_bins + 1] = {0., 1.5, 2.5};
+    double eta_edges[eta_bins + 1] = {0., 1.479, 2.5};
     double eta_central[eta_bins] = {};
     for(int ibin = 0; ibin < eta_bins; ibin++)
       eta_central[ibin] = (eta_edges[ibin+1] + eta_edges[ibin])/2.; 
@@ -626,8 +626,8 @@ protected:
     sf_up = new TH2D(label+"_sf_up", label+"_sf_up", pt_bins, pt_edges, eta_bins, eta_edges);
     sf_down = new TH2D(label+"_sf_down", label+"_sf_down", pt_bins, pt_edges, eta_bins, eta_edges);
 
-    sf_up->SetBinContent( sf_up->FindBin( pt_central[0], eta_central[0] ), 0.03);
-    sf_down->SetBinContent( sf_down->FindBin( pt_central[0], eta_central[0] ), 0.03);
+    sf_up->SetBinContent( sf_up->FindBin( pt_central[0], eta_central[0] ), 0.01);
+    sf_down->SetBinContent( sf_down->FindBin( pt_central[0], eta_central[0] ), 0.01);
   };
 
   virtual void ScaleUp(utils::channel ch){
