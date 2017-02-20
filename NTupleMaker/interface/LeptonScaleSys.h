@@ -94,6 +94,7 @@ protected:
     // store cen values
     float pt_1_cen = cenTree->pt_1;
     float pt_2_cen = cenTree->pt_2;
+    float met_cen = cenTree->met;
 
     float mt_1_cen = cenTree->mt_1;
     float pfmt_1_cen = cenTree->pfmt_1;    
@@ -117,15 +118,8 @@ protected:
     // calc shifted values
     cenTree->pt_1 = lep1_scaled.Pt();
     cenTree->pt_2 = lep2_scaled.Pt();
-    
-    //cenTree->mt_1 = sqrt(2*lep1_scaled.Pt()*cenTree->mvamet*(1.-cos(lep1_scaled.Phi()-cenTree->mvametphi)));
-    cenTree->pfmt_1 = sqrt(2*lep1_scaled.Pt()*cenTree->met*(1.-cos(lep1_scaled.Phi()-cenTree->metphi)));
-    //cenTree->mt_2 = sqrt(2*lep2_scaled.Pt()*cenTree->mvamet*(1.-cos(lep2_scaled.Phi()-cenTree->mvametphi)));
-    cenTree->pfmt_2 = sqrt(2*lep2_scaled.Pt()*cenTree->met*(1.-cos(lep2_scaled.Phi()-cenTree->metphi)));
-    cenTree->mt_1 = sqrt(2*lep1_scaled.Pt()*cenTree->met*(1.-cos(lep1_scaled.Phi()-cenTree->metphi)));
-    cenTree->mt_2 = sqrt(2*lep2_scaled.Pt()*cenTree->met*(1.-cos(lep2_scaled.Phi()-cenTree->metphi)));
 
-    
+    // central value of the met    
     TLorentzVector pfmetLV; pfmetLV.SetXYZT(cenTree->met * cos(cenTree->metphi),
 					    cenTree->met * sin(cenTree->metphi),
 					    0.,
@@ -137,6 +131,24 @@ protected:
 					      0.,
 					      TMath::Sqrt( cenTree->mvamet * cos(cenTree->mvametphi) * cenTree->mvamet * cos(cenTree->mvametphi) +
 							   cenTree->mvamet * sin(cenTree->mvametphi) * cenTree->mvamet * sin(cenTree->mvametphi) ) ) ;    
+
+    // propagate the lepton pt shift to the MET 
+	pfmetLV.SetPx(pfmetLV.Px()- (lep1_scaled.Px()-lep1.Px()));
+	pfmetLV.SetPy(pfmetLV.Py()- (lep1_scaled.Px()-lep1.Py()));
+
+	mvametLV.SetPx(mvametLV.Px()- (lep1_scaled.Px()-lep1.Px()));
+	mvametLV.SetPy(mvametLV.Py()- (lep1_scaled.Px()-lep1.Py()));
+
+    // calc shifted values
+	cenTree->met = pfmetLV.Pt();
+	cenTree->mvamet = mvametLV.Pt();
+
+    //cenTree->mt_1 = sqrt(2*lep1_scaled.Pt()*mvametLV.Pt()*(1.-cos(lep1_scaled.Phi()-mvametLV.Phi())));
+    cenTree->pfmt_1 = sqrt(2*lep1_scaled.Pt()*pfmetLV.Pt()*(1.-cos(lep1_scaled.Phi()-pfmetLV.Phi())));
+    //cenTree->mt_2 = sqrt(2*lep2_scaled.Pt()*mvametLV.Pt()*(1.-cos(lep2_scaled.Phi()-cenTree->mvametLV.Phi())));
+    cenTree->pfmt_2 = sqrt(2*lep2_scaled.Pt()*pfmetLV.Pt()*(1.-cos(lep2_scaled.Phi()-pfmetLV.Phi())));
+    cenTree->mt_1 = sqrt(2*lep1_scaled.Pt()*pfmetLV.Pt()*(1.-cos(lep1_scaled.Phi()-pfmetLV.Phi())));
+    cenTree->mt_2 = sqrt(2*lep2_scaled.Pt()*pfmetLV.Pt()*(1.-cos(lep2_scaled.Phi()-pfmetLV.Phi())));
     
     TMatrixD covMET(2, 2);
     covMET[0][0] = cenTree->metcov00;
@@ -182,7 +194,7 @@ protected:
     // restore cen values
     cenTree->pt_1 = pt_1_cen;
     cenTree->pt_2 = pt_2_cen;
-
+    cenTree->met = met_cen;
     cenTree->mt_1 = mt_1_cen;
     cenTree->pfmt_1 = pfmt_1_cen;    
     cenTree->mt_2 = mt_2_cen;
