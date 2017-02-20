@@ -25,7 +25,7 @@ public :
 
    // Declaration of leaf types
    UInt_t          errors;
-   UInt_t          event_nr;
+   ULong64_t       event_nr;
    UInt_t          event_run;
    UInt_t          event_timeunix;
    UInt_t          event_timemicrosec;
@@ -211,6 +211,10 @@ public :
    Bool_t          electron_cutId_loose_Spring15[50];   //[electron_count]
    Bool_t          electron_cutId_medium_Spring15[50];   //[electron_count]
    Bool_t          electron_cutId_tight_Spring15[50];   //[electron_count]
+   Bool_t          electron_cutId_veto_Summer16[50];   //[electron_count]
+   Bool_t          electron_cutId_loose_Summer16[50];   //[electron_count]
+   Bool_t          electron_cutId_medium_Summer16[50];   //[electron_count]
+   Bool_t          electron_cutId_tight_Summer16[50];   //[electron_count]
    Float_t         electron_mva_value_Spring16_v1[50];   //[electron_count]
    Int_t           electron_mva_category_Spring16_v1[50];   //[electron_count]
    Float_t         electron_mva_wp90_general_Spring16_v1[50];   //[electron_count]
@@ -808,6 +812,10 @@ public :
    TBranch        *b_electron_cutId_loose_Spring15;   //!
    TBranch        *b_electron_cutId_medium_Spring15;   //!
    TBranch        *b_electron_cutId_tight_Spring15;   //!
+   TBranch        *b_electron_cutId_veto_Summer16;   //!
+   TBranch        *b_electron_cutId_loose_Summer16;   //!
+   TBranch        *b_electron_cutId_medium_Summer16;   //!
+   TBranch        *b_electron_cutId_tight_Summer16;   //!
    TBranch        *b_electron_mva_value_Spring16_v1;   //!
    TBranch        *b_electron_mva_category_Spring16_v1;   //!
    TBranch        *b_electron_mva_wp90_general_Spring16_v1;   //!
@@ -1505,6 +1513,10 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("electron_cutId_loose_Spring15", electron_cutId_loose_Spring15, &b_electron_cutId_loose_Spring15);
    fChain->SetBranchAddress("electron_cutId_medium_Spring15", electron_cutId_medium_Spring15, &b_electron_cutId_medium_Spring15);
    fChain->SetBranchAddress("electron_cutId_tight_Spring15", electron_cutId_tight_Spring15, &b_electron_cutId_tight_Spring15);
+   fChain->SetBranchAddress("electron_cutId_veto_Summer16", electron_cutId_veto_Summer16, &b_electron_cutId_veto_Summer16);
+   fChain->SetBranchAddress("electron_cutId_loose_Summer16", electron_cutId_loose_Summer16, &b_electron_cutId_loose_Summer16);
+   fChain->SetBranchAddress("electron_cutId_medium_Summer16", electron_cutId_medium_Summer16, &b_electron_cutId_medium_Summer16);
+   fChain->SetBranchAddress("electron_cutId_tight_Summer16", electron_cutId_tight_Summer16, &b_electron_cutId_tight_Summer16);
    fChain->SetBranchAddress("electron_mva_value_Spring16_v1", electron_mva_value_Spring16_v1, &b_electron_mva_value_Spring16_v1);
    fChain->SetBranchAddress("electron_mva_category_Spring16_v1", electron_mva_category_Spring16_v1, &b_electron_mva_category_Spring16_v1);
    fChain->SetBranchAddress("electron_mva_wp90_general_Spring16_v1", electron_mva_wp90_general_Spring16_v1, &b_electron_mva_wp90_general_Spring16_v1);

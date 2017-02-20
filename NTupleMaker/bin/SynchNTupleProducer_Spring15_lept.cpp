@@ -222,7 +222,7 @@ int main(int argc, char * argv[]){
   if(!isData && applyRecoilCorrections && (isDY || isWJets || isVBForGGHiggs) ){
     TString RecoilDir("HTT-utilities/RecoilCorrections/data/");
 
-    TString RecoilFileName = RecoilDir; RecoilFileName += "TypeIPFMET_2016BCD.root";
+    TString RecoilFileName = RecoilDir; RecoilFileName += "TypeI-PFMet_Run2016BtoH.root";
     std::cout<<RecoilFileName<<std::endl;
     recoilPFMetCorrector = new RecoilCorrector( RecoilFileName);
         
@@ -1452,7 +1452,7 @@ bool dilepton_veto_et(const Config *cfg,const  AC1B *analysisTree){
     float relIsoEle =   rel_Iso(ie, "et", analysisTree, cfg->get<float>("dRiso"));
     if(relIsoEle >= cfg->get<float>("isoDiElectronVeto")) continue;
 		
-    bool passedVetoId =  analysisTree->electron_cutId_veto_Spring15[ie];
+    bool passedVetoId =  analysisTree->electron_cutId_veto_Summer16[ie];
     if (!passedVetoId && cfg->get<bool>("applyDiElectronVetoId")) continue;
 		
     for (unsigned int je = ie+1; je<analysisTree->electron_count; ++je) {
@@ -1466,7 +1466,7 @@ bool dilepton_veto_et(const Config *cfg,const  AC1B *analysisTree){
       float relIsoEle =  rel_Iso(je, "et", analysisTree, cfg->get<float>("dRiso"));
       if(relIsoEle >= cfg->get<float>("isoDiElectronVeto")) continue;	
 
-      passedVetoId =  analysisTree->electron_cutId_veto_Spring15[je];
+      passedVetoId =  analysisTree->electron_cutId_veto_Summer16[je];
       if (!passedVetoId && cfg->get<bool>("applyDiElectronVetoId")) continue;
 
       if (analysisTree->electron_charge[ie] * analysisTree->electron_charge[je] > 0. && cfg->get<bool>("applyDiElectronOS")) continue;

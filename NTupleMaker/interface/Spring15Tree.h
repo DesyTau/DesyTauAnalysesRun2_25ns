@@ -28,7 +28,7 @@ public :
   // Declaration of leaf types
   UInt_t          run;
   UInt_t          lumi;
-  UInt_t          evt;
+  ULong64_t       evt;
   Int_t           npv;
   Float_t         npu;
   Float_t         rho;

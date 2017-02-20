@@ -158,6 +158,10 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
   eleLooseIdMapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleLooseIdMap"))),
   eleMediumIdMapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleMediumIdMap"))),
   eleTightIdMapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleTightIdMap"))),
+  eleVetoIdSummer16MapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleVetoIdSummer16Map"))),
+  eleLooseIdSummer16MapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleLooseIdSummer16Map"))),
+  eleMediumIdSummer16MapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleMediumIdSummer16Map"))),
+  eleTightIdSummer16MapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleTightIdSummer16Map"))),
   eleMvaNonTrigWP80MapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleMvaNonTrigIdWP80Map"))),
   eleMvaNonTrigWP90MapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleMvaNonTrigIdWP90Map"))),
   eleMvaTrigWP80MapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleMvaTrigIdWP80Map"))),
@@ -309,7 +313,7 @@ void NTupleMaker::beginJob(){
   nEvents = FS->make<TH1D>("nEvents", "nEvents", 2, -0.5, +1.5);
   
   tree->Branch("errors", &errors, "errors/i");
-  tree->Branch("event_nr", &event_nr, "event_nr/i");
+  tree->Branch("event_nr", &event_nr, "event_nr/l");
   tree->Branch("event_run", &event_run, "event_run/i");
   tree->Branch("event_timeunix", &event_timeunix, "event_timeunix/i");
   tree->Branch("event_timemicrosec", &event_timemicrosec, "event_timemicrosec/i");
@@ -511,7 +515,10 @@ void NTupleMaker::beginJob(){
     tree->Branch("electron_superclusterY", electron_superClusterY, "electron_superclusterY[electron_count]/F");
     tree->Branch("electron_superclusterZ", electron_superClusterZ, "electron_superclusterZ[electron_count]/F");
 
-    
+    tree->Branch("electron_detaInSeed", electron_detaInSeed, "electron_detaInSeed[electron_count]/F");
+    tree->Branch("electron_he", electron_he, "electron_he[electron_count]/F");
+    tree->Branch("electron_eaIsolation", electron_eaIsolation, "electron_eaIsolation[electron_count]/F");
+
     tree->Branch("electron_chargedHadIso", electron_chargedHadIso,"electron_chargedHadIso[electron_count]/F");
     tree->Branch("electron_neutralHadIso", electron_neutralHadIso,"electron_neutralHadIso[electron_count]/F");
     tree->Branch("electron_photonIso",     electron_photonIso,    "electron_photonIso[electron_count]/F");
@@ -561,12 +568,15 @@ void NTupleMaker::beginJob(){
     tree->Branch("electron_cutId_medium_Spring15", electron_cutId_medium_Spring15, "electron_cutId_medium_Spring15[electron_count]/O");
     tree->Branch("electron_cutId_tight_Spring15", electron_cutId_tight_Spring15, "electron_cutId_tight_Spring15[electron_count]/O");
 
+    tree->Branch("electron_cutId_veto_Summer16", electron_cutId_veto_Summer16, "electron_cutId_veto_Summer16[electron_count]/O");
+    tree->Branch("electron_cutId_loose_Summer16", electron_cutId_loose_Summer16, "electron_cutId_loose_Summer16[electron_count]/O");
+    tree->Branch("electron_cutId_medium_Summer16", electron_cutId_medium_Summer16, "electron_cutId_medium_Summer16[electron_count]/O");
+    tree->Branch("electron_cutId_tight_Summer16", electron_cutId_tight_Summer16, "electron_cutId_tight_Summer16[electron_count]/O");
+
     tree->Branch("electron_mva_value_Spring16_v1", electron_mva_value_Spring16_v1, "electron_mva_value_Spring16_v1[electron_count]/F");
     tree->Branch("electron_mva_category_Spring16_v1", electron_mva_category_Spring16_v1, "electron_mva_category_Spring16_v1[electron_count]/I");
     tree->Branch("electron_mva_wp90_general_Spring16_v1", electron_mva_wp90_general_Spring16_v1, "electron_mva_wp90_general_Spring16_v1[electron_count]/F");
     tree->Branch("electron_mva_wp80_general_Spring16_v1", electron_mva_wp80_general_Spring16_v1, "electron_mva_wp80_general_Spring16_v1[electron_count]/F");
-
-
 
 
     tree->Branch("electron_pass_conversion", electron_pass_conversion, "electron_pass_conversion[electron_count]/O");
@@ -649,7 +659,6 @@ void NTupleMaker::beginJob(){
     tree->Branch("tau_leadchargedhadrcand_id",  tau_leadchargedhadrcand_id,  "tau_leadchargedhadrcand_id[tau_count]/I");
     tree->Branch("tau_leadchargedhadrcand_dxy", tau_leadchargedhadrcand_dxy, "tau_leadchargedhadrcand_dxy[tau_count]/F");
     tree->Branch("tau_leadchargedhadrcand_dz",  tau_leadchargedhadrcand_dz,  "tau_leadchargedhadrcand_dz[tau_count]/F");
-    tree->Branch("tau_photonPtSumOutsideSignalCone", tau_photonPtSumOutsideSignalCone, "tau_photonPtSumOutsideSignalCone[tau_count]/F");
  
     tree->Branch("tau_ntracks_pt05", tau_ntracks_pt05, "tau_ntracks_pt05[tau_count]/i");
     tree->Branch("tau_ntracks_pt08", tau_ntracks_pt05, "tau_ntracks_pt05[tau_count]/i");
@@ -3686,6 +3695,15 @@ unsigned int NTupleMaker::AddElectrons(const edm::Event& iEvent, const edm::Even
         iEvent.getByToken(eleLooseIdMapToken_,loose_id_decisions);
         iEvent.getByToken(eleMediumIdMapToken_,medium_id_decisions);
         iEvent.getByToken(eleTightIdMapToken_,tight_id_decisions);
+	// cut-based (Summer16)
+	edm::Handle<edm::ValueMap<bool> > veto_id_summer16_decisions;
+	edm::Handle<edm::ValueMap<bool> > loose_id_summer16_decisions;
+	edm::Handle<edm::ValueMap<bool> > medium_id_summer16_decisions;
+	edm::Handle<edm::ValueMap<bool> > tight_id_summer16_decisions;
+        iEvent.getByToken(eleVetoIdSummer16MapToken_,veto_id_summer16_decisions);
+        iEvent.getByToken(eleLooseIdSummer16MapToken_,loose_id_summer16_decisions);
+        iEvent.getByToken(eleMediumIdSummer16MapToken_,medium_id_summer16_decisions);
+        iEvent.getByToken(eleTightIdSummer16MapToken_,tight_id_summer16_decisions);
 
 	// mva
 	edm::Handle<edm::ValueMap<bool> > nontrig_wp80_decisions;
@@ -3773,6 +3791,12 @@ unsigned int NTupleMaker::AddElectrons(const edm::Event& iEvent, const edm::Even
 	  electron_superClusterX[electron_count] = el->superCluster()->x();
 	  electron_superClusterY[electron_count] = el->superCluster()->y();
 	  electron_superClusterZ[electron_count] = el->superCluster()->z();
+	  
+	  electron_detaInSeed[electron_count] = el->deltaEtaSuperClusterTrackAtVtx() 
+	    - el->superCluster()->eta() 
+	    + el->superCluster()->seed()->eta(); 
+
+	  electron_he[electron_count] = el->hadronicOverEm();
 
 	  electron_chargedHadIso[electron_count] = el->chargedHadronIso();
 	  electron_neutralHadIso[electron_count] = el->neutralHadronIso();
@@ -3787,6 +3811,9 @@ unsigned int NTupleMaker::AddElectrons(const edm::Event& iEvent, const edm::Even
 	  electron_r03_sumPhotonEtHighThreshold[electron_count] = el->pfIsolationVariables().sumPhotonEtHighThreshold;
 	  electron_r03_sumPUPt[electron_count] = el->pfIsolationVariables().sumPUPt;
 
+	  float  eA = getEffectiveArea( fabs(electron_superClusterEta[electron_count]) );
+	  electron_eaIsolation[electron_count] = electron_r03_sumChargedHadronPt[electron_count] +
+	    TMath::Max(0.0f,electron_r03_sumNeutralHadronEt[electron_count]+electron_r03_sumPhotonEt[electron_count]-eA*rhoNeutral);
 	  
 	  electron_gapinfo[electron_count] = 0;
 	  electron_gapinfo[electron_count] |= el->isEB() << 0;
@@ -3850,7 +3877,12 @@ unsigned int NTupleMaker::AddElectrons(const edm::Event& iEvent, const edm::Even
           electron_cutId_medium_Spring15[electron_count] = (*medium_id_decisions)[el];
           electron_cutId_tight_Spring15[electron_count] = (*tight_id_decisions)[el];
 
-	   electron_mva_wp90_general_Spring16_v1[electron_count] = (*mva_wp90_general_decisions)[el];
+          electron_cutId_veto_Summer16[electron_count] = (*veto_id_summer16_decisions)[el];
+          electron_cutId_loose_Summer16[electron_count] = (*loose_id_summer16_decisions)[el];
+          electron_cutId_medium_Summer16[electron_count] = (*medium_id_summer16_decisions)[el];
+          electron_cutId_tight_Summer16[electron_count] = (*tight_id_summer16_decisions)[el];
+
+	  electron_mva_wp90_general_Spring16_v1[electron_count] = (*mva_wp90_general_decisions)[el];
 	  electron_mva_wp80_general_Spring16_v1[electron_count] = (*mva_wp80_general_decisions)[el];
 	  electron_mva_wp80_nontrig_Spring15_v1[electron_count] = (*nontrig_wp80_decisions)[el];
 	  electron_mva_wp90_nontrig_Spring15_v1[electron_count] = (*nontrig_wp90_decisions)[el];

@@ -175,6 +175,19 @@ class NTupleMaker : public edm::EDAnalyzer{
   explicit NTupleMaker( const edm::ParameterSet& iConfig );
   ~NTupleMaker();
 
+  float getEffectiveArea(float eta) {
+    float effArea = 0.2393;
+    float absEta = fabs(eta);
+    if (absEta<1.0) effArea = 0.1703;
+    else if (absEta < 1.4790) effArea = 0.1715;
+    else if (absEta < 2.0) effArea = 0.1213;
+    else if (absEta < 2.2) effArea = 0.1230;
+    else if (absEta < 2.3) effArea = 0.1635;
+    else if (absEta < 2.4) effArea = 0.1937;
+    return effArea;
+
+  } 
+
  double getPFIsolation(edm::Handle<pat::PackedCandidateCollection> pfcands,
                         const reco::Candidate* ptcl,  
                         double r_iso_min, double r_iso_max, double kt_scale,
@@ -375,6 +388,10 @@ class NTupleMaker : public edm::EDAnalyzer{
   edm::EDGetTokenT<edm::ValueMap<bool> > eleLooseIdMapToken_;
   edm::EDGetTokenT<edm::ValueMap<bool> > eleMediumIdMapToken_;
   edm::EDGetTokenT<edm::ValueMap<bool> > eleTightIdMapToken_;
+  edm::EDGetTokenT<edm::ValueMap<bool> > eleVetoIdSummer16MapToken_;
+  edm::EDGetTokenT<edm::ValueMap<bool> > eleLooseIdSummer16MapToken_;
+  edm::EDGetTokenT<edm::ValueMap<bool> > eleMediumIdSummer16MapToken_;
+  edm::EDGetTokenT<edm::ValueMap<bool> > eleTightIdSummer16MapToken_;
   edm::EDGetTokenT<edm::ValueMap<bool> > eleMvaNonTrigWP80MapToken_;
   edm::EDGetTokenT<edm::ValueMap<bool> > eleMvaNonTrigWP90MapToken_;
   edm::EDGetTokenT<edm::ValueMap<bool> > eleMvaTrigWP80MapToken_;
@@ -664,6 +681,10 @@ class NTupleMaker : public edm::EDAnalyzer{
   Float_t electron_full5x5_sigmaietaieta[M_electronmaxcount];
   Float_t electron_ooemoop[M_electronmaxcount];
 
+  Float_t electron_detaInSeed[M_electronmaxcount];
+  Float_t electron_he[M_electronmaxcount];
+  Float_t electron_eaIsolation[M_electronmaxcount];
+
   Float_t electron_superClusterEta[M_electronmaxcount];
   Float_t electron_superClusterPhi[M_electronmaxcount];
   
@@ -727,6 +748,11 @@ class NTupleMaker : public edm::EDAnalyzer{
   Bool_t electron_cutId_medium_Spring15[M_electronmaxcount];
   Bool_t electron_cutId_tight_Spring15[M_electronmaxcount];
 
+  Bool_t electron_cutId_veto_Summer16[M_electronmaxcount];
+  Bool_t electron_cutId_loose_Summer16[M_electronmaxcount];
+  Bool_t electron_cutId_medium_Summer16[M_electronmaxcount];
+  Bool_t electron_cutId_tight_Summer16[M_electronmaxcount];
+
   Bool_t electron_pass_conversion[M_electronmaxcount];
 
   Int_t electron_genmatch[M_electronmaxcount];
@@ -780,8 +806,6 @@ class NTupleMaker : public edm::EDAnalyzer{
   Int_t   tau_leadchargedhadrcand_id[M_taumaxcount];
   Float_t tau_leadchargedhadrcand_dxy[M_taumaxcount];
   Float_t tau_leadchargedhadrcand_dz[M_taumaxcount];
-  Float_t tau_photonPtSumOutsideSignalCone[M_taumaxcount];
-
 
   Float_t tau_vertexx[M_taumaxcount];
   Float_t tau_vertexy[M_taumaxcount];

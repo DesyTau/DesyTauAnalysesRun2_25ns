@@ -20,6 +20,7 @@
 #include "TLorentzVector.h"
 #include "TPaveText.h"
 #include "TRandom.h"
+#include "TRandom3.h"
 #include "TGraphAsymmErrors.h"
 
 #include "DesyTauAnalyses/NTupleMaker/interface/Config.h"
@@ -32,6 +33,8 @@
 #include "HTT-utilities/RecoilCorrections/interface/RecoilCorrector.h"
 #include "HTT-utilities/RecoilCorrections/interface/MEtSys.h"
 
+#include "CondFormats/BTauObjects/interface/BTagCalibration.h"
+#include "CondTools/BTau/interface/BTagCalibrationReader.h"
 
 float topPtWeight(float pt1,
 		  float pt2) {
@@ -48,6 +51,25 @@ float topPtWeight(float pt1,
   return TMath::Sqrt(w1*w2);
 
 }
+
+/*
+
+float topPtWeight(float pt1,
+		  float pt2) {
+    
+  if (pt1>400) pt1 = 400;
+  if (pt2>400) pt2 = 400;
+    
+  float a = 0.0615;    // Run2 a parameter
+  float b = -0.0005;  // Run2 b parameter
+    
+  float w1 = TMath::Exp(a+b*pt1);
+  float w2 = TMath::Exp(a+b*pt2);
+    
+  return TMath::Sqrt(w1*w2);  
+}
+
+*/
 
 float nJetsWeight(int nJets) {
 
@@ -319,6 +341,7 @@ int main(int argc, char * argv[]) {
   TH1D * etaTrailingMuSelH = new TH1D("etaTrailingMuSelH","",50,-2.5,2.5);
   TH1D * massSelH = new TH1D("massSelH","",200,0,200);
   TH1D * massExtendedSelH =  new TH1D("massExtendedSelH","",500,0,5000);
+  
 
   TH2D * dimuonMassPtH = new TH2D("dimuonMassPtH","",100,0,1000,100,0,1000);
 
@@ -338,6 +361,32 @@ int main(int argc, char * argv[]) {
 
   TH1D * numberOfVerticesH = new TH1D("numberOfVerticesH","",100,-0.5,99.5);
 
+  // Event categories
+  TH1D * mass0jetH = new TH1D("mass0jetH","",200,0,200);
+  TH1D * mass0jetBvetoH = new TH1D("mass0jetBvetoH","",200,0,200);
+
+  TH1D * massBoostedH = new TH1D("massBoostedH","",200,0,200);
+  TH1D * massBoostedBvetoH = new TH1D("massBoostedBvetoH","",200,0,200);
+
+  TH1D * massVBFH = new TH1D("massVBFH","",200,0,200);
+  TH1D * massVBFBvetoH = new TH1D("massVBFBvetoH","",200,0,200);
+
+  // Applying selection and mass cut
+
+  TH1D * nJets20BTagMedium0jetH = new TH1D("nJets20BTagMedium0jetH","",11,-0.5,10.5);
+  TH1D * nJets20BTagMediumBoostedH = new TH1D("nJets20BTagMediumBoostedH","",11,-0.5,10.5);
+  TH1D * nJets20BTagMediumVBFH = new TH1D("nJets20BTagMediumVBFH","",11,-0.5,10.5);
+
+  TH1D * mjjVBFH = new TH1D("mjjVBFH","",30,0,3000);
+  TH1D * mjjVBFBvetoH = new TH1D("mjjVBFBvetoH","",30,0,3000);
+
+  TH1D * dimuonPtBoostedH = new TH1D("dimuonPtBoostedH","",100,0,1000);
+  TH1D * dimuonPtBoostedBvetoH = new TH1D("dimuonPtBoostedBvetoH","",100,0,1000);
+
+  TH1D * leadingJetPtH  = new TH1D("leadingJetPtH","",50,0,500);
+  TH1D * leadingJetEtaH = new TH1D("leadingJetEtaH","",100,-5,5);
+  TH1D * leadingJetPhiH = new TH1D("leadingJetPhiH","",100,-TMath::Pi(),TMath::Pi());
+  
   TString scales[21] = {"M10","M9","M8","M7","M6","M5","M4","M3","M2","M1","0",
 			"P1","P2","P3","P4","P5","P6","P7","P8","P9","P10"};
   
@@ -899,6 +948,53 @@ int main(int argc, char * argv[]) {
     exit(-1);
   }
 
+  // BTag scale factors                                                                                                                                                                                                                    
+  BTagCalibration calib("csvv2", cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/CSVv2_ichep.csv");
+  BTagCalibrationReader reader_B(BTagEntry::OP_MEDIUM,"central",{"up","down"});
+  BTagCalibrationReader reader_C(BTagEntry::OP_MEDIUM,"central",{"up","down"});
+  BTagCalibrationReader reader_Light(BTagEntry::OP_MEDIUM,"central",{"up","down"});
+  reader_B.load(calib,BTagEntry::FLAV_B,"comb");
+  reader_C.load(calib,BTagEntry::FLAV_C,"comb");
+  reader_Light.load(calib,BTagEntry::FLAV_UDSG,"incl");
+
+  float etaBTAG[2] = {0.5,2.1};
+  float ptBTAG[5] = {25.,35.,50.,100.,200.};
+
+  for (int iEta=0; iEta<2; ++iEta) {
+    for (int iPt=0; iPt<5; ++iPt) {
+      float sfB = reader_B.eval_auto_bounds("central",BTagEntry::FLAV_B, etaBTAG[iEta], ptBTAG[iPt]);
+      float sfC = reader_C.eval_auto_bounds("central",BTagEntry::FLAV_C, etaBTAG[iEta], ptBTAG[iPt]);
+      float sfLight = reader_Light.eval_auto_bounds("central",BTagEntry::FLAV_UDSG, etaBTAG[iEta], ptBTAG[iPt]);
+      
+      float sfB_Up = reader_B.eval_auto_bounds("up",BTagEntry::FLAV_B, etaBTAG[iEta], ptBTAG[iPt]);
+      float sfC_Up = reader_C.eval_auto_bounds("up",BTagEntry::FLAV_C, etaBTAG[iEta], ptBTAG[iPt]);
+      float sfLight_Up = reader_Light.eval_auto_bounds("up",BTagEntry::FLAV_UDSG, etaBTAG[iEta], ptBTAG[iPt]);
+
+      float sfB_Down = reader_B.eval_auto_bounds("down",BTagEntry::FLAV_B, etaBTAG[iEta], ptBTAG[iPt]);
+      float sfC_Down = reader_C.eval_auto_bounds("down",BTagEntry::FLAV_C, etaBTAG[iEta], ptBTAG[iPt]);
+      float sfLight_Down = reader_Light.eval_auto_bounds("down",BTagEntry::FLAV_UDSG, etaBTAG[iEta], ptBTAG[iPt]);
+      
+      printf("pT = %3.0f   eta = %3.1f  ->  SFb = %5.3f + %5.3f - %5.3f ; SFc = %5.3f + %5.3f - %5.3f ; SFl = %5.3f + %5.3f - %5.3f\n",
+	     ptBTAG[iPt],etaBTAG[iEta],
+	     sfB,sfB_Up,sfB_Down,
+	     sfC,sfC_Up,sfC_Down,
+	     sfLight,sfLight_Up,sfLight_Down);
+      
+        }
+  }
+
+  //  exit(0);
+
+  TFile * fileTagging = new TFile(TString(cmsswBase)+TString("/src/DesyTauAnalyses/NTupleMaker/data/tagging_efficiencies_ichep2016.root"));
+  TH2F * tagEff_B = (TH2F*)fileTagging->Get("btag_eff_b");
+  TH2F * tagEff_C = (TH2F*)fileTagging->Get("btag_eff_c");
+  TH2F * tagEff_Light = (TH2F*)fileTagging->Get("btag_eff_oth");
+
+  float MaxBJetPt = 1000;
+  float MinBJetPt = 20;
+
+  TRandom3 rand;
+
   int nFiles = 0;
   int nEvents = 0;
   int selEventsAllMuons = 0;
@@ -1381,7 +1477,8 @@ int main(int argc, char * argv[]) {
 	//	  analysisTree.muon_isLoose[im] &&
 	//          analysisTree.muon_validFraction[im] >0.49 &&
 	//          analysisTree.muon_segmentComp[im] > (goodGlob ? 0.303 : 0.451);
-	bool ichepMed = analysisTree.muon_isICHEP[im];
+	//	bool ichepMed = analysisTree.muon_isICHEP[im];
+	bool ichepMed = analysisTree.muon_isMedium[im];
 	if (!ichepMed) muPassed = false;
 	//	if (!analysisTree.muon_isMedium[im]) muPassed = false;
 	if (muPassed) idMuons.push_back(im);
@@ -1808,7 +1905,7 @@ int main(int argc, char * argv[]) {
 	}
 
 	// accessing Mva Met
-	
+	/*
 	bool mvaMetFound = false;
 	unsigned int metMuMu = 0; 
 	for (unsigned int iMet=0; iMet<analysisTree.mvamet_count; ++iMet) {
@@ -1837,11 +1934,11 @@ int main(int argc, char * argv[]) {
 	  mvamet = TMath::Sqrt(mvamet_ex2+mvamet_ey2);
 	  mvamet_phi = TMath::ATan2(mvamet_ey,mvamet_ex);
 	}
-	
-	//	float mvamet     = analysisTree.pfmet_pt;
-	//	float mvamet_ex  = analysisTree.pfmet_ex;
-	//	float mvamet_ey  = analysisTree.pfmet_ey;
-	//	float mvamet_phi = TMath::ATan2(analysisTree.pfmet_ey,analysisTree.pfmet_ex);
+	*/
+	float mvamet     = analysisTree.pfmet_pt;
+	float mvamet_ex  = analysisTree.pfmet_ex;
+	float mvamet_ey  = analysisTree.pfmet_ey;
+	float mvamet_phi = TMath::ATan2(analysisTree.pfmet_ey,analysisTree.pfmet_ex);
 
 	// selecting good jets --->
 
@@ -1864,6 +1961,12 @@ int main(int argc, char * argv[]) {
 	int nJets20BTagLoose = 0;
 	int nJets20BTagMedium = 0;
 
+	int indexLeadingJet = -1;
+	float ptLeadingJet = -1;
+
+	int indexSubLeadingJet = -1;
+	float ptSubLeadingJet = -1;
+
 	for (unsigned int jet=0; jet<analysisTree.pfjet_count; ++jet) {
 	  //	  std::cout << analysisTree.pfjet_jecUncertainty[jet] << std::endl;
 	  float scale = 1;
@@ -1877,7 +1980,9 @@ int main(int argc, char * argv[]) {
 	    analysisTree.pfjet_e[jet] *= scale;
 	  }
 
+	  float jetEta = analysisTree.pfjet_eta[jet];
 	  float absJetEta = fabs(analysisTree.pfjet_eta[jet]);
+	  float jetPt = analysisTree.pfjet_pt[jet];
 	  if (absJetEta>jetEtaCut) continue;
 	  
 	  float dR1 = deltaR(analysisTree.pfjet_eta[jet],analysisTree.pfjet_phi[jet],
@@ -1895,6 +2000,23 @@ int main(int argc, char * argv[]) {
 	  if (analysisTree.pfjet_pt[jet]>jetPtHighCut) {
 	    nJets30++;
 	    HT30 += analysisTree.pfjet_pt[jet];
+
+	    if (indexLeadingJet>=0) {
+	      if (jetPt<ptLeadingJet&&jetPt>ptSubLeadingJet) {
+		indexSubLeadingJet = jet;
+		ptSubLeadingJet = jetPt;
+	      }
+	    }
+
+	    if (jetPt>ptLeadingJet) {
+	      indexSubLeadingJet = indexLeadingJet;
+	      ptSubLeadingJet = ptLeadingJet;
+	      indexLeadingJet = jet;
+	      ptLeadingJet = jetPt; 
+	    }
+
+
+
 	    if (fabs(analysisTree.pfjet_eta[jet])<jetEtaTrkCut) {
 	      HT30etaCut += analysisTree.pfjet_pt[jet];
 	      nJets30etaCut++;
@@ -1910,12 +2032,62 @@ int main(int argc, char * argv[]) {
 	  if (analysisTree.pfjet_pt[jet]>jetPtLowCut) {
 	    nJets20++;
 	    HT20 += analysisTree.pfjet_pt[jet]; 
+
 	    if (fabs(analysisTree.pfjet_eta[jet])<jetEtaTrkCut) {
+
               HT20etaCut += analysisTree.pfjet_pt[jet];
               nJets20etaCut++;
+
+	      bool tagged = analysisTree.pfjet_btag[jet][0]>0.80;
+
+	      float JetPtForBTag = analysisTree.pfjet_pt[jet];
+	      float absJetEta = fabs(analysisTree.pfjet_eta[jet]);
+	      if (JetPtForBTag>MaxBJetPt) JetPtForBTag = MaxBJetPt - 0.1;
+	      if (JetPtForBTag<MinBJetPt) JetPtForBTag = MinBJetPt + 0.1;
+	      float jet_scalefactor = 1;
+	      float tageff = 1;
+	      if (!isData) {
+		int flavor = abs(analysisTree.pfjet_flavour[jet]);
+		if (flavor==5) { // b-quark
+		  jet_scalefactor = reader_B.eval_auto_bounds("central",BTagEntry::FLAV_B, absJetEta, JetPtForBTag);
+		  tageff = tagEff_B->GetBinContent(tagEff_B->FindBin(JetPtForBTag,absJetEta));
+		}
+		else if (flavor==4) { // c-quark
+		  jet_scalefactor = reader_C.eval_auto_bounds("central",BTagEntry::FLAV_C, absJetEta, JetPtForBTag);
+                  tageff = tagEff_C->GetBinContent(tagEff_C->FindBin(JetPtForBTag,absJetEta));
+		}
+		else {
+		  jet_scalefactor = reader_Light.eval_auto_bounds("central",BTagEntry::FLAV_UDSG, absJetEta, JetPtForBTag);
+		  tageff = tagEff_Light->GetBinContent(tagEff_Light->FindBin(JetPtForBTag,absJetEta));
+		}
+
+		//		std::cout << "Flavor = " << flavor << " pt = " <<  JetPtForBTag << "  eta = " << jetEta 
+		//			  << "  SF = " << jet_scalefactor << " tageff = " << tageff << "  tagged = " << tagged << std::endl;
+		//
+		if (tageff<1e-5)      tageff = 1e-5;
+		if (tageff>0.99999)   tageff = 0.99999;
+		rand.SetSeed((int)((jetEta+5)*100000));
+		double rannum = rand.Rndm();
+		if (jet_scalefactor<1 && tagged) { // downgrading
+		  double fraction = 1-jet_scalefactor;
+		  if (rannum<fraction) {
+		    tagged = false;
+		  }
+		}
+		if (jet_scalefactor>1 && !tagged) { // upgrading
+		  double fraction = (jet_scalefactor-1.0)/(1.0/tageff-1.0);
+		  if (rannum<fraction) {
+		    tagged = true;
+		  }
+		}
+
+		//		std::cout << "Updated taggged = " << tagged << std::endl;
+	      }
+
+
 	      if (analysisTree.pfjet_btag[jet][0]>0.46) 
 		nJets20BTagLoose++;
-	      if (analysisTree.pfjet_btag[jet][0]>0.80) 
+	      if (tagged) 
 		nJets20BTagMedium++;
 
             }
@@ -1923,6 +2095,36 @@ int main(int argc, char * argv[]) {
 
 
 	}
+
+	float mjj = -1;
+	float etaLeadingJet = -999;
+	float phiLeadingJet = -999;
+
+	if (indexLeadingJet>=0) {
+	  ptLeadingJet = analysisTree.pfjet_pt[indexLeadingJet];
+	  etaLeadingJet = analysisTree.pfjet_eta[indexLeadingJet];
+	  phiLeadingJet = analysisTree.pfjet_phi[indexLeadingJet];
+	}
+
+	if (indexLeadingJet>=0 && indexSubLeadingJet>=0) {
+
+
+	  TLorentzVector jet1; jet1.SetPxPyPzE(analysisTree.pfjet_px[indexLeadingJet],
+					       analysisTree.pfjet_py[indexLeadingJet],
+					       analysisTree.pfjet_pz[indexLeadingJet],
+					       analysisTree.pfjet_e[indexLeadingJet]);
+	  
+	  TLorentzVector jet2; jet2.SetPxPyPzE(analysisTree.pfjet_px[indexSubLeadingJet],
+                                               analysisTree.pfjet_py[indexSubLeadingJet],
+                                               analysisTree.pfjet_pz[indexSubLeadingJet],
+                                               analysisTree.pfjet_e[indexSubLeadingJet]);
+	  mjj = (jet1+jet2).M();
+
+	}
+
+	bool is0Jet    = nJets30==0;
+	bool isBoosted = nJets30==1 || (nJets30==2 && mjj<300) || nJets30>2;
+	bool isVBF     = nJets30==2 && mjj>300;
 
 	//	std::cout << "Jet processed" << std::endl;
 
@@ -1953,7 +2155,8 @@ int main(int argc, char * argv[]) {
 		  std::cout << std::endl;
 		  } 
 	  */
-	  weight = weight*IdIsoSF_mu1*IdIsoSF_mu2*trackSF_mu1*trackSF_mu2;
+	  //	  weight = weight*IdIsoSF_mu1*IdIsoSF_mu2*trackSF_mu1*trackSF_mu2;
+	  weight = weight*IdIsoSF_mu1*IdIsoSF_mu2;
 
 	  double effDataTrig1 = SF_muonTrig->get_EfficiencyData(ptMu1, etaMu1);  
 	  double effDataTrig2 = SF_muonTrig->get_EfficiencyData(ptMu2, etaMu2);  
@@ -1968,7 +2171,12 @@ int main(int argc, char * argv[]) {
 	  if (applyTrigger) {
 	    double effMcTrig1 = SF_muonTrig->get_EfficiencyMC(ptMu1, etaMu1);
 	    double effMcTrig2 = SF_muonTrig->get_EfficiencyMC(ptMu2, etaMu2);
-	    double effMcTrig = 1 - (1-effMcTrig1)*(1-effMcTrig2);
+	    //	    double effMcTrig = 1 - (1-effMcTrig1)*(1-effMcTrig2);
+	    double effMcTrig = 1;
+	    if (firstTrigger)
+	      effMcTrig = effMcTrig1;
+	    else
+	      effMcTrig = effMcTrig2;
 	    if (effTrigData>0&&effMcTrig>0) {
 	      weightTrig = effTrigData/effMcTrig;
 	      weight = weight*weightTrig;
@@ -2245,6 +2453,24 @@ int main(int argc, char * argv[]) {
 	    massSelScaleH[iScale]->Fill(massSel*scaleFactor,weight);
 	  }
 
+	  if (is0Jet) {
+	    mass0jetH->Fill(double(massSel),weight);
+	    if (nJets20BTagMedium==0) 
+	      mass0jetBvetoH->Fill(double(massSel),weight);
+	  }
+
+	  if (isBoosted) {
+	    massBoostedH->Fill(double(massSel),weight);
+	    if (nJets20BTagMedium==0)
+	      massBoostedBvetoH->Fill(double(massSel),weight);
+	  }
+
+	  if (isVBF) {
+	    massVBFH->Fill(double(massSel),weight);
+	    if (nJets20BTagMedium==0)
+	      massVBFBvetoH->Fill(double(massSel),weight);
+	  }
+
 	  ptLeadingMuSelH->Fill(analysisTree.muon_pt[indx1],weight);
 	  ptTrailingMuSelH->Fill(analysisTree.muon_pt[indx2],weight);
 	  etaLeadingMuSelH->Fill(analysisTree.muon_eta[indx1],weight);
@@ -2259,6 +2485,9 @@ int main(int argc, char * argv[]) {
 	  HT20SelH->Fill(double(HT20),weight);
 	  HT30etaCutSelH->Fill(double(HT30etaCut),weight);
 	  HT20etaCutSelH->Fill(double(HT20etaCut),weight);
+
+	  nJets20BTagLooseSelH->Fill(double(nJets20BTagLoose),weight);
+	  nJets20BTagMediumSelH->Fill(double(nJets20BTagMedium),weight);
 
 	  // cout << "dxy (mu1) = " << analysisTree.muon_dxy[indx1] << "   error = " << analysisTree.muon_dxyerr[indx1] << std::endl;
 	  //cout << "dxy (mu2) = " << analysisTree.muon_dxy[indx2] << "   error = " << analysisTree.muon_dxyerr[indx2] << std::endl;
@@ -2551,6 +2780,31 @@ int main(int argc, char * argv[]) {
 	    metZSelNJetsH[jetBin]->Fill(pfmet,weight);
 	    puppimetZSelNJetsH[jetBin]->Fill(puppimet,weight);
 	    mvametZSelNJetsH[jetBin]->Fill(mvamet,weight);
+
+	    nJets20BTagLooseZSelH->Fill(double(nJets20BTagLoose),weight);
+	    nJets20BTagMediumZSelH->Fill(double(nJets20BTagMedium),weight);
+
+	    if (nJets30>0) {
+	      leadingJetPtH->Fill(ptLeadingJet,weight);
+	      leadingJetEtaH->Fill(etaLeadingJet,weight);
+	      leadingJetPhiH->Fill(phiLeadingJet,weight);
+	    }
+	    
+	    if (is0Jet) {
+	      nJets20BTagMedium0jetH->Fill(double(nJets20BTagMedium),weight);
+	    }
+	    if (isBoosted) {
+	      nJets20BTagMediumBoostedH->Fill(double(nJets20BTagMedium),weight);
+	      dimuonPtBoostedH->Fill(dimuonPt,weight);
+	      if (nJets20BTagMedium==0) 
+		dimuonPtBoostedBvetoH->Fill(dimuonPt,weight);
+	    }
+	    if (isVBF) {
+	      nJets20BTagMediumVBFH->Fill(double(nJets20BTagMedium),weight);
+	      mjjVBFH->Fill(mjj,weight);
+	      if ( nJets20BTagMedium==0 )
+		mjjVBFBvetoH->Fill(mjj,weight);
+	    }
 
 	    // pfmet
 	    recoilZParalH[jetBin]->Fill(recoilParal,weight);

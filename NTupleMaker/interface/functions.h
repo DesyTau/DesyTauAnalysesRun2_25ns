@@ -489,9 +489,9 @@ namespace genTools{
     bool isMuon = 0;
     bool isElectron = 0;
     bool isChargedLepton = 0;
-    bool isNeutrino = 0;
+    //bool isNeutrino = 0;
     bool fromHardProcessFinalState = 0;
-    bool isDirectHardProcessTauDecayProduct = 0;
+    //bool isDirectHardProcessTauDecayProduct = 0;
     
     for (unsigned int igen=0; igen<analysisTree.genparticles_count; ++igen) {
       genPart.SetXYZT(analysisTree.genparticles_px[igen],
@@ -502,11 +502,9 @@ namespace genTools{
       isMuon = fabs(analysisTree.genparticles_pdgid[igen])==13;
       isElectron = fabs(analysisTree.genparticles_pdgid[igen])==11;
       isChargedLepton = isMuon || isElectron;
-      isNeutrino = fabs(analysisTree.genparticles_pdgid[igen])==12||
-	fabs(analysisTree.genparticles_pdgid[igen])==14||
-	fabs(analysisTree.genparticles_pdgid[igen])==16;
+      //isNeutrino = fabs(analysisTree.genparticles_pdgid[igen])==12||	fabs(analysisTree.genparticles_pdgid[igen])==14||	fabs(analysisTree.genparticles_pdgid[igen])==16;
       fromHardProcessFinalState = analysisTree.genparticles_fromHardProcess[igen] && analysisTree.genparticles_status[igen]==1;
-      isDirectHardProcessTauDecayProduct = analysisTree.genparticles_isDirectHardProcessTauDecayProduct[igen];
+      //isDirectHardProcessTauDecayProduct = analysisTree.genparticles_isDirectHardProcessTauDecayProduct[igen];
 
       /*if((fromHardProcessFinalState && isChargedLepton) || (isDirectHardProcessTauDecayProduct && (!isNeutrino)))
 	genL += genPart;
@@ -574,7 +572,7 @@ namespace genTools{
     bool isChargedLepton = 0;
     bool isNeutrino = 0;
     bool fromHardProcessFinalState = 0;
-    bool isDirectHardProcessTauDecayProduct = 0;
+    //bool isDirectHardProcessTauDecayProduct = 0;
     
     for (unsigned int igen=0; igen<analysisTree.genparticles_count; ++igen) {
       genPart.SetXYZT(analysisTree.genparticles_px[igen],
@@ -589,7 +587,7 @@ namespace genTools{
 	fabs(analysisTree.genparticles_pdgid[igen])==14||
 	fabs(analysisTree.genparticles_pdgid[igen])==16;
       fromHardProcessFinalState = analysisTree.genparticles_fromHardProcess[igen] && analysisTree.genparticles_status[igen]==1;
-      isDirectHardProcessTauDecayProduct = analysisTree.genparticles_isDirectHardProcessTauDecayProduct[igen];
+      //isDirectHardProcessTauDecayProduct = analysisTree.genparticles_isDirectHardProcessTauDecayProduct[igen];
 
       /*if((fromHardProcessFinalState && (isChargedLepton || isNeutrino)) || isDirectHardProcessTauDecayProduct)
 	genV += genPart;
