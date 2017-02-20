@@ -59,15 +59,19 @@ void TagProbeTree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("eta_probe", &eta_probe, &b_eta_probe); 
    fChain->SetBranchAddress("phi_probe", &phi_probe, &b_phi_probe); 
 
+   fChain->SetBranchAddress("delta_phi", &delta_phi, &b_delta_phi); 
+
    fChain->SetBranchAddress("m_vis", &m_vis, &b_m_vis); 
 
    fChain->SetBranchAddress("id_probe", &id_probe, &b_id_probe);
    fChain->SetBranchAddress("iso_probe", &iso_probe, &b_iso_probe);
 
    fChain->SetBranchAddress("tag_isoLeg", &tag_isoLeg, &b_tag_isoLeg);
-   //fChain->SetBranchAddress("tag_isoLeg2", &tag_isoLeg2, &b_tag_isoLeg2);
+
+   fChain->SetBranchAddress("levelone_match_probe", &levelone_match_probe, &b_levelone_match_probe);
 
    fChain->SetBranchAddress("trigobjpt_probe", &trigobjpt_probe, &b_trigobjpt_probe);
+   fChain->SetBranchAddress("trigobjpt_tag", &trigobjpt_tag, &b_trigobjpt_tag);
 
    fChain->SetBranchAddress("hlt_1_probe", &hlt_1_probe, &b_hlt_1_probe);
    fChain->SetBranchAddress("hlt_2_probe", &hlt_2_probe, &b_hlt_2_probe);
@@ -89,6 +93,8 @@ void TagProbeTree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("hlt_18_probe", &hlt_18_probe, &b_hlt_18_probe);
    fChain->SetBranchAddress("hlt_19_probe", &hlt_19_probe, &b_hlt_19_probe);
    fChain->SetBranchAddress("hlt_20_probe", &hlt_20_probe, &b_hlt_20_probe);
+
+   fChain->SetBranchAddress("hlt_tag_match", &hlt_tag_match, &b_hlt_tag_match);
 
    fChain->SetBranchAddress("mcweight", &mcweight, &b_mcweight); 
    fChain->SetBranchAddress("pu_weight", &pu_weight, &b_pu_weight); 
@@ -176,15 +182,19 @@ void TagProbeTree::WriteInit(TTree *tree) {
   fChain->Branch("eta_probe", &eta_probe, "eta_probe/F");
   fChain->Branch("phi_probe", &phi_probe, "phi_probe/F");
 
+  fChain->Branch("delta_phi", &delta_phi, "delta_phi/F");
+
   fChain->Branch("m_vis", &m_vis, "m_vis/F");
 
   fChain->Branch("id_probe", &id_probe, "id_probe/B");
   fChain->Branch("iso_probe", &iso_probe, "iso_probe/F");
 
   fChain->Branch("tag_isoLeg", &tag_isoLeg, "tag_isoLeg/I");
-  //fChain->Branch("tag_isoLeg2", &tag_isoLeg2, "tag_isoLeg2/I");
+
+  fChain->Branch("levelone_match_probe", &levelone_match_probe, "levelone_match_probe/I");
 
   fChain->Branch("trigobjpt_probe", &trigobjpt_probe, "trigobjpt_probe/F");
+  fChain->Branch("trigobjpt_tag", &trigobjpt_tag, "trigobjpt_tag/F");
 
   fChain->Branch("hlt_1_probe", &hlt_1_probe, "hlt_1_probe/I");
   fChain->Branch("hlt_2_probe", &hlt_2_probe, "hlt_2_probe/I");
@@ -206,6 +216,8 @@ void TagProbeTree::WriteInit(TTree *tree) {
   fChain->Branch("hlt_18_probe", &hlt_18_probe, "hlt_18_probe/I");
   fChain->Branch("hlt_19_probe", &hlt_19_probe, "hlt_19_probe/I");
   fChain->Branch("hlt_20_probe", &hlt_20_probe, "hlt_20_probe/I");
+
+  fChain->Branch("hlt_tag_match", &hlt_tag_match, "hlt_tag_match/I");
 
   fChain->Branch("mcweight", &mcweight, "mcweight/F");
   fChain->Branch("pu_weight", &pu_weight, "pu_weight/F");

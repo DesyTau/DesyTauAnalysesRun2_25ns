@@ -313,7 +313,8 @@ int main(int argc, char * argv[]){
       for (unsigned int i=0; i<nfilters; ++i) {
       	TString HLTFilter(analysisTree.run_hltfilters->at(i));
         for(unsigned int i2=0; i2<nhlt_check; ++i2){
-          if (HLTFilter==hlt[i2]) nHLT[i2] = i;
+          if (HLTFilter==hlt[i2]) nHLT[i2] = i; 
+		     //std::cout << HLTFilter << " at index " << i << std::endl;}
 //          if((i2==11) && (nHLT[i2]!=-1)) cout<<"debug "<<hlt[i2]<<": "<<nHLT[i2]<<endl; //OK
         }
       }
@@ -417,8 +418,11 @@ int main(int argc, char * argv[]){
 
           otree->pt_probe = analysisTree.muon_pt[ip];
           otree->eta_probe = analysisTree.muon_eta[ip];
-          otree->phi_probe = analysisTree.muon_phi[ip];
+          otree->phi_probe = analysisTree.muon_phi[ip];		
           otree->m_vis = m_vis;
+
+		  otree->delta_phi = dPhiFrom2P(tagLV.Px(), tagLV.Py(), probeLV.Px(), probeLV.Py()); 
+
           otree->mcweight = 1.;
           if(!isData)
             otree->mcweight = analysisTree.genweight;

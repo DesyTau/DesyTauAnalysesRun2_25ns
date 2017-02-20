@@ -116,6 +116,52 @@ void TP_eff_e(TString fileName = "SingleElectron_Run2016B_TP", // RooT file with
 
 	int nPtBins = 25; if(what == "IdIso") nPtBins = 10;
 
+/*
+/// for anti-isolated regions
+// up to Eta2p1
+
+  int nEtaBins = 2;
+  float etaBins[3] = {0, 1.48, 2.1};
+
+  TString EtaBins[2] = {"EtaLt1p48","Eta1p48to2p1"};
+
+  float ptBins_def[8] = {10,20,25,30,40,50,100,1000};
+//pt binning for the triggers: 10., 20., 22., 24., 26., 28., 30., 40., 50., 100., 200., 1000.
+
+
+  TString PtBins_def[7] = {"Pt10to20",
+       "Pt20to25",
+       "Pt25to30",
+       "Pt30to40",
+       "Pt40to50",
+       "Pt50to100",
+       "PtGt100"};
+
+  float ptBinsTrig_def[11] = {10,
+              20,
+			  22, 
+			  24,
+			  26,
+			  28,
+			  30,
+			  40,
+			  50,
+			  100,
+			  1000};
+
+	TString PtBinsTrig_def[10] = {"Pt10to20",
+			"Pt20to22","Pt22to24",
+		    "Pt24to26","Pt26to28",
+		    "Pt28to30",
+		    "Pt30to40",
+		    "Pt40to50",
+		    "Pt50to100",
+			"PtGt100"};
+
+	int nPtBins = 10; if(what == "IdIso") nPtBins = 7;*/
+
+
+
 /*  int nEtaBins = 5;
   float etaBins[6] = {0, 1.0, 1.4442, 1.56, 2.1, 2.5};
 
@@ -234,7 +280,8 @@ void TP_eff_e(TString fileName = "SingleElectron_Run2016B_TP", // RooT file with
   if(what == "hlt_5") {cut_flag_hlt_pass = "fabs(eta_tag)<2 && hlt_5_probe == 1"; cut_flag_hlt_fail = "fabs(eta_tag)<2 && hlt_5_probe == 0"; }
   if(what == "hlt_6") {cut_flag_hlt_pass = "fabs(eta_tag)<2 && hlt_6_probe == 1"; cut_flag_hlt_fail = "fabs(eta_tag)<2 && hlt_6_probe == 0"; }
   if(what == "hlt_7") {cut_flag_hlt_pass = "fabs(eta_tag)<2 && hlt_7_probe == 1"; cut_flag_hlt_fail = "fabs(eta_tag)<2 && hlt_7_probe == 0"; }
-  if(what == "hlt_8") {cut_flag_hlt_pass = "fabs(eta_tag)<2 && hlt_8_probe == 1"; cut_flag_hlt_fail = "fabs(eta_tag)<2 && hlt_8_probe == 0"; }
+// for Ele24 leg of the e+tau trigger
+  if(what == "hlt_8") {cut_flag_hlt_pass = "(fabs(eta_tag)<2 && hlt_tag_match ==1 && hlt_8_probe == 1 && levelone_match_probe ==1 && fabs(eta_probe)<2.1 && trigobjpt_probe>24)"; cut_flag_hlt_fail = "(fabs(eta_tag)<2 && (hlt_8_probe == 0 || levelone_match_probe == 0 || trigobjpt_probe<=24 || fabs(eta_probe)>=2.1) )"; }
   if(what == "hlt_9") {cut_flag_hlt_pass = "hlt_9_probe == 1"; cut_flag_hlt_fail = "hlt_9_probe == 0"; }
   if(what == "hlt_10") {cut_flag_hlt_pass = "hlt_10_probe == 1"; cut_flag_hlt_fail = "hlt_10_probe == 0"; }
   if(what == "hlt_11") {cut_flag_hlt_pass = "hlt_11_probe == 1"; cut_flag_hlt_fail = "hlt_11_probe == 0"; }

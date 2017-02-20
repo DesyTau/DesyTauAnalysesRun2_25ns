@@ -81,6 +81,7 @@ bool isGoodLumi(const std::pair<int, int>& lumi, const lumi_json& json);
 bool isGoodLumi(int run, int lumi, const lumi_json& json);
 float abs_Iso(int Index, TString lep, const AC1B * analysisTree, float dRiso);
 float rel_Iso(int Index, TString lep, const AC1B * analysisTree, float dRiso); //dr cone 0.3 OR 0.4 
+bool isMatchedToLevelOne(unsigned int Index, const AC1B * analysisTree, float L1ptCut, float L1DrCut, bool requireIsolation);
 
 int main(int argc, char * argv[]){
 
@@ -100,6 +101,7 @@ int main(int argc, char * argv[]){
   const string infiles = argv[2];
 
   const bool isData = cfg.get<bool>("isData");
+  //cout << "isData" << isData << endl;
 
   lumi_json json;
   if (isData){ 
@@ -112,6 +114,9 @@ int main(int argc, char * argv[]){
   const float dxyProbeElectronCut = cfg.get<float>("dxyProbeElectronCut");
   const float dzProbeElectronCut = cfg.get<float>("dzProbeElectronCut");
 
+  const float levelOneProbePtCut = cfg.get<float>("levelOneProbePtCut");
+  const float levelOneProbeDrCut = cfg.get<float>("levelOneProbeDrCut");
+  const bool  levelOneProbeIsIsolated = cfg.get<bool>("levelOneProbeIsIsolated");
 
   const float isoElectronCut = cfg.get<float>("isoElectronCut");
   const float dRPairCut = cfg.get<float>("dRPairCut");
@@ -122,7 +127,10 @@ int main(int argc, char * argv[]){
   const float dxyElectronCut = cfg.get<float>("dxyElectronCut");
   const float dzElectronCut = cfg.get<float>("dzElectronCut");
   const float dRiso = cfg.get<float>("dRiso");
-
+  const bool requireTagLevelOneMatch = cfg.get<bool>("requireTagLevelOneMatch");
+  const float tagLevelOnePtCut = cfg.get<float>("tagLevelOnePtCut");
+  const float tagLevelOneDrCut = cfg.get<float>("tagLevelOneDrCut");
+  const bool  tagLevelOneIsIsolated = cfg.get<bool>("tagLevelOneIsIsolated");
 
   const float massCut = cfg.get<float>("massCut");
 
@@ -133,6 +141,8 @@ int main(int argc, char * argv[]){
 
   const unsigned int nhlt_check =  cfg.get<unsigned int>("nhlt_check");
 
+  //const unsigned int nhlt_tag = cfg.get<unsigned int>("nhlt_tag");
+
   const int nEventsMax = cfg.get<int>("nEventsMax");
   const unsigned int nRunMin = cfg.get<unsigned int>("nRunMin");
   const unsigned int nRunMax = cfg.get<unsigned int>("nRunMax");
@@ -140,6 +150,7 @@ int main(int argc, char * argv[]){
 
 
   const bool debug = cfg.get<bool>("debug");
+  std::cout << "debug : " << debug << std::endl;
 
   const bool ApplyTrigger = cfg.get<bool>("ApplyTrigger");
   const float ptTrigObjCut = cfg.get<float>("ptTrigObjCut");
@@ -154,21 +165,30 @@ int main(int argc, char * argv[]){
     isoLeg = cfg.get<string>("isoLeg");
   }
 
-  //string isoLeg2;
-  //if (isData || ApplyTrigger) {
-  //  isoLeg2 = cfg.get<string>("isoLeg2");
-  //}
+  string HltTag;
+  if (ApplyTrigger){
+	HltTag = cfg.get<string>("hlt_tag"); 
+	if (debug) cout << "hlt_tag :  " << HltTag << endl; 
+  }
 
   vector<string> hlt;
-
   for(unsigned int i=1; i<=nhlt_check; i++){
-    hlt.push_back(cfg.get<string>("hlt_" + std::to_string(i)));
+    hlt.push_back(cfg.get<string>("probe_hlt_" + std::to_string(i)));
+  }
+  if(debug){
+    for(unsigned int i=1; i<=nhlt_check; i++){
+    cout<<cfg.get<string>("probe_hlt_" + std::to_string(i))<<" - "<<hlt[i-1]<<endl;}
   }
 
-  if(0){
-    for(unsigned int i=1; i<=nhlt_check; i++){
-    cout<<cfg.get<string>("hlt_" + std::to_string(i))<<" - "<<hlt[i-1]<<endl;}
+  /*
+  vector<string> hlt_tag;	
+  for(unsigned int i=1; i<=nhlt_tag; i++){
+    hlt_tag.push_back(cfg.get<string>("tag_hlt_" + std::to_string(i)));
   }
+  if(debug){
+    for(unsigned int i=1; i<=nhlt_tag; i++){
+    cout<<cfg.get<string>("tag_hlt_" + std::to_string(i))<<" - "<<hlt_tag[i-1]<<endl;}
+  }*/
 
   int ifile = 0;
   int jfile = -1;
@@ -279,8 +299,6 @@ int main(int argc, char * argv[]){
     
     Long64_t numberOfEntries = analysisTree.GetEntries();
 
-  
-
     for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++){ //EVENT LOOP
 
       analysisTree.GetEntry(iEntry);
@@ -292,6 +310,8 @@ int main(int argc, char * argv[]){
       }
 
       nEvents++;
+	  if (debug) cout << "Event # " << nEvents << endl;
+      if (nEvents>nEventsMax && nEventsMax !=-1) break;
 
       //filters
       unsigned int nfilters = analysisTree.run_hltfilters->size();
@@ -312,31 +332,30 @@ int main(int argc, char * argv[]){
           exit(-1);
         }
       }
-
-      //check isoleg2
-	  /*
-      unsigned int nIsoLeg2 = 0;
-      bool checkIsoLeg2 = false;
-      if(isData || ApplyTrigger){  
+	
+	  if (debug) cout << "after checking tag iso leg index" << endl;
+      
+      // additional hlt filter to check for the tag (optional)
+      unsigned int nHltTag =0;
+      bool foundHltTag = false;
+	  if (ApplyTrigger){
         for (unsigned int i=0; i<nfilters; ++i) {
-          TString HLTFilter(analysisTree.run_hltfilters->at(i));
-          if (HLTFilter==isoLeg2) {
-            nIsoLeg2 = i;
-            checkIsoLeg2 = true;
+          TString HLTFilter_tag(analysisTree.run_hltfilters->at(i));
+		  if (HLTFilter_tag == HltTag) {
+		    nHltTag = i;
+		    foundHltTag = true;
           }
         }
-        if (!checkIsoLeg2) {
-          std::cout << "HLT filter " << isoLeg2 << " not found" << std::endl;
+	  /*if (!foundHltTag) {
+          std::cout << "HLT filter " << HltTag << " not found" << std::endl;
           exit(-1);
-        }
-      } */
+	  }*/
+       }
 
 
       //hlt filters indices
       int *nHLT = new int[nhlt_check];
-
       for(unsigned int i2=0; i2<nhlt_check; ++i2) {nHLT[i2] = -1;}
-
       for (unsigned int i=0; i<nfilters; ++i) {
         TString HLTFilter(analysisTree.run_hltfilters->at(i));
         for(unsigned int i2=0; i2<nhlt_check; ++i2){
@@ -359,15 +378,17 @@ int main(int argc, char * argv[]){
       otree->evt = int(analysisTree.event_nr); 
 	  otree->npv = int(analysisTree.primvertex_count);
       
+	  //cout << "before checking lumi section " << endl;
+      if (isData && !isGoodLumi(otree->run, otree->lumi, json)) continue;
 
-      if (isData && !isGoodLumi(otree->run, otree->lumi, json))
-      	continue;
+	  if (debug) cout << "after checking lumi section " << endl;
 
       otree->pu_weight=1;
 
       if(ApplyPUweight) {
         otree->pu_weight = 0;
         otree->pu_weight = float(PUofficial->get_PUweight(double(analysisTree.numtruepileupinteractions)));
+		//cout << "pile up weight " << otree->pu_weight << endl;
       } 
 
       //tag selection
@@ -376,7 +397,10 @@ int main(int argc, char * argv[]){
       vector<int> tags; tags.clear();
       TLorentzVector tagLV, probeLV, pairLV;
 
+	  if (debug) cout << "before looping on " << analysisTree.electron_count << "electrons" << endl;
       for (it = 0; it<analysisTree.electron_count; it++){
+
+		//cout << "start loop on the tag " << endl;
 
  		bool electronMvaId = analysisTree.electron_mva_wp80_general_Spring16_v1[it];
 
@@ -390,11 +414,13 @@ int main(int argc, char * argv[]){
         if (analysisTree.electron_nmissinginnerhits[it]>1) continue;
         if (!analysisTree.electron_pass_conversion[it]) continue;
 
+		// check Level1 matching and requirements for the tag
+		if (requireTagLevelOneMatch && !isMatchedToLevelOne(it, &analysisTree, tagLevelOnePtCut, tagLevelOneDrCut, tagLevelOneIsIsolated) ) continue;
+		if (debug) cout << "after level 1 matching for the tag " << endl;
+
         //trigger match
         bool isSingleLepTrig = false;
 		otree->tag_isoLeg = -1;
-
-		//otree->tag_isoLeg2 =-1;
 
 		// check first trigger
         if(isData || ApplyTrigger){  
@@ -408,13 +434,6 @@ int main(int argc, char * argv[]){
               if (analysisTree.trigobject_filters[iT][nIsoLeg] && ( isData || analysisTree.trigobject_pt[iT] > ptTrigObjCut)){
                 isSingleLepTrig = true;
 				otree->tag_isoLeg = 1;
-
-			  	// check second trigger 
-				/*
-			  	if (analysisTree.trigobject_filters[iT][nIsoLeg2] && ( isData || analysisTree.trigobject_pt[iT] > ptTrigObjCut)){
-					otree->tag_isoLeg2 = 1;
-              	}
-				else otree->tag_isoLeg2 = 0; */
 			  }
             }
           }
@@ -429,6 +448,49 @@ int main(int argc, char * argv[]){
         otree->pt_tag = analysisTree.electron_pt[it]; 
         otree->eta_tag = analysisTree.electron_eta[it];
         otree->phi_tag = analysisTree.electron_phi[it];
+
+        if (ApplyTrigger){
+		  if (!foundHltTag) otree->hlt_tag_match = -1;
+		  else {
+			otree->hlt_tag_match = 0;
+            for (unsigned int iT=0; iT<analysisTree.trigobject_count; ++iT) {
+              float dRtrig = deltaR(analysisTree.electron_eta[it], analysisTree.electron_phi[it], 
+                                  analysisTree.trigobject_eta[iT],analysisTree.trigobject_phi[iT]);
+
+              if (dRtrig < deltaRTrigMatch && analysisTree.trigobject_filters[iT][nHltTag]){
+				otree->hlt_tag_match = 1;
+			    }
+              }
+          }
+        }
+
+	    // check additional trigger match for the tag  
+/*
+		if (debug) cout << "before tag trigger check" << endl;
+        int *hlt_tag = new int[nhlt_tag];
+        for(unsigned int i=0; i<nhlt_tag; ++i) {
+          hlt_tag[i] = 0;
+          if(nHLT_tag[i] == -1) hlt_tag[i] = -1;
+        }
+
+        for (unsigned int iTr=0; iTr<analysisTree.trigobject_count; ++iTr){
+
+          float dRtrig = deltaR(analysisTree.electron_eta[it],analysisTree.electron_phi[it],
+                                  analysisTree.trigobject_eta[iTr],analysisTree.trigobject_phi[iTr]);
+
+          if (dRtrig < deltaRTrigMatch){
+			otree->trigobjpt_tag = (float)analysisTree.trigobject_pt[iTr];			 
+            for(unsigned int i=0; i<nhlt_tag; ++i){
+              if(nHLT_tag[i] == -1){
+                hlt_tag[i] = -1;
+              } else{
+                if (analysisTree.trigobject_filters[iTr][nHLT_tag[i]]){
+                  hlt_tag[i] = 1;
+                }
+              }
+            }
+          }
+        }*/
 
 
         //probe selection
@@ -482,6 +544,11 @@ int main(int argc, char * argv[]){
 
           otree->id_probe = id_probe;
           otree->iso_probe = iso_probe;
+
+		  // check level one requirements on the probe
+		  otree->levelone_match_probe = -1;
+		  if (isMatchedToLevelOne(ip, &analysisTree, levelOneProbePtCut, levelOneProbeDrCut, levelOneProbeIsIsolated)) otree->levelone_match_probe = 1;
+		  else if (!isMatchedToLevelOne(ip, &analysisTree, levelOneProbePtCut, levelOneProbeDrCut, levelOneProbeIsIsolated)) otree->levelone_match_probe = 0;
 
           otree->hlt_1_probe = -1;
           otree->hlt_2_probe = -1;
@@ -582,6 +649,27 @@ int main(int argc, char * argv[]){
 ///////////////////////////////////////////////
 //////////////FUNCTION DEFINITION//////////////
 ///////////////////////////////////////////////
+
+bool isMatchedToLevelOne(unsigned int Index, const AC1B * analysisTree, float levelOnePtCut, float levelOneDrCut, bool requireIsolation){
+  bool isMatched = false; 
+  TLorentzVector L1objectLV;	
+  // loop on egamma level 1 objetcs
+  for (unsigned int iL1 = 0; iL1 < analysisTree->l1egamma_count; iL1++){
+    L1objectLV.SetXYZM(analysisTree->l1egamma_px[iL1],analysisTree->l1egamma_py[iL1],analysisTree->l1egamma_pz[iL1],0 );
+	float dRlevel1 = deltaR(analysisTree->electron_eta[Index], analysisTree->electron_phi[Index], 
+							L1objectLV.Eta(), L1objectLV.Phi());
+	if (requireIsolation){
+	  if (analysisTree->l1egamma_pt[iL1]>= levelOnePtCut && dRlevel1 < levelOneDrCut && analysisTree->l1egamma_iso>0) {isMatched = true; break;}
+    }
+    else if (!requireIsolation){
+	  if (analysisTree->l1egamma_pt[iL1]>= levelOnePtCut && dRlevel1 < levelOneDrCut)  {isMatched = true; break;}
+    }
+  }
+  return isMatched;
+}
+
+
+
 
 float rel_Iso(int Index, TString lep, const AC1B * analysisTree, float dRiso){
   if(lep=="m")  return(abs_Iso(Index, lep, analysisTree, dRiso) / analysisTree->muon_pt[Index] );
