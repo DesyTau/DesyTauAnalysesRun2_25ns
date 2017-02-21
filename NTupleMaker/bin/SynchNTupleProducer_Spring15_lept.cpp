@@ -95,7 +95,7 @@ void mt_calculation(Spring15Tree *otree);
 void svfit_variables(const AC1B *analysisTree, Spring15Tree *otree, const Config *cfg, TFile *inputFile_visPtResolution);
 bool isICHEPmed(int Index, const AC1B * analysisTree);
 bool isIdentifiedMediumMuon(int Index, const AC1B * analysisTree, bool isData);
-void correctTauES(TLorentzVector Tau, TLorentzVector Met, float relative_shift);
+void correctTauES(TLorentzVector& Tau, TLorentzVector& Met, float relative_shift, bool tau_is_one_prong);
 
 
 int main(int argc, char * argv[]){
@@ -1007,18 +1007,18 @@ int main(int argc, char * argv[]){
 	  }
 
 	  // shift the tau energy scale by decay mode and propagate to the met. 
-      if (!isData) {
-	    //float shift_tes_1prong = -0.018; //0
-	    //float shift_tes_1p1p0 = +0.01;   // 1 
-	    //float shift_tes_3prong = +0.004; // 10
-	    if (otree->tau_decay_mode_2 == 0) correctTauES(tauLV, metLV, shift_tes_1prong);
-	    else if (otree->tau_decay_mode_2 ==1) correctTauES(tauLV, metLV, shift_tes_1p1p0);
-	    else if (otree->tau_decay_mode_2 ==10) correctTauES(tauLV, metLV, shift_tes_3prong);
+	  if (!isData) {
+	    bool isOneProng = false; 
+	    float shift_tes = 0.0;
+	    if (otree->tau_decay_mode_2 == 0){     shift_tes=shift_tes_1prong; isOneProng=true;}
+	    else if (otree->tau_decay_mode_2 ==1){ shift_tes=shift_tes_1p1p0;}
+	    else if (otree->tau_decay_mode_2 ==10){shift_tes=shift_tes_3prong;}
+	    correctTauES(tauLV, metLV, shift_tes, isOneProng);
 	    // save shifted values to the tree
 	    otree->pt_2 = tauLV.Pt();
-        otree->met = metLV.Pt();
+	    otree->met = metLV.Pt();
 	    otree->metphi = metLV.Phi();
-      }
+	  }
 
       TLorentzVector dileptonLV = leptonLV + tauLV;
 
@@ -1768,9 +1768,14 @@ void svfit_variables(const AC1B *analysisTree, Spring15Tree *otree, const Config
 
 
 /// shift tau energy scale and propagate it to the met. 
-void correctTauES(TLorentzVector Tau, TLorentzVector Met, float relative_shift){
+void correctTauES(TLorentzVector& Tau, TLorentzVector& Met, float relative_shift, bool tau_is_one_prong){
   Met.SetPx(Met.Px()- (Tau.Px()*relative_shift) ) ;
   Met.SetPy(Met.Py()- (Tau.Py()*relative_shift) );
-  Tau.SetXYZM( Tau.Px()*(1+relative_shift), Tau.Py()*(1+relative_shift), Tau.Pz()*(1+relative_shift), Tau.M()*(1+relative_shift));
+  if (tau_is_one_prong){ // don't scale the mass
+  	Tau.SetXYZM( Tau.Px()*(1+relative_shift), Tau.Py()*(1+relative_shift), Tau.Pz()*(1+relative_shift), Tau.M());
+  }
+  else {
+    Tau.SetXYZM( Tau.Px()*(1+relative_shift), Tau.Py()*(1+relative_shift), Tau.Pz()*(1+relative_shift), Tau.M()*(1+relative_shift));
+  }
 }
 
