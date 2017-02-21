@@ -35,10 +35,16 @@ public:
 	
 		// mu->tau fake rates
 	    // Scale Factor values corresponding to eta={0, 0.4, 0.8, 1.2, 1.7, >1.7} 
+		/* ICHEP dataset numbers
 		std::vector<float> FakeRates_Loose_mu = {1.137, 1.067, 1.221, 1.460, 1.609};
 		std::vector<float> FakeRates_Tight_mu = {1.418, 1.134, 1.260, 1.660, 1.205};
 		MUTAUfakerates.insert(std::make_pair("Loose", FakeRates_Tight_mu));
-		MUTAUfakerates.insert(std::make_pair("Tight", FakeRates_Loose_mu));			
+		MUTAUfakerates.insert(std::make_pair("Tight", FakeRates_Loose_mu));*/			
+		// full 2016 from Artur
+		std::vector<float> FakeRates_Loose_mu = {1.09, 1.05, 1.1, 1.03, 1.2};
+		std::vector<float> FakeRates_Tight_mu = {1.37, 1.2, 1.14, 1.0, 1.8};
+		MUTAUfakerates.insert(std::make_pair("Loose", FakeRates_Loose_mu));
+		MUTAUfakerates.insert(std::make_pair("Tight", FakeRates_Tight_mu));			
 	}
 
     float get_fakerate(string lepton, string AntiLeptonDiscriminatorWP, float tauEta, int tau_gen_match ){
