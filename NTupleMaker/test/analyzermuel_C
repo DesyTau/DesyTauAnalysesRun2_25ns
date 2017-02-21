@@ -110,7 +110,7 @@ void analyzer::Loop(){
 	cout <<"  "<<cut.c_str()<<endl;
 	char plots_[100];
 	string data = "MuonEG";
-	string tt = "TT_TuneCUETP8M1_13TeV-powheg-pythia8";
+	string tt = "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8";
 	string wj = "WJetsToLNu";
 	string wj1 = "W1JetsToLNu";
 	string wj2 = "W2JetsToLNu";
@@ -126,16 +126,19 @@ void analyzer::Loop(){
 	string dyj4 = "DY4JetsToLL";
 	string signal = "stau";
 	string signalC1 = "C1";
+	string ttw = "TTWJetsToLNu";
 	if (string::npos != old.find(data)) isData= true;
 	if (string::npos != old.find(signal)) isSignal= true;
 	if (string::npos != old.find(signalC1)) isSignal= true;
 	if (string::npos != old.find(tt)) isTT= true;
 	if (string::npos != old.find(wj)) isWJ= true;
+	if (string::npos != old.find(ttw)) isWJ= false;
 	if (string::npos != old.find(dyj)) isDY= true;
 	if (string::npos != old.find(dyjhigh)) isDYhigh= true;
 	if (string::npos != old.find(dyjlow) || string::npos != old.find(dyjlow2)) isDYlow= true;
 	if (string::npos != old.find(dyj1) || string::npos != old.find(dyj2) || string::npos != old.find(dyj3) || string::npos != old.find(dyj4)) isDYNJ = true;
 	if (string::npos != old.find(wj1) || string::npos != old.find(wj2) || string::npos != old.find(wj3) || string::npos != old.find(wj4)) isWNJ= true;
+	if ((string::npos != old.find(wj1) || string::npos != old.find(wj2) || string::npos != old.find(wj3) || string::npos != old.find(wj4)) && string::npos == old.find(ttw)) isWNJ= true;
 	isNJ = isDYNJ && isWNJ;
 	
 	if (isSignal) cout<<" YOU HAVE FOUND ITTTTTTTTT "<<endl;
@@ -163,19 +166,18 @@ TObject *obj = key->ReadObj ();
 TH2D *histo = (TH2D*) obj;
 
 
-
-	TString fileinName = "/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/CMSSW_8_0_20/src/DesyTauAnalyses/NTupleMaker/test/CHANNELHERE/FILEIN";
-	if (systematic == "JetEnUp" || systematic == "JetEnDown" || systematic == "UnclEnDown" || systematic == "UnclEnDown" || systematic == "TauEnUp" || systematic == "TauEnDown" || systematic == "ElEnUp" || systematic == "ElEnDown" || systematic == "MuEnUp" || systematic == "MuEnDown") 
-	{fileinName ="/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/CMSSW_8_0_20/src/DesyTauAnalyses/NTupleMaker/test/CHANNELHERE_"+systematic+"/FILEIN";}
+	TString fileinName = "/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/New8025/CMSSW_8_0_25/src/DesyTauAnalyses/NTupleMaker/test/CHANNELHERE/FILEIN";
+	if (systematic == "JetEnUp" || systematic == "JetEnDown"  || systematic == "UnclEnDown" || systematic == "UnclEnDown" || systematic == "TauEnUp" || systematic == "TauEnDown" || systematic == "ElEnUp" || systematic == "ElEnDown" || systematic == "MuEnUp" || systematic == "MuEnDown") 
+	{fileinName ="/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/New8025/CMSSW_8_0_25/src/DesyTauAnalyses/NTupleMaker/test/CHANNELHERE_"+systematic+"/FILEIN";}
 
 
 	TFile * filein = new TFile(fileinName,"read");
 
 	TH1D * histW = (TH1D*)filein->Get("muel/histWeightsH");
-	TH1D * histTop ;
+	TH1D * histTop , *histTopSq;
 	if (isTT) histTop = (TH1D*)filein->Get("muel/histTopPt");
+	if (isTT && systematic == "TopPtUp" ) histTopSq = (TH1D*)filein->Get("muel/histTopPtSq");
 
-//	TH1D * hxsecW = (TH1D*)filein->Get("muel/xsec");
 	TH1D * CutFlow = (TH1D*)filein->Get("muel/CutFlowUnW");
 	TFile * file = new TFile("plots.root","recreate");
 
@@ -325,7 +327,7 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
 		iCut++;
 	
 
-		float trigw =   ( (20233)*trig_weight_1+ (0.953 * 16357 )* trig_weight_2)/float(36590.) ;
+		float trigw =   ( 17677*trig_weight_1 +   18188 * trig_weight_2)/float(35865.) ;
 		if (!isData) all_weights *= trigw;
 
 		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
@@ -563,11 +565,10 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
 
 			cout<<"  end from TH1D "<<endl;
 
-		//hcount->Draw();
 		CutFlowUnW->Write();
 		histW->Write();
 	if (isTT) histTop->Write();
-	//	hxsecW->Write();
+	if (isTT && systematic == "TopPtUp"  ) histTopSq->Write();
 		file->Write();
 		file->Close();
 		cout<<" Failed events  "<<counter<<endl;

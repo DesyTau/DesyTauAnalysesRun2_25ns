@@ -105,7 +105,7 @@ void analyzer::Loop(){
 	cout <<"  "<<cut.c_str()<<endl;
 	char plots_[100];
 	string data = "Single";
-	string tt = "TT_TuneCUETP8M1_13TeV-powheg-pythia8";
+	string tt = "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8";
 	string wj = "WJetsToLNu";
 	string wj1 = "W1JetsToLNu";
 	string wj2 = "W2JetsToLNu";
@@ -119,6 +119,7 @@ void analyzer::Loop(){
 	string dyj2 = "DY2JetsToLL";
 	string dyj3 = "DY3JetsToLL";
 	string dyj4 = "DY4JetsToLL";
+	string ttw = "TTWJetsToLNu";
 	string signal = "stau";
 	string signalC1 = "C1";
 	if (string::npos != old.find(data)) isData= true;
@@ -130,20 +131,13 @@ void analyzer::Loop(){
 	if (string::npos != old.find(dyjhigh)) isDYhigh= true;
 	if (string::npos != old.find(dyjlow) || string::npos != old.find(dyjlow2)) isDYlow= true;
 	if (string::npos != old.find(dyj1) || string::npos != old.find(dyj2) || string::npos != old.find(dyj3) || string::npos != old.find(dyj4)) isDYNJ = true;
-	if (string::npos != old.find(wj1) || string::npos != old.find(wj2) || string::npos != old.find(wj3) || string::npos != old.find(wj4)) isWNJ= true;
+	if ((string::npos != old.find(wj1) || string::npos != old.find(wj2) || string::npos != old.find(wj3) || string::npos != old.find(wj4)) && string::npos == old.find(ttw)) isWNJ= true;
 	isNJ = isDYNJ && isWNJ;
 
 	if (isSignal) cout<<" YOU HAVE FOUND ITTTTTTTTT "<<endl;
 	if (isData) cout<<" YOU HAVE FOUND a DATA "<<endl;
 
 	string channel = "mumu";
-
-	TString inputRootFile = "/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/CMSSW_8_0_12/src/DesyTauAnalyses/NTupleMaker/data/HIP_mediumID.root";
-	TFile * fileInHIP = new TFile(inputRootFile, "read");
-
-TGraphAsymmErrors * TGr_hip;
-TGr_hip = new TGraphAsymmErrors();
-TGr_hip = (TGraphAsymmErrors*)fileInHIP->Get("ratio_eta");
 
 
 	TString inputRootFile2 = "/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/CMSSW_8_0_20/src/DesyTauAnalyses/NTupleMaker/data/sf_mu_medium.root";
@@ -157,17 +151,18 @@ key = (TKey *) nextkey ();
 TObject *obj = key->ReadObj ();
 TH2D *histo = (TH2D*) obj;
 
-	TString fileinName = "/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/CMSSW_8_0_20/src/DesyTauAnalyses/NTupleMaker/test/CHANNELHERE/FILEIN";
-	if (systematic == "JetEnUp" || systematic == "JetEnDown" || systematic == "TauEnUp" || systematic == "TauEnDown" || systematic == "ElEnUp" || systematic == "ElEnDown" || systematic == "MuEnUp" || systematic == "MuEnDown") 
-	{fileinName ="/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/CMSSW_8_0_20/src/DesyTauAnalyses/NTupleMaker/test/CHANNELHERE_"+systematic+"/FILEIN";}
+
+	TString fileinName = "/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/New8025/CMSSW_8_0_25/src/DesyTauAnalyses/NTupleMaker/test/CHANNELHERE/FILEIN";
+	if (systematic == "JetEnUp" || systematic == "JetEnDown"  || systematic == "UnclEnDown" || systematic == "UnclEnDown" || systematic == "TauEnUp" || systematic == "TauEnDown" || systematic == "ElEnUp" || systematic == "ElEnDown" || systematic == "MuEnUp" || systematic == "MuEnDown") 
+	{fileinName ="/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/New8025/CMSSW_8_0_25/src/DesyTauAnalyses/NTupleMaker/test/CHANNELHERE_"+systematic+"/FILEIN";}
 
 	TFile * filein = new TFile(fileinName,"read");
 
 	TH1D * histW = (TH1D*)filein->Get("mumu/histWeightsH");
-	TH1D * histTop ;
+	TH1D * histTop , *histTopSq;
 	if (isTT) histTop = (TH1D*)filein->Get("mumu/histTopPt");
+	if (isTT && systematic == "TopPtUp" ) histTopSq = (TH1D*)filein->Get("mumu/histTopPtSq");
 	
-//	TH1D * hxsecW = (TH1D*)filein->Get("mumu/xsec");
 	TH1D * CutFlow = (TH1D*)filein->Get("mumu/CutFlowUnW");
 	TFile * file = new TFile("plots.root","recreate");
 
@@ -300,7 +295,8 @@ if(muon_index_2>-1 )			LeptV2.SetPtEtaPhiM(mu_pt[muon_index_2], mu_eta[muon_inde
 		iCut++;
 		
 		//1 -  (1-EffFromData1) * (1 -EffFromData2);
-		float trigw = 1 -  (1-trig_weight_1) * (1 -trig_weight_2);
+		float trigw = trig_weight_1/trig_weight_2;
+
 		if (!isData) all_weights *= trigw ;
 		FillHistsDiL(iCut, all_weights, LeptV2, LeptV1, JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index_1,muon_index_2);
 		CFCounter[iCut]+= all_weights;
@@ -353,8 +349,6 @@ if(muon_index_2>-1 )			LeptV2.SetPtEtaPhiM(mu_pt[muon_index_2], mu_eta[muon_inde
 		METV.SetPy(met_ey_UnclusteredEnDown_recoil);
 		met = sqrt(met_ex_UnclusteredEnDown_recoil*met_ex_UnclusteredEnDown_recoil + met_ey_UnclusteredEnDown_recoil*met_ey_UnclusteredEnDown_recoil);
 		}
-
-
 
 
 		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
@@ -461,11 +455,10 @@ if(muon_index_2>-1 )			LeptV2.SetPtEtaPhiM(mu_pt[muon_index_2], mu_eta[muon_inde
 
 			cout<<"  end from TH1D "<<endl;
 
-		//hcount->Draw();
 		CutFlowUnW->Write();
 		histW->Write();
 	if (isTT) histTop->Write();
-	//	hxsecW->Write();
+	if (isTT && systematic == "TopPtUp"  ) histTopSq->Write();
 		file->Write();
 		file->Close();
 		cout<<" Failed events  "<<counter<<endl;
