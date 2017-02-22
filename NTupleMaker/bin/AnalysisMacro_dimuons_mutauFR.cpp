@@ -191,12 +191,16 @@ int main(int argc, char * argv[]) {
     Bool_t tauagainstMuonLoose;
     Bool_t tauagainstMuonTight;
     Bool_t taubyLooseCombinedIsolationDeltaBetaCorr3Hits;
+    Bool_t taubyLooseIsolationMVArun2v1DBoldDMwLT;
+    Bool_t taubyTightIsolationMVArun2v1DBoldDMwLT;
     
     Float_t PtTag;
     Float_t EtaTag;
     Float_t PtProbe;
     Float_t EtaProbe;
     Float_t met;
+    UInt_t  npartons;
+
     
     muonTree->Branch("isZLL",&isZLL,"isZLL/O");
     muonTree->Branch("isZEE",&isZEE,"isZEE/O");
@@ -229,11 +233,15 @@ int main(int argc, char * argv[]) {
     muonTree->Branch("tauagainstMuonLoose",&tauagainstMuonLoose,"tauagainstMuonLoose/O");
     muonTree->Branch("tauagainstMuonTight",&tauagainstMuonTight,"tauagainstMuonTight/O");
     muonTree->Branch("taubyLooseCombinedIsolationDeltaBetaCorr3Hits",&taubyLooseCombinedIsolationDeltaBetaCorr3Hits,"taubyLooseCombinedIsolationDeltaBetaCorr3Hits/O");
+    muonTree->Branch("taubyLooseIsolationMVArun2v1DBoldDMwLT",&taubyLooseIsolationMVArun2v1DBoldDMwLT,"taubyLooseIsolationMVArun2v1DBoldDMwLT/O");
+    muonTree->Branch("taubyTightIsolationMVArun2v1DBoldDMwLT",&taubyTightIsolationMVArun2v1DBoldDMwLT,"taubyTightIsolationMVArun2v1DBoldDMwLT/O");
     muonTree->Branch("PtTag",&PtTag,"PtTag/F");
     muonTree->Branch("EtaTag",&EtaTag,"EtaTag/F");
     muonTree->Branch("PtProbe",&PtProbe,"PtProbe/F");
     muonTree->Branch("EtaProbe",&EtaProbe,"EtaProbe/F");
     muonTree->Branch("met",&met,"met/F");
+    muonTree->Branch("npartons",&npartons,"npartons/i");
+
 
 
   TH1D * PUweightsOfficialH = new TH1D("PUweightsOfficialH","PU weights w/ official reweighting",1000, 0, 10);
@@ -244,9 +252,6 @@ int main(int argc, char * argv[]) {
   PileUp * PUofficial = new PileUp();
   
   if (applyPUreweighting) {
-    //Temprory DY MC Summer16, other MCs are Spring16, need to switch mannually, won't need this when all the Summer16 samples come
-    //TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/pileUp_data_runBCDEFGH_Rereco_xsec69p2mb_bin50.root","read");
-    //TFile * filePUdistribution_MC = new TFile (TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/MC_Spring16_PU.root", "read");
 
     TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/"+TString(dataPUFile),"read");
     TFile * filePUdistribution_MC = new TFile (TString(cmsswBase)+"/src/"+TString(mcPUFile), "read");
@@ -345,6 +350,8 @@ int main(int argc, char * argv[]) {
 
         if (!isData)
           weight *=analysisTree.genweight;
+        npartons = analysisTree.genparticles_noutgoing;
+
         
         if (!isData) {
 
@@ -626,16 +633,16 @@ int main(int argc, char * argv[]) {
                 unsigned int index1 = isoMuons[im1];
                 bool isMu1matched = false;
                 //cout << "ICHEP ID:"<< analysisTree.muon_isICHEP[index1]<< endl;
-                if(isData)
+                //if(isData)
+                //{
+                for (unsigned int iT=0; iT<analysisTree.trigobject_count; ++iT)
                 {
-                    for (unsigned int iT=0; iT<analysisTree.trigobject_count; ++iT)
-                    {
-                        float dRtrig = deltaR(analysisTree.muon_eta[index1],analysisTree.muon_phi[index1],analysisTree.trigobject_eta[iT],analysisTree.trigobject_phi[iT]);
-                        if (dRtrig>DRTrigMatch) continue;
-                        if (analysisTree.trigobject_filters[iT][nMuonFilter] && analysisTree.muon_pt[index1] > ptMuonTagCut && fabs(analysisTree.muon_eta[index1]) < etaMuonTagCut)
-                        isMu1matched = true;
-                    }
+                    float dRtrig = deltaR(analysisTree.muon_eta[index1],analysisTree.muon_phi[index1],analysisTree.trigobject_eta[iT],analysisTree.trigobject_phi[iT]);
+                    if (dRtrig>DRTrigMatch) continue;
+                    if (analysisTree.trigobject_filters[iT][nMuonFilter] && analysisTree.muon_pt[index1] > ptMuonTagCut && fabs(analysisTree.muon_eta[index1]) < etaMuonTagCut)
+                    isMu1matched = true;
                 }
+                //}
                 bool genRecoTagMuonMatched = false;
                 TLorentzVector genMuon1;
                 float indexGen1 = -9999;
@@ -656,8 +663,9 @@ int main(int argc, char * argv[]) {
                         }
                     }
                 }
-                                
-                if (isMu1matched || (!isData)) {
+                //if (isMu1matched || (!isData)) {
+                
+                if (isMu1matched) {
                     for (unsigned int iTau=0; iTau<goodTaus.size(); ++iTau) {
                         unsigned int indexProbe = goodTaus[iTau];
                         float q1 = analysisTree.muon_charge[index1];
@@ -736,13 +744,6 @@ int main(int argc, char * argv[]) {
                         met = TMath::Sqrt(analysisTree.pfmetcorr_ex*analysisTree.pfmetcorr_ex + analysisTree.pfmetcorr_ey*analysisTree.pfmetcorr_ey);
                         float dPhiMETMuon = dPhiFrom2P(analysisTree.muon_px[index1],analysisTree.muon_py[index1],analysisTree.pfmetcorr_ex,analysisTree.pfmetcorr_ey);
                         
-                        if(!isData)//only temporary for these round's MC
-                        {
-                            met = TMath::Sqrt(analysisTree.pfmet_ex*analysisTree.pfmet_ex + analysisTree.pfmet_ey*analysisTree.pfmet_ey);
-                            dPhiMETMuon = dPhiFrom2P(analysisTree.muon_px[index1],analysisTree.muon_py[index1],analysisTree.pfmet_ex,analysisTree.pfmet_ey);
-                        }
-        
-                        
                         mt_1 = TMath::Sqrt(2*met*analysisTree.muon_pt[index1]*(1-TMath::Cos(dPhiMETMuon)));
             
                         TLorentzVector muon1;
@@ -771,13 +772,7 @@ int main(int argc, char * argv[]) {
                         {
                             mcweight = analysisTree.genweight;
                             isoweight_1 = (float)SF_muonIdIso->get_ScaleFactor(double(analysisTree.muon_pt[index1]),double(analysisTree.muon_eta[index1]));
-                            //FIX ME next time for all Summer16 MC
-                            trigweight_1 = (float)SF_muonTrig->get_EfficiencyData(double(analysisTree.muon_pt[index1]),double(analysisTree.muon_eta[index1]));
-                            if(isDY)
-                            {
-                                trigweight_1 = (float)SF_muonTrig->get_ScaleFactor(double(analysisTree.muon_pt[index1]),double(analysisTree.muon_eta[index1]));
-   
-                            }
+                            trigweight_1 = (float)SF_muonTrig->get_ScaleFactor(double(analysisTree.muon_pt[index1]),double(analysisTree.muon_eta[index1]));
                             //      cout << "isoweight_1 = " << isoweight_1 << endl;
                             effweight = isoweight_1*trigweight_1;
                             puweight = float (PUofficial->get_PUweight(double(analysisTree.numtruepileupinteractions)));
@@ -835,6 +830,8 @@ int main(int argc, char * argv[]) {
                         tauagainstMuonLoose = analysisTree.tau_againstMuonLoose3[indexProbe];
                         tauagainstMuonTight = analysisTree.tau_againstMuonTight3[indexProbe];
                         taubyLooseCombinedIsolationDeltaBetaCorr3Hits = analysisTree.tau_byLooseCombinedIsolationDeltaBetaCorr3Hits[indexProbe];
+                        taubyLooseIsolationMVArun2v1DBoldDMwLT = analysisTree.tau_byLooseIsolationMVArun2v1DBoldDMwLT[indexProbe];
+                        taubyTightIsolationMVArun2v1DBoldDMwLT = analysisTree.tau_byTightIsolationMVArun2v1DBoldDMwLT[indexProbe];
                         PtTag = analysisTree.muon_pt[index1];
                         EtaTag = analysisTree.muon_eta[index1];
                         PtProbe = analysisTree.tau_pt[indexProbe];
