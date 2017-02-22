@@ -96,6 +96,7 @@ void svfit_variables(TString ch, const AC1B *analysisTree, Spring15Tree *otree, 
 bool isICHEPmed(int Index, const AC1B * analysisTree);
 bool isIdentifiedMediumMuon(int Index, const AC1B * analysisTree, bool isData);
 void correctTauES(TLorentzVector& Tau, TLorentzVector& Met, float relative_shift, bool tau_is_one_prong);
+bool passedSummer16VetoId(const AC1B * analysisTree, int index);
 
 
 int main(int argc, char * argv[]){
@@ -1539,8 +1540,8 @@ bool dilepton_veto_et(const Config *cfg,const  AC1B *analysisTree){
     float absIsoEle =   abs_Iso(ie, "et", analysisTree, cfg->get<float>("dRiso"));
     float relIsoEle =   rel_Iso(ie, "et", analysisTree, cfg->get<float>("dRiso"));
     if(relIsoEle >= cfg->get<float>("isoDiElectronVeto")) continue;
-		
-    bool passedVetoId =  analysisTree->electron_cutId_veto_Summer16[ie];
+    
+    bool passedVetoId =  passedSummer16VetoId(analysisTree, ie); //analysisTree->electron_cutId_veto_Summer16[ie];
     if (!passedVetoId && cfg->get<bool>("applyDiElectronVetoId")) continue;
 		
     for (unsigned int je = ie+1; je<analysisTree->electron_count; ++je) {
@@ -1801,3 +1802,33 @@ void correctTauES(TLorentzVector& Tau, TLorentzVector& Met, float relative_shift
   }
 }
 
+// Implementation of cut-based veto ID Summer 16 (https://twiki.cern.ch/twiki/bin/view/CMS/CutBasedElectronIdentificationRun2#Electron_ID_Working_Points_WP_de)
+bool passedSummer16VetoId(const AC1B * analysisTree, int index){
+
+  if(abs(analysisTree->electron_superclusterEta[index]) <= 1.479){
+
+    if( analysisTree->electron_full5x5_sigmaietaieta[index] >= 0.0155 )                       return false;
+    if( abs(analysisTree->electron_detaInSeed[index]) >= 0.00749 )                            return false;
+    if( abs(analysisTree->electron_deltaphisuperclustertrack[index]) >= 0.228 )               return false;
+    if( analysisTree->electron_he[index] >= 0.356 )                                           return false;
+    if( analysisTree->electron_eaIsolation[index]/analysisTree->electron_pt[index] >= 0.175 ) return false;
+    if( abs(analysisTree->electron_ooemoop[index]) >= 0.299 )                                 return false;
+    if( analysisTree->electron_nmissinginnerhits[index] > 2 )                                 return false;
+    if( analysisTree->electron_pass_conversion[index] == false )                              return false;
+    
+    return true;
+  }
+  else{
+
+    if( analysisTree->electron_full5x5_sigmaietaieta[index] >= 0.037 )                        return false;
+    if( abs(analysisTree->electron_detaInSeed[index]) >= 0.00895 )                            return false;
+    if( abs(analysisTree->electron_deltaphisuperclustertrack[index]) >= 0.213 )               return false;
+    if( analysisTree->electron_he[index] >= 0.211 )                                           return false;
+    if( analysisTree->electron_eaIsolation[index]/analysisTree->electron_pt[index] >= 0.159 ) return false;
+    if( abs(analysisTree->electron_ooemoop[index]) >= 0.15 )                                  return false;
+    if( analysisTree->electron_nmissinginnerhits[index] > 3 )                                 return false;
+    if( analysisTree->electron_pass_conversion[index] == false )                              return false;
+    
+    return true;
+  }
+}
