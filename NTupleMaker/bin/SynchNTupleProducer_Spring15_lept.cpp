@@ -92,7 +92,7 @@ bool extra_muon_veto(int leptonIndex, TString ch, const Config *cfg, const AC1B 
 void fillMET(TString ch, int leptonIndex, int tauIndex, const AC1B * analysisTree, Spring15Tree *otree);
 void mt_calculation(Spring15Tree *otree);
 //void counting_jets(const AC1B *analysisTree, Spring15Tree *otree, const Config *cfg, const btag_scaling_inputs *inputs);
-void svfit_variables(const AC1B *analysisTree, Spring15Tree *otree, const Config *cfg, TFile *inputFile_visPtResolution);
+void svfit_variables(TString ch, const AC1B *analysisTree, Spring15Tree *otree, const Config *cfg, TFile *inputFile_visPtResolution);
 bool isICHEPmed(int Index, const AC1B * analysisTree);
 bool isIdentifiedMediumMuon(int Index, const AC1B * analysisTree, bool isData);
 void correctTauES(TLorentzVector& Tau, TLorentzVector& Met, float relative_shift, bool tau_is_one_prong);
@@ -477,18 +477,25 @@ int main(int argc, char * argv[]){
   TFile* inputFile_visPtResolution = new TFile(svFitPtResFile.data());
 
   //Systematics init
-  TauScaleSys* tauScaleSys = 0;
+  //TauScaleSys* tauScaleSys = 0;
+  TauOneProngScaleSys* tauOneProngScaleSys =0;
+  TauOneProngOnePi0ScaleSys* tauOneProngOnePi0ScaleSys=0;
+  TauThreeProngScaleSys* tauThreeProngScaleSys=0;
   ZPtWeightSys* zPtWeightSys = 0;
   TopPtWeightSys* topPtWeightSys = 0;
   JetEnergyScaleSys* jetEnergyScaleSys = 0;
   LepTauFakeScaleSys * lepTauFakeScaleSys = 0;
   if(!isData && ApplySystShift){
-    tauScaleSys = new TauScaleSys(otree);
-    tauScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);
+    tauOneProngScaleSys = new TauOneProngScaleSys(otree);
+    tauOneProngScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);
+    tauOneProngOnePi0ScaleSys = new TauOneProngOnePi0ScaleSys(otree);
+    tauOneProngOnePi0ScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);
+    tauThreeProngScaleSys = new TauThreeProngScaleSys(otree);
+    tauThreeProngScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);
     zPtWeightSys = new ZPtWeightSys(otree);
     topPtWeightSys = new TopPtWeightSys(otree);
-	jetEnergyScaleSys = new JetEnergyScaleSys(otree);
-	jetEnergyScaleSys->SetConfig(&cfg);
+    jetEnergyScaleSys = new JetEnergyScaleSys(otree);
+    jetEnergyScaleSys->SetConfig(&cfg);
     jetEnergyScaleSys->SetBtagScaling(&inputs_btag_scaling_medium);
     lepTauFakeScaleSys = new LepTauFakeScaleSys(otree);
     lepTauFakeScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);
@@ -816,6 +823,7 @@ int main(int argc, char * argv[]){
 
         if (!isData && ApplyLepSF) {
 
+          otree->idisoweight_1 = (SF_lepIdIso->get_ScaleFactor(double(analysisTree.muon_pt[leptonIndex]),double(analysisTree.muon_eta[leptonIndex])));
 	  // calculate trigger weight with sale factor for corresponding trigger
 	  double sf_L = SF_SingleLepTrigger -> get_ScaleFactor(double(analysisTree.muon_pt[leptonIndex]),double(analysisTree.muon_eta[leptonIndex]));
 	  double sf_l = SF_XTriggerLepLeg   -> get_ScaleFactor(double(analysisTree.muon_pt[leptonIndex]),double(analysisTree.muon_eta[leptonIndex]));
@@ -823,18 +831,15 @@ int main(int argc, char * argv[]){
 	  if(isSingleLepTrig && !isXTrig)      otree->trigweight_1 = sf_L;
 	  else if(isXTrig && !isSingleLepTrig) otree->trigweight_1 = sf_t*sf_l;
 	  else if(isXTrig && isSingleLepTrig)  otree->trigweight_1 = sf_L + sf_t*sf_l - sf_L*sf_t;
-
-	  sf_L = SF_SingleLepTrigger_antiiso -> get_ScaleFactor(double(analysisTree.muon_pt[leptonIndex]),double(analysisTree.muon_eta[leptonIndex]));
-	  sf_l = SF_XTriggerLepLeg_antiiso   -> get_ScaleFactor(double(analysisTree.muon_pt[leptonIndex]),double(analysisTree.muon_eta[leptonIndex]));
-	  sf_t = w_XTrigTauLegSF->function("t_genuine_TightIso_mt_ratio")->getVal();
-	  if(isSingleLepTrig && !isXTrig)      otree->trigweight_antiiso_1 = sf_L;
-	  else if(isXTrig && !isSingleLepTrig) otree->trigweight_antiiso_1 = sf_t*sf_l;
-	  else if(isXTrig && isSingleLepTrig)  otree->trigweight_antiiso_1 = sf_L + sf_t*sf_l - sf_L*sf_t;
-	    
-	  // Scale Factor Id+Iso SF_eleIdIso
-          otree->idisoweight_1 = (SF_lepIdIso->get_ScaleFactor(double(analysisTree.muon_pt[leptonIndex]),double(analysisTree.muon_eta[leptonIndex])));
-          otree->idisoweight_antiiso_1 =  (SF_lepIdIso_antiiso->get_ScaleFactor(double(analysisTree.muon_pt[leptonIndex]),double(analysisTree.muon_eta[leptonIndex])));
-
+          if (otree->iso_1>=0.15 && otree->iso_1<=0.3){  
+	    sf_L = SF_SingleLepTrigger_antiiso -> get_ScaleFactor(double(analysisTree.muon_pt[leptonIndex]),double(analysisTree.muon_eta[leptonIndex]));
+	    sf_l = SF_XTriggerLepLeg_antiiso   -> get_ScaleFactor(double(analysisTree.muon_pt[leptonIndex]),double(analysisTree.muon_eta[leptonIndex]));
+	    sf_t = w_XTrigTauLegSF->function("t_genuine_TightIso_mt_ratio")->getVal();
+	    if(isSingleLepTrig && !isXTrig)      otree->trigweight_antiiso_1 = sf_L;
+	    else if(isXTrig && !isSingleLepTrig) otree->trigweight_antiiso_1 = sf_t*sf_l;
+	    else if(isXTrig && isSingleLepTrig)  otree->trigweight_antiiso_1 = sf_L + sf_t*sf_l - sf_L*sf_t;
+            otree->idisoweight_antiiso_1 =  (SF_lepIdIso_antiiso->get_ScaleFactor(double(analysisTree.muon_pt[leptonIndex]),double(analysisTree.muon_eta[leptonIndex])));
+          }
 	  // tracking efficiency weight
 	  w->var("m_eta")->setVal(analysisTree.muon_eta[leptonIndex]); 
 	  otree->trkeffweight_1 = (double)( w->function("m_trk_ratio")->getVal());
@@ -849,6 +854,7 @@ int main(int argc, char * argv[]){
 						    electronMass);
 
         if (!isData && ApplyLepSF) {
+          otree->idisoweight_1 = (SF_lepIdIso->get_ScaleFactor(double(analysisTree.electron_pt[leptonIndex]),double(analysisTree.electron_eta[leptonIndex])));
 	  // calculate trigger weight with sale factor for corresponding trigger
 	  double sf_L = SF_SingleLepTrigger -> get_ScaleFactor(double(analysisTree.electron_pt[leptonIndex]),double(analysisTree.electron_eta[leptonIndex]));
 	  double sf_l = SF_XTriggerLepLeg   -> get_ScaleFactor(double(analysisTree.electron_pt[leptonIndex]),double(analysisTree.electron_eta[leptonIndex]));
@@ -856,18 +862,15 @@ int main(int argc, char * argv[]){
 	  if(isSingleLepTrig && !isXTrig)      otree->trigweight_1 = sf_L;
 	  else if(isXTrig && !isSingleLepTrig) otree->trigweight_1 = sf_t*sf_l;
 	  else if(isXTrig && isSingleLepTrig)  otree->trigweight_1 = sf_L + sf_t*sf_l - sf_L*sf_t;
-
-	  sf_L = SF_SingleLepTrigger_antiiso -> get_ScaleFactor(double(analysisTree.electron_pt[leptonIndex]),double(analysisTree.electron_eta[leptonIndex]));
-	  sf_l = SF_XTriggerLepLeg_antiiso   -> get_ScaleFactor(double(analysisTree.electron_pt[leptonIndex]),double(analysisTree.electron_eta[leptonIndex]));
-	  sf_t = w_XTrigTauLegSF->function("t_genuine_TightIso_et_ratio")->getVal();
-	  if(isSingleLepTrig && !isXTrig)      otree->trigweight_antiiso_1 = sf_L;
-	  else if(isXTrig && !isSingleLepTrig) otree->trigweight_antiiso_1 = sf_t*sf_l;
-	  else if(isXTrig && isSingleLepTrig)  otree->trigweight_antiiso_1 = sf_L + sf_t*sf_l - sf_L*sf_t;
-	  
-	  // Scale Factor Id+Iso SF_eleIdIso
-          otree->idisoweight_1 = (SF_lepIdIso->get_ScaleFactor(double(analysisTree.electron_pt[leptonIndex]),double(analysisTree.electron_eta[leptonIndex])));
-          otree->idisoweight_antiiso_1 =  (SF_lepIdIso_antiiso->get_ScaleFactor(double(analysisTree.electron_pt[leptonIndex]),double(analysisTree.electron_eta[leptonIndex])));
-
+          if (otree->iso_1>0.1 && otree->iso_1<0.3){
+	    sf_L = SF_SingleLepTrigger_antiiso -> get_ScaleFactor(double(analysisTree.electron_pt[leptonIndex]),double(analysisTree.electron_eta[leptonIndex]));
+	    sf_l = SF_XTriggerLepLeg_antiiso   -> get_ScaleFactor(double(analysisTree.electron_pt[leptonIndex]),double(analysisTree.electron_eta[leptonIndex]));
+	    sf_t = w_XTrigTauLegSF->function("t_genuine_TightIso_et_ratio")->getVal();
+	    if(isSingleLepTrig && !isXTrig)      otree->trigweight_antiiso_1 = sf_L;
+	    else if(isXTrig && !isSingleLepTrig) otree->trigweight_antiiso_1 = sf_t*sf_l;
+	    else if(isXTrig && isSingleLepTrig)  otree->trigweight_antiiso_1 = sf_L + sf_t*sf_l - sf_L*sf_t;
+            otree->idisoweight_antiiso_1 =  (SF_lepIdIso_antiiso->get_ScaleFactor(double(analysisTree.electron_pt[leptonIndex]),double(analysisTree.electron_eta[leptonIndex])));
+          }
 	  // tracking efficiency weight
 	  w->var("e_eta")->setVal(analysisTree.electron_eta[leptonIndex]); 
 	  w->var("e_pt")->setVal(analysisTree.electron_pt[leptonIndex]); 	
@@ -1109,24 +1112,30 @@ int main(int argc, char * argv[]){
       if (!Synch && !passedBaselineSel)
         continue;
 
-      if (ApplySVFit) svfit_variables(&analysisTree, otree, &cfg, inputFile_visPtResolution);
+      if (ApplySVFit) svfit_variables(ch, &analysisTree, otree, &cfg, inputFile_visPtResolution);
 
       otree->Fill();
 
 	  // evaluate systematics for MC 
       if(!isData && ApplySystShift){
        zPtWeightSys->Eval(); 
-	   topPtWeightSys->Eval();
-	   jetEnergyScaleSys->Eval();
-	   if (ch=="mt") {
-         tauScaleSys->Eval(utils::MUTAU);
-		 lepTauFakeScaleSys->Eval(utils::MUTAU);
+       topPtWeightSys->Eval();
+       jetEnergyScaleSys->Eval();
+         if (ch=="mt") {
+           //tauScaleSys->Eval(utils::MUTAU);
+           tauOneProngScaleSys->Eval(utils::MUTAU);
+           tauOneProngOnePi0ScaleSys->Eval(utils::MUTAU);
+           tauThreeProngScaleSys->Eval(utils::MUTAU);
+           lepTauFakeScaleSys->Eval(utils::MUTAU);
          }
-	   else if (ch=="et") {
-         tauScaleSys->Eval(utils::ETAU);
-		 lepTauFakeScaleSys->Eval(utils::ETAU);
-       }
-	  }
+	 else if (ch=="et") {
+           //tauScaleSys->Eval(utils::ETAU);
+           tauOneProngScaleSys->Eval(utils::ETAU);
+           tauOneProngOnePi0ScaleSys->Eval(utils::ETAU);
+           tauThreeProngScaleSys->Eval(utils::ETAU);
+           lepTauFakeScaleSys->Eval(utils::ETAU);
+         }
+      }
 
       selEvents++;
     } // end of file processing (loop over events in one file)
@@ -1149,9 +1158,19 @@ int main(int argc, char * argv[]){
 
   // delete systematics objects
 
-  if(tauScaleSys != 0){
-    tauScaleSys->Write();
-    delete tauScaleSys;
+  if(tauOneProngScaleSys != 0){
+    tauOneProngScaleSys->Write();
+    delete tauOneProngScaleSys;
+  }
+
+  if(tauOneProngOnePi0ScaleSys != 0){
+    tauOneProngOnePi0ScaleSys->Write();
+    delete tauOneProngOnePi0ScaleSys;
+  }
+
+  if(tauThreeProngScaleSys != 0){
+    tauThreeProngScaleSys->Write();
+    delete tauThreeProngScaleSys;
   }
 
   if(zPtWeightSys != 0){
@@ -1711,7 +1730,7 @@ void mt_calculation(Spring15Tree *otree){
 // SV fit 
 ///////////////////////////////////
 
-void svfit_variables(const AC1B *analysisTree, Spring15Tree *otree, const Config *cfg, TFile * inputFile_visPtResolution){
+void svfit_variables(TString ch, const AC1B *analysisTree, Spring15Tree *otree, const Config *cfg, TFile * inputFile_visPtResolution){
 
   // define MET covariance
   TMatrixD covMET(2, 2);
@@ -1727,13 +1746,16 @@ void svfit_variables(const AC1B *analysisTree, Spring15Tree *otree, const Config
   covMET[0][1] = otree->metcov01;
   covMET[1][1] = otree->metcov11;
 
+  svFitStandalone::kDecayType type_ = svFitStandalone::kUndefinedDecayType;
+  if (ch == "mt")      type_ = svFitStandalone::kTauToMuDecay;
+  else if (ch == "et") type_ = svFitStandalone::kTauToElecDecay;
   // define lepton four vectors
   std::vector<svFitStandalone::MeasuredTauLepton> measuredTauLeptons;
-  measuredTauLeptons.push_back(svFitStandalone::MeasuredTauLepton(svFitStandalone::kTauToMuDecay,
+  measuredTauLeptons.push_back(svFitStandalone::MeasuredTauLepton(type_,
 								  otree->pt_1,
 								  otree->eta_1,
 								  otree->phi_1,
-								  105.658e-3)); 
+								  otree->m_1)); 
   measuredTauLeptons.push_back(svFitStandalone::MeasuredTauLepton(svFitStandalone::kTauToHadDecay,
 								  otree->pt_2,
 								  otree->eta_2,
