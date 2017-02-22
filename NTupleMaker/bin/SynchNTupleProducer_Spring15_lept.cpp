@@ -1018,8 +1018,9 @@ int main(int argc, char * argv[]){
 	    else if (otree->tau_decay_mode_2 ==1){  shift_tes=shift_tes_1p1p0; }
 	    else if (otree->tau_decay_mode_2 ==10){ shift_tes=shift_tes_3prong; }
 	    correctTauES(tauLV, metLV, shift_tes, isOneProng);
-	    // save shifted values to the tree
+	    
 	    otree->pt_2 = tauLV.Pt();
+	    otree->m_2 = tauLV.M();
 	    otree->met = metLV.Pt();
 	    otree->metphi = metLV.Phi();
 	  }
