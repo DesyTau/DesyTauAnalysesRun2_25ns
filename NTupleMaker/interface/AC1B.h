@@ -221,6 +221,9 @@ public :
    Float_t         electron_mva_wp80_general_Spring16_v1[50];   //[electron_count]
    Bool_t          electron_pass_conversion[50];   //[electron_count]
    Int_t           electron_genmatch[50];   //[electron_count]
+   Float_t         electron_detaInSeed[50];   //[electron_count]
+   Float_t         electron_he[50];   //[electron_count]
+   Float_t         electron_eaIsolation[50];   //[electron_count]
    UInt_t          tau_count;
    Float_t         tau_e[50];   //[tau_count]
    Float_t         tau_px[50];   //[tau_count]
@@ -822,6 +825,9 @@ public :
    TBranch        *b_electron_mva_wp80_general_Spring16_v1;   //!
    TBranch        *b_electron_pass_conversion;   //!
    TBranch        *b_electron_genmatch;   //!
+   TBranch        *b_electron_detaInSeed;   //!
+   TBranch        *b_electron_he;   //!
+   TBranch        *b_electron_eaIsolation;   //!
    TBranch        *b_tau_count;   //!
    TBranch        *b_tau_e;   //!
    TBranch        *b_tau_px;   //!
@@ -1523,6 +1529,9 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("electron_mva_wp80_general_Spring16_v1", electron_mva_wp80_general_Spring16_v1, &b_electron_mva_wp80_general_Spring16_v1);
    fChain->SetBranchAddress("electron_pass_conversion", electron_pass_conversion, &b_electron_pass_conversion);
    fChain->SetBranchAddress("electron_genmatch", electron_genmatch, &b_electron_genmatch);
+   fChain->SetBranchAddress("electron_detaInSeed", electron_detaInSeed, &b_electron_detaInSeed);
+   fChain->SetBranchAddress("electron_he", electron_he, &b_electron_he);
+   fChain->SetBranchAddress("electron_eaIsolation", electron_eaIsolation, &b_electron_eaIsolation);
    fChain->SetBranchAddress("tau_count", &tau_count, &b_tau_count);
    fChain->SetBranchAddress("tau_e", tau_e, &b_tau_e);
    fChain->SetBranchAddress("tau_px", tau_px, &b_tau_px);
