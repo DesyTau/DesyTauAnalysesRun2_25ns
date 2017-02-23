@@ -860,7 +860,6 @@ int main(int argc, char * argv[]){
 	  w->var("m_eta")->setVal(analysisTree.muon_eta[leptonIndex]); 
 	  otree->trkeffweight_1 = (double)( w->function("m_trk_ratio")->getVal());
         }
-	
       } else if(ch=="et"){
 	FillETau(&analysisTree, otree, leptonIndex, dRiso);
 	      
@@ -870,29 +869,47 @@ int main(int argc, char * argv[]){
 						    electronMass);
 
         if (!isData && ApplyLepSF) {
-          otree->idisoweight_1 = (SF_lepIdIso->get_ScaleFactor(double(analysisTree.electron_pt[leptonIndex]),double(analysisTree.electron_eta[leptonIndex])));
-	  // calculate trigger weight with sale factor for corresponding trigger
-	  double sf_L = SF_SingleLepTrigger -> get_ScaleFactor(double(analysisTree.electron_pt[leptonIndex]),double(analysisTree.electron_eta[leptonIndex]));
-	  double sf_l = SF_XTriggerLepLeg   -> get_ScaleFactor(double(analysisTree.electron_pt[leptonIndex]),double(analysisTree.electron_eta[leptonIndex]));
-	  double sf_t = w_XTrigTauLegSF->function("t_genuine_TightIso_et_ratio")->getVal();
-	  if(isSingleLepTrig && !isXTrig)      otree->trigweight_1 = sf_L;
-	  else if(isXTrig && !isSingleLepTrig) otree->trigweight_1 = sf_t*sf_l;
-	  else if(isXTrig && isSingleLepTrig)  otree->trigweight_1 = sf_L + sf_t*sf_l - sf_L*sf_t;
-          if (otree->iso_1>0.1 && otree->iso_1<0.3){
-	    sf_L = SF_SingleLepTrigger_antiiso -> get_ScaleFactor(double(analysisTree.electron_pt[leptonIndex]),double(analysisTree.electron_eta[leptonIndex]));
-	    sf_l = SF_XTriggerLepLeg_antiiso   -> get_ScaleFactor(double(analysisTree.electron_pt[leptonIndex]),double(analysisTree.electron_eta[leptonIndex]));
-	    sf_t = w_XTrigTauLegSF->function("t_genuine_TightIso_et_ratio")->getVal();
-	    if(isSingleLepTrig && !isXTrig)      otree->trigweight_antiiso_1 = sf_L;
-	    else if(isXTrig && !isSingleLepTrig) otree->trigweight_antiiso_1 = sf_t*sf_l;
-	    else if(isXTrig && isSingleLepTrig)  otree->trigweight_antiiso_1 = sf_L + sf_t*sf_l - sf_L*sf_t;
-            otree->idisoweight_antiiso_1 =  (SF_lepIdIso_antiiso->get_ScaleFactor(double(analysisTree.electron_pt[leptonIndex]),double(analysisTree.electron_eta[leptonIndex])));
+
+	  otree->idisoweight_1 = (SF_lepIdIso->get_ScaleFactor(double(analysisTree.electron_pt[leptonIndex]),double(analysisTree.electron_eta[leptonIndex])));
+	  
+	  // calculation of trigger weights
+	  double scalefactor = 1;
+	  double eff_L_MC   = SF_SingleLepTrigger -> get_EfficiencyMC(double(analysisTree.electron_pt[leptonIndex]),double(analysisTree.electron_eta[leptonIndex]));
+	  double eff_l_MC   = SF_XTriggerLepLeg   -> get_EfficiencyMC(double(analysisTree.electron_pt[leptonIndex]),double(analysisTree.electron_eta[leptonIndex]));
+	  double eff_t_MC   = w_XTrigTauLegSF     -> function("t_genuine_TightIso_et_mc")->getVal();
+	  double eff_L_DATA = SF_SingleLepTrigger -> get_EfficiencyData(double(analysisTree.electron_pt[leptonIndex]),double(analysisTree.electron_eta[leptonIndex]));
+	  double eff_l_DATA = SF_XTriggerLepLeg   -> get_EfficiencyData(double(analysisTree.electron_pt[leptonIndex]),double(analysisTree.electron_eta[leptonIndex]));
+	  double eff_t_DATA = w_XTrigTauLegSF     -> function("t_genuine_TightIso_et_data")->getVal();
+
+	  if(isSingleLepTrig && !isXTrig)      scalefactor = (eff_L_MC*(1.-eff_t_MC))/(eff_L_DATA*(1.-eff_t_DATA));
+	  else if(isXTrig && !isSingleLepTrig) scalefactor = ((eff_l_MC-eff_L_MC)*eff_t_MC)/((eff_l_DATA-eff_L_DATA)*eff_t_DATA);
+	  else if(isXTrig && isSingleLepTrig)  scalefactor = (eff_L_MC*eff_t_MC)/(eff_L_DATA*eff_t_DATA);
+	  otree->trigweight_1 = scalefactor;
+
+          if (otree->iso_1>=0.15 && otree->iso_1<=0.3){  
+
+	    otree->idisoweight_antiiso_1 =  (SF_lepIdIso_antiiso->get_ScaleFactor(double(analysisTree.electron_pt[leptonIndex]),double(analysisTree.electron_eta[leptonIndex])));
+
+	    scalefactor = 1;
+	    eff_L_MC   = SF_SingleLepTrigger_antiiso -> get_EfficiencyMC(double(analysisTree.electron_pt[leptonIndex]),double(analysisTree.electron_eta[leptonIndex]));
+	    eff_l_MC   = SF_XTriggerLepLeg_antiiso   -> get_EfficiencyMC(double(analysisTree.electron_pt[leptonIndex]),double(analysisTree.electron_eta[leptonIndex]));
+	    eff_L_DATA = SF_SingleLepTrigger_antiiso -> get_EfficiencyData(double(analysisTree.electron_pt[leptonIndex]),double(analysisTree.electron_eta[leptonIndex]));
+	    eff_l_DATA = SF_XTriggerLepLeg_antiiso   -> get_EfficiencyData(double(analysisTree.electron_pt[leptonIndex]),double(analysisTree.electron_eta[leptonIndex]));
+
+	    if(isSingleLepTrig && !isXTrig)      scalefactor = (eff_L_MC*(1.-eff_t_MC))/(eff_L_DATA*(1.-eff_t_DATA));
+	    else if(isXTrig && !isSingleLepTrig) scalefactor = ((eff_l_MC-eff_L_MC)*eff_t_MC)/((eff_l_DATA-eff_L_DATA)*eff_t_DATA);
+	    else if(isXTrig && isSingleLepTrig)  scalefactor = (eff_L_MC*eff_t_MC)/(eff_L_DATA*eff_t_DATA);
+	    otree->trigweight_antiiso_1 = scalefactor;
           }
+
 	  // tracking efficiency weight
 	  w->var("e_eta")->setVal(analysisTree.electron_eta[leptonIndex]); 
 	  w->var("e_pt")->setVal(analysisTree.electron_pt[leptonIndex]); 	
 	  otree->trkeffweight_1 = (double)( w->function("e_trk_ratio")->getVal());
         }
       }
+
+      
       
       FillTau(&analysisTree, otree, tauIndex);
 	  
