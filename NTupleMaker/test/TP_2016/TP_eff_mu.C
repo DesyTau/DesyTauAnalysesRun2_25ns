@@ -62,13 +62,14 @@ void TP_eff_mu(TString fileName = "SingleMuon_Run2016_TP", // RooT file with TP 
 				"Eta1p2to2p1",
 				"EtaGt2p1"};
 */
-  int nEtaBins = 4;
+
+
+  int nEtaBins =4;
   float etaBins[5] = {0,0.9,1.2,2.1,2.4};
 
   TString EtaBins[4] = {"EtaLt0p9",
 				"Eta0p9to1p2",
-				"Eta1p2to2p1",
-				"EtaGt2p1"};
+				"Eta1p2to2p1", "EtaGt2p1"};
 
   float ptBins_def[11] = {10,15,20,25,30,40,50,60,70,100,1000};
 
@@ -128,7 +129,43 @@ void TP_eff_mu(TString fileName = "SingleMuon_Run2016_TP", // RooT file with TP 
 			"Pt100to200",
 			"PtGt200"};
 
-	int nPtBins = 25; if(what == "IdIso") nPtBins = 10;
+	int nPtBins = 25; if(what == "IdIso") nPtBins = 10; 
+
+/// BINNING FOR ANTIISOLATED REGIONS
+/*
+  int nEtaBins = 2;
+  float etaBins[3] = {0,0.9,2.4};
+  TString EtaBins[2] = {"EtaLt0p9","EtaGt0p9"};
+
+  float ptBins_def[11] = {10,15,20,25,30,40,50,60,70,100,1000};
+
+  TString PtBins_def[10] = {"Pt10to15",
+       "Pt15to20",
+       "Pt20to25",
+       "Pt25to30",
+       "Pt30to40",
+       "Pt40to50",
+       "Pt50to60",
+       "Pt60to70",
+       "Pt70to100",
+       "PtGt100"};
+
+  // for Mu24
+  //float ptBinsTrig_def[12] = {10,15,20,23,24,25,28,30,40,60,100,1000};
+
+  // for Mu19
+  float ptBinsTrig_def[12] = {10,18,19,20,21,23,26,30,40,60,100,1000};
+
+	TString PtBinsTrig_def[11] = {"Pt10to18",
+		    "Pt18to19","Pt19to20",
+		    "Pt20to21","Pt21to23","Pt23to26",
+		    "Pt26to30",
+		    "Pt30to40",
+		    "Pt40to60",
+		    "Pt60to100",
+			"PtGt100"};
+
+	int nPtBins = 11; if(what == "IdIso") nPtBins = 10; */
 
 	//float ptBinsTrig_def[8] = {24,30,40,50,60,120,200,500};
 	//TString PtBinsTrig_def[7] = {"Pt24to30","Pt30to40",
@@ -203,17 +240,26 @@ void TP_eff_mu(TString fileName = "SingleMuon_Run2016_TP", // RooT file with TP 
   
   TCut cut_flag_hlt_pass, cut_flag_hlt_fail, cut_pt, cut_eta;
 
-  if(what == "hlt_1") {cut_flag_hlt_pass = "hlt_1_probe == 1"; cut_flag_hlt_fail = "hlt_1_probe == 0"; }
-  if(what == "hlt_2") {cut_flag_hlt_pass = "(hlt_2_probe == 1 || hlt_1_probe==1)"; cut_flag_hlt_fail = "(hlt_2_probe == 0 && hlt_1_probe==0)"; }
-  if(what == "hlt_3") {cut_flag_hlt_pass = "hlt_3_probe == 1"; cut_flag_hlt_fail = "hlt_3_probe == 0"; }
+  // additional cut for trigger selection : require delta phi between tag and probe > 70 degrees when both are in the endcaps (eta>0.9). 
+  TCut phi_cut = "((delta_phi>1.22 && fabs(eta_tag)>=0.9 && fabs(eta_probe)>=0.9) || (fabs(eta_tag)<0.9 || fabs(eta_probe)<0.9))";
+
+  //if(what == "hlt_1") {cut_flag_hlt_pass = "hlt_1_probe == 1"; cut_flag_hlt_fail = "hlt_1_probe == 0"; }
+  //if(what == "hlt_2") {cut_flag_hlt_pass = "(hlt_2_probe == 1 || hlt_1_probe==1)"; cut_flag_hlt_fail = "(hlt_2_probe == 0 && hlt_1_probe==0)"; }
+
+  if(what == "hlt_3") {cut_flag_hlt_pass = "(hlt_3_probe == 1 || hlt_4_probe==1 || hlt_8_probe==1 || hlt_9_probe==1)" && phi_cut; 
+					   cut_flag_hlt_fail = "(hlt_3_probe != 1 && hlt_4_probe !=1 && hlt_8_probe!=1 && hlt_9_probe!=1)" && phi_cut ; }
+
+  if (what == "hlt_10") {cut_flag_hlt_pass = "(hlt_10_probe==1)" && phi_cut; cut_flag_hlt_fail = "(hlt_10_probe==0)" && phi_cut; }
+
   if(what == "hlt_4") {cut_flag_hlt_pass = "(hlt_4_probe == 1 || hlt_3_probe ==1)"; cut_flag_hlt_fail = "(hlt_4_probe == 0 && hlt_3_probe==0)"; }
-  if(what == "hlt_5") {cut_flag_hlt_pass = "hlt_5_probe == 1 && trigobjpt_probe>23"; cut_flag_hlt_fail = "(hlt_5_probe == 0 || (hlt_5_probe==1 &&  trigobjpt_probe<=23)) "; }
+  if(what == "hlt_5") {cut_flag_hlt_pass = "(hlt_5_probe == 1 && trigobjpt_probe>23)" && phi_cut; 
+                       cut_flag_hlt_fail = "(hlt_5_probe == 0 || (hlt_5_probe==1 &&  trigobjpt_probe<=23))" && phi_cut; }
   //if(what == "hlt_6") {cut_flag_hlt_pass = "(hlt_6_probe == 1 || hlt_7_probe==1)"; cut_flag_hlt_fail = "(hlt_6_probe == 0 && hlt_7_probe==0)"; } // eff is always =1
- if(what == "hlt_6") {cut_flag_hlt_pass = "(hlt_6_probe == 1 || hlt_7_probe==1)"; cut_flag_hlt_fail = "(hlt_6_probe != 1 && hlt_7_probe!=1)"; }
+ if(what == "hlt_6") {cut_flag_hlt_pass = "(hlt_6_probe == 1 || hlt_7_probe==1)" && phi_cut; cut_flag_hlt_fail = "(hlt_6_probe != 1 && hlt_7_probe!=1)" && phi_cut; }
   if(what == "hlt_7") {cut_flag_hlt_pass = "hlt_7_probe == 1"; cut_flag_hlt_fail = "hlt_7_probe == 0"; }
   if(what == "hlt_8") {cut_flag_hlt_pass = "hlt_8_probe == 1"; cut_flag_hlt_fail = "hlt_8_probe == 0"; }
   if(what == "hlt_9") {cut_flag_hlt_pass = "hlt_9_probe == 1"; cut_flag_hlt_fail = "hlt_9_probe == 0"; }
-  if(what == "hlt_10") {cut_flag_hlt_pass = "hlt_10_probe == 1"; cut_flag_hlt_fail = "hlt_10_probe == 0"; }
+  //if(what == "hlt_10") {cut_flag_hlt_pass = "hlt_10_probe == 1"; cut_flag_hlt_fail = "hlt_10_probe == 0"; }
   if(what == "hlt_11") {cut_flag_hlt_pass = "hlt_11_probe == 1"; cut_flag_hlt_fail = "hlt_11_probe == 0"; }
   if(what == "hlt_12") {cut_flag_hlt_pass = "hlt_12_probe == 1"; cut_flag_hlt_fail = "hlt_12_probe == 0"; }
   if(what == "hlt_13") {cut_flag_hlt_pass = "hlt_13_probe == 1"; cut_flag_hlt_fail = "hlt_13_probe==0"; }
@@ -224,7 +270,7 @@ void TP_eff_mu(TString fileName = "SingleMuon_Run2016_TP", // RooT file with TP 
   if(what == "hlt_18") {cut_flag_hlt_pass = "hlt_18_probe == 1"; cut_flag_hlt_fail = "hlt_18_probe == 0"; }
   if(what == "hlt_19") {cut_flag_hlt_pass = "hlt_19_probe == 1"; cut_flag_hlt_fail = "hlt_19_probe == 0"; }
   if(what == "hlt_20") {cut_flag_hlt_pass = "hlt_20_probe == 1"; cut_flag_hlt_fail = "hlt_20_probe == 0"; }
- 
+
   //Definition of the output directory names and creation of it
 	TString dir_name = "Muon_";
 	dir_name += what;
