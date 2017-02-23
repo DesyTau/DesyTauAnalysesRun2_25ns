@@ -416,15 +416,15 @@ int main(int argc, char * argv[]){
   RooWorkspace *w_XTrigTauLegSF = (RooWorkspace*)f_XTrigTauLegSF.Get("w");
   f_XTrigTauLegSF.Close();
 
-  // tau ID scale factors 
-  TString workspace_filename = TString(cmsswBase)+"/src/HTT-utilities/CorrectionsWorkspace/htt_scalefactors_v4.root";
+  // Workspace containing tracking efficiency weights 
+  TString workspace_filename = TString(cmsswBase)+"/src/HTT-utilities/CorrectionsWorkspace/htt_scalefactors_v16_3.root";
   TFile *f_workspace = new TFile(workspace_filename,"read");
   if (f_workspace->IsZombie()) {std::cout << " workspace file " << workspace_filename << " not found. Please check. " << std::endl; exit(1);}
   RooWorkspace *w = (RooWorkspace*)f_workspace->Get("w");
   //f.Close();
 
   // Zpt reweighting for LO DY samples
-  TFile * f_zptweight = new TFile("/afs/cern.ch/user/r/rlane/public/HIG16037/zpt_weights/zpt_weights_2016.root","read");
+  TFile * f_zptweight = new TFile(TString(cmsswBase)+"/src/"+"DesyTauAnalyses/NTupleMaker/data/zpt_weights_2016_BtoH.root","read");
   TH2D * h_zptweight = (TH2D*)f_zptweight->Get("zptmass_histo");
 
   // lepton to tau fake init
@@ -495,9 +495,9 @@ int main(int argc, char * argv[]){
     tauThreeProngScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);
     zPtWeightSys = new ZPtWeightSys(otree);
     topPtWeightSys = new TopPtWeightSys(otree);
-    jetEnergyScaleSys = new JetEnergyScaleSys(otree);
-    jetEnergyScaleSys->SetConfig(&cfg);
-    jetEnergyScaleSys->SetBtagScaling(&inputs_btag_scaling_medium);
+    //jetEnergyScaleSys = new JetEnergyScaleSys(otree);
+    //jetEnergyScaleSys->SetConfig(&cfg);
+    //jetEnergyScaleSys->SetBtagScaling(&inputs_btag_scaling_medium);
     lepTauFakeScaleSys = new LepTauFakeScaleSys(otree);
     lepTauFakeScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);
   }
