@@ -8,7 +8,7 @@ period = 'Spring16'
 
 #configurable options =======================================================================
 runOnData=isData #data/MC switch
-usePrivateSQlite=True #use external JECs (sqlite file) /// OUTDATED for 25ns
+usePrivateSQlite=False #use external JECs (sqlite file) /// OUTDATED for 25ns
 useHFCandidates=True #create an additionnal NoHF slimmed MET collection if the option is set to false  == existing as slimmedMETsNoHF
 applyResiduals=True #application of residual corrections. Have to be set to True once the 13 TeV residual corrections are available. False to be kept meanwhile. Can be kept to False later for private tests or for analysis checks and developments (not the official recommendation!).
 #===================================================================
@@ -56,9 +56,9 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condD
 from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag
 
 if runOnData:
-  process.GlobalTag.globaltag = '80X_dataRun2_Prompt_ICHEP16JEC_v0'
+  process.GlobalTag.globaltag = '80X_dataRun2_2016SeptRepro_v7'
 else:
-  process.GlobalTag.globaltag = '80X_mcRun2_asymptotic_2016_TrancheIV_v6'
+  process.GlobalTag.globaltag = '80X_mcRun2_asymptotic_2016_TrancheIV_v8'
 
 print 'The conditions are =======>',process.GlobalTag.globaltag
     
@@ -68,9 +68,9 @@ if usePrivateSQlite:
     CondDBSetup.__delattr__('connect')
     import os
     if runOnData:
-      era="Summer16_23Sep2016AllV3_DATA"
+      era="Summer16_23Sep2016AllV4_DATA"
     else:
-      era="Summer16_23Sep2016V3_MC"
+      era="Summer16_23Sep2016V4_MC"
     
     dBFile = os.path.expandvars("$CMSSW_BASE/src/DesyTauAnalyses/NTupleMaker/data/JEC/"+era+".db")
     process.jec = cms.ESSource("PoolDBESSource",CondDBSetup,
@@ -469,6 +469,7 @@ JetCollectionTag = cms.InputTag("patJetsReapplyJEC::TreeProducer"),
 #JetCollectionTag = cms.InputTag("slimmedJets"),
 MetCollectionTag = cms.InputTag("slimmedMETs::@skipCurrentProcess"),
 MetCorrCollectionTag = cms.InputTag("slimmedMETs::TreeProducer"),
+MetCorrCovMatrixTag = cms.InputTag("METCorrSignificance:METCovariance:TreeProducer"),
 PuppiMetCollectionTag = cms.InputTag("slimmedMETsPuppi::TreeProducer"),
 MvaMetCollectionsTag = cms.VInputTag(cms.InputTag("MVAMET","MVAMET","TreeProducer")),
 TrackCollectionTag = cms.InputTag("generalTracks"),
@@ -850,7 +851,7 @@ process.p = cms.Path(
   process.puppiMETSequence *
   process.fullPatMetSequencePuppi *
   process.egmGsfElectronIDSequence * 
-  process.rerunMvaIsolation2SeqRun2 * 
+  process.rerunMvaIsolation2SeqRun2 *
   #process.mvaMetSequence *
   #process.HBHENoiseFilterResultProducer* #produces HBHE bools baseline
   #process.ApplyBaselineHBHENoiseFilter*  #reject events based 
