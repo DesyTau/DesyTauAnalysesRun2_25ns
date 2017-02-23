@@ -97,7 +97,7 @@ bool isICHEPmed(int Index, const AC1B * analysisTree);
 bool isIdentifiedMediumMuon(int Index, const AC1B * analysisTree, bool isData);
 void correctTauES(TLorentzVector& Tau, TLorentzVector& Met, float relative_shift, bool tau_is_one_prong);
 bool passedSummer16VetoId(const AC1B * analysisTree, int index);
-
+bool SafeRatio(double denominator);
 
 int main(int argc, char * argv[]){
 
@@ -835,9 +835,9 @@ int main(int argc, char * argv[]){
 	  double eff_l_DATA = SF_XTriggerLepLeg   -> get_EfficiencyData(double(analysisTree.muon_pt[leptonIndex]),double(analysisTree.muon_eta[leptonIndex]));
 	  double eff_t_DATA = w_XTrigTauLegSF     -> function("t_genuine_TightIso_mt_data")->getVal();
 
-	  if(isSingleLepTrig && !isXTrig)      scalefactor = (eff_L_MC*(1.-eff_t_MC))/(eff_L_DATA*(1.-eff_t_DATA));
-	  else if(isXTrig && !isSingleLepTrig) scalefactor = ((eff_l_MC-eff_L_MC)*eff_t_MC)/((eff_l_DATA-eff_L_DATA)*eff_t_DATA);
-	  else if(isXTrig && isSingleLepTrig)  scalefactor = (eff_L_MC*eff_t_MC)/(eff_L_DATA*eff_t_DATA);
+	  if(isSingleLepTrig && !isXTrig && SafeRatio(eff_L_DATA*(1.-eff_t_DATA)))              scalefactor = (eff_L_MC*(1.-eff_t_MC))/(eff_L_DATA*(1.-eff_t_DATA));
+	  else if(isXTrig && !isSingleLepTrig && SafeRatio((eff_l_DATA-eff_L_DATA)*eff_t_DATA)) scalefactor = ((eff_l_MC-eff_L_MC)*eff_t_MC)/((eff_l_DATA-eff_L_DATA)*eff_t_DATA);
+	  else if(isXTrig && isSingleLepTrig && SafeRatio(eff_L_DATA*eff_t_DATA))               scalefactor = (eff_L_MC*eff_t_MC)/(eff_L_DATA*eff_t_DATA);
 	  otree->trigweight_1 = scalefactor;
 
           if (otree->iso_1>=0.15 && otree->iso_1<=0.3){  
@@ -850,9 +850,9 @@ int main(int argc, char * argv[]){
 	    eff_L_DATA = SF_SingleLepTrigger_antiiso -> get_EfficiencyData(double(analysisTree.muon_pt[leptonIndex]),double(analysisTree.muon_eta[leptonIndex]));
 	    eff_l_DATA = SF_XTriggerLepLeg_antiiso   -> get_EfficiencyData(double(analysisTree.muon_pt[leptonIndex]),double(analysisTree.muon_eta[leptonIndex]));
 
-	    if(isSingleLepTrig && !isXTrig)      scalefactor = (eff_L_MC*(1.-eff_t_MC))/(eff_L_DATA*(1.-eff_t_DATA));
-	    else if(isXTrig && !isSingleLepTrig) scalefactor = ((eff_l_MC-eff_L_MC)*eff_t_MC)/((eff_l_DATA-eff_L_DATA)*eff_t_DATA);
-	    else if(isXTrig && isSingleLepTrig)  scalefactor = (eff_L_MC*eff_t_MC)/(eff_L_DATA*eff_t_DATA);
+	    if(isSingleLepTrig && !isXTrig && SafeRatio(eff_L_DATA*(1.-eff_t_DATA)))              scalefactor = (eff_L_MC*(1.-eff_t_MC))/(eff_L_DATA*(1.-eff_t_DATA));
+	    else if(isXTrig && !isSingleLepTrig && SafeRatio((eff_l_DATA-eff_L_DATA)*eff_t_DATA)) scalefactor = ((eff_l_MC-eff_L_MC)*eff_t_MC)/((eff_l_DATA-eff_L_DATA)*eff_t_DATA);
+	    else if(isXTrig && isSingleLepTrig && SafeRatio(eff_L_DATA*eff_t_DATA))               scalefactor = (eff_L_MC*eff_t_MC)/(eff_L_DATA*eff_t_DATA);
 	    otree->trigweight_antiiso_1 = scalefactor;
           }
 
@@ -881,9 +881,9 @@ int main(int argc, char * argv[]){
 	  double eff_l_DATA = SF_XTriggerLepLeg   -> get_EfficiencyData(double(analysisTree.electron_pt[leptonIndex]),double(analysisTree.electron_eta[leptonIndex]));
 	  double eff_t_DATA = w_XTrigTauLegSF     -> function("t_genuine_TightIso_et_data")->getVal();
 
-	  if(isSingleLepTrig && !isXTrig)      scalefactor = (eff_L_MC*(1.-eff_t_MC))/(eff_L_DATA*(1.-eff_t_DATA));
-	  else if(isXTrig && !isSingleLepTrig) scalefactor = ((eff_l_MC-eff_L_MC)*eff_t_MC)/((eff_l_DATA-eff_L_DATA)*eff_t_DATA);
-	  else if(isXTrig && isSingleLepTrig)  scalefactor = (eff_L_MC*eff_t_MC)/(eff_L_DATA*eff_t_DATA);
+	  if(isSingleLepTrig && !isXTrig && SafeRatio(eff_L_DATA*(1.-eff_t_DATA)))              scalefactor = (eff_L_MC*(1.-eff_t_MC))/(eff_L_DATA*(1.-eff_t_DATA));
+	  else if(isXTrig && !isSingleLepTrig && SafeRatio((eff_l_DATA-eff_L_DATA)*eff_t_DATA)) scalefactor = ((eff_l_MC-eff_L_MC)*eff_t_MC)/((eff_l_DATA-eff_L_DATA)*eff_t_DATA);
+	  else if(isXTrig && isSingleLepTrig && SafeRatio(eff_L_DATA*eff_t_DATA))               scalefactor = (eff_L_MC*eff_t_MC)/(eff_L_DATA*eff_t_DATA);
 	  otree->trigweight_1 = scalefactor;
 
           if (otree->iso_1>=0.15 && otree->iso_1<=0.3){  
@@ -896,9 +896,9 @@ int main(int argc, char * argv[]){
 	    eff_L_DATA = SF_SingleLepTrigger_antiiso -> get_EfficiencyData(double(analysisTree.electron_pt[leptonIndex]),double(analysisTree.electron_eta[leptonIndex]));
 	    eff_l_DATA = SF_XTriggerLepLeg_antiiso   -> get_EfficiencyData(double(analysisTree.electron_pt[leptonIndex]),double(analysisTree.electron_eta[leptonIndex]));
 
-	    if(isSingleLepTrig && !isXTrig)      scalefactor = (eff_L_MC*(1.-eff_t_MC))/(eff_L_DATA*(1.-eff_t_DATA));
-	    else if(isXTrig && !isSingleLepTrig) scalefactor = ((eff_l_MC-eff_L_MC)*eff_t_MC)/((eff_l_DATA-eff_L_DATA)*eff_t_DATA);
-	    else if(isXTrig && isSingleLepTrig)  scalefactor = (eff_L_MC*eff_t_MC)/(eff_L_DATA*eff_t_DATA);
+	    if(isSingleLepTrig && !isXTrig && SafeRatio(eff_L_DATA*(1.-eff_t_DATA)))              scalefactor = (eff_L_MC*(1.-eff_t_MC))/(eff_L_DATA*(1.-eff_t_DATA));
+	    else if(isXTrig && !isSingleLepTrig && SafeRatio((eff_l_DATA-eff_L_DATA)*eff_t_DATA)) scalefactor = ((eff_l_MC-eff_L_MC)*eff_t_MC)/((eff_l_DATA-eff_L_DATA)*eff_t_DATA);
+	    else if(isXTrig && isSingleLepTrig && SafeRatio(eff_L_DATA*eff_t_DATA))               scalefactor = (eff_L_MC*eff_t_MC)/(eff_L_DATA*eff_t_DATA);
 	    otree->trigweight_antiiso_1 = scalefactor;
           }
 
@@ -1864,4 +1864,12 @@ bool passedSummer16VetoId(const AC1B * analysisTree, int index){
     
     return true;
   }
+}
+
+
+bool SafeRatio(double denominator){
+
+  if(denominator==0.) return false;
+  else                return true;
+
 }
