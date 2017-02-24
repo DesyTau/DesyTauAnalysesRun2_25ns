@@ -692,6 +692,8 @@ int main(int argc, char * argv[]){
       vector<bool> isXTrigLepLeg(filterXtriggerLepLeg.size(), false);
       vector<bool> isXTrigTauLeg(filterXtriggerTauLeg.size(), false);
       bool isXTrig         = false;
+      otree->singleLepTrigger = false;
+      otree->xTrigger = false;
 
       for (unsigned int il=0; il<leptons.size(); ++il) {
         unsigned int lIndex  = leptons.at(il);
@@ -873,6 +875,8 @@ int main(int argc, char * argv[]){
 	else if(isXTrigStored && !isSingleLepTrigStored && SafeRatio((eff_l_MC-eff_L_MC)*eff_t_MC) && (eff_l_DATA-eff_L_DATA) > 0.) scalefactor = ((eff_l_DATA-eff_L_DATA)*eff_t_DATA)/((eff_l_MC-eff_L_MC)*eff_t_MC);
 	else if(isXTrigStored && isSingleLepTrigStored && SafeRatio(eff_L_MC*eff_t_MC))             scalefactor = (eff_L_DATA*eff_t_DATA)/(eff_L_MC*eff_t_MC);
 	otree->trigweight_1 = scalefactor;
+	otree->singleLepTrigger = isSingleLepTrigStored;
+	otree->xTrigger = isXTrigStored;
 	
 	if (otree->iso_1>=0.15 && otree->iso_1<=0.3){  
 	  
