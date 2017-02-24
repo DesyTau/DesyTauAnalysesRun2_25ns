@@ -336,7 +336,7 @@ if (string::npos != rootFileName.find("SMS-") || string::npos != rootFileName.fi
   float MinBJetPt = 20.;
 
   // Z pt mass weights
-  TFile * fileZMassPtWeights = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/zpt_weights_2016.root"); 
+  TFile * fileZMassPtWeights = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/zpt_weights_2016_BtoH.root"); 
   if (fileZMassPtWeights->IsZombie()) {
     std::cout << "File " << TString(cmsswBase) << "src/DesyTauAnalyses/NTupleMaker/data/zpt_weights_2016.root" << "  does not exist!" << std::endl;
     exit(-1);

@@ -320,7 +320,7 @@ if (string::npos != rootFileName.find("SMS-") || string::npos != rootFileName.fi
   float MinBJetPt = 20.;
 
   // Z pt mass weights
-  TFile * fileZMassPtWeights = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/zpt_weights_2016.root"); 
+  TFile * fileZMassPtWeights = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/zpt_weights_2016_BtoH.root"); 
   if (fileZMassPtWeights->IsZombie()) {
     std::cout << "File " << TString(cmsswBase) << "src/DesyTauAnalyses/NTupleMaker/data/zpt_weights_2016.root" << "  does not exist!" << std::endl;
     exit(-1);
@@ -1383,29 +1383,19 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       float bJetEtaCut = jetEta;
 
       vector<unsigned int> jets; jets.clear();
-      vector<unsigned int> jetspt20; jetspt20.clear();
       vector<unsigned int> bjets; bjets.clear();
-      vector<unsigned int> bjets_nocleaned; bjets_nocleaned.clear();
 
-      int indexLeadingJet = -1;
-      float ptLeadingJet = -1;
-
-      int indexSubLeadingJet = -1;
-      float ptSubLeadingJet = -1;
-      
-      int indexLeadingBJet = -1;
 
 	int counter_cleaned_jets = 0;
 
 
       for (unsigned int jet=0; jet<analysisTree.pfjet_count; ++jet) {
-
-	if (fabs(analysisTree.pfjet_pt[jet])<ptJetCut) continue;
         float absJetEta = fabs(analysisTree.pfjet_eta[jet]);
+
 	if (absJetEta > etaJetCut) continue;
+	if (fabs(analysisTree.pfjet_pt[jet])<ptJetCut) continue;
 
 	float jetPt = analysisTree.pfjet_pt[jet];
-
 
 	bool isPFJetId = false ; 
 	isPFJetId =looseJetiD(analysisTree,jet);
@@ -1414,12 +1404,12 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	if (!isPFJetId) continue;
 	bool cleanedJet = true;
 
-	double Dr=deltaR(analysisTree.muon_eta[mu_index],analysisTree.muon_phi[mu_index],
+	double Dr=deltaR(analysisTree.muon_eta[mu_index_1],analysisTree.muon_phi[mu_index_1],
 			 analysisTree.pfjet_eta[jet],analysisTree.pfjet_phi[jet]);
 	if (  Dr  < DRmax)  cleanedJet=false;
 
 
-	double Drr=deltaR(analysisTree.tau_eta[tau_index],analysisTree.tau_phi[tau_index],
+	double Drr=deltaR(analysisTree.muon_eta[mu_index_2],analysisTree.muon_phi[mu_index_2],
 						  analysisTree.pfjet_eta[jet],analysisTree.pfjet_phi[jet]);
 
 	if ( Drr < DRmax) cleanedJet=false;
@@ -1496,9 +1486,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
       njets = jets.size();
       jet_count = jets.size();
-      //njetspt20 = jetspt20.size();
       nbtag = bjets.size();
-      //nbtag_nocleaned = bjets_nocleaned.size();
 
       npv =  analysisTree.primvertex_count;
       npu = analysisTree.numtruepileupinteractions;

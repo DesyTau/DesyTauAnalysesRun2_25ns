@@ -11,7 +11,7 @@
 #(the maximum memory usage of this job)
 #$ -l h_vmem=1500M
 
-wdir="/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/CMSSW_8_0_20/src/DesyTauAnalyses/NTupleMaker/test"
+wdir="/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/New8025/CMSSW_8_0_25/src/DesyTauAnalyses/NTupleMaker/test"
 channel=$2 
 
 ##type MC or Data
@@ -55,9 +55,9 @@ ctt=`cat ${dir}/${line} | wc -l`
 
 echo There are  $ct out of $ctt for $line in $dir dir for systematic $syst
 
-if [[ $ct -ge $ctt ]] ;then
-	continue;
-fi
+#if [[ $ct -ge $ctt ]] ;then
+#	continue;
+#fi
 
 unset xsec
 xsec=`grep " ${line} " xsecs | cut -d " " -f3-4`	
@@ -93,7 +93,7 @@ if [ ! -f ${dir}/${bas}_B_OS.root ] ;then
 echo $bas $xsec $dir
 echo SUSY$channel analysisMacroSUSY_${type}_B.conf ${bas} ${channel} 1 $syst>> Jobs/job${line}$channel$dir${bas}_B${syst}.sh
 chmod u+x $wdir/Jobs/job${line}$channel$dir${bas}_B${syst}.sh
- qsub -l h_rt=1:45:00 -l h_cpu=1500M $wdir/Jobs/job${line}$channel$dir${bas}_B${syst}.sh 
+ qsub -l h_rt=0:45:00 -l h_cpu=1500M $wdir/Jobs/job${line}$channel$dir${bas}_B${syst}.sh 
 fi
 
 

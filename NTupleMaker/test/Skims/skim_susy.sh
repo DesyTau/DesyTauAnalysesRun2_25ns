@@ -1,4 +1,3 @@
-dir="/nfs/dust/cms/group/higgs-kit/80x_MC_SUSY_v1/"
 dir="/nfs/dust/cms/group/susy-desy/Run2/Stau/8025_MC_SUSY_v1/"
 
 sources="TChipmStauSnu   TChiStauStau   TStauStau"
@@ -60,27 +59,29 @@ outfile=${model}_${susy}_LSP${lsp}_${COUNTER}.root
 if [ ! -f $outfile ] ; then
 
 
-cp copytrees_C copytrees.C
+cp copytrees_C copytrees${model}.C
 
-chmod 777 copytrees.C
+chmod 777 copytrees${model}.C
 f2=$(basename $file)
 
-sed -i 's/MODEL/'$model'/g' copytrees.C
+sed -i 's/MODEL/'$model'/g' copytrees${model}.C
 
-sed -i 's/FILEIN/'$f2'/g' copytrees.C
+sed -i 's/FILEIN/'$f2'/g' copytrees${model}.C
 
-sed -i 's/SUSYMASS/'$susy'/g' copytrees.C
+sed -i 's/SUSYMASS/'$susy'/g' copytrees${model}.C
 
-sed -i 's/N1MASS/'$lsp'/g' copytrees.C
+sed -i 's/N1MASS/'$lsp'/g' copytrees${model}.C
 
-sed -i 's/NUMBER/'$COUNTER'/g' copytrees.C
+sed -i 's/NUMBER/'$COUNTER'/g' copytrees${model}.C
 
 cp bss job_skim${susy}_LSP${lsp}_${COUNTER}.sh
-mv copytrees.C copytrees${model}_${susy}_LSP${lsp}_${COUNTER}.C
+mv copytrees${model}.C copytrees${model}_${susy}_LSP${lsp}_${COUNTER}.C
 
 echo "root -l -q -b copytrees${model}_${susy}_LSP${lsp}_${COUNTER}.C " >>job_skim${susy}_LSP${lsp}_${COUNTER}.sh
 
- qsub job_skim${susy}_LSP${lsp}_${COUNTER}.sh
+echo "rm copytrees${model}_${susy}_LSP${lsp}_${COUNTER}.C" >> job_skim${susy}_LSP${lsp}_${COUNTER}.sh
+
+qsub job_skim${susy}_LSP${lsp}_${COUNTER}.sh
 
 #mv skim.root ${out}${susy}_LSP${lsp}_${COUNTER}.root
 
