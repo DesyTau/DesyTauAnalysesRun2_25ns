@@ -16,7 +16,9 @@ void TestTree(int numberOfEvents = 10) {
   std::map<std::string, int>* hltriggerresults = new std::map<std::string, int>();
   std::map<std::string, int>* hltprescales = new std::map<std::string, int>();
   std::map<std::string, int>* flags = new std::map<std::string, int>();
+  UInt_t event_nr;
 
+  tree->SetBranchAddress("event_nr",&event_nr);
   tree->SetBranchAddress("run_hltnames",&hltpaths);
   tree->SetBranchAddress("run_hltfilters",&hltfilters);
   tree->SetBranchAddress("run_btagdiscriminators",&btagdiscriminators);
