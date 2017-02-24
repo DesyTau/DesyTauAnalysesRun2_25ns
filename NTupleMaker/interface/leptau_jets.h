@@ -6,6 +6,8 @@
 #include "DesyTauAnalyses/NTupleMaker/interface/Spring15Tree.h"
 #include "CondFormats/BTauObjects/interface/BTagCalibration.h"
 #include "CondTools/BTau/interface/BTagCalibrationReader.h"
+#include "DesyTauAnalyses/NTupleMaker/interface/JESUncertainties.h"
+
 //void counting_jets(const AC1B *analysisTree, Spring15Tree *otree, const Config *cfg, const btag_scaling_inputs *inputs);
 
 struct btag_scaling_inputs{
@@ -20,11 +22,39 @@ struct btag_scaling_inputs{
 
 namespace jets{
 
-float get_jetPt(const AC1B *analysisTree, int jetIndex, TString JESshift){
+JESUncertainties * jecUncertainties = new JESUncertainties("DesyTauAnalyses/NTupleMaker/data/Summer16_UncertaintySources_AK4PFchs.txt");
+
+float get_jetPt(const AC1B *analysisTree, int jetIndex, TString JESshift, TString direction, JESUncertainties * jecUncertainties = jecUncertainties){ // direction can be Up or Down
+	float jetPt = -9999;
+	float shift = 0.;
+	// get the relative shift
+	if (JESshift == "central")  { jetPt = analysisTree->pfjet_pt[jetIndex]; return jetPt;}
+	else if (JESshift== "JES")  shift = analysisTree->pfjet_jecUncertainty[jetIndex];
+	else if (std::find(jecUncertainties->getUncertNames().begin(), jecUncertainties->getUncertNames().end(), JESshift) != jecUncertainties->getUncertNames().end()) 
+		shift = jecUncertainties->getUncertainty(std::string(JESshift), analysisTree->pfjet_pt[jetIndex],analysisTree->pfjet_eta[jetIndex]);
+	// calculate shifted pt 
+	if (direction == "Up") jetPt = (analysisTree->pfjet_pt[jetIndex])*(1+shift);
+	else if (direction == "Down") jetPt = (analysisTree->pfjet_pt[jetIndex])*(1-shift);
+	return jetPt;
+};
+
+float get_jetE(const AC1B *analysisTree, int jetIndex, TString JESshift){
+	float jetE = -9999;
+	float shift = 0.;
+	if (JESshift == "central")  shift = 0.;
+	else if (JESshift== "JESUp")   jetE =  (analysisTree->pfjet_e[jetIndex])*(1+analysisTree->pfjet_jecUncertainty[jetIndex]);
+	else if (JESshift== "JESDown") jetE =  (analysisTree->pfjet_e[jetIndex])*(1-analysisTree->pfjet_jecUncertainty[jetIndex]);
+	return jetE;
+};
+
+
+/*
+float get_jetPt(const AC1B *analysisTree, int jetIndex, TString JESshift, TString direction){ // direction can be Up or Down
 	float jetPt = -9999;
 	if (JESshift == "central")  jetPt = analysisTree->pfjet_pt[jetIndex];
-	else if (JESshift== "JESUp")   jetPt =  (analysisTree->pfjet_pt[jetIndex])*(1+analysisTree->pfjet_jecUncertainty[jetIndex]);
+	else if (JESshift== "JES")   jetPt =  (analysisTree->pfjet_pt[jetIndex])*(1+analysisTree->pfjet_jecUncertainty[jetIndex]);
 	else if (JESshift== "JESDown") jetPt =  (analysisTree->pfjet_pt[jetIndex])*(1-analysisTree->pfjet_jecUncertainty[jetIndex]);
+	else if () jetPt = 
 	return jetPt;
 };
 
@@ -36,9 +66,10 @@ float get_jetE(const AC1B *analysisTree, int jetIndex, TString JESshift){
 	return jetE;
 };
 
+*/
 
 
-void counting_jets(const AC1B *analysisTree, Spring15Tree *otree, const Config *cfg, const btag_scaling_inputs *inputs_btag_scaling, TString JESshift = "central"){
+void counting_jets(const AC1B *analysisTree, Spring15Tree *otree, const Config *cfg, const btag_scaling_inputs *inputs_btag_scaling, TString JESshift = "central", TString direction = "None", JESUncertainties * jecUncertainties = jecUncertainties){
 
   vector<unsigned int> jets; jets.clear();
   vector<unsigned int> jetspt20; jetspt20.clear();
@@ -65,7 +96,7 @@ void counting_jets(const AC1B *analysisTree, Spring15Tree *otree, const Config *
     if (absJetEta>=cfg->get<float>("JetEtaCut")) continue;
 
     //float jetPt = analysisTree->pfjet_pt[jet];
-    float jetPt = get_jetPt(analysisTree, jet, JESshift);
+    float jetPt = get_jetPt(analysisTree, jet, JESshift, direction, jecUncertainties);
     if (jetPt<=cfg->get<float>("JetPtLowCut")) continue;
 
     float dR1 = deltaR(analysisTree->pfjet_eta[jet],analysisTree->pfjet_phi[jet],otree->eta_1,otree->phi_1);
@@ -193,7 +224,7 @@ void counting_jets(const AC1B *analysisTree, Spring15Tree *otree, const Config *
   otree->bpuid_tight_1 = -9999;
   
   if (indexLeadingBJet>=0) {
-    otree->bpt_1   = get_jetPt(analysisTree, indexLeadingBJet, JESshift);//analysisTree->pfjet_pt[indexLeadingBJet];
+    otree->bpt_1   = get_jetPt(analysisTree, indexLeadingBJet, JESshift, direction, jecUncertainties);//analysisTree->pfjet_pt[indexLeadingBJet];
     otree->beta_1  = analysisTree->pfjet_eta[indexLeadingBJet];
     otree->bphi_1  = analysisTree->pfjet_phi[indexLeadingBJet];
     otree->brawf_1 = analysisTree->pfjet_energycorr[indexLeadingBJet]; 
@@ -215,7 +246,7 @@ void counting_jets(const AC1B *analysisTree, Spring15Tree *otree, const Config *
   otree->bpuid_tight_2 = -9999;
   
   if (indexSubLeadingBJet>=0) {
-    otree->bpt_2   = get_jetPt(analysisTree, indexSubLeadingBJet, JESshift); //analysisTree->pfjet_pt[indexSubLeadingBJet];
+    otree->bpt_2   = get_jetPt(analysisTree, indexSubLeadingBJet, JESshift, direction, jecUncertainties); //analysisTree->pfjet_pt[indexSubLeadingBJet];
     otree->beta_2  = analysisTree->pfjet_eta[indexSubLeadingBJet];
     otree->bphi_2  = analysisTree->pfjet_phi[indexSubLeadingBJet];
     otree->brawf_2 = analysisTree->pfjet_energycorr[indexSubLeadingBJet];
@@ -242,7 +273,7 @@ void counting_jets(const AC1B *analysisTree, Spring15Tree *otree, const Config *
 cout << "warning : indexLeadingJet ==indexSubLeadingJet = " << indexSubLeadingJet << endl;
 
   if (indexLeadingJet>=0) {
-    otree->jpt_1 = get_jetPt(analysisTree, indexLeadingJet, JESshift); //analysisTree->pfjet_pt[indexLeadingJet];
+    otree->jpt_1 = get_jetPt(analysisTree, indexLeadingJet, JESshift, direction, jecUncertainties); //analysisTree->pfjet_pt[indexLeadingJet];
     otree->jeta_1 = analysisTree->pfjet_eta[indexLeadingJet];
     otree->jphi_1 = analysisTree->pfjet_phi[indexLeadingJet];
     otree->jrawf_1 = analysisTree->pfjet_energycorr[indexLeadingJet];
@@ -266,7 +297,7 @@ cout << "warning : indexLeadingJet ==indexSubLeadingJet = " << indexSubLeadingJe
   otree->jpuid_tight_2 = -9999;
 
   if (indexSubLeadingJet>=0) {
-    otree->jpt_2 = get_jetPt(analysisTree, indexSubLeadingJet, JESshift);//analysisTree->pfjet_pt[indexSubLeadingJet];
+    otree->jpt_2 = get_jetPt(analysisTree, indexSubLeadingJet, JESshift, direction, jecUncertainties);//analysisTree->pfjet_pt[indexSubLeadingJet];
     otree->jeta_2 = analysisTree->pfjet_eta[indexSubLeadingJet];
     otree->jphi_2 = analysisTree->pfjet_phi[indexSubLeadingJet];
     otree->jrawf_2 = analysisTree->pfjet_energycorr[indexSubLeadingJet];

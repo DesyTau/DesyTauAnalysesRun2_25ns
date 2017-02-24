@@ -18,9 +18,9 @@ public:
   
   JetEnergyScaleSys(){};
   
-  JetEnergyScaleSys(Spring15Tree* c){
+  JetEnergyScaleSys(Spring15Tree* c, TString uncertainty_name){
     cenTree = c;
-    label = "CMS_j_13TeV";
+    label = "CMS_scale_j_"+uncertainty_name+"13TeV";
     
     this->Init(cenTree);
   };
