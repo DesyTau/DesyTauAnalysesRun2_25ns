@@ -1131,7 +1131,7 @@ int main(int argc, char * argv[]){
       if (!Synch && !passedBaselineSel)
         continue;
 
-      if (ApplySVFit) svfit_variables(ch, &analysisTree, otree, &cfg, inputFile_visPtResolution);
+      if (ApplySVFit && otree->njetspt20>0) svfit_variables(ch, &analysisTree, otree, &cfg, inputFile_visPtResolution);
 
       otree->Fill();
 
