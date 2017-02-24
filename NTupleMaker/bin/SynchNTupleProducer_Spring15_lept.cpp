@@ -885,10 +885,9 @@ int main(int argc, char * argv[]){
 	  eff_l_DATA = SF_XTriggerLepLeg_antiiso   -> get_EfficiencyData(leptonLV.Pt(), leptonLV.Eta());
 	  
 	  if(isSingleLepTrigStored && !isXTrigStored && SafeRatio(eff_L_MC*(1.-eff_t_MC)))            scalefactor = (eff_L_DATA*(1.-eff_t_DATA))/(eff_L_MC*(1.-eff_t_MC));
-	  else if(isXTrigStored && !isSingleLepTrigStored && SafeRatio((eff_l_MC-eff_L_MC)*eff_t_MC)) scalefactor = ((eff_l_DATA-eff_L_DATA)*eff_t_DATA)/((eff_l_MC-eff_L_MC)*eff_t_MC);
+	  else if(isXTrigStored && !isSingleLepTrigStored && SafeRatio((eff_l_MC-eff_L_MC)*eff_t_MC) && (eff_l_DATA-eff_L_DATA) > 0.) scalefactor = ((eff_l_DATA-eff_L_DATA)*eff_t_DATA)/((eff_l_MC-eff_L_MC)*eff_t_MC);
 	  else if(isXTrigStored && isSingleLepTrigStored && SafeRatio(eff_L_MC*eff_t_MC))             scalefactor = (eff_L_DATA*eff_t_DATA)/(eff_L_MC*eff_t_MC);
 	  otree->trigweight_antiiso_1 = scalefactor;
-	  if(scalefactor<0) cout<<"scalefactor is negative 2"<<endl;
 	}
       }
       
