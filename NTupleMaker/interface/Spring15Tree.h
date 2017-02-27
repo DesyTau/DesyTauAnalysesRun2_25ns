@@ -258,6 +258,8 @@ public :
   Bool_t          bpuid_loose_2;
   Bool_t          bpuid_medium_2;
   Bool_t          bpuid_tight_2;
+  Bool_t          singleLepTrigger;
+  Bool_t          xTrigger;
   
   // List of branches
   TBranch        *b_run;   //!
@@ -491,7 +493,8 @@ public :
   TBranch        *b_bpuid_loose_2;
   TBranch        *b_bpuid_medium_2;
   TBranch        *b_bpuid_tight_2;
-
+  TBranch        *b_singleLepTrigger;
+  TBranch        *b_xTrigger;
   
   Spring15Tree(TTree *tree=0);
   virtual ~Spring15Tree();

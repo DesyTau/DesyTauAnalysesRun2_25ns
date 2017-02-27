@@ -292,7 +292,9 @@ void Spring15Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("bpuid_loose_2", &bpuid_loose_2, &b_bpuid_loose_2);
    fChain->SetBranchAddress("bpuid_medium_2", &bpuid_medium_2, &b_bpuid_medium_2);
    fChain->SetBranchAddress("bpuid_tight_2",  &bpuid_tight_2, &b_bpuid_tight_2);
-
+   fChain->SetBranchAddress("singleLepTrigger",  &singleLepTrigger, &b_singleLepTrigger);
+   fChain->SetBranchAddress("xTrigger",  &xTrigger, &b_xTrigger);
+   
    lock=true;
 }
 
@@ -616,6 +618,8 @@ void Spring15Tree::WriteInit(TTree *tree) {
   fChain->Branch("bpuid_loose_2", &bpuid_loose_2, "bpuid_loose_2/O");
   fChain->Branch("bpuid_medium_2", &bpuid_medium_2, "bpuid_medium_2/O");
   fChain->Branch("bpuid_tight_2", &bpuid_tight_2, "bpuid_tight_2/O");
+  fChain->Branch("singleLepTrigger",  &singleLepTrigger, "singleLepTrigger/O");
+  fChain->Branch("xTrigger",  &xTrigger, "xTrigger/O");
 }
 
 void Spring15Tree::Fill(){
