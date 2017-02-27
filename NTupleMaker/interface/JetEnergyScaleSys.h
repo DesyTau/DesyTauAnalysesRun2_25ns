@@ -18,10 +18,10 @@ public:
   
   JetEnergyScaleSys(){};
   
-  JetEnergyScaleSys(Spring15Tree* c){
+  JetEnergyScaleSys(Spring15Tree* c, TString name){
     cenTree = c;
-    label = "CMS_j_13TeV";
-    
+    label = "CMS_scale_j_13TeV";    
+	this->SetUncertaintyName(name);
     this->Init(cenTree);
   };
   
@@ -53,6 +53,15 @@ void SetBtagScaling(const btag_scaling_inputs * _InputsBtagScaling){
 	inputs_btag_scaling = _InputsBtagScaling;
 };
 
+void SetUncertaintyName(TString name){
+	uncertainty_name = name;
+	label = "CMS_scale_j_"+uncertainty_name+"13TeV";
+}
+
+void SetJESUncertainties(JESUncertainties * jec){
+	jecUncertainties = jec;
+}
+
 protected:
 
   virtual void Init(Spring15Tree* c){
@@ -74,12 +83,12 @@ protected:
   };
 
   virtual void ScaleUp(){
-	jets::counting_jets(analysisTree, cenTree, cfg, inputs_btag_scaling, "JESUp");
+	jets::counting_jets(analysisTree, cenTree, cfg, inputs_btag_scaling, uncertainty_name, "Up", jecUncertainties);
     this->Fill("Up");
   };
   
   virtual void ScaleDown(){
-	jets::counting_jets(analysisTree, cenTree, cfg, inputs_btag_scaling, "JESDown");
+	jets::counting_jets(analysisTree, cenTree, cfg, inputs_btag_scaling, uncertainty_name, "Down", jecUncertainties);
     this->Fill("Down");
   };
   
@@ -92,6 +101,9 @@ protected:
   Config * cfg;
   const btag_scaling_inputs * inputs_btag_scaling;
   std::map< std::string, TTree* >  outTree;
+  TString uncertainty_name;
+  JESUncertainties * jecUncertainties;
+  
 };
 
 #undef addvar

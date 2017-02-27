@@ -52,6 +52,7 @@
 #include "DesyTauAnalyses/NTupleMaker/interface/ZPtWeightSys.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/TopPtWeightSys.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/JetEnergyScaleSys.h"
+//#include "DesyTauAnalyses/NTupleMaker/interface/JESUncertainties.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/LepTauFakeRate.h"
 
 #define pi 	3.14159265358979312
@@ -91,7 +92,6 @@ bool extra_electron_veto(int leptonIndex, TString ch, const Config *cfg, const A
 bool extra_muon_veto(int leptonIndex, TString ch, const Config *cfg, const AC1B *analysisTree, bool isData);
 void fillMET(TString ch, int leptonIndex, int tauIndex, const AC1B * analysisTree, Spring15Tree *otree);
 void mt_calculation(Spring15Tree *otree);
-//void counting_jets(const AC1B *analysisTree, Spring15Tree *otree, const Config *cfg, const btag_scaling_inputs *inputs);
 void svfit_variables(TString ch, const AC1B *analysisTree, Spring15Tree *otree, const Config *cfg, TFile *inputFile_visPtResolution);
 bool isICHEPmed(int Index, const AC1B * analysisTree);
 bool isIdentifiedMediumMuon(int Index, const AC1B * analysisTree, bool isData);
@@ -478,13 +478,13 @@ int main(int argc, char * argv[]){
   TFile* inputFile_visPtResolution = new TFile(svFitPtResFile.data());
 
   //Systematics init
-  //TauScaleSys* tauScaleSys = 0;
   TauOneProngScaleSys* tauOneProngScaleSys =0;
   TauOneProngOnePi0ScaleSys* tauOneProngOnePi0ScaleSys=0;
   TauThreeProngScaleSys* tauThreeProngScaleSys=0;
   ZPtWeightSys* zPtWeightSys = 0;
   TopPtWeightSys* topPtWeightSys = 0;
-  JetEnergyScaleSys* jetEnergyScaleSys = 0;
+  std::vector<JetEnergyScaleSys*> jetEnergyScaleSys;
+  JESUncertainties * jecUncertainties = 0;
   LepTauFakeScaleSys * lepTauFakeScaleSys = 0;
   if(!isData && ApplySystShift){
     tauOneProngScaleSys = new TauOneProngScaleSys(otree);
@@ -495,11 +495,28 @@ int main(int argc, char * argv[]){
     tauThreeProngScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);
     zPtWeightSys = new ZPtWeightSys(otree);
     topPtWeightSys = new TopPtWeightSys(otree);
-    //jetEnergyScaleSys = new JetEnergyScaleSys(otree);
-    //jetEnergyScaleSys->SetConfig(&cfg);
-    //jetEnergyScaleSys->SetBtagScaling(&inputs_btag_scaling_medium);
     lepTauFakeScaleSys = new LepTauFakeScaleSys(otree);
     lepTauFakeScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);
+	if (cfg.get<bool>("splitJES")){
+      JESUncertainties * jecUncertainties = new JESUncertainties("DesyTauAnalyses/NTupleMaker/data/Summer16_UncertaintySources_AK4PFchs.txt");
+      std::vector<std::string> JESnames = jecUncertainties->getUncertNames();
+	  for (unsigned int i = 0; i<JESnames.size(); i++) std::cout << "i: "<< i << ", JESnames.at(i) : " << JESnames.at(i) << std::endl;
+      for (unsigned int i = 0; i<JESnames.size(); i++){
+        JetEnergyScaleSys * aJESobject = new JetEnergyScaleSys(otree, TString(JESnames.at(i)));
+        aJESobject->SetConfig(&cfg);
+        aJESobject->SetBtagScaling(&inputs_btag_scaling_medium);
+        aJESobject->SetJESUncertainties(jecUncertainties);
+        jetEnergyScaleSys.push_back(aJESobject);
+      }	  
+    }
+	else { // use JEC uncertainty from analysis tree
+      JetEnergyScaleSys * singleJES = new JetEnergyScaleSys(otree, TString("JES"));
+      singleJES->SetConfig(&cfg);
+      singleJES->SetBtagScaling(&inputs_btag_scaling_medium);
+      singleJES->SetJESUncertainties(jecUncertainties);
+      jetEnergyScaleSys.push_back(singleJES);
+	}
+
   }
 
 
@@ -532,8 +549,9 @@ int main(int argc, char * argv[]){
     AC1B analysisTree(_tree, isData);
 
 	// set AC1B for JES systematics
-	if (!isData && ApplySystShift && jetEnergyScaleSys !=0){
-		jetEnergyScaleSys->SetAC1B(&analysisTree);
+	if (!isData && ApplySystShift && jetEnergyScaleSys.size() >0){
+		for (unsigned int i=0; i<jetEnergyScaleSys.size(); i++)
+			(jetEnergyScaleSys.at(i))->SetAC1B(&analysisTree);
 	}
     
     Long64_t numberOfEntries = analysisTree.GetEntries();
@@ -1139,16 +1157,15 @@ int main(int argc, char * argv[]){
       if(!isData && ApplySystShift){
        zPtWeightSys->Eval(); 
        topPtWeightSys->Eval();
-       jetEnergyScaleSys->Eval();
+       for (unsigned int i=0; i<jetEnergyScaleSys.size(); i++)
+         (jetEnergyScaleSys.at(i)) ->Eval(); 
          if (ch=="mt") {
-           //tauScaleSys->Eval(utils::MUTAU);
            tauOneProngScaleSys->Eval(utils::MUTAU);
            tauOneProngOnePi0ScaleSys->Eval(utils::MUTAU);
            tauThreeProngScaleSys->Eval(utils::MUTAU);
            lepTauFakeScaleSys->Eval(utils::MUTAU);
          }
 	 else if (ch=="et") {
-           //tauScaleSys->Eval(utils::ETAU);
            tauOneProngScaleSys->Eval(utils::ETAU);
            tauOneProngOnePi0ScaleSys->Eval(utils::ETAU);
            tauThreeProngScaleSys->Eval(utils::ETAU);
@@ -1202,9 +1219,11 @@ int main(int argc, char * argv[]){
     delete topPtWeightSys;
   }
 
-  if(jetEnergyScaleSys != 0){
-    jetEnergyScaleSys->Write();
-    delete jetEnergyScaleSys;
+  if(jetEnergyScaleSys.size() >0 ){
+    for (unsigned int i=0; i<jetEnergyScaleSys.size(); i++){
+      (jetEnergyScaleSys.at(i))->Write();
+      delete jetEnergyScaleSys.at(i);
+    }
   }
 
   if(lepTauFakeScaleSys != 0){
