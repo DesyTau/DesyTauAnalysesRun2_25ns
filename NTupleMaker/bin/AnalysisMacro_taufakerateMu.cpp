@@ -249,6 +249,8 @@ int main(int argc, char * argv[]) {
 
   CutList.clear();
   CutList.push_back("No cut");
+  CutList.push_back("topPt");
+  CutList.push_back("ZPt");
   CutList.push_back("No cut after PU");
   CutList.push_back("METFilters");
   CutList.push_back("Trigger");
@@ -256,7 +258,6 @@ int main(int argc, char * argv[]) {
   CutList.push_back("tau");
   CutList.push_back("$mu-tau OS");
   CutList.push_back("Trigger eff");
-  CutList.push_back("topPtReweighting");
   CutList.push_back("LSF");
   CutList.push_back("gt 0 jets");
   CutList.push_back("Loose/Tight");
@@ -897,15 +898,6 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	  }
 	  
 
-/////////Matching ISR Jets
-
-	}
-
-/*	if (isGSfound) {
-	  //	  std::cout << "gamma* found : " << std::endl;
-	  if (removeGammaStar) continue;
-	}
-*/
 	if (isDY) {
 	  
 	  if (promptTausFirstCopy.size()==2) {
@@ -988,7 +980,6 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	     // cout<<"  "<<topPt<<"  "<<antitopPt<<"  "<<topptweight<<endl;
 	  }
 
-
       histTopPt->Fill(0.,topptweight);
 
 	}
@@ -1009,7 +1000,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	  weight *=zptmassweight;
 	}
 
-
+      }
 
     LooseCFCounter[iCutL]+= weight;
       TightCFCounter[iCutT]+= weight;

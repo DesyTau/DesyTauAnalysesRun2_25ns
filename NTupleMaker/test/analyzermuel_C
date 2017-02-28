@@ -146,13 +146,6 @@ void analyzer::Loop(){
 
 	string channel = "CHANNELHERE";
 
-	TString inputRootFile = "/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/CMSSW_8_0_20/src/DesyTauAnalyses/NTupleMaker/data/HIP_mediumID.root";
-	TFile * fileInHIP = new TFile(inputRootFile, "read");
-
-TGraphAsymmErrors * TGr_hip;
-TGr_hip = new TGraphAsymmErrors();
-TGr_hip = (TGraphAsymmErrors*)fileInHIP->Get("ratio_eta");
-
 
 	TString inputRootFile2 = "/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/CMSSW_8_0_20/src/DesyTauAnalyses/NTupleMaker/data/sf_mu_medium.root";
 
@@ -278,7 +271,6 @@ float met = -1.;
 
 if(muon_index>-1)			MuV.SetPtEtaPhiM(mu_pt[muon_index], mu_eta[muon_index], mu_phi[muon_index], muonMass);
 if(electron_index>-1)		ElV.SetPtEtaPhiM(el_pt[electron_index], el_eta[electron_index], el_phi[electron_index],electronMass);
-if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], ta_phi[taus_index], tauMass);
 
 
 
@@ -328,6 +320,7 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
 	
 
 		float trigw =   ( 17677*trig_weight_1 +   18188 * trig_weight_2)/float(35865.) ;
+		if (isSignal) trigw = trig_weight;
 		if (!isData) all_weights *= trigw;
 
 		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
@@ -351,8 +344,6 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
 		FastSF = histo->GetBinContent(ptN,etaN);
 	
 //	if (isSignal) all_weights *= FastSF;
-		double hip = TGr_hip->Eval(float(mu_eta[muon_index]));
-		//all_weights *= hip;
 
 
 		bool bqcd = false;

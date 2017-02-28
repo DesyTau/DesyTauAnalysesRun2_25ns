@@ -326,8 +326,8 @@ double xs,fact,fact2;
 float topPtWeight(float pt1,
 		  float pt2) {
 
-  float a = 0.156;    // Run1 a parameter
-  float b = -0.00137;  // Run1 b parameter
+  float a = 0.0615;    // Run1 a parameter
+  float b = -0.0005;  // Run1 b parameter
  //   float a =  0.159; //l+jets
  //   float b =  -0.00141;
   
@@ -340,41 +340,6 @@ float topPtWeight(float pt1,
   return TMath::Sqrt(w1*w2);
 
 }
-
-double TauFakeRateOld(float pt,float eta){
-
-float SF = 1;
-
-if (  fabs(eta) < 0.9 ) 
-	{
-		if (pt>20 && pt<30) SF = 1.12569;
-		if (pt>30 && pt<50) SF = 1.17716;
-		if (pt>50 && pt<60) SF = 1.1107;
-		if (pt>60 )	    SF = 0.929284;
-	}
-if (  fabs(eta) > 0.9 && fabs(eta) < 1.2 ) 
-	{
-
-		if (pt>20 && pt<30) SF = 1.12176;
-		if (pt>30 && pt<50) SF = 1.14511;
-		if (pt>50 && pt<60) SF = 1.13235;
-		if (pt>60 )	    SF = 0.803793;
-	}
-
-if (  fabs(eta) > 1.2 && fabs(eta) < 2.4 ) 
-	{
-
-		if (pt>20 && pt<30) SF = 1.19201;
-		if (pt>30 && pt<50) SF = 1.36684;
-		if (pt>50 && pt<60) SF = 0.822642;
-		if (pt>60 )	    SF = 0.935916;
-	}
-
-return SF;
-
-
-}
-
 
 
 //string CutList[20];

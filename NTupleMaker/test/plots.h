@@ -121,8 +121,7 @@ float SF = 1.;
 //80x MVAid
 
 if ( working_point == "MVA"){
-	{
-
+/*
 if (  fabs(eta) < 0.8 )
         {
                 if (pt>20 && pt<30) SF = 0.965212;
@@ -150,82 +149,37 @@ if (  fabs(eta) > 1.566 && fabs(eta) < 2.3 )
                 if (pt>30 && pt<40) SF = 1.0993;
                 if (pt>40) SF = 1.04831;
         }
+*/
+if (  fabs(eta) < 0.8 )
+        {
+                if (pt>20 && pt<30) SF = 1.10106;
+                if (pt>30 && pt<40) SF = 0.992874;
+                if (pt>40 ) SF = 0.856451;
+        }
+if (  fabs(eta) > 0.8 && fabs(eta) < 1.44 )
+        {
+
+                if (pt>20 && pt<30) SF = 1.1036;
+                if (pt>30 && pt<40) SF = 1.05988;
+                if (pt>40 ) SF = 0.746467;
+        }
+
+if (  fabs(eta) > 1.44 && fabs(eta) < 1.566 )
+        {
+
+                if (pt>20 && pt<40) SF = 0.98157;
+                if (pt>40) SF = 1.60851;
+        }
+if (  fabs(eta) > 1.566 && fabs(eta) < 2.3 )
+        {
+
+                if (pt>20 && pt<30) SF = 0.975276;
+                if (pt>30 && pt<40) SF = 0.384074;
+                if (pt>40) SF = 0.839173;
+        }
 
 }//mutau MVA
 
-
-}
-
-
-
-//CutBased
-if (working_point == "CutBased" ){
-
-	if (sel =="eltau"){
-
-if (  fabs(eta) < 1.48 ) 
-	{
-		if (pt>20 && pt<30) SF = 1.125;
-		if (pt>30 && pt<50) SF = 1.75138;
-		if (pt>50 ) SF = 2.02406;
-	}
-if (  fabs(eta) > 1.48 && fabs(eta) < 2.1 ) 
-	{
-
-		if (pt>20 && pt<30) SF = 1.06778;
-		if (pt>30 && pt<50) SF = 1.36354;
-		if (pt>50 ) SF = 1.91359;
-	}
-
-if (  fabs(eta) > 2.1 && fabs(eta) < 2.4 ) 
-	{
-
-		if (pt>20 && pt<30) SF = 0.856469;
-		if (pt>30 && pt<50) SF = 1.28117;
-		if (pt>60) SF = 1.80822;
-	}
-	
-}//eltau CutBased
-
-
-if (sel == "mutau"){
-
-	if (  fabs(eta) < 0.9 )
-        {
-                if (pt>20 && pt<30) SF = 0.921993;
-                if (pt>30 && pt<50) SF = 1.06514;
-                if (pt>50 ) SF = 1.44677;
-        }
-if (  fabs(eta) > 0.9 && fabs(eta) < 1.2 )
-        {
-
-                if (pt>20 && pt<30) SF = 1.16935;
-                if (pt>30 && pt<50) SF = 1.38829;
-                if (pt>50 ) SF = 1.016;
-        }
-
-if (  fabs(eta) > 1.2 && fabs(eta) < 2.1 )
-	{
-
-
-		if (pt>20 && pt<30) SF = 1.0466;
-		if (pt>30 && pt<50) SF = 1.10949;
-		if (pt>50) SF = 1.265;
-	}
-if (  fabs(eta) > 2.1 && fabs(eta) < 2.4 )
-	{
-
-		if (pt>20 && pt<30) SF = 1.1374;
-		if (pt>30 && pt<50) SF = 0.859957;
-		if (pt>50) SF = 0.584229;
-	}
-
-}//mutau CutBased
-
-
-}//CutBased
-
-//cout<<" working point "<<working_point<<"  "<<sel<<"  "<<pt<<"  "<<eta<<"  "<<SF<<endl;
 
 return SF;
 

@@ -57,19 +57,19 @@ void analyzer::Loop(){
 	CutList.push_back("Lepton SF");
 	CutList.push_back("Tau-id");
 	CutList.push_back("TauFakeRate");
-	CutList.push_back("ElTauFakeRate");
-	CutList.push_back("MET recoil");
-	CutList.push_back("ZpT correction");
+	CutList.push_back("LeptonTauFakeRate");
+	CutList.push_back("METrecoil");
+	CutList.push_back("ZpTcorrection");
 	CutList.push_back("topPtRwgt");
-	CutList.push_back("Jets gt 1 ");
-	CutList.push_back("0 btag");
-	CutList.push_back("MT window");
-	CutList.push_back("Cuts");
-	CutList.push_back("Cuts2");
+	CutList.push_back("Jets<2");
+	CutList.push_back("btag=0");
+	CutList.push_back("MTwindow");
+	CutList.push_back("SRCuts");
+	CutList.push_back("JetsCuts");
 	CutList.push_back("StauCuts");
-	CutList.push_back("MET gt 20");
-	CutList.push_back("MET gt 30");
-	CutList.push_back("MET gt 40");
+	CutList.push_back("MET>20");
+	CutList.push_back("MET>30");
+	CutList.push_back("MET>40");
 	CutList.push_back("MTsum>120");
 
 	//ChiMass = CHIMASSS;
@@ -114,7 +114,8 @@ void analyzer::Loop(){
 	cout <<"  "<<cut.c_str()<<endl;
 	char plots_[100];
 	string data = "Single";
-	string tt = "TT_TuneCUETP8M1_13TeV-powheg-pythia8";
+	string tt = "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8";
+	string ttw = "TTWJetsToLNu";
 	string wj = "WJetsToLNu";
 	string wj1 = "W1JetsToLNu";
 	string wj2 = "W2JetsToLNu";
@@ -135,11 +136,12 @@ void analyzer::Loop(){
 	if (string::npos != old.find(signalC1)) isSignal= true;
 	if (string::npos != old.find(tt)) isTT= true;
 	if (string::npos != old.find(wj)) isWJ= true;
+	if (string::npos != old.find(ttw)) isWJ= false;
 	if (string::npos != old.find(dyj)) isDY= true;
 	if (string::npos != old.find(dyjhigh)) isDYhigh= true;
 	if (string::npos != old.find(dyjlow) || string::npos != old.find(dyjlow2)) isDYlow= true;
 	if (string::npos != old.find(dyj1) || string::npos != old.find(dyj2) || string::npos != old.find(dyj3) || string::npos != old.find(dyj4)) isDYNJ = true;
-	if (string::npos != old.find(wj1) || string::npos != old.find(wj2) || string::npos != old.find(wj3) || string::npos != old.find(wj4)) isWNJ= true;
+	if ((string::npos != old.find(wj1) || string::npos != old.find(wj2) || string::npos != old.find(wj3) || string::npos != old.find(wj4)) && string::npos == old.find(ttw)) isWNJ= true;
 	isNJ = isDYNJ && isWNJ;
 	
 	if (isSignal) cout<<" YOU HAVE FOUND ITTTTTTTTT "<<endl;
@@ -147,10 +149,10 @@ void analyzer::Loop(){
 
 	string channel = "CHANNELHERE";
 
+	TString fileinName = "/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/New8025/CMSSW_8_0_25/src/DesyTauAnalyses/NTupleMaker/test/CHANNELHERE/FILEIN";
+	if (systematic == "JetEnUp" || systematic == "JetEnDown"  || systematic == "UnclEnDown" || systematic == "UnclEnDown" || systematic == "TauEnUp" || systematic == "TauEnDown" || systematic == "ElEnUp" || systematic == "ElEnDown" || systematic == "MuEnUp" || systematic == "MuEnDown") 
+	{fileinName ="/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/New8025/CMSSW_8_0_25/src/DesyTauAnalyses/NTupleMaker/test/CHANNELHERE_"+systematic+"/FILEIN";}
 
-	TString fileinName = "/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/CMSSW_8_0_20/src/DesyTauAnalyses/NTupleMaker/test/CHANNELHERE/FILEIN";
-	if (systematic == "JetEnUp" || systematic == "JetEnDown" || systematic == "UnclEnDown" || systematic == "UnclEnDown" || systematic == "TauEnUp" || systematic == "TauEnDown" || systematic == "ElEnUp" || systematic == "ElEnDown" || systematic == "MuEnUp" || systematic == "MuEnDown") 
-	{fileinName ="/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/CMSSW_8_0_20/src/DesyTauAnalyses/NTupleMaker/test/CHANNELHERE_"+systematic+"/FILEIN";}
 
 
 	TFile * filein = new TFile(fileinName,"read");
@@ -323,16 +325,6 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
 		double etaEl1 = (double)el_eta[electron_index];
 	
 
-		//string tID="CutBased_Medium";
-		string tID="MVA_Tight";
-		double tauId = TauiD(channel,tID);
-		//if (genTauMatched>0.5 && genLeptonMatched < 0.5 && !isData) all_weights *= tauId;
-		if (genTauMatched>0.5 && genLeptonMatched < 0.5 && !isData) all_weights *= 0.9;
-		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
-		CFCounter[iCut]+= all_weights;
-		CFCounter_[iCut]+= all_weights;
-                iCFCounter[iCut]++;
-		iCut++;
 /*
 		double ptN=0;double etaN=0;double FastSF=0;
 
@@ -342,23 +334,58 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
 
 	if (isSignal) all_weights *= FastSF;
 */
+/////////////////////////////////////////////////////////////////////////////////////////////////
 
-		//ChargedIso CutBased MVA
-		string WP = "MVA";
-		double tfr  = TauFakeRate(ptTau1,etaTau1,channel,WP);
-		if (genTauMatched<0.5 && genLeptonMatched < 0.5 && genTauDecayedElMatched <0.5 && !isData) all_weights *= tfr;
+		bool isRealTau  = (genTauMatched>0.5 && !isData) ;
+		bool isMuPromptLepton =  (genLeptonMatchedPromptMu >0.5 && genLeptonMatchedPromptEl<0.5 && !isData);
+		bool isElPromptLepton =  (genLeptonMatchedPromptEl >0.5 && genLeptonMatchedPromptMu<0.5 && !isData);
+
+		bool isMuFromTau =  (genMuMatchedToTauDecay > 0.5 && !isData);
+
+		bool isfakeTauFromPromptLepton = matchedTauToPromptEl>0.5 || matchedTauToPromptMu >0.5 ;
+	
+		bool isfakeTauFromJet = genTauMatched<0.5 && !isfakeTauFromPromptLepton ;
+		bool isfakeTauFromHadron = matchedTauToMuHadronDec > 0.5 || matchedTauToElHadronDec > 0.5;
+		
+		if (isfakeTauFromHadron) isfakeTauFromJet = true;
+
+		bool isfakeTauFromMu =  ( genTauMatched < 0.5 && matchedTauToPromptMu > 0.5 && !isfakeTauFromJet && !isData) ;
+		bool isfakeTauFromEl =  ( genTauMatched < 0.5 && matchedTauToPromptEl > 0.5 && !isfakeTauFromJet && !isData) ;
+	
+
+		bool isfakeMuFromGluon =  ( genLeptonMatchedGluon >0.5 && !isData) ;
+		bool isfakeMuFromHFQ =  (  genLeptonMatchedHFQ >0.5 && !isData) ;
+		bool isfakeMuFromLFQ =  (  genLeptonMatchedLFQ >0.5 && !isData) ;
+
+
+		string tID="MVA_Tight";
+		double tauId = TauiD(channel,tID);
+		if (isRealTau && !isData) all_weights *= 0.95;
+		
                 FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
 		CFCounter[iCut]+= all_weights;
 		CFCounter_[iCut]+= all_weights;
                 iCFCounter[iCut]++;
 		iCut++;
 
-		double tfrel  = ElectronFakeRate(ptEl1,etaEl1);
-		double tfrmu  = MuonFakeRate(ptEl1,etaEl1);
-		//if (genTauMatched<0.5 && genLeptonMatchedEl > 0.5 && genTauDecayedElMatched < 0.5 && !isData) all_weights *= tfrel;
 
-		if ( (genLeptonMatched > 0.5 && genTauDecayedMuMatched > 0.5 && genTauDecayedElMatched < 0.5) && !isData) all_weights *= tfrmu;
-		if ( (genLeptonMatched > 0.5 && genTauDecayedElMatched > 0.5 && genTauDecayedMuMatched < 0.5) && !isData) all_weights *= tfrel;
+		string WP = "MVA";
+		double tfr  = TauFakeRate(ptTau1,etaTau1,channel,WP);
+		if (!isRealTau && isfakeTauFromJet  && !isData) all_weights *= tfr;
+		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
+		CFCounter[iCut]+= all_weights;
+		CFCounter_[iCut]+= all_weights;
+                iCFCounter[iCut]++;
+		iCut++;
+
+		//reco tau to matched genmu but not matched tau which is decayed hadronically or electron
+
+		double tfrmu  = MuonFakeRate(ptEl1,etaEl1);
+		double tfrel  = ElectronFakeRate(ptEl1,etaEl1);
+
+
+		if ( !isRealTau && isfakeTauFromMu  && !isfakeTauFromEl && !isData) all_weights *= tfrmu;
+		if ( !isRealTau && isfakeTauFromEl  && !isfakeTauFromMu && !isData) all_weights *= tfrel;
 		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
 		CFCounter[iCut]+= all_weights;
 		CFCounter_[iCut]+= all_weights;

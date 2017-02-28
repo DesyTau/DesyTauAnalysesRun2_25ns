@@ -223,20 +223,6 @@ int main(int argc, char * argv[]) {
 
   const double bTag   = cfg.get<double>("bTag");
 
-  CutList.clear();
-  CutList.push_back("No cut");
-  CutList.push_back("No cut after PU");
-  CutList.push_back("mu-el");
-  CutList.push_back("2nd lepV");
-  CutList.push_back("3rd lepV");
-  CutList.push_back("Trigger");
-  CutList.push_back("Lepton SF");
-  CutList.push_back("topPtRwgt");
-  CutList.push_back("Cleaned jets");
-  CutList.push_back("b-Veto");
-
-
-  int CutNumb = (int)CutList.size();
   xs=1;fact=1;fact2=1;
 
   unsigned int RunMin = 9999999;
@@ -244,31 +230,6 @@ int main(int argc, char * argv[]) {
 
   ifstream ifs("xsecs");
   string line;
-/*
-  while(std::getline(ifs, line)) // read one line from ifs
-    {
-
-      fact=fact2=1;
-      istringstream iss(line); // access line as a stream
-
-      // we only need the first two columns
-      string dt;
-      iss >> dt >> xs >> fact >> fact2;
-      //datasetName = dt.c_str();
-      //ifs >> dt >> xs; // no need to read further
-      //cout<< " "<<dt<<"  "<<endl;
-      //cout<< "For sample ========================"<<dt<<" xsecs is "<<xs<<" XSec "<<XSec<<"  "<<fact<<"  "<<fact2<<endl;
-      if (  dt == argv[2]) {
-	XSec= xs*fact*fact2;
-	cout<<" Found the correct cross section "<<xs<<" for Dataset "<<dt<<" XSec "<<XSec<<" number of expected events for Lumi "<<Lumi <<" /pb  = " <<XSec*Lumi<<endl;
-      }
-      
-      
-      if (isData) XSec=1.;
-    }
-
-  if (XSec<0&& !isData) {cout<<" Something probably wrong with the xsecs...please check  - the input was "<<argv[2]<<endl;XSec = 1;}*/
-
 
       XSec=1.;
    xsecs=XSec;
@@ -284,12 +245,24 @@ int main(int argc, char * argv[]) {
 
   std::string rootFileName(argv[2]);
   std::string NrootFile(argv[4]);
-  //std::ifstream fileList(argv[2]);
   std::ifstream fileList(ff);
-  //std::ifstream fileList0(argv[2]);
   std::ifstream fileList0(ff);
   std::string ntupleName("makeroottree/AC1B");
   std::string initNtupleName("initroottree/AC1B");
+
+  int nTotalFiles = 0;
+
+  string SaveDir=argv[3];
+
+  if (string::npos == Systematic.find("Nominal")) {SaveDir.append("_");SaveDir.append(argv[5]);}
+
+  TString TStrName(rootFileName+"_"+Region+"_"+Sign);
+  datasetName = rootFileName.c_str();
+  std::cout <<" The filename will be "<<TStrName <<"  "<<datasetName<<"  The systematic will be "<<Systematic<<"  and save dir will be  "<<SaveDir<<endl;
+
+
+
+if (string::npos != datasetName.find("SMS-") || string::npos != datasetName.find("stau") || string::npos != datasetName.find("C1")) SUSY = true;
 
 
   // qcd weight (dzeta cut)
@@ -298,10 +271,6 @@ int main(int argc, char * argv[]) {
 QCDModelForEMu qcdWeightNoDzeta("HTT-utilities/QCDModelingEMu/data/QCD_weight_emu_nodzeta.root");
 
 
-  string era=argv[3];
-
-if (string::npos != rootFileName.find("SMS-") || string::npos != rootFileName.find("stau") || string::npos != rootFileName.find("C1"))
-	SUSY = true;
 
 // PU reweighting
   PileUp * PUofficial = new PileUp();
@@ -312,18 +281,22 @@ if (string::npos != rootFileName.find("SMS-") || string::npos != rootFileName.fi
   PUofficial->set_h_data(PU_data);
   PUofficial->set_h_MC(PU_mc);
 
-  string BtagCVS ;
-  if (SUSY) BtagCVS = "fastsim_csvv2_ttbar_26_1_2017.csv" ;
-	else BtagCVS = "CSVv2Moriond17_2017_1_26_BtoH.csv" ;  
+
+ string BtagCVS = "CSVv2Moriond17_2017_1_26_BtoH.csv" ;  
+  if (SUSY) BtagCVS = "fastsim_csvv2_ttbar_26_1_2017.csv";
 
   BTagCalibration calib("csvv2", cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/"+BtagCVS);
+
 
   BTagCalibrationReader reader_B(BTagEntry::OP_MEDIUM,"central");
   BTagCalibrationReader reader_C(BTagEntry::OP_MEDIUM,"central");
   BTagCalibrationReader reader_Light(BTagEntry::OP_MEDIUM,"central");
-  reader_B.load(calib,BTagEntry::FLAV_B,"comb");
+  if (!SUSY){reader_B.load(calib,BTagEntry::FLAV_B,"comb");
   reader_C.load(calib,BTagEntry::FLAV_C,"comb");
-  reader_Light.load(calib,BTagEntry::FLAV_UDSG,"incl");
+  reader_Light.load(calib,BTagEntry::FLAV_UDSG,"incl");}
+  if (SUSY){reader_B.load(calib,BTagEntry::FLAV_B,"fastsim");
+  reader_C.load(calib,BTagEntry::FLAV_C,"fastsim");
+  reader_Light.load(calib,BTagEntry::FLAV_UDSG,"fastsim");}
 
 
   float etaBTAG[2] = {0.5,2.1};
@@ -392,53 +365,11 @@ SF_electronIdIso0p1->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(Electro
 
   cout<<" ended initialization here "<<endl;
 
-  int nTotalFiles = 0;
-
-
-  if (string::npos == Systematic.find("Nominal")) {era.append("_");era.append(argv[5]);}
-
-  TString TStrName(rootFileName+"_"+Region+"_"+Sign);
-  datasetName = rootFileName.c_str();
-  std::cout <<" The filename will be "<<TStrName <<"  "<<datasetName<<"  The systematic will be "<<Systematic<<"  and save dir will be  "<<era<<endl;
-  // output fileName with histograms
-
-std::string st1,st2;
-
-//SMS-TChiSlepSnu_x0p5_TuneCUETP8M1_13TeV-madgraphMLM-pythia8   SMS-TChiStauStau_x0p5_TuneCUETP8M1_13TeV-madgraphMLM-pythia8  SMS-TStauStau_TuneCUETP8M1_13TeV-madgraphMLM-pythia8
-
-if (string::npos != rootFileName.find("SMS-") || string::npos != rootFileName.find("stau") || string::npos != rootFileName.find("C1"))
-	{
-	//st1 =  rootFileName.substr(4,3);
-	//SusyMotherMassF = stof(argv[5]);
-	//st1=string(argv[5]);
-	//st2 =  rootFileName.substr(11);
-	//st2=string(argv[6]);
-	//SusyLSPMassF = stof(argv[6]);
-	SUSY = true;
-	  std::cout <<" SUSY "<< " SusyMotherMassF= "<<SusyMotherMassF <<" SusyLSPMassF= "<<SusyLSPMassF <<std::endl;  
-	}
-/*
-if (string::npos != rootFileName.find("SMS-TChiStauStau"))
-	{
-	st1 =  rootFileName.substr(5,3);
-	SusyMotherMassF = stof(st1);
-	st2 =  rootFileName.substr(12);
-	SusyLSPMassF = stof(st2);
-	SUSY = true;
-	  std::cout <<" SUSY "<< " SusyMotherMassF= "<<SusyMotherMassF <<" SusyLSPMassF= "<<SusyLSPMassF <<std::endl;  
-	}
-*/
 
 
   TFile * file;
-  if (isData) file = new TFile(era+"/"+TStrName+TString("_DataDriven.root"),"update");
-  if (!isData) file = new TFile(era+"/"+TStrName+TString(".root"),"update");
- /* if (SUSY)
-	{  
-	TString TStrNameS(rootFileName+invMuStr+invTauStr+invMETStr+"_"+Region+"_"+Sign+"_"+st1+"_"+st2);
-	file = new TFile(era+"/"+TStrNameS+TString(".root"),"update");
-
-	}*/
+  if (isData) file = new TFile(SaveDir+"/"+TStrName+TString("_DataDriven.root"),"update");
+  if (!isData) file = new TFile(SaveDir+"/"+TStrName+TString(".root"),"update");
   file->mkdir(Channel.c_str());
   file->cd(Channel.c_str());
 
@@ -452,10 +383,8 @@ if (string::npos != rootFileName.find("SMS-TChiStauStau"))
   std::string dummy;
   // count number of files --->
   while (fileList0 >> dummy) nTotalFiles++;
-  //string treename = rootFileName+"_tree.root";
   
   SetupTree(); 
-  SetupHists(CutNumb); 
 
   if (argv[4] != NULL  && atoi(argv[4])< nTotalFiles) nTotalFiles=atoi(argv[4]);
  
@@ -466,20 +395,7 @@ for (int iF=0; iF<nTotalFiles; ++iF) {
 
     std::cout << "file " << iF+1 << " out of " << nTotalFiles << " filename : " << filen << std::endl;
 //////////// for SUSY!!!
-//if (SUSY){
-//if (iF+1 != nTotalFiles) continue;}
     TFile * file_ = TFile::Open(TString(filen));
-
-/*    TH1D * histoInputEvents = NULL;
-    histoInputEvents = (TH1D*)file_->Get("makeroottree/nEvents");
-    if (histoInputEvents==NULL) continue;
-    int NE = (int)histoInputEvents->GetEntries();
-    for (int iE=0;iE<NE;++iE)
-      inputEventsH->Fill(0.);
-
-    std::cout << "      number of input events         = " << NE << std::endl;
-*/
-
 
 bool WithInit = true;
 if (SUSY) WithInit=false;
@@ -502,8 +418,6 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       _inittree->GetEntry(iEntry);
       if (isData)
 	histWeightsH->Fill(0.,1.);
-      //else
-      //histWeightsH->Fill(0.,genweight);
     }
 
 
@@ -516,35 +430,24 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
     AC1B analysisTree(_tree);
 
 	if (!isData && !WithInit)
-	//if (!isData)
 		{    
 		for (Long64_t iEntry=0; iEntry<numberOfEntries; ++iEntry) 
 			{
 			analysisTree.GetEntry(iEntry);
-		/*	if (SUSY)
-			{
-			if (!(SusyMotherMassF < (analysisTree.SusyMotherMass+1) && SusyMotherMassF > (analysisTree.SusyMotherMass - 1) 
-			&& SusyLSPMassF <(analysisTree.SusyLSPMass + 1) && SusyLSPMassF > (analysisTree.SusyLSPMass - 1))) continue;
-			}*/
 			histWeightsH->Fill(0.,analysisTree.genweight);
 			}
 		}
   	float genweights=1.;
+    if(!isData && WithInit) 
+      {
 
 	TTree *genweightsTree = (TTree*)file_->Get("initroottree/AC1B");
 	genweightsTree->SetBranchAddress("genweight",&genweights);
 
-    if(!isData && WithInit) 
-      {
 
 	Long64_t numberOfEntriesInit = genweightsTree->GetEntries();
 	for (Long64_t iEntryInit=0; iEntryInit<numberOfEntriesInit; ++iEntryInit) { 
 	  genweightsTree->GetEntry(iEntryInit);
-	/*		if (SUSY)
-			{
-			if (!(SusyMotherMassF < (analysisTree.SusyMotherMass+1) && SusyMotherMassF > (analysisTree.SusyMotherMass - 1) 
-			&& SusyLSPMassF <(analysisTree.SusyLSPMass + 1) && SusyLSPMassF > (analysisTree.SusyLSPMass - 1))) continue;
-			}*/
 	  histWeightsH->Fill(0.,genweights);
 	}
     
@@ -559,11 +462,6 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       Float_t puweight = 1;
       Float_t topptweight = 1;
       analysisTree.GetEntry(iEntry);
-/*	if (SUSY)
-		{
-		if (!(SusyMotherMassF < (analysisTree.SusyMotherMass+1) && SusyMotherMassF > (analysisTree.SusyMotherMass - 1) 
-		&& SusyLSPMassF <(analysisTree.SusyLSPMass + 1) && SusyLSPMassF > (analysisTree.SusyLSPMass - 1))) continue;
-		}*/
       nEvents++;
 
       //std::cout << "      number of entries in Tree = " << numberOfEntries <<" starting weight "<<weight<< std::endl;
@@ -1127,13 +1025,8 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	std::cout << "HLT filter " << Mu23Ele12DZ << " not found" << std::endl;
 	exit(-1);
       }
-
-      if (RunNo > 278820-1 && !isMu8Ele23DZ) {
-	std::cout << "HLT filter " << Mu8Ele23DZ << " not found" << std::endl;
-	exit(-1);
       }
 
-      }
 
 	
 
@@ -1168,7 +1061,6 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
 
       if (muons.size()==0) continue;
-      // selecting muon and electron pair (OS or SS);
 
       int el_index=-1;
       int mu_index=-1;
@@ -1199,6 +1091,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	neutralIsoMu = TMath::Max(float(0),neutralIsoMu); 
 	float absIsoMu = chargedHadIsoMu + neutralIsoMu;
 	float relIsoMu = absIsoMu/analysisTree.muon_pt[mIndex];
+
 	if (!SUSY){
 	for (unsigned int iT=0; iT<analysisTree.trigobject_count; ++iT) {
 	  float dRtrig = deltaR(analysisTree.muon_eta[mIndex],analysisTree.muon_phi[mIndex],
@@ -1253,17 +1146,14 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	  }
 	}//SUSY
 	  
-	  //	  std::cout << "Trigger match = " << trigElMatch << std::endl;
-	
-	  if (!SUSY && analysisTree.electron_pt[eIndex]>ptElectronHighCut) isEle23 = true;
-	  if (!SUSY && analysisTree.electron_pt[eIndex]>ptElectronLowCut) isEle12 = true;
+	  if (SUSY && analysisTree.electron_pt[eIndex]>ptElectronHighCut) isEle23 = true;
+	  if (SUSY && analysisTree.electron_pt[eIndex]>ptElectronLowCut) isEle12 = true;
 	  bool trigMatchA = (isMu23 && isEle12) ;
 	  bool trigMatchB = (isMu8 && isEle23);
 
 	  if (applyTriggerMatch && !isEle23 && !isEle12) continue;
 
 	  if (!trigMatchA && !trigMatchB) continue;
-
 
 	  float neutralHadIsoEle = analysisTree.electron_neutralHadIso[eIndex];
 	  float photonIsoEle = analysisTree.electron_photonIso[eIndex];
@@ -1324,7 +1214,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	}
       }
 
-        //    cout << "mIndex = " << mu_index << "   eIndex = " << el_index << std::endl;
+       //     cout << "mIndex = " << mu_index << "   eIndex = " << el_index << std::endl;
 
       if ((int)el_index<0) continue;
       if ((int)mu_index<0) continue;

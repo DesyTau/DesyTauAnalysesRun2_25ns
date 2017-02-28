@@ -111,7 +111,7 @@ void analyzer::Loop(){
 	string wj2 = "W2JetsToLNu";
 	string wj3 = "W3JetsToLNu";
 	string wj4 = "W4JetsToLNu";
-	string dyj = "DYJetsToLL";
+	string dyj = "JetsToLL_M";
 	string dyjhigh = "DYJetsToLL_M-50";
 	string dyjlow = "DYJetsToLL_M-5to";
 	string dyjlow2 = "DYJetsToLL_M-10to";

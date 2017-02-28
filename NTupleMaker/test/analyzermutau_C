@@ -57,7 +57,7 @@ void analyzer::Loop(){
 	CutList.push_back("LeptonSF");
 	CutList.push_back("Tau-id");
 	CutList.push_back("TauFakeRate");
-	CutList.push_back("MuTauFakeRate");
+	CutList.push_back("LeptonTauFakeRate");
 	CutList.push_back("METrecoil");
 	CutList.push_back("ZpTcorrection");
 	CutList.push_back("topPtRwgt");
@@ -162,6 +162,18 @@ key = (TKey *) nextkey ();
 TObject *obj = key->ReadObj ();
 TH2D *histo = (TH2D*) obj;
 
+/*
+	TString inputRootTracking = "/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/CMSSW_8_0_20/src/DesyTauAnalyses/NTupleMaker/data/Tracking_EfficienciesAndSF_BCDEFGH.root";
+	TFile * fileInTracking = new TFile(inputRootTracking, "read");
+
+	  TGraphAsymmErrors * TGr_track;
+	  TGr_track = new TGraphAsymmErrors();
+	  TGr_track = (TGraphAsymmErrors*)fileInTracking->Get("ratio_eff_eta3_dr030e030_corr");
+*/
+
+
+
+
 	TString fileinName = "/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/New8025/CMSSW_8_0_25/src/DesyTauAnalyses/NTupleMaker/test/CHANNELHERE/FILEIN";
 	if (systematic == "JetEnUp" || systematic == "JetEnDown"  || systematic == "UnclEnDown" || systematic == "UnclEnDown" || systematic == "TauEnUp" || systematic == "TauEnDown" || systematic == "ElEnUp" || systematic == "ElEnDown" || systematic == "MuEnUp" || systematic == "MuEnDown") 
 	{fileinName ="/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/New8025/CMSSW_8_0_25/src/DesyTauAnalyses/NTupleMaker/test/CHANNELHERE_"+systematic+"/FILEIN";}
@@ -174,7 +186,7 @@ TH2D *histo = (TH2D*) obj;
 	if (isTT) histTop = (TH1D*)filein->Get("mutau/histTopPt");
 	if (isTT && systematic == "TopPtUp" ) histTopSq = (TH1D*)filein->Get("mutau/histTopPtSq");
 	
-	TH1D * CutFlow = (TH1D*)filein->Get("mutau/CutFlowUnW");
+	//TH1D * CutFlow = (TH1D*)filein->Get("mutau/CutFlowUnW");
 	TFile * file = new TFile("plots.root","recreate");
 
 	//cout<<"  "<<old<<"  "<<datasetName->c_str()<<"  "<<hist_<<"  "<<CutFlow->GetName()<<"  "<<CutFlow->GetBinContent(1)<<endl;
@@ -299,7 +311,7 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
 		if (JetsMV.size()>0)
      		dPhiJM=dPhiFrom2P( JetsMV.at(0).Px(), JetsMV.at(0).Py(), METV.Px(),  METV.Py() );
 
-		if (JetsMV.size()>0 && TMath::Cos(dPhiJM)>0.9) continue;
+		//if (JetsMV.size()>0 && TMath::Cos(dPhiJM)>0.9) continue;
 
 		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
 		CFCounter[iCut]+= all_weights;
@@ -345,7 +357,13 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
 		ptN = histo->GetXaxis()->FindBin(mu_pt[muon_index]);
 		etaN = histo->GetYaxis()->FindBin(fabs(mu_eta[muon_index]));
 		FastSF = histo->GetBinContent(ptN,etaN);
-	
+
+/*
+		int binNumber = TGr_track->GetXaxis()->FindBin(mu_eta[muon_index]);
+		float trackSF = TGr_track->GetXaxis()->GetBinContent(binNumber);
+
+		if (!isData) all_weights *=trackSF;
+*/	
 //	if (isSignal) all_weights *= FastSF;
 //////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
@@ -372,7 +390,6 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
 		bool isfakeMuFromLFQ =  (  genLeptonMatchedLFQ >0.5 && !isData) ;
 
 
-		//string tID="CutBased_Medium";
 		string tID="MVA_Tight";
 		double tauId = TauiD(channel,tID);
 		if (isRealTau && !isData) all_weights *= 0.95;
