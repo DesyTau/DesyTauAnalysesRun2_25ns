@@ -22,27 +22,38 @@ public:
     void Init(){
 		// e->tau fake rates
 		// Scale Factor values corresponding to eta<1.46, 1.46<eta<1.558, eta>1.558
-		std::vector<float> FakeRates_VLoose_ele = {1.292, 1., 1.536}; 
+
+		// ICHEP 2016 dataset
+		/*std::vector<float> FakeRates_VLoose_ele = {1.292, 1., 1.536}; 
 		std::vector<float> FakeRates_Loose_ele =  {1.431, 1., 1.722}; 
 		std::vector<float> FakeRates_Medium_ele = {1.549, 1., 1.678}; 
 		std::vector<float> FakeRates_Tight_ele =  {1.505, 1., 1.994}; 
-		std::vector<float> FakeRates_VTight_ele = {1.420, 1., 2.017}; 
+		std::vector<float> FakeRates_VTight_ele = {1.420, 1., 2.017}; */		
+
+		// full 2016 dataset
+		// no number available for loose and very loose. Set to 1. 
+		std::vector<float> FakeRates_VLoose_ele = {1., 1., 1.}; 
+		std::vector<float> FakeRates_Loose_ele =  {1., 1., 1.}; 
+		std::vector<float> FakeRates_Medium_ele = {1.648, 1., 1.241}; 
+		std::vector<float> FakeRates_Tight_ele =  {1.867, 1., 1.456}; 
+		std::vector<float> FakeRates_VTight_ele = {1.967, 1., 1.401}; 
 		ETAUfakerates.insert(std::make_pair("VLoose", FakeRates_VLoose_ele));
 		ETAUfakerates.insert(std::make_pair("Loose",  FakeRates_Loose_ele));
 		ETAUfakerates.insert(std::make_pair("Medium", FakeRates_Medium_ele));
 		ETAUfakerates.insert(std::make_pair("Tight",  FakeRates_Tight_ele));
-		ETAUfakerates.insert(std::make_pair("VTight", FakeRates_VTight_ele));		
+		ETAUfakerates.insert(std::make_pair("VTight", FakeRates_VTight_ele));
+
 	
 		// mu->tau fake rates
 	    // Scale Factor values corresponding to eta={0, 0.4, 0.8, 1.2, 1.7, >1.7} 
-		/* ICHEP dataset numbers
-		std::vector<float> FakeRates_Loose_mu = {1.137, 1.067, 1.221, 1.460, 1.609};
-		std::vector<float> FakeRates_Tight_mu = {1.418, 1.134, 1.260, 1.660, 1.205};
-		MUTAUfakerates.insert(std::make_pair("Loose", FakeRates_Tight_mu));
-		MUTAUfakerates.insert(std::make_pair("Tight", FakeRates_Loose_mu));*/			
+			
 		// full 2016 from Artur
-		std::vector<float> FakeRates_Loose_mu = {1.09, 1.05, 1.1, 1.03, 1.2};
-		std::vector<float> FakeRates_Tight_mu = {1.37, 1.2, 1.14, 1.0, 1.8};
+		/*std::vector<float> FakeRates_Loose_mu = {1.09, 1.05, 1.1, 1.03, 1.2};
+		std::vector<float> FakeRates_Tight_mu = {1.37, 1.2, 1.14, 1.0, 1.8};*/
+
+		// full 2016 from Yiwen on 28.02.17
+		std::vector<float> FakeRates_Loose_mu = {1.012, 1.007, 0.870, 1.154, 2.281};
+		std::vector<float> FakeRates_Tight_mu = {1.263, 1.364, 0.854, 1.712, 2.324};
 		MUTAUfakerates.insert(std::make_pair("Loose", FakeRates_Loose_mu));
 		MUTAUfakerates.insert(std::make_pair("Tight", FakeRates_Tight_mu));			
 	}
