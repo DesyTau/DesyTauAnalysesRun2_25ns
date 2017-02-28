@@ -1317,7 +1317,6 @@ bool isGoodLumi(int run, int lumi, const lumi_json& json){
 
 //fill the otree with the weights
 void fill_weight(const AC1B * analysisTree, Spring15Tree *otree, PileUp *PUofficial, bool isData){
-  float xs = -1.;
   
   otree->mcweight = 1.;
   otree->pu_weight = 0;
@@ -1327,7 +1326,6 @@ void fill_weight(const AC1B * analysisTree, Spring15Tree *otree, PileUp *PUoffic
 
   otree->pu_weight = float(PUofficial->get_PUweight(double(analysisTree->numtruepileupinteractions)));
 
-  otree->xs = xs;
   otree->trigweight_1 = 0;
   otree->trigweight_2 = 1;
   otree->idisoweight_1 = 0;
@@ -1336,9 +1334,6 @@ void fill_weight(const AC1B * analysisTree, Spring15Tree *otree, PileUp *PUoffic
   otree->idisoweight_antiiso_1 = 0;
   otree->trkeffweight_1=1;
   otree->effweight = 0;
-  //otree->fakeweight = 0;
-  otree->embeddedWeight = 0;
-  otree->signalWeight = 0;
   otree->weight = 1;
   otree->lheHt = analysisTree->genparticles_lheHt;
   otree->gen_noutgoing = analysisTree->genparticles_noutgoing;
@@ -1428,20 +1423,6 @@ void FillMuTau(const AC1B * analysisTree, Spring15Tree *otree, int leptonIndex, 
 	otree->d0_1 = analysisTree->muon_dxy[leptonIndex];
 	otree->dZ_1 = analysisTree->muon_dz[leptonIndex];
 
-	otree->byCombinedIsolationDeltaBetaCorrRaw3Hits_1 = 0;
-	otree->byLooseCombinedIsolationDeltaBetaCorr3Hits_1 = 0;
-	otree->byMediumCombinedIsolationDeltaBetaCorr3Hits_1 = 0;
-	otree->byTightCombinedIsolationDeltaBetaCorr3Hits_1 = 0;
-	otree->againstElectronLooseMVA5_1 = 0;
-	otree->againstElectronMediumMVA5_1 = 0;
-	otree->againstElectronTightMVA5_1 = 0;
-	otree->againstElectronVLooseMVA5_1 = 0;
-	otree->againstElectronVTightMVA5_1 = 0;
-	otree->againstElectronVLooseMVA6_2 = 0;
-	otree->againstElectronTightMVA6_2 = 0;
-	otree->againstMuonLoose3_1 = 0;
-	otree->againstMuonTight3_1 = 0;
-
 }
 
 //fill the otree with the electron variables in channel etau
@@ -1460,19 +1441,6 @@ void FillETau(const AC1B * analysisTree, Spring15Tree *otree, int leptonIndex, f
 
 	otree->d0_1 = analysisTree->electron_dxy[leptonIndex];
 	otree->dZ_1 = analysisTree->electron_dz[leptonIndex];
-
-	otree->byCombinedIsolationDeltaBetaCorrRaw3Hits_1 = 0;
-	otree->byLooseCombinedIsolationDeltaBetaCorr3Hits_1 = 0;
-	otree->byMediumCombinedIsolationDeltaBetaCorr3Hits_1 = 0;
-	otree->byTightCombinedIsolationDeltaBetaCorr3Hits_1 = 0;
-	otree->againstElectronLooseMVA5_1 = 0;
-	otree->againstElectronMediumMVA5_1 = 0;
-	otree->againstElectronTightMVA5_1 = 0;
-	otree->againstElectronVLooseMVA5_1 = 0;
-	otree->againstElectronVTightMVA5_1 = 0;
-
-	otree->againstMuonLoose3_1 = 0;
-	otree->againstMuonTight3_1 = 0;
 
 }
 
@@ -1497,11 +1465,6 @@ void FillTau(const AC1B * analysisTree, Spring15Tree *otree, int tauIndex){
   otree->byLooseCombinedIsolationDeltaBetaCorr3Hits_2 = analysisTree->tau_byLooseCombinedIsolationDeltaBetaCorr3Hits[tauIndex];
   otree->byMediumCombinedIsolationDeltaBetaCorr3Hits_2 = analysisTree->tau_byMediumCombinedIsolationDeltaBetaCorr3Hits[tauIndex];
   otree->byTightCombinedIsolationDeltaBetaCorr3Hits_2 = analysisTree->tau_byTightCombinedIsolationDeltaBetaCorr3Hits[tauIndex];
-  otree->againstElectronLooseMVA5_2 = analysisTree->tau_againstElectronLooseMVA5[tauIndex];
-  otree->againstElectronMediumMVA5_2 = analysisTree->tau_againstElectronMediumMVA5[tauIndex];
-  otree->againstElectronTightMVA5_2 = analysisTree->tau_againstElectronTightMVA5[tauIndex];
-  otree->againstElectronVLooseMVA5_2 = analysisTree->tau_againstElectronVLooseMVA5[tauIndex];
-  otree->againstElectronVTightMVA5_2 = analysisTree->tau_againstElectronVTightMVA5[tauIndex];
   otree->againstMuonLoose3_2 = analysisTree->tau_againstMuonLoose3[tauIndex];
   otree->againstMuonTight3_2 = analysisTree->tau_againstMuonTight3[tauIndex];
   otree->againstElectronVLooseMVA6_2 = analysisTree->tau_againstElectronVLooseMVA6[tauIndex];

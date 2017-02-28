@@ -32,7 +32,7 @@ public :
   Int_t           npv;
   Float_t         npu;
   Float_t         rho;
-  Float_t         xs;
+  //Float_t         xs;
   Float_t         mcweight;
   Float_t         pu_weight;
   Float_t         trigweight_1;
@@ -47,9 +47,9 @@ public :
   Float_t         effweight;
   Float_t         etaufakeweight;
   Float_t         mutaufakeweight;
-  Float_t         fakeweight;
-  Float_t         embeddedWeight;
-  Float_t         signalWeight;
+  //Float_t         fakeweight;
+  //Float_t         embeddedWeight;
+  //Float_t         signalWeight;
   Float_t         weight;
   Float_t         lheHt;
   Int_t           gen_noutgoing;
@@ -127,19 +127,17 @@ public :
   Float_t         puCorrPtSum_2;
   UInt_t          isolationGammaCands_size_2;
   UInt_t          signalGammaCands_size_2;
-  Float_t         byCombinedIsolationDeltaBetaCorrRaw3Hits_1;
-  Float_t         byLooseCombinedIsolationDeltaBetaCorr3Hits_1;
-  Float_t         byMediumCombinedIsolationDeltaBetaCorr3Hits_1;
-  Float_t         byTightCombinedIsolationDeltaBetaCorr3Hits_1;
-  Float_t         againstElectronLooseMVA5_1;
-  Float_t         againstElectronMediumMVA5_1;
-  Float_t         againstElectronTightMVA5_1;
-  Float_t         againstElectronVLooseMVA5_1;
-  Float_t         againstElectronVTightMVA5_1;
-  Float_t 	  againstElectronVLooseMVA6_2;
-  Float_t 	  againstElectronTightMVA6_2;
-  Float_t         againstMuonLoose3_1;
-  Float_t         againstMuonTight3_1;
+  //Float_t         byCombinedIsolationDeltaBetaCorrRaw3Hits_1;
+  //Float_t         byLooseCombinedIsolationDeltaBetaCorr3Hits_1;
+  //Float_t         byMediumCombinedIsolationDeltaBetaCorr3Hits_1;
+  //Float_t         byTightCombinedIsolationDeltaBetaCorr3Hits_1;
+  //Float_t         againstElectronLooseMVA5_1;
+  //Float_t         againstElectronMediumMVA5_1;
+  //Float_t         againstElectronTightMVA5_1;
+  //Float_t         againstElectronVLooseMVA5_1;
+  //Float_t         againstElectronVTightMVA5_1;
+  //Float_t         againstMuonLoose3_1;
+  //Float_t         againstMuonTight3_1;
   UInt_t          n_badmuons;
   UInt_t          n_duplicatemuons;
   Float_t         byCombinedIsolationDeltaBetaCorrRaw3Hits_2;
@@ -153,11 +151,13 @@ public :
   Float_t 	      byTightIsolationMVArun2v1DBoldDMwLT_2;
   Float_t 	      byVTightIsolationMVArun2v1DBoldDMwLT_2;
   Float_t 	      byVVTightIsolationMVArun2v1DBoldDMwLT_2;
-  Float_t         againstElectronLooseMVA5_2;
-  Float_t         againstElectronMediumMVA5_2;
-  Float_t         againstElectronTightMVA5_2;
-  Float_t         againstElectronVLooseMVA5_2;
-  Float_t         againstElectronVTightMVA5_2;
+  //Float_t         againstElectronLooseMVA5_2;
+  //Float_t         againstElectronMediumMVA5_2;
+  //Float_t         againstElectronTightMVA5_2;
+  //Float_t         againstElectronVLooseMVA5_2;
+  //Float_t         againstElectronVTightMVA5_2;
+  Float_t 	  againstElectronVLooseMVA6_2;
+  Float_t 	  againstElectronTightMVA6_2;
   Float_t         againstMuonLoose3_2;
   Float_t         againstMuonTight3_2;
   Float_t         met;
@@ -268,7 +268,7 @@ public :
   TBranch        *b_npv;   //!
   TBranch        *b_npu;   //!
   TBranch        *b_rho;   //!
-  TBranch        *b_xs;   //!
+  //TBranch        *b_xs;   //!
   TBranch        *b_mcweight;   //!
   TBranch        *b_pu_weight;   //!
   TBranch        *b_trigweight_1;   //!
@@ -283,9 +283,9 @@ public :
   TBranch        *b_effweight;   //! 
   TBranch        *b_etaufakeweight;   //!
   TBranch        *b_mutaufakeweight;   //!
-  TBranch        *b_fakeweight;   //!
-  TBranch        *b_embeddedWeight;   //!
-  TBranch        *b_signalWeight;   //!
+  //TBranch        *b_fakeweight;   //!
+  //TBranch        *b_embeddedWeight;   //!
+  //TBranch        *b_signalWeight;   //!
   TBranch        *b_weight;   //!
   TBranch        *b_lheHt;   //!
   TBranch        *b_gen_noutgoing;   //!  
@@ -363,17 +363,17 @@ public :
   TBranch        *b_puCorrPtSum_2;
   TBranch        *b_isolationGammaCands_size_2;
   TBranch        *b_signalGammaCands_size_2;
-  TBranch        *b_byCombinedIsolationDeltaBetaCorrRaw3Hits_1;   //!
-  TBranch        *b_byLooseCombinedIsolationDeltaBetaCorr3Hits_1;   //!
-  TBranch        *b_byMediumCombinedIsolationDeltaBetaCorr3Hits_1;   //!
-  TBranch        *b_byTightCombinedIsolationDeltaBetaCorr3Hits_1;   //!
-  TBranch        *b_againstElectronLooseMVA5_1;   //!
-  TBranch        *b_againstElectronMediumMVA5_1;   //!
-  TBranch        *b_againstElectronTightMVA5_1;   //!
-  TBranch        *b_againstElectronVLooseMVA5_1;   //!
-  TBranch        *b_againstElectronVTightMVA5_1;   //!
-  TBranch        *b_againstMuonLoose3_1;   //!
-  TBranch        *b_againstMuonTight3_1;   //!
+  //TBranch        *b_byCombinedIsolationDeltaBetaCorrRaw3Hits_1;   //!
+  //TBranch        *b_byLooseCombinedIsolationDeltaBetaCorr3Hits_1;   //!
+  //TBranch        *b_byMediumCombinedIsolationDeltaBetaCorr3Hits_1;   //!
+  //TBranch        *b_byTightCombinedIsolationDeltaBetaCorr3Hits_1;   //!
+  //TBranch        *b_againstElectronLooseMVA5_1;   //!
+  //TBranch        *b_againstElectronMediumMVA5_1;   //!
+  //TBranch        *b_againstElectronTightMVA5_1;   //!
+  //TBranch        *b_againstElectronVLooseMVA5_1;   //!
+  //TBranch        *b_againstElectronVTightMVA5_1;   //!
+  //TBranch        *b_againstMuonLoose3_1;   //!
+  //TBranch        *b_againstMuonTight3_1;   //!
   TBranch        *b_n_badmuons;
   TBranch        *b_n_duplicatemuons;
   TBranch        *b_byCombinedIsolationDeltaBetaCorrRaw3Hits_2;   //!
@@ -387,11 +387,11 @@ public :
   TBranch	     *b_byTightIsolationMVArun2v1DBoldDMwLT_2;
   TBranch	     *b_byVTightIsolationMVArun2v1DBoldDMwLT_2;
   TBranch	     *b_byVVTightIsolationMVArun2v1DBoldDMwLT_2;
-  TBranch        *b_againstElectronLooseMVA5_2;   //!
-  TBranch        *b_againstElectronMediumMVA5_2;   //!
-  TBranch        *b_againstElectronTightMVA5_2;   //!
-  TBranch        *b_againstElectronVLooseMVA5_2;   //!
-  TBranch        *b_againstElectronVTightMVA5_2;   //!
+  //TBranch        *b_againstElectronLooseMVA5_2;   //!
+  //TBranch        *b_againstElectronMediumMVA5_2;   //!
+  //TBranch        *b_againstElectronTightMVA5_2;   //!
+  //TBranch        *b_againstElectronVLooseMVA5_2;   //!
+  //TBranch        *b_againstElectronVTightMVA5_2;   //!
   TBranch	     *b_againstElectronVLooseMVA6_2;
   TBranch        *b_againstElectronTightMVA6_2;
   TBranch        *b_againstMuonLoose3_2;   //!
