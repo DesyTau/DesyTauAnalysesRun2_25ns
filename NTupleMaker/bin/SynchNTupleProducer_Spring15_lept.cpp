@@ -934,11 +934,11 @@ int main(int argc, char * argv[]){
       TLorentzVector genL( 0., 0., 0., 0.);
 
       // Zpt weight
-	  otree->zptweight = 1.;
+      otree->zptweight = 1.;
       if (!isData && isDY && isMG ) {
         genV = genTools::genV(analysisTree); // gen Z boson ?
         otree->zptweight = h_zptweight->GetBinContent(h_zptweight->GetXaxis()->FindBin(genV.M()),h_zptweight->GetYaxis()->FindBin(genV.Pt()));
-	  } 
+      }
 
       // topPt weight
 	  otree->topptweight =1.;
@@ -998,6 +998,16 @@ int main(int argc, char * argv[]){
       // overwriting with recoil-corrected values 
       otree->met = otree->met_rcmr;
       otree->metphi = otree->metphi_rcmr;   
+
+      // save genV and genL
+      otree->genV_px = genV.Px();
+      otree->genV_py = genV.Py();
+      otree->genV_pz = genV.Pz();
+      otree->genV_e  = genV.E();
+      otree->genL_px = genL.Px();
+      otree->genL_py = genL.Py();
+      otree->genL_pz = genL.Pz();
+      otree->genL_e  = genL.E();
 
       //end MET Recoil Corrections
 
