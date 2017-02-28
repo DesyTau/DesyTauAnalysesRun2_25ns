@@ -748,15 +748,17 @@ int main(int argc, char * argv[]){
 	      
  	      if (dRtrigLep < deltaRTrigMatch){
 		for(unsigned int i_trig = 0; i_trig<filterSingleLep.size(); i_trig++){
+		  if(ch=="mt" && lep_pt<23) continue;
 		  if (nSingleLepTrig.at(i_trig) == -1) continue;
 		  if (analysisTree.trigobject_filters[iT][nSingleLepTrig.at(i_trig)]) isSingleLepTrig = true;
 		}
 		for(unsigned int i_trig = 0; i_trig<filterXtriggerLepLeg.size(); i_trig++){
+		  if(ch=="mt" && lep_pt>=23) continue;
 		  if (nXTrigLepLeg.at(i_trig) == -1) continue;
 		  if (analysisTree.trigobject_filters[iT][nXTrigLepLeg.at(i_trig)]) isXTrigLepLeg.at(i_trig) = true;
 		}
 	      }
-	      if (dRtrigTau < deltaRTrigMatch){
+	      if (dRtrigTau < deltaRTrigMatch && ch=="mt"){
 		for(unsigned int i_trig = 0; i_trig<filterXtriggerTauLeg.size(); i_trig++){
 		  if (nXTrigTauLeg.at(i_trig) == -1) continue;
 		  if (analysisTree.trigobject_filters[iT][nXTrigTauLeg.at(i_trig)]) isXTrigTauLeg.at(i_trig) = true;
@@ -837,8 +839,7 @@ int main(int argc, char * argv[]){
       w_XTrigTauLegSF->var("t_pt")  -> setVal(analysisTree.tau_pt[tauIndex]);
       w_XTrigTauLegSF->var("t_eta") -> setVal(analysisTree.tau_eta[tauIndex]);
       w_XTrigTauLegSF->var("t_dm")  -> setVal(analysisTree.tau_decayMode[tauIndex]);
-      double eff_t_MC = 0;
-      double eff_t_DATA = 0;
+      double sf_trig_t = 0;
       
       if(ch=="mt") {
       	FillMuTau(&analysisTree, otree, leptonIndex, dRiso);
@@ -849,8 +850,7 @@ int main(int argc, char * argv[]){
 			 muonMass);
 	
 	// used for trigger weights: channel dependent settings
-	eff_t_MC   = w_XTrigTauLegSF -> function("t_genuine_TightIso_mt_mc")->getVal();
-	eff_t_DATA = w_XTrigTauLegSF -> function("t_genuine_TightIso_mt_data")->getVal();
+	sf_trig_t  = w_XTrigTauLegSF -> function("t_genuine_TightIso_mt_ratio")->getVal();
 	
 	// tracking efficiency weight	
         if (!isData && ApplyLepSF) {
@@ -867,8 +867,7 @@ int main(int argc, char * argv[]){
 			 electronMass);
 	
 	// used for trigger weights: channel dependent settings
-	eff_t_MC   = w_XTrigTauLegSF -> function("t_genuine_TightIso_et_mc")->getVal();
-	eff_t_DATA = w_XTrigTauLegSF -> function("t_genuine_TightIso_et_data")->getVal();
+	sf_trig_t  = w_XTrigTauLegSF -> function("t_genuine_TightIso_et_ratio")->getVal();
 	
 	// tracking efficiency weight
         if (!isData && ApplyLepSF) {
@@ -884,14 +883,12 @@ int main(int argc, char * argv[]){
 	
 	// calculation of trigger weights
 	double scalefactor = 1;
-	double eff_L_MC   = SF_SingleLepTrigger -> get_EfficiencyMC(leptonLV.Pt(), leptonLV.Eta());
-	double eff_l_MC   = SF_XTriggerLepLeg   -> get_EfficiencyMC(leptonLV.Pt(), leptonLV.Eta());
-	double eff_L_DATA = SF_SingleLepTrigger -> get_EfficiencyData(leptonLV.Pt(), leptonLV.Eta());
-	double eff_l_DATA = SF_XTriggerLepLeg   -> get_EfficiencyData(leptonLV.Pt(), leptonLV.Eta());
-	
-	if(isSingleLepTrigStored && !isXTrigStored && SafeRatio(eff_L_MC*(1.-eff_t_MC)))            scalefactor = (eff_L_DATA*(1.-eff_t_DATA))/(eff_L_MC*(1.-eff_t_MC));
-	else if(isXTrigStored && !isSingleLepTrigStored && SafeRatio((eff_l_MC-eff_L_MC)*eff_t_MC) && (eff_l_DATA-eff_L_DATA) > 0.) scalefactor = ((eff_l_DATA-eff_L_DATA)*eff_t_DATA)/((eff_l_MC-eff_L_MC)*eff_t_MC);
-	else if(isXTrigStored && isSingleLepTrigStored && SafeRatio(eff_L_MC*eff_t_MC))             scalefactor = (eff_L_DATA*eff_t_DATA)/(eff_L_MC*eff_t_MC);
+	if(isSingleLepTrigStored && !isXTrigStored)      scalefactor = SF_SingleLepTrigger -> get_ScaleFactor(leptonLV.Pt(), leptonLV.Eta());
+	else if(isXTrigStored && !isSingleLepTrigStored) scalefactor = SF_XTriggerLepLeg   -> get_ScaleFactor(leptonLV.Pt(), leptonLV.Eta())*sf_trig_t;
+	else if(isXTrigStored && isSingleLepTrigStored){
+	  cout<<"Both triggers returned true. This should not happen. Please check. Exiting"<<endl;
+	  exit(-1);
+	}  
 	otree->trigweight_1 = scalefactor;
 	otree->singleLepTrigger = isSingleLepTrigStored;
 	otree->xTrigger = isXTrigStored;
@@ -901,14 +898,12 @@ int main(int argc, char * argv[]){
 	  otree->idisoweight_antiiso_1 = SF_lepIdIso_antiiso->get_ScaleFactor(leptonLV.Pt(), leptonLV.Eta());
 	  
 	  scalefactor = 1;
-	  eff_L_MC   = SF_SingleLepTrigger_antiiso -> get_EfficiencyMC(leptonLV.Pt(), leptonLV.Eta());
-	  eff_l_MC   = SF_XTriggerLepLeg_antiiso   -> get_EfficiencyMC(leptonLV.Pt(), leptonLV.Eta());
-	  eff_L_DATA = SF_SingleLepTrigger_antiiso -> get_EfficiencyData(leptonLV.Pt(), leptonLV.Eta());
-	  eff_l_DATA = SF_XTriggerLepLeg_antiiso   -> get_EfficiencyData(leptonLV.Pt(), leptonLV.Eta());
-	  
-	  if(isSingleLepTrigStored && !isXTrigStored && SafeRatio(eff_L_MC*(1.-eff_t_MC)))            scalefactor = (eff_L_DATA*(1.-eff_t_DATA))/(eff_L_MC*(1.-eff_t_MC));
-	  else if(isXTrigStored && !isSingleLepTrigStored && SafeRatio((eff_l_MC-eff_L_MC)*eff_t_MC) && (eff_l_DATA-eff_L_DATA) > 0.) scalefactor = ((eff_l_DATA-eff_L_DATA)*eff_t_DATA)/((eff_l_MC-eff_L_MC)*eff_t_MC);
-	  else if(isXTrigStored && isSingleLepTrigStored && SafeRatio(eff_L_MC*eff_t_MC))             scalefactor = (eff_L_DATA*eff_t_DATA)/(eff_L_MC*eff_t_MC);
+	  if(isSingleLepTrigStored && !isXTrigStored)      scalefactor = SF_SingleLepTrigger_antiiso -> get_ScaleFactor(leptonLV.Pt(), leptonLV.Eta());
+	  else if(isXTrigStored && !isSingleLepTrigStored) scalefactor = SF_XTriggerLepLeg_antiiso   -> get_ScaleFactor(leptonLV.Pt(), leptonLV.Eta())*sf_trig_t;
+	  else if(isXTrigStored && isSingleLepTrigStored){
+	    cout<<"Both triggers returned true. This should not happen. Please check. Exiting"<<endl;
+	    exit(-1);
+	  }
 	  otree->trigweight_antiiso_1 = scalefactor;
 	}
       }
@@ -939,11 +934,11 @@ int main(int argc, char * argv[]){
       TLorentzVector genL( 0., 0., 0., 0.);
 
       // Zpt weight
-	  otree->zptweight = 1.;
+      otree->zptweight = 1.;
       if (!isData && isDY && isMG ) {
         genV = genTools::genV(analysisTree); // gen Z boson ?
         otree->zptweight = h_zptweight->GetBinContent(h_zptweight->GetXaxis()->FindBin(genV.M()),h_zptweight->GetYaxis()->FindBin(genV.Pt()));
-	  } 
+      }
 
       // topPt weight
 	  otree->topptweight =1.;
@@ -1003,6 +998,16 @@ int main(int argc, char * argv[]){
       // overwriting with recoil-corrected values 
       otree->met = otree->met_rcmr;
       otree->metphi = otree->metphi_rcmr;   
+
+      // save genV and genL
+      otree->genV_px = genV.Px();
+      otree->genV_py = genV.Py();
+      otree->genV_pz = genV.Pz();
+      otree->genV_e  = genV.E();
+      otree->genL_px = genL.Px();
+      otree->genL_py = genL.Py();
+      otree->genL_pz = genL.Pz();
+      otree->genL_e  = genL.E();
 
       //end MET Recoil Corrections
 
