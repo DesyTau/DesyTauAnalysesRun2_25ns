@@ -3,12 +3,13 @@
 # $2 - analysis macro
 # $3 - filelist
 # $4 - channel
+# $5 - # of files per job
 let "n = 0"
 rm -rf $3_files
 mkdir $3_files
 cp qsub_leptau.sh $3_files/
 cp $2 $3_files/
-Splitter $3 5
+Splitter $3 $5
 cd $3_files/
 for i in $(ls $3_*)
  do
