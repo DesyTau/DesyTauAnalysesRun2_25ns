@@ -1142,11 +1142,11 @@ int main(int argc, char * argv[]){
 
       bool passedBaselineSel = false;
       if (ch=="mt") 
-        passedBaselineSel = ( otree->iso_1<0.35 && otree->byTightIsolationMVArun2v1DBoldDMwLT_2>0.5 && 
+        passedBaselineSel = ( otree->iso_1<0.35 && otree->byMediumIsolationMVArun2v1DBoldDMwLT_2>0.5 && 
                             otree->againstElectronVLooseMVA6_2>0.5 && otree->againstMuonTight3_2>0.5  &&
                             otree->dilepton_veto == 0 && otree->extraelec_veto == 0 && otree->extramuon_veto == 0);
       if (ch=="et") 
-        passedBaselineSel = ( otree->iso_1<0.35 && otree->byTightIsolationMVArun2v1DBoldDMwLT_2>0.5 && 
+        passedBaselineSel = ( otree->iso_1<0.35 && otree->byMediumIsolationMVArun2v1DBoldDMwLT_2>0.5 && 
                             otree->againstMuonLoose3_2>0.5 && otree->againstElectronTightMVA6_2>0.5 && 
                             otree->dilepton_veto == 0 && otree->extraelec_veto == 0 && otree->extramuon_veto == 0);
 
