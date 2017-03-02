@@ -19,6 +19,8 @@
 #include "TChain.h"
 #include "TMath.h"
 #include "TF1.h"
+#include "TKey.h"
+#include "TGraphErrors.h"
 
 #include "TLorentzVector.h"
 
@@ -59,204 +61,33 @@ double dPhiFromLV(TLorentzVector v1, TLorentzVector v2) {
   return dPhiFrom2P(v1.Px(),v1.Py(),v2.Px(),v2.Py());
 
 }
-void FakeRateMva(float pt, float * mean, float * error, int &iso) {
+void GetFakeRates(TString filename, map<std::pair<TString,int>, double>* fakerate, map<std::pair<TString,int>, double>* fakerateE) {
 
-  // 80X Run2016BCDEFGH
-  if (pt<150) {
-    mean[0]  = 0.0726; error[0] = 0.0035;
-    mean[1]  = 0.0387; error[1] = 0.0025;
-    mean[2]  = 0.0248; error[2] = 0.0020;
-    mean[3]  = 0.019; error[3] = 0.004;
-    iso = 0;
+  TFile *f1 = TFile::Open(filename);
+  if(!f1){
+    cout<<"File "<<filename<<" does not exists. Exiting."<<endl;
+    exit(-1);
   }
-  else if (pt>=150&&pt<200) {
-    mean[0]  = 0.0833; error[0] = 0.0070;
-    mean[1]  = 0.0495; error[1] = 0.0052;
-    mean[2]  = 0.0326; error[2] = 0.0044;
-    mean[3]  = 0.009; error[3] = 0.008;
-    iso = 1;
+  
+  TIter next(f1->GetListOfKeys());
+  TKey *key;
+  
+  while ((key = (TKey*)next())) {
+    TClass *cl = gROOT->GetClass(key->GetClassName());
+    
+    if (!cl->InheritsFrom("TGraphErrors")) continue;
+    
+    TGraphErrors *g = (TGraphErrors*) key->ReadObj();
+    
+    for(int i = 0; i<g->GetN(); i++){
+      fakerate  -> insert( std::make_pair( std::make_pair( g->GetName() , i ) , g->GetY()[i] ) );
+      fakerateE -> insert( std::make_pair( std::make_pair( g->GetName() , i ), g->GetEY()[i] ) );
+    }
   }
-  else {
-    mean[0]  = 0.0483; error[0] = 0.0134;
-    mean[1]  = 0.0288; error[1] = 0.0102;
-    mean[2]  = 0.0189; error[2] = 0.0089;
-    mean[3]  = 0.029; error[3] = 0.027;
-    iso = 2;
-  }
-
-  // 80X Run2016B
-  /*
-  if (pt<150) {
-    mean[0]  = 0.072; error[0] = 0.004;
-    mean[1]  = 0.043; error[1] = 0.003;
-    mean[2]  = 0.026; error[2] = 0.003;
-    mean[3]  = 0.019; error[3] = 0.004;
-    iso = 0;
-  }
-  else if (pt>=150&&pt<200) {
-    mean[0]  = 0.065; error[0] = 0.011;
-    mean[1]  = 0.037; error[1] = 0.008;
-    mean[2]  = 0.021; error[2] = 0.006;
-    mean[3]  = 0.009; error[3] = 0.008;
-    iso = 1;
-  }
-  else {
-    mean[0]  = 0.069; error[0] = 0.014;
-    mean[1]  = 0.042; error[1] = 0.012;
-    mean[2]  = 0.026; error[2] = 0.011;
-    mean[3]  = 0.029; error[3] = 0.027;
-    iso = 2;
-  }
-  */
-  // 76X MEt filters + pt(leadtrk) > 4 GeV
-  //  if (pt<150) {
-  //    mean[0]  = 0.080; error[0] = 0.009;
-  //    mean[1]  = 0.048; error[1] = 0.007;
-  //    mean[2]  = 0.035; error[2] = 0.006;
-  //    iso = 0;
-  //  }
-  //  else if (pt>=150&&pt<200) {
-  //    mean[0]  = 0.061; error[0] = 0.020;
-  //    mean[1]  = 0.049; error[1] = 0.019;
-  //    mean[2]  = 0.017; error[2] = 0.012;
-  //    iso = 1;
-  //  }
-  //  else {
-  //    mean[0]  = 0.078; error[0] = 0.035;
-  //    mean[1]  = 0.072; error[1] = 0.035;
-  //    mean[2]  = 0.032; error[2] = 0.027;
-  //    iso = 2;
-  //  }
-
+  f1->Close();
+  delete f1;
 }
 
-void FakeRate(float pt, float * mean, float * error, int &iso) {
-
-  // 80X Run2016BCDEFGH (January 20)
-  if (pt<150) {
-    mean[0]  = 0.0859; error[0] = 0.0038;
-    mean[1]  = 0.0522; error[1] = 0.0029;
-    mean[2]  = 0.0350; error[2] = 0.0024;
-    iso = 0;
-  }
-  else if (pt>=150&&pt<200) {
-    mean[0]  = 0.1045; error[0] = 0.0076;
-    mean[1]  = 0.0735; error[1] = 0.0063;
-    mean[2]  = 0.0470; error[2] = 0.0052;
-    iso = 1;
-  }
-  else {
-    mean[0]  = 0.0756; error[0] = 0.0163;
-    mean[1]  = 0.0600; error[1] = 0.0150;
-    mean[2]  = 0.0428; error[2] = 0.0130;
-    iso = 2;
-  } 
-
-  // 80X Run2016BCD
-  /*
-  if (pt<150) {
-    mean[0]  = 0.0949; error[0] = 0.0037;
-    mean[1]  = 0.0596; error[1] = 0.0029;
-    mean[2]  = 0.0376; error[2] = 0.0024;
-    iso = 0;
-  }
-  else if (pt>=150&&pt<200) {
-    mean[0]  = 0.1153; error[0] = 0.0096;
-    mean[1]  = 0.0735; error[1] = 0.0075;
-    mean[2]  = 0.0508; error[2] = 0.0071;
-    iso = 1;
-  }
-  else {
-    mean[0]  = 0.0924; error[0] = 0.0121;
-    mean[1]  = 0.0629; error[1] = 0.0102;
-    mean[2]  = 0.0453; error[2] = 0.0092;
-    iso = 2;
-  } 
-  */
-
-  // 80X Run2016B
-  /*
-  if (pt<150) {
-    mean[0]  = 0.092; error[0] = 0.004;
-    mean[1]  = 0.056; error[1] = 0.004;
-    mean[2]  = 0.035; error[2] = 0.003;
-    iso = 0;
-  }
-  else if (pt>=150&&pt<200) {
-    mean[0]  = 0.103; error[0] = 0.013;
-    mean[1]  = 0.060; error[1] = 0.010;
-    mean[2]  = 0.041; error[2] = 0.009;
-    iso = 1;
-  }
-  else {
-    mean[0]  = 0.109; error[0] = 0.019;
-    mean[1]  = 0.076; error[1] = 0.017;
-    mean[2]  = 0.058; error[2] = 0.015;
-    iso = 2;
-  } 
-  */
-   // 76X MEt filters + pt(leadtrk) > 4 GeV
-   //   if (pt<150) {
-   //    mean[0]  = 0.100; error[0] = 0.010;
-   //    mean[1]  = 0.061; error[1] = 0.008;
-   //    mean[2]  = 0.041; error[2] = 0.007;
-   //    iso = 0;
-   //  }
-   //  else if (pt>=150&&pt<200) {
-   //    mean[0]  = 0.097; error[0] = 0.025;
-   //    mean[1]  = 0.081; error[1] = 0.023;
-   //    mean[2]  = 0.045; error[2] = 0.018;
-   //    iso = 1;
-   //  }
-   //  else {
-   //    mean[0]  = 0.072; error[0] = 0.035;
-   //    mean[1]  = 0.066; error[1] = 0.035;
-   //    mean[2]  = 0.049; error[2] = 0.031;
-   //    iso = 2;
-   //  } 
-
-   // 76X no MEt filters, 
-   /*  if (pt<150) {
-       mean[0]  = 0.110; error[0] = 0.010;
-       mean[1]  = 0.067; error[1] = 0.008;
-       mean[2]  = 0.046; error[2] = 0.007;
-       iso = 0;
-       }
-       else if (pt>=150&&pt<200) {
-       mean[0]  = 0.100; error[0] = 0.024;
-       mean[1]  = 0.081; error[1] = 0.022;
-       mean[2]  = 0.045; error[2] = 0.017;
-       iso = 1;
-       }
-       else {
-       mean[0]  = 0.113; error[0] = 0.047;
-       mean[1]  = 0.087; error[1] = 0.043;
-       mean[2]  = 0.068; error[2] = 0.040;
-       iso = 2;
-       } 
-       
-       // 74X
-       if (pt<150) {
-       mean[0]  = 0.100; error[0] = 0.007;
-       mean[1]  = 0.067; error[1] = 0.006;
-       mean[2]  = 0.043; error[2] = 0.005;
-       iso = 0;
-       }
-       else if (pt>=150&&pt<200) {
-       mean[0]  = 0.100; error[0] = 0.020;
-       mean[1]  = 0.080; error[1] = 0.018;
-       mean[2]  = 0.052; error[2] = 0.015;
-       iso = 1;
-       }
-       else {
-       mean[0]  = 0.086; error[0] = 0.044;
-       mean[1]  = 0.028; error[1] = 0.020;
-       mean[2]  = 0.022; error[2] = 0.022;
-       iso = 2;
-       }
-   */
-
-}
 
 int main(int argc, char * argv[]) {
 
@@ -1124,7 +955,7 @@ int main(int argc, char * argv[]) {
       tauMediumMvaIso_ = false;
       tauTightMvaIso_ = false;
       tauVTightMvaIso_ = false;
-
+      
       tauAntiMuonLoose3_ = false;
       tauAntiMuonTight3_ = false;
 
@@ -2162,84 +1993,87 @@ int main(int argc, char * argv[]) {
 	tauAntiElectronVLooseMVA6_ = analysisTree.tau_againstElectronVLooseMVA6[indexTau] > 0.5;
 	tauAntiElectronLooseMVA6_ = analysisTree.tau_againstElectronLooseMVA6[indexTau] > 0.5;
 
-	float fake[4]; 
-	float efake[4];
-	int iso;
+	// Add fake rate
+	map<std::pair<TString,int>, double>* fakerate  = new map<std::pair<TString,int>, double>();
+	map<std::pair<TString,int>, double>* fakerateE = new map<std::pair<TString,int>, double>();
+	TString file_tauFakeRate = TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/"+tauAntiLFakeRateFileName;
+	GetFakeRates(file_tauFakeRate, fakerate, fakerateE);
 
-	FakeRate(tauPt_,fake, efake,iso);
-
-	fakeAntiLLoose_  = fake[0]; 
-	fakeAntiLMedium_ = fake[1];
-	fakeAntiLTight_  = fake[2];
+	// check pt bin
+	int ptBin = -1;
+	if(tauPt_<150)                     ptBin = 0;
+	else if(tauPt_<200 && tauPt_>150 ) ptBin = 1;
+	else                               ptBin = 2;
 	
-	fakeAntiLLooseUp1_  = fake[0]; 
-	fakeAntiLMediumUp1_ = fake[1];
-	fakeAntiLTightUp1_  = fake[2];
+	fakeAntiLLoose_  = fakerate->at(std::make_pair("LooseIso", ptBin));
+	fakeAntiLMedium_ = fakerate->at(std::make_pair("MediumIso", ptBin));
+	fakeAntiLTight_  = fakerate->at(std::make_pair("TightIso", ptBin));
+	
+	fakeAntiLLooseUp1_  = fakeAntiLLoose_;
+	fakeAntiLMediumUp1_ = fakeAntiLMedium_;
+	fakeAntiLTightUp1_  = fakeAntiLTight_;
 
-	fakeAntiLLooseUp2_  = fake[0];
-	fakeAntiLMediumUp2_ = fake[1];
-	fakeAntiLTightUp2_  = fake[2];
+	fakeAntiLLooseUp2_  = fakeAntiLLoose_;
+	fakeAntiLMediumUp2_ = fakeAntiLMedium_;
+	fakeAntiLTightUp2_  = fakeAntiLTight_;
 
-	fakeAntiLLooseUp3_  = fake[0];
-	fakeAntiLMediumUp3_ = fake[1];
-	fakeAntiLTightUp3_  = fake[2];
+	fakeAntiLLooseUp3_  = fakeAntiLLoose_;
+	fakeAntiLMediumUp3_ = fakeAntiLMedium_;
+	fakeAntiLTightUp3_  = fakeAntiLTight_;
 
-	if (iso==0) {
-	  fakeAntiLLooseUp1_  = fake[0] + efake[0]; 
-	  fakeAntiLMediumUp1_ = fake[1] + efake[1];
-	  fakeAntiLTightUp1_  = fake[2] + efake[2];
+	if (ptBin==0) {
+	  fakeAntiLLooseUp1_  = fakerate->at(std::make_pair("LooseIso", ptBin)) + fakerateE->at(std::make_pair("LooseIso", ptBin));
+	  fakeAntiLMediumUp1_ = fakerate->at(std::make_pair("MediumIso", ptBin)) + fakerateE->at(std::make_pair("MediumIso", ptBin));
+	  fakeAntiLTightUp1_  = fakerate->at(std::make_pair("TightIso", ptBin)) + fakerateE->at(std::make_pair("TightIso", ptBin));
 	}
-	else if (iso==1) {
-	  fakeAntiLLooseUp2_  = fake[0] + efake[0]; 
-	  fakeAntiLMediumUp2_ = fake[1] + efake[1];
-	  fakeAntiLTightUp2_  = fake[2] + efake[2];
+	else if (ptBin==1) {
+	  fakeAntiLLooseUp2_  = fakerate->at(std::make_pair("LooseIso", ptBin)) + fakerateE->at(std::make_pair("LooseIso", ptBin));
+	  fakeAntiLMediumUp2_ = fakerate->at(std::make_pair("MediumIso", ptBin)) + fakerateE->at(std::make_pair("MediumIso", ptBin));
+	  fakeAntiLTightUp2_  = fakerate->at(std::make_pair("TightIso", ptBin)) + fakerateE->at(std::make_pair("TightIso", ptBin));
 	}
 	else {
-	  fakeAntiLLooseUp3_  = fake[0] + efake[0]; 
-	  fakeAntiLMediumUp3_ = fake[1] + efake[1];
-	  fakeAntiLTightUp3_  = fake[2] + efake[2];
+	  fakeAntiLLooseUp3_  = fakerate->at(std::make_pair("LooseIso", ptBin)) + fakerateE->at(std::make_pair("LooseIso", ptBin));
+	  fakeAntiLMediumUp3_ = fakerate->at(std::make_pair("MediumIso", ptBin)) + fakerateE->at(std::make_pair("MediumIso", ptBin));
+	  fakeAntiLTightUp3_  = fakerate->at(std::make_pair("TightIso", ptBin)) + fakerateE->at(std::make_pair("TightIso", ptBin));
 	}
 
-	// MVA
-	FakeRateMva(tauPt_,fake, efake,iso);
-
-	fakeAntiLLooseMva_   = fake[0]; 
-	fakeAntiLMediumMva_  = fake[1];
-	fakeAntiLTightMva_   = fake[2];
-	fakeAntiLVTightMva_  = fake[3];
+ 	fakeAntiLLooseMva_   = fakerate->at(std::make_pair("LooseMvaIso", ptBin));
+	fakeAntiLMediumMva_  = fakerate->at(std::make_pair("MediumMvaIso", ptBin));
+	fakeAntiLTightMva_   = fakerate->at(std::make_pair("TightMvaIso", ptBin));
+	fakeAntiLVTightMva_  = fakerate->at(std::make_pair("VTightMvaIso", ptBin));
 	
-	fakeAntiLLooseMvaUp1_   = fake[0]; 
-	fakeAntiLMediumMvaUp1_  = fake[1];
-	fakeAntiLTightMvaUp1_   = fake[2];
-	fakeAntiLVTightMvaUp1_  = fake[3];
+	fakeAntiLLooseMvaUp1_   = fakeAntiLLooseMva_;
+	fakeAntiLMediumMvaUp1_  = fakeAntiLMediumMva_;
+	fakeAntiLTightMvaUp1_   = fakeAntiLTightMva_;
+	fakeAntiLVTightMvaUp1_  = fakeAntiLVTightMva_;
 
-	fakeAntiLLooseMvaUp2_   = fake[0];
-	fakeAntiLMediumMvaUp2_  = fake[1];
-	fakeAntiLTightMvaUp2_   = fake[2];
-	fakeAntiLVTightMvaUp2_  = fake[3];
+	fakeAntiLLooseMvaUp2_   = fakeAntiLLooseMva_;
+	fakeAntiLMediumMvaUp2_  = fakeAntiLMediumMva_;
+	fakeAntiLTightMvaUp2_   = fakeAntiLTightMva_;
+	fakeAntiLVTightMvaUp2_  = fakeAntiLVTightMva_;
 
-	fakeAntiLLooseMvaUp3_   = fake[0];
-	fakeAntiLMediumMvaUp3_  = fake[1];
-	fakeAntiLTightMvaUp3_   = fake[2];
-	fakeAntiLVTightMvaUp3_  = fake[3];
+	fakeAntiLLooseMvaUp3_   = fakeAntiLLooseMva_;;
+	fakeAntiLMediumMvaUp3_  = fakeAntiLMediumMva_;
+	fakeAntiLTightMvaUp3_   = fakeAntiLTightMva_;
+	fakeAntiLVTightMvaUp3_  = fakeAntiLVTightMva_;
 
-	if (iso==0) {
-	  fakeAntiLLooseMvaUp1_  = fake[0] + efake[0]; 
-	  fakeAntiLMediumMvaUp1_ = fake[1] + efake[1];
-	  fakeAntiLTightMvaUp1_  = fake[2] + efake[2];
-	  fakeAntiLVTightMvaUp1_ = fake[3] + efake[3];
+	if (ptBin==0) {
+	  fakeAntiLLooseMvaUp1_  = fakerate->at(std::make_pair("LooseMvaIso", ptBin)) + fakerateE->at(std::make_pair("LooseMvaIso", ptBin));
+	  fakeAntiLMediumMvaUp1_ = fakerate->at(std::make_pair("MediumMvaIso", ptBin)) + fakerateE->at(std::make_pair("MediumMvaIso", ptBin));
+	  fakeAntiLTightMvaUp1_  = fakerate->at(std::make_pair("TightMvaIso", ptBin)) + fakerateE->at(std::make_pair("TightMvaIso", ptBin));
+	  fakeAntiLVTightMvaUp1_ = fakerate->at(std::make_pair("VTightMvaIso", ptBin)) + fakerateE->at(std::make_pair("VTightMvaIso", ptBin));
 	}
-	else if (iso==1) {
-	  fakeAntiLLooseMvaUp2_  = fake[0] + efake[0]; 
-	  fakeAntiLMediumMvaUp2_ = fake[1] + efake[1];
-	  fakeAntiLTightMvaUp2_  = fake[2] + efake[2];
-	  fakeAntiLVTightMvaUp2_ = fake[3] + efake[3];
+	else if (ptBin==1) {
+	  fakeAntiLLooseMvaUp2_  = fakerate->at(std::make_pair("LooseMvaIso", ptBin)) + fakerateE->at(std::make_pair("LooseMvaIso", ptBin));
+	  fakeAntiLMediumMvaUp2_ = fakerate->at(std::make_pair("MediumMvaIso", ptBin)) + fakerateE->at(std::make_pair("MediumMvaIso", ptBin));
+	  fakeAntiLTightMvaUp2_  = fakerate->at(std::make_pair("TightMvaIso", ptBin)) + fakerateE->at(std::make_pair("TightMvaIso", ptBin));
+	  fakeAntiLVTightMvaUp2_ = fakerate->at(std::make_pair("VTightMvaIso", ptBin)) + fakerateE->at(std::make_pair("VTightMvaIso", ptBin));
 	}
 	else {
-	  fakeAntiLLooseMvaUp3_  = fake[0] + efake[0]; 
-	  fakeAntiLMediumMvaUp3_ = fake[1] + efake[1];
-	  fakeAntiLTightMvaUp3_  = fake[2] + efake[2];
-	  fakeAntiLVTightMvaUp3_ = fake[3] + efake[3];
+	  fakeAntiLLooseMvaUp2_  = fakerate->at(std::make_pair("LooseMvaIso", ptBin)) + fakerateE->at(std::make_pair("LooseMvaIso", ptBin));
+	  fakeAntiLMediumMvaUp2_ = fakerate->at(std::make_pair("MediumMvaIso", ptBin)) + fakerateE->at(std::make_pair("MediumMvaIso", ptBin));
+	  fakeAntiLTightMvaUp2_  = fakerate->at(std::make_pair("TightMvaIso", ptBin)) + fakerateE->at(std::make_pair("TightMvaIso", ptBin));
+	  fakeAntiLVTightMvaUp2_ = fakerate->at(std::make_pair("VTightMvaIso", ptBin)) + fakerateE->at(std::make_pair("VTightMvaIso", ptBin));
 	}
 	
 	// finding matching jet
@@ -2541,7 +2375,7 @@ int main(int argc, char * argv[]) {
 	    tauMediumMvaIso_ = analysisTree.tau_byMediumIsolationMVArun2v1DBoldDMwLT[indexTau] > 0.5;
 	    tauTightMvaIso_ = analysisTree.tau_byTightIsolationMVArun2v1DBoldDMwLT[indexTau] > 0.5;
 	    tauVTightMvaIso_ = analysisTree.tau_byVTightIsolationMVArun2v1DBoldDMwLT[indexTau] > 0.5;
-
+ 
 	    tauAntiMuonLoose3_ = analysisTree.tau_againstMuonLoose3[indexTau] > 0.5;
 	    tauAntiMuonTight3_ = analysisTree.tau_againstMuonTight3[indexTau] > 0.5;
 	    tauAntiElectronVLooseMVA5_ = analysisTree.tau_againstElectronVLooseMVA5[indexTau] > 0.5;
