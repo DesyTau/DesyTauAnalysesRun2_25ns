@@ -334,9 +334,7 @@ int main(int argc, char * argv[]) {
     Float_t         signalWeight;
     Float_t         topptweight;
     Float_t         topptweightRun2;
-    Float_t         zmumu0jetweight;
-    Float_t         zmumuboostedweight;
-    Float_t         zmumuvbfweight;
+
     Float_t         btag0weight;
     Float_t         btag0weight_Up;
     Float_t         btag0weight_Down;
@@ -547,7 +545,16 @@ int main(int argc, char * argv[]) {
     
     Float_t         pzetamiss_resoDown;
     Float_t         dzeta_resoDown;
+
+    Float_t         dzeta_eUp;
+    Float_t         dzeta_eDown;
     
+    Float_t         pzetavis_eUp;
+    Float_t         pzetavis_eDown;
+
+    Float_t         pzetamiss_eUp;
+    Float_t         pzetamiss_eDown;
+
     Float_t         pzetamiss_genmet;
     Float_t         dzeta_genmet;
     
@@ -684,9 +691,6 @@ int main(int argc, char * argv[]) {
     tree->Branch("signalWeight", &signalWeight, "signalWeight/F");
     tree->Branch("topptweight", &topptweight, "topptweight/F");
     tree->Branch("topptweightRun2", &topptweightRun2, "topptweightRun2/F");
-    tree->Branch("zmumu0jetweight",&zmumu0jetweight,"zmumu0jetweight/F");
-    tree->Branch("zmumuboostedweight",&zmumuboostedweight,"zmumuboostedweight/F");
-    tree->Branch("zmumuvbfweight",&zmumuvbfweight,"zmumuvbfweight/F");
 
     tree->Branch("btag0weight",&btag0weight,"btag0weight/F");
     tree->Branch("btag0weight_Up",&btag0weight_Up,"btag0weight_Up/F");
@@ -888,11 +892,19 @@ int main(int argc, char * argv[]) {
     tree->Branch("dphi_tt", &dphi_tt, "dphi_tt/F");
     
     tree->Branch("pzetavis", &pzetavis, "pzetavis/F");
+    tree->Branch("pzetavis_eUp", &pzetavis_eUp, "pzetavis_eUp/F");
+    tree->Branch("pzetavis_eDown", &pzetavis_eDown, "pzetavis_eDown/F");
     
 
     tree->Branch("pzetamiss", &pzetamiss, "pzetamiss/F");
-    tree->Branch("dzeta",&dzeta,"dzeta/F");
-    
+    tree->Branch("pzetamiss_eUp", &pzetamiss_eUp, "pzetamiss_eUp/F");
+    tree->Branch("pzetamiss_eDown", &pzetamiss_eDown, "pzetamiss_eDown/F");
+
+    tree->Branch("dzeta",&dzeta,"dzeta/F");    
+    tree->Branch("dzeta_eUp",&dzeta_eUp,"dzeta_eUp/F");
+    tree->Branch("dzeta_eDown",&dzeta_eDown,"dzeta_eDown/F");
+
+
     tree->Branch("pzetamiss_resoUp", &pzetamiss_resoUp, "pzetamiss_resoUp/F");
     tree->Branch("dzeta_resoUp",&dzeta_resoUp,"dzeta_resoUp/F");
     
@@ -1213,6 +1225,19 @@ int main(int argc, char * argv[]) {
     }
     
     //  exit(-1);
+
+    unsigned int eventList[10] = {
+      527972,
+      528010,
+      683511,
+      973776,
+      998531,
+      998633,
+      1012498,
+      1166167,
+      1353553,
+      1483112
+    };
     
     int nEvents = 0;
     int selEvents = 0;
@@ -1274,6 +1299,16 @@ int main(int argc, char * argv[]) {
             if (nEvents%10000==0)
                 cout << "      processed " << nEvents << " events" << endl;
 
+	    /*
+	    bool eventFound = false;
+	    for (unsigned int iEv=0; iEv<10; ++iEv) {
+	      if (analysisTree.event_nr == eventList[iEv]) {
+		eventFound = true;
+		break;
+	      }
+	    }
+	    if (!eventFound) continue;
+	    */
 
             isZLL = false;
             isZEE = false;
@@ -1301,9 +1336,7 @@ int main(int argc, char * argv[]) {
             signalWeight = 1;
             topptweight = 1;
 	    topptweightRun2 = 1;
-            zmumu0jetweight = 1 ;
-            zmumuboostedweight = 1;
-            zmumuvbfweight = 1;
+
 	    btag0weight = 1;
 	    btag0weight_Up = 1;
 	    btag0weight_Down = 1;
@@ -1378,9 +1411,14 @@ int main(int argc, char * argv[]) {
             TLorentzVector wDecayProductsLV; wDecayProductsLV.SetXYZT(0,0,0,0);
             TLorentzVector fullVLV; fullVLV.SetXYZT(0,0,0,0);
             TLorentzVector visVLV; visVLV.SetXYZT(0,0,0,0);
+
+	    TLorentzVector genBosonLV; genBosonLV.SetXYZT(0,0,0,0);
+	    TLorentzVector genVisBosonLV; genVisBosonLV.SetXYZT(0,0,0,0);
             
             if (!isData) {
                 
+	      // computing boson 4-vector
+
                 for (unsigned int igentau=0; igentau < analysisTree.gentau_count; ++igentau) {
                     TLorentzVector tauLV; tauLV.SetXYZT(analysisTree.gentau_px[igentau],
                                                         analysisTree.gentau_py[igentau],
@@ -1434,8 +1472,15 @@ int main(int argc, char * argv[]) {
                         isWfound = true;
                         wBosonLV = genLV;
                     }
+
+		    bool fromHardProcessFinalState = analysisTree.genparticles_fromHardProcess[igen]&&analysisTree.genparticles_status[igen]==1;
+		    bool isMuon = false;
+		    bool isElectron = false;
+		    bool isNeutrino = false;
+		    bool isDirectHardProcessTauDecayProduct = analysisTree.genparticles_isDirectHardProcessTauDecayProduct[igen];
                     
-                    if (fabs(analysisTree.genparticles_pdgid[igen])==11) {
+                    if (abs(analysisTree.genparticles_pdgid[igen])==11) {
+		      isElectron = true;
                         if (analysisTree.genparticles_fromHardProcess[igen]&&analysisTree.genparticles_status[igen]==1) {
                             promptElectrons.push_back(genLV);
                             promptElectronsLV += genLV;
@@ -1443,7 +1488,8 @@ int main(int argc, char * argv[]) {
                         }
                     }
                     
-                    if (fabs(analysisTree.genparticles_pdgid[igen])==13) {
+                    if (abs(analysisTree.genparticles_pdgid[igen])==13) {
+		      isMuon = true;
                         if (analysisTree.genparticles_fromHardProcess[igen]&&analysisTree.genparticles_status[igen]==1) {
                             promptMuons.push_back(genLV);
                             promptMuonsLV += genLV;
@@ -1451,9 +1497,10 @@ int main(int argc, char * argv[]) {
                         }
                     }
                     
-                    if (fabs(analysisTree.genparticles_pdgid[igen])==12||
-                        fabs(analysisTree.genparticles_pdgid[igen])==14||
-                        fabs(analysisTree.genparticles_pdgid[igen])==16)  {
+                    if (abs(analysisTree.genparticles_pdgid[igen])==12||
+                        abs(analysisTree.genparticles_pdgid[igen])==14||
+                        abs(analysisTree.genparticles_pdgid[igen])==16)  {
+		      isNeutrino = true;
                         if ((analysisTree.genparticles_fromHardProcess[igen]||analysisTree.genparticles_isPrompt[igen])&&
                             !analysisTree.genparticles_isDirectHardProcessTauDecayProduct[igen]&&
                             analysisTree.genparticles_status[igen]==1) {
@@ -1468,7 +1515,14 @@ int main(int argc, char * argv[]) {
                         }
                     }
                     
-                    
+		    bool isBoson = (fromHardProcessFinalState && (isMuon || isElectron || isNeutrino)) || isDirectHardProcessTauDecayProduct;
+		    bool isVisibleBoson = (fromHardProcessFinalState && (isMuon || isElectron)) || (isDirectHardProcessTauDecayProduct && !isNeutrino);
+		    
+		    if (isBoson)
+		      genBosonLV += genLV;
+		    if (isVisibleBoson)
+		      genVisBosonLV += genLV;
+
                 }
                 
                 if (isGSfound) {
@@ -1526,11 +1580,21 @@ int main(int argc, char * argv[]) {
                     lepPx = lepLV.Px(); lepPy = lepLV.Py(); lepPz = lepLV.Pz();
                     nuPx = promptNeutrinosLV.Px(); nuPy = promptNeutrinosLV.Py(); nuPz = promptNeutrinosLV.Pz();
                 }
-                
+            
+		bosonPx = genBosonLV.Px();
+		bosonPy = genBosonLV.Py();
+		bosonPz = genBosonLV.Pz();
+		bosonPt = genBosonLV.Pt();
+		bosonMass = genBosonLV.M();
+
+		lepPx = genVisBosonLV.Px();
+		lepPy = genVisBosonLV.Py();
+		lepPz = genVisBosonLV.Pz();
+
                 nuPt = TMath::Sqrt(nuPx*nuPx+nuPy*nuPy);
                 nuPhi = TMath::ATan2(nuPy,nuPx);
                 
-                bosonPt = TMath::Sqrt(bosonPx*bosonPx+bosonPy*bosonPy);
+		//                bosonPt = TMath::Sqrt(bosonPx*bosonPx+bosonPy*bosonPy);
                 /*
                  if (isHfound) {
                  higgsMass = hBosonLV.M();
@@ -1557,10 +1621,17 @@ int main(int argc, char * argv[]) {
                  std::cout << "ZBoson  px = " << zBosonLV.Px()
                  << "        py = " << zBosonLV.Py()
                  << "        pz = " << zBosonLV.Pz() << std::endl;
+		
                  if (isHfound)
                  std::cout << "HBoson  px = " << hBosonLV.Px()
-                 << "        py = " << hBosonLV.Py()
-                 << "        pz = " << hBosonLV.Pz() << std::endl;
+			   << "        py = " << hBosonLV.Py()
+			   << "        pz = " << hBosonLV.Pz() << std::endl;
+		 std::cout << "  Px = " << bosonPx 
+			   << "  Py = " << bosonPy
+			   << "  Pz = " << bosonPz << std::endl;
+		 std::cout << "  lepPx = " << lepPx 
+			   << "  lepPy = " << lepPy
+			   << "  lepPz = " << lepPz << std::endl;
                  if (isWfound) {
                  std::cout << "WBoson  px = " << wBosonLV.Px()
                  << "        py = " << wBosonLV.Py()
@@ -1604,7 +1675,11 @@ int main(int argc, char * argv[]) {
                         if (bosonPtX>1000.)   bosonPtX = 1000.;
                         zptmassweight = histZMassPtWeights->GetBinContent(histZMassPtWeights->GetXaxis()->FindBin(bosonMassX),
                                                                           histZMassPtWeights->GetYaxis()->FindBin(bosonPtX));
-                    }
+
+			//			std::cout << "boson pt = " << bosonPtX << "  mass = " << "  weight = " << zptmassweight << std::endl;
+                    } 
+
+
                 }
                 
                 ALL->Fill(0.0);
@@ -1628,6 +1703,9 @@ int main(int argc, char * argv[]) {
             
             //      cout << "Ok" << endl;
             
+	    
+
+
             run = int(analysisTree.event_run);
             lumi = int(analysisTree.event_luminosityblock);
             evt = int(analysisTree.event_nr);
@@ -2625,17 +2703,8 @@ int main(int argc, char * argv[]) {
 	      mjj_Up = (jet1Up+jet2Up).M();
 	      mjj_Down = (jet1Down+jet2Down).M();
           
-	      if(mjj<700 && mjj>300)
-		zmumuvbfweight = 1.043;
-	      if(mjj<1100 && mjj>700)
-                zmumuvbfweight = 0.965;
-	      if(mjj<1500 && mjj>1100)
-                zmumuvbfweight = 0.901;
-	      if(mjj>1500)
-                zmumuvbfweight = 0.888;
-
-	      jdeta = abs(analysisTree.pfjet_eta[indexLeadingJet]-
-			  analysisTree.pfjet_eta[indexSubLeadingJet]);
+	      jdeta = fabs(analysisTree.pfjet_eta[indexLeadingJet]-
+			   analysisTree.pfjet_eta[indexSubLeadingJet]);
 	      
 	      float etamax = analysisTree.pfjet_eta[indexLeadingJet];
 	      float etamin = analysisTree.pfjet_eta[indexSubLeadingJet];
@@ -2866,9 +2935,32 @@ int main(int argc, char * argv[]) {
             
             float vectorVisX = muonLV.Px() + electronLV.Px();
             float vectorVisY = muonLV.Py() + electronLV.Py();
+
+            float vectorVisX_eUp = muonLV.Px() + electronUpLV.Px();
+            float vectorVisY_eUp = muonLV.Py() + electronUpLV.Py();
+
+            float vectorVisX_eDown = muonLV.Px() + electronDownLV.Px();
+            float vectorVisY_eDown = muonLV.Py() + electronDownLV.Py();
             
             pzetavis = vectorVisX*zetaX + vectorVisY*zetaY;
-            
+            pzetavis_eUp = vectorVisX_eUp*zetaX + vectorVisY_eUp*zetaY;
+            pzetavis_eDown = vectorVisX_eDown*zetaX + vectorVisY_eDown*zetaY;
+
+	    double px_eUp = (1+eleScale) * pt_1 * TMath::Cos(phi_1);
+	    double py_eUp = (1+eleScale) * pt_1 * TMath::Sin(phi_1);
+	    
+	    double px_e = pt_1 * TMath::Cos(phi_1);
+	    double py_e = pt_1 * TMath::Sin(phi_1);
+	    
+	    double px_eDown = (1-eleScale) * pt_1 * TMath::Cos(phi_1);
+	    double py_eDown = (1-eleScale) * pt_1 * TMath::Sin(phi_1);
+	    
+	    double metx_eUp = met_x + px_e - px_eUp;
+	    double mety_eUp = met_y + py_e - py_eUp;
+	    
+	    double metx_eDown = met_x + px_e - px_eDown;
+	    double mety_eDown = met_y + py_e - py_eDown;
+
             // computation of DZeta variable
             // pfmet
             computeDzeta(met_x,met_y,
@@ -2882,7 +2974,10 @@ int main(int argc, char * argv[]) {
                          zetaX,zetaY,pzetavis,pzetamiss_resoUp,dzeta_resoUp); // resoUp
             computeDzeta(met_resoDown_x,met_resoDown_y,
                          zetaX,zetaY,pzetavis,pzetamiss_resoDown,dzeta_resoDown); // resoDown
-
+            computeDzeta(metx_eUp,mety_eUp,
+                         zetaX,zetaY,pzetavis_eUp,pzetamiss_eUp,dzeta_eUp); // eUp
+            computeDzeta(metx_eDown,mety_eDown,
+                         zetaX,zetaY,pzetavis_eDown,pzetamiss_eDown,dzeta_eDown); // eDown
             
             // mvamet
             computeDzeta(mvamet_x,mvamet_y,
@@ -2906,7 +3001,13 @@ int main(int argc, char * argv[]) {
             TLorentzVector mvametLV; mvametLV.SetXYZT(mvamet_x,mvamet_y,0.,mvamet);
 	    //            float PFETmis = TMath::Sqrt(met_x*met_x+met_y*met_y);
             TLorentzVector metLV; metLV.SetXYZT(met_x,met_y,0.,met);
+
+	    float met_eUp = TMath::Sqrt(metx_eUp*metx_eUp+mety_eUp*mety_eUp);
+	    float met_eDown = TMath::Sqrt(metx_eDown*metx_eDown+mety_eDown*mety_eDown);
             
+            TLorentzVector metEleUpLV; metEleUpLV.SetXYZT(metx_eUp,mety_eUp,0.,met_eUp);
+            TLorentzVector metEleDownLV; metEleDownLV.SetXYZT(metx_eDown,mety_eDown,0.,met_eDown);
+
             mt_1 = mT(electronLV,metLV);
             mt_2 = mT(muonLV,metLV);
             mtmax = TMath::Max(float(mt_1),float(mt_2));
@@ -2956,8 +3057,8 @@ int main(int argc, char * argv[]) {
 
 	    mTdileptonMET_muUp = mT(muonUpLV+electronLV,metLV);
 	    mTdileptonMET_muDown = mT(muonDownLV+electronLV,metLV);
-	    mTdileptonMET_eUp = mT(muonLV+electronUpLV,metLV);
-	    mTdileptonMET_eDown = mT(muonLV+electronDownLV,metLV);
+	    mTdileptonMET_eUp = mT(muonLV+electronUpLV,metEleUpLV);
+	    mTdileptonMET_eDown = mT(muonLV+electronDownLV,metEleDownLV);
 
 	    //	    std::cout << "mT(ll,MET) = " << mTdileptonMET << "  mTtot = " << mTtot << std::endl;
             //      std::cout << "BDT       = " << bdt << std::endl;
@@ -2993,6 +3094,9 @@ int main(int argc, char * argv[]) {
                     covMET[1][0] =  metcov10;
                     covMET[0][1] =  metcov01;
                     covMET[1][1] =  metcov11;
+
+		    //		    std::cout << "Eta = " << eta_1 << "   eleScale = " << eleScale << std::endl;
+
                     
                     // mva met
                     // define electron 4-vector
@@ -3039,7 +3143,7 @@ int main(int argc, char * argv[]) {
                     //	  if ( !algoGen.isValidSolution() ) 
                     //	    std::cout << "sorry -- status of NLL is not valid [" << algoGen.isValidSolution() << "]" << std::endl;
                     
-                    //	  std::cout << "msv = " << m_sv << "   msv_gen = " << msv_gen << std::endl;
+		    //		    std::cout << "msv = " << m_sv << "   msv_gen = " << msv_gen << std::endl;
                     //	  std::cout << std::endl;
                     
                     //	  pt_sv_gen = algoGen.pt();
@@ -3073,39 +3177,33 @@ int main(int argc, char * argv[]) {
                     mt_sv_muUp      = mt_sv;
                     mt_sv_muDown    = mt_sv;
                 
-                
-                    if(pt_sv<100 && pt_sv>0)
-                    zmumuboostedweight = 0.971;
-                
-                    if(pt_sv<150 && pt_sv>100)
-                    zmumuboostedweight = 0.975;
-                
-                    if(pt_sv<200 && pt_sv>150)
-                    zmumuboostedweight = 0.960;
-                
-                    if(pt_sv<250 && pt_sv>200)
-                    zmumuboostedweight = 0.964;
-                
-                    if(pt_sv<300 && pt_sv>250)
-                    zmumuboostedweight = 0.934;
-                
-                    if(pt_sv>300)
-                    zmumuboostedweight = 0.942;
-                
                     bool applyMSVvariations = true;
                     
                     if (!isData && applyMSVvariations) { 
                         
+
+		      /*		      		      
+		      std::cout << "Event = " << analysisTree.event_nr << std::endl;
+		      std::cout << "MetX = " << met_x << "   MetY = " << met_y << std::endl;
+		      std::cout << "MetX_eUp = " << metx_eUp << "   MetY_eUp = " << mety_eUp << std::endl;
+		      std::cout << "MetX_ = " << metx_eDown << "   MetY_eDown = " << mety_eDown << std::endl;
+
+		      std::cout << "eta1 = " << eta_1 << std::endl;
+		      std::cout << "pt1 = " << pt_1 << "  pt1_eUp = " << (1.0+eleScale)*pt_1 << "  pt1_eDown = " << (1.0-eleScale)*pt_1 << std::endl;
+		      std::cout << "cov00 = " << metcov00 << "  cov01 = " << metcov01 << "   cov11 = " << metcov11 << std::endl; 
+		      */
+
                         SVfitStandaloneAlgorithm algo_eUp = SVFitMassComputation(svFitEleUp, svFitMu,
-                                                                                 met_x, met_y,
+                                                                                 metx_eUp, mety_eUp,
                                                                                  covMET, inputFile_visPtResolution);
                         SVfitStandaloneAlgorithm algo_eDown = SVFitMassComputation(svFitEleDown, svFitMu,
-                                                                                   met_x, met_y,
+                                                                                   metx_eDown, mety_eDown,
                                                                                    covMET, inputFile_visPtResolution);
                         
                         
                         m_sv_eUp    = algo_eUp.getMass();
                         mt_sv_eUp   = algo_eUp.transverseMass();
+
                         m_sv_eDown  = algo_eDown.getMass();
                         mt_sv_eDown = algo_eDown.transverseMass();
 
@@ -3116,6 +3214,13 @@ int main(int argc, char * argv[]) {
 			pt_sv_eDown  = algo_eDown.pt(); 
 			eta_sv_eDown = algo_eDown.eta();
 			phi_sv_eDown = algo_eDown.phi();
+
+			/*
+			std::cout << "msv = " << m_sv 
+				  << "   msv_eUp = " << m_sv_eUp 
+				  << "   msv_eDown = " << m_sv_eDown << std::endl;
+			std::cout << std::endl;
+			*/
 
 			/*                        
                         if (isDY || isW) {
