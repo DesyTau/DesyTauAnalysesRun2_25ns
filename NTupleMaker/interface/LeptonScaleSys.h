@@ -132,7 +132,13 @@ protected:
 					      TMath::Sqrt( cenTree->mvamet * cos(cenTree->mvametphi) * cenTree->mvamet * cos(cenTree->mvametphi) +
 							   cenTree->mvamet * sin(cenTree->mvametphi) * cenTree->mvamet * sin(cenTree->mvametphi) ) ) ;    
 
-    // propagate the lepton pt shift to the MET 
+    // propagate the tau pt shift to the MET 
+	pfmetLV.SetPx(pfmetLV.Px()- (lep2_scaled.Px()-lep2.Px()));
+	pfmetLV.SetPy(pfmetLV.Py()- (lep2_scaled.Px()-lep2.Py()));
+
+	mvametLV.SetPx(mvametLV.Px()- (lep2_scaled.Px()-lep2.Px()));
+	mvametLV.SetPy(mvametLV.Py()- (lep2_scaled.Px()-lep2.Py()));
+
 	pfmetLV.SetPx(pfmetLV.Px()- (lep1_scaled.Px()-lep1.Px()));
 	pfmetLV.SetPy(pfmetLV.Py()- (lep1_scaled.Px()-lep1.Py()));
 
@@ -655,22 +661,22 @@ protected:
         lep2_scaled.SetXYZM(lep2.Px() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))),
 			  lep2.Py() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))),
 			  lep2.Pz() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))),
-			  lep2.M()  * (1. + sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))));
+			  lep2.M()  );
       else if (ch == MUTAU)
         lep2_scaled.SetXYZM(lep2.Px() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))),
 			  lep2.Py() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))),
 			  lep2.Pz() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))),
-			  lep2.M()  * (1. + sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))));
+			  lep2.M()  );
       else if (ch == TAUTAU){
         lep1_scaled.SetXYZM(lep1.Px() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt1, absEta1))),
 			  lep1.Py() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt1, absEta1))),
 			  lep1.Pz() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt1, absEta1))),
-			  lep1.M()  * (1. + sf_up->GetBinContent( sf_up->FindBin(pt1, absEta1))));
+			  lep1.M()  );
       
         lep2_scaled.SetXYZM(lep2.Px() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))),
 			  lep2.Py() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))),
 			  lep2.Pz() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))),
-			  lep2.M()  * (1. + sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))));
+			  lep2.M()  );
       }
     }
     this->Fill(ch, "Up");

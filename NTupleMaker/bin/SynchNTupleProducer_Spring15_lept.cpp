@@ -214,6 +214,7 @@ int main(int argc, char * argv[]){
   const bool isDY = infiles.find("DY") == infiles.rfind("/")+1;
   const bool isWJets = (infiles.find("WJets") == infiles.rfind("/")+1) || (infiles.find("W1Jets") == infiles.rfind("/")+1) || (infiles.find("W2Jets") == infiles.rfind("/")+1) || (infiles.find("W3Jets") == infiles.rfind("/")+1) || (infiles.find("W4Jets") == infiles.rfind("/")+1) || (infiles.find("EWK") == infiles.rfind("/")+1);
   const bool isVBForGGHiggs = (infiles.find("VBFHToTauTau")== infiles.rfind("/")+1) || (infiles.find("GluGluHToTauTau")== infiles.rfind("/")+1);
+  const bool isEWKZ =  infiles.find("EWKZ") == infiles.rfind("/")+1;
   const bool isMG = infiles.find("madgraph") != string::npos;
   //const bool applyRecoilCorrections = isDY || isWJets;
   
@@ -610,6 +611,9 @@ int main(int argc, char * argv[]){
       otree->run  = analysisTree.event_run;
       otree->lumi = analysisTree.event_luminosityblock;
       otree->evt  = analysisTree.event_nr;
+	  
+	  //if (otree->evt != 8993558 && otree->evt != 8563251 && otree->evt != 8765306 && otree->evt != 8776865 && otree->evt != 8816054 && otree->evt !=8763551)	
+	  //continue;
       
       bool overlapEvent = true;
       for (unsigned int iEvent=0; iEvent<runList.size(); ++iEvent) {
@@ -935,7 +939,7 @@ int main(int argc, char * argv[]){
 
       // Zpt weight
       otree->zptweight = 1.;
-      if (!isData && isDY && isMG ) {
+      if (!isData && ((isDY && isMG ) || isEWKZ) ) {
         genV = genTools::genV(analysisTree); // gen Z boson ?
         otree->zptweight = h_zptweight->GetBinContent(h_zptweight->GetXaxis()->FindBin(genV.M()),h_zptweight->GetYaxis()->FindBin(genV.Pt()));
       }
