@@ -34,7 +34,7 @@
 #include "DesyTauAnalyses/NTupleMaker/interface/functions.h"
 #include "HTT-utilities/LepEffInterface/interface/ScaleFactor.h"
 
-bool metFiltersPasses(AC1B &tree_, std::vector<TString> metFlags) {
+bool metFiltersPasses(AC1B &tree_, std::vector<TString> metFlags, bool isData) {
 
   bool passed = true;
   unsigned int nFlags = metFlags.size();
@@ -44,6 +44,7 @@ bool metFiltersPasses(AC1B &tree_, std::vector<TString> metFlags) {
     //    std::cout << it->first << " : " << it->second << std::endl;
     for (unsigned int iFilter=0; iFilter<nFlags; ++iFilter) {
       if (flagName.Contains(metFlags[iFilter])) {
+	if(flagName.Contains("eeBadScFilter") && !isData) continue;
 	if (it->second==0) {
 	  passed = false;
 	  break;
@@ -773,6 +774,12 @@ int main(int argc, char * argv[]) {
   metFlags.push_back("Flag_chargedHadronTrackResolutionFilter");
   metFlags.push_back("Flag_BadChargedCandidateFilter");
   metFlags.push_back("Flag_BadPFMuonFilter");
+
+  // Read fake rates
+  map<std::pair<TString,int>, double>* fakerate  = new map<std::pair<TString,int>, double>();
+  map<std::pair<TString,int>, double>* fakerateE = new map<std::pair<TString,int>, double>();
+  TString file_tauFakeRate = TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/"+tauAntiLFakeRateFileName;
+  GetFakeRates(file_tauFakeRate, fakerate, fakerateE);
 
   int nFiles = 0;
   int nEvents = 0;
@@ -1993,12 +2000,7 @@ int main(int argc, char * argv[]) {
 	tauAntiElectronVLooseMVA6_ = analysisTree.tau_againstElectronVLooseMVA6[indexTau] > 0.5;
 	tauAntiElectronLooseMVA6_ = analysisTree.tau_againstElectronLooseMVA6[indexTau] > 0.5;
 
-	// Add fake rate
-	map<std::pair<TString,int>, double>* fakerate  = new map<std::pair<TString,int>, double>();
-	map<std::pair<TString,int>, double>* fakerateE = new map<std::pair<TString,int>, double>();
-	TString file_tauFakeRate = TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/"+tauAntiLFakeRateFileName;
-	GetFakeRates(file_tauFakeRate, fakerate, fakerateE);
-
+	// Add fake rates to tree
 	// check pt bin
 	int ptBin = -1;
 	if(tauPt_<150)                     ptBin = 0;
@@ -2154,7 +2156,7 @@ int main(int argc, char * argv[]) {
       }
       
       // setting met filters
-      metFilters_ = metFiltersPasses(analysisTree,metFlags);
+      metFilters_ = metFiltersPasses(analysisTree,metFlags,isData);
 
       // ******************************
       // ********* ZJet selection *****
@@ -2419,6 +2421,9 @@ int main(int argc, char * argv[]) {
   file->Write();
   file->Close();
   delete file;
+
+  delete fakerate;
+  delete fakerateE;
   
 }
 
