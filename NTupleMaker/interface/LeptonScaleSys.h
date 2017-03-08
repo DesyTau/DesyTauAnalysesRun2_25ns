@@ -134,16 +134,16 @@ protected:
 
     // propagate the tau pt shift to the MET 
 	pfmetLV.SetPx(pfmetLV.Px()- (lep2_scaled.Px()-lep2.Px()));
-	pfmetLV.SetPy(pfmetLV.Py()- (lep2_scaled.Px()-lep2.Py()));
+	pfmetLV.SetPy(pfmetLV.Py()- (lep2_scaled.Py()-lep2.Py()));
 
 	mvametLV.SetPx(mvametLV.Px()- (lep2_scaled.Px()-lep2.Px()));
-	mvametLV.SetPy(mvametLV.Py()- (lep2_scaled.Px()-lep2.Py()));
+	mvametLV.SetPy(mvametLV.Py()- (lep2_scaled.Py()-lep2.Py()));
 
 	pfmetLV.SetPx(pfmetLV.Px()- (lep1_scaled.Px()-lep1.Px()));
-	pfmetLV.SetPy(pfmetLV.Py()- (lep1_scaled.Px()-lep1.Py()));
+	pfmetLV.SetPy(pfmetLV.Py()- (lep1_scaled.Py()-lep1.Py()));
 
 	mvametLV.SetPx(mvametLV.Px()- (lep1_scaled.Px()-lep1.Px()));
-	mvametLV.SetPy(mvametLV.Py()- (lep1_scaled.Px()-lep1.Py()));
+	mvametLV.SetPy(mvametLV.Py()- (lep1_scaled.Py()-lep1.Py()));
 
     // calc shifted values
 	cenTree->met = pfmetLV.Pt();
@@ -172,14 +172,14 @@ protected:
     
     cenTree->m_vis = dileptonLV.M();
 
-    cenTree->m_sv = 0.;
-    cenTree->pt_sv = 0.;
-    cenTree->eta_sv = 0.;
-    cenTree->phi_sv = 0.;
-    cenTree->met_sv = 0.;
-    cenTree->mt_sv = 0.;
+    cenTree->m_sv = -9999;
+    cenTree->pt_sv = -9999;
+    cenTree->eta_sv = -9999;
+    cenTree->phi_sv = -9999;
+    cenTree->met_sv = -9999;
+    cenTree->mt_sv = -9999;
 
-    if(ch != UNKNOWN){
+    if(ch != UNKNOWN && cenTree->njetspt20>0){
       std::shared_ptr<SVfitStandaloneAlgorithm> algo = calc::svFit(lep1_scaled, cenTree->tau_decay_mode_1, 
 								   lep2_scaled, cenTree->tau_decay_mode_2, 
 								   pfmetLV, covMET, 
@@ -195,8 +195,16 @@ protected:
       }
     }
     outTree[shift]->Fill();
-
-
+/*
+  std::cout << " SVFit in shift  - Inputs -  " << std::endl;
+  std::cout << " Lep 1 : pt = " << lep1_scaled.Pt() << " eta : " << lep1_scaled.Eta() << " phi : " << lep1_scaled.Phi() << " M : " << lep1_scaled.M() <<   " DM : " << cenTree->tau_decay_mode_1 << std::endl;
+  std::cout << " Lep 2 : pt = " << lep2_scaled.Pt() << " eta : " << lep2_scaled.Eta() << " phi : " << lep2_scaled.Phi() << " M : " << lep2_scaled.M() <<   " DM : " << cenTree->tau_decay_mode_2 << std::endl;
+  std::cout << " MET : px = " <<  pfmetLV.Px() << " py = " <<  pfmetLV.Py() << std::endl;
+  std::cout << " MET COV : 00 = " << cenTree->metcov00 << " 01 " << cenTree->metcov01  << " 10 " << cenTree->metcov10 << " 11 " << cenTree->metcov11 << std::endl;
+  std::cout << " SVFit in shift  - Output -  " << std::endl;
+  std::cout << " Mass sv = " << cenTree->m_sv << "pt sv = " << cenTree->pt_sv << std::endl;  
+  std::cout << " SVFit in shift  - END -  " << std::endl;
+*/
     // restore cen values
     cenTree->pt_1 = pt_1_cen;
     cenTree->pt_2 = pt_2_cen;

@@ -614,7 +614,7 @@ int main(int argc, char * argv[]){
 	  
 	  //if (otree->evt != 8993558 && otree->evt != 8563251 && otree->evt != 8765306 && otree->evt != 8776865 && otree->evt != 8816054 && otree->evt !=8763551)	
 	  //continue;
-      
+
       bool overlapEvent = true;
       for (unsigned int iEvent=0; iEvent<runList.size(); ++iEvent) {
       	if (runList.at(iEvent)==otree->run && eventList.at(iEvent)==otree->evt) {
@@ -1788,7 +1788,16 @@ void svfit_variables(TString ch, const AC1B *analysisTree, Spring15Tree *otree, 
   otree->phi_sv = algo.phi();      
   otree->met_sv = algo.fittedMET().Rho();
   otree->mt_sv  = algo.transverseMass();
-
+/*
+  std::cout << " SVFit in main  - Inputs -  " << std::endl;
+  std::cout << " Lep 1 : pt = " << otree->pt_1 << " eta : " << otree->eta_1 << " phi : " << otree->phi_1 << " M : " << otree->m_1 <<   " DM : " << otree->tau_decay_mode_1 << std::endl;
+  std::cout << " Lep 2 : pt = " << otree->pt_2 << " eta : " << otree->eta_2 << " phi : " << otree->phi_2 << " M : " << otree->m_2 << " DM : " << otree->tau_decay_mode_2 << std::endl;
+  std::cout << " MET : px = " <<  otree->met * cos(otree->metphi) << " py = " << otree->met * sin(otree->metphi) << std::endl;
+  std::cout << " MET COV : 00 = " << otree->metcov00 << " 01 " << otree->metcov01  << " 10 " << otree->metcov10 << " 11 " << otree->metcov11 << std::endl;
+  std::cout << " SVFit in main  - Output -  " << std::endl;
+  std::cout << " Mass sv = " << otree->m_sv << "pt sv = " << otree->pt_sv << std::endl;  
+  std::cout << " SVFit in main  - END -  " << std::endl;
+*/
   //if ( algo.isValidSolution() ) {
   //  std::cout << "found mass = " << mass << std::endl;
   //} else {
