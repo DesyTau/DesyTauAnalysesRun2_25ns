@@ -127,7 +127,7 @@ int main(int argc, char * argv[]) {
   for (int iB=0; iB<=nBinsY; ++iB) binsY[iB] = binsY_0jet[iB];
 
   // Weights
-  TString Weight = "mcweight*puweight*effweight*0.978824*";
+  TString Weight = "mcweight*puweight*effweight*0.978824*0.985*";
   if (applyBTagWeight)
     Weight += "btag0weight*";
 
@@ -599,6 +599,7 @@ int main(int argc, char * argv[]) {
   cuts[3] = Weight+"(os>0.5"+Cuts+"&&isZTT)";
   cuts[4] = Weight+"(os>0.5"+Cuts+"&&!isZTT)";
   cuts[6] = Weight+topweight+"(os>0.5"+Cuts+")";
+  cuts[22] = Weight+zptmassweight+"(os>0.5"+Cuts+"&&isZTT)";
 
   cutsSS[0] = qcdweight+"(os<0.5"+Cuts+btagVetoForData+")";
   cutsSS[1] = Weight+zptmassweight+qcdweight+"(os<0.5"+Cuts+"&&isZTT)";
@@ -606,24 +607,25 @@ int main(int argc, char * argv[]) {
   cutsSS[3] = Weight+qcdweight+"(os<0.5"+Cuts+"&&isZTT)";
   cutsSS[4] = Weight+qcdweight+"(os<0.5"+Cuts+"&&!isZTT)";
   cutsSS[6] = Weight+topweight+qcdweight+"(os<0.5"+Cuts+")";
+  cutsSS[22] = Weight+zptmassweight+qcdweight+"(os<0.5"+Cuts+"&&isZTT)";
 
-  cutsSSrelaxed[0] = "(os<0.5"+CutsSS+btagVetoForData+")";
-  cutsSSrelaxed[1] = Weight+zptmassweight+"(os<0.5"+CutsSS+"&&isZTT)";
-  cutsSSrelaxed[2] = Weight+zptmassweight+"(os<0.5"+CutsSS+"&&!isZTT)";
-  cutsSSrelaxed[3] = Weight+"(os<0.5"+CutsSS+"&&isZTT)";
-  cutsSSrelaxed[4] = Weight+"(os<0.5"+CutsSS+"&&!isZTT)";
-  cutsSSrelaxed[6] = Weight+topweight+"(os<0.5"+CutsSS+")";
+  cutsSSrelaxed[0] = qcdweight+"(os<0.5"+CutsSS+btagVetoForData+")";
+  cutsSSrelaxed[1] = Weight+zptmassweight+qcdweight+"(os<0.5"+CutsSS+"&&isZTT)";
+  cutsSSrelaxed[2] = Weight+zptmassweight+qcdweight+"(os<0.5"+CutsSS+"&&!isZTT)";
+  cutsSSrelaxed[3] = Weight+qcdweight+"(os<0.5"+CutsSS+"&&isZTT)";
+  cutsSSrelaxed[4] = Weight+qcdweight+"(os<0.5"+CutsSS+"&&!isZTT)";
+  cutsSSrelaxed[6] = Weight+topweight+qcdweight+"(os<0.5"+CutsSS+")";
+  cutsSSrelaxed[22] = Weight+zptmassweight+qcdweight+"(os<0.5"+CutsSS+"&&isZTT)";
 
   cutsSignal = Weight+"(os>0.5"+Cuts+")"; 
-
 
   // Systematics ->
   for (int iSys=0; iSys<nSys; ++iSys) {
 
     for (int i=0; i<30; ++i) {
       cutsSys[i][iSys] = Weight+"(os>0.5"+CutsSys[iSys]+")";
-      cutsSSSys[i][iSys] = Weight+"(os<0.5"+CutsSys[iSys]+")";
-      cutsSSrelaxedSys[i][iSys] = Weight+"(os<0.5"+CutsSSSys[iSys]+")";
+      cutsSSSys[i][iSys] = Weight+qcdweight+"(os<0.5"+CutsSys[iSys]+")";
+      cutsSSrelaxedSys[i][iSys] = Weight+qcdweight+"(os<0.5"+CutsSSSys[iSys]+")";
     }
 
     cutsSys[0][iSys] = "(os>0.5"+CutsSys[iSys]+btagVetoForData+")";
@@ -632,6 +634,7 @@ int main(int argc, char * argv[]) {
     cutsSys[3][iSys] = Weight+"(os>0.5"+CutsSys[iSys]+"&&isZTT)";
     cutsSys[4][iSys] = Weight+"(os>0.5"+CutsSys[iSys]+"&&!isZTT)";
     cutsSys[6][iSys] = Weight+topweightSys[iSys]+"(os>0.5"+CutsSys[iSys]+")";
+    cutsSys[22][iSys] = Weight+zptmassweightSys[iSys]+"(os>0.5"+CutsSys[iSys]+"&&isZTT)";
 
     cutsSSSys[0][iSys] = qcdweight+"(os<0.5"+CutsSys[iSys]+btagVetoForData+")";
     cutsSSSys[1][iSys] = Weight+zptmassweightSys[iSys]+qcdweight+"(os<0.5"+CutsSys[iSys]+"&&isZTT)";
@@ -639,13 +642,15 @@ int main(int argc, char * argv[]) {
     cutsSSSys[3][iSys] = Weight+qcdweight+"(os<0.5"+CutsSys[iSys]+"&&isZTT)";
     cutsSSSys[4][iSys] = Weight+qcdweight+"(os<0.5"+CutsSys[iSys]+"&&!isZTT)";
     cutsSSSys[6][iSys] = Weight+topweightSys[iSys]+qcdweight+"(os<0.5"+CutsSys[iSys]+")";
+    cutsSSSys[22][iSys] = Weight+zptmassweightSys[iSys]+qcdweight+"(os<0.5"+CutsSys[iSys]+"&&isZTT)";
 
-    cutsSSrelaxedSys[0][iSys] = "(os<0.5"+CutsSSSys[iSys]+btagVetoForData+")";
-    cutsSSrelaxedSys[1][iSys] = Weight+zptmassweightSys[iSys]+"(os<0.5"+CutsSSSys[iSys]+"&&isZTT)";
-    cutsSSrelaxedSys[2][iSys] = Weight+zptmassweightSys[iSys]+"(os<0.5"+CutsSSSys[iSys]+"&&!isZTT)";
-    cutsSSrelaxedSys[3][iSys] = Weight+"(os<0.5"+CutsSSSys[iSys]+"&&isZTT)";
-    cutsSSrelaxedSys[4][iSys] = Weight+"(os<0.5"+CutsSSSys[iSys]+"&&!isZTT)";
-    cutsSSrelaxedSys[6][iSys] = Weight+topweightSys[iSys]+"(os<0.5"+CutsSSSys[iSys]+")";
+    cutsSSrelaxedSys[0][iSys] = qcdweight+"(os<0.5"+CutsSSSys[iSys]+btagVetoForData+")";
+    cutsSSrelaxedSys[1][iSys] = Weight+zptmassweightSys[iSys]+qcdweight+"(os<0.5"+CutsSSSys[iSys]+"&&isZTT)";
+    cutsSSrelaxedSys[2][iSys] = Weight+zptmassweightSys[iSys]+qcdweight+"(os<0.5"+CutsSSSys[iSys]+"&&!isZTT)";
+    cutsSSrelaxedSys[3][iSys] = Weight+qcdweight+"(os<0.5"+CutsSSSys[iSys]+"&&isZTT)";
+    cutsSSrelaxedSys[4][iSys] = Weight+qcdweight+"(os<0.5"+CutsSSSys[iSys]+"&&!isZTT)";
+    cutsSSrelaxedSys[6][iSys] = Weight+topweightSys[iSys]+qcdweight+"(os<0.5"+CutsSSSys[iSys]+")";
+    cutsSSrelaxedSys[22][iSys] = Weight+zptmassweightSys[iSys]+qcdweight+"(os<0.5"+CutsSSSys[iSys]+"&&isZTT)";
 
     cutsSignalSys[iSys] = Weight+"(os>0.5"+CutsSys[iSys]+")";
 
@@ -661,8 +666,8 @@ int main(int argc, char * argv[]) {
 
       for (int i=0; i<30; ++i) {
 	cutsJesSys[i][iSys][iUp] = Weight+"(os>0.5"+CutsJesSys[iSys][iUp]+")";
-	cutsSSJesSys[i][iSys][iUp] = Weight+"(os<0.5"+CutsJesSys[iSys][iUp]+")";
-	cutsSSrelaxedJesSys[i][iSys][iUp] = Weight+"(os<0.5"+CutsSSJesSys[iSys][iUp]+")";
+	cutsSSJesSys[i][iSys][iUp] = Weight+qcdweight+"(os<0.5"+CutsJesSys[iSys][iUp]+")";
+	cutsSSrelaxedJesSys[i][iSys][iUp] = Weight+qcdweight+"(os<0.5"+CutsSSJesSys[iSys][iUp]+")";
       }
       
       cutsJesSys[0][iSys][iUp] = "(os>0.5"+CutsJesSys[iSys][iUp]+")";
@@ -671,6 +676,7 @@ int main(int argc, char * argv[]) {
       cutsJesSys[3][iSys][iUp] = Weight+"(os>0.5"+CutsJesSys[iSys][iUp]+"&&isZTT)";
       cutsJesSys[4][iSys][iUp] = Weight+"(os>0.5"+CutsJesSys[iSys][iUp]+"&&!isZTT)";
       cutsJesSys[6][iSys][iUp] = Weight+topweight+"(os>0.5"+CutsJesSys[iSys][iUp]+")";
+      cutsJesSys[22][iSys][iUp] = Weight+zptmassweight+"(os>0.5"+CutsJesSys[iSys][iUp]+"&&isZTT)";
       
       cutsSSJesSys[0][iSys][iUp] = qcdweight+"(os<0.5"+CutsJesSys[iSys][iUp]+")";
       cutsSSJesSys[1][iSys][iUp] = Weight+zptmassweight+qcdweight+"(os<0.5"+CutsJesSys[iSys][iUp]+"&&isZTT)";
@@ -678,13 +684,15 @@ int main(int argc, char * argv[]) {
       cutsSSJesSys[3][iSys][iUp] = Weight+qcdweight+"(os<0.5"+CutsJesSys[iSys][iUp]+"&&isZTT)";
       cutsSSJesSys[4][iSys][iUp] = Weight+qcdweight+"(os<0.5"+CutsJesSys[iSys][iUp]+"&&!isZTT)";
       cutsSSJesSys[6][iSys][iUp] = Weight+topweight+qcdweight+"(os<0.5"+CutsJesSys[iSys][iUp]+")";
+      cutsSSJesSys[22][iSys][iUp] = Weight+zptmassweight+qcdweight+"(os<0.5"+CutsJesSys[iSys][iUp]+"&&isZTT)";
       
-      cutsSSrelaxedJesSys[0][iSys][iUp] = "(os<0.5"+CutsSSJesSys[iSys][iUp]+")";
-      cutsSSrelaxedJesSys[1][iSys][iUp] = Weight+zptmassweight+"(os<0.5"+CutsSSJesSys[iSys][iUp]+"&&isZTT)";
-      cutsSSrelaxedJesSys[2][iSys][iUp] = Weight+zptmassweight+"(os<0.5"+CutsSSJesSys[iSys][iUp]+"&&!isZTT)";
-      cutsSSrelaxedJesSys[3][iSys][iUp] = Weight+"(os<0.5"+CutsSSJesSys[iSys][iUp]+"&&isZTT)";
-      cutsSSrelaxedJesSys[4][iSys][iUp] = Weight+"(os<0.5"+CutsSSJesSys[iSys][iUp]+"&&!isZTT)";
-      cutsSSrelaxedJesSys[6][iSys][iUp] = Weight+topweight+"(os<0.5"+CutsSSJesSys[iSys][iUp]+")";
+      cutsSSrelaxedJesSys[0][iSys][iUp] = qcdweight+"(os<0.5"+CutsSSJesSys[iSys][iUp]+")";
+      cutsSSrelaxedJesSys[1][iSys][iUp] = Weight+zptmassweight+qcdweight+"(os<0.5"+CutsSSJesSys[iSys][iUp]+"&&isZTT)";
+      cutsSSrelaxedJesSys[2][iSys][iUp] = Weight+zptmassweight+qcdweight+"(os<0.5"+CutsSSJesSys[iSys][iUp]+"&&!isZTT)";
+      cutsSSrelaxedJesSys[3][iSys][iUp] = Weight+qcdweight+"(os<0.5"+CutsSSJesSys[iSys][iUp]+"&&isZTT)";
+      cutsSSrelaxedJesSys[4][iSys][iUp] = Weight+qcdweight+"(os<0.5"+CutsSSJesSys[iSys][iUp]+"&&!isZTT)";
+      cutsSSrelaxedJesSys[6][iSys][iUp] = Weight+topweight+qcdweight+"(os<0.5"+CutsSSJesSys[iSys][iUp]+")";
+      cutsSSrelaxedJesSys[22][iSys][iUp] = Weight+zptmassweight+qcdweight+"(os<0.5"+CutsSSJesSys[iSys][iUp]+"&&isZTT)";
       
     }
   }
@@ -858,7 +866,7 @@ int main(int argc, char * argv[]) {
       
       hist2D->Sumw2();
       
-      tree->Draw(Variable+">>"+histName,cuts[i]);
+      tree->Draw(Variable+">>"+histName,cutsSignal);
       histSignal[i][iM] = (TH1D*)Unfold(hist2D);
       
       std::cout << sampleName << std::endl;
@@ -1023,11 +1031,11 @@ int main(int argc, char * argv[]) {
 
     cutsZtt[iDY]   = Weight+zptmassweight+"(os>0.5"+Cuts+npartonCuts[iDY]+"&&isZTT>0.5)";
     cutsZttSS[iDY] = Weight+zptmassweight+qcdweight+"(os<0.5"+Cuts+npartonCuts[iDY]+"&&isZTT>0.5)";
-    cutsZttSSrelaxed[iDY] = Weight+zptmassweight+"(os<0.5"+CutsSS+npartonCuts[iDY]+"&&isZTT>0.5)";
+    cutsZttSSrelaxed[iDY] = Weight+zptmassweight+qcdweight+"(os<0.5"+CutsSS+npartonCuts[iDY]+"&&isZTT>0.5)";
 
     cutsZll[iDY]   = Weight+zptmassweight+"(os>0.5"+Cuts+npartonCuts[iDY]+"&&isZTT<0.5)";
     cutsZllSS[iDY] = Weight+zptmassweight+qcdweight+"(os<0.5"+Cuts+npartonCuts[iDY]+"&&isZTT<0.5)";
-    cutsZllSSrelaxed[iDY] = Weight+zptmassweight+"(os<0.5"+CutsSS+npartonCuts[iDY]+"&&isZTT<0.5)";
+    cutsZllSSrelaxed[iDY] = Weight+zptmassweight+qcdweight+"(os<0.5"+CutsSS+npartonCuts[iDY]+"&&isZTT<0.5)";
 
     for (int iSys=0; iSys<nSys; ++iSys) {
 
@@ -1037,8 +1045,8 @@ int main(int argc, char * argv[]) {
       cutsZttSSSys[iDY][iSys] = Weight+zptmassweightSys[iSys]+qcdweight+"(os<0.5"+CutsSys[iSys]+npartonCuts[iDY]+"&&isZTT>0.5)";
       cutsZllSSSys[iDY][iSys] = Weight+zptmassweightSys[iSys]+qcdweight+"(os<0.5"+CutsSys[iSys]+npartonCuts[iDY]+"&&isZTT<0.5)";
 
-      cutsZttSSrelaxedSys[iDY][iSys] = Weight+zptmassweightSys[iSys]+"(os<0.5"+CutsSSSys[iSys]+npartonCuts[iDY]+"&&isZTT>0.5)";
-      cutsZllSSrelaxedSys[iDY][iSys] = Weight+zptmassweightSys[iSys]+"(os<0.5"+CutsSSSys[iSys]+npartonCuts[iDY]+"&&isZTT<0.5)";
+      cutsZttSSrelaxedSys[iDY][iSys] = Weight+zptmassweightSys[iSys]+qcdweight+"(os<0.5"+CutsSSSys[iSys]+npartonCuts[iDY]+"&&isZTT>0.5)";
+      cutsZllSSrelaxedSys[iDY][iSys] = Weight+zptmassweightSys[iSys]+qcdweight+"(os<0.5"+CutsSSSys[iSys]+npartonCuts[iDY]+"&&isZTT<0.5)";
 
     }
 
@@ -1051,8 +1059,8 @@ int main(int argc, char * argv[]) {
 	cutsZttSSJesSys[iDY][iSys][iUp] = Weight+zptmassweight+qcdweight+"(os<0.5"+CutsJesSys[iSys][iUp]+npartonCuts[iDY]+"&&isZTT>0.5)";
 	cutsZllSSJesSys[iDY][iSys][iUp] = Weight+zptmassweight+qcdweight+"(os<0.5"+CutsJesSys[iSys][iUp]+npartonCuts[iDY]+"&&isZTT<0.5)";
 
-	cutsZttSSrelaxedJesSys[iDY][iSys][iUp] = Weight+zptmassweight+"(os<0.5"+CutsSSJesSys[iSys][iUp]+npartonCuts[iDY]+"&&isZTT>0.5)";
-	cutsZllSSrelaxedJesSys[iDY][iSys][iUp] = Weight+zptmassweight+"(os<0.5"+CutsSSJesSys[iSys][iUp]+npartonCuts[iDY]+"&&isZTT<0.5)";
+	cutsZttSSrelaxedJesSys[iDY][iSys][iUp] = Weight+zptmassweight+qcdweight+"(os<0.5"+CutsSSJesSys[iSys][iUp]+npartonCuts[iDY]+"&&isZTT>0.5)";
+	cutsZllSSrelaxedJesSys[iDY][iSys][iUp] = Weight+zptmassweight+qcdweight+"(os<0.5"+CutsSSJesSys[iSys][iUp]+npartonCuts[iDY]+"&&isZTT<0.5)";
 
       }
     }
@@ -1440,17 +1448,17 @@ int main(int argc, char * argv[]) {
   for (int iDY=0; iDY<9; ++iDY) {
     cutsW[iDY]   = Weight+"(os>0.5"+Cuts+npartonCuts[iDY]+")";
     cutsWSS[iDY] = Weight+qcdweight+"(os<0.5"+Cuts+npartonCuts[iDY]+")";
-    cutsWSSrelaxed[iDY] = Weight+"(os<0.5"+CutsSS+npartonCuts[iDY]+")";
+    cutsWSSrelaxed[iDY] = Weight+qcdweight+"(os<0.5"+CutsSS+npartonCuts[iDY]+")";
     for (int iSys=0; iSys<nSys; ++iSys) {
       cutsWSys[iDY][iSys] = Weight+"(os>0.5"+CutsSys[iSys]+npartonCuts[iDY]+")";
       cutsWSSSys[iDY][iSys] = Weight+qcdweight+"(os<0.5"+CutsSys[iSys]+npartonCuts[iDY]+")";
-      cutsWSSrelaxedSys[iDY][iSys] = Weight+"(os<0.5"+CutsSSSys[iSys]+npartonCuts[iDY]+")";
+      cutsWSSrelaxedSys[iDY][iSys] = Weight+qcdweight+"(os<0.5"+CutsSSSys[iSys]+npartonCuts[iDY]+")";
     }
     for (int iSys=0; iSys<29; ++iSys) {
       for (int iUp=0; iUp<2; ++iUp) {
 	cutsWJesSys[iDY][iSys][iUp] = Weight+"(os>0.5"+CutsJesSys[iSys][iUp]+npartonCuts[iDY]+")";
 	cutsWSSJesSys[iDY][iSys][iUp] = Weight+qcdweight+"(os<0.5"+CutsJesSys[iSys][iUp]+npartonCuts[iDY]+")";
-	cutsWSSrelaxedJesSys[iDY][iSys][iUp] = Weight+"(os<0.5"+CutsSSJesSys[iSys][iUp]+npartonCuts[iDY]+")";
+	cutsWSSrelaxedJesSys[iDY][iSys][iUp] = Weight+qcdweight+"(os<0.5"+CutsSSJesSys[iSys][iUp]+npartonCuts[iDY]+")";
       }
     }
   }
@@ -1637,7 +1645,7 @@ int main(int argc, char * argv[]) {
   // ********************************
 
 
-  // Dreall-Yan low mass + high mass
+  // Drell-Yan low mass + high mass
   hist[1]->Add(hist[1],hist[3]); 
   hist[2]->Add(hist[2],hist[4]); 
   for (int iSys=0; iSys<nSys; ++iSys) {
@@ -1686,9 +1694,11 @@ int main(int argc, char * argv[]) {
   }
 
   std::cout << "Data in SS region = " << histSS[0]->GetSumOfWeights() << std::endl;
+  std::cout << "Data in SS relaxed region = " << histSSrelaxed[0]->GetSumOfWeights() << std::endl;
  
   // subtracting background from SS
-  for (int iH=1; iH<27; ++iH) {
+  for (int iH=1; iH<25; ++iH) {
+    std::cout << sampleNames[iH] << " : " << histSSrelaxed[iH]->GetSumOfWeights() << std::endl;
     histSS[0]->Add(histSS[0],histSS[iH],1,-1);
     histSSrelaxed[0]->Add(histSSrelaxed[0],histSSrelaxed[iH],1,-1);
     for (int iSys=0; iSys<nSys; ++iSys) {
@@ -1778,11 +1788,16 @@ int main(int argc, char * argv[]) {
   histSys[1][11] = (TH1D*)hist[1]->Clone("ZTT_2DDown");
   histSys[2][10] = (TH1D*)hist[2]->Clone("ZL_2DUp");
   histSys[2][11] = (TH1D*)hist[2]->Clone("ZL_2DDown");
+  histSys[22][10] = (TH1D*)hist[22]->Clone("EWKZ_2DUp");
+  histSys[22][11] = (TH1D*)hist[22]->Clone("EWKZ_2DDown");
+  
+  int dyS[3] = {1,2,22};
   if (category=="em_vbf") {
     for (int iB=1; iB<=nBins; ++iB) {
       int binN = int((iB-1)/nBinsX);
       float dySF = dyCorr2D[binN];
-      for (int iDY=1; iDY<=2; ++iDY) {
+      for (int iSDY=0; iSDY<3; ++iSDY) {
+	int iDY = dyS[iSDY];
 	float xDY = hist[iDY]->GetBinContent(iB);
 	float eDY = hist[iDY]->GetBinError(iB);
 	hist[iDY]->SetBinContent(iB,dySF*xDY);
@@ -1807,6 +1822,7 @@ int main(int argc, char * argv[]) {
 	}
       }
     }
+    
   }
 
   // ********************************************
@@ -1834,7 +1850,7 @@ int main(int argc, char * argv[]) {
   TH1D * ggHWW125 = (TH1D*)hist[25]->Clone("HWW_gg125");
   TH1D * qqHWW125 = (TH1D*)hist[26]->Clone("HWW_qq125");
 
-  TString BaseName = "htt_em.inputs-sm-13TeV_" +Suffix;
+  TString BaseName = "htt_em.inputs-sm-13TeV_" + category + "_" + Suffix;
   TString rootFileName = BaseName+".root";
   TFile * fileInputs = new TFile(rootFileName,"recreate"); 
   fileInputs->mkdir(category);
@@ -1864,11 +1880,11 @@ int main(int argc, char * argv[]) {
   for (int iSys=0; iSys<2; ++iSys) {
     histSys[6][iSys]->Write("TT"+sysName[iSys]);
   }
-  for (int iSys=6; iSys<7; ++iSys) {
+  for (int iSys=6; iSys<8; ++iSys) {
     histSys[1][iSys]->Write("ZTT"+sysName[iSys]);
     histSys[2][iSys]->Write("ZL"+sysName[iSys]);
   }
-  for (int iSys=10; iSys<11; ++iSys) {
+  for (int iSys=10; iSys<12; ++iSys) {
     histSys[1][iSys]->Write("ZTT"+sysName[iSys]);
     histSys[2][iSys]->Write("ZL"+sysName[iSys]);
   }
@@ -1886,7 +1902,7 @@ int main(int argc, char * argv[]) {
     }
   }
 
-  TString signalTemplates[4] = {"ggH","qqH","WH","ZH"};
+  TString signalTemplates[4] = {"ggH","qqH","ZH","WH"};
   for (int iSig=0; iSig<4; ++iSig) {
     for (int iM=0; iM<5; ++iM) {
       TString sigTemplate = signalTemplates[iSig] + massH[iM];
