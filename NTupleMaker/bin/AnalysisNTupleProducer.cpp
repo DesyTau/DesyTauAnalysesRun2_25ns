@@ -247,6 +247,7 @@ int main(int argc, char * argv[]) {
   // ntuple variables
 
   UInt_t run_;
+  UInt_t lumi_;
   UInt_t event_;
   
   Float_t puWeight_;
@@ -499,6 +500,7 @@ int main(int argc, char * argv[]) {
 
   ntuple_->Branch("event",&event_,"event/i"); 
   ntuple_->Branch("run",  &run_,  "run/i");
+  ntuple_->Branch("luminosityBlock", &lumi_,  "luminosityBlock/i");
 
   ntuple_->Branch("puWeight",  &puWeight_,  "puWeight/F");
   ntuple_->Branch("genWeight", &genWeight_, "genWeight/F");
@@ -832,6 +834,7 @@ int main(int argc, char * argv[]) {
       // initialize ntuple variables
       // ***************************
       run_ = analysisTree.event_run;
+      lumi_ = analysisTree.event_luminosityblock;
       event_ = analysisTree.event_nr;
       nVert_ = analysisTree.primvertex_count;
 
