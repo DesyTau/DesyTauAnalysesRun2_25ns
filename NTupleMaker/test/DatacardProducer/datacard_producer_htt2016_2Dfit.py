@@ -155,6 +155,8 @@ def Wjets_dataMC_sf(SSOSratio, hw): #hw contains the result of the calculation, 
 
 	hdata_os_highmt = hdummy.Clone("hdata_os_highmt")
 	hdata_ss_highmt = hdummy.Clone("hdata_ss_highmt")
+	global var
+	#print "var= " , var
 	tdata.Draw(var+" >> hdata_os_highmt", cvalue+"&&"+highMTcut+" && q_1 * q_2 < 0. ")
 	tdata.Draw(var + " >> hdata_ss_highmt", cvalue+"&&"+highMTcut+" && q_1 * q_2 > 0. " )
 
@@ -176,13 +178,35 @@ def Wjets_dataMC_sf(SSOSratio, hw): #hw contains the result of the calculation, 
 	htt_os_highmt = hdummy.Clone("htt_os_highmt")
 	htt_ss_highmt = hdummy.Clone("htt_ss_highmt")
 	makeDatacard_ssos(treeName, ltt, cvalue+"&&"+highMTcut, wvalue, htt_os_highmt, htt_ss_highmt)
+	
+	#Drell Yan components
+	hztt_os_highmt = hdummy.Clone("hztt_os_highmt")
+	hztt_ss_highmt = hdummy.Clone("hztt_ss_highmt")
+	makeDatacard_ssos(treeName, ldy, cvalue+"&&"+highMTcut+"&&"+ZTTcut, wvalue+"*"+dy_weight, hztt_os_highmt, hztt_ss_highmt)
+	hzl_os_highmt = hdummy.Clone("hzl_os_highmt")
+	hzl_ss_highmt = hdummy.Clone("hzl_ss_highmt")
+	if (("0jet" in ckey) and datacardFor2Dfit):
+		var = varY+"*"+mvis_zl_corr.get(channel,"1")+":"+varX
+	makeDatacard_ssos(treeName, ldy, cvalue+"&&"+highMTcut+"&&"+ZLcut, wvalue+"*"+dy_weight+"*"+ZL_yield_SF.get(channel,"1"), hzl_os_highmt, hzl_ss_highmt)
+	var = varY+":"+varX
+	hzj_os_highmt = hdummy.Clone("hzj_os_highmt")
+	hzj_ss_highmt = hdummy.Clone("hzj_ss_highmt")
+	makeDatacard_ssos(treeName, ldy, cvalue+"&&"+highMTcut+"&&"+ZJcut, wvalue+"*"+dy_weight, hzj_os_highmt, hzj_ss_highmt)
+	# add Drell Yan together
 	hdy_os_highmt = hdummy.Clone("hdy_os_highmt")
-	hdy_ss_highmt = hdummy.Clone("hdy_ss_highmt")
-	makeDatacard_ssos(treeName, ldy, cvalue+"&&"+highMTcut, wvalue+"*"+dy_weight, hdy_os_highmt, hdy_ss_highmt)
+	hdy_os_highmt.Add(hztt_os_highmt)
+	hdy_os_highmt.Add(hzl_os_highmt)
+	hdy_os_highmt.Add(hzj_os_highmt)
+	hdy_ss_highmt = hdummy.Clone("hdy_ss_highmt")	
+	hdy_ss_highmt.Add(hztt_ss_highmt)
+	hdy_ss_highmt.Add(hzl_ss_highmt)
+	hdy_ss_highmt.Add(hzj_ss_highmt)
+	#makeDatacard_ssos(treeName, ldy, cvalue+"&&"+highMTcut, wvalue+"*"+dy_weight, hdy_os_highmt, hdy_ss_highmt)
+
 	hw_os_highmt = hdummy.Clone("hw_os_highmt")
 	hw_ss_highmt = hdummy.Clone("hw_ss_highmt")		
 	makeDatacard_ssos(treeName, lw, cvalue+"&&"+highMTcut, wvalue+"*"+dy_weight, hw_os_highmt, hw_ss_highmt)
-
+	
 	hqcd_ss_highmt = hdummy.Clone("hqcd_ss_highmt")
 	add_all(hqcd_ss_highmt, [(hdata_ss_highmt,1),(hvv_ss_highmt,-1),(htt_ss_highmt,-1),(hdy_ss_highmt,-1),(hw_ss_highmt,-1),(hewkz_ss_highmt,-1), (hvbfhww_ss_highmt,-1), (hgghww_ss_highmt,-1)])	
 			
@@ -201,11 +225,25 @@ def Wjets_dataMC_sf(SSOSratio, hw): #hw contains the result of the calculation, 
 		hvv_ss_highmt_rel = hdummy.Clone("hvv_ss_highmt_rel")
 		makeDatacard_category(treeName, lvv, relaxedSel+"&&"+highMTcut, "q_1*q_2>0", wvalue, "_highmt_ss_rel", hvv_ss_highmt_rel )
 		hewkz_ss_highmt_rel = hdummy.Clone("hewkz_ss_highmt_rel")
-		makeDatacard_category(treeName, lewkz, relaxedSel+"&&"+highMTcut, "q_1*q_2>0", wvalue, "_highmt_ss_rel", hewkz_ss_highmt_rel )
+		makeDatacard_category(treeName, lewkz, relaxedSel+"&&"+highMTcut, "q_1*q_2>0", wvalue+"*"+dy_weight, "_highmt_ss_rel", hewkz_ss_highmt_rel )
 		htt_ss_highmt_rel = hdummy.Clone("htt_ss_highmt_rel")
-		makeDatacard_category(treeName, ltt, relaxedSel+"&&"+highMTcut, "q_1*q_2>0", wvalue+"*"+dy_weight, "_highmt_ss_rel", htt_ss_highmt_rel )
+		makeDatacard_category(treeName, ltt, relaxedSel+"&&"+highMTcut, "q_1*q_2>0", wvalue, "_highmt_ss_rel", htt_ss_highmt_rel )
+
+		hztt_ss_highmt_rel = hdummy.Clone("hztt_ss_highmt_rel")
+		hzl_ss_highmt_rel = hdummy.Clone("hzl_ss_highmt_rel")
+		hzj_ss_highmt_rel = hdummy.Clone("hzj_ss_highmt_rel")
+		makeDatacard_category(treeName, ldy, relaxedSel+"&&"+highMTcut+"&&"+ZTTcut, "q_1*q_2>0", wvalue+"*"+dy_weight, "_ztt_highmt_ss_rel", hztt_ss_highmt_rel )
+		if (("0jet" in ckey) and datacardFor2Dfit):
+			var = varY+"*"+mvis_zl_corr.get(channel,"1")+":"+varX
+		makeDatacard_category(treeName, ldy, relaxedSel+"&&"+highMTcut+"&&"+ZLcut, "q_1*q_2>0", wvalue+"*"+dy_weight+"*"+ZL_yield_SF.get(channel,"1"), "_zl_highmt_ss_rel", hzl_ss_highmt_rel )
+		var = varY+":"+varX
+		makeDatacard_category(treeName, ldy, relaxedSel+"&&"+highMTcut+"&&"+ZJcut, "q_1*q_2>0", wvalue+"*"+dy_weight, "_zj_highmt_ss_rel", hzj_ss_highmt_rel )
 		hdy_ss_highmt_rel = hdummy.Clone("hdy_ss_highmt_rel")
-		makeDatacard_category(treeName, ldy, relaxedSel+"&&"+highMTcut, "q_1*q_2>0", wvalue+"*"+dy_weight, "_highmt_ss_rel", hdy_ss_highmt_rel )
+		hdy_ss_highmt_rel.Add(hztt_ss_highmt_rel)
+		hdy_ss_highmt_rel.Add(hzl_ss_highmt_rel)
+		hdy_ss_highmt_rel.Add(hzj_ss_highmt_rel)		
+		#makeDatacard_category(treeName, ldy, relaxedSel+"&&"+highMTcut, "q_1*q_2>0", wvalue+"*"+dy_weight, "_highmt_ss_rel", hdy_ss_highmt_rel )
+
 		hw_ss_highmt_rel = hdummy.Clone("hw_ss_highmt_rel")
 		makeDatacard_category(treeName, lw, relaxedSel+"&&"+highMTcut, "q_1*q_2>0",  wvalue, "_highmt_ss_rel", hw_ss_highmt_rel )
 		hvbfhww_ss_highmt_rel = hdummy.Clone("hvbfhww_ss_highmt_rel")
@@ -325,11 +363,11 @@ lumi = 35870
 
 if channel == "mt":
 	indir = "/nfs/dust/cms/user/bottav/CMSSW_8_0_25/src/DesyTauAnalyses/NTupleMaker/test/NTuple_Mar/mutau/final"
-	indirData = "/nfs/dust/cms/user/bottav/CMSSW_8_0_25/src/DesyTauAnalyses/NTupleMaker/test/NTuple_Feb/mutau/final"
+	indirData = "/nfs/dust/cms/user/bottav/CMSSW_8_0_25/src/DesyTauAnalyses/NTupleMaker/test/NTuple_Mar/mutau/final"
 
 if channel == "et":
-	indir = "/nfs/dust/cms/user/bottav/CMSSW_8_0_25/src/DesyTauAnalyses/NTupleMaker/test/NTuple_Feb/etau/final"
-	indirData = "/nfs/dust/cms/user/bottav/CMSSW_8_0_25/src/DesyTauAnalyses/NTupleMaker/test/NTuple_Feb/etau/final"
+	indir = "/nfs/dust/cms/user/bottav/CMSSW_8_0_25/src/DesyTauAnalyses/NTupleMaker/test/NTuple_Mar/etau/final"
+	indirData = "/nfs/dust/cms/user/bottav/CMSSW_8_0_25/src/DesyTauAnalyses/NTupleMaker/test/NTuple_Mar/etau/final"
 
 isBlinded = False 
 datacardFor2Dfit = True
@@ -408,6 +446,33 @@ zmumu_CR_weights = {"vbf":               {"binVar":"mjj", "weights":{(300.,700.)
 					"wjets_vbf_cr":      {"binVar":"mjj", "weights":{(300.,700.):1.070, (700.,1000.):1.090, (1100.,1500.):1.055, (1500.,14000):1.015}}, 
 					"antiiso_vbf_cr":    {"binVar":"mjj", "weights":{(300.,700.):1.070, (700.,1000.):1.090, (1100.,1500.):1.055, (1500.,14000):1.015}},
 					"down_shape":        {"binVar":"mjj", "weights":{(300.,700.):1.1449, (700.,1000.):1.1881, (1100.,1500.):1.113, (1500.,14000):1.030}}}
+
+# correct mvis shape for ZL in 0jet. Applied to nominal value. 
+mvis_zl_corr = {"mt": "(1+(0.01*(tau_decay_mode_2==0)))", 
+				"mt_1prong_up": "(1+(0.013*(tau_decay_mode_2==0)))", #1.01*1.003 is the up shift 
+				"mt_1prong_down": "(1+(0.007*(tau_decay_mode_2==0)))", #1.01*0.997 is the down shift
+				"mt_1prong1pi_up": "(1+(0.01*(tau_decay_mode_2==0))+(0.004*(tau_decay_mode_2==1)))", # 1.004
+				"mt_1prong1pi_down": "(1+(0.01*(tau_decay_mode_2==0))+(-0.004*(tau_decay_mode_2==1)))", #0.996
+				"et": "(1+((0.017*(tau_decay_mode_2==0))+(0.03*(tau_decay_mode_2==1))))",
+				"et_1prong_up": "(1+((0.022*(tau_decay_mode_2==0))+(0.03*(tau_decay_mode_2==1))))", #1.017*1.005
+				"et_1prong_down": "(1+((0.0119*(tau_decay_mode_2==0))+(0.03*(tau_decay_mode_2==1))))", #1.017*0.995
+				"et_1prong1pi_up": "(1+((0.017*(tau_decay_mode_2==0))+(0.035*(tau_decay_mode_2==1))))", #1.03*1.005
+				"et_1prong1pi_down": "(1+((0.017*(tau_decay_mode_2==0))+(0.02485*(tau_decay_mode_2==1))))" #1.03*0.995
+				}
+
+
+ZL_yield_SF = {"mt": "((0.74*(tau_decay_mode_2==0))+(1*(tau_decay_mode_2!=0)))",
+				"mt_1prong_up":"((0.74*1.25*(tau_decay_mode_2==0))+(1*(tau_decay_mode_2!=0)))", 
+				"mt_1prong_down":"((0.74*0.75*(tau_decay_mode_2==0))+(1*(tau_decay_mode_2!=0)))",
+				"mt_1prong1pi_up":"((0.74*(tau_decay_mode_2==0))+(1.25*(tau_decay_mode_2==1))+(1*(tau_decay_mode_2==10)))", 
+				"mt_1prong1pi_down":"((0.74*(tau_decay_mode_2==0))+(0.75*(tau_decay_mode_2==1))+(1*(tau_decay_mode_2==10)))",
+			   "et": "((0.98*(tau_decay_mode_2==0))+(1.49*(tau_decay_mode_2==1))+(1*(tau_decay_mode_2==10)))",
+				"et_1prong_up":"((0.98*1.12*(tau_decay_mode_2==0))+(1.49*(tau_decay_mode_2==1))+(1*(tau_decay_mode_2==10)))", 
+				"et_1prong_down":"((0.98*0.88*(tau_decay_mode_2==0))+(1.49*(tau_decay_mode_2==1))+(1*(tau_decay_mode_2==10)))",
+				"et_1prong1pi_up":"((0.98*(tau_decay_mode_2==0))+(1.49*1.12*(tau_decay_mode_2==1))+(1*(tau_decay_mode_2==10)))", 
+				"et_1prong1pi_down":"((0.98*(tau_decay_mode_2==0))+(1.49*0.88*(tau_decay_mode_2==1))+(1*(tau_decay_mode_2==10)))"
+			  }
+
 ##########################
 # define file lists
 ##########################
@@ -819,22 +884,12 @@ for wkey, wvalue in weighting.iteritems():
 			print "TT, done"
 
 			#DY
-			hdy = hdummy.Clone("DY")
-			hdy_ss = hdummy.Clone("DY_ss")
-			hdy.SetDirectory(0)
-			hdy_ss.SetDirectory(0)
 
 			# weights for DY from Zmumu CR
 			zmumu_weight = zmumu_CR_weights.get(ckey,None)
 			dy_weight = "1.00"
 			if zmumu_weight is not None:
 				dy_weight += "*" + makeBinString(zmumu_weight["weights"],zmumu_weight["binVar"])
-		
-			makeDatacard_ssos(treeName, ldy, cvalue+lowMTcut, wvalue, hdy, hdy_ss)
-			if (relaxedSel is not None):
-				hdy_rel = hdummy.Clone("DY_rel")
-				hdy_rel_ss = hdummy.Clone("DY_rel_ss")				
-				makeDatacard_ssos(treeName, ldy, relaxedSel+lowMTcut, wvalue+"*"+dy_weight, hdy_rel, hdy_rel_ss)
 
 			#ZTT , ZL, ZJ
 			hztt = hdummy.Clone("ztt")
@@ -843,21 +898,75 @@ for wkey, wvalue in weighting.iteritems():
 
 			hztt.SetDirectory(0)
 			hzl.SetDirectory(0)		
-			hzj.SetDirectory(0)		
+			hzj.SetDirectory(0)
 
-			ZTTcut = "gen_match_2 == 5 && q_1 * q_2 < 0." 
-			ZLcut = "gen_match_2 < 5 && q_1 * q_2 < 0." 
-			ZJcut = "gen_match_2 == 6 && q_1 * q_2 < 0." 
+			hztt_ss = hdummy.Clone("ztt_ss")
+			hzl_ss = hdummy.Clone("zl_ss")
+			hzj_ss = hdummy.Clone("zj_ss")
 
-			makeDatacard_category(treeName, ldy, cvalue+lowMTcut, ZTTcut, wvalue+"*"+dy_weight, "ZTT", hztt)
-			makeDatacard_category(treeName, ldy, cvalue+lowMTcut, ZJcut, wvalue+"*"+dy_weight, "ZJ", hzj)
+			hztt_ss.SetDirectory(0)
+			hzl_ss.SetDirectory(0)		
+			hzj_ss.SetDirectory(0)
+
+			ZTTcut = "gen_match_2 == 5"# && q_1 * q_2 < 0." 
+			ZLcut = "gen_match_2 < 5 "#&& q_1 * q_2 < 0." 
+			ZJcut = "gen_match_2 == 6 "#&& q_1 * q_2 < 0." 
+
+			makeDatacard_ssos(treeName, ldy, cvalue+lowMTcut+"&&"+ZTTcut, wvalue+"*"+dy_weight, hztt, hztt_ss)
+			makeDatacard_ssos(treeName, ldy, cvalue+lowMTcut+"&&"+ZJcut, wvalue+"*"+dy_weight, hzj, hzj_ss)
 			# correct m_vis for ZL in 0jet
-			# var = varY+":"+varX
-			#if (("0jet" in ckey) and datacardFor2Dfit):
-			#	var = varY+"*"+mvis_weight+":"+varX
-			makeDatacard_category(treeName, ldy, cvalue+lowMTcut, ZLcut, wvalue+"*"+dy_weight, "ZL", hzl)
+			if (("0jet" in ckey) and datacardFor2Dfit):
+				var = varY+"*"+mvis_zl_corr.get(channel,"1")+":"+varX
+				print "#################"
+				print " using var = ", var , "for ZL"
+			makeDatacard_ssos(treeName, ldy, cvalue+lowMTcut+"&&"+ZLcut, wvalue+"*"+dy_weight+"*"+ZL_yield_SF.get(channel,"1"), hzl, hzl_ss)
 			# back to normal "var"
- 			#var = varY+":"+varX
+ 			var = varY+":"+varX
+
+			hdy = hdummy.Clone("DY")
+			hdy.SetDirectory(0)
+			hdy.Add(hztt)
+			hdy.Add(hzl)
+			hdy.Add(hzj)
+
+			hdy_ss = hdummy.Clone("DY_ss")
+			hdy_ss.SetDirectory(0)
+			hdy_ss.Add(hztt_ss)
+			hdy_ss.Add(hzl_ss)
+			hdy_ss.Add(hzj_ss)
+
+			if (relaxedSel is not None):
+				hztt_rel = hdummy.Clone("ZTT_rel")
+				hzl_rel = hdummy.Clone("ZL_rel")
+				hzj_rel = hdummy.Clone("ZJ_rel")	
+				hztt_rel.SetDirectory(0)
+				hzl_rel.SetDirectory(0)
+				hzj_rel.SetDirectory(0)
+				hztt_rel_ss = hdummy.Clone("ZTT_rel_ss")
+				hzl_rel_ss = hdummy.Clone("ZL_rel_ss")
+				hzj_rel_ss = hdummy.Clone("ZJ_rel_ss")			
+				hztt_rel_ss.SetDirectory(0)
+				hzl_rel_ss.SetDirectory(0)
+				hzj_rel_ss.SetDirectory(0)
+
+				makeDatacard_ssos(treeName, ldy, relaxedSel+lowMTcut+"&&"+ZTTcut, wvalue+"*"+dy_weight, hztt_rel, hztt_rel_ss)
+				makeDatacard_ssos(treeName, ldy, relaxedSel+lowMTcut+"&&"+ZJcut, wvalue+"*"+dy_weight, hzj_rel, hzj_rel_ss)
+				if (("0jet" in ckey) and datacardFor2Dfit):
+					var = varY+"*"+mvis_zl_corr.get(channel,"1")+":"+varX
+				makeDatacard_ssos(treeName, ldy, relaxedSel+lowMTcut+"&&"+ZLcut, wvalue+"*"+dy_weight+"*"+ZL_yield_SF.get(channel,"1"), hzl_rel, hzl_rel_ss)
+ 				var = varY+":"+varX
+
+				hdy_rel = hdummy.Clone("DY_rel")
+				hdy_rel.SetDirectory(0)
+				hdy_rel.Add(hztt_rel)
+				hdy_rel.Add(hzj_rel)
+				hdy_rel.Add(hzl_rel)
+				hdy_rel_ss = hdummy.Clone("DY_rel_ss")	
+				hdy_rel_ss.SetDirectory(0)
+				hdy_rel_ss.Add(hztt_rel_ss)
+				hdy_rel_ss.Add(hzj_rel_ss)
+				hdy_rel_ss.Add(hzl_rel_ss)
+
 			print "DY all done"
 
 			#Wjets
@@ -951,7 +1060,7 @@ for wkey, wvalue in weighting.iteritems():
 				httj_jettaufake_up =  hdummy.Clone("TTJ_jettaufake_up")
 				weight_up = wvalue+"*"+jet_tau_fake_weights["up"]
 				#calculate shift and rescale to nominal yield
-				makeDatacard_category(treeName, ldy, cvalue+lowMTcut, ZJcut, weight_up+"*"+dy_weight, "ZJ_jettaufake_up", hzj_jettaufake_up)
+				makeDatacard_category(treeName, ldy, cvalue+lowMTcut, ZJcut+" && q_1 * q_2 < 0.", weight_up+"*"+dy_weight, "ZJ_jettaufake_up", hzj_jettaufake_up)
 				#if (hzj_jettaufake_up.Integral()!=0):
 				#	hzj_jettaufake_up.Scale(hzj.Integral()/hzj_jettaufake_up.Integral())
 
@@ -971,7 +1080,7 @@ for wkey, wvalue in weighting.iteritems():
 				httj_jettaufake_down =  hdummy.Clone("TTJ_jettaufake_down")
 				weight_down = wvalue+"*"+jet_tau_fake_weights["down"]
 				#calculate shift and rescale to nominal yield
-				makeDatacard_category(treeName, ldy, cvalue+lowMTcut, ZJcut, weight_down+"*"+dy_weight, "ZJ_jettaufake_down", hzj_jettaufake_down)
+				makeDatacard_category(treeName, ldy, cvalue+lowMTcut, ZJcut+" && q_1 * q_2 < 0.", weight_down+"*"+dy_weight, "ZJ_jettaufake_down", hzj_jettaufake_down)
 				#if (hzj_jettaufake_down.Integral()!=0):
 				#	hzj_jettaufake_down.Scale(hzj.Integral()/hzj_jettaufake_down.Integral())
 
@@ -997,18 +1106,23 @@ for wkey, wvalue in weighting.iteritems():
 				hztt_dyweight_up = hdummy.Clone("hztt_dyweight_up")
 				hzl_dyweight_up = hdummy.Clone("hzl_dyweight_up")
 				hzj_dyweight_up = hdummy.Clone("hzj_dyweight_up")
+				hewkz_dyweight_up = hdummy.Clone("hewkz_dyweight_up") 
 				makeDatacard_category(treeName, ldy, cvalue+lowMTcut, ZTTcut+" && q_1*q_2 < 0", wvalue+"*"+dy_weight+"*"+dy_weight_up, "ZTT_dyweight_up", hztt_dyweight_up)
-				makeDatacard_category(treeName, ldy, cvalue+lowMTcut, ZLcut+" && q_1*q_2 < 0", wvalue+"*"+dy_weight+"*"+dy_weight_up, "ZL_dyweight_up", hzl_dyweight_up)
+				makeDatacard_category(treeName, ldy, cvalue+lowMTcut, ZLcut+" && q_1*q_2 < 0", wvalue+"*"+dy_weight+"*"+dy_weight_up+"*"+ZL_yield_SF.get(channel,"1"), "ZL_dyweight_up", hzl_dyweight_up)
 				makeDatacard_category(treeName, ldy, cvalue+lowMTcut, ZJcut+" && q_1*q_2 < 0", wvalue+"*"+dy_weight+"*"+dy_weight_up, "ZJ_dyweight_up", hzj_dyweight_up)
+				makeDatacard_category(treeName, lewkz, cvalue+lowMTcut, "q_1*q_2 < 0", wvalue+"*"+dy_weight+"*"+dy_weight_up, "EWKZ_dyweight_up", hewkz_dyweight_up)
+
 
 				dy_weight_down_dict = zmumu_CR_weights.get("down_shape",None)
 				dy_weight_down = makeBinString(dy_weight_down_dict["weights"],dy_weight_down_dict["binVar"])
 				hztt_dyweight_down = hdummy.Clone("hztt_dyweight_down")
 				hzl_dyweight_down = hdummy.Clone("hzl_dyweight_down")
 				hzj_dyweight_down = hdummy.Clone("hzj_dyweight_down")
+				hewkz_dyweight_down = hdummy.Clone("hewkz_dyweight_down")
 				makeDatacard_category(treeName, ldy, cvalue+lowMTcut, ZTTcut+" && q_1*q_2 < 0", wvalue+"*"+dy_weight+"*"+dy_weight_down, "ZTT_dyweight_down", hztt_dyweight_down)
-				makeDatacard_category(treeName, ldy, cvalue+lowMTcut, ZLcut+" && q_1*q_2 < 0", wvalue+"*"+dy_weight+"*"+dy_weight_down, "ZL_dyweight_down", hzl_dyweight_down)
+				makeDatacard_category(treeName, ldy, cvalue+lowMTcut, ZLcut+" && q_1*q_2 < 0", wvalue+"*"+dy_weight+"*"+dy_weight_down+"*"+ZL_yield_SF.get(channel,"1"), "ZL_dyweight_down", hzl_dyweight_down)
 				makeDatacard_category(treeName, ldy, cvalue+lowMTcut, ZJcut+" && q_1*q_2 < 0", wvalue+"*"+dy_weight+"*"+dy_weight_down, "ZJ_dyweight_down", hzj_dyweight_down)
+				makeDatacard_category(treeName, lewkz, cvalue+lowMTcut,"q_1*q_2 < 0", wvalue+"*"+dy_weight+"*"+dy_weight_down, "EWKZ_dyweight_down", hewkz_dyweight_down)
 
 			
 
@@ -1023,17 +1137,17 @@ for wkey, wvalue in weighting.iteritems():
 				hztt_taudm_3prong_up = hdummy.Clone("ZTT_tauDM_3prong_up")
 				hztt_taudm_1prong1pi_up = hdummy.Clone("ZTT_tauDM_1prong1pi_up")
 
-				makeDatacard_category(treeName, ldy, cvalue+lowMTcut, ZTTcut, wvalue+"*"+dy_weight+"*"+"(1+(0.03*(tau_decay_mode_2==0)))", "ZTT_tauDM_1prong_up", hztt_taudm_1prong_up)
-				makeDatacard_category(treeName, ldy, cvalue+lowMTcut, ZTTcut, wvalue+"*"+dy_weight+"*"+"(1+(0.03*(tau_decay_mode_2==10)))",  "ZTT_tauDM_3prong_up", hztt_taudm_3prong_up)
-				makeDatacard_category(treeName, ldy, cvalue+lowMTcut, ZTTcut, wvalue+"*"+dy_weight+"*"+"(1+(0.03*(tau_decay_mode_2==1)))",  "ZTT_tauDM_1prong1pi_up", hztt_taudm_1prong1pi_up)
+				makeDatacard_category(treeName, ldy, cvalue+lowMTcut, ZTTcut+" && q_1 * q_2 < 0.", wvalue+"*"+dy_weight+"*"+"(1+(0.03*(tau_decay_mode_2==0)))", "ZTT_tauDM_1prong_up", hztt_taudm_1prong_up)
+				makeDatacard_category(treeName, ldy, cvalue+lowMTcut, ZTTcut+" && q_1 * q_2 < 0.", wvalue+"*"+dy_weight+"*"+"(1+(0.03*(tau_decay_mode_2==10)))",  "ZTT_tauDM_3prong_up", hztt_taudm_3prong_up)
+				makeDatacard_category(treeName, ldy, cvalue+lowMTcut, ZTTcut+" && q_1 * q_2 < 0.", wvalue+"*"+dy_weight+"*"+"(1+(0.03*(tau_decay_mode_2==1)))",  "ZTT_tauDM_1prong1pi_up", hztt_taudm_1prong1pi_up)
 			
 				hztt_taudm_1prong_down = hdummy.Clone("ZTT_tauDM_1prong_down")
 				hztt_taudm_3prong_down = hdummy.Clone("ZTT_tauDM_3prong_down")
 				hztt_taudm_1prong1pi_down = hdummy.Clone("ZTT_tauDM_1prong1pi_down")
 
-				makeDatacard_category(treeName, ldy, cvalue+lowMTcut, ZTTcut, wvalue+"*"+dy_weight+"*"+"(1-(0.03*(tau_decay_mode_2==0)))", "ZTT_tauDM_1prong_down", hztt_taudm_1prong_down)
-				makeDatacard_category(treeName, ldy, cvalue+lowMTcut, ZTTcut, wvalue+"*"+dy_weight+"*"+"(1-(0.03*(tau_decay_mode_2==10)))",  "ZTT_tauDM_3prong_down", hztt_taudm_3prong_down)
-				makeDatacard_category(treeName, ldy, cvalue+lowMTcut, ZTTcut, wvalue+"*"+dy_weight+"*"+"(1-(0.03*(tau_decay_mode_2==1)))",  "ZTT_tauDM_1prong1pi_down", hztt_taudm_1prong1pi_down)	
+				makeDatacard_category(treeName, ldy, cvalue+lowMTcut, ZTTcut+" && q_1 * q_2 < 0.", wvalue+"*"+dy_weight+"*"+"(1-(0.03*(tau_decay_mode_2==0)))", "ZTT_tauDM_1prong_down", hztt_taudm_1prong_down)
+				makeDatacard_category(treeName, ldy, cvalue+lowMTcut, ZTTcut+" && q_1 * q_2 < 0.", wvalue+"*"+dy_weight+"*"+"(1-(0.03*(tau_decay_mode_2==10)))",  "ZTT_tauDM_3prong_down", hztt_taudm_3prong_down)
+				makeDatacard_category(treeName, ldy, cvalue+lowMTcut, ZTTcut+" && q_1 * q_2 < 0.", wvalue+"*"+dy_weight+"*"+"(1-(0.03*(tau_decay_mode_2==1)))",  "ZTT_tauDM_1prong1pi_down", hztt_taudm_1prong1pi_down)	
 
 				#get the nominal ZTT yield per DM and renormalise. 
 				hztt_taudm_1prong_up.Scale(hztt.Integral()/hztt_taudm_1prong_up.Integral())
@@ -1051,32 +1165,72 @@ for wkey, wvalue in weighting.iteritems():
 				#apply 80% shift for ZL, 1 prong only. Normalised to ZL yield. 
 				hzl_leptaufake_up = hdummy.Clone("ZL_leptaufake_up")
 				hzl_leptaufake_down = hdummy.Clone("ZL_leptaufake_down")
+				var = varY+"*"+mvis_zl_corr.get(channel,"1")+":"+varX
+				makeDatacard_category(treeName, ldy, cvalue+lowMTcut, ZLcut+" && q_1 * q_2 < 0.", wvalue+"*"+dy_weight+"*"+ZL_yield_SF.get(channel,"1")+"*"+"(1-(0.8*(tau_decay_mode_2==0)))", "ZL_leptaufake_down", hzl_leptaufake_down)
+				makeDatacard_category(treeName, ldy, cvalue+lowMTcut, ZLcut+" && q_1 * q_2 < 0.", wvalue+"*"+dy_weight+"*"+ZL_yield_SF.get(channel,"1")+"*"+"(1+(0.8*(tau_decay_mode_2==0)))", "ZL_leptaufake_up", hzl_leptaufake_up)
 
-
-				makeDatacard_category(treeName, ldy, cvalue+lowMTcut, ZLcut, wvalue+"*"+dy_weight+"*"+"(1-(0.8*(tau_decay_mode_2==0)))", "ZL_leptaufake_down", hzl_leptaufake_down)
-				makeDatacard_category(treeName, ldy, cvalue+lowMTcut, ZLcut, wvalue+"*"+dy_weight+"*"+"(1+(0.8*(tau_decay_mode_2==0)))", "ZL_leptaufake_up", hzl_leptaufake_up)
-				#makeDatacard_category(treeName, ldy, cvalue+lowMTcut, ZLcut, wvalue+"*"+dy_weight+"*"+"(1.8*tau_decay_mode_2==0+1*tau_decay_mode_2!=0)", "ZL_leptaufake_up", hzl_leptaufake_up)
-				#makeDatacard_category(treeName, ldy, cvalue+lowMTcut, ZLcut, wvalue+"*"+dy_weight+"*"+"(0.2*tau_decay_mode_2==0+1*tau_decay_mode_2!=0)", "ZL_leptaufake_down", hzl_leptaufake_down)
 				hzl_leptaufake_up.Scale(hzl.Integral()/hzl_leptaufake_up.Integral())
 				hzl_leptaufake_down.Scale(hzl.Integral()/hzl_leptaufake_down.Integral())
+				var = varY+":"+varX
 
+			#uncertainty on the ZL scale factor per DM
+			if (mode=="datacard" and systName ==""):
+				if (("0jet") in ckey):
+					var = varY+"*"+mvis_zl_corr.get(channel,"1")+":"+varX
+
+				hzl_sf_1prong_up = hdummy.Clone("ZL_SF_1prong_up")
+				hzl_sf_1prong_down = hdummy.Clone("ZL_SF_1prong_down")
+
+				makeDatacard_category(treeName, ldy, cvalue+lowMTcut, ZLcut+" && q_1 * q_2 < 0.", wvalue+"*"+dy_weight+"*"+ZL_yield_SF.get(channel+"_1prong_up","1"), "ZL_SF_1prong_up", hzl_sf_1prong_up)
+				makeDatacard_category(treeName, ldy, cvalue+lowMTcut, ZLcut+" && q_1 * q_2 < 0.", wvalue+"*"+dy_weight+"*"+ZL_yield_SF.get(channel+"_1prong_down","1"), "ZL_SF_1prong_down", hzl_sf_1prong_down)								
+
+				hzl_sf_1prong1pi_up = hdummy.Clone("ZL_SF_1prong1pi_up")
+				hzl_sf_1prong1pi_down = hdummy.Clone("ZL_SF_1prong1pi_down")
+				makeDatacard_category(treeName, ldy, cvalue+lowMTcut, ZLcut+" && q_1 * q_2 < 0.", wvalue+"*"+dy_weight+"*"+ZL_yield_SF.get(channel+"_1prong1pi_up","1"), "ZL_SF_1prong1pi_up", hzl_sf_1prong1pi_up)
+				makeDatacard_category(treeName, ldy, cvalue+lowMTcut, ZLcut+" && q_1 * q_2 < 0.", wvalue+"*"+dy_weight+"*"+ZL_yield_SF.get(channel+"_1prong1pi_down","1"), "ZL_SF_1prong1pi_down", hzl_sf_1prong1pi_down)								
+
+				var = varY+":"+varX
 
 			########################################################
 			# shape uncertainties for ZL m_vis shape               #
 			########################################################				
-			'''
 			if (mode=="datacard" and systName =="" and ("0jet" in ckey) and datacardFor2Dfit):
 				# shift the visible mass for ZL, for 1 prong and 1prong 1pizero.
 				hzl_mvis_1prong_up = hdummy.Clone("ZL_mvis_1prong_up")
-				mvis_shift_1prong_up = "(1.03*tau_decay_mode_2==0+1*tau_decay_mode_2!=0)"
-				var = varY+"*"+mvis_weight+"*"+mvis_shift_1prong_up+":"+varX
-				hzl_mvis_1prong1pi_up = hdummy.Clone("ZL_mvis_1prong_down")
-				mvis_shift_down = 0.97
 				hzl_mvis_1prong_down = hdummy.Clone("ZL_mvis_1prong_down")
-				hzl_mvis_1prong1pi_down = hdummy.Clone("ZL_mvis_1prong1pi_down")
-								
-			'''
+				# 1 prong up
+				#mvis_shift_1prong_up = "(1+(0.03*(tau_decay_mode_2==0)))"
+				#var = varY+"*"+mvis_zl_corr.get(channel,"1")+"*"+mvis_shift_1prong_up+":"+varX
 
+				var = varY+"*"+mvis_zl_corr.get(channel+"_1prong_up","1")+":"+varX
+				print " 1 prong up --- var: ", var
+				makeDatacard_category(treeName, ldy, cvalue+lowMTcut, ZLcut+" && q_1 * q_2 < 0.", wvalue+"*"+dy_weight+"*"+ZL_yield_SF.get(channel,"1"), "ZL_mvis_1prong_up", hzl_mvis_1prong_up)
+				# 1 prong down
+				#mvis_shift_1prong_down = "(1-(0.03*(tau_decay_mode_2==0)))"
+				#var = varY+"*"+mvis_zl_corr.get(channel,"1")+"*"+mvis_shift_1prong_down+":"+varX
+
+				var = varY+"*"+mvis_zl_corr.get(channel+"_1prong_down","1")+":"+varX
+				print " 1 prong down --- var: ", var
+				makeDatacard_category(treeName, ldy, cvalue+lowMTcut, ZLcut+" && q_1 * q_2 < 0.", wvalue+"*"+dy_weight+"*"+ZL_yield_SF.get(channel,"1"), "ZL_mvis_1prong_down", hzl_mvis_1prong_down)
+
+				hzl_mvis_1prong1pi_up = hdummy.Clone("ZL_mvis_1prong1pi_up")
+				hzl_mvis_1prong1pi_down = hdummy.Clone("ZL_mvis_1prong1pi_down")
+				# 1prong1pi up
+				#mvis_shift_1prong1pi_up = "(1+(0.03*(tau_decay_mode_2==1)))"
+				#var = varY+"*"+mvis_zl_corr.get(channel,"1")+"*"+mvis_shift_1prong1pi_up+":"+varX
+
+				var = varY+"*"+mvis_zl_corr.get(channel+"_1prong1pi_up","1")+":"+varX
+				print " 1 prong 1pi up --- var: ", var
+				makeDatacard_category(treeName, ldy, cvalue+lowMTcut, ZLcut+" && q_1 * q_2 < 0.", wvalue+"*"+dy_weight+"*"+ZL_yield_SF.get(channel,"1"), "ZL_mvis_1prong1pi_up", hzl_mvis_1prong1pi_up)
+				#1prong1pi down
+				#mvis_shift_1prong1pi_down = "(1-(0.03*(tau_decay_mode_2==1)))"
+				#var = varY+"*"+mvis_zl_corr.get(channel,"1")+"*"+mvis_shift_1prong1pi_down+":"+varX
+
+				var = varY+"*"+mvis_zl_corr.get(channel+"_1prong1pi_down","1")+":"+varX
+				print " 1 prong 1pi down --- var: ", var
+				makeDatacard_category(treeName, ldy, cvalue+lowMTcut, ZLcut+" && q_1 * q_2 < 0.", wvalue+"*"+dy_weight+"*"+ZL_yield_SF.get(channel,"1"), "ZL_mvis_1prong1pi_down", hzl_mvis_1prong1pi_down)
+			
+				var = varY + ":" + varX
 
 			##########################################
 			# shape uncertainties for Z pt weights   #
@@ -1103,15 +1257,21 @@ for wkey, wvalue in weighting.iteritems():
 				#print " Zpt weight uncertainty "
 				#print " weight_up : " , weight_up
 				#print " weight_down : ", weight_down
-				makeDatacard_category(treeName, ldy, cvalue+lowMTcut, ZTTcut+" && q_1*q_2 < 0",weight_down+"*"+dy_weight, "ZTT_zptweight_down", hztt_zptweight_down)
-				makeDatacard_category(treeName, ldy, cvalue+lowMTcut, ZLcut+" && q_1*q_2 < 0", weight_down+"*"+dy_weight, "ZL_zptweight_down", hzl_zptweight_down)
-				makeDatacard_category(treeName, ldy, cvalue+lowMTcut, ZJcut+" && q_1*q_2 < 0", weight_down+"*"+dy_weight, "ZJ_zptweight_down", hzj_zptweight_down)
-				makeDatacard_category(treeName, lewkz, cvalue+lowMTcut, "q_1*q_2 < 0", weight_down+"*"+dy_weight, "EWKZ_zptweight_down", hewkz_zptweight_down)							
+				makeDatacard_category(treeName, lewkz, cvalue+lowMTcut, "q_1*q_2 < 0", weight_down+"*"+dy_weight, "EWKZ_zptweight_down", hewkz_zptweight_down)
+				makeDatacard_category(treeName, lewkz, cvalue+lowMTcut, "q_1*q_2 < 0", weight_up+"*"+dy_weight, "EWKZ_zptweight_up", hewkz_zptweight_up)	
 
+				makeDatacard_category(treeName, ldy, cvalue+lowMTcut, ZTTcut+" && q_1*q_2 < 0",weight_down+"*"+dy_weight, "ZTT_zptweight_down", hztt_zptweight_down)
 				makeDatacard_category(treeName, ldy, cvalue+lowMTcut, ZTTcut+" && q_1*q_2 < 0",weight_up+"*"+dy_weight, "ZTT_zptweight_up", hztt_zptweight_up)
-				makeDatacard_category(treeName, ldy, cvalue+lowMTcut, ZLcut+" && q_1*q_2 < 0", weight_up+"*"+dy_weight, "ZL_zptweight_up", hzl_zptweight_up)
+
+				makeDatacard_category(treeName, ldy, cvalue+lowMTcut, ZJcut+" && q_1*q_2 < 0", weight_down+"*"+dy_weight, "ZJ_zptweight_down", hzj_zptweight_down)
 				makeDatacard_category(treeName, ldy, cvalue+lowMTcut, ZJcut+" && q_1*q_2 < 0", weight_up+"*"+dy_weight, "ZJ_zptweight_up", hzj_zptweight_up)
-				makeDatacard_category(treeName, lewkz, cvalue+lowMTcut, "q_1*q_2 < 0", weight_up+"*"+dy_weight, "EWKZ_zptweight_up", hewkz_zptweight_up)
+
+				if ("0jet" in ckey):
+					var = varY+"*"+mvis_zl_corr.get(channel,"1")+":"+varX
+				makeDatacard_category(treeName, ldy, cvalue+lowMTcut, ZLcut+" && q_1*q_2 < 0", weight_up+"*"+dy_weight+"*"+ZL_yield_SF.get(channel,"1"), "ZL_zptweight_up", hzl_zptweight_up)
+				makeDatacard_category(treeName, ldy, cvalue+lowMTcut, ZLcut+" && q_1*q_2 < 0", weight_down+"*"+dy_weight+"*"+ZL_yield_SF.get(channel,"1"), "ZL_zptweight_down", hzl_zptweight_down)
+				var = varY+":"+varX
+
 
 			##########################
 			#writing to output file
@@ -1212,17 +1372,28 @@ for wkey, wvalue in weighting.iteritems():
 					hztt_taudm_1prong1pi_up = unroll(hztt_taudm_1prong1pi_up)
 					hztt_taudm_1prong1pi_down = unroll(hztt_taudm_1prong1pi_down)
 
+					hzl_sf_1prong_up = unroll(hzl_sf_1prong_up)
+					hzl_sf_1prong_down = unroll(hzl_sf_1prong_down)
+					hzl_sf_1prong1pi_up = unroll(hzl_sf_1prong1pi_up)
+					hzl_sf_1prong1pi_down = unroll(hzl_sf_1prong1pi_down)
+
 					if (("0jet" in ckey)):
 						hzl_leptaufake_up = unroll(hzl_leptaufake_up)
-						hzl_leptaufake_down = unroll(hzl_leptaufake_down)				
+						hzl_leptaufake_down = unroll(hzl_leptaufake_down)	
+						hzl_mvis_1prong_up = unroll(hzl_mvis_1prong_up)			
+						hzl_mvis_1prong_down = unroll(hzl_mvis_1prong_down)			
+						hzl_mvis_1prong1pi_up = unroll(hzl_mvis_1prong1pi_up)			
+						hzl_mvis_1prong1pi_down = unroll(hzl_mvis_1prong1pi_down)			
 					
 					if (("vbf" in ckey)):
 						hztt_dyweight_up = unroll(hztt_dyweight_up)
 						hzl_dyweight_up = unroll(hzl_dyweight_up)
 						hzj_dyweight_up = unroll(hzj_dyweight_up)
+						hewkz_dyweight_up = unroll(hewkz_dyweight_up)
 						hztt_dyweight_down = unroll(hztt_dyweight_down)
 						hzl_dyweight_down = unroll(hzl_dyweight_down)
 						hzj_dyweight_down = unroll(hzj_dyweight_down)
+						hewkz_dyweight_down = unroll(hewkz_dyweight_down)
 
 			
 			print "writing to out file..."
@@ -1273,21 +1444,43 @@ for wkey, wvalue in weighting.iteritems():
 				hztt_taudm_1prong1pi_up.Write("ZTT_CMS_tauDMReco_1prong1pizero_13TeVUp")
 				hztt_taudm_1prong1pi_down.Write("ZTT_CMS_tauDMReco_1prong1pizero_13TeVDown")
 
+				if (channel =="mt"):
+					hzl_sf_1prong_up.Write("ZL_CMS_mFakeTau_1prong_13TeVUp")
+					hzl_sf_1prong_down.Write("ZL_CMS_mFakeTau_1prong_13TeVDown")
+					hzl_sf_1prong1pi_up.Write("ZL_CMS_mFakeTau_1prong1pizero_13TeVUp")
+					hzl_sf_1prong1pi_down.Write("ZL_CMS_mFakeTau_1prong1pizero_13TeVDown")
+
+				if (channel =="et"):
+					hzl_sf_1prong_up.Write("ZL_CMS_eFakeTau_1prong_13TeVUp")
+					hzl_sf_1prong_down.Write("ZL_CMS_eFakeTau_1prong_13TeVDown")
+					hzl_sf_1prong1pi_up.Write("ZL_CMS_eFakeTau_1prong1pizero_13TeVUp")
+					hzl_sf_1prong1pi_down.Write("ZL_CMS_eFakeTau_1prong1pizero_13TeVDown")
+
 				if (channel == "et" and ("0jet" in ckey)):
 					hzl_leptaufake_up.Write("ZL_CMS_eFakeTau_0jet_tauDMReco_13TeVUp")
 					hzl_leptaufake_down.Write("ZL_CMS_eFakeTau_0jet_tauDMReco_13TeVDown")
+					hzl_mvis_1prong_up.Write("ZL_CMS_ZLShape_et_0jet_1prong_13TeVUp")
+					hzl_mvis_1prong_down.Write("ZL_CMS_ZLShape_et_0jet_1prong_13TeVDown")
+					hzl_mvis_1prong1pi_up.Write("ZL_CMS_ZLShape_et_0jet_1prong1pizero_13TeVUp")
+					hzl_mvis_1prong1pi_down.Write("ZL_CMS_ZLShape_et_0jet_1prong1pizero_13TeVDown")
 
 				if (channel == "mt" and ("0jet" in ckey)):
 					hzl_leptaufake_up.Write("ZL_CMS_mFakeTau_0jet_tauDMReco_13TeVUp")
-					hzl_leptaufake_down.Write("ZL_CMS_mFakeTau_0jet_tauDMReco_13TeVDown")				
+					hzl_leptaufake_down.Write("ZL_CMS_mFakeTau_0jet_tauDMReco_13TeVDown")			
+					hzl_mvis_1prong_up.Write("ZL_CMS_ZLShape_mt_0jet_1prong_13TeVUp")
+					hzl_mvis_1prong_down.Write("ZL_CMS_ZLShape_mt_0jet_1prong_13TeVDown")
+					hzl_mvis_1prong1pi_up.Write("ZL_CMS_ZLShape_mt_0jet_1prong1pizero_13TeVUp")
+					hzl_mvis_1prong1pi_down.Write("ZL_CMS_ZLShape_mt_0jet_1prong1pizero_13TeVDown")	
 
 				if (("vbf" in ckey)):
 					hztt_dyweight_up.Write("ZTT_CMS_htt_zmumuShape_"+"VBF"+"_13TeVUp")
 					hzl_dyweight_up.Write("ZL_CMS_htt_zmumuShape_"+"VBF"+"_13TeVUp")
 					hzj_dyweight_up.Write("ZJ_CMS_htt_zmumuShape_"+"VBF"+"_13TeVUp")
+					hewkz_dyweight_up.Write("EWKZ_CMS_htt_zmumuShape_"+"VBF"+"_13TeVUp")
 					hztt_dyweight_down.Write("ZTT_CMS_htt_zmumuShape_"+"VBF"+"_13TeVDown")
 					hzl_dyweight_down.Write("ZL_CMS_htt_zmumuShape_"+"VBF"+"_13TeVDown")
 					hzj_dyweight_down.Write("ZJ_CMS_htt_zmumuShape_"+"VBF"+"_13TeVDown")
+					hewkz_dyweight_down.Write("EWKZ_CMS_htt_zmumuShape_"+"VBF"+"_13TeVDown")
 
 			#dictionary to convert from naming in synch ntuples to names in datacards
 			#add only the names that need to be changed
