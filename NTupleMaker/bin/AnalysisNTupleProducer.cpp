@@ -2108,6 +2108,9 @@ int main(int argc, char * argv[]) {
 	  lorentzVectorTauJet = lorentzVectorTau;
 	}
 
+	tauJetPt_  = lorentzVectorTauJet.Pt();
+	tauJetEta_ = lorentzVectorTauJet.Eta();
+	tauJetPhi_ = lorentzVectorTauJet.Phi();
 
 	//	cout << "fake  Loose = " << fakeAntiLLoose_
 	//	     << "   Medium = " << fakeAntiLMedium_
@@ -2220,9 +2223,6 @@ int main(int argc, char * argv[]) {
           mutrigweight = SF_muonTrig->get_EfficiencyData(ptTriggerMu, etaTriggerMu);
 	  HtNoRecoil_     = Ht_     - ptTriggerMu;
 	  SoftHtNoRecoil_ = SoftHt_ - ptTriggerMu;
-	  tauJetPt_  = lorentzVectorTauJet.Pt();
-	  tauJetEta_ = lorentzVectorTauJet.Eta();
-	  tauJetPhi_ = lorentzVectorTauJet.Phi();
 	  recoilM_   = lorentzVectorW.M();
           recoilPt_  = lorentzVectorW.Pt();
           recoilEta_ = lorentzVectorW.Eta();
