@@ -385,11 +385,10 @@ int main(int argc, char * argv[]) {
   Bool_t tauAntiMuonLoose3_;
   Bool_t tauAntiMuonTight3_;
 
-  Bool_t tauAntiElectronVLooseMVA5_;
-  Bool_t tauAntiElectronLooseMVA5_;
-
   Bool_t tauAntiElectronVLooseMVA6_;
   Bool_t tauAntiElectronLooseMVA6_;
+  Bool_t tauAntiElectronTightMVA6_;
+  Bool_t tauAntiElectronVTightMVA6_;
 
   Float_t tauLeadingTrackPt_;
   Float_t tauLeadingTrackEta_;
@@ -442,6 +441,7 @@ int main(int argc, char * argv[]) {
   Float_t SoftHtNoRecoil_   ; // sumJetPtCentral20 + sumJetPtForward30 + sumLeptonPt - sumPtRecoil 
 
   Int_t selection_; 
+  UInt_t npartons_; 
   //  0 : Z->mumu+Jet, 
   //  1 : W->muv+Jet
   //  2 : W*->muv 
@@ -627,11 +627,10 @@ int main(int argc, char * argv[]) {
   ntuple_->Branch("tauAntiMuonLoose3",&tauAntiMuonLoose3_,"tauAntiMuonLoose3/O");
   ntuple_->Branch("tauAntiMuonTight3",&tauAntiMuonTight3_,"tauAntiMuonTight3/O");
 
-  ntuple_->Branch("tauAntiElectronVLooseMVA5",&tauAntiElectronVLooseMVA5_,"tauAntiElectronVLooseMVA5/O");
-  ntuple_->Branch("tauAntiElectronLooseMVA5", &tauAntiElectronLooseMVA5_, "tauAntiElectronLooseMVA5/O");
-
   ntuple_->Branch("tauAntiElectronVLooseMVA6",&tauAntiElectronVLooseMVA6_,"tauAntiElectronVLooseMVA6/O");
   ntuple_->Branch("tauAntiElectronLooseMVA6", &tauAntiElectronLooseMVA6_, "tauAntiElectronLooseMVA6/O");
+  ntuple_->Branch("tauAntiElectronTightMVA6",&tauAntiElectronTightMVA6_,"tauAntiElectronTightMVA6/O");
+  ntuple_->Branch("tauAntiElectronVTightMVA6", &tauAntiElectronVTightMVA6_, "tauAntiElectronVTightMVA6/O");
 
   ntuple_->Branch("nMuon",&nMuon_,"nMuon/i");
   ntuple_->Branch("nSelMuon",&nSelMuon_,"nSelMuon/i");
@@ -687,6 +686,8 @@ int main(int argc, char * argv[]) {
   ntuple_->Branch("pf2Jet140",&pf2Jet140_,"p2fJet140/O");
 
   ntuple_->Branch("Selection",&selection_,"Selection/I");
+
+  ntuple_->Branch("npartons",&npartons_,"npartons/i");
 
   TH1D * dRtauCentralJetH = new TH1D("dRtauCentralJetH","",50,0.,5.0);
   TH1D * dRtauForwardJetH = new TH1D("dRtauForwardJetH","",50,0.,5.0);
@@ -969,11 +970,10 @@ int main(int argc, char * argv[]) {
       tauAntiMuonLoose3_ = false;
       tauAntiMuonTight3_ = false;
 
-      tauAntiElectronVLooseMVA5_ = false;
-      tauAntiElectronLooseMVA5_ = false;
-      
       tauAntiElectronVLooseMVA6_ = false;
       tauAntiElectronLooseMVA6_ = false;
+      tauAntiElectronTightMVA6_ = false;
+      tauAntiElectronVTightMVA6_ = false;
       
       nMuon_ = 0;
       nSelMuon_ = 0;
@@ -1052,6 +1052,8 @@ int main(int argc, char * argv[]) {
       nMuonTrig_ = 0;
       nSelMuonTrig_ = 0;
 
+      npartons_ = 9999;
+
       if (debug) {
 	std::cout << "Run = " << analysisTree.event_nr << "    Event = " << analysisTree.event_run << std::endl; 
 	std::cout << "Number of gen particles = " << analysisTree.genparticles_count << std::endl;
@@ -1068,6 +1070,8 @@ int main(int argc, char * argv[]) {
 	else
 	  genWeight_ = 1;
 	weight_ *= genWeight_;
+
+	npartons_ = analysisTree.genparticles_noutgoing;
       }
       histWeightsH->Fill(double(0.),double(genWeight_));
       
@@ -1997,11 +2001,10 @@ int main(int argc, char * argv[]) {
 	tauAntiMuonLoose3_ = analysisTree.tau_againstMuonLoose3[indexTau] > 0.5;
 	tauAntiMuonTight3_ = analysisTree.tau_againstMuonTight3[indexTau] > 0.5;
 
-	tauAntiElectronVLooseMVA5_ = analysisTree.tau_againstElectronVLooseMVA5[indexTau] > 0.5;
-	tauAntiElectronLooseMVA5_ = analysisTree.tau_againstElectronLooseMVA5[indexTau] > 0.5;
-
 	tauAntiElectronVLooseMVA6_ = analysisTree.tau_againstElectronVLooseMVA6[indexTau] > 0.5;
-	tauAntiElectronLooseMVA6_ = analysisTree.tau_againstElectronLooseMVA6[indexTau] > 0.5;
+	tauAntiElectronLooseMVA6_  = analysisTree.tau_againstElectronLooseMVA6[indexTau] > 0.5;
+	tauAntiElectronTightMVA6_  = analysisTree.tau_againstElectronTightMVA6[indexTau] > 0.5;
+	tauAntiElectronVTightMVA6_ = analysisTree.tau_againstElectronVTightMVA6[indexTau] > 0.5;
 
 	// Add fake rates to tree
 	// check pt bin
@@ -2383,8 +2386,6 @@ int main(int argc, char * argv[]) {
  
 	    tauAntiMuonLoose3_ = analysisTree.tau_againstMuonLoose3[indexTau] > 0.5;
 	    tauAntiMuonTight3_ = analysisTree.tau_againstMuonTight3[indexTau] > 0.5;
-	    tauAntiElectronVLooseMVA5_ = analysisTree.tau_againstElectronVLooseMVA5[indexTau] > 0.5;
-	    tauAntiElectronLooseMVA5_ = analysisTree.tau_againstElectronLooseMVA5[indexTau] > 0.5;
 
 	    recoilRatio_ = tauPt_/recoilJetLV.Pt();
 	    recoilDPhi_ = dPhiFromLV(tauLV,recoilJetLV);
