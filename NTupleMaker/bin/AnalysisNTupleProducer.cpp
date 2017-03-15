@@ -359,6 +359,7 @@ int main(int argc, char * argv[]) {
   Float_t tauJetPt_;
   Float_t tauJetEta_;
   Float_t tauJetPhi_;
+  Bool_t  tauJetTightId_;
 
   Float_t recoilRatio_;
   Float_t recoilDPhi_;
@@ -594,6 +595,7 @@ int main(int argc, char * argv[]) {
   ntuple_->Branch("tauJetPt",  &tauJetPt_,  "tauJetPt/F");
   ntuple_->Branch("tauJetEta", &tauJetEta_, "tauJetEta/F");
   ntuple_->Branch("tauJetPhi", &tauJetPhi_, "tauJetPhi/F");
+  ntuple_->Branch("tauJetTightId", &tauJetTightId_, "tauJetTightId/O");
 
   ntuple_->Branch("tauLeadingTrackPt",&tauLeadingTrackPt_,"tauLeadingTrackPt/F");
   ntuple_->Branch("tauLeadingTrackEta",&tauLeadingTrackEta_,"tauLeadingTrackEta/F");
@@ -941,6 +943,7 @@ int main(int argc, char * argv[]) {
       tauJetPt_ = 0;
       tauJetEta_ = 0;
       tauJetPhi_ = 0;
+      tauJetTightId_ = false;
 
       recoilRatio_ = -1;
       recoilDPhi_ = 0;
@@ -2132,7 +2135,7 @@ int main(int argc, char * argv[]) {
 	// finding matching jet
 	bool jetFound = false;
 	float dRmin = 1;
-	//unsigned int indexMatchingJet = 0;
+	int indexMatchingJet = -1;
 	for (unsigned int ijet=0; ijet<analysisTree.pfjet_count; ++ijet) {
 	  TLorentzVector lorentzVectorJ; lorentzVectorJ.SetXYZT(analysisTree.pfjet_px[ijet],
 								analysisTree.pfjet_py[ijet],
@@ -2144,19 +2147,20 @@ int main(int argc, char * argv[]) {
 	  if (drJetTau<dRmin) {
 	    dRmin = drJetTau;
 	    jetFound = true;
-	    //indexMatchingJet = ijet;
+	    indexMatchingJet = ijet;
 	    lorentzVectorTauJet = lorentzVectorJ;
 	  }
 
 	}
 	if (!jetFound) {
 	  lorentzVectorTauJet = lorentzVectorTau;
+	  continue;
 	}
 
 	tauJetPt_  = lorentzVectorTauJet.Pt();
 	tauJetEta_ = lorentzVectorTauJet.Eta();
 	tauJetPhi_ = lorentzVectorTauJet.Phi();
-
+	tauJetTightId_ = tightJetiD(analysisTree,indexMatchingJet);
 	//	cout << "fake  Loose = " << fakeAntiLLoose_
 	//	     << "   Medium = " << fakeAntiLMedium_
 	//	     << "   Tight  = " << fakeAntiLTight_ << endl;
@@ -2261,7 +2265,7 @@ int main(int argc, char * argv[]) {
 	isWJet = isWJet && nSelTaus_ == 1;
 	isWJet = isWJet && nJetsCentral30_ == 1;
 	isWJet = isWJet && nJetsForward30_ == 0;
-	isWJet = isWJet && tauPt_>100.;
+	isWJet = isWJet && tauPt_>50.;
 
 	if (isWJet) {
 	  mueffweight  = SF_muonIdIso->get_ScaleFactor(ptTriggerMu, etaTriggerMu);
@@ -2398,7 +2402,7 @@ int main(int argc, char * argv[]) {
 	    // finding matching jet
 	    bool jetFound = false;
 	    float dRmin = 1;
-	    //unsigned int indexMatchingJet = 0;
+	    int indexMatchingJet = -1;
 	    for (unsigned int ijet=0; ijet<analysisTree.pfjet_count; ++ijet) {
 	      TLorentzVector lorentzVectorJ; lorentzVectorJ.SetXYZT(analysisTree.pfjet_px[ijet],
 								    analysisTree.pfjet_py[ijet],
@@ -2410,18 +2414,20 @@ int main(int argc, char * argv[]) {
 	      if (drJetTau<dRmin) {
 		dRmin = drJetTau;
 		jetFound = true;
-		//indexMatchingJet = ijet;
+		indexMatchingJet = ijet;
 		lorentzVectorTauJet = lorentzVectorJ;
 	      }
 	      
 	    }
 	    if (!jetFound) {
 	      lorentzVectorTauJet = lorentzVectorTau;
+	      continue;
 	    }
 
 	    tauJetPt_  = lorentzVectorTauJet.Pt();
 	    tauJetEta_ = lorentzVectorTauJet.Eta();
 	    tauJetPhi_ = lorentzVectorTauJet.Phi();
+	    tauJetTightId_ = tightJetiD(analysisTree,indexMatchingJet);
 
 	    tauLeadingTrackPt_ = PtoPt(analysisTree.tau_leadchargedhadrcand_px[indexTau],
 				       analysisTree.tau_leadchargedhadrcand_py[indexTau]);
