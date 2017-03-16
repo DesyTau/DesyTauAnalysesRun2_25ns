@@ -2139,7 +2139,7 @@ int main(int argc, char * argv[]) {
 	
 	// finding matching jet
 	bool jetFound = false;
-	float dRmin = 1;
+	float dRmin = 0.4;
 	int indexMatchingJet = -1;
 	for (unsigned int ijet=0; ijet<analysisTree.pfjet_count; ++ijet) {
 	  TLorentzVector lorentzVectorJ; lorentzVectorJ.SetXYZT(analysisTree.pfjet_px[ijet],
@@ -2406,7 +2406,7 @@ int main(int argc, char * argv[]) {
 
 	    // finding matching jet
 	    bool jetFound = false;
-	    float dRmin = 1;
+	    float dRmin = 0.4;
 	    int indexMatchingJet = -1;
 	    for (unsigned int ijet=0; ijet<analysisTree.pfjet_count; ++ijet) {
 	      TLorentzVector lorentzVectorJ; lorentzVectorJ.SetXYZT(analysisTree.pfjet_px[ijet],
