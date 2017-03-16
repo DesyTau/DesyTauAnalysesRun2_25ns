@@ -445,7 +445,9 @@ int main(int argc, char * argv[]) {
   Float_t SoftHt_           ; // sumJetPtCentral20 + sumJetPtForward30 + sumLeptonPt
   Float_t HtNoRecoil_       ; // sumJetPtCentral30 + sumJetPtForward30 + sumLeptonPt - sumPtRecoil
   Float_t SoftHtNoRecoil_   ; // sumJetPtCentral20 + sumJetPtForward30 + sumLeptonPt - sumPtRecoil 
-
+  Float_t mhtNoMu_;
+  Float_t metNoMu_;
+  
   Int_t selection_; 
   UInt_t npartons_; 
   //  0 : Z->mumu+Jet, 
@@ -685,6 +687,8 @@ int main(int argc, char * argv[]) {
   ntuple_->Branch("SoftHt",&SoftHt_,"SoftHt/F");
   ntuple_->Branch("HtNoRecoil",&HtNoRecoil_,"HtNoRecoil/F");
   ntuple_->Branch("SoftHtNoRecoil",&SoftHtNoRecoil_,"SoftHtNoRecoil/F");
+  ntuple_->Branch("mhtNoMu",&mhtNoMu_,"mhtNoMu/F");
+  ntuple_->Branch("metNoMu",&metNoMu_,"metNoMu/F");
 
   ntuple_->Branch("pfJet40",&pfJet40_,"pfJet40/O");
   ntuple_->Branch("pfJet60",&pfJet60_,"pfJet60/O");
@@ -706,14 +710,15 @@ int main(int argc, char * argv[]) {
   Bool_t trigger_;
   Bool_t isWTrig_;
   Bool_t isZTrig_;
-  Float_t metNoMu_;
-  Float_t mhtNoMu_;
   Float_t metNoSelMu_;
   Float_t mhtNoSelMu_;
   UInt_t nMuonTrig_;
   UInt_t nSelMuonTrig_;
 
   TTree * trigNTuple_ = new TTree("TriggerNTuple","TriggerNTuple");
+  trigNTuple_->Branch("event",&event_,"event/i"); 
+  trigNTuple_->Branch("run",  &run_,  "run/i");
+  trigNTuple_->Branch("luminosityBlock", &lumi_,  "luminosityBlock/i");
   trigNTuple_->Branch("trigger",&trigger_,"trigger/O");
   trigNTuple_->Branch("NVert",&nVert_,"NVert/i");
   trigNTuple_->Branch("metNoMu",&metNoMu_,"metNoMu/F");
