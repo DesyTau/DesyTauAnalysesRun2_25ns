@@ -213,7 +213,7 @@ int main(int argc, char * argv[]){
   const bool applyRecoilCorrections = cfg.get<bool>("ApplyRecoilCorrections");
   const bool isDY = infiles.find("DY") == infiles.rfind("/")+1;
   const bool isWJets = (infiles.find("WJets") == infiles.rfind("/")+1) || (infiles.find("W1Jets") == infiles.rfind("/")+1) || (infiles.find("W2Jets") == infiles.rfind("/")+1) || (infiles.find("W3Jets") == infiles.rfind("/")+1) || (infiles.find("W4Jets") == infiles.rfind("/")+1) || (infiles.find("EWK") == infiles.rfind("/")+1);
-  const bool isVBForGGHiggs = (infiles.find("VBFHToTauTau")== infiles.rfind("/")+1) || (infiles.find("GluGluHToTauTau")== infiles.rfind("/")+1);
+  const bool isVBForGGHiggs = (infiles.find("VBFHTo")== infiles.rfind("/")+1) || (infiles.find("GluGluHTo")== infiles.rfind("/")+1);
   const bool isEWKZ =  infiles.find("EWKZ") == infiles.rfind("/")+1;
   const bool isMG = infiles.find("madgraph") != string::npos;
   //const bool applyRecoilCorrections = isDY || isWJets;
@@ -274,6 +274,10 @@ int main(int argc, char * argv[]){
   const float shift_tes_1prong = cfg.get<float>("TauEnergyScaleShift_OneProng");
   const float shift_tes_1p1p0 = cfg.get<float>("TauEnergyScaleShift_OneProngOnePi0");
   const float shift_tes_3prong = cfg.get<float>("TauEnergyScaleShift_ThreeProng");
+  // for lep->tau fakes
+  const float shift_tes_lepfake_1prong = cfg.get<float>("TauEnergyScaleShift_LepFake_OneProng");
+  const float shift_tes_lepfake_1p1p0 = cfg.get<float>("TauEnergyScaleShift_LepFake_OneProngOnePi0");
+  const float shift_tes_lepfake_3prong = cfg.get<float>("TauEnergyScaleShift_LepFake_ThreeProng");
 
   // pair selection
   const float dRleptonsCut   = cfg.get<float>("dRleptonsCut");
@@ -482,11 +486,17 @@ int main(int argc, char * argv[]){
   TauOneProngScaleSys* tauOneProngScaleSys =0;
   TauOneProngOnePi0ScaleSys* tauOneProngOnePi0ScaleSys=0;
   TauThreeProngScaleSys* tauThreeProngScaleSys=0;
+
+  //LepTauFakeScaleSys * lepTauFakeScaleSys = 0;
+  LepTauFakeOneProngScaleSys* lepTauFakeOneProngScaleSys =0;
+  LepTauFakeOneProngOnePi0ScaleSys* lepTauFakeOneProngOnePi0ScaleSys=0;
+  LepTauFakeThreeProngScaleSys * lepTauFakeThreeProngScaleSys =0;
+
   ZPtWeightSys* zPtWeightSys = 0;
   TopPtWeightSys* topPtWeightSys = 0;
   std::vector<JetEnergyScaleSys*> jetEnergyScaleSys;
   JESUncertainties * jecUncertainties = 0;
-  LepTauFakeScaleSys * lepTauFakeScaleSys = 0;
+
   if(!isData && ApplySystShift){
     tauOneProngScaleSys = new TauOneProngScaleSys(otree);
     tauOneProngScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);
@@ -496,8 +506,16 @@ int main(int argc, char * argv[]){
     tauThreeProngScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);
     zPtWeightSys = new ZPtWeightSys(otree);
     topPtWeightSys = new TopPtWeightSys(otree);
-    lepTauFakeScaleSys = new LepTauFakeScaleSys(otree);
-    lepTauFakeScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);
+    //lepTauFakeScaleSys = new LepTauFakeScaleSys(otree);
+    //lepTauFakeScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);
+    lepTauFakeOneProngScaleSys = new LepTauFakeOneProngScaleSys(otree);
+    lepTauFakeOneProngScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);	
+    lepTauFakeOneProngOnePi0ScaleSys = new LepTauFakeOneProngOnePi0ScaleSys(otree);
+    lepTauFakeOneProngOnePi0ScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);	
+    lepTauFakeThreeProngScaleSys = new LepTauFakeThreeProngScaleSys(otree);
+    lepTauFakeThreeProngScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);	
+
+	
 	if (cfg.get<bool>("splitJES")){
       JESUncertainties * jecUncertainties = new JESUncertainties("DesyTauAnalyses/NTupleMaker/data/Summer16_UncertaintySources_AK4PFchs.txt");
       std::vector<std::string> JESnames = jecUncertainties->getUncertNames();
@@ -1058,11 +1076,19 @@ int main(int argc, char * argv[]){
 	  if (!isData) {
 	    bool isOneProng = false;
 	    float shift_tes = 0.0;
-	    if (otree->tau_decay_mode_2 == 0){      shift_tes=shift_tes_1prong; isOneProng=true; }
-	    else if (otree->tau_decay_mode_2 ==1){  shift_tes=shift_tes_1p1p0; }
-	    else if (otree->tau_decay_mode_2 ==10){ shift_tes=shift_tes_3prong; }
-	    correctTauES(tauLV, metLV, shift_tes, isOneProng);
-	    
+		if (otree->gen_match_2 >=5){
+	    	if (otree->tau_decay_mode_2 == 0){      shift_tes=shift_tes_1prong; isOneProng=true; }
+	    	else if (otree->tau_decay_mode_2 ==1){  shift_tes=shift_tes_1p1p0; }
+	    	else if (otree->tau_decay_mode_2 ==10){ shift_tes=shift_tes_3prong; }
+		}
+
+		else if (otree->gen_match_2 <5) {
+	    	if (otree->tau_decay_mode_2 == 0){      shift_tes=shift_tes_lepfake_1prong; isOneProng=true; }
+	    	else if (otree->tau_decay_mode_2 ==1){  shift_tes=shift_tes_lepfake_1p1p0; }
+	    	else if (otree->tau_decay_mode_2 ==10){ shift_tes=shift_tes_lepfake_3prong; }
+		}
+
+	    correctTauES(tauLV, metLV, shift_tes, isOneProng);	    
 	    otree->pt_2 = tauLV.Pt();
 	    otree->m_2 = tauLV.M();
 	    otree->met = metLV.Pt();
@@ -1172,13 +1198,19 @@ int main(int argc, char * argv[]){
            tauOneProngScaleSys->Eval(utils::MUTAU);
            tauOneProngOnePi0ScaleSys->Eval(utils::MUTAU);
            tauThreeProngScaleSys->Eval(utils::MUTAU);
-           lepTauFakeScaleSys->Eval(utils::MUTAU);
+		   lepTauFakeOneProngScaleSys->Eval(utils::MUTAU);			
+		   lepTauFakeOneProngOnePi0ScaleSys->Eval(utils::MUTAU);			
+		   lepTauFakeThreeProngScaleSys->Eval(utils::MUTAU);			
+           //lepTauFakeScaleSys->Eval(utils::MUTAU);
          }
 	 else if (ch=="et") {
            tauOneProngScaleSys->Eval(utils::ETAU);
            tauOneProngOnePi0ScaleSys->Eval(utils::ETAU);
            tauThreeProngScaleSys->Eval(utils::ETAU);
-           lepTauFakeScaleSys->Eval(utils::ETAU);
+		   lepTauFakeOneProngScaleSys->Eval(utils::ETAU);			
+		   lepTauFakeOneProngOnePi0ScaleSys->Eval(utils::ETAU);			
+		   lepTauFakeThreeProngScaleSys->Eval(utils::ETAU);	
+           //lepTauFakeScaleSys->Eval(utils::ETAU);
          }
       }
 
@@ -1235,10 +1267,26 @@ int main(int argc, char * argv[]){
     }
   }
 
-  if(lepTauFakeScaleSys != 0){
-    lepTauFakeScaleSys->Write();
-    delete lepTauFakeScaleSys;
+  //if(lepTauFakeScaleSys != 0){
+  //  lepTauFakeScaleSys->Write();
+  //  delete lepTauFakeScaleSys;
+  //}
+
+  if(lepTauFakeOneProngScaleSys != 0){
+    lepTauFakeOneProngScaleSys->Write();
+    delete lepTauFakeOneProngScaleSys;
   }
+
+  if(lepTauFakeOneProngOnePi0ScaleSys != 0){
+    lepTauFakeOneProngOnePi0ScaleSys->Write();
+    delete lepTauFakeOneProngOnePi0ScaleSys;
+  }
+
+  if(lepTauFakeThreeProngScaleSys != 0){
+    lepTauFakeThreeProngScaleSys->Write();
+    delete lepTauFakeThreeProngScaleSys;
+  }
+
 
   file->Close();
   delete file;

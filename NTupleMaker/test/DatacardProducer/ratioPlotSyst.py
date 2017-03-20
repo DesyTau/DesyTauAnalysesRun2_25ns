@@ -105,12 +105,13 @@ ROOT.TH1.SetDefaultSumw2(kTRUE)
 channel = sys.argv[1]
 
 # directory with input ROOT file 
-indir = "/nfs/dust/cms/user/bottav/Area76X/CMSSW_7_6_3_patch2/src/DesyTauAnalyses/NTupleMaker/test/NTuple/final/datacards/withSyst/"
+indir = "/nfs/dust/cms/user/bottav/CMSSW_8_0_25/src/DesyTauAnalyses/NTupleMaker/test/DatacardProducer/"
 
 #specify here (varDict) the name of the input ROOT file (datacard file with systematic variations) and name of the variable (eg: "mvis", "msv", ..)
-varDict = {"mvis": "ztt_"+channel+".inputs-sm-13TeV-mvis_fall15.root"}
+varDict = {"bin": "cuts_mt_nominal_mt_nominal_htt_mt.inputs-sm-13TeV-mvis.root"}
 
-mcProc = ["ZTT","ZL","ZJ","ZLL","TT","W","VV","QCD"]
+#mcProc = ["ZTT","ZL","ZJ","TTJ","TTT","W","VV","QCD"]
+mcProc = ["ZL"]
 
 #directory for plots
 plotOutDir = "."
@@ -121,8 +122,10 @@ if channel == "et":
 	cat = ["et_inclusive", "et_inclusivemt40"]
 	systName = ["_CMS_scale_t_13TeV","_topPtWeight","_CMS_scale_eEB_13TeV", "_CMS_scale_eEE_13TeV"]
 if channel == "mt":
-	cat = ["mt_inclusivemt40", "mt_inclusivemt30"]
-	systName = ["_CMS_scale_t_13TeV","_topPtWeight"]
+	#cat = ["mt_boosted", "mt_0jet", "mt_vbf"]
+	cat = ["mt_0jet"]
+	#systName = ["_CMS_scale_t_1prong_13TeV","_CMS_scale_t_3prong_13TeV", "_CMS_scale_t_1prong1pizero_13TeV"]
+	systName = ["_CMS_mFakeTau_1prong_13TeV", "_CMS_mFakeTau_1prong1pizero_13TeV", "_CMS_ZLShape_mt_0jet_1prong_13TeV", "_CMS_ZLShape_mt_0jet_1prong1pizero_13TeV"]
 else:
 	print "invalid channel choice"
 

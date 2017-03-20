@@ -31,12 +31,11 @@ public:
 		std::vector<float> FakeRates_VTight_ele = {1.420, 1., 2.017}; */		
 
 		// full 2016 dataset
-		// no number available for loose and very loose. Set to 1. 
-		std::vector<float> FakeRates_VLoose_ele = {1., 1., 1.}; 
-		std::vector<float> FakeRates_Loose_ele =  {1., 1., 1.}; 
-		std::vector<float> FakeRates_Medium_ele = {1.648, 1., 1.241}; 
-		std::vector<float> FakeRates_Tight_ele =  {1.867, 1., 1.456}; 
-		std::vector<float> FakeRates_VTight_ele = {1.967, 1., 1.401}; 
+		std::vector<float> FakeRates_VLoose_ele = {1.213, 1., 1.375}; 
+		std::vector<float> FakeRates_Loose_ele =  {1.320, 1., 1.380}; 
+		std::vector<float> FakeRates_Medium_ele = {1.323, 1., 1.527}; 
+		std::vector<float> FakeRates_Tight_ele =  {1.402, 1., 1.900}; 
+		std::vector<float> FakeRates_VTight_ele = {1.207, 1., 1.968}; 
 		ETAUfakerates.insert(std::make_pair("VLoose", FakeRates_VLoose_ele));
 		ETAUfakerates.insert(std::make_pair("Loose",  FakeRates_Loose_ele));
 		ETAUfakerates.insert(std::make_pair("Medium", FakeRates_Medium_ele));
