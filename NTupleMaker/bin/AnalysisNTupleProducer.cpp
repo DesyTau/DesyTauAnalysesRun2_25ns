@@ -247,6 +247,7 @@ int main(int argc, char * argv[]) {
   // ntuple variables
 
   UInt_t run_;
+  UInt_t lumi_;
   UInt_t event_;
   
   Float_t puWeight_;
@@ -358,9 +359,13 @@ int main(int argc, char * argv[]) {
   Float_t tauJetPt_;
   Float_t tauJetEta_;
   Float_t tauJetPhi_;
+  Bool_t  tauJetTightId_;
 
   Float_t recoilRatio_;
   Float_t recoilDPhi_;
+
+  Float_t recoilJetRatio_;
+  Float_t recoilJetDPhi_;
 
   Int_t   tauDecay_;
   Int_t   tauGenDecay_;
@@ -368,6 +373,8 @@ int main(int argc, char * argv[]) {
   UInt_t  tauNtrk05_;
   UInt_t  tauNtrk08_;
   UInt_t  tauNtrk1_;
+
+  UInt_t  tauGenMatch_;
 
   Bool_t  tauDM_;
   Bool_t  tauNewDM_;
@@ -384,11 +391,10 @@ int main(int argc, char * argv[]) {
   Bool_t tauAntiMuonLoose3_;
   Bool_t tauAntiMuonTight3_;
 
-  Bool_t tauAntiElectronVLooseMVA5_;
-  Bool_t tauAntiElectronLooseMVA5_;
-
   Bool_t tauAntiElectronVLooseMVA6_;
   Bool_t tauAntiElectronLooseMVA6_;
+  Bool_t tauAntiElectronTightMVA6_;
+  Bool_t tauAntiElectronVTightMVA6_;
 
   Float_t tauLeadingTrackPt_;
   Float_t tauLeadingTrackEta_;
@@ -439,8 +445,11 @@ int main(int argc, char * argv[]) {
   Float_t SoftHt_           ; // sumJetPtCentral20 + sumJetPtForward30 + sumLeptonPt
   Float_t HtNoRecoil_       ; // sumJetPtCentral30 + sumJetPtForward30 + sumLeptonPt - sumPtRecoil
   Float_t SoftHtNoRecoil_   ; // sumJetPtCentral20 + sumJetPtForward30 + sumLeptonPt - sumPtRecoil 
-
+  Float_t mhtNoMu_;
+  Float_t metNoMu_;
+  
   Int_t selection_; 
+  UInt_t npartons_; 
   //  0 : Z->mumu+Jet, 
   //  1 : W->muv+Jet
   //  2 : W*->muv 
@@ -499,6 +508,7 @@ int main(int argc, char * argv[]) {
 
   ntuple_->Branch("event",&event_,"event/i"); 
   ntuple_->Branch("run",  &run_,  "run/i");
+  ntuple_->Branch("luminosityBlock", &lumi_,  "luminosityBlock/i");
 
   ntuple_->Branch("puWeight",  &puWeight_,  "puWeight/F");
   ntuple_->Branch("genWeight", &genWeight_, "genWeight/F");
@@ -587,6 +597,7 @@ int main(int argc, char * argv[]) {
   ntuple_->Branch("tauJetPt",  &tauJetPt_,  "tauJetPt/F");
   ntuple_->Branch("tauJetEta", &tauJetEta_, "tauJetEta/F");
   ntuple_->Branch("tauJetPhi", &tauJetPhi_, "tauJetPhi/F");
+  ntuple_->Branch("tauJetTightId", &tauJetTightId_, "tauJetTightId/O");
 
   ntuple_->Branch("tauLeadingTrackPt",&tauLeadingTrackPt_,"tauLeadingTrackPt/F");
   ntuple_->Branch("tauLeadingTrackEta",&tauLeadingTrackEta_,"tauLeadingTrackEta/F");
@@ -597,6 +608,9 @@ int main(int argc, char * argv[]) {
   ntuple_->Branch("recoilRatio",&recoilRatio_,"recoilRatio/F");
   ntuple_->Branch("recoilDPhi",&recoilDPhi_,"recoilDPhi/F");
 
+  ntuple_->Branch("recoilJetRatio",&recoilJetRatio_,"recoilJetRatio/F");
+  ntuple_->Branch("recoilJetDPhi",&recoilJetDPhi_,"recoilJetDPhi/F");
+
   ntuple_->Branch("recoilM",&recoilM_,"recoilM/F");
   ntuple_->Branch("recoilPt",&recoilPt_,"recoilPt/F");
   ntuple_->Branch("recoilEta",&recoilEta_,"recoilEta/F");
@@ -605,6 +619,7 @@ int main(int argc, char * argv[]) {
   ntuple_->Branch("tauDecay",   &tauDecay_,   "tauDecay/I");
   ntuple_->Branch("tauGenDecay",&tauGenDecay_,"tauGenDecay/I");
   ntuple_->Branch("tauGenMatchDecay",&tauGenMatchDecay_,"tauGenMatchDecay/I");
+  ntuple_->Branch("tauGenMatch",&tauGenMatch_,"tauGenMatch/i");
 
   ntuple_->Branch("tauNtrk1", &tauNtrk1_, "tauNtrk1/i");
   ntuple_->Branch("tauNtrk08",&tauNtrk08_,"tauNtrk08/i");
@@ -625,11 +640,10 @@ int main(int argc, char * argv[]) {
   ntuple_->Branch("tauAntiMuonLoose3",&tauAntiMuonLoose3_,"tauAntiMuonLoose3/O");
   ntuple_->Branch("tauAntiMuonTight3",&tauAntiMuonTight3_,"tauAntiMuonTight3/O");
 
-  ntuple_->Branch("tauAntiElectronVLooseMVA5",&tauAntiElectronVLooseMVA5_,"tauAntiElectronVLooseMVA5/O");
-  ntuple_->Branch("tauAntiElectronLooseMVA5", &tauAntiElectronLooseMVA5_, "tauAntiElectronLooseMVA5/O");
-
   ntuple_->Branch("tauAntiElectronVLooseMVA6",&tauAntiElectronVLooseMVA6_,"tauAntiElectronVLooseMVA6/O");
   ntuple_->Branch("tauAntiElectronLooseMVA6", &tauAntiElectronLooseMVA6_, "tauAntiElectronLooseMVA6/O");
+  ntuple_->Branch("tauAntiElectronTightMVA6",&tauAntiElectronTightMVA6_,"tauAntiElectronTightMVA6/O");
+  ntuple_->Branch("tauAntiElectronVTightMVA6", &tauAntiElectronVTightMVA6_, "tauAntiElectronVTightMVA6/O");
 
   ntuple_->Branch("nMuon",&nMuon_,"nMuon/i");
   ntuple_->Branch("nSelMuon",&nSelMuon_,"nSelMuon/i");
@@ -673,6 +687,8 @@ int main(int argc, char * argv[]) {
   ntuple_->Branch("SoftHt",&SoftHt_,"SoftHt/F");
   ntuple_->Branch("HtNoRecoil",&HtNoRecoil_,"HtNoRecoil/F");
   ntuple_->Branch("SoftHtNoRecoil",&SoftHtNoRecoil_,"SoftHtNoRecoil/F");
+  ntuple_->Branch("mhtNoMu",&mhtNoMu_,"mhtNoMu/F");
+  ntuple_->Branch("metNoMu",&metNoMu_,"metNoMu/F");
 
   ntuple_->Branch("pfJet40",&pfJet40_,"pfJet40/O");
   ntuple_->Branch("pfJet60",&pfJet60_,"pfJet60/O");
@@ -686,20 +702,23 @@ int main(int argc, char * argv[]) {
 
   ntuple_->Branch("Selection",&selection_,"Selection/I");
 
+  ntuple_->Branch("npartons",&npartons_,"npartons/i");
+
   TH1D * dRtauCentralJetH = new TH1D("dRtauCentralJetH","",50,0.,5.0);
   TH1D * dRtauForwardJetH = new TH1D("dRtauForwardJetH","",50,0.,5.0);
 
   Bool_t trigger_;
   Bool_t isWTrig_;
   Bool_t isZTrig_;
-  Float_t metNoMu_;
-  Float_t mhtNoMu_;
   Float_t metNoSelMu_;
   Float_t mhtNoSelMu_;
   UInt_t nMuonTrig_;
   UInt_t nSelMuonTrig_;
 
   TTree * trigNTuple_ = new TTree("TriggerNTuple","TriggerNTuple");
+  trigNTuple_->Branch("event",&event_,"event/i"); 
+  trigNTuple_->Branch("run",  &run_,  "run/i");
+  trigNTuple_->Branch("luminosityBlock", &lumi_,  "luminosityBlock/i");
   trigNTuple_->Branch("trigger",&trigger_,"trigger/O");
   trigNTuple_->Branch("NVert",&nVert_,"NVert/i");
   trigNTuple_->Branch("metNoMu",&metNoMu_,"metNoMu/F");
@@ -832,6 +851,7 @@ int main(int argc, char * argv[]) {
       // initialize ntuple variables
       // ***************************
       run_ = analysisTree.event_run;
+      lumi_ = analysisTree.event_luminosityblock;
       event_ = analysisTree.event_nr;
       nVert_ = analysisTree.primvertex_count;
 
@@ -928,9 +948,13 @@ int main(int argc, char * argv[]) {
       tauJetPt_ = 0;
       tauJetEta_ = 0;
       tauJetPhi_ = 0;
+      tauJetTightId_ = false;
 
       recoilRatio_ = -1;
       recoilDPhi_ = 0;
+
+      recoilJetRatio_ = -1;
+      recoilJetDPhi_ = 0;
 
       recoilM_ = -1;
       recoilPt_ = -1;
@@ -940,6 +964,7 @@ int main(int argc, char * argv[]) {
       tauDecay_ = -1;
       tauGenDecay_ = -1;
       tauGenMatchDecay_ = -1;
+      tauGenMatch_ = 6;
 
       tauNtrk1_  = 0;
       tauNtrk05_ = 0;
@@ -966,11 +991,10 @@ int main(int argc, char * argv[]) {
       tauAntiMuonLoose3_ = false;
       tauAntiMuonTight3_ = false;
 
-      tauAntiElectronVLooseMVA5_ = false;
-      tauAntiElectronLooseMVA5_ = false;
-      
       tauAntiElectronVLooseMVA6_ = false;
       tauAntiElectronLooseMVA6_ = false;
+      tauAntiElectronTightMVA6_ = false;
+      tauAntiElectronVTightMVA6_ = false;
       
       nMuon_ = 0;
       nSelMuon_ = 0;
@@ -1049,6 +1073,8 @@ int main(int argc, char * argv[]) {
       nMuonTrig_ = 0;
       nSelMuonTrig_ = 0;
 
+      npartons_ = 9999;
+
       if (debug) {
 	std::cout << "Run = " << analysisTree.event_nr << "    Event = " << analysisTree.event_run << std::endl; 
 	std::cout << "Number of gen particles = " << analysisTree.genparticles_count << std::endl;
@@ -1065,6 +1091,8 @@ int main(int argc, char * argv[]) {
 	else
 	  genWeight_ = 1;
 	weight_ *= genWeight_;
+
+	npartons_ = analysisTree.genparticles_noutgoing;
       }
       histWeightsH->Fill(double(0.),double(genWeight_));
       
@@ -1974,6 +2002,38 @@ int main(int argc, char * argv[]) {
 	if (tauGenDecay_<0) tauGenDecay_ = -1;
 	if (tauGenMatchDecay_<0) tauGenMatchDecay_ = -1;
 
+	tauGenMatch_ = 6;
+	if (tauGenMatchDecay_>=0) tauGenMatch_ = 5;
+	float minDR = 0.2;
+	if (!isData) {
+	  for (unsigned int igen=0; igen < analysisTree.genparticles_count; ++igen) {
+	    TLorentzVector genLV; genLV.SetXYZT(analysisTree.genparticles_px[igen],
+						analysisTree.genparticles_py[igen],
+						analysisTree.genparticles_pz[igen],
+						analysisTree.genparticles_e[igen]);
+	    float ptGen = genLV.Pt();
+	    bool type1 = abs(analysisTree.genparticles_pdgid[igen])==11 && analysisTree.genparticles_isPrompt[igen] && ptGen>8;
+	    bool type2 = abs(analysisTree.genparticles_pdgid[igen])==13 && analysisTree.genparticles_isPrompt[igen] && ptGen>8;
+	    bool type3 = abs(analysisTree.genparticles_pdgid[igen])==11 && analysisTree.genparticles_isDirectPromptTauDecayProduct[igen] && ptGen>8;
+	    bool type4 = abs(analysisTree.genparticles_pdgid[igen])==13 && analysisTree.genparticles_isDirectPromptTauDecayProduct[igen] && ptGen>8;
+	    bool isAnyType = type1 || type2 || type3 || type4;
+	    if (isAnyType && analysisTree.genparticles_status[igen]==1) {
+	      float etaGen = genLV.Eta();
+	      float phiGen = genLV.Phi();
+	      float dR = deltaR(tauEta_,tauPhi_,
+				etaGen,phiGen);
+	      if (dR<minDR) {
+		minDR = dR;
+		if (type1) tauGenMatch_ = 1;
+		else if (type2) tauGenMatch_ = 2;
+		else if (type3) tauGenMatch_ = 3;
+		else if (type4) tauGenMatch_ = 4;
+	      }
+
+	    }
+	  }
+	}
+
 	tauDM_ = analysisTree.tau_decayModeFinding[indexTau] > 0.5;
 	tauNewDM_ = analysisTree.tau_decayModeFindingNewDMs[indexTau] > 0.5;
 
@@ -1994,11 +2054,10 @@ int main(int argc, char * argv[]) {
 	tauAntiMuonLoose3_ = analysisTree.tau_againstMuonLoose3[indexTau] > 0.5;
 	tauAntiMuonTight3_ = analysisTree.tau_againstMuonTight3[indexTau] > 0.5;
 
-	tauAntiElectronVLooseMVA5_ = analysisTree.tau_againstElectronVLooseMVA5[indexTau] > 0.5;
-	tauAntiElectronLooseMVA5_ = analysisTree.tau_againstElectronLooseMVA5[indexTau] > 0.5;
-
 	tauAntiElectronVLooseMVA6_ = analysisTree.tau_againstElectronVLooseMVA6[indexTau] > 0.5;
-	tauAntiElectronLooseMVA6_ = analysisTree.tau_againstElectronLooseMVA6[indexTau] > 0.5;
+	tauAntiElectronLooseMVA6_  = analysisTree.tau_againstElectronLooseMVA6[indexTau] > 0.5;
+	tauAntiElectronTightMVA6_  = analysisTree.tau_againstElectronTightMVA6[indexTau] > 0.5;
+	tauAntiElectronVTightMVA6_ = analysisTree.tau_againstElectronVTightMVA6[indexTau] > 0.5;
 
 	// Add fake rates to tree
 	// check pt bin
@@ -2080,8 +2139,8 @@ int main(int argc, char * argv[]) {
 	
 	// finding matching jet
 	bool jetFound = false;
-	float dRmin = 1;
-	//unsigned int indexMatchingJet = 0;
+	float dRmin = 0.4;
+	int indexMatchingJet = -1;
 	for (unsigned int ijet=0; ijet<analysisTree.pfjet_count; ++ijet) {
 	  TLorentzVector lorentzVectorJ; lorentzVectorJ.SetXYZT(analysisTree.pfjet_px[ijet],
 								analysisTree.pfjet_py[ijet],
@@ -2093,16 +2152,20 @@ int main(int argc, char * argv[]) {
 	  if (drJetTau<dRmin) {
 	    dRmin = drJetTau;
 	    jetFound = true;
-	    //indexMatchingJet = ijet;
+	    indexMatchingJet = ijet;
 	    lorentzVectorTauJet = lorentzVectorJ;
 	  }
 
 	}
 	if (!jetFound) {
 	  lorentzVectorTauJet = lorentzVectorTau;
+	  continue;
 	}
 
-
+	tauJetPt_  = lorentzVectorTauJet.Pt();
+	tauJetEta_ = lorentzVectorTauJet.Eta();
+	tauJetPhi_ = lorentzVectorTauJet.Phi();
+	tauJetTightId_ = tightJetiD(analysisTree,indexMatchingJet);
 	//	cout << "fake  Loose = " << fakeAntiLLoose_
 	//	     << "   Medium = " << fakeAntiLMedium_
 	//	     << "   Tight  = " << fakeAntiLTight_ << endl;
@@ -2196,8 +2259,8 @@ int main(int argc, char * argv[]) {
       if (lorentzVectorW.Pt()>1e-4) {
 	recoilRatio_ = tauPt_ / lorentzVectorW.Pt();
 	recoilDPhi_  = dPhiFromLV(lorentzVectorW,lorentzVectorTau);
-	//	recoilRatio_ = lorentzVectorTauJet.Pt()/lorentzVectorW.Pt();
-	//	recoilDPhi_ = dPhiFromLV(lorentzVectorW,lorentzVectorTauJet);
+	recoilJetRatio_ = lorentzVectorTauJet.Pt()/lorentzVectorW.Pt();
+	recoilJetDPhi_ = dPhiFromLV(lorentzVectorW,lorentzVectorTauJet);
 	isWJet = ptTriggerMu>ptMuCut_WJet; 
 	isWJet = isWJet && mtmuon_ > mtCut_WJet;
 	isWJet = isWJet && recoilRatio_>ptJetWRatioLowerCut_WJet && recoilRatio_<ptJetWRatioUpperCut_WJet;
@@ -2207,16 +2270,13 @@ int main(int argc, char * argv[]) {
 	isWJet = isWJet && nSelTaus_ == 1;
 	isWJet = isWJet && nJetsCentral30_ == 1;
 	isWJet = isWJet && nJetsForward30_ == 0;
-	isWJet = isWJet && tauPt_>100.;
+	isWJet = isWJet && tauPt_>50.;
 
 	if (isWJet) {
 	  mueffweight  = SF_muonIdIso->get_ScaleFactor(ptTriggerMu, etaTriggerMu);
           mutrigweight = SF_muonTrig->get_EfficiencyData(ptTriggerMu, etaTriggerMu);
 	  HtNoRecoil_     = Ht_     - ptTriggerMu;
 	  SoftHtNoRecoil_ = SoftHt_ - ptTriggerMu;
-	  tauJetPt_  = lorentzVectorTauJet.Pt();
-	  tauJetEta_ = lorentzVectorTauJet.Eta();
-	  tauJetPhi_ = lorentzVectorTauJet.Phi();
 	  recoilM_   = lorentzVectorW.M();
           recoilPt_  = lorentzVectorW.Pt();
           recoilEta_ = lorentzVectorW.Eta();
@@ -2233,14 +2293,16 @@ int main(int argc, char * argv[]) {
       if (lorentzVectorMet.Pt()>1e-4) {
 	recoilRatio_ = ptTriggerMu/lorentzVectorMet.Pt();
 	recoilDPhi_  = dPhiFromLV(lorentzVectorTriggerMu,lorentzVectorMet);
+	recoilJetRatio_ = -1;
+	recoilJetDPhi_  = 0;
 	isWMuNu = ptTriggerMu>ptMuCut_WMuNu;
 	isWMuNu = isWMuNu && met_>metCut_WMuNu;
 	isWMuNu = isWMuNu && recoilRatio_>ptMuMetRatioLowerCut_WMuNu && recoilRatio_<ptMuMetRatioUpperCut_WMuNu;
 	isWMuNu = isWMuNu && recoilDPhi_>deltaPhiMuMetCut_WMuNu;
-	isWMuNu = isWMuNu && nMuon_ == 0;
+	isWMuNu = isWMuNu && nMuon_ == 1;
 	isWMuNu = isWMuNu && nElec_ == 0;
-	isWMuNu = isWMuNu && nSelTaus_ == 1;
-	isWMuNu = isWMuNu && nJetsCentral30_ <= 1;
+	isWMuNu = isWMuNu && nSelTaus_ == 0;
+	isWMuNu = isWMuNu && nJetsCentral30_ == 0;
 	isWMuNu = isWMuNu && nJetsForward30_ == 0;
 
 	if (isWMuNu) {
@@ -2264,6 +2326,8 @@ int main(int argc, char * argv[]) {
       if (lorentzVectorMet.Pt()>1e-4) {
 	recoilRatio_ = tauPt_ / lorentzVectorMet.Pt();
 	recoilDPhi_  = dPhiFromLV(lorentzVectorTau,lorentzVectorMet);
+	recoilJetRatio_ = lorentzVectorTauJet.Pt()/lorentzVectorMet.Pt();
+	recoilJetDPhi_ = dPhiFromLV(lorentzVectorMet,lorentzVectorTauJet);
 	isWTauNu = met_>metCut_WTauNu;
 	isWTauNu = isWTauNu && recoilRatio_>ptTauMetRatioLowerCut_WTauNu && recoilRatio_<ptTauMetRatioUpperCut_WTauNu;
 	isWTauNu = isWTauNu && recoilDPhi_>deltaPhiTauMetCut_WTauNu;
@@ -2340,6 +2404,36 @@ int main(int argc, char * argv[]) {
 	    tauNtrk05_ = analysisTree.tau_ntracks_pt05[indexTau];
 	    tauNtrk08_ = analysisTree.tau_ntracks_pt08[indexTau];
 
+	    // finding matching jet
+	    bool jetFound = false;
+	    float dRmin = 0.4;
+	    int indexMatchingJet = -1;
+	    for (unsigned int ijet=0; ijet<analysisTree.pfjet_count; ++ijet) {
+	      TLorentzVector lorentzVectorJ; lorentzVectorJ.SetXYZT(analysisTree.pfjet_px[ijet],
+								    analysisTree.pfjet_py[ijet],
+								    analysisTree.pfjet_pz[ijet],
+								    analysisTree.pfjet_e[ijet]);
+	      float drJetTau = deltaR(lorentzVectorJ.Eta(),lorentzVectorJ.Phi(),
+				      tauEta_,tauPhi_);
+	      
+	      if (drJetTau<dRmin) {
+		dRmin = drJetTau;
+		jetFound = true;
+		indexMatchingJet = ijet;
+		lorentzVectorTauJet = lorentzVectorJ;
+	      }
+	      
+	    }
+	    if (!jetFound) {
+	      lorentzVectorTauJet = lorentzVectorTau;
+	      continue;
+	    }
+
+	    tauJetPt_  = lorentzVectorTauJet.Pt();
+	    tauJetEta_ = lorentzVectorTauJet.Eta();
+	    tauJetPhi_ = lorentzVectorTauJet.Phi();
+	    tauJetTightId_ = tightJetiD(analysisTree,indexMatchingJet);
+
 	    tauLeadingTrackPt_ = PtoPt(analysisTree.tau_leadchargedhadrcand_px[indexTau],
 				       analysisTree.tau_leadchargedhadrcand_py[indexTau]);
 	    
@@ -2380,11 +2474,12 @@ int main(int argc, char * argv[]) {
  
 	    tauAntiMuonLoose3_ = analysisTree.tau_againstMuonLoose3[indexTau] > 0.5;
 	    tauAntiMuonTight3_ = analysisTree.tau_againstMuonTight3[indexTau] > 0.5;
-	    tauAntiElectronVLooseMVA5_ = analysisTree.tau_againstElectronVLooseMVA5[indexTau] > 0.5;
-	    tauAntiElectronLooseMVA5_ = analysisTree.tau_againstElectronLooseMVA5[indexTau] > 0.5;
+
 
 	    recoilRatio_ = tauPt_/recoilJetLV.Pt();
 	    recoilDPhi_ = dPhiFromLV(tauLV,recoilJetLV);
+	    recoilJetRatio_ = lorentzVectorTauJet.Pt()/recoilJetLV.Pt();
+	    recoilJetDPhi_ = dPhiFromLV(lorentzVectorTauJet,recoilJetLV);
 	    recoilM_ = recoilJetLV.M();
 	    recoilPt_ = recoilJetLV.Pt();
 	    recoilEta_ = recoilJetLV.Eta();
