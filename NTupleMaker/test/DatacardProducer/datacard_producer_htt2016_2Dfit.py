@@ -205,7 +205,7 @@ def Wjets_dataMC_sf(SSOSratio, hw): #hw contains the result of the calculation, 
 
 	hw_os_highmt = hdummy.Clone("hw_os_highmt")
 	hw_ss_highmt = hdummy.Clone("hw_ss_highmt")		
-	makeDatacard_ssos(treeName, lw, cvalue+"&&"+highMTcut, wvalue+"*"+dy_weight, hw_os_highmt, hw_ss_highmt)
+	makeDatacard_ssos(treeName, lw, cvalue+"&&"+highMTcut, wvalue, hw_os_highmt, hw_ss_highmt)
 	
 	hqcd_ss_highmt = hdummy.Clone("hqcd_ss_highmt")
 	add_all(hqcd_ss_highmt, [(hdata_ss_highmt,1),(hvv_ss_highmt,-1),(htt_ss_highmt,-1),(hdy_ss_highmt,-1),(hw_ss_highmt,-1),(hewkz_ss_highmt,-1), (hvbfhww_ss_highmt,-1), (hgghww_ss_highmt,-1)])	
@@ -996,7 +996,8 @@ for wkey, wvalue in weighting.iteritems():
 			SSOSratio = ssosvalues.get(channel+"_"+ckey, 1.06)
 			hw_corrected = hw.Clone("hw_corrected")
 			W_sf = Wjets_dataMC_sf(SSOSratio, hw_corrected)
-			hw_corrected.Scale(W_sf)
+			if (W_sf>0):
+				hw_corrected.Scale(W_sf)
 			
 			##########################
 			# QCD estimate
