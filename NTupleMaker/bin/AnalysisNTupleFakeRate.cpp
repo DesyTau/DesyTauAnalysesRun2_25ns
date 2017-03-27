@@ -254,40 +254,6 @@ int main(int argc, char * argv[]) {
   Float_t recoilRatio_;
   Float_t recoilDPhi_;
 
-  Int_t   tauDecay_;
-  Int_t   tauGenDecay_;
-  Int_t   tauGenMatchDecay_;
-  UInt_t  tauNtrk05_;
-  UInt_t  tauNtrk08_;
-  UInt_t  tauNtrk1_;
-
-  Bool_t  tauDM_;
-  Bool_t  tauNewDM_;
-
-  Bool_t  tauLooseIso_;
-  Bool_t  tauMediumIso_;
-  Bool_t  tauTightIso_;
-
-  Bool_t  tauLooseMvaIso_;
-  Bool_t  tauMediumMvaIso_;
-  Bool_t  tauTightMvaIso_;
-  Bool_t  tauVTightMvaIso_;
-
-  Bool_t tauAntiMuonLoose3_;
-  Bool_t tauAntiMuonTight3_;
-
-  Bool_t tauAntiElectronVLooseMVA5_;
-  Bool_t tauAntiElectronLooseMVA5_;
-
-  Bool_t tauAntiElectronVLooseMVA6_;
-  Bool_t tauAntiElectronLooseMVA6_;
-
-  Float_t tauLeadingTrackPt_;
-  Float_t tauLeadingTrackEta_;
-  Float_t tauLeadingTrackPhi_;
-  Float_t tauLeadingTrackDz_;
-  Float_t tauLeadingTrackDxy_;
-
   UInt_t nMuon_;
   UInt_t nSelMuon_;
   UInt_t nElec_;
@@ -345,10 +311,6 @@ int main(int argc, char * argv[]) {
   Float_t mueffweight;
   Float_t mutrigweight;
 
-  UInt_t nSelTaus_;
-  UInt_t nTaus20_;
-  UInt_t nTaus30_;
-
   Float_t JetHt_            ; // sumJetPtCentral30 + sumJetPtForward30
   Float_t SoftJetHt_        ; // sumJetPtCentral20 + sumJetPtForward30
   Float_t Ht_               ; // sumJetPtCentral30 + sumJetPtForward30 + sumLeptonPt
@@ -376,44 +338,6 @@ int main(int argc, char * argv[]) {
   Bool_t pf2Jet80_;
   Bool_t pf2Jet140_;
   
-  ////////////
-  Float_t taujetPt_;
-  ///////////
-
-  UInt_t nJets20_;
-  Float_t jet20Pt_[10];
-  Float_t jet20Eta_[10];
-  Float_t jet20Phi_[10];
-
-  TTree * wntuple_ = new TTree("WNTuple","WNTuple"); // small ntuple
-
-  wntuple_->Branch("WMass",&wMass_,   "WMass/F");
-  wntuple_->Branch("WPt",  &wPt_,     "WPt/F");
-  wntuple_->Branch("WEta", &wEta_,    "WEta/F");
-  wntuple_->Branch("WPhi", &wPhi_,    "WPhi/F");
-  wntuple_->Branch("WDecay", &wDecay_,"WDecay/I");
-  wntuple_->Branch("WTauDecay",&wTauDecay_, "WTauDecay/I");
-
-  wntuple_->Branch("lepWPt",&lepWPt_,"lepWPt/F");
-  wntuple_->Branch("lepWEta",&lepWEta_,"lepWEta/F");
-  wntuple_->Branch("lepWPhi",&lepWPhi_,"lepWPhi/F");
-
-  wntuple_->Branch("nuWPt",&nuWPt_,"nuWPt/F");
-  wntuple_->Branch("nuWEta",&nuWEta_,"nuWEta/F");
-  wntuple_->Branch("nuWPhi",&nuWPhi_,"nuWPhi/F");
-
-  wntuple_->Branch("met",&met_,"met/F");
-  wntuple_->Branch("metphi",&metphi_,"metphi/F");
-
-  wntuple_->Branch("nJets20",&nJets20_,"nJets20/i");
-  wntuple_->Branch("jet20Pt",jet20Pt_,"jet20Pt[nJets20]/F");
-  wntuple_->Branch("jet20Eta",jet20Eta_,"jet20Eta[nJets20]/F");
-  wntuple_->Branch("jet20Phi",jet20Phi_,"jet20Phi[nJets20]/F");
-
-  wntuple_->Branch("tauPt",  &tauPt_,  "tauPt/F");
-  wntuple_->Branch("tauEta", &tauEta_, "tauEta/F");
-  wntuple_->Branch("tauPhi", &tauPhi_, "tauPhi/F");
-
   TTree * ntuple_ = new TTree("NTuple","NTuple");
 
   ntuple_->Branch("event",&event_,"event/i"); 
@@ -503,8 +427,8 @@ int main(int argc, char * argv[]) {
   ntuple_->Branch("jettauAntiElectronVLooseMVA6",&jettauAntiElectronVLooseMVA6_,"jettauAntiElectronVLooseMVA6/O");
   ntuple_->Branch("jettauAntiElectronLooseMVA6", &jettauAntiElectronLooseMVA6_, "jettauAntiElectronLooseMVA6/O");
 
-  ntuple_->Branch("jettauDecay",&jettauDecay_,"jettauDecay/F");
-  ntuple_->Branch("jettauGenDecay",&jettauGenDecay_,"jettauGenDecay/F");
+  ntuple_->Branch("jettauDecay",&jettauDecay_,"jettauDecay/I");
+  ntuple_->Branch("jettauGenDecay",&jettauGenDecay_,"jettauGenDecay/I");
 
   ntuple_->Branch("jetChargedMult",   &jetChargedMult_,   "jetChargedMult/i");
   ntuple_->Branch("jetNeutralMult",   &jetNeutralMult_,   "jetNeutralMult/i");
@@ -523,10 +447,6 @@ int main(int argc, char * argv[]) {
 
   ntuple_->Branch("jet2NeutralEMEnergyFraction", &jet2NeutralEMEnergyFraction_, "jet2NeutralEMEnergyFraction/F");
   ntuple_->Branch("jet2NeutralHadEnergyFraction",&jet2NeutralHadEnergyFraction_,"jet2NeutralHadEnergyFraction/F");
-
-  ntuple_->Branch("nSelTaus",&nSelTaus_,"nSelTaus/i");
-  ntuple_->Branch("nTaus20",&nTaus20_,"nTaus20/i");
-  ntuple_->Branch("nTaus30",&nTaus30_,"nTaus30/i");
 
   ntuple_->Branch("JetHt",&JetHt_,"JetHt/F");
   ntuple_->Branch("SoftJetHt",&SoftJetHt_,"SoftJetHt/F");
@@ -661,6 +581,7 @@ int main(int argc, char * argv[]) {
       genWeight_ = 1;
       puWeight_ = 1;
 
+      genHt_ = analysisTree.genparticles_lheHt;
       metFilters_ = metFiltersPasses(analysisTree,metFlags);
 
       wMass_ = -1;
@@ -693,18 +614,6 @@ int main(int argc, char * argv[]) {
       muon2Phi_ = 0;
       muon2Q_ = 0;
 
-      tauPt_ = 0;
-      tauEta_ = 0;
-      tauPhi_ = 0;
-      tauMass_ = 0;
-      tauQ_ = 0;
-
-
-      ///////////////
-      taujetPt_ = 0;
-      ///////////////
-
-      genHt_ = analysisTree.genparticles_lheHt;
 
       recoilRatio_ = -1;
       recoilDPhi_ = 0;
@@ -714,41 +623,6 @@ int main(int argc, char * argv[]) {
       recoilEta_ = 0;
       recoilPhi_ = 0;
 
-      tauDecay_ = -1;
-      tauGenDecay_ = -1;
-      tauGenMatchDecay_ = -1;
-
-      tauNtrk1_  = 0;
-      tauNtrk05_ = 0;
-      tauNtrk08_ = 0;
-
-      tauLeadingTrackPt_  = 0;
-      tauLeadingTrackEta_ = 0;
-      tauLeadingTrackPhi_ = 0;
-      tauLeadingTrackDz_  = -999;
-      tauLeadingTrackDxy_ = -999;
-
-      tauDM_ = false;
-      tauNewDM_ = false;
-      
-      tauLooseIso_ = false;
-      tauMediumIso_ = false;
-      tauTightIso_ = false;
-
-      tauLooseMvaIso_ = false;
-      tauMediumMvaIso_ = false;
-      tauTightMvaIso_ = false;
-      tauVTightMvaIso_ = false;
-
-      tauAntiMuonLoose3_ = false;
-      tauAntiMuonTight3_ = false;
-
-      tauAntiElectronVLooseMVA5_ = false;
-      tauAntiElectronLooseMVA5_ = false;
-      
-      tauAntiElectronVLooseMVA6_ = false;
-      tauAntiElectronLooseMVA6_ = false;
-      
       nMuon_ = 0;
       nSelMuon_ = 0;
       nElec_ = 0;
@@ -759,9 +633,9 @@ int main(int argc, char * argv[]) {
       nJetsForward20_ = 0;
       nJetsForward30_ = 0;
 
-      jetPt_ = 0;
-      jetEta_ = 0;
-      jetPhi_ = 0;
+      jetPt_  = -9999;
+      jetEta_ = -9999;
+      jetPhi_ = -9999;
 
       jettauPt_ = 0;
       jettauEta_ = 0;
@@ -788,9 +662,9 @@ int main(int argc, char * argv[]) {
       jetNeutralEMEnergyFraction_ = 0;
       jetNeutralHadEnergyFraction_ = 0;
 
-      jet2Pt_ = 0;
-      jet2Eta_ = 0;
-      jet2Phi_ = 0;
+      jet2Pt_ = -9999;
+      jet2Eta_ = -9999;
+      jet2Phi_ = -9999;
 
       jet2ChargedMult_ = 0;
       jet2NeutralMult_ = 0;
@@ -798,11 +672,6 @@ int main(int argc, char * argv[]) {
 
       jet2NeutralEMEnergyFraction_ = 0;
       jet2NeutralHadEnergyFraction_ = 0;
-
-      nJets20_ = 0;
-      nTaus20_ = 0;
-      nTaus30_ = 0;
-      nSelTaus_ = 0;
 
       JetHt_ = 0;
       SoftJetHt_ = 0;
@@ -1452,12 +1321,6 @@ int main(int argc, char * argv[]) {
 	    forwardJets20Indexes.push_back(ijet);
 	    htForward20 += analysisTree.pfjet_pt[ijet]; 
 	  }
-	  if (nJets20_<10) {
-	    jet20Pt_[nJets20_]  = analysisTree.pfjet_pt[ijet];
-	    jet20Eta_[nJets20_] = analysisTree.pfjet_eta[ijet];
-	    jet20Phi_[nJets20_] = analysisTree.pfjet_phi[ijet];
-	    nJets20_++;
-	  }
 	}
 
 	// pt > 30 GeV
@@ -1613,8 +1476,6 @@ int main(int argc, char * argv[]) {
 	  if ((analysisTree.trigobject_filters[iT][nPFJet140HLTFilter]&&isPFJet140HLTFilter)) pf2Jet140_ = true;
 	}
       }
-      
-
       // ****************************
       // **** end accessing jets ****
       // ****************************
@@ -1630,7 +1491,7 @@ int main(int argc, char * argv[]) {
 	recoilRatio_ = jetPt_ / lorentzVectorW.Pt();
 	recoilDPhi_  = dPhiFromLV(lorentzVectorW,lorentzVectorJet);
 
-	isWJet = ptTriggerMu>ptMuCut_WJet && jetPt_>20; 
+	isWJet = ptTriggerMu>ptMuCut_WJet && jetPt_>20 && fabs(jetEta_)<2.4; 
 	isWJet = isWJet && mtmuon_ > mtCut_WJet;
 	isWJet = isWJet && recoilRatio_>ptJetWRatioLowerCut_WJet && recoilRatio_<ptJetWRatioUpperCut_WJet;
 	isWJet = isWJet && recoilDPhi_>deltaPhiWJetCut_WJet;
