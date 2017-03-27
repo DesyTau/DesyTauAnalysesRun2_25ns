@@ -21,6 +21,7 @@
 #include "TF1.h"
 #include "TKey.h"
 #include "TGraphErrors.h"
+#include "TGraphAsymmErrors.h"
 
 #include "TLorentzVector.h"
 
@@ -62,7 +63,7 @@ double dPhiFromLV(TLorentzVector v1, TLorentzVector v2) {
   return dPhiFrom2P(v1.Px(),v1.Py(),v2.Px(),v2.Py());
 
 }
-void GetFakeRates(TString filename, map<std::pair<TString,int>, double>* fakerate, map<std::pair<TString,int>, double>* fakerateE) {
+std::map<TString,TH2D*> GetFakeRates(TString filename) {
 
   TFile *f1 = TFile::Open(filename);
   if(!f1){
@@ -70,23 +71,27 @@ void GetFakeRates(TString filename, map<std::pair<TString,int>, double>* fakerat
     exit(-1);
   }
   
-  TIter next(f1->GetListOfKeys());
-  TKey *key;
-  
-  while ((key = (TKey*)next())) {
-    TClass *cl = gROOT->GetClass(key->GetClassName());
-    
-    if (!cl->InheritsFrom("TGraphErrors")) continue;
-    
-    TGraphErrors *g = (TGraphErrors*) key->ReadObj();
-    
-    for(int i = 0; i<g->GetN(); i++){
-      fakerate  -> insert( std::make_pair( std::make_pair( g->GetName() , i ) , g->GetY()[i] ) );
-      fakerateE -> insert( std::make_pair( std::make_pair( g->GetName() , i ), g->GetEY()[i] ) );
-    }
+  std::vector<TString> isolations;
+  isolations.push_back("LooseIso");
+  isolations.push_back("MediumIso");
+  isolations.push_back("TightIso");
+  isolations.push_back("LooseMvaIso");
+  isolations.push_back("MediumMvaIso");
+  isolations.push_back("TightMvaIso");
+  isolations.push_back("VTightMvaIso");
+
+  std::map<TString,TH2D*> fakerates;
+
+  int nIso = isolations.size();
+
+  for (int iIso=0; iIso<nIso; ++iIso) {
+    TH2D *g = (TH2D*) f1->Get(isolations.at(iIso));
+    std::cout << isolations.at(iIso) << " : " << g << "  bins = " << g->GetNbinsX() << ":" << g->GetNbinsY() << std::endl;
+    fakerates[isolations.at(iIso)] = g;
   }
-  f1->Close();
-  delete f1;
+
+  return fakerates;
+
 }
 
 
@@ -192,7 +197,6 @@ int main(int argc, char * argv[]) {
 
   // weighting (tau fake rate)
   const string tauFakeRateFileName = cfg.get<string>("TauFakeRateFileName");
-  const string tauAntiLFakeRateFileName = cfg.get<string>("TauAntiLFakeRateFileName");
 
   // trigger eff filename
   const string trigEffFileName = cfg.get<string>("TrigEffFileName");
@@ -297,38 +301,19 @@ int main(int argc, char * argv[]) {
   Float_t fakeAntiLMedium_;
   Float_t fakeAntiLTight_;
 
-  Float_t fakeAntiLLooseUp1_;
-  Float_t fakeAntiLMediumUp1_;
-  Float_t fakeAntiLTightUp1_;
-
-  Float_t fakeAntiLLooseUp2_;
-  Float_t fakeAntiLMediumUp2_;
-  Float_t fakeAntiLTightUp2_;
-
-  Float_t fakeAntiLLooseUp3_;
-  Float_t fakeAntiLMediumUp3_;
-  Float_t fakeAntiLTightUp3_;
+  Float_t fakeAntiLLooseUp_[6];
+  Float_t fakeAntiLMediumUp_[6];
+  Float_t fakeAntiLTightUp_[6];
 
   Float_t fakeAntiLLooseMva_;
   Float_t fakeAntiLMediumMva_;
   Float_t fakeAntiLTightMva_;
   Float_t fakeAntiLVTightMva_;
 
-  Float_t fakeAntiLLooseMvaUp1_;
-  Float_t fakeAntiLMediumMvaUp1_;
-  Float_t fakeAntiLTightMvaUp1_;
-  Float_t fakeAntiLVTightMvaUp1_;
-
-  Float_t fakeAntiLLooseMvaUp2_;
-  Float_t fakeAntiLMediumMvaUp2_;
-  Float_t fakeAntiLTightMvaUp2_;
-  Float_t fakeAntiLVTightMvaUp2_;
-
-  Float_t fakeAntiLLooseMvaUp3_;
-  Float_t fakeAntiLMediumMvaUp3_;
-  Float_t fakeAntiLTightMvaUp3_;
-  Float_t fakeAntiLVTightMvaUp3_;
- 
+  Float_t fakeAntiLLooseMvaUp_[6];
+  Float_t fakeAntiLMediumMvaUp_[6];
+  Float_t fakeAntiLTightMvaUp_[6];
+  Float_t fakeAntiLVTightMvaUp_[6];
 
   Float_t met_;
   Float_t metphi_;
@@ -541,37 +526,26 @@ int main(int argc, char * argv[]) {
   ntuple_->Branch("fakeAntiLMedium",&fakeAntiLMedium_,"fakeAntiLMedium/F");
   ntuple_->Branch("fakeAntiLTight", &fakeAntiLTight_, "fakeAntiLTight/F");
 
-  ntuple_->Branch("fakeAntiLLooseUp1", &fakeAntiLLooseUp1_, "fakeAntiLLooseUp1/F");
-  ntuple_->Branch("fakeAntiLMediumUp1",&fakeAntiLMediumUp1_,"fakeAntiLMediumUp1/F");
-  ntuple_->Branch("fakeAntiLTightUp1", &fakeAntiLTightUp1_, "fakeAntiLTightUp1/F");
-
-  ntuple_->Branch("fakeAntiLLooseUp2", &fakeAntiLLooseUp2_, "fakeAntiLLooseUp2/F");
-  ntuple_->Branch("fakeAntiLMediumUp2",&fakeAntiLMediumUp2_,"fakeAntiLMediumUp2/F");
-  ntuple_->Branch("fakeAntiLTightUp2" ,&fakeAntiLTightUp2_, "fakeAntiLTightUp2/F");
-
-  ntuple_->Branch("fakeAntiLLooseUp3", &fakeAntiLLooseUp3_, "fakeAntiLLooseUp3/F");
-  ntuple_->Branch("fakeAntiLMediumUp3",&fakeAntiLMediumUp3_,"fakeAntiLMediumUp3/F");
-  ntuple_->Branch("fakeAntiLTightUp3", &fakeAntiLTightUp3_, "fakeAntiLTightUp3/F");
-
   ntuple_->Branch("fakeAntiLLooseMva", &fakeAntiLLooseMva_, "fakeAntiLLooseMva/F");
   ntuple_->Branch("fakeAntiLMediumMva",&fakeAntiLMediumMva_,"fakeAntiLMediumMva/F");
   ntuple_->Branch("fakeAntiLTightMva", &fakeAntiLTightMva_, "fakeAntiLTightMva/F");
   ntuple_->Branch("fakeAntiLVTightMva", &fakeAntiLVTightMva_, "fakeAntiLVTightMva/F");
 
-  ntuple_->Branch("fakeAntiLLooseMvaUp1", &fakeAntiLLooseMvaUp1_, "fakeAntiLLooseMvaUp1/F");
-  ntuple_->Branch("fakeAntiLMediumMvaUp1",&fakeAntiLMediumMvaUp1_,"fakeAntiLMediumMvaUp1/F");
-  ntuple_->Branch("fakeAntiLTightMvaUp1", &fakeAntiLTightMvaUp1_, "fakeAntiLTightMvaUp1/F");
-  ntuple_->Branch("fakeAntiLVTightMvaUp1", &fakeAntiLVTightMvaUp1_, "fakeAntiLVTightMvaUp1/F");
 
-  ntuple_->Branch("fakeAntiLLooseMvaUp2", &fakeAntiLLooseMvaUp2_, "fakeAntiLLooseMvaUp2/F");
-  ntuple_->Branch("fakeAntiLMediumMvaUp2",&fakeAntiLMediumMvaUp2_,"fakeAntiLMediumMvaUp2/F");
-  ntuple_->Branch("fakeAntiLTightMvaUp2" ,&fakeAntiLTightMvaUp2_, "fakeAntiLTightMvaUp2/F");
-  ntuple_->Branch("fakeAntiLVTightMvaUp2" ,&fakeAntiLVTightMvaUp2_, "fakeAntiLVTightMvaUp2/F");
+  TString numbers[6] = {"1","2","3","4","5","6"};
 
-  ntuple_->Branch("fakeAntiLLooseMvaUp3", &fakeAntiLLooseMvaUp3_, "fakeAntiLLooseMvaUp3/F");
-  ntuple_->Branch("fakeAntiLMediumMvaUp3",&fakeAntiLMediumMvaUp3_,"fakeAntiLMediumMvaUp3/F");
-  ntuple_->Branch("fakeAntiLTightMvaUp3", &fakeAntiLTightMvaUp3_, "fakeAntiLTightMvaUp3/F");
-  ntuple_->Branch("fakeAntiLVTightMvaUp3", &fakeAntiLVTightMvaUp3_, "fakeAntiLVTightMvaUp3/F");
+  for (int number=0; number<6; ++number) {
+
+    ntuple_->Branch("fakeAntiLLooseUp"+numbers[number], &fakeAntiLLooseUp_[number], "fakeAntiLLooseUp"+numbers[number]+"/F");
+    ntuple_->Branch("fakeAntiLMediumUp"+numbers[number], &fakeAntiLMediumUp_[number], "fakeAntiLMediumUp"+numbers[number]+"/F");
+    ntuple_->Branch("fakeAntiLTightUp"+numbers[number], &fakeAntiLTightUp_[number], "fakeAntiLTightUp"+numbers[number]+"/F");
+
+    ntuple_->Branch("fakeAntiLLooseMvaUp"+numbers[number], &fakeAntiLLooseMvaUp_[number], "fakeAntiLLooseMvaUp"+numbers[number]+"/F");
+    ntuple_->Branch("fakeAntiLMediumMvaUp"+numbers[number], &fakeAntiLMediumMvaUp_[number], "fakeAntiLMediumMvaUp"+numbers[number]+"/F");
+    ntuple_->Branch("fakeAntiLTightMvaUp"+numbers[number], &fakeAntiLTightMvaUp_[number], "fakeAntiLTightMvaUp"+numbers[number]+"/F");
+    ntuple_->Branch("fakeAntiLVTightMvaUp"+numbers[number], &fakeAntiLVTightMvaUp_[number], "fakeAntiLVTightMvaUp"+numbers[number]+"/F");
+
+  }
 
   ntuple_->Branch("met",    &met_,   "met/F");
   ntuple_->Branch("metphi", &metphi_,"metphi/F");
@@ -795,10 +769,13 @@ int main(int argc, char * argv[]) {
   metFlags.push_back("Flag_BadPFMuonFilter");
 
   // Read fake rates
-  map<std::pair<TString,int>, double>* fakerate  = new map<std::pair<TString,int>, double>();
-  map<std::pair<TString,int>, double>* fakerateE = new map<std::pair<TString,int>, double>();
-  TString file_tauFakeRate = TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/"+tauAntiLFakeRateFileName;
-  GetFakeRates(file_tauFakeRate, fakerate, fakerateE);
+  TString file_tauFakeRate = TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/"+tauFakeRateFileName;
+  std::map<TString,TH2D*>  fakerates = GetFakeRates(file_tauFakeRate);
+  int nBins = fakerates["LooseIso"]->GetNbinsX();
+  double bins[20];
+  for (int iBin=0; iBin<=nBins; iBin++)
+    bins[iBin] = fakerates["LooseIso"]->GetYaxis()->GetBinLowEdge(iBin+1);
+  TH1D * binsH = new TH1D("binsH","",nBins,bins);
 
   int nFiles = 0;
   int nEvents = 0;
@@ -888,41 +865,26 @@ int main(int argc, char * argv[]) {
       //      fakeMedium_ = 1.;
       //      fakeTight_ = 1.;
 
-      fakeAntiLLooseUp1_ = 1.;
-      fakeAntiLMediumUp1_ = 1.;
-      fakeAntiLTightUp1_ = 1.;
-
-      fakeAntiLLooseUp2_ = 1.;
-      fakeAntiLMediumUp2_ = 1.;
-      fakeAntiLTightUp2_ = 1.;
-
-      fakeAntiLLooseUp3_ = 1.;
-      fakeAntiLMediumUp3_ = 1.;
-      fakeAntiLTightUp3_ = 1.;
 
       fakeAntiLLoose_ = 1.;
       fakeAntiLMedium_ = 1.;
       fakeAntiLTight_ = 1.;
 
-      fakeAntiLLooseMvaUp1_ = 1.;
-      fakeAntiLMediumMvaUp1_ = 1.;
-      fakeAntiLTightMvaUp1_ = 1.;
-      fakeAntiLVTightMvaUp1_ = 1.;
-
-      fakeAntiLLooseMvaUp2_ = 1.;
-      fakeAntiLMediumMvaUp2_ = 1.;
-      fakeAntiLTightMvaUp2_ = 1.;
-      fakeAntiLVTightMvaUp2_ = 1.;
-
-      fakeAntiLLooseMvaUp3_ = 1.;
-      fakeAntiLMediumMvaUp3_ = 1.;
-      fakeAntiLTightMvaUp3_ = 1.;
-      fakeAntiLVTightMvaUp3_ = 1.;
-
       fakeAntiLLooseMva_ = 1.;
       fakeAntiLMediumMva_ = 1.;
       fakeAntiLTightMva_ = 1.;
       fakeAntiLVTightMva_ = 1.;
+
+      
+      for (int in=0; in<6; ++in) {
+	fakeAntiLLooseMvaUp_[in] = 1.0;
+	fakeAntiLMediumMvaUp_[in] = 1.0;
+	fakeAntiLTightMvaUp_[in] = 1.0;
+	fakeAntiLVTightMvaUp_[in] = 1.0;
+	fakeAntiLLooseUp_[in] = 1.0;
+	fakeAntiLMediumUp_[in] = 1.0;
+	fakeAntiLTightUp_[in] = 1.0;
+      }
 
       met_ =  -1;
       metphi_ =  0;
@@ -2059,84 +2021,6 @@ int main(int argc, char * argv[]) {
 	tauAntiElectronTightMVA6_  = analysisTree.tau_againstElectronTightMVA6[indexTau] > 0.5;
 	tauAntiElectronVTightMVA6_ = analysisTree.tau_againstElectronVTightMVA6[indexTau] > 0.5;
 
-	// Add fake rates to tree
-	// check pt bin
-	int ptBin = -1;
-	if(tauPt_<150)                     ptBin = 0;
-	else if(tauPt_<200 && tauPt_>150 ) ptBin = 1;
-	else                               ptBin = 2;
-	
-	fakeAntiLLoose_  = fakerate->at(std::make_pair("LooseIso", ptBin));
-	fakeAntiLMedium_ = fakerate->at(std::make_pair("MediumIso", ptBin));
-	fakeAntiLTight_  = fakerate->at(std::make_pair("TightIso", ptBin));
-	
-	fakeAntiLLooseUp1_  = fakeAntiLLoose_;
-	fakeAntiLMediumUp1_ = fakeAntiLMedium_;
-	fakeAntiLTightUp1_  = fakeAntiLTight_;
-
-	fakeAntiLLooseUp2_  = fakeAntiLLoose_;
-	fakeAntiLMediumUp2_ = fakeAntiLMedium_;
-	fakeAntiLTightUp2_  = fakeAntiLTight_;
-
-	fakeAntiLLooseUp3_  = fakeAntiLLoose_;
-	fakeAntiLMediumUp3_ = fakeAntiLMedium_;
-	fakeAntiLTightUp3_  = fakeAntiLTight_;
-
-	if (ptBin==0) {
-	  fakeAntiLLooseUp1_  = fakerate->at(std::make_pair("LooseIso", ptBin)) + fakerateE->at(std::make_pair("LooseIso", ptBin));
-	  fakeAntiLMediumUp1_ = fakerate->at(std::make_pair("MediumIso", ptBin)) + fakerateE->at(std::make_pair("MediumIso", ptBin));
-	  fakeAntiLTightUp1_  = fakerate->at(std::make_pair("TightIso", ptBin)) + fakerateE->at(std::make_pair("TightIso", ptBin));
-	}
-	else if (ptBin==1) {
-	  fakeAntiLLooseUp2_  = fakerate->at(std::make_pair("LooseIso", ptBin)) + fakerateE->at(std::make_pair("LooseIso", ptBin));
-	  fakeAntiLMediumUp2_ = fakerate->at(std::make_pair("MediumIso", ptBin)) + fakerateE->at(std::make_pair("MediumIso", ptBin));
-	  fakeAntiLTightUp2_  = fakerate->at(std::make_pair("TightIso", ptBin)) + fakerateE->at(std::make_pair("TightIso", ptBin));
-	}
-	else {
-	  fakeAntiLLooseUp3_  = fakerate->at(std::make_pair("LooseIso", ptBin)) + fakerateE->at(std::make_pair("LooseIso", ptBin));
-	  fakeAntiLMediumUp3_ = fakerate->at(std::make_pair("MediumIso", ptBin)) + fakerateE->at(std::make_pair("MediumIso", ptBin));
-	  fakeAntiLTightUp3_  = fakerate->at(std::make_pair("TightIso", ptBin)) + fakerateE->at(std::make_pair("TightIso", ptBin));
-	}
-
- 	fakeAntiLLooseMva_   = fakerate->at(std::make_pair("LooseMvaIso", ptBin));
-	fakeAntiLMediumMva_  = fakerate->at(std::make_pair("MediumMvaIso", ptBin));
-	fakeAntiLTightMva_   = fakerate->at(std::make_pair("TightMvaIso", ptBin));
-	fakeAntiLVTightMva_  = fakerate->at(std::make_pair("VTightMvaIso", ptBin));
-	
-	fakeAntiLLooseMvaUp1_   = fakeAntiLLooseMva_;
-	fakeAntiLMediumMvaUp1_  = fakeAntiLMediumMva_;
-	fakeAntiLTightMvaUp1_   = fakeAntiLTightMva_;
-	fakeAntiLVTightMvaUp1_  = fakeAntiLVTightMva_;
-
-	fakeAntiLLooseMvaUp2_   = fakeAntiLLooseMva_;
-	fakeAntiLMediumMvaUp2_  = fakeAntiLMediumMva_;
-	fakeAntiLTightMvaUp2_   = fakeAntiLTightMva_;
-	fakeAntiLVTightMvaUp2_  = fakeAntiLVTightMva_;
-
-	fakeAntiLLooseMvaUp3_   = fakeAntiLLooseMva_;;
-	fakeAntiLMediumMvaUp3_  = fakeAntiLMediumMva_;
-	fakeAntiLTightMvaUp3_   = fakeAntiLTightMva_;
-	fakeAntiLVTightMvaUp3_  = fakeAntiLVTightMva_;
-
-	if (ptBin==0) {
-	  fakeAntiLLooseMvaUp1_  = fakerate->at(std::make_pair("LooseMvaIso", ptBin)) + fakerateE->at(std::make_pair("LooseMvaIso", ptBin));
-	  fakeAntiLMediumMvaUp1_ = fakerate->at(std::make_pair("MediumMvaIso", ptBin)) + fakerateE->at(std::make_pair("MediumMvaIso", ptBin));
-	  fakeAntiLTightMvaUp1_  = fakerate->at(std::make_pair("TightMvaIso", ptBin)) + fakerateE->at(std::make_pair("TightMvaIso", ptBin));
-	  fakeAntiLVTightMvaUp1_ = fakerate->at(std::make_pair("VTightMvaIso", ptBin)) + fakerateE->at(std::make_pair("VTightMvaIso", ptBin));
-	}
-	else if (ptBin==1) {
-	  fakeAntiLLooseMvaUp2_  = fakerate->at(std::make_pair("LooseMvaIso", ptBin)) + fakerateE->at(std::make_pair("LooseMvaIso", ptBin));
-	  fakeAntiLMediumMvaUp2_ = fakerate->at(std::make_pair("MediumMvaIso", ptBin)) + fakerateE->at(std::make_pair("MediumMvaIso", ptBin));
-	  fakeAntiLTightMvaUp2_  = fakerate->at(std::make_pair("TightMvaIso", ptBin)) + fakerateE->at(std::make_pair("TightMvaIso", ptBin));
-	  fakeAntiLVTightMvaUp2_ = fakerate->at(std::make_pair("VTightMvaIso", ptBin)) + fakerateE->at(std::make_pair("VTightMvaIso", ptBin));
-	}
-	else {
-	  fakeAntiLLooseMvaUp2_  = fakerate->at(std::make_pair("LooseMvaIso", ptBin)) + fakerateE->at(std::make_pair("LooseMvaIso", ptBin));
-	  fakeAntiLMediumMvaUp2_ = fakerate->at(std::make_pair("MediumMvaIso", ptBin)) + fakerateE->at(std::make_pair("MediumMvaIso", ptBin));
-	  fakeAntiLTightMvaUp2_  = fakerate->at(std::make_pair("TightMvaIso", ptBin)) + fakerateE->at(std::make_pair("TightMvaIso", ptBin));
-	  fakeAntiLVTightMvaUp2_ = fakerate->at(std::make_pair("VTightMvaIso", ptBin)) + fakerateE->at(std::make_pair("VTightMvaIso", ptBin));
-	}
-	
 	// finding matching jet
 	bool jetFound = false;
 	float dRmin = 0.4;
@@ -2166,9 +2050,60 @@ int main(int argc, char * argv[]) {
 	tauJetEta_ = lorentzVectorTauJet.Eta();
 	tauJetPhi_ = lorentzVectorTauJet.Phi();
 	tauJetTightId_ = tightJetiD(analysisTree,indexMatchingJet);
-	//	cout << "fake  Loose = " << fakeAntiLLoose_
-	//	     << "   Medium = " << fakeAntiLMedium_
-	//	     << "   Tight  = " << fakeAntiLTight_ << endl;
+
+	// Add fake rates to tree
+	// check pt bin
+	double tauJetPtRatio = TMath::Min(double(tauPt_ / tauJetPt_), double(0.99));
+	double tauJetPtX = TMath::Min(double(tauJetPt_),double(999.));
+	int ptBin = fakerates[TString("LooseIso")]->FindBin(tauJetPtRatio,tauJetPtX);
+
+	fakeAntiLLoose_  = fakerates[TString("LooseIso")]->GetBinContent(ptBin);
+	fakeAntiLMedium_ = fakerates[TString("MediumIso")]->GetBinContent(ptBin);
+	fakeAntiLTight_  = fakerates[TString("TightIso")]->GetBinContent(ptBin);
+	
+	fakeAntiLLooseMva_   = fakerates[TString("LooseMvaIso")]->GetBinContent(ptBin);
+	fakeAntiLMediumMva_  = fakerates[TString("MediumMvaIso")]->GetBinContent(ptBin);
+	fakeAntiLTightMva_   = fakerates[TString("TightMvaIso")]->GetBinContent(ptBin);
+	fakeAntiLVTightMva_  = fakerates[TString("VTightMvaIso")]->GetBinContent(ptBin);
+	
+	float fakeAntiLLooseE_  = fakerates[TString("LooseIso")]->GetBinError(ptBin);
+	float fakeAntiLMediumE_ = fakerates[TString("MediumIso")]->GetBinError(ptBin);
+	float fakeAntiLTightE_  = fakerates[TString("TightIso")]->GetBinError(ptBin);
+	
+	float fakeAntiLLooseMvaE_   = fakerates[TString("LooseMvaIso")]->GetBinError(ptBin);
+	float fakeAntiLMediumMvaE_  = fakerates[TString("MediumMvaIso")]->GetBinError(ptBin);
+	float fakeAntiLTightMvaE_   = fakerates[TString("TightMvaIso")]->GetBinError(ptBin);
+	float fakeAntiLVTightMvaE_  = fakerates[TString("VTightMvaIso")]->GetBinError(ptBin);
+
+	int jetPtBin = binsH->FindBin(tauJetPtX) - 1;
+
+	for (int in=0; in<6; ++in) {
+
+	  fakeAntiLLooseUp_[in]  = fakeAntiLLoose_;
+	  fakeAntiLMediumUp_[in] = fakeAntiLMedium_;
+	  fakeAntiLTightUp_[in]  = fakeAntiLTight_;
+	  
+	  fakeAntiLLooseMvaUp_[in]   = fakeAntiLLooseMva_;
+	  fakeAntiLMediumMvaUp_[in]  = fakeAntiLMediumMva_;
+	  fakeAntiLTightMvaUp_[in]   = fakeAntiLTightMva_;
+	  fakeAntiLVTightMvaUp_[in]  = fakeAntiLVTightMva_;
+
+	  if (in==jetPtBin) {
+	    fakeAntiLLooseUp_[in] += fakeAntiLLooseE_;
+	    fakeAntiLMediumUp_[in] += fakeAntiLMediumE_;
+	    fakeAntiLTightUp_[in] += fakeAntiLTightE_;
+	    fakeAntiLLooseMvaUp_[in] += fakeAntiLLooseMvaE_;
+	    fakeAntiLMediumMvaUp_[in] += fakeAntiLMediumMvaE_;
+	    fakeAntiLTightMvaUp_[in] += fakeAntiLTightMvaE_;
+	    fakeAntiLVTightMvaUp_[in] += fakeAntiLVTightMvaE_;
+	  }
+	}
+	
+	//	std::cout << " pt(tau)/pt(jet) = " << tauJetPtRatio
+	//		  << "  pt(jet) = " << tauJetPtX
+	//		  << "    -> fake rates : Loose = " << fakeAntiLLoose_
+	//		  << "    Medium = " << fakeAntiLMedium_
+	//		  << "    Tight  = " << fakeAntiLTight_ << std::endl;
 
       }
       // ****************************
@@ -2517,8 +2452,8 @@ int main(int argc, char * argv[]) {
   file->Close();
   delete file;
 
-  delete fakerate;
-  delete fakerateE;
+  //  delete fakerate;
+  //  delete fakerateE;
   
 }
 
