@@ -148,7 +148,7 @@ def add_all(result, histo_list):
 		result.Add(h[0],h[1])
 
 
-def Wjets_dataMC_sf(SSOSratio, hw): #hw contains the result of the calculation, should be the w histogram as it comes from MC, nominal selection
+def Wjets_dataMC_sf(SSOSratio):#, hw): #hw contains the result of the calculation, should be the w histogram as it comes from MC, nominal selection
 
 	print "Wjets data-driven normalisation from high mt region"
 	print "using SS/OS QCD  = ", SSOSratio
@@ -257,7 +257,7 @@ def Wjets_dataMC_sf(SSOSratio, hw): #hw contains the result of the calculation, 
 		hqcd_ss_highmt_rel.Scale(hqcd_ss_highmt.Integral()/(hqcd_ss_highmt_rel.Integral()))
 		hqcd_ss_highmt = hqcd_ss_highmt_rel
 
-	hw_os_highmt_datadriven = hdummy.Clone("hw_os_highmt_datadriven") 
+	#hw_os_highmt_datadriven = hdummy.Clone("hw_os_highmt_datadriven") 
 	add_all(hw_os_highmt_datadriven, [(hdata_os_highmt,1),(hvv_os_highmt,-1),(htt_os_highmt,-1),(hdy_os_highmt,-1),(hewkz_os_highmt,-1), (hvbfhww_os_highmt,-1), (hgghww_os_highmt,-1), (hqcd_ss_highmt, -1*SSOSratio)] )
 
 	# apply some relaxed selection. check which. For now taking the usual one. 
@@ -281,21 +281,25 @@ def Wjets_dataMC_sf(SSOSratio, hw): #hw contains the result of the calculation, 
 	}
 
 
-
-	hw_os_MC = hdummy.Clone("hw_os_MC")
-	hw_os_highmt_MC = hdummy.Clone("hw_os_highmt_MC")
+	#hw_os_highmt_datadriven = hdummy.Clone("hw_os_highmt_datadriven") 
+	#hw_os_MC = hdummy.Clone("hw_os_MC")
+	#hw_os_highmt_MC = hdummy.Clone("hw_os_highmt_MC")
 	makeDatacard_category(treeName, lw, relaxed_cuts_w_MC.get(channel+"_"+ckey, cvalue), "q_1*q_2<0"+lowMTcut,       wvalue, "hw_os_MC", hw_os_MC )
 	makeDatacard_category(treeName, lw, relaxed_cuts_w_MC.get(channel+"_"+ckey, cvalue), "q_1*q_2<0"+"&&"+highMTcut, wvalue, "hw_os_highmt_MC", hw_os_highmt_MC)
 
 	# W scale factor 
 	W_sf =  hw_os_highmt_datadriven.Integral()/hw_os_highmt_MC.Integral()
-	hw.Scale(hw_os_MC.Integral()/hw.Integral()) 
+	#hw.Scale(hw_os_MC.Integral()/hw.Integral()) 
 	#adjust yield to norm_w = W_sf*hw_os_MC.Integral()
 	print " --- W SF = ", W_sf
 	return W_sf
 
 
-
+def normalise_wjets(w_hist):
+	w_hist.Scale(1/w_hist.Integral())
+	w_hist.Scale(hw_os_MC.Integral()/hw_os_highmt_MC.Integral())
+	w_hist.Scale(hw_os_highmt_datadriven.Integral())
+	
 def QCD_datadriven(SSOSratio, W_sf, hqcd): #hqcd contains the result of the QCD calculation
 	hqcd_ss = hdummy.Clone("QCD_ss")
 	add_all(hqcd_ss, [(hdata_ss,1),(hvv_ss,-1),(htt_ss,-1),(hdy_ss,-1),(hw_ss,-1*W_sf),(hewkz_ss,-1), (hvbfhww_ss,-1), (hgghww_ss,-1)])
@@ -992,12 +996,17 @@ for wkey, wvalue in weighting.iteritems():
 			
 
 			####### Wjets data-driven normalisation from high mt region
+			hw_os_highmt_datadriven = hdummy.Clone("hw_os_highmt_datadriven") 
+			hw_os_MC = hdummy.Clone("hw_os_MC")
+			hw_os_highmt_MC = hdummy.Clone("hw_os_highmt_MC")
 
 			SSOSratio = ssosvalues.get(channel+"_"+ckey, 1.06)
 			hw_corrected = hw.Clone("hw_corrected")
-			W_sf = Wjets_dataMC_sf(SSOSratio, hw_corrected)
-			if (W_sf>0):
-				hw_corrected.Scale(W_sf)
+			W_sf = Wjets_dataMC_sf(SSOSratio)
+			normalise_wjets(hw_corrected)
+			#W_sf = Wjets_dataMC_sf(SSOSratio, hw_corrected)
+			#if (W_sf>0):
+			#	hw_corrected.Scale(W_sf)
 			
 			##########################
 			# QCD estimate
@@ -1040,12 +1049,21 @@ for wkey, wvalue in weighting.iteritems():
 				QCD_datadriven(SSOS_down, W_sf, hqcd_ssos_down)
 				hw_ssos_up = hw.Clone("hw_ssos_up")
 				hw_ssos_down = hw.Clone("hw_ssos_down")
-				#W_sf = Wjets_dataMC_sf(SSOSratio*SSOS_up, hw_ssos_up)
-				W_sf = Wjets_dataMC_sf(SSOS_up, hw_ssos_up)
-				hw_ssos_up.Scale(W_sf)
-				#W_sf = Wjets_dataMC_sf(SSOSratio*SSOS_down, hw_ssos_down)
-				W_sf = Wjets_dataMC_sf(SSOS_down, hw_ssos_down)
-				hw_ssos_down.Scale(W_sf)
+				#W_sf = Wjets_dataMC_sf(SSOS_up, hw_ssos_up)
+				#hw_ssos_up.Scale(W_sf)
+				#W_sf = Wjets_dataMC_sf(SSOS_down, hw_ssos_down)
+				#hw_ssos_down.Scale(W_sf)
+				hw_os_highmt_datadriven = hdummy.Clone("hw_os_highmt_datadriven") 
+				hw_os_MC = hdummy.Clone("hw_os_MC")
+				hw_os_highmt_MC = hdummy.Clone("hw_os_highmt_MC")
+				W_sf =  Wjets_dataMC_sf(SSOS_up)
+				normalise_wjets(hw_ssos_up)
+				hw_os_highmt_datadriven = hdummy.Clone("hw_os_highmt_datadriven") 
+				hw_os_MC = hdummy.Clone("hw_os_MC")
+				hw_os_highmt_MC = hdummy.Clone("hw_os_highmt_MC")
+				W_sf = Wjets_dataMC_sf(SSOS_down)
+				normalise_wjets(hw_ssos_down)
+
 
 
 			##########################################
