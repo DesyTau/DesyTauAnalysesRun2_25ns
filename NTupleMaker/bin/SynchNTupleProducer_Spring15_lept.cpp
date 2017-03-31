@@ -98,6 +98,7 @@ bool isIdentifiedMediumMuon(int Index, const AC1B * analysisTree, bool isData);
 void correctTauES(TLorentzVector& Tau, TLorentzVector& Met, float relative_shift, bool tau_is_one_prong);
 bool passedSummer16VetoId(const AC1B * analysisTree, int index);
 bool SafeRatio(double denominator);
+bool passedAllMetFilters(const AC1B * analysisTree, std::vector<TString> met_filters, bool isData);
 
 int main(int argc, char * argv[]){
 
@@ -154,6 +155,7 @@ int main(int argc, char * argv[]){
   const bool ApplySVFit       = cfg.get<bool>("ApplySVFit");
   const bool ApplyBTagScaling = cfg.get<bool>("ApplyBTagScaling");
   const bool ApplySystShift   = cfg.get<bool>("ApplySystShift");
+  const bool ApplyMetFilters  = cfg.get<bool>("ApplyMetFilters");
 
   bool checkDuplicateMuons = false;
   if (isData && ch == "mt") checkDuplicateMuons = cfg.get<bool>("checkDuplicateMuons");
@@ -175,8 +177,13 @@ int main(int argc, char * argv[]){
   //const string svFitPtResFile = cfg.get<string>("svFitPtResFile");
   const string svFitPtResFile = TString(TString(cmsswBase)+"/src/"+TString(cfg.get<string>("svFitPtResFile"))).Data();
 
+  //zptweight file 
+  const string ZptweightFile = cfg.get<string>("ZptweightFile");
+
   //b-tag scale factors
-  TString pathToBtagScaleFactors = (TString) cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/CSVv2_ichep.csv";
+  const string BtagSfFile = cfg.get<string>("BtagSfFile");
+  TString pathToBtagScaleFactors = (TString) cmsswBase+"/src/"+BtagSfFile;
+  //TString pathToBtagScaleFactors = (TString) cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/CSVv2_ichep.csv";
   if( ApplyBTagScaling && gSystem->AccessPathName(pathToBtagScaleFactors) ){
     cout<<pathToBtagScaleFactors<<" not found. Please check."<<endl;
     exit( -1 );
@@ -190,7 +197,9 @@ int main(int argc, char * argv[]){
     reader_C.load(calib,BTagEntry::FLAV_C,"comb");
     reader_Light.load(calib,BTagEntry::FLAV_UDSG,"incl");
   }
-  TString pathToTaggingEfficiencies = (TString) cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/tagging_efficiencies_ichep2016.root";
+  const string TaggingEfficienciesFile = cfg.get<string>("BtagMCeffFile");
+  TString pathToTaggingEfficiencies = (TString) cmsswBase+"/src/"+TaggingEfficienciesFile;
+  //TString pathToTaggingEfficiencies = (TString) cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/tagging_efficiencies_ichep2016.root";
   if ( ApplyBTagScaling && gSystem->AccessPathName(pathToTaggingEfficiencies) ){
     cout<<pathToTaggingEfficiencies<<" not found. Please check."<<endl;
     exit( -1 );
@@ -216,6 +225,7 @@ int main(int argc, char * argv[]){
   const bool isVBForGGHiggs = (infiles.find("VBFHTo")== infiles.rfind("/")+1) || (infiles.find("GluGluHTo")== infiles.rfind("/")+1);
   const bool isEWKZ =  infiles.find("EWKZ") == infiles.rfind("/")+1;
   const bool isMG = infiles.find("madgraph") != string::npos;
+  const bool isMSSMsignal =  (infiles.find("SUSYGluGluToHToTauTau")== infiles.rfind("/")+1) || (infiles.find("SUSYGluGluToBBHToTauTau")== infiles.rfind("/")+1);
   //const bool applyRecoilCorrections = isDY || isWJets;
   
 
@@ -223,7 +233,7 @@ int main(int argc, char * argv[]){
   //RecoilCorrector* recoilPuppiMetCorrector = (RecoilCorrector*) malloc(sizeof(*recoilPuppiMetCorrector));
   RecoilCorrector* recoilMvaMetCorrector = (RecoilCorrector*) malloc(sizeof(*recoilMvaMetCorrector));
 
-  if(!isData && applyRecoilCorrections && (isDY || isWJets || isVBForGGHiggs) ){
+  if(!isData && applyRecoilCorrections && (isDY || isWJets || isVBForGGHiggs || isMSSMsignal) ){
     TString RecoilDir("HTT-utilities/RecoilCorrections/data/");
 
     TString RecoilFileName = RecoilDir; RecoilFileName += "TypeI-PFMet_Run2016BtoH.root";
@@ -428,8 +438,9 @@ int main(int argc, char * argv[]){
   RooWorkspace *w = (RooWorkspace*)f_workspace->Get("w");
   //f.Close();
 
-  // Zpt reweighting for LO DY samples
-  TFile * f_zptweight = new TFile(TString(cmsswBase)+"/src/"+"DesyTauAnalyses/NTupleMaker/data/zpt_weights_2016_BtoH.root","read");
+  // Zpt reweighting for LO DY samples 
+  TFile * f_zptweight = new TFile(TString(cmsswBase)+"/src/"+ZptweightFile,"read");
+  //TFile * f_zptweight = new TFile(TString(cmsswBase)+"/src/"+"DesyTauAnalyses/NTupleMaker/data/zpt_weights_2016_BtoH.root","read");
   TH2D * h_zptweight = (TH2D*)f_zptweight->Get("zptmass_histo");
 
   // lepton to tau fake init
@@ -538,6 +549,16 @@ int main(int argc, char * argv[]){
 
   }
 
+  // list of met filters
+  std::vector<TString> met_filters_list ;
+  met_filters_list.push_back("Flag_HBHENoiseFilter");
+  met_filters_list.push_back("Flag_HBHENoiseIsoFilter");
+  met_filters_list.push_back("Flag_EcalDeadCellTriggerPrimitiveFilter");
+  met_filters_list.push_back("Flag_goodVertices");
+  met_filters_list.push_back("Flag_eeBadScFilter");
+  met_filters_list.push_back("Flag_globalTightHalo2016Filter");
+  met_filters_list.push_back("Flag_BadPFMuonFilter");
+  met_filters_list.push_back("Flag_BadChargedCandidateFilter");
 
 
   ///////////////FILE LOOP///////////////
@@ -585,6 +606,9 @@ int main(int argc, char * argv[]){
 	       nWeightedEventsH->Fill(0., 1.);
       else
 	       nWeightedEventsH->Fill(0., analysisTree.genweight);
+
+	  //Skip events not passing the MET filters, if applied
+      if (ApplyMetFilters && !passedAllMetFilters(&analysisTree, met_filters_list, isData)) continue;
 
       // Check if all triggers are existent in each event and save index
       vector<int> nSingleLepTrig(filterSingleLep.size(),-1);
@@ -734,6 +758,8 @@ int main(int argc, char * argv[]){
       bool isXTrig         = false;
       otree->singleLepTrigger = false;
       otree->xTrigger = false;
+	  otree->trg_singlemuon = false;
+	  otree->trg_singleelectron = false;
 
       for (unsigned int il=0; il<leptons.size(); ++il) {
         unsigned int lIndex  = leptons.at(il);
@@ -791,6 +817,11 @@ int main(int argc, char * argv[]){
 	      if(isXTrigLepLeg.at(i_trig) && isXTrigTauLeg.at(i_trig)) isXTrig = true;
 	    }
 	    if ( !(isSingleLepTrig || isXTrig) ) continue;
+
+        if (isSingleLepTrig){
+			if (ch=="mt") otree->trg_singlemuon = true;
+			else if (ch=="et") otree->trg_singleelectron = true;
+		}
 	  }
         
 
@@ -986,14 +1017,14 @@ int main(int argc, char * argv[]){
       ////////////////////////////////////////////////////////////
 
       otree->njetshad = otree->njets;
-      if (!isData && applyRecoilCorrections && (isDY || isWJets || isVBForGGHiggs) ){
+      if (!isData && applyRecoilCorrections && (isDY || isWJets || isVBForGGHiggs || isMSSMsignal) ){
 				genV = genTools::genV(analysisTree);
 				genL = genTools::genL(analysisTree);
 				if(isWJets) otree->njetshad += 1;
       }
 
       // MVA MET      
-      genTools::RecoilCorrections( *recoilMvaMetCorrector, (!isData && applyRecoilCorrections && (isDY || isWJets || isVBForGGHiggs)) * genTools::MeanResolution,
+      genTools::RecoilCorrections( *recoilMvaMetCorrector, (!isData && applyRecoilCorrections && (isDY || isWJets || isVBForGGHiggs || isMSSMsignal)) * genTools::MeanResolution,
 			                     otree->mvamet, otree->mvametphi,
 			                     genV.Px(), genV.Py(),
 			                     genL.Px(), genL.Py(),
@@ -1009,7 +1040,7 @@ int main(int argc, char * argv[]){
       //otree->pzetamiss_rcmr = calc::pzetamiss( zetaX, zetaY, otree->mvamet_rcmr, otree->mvametphi_rcmr);
 
       // PF MET
-      genTools::RecoilCorrections( *recoilPFMetCorrector, (!isData && applyRecoilCorrections && (isDY || isWJets || isVBForGGHiggs)) * genTools::MeanResolution,
+      genTools::RecoilCorrections( *recoilPFMetCorrector, (!isData && applyRecoilCorrections && (isDY || isWJets || isVBForGGHiggs || isMSSMsignal)) * genTools::MeanResolution,
 			                     otree->met, otree->metphi,
 			                     genV.Px(), genV.Py(),
 			                     genL.Px(), genL.Py(),
@@ -1104,8 +1135,8 @@ int main(int argc, char * argv[]){
       otree->pt_tt = (dileptonLV+metLV).Pt();   
 
 	  // mt TOT
-	  float mtTOT = 2*(otree->pt_1)*metLV.Pt()*(1-cos(otree->phi_1 - otree->mvametphi));
-	  mtTOT += 2*(otree->pt_2)*metLV.Pt()*(1-cos(otree->phi_2 - otree->mvametphi)); 
+	  float mtTOT = 2*(otree->pt_1)*metLV.Pt()*(1-cos(otree->phi_1 - otree->metphi));
+	  mtTOT += 2*(otree->pt_2)*metLV.Pt()*(1-cos(otree->phi_2 - otree->metphi)); 
 	  mtTOT += 2*(otree->pt_1)*(otree->pt_2)*(1-cos(otree->phi_1-otree->phi_2)); 
 	  otree->mt_tot = TMath::Sqrt(mtTOT);
 
@@ -1906,3 +1937,20 @@ bool SafeRatio(double denominator){
   else                  return true;
 
 }
+
+bool passedAllMetFilters(const AC1B * analysisTree, std::vector<TString> met_filters, bool isData){
+  bool passed = true;
+  unsigned int nfilters = met_filters.size();
+  for (std::map<string,int>::iterator it=analysisTree->flags->begin(); it!=analysisTree->flags->end(); ++it) {
+    TString filter_name(it->first);
+    for (unsigned int iFilter=0; iFilter<nfilters; ++iFilter){
+      if (filter_name.Contains(met_filters[iFilter])) {
+	  if (!isData && met_filters[iFilter].Contains("Flag_eeBadScFilter") ) continue; // this filter not applied in MC
+      if (it->second ==0){passed = false; break;}
+      }
+    }      
+  }
+  return passed;
+}
+
+
