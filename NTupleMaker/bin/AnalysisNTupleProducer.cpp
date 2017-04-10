@@ -72,13 +72,13 @@ std::map<TString,TH2D*> GetFakeRates(TString filename) {
   }
   
   std::vector<TString> isolations;
-  isolations.push_back("LooseIso");
-  isolations.push_back("MediumIso");
-  isolations.push_back("TightIso");
-  isolations.push_back("LooseMvaIso");
-  isolations.push_back("MediumMvaIso");
-  isolations.push_back("TightMvaIso");
-  isolations.push_back("VTightMvaIso");
+  isolations.push_back("Loose");
+  isolations.push_back("Medium");
+  isolations.push_back("Tight");
+  isolations.push_back("LooseMva");
+  isolations.push_back("MediumMva");
+  isolations.push_back("TightMva");
+  isolations.push_back("VTightMva");
 
   std::map<TString,TH2D*> fakerates;
 
@@ -123,6 +123,10 @@ int main(int argc, char * argv[]) {
   const string metHTLName        = cfg.get<string>("MetHLTName");
   const string singleMuonHLTName = cfg.get<string>("SingleMuonHLTName");
   const string singleMuonHLTFilterName = cfg.get<string>("SingleMuonHLTFilterName");
+  const string singleMuonHLTFilterName1 = cfg.get<string>("SingleMuonHLTFilterName1");
+  const string singleTkMuonHLTFilterName = cfg.get<string>("SingleTkMuonHLTFilterName");
+  const string singleTkMuonHLTFilterName1 = cfg.get<string>("SingleTkMuonHLTFilterName1");
+
   const string pfJet40HLTFilterName = cfg.get<string>("PFJet40HLTFilterName"); 
   const string pfJet60HLTFilterName = cfg.get<string>("PFJet60HLTFilterName"); 
   const string pfJet80HLTFilterName = cfg.get<string>("PFJet80HLTFilterName"); 
@@ -131,6 +135,9 @@ int main(int argc, char * argv[]) {
   TString MetHLTName(metHTLName);
   TString SingleMuonHLTName(singleMuonHLTName);
   TString SingleMuonHLTFilterName(singleMuonHLTFilterName);
+  TString SingleTkMuonHLTFilterName(singleTkMuonHLTFilterName);
+  TString SingleMuonHLTFilterName1(singleMuonHLTFilterName1);
+  TString SingleTkMuonHLTFilterName1(singleTkMuonHLTFilterName1);
   TString PFJet40HLTFilterName(pfJet40HLTFilterName);
   TString PFJet60HLTFilterName(pfJet60HLTFilterName);
   TString PFJet80HLTFilterName(pfJet80HLTFilterName);
@@ -301,19 +308,19 @@ int main(int argc, char * argv[]) {
   Float_t fakeAntiLMedium_;
   Float_t fakeAntiLTight_;
 
-  Float_t fakeAntiLLooseUp_[6];
-  Float_t fakeAntiLMediumUp_[6];
-  Float_t fakeAntiLTightUp_[6];
+  Float_t fakeAntiLLooseUp_[12];
+  Float_t fakeAntiLMediumUp_[12];
+  Float_t fakeAntiLTightUp_[12];
 
   Float_t fakeAntiLLooseMva_;
   Float_t fakeAntiLMediumMva_;
   Float_t fakeAntiLTightMva_;
   Float_t fakeAntiLVTightMva_;
 
-  Float_t fakeAntiLLooseMvaUp_[6];
-  Float_t fakeAntiLMediumMvaUp_[6];
-  Float_t fakeAntiLTightMvaUp_[6];
-  Float_t fakeAntiLVTightMvaUp_[6];
+  Float_t fakeAntiLLooseMvaUp_[12];
+  Float_t fakeAntiLMediumMvaUp_[12];
+  Float_t fakeAntiLTightMvaUp_[12];
+  Float_t fakeAntiLVTightMvaUp_[12];
 
   Float_t met_;
   Float_t metphi_;
@@ -532,9 +539,9 @@ int main(int argc, char * argv[]) {
   ntuple_->Branch("fakeAntiLVTightMva", &fakeAntiLVTightMva_, "fakeAntiLVTightMva/F");
 
 
-  TString numbers[6] = {"1","2","3","4","5","6"};
+  TString numbers[12] = {"1","2","3","4","5","6","7","8","9","10","11","12"};
 
-  for (int number=0; number<6; ++number) {
+  for (int number=0; number<12; ++number) {
 
     ntuple_->Branch("fakeAntiLLooseUp"+numbers[number], &fakeAntiLLooseUp_[number], "fakeAntiLLooseUp"+numbers[number]+"/F");
     ntuple_->Branch("fakeAntiLMediumUp"+numbers[number], &fakeAntiLMediumUp_[number], "fakeAntiLMediumUp"+numbers[number]+"/F");
@@ -771,10 +778,10 @@ int main(int argc, char * argv[]) {
   // Read fake rates
   TString file_tauFakeRate = TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/"+tauFakeRateFileName;
   std::map<TString,TH2D*>  fakerates = GetFakeRates(file_tauFakeRate);
-  int nBins = fakerates["LooseIso"]->GetNbinsX();
+  int nBins = fakerates["Loose"]->GetNbinsX();
   double bins[20];
   for (int iBin=0; iBin<=nBins; iBin++)
-    bins[iBin] = fakerates["LooseIso"]->GetYaxis()->GetBinLowEdge(iBin+1);
+    bins[iBin] = fakerates["Loose"]->GetYaxis()->GetBinLowEdge(iBin+1);
   TH1D * binsH = new TH1D("binsH","",nBins,bins);
 
   int nFiles = 0;
@@ -1257,6 +1264,9 @@ int main(int argc, char * argv[]) {
       unsigned int nSingleMuonHLTFilter = 0;
       bool isSingleMuonHLTFilter = false;
 
+      unsigned int nSingleTkMuonHLTFilter = 0;
+      bool isSingleTkMuonHLTFilter = false;
+
       unsigned int nPFJet40HLTFilter = 0;
       bool isPFJet40HLTFilter = false;
 
@@ -1272,9 +1282,13 @@ int main(int argc, char * argv[]) {
       for (unsigned int i=0; i<analysisTree.run_hltfilters->size(); ++i) {
 	//	std::cout << "HLT Filter : " << i << " = " << analysisTree.run_hltfilters->at(i) << std::endl;
 	TString HLTFilter(analysisTree.run_hltfilters->at(i));
-	if (HLTFilter==SingleMuonHLTFilterName) {
+	if (HLTFilter==SingleMuonHLTFilterName||HLTFilter==SingleMuonHLTFilterName1) {
 	  nSingleMuonHLTFilter = i;
 	  isSingleMuonHLTFilter = true;
+	}
+	if (HLTFilter==SingleTkMuonHLTFilterName||HLTFilter==SingleTkMuonHLTFilterName1) {
+	  nSingleTkMuonHLTFilter = i;
+	  isSingleTkMuonHLTFilter = true;
 	}
 	if (HLTFilter==PFJet40HLTFilterName) {
 	  nPFJet40HLTFilter = i;
@@ -1296,6 +1310,10 @@ int main(int argc, char * argv[]) {
       //      if (isData) {
       if (!isSingleMuonHLTFilter) {
 	std::cout << "HLT filter " << SingleMuonHLTFilterName << " not found" << std::endl;
+	exit(-1);
+      }
+      if (!isSingleTkMuonHLTFilter) {
+	std::cout << "HLT filter " << SingleTkMuonHLTFilterName << " not found" << std::endl;
 	exit(-1);
       }
       if (!isPFJet40HLTFilter) {
@@ -1445,10 +1463,10 @@ int main(int argc, char * argv[]) {
 	    float dRtrig = deltaR(analysisTree.muon_eta[imuon],analysisTree.muon_phi[imuon],
 				  analysisTree.trigobject_eta[iT],analysisTree.trigobject_phi[iT]);
 	    if (dRtrig>0.5) continue;
-	    if (analysisTree.trigobject_filters[iT][nSingleMuonHLTFilter]) trigMatch = true;
+	    if (analysisTree.trigobject_filters[iT][nSingleMuonHLTFilter]||
+		analysisTree.trigobject_filters[iT][nSingleTkMuonHLTFilter]) trigMatch = true;
 
 	  }
-	  if (!isData) trigMatch = true;
 	  if (trigMatch&&analysisTree.muon_pt[imuon]>ptTriggerMu) {
 	    ptTriggerMu = analysisTree.muon_pt[imuon];
 	    etaTriggerMu = analysisTree.muon_eta[imuon];
@@ -2054,30 +2072,64 @@ int main(int argc, char * argv[]) {
 	// Add fake rates to tree
 	// check pt bin
 	double tauJetPtRatio = TMath::Min(double(tauPt_ / tauJetPt_), double(0.99));
-	double tauJetPtX = TMath::Min(double(tauJetPt_),double(999.));
-	int ptBin = fakerates[TString("LooseIso")]->FindBin(tauJetPtRatio,tauJetPtX);
+	double tauJetPtX = TMath::Max(double(101.),TMath::Min(double(tauJetPt_),double(999.)));
+	int ptBin = fakerates[TString("Loose")]->FindBin(tauJetPtRatio,tauJetPtX);
 
-	fakeAntiLLoose_  = fakerates[TString("LooseIso")]->GetBinContent(ptBin);
-	fakeAntiLMedium_ = fakerates[TString("MediumIso")]->GetBinContent(ptBin);
-	fakeAntiLTight_  = fakerates[TString("TightIso")]->GetBinContent(ptBin);
+	fakeAntiLLoose_  = fakerates[TString("Loose")]->GetBinContent(ptBin);
+	fakeAntiLMedium_ = fakerates[TString("Medium")]->GetBinContent(ptBin);
+	fakeAntiLTight_  = fakerates[TString("Tight")]->GetBinContent(ptBin);
 	
-	fakeAntiLLooseMva_   = fakerates[TString("LooseMvaIso")]->GetBinContent(ptBin);
-	fakeAntiLMediumMva_  = fakerates[TString("MediumMvaIso")]->GetBinContent(ptBin);
-	fakeAntiLTightMva_   = fakerates[TString("TightMvaIso")]->GetBinContent(ptBin);
-	fakeAntiLVTightMva_  = fakerates[TString("VTightMvaIso")]->GetBinContent(ptBin);
+	fakeAntiLLooseMva_   = fakerates[TString("LooseMva")]->GetBinContent(ptBin);
+	fakeAntiLMediumMva_  = fakerates[TString("MediumMva")]->GetBinContent(ptBin);
+	fakeAntiLTightMva_   = fakerates[TString("TightMva")]->GetBinContent(ptBin);
+	fakeAntiLVTightMva_  = fakerates[TString("VTightMva")]->GetBinContent(ptBin);
 	
-	float fakeAntiLLooseE_  = fakerates[TString("LooseIso")]->GetBinError(ptBin);
-	float fakeAntiLMediumE_ = fakerates[TString("MediumIso")]->GetBinError(ptBin);
-	float fakeAntiLTightE_  = fakerates[TString("TightIso")]->GetBinError(ptBin);
+	float fakeAntiLLooseE_  = fakerates[TString("Loose")]->GetBinError(ptBin);
+	float fakeAntiLMediumE_ = fakerates[TString("Medium")]->GetBinError(ptBin);
+	float fakeAntiLTightE_  = fakerates[TString("Tight")]->GetBinError(ptBin);
 	
-	float fakeAntiLLooseMvaE_   = fakerates[TString("LooseMvaIso")]->GetBinError(ptBin);
-	float fakeAntiLMediumMvaE_  = fakerates[TString("MediumMvaIso")]->GetBinError(ptBin);
-	float fakeAntiLTightMvaE_   = fakerates[TString("TightMvaIso")]->GetBinError(ptBin);
-	float fakeAntiLVTightMvaE_  = fakerates[TString("VTightMvaIso")]->GetBinError(ptBin);
+	float fakeAntiLLooseMvaE_   = fakerates[TString("LooseMva")]->GetBinError(ptBin);
+	float fakeAntiLMediumMvaE_  = fakerates[TString("MediumMva")]->GetBinError(ptBin);
+	float fakeAntiLTightMvaE_   = fakerates[TString("TightMva")]->GetBinError(ptBin);
+	float fakeAntiLVTightMvaE_  = fakerates[TString("VTightMva")]->GetBinError(ptBin);
 
-	int jetPtBin = binsH->FindBin(tauJetPtX) - 1;
+	int binRatio = 0;
+	int binPt = 0;
+	if (tauJetPtRatio<0.75)
+	  binRatio = 0;
+	else if (tauJetPtRatio<0.825)
+	  binRatio = 1;
+	else if (tauJetPtRatio<0.9)
+	  binRatio = 2;
+	else
+	  binRatio = 3;
 
-	for (int in=0; in<6; ++in) {
+	if (tauJetPtX<150.)
+	  binPt = 0;
+	else if (tauJetPtX<200.)
+	  binPt = 1;
+	else
+	  binPt = 2;
+
+	int bin2D = 4*binPt + binRatio;
+	//	std::cout << bin2D << std::endl;
+
+
+	/*
+	if (tauMediumMvaIso_>0.5) { 
+	  std::cout << " tauPt/jetPt = " << tauJetPtRatio << "  jetPt = " << tauJetPtX << "   bin = " << ptBin << std::endl;
+	  std::cout << "       Loose  = " << fakeAntiLLooseE_/fakeAntiLLoose_ << std::endl;
+	  std::cout << "       Medium = " << fakeAntiLMediumE_/fakeAntiLMedium_<< std::endl;
+	  std::cout << "       Tight = " << fakeAntiLTightE_ /fakeAntiLTight_<< std::endl;
+	  std::cout << "       MvaLoose  = " << fakeAntiLLooseMvaE_  / fakeAntiLLooseMva_<< std::endl;
+	  std::cout << "       MvaMedium = " << fakeAntiLMediumMvaE_ / fakeAntiLMediumMva_<< std::endl;
+	  std::cout << "       MvaTight   = " << fakeAntiLTightMvaE_ / fakeAntiLTightMva_<< std::endl;
+	  std::cout << "       MvaVTight = " << fakeAntiLVTightMvaE_ / fakeAntiLVTightMva_<< std::endl;
+	  std::cout << std::endl;
+	}
+
+	*/
+	for (int in=0; in<12; ++in) {
 
 	  fakeAntiLLooseUp_[in]  = fakeAntiLLoose_;
 	  fakeAntiLMediumUp_[in] = fakeAntiLMedium_;
@@ -2088,7 +2140,7 @@ int main(int argc, char * argv[]) {
 	  fakeAntiLTightMvaUp_[in]   = fakeAntiLTightMva_;
 	  fakeAntiLVTightMvaUp_[in]  = fakeAntiLVTightMva_;
 
-	  if (in==jetPtBin) {
+	  if (in==bin2D) {
 	    fakeAntiLLooseUp_[in] += fakeAntiLLooseE_;
 	    fakeAntiLMediumUp_[in] += fakeAntiLMediumE_;
 	    fakeAntiLTightUp_[in] += fakeAntiLTightE_;
@@ -2097,6 +2149,11 @@ int main(int argc, char * argv[]) {
 	    fakeAntiLTightMvaUp_[in] += fakeAntiLTightMvaE_;
 	    fakeAntiLVTightMvaUp_[in] += fakeAntiLVTightMvaE_;
 	  }
+	  //	  else {
+	  //	    std::cout << "Nothing !" << std::endl;
+	  //	  }
+
+
 	}
 	
 	//	std::cout << " pt(tau)/pt(jet) = " << tauJetPtRatio
@@ -2208,8 +2265,10 @@ int main(int argc, char * argv[]) {
 	isWJet = isWJet && tauPt_>50.;
 
 	if (isWJet) {
-	  mueffweight  = SF_muonIdIso->get_ScaleFactor(ptTriggerMu, etaTriggerMu);
-          mutrigweight = SF_muonTrig->get_EfficiencyData(ptTriggerMu, etaTriggerMu);
+	  if (!isData) {
+	    mueffweight  = SF_muonIdIso->get_ScaleFactor(ptTriggerMu, etaTriggerMu);
+	    mutrigweight = SF_muonTrig->get_ScaleFactor(ptTriggerMu, etaTriggerMu);
+	  }
 	  HtNoRecoil_     = Ht_     - ptTriggerMu;
 	  SoftHtNoRecoil_ = SoftHt_ - ptTriggerMu;
 	  recoilM_   = lorentzVectorW.M();
@@ -2241,8 +2300,10 @@ int main(int argc, char * argv[]) {
 	isWMuNu = isWMuNu && nJetsForward30_ == 0;
 
 	if (isWMuNu) {
-	  mueffweight  = SF_muonIdIso->get_ScaleFactor(ptTriggerMu, etaTriggerMu);
-          mutrigweight = SF_muonTrig->get_EfficiencyData(ptTriggerMu, etaTriggerMu);
+	  if (!isData) {
+	    mueffweight  = SF_muonIdIso->get_ScaleFactor(ptTriggerMu, etaTriggerMu);
+	    mutrigweight = SF_muonTrig->get_ScaleFactor(ptTriggerMu, etaTriggerMu);
+	  }
 	  HtNoRecoil_     = Ht_;
 	  SoftHtNoRecoil_ = SoftHt_;
 	  recoilM_   = lorentzVectorMet.M();

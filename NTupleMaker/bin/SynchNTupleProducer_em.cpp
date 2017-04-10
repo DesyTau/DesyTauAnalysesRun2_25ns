@@ -1855,6 +1855,27 @@ int main(int argc, char * argv[]) {
 		chargedHadronTrackResolutionFilter_ = metFiltersPasses(analysisTree,chargedHadronTrackResolutionFlag);
             }
             
+
+	    for (unsigned int iT=0; iT<analysisTree.trigobject_count; ++iT) {
+	      bool lowPtMuon = false;
+	      bool highPtMuon = false;
+	      if (analysisTree.trigobject_filters[iT][nHighPtLegMuon])
+		highPtMuon = true;
+              if (analysisTree.trigobject_filters[iT][nLowPtLegMuon])
+		lowPtMuon = true;
+
+	      if (highPtMuon)
+		std::cout << "High pT Muon leg ";
+	      if (highPtMuon)
+		std::cout << "Low pT Muon leg ";
+		
+	      if (highPtMuon||lowPtMuon)
+		std::cout << "TO : pT = " << analysisTree.trigobject_pt[iT] 
+			  << "  eta = " << analysisTree.trigobject_eta[iT]
+			  << "  phi = " << analysisTree.trigobject_phi[iT] << std::endl;
+
+	    }
+
             /*
              std::cout << "LowPtE  : " << LowPtLegElectron << " : " << nLowPtLegElectron << std::endl;
              std::cout << "HighPtE : " << HighPtLegElectron << " : " << nHighPtLegElectron << std::endl;
