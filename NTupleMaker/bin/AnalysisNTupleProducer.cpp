@@ -2298,6 +2298,7 @@ int main(int argc, char * argv[]) {
 	isWMuNu = isWMuNu && nSelTaus_ == 0;
 	isWMuNu = isWMuNu && nJetsCentral30_ == 0;
 	isWMuNu = isWMuNu && nJetsForward30_ == 0;
+	isWMuNu = isWMuNu && abs(muonEta_)<2.1;
 
 	if (isWMuNu) {
 	  if (!isData) {
