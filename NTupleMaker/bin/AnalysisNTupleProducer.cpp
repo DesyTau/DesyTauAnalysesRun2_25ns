@@ -2263,6 +2263,7 @@ int main(int argc, char * argv[]) {
 	isWJet = isWJet && nJetsCentral30_ == 1;
 	isWJet = isWJet && nJetsForward30_ == 0;
 	isWJet = isWJet && tauPt_>50.;
+	isWJet = isWJet && abs(muonEta_)<2.1;
 
 	if (isWJet) {
 	  if (!isData) {
