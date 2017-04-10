@@ -279,6 +279,23 @@
 </bin>
 
 
+<bin name="nmssm" file="analysis_macro_v2.cpp">
+ <use name="PhysicsTools/Utilities"/>
+ <use name="rootgraphics"/>
+ <use name="root"/>
+ <use name="rootmath"/>
+ <use name="CondFormats/BTauObjects"/>
+ <use name="FWCore/ParameterSet"/>
+ <use name="HTT-utilities/LepEffInterface"/>
+ <use name="roottmva"/>
+ <use name="DesyTauAnalyses/NTupleMaker"/>
+</bin>
+
+
+
+
+
+
 <bin name="SUSYmutau" file="AnalysisMacroSUSYmutau.cpp">
  <use name="PhysicsTools/Utilities"/>
  <use name="rootgraphics"/>
@@ -293,7 +310,7 @@
  <use name="CondTools/BTau"/>
 </bin>
 
-<bin name="SUSYmumu" file="AnalysisMacromumu.cpp">
+<bin name="SUSYmumu" file="AnalysisMacroSUSYmumu.cpp">
  <use name="PhysicsTools/Utilities"/>
  <use name="rootgraphics"/>
  <use name="root"/>
