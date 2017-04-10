@@ -2327,13 +2327,6 @@ int main(int argc, char * argv[]) {
 	isWTauNu = met_>metCut_WTauNu;
 	isWTauNu = isWTauNu && recoilRatio_>ptTauMetRatioLowerCut_WTauNu && recoilRatio_<ptTauMetRatioUpperCut_WTauNu;
 	isWTauNu = isWTauNu && recoilDPhi_>deltaPhiTauMetCut_WTauNu;
-	isWTauNu = isWTauNu && nMuon_ == 0;
-	isWTauNu = isWTauNu && nElec_ == 0;
-	isWTauNu = isWTauNu && nSelTaus_ == 1;
-	isWTauNu = isWTauNu && nJetsCentral30_ == 1;
-	isWTauNu = isWTauNu && nJetsForward30_ == 0;
-	isWTauNu = isWTauNu && tauPt_>50;
-	
 	if (isWTauNu) {
 	  HtNoRecoil_     = Ht_;
 	  SoftHtNoRecoil_ = SoftHt_;
