@@ -98,6 +98,7 @@ bool isIdentifiedMediumMuon(int Index, const AC1B * analysisTree, bool isData);
 void correctTauES(TLorentzVector& Tau, TLorentzVector& Met, float relative_shift, bool tau_is_one_prong);
 bool passedSummer16VetoId(const AC1B * analysisTree, int index);
 bool SafeRatio(double denominator);
+bool passedAllMetFilters(const AC1B * analysisTree, std::vector<TString> met_filters, bool isData);
 
 int main(int argc, char * argv[]){
 
@@ -154,6 +155,7 @@ int main(int argc, char * argv[]){
   const bool ApplySVFit       = cfg.get<bool>("ApplySVFit");
   const bool ApplyBTagScaling = cfg.get<bool>("ApplyBTagScaling");
   const bool ApplySystShift   = cfg.get<bool>("ApplySystShift");
+  const bool ApplyMetFilters  = cfg.get<bool>("ApplyMetFilters");
 
   bool checkDuplicateMuons = false;
   if (isData && ch == "mt") checkDuplicateMuons = cfg.get<bool>("checkDuplicateMuons");
@@ -175,8 +177,13 @@ int main(int argc, char * argv[]){
   //const string svFitPtResFile = cfg.get<string>("svFitPtResFile");
   const string svFitPtResFile = TString(TString(cmsswBase)+"/src/"+TString(cfg.get<string>("svFitPtResFile"))).Data();
 
+  //zptweight file 
+  const string ZptweightFile = cfg.get<string>("ZptweightFile");
+
   //b-tag scale factors
-  TString pathToBtagScaleFactors = (TString) cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/CSVv2_ichep.csv";
+  const string BtagSfFile = cfg.get<string>("BtagSfFile");
+  TString pathToBtagScaleFactors = (TString) cmsswBase+"/src/"+BtagSfFile;
+  //TString pathToBtagScaleFactors = (TString) cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/CSVv2_ichep.csv";
   if( ApplyBTagScaling && gSystem->AccessPathName(pathToBtagScaleFactors) ){
     cout<<pathToBtagScaleFactors<<" not found. Please check."<<endl;
     exit( -1 );
@@ -190,7 +197,9 @@ int main(int argc, char * argv[]){
     reader_C.load(calib,BTagEntry::FLAV_C,"comb");
     reader_Light.load(calib,BTagEntry::FLAV_UDSG,"incl");
   }
-  TString pathToTaggingEfficiencies = (TString) cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/tagging_efficiencies_ichep2016.root";
+  const string TaggingEfficienciesFile = cfg.get<string>("BtagMCeffFile");
+  TString pathToTaggingEfficiencies = (TString) cmsswBase+"/src/"+TaggingEfficienciesFile;
+  //TString pathToTaggingEfficiencies = (TString) cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/tagging_efficiencies_ichep2016.root";
   if ( ApplyBTagScaling && gSystem->AccessPathName(pathToTaggingEfficiencies) ){
     cout<<pathToTaggingEfficiencies<<" not found. Please check."<<endl;
     exit( -1 );
@@ -216,6 +225,7 @@ int main(int argc, char * argv[]){
   const bool isVBForGGHiggs = (infiles.find("VBFHTo")== infiles.rfind("/")+1) || (infiles.find("GluGluHTo")== infiles.rfind("/")+1);
   const bool isEWKZ =  infiles.find("EWKZ") == infiles.rfind("/")+1;
   const bool isMG = infiles.find("madgraph") != string::npos;
+  const bool isMSSMsignal =  (infiles.find("SUSYGluGluToHToTauTau")== infiles.rfind("/")+1) || (infiles.find("SUSYGluGluToBBHToTauTau")== infiles.rfind("/")+1);
   //const bool applyRecoilCorrections = isDY || isWJets;
   
 
@@ -223,7 +233,7 @@ int main(int argc, char * argv[]){
   //RecoilCorrector* recoilPuppiMetCorrector = (RecoilCorrector*) malloc(sizeof(*recoilPuppiMetCorrector));
   RecoilCorrector* recoilMvaMetCorrector = (RecoilCorrector*) malloc(sizeof(*recoilMvaMetCorrector));
 
-  if(!isData && applyRecoilCorrections && (isDY || isWJets || isVBForGGHiggs) ){
+  if(!isData && applyRecoilCorrections && (isDY || isWJets || isVBForGGHiggs || isMSSMsignal) ){
     TString RecoilDir("HTT-utilities/RecoilCorrections/data/");
 
     TString RecoilFileName = RecoilDir; RecoilFileName += "TypeI-PFMet_Run2016BtoH.root";
@@ -428,8 +438,9 @@ int main(int argc, char * argv[]){
   RooWorkspace *w = (RooWorkspace*)f_workspace->Get("w");
   //f.Close();
 
-  // Zpt reweighting for LO DY samples
-  TFile * f_zptweight = new TFile(TString(cmsswBase)+"/src/"+"DesyTauAnalyses/NTupleMaker/data/zpt_weights_2016_BtoH.root","read");
+  // Zpt reweighting for LO DY samples 
+  TFile * f_zptweight = new TFile(TString(cmsswBase)+"/src/"+ZptweightFile,"read");
+  //TFile * f_zptweight = new TFile(TString(cmsswBase)+"/src/"+"DesyTauAnalyses/NTupleMaker/data/zpt_weights_2016_BtoH.root","read");
   TH2D * h_zptweight = (TH2D*)f_zptweight->Get("zptmass_histo");
 
   // lepton to tau fake init
@@ -483,6 +494,7 @@ int main(int argc, char * argv[]){
   TFile* inputFile_visPtResolution = new TFile(svFitPtResFile.data());
 
   //Systematics init
+  TauScaleSys * tauScaleSys =0;
   TauOneProngScaleSys* tauOneProngScaleSys =0;
   TauOneProngOnePi0ScaleSys* tauOneProngOnePi0ScaleSys=0;
   TauThreeProngScaleSys* tauThreeProngScaleSys=0;
@@ -498,22 +510,31 @@ int main(int argc, char * argv[]){
   JESUncertainties * jecUncertainties = 0;
 
   if(!isData && ApplySystShift){
-    tauOneProngScaleSys = new TauOneProngScaleSys(otree);
+    /*tauOneProngScaleSys = new TauOneProngScaleSys(otree);
     tauOneProngScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);
+    tauOneProngScaleSys->SetUseSVFit(ApplySVFit);
     tauOneProngOnePi0ScaleSys = new TauOneProngOnePi0ScaleSys(otree);
     tauOneProngOnePi0ScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);
+    tauOneProngOnePi0ScaleSys->SetUseSVFit(ApplySVFit);
     tauThreeProngScaleSys = new TauThreeProngScaleSys(otree);
     tauThreeProngScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);
+    tauThreeProngScaleSys->SetUseSVFit(ApplySVFit);*/
+	tauScaleSys = new TauScaleSys(otree);
+    tauScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);
+    tauScaleSys->SetUseSVFit(ApplySVFit);
     zPtWeightSys = new ZPtWeightSys(otree);
     topPtWeightSys = new TopPtWeightSys(otree);
     //lepTauFakeScaleSys = new LepTauFakeScaleSys(otree);
     //lepTauFakeScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);
     lepTauFakeOneProngScaleSys = new LepTauFakeOneProngScaleSys(otree);
-    lepTauFakeOneProngScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);	
+    lepTauFakeOneProngScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);
+    lepTauFakeOneProngScaleSys->SetUseSVFit(ApplySVFit);	
     lepTauFakeOneProngOnePi0ScaleSys = new LepTauFakeOneProngOnePi0ScaleSys(otree);
     lepTauFakeOneProngOnePi0ScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);	
+    lepTauFakeOneProngOnePi0ScaleSys->SetUseSVFit(ApplySVFit);
     lepTauFakeThreeProngScaleSys = new LepTauFakeThreeProngScaleSys(otree);
     lepTauFakeThreeProngScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);	
+    lepTauFakeThreeProngScaleSys->SetUseSVFit(ApplySVFit);
 
 	
 	if (cfg.get<bool>("splitJES")){
@@ -538,6 +559,16 @@ int main(int argc, char * argv[]){
 
   }
 
+  // list of met filters
+  std::vector<TString> met_filters_list ;
+  met_filters_list.push_back("Flag_HBHENoiseFilter");
+  met_filters_list.push_back("Flag_HBHENoiseIsoFilter");
+  met_filters_list.push_back("Flag_EcalDeadCellTriggerPrimitiveFilter");
+  met_filters_list.push_back("Flag_goodVertices");
+  met_filters_list.push_back("Flag_eeBadScFilter");
+  met_filters_list.push_back("Flag_globalTightHalo2016Filter");
+  met_filters_list.push_back("Flag_BadPFMuonFilter");
+  met_filters_list.push_back("Flag_BadChargedCandidateFilter");
 
 
   ///////////////FILE LOOP///////////////
@@ -585,6 +616,9 @@ int main(int argc, char * argv[]){
 	       nWeightedEventsH->Fill(0., 1.);
       else
 	       nWeightedEventsH->Fill(0., analysisTree.genweight);
+
+	  //Skip events not passing the MET filters, if applied
+      if (ApplyMetFilters && !passedAllMetFilters(&analysisTree, met_filters_list, isData)) continue;
 
       // Check if all triggers are existent in each event and save index
       vector<int> nSingleLepTrig(filterSingleLep.size(),-1);
@@ -734,6 +768,8 @@ int main(int argc, char * argv[]){
       bool isXTrig         = false;
       otree->singleLepTrigger = false;
       otree->xTrigger = false;
+	  otree->trg_singlemuon = false;
+	  otree->trg_singleelectron = false;
 
       for (unsigned int il=0; il<leptons.size(); ++il) {
         unsigned int lIndex  = leptons.at(il);
@@ -791,6 +827,11 @@ int main(int argc, char * argv[]){
 	      if(isXTrigLepLeg.at(i_trig) && isXTrigTauLeg.at(i_trig)) isXTrig = true;
 	    }
 	    if ( !(isSingleLepTrig || isXTrig) ) continue;
+
+        if (isSingleLepTrig){
+			if (ch=="mt") otree->trg_singlemuon = true;
+			else if (ch=="et") otree->trg_singleelectron = true;
+		}
 	  }
         
 
@@ -986,14 +1027,14 @@ int main(int argc, char * argv[]){
       ////////////////////////////////////////////////////////////
 
       otree->njetshad = otree->njets;
-      if (!isData && applyRecoilCorrections && (isDY || isWJets || isVBForGGHiggs) ){
+      if (!isData && applyRecoilCorrections && (isDY || isWJets || isVBForGGHiggs || isMSSMsignal) ){
 				genV = genTools::genV(analysisTree);
 				genL = genTools::genL(analysisTree);
 				if(isWJets) otree->njetshad += 1;
       }
 
       // MVA MET      
-      genTools::RecoilCorrections( *recoilMvaMetCorrector, (!isData && applyRecoilCorrections && (isDY || isWJets || isVBForGGHiggs)) * genTools::MeanResolution,
+      genTools::RecoilCorrections( *recoilMvaMetCorrector, (!isData && applyRecoilCorrections && (isDY || isWJets || isVBForGGHiggs || isMSSMsignal)) * genTools::MeanResolution,
 			                     otree->mvamet, otree->mvametphi,
 			                     genV.Px(), genV.Py(),
 			                     genL.Px(), genL.Py(),
@@ -1009,7 +1050,7 @@ int main(int argc, char * argv[]){
       //otree->pzetamiss_rcmr = calc::pzetamiss( zetaX, zetaY, otree->mvamet_rcmr, otree->mvametphi_rcmr);
 
       // PF MET
-      genTools::RecoilCorrections( *recoilPFMetCorrector, (!isData && applyRecoilCorrections && (isDY || isWJets || isVBForGGHiggs)) * genTools::MeanResolution,
+      genTools::RecoilCorrections( *recoilPFMetCorrector, (!isData && applyRecoilCorrections && (isDY || isWJets || isVBForGGHiggs || isMSSMsignal)) * genTools::MeanResolution,
 			                     otree->met, otree->metphi,
 			                     genV.Px(), genV.Py(),
 			                     genL.Px(), genL.Py(),
@@ -1104,8 +1145,8 @@ int main(int argc, char * argv[]){
       otree->pt_tt = (dileptonLV+metLV).Pt();   
 
 	  // mt TOT
-	  float mtTOT = 2*(otree->pt_1)*metLV.Pt()*(1-cos(otree->phi_1 - otree->mvametphi));
-	  mtTOT += 2*(otree->pt_2)*metLV.Pt()*(1-cos(otree->phi_2 - otree->mvametphi)); 
+	  float mtTOT = 2*(otree->pt_1)*metLV.Pt()*(1-cos(otree->phi_1 - otree->metphi));
+	  mtTOT += 2*(otree->pt_2)*metLV.Pt()*(1-cos(otree->phi_2 - otree->metphi)); 
 	  mtTOT += 2*(otree->pt_1)*(otree->pt_2)*(1-cos(otree->phi_1-otree->phi_2)); 
 	  otree->mt_tot = TMath::Sqrt(mtTOT);
 
@@ -1195,18 +1236,20 @@ int main(int argc, char * argv[]){
        for (unsigned int i=0; i<jetEnergyScaleSys.size(); i++)
          (jetEnergyScaleSys.at(i)) ->Eval(); 
          if (ch=="mt") {
-           tauOneProngScaleSys->Eval(utils::MUTAU);
+           /*tauOneProngScaleSys->Eval(utils::MUTAU);
            tauOneProngOnePi0ScaleSys->Eval(utils::MUTAU);
-           tauThreeProngScaleSys->Eval(utils::MUTAU);
+           tauThreeProngScaleSys->Eval(utils::MUTAU);*/
+           tauScaleSys->Eval(utils::MUTAU);
 		   lepTauFakeOneProngScaleSys->Eval(utils::MUTAU);			
 		   lepTauFakeOneProngOnePi0ScaleSys->Eval(utils::MUTAU);			
 		   lepTauFakeThreeProngScaleSys->Eval(utils::MUTAU);			
            //lepTauFakeScaleSys->Eval(utils::MUTAU);
          }
 	 else if (ch=="et") {
-           tauOneProngScaleSys->Eval(utils::ETAU);
+           /*tauOneProngScaleSys->Eval(utils::ETAU);
            tauOneProngOnePi0ScaleSys->Eval(utils::ETAU);
-           tauThreeProngScaleSys->Eval(utils::ETAU);
+           tauThreeProngScaleSys->Eval(utils::ETAU);*/
+           tauScaleSys->Eval(utils::ETAU);
 		   lepTauFakeOneProngScaleSys->Eval(utils::ETAU);			
 		   lepTauFakeOneProngOnePi0ScaleSys->Eval(utils::ETAU);			
 		   lepTauFakeThreeProngScaleSys->Eval(utils::ETAU);	
@@ -1234,6 +1277,11 @@ int main(int argc, char * argv[]){
   file->Write();
 
   // delete systematics objects
+
+  if(tauScaleSys != 0){
+    tauScaleSys->Write();
+    delete tauScaleSys;
+  }
 
   if(tauOneProngScaleSys != 0){
     tauOneProngScaleSys->Write();
@@ -1906,3 +1954,20 @@ bool SafeRatio(double denominator){
   else                  return true;
 
 }
+
+bool passedAllMetFilters(const AC1B * analysisTree, std::vector<TString> met_filters, bool isData){
+  bool passed = true;
+  unsigned int nfilters = met_filters.size();
+  for (std::map<string,int>::iterator it=analysisTree->flags->begin(); it!=analysisTree->flags->end(); ++it) {
+    TString filter_name(it->first);
+    for (unsigned int iFilter=0; iFilter<nfilters; ++iFilter){
+      if (filter_name.Contains(met_filters[iFilter])) {
+	  if (!isData && met_filters[iFilter].Contains("Flag_eeBadScFilter") ) continue; // this filter not applied in MC
+      if (it->second ==0){passed = false; break;}
+      }
+    }      
+  }
+  return passed;
+}
+
+

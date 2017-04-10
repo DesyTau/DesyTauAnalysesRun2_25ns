@@ -260,6 +260,8 @@ public :
   Bool_t          bpuid_tight_2;
   Bool_t          singleLepTrigger;
   Bool_t          xTrigger;
+  Bool_t          trg_singlemuon;
+  Bool_t		  trg_singleelectron;
   
   // List of branches
   TBranch        *b_run;   //!
@@ -495,6 +497,8 @@ public :
   TBranch        *b_bpuid_tight_2;
   TBranch        *b_singleLepTrigger;
   TBranch        *b_xTrigger;
+  TBranch        *b_trg_singlemuon;
+  TBranch        *b_trg_singleelectron;
   
   Spring15Tree(TTree *tree=0);
   virtual ~Spring15Tree();

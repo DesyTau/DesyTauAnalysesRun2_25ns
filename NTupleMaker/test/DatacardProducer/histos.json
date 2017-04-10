@@ -1,4 +1,17 @@
 {
 "mvis" : {"var":"m_vis", "nbins":35, "xmin":0, "xmax":350, "xtit":"m_{vis} [GeV]", "ytit": "Events / 10 GeV"},
-"msv" : {"var":"m_sv", "nbins":35, "xmin":0, "xmax":350, "xtit":"m_{SV} [GeV]", "ytit": "Events / 10 GeV"}
+"pt2": {"var":"pt_2", "nbins":20, "xmin":0, "xmax":100, "xtit":"p_{T,2} [GeV]", "ytit": "Events / 5 GeV"},
+"eta2": {"var":"eta_2", "nbins":30, "xmin":-3.0, "xmax":3.0, "xtit":"tau #eta", "ytit": "Events / 0.20"},
+"pt1": {"var":"pt_1", "nbins":40, "xmin":0, "xmax":200, "xtit":"p_{T,1} [GeV]", "ytit": "Events / 5 GeV"},
+"eta1": {"var":"eta_1", "nbins":24, "xmin":-2.4, "xmax":2.4, "xtit":"lep #eta", "ytit": "Events / 0.20"},
+"mt1": {"var":"mt_1", "nbins":30, "xmin":0, "xmax":150, "xtit":"mt_{1} [GeV]", "ytit": "Events / 5 GeV"},
+"met": {"var":"met", "nbins":30, "xmin":0, "xmax":150, "xtit":"MET [GeV]", "ytit": "Events / 5 GeV"},
+"msv" : {"var":"m_sv", "nbins":35, "xmin":0, "xmax":350, "xtit":"SV fit mass [GeV]", "ytit": "Events / 10 GeV"},
+"ptsv" : {"var":"pt_sv", "nbins":30, "xmin":0, "xmax":150, "xtit":"Higgs p_{T, SVfit} [GeV]", "ytit": "Events / 5 GeV"},
+"metphi": {"var":"metphi", "nbins":16, "xmin":-3.2, "xmax":3.2, "xtit":"PF MET #phi", "ytit": "Events / 0.4 "},
+"phi2": {"var":"phi_2", "nbins":16, "xmin":-3.2, "xmax":3.2, "xtit":"tau #phi", "ytit": "Events / 0.4 "},
+"phi1": {"var":"phi_1", "nbins":16, "xmin":-3.2, "xmax":3.2, "xtit":"lep #phi", "ytit": "Events / 0.4 "},
+"npv": {"var":"npv", "nbins":70, "xmin":0, "xmax":70, "xtit":"PV multiplicity", "ytit": "Events / 1"},
+"mjj": {"var":"mjj", "nbins":50, "xmin":0, "xmax":500, "xtit":"dijet mass", "ytit": "Events / 10 GeV"},
+"njets": {"var":"njets", "nbins":10, "xmin":0, "xmax":10, "xtit":"number of jets", "ytit": "Events / 1"}
 }

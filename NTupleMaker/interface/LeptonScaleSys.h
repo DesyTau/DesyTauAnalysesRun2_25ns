@@ -50,6 +50,10 @@ public:
   void SetSvFitVisPtResolution(TFile* f){
     svFit_visPtResolution = f;
   };
+
+  void SetUseSVFit(bool isSV){
+    useSVFit = isSV;	
+}
   
 protected:
   virtual void Init(Spring15Tree* c){
@@ -115,6 +119,8 @@ protected:
     float met_sv_cen = cenTree->met_sv;
     float mt_sv_cen = cenTree->mt_sv;
 
+	float mt_tot_cen = cenTree->mt_tot;
+
     // calc shifted values
     cenTree->pt_1 = lep1_scaled.Pt();
     cenTree->pt_2 = lep2_scaled.Pt();
@@ -179,21 +185,30 @@ protected:
     cenTree->met_sv = -9999;
     cenTree->mt_sv = -9999;
 
-    if(ch != UNKNOWN && cenTree->njetspt20>0){
-      std::shared_ptr<SVfitStandaloneAlgorithm> algo = calc::svFit(lep1_scaled, cenTree->tau_decay_mode_1, 
+	float mtTOT =2*lep1_scaled.Pt()*pfmetLV.Pt()*(1-cos(cenTree->phi_1 - cenTree->metphi));
+	mtTOT += 2*lep2_scaled.Pt()*pfmetLV.Pt()*(1-cos(cenTree->phi_2 - cenTree->metphi)); 
+	mtTOT += 2*lep1_scaled.Pt()*lep2_scaled.Pt()*(1-cos(cenTree->phi_1-cenTree->phi_2)); 
+	cenTree->mt_tot = TMath::Sqrt(mtTOT);
+
+	// add flag for svfit
+	if (useSVFit) {
+    	if(ch != UNKNOWN && cenTree->njetspt20>0){
+      		std::shared_ptr<SVfitStandaloneAlgorithm> algo = calc::svFit(lep1_scaled, cenTree->tau_decay_mode_1, 
 								   lep2_scaled, cenTree->tau_decay_mode_2, 
 								   pfmetLV, covMET, 
 								   ch, 
 								   svFit_visPtResolution); 
-      if (algo != 0){
-	cenTree->m_sv = algo->mass();
-	cenTree->pt_sv = algo->pt();
-	cenTree->eta_sv = algo->eta();
-	cenTree->phi_sv = algo->phi();      
-	cenTree->met_sv = algo->fittedMET().Rho();
-	cenTree->mt_sv = algo->transverseMass();
-      }
-    }
+      		if (algo != 0){
+				cenTree->m_sv = algo->mass();
+				cenTree->pt_sv = algo->pt();
+				cenTree->eta_sv = algo->eta();
+				cenTree->phi_sv = algo->phi();      
+				cenTree->met_sv = algo->fittedMET().Rho();
+				cenTree->mt_sv = algo->transverseMass();
+			}
+    	}
+	}
+
     outTree[shift]->Fill();
 /*
   std::cout << " SVFit in shift  - Inputs -  " << std::endl;
@@ -227,6 +242,9 @@ protected:
     cenTree->phi_sv = phi_sv_cen;
     cenTree->met_sv = met_sv_cen;
     cenTree->mt_sv = mt_sv_cen;    
+	
+	cenTree->mt_tot = mt_tot_cen;
+
   }
 
   //std::map< std::string, Float_t >  mt_sv;
@@ -238,6 +256,7 @@ protected:
   TLorentzVector lep1_scaled, lep2_scaled;
 
   TFile* svFit_visPtResolution;
+  bool useSVFit;
 
   std::map< std::string, TTree* >  outTree;
   //std::map< std::string, SpringTree* >  outTree;
@@ -544,8 +563,8 @@ protected:
     sf_up = new TH2D(label+"_sf_up", label+"_sf_up", pt_bins, pt_edges, eta_bins, eta_edges);
     sf_down = new TH2D(label+"_sf_down", label+"_sf_down", pt_bins, pt_edges, eta_bins, eta_edges);
 
-    sf_up->SetBinContent( sf_up->FindBin( pt_central[0], eta_central[0] ), 0.03);
-    sf_down->SetBinContent( sf_down->FindBin( pt_central[0], eta_central[0] ), 0.03);
+    sf_up->SetBinContent( sf_up->FindBin( pt_central[0], eta_central[0] ), 0.012);
+    sf_down->SetBinContent( sf_down->FindBin( pt_central[0], eta_central[0] ), 0.012);
   };
 
   virtual void ScaleUp(utils::channel ch){
