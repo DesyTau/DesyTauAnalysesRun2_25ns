@@ -153,29 +153,29 @@ if (  fabs(eta) > 1.566 && fabs(eta) < 2.3 )
 if (  fabs(eta) < 0.8 )
         {
                 if (pt>20 && pt<30) SF = 1.10106;
-                if (pt>30 && pt<40) SF = 0.992874;
-                if (pt>40 ) SF = 0.856451;
+                if (pt>30 && pt<40) SF = 0.991969;
+                if (pt>40 ) SF = 0.856711;
         }
 if (  fabs(eta) > 0.8 && fabs(eta) < 1.44 )
         {
 
-                if (pt>20 && pt<30) SF = 1.1036;
-                if (pt>30 && pt<40) SF = 1.05988;
-                if (pt>40 ) SF = 0.746467;
+                if (pt>20 && pt<30) SF = 1.10266;
+                if (pt>30 && pt<40) SF = 1.05957;
+                if (pt>40 ) SF = 0.746502;
         }
 
 if (  fabs(eta) > 1.44 && fabs(eta) < 1.566 )
         {
 
-                if (pt>20 && pt<40) SF = 0.98157;
+                if (pt>20 && pt<40) SF = 0.982112;
                 if (pt>40) SF = 1.60851;
         }
 if (  fabs(eta) > 1.566 && fabs(eta) < 2.3 )
         {
 
-                if (pt>20 && pt<30) SF = 0.975276;
-                if (pt>30 && pt<40) SF = 0.384074;
-                if (pt>40) SF = 0.839173;
+                if (pt>20 && pt<30) SF = 0.974844;
+                if (pt>30 && pt<40) SF = 0.384193;
+                if (pt>40) SF = 0.839436;
         }
 
 }//mutau MVA
@@ -630,7 +630,7 @@ TH1D *CutFlowUnWNorm= new TH1D("CutFlowUnWNorm","Cut Flow",CutN,1,CutN+1);
 TH1D *CutFlowUnWLoose= new TH1D("CutFlowUnWLoose","Cut Flow",CutN,1,CutN+1);
 TH1D *CutFlowUnWTight= new TH1D("CutFlowUnWTight","Cut Flow",CutN,1,CutN+1);
 
-TH1D *CutFlowUnWFakeRate[CutF];
+TH1D *CutFlowUnWFakeRate[CutF][40];
 
 TH1D * inputEventsH = new TH1D("inputEventsH","",1,-0.5,0.5);
 TH1D * hxsec = new TH1D("xsec","",1,0,10e+20);
@@ -812,19 +812,25 @@ void WriteHists(int CutNer, TFile *in, TString dir){
 }
 
 void SetupHistsFake(int CutNF){
-for(int cj = 0; cj < CutNF; cj++)
-    {
+
+
+for(int nSR = 0; nSR < 40; nSR++){
+  for(int cj = 0; cj < CutNF; cj++)
+    	{
       TString nCut;
+      TString nsr;
       nCut.Form("%i",cj);
-      CutFlowUnWFakeRate[cj]= new TH1D("CutFlowUnWFakeRate_"+nCut,"Cut Flow",CutNF,1,CutNF+1);
+      nsr.Form("%i",nSR);
+      CutFlowUnWFakeRate[cj][nSR]= new TH1D("CutFlowUnWFakeRate_"+nCut+"_"+nsr,"Cut Flow",CutNF,1,CutNF+1);
 
 	int sz = FakeList.size();
 	for (int j=0;j<sz;++j){
 	TString l_ = FakeList[j].c_str();
 	//cout<<" set up "<<FakeList[cj].c_str()<<endl;
-      CutFlowUnWFakeRate[cj]->GetXaxis()->SetBinLabel(j+1,l_);
-	}
-    }
+       CutFlowUnWFakeRate[cj][nSR]->GetXaxis()->SetBinLabel(j+1,l_);
+			}
+    		}
+	}//loop in nSR
 }
 
 void SetupHistsFakeRate(int CutNer){
@@ -1463,16 +1469,16 @@ TH1D *hdEtaTauMET[CutN];
 /////////////////////////////////////////1D histos
 //
 //
-      hmet_MT2lester_DZeta_1D[cj]= new TH1D ("met_MT2lester_DZeta1D_"+nCut,"met_MT2lester_DZeta1D "+cutName,33,0.5,33.5);;
+      hmet_MT2lester_DZeta_1D[cj]= new TH1D ("met_MT2lester_DZeta1D_"+nCut,"met_MT2lester_DZeta1D "+cutName,29,0.5,29.5);;
       hmet_MT2lester_DZeta_1D[cj]->Sumw2();
 
-      hmet_MT2lester_DZeta_0J1D[cj]= new TH1D ("met_MT2lester_DZeta0J1D_"+nCut,"met_MT2lester_DZeta0J1D "+cutName,33,0.5,33.5);;
+      hmet_MT2lester_DZeta_0J1D[cj]= new TH1D ("met_MT2lester_DZeta0J1D_"+nCut,"met_MT2lester_DZeta0J1D "+cutName,29,0.5,29.5);;
       hmet_MT2lester_DZeta_0J1D[cj]->Sumw2();
       
-      hmet_MT2lester_DZeta_1J1D[cj]= new TH1D ("met_MT2lester_DZeta1J1D_"+nCut,"met_MT2lester_DZeta1J1D "+cutName,33,0.5,33.5);;
+      hmet_MT2lester_DZeta_1J1D[cj]= new TH1D ("met_MT2lester_DZeta1J1D_"+nCut,"met_MT2lester_DZeta1J1D "+cutName,29,0.5,29.5);;
       hmet_MT2lester_DZeta_1J1D[cj]->Sumw2();
       
-      hmet_MT2lester_DZeta_01J1D[cj]= new TH1D ("met_MT2lester_DZeta01J1D_"+nCut,"met_MT2lester_DZeta01J1D "+cutName,66,0.5,66.5);;
+      hmet_MT2lester_DZeta_01J1D[cj]= new TH1D ("met_MT2lester_DZeta01J1D_"+nCut,"met_MT2lester_DZeta01J1D "+cutName,58,0.5,58.5);;
       hmet_MT2lester_DZeta_01J1D[cj]->Sumw2();
 
       hmet_MT2lester1D[cj]= new TH1D ("met_MT2lester1D_"+nCut,"met_MT2lester1D "+cutName,6,0.5,6.5);;

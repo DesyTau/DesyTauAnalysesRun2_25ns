@@ -450,7 +450,11 @@ class analyzer {
 
     //cout<<" check out  "<<Sel<<"  "<<CutIndex<<"  "<<mIndex<<"  "<<tIndex<<"  "<<category<<endl;
 
-    CutFlowUnWFakeRate[CutIndex]->Fill(category+1,EvWeight);
+   int nSR = GetSRIndex(muV, tauV, JetsV, MetV, Chimass, mIndex, tIndex);
+
+//   cout<<" Found which SR it is .... "<<nSR<<endl;
+
+    CutFlowUnWFakeRate[CutIndex][nSR]->Fill(category+1,EvWeight);
 
     hnJetFake[CutIndex][0]->Fill(njets,EvWeight);
     if (!isdata)  hnJetFake[CutIndex][category]->Fill(njets,EvWeight);
@@ -1005,7 +1009,7 @@ class analyzer {
     }////////////end of eltau channe
 
 
-    if (Sel=="muel"){
+    if (Sel=="muel" &&  eIndex >-1 &&  mIndex>-1){
 
       double deta=deltaEta(muV.Px(),  muV.Py(),muV.Pz(), elV.Px(),  elV.Py(),elV.Pz() );
       hdEtaDil[CutIndex]->Fill(deta,EvWeight);
@@ -1207,27 +1211,24 @@ class analyzer {
 	    if (dzeta>0) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(4,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(4,EvWeight);}
 	  }
 	  if (Mt2as>40) 	{
-	    if (dzeta<-100) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(5,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(5,EvWeight);}
-	    if (dzeta>-100) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(6,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(6,EvWeight);}
+	    {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(5,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(5,EvWeight);}
 	  }
 
 
 	}//////met < 40 bin
 	if (met>40 && met<80){
 	  if (Mt2as<40) 	{
-	    if (dzeta<-150) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(7,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(7,EvWeight);}
-	    if (dzeta>-150 && dzeta<-100) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(8,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(8,EvWeight);}
-	    if (dzeta>-100 && dzeta<50) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(9,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(9,EvWeight);}
-	    if (dzeta>50) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(10,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(10,EvWeight);}
+	    if (dzeta<-100) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(6,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(6,EvWeight);}
+	    if (dzeta>-100 && dzeta<50) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(7,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(7,EvWeight);}
+	    if (dzeta>50) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(8,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(8,EvWeight);}
 	  }
 	  if (Mt2as>40 && Mt2as<80) 	{
-	    if (dzeta<-150) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(11,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(11,EvWeight);}
-	    if (dzeta>-150 && dzeta<-100) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(12,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(12,EvWeight);}
-	    if (dzeta>-100) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(13,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(13,EvWeight);}
+	    if (dzeta<-100) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(9,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(9,EvWeight);}
+	    if (dzeta>-100) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(10,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(10,EvWeight);}
 	  }
 
 	  if (Mt2as>80 ) 	{
-	    {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(14,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(14,EvWeight);}
+	    {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(11,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(11,EvWeight);}
 	  }
 
 
@@ -1235,20 +1236,19 @@ class analyzer {
 
 	if (met>80 && met<120){
 	  if (Mt2as<40) 	{
-	    if (dzeta<-100) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(15,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(15,EvWeight);}
-	    if (dzeta>-100) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(16,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(16,EvWeight);}
+	    if (dzeta<-100) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(12,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(12,EvWeight);}
+	    if (dzeta>-100) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(13,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(13,EvWeight);}
 	  }
 	  if (Mt2as>40 && Mt2as<80) 	{
-	    if (dzeta<-150) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(17,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(17,EvWeight);}
-	    if (dzeta>-150 && dzeta<-100) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(18,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(18,EvWeight);}
-	    if (dzeta>-100) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(19,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(19,EvWeight);}
+	    if (dzeta<-150) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(14,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(14,EvWeight);}
+	    if (dzeta>-150 ) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(15,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(15,EvWeight);}
 	  }
 
 	  if (Mt2as>80 && Mt2as<120) 	{
-	    {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(20,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(20,EvWeight);}
+	    {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(16,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(16,EvWeight);}
 	  }
 	  if (Mt2as>120) 	{
-	    {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(21,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(21,EvWeight);}
+	    {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(17,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(17,EvWeight);}
 	  }
 
 
@@ -1257,24 +1257,24 @@ class analyzer {
 	if (met>120 && met < 250){
 							
 	  if (Mt2as<40) 	{
-	    if (dzeta<-150) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(22,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(22,EvWeight);}
-	    if (dzeta>-150 && dzeta<-100) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(23,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(23,EvWeight);}
-	    if (dzeta>-100) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(24,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(24,EvWeight);}
+	    if (dzeta<-150) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(18,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(18,EvWeight);}
+	    if (dzeta>-150 && dzeta<-100) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(19,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(19,EvWeight);}
+	    if (dzeta>-100) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(20,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(20,EvWeight);}
 	  }
 	  if (Mt2as>40 && Mt2as<80) 	{
-	    if (dzeta<-150) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(25,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(25,EvWeight);}
-	    if (dzeta>-150 && dzeta<-100) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(26,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(26,EvWeight);}
-	    if (dzeta>-100) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(27,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(27,EvWeight);}
+	    if (dzeta<-150) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(21,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(21,EvWeight);}
+	    if (dzeta>-150 && dzeta<-100) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(22,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(22,EvWeight);}
+	    if (dzeta>-100) {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(23,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(23,EvWeight);}
 	  }
 
 	  if (Mt2as>80 && Mt2as<100) 	{
-	    {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(28,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(28,EvWeight);}
+	    {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(24,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(24,EvWeight);}
 	  }
 	  if (Mt2as>100 && Mt2as<120) 	{
-	    {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(29,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(29,EvWeight);}
+	    {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(25,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(25,EvWeight);}
 	  }
 	  if (Mt2as>120) 	{
-	    hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(30,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(30,EvWeight);
+	    hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(26,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(26,EvWeight);
 	  }
 
 
@@ -1282,13 +1282,13 @@ class analyzer {
 	if (met>250){
 							
 	  if (Mt2as>80 && Mt2as<100) 	{
-	    {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(31,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(31,EvWeight);}
+	    {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(27,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(27,EvWeight);}
 	  }
 	  if (Mt2as>100 && Mt2as<120) 	{
-	    {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(32,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(32,EvWeight);}
+	    {hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(28,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(28,EvWeight);}
 	  }
 	  if (Mt2as>120) 	{
-	    hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(33,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(33,EvWeight);
+	    hmet_MT2lester_DZeta_0J1D[CutIndex]->Fill(29,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(29,EvWeight);
 	  }
 
 
@@ -1296,7 +1296,7 @@ class analyzer {
 	
       }///////////////JetsVsize = 0
 
-      int nB=33;
+      int nB=29;
       ///////////////////////
       if (JetsV.size()==1){
 	if (met<40.){
@@ -1308,27 +1308,24 @@ class analyzer {
 	    if (dzeta>0) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(4,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(4+nB,EvWeight);}
 	  }
 	  if (Mt2as>40.) 	{
-	    if (dzeta<-100) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(5,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(5+nB,EvWeight);}
-	    if (dzeta>-100)	{hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(6,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(6+nB,EvWeight);}
+	     {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(5,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(5+nB,EvWeight);}
 	  }
 
 
 	}//////met < 40 bin
 	if (met>40. && met<80.){
 	  if (Mt2as<40.) 	{
-	    if (dzeta<-150) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(7,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(7+nB,EvWeight);}
-	    if (dzeta>-150 && dzeta<-100) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(8,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(8+nB,EvWeight);}
-	    if (dzeta>-100 && dzeta<50) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(9,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(9+nB,EvWeight);}
-	    if (dzeta>50) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(10,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(10+nB,EvWeight);}
+	    if (dzeta<-100) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(6,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(6+nB,EvWeight);}
+	    if (dzeta>-100 && dzeta<50) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(7,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(7+nB,EvWeight);}
+	    if (dzeta>50) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(8,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(8+nB,EvWeight);}
 	  }
 	  if (Mt2as>40. && Mt2as<80.) 	{
-	    if (dzeta<-150) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(11,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(11+nB,EvWeight);}
-	    if (dzeta>-150 && dzeta<-100) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(12,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(12+nB,EvWeight);}
-	    if (dzeta>-100.) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(13,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(13+nB,EvWeight);}
+	    if (dzeta<-100) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(9,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(9+nB,EvWeight);}
+	    if (dzeta>-100.) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(10,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(10+nB,EvWeight);}
 	  }
 
 	  if (Mt2as>80.) 	{
-	    {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(14,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(14+nB,EvWeight);}
+	    {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(11,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(11+nB,EvWeight);}
 	  }
 
 
@@ -1336,20 +1333,19 @@ class analyzer {
 
 	if (met>80 && met<120){
 	  if (Mt2as<40) 	{
-	    if (dzeta<-100) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(15,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(15+nB,EvWeight);}
-	    if (dzeta>-100) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(16,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(16+nB,EvWeight);}
+	    if (dzeta<-100) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(12,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(12+nB,EvWeight);}
+	    if (dzeta>-100) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(13,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(13+nB,EvWeight);}
 	  }
 	  if (Mt2as>40 && Mt2as<80) 	{
-	    if (dzeta<-150) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(17,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(17+nB,EvWeight);}
-	    if (dzeta>-150 && dzeta<-100) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(18,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(18+nB,EvWeight);}
-	    if (dzeta>-100) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(19,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(19+nB,EvWeight);}
+	    if (dzeta<-150) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(14,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(14+nB,EvWeight);}
+	    if (dzeta>-150 ) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(15,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(15+nB,EvWeight);}
 	  }
 
 	  if (Mt2as>80 && Mt2as<120) 	{
-	    {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(20,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(20+nB,EvWeight);}
+	    {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(16,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(16+nB,EvWeight);}
 	  }
 	  if (Mt2as>120) 	{
-	    {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(21,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(21+nB,EvWeight);}
+	    {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(17,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(17+nB,EvWeight);}
 	  }
 
 
@@ -1358,24 +1354,24 @@ class analyzer {
 	if (met>120 && met <250){
 							
 	  if (Mt2as<40) 	{
-	    if (dzeta<-150) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(22,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(22+nB,EvWeight);}
-	    if (dzeta>-150 && dzeta<-100) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(23,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(23+nB,EvWeight);}
-	    if (dzeta>-100) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(24,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(24+nB,EvWeight);}
+	    if (dzeta<-150) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(18,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(18+nB,EvWeight);}
+	    if (dzeta>-150 && dzeta<-100) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(19,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(19+nB,EvWeight);}
+	    if (dzeta>-100) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(20,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(20+nB,EvWeight);}
 	  }
 	  if (Mt2as>40 && Mt2as<80) 	{
-	    if (dzeta<-150) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(25,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(25+nB,EvWeight);}
-	    if (dzeta>-150 && dzeta<-100) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(26,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(26+nB,EvWeight);}
-	    if (dzeta>-100) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(27,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(27+nB,EvWeight);}
+	    if (dzeta<-150) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(21,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(21+nB,EvWeight);}
+	    if (dzeta>-150 && dzeta<-100) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(22,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(22+nB,EvWeight);}
+	    if (dzeta>-100) {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(23,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(23+nB,EvWeight);}
 	  }
 
 	  if (Mt2as>80 && Mt2as<100) 	{
-	    {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(28,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(28+nB,EvWeight);}
+	    {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(24,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(24+nB,EvWeight);}
 	  }
 	  if (Mt2as>100 && Mt2as<120) 	{
-	    {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(29,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(29+nB,EvWeight);}
+	    {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(25,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(25+nB,EvWeight);}
 	  }
 	  if (Mt2as>120) 	{
-	    hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(30,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(30+nB,EvWeight);
+	    hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(26,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(26+nB,EvWeight);
 	  }
 
 
@@ -1384,13 +1380,13 @@ class analyzer {
 	if (met>250){
 							
 	  if (Mt2as>80 && Mt2as<100) 	{
-	    {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(31,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(31+nB,EvWeight);}
+	    {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(27,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(27+nB,EvWeight);}
 	  }
 	  if (Mt2as>100 && Mt2as<120) 	{
-	    {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(32,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(32+nB,EvWeight);}
+	    {hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(28,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(28+nB,EvWeight);}
 	  }
 	  if (Mt2as>120) 	{
-	    hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(33,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(33+nB,EvWeight);
+	    hmet_MT2lester_DZeta_1J1D[CutIndex]->Fill(29,EvWeight); hmet_MT2lester_DZeta_01J1D[CutIndex]->Fill(29+nB,EvWeight);
 	  }
 
 
@@ -1602,6 +1598,175 @@ class analyzer {
 
 
   }
+
+
+/////////////////////////////////////////////////////////////////////////////
+  int GetSRIndex(TLorentzVector  muV, TLorentzVector tauV, vector<TLorentzVector>  &JetsV, TLorentzVector  &MetV, double Chimass, int  mIndex, int  tIndex){
+
+			
+    double Mt2as = 0.;
+    double met = MetV.Pt();
+    double dzeta=-9999;
+
+    ///////////////////mutau
+    ////////////////////
+
+    if (mIndex >-1 && tIndex>-1 ){
+
+      tauMass = tauV.M();
+
+      double v1[4] = {muV.Px(),muV.Py(),muV.Pz(),muonMass};
+      double v2[4] = {tauV.Px(),tauV.Py(),tauV.Pz(),tauMass};
+      double ecm = 13000.0;
+      double mxlo = Chimass;
+      double ptm[2] = {MetV.Px(),MetV.Py()};
+      double vds[4] = {0,0,0,0};
+      // TMctLib t;
+
+      Mt2as = asymm_mt2_lester_bisect::get_mT2(muonMass, muV.Px(), muV.Py(),tauMass,tauV.Px(),tauV.Py(),MetV.Px(),MetV.Py(),Chimass,Chimass,0);
+
+      float tauUnitX = tauV.Px()/tauV.Pt();
+      float tauUnitY = tauV.Py()/tauV.Pt();
+
+      float muonUnitX = muV.Px()/muV.Pt();
+      float muonUnitY = muV.Py()/muV.Pt();
+
+      float zetaX = tauUnitX + muonUnitX;
+      float zetaY = tauUnitY + muonUnitY;
+
+      float normZeta = TMath::Sqrt(zetaX*zetaX+zetaY*zetaY);
+
+      zetaX = zetaX/normZeta;
+      zetaY = zetaY/normZeta;
+
+      float vectorX = MetV.Px() + muV.Px() + tauV.Px();
+      float vectorY = MetV.Py() + muV.Py() + tauV.Py();
+
+      float vectorVisX = muV.Px() + tauV.Px();
+      float vectorVisY = muV.Py() + tauV.Py();
+
+      // computation of DZeta variable
+      // pfmet
+      float pzetamiss = MetV.Px()*zetaX + MetV.Py()*zetaY;
+      float pzetavis = vectorVisX*zetaX + vectorVisY*zetaY;
+      dzeta = pzetamiss - 0.85*pzetavis;
+
+
+    }
+
+    /////////////////////////////////////////////1D distributions
+
+    int nB = 0;
+    int binIndex=-1;
+      if (JetsV.size()==0) nB=0; 
+      if (JetsV.size()==1) nB=29; 
+    if (dzeta > -500 && met>0 && Mt2as>0){
+	
+
+	if (met<40){
+				
+	  if (Mt2as<40) 	{
+	    if (dzeta<-150) binIndex=nB+1;
+	    if (dzeta>-150 && dzeta<-100) {binIndex=nB+2;}
+	    if (dzeta>-100 && dzeta<0) {binIndex=nB+3;}
+	    if (dzeta>0) {binIndex=nB+4;}
+	  }
+	  if (Mt2as>40) 	{
+	    {binIndex=nB+5;}
+	  }
+
+
+	}//////met < 40 bin
+	if (met>40 && met<80){
+	  if (Mt2as<40) 	{
+	    if (dzeta<-100) {binIndex=nB+6;}
+	    if (dzeta>-100 && dzeta<50) {binIndex=nB+7;}
+	    if (dzeta>50) {binIndex=nB+8;}
+	  }
+	  if (Mt2as>40 && Mt2as<80) 	{
+	    if (dzeta<-100) {binIndex=nB+9;}
+	    if (dzeta>-100) {binIndex=nB+10;}
+	  }
+
+	  if (Mt2as>80 ) 	{
+	    {binIndex=nB+11;}
+	  }
+
+
+	}///met 40-80 bin
+
+	if (met>80 && met<120){
+	  if (Mt2as<40) 	{
+	    if (dzeta<-100) {binIndex=nB+12;};
+	    if (dzeta>-100) {binIndex=nB+13;};
+	  }
+	  if (Mt2as>40 && Mt2as<80) 	{
+	    if (dzeta<-150) {binIndex=nB+14;};
+	    if (dzeta>-150 ) {binIndex=nB+15;};
+	  }
+
+	  if (Mt2as>80 && Mt2as<120) 	{
+	    {binIndex=nB+16;};
+	  }
+	  if (Mt2as>120) 	{
+	    {binIndex=nB+17;};
+	  }
+
+
+	}///met 80-120 bin
+
+	if (met>120 && met < 250){
+							
+	  if (Mt2as<40) 	{
+	    if (dzeta<-150) {binIndex=nB+18;};
+	    if (dzeta>-150 && dzeta<-100) {binIndex=nB+19;};
+	    if (dzeta>-100) {binIndex=nB+20;};
+	  }
+	  if (Mt2as>40 && Mt2as<80) 	{
+	    if (dzeta<-150) {binIndex=nB+21;};
+	    if (dzeta>-150 && dzeta<-100) {binIndex=nB+22;};
+	    if (dzeta>-100) {binIndex=nB+23;};
+	  }
+
+	  if (Mt2as>80 && Mt2as<100) 	{
+	    binIndex=nB+24;
+	  }
+	  if (Mt2as>100 && Mt2as<120) 	{
+	    binIndex=nB+25;
+	  }
+	  if (Mt2as>120) 	{
+	    binIndex=nB+26;
+	  }
+
+
+	}///met 120 bin & < 250
+	if (met>250){
+							
+	  if (Mt2as>80 && Mt2as<100) 	{
+	    binIndex=nB+27;
+	  }
+	  if (Mt2as>100 && Mt2as<120) 	{
+	    binIndex=nB+28;
+	  }
+	  if (Mt2as>120) 	{
+	    binIndex=nB+29;
+	  }
+
+
+	}///met 250 bin
+	
+
+
+    }/////////dzeta>-9999
+
+
+//    cout<<" inside founder  MT2 "<<Mt2as<<" met "<<met<<" DZ "<<dzeta<<"  m "<<mIndex<<" t "<<tIndex<<endl;
+    return binIndex;
+
+
+  }
+
+///////////////////////////////////////////////////////////////
 
 
 
