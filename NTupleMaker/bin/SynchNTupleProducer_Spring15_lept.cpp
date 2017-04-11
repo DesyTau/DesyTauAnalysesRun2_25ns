@@ -494,6 +494,7 @@ int main(int argc, char * argv[]){
   TFile* inputFile_visPtResolution = new TFile(svFitPtResFile.data());
 
   //Systematics init
+  TauScaleSys * tauScaleSys =0;
   TauOneProngScaleSys* tauOneProngScaleSys =0;
   TauOneProngOnePi0ScaleSys* tauOneProngOnePi0ScaleSys=0;
   TauThreeProngScaleSys* tauThreeProngScaleSys=0;
@@ -509,22 +510,31 @@ int main(int argc, char * argv[]){
   JESUncertainties * jecUncertainties = 0;
 
   if(!isData && ApplySystShift){
-    tauOneProngScaleSys = new TauOneProngScaleSys(otree);
+    /*tauOneProngScaleSys = new TauOneProngScaleSys(otree);
     tauOneProngScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);
+    tauOneProngScaleSys->SetUseSVFit(ApplySVFit);
     tauOneProngOnePi0ScaleSys = new TauOneProngOnePi0ScaleSys(otree);
     tauOneProngOnePi0ScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);
+    tauOneProngOnePi0ScaleSys->SetUseSVFit(ApplySVFit);
     tauThreeProngScaleSys = new TauThreeProngScaleSys(otree);
     tauThreeProngScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);
+    tauThreeProngScaleSys->SetUseSVFit(ApplySVFit);*/
+	tauScaleSys = new TauScaleSys(otree);
+    tauScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);
+    tauScaleSys->SetUseSVFit(ApplySVFit);
     zPtWeightSys = new ZPtWeightSys(otree);
     topPtWeightSys = new TopPtWeightSys(otree);
     //lepTauFakeScaleSys = new LepTauFakeScaleSys(otree);
     //lepTauFakeScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);
     lepTauFakeOneProngScaleSys = new LepTauFakeOneProngScaleSys(otree);
-    lepTauFakeOneProngScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);	
+    lepTauFakeOneProngScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);
+    lepTauFakeOneProngScaleSys->SetUseSVFit(ApplySVFit);	
     lepTauFakeOneProngOnePi0ScaleSys = new LepTauFakeOneProngOnePi0ScaleSys(otree);
     lepTauFakeOneProngOnePi0ScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);	
+    lepTauFakeOneProngOnePi0ScaleSys->SetUseSVFit(ApplySVFit);
     lepTauFakeThreeProngScaleSys = new LepTauFakeThreeProngScaleSys(otree);
     lepTauFakeThreeProngScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);	
+    lepTauFakeThreeProngScaleSys->SetUseSVFit(ApplySVFit);
 
 	
 	if (cfg.get<bool>("splitJES")){
@@ -1226,18 +1236,20 @@ int main(int argc, char * argv[]){
        for (unsigned int i=0; i<jetEnergyScaleSys.size(); i++)
          (jetEnergyScaleSys.at(i)) ->Eval(); 
          if (ch=="mt") {
-           tauOneProngScaleSys->Eval(utils::MUTAU);
+           /*tauOneProngScaleSys->Eval(utils::MUTAU);
            tauOneProngOnePi0ScaleSys->Eval(utils::MUTAU);
-           tauThreeProngScaleSys->Eval(utils::MUTAU);
+           tauThreeProngScaleSys->Eval(utils::MUTAU);*/
+           tauScaleSys->Eval(utils::MUTAU);
 		   lepTauFakeOneProngScaleSys->Eval(utils::MUTAU);			
 		   lepTauFakeOneProngOnePi0ScaleSys->Eval(utils::MUTAU);			
 		   lepTauFakeThreeProngScaleSys->Eval(utils::MUTAU);			
            //lepTauFakeScaleSys->Eval(utils::MUTAU);
          }
 	 else if (ch=="et") {
-           tauOneProngScaleSys->Eval(utils::ETAU);
+           /*tauOneProngScaleSys->Eval(utils::ETAU);
            tauOneProngOnePi0ScaleSys->Eval(utils::ETAU);
-           tauThreeProngScaleSys->Eval(utils::ETAU);
+           tauThreeProngScaleSys->Eval(utils::ETAU);*/
+           tauScaleSys->Eval(utils::ETAU);
 		   lepTauFakeOneProngScaleSys->Eval(utils::ETAU);			
 		   lepTauFakeOneProngOnePi0ScaleSys->Eval(utils::ETAU);			
 		   lepTauFakeThreeProngScaleSys->Eval(utils::ETAU);	
@@ -1265,6 +1277,11 @@ int main(int argc, char * argv[]){
   file->Write();
 
   // delete systematics objects
+
+  if(tauScaleSys != 0){
+    tauScaleSys->Write();
+    delete tauScaleSys;
+  }
 
   if(tauOneProngScaleSys != 0){
     tauOneProngScaleSys->Write();

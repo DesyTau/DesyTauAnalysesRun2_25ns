@@ -563,9 +563,6 @@ int main(int argc, char * argv[]) {
     Int_t           njets;
     Int_t           njets_Up;
     Int_t           njets_Down;
-    
-    Bool_t          isJetFakeEle;
-    Bool_t          isJetFakeMu;
 
     Int_t           njetspt20;
 
@@ -950,8 +947,6 @@ int main(int argc, char * argv[]) {
     tree->Branch("njets_Up", &njets_Up, "njets_Up/I");
     tree->Branch("njets_Down", &njets_Down, "njets_Down/I");
 
-    tree->Branch("isJetFakeEle",&isJetFakeEle,"isJetFakeEle/O");
-    tree->Branch("isJetFakeMu",&isJetFakeMu,"isJetFakeMu/O");
 
     tree->Branch("njetspt20", &njetspt20, "njetspt20/I");
 
@@ -1860,6 +1855,27 @@ int main(int argc, char * argv[]) {
 		chargedHadronTrackResolutionFilter_ = metFiltersPasses(analysisTree,chargedHadronTrackResolutionFlag);
             }
             
+
+	    for (unsigned int iT=0; iT<analysisTree.trigobject_count; ++iT) {
+	      bool lowPtMuon = false;
+	      bool highPtMuon = false;
+	      if (analysisTree.trigobject_filters[iT][nHighPtLegMuon])
+		highPtMuon = true;
+              if (analysisTree.trigobject_filters[iT][nLowPtLegMuon])
+		lowPtMuon = true;
+
+	      if (highPtMuon)
+		std::cout << "High pT Muon leg ";
+	      if (highPtMuon)
+		std::cout << "Low pT Muon leg ";
+		
+	      if (highPtMuon||lowPtMuon)
+		std::cout << "TO : pT = " << analysisTree.trigobject_pt[iT] 
+			  << "  eta = " << analysisTree.trigobject_eta[iT]
+			  << "  phi = " << analysisTree.trigobject_phi[iT] << std::endl;
+
+	    }
+
             /*
              std::cout << "LowPtE  : " << LowPtLegElectron << " : " << nLowPtLegElectron << std::endl;
              std::cout << "HighPtE : " << HighPtLegElectron << " : " << nHighPtLegElectron << std::endl;
@@ -2418,9 +2434,6 @@ int main(int argc, char * argv[]) {
             int indexLeadingBJet = -1;
             float ptLeadingBJet = -1;
             
-            isJetFakeEle = false;
-            isJetFakeMu = false;
-            
             for (unsigned int jet=0; jet<analysisTree.pfjet_count; ++jet) {
                 
                 float absJetEta = fabs(analysisTree.pfjet_eta[jet]);
@@ -2440,19 +2453,12 @@ int main(int argc, char * argv[]) {
                 
                 float dR1 = deltaR(analysisTree.pfjet_eta[jet],analysisTree.pfjet_phi[jet],
                                    eta_1,phi_1);
-                if (dR1<dRJetLeptonCut)
-                    cleanedJet = false;
+                if (dR1<dRJetLeptonCut) cleanedJet = false;
                 
-                if (dR1 < 0.3 && jetPt > 30)
-                    isJetFakeEle = true;
-
                 float dR2 = deltaR(analysisTree.pfjet_eta[jet],analysisTree.pfjet_phi[jet],
                                    eta_2,phi_2);
-                if (dR2<dRJetLeptonCut)
-                    cleanedJet = false;
+                if (dR2<dRJetLeptonCut) cleanedJet = false;
                 
-                if (dR2 < 0.3 && jetPt > 30)
-                    isJetFakeMu = true;
                 // jetId
                 
                 if (!cleanedJet) continue;
@@ -2460,7 +2466,70 @@ int main(int argc, char * argv[]) {
 		if (jetPt>jetPtLowCut)
 		  jetspt20.push_back(jet);
                 
-                if (absJetEta<bJetEtaCut)
+                if (absJetEta<bJetEtaCut) { // jet within b-tagging acceptance
+                    
+                    bool tagged = analysisTree.pfjet_btag[jet][nBTagDiscriminant]>btagCut; // b-jet
+		    bool taggedRaw = tagged;
+                    
+                    if (!isData) {
+                        int flavor = abs(analysisTree.pfjet_flavour[jet]);
+                        
+                        double jet_scalefactor = 1;
+                        double JetPtForBTag = jetPt;
+                        double tageff = 1;
+                        
+                        if (flavor==5) {
+                            if (JetPtForBTag>MaxBJetPt) JetPtForBTag = MaxBJetPt - 0.1;
+                            if (JetPtForBTag<MinBJetPt) JetPtForBTag = MinBJetPt + 0.1;
+                            jet_scalefactor = reader_B.eval_auto_bounds("central",BTagEntry::FLAV_B, absJetEta, JetPtForBTag);
+                            tageff = tagEff_B->Interpolate(JetPtForBTag,absJetEta);
+                        }
+                        else if (flavor==4) {
+                            if (JetPtForBTag>MaxBJetPt) JetPtForBTag = MaxBJetPt - 0.1;
+                            if (JetPtForBTag<MinBJetPt) JetPtForBTag = MinBJetPt + 0.1;
+                            jet_scalefactor = reader_C.eval_auto_bounds("central",BTagEntry::FLAV_C, absJetEta, JetPtForBTag);
+                            tageff = tagEff_C->Interpolate(JetPtForBTag,absJetEta);
+                        }
+                        else {
+                            if (JetPtForBTag>MaxLJetPt) JetPtForBTag = MaxLJetPt - 0.1;
+                            if (JetPtForBTag<MinLJetPt) JetPtForBTag = MinLJetPt + 0.1;
+                            jet_scalefactor = reader_Light.eval_auto_bounds("central",BTagEntry::FLAV_UDSG, absJetEta, JetPtForBTag);
+                            tageff = tagEff_Light->Interpolate(JetPtForBTag,absJetEta);
+                        }
+                        
+                        if (tageff<1e-5)      tageff = 1e-5;
+                        if (tageff>0.99999)   tageff = 0.99999;
+                        rand.SetSeed((int)((jetEta+5)*100000));
+                        double rannum = rand.Rndm();
+                        
+                        if (jet_scalefactor<1 && tagged) { // downgrade
+                            double fraction = 1-jet_scalefactor;
+                            if (rannum<fraction) {
+                                tagged = false;
+                                //		std::cout << "downgrading " << std::endl;
+                            }
+                        }
+                        if (jet_scalefactor>1 && !tagged) { // upgrade
+                            double fraction = (jet_scalefactor-1.0)/(1.0/tageff-1.0);
+                            if (rannum<fraction) {
+                                tagged = true;
+                                //		std::cout << "upgrading " << std::endl;
+                            }
+                        }
+                    }
+		
+		    if (taggedRaw)
+		      bjetsRaw.push_back(jet);
+
+                    if (tagged) {
+		      bjets.push_back(jet);
+		      if (jetPt>ptLeadingBJet) {
+			ptLeadingBJet = jetPt;
+			indexLeadingBJet = jet;
+		      }
+		    }
+                
+		}
 
 		if (jetPtUp>jetPtHighCut)
 		  jetsUp.push_back(jet);
