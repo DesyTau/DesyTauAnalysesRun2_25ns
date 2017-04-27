@@ -87,14 +87,19 @@ void analyzer::Loop(){
 	fChain->GetEntry(0);  
 	string old = datasetName->c_str();
 	int counter = 0;
-		
+
+
 	//char hist_[100];
 	bool isData = false;
 	bool isTT = false;
 	bool isWJ = false;
 	bool isDY = false;
+	bool isDYee = false;
+	bool isDYmm = false;
+	bool isDYnunu = false;
 	bool isDYhigh = false;
 	bool isDYlow = false;
+	bool isZTT = false;
 	bool isDYNJ = false;
 	bool isWNJ = false;
 	bool isNJ = false;
@@ -129,6 +134,7 @@ void analyzer::Loop(){
 	string dyj2 = "DY2JetsToLL";
 	string dyj3 = "DY3JetsToLL";
 	string dyj4 = "DY4JetsToLL";
+	string ztt = "isZTT";
 	string ttw = "TTWJetsToLNu";
 	string signal = "stau";
 	string signalC1 = "C1";
@@ -145,7 +151,7 @@ void analyzer::Loop(){
 	if ((string::npos != old.find(wj1) || string::npos != old.find(wj2) || string::npos != old.find(wj3) || string::npos != old.find(wj4)) && string::npos == old.find(ttw)) isWNJ= true;
 	isNJ = isDYNJ && isWNJ;
 	
-	
+
 	if (isSignal) cout<<" YOU HAVE FOUND ITTTTTTTTT "<<endl;
 	if (isData) cout<<" YOU HAVE FOUND a DATA "<<endl;
 
@@ -169,6 +175,9 @@ TH2D *histo = (TH2D*) obj;
 
 
 	TFile * filein = new TFile(fileinName,"read");
+	string fln = filein->GetName();
+	if (string::npos != fln.find(ztt)) isZTT= true;
+	if (string::npos == fln.find(ztt)) isZTT= false;
 
 	TH1D * histW = (TH1D*)filein->Get("mutau/histWeightsH");
 	TH1D * histTop , *histTopSq;
@@ -197,6 +206,18 @@ TH2D *histo = (TH2D*) obj;
 		Long64_t ientry = LoadTree(jentry);
 		nb = fChain->GetEntry(jentry);   nbytes += nb;
 		float all_weights = 1.;
+		bool isDYTauTau = false;
+		bool isDYll = false;
+
+		if ((isDY  ||  isDYNJ) && isDYTT>0.5) isDYTauTau = true;
+		if ((isDY  ||  isDYNJ) && isDYEE>0.5) isDYee = true;
+		if ((isDY  ||  isDYNJ) && isDYMM>0.5) isDYmm = true;
+		if ((isDY  ||  isDYNJ) && isDYNuNu>0.5) isDYnunu = true;
+
+		if ((isDY  ||  isDYNJ) && isDYTT<0.5) isDYll = true;
+		//cout<<" Again ..................... "<<isZTT<<" DYTT "<<isDYTauTau<<endl;
+		if ((isDY || isDYNJ) && isZTT && !isDYTauTau) continue;
+		if ((isDY || isDYNJ) && !isZTT && !isDYll) continue;
 
 		float charge_ =mu_charge[muon_index]  * ta_charge[taus_index];
 

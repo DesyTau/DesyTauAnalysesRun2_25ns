@@ -708,10 +708,16 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	  if (removeGammaStar) continue;
 	}
 */
+	isDYTT=false;
+	isDYLL=false;
+	isDYLL=false;
+	isDYEE=false;
+	isDYMM=false;
 	if (isDY) {
 	  
 	  if (promptTausFirstCopy.size()==2) {
 	    isZTT = true; isZMM = false; isZEE = false;
+	    isDYTT=true;
 	    bosonPx = promptTausLV.Px(); bosonPy = promptTausLV.Py(); bosonPz = promptTausLV.Pz(); 
 	    bosonMass = promptTausLV.M();
 	    bosonEta  = promptTausLV.Eta();
@@ -720,6 +726,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	  }
 	  else if (promptMuons.size()==2) {
 	    isZTT = false; isZMM = true; isZEE = false;
+	    isDYMM=true;
 	    bosonPx = promptMuonsLV.Px(); bosonPy = promptMuonsLV.Py(); bosonPz = promptMuonsLV.Pz(); 
 	    bosonMass = promptMuonsLV.M(); 
 	    bosonEta = promptMuonsLV.Eta();
@@ -728,6 +735,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	  }
 	  else {
 	    isZTT = false; isZMM = false; isZEE = true;
+	    isDYEE=true;
 	    bosonPx = promptElectronsLV.Px(); bosonPy = promptElectronsLV.Py(); bosonPz = promptElectronsLV.Pz(); 
 	    bosonMass = promptElectronsLV.M();
 	    bosonEta = promptElectronsLV.Eta();
@@ -917,6 +925,10 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	 metFlags.push_back("Flag_globalSuperTightHalo2016Filter");
 	// metFlags.push_back("Flag_METFilters");
 	 metFlags.push_back("Flag_eeBadScFilter");
+	 metFlags.push_back("Flag_BadChargedCandidateFilter");
+	 metFlags.push_back("Flag_BadPFMuonFilter");
+	 metFlags.push_back("Flag_muonBadTrackFilter");
+	 metFlags.push_back("Flag_chargedHadronTrackResolutionFilter");
 
   //    }
 
@@ -1659,6 +1671,7 @@ cout<<""<<endl;
 
       if (!isData) npartons = analysisTree.genparticles_noutgoing;
 
+      if (npartons>0 && npartons<5 && string::npos != filen.find("DYJets")) continue;
       all_weight = weight;
 
       T->Fill();

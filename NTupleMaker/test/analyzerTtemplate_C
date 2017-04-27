@@ -55,11 +55,11 @@ void analyzer::Loop(){
 	CutList.push_back("METrecoil");
 	CutList.push_back("ZpTcorrection");
 	CutList.push_back("topPtRwgt");
-	CutList.push_back("Jets>1");
 	CutList.push_back("btag>0");
 	CutList.push_back("Jets<5");
 	CutList.push_back("Jets<4");
 	CutList.push_back("Jets<3");
+	CutList.push_back("Jets<2");
 	CutList.push_back("Masswindow");
 	CutList.push_back("SRCuts");	
 	CutList.push_back("JetsCuts");	
@@ -91,14 +91,17 @@ void analyzer::Loop(){
 	bool isTT = false;
 	bool isWJ = false;
 	bool isDY = false;
+	bool isDYee = false;
+	bool isDYmm = false;
+	bool isDYnunu = false;
 	bool isDYhigh = false;
 	bool isDYlow = false;
+	bool isZTT = false;
 	bool isDYNJ = false;
 	bool isWNJ = false;
 	bool isNJ = false;
 	bool isSignal = false;
 	bool cut_btag = true;
-
 
 	bool t = true;
 	bool f = false;
@@ -112,6 +115,7 @@ void analyzer::Loop(){
 	string cut = to_string(t);
 	cout <<"  "<<cut.c_str()<<endl;
 	char plots_[100];
+	
 	string data = "MuonEG";
 	string tt = "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8";
 	string wj = "WJetsToLNu";
@@ -127,9 +131,10 @@ void analyzer::Loop(){
 	string dyj2 = "DY2JetsToLL";
 	string dyj3 = "DY3JetsToLL";
 	string dyj4 = "DY4JetsToLL";
+	string ztt = "isZTT";
+	string ttw = "TTWJetsToLNu";
 	string signal = "stau";
 	string signalC1 = "C1";
-	string ttw = "TTWJets";
 	if (string::npos != old.find(data)) isData= true;
 	if (string::npos != old.find(signal)) isSignal= true;
 	if (string::npos != old.find(signalC1)) isSignal= true;
@@ -140,9 +145,9 @@ void analyzer::Loop(){
 	if (string::npos != old.find(dyjhigh)) isDYhigh= true;
 	if (string::npos != old.find(dyjlow) || string::npos != old.find(dyjlow2)) isDYlow= true;
 	if (string::npos != old.find(dyj1) || string::npos != old.find(dyj2) || string::npos != old.find(dyj3) || string::npos != old.find(dyj4)) isDYNJ = true;
+	if (string::npos != old.find(wj1) || string::npos != old.find(wj2) || string::npos != old.find(wj3) || string::npos != old.find(wj4)) isWNJ= true;
 	if ((string::npos != old.find(wj1) || string::npos != old.find(wj2) || string::npos != old.find(wj3) || string::npos != old.find(wj4)) && string::npos == old.find(ttw)) isWNJ= true;
 	isNJ = isDYNJ && isWNJ;
-	
 	if (isSignal) cout<<" YOU HAVE FOUND ITTTTTTTTT "<<endl;
 	if (isData) cout<<" YOU HAVE FOUND a DATA "<<endl;
 
@@ -168,6 +173,9 @@ TH2D *histo = (TH2D*) obj;
 
 
 	TFile * filein = new TFile(fileinName,"read");
+	string fln = filein->GetName();
+	if (string::npos != fln.find(ztt)) isZTT= true;
+	if (string::npos == fln.find(ztt)) isZTT= false;
 
 	TH1D * histW = (TH1D*)filein->Get("muel/histWeightsH");
 	TH1D * histTop, *histTopSq ;
@@ -195,6 +203,18 @@ TH2D *histo = (TH2D*) obj;
 		Long64_t ientry = LoadTree(jentry);
 		nb = fChain->GetEntry(jentry);   nbytes += nb;
 		float all_weights = 1.;
+		bool isDYTauTau = false;
+		bool isDYll = false;
+
+		if ((isDY  ||  isDYNJ) && isDYTT>0.5) isDYTauTau = true;
+		if ((isDY  ||  isDYNJ) && isDYEE>0.5) isDYee = true;
+		if ((isDY  ||  isDYNJ) && isDYMM>0.5) isDYmm = true;
+		if ((isDY  ||  isDYNJ) && isDYNuNu>0.5) isDYnunu = true;
+
+		if ((isDY  ||  isDYNJ) && isDYTT<0.5) isDYll = true;
+		//cout<<" Again ..................... "<<isZTT<<" DYTT "<<isDYTauTau<<endl;
+		if ((isDY || isDYNJ) && isZTT && !isDYTauTau) continue;
+		if ((isDY || isDYNJ) && !isZTT && !isDYll) continue;
 
 if(muon_index<0) continue;
 if(electron_index<0) continue;
@@ -277,7 +297,6 @@ float met = -1.;
 
 if(muon_index>-1)			MuV.SetPtEtaPhiM(mu_pt[muon_index], mu_eta[muon_index], mu_phi[muon_index], muonMass);
 if(electron_index>-1)		ElV.SetPtEtaPhiM(el_pt[electron_index], el_eta[electron_index], el_phi[electron_index],electronMass);
-//if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], ta_phi[taus_index], tauMass);
 
 
 
@@ -293,11 +312,8 @@ if(electron_index>-1)		ElV.SetPtEtaPhiM(el_pt[electron_index], el_eta[electron_i
 		if(muon_index<0 || electron_index<0) continue;
 
 
-
 		if ( (el_relIso[0] > 0.1 || mu_relIso[0] > 0.15) && !InvertLeptonIso) continue;
 		if ( (el_relIso[0] < 0.1 ||  mu_relIso[0] < 0.15) && InvertLeptonIso) continue;
-	//	if ( el_relIso[0] > 0.1 && !InvertLeptonIso) continue;
-	//	if ( mu_relIso[0] < 0.15 && InvertLeptonIso) continue;
 		
 		if ( el_relIso[0] > 0.2 ) continue;
 		if ( mu_relIso[0] > 0.3) continue;
@@ -309,7 +325,7 @@ if(electron_index>-1)		ElV.SetPtEtaPhiM(el_pt[electron_index], el_eta[electron_i
 
                  double Dr=deltaR(ElV.Eta(),ElV.Phi(),
 					MuV.Eta(), MuV.Phi());
-		if (Dr>3.5 && !InvertLeptonIso) continue;
+//		if (Dr>3.5 && !InvertLeptonIso) continue;
 		if (Dr<3.5 && InvertLeptonIso) continue;
 
 		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
@@ -420,13 +436,6 @@ if(electron_index>-1)		ElV.SetPtEtaPhiM(el_pt[electron_index], el_eta[electron_i
 
 			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		if (njets<2 ) continue;
-		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
-		CFCounter[iCut]+= all_weights;
-		CFCounter_[iCut]+= all_weights;
-                iCFCounter[iCut]++;
-		iCut++;
-
 
 		if (nbtag==0) continue;
 		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
@@ -456,6 +465,12 @@ if(electron_index>-1)		ElV.SetPtEtaPhiM(el_pt[electron_index], el_eta[electron_i
                 iCFCounter[iCut]++;
 		iCut++;
 
+		if (njets>1 ) continue;
+		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
+		CFCounter[iCut]+= all_weights;
+		CFCounter_[iCut]+= all_weights;
+                iCFCounter[iCut]++;
+		iCut++;
 
 		 TLorentzVector DiLL = MuV + ElV ;
 		if (DiLL.M() > 30. && DiLL.M() < 90. ) continue;

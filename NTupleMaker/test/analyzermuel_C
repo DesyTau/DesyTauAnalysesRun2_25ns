@@ -61,6 +61,7 @@ void analyzer::Loop(){
 	CutList.push_back("SRCuts");	
 	CutList.push_back("JetsCuts");	
 	CutList.push_back("StauCuts");	
+	CutList.push_back("StauCuts2");	
         CutList.push_back("MET>20");
         CutList.push_back("MET>30");
         CutList.push_back("MET>40");
@@ -88,8 +89,12 @@ void analyzer::Loop(){
 	bool isTT = false;
 	bool isWJ = false;
 	bool isDY = false;
+	bool isDYee = false;
+	bool isDYmm = false;
+	bool isDYnunu = false;
 	bool isDYhigh = false;
 	bool isDYlow = false;
+	bool isZTT = false;
 	bool isDYNJ = false;
 	bool isWNJ = false;
 	bool isNJ = false;
@@ -124,9 +129,10 @@ void analyzer::Loop(){
 	string dyj2 = "DY2JetsToLL";
 	string dyj3 = "DY3JetsToLL";
 	string dyj4 = "DY4JetsToLL";
+	string ztt = "isZTT";
+	string ttw = "TTWJetsToLNu";
 	string signal = "stau";
 	string signalC1 = "C1";
-	string ttw = "TTWJetsToLNu";
 	if (string::npos != old.find(data)) isData= true;
 	if (string::npos != old.find(signal)) isSignal= true;
 	if (string::npos != old.find(signalC1)) isSignal= true;
@@ -165,6 +171,9 @@ TH2D *histo = (TH2D*) obj;
 
 
 	TFile * filein = new TFile(fileinName,"read");
+	string fln = filein->GetName();
+	if (string::npos != fln.find(ztt)) isZTT= true;
+	if (string::npos == fln.find(ztt)) isZTT= false;
 
 	TH1D * histW = (TH1D*)filein->Get("muel/histWeightsH");
 	TH1D * histTop , *histTopSq;
@@ -190,6 +199,19 @@ TH2D *histo = (TH2D*) obj;
 		Long64_t ientry = LoadTree(jentry);
 		nb = fChain->GetEntry(jentry);   nbytes += nb;
 		float all_weights = 1.;
+
+		bool isDYTauTau = false;
+		bool isDYll = false;
+
+		if ((isDY  ||  isDYNJ) && isDYTT>0.5) isDYTauTau = true;
+		if ((isDY  ||  isDYNJ) && isDYEE>0.5) isDYee = true;
+		if ((isDY  ||  isDYNJ) && isDYMM>0.5) isDYmm = true;
+		if ((isDY  ||  isDYNJ) && isDYNuNu>0.5) isDYnunu = true;
+
+		if ((isDY  ||  isDYNJ) && isDYTT<0.5) isDYll = true;
+		//cout<<" Again ..................... "<<isZTT<<" DYTT "<<isDYTauTau<<endl;
+		if ((isDY || isDYNJ) && isZTT && !isDYTauTau) continue;
+		if ((isDY || isDYNJ) && !isZTT && !isDYll) continue;
 
 if(muon_index<0) continue;
 if(electron_index<0) continue;
@@ -289,8 +311,6 @@ if(electron_index>-1)		ElV.SetPtEtaPhiM(el_pt[electron_index], el_eta[electron_i
 
 		if ( (el_relIso[0] > 0.1 || mu_relIso[0] > 0.15) && !InvertLeptonIso) continue;
 		if ( (el_relIso[0] < 0.1 ||  mu_relIso[0] < 0.15) && InvertLeptonIso) continue;
-	//	if ( el_relIso[0] > 0.1 && !InvertLeptonIso) continue;
-	//	if ( mu_relIso[0] < 0.15 && InvertLeptonIso) continue;
 		
 		if ( el_relIso[0] > 0.2 ) continue;
 		if ( mu_relIso[0] > 0.3) continue;
@@ -320,7 +340,7 @@ if(electron_index>-1)		ElV.SetPtEtaPhiM(el_pt[electron_index], el_eta[electron_i
 	
 
 		float trigw =   ( 17677*trig_weight_1 +   18188 * trig_weight_2)/float(35865.) ;
-		if (isSignal) trigw = trig_weight;
+//		if (isSignal) trigw = ;
 		if (!isData) all_weights *= trigw;
 
 		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
@@ -347,7 +367,6 @@ if(electron_index>-1)		ElV.SetPtEtaPhiM(el_pt[electron_index], el_eta[electron_i
 
 
 		bool bqcd = false;
-
 
 		//if (bqcd) all_weights *=qcdweight;
 
@@ -408,10 +427,11 @@ if(electron_index>-1)		ElV.SetPtEtaPhiM(el_pt[electron_index], el_eta[electron_i
 		CFCounter_[iCut]+= all_weights;
                 iCFCounter[iCut]++;
 		iCut++;
-
+	if (isTT){
 		if (systematic !="TopPtUp" && systematic !="TopPtDown" ) all_weights *= top_weight;
 		if (systematic =="TopPtUp") all_weights *= top_weight*top_weight;
-		if (systematic =="TopPtDown") all_weights *= 1;
+	//	if (systematic =="TopPtDown") all_weights *= 1;
+	}
 		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
 		CFCounter[iCut]+= all_weights;
 		CFCounter_[iCut]+= all_weights;
@@ -504,6 +524,16 @@ if(electron_index>-1)		ElV.SetPtEtaPhiM(el_pt[electron_index], el_eta[electron_i
 		CFCounter_[iCut]+= all_weights;
                 iCFCounter[iCut]++;
 		iCut++;
+
+
+		if ( fabs(el_dz[electron_index]) > 0.02) continue;
+		if ( fabs(mu_dz[muon_index]) > 0.02) continue;
+		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
+		CFCounter[iCut]+= all_weights;
+		CFCounter_[iCut]+= all_weights;
+                iCFCounter[iCut]++;
+		iCut++;
+
 
 		if (met<20.) continue;
 		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);

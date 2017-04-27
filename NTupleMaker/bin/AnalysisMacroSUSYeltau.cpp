@@ -711,10 +711,16 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	  if (removeGammaStar) continue;
 	}
 */
+	isDYTT=false;
+	isDYLL=false;
+	isDYLL=false;
+	isDYEE=false;
+	isDYMM=false;
 	if (isDY) {
 	  
 	  if (promptTausFirstCopy.size()==2) {
 	    isZTT = true; isZMM = false; isZEE = false;
+	    isDYTT=true;
 	    bosonPx = promptTausLV.Px(); bosonPy = promptTausLV.Py(); bosonPz = promptTausLV.Pz(); 
 	    bosonMass = promptTausLV.M();
 	    bosonEta  = promptTausLV.Eta();
@@ -723,6 +729,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	  }
 	  else if (promptMuons.size()==2) {
 	    isZTT = false; isZMM = true; isZEE = false;
+	    isDYMM=true;
 	    bosonPx = promptMuonsLV.Px(); bosonPy = promptMuonsLV.Py(); bosonPz = promptMuonsLV.Pz(); 
 	    bosonMass = promptMuonsLV.M(); 
 	    bosonEta = promptMuonsLV.Eta();
@@ -731,6 +738,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	  }
 	  else {
 	    isZTT = false; isZMM = false; isZEE = true;
+	    isDYEE=true;
 	    bosonPx = promptElectronsLV.Px(); bosonPy = promptElectronsLV.Py(); bosonPz = promptElectronsLV.Pz(); 
 	    bosonMass = promptElectronsLV.M();
 	    bosonEta = promptElectronsLV.Eta();
@@ -913,6 +921,10 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	 metFlags.push_back("Flag_globalSuperTightHalo2016Filter");
 	// metFlags.push_back("Flag_METFilters");
 	 metFlags.push_back("Flag_eeBadScFilter");
+	 metFlags.push_back("Flag_BadChargedCandidateFilter");
+	 metFlags.push_back("Flag_BadPFMuonFilter");
+	 metFlags.push_back("Flag_muonBadTrackFilter");
+	 metFlags.push_back("Flag_chargedHadronTrackResolutionFilter");
 
 
 	bool METflag = metFiltersPasses2(analysisTree, metFlags);
@@ -1334,6 +1346,26 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
 
       if (!isData){
+	genTauMatched = false;
+	genLeptonMatchedPromptEl = false;
+	genLeptonMatchedPromptMu = false;
+	genLeptonMatchedPromptTau = false;
+	genElMatchedToTauDecay = false;
+	genMuMatchedToTauDecay = false;
+	genTauMatchedToTauDecay = false;
+	genElMatchedHadrDecay = false;
+	genMuMatchedHadrDecay = false;
+	genTauMatchedHadrDecay = false;
+	genLeptonMatchedHFQ = false;
+	genLeptonMatchedLFQ = false;
+	genLeptonMatchedGluon =false;
+	matchedTauToPromptEl = false;
+	matchedTauToPromptMu = false;
+	matchedTauToTauDecEl =false;
+	matchedTauToTauDecMu =false;
+	matchedTauToElHadronDec = false;
+	matchedTauToMuHadronDec = false;
+	matchedTauToTauHadronDec = false;
 	TLorentzVector genTauV;  
 	TLorentzVector genLepV;  
 
@@ -1373,13 +1405,13 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 		if ( abs(analysisTree.genparticles_pdgid[igen])==13 && analysisTree.genparticles_isPrompt[igen] > 0.5) genLeptonMatchedPromptMu = true;
 		if ( abs(analysisTree.genparticles_pdgid[igen])==15 && analysisTree.genparticles_isPrompt[igen] > 0.5) genLeptonMatchedPromptTau = true;
 
-		if (abs(analysisTree.genparticles_pdgid[igen])==11 && analysisTree.gentau_isDirectPromptTauDecayProduct[igen] > 0.5 ) genElMatchedToTauDecay = true;
-		if (abs(analysisTree.genparticles_pdgid[igen])==13 && analysisTree.gentau_isDirectPromptTauDecayProduct[igen] > 0.5 ) genMuMatchedToTauDecay = true;
-		if (abs(analysisTree.genparticles_pdgid[igen])==15 && analysisTree.gentau_isDirectPromptTauDecayProduct[igen] > 0.5 ) genTauMatchedToTauDecay = true;
+		if (abs(analysisTree.genparticles_pdgid[igen])==11 && analysisTree.genparticles_isDirectPromptTauDecayProduct[igen] > 0.5 ) genElMatchedToTauDecay = true;
+		if (abs(analysisTree.genparticles_pdgid[igen])==13 && analysisTree.genparticles_isDirectPromptTauDecayProduct[igen] > 0.5 ) genMuMatchedToTauDecay = true;
+		if (abs(analysisTree.genparticles_pdgid[igen])==15 && analysisTree.genparticles_isDirectPromptTauDecayProduct[igen] > 0.5 ) genTauMatchedToTauDecay = true;
 		
-		if (abs(analysisTree.genparticles_pdgid[igen])==11 && analysisTree.gentau_isDirectHadronDecayProduct[igen] > 0.5 ) genElMatchedHadrDecay = true;
-		if (abs(analysisTree.genparticles_pdgid[igen])==13 && analysisTree.gentau_isDirectHadronDecayProduct[igen] > 0.5 ) genMuMatchedHadrDecay = true;
-		if (abs(analysisTree.genparticles_pdgid[igen])==15 && analysisTree.gentau_isDirectHadronDecayProduct[igen] > 0.5 ) genTauMatchedHadrDecay = true;
+		if (abs(analysisTree.genparticles_pdgid[igen])==11 && analysisTree.genparticles_isDirectHadronDecayProduct[igen] > 0.5 ) genElMatchedHadrDecay = true;
+		if (abs(analysisTree.genparticles_pdgid[igen])==13 && analysisTree.genparticles_isDirectHadronDecayProduct[igen] > 0.5 ) genMuMatchedHadrDecay = true;
+		if (abs(analysisTree.genparticles_pdgid[igen])==15 && analysisTree.genparticles_isDirectHadronDecayProduct[igen] > 0.5 ) genTauMatchedHadrDecay = true;
 		
 		if ( (abs(analysisTree.genparticles_pdgid[igen])==1 || abs(analysisTree.genparticles_pdgid[igen])==5) && analysisTree.genparticles_isDirectHadronDecayProduct[igen] > 0.5) genLeptonMatchedHFQ = true;
 	

@@ -722,10 +722,16 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	  if (removeGammaStar) continue;
 	}
 */
+	isDYTT=false;
+	isDYLL=false;
+	isDYLL=false;
+	isDYEE=false;
+	isDYMM=false;
 	if (isDY) {
 	  
 	  if (promptTausFirstCopy.size()==2) {
 	    isZTT = true; isZMM = false; isZEE = false;
+	    isDYTT=true;
 	    bosonPx = promptTausLV.Px(); bosonPy = promptTausLV.Py(); bosonPz = promptTausLV.Pz(); 
 	    bosonMass = promptTausLV.M();
 	    bosonEta  = promptTausLV.Eta();
@@ -734,6 +740,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	  }
 	  else if (promptMuons.size()==2) {
 	    isZTT = false; isZMM = true; isZEE = false;
+	    isDYMM=true;
 	    bosonPx = promptMuonsLV.Px(); bosonPy = promptMuonsLV.Py(); bosonPz = promptMuonsLV.Pz(); 
 	    bosonMass = promptMuonsLV.M(); 
 	    bosonEta = promptMuonsLV.Eta();
@@ -742,6 +749,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	  }
 	  else {
 	    isZTT = false; isZMM = false; isZEE = true;
+	    isDYEE=true;
 	    bosonPx = promptElectronsLV.Px(); bosonPy = promptElectronsLV.Py(); bosonPz = promptElectronsLV.Pz(); 
 	    bosonMass = promptElectronsLV.M();
 	    bosonEta = promptElectronsLV.Eta();
@@ -923,7 +931,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	std::vector<TString> metFlags; metFlags.clear();
      //////////////MET filters flag
 
-	 
+
 	 metFlags.push_back("Flag_HBHENoiseFilter");
 	 metFlags.push_back("Flag_HBHENoiseIsoFilter");
 	 metFlags.push_back("Flag_EcalDeadCellTriggerPrimitiveFilter");
@@ -931,6 +939,10 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	 metFlags.push_back("Flag_globalSuperTightHalo2016Filter");
 	// metFlags.push_back("Flag_METFilters");
 	 metFlags.push_back("Flag_eeBadScFilter");
+	 metFlags.push_back("Flag_BadChargedCandidateFilter");
+	 metFlags.push_back("Flag_BadPFMuonFilter");
+	 metFlags.push_back("Flag_muonBadTrackFilter");
+	 metFlags.push_back("Flag_chargedHadronTrackResolutionFilter");
 
 
 	bool METflag = metFiltersPasses2(analysisTree, metFlags);
@@ -1348,12 +1360,19 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       Mu8EffMC0p15 = (float)SF_muon80p15->get_EfficiencyMC(double(pt_2),double(eta_2));
       Mu23EffMC0p15 = (float)SF_muon230p15->get_EfficiencyMC(double(pt_2),double(eta_2));
 
-	float termA =0; if (Mu23EffMC0p15*Ele12EffMC0p1>0.001)  termA = (Mu23EffData0p15*Ele12EffData0p1) / (Mu23EffMC0p15*Ele12EffMC0p1) ; 
-	float termB =0; if (Mu8EffMC0p15*Ele23EffMC0p1>0.001) termB = (Mu8EffData0p15*Ele23EffData0p1)/(Mu8EffMC0p15*Ele23EffMC0p1) ; 
-	float termC =0; if (Mu23EffMC0p15*Ele23EffMC0p1>0.001) termC = (Mu23EffData0p15*Ele23EffData0p1)/(Mu23EffMC0p15*Ele23EffMC0p1);
+	float termA =0;   termA = (Mu23EffData0p15*Ele12EffData0p1) ; 
+	float termB =0;   termB = (Mu8EffData0p15*Ele23EffData0p1); 
+	float termC =0;   termC = (Mu23EffData0p15*Ele23EffData0p1);
 
+	float termAMC =0;   termAMC =  (Mu23EffMC0p15*Ele12EffMC0p1) ; 
+	float termBMC =0;   termBMC = (Mu8EffMC0p15*Ele23EffMC0p1) ; 
+	float termCMC =0;   termCMC = (Mu23EffMC0p15*Ele23EffMC0p1);
 
-	 float trigWeight = termA + termB - termC;
+	 float trigWeight = (termA + termB - termC)/ (termAMC + termBMC - termCMC); 
+
+	 //if ( (termA==0 && termB==0) || (termAMC==0 && termBMC==0)) trigWeight =0;
+
+	// cout<<"  "<<trigWeight<<"  "<<termA<<"  "<<termAMC<<"  "<<termB<<"  "<<termBMC<<"  "<<termC<<"  "<<termCMC<<endl;
 
          if (SUSY) trigWeight = Mu23EffData0p15*Ele12EffData0p1 + Mu8EffData0p15*Ele23EffData0p1 - Mu23EffData0p15*Ele23EffData0p1;
 

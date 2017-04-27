@@ -21,7 +21,8 @@ using namespace std;
 
 const  int CutN=35;
 const  int CutF=35;
-
+const  int CutCat=10;
+const int nBinsSR=60;
 
 
 unsigned int RunMin = 9999999;
@@ -291,6 +292,10 @@ TH1D * histTopPt = new TH1D("histTopPt","",1,-0.5,0.5);
 TH1D * hWeights [CutN];
 TH1D * hEventSign [CutN];
 
+TH1D * hDeltaMET [CutN][60];
+TH1D * hDeltaMETRel [CutN][60];
+TH1D * hmet1D[CutN];
+
 TH1D * hMudxy [CutN];
 TH1D * hMudz [CutN];
 
@@ -436,10 +441,14 @@ TH1D *hIsoMuFake[CutN][CutF];
 TH1D *hIsoTauFake[CutN][CutF];
 TH1D *hMt2lesterFake[CutN][CutF];
 TH1D *hDZetaFake[CutN][CutF];
+TH1D *hTauDecayMode1[CutN];
+TH1D *hTauDecayMode2[CutN];
+TH1D *hTauDecayModeAll[CutN];
 
 
 TH1D *hMET[CutN];
 TH1D *hMETFB[CutN];
+TH1D *hGenMETFB[CutN];
 TH1D *hMETphi[CutN];
 //TH1D *hnOver[CutN];
 
@@ -497,6 +506,7 @@ TH1D *hMTtautau[CutN];
 
 
 TH1D *hMt2lesterDil[CutN];
+TH1D *hMt2lesterDilFB[CutN];
 TH1D *hMt2Dil[CutN];
 TH1D *hMCTDil[CutN];
 TH1D *hMCTbDil[CutN];
@@ -549,10 +559,8 @@ TH1D *hdR_taujet[CutN];
 TH1D *hnpv[CutN];
 TH1D *hnpu[CutN];
 TH1D *hnrho[CutN];
-TH1D *hmet_MT2lester_DZeta_1D[CutN];
-TH1D *hmet_MT2lester_DZeta_0J1D[CutN];
-TH1D *hmet_MT2lester_DZeta_1J1D[CutN];
 TH1D *hmet_MT2lester_DZeta_01J1D[CutN];
+
 
 TH1D *hmet_MT2lester1D[CutN];
 TH1D *hmet_DZeta1D[CutN];
@@ -630,7 +638,7 @@ TH1D *CutFlowUnWNorm= new TH1D("CutFlowUnWNorm","Cut Flow",CutN,1,CutN+1);
 TH1D *CutFlowUnWLoose= new TH1D("CutFlowUnWLoose","Cut Flow",CutN,1,CutN+1);
 TH1D *CutFlowUnWTight= new TH1D("CutFlowUnWTight","Cut Flow",CutN,1,CutN+1);
 
-TH1D *CutFlowUnWFakeRate[CutF][40];
+TH1D *CutFlowUnWFakeRate[CutF][nBinsSR];
 
 TH1D * inputEventsH = new TH1D("inputEventsH","",1,-0.5,0.5);
 TH1D * hxsec = new TH1D("xsec","",1,0,10e+20);
@@ -814,13 +822,16 @@ void WriteHists(int CutNer, TFile *in, TString dir){
 void SetupHistsFake(int CutNF){
 
 
-for(int nSR = 0; nSR < 40; nSR++){
+for(int nSR = 0; nSR < nBinsSR; nSR++){
   for(int cj = 0; cj < CutNF; cj++)
     	{
       TString nCut;
       TString nsr;
       nCut.Form("%i",cj);
       nsr.Form("%i",nSR);
+      
+     // cout<<" setting histo now "<<"CutFlowUnWFakeRate_"<<nCut<<"_"<<nsr<<endl;
+
       CutFlowUnWFakeRate[cj][nSR]= new TH1D("CutFlowUnWFakeRate_"+nCut+"_"+nsr,"Cut Flow",CutNF,1,CutNF+1);
 
 	int sz = FakeList.size();
@@ -880,6 +891,8 @@ for(int cj = 0; cj < CutNer; cj++)
 
 void SetupHists(int CutNer){
 
+
+
 for(int cj = 0; cj < CutNer; cj++)
     {
       CutFlow->GetXaxis()->SetBinLabel(cj+1,CutList[cj].c_str());
@@ -896,6 +909,26 @@ for(int cj = 0; cj < CutNer; cj++)
       TString fCut;
       ///generic variables
       
+for(int jj = 0; jj < 60; jj++){
+      TString nCutt;
+      nCutt.Form("%i",jj);
+      hDeltaMET[cj][jj] = new TH1D ("DeltaMET_"+nCut+"_bin"+nCutt,"DMET "+cutName,100,-100,100);
+      hDeltaMET[cj][jj]->Sumw2();
+      hDeltaMETRel[cj][jj] = new TH1D ("DeltaMETRel_"+nCut+"_bin"+nCutt,"DMETRel "+cutName,100,-10,10);
+      hDeltaMETRel[cj][jj]->Sumw2();
+
+}
+
+      hmet1D[cj]= new TH1D ("met1D_"+nCut,"met1D "+cutName,100,-100,100);
+      hmet1D[cj]->Sumw2();
+      hTauDecayMode1[cj] = new TH1D("TauDecayMode1_"+nCut,"TauDecayMode "+cutName, 10, -0.5,9.5);
+      hTauDecayMode1[cj]->Sumw2();
+      hTauDecayMode2[cj] = new TH1D("TauDecayMode2_"+nCut,"TauDecayMode "+cutName, 10, -0.5,9.5);
+      hTauDecayMode2[cj]->Sumw2();
+
+      hTauDecayModeAll[cj] = new TH1D("TauDecayModeAll_"+nCut,"TauDecayModeAll "+cutName, 11, -1.5,9.5);
+      hTauDecayModeAll[cj]->Sumw2();
+
       hDZeta[cj] = new TH1D("hDZeta_"+nCut,"hDZeta"+cutName,nBinsDZeta,binsDZeta);
       //hDZeta[cj] = new TH1D("hDZeta_"+nCut,"hDZeta"+cutName,30,-400,200);
       hDZeta[cj]->Sumw2();
@@ -995,6 +1028,7 @@ for(int cj = 0; cj < CutNer; cj++)
 
       hElrelIsoEl[cj] = new TH1D("el_relIsoEl_"+nCut,"el_relIsoEl "+cutName,200,0,10);
       hElrelIsoEl[cj]->Sumw2();
+
 
       hMudxy[cj] = new TH1D ("mu_dxy_"+nCut,"mu_dxy "+cutName,20,-.2,.2);
       hMudxy[cj]->Sumw2();
@@ -1192,6 +1226,9 @@ for(int cj = 0; cj < CutNer; cj++)
        
       hMETFB[cj] = new TH1D("METFB_"+nCut,"METFB "+cutName,50,0.,500.);
       hMETFB[cj]->Sumw2();
+      hGenMETFB[cj] = new TH1D("GenMETFB_"+nCut,"GenMETFB "+cutName,50,0.,500.);
+      hGenMETFB[cj]->Sumw2();
+
 
    
    int nBinsMT2lester = 8;
@@ -1397,6 +1434,9 @@ TH1D *hdEtaTauMET[CutN];
       hMt2lesterDil[cj] = new TH1D ("Mt2lesterDil_"+nCut,"Mt2lesterDil "+cutName,nBinsMT2lester,binsMT2lester);
       hMt2lesterDil[cj]->Sumw2();
 
+      hMt2lesterDilFB[cj] = new TH1D ("hMt2lesterDilFB_"+nCut,"Mt2lesterDilFB "+cutName,50,0,500);
+      hMt2lesterDilFB[cj]->Sumw2();
+
       hMCTDil[cj] = new TH1D ("MCTDil_"+nCut,"MCTDil "+cutName,50,0,500);
       hMCTDil[cj]->Sumw2();
       
@@ -1469,14 +1509,6 @@ TH1D *hdEtaTauMET[CutN];
 /////////////////////////////////////////1D histos
 //
 //
-      hmet_MT2lester_DZeta_1D[cj]= new TH1D ("met_MT2lester_DZeta1D_"+nCut,"met_MT2lester_DZeta1D "+cutName,29,0.5,29.5);;
-      hmet_MT2lester_DZeta_1D[cj]->Sumw2();
-
-      hmet_MT2lester_DZeta_0J1D[cj]= new TH1D ("met_MT2lester_DZeta0J1D_"+nCut,"met_MT2lester_DZeta0J1D "+cutName,29,0.5,29.5);;
-      hmet_MT2lester_DZeta_0J1D[cj]->Sumw2();
-      
-      hmet_MT2lester_DZeta_1J1D[cj]= new TH1D ("met_MT2lester_DZeta1J1D_"+nCut,"met_MT2lester_DZeta1J1D "+cutName,29,0.5,29.5);;
-      hmet_MT2lester_DZeta_1J1D[cj]->Sumw2();
       
       hmet_MT2lester_DZeta_01J1D[cj]= new TH1D ("met_MT2lester_DZeta01J1D_"+nCut,"met_MT2lester_DZeta01J1D "+cutName,58,0.5,58.5);;
       hmet_MT2lester_DZeta_01J1D[cj]->Sumw2();
