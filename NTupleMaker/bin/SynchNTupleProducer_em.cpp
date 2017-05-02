@@ -457,6 +457,8 @@ int main(int argc, char * argv[]) {
     Bool_t          dilepton_veto;
     Bool_t          extraelec_veto;
     Bool_t          extramuon_veto;
+
+    Bool_t          trg_muonelectron;
     
     Float_t         met;
     Float_t         metphi;
@@ -708,6 +710,7 @@ int main(int argc, char * argv[]) {
     tree->Branch("weight", &weight, "weight/F");
     
     tree->Branch("metFilters",&metFilters_,"metFilters/O");
+    tree->Branch("trg_muonelectron",&trg_muonelectron,"trg_muonelectron/O");
 
     tree->Branch("badChargedCandidateFilter",&badChargedCandidateFilter_,"badChargedCandidateFilter/O");
     tree->Branch("badPFMuonFilter",&badPFMuonFilter_,"badPFMuonFilter/O");
@@ -1149,8 +1152,11 @@ int main(int argc, char * argv[]) {
     metFlags.push_back("Flag_globalTightHalo2016Filter");
     metFlags.push_back("Flag_EcalDeadCellTriggerPrimitiveFilter");
     metFlags.push_back("Flag_goodVertices");
-    metFlags.push_back("Flag_eeBadScFilter");
-    
+    if (isData)
+      metFlags.push_back("Flag_eeBadScFilter");
+    metFlags.push_back("Flag_BadPFMuonFilter");
+    metFlags.push_back("Flag_BadChargedCandidateFilter");
+
     std::vector<TString> badChargedCandidateFlag; badChargedCandidateFlag.clear();
     badChargedCandidateFlag.push_back("Flag_BadChargedCandidateFilter");
     std::vector<TString> badPFMuonFlag; badPFMuonFlag.clear();
@@ -1200,7 +1206,7 @@ int main(int argc, char * argv[]) {
     }
     std::cout << std::endl;
     
-    TFile * fileTagging = new TFile(TString(cmsswBase)+TString("/src/DesyTauAnalyses/NTupleMaker/data/taggingEfficiencies_CSV_Medium.root"));
+    TFile * fileTagging = new TFile(TString(cmsswBase)+TString("/src/DesyTauAnalyses/NTupleMaker/data/tagging_efficiencies_Moriond2017.root"));
     TH1F * tagEff_B = (TH1F*)fileTagging->Get("btag_eff_b");
     TH1F * tagEff_C = (TH1F*)fileTagging->Get("btag_eff_c");
     TH1F * tagEff_Light = (TH1F*)fileTagging->Get("btag_eff_oth");
@@ -1846,16 +1852,14 @@ int main(int argc, char * argv[]) {
             
             
             // MET Filters
-            if (isData) {
-                metFilters_ = metFiltersPasses(analysisTree,metFlags);
-		badChargedCandidateFilter_ = metFiltersPasses(analysisTree,badChargedCandidateFlag);
-		badPFMuonFilter_ = metFiltersPasses(analysisTree,badPFMuonFlag);
-		badGlobalMuonFilter_ = metFiltersPasses(analysisTree,badGlobalMuonFlag);
-		muonBadTrackFilter_ = metFiltersPasses(analysisTree,muonBadTrackFlag);
-		chargedHadronTrackResolutionFilter_ = metFiltersPasses(analysisTree,chargedHadronTrackResolutionFlag);
-            }
-            
+	    metFilters_ = metFiltersPasses(analysisTree,metFlags);
+	    badChargedCandidateFilter_ = metFiltersPasses(analysisTree,badChargedCandidateFlag);
+	    badPFMuonFilter_ = metFiltersPasses(analysisTree,badPFMuonFlag);
+	    badGlobalMuonFilter_ = metFiltersPasses(analysisTree,badGlobalMuonFlag);
+	    muonBadTrackFilter_ = metFiltersPasses(analysisTree,muonBadTrackFlag);
+	    chargedHadronTrackResolutionFilter_ = metFiltersPasses(analysisTree,chargedHadronTrackResolutionFlag);
 
+	    /*
 	    for (unsigned int iT=0; iT<analysisTree.trigobject_count; ++iT) {
 	      bool lowPtMuon = false;
 	      bool highPtMuon = false;
@@ -1875,15 +1879,16 @@ int main(int argc, char * argv[]) {
 			  << "  phi = " << analysisTree.trigobject_phi[iT] << std::endl;
 
 	    }
+	    
+            
+	    std::cout << "LowPtE  : " << LowPtLegElectron << " : " << nLowPtLegElectron << std::endl;
+	    std::cout << "HighPtE : " << HighPtLegElectron << " : " << nHighPtLegElectron << std::endl;
+	    std::cout << "LowPtM  : " << LowPtLegMuon << " : " << nLowPtLegMuon << std::endl;
+	    std::cout << "HighPtM : " << HighPtLegMuon << " : " << nHighPtLegMuon << std::endl;
+	    std::cout << BTagDiscriminator << " : "<< nBTagDiscriminant << std::endl;
+	    std::cout << std::endl;
+	    */
 
-            /*
-             std::cout << "LowPtE  : " << LowPtLegElectron << " : " << nLowPtLegElectron << std::endl;
-             std::cout << "HighPtE : " << HighPtLegElectron << " : " << nHighPtLegElectron << std::endl;
-             std::cout << "LowPtM  : " << LowPtLegMuon << " : " << nLowPtLegMuon << std::endl;
-             std::cout << "HighPtM : " << HighPtLegMuon << " : " << nHighPtLegMuon << std::endl;
-             std::cout << BTagDiscriminator << " : "<< nBTagDiscriminant << std::endl;
-             std::cout << std::endl;
-             */
             //      continue;
             
             // vertex cuts no longer required
@@ -1949,9 +1954,11 @@ int main(int argc, char * argv[]) {
                 muons.push_back(im);
             }
             
+
+	    if (metFilters_<0.5) continue;
+	    metFilters_ = metFilters_ && badMuonFilter_ && duplicateMuonFilter_;
 	    //	    cout << "  SelEle=" << electrons.size()
 	    //		 << "  SelMu=" << muons.size() << std::endl;
-            
             if (electrons.size()==0) continue;
             if (muons.size()==0) continue;
             
@@ -1968,10 +1975,6 @@ int main(int argc, char * argv[]) {
             bool isElectron23matched = false;
             bool isElectron12matched = false;
             for (unsigned int im=0; im<muons.size(); ++im) {
-                bool isMu23 = false;
-                bool isMu8 = false;
-		bool isMu23dz = false;
-		bool isMu8dz  = false;
                 unsigned int mIndex  = muons.at(im);
                 float neutralHadIsoMu = analysisTree.muon_neutralHadIso[mIndex];
                 float photonIsoMu = analysisTree.muon_photonIso[mIndex];
@@ -1987,39 +1990,10 @@ int main(int argc, char * argv[]) {
                 neutralIsoMu = TMath::Max(float(0),neutralIsoMu);
                 float absIsoMu = chargedHadIsoMu + neutralIsoMu;
                 float relIsoMu = absIsoMu/analysisTree.muon_pt[mIndex];
-                for (unsigned int iT=0; iT<analysisTree.trigobject_count; ++iT) {
-                    float dRtrig = deltaR(analysisTree.muon_eta[mIndex],analysisTree.muon_phi[mIndex],
-                                          analysisTree.trigobject_eta[iT],analysisTree.trigobject_phi[iT]);
-                    if (dRtrig<deltaRTrigMatch) {
-                        if (analysisTree.trigobject_filters[iT][nHighPtLegMuon]&&
-                            analysisTree.muon_pt[mIndex]>ptMuonHighCut) { // Mu23 Leg
-                            isMu23 = true;
-                        }
-                        if (analysisTree.trigobject_filters[iT][nLowPtLegMuon]&&
-                            analysisTree.muon_pt[mIndex]>ptMuonLowCut) { // Mu8 Leg
-                            isMu8 = true;
-                        }
-			if (analysisTree.trigobject_filters[iT][nMu23Ele12DzFilter])
-			  isMu23dz = true;
-			if (analysisTree.trigobject_filters[iT][nMu8Ele23DzFilter])
-                          isMu8dz = true;
-
-                    }
-                }
-		if (applyDzFilterMatch) {
-		  isMu23 = isMu23 && isMu23dz;
-		  isMu8 = isMu8 && isMu8dz;
-		}
-                if (!applyTriggerMatch) {
-                    isMu23 = true;
-                    isMu8 = true;
-                }
 
 		//		cout << "muon " << im
 		//		     << "   pt = " << analysisTree.muon_pt[im] << "   eta = " << analysisTree.muon_eta[im]
 		//		     << " : isMu23 = " << isMu23 << "  isMu8 = " << isMu8 << std::endl;
-                
-		if (applyTriggerMatch && (!isMu23) && (!isMu8)) continue;
                 
                 for (unsigned int ie=0; ie<electrons.size(); ++ie) {
                     
@@ -2033,48 +2007,15 @@ int main(int argc, char * argv[]) {
 
                     if (dR<dRleptonsCut) continue;
                     
-                    bool isEle23 = false;
-                    bool isEle12 = false;
-		    bool isEle23dz = false;
-		    bool isEle12dz = false;
 
-                    for (unsigned int iT=0; iT<analysisTree.trigobject_count; ++iT) {
-                        float dRtrig = deltaR(analysisTree.electron_eta[eIndex],analysisTree.electron_phi[eIndex],
-                                              analysisTree.trigobject_eta[iT],analysisTree.trigobject_phi[iT]);
-                        if (dRtrig<deltaRTrigMatch) {
-                            if (analysisTree.trigobject_filters[iT][nHighPtLegElectron]&&
-                                analysisTree.electron_pt[eIndex]>ptElectronHighCut) { // Ele23 Leg
-                                isEle23 = true;
-                            }
-                            if (analysisTree.trigobject_filters[iT][nLowPtLegElectron]&&
-                                analysisTree.electron_pt[eIndex]>ptElectronLowCut) { // Ele12 Leg
-                                isEle12 = true;
-                            }
-			    if (analysisTree.trigobject_filters[iT][nMu23Ele12DzFilter])
-			      isEle12dz = true;
-			    if (analysisTree.trigobject_filters[iT][nMu8Ele23DzFilter])
-			      isEle23dz = true;
-                        }
-                    }
-                    
-		    if (applyDzFilterMatch) {
-		      isEle23 = isEle23 && isEle23dz;
-		      isEle12 = isEle12 && isEle12dz;
-		    }		      
-
-                    if (!applyTriggerMatch) {
-                        isEle23 = true;
-                        isEle12 = true;
-                    }
-                    
 		    //		    cout << "electron " << ie 
 		    //			 << "   pt = " << analysisTree.electron_pt[ie] << "   eta = " << analysisTree.electron_eta[ie]
 		    //			 << " : isEle23 = " << isEle23 << "  isEle12 = " << isEle12 << std::endl;
 
 
                     bool trigMatch =
-                    (isMu23&&isEle12&&analysisTree.muon_pt[mIndex]>ptMuonHighCut) ||
-                    (isMu8&&isEle23&&analysisTree.electron_pt[eIndex]>ptElectronHighCut);
+                    (analysisTree.muon_pt[mIndex]>ptMuonHighCut) ||
+                    (analysisTree.electron_pt[eIndex]>ptElectronHighCut);
                     //	  std::cout << "Trigger match = " << trigMatch << std::endl;
                     
                     if (!trigMatch) continue;
@@ -2106,46 +2047,33 @@ int main(int argc, char * argv[]) {
                     float relIsoEle = absIsoEle/analysisTree.electron_pt[eIndex];
                     
                     if (int(mIndex)!=muonIndex) {
-                        if (relIsoMu==isoMuMin) {
-                            if (analysisTree.muon_pt[mIndex]>analysisTree.muon_pt[muonIndex]) {
-                                isoMuMin  = relIsoMu;
-                                muonIndex = int(mIndex);
-                                isoEleMin = relIsoEle;
-                                electronIndex = int(eIndex);
-                                isMuon23matched = isMu23;
-                                isMuon8matched = isMu8;
-                                isElectron23matched = isEle23;
-                                isElectron12matched = isEle12;
-                            }
-                        }
-                        else if (relIsoMu<isoMuMin) {
-                            isoMuMin  = relIsoMu;
-                            muonIndex = int(mIndex);
-                            isoEleMin = relIsoEle;
-                            electronIndex = int(eIndex);
-                            isMuon23matched = isMu23;
-                            isMuon8matched = isMu8;
-                            isElectron23matched = isEle23;
-                            isElectron12matched = isEle12;
-                        }
+		      if (relIsoMu==isoMuMin) {
+			if (analysisTree.muon_pt[mIndex]>analysisTree.muon_pt[muonIndex]) {
+			  isoMuMin  = relIsoMu;
+			  muonIndex = int(mIndex);
+			  isoEleMin = relIsoEle;
+			  electronIndex = int(eIndex);
+			}
+		      }
+		      else if (relIsoMu<isoMuMin) {
+			isoMuMin  = relIsoMu;
+			muonIndex = int(mIndex);
+			isoEleMin = relIsoEle;
+			electronIndex = int(eIndex);
+		      }
                     }
                     else {
-                        if (relIsoEle==isoEleMin) {
-                            if (analysisTree.electron_pt[eIndex]>analysisTree.electron_pt[electronIndex]) {
-                                isoEleMin = relIsoEle;
-                                electronIndex = int(eIndex);
-                                isElectron23matched = isEle23;
-                                isElectron12matched = isEle12;
-                            }
-                        }
-                        else if (relIsoEle<isoEleMin) {
-                            isoEleMin = relIsoEle;
-                            electronIndex = int(eIndex);
-                            isElectron23matched = isEle23;
-                            isElectron12matched = isEle12;
-                        }
+		      if (relIsoEle==isoEleMin) {
+			if (analysisTree.electron_pt[eIndex]>analysisTree.electron_pt[electronIndex]) {
+			  isoEleMin = relIsoEle;
+			  electronIndex = int(eIndex);
+			}
+		      }
+		      else if (relIsoEle<isoEleMin) {
+			isoEleMin = relIsoEle;
+			electronIndex = int(eIndex);
+		      }
                     }
-                    
                 }
             }
 
@@ -2153,7 +2081,71 @@ int main(int argc, char * argv[]) {
             
             if (electronIndex<0) continue;
             if (muonIndex<0) continue;
+
+	    bool isMu23 = false;
+	    bool isMu8 = false;
+	    bool isMu23dz = false;
+	    bool isMu8dz  = false;
+
+	    for (unsigned int iT=0; iT<analysisTree.trigobject_count; ++iT) {
+	      float dRtrig = deltaR(analysisTree.muon_eta[muonIndex],analysisTree.muon_phi[muonIndex],
+				    analysisTree.trigobject_eta[iT],analysisTree.trigobject_phi[iT]);
+	      if (dRtrig<deltaRTrigMatch) {
+		if (analysisTree.trigobject_filters[iT][nHighPtLegMuon]&&
+		    analysisTree.muon_pt[muonIndex]>ptMuonHighCut) { // Mu23 Leg
+		  isMu23 = true;
+		}
+		if (analysisTree.trigobject_filters[iT][nLowPtLegMuon]&&
+		    analysisTree.muon_pt[muonIndex]>ptMuonLowCut) { // Mu8 Leg
+		  isMu8 = true;
+		}
+		if (analysisTree.trigobject_filters[iT][nMu23Ele12DzFilter])
+		  isMu23dz = true;
+		if (analysisTree.trigobject_filters[iT][nMu8Ele23DzFilter])
+		  isMu8dz = true;
+		
+	      }
+	    }
+	    if (applyDzFilterMatch) {
+	      isMu23 = isMu23 && isMu23dz;
+	      isMu8 = isMu8 && isMu8dz;
+	    }
+
+	    bool isEle23 = false;
+	    bool isEle12 = false;
+	    bool isEle23dz = false;
+	    bool isEle12dz = false;
+	    
+	    for (unsigned int iT=0; iT<analysisTree.trigobject_count; ++iT) {
+	      float dRtrig = deltaR(analysisTree.electron_eta[electronIndex],analysisTree.electron_phi[electronIndex],
+				    analysisTree.trigobject_eta[iT],analysisTree.trigobject_phi[iT]);
+	      if (dRtrig<deltaRTrigMatch) {
+		if (analysisTree.trigobject_filters[iT][nHighPtLegElectron]&&
+		    analysisTree.electron_pt[electronIndex]>ptElectronHighCut) { // Ele23 Leg
+		  isEle23 = true;
+		}
+		if (analysisTree.trigobject_filters[iT][nLowPtLegElectron]&&
+		    analysisTree.electron_pt[electronIndex]>ptElectronLowCut) { // Ele12 Leg
+		  isEle12 = true;
+		}
+		if (analysisTree.trigobject_filters[iT][nMu23Ele12DzFilter])
+		  isEle12dz = true;
+		if (analysisTree.trigobject_filters[iT][nMu8Ele23DzFilter])
+		  isEle23dz = true;
+	      }
+	    }
             
+	    if (applyDzFilterMatch) {
+	      isEle23 = isEle23 && isEle23dz;
+	      isEle12 = isEle12 && isEle12dz;
+	    }		      
+            
+
+	    trg_muonelectron = 
+	      (isMu23&&isEle12&&analysisTree.muon_pt[muonIndex]>ptMuonHighCut) ||
+	      (isMu8&&isEle23&&analysisTree.electron_pt[electronIndex]>ptElectronHighCut);
+
+	    if (applyTriggerMatch&&trg_muonelectron<0.5) continue;
             
             os = (analysisTree.muon_charge[muonIndex]*analysisTree.electron_charge[electronIndex]) < 0;
             
@@ -2277,7 +2269,7 @@ int main(int argc, char * argv[]) {
                 isoweight_1 = (float)SF_electronIdIso->get_ScaleFactor(double(pt_1),double(eta_1));
                 isoweight_2 = (float)SF_muonIdIso->get_ScaleFactor(double(pt_2),double(eta_2));
                 
-		/*
+		
                 float eta1_sf = eta_1;
                 if (eta1_sf<-2.5) eta1_sf = -2.49;
                 if (eta1_sf>2.5) eta1_sf = 2.49;
@@ -2291,7 +2283,7 @@ int main(int argc, char * argv[]) {
 
                 isoweight_1 *= idweight_1;
                 isoweight_2 *= idweight_2;
-                */
+                
 		//		cout << "isoweight_1 = " << isoweight_1
 		//		     << "isoweight_2 = " << isoweight_2 << endl;
                 
