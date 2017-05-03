@@ -298,11 +298,20 @@ int main(int argc, char * argv[]) {
   Bool_t jettauAntiElectronVLooseMVA6_;
   Bool_t jettauAntiElectronLooseMVA6_;
 
+  Float_t jettauLeadingTrackPt_;
+  Float_t jettauLeadingTrackEta_;
+  Float_t jettauLeadingTrackPhi_;
+  Float_t jettauLeadingTrackDz_;
+  Float_t jettauLeadingTrackDxy_;
+
   UInt_t jetChargedMult_;
   UInt_t jetNeutralMult_;
   UInt_t jetChargedHadMult_;
   Float_t jetNeutralEMEnergyFraction_;
   Float_t jetNeutralHadEnergyFraction_;
+
+  Float_t muonJetTauMass_;
+  Float_t muonJetTauTrkMass_;
 
   Float_t jet2Pt_;
   Float_t jet2Eta_;
@@ -446,6 +455,15 @@ int main(int argc, char * argv[]) {
   ntuple_->Branch("jettauDecay",&jettauDecay_,"jettauDecay/I");
   ntuple_->Branch("jettauGenDecay",&jettauGenDecay_,"jettauGenDecay/I");
   ntuple_->Branch("jettauGenMatch",&jettauGenMatch_,"jettauGenMatch/I");
+
+  ntuple_->Branch("jettauLeadingTrackPt",&jettauLeadingTrackPt_,"jettauLeadingTrackPt/F");
+  ntuple_->Branch("jettauLeadingTrackEta",&jettauLeadingTrackEta_,"jettauLeadingTrackEta/F");
+  ntuple_->Branch("jettauLeadingTrackPhi",&jettauLeadingTrackPhi_,"jettauLeadingTrackPhi/F");
+  ntuple_->Branch("jettauLeadingTrackDz",&jettauLeadingTrackDz_,"jettauLeadingTrackDz/F");
+  ntuple_->Branch("jettauLeadingTrackDxy",&jettauLeadingTrackDxy_,"jettauLeadingTrackDxy/F");
+
+  ntuple_->Branch("muonjettauMass",&muonJetTauMass_,"muonjettauMass/F");
+  ntuple_->Branch("muonjettautrkMass",&muonJetTauTrkMass_,"muonjettautrkMass/F");
 
   ntuple_->Branch("jetChargedMult",   &jetChargedMult_,   "jetChargedMult/i");
   ntuple_->Branch("jetNeutralMult",   &jetNeutralMult_,   "jetNeutralMult/i");
@@ -678,6 +696,12 @@ int main(int argc, char * argv[]) {
       jettauVTightMvaIso_ = false;
       jettauAntiMuonLoose3_ = false;
       jettauAntiMuonTight3_ = false;
+
+      jettauLeadingTrackPt_  = 0;
+      jettauLeadingTrackEta_ = 0;
+      jettauLeadingTrackPhi_ = 0;
+      jettauLeadingTrackDz_  = -999;
+      jettauLeadingTrackDxy_ = -999;
 
       jettauDecay_ = -1;
       jettauGenDecay_ = -1;
@@ -1420,6 +1444,8 @@ int main(int argc, char * argv[]) {
       SoftHt_    = SoftJetHt_ + muonHt + elecHt;
       TLorentzVector lorentzVectorJet; lorentzVectorJet.SetXYZT(0,0,0,0);
       TLorentzVector lorentzVectorJet2; lorentzVectorJet2.SetXYZT(0,0,0,0);
+      TLorentzVector lorentzVectorTau; lorentzVectorTau.SetXYZT(0,0,0,0);
+      TLorentzVector lorentzVectorTauTrk; lorentzVectorTauTrk.SetXYZT(0,0,0,0);
       if (nJetsCentral20_>0) {
 	unsigned int indexJet0 = indexLeadingJet;
 	jetPt_ = analysisTree.pfjet_pt[indexJet0];
@@ -1490,7 +1516,30 @@ int main(int argc, char * argv[]) {
 	  jettauDecay_ = analysisTree.tau_decayMode[taujetIndex];
 	  jettauGenDecay_ = analysisTree.tau_genDecayMode[taujetIndex];
 	  
+	  jettauLeadingTrackPt_ = PtoPt(analysisTree.tau_leadchargedhadrcand_px[indexTau],
+				     analysisTree.tau_leadchargedhadrcand_py[indexTau]);
 
+	  jettauLeadingTrackEta_ = PtoEta(analysisTree.tau_leadchargedhadrcand_px[indexTau],
+				       analysisTree.tau_leadchargedhadrcand_py[indexTau],
+				       analysisTree.tau_leadchargedhadrcand_pz[indexTau]);
+
+	  jettauLeadingTrackPhi_ = PtoPhi(analysisTree.tau_leadchargedhadrcand_px[indexTau],
+				       analysisTree.tau_leadchargedhadrcand_py[indexTau]);
+	  
+	  jettauLeadingTrackDz_  = analysisTree.tau_leadchargedhadrcand_dz[indexTau];
+	  jettauLeadingTrackDxy_ = analysisTree.tau_leadchargedhadrcand_dxy[indexTau];
+
+	  lorentzVectorTau.SetXYZT(analysisTree.tau_px[indexTau],
+				   analysisTree.tau_py[indexTau],
+				   analysisTree.tau_pz[indexTau],
+				   analysisTree.tau_e[indexTau]);
+
+	  lorentzVectorTauTrk.SetXYZM(analysisTree.tau_leadchargedhadrcand_px[indexTau],
+				      analysisTree.tau_leadchargedhadrcand_py[indexTau],
+				      analysisTree.tau_leadchargedhadrcand_pz[indexTau],
+				      pionMass);
+
+	  
 	  jettauGenMatch_ = 6;
 	  if (jettauGenDecay_>=0) jettauGenMatch_ = 5;
 	  float minDR = 0.2;
@@ -1695,6 +1744,9 @@ int main(int argc, char * argv[]) {
 	// ******* WJet selection ****
 	// ***************************
 	if (lorentzVectorW.Pt()>1e-4) {
+
+	  muonJetTauMass_ = (lorentzVectorTriggerMu+lorentzVectorTau).M();
+	  muonJetTauTrkMass_ = (lorentzVectorTriggerMu+lorentzVectorTauTrk).M();
 	  
 	  recoilRatio_ = jetPt_ / lorentzVectorW.Pt();
 	  recoilDPhi_  = dPhiFromLV(lorentzVectorW,lorentzVectorJet);
