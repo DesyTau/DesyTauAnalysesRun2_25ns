@@ -110,6 +110,8 @@ void Spring15Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("mva_1", &mva_1, &b_mva_1);
    fChain->SetBranchAddress("d0_1", &d0_1, &b_d0_1);
    fChain->SetBranchAddress("dZ_1", &dZ_1, &b_dZ_1);
+   fChain->SetBranchAddress("d0err_1", &d0err_1, &b_d0err_1);
+   fChain->SetBranchAddress("dZerr_1", &dZerr_1, &b_dZerr_1);
    fChain->SetBranchAddress("mt_1", &mt_1, &b_mt_1);
    fChain->SetBranchAddress("pfmt_1", &pfmt_1, &b_pfmt_1);
    fChain->SetBranchAddress("puppimt_1", &puppimt_1, &b_puppimt_1);
@@ -426,6 +428,8 @@ void Spring15Tree::WriteInit(TTree *tree) {
   fChain->Branch("mva_1", &mva_1, "mva_1/F");
   fChain->Branch("d0_1", &d0_1, "d0_1/F");
   fChain->Branch("dZ_1", &dZ_1, "dZ_1/F");
+  fChain->Branch("d0err_1", &d0err_1, "d0err_1/F");
+  fChain->Branch("dZerr_1", &dZerr_1, "dZerr_1/F");
   fChain->Branch("mt_1", &mt_1, "mt_1/F");
   fChain->Branch("pfmt_1", &pfmt_1, "pfmt_1/F");
   fChain->Branch("puppimt_1", &puppimt_1, "puppimt_1/F");

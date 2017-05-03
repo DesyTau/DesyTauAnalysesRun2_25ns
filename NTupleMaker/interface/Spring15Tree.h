@@ -80,6 +80,8 @@ public :
   Float_t         mva_1;
   Float_t         d0_1;
   Float_t         dZ_1;
+  Float_t         d0err_1;
+  Float_t         dZerr_1;
   Float_t         mt_1;
   Float_t         pfmt_1;
   Float_t         puppimt_1;
@@ -318,6 +320,8 @@ public :
   TBranch        *b_mva_1;   //!
   TBranch        *b_d0_1;   //!
   TBranch        *b_dZ_1;   //!
+  TBranch        *b_d0err_1;   //!
+  TBranch        *b_dZerr_1;   //!
   TBranch        *b_mt_1;   //!
   TBranch        *b_pfmt_1;   //!
   TBranch        *b_puppimt_1;   //!
