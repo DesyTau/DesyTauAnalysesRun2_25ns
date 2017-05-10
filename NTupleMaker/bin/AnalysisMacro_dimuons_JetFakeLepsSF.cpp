@@ -98,6 +98,12 @@ int main(int argc, char * argv[])
     const float jetPtCut   = cfg.get<float>("JetPtCut");
     const float dRJetLeptonCut = cfg.get<float>("dRJetLeptonCut");
     
+    const string zMassPtWeightsFileName   = cfg.get<string>("ZMassPtWeightsFileName");
+    TString ZMassPtWeightsFileName(zMassPtWeightsFileName);
+    
+    const string zMassPtWeightsHistName   = cfg.get<string>("ZMassPtWeightsHistName");
+    TString ZMassPtWeightsHistName(zMassPtWeightsHistName);
+    
     // **** end of configuration
     
     string cmsswBase = (getenv ("CMSSW_BASE"));
@@ -161,6 +167,7 @@ int main(int argc, char * argv[])
     Float_t         idweight_1;
     Float_t         isoweight_1;
     Float_t         effweight;
+    Float_t         zptmassweight;
     Float_t         iso_1;
     Float_t         iso_2;
     Int_t           JetMatchingMuonStatus;
@@ -194,6 +201,23 @@ int main(int argc, char * argv[])
     Float_t jet_eta;
     Float_t jet_phi;
     
+    Float_t         nuPx;  // neutrinos from t -> W(lv) + b
+    Float_t         nuPy;  // or from tau->l+v+v events
+    Float_t         nuPz;  // (x,y,z) components
+    Float_t         nuPt;  // pT
+    Float_t         nuPhi; // phi
+    
+    Float_t         lepPx;
+    Float_t         lepPy;
+    Float_t         lepPz;
+    
+    Float_t         bosonPx;
+    Float_t         bosonPy;
+    Float_t         bosonPz;
+    Float_t         bosonPt;
+    Float_t         bosonEta;
+    Float_t         bosonMass;
+    
     ZMMTree->Branch("isZLL",&isZLL,"isZLL/O");
     ZMMTree->Branch("isZEE",&isZEE,"isZEE/O");
     ZMMTree->Branch("isZMM",&isZMM,"isZMM/O");
@@ -205,6 +229,8 @@ int main(int argc, char * argv[])
     ZMMTree->Branch("idweight_1", &idweight_1, "idweight_1/F");
     ZMMTree->Branch("isoweight_1", &isoweight_1, "isoweight_1/F");
     ZMMTree->Branch("effweight", &effweight, "effweight/F");
+    ZMMTree->Branch("zptmassweight",&zptmassweight,"zptmassweight/F");
+
     ZMMTree->Branch("iso_1",&iso_1,"iso_1/F");
     ZMMTree->Branch("iso_2",&iso_2,"iso_2/F");
     ZMMTree->Branch("JetMatchingMuonStatus",&JetMatchingMuonStatus,"JetMatchingMuonStatus/I");
@@ -240,6 +266,22 @@ int main(int argc, char * argv[])
     ZMMTree->Branch("jet_eta",&jet_eta,"jet_eta/F");
     ZMMTree->Branch("jet_phi",&jet_phi,"jet_phi/F");
     
+    ZMMTree->Branch("nuPx",&nuPx,"nuPx/F");
+    ZMMTree->Branch("nuPy",&nuPy,"nuPy/F");
+    ZMMTree->Branch("nuPz",&nuPz,"nuPz/F");
+    ZMMTree->Branch("nuPt",&nuPt,"nuPt/F");
+    ZMMTree->Branch("nuPhi",&nuPhi,"nuPhi/F");
+    
+    ZMMTree->Branch("lepPx",&lepPx,"lepPx/F");
+    ZMMTree->Branch("lepPy",&lepPy,"lepPy/F");
+    ZMMTree->Branch("lepPz",&lepPz,"lepPz/F");
+    
+    ZMMTree->Branch("bosonPx",&bosonPx,"bosonPx/F");
+    ZMMTree->Branch("bosonPy",&bosonPy,"bosonPy/F");
+    ZMMTree->Branch("bosonPz",&bosonPz,"bosonPz/F");
+    ZMMTree->Branch("bosonPt",&bosonPt,"bosonPt/F");
+    ZMMTree->Branch("bosonMass",&bosonMass,"bosonMass/F");
+    
     
     TH1D * PUweightsOfficialH = new TH1D("PUweightsOfficialH","PU weights w/ official reweighting",1000, 0, 10);
     TH1D * nTruePUInteractionsH = new TH1D("nTruePUInteractionsH","",50,-0.5,49.5);
@@ -263,6 +305,20 @@ int main(int argc, char * argv[])
     SF_muonIdIso->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(MuonIdIsoFile));
     ScaleFactor * SF_muonTrig = new ScaleFactor();
     SF_muonTrig->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(MuonTriggerFile));
+    
+    // Z pt mass weights
+    TFile * fileZMassPtWeights = new TFile(TString(cmsswBase)+"/src/"+ZMassPtWeightsFileName);
+    if (fileZMassPtWeights->IsZombie()) {
+        std::cout << "File " << TString(cmsswBase) << "/src/" << ZMassPtWeightsFileName << "  does not exist!" << std::endl;
+        exit(-1);
+    }
+    TH2D * histZMassPtWeights = (TH2D*)fileZMassPtWeights->Get(ZMassPtWeightsHistName);
+    if (histZMassPtWeights==NULL) {
+        std::cout << "histogram " << ZMassPtWeightsHistName << " is not found in file " << TString(cmsswBase) << "/src/DesyTauAnalyses/NTupleMaker/data/" << ZMassPtWeightsFileName
+        << std::endl;
+        exit(-1);
+    }
+    
     int nFiles = 0;
     int nEvents = 0;
     int selEventsIsoMuons = 0;
@@ -342,6 +398,7 @@ int main(int argc, char * argv[])
             isoweight_1 = 1;
             effweight = 1;
             mcweight = 1;
+            zptmassweight = 1;
             
             //------------------------------------------------
             if (!isData)
@@ -569,6 +626,9 @@ int main(int argc, char * argv[])
 
             }
             
+            //if(isoMuons.size()>2)
+               // cout << "iso Muon numbers: " << isoMuons.size() << endl;
+            
             //electron selection
             vector<unsigned int> allEles; allEles.clear();
             vector<unsigned int> idEles; idEles.clear();
@@ -588,7 +648,6 @@ int main(int argc, char * argv[])
                 if (!analysisTree.electron_mva_wp80_general_Spring16_v1[ie]) elePassed = false;
                 if (!analysisTree.electron_pass_conversion[ie]) elePassed = false;
                 if (elePassed) idEles.push_back(ie);
-                
                 float absIso = 0;
                 if (isoDR03)
                 {
@@ -615,17 +674,38 @@ int main(int argc, char * argv[])
                 isElePassedIdIso.push_back(elePassed);
 
             }
+            //if(isoEles.size()>0)
+                //cout << "iso ele number:" << isoEles.size()<< endl;
             
-            //cout << "iso ele number:" << isoEles.size()<< endl;
+            //cout << "-----------------------------------" << endl;
             
-            //determining isZMM isZTT or isZEE
+            //determining isZMM isZTT or isZEE and implementing zptmasweight
             std::vector<TLorentzVector> promptTausFirstCopy; promptTausFirstCopy.clear();
             std::vector<TLorentzVector> promptTausLastCopy;  promptTausLastCopy.clear();
             std::vector<TLorentzVector> promptElectrons; promptElectrons.clear();
             std::vector<TLorentzVector> promptMuons; promptMuons.clear();
+            std::vector<TLorentzVector> promptNeutrinos; promptNeutrinos.clear();
+            std::vector<TLorentzVector> tauNeutrinos; tauNeutrinos.clear();
+            
+            TLorentzVector promptTausLV; promptTausLV.SetXYZT(0.001,0.001,0,0);
+            TLorentzVector promptVisTausLV; promptVisTausLV.SetXYZT(0.001,0.001,0,0);
+            TLorentzVector zBosonLV; zBosonLV.SetXYZT(0,0,0,0);
+            TLorentzVector wBosonLV; wBosonLV.SetXYZT(0,0,0,0);
+            TLorentzVector hBosonLV; hBosonLV.SetXYZT(0,0,0,0);
+            TLorentzVector promptElectronsLV; promptElectronsLV.SetXYZT(0.001,0.001,0,0);
+            TLorentzVector promptMuonsLV; promptMuonsLV.SetXYZT(0.001,0.001,0,0);
+            TLorentzVector promptNeutrinosLV;  promptNeutrinosLV.SetXYZT(0,0,0,0);
+            TLorentzVector tauNeutrinosLV;  tauNeutrinosLV.SetXYZT(0,0,0,0);
+            TLorentzVector wDecayProductsLV; wDecayProductsLV.SetXYZT(0,0,0,0);
+            TLorentzVector fullVLV; fullVLV.SetXYZT(0,0,0,0);
+            TLorentzVector visVLV; visVLV.SetXYZT(0,0,0,0);
+            
+            TLorentzVector genBosonLV; genBosonLV.SetXYZT(0,0,0,0);
+            TLorentzVector genVisBosonLV; genVisBosonLV.SetXYZT(0,0,0,0);
             
             if(!isData)
             {
+                // computing boson 4-vector
                 for (unsigned int igentau=0; igentau < analysisTree.gentau_count; ++igentau) {
                     TLorentzVector tauLV; tauLV.SetXYZT(analysisTree.gentau_px[igentau],
                                                         analysisTree.gentau_py[igentau],
@@ -637,9 +717,12 @@ int main(int argc, char * argv[])
                                                               analysisTree.gentau_visible_e[igentau]);
                     if (analysisTree.gentau_isPrompt[igentau]&&analysisTree.gentau_isFirstCopy[igentau]) {
                         promptTausFirstCopy.push_back(tauLV);
+                        promptTausLV += tauLV;
+                        wDecayProductsLV += tauLV;
                     }
                     if (analysisTree.gentau_isPrompt[igentau]&&analysisTree.gentau_isLastCopy[igentau]) {
                         promptTausLastCopy.push_back(tauVisLV);
+                        promptVisTausLV += tauVisLV;
                     }
                 }
                 
@@ -650,28 +733,112 @@ int main(int argc, char * argv[])
                                                         analysisTree.genparticles_pz[igen],
                                                         analysisTree.genparticles_e[igen]);
                     
-                    if (fabs(analysisTree.genparticles_pdgid[igen])==11) {
+                    bool fromHardProcessFinalState = analysisTree.genparticles_fromHardProcess[igen]&&analysisTree.genparticles_status[igen]==1;
+                    bool isMuon = false;
+                    bool isElectron = false;
+                    bool isNeutrino = false;
+                    bool isDirectHardProcessTauDecayProduct = analysisTree.genparticles_isDirectHardProcessTauDecayProduct[igen];
+                    
+                    if (abs(analysisTree.genparticles_pdgid[igen])==11) {
+                        isElectron = true;
                         if (analysisTree.genparticles_fromHardProcess[igen]&&analysisTree.genparticles_status[igen]==1) {
                             promptElectrons.push_back(genLV);
+                            promptElectronsLV += genLV;
+                            wDecayProductsLV += genLV;
                         }
                     }
                     
-                    if (fabs(analysisTree.genparticles_pdgid[igen])==13) {
+                    if (abs(analysisTree.genparticles_pdgid[igen])==13) {
+                        isMuon = true;
                         if (analysisTree.genparticles_fromHardProcess[igen]&&analysisTree.genparticles_status[igen]==1) {
                             promptMuons.push_back(genLV);
+                            promptMuonsLV += genLV;
+                            wDecayProductsLV += genLV;
                         }
                     }
+                    
+                    if (abs(analysisTree.genparticles_pdgid[igen])==12||
+                        abs(analysisTree.genparticles_pdgid[igen])==14||
+                        abs(analysisTree.genparticles_pdgid[igen])==16)  {
+                        isNeutrino = true;
+                        if ((analysisTree.genparticles_fromHardProcess[igen]||analysisTree.genparticles_isPrompt[igen])&&
+                            !analysisTree.genparticles_isDirectHardProcessTauDecayProduct[igen]&&
+                            analysisTree.genparticles_status[igen]==1) {
+                            promptNeutrinos.push_back(genLV);
+                            promptNeutrinosLV += genLV;
+                            wDecayProductsLV += genLV;
+                        }
+                        if (analysisTree.genparticles_isDirectHardProcessTauDecayProduct[igen]&&
+                            analysisTree.genparticles_status[igen]==1) {
+                            tauNeutrinos.push_back(genLV);
+                            tauNeutrinosLV += genLV;
+                        }
+                    }
+                    
+                    bool isBoson = (fromHardProcessFinalState && (isMuon || isElectron || isNeutrino)) || isDirectHardProcessTauDecayProduct;
+                    bool isVisibleBoson = (fromHardProcessFinalState && (isMuon || isElectron)) || (isDirectHardProcessTauDecayProduct && !isNeutrino);
+                    
+                    if (isBoson)
+                        genBosonLV += genLV;
+                    if (isVisibleBoson)
+                        genVisBosonLV += genLV;
+                    
                 }
                 
-                if (isDY) {
-                    if (promptTausFirstCopy.size()==2) {
+                if (isDY)
+                {
+                    if (promptTausFirstCopy.size()==2)
+                    {
                         isZTT = true; isZMM = false; isZEE = false;
+                        bosonPx = promptTausLV.Px(); bosonPy = promptTausLV.Py(); bosonPz = promptTausLV.Pz();
+                        bosonMass = promptTausLV.M();
+                        bosonEta  = promptTausLV.Eta();
+                        lepPx = promptVisTausLV.Px(); lepPy = promptVisTausLV.Py(); lepPz = promptVisTausLV.Pz();
                     }
-                    else if (promptMuons.size()==2) {
+                    else if (promptMuons.size()==2)
+                    {
                         isZTT = false; isZMM = true; isZEE = false;
+                        bosonPx = promptMuonsLV.Px(); bosonPy = promptMuonsLV.Py(); bosonPz = promptMuonsLV.Pz();
+                        bosonMass = promptMuonsLV.M();
+                        bosonEta = promptMuonsLV.Eta();
+                        lepPx = promptMuonsLV.Px(); lepPy = promptMuonsLV.Py(); lepPz = promptMuonsLV.Pz();
                     }
-                    else {
+                    else
+                    {
                         isZTT = false; isZMM = false; isZEE = true;
+                        bosonPx = promptElectronsLV.Px(); bosonPy = promptElectronsLV.Py(); bosonPz = promptElectronsLV.Pz();
+                        bosonMass = promptElectronsLV.M();
+                        bosonEta = promptElectronsLV.Eta();
+                        lepPx = promptElectronsLV.Px(); lepPy = promptElectronsLV.Py(); lepPz = promptElectronsLV.Pz();
+                    }
+                    nuPx = tauNeutrinosLV.Px(); nuPy = tauNeutrinosLV.Py(); nuPz = tauNeutrinosLV.Pz();
+                }
+                
+                bosonPx = genBosonLV.Px();
+                bosonPy = genBosonLV.Py();
+                bosonPz = genBosonLV.Pz();
+                bosonPt = genBosonLV.Pt();
+                bosonMass = genBosonLV.M();
+                
+                lepPx = genVisBosonLV.Px();
+                lepPy = genVisBosonLV.Py();
+                lepPz = genVisBosonLV.Pz();
+                
+                nuPt = TMath::Sqrt(nuPx*nuPx+nuPy*nuPy);
+                nuPhi = TMath::ATan2(nuPy,nuPx);
+                
+                if (isDY)// applying Z pt mass weights
+                {
+                    zptmassweight = 1;
+                    if (bosonMass>50.0)
+                    {
+                        float bosonMassX = bosonMass;
+                        float bosonPtX = bosonPt;
+                        if (bosonMassX>1000.) bosonMassX = 1000.;
+                        if (bosonPtX<1.)      bosonPtX = 1.;
+                        if (bosonPtX>1000.)   bosonPtX = 1000.;
+                        zptmassweight = histZMassPtWeights->GetBinContent(histZMassPtWeights->GetXaxis()->FindBin(bosonMassX),
+                                                                          histZMassPtWeights->GetYaxis()->FindBin(bosonPtX));
                     }
                 }
                 
@@ -758,7 +925,7 @@ int main(int argc, char * argv[])
                     }//end looping second isolated muons
                 }//end looping first isolated muons
             }//end selecting muon pair
-        
+            
             if (!isIsoMuonsPair) continue;
             
             //fill the trigger weight if first lepton matched to single trigger
@@ -794,6 +961,8 @@ int main(int argc, char * argv[])
             TLorentzVector dimuon = mu1 + mu2;
                 
             m_vis = dimuon.M();
+            float dilepton_px = dimuon.Px();
+            float dilepton_py = dimuon.Py();
             dilepton_pt = dimuon.Pt();
             dilepton_eta = dimuon.Eta();
             dilepton_phi = dimuon.Phi();
@@ -806,6 +975,10 @@ int main(int argc, char * argv[])
             jet_pt = -9999;
             jet_eta = -9999;
             jet_phi = -9999;
+            
+            int jet_indx = -1;
+            float dPhiJetZ = -1.0;
+            
             for (unsigned int jet=0; jet<analysisTree.pfjet_count; ++jet)
             {
                 float jetEta = analysisTree.pfjet_eta[jet];
@@ -822,39 +995,50 @@ int main(int argc, char * argv[])
                 if (dR2<dRJetLeptonCut) continue;
                     
                 // pfJetId
-                bool isPFJetId = looseJetiD(analysisTree,int(jet));
-                if (!isPFJetId) continue;
-                    
+                //bool isPFJetId = looseJetiD(analysisTree,int(jet));
+                //if (!isPFJetId) continue;
+                
+                // jet is required to be separated delta phi > 2.0
+                
+                float dPhiJetZ_temp = dPhiFrom2P(dilepton_px,dilepton_py,analysisTree.pfjet_px[jet],analysisTree.pfjet_py[jet]);
+                
+                
+                if(dPhiJetZ_temp < 2.0) continue;
+                
                 njets++;
-                // jet is required to be separated delta phi > 2.6
                 
-                float dPhiJetZ = fabs(dilepton_phi-analysisTree.pfjet_phi[jet]);
-                
-                if(dPhiJetZ<2.6) continue;
-                    
-                if(analysisTree.pfjet_pt[jet] > jet_pt)
+                if(dPhiJetZ < dPhiJetZ_temp)
                 {
-                    jet_pt = analysisTree.pfjet_pt[jet];
-                    jet_eta = analysisTree.pfjet_eta[jet];
-                    jet_phi = analysisTree.pfjet_phi[jet];
-                }
-                    
-                for(unsigned int im=0; im<isoMuons.size(); ++im)
-                {
-                    if((im == indx1) || (im == indx2)) continue;
-                    float dRJetMuon = deltaR(analysisTree.pfjet_eta[jet],analysisTree.pfjet_phi[jet],analysisTree.muon_eta[im],analysisTree.muon_phi[im]);
-                    if (dRJetMuon<0.3)
-                        JetMatchingMuonStatus = 1;
-                }
-                    
-                for(unsigned int ie=0; ie<isoEles.size(); ++ie)
-                {
-                    float dRJetEle = deltaR(analysisTree.pfjet_eta[jet],analysisTree.pfjet_phi[jet],analysisTree.electron_eta[ie],analysisTree.electron_phi[ie]);
-                    if(dRJetEle<0.3)
-                        JetMatchingEleStatus = 1;
+                    dPhiJetZ = dPhiJetZ_temp;
+                    jet_indx = jet;
                 }
                     
             }//end looping pf jet
+            
+            //filling up jet variables
+        
+            if(njets==0) continue;
+            
+            jet_pt = analysisTree.pfjet_pt[jet_indx];
+            jet_eta = analysisTree.pfjet_eta[jet_indx];
+            jet_phi = analysisTree.pfjet_phi[jet_indx];
+            
+            
+            //define jet matching status
+            for(unsigned int im=0; im<isoMuons.size(); ++im)
+            {
+                if((isoMuons[im] == indx1) || (isoMuons[im] == indx2)) continue;
+                float dRJetMuon = deltaR(analysisTree.pfjet_eta[jet_indx],analysisTree.pfjet_phi[jet_indx],analysisTree.muon_eta[isoMuons[im]],analysisTree.muon_phi[isoMuons[im]]);
+                if (dRJetMuon<0.5)
+                    JetMatchingMuonStatus = 1;
+            }
+            
+            for(unsigned int ie=0; ie<isoEles.size(); ++ie)
+            {
+                float dRJetEle = deltaR(analysisTree.pfjet_eta[jet_indx],analysisTree.pfjet_phi[jet_indx],analysisTree.electron_eta[isoEles[ie]],analysisTree.electron_phi[isoEles[ie]]);
+                if(dRJetEle<0.5)
+                    JetMatchingEleStatus = 1;
+            }
             
             //filling isolation of muon variable
             float absIso_1 = analysisTree.muon_r04_sumChargedHadronPt[indx1];
