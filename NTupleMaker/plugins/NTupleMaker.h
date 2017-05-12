@@ -264,7 +264,7 @@ class NTupleMaker : public edm::EDAnalyzer{
   virtual void beginJob();
   virtual void endJob();
   virtual void beginRun(const edm::Run& iRun, const edm::EventSetup& iSetup);
-  virtual void endRun();
+  virtual void endRun(const edm::Run& iRun);
   virtual void beginLuminosityBlock(const edm::LuminosityBlock& iLumiBlock, const edm::EventSetup& iSetup);
   virtual void endLuminosityBlock(const edm::LuminosityBlock& iLumiBlock, const edm::EventSetup& iSetup);
   virtual void analyze( const edm::Event& iEvent, const edm::EventSetup& iSetup );
@@ -1110,6 +1110,14 @@ class NTupleMaker : public edm::EDAnalyzer{
   Float_t genid2;
   Float_t genx2;
   Float_t genScale;
+
+  Float_t weightScale[9];
+  Float_t weightPDFmax;
+  Float_t weightPDFmin;
+  Float_t weightPDFmean;
+  Float_t weightPDFup;
+  Float_t weightPDFdown;
+  Float_t weightPDFvar;
 
   Int_t numpileupinteractionsminus;
   Int_t numpileupinteractions;

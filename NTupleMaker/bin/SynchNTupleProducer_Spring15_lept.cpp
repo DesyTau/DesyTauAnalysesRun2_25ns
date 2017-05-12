@@ -151,6 +151,7 @@ int main(int argc, char * argv[]){
 
   const bool ApplyPUweight    = cfg.get<bool>("ApplyPUweight"); 
   const bool ApplyLepSF       = cfg.get<bool>("ApplyLepSF"); 
+  const bool ApplyLeptonSFfromKIT  = cfg.get<bool>("ApplyLeptonSFfromKIT"); 
   const bool ApplyTrigger     = cfg.get<bool>("ApplyTrigger"); 
   const bool ApplySVFit       = cfg.get<bool>("ApplySVFit");
   const bool ApplyBTagScaling = cfg.get<bool>("ApplyBTagScaling");
@@ -430,6 +431,14 @@ int main(int argc, char * argv[]){
   if (f_XTrigTauLegSF.IsZombie()) {std::cout << " workspace file " << filename_XTrigTauLegSF << " not found. Please check. " << std::endl; exit(1);}
   RooWorkspace *w_XTrigTauLegSF = (RooWorkspace*)f_XTrigTauLegSF.Get("w");
   f_XTrigTauLegSF.Close();
+
+  //Lepton Scale Factors from KIT - for MSSM 2016
+  TString filename_kitLeptonSF = TString(cmsswBase)+"/src/HTT-utilities/CorrectionsWorkspace/htt_scalefactors_v16_4.root";
+  TFile f_kitLeptonSF(filename_kitLeptonSF);
+  if (f_kitLeptonSF.IsZombie()) {std::cout << " workspace file " << filename_kitLeptonSF << " not found. Please check. " << std::endl; exit(1);}
+  RooWorkspace *w_kitLeptonSF = (RooWorkspace*)f_kitLeptonSF.Get("w");
+  f_kitLeptonSF.Close();
+
 
   // Workspace containing tracking efficiency weights 
   TString workspace_filename = TString(cmsswBase)+"/src/HTT-utilities/CorrectionsWorkspace/htt_scalefactors_v16_3.root";
@@ -914,6 +923,8 @@ int main(int argc, char * argv[]){
 	
 	// used for trigger weights: channel dependent settings
 	sf_trig_t  = w_XTrigTauLegSF -> function("t_genuine_TightIso_mt_ratio")->getVal();
+
+
 	
 	// tracking efficiency weight	
         if (!isData && ApplyLepSF) {
@@ -931,7 +942,7 @@ int main(int argc, char * argv[]){
 	
 	// used for trigger weights: channel dependent settings
 	sf_trig_t  = w_XTrigTauLegSF -> function("t_genuine_TightIso_et_ratio")->getVal();
-	
+
 	// tracking efficiency weight
         if (!isData && ApplyLepSF) {
 	  w->var("e_eta")->setVal(analysisTree.electron_eta[leptonIndex]); 
@@ -955,7 +966,7 @@ int main(int argc, char * argv[]){
 	otree->trigweight_1 = scalefactor;
 	otree->singleLepTrigger = isSingleLepTrigStored;
 	otree->xTrigger = isXTrigStored;
-	
+
 	if (otree->iso_1>=0.15 && otree->iso_1<=0.3){  
 	  
 	  otree->idisoweight_antiiso_1 = SF_lepIdIso_antiiso->get_ScaleFactor(leptonLV.Pt(), leptonLV.Eta());
@@ -969,6 +980,26 @@ int main(int argc, char * argv[]){
 	  }
 	  otree->trigweight_antiiso_1 = scalefactor;
 	}
+
+	// use lepton SF from KIT workspace - for MSSM 
+	// already binned in lepton isolation, no need for antiiso weights in separate branches.
+	if (ApplyLeptonSFfromKIT){
+	  if (ch == "mt"){
+	  w_kitLeptonSF ->var("m_eta")->setVal(leptonLV.Eta());
+	  w_kitLeptonSF ->var("m_pt")->setVal(leptonLV.Pt());
+	  w_kitLeptonSF ->var("m_iso")->setVal(otree->iso_1);
+	  otree->idisoweight_1 = (w_kitLeptonSF->function("m_id_ratio")->getVal())*(w_kitLeptonSF->function("m_iso_binned_ratio")->getVal());
+	  otree->trigweight_1 = w_kitLeptonSF->function("m_trgOR4_binned_ratio")->getVal();
+	  }
+	  else if (ch == "et"){
+	  w_kitLeptonSF ->var("e_eta")->setVal(analysisTree.electron_superclusterEta[leptonIndex]);//leptonLV.Eta());
+	  w_kitLeptonSF ->var("e_pt")->setVal(leptonLV.Pt());
+	  w_kitLeptonSF ->var("e_iso")->setVal(otree->iso_1);
+	  otree->idisoweight_1 = (w_kitLeptonSF->function("e_id_ratio")->getVal())*(w_kitLeptonSF->function("e_iso_binned_ratio")->getVal());
+	  otree->trigweight_1 = w_kitLeptonSF->function("e_trg_binned_ratio")->getVal();
+	  }
+	}
+
       }
       
       
@@ -1522,6 +1553,8 @@ void FillMuTau(const AC1B * analysisTree, Spring15Tree *otree, int leptonIndex, 
 
 	otree->d0_1 = analysisTree->muon_dxy[leptonIndex];
 	otree->dZ_1 = analysisTree->muon_dz[leptonIndex];
+	otree->d0err_1 = analysisTree->muon_dxyerr[leptonIndex];
+	otree->dZerr_1 = analysisTree->muon_dzerr[leptonIndex];
 
 }
 
@@ -1541,7 +1574,8 @@ void FillETau(const AC1B * analysisTree, Spring15Tree *otree, int leptonIndex, f
 
 	otree->d0_1 = analysisTree->electron_dxy[leptonIndex];
 	otree->dZ_1 = analysisTree->electron_dz[leptonIndex];
-
+	otree->d0err_1 = analysisTree->electron_dxyerr[leptonIndex];
+	otree->dZerr_1 = analysisTree->electron_dzerr[leptonIndex]; 
 }
 
 //fill the otree with the tau variables 

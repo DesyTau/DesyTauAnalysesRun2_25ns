@@ -216,6 +216,9 @@ int main(int argc, char * argv[]) {
 
   // weighting (tau fake rate)
   const string tauFakeRateFileName = cfg.get<string>("TauFakeRateFileName");
+  const string tauFakeRate1prongFileName = cfg.get<string>("TauFakeRate1prongFileName");
+  const string tauFakeRate1prongPi0FileName = cfg.get<string>("TauFakeRate1prongPi0FileName");
+  const string tauFakeRate3prongFileName = cfg.get<string>("TauFakeRate3prongFileName");
 
   // trigger eff filename
   const string trigEffFileName = cfg.get<string>("TrigEffFileName");
@@ -321,19 +324,37 @@ int main(int argc, char * argv[]) {
   Float_t fakeAntiLMedium_;
   Float_t fakeAntiLTight_;
 
-  Float_t fakeAntiLLooseUp_[12];
-  Float_t fakeAntiLMediumUp_[12];
-  Float_t fakeAntiLTightUp_[12];
+  Float_t fakeAntiLLooseUp_[20];
+  Float_t fakeAntiLMediumUp_[20];
+  Float_t fakeAntiLTightUp_[20];
 
   Float_t fakeAntiLLooseMva_;
   Float_t fakeAntiLMediumMva_;
   Float_t fakeAntiLTightMva_;
   Float_t fakeAntiLVTightMva_;
 
-  Float_t fakeAntiLLooseMvaUp_[12];
-  Float_t fakeAntiLMediumMvaUp_[12];
-  Float_t fakeAntiLTightMvaUp_[12];
-  Float_t fakeAntiLVTightMvaUp_[12];
+  Float_t fakeAntiLLooseMvaUp_[20];
+  Float_t fakeAntiLMediumMvaUp_[20];
+  Float_t fakeAntiLTightMvaUp_[20];
+  Float_t fakeAntiLVTightMvaUp_[20];
+
+  Float_t fakeDMAntiLLoose_;
+  Float_t fakeDMAntiLMedium_;
+  Float_t fakeDMAntiLTight_;
+
+  Float_t fakeDMAntiLLooseUp_[20];
+  Float_t fakeDMAntiLMediumUp_[20];
+  Float_t fakeDMAntiLTightUp_[20];
+
+  Float_t fakeDMAntiLLooseMva_;
+  Float_t fakeDMAntiLMediumMva_;
+  Float_t fakeDMAntiLTightMva_;
+  Float_t fakeDMAntiLVTightMva_;
+
+  Float_t fakeDMAntiLLooseMvaUp_[20];
+  Float_t fakeDMAntiLMediumMvaUp_[20];
+  Float_t fakeDMAntiLTightMvaUp_[20];
+  Float_t fakeDMAntiLVTightMvaUp_[20];
 
   Float_t met_;
   Float_t metphi_;
@@ -562,10 +583,27 @@ int main(int argc, char * argv[]) {
   ntuple_->Branch("fakeAntiLTightMva", &fakeAntiLTightMva_, "fakeAntiLTightMva/F");
   ntuple_->Branch("fakeAntiLVTightMva", &fakeAntiLVTightMva_, "fakeAntiLVTightMva/F");
 
+  ntuple_->Branch("fakeDMAntiLLoose", &fakeDMAntiLLoose_, "fakeDMAntiLLoose/F");
+  ntuple_->Branch("fakeDMAntiLMedium",&fakeDMAntiLMedium_,"fakeDMAntiLMedium/F");
+  ntuple_->Branch("fakeAntiLTight", &fakeDMAntiLTight_, "fakeDMAntiLTight/F");
 
-  TString numbers[12] = {"1","2","3","4","5","6","7","8","9","10","11","12"};
+  ntuple_->Branch("fakeDMAntiLLooseMva", &fakeDMAntiLLooseMva_, "fakeDMAntiLLooseMva/F");
+  ntuple_->Branch("fakeDMAntiLMediumMva",&fakeDMAntiLMediumMva_,"fakeDMAntiLMediumMva/F");
+  ntuple_->Branch("fakeDMAntiLTightMva", &fakeDMAntiLTightMva_, "fakeDMAntiLTightMva/F");
+  ntuple_->Branch("fakeDMAntiLVTightMva", &fakeDMAntiLVTightMva_, "fakeDMAntiLVTightMva/F");
 
-  for (int number=0; number<12; ++number) {
+
+  TString numbers[20];
+
+  for (int number=0; number<20; ++number) {
+    char Number[20];
+    int NN = number+1;
+    if (NN<10)
+      sprintf(Number,"%1i",NN);
+    else
+      sprintf(Number,"%2i",NN);
+
+    numbers[number] = TString(Number);
 
     ntuple_->Branch("fakeAntiLLooseUp"+numbers[number], &fakeAntiLLooseUp_[number], "fakeAntiLLooseUp"+numbers[number]+"/F");
     ntuple_->Branch("fakeAntiLMediumUp"+numbers[number], &fakeAntiLMediumUp_[number], "fakeAntiLMediumUp"+numbers[number]+"/F");
@@ -575,6 +613,15 @@ int main(int argc, char * argv[]) {
     ntuple_->Branch("fakeAntiLMediumMvaUp"+numbers[number], &fakeAntiLMediumMvaUp_[number], "fakeAntiLMediumMvaUp"+numbers[number]+"/F");
     ntuple_->Branch("fakeAntiLTightMvaUp"+numbers[number], &fakeAntiLTightMvaUp_[number], "fakeAntiLTightMvaUp"+numbers[number]+"/F");
     ntuple_->Branch("fakeAntiLVTightMvaUp"+numbers[number], &fakeAntiLVTightMvaUp_[number], "fakeAntiLVTightMvaUp"+numbers[number]+"/F");
+
+    ntuple_->Branch("fakeDMAntiLLooseUp"+numbers[number], &fakeDMAntiLLooseUp_[number], "fakeDMAntiLLooseUp"+numbers[number]+"/F");
+    ntuple_->Branch("fakeDMAntiLMediumUp"+numbers[number], &fakeDMAntiLMediumUp_[number], "fakeDMAntiLMediumUp"+numbers[number]+"/F");
+    ntuple_->Branch("fakeDMAntiLTightUp"+numbers[number], &fakeDMAntiLTightUp_[number], "fakeDMAntiLTightUp"+numbers[number]+"/F");
+
+    ntuple_->Branch("fakeDMAntiLLooseMvaUp"+numbers[number], &fakeDMAntiLLooseMvaUp_[number], "fakeDMAntiLLooseMvaUp"+numbers[number]+"/F");
+    ntuple_->Branch("fakeDMAntiLMediumMvaUp"+numbers[number], &fakeDMAntiLMediumMvaUp_[number], "fakeDMAntiLMediumMvaUp"+numbers[number]+"/F");
+    ntuple_->Branch("fakeDMAntiLTightMvaUp"+numbers[number], &fakeDMAntiLTightMvaUp_[number], "fakeDMAntiLTightMvaUp"+numbers[number]+"/F");
+    ntuple_->Branch("fakeDMAntiLVTightMvaUp"+numbers[number], &fakeDMAntiLVTightMvaUp_[number], "fakeDMAntiLVTightMvaUp"+numbers[number]+"/F");
 
   }
 
@@ -814,6 +861,16 @@ int main(int argc, char * argv[]) {
   // Read fake rates
   TString file_tauFakeRate = TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/"+tauFakeRateFileName;
   std::map<TString,TH2D*>  fakerates = GetFakeRates(file_tauFakeRate);
+
+  file_tauFakeRate = TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/"+tauFakeRate1prongFileName;
+  std::map<TString,TH2D*>  fakerates1prong = GetFakeRates(file_tauFakeRate);
+
+  file_tauFakeRate = TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/"+tauFakeRate1prongPi0FileName;
+  std::map<TString,TH2D*>  fakerates1prongPi0 = GetFakeRates(file_tauFakeRate);
+
+  file_tauFakeRate = TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/"+tauFakeRate3prongFileName;
+  std::map<TString,TH2D*>  fakerates3prong = GetFakeRates(file_tauFakeRate);
+
   int nBins = fakerates["Loose"]->GetNbinsX();
   double bins[20];
   for (int iBin=0; iBin<=nBins; iBin++)
@@ -1489,7 +1546,7 @@ int main(int argc, char * argv[]) {
       met_ = TMath::Sqrt(pfmet_ex*pfmet_ex+pfmet_ey*pfmet_ey);
       if (met_<1e-4) met_ = 1e-4;
       metphi_ = TMath::ATan2(pfmet_ey,pfmet_ex);
-      TLorentzVector lorentzVectorMet; lorentzVectorMet.SetXYZM(pfmet_ex,pfmet_ey,0,0);
+      TLorentzVector lorentzVectorMet; lorentzVectorMet.SetXYZT(pfmet_ex,pfmet_ey,0,met_);
 
       // *************************
       // **** accessing muons ****
@@ -1615,6 +1672,11 @@ int main(int argc, char * argv[]) {
 	muonEta_ = lorentzVectorTriggerMu.Eta();
 	muonPhi_ = lorentzVectorTriggerMu.Phi();
 	muonQ_   = int(analysisTree.muon_charge[indexTriggerMu]);
+	pfmet_ex = pfmet_ex + lorentzVectorTriggerMu.Px()/muonMomScale - lorentzVectorTriggerMu.Px();
+	pfmet_ey = pfmet_ey + lorentzVectorTriggerMu.Py()/muonMomScale - lorentzVectorTriggerMu.Py();
+	met_ = TMath::Sqrt(pfmet_ex*pfmet_ex+pfmet_ey*pfmet_ey);
+	metphi_ = TMath::ATan2(pfmet_ey,pfmet_ex);
+	lorentzVectorMet.SetXYZT(pfmet_ex,pfmet_ey,0,met_);
 	mtmuon_  = mT(lorentzVectorTriggerMu,lorentzVectorMet);
 	lorentzVectorW = lorentzVectorTriggerMu + lorentzVectorMet;
 	for (unsigned int iMu = 0; iMu < selMuonIndexes.size(); ++iMu) {
@@ -2125,7 +2187,11 @@ int main(int argc, char * argv[]) {
 				 analysisTree.tau_py[indexTau],
 				 analysisTree.tau_pz[indexTau],
 				 analysisTree.tau_mass[indexTau]);
-
+	pfmet_ex = pfmet_ex + lorentzVectorTau.Px()/tauMomScale - lorentzVectorTau.Px();
+	pfmet_ey = pfmet_ey + lorentzVectorTau.Py()/tauMomScale - lorentzVectorTau.Py();
+	met_ = TMath::Sqrt(pfmet_ex*pfmet_ex+pfmet_ey*pfmet_ey);
+	metphi_ = TMath::ATan2(pfmet_ey,pfmet_ex);
+	lorentzVectorMet.SetXYZT(pfmet_ex,pfmet_ey,0,met_);
 	mttau_ = mT(lorentzVectorTau,lorentzVectorMet);
 	tauPt_ = analysisTree.tau_pt[indexTau];
 	tauEta_ = analysisTree.tau_eta[indexTau];
@@ -2246,9 +2312,16 @@ int main(int argc, char * argv[]) {
 
 	// Add fake rates to tree
 	// check pt bin
-	double tauJetPtRatio = TMath::Min(double(tauPt_ / tauJetPt_), double(0.99));
+	double tauJetPtRatio = TMath::Min(double(tauPt_ / tauJetPt_), double(1.5));
 	double tauJetPtX = TMath::Max(double(101.),TMath::Min(double(tauJetPt_),double(999.)));
 	int ptBin = fakerates[TString("Loose")]->FindBin(tauJetPtRatio,tauJetPtX);
+	std::map<TString,TH2D*> fakeratesDM;
+	if (tauDecay_==0) 
+	  fakeratesDM = fakerates1prong;
+	else if (tauDecay_>=10)
+	  fakeratesDM = fakerates3prong;
+	else
+	  fakeratesDM = fakerates1prongPi0;
 
 	fakeAntiLLoose_  = fakerates[TString("Loose")]->GetBinContent(ptBin);
 	fakeAntiLMedium_ = fakerates[TString("Medium")]->GetBinContent(ptBin);
@@ -2259,6 +2332,15 @@ int main(int argc, char * argv[]) {
 	fakeAntiLTightMva_   = fakerates[TString("TightMva")]->GetBinContent(ptBin);
 	fakeAntiLVTightMva_  = fakerates[TString("VTightMva")]->GetBinContent(ptBin);
 	
+	fakeDMAntiLLoose_  = fakeratesDM[TString("Loose")]->GetBinContent(ptBin);
+	fakeDMAntiLMedium_ = fakeratesDM[TString("Medium")]->GetBinContent(ptBin);
+	fakeDMAntiLTight_  = fakeratesDM[TString("Tight")]->GetBinContent(ptBin);
+	
+	fakeDMAntiLLooseMva_   = fakeratesDM[TString("LooseMva")]->GetBinContent(ptBin);
+	fakeDMAntiLMediumMva_  = fakeratesDM[TString("MediumMva")]->GetBinContent(ptBin);
+	fakeDMAntiLTightMva_   = fakeratesDM[TString("TightMva")]->GetBinContent(ptBin);
+	fakeDMAntiLVTightMva_  = fakeratesDM[TString("VTightMva")]->GetBinContent(ptBin);
+	
 	float fakeAntiLLooseE_  = fakerates[TString("Loose")]->GetBinError(ptBin);
 	float fakeAntiLMediumE_ = fakerates[TString("Medium")]->GetBinError(ptBin);
 	float fakeAntiLTightE_  = fakerates[TString("Tight")]->GetBinError(ptBin);
@@ -2267,6 +2349,15 @@ int main(int argc, char * argv[]) {
 	float fakeAntiLMediumMvaE_  = fakerates[TString("MediumMva")]->GetBinError(ptBin);
 	float fakeAntiLTightMvaE_   = fakerates[TString("TightMva")]->GetBinError(ptBin);
 	float fakeAntiLVTightMvaE_  = fakerates[TString("VTightMva")]->GetBinError(ptBin);
+
+	float fakeDMAntiLLooseE_  = fakeratesDM[TString("Loose")]->GetBinError(ptBin);
+	float fakeDMAntiLMediumE_ = fakeratesDM[TString("Medium")]->GetBinError(ptBin);
+	float fakeDMAntiLTightE_  = fakeratesDM[TString("Tight")]->GetBinError(ptBin);
+	
+	float fakeDMAntiLLooseMvaE_   = fakeratesDM[TString("LooseMva")]->GetBinError(ptBin);
+	float fakeDMAntiLMediumMvaE_  = fakeratesDM[TString("MediumMva")]->GetBinError(ptBin);
+	float fakeDMAntiLTightMvaE_   = fakeratesDM[TString("TightMva")]->GetBinError(ptBin);
+	float fakeDMAntiLVTightMvaE_  = fakeratesDM[TString("VTightMva")]->GetBinError(ptBin);
 
 	int binRatio = 0;
 	int binPt = 0;
@@ -2283,8 +2374,12 @@ int main(int argc, char * argv[]) {
 	  binPt = 0;
 	else if (tauJetPtX<200.)
 	  binPt = 1;
-	else
+	else if (tauJetPtX<350.)
 	  binPt = 2;
+	else if (tauJetPtX<500.)
+	  binPt = 3;
+	else
+	  binPt = 4;
 
 	int bin2D = 4*binPt + binRatio;
 	//	std::cout << bin2D << std::endl;
@@ -2304,7 +2399,7 @@ int main(int argc, char * argv[]) {
 	}
 
 	*/
-	for (int in=0; in<12; ++in) {
+	for (int in=0; in<20; ++in) {
 
 	  fakeAntiLLooseUp_[in]  = fakeAntiLLoose_;
 	  fakeAntiLMediumUp_[in] = fakeAntiLMedium_;
@@ -2315,7 +2410,17 @@ int main(int argc, char * argv[]) {
 	  fakeAntiLTightMvaUp_[in]   = fakeAntiLTightMva_;
 	  fakeAntiLVTightMvaUp_[in]  = fakeAntiLVTightMva_;
 
+	  fakeDMAntiLLooseUp_[in]  = fakeDMAntiLLoose_;
+	  fakeDMAntiLMediumUp_[in] = fakeDMAntiLMedium_;
+	  fakeDMAntiLTightUp_[in]  = fakeDMAntiLTight_;
+	  
+	  fakeDMAntiLLooseMvaUp_[in]   = fakeDMAntiLLooseMva_;
+	  fakeDMAntiLMediumMvaUp_[in]  = fakeDMAntiLMediumMva_;
+	  fakeDMAntiLTightMvaUp_[in]   = fakeDMAntiLTightMva_;
+	  fakeDMAntiLVTightMvaUp_[in]  = fakeDMAntiLVTightMva_;
+
 	  if (in==bin2D) {
+
 	    fakeAntiLLooseUp_[in] += fakeAntiLLooseE_;
 	    fakeAntiLMediumUp_[in] += fakeAntiLMediumE_;
 	    fakeAntiLTightUp_[in] += fakeAntiLTightE_;
@@ -2323,6 +2428,15 @@ int main(int argc, char * argv[]) {
 	    fakeAntiLMediumMvaUp_[in] += fakeAntiLMediumMvaE_;
 	    fakeAntiLTightMvaUp_[in] += fakeAntiLTightMvaE_;
 	    fakeAntiLVTightMvaUp_[in] += fakeAntiLVTightMvaE_;
+
+	    fakeDMAntiLLooseUp_[in] += fakeDMAntiLLooseE_;
+	    fakeDMAntiLMediumUp_[in] += fakeDMAntiLMediumE_;
+	    fakeDMAntiLTightUp_[in] += fakeDMAntiLTightE_;
+	    fakeDMAntiLLooseMvaUp_[in] += fakeDMAntiLLooseMvaE_;
+	    fakeDMAntiLMediumMvaUp_[in] += fakeDMAntiLMediumMvaE_;
+	    fakeDMAntiLTightMvaUp_[in] += fakeDMAntiLTightMvaE_;
+	    fakeDMAntiLVTightMvaUp_[in] += fakeDMAntiLVTightMvaE_;
+
 	  }
 	  //	  else {
 	  //	    std::cout << "Nothing !" << std::endl;

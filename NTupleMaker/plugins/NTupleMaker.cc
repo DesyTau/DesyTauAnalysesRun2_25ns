@@ -27,6 +27,7 @@
 //#include "AnalysisDataFormats/TauAnalysis/interface/CompositePtrCandidateT1T2MEt.h"
 //#include "AnalysisDataFormats/TauAnalysis/interface/CompositePtrCandidateT1T2MEtFwd.h"
 #include "SimDataFormats/GeneratorProducts/interface/LHEEventProduct.h"
+#include "SimDataFormats/GeneratorProducts/interface/LHERunInfoProduct.h"
 #include "SimDataFormats/GeneratorProducts/interface/GenFilterInfo.h"
 #include "DataFormats/PatCandidates/interface/PackedCandidate.h"
 #include "DataFormats/JetReco/interface/PFJetCollection.h"
@@ -263,9 +264,12 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
 
   string cmsswBase = (getenv ("CMSSW_BASE"));
   
-  if(cgen && !cdata)
+  if(cgen && !cdata) {
     consumes<LHEEventProduct>(edm::InputTag("externalLHEProducer"));
-  
+    //    consumes<LHERunInfoProduct>(edm::InputTag("externalLHEProducer"));
+    consumes<LHERunInfoProduct, edm::InRun>({"externalLHEProducer"});
+  }
+
   consumes<edm::TriggerResults>(edm::InputTag("TriggerResults", "", cTriggerProcess));
   consumes<L1GlobalTriggerReadoutRecord>(edm::InputTag("gtDigis"));
 
@@ -844,6 +848,20 @@ void NTupleMaker::beginJob(){
     tree->Branch("genid2", &genid2, "genid2/F");
     tree->Branch("genx2", &genx2, "genx2/F");
     tree->Branch("genScale", &genScale, "genScale/F");
+
+    for (int iScale=0; iScale<9; ++iScale) {
+      char number[4];
+      sprintf(number,"%1i",iScale);
+      TString Number(number);
+      tree->Branch("weightScale"+Number,&weightScale[iScale],"weightScale"+Number+"/F");
+    }
+
+    tree->Branch("weightPDFmax",&weightPDFmax,"weightPDFmax/F");
+    tree->Branch("weightPDFmin",&weightPDFmin,"weightPDFmin/F");
+    tree->Branch("weightPDFmean",&weightPDFmean,"weightPDFmean/F");
+    tree->Branch("weightPDFup",&weightPDFup,"weightPDFup/F");
+    tree->Branch("weightPDFdown",&weightPDFdown,"weightPDFdown/F");
+    tree->Branch("weightPDFvar",&weightPDFvar,"weightPDFvar/F");
     
     tree->Branch("numpileupinteractionsminus", &numpileupinteractionsminus, "numpileupinteractionsminus/I");
     tree->Branch("numpileupinteractions", &numpileupinteractions, "numpileupinteractions/I");
@@ -1395,11 +1413,50 @@ void NTupleMaker::beginRun(const edm::Run& iRun, const edm::EventSetup& iSetup)
   JetCorrectorParameters const & JetCorPar = (*JetCorParColl)["Uncertainty"];
   jecUnc = new JetCorrectionUncertainty(JetCorPar); 
 
+  /*
+  std::cout << "Begin of run ----> " << std::endl;
+  
+  edm::Handle<LHERunInfoProduct> run; 
+  typedef std::vector<LHERunInfoProduct::Header>::const_iterator headers_const_iterator;
+ 
+  iRun.getByLabel( "externalLHEProducer", run );
+  LHERunInfoProduct myLHERunInfoProduct = *(run.product());
+ 
+  for (headers_const_iterator iter=myLHERunInfoProduct.headers_begin(); iter!=myLHERunInfoProduct.headers_end(); iter++){
+    std::cout << iter->tag() << std::endl;
+    std::vector<std::string> lines = iter->lines();
+    for (unsigned int iLine = 0; iLine<lines.size(); iLine++) {
+      std::cout << lines.at(iLine);
+    }
+  }
+  */
+
 }
 
-void NTupleMaker::endRun()
+void NTupleMaker::endRun(const edm::Run& iRun)
 {
   delete jecUnc;
+
+  std::cout << "End of run --->" << std::endl;
+
+  // LHERunInfoProduct
+  
+  edm::Handle<LHERunInfoProduct> run; 
+  typedef std::vector<LHERunInfoProduct::Header>::const_iterator headers_const_iterator;
+ 
+  iRun.getByLabel( "externalLHEProducer", run );
+  LHERunInfoProduct myLHERunInfoProduct = *(run.product());
+ 
+  for (headers_const_iterator iter=myLHERunInfoProduct.headers_begin(); iter!=myLHERunInfoProduct.headers_end(); iter++){
+    std::cout << iter->tag() << std::endl;
+    std::vector<std::string> lines = iter->lines();
+    for (unsigned int iLine = 0; iLine<lines.size(); iLine++) {
+      std::cout << lines.at(iLine);
+    }
+  }
+  
+
+
 }
 
 void NTupleMaker::beginLuminosityBlock(const edm::LuminosityBlock& iLumiBlock, const edm::EventSetup& iSetup)
@@ -2326,8 +2383,48 @@ bool NTupleMaker::AddGenHt(const edm::Event& iEvent) {
        ++genparticles_noutgoing;
    } 
   }
+   
+  weightPDFmax = 0.1;
+  weightPDFmin = 10; 
+  
+  float nPDFWeights = 0;
+  float nPDFWeightsUp = 0;
+  float nPDFWeightsDown = 0;
+  float weightPDF2 = 0;
 
+  weightPDFmean = 0;
+  weightPDFup = 0;
+  weightPDFdown = 0;
+
+  for (unsigned int iW=0; iW<lheEventProduct->weights().size(); iW++) {
+    float weightGen = lheEventProduct->weights()[iW].wgt/lheEventProduct->originalXWGTUP();
+    if (iW<9)
+      weightScale[iW] = weightGen;
+    else {
+      weightPDFmean += weightGen;
+      weightPDF2 += weightGen*weightGen; 
+      nPDFWeights += 1.0;
+      if (weightGen>weightPDFmax) weightPDFmax = weightGen;
+      if (weightGen<weightPDFmin) weightPDFmin = weightGen;
+      if (weightGen>1.0) {
+	weightPDFup += weightGen;
+	nPDFWeightsUp += 1.0;
+      }
+      else {
+	weightPDFdown += weightGen;
+	nPDFWeightsDown += 1.0;
+      }
+    }
+  }
+
+  weightPDFmean = weightPDFmean/nPDFWeights;
+  weightPDF2 = weightPDF2/nPDFWeights;
+  weightPDFvar = TMath::Sqrt(weightPDF2 - weightPDFmean*weightPDFmean);
+  weightPDFup = weightPDFup/nPDFWeightsUp;
+  weightPDFdown = weightPDFdown/nPDFWeightsDown;
+  
   return true;
+
 }
 
 bool NTupleMaker::AddGenParticles(const edm::Event& iEvent) {
@@ -2503,7 +2600,7 @@ bool NTupleMaker::AddGenParticles(const edm::Event& iEvent) {
 	  // Save photons
 	  else if(abs((*GenParticles)[i].pdgId()) == 22)
 	    {
-	      if ((*GenParticles)[i].status()==44)
+	      if (statusFlags.isPrompt())
 		fill = true;
 	    }
 

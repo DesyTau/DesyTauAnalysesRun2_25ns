@@ -184,26 +184,26 @@ int main(int argc, char * argv[]) {
   std::ifstream fileList(argv[2]);
 
   // event info
-  unsigned int event_nr;
+  ULong64_t event_nr;
   unsigned int event_run;
   unsigned int event_luminosityblock;
 
   // tracks 
   UInt_t track_count;
-  int track_ID[10000];
-  float track_px[10000];
-  float track_py[10000];
-  float track_pz[10000];
-  float track_pt[10000];
-  float track_eta[10000];
-  float track_phi[10000];
-  float track_charge[10000];
-  float track_mass[10000];
-  float track_dxy[10000];
-  float track_dxyerr[10000];
-  float track_dz[10000];
-  float track_dzerr[10000];
-  bool track_highPurity[10000];
+  int track_ID[1000];
+  float track_px[1000];
+  float track_py[1000];
+  float track_pz[1000];
+  float track_pt[1000];
+  float track_eta[1000];
+  float track_phi[1000];
+  float track_charge[1000];
+  float track_mass[1000];
+  float track_dxy[1000];
+  float track_dxyerr[1000];
+  float track_dz[1000];
+  float track_dzerr[1000];
+  bool track_highPurity[1000];
   // muons
   UInt_t muon_count;
   UInt_t muon_nMuonStations[1000];
@@ -259,7 +259,7 @@ int main(int argc, char * argv[]) {
   float trigobject_pt[1000];
   float  trigobject_eta[1000];
   float trigobject_phi[1000];
-  bool trigobject_filters[1000][50];
+  bool trigobject_filters[1000][200];
 
   //unsigned int iLeadingPosTrig = 0;
   //vector<bool> trigobject_filter; trigobject_filter.clear();
@@ -439,13 +439,11 @@ int main(int argc, char * argv[]) {
    
    if (tree_==NULL) continue;
 
+   tree_->SetMaxVirtualSize(3000000);
    // event info
    tree_->SetBranchAddress("event_nr", &event_nr);
    tree_->SetBranchAddress("event_run", &event_run);
    tree_->SetBranchAddress("event_luminosityblock", &event_luminosityblock);
-
-   // genWeight
-   tree_->SetBranchAddress("genweight",&genweight);
 
    // Muons
    tree_->SetBranchAddress("muon_count", &muon_count);
@@ -467,11 +465,11 @@ int main(int argc, char * argv[]) {
    tree_->SetBranchAddress("muon_dxyerr", muon_dxyerr);
    tree_->SetBranchAddress("muon_dz", muon_dz);
    tree_->SetBranchAddress("muon_dzerr", muon_dzerr);
-   tree_->SetBranchAddress("muon_chargedHadIso", &muon_chargedHadIso);
-   tree_->SetBranchAddress("muon_neutralHadIso", &muon_neutralHadIso);
-   tree_->SetBranchAddress("muon_photonIso", &muon_photonIso);
-   tree_->SetBranchAddress("muon_puIso", &muon_puIso);
-   tree_->SetBranchAddress("muon_isMedium", &muon_isMedium);
+   tree_->SetBranchAddress("muon_chargedHadIso", muon_chargedHadIso);
+   tree_->SetBranchAddress("muon_neutralHadIso", muon_neutralHadIso);
+   tree_->SetBranchAddress("muon_photonIso", muon_photonIso);
+   tree_->SetBranchAddress("muon_puIso", muon_puIso);
+   tree_->SetBranchAddress("muon_isMedium", muon_isMedium);
 
    // MET
    tree_->SetBranchAddress("pfmet_ex", &metx);
@@ -516,6 +514,7 @@ int main(int argc, char * argv[]) {
    //     tree_->SetBranchAddress("hltriggerresultsV", &hltriggerresultsV_);
 
    if (!isData) {
+     tree_->SetBranchAddress("genweight",&genweight);
      tree_->SetBranchAddress("genparticles_count", &genparticles_count);
      tree_->SetBranchAddress("genparticles_e", genparticles_e);
      tree_->SetBranchAddress("genparticles_px", genparticles_px);
