@@ -339,9 +339,10 @@ if(electron_index>-1)		ElV.SetPtEtaPhiM(el_pt[electron_index], el_eta[electron_i
 		iCut++;
 	
 
-		float trigw =   ( 17677*trig_weight_1 +   18188 * trig_weight_2)/float(35865.) ;
-//		if (isSignal) trigw = ;
-		if (!isData) all_weights *= trigw;
+		float trigw =   ( 17677*trig_weight_1 +   (18188) * trig_weight_2)/float(35865.) ;
+//		if (isSignal ) trigw = ;
+		if (!isData  && trig_weight_1>0.001) all_weights *= trigw;
+		if (!isData  && trig_weight_1<0.001) continue;
 
 		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
 		CFCounter[iCut]+= all_weights;
@@ -430,7 +431,7 @@ if(electron_index>-1)		ElV.SetPtEtaPhiM(el_pt[electron_index], el_eta[electron_i
 	if (isTT){
 		if (systematic !="TopPtUp" && systematic !="TopPtDown" ) all_weights *= top_weight;
 		if (systematic =="TopPtUp") all_weights *= top_weight*top_weight;
-	//	if (systematic =="TopPtDown") all_weights *= 1;
+		if (systematic =="TopPtDown") all_weights *= 1;
 	}
 		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
 		CFCounter[iCut]+= all_weights;

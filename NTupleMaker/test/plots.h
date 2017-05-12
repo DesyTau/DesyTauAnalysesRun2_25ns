@@ -20,7 +20,7 @@ using namespace std;
 
 
 const  int CutN=35;
-const  int CutF=35;
+const  int CutF=20;
 const  int CutCat=10;
 const int nBinsSR=60;
 
@@ -282,6 +282,7 @@ double var_[1000];
 
 vector<string> CutList;
 vector<string> FakeList;
+vector<string> FakeListJet;
 
 TH1D * histRuns = new TH1D("histRuns","",6000,24000,30000);
 
@@ -639,6 +640,7 @@ TH1D *CutFlowUnWLoose= new TH1D("CutFlowUnWLoose","Cut Flow",CutN,1,CutN+1);
 TH1D *CutFlowUnWTight= new TH1D("CutFlowUnWTight","Cut Flow",CutN,1,CutN+1);
 
 TH1D *CutFlowUnWFakeRate[CutF][nBinsSR];
+TH1D *CutFlowUnWFakeRateJet[CutF][nBinsSR];
 
 TH1D * inputEventsH = new TH1D("inputEventsH","",1,-0.5,0.5);
 TH1D * hxsec = new TH1D("xsec","",1,0,10e+20);
@@ -839,6 +841,30 @@ for(int nSR = 0; nSR < nBinsSR; nSR++){
 	TString l_ = FakeList[j].c_str();
 	//cout<<" set up "<<FakeList[cj].c_str()<<endl;
        CutFlowUnWFakeRate[cj][nSR]->GetXaxis()->SetBinLabel(j+1,l_);
+			}
+    		}
+	}//loop in nSR
+}
+
+void SetupHistsFakeJet(int CutNF){
+
+for(int nSR = 0; nSR < nBinsSR; ++nSR){
+  for(int cj = 0; cj < CutNF; ++cj)
+    	{
+      TString nCut;
+      TString nsr;
+      nCut.Form("%i",cj);
+      nsr.Form("%i",nSR);
+      
+     // cout<<" setting histo now "<<"CutFlowUnWFakeRate_"<<nCut<<"_"<<nsr<<endl;
+
+      CutFlowUnWFakeRateJet[cj][nSR]= new TH1D("CutFlowUnWFakeRateJet_"+nCut+"_"+nsr,"Cut Flow",17,1,17+1);
+
+	int sz = FakeListJet.size();
+	for (int j=0;j<sz;++j){
+	TString l_ = FakeListJet[j].c_str();
+//	cout<<" set up "<<FakeListJet[cj].c_str()<<" for "<<nSR<<endl;
+       CutFlowUnWFakeRateJet[cj][nSR]->GetXaxis()->SetBinLabel(j+1,l_);
 			}
     		}
 	}//loop in nSR
@@ -1510,7 +1536,7 @@ TH1D *hdEtaTauMET[CutN];
 //
 //
       
-      hmet_MT2lester_DZeta_01J1D[cj]= new TH1D ("met_MT2lester_DZeta01J1D_"+nCut,"met_MT2lester_DZeta01J1D "+cutName,58,0.5,58.5);;
+      hmet_MT2lester_DZeta_01J1D[cj]= new TH1D ("met_MT2lester_DZeta01J1D_"+nCut,"met_MT2lester_DZeta01J1D "+cutName,53,0.5,53.5);;
       hmet_MT2lester_DZeta_01J1D[cj]->Sumw2();
 
       hmet_MT2lester1D[cj]= new TH1D ("met_MT2lester1D_"+nCut,"met_MT2lester1D "+cutName,6,0.5,6.5);;

@@ -22,7 +22,8 @@ type=MC
 systematics="$3"
 
 if [[ $3 == "all" || $3 == "All"  || $3 == "list" ]];then
-systematics="Nominal JetEnUp JetEnDown TauEnUp TauEnDown ElEnUp ElEnDown MuEnUp MuEnDown UnclEnUp UnclEnDown"
+#systematics="Nominal JetEnUp JetEnDown TauEnUp TauEnDown ElEnUp ElEnDown MuEnUp MuEnDown UnclEnUp UnclEnDown"
+systematics="JetEnUp JetEnDown TauEnUp TauEnDown ElEnUp ElEnDown MuEnUp MuEnDown UnclEnUp UnclEnDown"
 #systematics="JetEnUp JetEnDown UnclEnUp UnclEnDown"
 
 fi
@@ -55,9 +56,9 @@ ctt=`cat ${dir}/${line} | wc -l`
 
 echo There are  $ct out of $ctt for $line in $dir dir for systematic $syst
 
-#if [[ $ct -ge $ctt ]] ;then
-#	continue;
-#fi
+if [[ $ct -ge $ctt ]] ;then
+	continue;
+fi
 
 unset xsec
 xsec=`grep " ${line} " xsecs | cut -d " " -f3-4`	
@@ -93,7 +94,7 @@ if [ ! -f ${dir}/${bas}_B_OS.root ] ;then
 echo $bas $xsec $dir
 echo SUSY$channel analysisMacroSUSY_${type}_B.conf ${bas} ${channel} 1 $syst>> Jobs/job${line}$channel$dir${bas}_B${syst}.sh
 chmod u+x $wdir/Jobs/job${line}$channel$dir${bas}_B${syst}.sh
- qsub -l h_rt=0:45:00 -l h_cpu=1500M $wdir/Jobs/job${line}$channel$dir${bas}_B${syst}.sh 
+ qsub -l h_rt=0:45:00 -l h_cpu=3500M -e /dev/null -o /dev/null $wdir/Jobs/job${line}$channel$dir${bas}_B${syst}.sh 
 fi
 
 

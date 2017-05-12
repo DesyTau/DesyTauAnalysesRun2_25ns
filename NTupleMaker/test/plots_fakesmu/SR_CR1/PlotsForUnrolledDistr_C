@@ -1,0 +1,369 @@
+#include <iostream>
+#include <vector>
+#include <map>
+#include "boost/lexical_cast.hpp"
+#include "boost/algorithm/string.hpp"
+#include "boost/format.hpp"
+#include "boost/program_options.hpp"
+#include "boost/range/algorithm.hpp"
+#include "boost/range/algorithm_ext.hpp"
+#include "Plotting.h"
+#include "Plotting_Style.h"
+#include "HttStylesNew.cc"
+#include "TPad.h"
+#include "TROOT.h"
+#include "TColor.h"
+#include "TEfficiency.h"
+#include "TMath.h"
+//WithoutNPV/
+void PlotsForUnrolledDistr(TString directory = "",
+	  TString suffix = "",
+	  TString File = "Templ_VARSHERE_35invfb_mt_C1N2_SR_CR1.root",
+	  TString variable = "",
+	  TString Suffix = "",
+	  TString xtitle = "",
+	  TString ytitle = "Events",
+      bool logY = true,
+ 	    bool BlindData = true
+
+          )
+
+
+{
+	  vector<TString> vars_;vars_.clear();
+	  vars_.push_back("VARSHERE");
+  //ModTDRStyle();
+
+
+int mycolor=TColor::GetColor("#ffcc66");
+int mycolorvv=TColor::GetColor("#8646ba");
+//int mycolorvv=TColor::GetColor("#FF6633");
+int mycolorww=TColor::GetColor("#6F2D35");
+int mycolorqcd=TColor::GetColor("#ffccff");
+int mycolortt=TColor::GetColor("#9999cc");
+int mycolorst=TColor::GetColor("#b6d0ea");
+//int mycolorttx=TColor::GetColor("#bbccdd");
+int mycolorttx=TColor::GetColor("#33CCFF");
+int mycolorwjet=TColor::GetColor("#de5a6a");
+//int mycolorwjet=TColor::GetColor("#66CC66");
+int mycolordyj=TColor::GetColor("#ffcc66");
+int mycolorztt=TColor::GetColor("#58d885");
+
+  bool plotLeg = true;
+  int position = 2; // 0 - right, 1 - left, 2 - central
+  int npos = 1;
+
+  TH1::SetDefaultSumw2();
+  TH2::SetDefaultSumw2();
+
+
+  //  TString topweight("");
+
+TString BinLabels[100] = 
+/*{
+"1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31",
+"32","33","34","35","36","37","38","39","40","41","42","43","44","45","46","47","48","49","50","51","52","53","54","55","56","57","58","59","60",
+"61","62","63","64","65","66","67","68","69","70","71","72","73","74","75","76","77","78","79","80","81","82","83","84","85","86","87","88","89","90","91","92","93"
+};*/
+/*
+	{"Unknown",
+	"#tau_{h}, #tau #rightarrow l", 
+	"#tau_{h}, Prompt l",
+	"#tau_{h}, G #rightarrow l",
+	"#tau_{h}, HFQ #rightarrow l",
+	"#tau_{h}, LFQ #rightarrow l",
+	"J #rightarrow #tau, #tau #rightarrow l",
+	"J #rightarrow #tau, Prompt l",
+	"J #rightarrow #tau, G #rightarrow l",
+	"J #rightarrow #tau, HFQ #rightarrow l",
+	"J #rightarrow #tau, LFQ #rightarrow l",
+	"#mu #rightarrow #tau, #tau #rightarrow l",
+	"#mu #rightarrow #tau, Prompt l",
+	"#mu #rightarrow #tau, G #rightarrow l",
+	"#mu #rightarrow #tau, HFQ #rightarrow l",
+	"#mu #rightarrow #tau, LFQ #rightarrow l",
+	"e #rightarrow #tau, #tau #rightarrow l",
+	"e #rightarrow #tau, Prompt l",
+	"e #rightarrow #tau, G #rightarrow l",
+	"e #rightarrow #tau, HFQ #rightarrow l",
+	"e #rightarrow #tau, LFQ #rightarrow l"};
+*/
+
+	{"Prompt #tau",
+	"G #rightarrow #tau, #tau #rightarrow l",
+	"G #rightarrow #tau, Prompt l",
+	"G #rightarrow #tau, G #rightarrow l",
+	"G #rightarrow #tau, HFQ #rightarrow l",
+	"G #rightarrow #tau, LFQ #rightarrow l",
+	"LFQ #rightarrow #tau, #tau #rightarrow l",
+	"LFQ #rightarrow #tau, Prompt l",
+	"LFQ #rightarrow #tau, G #rightarrow l",
+	"LFQ #rightarrow #tau, HFQ #rightarrow l",
+	"LFQ #rightarrow #tau, LFQ #rightarrow l",
+	"HFQ #rightarrow #tau, #tau #rightarrow l",
+	"HFQ #rightarrow #tau, Prompt l",
+	"HFQ #rightarrow #tau, G #rightarrow l",
+	"HFQ #rightarrow #tau, HFQ #rightarrow l",
+	"HFQ #rightarrow #tau, LFQ #rightarrow l"
+	};
+
+	ifstream BinLabelsFile;
+	BinLabelsFile.open("LabelListTESR");
+	int i=0;
+	string name;
+   	 while(getline(BinLabelsFile, name))
+		{
+//		BinLabels[i]=name;
+		i++;
+		}
+
+
+	directory="";
+    TFile * filee ;//
+    TH1D * fitHisto, *fitHisto2, *fitHistoPostH0, *fitHistoPostH1;
+    int nB=1;
+
+    TFile * file = new TFile(File);
+    
+for (int svar=0;svar<vars_.size();++svar)
+{
+	TString Variable=vars_.at(svar);
+
+    TH1D * TT = (TH1D*)file->Get("1D_tt_"+Variable);
+    //TH1D * TTcl = (TH1D*)file->Get("1D_tt_"+Variable);
+    TH1D * WJ = (TH1D*)file->Get("1D_wj_"+Variable);
+    TH1D * DY = (TH1D*)file->Get("1D_dyj_"+Variable);
+    TH1D * ZTT = (TH1D*)file->Get("1D_ztt_"+Variable);
+    TH1D * ST = (TH1D*)file->Get("1D_sT_"+Variable);
+    TH1D * VV = (TH1D*)file->Get("1D_dib_"+Variable);
+    TH1D * WW = (TH1D*)file->Get("1D_ww_"+Variable);
+    TH1D * TTX = (TH1D*)file->Get("1D_ttx_"+Variable);
+    TH1D * QCD = (TH1D*)file->Get("1D_qcd_"+Variable);
+    TH1D * allbkg = (TH1D*)file->Get("1D_tt_"+Variable);
+    TH1D * histData = (TH1D*)file->Get("data_obs_"+Variable);
+    TH1D * histSignal = (TH1D*)file->Get("1D_C1N2_100_LSP1_B_"+Variable);
+    TH1D * histSignal2 = (TH1D*)file->Get("1D_stau-stau_left_100_LSP1_B_"+Variable);
+//    TH1D * histSignal2 = (TH1D*)file->Get("1D_C1N2_100_LSP50_B_"+Variable);
+//    TH1D * histSignal3 = (TH1D*)file->Get("1D_C1N2_500_LSP100_B_"+Variable);
+//    TH1D * histSignal4 = (TH1D*)file->Get("1D_stau-stau_100_LSP1_B_"+Variable);
+//    TH1D * histSignal6 = (TH1D*)file->Get("1D_stau-stau_right_100_LSP1_B_"+Variable);
+
+    //TH1D * hist = (TH1D*)file->Get("");
+int nBins  =   histData->GetNbinsX();
+if (BlindData) {for (int iB=1; iB<=nBins; ++iB) {histData->SetBinContent(iB,0);}}
+//{for (int iB=1; iB<=nBins; ++iB) {TTcl->SetBinContent(iB,0);}}
+
+  TH1D * TTcl = (TH1D*)TT->Clone("dummy");
+
+   allbkg->Add(WJ);
+   allbkg->Add(DY);
+   allbkg->Add(ZTT);
+   allbkg->Add(ST);
+   allbkg->Add(VV);
+   allbkg->Add(WW);
+   allbkg->Add(TTX);
+   allbkg->Add(QCD);
+
+
+  std::cout << "TT  : " << TTcl->GetSumOfWeights() << " : "  <<" GetNbinsX= " << TTcl->GetNbinsX()<< "  Purity  "<<TTcl->GetSumOfWeights()/allbkg->GetSumOfWeights()<< std::endl;
+  std::cout << "WJ   : " << WJ->GetSumOfWeights() << " : "  <<" GetNbinsX= " << WJ->GetNbinsX()<< "  Purity  "<<WJ->GetSumOfWeights()/allbkg->GetSumOfWeights()<< std::endl;
+  std::cout << "DY : " << DY->GetSumOfWeights() << " : "  <<" GetNbinsX= " << DY->GetNbinsX()<< "  Purity  "<<DY->GetSumOfWeights()/allbkg->GetSumOfWeights()<< std::endl;
+  std::cout << "ZTT : " << ZTT->GetSumOfWeights() << " : "  <<" GetNbinsX= " << ZTT->GetNbinsX()<< "  Purity  "<<ZTT->GetSumOfWeights()/allbkg->GetSumOfWeights()<< std::endl;
+  std::cout << "ST   : " << ST->GetSumOfWeights() << " : "  <<" GetNbinsX= " << ST->GetNbinsX()<< "  Purity  "<<ST->GetSumOfWeights()/allbkg->GetSumOfWeights()<< std::endl;
+  std::cout << "Rest   : " << VV->GetSumOfWeights() << " : "  <<" GetNbinsX= " << VV->GetNbinsX() << "  Purity  "<<VV->GetSumOfWeights()/allbkg->GetSumOfWeights()<< std::endl;
+  std::cout << "WW   : " << WW->GetSumOfWeights() << " : "  <<" GetNbinsX= " << WW->GetNbinsX() << "  Purity  "<<WW->GetSumOfWeights()/allbkg->GetSumOfWeights()<< std::endl;
+  std::cout << "QCD   : " << QCD->GetSumOfWeights() << " : " <<" GetNbinsX= " << QCD->GetNbinsX()<< "  Purity  "<<QCD->GetSumOfWeights()/allbkg->GetSumOfWeights()<< std::endl;
+  std::cout << "TTX  : " << TTX->GetSumOfWeights() << " : "  <<" GetNbinsX= " << TTX->GetNbinsX()<< "  Purity  "<<TTX->GetSumOfWeights()/allbkg->GetSumOfWeights()<< std::endl;
+  std::cout << "histData : " << histData->GetSumOfWeights() << " : "  <<" GetNbinsX= " << histData->GetNbinsX()<< endl;
+  std::cout << "histSignal : " << histSignal2->GetSumOfWeights() << " : "  <<" GetNbinsX= " << histSignal2->GetNbinsX()<<endl;
+
+  std::cout << "BKG : " << allbkg->GetSumOfWeights() << " : " << allbkg->Integral(0,nBins+1) << std::endl;
+  std::cout << "DAT : " << histData->GetSumOfWeights() << " : " << histData->Integral(0,nBins+1) << std::endl;
+  std::cout << "DAT/BKG = " << histData->GetSumOfWeights()/allbkg->GetSumOfWeights() << "+/-" 
+	    << TMath::Sqrt(histData->GetSumOfWeights())/allbkg->GetSumOfWeights() << std::endl;
+cout<<"==========="<<endl;
+///////////////////////////////////////////////////////////////////////////////////////////////
+    //ModTDRStyle();
+
+    ModTDRStyle();
+
+  for (int nB=1;nB<WJ->GetNbinsX();++nB) cout<<" nB "<<nB<<" Label "<<BinLabels[nB-1]<<"  "<<WJ->GetBinContent(nB)/WJ->GetSumOfWeights()<<endl;
+
+    TCanvas* canv1 = new TCanvas("c1", "c1");
+    canv1->cd();
+    std::vector<TPad*> pads = TwoPadSplit(0.1, 0.00, 0.00);
+    pads[0]->SetLogy(logY);
+    histData->GetXaxis()->SetLabelSize(0.025);
+    histData->GetYaxis()->SetNdivisions(512);
+    histData->GetXaxis()->SetTimeFormat("#splitline{%s}{%s}");
+     for (int iB=1; iB<=nBins; ++iB) {histData->GetXaxis()->SetBinLabel(iB,BinLabels[iB-1]);}
+    std::vector<TH1*> h = CreateAxisHists(2, histData, histData->GetXaxis()->GetXmin(), histData->GetXaxis()->GetXmax()-0.01);
+    h[0]->Draw();
+    
+    
+    std::string units="";
+    std::string xtitle_ = (std::string) xtitle;
+    size_t pos = xtitle_.find("[");
+    if(pos!=std::string::npos) {
+        units = xtitle_.substr(pos+1, xtitle_.find("]") - pos -1 );
+        xtitle_ = xtitle_.substr(0, pos);
+    }
+    
+
+    pads[0]->cd();
+    
+    // Setup legend
+    TLegend *legend = PositionedLegend(0.40, 0.30, 3, 0.03);
+    legend->SetTextFont(42);
+    
+    histData->SetMarkerColor(0);
+    histData->SetLineColor(0);
+    histData->SetFillColor(0);
+    histData->SetFillStyle(0);
+    histData->SetMarkerStyle(20);
+    histData->SetMarkerSize(1);
+
+
+    int color = CreateTransparentColor(13,0.);
+    color=kBlue;
+    histSignal->SetMarkerColor(kBlue);
+    histSignal->SetLineColor(color);
+    histSignal->SetFillColor(color);
+    histSignal->SetFillStyle(0);
+    //histSignal->SetLineWidth(2);
+    histSignal->SetMarkerStyle(31);
+    histSignal->SetMarkerSize(1.5);
+    color=kRed;
+    histSignal2->SetMarkerColor(color);
+    histSignal2->SetLineColor(color);
+    histSignal2->SetFillColor(color);
+    histSignal2->SetFillStyle(0);
+    histSignal2->SetMarkerStyle(31);
+    histSignal2->SetMarkerSize(1.5);
+
+
+
+    InitHist(QCD,mycolorqcd);
+    InitHist(DY,mycolordyj);
+    InitHist(ZTT,mycolorztt);
+    InitHist(TT,mycolortt);
+    InitHist(TTcl,mycolortt);
+    InitHist(ST,mycolorst);
+    InitHist(TTX,mycolorttx);
+    InitHist(WJ,mycolorwjet);
+    InitHist(VV,mycolorvv);
+    InitHist(WW,mycolorww);
+    
+    legend->AddEntry(TT,"TTJets","f");
+    legend->AddEntry(ST,"singleTop","f");
+    legend->AddEntry(TTX,"TTX/TG","f");
+    legend->AddEntry(WJ,"WJets","f");
+//    legend->AddEntry(QCD,"QCD","f");
+    legend->AddEntry(DY,"Z#rightarrow ll","f");
+    legend->AddEntry(ZTT,"Z#rightarrow#tau#tau","f");
+    legend->AddEntry(WW,"WW","f");
+    legend->AddEntry(VV,"Rest","f");
+    legend->AddEntry(histSignal,"C1N2_100_LSP_1","ple");
+    legend->AddEntry(histSignal2,"#tau_{L}100_LSP_1","ple");
+
+
+
+for (int iB=1; iB<=nBins; ++iB) {WJ->SetBinError(iB,0);TT->SetBinError(iB,0);TTcl->SetBinError(iB,0);DY->SetBinError(iB,0);ZTT->SetBinError(iB,0);QCD->SetBinError(iB,0);VV->SetBinError(iB,0);WW->SetBinError(iB,0);TTX->SetBinError(iB,0);ST->SetBinError(iB,0);}
+    WJ->SetMarkerStyle(0);
+    TT->SetMarkerStyle(0);
+    TTcl->SetMarkerStyle(0);
+    DY->SetMarkerStyle(0);
+    ZTT->SetMarkerStyle(0);
+    QCD->SetMarkerStyle(0);
+    VV->SetMarkerStyle(0);
+    WW->SetMarkerStyle(0);
+    TTX->SetMarkerStyle(0);
+    ST->SetMarkerStyle(0);
+
+
+    THStack *hs = new THStack("","");
+    hs->Add(TTX);
+    hs->Add(ST);
+    hs->Add(TTcl);
+    hs->Add(VV);
+    hs->Add(WW);
+    hs->Add(DY);
+    hs->Add(WJ);
+    hs->Add(ZTT);
+
+
+
+    TH1D *hsum = ((TH1D*)(hs->GetStack()->Last()));
+ //   */
+ 
+  WJ->SetLineStyle(0);
+  TT->SetLineStyle(0);
+  QCD->SetLineStyle(0);
+  TTX->SetLineStyle(0);
+  VV->SetLineStyle(0);
+  ST->SetLineStyle(0);
+  WJ->SetLineColor(kBlack);
+
+
+/*
+  //  hsum->Draw("h");
+    ST->Draw("sameh");
+    WJ->Draw("sameh");
+    ZTT->Draw("sameh");
+    DY->Draw("sameh");
+    TTX->Draw("sameh");
+    VV->Draw("sameh");
+    TTcl->Draw("sameh");
+*/
+
+
+  hsum->Draw("same hist");
+  hs->Draw("same hist");
+
+    histSignal->Draw("samep");
+    histSignal2->Draw("samep");
+
+
+
+
+float sum;
+//    for (int b=1;b<allbkg->GetNbinsX()+1;++b) cout<< "  b  "<<b<<" mc "<<allbkg->GetBinContent(b)<<" data  "<<histData->GetBinContent(b)<<"  "<<histData->GetBinContent(b)/allbkg->GetBinContent(b)<<" deviation "<<(histData->GetBinContent(b) - allbkg->GetBinContent(b))/sqrt(histData->GetBinContent(b))<<" DYJets "<<DY->GetBinContent(b)<<" TT "<<TTcl->GetBinContent(b)<<endl;
+
+    cout<<" =============== SF study  ======================"<<endl;
+    for (int b=1;b<allbkg->GetNbinsX()+1;++b) {
+	    
+ float SFw = 1; if (WJ->GetBinContent(b) > 0) SFw = (histData->GetBinContent(b) - (allbkg->GetBinContent(b)-WJ->GetBinContent(b))) / WJ->GetBinContent(b); 
+ float SFdyj = 1; if (DY->GetBinContent(b)> 0) SFdyj = (histData->GetBinContent(b) - (allbkg->GetBinContent(b)-DY->GetBinContent(b))) / DY->GetBinContent(b); 
+ float SFtt = 1; if (TTcl->GetBinContent(b)> 0)  SFtt = (histData->GetBinContent(b) - (allbkg->GetBinContent(b)-TTcl->GetBinContent(b))) / TTcl->GetBinContent(b); 
+
+ float purW =  WJ->GetBinContent(b)/allbkg->GetBinContent(b);
+ float purtt =  TTcl->GetBinContent(b)/allbkg->GetBinContent(b);
+ float purdyj =  DY->GetBinContent(b)/allbkg->GetBinContent(b);
+	    
+sum +=allbkg->GetBinContent(b);
+
+	//    cout<< "  b  "<<allbkg->GetXaxis()->GetBinLabel(b)<<" sum  "<<sum<<"  mc "<<allbkg->GetBinContent(b)<<" purWJ  "<<purW<<" purDY  "<<purdyj<<"  purTT "<<purtt<<"  sfW "<<SFw<<" sfDY  "<<SFdyj<<" sfTT  "<<SFtt<<"  "<<TTcl->GetBinContent(b)<<endl;
+   // cout<<" Bin  "<< b  <<" Sign "<<histSignal->GetBinContent(b)/sqrt(allbkg->GetBinContent(b))<<" Signal2  "<<histSignal2->GetBinContent(b)/sqrt(allbkg->GetBinContent(b))<<" Signal3  "<<histSignal3->GetBinContent(b)/sqrt(allbkg->GetBinContent(b))<<endl;
+    
+    }
+
+    canv1->Update();
+
+ 
+
+    pads[0]->cd();
+    
+    string v="BINHERE";
+    FixTopRange(pads[0], GetPadYMax(pads[0]), 0.5);
+    DrawCMSLogo(pads[0], "CMS", "Preliminary", 11, 0.045, 0.035, 1.2);
+    DrawTitle(pads[0], "35.9 fb^{-1} (13 TeV)", 3);
+    DrawTitle(pads[0], v, 1);
+
+    FixBoxPadding(pads[0], legend, 0.05);
+    legend->Draw();
+    FixOverlay();
+    canv1->Update();
+    pads[0]->GetFrame()->Draw();
+    canv1->Print(Variable+Suffix+suffix+".pdf");
+}
+}
