@@ -535,7 +535,8 @@ int main(int argc, char * argv[]){
     topPtWeightSys = new TopPtWeightSys(otree);
     //lepTauFakeScaleSys = new LepTauFakeScaleSys(otree);
     //lepTauFakeScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);
-    lepTauFakeOneProngScaleSys = new LepTauFakeOneProngScaleSys(otree);
+	/* not needed for MSSM */
+    /*lepTauFakeOneProngScaleSys = new LepTauFakeOneProngScaleSys(otree);
     lepTauFakeOneProngScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);
     lepTauFakeOneProngScaleSys->SetUseSVFit(ApplySVFit);	
     lepTauFakeOneProngOnePi0ScaleSys = new LepTauFakeOneProngOnePi0ScaleSys(otree);
@@ -543,7 +544,7 @@ int main(int argc, char * argv[]){
     lepTauFakeOneProngOnePi0ScaleSys->SetUseSVFit(ApplySVFit);
     lepTauFakeThreeProngScaleSys = new LepTauFakeThreeProngScaleSys(otree);
     lepTauFakeThreeProngScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);	
-    lepTauFakeThreeProngScaleSys->SetUseSVFit(ApplySVFit);
+    lepTauFakeThreeProngScaleSys->SetUseSVFit(ApplySVFit);*/
 
 	
 	if (cfg.get<bool>("splitJES")){
@@ -1243,6 +1244,8 @@ int main(int argc, char * argv[]){
       const bool Synch = cfg.get<bool>("Synch"); 
 
       bool passedBaselineSel = false;
+	  // for SM analysis
+      /*
       if (ch=="mt") 
         passedBaselineSel = ( otree->iso_1<0.35 && otree->byMediumIsolationMVArun2v1DBoldDMwLT_2>0.5 && 
                             otree->againstElectronVLooseMVA6_2>0.5 && otree->againstMuonTight3_2>0.5  &&
@@ -1252,7 +1255,16 @@ int main(int argc, char * argv[]){
                             otree->againstMuonLoose3_2>0.5 && otree->againstElectronTightMVA6_2>0.5 && 
                             otree->dilepton_veto == 0 && otree->extraelec_veto == 0 && otree->extramuon_veto == 0);
 
-
+      */
+	  // for MSSM analysis
+      if (ch=="mt") 
+        passedBaselineSel = ( otree->iso_1<0.35 && otree->byLooseIsolationMVArun2v1DBoldDMwLT_2>0.5 && 
+                            otree->againstElectronVLooseMVA6_2>0.5 && otree->againstMuonTight3_2>0.5  &&
+                            otree->dilepton_veto == 0 && otree->extraelec_veto == 0 && otree->extramuon_veto == 0);
+      if (ch=="et") 
+        passedBaselineSel = ( otree->iso_1<0.35 && otree->byLooseIsolationMVArun2v1DBoldDMwLT_2>0.5 && 
+                            otree->againstMuonLoose3_2>0.5 && otree->againstElectronTightMVA6_2>0.5 && 
+                            otree->dilepton_veto == 0 && otree->extraelec_veto == 0 && otree->extramuon_veto == 0);
       if (!Synch && !passedBaselineSel)
         continue;
 
@@ -1271,9 +1283,10 @@ int main(int argc, char * argv[]){
            tauOneProngOnePi0ScaleSys->Eval(utils::MUTAU);
            tauThreeProngScaleSys->Eval(utils::MUTAU);*/
            tauScaleSys->Eval(utils::MUTAU);
-		   lepTauFakeOneProngScaleSys->Eval(utils::MUTAU);			
-		   lepTauFakeOneProngOnePi0ScaleSys->Eval(utils::MUTAU);			
-		   lepTauFakeThreeProngScaleSys->Eval(utils::MUTAU);			
+		   /* not needed for MSSM */	
+		   //lepTauFakeOneProngScaleSys->Eval(utils::MUTAU);			
+		   //lepTauFakeOneProngOnePi0ScaleSys->Eval(utils::MUTAU);			
+		   //lepTauFakeThreeProngScaleSys->Eval(utils::MUTAU);			
            //lepTauFakeScaleSys->Eval(utils::MUTAU);
          }
 	 else if (ch=="et") {
@@ -1281,9 +1294,10 @@ int main(int argc, char * argv[]){
            tauOneProngOnePi0ScaleSys->Eval(utils::ETAU);
            tauThreeProngScaleSys->Eval(utils::ETAU);*/
            tauScaleSys->Eval(utils::ETAU);
-		   lepTauFakeOneProngScaleSys->Eval(utils::ETAU);			
-		   lepTauFakeOneProngOnePi0ScaleSys->Eval(utils::ETAU);			
-		   lepTauFakeThreeProngScaleSys->Eval(utils::ETAU);	
+		   /* not needed for MSSM */	
+		   //lepTauFakeOneProngScaleSys->Eval(utils::ETAU);			
+		   //lepTauFakeOneProngOnePi0ScaleSys->Eval(utils::ETAU);			
+		   //lepTauFakeThreeProngScaleSys->Eval(utils::ETAU);	
            //lepTauFakeScaleSys->Eval(utils::ETAU);
          }
       }
