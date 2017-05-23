@@ -299,6 +299,7 @@ int main(int argc, char * argv[]) {
   Float_t lepWPt_;
   Float_t lepWEta_;
   Float_t lepWPhi_;
+  Float_t lepWE_;
 
   Float_t nuWPt_;
   Float_t nuWEta_;
@@ -386,6 +387,7 @@ int main(int argc, char * argv[]) {
   Float_t genTauWPt_;
   Float_t genTauWEta_;
   Float_t genTauWPhi_;
+  Float_t genTauWE_;
 
   Float_t tauJetPt_;
   Float_t tauJetEta_;
@@ -529,6 +531,7 @@ int main(int argc, char * argv[]) {
   wntuple_->Branch("lepWPt",&lepWPt_,"lepWPt/F");
   wntuple_->Branch("lepWEta",&lepWEta_,"lepWEta/F");
   wntuple_->Branch("lepWPhi",&lepWPhi_,"lepWPhi/F");
+  wntuple_->Branch("lepWE",&lepWE_,"lepWE/F");
 
   wntuple_->Branch("nuWPt",&nuWPt_,"nuWPt/F");
   wntuple_->Branch("nuWEta",&nuWEta_,"nuWEta/F");
@@ -549,6 +552,7 @@ int main(int argc, char * argv[]) {
   wntuple_->Branch("genTauWPt",  &genTauWPt_,  "genTauWPt/F");
   wntuple_->Branch("genTauWEta", &genTauWEta_, "genTauWEta/F");
   wntuple_->Branch("genTauWPhi", &genTauWPhi_, "genTauWPhi/F");
+  wntuple_->Branch("genTauWE", &genTauWE_, "genTauWE/F");
 
   TTree * ntuple_ = new TTree("NTuple","NTuple");
 
@@ -578,6 +582,7 @@ int main(int argc, char * argv[]) {
   ntuple_->Branch("lepWPt",&lepWPt_,"lepWPt/F");
   ntuple_->Branch("lepWEta",&lepWEta_,"lepWEta/F");
   ntuple_->Branch("lepWPhi",&lepWPhi_,"lepWPhi/F");
+  ntuple_->Branch("lepWE",&lepWE_,"lepWE/F");
 
   ntuple_->Branch("nuWPt",&nuWPt_,"nuWPt/F");
   ntuple_->Branch("nuWEta",&nuWEta_,"nuWEta/F");
@@ -659,6 +664,7 @@ int main(int argc, char * argv[]) {
   ntuple_->Branch("genTauWPt",  &genTauWPt_,  "genTauWPt/F");
   ntuple_->Branch("genTauWEta", &genTauWEta_, "genTauWEta/F");
   ntuple_->Branch("genTauWPhi", &genTauWPhi_, "genTauWPhi/F");
+  ntuple_->Branch("genTauWE", &genTauWE_, "genTauWE/F");
 
   ntuple_->Branch("tauJetPt",  &tauJetPt_,  "tauJetPt/F");
   ntuple_->Branch("tauJetEta", &tauJetEta_, "tauJetEta/F");
@@ -970,6 +976,7 @@ int main(int argc, char * argv[]) {
       lepWPt_ = -1;
       lepWEta_ = 0;
       lepWPhi_ = 0;
+      lepWE_   = 0;
 
       nuWPt_ = -1;
       nuWEta_ = 0;
@@ -1314,21 +1321,25 @@ int main(int argc, char * argv[]) {
 	  lepWPt_  = wmuonLV.Pt();
 	  lepWEta_ = wmuonLV.Eta(); 
 	  lepWPhi_ = wmuonLV.Phi();
+	  lepWE_   = wmuonLV.E();
 	}
 	else if (indexE>=0) {
 	  wDecay_ = 1;
 	  lepWPt_  = welecLV.Pt();
           lepWEta_ = welecLV.Eta();
           lepWPhi_ = welecLV.Phi();
+          lepWE_   = welecLV.E();
 	}
 	else if (indexTau>=0) {
 	  lepWPt_  = wgenvistauLV.Pt();
           lepWEta_ = wgenvistauLV.Eta();
           lepWPhi_ = wgenvistauLV.Phi();
+          lepWE_   = wgenvistauLV.E();
 	  
 	  genTauWPt_  = wgentauLV.Pt();
           genTauWEta_ = wgentauLV.Eta();
           genTauWPhi_ = wgentauLV.Phi();
+          genTauWE_   = wgentauLV.E();
 	  wDecay_ = 3;
 	  wTauDecay_ = analysisTree.gentau_decayMode[indexTau];
 	  if (wTauDecay_<0) wTauDecay_ = -1;
