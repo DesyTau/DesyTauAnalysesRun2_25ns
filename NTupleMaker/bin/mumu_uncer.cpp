@@ -56,22 +56,44 @@
 #include "TauAnalysis/SVfitStandalone/interface/SVfitStandaloneAlgorithm.h"
 #include "CondFormats/BTauObjects/interface/BTagCalibration.h"
 #include "CondTools/BTau/interface/BTagCalibrationReader.h"
+#include "HTT-utilities/RecoilCorrections/interface/MEtSys.h"
+
 #include "DesyTauAnalyses/NTupleMaker/interface/btagSF.h"
+#include "DesyTauAnalyses/NTupleMaker/interface/JESUncertainties.h"
 
 float topPtWeight(float pt1,
                   float pt2) {
     
-    float a = 0.156;    // Run1 a parameter
-    float b = -0.00137;  // Run1 b parameter
+    float a = 0.0615;    // Run1 a parameter
+    float b = -0.0005;  // Run1 b parameter
     
-    if (pt1>400) pt1 = 400;
-    if (pt2>400) pt2 = 400;
+    //    if (pt1>400) pt1 = 400;
+    //if (pt2>400) pt2 = 400;
     
     float w1 = TMath::Exp(a+b*pt1);
     float w2 = TMath::Exp(a+b*pt2);
     
     return TMath::Sqrt(w1*w2);
     
+}
+
+SVfitStandaloneAlgorithm SVFitMassComputation(svFitStandalone::MeasuredTauLepton svFitMu1,
+                                              svFitStandalone::MeasuredTauLepton svFitMu2,
+                                              double measuredMETx,
+                                              double measuredMETy,
+                                              TMatrixD covMVAMET,
+					      TFile * inputFile_visPtResolution){
+  
+  std::vector<svFitStandalone::MeasuredTauLepton> measuredTauLeptons;
+  measuredTauLeptons.push_back(svFitMu1);
+  measuredTauLeptons.push_back(svFitMu2);
+  SVfitStandaloneAlgorithm algo(measuredTauLeptons, measuredMETx, measuredMETy, covMVAMET, 0);
+  algo.addLogM(false);
+  algo.shiftVisPt(true, inputFile_visPtResolution);
+  algo.integrateMarkovChain();
+  
+  return algo;
+  
 }
 
 float nJetsWeight(int nJets) {
@@ -172,8 +194,11 @@ int main(int argc, char * argv[]) {
     
     const bool applyTopPtReweighting = cfg.get<bool>("ApplyTopPtReweighting");
     const bool applyBDT = cfg.get<bool>("ApplyBDT");
+    const bool applyBDTvariations = cfg.get<bool>("ApplyBDTvariation");
     
     const bool applySVFit = cfg.get<bool>("ApplySVFit");
+    const bool applyMSVvariation = cfg.get<bool>("ApplyMSVvariation");
+    
     const bool applyZptmassCorr = cfg.get<bool>("ApplyZptmassCorr");
     
     const bool applyCategoryWeights = cfg.get<bool>("ApplyCategoryWeights");
@@ -201,7 +226,7 @@ int main(int argc, char * argv[]) {
     // topological cuts
     const float dRleptonsCut   = cfg.get<float>("dRleptonsCut");
     const float DRTrigMatch    = cfg.get<float>("DRTrigMatch");
-    const bool oppositeSign    = cfg.get<bool>("OppositeSign");
+    //const bool oppositeSign    = cfg.get<bool>("OppositeSign");
     const float dimuonMassCut = cfg.get<float>("DimuonMassCut"); // aug 17
     
     // jets
@@ -249,6 +274,8 @@ int main(int argc, char * argv[]) {
     const string categoryWeightsFileName   = cfg.get<string>("CategoryWeightsFileName");
     TString CategoryWeightsFileName(categoryWeightsFileName);
     
+    const string jet0WeightsHist = cfg.get<string>("Jet0WeightsHist");
+    TString Jet0WeightsHist(jet0WeightsHist);
     const string boostedWeightsHist  =  cfg.get<string>("BoostedWeightsHist");
     TString BoostedWeightsHist(boostedWeightsHist);
     const string vbfWeightsHist      =  cfg.get<string>("VBFWeightsHist");
@@ -332,6 +359,7 @@ int main(int argc, char * argv[]) {
     Float_t         topptweight;
     Float_t         trkeffweight;
     Float_t         zptmassweight;
+    Float_t         jet0weight;
     Float_t         boostedweight;
     Float_t         vbfweight;
     Float_t         weight;
@@ -373,12 +401,20 @@ int main(int argc, char * argv[]) {
     Float_t         eta_sv;
     Float_t         phi_sv;
     
-    Float_t         m_sv_Up;
-    Float_t         m_sv_Down;
+    Float_t         m_sv_muUp;
+    Float_t         m_sv_muDown;
     Float_t         m_sv_scaleUp;
     Float_t         m_sv_scaleDown;
     Float_t         m_sv_resoUp;
     Float_t         m_sv_resoDown;
+
+    Float_t         pt_sv_muUp;            
+    Float_t         eta_sv_muUp;
+    Float_t         phi_sv_muUp;
+
+    Float_t         pt_sv_muDown;
+    Float_t         eta_sv_muDown;
+    Float_t         phi_sv_muDown;
     
     Float_t         pt_1;
     Float_t         pt_1_Up;
@@ -416,6 +452,9 @@ int main(int argc, char * argv[]) {
     Float_t         met_uncorr;
     Float_t         metphi_uncorr;
 
+    Float_t         met_Up;
+    Float_t         met_Down;
+
     Float_t         met_JES_Up_uncorr;
     Float_t         met_JES_Down_uncorr;
     
@@ -428,27 +467,23 @@ int main(int argc, char * argv[]) {
     Float_t         met_UnclusteredJES_Up;
     Float_t         met_UnclusteredJES_Down;
     
-//    Float_t         mvamet;
-//    Float_t         mvametphi;
-//    Float_t         mvametcov00;
-//    Float_t         mvametcov01;
-//    Float_t         mvametcov10;
-//    Float_t         mvametcov11;
-//    
-//    Float_t         mvamet_uncorr;
-//    Float_t         mvametphi_uncorr;
-//    
-//    Float_t         mvamet_JES_Up;
-//    Float_t         mvamet_JES_Down;
-//    
-//    Float_t         mvamet_UnclusteredJES_Up;
-//    Float_t         mvamet_UnclusteredJES_Down;
-    
     Float_t         genmet;
     Float_t         genmetphi;
     
     Float_t         msvmet;
     Float_t         msvmetphi;
+
+    Float_t         met_x;
+    Float_t         met_y;
+    Float_t         px_mu1;
+    Float_t         py_mu1;
+    Float_t         px_mu2;
+    Float_t         py_mu2;
+    Float_t         pt_tot_x;
+    Float_t         pt_tot_y;
+    Float_t         pt_tot;
+    Float_t         pt_tot_Up;
+    Float_t         pt_tot_Down;
     
     //dimuon system
     Float_t         pt_tt;
@@ -456,6 +491,18 @@ int main(int argc, char * argv[]) {
     Float_t         dphi_tt;
     Float_t         eta_tt;             //BDT discriminator (dimuonEta)
     Float_t         ptRatio;          //BDT discriminator
+
+    Float_t         pt_tt_Up;
+    Float_t         dr_tt_Up;
+    Float_t         dphi_tt_Up;
+    Float_t         eta_tt_Up;             
+    Float_t         ptRatio_Up;
+
+    Float_t         pt_tt_Down;
+    Float_t         dr_tt_Down;
+    Float_t         dphi_tt_Down;
+    Float_t         eta_tt_Down;             
+    Float_t         ptRatio_Down;
     
     Float_t         dcasig2Mu2D;
     Float_t         dcasig2Mu3D;
@@ -470,6 +517,10 @@ int main(int argc, char * argv[]) {
     Float_t         pzetamiss_uncorr;
     Float_t         dzeta_uncorr;
     
+    Float_t         pzetamiss_Up;
+    Float_t         dzeta_Up;
+    Float_t         pzetamiss_Down;
+    Float_t         dzeta_Down;
     Float_t         pzetamiss_JES_Up;
     Float_t         dzeta_JES_Up;
     Float_t         pzetamiss_JES_Down;
@@ -481,27 +532,13 @@ int main(int argc, char * argv[]) {
     Float_t         pzetamiss_UnclusteredJES_Down;
     Float_t         dzeta_UnclusteredJES_Down;
     
-//    Float_t         pzetamiss_mvamet;
-//    Float_t         dzeta_mvamet;
-//    
-//    Float_t         pzetamiss_mvamet_uncorr;
-//    Float_t         dzeta_mvamet_uncorr;
-//    
-//    Float_t         pzetamiss_mvamet_JES_Up;
-//    Float_t         dzeta_mvamet_JES_Up;
-//    Float_t         pzetamiss_mvamet_JES_Down;
-//    Float_t         dzeta_mvamet_JES_Down;
-//    
-//    Float_t         pzetamiss_mvamet_UnclusteredJES_Up;
-//    Float_t         dzeta_mvamet_UnclusteredJES_Up;
-//    Float_t         pzetamiss_mvamet_UnclusteredJES_Down;
-//    Float_t         dzeta_mvamet_UnclusteredJES_Down;
-    
     Float_t         pzetamiss_genmet;
     Float_t         dzeta_genmet;
     
     Float_t         dphi_mumet_1;
     Float_t         dphi_mumet_uncorr_1;
+    Float_t         dphi_mumet_Up_1;
+    Float_t         dphi_mumet_Down_1;
     Float_t         dphi_mumet_JES_Up_1;
     Float_t         dphi_mumet_JES_Down_1;
     Float_t         dphi_mumet_UnclusteredJES_Up_1;
@@ -509,52 +546,21 @@ int main(int argc, char * argv[]) {
     
     Float_t         dphi_mumet_2;
     Float_t         dphi_mumet_uncorr_2;
+    Float_t         dphi_mumet_Up_2;
+    Float_t         dphi_mumet_Down_2;
     Float_t         dphi_mumet_JES_Up_2;
     Float_t         dphi_mumet_JES_Down_2;
     Float_t         dphi_mumet_UnclusteredJES_Up_2;
     Float_t         dphi_mumet_UnclusteredJES_Down_2;
     
-    Float_t         dphi_mumet_pos;
-    Float_t         dphi_mumet_pos_uncorr;
-    Float_t         dphi_mumet_pos_JES_Up;
-    Float_t         dphi_mumet_pos_JES_Down;
-    Float_t         dphi_mumet_pos_UnclusteredJES_Up;
-    Float_t         dphi_mumet_pos_UnclusteredJES_Down;
-    
     Float_t         dphi_posmu_met;
     Float_t         dphi_posmu_met_uncorr;
+    Float_t         dphi_posmu_met_Up;
+    Float_t         dphi_posmu_met_Down;
     Float_t         dphi_posmu_met_JES_Up;
     Float_t         dphi_posmu_met_JES_Down;
     Float_t         dphi_posmu_met_UnclusteredJES_Up;
     Float_t         dphi_posmu_met_UnclusteredJES_Down;
-    
-//    Float_t         dphi_mumvamet_1;
-//    Float_t         dphi_mumvamet_uncorr_1;
-//    Float_t         dphi_mumvamet_JES_Up_1;
-//    Float_t         dphi_mumvamet_JES_Down_1;
-//    Float_t         dphi_mumvamet_UnclusteredJES_Up_1;
-//    Float_t         dphi_mumvamet_UnclusteredJES_Down_1;
-//    
-//    Float_t         dphi_mumvamet_2;
-//    Float_t         dphi_mumvamet_uncorr_2;
-//    Float_t         dphi_mumvamet_JES_Up_2;
-//    Float_t         dphi_mumvamet_JES_Down_2;
-//    Float_t         dphi_mumvamet_UnclusteredJES_Up_2;
-//    Float_t         dphi_mumvamet_UnclusteredJES_Down_2;
-//    
-//    Float_t         dphi_mumvamet_pos;
-//    Float_t         dphi_mumvamet_pos_uncorr;
-//    Float_t         dphi_mumvamet_pos_JES_Up;
-//    Float_t         dphi_mumvamet_pos_JES_Down;
-//    Float_t         dphi_mumvamet_pos_UnclusteredJES_Up;
-//    Float_t         dphi_mumvamet_pos_UnclusteredJES_Down;
-//    
-//    Float_t         dphi_posmu_mvamet;
-//    Float_t         dphi_posmu_mvamet_uncorr;
-//    Float_t         dphi_posmu_mvamet_JES_Up;
-//    Float_t         dphi_posmu_mvamet_JES_Down;
-//    Float_t         dphi_posmu_mvamet_UnclusteredJES_Up;
-    Float_t         dphi_posmu_mvamet_UnclusteredJES_Down;
     
     Float_t         dphi_twomu;
     
@@ -684,7 +690,7 @@ int main(int argc, char * argv[]) {
     
     T->Branch("genAccept", &genAccept, "genAccept/O");
     T->Branch("noOfvertices", &noOfvertices, "noOfvertices/F");
-    
+    T->Branch("genweight",&genweight,"genweight/F");
     T->Branch("mcweight", &mcweight, "mcweight/F");
     T->Branch("puweight", &puweight, "puweight/F");
     T->Branch("trigweight", &trigweight, "trigweight/F");
@@ -698,6 +704,7 @@ int main(int argc, char * argv[]) {
     T->Branch("topptweight", &topptweight, "topptweight/F");
     T->Branch("trkeffweight", &trkeffweight, "trkeffweight/F");
     T->Branch("zptmassweight",&zptmassweight,"zptmassweight/F");
+    T->Branch("jet0weight", &jet0weight, "jet0weight/F");
     T->Branch("boostedweight", &boostedweight, "boostedweight/F");
     T->Branch("vbfweight", &vbfweight, "vbfweight/F");
     T->Branch("weight", &weight, "weight/F");
@@ -718,12 +725,20 @@ int main(int argc, char * argv[]) {
     T->Branch("eta_sv", &eta_sv, "eta_sv/F");
     T->Branch("phi_sv", &phi_sv, "phi_sv/F");
     
-    T->Branch("m_sv_Up", &m_sv_Up, "m_sv_Up/F");
-    T->Branch("m_sv_Down", &m_sv_Down, "m_sv_Down/F");
+    T->Branch("m_sv_muUp", &m_sv_muUp, "m_sv_muUp/F");
+    T->Branch("m_sv_muDown", &m_sv_muDown, "m_sv_muDown/F");
     T->Branch("m_sv_scaleUp", &m_sv_scaleUp, "m_sv_scaleUp/F");
     T->Branch("m_sv_scaleDown", &m_sv_scaleDown, "m_sv_scaleDown/F");
     T->Branch("m_sv_resoUp", &m_sv_resoUp, "m_sv_resoUp/F");
     T->Branch("m_sv_resoDown", &m_sv_resoDown, "m_sv_resoDown/F");
+
+    T->Branch("pt_sv_muUp", &pt_sv_muUp, "pt_sv_muUp/F");
+    T->Branch("eta_sv_muUp", &eta_sv_muUp, "eta_sv_muUp/F");
+    T->Branch("phi_sv_muUp", &phi_sv_muUp, "phi_sv_muUp/F");
+
+    T->Branch("pt_sv_muDown", &pt_sv_muDown, "pt_sv_muDown/F");
+    T->Branch("eta_sv_muDown", &eta_sv_muDown, "eta_sv_muDown/F");
+    T->Branch("phi_sv_muDown", &phi_sv_muDown, "phi_sv_muDown/F");
 
     T->Branch("pt_1", &pt_1, "pt_1/F");
     T->Branch("pt_1_Up", &pt_1_Up, "pt_1_Up/F");
@@ -760,6 +775,9 @@ int main(int argc, char * argv[]) {
     
     T->Branch("met_uncorr", &met_uncorr, "met_uncorr/F");
     T->Branch("metphi_uncorr", &metphi_uncorr, "metphi_uncorr/F");
+
+    T->Branch("met_Up", &met_Up, "met_Up/F");
+    T->Branch("met_Down", &met_Down, "met_Down/F");
     
     T->Branch("met_JES_Up_uncorr", &met_JES_Up_uncorr, "met_JES_Up_uncorr/F");
     T->Branch("met_JES_Down_uncorr", &met_JES_Down_uncorr, "met_JES_Down_uncorr/F");
@@ -773,39 +791,41 @@ int main(int argc, char * argv[]) {
     T->Branch("met_UnclusteredJES_Up", &met_UnclusteredJES_Up, "met_UnclusteredJES_Up/F");
     T->Branch("met_UnclusteredJES_Down", &met_UnclusteredJES_Down, "met_UnclusteredJES_Down/F");
     
-//    T->Branch("mvamet",&mvamet,"mvamet/F");
-//    T->Branch("mvametphi",&mvametphi,"mvametphi/F");
-//    T->Branch("mvametcov00", &mvametcov00, "mvametcov00/F");
-//    T->Branch("mvametcov01", &mvametcov01, "mvametcov01/F");
-//    T->Branch("mvametcov10", &mvametcov10, "mvametcov10/F");
-//    T->Branch("mvametcov11", &mvametcov11, "mvametcov11/F");
-//    
-//    T->Branch("mvamet_uncorr", &mvamet_uncorr, "mvamet_uncorr/F");
-//    T->Branch("mvametphi_uncorr", &mvametphi_uncorr, "mvametphi_uncorr/F");
-//    
-//    T->Branch("mvamet_JES_Up_uncorr", &mvamet_JES_Up_uncorr, "mvamet_JES_Up_uncorr/F");
-//    T->Branch("mvamet_JES_Down_uncorr", &mvamet_JES_Down_uncorr, "mvamet_JES_Down_uncorr/F");
-//    
-//    T->Branch("mvamet_JES_Up", &mvamet_JES_Up, "mvamet_JES_Up/F");
-//    T->Branch("mvamet_JES_Down", &mvamet_JES_Down, "mvamet_JES_Down/F");
-//    
-//    T->Branch("mvamet_UnclusteredJES_Up_uncorr", &mvamet_UnclusteredJES_Up_uncorr, "mvamet_UnclusteredJES_Up_uncorr/F");
-//    T->Branch("mvamet_UnclusteredJES_Down_uncorr", &mvamet_UnclusteredJES_Down_uncorr, "mvamet_UnclusteredJES_Down_uncorr/F");
-//    
-//    T->Branch("mvamet_UnclusteredJES_Up", &mvamet_UnclusteredJES_Up, "mvamet_UnclusteredJES_Up/F");
-//    T->Branch("mvamet_UnclusteredJES_Down", &mvamet_UnclusteredJES_Down, "mvamet_UnclusteredJES_Down/F");
-
     T->Branch("genmet", &genmet, "genmet/F");
     T->Branch("genmetphi", &genmetphi, "genmetphi/F");
 
     T->Branch("msvmet", &msvmet, "msvmet/F");
     T->Branch("msvmetphi", &msvmetphi, "msvmetphi/F");
 
+    T->Branch("met_x", &met_x, "met_x/F");
+    T->Branch("met_y", &met_y, "met_y/F");
+    T->Branch("px_mu1", &px_mu1, "px_mu1/F");
+    T->Branch("py_mu1", &py_mu1, "py_mu1/F");
+    T->Branch("px_mu2", &px_mu2, "px_mu2/F");
+    T->Branch("py_mu2", &py_mu2, "py_mu2/F");
+    T->Branch("pt_tot_x", &pt_tot_x, "pt_tot_x/F");
+    T->Branch("pt_tot_y", &pt_tot_y, "pt_tot_y/F");
+    T->Branch("pt_tot", &pt_tot, "pt_tot/F");
+    T->Branch("pt_tot_Up", &pt_tot_Up, "pt_tot_Up/F");
+    T->Branch("pt_tot_Down", &pt_tot_Down, "pt_tot_Down/F");
+
     T->Branch("pt_tt", &pt_tt, "pt_tt/F");
     T->Branch("dr_tt", &dr_tt, "dr_tt/F");
     T->Branch("dphi_tt", &dphi_tt, "dphi_tt/F");
     T->Branch("eta_tt", &eta_tt, "eta_tt/F");
     T->Branch("ptRatio",&ptRatio,"ptRatio/F");
+
+    T->Branch("pt_tt_Up", &pt_tt_Up, "pt_tt_Up/F");
+    T->Branch("dr_tt_Up", &dr_tt_Up, "dr_tt_Up/F");
+    T->Branch("dphi_tt_Up", &dphi_tt_Up, "dphi_tt_Up/F");
+    T->Branch("eta_tt_Up", &eta_tt_Up, "eta_tt_Up/F");
+    T->Branch("ptRatio_Up",&ptRatio_Up,"ptRatio_Up/F");
+
+    T->Branch("pt_tt_Down", &pt_tt_Down, "pt_tt_Down/F");
+    T->Branch("dr_tt_Down", &dr_tt_Down, "dr_tt_Down/F");
+    T->Branch("dphi_tt_Down", &dphi_tt_Down, "dphi_tt_Down/F");
+    T->Branch("eta_tt_Down", &eta_tt_Down, "eta_tt_Down/F");
+    T->Branch("ptRatio_Down",&ptRatio_Down,"ptRatio_Down/F");
     
     T->Branch("dcasig2Mu2D", &dcasig2Mu2D, "dcasig2Mu2D/F");
     T->Branch("dcasig2Mu3D", &dcasig2Mu3D, "dcasig2Mu3D/F");
@@ -820,6 +840,11 @@ int main(int argc, char * argv[]) {
     T->Branch("pzetamiss_uncorr", &pzetamiss_uncorr, "pzetamiss_uncorr/F");
     T->Branch("dzeta_uncorr", &dzeta_uncorr, "dzeta_uncorr/F");
     
+    T->Branch("pzetamiss_Up", &pzetamiss_Up, "pzetamiss_Up/F");
+    T->Branch("dzeta_Up", &dzeta_Up, "dzeta_Up/F");
+    T->Branch("pzetamiss_Down", &pzetamiss_Down, "pzetamiss_Down/F");
+    T->Branch("dzeta_Down", &dzeta_Down, "dzeta_Down/F");
+    
     T->Branch("pzetamiss_JES_Up", &pzetamiss_JES_Up, "pzetamiss_JES_Up/F");
     T->Branch("dzeta_JES_Up", &dzeta_JES_Up, "dzeta_JES_Up/F");
     T->Branch("pzetamiss_JES_Down", &pzetamiss_JES_Down, "pzetamiss_JES_Down/F");
@@ -830,22 +855,6 @@ int main(int argc, char * argv[]) {
     T->Branch("pzetamiss_UnclusteredJES_Down", &pzetamiss_UnclusteredJES_Down, "pzetamiss_UnclusteredJES_Down/F");
     T->Branch("dzeta_UnclusteredJES_Down", &dzeta_UnclusteredJES_Down, "dzeta_UnclusteredJES_Down/F");
     
-//    T->Branch("pzetamiss_mvamet", &pzetamiss_mvamet, "pzetamiss_mvamet/F");
-//    T->Branch("dzeta_mvamet", &dzeta_mvamet, "dzeta_mvamet/F");
-//    
-//    T->Branch("pzetamiss_mvamet_uncorr", &pzetamiss_mvamet_uncorr, "pzetamiss_mvamet_uncorr/F");
-//    T->Branch("dzeta_mvamet_uncorr", &dzeta_mvamet_uncorr, "dzeta_mvamet_uncorr/F");
-//    
-//    T->Branch("pzetamiss_mvamet_JES_Up", &pzetamiss_mvamet_JES_Up, "pzetamiss_mvamet_JES_Up/F" );
-//    T->Branch("dzeta_mvamet_JES_Up", &dzeta_mvamet_JES_Up, "dzeta_mvamet_JES_Up/F");
-//    T->Branch("pzetamiss_mvamet_JES_Down", &pzetamiss_mvamet_JES_Down, "pzetamiss_mvamet_JES_Down/F");
-//    T->Branch("dzeta_mvamet_JES_Down", &dzeta_mvamet_JES_Down, "dzeta_mvamet_JES_Down/F");
-//    
-//    T->Branch("pzetamiss_mvamet_UnclusteredJES_Up", &pzetamiss_mvamet_UnclusteredJES_Up, "pzetamiss_mvamet_UnclusteredJES_Up/F");
-//    T->Branch("dzeta_mvamet_UnclusteredJES_Up", &dzeta_mvamet_UnclusteredJES_Up, "dzeta_mvamet_UnclusteredJES_Up/F");
-//    T->Branch("pzetamiss_mvamet_UnclusteredJES_Down", &pzetamiss_mvamet_UnclusteredJES_Down, "pzetamiss_mvamet_UnclusteredJES_Down/F");
-//    T->Branch("dzeta_mvamet_UnclusteredJES_Down", &dzeta_mvamet_UnclusteredJES_Down, "dzeta_mvamet_UnclusteredJES_Down/F");
-
     T->Branch("pzetamiss_genmet", &genmet, "genmet/F");
     T->Branch("dzeta_genmet", &genmet, "genmet/F");
 
@@ -865,31 +874,12 @@ int main(int argc, char * argv[]) {
     
     T->Branch("dphi_posmu_met", &dphi_posmu_met, "dphi_posmu_met/F");
     T->Branch("dphi_posmu_met_uncorr", &dphi_posmu_met_uncorr, "dphi_posmu_met_uncorr/F");
+    T->Branch("dphi_posmu_met_Up", &dphi_posmu_met_Up, "dphi_posmu_met_Up/F");
+    T->Branch("dphi_posmu_met_Down", &dphi_posmu_met_Down, "dphi_posmu_met_Down/F");
     T->Branch("dphi_posmu_met_JES_Up", &dphi_posmu_met_JES_Up, "dphi_posmu_met_JES_Up/F");
     T->Branch("dphi_posmu_met_JES_Down", &dphi_posmu_met_JES_Down, "dphi_posmu_met_JES_Down/F");
     T->Branch("dphi_posmu_met_UnclusteredJES_Up", &dphi_posmu_met_UnclusteredJES_Up, "dphi_posmu_met_UnclusteredJES_Up/F");
     T->Branch("dphi_posmu_met_UnclusteredJES_Down", &dphi_posmu_met_UnclusteredJES_Down, "dphi_posmu_met_UnclusteredJES_Down/F");
-    
-//    T->Branch("dphi_mumvamet_1", &dphi_mumvamet_1, "dphi_mumvamet_1/F");
-//    T->Branch("dphi_mumvamet_uncorr_1", &dphi_mumvamet_uncorr_1, "dphi_mumvamet_uncorr_1/F");
-//    T->Branch("dphi_mumvamet_JES_Up_1", &dphi_mumvamet_JES_Up_1, "dphi_mumvamet_JES_Up_1/F");
-//    T->Branch("dphi_mumvamet_JES_Down_1", &dphi_mumvamet_JES_Down_1, "dphi_mumvamet_JES_Down_1/F");
-//    T->Branch("dphi_mumvamet_UnclusteredJES_Up_1", &dphi_mumvamet_UnclusteredJES_Up_1, "dphi_mumvamet_UnclusteredJES_Up_1/F");
-//    T->Branch("dphi_mumvamet_UnclusteredJES_Down_1", &dphi_mumvamet_UnclusteredJES_Down_1, "dphi_mumvamet_UnclusteredJES_Down_1/F");
-//    
-//    T->Branch("dphi_mumvamet_2", &dphi_mumvamet_2, "dphi_mumvamet_2/F");
-//    T->Branch("dphi_mumvamet_uncorr_2", &dphi_mumvamet_uncorr_2, "dphi_mumvamet_uncorr_2/F");
-//    T->Branch("dphi_mumvamet_JES_Up_2", &dphi_mumvamet_JES_Up_2, "dphi_mumvamet_JES_Up_2/F");
-//    T->Branch("dphi_mumvamet_JES_Down_2", &dphi_mumvamet_JES_Down_2, "dphi_mumvamet_JES_Down_2/F");
-//    T->Branch("dphi_mumvamet_UnclusteredJES_Up_2", &dphi_mumvamet_UnclusteredJES_Up_2, "dphi_mumvamet_UnclusteredJES_Up_2/F");
-//    T->Branch("dphi_mumvamet_UnclusteredJES_Down_2", &dphi_mumvamet_UnclusteredJES_Down_2, "dphi_mumvamet_UnclusteredJES_Down_2/F");
-//    
-//    T->Branch("dphi_posmu_mvamet", &dphi_posmu_mvamet, "dphi_posmu_mvamet/F");
-//    T->Branch("dphi_posmu_mvamet_uncorr", &dphi_posmu_mvamet_uncorr, "dphi_posmu_mvamet_uncorr/F");
-//    T->Branch("dphi_posmu_mvamet_JES_Up", &dphi_posmu_mvamet_JES_Up, "dphi_posmu_mvamet_JES_Up/F");
-//    T->Branch("dphi_posmu_mvamet_JES_Down", &dphi_posmu_mvamet_JES_Down, "dphi_posmu_mvamet_JES_Down/F");
-//    T->Branch("dphi_posmu_mvamet_UnclusteredJES_Up", &dphi_posmu_mvamet_UnclusteredJES_Up, "dphi_posmu_mvamet_UnclusteredJES_Up/F");
-//    T->Branch("dphi_posmu_mvamet_UnclusteredJES_Down", &dphi_posmu_mvamet_UnclusteredJES_Down, "dphi_posmu_mvamet_UnclusteredJES_Down/F");
     
     T->Branch("dphi_twomu", &dphi_twomu, "dphi_twomu/F");
     
@@ -970,7 +960,7 @@ int main(int argc, char * argv[]) {
     T->Branch("bphi",  &bphi,  "bphi/F");
     
     T->Branch("npartons",&npartons,"npartons/i");
-    
+
     T->Branch("bdt", &bdt, "bdt/F");
     T->Branch("bdt_Up", &bdt_Up, "bdt_Up/F");
     T->Branch("bdt_Down", &bdt_Down, "bdt_Down/F");
@@ -1002,6 +992,32 @@ int main(int argc, char * argv[]) {
     T->Branch("bdt_vbf_JES_Down", &bdt_vbf_JES_Down, "bdt_vbf_JES_Down/F");
     T->Branch("bdt_vbf_UnclusteredJES_Up", &bdt_vbf_UnclusteredJES_Up, "bdt_vbf_UnclusteredJES_Up/F");
     T->Branch("bdt_vbf_UnclusteredJES_Down", &bdt_vbf_UnclusteredJES_Down, "bdt_vbf_UnclusteredJES_Down/F");
+
+    //---------------------------defining JES uncertainties------------------------->
+
+    JESUncertainties * jecUncertainties = new JESUncertainties("DesyTauAnalyses/NTupleMaker/data/Summer16_UncertaintySources_AK4PFchs.txt");
+    std::vector<std::string> uncertNames = jecUncertainties->getUncertNames();
+
+    std::cout << "Number of uncertainties = " << uncertNames.size() << std::endl;
+
+    int njetsUncUp[30];
+    int njetsUncDown[30];
+    float mjjUncUp[30];
+    float mjjUncDown[30];
+
+    int iUncert = 0;
+    if (!isData) {
+      for (auto const& Name : uncertNames) {
+	TString name(Name);
+	cout << name << endl;
+	T->Branch("njets_"+name+"Up",&njetsUncUp[iUncert],"njets_"+name+"Up/I");
+	T->Branch("njets_"+name+"Down",&njetsUncDown[iUncert],"njets_"+name+"Down/I");
+	T->Branch("mjj_"+name+"Up",&mjjUncUp[iUncert],"njets_"+name+"Up/F");
+	T->Branch("mjj_"+name+"Down",&mjjUncDown[iUncert],"njets_"+name+"Down/F");
+	iUncert++;
+      }
+      cout << endl;
+    }
     
     //-----------  Pileup reweighting official receipe------------------------>
     
@@ -1056,10 +1072,11 @@ int main(int argc, char * argv[]) {
     if (fileCategoryWeights==NULL){
         std::cout << "File " << TString(cmsswBase) << "/src/" << CategoryWeightsFileName << "  does not exist!" << std::endl;
     }
-    TH2D * boostedHist = (TH2D*)fileCategoryWeights->Get(BoostedWeightsHist);
+    TH3D * jet0Hist = (TH3D*)fileCategoryWeights->Get(Jet0WeightsHist);
+    TH3D * boostedHist = (TH3D*)fileCategoryWeights->Get(BoostedWeightsHist);
     TH3D * vbfHist = (TH3D*)fileCategoryWeights->Get(VBFWeightsHist);
-    if (BoostedWeightsHist ==NULL || VBFWeightsHist == NULL){
-        std::cout << "histogram " << BoostedWeightsHist <<" and  " <<VBFWeightsHist  << " are not found in file " << TString(cmsswBase) << "/src/DesyTauAnalyses/NTupleMaker/data/" << CategoryWeightsFileName << std::endl;
+    if (Jet0WeightsHist == NULL|| BoostedWeightsHist ==NULL || VBFWeightsHist == NULL){
+        std::cout << "histogram "<< Jet0WeightsHist<<" and " << BoostedWeightsHist <<" and  " <<VBFWeightsHist  << " are not found in file " << TString(cmsswBase) << "/src/DesyTauAnalyses/NTupleMaker/data/" << CategoryWeightsFileName << std::endl;
         exit(-1);
     }
     
@@ -1103,62 +1120,311 @@ int main(int argc, char * argv[]) {
     float MinBJetPt = 20.; // !!!!!
     
 //    //-------------------BDTs ----------------------------------------->
-//    
-//    //This loads the library
-//    TMVA::Tools::Instance();
-//    
-//    //Create TMVA Reader Object
-//    TMVA::Reader *reader = new TMVA::Reader("!V:!Color");
-//    
-//    //create set of variables as declared in the weight file and declared them to reader
-//    reader->AddVariable( "eta_tt",&eta_tt);
-//    reader->AddVariable( "dphi_posmu_met",&dphi_posmu_met);
-//    reader->AddVariable("dzeta",&dzeta);
-//    reader->AddVariable( "met",&met);
-//    reader->AddVariable("m_vis", &m_vis);
-//    reader->AddVariable("costheta", &costheta);
-//    reader->AddVariable("ptRatio", &ptRatio);
-//    
-//    //BookMethod
-//    reader->BookMVA("BDT", cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/test/BDTweights/TMVA_BDT.weights.xml");
-//    
-//    //0jets
-//    TMVA::Reader *reader0jets = new TMVA::Reader("!V:!Color");
-//    reader0jets->AddVariable( "eta_tt",&eta_tt);
-//    reader0jets->AddVariable( "dphi_posmu_met",&dphi_posmu_met);
-//    reader0jets->AddVariable("dzeta",&dzeta);
-//    reader0jets->AddVariable( "met",&met);
-//    reader0jets->AddVariable("m_vis", &m_vis);
-//    reader0jets->AddVariable("costheta", &costheta);
-//    reader0jets->AddVariable("ptRatio", &ptRatio);
-//    reader0jets->BookMVA("BDT", cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/test/BDTweights/TMVA_0jets_BDT.weights.xml");
-//    
-//    //boosted
-//    TMVA::Reader *readerboost = new TMVA::Reader("!V:!Color");
-//    readerboost->AddVariable( "eta_tt",&eta_tt);
-//    readerboost->AddVariable( "dphi_posmu_met",&dphi_posmu_met);
-//    readerboost->AddVariable("dzeta",&dzeta);
-//    readerboost->AddVariable( "met",&met);
-//    readerboost->AddVariable("m_vis", &m_vis);
-//    readerboost->AddVariable("costheta", &costheta);
-//    readerboost->AddVariable("ptRatio", &ptRatio);
-//    readerboost->AddVariable("pt_sv", &pt_sv);
-//    readerboost->BookMVA("BDT", cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/test/BDTweights/TMVA_boosted_BDT.weights.xml");
-//    
-//    //vbf
-//    TMVA::Reader *readervbf = new TMVA::Reader("!V:!Color");
-//    readervbf->AddVariable("eta_tt",&eta_tt);
-//    readervbf->AddVariable("dphi_posmu_met",&dphi_posmu_met);
-//    readervbf->AddVariable("dzeta",&dzeta);
-//    readervbf->AddVariable("met",&met);
-//    readervbf->AddVariable("m_vis", &m_vis);
-//    readervbf->AddVariable("costheta", &costheta);
-//    readervbf->AddVariable("ptRatio", &ptRatio);
-//    readervbf->AddVariable("mjj", &mjj);
-//    readervbf->AddVariable("jdeta", &jdeta);
-//    
-//    readervbf->BookMVA("BDT", cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/test/BDTweights/TMVA_2jets_BDT.weights.xml");
-//
+
+    TString jet0BDTweight = "/src/DesyTauAnalyses/NTupleMaker/data/mumu_BDTWeights/TMVA_RunBtoH_0jets_May18_BDT.weights.xml";
+    TString boostBDTweight= "/src/DesyTauAnalyses/NTupleMaker/data/mumu_BDTWeights/TMVA_RunBtoH_boosted_May25_BDT.weights.xml";
+    TString vbfBDTweight  = "/src/DesyTauAnalyses/NTupleMaker/data/mumu_BDTWeights/TMVA_RunBtoH_vbf_May18_BDT.weights.xml";
+    //This loads the library
+    TMVA::Tools::Instance();
+    
+    //0jets
+    TMVA::Reader *reader0jets = new TMVA::Reader("!V:!Color");
+    reader0jets->AddVariable( "eta_tt",&eta_tt);
+    reader0jets->AddVariable( "dphi_posmu_met",&dphi_posmu_met);
+    reader0jets->AddVariable("dzeta",&dzeta);
+    reader0jets->AddVariable( "met",&met);
+    reader0jets->AddVariable("m_vis", &m_vis);
+    reader0jets->AddVariable("costheta", &costheta);
+    reader0jets->AddVariable("ptRatio", &ptRatio);
+    reader0jets->BookMVA("BDT", cmsswBase+jet0BDTweight);
+    
+    //boosted
+    TMVA::Reader *readerboost = new TMVA::Reader("!V:!Color");
+    readerboost->AddVariable( "eta_tt",&eta_tt);
+    readerboost->AddVariable( "dphi_posmu_met",&dphi_posmu_met);
+    readerboost->AddVariable("dzeta",&dzeta);
+    readerboost->AddVariable( "met",&met);
+    readerboost->AddVariable("m_vis", &m_vis);
+    readerboost->AddVariable("costheta", &costheta);
+    readerboost->AddVariable("ptRatio", &ptRatio);
+    readerboost->AddVariable("pt_tot", &pt_tot);
+    readerboost->BookMVA("BDT", cmsswBase+boostBDTweight);
+    
+    //vbf
+    TMVA::Reader *readervbf = new TMVA::Reader("!V:!Color");
+    readervbf->AddVariable("eta_tt",&eta_tt);
+    readervbf->AddVariable("dphi_posmu_met",&dphi_posmu_met);
+    readervbf->AddVariable("dzeta",&dzeta);
+    readervbf->AddVariable("met",&met);
+    readervbf->AddVariable("m_vis", &m_vis);
+    readervbf->AddVariable("costheta", &costheta);
+    readervbf->AddVariable("ptRatio", &ptRatio);
+    readervbf->AddVariable("mjj", &mjj);
+    //readervbf->AddVariable("jdeta", &jdeta);
+    
+    readervbf->BookMVA("BDT", cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/mumu_BDTWeights/TMVA_RunBtoH_vbf_May18_BDT.weights.xml");
+    
+    //Create TMVA reader for JESUp******************************************************************
+    TMVA::Reader *reader_0jetsJESUp = new TMVA::Reader("!V:!Color");
+    //create set of variables as declared in weight file and declared them to reader
+    reader_0jetsJESUp->AddVariable( "eta_tt",&eta_tt);
+    reader_0jetsJESUp->AddVariable( "dphi_posmu_met",&dphi_posmu_met_JES_Up);
+    reader_0jetsJESUp->AddVariable("dzeta",&dzeta_JES_Up);
+    reader_0jetsJESUp->AddVariable( "met",&met_JES_Up);
+    reader_0jetsJESUp->AddVariable("m_vis", &m_vis);
+    reader_0jetsJESUp->AddVariable("costheta", &costheta);
+    reader_0jetsJESUp->AddVariable("ptRatio", &ptRatio);
+    //BookMethod
+    reader_0jetsJESUp->BookMVA("BDT", cmsswBase+jet0BDTweight);
+    
+    TMVA::Reader *reader_boostJESUp = new TMVA::Reader("!V:!Color");
+    
+    //create set of variables as declared in weight file and declared them to reader
+    reader_boostJESUp->AddVariable( "eta_tt",&eta_tt);
+    reader_boostJESUp->AddVariable( "dphi_posmu_met",&dphi_posmu_met_JES_Up);
+    reader_boostJESUp->AddVariable("dzeta",&dzeta_JES_Up);
+    reader_boostJESUp->AddVariable( "met",&met_JES_Up);
+    reader_boostJESUp->AddVariable("m_vis", &m_vis);
+    reader_boostJESUp->AddVariable("costheta", &costheta);
+    reader_boostJESUp->AddVariable("ptRatio", &ptRatio);
+    reader_boostJESUp->AddVariable("pt_tot", &pt_tot);
+    //BookMethod
+    reader_boostJESUp->BookMVA("BDT", cmsswBase+boostBDTweight);
+    
+    TMVA::Reader *reader_vbfJESUp = new TMVA::Reader("!V:!Color");
+    
+    //create set of variables as declared in weight file and declared them to reader
+    reader_vbfJESUp->AddVariable( "eta_tt",&eta_tt);
+    reader_vbfJESUp->AddVariable( "dphi_posmu_met",&dphi_posmu_met_JES_Up);
+    reader_vbfJESUp->AddVariable("dzeta",&dzeta_JES_Up);
+    reader_vbfJESUp->AddVariable( "met",&met_JES_Up);
+    reader_vbfJESUp->AddVariable("m_vis", &m_vis);
+    reader_vbfJESUp->AddVariable("costheta", &costheta);
+    reader_vbfJESUp->AddVariable("ptRatio", &ptRatio);
+    reader_vbfJESUp->AddVariable("mjj", &mjj);
+    //BookMethod
+    reader_vbfJESUp->BookMVA("BDT", cmsswBase+vbfBDTweight);
+    
+    //Create TMVA reader for JESDown****************************************************************
+    TMVA::Reader *reader_0jetsJESDown = new TMVA::Reader("!V:!Color");
+    
+    //create set of variables as declared in weight file and declared them to reader
+    reader_0jetsJESDown->AddVariable( "eta_tt",&eta_tt);
+    reader_0jetsJESDown->AddVariable( "dphi_posmu_met",&dphi_posmu_met_JES_Down);
+    reader_0jetsJESDown->AddVariable("dzeta",&dzeta_JES_Down);
+    reader_0jetsJESDown->AddVariable( "met",&met_JES_Down);
+    reader_0jetsJESDown->AddVariable("m_vis", &m_vis);
+    reader_0jetsJESDown->AddVariable("costheta", &costheta);
+    reader_0jetsJESDown->AddVariable("ptRatio", &ptRatio);
+    //BookMethod
+    reader_0jetsJESDown->BookMVA("BDT", cmsswBase+jet0BDTweight);
+    
+    //Create TMVA Reader Object
+    TMVA::Reader *reader_boostJESDown = new TMVA::Reader("!V:!Color");
+    
+    //create set of variables as declared in weight file and declared them to reader
+    reader_boostJESDown->AddVariable( "eta_tt",&eta_tt);
+    reader_boostJESDown->AddVariable( "dphi_posmu_met",&dphi_posmu_met_JES_Down);
+    reader_boostJESDown->AddVariable("dzeta",&dzeta_JES_Down);
+    reader_boostJESDown->AddVariable( "met",&met_JES_Down);
+    reader_boostJESDown->AddVariable("m_vis", &m_vis);
+    reader_boostJESDown->AddVariable("costheta", &costheta);
+    reader_boostJESDown->AddVariable("ptRatio", &ptRatio);
+    reader_boostJESDown->AddVariable("pt_tot", &pt_tot);
+    //BookMethod
+    reader_boostJESDown->BookMVA("BDT", cmsswBase+boostBDTweight);
+    
+    //Create TMVA Reader Object
+    TMVA::Reader *reader_vbfJESDown = new TMVA::Reader("!V:!Color");
+    
+    //create set of variables as declared in weight file and declared them to reader
+    reader_vbfJESDown->AddVariable( "eta_tt",&eta_tt);
+    reader_vbfJESDown->AddVariable( "dphi_posmu_met",&dphi_posmu_met_JES_Down);
+    reader_vbfJESDown->AddVariable("dzeta",&dzeta_JES_Down);
+    reader_vbfJESDown->AddVariable( "met",&met_JES_Down);
+    reader_vbfJESDown->AddVariable("m_vis", &m_vis);
+    reader_vbfJESDown->AddVariable("costheta", &costheta);
+    reader_vbfJESDown->AddVariable("ptRatio", &ptRatio);
+    reader_vbfJESDown->AddVariable("mjj", &mjj);
+    //BookMethod
+    reader_vbfJESDown->BookMVA("BDT", cmsswBase+vbfBDTweight);
+    
+    //Create TMVA reader for UnclustJESUp******************************************************************
+    TMVA::Reader *reader_0jetsUnclustJESUp = new TMVA::Reader("!V:!Color");
+    
+    //create set of variables as declared in weight file and declared them to reader
+    reader_0jetsUnclustJESUp->AddVariable( "eta_tt",&eta_tt);
+    reader_0jetsUnclustJESUp->AddVariable( "dphi_posmu_met",&dphi_posmu_met_UnclusteredJES_Up);
+    reader_0jetsUnclustJESUp->AddVariable("dzeta",&dzeta_UnclusteredJES_Up);
+    reader_0jetsUnclustJESUp->AddVariable( "met",&met_UnclusteredJES_Up);
+    reader_0jetsUnclustJESUp->AddVariable("m_vis", &m_vis);
+    reader_0jetsUnclustJESUp->AddVariable("costheta", &costheta);
+    reader_0jetsUnclustJESUp->AddVariable("ptRatio", &ptRatio);
+    //BookMethod
+    reader_0jetsUnclustJESUp->BookMVA("BDT", cmsswBase+jet0BDTweight);
+    
+    //Create TMVA Reader Object
+    TMVA::Reader *reader_boostUnclustJESUp = new TMVA::Reader("!V:!Color");
+    
+    //create set of variables as declared in weight file and declared them to reader
+    reader_boostUnclustJESUp->AddVariable( "eta_tt",&eta_tt);
+    reader_boostUnclustJESUp->AddVariable( "dphi_posmu_met",&dphi_posmu_met_UnclusteredJES_Up);
+    reader_boostUnclustJESUp->AddVariable("dzeta",&dzeta_UnclusteredJES_Up);
+    reader_boostUnclustJESUp->AddVariable( "met",&met_UnclusteredJES_Up);
+    reader_boostUnclustJESUp->AddVariable("m_vis", &m_vis);
+    reader_boostUnclustJESUp->AddVariable("costheta", &costheta);
+    reader_boostUnclustJESUp->AddVariable("ptRatio", &ptRatio);
+    reader_boostUnclustJESUp->AddVariable("pt_tot", &pt_tot);
+    //BookMethod
+    reader_boostUnclustJESUp->BookMVA("BDT", cmsswBase+boostBDTweight);
+    
+    //Create TMVA Reader Object
+    TMVA::Reader *reader_vbfUnclustJESUp = new TMVA::Reader("!V:!Color");
+    
+    //create set of variables as declared in weight file and declared them to reader
+    reader_vbfUnclustJESUp->AddVariable( "eta_tt",&eta_tt);
+    reader_vbfUnclustJESUp->AddVariable( "dphi_posmu_met",&dphi_posmu_met_UnclusteredJES_Up);
+    reader_vbfUnclustJESUp->AddVariable("dzeta",&dzeta_UnclusteredJES_Up);
+    reader_vbfUnclustJESUp->AddVariable( "met",&met_UnclusteredJES_Up);
+    reader_vbfUnclustJESUp->AddVariable("m_vis", &m_vis);
+    reader_vbfUnclustJESUp->AddVariable("costheta", &costheta);
+    reader_vbfUnclustJESUp->AddVariable("ptRatio", &ptRatio);
+    reader_vbfUnclustJESUp->AddVariable("mjj", &mjj);
+    //BookMethod
+    reader_vbfUnclustJESUp->BookMVA("BDT",cmsswBase+vbfBDTweight);
+    
+    //Create TMVA reader for UnclustJESDown******************************************************************
+    TMVA::Reader *reader_0jetsUnclustJESDown = new TMVA::Reader("!V:!Color");
+    
+    //create set of variables as declared in weight file and declared them to reader
+    reader_0jetsUnclustJESDown->AddVariable( "eta_tt",&eta_tt);
+    reader_0jetsUnclustJESDown->AddVariable( "dphi_posmu_met",&dphi_posmu_met_UnclusteredJES_Down);
+    reader_0jetsUnclustJESDown->AddVariable("dzeta",&dzeta_UnclusteredJES_Down);
+    reader_0jetsUnclustJESDown->AddVariable( "met",&met_UnclusteredJES_Down);
+    reader_0jetsUnclustJESDown->AddVariable("m_vis", &m_vis);
+    reader_0jetsUnclustJESDown->AddVariable("costheta", &costheta);
+    reader_0jetsUnclustJESDown->AddVariable("ptRatio", &ptRatio);
+    //BookMethod
+    reader_0jetsUnclustJESDown->BookMVA("BDT", cmsswBase+jet0BDTweight);
+    
+    //Create TMVA Reader Object
+    TMVA::Reader *reader_boostUnclustJESDown = new TMVA::Reader("!V:!Color");
+    
+    //create set of variables as declared in weight file and declared them to reader
+    reader_boostUnclustJESDown->AddVariable( "eta_tt",&eta_tt);
+    reader_boostUnclustJESDown->AddVariable( "dphi_posmu_met",&dphi_posmu_met_UnclusteredJES_Down);
+    reader_boostUnclustJESDown->AddVariable("dzeta",&dzeta_UnclusteredJES_Down);
+    reader_boostUnclustJESDown->AddVariable( "met",&met_UnclusteredJES_Down);
+    reader_boostUnclustJESDown->AddVariable("m_vis", &m_vis);
+    reader_boostUnclustJESDown->AddVariable("costheta", &costheta);
+    reader_boostUnclustJESDown->AddVariable("ptRatio", &ptRatio);
+    reader_boostUnclustJESDown->AddVariable("pt_tot", &pt_tot);
+    //BookMethod
+    reader_boostUnclustJESDown->BookMVA("BDT", cmsswBase+boostBDTweight);
+    
+    //Create TMVA Reader Object
+    TMVA::Reader *reader_vbfUnclustJESDown = new TMVA::Reader("!V:!Color");
+    
+    //create set of variables as declared in weight file and declared them to reader
+    reader_vbfUnclustJESDown->AddVariable( "eta_tt",&eta_tt);
+    reader_vbfUnclustJESDown->AddVariable( "dphi_posmu_met",&dphi_posmu_met_UnclusteredJES_Down);
+    reader_vbfUnclustJESDown->AddVariable("dzeta",&dzeta_UnclusteredJES_Down);
+    reader_vbfUnclustJESDown->AddVariable( "met",&met_UnclusteredJES_Down);
+    reader_vbfUnclustJESDown->AddVariable("m_vis", &m_vis);
+    reader_vbfUnclustJESDown->AddVariable("costheta", &costheta);
+    reader_vbfUnclustJESDown->AddVariable("ptRatio", &ptRatio);
+    reader_vbfUnclustJESDown->AddVariable("mjj", &mjj);
+    //BookMethod
+    reader_vbfUnclustJESDown->BookMVA("BDT", cmsswBase+vbfBDTweight);
+    
+    //Create TMVA reader for MuScaleUp******************************************************************
+    TMVA::Reader *reader_0jetsMuScaleUp = new TMVA::Reader("!V:!Color");
+    
+    //create set of variables as declared in weight file and declared them to reader
+    reader_0jetsMuScaleUp->AddVariable( "eta_tt",&eta_tt_Up);
+    reader_0jetsMuScaleUp->AddVariable( "dphi_posmu_met",&dphi_posmu_met);
+    reader_0jetsMuScaleUp->AddVariable("dzeta",&dzeta);
+    reader_0jetsMuScaleUp->AddVariable( "met",&met);
+    reader_0jetsMuScaleUp->AddVariable("m_vis", &m_vis_Up);
+    reader_0jetsMuScaleUp->AddVariable("costheta", &costheta);
+    reader_0jetsMuScaleUp->AddVariable("ptRatio", &ptRatio_Up);
+    //BookMethod
+    reader_0jetsMuScaleUp->BookMVA("BDT", cmsswBase+jet0BDTweight);
+    
+    //Create TMVA Reader Object
+    TMVA::Reader *reader_boostMuScaleUp = new TMVA::Reader("!V:!Color");
+    
+    //create set of variables as declared in weight file and declared them to reader
+    reader_boostMuScaleUp->AddVariable( "eta_tt",&eta_tt_Up);
+    reader_boostMuScaleUp->AddVariable( "dphi_posmu_met",&dphi_posmu_met);
+    reader_boostMuScaleUp->AddVariable("dzeta",&dzeta);
+    reader_boostMuScaleUp->AddVariable( "met",&met);
+    reader_boostMuScaleUp->AddVariable("m_vis", &m_vis_Up);
+    reader_boostMuScaleUp->AddVariable("costheta", &costheta);
+    reader_boostMuScaleUp->AddVariable("ptRatio", &ptRatio_Up);
+    reader_boostMuScaleUp->AddVariable("pt_tot", &pt_tot_Up);
+    //BookMethod
+    reader_boostMuScaleUp->BookMVA("BDT", cmsswBase+boostBDTweight);
+    
+    //Create TMVA Reader Object
+    TMVA::Reader *reader_vbfMuScaleUp = new TMVA::Reader("!V:!Color");
+	
+    //create set of variables as declared in weight file and declared them to reader
+    reader_vbfMuScaleUp->AddVariable( "eta_tt",&eta_tt_Up);
+    reader_vbfMuScaleUp->AddVariable( "dphi_posmu_met",&dphi_posmu_met);
+    reader_vbfMuScaleUp->AddVariable("dzeta",&dzeta);
+    reader_vbfMuScaleUp->AddVariable( "met",&met);
+    reader_vbfMuScaleUp->AddVariable("m_vis", &m_vis_Up);
+    reader_vbfMuScaleUp->AddVariable("costheta", &costheta);
+    reader_vbfMuScaleUp->AddVariable("ptRatio", &ptRatio_Up);
+    reader_vbfMuScaleUp->AddVariable("mjj", &mjj);
+    //BookMethod
+    reader_vbfMuScaleUp->BookMVA("BDT", cmsswBase+vbfBDTweight);
+    
+    //Create TMVA reader for MuScaleDown******************************************************************
+    TMVA::Reader *reader_0jetsMuScaleDown = new TMVA::Reader("!V:!Color");
+    
+    //create set of variables as declared in weight file and declared them to reader
+    reader_0jetsMuScaleDown->AddVariable( "eta_tt",&eta_tt_Down);
+    reader_0jetsMuScaleDown->AddVariable( "dphi_posmu_met",&dphi_posmu_met);
+    reader_0jetsMuScaleDown->AddVariable("dzeta",&dzeta);
+    reader_0jetsMuScaleDown->AddVariable( "met",&met);
+    reader_0jetsMuScaleDown->AddVariable("m_vis", &m_vis_Down);
+    reader_0jetsMuScaleDown->AddVariable("costheta", &costheta);
+    reader_0jetsMuScaleDown->AddVariable("ptRatio", &ptRatio_Down);
+    //BookMethod
+    reader_0jetsMuScaleDown->BookMVA("BDT", cmsswBase+jet0BDTweight);
+    
+    //Create TMVA Reader Object
+    TMVA::Reader *reader_boostMuScaleDown = new TMVA::Reader("!V:!Color");
+    
+    //create set of variables as declared in weight file and declared them to reader
+    reader_boostMuScaleDown->AddVariable( "eta_tt",&eta_tt_Down);
+    reader_boostMuScaleDown->AddVariable( "dphi_posmu_met",&dphi_posmu_met);
+    reader_boostMuScaleDown->AddVariable("dzeta",&dzeta);
+    reader_boostMuScaleDown->AddVariable( "met",&met);
+    reader_boostMuScaleDown->AddVariable("m_vis", &m_vis_Down);
+    reader_boostMuScaleDown->AddVariable("costheta", &costheta);
+    reader_boostMuScaleDown->AddVariable("ptRatio", &ptRatio_Down);
+    reader_boostMuScaleDown->AddVariable("pt_tot", &pt_tot_Down);
+    //BookMethod
+    reader_boostMuScaleDown->BookMVA("BDT", cmsswBase+boostBDTweight);
+    
+    //Create TMVA Reader Object
+    TMVA::Reader *reader_vbfMuScaleDown = new TMVA::Reader("!V:!Color");
+    
+    //create set of variables as declared in weight file and declared them to reader
+    reader_vbfMuScaleDown->AddVariable( "eta_tt",&eta_tt_Down);
+    reader_vbfMuScaleDown->AddVariable( "dphi_posmu_met",&dphi_posmu_met);
+    reader_vbfMuScaleDown->AddVariable("dzeta",&dzeta);
+    reader_vbfMuScaleDown->AddVariable( "met",&met);
+    reader_vbfMuScaleDown->AddVariable("m_vis", &m_vis_Down);
+    reader_vbfMuScaleDown->AddVariable("costheta", &costheta);
+    reader_vbfMuScaleDown->AddVariable("ptRatio", &ptRatio_Down);
+    reader_vbfMuScaleDown->AddVariable("mjj", &mjj);
+    //BookMethod
+    reader_vbfMuScaleDown->BookMVA("BDT", cmsswBase+vbfBDTweight);
+
 //    //------------------------------->
     
     int nFiles = 0;
@@ -1254,13 +1520,14 @@ int main(int argc, char * argv[]) {
                 
                 //std::cout << "genweight = " << analysisTree.genweight << std::endl;
                 weight *= genweight;
-                histWeightsH->Fill(float(0),weight);
+                histWeightsH->Fill(0.,weight);
 
             }
             else
-                histWeightsH->Fill(float(0),1);
-            
-            mcweight = analysisTree.genweight;
+                histWeightsH->Fill(0.,1.);
+	    mcweight = 1;
+	    if (!isData)
+	      mcweight = analysisTree.genweight;
             puweight = 1;
             trigweight = 1;
             weightTrig_gen = 1;
@@ -1273,6 +1540,7 @@ int main(int argc, char * argv[]) {
             topptweight = 1;
             zptmassweight = 1;
             trkeffweight = 1;
+            jet0weight = 1;
             boostedweight = 1;
             vbfweight = 1;
             btag0weight =1;
@@ -1415,20 +1683,37 @@ int main(int argc, char * argv[]) {
                     if (genVAbsEta >7.) genVAbsEta = 7.;
                     if (genVPt >1000.) genVPt = 1000.;
                     if (genVMass > 1000.) genVMass = 1000.;
+                    float jet0Cat =1.;
                     float boosted = 1.;
                     float vbf = 1.;
                     if (genVPt>0.0){
                         //std::cout << "genV Mass     =  " << genVMass <<     "          genVPt Pt   =      "<< genVPt <<     "        genVAbsEta    =" << genVAbsEta << std::endl;
-                        boosted = boostedHist->GetBinContent(boostedHist->GetXaxis()->FindBin(genVAbsEta), boostedHist->GetYaxis()->FindBin(genVPt));
-                        //std::cout<< "   Eta bin     = " <<boostedHist->GetXaxis()->FindBin(genVAbsEta)<< "        pt bin  =   " <<  boostedHist->GetYaxis()->FindBin(genVPt) << std::endl;
+                        jet0Cat = jet0Hist->GetBinContent(jet0Hist->GetXaxis()->FindBin(genVAbsEta), jet0Hist->GetYaxis()->FindBin(genVPt), jet0Hist->GetZaxis()->FindBin(genVMass));
+                        //cout << "  Eta Bin   = "<<jet0Hist->GetXaxis()->FindBin(genVAbsEta) <<
+                        //"    Pt Bin  = "<<jet0Hist->GetYaxis()->FindBin(genVPt)<<
+                        //"    Mass Bin = "<<jet0Hist->GetZaxis()->FindBin(genVMass)<<endl;
+                        
+                        //cout << " jet0Cat  =  " <<jet0Cat<<endl;
+                        
+                        if (jet0Cat<= 0.0) jet0weight = 1;
+                        else jet0weight = jet0Cat;
+                        
+                        //cout<< " jet0weight = "<< jet0weight << endl;
+                        
+                        boosted = boostedHist->GetBinContent(boostedHist->GetXaxis()->FindBin(genVAbsEta), boostedHist->GetYaxis()->FindBin(genVPt),boostedHist->GetZaxis()->FindBin(genVMass));
+//                        std::cout<< "   Eta bin     = " <<boostedHist->GetXaxis()->FindBin(genVAbsEta)<<
+//                        "        pt bin  =   " <<  boostedHist->GetYaxis()->FindBin(genVPt)<<
+//                        "        Mass bin =  " <<  boostedHist->GetZaxis()->FindBin(genVMass)<< std::endl;
+                        
                         //std::cout << " boosted    =     " << boosted << std::endl;
-                        if (boosted < 0.0) boostedweight = 1;
+                        
+                        if (boosted <= 0.0) boostedweight = 1;
                         else boostedweight = boosted;
                         //std::cout << " boostedweight  =    " << boostedweight << std::endl;
                         
                         vbf = vbfHist->GetBinContent(vbfHist->GetXaxis()->FindBin(genVAbsEta), vbfHist->GetYaxis()->FindBin(genVPt), vbfHist->GetZaxis()->FindBin(genVMass));
                         //std::cout << "vbf    =   " << vbf << std::endl;
-                        if (vbf < 0.0) vbfweight = 1;
+                        if (vbf <= 0.0) vbfweight = 1;
                         else vbfweight = vbf;
                         //std::cout << " vbfweight  =    " << vbfweight << std::endl;
                     }
@@ -1855,13 +2140,14 @@ int main(int argc, char * argv[]) {
 //                        }
                         //if (!isData) isMu2matched = true;
                         os = q_1*q_2 < 0;
-                        bool isPairSelected = q_1*q_2 > 0;
-                        if (oppositeSign) isPairSelected = q_1*q_2 < 0;
+                        //bool isPairSelected = q_1*q_2 > 0;
+                        //if (oppositeSign) isPairSelected = q_1*q_2 < 0;
                         bool isTriggerMatch = isMu1matched;
                         
                         float dRmumu = deltaR(analysisTree.muon_eta[index1],analysisTree.muon_phi[index1],
                                               analysisTree.muon_eta[index2],analysisTree.muon_phi[index2]);
-                        if (isTriggerMatch && isPairSelected && dRmumu>dRleptonsCut) {
+                        //if (isTriggerMatch && isPairSelected && dRmumu>dRleptonsCut) {
+			if (isTriggerMatch && dRmumu>dRleptonsCut) {
                             bool sumIso = isoMuonsValue[im1]+isoMuonsValue[im2];
                             if (sumIso<isoMin) {
                                 isIsoMuonsPair = true;
@@ -1926,8 +2212,8 @@ int main(int argc, char * argv[]) {
                 //Leading muon
                 
                 pt_1      = analysisTree.muon_pt[indx1];
-                pt_1_Up   = (1+muonScale)* pt_1;
-                pt_1_Down = (1-muonScale)* pt_1;
+                pt_1_Up   = (1.0+muonScale)* pt_1;
+                pt_1_Down = (1.0-muonScale)* pt_1;
                 q_1       = analysisTree.muon_charge[indx1];
                 eta_1     = analysisTree.muon_eta[indx1];
                 phi_1     = analysisTree.muon_phi[indx1];
@@ -1944,8 +2230,8 @@ int main(int argc, char * argv[]) {
                 //Trailing muon
                 
                 pt_2      = analysisTree.muon_pt[indx2];
-                pt_2_Up   = (1+muonScale)* pt_2;
-                pt_2_Down = (1-muonScale)* pt_2;
+                pt_2_Up   = (1.0+muonScale)* pt_2;
+                pt_2_Down = (1.0-muonScale)* pt_2;
                 q_2       = analysisTree.muon_charge[indx2];
                 eta_2     = analysisTree.muon_eta[indx2];
                 phi_2     = analysisTree.muon_phi[indx2];
@@ -1978,10 +2264,28 @@ int main(int argc, char * argv[]) {
                 eta_tt = dimuon.Eta();
                 dphi_tt = dPhiFrom2P(mu1.Px(), mu1.Py(), mu2.Px(), mu2.Py());
                 dr_tt = deltaR(mu1.Eta(), mu1.Phi(), mu2.Eta(), mu2.Phi());
-                float sumMuonPt = (mu1.Pt()+mu2.Pt());
+
+		pt_tt_Up = dimuon_Up.Pt();
+                eta_tt_Up = dimuon_Up.Eta();
+                dphi_tt_Up = dPhiFrom2P(mu1_Up.Px(), mu1_Up.Py(), mu2_Up.Px(), mu2_Up.Py());
+                dr_tt_Up = deltaR(mu1_Up.Eta(), mu1_Up.Phi(), mu2_Up.Eta(), mu2_Up.Phi());
+
+		pt_tt_Down = dimuon_Down.Pt();
+                eta_tt_Down = dimuon_Down.Eta();
+                dphi_tt_Down = dPhiFrom2P(mu1_Down.Px(), mu1_Down.Py(), mu2_Down.Px(), mu2_Down.Py());
+                dr_tt_Down = deltaR(mu1_Down.Eta(), mu1_Down.Phi(), mu2_Down.Eta(), mu2_Down.Phi());
+		
+		float sumMuonPt = (mu1.Pt()+mu2.Pt());
+		float sumMuonPt_Up = (mu1_Up.Pt()+mu2_Up.Pt());
+		float sumMuonPt_Down = (mu1_Down.Pt()+mu2_Down.Pt());
+		
                 //float ptRatio = 0.0;
                 if (sumMuonPt != 0)
                     ptRatio = (pt_tt/sumMuonPt);
+		if (sumMuonPt_Up != 0)
+                    ptRatio_Up = (pt_tt_Up/sumMuonPt_Up);
+		if (sumMuonPt_Down != 0)
+                    ptRatio_Down = (pt_tt_Down/sumMuonPt_Down);
             
                 //dca of dimuon system
                 for(unsigned int dimu=0; dimu<analysisTree.dimuon_count; ++dimu){
@@ -1995,45 +2299,6 @@ int main(int argc, char * argv[]) {
                         dcasig2Mu3D = log10(fabs(analysisTree.dimuon_dist3D[dimu]/analysisTree.dimuon_dist3DE[dimu]));
                     }
                 }
-                
-//                //-------------accessing Mva Met-------------->
-//                bool mvaMetFound = false;
-//                unsigned int metMuMu = 0;
-//                for (unsigned int iMet=0; iMet<analysisTree.mvamet_count; ++iMet) {
-//                    if (analysisTree.mvamet_channel[iMet]==5) {
-//                        if (analysisTree.mvamet_lep1[iMet]==indx1&&
-//                            analysisTree.mvamet_lep2[iMet]==indx2) {
-//                            metMuMu = iMet;
-//                            mvaMetFound = true;
-//                        }
-//                    }
-//                }
-//                if (!mvaMetFound) {
-//                    cout << "Warning : mva Met is not found..." << endl;
-//                }
-//                
-//                float mvamet = 0;
-//                float mvamet_phi = 0;
-//                float mvamet_ex = 0;
-//                float mvamet_ey = 0;
-//                float n_covmet_xx =0;
-//                float n_covmet_xy =0;
-//                float n_covmet_yy =0;
-//                if (analysisTree.mvamet_count>0) {
-//                    mvamet_ex = analysisTree.mvamet_ex[metMuMu];
-//                    mvamet_ey = analysisTree.mvamet_ey[metMuMu];
-//                    float mvamet_ex2 = mvamet_ex * mvamet_ex;
-//                    float mvamet_ey2 = mvamet_ey * mvamet_ey;
-//                    n_covmet_xx = analysisTree.mvamet_sigxx[metMuMu];
-//                    n_covmet_xy = analysisTree.mvamet_sigxy[metMuMu];
-//                    n_covmet_yy = analysisTree.mvamet_sigyy[metMuMu];
-//                    
-//                    // std::cout << "xx = " << n_covmet_xx
-//                    //  	    << "   xy = " << n_covmet_xy
-//                    // 	    << "   yy = " << n_covmet_yy << std::endl;
-//                    mvamet = TMath::Sqrt(mvamet_ex2+mvamet_ey2);
-//                    mvamet_phi = TMath::ATan2(mvamet_ey,mvamet_ex);
-//                }
 
                 //---------counting jets ---------->
                 vector<unsigned int> jets; jets.clear();
@@ -2157,27 +2422,49 @@ int main(int argc, char * argv[]) {
                     if (jetPtDown>jetPtHighCut)
                         jetsDown.push_back(jet);
                     
-                    if (jetPt>jetPtHighCut)
+                    if (jetPt>jetPtHighCut){
                         jets.push_back(jet);
                     
-                    if (indexLeadingJet>=0) {
-                        if (jetPt<ptLeadingJet&&jetPt>ptSubLeadingJet) {
-                            indexSubLeadingJet = jet;
-                            ptSubLeadingJet = jetPt;
+                        if (indexLeadingJet>=0) {
+                            if (jetPt<ptLeadingJet&&jetPt>ptSubLeadingJet) {
+                                indexSubLeadingJet = jet;
+                                ptSubLeadingJet = jetPt;
+                            }
                         }
-                    }
-                    
-                    if (jetPt>ptLeadingJet) {
-                        indexSubLeadingJet = indexLeadingJet;
-                        ptSubLeadingJet = ptLeadingJet;
-                        indexLeadingJet = jet;
-                        ptLeadingJet = jetPt;
-                    }
+                        
+                        if (jetPt>ptLeadingJet) {
+                            //indexSubLeadingJet = indexLeadingJet;
+                            //ptSubLeadingJet = ptLeadingJet;
+                            indexLeadingJet = jet;
+                            ptLeadingJet = jetPt;
+                        }
+                    }// This introduced to fix mjj
                 }
                 njets = jets.size();
                 njets_Up = jetsUp.size();
                 njets_Down = jetsDown.size();
-                
+
+		//-----jet uncertainty calculation-----
+
+		int njetsMax = njets;
+		
+		if (!isData) {
+		  jecUncertainties->runOnEvent(analysisTree,eta_1,phi_1,eta_2,phi_2);
+		  
+		  iUncert = 0;
+		  for (auto const& Name : uncertNames) {
+		    njetsUncUp[iUncert] = jecUncertainties->getNJets(Name,true);
+		    njetsUncDown[iUncert] = jecUncertainties->getNJets(Name,false);
+		    mjjUncUp[iUncert] = jecUncertainties->getMjj(Name,true);
+		    mjjUncDown[iUncert] = jecUncertainties->getMjj(Name,false);
+		    if (njetsUncUp[iUncert]>njetsMax) njetsMax = njetsUncUp[iUncert];
+		    if (njetsUncDown[iUncert]>njetsMax) njetsMax = njetsUncDown[iUncert];
+		    iUncert++;
+		  }
+		}
+
+                int njetsCheckup = jecUncertainties->getNJets();
+		
                 njetspt20 = jetspt20.size();
                 nbtag = bjets.size();
                 nbtag_noSF = bjetsRaw.size();
@@ -2379,39 +2666,20 @@ int main(int argc, char * argv[]) {
             
                     if (applyMEtRecoilCorrections) {
                         //-----pfmet------
-                        recoilPFMetCorrector.CorrectByMeanResolution(met_ex,met_ey,genV.Px(),genV.Py(),genL.Px(),genL.Py(),njets,metcorr_ex,metcorr_ey);
-                        
-            // std::cout << "PFMet : (" << met_ex << "," << met_ey << ")  " << "  (" << metcorr_ex << "," << metcorr_ey << ")" << std::endl;
-                        
-                        recoilPFMetCorrector.CorrectByMeanResolution(met_ex_JES_Up, met_ey_JES_Up,genV.Px(),genV.Py(),genL.Px(),genL.Py(),njets,metcorr_ex_JES_Up, metcorr_ey_JES_Up);
-                        
-                        recoilPFMetCorrector.CorrectByMeanResolution(met_ex_JES_Down, met_ey_JES_Down,genV.Px(),genV.Py(),genL.Px(),genL.Py(),njets,metcorr_ex_JES_Down, metcorr_ey_JES_Down);
-                        
-                        recoilPFMetCorrector.CorrectByMeanResolution(met_ex_UnclusteredJES_Up, met_ey_UnclusteredJES_Up,genV.Px(),genV.Py(),genL.Px(),genL.Py(),njets, metcorr_ex_UnclusteredJES_Up, metcorr_ey_UnclusteredJES_Up);
-                        
-                        recoilPFMetCorrector.CorrectByMeanResolution(met_ex_UnclusteredJES_Down, met_ey_UnclusteredJES_Down,genV.Px(),genV.Py(),genL.Px(),genL.Py(),njets, metcorr_ex_UnclusteredJES_Down, metcorr_ey_UnclusteredJES_Down);
-                        
-    //                        //-----mvamet------
-    //                        float mvametcorr_ex = mvamet_ex;
-    //                        float mvametcorr_ey = mvamet_ey;
-    //                        
-    //                        float mvamet_uncorr_ex = mvamet_ex;
-    //                        float mvamet_uncorr_ey = mvamet_ey;
-    //                        
-    //                        float mvamet_uncorr = mvamet;
-    //                        float mvametphi_uncorr = mvamet_phi;
-    //                        
-    //                        
-    //                        recoilMvaMetCorrector.CorrectByMeanResolution(mvamet_ex,mvamet_ey,genV.Px(),genV.Py(),genL.Px(),genL.Py(),njets,mvametcorr_ex,mvametcorr_ey);
-    //                        //std::cout << "MvaMet : (" << mvamet_ex << "," << mvamet_ey << ")  "
-    //                        //	                      << "  (" << mvametcorr_ex << "," << mvametcorr_ey << ")" << std::endl;
-    //                        mvamet_phi = TMath::ATan2(mvametcorr_ey,mvametcorr_ex);
-    //                        mvamet = TMath::Sqrt(mvametcorr_ex*mvametcorr_ex+mvametcorr_ey*mvametcorr_ey);
-    //                        mvamet_ex = mvametcorr_ex;
-    //                        mvamet_ey = mvametcorr_ey;
-                    }
-                    
-                }
+		      recoilPFMetCorrector.CorrectByMeanResolution(met_ex, met_ey, genV.Px(), genV.Py(), genL.Px(), genL.Py(),
+								   njets,metcorr_ex,metcorr_ey);
+		      // std::cout << "PFMet : (" << met_ex << "," << met_ey << ")  " << "  (" << metcorr_ex << "," << metcorr_ey << ")" << std::endl;
+		      recoilPFMetCorrector.CorrectByMeanResolution(met_ex_JES_Up, met_ey_JES_Up, genV.Px(), genV.Py(), genL.Px(), genL.Py(),
+								   njets,metcorr_ex_JES_Up, metcorr_ey_JES_Up);
+		      recoilPFMetCorrector.CorrectByMeanResolution(met_ex_JES_Down, met_ey_JES_Down, genV.Px(), genV.Py(), genL.Px(), genL.Py(),
+								   njets,metcorr_ex_JES_Down, metcorr_ey_JES_Down);
+		      recoilPFMetCorrector.CorrectByMeanResolution(met_ex_UnclusteredJES_Up, met_ey_UnclusteredJES_Up, genV.Px(), genV.Py(),
+								   genL.Px(), genL.Py(), njets, metcorr_ex_UnclusteredJES_Up, metcorr_ey_UnclusteredJES_Up);
+		      recoilPFMetCorrector.CorrectByMeanResolution(met_ex_UnclusteredJES_Down, met_ey_UnclusteredJES_Down, genV.Px(), genV.Py(),
+								   genL.Px(), genL.Py(), njets, metcorr_ex_UnclusteredJES_Down, metcorr_ey_UnclusteredJES_Down);
+		    }
+		}
+		
                 met = TMath::Sqrt(metcorr_ex*metcorr_ex+metcorr_ey*metcorr_ey);
                 //std::cout << "corrected met =  "<< met << std::endl;
                 metphi = TMath::ATan2(metcorr_ex,metcorr_ey);
@@ -2420,9 +2688,11 @@ int main(int argc, char * argv[]) {
                 //cout<< "corrected met_JES_Up  = "<< met_JES_Up <<endl;
                 met_JES_Down = TMath::Sqrt(metcorr_ex_JES_Down*metcorr_ex_JES_Down + metcorr_ey_JES_Down*metcorr_ey_JES_Down);
                 //cout<< "corrected met_JES_Down  = "<< met_JES_Down <<endl;
-                met_UnclusteredJES_Up = TMath::Sqrt(metcorr_ex_UnclusteredJES_Up*metcorr_ex_UnclusteredJES_Up +metcorr_ey_UnclusteredJES_Up*metcorr_ey_UnclusteredJES_Up);
+                met_UnclusteredJES_Up = TMath::Sqrt(metcorr_ex_UnclusteredJES_Up*metcorr_ex_UnclusteredJES_Up
+						    + metcorr_ey_UnclusteredJES_Up*metcorr_ey_UnclusteredJES_Up);
                 //cout << "corrected met_UnclusteredJES_Up = "<< met_UnclusteredJES_Up<<endl;
-                met_UnclusteredJES_Down = TMath::Sqrt(metcorr_ex_UnclusteredJES_Down*metcorr_ex_UnclusteredJES_Down +metcorr_ey_UnclusteredJES_Down*metcorr_ey_UnclusteredJES_Down);
+                met_UnclusteredJES_Down = TMath::Sqrt(metcorr_ex_UnclusteredJES_Down*metcorr_ex_UnclusteredJES_Down
+						      + metcorr_ey_UnclusteredJES_Down*metcorr_ey_UnclusteredJES_Down);
                 //cout << "corrected met_UnclusteredJES_Down = "<< met_UnclusteredJES_Down<<endl;
                 
                 float genmet_ex = analysisTree.genmet_ex;
@@ -2430,9 +2700,56 @@ int main(int argc, char * argv[]) {
                 
                 genmet = TMath::Sqrt(genmet_ex*genmet_ex + genmet_ey*genmet_ey);
                 genmetphi = TMath::ATan2(genmet_ey,genmet_ex);
-                    
-                
-                
+
+		//defining metx_mu and mety_mu used in MSVvariation
+		px_mu1     = pt_1 * TMath::Cos(phi_1);
+		py_mu1     = pt_1 * TMath::Sin(phi_1);
+		 
+		px_mu2     = pt_2 * TMath::Cos(phi_2);
+		py_mu2     = pt_2 * TMath::Sin(phi_2);
+		
+		float px_mu1Up   = pt_1_Up * TMath::Cos(phi_1);
+		float px_mu1Down = pt_1_Down * TMath::Cos(phi_1);
+
+		float py_mu1Up   = pt_1_Up * TMath::Sin(phi_1);
+		float py_mu1Down = pt_1_Down * TMath::Sin(phi_1);
+
+		float px_mu2Up   = pt_2_Up * TMath::Cos(phi_2);
+		float px_mu2Down = pt_2_Down * TMath::Cos(phi_2);
+
+		float py_mu2Up   = pt_2_Up * TMath::Sin(phi_2);
+		float py_mu2Down = pt_2_Down * TMath::Sin(phi_2);
+
+		met_x = metcorr_ex;
+		met_y = metcorr_ey;
+		
+                float metx_muUp = met_x + (px_mu1 + px_mu2) - (px_mu1Up + px_mu2Up);
+		float mety_muUp = met_y + (py_mu1 + py_mu2) - (py_mu1Up + py_mu2Up);
+
+		float met_Up = TMath::Sqrt(metx_muUp*metx_muUp+mety_muUp*mety_muUp);
+
+		float metx_muDown = met_x + (px_mu1 + px_mu2) - (px_mu1Down + px_mu2Down);
+		float mety_muDown = met_y + (py_mu1 + py_mu2) - (py_mu1Down + py_mu2Down);
+
+		float met_Down = TMath::Sqrt(metx_muDown*metx_muDown + mety_muDown*mety_muDown);
+
+		//Total transverse momentum calculations for (boosted categoty BDT trainning)
+		pt_tot = -9999;
+
+		pt_tot_x  = met_x + px_mu1 + px_mu2;
+		pt_tot_y  = met_y + py_mu1 + py_mu2;
+
+		float pt_tot_xmuUp   = metx_muUp + px_mu1Up + px_mu2Up;
+		float pt_tot_xmuDown = metx_muDown + px_mu1Down +  px_mu2Down;
+
+		float pt_tot_ymuUp   = mety_muUp + py_mu1Up + py_mu2Up;
+		float pt_tot_ymuDown = mety_muDown + py_mu1Down + py_mu2Down;
+
+		pt_tot = TMath::Sqrt(pt_tot_x*pt_tot_x + pt_tot_y*pt_tot_y);
+		pt_tot_Up   = TMath::Sqrt(pt_tot_xmuUp*pt_tot_xmuUp + pt_tot_ymuUp*pt_tot_ymuUp);
+		pt_tot_Down = TMath::Sqrt(pt_tot_xmuDown*pt_tot_xmuDown + pt_tot_ymuDown*pt_tot_ymuDown);
+		
+		
                 //----bisector of dimuon transerve momenta for defining the dzeta variables-------
                 
                 // bisector of electron and muon transverse momenta
@@ -2455,8 +2772,16 @@ int main(int argc, char * argv[]) {
                 
                 float vectorVisX = mu2.Px() + mu1.Px();
                 float vectorVisY = mu2.Py() + mu1.Py();
-                
+
+		float vectorVisX_Up = mu2_Up.Px() + mu1_Up.Px();
+		float vectorVisY_Up = mu2_Up.Py() +mu1_Up.Py();
+		
+                float vectorVisX_Down = mu2_Down.Px() + mu1_Down.Px();
+		float vectorVisY_Down = mu2_Down.Py() +mu1_Down.Py();
+		
                 pzetavis = vectorVisX*zetaX + vectorVisY*zetaY;
+		float pzetavis_Up = vectorVisX_Up*zetaX + vectorVisY_Up*zetaY;
+		float pzetavis_Down = vectorVisX_Down*zetaX + vectorVisY_Down*zetaY;
                 
                 // computation of DZeta variable
                 // pfmet
@@ -2466,6 +2791,10 @@ int main(int argc, char * argv[]) {
                 computeDzeta(met_ex_uncorr, met_ey_uncorr,
                              zetaX,zetaY,pzetavis,pzetamiss_uncorr, dzeta_uncorr); //uncorrected
                 //cout << "dzeta  uncorrected = " << dzeta_uncorr<< endl;
+		computeDzeta(metx_muUp, mety_muUp,
+			     zetaX,zetaY,pzetavis_Up,pzetamiss_Up,dzeta_Up);
+		computeDzeta(metx_muDown, mety_muDown,
+			     zetaX,zetaY,pzetavis_Down,pzetamiss_Down,dzeta_Up);
                 computeDzeta(metcorr_ex_JES_Up,metcorr_ey_JES_Up,
                              zetaX,zetaY,pzetavis,pzetamiss_JES_Up,dzeta_JES_Up); // JESUp
                 
@@ -2518,7 +2847,8 @@ int main(int argc, char * argv[]) {
                 //new check implementation
                 
                 // check pos and neg muon pt and eta
-                if (!oppositeSign){
+                //if (!oppositeSign){
+		if(!os){
                     pos_mupt1 = -9999;
                     pos_mupt2 = -9999;
                     neg_mupt1 = -9999;
@@ -2542,6 +2872,8 @@ int main(int argc, char * argv[]) {
                 //cout << "dphi_mumet1 = " << dphi_mumet_1 << endl;
                 dphi_mumet_uncorr_1 = dPhiFrom2P(analysisTree.muon_px[indx1],analysisTree.muon_py[indx1],met_ex_uncorr, met_ey_uncorr);
                 //cout << "dphi_mumet1 uncorrected = " << dphi_mumet_uncorr_1 << endl;
+		dphi_mumet_Up_1 = dPhiFrom2P(analysisTree.muon_px[indx1],analysisTree.muon_py[indx1],metx_muUp,mety_muUp);
+		dphi_mumet_Down_1 = dPhiFrom2P(analysisTree.muon_px[indx1],analysisTree.muon_py[indx1],metx_muDown,mety_muDown);
                 dphi_mumet_JES_Up_1 = dPhiFrom2P(analysisTree.muon_px[indx1],analysisTree.muon_py[indx1],metcorr_ex_JES_Up,metcorr_ey_JES_Up);
                 dphi_mumet_JES_Down_1 = dPhiFrom2P(analysisTree.muon_px[indx1],analysisTree.muon_py[indx1],metcorr_ex_JES_Down, metcorr_ey_JES_Down);
                 dphi_mumet_UnclusteredJES_Up_1 = dPhiFrom2P(analysisTree.muon_px[indx1],analysisTree.muon_py[indx1],metcorr_ex_UnclusteredJES_Up, metcorr_ey_UnclusteredJES_Up);
@@ -2551,6 +2883,8 @@ int main(int argc, char * argv[]) {
                 //cout << "dphi_mumet2 = " << dphi_mumet_2 << endl;
                 dphi_mumet_uncorr_2 = dPhiFrom2P(analysisTree.muon_px[indx2],analysisTree.muon_py[indx2],met_ex_uncorr, met_ey_uncorr);
                 //cout << "dphi_mumet2 uncorrected = " << dphi_mumet_uncorr_2 << endl;
+		dphi_mumet_Up_2 = dPhiFrom2P(analysisTree.muon_px[indx2],analysisTree.muon_py[indx2],metx_muUp,mety_muUp);
+		dphi_mumet_Down_2 = dPhiFrom2P(analysisTree.muon_px[indx2],analysisTree.muon_py[indx2],metx_muDown,mety_muDown);
                 dphi_mumet_JES_Up_2 = dPhiFrom2P(analysisTree.muon_px[indx2],analysisTree.muon_py[indx2],metcorr_ex_JES_Up,metcorr_ey_JES_Up);
                 dphi_mumet_JES_Down_2 = dPhiFrom2P(analysisTree.muon_px[indx2],analysisTree.muon_py[indx2],metcorr_ex_JES_Down, metcorr_ey_JES_Down);
                 dphi_mumet_UnclusteredJES_Up_2 = dPhiFrom2P(analysisTree.muon_px[indx2],analysisTree.muon_py[indx2],metcorr_ex_UnclusteredJES_Up, metcorr_ey_UnclusteredJES_Up);
@@ -2559,6 +2893,8 @@ int main(int argc, char * argv[]) {
                 if (q_1>0){
                     dphi_posmu_met = dphi_mumet_1;
                     dphi_posmu_met_uncorr = dphi_mumet_uncorr_1;
+		    dphi_posmu_met_Up = dphi_mumet_Up_1;
+		    dphi_posmu_met_Down = dphi_mumet_Down_1;
                     dphi_posmu_met_JES_Up = dphi_mumet_JES_Up_1;
                     dphi_posmu_met_JES_Down = dphi_mumet_JES_Down_1;
                     dphi_posmu_met_UnclusteredJES_Up = dphi_mumet_UnclusteredJES_Up_1;
@@ -2567,6 +2903,8 @@ int main(int argc, char * argv[]) {
                 else{
                     dphi_posmu_met = dphi_mumet_2;
                     dphi_posmu_met_uncorr = dphi_mumet_uncorr_2;
+		    dphi_posmu_met_Up = dphi_mumet_Up_2;
+		    dphi_posmu_met_Down = dphi_mumet_Down_2;
                     dphi_posmu_met_JES_Up = dphi_mumet_JES_Up_2;
                     dphi_posmu_met_JES_Down = dphi_mumet_JES_Down_2;
                     dphi_posmu_met_UnclusteredJES_Up = dphi_mumet_UnclusteredJES_Up_2;
@@ -2574,74 +2912,229 @@ int main(int argc, char * argv[]) {
                 }
                 
                 dphi_twomu = dPhiFrom2P(analysisTree.muon_px[indx1],analysisTree.muon_py[indx1], analysisTree.muon_px[indx2],analysisTree.muon_py[indx2]);
-                
-//                //-----------Evaluating BDT-----------------
-//                if (applyBDT){
-//                    bdt = reader->EvaluateMVA("BDT");
-//                    bdt_0jets = reader0jets->EvaluateMVA("BDT");
-//                    bdt_boosted = readerboost->EvaluateMVA("BDT");
-//                    bdt_vbf = readervbf->EvaluateMVA("BDT");
-//                }
-                
+
+		//-----------Evaluating BDT central values-----------------
+                if (applyBDT){
+
+		  bdt_0jets = reader0jets->EvaluateMVA("BDT");
+		  bdt_boosted = readerboost->EvaluateMVA("BDT");
+		  bdt_vbf = readervbf->EvaluateMVA("BDT");
+
+		  //Evaluating BDT Variations
+		  if (applyBDTvariations){
+		    bdt_0jets_Up                    = reader_0jetsMuScaleUp->EvaluateMVA("BDT");
+		    bdt_0jets_Down                  = reader_0jetsMuScaleDown->EvaluateMVA("BDT");
+		    bdt_0jets_JES_Up                = reader_0jetsJESUp->EvaluateMVA("BDT");
+		    bdt_0jets_JES_Down              = reader_0jetsJESDown->EvaluateMVA("BDT");
+		    bdt_0jets_UnclusteredJES_Up     = reader_0jetsUnclustJESUp->EvaluateMVA("BDT");
+		    bdt_0jets_UnclusteredJES_Down   = reader_0jetsUnclustJESDown->EvaluateMVA("BDT");
+		    
+		    bdt_boosted_Up                  = reader_boostMuScaleUp->EvaluateMVA("BDT");
+		    bdt_boosted_Down                = reader_boostMuScaleDown->EvaluateMVA("BDT");
+		    bdt_boosted_JES_Up              = reader_boostJESUp->EvaluateMVA("BDT");
+		    bdt_boosted_JES_Down            = reader_boostJESDown->EvaluateMVA("BDT");
+		    bdt_boosted_UnclusteredJES_Up   = reader_boostUnclustJESUp->EvaluateMVA("BDT");
+		    bdt_boosted_UnclusteredJES_Down = reader_boostUnclustJESDown->EvaluateMVA("BDT");
+		    
+		    bdt_vbf_Up                      = reader_vbfMuScaleUp->EvaluateMVA("BDT");
+		    bdt_vbf_Down                    = reader_vbfMuScaleDown->EvaluateMVA("BDT");
+		    bdt_vbf_JES_Up                  = reader_vbfJESUp->EvaluateMVA("BDT");
+		    bdt_vbf_JES_Down                = reader_vbfJESDown->EvaluateMVA("BDT");
+		    bdt_vbf_UnclusteredJES_Up       = reader_vbfUnclustJESUp->EvaluateMVA("BDT");
+		    bdt_vbf_UnclusteredJES_Down     = reader_vbfUnclustJESDown->EvaluateMVA("BDT");
+		  }
+		}
+                                
                 //-----------computingSVfitmass--------------
+		
                 m_sv           = -9999;
-                m_sv_Up        = -9999;
-                m_sv_Down      = -9999;
+                m_sv_muUp      = -9999;
+                m_sv_muDown    = -9999;
                 m_sv_scaleUp   = -9999;
                 m_sv_scaleDown = -9999;
                 m_sv_resoUp    = -9999;
                 m_sv_resoDown  = -9999;
+		float px_sv    = -9999;
+		float py_sv    = -9999;
+		float msvmet_ex= -9999;
+		float msvmet_ey= -9999;
                 
                 if (applySVFit){
-                    double measuredMETx = metcorr_ex;
-                    double measuredMETy = metcorr_ey;
-                    
-                    // define MET covariance
-                    TMatrixD covMET(2, 2);
-                    
-                    // std::cout << "covmetxx " << n_covmet_xx << "\t covmetxy " << n_covmet_xy  << "\t covmetyy " << n_covmet_yy <<std::endl;
-                    
-                    covMET[0][0] = metcov00;
-                    covMET[1][0] = metcov10;
-                    covMET[0][1] = metcov01;
-                    covMET[1][1] = metcov11;
-                    
-                    // define lepton four vectors
-                    std::vector<svFitStandalone::MeasuredTauLepton> measuredTauLeptons;
-                    
-                    measuredTauLeptons.push_back(svFitStandalone::MeasuredTauLepton(svFitStandalone::kTauToMuDecay, pt_1, eta_1, phi_1, 105.658e-3));
-                    measuredTauLeptons.push_back(svFitStandalone::MeasuredTauLepton(svFitStandalone::kTauToMuDecay, pt_2, eta_2, phi_2, 105.658e-3));
-                    
-                    SVfitStandaloneAlgorithm algo(measuredTauLeptons, measuredMETx, measuredMETy, covMET, 0);
-                    algo.addLogM(false);
-                    
-                    
-                    algo.shiftVisPt(true, inputFile_visPtResolution);
-                    
-                    algo.integrateMarkovChain();
-                    m_sv = algo.getMass(); // return value is in units of GeV
-                    
-                    bool algoVerify = false;
-                    algoVerify = algo.isValidSolution();
-                    if ( algoVerify ) {
-                        //std::cout << "SVfit mass (pfmet)    = " << n_m_sv << std::endl;
-                    } else {
-                        std::cout << "sorry -- status of NLL is not valid [" << algoVerify << "]" << std::endl;
-                    }
-                    
-                    pt_sv = algo.pt();
-                    eta_sv = algo.eta();
-                    phi_sv = algo.phi();
-                    
-                    m_sv_Up        = m_sv;
-                    m_sv_Down      = m_sv;
-                    m_sv_scaleUp   = m_sv;
-                    m_sv_scaleDown = m_sv;
-                    m_sv_resoUp    = m_sv;
-                    m_sv_resoDown  = m_sv;
-
-                }
-                
+		  double measuredMETx = metcorr_ex;
+		  double measuredMETy = metcorr_ey;
+		  
+		  // define MET covariance
+		  TMatrixD covMET(2, 2);
+                  
+		  // std::cout << "covmetxx " << n_covmet_xx << "\t covmetxy " << n_covmet_xy  << "\t covmetyy " << n_covmet_yy <<std::endl;
+                  
+		  covMET[0][0] = metcov00;
+		  covMET[1][0] = metcov10;
+		  covMET[0][1] = metcov01;
+		  covMET[1][1] = metcov11;
+		  
+		  /* ///Earlier definition
+		  // define lepton four vectors
+		  std::vector<svFitStandalone::MeasuredTauLepton> measuredTauLeptons;
+                  
+		  measuredTauLeptons.push_back(svFitStandalone::MeasuredTauLepton(svFitStandalone::kTauToMuDecay, pt_1, eta_1, phi_1, 105.658e-3));
+		  measuredTauLeptons.push_back(svFitStandalone::MeasuredTauLepton(svFitStandalone::kTauToMuDecay, pt_2, eta_2, phi_2, 105.658e-3));
+                  
+		  SVfitStandaloneAlgorithm algo(measuredTauLeptons, measuredMETx, measuredMETy, covMET, 0);
+		  algo.addLogM(false);
+		  algo.shiftVisPt(true, inputFile_visPtResolution);
+		  algo.integrateMarkovChain();
+		  m_sv = algo.getMass(); // return value is in units of GeV
+		  
+		  bool algoVerify = false;
+		  algoVerify = algo.isValidSolution();
+		  if ( algoVerify ) {
+		  //std::cout << "SVfit mass (pfmet)    = " << m_sv << std::endl;
+		  } else {
+		  std::cout << "sorry -- status of NLL is not valid [" << algoVerify << "]" << std::endl;
+		  }
+		  
+		  */
+		  //Updated definition
+		  //defining muon 4-vectors
+		  svFitStandalone::MeasuredTauLepton svFitMu1(svFitStandalone::kTauToMuDecay, pt_1, eta_1, phi_1, 105.658e-3);
+		  svFitStandalone::MeasuredTauLepton svFitMu2(svFitStandalone::kTauToMuDecay, pt_2, eta_2, phi_2, 105.658e-3);
+		  
+		  svFitStandalone::MeasuredTauLepton svFitMu1Up(svFitStandalone::kTauToMuDecay, pt_1_Up, eta_1, phi_1, 105.658e-3);
+		  svFitStandalone::MeasuredTauLepton svFitMu1Down(svFitStandalone::kTauToMuDecay, pt_1_Down, eta_1, phi_1, 105.658e-3);
+		  
+		  svFitStandalone::MeasuredTauLepton svFitMu2Up(svFitStandalone::kTauToMuDecay, pt_2_Up, eta_2, phi_2, 105.658e-3);
+		  svFitStandalone::MeasuredTauLepton svFitMu2Down(svFitStandalone::kTauToMuDecay, pt_2_Down, eta_2, phi_2, 105.658e-3);
+		  
+		  //central value
+		  if (njets==0 && bdt_0jets>0.24){
+		    SVfitStandaloneAlgorithm algo = SVFitMassComputation(svFitMu1, svFitMu2, measuredMETx, measuredMETy, covMET, inputFile_visPtResolution);
+		    
+		    m_sv = algo.getMass(); // return value is in units of GeV
+		    if ( !algo.isValidSolution() ) 
+		      std::cout << "sorry -- status of NLL is not valid [" << algo.isValidSolution() << "]" << std::endl; 
+		    pt_sv = algo.pt();
+		    eta_sv = algo.eta();
+		    phi_sv = algo.phi();
+		    
+		    px_sv = pt_sv*TMath::Cos(phi_sv);
+		    py_sv = pt_sv*TMath::Sin(phi_sv);
+		    
+		    msvmet_ex = px_sv - dimuon.Px();
+		    msvmet_ey = py_sv - dimuon.Py();
+		    
+		    msvmet = TMath::Sqrt(msvmet_ex*msvmet_ex+msvmet_ey*msvmet_ey);
+		    msvmetphi = TMath::ATan2(msvmet_ey,msvmet_ex);
+		    
+		    m_sv_muUp      = m_sv;
+		    m_sv_muDown    = m_sv;
+		    m_sv_scaleUp   = m_sv;
+		    m_sv_scaleDown = m_sv;
+		    m_sv_resoUp    = m_sv;
+		    m_sv_resoDown  = m_sv;
+		    
+		  }
+		  
+		  else if ((njets==1 || (njets==2 && mjj<300) || njets>2) && bdt_boosted>0.0){
+		    SVfitStandaloneAlgorithm algo = SVFitMassComputation(svFitMu1, svFitMu2, measuredMETx, measuredMETy, covMET, inputFile_visPtResolution);
+		    m_sv = algo.getMass(); // return value is in units of GeV
+		    if ( !algo.isValidSolution() ) 
+		      std::cout << "sorry -- status of NLL is not valid [" << algo.isValidSolution() << "]" << std::endl; 
+		    pt_sv = algo.pt();
+		    eta_sv = algo.eta();
+		    phi_sv = algo.phi();
+		    
+		    px_sv = pt_sv*TMath::Cos(phi_sv);
+		    py_sv = pt_sv*TMath::Sin(phi_sv);
+		    
+		    msvmet_ex = px_sv - dimuon.Px();
+		    msvmet_ey = py_sv - dimuon.Py();
+		    
+		    msvmet = TMath::Sqrt(msvmet_ex*msvmet_ex+msvmet_ey*msvmet_ey);
+		    msvmetphi = TMath::ATan2(msvmet_ey,msvmet_ex);
+		    m_sv_muUp      = m_sv;
+		    m_sv_muDown    = m_sv;
+		    m_sv_scaleUp   = m_sv;
+		    m_sv_scaleDown = m_sv;
+		    m_sv_resoUp    = m_sv;
+		    m_sv_resoDown  = m_sv;
+		  }
+		  else if ((njets==2 && mjj>300) && bdt_vbf>0.8){
+		    SVfitStandaloneAlgorithm algo = SVFitMassComputation(svFitMu1, svFitMu2, measuredMETx, measuredMETy, covMET, inputFile_visPtResolution);
+		    m_sv = algo.getMass(); // return value is in units of GeV
+		    if ( !algo.isValidSolution() ) 
+		      std::cout << "sorry -- status of NLL is not valid [" << algo.isValidSolution() << "]" << std::endl; 
+		    pt_sv = algo.pt();
+		    eta_sv = algo.eta();
+		    phi_sv = algo.phi();
+		    
+		    px_sv = pt_sv*TMath::Cos(phi_sv);
+		    py_sv = pt_sv*TMath::Sin(phi_sv);
+		    
+		    msvmet_ex = px_sv - dimuon.Px();
+		    msvmet_ey = py_sv - dimuon.Py();
+		    
+		    msvmet = TMath::Sqrt(msvmet_ex*msvmet_ex+msvmet_ey*msvmet_ey);
+		    msvmetphi = TMath::ATan2(msvmet_ey,msvmet_ex);
+		    m_sv_muUp      = m_sv;
+		    m_sv_muDown    = m_sv;
+		    m_sv_scaleUp   = m_sv;
+		    m_sv_scaleDown = m_sv;
+		    m_sv_resoUp    = m_sv;
+		    m_sv_resoDown  = m_sv;
+		  }
+		  
+		  if (applyMSVvariation){
+		    //SVfit scale variation with BDT cuts
+		    if (njets==0 && bdt_0jets>0.24){
+		      SVfitStandaloneAlgorithm algo_muUp = SVFitMassComputation(svFitMu1Up, svFitMu2Up, metx_muUp, mety_muUp,
+										covMET, inputFile_visPtResolution);
+		      SVfitStandaloneAlgorithm algo_muDown = SVFitMassComputation(svFitMu1Down, svFitMu2Down, metx_muDown, mety_muDown,
+										  covMET, inputFile_visPtResolution);
+		      m_sv_muUp   = algo_muUp.getMass();
+		      m_sv_muDown = algo_muDown.getMass();
+		      
+		      pt_sv_muUp  = algo_muUp.pt();
+		      eta_sv_muUp = algo_muUp.eta();
+		      phi_sv_muUp = algo_muUp.phi();
+		      
+		      pt_sv_muDown  = algo_muDown.pt();
+		      eta_sv_muDown = algo_muDown.eta();
+		      phi_sv_muDown = algo_muDown.phi();
+		    }
+		    else if ((njets==1 || (njets==2 && mjj<300) || njets>2) && bdt_boosted>0.0){
+		      SVfitStandaloneAlgorithm algo_muUp = SVFitMassComputation(svFitMu1Up, svFitMu2Up, metx_muUp, mety_muUp,
+										covMET, inputFile_visPtResolution);
+		      SVfitStandaloneAlgorithm algo_muDown = SVFitMassComputation(svFitMu1Down, svFitMu2Down, metx_muDown, mety_muDown,
+										  covMET, inputFile_visPtResolution);
+		      m_sv_muUp   = algo_muUp.getMass();
+		      m_sv_muDown = algo_muDown.getMass();
+		      
+		      pt_sv_muUp  = algo_muUp.pt();
+		      eta_sv_muUp = algo_muUp.eta();
+		      phi_sv_muUp = algo_muUp.phi();
+		      
+		      pt_sv_muDown  = algo_muDown.pt();
+		      eta_sv_muDown = algo_muDown.eta();
+		      phi_sv_muDown = algo_muDown.phi();
+		    }
+		    else if ((njets==2 && mjj>300) && bdt_vbf>0.8){
+		      SVfitStandaloneAlgorithm algo_muUp = SVFitMassComputation(svFitMu1Up, svFitMu2Up, metx_muUp, mety_muUp, covMET, inputFile_visPtResolution);
+		      SVfitStandaloneAlgorithm algo_muDown = SVFitMassComputation(svFitMu1Down, svFitMu2Down, metx_muDown, mety_muDown, covMET, inputFile_visPtResolution);
+		      m_sv_muUp   = algo_muUp.getMass();
+		      m_sv_muDown = algo_muDown.getMass();
+		      
+		      pt_sv_muUp  = algo_muUp.pt();
+		      eta_sv_muUp = algo_muUp.eta();
+		      phi_sv_muUp = algo_muUp.phi();
+		      
+		      pt_sv_muDown  = algo_muDown.pt();
+		      eta_sv_muDown = algo_muDown.eta();
+		      phi_sv_muDown = algo_muDown.phi();
+		    }
+		  }
+		  
+		}             
                 bool recAccept = pt_1>20 && pt_2>10;
                 recAccept = recAccept && fabs(eta_1)<2.4 && fabs(eta_2)<2.4;
                 // filling ntuple
@@ -2649,11 +3142,18 @@ int main(int argc, char * argv[]) {
                     if (recAccept) {
                         histRecCutsWeightsH->Fill(0.,weight);
                         histRecCutsGenWeightsH->Fill(0.,genweight);
-                        if (bdt>0.5) {
-                            histBDTCutWeightsH->Fill(0.,weight);
-                            histBDTCutGenWeightsH->Fill(0.,genweight);
+                        if (njets==0 && bdt_0jets>0.24) {
+			  histBDTCutWeightsH->Fill(0.,weight);
+			  histBDTCutGenWeightsH->Fill(0.,genweight);
                         }
-                        
+			else if ((njets==1 || (njets==2 && mjj<300) || njets>2) && bdt_boosted>0.0){
+			  histBDTCutWeightsH->Fill(0.,weight);
+			  histBDTCutGenWeightsH->Fill(0.,genweight);
+                        }
+                        else if ((njets==2 && mjj>300) && bdt_vbf>0.8){
+			  histBDTCutWeightsH->Fill(0.,weight);
+			  histBDTCutGenWeightsH->Fill(0.,genweight);
+			}
                     }
                 }
                 
@@ -2665,14 +3165,30 @@ int main(int argc, char * argv[]) {
                         noutNumRecCutsWeightsH->Fill(0.,weight);
                         noutNumRecCutsGenWeightsH->Fill(0.,genweight);
                     }
-                    if (bdt>0.5) {
-                        noutDenBDTCutWeightsH->Fill(0.,weight);
-                        noutDenBDTCutGenWeightsH->Fill(0.,genweight);
-                        if (genAccept) {
-                            noutNumBDTCutWeightsH->Fill(0.,weight);
-                            noutNumBDTCutGenWeightsH->Fill(0.,genweight);
-                        }
+                    if (njets==0 && bdt_0jets>0.24) {
+		      noutDenBDTCutWeightsH->Fill(0.,weight);
+		      noutDenBDTCutGenWeightsH->Fill(0.,genweight);
+		      if (genAccept) {
+			noutNumBDTCutWeightsH->Fill(0.,weight);
+			noutNumBDTCutGenWeightsH->Fill(0.,genweight);
+		      }
                     }
+		    else if ((njets==1 || (njets==2 && mjj<300) || njets>2) && bdt_boosted>0.0){
+		      noutDenBDTCutWeightsH->Fill(0.,weight);
+		      noutDenBDTCutGenWeightsH->Fill(0.,genweight);
+		      if (genAccept) {
+			noutNumBDTCutWeightsH->Fill(0.,weight);
+			noutNumBDTCutGenWeightsH->Fill(0.,genweight);
+		      }
+		    }
+		    else if ((njets==2 && mjj>300) && bdt_vbf>0.8){
+		      noutDenBDTCutWeightsH->Fill(0.,weight);
+		      noutDenBDTCutGenWeightsH->Fill(0.,genweight);
+		      if (genAccept) {
+			noutNumBDTCutWeightsH->Fill(0.,weight);
+			noutNumBDTCutGenWeightsH->Fill(0.,genweight);
+		      }
+		    }
                 }
                 
                 T->Fill();
