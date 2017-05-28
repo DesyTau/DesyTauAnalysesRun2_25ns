@@ -26,8 +26,6 @@
 //#include "TauAnalysis/CandidateTools/interface/CompositePtrCandidateT1T2MEtProducer.h"
 //#include "AnalysisDataFormats/TauAnalysis/interface/CompositePtrCandidateT1T2MEt.h"
 //#include "AnalysisDataFormats/TauAnalysis/interface/CompositePtrCandidateT1T2MEtFwd.h"
-#include "SimDataFormats/GeneratorProducts/interface/LHEEventProduct.h"
-#include "SimDataFormats/GeneratorProducts/interface/LHERunInfoProduct.h"
 #include "SimDataFormats/GeneratorProducts/interface/GenFilterInfo.h"
 #include "DataFormats/PatCandidates/interface/PackedCandidate.h"
 #include "DataFormats/JetReco/interface/PFJetCollection.h"
@@ -197,6 +195,7 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
   TriggerObjectCollectionToken_(consumes<pat::TriggerObjectStandAloneCollection>(iConfig.getParameter<edm::InputTag>("TriggerObjectCollectionTag"))),
   BeamSpotToken_(consumes<BeamSpot>(iConfig.getParameter<edm::InputTag>("BeamSpotCollectionTag"))),
   PVToken_(consumes<VertexCollection>(iConfig.getParameter<edm::InputTag>("PVCollectionTag"))),
+  LHEToken_(consumes<LHEEventProduct>(iConfig.getParameter<edm::InputTag>("LHEEventProductTag"))),
   SusyMotherMassToken_(consumes<double>(iConfig.getParameter<edm::InputTag>("SusyMotherMassTag"))),
   SusyLSPMassToken_(consumes<double>(iConfig.getParameter<edm::InputTag>("SusyLSPMassTag"))),
   sampleName(iConfig.getUntrackedParameter<std::string>("SampleName", "Higgs")),
@@ -264,11 +263,12 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
 
   string cmsswBase = (getenv ("CMSSW_BASE"));
   
-  if(cgen && !cdata) {
-    consumes<LHEEventProduct>(edm::InputTag("externalLHEProducer"));
-    //    consumes<LHERunInfoProduct>(edm::InputTag("externalLHEProducer"));
-    consumes<LHERunInfoProduct, edm::InRun>({"externalLHEProducer"});
-  }
+  //  if(cgen && !cdata) {
+  //    consumes<LHEEventProduct>(edm::InputTag("externalLHEProducer"));
+  //    consumes<LHEEventProduct>(edm::InputTag("source"));
+  //    consumes<LHERunInfoProduct>(edm::InputTag("externalLHEProducer"));
+  //    consumes<LHERunInfoProduct, edm::InRun>({"source"});
+  //  }
 
   consumes<edm::TriggerResults>(edm::InputTag("TriggerResults", "", cTriggerProcess));
   consumes<L1GlobalTriggerReadoutRecord>(edm::InputTag("gtDigis"));
@@ -2366,7 +2366,7 @@ bool NTupleMaker::AddGenHt(const edm::Event& iEvent) {
   genparticles_noutgoing = 0;
 
   edm::Handle<LHEEventProduct> lheEventProduct;  
-  iEvent.getByLabel( "externalLHEProducer", lheEventProduct);
+  iEvent.getByToken(LHEToken_, lheEventProduct);
   
   if(!lheEventProduct.isValid())
     return false;
@@ -2397,6 +2397,8 @@ bool NTupleMaker::AddGenHt(const edm::Event& iEvent) {
   weightPDFdown = 0;
 
   for (unsigned int iW=0; iW<lheEventProduct->weights().size(); iW++) {
+    //    std::cout << lheEventProduct->weights()[iW].id << " : " << lheEventProduct->weights()[iW].wgt/lheEventProduct->originalXWGTUP() << std::endl;
+
     float weightGen = lheEventProduct->weights()[iW].wgt/lheEventProduct->originalXWGTUP();
     if (iW<9)
       weightScale[iW] = weightGen;
@@ -2416,7 +2418,7 @@ bool NTupleMaker::AddGenHt(const edm::Event& iEvent) {
       }
     }
   }
-
+  //  std::cout << std::endl;
   weightPDFmean = weightPDFmean/nPDFWeights;
   weightPDF2 = weightPDF2/nPDFWeights;
   weightPDFvar = TMath::Sqrt(weightPDF2 - weightPDFmean*weightPDFmean);

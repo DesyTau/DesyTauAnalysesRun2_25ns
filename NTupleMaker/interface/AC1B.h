@@ -361,6 +361,20 @@ public :
    Float_t         mvamet_lep1_pt[50];   //[mvamet_count]
    Float_t         mvamet_lep2_pt[50];   //[mvamet_count]
    Float_t         genweight;
+
+   Float_t         weightScale0;
+   Float_t         weightScale1;
+   Float_t         weightScale2;
+   Float_t         weightScale3;
+   Float_t         weightScale4;
+   Float_t         weightScale5;
+   Float_t         weightScale6;
+   Float_t         weightScale7;
+   Float_t         weightScale8;
+
+   Float_t         weightPDFup;
+   Float_t         weightPDFdown;
+
    Float_t         genid1;
    Float_t         genx1;
    Float_t         genid2;
@@ -964,6 +978,20 @@ public :
    TBranch        *b_mvamet_lep1_pt;   //!
    TBranch        *b_mvamet_lep2_pt;   //!
    TBranch        *b_genweight;   //!
+
+   TBranch        *b_weightScale0;
+   TBranch        *b_weightScale1;
+   TBranch        *b_weightScale2;
+   TBranch        *b_weightScale3;
+   TBranch        *b_weightScale4;
+   TBranch        *b_weightScale5;
+   TBranch        *b_weightScale6;
+   TBranch        *b_weightScale7;
+   TBranch        *b_weightScale8;
+
+   TBranch        *b_weightPDFup;
+   TBranch        *b_weightPDFdown;
+
    TBranch        *b_genid1;   //!
    TBranch        *b_genx1;   //!
    TBranch        *b_genid2;   //!
@@ -1668,6 +1696,20 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("mvamet_lep1_pt", &mvamet_lep1_pt, &b_mvamet_lep1_pt);
    fChain->SetBranchAddress("mvamet_lep2_pt", &mvamet_lep2_pt, &b_mvamet_lep2_pt);
    fChain->SetBranchAddress("genweight", &genweight, &b_genweight);
+
+   fChain->SetBranchAddress("weightScale0", &weightScale0, &b_weightScale0);
+   fChain->SetBranchAddress("weightScale1", &weightScale1, &b_weightScale1);
+   fChain->SetBranchAddress("weightScale2", &weightScale2, &b_weightScale2);
+   fChain->SetBranchAddress("weightScale3", &weightScale3, &b_weightScale3);
+   fChain->SetBranchAddress("weightScale4", &weightScale4, &b_weightScale4);
+   fChain->SetBranchAddress("weightScale5", &weightScale5, &b_weightScale5);
+   fChain->SetBranchAddress("weightScale6", &weightScale6, &b_weightScale6);
+   fChain->SetBranchAddress("weightScale7", &weightScale7, &b_weightScale7);
+   fChain->SetBranchAddress("weightScale8", &weightScale8, &b_weightScale8);
+
+   fChain->SetBranchAddress("weightPDFup", &weightPDFup, &b_weightPDFup);
+   fChain->SetBranchAddress("weightPDFdown", &weightPDFdown, &b_weightPDFdown);
+
    fChain->SetBranchAddress("genid1", &genid1, &b_genid1);
    fChain->SetBranchAddress("genx1", &genx1, &b_genx1);
    fChain->SetBranchAddress("genid2", &genid2, &b_genid2);

@@ -107,6 +107,9 @@
 #include "RecoEgamma/EgammaTools/interface/ConversionInfo.h"
 #include "RecoEgamma/EgammaTools/interface/ConversionFinder.h"
 
+#include "SimDataFormats/GeneratorProducts/interface/LHEEventProduct.h"
+#include "SimDataFormats/GeneratorProducts/interface/LHERunInfoProduct.h"
+
 #include "TH1D.h"
 #include "TH2D.h"
 #include "TMath.h"
@@ -440,6 +443,7 @@ class NTupleMaker : public edm::EDAnalyzer{
   edm::EDGetTokenT<pat::TriggerObjectStandAloneCollection> TriggerObjectCollectionToken_;
   edm::EDGetTokenT<BeamSpot> BeamSpotToken_;
   edm::EDGetTokenT<VertexCollection> PVToken_;
+  edm::EDGetTokenT<LHEEventProduct> LHEToken_;
   edm::EDGetTokenT<double> SusyMotherMassToken_;
   edm::EDGetTokenT<double> SusyLSPMassToken_;
   std::string sampleName;

@@ -49,6 +49,10 @@
 #include "DesyTauAnalyses/NTupleMaker/interface/btagSF.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/JESUncertainties.h"
 
+#include "RooWorkspace.h"
+#include "RooAbsReal.h"
+#include "RooRealVar.h"
+
 float totalTransverseMass(TLorentzVector l1,
                           TLorentzVector l2,
                           TLorentzVector l3) {
@@ -277,7 +281,25 @@ int main(int argc, char * argv[]) {
     TString PileUpMCFile(pileUpMCFile);
     
     // **** end of configuration
-    
+
+    const float a_jetMu = 0.902;
+    const float b_jetMu = 0.0025;
+
+    const float a_jetMuUp = 0.992;
+    const float b_jetMuUp = 0.005;
+
+    const float a_jetMuDown = 0.812;
+    const float b_jetMuDown = 0.0;
+
+    const float a_jetEle = 0.794;
+    const float b_jetEle = 0.0015;
+
+    const float a_jetEleUp = 0.883;
+    const float b_jetEleUp = 0.003;
+
+    const float a_jetEleDown = 0.702;
+    const float b_jetEleDown = 0.0;
+
     // file name and tree name
     std::string rootFileName(argv[2]);
     std::ifstream fileList(argv[2]);
@@ -329,6 +351,10 @@ int main(int argc, char * argv[]) {
     Float_t         isoweight_1;
     Float_t         isoweight_2;
     Float_t         effweight;
+    Float_t         effweight_jetMuUp;
+    Float_t         effweight_jetMuDown;
+    Float_t         effweight_jetEUp;
+    Float_t         effweight_jetEDown;
     Float_t         fakeweight;
     Float_t         embeddedWeight;
     Float_t         signalWeight;
@@ -348,6 +374,17 @@ int main(int argc, char * argv[]) {
     Float_t         qcdweightdown_nodzeta;
     
     Float_t         zptmassweight;
+    Float_t         zptmassweight_esup;
+    Float_t         zptmassweight_esdown;
+    Float_t         zptmassweight_ttup;
+    Float_t         zptmassweight_ttdown;
+    Float_t         zptmassweight_statpt0up;
+    Float_t         zptmassweight_statpt0down;
+    Float_t         zptmassweight_statpt40up;
+    Float_t         zptmassweight_statpt40down;
+    Float_t         zptmassweight_statpt80up;
+    Float_t         zptmassweight_statpt80down;
+
     Float_t         weight;
     
     Float_t         m_vis;
@@ -666,6 +703,20 @@ int main(int argc, char * argv[]) {
     Bool_t badMuonFilter_;
     Bool_t duplicateMuonFilter_;
 
+    Float_t weightScale1;
+    Float_t weightScale2;
+    Float_t weightScale3;
+    Float_t weightScale4;
+    Float_t weightScale5;
+    Float_t weightScale6;
+    Float_t weightScale7;
+    Float_t weightScale8;
+
+    Float_t weightPDFup;
+    Float_t weightPDFdown;
+    
+
+
     tree->Branch("run", &run, "run/I");
     tree->Branch("lumi", &lumi, "lumi/I");
     tree->Branch("evt", &evt, "evt/I");
@@ -678,6 +729,18 @@ int main(int argc, char * argv[]) {
     tree->Branch("isZMM",&isZMM,"isZMM/O");
     tree->Branch("isZTT",&isZTT,"isZTT/O");
     
+    tree->Branch("weightScale1",&weightScale1,"weightScale1/F");
+    tree->Branch("weightScale2",&weightScale2,"weightScale2/F");
+    tree->Branch("weightScale3",&weightScale3,"weightScale3/F");
+    tree->Branch("weightScale4",&weightScale4,"weightScale4/F");
+    tree->Branch("weightScale5",&weightScale5,"weightScale5/F");
+    tree->Branch("weightScale6",&weightScale6,"weightScale6/F");
+    tree->Branch("weightScale7",&weightScale7,"weightScale7/F");
+    tree->Branch("weightScale8",&weightScale8,"weightScale8/F");
+
+    tree->Branch("weightPDFup",&weightPDFup,"weightPDFup/F");
+    tree->Branch("weightPDFdown",&weightPDFdown,"weightPDFdown/F");
+
     tree->Branch("mcweight", &mcweight, "mcweight/F");
     tree->Branch("puweight", &puweight, "puweight/F");
     tree->Branch("trigweight_1", &trigweight_1, "trigweight_1/F");
@@ -688,6 +751,10 @@ int main(int argc, char * argv[]) {
     tree->Branch("isoweight_1", &isoweight_1, "isoweight_1/F");
     tree->Branch("isoweight_2", &isoweight_2, "isoweight_2/F");
     tree->Branch("effweight", &effweight, "effweight/F");
+    tree->Branch("effweight_jetMuUp", &effweight_jetMuUp, "effweight_jetMuUp/F");
+    tree->Branch("effweight_jetMuDown", &effweight_jetMuDown, "effweight_jetMuDown/F");
+    tree->Branch("effweight_jetEUp", &effweight_jetEUp, "effweight_jetEUp/F");
+    tree->Branch("effweight_jetEDown", &effweight_jetEDown, "effweight_jetEDown/F");
     tree->Branch("fakeweight", &fakeweight, "fakeweight/F");
     tree->Branch("embeddedWeight", &embeddedWeight, "embeddedWeight/F");
     tree->Branch("signalWeight", &signalWeight, "signalWeight/F");
@@ -707,6 +774,22 @@ int main(int argc, char * argv[]) {
     tree->Branch("qcdweightdown_nodzeta", &qcdweightdown_nodzeta, "qcdweightdown_nodzeta/F");
     
     tree->Branch("zptmassweight",&zptmassweight,"zptmassweight/F");
+
+    tree->Branch("zptmassweight_esup",&zptmassweight_esup,"zptmassweight_esup/F");
+    tree->Branch("zptmassweight_esdown",&zptmassweight_esdown,"zptmassweight_esdown/F");
+
+    tree->Branch("zptmassweight_ttup",&zptmassweight_ttup,"zptmassweight_ttup/F");
+    tree->Branch("zptmassweight_ttdown",&zptmassweight_ttdown,"zptmassweight_ttdown/F");
+
+    tree->Branch("zptmassweight_statpt0up",&zptmassweight_statpt0up,"zptmassweight_statpt0up/F");
+    tree->Branch("zptmassweight_statpt0down",&zptmassweight_statpt0down,"zptmassweight_statpt0down/F");
+
+    tree->Branch("zptmassweight_statpt40up",&zptmassweight_statpt40up,"zptmassweight_statpt40up/F");
+    tree->Branch("zptmassweight_statpt40down",&zptmassweight_statpt40down,"zptmassweight_statpt40down/F");
+
+    tree->Branch("zptmassweight_statpt80up",&zptmassweight_statpt80up,"zptmassweight_statpt80up/F");
+    tree->Branch("zptmassweight_statpt80down",&zptmassweight_statpt80down,"zptmassweight_statpt80down/F");
+
     tree->Branch("weight", &weight, "weight/F");
     
     tree->Branch("metFilters",&metFilters_,"metFilters/O");
@@ -1185,9 +1268,9 @@ int main(int argc, char * argv[]) {
     
     // BTag scale factors
     BTagCalibration calib("csvv2", cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/CSVv2_Moriond17_B_H.csv");
-    BTagCalibrationReader reader_B(BTagEntry::OP_MEDIUM,"central");
-    BTagCalibrationReader reader_C(BTagEntry::OP_MEDIUM,"central");
-    BTagCalibrationReader reader_Light(BTagEntry::OP_MEDIUM,"central");
+    BTagCalibrationReader reader_B(BTagEntry::OP_MEDIUM,"central",{"up","down"});
+    BTagCalibrationReader reader_C(BTagEntry::OP_MEDIUM,"central",{"up","down"});
+    BTagCalibrationReader reader_Light(BTagEntry::OP_MEDIUM,"central",{"up","down"});
     reader_B.load(calib,BTagEntry::FLAV_B,"comb");
     reader_C.load(calib,BTagEntry::FLAV_C,"comb");
     reader_Light.load(calib,BTagEntry::FLAV_UDSG,"incl");
@@ -1230,6 +1313,11 @@ int main(int argc, char * argv[]) {
         exit(-1);
     }
     
+    // Z-pt weights from correction WS
+    TString correctionsWorkspaceFileName = TString(cmsswBase)+"/src/HTT-utilities/CorrectionsWorkspace/htt_scalefactors_v16_5.root";
+    TFile * correctionWorkSpaceFile = new TFile(correctionsWorkspaceFileName);
+    RooWorkspace *correctionWS = (RooWorkspace*)correctionWorkSpaceFile->Get("w");
+
     //  exit(-1);
 
     unsigned int eventList[10] = {
@@ -1328,6 +1416,19 @@ int main(int argc, char * argv[]) {
             
             // weights
             mcweight = analysisTree.genweight;
+
+	    weightScale1 = analysisTree.weightScale1;
+	    weightScale2 = analysisTree.weightScale2;
+	    weightScale3 = analysisTree.weightScale3;
+	    weightScale4 = analysisTree.weightScale4;
+	    weightScale5 = analysisTree.weightScale5;
+	    weightScale6 = analysisTree.weightScale6;
+	    weightScale7 = analysisTree.weightScale7;
+	    weightScale8 = analysisTree.weightScale8;
+
+	    weightPDFup   = analysisTree.weightPDFup;
+	    weightPDFdown = analysisTree.weightPDFdown;
+
             puweight = 1;
             trigweight_1 = 1;
             trigweight_2 = 1;
@@ -1337,6 +1438,10 @@ int main(int argc, char * argv[]) {
             isoweight_1 = 1;
             isoweight_2 = 1;
             effweight = 1;
+	    effweight_jetMuUp = 1;
+	    effweight_jetMuDown = 1;
+	    effweight_jetEUp = 1;
+	    effweight_jetEDown = 1;
             fakeweight = 1;
             embeddedWeight = 1;
             signalWeight = 1;
@@ -1353,6 +1458,17 @@ int main(int argc, char * argv[]) {
             qcdweightup_nodzeta = 1;
             qcdweightdown_nodzeta = 1;
             zptmassweight = 1;
+	    zptmassweight_esup = 1;
+	    zptmassweight_esdown = 1;
+	    zptmassweight_ttup = 1;
+	    zptmassweight_ttdown = 1;
+	    zptmassweight_statpt0up = 1;
+	    zptmassweight_statpt0down = 1;
+	    zptmassweight_statpt40up = 1;
+	    zptmassweight_statpt40down = 1;
+	    zptmassweight_statpt80up = 1;
+	    zptmassweight_statpt80down = 1;
+
             weight = 1;
             
             nuPx = 0;
@@ -1679,11 +1795,33 @@ int main(int argc, char * argv[]) {
                         if (bosonMassX>1000.) bosonMassX = 1000.;
                         if (bosonPtX<1.)      bosonPtX = 1.;
                         if (bosonPtX>1000.)   bosonPtX = 1000.;
-                        zptmassweight = histZMassPtWeights->GetBinContent(histZMassPtWeights->GetXaxis()->FindBin(bosonMassX),
-                                                                          histZMassPtWeights->GetYaxis()->FindBin(bosonPtX));
-
-			//			std::cout << "boson pt = " << bosonPtX << "  mass = " << "  weight = " << zptmassweight << std::endl;
-                    } 
+			//  zptmassweight = histZMassPtWeights->GetBinContent(histZMassPtWeights->GetXaxis()->FindBin(bosonMassX),
+			//  histZMassPtWeights->GetYaxis()->FindBin(bosonPtX));
+			correctionWS->var("z_gen_pt")->setVal(bosonPtX);
+			correctionWS->var("z_gen_mass")->setVal(bosonMassX);
+			zptmassweight = correctionWS->function("zpt_weight_nom")->getVal();
+			zptmassweight_esup = correctionWS->function("zpt_weight_esup")->getVal();
+			zptmassweight_esdown = correctionWS->function("zpt_weight_esdown")->getVal();
+			zptmassweight_ttup = correctionWS->function("zpt_weight_ttup")->getVal();
+			zptmassweight_ttdown = correctionWS->function("zpt_weight_ttdown")->getVal();
+			zptmassweight_statpt0up = correctionWS->function("zpt_weight_statpt0up")->getVal();
+			zptmassweight_statpt0down = correctionWS->function("zpt_weight_statpt0down")->getVal();
+			zptmassweight_statpt40up = correctionWS->function("zpt_weight_statpt40up")->getVal();
+			zptmassweight_statpt40down = correctionWS->function("zpt_weight_statpt40down")->getVal();
+			zptmassweight_statpt80up = correctionWS->function("zpt_weight_statpt80up")->getVal();
+			zptmassweight_statpt80down = correctionWS->function("zpt_weight_statpt80down")->getVal();
+			/*
+			if (bosonPtX>500||bosonMassX>500) {
+			  std::cout << "boson pt = " << bosonPtX << "  mass = " << bosonMassX << std::endl;
+			  std::cout << "  weight = " << zptmassweight << std::endl;
+			  std::cout << "  weight_esup = " << zptmassweight_esup << "  weight_esdown = " << zptmassweight_esdown << std::endl;
+			  std::cout << "  weight_ttup = " << zptmassweight_ttup << "  weight_ttdown = " << zptmassweight_ttdown << std::endl;
+			  std::cout << "  weight_statpt0up = " << zptmassweight_statpt0up << "  weight_statpt0down = " << zptmassweight_statpt0down << std::endl;
+			  std::cout << "  weight_statpt40up = " << zptmassweight_statpt40up << "  weight_statpt40down = " << zptmassweight_statpt40down << std::endl;
+			  std::cout << "  weight_statpt80up = " << zptmassweight_statpt80up << "  weight_statpt80down = " << zptmassweight_statpt80down << std::endl;
+			} 
+			*/
+		    }
 
 
                 }
@@ -2325,7 +2463,7 @@ int main(int argc, char * argv[]) {
                     }
                 }
                 
-                effweight = isoweight_1*isoweight_2*trigweight;
+                effweight = trigweight;
             }
             
             // cout << "effweight = " << effweight << endl;
@@ -3358,7 +3496,78 @@ int main(int argc, char * argv[]) {
                     isZTT = false;
                     isZLL = true;
                 }
-                
+
+		double weightE = 1;
+		double weightEUp = 1;
+		double weightEDown = 1;
+		if (gen_match_1==6) {
+		  double dRmin = 0.5;
+		  double ptJet = pt_1;
+		  for (unsigned int ijet=0; ijet<analysisTree.pfjet_count; ++ijet) {
+		    double etaJet = analysisTree.pfjet_eta[ijet];
+		    double phiJet = analysisTree.pfjet_phi[ijet];
+		    double dRjetE = deltaR(etaJet,phiJet,eta_1,phi_1);
+		    if (dRjetE<dRmin) {
+		      dRmin = dRjetE;
+		      ptJet = analysisTree.pfjet_pt[ijet];
+		    }
+		  }
+		  if (isTOP) {
+		    weightE = 1;
+		    weightEUp = 1;
+		    weightEDown = 1;
+		  }
+		  else {
+		    weightE     = a_jetEle + b_jetEle*ptJet;
+		    weightEUp   = a_jetEleUp + b_jetEleUp*ptJet;
+		    weightEDown = a_jetEleDown + b_jetEleDown*ptJet;
+		  }
+		  fakeweight *= weightE;
+		}
+		else {
+		  weightE = isoweight_1;
+		  weightEUp = isoweight_1;
+		  weightEDown = isoweight_1;
+		}
+
+		double weightMu = 1;
+		double weightMuUp = 1;
+		double weightMuDown = 1;
+		if (gen_match_2==6) {
+		  double dRmin = 0.5;
+		  double ptJet = pt_2;
+		  for (unsigned int ijet=0; ijet<analysisTree.pfjet_count; ++ijet) {
+		    double etaJet = analysisTree.pfjet_eta[ijet];
+		    double phiJet = analysisTree.pfjet_phi[ijet];
+		    double dRjetM = deltaR(etaJet,phiJet,eta_2,phi_2);
+		    if (dRjetM<dRmin) {
+		      dRmin = dRjetM;
+		      ptJet = analysisTree.pfjet_pt[ijet];
+		    }
+		  }
+		  if (isTOP) {
+		    weightMu = 1;
+		    weightMuUp = 1;
+		    weightMuDown = 1;
+		  }
+		  else {
+		    weightMu     = a_jetMu     + b_jetMu*ptJet;
+		    weightMuUp   = a_jetMuUp   + b_jetMuUp*ptJet;
+		    weightMuDown = a_jetMuDown + b_jetMuDown*ptJet;
+		  }
+		  fakeweight *= weightMu;
+		}
+		else {
+		  weightMu = isoweight_2;
+		  weightMuUp = isoweight_2;
+		  weightMuDown = isoweight_2;
+		}
+		float effweight0 = effweight;
+		effweight = effweight0 * weightE * weightMu;
+		effweight_jetMuUp   = effweight0 * weightE     * weightMuUp;
+		effweight_jetMuDown = effweight0 * weightE     * weightMuDown; 
+		effweight_jetEUp    = effweight0 * weightEUp   * weightMu;
+		effweight_jetEDown  = effweight0 * weightEDown * weightMu; 
             }
             
             tree->Fill();
