@@ -477,6 +477,7 @@ GenJetCollectionTag = cms.InputTag("slimmedGenJets"),
 TriggerObjectCollectionTag = cms.InputTag("selectedPatTrigger"),
 BeamSpotCollectionTag =  cms.InputTag("offlineBeamSpot"),
 PVCollectionTag = cms.InputTag("offlineSlimmedPrimaryVertices"),
+LHEEventProductTag = cms.InputTag("externalLHEProducer"),
 SusyMotherMassTag = cms.InputTag("SusyScanProducer","SusyMotherMass"),
 SusyLSPMassTag = cms.InputTag("SusyScanProducer","SusyLSPMass"),
 # trigger info

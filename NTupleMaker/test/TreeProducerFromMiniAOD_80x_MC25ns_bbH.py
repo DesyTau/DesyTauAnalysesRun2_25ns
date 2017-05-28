@@ -1,6 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 
-isData = True
+isData = False
+isFastSim = False
 is25ns = True
 year = 2016
 period = 'Spring16'
@@ -31,6 +32,12 @@ process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.destinations = ['cout', 'cerr']
 process.MessageLogger.cerr.threshold = cms.untracked.string('INFO')
 process.MessageLogger.cerr.FwkReport.reportEvery = 500
+process.MessageLogger.cerr.default = cms.untracked.PSet (
+  limit = cms.untracked.int32(10),
+  timespan = cms.untracked.int32(60)
+)    
+
+
 # Set the process options -- Display summary at the end, enable unscheduled execution
 process.options = cms.untracked.PSet( 
     allowUnscheduled = cms.untracked.bool(True),
@@ -39,7 +46,7 @@ process.options = cms.untracked.PSet(
 
 # How many events to process
 process.maxEvents = cms.untracked.PSet( 
-   input = cms.untracked.int32(100)
+   input = cms.untracked.int32(2)
 )
 
 ### External JECs =====================================================================================================
@@ -61,9 +68,9 @@ if usePrivateSQlite:
     CondDBSetup.__delattr__('connect')
     import os
     if runOnData:
-      era="Summer16_23Sep2016AllV3_DATA"
+      era="Summer16_23Sep2016AllV4_DATA"
     else:
-      era="Summer16_23Sep2016V3_MC"
+      era="Summer16_23Sep2016V4_MC"
     
     dBFile = os.path.expandvars("$CMSSW_BASE/src/DesyTauAnalyses/NTupleMaker/data/JEC/"+era+".db")
     process.jec = cms.ESSource("PoolDBESSource",CondDBSetup,
@@ -253,12 +260,15 @@ process.HBHENoiseFilterResultProducer.defaultDecision = cms.string("HBHENoiseFil
 
 fnames = []
 if runOnData:
-  #fnames.append('/store/data/Run2016B/SingleMuon/MINIAOD/23Sep2016-v3/00000/00AE0629-1F98-E611-921A-008CFA1112CC.root')
-  #fnames.append('/store/data/Run2016G/SingleMuon/MINIAOD/23Sep2016-v1/1110000/F019E8FE-B19C-E611-8FAD-6CC2173BC7B0.root')
-  fnames.append('/store/data/Run2016H/SingleMuon/MINIAOD/PromptReco-v3/000/284/036/00000/0E02D50E-989F-E611-A962-FA163EE15C80.root')
+  fnames.append('/store/data/Run2016B/SingleMuon/MINIAOD/PromptReco-v2/000/273/448/00000/CECFFCBE-CE1C-E611-8660-02163E011A4E.root')
 else:
-  fnames.append('/store/mc/RunIISpring16MiniAODv2/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/00000/00F0B3DC-211B-E611-A6A0-001E67248A39.root')
-    
+#  fnames.append('/store/mc/RunIISummer16MiniAODv2/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v2/50000/7C434F1C-82C4-E611-B0D3-008CFA0518D4.root')
+#  fnames.append('/store/mc/RunIISummer16MiniAODv2/SUSYGluGluToBBHToBB_NarrowWidth_M-100_TuneCUETP8M1_13TeV-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/50000/0077880A-64C7-E611-BC4A-02163E0130AE.root')
+#  fnames.append('/store/mc/RunIISummer16MiniAODv2/GluGluHToTauTau_M125_13TeV_powheg_pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/120000/1C6F3F7F-96C8-E611-A0D7-0025905A4964.root')
+#  fnames.append('/store/mc/RunIISummer16MiniAODv2/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/50000/0693E0E7-97BE-E611-B32F-0CC47A78A3D8.root')
+#  fnames.append('/store/mc/RunIISummer16MiniAODv2/TTJets_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/110000/08BA365D-40E5-E611-955F-00266CF89498.root')
+  fnames.append('/store/user/agilbert/SUSYGluGluToBBHToTauTau_M-700_TuneCUETP8M1_13TeV-amcatnlo-pythia8/miniaod-prod-150517/170518_210633/0000/miniaod_10.root')
+
 # Define the input source
 process.source = cms.Source("PoolSource", 
                             fileNames = cms.untracked.vstring( fnames ),
@@ -300,6 +310,7 @@ process.mvaMetSequence  = cms.Sequence(process.leptonPreSelectionSequence +
 # END Pairwise MVA MET ==============================================================
 '''
 ########### HBHE
+
 
 
 process.ApplyBaselineHBHENoiseFilter = cms.EDFilter('BooleanFlagFilter',
@@ -451,6 +462,7 @@ mvaNonTrigValuesMap     = cms.InputTag("electronMVAValueMapProducer:ElectronMVAE
 mvaNonTrigCategoriesMap = cms.InputTag("electronMVAValueMapProducer:ElectronMVAEstimatorRun2Spring15NonTrig25nsV1Categories"),
 mvaTrigValuesMap     = cms.InputTag("electronMVAValueMapProducer:ElectronMVAEstimatorRun2Spring15Trig25nsV1Values"),
 mvaTrigCategoriesMap = cms.InputTag("electronMVAValueMapProducer:ElectronMVAEstimatorRun2Spring15Trig25nsV1Categories"),
+
 TauCollectionTag = cms.InputTag("slimmedTaus"),
 L1MuonCollectionTag = cms.InputTag("gmtStage2Digis:Muon"),
 L1EGammaCollectionTag = cms.InputTag("caloStage2Digis:EGamma"),
@@ -460,6 +472,7 @@ JetCollectionTag = cms.InputTag("patJetsReapplyJEC::TreeProducer"),
 #JetCollectionTag = cms.InputTag("slimmedJets"),
 MetCollectionTag = cms.InputTag("slimmedMETs::@skipCurrentProcess"),
 MetCorrCollectionTag = cms.InputTag("slimmedMETs::TreeProducer"),
+MetCorrCovMatrixTag = cms.InputTag("METCorrSignificance:METCovariance:TreeProducer"),
 PuppiMetCollectionTag = cms.InputTag("slimmedMETsPuppi::TreeProducer"),
 MvaMetCollectionsTag = cms.VInputTag(cms.InputTag("MVAMET","MVAMET","TreeProducer")),
 TrackCollectionTag = cms.InputTag("generalTracks"),
@@ -468,7 +481,7 @@ GenJetCollectionTag = cms.InputTag("slimmedGenJets"),
 TriggerObjectCollectionTag = cms.InputTag("selectedPatTrigger"),
 BeamSpotCollectionTag =  cms.InputTag("offlineBeamSpot"),
 PVCollectionTag = cms.InputTag("offlineSlimmedPrimaryVertices"),
-LHEEventProductTag = cms.InputTag("externalLHEProducer"),
+LHEEventProductTag = cms.InputTag("source"),
 SusyMotherMassTag = cms.InputTag("susyInfo","SusyMotherMass"),
 SusyLSPMassTag = cms.InputTag("susyInfo","SusyLSPMass"),
 # trigger info
@@ -763,8 +776,8 @@ RecElectronHLTriggerMatching = cms.untracked.vstring(
 'HLT_Ele23_CaloIdL_TrackIdL_IsoVL_v.*:hltEle23CaloIdLTrackIdLIsoVLTrackIsoFilter',
 'HLT_Ele12_CaloIdL_TrackIdL_IsoVL_v.*:hltEle12CaloIdLTrackIdLIsoVLTrackIsoFilter',
 'HLT_Ele45_WPLoose_Gsf_L1JetTauSeeded_v.*:hltEle45WPLooseGsfTrackIsoL1TauJetSeededFilter',
-'HLT_Ele24_eta2p1_WPLoose_Gsf_LooseIsoPFTau30_v.*:hltOverlapFilterIsoEle24WPLooseGsfLooseIsoPFTau30', # for RunG-H
 'HLT_Ele24_eta2p1_WPLoose_Gsf_LooseIsoPFTau30_v.*:hltEle24WPLooseL1IsoEG22erIsoTau26erGsfTrackIsoFilter',
+'HLT_Ele24_eta2p1_WPLoose_Gsf_LooseIsoPFTau30_v.*:hltOverlapFilterIsoEle24WPLooseGsfLooseIsoPFTau30', # for RunG-H
 #MuonEG
 'HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v.*:hltL1sMu12EG10',
 'HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v.*:hltMu17TrkIsoVVLEle12CaloIdLTrackIdLIsoVLElectronlegTrackIsoFilter',
@@ -881,7 +894,7 @@ process.p = cms.Path(
   process.puppiMETSequence *
   process.fullPatMetSequencePuppi *
   process.egmGsfElectronIDSequence * 
-  process.rerunMvaIsolation2SeqRun2 * 
+  process.rerunMvaIsolation2SeqRun2 *
   #process.mvaMetSequence *
   #process.HBHENoiseFilterResultProducer* #produces HBHE bools baseline
   #process.ApplyBaselineHBHENoiseFilter*  #reject events based 
@@ -890,17 +903,16 @@ process.p = cms.Path(
 )
 
 process.TFileService = cms.Service("TFileService",
-                                   fileName = cms.string("output_DATA.root")
+                                   fileName = cms.string("output_MC.root")
                                  )
 
 process.output = cms.OutputModule("PoolOutputModule",
-                                  fileName = cms.untracked.string('output_particles_DATA.root'),
+                                  fileName = cms.untracked.string('output_particles_MC.root'),
                                   outputCommands = cms.untracked.vstring(
-                                    'keep *_*_bad_TreeProducer'#,
-                                    #'drop patJets*_*_*_*'
-                                    #'keep *_slimmedMuons_*_*',
-                                    #'drop *_selectedPatJetsForMetT1T2Corr_*_*',
-                                    #'drop patJets_*_*_*'
+                                    'keep *_slimmedMETs_*_*',
+				    'keep *_MVAMET_*_*',
+                                    'keep *_patpfMETT1_*_*',
+                                    'keep *_*MET*_*_*'
                                   ),        
                                   SelectEvents = cms.untracked.PSet(  SelectEvents = cms.vstring('p'))
 )
