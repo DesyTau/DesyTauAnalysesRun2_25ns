@@ -313,8 +313,8 @@ int main(int argc, char * argv[]) {
   TH1D * triggerWeightH = new TH1D("triggerWeightH","",100,0,2);
 
   // histograms after dimuon selection
-  TH1D * ptLeadingMuH = new TH1D("ptLeadingMuH","",50,0,100);
-  TH1D * ptTrailingMuH = new TH1D("ptTrailingMuH","",50,0,100);
+  TH1D * ptLeadingMuH = new TH1D("ptLeadingMuH","",400,0,400);
+  TH1D * ptTrailingMuH = new TH1D("ptTrailingMuH","",400,0,400);
   TH1D * etaLeadingMuH = new TH1D("etaLeadingMuH","",48,-2.4,2.4);
   TH1D * etaTrailingMuH = new TH1D("etaTrailingMuH","",48,-2.4,2.4);
   TH1D * dimuonMassH = new TH1D("dimuonMassH","",500,0,500);
@@ -349,7 +349,7 @@ int main(int argc, char * argv[]) {
   TH2D * InvMass2DH = new TH2D("InvMass2DH","",20,0.,20.,20,0.,20.);
 
   TH1D * MetSelH = new TH1D("MetH","",400,0.,400.);
-  TH1D * mTtotSelH = new TH1D("","",400,0.,400.);
+  TH1D * mTtotSelH = new TH1D("mTtotSelH","",400,0.,400.);
 
   TH1D * ptLeadingMuSelH = new TH1D("ptLeadingMuSelH","",100,0,100);
   TH1D * ptLeadingMuTrkSelH = new TH1D("ptLeadingMuTrkSelH","",100,0,100);
