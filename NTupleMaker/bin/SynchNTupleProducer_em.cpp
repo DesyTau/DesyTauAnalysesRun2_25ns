@@ -2093,8 +2093,8 @@ int main(int argc, char * argv[]) {
             }
             
 
-	    if (metFilters_<0.5) continue;
 	    metFilters_ = metFilters_ && badMuonFilter_ && duplicateMuonFilter_;
+	    if (metFilters_<0.5) continue;
 	    //	    cout << "  SelEle=" << electrons.size()
 	    //		 << "  SelMu=" << muons.size() << std::endl;
             if (electrons.size()==0) continue;
