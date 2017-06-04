@@ -153,33 +153,35 @@ if (  fabs(eta) > 1.566 && fabs(eta) < 2.3 )
 */
 if (  fabs(eta) < 0.8 )
         {
-                if (pt>20 && pt<30) SF = 1.10106;
-                if (pt>30 && pt<40) SF = 0.991969;
-                if (pt>40 ) SF = 0.856711;
+                if (pt>20 && pt<30) SF = 1.10672;
+                if (pt>30 && pt<40) SF = 0.977925;
+                if (pt>40 ) SF = 0.834732;
         }
 if (  fabs(eta) > 0.8 && fabs(eta) < 1.44 )
         {
 
-                if (pt>20 && pt<30) SF = 1.10266;
-                if (pt>30 && pt<40) SF = 1.05957;
-                if (pt>40 ) SF = 0.746502;
+                if (pt>20 && pt<30) SF = 1.10876;
+                if (pt>30 && pt<40) SF = 1.04681;
+                if (pt>40 ) SF = 0.731267;
         }
 
 if (  fabs(eta) > 1.44 && fabs(eta) < 1.566 )
         {
 
-                if (pt>20 && pt<40) SF = 0.982112;
-                if (pt>40) SF = 1.60851;
+                if (pt>20 && pt<40) SF = 0.909111;
+                if (pt>40) SF = 1.60314;
         }
 if (  fabs(eta) > 1.566 && fabs(eta) < 2.3 )
         {
 
-                if (pt>20 && pt<30) SF = 0.974844;
-                if (pt>30 && pt<40) SF = 0.384193;
-                if (pt>40) SF = 0.839436;
+                if (pt>20 && pt<40) SF = 0.859504;
+                if (pt>40) SF = 0.884979;
         }
 
 }//mutau MVA
+
+
+
 
 
 return SF;

@@ -73,6 +73,7 @@ int main(int argc, char * argv[]) {
 //_Nominal _JetEnUp _JetEnDown  _ElEnUp _ElEnDown _MuEnUp _MuEnDown
 
 
+  	 string BTag_ = "central";
   	string Systematic=argv[5];
 
 	if (Systematic=="1" || Systematic=="" || isData) Systematic = "Nominal";
@@ -89,6 +90,9 @@ int main(int argc, char * argv[]) {
 	if (string::npos != Systematic.find("JetEnUp")){ ApplyJetEnergyCorrectionUnc = true; ApplyJetEnergyCorrectionUncSignPositive = true;}
 	if (string::npos != Systematic.find("JetEnDown")){ ApplyJetEnergyCorrectionUnc = true; ApplyJetEnergyCorrectionUncSignPositive = false;}
 
+
+	if (string::npos != Systematic.find("BTagUp")){ BTag_ = "up";}
+	if (string::npos != Systematic.find("BTagDown")){ BTag_ = "down";}
 
   // kinematics electrons
   const float  ptElectronCut       = cfg.get<float>("ptElectronCuteltau");
@@ -245,7 +249,7 @@ int main(int argc, char * argv[]) {
 
   string SaveDir=argv[3];
 
-if (string::npos != rootFileName.find("SMS-") || string::npos != rootFileName.find("stau") || string::npos != rootFileName.find("C1"))
+if (string::npos != rootFileName.find("SMS-") || string::npos != rootFileName.find("stau") || string::npos != rootFileName.find("C1") || string::npos != rootFileName.find("Chi"))
 	SUSY = true;
 
   if (string::npos == Systematic.find("Nominal")) {SaveDir.append("_");SaveDir.append(argv[5]);}
@@ -256,7 +260,6 @@ if (string::npos != rootFileName.find("SMS-") || string::npos != rootFileName.fi
 
 
 
-if (string::npos != datasetName.find("SMS-") || string::npos != datasetName.find("stau") || string::npos != datasetName.find("C1")) SUSY = true;
 
 
 // PU reweighting
@@ -275,9 +278,9 @@ if (string::npos != datasetName.find("SMS-") || string::npos != datasetName.find
   BTagCalibration calib("csvv2", cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/"+BtagCVS);
 
 
-  BTagCalibrationReader reader_B(BTagEntry::OP_MEDIUM,"central");
-  BTagCalibrationReader reader_C(BTagEntry::OP_MEDIUM,"central");
-  BTagCalibrationReader reader_Light(BTagEntry::OP_MEDIUM,"central");
+  BTagCalibrationReader reader_B(BTagEntry::OP_MEDIUM,BTag_);
+  BTagCalibrationReader reader_C(BTagEntry::OP_MEDIUM,BTag_);
+  BTagCalibrationReader reader_Light(BTagEntry::OP_MEDIUM,BTag_);
   if (!SUSY){reader_B.load(calib,BTagEntry::FLAV_B,"comb");
   reader_C.load(calib,BTagEntry::FLAV_C,"comb");
   reader_Light.load(calib,BTagEntry::FLAV_UDSG,"incl");}
@@ -293,9 +296,9 @@ if (string::npos != datasetName.find("SMS-") || string::npos != datasetName.find
   std::cout << std::endl;
   for (int iEta=0; iEta<2; ++iEta) {
     for (int iPt=0; iPt<5; ++iPt) {
-      float sfB = reader_B.eval_auto_bounds("central",BTagEntry::FLAV_B, etaBTAG[iEta], ptBTAG[iPt]);
-      float sfC = reader_C.eval_auto_bounds("central",BTagEntry::FLAV_C, etaBTAG[iEta], ptBTAG[iPt]);
-      float sfLight = reader_Light.eval_auto_bounds("central",BTagEntry::FLAV_UDSG, etaBTAG[iEta], ptBTAG[iPt]);
+      float sfB = reader_B.eval_auto_bounds(BTag_,BTagEntry::FLAV_B, etaBTAG[iEta], ptBTAG[iPt]);
+      float sfC = reader_C.eval_auto_bounds(BTag_,BTagEntry::FLAV_C, etaBTAG[iEta], ptBTAG[iPt]);
+      float sfLight = reader_Light.eval_auto_bounds(BTag_,BTagEntry::FLAV_UDSG, etaBTAG[iEta], ptBTAG[iPt]);
       printf("pT = %3.0f   eta = %3.1f  ->  SFb = %5.3f   SFc = %5.3f   SFl = %5.3f\n",ptBTAG[iPt],etaBTAG[iEta],sfB,sfC,sfLight);
     }
   }
@@ -1366,9 +1369,12 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	matchedTauToElHadronDec = false;
 	matchedTauToMuHadronDec = false;
 	matchedTauToTauHadronDec = false;
+	genTauDecayMode1=-1;
+	genTauDecayMode2=-1;
 	TLorentzVector genTauV;  
 	TLorentzVector genLepV;  
 
+	bool FoundFirstMatchedTau = false;
 	for (unsigned int gt = 0 ; gt < analysisTree.gentau_count; ++gt){
 
 	 // genTauV.SetXYZT(0.,0.,0.,0.);
@@ -1380,6 +1386,8 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
 
 	  if (Drr < 0.2 && ( analysisTree.gentau_isPrompt[gt] > 0.5  ) && genTauV.Pt() > 15. ) genTauMatched = true;
+	  if (genTauMatched && !FoundFirstMatchedTau) {genTauDecayMode1 = analysisTree.gentau_decayMode[gt]; FoundFirstMatchedTau = true;}
+	  if (genTauMatched && FoundFirstMatchedTau)   genTauDecayMode2 = analysisTree.gentau_decayMode[gt];
 
 	}
       
@@ -1613,19 +1621,19 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	    if (flavor==5) {
 	      if (JetPtForBTag>MaxBJetPt) JetPtForBTag = MaxBJetPt - 0.1;
 	      if (JetPtForBTag<MinBJetPt) JetPtForBTag = MinBJetPt + 0.1;
-	      jet_scalefactor = reader_B.eval_auto_bounds("central",BTagEntry::FLAV_B, absJetEta, JetPtForBTag);
+	      jet_scalefactor = reader_B.eval_auto_bounds(BTag_,BTagEntry::FLAV_B, absJetEta, JetPtForBTag);
 	      tageff = tagEff_B->Interpolate(JetPtForBTag,absJetEta);
 	    }
 	    else if (flavor==4) {
 	      if (JetPtForBTag>MaxBJetPt) JetPtForBTag = MaxBJetPt - 0.1;
 	      if (JetPtForBTag<MinBJetPt) JetPtForBTag = MinBJetPt + 0.1;
-	      jet_scalefactor = reader_C.eval_auto_bounds("central",BTagEntry::FLAV_C, absJetEta, JetPtForBTag);
+	      jet_scalefactor = reader_C.eval_auto_bounds(BTag_,BTagEntry::FLAV_C, absJetEta, JetPtForBTag);
 	      tageff = tagEff_C->Interpolate(JetPtForBTag,absJetEta);
 	    }
 	    else {
 	      if (JetPtForBTag>MaxLJetPt) JetPtForBTag = MaxLJetPt - 0.1;
 	      if (JetPtForBTag<MinLJetPt) JetPtForBTag = MinLJetPt + 0.1;
-	      jet_scalefactor = reader_Light.eval_auto_bounds("central",BTagEntry::FLAV_UDSG, absJetEta, JetPtForBTag);
+	      jet_scalefactor = reader_Light.eval_auto_bounds(BTag_,BTagEntry::FLAV_UDSG, absJetEta, JetPtForBTag);
 	      tageff = tagEff_Light->Interpolate(JetPtForBTag,absJetEta);
 	    }
 	    
@@ -1845,7 +1853,27 @@ cout<<""<<endl;
       if (!isData) npartons = analysisTree.genparticles_noutgoing;
 
       all_weight = weight;
+      event_run = analysisTree.event_run;
+      event_lumi = analysisTree.event_luminosityblock;
+      NuPx = nuPx;
+      NuPy = nuPy;
+      NuPz = nuPz;
+      NuPt = nuPt;
+      NuPhi = nuPhi;
+      genmet_Ex = analysisTree.genmet_ex;
+      genmet_Ey = analysisTree.genmet_ey;
 
+       wScale0 = analysisTree.weightScale0;
+       wScale1 = analysisTree.weightScale1;
+       wScale2 = analysisTree.weightScale2;
+       wScale3 = analysisTree.weightScale3;
+       wScale4 = analysisTree.weightScale4;
+       wScale5 = analysisTree.weightScale5;
+       wScale6 = analysisTree.weightScale6;
+       wScale7 = analysisTree.weightScale7;
+       wScale8 = analysisTree.weightScale8;
+       wPDFUp = analysisTree.weightPDFup;
+       wPDFDown = analysisTree.weightPDFdown;
       T->Fill();
 	
       selEvents++;

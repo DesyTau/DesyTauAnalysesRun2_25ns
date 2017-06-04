@@ -86,34 +86,33 @@ float SF = 1;
 
 if ( working_point == "MVA"){
 
-
 if (  fabs(eta) < 0.8 )
         {
-                if (pt>20 && pt<30) SF = 0.965212;
-                if (pt>30 && pt<40) SF = 0.934714;
-                if (pt>40 ) SF = 0.833209;
+                if (pt>20 && pt<30) SF = 1.10672;
+                if (pt>30 && pt<40) SF = 0.977925;
+                if (pt>40 ) SF = 0.834732;
         }
 if (  fabs(eta) > 0.8 && fabs(eta) < 1.44 )
         {
 
-                if (pt>20 && pt<30) SF = 1.0795;
-                if (pt>30 && pt<40) SF = 1.0543;
-                if (pt>40 ) SF = 0.999562;
+                if (pt>20 && pt<30) SF = 1.10876;
+                if (pt>30 && pt<40) SF = 1.04681;
+                if (pt>40 ) SF = 0.731267;
         }
 
 if (  fabs(eta) > 1.44 && fabs(eta) < 1.566 )
         {
 
-                if (pt>20 && pt<40) SF = 1.17946;
-                if (pt>40) SF = 1.18639;
+                if (pt>20 && pt<40) SF = 0.909111;
+                if (pt>40) SF = 1.60314;
         }
 if (  fabs(eta) > 1.566 && fabs(eta) < 2.3 )
         {
 
-                if (pt>20 && pt<30) SF = 1.07492;
-                if (pt>30 && pt<40) SF = 1.0993;
-                if (pt>40) SF = 1.04831;
+                if (pt>20 && pt<40) SF = 0.859504;
+                if (pt>40) SF = 0.884979;
         }
+
 
 	
 }
@@ -131,11 +130,47 @@ int main(int argc, char * argv[]) {
 
   // **** configuration
   Config cfg(argv[1]);
+  const bool isData = cfg.get<bool>("IsData");
 
   string Channel="mutau";
 
+  bool ApplyTauEnergyScaleUnc = false;
+  bool ApplyTauCorrectionUncSignPositive = false;
+  bool ApplyElEnergyScaleUnc = false;
+  bool ApplyElectronCorrectionUncSignPositive = false;
+  bool ApplyMuEnergyScaleUnc = false;
+  bool ApplyMuonCorrectionUncSignPositive = false;
+  bool ApplyJetEnergyCorrectionUnc = false;
+  bool ApplyJetEnergyCorrectionUncSignPositive = false;
+
+  const double TauEnergyScaleUnc   = cfg.get<double>("TauEnergyScaleUnc");
+  const double MuEnergyScaleUnc   = cfg.get<double>("MuEnergyScaleUnc");
+  const double ElEnergyScaleUncBarrel   = cfg.get<double>("ElEnergyScaleUncBarrel");
+  const double ElEnergyScaleUncEndcaps   = cfg.get<double>("ElEnergyScaleUncEndcaps");
+//_Nominal _JetEnUp _JetEnDown  _ElEnUp _ElEnDown _MuEnUp _MuEnDown
+
+  	string BTag_ = "central";
+
+  	string Systematic=argv[5];
+	if (Systematic=="1" || Systematic=="" || isData) Systematic = "Nominal";
+
+	if (string::npos != Systematic.find("TauEnUp")){ ApplyTauEnergyScaleUnc = true; ApplyTauCorrectionUncSignPositive = true;}
+	if (string::npos != Systematic.find("TauEnDown")){ ApplyTauEnergyScaleUnc = true; ApplyTauCorrectionUncSignPositive = false;}
+
+	if (string::npos != Systematic.find("ElEnUp")){ ApplyElEnergyScaleUnc = true; ApplyElectronCorrectionUncSignPositive = true;}
+	if (string::npos != Systematic.find("ElEnDown")){ ApplyElEnergyScaleUnc = true; ApplyElectronCorrectionUncSignPositive = false;}
+
+	if (string::npos != Systematic.find("MuEnUp")){ ApplyMuEnergyScaleUnc = true; ApplyMuonCorrectionUncSignPositive = true;}
+	if (string::npos != Systematic.find("MuEnDown")){ ApplyMuEnergyScaleUnc = true; ApplyMuonCorrectionUncSignPositive = false;}
+
+	if (string::npos != Systematic.find("JetEnUp")){ ApplyJetEnergyCorrectionUnc = true; ApplyJetEnergyCorrectionUncSignPositive = true;}
+	if (string::npos != Systematic.find("JetEnDown")){ ApplyJetEnergyCorrectionUnc = true; ApplyJetEnergyCorrectionUncSignPositive = false;}
+
+	if (string::npos != Systematic.find("BTagUp")){ BTag_ = "up";}
+	if (string::npos != Systematic.find("BTagDown")){ BTag_ = "down";}
+
+
   // kinematic cuts on electrons
-  const bool isData = cfg.get<bool>("IsData");
   
 
 ////////////muons
@@ -313,9 +348,9 @@ int main(int argc, char * argv[]) {
 
   BTagCalibration calib("csvv2", cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/"+BtagCVS);
 
-  BTagCalibrationReader reader_B(BTagEntry::OP_MEDIUM,"central");
-  BTagCalibrationReader reader_C(BTagEntry::OP_MEDIUM,"central");
-  BTagCalibrationReader reader_Light(BTagEntry::OP_MEDIUM,"central");
+  BTagCalibrationReader reader_B(BTagEntry::OP_MEDIUM,BTag_);
+  BTagCalibrationReader reader_C(BTagEntry::OP_MEDIUM,BTag_);
+  BTagCalibrationReader reader_Light(BTagEntry::OP_MEDIUM,BTag_);
   reader_B.load(calib,BTagEntry::FLAV_B,"comb");
   reader_C.load(calib,BTagEntry::FLAV_C,"comb");
   reader_Light.load(calib,BTagEntry::FLAV_UDSG,"incl");
@@ -327,9 +362,9 @@ int main(int argc, char * argv[]) {
   std::cout << std::endl;
   for (int iEta=0; iEta<2; ++iEta) {
     for (int iPt=0; iPt<5; ++iPt) {
-      float sfB = reader_B.eval_auto_bounds("central",BTagEntry::FLAV_B, etaBTAG[iEta], ptBTAG[iPt]);
-      float sfC = reader_C.eval_auto_bounds("central",BTagEntry::FLAV_C, etaBTAG[iEta], ptBTAG[iPt]);
-      float sfLight = reader_Light.eval_auto_bounds("central",BTagEntry::FLAV_UDSG, etaBTAG[iEta], ptBTAG[iPt]);
+      float sfB = reader_B.eval_auto_bounds(BTag_,BTagEntry::FLAV_B, etaBTAG[iEta], ptBTAG[iPt]);
+      float sfC = reader_C.eval_auto_bounds(BTag_,BTagEntry::FLAV_C, etaBTAG[iEta], ptBTAG[iPt]);
+      float sfLight = reader_Light.eval_auto_bounds(BTag_,BTagEntry::FLAV_UDSG, etaBTAG[iEta], ptBTAG[iPt]);
       printf("pT = %3.0f   eta = %3.1f  ->  SFb = %5.3f   SFc = %5.3f   SFl = %5.3f\n",ptBTAG[iPt],etaBTAG[iEta],sfB,sfC,sfLight);
     }
   }
@@ -531,12 +566,12 @@ const    int nEtaBins = 4;
 
   for (int iEta=0; iEta<nEtaBins; ++iEta) {
     for (int iCut=0; iCut<nCuts; ++iCut) {
-    	if (iEta!=2){  
+    	if (iEta<2){  
       		FakeRatePtIncLoose[iEta][iCut] = new TH1D("FakeRatePtIncLoose"+EtaBins[iEta]+Cuts[iCut],"",nPtBins,ptBins);
       		FakeRatePtIncTight[iEta][iCut] = new TH1D("FakeRatePtIncTight"+EtaBins[iEta]+Cuts[iCut],"",nPtBins,ptBins);
 	}
   
-   	if (iEta==2) {
+   	if (iEta>1) {
       		FakeRatePtIncLoose[iEta][iCut] = new TH1D("FakeRatePtIncLoose"+EtaBins[iEta]+Cuts[iCut],"",nPtBins2,ptBins2);
       		FakeRatePtIncTight[iEta][iCut] = new TH1D("FakeRatePtIncTight"+EtaBins[iEta]+Cuts[iCut],"",nPtBins2,ptBins2);
     		}
@@ -695,13 +730,14 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
     bool isDYNJ = false;
     bool isWNJ = false;
     bool isNJ = false;
+	
 	string tt = "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8";
 	string wj = "WJetsToLNu";
 	string wj1 = "W1JetsToLNu";
 	string wj2 = "W2JetsToLNu";
 	string wj3 = "W3JetsToLNu";
 	string wj4 = "W4JetsToLNu";
-	string dyj = "JetsToLL_M";
+	string dyj = "DYJetsToLL";
 	string dyjhigh = "DYJetsToLL_M-50";
 	string dyjlow = "DYJetsToLL_M-5to";
 	string dyjlow2 = "DYJetsToLL_M-10to";
@@ -710,16 +746,18 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	string dyj3 = "DY3JetsToLL";
 	string dyj4 = "DY4JetsToLL";
 	string ttw = "TTWJetsToLNu";
+	string signal = "stau";
+	string signalC1 = "C1";
+	string signalChi = "Chi";
 	if (string::npos != filen.find(tt)) isTT= true;
 	if (string::npos != filen.find(wj)) isWJ= true;
+	if (string::npos != filen.find(ttw)) isWJ= false;
 	if (string::npos != filen.find(dyj)) isDY= true;
 	if (string::npos != filen.find(dyjhigh)) isDYhigh= true;
 	if (string::npos != filen.find(dyjlow) || string::npos != filen.find(dyjlow2)) isDYlow= true;
 	if (string::npos != filen.find(dyj1) || string::npos != filen.find(dyj2) || string::npos != filen.find(dyj3) || string::npos != filen.find(dyj4)) isDYNJ = true;
-	if (string::npos != filen.find(wj1) || string::npos != filen.find(wj2) || string::npos != filen.find(wj3) || string::npos != filen.find(wj4)) isWNJ= true;
-	if (string::npos != filen.find(ttw)) isWNJ = false;
+	if ((string::npos != filen.find(wj1) || string::npos != filen.find(wj2) || string::npos != filen.find(wj3) || string::npos != filen.find(wj4)) && string::npos == filen.find(ttw)) isWNJ= true;
 	isNJ = isDYNJ && isWNJ;
-	
 
 
     for (Long64_t iEntry=0; iEntry<numberOfEntries; ++iEntry) { 
@@ -748,6 +786,80 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       if (analysisTree.primvertex_count<2) continue;  
       bool lumi=false;
 
+///////////////////////////////////////////////////////////////////////////// systematic study
+	if (ApplyTauEnergyScaleUnc && !isData)
+		{
+			double ApplyTauCorrectionUncSign=1;
+			if (!ApplyTauCorrectionUncSignPositive) ApplyTauCorrectionUncSign = -1;
+
+		for (unsigned int it = 0; it<analysisTree.tau_count; ++it) 
+			{
+
+			analysisTree.tau_pt[it] *= (1 +ApplyTauCorrectionUncSign*TauEnergyScaleUnc);
+			analysisTree.tau_px[it] *= (1 +ApplyTauCorrectionUncSign*TauEnergyScaleUnc);
+			analysisTree.tau_py[it] *= (1 +ApplyTauCorrectionUncSign*TauEnergyScaleUnc);
+			analysisTree.tau_pz[it] *= (1 +ApplyTauCorrectionUncSign*TauEnergyScaleUnc);
+			analysisTree.tau_e[it] *= (1 +ApplyTauCorrectionUncSign*TauEnergyScaleUnc);
+
+			//analysisTree.pfmet_ex = analysisTree.pfmet_ex+((analysisTree.tau_px[it]/TauEnergyScaleUnc)-analysisTree.tau_px[it]);
+			//analysisTree.pfmet_ey = analysisTree.pfmet_ey+((analysisTree.tau_py[it]/TauEnergyScaleUnc)-analysisTree.tau_py[it]);
+			}
+		
+		} 
+
+	if (ApplyJetEnergyCorrectionUnc && !isData)
+		{
+		double ApplyJetEnergyCorrectionUncSign=1;
+		for (unsigned int it = 0; it<analysisTree.pfjet_count; ++it) 
+			{
+			if (!ApplyJetEnergyCorrectionUncSignPositive) ApplyJetEnergyCorrectionUncSign = -1;
+			analysisTree.pfjet_pt[it] *=(1 + ApplyJetEnergyCorrectionUncSign*analysisTree.pfjet_jecUncertainty[it]);
+			analysisTree.pfjet_px[it] *=(1 + ApplyJetEnergyCorrectionUncSign*analysisTree.pfjet_jecUncertainty[it]);
+			analysisTree.pfjet_py[it] *=(1 + ApplyJetEnergyCorrectionUncSign*analysisTree.pfjet_jecUncertainty[it]);
+			analysisTree.pfjet_pz[it] *=(1 + ApplyJetEnergyCorrectionUncSign*analysisTree.pfjet_jecUncertainty[it]);
+			analysisTree.pfjet_e[it] *=(1 + ApplyJetEnergyCorrectionUncSign*analysisTree.pfjet_jecUncertainty[it]);
+			}
+		
+		} 
+
+	if (ApplyElEnergyScaleUnc && !isData)
+		{
+		double ElEnergyScaleUnc=1;
+			double ApplyElectronCorrectionUncSign=1;
+			if (!ApplyElectronCorrectionUncSignPositive) ApplyElectronCorrectionUncSign = -1;
+
+		for (unsigned int it = 0; it<analysisTree.electron_count; ++it) 
+			{
+
+			if (analysisTree.electron_eta[it] < 1.48)  ElEnergyScaleUnc = ElEnergyScaleUncBarrel;
+			if (analysisTree.electron_eta[it] > 1.48)  ElEnergyScaleUnc = ElEnergyScaleUncEndcaps;
+
+			analysisTree.electron_pt[it] *=(1 + ApplyElectronCorrectionUncSign*ElEnergyScaleUnc);
+			analysisTree.electron_px[it] *=(1 + ApplyElectronCorrectionUncSign*ElEnergyScaleUnc);
+			analysisTree.electron_py[it] *=(1 + ApplyElectronCorrectionUncSign*ElEnergyScaleUnc);
+			analysisTree.electron_pz[it] *=(1 + ApplyElectronCorrectionUncSign*ElEnergyScaleUnc);
+
+			}
+		
+		} 
+
+	if (ApplyMuEnergyScaleUnc && !isData)
+		{
+			double ApplyMuonCorrectionUncSign=1;
+			if (!ApplyMuonCorrectionUncSignPositive) ApplyMuonCorrectionUncSign = -1;
+
+		for (unsigned int it = 0; it<analysisTree.muon_count; ++it) 
+			{
+
+			analysisTree.muon_pt[it] *= (1 + ApplyMuonCorrectionUncSign*MuEnergyScaleUnc);
+			analysisTree.muon_px[it] *= (1 + ApplyMuonCorrectionUncSign*MuEnergyScaleUnc);
+			analysisTree.muon_py[it] *= (1 + ApplyMuonCorrectionUncSign*MuEnergyScaleUnc);
+			analysisTree.muon_pz[it] *= (1 + ApplyMuonCorrectionUncSign*MuEnergyScaleUnc);
+			}
+		
+		} 
+
+///////////////////////////////////////////////////////////////////////////// systematic study end
 
       float topPt = 0;
       float antitopPt = 0;
@@ -897,11 +1009,17 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	    }
 	  }
 	  
+	isDYTT=false;
+	isDYLL=false;
+	isDYLL=false;
+	isDYEE=false;
+	isDYMM=false;
 
 	if (isDY) {
 	  
 	  if (promptTausFirstCopy.size()==2) {
 	    isZTT = true; isZMM = false; isZEE = false;
+	    isDYTT=true;
 	    bosonPx = promptTausLV.Px(); bosonPy = promptTausLV.Py(); bosonPz = promptTausLV.Pz(); 
 	    bosonMass = promptTausLV.M();
 	    bosonEta  = promptTausLV.Eta();
@@ -910,6 +1028,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	  }
 	  else if (promptMuons.size()==2) {
 	    isZTT = false; isZMM = true; isZEE = false;
+	    isDYMM=true;
 	    bosonPx = promptMuonsLV.Px(); bosonPy = promptMuonsLV.Py(); bosonPz = promptMuonsLV.Pz(); 
 	    bosonMass = promptMuonsLV.M(); 
 	    bosonEta = promptMuonsLV.Eta();
@@ -918,6 +1037,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	  }
 	  else {
 	    isZTT = false; isZMM = false; isZEE = true;
+	    isDYEE=true;
 	    bosonPx = promptElectronsLV.Px(); bosonPy = promptElectronsLV.Py(); bosonPz = promptElectronsLV.Pz(); 
 	    bosonMass = promptElectronsLV.M();
 	    bosonEta = promptElectronsLV.Eta();
@@ -1081,53 +1201,29 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
       if (!lumi) continue;
 
-
-	bool Run2016A, Run2016B, Run2016C, Run2016D, Run2016E, Run2016F, Run2016G,Run2016H;
-	bool RunBCDEF = false;
-	bool RunGH = false;
-	Run2016A=false;
-	Run2016B=false;
-	Run2016C=false;
-	Run2016D=false;
-	Run2016E=false;
-	Run2016F=false;
-	Run2016G=false;
-	Run2016H=false;
-
-
 	int RunNo = analysisTree.event_run;
-	if (isData){
-	if (RunNo >  271036-1 &&  RunNo < 271658+1 ) Run2016A = true;
-	if (RunNo >  272007-1 &&  RunNo < 275376+1 ) Run2016B = true;
-	if (RunNo >  275657-1 &&  RunNo < 276283+1 ) Run2016C = true;
-	if (RunNo >  276315-1 &&  RunNo < 276811+1 ) Run2016D = true;
-	if (RunNo >  276831-1 &&  RunNo < 277420+1 ) Run2016E = true;
-	if (RunNo >  277772-1 &&  RunNo < 278808+1 ) Run2016F = true;
-	if (RunNo >  278820-1 &&  RunNo < 280385+1 ) Run2016G = true;
-	if (RunNo >  280919-1 &&  RunNo < 284044+1 ) Run2016H = true;
-	//cout<<Run2016A<<"  "<<Run2016B<<"  "<<Run2016E<<endl;
-
-	if (Run2016B || Run2016C || Run2016D || Run2016E || Run2016F) RunBCDEF = true;
-	if (Run2016G || Run2016H) RunGH = true;
-	}
 
 
 	std::vector<TString> metFlags; metFlags.clear();
      //////////////MET filters flag
 
-	
-         metFlags.push_back("Flag_HBHENoiseFilter");
-         metFlags.push_back("Flag_HBHENoiseIsoFilter");
-         metFlags.push_back("Flag_EcalDeadCellTriggerPrimitiveFilter");
-         metFlags.push_back("Flag_goodVertices");
+	 metFlags.push_back("Flag_HBHENoiseFilter");
+	 metFlags.push_back("Flag_HBHENoiseIsoFilter");
+	 metFlags.push_back("Flag_EcalDeadCellTriggerPrimitiveFilter");
+	 metFlags.push_back("Flag_goodVertices");
 	 metFlags.push_back("Flag_globalSuperTightHalo2016Filter");
-        // metFlags.push_back("Flag_METFilters");
-         metFlags.push_back("Flag_eeBadScFilter");
+	// metFlags.push_back("Flag_METFilters");
+	 metFlags.push_back("Flag_eeBadScFilter");
+	 metFlags.push_back("Flag_BadChargedCandidateFilter");
+	 metFlags.push_back("Flag_BadPFMuonFilter");
+	 metFlags.push_back("Flag_muonBadTrackFilter");
+	 metFlags.push_back("Flag_chargedHadronTrackResolutionFilter");
 
+  //    }
 
 
 	bool METflag = metFiltersPasses2(analysisTree, metFlags);
-	if (!METflag) continue;
+	if (!METflag && isData) continue;
 
 
     LooseCFCounter[iCutL]+= weight;
@@ -1348,7 +1444,6 @@ if (!CutBasedTauId){
 	tau_loose = (int)tau_index;
 	
 	if (!isLoose) continue;
-//	if (tau_loose  > 10) continue;	 
 
       double q = analysisTree.tau_charge[tau_loose] * analysisTree.muon_charge[mu_index];
       if (q > 0) continue;
@@ -1591,19 +1686,19 @@ if (isTight)
 	    if (flavor==5) {
 	      if (JetPtForBTag>MaxBJetPt) JetPtForBTag = MaxBJetPt - 0.1;
 	      if (JetPtForBTag<MinBJetPt) JetPtForBTag = MinBJetPt + 0.1;
-	      jet_scalefactor = reader_B.eval_auto_bounds("central",BTagEntry::FLAV_B, absJetEta, JetPtForBTag);
+	      jet_scalefactor = reader_B.eval_auto_bounds(BTag_,BTagEntry::FLAV_B, absJetEta, JetPtForBTag);
 	      tageff = tagEff_B->Interpolate(JetPtForBTag,absJetEta);
 	    }
 	    else if (flavor==4) {
 	      if (JetPtForBTag>MaxBJetPt) JetPtForBTag = MaxBJetPt - 0.1;
 	      if (JetPtForBTag<MinBJetPt) JetPtForBTag = MinBJetPt + 0.1;
-	      jet_scalefactor = reader_C.eval_auto_bounds("central",BTagEntry::FLAV_C, absJetEta, JetPtForBTag);
+	      jet_scalefactor = reader_C.eval_auto_bounds(BTag_,BTagEntry::FLAV_C, absJetEta, JetPtForBTag);
 	      tageff = tagEff_C->Interpolate(JetPtForBTag,absJetEta);
 	    }
 	    else {
 	      if (JetPtForBTag>MaxLJetPt) JetPtForBTag = MaxLJetPt - 0.1;
 	      if (JetPtForBTag<MinLJetPt) JetPtForBTag = MinLJetPt + 0.1;
-	      jet_scalefactor = reader_Light.eval_auto_bounds("central",BTagEntry::FLAV_UDSG, absJetEta, JetPtForBTag);
+	      jet_scalefactor = reader_Light.eval_auto_bounds(BTag_,BTagEntry::FLAV_UDSG, absJetEta, JetPtForBTag);
 	      tageff = tagEff_Light->Interpolate(JetPtForBTag,absJetEta);
 	    }
 	    
@@ -1633,8 +1728,6 @@ if (isTight)
 
 
 	if (cleanedJet){
-		
-	//	cout<<"  will push to save now cleaned jet  "<<(int)jet<<"  for counter_cleaned_jet "<<(int)counter_cleaned_jets<<" event "<<iEntry<<endl;
 
 	jets.push_back((int)jet);
 	counter_cleaned_jets++;
@@ -1736,89 +1829,76 @@ if (isTight)
         met_x = pfmet_corr_x;
         met_y = pfmet_corr_y;
  
-      // MEt related systematic uncertainties
-      int bkgdType = 0;
-      if (isDY||isW)
-	bkgdType = MEtSys::ProcessType::BOSON;
-      else if (isTOP)
-	bkgdType = MEtSys::ProcessType::TOP;
-      else 
-	bkgdType = MEtSys::ProcessType::EWK; 
-
-      float met_scaleUp_x   = met_x;
-      float met_scaleUp_y   = met_y;
-      float met_scaleDown_x = met_x;
-      float met_scaleDown_y = met_y;
-      float met_resoUp_x    = met_x;
-      float met_resoUp_y    = met_y;
-      float met_resoDown_x  = met_x;
-      float met_resoDown_y  = met_y;
-
-	metSys.ApplyMEtSys(met_x,met_y,
-			   bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,bkgdType,
-			   MEtSys::SysType::Response,MEtSys::SysShift::Up,
-			   met_scaleUp_x,met_scaleUp_y);
-	metSys.ApplyMEtSys(met_x,met_y,
-			   bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,bkgdType,
-			   MEtSys::SysType::Response,MEtSys::SysShift::Down,
-			   met_scaleDown_x,met_scaleDown_y);
-	metSys.ApplyMEtSys(met_x,met_y,
-			   bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,bkgdType,
-			   MEtSys::SysType::Resolution,MEtSys::SysShift::Up,
-			   met_resoUp_x,met_resoUp_y);
-	metSys.ApplyMEtSys(met_x,met_y,
-			   bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,bkgdType,
-			   MEtSys::SysType::Resolution,MEtSys::SysShift::Down,
-			   met_resoDown_x,met_resoDown_y);
-
-      
-      met_scaleUp = TMath::Sqrt(met_scaleUp_x*met_scaleUp_x+
-				   met_scaleUp_y*met_scaleUp_y);
-      metphi_scaleUp = TMath::ATan2(met_scaleUp_y,met_scaleUp_x);
-      
-      met_scaleDown = TMath::Sqrt(met_scaleDown_x*met_scaleDown_x+
-				     met_scaleDown_y*met_scaleDown_y);
-      metphi_scaleDown = TMath::ATan2(met_scaleDown_y,met_scaleDown_x);
-      
-      met_resoUp = TMath::Sqrt(met_resoUp_x*met_resoUp_x+
-				  met_resoUp_y*met_resoUp_y);
-      metphi_resoUp = TMath::ATan2(met_resoUp_y,met_resoUp_x);
-      
-      met_resoDown = TMath::Sqrt(met_resoDown_x*met_resoDown_x+
-				    met_resoDown_y*met_resoDown_y);
-      metphi_resoDown = TMath::ATan2(met_resoDown_y,met_resoDown_x);
-
       met_ex_recoil = pfmet_corr_x;
       met_ey_recoil = pfmet_corr_y;
 
-
       }//if isW, isDY !isData
+
+if ((isW || isDY) && !isData) 
+	{
+	
+
+	if (string::npos != Systematic.find("JetEnUp")) {
+      	met_x = met_ex_JetEnUp_recoil;
+      	met_y = met_ey_JetEnUp_recoil;
+	}
+
+	if (string::npos != Systematic.find("JetEnDown")) {
+      	met_x = met_ex_JetEnDown_recoil;
+      	met_y = met_ey_JetEnDown_recoil;
+	}
+
+	if (string::npos != Systematic.find("UnclEnUp")) {
+      	met_x = met_ex_UnclusteredEnUp_recoil;
+      	met_y = met_ey_UnclusteredEnUp_recoil;
+	}
+
+	if (string::npos != Systematic.find("UnclEnDown")) {
+      	met_x = met_ex_UnclusteredEnDown_recoil;
+      	met_y = met_ey_UnclusteredEnDown_recoil;
+	}
+
+	}
+
+if ((!isW && !isDY) && !isData) 
+	{
+	
+
+	if (string::npos != Systematic.find("JetEnUp")) {
+      	met_x = met_ex_JetEnUp;
+      	met_y = met_ey_JetEnUp;
+	}
+
+	if (string::npos != Systematic.find("JetEnDown")) {
+      	met_x = met_ex_JetEnDown;
+      	met_y = met_ey_JetEnDown;
+	}
+
+	if (string::npos != Systematic.find("UnclEnUp")) {
+      	met_x = met_ex_UnclusteredEnUp;
+      	met_y = met_ey_UnclusteredEnUp;
+	}
+
+	if (string::npos != Systematic.find("UnclEnDown")) {
+      	met_x = met_ex_UnclusteredEnDown;
+      	met_y = met_ey_UnclusteredEnDown;
+	}
+
+	}
 
       met_ex = met_x;
       met_ey = met_y;
-      met_ez = analysisTree.pfmet_ez;
+    //  met_ez = analysisTree.pfmet_ez;
+
+
       met_pt = TMath::Sqrt(met_ex*met_ex + met_ey*met_ey);
-      met_phi = TMath::ATan2(met_y,met_x);
-
-     met_ex_JetEnUp = analysisTree.pfmetcorr_ex_JetEnUp;
-     met_ey_JetEnUp = analysisTree.pfmetcorr_ey_JetEnUp;
-
-     met_ex_JetEnDown = analysisTree.pfmetcorr_ex_JetEnDown;
-     met_ey_JetEnDown = analysisTree.pfmetcorr_ey_JetEnDown;
-
-     met_ex_UnclusteredEnUp = analysisTree.pfmetcorr_ex_UnclusteredEnUp;
-     met_ey_UnclusteredEnUp = analysisTree.pfmetcorr_ey_UnclusteredEnUp;
-   
-     met_ex_UnclusteredEnDown = analysisTree.pfmetcorr_ex_UnclusteredEnDown;
-     met_ey_UnclusteredEnDown = analysisTree.pfmetcorr_ey_UnclusteredEnDown;
+      met_phi = TMath::ATan2(met_ey,met_ex);
 
 
 
       double dPhi=-1;double MT=-1 ; double RatioSums=-1;
 
       double met = sqrt ( met_ex*met_ex + met_ey*met_ey);
-      // w = mu+MET
-      // ptW - ptJ/ptW+ptJ      
       
 
       TLorentzVector MetV; 

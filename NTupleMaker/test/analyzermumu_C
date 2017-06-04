@@ -97,6 +97,7 @@ void analyzer::Loop(){
 	bool isNJ = false;
 	bool isSignal = false;
 	bool cut_btag = true;
+
 	bool t = true;
 	bool f = false;
 	bool InvertLeptonIso = LEPTONHERE;
@@ -129,8 +130,8 @@ void analyzer::Loop(){
 	string signal = "stau";
 	string signalC1 = "C1";
 	if (string::npos != old.find(data)) isData= true;
-	if (string::npos != old.find(signal)) isSignal= true;
-	if (string::npos != old.find(signalC1)) isSignal= true;
+	if (string::npos != old.find(signal) && systematic =="genMET") isSignal= true;
+	if (string::npos != old.find(signalC1) && systematic =="genMET") isSignal= true;
 	if (string::npos != old.find(tt)) isTT= true;
 	if (string::npos != old.find(wj)) isWJ= true;
 	if (string::npos != old.find(ttw)) isWJ= false;
@@ -160,7 +161,7 @@ TH2D *histo = (TH2D*) obj;
 
 
 	TString fileinName = "/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/New8025/CMSSW_8_0_25/src/DesyTauAnalyses/NTupleMaker/test/CHANNELHERE/FILEIN";
-	if (systematic == "JetEnUp" || systematic == "JetEnDown"  || systematic == "UnclEnDown" || systematic == "UnclEnDown" || systematic == "TauEnUp" || systematic == "TauEnDown" || systematic == "ElEnUp" || systematic == "ElEnDown" || systematic == "MuEnUp" || systematic == "MuEnDown") 
+	if (systematic == "JetEnUp" || systematic == "JetEnDown"  || systematic == "UnclEnDown" || systematic == "UnclEnDown" || systematic == "TauEnUp" || systematic == "TauEnDown" || systematic == "ElEnUp" || systematic == "ElEnDown" || systematic == "MuEnUp" || systematic == "MuEnDown" || systematic =="BTagUp" || systematic =="BTagDown") 
 	{fileinName ="/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/New8025/CMSSW_8_0_25/src/DesyTauAnalyses/NTupleMaker/test/CHANNELHERE_"+systematic+"/FILEIN";}
 
 	TFile * filein = new TFile(fileinName,"read");
@@ -192,8 +193,12 @@ TH2D *histo = (TH2D*) obj;
 		Long64_t ientry = LoadTree(jentry);
 		nb = fChain->GetEntry(jentry);   nbytes += nb;
 		float all_weights = 1.;
+
 		bool isDYTauTau = false;
 		bool isDYll = false;
+
+
+
 
 		if ((isDY  ||  isDYNJ) && isDYTT>0.5) isDYTauTau = true;
 		if ((isDY  ||  isDYNJ) && isDYEE>0.5) isDYee = true;
@@ -205,7 +210,7 @@ TH2D *histo = (TH2D*) obj;
 		if ((isDY || isDYNJ) && isZTT && !isDYTauTau) continue;
 		if ((isDY || isDYNJ) && !isZTT && !isDYll) continue;
 	
-if (muon_index_1 <0 || muon_index_2 <0) continue;
+	if (muon_index_1 <0 || muon_index_2 <0) continue;
 
 
 		float charge_ =mu_charge[muon_index_1]  * mu_charge[muon_index_2];
@@ -283,6 +288,28 @@ if(muon_index_2>-1 )			LeptV2.SetPtEtaPhiM(mu_pt[muon_index_2], mu_eta[muon_inde
 		int iCut = 1;
 		all_weights = 1.;
 		if (!isData) all_weights = pu_weight * gen_weight ;
+		double cLower, cUpper;
+		vector <double> ScalesV; ScalesV.clear();
+//		ScalesV.push_back(wScale0);
+		ScalesV.push_back(wScale1);
+		ScalesV.push_back(wScale2);
+		ScalesV.push_back(wScale3);
+		ScalesV.push_back(wScale4);
+		ScalesV.push_back(wScale5);
+		ScalesV.push_back(wScale6);
+		ScalesV.push_back(wScale7);
+		ScalesV.push_back(wScale8);
+
+		cLower = *min_element(ScalesV.begin(), ScalesV.end());
+      	        cUpper = *max_element(ScalesV.begin(), ScalesV.end());
+
+	if (systematic =="ScalesDown") all_weights *=cLower;
+	if (systematic =="ScalesUp") all_weights *=cUpper;
+	if (systematic =="PDFUp") all_weights *=wPDFUp;
+	if (systematic =="PDFDown") all_weights *=wPDFDown;
+
+//cout<<" lets see the facts  "<<gen_weight<<"  "<<wScale0<<"  "<<wScale1<<"  "<<wScale2<<"  "<<wScale3<<"  "<<wScale4<<"  "<<wScale5<<"  "<<wScale6<<"  "<<wScale7<<"  "<<wScale8<<" min "<<cLower<<" max  "<<cUpper<<" pdfUp "<<wPDFUp<<" pdfDown "<<wPDFDown<<endl;
+
 
 		FillHistsDiL(iCut, all_weights, LeptV2, LeptV1, JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index_1,muon_index_2);
 		CFCounter[iCut]+= all_weights;
@@ -342,7 +369,6 @@ if(muon_index_2>-1 )			LeptV2.SetPtEtaPhiM(mu_pt[muon_index_2], mu_eta[muon_inde
 		METV.SetPx(met_ex_recoil);
 		METV.SetPy(met_ey_recoil);
 		met=sqrt(met_ex_recoil*met_ex_recoil+met_ey_recoil*met_ey_recoil);
-		}
 
 	if (systematic =="JetEnUp")
 		{
@@ -372,8 +398,23 @@ if(muon_index_2>-1 )			LeptV2.SetPtEtaPhiM(mu_pt[muon_index_2], mu_eta[muon_inde
 		met = sqrt(met_ex_UnclusteredEnDown_recoil*met_ex_UnclusteredEnDown_recoil + met_ey_UnclusteredEnDown_recoil*met_ey_UnclusteredEnDown_recoil);
 		}
 
+	if (systematic =="METRecoilUp")
+		{
+		METV.SetPx(met_ex_recoil*1.02);
+		METV.SetPy(met_ey_recoil*1.02);
+		met=METV.Pt();
+		}
 
-		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
+	if (systematic =="METRecoilDown")
+		{
+		METV.SetPx(met_ex_recoil*0.98);
+		METV.SetPy(met_ey_recoil*0.98);
+		met=METV.Pt();
+		}
+
+		}
+
+		FillHistsDiL(iCut, all_weights, LeptV2, LeptV1, JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index_1,muon_index_2);
 		CFCounter[iCut]+= all_weights;
 		CFCounter_[iCut]+= all_weights;
                 iCFCounter[iCut]++;
@@ -385,7 +426,7 @@ if(muon_index_2>-1 )			LeptV2.SetPtEtaPhiM(mu_pt[muon_index_2], mu_eta[muon_inde
 		}
 
 
-		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
+		FillHistsDiL(iCut, all_weights, LeptV2, LeptV1, JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index_1,muon_index_2);
 		CFCounter[iCut]+= all_weights;
 		CFCounter_[iCut]+= all_weights;
                 iCFCounter[iCut]++;
@@ -394,7 +435,7 @@ if(muon_index_2>-1 )			LeptV2.SetPtEtaPhiM(mu_pt[muon_index_2], mu_eta[muon_inde
 		if (systematic !="TopPtUp" && systematic !="TopPtDown" ) all_weights *= top_weight;
 		if (systematic =="TopPtUp") all_weights *= top_weight*top_weight;
 		if (systematic =="TopPtDown") all_weights *= 1;
-		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
+		FillHistsDiL(iCut, all_weights, LeptV2, LeptV1, JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index_1,muon_index_2);
 		CFCounter[iCut]+= all_weights;
 		CFCounter_[iCut]+= all_weights;
                 iCFCounter[iCut]++;

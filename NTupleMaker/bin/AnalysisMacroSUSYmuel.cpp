@@ -77,6 +77,8 @@ int main(int argc, char * argv[]) {
 //_Nominal _JetEnUp _JetEnDown  _ElEnUp _ElEnDown _MuEnUp _MuEnDown
 
 
+	string BTag_ = "central";
+
   	string Systematic=argv[5];
 	if (Systematic=="1" || Systematic=="" || isData) Systematic = "Nominal";
 
@@ -91,6 +93,9 @@ int main(int argc, char * argv[]) {
 
 	if (string::npos != Systematic.find("JetEnUp")){ ApplyJetEnergyCorrectionUnc = true; ApplyJetEnergyCorrectionUncSignPositive = true;}
 	if (string::npos != Systematic.find("JetEnDown")){ ApplyJetEnergyCorrectionUnc = true; ApplyJetEnergyCorrectionUncSignPositive = false;}
+
+	if (string::npos != Systematic.find("BTagUp")){ BTag_ = "up";}
+	if (string::npos != Systematic.find("BTagDown")){ BTag_ = "down";}
 
 
 ////////////muons
@@ -262,7 +267,7 @@ int main(int argc, char * argv[]) {
 
 
 
-if (string::npos != datasetName.find("SMS-") || string::npos != datasetName.find("stau") || string::npos != datasetName.find("C1")) SUSY = true;
+if (string::npos != datasetName.find("SMS-") || string::npos != datasetName.find("stau") || string::npos != datasetName.find("C1") || string::npos != rootFileName.find("Chi")) SUSY = true;
 
 
   // qcd weight (dzeta cut)
@@ -288,9 +293,9 @@ QCDModelForEMu qcdWeightNoDzeta("HTT-utilities/QCDModelingEMu/data/QCD_weight_em
   BTagCalibration calib("csvv2", cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/"+BtagCVS);
 
 
-  BTagCalibrationReader reader_B(BTagEntry::OP_MEDIUM,"central");
-  BTagCalibrationReader reader_C(BTagEntry::OP_MEDIUM,"central");
-  BTagCalibrationReader reader_Light(BTagEntry::OP_MEDIUM,"central");
+  BTagCalibrationReader reader_B(BTagEntry::OP_MEDIUM,BTag_);
+  BTagCalibrationReader reader_C(BTagEntry::OP_MEDIUM,BTag_);
+  BTagCalibrationReader reader_Light(BTagEntry::OP_MEDIUM,BTag_);
   if (!SUSY){reader_B.load(calib,BTagEntry::FLAV_B,"comb");
   reader_C.load(calib,BTagEntry::FLAV_C,"comb");
   reader_Light.load(calib,BTagEntry::FLAV_UDSG,"incl");}
@@ -305,9 +310,9 @@ QCDModelForEMu qcdWeightNoDzeta("HTT-utilities/QCDModelingEMu/data/QCD_weight_em
   std::cout << std::endl;
   for (int iEta=0; iEta<2; ++iEta) {
     for (int iPt=0; iPt<5; ++iPt) {
-      float sfB = reader_B.eval_auto_bounds("central",BTagEntry::FLAV_B, etaBTAG[iEta], ptBTAG[iPt]);
-      float sfC = reader_C.eval_auto_bounds("central",BTagEntry::FLAV_C, etaBTAG[iEta], ptBTAG[iPt]);
-      float sfLight = reader_Light.eval_auto_bounds("central",BTagEntry::FLAV_UDSG, etaBTAG[iEta], ptBTAG[iPt]);
+      float sfB = reader_B.eval_auto_bounds(BTag_,BTagEntry::FLAV_B, etaBTAG[iEta], ptBTAG[iPt]);
+      float sfC = reader_C.eval_auto_bounds(BTag_,BTagEntry::FLAV_C, etaBTAG[iEta], ptBTAG[iPt]);
+      float sfLight = reader_Light.eval_auto_bounds(BTag_,BTagEntry::FLAV_UDSG, etaBTAG[iEta], ptBTAG[iPt]);
       printf("pT = %3.0f   eta = %3.1f  ->  SFb = %5.3f   SFc = %5.3f   SFl = %5.3f\n",ptBTAG[iPt],etaBTAG[iEta],sfB,sfC,sfLight);
     }
   }
@@ -1343,7 +1348,8 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
      float Mu8EffMC0p15 = 1.;
      float Mu23EffMC0p15 = 1.;
 
-
+	trig_weight_1 = 0;
+	trig_weight_2 = 0;
      float LumiA, LumiB, Lumi;
       Lumi = 36590.; LumiA = 20233.; LumiB = 16357.;
 
@@ -1368,7 +1374,9 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	float termBMC =0;   termBMC = (Mu8EffMC0p15*Ele23EffMC0p1) ; 
 	float termCMC =0;   termCMC = (Mu23EffMC0p15*Ele23EffMC0p1);
 
-	 float trigWeight = (termA + termB - termC)/ (termAMC + termBMC - termCMC); 
+	
+	 float trigWeight = 0;//
+	 if (termAMC + termBMC - termCMC >0.001) trigWeight = (termA + termB - termC)/ (termAMC + termBMC - termCMC); 
 
 	 //if ( (termA==0 && termB==0) || (termAMC==0 && termBMC==0)) trigWeight =0;
 
@@ -1565,19 +1573,19 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	    if (flavor==5) {
 	      if (JetPtForBTag>MaxBJetPt) JetPtForBTag = MaxBJetPt - 0.1;
 	      if (JetPtForBTag<MinBJetPt) JetPtForBTag = MinBJetPt + 0.1;
-	      jet_scalefactor = reader_B.eval_auto_bounds("central",BTagEntry::FLAV_B, absJetEta, JetPtForBTag);
+	      jet_scalefactor = reader_B.eval_auto_bounds(BTag_,BTagEntry::FLAV_B, absJetEta, JetPtForBTag);
 	      tageff = tagEff_B->Interpolate(JetPtForBTag,absJetEta);
 	    }
 	    else if (flavor==4) {
 	      if (JetPtForBTag>MaxBJetPt) JetPtForBTag = MaxBJetPt - 0.1;
 	      if (JetPtForBTag<MinBJetPt) JetPtForBTag = MinBJetPt + 0.1;
-	      jet_scalefactor = reader_C.eval_auto_bounds("central",BTagEntry::FLAV_C, absJetEta, JetPtForBTag);
+	      jet_scalefactor = reader_C.eval_auto_bounds(BTag_,BTagEntry::FLAV_C, absJetEta, JetPtForBTag);
 	      tageff = tagEff_C->Interpolate(JetPtForBTag,absJetEta);
 	    }
 	    else {
 	      if (JetPtForBTag>MaxLJetPt) JetPtForBTag = MaxLJetPt - 0.1;
 	      if (JetPtForBTag<MinLJetPt) JetPtForBTag = MinLJetPt + 0.1;
-	      jet_scalefactor = reader_Light.eval_auto_bounds("central",BTagEntry::FLAV_UDSG, absJetEta, JetPtForBTag);
+	      jet_scalefactor = reader_Light.eval_auto_bounds(BTag_,BTagEntry::FLAV_UDSG, absJetEta, JetPtForBTag);
 	      tageff = tagEff_Light->Interpolate(JetPtForBTag,absJetEta);
 	    }
 	    
@@ -1798,6 +1806,17 @@ cout<<""<<endl;
 
       all_weight = weight;
 
+       wScale0 = analysisTree.weightScale0;
+       wScale1 = analysisTree.weightScale1;
+       wScale2 = analysisTree.weightScale2;
+       wScale3 = analysisTree.weightScale3;
+       wScale4 = analysisTree.weightScale4;
+       wScale5 = analysisTree.weightScale5;
+       wScale6 = analysisTree.weightScale6;
+       wScale7 = analysisTree.weightScale7;
+       wScale8 = analysisTree.weightScale8;
+       wPDFUp = analysisTree.weightPDFup;
+       wPDFDown = analysisTree.weightPDFdown;
       T->Fill();
 	
       selEvents++;

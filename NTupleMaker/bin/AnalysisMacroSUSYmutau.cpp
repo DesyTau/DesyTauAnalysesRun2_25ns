@@ -76,6 +76,7 @@ int main(int argc, char * argv[]) {
   const double ElEnergyScaleUncEndcaps   = cfg.get<double>("ElEnergyScaleUncEndcaps");
 //_Nominal _JetEnUp _JetEnDown  _ElEnUp _ElEnDown _MuEnUp _MuEnDown
 
+  	string BTag_ = "central";
 
   	string Systematic=argv[5];
 	if (Systematic=="1" || Systematic=="" || isData) Systematic = "Nominal";
@@ -92,6 +93,8 @@ int main(int argc, char * argv[]) {
 	if (string::npos != Systematic.find("JetEnUp")){ ApplyJetEnergyCorrectionUnc = true; ApplyJetEnergyCorrectionUncSignPositive = true;}
 	if (string::npos != Systematic.find("JetEnDown")){ ApplyJetEnergyCorrectionUnc = true; ApplyJetEnergyCorrectionUncSignPositive = false;}
 
+	if (string::npos != Systematic.find("BTagUp")){ BTag_ = "up";}
+	if (string::npos != Systematic.find("BTagDown")){ BTag_ = "down";}
 
 ////////////muons
 
@@ -251,7 +254,7 @@ int main(int argc, char * argv[]) {
   std::cout <<" The filename will be "<<TStrName <<"  "<<datasetName<<"  The systematic will be "<<Systematic<<"  and save dir will be  "<<SaveDir<<endl;
 
 
-if (string::npos != datasetName.find("SMS-") || string::npos != datasetName.find("stau") || string::npos != datasetName.find("C1")) SUSY = true;
+if (string::npos != datasetName.find("SMS-") || string::npos != datasetName.find("stau") || string::npos != datasetName.find("C1") || string::npos != datasetName.find("ChiWZ")) SUSY = true;
 
 
 // PU reweighting
@@ -270,9 +273,9 @@ if (string::npos != datasetName.find("SMS-") || string::npos != datasetName.find
   BTagCalibration calib("csvv2", cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/"+BtagCVS);
 
 
-  BTagCalibrationReader reader_B(BTagEntry::OP_MEDIUM,"central");
-  BTagCalibrationReader reader_C(BTagEntry::OP_MEDIUM,"central");
-  BTagCalibrationReader reader_Light(BTagEntry::OP_MEDIUM,"central");
+  BTagCalibrationReader reader_B(BTagEntry::OP_MEDIUM,BTag_);
+  BTagCalibrationReader reader_C(BTagEntry::OP_MEDIUM,BTag_);
+  BTagCalibrationReader reader_Light(BTagEntry::OP_MEDIUM,BTag_);
   if (!SUSY){reader_B.load(calib,BTagEntry::FLAV_B,"comb");
   reader_C.load(calib,BTagEntry::FLAV_C,"comb");
   reader_Light.load(calib,BTagEntry::FLAV_UDSG,"incl");}
@@ -288,9 +291,9 @@ if (string::npos != datasetName.find("SMS-") || string::npos != datasetName.find
   std::cout << std::endl;
   for (int iEta=0; iEta<2; ++iEta) {
     for (int iPt=0; iPt<5; ++iPt) {
-      float sfB = reader_B.eval_auto_bounds("central",BTagEntry::FLAV_B, etaBTAG[iEta], ptBTAG[iPt]);
-      float sfC = reader_C.eval_auto_bounds("central",BTagEntry::FLAV_C, etaBTAG[iEta], ptBTAG[iPt]);
-      float sfLight = reader_Light.eval_auto_bounds("central",BTagEntry::FLAV_UDSG, etaBTAG[iEta], ptBTAG[iPt]);
+      float sfB = reader_B.eval_auto_bounds(BTag_,BTagEntry::FLAV_B, etaBTAG[iEta], ptBTAG[iPt]);
+      float sfC = reader_C.eval_auto_bounds(BTag_,BTagEntry::FLAV_C, etaBTAG[iEta], ptBTAG[iPt]);
+      float sfLight = reader_Light.eval_auto_bounds(BTag_,BTagEntry::FLAV_UDSG, etaBTAG[iEta], ptBTAG[iPt]);
       printf("pT = %3.0f   eta = %3.1f  ->  SFb = %5.3f   SFc = %5.3f   SFl = %5.3f\n",ptBTAG[iPt],etaBTAG[iEta],sfB,sfC,sfLight);
     }
   }
@@ -800,7 +803,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	   // std::cout <<"analysisTree.genweight "<< float(analysisTree.genweight) << std::endl;
 	  lumi=true;
 	  }
-					
+	
 
       if (isData)  {
 	XSec = 1.;
@@ -1349,6 +1352,9 @@ if (!CutBasedTauId){
 	matchedTauToElHadronDec = false;
 	matchedTauToMuHadronDec = false;
 	matchedTauToTauHadronDec = false;
+	matchedTauToGluon = false;
+	matchedTauToHFQ = false;
+	matchedTauToLFQ = false;
 	genTauDecayMode1=-1;
 	genTauDecayMode2=-1;
 	TLorentzVector genTauV;  
@@ -1371,7 +1377,7 @@ if (!CutBasedTauId){
 
 	  for (unsigned int igen=0; igen<analysisTree.genparticles_count; ++igen) {
 
-      		  if ( (abs(analysisTree.genparticles_pdgid[igen])==11 || abs(analysisTree.genparticles_pdgid[igen])==13 || abs(analysisTree.genparticles_pdgid[igen])==15)){
+      		  if ( (abs(analysisTree.genparticles_pdgid[igen])==11 || abs(analysisTree.genparticles_pdgid[igen])==13 || abs(analysisTree.genparticles_pdgid[igen])==15 || abs(analysisTree.genparticles_pdgid[igen])<6 || abs(analysisTree.genparticles_pdgid[igen])==21)){
 
 	  genLepV.SetXYZT(analysisTree.genparticles_px[igen], analysisTree.genparticles_py[igen], analysisTree.genparticles_pz[igen], analysisTree.genparticles_e[igen]);
 
@@ -1415,8 +1421,9 @@ if (!CutBasedTauId){
 		if ( abs(analysisTree.genparticles_pdgid[igen])==13 && analysisTree.gentau_isDirectPromptTauDecayProduct[igen] > 0.5 ) matchedTauToTauDecMu = true;
 		if ( abs(analysisTree.genparticles_pdgid[igen])==11 && analysisTree.gentau_isDirectHadronDecayProduct[igen] > 0.5 ) matchedTauToElHadronDec= true;
 		if ( abs(analysisTree.genparticles_pdgid[igen])==13 && analysisTree.gentau_isDirectHadronDecayProduct[igen] > 0.5 ) matchedTauToMuHadronDec= true;
-		if ( abs(analysisTree.genparticles_pdgid[igen])==11 && analysisTree.gentau_isDirectHadronDecayProduct[igen] > 0.5 ) matchedTauToTauHadronDec= true;
-			}
+		if ( abs(analysisTree.genparticles_pdgid[igen])==15 && analysisTree.gentau_isDirectHadronDecayProduct[igen] > 0.5 ) matchedTauToTauHadronDec= true;
+		}
+
 		}//loop for gen 11 13 15
       
 	  }
@@ -1579,6 +1586,16 @@ if (!CutBasedTauId){
 
 	if ( Drr < DRmax) cleanedJet=false;
 
+
+		if (Drr < 0.5 && !genTauMatched && !isData) 
+		{
+			
+	     if (analysisTree.pfjet_flavour[jet] == 21) matchedTauToGluon = true;
+	     if (abs(analysisTree.pfjet_flavour[jet]) == 1 || abs(analysisTree.pfjet_flavour[jet]) == 5) matchedTauToHFQ = true;
+	     if (abs(analysisTree.pfjet_flavour[jet]) > 1 && abs(analysisTree.pfjet_flavour[jet]) < 5) matchedTauToLFQ = true;
+
+			}
+
 	if (!cleanedJet) continue;
 
 	if (absJetEta<bJetEtaCut) { // jet within b-tagging acceptance
@@ -1595,19 +1612,19 @@ if (!CutBasedTauId){
 	    if (flavor==5) {
 	      if (JetPtForBTag>MaxBJetPt) JetPtForBTag = MaxBJetPt - 0.1;
 	      if (JetPtForBTag<MinBJetPt) JetPtForBTag = MinBJetPt + 0.1;
-	      jet_scalefactor = reader_B.eval_auto_bounds("central",BTagEntry::FLAV_B, absJetEta, JetPtForBTag);
+	      jet_scalefactor = reader_B.eval_auto_bounds(BTag_,BTagEntry::FLAV_B, absJetEta, JetPtForBTag);
 	      tageff = tagEff_B->Interpolate(JetPtForBTag,absJetEta);
 	    }
 	    else if (flavor==4) {
 	      if (JetPtForBTag>MaxBJetPt) JetPtForBTag = MaxBJetPt - 0.1;
 	      if (JetPtForBTag<MinBJetPt) JetPtForBTag = MinBJetPt + 0.1;
-	      jet_scalefactor = reader_C.eval_auto_bounds("central",BTagEntry::FLAV_C, absJetEta, JetPtForBTag);
+	      jet_scalefactor = reader_C.eval_auto_bounds(BTag_,BTagEntry::FLAV_C, absJetEta, JetPtForBTag);
 	      tageff = tagEff_C->Interpolate(JetPtForBTag,absJetEta);
 	    }
 	    else {
 	      if (JetPtForBTag>MaxLJetPt) JetPtForBTag = MaxLJetPt - 0.1;
 	      if (JetPtForBTag<MinLJetPt) JetPtForBTag = MinLJetPt + 0.1;
-	      jet_scalefactor = reader_Light.eval_auto_bounds("central",BTagEntry::FLAV_UDSG, absJetEta, JetPtForBTag);
+	      jet_scalefactor = reader_Light.eval_auto_bounds(BTag_,BTagEntry::FLAV_UDSG, absJetEta, JetPtForBTag);
 	      tageff = tagEff_Light->Interpolate(JetPtForBTag,absJetEta);
 	    }
 	    
@@ -1806,18 +1823,6 @@ if (!CutBasedTauId){
      met_ey_UnclusteredEnDown = analysisTree.pfmetcorr_ey_UnclusteredEnDown;
 
 
-/*
-     float m = sqrt(met_ex*met_ex+met_ey*met_ey);
-     float m1 =sqrt(met_ex_JetEnUp*met_ex_JetEnUp+met_ey_JetEnUp*met_ey_JetEnUp);
-     float m2 =sqrt(met_ex_JetEnDown*met_ex_JetEnDown+met_ey_JetEnDown*met_ey_JetEnDown);
-
-
-cout<<"  ex  "<<met_ex<<"  "<<met_ey<<" exJU " <<met_ex_JetEnUp<<"  "<<met_ey_JetEnUp<<" exUncU "<<met_ex_UnclusteredEnUp<<"  "<<met_ey_UnclusteredEnUp<<endl;
-
-cout<<" "<<m<<"  "<<m1<<"  "<<m2<<endl;
-
-cout<<""<<endl;
-*/
       float genmet_ex = analysisTree.genmet_ex;
       float genmet_ey = analysisTree.genmet_ey;
 
@@ -1827,6 +1832,29 @@ cout<<""<<endl;
       if (!isData) npartons = analysisTree.genparticles_noutgoing;
 
       all_weight = weight;
+      event_run = analysisTree.event_run;
+      event_lumi = analysisTree.event_luminosityblock;
+      NuPx = nuPx;
+      NuPy = nuPy;
+      NuPz = nuPz;
+      NuPt = nuPt;
+      NuPhi = nuPhi;
+      genmet_Ex = analysisTree.genmet_ex;
+      genmet_Ey = analysisTree.genmet_ey;
+
+
+
+       wScale0 = analysisTree.weightScale0;
+       wScale1 = analysisTree.weightScale1;
+       wScale2 = analysisTree.weightScale2;
+       wScale3 = analysisTree.weightScale3;
+       wScale4 = analysisTree.weightScale4;
+       wScale5 = analysisTree.weightScale5;
+       wScale6 = analysisTree.weightScale6;
+       wScale7 = analysisTree.weightScale7;
+       wScale8 = analysisTree.weightScale8;
+       wPDFUp = analysisTree.weightPDFup;
+       wPDFDown = analysisTree.weightPDFdown;
 
       T->Fill();
 	

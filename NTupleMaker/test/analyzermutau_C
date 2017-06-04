@@ -137,9 +137,11 @@ void analyzer::Loop(){
 	string ttw = "TTWJetsToLNu";
 	string signal = "stau";
 	string signalC1 = "C1";
+	string signalChi = "Chi";
 	if (string::npos != old.find(data)) isData= true;
-	if (string::npos != old.find(signal)) isSignal= true;
-	if (string::npos != old.find(signalC1)) isSignal= true;
+	if (string::npos != old.find(signal) && systematic =="genMET") isSignal= true;
+	if (string::npos != old.find(signalC1) && systematic =="genMET") isSignal= true;
+	if (string::npos != old.find(signalChi) && systematic =="genMET") isSignal= true;
 	if (string::npos != old.find(tt)) isTT= true;
 	if (string::npos != old.find(wj)) isWJ= true;
 	if (string::npos != old.find(ttw)) isWJ= false;
@@ -150,7 +152,7 @@ void analyzer::Loop(){
 	if ((string::npos != old.find(wj1) || string::npos != old.find(wj2) || string::npos != old.find(wj3) || string::npos != old.find(wj4)) && string::npos == old.find(ttw)) isWNJ= true;
 	isNJ = isDYNJ && isWNJ;
 	
-	if (isSignal) cout<<" YOU HAVE FOUND ITTTTTTTTT is it ZTT ???  "<<isZTT<<" old "<<endl;
+	if (isSignal) cout<<" YOU HAVE FOUND ITTTTTTTTT is it signal ???  "<<isSignal<<endl;
 	if (isData) cout<<" YOU HAVE FOUND a DATA "<<endl;
 
 	string channel = "CHANNELHERE";
@@ -167,20 +169,9 @@ key = (TKey *) nextkey ();
 TObject *obj = key->ReadObj ();
 TH2D *histo = (TH2D*) obj;
 
-/*
-	TString inputRootTracking = "/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/CMSSW_8_0_20/src/DesyTauAnalyses/NTupleMaker/data/Tracking_EfficienciesAndSF_BCDEFGH.root";
-	TFile * fileInTracking = new TFile(inputRootTracking, "read");
-
-	  TGraphAsymmErrors * TGr_track;
-	  TGr_track = new TGraphAsymmErrors();
-	  TGr_track = (TGraphAsymmErrors*)fileInTracking->Get("ratio_eff_eta3_dr030e030_corr");
-*/
-
-
-
 
 	TString fileinName = "/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/New8025/CMSSW_8_0_25/src/DesyTauAnalyses/NTupleMaker/test/CHANNELHERE/FILEIN";
-	if (systematic == "JetEnUp" || systematic == "JetEnDown"  || systematic == "UnclEnDown" || systematic == "UnclEnDown" || systematic == "TauEnUp" || systematic == "TauEnDown" || systematic == "ElEnUp" || systematic == "ElEnDown" || systematic == "MuEnUp" || systematic == "MuEnDown") 
+	if (systematic == "JetEnUp" || systematic == "JetEnDown"  || systematic == "UnclEnDown" || systematic == "UnclEnDown" || systematic == "TauEnUp" || systematic == "TauEnDown" || systematic == "ElEnUp" || systematic == "ElEnDown" || systematic == "MuEnUp" || systematic == "MuEnDown" || systematic == "BTagUp" || systematic == "BTagDown") 
 	{fileinName ="/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/New8025/CMSSW_8_0_25/src/DesyTauAnalyses/NTupleMaker/test/CHANNELHERE_"+systematic+"/FILEIN";}
 
 
@@ -188,8 +179,6 @@ TH2D *histo = (TH2D*) obj;
 	string fln = filein->GetName();
 	if (string::npos != fln.find(ztt)) isZTT= true;
 	if (string::npos == fln.find(ztt)) isZTT= false;
-
-	cout<<" ============================================ is it ZTT ???  "<<isZTT<<" old "<<fln<<endl;
 
 	TH1D * histW = (TH1D*)filein->Get("mutau/histWeightsH");
 	TH1D * histTop , *histTopSq;
@@ -306,8 +295,29 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
 		int iCut = 1;
 
 		all_weights = pu_weight * gen_weight ;
+		double cLower, cUpper;
+		vector <double> ScalesV; ScalesV.clear();
+//		ScalesV.push_back(wScale0);
+		ScalesV.push_back(wScale1);
+		ScalesV.push_back(wScale2);
+		ScalesV.push_back(wScale3);
+		ScalesV.push_back(wScale4);
+		ScalesV.push_back(wScale5);
+		ScalesV.push_back(wScale6);
+		ScalesV.push_back(wScale7);
+		ScalesV.push_back(wScale8);
 
-		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
+		cLower = *min_element(ScalesV.begin(), ScalesV.end());
+      	        cUpper = *max_element(ScalesV.begin(), ScalesV.end());
+
+	if (systematic =="ScalesDown") all_weights *=cLower;
+	if (systematic =="ScalesUp") all_weights *=cUpper;
+	if (systematic =="PDFUp") all_weights *=wPDFUp;
+	if (systematic =="PDFDown") all_weights *=wPDFDown;
+
+//cout<<" lets see the facts  "<<gen_weight<<"  "<<wScale0<<"  "<<wScale1<<"  "<<wScale2<<"  "<<wScale3<<"  "<<wScale4<<"  "<<wScale5<<"  "<<wScale6<<"  "<<wScale7<<"  "<<wScale8<<" min "<<cLower<<" max  "<<cUpper<<" pdfUp "<<wPDFUp<<" pdfDown "<<wPDFDown<<endl;
+
+		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index,isSignal);
 		CFCounter[iCut]+= all_weights;
 		CFCounter_[iCut]+= all_weights;
                 iCFCounter[iCut]++;
@@ -336,35 +346,35 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
 
 		//if (JetsMV.size()>0 && TMath::Cos(dPhiJM)>0.9) continue;
 
-		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
+		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index,isSignal);
 		CFCounter[iCut]+= all_weights;
 		CFCounter_[iCut]+= all_weights;
                 iCFCounter[iCut]++;
 		iCut++;
 
 		if (event_secondLeptonVeto >0.5) continue;
-		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
+		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index,isSignal);
 		CFCounter[iCut]+= all_weights;
 		CFCounter_[iCut]+= all_weights;
                 iCFCounter[iCut]++;
 		iCut++;
 
 		if (event_thirdLeptonVeto >0.5) continue;
-		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
+		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index,isSignal);
 		CFCounter[iCut]+= all_weights;
 		CFCounter_[iCut]+= all_weights;
                 iCFCounter[iCut]++;
 		iCut++;
 		
 		if (!isData) all_weights *= trig_weight;
-		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
+		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index,isSignal);
 		CFCounter[iCut]+= all_weights;
 		CFCounter_[iCut]+= all_weights;
                 iCFCounter[iCut]++;
 		iCut++;
 
 		if (!isData) all_weights *= LSF_weight;
-		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
+		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index,isSignal);
 		CFCounter[iCut]+= all_weights;
 		CFCounter_[iCut]+= all_weights;
                 iCFCounter[iCut]++;
@@ -418,7 +428,7 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
 		double tauId = TauiD(channel,tID);
 		if (isRealTau && !isData) all_weights *= 0.95;
 		
-                FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
+                FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index,isSignal);
 		CFCounter[iCut]+= all_weights;
 		CFCounter_[iCut]+= all_weights;
                 iCFCounter[iCut]++;
@@ -428,7 +438,7 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
 		string WP = "MVA";
 		double tfr  = TauFakeRate(ptTau1,etaTau1,channel,WP);
 		if (!isRealTau && isfakeTauFromJet  && !isData) all_weights *= tfr;
-		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
+		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index,isSignal);
 		CFCounter[iCut]+= all_weights;
 		CFCounter_[iCut]+= all_weights;
                 iCFCounter[iCut]++;
@@ -442,7 +452,7 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
 
 		if ( !isRealTau && isfakeTauFromMu  && !isfakeTauFromEl && !isData) all_weights *= tfrmu;
 		if ( !isRealTau && isfakeTauFromEl  && !isfakeTauFromMu && !isData) all_weights *= tfrel;
-		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
+		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index,isSignal);
 		CFCounter[iCut]+= all_weights;
 		CFCounter_[iCut]+= all_weights;
                 iCFCounter[iCut]++;
@@ -486,12 +496,27 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
 		met = sqrt(met_ex_UnclusteredEnDown_recoil*met_ex_UnclusteredEnDown_recoil + met_ey_UnclusteredEnDown_recoil*met_ey_UnclusteredEnDown_recoil);
 		}
 
+	if (systematic =="METRecoilUp")
+		{
+		METV.SetPx(met_ex_recoil*1.02);
+		METV.SetPy(met_ey_recoil*1.02);
+		met=METV.Pt();
+		}
+
+	if (systematic =="METRecoilDown")
+		{
+		METV.SetPx(met_ex_recoil*0.98);
+		METV.SetPy(met_ey_recoil*0.98);
+		met=METV.Pt();
+		}
+
+
 		}
 
 
 
 
-		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
+		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index,isSignal);
 		CFCounter[iCut]+= all_weights;
 		CFCounter_[iCut]+= all_weights;
                 iCFCounter[iCut]++;
@@ -503,7 +528,7 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
 		}
 
 
-		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
+		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index,isSignal);
 		CFCounter[iCut]+= all_weights;
 		CFCounter_[iCut]+= all_weights;
                 iCFCounter[iCut]++;
@@ -514,7 +539,7 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
 		if (systematic =="TopPtUp") all_weights *= top_weight*top_weight;
 		if (systematic =="TopPtDown") all_weights *= 1;
 		}
-		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
+		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index,isSignal);
 		CFCounter[iCut]+= all_weights;
 		CFCounter_[iCut]+= all_weights;
                 iCFCounter[iCut]++;
@@ -524,14 +549,14 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
 			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 		if (njets>1) continue;
-		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
+		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index,isSignal);
 		CFCounter[iCut]+= all_weights;
 		CFCounter_[iCut]+= all_weights;
                 iCFCounter[iCut]++;
 		iCut++;
 
 		if (nbtag!=0) continue;
-		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
+		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index,isSignal);
 		CFCounter[iCut]+= all_weights;
 		CFCounter_[iCut]+= all_weights;
                 iCFCounter[iCut]++;
@@ -546,7 +571,7 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
 	     	
 		if (MT > 60. && MT < 120. ) continue;
 		if (MT < 20.) continue;
-		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
+		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index,isSignal);
 		CFCounter[iCut]+= all_weights;
 		CFCounter_[iCut]+= all_weights;
                 iCFCounter[iCut]++;
@@ -566,7 +591,7 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
 		if (DiLL.M()<20.) continue;
 		if (MTsum<30.) continue;
 
-		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
+		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index,isSignal);
 		CFCounter[iCut]+= all_weights;
 		CFCounter_[iCut]+= all_weights;
                 iCFCounter[iCut]++;
@@ -577,7 +602,7 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
 		if (JetsMV.size()>0 && fabs(dEtaJTau)>3.) continue;
 		if (JetsMV.size()>0 && Dr2>4.) continue;
 
-		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
+		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index,isSignal);
 		CFCounter[iCut]+= all_weights;
 		CFCounter_[iCut]+= all_weights;
                 iCFCounter[iCut]++;
@@ -598,7 +623,7 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
 		if (DiLL.M()<50.) continue;
 		if (MTsum<50.) continue;
 
-		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
+		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index,isSignal);
 		CFCounter[iCut]+= all_weights;
 		CFCounter_[iCut]+= all_weights;
                 iCFCounter[iCut]++;
@@ -607,35 +632,35 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
 		if ( fabs(mu_dz[muon_index]) > 0.02) continue;
 		if ( fabs(ta_dxy[taus_index]) > 0.02) continue;
 
-		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
+		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index,isSignal);
 		CFCounter[iCut]+= all_weights;
 		CFCounter_[iCut]+= all_weights;
                 iCFCounter[iCut]++;
 		iCut++;
 
 		if (met<20.) continue;
-		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
+		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index,isSignal);
 		CFCounter[iCut]+= all_weights;
 		CFCounter_[iCut]+= all_weights;
                 iCFCounter[iCut]++;
 		iCut++;
 
 		if (met<30.) continue;
-		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
+		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index,isSignal);
 		CFCounter[iCut]+= all_weights;
 		CFCounter_[iCut]+= all_weights;
                 iCFCounter[iCut]++;
 		iCut++;
 
 		if (met<40.) continue;
-		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
+		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index,isSignal);
 		CFCounter[iCut]+= all_weights;
 		CFCounter_[iCut]+= all_weights;
                 iCFCounter[iCut]++;
 		iCut++;
 	
 		if (MTsum<120.) continue;
-		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index);
+		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index,isSignal);
 		CFCounter[iCut]+= all_weights;
 		CFCounter_[iCut]+= all_weights;
                 iCFCounter[iCut]++;
