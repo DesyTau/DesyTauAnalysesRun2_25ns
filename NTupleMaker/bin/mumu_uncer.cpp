@@ -96,6 +96,28 @@ SVfitStandaloneAlgorithm SVFitMassComputation(svFitStandalone::MeasuredTauLepton
   
 }
 
+bool metFiltersPasses(AC1B &tree_, std::vector<TString> metFlags) {
+    
+    bool passed = true;
+    unsigned int nFlags = metFlags.size();
+    //  std::cout << "MEt filters : " << std::endl;
+    for (std::map<string,int>::iterator it=tree_.flags->begin(); it!=tree_.flags->end(); ++it) {
+        TString flagName(it->first);
+        //    std::cout << it->first << " : " << it->second << std::endl;
+        for (unsigned int iFilter=0; iFilter<nFlags; ++iFilter) {
+            if (flagName.Contains(metFlags[iFilter])) {
+                if (it->second==0) {
+                    passed = false;
+                    break;
+                }
+            }
+        }
+    }
+    //  std::cout << "Passed : " << passed << std::endl;
+    return passed;
+    
+}
+
 float nJetsWeight(int nJets) {
     
     float weight = 1;
@@ -366,6 +388,17 @@ int main(int argc, char * argv[]) {
     Float_t         btag0weight;
     Float_t         btag0weight_Up;
     Float_t         btag0weight_Down;
+
+    Bool_t metFilters_;
+
+    Bool_t badChargedCandidateFilter_;
+    Bool_t badPFMuonFilter_;
+    Bool_t badGlobalMuonFilter_;
+    Bool_t muonBadTrackFilter_;
+    Bool_t chargedHadronTrackResolutionFilter_;
+
+    Bool_t badMuonFilter_;
+    Bool_t duplicateMuonFilter_;
     
     Float_t         n_genZ_mass;
     Float_t         n_genZ_Pt;
@@ -484,6 +517,10 @@ int main(int argc, char * argv[]) {
     Float_t         pt_tot;
     Float_t         pt_tot_Up;
     Float_t         pt_tot_Down;
+    Float_t         pt_tot_JES_Up;
+    Float_t         pt_tot_JES_Down;
+    Float_t         pt_tot_UnclusteredJES_Up;
+    Float_t         pt_tot_UnclusteredJES_Down;
     
     //dimuon system
     Float_t         pt_tt;
@@ -711,6 +748,17 @@ int main(int argc, char * argv[]) {
     T->Branch("btag0weight",&btag0weight,"btag0weight/F");
     T->Branch("btag0weight_Up",&btag0weight_Up,"btag0weight_Up/F");
     T->Branch("btag0weight_Down",&btag0weight_Down,"btag0weight_Down/F");
+
+    T->Branch("metFilters",&metFilters_,"metFilters/O");
+   
+    T->Branch("badChargedCandidateFilter",&badChargedCandidateFilter_,"badChargedCandidateFilter/O");
+    T->Branch("badPFMuonFilter",&badPFMuonFilter_,"badPFMuonFilter/O");
+    T->Branch("badGlobalMuonFilter",&badGlobalMuonFilter_,"badGlobalMuonFilter/O");
+    T->Branch("muonBadTrackFilter",&muonBadTrackFilter_,"muonBadTrackFilter/O");
+    T->Branch("chargedHadronTrackResolutionFilter",&chargedHadronTrackResolutionFilter_,"chargedHadronTrackResolutionFilter/O");
+
+    T->Branch("badMuonFilter",&badMuonFilter_,"badMuonFilter/O");
+    T->Branch("duplicateMuonFilter",&duplicateMuonFilter_,"duplicateMuonFilter/O");
     
     T->Branch("m_vis",&m_vis,"m_vis/F");
     T->Branch("m_vis_Up",&m_vis_Up,"m_vis_Up/F");
@@ -808,6 +856,10 @@ int main(int argc, char * argv[]) {
     T->Branch("pt_tot", &pt_tot, "pt_tot/F");
     T->Branch("pt_tot_Up", &pt_tot_Up, "pt_tot_Up/F");
     T->Branch("pt_tot_Down", &pt_tot_Down, "pt_tot_Down/F");
+    T->Branch("pt_tot_JES_Up", &pt_tot_JES_Up, "pt_tot_JES_Up/F");
+    T->Branch("pt_tot_JES_Down", &pt_tot_JES_Down, "pt_tot_JES_Down/F");
+    T->Branch("pt_tot_UnclusteredJES_Up", &pt_tot_UnclusteredJES_Up, "pt_tot_UnclusteredJES_Up/F");
+    T->Branch("pt_tot_UnclusteredJES_Down", &pt_tot_UnclusteredJES_Down, "pt_tot_UnclusteredJES_Down/F");
 
     T->Branch("pt_tt", &pt_tt, "pt_tt/F");
     T->Branch("dr_tt", &dr_tt, "dr_tt/F");
@@ -1187,7 +1239,7 @@ int main(int argc, char * argv[]) {
     reader_boostJESUp->AddVariable("m_vis", &m_vis);
     reader_boostJESUp->AddVariable("costheta", &costheta);
     reader_boostJESUp->AddVariable("ptRatio", &ptRatio);
-    reader_boostJESUp->AddVariable("pt_tot", &pt_tot);
+    reader_boostJESUp->AddVariable("pt_tot", &pt_tot_JES_Up);
     //BookMethod
     reader_boostJESUp->BookMVA("BDT", cmsswBase+boostBDTweight);
     
@@ -1230,7 +1282,7 @@ int main(int argc, char * argv[]) {
     reader_boostJESDown->AddVariable("m_vis", &m_vis);
     reader_boostJESDown->AddVariable("costheta", &costheta);
     reader_boostJESDown->AddVariable("ptRatio", &ptRatio);
-    reader_boostJESDown->AddVariable("pt_tot", &pt_tot);
+    reader_boostJESDown->AddVariable("pt_tot", &pt_tot_JES_Down);
     //BookMethod
     reader_boostJESDown->BookMVA("BDT", cmsswBase+boostBDTweight);
     
@@ -1274,7 +1326,7 @@ int main(int argc, char * argv[]) {
     reader_boostUnclustJESUp->AddVariable("m_vis", &m_vis);
     reader_boostUnclustJESUp->AddVariable("costheta", &costheta);
     reader_boostUnclustJESUp->AddVariable("ptRatio", &ptRatio);
-    reader_boostUnclustJESUp->AddVariable("pt_tot", &pt_tot);
+    reader_boostUnclustJESUp->AddVariable("pt_tot", &pt_tot_UnclusteredJES_Up);
     //BookMethod
     reader_boostUnclustJESUp->BookMVA("BDT", cmsswBase+boostBDTweight);
     
@@ -1318,7 +1370,7 @@ int main(int argc, char * argv[]) {
     reader_boostUnclustJESDown->AddVariable("m_vis", &m_vis);
     reader_boostUnclustJESDown->AddVariable("costheta", &costheta);
     reader_boostUnclustJESDown->AddVariable("ptRatio", &ptRatio);
-    reader_boostUnclustJESDown->AddVariable("pt_tot", &pt_tot);
+    reader_boostUnclustJESDown->AddVariable("pt_tot", &pt_tot_UnclusteredJES_Down);
     //BookMethod
     reader_boostUnclustJESDown->BookMVA("BDT", cmsswBase+boostBDTweight);
     
@@ -1425,7 +1477,31 @@ int main(int argc, char * argv[]) {
     //BookMethod
     reader_vbfMuScaleDown->BookMVA("BDT", cmsswBase+vbfBDTweight);
 
-//    //------------------------------->
+    //Met filters
+    std::vector<TString> metFlags; metFlags.clear();
+    metFlags.push_back("Flag_HBHENoiseFilter");
+    metFlags.push_back("Flag_HBHENoiseIsoFilter");
+    metFlags.push_back("Flag_globalTightHalo2016Filter");
+    metFlags.push_back("Flag_EcalDeadCellTriggerPrimitiveFilter");
+    metFlags.push_back("Flag_goodVertices");
+    if (isData)
+      metFlags.push_back("Flag_eeBadScFilter");
+    metFlags.push_back("Flag_BadPFMuonFilter");
+    metFlags.push_back("Flag_BadChargedCandidateFilter");
+
+    std::vector<TString> badChargedCandidateFlag; badChargedCandidateFlag.clear();
+    badChargedCandidateFlag.push_back("Flag_BadChargedCandidateFilter");
+    std::vector<TString> badPFMuonFlag; badPFMuonFlag.clear();
+    badPFMuonFlag.push_back("Flag_BadPFMuonFilter");
+    std::vector<TString> badGlobalMuonFlag; badGlobalMuonFlag.clear();
+    badGlobalMuonFlag.push_back("Flag_BadGlobalMuonFilter");
+    std::vector<TString> muonBadTrackFlag; muonBadTrackFlag.clear();
+    muonBadTrackFlag.push_back("Flag_muonBadTrackFilter");
+    std::vector<TString> chargedHadronTrackResolutionFlag; chargedHadronTrackResolutionFlag.clear();
+    chargedHadronTrackResolutionFlag.push_back("Flag_chargedHadronTrackResolutionFilter");
+    
+
+    //------------------------------->
     
     int nFiles = 0;
     int nEvents = 0;
@@ -1546,6 +1622,17 @@ int main(int argc, char * argv[]) {
             btag0weight =1;
             btag0weight_Up =1;
             btag0weight_Down =1;
+
+	    metFilters_ = true;
+
+	    badChargedCandidateFilter_ = true;
+            badPFMuonFilter_ = true;
+	    badGlobalMuonFilter_ = true;
+	    muonBadTrackFilter_ = true;
+	    chargedHadronTrackResolutionFilter_ = true;
+
+	    badMuonFilter_ = true;
+	    duplicateMuonFilter_ = true;
             
             TLorentzVector genZ; genZ.SetXYZT(0,0,0,0);
             TLorentzVector genZTT; genZTT.SetXYZT(0,0,0,0);
@@ -1914,6 +2001,14 @@ int main(int argc, char * argv[]) {
                 cout << "Filter " << SingleMuonFilterName << " not found " << endl;
                 continue;
             }
+
+	    // MET Filters
+	    metFilters_ = metFiltersPasses(analysisTree,metFlags);
+	    badChargedCandidateFilter_ = metFiltersPasses(analysisTree,badChargedCandidateFlag);
+	    badPFMuonFilter_ = metFiltersPasses(analysisTree,badPFMuonFlag);
+	    badGlobalMuonFilter_ = metFiltersPasses(analysisTree,badGlobalMuonFlag);
+	    muonBadTrackFilter_ = metFiltersPasses(analysisTree,muonBadTrackFlag);
+	    chargedHadronTrackResolutionFilter_ = metFiltersPasses(analysisTree,chargedHadronTrackResolutionFlag);
         
 
             //---------pfmet-----
@@ -2006,6 +2101,10 @@ int main(int argc, char * argv[]) {
                 if (fabs(analysisTree.muon_dz[im])>dzMuonLooseCut) continue;
                 if (fabs(analysisTree.muon_dxy[im])>dxyMuonCut) muPassed = false;
                 if (fabs(analysisTree.muon_dz[im])>dzMuonCut) muPassed = false;
+
+		
+		if (analysisTree.muon_isBad[im]) badMuonFilter_ = false;//Updated on Jun5,2017
+		if (analysisTree.muon_isDuplicate[im]) duplicateMuonFilter_ = false;//updated on Jun5, 2017
                 
                 bool goodGlob =
                 analysisTree.muon_isGlobal[im] &&
@@ -2078,7 +2177,10 @@ int main(int argc, char * argv[]) {
                 isMuonMatchedSingleMuFilter.push_back(muSingleMatched);
                 
             }
-            
+
+	    metFilters_ = metFilters_ && badMuonFilter_ && duplicateMuonFilter_; //added on Jun 5, 2017
+	    if (metFilters_<0.5) continue; //added on Jun 5, 2017
+	    
             unsigned int indx1 = 0;
             unsigned int indx2 = 0;
             bool isIsoMuonsPair = false;
@@ -2735,9 +2837,27 @@ int main(int argc, char * argv[]) {
 
 		//Total transverse momentum calculations for (boosted categoty BDT trainning)
 		pt_tot = -9999;
+		pt_tot_Up = -9999;
+		pt_tot_Down = -9999;
+		pt_tot_JES_Up =-9999;
+		pt_tot_JES_Down =-9999;
+		pt_tot_UnclusteredJES_Up = -9999;
+		pt_tot_UnclusteredJES_Down =-9999;
 
 		pt_tot_x  = met_x + px_mu1 + px_mu2;
 		pt_tot_y  = met_y + py_mu1 + py_mu2;
+
+		float pt_totx_JESUp =  metcorr_ex_JES_Up + px_mu1 + px_mu2;
+		float pt_toty_JESUp =  metcorr_ey_JES_Up + py_mu1 + py_mu2;
+		
+		float pt_totx_JESDown =  metcorr_ex_JES_Down + px_mu1 + px_mu2;
+		float pt_toty_JESDown =  metcorr_ey_JES_Down + py_mu1 + py_mu2;
+
+		float pt_totx_UnclusteredJESUp =  metcorr_ex_UnclusteredJES_Up + px_mu1 + px_mu2;
+		float pt_toty_UnclusteredJESUp =  metcorr_ey_UnclusteredJES_Up + py_mu1 + py_mu2;
+		
+		float pt_totx_UnclusteredJESDown =  metcorr_ex_UnclusteredJES_Down + px_mu1 + px_mu2;
+		float pt_toty_UnclusteredJESDown =  metcorr_ey_UnclusteredJES_Down + py_mu1 + py_mu2;
 
 		float pt_tot_xmuUp   = metx_muUp + px_mu1Up + px_mu2Up;
 		float pt_tot_xmuDown = metx_muDown + px_mu1Down +  px_mu2Down;
@@ -2748,7 +2868,10 @@ int main(int argc, char * argv[]) {
 		pt_tot = TMath::Sqrt(pt_tot_x*pt_tot_x + pt_tot_y*pt_tot_y);
 		pt_tot_Up   = TMath::Sqrt(pt_tot_xmuUp*pt_tot_xmuUp + pt_tot_ymuUp*pt_tot_ymuUp);
 		pt_tot_Down = TMath::Sqrt(pt_tot_xmuDown*pt_tot_xmuDown + pt_tot_ymuDown*pt_tot_ymuDown);
-		
+		pt_tot_JES_Up   = TMath::Sqrt(pt_totx_JESUp*pt_totx_JESUp + pt_toty_JESUp*pt_toty_JESUp);
+		pt_tot_JES_Down = TMath::Sqrt(pt_totx_JESDown*pt_totx_JESDown + pt_toty_JESDown*pt_toty_JESDown);
+		pt_tot_UnclusteredJES_Up   = TMath::Sqrt(pt_totx_UnclusteredJESUp*pt_totx_UnclusteredJESUp + pt_toty_UnclusteredJESUp*pt_toty_UnclusteredJESUp);
+		pt_tot_UnclusteredJES_Down = TMath::Sqrt(pt_totx_UnclusteredJESDown*pt_totx_UnclusteredJESDown + pt_toty_UnclusteredJESDown*pt_toty_UnclusteredJESDown);
 		
                 //----bisector of dimuon transerve momenta for defining the dzeta variables-------
                 
