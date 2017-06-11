@@ -409,23 +409,30 @@ int main(int argc, char * argv[]) {
 
   // file name and tree name
   std::string rootFileName(argv[2]);
-  //std::ifstream fileList(argv[2]);
+  std::string NrootFile(argv[4]);
   std::ifstream fileList(ff);
-  //std::ifstream fileList0(argv[2]);
   std::ifstream fileList0(ff);
   std::string ntupleName("makeroottree/AC1B");
   std::string initNtupleName("initroottree/AC1B");
 
-  TString era=argv[3];
+
+  string SaveDir=argv[3];
+
+
+  if (string::npos == Systematic.find("Nominal")) {SaveDir.append("_");SaveDir.append(argv[5]);}
 
   TString TStrName(rootFileName+"_"+Region+"_"+Sign);
-  std::cout <<" The filename will be "<<TStrName <<std::endl;  
+  datasetName = rootFileName.c_str();
+  std::cout <<" The filename will be "<<TStrName <<"  "<<datasetName<<"  The systematic will be "<<Systematic<<"  and save dir will be  "<<SaveDir<<endl;
 
   // output fileName with histograms
-  TFile * file ;
-  if (isData) file = new TFile(era+"/"+TStrName+TString("_DataDriven.root"),"update");
-  if (!isData) file = new TFile(era+"/"+TStrName+TString(".root"),"update");
+  
+  TFile * file;
+  if (isData) file = new TFile(SaveDir+"/"+TStrName+TString("_DataDriven.root"),"update");
+  else file = new TFile(SaveDir+"/"+TStrName+TString(".root"),"update");
+
   TH1::SetDefaultSumw2(true);
+
   //file->mkdir(Channel.c_str());
   //file->cd();
   TH1D * inputEventsH = new TH1D("inputEventsH","",1,-0.5,0.5);
@@ -1783,7 +1790,8 @@ if (isTight)
       met_x = analysisTree.pfmetcorr_ex;
       met_y = analysisTree.pfmetcorr_ey;
 
-      if ((isW || isDY) && !isData) {
+	     
+      if (isWJ || isDY || isWNJ || isDYNJ) {
 
 	  recoilMetCorrector.CorrectByMeanResolution(met_x,met_y,bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,pfmet_corr_x,pfmet_corr_y);
  

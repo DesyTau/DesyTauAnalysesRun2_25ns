@@ -180,7 +180,19 @@ TH2D *histo = (TH2D*) obj;
 	if (string::npos != fln.find(ztt)) isZTT= true;
 	if (string::npos == fln.find(ztt)) isZTT= false;
 
-	TH1D * histW = (TH1D*)filein->Get("mutau/histWeightsH");
+	TH1D * histW   ;
+	if (systematic == "ScalesUp" ) histW = (TH1D*)filein->Get("mutau/histWeightsScalesUp");
+	else if (systematic == "ScalesDown" ) histW = (TH1D*)filein->Get("mutau/histWeightsScalesDown");
+	else if (systematic == "PDFUp" ) histW = (TH1D*)filein->Get("mutau/histWeightsPDFUp");
+	else if (systematic == "PDFDown" ) histW = (TH1D*)filein->Get("mutau/histWeightsPDFDown");
+	else  {histW = (TH1D*)filein->Get("mutau/histWeightsH");}
+
+	histW->SetName("histWeightsH");
+	histW->SetTitle("histWeightsH");
+
+
+	cout<<" The Systematic "<<systematic<<" histW "<<histW->GetSumOfWeights()<<endl;
+
 	TH1D * histTop , *histTopSq;
 	if (isTT) histTop = (TH1D*)filein->Get("mutau/histTopPt");
 	if (isTT && systematic == "TopPtUp" ) histTopSq = (TH1D*)filein->Get("mutau/histTopPtSq");

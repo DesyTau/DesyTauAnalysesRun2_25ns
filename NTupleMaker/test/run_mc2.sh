@@ -2,14 +2,28 @@
 #
 #(make sure the right shell will be used)
 #$ -S /bin/sh
+#
+#(the cpu time for this job)
+#$ -l h_cpu=1:45:00
+#
+#(the maximum memory usage of this job)
+#$ -l h_vmem=3500M
+#
+#(use hh site)
+#$ -l site=hh
+#(stderr and stdout are merged together to stdout)
+#$ -j y
+#
+# use SL5
+#$ -l os=sld6
+#
 # use current dir and current environment
 #$ -cwd
 #$ -V
-
-#$ -l h_cpu=2:59:00
 #
-#(the maximum memory usage of this job)
-#$ -l h_vmem=1500M
+
+cd /nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/New8025/CMSSW_8_0_25/src/DesyTauAnalyses/NTupleMaker/test;eval `scramv1 runtime -sh` ;
+
 
 wdir="/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/New8025/CMSSW_8_0_25/src/DesyTauAnalyses/NTupleMaker/test"
 channel=$2 
@@ -23,7 +37,9 @@ systematics="$3"
 
 if [[ $3 == "all" || $3 == "All"  || $3 == "list" ]];then
 #systematics="Nominal JetEnUp JetEnDown TauEnUp TauEnDown ElEnUp ElEnDown MuEnUp MuEnDown UnclEnUp UnclEnDown"
-systematics="JetEnUp JetEnDown TauEnUp TauEnDown ElEnUp ElEnDown MuEnUp MuEnDown UnclEnUp UnclEnDown"
+systematics="Nominal JetEnUp JetEnDown TauEnUp TauEnDown ElEnUp ElEnDown MuEnUp MuEnDown UnclEnUp UnclEnDown BTagUp BTagDown"
+systematics="Nominal JetEnUp JetEnDown TauEnUp TauEnDown ElEnUp ElEnDown MuEnUp MuEnDown UnclEnUp UnclEnDown BTagUp BTagDown"
+#systematics="Nominal JetEnUp JetEnDown ElEnUp ElEnDown MuEnUp MuEnDown UnclEnUp UnclEnDown BTagUp BTagDown"
 #systematics="JetEnUp JetEnDown UnclEnUp UnclEnDown"
 
 fi
@@ -56,9 +72,9 @@ ctt=`cat ${dir}/${line} | wc -l`
 
 echo There are  $ct out of $ctt for $line in $dir dir for systematic $syst
 
-if [[ $ct -ge $ctt ]] ;then
-	continue;
-fi
+#if [[ $ct -ge $ctt ]] ;then
+#	continue;
+#fi
 
 unset xsec
 xsec=`grep " ${line} " xsecs | cut -d " " -f3-4`	
@@ -79,12 +95,12 @@ echo $f > $dir/$bas
 #	echo " "$bas $xsec >> xsecs
 
 
-	if [ -f Jobs/job${line}$channel$dir${bas}_B${syst}.sh ] ; then
-rm Jobs/job${line}$channel$dir${bas}_B${syst}.sh
+	if [ -f Jobs/job${channel}${line}$dir${bas}_B${syst}.sh ] ; then
+rm Jobs/job${channel}${line}$dir${bas}_B${syst}.sh
 fi
 
 
-cat bss > Jobs/job${line}$channel$dir${bas}_B${syst}.sh
+cat bss > Jobs/job${channel}${line}$dir${bas}_B${syst}.sh
 
 
 
@@ -92,9 +108,9 @@ cat bss > Jobs/job${line}$channel$dir${bas}_B${syst}.sh
 if [ ! -f ${dir}/${bas}_B_OS.root ] ;then
 
 echo $bas $xsec $dir
-echo SUSY$channel analysisMacroSUSY_${type}_B.conf ${bas} ${channel} 1 $syst>> Jobs/job${line}$channel$dir${bas}_B${syst}.sh
-chmod u+x $wdir/Jobs/job${line}$channel$dir${bas}_B${syst}.sh
- qsub -l h_rt=0:45:00 -l h_cpu=3500M -e /dev/null -o /dev/null $wdir/Jobs/job${line}$channel$dir${bas}_B${syst}.sh 
+echo SUSY$channel analysisMacroSUSY_${type}_B.conf ${bas} ${channel} 1 $syst>> Jobs/job${channel}${line}$dir${bas}_B${syst}.sh
+chmod u+x $wdir/Jobs/job${channel}${line}$dir${bas}_B${syst}.sh
+ qsub -l h_rt=1:45:00 -l h_cpu=3500M -e /dev/null -o /dev/null $wdir/Jobs/job${channel}${line}$dir${bas}_B${syst}.sh 
 fi
 
 

@@ -169,7 +169,16 @@ TH2D *histo = (TH2D*) obj;
 	if (string::npos != fln.find(ztt)) isZTT= true;
 	if (string::npos == fln.find(ztt)) isZTT= false;
 
-	TH1D * histW = (TH1D*)filein->Get("mumu/histWeightsH");
+	TH1D * histW ;
+	if (systematic == "ScalesUp" ) histW = (TH1D*)filein->Get("mumu/histWeightsScalesUp");
+	else if (systematic == "ScalesDown" ) histW = (TH1D*)filein->Get("mumu/histWeightsScalesDown");
+	else if (systematic == "PDFUp" ) histW = (TH1D*)filein->Get("mumu/histWeightsPDFUp");
+	else if (systematic == "PDFDown" ) histW = (TH1D*)filein->Get("mumu/histWeightsPDFDown");
+	else  {histW = (TH1D*)filein->Get("mumu/histWeightsH");}
+
+	histW->SetName("histWeightsH");
+	histW->SetTitle("histWeightsH");
+
 	TH1D * histTop , *histTopSq;
 	if (isTT) histTop = (TH1D*)filein->Get("mumu/histTopPt");
 	if (isTT && systematic == "TopPtUp" ) histTopSq = (TH1D*)filein->Get("mumu/histTopPtSq");

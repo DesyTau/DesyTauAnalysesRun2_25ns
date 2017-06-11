@@ -24,10 +24,10 @@
 
 
 
-cd /nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/CMSSW_8_0_20/src/DesyTauAnalyses/NTupleMaker/test;eval `scramv1 runtime -sh` ;
+cd /nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/New8025/CMSSW_8_0_25/src/DesyTauAnalyses/NTupleMaker/test;eval `scramv1 runtime -sh` ;
 
 
-dir="/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/CMSSW_8_0_20/src/DesyTauAnalyses/NTupleMaker/test/"
+dir="/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/New8025/CMSSW_8_0_25/src/DesyTauAnalyses/NTupleMaker/test"
 
 channel=$2
 channel2=$2
@@ -45,10 +45,33 @@ btag="0.8484"
 systematics="$3"
 
 if [[  $3 == "list" ||  $3 == "all" ]];then
-systematics="Nominal JetEnUp JetEnDown TopPtUp TopPtDown ZPtUp ZPtDown TauEnUp TauEnDown ElEnUp ElEnDown MuEnUp MuEnDown UnclEnUp UnclEnDown"
+systematics="Nominal TopPtUp TopPtDown ZPtUp ZPtDown JetEnUp JetEnDown TauEnUp TauEnDown ElEnUp ElEnDown MuEnUp MuEnDown UnclEnUp UnclEnDown genMET ScalesDown ScalesUp PDFUp PDFDown BTagUp BTagDown METRecoilUp METRecoilDown"
+#systematics="Nominal JetEnUp JetEnDown TopPtUp TopPtDown ZPtUp ZPtDown TauEnUp TauEnDown ElEnUp ElEnDown MuEnUp MuEnDown UnclEnUp UnclEnDown genMET ScalesDown ScalesUp PDFUp PDFDown"
 #systematics="JetEnUp JetEnDown UnclEnUp UnclEnDown"
 fi
 
+if [[  $3 == "New" ]];then
+systematics="genMET ScalesDown ScalesUp PDFUp PDFDown BTagUp BTagDown METRecoilUp METRecoilDown"
+#systematics="Nominal JetEnUp JetEnDown TopPtUp TopPtDown ZPtUp ZPtDown TauEnUp TauEnDown ElEnUp ElEnDown MuEnUp MuEnDown UnclEnUp UnclEnDown genMET ScalesDown ScalesUp PDFUp PDFDown"
+fi
+
+
+if [[  $3 == "listTT" ]];then
+systematics="Nominal JetEnUp JetEnDown TopPtUp TopPtDown ZPtUp ZPtDown ElEnUp ElEnDown MuEnUp MuEnDown UnclEnUp UnclEnDown ScalesDown ScalesUp PDFUp PDFDown BTagUp BTagDown METRecoilUp METRecoilDown"
+#systematics="JetEnUp JetEnDown ElEnUp ElEnDown MuEnUp MuEnDown UnclEnUp UnclEnDown BTagUp BTagDown"
+#systematics="Nominal  TopPtUp TopPtDown ZPtUp ZPtDown ElEnUp ElEnDown MuEnUp MuEnDown UnclEnUp UnclEnDown ScalesDown ScalesUp PDFUp PDFDown BTagUp BTagDown METRecoilUp METRecoilDown"
+fi
+
+if [[  $3 == "listDY" ]];then
+systematics="Nominal JetEnUp JetEnDown ZPtUp ZPtDown MuEnUp MuEnDown UnclEnUp UnclEnDown ScalesDown ScalesUp PDFUp PDFDown METRecoilUp METRecoilDown"
+
+fi
+
+if [[  $3 == "listWJ" ]];then
+systematics="Nominal ZpTUp ZPtDown TopPtUp TopPtDown JetEnUp JetEnDown MuEnUp MuEnDown UnclEnUp UnclEnDown ScalesDown ScalesUp PDFUp PDFDown METRecoilUp METRecoilDown  BTagUp BTagDown"
+#systematics="JetEnUp JetEnDown MuEnUp MuEnDown UnclEnUp UnclEnDown METRecoilUp METRecoilDown  BTagUp BTagDown"
+
+fi
 
 if [[ -z $3 ]];then
 systematics="Nominal"
@@ -60,7 +83,7 @@ then
 	channel2="muel"
 fi
 
-if [[ $2 == "Wtemplate"   ||   $2 == "fakesmu" ]]
+if [[ $2 == "Wtemplate"   ||   $2 == "fakesmu"  || $2 == "Wtemplate2" ]]
 then
 	channel2="mutau"
 fi
@@ -75,8 +98,8 @@ fi
 while read line
 do
 
-unset isDataSyst
-export isDataSyst=0
+#unset isDataSyst
+isDataSyst=0
 
 unset isSystTopZpt
 export isSystTopZPt=0
@@ -101,20 +124,29 @@ if [[ $file == *"Single"* || $file == *"MuonEG"* ]] && [[ $syst != "Nominal" ]];
 isDataSyst=1
 fi
 
+if  [[ $syst == "genMET" ]]; then
 
-#######Do something is systematic is the TopPt or ZPt Up/Down
+#if [[ $file == *"stau"* || $file == *"Chi"* || $file == *"C1"* ]] ; then
+if [[  $file == *"Chi"*  ]] ; then
 
-if [[  $syst -eq "TopPtUp" || $syst -eq "TopPtDown" || $syst -eq "ZPtUp" || $syst -eq "ZPtDown" ]]; then
-
-isSystTopZPt=1
+isDataSyst=0
+	echo we will run genMET syst only for signal ....$file , isData $isDataSyst
+fi
 
 fi
 
+#######Do something is systematic is the TopPt or ZPt Up/Down
+
+#if [[  $syst -eq "TopPtUp" || $syst -eq "TopPtDown" || $syst -eq "ZPtUp" || $syst -eq "ZPtDown" ]]; then
+
+#isSystTopZPt=1
+
+#fi
 
 
-if [[ ${isDataSyst} != 1 ]] ; then
+if [[ $isDataSyst == 0 ]] ; then
 
-if [[ $line == *"stau"* || $line == *"C1"* ]] ; then
+if [[ $line == *"stau"* || $line == *"C1"* || $file == *"Chi"* ]] ; then
 lsp=`echo $line | awk -F "_LSP" '{print $2}' | cut -d '_' -f1`
 else
 lsp=0
@@ -146,12 +178,12 @@ echo $line , $fileB
 
 ######### signal
 
-if [[ $file == *"B_OS"*  ]] && [[ $file == *"stau"*  || $file == *"C1"* ]];then
+if [[ $file == *"B_OS"*  ]] && [[ $file == *"stau"*  || $file == *"C1"*  || $file == *"Chi"* ]];then
 
 cp analyzer_h analyzer.h
 cp analyzer${channel}_C analyzer.C
 
-echo Signal file here .....
+#echo Signal file here .....
 
 
 if [[ ! -f $dir/plots_$channel/${fileB}_B.root ]] ; then
@@ -184,7 +216,7 @@ cp analyzer_h analyzer.h
 ######### B region non inverted OS
 
 #if [[ ! -f $dir/plots_$channel/${fileB}_${syst}_B.root  ]] && [[ ! -f $dir/plots_$channel/${fileB}_B.root ]]  &&  [[ $file != *"stau"* && $file != *"C1"* ]]; then
-if [[ ! -f $dir/plots_$channel/${fileB}_B.root  ]]   &&  [[ $file != *"stau"* && $file != *"C1"* ]]; then
+if [[ ! -f $dir/plots_$channel/${fileB}_B.root  ]]   &&  [[ $file != *"stau"* && $file != *"C1"* &&  $file != *"Chi"* ]]; then
 
 
 cp analyzer_h analyzer.h
@@ -210,7 +242,8 @@ fi
 
 ######### A region non inverted SS
 
-if [[ ! -f $dir/plots_$channel/${fileB}_A.root ]] && [[ $file != *"stau"* && $file != *"C1"*  ]] && [[ $2 != "Ttemplate" ]] && [[ $2 != "mumu" ]] && [[ $2 != "WJETSMU" ]]   && [[ $2 != "fakesmu" ]] ;then
+if [[ ! -f $dir/plots_$channel/${fileB}_A.root ]] && [[ $file != *"stau"* && $file != *"C1"*  &&  $file != *"Chi"* ]] && [[ $2 != "Ttemplate" ]] && [[ $2 != "mumu" ]] && [[ $2 != "WJETSMU" ]]   && [[ $2 != "fakesmu" ]] ;then
+#if [[ ! -f $dir/plots_$channel/${fileB}_A.root ]] ; then
 #if [[ ! -f $dir/plots_$channel/${fileB}_A.root ]]  &&  [[ $2 != "Ttemplate" ]] && [[ $2 != "mumu" ]]  && [[ $file == *"stau"*  || $file == *"C1"* ]]; then
 cp analyzer_h analyzer.h
 cp analyzer${channel}_C analyzer.C
@@ -239,7 +272,7 @@ fi
 
 
 ######## D region
-if [[ ! -f $dir/plots_$channel/${fileB}_D.root ]] &&  [[ $file != *"stau"*  && $file != *"C1"* ]] && [[ $2 != "Ttemplate" ]] && [[ $2 != "mumu" ]] && [[ $2 != "WJETSMU" ]]  && [[ $2 != "fakesmu" ]]; then
+if [[ ! -f $dir/plots_$channel/${fileB}_D.root ]] &&  [[ $file != *"stau"*  && $file != *"C1"* && $file != *"Chi"* ]] && [[ $2 != "Ttemplate" ]] && [[ $2 != "mumu" ]] && [[ $2 != "WJETSMU" ]]  && [[ $2 != "fakesmu" ]]; then
 cp analyzer${channel}_C analyzer.C
 cp analyzer_h analyzer.h
 
@@ -262,7 +295,7 @@ fi
 
 
 ####### C region
-if [[ ! -f $dir/plots_$channel/${fileB}_C.root ]] &&  [[ $file != *"stau"* && $file != *"C1"*  ]] && [[ $2 != "Ttemplate" ]] && [[ $2 != "mumu" ]] && [[ $2 != "WJETSMU" ]]  && [[ $2 != "fakesmu" ]] ;then
+if [[ ! -f $dir/plots_$channel/${fileB}_C.root ]] &&  [[ $file != *"stau"* && $file != *"C1"*  &&  $file != *"Chi"* ]] && [[ $2 != "Ttemplate" ]] && [[ $2 != "mumu" ]] && [[ $2 != "WJETSMU" ]]  && [[ $2 != "fakesmu" ]] ;then
 cp analyzer${channel}_C analyzer.C
 cp analyzer_h analyzer.h
 

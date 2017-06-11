@@ -170,8 +170,15 @@ void analyzer::Loop(){
 	if (string::npos != fln.find(ztt)) isZTT= true;
 	if (string::npos == fln.find(ztt)) isZTT= false;
 
-	TH1D * histW = (TH1D*)filein->Get("eltau/histWeightsH");
-	TH1D * histTop , *histTopSq;
+	TH1D * histW   ;
+	if (systematic == "ScalesUp" ) histW = (TH1D*)filein->Get("eltau/histWeightsScalesUp");
+	else if (systematic == "ScalesDown" ) histW = (TH1D*)filein->Get("eltau/histWeightsScalesDown");
+	else if (systematic == "PDFUp" ) histW = (TH1D*)filein->Get("eltau/histWeightsPDFUp");
+	else if (systematic == "PDFDown" ) histW = (TH1D*)filein->Get("eltau/histWeightsPDFDown");
+	else  {histW = (TH1D*)filein->Get("eltau/histWeightsH");}
+
+
+ 	TH1D * histTop , *histTopSq;
 	if (isTT) histTop = (TH1D*)filein->Get("eltau/histTopPt");
 	if (isTT && systematic == "TopPtUp" ) histTopSq = (TH1D*)filein->Get("eltau/histTopPtSq");
 	

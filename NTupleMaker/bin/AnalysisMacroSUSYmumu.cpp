@@ -810,15 +810,36 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	  }
 
 
-      histTopPt->Fill(0.,topptweight);
-      histTopPtSq->Fill(0.,topptweight*topptweight);
+      histTopPt->Fill(0.,topptweight*analysisTree.genweight);
+      histTopPtSq->Fill(0.,topptweight*topptweight*analysisTree.genweight);
 
 	}
 	  if (!isData ) {
 	    weight *= analysisTree.genweight;
 	    gen_weight *=analysisTree.genweight;
 	   // std::cout <<"analysisTree.genweight "<< float(analysisTree.genweight) << std::endl;
-	  lumi=true;
+		
+	    double cLower, cUpper;
+	    vector <double> ScalesV; ScalesV.clear();
+//	ScalesV.push_back(wScale0);
+	    ScalesV.push_back(analysisTree.weightScale1);
+	    ScalesV.push_back(analysisTree.weightScale2);
+	    ScalesV.push_back(analysisTree.weightScale3);
+	    ScalesV.push_back(analysisTree.weightScale4);
+	    ScalesV.push_back(analysisTree.weightScale5);
+	    ScalesV.push_back(analysisTree.weightScale6);
+	    ScalesV.push_back(analysisTree.weightScale7);
+	    ScalesV.push_back(analysisTree.weightScale8);
+		
+	    cLower = *min_element(ScalesV.begin(), ScalesV.end());
+      	    cUpper = *max_element(ScalesV.begin(), ScalesV.end());
+	    histWeightsScalesUp->Fill(0.,analysisTree.genweight*cUpper);
+	    histWeightsScalesDown->Fill(0.,analysisTree.genweight*cLower);
+
+	    histWeightsPDFUp->Fill(0.,analysisTree.genweight*analysisTree.weightPDFup);
+	    histWeightsPDFDown->Fill(0.,analysisTree.genweight*analysisTree.weightPDFdown);
+
+	    lumi=true;
 	  }
 					
 
@@ -1722,6 +1743,10 @@ cout<<""<<endl;
   hxsec->Write();
   inputEventsH->Write();
   histWeightsH->Write();
+  histWeightsScalesUp->Write();
+  histWeightsScalesDown->Write();
+  histWeightsPDFUp->Write();
+  histWeightsPDFDown->Write();
   histTopPt->Write();
   histRuns->Write();
   CutFlowUnW->Write();
