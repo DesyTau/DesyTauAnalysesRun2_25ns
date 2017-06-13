@@ -558,6 +558,19 @@ const    int nEtaBins = 4;
   TH1D * FakeRatePtIncLoose[nEtaBins][nCuts];
   TH1D * FakeRatePtIncTight[nEtaBins][nCuts];
 
+  TH1D * FakeRatePtIncLooseUpQ[nEtaBins][nCuts];
+  TH1D * FakeRatePtIncTightUpQ[nEtaBins][nCuts];
+  TH1D * FakeRatePtIncLooseDownQ[nEtaBins][nCuts];
+  TH1D * FakeRatePtIncTightDownQ[nEtaBins][nCuts];
+  TH1D * FakeRatePtIncLooseCharmQ[nEtaBins][nCuts];
+  TH1D * FakeRatePtIncTightCharmQ[nEtaBins][nCuts];
+  TH1D * FakeRatePtIncLooseStrangeQ[nEtaBins][nCuts];
+  TH1D * FakeRatePtIncTightStrangeQ[nEtaBins][nCuts];
+  TH1D * FakeRatePtIncLooseGluon[nEtaBins][nCuts];
+  TH1D * FakeRatePtIncTightGluon[nEtaBins][nCuts];
+  TH1D * FakeRatePtIncLooseBottomQ[nEtaBins][nCuts];
+  TH1D * FakeRatePtIncTightBottomQ[nEtaBins][nCuts];
+
 
 
   TH1D * etaBinsH = new TH1D("etaBinsH", "etaBinsH", nEtaBins, etaBins);
@@ -576,11 +589,38 @@ const    int nEtaBins = 4;
     	if (iEta<2){  
       		FakeRatePtIncLoose[iEta][iCut] = new TH1D("FakeRatePtIncLoose"+EtaBins[iEta]+Cuts[iCut],"",nPtBins,ptBins);
       		FakeRatePtIncTight[iEta][iCut] = new TH1D("FakeRatePtIncTight"+EtaBins[iEta]+Cuts[iCut],"",nPtBins,ptBins);
+
+      		FakeRatePtIncLooseUpQ[iEta][iCut] = new TH1D("FakeRatePtIncLooseUpQ"+EtaBins[iEta]+Cuts[iCut],"",nPtBins,ptBins);
+      		FakeRatePtIncTightUpQ[iEta][iCut] = new TH1D("FakeRatePtIncTightUpQ"+EtaBins[iEta]+Cuts[iCut],"",nPtBins,ptBins);
+      		FakeRatePtIncLooseDownQ[iEta][iCut] = new TH1D("FakeRatePtIncLooseDownQ"+EtaBins[iEta]+Cuts[iCut],"",nPtBins,ptBins);
+      		FakeRatePtIncTightDownQ[iEta][iCut] = new TH1D("FakeRatePtIncTightDownQ"+EtaBins[iEta]+Cuts[iCut],"",nPtBins,ptBins);
+      		FakeRatePtIncLooseCharmQ[iEta][iCut] = new TH1D("FakeRatePtIncLooseCharmQ"+EtaBins[iEta]+Cuts[iCut],"",nPtBins,ptBins);
+      		FakeRatePtIncTightCharmQ[iEta][iCut] = new TH1D("FakeRatePtIncTightCharmQ"+EtaBins[iEta]+Cuts[iCut],"",nPtBins,ptBins);
+      		FakeRatePtIncLooseStrangeQ[iEta][iCut] = new TH1D("FakeRatePtIncLooseStrangeQ"+EtaBins[iEta]+Cuts[iCut],"",nPtBins,ptBins);
+      		FakeRatePtIncTightStrangeQ[iEta][iCut] = new TH1D("FakeRatePtIncTightStrangeQ"+EtaBins[iEta]+Cuts[iCut],"",nPtBins,ptBins);
+      		FakeRatePtIncLooseBottomQ[iEta][iCut] = new TH1D("FakeRatePtIncLooseBottomQ"+EtaBins[iEta]+Cuts[iCut],"",nPtBins,ptBins);
+      		FakeRatePtIncTightBottomQ[iEta][iCut] = new TH1D("FakeRatePtIncTightBottomQ"+EtaBins[iEta]+Cuts[iCut],"",nPtBins,ptBins);
+      		FakeRatePtIncLooseGluon[iEta][iCut] = new TH1D("FakeRatePtIncLooseGluon"+EtaBins[iEta]+Cuts[iCut],"",nPtBins,ptBins);
+      		FakeRatePtIncTightGluon[iEta][iCut] = new TH1D("FakeRatePtIncTightGluon"+EtaBins[iEta]+Cuts[iCut],"",nPtBins,ptBins);
+
 	}
   
    	if (iEta>1) {
       		FakeRatePtIncLoose[iEta][iCut] = new TH1D("FakeRatePtIncLoose"+EtaBins[iEta]+Cuts[iCut],"",nPtBins2,ptBins2);
       		FakeRatePtIncTight[iEta][iCut] = new TH1D("FakeRatePtIncTight"+EtaBins[iEta]+Cuts[iCut],"",nPtBins2,ptBins2);
+
+      		FakeRatePtIncLooseUpQ[iEta][iCut] = new TH1D("FakeRatePtIncLooseUpQ"+EtaBins[iEta]+Cuts[iCut],"",nPtBins2,ptBins2);
+      		FakeRatePtIncTightUpQ[iEta][iCut] = new TH1D("FakeRatePtIncTightUpQ"+EtaBins[iEta]+Cuts[iCut],"",nPtBins2,ptBins2);
+      		FakeRatePtIncLooseDownQ[iEta][iCut] = new TH1D("FakeRatePtIncLooseDownQ"+EtaBins[iEta]+Cuts[iCut],"",nPtBins2,ptBins2);
+      		FakeRatePtIncTightDownQ[iEta][iCut] = new TH1D("FakeRatePtIncTightDownQ"+EtaBins[iEta]+Cuts[iCut],"",nPtBins2,ptBins2);
+      		FakeRatePtIncLooseCharmQ[iEta][iCut] = new TH1D("FakeRatePtIncLooseCharmQ"+EtaBins[iEta]+Cuts[iCut],"",nPtBins2,ptBins2);
+      		FakeRatePtIncTightCharmQ[iEta][iCut] = new TH1D("FakeRatePtIncTightCharmQ"+EtaBins[iEta]+Cuts[iCut],"",nPtBins2,ptBins2);
+      		FakeRatePtIncLooseStrangeQ[iEta][iCut] = new TH1D("FakeRatePtIncLooseStrangeQ"+EtaBins[iEta]+Cuts[iCut],"",nPtBins2,ptBins2);
+      		FakeRatePtIncTightStrangeQ[iEta][iCut] = new TH1D("FakeRatePtIncTightStrangeQ"+EtaBins[iEta]+Cuts[iCut],"",nPtBins2,ptBins2);
+      		FakeRatePtIncLooseBottomQ[iEta][iCut] = new TH1D("FakeRatePtIncLooseBottomQ"+EtaBins[iEta]+Cuts[iCut],"",nPtBins2,ptBins2);
+      		FakeRatePtIncTightBottomQ[iEta][iCut] = new TH1D("FakeRatePtIncTightBottomQ"+EtaBins[iEta]+Cuts[iCut],"",nPtBins2,ptBins2);
+      		FakeRatePtIncLooseGluon[iEta][iCut] = new TH1D("FakeRatePtIncLooseGluon"+EtaBins[iEta]+Cuts[iCut],"",nPtBins2,ptBins2);
+      		FakeRatePtIncTightGluon[iEta][iCut] = new TH1D("FakeRatePtIncTightGluon"+EtaBins[iEta]+Cuts[iCut],"",nPtBins2,ptBins2);
     		}
     }
 
@@ -1658,7 +1698,6 @@ if (isTight)
 	//isPFJetId =tightLepVetoJetiD(analysisTree,jet);
 
 	if (!isPFJetId) continue;
-
 	bool cleanedJet = true;
 
 	double Dr=deltaR(analysisTree.muon_eta[mu_index],analysisTree.muon_phi[mu_index],
@@ -1673,6 +1712,22 @@ if (isTight)
 
 	
 	if ( Drr < 0.2) matchedJets++;
+
+		if (Drr < 0.5 && !genTauMatched && !isData) 
+		{
+			
+	     if (analysisTree.pfjet_flavour[jet] == 21) matchedTauToGluon = true;
+
+	     if (abs(analysisTree.pfjet_flavour[jet]) == 1 ) matchedTauToDownQ = true;
+	     if (abs(analysisTree.pfjet_flavour[jet]) == 2 ) matchedTauToUpQ = true;
+	     if (abs(analysisTree.pfjet_flavour[jet]) == 3 ) matchedTauToStrangeQ = true;
+	     if (abs(analysisTree.pfjet_flavour[jet]) == 4 ) matchedTauToCharmQ = true;
+	     if (abs(analysisTree.pfjet_flavour[jet]) == 5 ) matchedTauToBottomQ = true;
+
+	     if (abs(analysisTree.pfjet_flavour[jet]) == 1 || abs(analysisTree.pfjet_flavour[jet]) == 5) matchedTauToHFQ = true;
+	     if (abs(analysisTree.pfjet_flavour[jet]) > 1 && abs(analysisTree.pfjet_flavour[jet]) < 5) matchedTauToLFQ = true;
+
+			}
 
 	if (!cleanedJet) continue;
 	JetsV.SetPxPyPzE(0.,0.,0.,0.);
@@ -1942,6 +1997,35 @@ if ((!isW && !isDY) && !isData)
       bool isTauMatched = false;
       bool isGenLeptonMatched = false;
       if (!isData){
+
+	genTauMatched = false;
+	genLeptonMatchedPromptEl = false;
+	genLeptonMatchedPromptMu = false;
+	genLeptonMatchedPromptTau = false;
+	genElMatchedToTauDecay = false;
+	genMuMatchedToTauDecay = false;
+	genTauMatchedToTauDecay = false;
+	genElMatchedHadrDecay = false;
+	genMuMatchedHadrDecay = false;
+	genTauMatchedHadrDecay = false;
+	genLeptonMatchedHFQ = false;
+	genLeptonMatchedLFQ = false;
+	genLeptonMatchedGluon =false;
+	matchedTauToPromptEl = false;
+	matchedTauToPromptMu = false;
+	matchedTauToTauDecEl =false;
+	matchedTauToTauDecMu =false;
+	matchedTauToElHadronDec = false;
+	matchedTauToMuHadronDec = false;
+	matchedTauToTauHadronDec = false;
+	matchedTauToGluon = false;
+	matchedTauToUpQ = false;
+	matchedTauToDownQ = false;
+	matchedTauToStrangeQ = false;
+	matchedTauToCharmQ = false;
+	matchedTauToBottom = false;
+	matchedTauToHFQ = false;
+	matchedTauToLFQ = false;
 	TLorentzVector genTauV;  
 	TLorentzVector genLepV;  
 
@@ -1958,7 +2042,7 @@ if ((!isW && !isDY) && !isData)
       
 	  for (unsigned int igen=0; igen<analysisTree.genparticles_count; ++igen) {
 
-      		  if ( (abs(analysisTree.genparticles_pdgid[igen])==11 || abs(analysisTree.genparticles_pdgid[igen])==13 || abs(analysisTree.genparticles_pdgid[igen])==15)){
+      		  if ( (abs(analysisTree.genparticles_pdgid[igen])==11 || abs(analysisTree.genparticles_pdgid[igen])==13 || abs(analysisTree.genparticles_pdgid[igen])==15 || abs(analysisTree.genparticles_pdgid[igen])<6 || abs(analysisTree.genparticles_pdgid[igen])==21)){
 
 	  genLepV.SetXYZT(analysisTree.genparticles_px[igen], analysisTree.genparticles_py[igen], analysisTree.genparticles_pz[igen], analysisTree.genparticles_e[igen]);
 
@@ -1975,18 +2059,20 @@ if ((!isW && !isDY) && !isData)
 		if ( abs(analysisTree.genparticles_pdgid[igen])==13 && analysisTree.genparticles_isPrompt[igen] > 0.5) genLeptonMatchedPromptMu = true;
 		if ( abs(analysisTree.genparticles_pdgid[igen])==15 && analysisTree.genparticles_isPrompt[igen] > 0.5) genLeptonMatchedPromptTau = true;
 
-		if (abs(analysisTree.genparticles_pdgid[igen])==11 && analysisTree.gentau_isDirectPromptTauDecayProduct[igen] > 0.5 ) genElMatchedToTauDecay = true;
-		if (abs(analysisTree.genparticles_pdgid[igen])==13 && analysisTree.gentau_isDirectPromptTauDecayProduct[igen] > 0.5 ) genMuMatchedToTauDecay = true;
-		if (abs(analysisTree.genparticles_pdgid[igen])==15 && analysisTree.gentau_isDirectPromptTauDecayProduct[igen] > 0.5 ) genTauMatchedToTauDecay = true;
+		if (abs(analysisTree.genparticles_pdgid[igen])==11 && analysisTree.genparticles_isDirectPromptTauDecayProduct[igen] > 0.5 ) genElMatchedToTauDecay = true;
+		if (abs(analysisTree.genparticles_pdgid[igen])==13 && analysisTree.genparticles_isDirectPromptTauDecayProduct[igen] > 0.5 ) genMuMatchedToTauDecay = true;
+		if (abs(analysisTree.genparticles_pdgid[igen])==15 && analysisTree.genparticles_isDirectPromptTauDecayProduct[igen] > 0.5 ) genTauMatchedToTauDecay = true;
 		
-		if (abs(analysisTree.genparticles_pdgid[igen])==11 && analysisTree.gentau_isDirectHadronDecayProduct[igen] > 0.5 ) genElMatchedHadrDecay = true;
-		if (abs(analysisTree.genparticles_pdgid[igen])==13 && analysisTree.gentau_isDirectHadronDecayProduct[igen] > 0.5 ) genMuMatchedHadrDecay = true;
-		if (abs(analysisTree.genparticles_pdgid[igen])==15 && analysisTree.gentau_isDirectHadronDecayProduct[igen] > 0.5 ) genTauMatchedHadrDecay = true;
+		if (abs(analysisTree.genparticles_pdgid[igen])==11 && analysisTree.genparticles_isDirectHadronDecayProduct[igen] > 0.5 ) genElMatchedHadrDecay = true;
+		if (abs(analysisTree.genparticles_pdgid[igen])==13 && analysisTree.genparticles_isDirectHadronDecayProduct[igen] > 0.5 ) genMuMatchedHadrDecay = true;
+		if (abs(analysisTree.genparticles_pdgid[igen])==15 && analysisTree.genparticles_isDirectHadronDecayProduct[igen] > 0.5 ) genTauMatchedHadrDecay = true;
 		
 		if ( (abs(analysisTree.genparticles_pdgid[igen])==1 || abs(analysisTree.genparticles_pdgid[igen])==5) && analysisTree.genparticles_isDirectHadronDecayProduct[igen] > 0.5) genLeptonMatchedHFQ = true;
 	
 		if ( (abs(analysisTree.genparticles_pdgid[igen])==2 || abs(analysisTree.genparticles_pdgid[igen])==3 || abs(analysisTree.genparticles_pdgid[igen])==4) && analysisTree.genparticles_isDirectHadronDecayProduct[igen] > 0.5) genLeptonMatchedLFQ = true;
 		if ( (abs(analysisTree.genparticles_pdgid[igen])==21 ) && analysisTree.genparticles_isDirectHadronDecayProduct[igen] > 0.5) genLeptonMatchedGluon = true;
+
+
 
 		}
 
@@ -2043,6 +2129,13 @@ if ((!isW && !isDY) && !isData)
       iCutL++;
 	      if (met>40){
 
+if (matchedTauToDownQ) FakeRatePtIncLooseDownQ[etaBin][0]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+if (matchedTauToUpQ) FakeRatePtIncLooseUpQ[etaBin][0]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+if (matchedTauToStrangeQ) FakeRatePtIncLooseStrangeQ[etaBin][0]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+if (matchedTauToCharmQ) FakeRatePtIncLooseCharmQ[etaBin][0]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+if (matchedTauToBottomQ) FakeRatePtIncLooseBottomQ[etaBin][0]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+if (matchedTauToGluon) FakeRatePtIncLooseGluon[etaBin][0]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+
 	    FakeRatePtIncLoose[etaBin][0]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
 	    hRatioSum1L->Fill(RatioSums,weight);
 	    hMTCut1L->Fill(MT,weight);
@@ -2054,6 +2147,14 @@ if ((!isW && !isDY) && !isData)
       iCutL++;
 
 	  if (MTb ){ 
+
+if (matchedTauToDownQ) FakeRatePtIncLooseDownQ[etaBin][1]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+if (matchedTauToUpQ) FakeRatePtIncLooseUpQ[etaBin][1]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+if (matchedTauToStrangeQ) FakeRatePtIncLooseStrangeQ[etaBin][1]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+if (matchedTauToCharmQ) FakeRatePtIncLooseCharmQ[etaBin][1]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+if (matchedTauToBottomQ) FakeRatePtIncLooseBottomQ[etaBin][1]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+if (matchedTauToGluon) FakeRatePtIncLooseGluon[etaBin][1]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+
 	    FakeRatePtIncLoose[etaBin][1]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
 	    hRatioSum2L->Fill(RatioSums,weight);
 	    hMTCut2L->Fill(MT,weight);
@@ -2066,6 +2167,14 @@ if ((!isW && !isDY) && !isData)
       iCutL++;
 
 	    if (dPhiW > 2.5){
+
+if (matchedTauToDownQ) FakeRatePtIncLooseDownQ[etaBin][2]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+if (matchedTauToUpQ) FakeRatePtIncLooseUpQ[etaBin][2]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+if (matchedTauToStrangeQ) FakeRatePtIncLooseStrangeQ[etaBin][2]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+if (matchedTauToCharmQ) FakeRatePtIncLooseCharmQ[etaBin][2]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+if (matchedTauToBottomQ) FakeRatePtIncLooseBottomQ[etaBin][2]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+if (matchedTauToGluon) FakeRatePtIncLooseGluon[etaBin][2]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+
 	    FakeRatePtIncLoose[etaBin][2]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
 	    hRatioSum3L->Fill(RatioSums,weight);
 	    hMTCut3L->Fill(MT,weight);
@@ -2078,6 +2187,14 @@ if ((!isW && !isDY) && !isData)
 
 	//if (RatioSums < 0.3 ) {
 	if (countjets<3 ) {
+
+if (matchedTauToDownQ) FakeRatePtIncLooseDownQ[etaBin][3]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+if (matchedTauToUpQ) FakeRatePtIncLooseUpQ[etaBin][3]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+if (matchedTauToStrangeQ) FakeRatePtIncLooseStrangeQ[etaBin][3]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+if (matchedTauToCharmQ) FakeRatePtIncLooseCharmQ[etaBin][3]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+if (matchedTauToBottomQ) FakeRatePtIncLooseBottomQ[etaBin][3]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+if (matchedTauToGluon) FakeRatePtIncLooseGluon[etaBin][3]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+
 	    FakeRatePtIncLoose[etaBin][3]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
 	    hRatioSum4L->Fill(RatioSums,weight);
 	    hMTCut4L->Fill(MT,weight);
@@ -2113,6 +2230,13 @@ if ((!isW && !isDY) && !isData)
       iCutT++;
 
 		if (met>40){
+if (matchedTauToDownQ) FakeRatePtIncTightDownQ[etaBin][0]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+if (matchedTauToUpQ) FakeRatePtIncTightUpQ[etaBin][0]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+if (matchedTauToStrangeQ) FakeRatePtIncTightStrangeQ[etaBin][0]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+if (matchedTauToCharmQ) FakeRatePtIncTightCharmQ[etaBin][0]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+if (matchedTauToBottomQ) FakeRatePtIncTightBottomQ[etaBin][0]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+if (matchedTauToGluon) FakeRatePtIncTightGluon[etaBin][0]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+
 	    FakeRatePtIncTight[etaBin][0]->Fill(analysisTree.tau_pt[(int)tau_loose],weight);
 	    hRatioSum1T->Fill(RatioSums,weight);
 	    hMTCut1T->Fill(MT,weight);
@@ -2125,6 +2249,12 @@ if ((!isW && !isDY) && !isData)
       iCutT++;
 
 	    if (MTb ){ 
+if (matchedTauToDownQ) FakeRatePtIncTightDownQ[etaBin][1]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+if (matchedTauToUpQ) FakeRatePtIncTightUpQ[etaBin][1]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+if (matchedTauToStrangeQ) FakeRatePtIncTightStrangeQ[etaBin][1]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+if (matchedTauToCharmQ) FakeRatePtIncTightCharmQ[etaBin][1]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+if (matchedTauToBottomQ) FakeRatePtIncTightBottomQ[etaBin][1]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+if (matchedTauToGluon) FakeRatePtIncTightGluon[etaBin][1]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
 	    FakeRatePtIncTight[etaBin][1]->Fill(analysisTree.tau_pt[(int)tau_loose],weight);
 	    hRatioSum2T->Fill(RatioSums,weight);
 	    hMTCut2T->Fill(MT,weight);
@@ -2137,6 +2267,13 @@ if ((!isW && !isDY) && !isData)
       iCutT++;
 
 	      if (dPhiW > 2.5){
+if (matchedTauToDownQ) FakeRatePtIncTightDownQ[etaBin][2]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+if (matchedTauToUpQ) FakeRatePtIncTightUpQ[etaBin][2]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+if (matchedTauToStrangeQ) FakeRatePtIncTightStrangeQ[etaBin][2]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+if (matchedTauToCharmQ) FakeRatePtIncTightCharmQ[etaBin][2]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+if (matchedTauToBottomQ) FakeRatePtIncTightBottomQ[etaBin][2]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+if (matchedTauToGluon) FakeRatePtIncTightGluon[etaBin][2]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+
 	    FakeRatePtIncTight[etaBin][2]->Fill(analysisTree.tau_pt[(int)tau_loose],weight);
 	    hRatioSum3T->Fill(RatioSums,weight);
 	    hMTCut3T->Fill(MT,weight);
@@ -2150,6 +2287,12 @@ if ((!isW && !isDY) && !isData)
 
 	//  if (RatioSums < 0.3 ) {
 	if (countjets<3 ) {
+if (matchedTauToDownQ) FakeRatePtIncTightDownQ[etaBin][3]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+if (matchedTauToUpQ) FakeRatePtIncTightUpQ[etaBin][3]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+if (matchedTauToStrangeQ) FakeRatePtIncTightStrangeQ[etaBin][3]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+if (matchedTauToCharmQ) FakeRatePtIncTightCharmQ[etaBin][3]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+if (matchedTauToBottomQ) FakeRatePtIncTightBottomQ[etaBin][3]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+if (matchedTauToGluon) FakeRatePtIncTightGluon[etaBin][3]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
 
 	    FakeRatePtIncTight[etaBin][3]->Fill(analysisTree.tau_pt[(int)tau_loose],weight);
 	    hRatioSum4T->Fill(RatioSums,weight);

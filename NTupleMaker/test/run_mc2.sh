@@ -38,7 +38,6 @@ systematics="$3"
 if [[ $3 == "all" || $3 == "All"  || $3 == "list" ]];then
 #systematics="Nominal JetEnUp JetEnDown TauEnUp TauEnDown ElEnUp ElEnDown MuEnUp MuEnDown UnclEnUp UnclEnDown"
 systematics="Nominal JetEnUp JetEnDown TauEnUp TauEnDown ElEnUp ElEnDown MuEnUp MuEnDown UnclEnUp UnclEnDown BTagUp BTagDown"
-systematics="Nominal JetEnUp JetEnDown TauEnUp TauEnDown ElEnUp ElEnDown MuEnUp MuEnDown UnclEnUp UnclEnDown BTagUp BTagDown"
 #systematics="Nominal JetEnUp JetEnDown ElEnUp ElEnDown MuEnUp MuEnDown UnclEnUp UnclEnDown BTagUp BTagDown"
 #systematics="JetEnUp JetEnDown UnclEnUp UnclEnDown"
 
@@ -66,19 +65,27 @@ fi
 while read line
 do
 
-ct=`ls ${dir}/${line}_*.root | wc -l`
+if [[ $line != *"C1"* ]] ; then
+ct=`ls ${dir}/${line}_[0-9]*_B_OS.root | wc -l`
+
+else
+ct=`ls ${dir}/${line}_B_OS.root | wc -l`
+
+fi
+
+
 ctt=`cat ${dir}/${line} | wc -l`
 
 
 echo There are  $ct out of $ctt for $line in $dir dir for systematic $syst
 
-#if [[ $ct -ge $ctt ]] ;then
-#	continue;
-#fi
+if [[ $ct -ge $ctt ]] ;then
+	continue;
+fi
 
-unset xsec
-xsec=`grep " ${line} " xsecs | cut -d " " -f3-4`	
-#xsec=1
+#unset xsec
+#xsec=`grep " ${line} " xsecs | cut -d " " -f3-4`	
+xsec=1
 #echo FOUND XSEC for ${line} to be $xsec
 unset f
 while read f

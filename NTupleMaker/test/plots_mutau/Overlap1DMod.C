@@ -41,6 +41,8 @@ TString signalnames[1500];
 TString variable;
 TString syst_;
 TString Channel="mutau";
+string sign_="C1";
+string sign2_="stau";
 
 
 void Impose( TDirectory *ttarget, TList *ssourcelist, string &np_legend , vector<string> titles_ ,vector<float> xsecs);
@@ -111,16 +113,46 @@ void Overlap1DMod(string syst="Nominal", string reg="SR")
 		float xs,fact,fact2,fact3;
 		xs=0;fact=1;fact2=1;fact3=1;
 		iss >> dataname >> xs >> fact >> fact2 >> fact3;
-		if (std::string::npos != dataname.find("Single") || std::string::npos != dataname.find("MuonEG") || syst=="Nominal" ) {titles.push_back(dataname+"_B.root");}
+
+		if (std::string::npos != dataname.find("Single") || std::string::npos != dataname.find("MuonEG") || syst=="Nominal" ) {
+			
+		//	cout<<" Data filename and syst Nominal "<<endl;
+			titles.push_back(dataname+"_B.root");
+			}
+		
+		else if (std::string::npos == dataname.find("C1") && std::string::npos == dataname.find("Chi") && (syst=="METUp" || syst=="METDown" ) ) {
+			
+		//	cout<<" Non signal filename and syst METUp or METDown "<<endl;
+			
+			titles.push_back(dataname+"_B.root");
+		}
+
+		else if (  (syst =="TopPtUp" || syst =="TopPtDown" || syst =="ZPtUp" || syst =="ZPtDown" || syst =="METRecoilUp" || syst =="METRecoilDown" ||  syst =="TFRJetEnUp" ||  syst =="TFRJetEnDown" ||  syst =="TFRMuEnUp" ||  syst =="TFRMuEnDown" ||  syst =="TFRTauEnUp" ||  syst =="TFRTauEnDown")  && 
+				
+				(std::string::npos != dataname.find("C1") || std::string::npos != dataname.find("Chi") || std::string::npos != dataname.find("stau")) ) {
+			
+			
+		//	cout<<" Data filename and syst Top/ZpT/METRecoil "<<endl;
+			titles.push_back(dataname+"_B.root");}
+/*
+		else if (  (syst =="METRecoilUp" || syst =="METRecoilDown")  && 
+				
+				(std::string::npos == dataname.find("JetsToLL") && std::string::npos == dataname.find("JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM") ) ) {
+			
+		//	cout<<" Data filename and syst Top/ZpT/METRecoil "<<endl;
+			titles.push_back(dataname+"_B.root");}
+*/			
+
 		else { titles.push_back(dataname+"_"+syst+"_B.root"); 
+
+		//	cout<<" Everything else case "<<endl;
 		}
 		
-		//titles.push_back(dirr+dataname+"_"+syst+"_B.root"); 
-		//cout<<dataname+"_"+syst+"_B.root"<<endl;
 
+		//titles.push_back(dirr+dataname+"_"+syst+"_B.root"); 
 		//titles.push_back(dataname+"_B.root");
 		XSec= xs*fact*fact2*fact3;
-		//cout<<" Found the correct cross section "<<xs<<" for Dataset "<<dataname<<" XSec "<<XSec<<"  "<<fact<<"  "<<fact2<<endl;
+		cout<<" Found the correct cross section "<<xs<<" for Dataset "<<dataname<<" XSec "<<XSec<<"  "<<fact<<"  "<<fact2<<endl;
 		xsecs_.push_back(XSec);
 	}
 
@@ -138,13 +170,11 @@ void Overlap1DMod(string syst="Nominal", string reg="SR")
 
 	}
 
-	string sign_="C1";
-	string sign2_="stau";
 	string n_;
 	//signal_names.clear();
 	for (unsigned int k=0; k<titles.size();k++)
 	{
-		if (   std::string::npos != titles[k].find(sign_) ||  std::string::npos != titles[k].find(sign2_)){
+		if (   std::string::npos != titles[k].find(sign_) ||  std::string::npos != titles[k].find(sign2_)  || std::string::npos != titles[k].find("Chi")){
 			n_ = titles[k];
 			n_.erase(n_.length()-5);
 			//string nn_ = n_+"_out.root";
@@ -223,7 +253,6 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 	//TIter nextkey (((TDirectory *) current_sourcedir->Get ("ana"))->GetListOfKeys ());
 	TKey *key, *oldkey = 0;
 			TH1D* hh[1500];
-			TH1D* hsignal[1500];
 	while ((key = (TKey *) nextkey ())) {
 
 	int count=0;
@@ -292,7 +321,7 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 
 				bool flagg= false;
 
-				if (std::string::npos != fname.find(sn) || std::string::npos != fname.find(cc1) || std::string::npos != fname.find(sdata)    ) 	flagg=true;
+				if (std::string::npos != fname.find(sn) || std::string::npos != fname.find(cc1) || std::string::npos != fname.find(sdata)   || std::string::npos != fname.find("Chi") ) 	flagg=true;
 
 				nextsource->cd(Channel);
 				TH1D* eventCountt ;
@@ -379,7 +408,7 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 
 
 
-							//cout<<" will add histogram "<<h2->GetName()<< " for "<<titles[cl-1]<<"  "<<fname<<"  cl  "<<cl<<endl;
+						//	cout<<" will add histogram "<<h2->GetName()<< " for "<<titles[cl-1]<<"  "<<fname<<"  cl  "<<cl<<endl;
 							hs->Add(h2);
 							//allbkg->Add(h2,1);
 						}
@@ -405,6 +434,7 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 		TH1D* htest_qcd;
 		TH1D* htest_ttx;
 		TH1D* htest_signal;
+		TH1D* htest_signal2;
 		TH1D* htest_data;
 		TH1D* htest_ww;
 
@@ -453,7 +483,7 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 				allbkg->SetName(s1);
 				cout<<" Total Integral before scaling up - "<<allbkg->GetSumOfWeights()<<" Data "<<variable<<" data "<<hh[1]->GetSumOfWeights()<<" tt "<<
 					htt->GetSumOfWeights()<<" dy "<<hdyj->GetSumOfWeights()<<" wj "<<hwj->GetSumOfWeights()<<" stop "<<hstop->GetSumOfWeights()<<
-					" vv"<<hdib->GetSumOfWeights()+hww->GetSumOfWeights()<<" qcd "<<hqcd->GetSumOfWeights()<<" ttx "<<httx->GetSumOfWeights()<<endl;
+					" dib "<<hdib->GetSumOfWeights()<<" ww "<<hww->GetSumOfWeights()<<" qcd "<<hqcd->GetSumOfWeights()<<" ttx "<<httx->GetSumOfWeights()<<endl;
 	if(b_scale)		allbkg->Scale(scale);
 				cout<<" Total Integral after scaling up - "<<allbkg->GetSumOfWeights()<<"  "<<variable<<"  all_  "<<all_->GetSumOfWeights()<<endl;
 				allbkg->Write();
@@ -464,7 +494,7 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 				TString textfilename ="bins_"+region;
 				vector <int> keep_bin;keep_bin.clear();
 				vector <string> label_bin;label_bin.clear();
-			 if (syst=="NominalL"){
+			 if (syst=="Nominall"){
 				tfile.open(textfilename);
 				//tfile.open("bins_"+region);
 				for (int nb=1;nb<=all_->GetNbinsX();++nb){
@@ -664,7 +694,7 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 				hqcd->Scale(scale);
 				httx->Scale(scale);
 	 }
-
+/*
 				htt->SetMinimum(0.1);
 				hdyj->SetMinimum(0.1);
 				hztt->SetMinimum(0.1);
@@ -674,23 +704,27 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 				hdib->SetMinimum(0.1);
 				hww->SetMinimum(0.1);
 				hqcd->SetMinimum(0.1);
-
+*/
 				s1 = "tt_"+variable;
+				CheckHistZero(htt);
 				htt->SetLineColor(kBlack);
 				htt->SetName(s1);
 				htt->Write();
 
 				s1 = "wj_"+variable;
+				CheckHistZero(hwj);
 				hwj->SetLineColor(kBlack);
 				hwj->SetName(s1);
 				hwj->Write();
 
 				s1 = "dyj_"+variable;
+				CheckHistZero(hdyj);
 				hdyj->SetLineColor(kBlack);
 				hdyj->SetName(s1);
 				hdyj->Write();
 
 				s1 = "ztt_"+variable;
+				CheckHistZero(hztt);
 				hztt->SetLineColor(kBlack);
 				hztt->SetName(s1);
 				hztt->Write();
@@ -740,7 +774,7 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 				hh[1]->SetName(s1);
 				hh[1]->Write();
 
-				cout<<" comparing MC to data  , syst "<<syst<<"  MC "<<allnew_->GetSumOfWeights()<<"  data  "<<hh[1]->GetSumOfWeights()<<" tt "<<htt->GetSumOfWeights()<<"  "<<" wj "<<hwj->GetSumOfWeights()<<" dyj "<<hdyj->GetSumOfWeights()+hztt->GetSumOfWeights()<<" qcd "<<hqcd->GetSumOfWeights()<<" sT "<<hstop->GetSumOfWeights()<<" dib "<<hdib->GetSumOfWeights()<<" ttx "<<httx->GetSumOfWeights()<<endl;
+				cout<<" comparing MC to data  , syst "<<syst<<"  MC "<<allnew_->GetSumOfWeights()<<"  data  "<<hh[1]->GetSumOfWeights()<<" tt "<<htt->GetSumOfWeights()<<"  "<<" wj "<<hwj->GetSumOfWeights()<<" dyj "<<hdyj->GetSumOfWeights()+hztt->GetSumOfWeights()<<" qcd "<<hqcd->GetSumOfWeights()<<" sT "<<hstop->GetSumOfWeights()<<" dib "<<hdib->GetSumOfWeights()<<" ttx "<<httx->GetSumOfWeights()<<" ww "<<hww->GetSumOfWeights()<<endl;
 
 				for (unsigned int ij=0;ij<signal_names.size();++ij){
 					//cout<<" again  "<<signal_names[ij]<<endl;
@@ -763,6 +797,7 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 					smFile->cd();
 				
 					htest_signal = new TH1D (hh[ij+2]->GetName(),hh[ij+2]->GetTitle(),sb_,1,sb_+1);
+
 
 				for (int nbb=0;nbb<keep_bin.size();++nbb){
 					htest_signal->SetBinContent(nbb+1,hh[ij+2]->GetBinContent(keep_bin[nbb]));
@@ -828,7 +863,7 @@ ModifyHist (TH1D* &h, int cl_ ,float & lumi,float & weight,string & title_, bool
 			}
 
 
-			if ( std::string::npos != title_.find("tau") || std::string::npos != title_.find("C1") || std::string::npos != title_.find("SMS")){
+			if ( std::string::npos != title_.find("tau") || std::string::npos != title_.find("C1") || std::string::npos != title_.find("SMS") || std::string::npos != title_.find("Chi")){
 
 				if (cl_>9) col=30+cl_;
 				col=cl_+1;
@@ -895,10 +930,10 @@ CheckHistZero (TH1D* &h)
 			for (int nb=0;nb<=h->GetNbinsX();++nb)
 			{
 				float bc_ = h->GetBinContent(nb);
-			if (bc_ <0) h->SetBinContent(nb,0.001);
+			if (bc_ <=0.) h->SetBinContent(nb,0.001);
 			float SoW = h->GetSumOfWeights();
 			int En = h->GetEntries();
-			if (bc_ <0) h->SetBinError(nb,float(SoW/En));
+			if (bc_ <=0.) h->SetBinError(nb,float(SoW/En));
 			}
 
 

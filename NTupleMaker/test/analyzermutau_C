@@ -447,9 +447,11 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
 		iCut++;
 
 
-		string WP = "MVA";
-		double tfr  = TauFakeRate(ptTau1,etaTau1,channel,WP);
+		//string WP = systematic;
+		double tfr  = TauFakeRate(ptTau1,etaTau1,channel,systematic);
 		if (!isRealTau && isfakeTauFromJet  && !isData) all_weights *= tfr;
+
+
 		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index,isSignal);
 		CFCounter[iCut]+= all_weights;
 		CFCounter_[iCut]+= all_weights;

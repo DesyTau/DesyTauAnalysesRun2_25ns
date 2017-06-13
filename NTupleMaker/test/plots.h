@@ -121,65 +121,224 @@ float SF = 1.;
 
 //80x MVAid
 
-if ( working_point == "MVA"){
-/*
+
+if ( working_point == "TFRJetEnUp"){
+
 if (  fabs(eta) < 0.8 )
         {
-                if (pt>20 && pt<30) SF = 0.965212;
-                if (pt>30 && pt<40) SF = 0.934714;
-                if (pt>40 ) SF = 0.833209;
+                if (pt>20 && pt<30) SF = 1.13395;
+                if (pt>30 && pt<40) SF = 1.12674;
+                if (pt>40 ) SF = 1.28658;
         }
 if (  fabs(eta) > 0.8 && fabs(eta) < 1.44 )
         {
 
-                if (pt>20 && pt<30) SF = 1.0795;
-                if (pt>30 && pt<40) SF = 1.0543;
-                if (pt>40 ) SF = 0.999562;
+                if (pt>20 && pt<30) SF = 1.12286;
+                if (pt>30 && pt<40) SF = 1.22019;
+                if (pt>40 ) SF = 1.05257;
         }
 
 if (  fabs(eta) > 1.44 && fabs(eta) < 1.566 )
         {
 
-                if (pt>20 && pt<40) SF = 1.17946;
-                if (pt>40) SF = 1.18639;
+                if (pt>20 && pt<40) SF = 0.976482;
+                if (pt>40) SF = 2.1966;
         }
 if (  fabs(eta) > 1.566 && fabs(eta) < 2.3 )
         {
 
-                if (pt>20 && pt<30) SF = 1.07492;
-                if (pt>30 && pt<40) SF = 1.0993;
-                if (pt>40) SF = 1.04831;
-        }
-*/
-if (  fabs(eta) < 0.8 )
-        {
-                if (pt>20 && pt<30) SF = 1.12667;
-                if (pt>30 && pt<40) SF = 1.01797;
-                if (pt>40 ) SF = 0.961579;
-        }
-if (  fabs(eta) > 0.8 && fabs(eta) < 1.44 )
-        {
-
-                if (pt>20 && pt<30) SF = 1.12562;
-                if (pt>30 && pt<40) SF = 1.0851;
-                if (pt>40 ) SF = 0.833426;
-        }
-
-if (  fabs(eta) > 1.44 && fabs(eta) < 1.566 )
-        {
-
-                if (pt>20 && pt<40) SF = 0.906648;
-                if (pt>40) SF = 1.69806;
-        }
-if (  fabs(eta) > 1.566 && fabs(eta) < 2.3 )
-        {
-
-                if (pt>20 && pt<40) SF = 0.876024;
-                if (pt>40) SF = 0.921834;
+                if (pt>20 && pt<40) SF = 0.896117;
+                if (pt>40) SF = 1.07363;
         }
 
 }//mutau MVA
 
+
+else if ( working_point == "TFRJetEnDown"){
+if (  fabs(eta) < 0.8 )
+        {
+                if (pt>20 && pt<30) SF = 1.16832;
+                if (pt>30 && pt<40) SF = 1.13744;
+                if (pt>40 ) SF = 1.27319;
+        }
+if (  fabs(eta) > 0.8 && fabs(eta) < 1.44 )
+        {
+
+                if (pt>20 && pt<30) SF = 1.15464;
+                if (pt>30 && pt<40) SF = 1.17642;
+                if (pt>40 ) SF = 1.16929;
+        }
+
+if (  fabs(eta) > 1.44 && fabs(eta) < 1.566 )
+        {
+
+                if (pt>20 && pt<40) SF = 1.13535;
+                if (pt>40) SF = 2.70057;
+        }
+if (  fabs(eta) > 1.566 && fabs(eta) < 2.3 )
+        {
+
+                if (pt>20 && pt<40) SF = 0.914509;
+                if (pt>40) SF = 1.11113;
+        }
+
+}//mutau MVA
+
+
+
+else if ( working_point == "TFRTauEnUp"){
+if (  fabs(eta) < 0.8 )
+        {
+                if (pt>20 && pt<30) SF = 1.09872;
+                if (pt>30 && pt<40) SF = 0.961079;
+                if (pt>40 ) SF = 0.897534;
+        }
+if (  fabs(eta) > 0.8 && fabs(eta) < 1.44 )
+        {
+
+                if (pt>20 && pt<30) SF = 1.07447;
+                if (pt>30 && pt<40) SF = 1.04198;
+                if (pt>40 ) SF = 0.741901;
+        }
+
+if (  fabs(eta) > 1.44 && fabs(eta) < 1.566 )
+        {
+
+                if (pt>20 && pt<40) SF = 0.888785;
+                if (pt>40) SF = 1.20708;
+        }
+if (  fabs(eta) > 1.566 && fabs(eta) < 2.3 )
+        {
+
+                if (pt>20 && pt<40) SF = 0.837741;
+                if (pt>40) SF = 0.902976;
+        }
+
+}//mutau MVA
+
+
+else if ( working_point == "TFRTauEnDown"){
+if (  fabs(eta) < 0.8 )
+        {
+                if (pt>20 && pt<30) SF = 1.18576;
+                if (pt>30 && pt<40) SF = 1.04045;
+                if (pt>40 ) SF = 1.14634;
+        }
+if (  fabs(eta) > 0.8 && fabs(eta) < 1.44 )
+        {
+
+                if (pt>20 && pt<30) SF = 1.16617;
+                if (pt>30 && pt<40) SF = 1.18176;
+                if (pt>40 ) SF = 0.864892;
+        }
+
+if (  fabs(eta) > 1.44 && fabs(eta) < 1.566 )
+        {
+
+                if (pt>20 && pt<40) SF = 1.05005;
+                if (pt>40) SF = 1.94742;
+        }
+if (  fabs(eta) > 1.566 && fabs(eta) < 2.3 )
+        {
+
+                if (pt>20 && pt<40) SF = 0.912782;
+                if (pt>40) SF = 0.950736;
+        }
+
+}//mutau MVA
+
+
+else if ( working_point == "TFRMuEnUp"){
+if (  fabs(eta) < 0.8 )
+        {
+                if (pt>20 && pt<30) SF = 1.11923;
+                if (pt>30 && pt<40) SF = 1.02944;
+                if (pt>40 ) SF = 0.96733;
+        }
+if (  fabs(eta) > 0.8 && fabs(eta) < 1.44 )
+        {
+
+                if (pt>20 && pt<30) SF = 1.1246;
+                if (pt>30 && pt<40) SF = 1.07141;
+                if (pt>40 ) SF = 0.844204;
+        }
+
+if (  fabs(eta) > 1.44 && fabs(eta) < 1.566 )
+        {
+
+                if (pt>20 && pt<40) SF = 0.908234;
+                if (pt>40) SF = 1.77257;
+        }
+if (  fabs(eta) > 1.566 && fabs(eta) < 2.3 )
+        {
+
+                if (pt>20 && pt<40) SF = 0.87063;
+                if (pt>40) SF = 0.92934;
+        }
+
+}//mutau MVA
+
+
+else if ( working_point == "TFRMuEnDown"){
+if (  fabs(eta) < 0.8 )
+        {
+                if (pt>20 && pt<30) SF = 1.12687;
+                if (pt>30 && pt<40) SF = 1.00911;
+                if (pt>40 ) SF = 0.958254;
+        }
+if (  fabs(eta) > 0.8 && fabs(eta) < 1.44 )
+        {
+
+                if (pt>20 && pt<30) SF = 1.12647;
+                if (pt>30 && pt<40) SF = 1.10256;
+                if (pt>40 ) SF = 0.841932;
+        }
+
+if (  fabs(eta) > 1.44 && fabs(eta) < 1.566 )
+        {
+
+                if (pt>20 && pt<40) SF = 0.900177;
+                if (pt>40) SF = 1.80231;
+        }
+if (  fabs(eta) > 1.566 && fabs(eta) < 2.3 )
+        {
+
+                if (pt>20 && pt<40) SF = 0.875394;
+                if (pt>40) SF = 0.911063;
+        }
+
+}//mutau MVA
+
+
+else {
+if (  fabs(eta) < 0.8 )
+        {
+                if (pt>20 && pt<30) SF = 1.12667;
+                if (pt>30 && pt<40) SF = 1.0178;
+                if (pt>40 ) SF = 0.961808;
+        }
+if (  fabs(eta) > 0.8 && fabs(eta) < 1.44 )
+        {
+
+                if (pt>20 && pt<30) SF = 1.12651;
+                if (pt>30 && pt<40) SF = 1.08668;
+                if (pt>40 ) SF = 0.832438;
+        }
+
+if (  fabs(eta) > 1.44 && fabs(eta) < 1.566 )
+        {
+
+                if (pt>20 && pt<40) SF = 0.907089;
+                if (pt>40) SF = 1.70447;
+        }
+if (  fabs(eta) > 1.566 && fabs(eta) < 2.3 )
+        {
+
+                if (pt>20 && pt<40) SF = 0.875675;
+                if (pt>40) SF = 0.91729;
+        }
+
+}//mutau MVA
 
 return SF;
 

@@ -823,6 +823,18 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	    histWeightsPDFDown->Fill(0.,analysisTree.genweight*analysisTree.weightPDFdown);
 
 	    lumi=true;
+            wScale0 = analysisTree.weightScale0;
+            wScale1 = analysisTree.weightScale1;
+  	    wScale2 = analysisTree.weightScale2;
+            wScale3 = analysisTree.weightScale3;
+            wScale4 = analysisTree.weightScale4;
+            wScale5 = analysisTree.weightScale5;
+            wScale6 = analysisTree.weightScale6;
+            wScale7 = analysisTree.weightScale7;
+            wScale8 = analysisTree.weightScale8;
+            wPDFUp = analysisTree.weightPDFup;
+            wPDFDown = analysisTree.weightPDFdown;
+
 	  }
 	
 
@@ -1865,17 +1877,6 @@ if (!CutBasedTauId){
 
 
 
-       wScale0 = analysisTree.weightScale0;
-       wScale1 = analysisTree.weightScale1;
-       wScale2 = analysisTree.weightScale2;
-       wScale3 = analysisTree.weightScale3;
-       wScale4 = analysisTree.weightScale4;
-       wScale5 = analysisTree.weightScale5;
-       wScale6 = analysisTree.weightScale6;
-       wScale7 = analysisTree.weightScale7;
-       wScale8 = analysisTree.weightScale8;
-       wPDFUp = analysisTree.weightPDFup;
-       wPDFDown = analysisTree.weightPDFdown;
 
       T->Fill();
 	
