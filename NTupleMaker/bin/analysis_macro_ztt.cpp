@@ -30,13 +30,24 @@
 #include "DesyTauAnalyses/NTupleMaker/interface/PileUp.h"
 #include "HTT-utilities/RecoilCorrections/interface/RecoilCorrector.h"
 #include "HTT-utilities/RecoilCorrections/interface/MEtSys.h"
-
+#include "TSystem.h"
 
 #include "RooWorkspace.h"
 #include "RooAbsReal.h"
 #include "RooRealVar.h"
 
 using namespace std;
+void computeDzeta(float metX,  float metY,
+                  float zetaX, float zetaY,
+                  float pzetavis,
+                  float & pzetamiss,
+                  float & dzeta) {
+    
+    pzetamiss = metX*zetaX + metY*zetaY;
+    dzeta = pzetamiss - 0.85*pzetavis;
+    
+}
+
 double PtoEta(double Px, double Py, double Pz) {
 
   double P = TMath::Sqrt(Px*Px+Py*Py+Pz*Pz);
@@ -211,6 +222,11 @@ int main(int argc, char * argv[]) {
   const bool isTOP  = cfg.get<bool>("IsTOP");
   const bool isDY   = cfg.get<bool>("IsDY");
   const bool isW    = cfg.get<bool>("IsW");
+  const bool isZTT  = cfg.get<bool>("IsZTT");
+
+  const bool applyGoodRunSelection = cfg.get<bool>("ApplyGoodRunSelection");
+  const string jsonFile = cfg.get<string>("jsonFile");
+
   
   // kinematic cuts on muons
   const float ptMuonCut      = cfg.get<float>("ptMuonLowCut");
@@ -241,9 +257,6 @@ int main(int argc, char * argv[]) {
   const float jetPtCut  = cfg.get<float>("jetPtCut");
   const float deltaRJetLeptonCut = cfg.get<float>("deltaRJetLeptonCut");
 
-  const bool applyGoodRunSelection = cfg.get<bool>("ApplyGoodRunSelection");
-  const string jsonFile = cfg.get<string>("jsonFile");
-
   // trigger
   const bool applyTriggerMatch = cfg.get<bool>("ApplyTriggerMatch");
   const string singleMuonTriggerName = cfg.get<string>("SingleMuonTriggerName");
@@ -266,8 +279,6 @@ int main(int argc, char * argv[]) {
 
   const string recoilFileName = cfg.get<string>("RecoilFileName");
   TString RecoilFileName(recoilFileName);
-
-  const bool applyRecoilCorrections = cfg.get<bool>("ApplyRecoilCorrections");
 
   // ********** end of configuration *******************
 
@@ -421,15 +432,82 @@ int main(int argc, char * argv[]) {
   TH1D * muTrigWeightH = new TH1D("muTrigWeightH","",100,0,2);
   TH1D * muIdWeightH = new TH1D("muIdWeightH","",100,0,2);
   TH1D * histWeightsH = new TH1D("histWeightsH","",1,0.,2.);
+  //TH1D * histWeightsH = (TH1D*)file->Get("makeroottree/histWeightsH");
 
   // histograms after final selection
-  TH1D * ptMuonH = new TH1D("ptLeadingMuH","",400,0,400);
-  TH1D * etaMuonH = new TH1D("ptTrailingMuH","",400,0,400);
-  TH1D * ptTrkH = new TH1D("ptLeadingMuH","",400,0,400);
-  TH1D * etaTrkH = new TH1D("ptTrailingMuH","",400,0,400);
+  TH1D * ptMuonH         = new TH1D("ptMuonH","",100,0,500);
+  TH1D * ptMuonH_2p5to5  = new TH1D("ptMuonH_2p5to5","",100,0,500);
+  TH1D * ptMuonH_5to7p5  = new TH1D("ptMuonH_5to7p5","",100,0,500);
+  TH1D * ptMuonH_7p5to10 = new TH1D("ptMuonH_7p5to10","",100,0,500);
+  TH1D * ptMuonH_10to20  = new TH1D("ptMuonH_10to20","",100,0,500);
+  TH1D * ptMuonH_20toInf = new TH1D("ptMuonH_20toInf","",100,0,500);
+  TH1D * etaMuonH = new TH1D("etaMuonH","",25,-2.5,2.5);
+  TH1D * ptTrackH = new TH1D("ptTrackH","",400,0,400);
+  TH1D * ptTrackLowH = new TH1D("ptTrackLowH","",100,0,50);
+  TH1D * etaTrackH = new TH1D("etaTrackH","",25,-2.5,2.5);
+  TH1D * dzTrackH = new TH1D("dzTrackH","",100,0,1.);
+  TH1D * dxyTrackH = new TH1D("dxyTrackH","",100,0,1.0);
+  TH1D * mTH         = new TH1D("mTH","",500,0,500);
+  TH1D * mTH_2p5to5  = new TH1D("mTH_2p5to5","",500,0,500);
+  TH1D * mTH_5to7p5  = new TH1D("mTH_5to7p5","",500,0,500);
+  TH1D * mTH_7p5to10 = new TH1D("mTH_7p5to10","",500,0,500);
+  TH1D * mTH_10to20  = new TH1D("mTH_10to20","",500,0,500);
+  TH1D * mTH_20toInf = new TH1D("mTH_20toInf","",500,0,500);
+  TH1D * invMassMuTrkH         = new TH1D("invMassMuTrkH","",500,0,500);
+  TH1D * invMassMuTrkH_2p5to5  = new TH1D("invMassMuTrkH_2p5to5","",500,0,500);
+  TH1D * invMassMuTrkH_5to7p5  = new TH1D("invMassMuTrkH_5to7p5","",500,0,500);
+  TH1D * invMassMuTrkH_7p5to10 = new TH1D("invMassMuTrkH_7p5to10","",500,0,500);
+  TH1D * invMassMuTrkH_10to20  = new TH1D("invMassMuTrkH_10to20","",500,0,500);
+  TH1D * invMassMuTrkH_20toInf = new TH1D("invMassMuTrkH_20toInf","",500,0,500);
+  TH1D * metH         = new TH1D("metH","",500,0,500);
+  TH1D * metH_2p5to5  = new TH1D("metH_2p5to5","",500,0,500);
+  TH1D * metH_5to7p5  = new TH1D("metH_5to7p5","",500,0,500);
+  TH1D * metH_7p5to10 = new TH1D("metH_7p5to10","",500,0,500);
+  TH1D * metH_10to20  = new TH1D("metH_10to20","",500,0,500);
+  TH1D * metH_20toInf = new TH1D("metH_20toInf","",500,0,500);
+  TH1D * dzetaH         = new TH1D("dzetaH","",200,-100,100);
+  TH1D * dzetaH_2p5to5  = new TH1D("dzetaH_2p5to5","",200,-100,100);
+  TH1D * dzetaH_5to7p5  = new TH1D("dzetaH_5to7p5","",200,-100,100);
+  TH1D * dzetaH_7p5to10 = new TH1D("dzetaH_7p5to10","",200,-100,100);
+  TH1D * dzetaH_10to20  = new TH1D("dzetaH_10to20","",200,-100,100);
+  TH1D * dzetaH_20toInf = new TH1D("dzetaH_20toInf","",200,-100,100);
+  TH1D * dPhiMuonTrkH = new TH1D("dPhiMuonTrkH","",32,0,3.15);
+  TH1D * dPhiMuonTrkH_2p5to5  = new TH1D("dPhiMuonTrkH_2p5to5","",32,0,3.15);
+  TH1D * dPhiMuonTrkH_5to7p5  = new TH1D("dPhiMuonTrkH_5to7p5","",32,0,3.15);
+  TH1D * dPhiMuonTrkH_7p5to10 = new TH1D("dPhiMuonTrkH_7p5to10","",32,0,3.15);
+  TH1D * dPhiMuonTrkH_10to20  = new TH1D("dPhiMuonTrkH_10to20","",32,0,3.15);
+  TH1D * dPhiMuonTrkH_20toInf = new TH1D("dPhiMuonTrkH_20toInf","",32,0,3.15);
+  TH1D * dPhiMuonMetH = new TH1D("dPhiMuonMetH","",32,0,3.15);
+  TH1D * dPhiMuonMetH_2p5to5  = new TH1D("dPhiMuonMetH_2p5to5","",32,0,3.15);
+  TH1D * dPhiMuonMetH_5to7p5  = new TH1D("dPhiMuonMetH_5to7p5","",32,0,3.15);
+  TH1D * dPhiMuonMetH_7p5to10 = new TH1D("dPhiMuonMetH_7p5to10","",32,0,3.15);
+  TH1D * dPhiMuonMetH_10to20  = new TH1D("dPhiMuonMetH_10to20","",32,0,3.15);
+  TH1D * dPhiMuonMetH_20toInf = new TH1D("dPhiMuonMetH_20toInf","",32,0,3.15);
+  TH1D * dPhiTrkMetH = new TH1D("dPhiTrkMetH","",32,0,3.15);
+  TH1D * dPhiTrkMetH_2p5to5  = new TH1D("dPhiTrkMetH_2p5to5","",32,0,3.15);
+  TH1D * dPhiTrkMetH_5to7p5  = new TH1D("dPhiTrkMetH_5to7p5","",32,0,3.15);
+  TH1D * dPhiTrkMetH_7p5to10 = new TH1D("dPhiTrkMetH_7p5to10","",32,0,3.15);
+  TH1D * dPhiTrkMetH_10to20  = new TH1D("dPhiTrkMetH_10to20","",32,0,3.15);
+  TH1D * dPhiTrkMetH_20toInf = new TH1D("dPhiTrkMetH_20toInf","",32,0,3.15);
 
+  // histograms not after final selection
+  TH1D * nCloseTrksH         = new TH1D("nCloseTrksH","",20,0,20);
+  TH1D * nCloseTrksH_2p5to5  = new TH1D("nCloseTrksH_2p5to5","",20,0,20);
+  TH1D * nCloseTrksH_5to7p5  = new TH1D("nCloseTrksH_5to7p5","",20,0,20);
+  TH1D * nCloseTrksH_7p5to10 = new TH1D("nCloseTrksH_7p5to10","",20,0,20);
+  TH1D * nCloseTrksH_10to20  = new TH1D("nCloseTrksH_10to20","",20,0,20);
+  TH1D * nCloseTrksH_20toInf = new TH1D("nCloseTrksH_20toInf","",20,0,20);
 
   string cmsswBase = (getenv ("CMSSW_BASE"));
+
+  // Load CrystalBallEfficiency class
+  TString pathToCrystalLib = (TString) cmsswBase + "/src/HTT-utilities/CorrectionsWorkspace/CrystalBallEfficiency_cxx.so";
+  int openSuccessful = gSystem->Load( pathToCrystalLib );
+  if (openSuccessful !=0 ) {
+    cout<<pathToCrystalLib<<" not found. Please create this file by running \"root -l -q CrystalBallEfficiency.cxx++\" in src/HTT-utilities/CorrectionsWorkspace/. "<<endl;
+    exit( -1 );
+  }
+
 
   // Run-lumi selector
   string fullPathToJsonFile = cmsswBase + "/src/DesyTauAnalyses/NTupleMaker/test/json/" + jsonFile;
@@ -476,6 +554,7 @@ int main(int argc, char * argv[]) {
   TString filen;
   int iFiles = 0;
   int events = 0;
+
   while (fileList >> filen) {
    iFiles++;
    cout << "file " << iFiles << " : " << filen << endl;
@@ -599,6 +678,9 @@ int main(int argc, char * argv[]) {
    
    TRandom3 rand;
 
+   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  Event Loop
+   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
    for (int iCand=0; iCand<numberOfCandidates; iCand++) {
      
      tree_->GetEntry(iCand);
@@ -625,39 +707,32 @@ int main(int argc, char * argv[]) {
 					     genparticles_py[igen],
 					     genparticles_pz[igen],
 					     genparticles_e[igen]);
-
-	 if (genparticles_pdgid[igen]==6)
+	 
+	 if (genparticles_pdgid[igen]==6){
 	   topPt = TMath::Sqrt(genparticles_px[igen]*genparticles_px[igen]+
 			       genparticles_py[igen]*genparticles_py[igen]);
-
-	 if (genparticles_pdgid[igen]==-6)
+	 }
+	 if (genparticles_pdgid[igen]==-6){
 	   antitopPt = TMath::Sqrt(genparticles_px[igen]*genparticles_px[igen]+
 				   genparticles_py[igen]*genparticles_py[igen]);
-
+	 }
 	 bool fromHardProcessFinalState = genparticles_fromHardProcess[igen]&&genparticles_status[igen]==1;
 	 bool isMuon = false;
 	 bool isElectron = false;
 	 bool isNeutrino = false;
 	 bool isDirectHardProcessTauDecayProduct = genparticles_isDirectHardProcessTauDecayProduct[igen];
 
-	 if (abs(genparticles_pdgid[igen])==11) 
-	   isElectron = true;
-	 if (abs(genparticles_pdgid[igen])==13)
-           isMuon = true;
+	 if (abs(genparticles_pdgid[igen])==11) isElectron = true;
+	 if (abs(genparticles_pdgid[igen])==13) isMuon = true;
 	 if (abs(genparticles_pdgid[igen])==12||
 	     abs(genparticles_pdgid[igen])==14||
-	     abs(genparticles_pdgid[igen])==16)  
-	   isNeutrino = true;
+	     abs(genparticles_pdgid[igen])==16) isNeutrino = true;
 
 	 bool isBoson = (fromHardProcessFinalState && (isMuon || isElectron || isNeutrino)) || isDirectHardProcessTauDecayProduct;
 	 bool isVisibleBoson = (fromHardProcessFinalState && (isMuon || isElectron)) || (isDirectHardProcessTauDecayProduct && !isNeutrino);
 
-	 if (isBoson)
-	   genBosonLV += genLV;
-	 if (isVisibleBoson)
-	   genVisBosonLV += genLV;
-
-
+	 if (isBoson)        genBosonLV += genLV;
+	 if (isVisibleBoson) genVisBosonLV += genLV;
        }
      }
      
@@ -683,8 +758,7 @@ int main(int argc, char * argv[]) {
 
      if (isTOP) { // applying top pT weights
        float topptweight = 1;
-       if (topPt>0&&antitopPt>0) 
-	 topptweight = topPtWeight(topPt,antitopPt,true);
+       if (topPt>0&&antitopPt>0) topptweight = topPtWeight(topPt,antitopPt,true);
        weight *= topptweight;
      }
 
@@ -743,6 +817,27 @@ int main(int argc, char * argv[]) {
        exit(-1);
      }
 
+     // Check if it is ztt or zll (for dy sample only)
+     if(isDY){
+       bool isDYtoTT = false;
+       int nPromptElectrons = 0;
+       int nPromptMuons     = 0;
+       for (unsigned int igen=0; igen<genparticles_count; ++igen) {
+	 if(abs(genparticles_pdgid[igen])==11&&genparticles_fromHardProcess[igen]&&genparticles_status[igen]==1){
+	   nPromptElectrons += 1;
+	 }
+	 
+	 if(abs(genparticles_pdgid[igen])==13&&genparticles_fromHardProcess[igen]&&genparticles_status[igen]==1){
+	   nPromptMuons += 1;
+	 }
+       }
+
+       if(nPromptMuons != 2 && nPromptElectrons != 2) isDYtoTT = true;
+       if(isZTT && !isDYtoTT) continue;
+       if(!isZTT && isDYtoTT) continue;
+     }
+
+
      // ********************
      // selecting good muons
      // ********************
@@ -754,14 +849,11 @@ int main(int argc, char * argv[]) {
 	 if (event_run >= 278820 && muon_isMedium[i]) muonID = true; // Run2016G-H
 	 if (event_run < 278820  && muon_isICHEP[i]) muonID = true; // Run2016B-F
        }
-       if (!muonID) continue;
+       if(!muonID) continue;
        if(fabs(muon_dxy[i])>dxyMuonCut) continue;
        if(fabs(muon_dz[i])>dzMuonCut) continue;
        if(muon_pt[i]<ptMuonLooseCut) continue;
        if(fabs(muon_eta[i])>etaMuonCut) continue;
-       //      cout << "muon pt = " << muon_pt[i] << endl;
-       //       rand.SetSeed((int)((muon_eta[i]+2.41)*100000));
-       //       double rannum  = rand.Rndm();
        float neutralHadIsoMu = muon_neutralHadIso[i];
        float photonIsoMu = muon_photonIso[i];
        float chargedHadIsoMu = muon_chargedHadIso[i];
@@ -770,10 +862,8 @@ int main(int argc, char * argv[]) {
        neutralIsoMu = TMath::Max(float(0),neutralIsoMu);
        float absIsoMu = chargedHadIsoMu + neutralIsoMu;
        float relIsoMu = absIsoMu/muon_pt[i];
-       if (relIsoMu<isoMuonCut)
-	 muons.push_back(i);
-       if (relIsoMu<isoMuonLooseCut)
-	 looseMuons.push_back(i);
+       if (relIsoMu<isoMuonCut)	 muons.push_back(i);
+       if (relIsoMu<isoMuonLooseCut) looseMuons.push_back(i);
      }
   
      if (muons.size()!=1) continue; // quit event if number of good muons < 1
@@ -784,6 +874,7 @@ int main(int argc, char * argv[]) {
 					   muon_py[indexMu],
 					   muon_pz[indexMu],
 					   MuMass);
+
      if (muonLV.Pt()<ptMuonCut) continue;
 
      bool muMatchedTrigger = false;
@@ -797,62 +888,74 @@ int main(int argc, char * argv[]) {
 
      if (applyTriggerMatch && !muMatchedTrigger) continue;
 
-     unsigned int indexTrack = 0;
+     // ********************
+     // selecting candidate tracks
+     // ********************
      bool trackFound = false;
      double ptTrkMax = 0;
      TLorentzVector trackLV;
+     int indexTrack = -1;
+     float dphiTrkMu = 0;
      for (unsigned int iTrk=0; iTrk<track_count; ++iTrk) {
        if (fabs(track_charge[iTrk])<0.1) continue; // make sure we are not taking neutral stuff
+       if (!track_highPurity[iTrk]) continue;
        if (fabs(track_dxy[iTrk])>dxyTrkCut) continue;
        if (fabs(track_dz[iTrk])>dzTrkCut) continue;
        if (fabs(track_eta[iTrk])>etaTrkCut) continue;
        if (fabs(track_pt[iTrk])<ptTrkCut) continue;
        if (abs(track_ID[iTrk])==13) continue;
 
-       TLorentzVector trk4; trk4.SetXYZM(track_px[iTrk],
-					 track_py[iTrk],
-					 track_pz[iTrk],
-					 track_mass[iTrk]);
+       TLorentzVector trk4; trk4.SetXYZM(track_px[iTrk],track_py[iTrk],track_pz[iTrk],track_mass[iTrk]);
        
-       TLorentzVector muDiff = muonLV - trk4;
+       double dPhi = TVector2::Phi_mpi_pi(muon_phi[indexMu] - track_phi[iTrk]);
+       double dEta = muon_eta[indexMu] - track_eta[iTrk];
+       double dR   = sqrt(dPhi*dPhi + dEta*dEta);
+       if(dR < 0.1) continue;
+
        bool netCharge = double(muon_charge[indexMu])*double(track_charge[iTrk]) < -0.5;
-       if (sameSign) 
-	 netCharge = double(muon_charge[indexMu])*double(track_charge[iTrk]) > 0.5;
-       if (muDiff.P()<0.1) continue;
+       if (sameSign) netCharge = double(muon_charge[indexMu])*double(track_charge[iTrk]) > 0.5;
        if (!netCharge) continue;
 
-       float dphiTrkMu = dPhiFrom2P(muonLV.Px(),muonLV.Py(),
-				    trk4.Px(),trk4.Py());
-
+       dphiTrkMu = dPhiFrom2P(muonLV.Px(),muonLV.Py(),trk4.Px(),trk4.Py());
        if (dphiTrkMu<dPhiMuonTrkCut) continue;
 
        // now check isolation
        bool isolation = true;
+       int nCloseTrks_ = 0;
        for (unsigned int jTrk=0; jTrk<track_count; ++jTrk)  {
-	 if (iTrk==jTrk) {
-	   if (fabs(track_charge[jTrk])<0.1) continue; // make sure we are not taking neutral stuff
-      	   if (fabs(track_dxy[jTrk])>dxyTrkLooseCut) continue;
-	   if (fabs(track_dz[jTrk])>dzTrkLooseCut) continue;
-	   if (fabs(track_eta[jTrk])>etaTrkCut) continue;
-	   if (fabs(track_pt[jTrk])<ptTrkLooseCut) continue;
-	   float dRtracks = deltaR(trk4.Eta(),trk4.Phi(),
-				   track_eta[jTrk],track_phi[jTrk]);
-	   if (dRtracks<dRIsoMuon) { 
-	     isolation = false;
-	     break;
-	   }
+	 if (iTrk==jTrk) continue;
+	 if (fabs(track_charge[jTrk])<0.1) continue; // make sure we are not taking neutral stuff
+	 if (fabs(track_dxy[jTrk])>dxyTrkLooseCut) continue;
+	 if (fabs(track_dz[jTrk])>dzTrkLooseCut) continue;
+	 if (fabs(track_eta[jTrk])>etaTrkCut) continue;
+	 if (fabs(track_pt[jTrk])<ptTrkLooseCut) continue;
+	 float dRtracks = deltaR(trk4.Eta(),trk4.Phi(),track_eta[jTrk],track_phi[jTrk]);
+	 if (dRtracks<dRIsoMuon) {
+	   isolation = false;
+	   nCloseTrks_ += 1;
 	 }
-	 if (!isolation) continue;
-	 if (trk4.Pt()>ptTrkMax) {
-	   trackFound = true;
-	   indexTrack = iTrk;
-	   ptTrkMax = trk4.Pt();
-	   trackLV = trk4;
-	 }
+       }
+
+       nCloseTrksH->Fill(nCloseTrks_,weight);
+       if(trackLV.Pt()<5.) nCloseTrksH_2p5to5->Fill(nCloseTrks_,weight);
+       else if(trackLV.Pt()<7.5) nCloseTrksH_5to7p5->Fill(nCloseTrks_,weight);
+       else if(trackLV.Pt()<10.) nCloseTrksH_7p5to10->Fill(nCloseTrks_,weight);
+       else if(trackLV.Pt()<20.) nCloseTrksH_10to20->Fill(nCloseTrks_,weight);
+       else if(trackLV.Pt()>20.) nCloseTrksH_20toInf->Fill(nCloseTrks_,weight);
+
+       if(!isolation) continue;
+
+       if (trk4.Pt()>ptTrkMax) {
+	 trackFound = true;
+	 indexTrack = iTrk;
+	 ptTrkMax = trk4.Pt();
+	 trackLV = trk4;
        }
      }
 
      if (!trackFound) continue;
+
+     double invMassMuTrk = (muonLV + trackLV).M();
 
      // jets 
      int njets = 0;
@@ -883,7 +986,6 @@ int main(int argc, char * argv[]) {
        if (dRTrkJet<deltaRJetLeptonCut) continue;
 
        njets++;
-
      }
      
      // recoil corrections
@@ -908,10 +1010,34 @@ int main(int argc, char * argv[]) {
      TLorentzVector Met4; Met4.SetXYZM(metx,mety,0,0);
      // counting tracks around each muon
 
-     float dPhiMuMET = dPhiFrom2P(muonLV.Px(),muonLV.Py(),
-				  metx,mety);
-     float mT = TMath::Sqrt(2*met*muonLV.Pt()*(1-TMath::Cos(dPhiMuMET)));
+     float dPhiMuMet = dPhiFrom2P(muonLV.Px(),muonLV.Py(),metx,mety);
+     float dPhiTrkMet = dPhiFrom2P(trackLV.Px(),trackLV.Py(),metx,mety);
+     float mT = TMath::Sqrt(2*met*muonLV.Pt()*(1-TMath::Cos(dPhiMuMet)));
 
+     if(mT > 30) continue;
+     
+     // compute dzeta
+     float dzeta = 0;
+     float pzetamiss = 0;
+
+     // bisector of electron and muon transverse momenta
+     float trackUnitX = trackLV.Px()/trackLV.Pt();
+     float trackUnitY = trackLV.Py()/trackLV.Pt();
+     float muonUnitX = muonLV.Px()/muonLV.Pt();
+     float muonUnitY = muonLV.Py()/muonLV.Pt();
+     float zetaX = trackUnitX + muonUnitX;
+     float zetaY = trackUnitY + muonUnitY;
+     float normZeta = TMath::Sqrt(zetaX*zetaX+zetaY*zetaY);
+     zetaX = zetaX/normZeta;
+     zetaY = zetaY/normZeta;
+     
+     float vectorX = metx + muonLV.Px() + trackLV.Px();
+     float vectorY = mety + muonLV.Py() + trackLV.Py();
+     float vectorVisX = muonLV.Px() + trackLV.Px();
+     float vectorVisY = muonLV.Py() + trackLV.Py();
+     float pzetavis = vectorVisX*zetaX + vectorVisY*zetaY;
+     
+     computeDzeta(metx,mety,zetaX,zetaY,pzetavis,pzetamiss,dzeta);
 
      // muon id/iso/trigger weights here
      double muTrigWeight = 1;
@@ -942,12 +1068,72 @@ int main(int argc, char * argv[]) {
      weight *= muTrigWeight;
      muIdWeightH->Fill(muIdWeight,1.0);
      weight *= muIdWeight;
-
      ptMuonH->Fill(muonLV.Pt(),weight);
      etaMuonH->Fill(muonLV.Eta(),weight);
-     
-     
+     ptTrackH->Fill(trackLV.Pt(),weight);
+     ptTrackLowH->Fill(trackLV.Pt(),weight);
+     etaTrackH->Fill(trackLV.Eta(),weight);
+     mTH->Fill(mT,weight);
+     invMassMuTrkH->Fill(invMassMuTrk,weight);
+     metH->Fill(met,weight);
+     dzetaH->Fill(dzeta,weight);
+     dPhiMuonTrkH->Fill(dphiTrkMu,weight);
+     dPhiMuonMetH->Fill(dPhiMuMet,weight);
+     dPhiTrkMetH->Fill(dPhiTrkMet,weight);
+     if(trackLV.Pt()<5.){
+       ptMuonH_2p5to5->Fill(muonLV.Pt(),weight);
+       mTH_2p5to5->Fill(mT,weight);
+       invMassMuTrkH_2p5to5->Fill(invMassMuTrk,weight);
+       metH_2p5to5->Fill(met,weight);
+       dzetaH_2p5to5->Fill(dzeta,weight);
+       dPhiMuonTrkH_2p5to5->Fill(dphiTrkMu,weight);
+       dPhiMuonMetH_2p5to5->Fill(dPhiMuMet,weight);
+       dPhiTrkMetH_2p5to5->Fill(dPhiTrkMet,weight);
+     }
+     else if(trackLV.Pt()<7.5){
+       ptMuonH_5to7p5->Fill(muonLV.Pt(),weight);
+       mTH_5to7p5->Fill(mT,weight);
+       invMassMuTrkH_5to7p5->Fill(invMassMuTrk,weight);
+       metH_5to7p5->Fill(met,weight);
+       dzetaH_5to7p5->Fill(dzeta,weight);
+       dPhiMuonTrkH_5to7p5->Fill(dphiTrkMu,weight);
+       dPhiMuonMetH_5to7p5->Fill(dPhiMuMet,weight);
+       dPhiTrkMetH_5to7p5->Fill(dPhiTrkMet,weight);
+     }
+     else if(trackLV.Pt()<10.){
+       ptMuonH_7p5to10->Fill(muonLV.Pt(),weight);
+       mTH_7p5to10->Fill(mT,weight);
+       invMassMuTrkH_7p5to10->Fill(invMassMuTrk,weight);
+       metH_7p5to10->Fill(met,weight);
+       dzetaH_7p5to10->Fill(dzeta,weight);
+       dPhiMuonTrkH_7p5to10->Fill(dphiTrkMu,weight);
+       dPhiMuonMetH_7p5to10->Fill(dPhiMuMet,weight);
+       dPhiTrkMetH_7p5to10->Fill(dPhiTrkMet,weight);
+     }
+     else if(trackLV.Pt()<20.){
+       ptMuonH_10to20->Fill(muonLV.Pt(),weight);
+       mTH_10to20->Fill(mT,weight);
+       invMassMuTrkH_10to20->Fill(invMassMuTrk,weight);
+       metH_10to20->Fill(met,weight);
+       dzetaH_10to20->Fill(dzeta,weight);
+       dPhiMuonTrkH_10to20->Fill(dphiTrkMu,weight);
+       dPhiMuonMetH_10to20->Fill(dPhiMuMet,weight);
+       dPhiTrkMetH_10to20->Fill(dPhiTrkMet,weight);
+     }
+     else if(trackLV.Pt()>20.){
+       ptMuonH_20toInf->Fill(muonLV.Pt(),weight);
+       mTH_20toInf->Fill(mT,weight);
+       invMassMuTrkH_20toInf->Fill(invMassMuTrk,weight);
+       metH_20toInf->Fill(met,weight);
+       dzetaH_20toInf->Fill(dzeta,weight);
+       dPhiMuonTrkH_20toInf->Fill(dphiTrkMu,weight);
+       dPhiMuonMetH_20toInf->Fill(dPhiMuMet,weight);
+       dPhiTrkMetH_20toInf->Fill(dPhiTrkMet,weight);
+     }
 
+     if(indexTrack < 0) continue;
+     dzTrackH->Fill(track_dz[indexTrack],weight);
+     dxyTrackH->Fill(track_dxy[indexTrack],weight);
 
    } // icand loop
    
