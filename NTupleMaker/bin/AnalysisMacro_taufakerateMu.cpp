@@ -86,33 +86,33 @@ float SF = 1;
 
 if ( working_point == "MVA"){
 
+
 if (  fabs(eta) < 0.8 )
         {
-                if (pt>20 && pt<30) SF = 1.10672;
-                if (pt>30 && pt<40) SF = 0.977925;
-                if (pt>40 ) SF = 0.834732;
+                if (pt>20 && pt<30) SF = 1.12667;
+                if (pt>30 && pt<40) SF = 1.0178;
+                if (pt>40 ) SF = 0.961808;
         }
 if (  fabs(eta) > 0.8 && fabs(eta) < 1.44 )
         {
 
-                if (pt>20 && pt<30) SF = 1.10876;
-                if (pt>30 && pt<40) SF = 1.04681;
-                if (pt>40 ) SF = 0.731267;
+                if (pt>20 && pt<30) SF = 1.12651;
+                if (pt>30 && pt<40) SF = 1.08668;
+                if (pt>40 ) SF = 0.832438;
         }
 
 if (  fabs(eta) > 1.44 && fabs(eta) < 1.566 )
         {
 
-                if (pt>20 && pt<40) SF = 0.909111;
-                if (pt>40) SF = 1.60314;
+                if (pt>20 && pt<40) SF = 0.907089;
+                if (pt>40) SF = 1.70447;
         }
 if (  fabs(eta) > 1.566 && fabs(eta) < 2.3 )
         {
 
-                if (pt>20 && pt<40) SF = 0.859504;
-                if (pt>40) SF = 0.884979;
+                if (pt>20 && pt<40) SF = 0.875675;
+                if (pt>40) SF = 0.91729;
         }
-
 
 	
 }
@@ -777,6 +777,34 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
     bool isDYNJ = false;
     bool isWNJ = false;
     bool isNJ = false;
+	genTauMatched = false;
+	genLeptonMatchedPromptEl = false;
+	genLeptonMatchedPromptMu = false;
+	genLeptonMatchedPromptTau = false;
+	genElMatchedToTauDecay = false;
+	genMuMatchedToTauDecay = false;
+	genTauMatchedToTauDecay = false;
+	genElMatchedHadrDecay = false;
+	genMuMatchedHadrDecay = false;
+	genTauMatchedHadrDecay = false;
+	genLeptonMatchedHFQ = false;
+	genLeptonMatchedLFQ = false;
+	genLeptonMatchedGluon =false;
+	matchedTauToPromptEl = false;
+	matchedTauToPromptMu = false;
+	matchedTauToTauDecEl =false;
+	matchedTauToTauDecMu =false;
+	matchedTauToElHadronDec = false;
+	matchedTauToMuHadronDec = false;
+	matchedTauToTauHadronDec = false;
+	matchedTauToGluon = false;
+	matchedTauToUpQ = false;
+	matchedTauToDownQ = false;
+	matchedTauToStrangeQ = false;
+	matchedTauToCharmQ = false;
+	matchedTauToBottom = false;
+	matchedTauToHFQ = false;
+	matchedTauToLFQ = false;
 	
 	string tt = "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8";
 	string wj = "WJetsToLNu";
@@ -1998,34 +2026,6 @@ if ((!isW && !isDY) && !isData)
       bool isGenLeptonMatched = false;
       if (!isData){
 
-	genTauMatched = false;
-	genLeptonMatchedPromptEl = false;
-	genLeptonMatchedPromptMu = false;
-	genLeptonMatchedPromptTau = false;
-	genElMatchedToTauDecay = false;
-	genMuMatchedToTauDecay = false;
-	genTauMatchedToTauDecay = false;
-	genElMatchedHadrDecay = false;
-	genMuMatchedHadrDecay = false;
-	genTauMatchedHadrDecay = false;
-	genLeptonMatchedHFQ = false;
-	genLeptonMatchedLFQ = false;
-	genLeptonMatchedGluon =false;
-	matchedTauToPromptEl = false;
-	matchedTauToPromptMu = false;
-	matchedTauToTauDecEl =false;
-	matchedTauToTauDecMu =false;
-	matchedTauToElHadronDec = false;
-	matchedTauToMuHadronDec = false;
-	matchedTauToTauHadronDec = false;
-	matchedTauToGluon = false;
-	matchedTauToUpQ = false;
-	matchedTauToDownQ = false;
-	matchedTauToStrangeQ = false;
-	matchedTauToCharmQ = false;
-	matchedTauToBottom = false;
-	matchedTauToHFQ = false;
-	matchedTauToLFQ = false;
 	TLorentzVector genTauV;  
 	TLorentzVector genLepV;  
 
@@ -2136,6 +2136,7 @@ if (matchedTauToCharmQ) FakeRatePtIncLooseCharmQ[etaBin][0]->Fill(double(analysi
 if (matchedTauToBottomQ) FakeRatePtIncLooseBottomQ[etaBin][0]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
 if (matchedTauToGluon) FakeRatePtIncLooseGluon[etaBin][0]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
 
+
 	    FakeRatePtIncLoose[etaBin][0]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
 	    hRatioSum1L->Fill(RatioSums,weight);
 	    hMTCut1L->Fill(MT,weight);
@@ -2145,6 +2146,16 @@ if (matchedTauToGluon) FakeRatePtIncLooseGluon[etaBin][0]->Fill(double(analysisT
 	    hnbJets1L->Fill(countbjets,weight);
       LooseCFCounter[iCutL]+= weight;
       iCutL++;
+
+if (isData) { 
+	FakeRatePtIncLooseDownQ[etaBin][0] ->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+	FakeRatePtIncLooseUpQ[etaBin][0] ->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+	FakeRatePtIncLooseStrangeQ[etaBin][0] ->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+	FakeRatePtIncLooseCharmQ[etaBin][0] ->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+	FakeRatePtIncLooseBottomQ[etaBin][0] ->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+	FakeRatePtIncLooseGluon[etaBin][0] ->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+
+}
 
 	  if (MTb ){ 
 
@@ -2165,6 +2176,15 @@ if (matchedTauToGluon) FakeRatePtIncLooseGluon[etaBin][1]->Fill(double(analysisT
 
       LooseCFCounter[iCutL]+= weight;
       iCutL++;
+if (isData) { 
+	FakeRatePtIncLooseDownQ[etaBin][1] ->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+	FakeRatePtIncLooseUpQ[etaBin][1] ->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+	FakeRatePtIncLooseStrangeQ[etaBin][1] ->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+	FakeRatePtIncLooseCharmQ[etaBin][1] ->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+	FakeRatePtIncLooseBottomQ[etaBin][1] ->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+	FakeRatePtIncLooseGluon[etaBin][1] ->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+
+}
 
 	    if (dPhiW > 2.5){
 
@@ -2184,6 +2204,15 @@ if (matchedTauToGluon) FakeRatePtIncLooseGluon[etaBin][2]->Fill(double(analysisT
 	    hnbJets3L->Fill(countbjets,weight);
       LooseCFCounter[iCutL]+= weight;
       iCutL++;
+if (isData) { 
+	FakeRatePtIncLooseDownQ[etaBin][2] ->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+	FakeRatePtIncLooseUpQ[etaBin][2] ->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+	FakeRatePtIncLooseStrangeQ[etaBin][2] ->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+	FakeRatePtIncLooseCharmQ[etaBin][2] ->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+	FakeRatePtIncLooseBottomQ[etaBin][2] ->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+	FakeRatePtIncLooseGluon[etaBin][2] ->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+
+}
 
 	//if (RatioSums < 0.3 ) {
 	if (countjets<3 ) {
@@ -2205,6 +2234,15 @@ if (matchedTauToGluon) FakeRatePtIncLooseGluon[etaBin][3]->Fill(double(analysisT
 
       LooseCFCounter[iCutL]+= weight;
       iCutL++;
+if (isData) { 
+	FakeRatePtIncLooseDownQ[etaBin][3] ->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+	FakeRatePtIncLooseUpQ[etaBin][3] ->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+	FakeRatePtIncLooseStrangeQ[etaBin][3] ->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+	FakeRatePtIncLooseCharmQ[etaBin][3] ->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+	FakeRatePtIncLooseBottomQ[etaBin][3] ->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+	FakeRatePtIncLooseGluon[etaBin][3] ->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+
+}
 /////////// corrected for TFR
 //
 	    hRatioSumTFRL->Fill(RatioSums,tfr*weight);
@@ -2247,6 +2285,15 @@ if (matchedTauToGluon) FakeRatePtIncTightGluon[etaBin][0]->Fill(double(analysisT
 
       TightCFCounter[iCutT]+= weight;
       iCutT++;
+if (isData) { 
+	FakeRatePtIncTightDownQ[etaBin][0] ->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+	FakeRatePtIncTightUpQ[etaBin][0] ->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+	FakeRatePtIncTightStrangeQ[etaBin][0] ->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+	FakeRatePtIncTightCharmQ[etaBin][0] ->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+	FakeRatePtIncTightBottomQ[etaBin][0] ->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+	FakeRatePtIncTightGluon[etaBin][0] ->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+
+}
 
 	    if (MTb ){ 
 if (matchedTauToDownQ) FakeRatePtIncTightDownQ[etaBin][1]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
@@ -2265,6 +2312,15 @@ if (matchedTauToGluon) FakeRatePtIncTightGluon[etaBin][1]->Fill(double(analysisT
     
       TightCFCounter[iCutT]+= weight;
       iCutT++;
+if (isData) { 
+	FakeRatePtIncTightDownQ[etaBin][1] ->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+	FakeRatePtIncTightUpQ[etaBin][1] ->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+	FakeRatePtIncTightStrangeQ[etaBin][1] ->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+	FakeRatePtIncTightCharmQ[etaBin][1] ->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+	FakeRatePtIncTightBottomQ[etaBin][1] ->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+	FakeRatePtIncTightGluon[etaBin][1] ->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+
+}
 
 	      if (dPhiW > 2.5){
 if (matchedTauToDownQ) FakeRatePtIncTightDownQ[etaBin][2]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
@@ -2284,6 +2340,15 @@ if (matchedTauToGluon) FakeRatePtIncTightGluon[etaBin][2]->Fill(double(analysisT
 
       TightCFCounter[iCutT]+= weight;
       iCutT++;
+if (isData) { 
+	FakeRatePtIncTightDownQ[etaBin][2] ->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+	FakeRatePtIncTightUpQ[etaBin][2] ->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+	FakeRatePtIncTightStrangeQ[etaBin][2] ->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+	FakeRatePtIncTightCharmQ[etaBin][2] ->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+	FakeRatePtIncTightBottomQ[etaBin][2] ->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+	FakeRatePtIncTightGluon[etaBin][2] ->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+
+}
 
 	//  if (RatioSums < 0.3 ) {
 	if (countjets<3 ) {
@@ -2304,6 +2369,15 @@ if (matchedTauToGluon) FakeRatePtIncTightGluon[etaBin][3]->Fill(double(analysisT
 
       TightCFCounter[iCutT]+= weight;
       iCutT++;
+if (isData) { 
+	FakeRatePtIncTightDownQ[etaBin][3] ->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+	FakeRatePtIncTightUpQ[etaBin][3] ->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+	FakeRatePtIncTightStrangeQ[etaBin][3] ->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+	FakeRatePtIncTightCharmQ[etaBin][3] ->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+	FakeRatePtIncTightBottomQ[etaBin][3] ->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+	FakeRatePtIncTightGluon[etaBin][3] ->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+
+}
       
 	    hRatioSumTFRT->Fill(RatioSums,tfr*weight);
 	    hMTCutTFRT->Fill(MT,tfr*weight);

@@ -40,9 +40,7 @@ vector <string > signal_names;
 TString signalnames[1500];
 TString variable;
 TString syst_;
-TString Channel="mutau";
-string sign_="C1";
-string sign2_="stau";
+TString Channel="eltau";
 
 
 void Impose( TDirectory *ttarget, TList *ssourcelist, string &np_legend , vector<string> titles_ ,vector<float> xsecs);
@@ -50,7 +48,6 @@ void Impose (TList * sourcel, string & np_title, vector<string> title,vector<flo
 void ModifyHist (TH1D* &h1, int cl ,float & lumi_,float & weight_,string & title, bool norm=false);
 void CheckHist (TH1D* &h1);
 void CheckHistZero (TH1D* &h1);
-void OverFlow (TH1D* &h, int bin);
 void Unroll(TH1D *&hist,TH2D *& hist2D,char *& histName);
 
 const int mycolor=TColor::GetColor("#ffcc66");
@@ -65,24 +62,12 @@ const int mycolorst=TColor::GetColor("#b6d0ea");
 const int mycolorww=TColor::GetColor("#C390D4");
 
 
-/*
-const int mycolor=TColor::GetColor("#ffcc66");
-const int mycolorvv=TColor::GetColor("#6F2D35");
-//int mycolorvv=TColor::GetColor("#FF6633");
-int mycolorqcd=TColor::GetColor("#ffccff");
-int mycolortt=TColor::GetColor("#9999cc");
-//int mycolorttx=TColor::GetColor("#bbccdd");
-int mycolorttx=TColor::GetColor("#33CCFF");
-int mycolorwj=TColor::GetColor("#de5a6a");
-//int mycolorwj=TColor::GetColor("#66CC66");
-int mycolordyj=TColor::GetColor("#ffcc66");
-*/
 
 
 int col = -1;
 
 
-void Overlap1DMod(string syst="Nominal", string reg="SR")
+void OverlapVars(string syst="Nominal", string reg="SR")
 {
 
 	gROOT->SetStyle ("Plain");
@@ -91,6 +76,7 @@ void Overlap1DMod(string syst="Nominal", string reg="SR")
 	gStyle->SetTitleFont(22,"xyz") ;
 	gStyle->SetLabelFont(22,"xyz") ;
 
+	cout<<" check here "<<endl;
 	vector <string> titles;
 	//TTrees
 	TList *FileList;
@@ -100,8 +86,8 @@ void Overlap1DMod(string syst="Nominal", string reg="SR")
 	Float_t value=0;
 	vector<float> xsecs_;
 	signal_names.clear();
-	ifstream ifs("datasets2D_C1N2_"+reg);
-	string channel="mutau";
+	ifstream ifs("datasets2D");
+	string channel="eltau";
 	string dirr="/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/CMSSW_8_0_20/src/DesyTauAnalyses/NTupleMaker/test/plots_"+channel+"/";
 	dirr="";
 	string line;
@@ -113,49 +99,16 @@ void Overlap1DMod(string syst="Nominal", string reg="SR")
 		float xs,fact,fact2,fact3;
 		xs=0;fact=1;fact2=1;fact3=1;
 		iss >> dataname >> xs >> fact >> fact2 >> fact3;
-
-		if (syst=="PDFUp" && ( (std::string::npos == dataname.find("Single") && std::string::npos == dataname.find("MuonEG")))) fact3 *=1.1;
-		if (syst=="PDFDown" && ( (std::string::npos == dataname.find("Single") && std::string::npos == dataname.find("MuonEG")))) fact3 *=0.9;
-
-		if (std::string::npos != dataname.find("Single") || std::string::npos != dataname.find("MuonEG") || syst=="Nominal" ) {
-			
-		//	cout<<" Data filename and syst Nominal "<<endl;
-			titles.push_back(dataname+"_B.root");
-			}
-		
-		else if (std::string::npos == dataname.find("C1") && std::string::npos == dataname.find("Chi") && (syst=="METUp" || syst=="METDown" ) ) {
-			
-		//	cout<<" Non signal filename and syst METUp or METDown "<<endl;
-			
-			titles.push_back(dataname+"_B.root");
-		}
-
-		else if (  (syst =="TopPtUp" || syst =="TopPtDown" || syst =="ZPtUp" || syst =="ZPtDown" || syst =="METRecoilUp" || syst =="METRecoilDown" ||  syst =="TFRJetEnUp" ||  syst =="TFRJetEnDown" ||  syst =="TFRMuEnUp" ||  syst =="TFRMuEnDown" ||  syst =="TFRTauEnUp" ||  syst =="TFRTauEnDown")  && 
-				
-				(std::string::npos != dataname.find("C1") || std::string::npos != dataname.find("Chi") || std::string::npos != dataname.find("stau")) ) {
-			
-			
-		//	cout<<" Data filename and syst Top/ZpT/METRecoil "<<endl;
-			titles.push_back(dataname+"_B.root");}
-/*
-		else if (  (syst =="METRecoilUp" || syst =="METRecoilDown")  && 
-				
-				(std::string::npos == dataname.find("JetsToLL") && std::string::npos == dataname.find("JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM") ) ) {
-			
-		//	cout<<" Data filename and syst Top/ZpT/METRecoil "<<endl;
-			titles.push_back(dataname+"_B.root");}
-*/			
-
+		if (std::string::npos != dataname.find("Single") || std::string::npos != dataname.find("MuonEG") || syst=="Nominal" ) {titles.push_back(dataname+"_B.root");}
 		else { titles.push_back(dataname+"_"+syst+"_B.root"); 
-
-		//	cout<<" Everything else case "<<endl;
 		}
 		
-
 		//titles.push_back(dirr+dataname+"_"+syst+"_B.root"); 
+		//cout<<dataname+"_"+syst+"_B.root"<<endl;
+
 		//titles.push_back(dataname+"_B.root");
 		XSec= xs*fact*fact2*fact3;
-		cout<<" Found the correct cross section "<<xs<<" for Dataset "<<dataname<<" XSec "<<XSec<<"  "<<fact<<"  "<<fact2<<" "<<fact3<<endl;
+		//cout<<" Found the correct cross section "<<xs<<" for Dataset "<<dataname<<" XSec "<<XSec<<"  "<<fact<<"  "<<fact2<<endl;
 		xsecs_.push_back(XSec);
 	}
 
@@ -173,11 +126,13 @@ void Overlap1DMod(string syst="Nominal", string reg="SR")
 
 	}
 
+	string sign_="C1";
+	string sign2_="stau";
 	string n_;
 	//signal_names.clear();
 	for (unsigned int k=0; k<titles.size();k++)
 	{
-		if (   std::string::npos != titles[k].find(sign_) ||  std::string::npos != titles[k].find(sign2_)  || std::string::npos != titles[k].find("Chi")){
+		if (   std::string::npos != titles[k].find(sign_) ||  std::string::npos != titles[k].find(sign2_)){
 			n_ = titles[k];
 			n_.erase(n_.length()-5);
 			//string nn_ = n_+"_out.root";
@@ -193,9 +148,13 @@ void Overlap1DMod(string syst="Nominal", string reg="SR")
 	vector <string>  variables;
 	//variables.push_back("met_MT2lester_DZeta0J1D_17");
 	//variables.push_back("met_MT2lester_DZeta1J1D_17");
-	variables.push_back("met_MT2lester_DZeta01J1D_17");
-	//variables.push_back("MET_17");
-	//variables.push_back("MET_17");
+	//variables.push_back("met_MT2lester_DZeta01J1D_17");
+	variables.push_back("MET_17");
+	//variables.push_back("METFB_17");
+	variables.push_back("Mt2lestereltau_17");
+	//variables.push_back("Mt2lestereltauFB_17");
+	variables.push_back("hDZeta_17");
+	//variables.push_back("hDZetaFB_17");
 
 	syst_= syst.c_str();
 
@@ -256,6 +215,7 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 	//TIter nextkey (((TDirectory *) current_sourcedir->Get ("ana"))->GetListOfKeys ());
 	TKey *key, *oldkey = 0;
 			TH1D* hh[1500];
+			TH1D* hsignal[1500];
 	while ((key = (TKey *) nextkey ())) {
 
 	int count=0;
@@ -324,7 +284,7 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 
 				bool flagg= false;
 
-				if (std::string::npos != fname.find(sn) || std::string::npos != fname.find(cc1) || std::string::npos != fname.find(sdata)   || std::string::npos != fname.find("Chi") ) 	flagg=true;
+				if (std::string::npos != fname.find(sn) || std::string::npos != fname.find(cc1) || std::string::npos != fname.find(sdata)    ) 	flagg=true;
 
 				nextsource->cd(Channel);
 				TH1D* eventCountt ;
@@ -354,7 +314,7 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 					ModifyHist (h2, cl,Lumi,lumiweights[cl-1],titles[cl-1],norm_);
 					h2->SetStats(0);
 					hh[cl] = h2;
-
+					h2->SetLineStyle(1);
 					if (cl==2){
 						allbkg  = (TH1D*) h2->Clone("allbkg");
 						allbkg->Reset();
@@ -396,7 +356,7 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 						{
 			if (std::string::npos != title_.find("JetsToLNu"))  { col=mycolorwjet ; hwj->Add(h2,1); hwj->SetLineColor(col);}
 			if (std::string::npos != title_.find("TT_TuneCUETP8M2T4_13TeV-powheg-pythia8") || std::string::npos != title_.find("TTPow")) { col=kBlue;col= mycolortt;htt->Add(h2); htt->SetLineColor(col) ;}
-			if (std::string::npos != title_.find("QCD"))  {col= mycolorqcd;hqcd->Add(h2,1); hqcd->SetLineColor(col); }
+			if (std::string::npos != title_.find("QCD"))  {col= mycolorqcd;hqcd->Add(h2,1); hqcd->SetLineColor(col); cout<<" QCD ======================== "<<hqcd->GetSumOfWeights()<<endl;}
 
 			if (std::string::npos != title_.find("JetsToLL") && std::string::npos == title_.find("isZTT"))  {col= mycolordyj;hdyj->Add(h2); hdyj->SetLineColor(col);}
 			if (std::string::npos != title_.find("isZTT"))  {col= mycolorztt;hztt->Add(h2); hztt->SetLineColor(col);}
@@ -411,7 +371,7 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 
 
 
-						//	cout<<" will add histogram "<<h2->GetName()<< " for "<<titles[cl-1]<<"  "<<fname<<"  cl  "<<cl<<endl;
+							//cout<<" will add histogram "<<h2->GetName()<< " for "<<titles[cl-1]<<"  "<<fname<<"  cl  "<<cl<<endl;
 							hs->Add(h2);
 							//allbkg->Add(h2,1);
 						}
@@ -437,7 +397,6 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 		TH1D* htest_qcd;
 		TH1D* htest_ttx;
 		TH1D* htest_signal;
-		TH1D* htest_signal2;
 		TH1D* htest_data;
 		TH1D* htest_ww;
 
@@ -462,11 +421,11 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 				string str = ssB.str();
 				
 				//if (MaxEventsBin<10000) lumistring = lumistring+"_"+str+"MaxEvntsBin_";
-				if (syst!="Nominal") smFilename =  region+"/Templ_"+variable+"_"+lumistring+"_mt_C1N2_"+region+"_"+syst+".root";
-					else smFilename =  region+"/Templ_"+variable+"_"+lumistring+"_mt_C1N2_"+region+".root";
+				if (syst!="Nominal") smFilename =  region+"/Var_"+variable+"_"+lumistring+"_et_C1N2_"+region+"_"+syst+".root";
+					else smFilename =  region+"/Var_"+variable+"_"+lumistring+"_et_C1N2_"+region+".root";
 
-				if (syst!="Nominal") 
-					variable=variable+"_"+syst;
+				//if (syst!="Nominal") 
+				//	variable=variable+"_"+syst;
 
 				TFile *smFile = TFile::Open (smFilename, "recreate");
 				
@@ -486,39 +445,39 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 				allbkg->SetName(s1);
 				cout<<" Total Integral before scaling up - "<<allbkg->GetSumOfWeights()<<" Data "<<variable<<" data "<<hh[1]->GetSumOfWeights()<<" tt "<<
 					htt->GetSumOfWeights()<<" dy "<<hdyj->GetSumOfWeights()<<" wj "<<hwj->GetSumOfWeights()<<" stop "<<hstop->GetSumOfWeights()<<
-					" dib "<<hdib->GetSumOfWeights()<<" ww "<<hww->GetSumOfWeights()<<" qcd "<<hqcd->GetSumOfWeights()<<" ttx "<<httx->GetSumOfWeights()<<endl;
+					" vv"<<hdib->GetSumOfWeights()+hww->GetSumOfWeights()<<" qcd "<<hqcd->GetSumOfWeights()<<" ttx "<<httx->GetSumOfWeights()<<endl;
 	if(b_scale)		allbkg->Scale(scale);
 				cout<<" Total Integral after scaling up - "<<allbkg->GetSumOfWeights()<<"  "<<variable<<"  all_  "<<all_->GetSumOfWeights()<<endl;
 				allbkg->Write();
 			
-				CheckHist(all_);
-				CheckHistZero(all_);
 				ofstream tfile;
-				TString textfilename ="bins_"+region;
+				TString textfilename ="bins_"+variable;
 				vector <int> keep_bin;keep_bin.clear();
 				vector <string> label_bin;label_bin.clear();
-			 if (syst=="Nominall"){
+				/*
+			 if (syst=="NominalL"){
 				tfile.open(textfilename);
 				//tfile.open("bins_"+region);
 				for (int nb=1;nb<=all_->GetNbinsX();++nb){
 
 				float bc_ = all_->GetBinContent(nb);
 				
-				bool SelEvents=false;
+				bool SelEvents=true;
 
-
+			
 				if (region =="SR" && bc_<MaxEventsBin) SelEvents = true;
 				else if (region =="SR_Fit" && bc_<MaxEventsBin) SelEvents = true;
 				else if (region =="CRA" && bc_>MaxEventsBin) SelEvents = true;
 				else if (region =="CRB" && bc_>MaxEventsBin && bc_<1000) SelEvents = true;
 				else if (region =="CRC" && bc_>1000) SelEvents = true;
 				else if (region =="SR_CR" ) SelEvents = true;
-				else if (region =="SR" && bc_<100) SelEvents = true;
-				else if (region =="SR_CR1" && bc_<1000) SelEvents = true;
+				else if (region =="SR_CR1" && bc_<100) SelEvents = true;
 
 				else SelEvents=false;
 
-				if (SelEvents && bc_>0.001) {
+				 SelEvents=true;
+
+				if (SelEvents) {
 			//		cout<<" will keep this bin "<<nb<<"  "<<all_->GetBinContent(nb)<<"  "<<keep_bin.size()<<" for Region  "<<region<<endl;
 					keep_bin.push_back(nb);
 					stringstream ss;
@@ -526,13 +485,13 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 					string str = ss.str();
 					label_bin.push_back(str);
 					tfile <<nb<<"  "<<nb<<endl;
+					//tfile <<htt->GetXaxis()->GetBinLabel(nb)<<"  "<<htt->GetXaxis()->GetBinLabel(nb)<<"  "<<htt->GetXaxis()->GetBinName(nb)<<endl;
 				}
 					}
 				tfile.close();
 			 }
-
-				TString textfilenameIn ="bins_"+region;
-			 if (syst!="Nominall"){
+				TString textfilenameIn ="bins_"+variable;
+			 if (syst!="NominalL"){
 				 ifstream ifs(textfilenameIn);
 				
 				 string line; string blabel;
@@ -555,6 +514,7 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 
 				const int sb_ = keep_bin.size();
 				cout<<" in total "<<sb_<<" bins "<<endl;
+
 
 				htest_tt = new TH1D (htt->GetName(),htt->GetTitle(),sb_,1,sb_+1);
 				htest_wj = new TH1D (hwj->GetName(),hwj->GetTitle(),sb_,1,sb_+1);
@@ -601,9 +561,7 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 				htest_qcd->GetXaxis()->SetBinLabel(nbb+1,lab_);
 				htest_ttx->GetXaxis()->SetBinLabel(nbb+1,lab_);
 				htest_data->GetXaxis()->SetBinLabel(nbb+1,lab_);
-
 				}
-
 
 				htt->Reset();
 				hwj->Reset();
@@ -637,7 +595,7 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 				CheckHistZero(hqcd);
 				CheckHistZero(httx);
 				//CheckHistZero(hh[1]);
-				
+*/				
 				htt->SetLineColor(mycolortt);
 				hwj->SetLineColor(mycolorwjet);
 				hdyj->SetLineColor(mycolordyj);
@@ -659,25 +617,6 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 				allnew_ ->Add(hqcd);
 				allnew_ ->Add(httx);
 
-				float sum_=0;float ss=0;
-				for (int nbb=0;nbb<sb_;++nbb) {
-				
-				sum_  = htt->GetBinContent(nbb+1);	
-				sum_ += hwj->GetBinContent(nbb+1);	
-				sum_ += hdyj->GetBinContent(nbb+1);	
-				sum_ += hztt->GetBinContent(nbb+1);	
-				sum_ += hstop->GetBinContent(nbb+1);	
-				sum_ += hdib->GetBinContent(nbb+1);	
-				sum_ += hww->GetBinContent(nbb+1);	
-				sum_ += hqcd->GetBinContent(nbb+1);	
-				sum_ += httx->GetBinContent(nbb+1);	
-				
-				ss += htt->GetBinContent(nbb+1);
-
-					cout<<" new histos allnew_ "<<allnew_->GetNbinsX()<<"  "<<allnew_->GetBinContent(nbb+1)<<" sum "<<sum_<<"  "<<ss<<endl;
-			
-				}
-	
 				histbkg = allnew_;
 				
 				//hh[1] = allbkg;
@@ -698,7 +637,7 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 				hqcd->Scale(scale);
 				httx->Scale(scale);
 	 }
-/*
+
 				htt->SetMinimum(0.1);
 				hdyj->SetMinimum(0.1);
 				hztt->SetMinimum(0.1);
@@ -708,61 +647,56 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 				hdib->SetMinimum(0.1);
 				hww->SetMinimum(0.1);
 				hqcd->SetMinimum(0.1);
-*/
+
 				s1 = "tt_"+variable;
-				CheckHistZero(htt);
-				htt->SetLineColor(kBlack);
+				htt->SetLineColor(mycolortt);
 				htt->SetName(s1);
 				htt->Write();
 
 				s1 = "wj_"+variable;
-				CheckHistZero(hwj);
-				hwj->SetLineColor(kBlack);
+				hwj->SetLineColor(mycolorwjet);
 				hwj->SetName(s1);
 				hwj->Write();
 
 				s1 = "dyj_"+variable;
-				CheckHistZero(hdyj);
-				hdyj->SetLineColor(kBlack);
+				hdyj->SetLineColor(mycolordyj);
 				hdyj->SetName(s1);
 				hdyj->Write();
 
 				s1 = "ztt_"+variable;
-				CheckHistZero(hztt);
-				hztt->SetLineColor(kBlack);
+				hztt->SetLineColor(mycolorztt);
 				hztt->SetName(s1);
 				hztt->Write();
 
 				s1 = "sT_"+variable;
 				CheckHistZero(hstop);
-				hstop->SetLineColor(kBlack);
+				hstop->SetLineColor(mycolortt);
 				hstop->SetName(s1);
 				hstop->Write();
 
 				s1 = "dib_"+variable;
 				CheckHistZero(hdib);
-				hdib->SetLineColor(kBlack);
+				hdib->SetLineColor(mycolorvv);
 				hdib->SetName(s1);
 				hdib->Write();
 
 				s1 = "ww_"+variable;
 				CheckHistZero(hww);
-				hww->SetLineColor(kBlack);
+				hww->SetLineColor(mycolorww);
 				hww->SetName(s1);
 				hww->Write();
 
 				s1 = "ttx_"+variable;
 				CheckHistZero(httx);
-				httx->SetLineColor(kBlack);
+				httx->SetLineColor(mycolorttx);
 				httx->SetName(s1);
 				httx->Write();
 
 				s1 = "qcd_"+variable;
 				CheckHistZero(hqcd);
-				hqcd->SetLineColor(kBlack);
+				hqcd->SetLineColor(mycolorqcd);
 				hqcd->SetName(s1);
 				hqcd->Write();
-				cout<<" Adding qcd ================= "<<hqcd->GetSumOfWeights()<<endl;
 
 				s1 = "data_obs_"+variable;
 				hh[1]->SetMinimum(0.1);
@@ -778,7 +712,7 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 				hh[1]->SetName(s1);
 				hh[1]->Write();
 
-				cout<<" comparing MC to data  , syst "<<syst<<"  MC "<<allnew_->GetSumOfWeights()<<"  data  "<<hh[1]->GetSumOfWeights()<<" tt "<<htt->GetSumOfWeights()<<"  "<<" wj "<<hwj->GetSumOfWeights()<<" dyj "<<hdyj->GetSumOfWeights()+hztt->GetSumOfWeights()<<" qcd "<<hqcd->GetSumOfWeights()<<" sT "<<hstop->GetSumOfWeights()<<" dib "<<hdib->GetSumOfWeights()<<" ttx "<<httx->GetSumOfWeights()<<" ww "<<hww->GetSumOfWeights()<<endl;
+				cout<<" comparing MC to data  , syst "<<syst<<"  MC "<<allnew_->GetSumOfWeights()<<"  data  "<<hh[1]->GetSumOfWeights()<<" tt "<<htt->GetSumOfWeights()<<"  "<<" wj "<<hwj->GetSumOfWeights()<<" dyj "<<hdyj->GetSumOfWeights()+hztt->GetSumOfWeights()<<" qcd "<<hqcd->GetSumOfWeights()<<" sT "<<hstop->GetSumOfWeights()<<" dib "<<hdib->GetSumOfWeights()<<" ttx "<<httx->GetSumOfWeights()<<endl;
 
 				for (unsigned int ij=0;ij<signal_names.size();++ij){
 					//cout<<" again  "<<signal_names[ij]<<endl;
@@ -795,17 +729,21 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 
 
 					TString ss1 = str.c_str();
-					s1 = ss1 +"_"+variable;
+					s1 = "1D_"+ss1 +"_"+variable;
 	if(b_scale)			hh[ij+2]->Scale(scale);
 					hh[ij+2]->SetLineColor(kBlue);
+					histbkg = hh[ij+2];
 					smFile->cd();
+					hh[ij+2]->SetName(s1);
+					hh[ij+2]->SetMarkerColor(kBlue);
+					hh[ij+2]->SetLineColor(kBlue);
+					hh[ij+2]->Write();
 				
-					htest_signal = new TH1D (hh[ij+2]->GetName(),hh[ij+2]->GetTitle(),sb_,1,sb_+1);
-
-
+					//htest_signal = new TH1D (histbkg->GetName(),histbkg->GetTitle(),sb_,1,sb_+1);
+/*
 				for (int nbb=0;nbb<keep_bin.size();++nbb){
-					htest_signal->SetBinContent(nbb+1,hh[ij+2]->GetBinContent(keep_bin[nbb]));
-					htest_signal->GetXaxis()->SetBinLabel(nbb+1,label_bin[nbb].c_str());
+					htest_signal->SetBinContent(nbb+1,histbkg->GetBinContent(keep_bin[nbb]));
+//					htest_signal->GetXaxis()->SetBinLabel(nbb+1,label_bin[nbb].c_str());
 
 //			float sing =  htest_signal->GetSumOfWeights()/sqrt(hh[1]->GetSumOfWeights());
 //				cout<<"  sign "<<sing<<" nb "<<nbb<<endl;
@@ -813,8 +751,8 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 				htest_signal->SetName(s1);
 				htest_signal->SetMarkerColor(kBlue);
 				htest_signal->SetLineColor(kBlue);
-				//CheckHistZero(htest_signal);
 				htest_signal->Write();
+				*/
 				}///end in signals
 
 
@@ -867,7 +805,7 @@ ModifyHist (TH1D* &h, int cl_ ,float & lumi,float & weight,string & title_, bool
 			}
 
 
-			if ( std::string::npos != title_.find("tau") || std::string::npos != title_.find("C1") || std::string::npos != title_.find("SMS") || std::string::npos != title_.find("Chi")){
+			if ( std::string::npos != title_.find("tau") || std::string::npos != title_.find("C1") || std::string::npos != title_.find("SMS")){
 
 				if (cl_>9) col=30+cl_;
 				col=cl_+1;
@@ -925,7 +863,6 @@ CheckHist (TH1D* &h)
 
 }
 
-
 void
 CheckHistZero (TH1D* &h)
 {
@@ -934,14 +871,12 @@ CheckHistZero (TH1D* &h)
 			for (int nb=0;nb<=h->GetNbinsX();++nb)
 			{
 				float bc_ = h->GetBinContent(nb);
-			if (bc_ <=0.) h->SetBinContent(nb,0.001);
-			float SoW = h->GetSumOfWeights();
-			int En = h->GetEntries();
-			if (bc_ <=0.) h->SetBinError(nb,float(SoW/En));
+			if (bc_ <0) h->SetBinContent(nb,0.001);
 			}
 
 
 }
+
 
 
 TH1D* Unroll(TH2D *& hist2D,char *&histName, float & norm){
@@ -974,14 +909,4 @@ TH1D* Unroll(TH2D *& hist2D,char *&histName, float & norm){
 }
 
 
-void OverFlow(TH1D *& h, int &last_bin){
-
-	int nb = h->GetNbinsX();
-	float over_ = h->GetBinContent(last_bin);
-	float contlast = 0.;//h->GetBinContent(last_bin);
-	for (int b=last_bin; b <= nb+1; b++) {contlast +=h->GetBinContent(b);h->SetBinContent(b,0.);}
-
-	h->SetBinContent(last_bin,0);
-	h->SetBinContent(last_bin,contlast);
-}
 

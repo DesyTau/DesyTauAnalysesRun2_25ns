@@ -86,10 +86,10 @@ TString BinLabels[100] = {
 	{
     //filee = new TFile("comb.root","read");
     //filee = new TFile("mlfit_all_mt_etBinbyBin.root","read");
-   // filee = new TFile("mlfit_all.root","read");
-    filee = new TFile("mlfit.root","read");
+    //filee = new TFile("/nfs/dust/cms/user/alkaloge/Workdir/CMSSW_7_4_7/src/Limits/STau/Results_SR_CR1/mlfit_all.root","read");
+    filee = new TFile("mlfit_all_noS.root","read");
     fitHisto = (TH1D*)filee->Get("shapes_fit_b/ch1/total_background");
-    fitHisto2 = (TH1D*)filee->Get("shapes_fit_s/ch1/total_background");
+    fitHisto2 = (TH1D*)filee->Get("shapes_fit_b/ch1/total_background");
 
     nB = fitHisto->GetNbinsX();
 
@@ -132,6 +132,7 @@ for (int svar=0;svar<vars_.size();++svar)
     TH1D * TTX = (TH1D*)file->Get("ttx_"+Variable);
     TH1D * QCD = (TH1D*)file->Get("qcd_"+Variable);
     TH1D * allbkg = (TH1D*)file->Get("tt_"+Variable);
+
  //   TH1D * histData = (TH1D*)file->Get("data_obs_"+Variable);
     TH1D * histData = (TH1D*)file->Get("data_obs");
     TH1D * histSignal = (TH1D*)file->Get("C1N2_100_LSP1_B_"+Variable);
@@ -319,8 +320,8 @@ cout<<" check "<<endl;
     ratioHPost->SetLineWidth(2);
     ratioHPost->SetLineStyle(2);
     ratioHPost->Sumw2();
-    if (!BlindData)legend->AddEntry(histData, "Observed - ProFit", "ple");
-    legend->AddEntry(ratioHPost, "Observed - PostFit" , "ple" );
+    if (!BlindData)legend->AddEntry(histData, "Observed", "ple");
+//    legend->AddEntry(ratioHPost, "Observed - PostFit" , "ple" );
     
 
 
@@ -426,6 +427,30 @@ sum +=allbkg->GetBinContent(b);
     
     }
 
+
+    cout<<" ========================================== Table ================================== "<<endl;
+
+
+cout<<"	    \\begin{table}"<<endl;
+cout<<"        \\caption{CR}"<<endl;
+cout<<"       \\begin{center}"<<endl;
+cout<<" \\resizebox{1.\\textwidth}{!} {"<<endl;
+cout<<"         \\begin{tabular}{|l|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}  \\hline "<<endl;
+cout<<"	 SR bin    &  TTJets     & WJets    & DYJets       & QCD   & SingleT    & VVJets   & TTXJets       & Total Bkg    & Observed \\\\"<<endl;
+     cout<<" \\hline "<<endl;
+
+     for (int b=1;b<allbkg->GetNbinsX()+1;++b){
+float sumBin = TTcl->GetBinContent(b)+WJ->GetBinContent(b)+DY->GetBinContent(b)+ZTT->GetBinContent(b)+QCD->GetBinContent(b)+ST->GetBinContent(b)+VV->GetBinContent(b)+WW->GetBinContent(b)+TTX->GetBinContent(b);
+    std::cout << std::setprecision(2);
+
+     cout<<"SL"<<histData->GetXaxis()->GetBinLabel(b)<<" & "<<TTcl->GetBinContent(b)<< " & "<<WJ->GetBinContent(b)<<" & "<<DY->GetBinContent(b)+ZTT->GetBinContent(b)<<" & "<<QCD->GetBinContent(b)<<" & "<<ST->GetBinContent(b)<<" & "<<VV->GetBinContent(b)+WW->GetBinContent(b)<<" & "<<TTX->GetBinContent(b)<<" & "<<sumBin<<" $\\pm$ "<<sqrt(sumBin)<<" & "<<histData->GetBinContent(b)<<" \\\\\\hline "<<endl;
+     }
+
+cout<<"	    \\end{tabular}}"<<endl;
+cout<<"       \\end{center}"<<endl;
+
+cout<<"	    \\end{table}"<<endl;
+
     canv1->Update();
 
     canv1->Update();
@@ -500,16 +525,16 @@ sum +=allbkg->GetBinContent(b);
     bkgdErr->SetFillStyle(3002);
     bkgdErr->SetFillColor(new_idx);
     bkgdErr->SetLineWidth(1);
-if (OverlayFit)   bkgdErr->Draw("e2same");
+//if (OverlayFit)   bkgdErr->Draw("e2same");
 
     bkgdErrPost->SetFillColor(new_idxP);
     bkgdErrPost->SetLineColor(new_idxP);
     bkgdErrPost->SetLineWidth(1);
-if (OverlayFit)    bkgdErrPost->Draw("e2same");
+//if (OverlayFit)    bkgdErrPost->Draw("e2same");
 
 
     legend->AddEntry(bkgdErr, "Bkg. uncertainty PreFit" , "F" );
-if (OverlayFit)    legend->AddEntry(bkgdErrPost, "Bkg. uncertainty PostFit" , "F" );
+//if (OverlayFit)    legend->AddEntry(bkgdErrPost, "Bkg. uncertainty PostFit" , "F" );
     canv1->Update();
 
     TH1D * ratioH = (TH1D*)histData->Clone("ratioH");
@@ -632,7 +657,7 @@ if (OverlayFit)    legend->AddEntry(bkgdErrPost, "Bkg. uncertainty PostFit" , "F
     //ratioErrHPost->GetYaxis()->SetRangeUser(0.8,1.2);
 
     ratioErrH->Draw("e2same");
-if (OverlayFit)    ratioErrHPost->Draw("e2same");
+//if (OverlayFit)    ratioErrHPost->Draw("e2same");
 //if (OverlayFit)    ratioErrHPostH1->Draw("e2same");
 
 
@@ -646,7 +671,7 @@ if (OverlayFit)    ratioErrHPost->Draw("e2same");
     ratioHPost->SetLineWidth(2);
     ratioHPost->SetLineStyle(2);
     ratioHPost->Sumw2();
-if (OverlayFit)    ratioHPost->Draw("pe0same");
+//if (OverlayFit)    ratioHPost->Draw("pe0same");
 
     ratioHPostH1->SetMarkerStyle(24);
     ratioHPostH1->SetMarkerColor(kBlue);

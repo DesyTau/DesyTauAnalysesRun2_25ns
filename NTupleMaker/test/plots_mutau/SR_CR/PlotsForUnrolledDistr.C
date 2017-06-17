@@ -17,15 +17,15 @@
 #include "TMath.h"
 //WithoutNPV/
 void PlotsForUnrolledDistr(TString directory = "",
-	  TString suffix = "_SR_CR1_MuTau_mt_et_wBinUncrt",
-	  TString File = "Templ_met_MT2lester_DZeta01J1D_17_35invfb_mt_C1N2_SR_CR1.root",
+	  TString suffix = "_SR_CR_MuTau_mt_et_wBinUncrt",
+	  TString File = "Templ_met_MT2lester_DZeta01J1D_17_35invfb_mt_C1N2_SR_CR.root",
 	  TString variable = "",
 	  TString Suffix = "",
 	  TString xtitle = "",
 	  TString ytitle = "Events",
       bool logY = true,
- 	    bool BlindData = false,
-	    bool OverlayFit = true
+ 	    bool BlindData = true,
+	    bool OverlayFit = false
 
           )
 
@@ -80,27 +80,26 @@ TString BinLabels[100] = {
 
 	directory="";
     TFile * filee ;//
-    TH1D * fitHisto, *fitHisto2, *fitHistoPostH0, *fitHistoPostH1, *errPreFit, *errPreFitB;
+    TH1D * fitHisto, *fitHisto2, *fitHistoPostH0, *fitHistoPostH1;
     int nB=1;
     if (OverlayFit) 
 	{
-    //filee = new TFile("/nfs/dust/cms/user/alkaloge/Workdir/CMSSW_7_4_7/src/Limits/STau/Results_SR_CR1/mlfit_mt_only.root","read");
-    //filee = new TFile("/nfs/dust/cms/user/alkaloge/Workdir/CMSSW_7_4_7/src/Limits/STau/Results_SR_CR1/mlfit_mt_only.root","read");
-    filee = new TFile("mlfit_all_noS.root","read");
+    filee = new TFile("mlfit_mt_et.root","read");
+  //  filee = new TFile("mlfit_et_only.root","read");
     fitHisto = (TH1D*)filee->Get("shapes_fit_b/ch1/total_background");
-    fitHisto2 = (TH1D*)filee->Get("shapes_fit_b/ch1/total_background");
-    errPreFit = (TH1D*)filee->Get("shapes_prefit/ch1/total_background");
+    fitHisto2 = (TH1D*)filee->Get("shapes_fit_s/ch1/total_background");
 
     nB = fitHisto->GetNbinsX();
 
     fitHistoPostH0 =  new TH1D ("","",nB,1,nB+1);
     fitHistoPostH1 =  new TH1D ("","",nB,1,nB+1);
-    errPreFitB =  new TH1D ("","",nB,1,nB+1);
 
     for (int nb=1;nb <= fitHisto->GetNbinsX()+1; ++nb){ fitHistoPostH0->SetBinContent(nb,fitHisto->GetBinContent(nb)); fitHistoPostH0->SetBinError(nb,fitHisto->GetBinError(nb)); cout<<"  i  "<<nb<<"  "<<fitHisto->GetBinError(nb)<<endl;}
     for (int nb=1;nb <= fitHisto2->GetNbinsX()+1; ++nb){ fitHistoPostH1->SetBinContent(nb,fitHisto2->GetBinContent(nb)); fitHistoPostH1->SetBinError(nb,fitHisto2->GetBinError(nb)); cout<<"  i  "<<nb<<"  "<<fitHisto2->GetBinError(nb)<<endl;}
-    for (int nb=1;nb <= fitHisto2->GetNbinsX()+1; ++nb){ errPreFitB->SetBinContent(nb,errPreFit->GetBinContent(nb)); errPreFitB->SetBinError(nb,errPreFit->GetBinError(nb)); cout<<"  i  "<<nb<<"  "<<errPreFitB->GetBinError(nb)<<endl;}
 
+  //  fitHistoPostH0->SetFillStyle(0);
+ //   fitHistoPostH0->SetFillColor(0);
+//    fitHistoPostH0->SetMarkerStyle(31);
     fitHistoPostH0->SetMarkerSize(1.5);
     fitHistoPostH0->SetLineColor(kRed);
     fitHistoPostH0->SetLineWidth(3);
@@ -120,25 +119,25 @@ for (int svar=0;svar<vars_.size();++svar)
 {
 	TString Variable=vars_.at(svar);
 
-    TH1D * TT = (TH1D*)file->Get("tt_"+Variable);
-    //TH1D * TTcl = (TH1D*)file->Get("tt_"+Variable);
-    TH1D * WJ = (TH1D*)file->Get("wj_"+Variable);
-    TH1D * DY = (TH1D*)file->Get("dyj_"+Variable);
-    TH1D * ZTT = (TH1D*)file->Get("ztt_"+Variable);
-    TH1D * ST = (TH1D*)file->Get("sT_"+Variable);
-    TH1D * VV = (TH1D*)file->Get("dib_"+Variable);
-    TH1D * WW = (TH1D*)file->Get("ww_"+Variable);
-    TH1D * TTX = (TH1D*)file->Get("ttx_"+Variable);
-    TH1D * QCD = (TH1D*)file->Get("qcd_"+Variable);
-    TH1D * allbkg = (TH1D*)file->Get("tt_"+Variable);
+    TH1D * TT = (TH1D*)file->Get("1D_tt_"+Variable);
+    //TH1D * TTcl = (TH1D*)file->Get("1D_tt_"+Variable);
+    TH1D * WJ = (TH1D*)file->Get("1D_wj_"+Variable);
+    TH1D * DY = (TH1D*)file->Get("1D_dyj_"+Variable);
+    TH1D * ZTT = (TH1D*)file->Get("1D_ztt_"+Variable);
+    TH1D * ST = (TH1D*)file->Get("1D_sT_"+Variable);
+    TH1D * VV = (TH1D*)file->Get("1D_dib_"+Variable);
+    TH1D * WW = (TH1D*)file->Get("1D_ww_"+Variable);
+    TH1D * TTX = (TH1D*)file->Get("1D_ttx_"+Variable);
+    TH1D * QCD = (TH1D*)file->Get("1D_qcd_"+Variable);
+    TH1D * allbkg = (TH1D*)file->Get("1D_tt_"+Variable);
  //   TH1D * histData = (TH1D*)file->Get("data_obs_"+Variable);
     TH1D * histData = (TH1D*)file->Get("data_obs");
-    TH1D * histSignal = (TH1D*)file->Get("C1N2_400_LSP1_B_"+Variable);
-    TH1D * histSignal2 = (TH1D*)file->Get("C1N2_100_LSP50_B_"+Variable);
-//    TH1D * histSignal3 = (TH1D*)file->Get("C1N2_500_LSP100_B_"+Variable);
-//    TH1D * histSignal4 = (TH1D*)file->Get("stau-stau_100_LSP1_B_"+Variable);
-
-
+    TH1D * histSignal = (TH1D*)file->Get("1D_C1N2_400_LSP1_B_"+Variable);
+    TH1D * histSignal2 = (TH1D*)file->Get("1D_C1N2_100_LSP50_B_"+Variable);
+//    TH1D * histSignal3 = (TH1D*)file->Get("1D_C1N2_500_LSP100_B_"+Variable);
+//    TH1D * histSignal4 = (TH1D*)file->Get("1D_stau-stau_100_LSP1_B_"+Variable);
+    TH1D * histSignal5 = (TH1D*)file->Get("1D_stau-stau_left_100_LSP1_B_"+Variable);
+    TH1D * histSignal6 = (TH1D*)file->Get("1D_stau-stau_right_100_LSP1_B_"+Variable);
 
 
 
@@ -175,6 +174,27 @@ if (BlindData) {for (int iB=1; iB<=nBins; ++iB) {histData->SetBinContent(iB,0);}
   std::cout << "histSignal : " << histSignal->GetSumOfWeights() << " : "  <<" GetNbinsX= " << histSignal->GetNbinsX()<<endl;
 if (OverlayFit) std::cout << "fitHisto : " << fitHisto->GetSumOfWeights() << " : "  <<" GetNbinsX= " << fitHisto->GetNbinsX()<< std::endl;
 
+/*
+  float nData = histData->GetSumOfWeights();
+  float nTT   = TT->GetSumOfWeights();
+  float eData = TMath::Sqrt(nData);
+  float nNonTT = 
+    VV->GetSumOfWeights() + 
+    ZTT->GetSumOfWeights() +
+    ZLL->GetSumOfWeights() + 
+    QCD->GetSumOfWeights() +
+    W->GetSumOfWeights(); 
+
+  float ttScale = (nData-nNonTT)/nTT;
+  float ttScaleE = eData/nTT;
+  float bkgE = 0.3*nNonTT/nTT;
+
+  //  std::cout << "TT scale factor = " << ttScale << " +/- " << ttScaleE << " +/- " << bkgE << std::endl;
+
+*/
+  // ***********************************
+  // **** Systematic uncertainties *****
+  // ***********************************
   
   std::cout << "BKG : " << allbkg->GetSumOfWeights() << " : " << allbkg->Integral(0,nBins+1) << std::endl;
   std::cout << "DAT : " << histData->GetSumOfWeights() << " : " << histData->Integral(0,nBins+1) << std::endl;
@@ -185,7 +205,6 @@ cout<<"==========="<<endl;
     //ModTDRStyle();
     TH1D * bkgdErr = (TH1D*)allbkg->Clone("bkgdErr");
     TH1D * bkgdErrPost, *bkgdErrPostH1; 
-
     if (OverlayFit) { bkgdErrPost = (TH1D*)fitHistoPostH0->Clone("bkgdErrPost"); bkgdErrPostH1 = (TH1D*)fitHistoPostH1->Clone("bkgdErrPost");}
     else{  bkgdErrPost = (TH1D*)allbkg->Clone("bkgdErrPost");  bkgdErrPostH1 = (TH1D*)allbkg->Clone("bkgdErrPost");}
 
@@ -215,7 +234,7 @@ cout<<"==========="<<endl;
 
     pads[1]->cd();
     h[1]->Draw();
-    SetupTwoPadSplitAsRatio(pads, "Obs/Exp", true, 0.35, 1.55);
+    SetupTwoPadSplitAsRatio(pads, "Obs/Exp", true, 0.45, 1.55);
     StandardAxes(h[1]->GetXaxis(), h[0]->GetYaxis(),xtitle_ ,units);
     h[1]->GetYaxis()->SetNdivisions(4);
     h[1]->GetXaxis()->SetTitleOffset(1.2);
@@ -294,6 +313,21 @@ cout<<"==========="<<endl;
     histSignal4->SetMarkerStyle(31);
     histSignal4->SetMarkerSize(1.5);
 */
+    color=kRed;
+    histSignal5->SetMarkerColor(color);
+    histSignal5->SetLineColor(color);
+    histSignal5->SetFillColor(color);
+    histSignal5->SetFillStyle(0);
+    histSignal5->SetMarkerStyle(31);
+    histSignal5->SetMarkerSize(1.5);
+
+    color=kGreen-1;
+    histSignal6->SetMarkerColor(color);
+    histSignal6->SetLineColor(color);
+    histSignal6->SetFillColor(color);
+    histSignal6->SetFillStyle(0);
+    histSignal6->SetMarkerStyle(31);
+    histSignal6->SetMarkerSize(1.5);
 
 cout<<" check "<<endl;
     if (!BlindData)legend->AddEntry(histData, "Observed", "ple");
@@ -326,6 +360,8 @@ cout<<" check "<<endl;
  //   legend->AddEntry(histSignal3,"C1N2_500_LSP_100","ple");
 //    legend->AddEntry(histSignal4,"C1C1_100_LSP_1","ple");
 //    legend->AddEntry(histSignal4,"#tau_100_LSP_1","ple");
+    legend->AddEntry(histSignal5,"#tau_{L}100_LSP_1","ple");
+    legend->AddEntry(histSignal6,"#tau_{R}100_LSP_1","ple");
 
 
 
@@ -380,12 +416,7 @@ for (int iB=1; iB<=nBins; ++iB) {WJ->SetBinError(iB,0);TT->SetBinError(iB,0);DY-
     cout<<" check again"<<endl;
   hsum->Draw("same hist");
   hs->Draw("same hist");
-  for (int n=1;n<histSignal->GetNbinsX()+1;++n) cout<<" Signal metrics  "<<histSignal->GetBinContent(n)<<endl;
-
-
-  for (int n=1;n<histSignal->GetNbinsX()+1;++n) histSignal->SetBinError(n,0);
-    histSignal->Draw("same p");
-
+    histSignal->Draw("samep");
 if(OverlayFit)    fitHistoPostH0->Draw("sameh");
 if(OverlayFit)    fitHistoPostH1->Draw("sameh");
 
@@ -398,15 +429,44 @@ cout<<" check "<<endl;
 //    histSignal5->SetLineStyle(4);
 //    histSignal6->SetLineStyle(4);
 //    histSignal4->Draw("samep");
+    histSignal5->Draw("samep");
+    histSignal6->Draw("samep");
 
 float sum;
     for (int b=1;b<allbkg->GetNbinsX()+1;++b) cout<< "  b  "<<b<<" mc "<<allbkg->GetBinContent(b)<<" data  "<<histData->GetBinContent(b)<<"  "<<histData->GetBinContent(b)/allbkg->GetBinContent(b)<<" deviation "<<(histData->GetBinContent(b) - allbkg->GetBinContent(b))/sqrt(histData->GetBinContent(b))<<" DYJets "<<DY->GetBinContent(b)<<" TT "<<TTcl->GetBinContent(b)<<endl;
 
     cout<<" =============== SF study  ======================"<<endl;
+    for (int b=1;b<allbkg->GetNbinsX()+1;++b) {
+	    
+ float SFw = 1; if (WJ->GetBinContent(b) > 0) SFw = (histData->GetBinContent(b) - (allbkg->GetBinContent(b)-WJ->GetBinContent(b))) / WJ->GetBinContent(b); 
+ float SFdyj = 1; if (DY->GetBinContent(b)> 0) SFdyj = (histData->GetBinContent(b) - (allbkg->GetBinContent(b)-DY->GetBinContent(b))) / DY->GetBinContent(b); 
+ float SFtt = 1; if (TTcl->GetBinContent(b)> 0)  SFtt = (histData->GetBinContent(b) - (allbkg->GetBinContent(b)-TTcl->GetBinContent(b))) / TTcl->GetBinContent(b); 
+
+ float purW =  WJ->GetBinContent(b)/allbkg->GetBinContent(b);
+ float purtt =  TTcl->GetBinContent(b)/allbkg->GetBinContent(b);
+ float purdyj =  DY->GetBinContent(b)/allbkg->GetBinContent(b);
+	    
+sum +=allbkg->GetBinContent(b);
+
+	//    cout<< "  b  "<<allbkg->GetXaxis()->GetBinLabel(b)<<" sum  "<<sum<<"  mc "<<allbkg->GetBinContent(b)<<" purWJ  "<<purW<<" purDY  "<<purdyj<<"  purTT "<<purtt<<"  sfW "<<SFw<<" sfDY  "<<SFdyj<<" sfTT  "<<SFtt<<"  "<<TTcl->GetBinContent(b)<<endl;
+   // cout<<" Bin  "<< b  <<" Sign "<<histSignal->GetBinContent(b)/sqrt(allbkg->GetBinContent(b))<<" Signal2  "<<histSignal2->GetBinContent(b)/sqrt(allbkg->GetBinContent(b))<<" Signal3  "<<histSignal3->GetBinContent(b)/sqrt(allbkg->GetBinContent(b))<<endl;
+    
+    }
 
     canv1->Update();
 
     canv1->Update();
+ /*   
+    if (blindData)
+    {
+        for (int iB=nbMin; iB<=nbMax; ++iB)
+        {
+            histData->SetBinContent(iB,-1);
+            histData->SetBinError(iB,0);
+        }
+    }
+   */ 
+    
 
 
 
@@ -452,21 +512,19 @@ float sum;
         //float eBkg = dummy->GetBinError(iB);
         //float Err = TMath::Sqrt(eStat*eStat+eLumi*eLumi+eBkg*eBkg+eMuon*eMuon+eElectron*eElectron);
 	float Err = TMath::Sqrt(eStat*eStat+eLumi*eLumi + eElectron*eElectron + eMuon*eMuon + eTau*eTau + eMET*eMET + eTFR*eTFR + eLTFR*eLTFR + eTauID*eTauID);
-	float ErrPost = eStatPost;//TMath::Sqrt(eStatPost*eStatPost+eLumiPost*eLumiPost + eElectronP*eElectronP + eMuonP*eMuonP + eTauP*eTauP + eMETP*eMETP + eTFRP*eTFRP + eLTFRP*eLTFRP + eTauIDP*eTauIDP);
-	
-	
-      if (OverlayFit)  bkgdErr->SetBinError(iB,errPreFitB->GetBinError(iB));
-      else bkgdErr->SetBinError(iB,allbkg->GetBinError(iB));
-        //bkgdErrPost->SetBinError(iB,ErrPost);
+	float ErrPost = TMath::Sqrt(eStatPost*eStatPost+eLumiPost*eLumiPost + eElectronP*eElectronP + eMuonP*eMuonP + eTauP*eTauP + eMETP*eMETP + eTFRP*eTFRP + eLTFRP*eLTFRP + eTauIDP*eTauIDP);
+
+        bkgdErr->SetBinError(iB,Err);
+        bkgdErrPost->SetBinError(iB,ErrPost);
 	cout<<" iB "<<iB<<" Pre "<<float(eStat/X)<<" Post  "<<float(eStatPost/XPost)<<"  "<<ErrPost<<"  "<<Err<<endl;
     }
 
     
     bkgdErr->SetMarkerSize(0);
-    int new_idx = CreateTransparentColor(kBlue,0.8);
+    int new_idx = CreateTransparentColor(13,0.5);
     int new_idxP = CreateTransparentColor(kGreen,0.3);
 
-    bkgdErr->SetFillStyle(3003);
+//    bkgdErr->SetFillStyle(3003);
     bkgdErr->SetFillColor(new_idx);
     bkgdErr->SetLineWidth(1);
 if (OverlayFit)   bkgdErr->Draw("e2same");
@@ -560,7 +618,7 @@ if (OverlayFit)    legend->AddEntry(bkgdErrPost, "Bkg. uncertainty PostFit H_{0}
 
     ratioErrH->Draw("e2same");
 if (OverlayFit)    ratioErrHPost->Draw("e2same");
-//if (OverlayFit)    ratioErrHPostH1->Draw("e2same");
+if (OverlayFit)    ratioErrHPostH1->Draw("e2same");
 
 
 
@@ -582,8 +640,8 @@ if (OverlayFit)    ratioHPost->Draw("pe0same");
     ratioHPostH1->SetLineWidth(2);
     ratioHPostH1->SetLineStyle(2);
     ratioHPostH1->Sumw2();
-//if (OverlayFit)    ratioHPostH1->Draw("pe0same");
-//    legend->AddEntry(ratioHPostH1, "PostFit H_{1} -Bkg+C1N2 (100,1)" , "ple" );
+if (OverlayFit)    ratioHPostH1->Draw("pe0same");
+    legend->AddEntry(ratioHPostH1, "PostFit H_{1} -Bkg+C1N2 (100,1)" , "ple" );
 
 
     }

@@ -80,22 +80,24 @@ TString BinLabels[100] = {
 
 	directory="";
     TFile * filee ;//
-    TH1D * fitHisto, *fitHisto2, *fitHistoPostH0, *fitHistoPostH1;
+    TH1D * fitHisto, *fitHisto2, *fitHistoPostH0, *fitHistoPostH1, *errPreFit, *errPreFitB;
     int nB=1;
     if (OverlayFit) 
 	{
-    //filee = new TFile("mlfit_all.root","read");
-   filee = new TFile("mlfit_mt_et.root","read");
+    filee = new TFile("/nfs/dust/cms/user/alkaloge/Workdir/CMSSW_7_4_7/src/Limits/STau/Results_CRB/mlfit_mt_et.root","read");
     fitHisto = (TH1D*)filee->Get("shapes_fit_b/ch1/total_background");
     fitHisto2 = (TH1D*)filee->Get("shapes_fit_s/ch1/total_background");
+    errPreFit = (TH1D*)filee->Get("shapes_prefit/ch1/total_background");
 
     nB = fitHisto->GetNbinsX();
 
     fitHistoPostH0 =  new TH1D ("","",nB,1,nB+1);
     fitHistoPostH1 =  new TH1D ("","",nB,1,nB+1);
+    errPreFitB =  new TH1D ("","",nB,1,nB+1);
 
     for (int nb=1;nb <= fitHisto->GetNbinsX()+1; ++nb){ fitHistoPostH0->SetBinContent(nb,fitHisto->GetBinContent(nb)); fitHistoPostH0->SetBinError(nb,fitHisto->GetBinError(nb)); cout<<"  i  "<<nb<<"  "<<fitHisto->GetBinError(nb)<<endl;}
     for (int nb=1;nb <= fitHisto2->GetNbinsX()+1; ++nb){ fitHistoPostH1->SetBinContent(nb,fitHisto2->GetBinContent(nb)); fitHistoPostH1->SetBinError(nb,fitHisto2->GetBinError(nb)); cout<<"  i  "<<nb<<"  "<<fitHisto2->GetBinError(nb)<<endl;}
+    for (int nb=1;nb <= fitHisto2->GetNbinsX()+1; ++nb){ errPreFitB->SetBinContent(nb,errPreFit->GetBinContent(nb)); errPreFitB->SetBinError(nb,errPreFit->GetBinError(nb)); cout<<"  i  "<<nb<<"  "<<errPreFitB->GetBinError(nb)<<endl;}
 
   //  fitHistoPostH0->SetFillStyle(0);
  //   fitHistoPostH0->SetFillColor(0);
@@ -132,12 +134,14 @@ for (int svar=0;svar<vars_.size();++svar)
     TH1D * allbkg = (TH1D*)file->Get("tt_"+Variable);
  //   TH1D * histData = (TH1D*)file->Get("data_obs_"+Variable);
     TH1D * histData = (TH1D*)file->Get("data_obs");
-    TH1D * histSignal = (TH1D*)file->Get("C1N2_100_LSP1_B_"+Variable);
-//    TH1D * histSignal2 = (TH1D*)file->Get("C1N2_100_LSP50_B_"+Variable);
+    TH1D * histSignal = (TH1D*)file->Get("C1N2_400_LSP1_B_"+Variable);
+    TH1D * histSignal2 = (TH1D*)file->Get("C1N2_100_LSP50_B_"+Variable);
 //    TH1D * histSignal3 = (TH1D*)file->Get("C1N2_500_LSP100_B_"+Variable);
 //    TH1D * histSignal4 = (TH1D*)file->Get("stau-stau_100_LSP1_B_"+Variable);
-//    TH1D * histSignal5 = (TH1D*)file->Get("stau-stau_left_100_LSP1_B_"+Variable);
-//    TH1D * histSignal6 = (TH1D*)file->Get("stau-stau_right_100_LSP1_B_"+Variable);
+    TH1D * histSignal5 = (TH1D*)file->Get("stau-stau_left_100_LSP1_B_"+Variable);
+    TH1D * histSignal6 = (TH1D*)file->Get("stau-stau_right_100_LSP1_B_"+Variable);
+
+
 
 
 
@@ -174,43 +178,6 @@ if (BlindData) {for (int iB=1; iB<=nBins; ++iB) {histData->SetBinContent(iB,0);}
   std::cout << "histSignal : " << histSignal->GetSumOfWeights() << " : "  <<" GetNbinsX= " << histSignal->GetNbinsX()<<endl;
 if (OverlayFit) std::cout << "fitHisto : " << fitHisto->GetSumOfWeights() << " : "  <<" GetNbinsX= " << fitHisto->GetNbinsX()<< std::endl;
 
-/*
-  float nData = histData->GetSumOfWeights();
-  float nTT   = TT->GetSumOfWeights();
-  float eData = TMath::Sqrt(nData);
-  float nNonTT = 
-    VV->GetSumOfWeights() + 
-    ZTT->GetSumOfWeights() +
-    ZLL->GetSumOfWeights() + 
-    QCD->GetSumOfWeights() +
-    W->GetSumOfWeights(); 
-
-  float ttScale = (nData-nNonTT)/nTT;
-  float ttScaleE = eData/nTT;
-  float bkgE = 0.3*nNonTT/nTT;
-
-  //  std::cout << "TT scale factor = " << ttScale << " +/- " << ttScaleE << " +/- " << bkgE << std::endl;
-
-*/
-  // ***********************************
-  // **** Systematic uncertainties *****
-  // ***********************************
- /* TH1D * dummy = (TH1D*)ZTT->Clone("dummy");
-  float errQCD = 0.15; // normalization of QCD background
-  float errVV = 0.15; // normalization of VV background
-  float errW = 0.1; // normalization of W+Jets background
-  float errTT = 0.07; // normalization of TT background
-  for (int iB=1; iB<=nBins; ++iB) {
-    float eQCD = errQCD*QCD->GetBinContent(iB);
-    float eVV = errVV*VV->GetBinContent(iB);
-    float eW = errW*W->GetBinContent(iB);
-    float eTT = errTT*TT->GetBinContent(iB);
-    float err2 = eQCD*eQCD + eVV*eVV + eW*eW + eTT*eTT;
-    float errTot = TMath::Sqrt(err2);
-    dummy->SetBinError(iB,errTot);
-    SMH->SetBinError(iB,0);
-  }
-   */ 
   
   std::cout << "BKG : " << allbkg->GetSumOfWeights() << " : " << allbkg->Integral(0,nBins+1) << std::endl;
   std::cout << "DAT : " << histData->GetSumOfWeights() << " : " << histData->Integral(0,nBins+1) << std::endl;
@@ -221,6 +188,7 @@ cout<<"==========="<<endl;
     //ModTDRStyle();
     TH1D * bkgdErr = (TH1D*)allbkg->Clone("bkgdErr");
     TH1D * bkgdErrPost, *bkgdErrPostH1; 
+
     if (OverlayFit) { bkgdErrPost = (TH1D*)fitHistoPostH0->Clone("bkgdErrPost"); bkgdErrPostH1 = (TH1D*)fitHistoPostH1->Clone("bkgdErrPost");}
     else{  bkgdErrPost = (TH1D*)allbkg->Clone("bkgdErrPost");  bkgdErrPostH1 = (TH1D*)allbkg->Clone("bkgdErrPost");}
 
@@ -250,7 +218,7 @@ cout<<"==========="<<endl;
 
     pads[1]->cd();
     h[1]->Draw();
-    SetupTwoPadSplitAsRatio(pads, "Obs/Exp", true, 0.25, 1.55);
+    SetupTwoPadSplitAsRatio(pads, "Obs/Exp", true, 0.35, 1.55);
     StandardAxes(h[1]->GetXaxis(), h[0]->GetYaxis(),xtitle_ ,units);
     h[1]->GetYaxis()->SetNdivisions(4);
     h[1]->GetXaxis()->SetTitleOffset(1.2);
@@ -285,49 +253,7 @@ cout<<"==========="<<endl;
     //histSignal->SetLineWidth(2);
     histSignal->SetMarkerStyle(31);
     histSignal->SetMarkerSize(1.5);
-/*
-    color=kRed;
-    histSignal2->SetMarkerColor(kRed);
-    histSignal2->SetLineColor(color);
-    histSignal2->SetFillColor(color);
-    histSignal2->SetFillStyle(0);
-    //histSignal->SetLineWidth(2);
-    histSignal2->SetMarkerStyle(31);
-    histSignal2->SetMarkerSize(1.5);
-    
 
-    color=TColor::GetColor("#66ccc3");
-    histSignal3->SetMarkerColor(color);
-    histSignal3->SetLineColor(color);
-    histSignal3->SetFillColor(color);
-    histSignal3->SetFillStyle(0);
-    //histSignal->SetLineWidth(2);
-    histSignal3->SetMarkerStyle(31);
-    histSignal3->SetMarkerSize(1.5);
-
-    color=kRed;
-    histSignal4->SetMarkerColor(color);
-    histSignal4->SetLineColor(color);
-    histSignal4->SetFillColor(color);
-    histSignal4->SetFillStyle(0);
-    //histSignal->SetLineWidth(2);
-    histSignal4->SetMarkerStyle(31);
-    histSignal4->SetMarkerSize(1.5);
-    color=kBlue;
-    histSignal6->SetMarkerColor(color);
-    histSignal6->SetLineColor(color);
-    histSignal6->SetFillColor(color);
-    histSignal6->SetFillStyle(0);
-    //histSignal->SetLineWidth(2);
-    histSignal6->SetMarkerStyle(31);
-    histSignal6->SetMarkerSize(1.5);
-    color=kMagenta;
-    histSignal4->SetMarkerColor(color);
-    histSignal4->SetLineColor(color);
-    histSignal4->SetFillColor(color);
-    histSignal4->SetFillStyle(0);
-    histSignal4->SetMarkerStyle(31);
-    histSignal4->SetMarkerSize(1.5);
     color=kRed;
     histSignal5->SetMarkerColor(color);
     histSignal5->SetLineColor(color);
@@ -343,12 +269,9 @@ cout<<"==========="<<endl;
     histSignal6->SetFillStyle(0);
     histSignal6->SetMarkerStyle(31);
     histSignal6->SetMarkerSize(1.5);
-*/
 
-cout<<" check "<<endl;
     if (!BlindData)legend->AddEntry(histData, "Observed", "ple");
     
-
 
 
     InitHist(QCD,mycolorqcd);
@@ -371,13 +294,9 @@ cout<<" check "<<endl;
     legend->AddEntry(DY,"DY#rightarrow#mu#mu/ee","f");
     legend->AddEntry(WW,"WW","f");
     legend->AddEntry(VV,"Rest","f");
-    legend->AddEntry(histSignal,"C1N2_100_LSP_1","ple");
-//    legend->AddEntry(histSignal2,"C1N2_325_LSP_25","ple");
- //   legend->AddEntry(histSignal3,"C1N2_500_LSP_100","ple");
-//    legend->AddEntry(histSignal4,"C1C1_100_LSP_1","ple");
-//    legend->AddEntry(histSignal4,"#tau_100_LSP_1","ple");
-//    legend->AddEntry(histSignal5,"#tau_{L}100_LSP_1","ple");
-//    legend->AddEntry(histSignal6,"#tau_{R}100_LSP_1","ple");
+    legend->AddEntry(histSignal,"C1N2_400_LSP_1","ple");
+    legend->AddEntry(histSignal5,"#tau_{L}100_LSP_1","ple");
+    legend->AddEntry(histSignal6,"#tau_{R}100_LSP_1","ple");
 
 
 
@@ -432,7 +351,14 @@ for (int iB=1; iB<=nBins; ++iB) {WJ->SetBinError(iB,0);TT->SetBinError(iB,0);DY-
     cout<<" check again"<<endl;
   hsum->Draw("same hist");
   hs->Draw("same hist");
-    histSignal->Draw("samep");
+  for (int n=1;n<histSignal->GetNbinsX()+1;++n) cout<<" Signal metrics  "<<histSignal->GetBinContent(n)<<endl;
+
+
+  for (int n=1;n<histSignal->GetNbinsX()+1;++n) histSignal->SetBinError(n,0);
+  for (int n=1;n<histSignal->GetNbinsX()+1;++n) histSignal5->SetBinError(n,0);
+  for (int n=1;n<histSignal->GetNbinsX()+1;++n) histSignal6->SetBinError(n,0);
+    histSignal->Draw("same p");
+
 if(OverlayFit)    fitHistoPostH0->Draw("sameh");
 if(OverlayFit)    fitHistoPostH1->Draw("sameh");
 
@@ -445,8 +371,8 @@ cout<<" check "<<endl;
 //    histSignal5->SetLineStyle(4);
 //    histSignal6->SetLineStyle(4);
 //    histSignal4->Draw("samep");
-//    histSignal5->Draw("samep");
-//    histSignal6->Draw("samep");
+    histSignal5->Draw("samep");
+    histSignal6->Draw("samep");
 
 float sum;
     for (int b=1;b<allbkg->GetNbinsX()+1;++b) cout<< "  b  "<<b<<" mc "<<allbkg->GetBinContent(b)<<" data  "<<histData->GetBinContent(b)<<"  "<<histData->GetBinContent(b)/allbkg->GetBinContent(b)<<" deviation "<<(histData->GetBinContent(b) - allbkg->GetBinContent(b))/sqrt(histData->GetBinContent(b))<<" DYJets "<<DY->GetBinContent(b)<<" TT "<<TTcl->GetBinContent(b)<<endl;
@@ -509,35 +435,14 @@ sum +=allbkg->GetBinContent(b);
         float XPost = bkgdErrPost->GetBinContent(iB);
         float eLumiPost = errLumi * XPost;
 
-        float eMuon = errMuon * X;
-        float eElectron = errElectron * X;
-        float eMET = errMET * X;
-        float eTau = errTau * X;
-        float eTauID = errTauID * X;
-        float eTFR = errTFR * X;
-        float eLTFR = errLTFR * X;
 
-        float eMuonP = errMuon * XPost;
-        float eElectronP = errElectron * XPost;
-        float eMETP = errMET * XPost;
-        float eTauP = errTau * XPost;
-        float eTauIDP = errTauID * XPost;
-        float eTFRP = errTFR * XPost;
-        float eLTFRP = errLTFR * XPost;
-
-        //float eBkg = dummy->GetBinError(iB);
-        //float Err = TMath::Sqrt(eStat*eStat+eLumi*eLumi+eBkg*eBkg+eMuon*eMuon+eElectron*eElectron);
-	float Err = TMath::Sqrt(eStat*eStat+eLumi*eLumi + eElectron*eElectron + eMuon*eMuon + eTau*eTau + eMET*eMET + eTFR*eTFR + eLTFR*eLTFR + eTauID*eTauID);
-	float ErrPost = eStatPost;//TMath::Sqrt(eStatPost*eStatPost+eLumiPost*eLumiPost + eElectronP*eElectronP + eMuonP*eMuonP + eTauP*eTauP + eMETP*eMETP + eTFRP*eTFRP + eLTFRP*eLTFRP + eTauIDP*eTauIDP);
-
-        bkgdErr->SetBinError(iB,Err);
-        bkgdErrPost->SetBinError(iB,ErrPost);
-	cout<<" iB "<<iB<<" Pre "<<float(eStat/X)<<" Post  "<<float(eStatPost/XPost)<<"  "<<ErrPost<<"  "<<Err<<endl;
+	
+        bkgdErr->SetBinError(iB,errPreFitB->GetBinError(iB));
     }
 
     
     bkgdErr->SetMarkerSize(0);
-    int new_idx = CreateTransparentColor(13,0.75);
+    int new_idx = CreateTransparentColor(kBlue,0.8);
     int new_idxP = CreateTransparentColor(kGreen,0.3);
 
     bkgdErr->SetFillStyle(3003);
@@ -627,14 +532,14 @@ if (OverlayFit)    legend->AddEntry(bkgdErrPost, "Bkg. uncertainty PostFit H_{0}
             ratioHPostH1->SetBinContent(iB,1000);
         }
     }
-    
+
     pads[1]->cd();
     ratioErrH->GetYaxis()->SetRangeUser(0.8,1.2);
     ratioErrHPost->GetYaxis()->SetRangeUser(0.8,1.2);
 
     ratioErrH->Draw("e2same");
 if (OverlayFit)    ratioErrHPost->Draw("e2same");
-if (OverlayFit)    ratioErrHPostH1->Draw("e2same");
+//if (OverlayFit)    ratioErrHPostH1->Draw("e2same");
 
 
 
@@ -647,7 +552,8 @@ if (OverlayFit)    ratioErrHPostH1->Draw("e2same");
     ratioHPost->SetLineWidth(2);
     ratioHPost->SetLineStyle(2);
     ratioHPost->Sumw2();
-if (OverlayFit)    ratioHPost->Draw("pe0same");
+
+    ratioHPost->Draw("pe0same");
     legend->AddEntry(ratioHPost, "PostFit H_{0} Bkg Only" , "ple" );
 
     ratioHPostH1->SetMarkerStyle(24);
@@ -656,9 +562,9 @@ if (OverlayFit)    ratioHPost->Draw("pe0same");
     ratioHPostH1->SetLineWidth(2);
     ratioHPostH1->SetLineStyle(2);
     ratioHPostH1->Sumw2();
-if (OverlayFit)    ratioHPostH1->Draw("pe0same");
-    legend->AddEntry(ratioHPostH1, "PostFit H_{1} -Bkg+C1N2 (100,1)" , "ple" );
 
+    ratioHPostH1->Draw("pe0same");
+    legend->AddEntry(ratioHPostH1, "PostFit H_{1} -Bkg+C1N2 (100,1)" , "ple" );
 
     }
 
