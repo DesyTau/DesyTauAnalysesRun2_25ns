@@ -283,8 +283,8 @@ int main(int argc, char * argv[]) {
   // sys uncertainties
   const float jetES = cfg.get<float>("JetES"); 
   const float unclusteredES = cfg.get<float>("UnclusteredES"); 
-  const float zPtReweightingScale = cfg.get<float>("ZPtReweightingScale"); 
-  const float topPtReweightingScale = cfg.get<float>("TopPtReweightingScale"); 
+  const float zPtReweighting = cfg.get<float>("ZPtReweighting"); 
+  const float topPtReweighting = cfg.get<float>("TopPtReweighting"); 
 
   // ********** end of configuration *******************
 
@@ -814,7 +814,8 @@ int main(int argc, char * argv[]) {
 	 correctionWS->var("z_gen_pt")->setVal(bosonPtX);
 	 correctionWS->var("z_gen_mass")->setVal(bosonMassX);
 	 zptmassweight = correctionWS->function("zpt_weight_nom")->getVal();
-	 zptmassweight *= zPtReweightingScale;
+	 if(zPtReweighting < 0)       zptmassweight = 1;
+	 else if(zPtReweighting > 0 ) zptmassweight *= zptmassweight;
        }
        weight *= zptmassweight;
      }
@@ -822,7 +823,8 @@ int main(int argc, char * argv[]) {
      if (isTOP) { // applying top pT weights
        float topptweight = 1;
        if (topPt>0&&antitopPt>0) topptweight = topPtWeight(topPt,antitopPt,true);
-       topptweight *= topPtReweightingScale;
+       if(topPtReweighting < 0)       topptweight = 1;
+       else if(topPtReweighting > 0 ) topptweight *= topptweight;
        weight *= topptweight;
      }
 
