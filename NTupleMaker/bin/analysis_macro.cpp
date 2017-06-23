@@ -337,6 +337,11 @@ int main(int argc, char * argv[]) {
   TH1D * dxyTrackTrailingMuH = new TH1D("dxyTrackTrailingMuH","",200,-0.5,0.5);
   TH1D * dzTrackTrailingMuH = new TH1D("dzTrackTrailingMuH","",200,-1,1);
 
+  TH1D * ptTrackN1H = new TH1D("ptTrackN1H","",100,0,100);
+  TH1D * etaTrackN1H = new TH1D("etaTrackN1H","",48,-2.4,2.4);
+  TH1D * dxyTrackN1H = new TH1D("dxyTrackN1H","",200,-0.5,0.5);
+  TH1D * dzTrackN1H = new TH1D("dzTrackN1H","",200,-1,1);
+
   TH1D * ptTrackH = new TH1D("ptTrackH","",100,0,100);
   TH1D * etaTrackH = new TH1D("etaTrackH","",48,-2.4,2.4);
   TH1D * dxyTrackH = new TH1D("dxyTrackH","",200,-0.5,0.5);
@@ -420,10 +425,21 @@ int main(int argc, char * argv[]) {
   // Correlation Plots
   TH1D * InvMassTrackPlusMuon1D_ControlH = new TH1D("InvMassTrackPlusMuon1D_ControlH","",20,0.,20.); 
   TH2D * InvMassTrackPlusMuon2D_ControlH = new TH2D("InvMassTrackPlusMuon2D_ControlH","",20,0.,20.,20,0.,20.);
+
+  TH1D * InvMassTrackPlusMuon1D_ControlXH = new TH1D("InvMassTrackPlusMuon1D_ControlXH","",20,0.,20.); 
+  TH2D * InvMassTrackPlusMuon2D_ControlXH = new TH2D("InvMassTrackPlusMuon2D_ControlXH","",20,0.,20.,20,0.,20.);
+   
+  TH1D * InvMassTrackPlusMuon1D_ControlYH = new TH1D("InvMassTrackPlusMuon1D_ControlYH","",20,0.,20.); 
+  TH2D * InvMassTrackPlusMuon2D_ControlYH = new TH2D("InvMassTrackPlusMuon2D_ControlYH","",20,0.,20.,20,0.,20.);
    
   // Monte Carlo information
   TH1D * deltaRMuonPionH = new TH1D("deltaRMuonPionH","",200,0,2);
   TH1D * pionPtH = new TH1D("pionPtH","",100,0,100);
+
+  float higgsPt;
+
+  TTree * higgsTree = new TTree("higgsTree","");
+  higgsTree->Branch("HiggsPt",&higgsPt,"HiggsPt/F");
 
   string cmsswBase = (getenv ("CMSSW_BASE"));
 
@@ -563,6 +579,8 @@ int main(int argc, char * argv[]) {
      tree_->SetBranchAddress("genparticles_info", genparticles_info);
    }   
 
+   
+
    int numberOfCandidates = tree_->GetEntries();
 
    std::cout << "number of events = " << numberOfCandidates << std::endl;
@@ -586,6 +604,8 @@ int main(int argc, char * argv[]) {
      std::vector<unsigned int> posMuon; posMuon.clear();
      std::vector<unsigned int> negMuon; negMuon.clear();
 
+     bool HiggsFound = false;
+     unsigned int higgsIndex = 0;
      if (!isData) {
        //       std::cout << "Generated particles = " << genparticles_count << std::endl;
        for (unsigned int iP=0; iP<genparticles_count; ++iP) {
@@ -594,6 +614,15 @@ int main(int argc, char * argv[]) {
 	   if (genparticles_pdgid[iP]==-13) posMuon.push_back(iP);
 	   if (genparticles_pdgid[iP]==211) posPion.push_back(iP);
 	   if (genparticles_pdgid[iP]==-211) negPion.push_back(iP);
+	 }
+	 if (genparticles_pdgid[iP]==35) {
+	   higgsIndex = iP;
+	   HiggsFound = true;
+	   TLorentzVector higgsLV; higgsLV.SetXYZT(genparticles_px[iP],
+						   genparticles_py[iP],
+						   genparticles_pz[iP],
+						   genparticles_e[iP]);
+	   
 	 }
        }
        //       if (posMuon.size()==2||negMuon.size()==2) {
@@ -648,6 +677,17 @@ int main(int argc, char * argv[]) {
 	   deltaRMuonPionH->Fill(dRMuonPion,weight);
 	 }
        }
+     }
+     if (HiggsFound) {
+       TLorentzVector higgsLV; higgsLV.SetXYZT(genparticles_px[higgsIndex],
+					       genparticles_py[higgsIndex],
+					       genparticles_pz[higgsIndex],
+					       genparticles_e[higgsIndex]);
+       higgsPt = higgsLV.Pt();
+       higgsTree->Fill();
+       //       std::cout << "Higgs : " << genparticles_pdgid[higgsIndex] 
+       //		 << "    pT = " << higgsLV.Pt()
+       //		 << "    eta = " << higgsLV.Eta() << std::endl;
      }
 
      histWeightsH->Fill(1.0,weight);
@@ -913,9 +953,9 @@ int main(int argc, char * argv[]) {
 	   float dRtrig = deltaR(muon_eta[index1],muon_phi[index1],
 				 trigobject_eta[iT],trigobject_phi[iT]);
 	   if (dRtrig>DRTrigMatch) continue;
-	   if (trigobject_filters[iT][nMu17Leg]);
+	   if (trigobject_filters[iT][nMu17Leg])
 	     mu1MatchMu17 = true;
-	   if (trigobject_filters[iT][nMu8Leg]);
+	   if (trigobject_filters[iT][nMu8Leg])
 	     mu1MatchMu8 = true;
 	   if (trigobject_filters[iT][nDZFilter])
 	     mu1MatchDz = true;
@@ -1145,19 +1185,42 @@ int main(int argc, char * argv[]) {
      // defining sidebands and signal region
      bool isolatedMuons = trkLeadingMu.size()==1 && trkTrailingMu.size()==1;
 
-     if (isolatedMuons) {
+
+     if (trkLeadingMu.size()==1) {
+
        unsigned int iTrkLeading = trkLeadingMu.at(0);
-       unsigned int iTrkTrailing = trkTrailingMu.at(0);
 
        ptTrackLeadingMuH->Fill(track_pt[iTrkLeading],weight);
        etaTrackLeadingMuH->Fill(track_eta[iTrkLeading],weight);
        dxyTrackLeadingMuH->Fill(track_dxy[iTrkLeading],weight);
        dzTrackLeadingMuH->Fill(track_dz[iTrkLeading],weight);
 
+       ptTrackN1H->Fill(track_pt[iTrkLeading],weight);
+       etaTrackN1H->Fill(track_eta[iTrkLeading],weight);
+       dxyTrackN1H->Fill(track_dxy[iTrkLeading],weight);
+       dzTrackN1H->Fill(track_dz[iTrkLeading],weight);
+       
+     }
+
+     if (trkTrailingMu.size()==1) {
+
+       unsigned int iTrkTrailing = trkTrailingMu.at(0);
+
        ptTrackTrailingMuH->Fill(track_pt[iTrkTrailing],weight);
        etaTrackTrailingMuH->Fill(track_eta[iTrkTrailing],weight);
        dxyTrackTrailingMuH->Fill(track_dxy[iTrkTrailing],weight);
        dzTrackTrailingMuH->Fill(track_dz[iTrkTrailing],weight);
+
+       ptTrackN1H->Fill(track_pt[iTrkTrailing],weight);
+       etaTrackN1H->Fill(track_eta[iTrkTrailing],weight);
+       dxyTrackN1H->Fill(track_dxy[iTrkTrailing],weight);
+       dzTrackN1H->Fill(track_dz[iTrkTrailing],weight);
+       
+     }
+
+     if (isolatedMuons) {
+       unsigned int iTrkLeading = trkLeadingMu.at(0);
+       unsigned int iTrkTrailing = trkTrailingMu.at(0);
 
        ptTrackH->Fill(track_pt[iTrkLeading],weight);
        etaTrackH->Fill(track_eta[iTrkLeading],weight);
@@ -1386,6 +1449,16 @@ int main(int argc, char * argv[]) {
      bool bkgdTrailingMu = 
        (trkSigTrailingMu.size()==1 && Soft_trkTrailingMu.size()==1 && trkTrailingMu.size()==2) ||
        (trkSigTrailingMu.size()==1 && Soft_trkTrailingMu.size()==2 && trkTrailingMu.size()==3);
+
+     bool bkgdXLeadingMu = 
+       (trkSigLeadingMu.size()==1 && Soft_trkLeadingMu.size()==1 && trkLeadingMu.size()==2) ||
+       (trkSigLeadingMu.size()==1 && Soft_trkLeadingMu.size()==2 && trkLeadingMu.size()==3) ||
+       (trkSigLeadingMu.size()==1 && Soft_trkLeadingMu.size()==3 && trkLeadingMu.size()==4);
+     
+     bool bkgdXTrailingMu = 
+       (trkSigTrailingMu.size()==1 && Soft_trkTrailingMu.size()==1 && trkTrailingMu.size()==2) ||
+       (trkSigTrailingMu.size()==1 && Soft_trkTrailingMu.size()==2 && trkTrailingMu.size()==3) ||
+       (trkSigTrailingMu.size()==1 && Soft_trkTrailingMu.size()==3 && trkTrailingMu.size()==4);
      
      bool ControlAll = (signalLeadingMu&&bkgdTrailingMu) || 
        (signalTrailingMu&&bkgdLeadingMu) || (bkgdLeadingMu&&bkgdTrailingMu);
@@ -1424,6 +1497,77 @@ int main(int argc, char * argv[]) {
        InvMassTrackPlusMuon1D_ControlH->Fill(massLeadingMuonTrk,weight);
        InvMassTrackPlusMuon1D_ControlH->Fill(massTrailingMuonTrk,weight);
        InvMassTrackPlusMuon2D_ControlH->Fill(masslow, masshigh, weight);
+     }
+
+     // ********** ControlX ****************************
+     bool ControlAllX = bkgdXLeadingMu&&bkgdXTrailingMu;
+     if(ControlAllX){
+       // leading muon and associated track
+       int iTrkLeading = trkSigLeadingMu[0];
+       TLorentzVector TrackLeading4; TrackLeading4.SetXYZM(track_px[iTrkLeading],
+							   track_py[iTrkLeading],
+							   track_pz[iTrkLeading],
+							   track_mass[iTrkLeading]);
+       TLorentzVector TrackPlusLeadingMuon4 = LeadingMuon4 + TrackLeading4;
+       float massLeadingMuonTrk = TrackPlusLeadingMuon4.M();
+       
+       // trailing muon and associated track
+       int iTrkTrailing = trkSigTrailingMu[0];
+       TLorentzVector TrackTrailing4; TrackTrailing4.SetXYZM(track_px[iTrkTrailing],
+							     track_py[iTrkTrailing],
+							     track_pz[iTrkTrailing],
+							     track_mass[iTrkTrailing]);
+       TLorentzVector TrackPlusTrailingMuon4 = TrailingMuon4 + TrackTrailing4;
+       float massTrailingMuonTrk = TrackPlusTrailingMuon4.M();
+       
+       float masshigh = massLeadingMuonTrk;
+       float masslow = massTrailingMuonTrk;
+       
+       if (masshigh<masslow) {
+	 masshigh = massTrailingMuonTrk;
+	 masslow = massLeadingMuonTrk;
+       }
+       
+       // filling histograms
+       InvMassTrackPlusMuon1D_ControlXH->Fill(massLeadingMuonTrk,weight);
+       InvMassTrackPlusMuon1D_ControlXH->Fill(massTrailingMuonTrk,weight);
+       InvMassTrackPlusMuon2D_ControlXH->Fill(masslow, masshigh, weight);
+     }
+     
+     // ********* ControlY *********************
+     bool ControlAllY = (signalLeadingMu&&bkgdXTrailingMu) ||
+       (signalTrailingMu&&bkgdXLeadingMu) || (bkgdXLeadingMu&&bkgdXTrailingMu);
+     if(ControlAllY){
+       // leading muon and associated track
+       int iTrkLeading = trkSigLeadingMu[0];
+       TLorentzVector TrackLeading4; TrackLeading4.SetXYZM(track_px[iTrkLeading],
+							   track_py[iTrkLeading],
+							   track_pz[iTrkLeading],
+							   track_mass[iTrkLeading]);
+       TLorentzVector TrackPlusLeadingMuon4 = LeadingMuon4 + TrackLeading4;
+       float massLeadingMuonTrk = TrackPlusLeadingMuon4.M();
+       
+       // trailing muon and associated track
+       int iTrkTrailing = trkSigTrailingMu[0];
+       TLorentzVector TrackTrailing4; TrackTrailing4.SetXYZM(track_px[iTrkTrailing],
+							     track_py[iTrkTrailing],
+							     track_pz[iTrkTrailing],
+							     track_mass[iTrkTrailing]);
+       TLorentzVector TrackPlusTrailingMuon4 = TrailingMuon4 + TrackTrailing4;
+       float massTrailingMuonTrk = TrackPlusTrailingMuon4.M();
+       
+       float masshigh = massLeadingMuonTrk;
+       float masslow = massTrailingMuonTrk;
+       
+       if (masshigh<masslow) {
+	 masshigh = massTrailingMuonTrk;
+	 masslow = massLeadingMuonTrk;
+       }
+       
+       // filling histograms
+       InvMassTrackPlusMuon1D_ControlYH->Fill(massLeadingMuonTrk,weight);
+       InvMassTrackPlusMuon1D_ControlYH->Fill(massTrailingMuonTrk,weight);
+       InvMassTrackPlusMuon2D_ControlYH->Fill(masslow, masshigh, weight);
      }
      
    } // icand loop
