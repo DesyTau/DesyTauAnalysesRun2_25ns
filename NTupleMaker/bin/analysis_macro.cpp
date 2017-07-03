@@ -381,8 +381,12 @@ int main(int argc, char * argv[]) {
   TH1D * counter_InputEventsH=new TH1D("counter_InputEventsH","",1,0.,2.);
   TH1D * counter_MuonSizeGTE2H=new TH1D("counter_MuonSizeGTE2H","",1,0.,2.);
   TH1D * counter_MuonKinematicsH=new TH1D("counter_MuonKinematicsH","",1,0.,2.);         
-  TH1D * counter_nTracksH=new TH1D("counter_nTracksH","",1,0.,2.);
+  TH1D * counter_nMuTrackSigH=new TH1D("counter_nMuTrackSigH","",1,0.,2.);
   TH1D * counter_FinalEventsH=new TH1D("counter_FinalEventsH","",1,0.,2.);         
+  TH1D * counter_ControlEventsH=new TH1D("counter_ControlEventsH","",1,0.,2.);         
+  TH1D * counter_ControlXEventsH=new TH1D("counter_ControlXEventsH","",1,0.,2.);         
+  TH1D * counter_ControlYEventsH=new TH1D("counter_ControlYEventsH","",1,0.,2.);         
+  
 
   TH1D * histWeightsH = new TH1D("histWeightsH","",1,0.,2.);
   TH1D * histWeightsSingleMuH = new TH1D("histWeightsSingleMuH","",1,0.,2.);
@@ -1182,9 +1186,9 @@ int main(int argc, char * argv[]) {
      nSoftTracksTrailingMuH->Fill(float(Soft_trkTrailingMu.size()),weight);
 
      
-     // defining sidebands and signal region
-     bool isolatedMuons = trkLeadingMu.size()==1 && trkTrailingMu.size()==1;
-
+     // definition of signal muon+track
+     bool signalLeadingMu  = trkLeadingMu.size()==1 && trkSigLeadingMu.size()==1;
+     bool signalTrailingMu = trkTrailingMu.size()==1 && trkSigTrailingMu.size()==1;
 
      if (trkLeadingMu.size()==1) {
 
@@ -1218,21 +1222,27 @@ int main(int argc, char * argv[]) {
        
      }
 
-     if (isolatedMuons) {
+     if (signalLeadingMu) {
        unsigned int iTrkLeading = trkLeadingMu.at(0);
-       unsigned int iTrkTrailing = trkTrailingMu.at(0);
 
        ptTrackH->Fill(track_pt[iTrkLeading],weight);
        etaTrackH->Fill(track_eta[iTrkLeading],weight);
        dxyTrackH->Fill(track_dxy[iTrkLeading],weight);
        dzTrackH->Fill(track_dz[iTrkLeading],weight);
 
+       counter_nMuTrackSigH->Fill(1.0,weight);                 
+
+     }
+
+     if (signalTrailingMu) {
+       unsigned int iTrkTrailing = trkTrailingMu.at(0);
+       
        ptTrackH->Fill(track_pt[iTrkTrailing],weight);
        etaTrackH->Fill(track_eta[iTrkTrailing],weight);
        dxyTrackH->Fill(track_dxy[iTrkTrailing],weight);
        dzTrackH->Fill(track_dz[iTrkTrailing],weight);
 
-       counter_nTracksH->Fill(1.0,weight);                 
+       counter_nMuTrackSigH->Fill(1.0,weight);                 
 
      }
      
@@ -1438,9 +1448,6 @@ int main(int argc, char * argv[]) {
      // ******************************************************************
      // Control region to study mass correlations (RegionA in HIG-14-019)
      // *****************************************************************
-     bool signalLeadingMu = trkSigLeadingMu.size()==1 && trkLeadingMu.size()==1;
-     
-     bool signalTrailingMu = trkSigTrailingMu.size()==1 && trkTrailingMu.size()==1;
      
      bool bkgdLeadingMu = 
        (trkSigLeadingMu.size()==1 && Soft_trkLeadingMu.size()==1 && trkLeadingMu.size()==2) ||
@@ -1497,6 +1504,9 @@ int main(int argc, char * argv[]) {
        InvMassTrackPlusMuon1D_ControlH->Fill(massLeadingMuonTrk,weight);
        InvMassTrackPlusMuon1D_ControlH->Fill(massTrailingMuonTrk,weight);
        InvMassTrackPlusMuon2D_ControlH->Fill(masslow, masshigh, weight);
+
+       counter_ControlEventsH->Fill(1.0,weight);
+
      }
 
      // ********** ControlX ****************************
@@ -1532,6 +1542,9 @@ int main(int argc, char * argv[]) {
        InvMassTrackPlusMuon1D_ControlXH->Fill(massLeadingMuonTrk,weight);
        InvMassTrackPlusMuon1D_ControlXH->Fill(massTrailingMuonTrk,weight);
        InvMassTrackPlusMuon2D_ControlXH->Fill(masslow, masshigh, weight);
+
+       counter_ControlXEventsH->Fill(1.0,weight);
+
      }
      
      // ********* ControlY *********************
@@ -1568,6 +1581,9 @@ int main(int argc, char * argv[]) {
        InvMassTrackPlusMuon1D_ControlYH->Fill(massLeadingMuonTrk,weight);
        InvMassTrackPlusMuon1D_ControlYH->Fill(massTrailingMuonTrk,weight);
        InvMassTrackPlusMuon2D_ControlYH->Fill(masslow, masshigh, weight);
+
+       counter_ControlYEventsH->Fill(1.0,weight);
+
      }
      
    } // icand loop
