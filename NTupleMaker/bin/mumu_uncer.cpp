@@ -1223,7 +1223,7 @@ int main(int argc, char * argv[]) {
     reader0jets->AddVariable( "dphi_posmu_met",&dphi_posmu_met);
     reader0jets->AddVariable("dzeta",&dzeta);
     reader0jets->AddVariable( "met",&met);
-    reader0jets->AddVariable("m_vis", &m_vis);
+    //    reader0jets->AddVariable("m_vis", &m_vis);
     reader0jets->AddVariable("costheta", &costheta);
     reader0jets->AddVariable("ptRatio", &ptRatio);
     reader0jets->BookMVA("BDT", cmsswBase+jet0BDTweight);
@@ -1234,7 +1234,7 @@ int main(int argc, char * argv[]) {
     readerboost->AddVariable( "dphi_posmu_met",&dphi_posmu_met);
     readerboost->AddVariable("dzeta",&dzeta);
     readerboost->AddVariable( "met",&met);
-    readerboost->AddVariable("m_vis", &m_vis);
+    //    readerboost->AddVariable("m_vis", &m_vis);
     readerboost->AddVariable("costheta", &costheta);
     readerboost->AddVariable("ptRatio", &ptRatio);
     readerboost->AddVariable("pt_tot", &pt_tot);
@@ -1246,13 +1246,13 @@ int main(int argc, char * argv[]) {
     readervbf->AddVariable("dphi_posmu_met",&dphi_posmu_met);
     readervbf->AddVariable("dzeta",&dzeta);
     readervbf->AddVariable("met",&met);
-    readervbf->AddVariable("m_vis", &m_vis);
+    //    readervbf->AddVariable("m_vis", &m_vis);
     readervbf->AddVariable("costheta", &costheta);
     readervbf->AddVariable("ptRatio", &ptRatio);
     readervbf->AddVariable("mjj", &mjj);
     //readervbf->AddVariable("jdeta", &jdeta);
     
-    readervbf->BookMVA("BDT", cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/mumu_BDTWeights/TMVA_RunBtoH_vbf_May18_BDT.weights.xml");
+    readervbf->BookMVA("BDT", cmsswBase+vbfBDTweight);
     
     //Create TMVA reader for JESUp******************************************************************
     TMVA::Reader *reader_0jetsJESUp = new TMVA::Reader("!V:!Color");
@@ -1261,7 +1261,7 @@ int main(int argc, char * argv[]) {
     reader_0jetsJESUp->AddVariable( "dphi_posmu_met",&dphi_posmu_met_JES_Up);
     reader_0jetsJESUp->AddVariable("dzeta",&dzeta_JES_Up);
     reader_0jetsJESUp->AddVariable( "met",&met_JES_Up);
-    reader_0jetsJESUp->AddVariable("m_vis", &m_vis);
+    //    reader_0jetsJESUp->AddVariable("m_vis", &m_vis);
     reader_0jetsJESUp->AddVariable("costheta", &costheta);
     reader_0jetsJESUp->AddVariable("ptRatio", &ptRatio);
     //BookMethod
@@ -1274,7 +1274,7 @@ int main(int argc, char * argv[]) {
     reader_boostJESUp->AddVariable( "dphi_posmu_met",&dphi_posmu_met_JES_Up);
     reader_boostJESUp->AddVariable("dzeta",&dzeta_JES_Up);
     reader_boostJESUp->AddVariable( "met",&met_JES_Up);
-    reader_boostJESUp->AddVariable("m_vis", &m_vis);
+    //    reader_boostJESUp->AddVariable("m_vis", &m_vis);
     reader_boostJESUp->AddVariable("costheta", &costheta);
     reader_boostJESUp->AddVariable("ptRatio", &ptRatio);
     reader_boostJESUp->AddVariable("pt_tot", &pt_tot_JES_Up);
@@ -1288,7 +1288,7 @@ int main(int argc, char * argv[]) {
     reader_vbfJESUp->AddVariable( "dphi_posmu_met",&dphi_posmu_met_JES_Up);
     reader_vbfJESUp->AddVariable("dzeta",&dzeta_JES_Up);
     reader_vbfJESUp->AddVariable( "met",&met_JES_Up);
-    reader_vbfJESUp->AddVariable("m_vis", &m_vis);
+    //    reader_vbfJESUp->AddVariable("m_vis", &m_vis);
     reader_vbfJESUp->AddVariable("costheta", &costheta);
     reader_vbfJESUp->AddVariable("ptRatio", &ptRatio);
     reader_vbfJESUp->AddVariable("mjj", &mjj);
@@ -1303,7 +1303,7 @@ int main(int argc, char * argv[]) {
     reader_0jetsJESDown->AddVariable( "dphi_posmu_met",&dphi_posmu_met_JES_Down);
     reader_0jetsJESDown->AddVariable("dzeta",&dzeta_JES_Down);
     reader_0jetsJESDown->AddVariable( "met",&met_JES_Down);
-    reader_0jetsJESDown->AddVariable("m_vis", &m_vis);
+    //    reader_0jetsJESDown->AddVariable("m_vis", &m_vis);
     reader_0jetsJESDown->AddVariable("costheta", &costheta);
     reader_0jetsJESDown->AddVariable("ptRatio", &ptRatio);
     //BookMethod
@@ -1317,7 +1317,7 @@ int main(int argc, char * argv[]) {
     reader_boostJESDown->AddVariable( "dphi_posmu_met",&dphi_posmu_met_JES_Down);
     reader_boostJESDown->AddVariable("dzeta",&dzeta_JES_Down);
     reader_boostJESDown->AddVariable( "met",&met_JES_Down);
-    reader_boostJESDown->AddVariable("m_vis", &m_vis);
+    //    reader_boostJESDown->AddVariable("m_vis", &m_vis);
     reader_boostJESDown->AddVariable("costheta", &costheta);
     reader_boostJESDown->AddVariable("ptRatio", &ptRatio);
     reader_boostJESDown->AddVariable("pt_tot", &pt_tot_JES_Down);
@@ -1332,7 +1332,7 @@ int main(int argc, char * argv[]) {
     reader_vbfJESDown->AddVariable( "dphi_posmu_met",&dphi_posmu_met_JES_Down);
     reader_vbfJESDown->AddVariable("dzeta",&dzeta_JES_Down);
     reader_vbfJESDown->AddVariable( "met",&met_JES_Down);
-    reader_vbfJESDown->AddVariable("m_vis", &m_vis);
+    //    reader_vbfJESDown->AddVariable("m_vis", &m_vis);
     reader_vbfJESDown->AddVariable("costheta", &costheta);
     reader_vbfJESDown->AddVariable("ptRatio", &ptRatio);
     reader_vbfJESDown->AddVariable("mjj", &mjj);
@@ -1347,7 +1347,7 @@ int main(int argc, char * argv[]) {
     reader_0jetsUnclustJESUp->AddVariable( "dphi_posmu_met",&dphi_posmu_met_UnclusteredJES_Up);
     reader_0jetsUnclustJESUp->AddVariable("dzeta",&dzeta_UnclusteredJES_Up);
     reader_0jetsUnclustJESUp->AddVariable( "met",&met_UnclusteredJES_Up);
-    reader_0jetsUnclustJESUp->AddVariable("m_vis", &m_vis);
+    //   reader_0jetsUnclustJESUp->AddVariable("m_vis", &m_vis);
     reader_0jetsUnclustJESUp->AddVariable("costheta", &costheta);
     reader_0jetsUnclustJESUp->AddVariable("ptRatio", &ptRatio);
     //BookMethod
@@ -1361,7 +1361,7 @@ int main(int argc, char * argv[]) {
     reader_boostUnclustJESUp->AddVariable( "dphi_posmu_met",&dphi_posmu_met_UnclusteredJES_Up);
     reader_boostUnclustJESUp->AddVariable("dzeta",&dzeta_UnclusteredJES_Up);
     reader_boostUnclustJESUp->AddVariable( "met",&met_UnclusteredJES_Up);
-    reader_boostUnclustJESUp->AddVariable("m_vis", &m_vis);
+    //    reader_boostUnclustJESUp->AddVariable("m_vis", &m_vis);
     reader_boostUnclustJESUp->AddVariable("costheta", &costheta);
     reader_boostUnclustJESUp->AddVariable("ptRatio", &ptRatio);
     reader_boostUnclustJESUp->AddVariable("pt_tot", &pt_tot_UnclusteredJES_Up);
@@ -1376,7 +1376,7 @@ int main(int argc, char * argv[]) {
     reader_vbfUnclustJESUp->AddVariable( "dphi_posmu_met",&dphi_posmu_met_UnclusteredJES_Up);
     reader_vbfUnclustJESUp->AddVariable("dzeta",&dzeta_UnclusteredJES_Up);
     reader_vbfUnclustJESUp->AddVariable( "met",&met_UnclusteredJES_Up);
-    reader_vbfUnclustJESUp->AddVariable("m_vis", &m_vis);
+    //    reader_vbfUnclustJESUp->AddVariable("m_vis", &m_vis);
     reader_vbfUnclustJESUp->AddVariable("costheta", &costheta);
     reader_vbfUnclustJESUp->AddVariable("ptRatio", &ptRatio);
     reader_vbfUnclustJESUp->AddVariable("mjj", &mjj);
@@ -1391,7 +1391,7 @@ int main(int argc, char * argv[]) {
     reader_0jetsUnclustJESDown->AddVariable( "dphi_posmu_met",&dphi_posmu_met_UnclusteredJES_Down);
     reader_0jetsUnclustJESDown->AddVariable("dzeta",&dzeta_UnclusteredJES_Down);
     reader_0jetsUnclustJESDown->AddVariable( "met",&met_UnclusteredJES_Down);
-    reader_0jetsUnclustJESDown->AddVariable("m_vis", &m_vis);
+    //    reader_0jetsUnclustJESDown->AddVariable("m_vis", &m_vis);
     reader_0jetsUnclustJESDown->AddVariable("costheta", &costheta);
     reader_0jetsUnclustJESDown->AddVariable("ptRatio", &ptRatio);
     //BookMethod
@@ -1405,7 +1405,7 @@ int main(int argc, char * argv[]) {
     reader_boostUnclustJESDown->AddVariable( "dphi_posmu_met",&dphi_posmu_met_UnclusteredJES_Down);
     reader_boostUnclustJESDown->AddVariable("dzeta",&dzeta_UnclusteredJES_Down);
     reader_boostUnclustJESDown->AddVariable( "met",&met_UnclusteredJES_Down);
-    reader_boostUnclustJESDown->AddVariable("m_vis", &m_vis);
+    //    reader_boostUnclustJESDown->AddVariable("m_vis", &m_vis);
     reader_boostUnclustJESDown->AddVariable("costheta", &costheta);
     reader_boostUnclustJESDown->AddVariable("ptRatio", &ptRatio);
     reader_boostUnclustJESDown->AddVariable("pt_tot", &pt_tot_UnclusteredJES_Down);
@@ -1420,7 +1420,7 @@ int main(int argc, char * argv[]) {
     reader_vbfUnclustJESDown->AddVariable( "dphi_posmu_met",&dphi_posmu_met_UnclusteredJES_Down);
     reader_vbfUnclustJESDown->AddVariable("dzeta",&dzeta_UnclusteredJES_Down);
     reader_vbfUnclustJESDown->AddVariable( "met",&met_UnclusteredJES_Down);
-    reader_vbfUnclustJESDown->AddVariable("m_vis", &m_vis);
+    //    reader_vbfUnclustJESDown->AddVariable("m_vis", &m_vis);
     reader_vbfUnclustJESDown->AddVariable("costheta", &costheta);
     reader_vbfUnclustJESDown->AddVariable("ptRatio", &ptRatio);
     reader_vbfUnclustJESDown->AddVariable("mjj", &mjj);
@@ -1435,7 +1435,7 @@ int main(int argc, char * argv[]) {
     reader_0jetsMuScaleUp->AddVariable( "dphi_posmu_met",&dphi_posmu_met);
     reader_0jetsMuScaleUp->AddVariable("dzeta",&dzeta);
     reader_0jetsMuScaleUp->AddVariable( "met",&met);
-    reader_0jetsMuScaleUp->AddVariable("m_vis", &m_vis_Up);
+    //   reader_0jetsMuScaleUp->AddVariable("m_vis", &m_vis_Up);
     reader_0jetsMuScaleUp->AddVariable("costheta", &costheta);
     reader_0jetsMuScaleUp->AddVariable("ptRatio", &ptRatio_Up);
     //BookMethod
@@ -1449,7 +1449,7 @@ int main(int argc, char * argv[]) {
     reader_boostMuScaleUp->AddVariable( "dphi_posmu_met",&dphi_posmu_met);
     reader_boostMuScaleUp->AddVariable("dzeta",&dzeta);
     reader_boostMuScaleUp->AddVariable( "met",&met);
-    reader_boostMuScaleUp->AddVariable("m_vis", &m_vis_Up);
+    //    reader_boostMuScaleUp->AddVariable("m_vis", &m_vis_Up);
     reader_boostMuScaleUp->AddVariable("costheta", &costheta);
     reader_boostMuScaleUp->AddVariable("ptRatio", &ptRatio_Up);
     reader_boostMuScaleUp->AddVariable("pt_tot", &pt_tot_Up);
@@ -1464,7 +1464,7 @@ int main(int argc, char * argv[]) {
     reader_vbfMuScaleUp->AddVariable( "dphi_posmu_met",&dphi_posmu_met);
     reader_vbfMuScaleUp->AddVariable("dzeta",&dzeta);
     reader_vbfMuScaleUp->AddVariable( "met",&met);
-    reader_vbfMuScaleUp->AddVariable("m_vis", &m_vis_Up);
+    //    reader_vbfMuScaleUp->AddVariable("m_vis", &m_vis_Up);
     reader_vbfMuScaleUp->AddVariable("costheta", &costheta);
     reader_vbfMuScaleUp->AddVariable("ptRatio", &ptRatio_Up);
     reader_vbfMuScaleUp->AddVariable("mjj", &mjj);
@@ -1479,7 +1479,7 @@ int main(int argc, char * argv[]) {
     reader_0jetsMuScaleDown->AddVariable( "dphi_posmu_met",&dphi_posmu_met);
     reader_0jetsMuScaleDown->AddVariable("dzeta",&dzeta);
     reader_0jetsMuScaleDown->AddVariable( "met",&met);
-    reader_0jetsMuScaleDown->AddVariable("m_vis", &m_vis_Down);
+    //    reader_0jetsMuScaleDown->AddVariable("m_vis", &m_vis_Down);
     reader_0jetsMuScaleDown->AddVariable("costheta", &costheta);
     reader_0jetsMuScaleDown->AddVariable("ptRatio", &ptRatio_Down);
     //BookMethod
@@ -1493,7 +1493,7 @@ int main(int argc, char * argv[]) {
     reader_boostMuScaleDown->AddVariable( "dphi_posmu_met",&dphi_posmu_met);
     reader_boostMuScaleDown->AddVariable("dzeta",&dzeta);
     reader_boostMuScaleDown->AddVariable( "met",&met);
-    reader_boostMuScaleDown->AddVariable("m_vis", &m_vis_Down);
+    //    reader_boostMuScaleDown->AddVariable("m_vis", &m_vis_Down);
     reader_boostMuScaleDown->AddVariable("costheta", &costheta);
     reader_boostMuScaleDown->AddVariable("ptRatio", &ptRatio_Down);
     reader_boostMuScaleDown->AddVariable("pt_tot", &pt_tot_Down);
@@ -1508,7 +1508,7 @@ int main(int argc, char * argv[]) {
     reader_vbfMuScaleDown->AddVariable( "dphi_posmu_met",&dphi_posmu_met);
     reader_vbfMuScaleDown->AddVariable("dzeta",&dzeta);
     reader_vbfMuScaleDown->AddVariable( "met",&met);
-    reader_vbfMuScaleDown->AddVariable("m_vis", &m_vis_Down);
+    //    reader_vbfMuScaleDown->AddVariable("m_vis", &m_vis_Down);
     reader_vbfMuScaleDown->AddVariable("costheta", &costheta);
     reader_vbfMuScaleDown->AddVariable("ptRatio", &ptRatio_Down);
     reader_vbfMuScaleDown->AddVariable("mjj", &mjj);
