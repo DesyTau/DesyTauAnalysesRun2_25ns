@@ -444,11 +444,27 @@ int main(int argc, char * argv[]) {
     Float_t         pt_sv_muUp;            
     Float_t         eta_sv_muUp;
     Float_t         phi_sv_muUp;
+	
+		Float_t         pt_sv_scaleUp;
+		Float_t         eta_sv_scaleUp;
+		Float_t         phi_sv_scaleUp;
+	
+		Float_t         pt_sv_resoUp;
+		Float_t         eta_sv_resoUp;
+		Float_t         phi_sv_resoUp;
 
     Float_t         pt_sv_muDown;
     Float_t         eta_sv_muDown;
     Float_t         phi_sv_muDown;
-    
+	
+		Float_t         pt_sv_scaleDown;
+		Float_t         eta_sv_scaleDown;
+		Float_t         phi_sv_scaleDown;
+		
+		Float_t         pt_sv_resoDown;
+		Float_t         eta_sv_resoDown;
+		Float_t         phi_sv_resoDown;
+	
     Float_t         pt_1;
     Float_t         pt_1_Up;
     Float_t         pt_1_Down;
@@ -783,10 +799,26 @@ int main(int argc, char * argv[]) {
     T->Branch("pt_sv_muUp", &pt_sv_muUp, "pt_sv_muUp/F");
     T->Branch("eta_sv_muUp", &eta_sv_muUp, "eta_sv_muUp/F");
     T->Branch("phi_sv_muUp", &phi_sv_muUp, "phi_sv_muUp/F");
+	
+		T->Branch("pt_sv_scaleUp", &pt_sv_scaleUp, "pt_sv_scaleUp/F");
+		T->Branch("eta_sv_scaleUp", &eta_sv_scaleUp, "eta_sv_scaleUp/F");
+		T->Branch("phi_sv_scaleUp", &phi_sv_scaleUp, "phi_sv_scaleUp/F");
+	
+		T->Branch("pt_sv_resoUp", &pt_sv_resoUp, "pt_sv_resoUp/F");
+		T->Branch("eta_sv_resoUp", &eta_sv_resoUp, "eta_sv_resoUp/F");
+		T->Branch("phi_sv_resoUp", &phi_sv_resoUp, "phi_sv_resoUp/F");
 
     T->Branch("pt_sv_muDown", &pt_sv_muDown, "pt_sv_muDown/F");
     T->Branch("eta_sv_muDown", &eta_sv_muDown, "eta_sv_muDown/F");
     T->Branch("phi_sv_muDown", &phi_sv_muDown, "phi_sv_muDown/F");
+
+		T->Branch("pt_sv_scaleDown", &pt_sv_scaleDown, "pt_sv_scaleDown/F");
+		T->Branch("eta_sv_scaleDown", &eta_sv_scaleDown, "eta_sv_scaleDown/F");
+		T->Branch("phi_sv_scaleDown", &phi_sv_scaleDown, "phi_sv_scaleDown/F");
+		
+		T->Branch("pt_sv_resoDown", &pt_sv_resoDown, "pt_sv_resoDown/F");
+		T->Branch("eta_sv_resoDown", &eta_sv_resoDown, "eta_sv_resoDown/F");
+		T->Branch("phi_sv_resoDown", &phi_sv_resoDown, "phi_sv_resoDown/F");
 
     T->Branch("pt_1", &pt_1, "pt_1/F");
     T->Branch("pt_1_Up", &pt_1_Up, "pt_1_Up/F");
@@ -1173,9 +1205,15 @@ int main(int argc, char * argv[]) {
     
 //    //-------------------BDTs ----------------------------------------->
 
-    TString jet0BDTweight = "/src/DesyTauAnalyses/NTupleMaker/data/mumu_BDTWeights/TMVA_RunBtoH_0jets_May18_BDT.weights.xml";
-    TString boostBDTweight= "/src/DesyTauAnalyses/NTupleMaker/data/mumu_BDTWeights/TMVA_RunBtoH_boosted_May25_BDT.weights.xml";
-    TString vbfBDTweight  = "/src/DesyTauAnalyses/NTupleMaker/data/mumu_BDTWeights/TMVA_RunBtoH_vbf_May18_BDT.weights.xml";
+//    TString jet0BDTweight = "/src/DesyTauAnalyses/NTupleMaker/data/mumu_BDTWeights/TMVA_RunBtoH_0jets_May18_BDT.weights.xml";
+//    TString boostBDTweight= "/src/DesyTauAnalyses/NTupleMaker/data/mumu_BDTWeights/TMVA_RunBtoH_boosted_May25_BDT.weights.xml";
+//    TString vbfBDTweight  = "/src/DesyTauAnalyses/NTupleMaker/data/mumu_BDTWeights/TMVA_RunBtoH_vbf_May18_BDT.weights.xml";
+    
+//BDT weight for nomvis trainned samples
+    TString jet0BDTweight = "/src/DesyTauAnalyses/NTupleMaker/data/mumu_BDTWeights/TMVA_RunBtoH_0jets_nomvis_july7_BDT.weights.xml";
+    TString boostBDTweight= "/src/DesyTauAnalyses/NTupleMaker/data/mumu_BDTWeights/TMVA_RunBtoH_nomvis_boosted_july7_BDT.weights.xml";
+    TString vbfBDTweight  = "/src/DesyTauAnalyses/NTupleMaker/data/mumu_BDTWeights/TMVA_RunBtoH_nomvis_vbf_July7_BDT.weights.xml";
+      
     //This loads the library
     TMVA::Tools::Instance();
     
@@ -2825,7 +2863,7 @@ int main(int argc, char * argv[]) {
 		met_x = metcorr_ex;
 		met_y = metcorr_ey;
 		
-                float metx_muUp = met_x + (px_mu1 + px_mu2) - (px_mu1Up + px_mu2Up);
+		float metx_muUp = met_x + (px_mu1 + px_mu2) - (px_mu1Up + px_mu2Up);
 		float mety_muUp = met_y + (py_mu1 + py_mu2) - (py_mu1Up + py_mu2Up);
 
 		float met_Up = TMath::Sqrt(metx_muUp*metx_muUp+mety_muUp*mety_muUp);
@@ -3068,32 +3106,32 @@ int main(int argc, char * argv[]) {
 		  }
 		}
                                 
-                //-----------computingSVfitmass--------------
+		//-----------computingSVfitmass--------------
 		
-                m_sv           = -9999;
-                m_sv_muUp      = -9999;
-                m_sv_muDown    = -9999;
-                m_sv_scaleUp   = -9999;
-                m_sv_scaleDown = -9999;
-                m_sv_resoUp    = -9999;
-                m_sv_resoDown  = -9999;
+		m_sv           = -9999;
+		m_sv_muUp      = -9999;
+		m_sv_muDown    = -9999;
+		m_sv_scaleUp   = -9999;
+		m_sv_scaleDown = -9999;
+		m_sv_resoUp    = -9999;
+		m_sv_resoDown  = -9999;
 		float px_sv    = -9999;
 		float py_sv    = -9999;
 		float msvmet_ex= -9999;
 		float msvmet_ey= -9999;
                 
-                if (applySVFit){
-		  double measuredMETx = metcorr_ex;
-		  double measuredMETy = metcorr_ey;
-		  
-		  // define MET covariance
-		  TMatrixD covMET(2, 2);
-                  
-		  // std::cout << "covmetxx " << n_covmet_xx << "\t covmetxy " << n_covmet_xy  << "\t covmetyy " << n_covmet_yy <<std::endl;
-                  
-		  covMET[0][0] = metcov00;
-		  covMET[1][0] = metcov10;
-		  covMET[0][1] = metcov01;
+		if (applySVFit){
+			double measuredMETx = metcorr_ex;
+			double measuredMETy = metcorr_ey;
+			
+			// define MET covariance
+			TMatrixD covMET(2, 2);
+			
+			// std::cout << "covmetxx " << n_covmet_xx << "\t covmetxy " << n_covmet_xy  << "\t covmetyy " << n_covmet_yy <<std::endl;
+			
+			covMET[0][0] = metcov00;
+			covMET[1][0] = metcov10;
+			covMET[0][1] = metcov01;
 		  covMET[1][1] = metcov11;
 		  
 		  /* ///Earlier definition
@@ -3129,8 +3167,20 @@ int main(int argc, char * argv[]) {
 		  svFitStandalone::MeasuredTauLepton svFitMu2Up(svFitStandalone::kTauToMuDecay, pt_2_Up, eta_2, phi_2, 105.658e-3);
 		  svFitStandalone::MeasuredTauLepton svFitMu2Down(svFitStandalone::kTauToMuDecay, pt_2_Down, eta_2, phi_2, 105.658e-3);
 		  
+		  svFitStandalone::MeasuredTauLepton svFitMu1scaleUp(svFitStandalone::kTauToMuDecay, pt_1, eta_1, phi_1, 105.658e-3);
+		  svFitStandalone::MeasuredTauLepton svFitMu1scaleDown(svFitStandalone::kTauToMuDecay, pt_1, eta_1, phi_1, 105.658e-3);
+		  
+		  svFitStandalone::MeasuredTauLepton svFitMu2scaleUp(svFitStandalone::kTauToMuDecay, pt_2, eta_2, phi_2, 105.658e-3);
+		  svFitStandalone::MeasuredTauLepton svFitMu2scaleDown(svFitStandalone::kTauToMuDecay, pt_2, eta_2, phi_2, 105.658e-3);
+		  
+		  svFitStandalone::MeasuredTauLepton svFitMu1resoUp(svFitStandalone::kTauToMuDecay, pt_1, eta_1, phi_1, 105.658e-3);
+		  svFitStandalone::MeasuredTauLepton svFitMu1resoDown(svFitStandalone::kTauToMuDecay, pt_1, eta_1, phi_1, 105.658e-3);
+		  
+		  svFitStandalone::MeasuredTauLepton svFitMu2resoUp(svFitStandalone::kTauToMuDecay, pt_2, eta_2, phi_2, 105.658e-3);
+		  svFitStandalone::MeasuredTauLepton svFitMu2resoDown(svFitStandalone::kTauToMuDecay, pt_2, eta_2, phi_2, 105.658e-3);
+		  
 		  //central value
-		  if (njets==0 && bdt_0jets>0.24){
+		  if (njets==0 && bdt_0jets>0.2){
 		    SVfitStandaloneAlgorithm algo = SVFitMassComputation(svFitMu1, svFitMu2, measuredMETx, measuredMETy, covMET, inputFile_visPtResolution);
 		    
 		    m_sv = algo.getMass(); // return value is in units of GeV
@@ -3199,61 +3249,167 @@ int main(int argc, char * argv[]) {
 		    
 		    msvmet = TMath::Sqrt(msvmet_ex*msvmet_ex+msvmet_ey*msvmet_ey);
 		    msvmetphi = TMath::ATan2(msvmet_ey,msvmet_ex);
-		    m_sv_muUp      = m_sv;
-		    m_sv_muDown    = m_sv;
-		    m_sv_scaleUp   = m_sv;
-		    m_sv_scaleDown = m_sv;
-		    m_sv_resoUp    = m_sv;
-		    m_sv_resoDown  = m_sv;
+//		    m_sv_muUp      = m_sv;
+//		    m_sv_muDown    = m_sv;
+//		    m_sv_scaleUp   = m_sv;
+//		    m_sv_scaleDown = m_sv;
+//		    m_sv_resoUp    = m_sv;
+//		    m_sv_resoDown  = m_sv;
 		  }
 		  
 		  if (applyMSVvariation){
 		    //SVfit scale variation with BDT cuts
-		    if (njets==0 && bdt_0jets>0.24){
+		    if (njets==0 && bdt_0jets>0.2){
 		      SVfitStandaloneAlgorithm algo_muUp = SVFitMassComputation(svFitMu1Up, svFitMu2Up, metx_muUp, mety_muUp,
 										covMET, inputFile_visPtResolution);
 		      SVfitStandaloneAlgorithm algo_muDown = SVFitMassComputation(svFitMu1Down, svFitMu2Down, metx_muDown, mety_muDown,
 										  covMET, inputFile_visPtResolution);
-		      m_sv_muUp   = algo_muUp.getMass();
-		      m_sv_muDown = algo_muDown.getMass();
 		      
-		      pt_sv_muUp  = algo_muUp.pt();
-		      eta_sv_muUp = algo_muUp.eta();
-		      phi_sv_muUp = algo_muUp.phi();
+		      SVfitStandaloneAlgorithm algo_scaleUp = SVFitMassComputation(svFitMu1scaleUp, svFitMu2scaleUp, metcorr_ex_JES_Up, metcorr_ey_JES_Up,
+										   covMET, inputFile_visPtResolution);
+		      SVfitStandaloneAlgorithm algo_scaleDown = SVFitMassComputation(svFitMu1scaleDown, svFitMu2scaleDown, metcorr_ex_JES_Down,
+										     metcorr_ey_JES_Down, covMET, inputFile_visPtResolution);
+		      
+		      SVfitStandaloneAlgorithm algo_resoUp = SVFitMassComputation(svFitMu1resoUp, svFitMu2resoUp, metcorr_ex_UnclusteredJES_Up,
+										  metcorr_ey_UnclusteredJES_Up, covMET, inputFile_visPtResolution);
+		      SVfitStandaloneAlgorithm algo_resoDown = SVFitMassComputation(svFitMu1resoDown, svFitMu2resoDown, metcorr_ex_UnclusteredJES_Down,
+										    metcorr_ey_UnclusteredJES_Down, covMET, inputFile_visPtResolution);
+					
+		      m_sv_muUp      = algo_muUp.getMass();
+		      m_sv_muDown    = algo_muDown.getMass();
+		      
+		      m_sv_scaleUp   = algo_scaleUp.getMass();
+		      m_sv_scaleDown = algo_scaleDown.getMass();
+		      
+		      m_sv_resoUp    = algo_resoUp.getMass();
+		      m_sv_resoDown  = algo_resoDown.getMass();
+		      
+		      pt_sv_muUp      = algo_muUp.pt();
+		      eta_sv_muUp     = algo_muUp.eta();
+		      phi_sv_muUp     = algo_muUp.phi();
+		      
+		      pt_sv_scaleUp   = algo_scaleUp.pt();
+		      eta_sv_scaleUp  = algo_scaleUp.eta();
+		      phi_sv_scaleUp  = algo_scaleUp.phi();
+		      
+		      pt_sv_resoUp   = algo_resoUp.pt();
+		      eta_sv_resoUp  = algo_resoUp.eta();
+		      phi_sv_resoUp  = algo_resoUp.phi();
 		      
 		      pt_sv_muDown  = algo_muDown.pt();
 		      eta_sv_muDown = algo_muDown.eta();
 		      phi_sv_muDown = algo_muDown.phi();
+		      
+		      pt_sv_scaleDown = algo_scaleDown.pt();
+		      eta_sv_scaleDown= algo_scaleDown.eta();
+		      phi_sv_scaleDown= algo_scaleDown.phi();
+		      
+		      pt_sv_resoDown  = algo_resoDown.pt();
+		      eta_sv_resoDown = algo_resoDown.eta();
+		      phi_sv_resoDown = algo_resoDown.phi();
+		      
 		    }
 		    else if ((njets==1 || (njets==2 && mjj<300) || njets>2) && bdt_boosted>0.0){
 		      SVfitStandaloneAlgorithm algo_muUp = SVFitMassComputation(svFitMu1Up, svFitMu2Up, metx_muUp, mety_muUp,
 										covMET, inputFile_visPtResolution);
 		      SVfitStandaloneAlgorithm algo_muDown = SVFitMassComputation(svFitMu1Down, svFitMu2Down, metx_muDown, mety_muDown,
 										  covMET, inputFile_visPtResolution);
+		      
+		      SVfitStandaloneAlgorithm algo_scaleUp = SVFitMassComputation(svFitMu1scaleUp, svFitMu2scaleUp, metcorr_ex_JES_Up, metcorr_ey_JES_Up,
+										   covMET, inputFile_visPtResolution);
+		      SVfitStandaloneAlgorithm algo_scaleDown = SVFitMassComputation(svFitMu1scaleDown, svFitMu2scaleDown, metcorr_ex_JES_Down,
+										     metcorr_ey_JES_Down, covMET, inputFile_visPtResolution);
+		      
+		      SVfitStandaloneAlgorithm algo_resoUp = SVFitMassComputation(svFitMu1resoUp, svFitMu2resoUp, metcorr_ex_UnclusteredJES_Up,
+										  metcorr_ey_UnclusteredJES_Up, covMET, inputFile_visPtResolution);
+		      SVfitStandaloneAlgorithm algo_resoDown = SVFitMassComputation(svFitMu1resoDown, svFitMu2resoDown, metcorr_ex_UnclusteredJES_Down,
+										    metcorr_ey_UnclusteredJES_Down, covMET, inputFile_visPtResolution);
+		      
 		      m_sv_muUp   = algo_muUp.getMass();
 		      m_sv_muDown = algo_muDown.getMass();
+		      
+		      m_sv_scaleUp   = algo_scaleUp.getMass();
+		      m_sv_scaleDown = algo_scaleDown.getMass();
+		      
+		      m_sv_resoUp    = algo_resoUp.getMass();
+		      m_sv_resoDown  = algo_resoDown.getMass();
 		      
 		      pt_sv_muUp  = algo_muUp.pt();
 		      eta_sv_muUp = algo_muUp.eta();
 		      phi_sv_muUp = algo_muUp.phi();
 		      
+		      pt_sv_scaleUp   = algo_scaleUp.pt();
+		      eta_sv_scaleUp  = algo_scaleUp.eta();
+		      phi_sv_scaleUp  = algo_scaleUp.phi();
+		      
+		      pt_sv_resoUp   = algo_resoUp.pt();
+		      eta_sv_resoUp  = algo_resoUp.eta();
+		      phi_sv_resoUp  = algo_resoUp.phi();
+		      
 		      pt_sv_muDown  = algo_muDown.pt();
 		      eta_sv_muDown = algo_muDown.eta();
 		      phi_sv_muDown = algo_muDown.phi();
+		      
+		      pt_sv_muDown  = algo_muDown.pt();
+		      eta_sv_muDown = algo_muDown.eta();
+		      phi_sv_muDown = algo_muDown.phi();
+		      
+		      pt_sv_scaleDown = algo_scaleDown.pt();
+		      eta_sv_scaleDown= algo_scaleDown.eta();
+		      phi_sv_scaleDown= algo_scaleDown.phi();
+		      
+		      pt_sv_resoDown  = algo_resoDown.pt();
+		      eta_sv_resoDown = algo_resoDown.eta();
+		      phi_sv_resoDown = algo_resoDown.phi();
 		    }
 		    else if ((njets==2 && mjj>300) && bdt_vbf>0.8){
-		      SVfitStandaloneAlgorithm algo_muUp = SVFitMassComputation(svFitMu1Up, svFitMu2Up, metx_muUp, mety_muUp, covMET, inputFile_visPtResolution);
-		      SVfitStandaloneAlgorithm algo_muDown = SVFitMassComputation(svFitMu1Down, svFitMu2Down, metx_muDown, mety_muDown, covMET, inputFile_visPtResolution);
+		      SVfitStandaloneAlgorithm algo_muUp = SVFitMassComputation(svFitMu1Up, svFitMu2Up, metx_muUp, mety_muUp,
+										covMET, inputFile_visPtResolution);
+		      SVfitStandaloneAlgorithm algo_muDown = SVFitMassComputation(svFitMu1Down, svFitMu2Down, metx_muDown, mety_muDown,
+										  covMET, inputFile_visPtResolution);
+		      
+		      SVfitStandaloneAlgorithm algo_scaleUp = SVFitMassComputation(svFitMu1scaleUp, svFitMu2scaleUp, metcorr_ex_JES_Up, metcorr_ey_JES_Up,
+										   covMET, inputFile_visPtResolution);
+		      SVfitStandaloneAlgorithm algo_scaleDown = SVFitMassComputation(svFitMu1scaleDown, svFitMu2scaleDown, metcorr_ex_JES_Down,
+										     metcorr_ey_JES_Down, covMET, inputFile_visPtResolution);
+					
+		      SVfitStandaloneAlgorithm algo_resoUp = SVFitMassComputation(svFitMu1resoUp, svFitMu2resoUp, metcorr_ex_UnclusteredJES_Up,
+										  metcorr_ey_UnclusteredJES_Up, covMET, inputFile_visPtResolution);
+		      SVfitStandaloneAlgorithm algo_resoDown = SVFitMassComputation(svFitMu1resoDown, svFitMu2resoDown, metcorr_ex_UnclusteredJES_Down,
+										    metcorr_ey_UnclusteredJES_Down, covMET, inputFile_visPtResolution);
+		      
 		      m_sv_muUp   = algo_muUp.getMass();
 		      m_sv_muDown = algo_muDown.getMass();
+		      
+		      m_sv_scaleUp   = algo_scaleUp.getMass();
+		      m_sv_scaleDown = algo_scaleDown.getMass();
+		      
+		      m_sv_resoUp    = algo_resoUp.getMass();
+		      m_sv_resoDown  = algo_resoDown.getMass();
 		      
 		      pt_sv_muUp  = algo_muUp.pt();
 		      eta_sv_muUp = algo_muUp.eta();
 		      phi_sv_muUp = algo_muUp.phi();
 		      
+		      pt_sv_scaleUp   = algo_scaleUp.pt();
+		      eta_sv_scaleUp  = algo_scaleUp.eta();
+		      phi_sv_scaleUp  = algo_scaleUp.phi();
+		      
+		      pt_sv_resoUp   = algo_resoUp.pt();
+		      eta_sv_resoUp  = algo_resoUp.eta();
+		      phi_sv_resoUp  = algo_resoUp.phi();
+		      
 		      pt_sv_muDown  = algo_muDown.pt();
 		      eta_sv_muDown = algo_muDown.eta();
 		      phi_sv_muDown = algo_muDown.phi();
+		      
+		      pt_sv_scaleDown = algo_scaleDown.pt();
+		      eta_sv_scaleDown= algo_scaleDown.eta();
+		      phi_sv_scaleDown= algo_scaleDown.phi();
+		      
+		      pt_sv_resoDown  = algo_resoDown.pt();
+		      eta_sv_resoDown = algo_resoDown.eta();
+		      phi_sv_resoDown = algo_resoDown.phi();
 		    }
 		  }
 		  
@@ -3262,10 +3418,10 @@ int main(int argc, char * argv[]) {
                 recAccept = recAccept && fabs(eta_1)<2.4 && fabs(eta_2)<2.4;
                 // filling ntuple
                 if (genAccept) {
-                    if (recAccept) {
+		  if (recAccept) {
                         histRecCutsWeightsH->Fill(0.,weight);
                         histRecCutsGenWeightsH->Fill(0.,genweight);
-                        if (njets==0 && bdt_0jets>0.24) {
+                        if (njets==0 && bdt_0jets>0.2) {
 			  histBDTCutWeightsH->Fill(0.,weight);
 			  histBDTCutGenWeightsH->Fill(0.,genweight);
                         }
@@ -3288,7 +3444,7 @@ int main(int argc, char * argv[]) {
                         noutNumRecCutsWeightsH->Fill(0.,weight);
                         noutNumRecCutsGenWeightsH->Fill(0.,genweight);
                     }
-                    if (njets==0 && bdt_0jets>0.24) {
+                    if (njets==0 && bdt_0jets>0.2) {
 		      noutDenBDTCutWeightsH->Fill(0.,weight);
 		      noutDenBDTCutGenWeightsH->Fill(0.,genweight);
 		      if (genAccept) {
