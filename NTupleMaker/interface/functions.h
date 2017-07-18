@@ -427,22 +427,39 @@ struct myclass {
 
 
 namespace genTools{
-  float topPtWeight(float pt1,
-		    float pt2) {
+  float topPtWeight(float pt1, float pt2) {
     
     if (pt1>400) pt1 = 400;
     if (pt2>400) pt2 = 400;
     
     float a = 0.0615;    // Run2 a parameter
-    float b = -0.0005;  // Run2 b parameter
-    
+    float b = -0.0005;   // Run2 b parameter
+
     float w1 = TMath::Exp(a+b*pt1);
     float w2 = TMath::Exp(a+b*pt2);
-    
+
     return TMath::Sqrt(w1*w2);  
   }
 
-  float topPtWeight(const AC1B& analysisTree){
+  float topPtWeight_Run1(float pt1, float pt2) {
+    
+    if (pt1>400) pt1 = 400;
+    if (pt2>400) pt2 = 400;
+    
+    float a = 0.156;    // Run1 a parameter
+    float b = -0.00137;  // Run1 b parameter
+
+    float w1 = TMath::Exp(a+b*pt1);
+    float w2 = TMath::Exp(a+b*pt2);
+
+    return TMath::Sqrt(w1*w2);  
+  }
+
+
+  float topPtWeight(const AC1B& analysisTree, unsigned int LHC_runEra=2){
+	// argument LHC_runEra allows to switch between Run1 and Run2 weights. Default is Run2.
+	// for Run1 weights use "LHC_runEra =1", for Run2 weights use "LHC_runEra =2". 
+
     float topPt = -1;
     float antitopPt = -1;
     
@@ -456,8 +473,12 @@ namespace genTools{
 				analysisTree.genparticles_py[igen]*analysisTree.genparticles_py[igen]);
     }
 
-    if(topPt > 0. && antitopPt > 0.)
-      return topPtWeight(topPt, antitopPt);
+    if(topPt > 0. && antitopPt > 0.){
+	  if (LHC_runEra ==2)
+      	return topPtWeight(topPt, antitopPt);
+	  else if (LHC_runEra ==1)
+		return topPtWeight_Run1(topPt, antitopPt);
+	}
 
     return 1.;
   };
