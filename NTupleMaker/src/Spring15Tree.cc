@@ -298,6 +298,18 @@ void Spring15Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("xTrigger",  &xTrigger, &b_xTrigger);
    fChain->SetBranchAddress("trg_singlemuon",  &trg_singlemuon, &b_trg_singlemuon);
    fChain->SetBranchAddress("trg_singleelectron",  &trg_singleelectron, &b_trg_singleelectron);
+     // weights for ttbar uncertainty
+   /*fChain->SetBranchAddress("weightScale0",  &weightScale0, &b_weightScale0);
+   fChain->SetBranchAddress("weightScale1",  &weightScale1, &b_weightScale1);
+   fChain->SetBranchAddress("weightScale2",  &weightScale2, &b_weightScale2);
+   fChain->SetBranchAddress("weightScale3",  &weightScale3, &b_weightScale3);
+   fChain->SetBranchAddress("weightScale4",  &weightScale4, &b_weightScale4);
+   fChain->SetBranchAddress("weightScale5",  &weightScale5, &b_weightScale5);
+   fChain->SetBranchAddress("weightScale6",  &weightScale6, &b_weightScale6);
+   fChain->SetBranchAddress("weightScale7",  &weightScale7, &b_weightScale7);
+   fChain->SetBranchAddress("weightScale8",  &weightScale8, &b_weightScale8);
+   fChain->SetBranchAddress("weightPDFup",  &weightPDFup, &b_weightPDFup);
+   fChain->SetBranchAddress("weightPDFdown",  &weightPDFdown, &b_weightPDFdown);*/
    
    lock=true;
 }
@@ -628,6 +640,18 @@ void Spring15Tree::WriteInit(TTree *tree) {
   fChain->Branch("xTrigger",  &xTrigger, "xTrigger/O");
   fChain->Branch("trg_singlemuon",  &trg_singlemuon, "trg_singlemuon/O");
   fChain->Branch("trg_singleelectron",  &trg_singleelectron, "trg_singleelectron/O");
+     // weights for ttbar uncertainty
+  /*fChain->Branch("weightScale0",  &weightScale0, "weightScale0/F");
+  fChain->Branch("weightScale1",  &weightScale1, "weightScale1/F");
+  fChain->Branch("weightScale2",  &weightScale2, "weightScale2/F");
+  fChain->Branch("weightScale3",  &weightScale3, "weightScale3/F");
+  fChain->Branch("weightScale4",  &weightScale4, "weightScale4/F");
+  fChain->Branch("weightScale5",  &weightScale5, "weightScale5/F");
+  fChain->Branch("weightScale6",  &weightScale6, "weightScale6/F");
+  fChain->Branch("weightScale7",  &weightScale7, "weightScale7/F");
+  fChain->Branch("weightScale8",  &weightScale8, "weightScale8/F");
+  fChain->Branch("weightPDFup",  &weightPDFup, "weightPDFup/F");
+  fChain->Branch("weightPDFdown",  &weightPDFdown, "weightPDFdown/F");*/
 }
 
 void Spring15Tree::Fill(){

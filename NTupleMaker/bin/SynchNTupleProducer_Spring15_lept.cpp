@@ -99,6 +99,7 @@ void correctTauES(TLorentzVector& Tau, TLorentzVector& Met, float relative_shift
 bool passedSummer16VetoId(const AC1B * analysisTree, int index);
 bool SafeRatio(double denominator);
 bool passedAllMetFilters(const AC1B * analysisTree, std::vector<TString> met_filters, bool isData);
+//void fillTTbarUncWeights(const AC1B * analysisTree, Spring15Tree *otree, bool isData, bool includeTTbarUncWeights);
 
 int main(int argc, char * argv[]){
 
@@ -344,6 +345,12 @@ int main(int argc, char * argv[]){
   const bool debug = cfg.get<bool>("debug");
   
   // **** end of configuration analysis
+
+  unsigned int lhc_run_era = 2;
+  bool applyRun1topPtWeights = true;
+  if (applyRun1topPtWeights) lhc_run_era =1;
+
+  bool includeTTbarUncWeights = true;
 
   //file list creation
 
@@ -1037,8 +1044,12 @@ int main(int argc, char * argv[]){
 
       // topPt weight
 	  otree->topptweight =1.;
-      if(!isData)
-	    otree->topptweight = genTools::topPtWeight(analysisTree);
+      if(!isData){
+		otree->topptweight = genTools::topPtWeight(analysisTree, lhc_run_era);
+      }
+
+	  // weights for ttbar samples to estimate uncertianties
+      //fillTTbarUncWeights(&analysisTree, otree, isData, includeTTbarUncWeights);
 
 
       // lepton tau fakerates
@@ -2017,5 +2028,36 @@ bool passedAllMetFilters(const AC1B * analysisTree, std::vector<TString> met_fil
   }
   return passed;
 }
+
+/*void fillTTbarUncWeights(const AC1B * analysisTree, Spring15Tree *otree, bool isData, bool includeTTbarUncWeights){
+	otree->weightScale0 =1;
+	otree->weightScale1 =1;
+	otree->weightScale2 =1;
+	otree->weightScale3 =1;
+	otree->weightScale4 =1;
+	otree->weightScale5 =1;
+	otree->weightScale6 =1;
+	otree->weightScale7 =1;
+	otree->weightScale8 =1;
+	otree->weightPDFup = 1;
+	otree->weightPDFdown = 1;
+
+	if (!isData and includeTTbarUncWeights){
+		otree->weightScale0 = analysisTree->weightScale0;
+		otree->weightScale1 = analysisTree->weightScale1;
+		otree->weightScale2 = analysisTree->weightScale2;
+		otree->weightScale3 = analysisTree->weightScale3;
+		otree->weightScale4 = analysisTree->weightScale4;
+		otree->weightScale5 = analysisTree->weightScale5;
+		otree->weightScale6 = analysisTree->weightScale6;
+		otree->weightScale7 = analysisTree->weightScale7;
+		otree->weightScale8 = analysisTree->weightScale8;
+		otree->weightPDFup = analysisTree->weightPDFup;
+		otree->weightPDFdown = analysisTree->weightPDFdown;
+	}
+
+}*/
+
+
 
 
