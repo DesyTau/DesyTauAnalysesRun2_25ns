@@ -99,6 +99,7 @@ void correctTauES(TLorentzVector& Tau, TLorentzVector& Met, float relative_shift
 bool passedSummer16VetoId(const AC1B * analysisTree, int index);
 bool SafeRatio(double denominator);
 bool passedAllMetFilters(const AC1B * analysisTree, std::vector<TString> met_filters, bool isData);
+//void fillTTbarUncWeights(const AC1B * analysisTree, Spring15Tree *otree, bool isData, bool includeTTbarUncWeights);
 
 int main(int argc, char * argv[]){
 
@@ -345,6 +346,12 @@ int main(int argc, char * argv[]){
   
   // **** end of configuration analysis
 
+  unsigned int lhc_run_era = 2;
+  bool applyRun1topPtWeights = true;
+  if (applyRun1topPtWeights) lhc_run_era =1;
+
+  bool includeTTbarUncWeights = true;
+
   //file list creation
 
   int ifile = 0;
@@ -535,7 +542,8 @@ int main(int argc, char * argv[]){
     topPtWeightSys = new TopPtWeightSys(otree);
     //lepTauFakeScaleSys = new LepTauFakeScaleSys(otree);
     //lepTauFakeScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);
-    lepTauFakeOneProngScaleSys = new LepTauFakeOneProngScaleSys(otree);
+	/* not needed for MSSM */
+    /*lepTauFakeOneProngScaleSys = new LepTauFakeOneProngScaleSys(otree);
     lepTauFakeOneProngScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);
     lepTauFakeOneProngScaleSys->SetUseSVFit(ApplySVFit);	
     lepTauFakeOneProngOnePi0ScaleSys = new LepTauFakeOneProngOnePi0ScaleSys(otree);
@@ -543,7 +551,7 @@ int main(int argc, char * argv[]){
     lepTauFakeOneProngOnePi0ScaleSys->SetUseSVFit(ApplySVFit);
     lepTauFakeThreeProngScaleSys = new LepTauFakeThreeProngScaleSys(otree);
     lepTauFakeThreeProngScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);	
-    lepTauFakeThreeProngScaleSys->SetUseSVFit(ApplySVFit);
+    lepTauFakeThreeProngScaleSys->SetUseSVFit(ApplySVFit);*/
 
 	
 	if (cfg.get<bool>("splitJES")){
@@ -1036,8 +1044,12 @@ int main(int argc, char * argv[]){
 
       // topPt weight
 	  otree->topptweight =1.;
-      if(!isData)
-	    otree->topptweight = genTools::topPtWeight(analysisTree);
+      if(!isData){
+		otree->topptweight = genTools::topPtWeight(analysisTree, lhc_run_era);
+      }
+
+	  // weights for ttbar samples to estimate uncertianties
+      //fillTTbarUncWeights(&analysisTree, otree, isData, includeTTbarUncWeights);
 
 
       // lepton tau fakerates
@@ -1243,6 +1255,8 @@ int main(int argc, char * argv[]){
       const bool Synch = cfg.get<bool>("Synch"); 
 
       bool passedBaselineSel = false;
+	  // for SM analysis
+      /*
       if (ch=="mt") 
         passedBaselineSel = ( otree->iso_1<0.35 && otree->byMediumIsolationMVArun2v1DBoldDMwLT_2>0.5 && 
                             otree->againstElectronVLooseMVA6_2>0.5 && otree->againstMuonTight3_2>0.5  &&
@@ -1252,7 +1266,16 @@ int main(int argc, char * argv[]){
                             otree->againstMuonLoose3_2>0.5 && otree->againstElectronTightMVA6_2>0.5 && 
                             otree->dilepton_veto == 0 && otree->extraelec_veto == 0 && otree->extramuon_veto == 0);
 
-
+      */
+	  // for MSSM analysis
+      if (ch=="mt") 
+        passedBaselineSel = ( otree->iso_1<0.35 && otree->byLooseIsolationMVArun2v1DBoldDMwLT_2>0.5 && 
+                            otree->againstElectronVLooseMVA6_2>0.5 && otree->againstMuonTight3_2>0.5  &&
+                            otree->dilepton_veto == 0 && otree->extraelec_veto == 0 && otree->extramuon_veto == 0);
+      if (ch=="et") 
+        passedBaselineSel = ( otree->iso_1<0.35 && otree->byLooseIsolationMVArun2v1DBoldDMwLT_2>0.5 && 
+                            otree->againstMuonLoose3_2>0.5 && otree->againstElectronTightMVA6_2>0.5 && 
+                            otree->dilepton_veto == 0 && otree->extraelec_veto == 0 && otree->extramuon_veto == 0);
       if (!Synch && !passedBaselineSel)
         continue;
 
@@ -1271,9 +1294,10 @@ int main(int argc, char * argv[]){
            tauOneProngOnePi0ScaleSys->Eval(utils::MUTAU);
            tauThreeProngScaleSys->Eval(utils::MUTAU);*/
            tauScaleSys->Eval(utils::MUTAU);
-		   lepTauFakeOneProngScaleSys->Eval(utils::MUTAU);			
-		   lepTauFakeOneProngOnePi0ScaleSys->Eval(utils::MUTAU);			
-		   lepTauFakeThreeProngScaleSys->Eval(utils::MUTAU);			
+		   /* not needed for MSSM */	
+		   //lepTauFakeOneProngScaleSys->Eval(utils::MUTAU);			
+		   //lepTauFakeOneProngOnePi0ScaleSys->Eval(utils::MUTAU);			
+		   //lepTauFakeThreeProngScaleSys->Eval(utils::MUTAU);			
            //lepTauFakeScaleSys->Eval(utils::MUTAU);
          }
 	 else if (ch=="et") {
@@ -1281,9 +1305,10 @@ int main(int argc, char * argv[]){
            tauOneProngOnePi0ScaleSys->Eval(utils::ETAU);
            tauThreeProngScaleSys->Eval(utils::ETAU);*/
            tauScaleSys->Eval(utils::ETAU);
-		   lepTauFakeOneProngScaleSys->Eval(utils::ETAU);			
-		   lepTauFakeOneProngOnePi0ScaleSys->Eval(utils::ETAU);			
-		   lepTauFakeThreeProngScaleSys->Eval(utils::ETAU);	
+		   /* not needed for MSSM */	
+		   //lepTauFakeOneProngScaleSys->Eval(utils::ETAU);			
+		   //lepTauFakeOneProngOnePi0ScaleSys->Eval(utils::ETAU);			
+		   //lepTauFakeThreeProngScaleSys->Eval(utils::ETAU);	
            //lepTauFakeScaleSys->Eval(utils::ETAU);
          }
       }
@@ -2003,5 +2028,36 @@ bool passedAllMetFilters(const AC1B * analysisTree, std::vector<TString> met_fil
   }
   return passed;
 }
+
+/*void fillTTbarUncWeights(const AC1B * analysisTree, Spring15Tree *otree, bool isData, bool includeTTbarUncWeights){
+	otree->weightScale0 =1;
+	otree->weightScale1 =1;
+	otree->weightScale2 =1;
+	otree->weightScale3 =1;
+	otree->weightScale4 =1;
+	otree->weightScale5 =1;
+	otree->weightScale6 =1;
+	otree->weightScale7 =1;
+	otree->weightScale8 =1;
+	otree->weightPDFup = 1;
+	otree->weightPDFdown = 1;
+
+	if (!isData and includeTTbarUncWeights){
+		otree->weightScale0 = analysisTree->weightScale0;
+		otree->weightScale1 = analysisTree->weightScale1;
+		otree->weightScale2 = analysisTree->weightScale2;
+		otree->weightScale3 = analysisTree->weightScale3;
+		otree->weightScale4 = analysisTree->weightScale4;
+		otree->weightScale5 = analysisTree->weightScale5;
+		otree->weightScale6 = analysisTree->weightScale6;
+		otree->weightScale7 = analysisTree->weightScale7;
+		otree->weightScale8 = analysisTree->weightScale8;
+		otree->weightPDFup = analysisTree->weightPDFup;
+		otree->weightPDFdown = analysisTree->weightPDFdown;
+	}
+
+}*/
+
+
 
 

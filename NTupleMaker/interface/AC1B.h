@@ -641,6 +641,19 @@ public :
    Float_t         tau_photonPtSumOutsideSignalConedR03[50];   //[tau_count]
    Float_t         tau_photonPtSumOutsideSignalConed[50];
    Float_t         tau_puCorrPtSum[50];   //[tau_count]
+   // weights for ttbar uncertainty 
+   /*Float_t         weightScale0;
+   Float_t         weightScale1;
+   Float_t         weightScale2;
+   Float_t         weightScale3;
+   Float_t         weightScale4;
+   Float_t         weightScale5;
+   Float_t         weightScale6;
+   Float_t         weightScale7;
+   Float_t         weightScale8;
+   Float_t         weightPDFup;
+   Float_t         weightPDFdown;*/
+
 
    // List of branches
    TBranch        *b_errors;   //!
@@ -1243,6 +1256,19 @@ public :
    TBranch        *b_tau_neutralIsoPtSumdR03;   //!
    TBranch        *b_tau_photonPtSumOutsideSignalConedR03;   //!
    TBranch        *b_tau_puCorrPtSum;   //!
+   // weights for ttbar uncertainty 
+   /*TBranch         *b_weightScale0;
+   TBranch         *b_weightScale1;
+   TBranch         *b_weightScale2;
+   TBranch         *b_weightScale3;
+   TBranch         *b_weightScale4;
+   TBranch         *b_weightScale5;
+   TBranch         *b_weightScale6;
+   TBranch         *b_weightScale7;
+   TBranch         *b_weightScale8;
+   TBranch         *b_weightPDFup;
+   TBranch         *b_weightPDFdown;*/
+
 
    AC1B(TTree *tree=0, bool isData=false);
    virtual ~AC1B();
@@ -1961,6 +1987,18 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("tau_neutralIsoPtSumdR03", tau_neutralIsoPtSumdR03, &b_tau_neutralIsoPtSumdR03);
    fChain->SetBranchAddress("tau_photonPtSumOutsideSignalConedR03", tau_photonPtSumOutsideSignalConedR03, &b_tau_photonPtSumOutsideSignalConedR03);
    fChain->SetBranchAddress("tau_puCorrPtSum", tau_puCorrPtSum, &b_tau_puCorrPtSum);
+     // weights for ttbar uncertainty
+   /*fChain->SetBranchAddress("weightScale0",  &weightScale0, &b_weightScale0);
+   fChain->SetBranchAddress("weightScale1",  &weightScale1, &b_weightScale1);
+   fChain->SetBranchAddress("weightScale2",  &weightScale2, &b_weightScale2);
+   fChain->SetBranchAddress("weightScale3",  &weightScale3, &b_weightScale3);
+   fChain->SetBranchAddress("weightScale4",  &weightScale4, &b_weightScale4);
+   fChain->SetBranchAddress("weightScale5",  &weightScale5, &b_weightScale5);
+   fChain->SetBranchAddress("weightScale6",  &weightScale6, &b_weightScale6);
+   fChain->SetBranchAddress("weightScale7",  &weightScale7, &b_weightScale7);
+   fChain->SetBranchAddress("weightScale8",  &weightScale8, &b_weightScale8);
+   fChain->SetBranchAddress("weightPDFup",   &weightPDFup, &b_weightPDFup);
+   fChain->SetBranchAddress("weightPDFdown", &weightPDFdown, &b_weightPDFdown);*/
    Notify();
 }
 

@@ -68,7 +68,7 @@ void TP_eff_e(TString fileName = "SingleElectron_Run2016B_TP", // RooT file with
        "Pt60to70",
        "Pt70to100",
        "PtGt100"};
-
+/*
   float ptBinsTrig_def[26] = {10,
 			  13,
 			  16,
@@ -115,6 +115,45 @@ void TP_eff_e(TString fileName = "SingleElectron_Run2016B_TP", // RooT file with
 			"PtGt200"};
 
 	int nPtBins = 25; if(what == "IdIso") nPtBins = 10;
+*/
+
+// start from pt = 24
+  float ptBinsTrig_def[16] = {
+			  24,
+			  25,
+			  26,
+			  27,
+			  28,
+			  31,
+			  34,
+			  37,
+			  40,
+			  45,
+			  50,
+			  60,
+			  70,
+			  100,
+			  200,
+			  1000};
+
+	TString PtBinsTrig_def[15] = {
+		    "Pt24to25","Pt25to26","Pt26to27",
+		    "Pt27to28",
+		    "Pt28to31",
+		    "Pt31to34",
+		    "Pt34to37",
+		    "Pt37to40",
+		    "Pt40to45",
+		    "Pt45to50",
+		    "Pt50to60",
+		    "Pt60to70",
+		    "Pt70to100",
+			"Pt100to200",
+			"PtGt200"};
+
+	int nPtBins = 15; if(what == "IdIso") nPtBins = 10;
+
+
 
 /*
 /// for anti-isolated regions
@@ -274,8 +313,10 @@ void TP_eff_e(TString fileName = "SingleElectron_Run2016B_TP", // RooT file with
 
 
   if(what == "hlt_1") {cut_flag_hlt_pass = "fabs(eta_tag)<2 && hlt_1_probe == 1"; cut_flag_hlt_fail = "fabs(eta_tag)<2 && hlt_1_probe == 0"; }
-  if(what == "hlt_2") {cut_flag_hlt_pass = "fabs(eta_tag)<2 && hlt_2_probe == 1"; cut_flag_hlt_fail = "fabs(eta_tag)<2 && hlt_2_probe == 0"; }
-  if(what == "hlt_3") {cut_flag_hlt_pass = "fabs(eta_tag)<2 && hlt_3_probe == 1"; cut_flag_hlt_fail = "fabs(eta_tag)<2 && hlt_3_probe == 0"; }
+  if(what == "hlt_2") {cut_flag_hlt_pass = "fabs(eta_tag)<2 && hlt_2_probe == 1"; cut_flag_hlt_fail = "fabs(eta_tag)<2 && hlt_2_probe == 0 "; }
+  //if(what == "hlt_3") {cut_flag_hlt_pass = "fabs(eta_tag)<2 && hlt_3_probe == 1  && run<280385"; cut_flag_hlt_fail = "fabs(eta_tag)<2 && hlt_3_probe == 0  && run<280385"; }
+  // Ele25Tigth OR Ele27Loose
+  if(what == "hlt_3") {cut_flag_hlt_pass = "fabs(eta_tag)<2 && (hlt_3_probe == 1 || hlt_1_probe ==1)"; cut_flag_hlt_fail = "fabs(eta_tag)<2 && hlt_3_probe == 0  && hlt_1_probe==0"; }
   if(what == "hlt_4") {cut_flag_hlt_pass = "fabs(eta_tag)<2 && hlt_4_probe == 1"; cut_flag_hlt_fail = "fabs(eta_tag)<2 && hlt_4_probe == 0"; }
   if(what == "hlt_5") {cut_flag_hlt_pass = "fabs(eta_tag)<2 && hlt_5_probe == 1"; cut_flag_hlt_fail = "fabs(eta_tag)<2 && hlt_5_probe == 0"; }
   if(what == "hlt_6") {cut_flag_hlt_pass = "fabs(eta_tag)<2 && hlt_6_probe == 1"; cut_flag_hlt_fail = "fabs(eta_tag)<2 && hlt_6_probe == 0"; }

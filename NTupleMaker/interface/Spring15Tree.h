@@ -264,6 +264,19 @@ public :
   Bool_t          xTrigger;
   Bool_t          trg_singlemuon;
   Bool_t		  trg_singleelectron;
+  // weights for ttbar uncertainty
+  /*Float_t         weightScale0;
+  Float_t         weightScale1;
+  Float_t         weightScale2;
+  Float_t         weightScale3;
+  Float_t         weightScale4;
+  Float_t         weightScale5;
+  Float_t         weightScale6;
+  Float_t         weightScale7;
+  Float_t         weightScale8;
+  Float_t         weightPDFup;
+  Float_t         weightPDFdown;*/
+  
   
   // List of branches
   TBranch        *b_run;   //!
@@ -503,6 +516,19 @@ public :
   TBranch        *b_xTrigger;
   TBranch        *b_trg_singlemuon;
   TBranch        *b_trg_singleelectron;
+  // weights for ttbar uncertainty
+  /*TBranch         *b_weightScale0;
+  TBranch         *b_weightScale1;
+  TBranch         *b_weightScale2;
+  TBranch         *b_weightScale3;
+  TBranch         *b_weightScale4;
+  TBranch         *b_weightScale5;
+  TBranch         *b_weightScale6;
+  TBranch         *b_weightScale7;
+  TBranch         *b_weightScale8;
+  TBranch         *b_weightPDFup;
+  TBranch         *b_weightPDFdown;*/
+
   
   Spring15Tree(TTree *tree=0);
   virtual ~Spring15Tree();
