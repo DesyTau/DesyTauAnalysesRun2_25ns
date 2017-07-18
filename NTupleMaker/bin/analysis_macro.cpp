@@ -29,6 +29,11 @@
 #include "HTT-utilities/LepEffInterface/interface/ScaleFactor.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/PileUp.h"
 
+#include "RooWorkspace.h"
+#include "RooAbsReal.h"
+#include "RooRealVar.h"
+
+
 using namespace std;
 double PtoEta(double Px, double Py, double Pz) {
 
@@ -140,6 +145,7 @@ int main(int argc, char * argv[]) {
   Config cfg(argv[1]);
 
   const bool isData = cfg.get<bool>("IsData");
+  const bool applyHiggsPtWeight = cfg.get<bool>("ApplyHiggsPtWeight");
 
   // kinematic cuts on muons
   const float ptMuonLowCut   = cfg.get<float>("ptMuonLowCut");
@@ -194,6 +200,10 @@ int main(int argc, char * argv[]) {
 
   const string Muon17TriggerFile = cfg.get<string>("Muon17TriggerEff");
   const string Muon8TriggerFile = cfg.get<string>("Muon8TriggerEff");
+
+  // Higgs pt reweighting
+  const string higgsPtFileName = cfg.get<string>("HiggsPtFileName");
+  TString HiggsPtFileName(higgsPtFileName);
 
 
   // ********** end of configuration *******************
@@ -475,12 +485,20 @@ int main(int argc, char * argv[]) {
   PUofficial->set_h_data(PU_data);
   PUofficial->set_h_MC(PU_mc);
 
-  // Trigger efficiencies
+  // Higgs reweighting 
+  TFile * higgsPtFile = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/"+HiggsPtFileName);
+  TH1D * higgsPtH = (TH1D*)higgsPtFile->Get("kfactor");
 
+  // Trigger efficiencies
   ScaleFactor * SF_muon17 = new ScaleFactor();
   SF_muon17->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(Muon17TriggerFile));
   ScaleFactor * SF_muon8 = new ScaleFactor();
   SF_muon8->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(Muon8TriggerFile));
+
+  // Correction workspace
+  TString correctionsWorkspaceFileName = TString(cmsswBase)+"/src/HTT-utilities/CorrectionsWorkspace/htt_scalefactors_v16_5.root";
+  TFile * correctionWorkSpaceFile = new TFile(correctionsWorkspaceFileName);
+  RooWorkspace *correctionWS = (RooWorkspace*)correctionWorkSpaceFile->Get("w");
 
   TString filen;
   int iFiles = 0;
@@ -692,6 +710,12 @@ int main(int argc, char * argv[]) {
        //       std::cout << "Higgs : " << genparticles_pdgid[higgsIndex] 
        //		 << "    pT = " << higgsLV.Pt()
        //		 << "    eta = " << higgsLV.Eta() << std::endl;
+       if (applyHiggsPtWeight) {
+	 double HiggsPtForWeighting = higgsPt;
+	 if (higgsPt>500) HiggsPtForWeighting = 499;
+	 double higgsPtWeight = higgsPtH->GetBinContent(higgsPtH->FindBin(HiggsPtForWeighting));
+	 weight *= higgsPtWeight;
+       }
      }
 
      histWeightsH->Fill(1.0,weight);
@@ -1022,11 +1046,27 @@ int main(int argc, char * argv[]) {
      if (iTrailing<0) continue;
 
      double triggerWeight = 1;
+     double idLeadingWeight = 1;
+     double idTrailingWeight = 1;
      if (!isData) { // trigger efficiency here
        double ptLeading = muon_pt[iLeading];
        double etaLeading = muon_eta[iLeading];
        double ptTrailing = muon_pt[iTrailing];
        double etaTrailing = muon_eta[iTrailing];
+
+       if (ptLeading<10.0) ptLeading = 10.01;
+       if (ptTrailing<10.0) ptTrailing = 10.01;
+
+       correctionWS->var("m_pt")->setVal(ptLeading);
+       correctionWS->var("m_eta")->setVal(etaLeading);
+       double idLeadingW  = correctionWS->function("m_id_ratio")->getVal();
+       double trkLeadingW = correctionWS->function("m_trk_ratio")->getVal();
+       idLeadingWeight = idLeadingW * trkLeadingW;
+       correctionWS->var("m_pt")->setVal(ptTrailing);
+       correctionWS->var("m_eta")->setVal(etaTrailing);
+       double idTrailingW = correctionWS->function("m_id_ratio")->getVal();
+       double trkTrailingW = correctionWS->function("m_trk_ratio")->getVal();
+       idTrailingWeight = idTrailingW * trkTrailingW;
 
        double effMu17dataTrailing = SF_muon17->get_EfficiencyData(ptTrailing,etaTrailing); 
        double effMu8dataTrailing = SF_muon8->get_EfficiencyData(ptTrailing,etaTrailing); 
@@ -1050,17 +1090,23 @@ int main(int argc, char * argv[]) {
 
        triggerWeight *= effDzSS;
 
-       /*
+       
        std::cout << "pT(leading) = " << ptLeading
 		 << "   eta(leading) = " << etaLeading
 		 << "   pT(trailing) = " << ptTrailing
 		 << "   eta(trailing) = " << etaTrailing << std::endl;
+       std::cout << "IdW(leading) = " << idLeadingW
+		 << "   TrkW(leading) = " << trkLeadingW 
+		 << "   IdW(trailing) = " << idTrailingW
+		 << "   TrkW(trailing) = " << trkTrailingW << std::endl;
        std::cout << "Trigger weight = " << triggerWeight << std::endl;
-       */
+      
 
      }
      triggerWeightH->Fill(triggerWeight,1.0);
      weight *= triggerWeight;
+     weight *= idLeadingWeight;
+     weight *= idTrailingWeight;
 
      // dimuon selection passed 
      TLorentzVector LeadingMuon4; LeadingMuon4.SetXYZM(muon_px[iLeading],
@@ -1189,6 +1235,51 @@ int main(int argc, char * argv[]) {
      // definition of signal muon+track
      bool signalLeadingMu  = trkLeadingMu.size()==1 && trkSigLeadingMu.size()==1;
      bool signalTrailingMu = trkTrailingMu.size()==1 && trkSigTrailingMu.size()==1;
+
+     double weightTrkLeading = 1;
+     double weightTrkTrailing = 1;
+     if (trkSigLeadingMu.size()>0&&!isData) {
+       unsigned int iTrkLeading = trkSigLeadingMu.at(0);
+       int absPdgId = TMath::Abs(track_ID[iTrkLeading]);
+       if (absPdgId==11) {
+	 correctionWS->var("e_pt")->setVal(track_pt[iTrkLeading]);
+	 correctionWS->var("e_eta")->setVal(track_eta[iTrkLeading]);
+	 weightTrkLeading = correctionWS->function("e_trk_ratio")->getVal();
+       }
+       else {
+	 correctionWS->var("m_pt")->setVal(track_pt[iTrkLeading]);
+         correctionWS->var("m_eta")->setVal(track_eta[iTrkLeading]);
+         weightTrkLeading = correctionWS->function("m_trk_ratio")->getVal();
+       }
+       //       std::cout << "track around leading : pT = " << track_pt[iTrkLeading]
+       //		 << "  eta = " << track_eta[iTrkLeading] 
+       //		 << "  Id = " << track_ID[iTrkLeading]
+       //		 << "  weight(trk) = " << weightTrkLeading << std::endl;
+	
+     }
+     weight *= weightTrkLeading;
+
+     if (trkSigTrailingMu.size()>0&&!isData) {
+       unsigned int iTrkTrailing = trkSigTrailingMu.at(0);
+       int absPdgId = TMath::Abs(track_ID[iTrkTrailing]);
+       if (absPdgId==11) {
+         correctionWS->var("e_pt")->setVal(track_pt[iTrkTrailing]);
+         correctionWS->var("e_eta")->setVal(track_eta[iTrkTrailing]);
+         weightTrkTrailing = correctionWS->function("e_trk_ratio")->getVal();
+       }
+       else {
+         correctionWS->var("m_pt")->setVal(track_pt[iTrkTrailing]);
+         correctionWS->var("m_eta")->setVal(track_eta[iTrkTrailing]);
+         weightTrkTrailing = correctionWS->function("m_trk_ratio")->getVal();
+       }
+       //       std::cout << "track around trailing : pT = " << track_pt[iTrkTrailing]
+       //                 << "  eta = " << track_eta[iTrkTrailing]
+       //                 << "  Id = " << track_ID[iTrkTrailing]
+       //                 << "  weight(trk) = " << weightTrkTrailing << std::endl;
+     }
+     std::cout << std::endl;
+     weight *= weightTrkTrailing;
+
 
      if (trkLeadingMu.size()==1) {
 
