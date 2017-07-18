@@ -42,11 +42,11 @@ bool looseJetiD(AC1B &tree_, int jet){  // updated recipe for 74x,76x,80x
 	float nm  = tree_.pfjet_neutralmulti[jet];
 	float npr = tree_.pfjet_chargedmulti[jet] + tree_.pfjet_neutralmulti[jet];
 
-	if (abs(eta)<=2.7)
+	if (fabs(eta)<=2.7)
 	  {
-	    looseJetID = (nhf < 0.99 && nem < 0.99 && npr > 1) && (abs(eta)>2.4 || (chf>0 && chm > 0 && elf < 0.99));
+	    looseJetID = (nhf < 0.99 && nem < 0.99 && npr > 1) && (fabs(eta)>2.4 || (chf>0 && chm > 0 && elf < 0.99));
 	  }
-	else if (abs(eta)<=3.0)
+	else if (fabs(eta)<=3.0)
 	  {
 	    looseJetID = (nem < 0.9 && nm > 2);
 	  }
