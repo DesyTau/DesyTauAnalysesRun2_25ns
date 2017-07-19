@@ -713,9 +713,9 @@ int main(int argc, char * argv[]) {
 	 if (higgsPt>500) HiggsPtForWeighting = 499;
 	 double higgsPtWeight = higgsPtH->GetBinContent(higgsPtH->FindBin(HiggsPtForWeighting));
 	 weight *= higgsPtWeight;
-	 std::cout << "Higgs : " << genparticles_pdgid[higgsIndex] 
-		   << "    pT = " << higgsLV.Pt()
-		   << "    eta = " << higgsLV.Eta() << " weight = " << higgsPtWeight << std::endl;
+	 //	 std::cout << "Higgs : " << genparticles_pdgid[higgsIndex] 
+	 //		   << "    pT = " << higgsLV.Pt()
+	 //		   << "    eta = " << higgsLV.Eta() << " weight = " << higgsPtWeight << std::endl;
 
        }
      }
