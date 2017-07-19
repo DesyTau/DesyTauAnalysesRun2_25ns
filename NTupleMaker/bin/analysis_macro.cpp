@@ -488,6 +488,7 @@ int main(int argc, char * argv[]) {
   // Higgs reweighting 
   TFile * higgsPtFile = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/"+HiggsPtFileName);
   TH1D * higgsPtH = (TH1D*)higgsPtFile->Get("kfactor");
+  //  std::cout << "Higgs Pt histogram : " << higgsPtH << std::endl;
 
   // Trigger efficiencies
   ScaleFactor * SF_muon17 = new ScaleFactor();
@@ -707,14 +708,15 @@ int main(int argc, char * argv[]) {
 					       genparticles_e[higgsIndex]);
        higgsPt = higgsLV.Pt();
        higgsTree->Fill();
-       //       std::cout << "Higgs : " << genparticles_pdgid[higgsIndex] 
-       //		 << "    pT = " << higgsLV.Pt()
-       //		 << "    eta = " << higgsLV.Eta() << std::endl;
        if (applyHiggsPtWeight) {
 	 double HiggsPtForWeighting = higgsPt;
 	 if (higgsPt>500) HiggsPtForWeighting = 499;
 	 double higgsPtWeight = higgsPtH->GetBinContent(higgsPtH->FindBin(HiggsPtForWeighting));
 	 weight *= higgsPtWeight;
+	 std::cout << "Higgs : " << genparticles_pdgid[higgsIndex] 
+		   << "    pT = " << higgsLV.Pt()
+		   << "    eta = " << higgsLV.Eta() << " weight = " << higgsPtWeight << std::endl;
+
        }
      }
 
@@ -1090,7 +1092,7 @@ int main(int argc, char * argv[]) {
 
        triggerWeight *= effDzSS;
 
-       
+       /*       
        std::cout << "pT(leading) = " << ptLeading
 		 << "   eta(leading) = " << etaLeading
 		 << "   pT(trailing) = " << ptTrailing
@@ -1100,7 +1102,7 @@ int main(int argc, char * argv[]) {
 		 << "   IdW(trailing) = " << idTrailingW
 		 << "   TrkW(trailing) = " << trkTrailingW << std::endl;
        std::cout << "Trigger weight = " << triggerWeight << std::endl;
-      
+       */
 
      }
      triggerWeightH->Fill(triggerWeight,1.0);
@@ -1277,7 +1279,7 @@ int main(int argc, char * argv[]) {
        //                 << "  Id = " << track_ID[iTrkTrailing]
        //                 << "  weight(trk) = " << weightTrkTrailing << std::endl;
      }
-     std::cout << std::endl;
+     //     std::cout << std::endl;
      weight *= weightTrkTrailing;
 
 
