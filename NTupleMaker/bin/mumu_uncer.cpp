@@ -671,6 +671,8 @@ int main(int argc, char * argv[]) {
     
     Int_t           nbtag;
     Int_t           nbtag_noSF;
+    Int_t           nbtag_Up;
+    Int_t           nbtag_Down;
     Float_t         bpt;
     Float_t         beta;
     Float_t         bphi;
@@ -1038,6 +1040,8 @@ int main(int argc, char * argv[]) {
     T->Branch("njetingap", &njetingap, "njetingap/I");
     
     T->Branch("nbtag", &nbtag, "nbtag/I");
+    T->Branch("nbtag_Up", &nbtag_Up, "nbtag_Up/I");
+    T->Branch("nbtag_Down", &nbtag_Down, "nbtag_Down/I");
     T->Branch("nbtag_noSF", &nbtag_noSF, "nbtag_noSF/I");
     T->Branch("bpt",   &bpt,   "bpt/F");
     T->Branch("beta",  &beta,  "beta/F");
@@ -1171,9 +1175,9 @@ int main(int argc, char * argv[]) {
     
     //-------------BTag scale factors--------------------->
     BTagCalibration calib("csvv2", cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/CSVv2_ichep.csv");
-    BTagCalibrationReader reader_B(BTagEntry::OP_MEDIUM,"central");
-    BTagCalibrationReader reader_C(BTagEntry::OP_MEDIUM,"central");
-    BTagCalibrationReader reader_Light(BTagEntry::OP_MEDIUM,"central");
+    BTagCalibrationReader reader_B(BTagEntry::OP_MEDIUM,"central",{"up","down"});
+    BTagCalibrationReader reader_C(BTagEntry::OP_MEDIUM,"central",{"up","down"});
+    BTagCalibrationReader reader_Light(BTagEntry::OP_MEDIUM,"central",{"up","down"});
     reader_B.load(calib,BTagEntry::FLAV_B,"comb");
     reader_C.load(calib,BTagEntry::FLAV_C,"comb");
     reader_Light.load(calib,BTagEntry::FLAV_UDSG,"incl");
@@ -2446,6 +2450,8 @@ int main(int argc, char * argv[]) {
                 vector<unsigned int> jetsDown; jetsDown.clear();
                 vector<unsigned int> jetspt20; jetspt20.clear();
                 vector<unsigned int> bjets; bjets.clear();
+                vector<unsigned int> bjets_Down; bjets_Down.clear();
+                vector<unsigned int> bjets_Up; bjets_Up.clear();
                 vector<unsigned int> bjets_nocleaned; bjets_nocleaned.clear();
                 vector<unsigned int> bjetsRaw; bjetsRaw.clear();
                 
@@ -2495,12 +2501,16 @@ int main(int argc, char * argv[]) {
                     if (absJetEta<bJetEtaCut) { // jet within b-tagging acceptance
                         
                         bool tagged = analysisTree.pfjet_btag[jet][nBTagDiscriminant]>btagCut; // b-jet
+                        bool taggedUp = analysisTree.pfjet_btag[jet][nBTagDiscriminant]>btagCut; // b-jet
+                        bool taggedDown = analysisTree.pfjet_btag[jet][nBTagDiscriminant]>btagCut; // b-jet
                         bool taggedRaw = tagged;
                         
                         if (!isData) {
                             int flavor = abs(analysisTree.pfjet_flavour[jet]);
                             
                             double jet_scalefactor = 1;
+			    double jet_scalefactor_down = 1;
+			    double jet_scalefactor_up = 1;
                             double JetPtForBTag = jetPt;
                             double tageff = 1;
                             
@@ -2508,21 +2518,31 @@ int main(int argc, char * argv[]) {
                                 if (JetPtForBTag>MaxBJetPt) JetPtForBTag = MaxBJetPt - 0.1;
                                 if (JetPtForBTag<MinBJetPt) JetPtForBTag = MinBJetPt + 0.1;
                                 jet_scalefactor = reader_B.eval_auto_bounds("central",BTagEntry::FLAV_B, absJetEta, JetPtForBTag);
+                                jet_scalefactor_down = reader_B.eval_auto_bounds("down",BTagEntry::FLAV_B, absJetEta, JetPtForBTag);
+                                jet_scalefactor_up = reader_B.eval_auto_bounds("up",BTagEntry::FLAV_B, absJetEta, JetPtForBTag);
                                 tageff = tagEff_B->Interpolate(JetPtForBTag,absJetEta);
                             }
                             else if (flavor==4) {
                                 if (JetPtForBTag>MaxBJetPt) JetPtForBTag = MaxBJetPt - 0.1;
                                 if (JetPtForBTag<MinBJetPt) JetPtForBTag = MinBJetPt + 0.1;
                                 jet_scalefactor = reader_C.eval_auto_bounds("central",BTagEntry::FLAV_C, absJetEta, JetPtForBTag);
+                                jet_scalefactor_down = reader_C.eval_auto_bounds("down",BTagEntry::FLAV_C, absJetEta, JetPtForBTag);
+                                jet_scalefactor_up = reader_C.eval_auto_bounds("up",BTagEntry::FLAV_C, absJetEta, JetPtForBTag);
                                 tageff = tagEff_C->Interpolate(JetPtForBTag,absJetEta);
                             }
                             else {
                                 if (JetPtForBTag>MaxLJetPt) JetPtForBTag = MaxLJetPt - 0.1;
                                 if (JetPtForBTag<MinLJetPt) JetPtForBTag = MinLJetPt + 0.1;
                                 jet_scalefactor = reader_Light.eval_auto_bounds("central",BTagEntry::FLAV_UDSG, absJetEta, JetPtForBTag);
+                                jet_scalefactor_down = reader_Light.eval_auto_bounds("down",BTagEntry::FLAV_UDSG, absJetEta, JetPtForBTag);
+                                jet_scalefactor_up = reader_Light.eval_auto_bounds("up",BTagEntry::FLAV_UDSG, absJetEta, JetPtForBTag);
                                 tageff = tagEff_Light->Interpolate(JetPtForBTag,absJetEta);
                             }
                             
+			    //			    std::cout << "SF : central = " << jet_scalefactor
+			    //	      << "   up = " << jet_scalefactor_up
+			    //	      << "   down = " << jet_scalefactor_down << std::endl;
+
                             if (tageff<1e-5)      tageff = 1e-5;
                             if (tageff>0.99999)   tageff = 0.99999;
                             rand.SetSeed((int)((jetEta+5)*100000));
@@ -2542,6 +2562,34 @@ int main(int argc, char * argv[]) {
                                     //		std::cout << "upgrading " << std::endl;
                                 }
                             }
+                            if (jet_scalefactor_up<1 && taggedUp) { // downgrade
+                                double fraction = 1-jet_scalefactor_up;
+                                if (rannum<fraction) {
+                                    taggedUp = false;
+                                    //		std::cout << "downgrading " << std::endl;
+                                }
+                            }
+                            if (jet_scalefactor_up>1 && !taggedUp) { // upgrade
+                                double fraction = (jet_scalefactor_up-1.0)/(1.0/tageff-1.0);
+                                if (rannum<fraction) {
+                                    taggedUp = true;
+                                    //		std::cout << "upgrading " << std::endl;
+                                }
+                            }
+                            if (jet_scalefactor_down<1 && taggedDown) { // downgrade
+                                double fraction = 1-jet_scalefactor_down;
+                                if (rannum<fraction) {
+                                    taggedDown = false;
+                                    //		std::cout << "downgrading " << std::endl;
+                                }
+                            }
+                            if (jet_scalefactor_down>1 && !taggedDown) { // upgrade
+                                double fraction = (jet_scalefactor_down-1.0)/(1.0/tageff-1.0);
+                                if (rannum<fraction) {
+                                    taggedDown = true;
+                                    //		std::cout << "upgrading " << std::endl;
+                                }
+                            }
                         }
                         if (taggedRaw)
                             bjetsRaw.push_back(jet);
@@ -2554,6 +2602,12 @@ int main(int argc, char * argv[]) {
                             }
                         }
                         
+                        if (taggedUp) 
+			  bjets_Up.push_back(jet);
+
+			if (taggedDown)
+			  bjets_Down.push_back(jet);
+
                     }
                     
                     if (jetPtUp>jetPtHighCut)
@@ -2607,6 +2661,8 @@ int main(int argc, char * argv[]) {
 		
                 njetspt20 = jetspt20.size();
                 nbtag = bjets.size();
+		nbtag_Up = bjets_Up.size();
+		nbtag_Down = bjets_Down.size();
                 nbtag_noSF = bjetsRaw.size();
                 
                 if (!isData) {
