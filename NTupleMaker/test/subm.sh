@@ -17,12 +17,28 @@ if [[ $3 == "syst" ]] ; then
 
 #systematics="UnclEnUp UnclEnDown"
 systematics="Nominal JetEnUp JetEnDown UnclEnUp UnclEnDown TauEnUp TauEnDown ElEnUp ElEnDown MuEnUp MuEnDown"
+systematics="JetEnUp JetEnDown UnclEnUp UnclEnDown TauEnUp TauEnDown ElEnUp ElEnDown MuEnUp MuEnDown BTagUp BTagDown"
 fi
 
 if [[ $3 == "list" ]] ; then
 
 #systematics="UnclEnUp UnclEnDown"
-systematics="JetEnUp JetEnDown UnclEnUp UnclEnDown TauEnUp TauEnDown ElEnUp ElEnDown MuEnUp MuEnDown"
+systematics="Nominal JetEnUp JetEnDown UnclEnUp UnclEnDown TauEnUp TauEnDown ElEnUp ElEnDown MuEnUp MuEnDown BTagUp BTagDown"
+#systematics="JetEnUp JetEnDown UnclEnUp UnclEnDown TauEnUp TauEnDown ElEnUp ElEnDown MuEnUp MuEnDown BTagUp BTagDown"
+#systematics="Nominal JetEnUp JetEnDown UnclEnUp UnclEnDown TauEnUp TauEnDown ElEnUp ElEnDown MuEnUp MuEnDown"
+#systematics="TauEnUp TauEnDown ElEnUp ElEnDown MuEnUp MuEnDown BTagUp BTagDown"
+fi
+
+if [[ $3 == "listDY" ]] ; then
+
+#systematics="UnclEnUp UnclEnDown"
+systematics="JetEnUp JetEnDown UnclEnUp UnclEnDown MuEnUp MuEnDown"
+fi
+
+if [[ $3 == "listTT" ]] ; then
+
+#systematics="UnclEnUp UnclEnDown"
+systematics="JetEnUp JetEnDown UnclEnUp UnclEnDown ElEnUp ElEnDown MuEnUp MuEnDown BTagUp BTagDown"
 fi
 
 if [[ $3 == "Jes" ]] ; then
@@ -31,7 +47,7 @@ if [[ $3 == "Jes" ]] ; then
 systematics="JetEnUp JetEnDown"
 fi
 
-if [[ $3 == "En" ]] ; then
+if [[ $3 == "Uncl" ]] ; then
 
 #systematics="UnclEnUp UnclEnDown"
 systematics="UnclEnUp UnclEnDown"
@@ -43,6 +59,10 @@ if [[ $3 == "lept" ]] ; then
 systematics="TauEnUp TauEnDown ElEnUp ElEnDown MuEnUp MuEnDown"
 fi
 
+if [[ $3 == "BTag" ]] ; then
+
+systematics="BTagUp BTagDown"
+fi
 
 cd /nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/New8025/CMSSW_8_0_25/src/DesyTauAnalyses/NTupleMaker/test 
 while read line

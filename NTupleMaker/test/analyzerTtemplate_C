@@ -71,7 +71,7 @@ void analyzer::Loop(){
 
 
 
-	//ChiMass = CHIMASSS;
+	//ChiMass = 0;
 	ChiMass = 0.;
 	//cout<<" THE MASS IS ========================= "<<ChiMass<<endl;
 	 int CutNumb = int(CutList.size());
@@ -151,7 +151,7 @@ void analyzer::Loop(){
 	if (isSignal) cout<<" YOU HAVE FOUND ITTTTTTTTT "<<endl;
 	if (isData) cout<<" YOU HAVE FOUND a DATA "<<endl;
 
-	string channel = "CHANNELHERE";
+	string channel = "muel";
 
 
 	TString inputRootFile2 = "/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/CMSSW_8_0_20/src/DesyTauAnalyses/NTupleMaker/data/sf_mu_medium.root";
@@ -167,9 +167,9 @@ TH2D *histo = (TH2D*) obj;
 
 
 
-	TString fileinName = "/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/New8025/CMSSW_8_0_25/src/DesyTauAnalyses/NTupleMaker/test/CHANNELHERE/FILEIN";
+	TString fileinName = "/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/New8025/CMSSW_8_0_25/src/DesyTauAnalyses/NTupleMaker/test/muel/FILEIN";
 	if (systematic == "JetEnUp" || systematic == "JetEnDown"  || systematic == "UnclEnDown" || systematic == "UnclEnDown" || systematic == "TauEnUp" || systematic == "TauEnDown" || systematic == "ElEnUp" || systematic == "ElEnDown" || systematic == "MuEnUp" || systematic == "MuEnDown" || systematic =="BTagUp" || systematic =="BTagDown") 
-	{fileinName ="/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/New8025/CMSSW_8_0_25/src/DesyTauAnalyses/NTupleMaker/test/CHANNELHERE_"+systematic+"/FILEIN";}
+	{fileinName ="/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/New8025/CMSSW_8_0_25/src/DesyTauAnalyses/NTupleMaker/test/muel_"+systematic+"/FILEIN";}
 
 
 	TFile * filein = new TFile(fileinName,"read");
@@ -188,10 +188,8 @@ TH2D *histo = (TH2D*) obj;
 	histW->SetTitle("histWeightsH");
 
 	TH1D * histTop, *histTopSq ;
-	if (isTT) {
-		histTop = (TH1D*)filein->Get("muel/histTopPt");
-		histTopSq = (TH1D*)filein->Get("muel/histTopPtSq");
-	}
+	if (isTT) histTop = (TH1D*)filein->Get("muel/histTopPt");
+	if (isTT && systematic == "TopPtUp" ) histTopSq = (TH1D*)filein->Get("muel/histTopPtSq");
 
 	TH1D * CutFlow = (TH1D*)filein->Get("muel/CutFlowUnW");
 	TFile * file = new TFile("plots.root","recreate");
@@ -212,6 +210,7 @@ TH2D *histo = (TH2D*) obj;
 		Long64_t ientry = LoadTree(jentry);
 		nb = fChain->GetEntry(jentry);   nbytes += nb;
 		float all_weights = 1.;
+
 		bool isDYTauTau = false;
 		bool isDYll = false;
 
@@ -275,7 +274,6 @@ float met = -1.;
 		}
 
 //JetEnUp JetEnDown UnclEnUp UnclEnDown
-		if (isWJ || isDY || isWNJ || isDYNJ) {
 		
 		METV.SetPx(0.);
 		METV.SetPy(0.);
@@ -324,7 +322,6 @@ float met = -1.;
 		met=sqrt(met_ex_recoil*met_ex_recoil+met_ey_recoil*met_ey_recoil);
 		}
 
-		}
 
 
 if(muon_index>-1)			MuV.SetPtEtaPhiM(mu_pt[muon_index], mu_eta[muon_index], mu_phi[muon_index], muonMass);
@@ -662,7 +659,7 @@ if(electron_index>-1)		ElV.SetPtEtaPhiM(el_pt[electron_index], el_eta[electron_i
 		CutFlowUnW->Write();
 		histW->Write();
 	if (isTT) histTop->Write();
-	if (isTT) histTopSq->Write();
+	if (isTT && systematic == "TopPtUp") histTopSq->Write();
 		file->Write();
 		file->Close();
 		cout<<" Failed events  "<<counter<<endl;

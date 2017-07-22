@@ -138,7 +138,7 @@ void analyzer::Loop(){
 	if (isSignal) cout<<" YOU HAVE FOUND ITTTTTTTTT "<<endl;
 	if (isData) cout<<" YOU HAVE FOUND a DATA "<<endl;
 
-	string channel = "CHANNELHERE";
+	string channel = "muel";
 
 	TString inputRootFile = "/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/CMSSW_8_0_20/src/DesyTauAnalyses/NTupleMaker//data/HIP_mediumID.root";
 	TFile * fileInHIP = new TFile(inputRootFile, "read");
@@ -159,20 +159,20 @@ key = (TKey *) nextkey ();
 TObject *obj = key->ReadObj ();
 TH2D *histo = (TH2D*) obj;
 
-	TString fileinName = "/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/CMSSW_8_0_20/src/DesyTauAnalyses/NTupleMaker/test/CHANNELHERE/FILEIN";
+	TString fileinName = "/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/CMSSW_8_0_20/src/DesyTauAnalyses/NTupleMaker/test/muel/FILEIN";
 	if (systematic == "JetEnUp" || systematic == "JetEnDown" || systematic == "TauEnUp" || systematic == "TauEnDown" || systematic == "ElEnUp" || systematic == "ElEnDown" || systematic == "MuEnUp" || systematic == "MuEnDown") 
-	{fileinName ="/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/CMSSW_8_0_20/src/DesyTauAnalyses/NTupleMaker/test/CHANNELHERE_"+systematic+"/FILEIN";}
+	{fileinName ="/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/CMSSW_8_0_20/src/DesyTauAnalyses/NTupleMaker/test/muel_"+systematic+"/FILEIN";}
 
 
 	TFile * filein = new TFile(fileinName,"read");
 
-	TH1D * histW = (TH1D*)filein->Get("CHANNELHERE/histWeightsH");
+	TH1D * histW = (TH1D*)filein->Get("muel/histWeightsH");
 	TH1D * histTop , *histTopSq;
-	if (isTT) histTop = (TH1D*)filein->Get("CHANNELHERE/histTopPt");
-//	if (isTT) histTopSq = (TH1D*)filein->Get("CHANNELHERE/histTopPtSq");
+	if (isTT) histTop = (TH1D*)filein->Get("muel/histTopPt");
+//	if (isTT) histTopSq = (TH1D*)filein->Get("muel/histTopPtSq");
 	
-//	TH1D * hxsecW = (TH1D*)filein->Get("CHANNELHERE/xsec");
-	TH1D * CutFlow = (TH1D*)filein->Get("CHANNELHERE/CutFlowUnW");
+//	TH1D * hxsecW = (TH1D*)filein->Get("muel/xsec");
+	TH1D * CutFlow = (TH1D*)filein->Get("muel/CutFlowUnW");
 	TFile * file = new TFile("plots.root","recreate");
 
 	//cout<<"  "<<old<<"  "<<datasetName->c_str()<<"  "<<hist_<<"  "<<CutFlow->GetName()<<"  "<<CutFlow->GetBinContent(1)<<endl;

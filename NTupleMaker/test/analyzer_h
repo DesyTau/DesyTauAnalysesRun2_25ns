@@ -53,6 +53,7 @@ class analyzer {
   const double bTagCut  = 0.8000;
 
     double dzeta=-9999;
+    double dzetaR=-9999;
     double pzetavis=-9999;
     double pzetamiss=-9999;
     double Mt2as=-1;
@@ -82,6 +83,7 @@ class analyzer {
    int 	   	   event_run;
    Float_t         genmet_Ex;
    Float_t         genmet_Ey;
+   Float_t         PtSystem;
    Float_t         NuPx;
    Float_t         NuPy;
    Float_t         NuPz;
@@ -304,6 +306,7 @@ class analyzer {
   TBranch        *b_met_ex_recoil;
   TBranch        *b_met_ey_recoil;
   TBranch        *b_genmet;
+  TBranch        *b_PtSystem;
   TBranch        *b_event_lumi;
   TBranch        *b_event_run;
   TBranch        *b_genmet_Ex;
@@ -606,6 +609,8 @@ if (dogenMET) {
       pzetamiss = metx*zetaX + mety*zetaY;
       pzetavis = vectorVisX*zetaX + vectorVisY*zetaY;
       dzeta = pzetamiss - 0.85*pzetavis;
+if (pzetavis !=0) dzetaR = pzetamiss/pzetavis;
+
 
 
 //   int nSRr = GetSRIndex(muV, tauV, JetsV, MetV, Chimass, mIndex, tIndex,CutIndex);
@@ -721,6 +726,9 @@ if (dogenMET) { met = sqrt(genmet_Ex*genmet_Ex + genmet_Ey*genmet_Ey);
 			
     Mt2as = 1.;
     dzeta=-9999;
+    dzetaR=-9999;
+
+   int nSR = GetSRIndex(muV, tauV, JetsV, MetV, Chimass, mIndex, tIndex, CutIndex,dogenMET);
 
     ///////////////////mutau
     ////////////////////
@@ -865,6 +873,7 @@ if (dogenMET) { met = sqrt(genmet_Ex*genmet_Ex + genmet_Ey*genmet_Ey);
       pzetamiss = metx*zetaX + mety*zetaY;
       pzetavis = vectorVisX*zetaX + vectorVisY*zetaY;
       dzeta = pzetamiss - 0.85*pzetavis;
+if (pzetavis !=0) dzetaR = pzetamiss/pzetavis;
 
 			
 if (CutIndex==17 &&  (int)event_lumi==101925 && (int) event_run ==1) 
@@ -872,7 +881,69 @@ if (CutIndex==17 &&  (int)event_lumi==101925 && (int) event_run ==1)
 
       hDZeta[CutIndex]->Fill(dzeta,EvWeight);
       hDZetaFB[CutIndex]->Fill(dzeta,EvWeight);
+      hDZetaR[CutIndex]->Fill(dzetaR,EvWeight);
+      hDZetaRFB[CutIndex]->Fill(dzetaR,EvWeight);
+/*
+	hprofMt2vsMET[CutIndex]->Fill(Mt2as,met,EvWeight);
+	hprofMt2vsDZeta[CutIndex]->Fill(Mt2as,dzeta,EvWeight);
 
+	hprofMETvsMt2[CutIndex]->Fill(met,Mt2as,EvWeight);
+	hprofMETvsDZeta[CutIndex]->Fill(met,dzeta,EvWeight);
+
+	hprofDZetavsMET[CutIndex]->Fill(dzeta,met,EvWeight);
+	hprofDZetavsMt2[CutIndex]->Fill(dzeta,Mt2as,EvWeight);
+*/
+
+//	hMt2_binned[CutIndex][nSR]->Fill(Mt2as,EvWeight);
+//	hMET_binned[CutIndex][nSR]->Fill(met,EvWeight);
+//	hDzeta_binned[CutIndex][nSR]->Fill(dzeta,EvWeight);
+
+if (dzeta < -100) {
+	hMt2LowDzeta[CutIndex]->Fill(Mt2as,EvWeight);
+	hMETLowDzeta[CutIndex]->Fill(met,EvWeight);
+
+
+if (met>120)
+	hMt2LowDzetaHighMET[CutIndex]->Fill(Mt2as,EvWeight);
+if (met<40)
+	hMt2LowDzetaLowMET[CutIndex]->Fill(Mt2as,EvWeight);
+if (met>40 && met<120)
+	hMt2LowDzetaMiddleMET[CutIndex]->Fill(Mt2as,EvWeight);
+
+if (Mt2as>120)
+	hMETLowDzetaHighMt2[CutIndex]->Fill(met,EvWeight);
+if (Mt2as<40)
+	hMETLowDzetaLowMt2[CutIndex]->Fill(met,EvWeight);
+if (Mt2as>40 && Mt2as<120)
+	hMETLowDzetaMiddleMt2[CutIndex]->Fill(met,EvWeight);
+
+
+
+	}
+if (dzeta > -100 && dzeta <50) {
+	hMt2MiddleDzeta[CutIndex]->Fill(Mt2as,EvWeight);
+	hMETMiddleDzeta[CutIndex]->Fill(met,EvWeight);
+	}
+
+if (dzeta > 50) {
+	hMt2HighDzeta[CutIndex]->Fill(Mt2as,EvWeight);
+	hMETHighDzeta[CutIndex]->Fill(met,EvWeight);
+
+if (met>120)
+	hMt2HighDzetaHighMET[CutIndex]->Fill(Mt2as,EvWeight);
+if (met<40)
+	hMt2HighDzetaLowMET[CutIndex]->Fill(Mt2as,EvWeight);
+if (met>40 && met<120)
+	hMt2HighDzetaMiddleMET[CutIndex]->Fill(Mt2as,EvWeight);
+
+if (Mt2as>120)
+	hMETHighDzetaHighMt2[CutIndex]->Fill(met,EvWeight);
+if (Mt2as<40)
+	hMETHighDzetaLowMt2[CutIndex]->Fill(met,EvWeight);
+if (Mt2as>40 && Mt2as<120)
+	hMETHighDzetaMiddleMt2[CutIndex]->Fill(met,EvWeight);
+
+	}
 
 
       /*
@@ -1048,10 +1119,13 @@ if (CutIndex==17 &&  (int)event_lumi==101925 && (int) event_run ==1)
       pzetamiss = metx*zetaX + mety*zetaY;
       pzetavis = vectorVisX*zetaX + vectorVisY*zetaY;
       dzeta = pzetamiss - 0.85*pzetavis;
+if (pzetavis !=0) dzetaR = pzetamiss/pzetavis;
 
 
       hDZeta[CutIndex]->Fill(dzeta,EvWeight);
       hDZetaFB[CutIndex]->Fill(dzeta,EvWeight);
+      hDZetaR[CutIndex]->Fill(dzetaR,EvWeight);
+      hDZetaRFB[CutIndex]->Fill(dzetaR,EvWeight);
       /*
 	hmet_DZeta_MT2lester[CutIndex]->Fill(met,dzeta,Mt2as,EvWeight);
 
@@ -1240,10 +1314,15 @@ if (CutIndex==17 &&  (int)event_lumi==101925 && (int) event_run ==1)
       pzetamiss = metx*zetaX + mety*zetaY;
       pzetavis = vectorVisX*zetaX + vectorVisY*zetaY;
       dzeta = pzetamiss - 0.85*pzetavis;
+if (pzetavis !=0) dzetaR = pzetamiss/pzetavis;
 
 
       hDZeta[CutIndex]->Fill(dzeta,EvWeight);
       hDZetaFB[CutIndex]->Fill(dzeta,EvWeight);
+      hDZetaR[CutIndex]->Fill(dzetaR,EvWeight);
+      hDZetaRFB[CutIndex]->Fill(dzetaR,EvWeight);
+
+
 
 
 
@@ -1758,6 +1837,7 @@ if (histoIndex>0){
     mety = MetV.Py();
     metphi = MetV.Phi();
     dzeta=-9999;
+    dzetaR=-9999;
 
 if (dogenMET) { met = sqrt(genmet_Ex*genmet_Ex + genmet_Ey*genmet_Ey);
 	metx = genmet_Ex;
@@ -2042,6 +2122,7 @@ if (dogenMET) { met = sqrt(genmet_Ex*genmet_Ex + genmet_Ey*genmet_Ey);
       Mt2as = -1.;
       met = MetV.Pt();
       dzeta=-9999;
+      dzetaR=-9999;
 				
 
       double v1[4] = {LeptV1.Px(),LeptV1.Py(),LeptV1.Pz(),muonMass};
@@ -2119,10 +2200,15 @@ if (dogenMET) { met = sqrt(genmet_Ex*genmet_Ex + genmet_Ey*genmet_Ey);
       pzetamiss = metx*zetaX + mety*zetaY;
       pzetavis = vectorVisX*zetaX + vectorVisY*zetaY;
       dzeta = pzetamiss - 0.85*pzetavis;
-			
+if (pzetavis !=0) dzetaR = pzetamiss/pzetavis;
+
 
       hDZeta[CutIndex]->Fill(dzeta,EvWeight);
       hDZetaFB[CutIndex]->Fill(dzeta,EvWeight);
+      hDZetaR[CutIndex]->Fill(dzetaR,EvWeight);
+      hDZetaRFB[CutIndex]->Fill(dzetaR,EvWeight);
+			
+
 
       if (JetsV.size()>0){
 	double dPhiJT=dPhiFrom2P( JetsV.at(0).Px(), JetsV.at(0).Py(), LeptV1.Px(),  LeptV1.Py() );
@@ -2393,6 +2479,7 @@ void analyzer::Init(TTree *tree)
   fChain->SetBranchAddress("met_scaleDown", &met_scaleDown, &b_met_scaleDown);
   fChain->SetBranchAddress("metphi_scaleUp", &metphi_scaleUp, &b_metphi_scaleUp);
   fChain->SetBranchAddress("metphi_scaleDown", &metphi_scaleDown, &b_metphi_scaleDown);
+  fChain->SetBranchAddress("PtSystem", &PtSystem, &b_PtSystem);
 
   fChain->SetBranchAddress("genmet_Ex", &genmet_Ex, &b_genmet_Ex);
   fChain->SetBranchAddress("genmet_Ey", &genmet_Ey, &b_genmet_Ey);

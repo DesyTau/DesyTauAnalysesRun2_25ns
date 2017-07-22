@@ -52,6 +52,12 @@ int el_index=-1;
    Int_t	   njets;
    Int_t	   npv;
    Int_t 	   npu;
+   int 	   	   genTauDecayMode;
+   int 	   	   event_lumi;
+   int 	   	   event_run;
+   int 	   	   genTauDecayMode1;
+   int 	   	   genTauDecayMode2;
+   int 	   	   genTauDecayModeAll;
    Float_t         mu_px[20];   //[mu_count]
    Float_t         mu_py[20];   //[mu_count]
    Float_t         mu_pz[20];   //[mu_count]
@@ -82,6 +88,18 @@ int el_index=-1;
    Float_t     el_absIsoEl[20]; 
    Float_t     el_relIsoEl[20]; 
 
+   Float_t         wScale0;
+   Float_t         wScale1;
+   Float_t         wScale2;
+   Float_t         wScale3;
+   Float_t         wScale4;
+   Float_t         wScale5;
+   Float_t         wScale6;
+   Float_t         wScale7;
+   Float_t         wScale8;
+   Float_t         wPDFUp;
+   Float_t         wPDFDown;
+   Float_t         wPDFdev;
 
 
 
@@ -151,6 +169,8 @@ int el_index=-1;
 
 
    Float_t         genmet;
+   Float_t         genmet_Ex;
+   Float_t         genmet_Ey;
    Float_t         genmetphi;
    Float_t         met_scaleUp;
    Float_t         metphi_scaleUp;
@@ -160,6 +180,12 @@ int el_index=-1;
    Float_t         met_resoDown;
    Float_t         metphi_resoUp;
    Float_t         metphi_resoDown;
+   Float_t         NuPx;
+   Float_t         NuPy;
+   Float_t         NuPz;
+   Float_t         NuPt;
+   Float_t         NuPhi;
+   Float_t         PtSystem;
 
    Float_t         met_ex;
    Float_t         met_ey;
@@ -225,9 +251,22 @@ int el_index=-1;
    Float_t	   matchedTauToElHadronDec;
    Float_t	   matchedTauToMuHadronDec;
    Float_t	   matchedTauToTauHadronDec;
+   Float_t	   matchedTauToGluon;
+   Float_t	   matchedTauToNothing;
+   Float_t	   matchedTauToHFQ;
+   Float_t	   matchedTauToLFQ;
+   Float_t	   matchedTauToUpQ;
+   Float_t	   matchedTauToDownQ;
+   Float_t	   matchedTauToStrangeQ;
+   Float_t	   matchedTauToCharmQ;
+   Float_t	   matchedTauToBottomQ;
+   Float_t	   matchedTauToBottom;
 
-
-
+   Float_t	   isDYTT;
+   Float_t	   isDYLL;
+   Float_t	   isDYEE;
+   Float_t	   isDYMM;
+   Float_t	   isDYNuNu;
 
 
 
@@ -351,7 +390,15 @@ vector<string> CutList;
 
 TH1D * histRuns = new TH1D("histRuns","",6000,24000,30000);
 
+int nBinsPt = 8;
+double binsPt[9] ={0,50,100,150,200,300,400,600,1000};
+TH1D * histPt = new TH1D("histPt","histPt",nBinsPt,binsPt);
+
 TH1D * histWeightsH = new TH1D("histWeightsH","",1,-0.5,0.5);
+TH1D * histWeightsScalesUp = new TH1D("histWeightsScalesUp","",1,-0.5,0.5);
+TH1D * histWeightsScalesDown = new TH1D("histWeightsScalesDown","",1,-0.5,0.5);
+TH1D * histWeightsPDFUp = new TH1D("histWeightsPDFUp","",1,-0.5,0.5);
+TH1D * histWeightsPDFDown = new TH1D("histWeightsPDFDown","",1,-0.5,0.5);
 TH1D * histTopPt = new TH1D("histTopPt","",1,-0.5,0.5);
 TH1D * histTopPtSq = new TH1D("histTopPtSq","",1,-0.5,0.5);
 
@@ -601,7 +648,7 @@ filetree->mkdir(Sel.c_str());
 filetree->cd(Sel.c_str());
 */
 T  = new TTree("T","T");
-
+/*
   T->Branch("genmet", &genmet, "genmet/F");
   T->Branch("genmetphi", &genmetphi, "genmetphi/F");
 
@@ -616,9 +663,30 @@ T  = new TTree("T","T");
    Float_t         met_resoDown;
    Float_t         metphi_resoUp;
    Float_t         metphi_resoDown;
-
+*/
   T->Branch("genmet", &genmet, "genmet/F");
+  T->Branch("genmet_Ex", &genmet_Ex, "genmet_Ex/F");
+  T->Branch("genmet_Ey", &genmet_Ey, "genmet_Ey/F");
   T->Branch("genmetphi", &genmetphi, "genmetphi/F");
+  T->Branch("PtSystem", &PtSystem, "PtSystem/F");
+  
+  T->Branch("wScale0", &wScale0, "wScale0/F");
+  T->Branch("wScale1", &wScale1, "wScale1/F");
+  T->Branch("wScale2", &wScale2, "wScale2/F");
+  T->Branch("wScale3", &wScale3, "wScale3/F");
+  T->Branch("wScale4", &wScale4, "wScale4/F");
+  T->Branch("wScale5", &wScale5, "wScale5/F");
+  T->Branch("wScale6", &wScale6, "wScale6/F");
+  T->Branch("wScale7", &wScale7, "wScale7/F");
+  T->Branch("wScale8", &wScale8, "wScale8/F");
+  T->Branch("wPDFUp", &wPDFUp, "wPDFUp/F");
+  T->Branch("wPDFDown", &wPDFDown, "wPDFDown/F");
+
+  T->Branch("NuPx", &NuPx, "NuPx/F");
+  T->Branch("NuPy", &NuPy, "NuPy/F");
+  T->Branch("NuPz", &NuPz, "NuPz/F");
+  T->Branch("NuPt", &NuPt, "NuPt/F");
+  T->Branch("NuPhi", &NuPhi, "NuPhi/F");
 
   T->Branch("met_scaleUp", &met_scaleUp, "met_scaleUp/F");
   T->Branch("met_scaleDown", &met_scaleDown, "met_scaleDown/F");
@@ -731,6 +799,12 @@ T  = new TTree("T","T");
 
   T->Branch("jet_count", &jet_count, "jet_count/I");
   T->Branch("njets", &njets, "njets/I");
+  T->Branch("genTauDecayMode1", &genTauDecayMode1, "genTauDecayMode1/I");
+  T->Branch("genTauDecayMode2", &genTauDecayMode2, "genTauDecayMode2/I");
+  T->Branch("genTauDecayMode", &genTauDecayMode, "genTauDecayMode/I");
+  T->Branch("genTauDecayModeAll", &genTauDecayModeAll, "genTauDecayModeAll/I");
+  T->Branch("event_run", &event_run, "event_run/I");
+  T->Branch("event_lumi", &event_lumi, "event_lumi/I");
   T->Branch("npv", &npv, "npv/I");
   T->Branch("npu", &npu, "npu/I");
   T->Branch("jets_cleaned", &jets_cleaned, "jets_cleaned[30]/I");
@@ -819,6 +893,9 @@ T  = new TTree("T","T");
   T->Branch("matchedTauToElHadronDec", &matchedTauToElHadronDec);
   T->Branch("matchedTauToMuHadronDec", &matchedTauToMuHadronDec);
   T->Branch("matchedTauToTauHadronDec", &matchedTauToTauHadronDec);
+  T->Branch("matchedTauToGluon", &matchedTauToGluon);
+  T->Branch("matchedTauToHFQ", &matchedTauToHFQ);
+  T->Branch("matchedTauToLFQ", &matchedTauToLFQ);
   T->Branch("genLeptonMatchedPromptEl", &genLeptonMatchedPromptEl);
   T->Branch("genLeptonMatchedPromptMu", &genLeptonMatchedPromptMu);
   T->Branch("genLeptonMatchedPromptTau", &genLeptonMatchedPromptTau);
@@ -828,6 +905,13 @@ T  = new TTree("T","T");
   T->Branch("genLeptonMatchedGluon", &genLeptonMatchedGluon);
   T->Branch("genLeptonMatchedLFQ", &genLeptonMatchedLFQ);
   T->Branch("genLeptonMatchedHFQ", &genLeptonMatchedHFQ);
+  
+  
+  T->Branch("isDYTT", &isDYTT);
+  T->Branch("isDYLL", &isDYLL);
+  T->Branch("isDYEE", &isDYEE);
+  T->Branch("isDYMM", &isDYMM);
+  T->Branch("isDYNuNu", &isDYNuNu);
 
 
 

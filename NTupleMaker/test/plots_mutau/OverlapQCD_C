@@ -36,8 +36,10 @@ using namespace std;
 
 void Impose( TDirectory *ttarget, TList *ssourcelist, string &np_legend , vector<string> titles_ ,vector<float> xsecs);
 void ModifyHist (TH1D* &h, int cl_,float &w, float &lumi, string &title,bool norm=false);
-			
+void CheckHistZero (TH1D* &h1);			
 
+TH1D* WInclw,*W1Jw,*W2Jw,*W3Jw,*W4Jw;
+TH1D* DYInclw,*DY1Jw,*DY2Jw,*DY3Jw,*DY4Jw;
 
 void OverlapQCDSYST()
 {
@@ -96,6 +98,64 @@ void OverlapQCDSYST()
 	Target = TFile::Open (fout.c_str (), "RECREATE");
 
 	string np_title = titles[0];
+
+
+
+				TString WInclname, W1Jname, W2Jname, W3Jname, W4Jname;
+				TString DYInclname, DY1Jname, DY2Jname, DY3Jname, DY4Jname;
+				TString app_ = "";
+				TString s_ = "SYST";
+				if (s_!="Nominal") app_="_"+s_;
+								
+					WInclname = "WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"+app_+"_B.root";
+					W1Jname = "W1JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"+app_+"_B.root";
+					W2Jname = "W2JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"+app_+"_B.root";
+					W3Jname = "W3JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"+app_+"_B.root";
+					W4Jname = "W4JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"+app_+"_B.root";
+
+					DYInclname = "DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"+app_+"_B.root";
+					DY1Jname = "DY1JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"+app_+"_B.root";
+					DY2Jname = "DY2JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"+app_+"_B.root";
+					DY3Jname = "DY3JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"+app_+"_B.root";
+					DY4Jname = "DY4JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"+app_+"_B.root";
+
+				TFile *WIncl = TFile::Open (WInclname, "read");
+				TFile *W1J = TFile::Open (W1Jname, "read");
+				TFile *W2J = TFile::Open (W2Jname, "read");
+				TFile *W3J = TFile::Open (W3Jname, "read");
+				TFile *W4J = TFile::Open (W4Jname, "read");
+
+				TFile *DYIncl = TFile::Open (DYInclname, "read");
+				TFile *DY1J = TFile::Open (DY1Jname, "read");
+				TFile *DY2J = TFile::Open (DY2Jname, "read");
+				TFile *DY3J = TFile::Open (DY3Jname, "read");
+				TFile *DY4J = TFile::Open (DY4Jname, "read");
+
+			TString Channel="CHANNELHERE";
+			DYInclw= (TH1D*)DYIncl->Get(Channel+"/histWeightsH");
+			DY1Jw= (TH1D*)DY1J->Get(Channel+"/histWeightsH");
+			DY2Jw= (TH1D*)DY2J->Get(Channel+"/histWeightsH");
+			DY3Jw= (TH1D*)DY3J->Get(Channel+"/histWeightsH");
+			DY4Jw= (TH1D*)DY4J->Get(Channel+"/histWeightsH");
+
+
+//			cout<<" ==================================== now the weights DY..... "<<DYInclw->GetSumOfWeights()<<"  "<<DY1Jw->GetSumOfWeights()<<"   "<<DY2Jw->GetSumOfWeights()<<"  "<<DY3Jw->GetSumOfWeights()<<"  "<<DY4Jw->GetSumOfWeights()<<endl;
+
+
+			WInclw= (TH1D*)WIncl->Get(Channel+"/histWeightsH");
+			W1Jw= (TH1D*)W1J->Get(Channel+"/histWeightsH");
+			W2Jw= (TH1D*)W2J->Get(Channel+"/histWeightsH");
+			W3Jw= (TH1D*)W3J->Get(Channel+"/histWeightsH");
+			W4Jw= (TH1D*)W4J->Get(Channel+"/histWeightsH");
+
+
+
+
+
+
+
+
+
 	Impose (Target, FileList, np_title,titles,xsecs_);
 
 	delete FileList;
@@ -251,6 +311,45 @@ Impose (TDirectory * target, TList * sourcelist, string & np_title_, vector<stri
 				normm = float(xsecc*Lumi) / float(nGenn);
 
 				if (flagg) { xsecc=1;normm =1.;}
+
+
+				  
+					if (std::string::npos != fname.find("WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_1Parton") || std::string::npos != fname.find("W1JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"))
+						normm = Lumi/ ( WInclw->GetSumOfWeights()/float(61526.7*0.8853) + W1Jw->GetSumOfWeights()/float(1.221*9644.5*0.8853));
+
+
+					if (std::string::npos != fname.find("WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_2Parton") || std::string::npos != fname.find("W2JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"))
+						normm = Lumi/ ( WInclw->GetSumOfWeights()/float(61526.7*0.8853) + W2Jw->GetSumOfWeights()/float(1.221*3144.5*0.8853));
+				
+					if (std::string::npos != fname.find("WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_3Parton") || std::string::npos != fname.find("W3JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"))
+						normm = Lumi/ ( WInclw->GetSumOfWeights()/float(61526.7*0.8853) + W3Jw->GetSumOfWeights()/float(1.221*954.8*0.8853));
+
+					if (std::string::npos != fname.find("WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_4Parton") || std::string::npos != fname.find("W4JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"))
+						normm = Lumi/ ( WInclw->GetSumOfWeights()/float(61526.7*0.8853) + W4Jw->GetSumOfWeights()/float(1.221*485.6*0.8853));
+
+
+
+					if (std::string::npos != fname.find("DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_1Parton") || std::string::npos != fname.find("DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_isZTT_1Parton") || std::string::npos != fname.find("DY1JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"))
+						normm = Lumi/ ( float(DYInclw->GetSumOfWeights())/float(5765.4*0.9611) + float(DY1Jw->GetSumOfWeights())/float(1.1637*1012.5*0.9611));
+
+
+					if (std::string::npos != fname.find("DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_2Parton") || std::string::npos != fname.find("DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_isZTT_2Parton") || std::string::npos != fname.find("DY2JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"))
+						normm = Lumi/ ( DYInclw->GetSumOfWeights()/float(5765.4*0.9611) + float(DY2Jw->GetSumOfWeights())/float(1.1637*332.8*0.9611));
+
+					if (std::string::npos != fname.find("DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_3Parton") || std::string::npos != fname.find("DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_isZTT_3Parton") || std::string::npos != fname.find("DY3JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"))
+						normm = Lumi/ ( DYInclw->GetSumOfWeights()/float(5765.4*0.9611) + float(DY3Jw->GetSumOfWeights())/float(1.1637*101.8*0.9611));
+
+					if (std::string::npos != fname.find("DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_4Parton") || std::string::npos != fname.find("DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_isZTT_4Parton") || std::string::npos != fname.find("DY4JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"))
+						normm = Lumi/ ( DYInclw->GetSumOfWeights()/float(5765.4*0.9611) + float(DY4Jw->GetSumOfWeights())/float(1.1637*54.8*0.9611));
+
+
+
+
+
+
+
+
+
 				lumiweights.push_back(normm);
 
 				TKey *key2 = (TKey *) gDirectory->GetListOfKeys ()->FindObject (h1->GetName ());
@@ -390,7 +489,9 @@ Impose (TDirectory * target, TList * sourcelist, string & np_title_, vector<stri
 				char namee[100];
 
 				sprintf(namee,"%s",key->GetName ());
-
+			//	CheckHistZero(allRegA);
+			//	CheckHistZero(allRegC);
+			//	CheckHistZero(allRegD);
 
 			    if ( string::npos != nn.find("CutFlow")  ) {			
 				allRegA->Sumw2();
@@ -400,8 +501,12 @@ Impose (TDirectory * target, TList * sourcelist, string & np_title_, vector<stri
 
 				double nd = allRegD->GetSumOfWeights();
 				double nc = allRegC->GetSumOfWeights();
+			if (string::npos != nn.find("METLowDzeta_17")) 
+				cout<<"allRegA  "<<allRegA->GetSumOfWeights()<<" ratio is nd "<<nd<<" nc "<<nc<<" nc/nd "<<double(nc/nd)<<endl;
 
-				allRegA->Scale(double(nc/nd));
+		if (nc>0 && nd >0 && allRegA->GetSumOfWeights()>0)	allRegA->Scale(double(nc/nd));
+		if (nc<0 || nd<0 || allRegA->GetSumOfWeights()<0) allRegA->Scale(0.);
+
 				//if (nd>0) cout<<"allRegA  "<<allRegA->GetSumOfWeights()<<" ratio is nd "<<nd<<" nc "<<nc<<" nc/nd "<<double(nc/nd)<<endl;//"  and different approach  "<<hregA->GetSumOfWeights()<<"  "<<double(Anc/And)<<endl;
 				//hh[1]->SetMinimum(1);
 				allRegA->SetMinimum(1);
@@ -603,6 +708,23 @@ Impose (TDirectory * target, TList * sourcelist, string & np_title_, vector<stri
 
 }
 
+void
+CheckHistZero (TH1D* &h)
+{
+
+
+                        for (int nb=0;nb<=h->GetNbinsX();++nb)
+                        {
+                                float bc_ = h->GetBinContent(nb);
+
+                        if (bc_ <=0.) h->SetBinContent(nb,0.0001);
+                        float SoW = h->GetSumOfWeights();
+                        int En = h->GetEntries();
+                        if (bc_ <=0.) h->SetBinError(nb,float(SoW/En));
+                        }
+
+
+}
 
 
 

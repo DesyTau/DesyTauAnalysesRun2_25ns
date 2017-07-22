@@ -434,12 +434,51 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
     std::cout << "      number of entries in Tree      = " << numberOfEntries << std::endl;
     AC1B analysisTree(_tree);
 
+      TLorentzVector BlobA; BlobA.SetXYZT(0,0,0,0);
+      TLorentzVector BlobB; BlobB.SetXYZT(0,0,0,0);
+      TLorentzVector PairLV; PairLV.SetXYZT(0,0,0,0);
+
 	if (!isData && !WithInit)
 		{    
 		for (Long64_t iEntry=0; iEntry<numberOfEntries; ++iEntry) 
 			{
 			analysisTree.GetEntry(iEntry);
 			histWeightsH->Fill(0.,analysisTree.genweight);
+	if (SUSY){
+		BlobA.SetXYZT(0,0,0,0);
+		BlobB.SetXYZT(0,0,0,0);
+		PairLV.SetXYZT(0,0,0,0);
+	for (unsigned int igen=0; igen < analysisTree.genparticles_count; ++igen) {
+
+	  TLorentzVector genLV; genLV.SetXYZT(analysisTree.genparticles_px[igen],
+					      analysisTree.genparticles_py[igen],
+					      analysisTree.genparticles_pz[igen],
+					      analysisTree.genparticles_e[igen]);
+
+	  if (string::npos != datasetName.find("C1N2")) {
+			  if (abs(analysisTree.genparticles_pdgid[igen])==1000024 && abs(analysisTree.genparticles_status[igen])==62) BlobA = genLV;
+	  		  if (analysisTree.genparticles_pdgid[igen]==1000023 && abs(analysisTree.genparticles_status[igen])==62) BlobB = genLV;
+			  }
+
+	  if (string::npos != datasetName.find("C1C1") || string::npos != datasetName.find("Chi")) {
+			  if (analysisTree.genparticles_pdgid[igen]==1000024 && abs(analysisTree.genparticles_status[igen])==62) BlobA = genLV;
+	  		  if (analysisTree.genparticles_pdgid[igen]==-1000024 && abs(analysisTree.genparticles_status[igen])==62) BlobB = genLV;
+			  }
+
+	  if (string::npos != datasetName.find("stau")) {
+			  if (analysisTree.genparticles_pdgid[igen]==1000015 && abs(analysisTree.genparticles_status[igen])==62) BlobA = genLV;
+	  		  if (analysisTree.genparticles_pdgid[igen]==-1000015 && abs(analysisTree.genparticles_status[igen])==62) BlobB = genLV;
+			  }
+
+	}
+		
+	if (BlobA.M()>0 && BlobB.M()>0) PairLV = BlobA+BlobB;
+	
+
+	if (PairLV.Pt()>0) histPt->Fill(PairLV.Pt());
+	
+
+				}
 			}
 		}
   	float genweights=1.;
@@ -656,6 +695,9 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	  }
 	  
 	}
+		BlobA.SetXYZT(0,0,0,0);
+		BlobB.SetXYZT(0,0,0,0);
+		PairLV.SetXYZT(0,0,0,0);
 
 	for (unsigned int igen=0; igen < analysisTree.genparticles_count; ++igen) {
 
@@ -663,6 +705,29 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 					      analysisTree.genparticles_py[igen],
 					      analysisTree.genparticles_pz[igen],
 					      analysisTree.genparticles_e[igen]);
+	if (SUSY){
+
+	  if (string::npos != datasetName.find("C1N2")) {
+			  if (abs(analysisTree.genparticles_pdgid[igen])==1000024 && abs(analysisTree.genparticles_status[igen])==62) BlobA = genLV;
+	  		  if (analysisTree.genparticles_pdgid[igen]==1000023 && abs(analysisTree.genparticles_status[igen])==62) BlobB = genLV;
+			  }
+
+	  if (string::npos != datasetName.find("C1C1") || string::npos != datasetName.find("Chi")) {
+			  if (analysisTree.genparticles_pdgid[igen]==1000024 && abs(analysisTree.genparticles_status[igen])==62) BlobA = genLV;
+	  		  if (analysisTree.genparticles_pdgid[igen]==-1000024 && abs(analysisTree.genparticles_status[igen])==62) BlobB = genLV;
+			  }
+
+	  if (string::npos != datasetName.find("stau")) {
+			  if (analysisTree.genparticles_pdgid[igen]==1000015 && abs(analysisTree.genparticles_status[igen])==62) BlobA = genLV;
+	  		  if (analysisTree.genparticles_pdgid[igen]==-1000015 && abs(analysisTree.genparticles_status[igen])==62) BlobB = genLV;
+			  }
+
+		
+	if (BlobA.M()>0 && BlobB.M()>0) PairLV = BlobA+BlobB;
+	
+
+	PtSystem = PairLV.Pt();
+	}
 
 
 	  if (analysisTree.genparticles_pdgid[igen]==22 && analysisTree.genparticles_status[igen]==44)
@@ -1879,6 +1944,7 @@ cout<<""<<endl;
   histTopPt->Write();
   histTopPtSq->Write();
   histRuns->Write();
+  histPt->Write();
   CutFlowUnW->Write();
   CutFlow->Write();
   file->Write();

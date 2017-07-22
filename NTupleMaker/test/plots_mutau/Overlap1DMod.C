@@ -82,6 +82,10 @@ int mycolordyj=TColor::GetColor("#ffcc66");
 int col = -1;
 
 
+TH1D* WInclw,*W1Jw,*W2Jw,*W3Jw,*W4Jw;
+TH1D* DYInclw,*DY1Jw,*DY2Jw,*DY3Jw,*DY4Jw;
+
+
 void Overlap1DMod(string syst="Nominal", string reg="SR")
 {
 
@@ -100,7 +104,7 @@ void Overlap1DMod(string syst="Nominal", string reg="SR")
 	Float_t value=0;
 	vector<float> xsecs_;
 	signal_names.clear();
-	ifstream ifs("datasets2D_C1N2_"+reg);
+	ifstream ifs("datasets2D_ChiWH_"+reg);
 	string channel="mutau";
 	string dirr="/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/CMSSW_8_0_20/src/DesyTauAnalyses/NTupleMaker/test/plots_"+channel+"/";
 	dirr="";
@@ -114,16 +118,18 @@ void Overlap1DMod(string syst="Nominal", string reg="SR")
 		xs=0;fact=1;fact2=1;fact3=1;
 		iss >> dataname >> xs >> fact >> fact2 >> fact3;
 
-		if (syst=="PDFUp" && ( (std::string::npos == dataname.find("Single") && std::string::npos == dataname.find("MuonEG")))) fact3 *=1.1;
-		if (syst=="PDFDown" && ( (std::string::npos == dataname.find("Single") && std::string::npos == dataname.find("MuonEG")))) fact3 *=0.9;
+		//if (syst=="PDFUp" && ( (std::string::npos == dataname.find("Single") && std::string::npos == dataname.find("MuonEG")))) fact3 *=1.1;
+		//if (syst=="PDFDown" && ( (std::string::npos == dataname.find("Single") && std::string::npos == dataname.find("MuonEG")))) fact3 *=0.9;
 
-		if (std::string::npos != dataname.find("Single") || std::string::npos != dataname.find("MuonEG") || syst=="Nominal" ) {
+		if ((std::string::npos != dataname.find("Single") || std::string::npos != dataname.find("MuonEG")) || syst=="Nominal" ) {
 			
 		//	cout<<" Data filename and syst Nominal "<<endl;
 			titles.push_back(dataname+"_B.root");
 			}
-		
-		else if (std::string::npos == dataname.find("C1") && std::string::npos == dataname.find("Chi") && (syst=="METUp" || syst=="METDown" ) ) {
+/*		else if (std::string::npos != dataname.find("C1")  && syst=="Nominal" )
+		{titles.push_back(dataname+"_EWKDown_B.root");}
+*/		
+		else if (std::string::npos == dataname.find("C1") && std::string::npos == dataname.find("Chi") && (syst=="METUp" || syst=="METDown"  || syst=="EWKUp" || syst=="EWKDown") ) {
 			
 		//	cout<<" Non signal filename and syst METUp or METDown "<<endl;
 			
@@ -191,11 +197,7 @@ void Overlap1DMod(string syst="Nominal", string reg="SR")
 
 	string np_title = titles[0];
 	vector <string>  variables;
-	//variables.push_back("met_MT2lester_DZeta0J1D_17");
-	//variables.push_back("met_MT2lester_DZeta1J1D_17");
 	variables.push_back("met_MT2lester_DZeta01J1D_17");
-	//variables.push_back("MET_17");
-	//variables.push_back("MET_17");
 
 	syst_= syst.c_str();
 
@@ -204,6 +206,56 @@ void Overlap1DMod(string syst="Nominal", string reg="SR")
 	variable=variables[vr].c_str();
 
 	cout<< " the variable name  "<<variable<<" syst "<<syst<<endl;
+
+				TString WInclname, W1Jname, W2Jname, W3Jname, W4Jname;
+				TString DYInclname, DY1Jname, DY2Jname, DY3Jname, DY4Jname;
+				TString app_;
+				if (syst != "Nominal") app_="";
+				else app_="_"+syst;;
+								
+					WInclname = "WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"+app_+"_B.root";
+					W1Jname = "W1JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"+app_+"_B.root";
+					W2Jname = "W2JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"+app_+"_B.root";
+					W3Jname = "W3JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"+app_+"_B.root";
+					W4Jname = "W4JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"+app_+"_B.root";
+
+					DYInclname = "DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"+app_+"_B.root";
+					DY1Jname = "DY1JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"+app_+"_B.root";
+					DY2Jname = "DY2JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"+app_+"_B.root";
+					DY3Jname = "DY3JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"+app_+"_B.root";
+					DY4Jname = "DY4JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"+app_+"_B.root";
+
+				TFile *WIncl = TFile::Open (WInclname, "read");
+				TFile *W1J = TFile::Open (W1Jname, "read");
+				TFile *W2J = TFile::Open (W2Jname, "read");
+				TFile *W3J = TFile::Open (W3Jname, "read");
+				TFile *W4J = TFile::Open (W4Jname, "read");
+
+				TFile *DYIncl = TFile::Open (DYInclname, "read");
+				TFile *DY1J = TFile::Open (DY1Jname, "read");
+				TFile *DY2J = TFile::Open (DY2Jname, "read");
+				TFile *DY3J = TFile::Open (DY3Jname, "read");
+				TFile *DY4J = TFile::Open (DY4Jname, "read");
+
+
+			DYInclw= (TH1D*)DYIncl->Get(Channel+"/histWeightsH");
+			DY1Jw= (TH1D*)DY1J->Get(Channel+"/histWeightsH");
+			DY2Jw= (TH1D*)DY2J->Get(Channel+"/histWeightsH");
+			DY3Jw= (TH1D*)DY3J->Get(Channel+"/histWeightsH");
+			DY4Jw= (TH1D*)DY4J->Get(Channel+"/histWeightsH");
+
+
+//			cout<<" ==================================== now the weights DY..... "<<DYInclw->GetSumOfWeights()<<"  "<<DY1Jw->GetSumOfWeights()<<"   "<<DY2Jw->GetSumOfWeights()<<"  "<<DY3Jw->GetSumOfWeights()<<"  "<<DY4Jw->GetSumOfWeights()<<endl;
+
+
+			WInclw= (TH1D*)WIncl->Get(Channel+"/histWeightsH");
+			W1Jw= (TH1D*)W1J->Get(Channel+"/histWeightsH");
+			W2Jw= (TH1D*)W2J->Get(Channel+"/histWeightsH");
+			W3Jw= (TH1D*)W3J->Get(Channel+"/histWeightsH");
+			W4Jw= (TH1D*)W4J->Get(Channel+"/histWeightsH");
+
+
+
 	Impose (FileList, np_title,titles,xsecs_, variable,syst,reg);
 	}
 //	delete FileList;
@@ -239,7 +291,6 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 	float nGen = eventCount->GetSumOfWeights();
 	float xsec = 1;//hxsec->GetMean();
 	float norm = xsec*Lumi/nGen;
-
 	norm =1;
 	lumiweights.push_back(float(norm));
 
@@ -255,7 +306,7 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 	TIter nextkey (current_sourcedir->GetListOfKeys ());
 	//TIter nextkey (((TDirectory *) current_sourcedir->Get ("ana"))->GetListOfKeys ());
 	TKey *key, *oldkey = 0;
-			TH1D* hh[1500];
+			TH1D* hh[2500];
 	while ((key = (TKey *) nextkey ())) {
 
 	int count=0;
@@ -316,7 +367,7 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 			string cc1="C1";
 
 
-
+			cout<<" ==================================== now the weights..... "<<WInclw->GetSumOfWeights()<<"  "<<W1Jw->GetSumOfWeights()<<"   "<<W2Jw->GetSumOfWeights()<<"  "<<W3Jw->GetSumOfWeights()<<"  "<<W4Jw->GetSumOfWeights()<<endl;
 			while (nextsource) {
 
 			string fname= nextsource->GetName();
@@ -336,10 +387,55 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
                                   if (std::string::npos != fname.find("TT_TuneCUETP8M2T4_13TeV-powheg-pythia8") &&  syst == "TopPtUp") eventCountt = (TH1D*)nextsource->Get(Channel+"/histTopPtSq");
 				
 				float xsecc = xsecs[cl];
+				
+
+				
+
+
 
 				float nGenn = eventCountt->GetSumOfWeights();
 				float normm = float(xsecc*Lumi) / float(nGenn)  ;
 				if (std::string::npos != fname.find("DataDriven")) normm=1.;
+
+					
+				  
+					if (std::string::npos != fname.find("WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_1Parton") || std::string::npos != fname.find("W1JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"))
+						normm = Lumi/ ( WInclw->GetSumOfWeights()/float(61526.7*0.8853) + W1Jw->GetSumOfWeights()/float(1.221*9644.5*0.8853));
+
+
+					if (std::string::npos != fname.find("WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_2Parton") || std::string::npos != fname.find("W2JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"))
+						normm = Lumi/ ( WInclw->GetSumOfWeights()/float(61526.7*0.8853) + W2Jw->GetSumOfWeights()/float(1.221*3144.5*0.8853));
+				
+					if (std::string::npos != fname.find("WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_3Parton") || std::string::npos != fname.find("W3JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"))
+						normm = Lumi/ ( WInclw->GetSumOfWeights()/float(61526.7*0.8853) + W3Jw->GetSumOfWeights()/float(1.221*954.8*0.8853));
+
+					if (std::string::npos != fname.find("WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_4Parton") || std::string::npos != fname.find("W4JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"))
+						normm = Lumi/ ( WInclw->GetSumOfWeights()/float(61526.7*0.8853) + W4Jw->GetSumOfWeights()/float(1.221*485.6*0.8853));
+
+
+					if (std::string::npos != fname.find("DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_1Parton") || std::string::npos != fname.find("DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_isZTT_1Parton") || std::string::npos != fname.find("DY1JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"))
+						normm = Lumi/ ( float(DYInclw->GetSumOfWeights())/float(5765.4*0.9611) + float(DY1Jw->GetSumOfWeights())/float(1.1637*1012.5*0.9611));
+
+
+					if (std::string::npos != fname.find("DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_2Parton") || std::string::npos != fname.find("DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_isZTT_2Parton") || std::string::npos != fname.find("DY2JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"))
+						normm = Lumi/ ( DYInclw->GetSumOfWeights()/float(5765.4*0.9611) + float(DY2Jw->GetSumOfWeights())/float(1.1637*332.8*0.9611));
+
+					if (std::string::npos != fname.find("DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_3Parton") || std::string::npos != fname.find("DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_isZTT_3Parton") || std::string::npos != fname.find("DY3JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"))
+						normm = Lumi/ ( DYInclw->GetSumOfWeights()/float(5765.4*0.9611) + float(DY3Jw->GetSumOfWeights())/float(1.1637*101.8*0.9611));
+
+					if (std::string::npos != fname.find("DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_4Parton") || std::string::npos != fname.find("DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_isZTT_4Parton") || std::string::npos != fname.find("DY4JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"))
+						normm = Lumi/ ( DYInclw->GetSumOfWeights()/float(5765.4*0.9611) + float(DY4Jw->GetSumOfWeights())/float(1.1637*54.8*0.9611));
+
+			//	if ( std::string::npos != fname.find("JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"))
+			//		cout<<" norm "<<normm<<" norm for w+w1 "<< Lumi/ ( float(WInclw->GetSumOfWeights())/float(61526.7*0.8853) + float(W1Jw->GetSumOfWeights())/float(1.221*9644.5*0.8853))<<" oln normm "<< Lumi/ ( float(WInclw->GetSumOfWeights())/float(61526.7*0.8853))<<"  xsec  "<<xsecc<<endl;
+
+			//cout<<" ==================================== now the weights DY..... "<<DYInclw->GetSumOfWeights()<<"  "<<DY1Jw->GetSumOfWeights()<<"   "<<DY2Jw->GetSumOfWeights()<<"  "<<DY3Jw->GetSumOfWeights()<<"  "<<DY4Jw->GetSumOfWeights()<<" fname  "<<fname<<"  "<<normm<<"  "<<xsecc<<endl;
+				//	if ( std::string::npos != fname.find("WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8") && std::string::npos == fname.find("Parton")) normmm = Lumi/ ( WInclw->GetSumOfWeights()/61526.7*0.8853);
+	
+
+				//			if (std::string::npos != fname.find("WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"))
+				//			cout<<" npartons "<<fname<<"  "<<normm<<"  "<<normmm<<"  "<<float (Lumi/ ( WInclw->GetSumOfWeights()/61526.7*0.8853))<<endl;
+
 
 				lumiweights.push_back(normm);
 
@@ -462,8 +558,8 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 				string str = ssB.str();
 				
 				//if (MaxEventsBin<10000) lumistring = lumistring+"_"+str+"MaxEvntsBin_";
-				if (syst!="Nominal") smFilename =  region+"/Templ_"+variable+"_"+lumistring+"_mt_C1N2_"+region+"_"+syst+".root";
-					else smFilename =  region+"/Templ_"+variable+"_"+lumistring+"_mt_C1N2_"+region+".root";
+				if (syst!="Nominal") smFilename =  region+"/Templ_"+variable+"_"+lumistring+"_mt_ChiWH_"+region+"_"+syst+".root";
+					else smFilename =  region+"/Templ_"+variable+"_"+lumistring+"_mt_ChiWH_"+region+".root";
 
 				if (syst!="Nominal") 
 					variable=variable+"_"+syst;
@@ -546,8 +642,8 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 					stringstream ss;
 					ss << bin_;
 					string str = ss.str();
-					label_bin.push_back(str);
-					cout<<" Read in for systematic "<<syst<<" nbin "<<bin_<<"  from  "<<textfilenameIn<<endl;
+					label_bin.push_back(bl_);
+					cout<<" Read in for systematic "<<syst<<" nbin "<<bin_<<"  from  "<<textfilenameIn<<"  "<<bl_<<endl;
         				}
 
 
@@ -590,7 +686,9 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 				htest_data->SetBinContent(nbb+1,hh[1]->GetBinContent(keep_bin[nbb]));
 			
 				TString lab_ = label_bin[nbb].c_str();
+				if (syst =="Nominal"){
 				cout<<" will set the label  "<<lab_<<endl;
+				/*
 				htest_tt->GetXaxis()->SetBinLabel(nbb+1,lab_);
 				htest_wj->GetXaxis()->SetBinLabel(nbb+1,lab_);
 				htest_dyj->GetXaxis()->SetBinLabel(nbb+1,lab_);
@@ -600,7 +698,10 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 				htest_ww->GetXaxis()->SetBinLabel(nbb+1,lab_);
 				htest_qcd->GetXaxis()->SetBinLabel(nbb+1,lab_);
 				htest_ttx->GetXaxis()->SetBinLabel(nbb+1,lab_);
+				*/
 				htest_data->GetXaxis()->SetBinLabel(nbb+1,lab_);
+
+				}
 
 				}
 
@@ -934,10 +1035,12 @@ CheckHistZero (TH1D* &h)
 			for (int nb=0;nb<=h->GetNbinsX();++nb)
 			{
 				float bc_ = h->GetBinContent(nb);
-			if (bc_ <=0.) h->SetBinContent(nb,0.001);
+		//	if (bc_ <=0.) cout<<" ======================================== NB with small entries  "<<h->GetBinError(nb)<<"  "<<h->GetBinContent(nb)<<"  "<<h->GetName()<<endl;
 			float SoW = h->GetSumOfWeights();
 			int En = h->GetEntries();
-			if (bc_ <=0.) h->SetBinError(nb,float(SoW/En));
+			if (bc_ <=0.) { h->SetBinContent(nb,0.001);h->SetBinError(nb,float(SoW/En));}
+			//if (bc_ <=0.) { h->SetBinContent(nb,0.01);h->SetBinError(nb,0.01);}
+			//if (bc_ <=0.) h->SetBinError(nb,0.001);
 			}
 
 
@@ -954,7 +1057,6 @@ TH1D* Unroll(TH2D *& hist2D,char *&histName, float & norm){
 	//hist = (TH1D*)unrolled(hist2D,histName);
 
 	//hist2D->Scale(norm);
-//		cout<<" "<<endl;
 	TH1D* hist1D = new TH1D(histName,hist2D->GetTitle(),nBins,double(0.),double(nBins));
 	for (int ix=0; ix<nBinsX; ++ix) {
 		for (int iy=0; iy<nBinsY; ++iy) {

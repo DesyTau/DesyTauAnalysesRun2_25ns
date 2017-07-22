@@ -138,6 +138,21 @@ void analyzer::Loop(){
 	string ttw = "TTWJetsToLNu";
 	string signal = "stau";
 	string signalC1 = "C1";
+	string N0part = "0Parton";
+	string N1part = "1Parton";
+	string N2part = "2Parton";
+	string N3part = "3Parton";
+	string N4part = "4Parton";
+	bool isW0Part = false;
+	bool isW1Part = false;
+	bool isW2Part = false;
+	bool isW3Part = false;
+	bool isW4Part = false;
+	bool isDY0Part = false;
+	bool isDY1Part = false;
+	bool isDY2Part = false;
+	bool isDY3Part = false;
+	bool isDY4Part = false;
 	if (string::npos != old.find(data)) isData= true;
 	if (string::npos != old.find(signal) && systematic =="genMET") isSignal= true;
 	if (string::npos != old.find(signalC1) && systematic =="genMET") isSignal= true;
@@ -191,6 +206,16 @@ TH2D *histo = (TH2D*) obj;
 
 cout<<" Name =============================== "<<histW->GetName()<<"  "<<histW->GetTitle()<<endl;
 
+	if (string::npos != fln.find(N0part) && isWJ) isW0Part= true;
+	if (string::npos != fln.find(N1part) && isWJ) isW1Part= true;
+	if (string::npos != fln.find(N2part) && isWJ) isW2Part= true;
+	if (string::npos != fln.find(N3part) && isWJ) isW3Part= true;
+	if (string::npos != fln.find(N4part) && isWJ) isW4Part= true;
+	if (string::npos != fln.find(N0part) && isDYhigh) isDY0Part= true;
+	if (string::npos != fln.find(N1part) && isDYhigh) isDY1Part= true;
+	if (string::npos != fln.find(N2part) && isDYhigh) isDY2Part= true;
+	if (string::npos != fln.find(N3part) && isDYhigh) isDY3Part= true;
+	if (string::npos != fln.find(N4part) && isDYhigh) isDY4Part= true;
 
 	histW->SetName("histWeightsH");
 	histW->SetTitle("histWeightsH");
@@ -241,9 +266,16 @@ cout<<" Name =============================== "<<histW->GetName()<<"  "<<histW->G
 
 		if ( jentry%100000 ==0 ) cout<<" working for you...processed " <<jentry<<" events from "<<nentries<<" dataset "<<datasetName->c_str()<<" weight "<<all_weights<< endl;
 
-		if (isWJ && (npartons>0 && npartons<5)) continue;
+		/*if (isWJ && (npartons>0 && npartons<5)) continue;
 
 		if ( isDYhigh  && (npartons>0 && npartons<5)) continue;
+		*/
+
+		if (npartons!=0 && (isW0Part || isDY0Part)) continue;
+		if (npartons!=1 && (isW1Part || isDY1Part)) continue;
+		if (npartons!=2 && (isW2Part || isDY2Part)) continue;
+		if (npartons!=3 && (isW3Part || isDY3Part)) continue;
+		if (npartons!=4 && (isW4Part || isDY4Part)) continue;
 
 		if (isData && met_flag<0.5) continue;	
 

@@ -1,57 +1,93 @@
 SingleMuon_RunBCDEFGH_35invfb_A 1.
 SingleMuon_RunBCDEFGH_35invfb_C 1.
 SingleMuon_RunBCDEFGH_35invfb_D 1.
-DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_A 5765.4 0.9611 
-DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_C 5765.4 0.9611  
-DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_D 5765.4 0.9611  
+W1JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_A 1.221 9644.5 0.8853
+W2JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_A 1.221 3144.5 0.8853
+W3JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_A 1.221 954.8 0.8853
+W4JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_A 1.221 485.6 0.8853
+WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_0Parton_A 61526.7  0.8853
+WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_1Parton_A 61526.7  0.8853
+WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_2Parton_A 61526.7  0.8853
+WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_3Parton_A 61526.7  0.8853
+WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_4Parton_A 61526.7  0.8853
+DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_isZTT_0Parton_A 5765.4 0.9611
+DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_isZTT_1Parton_A 5765.4 0.9611
+DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_isZTT_2Parton_A 5765.4 0.9611
+DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_isZTT_3Parton_A 5765.4 0.9611
+DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_isZTT_4Parton_A 5765.4 0.9611
+DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_0Parton_A 5765.4 0.9611
+DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_1Parton_A 5765.4 0.9611
+DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_2Parton_A 5765.4 0.9611
+DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_3Parton_A 5765.4 0.9611
+DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_4Parton_A 5765.4 0.9611
 DY1JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_A 1.1637 1012.5 0.9611
-DY1JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_C 1.1637 1012.5 0.9611
-DY1JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_D 1.1637 1012.5 0.9611
 DY2JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_A 1.1637 332.8 0.9611
-DY2JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_C 1.1637 332.8 0.9611
-DY2JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_D 1.1637 332.8 0.9611
 DY3JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_A 1.1637 101.8 0.9611
-DY3JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_C 1.1637 101.8 0.9611
-DY3JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_D 1.1637 101.8 0.9611
 DY4JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_A 1.1637 54.8 0.9611
-DY4JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_C 1.1637 54.8 0.9611
-DY4JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_D 1.1637 54.8 0.9611
-DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_A 18610 0.9611  
-DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_C 18610 0.9611
-DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_D 18610 0.9611 
-DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_isZTT_A 5765.4 0.9611 
-DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_isZTT_C 5765.4 0.9611  
-DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_isZTT_D 5765.4 0.9611  
 DY1JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_isZTT_A 1.1637 1012.5 0.9611
-DY1JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_isZTT_C 1.1637 1012.5 0.9611
-DY1JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_isZTT_D 1.1637 1012.5 0.9611
 DY2JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_isZTT_A 1.1637 332.8 0.9611
-DY2JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_isZTT_C 1.1637 332.8 0.9611
-DY2JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_isZTT_D 1.1637 332.8 0.9611
 DY3JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_isZTT_A 1.1637 101.8 0.9611
-DY3JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_isZTT_C 1.1637 101.8 0.9611
-DY3JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_isZTT_D 1.1637 101.8 0.9611
 DY4JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_isZTT_A 1.1637 54.8 0.9611
+DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_isZTT_A 18610. 0.9611
+DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_A 18610. 0.9611
+W1JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_C 1.221 9644.5 0.8853
+W2JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_C 1.221 3144.5 0.8853
+W3JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_C 1.221 954.8 0.8853
+W4JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_C 1.221 485.6 0.8853
+WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_0Parton_C 61526.7  0.8853
+WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_1Parton_C 61526.7  0.8853
+WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_2Parton_C 61526.7  0.8853
+WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_3Parton_C 61526.7  0.8853
+WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_4Parton_C 61526.7  0.8853
+DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_isZTT_0Parton_C 5765.4 0.9611
+DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_isZTT_1Parton_C 5765.4 0.9611
+DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_isZTT_2Parton_C 5765.4 0.9611
+DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_isZTT_3Parton_C 5765.4 0.9611
+DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_isZTT_4Parton_C 5765.4 0.9611
+DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_0Parton_C 5765.4 0.9611
+DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_1Parton_C 5765.4 0.9611
+DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_2Parton_C 5765.4 0.9611
+DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_3Parton_C 5765.4 0.9611
+DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_4Parton_C 5765.4 0.9611
+DY1JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_C 1.1637 1012.5 0.9611
+DY2JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_C 1.1637 332.8 0.9611
+DY3JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_C 1.1637 101.8 0.9611
+DY4JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_C 1.1637 54.8 0.9611
+DY1JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_isZTT_C 1.1637 1012.5 0.9611
+DY2JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_isZTT_C 1.1637 332.8 0.9611
+DY3JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_isZTT_C 1.1637 101.8 0.9611
 DY4JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_isZTT_C 1.1637 54.8 0.9611
+DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_isZTT_C 18610. 0.9611
+DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_C 18610. 0.9611
+W1JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_D 1.221 9644.5 0.8853
+W2JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_D 1.221 3144.5 0.8853
+W3JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_D 1.221 954.8 0.8853
+W4JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_D 1.221 485.6 0.8853
+WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_0Parton_D 61526.7  0.8853
+WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_1Parton_D 61526.7  0.8853
+WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_2Parton_D 61526.7  0.8853
+WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_3Parton_D 61526.7  0.8853
+WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_4Parton_D 61526.7  0.8853
+DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_isZTT_0Parton_D 5765.4 0.9611
+DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_isZTT_1Parton_D 5765.4 0.9611
+DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_isZTT_2Parton_D 5765.4 0.9611
+DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_isZTT_3Parton_D 5765.4 0.9611
+DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_isZTT_4Parton_D 5765.4 0.9611
+DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_0Parton_D 5765.4 0.9611
+DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_1Parton_D 5765.4 0.9611
+DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_2Parton_D 5765.4 0.9611
+DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_3Parton_D 5765.4 0.9611
+DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_4Parton_D 5765.4 0.9611
+DY1JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_D 1.1637 1012.5 0.9611
+DY2JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_D 1.1637 332.8 0.9611
+DY3JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_D 1.1637 101.8 0.9611
+DY4JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_D 1.1637 54.8 0.9611
+DY1JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_isZTT_D 1.1637 1012.5 0.9611
+DY2JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_isZTT_D 1.1637 332.8 0.9611
+DY3JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_isZTT_D 1.1637 101.8 0.9611
 DY4JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_isZTT_D 1.1637 54.8 0.9611
-DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_isZTT_A 18610 0.9611  
-DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_isZTT_C 18610 0.9611
-DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_isZTT_D 18610 0.9611 
-W1JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_A 1.221  9644.5 0.8853
-W1JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_C 1.221  9644.5 0.8853
-W1JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_D 1.221  9644.5 0.8853
-W2JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_A 1.221  3144.5 0.8853
-W2JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_C 1.221  3144.5 0.8853
-W2JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_D 1.221  3144.5 0.8853
-W3JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_A 1.221  954.8 0.8853
-W3JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_C 1.221  954.8 0.8853
-W3JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_D 1.221  954.8 0.8853
-W4JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_A 1.221  485.6 0.8853
-W4JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_C 1.221  485.6 0.8853
-W4JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_D 1.221  485.6 0.8853
-WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_A 61526.7  0.8853
-WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_C 61526.7  0.8853
-WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_D 61526.7  0.8853
+DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_isZTT_D 18610. 0.9611
+DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_D 18610. 0.9611
 ST_t-channel_antitop_4f_inclusiveDecays_13TeV-powhegV2-madspin-pythia8_A 80.95   
 ST_t-channel_antitop_4f_inclusiveDecays_13TeV-powhegV2-madspin-pythia8_C 80.95  
 ST_t-channel_antitop_4f_inclusiveDecays_13TeV-powhegV2-madspin-pythia8_D 80.95  

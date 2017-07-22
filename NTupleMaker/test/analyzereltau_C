@@ -103,6 +103,7 @@ void analyzer::Loop(){
 	bool isWNJ = false;
 	bool isNJ = false;
 	bool isSignal = false;
+	bool isSUSY = false;
 	bool cut_btag = true;
 	
 	bool t = true;
@@ -138,10 +139,30 @@ void analyzer::Loop(){
 	string signal = "stau";
 	string signalC1 = "C1";
 	string signalChi = "Chi";
+	string N0part = "0Parton";
+	string N1part = "1Parton";
+	string N2part = "2Parton";
+	string N3part = "3Parton";
+	string N4part = "4Parton";
+	bool isW0Part = false;
+	bool isW1Part = false;
+	bool isW2Part = false;
+	bool isW3Part = false;
+	bool isW4Part = false;
+	bool isDY0Part = false;
+	bool isDY1Part = false;
+	bool isDY2Part = false;
+	bool isDY3Part = false;
+	bool isDY4Part = false;
 	if (string::npos != old.find(data)) isData= true;
 	if (string::npos != old.find(signal) && systematic =="genMET") isSignal= true;
 	if (string::npos != old.find(signalC1) && systematic =="genMET") isSignal= true;
 	if (string::npos != old.find(signalChi) && systematic =="genMET") isSignal= true;
+
+	if (string::npos != old.find(signal)) isSUSY = true;
+	if (string::npos != old.find(signalC1)) isSUSY = true;
+	if (string::npos != old.find(signalChi)) isSUSY = true;
+
 	if (string::npos != old.find(tt)) isTT= true;
 	if (string::npos != old.find(wj)) isWJ= true;
 	if (string::npos != old.find(ttw)) isWJ= false;
@@ -170,15 +191,31 @@ void analyzer::Loop(){
 	if (string::npos != fln.find(ztt)) isZTT= true;
 	if (string::npos == fln.find(ztt)) isZTT= false;
 
-	TH1D * histW   ;
+	TH1D * histW   , *histPt;
 	if (systematic == "ScalesUp" ) histW = (TH1D*)filein->Get("eltau/histWeightsScalesUp");
 	else if (systematic == "ScalesDown" ) histW = (TH1D*)filein->Get("eltau/histWeightsScalesDown");
 	else if (systematic == "PDFUp" ) histW = (TH1D*)filein->Get("eltau/histWeightsPDFUp");
 	else if (systematic == "PDFDown" ) histW = (TH1D*)filein->Get("eltau/histWeightsPDFDown");
 	else  {histW = (TH1D*)filein->Get("eltau/histWeightsH");}
 
+	if (string::npos != fln.find(N0part) && isWJ) isW0Part= true;
+	if (string::npos != fln.find(N1part) && isWJ) isW1Part= true;
+	if (string::npos != fln.find(N2part) && isWJ) isW2Part= true;
+	if (string::npos != fln.find(N3part) && isWJ) isW3Part= true;
+	if (string::npos != fln.find(N4part) && isWJ) isW4Part= true;
+	if (string::npos != fln.find(N0part) && isDYhigh) isDY0Part= true;
+	if (string::npos != fln.find(N1part) && isDYhigh) isDY1Part= true;
+	if (string::npos != fln.find(N2part) && isDYhigh) isDY2Part= true;
+	if (string::npos != fln.find(N3part) && isDYhigh) isDY3Part= true;
+	if (string::npos != fln.find(N4part) && isDYhigh) isDY4Part= true;
+
+
 	histW->SetName("histWeightsH");
 	histW->SetTitle("histWeightsH");
+
+	if (isSUSY) histPt = (TH1D*)filein->Get("eltau/histPt");
+	float Nw = 1;
+	if (isSUSY) { Nw = 1/histPt->GetSumOfWeights(); Nw *=histW->GetSumOfWeights();}
 
  	TH1D * histTop , *histTopSq;
 	if (isTT) histTop = (TH1D*)filein->Get("eltau/histTopPt");
@@ -222,9 +259,18 @@ void analyzer::Loop(){
 
 		if ( jentry%100000 ==0 ) cout<<" working for you...processed " <<jentry<<" events from "<<nentries<<" dataset "<<datasetName->c_str()<<" weight "<<all_weights<< endl;
 
-		if (isWJ && (npartons>0 && npartons<5)) continue;
+		/*if (isWJ && (npartons>0 && npartons<5)) continue;
 
 		if ( isDYhigh && npartons>0 && npartons<5) continue;
+
+		*/
+
+		if (npartons!=0 && (isW0Part || isDY0Part)) continue;
+		if (npartons!=1 && (isW1Part || isDY1Part)) continue;
+		if (npartons!=2 && (isW2Part || isDY2Part)) continue;
+		if (npartons!=3 && (isW3Part || isDY3Part)) continue;
+		if (npartons!=4 && (isW4Part || isDY4Part)) continue;
+
 
 		if (isData && met_flag<0.5) continue;	
 
@@ -310,6 +356,15 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
 	if (systematic =="PDFDown") all_weights *=wPDFDown;
 
 //cout<<" lets see the facts  "<<gen_weight<<"  "<<wScale0<<"  "<<wScale1<<"  "<<wScale2<<"  "<<wScale3<<"  "<<wScale4<<"  "<<wScale5<<"  "<<wScale6<<"  "<<wScale7<<"  "<<wScale8<<" min "<<cLower<<" max  "<<cUpper<<" pdfUp "<<wPDFUp<<" pdfDown "<<wPDFDown<<endl;
+
+		double EWK  = 1.;
+		if (isSUSY) { 
+			EWK = EWKWeight(PtSystem);
+
+	if (systematic =="Nominal") all_weights *= EWK * Nw;
+	if (systematic =="EWKUp") all_weights *=EWK *EWK *Nw;
+
+		}
 
 		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index,isSignal);
 		CFCounter[iCut]+= all_weights;

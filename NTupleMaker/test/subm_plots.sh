@@ -23,8 +23,8 @@
 #
 
 systematics="Nominal JetEnUp JetEnDown TauEnUp TauEnDown ElEnUp ElEnDown MuEnUp MuEnDown UnclEnUp UnclEnDown"
-systematics="Nominal JetEnUp JetEnDown TauEnUp TauEnDown ElEnUp ElEnDown MuEnUp MuEnDown UnclEnUp UnclEnDown TopPtUp TopPtDown ZPtUp ZPtDown BTagUp BTagDown"
-systematics="Nominal JetEnUp JetEnDown TopPtUp TopPtDown ZPtUp ZPtDown TauEnUp TauEnDown ElEnUp ElEnDown MuEnUp MuEnDown UnclEnUp UnclEnDown genMET ScalesDown ScalesUp PDFUp PDFDown BTagUp BTagDown METRecoilUp METRecoilDown"
+systematics="Nominal JetEnUp JetEnDown TopPtUp TopPtDown ZPtUp ZPtDown TauEnUp TauEnDown ElEnUp ElEnDown MuEnUp MuEnDown UnclEnUp UnclEnDown genMET ScalesDown ScalesUp PDFUp PDFDown BTagUp BTagDown METRecoilUp METRecoilDown TFRJetEnUp TFRJetEnDown TFRMuEnUp TFRMuEnDown TFRTauEnUp TFRTauEnDown"
+
 #systematics="JetEnUp JetEnDown UnclEnUp UnclEnDown ZPtUp ZPtDown"
 
 cd /nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/New8025/CMSSW_8_0_25/src/DesyTauAnalyses/NTupleMaker/test;eval `scramv1 runtime -sh` ;
@@ -48,16 +48,26 @@ if [[  $3 == "list" ]] ;then
 systematics="list"
 fi
 
+if [[  $3 == "listSignal" ]] ;then
+systematics="listSignal"
+fi
+
+if [[  $3 == "listmuel" ]] ;then
+systematics="listmuel"
+fi
+
+if [[  $3 == "listTFR" ]] ;then
+systematics="TFRJetEnUp TFRJetEnDown TFRMuEnUp TFRMuEnDown TFRTauEnUp TFRTauEnDown"
+fi
+
+
+
 if [[  $3 == "listTT" ]] ;then
-#systematics="Nominal JetEnUp JetEnDown TopPtUp TopPtDown ZPtUp ZPtDown ElEnUp ElEnDown MuEnUp MuEnDown UnclEnUp UnclEnDown ScalesDown ScalesUp PDFUp PDFDown BTagUp BTagDown METRecoilUp METRecoilDown"
-systematics="TopPtUp TopPtDown ZPtUp ZPtDown ScalesDown ScalesUp PDFUp PDFDown  METRecoilUp METRecoilDown"
-#systematics="JetEnUp JetEnDown ElEnUp ElEnDown MuEnUp MuEnDown UnclEnUp UnclEnDown BTagUp BTagDown"
+systematics="Nominal JetEnUp JetEnDown TopPtUp TopPtDown ZPtUp ZPtDown ElEnUp ElEnDown MuEnUp MuEnDown UnclEnUp UnclEnDown ScalesDown ScalesUp PDFUp PDFDown BTagUp BTagDown METRecoilUp METRecoilDown BTagUp BTagDown"
 fi
 
 if [[  $3 == "listDY" ]] ;then
 systematics="Nominal JetEnUp JetEnDown ZPtUp ZPtDown MuEnUp MuEnDown UnclEnUp UnclEnDown ScalesDown ScalesUp PDFUp PDFDown METRecoilUp METRecoilDown"
-#systematics="ZPtUp ZPtDown MuEnUp MuEnDown UnclEnUp UnclEnDown ScalesDown ScalesUp PDFUp PDFDown METRecoilUp METRecoilDown"
-systematics="ZPtUp ZPtDown MuEnUp MuEnDown UnclEnUp UnclEnDown JetEnUp JetEnDown ElEnUp ElEnDown"
 fi
 
 
@@ -66,7 +76,7 @@ if [[  $3 == "listWJ" ]] ;then
 systematics="Nominal JetEnUp JetEnDown MuEnUp MuEnDown UnclEnUp UnclEnDown ScalesDown ScalesUp PDFUp PDFDown METRecoilUp METRecoilDown BTagUp BTagDown ZPtUp ZPtDown TopPtUp TopPtDown"
 #systematics="TopPtUp TopPtDown ZPtUp ZPtDown"
 #systematics="JetEnUp JetEnDown MuEnUp MuEnDown UnclEnUp UnclEnDown BTagUp BTagDown"
-systematics="BTagDown BTagUp"
+#systematics="BTagDown BTagUp"
 fi
 
 if [[  $3 == "top" ]] ;then
@@ -76,8 +86,18 @@ fi
 if [[  $3 == "Tau" ]] ;then
 systematics="TauEnUp TauEnDown"
 fi
+if [[  $3 == "Scales" ]] ;then
+systematics="ScalesUp ScalesDown"
+fi
+if [[  $3 == "PDF" ]] ;then
+systematics="PDFUp PDFDown"
+fi
 if [[  $3 == "El" ]] ;then
 systematics="ElEnUp ElEnDown"
+systematics="ElEnUp"
+fi
+if [[  $3 == "Mu" ]] ;then
+systematics="MuEnUp MuEnDown"
 fi
 
 if [[  $3 == "Jet" ]] ;then
@@ -86,7 +106,6 @@ fi
 
 if [[  $3 == "new" ]] ;then
 systematics="PDFUp PDFDown ScalesUp ScalesDown BTagUp BTagDown"
-systematics="PDFUp PDFDown ScalesUp ScalesDown"
 systematics="PDFUp PDFDown ScalesUp ScalesDown"
 fi
 

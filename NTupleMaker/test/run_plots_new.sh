@@ -46,8 +46,19 @@ systematics="$3"
 
 if [[  $3 == "list" ||  $3 == "all" ]];then
 systematics="Nominal TopPtUp TopPtDown ZPtUp ZPtDown JetEnUp JetEnDown TauEnUp TauEnDown ElEnUp ElEnDown MuEnUp MuEnDown UnclEnUp UnclEnDown genMET ScalesDown ScalesUp PDFUp PDFDown BTagUp BTagDown METRecoilUp METRecoilDown"
+systematics="Nominal JetEnUp JetEnDown TopPtUp TopPtDown ZPtUp ZPtDown TauEnUp TauEnDown ElEnUp ElEnDown MuEnUp MuEnDown UnclEnUp UnclEnDown ScalesDown ScalesUp PDFUp PDFDown BTagUp BTagDown METRecoilUp METRecoilDown TFRJetEnUp TFRJetEnDown TFRMuEnUp TFRMuEnDown TFRTauEnUp TFRTauEnDown"
 #systematics="Nominal JetEnUp JetEnDown TopPtUp TopPtDown ZPtUp ZPtDown TauEnUp TauEnDown ElEnUp ElEnDown MuEnUp MuEnDown UnclEnUp UnclEnDown genMET ScalesDown ScalesUp PDFUp PDFDown"
 #systematics="JetEnUp JetEnDown UnclEnUp UnclEnDown"
+fi
+
+if [[  $3 == "listme" ]];then
+systematics="Nominal JetEnUp JetEnDown TopPtUp TopPtDown ZPtUp ZPtDown ElEnUp ElEnDown MuEnUp MuEnDown UnclEnUp UnclEnDown ScalesDown ScalesUp PDFUp PDFDown BTagUp BTagDown METRecoilUp METRecoilDown"
+fi
+
+if [[  $3 == "listSignal" ]];then
+systematics="Nominal JetEnUp JetEnDown TauEnUp TauEnDown ElEnUp ElEnDown MuEnUp MuEnDown UnclEnUp UnclEnDown genMET ScalesDown ScalesUp PDFUp PDFDown BTagUp BTagDown EWKUp EWKDown"
+#systematics="ScalesDown ScalesUp PDFUp PDFDown"
+#systematics="Nominal ScalesUp ScalesDown genMET"
 fi
 
 if [[  $3 == "New" ]];then
@@ -83,7 +94,7 @@ then
 	channel2="muel"
 fi
 
-if [[ $2 == "Wtemplate"   ||   $2 == "fakesmu"  || $2 == "Wtemplate2" ]]
+if [[ $2 == "Wtemplate"   ||   $2 == "fakesmu"  || $2 == "Wtemplate2" || $2 == "mutauInvertedTauIso" ]]
 then
 	channel2="mutau"
 fi
@@ -127,11 +138,11 @@ fi
 if  [[ $syst == "genMET" ]]; then
 
 #if [[ $file == *"stau"* || $file == *"Chi"* || $file == *"C1"* ]] ; then
-if [[  $file == *"Chi"*  ]] ; then
+#if [[  $file == *"Chi"*  ]] ; then
 
 isDataSyst=0
 	echo we will run genMET syst only for signal ....$file , isData $isDataSyst
-fi
+#fi
 
 fi
 
@@ -146,7 +157,7 @@ fi
 
 if [[ $isDataSyst == 0 ]] ; then
 
-if [[ $line == *"stau"* || $line == *"C1"* || $file == *"Chi"* ]] ; then
+if [[ $line == *"stau"* || $line == *"C1"* || $line == *"Chi"* ]] ; then
 lsp=`echo $line | awk -F "_LSP" '{print $2}' | cut -d '_' -f1`
 else
 lsp=0
