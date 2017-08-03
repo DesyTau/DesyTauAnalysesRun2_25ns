@@ -44,9 +44,11 @@ int el_index=-1;
    Int_t	   muon_index;
    Int_t	   muon_index_1;
    Int_t	   muon_index_2;
+   Int_t	   muon_index_3;
    Int_t	   electron_index;
    Int_t	   taus_index;
-   Int_t	   taus_index2;
+   Int_t	   taus_index_1;
+   Int_t	   taus_index_2;
    Int_t           mu_count;
    Int_t	   nbtag;
    Int_t	   njets;
@@ -162,6 +164,9 @@ int el_index=-1;
    Float_t 	   ta_IsoFlagVTight[30];
    Float_t 	   ta_IsoFlagLoose[30];
    Float_t 	   ta_IsoFlagMedium[30];
+   Float_t 	   isElTau;
+   Float_t 	   isMuTau;
+   Float_t 	   isTauTau;
 
    Float_t 	   ta_isLoose;
    Float_t 	   ta_isTight;
@@ -757,9 +762,11 @@ T  = new TTree("T","T");
   T->Branch("muon_index", &muon_index, "muon_index/I");
   T->Branch("muon_index_1", &muon_index_1, "muon_index_1/I");
   T->Branch("muon_index_2", &muon_index_2, "muon_index_2/I");
+  T->Branch("muon_index_3", &muon_index_3, "muon_index_3/I");
   T->Branch("electron_index", &electron_index, "electron_index/I");
   T->Branch("taus_index", &taus_index, "taus_index/I");
-  T->Branch("taus_index2", &taus_index2, "taus_index2/I");
+  T->Branch("taus_index_1", &taus_index_1, "taus_index_1/I");
+  T->Branch("taus_index_2", &taus_index_2, "taus_index_2/I");
 
   T->Branch("primvert_count", &primvert_count, "primvert_count/I");
   T->Branch("primvert_x", &primvert_x, "primvert_x/F");
@@ -843,6 +850,9 @@ T  = new TTree("T","T");
   T->Branch("el_istrig_MVA80", el_istrig_MVA80, "el_istrig_MVA80[20]/F");
   T->Branch("el_istrig_MVA90", el_istrig_MVA90, "el_istrig_MVA90[20]/F");
 
+  T->Branch("isMuTau", &isMuTau, "isMuTau/F");
+  T->Branch("isElTau", &isElTau, "isElTau/F");
+  T->Branch("isTauTau", &isTauTau, "isTauTau/F");
 
   T->Branch("ta_count", &ta_count, "ta_count/I");
   T->Branch("ta_px", ta_px, "ta_px[20]/F");

@@ -211,12 +211,19 @@ public :
    Bool_t          electron_cutId_loose_Spring15[50];   //[electron_count]
    Bool_t          electron_cutId_medium_Spring15[50];   //[electron_count]
    Bool_t          electron_cutId_tight_Spring15[50];   //[electron_count]
+   Bool_t          electron_cutId_veto_Summer16[50];   //[electron_count]
+   Bool_t          electron_cutId_loose_Summer16[50];   //[electron_count]
+   Bool_t          electron_cutId_medium_Summer16[50];   //[electron_count]
+   Bool_t          electron_cutId_tight_Summer16[50];   //[electron_count]
    Float_t         electron_mva_value_Spring16_v1[50];   //[electron_count]
    Int_t           electron_mva_category_Spring16_v1[50];   //[electron_count]
    Float_t         electron_mva_wp90_general_Spring16_v1[50];   //[electron_count]
    Float_t         electron_mva_wp80_general_Spring16_v1[50];   //[electron_count]
    Bool_t          electron_pass_conversion[50];   //[electron_count]
    Int_t           electron_genmatch[50];   //[electron_count]
+   Float_t         electron_detaInSeed[50];   //[electron_count]
+   Float_t         electron_he[50];   //[electron_count]
+   Float_t         electron_eaIsolation[50];   //[electron_count]
    UInt_t          tau_count;
    Float_t         tau_e[50];   //[tau_count]
    Float_t         tau_px[50];   //[tau_count]
@@ -363,6 +370,18 @@ public :
    Int_t           numpileupinteractions;
    Int_t           numpileupinteractionsplus;
    Float_t         numtruepileupinteractions;
+   Float_t         weightScale0;
+   Float_t         weightScale1;
+   Float_t         weightScale2;
+   Float_t         weightScale3;
+   Float_t         weightScale4;
+   Float_t         weightScale5;
+   Float_t         weightScale6;
+   Float_t         weightScale7;
+   Float_t         weightScale8;
+   Float_t         weightPDFup;
+   Float_t         weightPDFdown;
+
    UInt_t          gentau_count;
    Float_t         gentau_e[50];   //[gentau_count]
    Float_t         gentau_px[50];   //[gentau_count]
@@ -621,6 +640,29 @@ public :
    Float_t         tau_photonPtSumOutsideSignalConed[50];
    Float_t         tau_puCorrPtSum[50];   //[tau_count]
 
+   UInt_t track_count;
+  int track_ID[1000];
+  Float_t track_px[1000];
+  Float_t track_py[1000];
+  Float_t track_pz[1000];
+  Float_t track_pt[1000];
+  Float_t track_eta[1000];
+  Float_t track_phi[1000];
+  Float_t track_charge[1000];
+  Float_t track_mass[1000];
+  Float_t track_dxy[1000];
+  Float_t track_dxyerr[1000];
+  Float_t track_dz[1000];
+  Float_t track_dzerr[1000];
+
+
+
+
+
+
+
+
+
    // List of branches
    TBranch        *b_errors;   //!
    TBranch        *b_event_nr;   //!
@@ -808,12 +850,19 @@ public :
    TBranch        *b_electron_cutId_loose_Spring15;   //!
    TBranch        *b_electron_cutId_medium_Spring15;   //!
    TBranch        *b_electron_cutId_tight_Spring15;   //!
+   TBranch        *b_electron_cutId_veto_Summer16;   //!
+   TBranch        *b_electron_cutId_loose_Summer16;   //!
+   TBranch        *b_electron_cutId_medium_Summer16;   //!
+   TBranch        *b_electron_cutId_tight_Summer16;   //!
    TBranch        *b_electron_mva_value_Spring16_v1;   //!
    TBranch        *b_electron_mva_category_Spring16_v1;   //!
    TBranch        *b_electron_mva_wp90_general_Spring16_v1;   //!
    TBranch        *b_electron_mva_wp80_general_Spring16_v1;   //!
    TBranch        *b_electron_pass_conversion;   //!
    TBranch        *b_electron_genmatch;   //!
+   TBranch        *b_electron_detaInSeed;   //!
+   TBranch        *b_electron_he;   //!
+   TBranch        *b_electron_eaIsolation;   //!
    TBranch        *b_tau_count;   //!
    TBranch        *b_tau_e;   //!
    TBranch        *b_tau_px;   //!
@@ -955,6 +1004,20 @@ public :
    TBranch        *b_genid2;   //!
    TBranch        *b_genx2;   //!
    TBranch        *b_genScale;   //!
+   TBranch        *b_weightScale0;
+   TBranch        *b_weightScale1;
+   TBranch        *b_weightScale2;
+   TBranch        *b_weightScale3;
+   TBranch        *b_weightScale4;
+   TBranch        *b_weightScale5;
+   TBranch        *b_weightScale6;
+   TBranch        *b_weightScale7;
+   TBranch        *b_weightScale8;
+   TBranch        *b_weightScale9;
+
+   TBranch        *b_weightPDFup;
+   TBranch        *b_weightPDFdown;
+
    TBranch        *b_numpileupinteractionsminus;   //!
    TBranch        *b_numpileupinteractions;   //!
    TBranch        *b_numpileupinteractionsplus;   //!
@@ -1492,6 +1555,12 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("electron_charge", electron_charge, &b_electron_charge);
    fChain->SetBranchAddress("electron_superclusterindex", electron_superclusterindex, &b_electron_superclusterindex);
    fChain->SetBranchAddress("electron_info", electron_info, &b_electron_info);
+   fChain->SetBranchAddress("electron_chargeinfo", electron_chargeinfo, &b_electron_chargeinfo);
+   fChain->SetBranchAddress("electron_fbrems", electron_fbrems, &b_electron_fbrems);
+   fChain->SetBranchAddress("electron_numbrems", electron_numbrems, &b_electron_numbrems);
+   fChain->SetBranchAddress("electron_charge", electron_charge, &b_electron_charge);
+   fChain->SetBranchAddress("electron_superclusterindex", electron_superclusterindex, &b_electron_superclusterindex);
+   fChain->SetBranchAddress("electron_info", electron_info, &b_electron_info);
    fChain->SetBranchAddress("electron_mva_id_nontrigPhys14", electron_mva_id_nontrigPhys14, &b_electron_mva_id_nontrigPhys14);
    fChain->SetBranchAddress("electron_mva_value_nontrig_Spring15_v1", electron_mva_value_nontrig_Spring15_v1, &b_electron_mva_value_nontrig_Spring15_v1);
    fChain->SetBranchAddress("electron_mva_value_trig_Spring15_v1", electron_mva_value_trig_Spring15_v1, &b_electron_mva_value_trig_Spring15_v1);
@@ -1505,12 +1574,19 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("electron_cutId_loose_Spring15", electron_cutId_loose_Spring15, &b_electron_cutId_loose_Spring15);
    fChain->SetBranchAddress("electron_cutId_medium_Spring15", electron_cutId_medium_Spring15, &b_electron_cutId_medium_Spring15);
    fChain->SetBranchAddress("electron_cutId_tight_Spring15", electron_cutId_tight_Spring15, &b_electron_cutId_tight_Spring15);
+   fChain->SetBranchAddress("electron_cutId_veto_Summer16", electron_cutId_veto_Summer16, &b_electron_cutId_veto_Summer16);
+   fChain->SetBranchAddress("electron_cutId_loose_Summer16", electron_cutId_loose_Summer16, &b_electron_cutId_loose_Summer16);
+   fChain->SetBranchAddress("electron_cutId_medium_Summer16", electron_cutId_medium_Summer16, &b_electron_cutId_medium_Summer16);
+   fChain->SetBranchAddress("electron_cutId_tight_Summer16", electron_cutId_tight_Summer16, &b_electron_cutId_tight_Summer16);
    fChain->SetBranchAddress("electron_mva_value_Spring16_v1", electron_mva_value_Spring16_v1, &b_electron_mva_value_Spring16_v1);
    fChain->SetBranchAddress("electron_mva_category_Spring16_v1", electron_mva_category_Spring16_v1, &b_electron_mva_category_Spring16_v1);
    fChain->SetBranchAddress("electron_mva_wp90_general_Spring16_v1", electron_mva_wp90_general_Spring16_v1, &b_electron_mva_wp90_general_Spring16_v1);
    fChain->SetBranchAddress("electron_mva_wp80_general_Spring16_v1", electron_mva_wp80_general_Spring16_v1, &b_electron_mva_wp80_general_Spring16_v1);
    fChain->SetBranchAddress("electron_pass_conversion", electron_pass_conversion, &b_electron_pass_conversion);
    fChain->SetBranchAddress("electron_genmatch", electron_genmatch, &b_electron_genmatch);
+   fChain->SetBranchAddress("electron_detaInSeed", electron_detaInSeed, &b_electron_detaInSeed);
+   fChain->SetBranchAddress("electron_he", electron_he, &b_electron_he);
+   fChain->SetBranchAddress("electron_eaIsolation", electron_eaIsolation, &b_electron_eaIsolation);
    fChain->SetBranchAddress("tau_count", &tau_count, &b_tau_count);
    fChain->SetBranchAddress("tau_e", tau_e, &b_tau_e);
    fChain->SetBranchAddress("tau_px", tau_px, &b_tau_px);
@@ -1652,6 +1728,21 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("genid2", &genid2, &b_genid2);
    fChain->SetBranchAddress("genx2", &genx2, &b_genx2);
    fChain->SetBranchAddress("genScale", &genScale, &b_genScale);
+
+
+   fChain->SetBranchAddress("weightScale0", &weightScale0, &b_weightScale0);
+   fChain->SetBranchAddress("weightScale1", &weightScale1, &b_weightScale1);
+   fChain->SetBranchAddress("weightScale2", &weightScale2, &b_weightScale2);
+   fChain->SetBranchAddress("weightScale3", &weightScale3, &b_weightScale3);
+   fChain->SetBranchAddress("weightScale4", &weightScale4, &b_weightScale4);
+   fChain->SetBranchAddress("weightScale5", &weightScale5, &b_weightScale5);
+   fChain->SetBranchAddress("weightScale6", &weightScale6, &b_weightScale6);
+   fChain->SetBranchAddress("weightScale7", &weightScale7, &b_weightScale7);
+   fChain->SetBranchAddress("weightScale8", &weightScale8, &b_weightScale8);
+
+   fChain->SetBranchAddress("weightPDFup", &weightPDFup, &b_weightPDFup);
+   fChain->SetBranchAddress("weightPDFdown", &weightPDFdown, &b_weightPDFdown);
+
    fChain->SetBranchAddress("numpileupinteractionsminus", &numpileupinteractionsminus, &b_numpileupinteractionsminus);
    fChain->SetBranchAddress("numpileupinteractions", &numpileupinteractions, &b_numpileupinteractions);
    fChain->SetBranchAddress("numpileupinteractionsplus", &numpileupinteractionsplus, &b_numpileupinteractionsplus);
@@ -1898,6 +1989,27 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("tau_neutralIsoPtSumdR03", tau_neutralIsoPtSumdR03, &b_tau_neutralIsoPtSumdR03);
    fChain->SetBranchAddress("tau_photonPtSumOutsideSignalConedR03", tau_photonPtSumOutsideSignalConedR03, &b_tau_photonPtSumOutsideSignalConedR03);
    fChain->SetBranchAddress("tau_puCorrPtSum", tau_puCorrPtSum, &b_tau_puCorrPtSum);
+
+
+   fChain->SetBranchAddress("track_count", &track_count);
+   fChain->SetBranchAddress("track_ID", track_ID);
+   fChain->SetBranchAddress("track_px", track_px);
+   fChain->SetBranchAddress("track_py", track_py);
+   fChain->SetBranchAddress("track_pz", track_pz);
+   fChain->SetBranchAddress("track_pt", track_pt);
+   fChain->SetBranchAddress("track_eta", track_eta);
+   fChain->SetBranchAddress("track_phi", track_phi);
+   fChain->SetBranchAddress("track_mass", track_mass);
+   fChain->SetBranchAddress("track_charge", track_charge);
+   fChain->SetBranchAddress("track_dxy", track_dxy);
+   fChain->SetBranchAddress("track_dxyerr", track_dxyerr);
+   fChain->SetBranchAddress("track_dz", track_dz);
+   fChain->SetBranchAddress("track_dzerr",track_dzerr);
+
+
+
+
+
    Notify();
 }
 
