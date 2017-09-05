@@ -1521,11 +1521,16 @@ if (!CutBasedTauId){
       unsigned int tau_tight=-1;
       vector<int> tau; tau.clear();
 
- 	if ((int)tau_index>-1) isLoose  = true;
+ 	if ((int)tau_index>-1 && analysisTree.tau_byLooseIsolationMVArun2v1DBoldDMwLT[tau_index] > 0.5) isLoose  = true;
 
 	tau_loose = (int)tau_index;
 	
 	if (!isLoose) continue;
+
+       ta_IsoFlagVTight[0]=analysisTree.tau_byVTightIsolationMVArun2v1DBoldDMwLT[tau_index];
+       ta_IsoFlagTight[0]=analysisTree.tau_byTightIsolationMVArun2v1DBoldDMwLT[tau_index];
+       ta_IsoFlagMedium[0]=analysisTree.tau_byMediumIsolationMVArun2v1DBoldDMwLT[tau_index];
+       ta_IsoFlagLoose[0]=analysisTree.tau_byLooseIsolationMVArun2v1DBoldDMwLT[tau_index];
 
       double q = analysisTree.tau_charge[tau_loose] * analysisTree.muon_charge[mu_index];
       if (q > 0) continue;
@@ -1691,7 +1696,8 @@ if (!CutBasedTauId){
 
  
        isoTau = analysisTree.tau_byIsolationMVArun2v1DBoldDMwLTraw[tau_index];
-       //ta_IsoFlag=analysisTree.tau_byTightIsolationMVArun2v1DBoldDMwLT[tau_index];
+       ta_IsoFlag=analysisTree.tau_byTightIsolationMVArun2v1DBoldDMwLT[tau_index];
+
        //isoTau = analysisTree.tau_chargedIsoPtSum[tau_index];
 
 

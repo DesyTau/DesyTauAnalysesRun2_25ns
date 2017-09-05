@@ -144,14 +144,6 @@ void analyzer::Loop(){
 	string N2part = "2Parton";
 	string N3part = "3Parton";
 	string N4part = "4Parton";
-	string HT0to70 = "0To70";
-	string HT70to100 = "70To100";
-	string HT100to200 = "100To200";
-	string HT200to400 = "200To400";
-	string HT400to600 = "400To600";
-	string HT600to800 = "600To800";
-	string HT800to1200 = "800To1200";
-
 	bool isW0Part = false;
 	bool isW1Part = false;
 	bool isW2Part = false;
@@ -162,13 +154,6 @@ void analyzer::Loop(){
 	bool isDY2Part = false;
 	bool isDY3Part = false;
 	bool isDY4Part = false;
-	bool isHTz = false;
-	bool isHTa = false;
-	bool isHTb = false;
-	bool isHTc = false;
-	bool isHTd = false;
-	bool isHTe = false;
-	bool isHTf = false;
 
 	if (string::npos != old.find(data)) isData= true;
 	if (string::npos != old.find(signal) && string::npos != systematic.find("genMET")) isSignal= true;
@@ -187,7 +172,7 @@ void analyzer::Loop(){
 	if (string::npos != old.find(dyjlow) || string::npos != old.find(dyjlow2)) isDYlow= true;
 	if (string::npos != old.find(dyj1) || string::npos != old.find(dyj2) || string::npos != old.find(dyj3) || string::npos != old.find(dyj4)) isDYNJ = true;
 	if ((string::npos != old.find(wj1) || string::npos != old.find(wj2) || string::npos != old.find(wj3) || string::npos != old.find(wj4)) && string::npos == old.find(ttw)) isWNJ= true;
-	isNJ = isDYNJ || isWNJ;
+	isNJ = isDYNJ && isWNJ;
 
 	
 	if (isSignal) cout<<" YOU HAVE FOUND ITTTTTTTTT is it signal ???  "<<isSignal<<" systematic "<<systematic<<endl;
@@ -219,52 +204,43 @@ TH2D *histo = (TH2D*) obj;
 	if (string::npos == fln.find(ztt)) isZTT= false;
 
 	TH1D * histW   , *histPt;
-	if (systematic == "ScalesUp" ) histW = (TH1D*)filein->Get("mutau/histWeightsScalesUp");
-	else if (systematic == "ScalesDown" ) histW = (TH1D*)filein->Get("mutau/histWeightsScalesDown");
-	else if (systematic == "PDFUp" ) histW = (TH1D*)filein->Get("mutau/histWeightsPDFUp");
-	else if (systematic == "PDFDown" ) histW = (TH1D*)filein->Get("mutau/histWeightsPDFDown");
-	else  {histW = (TH1D*)filein->Get("mutau/histWeightsH");}
+	if (systematic == "ScalesUp" ) histW = (TH1D*)filein->Get("WJetsCR/histWeightsScalesUp");
+	else if (systematic == "ScalesDown" ) histW = (TH1D*)filein->Get("WJetsCR/histWeightsScalesDown");
+	else if (systematic == "PDFUp" ) histW = (TH1D*)filein->Get("WJetsCR/histWeightsPDFUp");
+	else if (systematic == "PDFDown" ) histW = (TH1D*)filein->Get("WJetsCR/histWeightsPDFDown");
+	else  {histW = (TH1D*)filein->Get("WJetsCR/histWeightsH");}
 
-	if (string::npos != fln.find(N0part) && (isWJ || isWNJ)) isW0Part= true;
-	if (string::npos != fln.find(N1part) && (isWJ || isWNJ)) isW1Part= true;
-	if (string::npos != fln.find(N2part) && (isWJ || isWNJ)) isW2Part= true;
-	if (string::npos != fln.find(N3part) && (isWJ || isWNJ)) isW3Part= true;
-	if (string::npos != fln.find(N4part) && (isWJ || isWNJ)) isW4Part= true;
+	cout<<" check =============================== "<<old<<"  "<<N1part<<"  "<<isWJ<<"  "<<isW1Part<<endl;
+	if (string::npos != fln.find(N0part) && isWJ) isW0Part= true;
+	if (string::npos != fln.find(N1part) && isWJ) isW1Part= true;
+	if (string::npos != fln.find(N2part) && isWJ) isW2Part= true;
+	if (string::npos != fln.find(N3part) && isWJ) isW3Part= true;
+	if (string::npos != fln.find(N4part) && isWJ) isW4Part= true;
 	if (string::npos != fln.find(N0part) && isDYhigh) isDY0Part= true;
 	if (string::npos != fln.find(N1part) && isDYhigh) isDY1Part= true;
 	if (string::npos != fln.find(N2part) && isDYhigh) isDY2Part= true;
 	if (string::npos != fln.find(N3part) && isDYhigh) isDY3Part= true;
 	if (string::npos != fln.find(N4part) && isDYhigh) isDY4Part= true;
 
-	if (string::npos != fln.find(HT0to70)) isHTz= true;
-	if (string::npos != fln.find(HT70to100)) isHTa= true;
-	if (string::npos != fln.find(HT100to200)) isHTb= true;
-	if (string::npos != fln.find(HT200to400)) isHTc= true;
-	if (string::npos != fln.find(HT400to600)) isHTd= true;
-	if (string::npos != fln.find(HT600to800)) isHTe= true;
-	if (string::npos != fln.find(HT800to1200)) isHTf= true;
-
-	cout<<" check =============================== "<<fln<<" isWJ "<<isWJ<<" isW1 "<<isW1Part<<" isWNJ "<<isWNJ<<" is HT ? "<<isHTa<<"  "<<isHTb<<endl;
-
 	histW->SetName("histWeightsH");
 	histW->SetTitle("histWeightsH");
 
-	if (isSUSY) histPt = (TH1D*)filein->Get("mutau/histPt");
+	if (isSUSY) histPt = (TH1D*)filein->Get("WJetsCR/histPt");
 	float Nw = 1;
 	if (isSUSY) { Nw = 1/histPt->GetSumOfWeights(); Nw *=histW->GetSumOfWeights();}
 
 	cout<<" The Systematic "<<systematic<<" histW "<<histW->GetSumOfWeights()<<endl;
 
 	TH1D * histTop , *histTopSq;
-	if (isTT) histTop = (TH1D*)filein->Get("mutau/histTopPt");
-	if (isTT && systematic == "TopPtUp" ) histTopSq = (TH1D*)filein->Get("mutau/histTopPtSq");
+	if (isTT) histTop = (TH1D*)filein->Get("WJetsCR/histTopPt");
+	if (isTT && systematic == "TopPtUp" ) histTopSq = (TH1D*)filein->Get("WJetsCR/histTopPtSq");
 	
-	//TH1D * CutFlow = (TH1D*)filein->Get("mutau/CutFlowUnW");
+	//TH1D * CutFlow = (TH1D*)filein->Get("WJetsCR/CutFlowUnW");
 	TFile * file = new TFile("plots.root","recreate");
 
 	//cout<<"  "<<old<<"  "<<datasetName->c_str()<<"  "<<hist_<<"  "<<CutFlow->GetName()<<"  "<<CutFlow->GetBinContent(1)<<endl;
 		
-	string Channel = "mutau";
+	string Channel = "WJetsCR";
 	file->mkdir(Channel.c_str());
 	file->cd(Channel.c_str());
 	float top_w = 1.;
@@ -275,17 +251,6 @@ TH2D *histo = (TH2D*) obj;
 		cout<<" will process "<<nentries<<" dataset "<<datasetName->c_str()<< endl;
 
 	Long64_t nbytes = 0, nb = 0;
-
-	int genHTa=0;
-	int genHTb=0;
-	int genHTc=0;
-	int genHTd=0;
-	int genHTlow=0;
-	int is0partons=0;
-	int is1partons=0;
-	int is2partons=0;
-	int is3partons=0;
-	int is4partons=0;
 
 	SetupTreeTp();
 
@@ -318,95 +283,13 @@ TH2D *histo = (TH2D*) obj;
 
 		if ( isDYhigh  && (npartons>0 && npartons<5)) continue;
 		*/
+
 		if (npartons!=0 && (isW0Part || isDY0Part)) continue;
 		if (npartons!=1 && (isW1Part || isDY1Part)) continue;
 		if (npartons!=2 && (isW2Part || isDY2Part)) continue;
 		if (npartons!=3 && (isW3Part || isDY3Part)) continue;
 		if (npartons!=4 && (isW4Part || isDY4Part)) continue;
 
-		if (npartons==0) is0partons++;
-		if (npartons==1) is1partons++;
-		if (npartons==2) is2partons++;
-		if (npartons==3) is3partons++;
-		if (npartons==4) is4partons++;
-
-		bool 	stitchflag = false;
-		
-		if (genHT<70 && genHT>0.) genHTlow++;
-		if (genHT>70&&genHT<100) genHTa++;
-		if (genHT>100&&genHT<200) genHTb++;
-		if (genHT>200&&genHT<400) genHTc++;
-		if (genHT>400&&genHT<600) genHTd++;
-
-		if (npartons==0 && isW0Part) stitchflag = true;
-
-		if (isHTz && genHT<70. ){
-		//if (npartons==0 && isW0Part) stitchflag = true;
-		if (npartons==1 && isW1Part) stitchflag = true;
-		if (npartons==2 && isW2Part) stitchflag = true;
-		if (npartons==3 && isW3Part) stitchflag = true;
-		if (npartons==4 && isW4Part) stitchflag = true;
-		}
-
-		if (isHTa && genHT>70. && genHT<100.){
-		if (npartons==0 && isW0Part) stitchflag = true;
-		if (npartons==1 && isW1Part) stitchflag = true;
-		if (npartons==2 && isW2Part) stitchflag = true;
-		if (npartons==3 && isW3Part) stitchflag = true;
-		if (npartons==4 && isW4Part) stitchflag = true;
-		}
-
-
-		if (isHTb && genHT>100. && genHT<200.){
-		if (npartons==0 && isW0Part) stitchflag = true;
-		if (npartons==1 && isW1Part) stitchflag = true;
-		if (npartons==2 && isW2Part) stitchflag = true;
-		if (npartons==3 && isW3Part) stitchflag = true;
-		if (npartons==4 && isW4Part) stitchflag = true;
-		}
-
-		if (isHTc && genHT>200. && genHT<400.){
-		if (npartons==0 && isW0Part) stitchflag = true;
-		if (npartons==1 && isW1Part) stitchflag = true;
-		if (npartons==2 && isW2Part) stitchflag = true;
-		if (npartons==3 && isW3Part) stitchflag = true;
-		if (npartons==4 && isW4Part) stitchflag = true;
-		}
-
-
-
-		if (isHTd && genHT>400. && genHT<600.){
-		if (npartons==0 && isW0Part) stitchflag = true;
-		if (npartons==1 && isW1Part) stitchflag = true;
-		if (npartons==2 && isW2Part) stitchflag = true;
-		if (npartons==3 && isW3Part) stitchflag = true;
-		if (npartons==4 && isW4Part) stitchflag = true;
-		}
-		if (isHTe && genHT>600. && genHT<800.){
-		if (npartons==0 && isW0Part) stitchflag = true;
-		if (npartons==1 && isW1Part) stitchflag = true;
-		if (npartons==2 && isW2Part) stitchflag = true;
-		if (npartons==3 && isW3Part) stitchflag = true;
-		if (npartons==4 && isW4Part) stitchflag = true;
-		}
-
-		if (isHTf && genHT>800.){
-		if (npartons==0 && isW0Part) stitchflag = true;
-		if (npartons==1 && isW1Part) stitchflag = true;
-		if (npartons==2 && isW2Part) stitchflag = true;
-		if (npartons==3 && isW3Part) stitchflag = true;
-		if (npartons==4 && isW4Part) stitchflag = true;
-		}
-
-		if (!isHTz && !isHTa && !isHTb && !isHTc && !isHTd ) stitchflag = true;
-
-	
-
-	if (!stitchflag) continue;
-
-
-		//cout<<" "<<jentry<<"  "<<" dataset "<<datasetName->c_str()<<"  partons "<<npartons<<" isW2part "<<isW2Part<<" genHT "<<genHT<<" isHTa "<<isHTa<<"  "<<isHTb<<"  "<<isHTc<<"  "<<isHTd<<" stitch "<<stitchflag<<endl;
-	
 
 		if ( jentry%100000 ==0 ) cout<<" working for you...processed " <<jentry<<" events from "<<nentries<<" dataset "<<datasetName->c_str()<<" weight "<<all_weights<< " partons "<<npartons<<"  "<<isW0Part<<"  "<<isW1Part<<"  "<<isW2Part<<endl;
 		
@@ -760,7 +643,7 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
          	double MTt = 0;MTt=sqrt(2*TauV.Pt()*met*(1-TMath::Cos(dPhiT)));
 		double MTsum = MT+MTt;
 	     	
-		if (MT > 60. && MT < 120. ) continue;
+		if (MT < 60. || MT > 120. ) continue;
 		if (MT < 20.) continue;
 		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index,isSignal);
 		CFCounter[iCut]+= all_weights;
@@ -861,7 +744,6 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
 	
   }
 
-	cout<<" and about HT now.... <70 "<<genHTlow<<" 70<x<100 "<<genHTa<<" 100x<200 "<<genHTb<<" 200<x<400 "<<genHTc<<" 400<x<600  "<<genHTd<<" 0partons "<<is0partons<<" 1p  "<<is1partons<<" 2p "<<is2partons<<" 3p "<<is3partons<<" 4p "<<is4partons<<endl;
 
 	float Lumi = 35864.;
 

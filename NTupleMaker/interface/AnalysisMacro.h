@@ -161,9 +161,11 @@ int el_index=-1;
    Float_t         ta_chargedIsoPtSum[30];   //[ta_count]
    Float_t         ta_neutralIsoPtSum[30];   //[ta_count]
 
-   Float_t 	   ta_IsoFlagVTight[30];
-   Float_t 	   ta_IsoFlagLoose[30];
-   Float_t 	   ta_IsoFlagMedium[30];
+   Float_t 	   ta_IsoFlagVTight[5];
+   Float_t 	   ta_IsoFlagTight[5];
+   Float_t 	   ta_IsoFlagLoose[5];
+   Float_t 	   ta_IsoFlagVLoose[5];
+   Float_t 	   ta_IsoFlagMedium[5];
    Float_t 	   isElTau;
    Float_t 	   isMuTau;
    Float_t 	   isTauTau;
@@ -173,6 +175,7 @@ int el_index=-1;
 
 
 
+   Float_t         genHT;
    Float_t         genmet;
    Float_t         genmet_Ex;
    Float_t         genmet_Ey;
@@ -224,6 +227,7 @@ int el_index=-1;
    Float_t 	   zptmassweight;
    Float_t 	   xsecs;
    Float_t 	   event_sign;
+   Float_t 	   event_type;
    Float_t 	   event_secondLeptonVeto;
    Float_t 	   eleMVA;
    Float_t 	   met_flag;
@@ -669,6 +673,7 @@ T  = new TTree("T","T");
    Float_t         metphi_resoUp;
    Float_t         metphi_resoDown;
 */
+  T->Branch("genHT", &genHT, "genHT/F");
   T->Branch("genmet", &genmet, "genmet/F");
   T->Branch("genmet_Ex", &genmet_Ex, "genmet_Ex/F");
   T->Branch("genmet_Ey", &genmet_Ey, "genmet_Ey/F");
@@ -753,6 +758,7 @@ T  = new TTree("T","T");
 
   T->Branch("xsecs", &xsecs, "xsecs/F");
   T->Branch("event_sign", &event_sign, "event_sign/F");
+  T->Branch("event_type", &event_type, "event_type/F");
   T->Branch("met_flag", &met_flag, "met_flag/F");
   T->Branch("event_secondLeptonVeto", &event_secondLeptonVeto, "event_secondLeptonVeto/F");
   T->Branch("event_thirdLeptonVeto", &event_thirdLeptonVeto, "event_thirdLeptonVeto/F");
@@ -871,9 +877,11 @@ T  = new TTree("T","T");
   T->Branch("ta_neutralIsoPtSum", &ta_neutralIsoPtSum, "ta_neutralIsoPtSum/F");
   T->Branch("ta_puCorrPtSum", &ta_puCorrPtSum, "ta_puCorrPtSum/F");
 
-  T->Branch("ta_IsoFlagVTight", &ta_IsoFlagVTight, "ta_IsoFlagVTight/F");
-  T->Branch("ta_IsoFlagLoose", &ta_IsoFlagLoose, "ta_IsoFlagLoose/F");
-  T->Branch("ta_IsoFlagMedium", &ta_IsoFlagMedium, "ta_IsoFlagMedium/F");
+  T->Branch("ta_IsoFlagVTight", ta_IsoFlagVTight, "ta_IsoFlagVTight[5]/F");
+  T->Branch("ta_IsoFlagTight", ta_IsoFlagTight, "ta_IsoFlagTight[5]/F");
+  T->Branch("ta_IsoFlagLoose", ta_IsoFlagLoose, "ta_IsoFlagLoose[5]/F");
+  T->Branch("ta_IsoFlagVLoose", ta_IsoFlagVLoose, "ta_IsoFlagVLoose[5]/F");
+  T->Branch("ta_IsoFlagMedium", ta_IsoFlagMedium, "ta_IsoFlagMedium[5]/F");
 
   T->Branch("ta_isLoose", &ta_isLoose, "ta_isLoose/F");
   T->Branch("ta_isTight", &ta_isTight, "ta_isTigh/F");

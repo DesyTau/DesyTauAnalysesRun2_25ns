@@ -53,7 +53,6 @@ class analyzer {
   const double bTagCut  = 0.8000;
 
     double dzeta=-9999;
-    double dzetaR=-9999;
     double pzetavis=-9999;
     double pzetamiss=-9999;
     double Mt2as=-1;
@@ -83,7 +82,6 @@ class analyzer {
    int 	   	   event_run;
    Float_t         genmet_Ex;
    Float_t         genmet_Ey;
-   Float_t         PtSystem;
    Float_t         NuPx;
    Float_t         NuPy;
    Float_t         NuPz;
@@ -114,7 +112,6 @@ class analyzer {
   Float_t         met_ex_recoil;
   Float_t         met_ey_recoil;
   Float_t         genmet;
-  Float_t         genHT;
   Float_t         genmetphi;
   Float_t         met_scaleUp;
   Float_t         metphi_scaleUp;
@@ -226,11 +223,6 @@ class analyzer {
   Float_t         ta_charge[30];
   Float_t         ta_relIso[30];
   Float_t         ta_IsoFlag;
-  Float_t 	  ta_IsoFlagVTight[5];
-  Float_t 	  ta_IsoFlagTight[5];
-  Float_t 	  ta_IsoFlagLoose[5];
-  Float_t 	  ta_IsoFlagVLoose[5];
-  Float_t 	  ta_IsoFlagMedium[5];
   Float_t         event_sign;
   Float_t         met_flag;
   Float_t         event_secondLeptonVeto;
@@ -312,8 +304,6 @@ class analyzer {
   TBranch        *b_met_ex_recoil;
   TBranch        *b_met_ey_recoil;
   TBranch        *b_genmet;
-  TBranch        *b_genHT;
-  TBranch        *b_PtSystem;
   TBranch        *b_event_lumi;
   TBranch        *b_event_run;
   TBranch        *b_genmet_Ex;
@@ -441,11 +431,6 @@ class analyzer {
   TBranch        *b_ta_dz;   //!
   TBranch        *b_ta_charge;   //!
   TBranch        *b_ta_IsoFlag;   //!
-  TBranch	 *b_ta_IsoFlagVTight[5];
-  TBranch	 *b_ta_IsoFlagTight[5];
-  TBranch	 *b_ta_IsoFlagVLoose[5];
-  TBranch	 *b_ta_IsoFlagLoose[5];
-  TBranch	 *b_ta_IsoFlagMedium[5];
   TBranch        *b_ta_Iso;   //!
   TBranch        *b_ta_relIso;   //!
   TBranch        *b_datasetName;   //!
@@ -572,7 +557,7 @@ if (dogenMET) {
 
     ///////////////////mutau
 
-    if ( (Sel=="mutau" || Sel=="WJetsCR" )&& mIndex >-1 && tIndex>-1 ){
+    if (Sel=="mutau" && mIndex >-1 && tIndex>-1 ){
 
       tauMass = tauV.M();
 
@@ -621,8 +606,6 @@ if (dogenMET) {
       pzetamiss = metx*zetaX + mety*zetaY;
       pzetavis = vectorVisX*zetaX + vectorVisY*zetaY;
       dzeta = pzetamiss - 0.85*pzetavis;
-if (pzetavis !=0) dzetaR = pzetamiss/pzetavis;
-
 
 
 //   int nSRr = GetSRIndex(muV, tauV, JetsV, MetV, Chimass, mIndex, tIndex,CutIndex);
@@ -711,7 +694,7 @@ if (dogenMET) { met = sqrt(genmet_Ex*genmet_Ex + genmet_Ey*genmet_Ey);
     for (unsigned int i = 0; i <   JetsV.size(); i++) AllJets_Lepton_noMet.push_back (JetsV.at(i));
 
 
-    if (Sel=="mutau" || Sel=="WJetsCR")    AllJets_Lepton_noMet.push_back (muV);
+    if (Sel=="mutau" )    AllJets_Lepton_noMet.push_back (muV);
     if (Sel=="WJetsmu" )    AllJets_Lepton_noMet.push_back (muV);
     if (Sel=="eltau" )    AllJets_Lepton_noMet.push_back (elV);
     if (Sel=="muel" )   { AllJets_Lepton_noMet.push_back (muV);AllJets_Lepton_noMet.push_back (elV);};
@@ -738,14 +721,11 @@ if (dogenMET) { met = sqrt(genmet_Ex*genmet_Ex + genmet_Ey*genmet_Ey);
 			
     Mt2as = 1.;
     dzeta=-9999;
-    dzetaR=-9999;
-
-   int nSR = GetSRIndex(muV, tauV, JetsV, MetV, Chimass, mIndex, tIndex, CutIndex,dogenMET);
 
     ///////////////////mutau
     ////////////////////
 
-    if ((Sel=="mutau" || Sel=="WJetsCR" )&& mIndex >-1 && tIndex>-1 ){
+    if (Sel=="mutau" && mIndex >-1 && tIndex>-1 ){
 
 
       tauMass = tauV.M();
@@ -885,7 +865,6 @@ if (dogenMET) { met = sqrt(genmet_Ex*genmet_Ex + genmet_Ey*genmet_Ey);
       pzetamiss = metx*zetaX + mety*zetaY;
       pzetavis = vectorVisX*zetaX + vectorVisY*zetaY;
       dzeta = pzetamiss - 0.85*pzetavis;
-if (pzetavis !=0) dzetaR = pzetamiss/pzetavis;
 
 			
 if (CutIndex==17 &&  (int)event_lumi==101925 && (int) event_run ==1) 
@@ -893,69 +872,7 @@ if (CutIndex==17 &&  (int)event_lumi==101925 && (int) event_run ==1)
 
       hDZeta[CutIndex]->Fill(dzeta,EvWeight);
       hDZetaFB[CutIndex]->Fill(dzeta,EvWeight);
-      hDZetaR[CutIndex]->Fill(dzetaR,EvWeight);
-      hDZetaRFB[CutIndex]->Fill(dzetaR,EvWeight);
-/*
-	hprofMt2vsMET[CutIndex]->Fill(Mt2as,met,EvWeight);
-	hprofMt2vsDZeta[CutIndex]->Fill(Mt2as,dzeta,EvWeight);
 
-	hprofMETvsMt2[CutIndex]->Fill(met,Mt2as,EvWeight);
-	hprofMETvsDZeta[CutIndex]->Fill(met,dzeta,EvWeight);
-
-	hprofDZetavsMET[CutIndex]->Fill(dzeta,met,EvWeight);
-	hprofDZetavsMt2[CutIndex]->Fill(dzeta,Mt2as,EvWeight);
-*/
-
-//	hMt2_binned[CutIndex][nSR]->Fill(Mt2as,EvWeight);
-//	hMET_binned[CutIndex][nSR]->Fill(met,EvWeight);
-//	hDzeta_binned[CutIndex][nSR]->Fill(dzeta,EvWeight);
-
-if (dzeta < -100) {
-	hMt2LowDzeta[CutIndex]->Fill(Mt2as,EvWeight);
-	hMETLowDzeta[CutIndex]->Fill(met,EvWeight);
-
-
-if (met>120)
-	hMt2LowDzetaHighMET[CutIndex]->Fill(Mt2as,EvWeight);
-if (met<40)
-	hMt2LowDzetaLowMET[CutIndex]->Fill(Mt2as,EvWeight);
-if (met>40 && met<120)
-	hMt2LowDzetaMiddleMET[CutIndex]->Fill(Mt2as,EvWeight);
-
-if (Mt2as>120)
-	hMETLowDzetaHighMt2[CutIndex]->Fill(met,EvWeight);
-if (Mt2as<40)
-	hMETLowDzetaLowMt2[CutIndex]->Fill(met,EvWeight);
-if (Mt2as>40 && Mt2as<120)
-	hMETLowDzetaMiddleMt2[CutIndex]->Fill(met,EvWeight);
-
-
-
-	}
-if (dzeta > -100 && dzeta <50) {
-	hMt2MiddleDzeta[CutIndex]->Fill(Mt2as,EvWeight);
-	hMETMiddleDzeta[CutIndex]->Fill(met,EvWeight);
-	}
-
-if (dzeta > 50) {
-	hMt2HighDzeta[CutIndex]->Fill(Mt2as,EvWeight);
-	hMETHighDzeta[CutIndex]->Fill(met,EvWeight);
-
-if (met>120)
-	hMt2HighDzetaHighMET[CutIndex]->Fill(Mt2as,EvWeight);
-if (met<40)
-	hMt2HighDzetaLowMET[CutIndex]->Fill(Mt2as,EvWeight);
-if (met>40 && met<120)
-	hMt2HighDzetaMiddleMET[CutIndex]->Fill(Mt2as,EvWeight);
-
-if (Mt2as>120)
-	hMETHighDzetaHighMt2[CutIndex]->Fill(met,EvWeight);
-if (Mt2as<40)
-	hMETHighDzetaLowMt2[CutIndex]->Fill(met,EvWeight);
-if (Mt2as>40 && Mt2as<120)
-	hMETHighDzetaMiddleMt2[CutIndex]->Fill(met,EvWeight);
-
-	}
 
 
       /*
@@ -1131,13 +1048,10 @@ if (Mt2as>40 && Mt2as<120)
       pzetamiss = metx*zetaX + mety*zetaY;
       pzetavis = vectorVisX*zetaX + vectorVisY*zetaY;
       dzeta = pzetamiss - 0.85*pzetavis;
-if (pzetavis !=0) dzetaR = pzetamiss/pzetavis;
 
 
       hDZeta[CutIndex]->Fill(dzeta,EvWeight);
       hDZetaFB[CutIndex]->Fill(dzeta,EvWeight);
-      hDZetaR[CutIndex]->Fill(dzetaR,EvWeight);
-      hDZetaRFB[CutIndex]->Fill(dzetaR,EvWeight);
       /*
 	hmet_DZeta_MT2lester[CutIndex]->Fill(met,dzeta,Mt2as,EvWeight);
 
@@ -1326,15 +1240,10 @@ if (pzetavis !=0) dzetaR = pzetamiss/pzetavis;
       pzetamiss = metx*zetaX + mety*zetaY;
       pzetavis = vectorVisX*zetaX + vectorVisY*zetaY;
       dzeta = pzetamiss - 0.85*pzetavis;
-if (pzetavis !=0) dzetaR = pzetamiss/pzetavis;
 
 
       hDZeta[CutIndex]->Fill(dzeta,EvWeight);
       hDZetaFB[CutIndex]->Fill(dzeta,EvWeight);
-      hDZetaR[CutIndex]->Fill(dzetaR,EvWeight);
-      hDZetaRFB[CutIndex]->Fill(dzetaR,EvWeight);
-
-
 
 
 
@@ -1746,9 +1655,6 @@ if (histoIndex>0){
       }
 
 
-	
-	hgenHT[CutIndex]->Fill(genHT,EvWeight);
-
     if (JetsV.size()>0){
 
       double dPhiJ=dPhiFrom2P( JetsV.at(0).Px(), JetsV.at(0).Py(), metx,  mety );
@@ -1852,7 +1758,6 @@ if (histoIndex>0){
     mety = MetV.Py();
     metphi = MetV.Phi();
     dzeta=-9999;
-    dzetaR=-9999;
 
 if (dogenMET) { met = sqrt(genmet_Ex*genmet_Ex + genmet_Ey*genmet_Ey);
 	metx = genmet_Ex;
@@ -2137,7 +2042,6 @@ if (dogenMET) { met = sqrt(genmet_Ex*genmet_Ex + genmet_Ey*genmet_Ey);
       Mt2as = -1.;
       met = MetV.Pt();
       dzeta=-9999;
-      dzetaR=-9999;
 				
 
       double v1[4] = {LeptV1.Px(),LeptV1.Py(),LeptV1.Pz(),muonMass};
@@ -2215,15 +2119,10 @@ if (dogenMET) { met = sqrt(genmet_Ex*genmet_Ex + genmet_Ey*genmet_Ey);
       pzetamiss = metx*zetaX + mety*zetaY;
       pzetavis = vectorVisX*zetaX + vectorVisY*zetaY;
       dzeta = pzetamiss - 0.85*pzetavis;
-if (pzetavis !=0) dzetaR = pzetamiss/pzetavis;
-
+			
 
       hDZeta[CutIndex]->Fill(dzeta,EvWeight);
       hDZetaFB[CutIndex]->Fill(dzeta,EvWeight);
-      hDZetaR[CutIndex]->Fill(dzetaR,EvWeight);
-      hDZetaRFB[CutIndex]->Fill(dzetaR,EvWeight);
-			
-
 
       if (JetsV.size()>0){
 	double dPhiJT=dPhiFrom2P( JetsV.at(0).Px(), JetsV.at(0).Py(), LeptV1.Px(),  LeptV1.Py() );
@@ -2309,7 +2208,6 @@ if (pzetavis !=0) dzetaR = pzetamiss/pzetavis;
 
     /////////////global variables
 
-	hgenHT[CutIndex]->Fill(genHT,EvWeight);
     if (JetsV.size()>0){
 
       double dPhiJ=dPhiFrom2P( JetsV.at(0).Px(), JetsV.at(0).Py(), metx,  mety );
@@ -2407,18 +2305,18 @@ analyzer::analyzer(TTree *tree) : fChain(0)
     if (!f || !f->IsOpen()) {
       f = new TFile("Memory Directory");
     }
-    f->GetObject("CHANNELHERE/T",tree);
+    f->GetObject("muel/T",tree);
 
 #else // SINGLE_TREE
 
     // The following code should be used if you want this class to access a chain
     // of trees.
-    TChain * chain = new TChain("CHANNELHERE/T","");
+    TChain * chain = new TChain("muel/T","");
 
-    TString ChainName = "/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/New8025/CMSSW_8_0_25/src/DesyTauAnalyses/NTupleMaker/test/CHANNELHERE/FILEIN/CHANNELHERE/T";
+    TString ChainName = "/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/New8025/CMSSW_8_0_25/src/DesyTauAnalyses/NTupleMaker/test/muel/FILEIN/muel/T";
     TString Tsystematic="SYSTEMATICHERE";
     if (Tsystematic == "JetEnUp" || Tsystematic == "JetEnDown" || Tsystematic == "UnclEnDown" || Tsystematic == "UnclEnDown" || Tsystematic == "TauEnUp" || Tsystematic == "TauEnDown" || Tsystematic == "ElEnUp" || Tsystematic == "ElEnDown" || Tsystematic == "MuEnUp" || Tsystematic == "MuEnDown" || Tsystematic == "BTagUp" || Tsystematic == "BTagDown") 
-      ChainName ="/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/New8025/CMSSW_8_0_25/src/DesyTauAnalyses/NTupleMaker/test/CHANNELHERE_"+Tsystematic+"/FILEIN/CHANNELHERE/T";				
+      ChainName ="/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/New8025/CMSSW_8_0_25/src/DesyTauAnalyses/NTupleMaker/test/muel_"+Tsystematic+"/FILEIN/muel/T";				
 
     cout<<"  Will now chain "<<ChainName<<endl;
     chain->Add(ChainName);
@@ -2490,13 +2388,11 @@ void analyzer::Init(TTree *tree)
   fChain->SetBranchAddress("met_ex_recoil", &met_ex_recoil, &b_met_ex_recoil);
   fChain->SetBranchAddress("met_ey_recoil", &met_ey_recoil, &b_met_ey_recoil);
   fChain->SetBranchAddress("genmet", &genmet, &b_genmet);
-  fChain->SetBranchAddress("genHT", &genHT, &b_genHT);
   fChain->SetBranchAddress("genmetphi", &genmetphi, &b_genmetphi);
   fChain->SetBranchAddress("met_scaleUp", &met_scaleUp, &b_met_scaleUp);
   fChain->SetBranchAddress("met_scaleDown", &met_scaleDown, &b_met_scaleDown);
   fChain->SetBranchAddress("metphi_scaleUp", &metphi_scaleUp, &b_metphi_scaleUp);
   fChain->SetBranchAddress("metphi_scaleDown", &metphi_scaleDown, &b_metphi_scaleDown);
-  fChain->SetBranchAddress("PtSystem", &PtSystem, &b_PtSystem);
 
   fChain->SetBranchAddress("genmet_Ex", &genmet_Ex, &b_genmet_Ex);
   fChain->SetBranchAddress("genmet_Ey", &genmet_Ey, &b_genmet_Ey);
@@ -2648,11 +2544,6 @@ void analyzer::Init(TTree *tree)
   fChain->SetBranchAddress("ta_dz", ta_dz, &b_ta_dz);
   fChain->SetBranchAddress("ta_charge", ta_charge, &b_ta_charge);
   fChain->SetBranchAddress("ta_IsoFlag", &ta_IsoFlag, &b_ta_IsoFlag);
-  fChain->SetBranchAddress("ta_IsoFlagVTight", ta_IsoFlagVTight, &b_ta_IsoFlagVTight);
-  fChain->SetBranchAddress("ta_IsoFlagTight", ta_IsoFlagTight, &b_ta_IsoFlagTight);
-  fChain->SetBranchAddress("ta_IsoFlagVLoose", ta_IsoFlagVLoose, &b_ta_IsoFlagVLoose);
-  fChain->SetBranchAddress("ta_IsoFlagLoose", ta_IsoFlagLoose, &b_ta_IsoFlagLoose);
-  fChain->SetBranchAddress("ta_IsoFlagMedium", ta_IsoFlagMedium, &b_ta_IsoFlagMedium);
   fChain->SetBranchAddress("ta_relIso", ta_relIso, &b_ta_relIso);
   fChain->SetBranchAddress("datasetName", &datasetName);
   fChain->SetBranchAddress("CFCounter_", CFCounter_,&b_CFCounter_);

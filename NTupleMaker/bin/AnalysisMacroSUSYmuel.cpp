@@ -1885,6 +1885,7 @@ cout<<""<<endl;
 */
       float genmet_ex = analysisTree.genmet_ex;
       float genmet_ey = analysisTree.genmet_ey;
+      genHT = analysisTree.genparticles_lheHt;
 
       genmet = TMath::Sqrt(genmet_ex*genmet_ex + genmet_ey*genmet_ey);
       genmetphi = TMath::ATan2(genmet_ey,genmet_ex);

@@ -87,6 +87,7 @@ class analyzer {
   Int_t	   njets;
    int 	   	   event_lumi;
    int 	   	   event_run;
+   Float_t         event_type;
    Float_t         genmet_Ex;
    Float_t         genmet_Ey;
    Float_t         PtSystem;
@@ -320,6 +321,7 @@ class analyzer {
   TBranch        *b_PtSystem;
   TBranch        *b_event_lumi;
   TBranch        *b_event_run;
+  TBranch        *b_event_type;
   TBranch        *b_genmet_Ex;
   TBranch        *b_genmet_Ey;
   TBranch        *b_NuPx;
@@ -574,6 +576,7 @@ class analyzer {
     hnpv[CutIndex]->Fill(npv,EvWeight);
     hnpu[CutIndex]->Fill(npu,EvWeight);
     hEventSign[CutIndex]->Fill(event_sign,EvWeight);
+    hEventType[CutIndex]->Fill(event_type,EvWeight);
 	
 
 
@@ -612,8 +615,9 @@ class analyzer {
       double dPhi=dPhiFrom2P( DiL.Px(), DiL.Py(), metx,  mety );
       float MT = TMath::Sqrt(2*DiL.Pt()*met*(1-TMath::Cos(dPhi)));
       hMTDil[CutIndex]->Fill(MT,EvWeight);
-      hInvMassDil[CutIndex]->Fill(DiL.M(),EvWeight);
-      hInvMassDilFineBin[CutIndex]->Fill(DiL.M(),EvWeight);
+      hInvMassZ1[CutIndex]->Fill(DiL.M(),EvWeight);
+      hInvMassZ1FB[CutIndex]->Fill(DiL.M(),EvWeight);
+
       hdR_Dil[CutIndex]->Fill(Dr,EvWeight);
       hPtDil[CutIndex]->Fill(DiL.Pt(),EvWeight);
 
@@ -833,16 +837,16 @@ if (pzetavis !=0) dzetaR = pzetamiss/pzetavis;
 
 	int mIndex = tIndex_1;
 
-	hTau1pt[CutIndex]->Fill(ta_pt[mIndex],EvWeight);
-	hTau1eta[CutIndex]->Fill(ta_eta[mIndex],EvWeight);
-	htau1_dxy[CutIndex]->Fill(ta_dxy[mIndex],EvWeight);
-	htau1_dz[CutIndex]->Fill(ta_dz[mIndex],EvWeight);
+	hTau1pt[CutIndex]->Fill(ta_pt[tIndex_1],EvWeight);
+	hTau1eta[CutIndex]->Fill(ta_eta[tIndex_1],EvWeight);
+	htau1_dxy[CutIndex]->Fill(ta_dxy[tIndex_1],EvWeight);
+	htau1_dz[CutIndex]->Fill(ta_dz[tIndex_1],EvWeight);
 
-	double dPhiJ=dPhiFrom2P( ta_px[mIndex], ta_py[mIndex], metx,  mety );
+	double dPhiJ=dPhiFrom2P( ta_px[tIndex_1], ta_py[tIndex_1], metx,  mety );
 	hdPhiTau1MET[CutIndex]->Fill(dPhiJ,EvWeight);
 
 	sumTaupT +=LeptTau1.Pt();
-	hIsoTau1[CutIndex]->Fill(ta_relIso[mIndex],EvWeight);
+	hIsoTau1[CutIndex]->Fill(ta_relIso[tIndex_1],EvWeight);
 
 
 	//cout<<" Inside  "<<relIsoL<<"  Cut"<<"  "<<CutIndex<<endl;
@@ -855,17 +859,17 @@ if (pzetavis !=0) dzetaR = pzetamiss/pzetavis;
 
 	int mIndex = tIndex_2;
 
-	hTau2pt[CutIndex]->Fill(ta_pt[mIndex],EvWeight);
-	hTau2eta[CutIndex]->Fill(ta_eta[mIndex],EvWeight);
-	htau2_dxy[CutIndex]->Fill(ta_dxy[mIndex],EvWeight);
-	htau2_dz[CutIndex]->Fill(ta_dz[mIndex],EvWeight);
+	hTau2pt[CutIndex]->Fill(ta_pt[tIndex_2],EvWeight);
+	hTau2eta[CutIndex]->Fill(ta_eta[tIndex_2],EvWeight);
+	htau2_dxy[CutIndex]->Fill(ta_dxy[tIndex_2],EvWeight);
+	htau2_dz[CutIndex]->Fill(ta_dz[tIndex_2],EvWeight);
 
-	double dPhiJ=dPhiFrom2P( ta_px[mIndex], ta_py[mIndex], metx,  mety );
+	double dPhiJ=dPhiFrom2P( ta_px[tIndex_2], ta_py[tIndex_2], metx,  mety );
 	hdPhiTau2MET[CutIndex]->Fill(dPhiJ,EvWeight);
 
 
 	sumTaupT +=LeptTau2.Pt();
-	hIsoTau2[CutIndex]->Fill(ta_relIso[mIndex],EvWeight);
+	hIsoTau2[CutIndex]->Fill(ta_relIso[tIndex_2],EvWeight);
 
 
       }
@@ -880,33 +884,45 @@ if (pzetavis !=0) dzetaR = pzetamiss/pzetavis;
 //	cout <<" what is it ???????????? "<<isMuTau<<"  "<<isElTau<<"  "<<isTauTau<<"  m1  "<<mIndex_1<<" m2 "<<mIndex_2<<" m3 "<<mIndex_3<<" t "<<tIndex<<" t1  "<<tIndex_1<<" t2 "<<tIndex_2<<endl;
 
 	      TLorentzVector DiL =  LeptV1  + LeptV2 + LeptMu3 + LeptTau;
+	      TLorentzVector DiL2 =  LeptMu3 + LeptTau;
 	      hInvMass3MuTau[CutIndex]->Fill(DiL.M(),EvWeight);
 	      hInvMass3MuTauFB[CutIndex]->Fill(DiL.M(),EvWeight);
+	      hInvMassZ1Z2[CutIndex]->Fill(DiL.M(),EvWeight);
+	      hInvMassZ1Z2FB[CutIndex]->Fill(DiL.M(),EvWeight);
 	      hPtDil3MuTau[CutIndex]->Fill(DiL.Pt(),EvWeight);
-	      hInvMass3MuTauZ2[CutIndex]->Fill(DiL.M(),EvWeight);
-	      hInvMass3MuTauZ2FB[CutIndex]->Fill(DiL.M(),EvWeight);
+
+	      hInvMass3MuTauZ2[CutIndex]->Fill(DiL2.M(),EvWeight);
+	      hInvMass3MuTauZ2FB[CutIndex]->Fill(DiL2.M(),EvWeight);
 
 		}
 
 	if (isElTau){
 		
 	      TLorentzVector DiL =  LeptV1  + LeptV2 + LeptEl3 + LeptTau;
+	      TLorentzVector DiL2 =  LeptEl3 + LeptTau;
 	      hInvMass2MuElTau[CutIndex]->Fill(DiL.M(),EvWeight);
 	      hInvMass2MuElTauFB[CutIndex]->Fill(DiL.M(),EvWeight);
+	      hInvMassZ1Z2[CutIndex]->Fill(DiL.M(),EvWeight);
+	      hInvMassZ1Z2FB[CutIndex]->Fill(DiL.M(),EvWeight);
 	      hPtDil2MuElTau[CutIndex]->Fill(DiL.Pt(),EvWeight);
-	      hInvMass2MuElTauZ2[CutIndex]->Fill(DiL.M(),EvWeight);
-	      hInvMass2MuElTauZ2FB[CutIndex]->Fill(DiL.M(),EvWeight);
+
+	      hInvMass2MuElTauZ2[CutIndex]->Fill(DiL2.M(),EvWeight);
+	      hInvMass2MuElTauZ2FB[CutIndex]->Fill(DiL2.M(),EvWeight);
 
 		}
 
 	if (isTauTau){
 		
 	      TLorentzVector DiL =  LeptV1  + LeptV2 + LeptTau1 + LeptTau2;
+	      TLorentzVector DiL2 =  LeptTau1 + LeptTau2;
 	      hInvMass2Mu2Tau[CutIndex]->Fill(DiL.M(),EvWeight);
 	      hInvMass2Mu2TauFB[CutIndex]->Fill(DiL.M(),EvWeight);
+	      hInvMassZ1Z2[CutIndex]->Fill(DiL.M(),EvWeight);
+	      hInvMassZ1Z2FB[CutIndex]->Fill(DiL.M(),EvWeight);
 	      hPtDil2Mu2Tau[CutIndex]->Fill(DiL.Pt(),EvWeight);
-	      hInvMass2Mu2TauZ2[CutIndex]->Fill(DiL.M(),EvWeight);
-	      hInvMass2Mu2TauZ2FB[CutIndex]->Fill(DiL.M(),EvWeight);
+
+	      hInvMass2Mu2TauZ2[CutIndex]->Fill(DiL2.M(),EvWeight);
+	      hInvMass2Mu2TauZ2FB[CutIndex]->Fill(DiL2.M(),EvWeight);
 
 		}
 
@@ -996,8 +1012,8 @@ if (pzetavis !=0) dzetaR = pzetamiss/pzetavis;
       hMET[CutIndex]->Fill(met,EvWeight);
       hMETFB[CutIndex]->Fill(met,EvWeight);
       hMETphi[CutIndex]->Fill(metphi,EvWeight);
-      hHTOsqrMET[CutIndex]->Fill(  sumpT/sqrt(met),EvWeight);
-      hMeffMuonOsqrMET[CutIndex]->Fill( (sumMuonpT+sumpT+ met)/sqrt(met),EvWeight);
+//      hHTOsqrMET[CutIndex]->Fill(  sumpT/sqrt(met),EvWeight);
+//      hMeffMuonOsqrMET[CutIndex]->Fill( (sumMuonpT+sumpT+ met)/sqrt(met),EvWeight);
     }
 
       hGenMETFB[CutIndex]->Fill(genmet,EvWeight);
@@ -1120,6 +1136,7 @@ void analyzer::Init(TTree *tree)
   fChain->SetBranchAddress("genmet_Ey", &genmet_Ey, &b_genmet_Ey);
   fChain->SetBranchAddress("event_lumi", &event_lumi, &b_event_lumi);
   fChain->SetBranchAddress("event_run", &event_run, &b_event_run);
+  fChain->SetBranchAddress("event_type", &event_type, &b_event_type);
   fChain->SetBranchAddress("NuPx", &NuPx, &b_NuPx);
   fChain->SetBranchAddress("NuPy", &NuPy, &b_NuPy);
   fChain->SetBranchAddress("NuPz", &NuPz, &b_NuPz);

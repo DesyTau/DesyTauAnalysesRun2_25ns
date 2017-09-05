@@ -967,7 +967,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	return(-1);
       }
 
-	
+	float MuonPtCut = 10;
       vector<unsigned int> allMuons; allMuons.clear();
       vector<unsigned int> idMuons; idMuons.clear();
       vector<unsigned int> isoMuons; isoMuons.clear();
@@ -979,7 +979,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	allMuons.push_back(im);
 	if (isData && analysisTree.muon_isDuplicate[im]) continue;
 	if (isData && analysisTree.muon_isBad[im]) continue;
-	if (analysisTree.muon_pt[im]<SingleMuonTriggerPtCut) continue;
+	if (analysisTree.muon_pt[im]<MuonPtCut) continue;
 	if (fabs(analysisTree.muon_eta[im])>etaMuonCut) continue;
 	if (fabs(analysisTree.muon_dxy[im])>dxyMuonCut) continue;
 	if (fabs(analysisTree.muon_dz[im])>dzMuonCut) continue;
@@ -1042,6 +1042,8 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       int indx1 = -1;
       int indx2 = -1;
       bool isIsoMuonsPair = false;
+      bool isTriggerMatch = false;
+
       float isoMin = 9999;
       if (isoMuons.size()>0) {
 	for (unsigned int im1=0; im1<isoMuons.size(); ++im1) {
@@ -1075,7 +1077,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 		}
 
 
-	    bool isTriggerMatch = (isMu1matched || isMu2matched);
+	   isTriggerMatch = (isMu1matched || isMu2matched);
 //		if (isSignal) isTriggerMatch=true;
 
 	    float dRmumu = deltaR(analysisTree.muon_eta[index1],analysisTree.muon_phi[index1],
@@ -1098,6 +1100,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	  }
 	}
 
+	if (!isTriggerMatch) continue;
 /*
 	TLorentzVector TLmu1; TLmu1.SetPtEtaPhiM(analysisTree.muon_pt[indx1], analysisTree.muon_eta[indx1],
 						analysisTree.muon_phi[indx1], muonMass);
@@ -1113,6 +1116,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 */
       }//isMuons
 
+      if (indx1 <0 || indx2 <0) continue;
 
       int mu_index_1 = indx1;
       int mu_index_2 = indx2;
@@ -1124,7 +1128,6 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       int tau_index_2 = -1;
       int el_index = -1;
 
-      if (mu_index_1 <0 || mu_index_2 <0)continue;
 
 
       mu_relIso[0]=isoMuonsValue[mu_index_1];
@@ -1142,7 +1145,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       vector<int> taus; taus.clear();
       for (unsigned int it = 0; it<analysisTree.tau_count; ++it) {
 
-	if (analysisTree.tau_pt[it] < ThirdLeptonPtCut ) continue; 
+	if (analysisTree.tau_pt[it] < ThirdLeptonPtCut+5 ) continue; 
 	if (fabs(analysisTree.tau_eta[it])> etaTauCut) continue;
 	if (analysisTree.tau_decayModeFinding[it]<decayModeFinding) continue;
 	if ( fabs(analysisTree.tau_leadchargedhadrcand_dz[it])> leadchargedhadrcand_dz) continue;
@@ -1167,12 +1170,12 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	  float dRtau1 = deltaR(analysisTree.tau_eta[tIndex1],analysisTree.tau_phi[tIndex1],
 			    analysisTree.muon_eta[mu_index_1],analysisTree.muon_phi[mu_index_1]);
 
-	  if (dRtau1<0.4) continue;
+	  if (dRtau1<0.02) continue;
 
 	  float dRtau2 = deltaR(analysisTree.tau_eta[tIndex1],analysisTree.tau_phi[tIndex1],
 			    analysisTree.muon_eta[mu_index_2],analysisTree.muon_phi[mu_index_2]);
 
-	  if (dRtau2<0.4) continue;
+	  if (dRtau2<0.02) continue;
 
 
 	 //if (isTauPair) continue;
@@ -1183,6 +1186,8 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
 	  unsigned int tIndex2 = taus.at(it2);
 
+	  if (analysisTree.tau_charge[tIndex1] *analysisTree.tau_charge[tIndex2] > 0) continue;
+
 	  float dR = deltaR(analysisTree.tau_eta[tIndex1],analysisTree.tau_phi[tIndex1],
 			    analysisTree.tau_eta[tIndex2],analysisTree.tau_phi[tIndex2]);
 
@@ -1191,12 +1196,12 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	  float dRtau1 = deltaR(analysisTree.tau_eta[tIndex2],analysisTree.tau_phi[tIndex2],
 			    analysisTree.muon_eta[mu_index_1],analysisTree.muon_phi[mu_index_1]);
 
-	  if (dRtau1<0.4) continue;
+	  if (dRtau1<0.02) continue;
 
 	  float dRtau2 = deltaR(analysisTree.tau_eta[tIndex2],analysisTree.tau_phi[tIndex2],
 			    analysisTree.muon_eta[mu_index_2],analysisTree.muon_phi[mu_index_2]);
 
-	  if (dRtau2<0.4) continue;
+	  if (dRtau2<0.02) continue;
 
 	
 	    if (pTtauPair < analysisTree.tau_pt[tIndex1] + analysisTree.tau_pt[tIndex2]){
@@ -1271,15 +1276,13 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
       float isoMuMin  = 1e+10;
       float isoElecMin  = 1e+10;
-      float isoTauMin = 1.; 
+      float isoTauMin = -10; 
       float isoTau = 1.; 
-       isoTauMin = -10;
       float ptMu = 0;
       float ptTau = 0;
       float ptEl = 0;
       bool isMuonAndTau = false;
-      bool isElectronAndTau = true;
-
+      bool isElectronAndTau = false;
       
 	for (unsigned int im=0; im<muonsThird.size(); ++im) {
 	unsigned int mIndex  = muonsThird.at(im);
@@ -1302,30 +1305,33 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
 	float dRmu3mu1 = deltaR(analysisTree.muon_eta[mIndex],analysisTree.muon_phi[mIndex],
 				analysisTree.muon_eta[mu_index_1],analysisTree.muon_phi[mu_index_1]);
-	if (dRmu3mu1 < 0.3) continue;
+	if (dRmu3mu1 < 0.02) continue;
 	float dRmu3mu2 = deltaR(analysisTree.muon_eta[mIndex],analysisTree.muon_phi[mIndex],
 				analysisTree.muon_eta[mu_index_2],analysisTree.muon_phi[mu_index_2]);
-	if (dRmu3mu2 < 0.3) continue;
+	if (dRmu3mu2 < 0.02) continue;
+
 
 ///////////// now look for a mu-tau pair
 	for (unsigned int it=0; it<taus.size(); ++it) {
 
 	  unsigned int tIndex = taus.at(it);
 
+	 if (analysisTree.muon_charge[mIndex] *analysisTree.tau_charge[tIndex] > 0) continue;
+
 	  float dRtaum1 = deltaR(analysisTree.tau_eta[tIndex],analysisTree.tau_phi[tIndex],
 			    analysisTree.muon_eta[mu_index_1],analysisTree.muon_phi[mu_index_1]);
 
-	  if (dRtaum1<0.4) continue;
+	  if (dRtaum1<0.5) continue;
 
 	  float dRtaum2 = deltaR(analysisTree.tau_eta[tIndex],analysisTree.tau_phi[tIndex],
 			    analysisTree.muon_eta[mu_index_2],analysisTree.muon_phi[mu_index_2]);
 
-	  if (dRtaum2<0.4) continue;
+	  if (dRtaum2<0.5) continue;
 
 	  float dRtaum = deltaR(analysisTree.tau_eta[tIndex],analysisTree.tau_phi[tIndex],
 			    analysisTree.muon_eta[mIndex],analysisTree.muon_phi[mIndex]);
 
-	  if (dRtaum<0.4) continue;
+	  if (dRtaum<0.5) continue;
 
 
    isoTau = analysisTree.tau_byIsolationMVArun2v1DBoldDMwLTraw[tIndex];
@@ -1372,6 +1378,10 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
 	if (tau_indexMu>-1 && mu_index_3 >-1) isMuonAndTau = true;
 
+      isoTauMin = -10; 
+      isoTau = 1.; 
+      ptTau = 0;
+
       for (unsigned int im=0; im<electronsThird.size(); ++im) {
 	bool isLegMatch = false;
 	unsigned int eIndex  = electronsThird.at(im);
@@ -1393,30 +1403,32 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
 	float dRel3mu1 = deltaR(analysisTree.electron_eta[eIndex],analysisTree.electron_phi[eIndex],
 				analysisTree.muon_eta[mu_index_1],analysisTree.muon_phi[mu_index_1]);
-	if (dRel3mu1 < 0.3) continue;
+	if (dRel3mu1 < 0.02) continue;
 
 	float dRel3mu2 = deltaR(analysisTree.electron_eta[eIndex],analysisTree.electron_phi[eIndex],
 				analysisTree.muon_eta[mu_index_2],analysisTree.muon_phi[mu_index_2]);
-	if (dRel3mu2 < 0.3) continue;
+	if (dRel3mu2 < 0.02) continue;
 
 	for (unsigned int it=0; it<taus.size(); ++it) {
 
 	  unsigned int tIndex = taus.at(it);
 
+	 if (analysisTree.electron_charge[eIndex] *analysisTree.tau_charge[tIndex] > 0) continue;
+
 	  float dRtaum1 = deltaR(analysisTree.tau_eta[tIndex],analysisTree.tau_phi[tIndex],
 			    analysisTree.muon_eta[mu_index_1],analysisTree.muon_phi[mu_index_1]);
 
-	  if (dRtaum1<0.3) continue;
+	  if (dRtaum1<0.5) continue;
 
 	  float dRtaum2 = deltaR(analysisTree.tau_eta[tIndex],analysisTree.tau_phi[tIndex],
 			    analysisTree.muon_eta[mu_index_2],analysisTree.muon_phi[mu_index_2]);
 
-	  if (dRtaum2<0.3) continue;
+	  if (dRtaum2<0.5) continue;
 
 	  float dRtaue = deltaR(analysisTree.tau_eta[tIndex],analysisTree.tau_phi[tIndex],
 			    analysisTree.electron_eta[eIndex],analysisTree.electron_phi[eIndex]);
 
-	  if (dRtaue<0.4) continue;
+	  if (dRtaue<0.5) continue;
 	
 
 
@@ -1471,8 +1483,9 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
 //	if (!tauPass) continue;
 //
-  	if (!isElectronAndTau && !isMuonAndTau && !isTauPair)continue;
 
+//  	if (!isElectronAndTau && !isMuonAndTau && !isTauPair)continue;
+	
 
 	float n1 = 0; if (isMuonAndTau) n1 = analysisTree.muon_pt[mu_index_3] + analysisTree.tau_pt[tau_indexMu];
 	float n2 =  0 ; if (isElectronAndTau) n2 = analysisTree.electron_pt[el_index] + analysisTree.tau_pt[tau_indexEl];
@@ -1490,7 +1503,7 @@ if (isMuTau || isElTau){
        ta_IsoFlag=analysisTree.tau_byLooseIsolationMVArun2v1DBoldDMwLT[tau_index];
 	}
 
-if (!isMuTau && !isElTau && !isTauTau) continue;
+//if (!isMuTau && !isElTau && !isTauTau) continue;
 
 //           cout << "mIndex1 = " << mu_index_1 << " mIndex2 "<<mu_index_2<<"   mIndex3  "<<mu_index_3<<"  tau_index = " << tau_index <<" ieElTau "<<isElTau<<"  isMuTau "<<isMuTau<<" isTauTau "<<isTauTau<<"  MassMuTau "<<n1<<" MassElTau  "<<n2<<" MassTauTau "<<n3<<" tau_indexMu "<<tau_indexMu<<" tau_indexEl "<<tau_indexEl<<endl;
 		
@@ -1574,7 +1587,7 @@ if (!isMuTau && !isElTau && !isTauTau) continue;
 	
 	if(extraelec_veto || extramuon_veto)   event_thirdLeptonVeto = true;
 
-	if (event_thirdLeptonVeto) continue;
+//	if (event_thirdLeptonVeto) continue;
 
 
       if (isIsoMuonsPair) {      
@@ -1760,7 +1773,7 @@ if (!isMuTau && !isElTau && !isTauTau) continue;
 
 
       float jetEta = 2.4;
-      float DRmax = 0.5;
+      float DRmax = 0.4;
       float bJetEtaCut = jetEta;
 
       vector<unsigned int> jets; jets.clear();
@@ -1769,11 +1782,12 @@ if (!isMuTau && !isElTau && !isTauTau) continue;
 
 	int counter_cleaned_jets = 0;
 
+	float etaJetCutt = 4.7;
 
       for (unsigned int jet=0; jet<analysisTree.pfjet_count; ++jet) {
         float absJetEta = fabs(analysisTree.pfjet_eta[jet]);
 
-	if (absJetEta > etaJetCut) continue;
+	if (absJetEta > etaJetCutt) continue;
 	if (fabs(analysisTree.pfjet_pt[jet])<ptJetCut) continue;
 
 	float jetPt = analysisTree.pfjet_pt[jet];
@@ -1794,6 +1808,34 @@ if (!isMuTau && !isElTau && !isTauTau) continue;
 						  analysisTree.pfjet_eta[jet],analysisTree.pfjet_phi[jet]);
 
 	if ( Drr < DRmax) cleanedJet=false;
+
+	double Drr3=0 ;double Drrt3=0;
+	
+	if (isMuTau ) {
+		Drr3 = deltaR(analysisTree.muon_eta[mu_index_3],analysisTree.muon_phi[mu_index_3],
+						  analysisTree.pfjet_eta[jet],analysisTree.pfjet_phi[jet]);
+
+		Drrt3 = deltaR(analysisTree.tau_eta[tau_index],analysisTree.tau_phi[tau_index],
+						  analysisTree.pfjet_eta[jet],analysisTree.pfjet_phi[jet]);
+	}
+	if (isElTau ) {
+		Drr3 = deltaR(analysisTree.electron_eta[el_index],analysisTree.electron_phi[el_index],
+						  analysisTree.pfjet_eta[jet],analysisTree.pfjet_phi[jet]);
+		
+		Drrt3 = deltaR(analysisTree.tau_eta[tau_index],analysisTree.tau_phi[tau_index],
+						  analysisTree.pfjet_eta[jet],analysisTree.pfjet_phi[jet]);
+	}
+	
+	if (isTauTau ) {
+		Drr3 = deltaR(analysisTree.tau_eta[tau_index_1],analysisTree.tau_phi[tau_index_1],
+						  analysisTree.pfjet_eta[jet],analysisTree.pfjet_phi[jet]);
+	
+		Drrt3 = deltaR(analysisTree.tau_eta[tau_index_2],analysisTree.tau_phi[tau_index_2],
+						  analysisTree.pfjet_eta[jet],analysisTree.pfjet_phi[jet]);
+	}
+
+
+	if ( Drr3 < DRmax || Drrt3 < DRmax) cleanedJet=false;
 
 	if (!cleanedJet) continue;
 
@@ -2053,7 +2095,10 @@ cout<<""<<endl;
       genmet_Ex = analysisTree.genmet_ex;
       genmet_Ey = analysisTree.genmet_ey;
 
-
+      if (isMuTau) event_type= 1;
+      else if (isElTau) event_type= 2;
+      else  if (isTauTau) event_type= 3;
+      else  event_type=0;
 
        wScale0 = analysisTree.weightScale0;
        wScale1 = analysisTree.weightScale1;

@@ -1262,8 +1262,8 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       //////////////////////////////////////////////
       muon_index = (int)mu_index;
       electron_index = (int)el_index;
-      taus_index = (int)tau_index1;
-      taus_index2 = (int)tau_index2;
+      taus_index_1 = (int)tau_index1;
+      taus_index_2 = (int)tau_index2;
 
       mu_count= (int)analysisTree.muon_count;
 

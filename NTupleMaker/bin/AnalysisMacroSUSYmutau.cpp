@@ -1052,6 +1052,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	return(-1);
       }
 
+
 	
       vector<int> muons; muons.clear();
       for (unsigned int im = 0; im<analysisTree.muon_count; ++im) {
@@ -1948,6 +1949,7 @@ if (!CutBasedTauId){
       genmet_Ex = analysisTree.genmet_ex;
       genmet_Ey = analysisTree.genmet_ey;
 
+      genHT = analysisTree.genparticles_lheHt;
 
 
 

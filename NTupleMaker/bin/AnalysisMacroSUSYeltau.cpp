@@ -1949,6 +1949,8 @@ cout<<""<<endl;
       genmet_Ex = analysisTree.genmet_ex;
       genmet_Ey = analysisTree.genmet_ey;
 
+      genHT = analysisTree.genparticles_lheHt;
+
        wScale0 = analysisTree.weightScale0;
        wScale1 = analysisTree.weightScale1;
        wScale2 = analysisTree.weightScale2;
