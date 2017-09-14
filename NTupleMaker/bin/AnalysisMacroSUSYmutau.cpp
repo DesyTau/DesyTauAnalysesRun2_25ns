@@ -1254,6 +1254,11 @@ if (!CutBasedTauId){
  
        isoTau = analysisTree.tau_byIsolationMVArun2v1DBoldDMwLTraw[tau_index];
        ta_IsoFlag=analysisTree.tau_byTightIsolationMVArun2v1DBoldDMwLT[tau_index];
+       ta_IsoFlagVTight[0]=analysisTree.tau_byVTightIsolationMVArun2v1DBoldDMwLT[tau_index];
+       ta_IsoFlagTight[0]=analysisTree.tau_byTightIsolationMVArun2v1DBoldDMwLT[tau_index];
+       ta_IsoFlagMedium[0]=analysisTree.tau_byMediumIsolationMVArun2v1DBoldDMwLT[tau_index];
+       ta_IsoFlagLoose[0]=analysisTree.tau_byLooseIsolationMVArun2v1DBoldDMwLT[tau_index];
+       ta_IsoFlagVLoose[0]=analysisTree.tau_byVLooseIsolationMVArun2v1DBoldDMwLT[tau_index];
        //isoTau = analysisTree.tau_chargedIsoPtSum[tau_index];
        //ta_IsoFlag=analysisTree.tau_chargedIsoPtSum[tau_index];
 
@@ -1267,7 +1272,7 @@ if (!CutBasedTauId){
           ta_IsoFlag=analysisTree.tau_byMediumCombinedIsolationDeltaBetaCorr3Hits[tau_index];
 	}
 
-	if (!tauPass) continue;
+//	if (!tauPass) continue;
 
       ta_relIso[0]=isoTauMin;
       mu_relIso[0]=isoMuMin;

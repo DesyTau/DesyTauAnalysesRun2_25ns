@@ -441,11 +441,11 @@ class analyzer {
   TBranch        *b_ta_dz;   //!
   TBranch        *b_ta_charge;   //!
   TBranch        *b_ta_IsoFlag;   //!
-  TBranch	 *b_ta_IsoFlagVTight[5];
-  TBranch	 *b_ta_IsoFlagTight[5];
-  TBranch	 *b_ta_IsoFlagVLoose[5];
-  TBranch	 *b_ta_IsoFlagLoose[5];
-  TBranch	 *b_ta_IsoFlagMedium[5];
+  TBranch	 *b_ta_IsoFlagVTight;
+  TBranch	 *b_ta_IsoFlagTight;
+  TBranch	 *b_ta_IsoFlagVLoose;
+  TBranch	 *b_ta_IsoFlagLoose;
+  TBranch	 *b_ta_IsoFlagMedium;
   TBranch        *b_ta_Iso;   //!
   TBranch        *b_ta_relIso;   //!
   TBranch        *b_datasetName;   //!
@@ -572,7 +572,7 @@ if (dogenMET) {
 
     ///////////////////mutau
 
-    if ( (Sel=="mutau" || Sel=="WJetsCR" )&& mIndex >-1 && tIndex>-1 ){
+    if ( (Sel=="mutau" || Sel=="WJetsCRMuTau" )&& mIndex >-1 && tIndex>-1 ){
 
       tauMass = tauV.M();
 
@@ -1029,7 +1029,7 @@ if (Mt2as>40 && Mt2as<120)
       }
 
     }
-    if (Sel=="eltau" && eIndex > -1 && tIndex>-1){
+    if ((Sel=="eltau" || Sel=="WJetsCRElTau")&& eIndex > -1 && tIndex>-1){
 
       tauMass = tauV.M();
 
@@ -1079,7 +1079,6 @@ if (Mt2as>40 && Mt2as<120)
       //cout<<"  "<<mTB<<endl;
       //	double mTtrue = Lester::mTTrue(elV.M(), elV.Px(), elV.Py(), elV.Pz(), tauMass,tauV.Px(),tauV.Py(),tauV.Pz(),metx,mety, mintermediate);
       double Dr = elV.DeltaR(tauV);
-
 
       TLorentzVector DiL = elV + tauV;
       double dPhi=dPhiFrom2P( DiL.Px(), DiL.Py(), metx,  mety );
@@ -1138,6 +1137,7 @@ if (pzetavis !=0) dzetaR = pzetamiss/pzetavis;
       hDZetaFB[CutIndex]->Fill(dzeta,EvWeight);
       hDZetaR[CutIndex]->Fill(dzetaR,EvWeight);
       hDZetaRFB[CutIndex]->Fill(dzetaR,EvWeight);
+
       /*
 	hmet_DZeta_MT2lester[CutIndex]->Fill(met,dzeta,Mt2as,EvWeight);
 
@@ -1194,7 +1194,6 @@ if (pzetavis !=0) dzetaR = pzetamiss/pzetavis;
       */
 
 
-
       if (JetsV.size()>0){
 	double dPhiJT=dPhiFrom2P( JetsV.at(0).Px(), JetsV.at(0).Py(), tauV.Px(),  tauV.Py() );
 	hdPhiJ0Tau[CutIndex]->Fill(dPhiJT,EvWeight);
@@ -1211,7 +1210,7 @@ if (pzetavis !=0) dzetaR = pzetamiss/pzetavis;
 	hdR_taujet[CutIndex]->Fill(Drtj,EvWeight);
       }
 
-    }////////////end of eltau channe
+    }////////////end of eltau channel
 
 
     if (Sel=="muel" &&  eIndex >-1 &&  mIndex>-1){

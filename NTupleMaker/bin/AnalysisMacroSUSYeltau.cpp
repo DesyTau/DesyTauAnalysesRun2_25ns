@@ -914,6 +914,17 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	    histWeightsPDFDown->Fill(0.,analysisTree.genweight*analysisTree.weightPDFdown);
 
 	    lumi=true;
+       	    wScale0 = analysisTree.weightScale0;
+	    wScale1 = analysisTree.weightScale1;
+	    wScale2 = analysisTree.weightScale2;
+	    wScale3 = analysisTree.weightScale3;
+	    wScale4 = analysisTree.weightScale4;
+	    wScale5 = analysisTree.weightScale5;
+	    wScale6 = analysisTree.weightScale6;
+	    wScale7 = analysisTree.weightScale7;
+	    wScale8 = analysisTree.weightScale8;
+	    wPDFUp = analysisTree.weightPDFup;
+	    wPDFDown = analysisTree.weightPDFdown;
 	  }
 					
 
@@ -1253,6 +1264,11 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
  
        isoTau = analysisTree.tau_byIsolationMVArun2v1DBoldDMwLTraw[tau_index];
        ta_IsoFlag=analysisTree.tau_byTightIsolationMVArun2v1DBoldDMwLT[tau_index];
+       ta_IsoFlagVTight[0]=analysisTree.tau_byVTightIsolationMVArun2v1DBoldDMwLT[tau_index];
+       ta_IsoFlagTight[0]=analysisTree.tau_byTightIsolationMVArun2v1DBoldDMwLT[tau_index];
+       ta_IsoFlagMedium[0]=analysisTree.tau_byMediumIsolationMVArun2v1DBoldDMwLT[tau_index];
+       ta_IsoFlagLoose[0]=analysisTree.tau_byLooseIsolationMVArun2v1DBoldDMwLT[tau_index];
+       ta_IsoFlagVLoose[0]=analysisTree.tau_byVLooseIsolationMVArun2v1DBoldDMwLT[tau_index];
        //isoTau = analysisTree.tau_chargedIsoPtSum[tau_index];
        //ta_IsoFlag=analysisTree.tau_chargedIsoPtSum[tau_index];
 	}
@@ -1266,7 +1282,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
           ta_IsoFlag=analysisTree.tau_byMediumCombinedIsolationDeltaBetaCorr3Hits[tau_index];
 	}
 	
-     if (!tauPass) continue;
+//     if (!tauPass) continue;
 
       ta_relIso[0]= isoTauMin;
       el_relIso[0] = isoElecMin;
@@ -1455,6 +1471,9 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	matchedTauToElHadronDec = false;
 	matchedTauToMuHadronDec = false;
 	matchedTauToTauHadronDec = false;
+	matchedTauToGluon = false;
+	matchedTauToHFQ = false;
+	matchedTauToLFQ = false;
 	genTauDecayMode1=-1;
 	genTauDecayMode2=-1;
 	TLorentzVector genTauV;  
@@ -1470,17 +1489,16 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	  double Drr=deltaR(analysisTree.tau_eta[tau_index],analysisTree.tau_phi[tau_index],
 			    genTauV.Eta(), genTauV.Phi());
 
-
 	  if (Drr < 0.2 && ( analysisTree.gentau_isPrompt[gt] > 0.5  ) && genTauV.Pt() > 15. ) genTauMatched = true;
 	  if (genTauMatched && !FoundFirstMatchedTau) {genTauDecayMode1 = analysisTree.gentau_decayMode[gt]; FoundFirstMatchedTau = true;}
 	  if (genTauMatched && FoundFirstMatchedTau)   genTauDecayMode2 = analysisTree.gentau_decayMode[gt];
 
 	}
-      
+
       
 	  for (unsigned int igen=0; igen<analysisTree.genparticles_count; ++igen) {
 
-      		  if ( (abs(analysisTree.genparticles_pdgid[igen])==11 || abs(analysisTree.genparticles_pdgid[igen])==13 || abs(analysisTree.genparticles_pdgid[igen])==15)){
+      		  if ( (abs(analysisTree.genparticles_pdgid[igen])==11 || abs(analysisTree.genparticles_pdgid[igen])==13 || abs(analysisTree.genparticles_pdgid[igen])==15 || abs(analysisTree.genparticles_pdgid[igen])<6 || abs(analysisTree.genparticles_pdgid[igen])==21)){
 
 	  genLepV.SetXYZT(analysisTree.genparticles_px[igen], analysisTree.genparticles_py[igen], analysisTree.genparticles_pz[igen], analysisTree.genparticles_e[igen]);
 
@@ -1489,7 +1507,6 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
 	double DrTauLepton=deltaR(analysisTree.tau_eta[tau_index],analysisTree.tau_phi[tau_index],
 			  genLepV.Eta(),genLepV.Phi());
-
 
 		if (Drl < 0.2 && genLepV.Pt() > 8){
 //if ( abs(analysisTree.genparticles_pdgid[igen])==13)
@@ -1521,17 +1538,17 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
 		if ( abs(analysisTree.genparticles_pdgid[igen])==11 && analysisTree.genparticles_isPrompt[igen] > 0.5 ) matchedTauToPromptEl = true;
 		if ( abs(analysisTree.genparticles_pdgid[igen])==13 && analysisTree.genparticles_isPrompt[igen] > 0.5 ) matchedTauToPromptMu = true;
-		if ( abs(analysisTree.genparticles_pdgid[igen])==15 && analysisTree.genparticles_isPrompt[igen] > 0.5 ) matchedTauToPromptTau = true;
 		if ( abs(analysisTree.genparticles_pdgid[igen])==11 && analysisTree.gentau_isDirectPromptTauDecayProduct[igen] > 0.5 ) matchedTauToTauDecEl = true;
 		if ( abs(analysisTree.genparticles_pdgid[igen])==13 && analysisTree.gentau_isDirectPromptTauDecayProduct[igen] > 0.5 ) matchedTauToTauDecMu = true;
-		if ( abs(analysisTree.genparticles_pdgid[igen])==15 && analysisTree.gentau_isDirectPromptTauDecayProduct[igen] > 0.5 ) matchedTauToTauDecTau = true;
 		if ( abs(analysisTree.genparticles_pdgid[igen])==11 && analysisTree.gentau_isDirectHadronDecayProduct[igen] > 0.5 ) matchedTauToElHadronDec= true;
 		if ( abs(analysisTree.genparticles_pdgid[igen])==13 && analysisTree.gentau_isDirectHadronDecayProduct[igen] > 0.5 ) matchedTauToMuHadronDec= true;
-		if ( abs(analysisTree.genparticles_pdgid[igen])==11 && analysisTree.gentau_isDirectHadronDecayProduct[igen] > 0.5 ) matchedTauToTauHadronDec= true;
-			}
+		if ( abs(analysisTree.genparticles_pdgid[igen])==15 && analysisTree.gentau_isDirectHadronDecayProduct[igen] > 0.5 ) matchedTauToTauHadronDec= true;
+		}
+
 		}//loop for gen 11 13 15
       
 	  }
+      
       
       
       }//!isData
@@ -1665,6 +1682,8 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	int counter_cleaned_jets = 0;
 
 
+
+
       for (unsigned int jet=0; jet<analysisTree.pfjet_count; ++jet) {
 
 	if (fabs(analysisTree.pfjet_pt[jet])<ptJetCut) continue;
@@ -1681,15 +1700,25 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	if (!isPFJetId) continue;
 	bool cleanedJet = true;
 
-	double Dre=deltaR(analysisTree.electron_eta[el_index],analysisTree.electron_phi[el_index],
+	double Dr=deltaR(analysisTree.electron_eta[el_index],analysisTree.electron_phi[el_index],
 			  analysisTree.pfjet_eta[jet],analysisTree.pfjet_phi[jet]);
-	if (  Dre  < DRmax )  cleanedJet=false;
+	if (  Dr  < DRmax)  cleanedJet=false;
 
 
 	double Drr=deltaR(analysisTree.tau_eta[tau_index],analysisTree.tau_phi[tau_index],
 						  analysisTree.pfjet_eta[jet],analysisTree.pfjet_phi[jet]);
 
 	if ( Drr < DRmax) cleanedJet=false;
+
+
+		if (Drr < 0.5 && !genTauMatched && !isData) 
+		{
+			
+	     if (analysisTree.pfjet_flavour[jet] == 21) matchedTauToGluon = true;
+	     if (abs(analysisTree.pfjet_flavour[jet]) == 1 || abs(analysisTree.pfjet_flavour[jet]) == 5) matchedTauToHFQ = true;
+	     if (abs(analysisTree.pfjet_flavour[jet]) > 1 && abs(analysisTree.pfjet_flavour[jet]) < 5) matchedTauToLFQ = true;
+
+			}
 
 	if (!cleanedJet) continue;
 
@@ -1760,6 +1789,8 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
 
       }///loop in all jets
+
+
 
       njets = jets.size();
       jet_count = jets.size();
@@ -1918,18 +1949,6 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
      met_ey_UnclusteredEnDown = analysisTree.pfmetcorr_ey_UnclusteredEnDown;
 
 
-/*
-     float m = sqrt(met_ex*met_ex+met_ey*met_ey);
-     float m1 =sqrt(met_ex_JetEnUp*met_ex_JetEnUp+met_ey_JetEnUp*met_ey_JetEnUp);
-     float m2 =sqrt(met_ex_JetEnDown*met_ex_JetEnDown+met_ey_JetEnDown*met_ey_JetEnDown);
-
-
-cout<<"  ex  "<<met_ex<<"  "<<met_ey<<" exJU " <<met_ex_JetEnUp<<"  "<<met_ey_JetEnUp<<" exUncU "<<met_ex_UnclusteredEnUp<<"  "<<met_ey_UnclusteredEnUp<<endl;
-
-cout<<" "<<m<<"  "<<m1<<"  "<<m2<<endl;
-
-cout<<""<<endl;
-*/
       float genmet_ex = analysisTree.genmet_ex;
       float genmet_ey = analysisTree.genmet_ey;
 
@@ -1951,17 +1970,10 @@ cout<<""<<endl;
 
       genHT = analysisTree.genparticles_lheHt;
 
-       wScale0 = analysisTree.weightScale0;
-       wScale1 = analysisTree.weightScale1;
-       wScale2 = analysisTree.weightScale2;
-       wScale3 = analysisTree.weightScale3;
-       wScale4 = analysisTree.weightScale4;
-       wScale5 = analysisTree.weightScale5;
-       wScale6 = analysisTree.weightScale6;
-       wScale7 = analysisTree.weightScale7;
-       wScale8 = analysisTree.weightScale8;
-       wPDFUp = analysisTree.weightPDFup;
-       wPDFDown = analysisTree.weightPDFdown;
+
+       genHT = analysisTree.genparticles_lheHt;
+
+
       T->Fill();
 	
       selEvents++;

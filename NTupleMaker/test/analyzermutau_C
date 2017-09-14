@@ -294,6 +294,9 @@ TH2D *histo = (TH2D*) obj;
 		nb = fChain->GetEntry(jentry);   nbytes += nb;
 		float all_weights = 1.;
 
+		////////////////// IMPORTANT///////////////////
+		if (ta_IsoFlagTight[0] <0.5) continue;
+
 		bool isDYTauTau = false;
 		bool isDYll = false;
 		npart=npartons;
@@ -329,7 +332,7 @@ TH2D *histo = (TH2D*) obj;
 		if (npartons==2) is2partons++;
 		if (npartons==3) is3partons++;
 		if (npartons==4) is4partons++;
-
+/*
 		bool 	stitchflag = false;
 		
 		if (genHT<70 && genHT>0.) genHTlow++;
@@ -400,9 +403,9 @@ TH2D *histo = (TH2D*) obj;
 
 		if (!isHTz && !isHTa && !isHTb && !isHTc && !isHTd ) stitchflag = true;
 
-	
 
 	if (!stitchflag) continue;
+*/	
 
 
 		//cout<<" "<<jentry<<"  "<<" dataset "<<datasetName->c_str()<<"  partons "<<npartons<<" isW2part "<<isW2Part<<" genHT "<<genHT<<" isHTa "<<isHTa<<"  "<<isHTb<<"  "<<isHTc<<"  "<<isHTd<<" stitch "<<stitchflag<<endl;
@@ -517,6 +520,7 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
 		
 		//if (mu_relIso[0] > 0.5 && InvertLeptonIso && HighInvertLeptonIso) continue;
 		if (mu_relIso[0] > 0.3) continue;
+		
 
 		if ( fabs(mu_dz[muon_index]) > 0.2) continue;
 		if ( fabs(mu_dxy[muon_index]) > 0.045) continue;
@@ -613,6 +617,8 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
 		bool isfakeMuFromLFQ =  (  genLeptonMatchedLFQ >0.5 && !isData) ;
 
 
+		if ( isfakeTauFromJet && !isData) continue;
+
 		string tID="MVA_Tight";
 		double tauId = TauiD(channel,tID);
 		if (isRealTau && !isData) all_weights *= 0.95;
@@ -627,8 +633,6 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
 		//string WP = systematic;
 		double tfr  = TauFakeRate(ptTau1,etaTau1,channel,systematic);
 		if (!isRealTau && isfakeTauFromJet  && !isData) all_weights *= tfr;
-
-
 		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index,isSignal);
 		CFCounter[iCut]+= all_weights;
 		CFCounter_[iCut]+= all_weights;
@@ -801,12 +805,12 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
 
 		if ( fabs(mu_dz[muon_index]) > 0.04) continue;
 		if ( fabs(mu_dxy[muon_index]) > 0.02) continue;
-		if (ta_relIso[0] < 0.85) continue;
+	//	if (ta_relIso[0] < 0.85) continue;
 
-		if (fabs(dEta)>1.5 && !InvertLeptonIso) continue;
-		if (fabs(dEta)<2 && InvertLeptonIso) continue;
-		if (dPhiDiL<1.5) continue;
-		if (dPhiDiL>3.2) continue;
+	//	if (fabs(dEta)>1.5 && !InvertLeptonIso) continue;
+	//	if (fabs(dEta)<2 && InvertLeptonIso) continue;
+	//	if (dPhiDiL<1.5) continue;
+	//	if (dPhiDiL>3.2) continue;
 		if (Dr<2.) continue;
 		if (Dr>3.2 && !InvertLeptonIso) continue;
 		if (Dr<3.5 && InvertLeptonIso) continue;
