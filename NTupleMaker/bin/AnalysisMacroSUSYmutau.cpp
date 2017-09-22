@@ -428,6 +428,8 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	  if (string::npos != datasetName.find("C1N2")) {
 			  if (abs(analysisTree.genparticles_pdgid[igen])==1000024 && abs(analysisTree.genparticles_status[igen])==62) BlobA = genLV;
 	  		  if (analysisTree.genparticles_pdgid[igen]==1000023 && abs(analysisTree.genparticles_status[igen])==62) BlobB = genLV;
+
+//			  cout<<"   BlobA "<<BlobA.Pt()<<"  BlobB  "<<BlobB.Pt()<<endl;
 			  }
 
 	  if (string::npos != datasetName.find("C1C1") || string::npos != datasetName.find("Chi")) {
@@ -435,9 +437,13 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	  		  if (analysisTree.genparticles_pdgid[igen]==-1000024 && abs(analysisTree.genparticles_status[igen])==62) BlobB = genLV;
 			  }
 
-	  if (string::npos != datasetName.find("stau")) {
+	  if (string::npos != datasetName.find("left")) {
 			  if (analysisTree.genparticles_pdgid[igen]==1000015 && abs(analysisTree.genparticles_status[igen])==62) BlobA = genLV;
 	  		  if (analysisTree.genparticles_pdgid[igen]==-1000015 && abs(analysisTree.genparticles_status[igen])==62) BlobB = genLV;
+			  }
+	  if (string::npos != datasetName.find("right")) {
+			  if (analysisTree.genparticles_pdgid[igen]==2000015 && abs(analysisTree.genparticles_status[igen])==62) BlobA = genLV;
+	  		  if (analysisTree.genparticles_pdgid[igen]==-2000015 && abs(analysisTree.genparticles_status[igen])==62) BlobB = genLV;
 			  }
 
 	}

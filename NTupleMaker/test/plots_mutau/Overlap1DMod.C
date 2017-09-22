@@ -48,14 +48,15 @@ string sign2_="stau";
 void Impose( TDirectory *ttarget, TList *ssourcelist, string &np_legend , vector<string> titles_ ,vector<float> xsecs);
 void Impose (TList * sourcel, string & np_title, vector<string> title,vector<float> xsecs, TString &variable, string &syst, string &region);
 void ModifyHist (TH1D* &h1, int cl ,float & lumi_,float & weight_,string & title, bool norm=false);
+TH1D* ModifyBins (TH1D* &h1, int cl);
 void CheckHist (TH1D* &h1);
-void CheckHistZero (TH1D* &h1);
+void CheckHistZero (TH1D* &h1, bool iszero=false);
 void OverFlow (TH1D* &h, int bin);
 void Unroll(TH1D *&hist,TH2D *& hist2D,char *& histName);
 
 const int mycolor=TColor::GetColor("#ffcc66");
 const int mycolorvv=TColor::GetColor("#8646ba");
-const int mycolorqcd=TColor::GetColor("#ffccff");
+const int mycolorfakes=TColor::GetColor("#ffccff");
 const int mycolortt=TColor::GetColor("#9999cc");
 const int mycolorttx=TColor::GetColor("#33CCFF");
 const int mycolorwjet=TColor::GetColor("#de5a6a");
@@ -69,7 +70,7 @@ const int mycolorww=TColor::GetColor("#C390D4");
 const int mycolor=TColor::GetColor("#ffcc66");
 const int mycolorvv=TColor::GetColor("#6F2D35");
 //int mycolorvv=TColor::GetColor("#FF6633");
-int mycolorqcd=TColor::GetColor("#ffccff");
+int mycolorfakes=TColor::GetColor("#ffccff");
 int mycolortt=TColor::GetColor("#9999cc");
 //int mycolorttx=TColor::GetColor("#bbccdd");
 int mycolorttx=TColor::GetColor("#33CCFF");
@@ -86,7 +87,7 @@ TH1D* WInclw,*W1Jw,*W2Jw,*W3Jw,*W4Jw;
 TH1D* DYInclw,*DY1Jw,*DY2Jw,*DY3Jw,*DY4Jw;
 
 
-void Overlap1DMod(string syst="Nominal", string reg="SR")
+void Overlap1DMod(string syst="Nominal", string reg="SR_CR1")
 {
 
 	gROOT->SetStyle ("Plain");
@@ -104,7 +105,7 @@ void Overlap1DMod(string syst="Nominal", string reg="SR")
 	Float_t value=0;
 	vector<float> xsecs_;
 	signal_names.clear();
-	ifstream ifs("datasets2D_ChiWH_"+reg);
+	ifstream ifs("datasets2D_C1N2_"+reg);
 	string channel="mutau";
 	string dirr="/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/CMSSW_8_0_20/src/DesyTauAnalyses/NTupleMaker/test/plots_"+channel+"/";
 	dirr="";
@@ -212,6 +213,7 @@ void Overlap1DMod(string syst="Nominal", string reg="SR")
 				TString app_;
 				if (syst != "Nominal") app_="";
 				else app_="_"+syst;;
+				app_="";
 								
 					WInclname = "WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"+app_+"_B.root";
 					W1Jname = "W1JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"+app_+"_B.root";
@@ -282,7 +284,7 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 //		cout<<" HERE is some signal  ===============================================  "<<signal_names[kk]<<"  "<<signalnames[kk]<<endl;
 //	}
 
-	TH1D* allbkg, *htt,*hstop,*hwj,*hdyj,*hztt,*hdib, *hww,*hqcd,*httx;
+	TH1D* allbkg, *htt,*hstop,*hwj,*hdyj,*hztt,*hdib, *hww,*hfakes,*httx,*hrest;
 	THStack *hs;
 	TFile *first_source = (TFile *) sourcelist->First ();
 	first_source->cd (Channel);
@@ -347,7 +349,8 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 
 			TH1D* h1 = (TH1D*) obj;
 
-			ModifyHist (h1,1,Lumi,lumiweights[0],titles[0],norm_);
+			ModifyHist (h1,1,Lumi,lumiweights[0],titles[0],norm_);;
+			//h1=ModifyBins (h1,56);
 			TFile *nextsource = (TFile *) sourcelist->After (first_source);
 
 			int cl, countsignal;
@@ -367,7 +370,7 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 			string cc1="C1";
 
 
-			cout<<" ==================================== now the weights..... "<<WInclw->GetSumOfWeights()<<"  "<<W1Jw->GetSumOfWeights()<<"   "<<W2Jw->GetSumOfWeights()<<"  "<<W3Jw->GetSumOfWeights()<<"  "<<W4Jw->GetSumOfWeights()<<endl;
+			cout<<" ==================================== now the weights..... "<<WInclw->GetSumOfWeights()<<"  "<<W1Jw->GetSumOfWeights()<<"   "<<W2Jw->GetSumOfWeights()<<"  "<<W3Jw->GetSumOfWeights()<<"  "<<W4Jw->GetSumOfWeights()<<"        "<<hh[1]->GetNbinsX()<<endl;
 			while (nextsource) {
 
 			string fname= nextsource->GetName();
@@ -448,6 +451,7 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 
 					h2 = (TH1D*) key2->ReadObj ();
 					ModifyHist (h2, cl,Lumi,lumiweights[cl-1],titles[cl-1],norm_);
+					//h2=ModifyBins (h2,56);
 					h2->SetStats(0);
 					hh[cl] = h2;
 
@@ -462,7 +466,8 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 						hztt  = (TH1D*) h2->Clone();
 						hdib  = (TH1D*) h2->Clone();
 						hww  = (TH1D*) h2->Clone();
-						hqcd  = (TH1D*) h2->Clone();
+						hfakes  = (TH1D*) h2->Clone();
+						hrest  = (TH1D*) h2->Clone();
 
 						htt->Reset();
 						httx->Reset();
@@ -471,8 +476,9 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 						hztt->Reset();
 						hwj->Reset();
 						hdib->Reset();
+						hrest->Reset();
 						hww->Reset();
-						hqcd->Reset();
+						hfakes->Reset();
 
 
 					}
@@ -482,34 +488,35 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 					string  hn_ = obj->GetName();
 					cout<<"  "<<fname<<endl;
 
+
+
 						if (std::string::npos != fname.find(sn) || std::string::npos != fname.find(cc1) || std::string::npos != fname.find(sdata) ||  std::string::npos != fname.find(sdata2)  )
 							flagg=true;
 
 
 						string  title_ = fname;
-
+////////////////hrest includes single-top VV
 						if (!flagg)
 						{
-			if (std::string::npos != title_.find("JetsToLNu"))  { col=mycolorwjet ; hwj->Add(h2,1); hwj->SetLineColor(col);}
+			if (std::string::npos != title_.find("JetsToLNu") && std::string::npos == title_.find("TTWJetsToLNu"))  { col=mycolorwjet ; hwj->Add(h2); hwj->SetLineColor(col);hrest->Add(h2);}
 			if (std::string::npos != title_.find("TT_TuneCUETP8M2T4_13TeV-powheg-pythia8") || std::string::npos != title_.find("TTPow")) { col=kBlue;col= mycolortt;htt->Add(h2); htt->SetLineColor(col) ;}
-			if (std::string::npos != title_.find("QCD"))  {col= mycolorqcd;hqcd->Add(h2,1); hqcd->SetLineColor(col); }
+			if (std::string::npos != title_.find("Fakes"))  {col= mycolorfakes;hfakes->Add(h2,1); hfakes->SetLineColor(col); }
 
 			if (std::string::npos != title_.find("JetsToLL") && std::string::npos == title_.find("isZTT"))  {col= mycolordyj;hdyj->Add(h2); hdyj->SetLineColor(col);}
 			if (std::string::npos != title_.find("isZTT"))  {col= mycolorztt;hztt->Add(h2); hztt->SetLineColor(col);}
-			if (std::string::npos != title_.find("ST_") || std::string::npos != title_.find("channel") )  {col= mycolortt; hstop->Add(h2);hstop->SetLineColor(col);}
+			if (std::string::npos != title_.find("ST_") || std::string::npos != title_.find("channel") )  {col= mycolortt; hstop->Add(h2);hstop->SetLineColor(col); }
 
-			if (  ( std::string::npos != title_.find("WW") || std::string::npos != title_.find("ZZ") ||  std::string::npos != title_.find("WZ") || std::string::npos != title_.find("WG") || std::string::npos != title_.find("ZG")) &&  std::string::npos == title_.find("WWTo") )  {col=mycolorvv; hdib->Add(h2) ; hdib->SetLineColor(col);}
+			if (  ( std::string::npos != title_.find("WW") || std::string::npos != title_.find("ZZ") ||  std::string::npos != title_.find("WZ") || std::string::npos != title_.find("WG") || std::string::npos != title_.find("ZG")) &&  std::string::npos == title_.find("WWTo") )  {col=mycolorvv; hdib->Add(h2) ; hdib->SetLineColor(col); hrest->Add(h2);}
 
-			if ( std::string::npos != title_.find("WWTo"))  {col=mycolorww; hww->Add(h2); hww->SetLineColor(col);}
+			if ( std::string::npos != title_.find("WWTo"))  {col=mycolorww; hww->Add(h2); hww->SetLineColor(col); }
 
 
-			if ( std::string::npos != title_.find("TTW") || std::string::npos != title_.find("TTZ") || std::string::npos != title_.find("tZ") || std::string::npos != title_.find("TG") || std::string::npos != title_.find("tG")  || std::string::npos != title_.find("ttW")  || std::string::npos != title_.find("TTT_") ) {col=mycolorttx ;httx->Add(h2);   httx->SetLineColor(col);}
-
+			if ( std::string::npos != title_.find("TTW") || std::string::npos != title_.find("TTZ") || std::string::npos != title_.find("tZ") || std::string::npos != title_.find("TG") || std::string::npos != title_.find("tG")  || std::string::npos != title_.find("ttW")  || std::string::npos != title_.find("TTT_") ) {col=mycolorttx ;httx->Add(h2);   httx->SetLineColor(col); hrest->Add(h2); }
 
 
 						//	cout<<" will add histogram "<<h2->GetName()<< " for "<<titles[cl-1]<<"  "<<fname<<"  cl  "<<cl<<endl;
 							hs->Add(h2);
-							//allbkg->Add(h2,1);
+							allbkg->Add(h2);
 						}
 
 				}
@@ -529,8 +536,9 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 		TH1D* htest_dyj;
 		TH1D* htest_ztt;
 		TH1D* htest_dib;
+		TH1D* htest_rest;
 		TH1D* htest_stop;
-		TH1D* htest_qcd;
+		TH1D* htest_fakes;
 		TH1D* htest_ttx;
 		TH1D* htest_signal;
 		TH1D* htest_signal2;
@@ -558,8 +566,8 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 				string str = ssB.str();
 				
 				//if (MaxEventsBin<10000) lumistring = lumistring+"_"+str+"MaxEvntsBin_";
-				if (syst!="Nominal") smFilename =  region+"/Templ_"+variable+"_"+lumistring+"_mt_ChiWH_"+region+"_"+syst+".root";
-					else smFilename =  region+"/Templ_"+variable+"_"+lumistring+"_mt_ChiWH_"+region+".root";
+				if (syst!="Nominal") smFilename =  region+"/Templ_"+variable+"_"+lumistring+"_mt_C1N2_"+region+"_"+syst+".root";
+					else smFilename =  region+"/Templ_"+variable+"_"+lumistring+"_mt_C1N2_"+region+".root";
 
 				if (syst!="Nominal") 
 					variable=variable+"_"+syst;
@@ -580,15 +588,15 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 				s1 = "data_obsMC_" + variable;
 				//s1 = "data_obsMC";
 				allbkg->SetName(s1);
-				cout<<" Total Integral before scaling up - "<<allbkg->GetSumOfWeights()<<" Data "<<variable<<" data "<<hh[1]->GetSumOfWeights()<<" tt "<<
+				cout<<" Total Integral before scaling up - "<<allbkg->GetSumOfWeights()<<" Data "<<variable<<" data "<<hh[1]->GetSumOfWeights()<<" data Entries  "<<hh[1]->GetEntries()<<" tt "<<
 					htt->GetSumOfWeights()<<" dy "<<hdyj->GetSumOfWeights()<<" wj "<<hwj->GetSumOfWeights()<<" stop "<<hstop->GetSumOfWeights()<<
-					" dib "<<hdib->GetSumOfWeights()<<" ww "<<hww->GetSumOfWeights()<<" qcd "<<hqcd->GetSumOfWeights()<<" ttx "<<httx->GetSumOfWeights()<<endl;
+					" dib "<<hdib->GetSumOfWeights()<<" ww "<<hww->GetSumOfWeights()<<" fakes "<<hfakes->GetSumOfWeights()<<" ttx "<<httx->GetSumOfWeights()<<endl;
 	if(b_scale)		allbkg->Scale(scale);
 				cout<<" Total Integral after scaling up - "<<allbkg->GetSumOfWeights()<<"  "<<variable<<"  all_  "<<all_->GetSumOfWeights()<<endl;
 				allbkg->Write();
 			
 				CheckHist(all_);
-				CheckHistZero(all_);
+				//CheckHistZero(all_);
 				ofstream tfile;
 				TString textfilename ="bins_"+region;
 				vector <int> keep_bin;keep_bin.clear();
@@ -648,9 +656,11 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 
 
 				 }
-
 				const int sb_ = keep_bin.size();
 				cout<<" in total "<<sb_<<" bins "<<endl;
+						
+						
+				//for (int ib=1;ib<=hfakes->GetNbinsX();ib++) cout<<"  FAKESSSSSSSSSSSSS  AGAIN    "<<ib<<"  "<<hfakes->GetXaxis()->GetBinLabel(ib)<<"   "<<hfakes->GetBinContent(ib)<<"  "<<hfakes->GetBinError(ib)<<endl;
 
 				htest_tt = new TH1D (htt->GetName(),htt->GetTitle(),sb_,1,sb_+1);
 				htest_wj = new TH1D (hwj->GetName(),hwj->GetTitle(),sb_,1,sb_+1);
@@ -658,8 +668,9 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 				htest_ztt = new TH1D (hztt->GetName(),hztt->GetTitle(),sb_,1,sb_+1);
 				htest_stop = new TH1D (hstop->GetName(),hstop->GetTitle(),sb_,1,sb_+1);
 				htest_dib = new TH1D (hdib->GetName(),hdib->GetTitle(),sb_,1,sb_+1);
+				htest_rest = new TH1D (hrest->GetName(),hrest->GetTitle(),sb_,1,sb_+1);
 				htest_ww = new TH1D (hww->GetName(),hww->GetTitle(),sb_,1,sb_+1);
-				htest_qcd = new TH1D (hqcd->GetName(),hqcd->GetTitle(),sb_,1,sb_+1);
+				htest_fakes = new TH1D (hfakes->GetName(),hfakes->GetTitle(),sb_,1,sb_+1);
 				htest_ttx = new TH1D (httx->GetName(),httx->GetTitle(),sb_,1,sb_+1);
 				htest_data = new TH1D (hh[1]->GetName(),hh[1]->GetTitle(),sb_,1,sb_+1);
 
@@ -670,7 +681,7 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 				htest_ztt->SetBinContent(nbb+1,0.);
 				htest_stop->SetBinContent(nbb+1,0.);
 				htest_dib->SetBinContent(nbb+1,0.);
-				htest_qcd->SetBinContent(nbb+1,0.);
+				htest_fakes->SetBinContent(nbb+1,0.);
 				htest_ttx->SetBinContent(nbb+1,0.);
 				htest_data->SetBinContent(nbb+1,0.);
 						
@@ -680,10 +691,23 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 				htest_ztt->SetBinContent(nbb+1,hztt->GetBinContent(keep_bin[nbb]));
 				htest_stop->SetBinContent(nbb+1,hstop->GetBinContent(keep_bin[nbb]));
 				htest_dib->SetBinContent(nbb+1,hdib->GetBinContent(keep_bin[nbb]));
+				htest_rest->SetBinContent(nbb+1,hrest->GetBinContent(keep_bin[nbb]));
 				htest_ww->SetBinContent(nbb+1,hww->GetBinContent(keep_bin[nbb]));
-				htest_qcd->SetBinContent(nbb+1,hqcd->GetBinContent(keep_bin[nbb]));
+				htest_fakes->SetBinContent(nbb+1,hfakes->GetBinContent(keep_bin[nbb]));
 				htest_ttx->SetBinContent(nbb+1,httx->GetBinContent(keep_bin[nbb]));
 				htest_data->SetBinContent(nbb+1,hh[1]->GetBinContent(keep_bin[nbb]));
+
+				htest_tt->SetBinError(nbb+1,htt->GetBinError(keep_bin[nbb]));
+				htest_wj->SetBinError(nbb+1,hwj->GetBinError(keep_bin[nbb]));
+				htest_dyj->SetBinError(nbb+1,hdyj->GetBinError(keep_bin[nbb]));
+				htest_ztt->SetBinError(nbb+1,hztt->GetBinError(keep_bin[nbb]));
+				htest_stop->SetBinError(nbb+1,hstop->GetBinError(keep_bin[nbb]));
+				htest_dib->SetBinError(nbb+1,hdib->GetBinError(keep_bin[nbb]));
+				htest_rest->SetBinError(nbb+1,hrest->GetBinError(keep_bin[nbb]));
+				htest_ww->SetBinError(nbb+1,hww->GetBinError(keep_bin[nbb]));
+				htest_fakes->SetBinError(nbb+1,hfakes->GetBinError(keep_bin[nbb]));
+				htest_ttx->SetBinError(nbb+1,httx->GetBinError(keep_bin[nbb]));
+				htest_data->SetBinError(nbb+1,hh[1]->GetBinError(keep_bin[nbb]));
 			
 				TString lab_ = label_bin[nbb].c_str();
 				if (syst =="Nominal"){
@@ -696,7 +720,7 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 				htest_stop->GetXaxis()->SetBinLabel(nbb+1,lab_);
 				htest_dib->GetXaxis()->SetBinLabel(nbb+1,lab_);
 				htest_ww->GetXaxis()->SetBinLabel(nbb+1,lab_);
-				htest_qcd->GetXaxis()->SetBinLabel(nbb+1,lab_);
+				htest_fakes->GetXaxis()->SetBinLabel(nbb+1,lab_);
 				htest_ttx->GetXaxis()->SetBinLabel(nbb+1,lab_);
 				*/
 				htest_data->GetXaxis()->SetBinLabel(nbb+1,lab_);
@@ -712,8 +736,9 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 				hztt->Reset();
 				hstop->Reset();
 				hdib->Reset();
+				hrest->Reset();
 				hww->Reset();
-				hqcd->Reset();
+				hfakes->Reset();
 				httx->Reset();
 				hh[1]->Reset();
 
@@ -723,30 +748,37 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 				hwj = (TH1D* )htest_wj->Clone();
 				hstop = (TH1D* )htest_stop->Clone();
 				hdib = (TH1D* )htest_dib->Clone();
+				hrest = (TH1D* )htest_rest->Clone();
 				hww = (TH1D* )htest_ww->Clone();
-				hqcd = (TH1D* )htest_qcd->Clone();
+				hfakes = (TH1D* )htest_fakes->Clone();
 				httx = (TH1D* )htest_ttx->Clone();
 				hh[1] = (TH1D* )htest_data->Clone();
-
-				CheckHistZero(htt);
-				CheckHistZero(hdyj);
-				CheckHistZero(hztt);
-				CheckHistZero(hwj);
-				CheckHistZero(hstop);
-				CheckHistZero(hdib);
-				CheckHistZero(hww);
-				CheckHistZero(hqcd);
-				CheckHistZero(httx);
+			
+				bool isnom = false;/*
+				if (syst=="Nominal") isnom=true;
+				CheckHistZero(htt, isnom);
+				CheckHistZero(hdyj,isnom);
+				CheckHistZero(hztt,isnom);
+				CheckHistZero(hwj,isnom);
+				CheckHistZero(hstop,isnom);
+				CheckHistZero(hdib,isnom);
+				CheckHistZero(hrest,isnom);
+				CheckHistZero(hww,isnom);
+				CheckHistZero(hfakes,isnom);
+				CheckHistZero(httx,isnom);
 				//CheckHistZero(hh[1]);
 				
+				//CheckHistZero(hfakes,true);
+*/
 				htt->SetLineColor(mycolortt);
 				hwj->SetLineColor(mycolorwjet);
 				hdyj->SetLineColor(mycolordyj);
 				hztt->SetLineColor(mycolorztt);
 				hstop->SetLineColor(mycolortt);
 				hdib->SetLineColor(mycolorvv);
+				hrest->SetLineColor(mycolorvv);
 				hww->SetLineColor(mycolorww);
-				hqcd->SetLineColor(mycolorqcd);
+				hfakes->SetLineColor(mycolorfakes);
 				httx->SetLineColor(mycolortt);
 				hh[1]->SetLineColor(kBlack);
 
@@ -757,7 +789,7 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 				allnew_ ->Add(hstop);
 				allnew_ ->Add(hdib);
 				allnew_ ->Add(hww);
-				allnew_ ->Add(hqcd);
+				allnew_ ->Add(hfakes);
 				allnew_ ->Add(httx);
 
 				float sum_=0;float ss=0;
@@ -770,7 +802,7 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 				sum_ += hstop->GetBinContent(nbb+1);	
 				sum_ += hdib->GetBinContent(nbb+1);	
 				sum_ += hww->GetBinContent(nbb+1);	
-				sum_ += hqcd->GetBinContent(nbb+1);	
+				sum_ += hfakes->GetBinContent(nbb+1);	
 				sum_ += httx->GetBinContent(nbb+1);	
 				
 				ss += htt->GetBinContent(nbb+1);
@@ -795,8 +827,9 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 				hztt->Scale(scale);
 				hstop->Scale(scale);
 				hdib->Scale(scale);
+				hrest->Scale(scale);
 				hww->Scale(scale);
-				hqcd->Scale(scale);
+				hfakes->Scale(scale);
 				httx->Scale(scale);
 	 }
 /*
@@ -808,63 +841,71 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 				hstop->SetMinimum(0.1);
 				hdib->SetMinimum(0.1);
 				hww->SetMinimum(0.1);
-				hqcd->SetMinimum(0.1);
+				hfakes->SetMinimum(0.1);
 */
 				s1 = "tt_"+variable;
-				CheckHistZero(htt);
+				//CheckHistZero(htt);
 				htt->SetLineColor(kBlack);
 				htt->SetName(s1);
 				htt->Write();
 
 				s1 = "wj_"+variable;
-				CheckHistZero(hwj);
+				//CheckHistZero(hwj);
 				hwj->SetLineColor(kBlack);
 				hwj->SetName(s1);
 				hwj->Write();
 
 				s1 = "dyj_"+variable;
-				CheckHistZero(hdyj);
+				//CheckHistZero(hdyj);
 				hdyj->SetLineColor(kBlack);
 				hdyj->SetName(s1);
 				hdyj->Write();
 
 				s1 = "ztt_"+variable;
-				CheckHistZero(hztt);
+				//CheckHistZero(hztt);
 				hztt->SetLineColor(kBlack);
 				hztt->SetName(s1);
 				hztt->Write();
 
 				s1 = "sT_"+variable;
-				CheckHistZero(hstop);
+				//CheckHistZero(hstop);
 				hstop->SetLineColor(kBlack);
 				hstop->SetName(s1);
 				hstop->Write();
 
 				s1 = "dib_"+variable;
-				CheckHistZero(hdib);
+				//CheckHistZero(hdib);
 				hdib->SetLineColor(kBlack);
 				hdib->SetName(s1);
 				hdib->Write();
 
+				s1 = "rest_"+variable;
+				//CheckHistZero(hdib);
+				hrest->SetLineColor(kBlack);
+				hrest->SetName(s1);
+				hrest->Write();
+
 				s1 = "ww_"+variable;
-				CheckHistZero(hww);
+				//CheckHistZero(hww);
 				hww->SetLineColor(kBlack);
 				hww->SetName(s1);
 				hww->Write();
 
 				s1 = "ttx_"+variable;
-				CheckHistZero(httx);
+				//CheckHistZero(httx);
 				httx->SetLineColor(kBlack);
 				httx->SetName(s1);
 				httx->Write();
 
-				s1 = "qcd_"+variable;
-				CheckHistZero(hqcd);
-				hqcd->SetLineColor(kBlack);
-				hqcd->SetName(s1);
-				hqcd->Write();
-				cout<<" Adding qcd ================= "<<hqcd->GetSumOfWeights()<<endl;
+				s1 = "fakes_"+variable;
+				//CheckHistZero(hfakes);
+				hfakes->SetLineColor(kBlack);
+				hfakes->SetName(s1);
+				hfakes->Write();
+				cout<<" Adding fakes ================= "<<hfakes->GetSumOfWeights()<<endl;
 
+				//for (int ib=1;ib<=hfakes->GetNbinsX();ib++) cout<<"  FAKESSSSSSSSSSSSS  AGAIN    "<<ib<<"  "<<hfakes->GetXaxis()->GetBinLabel(ib)<<"   "<<hfakes->GetBinContent(ib)<<"  "<<hfakes->GetBinError(ib)<<endl;
+				//for (int ib=1;ib<=hfakes->GetNbinsX();ib++) cout<<"  FAKESSSSSSSSSSSSS  AGAIN    "<<ib<<"  "<<hfakes->GetXaxis()->GetBinLabel(ib)<<"   "<<htt->GetBinContent(ib)<<"  "<<htt->GetBinError(ib)<<endl;
 				s1 = "data_obs_"+variable;
 				hh[1]->SetMinimum(0.1);
 				hh[1]->SetLineColor(kBlack);
@@ -879,7 +920,7 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 				hh[1]->SetName(s1);
 				hh[1]->Write();
 
-				cout<<" comparing MC to data  , syst "<<syst<<"  MC "<<allnew_->GetSumOfWeights()<<"  data  "<<hh[1]->GetSumOfWeights()<<" tt "<<htt->GetSumOfWeights()<<"  "<<" wj "<<hwj->GetSumOfWeights()<<" dyj "<<hdyj->GetSumOfWeights()+hztt->GetSumOfWeights()<<" qcd "<<hqcd->GetSumOfWeights()<<" sT "<<hstop->GetSumOfWeights()<<" dib "<<hdib->GetSumOfWeights()<<" ttx "<<httx->GetSumOfWeights()<<" ww "<<hww->GetSumOfWeights()<<endl;
+				cout<<" comparing MC to data  , syst "<<syst<<"  MC "<<allnew_->GetSumOfWeights()<<"  data  "<<hh[1]->GetSumOfWeights()<<" tt "<<htt->GetSumOfWeights()<<"  "<<" wj "<<hwj->GetSumOfWeights()<<" dyj "<<hdyj->GetSumOfWeights()+hztt->GetSumOfWeights()<<" fakes "<<hfakes->GetSumOfWeights()<<" sT "<<hstop->GetSumOfWeights()<<" dib "<<hdib->GetSumOfWeights()<<" ttx "<<httx->GetSumOfWeights()<<" ww "<<hww->GetSumOfWeights()<<endl;
 
 				for (unsigned int ij=0;ij<signal_names.size();++ij){
 					//cout<<" again  "<<signal_names[ij]<<endl;
@@ -897,6 +938,7 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 
 					TString ss1 = str.c_str();
 					s1 = ss1 +"_"+variable;
+
 	if(b_scale)			hh[ij+2]->Scale(scale);
 					hh[ij+2]->SetLineColor(kBlue);
 					smFile->cd();
@@ -906,6 +948,7 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 
 				for (int nbb=0;nbb<keep_bin.size();++nbb){
 					htest_signal->SetBinContent(nbb+1,hh[ij+2]->GetBinContent(keep_bin[nbb]));
+					htest_signal->SetBinError(nbb+1,hh[ij+2]->GetBinError(keep_bin[nbb]));
 					htest_signal->GetXaxis()->SetBinLabel(nbb+1,label_bin[nbb].c_str());
 
 //			float sing =  htest_signal->GetSumOfWeights()/sqrt(hh[1]->GetSumOfWeights());
@@ -914,6 +957,7 @@ Impose (TList * sourcelist, string & np_title_, vector<string> titles,vector<flo
 				htest_signal->SetName(s1);
 				htest_signal->SetMarkerColor(kBlue);
 				htest_signal->SetLineColor(kBlue);
+				//cout<<" CHECKHISTZERO============================= SIGNAL  "<<endl;
 				//CheckHistZero(htest_signal);
 				htest_signal->Write();
 				}///end in signals
@@ -952,8 +996,13 @@ ModifyHist (TH1D* &h, int cl_ ,float & lumi,float & weight,string & title_, bool
 
 	h->GetXaxis()->SetTitleOffset(0.8);
 	h->GetYaxis()->SetTitleOffset(1.5);
-			
+		
+		
+			//if ( std::string::npos != title_.find("tau") || std::string::npos != title_.find("C1") || std::string::npos != title_.find("SMS") || std::string::npos != title_.find("Chi"))
+			//	cout<<" before scaling  ================================ "<<h->GetBinContent(6)<<"  "<<h->GetBinError(6)<<"  "<<weight<<endl;
 	h->Scale(weight);
+			//if ( std::string::npos != title_.find("tau") || std::string::npos != title_.find("C1") || std::string::npos != title_.find("SMS") || std::string::npos != title_.find("Chi"))
+			//	cout<<" after scaling  ================================ "<<h->GetBinContent(6)<<"  "<<h->GetBinError(6)<<"  "<<h->GetNbinsX()<<endl;
 	int col=cl_;
 
 			if (std::string::npos != title_.find("Data") || std::string::npos != title_.find("Single") || std::string::npos != title_.find("MuonEG")  )  {
@@ -982,9 +1031,9 @@ ModifyHist (TH1D* &h, int cl_ ,float & lumi,float & weight,string & title_, bool
 			}
 
 
-			if (std::string::npos != title_.find("JetsToLNu") )  { col=mycolorwjet ;}
+			if (std::string::npos != title_.find("JetsToLNu") && std::string::npos == title_.find("TTWJetsToLNu"))  { col=mycolorwjet ;}
 			if (std::string::npos != title_.find("TT_TuneCUETP8M2T4_13TeV-powheg-pythia8") || std::string::npos != title_.find("TTPow")) { col= mycolortt; }
-			if (std::string::npos != title_.find("QCD"))  {col= mycolorqcd; }
+			if (std::string::npos != title_.find("Fakes"))  {col= mycolorfakes; h->SetEntries(h->GetSumOfWeights());}
 
 			if (std::string::npos != title_.find("JetsToLL") && std::string::npos == title_.find("isZTT"))  {col= mycolordyj;}
 			if (std::string::npos != title_.find("isZTT"))  {col= mycolorztt;}
@@ -1028,24 +1077,90 @@ CheckHist (TH1D* &h)
 
 
 void
-CheckHistZero (TH1D* &h)
+CheckHistZero (TH1D* &h, bool isNominal=false)
 {
-
-
-			for (int nb=0;nb<=h->GetNbinsX();++nb)
-			{
-				float bc_ = h->GetBinContent(nb);
-		//	if (bc_ <=0.) cout<<" ======================================== NB with small entries  "<<h->GetBinError(nb)<<"  "<<h->GetBinContent(nb)<<"  "<<h->GetName()<<endl;
+			float ww =0;
 			float SoW = h->GetSumOfWeights();
 			int En = h->GetEntries();
-			if (bc_ <=0.) { h->SetBinContent(nb,0.001);h->SetBinError(nb,float(SoW/En));}
-			//if (bc_ <=0.) { h->SetBinContent(nb,0.01);h->SetBinError(nb,0.01);}
-			//if (bc_ <=0.) h->SetBinError(nb,0.001);
+			for (int nb=1;nb<=h->GetNbinsX();++nb)
+			//ww+=h->GetSumw2()->At(nb);
+
+			for (int nb=1;nb<=h->GetNbinsX();++nb)
+			{
+				float bc_ = h->GetBinContent(nb);
+
+			  if (isNominal){
+				if (float(h->GetBinContent(nb)) < float(h->GetBinError(nb))){
+				h->SetBinContent(nb,(h->GetBinContent(nb)+ h->GetBinError(nb))/2);
+				h->SetBinError(nb,(h->GetBinContent(nb)+ h->GetBinError(nb))/2);
+		//cout<<" ======================================== entering  NB with small entries  iBin "<<nb<<"  error "<<h->GetBinError(nb)<<" BinCont "<<h->GetBinContent(nb)<<"  "<<h->GetName()<<"  "<<h->GetEntries()<<endl;
+				}
+			  }
+			//if (bc_ <=0.01) { h->SetBinContent(nb,0.01);}
+			//En = SoW*SoW/ww;
+//			if (bc_ <=0. && !isNominal) { h->SetBinContent(nb,0.001);h->SetBinError(nb,float(SoW/En));}
+//			if (bc_ <=0. && isNominal) { h->SetBinContent(nb,0.7);h->SetBinError(nb,0.7);}
+
 			}
+
+			 TGraphAsymmErrors * g = new TGraphAsymmErrors(h);
+			 const double alpha = 1 - 0.6827;
+
+			  if (isNominal){
+ 			   for (int i = 1; i < h->GetNbinsX()+1; ++i) {
+			       //float N = g->GetY()[i];
+				float bc_ = h->GetBinContent(i);
+			       float N=bc_;
+			       //float N=SoW/En;
+	if (bc_ <=4)	{	
+			       double L =  (N==0) ? 0  : (ROOT::Math::gamma_quantile(alpha/2,N,1.));
+			       double U =  ROOT::Math::gamma_quantile_c(alpha/2,N+1,1) ;
+			       g->SetPointEYlow(i, N-L);
+			       g->SetPointEYhigh(i, U-N);
+
+//		cout<<" ======================================== NB with small entries  iBin "<<i<<"  error "<<h->GetBinError(i)<<" BinCont "<<h->GetBinContent(i)<<"  "<<h->GetName()<<"  "<<N<<endl;
+
+
+			       h->SetBinError(i,g->GetErrorYhigh(i)/2);
+		//	       h->SetBinContent(i,g->GetErrorYhigh(i)/2);
+				}
+			   }
+			}
+		
+
 
 
 }
 
+
+TH1D* ModifyBins(TH1D *& h,int nbins){
+
+TH1D *  hmet_MT2lester_DZeta_01J1D= new TH1D ("","",nbins,0.5,nbins+0.5);
+//hmet_MT2lester_DZeta_01J1D= new TH1D ("","",51,0.5,51.5);
+
+for ( int nb=0;nb<nbins-2;nb++){
+hmet_MT2lester_DZeta_01J1D->SetBinContent(nb,h->GetBinContent(nb));
+hmet_MT2lester_DZeta_01J1D->SetBinError(nb,h->GetBinError(nb));
+
+cout<<" nb  "<<nb <<" new "<<hmet_MT2lester_DZeta_01J1D->GetBinContent(nb)<<" old  "<<h->GetBinContent(nb)<<" total "<<hmet_MT2lester_DZeta_01J1D->GetNbinsX()<<endl;
+
+}
+
+float nbb = h->GetBinContent(nbins-2)+h->GetBinContent(nbins-1)+h->GetBinContent(nbins);
+float error_ = sqrt(h->GetBinError(nbins-2)*h->GetBinError(nbins-2) + h->GetBinError(nbins-1)*h->GetBinError(nbins-1) + h->GetBinError(nbins)*h->GetBinError(nbins));
+
+hmet_MT2lester_DZeta_01J1D->SetBinContent(nbins,nbb);
+hmet_MT2lester_DZeta_01J1D->SetBinError(nbins,error_);
+
+hmet_MT2lester_DZeta_01J1D->SetName(h->GetName());
+hmet_MT2lester_DZeta_01J1D->SetTitle(h->GetTitle());
+
+						
+h  = (TH1D*) hmet_MT2lester_DZeta_01J1D->Clone();
+
+return  hmet_MT2lester_DZeta_01J1D;
+
+}
 
 TH1D* Unroll(TH2D *& hist2D,char *&histName, float & norm){
 	int nBinsX = hist2D->GetNbinsX();

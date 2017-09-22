@@ -234,6 +234,11 @@ class analyzer {
   Float_t         ta_charge[30];
   Float_t         ta_relIso[30];
   Float_t         ta_IsoFlag;
+  Float_t 	  ta_IsoFlagVTight[5];
+  Float_t 	  ta_IsoFlagTight[5];
+  Float_t 	  ta_IsoFlagLoose[5];
+  Float_t 	  ta_IsoFlagVLoose[5];
+  Float_t 	  ta_IsoFlagMedium[5];
   Float_t         event_sign;
   Float_t         met_flag;
   Float_t         event_secondLeptonVeto;
@@ -450,6 +455,11 @@ class analyzer {
   TBranch        *b_ta_dz;   //!
   TBranch        *b_ta_charge;   //!
   TBranch        *b_ta_IsoFlag;   //!
+  TBranch	 *b_ta_IsoFlagVTight;
+  TBranch	 *b_ta_IsoFlagTight;
+  TBranch	 *b_ta_IsoFlagVLoose;
+  TBranch	 *b_ta_IsoFlagLoose;
+  TBranch	 *b_ta_IsoFlagMedium;
   TBranch        *b_ta_Iso;   //!
   TBranch        *b_ta_relIso;   //!
   TBranch        *b_datasetName;   //!
@@ -1286,6 +1296,11 @@ void analyzer::Init(TTree *tree)
   fChain->SetBranchAddress("ta_dz", ta_dz, &b_ta_dz);
   fChain->SetBranchAddress("ta_charge", ta_charge, &b_ta_charge);
   fChain->SetBranchAddress("ta_IsoFlag", &ta_IsoFlag, &b_ta_IsoFlag);
+  fChain->SetBranchAddress("ta_IsoFlagVTight", ta_IsoFlagVTight, &b_ta_IsoFlagVTight);
+  fChain->SetBranchAddress("ta_IsoFlagTight", ta_IsoFlagTight, &b_ta_IsoFlagTight);
+  fChain->SetBranchAddress("ta_IsoFlagVLoose", ta_IsoFlagVLoose, &b_ta_IsoFlagVLoose);
+  fChain->SetBranchAddress("ta_IsoFlagLoose", ta_IsoFlagLoose, &b_ta_IsoFlagLoose);
+  fChain->SetBranchAddress("ta_IsoFlagMedium", ta_IsoFlagMedium, &b_ta_IsoFlagMedium);
   fChain->SetBranchAddress("ta_relIso", ta_relIso, &b_ta_relIso);
   fChain->SetBranchAddress("datasetName", &datasetName);
   fChain->SetBranchAddress("CFCounter_", CFCounter_,&b_CFCounter_);

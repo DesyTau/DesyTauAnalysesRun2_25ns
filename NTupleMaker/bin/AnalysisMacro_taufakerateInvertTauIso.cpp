@@ -296,10 +296,11 @@ int main(int argc, char * argv[]) {
   CutList.push_back("LSF");
   CutList.push_back("gt 0 jets");
   CutList.push_back("Loose/Tight");
-  CutList.push_back("MET");
+  CutList.push_back("metgt0");
   CutList.push_back("MT");
   CutList.push_back("DeltaPhi");
   CutList.push_back("nJets");
+  CutList.push_back("metgt40");
 
   int CutNumb = int(CutList.size());
 
@@ -463,6 +464,8 @@ int main(int argc, char * argv[]) {
   TH1D * hnbJets3L = new TH1D("hnbJets3L","",15,-0.5,14.5);
   TH1D * hnJets4L = new TH1D("hnJets4L","",15,-0.5,14.5);
   TH1D * hnbJets4L = new TH1D("hnbJets4L","",15,-0.5,14.5);
+  TH1D * hnJets5L = new TH1D("hnJets5L","",15,-0.5,14.5);
+  TH1D * hnbJets5L = new TH1D("hnbJets5L","",15,-0.5,14.5);
   TH1D * hnJets1T = new TH1D("hnJets1T","",15,-0.5,14.5);
   TH1D * hnbJets1T = new TH1D("hnbJets1T","",15,-0.5,14.5);
   TH1D * hnJets2T = new TH1D("hnJets2T","",15,-0.5,14.5);
@@ -471,6 +474,8 @@ int main(int argc, char * argv[]) {
   TH1D * hnbJets3T = new TH1D("hnbJets3T","",15,-0.5,14.5);
   TH1D * hnJets4T = new TH1D("hnJets4T","",15,-0.5,14.5);
   TH1D * hnbJets4T = new TH1D("hnbJets4T","",15,-0.5,14.5);
+  TH1D * hnJets5T = new TH1D("hnJets5T","",15,-0.5,14.5);
+  TH1D * hnbJets5T = new TH1D("hnbJets5T","",15,-0.5,14.5);
   TH1D * hnJetsTFRL = new TH1D("hnJetsTFRL","",15,-0.5,14.5);
   TH1D * hnbJetsTFRL = new TH1D("hnbJetsTFRL","",15,-0.5,14.5);
   TH1D * hnJetsTFRT = new TH1D("hnJetsTFRT","",15,-0.5,14.5);
@@ -480,43 +485,52 @@ int main(int argc, char * argv[]) {
   TH1D * hMTCut2L = new TH1D("hMTCut2L","",20,0,200);
   TH1D * hMTCut3L = new TH1D("hMTCut3L","",20,0,200);
   TH1D * hMTCut4L = new TH1D("hMTCut4L","",20,0,200);
+  TH1D * hMTCut5L = new TH1D("hMTCut5L","",20,0,200);
   TH1D * hMTCutTFRL = new TH1D("hMTCutTFRL","",20,0,200);
   TH1D * hMTCut1T = new TH1D("hMTCut1T","",20,0,200);
   TH1D * hMTCut2T = new TH1D("hMTCut2T","",20,0,200);
   TH1D * hMTCut3T = new TH1D("hMTCut3T","",20,0,200);
   TH1D * hMTCut4T = new TH1D("hMTCut4T","",20,0,200);
+  TH1D * hMTCut5T = new TH1D("hMTCut5T","",20,0,200);
   TH1D * hMTCutTFRT = new TH1D("hMTCutTFRT","",20,0,200);
 
   TH1D * hRatioSum1L = new TH1D("hRatioSum1L","",10,0,1);
   TH1D * hRatioSum2L = new TH1D("hRatioSum2L","",10,0,1);
   TH1D * hRatioSum3L = new TH1D("hRatioSum3L","",10,0,1);
   TH1D * hRatioSum4L = new TH1D("hRatioSum4L","",10,0,1);
+  TH1D * hRatioSum5L = new TH1D("hRatioSum5L","",10,0,1);
   TH1D * hRatioSumTFRL = new TH1D("hRatioSumTFRL","",10,0,1);
   TH1D * hRatioSum1T = new TH1D("hRatioSum1T","",10,0,1);
   TH1D * hRatioSum2T = new TH1D("hRatioSum2T","",10,0,1);
   TH1D * hRatioSum3T = new TH1D("hRatioSum3T","",10,0,1);
   TH1D * hRatioSum4T = new TH1D("hRatioSum4T","",10,0,1);
+  TH1D * hRatioSum5T = new TH1D("hRatioSum5T","",10,0,1);
   TH1D * hRatioSumTFRT = new TH1D("hRatioSumTFRT","",10,0,1);
 
   TH1D * hDPhiCut1L = new TH1D("hDPhiCut1L","",70,0,3.5);
   TH1D * hDPhiCut2L = new TH1D("hDPhiCut2L","",70,0,3.5);
   TH1D * hDPhiCut3L = new TH1D("hDPhiCut3L","",70,0,3.5);
   TH1D * hDPhiCut4L = new TH1D("hDPhiCut4L","",70,0,3.5);
+  TH1D * hDPhiCut5L = new TH1D("hDPhiCut5L","",70,0,3.5);
   TH1D * hDPhiCutTFRL = new TH1D("hDPhiCutTFRL","",70,0,3.5);
   TH1D * hDPhiCut1T = new TH1D("hDPhiCut1T","",70,0,3.5);
   TH1D * hDPhiCut2T = new TH1D("hDPhiCut2T","",70,0,3.5);
   TH1D * hDPhiCut3T = new TH1D("hDPhiCut3T","",70,0,3.5);
   TH1D * hDPhiCut4T = new TH1D("hDPhiCut4T","",70,0,3.5);
+  TH1D * hDPhiCut5T = new TH1D("hDPhiCut5T","",70,0,3.5);
   TH1D * hDPhiCutTFRT = new TH1D("hDPhiCutTFRT","",70,0,3.5);
+
   TH1D * hMETCut1L = new TH1D("hMETCut1L","",10,0,200);
   TH1D * hMETCut2L = new TH1D("hMETCut2L","",10,0,200);
   TH1D * hMETCut3L = new TH1D("hMETCut3L","",10,0,200);
   TH1D * hMETCut4L = new TH1D("hMETCut4L","",10,0,200);
+  TH1D * hMETCut5L = new TH1D("hMETCut5L","",10,0,200);
   TH1D * hMETCutTFRL = new TH1D("hMETCutTFRL","",10,0,200);
   TH1D * hMETCut1T = new TH1D("hMETCut1T","",10,0,200);
   TH1D * hMETCut2T = new TH1D("hMETCut2T","",10,0,200);
   TH1D * hMETCut3T = new TH1D("hMETCut3T","",10,0,200);
   TH1D * hMETCut4T = new TH1D("hMETCut4T","",10,0,200);
+  TH1D * hMETCut5T = new TH1D("hMETCut5T","",10,0,200);
   TH1D * hMETCutTFRT = new TH1D("hMETCutTFRT","",10,0,200);
 
   TH1D * hLooseIndex = new TH1D("hLooseIndex","",5,0,5);
@@ -551,9 +565,9 @@ const    int nEtaBins = 4;
 
 
 
-  const int nCuts = 4;
+  const int nCuts = 5;
 
-  TString Cuts[4] = {"MET","mT","DPhi","All"};
+  TString Cuts[5] = {"met","mT","DPhi","metgt40","All"};
   /////first stands for the Eta bin, second array for the cut 
   TH1D * FakeRatePtIncLoose[nEtaBins][nCuts];
   TH1D * FakeRatePtIncTight[nEtaBins][nCuts];
@@ -1521,11 +1535,11 @@ if (!CutBasedTauId){
       unsigned int tau_tight=-1;
       vector<int> tau; tau.clear();
 
- 	if ((int)tau_index>-1 && analysisTree.tau_byLooseIsolationMVArun2v1DBoldDMwLT[tau_index] > 0.5) isLoose  = true;
+ 	if ((int)tau_index>-1 && analysisTree.tau_byVLooseIsolationMVArun2v1DBoldDMwLT[tau_index] > 0.5 && analysisTree.tau_byTightIsolationMVArun2v1DBoldDMwLT[tau_index] < 0.5) isLoose  = true;
 
 	tau_loose = (int)tau_index;
 	
-	if (!isLoose) continue;
+//	if (!isLoose) continue;
 
        ta_IsoFlagVTight[0]=analysisTree.tau_byVTightIsolationMVArun2v1DBoldDMwLT[tau_index];
        ta_IsoFlagTight[0]=analysisTree.tau_byTightIsolationMVArun2v1DBoldDMwLT[tau_index];
@@ -2131,7 +2145,10 @@ if ((!isW && !isDY) && !isData)
       //cout<< "filling here  "<<analysisTree.tau_pt[tau_loose]<<"  "<<ptBin<<"  "<<etaBin<<"  "<<weight<<endl;
       //FakeRatePt[etaBin][ptBin]->Fill(analysisTree.tau_pt[tau_loose],weight);
 
-      bool MTb = (MT>60 && MT<120);
+      bool MTb = false;//(MT>60 && MT<120);
+		if (MT > 60. && MT < 120. ) MTb=true;
+		//if (MT < 20.) MTb=false;
+      //bool MTb = ( (MT>20 && MT<60 ) || MT>120) ;
       double ptTau1 = (double)analysisTree.tau_pt[(int)tau_loose];
       double etaTau1 = (double)analysisTree.tau_eta[(int)tau_loose];
       string WP = "MVA";
@@ -2142,7 +2159,7 @@ if ((!isW && !isDY) && !isData)
       {
       LooseCFCounter[iCutL]+= weight;
       iCutL++;
-	      if (met>40){
+	      if (met>0){
 
 if (matchedTauToDownQ) FakeRatePtIncLooseDownQ[etaBin][0]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
 if (matchedTauToUpQ) FakeRatePtIncLooseUpQ[etaBin][0]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
@@ -2262,6 +2279,43 @@ if (isData) {
 	FakeRatePtIncLooseGluon[etaBin][3] ->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
 
 }
+
+
+	if (met>40 ) {
+
+if (matchedTauToDownQ) FakeRatePtIncLooseDownQ[etaBin][4]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+if (matchedTauToUpQ) FakeRatePtIncLooseUpQ[etaBin][4]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+if (matchedTauToStrangeQ) FakeRatePtIncLooseStrangeQ[etaBin][4]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+if (matchedTauToCharmQ) FakeRatePtIncLooseCharmQ[etaBin][4]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+if (matchedTauToBottomQ) FakeRatePtIncLooseBottomQ[etaBin][4]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+if (matchedTauToGluon) FakeRatePtIncLooseGluon[etaBin][4]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+if (matchedTauToNothing) FakeRatePtIncLooseNothing[etaBin][4]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+
+	    FakeRatePtIncLoose[etaBin][4]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+	    hRatioSum5L->Fill(RatioSums,weight);
+	    hMTCut5L->Fill(MT,weight);
+	    hDPhiCut5L->Fill(dPhiW, weight);
+	    hMETCut5L->Fill(met, weight);
+      	    hnJets5L->Fill(countjets,weight);
+	    hnbJets5L->Fill(countbjets,weight);
+
+      LooseCFCounter[iCutL]+= weight;
+      iCutL++;
+if (isData) { 
+	FakeRatePtIncLooseDownQ[etaBin][4] ->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+	FakeRatePtIncLooseUpQ[etaBin][4] ->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+	FakeRatePtIncLooseStrangeQ[etaBin][4] ->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+	FakeRatePtIncLooseCharmQ[etaBin][4] ->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+	FakeRatePtIncLooseBottomQ[etaBin][4] ->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+	FakeRatePtIncLooseGluon[etaBin][4] ->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+
+}
+
+
+
+
+
+
 /////////// corrected for TFR
 //
 	    hRatioSumTFRL->Fill(RatioSums,tfr*weight);
@@ -2271,12 +2325,13 @@ if (isData) {
       	    hnJetsTFRL->Fill(countjets,weight);
 	    hnbJetsTFRL->Fill(countbjets,weight);
 
-	      }//met<80
+	      }//met>0
 
 	    }//dPhiW	
 				
 	  }//MTb
 	}//ratio
+	}//met>40
 
       }//Loose 
 
@@ -2286,7 +2341,7 @@ if (isData) {
       TightCFCounter[iCutT]+= weight;
       iCutT++;
 
-		if (met>40){
+		if (met>0){
 if (matchedTauToDownQ) FakeRatePtIncTightDownQ[etaBin][0]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
 if (matchedTauToUpQ) FakeRatePtIncTightUpQ[etaBin][0]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
 if (matchedTauToStrangeQ) FakeRatePtIncTightStrangeQ[etaBin][0]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
@@ -2402,6 +2457,34 @@ if (isData) {
 
 }
       
+	if (met>40 ) {
+if (matchedTauToDownQ) FakeRatePtIncTightDownQ[etaBin][4]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+if (matchedTauToUpQ) FakeRatePtIncTightUpQ[etaBin][4]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+if (matchedTauToStrangeQ) FakeRatePtIncTightStrangeQ[etaBin][4]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+if (matchedTauToCharmQ) FakeRatePtIncTightCharmQ[etaBin][4]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+if (matchedTauToBottomQ) FakeRatePtIncTightBottomQ[etaBin][4]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+if (matchedTauToGluon) FakeRatePtIncTightGluon[etaBin][4]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+if (matchedTauToNothing) FakeRatePtIncTightNothing[etaBin][4]->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+
+	    FakeRatePtIncTight[etaBin][4]->Fill(analysisTree.tau_pt[(int)tau_loose],weight);
+	    hRatioSum5T->Fill(RatioSums,weight);
+	    hMTCut5T->Fill(MT,weight);
+	    hDPhiCut5T->Fill(dPhiW, weight);
+	    hMETCut5T->Fill(met, weight);
+      	    hnJets5T->Fill(countjets,weight);
+	    hnbJets5T->Fill(countbjets,weight);
+
+      TightCFCounter[iCutT]+= weight;
+      iCutT++;
+if (isData) { 
+	FakeRatePtIncTightDownQ[etaBin][4] ->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+	FakeRatePtIncTightUpQ[etaBin][4] ->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+	FakeRatePtIncTightStrangeQ[etaBin][4] ->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+	FakeRatePtIncTightCharmQ[etaBin][4] ->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+	FakeRatePtIncTightBottomQ[etaBin][4] ->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+	FakeRatePtIncTightGluon[etaBin][4] ->Fill(double(analysisTree.tau_pt[(int)tau_loose]),weight);
+
+}
 	    hRatioSumTFRT->Fill(RatioSums,tfr*weight);
 	    hMTCutTFRT->Fill(MT,tfr*weight);
 	    hDPhiCutTFRT->Fill(dPhiW, tfr*weight);
@@ -2410,12 +2493,13 @@ if (isData) {
 	    hnbJetsTFRT->Fill(countbjets,weight);
 
 
-		}//met<80
+		}//met>0
 
 	      }//dPhiW	
 				
 	    }//MTb
 	  }//ratio
+	  }//met>40
 
 	}//Tight
 
@@ -2460,24 +2544,61 @@ if (isData) {
   hnbJets->Write();
   hnJets1L->Write();
   hnbJets1L->Write();
+  hMTCut1L->Write();
+  hDPhiCut1L->Write();
+  hMETCut1L->Write();
   hnJets2L->Write();
   hnbJets2L->Write();
+  hMTCut2L->Write();
+  hDPhiCut2L->Write();
+  hMETCut2L->Write();
   hnJets3L->Write();
   hnbJets3L->Write();
+  hMTCut3L->Write();
+  hDPhiCut3L->Write();
+  hMETCut3L->Write();
   hnJets4L->Write();
   hnbJets4L->Write();
+  hMTCut4L->Write();
+  hDPhiCut4L->Write();
+  hMETCut4L->Write();
+  hnJets5L->Write();
+  hnbJets5L->Write();
+  hMTCut5L->Write();
+  hDPhiCut5L->Write();
+  hMETCut5L->Write();
+
   hnJets1T->Write();
   hnbJets1T->Write();
+  hMTCut1T->Write();
+  hDPhiCut1T->Write();
+  hMETCut1T->Write();
   hnJets2T->Write();
   hnbJets2T->Write();
+  hMTCut2T->Write();
+  hDPhiCut2T->Write();
+  hMETCut2T->Write();
   hnJets3T->Write();
   hnbJets3T->Write();
+  hMTCut3T->Write();
+  hDPhiCut3T->Write();
+  hMETCut3T->Write();
   hnJets4T->Write();
+  hnbJets4T->Write();
+  hMTCut4T->Write();
+  hDPhiCut4T->Write();
+  hMETCut4T->Write();
+  hnJets5T->Write();
+  hnbJets5T->Write();
+  hMTCut5T->Write();
+  hDPhiCut5T->Write();
+  hMETCut5T->Write();
+
+
   hnbJetsTFRL->Write();
   hnJetsTFRL->Write();
   hnbJetsTFRT->Write();
   hnJetsTFRT->Write();
-  hnbJets4T->Write();
   CutFlowUnWTight->Write();
   CutFlowUnWLoose->Write();
   file->Write();

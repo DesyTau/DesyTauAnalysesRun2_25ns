@@ -610,6 +610,9 @@ if(electron_index>-1)		ElV.SetPtEtaPhiM(el_pt[electron_index], el_eta[electron_i
 		if (JetsMV.size()>0 && fabs(dEtaJMu)>3.) continue;
 		if (JetsMV.size()>0 && fabs(dEtaJEl)>3.) continue;
 
+		if (DiLL.M()<50.) continue;
+		if (MTsum<50.) continue;
+
 		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index,isSignal);
 		CFCounter[iCut]+= all_weights;
 		CFCounter_[iCut]+= all_weights;
@@ -617,6 +620,7 @@ if(electron_index>-1)		ElV.SetPtEtaPhiM(el_pt[electron_index], el_eta[electron_i
 		iCut++;
 
 
+		/*		
 		if ( fabs(el_dz[electron_index]) > 0.04) continue;
 		if ( fabs(el_dxy[electron_index]) > 0.02) continue;
 		if ( fabs(mu_dz[muon_index]) > 0.04) continue;
@@ -624,11 +628,13 @@ if(electron_index>-1)		ElV.SetPtEtaPhiM(el_pt[electron_index], el_eta[electron_i
 
 		if (fabs(dEta)>1.5 && !InvertLeptonIso) continue;
 		if (fabs(dEta)<2 && InvertLeptonIso) continue;
+		
+		*/
 		if (dPhiDiL<1.5) continue;
-		if (dPhiDiL>3.2) continue;
-		if (Dr<2.) continue;
-		if (Dr>3.2 && !InvertLeptonIso) continue;
-		if (Dr<3.5 && InvertLeptonIso) continue;
+		//if (dPhiDiL>3.2) continue;
+		//if (Dr<2.) continue;
+		//if (Dr>3.2 && !InvertLeptonIso) continue;
+		//if (Dr<3.5 && InvertLeptonIso) continue;
 
 		if (DiLL.M()<50.) continue;
 		if (MTsum<50.) continue;
@@ -643,6 +649,12 @@ if(electron_index>-1)		ElV.SetPtEtaPhiM(el_pt[electron_index], el_eta[electron_i
 
 		if ( fabs(el_dz[electron_index]) > 0.02) continue;
 		if ( fabs(mu_dz[muon_index]) > 0.02) continue;
+
+		if (Dr<2.) continue;
+		if (Dr>3.2 && !InvertLeptonIso) continue;	
+		if (Dr<3.5 && InvertLeptonIso) continue;
+
+
 		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index,isSignal);
 		CFCounter[iCut]+= all_weights;
 		CFCounter_[iCut]+= all_weights;

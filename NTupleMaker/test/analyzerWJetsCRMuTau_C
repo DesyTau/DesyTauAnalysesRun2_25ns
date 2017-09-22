@@ -73,6 +73,9 @@ void analyzer::Loop(){
 	CutList.push_back("MET>40");
 	CutList.push_back("MTsum>120");
 
+	string channel = "CHANNELHERE";
+
+	string Channel = "mutau";
 	//ChiMass = 0;
 	ChiMass = 0.;
 	//cout<<" THE MASS IS ========================= "<<ChiMass<<endl;
@@ -177,8 +180,6 @@ void analyzer::Loop(){
 	if (isSignal) cout<<" YOU HAVE FOUND ITTTTTTTTT is it signal ???  "<<isSignal<<" systematic "<<systematic<<endl;
 	if (isData) cout<<" YOU HAVE FOUND a DATA "<<endl;
 
-	string channel = "CHANNELHERE";
-
 
 	TString fileinName = "/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/New8025/CMSSW_8_0_25/src/DesyTauAnalyses/NTupleMaker/test/CHANNELHERE/FILEIN";
 	if (systematic == "JetEnUp" || systematic == "JetEnDown"  || systematic == "UnclEnDown" || systematic == "UnclEnDown" || systematic == "TauEnUp" || systematic == "TauEnDown" || systematic == "ElEnUp" || systematic == "ElEnDown" || systematic == "MuEnUp" || systematic == "MuEnDown" || systematic == "BTagUp" || systematic == "BTagDown") 
@@ -226,7 +227,6 @@ void analyzer::Loop(){
 
 	//cout<<"  "<<old<<"  "<<datasetName->c_str()<<"  "<<hist_<<"  "<<CutFlow->GetName()<<"  "<<CutFlow->GetBinContent(1)<<endl;
 		
-	string Channel = "mutau";
 	file->mkdir(Channel.c_str());
 	file->cd(Channel.c_str());
 	float top_w = 1.;
@@ -349,7 +349,10 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
 
 		int iCut = 1;
 
+
+
 		all_weights = pu_weight * gen_weight ;
+
 		double cLower, cUpper;
 		vector <double> ScalesV; ScalesV.clear();
 //		ScalesV.push_back(wScale0);
@@ -432,6 +435,8 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
 		CFCounter_[iCut]+= all_weights;
                 iCFCounter[iCut]++;
 		iCut++;
+
+
 
 		double ptTau1 = (double)ta_pt[taus_index];
 		double etaTau1 = (double)ta_eta[taus_index];
@@ -650,23 +655,26 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
 		if (JetsMV.size()>0 && fabs(dEtaJTau)>3.) continue;
 		if (JetsMV.size()>0 && Dr2>4.) continue;
 
+		if (DiLL.M()<50.) continue;
+		if (MTsum<50.) continue;
+
 		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index,isSignal);
 		CFCounter[iCut]+= all_weights;
 		CFCounter_[iCut]+= all_weights;
                 iCFCounter[iCut]++;
 		iCut++;
 
-		if ( fabs(mu_dz[muon_index]) > 0.04) continue;
-		if ( fabs(mu_dxy[muon_index]) > 0.02) continue;
+	//	if ( fabs(mu_dz[muon_index]) > 0.04) continue;
+	//	if ( fabs(mu_dxy[muon_index]) > 0.02) continue;
 		//if (ta_relIso[0] < 0.85) continue;
 
 	//	if (fabs(dEta)>1.5 && !InvertTauIso) continue;
 	//	if (fabs(dEta)<2 && InvertTauIso) continue;
-	//	if (dPhiDiL<1.5) continue;
+		if (dPhiDiL<1.5) continue;
 	//	if (dPhiDiL>3.2) continue;
-		if (Dr<2.) continue;
-		if (Dr>3.2 && !InvertTauIso) continue;
-		if (Dr<3.5 && InvertTauIso) continue;
+	//	if (Dr<2.) continue;
+	//	if (Dr>3.2 && !InvertTauIso) continue;
+	//	if (Dr<3.5 && InvertTauIso) continue;
 
 		if (DiLL.M()<50.) continue;
 		if (MTsum<50.) continue;
@@ -676,6 +684,10 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
 		CFCounter_[iCut]+= all_weights;
                 iCFCounter[iCut]++;
 		iCut++;
+
+		if (Dr<2.) continue;
+		if (Dr>3.2 && !InvertTauIso) continue;
+		if (Dr<3.5 && InvertTauIso) continue;
 
 		if ( fabs(mu_dz[muon_index]) > 0.02) continue;
 		if ( fabs(ta_dxy[taus_index]) > 0.02) continue;

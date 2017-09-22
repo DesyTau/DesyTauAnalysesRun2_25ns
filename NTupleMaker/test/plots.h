@@ -38,6 +38,9 @@ double sumpT = 0;
 double XSec=-1;
 double xs,fact,fact2;
  
+double ErrorSoW=0;
+double sumOfWeight=0;
+
 vector<TLorentzVector> AllJets_Lepton_noMet;
 vector<TLorentzVector> JetsMV;
 vector<TLorentzVector>  ElMV;
@@ -45,13 +48,25 @@ vector<TLorentzVector>  MuMV;
 vector<TLorentzVector>  TauMV;
 vector<TLorentzVector>  LeptMV;
 
+Int_t 	   npart;
+TTree *Tp;
+void SetupTreeTp(){
+Tp  = new TTree("Tp","Tp");
+Tp->Branch("npart",&npart,"npart/I");
+
+}
+
 
    int nBinsDZeta = 5;
    double binsDZeta[6] = {-500, -150,-100,0,50,1000};
+   int nBinsDZetaR = 29;
+   //double binsDZetaR[18] = {0, 0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1,1.1,1.2,1.3,1.4,1.5,2,10};
+   double binsDZetaR[30] = {0,0.25,0.5, 0.75, 1, 1.1,1.2,1.3,1.4,1.5,1.6,1.7,1.8,1.9, 2,2.1,2.2,2.3,2.4,2.5,2.6,2.7,2.8,2.9,3,3.5,4,4.5,5,10};
 
 int nBinsmet = 8;
 //   double binsmet[7] =  {0, 40, 80,100,120,250,1000};
    double binsmet[9] =  {0, 10,20,30, 40, 80,120,250,1000};
+   double binsmett[9] =  {0.1, 10,20,30, 40, 80,120,250,1000};
 
    int nBinsmetFB = 8;
    double binsmetFB[9] = {0, 40, 80,120,160,200,300,400,1000};
@@ -86,6 +101,9 @@ int nBinsmet = 8;
    double binsDr[6] = {0,1,2,3,4,7};
 
 
+   int nBinsMT2lester = 8;
+   double binsMT2lester[9] = {0,10,20,30,40,80,100,120,1000};
+   double binsMT2lesterr[9] = {0.1,10,20,30,40,80,100,120,1000};
 
 double HIP_SF(double pt,double eta)
 
@@ -112,6 +130,482 @@ return result;
 }
 
 
+
+double EWKWeight(float pt){
+float sf = 1;
+
+if (pt>0 && pt <50 ) sf = 1.;
+if (pt>50 && pt <100 ) sf = 1.052;
+if (pt>100 && pt <150 ) sf = 1.179;
+if (pt>150 && pt <200 ) sf = 1.150;
+if (pt>200 && pt <300 ) sf = 1.057;
+if (pt>300 && pt <400 ) sf = 1.;
+if (pt>400 && pt <600 ) sf = 0.912;
+if (pt>600 ) sf = 0.783;
+
+return sf;
+}
+
+double TauFakeRateFromData2(float pt,float eta, string sel,string working_point){
+float SF = 1.;
+
+
+//80x MVAid
+
+
+if (  fabs(eta) < 0.8 )
+        {
+                if (pt>20 && pt<30) SF = 0.0397521;
+                if (pt>30 && pt<40) SF = 0.0298394;
+                if (pt>40 ) SF = 0.0160712;
+        }
+if (  fabs(eta) > 0.8 && fabs(eta) < 1.44 )
+        {
+
+                if (pt>20 && pt<30) SF = 0.0480039;
+                if (pt>30 && pt<40) SF = 0.0325758;
+                if (pt>40 ) SF = 0.0158167;
+        }
+
+if (  fabs(eta) > 1.44 && fabs(eta) < 1.566 )
+        {
+
+                if (pt>20 && pt<40) SF = 0.0413137;
+                if (pt>40) SF = 0.0229581;
+        }
+if (  fabs(eta) > 1.566 && fabs(eta) < 2.3 )
+        {
+
+                if (pt>20 && pt<40) SF = 0.0457624;
+                if (pt>40) SF = 0.0295553;
+        }
+
+
+return SF;
+
+}
+
+double TauFakeRateFromData(float pt,float eta, string sel,string working_point){
+float SF = 1.;
+
+
+//80x MVAid
+
+
+if (  fabs(eta) < 0.8 )
+        {
+                if (pt>20 && pt<30) SF = 0.726176;
+                if (pt>30 && pt<40) SF = 0.661467;
+                if (pt>40 ) SF = 0.560296;
+        }
+if (  fabs(eta) > 0.8 && fabs(eta) < 1.44 )
+        {
+
+                if (pt>20 && pt<30) SF = 0.67626;
+                if (pt>30 && pt<40) SF = 0.613248;
+                if (pt>40 ) SF = 0.390183;
+        }
+
+if (  fabs(eta) > 1.44 && fabs(eta) < 1.566 )
+        {
+
+                if (pt>20 && pt<40) SF = 0.681135;
+                if (pt>40) SF = 0.639072;
+        }
+if (  fabs(eta) > 1.566 && fabs(eta) < 2.3 )
+        {
+
+                if (pt>20 && pt<40) SF = 0.598693;
+                if (pt>40) SF = 0.608262;
+        }
+
+
+
+if ( working_point == "JetEnUp"){
+
+if (  fabs(eta) < 0.8 )
+        {
+                if (pt>20 && pt<30) SF = 0.693816;
+                if (pt>30 && pt<40) SF = 0.755752;
+                if (pt>40 ) SF = 0.799038;
+        }
+if (  fabs(eta) > 0.8 && fabs(eta) < 1.44 )
+        {
+
+                if (pt>20 && pt<30) SF = 0.703645;
+                if (pt>30 && pt<40) SF = 0.685642;
+                if (pt>40 ) SF = 0.563055;
+        }
+
+if (  fabs(eta) > 1.44 && fabs(eta) < 1.566 )
+        {
+
+                if (pt>20 && pt<40) SF = 0.750739;
+                if (pt>40) SF = 0.92409;
+        }
+if (  fabs(eta) > 1.566 && fabs(eta) < 2.3 )
+        {
+
+                if (pt>20 && pt<40) SF = 0.789474;
+                if (pt>40) SF = 0.75253;
+        }
+
+}
+
+
+
+if ( working_point == "JetEnDown"){
+
+if (  fabs(eta) < 0.8 )
+        {
+                if (pt>20 && pt<30) SF = 0.698346;
+                if (pt>30 && pt<40) SF = 0.766291;
+                if (pt>40 ) SF = 0.81272;
+        }
+if (  fabs(eta) > 0.8 && fabs(eta) < 1.44 )
+        {
+
+                if (pt>20 && pt<30) SF = 0.711696;
+                if (pt>30 && pt<40) SF = 0.692606;
+                if (pt>40 ) SF = 0.601689;
+        }
+
+if (  fabs(eta) > 1.44 && fabs(eta) < 1.566 )
+        {
+
+                if (pt>20 && pt<40) SF = 0.7331;
+                if (pt>40) SF = 0.894102;
+        }
+if (  fabs(eta) > 1.566 && fabs(eta) < 2.3 )
+        {
+
+                if (pt>20 && pt<40) SF = 0.787022;
+                if (pt>40) SF = 0.752606;
+        }
+
+}
+
+
+if ( working_point == "UnclEnUp"){
+
+if (  fabs(eta) < 0.8 )
+        {
+                if (pt>20 && pt<30) SF = 0.684853;
+                if (pt>30 && pt<40) SF = 0.76416;
+                if (pt>40 ) SF = 0.790217;
+        }
+if (  fabs(eta) > 0.8 && fabs(eta) < 1.44 )
+        {
+
+                if (pt>20 && pt<30) SF = 0.698415;
+                if (pt>30 && pt<40) SF = 0.677333;
+                if (pt>40 ) SF = 0.577103;
+        }
+
+if (  fabs(eta) > 1.44 && fabs(eta) < 1.566 )
+        {
+
+                if (pt>20 && pt<40) SF = 0.724432;
+                if (pt>40) SF = 0.92409;
+        }
+if (  fabs(eta) > 1.566 && fabs(eta) < 2.3 )
+        {
+
+                if (pt>20 && pt<40) SF = 0.790163;
+                if (pt>40) SF = 0.745237;
+        }
+
+}
+
+
+if ( working_point == "UnclEnDown"){
+
+if (  fabs(eta) < 0.8 )
+        {
+                if (pt>20 && pt<30) SF = 0.699328;
+                if (pt>30 && pt<40) SF = 0.772908;
+                if (pt>40 ) SF = 0.809592;
+        }
+if (  fabs(eta) > 0.8 && fabs(eta) < 1.44 )
+        {
+
+                if (pt>20 && pt<30) SF = 0.710733;
+                if (pt>30 && pt<40) SF = 0.692155;
+                if (pt>40 ) SF = 0.608349;
+        }
+
+if (  fabs(eta) > 1.44 && fabs(eta) < 1.566 )
+        {
+
+                if (pt>20 && pt<40) SF = 0.765928;
+                if (pt>40) SF = 0.866507;
+        }
+if (  fabs(eta) > 1.566 && fabs(eta) < 2.3 )
+        {
+
+                if (pt>20 && pt<40) SF = 0.79236;
+                if (pt>40) SF = 0.756964;
+        }
+
+}
+
+
+if ( working_point == "MuEnUp"){
+
+if (  fabs(eta) < 0.8 )
+        {
+                if (pt>20 && pt<30) SF = 0.645379;
+                if (pt>30 && pt<40) SF = 0.661151;
+                if (pt>40 ) SF = 0.562661;
+        }
+if (  fabs(eta) > 0.8 && fabs(eta) < 1.44 )
+        {
+
+                if (pt>20 && pt<30) SF = 0.675891;
+                if (pt>30 && pt<40) SF = 0.609651;
+                if (pt>40 ) SF = 0.389478;
+        }
+
+if (  fabs(eta) > 1.44 && fabs(eta) < 1.566 )
+        {
+
+                if (pt>20 && pt<40) SF = 0.675381;
+                if (pt>40) SF = 0.662927;
+        }
+if (  fabs(eta) > 1.566 && fabs(eta) < 2.3 )
+        {
+
+                if (pt>20 && pt<40) SF = 0.757503;
+                if (pt>40) SF = 0.610973;
+        }
+
+}
+
+
+
+if ( working_point == "MuEnDown"){
+
+if (  fabs(eta) < 0.8 )
+        {
+                if (pt>20 && pt<30) SF = 0.648652;
+                if (pt>30 && pt<40) SF = 0.662728;
+                if (pt>40 ) SF = 0.562374;
+        }
+if (  fabs(eta) > 0.8 && fabs(eta) < 1.44 )
+        {
+
+                if (pt>20 && pt<30) SF = 0.676839;
+                if (pt>30 && pt<40) SF = 0.616648;
+                if (pt>40 ) SF = 0.390872;
+        }
+
+if (  fabs(eta) > 1.44 && fabs(eta) < 1.566 )
+        {
+
+                if (pt>20 && pt<40) SF = 0.678148;
+                if (pt>40) SF = 0.686361;
+        }
+if (  fabs(eta) > 1.566 && fabs(eta) < 2.3 )
+        {
+
+                if (pt>20 && pt<40) SF = 0.756978;
+                if (pt>40) SF = 0.607251;
+        }
+
+}
+
+
+if ( working_point == "ElEnUp"){
+
+if (  fabs(eta) < 0.8 )
+        {
+                if (pt>20 && pt<30) SF = 0.646808;
+                if (pt>30 && pt<40) SF = 0.661467;
+                if (pt>40 ) SF = 0.560296;
+        }
+if (  fabs(eta) > 0.8 && fabs(eta) < 1.44 )
+        {
+
+                if (pt>20 && pt<30) SF = 0.676055;
+                if (pt>30 && pt<40) SF = 0.614288;
+                if (pt>40 ) SF = 0.390694;
+        }
+
+if (  fabs(eta) > 1.44 && fabs(eta) < 1.566 )
+        {
+
+                if (pt>20 && pt<40) SF = 0.681135;
+                if (pt>40) SF = 0.639072;
+        }
+if (  fabs(eta) > 1.566 && fabs(eta) < 2.3 )
+        {
+
+                if (pt>20 && pt<40) SF = 0.75731;
+                if (pt>40) SF = 0.608262;
+        }
+
+}
+
+
+if ( working_point == "ElEnDown"){
+
+if (  fabs(eta) < 0.8 )
+        {
+                if (pt>20 && pt<30) SF = 0.646804;
+                if (pt>30 && pt<40) SF = 0.65908;
+                if (pt>40 ) SF = 0.558602;
+        }
+if (  fabs(eta) > 0.8 && fabs(eta) < 1.44 )
+        {
+
+                if (pt>20 && pt<30) SF = 0.676066;
+                if (pt>30 && pt<40) SF = 0.613408;
+                if (pt>40 ) SF = 0.389452;
+        }
+
+if (  fabs(eta) > 1.44 && fabs(eta) < 1.566 )
+        {
+
+                if (pt>20 && pt<40) SF = 0.677844;
+                if (pt>40) SF = 0.640211;
+        }
+if (  fabs(eta) > 1.566 && fabs(eta) < 2.3 )
+        {
+
+                if (pt>20 && pt<40) SF = 0.756993;
+                if (pt>40) SF = 0.610414;
+        }
+
+}
+
+
+if ( working_point == "TauEnUp"){
+
+if (  fabs(eta) < 0.8 )
+        {
+                if (pt>20 && pt<30) SF = 0.648833;
+                if (pt>30 && pt<40) SF = 0.644346;
+                if (pt>40 ) SF = 0.531448;
+        }
+if (  fabs(eta) > 0.8 && fabs(eta) < 1.44 )
+        {
+
+                if (pt>20 && pt<30) SF = 0.672807;
+                if (pt>30 && pt<40) SF = 0.60031;
+                if (pt>40 ) SF = 0.362064;
+        }
+
+if (  fabs(eta) > 1.44 && fabs(eta) < 1.566 )
+        {
+
+                if (pt>20 && pt<40) SF = 0.680111;
+                if (pt>40) SF = 0.590337;
+        }
+if (  fabs(eta) > 1.566 && fabs(eta) < 2.3 )
+        {
+
+                if (pt>20 && pt<40) SF = 0.753283;
+                if (pt>40) SF = 0.594045;
+        }
+
+}
+
+if ( working_point == "TauEnDown"){
+
+if (  fabs(eta) < 0.8 )
+        {
+                if (pt>20 && pt<30) SF = 0.649911;
+                if (pt>30 && pt<40) SF = 0.663066;
+                if (pt>40 ) SF = 0.601234;
+        }
+if (  fabs(eta) > 0.8 && fabs(eta) < 1.44 )
+        {
+
+                if (pt>20 && pt<30) SF = 0.674619;
+                if (pt>30 && pt<40) SF = 0.634861;
+                if (pt>40 ) SF = 0.404108;
+        }
+
+if (  fabs(eta) > 1.44 && fabs(eta) < 1.566 )
+        {
+
+                if (pt>20 && pt<40) SF = 0.710257;
+                if (pt>40) SF = 0.629404;
+        }
+if (  fabs(eta) > 1.566 && fabs(eta) < 2.3 )
+        {
+
+                if (pt>20 && pt<40) SF = 0.759325;
+                if (pt>40) SF = 0.622256;
+        }
+
+}
+
+if ( working_point == "BTagUp"){
+
+if (  fabs(eta) < 0.8 )
+        {
+                if (pt>20 && pt<30) SF = 0.653137;
+                if (pt>30 && pt<40) SF = 0.670859;
+                if (pt>40 ) SF = 0.586556;
+        }
+if (  fabs(eta) > 0.8 && fabs(eta) < 1.44 )
+        {
+
+                if (pt>20 && pt<30) SF = 0.681814;
+                if (pt>30 && pt<40) SF = 0.62254;
+                if (pt>40 ) SF = 0.413818;
+        }
+
+if (  fabs(eta) > 1.44 && fabs(eta) < 1.566 )
+        {
+
+                if (pt>20 && pt<40) SF = 0.71083;
+                if (pt>40) SF = 0.606968;
+        }
+if (  fabs(eta) > 1.566 && fabs(eta) < 2.3 )
+        {
+
+                if (pt>20 && pt<40) SF = 0.760291;
+                if (pt>40) SF = 0.631967;
+        }
+
+}
+
+if ( working_point == "BTagDown"){
+
+if (  fabs(eta) < 0.8 )
+        {
+                if (pt>20 && pt<30) SF = 0.641497;
+                if (pt>30 && pt<40) SF = 0.655955;
+                if (pt>40 ) SF = 0.520607;
+        }
+if (  fabs(eta) > 0.8 && fabs(eta) < 1.44 )
+        {
+
+                if (pt>20 && pt<30) SF = 0.668485;
+                if (pt>30 && pt<40) SF = 0.594856;
+                if (pt>40 ) SF = 0.354048;
+        }
+
+if (  fabs(eta) > 1.44 && fabs(eta) < 1.566 )
+        {
+
+                if (pt>20 && pt<40) SF = 0.654878;
+                if (pt>40) SF = 0.594868;
+        }
+if (  fabs(eta) > 1.566 && fabs(eta) < 2.3 )
+        {
+
+                if (pt>20 && pt<40) SF = 0.753953;
+                if (pt>40) SF = 0.589413;
+        }
+
+}
+
+return SF;
+
+}
 
 
 
@@ -442,6 +936,16 @@ vector<string> CutList;
 vector<string> FakeList;
 vector<string> FakeListJet;
 
+
+/*
+TProfile * hprofMt2vsMET[CutN]  ;//= new TProfile("hprof","",100,-4,4,0,20);
+TProfile * hprofMt2vsDZeta[CutN]  ;//= new TProfile("hprof","",100,-4,4,0,20);
+TProfile * hprofMETvsMt2[CutN]  ;//= new TProfile("hprof","",100,-4,4,0,20);
+TProfile * hprofMETvsDZeta[CutN]  ;//= new TProfile("hprof","",100,-4,4,0,20);
+TProfile * hprofDZetavsMET[CutN]  ;//= new TProfile("hprof","",100,-4,4,0,20);
+TProfile * hprofDZetavsMt2[CutN]  ;//= new TProfile("hprof","",100,-4,4,0,20);
+*/
+
 TH1D * histRuns = new TH1D("histRuns","",6000,24000,30000);
 
 TH1D * histWeightsH = new TH1D("histWeightsH","",1,-0.5,0.5);
@@ -503,6 +1007,9 @@ TH1D *hMuneutralIso[CutN];
 TH1D *hMuabsIsoMu[CutN];
 TH1D *hMurelIsoMu[CutN];
 
+
+
+
 TH1D *hLept1neutralHadIso[CutN]; 
 TH1D *hLept1photonIso[CutN];
 TH1D *hLept1chargedHadIso[CutN];
@@ -527,6 +1034,10 @@ TH1D * hEldz [CutN];
 
 TH1D * htau_dxy [CutN];
 TH1D * htau_dz [CutN];
+TH1D * htau1_dxy [CutN];
+TH1D * htau1_dz [CutN];
+TH1D * htau2_dxy [CutN];
+TH1D * htau2_dz [CutN];
 
 TH1D *hMeffMuon[CutN];
 TH1D *hMeffEl[CutN];
@@ -538,6 +1049,7 @@ TH1D *hMeffElOsqrMET[CutN];
 TH1D *hMeffOsqrMET[CutN];
 
 TH1D *hHT[CutN];
+TH1D *hgenHT[CutN];
 TH1D *hHText[CutN];
 TH1D *hRht[CutN];
 TH1D *hHT2[CutN];
@@ -561,6 +1073,8 @@ TH1D *hIsoLept1[CutN];
 TH1D *hIsoLept2[CutN];
 TH1D *hIsoEl[CutN];
 TH1D *hIsoTau[CutN];
+TH1D *hIsoTau1[CutN];
+TH1D *hIsoTau2[CutN];
 
 TH1D *hInvMassMuTau[CutN];
 TH1D *hInvMassMuEl[CutN];
@@ -568,6 +1082,14 @@ TH1D *hInvMassTauTau[CutN];
 TH1D *hInvMassElEl[CutN];
 TH1D *hInvMassElTau[CutN];
 TH1D *hInvMassMuMu[CutN];
+TH1D *hInvMass3MuTau[CutN];
+TH1D *hInvMass2MuElTau[CutN];
+TH1D *hInvMass2Mu2Tau[CutN];
+TH1D *hInvMass3ElTauFB[CutN];
+TH1D *hInvMass2ElMuTauFB[CutN];
+TH1D *hInvMass2El2TauFB[CutN];
+
+
 
 
 TH1D *hnEl[CutN];
@@ -588,6 +1110,10 @@ TH1D *hLept2eta[CutN];
 TH1D *hnTau[CutN];
 TH1D *hTaupt[CutN];
 TH1D *hTaueta[CutN];
+TH1D *hTau1pt[CutN];
+TH1D *hTau1eta[CutN];
+TH1D *hTau2pt[CutN];
+TH1D *hTau2eta[CutN];
 
 
 TH1D *hMETFake[CutN][CutF];
@@ -604,12 +1130,34 @@ TH1D *hTauDecayMode1[CutN];
 TH1D *hTauDecayMode2[CutN];
 TH1D *hTauDecayModeAll[CutN];
 
+TH1D *hMt2_binned[CutN][nBinsSR];
+TH1D *hMET_binned[CutN][nBinsSR];
+TH1D *hDzeta_binned[CutN][nBinsSR];
 
 TH1D *hMET[CutN];
 TH1D *hMETFB[CutN];
 TH1D *hGenMETFB[CutN];
 TH1D *hMETphi[CutN];
 //TH1D *hnOver[CutN];
+TH1D *hMETLowDzeta[CutN];
+TH1D *hMETMiddleDzeta[CutN];
+TH1D *hMETHighDzeta[CutN];
+
+TH1D *hMETHighDzetaHighMt2[CutN];
+TH1D *hMETHighDzetaLowMt2[CutN];
+TH1D *hMETHighDzetaMiddleMt2[CutN];
+
+TH1D *hMETLowDzetaHighMt2[CutN];
+TH1D *hMETLowDzetaLowMt2[CutN];
+TH1D *hMETLowDzetaMiddleMt2[CutN];
+
+TH1D *hMt2HighDzetaMiddleMET[CutN];
+TH1D *hMt2HighDzetaLowMET[CutN];
+TH1D *hMt2HighDzetaHighMET[CutN];
+
+TH1D *hMt2LowDzetaMiddleMET[CutN];
+TH1D *hMt2LowDzetaLowMET[CutN];
+TH1D *hMt2LowDzetaHighMET[CutN];
 
 TH1D *hdEtaDil[CutN];
 TH1D *hdEtaJ0J1[CutN];
@@ -626,6 +1174,8 @@ TH1D *hdPhiDil[CutN];
 TH1D *hdPhiElMET[CutN];
 TH1D *hdPhiMuMET[CutN];
 TH1D *hdPhiTauMET[CutN];
+TH1D *hdPhiTau1MET[CutN];
+TH1D *hdPhiTau2MET[CutN];
 
 TH1D *hdPhiJMET[CutN];
 TH1D *hdPhiJ0J1[CutN];
@@ -657,6 +1207,8 @@ TH1D *hMTmin[CutN];
 TH1D *hMTtau[CutN];
 TH1D *hDZeta[CutN];
 TH1D *hDZetaFB[CutN];
+TH1D *hDZetaR[CutN];
+TH1D *hDZetaRFB[CutN];
 
 TH1D *hMTmutau[CutN];
 TH1D *hMTmuel[CutN];
@@ -676,7 +1228,20 @@ TH1D *hdR_Dil[CutN];
 TH1D *hInvMassDil[CutN];
 TH1D *hInvMassDilFineBin[CutN];
 TH1D *hPtDil[CutN];
+
+TH1D *hPtDil3MuTau[CutN];
+TH1D *hPtDil2Mu2Tau[CutN];
+TH1D *hPtDil2MuElTau[CutN];
+
+TH1D *hPtDil3ElTau[CutN];
+TH1D *hPtDil2El2Tau[CutN];
+TH1D *hPtDil2ElMuTau[CutN];
+
 TH1D *hDiJetMass_J0J1[CutN];
+
+TH1D *hMt2LowDzeta[CutN];
+TH1D *hMt2MiddleDzeta[CutN];
+TH1D *hMt2HighDzeta[CutN];
 
 TH1D *hMt2lestermutau[CutN];
 TH1D *hMt2lestermutauFB[CutN];
@@ -724,67 +1289,6 @@ TH1D *hmet_MT2lester_DZeta_01J1D[CutN];
 TH1D *hmet_MT2lester1D[CutN];
 TH1D *hmet_DZeta1D[CutN];
 TH1D *hMT2lester_DZeta1D[CutN];
-/*
-TH3D *hmet_DZeta_MT2lester[CutN];
-TH3D *hmet_DZeta_MT2lester0Jets[CutN];
-TH3D *hmet_DZeta_MT2lester1Jets[CutN];
-
-
-
-TH2D *hmet_MT[CutN];
-TH2D *hmet_MTsum[CutN];
-TH2D *hmet_MTtot[CutN];
-TH2D *hmet_MCTb[CutN];
-TH2D *hmet_MT2lester[CutN];
-TH2D *hmet_TauPt[CutN];
-TH2D *hmet_DZeta[CutN];
-TH2D *hmet_dR[CutN];
-TH2D *hmet_MTDil[CutN];
-
-
-
-TH2D *hMT_MTsum[CutN];
-TH2D *hMT_MTtot[CutN];
-TH2D *hMT_MCTb[CutN];
-TH2D *hMT_MT2lester[CutN];
-TH2D *hMT_TauPt[CutN];
-TH2D *hMT_DZeta[CutN];
-TH2D *hMT_dR[CutN];
-TH2D *hMT_MTDil[CutN];
-
-TH2D *hMTsum_MTtot[CutN];
-TH2D *hMTsum_MCTb[CutN];
-TH2D *hMTsum_MT2lester[CutN];
-TH2D *hMTsum_TauPt[CutN];
-TH2D *hMTsum_DZeta[CutN];
-TH2D *hMTsum_dR[CutN];
-TH2D *hMTsum_MTDil[CutN];
-
-TH2D *hMTtot_MCTb[CutN];
-TH2D *hMTtot_MT2lester[CutN];
-TH2D *hMTtot_TauPt[CutN];
-TH2D *hMTtot_DZeta[CutN];
-TH2D *hMTtot_dR[CutN];
-TH2D *hMTtot_MTDil[CutN];
-
-TH2D *hMCTb_MT2lester[CutN];
-TH2D *hMCTb_TauPt[CutN];
-TH2D *hMCTb_DZeta[CutN];
-TH2D *hMCTb_dR[CutN];
-TH2D *hMCTb_MTDil[CutN];
-
-TH2D *hMT2lester_TauPt[CutN];
-TH2D *hMT2lester_DZeta[CutN];
-TH2D *hMT2lester_dR[CutN];
-TH2D *hMT2lester_MTDil[CutN];
-
-TH2D *hTauPt_DZeta[CutN];
-TH2D *hTauPt_dR[CutN];
-TH2D *hTauPt_MTDil[CutN];
-
-TH2D *hdR_MTDil[CutN];
-
-*/
  
      
 
@@ -1004,6 +1508,27 @@ for(int nSR = 0; nSR < nBinsSR; nSR++){
 	}//loop in nSR
 }
 
+void SetupHistsnSR(int CutNF){
+
+
+for(int nSR = 0; nSR < nBinsSR; nSR++){
+  for(int cj = 0; cj < CutNF; cj++)
+    	{
+      TString nCut;
+      TString nsr;
+      nCut.Form("%i",cj);
+      nsr.Form("%i",nSR);
+      
+//      cout<<" setting histo now hMt2_binned_"<<nCut<<"_"<<nsr<<endl;
+
+      hMt2_binned[cj][nSR]= new TH1D("hMt2_binned_"+nCut+"_"+nsr,"Mt2 ",nBinsMT2lester,binsMT2lesterr);
+      hMET_binned[cj][nSR]= new TH1D("hMET_binned_"+nCut+"_"+nsr,"MET ",nBinsmet,binsmett);
+      hDzeta_binned[cj][nSR]= new TH1D("hDzeta_binned_"+nCut+"_"+nsr,"DZeta ",nBinsDZeta,binsDZeta);
+
+    		}
+	}//loop in nSR
+}
+
 void SetupHistsFakeJet(int CutNF){
 
 for(int nSR = 0; nSR < nBinsSR; ++nSR){
@@ -1113,13 +1638,17 @@ for(int jj = 0; jj < 60; jj++){
       hTauDecayModeAll[cj] = new TH1D("TauDecayModeAll_"+nCut,"TauDecayModeAll "+cutName, 11, -1.5,9.5);
       hTauDecayModeAll[cj]->Sumw2();
 
-      hDZeta[cj] = new TH1D("hDZeta_"+nCut,"hDZeta"+cutName,nBinsDZeta,binsDZeta);
       //hDZeta[cj] = new TH1D("hDZeta_"+nCut,"hDZeta"+cutName,30,-400,200);
+      hDZeta[cj] = new TH1D("hDZeta_"+nCut,"hDZeta"+cutName,nBinsDZeta,binsDZeta);
       hDZeta[cj]->Sumw2();
 
       hDZetaFB[cj] = new TH1D("hDZetaFB_"+nCut,"hDZeta"+cutName,30,-400,200);
       hDZetaFB[cj]->Sumw2();
       
+      hDZetaR[cj] = new TH1D("hDZetaR_"+nCut,"hDZetaR"+cutName,nBinsDZetaR,binsDZetaR);
+      hDZetaR[cj]->Sumw2();
+      hDZetaRFB[cj] = new TH1D("hDZetaRFB_"+nCut,"hDZetaRFB"+cutName,200,0,2);
+      hDZetaRFB[cj]->Sumw2();
 	
       hMuneutralHadIso[cj] = new TH1D("mu_neutralHadIso_"+nCut,"mu_neutralHadIso "+cutName,150,0,300);
       hMuneutralHadIso[cj]->Sumw2();
@@ -1141,6 +1670,9 @@ for(int jj = 0; jj < 60; jj++){
 
       hMurelIsoMu[cj] = new TH1D("mu_relIsoMu_"+nCut,"mu_relIsoMu "+cutName,200,0,10);
       hMurelIsoMu[cj]->Sumw2();
+
+
+
 
 
       hLept1neutralHadIso[cj] = new TH1D("lept1_neutralHadIso_"+nCut,"lept1_neutralHadIso "+cutName,150,0,300);
@@ -1214,6 +1746,7 @@ for(int jj = 0; jj < 60; jj++){
       hElrelIsoEl[cj]->Sumw2();
 
 
+
       hMudxy[cj] = new TH1D ("mu_dxy_"+nCut,"mu_dxy "+cutName,20,-.2,.2);
       hMudxy[cj]->Sumw2();
       hMudxyerr[cj] = new TH1D ("mu_dxyerr_"+nCut,"mu_dxyerr "+cutName,20,-.2,.2);
@@ -1234,9 +1767,19 @@ for(int jj = 0; jj < 60; jj++){
 
       htau_dxy[cj] = new TH1D ("tau_dxy_"+nCut,"tau_dxy "+cutName,20,-.2,.2);
       htau_dxy[cj]->Sumw2();
+      htau1_dxy[cj] = new TH1D ("tau1_dxy_"+nCut,"tau_dxy "+cutName,20,-.2,.2);
+      htau1_dxy[cj]->Sumw2();
+      htau2_dxy[cj] = new TH1D ("tau2_dxy_"+nCut,"tau_dxy "+cutName,20,-.2,.2);
+      htau2_dxy[cj]->Sumw2();
       
+
       htau_dz[cj] = new TH1D ("tau_dz_"+nCut,"tau_dz "+cutName,20,-.2,.2);
       htau_dz[cj]->Sumw2();
+      htau1_dz[cj] = new TH1D ("tau1_dz_"+nCut,"tau_dz "+cutName,20,-.2,.2);
+      htau1_dz[cj]->Sumw2();
+      htau2_dz[cj] = new TH1D ("tau2_dz_"+nCut,"tau_dz "+cutName,20,-.2,.2);
+      htau2_dz[cj]->Sumw2();
+
       hMudz[cj] = new TH1D ("mu_dz_"+nCut,"mu_dz "+cutName,20,-.2,.2);
       hMudz[cj]->Sumw2();
       hLept1dz[cj] = new TH1D ("lept1_dz_"+nCut,"lept1_dz "+cutName,20,-.2,.2);
@@ -1269,7 +1812,9 @@ for(int jj = 0; jj < 60; jj++){
       hLept2IPsigz[cj]->Sumw2();
  
       hElIPsigxy[cj] = new TH1D ("elIPsigxy_"+nCut,"elIPsigxy "+cutName,50,0,10);
+      hElIPsigxy[cj]->Sumw2();
       hElIPsigz[cj] = new TH1D ("elIPsigz_"+nCut,"elIPsigz "+cutName,50,0,10);
+      hElIPsigz[cj]->Sumw2();
 
       hHTOsqrMET[cj] = new TH1D ("hHTOsqrMET_"+nCut,"hHTOsqrMET "+cutName,10,0.0,100.0);
       hHTOsqrMET[cj]->Sumw2();
@@ -1295,6 +1840,8 @@ for(int jj = 0; jj < 60; jj++){
 
       hHT[cj] = new TH1D ("HT_"+nCut,"HT "+cutName,10,0.0,1000.0);
       hHT[cj]->Sumw2();
+      hgenHT[cj] = new TH1D ("genHT_"+nCut,"genHT "+cutName,10,0.0,1000.0);
+      hgenHT[cj]->Sumw2();
  
       hRht[cj] = new TH1D ("Rht_"+nCut,"Rht "+cutName,30,0.0,15);
       hRht[cj]->Sumw2();
@@ -1351,9 +1898,45 @@ for(int jj = 0; jj < 60; jj++){
       hInvMassDilFineBin[cj]->Sumw2();
       hDiJetMass_J0J1[cj] = new TH1D ("hDiJetMass_J0J1_"+nCut,"hDiJetMass_J0J1 "+cutName,50,0,500);
       hDiJetMass_J0J1[cj]->Sumw2();
+
+
+      hInvMass3MuTau[cj] = new TH1D ("hInvMass3MuTau_"+nCut,"hInvMass3MuTau "+cutName,50,0,500);
+      hInvMass3MuTau[cj]->Sumw2();
+      hInvMass2MuElTau[cj] = new TH1D ("hInvMass2MuElTau_"+nCut,"hInvMass2MuElTau "+cutName,50,0,500);
+      hInvMass2MuElTau[cj]->Sumw2();
+      hInvMass2Mu2Tau[cj] = new TH1D ("hInvMass2Mu2Tau_"+nCut,"hInvMass2Mu2Tau "+cutName,50,0,500);
+      hInvMass2Mu2Tau[cj]->Sumw2();
+
+      hInvMass3ElTauFB[cj] = new TH1D ("hInvMass3ElTauFB_"+nCut,"hInvMass3ElTauFB "+cutName,250,0,500);
+      hInvMass3ElTauFB[cj]->Sumw2();
+      hInvMass2ElMuTauFB[cj] = new TH1D ("hInvMass2ElMuTauFB_"+nCut,"hInvMass2ElMuTauFB "+cutName,250,0,500);
+      hInvMass2ElMuTauFB[cj]->Sumw2();
+      hInvMass2El2TauFB[cj] = new TH1D ("hInvMass2El2TauFB_"+nCut,"hInvMass2El2TauFB "+cutName,250,0,500);
+      hInvMass2El2TauFB[cj]->Sumw2();
+
         
       hPtDil[cj] = new TH1D ("PtDil_"+nCut,"PtDil "+cutName,80,0,800);
       hPtDil[cj]->Sumw2();
+
+      hPtDil3MuTau[cj] = new TH1D ("PtDil3MuTau_"+nCut,"PtDil3MuTau "+cutName,80,0,800);
+      hPtDil3MuTau[cj]->Sumw2();
+
+      hPtDil2MuElTau[cj] = new TH1D ("PtDil2MuElTau_"+nCut,"PtDil2MuElTau "+cutName,80,0,800);
+      hPtDil2MuElTau[cj]->Sumw2();
+
+      hPtDil2Mu2Tau[cj] = new TH1D ("PtDil2Mu2Tau_"+nCut,"PtDil2Mu2Tau "+cutName,80,0,800);
+      hPtDil2Mu2Tau[cj]->Sumw2();
+
+
+      hPtDil3ElTau[cj] = new TH1D ("PtDil3ElTau_"+nCut,"PtDil3ElTau "+cutName,80,0,800);
+      hPtDil3ElTau[cj]->Sumw2();
+
+      hPtDil2ElMuTau[cj] = new TH1D ("PtDil2ElMuTau_"+nCut,"PtDil2ElMuTau "+cutName,80,0,800);
+      hPtDil2ElMuTau[cj]->Sumw2();
+
+      hPtDil2El2Tau[cj] = new TH1D ("PtDil2El2Tau_"+nCut,"PtDil2El2Tau "+cutName,80,0,800);
+      hPtDil2El2Tau[cj]->Sumw2();
+
       //Leptons
       //
       //
@@ -1367,6 +1950,7 @@ for(int jj = 0; jj < 60; jj++){
       hMupt[cj]->Sumw2();
       hMueta[cj] = new TH1D ("Mueta_"+nCut,"Mu eta "+cutName,30,-3,3);
       hMueta[cj]->Sumw2();
+
       hLept1pt[cj] = new TH1D ("Lept1pT_"+nCut,"Lept1 pT "+cutName,50,0,500);
       hLept1pt[cj]->Sumw2();
       hLept1eta[cj] = new TH1D ("Lept1eta_"+nCut,"Lept1 eta "+cutName,30,-3,3);
@@ -1385,6 +1969,15 @@ for(int jj = 0; jj < 60; jj++){
       hTaupt[cj]->Sumw2();
       hTaueta[cj] = new TH1D ("Taueta_"+nCut,"Tau eta "+cutName,30,-3,3);
       hTaueta[cj]->Sumw2();
+
+      hTau1pt[cj] = new TH1D ("Tau1pT_"+nCut,"Tau pT 1"+cutName,50,0,500);
+      hTau1pt[cj]->Sumw2();
+      hTau1eta[cj] = new TH1D ("Tau1eta_"+nCut,"Tau eta 1"+cutName,30,-3,3);
+      hTau1eta[cj]->Sumw2();
+      hTau2pt[cj] = new TH1D ("Tau2pT_"+nCut,"Tau pT 2"+cutName,50,0,500);
+      hTau2pt[cj]->Sumw2();
+      hTau2eta[cj] = new TH1D ("Tau2eta_"+nCut,"Tau eta 2"+cutName,30,-3,3);
+      hTau2eta[cj]->Sumw2();
 	
       //hnOver[cj] = new TH1D ("nOver_"+nCut,"nOver "+cutName,2,0,2);
       //Electrons
@@ -1407,6 +2000,10 @@ for(int jj = 0; jj < 60; jj++){
       hIsoEl[cj]->Sumw2();
       hIsoTau[cj] = new TH1D ("IsoTau_"+nCut,"Tau Iso "+cutName,100,0,5);
       hIsoTau[cj]->Sumw2();
+      hIsoTau1[cj] = new TH1D ("IsoTau1_"+nCut,"Tau Iso 1"+cutName,100,0,5);
+      hIsoTau1[cj]->Sumw2();
+      hIsoTau2[cj] = new TH1D ("IsoTau2_"+nCut,"Tau Iso 2"+cutName,100,0,5);
+      hIsoTau2[cj]->Sumw2();
        
       hMETFB[cj] = new TH1D("METFB_"+nCut,"METFB "+cutName,50,0.,500.);
       hMETFB[cj]->Sumw2();
@@ -1415,8 +2012,6 @@ for(int jj = 0; jj < 60; jj++){
 
 
    
-   int nBinsMT2lester = 8;
-   double binsMT2lester[9] = {0,10,20,30,40,80,100,120,1000};
 	
 for (int i=0;i<FakeList.size();++i){
 
@@ -1518,6 +2113,7 @@ TH1D *hdEtaTauMET[CutN];
 
       hdPhiMuMET[cj] = new TH1D("dPhiMuMET_"+nCut,"dPhiMuMET "+cutName,64,-3.2,3.2);
       hdPhiMuMET[cj]->Sumw2();
+
       hdPhiLept1MET[cj] = new TH1D("dPhiLept1MET_"+nCut,"dPhiLept1MET "+cutName,64,-3.2,3.2);
       hdPhiLept1MET[cj]->Sumw2();
       hdPhiLept2MET[cj] = new TH1D("dPhiLept2MET_"+nCut,"dPhiLept2MET "+cutName,64,-3.2,3.2);
@@ -1528,6 +2124,10 @@ TH1D *hdEtaTauMET[CutN];
    
       hdPhiTauMET[cj] = new TH1D("dPhiTauMET_"+nCut,"dPhiTauMET "+cutName,64,-3.2,3.2);
       hdPhiTauMET[cj]->Sumw2();
+      hdPhiTau1MET[cj] = new TH1D("dPhiTau1MET_"+nCut,"dPhiTauMET "+cutName,64,-3.2,3.2);
+      hdPhiTau1MET[cj]->Sumw2();
+      hdPhiTau2MET[cj] = new TH1D("dPhiTau2MET_"+nCut,"dPhiTauMET "+cutName,64,-3.2,3.2);
+      hdPhiTau2MET[cj]->Sumw2();
    
       //MT
       //
@@ -1583,10 +2183,55 @@ TH1D *hdEtaTauMET[CutN];
       hMt2[cj]->Sumw2();
       hMt2mutau[cj] = new TH1D ("Mt2mutau_"+nCut,"Mt2mutau "+cutName,200,0,1000);
       hMt2mutau[cj]->Sumw2();
-      
+     /*
+      hprofMt2vsDZeta[cj]  = new TProfile("hprofMt2vsDZeta_"+nCut,"hprof "+cutName,nBinsMT2lester,binsMT2lester);
+      hprofMt2vsMET[cj]  = new TProfile("hprofMt2vsMET_"+nCut,"hprof "+cutName,nBinsMT2lester,binsMT2lester);
+      hprofMETvsMt2[cj]  = new TProfile("hprofMETvsMt2_"+nCut,"hprof "+cutName,nBinsmet,binsmet);
+      hprofMETvsDZeta[cj]  = new TProfile("hprofMETvsDZeta_"+nCut,"hprof "+cutName,nBinsmet,binsmet);
+      hprofDZetavsMET[cj]  = new TProfile("hprofMETvsMET_"+nCut,"hprof "+cutName,nBinsDZeta,binsDZeta);
+      hprofDZetavsMt2[cj]  = new TProfile("hprofMETvsMt2_"+nCut,"hprof "+cutName,nBinsDZeta,binsDZeta);
+      */
       hMt2lestermutau[cj] = new TH1D ("Mt2lestermutau_"+nCut,"Mt2lestermutau "+cutName,nBinsMT2lester,binsMT2lester);
       //hMt2lestermutau[cj] = new TH1D ("Mt2lestermutau_"+nCut,"Mt2lestermutau "+cutName,50,0,500);
       hMt2lestermutau[cj]->Sumw2();
+
+      hMt2LowDzeta[cj] = new TH1D ("Mt2lestermutauLowDzeta_"+nCut,"Mt2lestermutauLowDzeta "+cutName,nBinsMT2lester,binsMT2lesterr);
+      hMt2LowDzeta[cj]->Sumw2();
+      hMt2MiddleDzeta[cj] = new TH1D ("Mt2lestermutauMiddleDzeta_"+nCut,"Mt2lestermutauMiddleDzeta "+cutName,nBinsMT2lester,binsMT2lesterr);
+      hMt2MiddleDzeta[cj]->Sumw2();
+      hMt2HighDzeta[cj] = new TH1D ("Mt2lestermutauHighDzeta_"+nCut,"Mt2lestermutauHighDzeta "+cutName,nBinsMT2lester,binsMT2lesterr);
+      hMt2HighDzeta[cj]->Sumw2();
+    
+      hMt2HighDzetaHighMET[cj] = new TH1D ("Mt2HighDzetaHighMET_"+nCut,"Mt2HighDzetaHighMET "+cutName,nBinsMT2lester,binsMT2lesterr);
+      hMt2HighDzetaLowMET[cj] = new TH1D ("Mt2HighDzetaLowMET_"+nCut,"Mt2HighDzetaLowMET "+cutName,nBinsMT2lester,binsMT2lesterr);
+      hMt2HighDzetaMiddleMET[cj] = new TH1D ("Mt2HighDzetaMiddleMET_"+nCut,"Mt2HighDzetaMiddleMET "+cutName,nBinsMT2lester,binsMT2lesterr);
+      hMt2HighDzetaHighMET[cj]->Sumw2();
+      hMt2HighDzetaLowMET[cj]->Sumw2();
+      hMt2HighDzetaMiddleMET[cj]->Sumw2();
+
+      hMETHighDzetaHighMt2[cj] = new TH1D ("METHighDzetaHighMt2_"+nCut,"METHighDzetaHighMt2 "+cutName,nBinsmet,binsmett);
+      hMETHighDzetaLowMt2[cj] = new TH1D ("METHighDzetaLowMt2_"+nCut,"METHighDzetaLowMt2 "+cutName,nBinsmet,binsmett);
+      hMETHighDzetaMiddleMt2[cj] = new TH1D ("METHighDzetaMiddleMt2_"+nCut,"METHighDzetaMiddleMt2 "+cutName,nBinsmet,binsmett);
+      hMETHighDzetaHighMt2[cj]->Sumw2();
+      hMETHighDzetaLowMt2[cj]->Sumw2();
+      hMETHighDzetaMiddleMt2[cj]->Sumw2();
+
+
+      hMt2LowDzetaHighMET[cj] = new TH1D ("Mt2LowDzetaHighMET_"+nCut,"Mt2LowDzetaHighMET "+cutName,nBinsMT2lester,binsMT2lesterr);
+      hMt2LowDzetaLowMET[cj] = new TH1D ("Mt2LowDzetaLowMET_"+nCut,"Mt2LowDzetaLowMET "+cutName,nBinsMT2lester,binsMT2lesterr);
+      hMt2LowDzetaMiddleMET[cj] = new TH1D ("Mt2LowDzetaMiddleMET_"+nCut,"Mt2LowDzetaMiddleMET "+cutName,nBinsMT2lester,binsMT2lesterr);
+      hMt2LowDzetaHighMET[cj]->Sumw2();
+      hMt2LowDzetaLowMET[cj]->Sumw2();
+      hMt2LowDzetaMiddleMET[cj]->Sumw2();
+
+      hMETLowDzetaHighMt2[cj] = new TH1D ("METLowDzetaHighMt2_"+nCut,"METLowDzetaHighMt2 "+cutName,nBinsmet,binsmett);
+      hMETLowDzetaLowMt2[cj] = new TH1D ("METLowDzetaLowMt2_"+nCut,"METLowDzetaLowMt2 "+cutName,nBinsmet,binsmett);
+      hMETLowDzetaMiddleMt2[cj] = new TH1D ("METLowDzetaMiddleMt2_"+nCut,"METLowDzetaMiddleMt2 "+cutName,nBinsmet,binsmett);
+      hMETLowDzetaHighMt2[cj]->Sumw2();
+      hMETLowDzetaLowMt2[cj]->Sumw2();
+      hMETLowDzetaMiddleMt2[cj]->Sumw2();
+
+
 
       hMt2lestermutauFB[cj] = new TH1D ("Mt2lestermutauFB_"+nCut,"Mt2lestermutau "+cutName,50,0,500);
       hMt2lestermutauFB[cj]->Sumw2();
@@ -1598,6 +2243,15 @@ TH1D *hdEtaTauMET[CutN];
 
       hMET[cj] = new TH1D("MET_"+nCut,"MET "+cutName,nBinsmet,binsmet);
       hMET[cj]->Sumw2();
+
+      hMETLowDzeta[cj] = new TH1D("METLowDzeta_"+nCut,"METLowDzeta "+cutName,nBinsmet,binsmett);
+      hMETLowDzeta[cj]->Sumw2();
+
+      hMETMiddleDzeta[cj] = new TH1D("METMiddleDzeta_"+nCut,"METMiddleDzeta "+cutName,nBinsmet,binsmett);
+      hMETMiddleDzeta[cj]->Sumw2();
+
+      hMETHighDzeta[cj] = new TH1D("METHighDzeta_"+nCut,"METHighDzeta "+cutName,nBinsmet,binsmett);
+      hMETHighDzeta[cj]->Sumw2();
 
       hMCTcor[cj] = new TH1D ("MCTcor_"+nCut,"MCTcor "+cutName,50,0,500);
       hMCTcor[cj]->Sumw2();
@@ -1694,7 +2348,7 @@ TH1D *hdEtaTauMET[CutN];
 //
 //
       
-      hmet_MT2lester_DZeta_01J1D[cj]= new TH1D ("met_MT2lester_DZeta01J1D_"+nCut,"met_MT2lester_DZeta01J1D "+cutName,53,0.5,53.5);;
+      hmet_MT2lester_DZeta_01J1D[cj]= new TH1D ("met_MT2lester_DZeta01J1D_"+nCut,"met_MT2lester_DZeta01J1D "+cutName,51,0.5,51.5);;
       hmet_MT2lester_DZeta_01J1D[cj]->Sumw2();
 
       hmet_MT2lester1D[cj]= new TH1D ("met_MT2lester1D_"+nCut,"met_MT2lester1D "+cutName,6,0.5,6.5);;

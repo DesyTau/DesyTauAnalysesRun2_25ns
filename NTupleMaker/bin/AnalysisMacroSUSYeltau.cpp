@@ -451,9 +451,13 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	  		  if (analysisTree.genparticles_pdgid[igen]==-1000024 && abs(analysisTree.genparticles_status[igen])==62) BlobB = genLV;
 			  }
 
-	  if (string::npos != datasetName.find("stau")) {
+	  if (string::npos != datasetName.find("left")) {
 			  if (analysisTree.genparticles_pdgid[igen]==1000015 && abs(analysisTree.genparticles_status[igen])==62) BlobA = genLV;
 	  		  if (analysisTree.genparticles_pdgid[igen]==-1000015 && abs(analysisTree.genparticles_status[igen])==62) BlobB = genLV;
+			  }
+	  if (string::npos != datasetName.find("right")) {
+			  if (analysisTree.genparticles_pdgid[igen]==2000015 && abs(analysisTree.genparticles_status[igen])==62) BlobA = genLV;
+	  		  if (analysisTree.genparticles_pdgid[igen]==-2000015 && abs(analysisTree.genparticles_status[igen])==62) BlobB = genLV;
 			  }
 
 	}
