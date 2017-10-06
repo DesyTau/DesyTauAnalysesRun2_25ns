@@ -1556,25 +1556,26 @@ if (!CutBasedTauId){
       electron_index = (int)el_index;
       taus_index = (int)tau_index;
 
-      mu_count= (int)analysisTree.muon_count;
-      //cout<<" here ============================> "<<iEntry<<"  "<<mu_count<<"  "<<(int)analysisTree.muon_count<<"  "<<analysisTree.muon_count<<endl;
-      for (unsigned int im=0;im<analysisTree.muon_count; ++im){
-	mu_px[im]=analysisTree.muon_px[im];
-	mu_py[im]=analysisTree.muon_py[im];
-	mu_pz[im]=analysisTree.muon_pz[im];
-	mu_eta[im]=analysisTree.muon_eta[im];
-	mu_pt[im]=analysisTree.muon_pt[im];
-	mu_phi[im]=analysisTree.muon_phi[im];
-	mu_charge[im]=analysisTree.muon_charge[im];
-	mu_dxy[im]=analysisTree.muon_dxy[im];
-	mu_dz[im]=analysisTree.muon_dz[im];
-	mu_dxyerr[im]=analysisTree.muon_dxyerr[im];
-	mu_dzerr[im]=analysisTree.muon_dzerr[im];
+      mu_count= (int)muons.size();
 
-        mu_neutralHadIso[im] = analysisTree.muon_r04_sumNeutralHadronEt[im];
-        mu_photonIso[im] = analysisTree.muon_r04_sumPhotonEt[im];
-        mu_chargedHadIso[im] = analysisTree.muon_r04_sumChargedHadronPt[im];
-        mu_puIso[im] = analysisTree.muon_r04_sumPUPt[im];
+      for (unsigned int im=0;im<muons.size(); ++im){
+	  unsigned int mIndex = muons[im];
+	mu_px[im]=analysisTree.muon_px[mIndex];
+	mu_py[im]=analysisTree.muon_py[mIndex];
+	mu_pz[im]=analysisTree.muon_pz[mIndex];
+	mu_eta[im]=analysisTree.muon_eta[mIndex];
+	mu_pt[im]=analysisTree.muon_pt[mIndex];
+	mu_phi[im]=analysisTree.muon_phi[mIndex];
+	mu_charge[im]=analysisTree.muon_charge[mIndex];
+	mu_dxy[im]=analysisTree.muon_dxy[mIndex];
+	mu_dz[im]=analysisTree.muon_dz[mIndex];
+	mu_dxyerr[im]=analysisTree.muon_dxyerr[mIndex];
+	mu_dzerr[im]=analysisTree.muon_dzerr[mIndex];
+
+        mu_neutralHadIso[im] = analysisTree.muon_r04_sumNeutralHadronEt[mIndex];
+        mu_photonIso[im] = analysisTree.muon_r04_sumPhotonEt[mIndex];
+        mu_chargedHadIso[im] = analysisTree.muon_r04_sumChargedHadronPt[mIndex];
+        mu_puIso[im] = analysisTree.muon_r04_sumPUPt[mIndex];
  
         double neutralIso = mu_neutralHadIso[im] + mu_photonIso[im] - 0.5*mu_puIso[im];
         neutralIso = max(double(0),neutralIso);
@@ -1585,52 +1586,24 @@ if (!CutBasedTauId){
      	}
 
 
-
-      el_count=(int)analysisTree.electron_count;
-      for (unsigned int ie=0;ie<analysisTree.electron_count; ++ie){
-	el_px[ie]=analysisTree.electron_px[ie];
-	el_py[ie]=analysisTree.electron_py[ie];
-	el_pz[ie]=analysisTree.electron_pz[ie];
-	el_eta[ie]=analysisTree.electron_eta[ie];
-	el_pt[ie]=analysisTree.electron_pt[ie];
-	el_phi[ie]=analysisTree.electron_phi[ie];
-	el_charge[ie]=analysisTree.electron_charge[ie];
-	el_dxy[ie]=analysisTree.electron_dxy[ie];
-	el_dz[ie]=analysisTree.electron_dz[ie];
-	el_dxyerr[ie]=analysisTree.electron_dxyerr[ie];
-	el_dzerr[ie]=analysisTree.electron_dzerr[ie];
-
-        el_neutralHadIso[ie] = analysisTree.electron_r03_sumNeutralHadronEt[ie];
-        el_photonIso[ie] = analysisTree.electron_r03_sumPhotonEt[ie];
-        el_chargedHadIso[ie] = analysisTree.electron_r03_sumChargedHadronPt[ie];
-        el_puIso[ie] = analysisTree.electron_r03_sumPUPt[ie];
- 
-        double neutralIso = el_neutralHadIso[ie] + el_photonIso[ie] - 0.5*el_puIso[ie];
-        neutralIso = max(double(0),neutralIso);
-        el_neutralIso[ie] = neutralIso ;
-        el_absIsoEl[ie] = el_chargedHadIso[ie] + mu_neutralIso[ie];
-	el_relIsoEl[ie]  = el_absIsoEl[ie]/el_pt[ie] ;
-
-      }
-
 				
-      ta_count=(int)analysisTree.tau_count;
-      for (unsigned int it=0;it<analysisTree.tau_count; ++it){
-	ta_mass[it]=analysisTree.tau_mass[it];
-	ta_px[it]=analysisTree.tau_px[it];
-	ta_py[it]=analysisTree.tau_py[it];
-	ta_pz[it]=analysisTree.tau_pz[it];
-	ta_eta[it]=analysisTree.tau_eta[it];
-	ta_pt[it]=analysisTree.tau_pt[it];
-	ta_phi[it]=analysisTree.tau_phi[it];
-	ta_charge[it]=analysisTree.tau_charge[it];
-	ta_dxy[it]=analysisTree.tau_dxy[it];
-	ta_dz[it]=analysisTree.tau_dz[it];
-     	ta_puCorrPtSum[it] = analysisTree.tau_puCorrPtSum[it];
-     	ta_chargedIsoPtSum[it] = analysisTree.tau_chargedIsoPtSum[it];
-     	ta_neutralIsoPtSum[it] = analysisTree.tau_neutralIsoPtSum[it];
+      ta_count=(int)taus.size();
 
-
+      for (unsigned int it=0;it<taus.size(); ++it){
+	  unsigned int itt = taus[it];
+	ta_px[it]=analysisTree.tau_px[itt];
+	ta_py[it]=analysisTree.tau_py[itt];
+	ta_pz[it]=analysisTree.tau_pz[itt];
+	ta_eta[it]=analysisTree.tau_eta[itt];
+	ta_pt[it]=analysisTree.tau_pt[itt];
+	ta_phi[it]=analysisTree.tau_phi[itt];
+	ta_charge[it]=analysisTree.tau_charge[itt];
+	ta_dxy[it]=analysisTree.tau_dxy[itt];
+	ta_dz[it]=analysisTree.tau_dz[itt];
+	//
+     	ta_puCorrPtSum[it] = analysisTree.tau_puCorrPtSum[itt];
+     	ta_chargedIsoPtSum[it] = analysisTree.tau_chargedIsoPtSum[itt];
+     	ta_neutralIsoPtSum[it] = analysisTree.tau_neutralIsoPtSum[itt];
 
       }
       jet_count=(int)analysisTree.pfjet_count;

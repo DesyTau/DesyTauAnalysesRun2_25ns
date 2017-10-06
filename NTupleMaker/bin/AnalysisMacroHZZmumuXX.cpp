@@ -27,7 +27,7 @@
 #include "DesyTauAnalyses/NTupleMaker/interface/PileUp.h"
 #include "HTT-utilities/LepEffInterface/interface/ScaleFactor.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/Jets.h"
-#include "DesyTauAnalyses/NTupleMaker/interface/AnalysisMacro.h"
+#include "DesyTauAnalyses/NTupleMaker/interface/AnalysisMacroHZZ.h"
 #include "CondFormats/BTauObjects/interface/BTagCalibration.h"
 #include "CondTools/BTau/interface/BTagCalibrationReader.h"
 #include "HTT-utilities/RecoilCorrections/interface/RecoilCorrector.h"
@@ -986,6 +986,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	if (applyMuonId && !analysisTree.muon_isMedium[im]) continue;
         if ( fabs(analysisTree.muon_charge[im]) != 1) continue;
 	idMuons.push_back((int)im);
+
 	float absIso = analysisTree.muon_r04_sumChargedHadronPt[im];
 	float neutralIso = analysisTree.muon_r04_sumNeutralHadronEt[im] + 
 	  analysisTree.muon_r04_sumPhotonEt[im] - 
@@ -1019,28 +1020,11 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	if (!isMu1matched) continue;
       	if (muons.size()==0) continue;
 
-      // MC study
-      vector<unsigned int> nonpromptMuons; nonpromptMuons.clear();
-      //      std::cout << "GenParticles = " << analysisTree.genparticles_count << std::endl;
-      if (!isData) {
-	for (unsigned int igen=0; igen<analysisTree.genparticles_count; ++igen) {
-	  if (fabs(analysisTree.genparticles_pdgid[igen])==13&&analysisTree.genparticles_status[igen]==1) {
-	    //	  float pxGen = analysisTree.genparticles_px[igen];
-	    //	  float pyGen = analysisTree.genparticles_py[igen];
-	    //	  float pzGen = analysisTree.genparticles_pz[igen];
-	    //	  float etaGen = PtoEta(pxGen,pyGen,pzGen);
-	    //	  float ptGen  = PtoPt(pxGen,pyGen);
-	    //	  std::cout << analysisTree.genparticles_pdgid[igen] << " : "
-	    //		    << "  pt = " << ptGen
-	    //		    << "  eta = " << etaGen
-	    //		    << "  info = " << analysisTree.genparticles_info[igen] << std::endl;
-	  }
-	}
-      }	
-
 
       int indx1 = -1;
       int indx2 = -1;
+      int indx3 = -1;
+      int indx4 = -1;
       bool isIsoMuonsPair = false;
       bool isTriggerMatch = false;
 
@@ -1058,6 +1042,16 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 				analysisTree.muon_eta[indexProbe],analysisTree.muon_phi[indexProbe]);
 	      if (dR<dRleptonsCut) continue; 
 	    }
+
+	float absIso = analysisTree.muon_r04_sumChargedHadronPt[im1];
+	float neutralIso = analysisTree.muon_r04_sumNeutralHadronEt[im1] + 
+	  analysisTree.muon_r04_sumPhotonEt[im1] - 
+	  0.5*analysisTree.muon_r04_sumPUPt[im1];
+	neutralIso = TMath::Max(float(0),neutralIso); 
+	absIso += neutralIso;
+	float relIsoMu1 = absIso/analysisTree.muon_pt[im1];
+
+	float isoMuonsVal1 = relIsoMu1;
 
 	  for (unsigned int im2=im1+1; im2<isoMuons.size(); ++im2) {
 	    unsigned int index2 = isoMuons[im2];
@@ -1083,8 +1077,19 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	    float dRmumu = deltaR(analysisTree.muon_eta[index1],analysisTree.muon_phi[index1],
 				  analysisTree.muon_eta[index2],analysisTree.muon_phi[index2]);
 	    if (isTriggerMatch && dRmumu>dRleptonsCut) {
-	      bool sumIso = isoMuonsValue[im1]+isoMuonsValue[im2];
+
+	absIso = analysisTree.muon_r04_sumChargedHadronPt[im2];
+	neutralIso = analysisTree.muon_r04_sumNeutralHadronEt[im2] + 
+	  analysisTree.muon_r04_sumPhotonEt[im2] - 
+	  0.5*analysisTree.muon_r04_sumPUPt[im2];
+	neutralIso = TMath::Max(float(0),neutralIso); 
+	absIso += neutralIso;
+	float relIsoMu2 = absIso/analysisTree.muon_pt[im2];
+	float isoMuonsVal2 = relIsoMu2;
+
+	      float sumIso = isoMuonsVal1+isoMuonsVal2;
 	      if (sumIso<isoMin) {
+		      //cout<<" logs sumIso "<<sumIso <<" isoMin "<<isoMin<<endl; 
 		isIsoMuonsPair = true;
 		isoMin = sumIso;
 		if (analysisTree.muon_pt[index1]>analysisTree.muon_pt[index2]) {
@@ -1118,8 +1123,124 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
       if (indx1 <0 || indx2 <0) continue;
 
+///////////loop a second time to form a 2nd mumu pair
+//
+      isoMin = 9999;
+      vector<int> muonsThird; muonsThird.clear();
+      if (isoMuons.size()>0) {
+	for (unsigned int im1=0; im1<isoMuons.size(); ++im1) {
+	  unsigned int index3 = isoMuons[im1];
+	  if ((int) index3 == indx1 || (int) index3 == indx2) continue;
+	
+	    muonsThird.push_back((int)im1);
+
+	    for (unsigned int iMu=0; iMu<allMuons.size(); ++iMu) {
+	      unsigned int indexProbe = allMuons[iMu];
+	      if ( index3==indexProbe) continue;
+	      float q1 = analysisTree.muon_charge[index3];
+	      float q2 = analysisTree.muon_charge[indexProbe];
+	      if (q1*q2>0) continue;
+	      float dR = deltaR(analysisTree.muon_eta[index3],analysisTree.muon_phi[index3],
+				analysisTree.muon_eta[indexProbe],analysisTree.muon_phi[indexProbe]);
+	      if (dR<dRleptonsCut) continue; 
+
+		float dRmu3mu1 = deltaR(analysisTree.muon_eta[im1],analysisTree.muon_phi[im1],
+				analysisTree.muon_eta[indx1],analysisTree.muon_phi[indx1]);
+		  if (dRmu3mu1 < 0.02) continue;
+
+
+		float dRmu3mu2 = deltaR(analysisTree.muon_eta[im1],analysisTree.muon_phi[im1],
+				analysisTree.muon_eta[indx2],analysisTree.muon_phi[indx2]);
+		  if (dRmu3mu2 < 0.02) continue;
+
+	    }
+
+	  for (unsigned int im2=im1+1; im2<isoMuons.size(); ++im2) {
+	    unsigned int index4 = isoMuons[im2];
+	  if ((int) index4 == indx1 || (int) index4 == indx2) continue;
+	    float q1 = analysisTree.muon_charge[index3];
+	    float q2 = analysisTree.muon_charge[index4];
+	      if (q1*q2>0) continue;
+	    bool isMu3matched = false;
+
+		float dRmu4mu1 = deltaR(analysisTree.muon_eta[im2],analysisTree.muon_phi[im2],
+				analysisTree.muon_eta[indx1],analysisTree.muon_phi[indx1]);
+		  if (dRmu4mu1 < 0.02) continue;
+
+		float dRmu4mu2 = deltaR(analysisTree.muon_eta[im2],analysisTree.muon_phi[im2],
+				analysisTree.muon_eta[indx2],analysisTree.muon_phi[indx2]);
+		  if (dRmu4mu2 < 0.02) continue;
+
+
+		for (unsigned int iT=0; iT<analysisTree.trigobject_count; ++iT) {
+	  	if (analysisTree.trigobject_filters[iT][nMainTrigger]
+	      	&& analysisTree.muon_pt[index4]>SingleMuonTriggerPtCut &&  analysisTree.trigobject_pt[iT]>SingleMuonTriggerPtCut) { // IsoMu Leg
+	    	float dRtrig = deltaR(analysisTree.muon_eta[index4],analysisTree.muon_phi[index4],
+				  analysisTree.trigobject_eta[iT],analysisTree.trigobject_phi[iT]);
+	   if (dRtrig<deltaRTrigMatch) 
+	      	isMu3matched = true;
+	  		}
+		}
+
+
+	   //isTriggerMatch = (isMu1matched || isMu2matched);
+//		if (isSignal) isTriggerMatch=true;
+
+	    float dRmumu = deltaR(analysisTree.muon_eta[index3],analysisTree.muon_phi[index3],
+				  analysisTree.muon_eta[index4],analysisTree.muon_phi[index4]);
+	    if (dRmumu>dRleptonsCut) {
+
+	float absIso = analysisTree.muon_r04_sumChargedHadronPt[im1];
+	float neutralIso = analysisTree.muon_r04_sumNeutralHadronEt[im1] + 
+	  analysisTree.muon_r04_sumPhotonEt[im1] - 
+	  0.5*analysisTree.muon_r04_sumPUPt[im1];
+	neutralIso = TMath::Max(float(0),neutralIso); 
+	absIso += neutralIso;
+	float relIsoMu3 = absIso/analysisTree.muon_pt[im1];
+
+	float isoMuonsVal3 = relIsoMu3;
+
+
+	absIso = analysisTree.muon_r04_sumChargedHadronPt[im2];
+	neutralIso = analysisTree.muon_r04_sumNeutralHadronEt[im2] + 
+	  analysisTree.muon_r04_sumPhotonEt[im2] - 
+	  0.5*analysisTree.muon_r04_sumPUPt[im2];
+	neutralIso = TMath::Max(float(0),neutralIso); 
+	absIso += neutralIso;
+	float relIsoMu4 = absIso/analysisTree.muon_pt[im2];
+
+	float isoMuonsVal4 = relIsoMu4;
+
+
+	      float sumIso = isoMuonsVal3+isoMuonsVal4;
+	      if (sumIso<isoMin) {
+		isIsoMuonsPair = true;
+		isoMin = sumIso;
+		if (analysisTree.muon_pt[index3]>analysisTree.muon_pt[index4]) {
+		  indx3 = (int)index3;
+		  indx4 = (int)index4;
+		}
+		else {
+		  indx4 = (int)index3;
+		  indx3 = (int)index4;
+		}
+	      }
+	    }
+	  }
+	}
+
+      }//isMuons
+
+
+//if (indx3 >-1)
+      //cout<<" do I have 4 muons  ??? "<<indx1<<"  "<<indx2<<"  "<<indx3<<"  "<<indx4<<endl;
+
+
+
       int mu_index_1 = indx1;
       int mu_index_2 = indx2;
+      int mu_index_1a = indx3;
+      int mu_index_2a = indx4;
       int mu_index_3 = -1;
       int tau_index = -1;
       int tau_indexMu = -1;
@@ -1129,10 +1250,15 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       int el_index = -1;
 
 
+      bool isMuonAndMuon = false;
 
       mu_relIso[0]=isoMuonsValue[mu_index_1];
       mu_relIso[1]=isoMuonsValue[mu_index_2];
+      mu_relIso[2]=isoMuonsValue[mu_index_1a];
+      mu_relIso[3]=isoMuonsValue[mu_index_2a];
       
+ 	if (indx3 !=-1 && indx4 !=-1) isMuonAndMuon = true;
+	if (isMuonAndMuon) isMuMu = true;
       double q = analysisTree.muon_charge[mu_index_1] * analysisTree.muon_charge[mu_index_2];
       event_sign  = q;
 	
@@ -1152,7 +1278,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
         if ( fabs(analysisTree.tau_charge[it]) != 1 ) continue;
         if (analysisTree.tau_againstElectronVLooseMVA6[it]<0.5 ) continue;
         if (analysisTree.tau_againstMuonLoose3[it]<0.5) continue;
-        if (analysisTree.tau_byLooseIsolationMVArun2v1DBoldDMwLT[it] < 0.5) continue;
+        if (analysisTree.tau_byVLooseIsolationMVArun2v1DBoldDMwLT[it] < 0.5) continue;
 
 	  taus.push_back((int)it);
 
@@ -1218,25 +1344,38 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
 
 	if (isTauPair){
+
+   if ( analysisTree.tau_againstElectronVLooseMVA6[tau_index_1]<0.5 ||   analysisTree.tau_againstMuonLoose3[tau_index_1]<0.5 ||
+	analysisTree.tau_againstElectronVLooseMVA6[tau_index_2]<0.5 ||   analysisTree.tau_againstMuonLoose3[tau_index_2]<0.5 ) continue;
+
 	float isoTau1 = analysisTree.tau_byIsolationMVArun2v1DBoldDMwLTraw[tau_index_1];
    	float isoTau2 = analysisTree.tau_byIsolationMVArun2v1DBoldDMwLTraw[tau_index_2];
 
-         ta_IsoFlagVTight[0] = analysisTree.tau_byTightCombinedIsolationDeltaBetaCorr3Hits[tau_index_1];
-         ta_IsoFlagVTight[1] = analysisTree.tau_byTightCombinedIsolationDeltaBetaCorr3Hits[tau_index_2];
-         ta_IsoFlagLoose[0] = analysisTree.tau_byLooseCombinedIsolationDeltaBetaCorr3Hits[tau_index_1];
-         ta_IsoFlagLoose[1] = analysisTree.tau_byLooseCombinedIsolationDeltaBetaCorr3Hits[tau_index_2];
-         ta_IsoFlagMedium[0] = analysisTree.tau_byMediumCombinedIsolationDeltaBetaCorr3Hits[tau_index_1];
-         ta_IsoFlagMedium[1] = analysisTree.tau_byMediumCombinedIsolationDeltaBetaCorr3Hits[tau_index_2];
 
+       ta_IsoFlagVTight[0]=analysisTree.tau_byVTightIsolationMVArun2v1DBoldDMwLT[tau_index_1];
+       ta_IsoFlagTight[0]=analysisTree.tau_byTightIsolationMVArun2v1DBoldDMwLT[tau_index_1];
+       ta_IsoFlagMedium[0]=analysisTree.tau_byMediumIsolationMVArun2v1DBoldDMwLT[tau_index_1];
+       ta_IsoFlagLoose[0]=analysisTree.tau_byLooseIsolationMVArun2v1DBoldDMwLT[tau_index_1];
+       ta_IsoFlagVLoose[0]=analysisTree.tau_byVLooseIsolationMVArun2v1DBoldDMwLT[tau_index_1];
+       ta_IsoFlagVTight[1]=analysisTree.tau_byVTightIsolationMVArun2v1DBoldDMwLT[tau_index_2];
+       ta_IsoFlagTight[1]=analysisTree.tau_byTightIsolationMVArun2v1DBoldDMwLT[tau_index_2];
+       ta_IsoFlagMedium[1]=analysisTree.tau_byMediumIsolationMVArun2v1DBoldDMwLT[tau_index_2];
+       ta_IsoFlagLoose[1]=analysisTree.tau_byLooseIsolationMVArun2v1DBoldDMwLT[tau_index_2];
+       ta_IsoFlagVLoose[1]=analysisTree.tau_byVLooseIsolationMVArun2v1DBoldDMwLT[tau_index_2];
 
 
       ta_relIso[0]= isoTau1;
       ta_relIso[1]= isoTau2;
+	////////////need to improve the code
+	//
+	//
+	if (analysisTree.tau_byVLooseIsolationMVArun2v1DBoldDMwLT[tau_index_1] <0.5 || analysisTree.tau_byVLooseIsolationMVArun2v1DBoldDMwLT[tau_index_2] < 0.5) continue;
 	}
 
 //////////////////////////////////////// Tau Pair search
 
 //muons
+/*
       vector<int> muonsThird; muonsThird.clear();
       for (unsigned int im = 0; im<analysisTree.muon_count; ++im) {
 	
@@ -1253,7 +1392,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	if ( fabs(analysisTree.muon_charge[im]) != 1) continue;
 	muonsThird.push_back((int)im);
       }
-
+*/
 
       //// electrons 
     vector<int> electronsThird; electronsThird.clear();
@@ -1286,22 +1425,14 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       
 	for (unsigned int im=0; im<muonsThird.size(); ++im) {
 	unsigned int mIndex  = muonsThird.at(im);
-	float neutralHadIsoMu = analysisTree.muon_neutralHadIso[mIndex];
-	float photonIsoMu = analysisTree.muon_photonIso[mIndex];
-	float chargedHadIsoMu = analysisTree.muon_chargedHadIso[mIndex];
-	float puIsoMu = analysisTree.muon_puIso[mIndex];
-	if (isIsoR03) {
-	  neutralHadIsoMu = analysisTree.muon_r04_sumNeutralHadronEt[mIndex];
-	  photonIsoMu = analysisTree.muon_r04_sumPhotonEt[mIndex];
-	  chargedHadIsoMu = analysisTree.muon_r04_sumChargedHadronPt[mIndex];
-	  puIsoMu = analysisTree.muon_r04_sumPUPt[mIndex];
-	}
-	double neutralIsoMuN = neutralHadIsoMu + photonIsoMu - 0.5*puIsoMu;
-	double neutralIsoMu = max(double(0),neutralIsoMuN); 
-	float absIsoMu = chargedHadIsoMu + neutralIsoMu;
-	float relIsoMu = absIsoMu/analysisTree.muon_pt[mIndex];
-	if (relIsoMu>0.35) continue;
-	
+
+	float absIso = analysisTree.muon_r04_sumChargedHadronPt[im];
+	float neutralIso = analysisTree.muon_r04_sumNeutralHadronEt[im] + 
+	  analysisTree.muon_r04_sumPhotonEt[im] - 
+	  0.5*analysisTree.muon_r04_sumPUPt[im];
+	neutralIso = TMath::Max(float(0),neutralIso); 
+	absIso += neutralIso;
+	float relIsoMu = absIso/analysisTree.muon_pt[im];
 
 	float dRmu3mu1 = deltaR(analysisTree.muon_eta[mIndex],analysisTree.muon_phi[mIndex],
 				analysisTree.muon_eta[mu_index_1],analysisTree.muon_phi[mu_index_1]);
@@ -1494,6 +1625,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	isTauTau = false;
 	isMuTau = false; 
 	isElTau = false;
+
 	if((n1 > n2) && (n1 > n3)) {isMuTau = true ; isElTau = false; isTauTau = false; tau_index=tau_indexMu;}
         if ((n2 > n1) && (n2 > n3)) {isMuTau = false ; isElTau = true; isTauTau = false;tau_index=tau_indexEl;}
         if ( n3>n1 && n3>n2){isMuTau = false ; isElTau = false; isTauTau = true;}
@@ -1502,6 +1634,7 @@ if (isMuTau || isElTau){
        isoTau = analysisTree.tau_byLooseIsolationMVArun2v1DBoldDMwLT[tau_index];
        ta_IsoFlag=analysisTree.tau_byLooseIsolationMVArun2v1DBoldDMwLT[tau_index];
 	}
+
 
 //if (!isMuTau && !isElTau && !isTauTau) continue;
 
@@ -1663,31 +1796,34 @@ if (isMuTau || isElTau){
       //////////////////////////////////////////////
       muon_index_1 = (int)mu_index_1;
       muon_index_2 = (int)mu_index_2;
+      muon_index_1a = (int)mu_index_1a;
+      muon_index_2a = (int)mu_index_2a;
       muon_index_3 = (int)mu_index_3;
       electron_index = (int)el_index;
+      //taus_index carries the index of the lepton in the case of MuTau or ElTau
       taus_index = (int)tau_index;
       taus_index_1 = (int)tau_index_1;
       taus_index_2 = (int)tau_index_2;
 
-      mu_count= (int)analysisTree.muon_count;
-      //cout<<" here ============================> "<<iEntry<<"  "<<mu_count<<"  "<<(int)analysisTree.muon_count<<"  "<<analysisTree.muon_count<<endl;
-      for (unsigned int im=0;im<analysisTree.muon_count; ++im){
-	mu_px[im]=analysisTree.muon_px[im];
-	mu_py[im]=analysisTree.muon_py[im];
-	mu_pz[im]=analysisTree.muon_pz[im];
-	mu_eta[im]=analysisTree.muon_eta[im];
-	mu_pt[im]=analysisTree.muon_pt[im];
-	mu_phi[im]=analysisTree.muon_phi[im];
-	mu_charge[im]=analysisTree.muon_charge[im];
-	mu_dxy[im]=analysisTree.muon_dxy[im];
-	mu_dz[im]=analysisTree.muon_dz[im];
-	mu_dxyerr[im]=analysisTree.muon_dxyerr[im];
-	mu_dzerr[im]=analysisTree.muon_dzerr[im];
+      mu_count= (int)muons.size();
+      for (unsigned int im=0;im<muons.size(); ++im){
+	  unsigned int mIndex = muons[im];
+	mu_px[im]=analysisTree.muon_px[mIndex];
+	mu_py[im]=analysisTree.muon_py[mIndex];
+	mu_pz[im]=analysisTree.muon_pz[mIndex];
+	mu_eta[im]=analysisTree.muon_eta[mIndex];
+	mu_pt[im]=analysisTree.muon_pt[mIndex];
+	mu_phi[im]=analysisTree.muon_phi[mIndex];
+	mu_charge[im]=analysisTree.muon_charge[mIndex];
+	mu_dxy[im]=analysisTree.muon_dxy[mIndex];
+	mu_dz[im]=analysisTree.muon_dz[mIndex];
+	mu_dxyerr[im]=analysisTree.muon_dxyerr[mIndex];
+	mu_dzerr[im]=analysisTree.muon_dzerr[mIndex];
 
-        mu_neutralHadIso[im] = analysisTree.muon_r04_sumNeutralHadronEt[im];
-        mu_photonIso[im] = analysisTree.muon_r04_sumPhotonEt[im];
-        mu_chargedHadIso[im] = analysisTree.muon_r04_sumChargedHadronPt[im];
-        mu_puIso[im] = analysisTree.muon_r04_sumPUPt[im];
+        mu_neutralHadIso[im] = analysisTree.muon_r04_sumNeutralHadronEt[mIndex];
+        mu_photonIso[im] = analysisTree.muon_r04_sumPhotonEt[mIndex];
+        mu_chargedHadIso[im] = analysisTree.muon_r04_sumChargedHadronPt[mIndex];
+        mu_puIso[im] = analysisTree.muon_r04_sumPUPt[mIndex];
  
         double neutralIso = mu_neutralHadIso[im] + mu_photonIso[im] - 0.5*mu_puIso[im];
         neutralIso = max(double(0),neutralIso);
@@ -1699,24 +1835,25 @@ if (isMuTau || isElTau){
 
 
 
-      el_count=(int)analysisTree.electron_count;
-      for (unsigned int ie=0;ie<analysisTree.electron_count; ++ie){
-	el_px[ie]=analysisTree.electron_px[ie];
-	el_py[ie]=analysisTree.electron_py[ie];
-	el_pz[ie]=analysisTree.electron_pz[ie];
-	el_eta[ie]=analysisTree.electron_eta[ie];
-	el_pt[ie]=analysisTree.electron_pt[ie];
-	el_phi[ie]=analysisTree.electron_phi[ie];
-	el_charge[ie]=analysisTree.electron_charge[ie];
-	el_dxy[ie]=analysisTree.electron_dxy[ie];
-	el_dz[ie]=analysisTree.electron_dz[ie];
-	el_dxyerr[ie]=analysisTree.electron_dxyerr[ie];
-	el_dzerr[ie]=analysisTree.electron_dzerr[ie];
+      el_count=(int)electronsThird.size();
+      for (unsigned int ie=0;ie<electronsThird.size(); ++ie){
+	  unsigned int iee = electronsThird[iee];
+	el_px[ie]=analysisTree.electron_px[iee];
+	el_py[ie]=analysisTree.electron_py[iee];
+	el_pz[ie]=analysisTree.electron_pz[iee];
+	el_eta[ie]=analysisTree.electron_eta[iee];
+	el_pt[ie]=analysisTree.electron_pt[iee];
+	el_phi[ie]=analysisTree.electron_phi[iee];
+	el_charge[ie]=analysisTree.electron_charge[iee];
+	el_dxy[ie]=analysisTree.electron_dxy[iee];
+	el_dz[ie]=analysisTree.electron_dz[iee];
+	el_dxyerr[ie]=analysisTree.electron_dxyerr[iee];
+	el_dzerr[ie]=analysisTree.electron_dzerr[iee];
 
-        el_neutralHadIso[ie] = analysisTree.electron_r03_sumNeutralHadronEt[ie];
-        el_photonIso[ie] = analysisTree.electron_r03_sumPhotonEt[ie];
-        el_chargedHadIso[ie] = analysisTree.electron_r03_sumChargedHadronPt[ie];
-        el_puIso[ie] = analysisTree.electron_r03_sumPUPt[ie];
+        el_neutralHadIso[ie] = analysisTree.electron_r03_sumNeutralHadronEt[iee];
+        el_photonIso[ie] = analysisTree.electron_r03_sumPhotonEt[iee];
+        el_chargedHadIso[ie] = analysisTree.electron_r03_sumChargedHadronPt[iee];
+        el_puIso[ie] = analysisTree.electron_r03_sumPUPt[iee];
  
         double neutralIso = el_neutralHadIso[ie] + el_photonIso[ie] - 0.5*el_puIso[ie];
         neutralIso = max(double(0),neutralIso);
@@ -1727,21 +1864,22 @@ if (isMuTau || isElTau){
       }
 
 				
-      ta_count=(int)analysisTree.tau_count;
-      for (unsigned int it=0;it<analysisTree.tau_count; ++it){
-	ta_px[it]=analysisTree.tau_px[it];
-	ta_py[it]=analysisTree.tau_py[it];
-	ta_pz[it]=analysisTree.tau_pz[it];
-	ta_eta[it]=analysisTree.tau_eta[it];
-	ta_pt[it]=analysisTree.tau_pt[it];
-	ta_phi[it]=analysisTree.tau_phi[it];
-	ta_charge[it]=analysisTree.tau_charge[it];
-	ta_dxy[it]=analysisTree.tau_dxy[it];
-	ta_dz[it]=analysisTree.tau_dz[it];
+      ta_count=(int)taus.size();
+      for (unsigned int it=0;it<taus.size(); ++it){
+	  unsigned int itt = taus[it];
+	ta_px[it]=analysisTree.tau_px[itt];
+	ta_py[it]=analysisTree.tau_py[itt];
+	ta_pz[it]=analysisTree.tau_pz[itt];
+	ta_eta[it]=analysisTree.tau_eta[itt];
+	ta_pt[it]=analysisTree.tau_pt[itt];
+	ta_phi[it]=analysisTree.tau_phi[itt];
+	ta_charge[it]=analysisTree.tau_charge[itt];
+	ta_dxy[it]=analysisTree.tau_dxy[itt];
+	ta_dz[it]=analysisTree.tau_dz[itt];
 	//
-     	ta_puCorrPtSum[it] = analysisTree.tau_puCorrPtSum[it];
-     	ta_chargedIsoPtSum[it] = analysisTree.tau_chargedIsoPtSum[it];
-     	ta_neutralIsoPtSum[it] = analysisTree.tau_neutralIsoPtSum[it];
+     	ta_puCorrPtSum[it] = analysisTree.tau_puCorrPtSum[itt];
+     	ta_chargedIsoPtSum[it] = analysisTree.tau_chargedIsoPtSum[itt];
+     	ta_neutralIsoPtSum[it] = analysisTree.tau_neutralIsoPtSum[itt];
 
 
 

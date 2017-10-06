@@ -18,7 +18,6 @@
 #include <TVector2.h>
 using namespace std;
 
-
 const  int CutN=35;
 const  int CutF=20;
 const  int CutCat=10;
@@ -102,329 +101,6 @@ int nBinsmet = 8;
    double binsMT2lester[9] = {0,10,20,30,40,80,100,120,1000};
    double binsMT2lesterr[9] = {0.1,10,20,30,40,80,100,120,1000};
 
-double HIP_SF(double pt,double eta)
-
-{
-
-	TString inputRootFile = "/nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/CMSSW_8_0_12/src/DesyTauAnalyses/NTupleMaker/data/HIP_mediumID.root";
-TFile * fileIn = new TFile(inputRootFile, "read");
-	if (fileIn->IsZombie() ) { std::cout << "ERROR in ScaleFactor::init_ScaleFactor(TString inputRootFile) " <<inputRootFile << " does not exist. Please check. " <<std::endl; exit(1); };
-
-
-TIter nextkey (fileIn->GetListOfKeys ());
-TKey *key = 0;
-key = (TKey *) nextkey ();
-TObject *obj = key->ReadObj ();
-//cout << "2D histos name for SF = " << obj->GetName() << endl;
-TH2D *histo = (TH2D*) obj;
-//TH2D *histo = (TH2D*)fileIn->Get("histo2D");
-double ptN = histo->GetXaxis()->FindBin(pt);
-double etaN = histo->GetYaxis()->FindBin(eta);
-double result = histo->GetBinContent(ptN,etaN);
-delete histo;
-delete fileIn;
-return result;
-}
-
-
-
-double EWKWeight(float pt){
-float sf = 1;
-
-if (pt>0 && pt <50 ) sf = 1.;
-if (pt>50 && pt <100 ) sf = 1.052;
-if (pt>100 && pt <150 ) sf = 1.179;
-if (pt>150 && pt <200 ) sf = 1.150;
-if (pt>200 && pt <300 ) sf = 1.057;
-if (pt>300 && pt <400 ) sf = 1.;
-if (pt>400 && pt <600 ) sf = 0.912;
-if (pt>600 ) sf = 0.783;
-
-return sf;
-}
-
-double TauFakeRate(float pt,float eta, string sel,string working_point){
-float SF = 1.;
-
-
-//80x MVAid
-
-
-if ( working_point == "TFRJetEnUp"){
-
-if (  fabs(eta) < 0.8 )
-        {
-                if (pt>20 && pt<30) SF = 1.13395;
-                if (pt>30 && pt<40) SF = 1.12674;
-                if (pt>40 ) SF = 1.28658;
-        }
-if (  fabs(eta) > 0.8 && fabs(eta) < 1.44 )
-        {
-
-                if (pt>20 && pt<30) SF = 1.12286;
-                if (pt>30 && pt<40) SF = 1.22019;
-                if (pt>40 ) SF = 1.05257;
-        }
-
-if (  fabs(eta) > 1.44 && fabs(eta) < 1.566 )
-        {
-
-                if (pt>20 && pt<40) SF = 0.976482;
-                if (pt>40) SF = 2.1966;
-        }
-if (  fabs(eta) > 1.566 && fabs(eta) < 2.3 )
-        {
-
-                if (pt>20 && pt<40) SF = 0.896117;
-                if (pt>40) SF = 1.07363;
-        }
-
-}//mutau MVA
-
-
-else if ( working_point == "TFRJetEnDown"){
-if (  fabs(eta) < 0.8 )
-        {
-                if (pt>20 && pt<30) SF = 1.16832;
-                if (pt>30 && pt<40) SF = 1.13744;
-                if (pt>40 ) SF = 1.27319;
-        }
-if (  fabs(eta) > 0.8 && fabs(eta) < 1.44 )
-        {
-
-                if (pt>20 && pt<30) SF = 1.15464;
-                if (pt>30 && pt<40) SF = 1.17642;
-                if (pt>40 ) SF = 1.16929;
-        }
-
-if (  fabs(eta) > 1.44 && fabs(eta) < 1.566 )
-        {
-
-                if (pt>20 && pt<40) SF = 1.13535;
-                if (pt>40) SF = 2.70057;
-        }
-if (  fabs(eta) > 1.566 && fabs(eta) < 2.3 )
-        {
-
-                if (pt>20 && pt<40) SF = 0.914509;
-                if (pt>40) SF = 1.11113;
-        }
-
-}//mutau MVA
-
-
-
-else if ( working_point == "TFRTauEnUp"){
-if (  fabs(eta) < 0.8 )
-        {
-                if (pt>20 && pt<30) SF = 1.09872;
-                if (pt>30 && pt<40) SF = 0.961079;
-                if (pt>40 ) SF = 0.897534;
-        }
-if (  fabs(eta) > 0.8 && fabs(eta) < 1.44 )
-        {
-
-                if (pt>20 && pt<30) SF = 1.07447;
-                if (pt>30 && pt<40) SF = 1.04198;
-                if (pt>40 ) SF = 0.741901;
-        }
-
-if (  fabs(eta) > 1.44 && fabs(eta) < 1.566 )
-        {
-
-                if (pt>20 && pt<40) SF = 0.888785;
-                if (pt>40) SF = 1.20708;
-        }
-if (  fabs(eta) > 1.566 && fabs(eta) < 2.3 )
-        {
-
-                if (pt>20 && pt<40) SF = 0.837741;
-                if (pt>40) SF = 0.902976;
-        }
-
-}//mutau MVA
-
-
-else if ( working_point == "TFRTauEnDown"){
-if (  fabs(eta) < 0.8 )
-        {
-                if (pt>20 && pt<30) SF = 1.18576;
-                if (pt>30 && pt<40) SF = 1.04045;
-                if (pt>40 ) SF = 1.14634;
-        }
-if (  fabs(eta) > 0.8 && fabs(eta) < 1.44 )
-        {
-
-                if (pt>20 && pt<30) SF = 1.16617;
-                if (pt>30 && pt<40) SF = 1.18176;
-                if (pt>40 ) SF = 0.864892;
-        }
-
-if (  fabs(eta) > 1.44 && fabs(eta) < 1.566 )
-        {
-
-                if (pt>20 && pt<40) SF = 1.05005;
-                if (pt>40) SF = 1.94742;
-        }
-if (  fabs(eta) > 1.566 && fabs(eta) < 2.3 )
-        {
-
-                if (pt>20 && pt<40) SF = 0.912782;
-                if (pt>40) SF = 0.950736;
-        }
-
-}//mutau MVA
-
-
-else if ( working_point == "TFRMuEnUp"){
-if (  fabs(eta) < 0.8 )
-        {
-                if (pt>20 && pt<30) SF = 1.11923;
-                if (pt>30 && pt<40) SF = 1.02944;
-                if (pt>40 ) SF = 0.96733;
-        }
-if (  fabs(eta) > 0.8 && fabs(eta) < 1.44 )
-        {
-
-                if (pt>20 && pt<30) SF = 1.1246;
-                if (pt>30 && pt<40) SF = 1.07141;
-                if (pt>40 ) SF = 0.844204;
-        }
-
-if (  fabs(eta) > 1.44 && fabs(eta) < 1.566 )
-        {
-
-                if (pt>20 && pt<40) SF = 0.908234;
-                if (pt>40) SF = 1.77257;
-        }
-if (  fabs(eta) > 1.566 && fabs(eta) < 2.3 )
-        {
-
-                if (pt>20 && pt<40) SF = 0.87063;
-                if (pt>40) SF = 0.92934;
-        }
-
-}//mutau MVA
-
-
-else if ( working_point == "TFRMuEnDown"){
-if (  fabs(eta) < 0.8 )
-        {
-                if (pt>20 && pt<30) SF = 1.12687;
-                if (pt>30 && pt<40) SF = 1.00911;
-                if (pt>40 ) SF = 0.958254;
-        }
-if (  fabs(eta) > 0.8 && fabs(eta) < 1.44 )
-        {
-
-                if (pt>20 && pt<30) SF = 1.12647;
-                if (pt>30 && pt<40) SF = 1.10256;
-                if (pt>40 ) SF = 0.841932;
-        }
-
-if (  fabs(eta) > 1.44 && fabs(eta) < 1.566 )
-        {
-
-                if (pt>20 && pt<40) SF = 0.900177;
-                if (pt>40) SF = 1.80231;
-        }
-if (  fabs(eta) > 1.566 && fabs(eta) < 2.3 )
-        {
-
-                if (pt>20 && pt<40) SF = 0.875394;
-                if (pt>40) SF = 0.911063;
-        }
-
-}//mutau MVA
-
-
-else {
-if (  fabs(eta) < 0.8 )
-        {
-                if (pt>20 && pt<30) SF = 1.12667;
-                if (pt>30 && pt<40) SF = 1.0178;
-                if (pt>40 ) SF = 0.961808;
-        }
-if (  fabs(eta) > 0.8 && fabs(eta) < 1.44 )
-        {
-
-                if (pt>20 && pt<30) SF = 1.12651;
-                if (pt>30 && pt<40) SF = 1.08668;
-                if (pt>40 ) SF = 0.832438;
-        }
-
-if (  fabs(eta) > 1.44 && fabs(eta) < 1.566 )
-        {
-
-                if (pt>20 && pt<40) SF = 0.907089;
-                if (pt>40) SF = 1.70447;
-        }
-if (  fabs(eta) > 1.566 && fabs(eta) < 2.3 )
-        {
-
-                if (pt>20 && pt<40) SF = 0.875675;
-                if (pt>40) SF = 0.91729;
-        }
-
-}//mutau MVA
-
-return SF;
-
-}
-
-double MuonFakeRate(float pt, float eta){
-float muonfake = 1.;
-
-if (  fabs(eta) < 1.2 ) muonfake = 1.04;
-if (  fabs(eta) > 1.2 && fabs(eta) < 1.7 ) muonfake = 1.54;
-if (  fabs(eta) > 1.7 && fabs(eta) < 2.3 ) muonfake = 1.42;
-	
-return muonfake;
-}
-
-
-double ElectronFakeRate(float pt, float eta){
-float elefake = 1.;
-
-if (  fabs(eta) < 1.460 ) elefake = 1.80;
-if (  fabs(eta) > 1.558 ) elefake = 1.30;
-	
-return elefake;
-}
-
-
-
-double TauiD(string sel,string working_point){
-
-float SF = 1;
-
-if ((sel =="mutau" || sel == "eltau")  && working_point == "CutBased_Loose" )
-	SF = 0.81;
-
-if ((sel =="mutau" || sel == "eltau")  && working_point == "CutBased_Medim" )
-	SF = 0.79;
-if ((sel =="mutau" || sel == "eltau")  && working_point == "CutBased_Tight" )
-	SF = 0.79;
-
-
-if ((sel =="mutau" || sel == "eltau")  && working_point == "MVA_Vloose" )
-	SF = 0.83;
-if ((sel =="mutau" || sel == "eltau")  && working_point == "MVA_Vloose" )
-	SF= 0.84;
-if ((sel =="mutau" || sel == "eltau")  && working_point == "MVA_Medium" )
-	SF = 0.84;
-
-if ((sel =="mutau" || sel == "eltau")  && working_point == "MVA_Tight" )
-	SF = 0.83;
-
-if ((sel =="mutau" || sel == "eltau")  && working_point == "MVA_Vtight" )
-	SF = 0.80;
-
-
-
-return SF;
-
-}
 
 float Dzeta(TLorentzVector LV, TLorentzVector muV, TLorentzVector MetV)
 	{
@@ -455,7 +131,6 @@ float Dzeta(TLorentzVector LV, TLorentzVector muV, TLorentzVector MetV)
 				float pzetavis = vectorVisX*zetaX + vectorVisY*zetaY;
 				float dzeta = pzetamiss - 0.85*pzetavis;
 
-
 				return dzeta;
 }
 
@@ -471,26 +146,14 @@ vector<string> FakeList;
 vector<string> FakeListJet;
 
 
-/*
-TProfile * hprofMt2vsMET[CutN]  ;//= new TProfile("hprof","",100,-4,4,0,20);
-TProfile * hprofMt2vsDZeta[CutN]  ;//= new TProfile("hprof","",100,-4,4,0,20);
-TProfile * hprofMETvsMt2[CutN]  ;//= new TProfile("hprof","",100,-4,4,0,20);
-TProfile * hprofMETvsDZeta[CutN]  ;//= new TProfile("hprof","",100,-4,4,0,20);
-TProfile * hprofDZetavsMET[CutN]  ;//= new TProfile("hprof","",100,-4,4,0,20);
-TProfile * hprofDZetavsMt2[CutN]  ;//= new TProfile("hprof","",100,-4,4,0,20);
-*/
 
 TH1D * histRuns = new TH1D("histRuns","",6000,24000,30000);
-
 TH1D * histWeightsH = new TH1D("histWeightsH","",1,-0.5,0.5);
-
 TH1D * histTopPt = new TH1D("histTopPt","",1,-0.5,0.5);
-
 TH1D * hWeights [CutN];
 TH1D * hEventSign [CutN];
+TH1D * hEventType [CutN];
 
-TH1D * hDeltaMET [CutN][60];
-TH1D * hDeltaMETRel [CutN][60];
 TH1D * hmet1D[CutN];
 
 TH1D * hMudxy [CutN];
@@ -509,6 +172,20 @@ TH1D * hLept1dzerr [CutN];
 TH1D * hLept1IPsigxy [CutN];
 TH1D * hLept1IPsigz [CutN];
 
+
+TH1D * hLept1adxy [CutN];
+TH1D * hLept1adz [CutN];
+
+TH1D * hLept1adxyerr [CutN];
+TH1D * hLept1adzerr [CutN];
+TH1D * hLept1aIPsigxy [CutN];
+TH1D * hLept1aIPsigz [CutN];
+
+
+
+
+
+
 TH1D * hLept2dxy [CutN];
 TH1D * hLept2dz [CutN];
 
@@ -517,6 +194,13 @@ TH1D * hLept2dzerr [CutN];
 TH1D * hLept2IPsigxy [CutN];
 TH1D * hLept2IPsigz [CutN];
 
+TH1D * hLept2adxy [CutN];
+TH1D * hLept2adz [CutN];
+
+TH1D * hLept2adxyerr [CutN];
+TH1D * hLept2adzerr [CutN];
+TH1D * hLept2aIPsigxy [CutN];
+TH1D * hLept2aIPsigz [CutN];
 TH1D * hMu3dxy [CutN];
 TH1D * hMu3dz [CutN];
 
@@ -589,6 +273,13 @@ TH1D *hLept1neutralIso[CutN];
 TH1D *hLept1absIsoMu[CutN];
 TH1D *hLept1relIsoMu[CutN];
 
+TH1D *hLept1aneutralHadIso[CutN]; 
+TH1D *hLept1aphotonIso[CutN];
+TH1D *hLept1achargedHadIso[CutN];
+TH1D *hLept1apuIso[CutN];
+TH1D *hLept1aneutralIso[CutN];
+TH1D *hLept1aabsIsoMu[CutN];
+TH1D *hLept1arelIsoMu[CutN];
 
 TH1D *hLept2neutralHadIso[CutN]; 
 TH1D *hLept2photonIso[CutN];
@@ -598,6 +289,13 @@ TH1D *hLept2neutralIso[CutN];
 TH1D *hLept2absIsoMu[CutN];
 TH1D *hLept2relIsoMu[CutN];
 
+TH1D *hLept2aneutralHadIso[CutN]; 
+TH1D *hLept2aphotonIso[CutN];
+TH1D *hLept2achargedHadIso[CutN];
+TH1D *hLept2apuIso[CutN];
+TH1D *hLept2aneutralIso[CutN];
+TH1D *hLept2aabsIsoMu[CutN];
+TH1D *hLept2arelIsoMu[CutN];
 
 
 TH1D * hEldxy [CutN];
@@ -641,6 +339,8 @@ TH1D *hPtJ3[CutN];
 TH1D *hIsoMu[CutN];
 TH1D *hIsoLept1[CutN];
 TH1D *hIsoLept2[CutN];
+TH1D *hIsoLept1a[CutN];
+TH1D *hIsoLept2a[CutN];
 TH1D *hIsoMu3[CutN];
 TH1D *hIsoEl3[CutN];
 TH1D *hIsoEl[CutN];
@@ -648,12 +348,15 @@ TH1D *hIsoTau[CutN];
 TH1D *hIsoTau1[CutN];
 TH1D *hIsoTau2[CutN];
 
+TH1D *hInvMassZ1Z2[CutN];
+TH1D *hInvMassZ1Z2FB[CutN];
 TH1D *hInvMassMuTau[CutN];
 TH1D *hInvMassMuEl[CutN];
 TH1D *hInvMassTauTau[CutN];
 TH1D *hInvMassElEl[CutN];
 TH1D *hInvMassElTau[CutN];
-TH1D *hInvMassMuMu[CutN];
+TH1D *hInvMassMuMutrail[CutN];
+TH1D *hInvMassMuMutrailFB[CutN];
 TH1D *hInvMass3MuTau[CutN];
 TH1D *hInvMass2MuElTau[CutN];
 TH1D *hInvMass2Mu2Tau[CutN];
@@ -695,6 +398,10 @@ TH1D *hLept1eta[CutN];
 TH1D *hLept2pt[CutN];
 TH1D *hLept2eta[CutN];
 
+TH1D *hLept1apt[CutN];
+TH1D *hLept1aeta[CutN];
+TH1D *hLept2apt[CutN];
+TH1D *hLept2aeta[CutN];
 
 
 TH1D *hnTau[CutN];
@@ -729,27 +436,9 @@ TH1D *hMETFB[CutN];
 TH1D *hGenMETFB[CutN];
 TH1D *hMETphi[CutN];
 //TH1D *hnOver[CutN];
-TH1D *hMETLowDzeta[CutN];
-TH1D *hMETMiddleDzeta[CutN];
-TH1D *hMETHighDzeta[CutN];
-
-TH1D *hMETHighDzetaHighMt2[CutN];
-TH1D *hMETHighDzetaLowMt2[CutN];
-TH1D *hMETHighDzetaMiddleMt2[CutN];
-
-TH1D *hMETLowDzetaHighMt2[CutN];
-TH1D *hMETLowDzetaLowMt2[CutN];
-TH1D *hMETLowDzetaMiddleMt2[CutN];
-
-TH1D *hMt2HighDzetaMiddleMET[CutN];
-TH1D *hMt2HighDzetaLowMET[CutN];
-TH1D *hMt2HighDzetaHighMET[CutN];
-
-TH1D *hMt2LowDzetaMiddleMET[CutN];
-TH1D *hMt2LowDzetaLowMET[CutN];
-TH1D *hMt2LowDzetaHighMET[CutN];
 
 TH1D *hdEtaDil[CutN];
+TH1D *hdEtaDilb[CutN];
 TH1D *hdEtaJ0J1[CutN];
 TH1D *hdEtaMuMET[CutN];
 TH1D *hdEtaElMET[CutN];
@@ -761,6 +450,7 @@ TH1D *hdEtaJ0Tau[CutN];
 
 
 TH1D *hdPhiDil[CutN];
+TH1D *hdPhiDilb[CutN];
 TH1D *hdPhiElMET[CutN];
 TH1D *hdPhiMuMET[CutN];
 TH1D *hdPhiMu3MET[CutN];
@@ -784,15 +474,22 @@ TH1D *hdPhiJ3MET[CutN];
 
 TH1D *hdPhiLept1MET[CutN];
 TH1D *hdPhiLept2MET[CutN];
+
+TH1D *hdPhiLept1aMET[CutN];
+TH1D *hdPhiLept2aMET[CutN];
+
+
 TH1D *hdPhiJ0Lept1[CutN];
 TH1D *hdPhiJ0Lept2[CutN];
+TH1D *hdPhiJ0Lept1a[CutN];
+TH1D *hdPhiJ0Lept2a[CutN];
 
 TH1D *hMT[CutN];
 TH1D *hMTsum[CutN];
 TH1D *hMTtot[CutN];
 TH1D *hMTel[CutN];
 TH1D *hMTmu[CutN];
-TH1D *hMTmuFineBin[CutN];
+TH1D *hMTmuFB[CutN];
 TH1D *hMTdif[CutN];
 TH1D *hMTmax[CutN];
 TH1D *hMTmin[CutN];
@@ -816,13 +513,16 @@ TH1D *hMCTbDil[CutN];
 TH1D *hMTDil[CutN];
 TH1D *hMTlept1[CutN];
 TH1D *hMTlept2[CutN];
+TH1D *hMTlept1a[CutN];
+TH1D *hMTlept2a[CutN];
 TH1D *hdR_Dil[CutN];
-TH1D *hInvMassDil[CutN];
-TH1D *hInvMassDilFineBin[CutN];
+TH1D *hInvMassZ1[CutN];
+TH1D *hInvMassZ1FB[CutN];
 TH1D *hPtDil[CutN];
 
 TH1D *hPtDil3MuTau[CutN];
 TH1D *hPtDil2Mu2Tau[CutN];
+TH1D *hPtDil2Mu2Mu[CutN];
 TH1D *hPtDil2MuElTau[CutN];
 
 TH1D *hPtDil3ElTau[CutN];
@@ -831,9 +531,6 @@ TH1D *hPtDil2ElMuTau[CutN];
 
 TH1D *hDiJetMass_J0J1[CutN];
 
-TH1D *hMt2LowDzeta[CutN];
-TH1D *hMt2MiddleDzeta[CutN];
-TH1D *hMt2HighDzeta[CutN];
 
 TH1D *hMt2lestermutau[CutN];
 TH1D *hMt2lestermutauFB[CutN];
@@ -1210,15 +907,6 @@ for(int cj = 0; cj < CutNer; cj++)
       TString fCut;
       ///generic variables
       
-for(int jj = 0; jj < 60; jj++){
-      TString nCutt;
-      nCutt.Form("%i",jj);
-      hDeltaMET[cj][jj] = new TH1D ("DeltaMET_"+nCut+"_bin"+nCutt,"DMET "+cutName,100,-100,100);
-      hDeltaMET[cj][jj]->Sumw2();
-      hDeltaMETRel[cj][jj] = new TH1D ("DeltaMETRel_"+nCut+"_bin"+nCutt,"DMETRel "+cutName,100,-10,10);
-      hDeltaMETRel[cj][jj]->Sumw2();
-
-}
 
       hmet1D[cj]= new TH1D ("met1D_"+nCut,"met1D "+cutName,100,-100,100);
       hmet1D[cj]->Sumw2();
@@ -1360,8 +1048,50 @@ for(int jj = 0; jj < 60; jj++){
 ///////////
 
 
+      hLept1aneutralHadIso[cj] = new TH1D("lept1a_neutralHadIso_"+nCut,"lept1_neutralHadIso "+cutName,150,0,300);
+      hLept1aneutralHadIso[cj]->Sumw2();
 
+      hLept1aphotonIso[cj] = new TH1D("lept1a_photonIso_"+nCut,"lept1_photonIso "+cutName,150,0,300);
+      hLept1aphotonIso[cj]->Sumw2();
 
+      hLept1achargedHadIso[cj] = new TH1D("lept1a_chargedHadIso_"+nCut,"lept1_chargedHadIso "+cutName,150,0,300);
+      hLept1achargedHadIso[cj]->Sumw2();
+
+      hLept1apuIso[cj] = new TH1D("lept1a_puIso_"+nCut,"lept1_puIso "+cutName,200,0,200);
+      hLept1apuIso[cj]->Sumw2();
+
+      hLept1aneutralIso[cj] = new TH1D("lept1a_neutralIso_"+nCut,"lept1_neutralIso "+cutName,150,0,300);
+      hLept1aneutralIso[cj]->Sumw2();
+
+      hLept1aabsIsoMu[cj] = new TH1D("lept1a_absIsoMu_"+nCut,"lept1_absIsoMu "+cutName,150,0,300);
+      hLept1aabsIsoMu[cj]->Sumw2();
+
+      hLept1arelIsoMu[cj] = new TH1D("lept1a_relIsoMu_"+nCut,"lept1_relIsoMu "+cutName,200,0,10);
+      hLept1arelIsoMu[cj]->Sumw2();
+/////////
+
+      hLept2aneutralHadIso[cj] = new TH1D("lept2a_neutralHadIso_"+nCut,"lept2_neutralHadIso "+cutName,150,0,300);
+      hLept2aneutralHadIso[cj]->Sumw2();
+
+      hLept2aphotonIso[cj] = new TH1D("lept2a_photonIso_"+nCut,"lept2_photonIso "+cutName,150,0,300);
+      hLept2aphotonIso[cj]->Sumw2();
+
+      hLept2achargedHadIso[cj] = new TH1D("lept2a_chargedHadIso_"+nCut,"lept2_chargedHadIso "+cutName,150,0,300);
+      hLept2achargedHadIso[cj]->Sumw2();
+
+      hLept2apuIso[cj] = new TH1D("lept2a_puIso_"+nCut,"lept2_puIso "+cutName,200,0,200);
+      hLept2apuIso[cj]->Sumw2();
+
+      hLept2aneutralIso[cj] = new TH1D("lept2a_neutralIso_"+nCut,"lept2_neutralIso "+cutName,150,0,300);
+      hLept2aneutralIso[cj]->Sumw2();
+
+      hLept2aabsIsoMu[cj] = new TH1D("lept2a_absIsoMu_"+nCut,"lept2_absIsoMu "+cutName,150,0,300);
+      hLept2aabsIsoMu[cj]->Sumw2();
+
+      hLept2arelIsoMu[cj] = new TH1D("lept2a_relIsoMu_"+nCut,"lept2_relIsoMu "+cutName,200,0,10);
+      hLept2arelIsoMu[cj]->Sumw2();
+
+//////////////////
 
       hElneutralHadIso[cj] = new TH1D("el_neutralHadIso_"+nCut,"el_neutralHadIso "+cutName,150,0,300);
       hElneutralHadIso[cj]->Sumw2();
@@ -1398,6 +1128,14 @@ for(int jj = 0; jj < 60; jj++){
       hLept2dxy[cj]->Sumw2();
       hLept2dxyerr[cj] = new TH1D ("lept2_dxyerr_"+nCut,"lept2_dxyerr "+cutName,20,-.2,.2);
       hLept2dxyerr[cj]->Sumw2();
+      hLept1adxy[cj] = new TH1D ("lept1a_dxy_"+nCut,"lept1_dxy "+cutName,20,-.2,.2);
+      hLept1adxy[cj]->Sumw2();
+      hLept1adxyerr[cj] = new TH1D ("lept1a_dxyerr_"+nCut,"lept1_dxyerr "+cutName,20,-.2,.2);
+      hLept1adxyerr[cj]->Sumw2();
+      hLept2adxy[cj] = new TH1D ("lept2a_dxy_"+nCut,"lept2_dxy "+cutName,20,-.2,.2);
+      hLept2adxy[cj]->Sumw2();
+      hLept2adxyerr[cj] = new TH1D ("lept2a_dxyerr_"+nCut,"lept2_dxyerr "+cutName,20,-.2,.2);
+      hLept2adxyerr[cj]->Sumw2();
       hMu3dxy[cj] = new TH1D ("mu3_dxy_"+nCut,"mu_dxy "+cutName,20,-.2,.2);
       hMu3dxy[cj]->Sumw2();
       hMu3dxyerr[cj] = new TH1D ("mu3_dxyerr_"+nCut,"mu_dxyerr "+cutName,20,-.2,.2);
@@ -1435,6 +1173,10 @@ for(int jj = 0; jj < 60; jj++){
       hLept1dz[cj]->Sumw2();
       hLept2dz[cj] = new TH1D ("lept2_dz_"+nCut,"lept2_dz "+cutName,20,-.2,.2);
       hLept2dz[cj]->Sumw2();
+      hLept1adz[cj] = new TH1D ("lept1a_dz_"+nCut,"lept1_dz "+cutName,20,-.2,.2);
+      hLept1adz[cj]->Sumw2();
+      hLept2adz[cj] = new TH1D ("lept2a_dz_"+nCut,"lept2_dz "+cutName,20,-.2,.2);
+      hLept2adz[cj]->Sumw2();
       hEldz[cj] = new TH1D ("el_dz_"+nCut,"el_dz "+cutName,20,-.2,.2);
       hEldz[cj]->Sumw2();
       hEl3dz[cj] = new TH1D ("el3_dz_"+nCut,"el_dz "+cutName,20,-.2,.2);
@@ -1448,6 +1190,10 @@ for(int jj = 0; jj < 60; jj++){
       hLept1dzerr[cj]->Sumw2();
       hLept2dzerr[cj] = new TH1D ("lept2_dzerr_"+nCut,"lept2_dzerr "+cutName,20,-.2,.2);
       hLept2dzerr[cj]->Sumw2();
+      hLept1adzerr[cj] = new TH1D ("lept1a_dzerr_"+nCut,"lept1_dzerr "+cutName,20,-.2,.2);
+      hLept1adzerr[cj]->Sumw2();
+      hLept2adzerr[cj] = new TH1D ("lept2a_dzerr_"+nCut,"lept2_dzerr "+cutName,20,-.2,.2);
+      hLept2adzerr[cj]->Sumw2();
       hEldzerr[cj] = new TH1D ("el_dzerr_"+nCut,"el_dzerr "+cutName,20,-.2,.2);
       hEldzerr[cj]->Sumw2();
       hEl3dzerr[cj] = new TH1D ("el3_dzerr_"+nCut,"el_dzerr "+cutName,20,-.2,.2);
@@ -1469,6 +1215,14 @@ for(int jj = 0; jj < 60; jj++){
       hLept2IPsigxy[cj]->Sumw2();
       hLept2IPsigz[cj] = new TH1D ("lept2IPsigz_"+nCut,"lept2IPsigz "+cutName,50,0,10);
       hLept2IPsigz[cj]->Sumw2();
+      hLept1aIPsigxy[cj] = new TH1D ("lept1aIPsigxy_"+nCut,"lept1IPsigxy "+cutName,50,0,10);
+      hLept1aIPsigxy[cj]->Sumw2();
+      hLept1aIPsigz[cj] = new TH1D ("lept1aIPsigz_"+nCut,"lept1IPsigz "+cutName,50,0,10);
+      hLept1aIPsigz[cj]->Sumw2();
+      hLept2aIPsigxy[cj] = new TH1D ("lept2aIPsigxy_"+nCut,"lept2IPsigxy "+cutName,50,0,10);
+      hLept2aIPsigxy[cj]->Sumw2();
+      hLept2aIPsigz[cj] = new TH1D ("lept2aIPsigz_"+nCut,"lept2IPsigz "+cutName,50,0,10);
+      hLept2aIPsigz[cj]->Sumw2();
  
       hElIPsigxy[cj] = new TH1D ("elIPsigxy_"+nCut,"elIPsigxy "+cutName,50,0,10);
       hElIPsigxy[cj]->Sumw2();
@@ -1539,68 +1293,78 @@ for(int jj = 0; jj < 60; jj++){
       hWeights[cj]->Sumw2();
       hEventSign[cj] = new TH1D ("hEventSign_"+nCut,"hEventSign "+cutName,20,-10,10);
       hEventSign[cj]->Sumw2();
+      hEventType[cj] = new TH1D ("hEventType_"+nCut,"hEventType "+cutName,4,0,4);
+      hEventType[cj]->Sumw2();
+
+      hInvMassZ1Z2FB[cj] = new TH1D ("hInvMassZ1Z2FB_"+nCut,"hInvMassZ1Z2 "+cutName,100,0,200);
+      hInvMassZ1Z2FB[cj]->Sumw2();
+      hInvMassZ1FB[cj] = new TH1D ("hInvMassZ1FB_"+nCut,"hInvMassZ1FB "+cutName,40,0,200);
+      hInvMassZ1FB[cj]->Sumw2();
+      hInvMassMuMutrailFB[cj] = new TH1D ("hInvMassMuMutrailFB_"+nCut,"hInvMassMuMutrailFB "+cutName,40,0,200);
+      hInvMassMuMutrailFB[cj]->Sumw2();
+      hInvMass3MuTauFB[cj] = new TH1D ("hInvMass3MuTauFB_"+nCut,"hInvMassMuTauFB "+cutName,40,0,200);
+      hInvMass3MuTauFB[cj]->Sumw2();
+      hInvMass2MuElTauFB[cj] = new TH1D ("hInvMass2MuElTauFB_"+nCut,"hInvMass2MuElTau "+cutName,40,0,200);
+      hInvMass2MuElTauFB[cj]->Sumw2();
+      hInvMass2Mu2TauFB[cj] = new TH1D ("hInvMass2Mu2TauFB_"+nCut,"hInvMass2Mu2Tau "+cutName,40,0,200);
+      hInvMass2Mu2TauFB[cj]->Sumw2();
+      hInvMass3MuTauZ2FB[cj] = new TH1D ("hInvMass3MuTauZ2FB_"+nCut,"hInvMass3MuTauZ2 "+cutName,40,0,200);
+      hInvMass3MuTauZ2FB[cj]->Sumw2();
+      hInvMass2MuElTauZ2FB[cj] = new TH1D ("hInvMass2MuElTauZ2FB_"+nCut,"hInvMass2MuElTauZ2 "+cutName,40,0,200);
+      hInvMass2MuElTauZ2FB[cj]->Sumw2();
+      hInvMass2Mu2TauZ2FB[cj] = new TH1D ("hInvMass2Mu2TauZ2FB_"+nCut,"hInvMass2Mu2TauZ2 "+cutName,40,0,200);
+      hInvMass2Mu2TauZ2FB[cj]->Sumw2();
+      hInvMass3ElTauFB[cj] = new TH1D ("hInvMass3ElTauFB_"+nCut,"hInvMass3ElTauFB "+cutName,40,0,200);
+      hInvMass3ElTauFB[cj]->Sumw2();
+      hInvMass2ElMuTauFB[cj] = new TH1D ("hInvMass2ElMuTauFB_"+nCut,"hInvMass2ElMuTauFB "+cutName,40,0,200);
+      hInvMass2ElMuTauFB[cj]->Sumw2();
+      hInvMass2El2TauFB[cj] = new TH1D ("hInvMass2El2TauFB_"+nCut,"hInvMass2El2TauFB "+cutName,40,0,200);
+      hInvMass2El2TauFB[cj]->Sumw2();
 	
 
-      hInvMassMuTau[cj] = new TH1D ("hInvMassMuTau_"+nCut,"hInvMassMuTau "+cutName,50,0,500);
+
+      hInvMassZ1Z2[cj] = new TH1D ("hInvMassZ1Z2_"+nCut,"hInvMassZ1Z2 "+cutName,20,0,200);
+      hInvMassZ1Z2[cj]->Sumw2();
+
+      hInvMassMuTau[cj] = new TH1D ("hInvMassMuTau_"+nCut,"hInvMassMuTau "+cutName,20,0,200);
       hInvMassMuTau[cj]->Sumw2();
-      hInvMassMuEl[cj] = new TH1D ("hInvMassMuEl_"+nCut,"hInvMassMuel "+cutName,50,0,500);
+      hInvMassMuEl[cj] = new TH1D ("hInvMassMuEl_"+nCut,"hInvMassMuel "+cutName,20,0,200);
       hInvMassMuEl[cj]->Sumw2();
-      hInvMassMuMu[cj] = new TH1D ("hInvMassMuMu_"+nCut,"hInvMassMuMu "+cutName,50,0,500);
-      hInvMassMuMu[cj]->Sumw2();
-      hInvMassElTau[cj] = new TH1D ("hInvMassElTau_"+nCut,"hInvMassElTau "+cutName,50,0,500);
+      hInvMassMuMutrail[cj] = new TH1D ("hInvMassMuMutrail_"+nCut,"hInvMassMuMutrail "+cutName,20,0,200);
+      hInvMassMuMutrail[cj]->Sumw2();
+      hInvMassElTau[cj] = new TH1D ("hInvMassElTau_"+nCut,"hInvMassElTau "+cutName,20,0,200);
       hInvMassElTau[cj]->Sumw2();
-      hInvMassElEl[cj] = new TH1D ("hInvMassElEl_"+nCut,"hInvMassElEl "+cutName,50,0,500);
+      hInvMassElEl[cj] = new TH1D ("hInvMassElEl_"+nCut,"hInvMassElEl "+cutName,20,0,200);
       hInvMassElEl[cj]->Sumw2();
-      hInvMassTauTau[cj] = new TH1D ("hInvMassTauTau_"+nCut,"hInvMassTauTau "+cutName,50,0,500);
+      hInvMassTauTau[cj] = new TH1D ("hInvMassTauTau_"+nCut,"hInvMassTauTau "+cutName,20,0,200);
       hInvMassTauTau[cj]->Sumw2();
-      hInvMassDil[cj] = new TH1D ("hInvMassDil_"+nCut,"hInvMassDil "+cutName,50,0,500);
-      hInvMassDil[cj]->Sumw2();
-      hInvMassDilFineBin[cj] = new TH1D ("hInvMassDilFineBin_"+nCut,"hInvMassDilFineBin "+cutName,250,0,500);
-      hInvMassDilFineBin[cj]->Sumw2();
-      hDiJetMass_J0J1[cj] = new TH1D ("hDiJetMass_J0J1_"+nCut,"hDiJetMass_J0J1 "+cutName,50,0,500);
+      hInvMassZ1[cj] = new TH1D ("hInvMassZ1_"+nCut,"hInvMassZ1 "+cutName,20,0,200);
+      hInvMassZ1[cj]->Sumw2();
+      hDiJetMass_J0J1[cj] = new TH1D ("hDiJetMass_J0J1_"+nCut,"hDiJetMass_J0J1 "+cutName,20,0,200);
       hDiJetMass_J0J1[cj]->Sumw2();
 
 
-      hInvMass3MuTau[cj] = new TH1D ("hInvMass3MuTau_"+nCut,"hInvMass3MuTau "+cutName,50,0,500);
+      hInvMass3MuTau[cj] = new TH1D ("hInvMass3MuTau_"+nCut,"hInvMass3MuTau "+cutName,20,0,200);
       hInvMass3MuTau[cj]->Sumw2();
-      hInvMass2MuElTau[cj] = new TH1D ("hInvMass2MuElTau_"+nCut,"hInvMass2MuElTau "+cutName,50,0,500);
+      hInvMass2MuElTau[cj] = new TH1D ("hInvMass2MuElTau_"+nCut,"hInvMass2MuElTau "+cutName,20,0,200);
       hInvMass2MuElTau[cj]->Sumw2();
-      hInvMass2Mu2Tau[cj] = new TH1D ("hInvMass2Mu2Tau_"+nCut,"hInvMass2Mu2Tau "+cutName,50,0,500);
+      hInvMass2Mu2Tau[cj] = new TH1D ("hInvMass2Mu2Tau_"+nCut,"hInvMass2Mu2Tau "+cutName,20,0,200);
       hInvMass2Mu2Tau[cj]->Sumw2();
-      hInvMass3MuTauFB[cj] = new TH1D ("hInvMass3MuTauFB_"+nCut,"hInvMass3MuTau "+cutName,50,0,500);
-      hInvMass3MuTauFB[cj]->Sumw2();
-      hInvMass2MuElTauFB[cj] = new TH1D ("hInvMass2MuElTauFB_"+nCut,"hInvMass2MuElTau "+cutName,50,0,500);
-      hInvMass2MuElTauFB[cj]->Sumw2();
-      hInvMass2Mu2TauFB[cj] = new TH1D ("hInvMass2Mu2TauFB_"+nCut,"hInvMass2Mu2Tau "+cutName,50,0,500);
-      hInvMass2Mu2TauFB[cj]->Sumw2();
 
-      hInvMass3MuTauZ2[cj] = new TH1D ("hInvMass3MuTauZ2_"+nCut,"hInvMass3MuTauZ2 "+cutName,50,0,500);
+      hInvMass3MuTauZ2[cj] = new TH1D ("hInvMass3MuTauZ2_"+nCut,"hInvMass3MuTauZ2 "+cutName,20,0,200);
       hInvMass3MuTauZ2[cj]->Sumw2();
-      hInvMass2MuElTauZ2[cj] = new TH1D ("hInvMass2MuElTauZ2_"+nCut,"hInvMass2MuElTauZ2 "+cutName,50,0,500);
+      hInvMass2MuElTauZ2[cj] = new TH1D ("hInvMass2MuElTauZ2_"+nCut,"hInvMass2MuElTauZ2 "+cutName,20,0,200);
       hInvMass2MuElTauZ2[cj]->Sumw2();
-      hInvMass2Mu2TauZ2[cj] = new TH1D ("hInvMass2Mu2TauZ2_"+nCut,"hInvMass2Mu2TauZ2 "+cutName,50,0,500);
+      hInvMass2Mu2TauZ2[cj] = new TH1D ("hInvMass2Mu2TauZ2_"+nCut,"hInvMass2Mu2TauZ2 "+cutName,20,0,200);
       hInvMass2Mu2TauZ2[cj]->Sumw2();
-      hInvMass3MuTauZ2FB[cj] = new TH1D ("hInvMass3MuTauZ2FB_"+nCut,"hInvMass3MuTauZ2 "+cutName,50,0,500);
-      hInvMass3MuTauZ2FB[cj]->Sumw2();
-      hInvMass2MuElTauZ2FB[cj] = new TH1D ("hInvMass2MuElTauZ2FB_"+nCut,"hInvMass2MuElTauZ2 "+cutName,50,0,500);
-      hInvMass2MuElTauZ2FB[cj]->Sumw2();
-      hInvMass2Mu2TauZ2FB[cj] = new TH1D ("hInvMass2Mu2TauZ2FB_"+nCut,"hInvMass2Mu2TauZ2 "+cutName,50,0,500);
-      hInvMass2Mu2TauZ2FB[cj]->Sumw2();
 
 
-
-      hInvMass3ElTau[cj] = new TH1D ("hInvMass3ElTau_"+nCut,"hInvMass3ElTau "+cutName,250,0,500);
+      hInvMass3ElTau[cj] = new TH1D ("hInvMass3ElTau_"+nCut,"hInvMass3ElTau "+cutName,20,0,200);
       hInvMass3ElTau[cj]->Sumw2();
-      hInvMass2ElMuTau[cj] = new TH1D ("hInvMass2ElMuTau_"+nCut,"hInvMass2ElMuTau "+cutName,250,0,500);
+      hInvMass2ElMuTau[cj] = new TH1D ("hInvMass2ElMuTau_"+nCut,"hInvMass2ElMuTau "+cutName,20,0,200);
       hInvMass2ElMuTau[cj]->Sumw2();
-      hInvMass2El2Tau[cj] = new TH1D ("hInvMass2El2Tau_"+nCut,"hInvMass2El2Tau "+cutName,250,0,500);
+      hInvMass2El2Tau[cj] = new TH1D ("hInvMass2El2Tau_"+nCut,"hInvMass2El2Tau "+cutName,20,0,200);
       hInvMass2El2Tau[cj]->Sumw2();
-      hInvMass3ElTauFB[cj] = new TH1D ("hInvMass3ElTauFB_"+nCut,"hInvMass3ElTauFB "+cutName,250,0,500);
-      hInvMass3ElTauFB[cj]->Sumw2();
-      hInvMass2ElMuTauFB[cj] = new TH1D ("hInvMass2ElMuTauFB_"+nCut,"hInvMass2ElMuTauFB "+cutName,250,0,500);
-      hInvMass2ElMuTauFB[cj]->Sumw2();
-      hInvMass2El2TauFB[cj] = new TH1D ("hInvMass2El2TauFB_"+nCut,"hInvMass2El2TauFB "+cutName,250,0,500);
-      hInvMass2El2TauFB[cj]->Sumw2();
 
         
       hPtDil[cj] = new TH1D ("PtDil_"+nCut,"PtDil "+cutName,80,0,800);
@@ -1614,6 +1378,8 @@ for(int jj = 0; jj < 60; jj++){
 
       hPtDil2Mu2Tau[cj] = new TH1D ("PtDil2Mu2Tau_"+nCut,"PtDil2Mu2Tau "+cutName,80,0,800);
       hPtDil2Mu2Tau[cj]->Sumw2();
+      hPtDil2Mu2Mu[cj] = new TH1D ("PtDil2Mu2Mu_"+nCut,"PtDil2Mu2Mu "+cutName,80,0,800);
+      hPtDil2Mu2Mu[cj]->Sumw2();
 
 
       hPtDil3ElTau[cj] = new TH1D ("PtDil3ElTau_"+nCut,"PtDil3ElTau "+cutName,80,0,800);
@@ -1634,43 +1400,52 @@ for(int jj = 0; jj < 60; jj++){
       //
       hnMu[cj] = new TH1D ("nMu_"+nCut,"nMu "+cutName,10,-0.5,9.5);
       hnMu[cj]->Sumw2();
-      hMupt[cj] = new TH1D ("MupT_"+nCut,"Mu pT "+cutName,50,0,500);
+      hMupt[cj] = new TH1D ("MupT_"+nCut,"Mu pT "+cutName,25,0,500);
       hMupt[cj]->Sumw2();
       hMueta[cj] = new TH1D ("Mueta_"+nCut,"Mu eta "+cutName,30,-3,3);
       hMueta[cj]->Sumw2();
-      hMu3pt[cj] = new TH1D ("Mu3pT_"+nCut,"Mu pT "+cutName,50,0,500);
+      hMu3pt[cj] = new TH1D ("Mu3pT_"+nCut,"Mu pT "+cutName,25,0,500);
       hMu3pt[cj]->Sumw2();
       hMu3eta[cj] = new TH1D ("Mu3eta_"+nCut,"Mu eta "+cutName,30,-3,3);
       hMu3eta[cj]->Sumw2();
-      hEl3pt[cj] = new TH1D ("El3pT_"+nCut,"Mu pT "+cutName,50,0,500);
+      hEl3pt[cj] = new TH1D ("El3pT_"+nCut,"Mu pT "+cutName,25,0,500);
       hEl3pt[cj]->Sumw2();
       hEl3eta[cj] = new TH1D ("El3eta_"+nCut,"Mu eta "+cutName,30,-3,3);
       hEl3eta[cj]->Sumw2();
 
-      hLept1pt[cj] = new TH1D ("Lept1pT_"+nCut,"Lept1 pT "+cutName,50,0,500);
+      hLept1pt[cj] = new TH1D ("Lept1pT_"+nCut,"Lept1 pT "+cutName,25,0,500);
       hLept1pt[cj]->Sumw2();
       hLept1eta[cj] = new TH1D ("Lept1eta_"+nCut,"Lept1 eta "+cutName,30,-3,3);
       hLept1eta[cj]->Sumw2();
-      hLept2pt[cj] = new TH1D ("Lept2pT_"+nCut,"Lept2 pT "+cutName,50,0,500);
+      hLept2pt[cj] = new TH1D ("Lept2pT_"+nCut,"Lept2 pT "+cutName,25,0,500);
       hLept2pt[cj]->Sumw2();
       hLept2eta[cj] = new TH1D ("Lept2eta_"+nCut,"Lept2 eta "+cutName,30,-3,3);
       hLept2eta[cj]->Sumw2();
+
+      hLept1apt[cj] = new TH1D ("Lept1apT_"+nCut,"Lept1 pT "+cutName,25,0,500);
+      hLept1apt[cj]->Sumw2();
+      hLept1aeta[cj] = new TH1D ("Lept1aeta_"+nCut,"Lept1 eta "+cutName,30,-3,3);
+      hLept1aeta[cj]->Sumw2();
+      hLept2apt[cj] = new TH1D ("Lept2apT_"+nCut,"Lept2 pT "+cutName,25,0,500);
+      hLept2apt[cj]->Sumw2();
+      hLept2aeta[cj] = new TH1D ("Lept2aeta_"+nCut,"Lept2 eta "+cutName,30,-3,3);
+      hLept2aeta[cj]->Sumw2();
         
       //Taus
       //
       //
       hnTau[cj] = new TH1D ("nTau_"+nCut,"nTau "+cutName,10,-0.5,9.5);
       hnTau[cj]->Sumw2();
-      hTaupt[cj] = new TH1D ("TaupT_"+nCut,"Tau pT "+cutName,50,0,500);
+      hTaupt[cj] = new TH1D ("TaupT_"+nCut,"Tau pT "+cutName,25,0,500);
       hTaupt[cj]->Sumw2();
       hTaueta[cj] = new TH1D ("Taueta_"+nCut,"Tau eta "+cutName,30,-3,3);
       hTaueta[cj]->Sumw2();
 
-      hTau1pt[cj] = new TH1D ("Tau1pT_"+nCut,"Tau pT 1"+cutName,50,0,500);
+      hTau1pt[cj] = new TH1D ("Tau1pT_"+nCut,"Tau pT 1"+cutName,25,0,500);
       hTau1pt[cj]->Sumw2();
       hTau1eta[cj] = new TH1D ("Tau1eta_"+nCut,"Tau eta 1"+cutName,30,-3,3);
       hTau1eta[cj]->Sumw2();
-      hTau2pt[cj] = new TH1D ("Tau2pT_"+nCut,"Tau pT 2"+cutName,50,0,500);
+      hTau2pt[cj] = new TH1D ("Tau2pT_"+nCut,"Tau pT 2"+cutName,25,0,500);
       hTau2pt[cj]->Sumw2();
       hTau2eta[cj] = new TH1D ("Tau2eta_"+nCut,"Tau eta 2"+cutName,30,-3,3);
       hTau2eta[cj]->Sumw2();
@@ -1681,7 +1456,7 @@ for(int jj = 0; jj < 60; jj++){
       //
       hnEl[cj] = new TH1D ("nEl_"+nCut,"nEl "+cutName,10,-0.5,9.5);
       hnEl[cj]->Sumw2();
-      hElpt[cj] = new TH1D ("ElpT_"+nCut,"El pT "+cutName,50,0,500);
+      hElpt[cj] = new TH1D ("ElpT_"+nCut,"El pT "+cutName,25,0,500);
       hElpt[cj]->Sumw2();
       hEleta[cj] = new TH1D ("Eleta_"+nCut,"El eta "+cutName,30,-3,3);
       hEleta[cj]->Sumw2();
@@ -1694,6 +1469,10 @@ for(int jj = 0; jj < 60; jj++){
       hIsoLept1[cj]->Sumw2();
       hIsoLept2[cj] = new TH1D ("IsoLept2_"+nCut,"Lept2 Iso "+cutName,100,0,5);
       hIsoLept2[cj]->Sumw2();
+      hIsoLept1a[cj] = new TH1D ("IsoLept1a_"+nCut,"Lept1 Iso "+cutName,100,0,5);
+      hIsoLept1a[cj]->Sumw2();
+      hIsoLept2a[cj] = new TH1D ("IsoLept2a_"+nCut,"Lept2 Iso "+cutName,100,0,5);
+      hIsoLept2a[cj]->Sumw2();
       hIsoEl[cj] = new TH1D ("IsoEl_"+nCut,"El Iso "+cutName,100,0,5);
       hIsoEl[cj]->Sumw2();
       hIsoEl3[cj] = new TH1D ("IsoEl3_"+nCut,"El Iso "+cutName,100,0,5);
@@ -1725,12 +1504,12 @@ for (int i=0;i<FakeList.size();++i){
       hMt2lesterFake[cj][i] = new TH1D ("Mt2lestermutauFake_"+nCut+"_"+fCut,"Mt2lestermutau "+FakeName,nBinsMT2lester,binsMT2lester);
       hMt2lesterFake[cj][i] ->Sumw2();
       
-      hMuptFake[cj][i] = new TH1D ("MupTFake_"+nCut+"_"+fCut,"Mu pT "+FakeName,50,0,500);
+      hMuptFake[cj][i] = new TH1D ("MupTFake_"+nCut+"_"+fCut,"Mu pT "+FakeName,25,0,500);
       hMuptFake[cj][i]->Sumw2();
       hMuetaFake[cj][i] = new TH1D ("MuetaFake_"+nCut+"_"+fCut,"Mu eta "+FakeName,30,-3,3);
       hMuetaFake[cj][i]->Sumw2();
 
-      hTauptFake[cj][i] = new TH1D ("TaupTFake_"+nCut+"_"+fCut,"Tau pT "+FakeName,50,0,500);
+      hTauptFake[cj][i] = new TH1D ("TaupTFake_"+nCut+"_"+fCut,"Tau pT "+FakeName,25,0,500);
       hTauptFake[cj][i]->Sumw2();
       hTauetaFake[cj][i] = new TH1D ("TauetaFake_"+nCut+"_"+fCut,"Tau eta "+FakeName,30,-3,3);
       hTauetaFake[cj][i]->Sumw2();
@@ -1756,6 +1535,8 @@ for (int i=0;i<FakeList.size();++i){
 
       hdEtaDil[cj] = new TH1D("dEtaDil_"+nCut,"dEtaDil "+cutName,100,-10.,10);
       hdEtaDil[cj]->Sumw2();
+      hdEtaDilb[cj] = new TH1D("dEtaDilb_"+nCut,"dEtaDilb "+cutName,100,-10.,10);
+      hdEtaDilb[cj]->Sumw2();
       hdEtaJ0J1[cj] = new TH1D("dEtaJ0J1_"+nCut,"dEtaJ0J1 "+cutName,100,-10.,10);
       hdEtaJ0J1[cj]->Sumw2();
       hdEtaMuMET[cj] = new TH1D("dEtaMuMET_"+nCut,"dEtaMuMET "+cutName,100,-10.,10);
@@ -1781,10 +1562,16 @@ TH1D *hdEtaTauMET[CutN];
 
       hdPhiDil[cj] = new TH1D("dPhiDil_"+nCut,"dPhiDil "+cutName,64,-3.2,3.2);
       hdPhiDil[cj]->Sumw2();
+      hdPhiDilb[cj] = new TH1D("dPhiDilb_"+nCut,"dPhiDilb "+cutName,64,-3.2,3.2);
+      hdPhiDilb[cj]->Sumw2();
       hdPhiJ0Lept1[cj] = new TH1D("dPhiJ0Lept1_"+nCut,"dPhiJ0Lept1 "+cutName,64,-3.2,3.2);
       hdPhiJ0Lept1[cj]->Sumw2();
       hdPhiJ0Lept2[cj] = new TH1D("dPhiJ0Lept2_"+nCut,"dPhiJ0Lept2 "+cutName,64,-3.2,3.2);
       hdPhiJ0Lept2[cj]->Sumw2();
+      hdPhiJ0Lept1a[cj] = new TH1D("dPhiJ0Lept1a_"+nCut,"dPhiJ0Lept1 "+cutName,64,-3.2,3.2);
+      hdPhiJ0Lept1a[cj]->Sumw2();
+      hdPhiJ0Lept2a[cj] = new TH1D("dPhiJ0Lept2a_"+nCut,"dPhiJ0Lept2 "+cutName,64,-3.2,3.2);
+      hdPhiJ0Lept2a[cj]->Sumw2();
 
     
       hdPhiJMET[cj] = new TH1D("dPhiJMET_"+nCut,"dPhiJMET "+cutName,64,-3.2,3.2);
@@ -1821,6 +1608,11 @@ TH1D *hdEtaTauMET[CutN];
       hdPhiLept2MET[cj] = new TH1D("dPhiLept2MET_"+nCut,"dPhiLept2MET "+cutName,64,-3.2,3.2);
       hdPhiLept2MET[cj]->Sumw2();
 
+      hdPhiLept1aMET[cj] = new TH1D("dPhiLept1aMET_"+nCut,"dPhiLept1MET "+cutName,64,-3.2,3.2);
+      hdPhiLept1aMET[cj]->Sumw2();
+      hdPhiLept2aMET[cj] = new TH1D("dPhiLept2aMET_"+nCut,"dPhiLept2MET "+cutName,64,-3.2,3.2);
+      hdPhiLept2aMET[cj]->Sumw2();
+
       hdPhiElMET[cj] = new TH1D("dPhiElMET_"+nCut,"dPhiElMET "+cutName,64,-3.2,3.2);
       hdPhiElMET[cj]->Sumw2();
       hdPhiEl3MET[cj] = new TH1D("dPhiEl3MET_"+nCut,"dPhiElMET "+cutName,64,-3.2,3.2);
@@ -1836,47 +1628,51 @@ TH1D *hdEtaTauMET[CutN];
       //MT
       //
       //
-      hMTsum[cj] = new TH1D ("MTsum_"+nCut,"MTsum "+cutName,50,0,500);
+      hMTsum[cj] = new TH1D ("MTsum_"+nCut,"MTsum "+cutName,25,0,500);
       hMTsum[cj]->Sumw2();
-      hMTtot[cj] = new TH1D ("MTtot_"+nCut,"MTtot "+cutName,50,0,500);
+      hMTtot[cj] = new TH1D ("MTtot_"+nCut,"MTtot "+cutName,25,0,500);
       hMTtot[cj]->Sumw2();
-      hMT[cj] = new TH1D ("MT_"+nCut,"MT "+cutName,50,0,500);
+      hMT[cj] = new TH1D ("MT_"+nCut,"MT "+cutName,25,0,500);
       hMT[cj]->Sumw2();
-      hMTel[cj] = new TH1D ("MTel_"+nCut,"MTel "+cutName,50,0,500);
+      hMTel[cj] = new TH1D ("MTel_"+nCut,"MTel "+cutName,25,0,500);
       hMTel[cj]->Sumw2();
-      hMTmu[cj] = new TH1D ("MTmu_"+nCut,"MTmu "+cutName,50,0,500);
+      hMTmu[cj] = new TH1D ("MTmu_"+nCut,"MTmu "+cutName,25,0,500);
       hMTmu[cj]->Sumw2();
-      hMTmuFineBin[cj] = new TH1D ("MTmuFB_"+nCut,"MTmu "+cutName,100,0,500);
-      hMTmuFineBin[cj]->Sumw2();
-      hMTdif[cj] = new TH1D ("MTdif_"+nCut,"MTdif "+cutName,50,0,500);
+      hMTmuFB[cj] = new TH1D ("MTmuFB_"+nCut,"MTmu "+cutName,100,0,500);
+      hMTmuFB[cj]->Sumw2();
+      hMTdif[cj] = new TH1D ("MTdif_"+nCut,"MTdif "+cutName,25,0,500);
       hMTdif[cj]->Sumw2();
-      hMTmax[cj] = new TH1D ("MTmax_"+nCut,"MTmax "+cutName,50,0,500);
+      hMTmax[cj] = new TH1D ("MTmax_"+nCut,"MTmax "+cutName,25,0,500);
       hMTmax[cj]->Sumw2();
-      hMTmin[cj] = new TH1D ("MTmin_"+nCut,"MTmin "+cutName,50,0,500);
+      hMTmin[cj] = new TH1D ("MTmin_"+nCut,"MTmin "+cutName,25,0,500);
       hMTmin[cj]->Sumw2();
 
-      hMTtau[cj] = new TH1D ("MTtau_"+nCut,"MTtau "+cutName,50,0,500);
+      hMTtau[cj] = new TH1D ("MTtau_"+nCut,"MTtau "+cutName,25,0,500);
       hMTtau[cj]->Sumw2();
 
-      hMTmutau[cj] = new TH1D ("MTmutau_"+nCut,"MTmutau "+cutName,50,0,500);
+      hMTmutau[cj] = new TH1D ("MTmutau_"+nCut,"MTmutau "+cutName,25,0,500);
       hMTmutau[cj]->Sumw2();
      
-      hMTmuel[cj] = new TH1D ("MTmuel_"+nCut,"MTmuel "+cutName,50,0,500);
+      hMTmuel[cj] = new TH1D ("MTmuel_"+nCut,"MTmuel "+cutName,25,0,500);
       hMTmuel[cj]->Sumw2();
        
-      hMTeltau[cj] = new TH1D ("MTeltau_"+nCut,"MTeltau "+cutName,50,0,500);
+      hMTeltau[cj] = new TH1D ("MTeltau_"+nCut,"MTeltau "+cutName,25,0,500);
       hMTeltau[cj]->Sumw2();
       
       hMTtautau[cj] = new TH1D ("MTtautau_"+nCut,"MTtautau "+cutName,200,0,1000);
       hMTtautau[cj]->Sumw2();
 
 
-      hMTDil[cj] = new TH1D ("MTDil_"+nCut,"MTDil "+cutName,50,0,500);
+      hMTDil[cj] = new TH1D ("MTDil_"+nCut,"MTDil "+cutName,25,0,500);
       hMTDil[cj]->Sumw2();
-      hMTlept1[cj] = new TH1D ("MTlept1_"+nCut,"MTlept1 "+cutName,50,0,500);
+      hMTlept1[cj] = new TH1D ("MTlept1_"+nCut,"MTlept1 "+cutName,25,0,500);
       hMTlept1[cj]->Sumw2();
-      hMTlept2[cj] = new TH1D ("MTlept2_"+nCut,"MTlept2 "+cutName,50,0,500);
+      hMTlept2[cj] = new TH1D ("MTlept2_"+nCut,"MTlept2 "+cutName,25,0,500);
       hMTlept2[cj]->Sumw2();
+      hMTlept1a[cj] = new TH1D ("MTlept1a_"+nCut,"MTlept1 "+cutName,25,0,500);
+      hMTlept1a[cj]->Sumw2();
+      hMTlept2a[cj] = new TH1D ("MTlept2a_"+nCut,"MTlept2 "+cutName,25,0,500);
+      hMTlept2a[cj]->Sumw2();
 
 
 
@@ -1887,86 +1683,33 @@ TH1D *hdEtaTauMET[CutN];
       hMt2[cj]->Sumw2();
       hMt2mutau[cj] = new TH1D ("Mt2mutau_"+nCut,"Mt2mutau "+cutName,200,0,1000);
       hMt2mutau[cj]->Sumw2();
-     /*
-      hprofMt2vsDZeta[cj]  = new TProfile("hprofMt2vsDZeta_"+nCut,"hprof "+cutName,nBinsMT2lester,binsMT2lester);
-      hprofMt2vsMET[cj]  = new TProfile("hprofMt2vsMET_"+nCut,"hprof "+cutName,nBinsMT2lester,binsMT2lester);
-      hprofMETvsMt2[cj]  = new TProfile("hprofMETvsMt2_"+nCut,"hprof "+cutName,nBinsmet,binsmet);
-      hprofMETvsDZeta[cj]  = new TProfile("hprofMETvsDZeta_"+nCut,"hprof "+cutName,nBinsmet,binsmet);
-      hprofDZetavsMET[cj]  = new TProfile("hprofMETvsMET_"+nCut,"hprof "+cutName,nBinsDZeta,binsDZeta);
-      hprofDZetavsMt2[cj]  = new TProfile("hprofMETvsMt2_"+nCut,"hprof "+cutName,nBinsDZeta,binsDZeta);
-      */
       hMt2lestermutau[cj] = new TH1D ("Mt2lestermutau_"+nCut,"Mt2lestermutau "+cutName,nBinsMT2lester,binsMT2lester);
-      //hMt2lestermutau[cj] = new TH1D ("Mt2lestermutau_"+nCut,"Mt2lestermutau "+cutName,50,0,500);
+      //hMt2lestermutau[cj] = new TH1D ("Mt2lestermutau_"+nCut,"Mt2lestermutau "+cutName,25,0,500);
       hMt2lestermutau[cj]->Sumw2();
 
-      hMt2LowDzeta[cj] = new TH1D ("Mt2lestermutauLowDzeta_"+nCut,"Mt2lestermutauLowDzeta "+cutName,nBinsMT2lester,binsMT2lesterr);
-      hMt2LowDzeta[cj]->Sumw2();
-      hMt2MiddleDzeta[cj] = new TH1D ("Mt2lestermutauMiddleDzeta_"+nCut,"Mt2lestermutauMiddleDzeta "+cutName,nBinsMT2lester,binsMT2lesterr);
-      hMt2MiddleDzeta[cj]->Sumw2();
-      hMt2HighDzeta[cj] = new TH1D ("Mt2lestermutauHighDzeta_"+nCut,"Mt2lestermutauHighDzeta "+cutName,nBinsMT2lester,binsMT2lesterr);
-      hMt2HighDzeta[cj]->Sumw2();
-    
-      hMt2HighDzetaHighMET[cj] = new TH1D ("Mt2HighDzetaHighMET_"+nCut,"Mt2HighDzetaHighMET "+cutName,nBinsMT2lester,binsMT2lesterr);
-      hMt2HighDzetaLowMET[cj] = new TH1D ("Mt2HighDzetaLowMET_"+nCut,"Mt2HighDzetaLowMET "+cutName,nBinsMT2lester,binsMT2lesterr);
-      hMt2HighDzetaMiddleMET[cj] = new TH1D ("Mt2HighDzetaMiddleMET_"+nCut,"Mt2HighDzetaMiddleMET "+cutName,nBinsMT2lester,binsMT2lesterr);
-      hMt2HighDzetaHighMET[cj]->Sumw2();
-      hMt2HighDzetaLowMET[cj]->Sumw2();
-      hMt2HighDzetaMiddleMET[cj]->Sumw2();
 
-      hMETHighDzetaHighMt2[cj] = new TH1D ("METHighDzetaHighMt2_"+nCut,"METHighDzetaHighMt2 "+cutName,nBinsmet,binsmett);
-      hMETHighDzetaLowMt2[cj] = new TH1D ("METHighDzetaLowMt2_"+nCut,"METHighDzetaLowMt2 "+cutName,nBinsmet,binsmett);
-      hMETHighDzetaMiddleMt2[cj] = new TH1D ("METHighDzetaMiddleMt2_"+nCut,"METHighDzetaMiddleMt2 "+cutName,nBinsmet,binsmett);
-      hMETHighDzetaHighMt2[cj]->Sumw2();
-      hMETHighDzetaLowMt2[cj]->Sumw2();
-      hMETHighDzetaMiddleMt2[cj]->Sumw2();
-
-
-      hMt2LowDzetaHighMET[cj] = new TH1D ("Mt2LowDzetaHighMET_"+nCut,"Mt2LowDzetaHighMET "+cutName,nBinsMT2lester,binsMT2lesterr);
-      hMt2LowDzetaLowMET[cj] = new TH1D ("Mt2LowDzetaLowMET_"+nCut,"Mt2LowDzetaLowMET "+cutName,nBinsMT2lester,binsMT2lesterr);
-      hMt2LowDzetaMiddleMET[cj] = new TH1D ("Mt2LowDzetaMiddleMET_"+nCut,"Mt2LowDzetaMiddleMET "+cutName,nBinsMT2lester,binsMT2lesterr);
-      hMt2LowDzetaHighMET[cj]->Sumw2();
-      hMt2LowDzetaLowMET[cj]->Sumw2();
-      hMt2LowDzetaMiddleMET[cj]->Sumw2();
-
-      hMETLowDzetaHighMt2[cj] = new TH1D ("METLowDzetaHighMt2_"+nCut,"METLowDzetaHighMt2 "+cutName,nBinsmet,binsmett);
-      hMETLowDzetaLowMt2[cj] = new TH1D ("METLowDzetaLowMt2_"+nCut,"METLowDzetaLowMt2 "+cutName,nBinsmet,binsmett);
-      hMETLowDzetaMiddleMt2[cj] = new TH1D ("METLowDzetaMiddleMt2_"+nCut,"METLowDzetaMiddleMt2 "+cutName,nBinsmet,binsmett);
-      hMETLowDzetaHighMt2[cj]->Sumw2();
-      hMETLowDzetaLowMt2[cj]->Sumw2();
-      hMETLowDzetaMiddleMt2[cj]->Sumw2();
-
-
-
-      hMt2lestermutauFB[cj] = new TH1D ("Mt2lestermutauFB_"+nCut,"Mt2lestermutau "+cutName,50,0,500);
+      hMt2lestermutauFB[cj] = new TH1D ("Mt2lestermutauFB_"+nCut,"Mt2lestermutau "+cutName,25,0,500);
       hMt2lestermutauFB[cj]->Sumw2();
-      hMt2lestereltauFB[cj] = new TH1D ("Mt2lestereltauFB_"+nCut,"Mt2lestereltau "+cutName,50,0,500);
+      hMt2lestereltauFB[cj] = new TH1D ("Mt2lestereltauFB_"+nCut,"Mt2lestereltau "+cutName,25,0,500);
       hMt2lestereltauFB[cj]->Sumw2();
-      hMt2lestermuelFB[cj] = new TH1D ("Mt2lestermuelFB_"+nCut,"Mt2lestermuel "+cutName,50,0,500);
+      hMt2lestermuelFB[cj] = new TH1D ("Mt2lestermuelFB_"+nCut,"Mt2lestermuel "+cutName,25,0,500);
       hMt2lestermuelFB[cj]->Sumw2();
 
 
       hMET[cj] = new TH1D("MET_"+nCut,"MET "+cutName,nBinsmet,binsmet);
       hMET[cj]->Sumw2();
 
-      hMETLowDzeta[cj] = new TH1D("METLowDzeta_"+nCut,"METLowDzeta "+cutName,nBinsmet,binsmett);
-      hMETLowDzeta[cj]->Sumw2();
 
-      hMETMiddleDzeta[cj] = new TH1D("METMiddleDzeta_"+nCut,"METMiddleDzeta "+cutName,nBinsmet,binsmett);
-      hMETMiddleDzeta[cj]->Sumw2();
-
-      hMETHighDzeta[cj] = new TH1D("METHighDzeta_"+nCut,"METHighDzeta "+cutName,nBinsmet,binsmett);
-      hMETHighDzeta[cj]->Sumw2();
-
-      hMCTcor[cj] = new TH1D ("MCTcor_"+nCut,"MCTcor "+cutName,50,0,500);
+      hMCTcor[cj] = new TH1D ("MCTcor_"+nCut,"MCTcor "+cutName,25,0,500);
       hMCTcor[cj]->Sumw2();
-      hMCTmutau[cj] = new TH1D ("MCTmutau_"+nCut,"MCTmutau "+cutName,50,0,500);
+      hMCTmutau[cj] = new TH1D ("MCTmutau_"+nCut,"MCTmutau "+cutName,25,0,500);
       hMCTmutau[cj]->Sumw2();
-      hMCTxmutau[cj] = new TH1D ("MCTxmutau_"+nCut,"MCTxmutau "+cutName,50,0,500);
+      hMCTxmutau[cj] = new TH1D ("MCTxmutau_"+nCut,"MCTxmutau "+cutName,25,0,500);
       hMCTxmutau[cj]->Sumw2();
-      hMCTymutau[cj] = new TH1D ("MCTymutau_"+nCut,"MCTymutau "+cutName,50,0,500);
+      hMCTymutau[cj] = new TH1D ("MCTymutau_"+nCut,"MCTymutau "+cutName,25,0,500);
       hMCTymutau[cj]->Sumw2();
       
-      hMCTbmutau[cj] = new TH1D ("MCTbmutau_"+nCut,"MCTbmutau "+cutName,50,0,500);
+      hMCTbmutau[cj] = new TH1D ("MCTbmutau_"+nCut,"MCTbmutau "+cutName,25,0,500);
       hMCTbmutau[cj]->Sumw2();
 
       hMt2muel[cj] = new TH1D ("Mt2muel_"+nCut,"Mt2muel "+cutName,200,0,1000);
@@ -1976,13 +1719,13 @@ TH1D *hdEtaTauMET[CutN];
       hMt2lesterDil[cj] = new TH1D ("Mt2lesterDil_"+nCut,"Mt2lesterDil "+cutName,nBinsMT2lester,binsMT2lester);
       hMt2lesterDil[cj]->Sumw2();
 
-      hMt2lesterDilFB[cj] = new TH1D ("hMt2lesterDilFB_"+nCut,"Mt2lesterDilFB "+cutName,50,0,500);
+      hMt2lesterDilFB[cj] = new TH1D ("hMt2lesterDilFB_"+nCut,"Mt2lesterDilFB "+cutName,25,0,500);
       hMt2lesterDilFB[cj]->Sumw2();
 
-      hMCTDil[cj] = new TH1D ("MCTDil_"+nCut,"MCTDil "+cutName,50,0,500);
+      hMCTDil[cj] = new TH1D ("MCTDil_"+nCut,"MCTDil "+cutName,25,0,500);
       hMCTDil[cj]->Sumw2();
       
-      hMCTbDil[cj] = new TH1D ("MCTbDil_"+nCut,"MCTbDil "+cutName,50,0,500);
+      hMCTbDil[cj] = new TH1D ("MCTbDil_"+nCut,"MCTbDil "+cutName,25,0,500);
       hMCTbDil[cj]->Sumw2();
 
       hMt2Dil[cj] = new TH1D ("Mt2Dil_"+nCut,"Mt2Dil "+cutName,200,0,1000);
@@ -1994,35 +1737,35 @@ TH1D *hdEtaTauMET[CutN];
       hMt2lestermuel[cj] = new TH1D ("Mt2lestermuel_"+nCut,"Mt2lestermuel "+cutName,nBinsMT2lester,binsMT2lester);
       hMt2lestermuel[cj]->Sumw2();
 
-      hMCTmuel[cj] = new TH1D ("MCTmuel_"+nCut,"MCTmuel "+cutName,50,0,500);
+      hMCTmuel[cj] = new TH1D ("MCTmuel_"+nCut,"MCTmuel "+cutName,25,0,500);
       hMCTmuel[cj]->Sumw2();
-      hMCTxmuel[cj] = new TH1D ("MCTxmuel_"+nCut,"MCTxmuel "+cutName,50,0,500);
+      hMCTxmuel[cj] = new TH1D ("MCTxmuel_"+nCut,"MCTxmuel "+cutName,25,0,500);
       hMCTxmuel[cj]->Sumw2();
-      hMCTymuel[cj] = new TH1D ("MCTymuel_"+nCut,"MCTymuel "+cutName,50,0,500);
+      hMCTymuel[cj] = new TH1D ("MCTymuel_"+nCut,"MCTymuel "+cutName,25,0,500);
       hMCTymuel[cj]->Sumw2();
       
-      hMCTbmuel[cj] = new TH1D ("MCTbmuel_"+nCut,"MCTbmuel "+cutName,50,0,500);
+      hMCTbmuel[cj] = new TH1D ("MCTbmuel_"+nCut,"MCTbmuel "+cutName,25,0,500);
       hMCTbmuel[cj]->Sumw2();
 
 
 
-      hMTBoundmutau[cj] = new TH1D ("MTBoundmutau_"+nCut,"MTBoundmutau "+cutName,50,0,500);
+      hMTBoundmutau[cj] = new TH1D ("MTBoundmutau_"+nCut,"MTBoundmutau "+cutName,25,0,500);
       hMTBoundmutau[cj] ->Sumw2();
       hMTTruemutau[cj] = new TH1D ("MTTruemutau_"+nCut,"MTTruemutau "+cutName,80,0,800);
       hMTTruemutau[cj] ->Sumw2();
-      hMt2eltau[cj] = new TH1D ("Mt2eltau_"+nCut,"Mt2eltau "+cutName,50,0,500);
+      hMt2eltau[cj] = new TH1D ("Mt2eltau_"+nCut,"Mt2eltau "+cutName,25,0,500);
       hMt2eltau[cj]->Sumw2();
       hMt2lestereltau[cj] = new TH1D ("Mt2lestereltau_"+nCut,"Mt2lestereltau "+cutName,nBinsMT2lester,binsMT2lester);
       hMt2lestereltau[cj]->Sumw2();
  
-      hMCTeltau[cj] = new TH1D ("MCTeltau_"+nCut,"MCTeltau "+cutName,50,0,500);
+      hMCTeltau[cj] = new TH1D ("MCTeltau_"+nCut,"MCTeltau "+cutName,25,0,500);
       hMCTeltau[cj]->Sumw2();
-      hMCTxeltau[cj] = new TH1D ("MCTxeltau_"+nCut,"MCTxeltau "+cutName,50,0,500);
+      hMCTxeltau[cj] = new TH1D ("MCTxeltau_"+nCut,"MCTxeltau "+cutName,25,0,500);
       hMCTxeltau[cj]->Sumw2();
-      hMCTyeltau[cj] = new TH1D ("MCTyeltau_"+nCut,"MCTyeltau "+cutName,50,0,500);
+      hMCTyeltau[cj] = new TH1D ("MCTyeltau_"+nCut,"MCTyeltau "+cutName,25,0,500);
       hMCTyeltau[cj]->Sumw2();
       
-      hMCTbeltau[cj] = new TH1D ("MCTbeltau_"+nCut,"MCTbeltau "+cutName,50,0,500);
+      hMCTbeltau[cj] = new TH1D ("MCTbeltau_"+nCut,"MCTbeltau "+cutName,25,0,500);
       hMCTbeltau[cj]->Sumw2();
 
  

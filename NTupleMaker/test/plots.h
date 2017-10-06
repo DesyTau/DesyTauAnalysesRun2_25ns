@@ -18,6 +18,8 @@
 #include <TVector2.h>
 using namespace std;
 
+TH1::SetDefaultSumw2();
+TH2::SetDefaultSumw2();
 
 const  int CutN=35;
 const  int CutF=20;
@@ -146,7 +148,7 @@ if (pt>600 ) sf = 0.783;
 return sf;
 }
 
-double TauFakeRateFromData2(float pt,float eta, string sel,string working_point){
+double TauFakeRateFromDataVLoose(float pt,float eta, string sel,string working_point){
 float SF = 1.;
 
 
@@ -155,35 +157,34 @@ float SF = 1.;
 
 if (  fabs(eta) < 0.8 )
         {
-                if (pt>20 && pt<30) SF = 0.0397521;
-                if (pt>30 && pt<40) SF = 0.0298394;
-                if (pt>40 ) SF = 0.0160712;
+                if (pt>20 && pt<30) SF = 0.29099;
+                if (pt>30 && pt<40) SF = 0.271191;
+                if (pt>40 ) SF = 0.231226;
         }
 if (  fabs(eta) > 0.8 && fabs(eta) < 1.44 )
         {
 
-                if (pt>20 && pt<30) SF = 0.0480039;
-                if (pt>30 && pt<40) SF = 0.0325758;
-                if (pt>40 ) SF = 0.0158167;
+                if (pt>20 && pt<30) SF = 0.298628;
+                if (pt>30 && pt<40) SF = 0.274101;
+                if (pt>40 ) SF = 0.173872;
         }
 
 if (  fabs(eta) > 1.44 && fabs(eta) < 1.566 )
         {
 
-                if (pt>20 && pt<40) SF = 0.0413137;
-                if (pt>40) SF = 0.0229581;
+                if (pt>20 && pt<40) SF = 0.316511;
+                if (pt>40) SF = 0.239111;
         }
 if (  fabs(eta) > 1.566 && fabs(eta) < 2.3 )
         {
 
-                if (pt>20 && pt<40) SF = 0.0457624;
-                if (pt>40) SF = 0.0295553;
+                if (pt>20 && pt<40) SF = 0.272468;
+                if (pt>40) SF = 0.274652;
         }
 
-
 return SF;
-
 }
+
 
 double TauFakeRateFromData(float pt,float eta, string sel,string working_point){
 float SF = 1.;
@@ -1116,6 +1117,31 @@ TH1D *hTau2pt[CutN];
 TH1D *hTau2eta[CutN];
 
 
+TH1D *hnJetByBin[CutN][55];
+TH1D *hMuptByBin[CutN][55];
+TH1D *hMuetaByBin[CutN][55];
+TH1D *hTauetaByBin[CutN][5];
+TH1D *hTauptByBin[CutN][55];
+TH1D *hMt2lesterByBin[CutN][55];
+TH1D *hMt2lesterFBByBin[CutN][55];
+
+TH1D *hDZetaByBin[CutN][55];
+TH1D *hDZetaFBByBin[CutN][55];
+
+TH1D *hMETByBin[CutN][55];
+TH1D *hMETFBByBin[CutN][55];
+
+TH1D *hElptByBin[CutN][55];
+TH1D *hEletaByBin[CutN][55];
+
+
+
+
+
+
+
+
+
 TH1D *hMETFake[CutN][CutF];
 TH1D *hnJetFake[CutN][CutF];
 TH1D *hMuptFake[CutN][CutF];
@@ -1638,11 +1664,11 @@ for(int jj = 0; jj < 60; jj++){
       hTauDecayModeAll[cj] = new TH1D("TauDecayModeAll_"+nCut,"TauDecayModeAll "+cutName, 11, -1.5,9.5);
       hTauDecayModeAll[cj]->Sumw2();
 
-      //hDZeta[cj] = new TH1D("hDZeta_"+nCut,"hDZeta"+cutName,30,-400,200);
-      hDZeta[cj] = new TH1D("hDZeta_"+nCut,"hDZeta"+cutName,nBinsDZeta,binsDZeta);
+      //hDZeta[cj] = new TH1D("hDZeta_"+nCut,"hDZeta "+cutName,30,-400,200);
+      hDZeta[cj] = new TH1D("hDZeta_"+nCut,"hDZeta "+cutName,nBinsDZeta,binsDZeta);
       hDZeta[cj]->Sumw2();
 
-      hDZetaFB[cj] = new TH1D("hDZetaFB_"+nCut,"hDZeta"+cutName,30,-400,200);
+      hDZetaFB[cj] = new TH1D("hDZetaFB_"+nCut,"hDZeta "+cutName,30,-400,200);
       hDZetaFB[cj]->Sumw2();
       
       hDZetaR[cj] = new TH1D("hDZetaR_"+nCut,"hDZetaR"+cutName,nBinsDZetaR,binsDZetaR);
@@ -1979,6 +2005,61 @@ for(int jj = 0; jj < 60; jj++){
       hTau2eta[cj] = new TH1D ("Tau2eta_"+nCut,"Tau eta 2"+cutName,30,-3,3);
       hTau2eta[cj]->Sumw2();
 	
+
+
+      for (int i=0;i<55;++i){
+      fCut.Form("%i",i);
+      hMETByBin[cj][i] = new TH1D("METByBin_"+nCut+"_"+fCut,"MET "+cutName,nBinsmet,binsmet);
+      hMETByBin[cj][i]->Sumw2();
+      hMETFBByBin[cj][i] = new TH1D("METFBByBin_"+nCut+"_"+fCut,"METFB "+cutName,50,0.,500.);
+      hMETFBByBin[cj][i]->Sumw2();
+     
+      hMt2lesterByBin[cj][i] = new TH1D ("Mt2lesterByBin_"+nCut+"_"+fCut,"Mt2lester "+cutName,nBinsMT2lester,binsMT2lester);
+      hMt2lesterByBin[cj][i] ->Sumw2();
+      hMt2lesterFBByBin[cj][i] = new TH1D ("Mt2lesterFBByBin_"+nCut+"_"+fCut,"Mt2lester "+cutName,50,0,500);
+      hMt2lesterFBByBin[cj][i]->Sumw2();
+      
+      hMuptByBin[cj][i] = new TH1D ("MupTByBin_"+nCut+"_"+fCut,"Mu pT "+cutName,50,0,500);
+      hMuptByBin[cj][i]->Sumw2();
+      hMuetaByBin[cj][i] = new TH1D ("MuetaByBin_"+nCut+"_"+fCut,"Mu eta "+cutName,30,-3,3);
+      hMuetaByBin[cj][i]->Sumw2();
+
+      hTauptByBin[cj][i] = new TH1D ("TaupTByBin_"+nCut+"_"+fCut,"Tau pT "+cutName,50,0,500);
+      hTauptByBin[cj][i]->Sumw2();
+      hTauetaByBin[cj][i] = new TH1D ("TauetaByBin_"+nCut+"_"+fCut,"Tau eta "+cutName,30,-3,3);
+      hTauetaByBin[cj][i]->Sumw2();
+      
+      hDZetaByBin[cj][i] = new TH1D("hDZetaByBin_"+nCut+"_"+fCut,"hDZeta "+cutName,60,-400,200);
+      hDZetaByBin[cj][i]->Sumw2();
+      hDZetaFBByBin[cj][i] = new TH1D("hDZetaFBByBin_"+nCut+"_"+fCut,"hDZeta "+cutName,nBinsDZeta,binsDZeta);
+      hDZetaFBByBin[cj][i]->Sumw2();
+
+      hnJetByBin[cj][i] = new TH1D ("nJetByBin_"+nCut+"_"+fCut,"nJet "+cutName, 25,-0.5,24.5);
+      hnJetByBin[cj][i]->Sumw2();
+
+
+      hElptByBin[cj][i] = new TH1D ("ElpTByBin_"+nCut+"_"+fCut,"El pT "+cutName,50,0,500);
+      hElptByBin[cj][i]->Sumw2();
+      hEletaByBin[cj][i] = new TH1D ("EletaByBin_"+nCut+"_"+fCut,"El eta "+cutName,30,-3,3);
+      hEletaByBin[cj][i]->Sumw2();
+
+
+
+
+
+
+      }
+
+
+
+
+
+
+
+
+
+
+
       //hnOver[cj] = new TH1D ("nOver_"+nCut,"nOver "+cutName,2,0,2);
       //Electrons
       //
