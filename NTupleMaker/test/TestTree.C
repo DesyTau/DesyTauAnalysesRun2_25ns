@@ -6,7 +6,9 @@ void TestTree(int numberOfEvents = 10) {
  // TFile * file = new TFile("/nfs/dust/cms/group/higgs-kit/80x_v3/SingleElectron__Run2016B-PromptReco-v2/SingleElectron__Run2016B-PromptReco-v2_489.root");
 
 //"/nfs/dust/cms/group/higgs-kit/80x_v2/SingleElectron__Run2016B-PromptReco-v2/SingleElectron__Run2016B-PromptReco-v2_3000.root");
+//  TFile * file = new TFile("output_DATA.root");
   TFile * file = new TFile("output_MC.root");
+//  TFile * file = new TFile("/nfs/dust/cms/user/rasp/ntuples/Run2017/SingleElectron_Run2017B_23Jun2017/SingleElectron_Run2017B_23Jun2017_1934.root");
 
   TTree * tree = (TTree*)file->Get("makeroottree/AC1B");
 
