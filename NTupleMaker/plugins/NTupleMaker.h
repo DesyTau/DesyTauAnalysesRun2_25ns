@@ -281,7 +281,7 @@ class NTupleMaker : public edm::EDAnalyzer{
   unsigned int AddTaus(const edm::Event& iEvent, const edm::EventSetup& iSetup);
   unsigned int AddPFCand(const edm::Event& iEvent, const edm::EventSetup& iSetup);
   unsigned int AddPFJets(const edm::Event& iEvent, const edm::EventSetup& iSetup);
-  unsigned int AddTriggerObjects(const edm::Event& iEvent);
+  unsigned int AddTriggerObjects(const edm::Event& iEvent, edm::EDGetTokenT<pat::TriggerObjectStandAloneCollection> TriggerObjectCollectionToken, const edm::TriggerResults & trigRes);
   bool foundCompatibleInnerHits(const reco::HitPattern& hitPatA, const reco::HitPattern& hitPatB);
   bool AddSusyInfo(const edm::Event& iEvent);
   bool AddFlags(const edm::Event& iEvent, const char* module, const char* label, const char* process);
@@ -340,7 +340,8 @@ class NTupleMaker : public edm::EDAnalyzer{
 
   vector<string> cHLTriggerPaths;
   string cTriggerProcess;
-  
+  string cMyTriggerProcess;
+
   vector<string> cFlags;
   vector<string> cFlagsProcesses;
   edm::EDGetTokenT<bool> BadChCandFilterToken_;
@@ -441,6 +442,7 @@ class NTupleMaker : public edm::EDAnalyzer{
   edm::EDGetTokenT<BXVector<l1t::Tau> > L1TauCollectionToken_;
   edm::EDGetTokenT<pat::PackedCandidateCollection> PackedCantidateCollectionToken_;
   edm::EDGetTokenT<pat::TriggerObjectStandAloneCollection> TriggerObjectCollectionToken_;
+  edm::EDGetTokenT<pat::TriggerObjectStandAloneCollection> myTriggerObjectCollectionToken_;
   edm::EDGetTokenT<BeamSpot> BeamSpotToken_;
   edm::EDGetTokenT<VertexCollection> PVToken_;
   edm::EDGetTokenT<LHEEventProduct> LHEToken_;
@@ -462,6 +464,7 @@ class NTupleMaker : public edm::EDAnalyzer{
   HLTConfigProvider HLTConfiguration;
   HLTPrescaleProvider* HLTPrescaleConfig;
   edm::Handle<edm::TriggerResults> HLTrigger;
+  edm::Handle<edm::TriggerResults> MyHLTrigger;
   edm::Handle<trigger::TriggerEvent> HLTriggerEvent;
   //edm::Handle<l1extra::L1MuonParticleCollection> L1Muons;
   //edm::Handle<l1extra::L1EmParticleCollection> L1Electrons;
@@ -928,6 +931,7 @@ class NTupleMaker : public edm::EDAnalyzer{
   Int_t   l1muon_dPhiExtra[M_muonmaxcount];
   Int_t   l1muon_dEtaExtra[M_muonmaxcount];
   Int_t   l1muon_rank[M_muonmaxcount];
+  Int_t   l1muon_bx[M_muonmaxcount];
 
   UInt_t  l1egamma_count;
   Float_t l1egamma_px[M_electronmaxcount];
@@ -946,15 +950,16 @@ class NTupleMaker : public edm::EDAnalyzer{
   Int_t   l1egamma_footprintEt[M_electronmaxcount];
   Int_t   l1egamma_nTT[M_electronmaxcount];
   Int_t   l1egamma_shape[M_electronmaxcount];
-  
+  Int_t   l1egamma_bx[M_electronmaxcount];
+
   UInt_t  l1tau_count;
   Float_t l1tau_px[M_taumaxcount];
   Float_t l1tau_py[M_taumaxcount];
   Float_t l1tau_pz[M_taumaxcount];
   Float_t l1tau_pt[M_taumaxcount];
   Int_t   l1tau_ipt[M_taumaxcount];
-  Int_t   l1tau_eta[M_taumaxcount];
-  Int_t   l1tau_phi[M_taumaxcount];
+  Int_t l1tau_eta[M_taumaxcount];
+  Int_t l1tau_phi[M_taumaxcount];
   Int_t   l1tau_iso[M_taumaxcount];
   Int_t   l1tau_qual[M_taumaxcount];
   Int_t   l1tau_towerIEta[M_taumaxcount];
@@ -964,6 +969,7 @@ class NTupleMaker : public edm::EDAnalyzer{
   Int_t   l1tau_nTT[M_taumaxcount];
   Int_t   l1tau_hasEM[M_taumaxcount];
   Int_t   l1tau_isMerged[M_taumaxcount];
+  Int_t l1tau_bx[M_taumaxcount];
     
   UInt_t l1isotau_count;
   Float_t l1isotau_e[M_taumaxcount];
@@ -975,7 +981,9 @@ class NTupleMaker : public edm::EDAnalyzer{
   Float_t l1isotau_phi[M_taumaxcount];
   Float_t l1isotau_mass[M_taumaxcount];  
   Float_t l1isotau_charge[M_taumaxcount]; 
-  
+  Int_t   l1isotau_iso[M_taumaxcount];
+
+
   // rho neutral
   Float_t rhoNeutral;
 

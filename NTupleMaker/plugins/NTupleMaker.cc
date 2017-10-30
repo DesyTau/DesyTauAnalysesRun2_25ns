@@ -108,7 +108,6 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
   cTriggerProcess(iConfig.getUntrackedParameter<string>("TriggerProcess", "HLT")),
 
   //Flags
-
   cFlags(iConfig.getUntrackedParameter<vector<string> >("Flags")),
   cFlagsProcesses(iConfig.getUntrackedParameter<vector<string> >("FlagsProcesses")),
   BadChCandFilterToken_(consumes<bool>(iConfig.getParameter<edm::InputTag>("BadChargedCandidateFilter"))),
@@ -204,8 +203,8 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
   setTauBranches = true;
   
   //  propagatorWithMaterial = NULL;
-  if(cYear != 2015 && cYear != 2016)
-    throw cms::Exception("NTupleMaker") << "Invalid Year, only 2015 and 2016allowed!";
+  if(cYear != 2015 && cYear != 2016 && cYear != 2017 )
+    throw cms::Exception("NTupleMaker") << "Invalid Year : 2015, 2016 and 2017 are allowed!";
   //if(cPeriod != "Summer11" && cPeriod != "Fall11" && cPeriod != "Summer12" && cPeriod != "PHYS14" && cPeriod != "Spring15" && cPeriod != "Run2015B" && cPeriod != "Run2015C" && cPeriod != "Run2015D")
   //  throw cms::Exception("NTupleMaker") << "Invalid period, only Summer11, Fall11, Summer12, PHYS14, Spring15, Run2015B, Run2015C and Run2015D are allowed!";
   
@@ -240,26 +239,6 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
     corrector_ = 0;
   */
 
-  std::vector<std::string> myManualCatWeigths;
-  myManualCatWeigths.push_back("DesyTauAnalyses/NTupleMaker/data/ElectronID/PHYS14/EIDmva_EB1_5_oldscenario2phys14_BDT.weights.xml");
-  myManualCatWeigths.push_back("DesyTauAnalyses/NTupleMaker/data/ElectronID/PHYS14/EIDmva_EB2_5_oldscenario2phys14_BDT.weights.xml");
-  myManualCatWeigths.push_back("DesyTauAnalyses/NTupleMaker/data/ElectronID/PHYS14/EIDmva_EE_5_oldscenario2phys14_BDT.weights.xml");
-  myManualCatWeigths.push_back("DesyTauAnalyses/NTupleMaker/data/ElectronID/PHYS14/EIDmva_EB1_10_oldscenario2phys14_BDT.weights.xml");
-  myManualCatWeigths.push_back("DesyTauAnalyses/NTupleMaker/data/ElectronID/PHYS14/EIDmva_EB2_10_oldscenario2phys14_BDT.weights.xml");
-  myManualCatWeigths.push_back("DesyTauAnalyses/NTupleMaker/data/ElectronID/PHYS14/EIDmva_EE_10_oldscenario2phys14_BDT.weights.xml");
-  
-  vector<string> myManualCatWeigthsTrig;
-  string the_path;
-  for (unsigned i  = 0 ; i < myManualCatWeigths.size() ; i++){
-    the_path = edm::FileInPath ( myManualCatWeigths[i] ).fullPath();
-    myManualCatWeigthsTrig.push_back(the_path);
-  }
-  
-  myMVAnonTrigPhys14 = new EGammaMvaEleEstimatorCSA14();
-  myMVAnonTrigPhys14->initialize("BDT",
-				 EGammaMvaEleEstimatorCSA14::kNonTrigPhys14,
-				 true,
-				 myManualCatWeigthsTrig);
 
   string cmsswBase = (getenv ("CMSSW_BASE"));
   
@@ -304,8 +283,6 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
 NTupleMaker::~NTupleMaker(){
   if(propagatorWithMaterial != 0){ delete propagatorWithMaterial;}
   
-  delete myMVAnonTrigPhys14;
-
 }
 
 
@@ -556,7 +533,6 @@ void NTupleMaker::beginJob(){
     tree->Branch("electron_superclusterindex", electron_superclusterindex, "electron_superclusterindex[electron_count]/I");
     tree->Branch("electron_info", electron_info, "electron_info[electron_count]/b");
 
-    tree->Branch("electron_mva_id_nontrigPhys14", electron_mva_id_nontrigPhys14, "electron_mva_id_nontrigPhys14[electron_count]/F");
     tree->Branch("electron_mva_value_nontrig_Spring15_v1", electron_mva_value_nontrig_Spring15_v1, "electron_mva_value_nontrig_Spring15_v1[electron_count]/F");
     tree->Branch("electron_mva_value_trig_Spring15_v1", electron_mva_value_trig_Spring15_v1, "electron_mva_value_trig_Spring15_v1[electron_count]/F");
     tree->Branch("electron_mva_category_nontrig_Spring15_v1", electron_mva_category_nontrig_Spring15_v1, "electron_mva_category_nontrig_Spring15_v1[electron_count]/I");
@@ -989,6 +965,7 @@ void NTupleMaker::beginJob(){
   tree->Branch("l1muon_dPhiExtra",    l1muon_dPhiExtra,   "l1muon_dPhiExtra[l1muon_count]/I");
   tree->Branch("l1muon_dEtaExtra",    l1muon_dEtaExtra,   "l1muon_dEtaExtra[l1muon_count]/I");
   tree->Branch("l1muon_rank",         l1muon_rank,        "l1muon_rank[l1muon_count]/I");
+  tree->Branch("l1muon_bx",           l1muon_bx,          "l1muon_bx[l1muon_count]/I");
 
   tree->Branch("l1egamma_count",       &l1egamma_count,       "l1egamma_count/i");
   tree->Branch("l1egamma_px",           l1egamma_px,          "l1egamma_px[l1egamma_count]/F");
@@ -1007,6 +984,7 @@ void NTupleMaker::beginJob(){
   tree->Branch("l1egamma_footprintEt",  l1egamma_footprintEt, "l1egamma_footprintEt[l1egamma_count]/I");
   tree->Branch("l1egamma_nTT",          l1egamma_nTT,         "l1egamma_nTT[l1egamma_count]/I");    
   tree->Branch("l1egamma_shape",        l1egamma_shape,       "l1egamma_shape[l1egamma_count]/I");
+  tree->Branch("l1egamma_bx",           l1egamma_bx,          "l1egamma_bx[l1egamma_count]/I");
 
   tree->Branch("l1tau_count",       &l1tau_count,       "l1tau_count/i");
   tree->Branch("l1tau_px",           l1tau_px,          "l1tau_px[l1tau_count]/F");
@@ -1025,7 +1003,8 @@ void NTupleMaker::beginJob(){
   tree->Branch("l1tau_nTT",          l1tau_nTT,         "l1tau_nTT[l1tau_count]/I");    
   tree->Branch("l1tau_hasEM",        l1tau_hasEM,       "l1tau_hasEM[l1tau_count]/I");
   tree->Branch("l1tau_isMerged",     l1tau_isMerged,    "l1tau_isMerged[l1tau_count]/I");
-  
+  tree->Branch("l1tau_bx",           l1tau_bx,          "l1tau_bx[l1tau_count]/I");
+
   tree->Branch("l1isotau_count", &l1isotau_count, "l1isotau_count/i");
   tree->Branch("l1isotau_e", l1isotau_e, "l1isotau_e[l1isotau_count]/F");
   tree->Branch("l1isotau_px", l1isotau_px, "l1isotau_px[l1isotau_count]/F");
@@ -1036,6 +1015,7 @@ void NTupleMaker::beginJob(){
   tree->Branch("l1isotau_phi", l1isotau_phi, "l1isotau_phi[l1isotau_count]/F");
   tree->Branch("l1isotau_pt", l1isotau_pt, "l1isotau_pt[l1isotau_count]/F");
   tree->Branch("l1isotau_charge", l1isotau_charge, "l1isotau_charge[l1isotau_count]/F");    
+  tree->Branch("l1isotau_iso",    l1isotau_iso,    "l1isotau_iso[l1isotau_count]/I");
   
   // trigger objects
   if (ctrigger) {
@@ -1272,15 +1252,14 @@ void NTupleMaker::beginRun(const edm::Run& iRun, const edm::EventSetup& iSetup)
     for (unsigned j = 0; j<cHLTriggerPaths.size(); ++j) {
       TString TrigNameConf(cHLTriggerPaths[j]);
       if (TrigName.Contains(TrigNameConf)) {
-	std::cout << TrigName << " --> " << std::endl;
+	//	std::cout << TrigName << " --> " << std::endl;
 	const std::vector<std::string> saveTagsModules = HLTConfiguration.moduleLabels(i);
 	for (unsigned k = 0; k<cHLTriggerPaths.size(); ++k) {
-	  //std::cout << "    " << k << " " << saveTagsModules[k] << std::endl; 
+	  //	  std::cout << "    " << k << " " << saveTagsModules[k] << std::endl; 
 	}
       }
     }
   }
-  std::cout << std::endl;
 
   vector<pair<boost::regex, string> > muonregexes;
   for(unsigned i = 0 ; i < cMuHLTriggerMatching.size() ; i++)
@@ -1337,6 +1316,7 @@ void NTupleMaker::beginRun(const edm::Run& iRun, const edm::EventSetup& iSetup)
   AddTriggerList(iRun, HLTConfiguration, photonregexes,   photontriggers,   allphotonnames);
   AddTriggerList(iRun, HLTConfiguration, jetregexes,      jettriggers,      alljetnames);
   
+
   run_hltnames.clear();
   for (unsigned int i=0; i<cHLTriggerPaths.size(); ++i)
     run_hltnames.push_back(cHLTriggerPaths.at(i));
@@ -1552,12 +1532,13 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   
   //HLTriggerResults
   iEvent.getByLabel(edm::InputTag("TriggerResults", "", cTriggerProcess), HLTrigger);
+  hltriggerresults_->clear();
+  hltriggerprescales_->clear();
+  hltriggerresultsV_.clear();
   if(HLTrigger.isValid()){
+    //    std::cout << "Valid HLT" << std::endl;
     for(int i = 0  ; i < 128 ; i++){trigger_HLT[i] = 0;}
     //store trigger bits for selected trigger paths
-    hltriggerresults_->clear();
-    hltriggerprescales_->clear();
-    hltriggerresultsV_.clear();
     const edm::TriggerNames& TrigNames_ = iEvent.triggerNames(*HLTrigger);
     for(unsigned i = 0 ; i < HLTrigger->size(); i++)
       {
@@ -1572,15 +1553,17 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 								 int(HLTPrescaleConfig->prescaleValue(iEvent,iSetup,trigName))));
 	      hltriggerresults_->insert(std::pair<string, int>(trigName, HLTrigger->accept(i)));
 	      TString TriggerName(trigName);
-	      //	    std::cout << trigName << " : " 
-	      //		      << HLTrigger->accept(i) << " ; prescale : " 
-	      //		      << HLTConfiguration.prescaleValue(iEvent,iSetup,trigName) << std::endl;
+	      //	      std::cout << trigName << " : " 
+	      //			<< HLTrigger->accept(i) 
+	      //			<< " ; prescale : "  << HLTConfiguration.prescaleValue(iEvent,iSetup,trigName) 
+	      //		<< std::endl;
 	      if(HLTrigger->accept(i)) hltriggerresultsV_.push_back(trigName);
 	    }
 	  }
 	}
       }
   }
+
   if (!cFastSim){
     flags_->clear();
     for(std::vector<string>::iterator it = cFlagsProcesses.begin();
@@ -1589,6 +1572,7 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       AddFlags(iEvent,"TriggerResults", "", it->data());
     }
 
+    /*
     edm::Handle<bool> ifilterbadChCand;
     iEvent.getByToken(BadChCandFilterToken_, ifilterbadChCand);
     flags_->insert(std::pair<string, int>("Flag_BadChargedCandidateFilter", *ifilterbadChCand));
@@ -1604,6 +1588,7 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     if(BadGlobalMuons->size() == 0 ) ifilterBadGlobalMuon = true;
     else                             ifilterBadGlobalMuon = false;
     flags_->insert(std::pair<string, int>("Flag_BadGlobalMuonFilter", ifilterBadGlobalMuon));
+    */
   }
   
   if(cbeamspot)
@@ -1742,105 +1727,118 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   if (cl1objects && l1muons.isValid() && l1egammas.isValid() && l1taus.isValid() && l1isotaus.isValid()){
     if (doDebug) cout<<"add L1 Objects"<< endl;
 
-    for(unsigned imu = 0 ; imu < l1muons->size() ; imu++) {
-      if(l1muon_count == M_muonmaxcount) {
-	cerr << "number of L1 Muons > M_muonmaxcount. They are missing." << endl; 
-	errors |= 1<<3; 
-	break;
+    for(int ibx = l1muons->getFirstBX() ; ibx <= l1muons->getLastBX() ; ++ibx) {
+      for(BXVector<l1t::Muon>::const_iterator it=l1muons->begin(ibx); it!=l1muons->end(ibx); it++) {
+	if(l1muon_count == M_muonmaxcount) {
+	  cerr << "number of L1 Muons > M_muonmaxcount. They are missing." << endl; 
+	  errors |= 1<<3; 
+	  break;
+	}
+
+	if(it->pt() < cMuPtMin ) continue;
+      
+	l1muon_px[l1muon_count]       = it->px();
+	l1muon_py[l1muon_count]       = it->py();
+	l1muon_pz[l1muon_count]       = it->pz();
+	l1muon_pt[l1muon_count]       = it->pt();
+	l1muon_ipt[l1muon_count]      = it->hwPt();
+	l1muon_eta[l1muon_count]      = it->hwEta();
+	l1muon_phi[l1muon_count]      = it->hwPhi();
+	l1muon_iso[l1muon_count]      = it->hwIso();
+	l1muon_qual[l1muon_count]     = it->hwQual();
+
+	l1muon_charge[l1muon_count]      = it->hwCharge();
+	l1muon_chargeValid[l1muon_count] = it->hwChargeValid();
+	l1muon_muonIndex[l1muon_count]   = it->tfMuonIndex();
+	l1muon_tag[l1muon_count]         = it->hwTag();
+	l1muon_isoSum[l1muon_count]      = it->hwIsoSum();
+	l1muon_dPhiExtra[l1muon_count]   = it->hwDPhiExtra();
+	l1muon_dEtaExtra[l1muon_count]   = it->hwDEtaExtra();
+	l1muon_rank[l1muon_count]        = it->hwRank();
+	l1muon_bx[l1muon_count]          = ibx;
+
+	l1muon_count++;
       }
-
-      if((*l1muons)[imu].pt() < cMuPtMin ) continue;
-      
-      l1muon_px[l1muon_count]       = (*l1muons)[imu].px();
-      l1muon_py[l1muon_count]       = (*l1muons)[imu].py();
-      l1muon_pz[l1muon_count]       = (*l1muons)[imu].pz();
-      l1muon_pt[l1muon_count]       = (*l1muons)[imu].pt();
-      l1muon_ipt[l1muon_count]      = (*l1muons)[imu].hwPt();
-      l1muon_eta[l1muon_count]      = (*l1muons)[imu].hwEta();
-      l1muon_phi[l1muon_count]      = (*l1muons)[imu].hwPhi();
-      l1muon_iso[l1muon_count]      = (*l1muons)[imu].hwIso();
-      l1muon_qual[l1muon_count]     = (*l1muons)[imu].hwQual();
-
-      l1muon_charge[l1muon_count]      = (*l1muons)[imu].hwCharge();
-      l1muon_chargeValid[l1muon_count] = (*l1muons)[imu].hwChargeValid();
-      l1muon_muonIndex[l1muon_count]   = (*l1muons)[imu].tfMuonIndex();
-      l1muon_tag[l1muon_count]         = (*l1muons)[imu].hwTag();
-      l1muon_isoSum[l1muon_count]      = (*l1muons)[imu].hwIsoSum();
-      l1muon_dPhiExtra[l1muon_count]   = (*l1muons)[imu].hwDPhiExtra();
-      l1muon_dEtaExtra[l1muon_count]   = (*l1muons)[imu].hwDEtaExtra();
-      l1muon_rank[l1muon_count]        = (*l1muons)[imu].hwRank();
-      
-      l1muon_count++;
     }
          
-    for(unsigned ieg = 0 ; ieg < l1egammas->size() ; ieg++) {
-      if(l1egamma_count == M_electronmaxcount) {
-	cerr << "number of L1 Electrons > M_electronmaxcount. They are missing." << endl; 
-	errors |= 1<<3; 
-	break;
-      }
 
-      if((*l1egammas)[ieg].pt() < cElPtMin ) continue;
+    for(int ibx = l1egammas->getFirstBX() ; ibx <= l1egammas->getLastBX() ; ibx++) {
+      for(BXVector<l1t::EGamma>::const_iterator it=l1egammas->begin(ibx); it!=l1egammas->end(ibx); it++) {
+	if(l1egamma_count == M_electronmaxcount) {
+	  cerr << "number of L1 Electrons > M_electronmaxcount. They are missing." << endl; 
+	  errors |= 1<<3; 
+	  break;
+	}
+	
+	if(it->pt() < cElPtMin ) continue;
+	
+	l1egamma_px[l1egamma_count]       = it->px();
+	l1egamma_py[l1egamma_count]       = it->py();
+	l1egamma_pz[l1egamma_count]       = it->pz();
+	l1egamma_pt[l1egamma_count]       = it->pt();
+	l1egamma_ipt[l1egamma_count]      = it->hwPt();
+	l1egamma_eta[l1egamma_count]      = it->hwEta();
+	l1egamma_phi[l1egamma_count]      = it->hwPhi();
+	l1egamma_iso[l1egamma_count]      = it->hwIso();
+	l1egamma_qual[l1egamma_count]     = it->hwQual();
+	l1egamma_bx[l1egamma_count]       = ibx;
+	
+	//l1egamma_towerIEta[l1egamma_count]   = it->towerIEta();
+	//l1egamma_towerIPhi[l1egamma_count]   = it->towerIPhi();
+	//l1egamma_rawEt[l1egamma_count]       = it->rawEt();
+	//l1egamma_isoEt[l1egamma_count]       = it->isoEt();
+	//l1egamma_footprintEt[l1egamma_count] = it->footprintEt();
+	//l1egamma_nTT[l1egamma_count]         = it->nTT();
+	//l1egamma_shape[l1egamma_count]       = it->shape();
       
-      l1egamma_px[l1egamma_count]       = (*l1egammas)[ieg].px();
-      l1egamma_py[l1egamma_count]       = (*l1egammas)[ieg].py();
-      l1egamma_pz[l1egamma_count]       = (*l1egammas)[ieg].pz();
-      l1egamma_pt[l1egamma_count]       = (*l1egammas)[ieg].pt();
-      l1egamma_ipt[l1egamma_count]      = (*l1egammas)[ieg].hwPt();
-      l1egamma_eta[l1egamma_count]      = (*l1egammas)[ieg].hwEta();
-      l1egamma_phi[l1egamma_count]      = (*l1egammas)[ieg].hwPhi();
-      l1egamma_iso[l1egamma_count]      = (*l1egammas)[ieg].hwIso();
-      l1egamma_qual[l1egamma_count]     = (*l1egammas)[ieg].hwQual();
-
-      //l1egamma_towerIEta[l1egamma_count]   = (*l1egammas)[ieg].towerIEta();
-      //l1egamma_towerIPhi[l1egamma_count]   = (*l1egammas)[ieg].towerIPhi();
-      //l1egamma_rawEt[l1egamma_count]       = (*l1egammas)[ieg].rawEt();
-      //l1egamma_isoEt[l1egamma_count]       = (*l1egammas)[ieg].isoEt();
-      //l1egamma_footprintEt[l1egamma_count] = (*l1egammas)[ieg].footprintEt();
-      //l1egamma_nTT[l1egamma_count]         = (*l1egammas)[ieg].nTT();
-      //l1egamma_shape[l1egamma_count]       = (*l1egammas)[ieg].shape();
-         
-      l1egamma_count++;
-    
+	  l1egamma_count++;
+      }
     }
     
-    for(unsigned itau = 0 ; itau < l1taus->size() ; itau++) {
-      if(l1tau_count == M_taumaxcount) {
-	cerr << "number of L1 Taus > M_taumaxcount. They are missing." << endl; 
-	errors |= 1<<3; 
-	break;
+    for (int ibx = l1taus->getFirstBX(); ibx<=l1taus->getLastBX(); ++ibx) {
+      for(BXVector<l1t::Tau>::const_iterator it=l1taus->begin(ibx); it!=l1taus->end(ibx); it++) {
+	if(l1tau_count == M_taumaxcount) {
+	  cerr << "number of L1 Taus > M_taumaxcount. They are missing." << endl; 
+	  errors |= 1<<3; 
+	  break;
+	}
+	
+	if(it->pt() < cTauPtMin ) continue;
+	
+	l1tau_px[l1tau_count]       = it->px();
+	l1tau_py[l1tau_count]       = it->py();
+	l1tau_pz[l1tau_count]       = it->pz();
+	l1tau_pt[l1tau_count]       = it->pt();
+	l1tau_ipt[l1tau_count]      = it->hwPt();
+	l1tau_eta[l1tau_count]      = it->hwEta();
+	l1tau_phi[l1tau_count]      = it->hwPhi();
+	l1tau_iso[l1tau_count]      = it->hwIso();
+	l1tau_qual[l1tau_count]     = it->hwQual();
+
+	l1tau_towerIEta[l1tau_count]  = it->towerIEta();
+	l1tau_towerIPhi[l1tau_count]  = it->towerIPhi();
+	l1tau_rawEt[l1tau_count]      = it->rawEt();
+	l1tau_isoEt[l1tau_count]      = it->isoEt();
+	l1tau_nTT[l1tau_count]        = it->nTT();
+	l1tau_hasEM[l1tau_count]      = it->hasEM();
+	l1tau_isMerged[l1tau_count]   = it->isMerged();
+	l1tau_bx[l1tau_count]         = ibx;
+
+	//	std::cout << "l1 tau : pT = " << l1tau_pt[l1tau_count] << "  BX = " << ibx << std::endl;
+
+	l1tau_count++;
       }
-
-      if((*l1taus)[itau].pt() < cTauPtMin ) continue;
-      
-      l1tau_px[l1tau_count]       = (*l1taus)[itau].px();
-      l1tau_py[l1tau_count]       = (*l1taus)[itau].py();
-      l1tau_pz[l1tau_count]       = (*l1taus)[itau].pz();
-      l1tau_pt[l1tau_count]       = (*l1taus)[itau].pt();
-      l1tau_ipt[l1tau_count]      = (*l1taus)[itau].hwPt();
-      l1tau_eta[l1tau_count]      = (*l1taus)[itau].hwEta();
-      l1tau_phi[l1tau_count]      = (*l1taus)[itau].hwPhi();
-      l1tau_iso[l1tau_count]      = (*l1taus)[itau].hwIso();
-      l1tau_qual[l1tau_count]     = (*l1taus)[itau].hwQual();
-
-      l1tau_towerIEta[l1tau_count]  = (*l1taus)[itau].towerIEta();
-      l1tau_towerIPhi[l1tau_count]  = (*l1taus)[itau].towerIPhi();
-      l1tau_rawEt[l1tau_count]      = (*l1taus)[itau].rawEt();
-      l1tau_isoEt[l1tau_count]      = (*l1taus)[itau].isoEt();
-      l1tau_nTT[l1tau_count]        = (*l1taus)[itau].nTT();
-      l1tau_hasEM[l1tau_count]      = (*l1taus)[itau].hasEM();
-      l1tau_isMerged[l1tau_count]   = (*l1taus)[itau].isMerged();
-      
-      l1tau_count++;
-      
     }
+    //    std::cout << std::endl;
 
+    /*
     for(unsigned itau = 0 ; itau < l1isotaus->size() ; itau++) {
       if(l1isotau_count == M_taumaxcount) {
 	cerr << "number of iso taus > M_taumaxcount. They are missing." << endl; 
 	errors |= 1<<3; 
 	break;
       }
+      if((*l1isotaus)[itau].pt() < cTauPtMin ) continue;
       l1isotau_e[l1isotau_count]        = (*l1isotaus)[itau].energy();
       l1isotau_px[l1isotau_count]       = (*l1isotaus)[itau].px();
       l1isotau_py[l1isotau_count]       = (*l1isotaus)[itau].py();
@@ -1850,9 +1848,11 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       l1isotau_eta[l1isotau_count]      = (*l1isotaus)[itau].eta();
       l1isotau_mass[l1isotau_count]     = (*l1isotaus)[itau].mass();
       l1isotau_charge[l1isotau_count]   = (*l1isotaus)[itau].charge();
+      l1isotau_iso[l1isotau_count]         = (*l1isotaus)[itau].hwIso();
 
       l1isotau_count++;
     }
+    */
   }
 
   
@@ -2188,7 +2188,8 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   if (ctrigger) 
     {
       if(doDebug)  cout<<"add trigger info"<< endl; 
-      int numberOfTriggerObjects = int(AddTriggerObjects(iEvent));
+      int numberOfTriggerObjects = int(AddTriggerObjects(iEvent,TriggerObjectCollectionToken_,*HLTrigger));
+      //      std::cout << std::endl;
     } // ctrigger
 
   tree->Fill();
@@ -2240,7 +2241,6 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
  
   
 } //void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
-
 
 
 Int_t NTupleMaker::HasAnyMother(const GenParticle* particle, int id)
@@ -2795,12 +2795,13 @@ unsigned int NTupleMaker::AddMuons(const edm::Event& iEvent, const edm::EventSet
   
   edm::Handle<pat::PackedCandidateCollection> pfcands;
   iEvent.getByToken( PackedCantidateCollectionToken_, pfcands);
-
+  /*
   edm::Handle<edm::PtrVector<reco::Muon>> BadDuplicateMuons;
   iEvent.getByToken(BadDuplicateMuonsToken_, BadDuplicateMuons);
 
   edm::Handle<edm::PtrVector<reco::Muon>> BadGlobalMuons;
   iEvent.getByToken(BadGlobalMuonsToken_, BadGlobalMuons);
+  */
 
   if(Muons.isValid())
     {
@@ -2928,13 +2929,13 @@ unsigned int NTupleMaker::AddMuons(const edm::Event& iEvent, const edm::EventSet
 
 	// Duplicate & bad muons
 	muon_isDuplicate[muon_count] = false;
-	for(unsigned j = 0; j < BadDuplicateMuons->size(); j++){
-	  if((*BadDuplicateMuons)[j]->pt() == muon_pt[muon_count]) muon_isDuplicate[muon_count] = true;
-	}
+	//	for(unsigned j = 0; j < BadDuplicateMuons->size(); j++){
+	//	  if((*BadDuplicateMuons)[j]->pt() == muon_pt[muon_count]) muon_isDuplicate[muon_count] = true;
+	//	}
 	muon_isBad[muon_count] = false;
-	for(unsigned j = 0; j < BadGlobalMuons->size(); j++){
-	  if((*BadGlobalMuons)[j]->pt() == muon_pt[muon_count]) muon_isBad[muon_count] = true;
-	}
+	//	for(unsigned j = 0; j < BadGlobalMuons->size(); j++){
+	//	  if((*BadGlobalMuons)[j]->pt() == muon_pt[muon_count]) muon_isBad[muon_count] = true;
+	//	}
 
 	// Dimuons
 	if( !(*Muons)[i].innerTrack().isNull()){
@@ -3122,13 +3123,23 @@ bool NTupleMaker::GetL1ExtraTriggerMatch(const BXVector<l1t::Jet>* l1jets,
   return matched;
 }
 
-unsigned int NTupleMaker::AddTriggerObjects(const edm::Event& iEvent) {
+unsigned int NTupleMaker::AddTriggerObjects(const edm::Event& iEvent, 
+					    edm::EDGetTokenT<pat::TriggerObjectStandAloneCollection> TriggerObjectCollectionToken,
+					    const edm::TriggerResults & triggerResults) {
 
   // trigger objects
   edm::Handle<pat::TriggerObjectStandAloneCollection> triggerObjects;
-  iEvent.getByToken(TriggerObjectCollectionToken_, triggerObjects);
-  assert(triggerObjects.isValid());
+  iEvent.getByToken(TriggerObjectCollectionToken, triggerObjects);
   
+  assert(triggerObjects.isValid());
+
+  /*  
+  std::cout << "Filters : " << std::endl;
+  for (unsigned int n=0; n < run_hltfilters.size(); ++n) {
+    std::cout << "  " << run_hltfilters.at(n) << std::endl;
+  }
+  */
+
   for (unsigned int iTO=0; iTO<triggerObjects->size(); ++iTO) {
     if (trigobject_count==M_trigobjectmaxcount) {
       cerr << "number of trigger objects > M_trigobjectmaxcount. They are missing." << endl; 
@@ -3136,8 +3147,16 @@ unsigned int NTupleMaker::AddTriggerObjects(const edm::Event& iEvent) {
       break;
     }
 
-    vector<string> filterLabels = (*triggerObjects)[iTO].filterLabels();
+    (*triggerObjects)[iTO].unpackNamesAndLabels( iEvent, triggerResults  );
+    //    std::vector<std::string> filterLabels = (*triggerObjects)[iTO].pathNames();
+    std::vector<std::string> filterLabels = (*triggerObjects)[iTO].filterLabels();
     bool matchFound = false;
+    //    std::cout << "Object " << iTO << " filters : " <<  filterLabels.size() << std::endl;
+    //    for (unsigned int i=0; i < filterLabels.size(); ++i) {
+    //      TString FilterLabel(filterLabels.at(i));
+    //      if (FilterLabel.Contains("hltL1sMu18erTau24erIorMu20erTau24er"))
+    //	std::cout << "    " << filterLabels.at(i) << std::endl;
+    //    }
     std::vector<bool> passedFilters; passedFilters.clear();
     //    std::vector<std::string> matchedFilters; matchedFilters.clear();
     for (unsigned int n=0; n < run_hltfilters.size(); ++n) {
@@ -3381,7 +3400,7 @@ unsigned int NTupleMaker::AddTaus(const edm::Event& iEvent, const edm::EventSetu
   //tau collection
   edm::Handle<pat::TauCollection> Taus;
   iEvent.getByToken(TauCollectionToken_, Taus);
-
+  /*
   edm::Handle<pat::PATTauDiscriminator> mvaIsoRaw;
   iEvent.getByToken(TauMVAIsolationRawToken_,mvaIsoRaw);
   edm::Handle<pat::PATTauDiscriminator> mvaIsoVLoose;
@@ -3396,7 +3415,7 @@ unsigned int NTupleMaker::AddTaus(const edm::Event& iEvent, const edm::EventSetu
   iEvent.getByToken(TauMVAIsolationVTightToken_,mvaIsoVTight);
   edm::Handle<pat::PATTauDiscriminator> mvaIsoVVTight;
   iEvent.getByToken(TauMVAIsolationVVTightToken_,mvaIsoVVTight);
-
+  */
   if(Taus.isValid())
     {
       
@@ -3455,6 +3474,7 @@ unsigned int NTupleMaker::AddTaus(const edm::Event& iEvent, const edm::EventSetu
 	  for(unsigned int id = 0; id < tauIdIndx.size(); id++)
 	    tau_ids[tauIdIndx[id].second][tau_count]=(*Taus)[i].tauID(tauIdIndx[id].first);
 
+	  /*
 	  pat::TauRef tau(Taus,i);
 	  tau_byIsolationMVArun2v1Raw[tau_count]     = (*mvaIsoRaw)[tau];
 	  tau_byIsolationMVArun2v1VLoose[tau_count]  = (*mvaIsoVLoose)[tau];
@@ -3463,7 +3483,7 @@ unsigned int NTupleMaker::AddTaus(const edm::Event& iEvent, const edm::EventSetu
 	  tau_byIsolationMVArun2v1Tight[tau_count]   = (*mvaIsoTight)[tau];
 	  tau_byIsolationMVArun2v1VTight[tau_count]  = (*mvaIsoVTight)[tau];
 	  tau_byIsolationMVArun2v1VVTight[tau_count] = (*mvaIsoVVTight)[tau];
-
+	  */
 
 	  if( ((*Taus)[i].genJet())) {
 	    std::string genTauDecayMode = JetMCTagUtils::genTauDecayMode(*((*Taus)[i].genJet()));
@@ -3753,14 +3773,17 @@ unsigned int NTupleMaker::AddPFJets(const edm::Event& iEvent, const edm::EventSe
 	  pfjet_flavour[pfjet_count] = (*pfjets)[i].partonFlavour();
 
 	  //pileup jet id
+	  
 	  pfjet_pu_jet_fullId_loose[pfjet_count]  = false;
 	  pfjet_pu_jet_fullId_medium[pfjet_count] = false;
 	  pfjet_pu_jet_fullId_tight[pfjet_count]  = false;
+	  /*
 	  pfjet_pu_jet_fullDisc_mva[pfjet_count]  = (*pfjets)[i].userFloat("pileupJetIdUpdated:fullDiscriminant");
 	  pfjet_pu_jet_fullId_loose[pfjet_count]  = ( (*pfjets)[i].userInt("pileupJetIdUpdated:fullId") & (1<<2) );
 	  pfjet_pu_jet_fullId_medium[pfjet_count] = ( (*pfjets)[i].userInt("pileupJetIdUpdated:fullId") & (1<<1) );
 	  pfjet_pu_jet_fullId_tight[pfjet_count]  = ( (*pfjets)[i].userInt("pileupJetIdUpdated:fullId") & (1<<0) );
-		
+	  */	
+	
 	  for(unsigned n = 0 ; n < cBtagDiscriminators.size() ; n++)
 	    {
 	      pfjet_btag[pfjet_count][n] = -1000;
@@ -3961,8 +3984,6 @@ unsigned int NTupleMaker::AddElectrons(const edm::Event& iEvent, const edm::Even
 	  electron_dzerr[electron_count]        = gsfTr_e->dzError();
 	  
 	  //	  std::cout << "   dxy = " << electron_dxy[electron_count] << "   dz = " << electron_dz[electron_count] << std::endl;
-
-	  electron_mva_id_nontrigPhys14[electron_count] = myMVAnonTrigPhys14->mvaValue(Electrons->at(i),false);
 
 	  electron_mva_value_nontrig_Spring15_v1[electron_count] = (*mvaNonTrigValues)[el];
 	  electron_mva_category_nontrig_Spring15_v1[electron_count] = (*mvaNonTrigCategories)[el];
