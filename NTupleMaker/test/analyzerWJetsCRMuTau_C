@@ -384,6 +384,40 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
 
 		}
 
+///////////////////////////////////////////////////////////////////////////////////////////////
+		double ptTau1 = (double)ta_pt[taus_index];
+		double etaTau1 = (double)ta_eta[taus_index];
+		double ptMu1 = (double)mu_pt[muon_index];
+		double etaMu1 = (double)mu_eta[muon_index];
+
+		bool isRealTau  = (genTauMatched>0.5 && !isData) ;
+		bool isMuPromptLepton =  (genLeptonMatchedPromptMu >0.5 && genLeptonMatchedPromptEl<0.5 && !isData);
+		bool isElPromptLepton =  (genLeptonMatchedPromptEl >0.5 && genLeptonMatchedPromptMu<0.5 && !isData);
+
+		bool isMuFromTau =  (genMuMatchedToTauDecay > 0.5 && !isData);
+
+		bool isfakeTauFromPromptLepton = matchedTauToPromptEl>0.5 || matchedTauToPromptMu >0.5 ;
+	
+		bool isfakeTauFromJet = genTauMatched<0.5 && !isfakeTauFromPromptLepton ;
+		bool isfakeTauFromHadron = matchedTauToMuHadronDec > 0.5 || matchedTauToElHadronDec > 0.5;
+		
+		if (isfakeTauFromHadron) isfakeTauFromJet = true;
+
+		bool isfakeTauFromMu =  ( genTauMatched < 0.5 && matchedTauToPromptMu > 0.5 && !isfakeTauFromJet && !isData) ;
+		bool isfakeTauFromEl =  ( genTauMatched < 0.5 && matchedTauToPromptEl > 0.5 && !isfakeTauFromJet && !isData) ;
+	
+
+		bool isfakeMuFromGluon =  ( genLeptonMatchedGluon >0.5 && !isData) ;
+		bool isfakeMuFromHFQ =  (  genLeptonMatchedHFQ >0.5 && !isData) ;
+		bool isfakeMuFromLFQ =  (  genLeptonMatchedLFQ >0.5 && !isData) ;
+
+		double tfr  = TauFakeRateFromData(ptTau1,etaTau1,channel,systematic);
+		if ( (!isRealTau || isfakeTauFromJet) && !isData) continue;
+
+		if (isRealTau || isData) all_weights *= float(tfr);
+
+
+
 
 		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index,isSignal);
 		CFCounter[iCut]+= all_weights;
@@ -438,46 +472,12 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
 
 
 
-		double ptTau1 = (double)ta_pt[taus_index];
-		double etaTau1 = (double)ta_eta[taus_index];
-		double ptMu1 = (double)mu_pt[muon_index];
-		double etaMu1 = (double)mu_eta[muon_index];
-/*
-		double ptN=0;double etaN=0;double FastSF=0;
-
-		ptN = histo->GetXaxis()->FindBin(mu_pt[muon_index]);
-		etaN = histo->GetYaxis()->FindBin(fabs(mu_eta[muon_index]));
-		FastSF = histo->GetBinContent(ptN,etaN);
-*/
-//////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
-
-		bool isRealTau  = (genTauMatched>0.5 && !isData) ;
-		bool isMuPromptLepton =  (genLeptonMatchedPromptMu >0.5 && genLeptonMatchedPromptEl<0.5 && !isData);
-		bool isElPromptLepton =  (genLeptonMatchedPromptEl >0.5 && genLeptonMatchedPromptMu<0.5 && !isData);
-
-		bool isMuFromTau =  (genMuMatchedToTauDecay > 0.5 && !isData);
-
-		bool isfakeTauFromPromptLepton = matchedTauToPromptEl>0.5 || matchedTauToPromptMu >0.5 ;
-	
-		bool isfakeTauFromJet = genTauMatched<0.5 && !isfakeTauFromPromptLepton ;
-		bool isfakeTauFromHadron = matchedTauToMuHadronDec > 0.5 || matchedTauToElHadronDec > 0.5;
-		
-		if (isfakeTauFromHadron) isfakeTauFromJet = true;
-
-		bool isfakeTauFromMu =  ( genTauMatched < 0.5 && matchedTauToPromptMu > 0.5 && !isfakeTauFromJet && !isData) ;
-		bool isfakeTauFromEl =  ( genTauMatched < 0.5 && matchedTauToPromptEl > 0.5 && !isfakeTauFromJet && !isData) ;
-	
-
-		bool isfakeMuFromGluon =  ( genLeptonMatchedGluon >0.5 && !isData) ;
-		bool isfakeMuFromHFQ =  (  genLeptonMatchedHFQ >0.5 && !isData) ;
-		bool isfakeMuFromLFQ =  (  genLeptonMatchedLFQ >0.5 && !isData) ;
 
 
 		string tID="MVA_Tight";
 		double tauId = TauiD(channel,tID);
 
-		if ( (!isRealTau || isfakeTauFromJet) && !isData) continue;
 
 		if (isRealTau && !isData) all_weights *= 0.95;
 		
@@ -487,18 +487,17 @@ if (taus_index>-1 )			TauV.SetPtEtaPhiM(ta_pt[taus_index], ta_eta[taus_index], t
                 iCFCounter[iCut]++;
 		iCut++;
 
-
 		//string WP = systematic;
-		double tfr  = TauFakeRateFromData(ptTau1,etaTau1,channel,systematic);
+//		double tfr  = TauFakeRateFromData(ptTau1,etaTau1,channel,systematic);
 		//if (!isRealTau && isfakeTauFromJet  && !isData) all_weights *= tfr;
-		if (isRealTau || isData) all_weights *= float(tfr);
-
+//		if (isRealTau || isData) all_weights *= float(tfr);
 
 		FillHists(iCut, all_weights, ElV, MuV, TauV,JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index,electron_index,taus_index,isSignal);
 		CFCounter[iCut]+= all_weights;
 		CFCounter_[iCut]+= all_weights;
                 iCFCounter[iCut]++;
 		iCut++;
+
 
 		//reco tau to matched genmu but not matched tau which is decayed hadronically or electron
 

@@ -325,8 +325,8 @@ if(taus_index_2>-1 )			LeptTau2.SetPtEtaPhiM(ta_pt[taus_index_2], ta_eta[taus_in
 
 //cout<<" lets see the facts  "<<gen_weight<<"  "<<wScale0<<"  "<<wScale1<<"  "<<wScale2<<"  "<<wScale3<<"  "<<wScale4<<"  "<<wScale5<<"  "<<wScale6<<"  "<<wScale7<<"  "<<wScale8<<" min "<<cLower<<" max  "<<cUpper<<" pdfUp "<<wPDFUp<<" pdfDown "<<wPDFDown<<endl;
 
-		if (mu_relIso[0] > 0.2) continue;
-		if (mu_relIso[1] > 0.2) continue;
+		if (mu_relIso[0] > 0.35) continue;
+		if (mu_relIso[1] > 0.35) continue;
 		if ( fabs(mu_dz[muon_index_1]) >0.2 ) continue;
 		if ( fabs(mu_dxy[muon_index_1]) >0.045) continue;
 		if ( fabs(mu_dz[muon_index_2]) >0.2 ) continue;
@@ -349,6 +349,8 @@ if(taus_index_2>-1 )			LeptTau2.SetPtEtaPhiM(ta_pt[taus_index_2], ta_eta[taus_in
                 iCFCounter[iCut]++;
 		iCut++;
 		
+	//	cout<<" muon_index_2a  "<<muon_index_2a<<"  "<<muon_index_1a<<endl;
+
 		//1 -  (1-EffFromData1) * (1 -EffFromData2);
 		float trigw = float(trig_weight_1/trig_weight_2);
 

@@ -809,7 +809,7 @@ if (pzetavis !=0) dzetaR = pzetamiss/pzetavis;
 
 
 	sumMuonpT +=LeptV2.Pt();
-	hIsoLept2[CutIndex]->Fill(mu_relIso[3],EvWeight);
+	hIsoLept2[CutIndex]->Fill(mu_relIso[1],EvWeight);
 
 
 	//cout<<" Inside  "<<relIsoL<<"  Cut"<<"  "<<CutIndex<<endl;
@@ -844,7 +844,7 @@ if (pzetavis !=0) dzetaR = pzetamiss/pzetavis;
 
 
 	sumMuonpT +=LeptV2.Pt();
-	hIsoLept2a[CutIndex]->Fill(mu_relIso[mIndex],EvWeight);
+	hIsoLept2a[CutIndex]->Fill(mu_relIso[3],EvWeight);
 
 
 	//cout<<" Inside  "<<relIsoL<<"  Cut"<<"  "<<CutIndex<<endl;
@@ -996,7 +996,7 @@ if (pzetavis !=0) dzetaR = pzetamiss/pzetavis;
 
 	if (mIndex_1a !=-1 && mIndex_2a !=-1 ){
 	
-	if (isMuMu && mu_relIso[mIndex_1a]<0.2 && mu_relIso[mIndex_2a]<0.2  && 
+	if (isMuMu && mu_relIso[mIndex_1a]<0.35 && mu_relIso[mIndex_2a]<0.35  && 
 
 	fabs(mu_dz[muon_index_1a]) <0.2 && fabs(mu_dz[muon_index_2a]) < 0.2 && fabs(mu_dxy[muon_index_1a]) <0.045  && fabs(mu_dxy[muon_index_2a]) <0.045 &&  fabs(mu_charge[muon_index_1a])==1 &&  fabs(mu_charge[muon_index_2a])==1 )
 
@@ -1006,7 +1006,7 @@ if (pzetavis !=0) dzetaR = pzetamiss/pzetavis;
 	      TLorentzVector DiL =  LeptV1  + LeptV2 + LeptV1a + LeptV2a;
 	      TLorentzVector DiL1 =  LeptV1  + LeptV2;
 	      TLorentzVector DiL2 =   LeptV1a + LeptV2a;
-	//cout <<" what is it ???????????? "<<isMuMu<<"  "<<isMuTau<<"  "<<isElTau<<"  "<<isTauTau<<"  m1  "<<mIndex_1<<" m2 "<<mIndex_2<<" m3 "<<mIndex_3<<" t "<<tIndex<<" t1  "<<tIndex_1<<" t2 "<<tIndex_2<<"  "<<DiL.M()<<"  "<<DiL2.M()<<endl;
+	cout <<" what is it ???????????? "<<CutIndex<<"  "<<isMuMu<<"  "<<isMuTau<<"  "<<isElTau<<"  "<<isTauTau<<"  m1  "<<mIndex_1<<" m2 "<<mIndex_2<<" m3 "<<mIndex_3<<" t "<<tIndex<<" t1  "<<tIndex_1<<" t2 "<<tIndex_2<<"  "<<DiL.M()<<"  "<<DiL2.M()<<endl;
 
 	      hInvMassMuMutrail[CutIndex]->Fill(DiL2.M(),EvWeight);
 	      hInvMassMuMutrailFB[CutIndex]->Fill(DiL2.M(),EvWeight);

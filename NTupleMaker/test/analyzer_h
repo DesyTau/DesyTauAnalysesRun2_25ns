@@ -529,7 +529,8 @@ class analyzer {
 
 
 ////////////////////fake study
-  void FillHists(int CutIndex, Double_t EvWeight, TLorentzVector  elV, TLorentzVector  muV, TLorentzVector tauV, vector<TLorentzVector>  &JetsV, TLorentzVector  &MetV, double Chimass, double mintermediate, string & Sel, int  mIndex, int eIndex, int  tIndex, int &category, int &categoryJet, bool isdata, bool dogenMET){
+  void FillHistsFakes(int CutIndex, Double_t EvWeight, TLorentzVector  elV, TLorentzVector  muV, TLorentzVector tauV, vector<TLorentzVector>  &JetsV, TLorentzVector  &MetV, double Chimass, double mintermediate, string & Sel, int  mIndex, int eIndex, int  tIndex, int &category, int &categoryJet, bool isdata, bool dogenMET){
+
 
 
 if (CutIndex==17){
@@ -686,6 +687,82 @@ if (pzetavis !=0) dzetaR = pzetamiss/pzetavis;
 
   }
 
+
+
+///////////////////////////////
+
+
+////////////////////fake study
+  void FillHistsFakesInvertTau(int CutIndex, Double_t EvWeight, TLorentzVector  elV, TLorentzVector  muV, TLorentzVector tauV, vector<TLorentzVector>  &JetsV, TLorentzVector  &MetV, double Chimass, double mintermediate, string & Sel, int  mIndex, int eIndex, int  tIndex, int &category, int &categoryJet, bool isData, bool isTight, int etaBin){
+
+
+
+
+
+//cout<<" cat "<<category<<" catJet "<<categoryJet<<endl;
+
+    CutFlowUnWFakeRateInvert[CutIndex]->Fill(category+1,EvWeight);
+    CutFlowUnWFakeRateJetInvert[CutIndex]->Fill(categoryJet+1,EvWeight);
+
+    
+
+
+			
+    met = MetV.Pt();
+    metx=MetV.Px();
+    mety=MetV.Py();
+    metphi=MetV.Phi();
+
+
+
+//cout<<""<<endl;
+
+    ///////////////////mutau
+
+    if ( mIndex >-1 && tIndex>-1 ){
+ 
+
+      TLorentzVector Wb = muV  + MetV;
+
+
+      float RatioSums = (Wb.Pt() - JetsMV.at(0).Pt() )/ (Wb.Pt() +JetsMV.at(0).Pt() );
+
+
+      float   dPhi = dPhiFrom2P( muV.Px(), muV.Py(), MetV.Px(),  MetV.Py() );
+      float MT = TMath::Sqrt(2*muV.Pt()*MetV.Pt()*(1-TMath::Cos(dPhi)));
+
+			
+      float dPhiW = dPhiFrom2P( Wb.Px(), Wb.Py(), JetsMV.at(0).Px(),  JetsMV.at(0).Py() );
+
+
+	    hRatioSumL[CutIndex]->Fill(RatioSums,EvWeight);
+	    hMTCutL[CutIndex]->Fill(MT,EvWeight);
+	    hDPhiCutL[CutIndex]->Fill(dPhiW, EvWeight);
+	    hMETCutL[CutIndex]->Fill(met, EvWeight);
+      	    hnJetsL[CutIndex]->Fill(njets,EvWeight);
+	    hnbJetsL[CutIndex]->Fill(nbtag,EvWeight);
+	    FakeRatePtIncLoose[etaBin][CutIndex]->Fill(tauV.Pt(),EvWeight);
+
+if (isTight){
+	    hRatioSumT[CutIndex]->Fill(RatioSums,EvWeight);
+	    hMTCutT[CutIndex]->Fill(MT,EvWeight);
+	    hDPhiCutT[CutIndex]->Fill(dPhiW, EvWeight);
+	    hMETCutT[CutIndex]->Fill(met, EvWeight);
+      	    hnJetsT[CutIndex]->Fill(njets,EvWeight);
+	    hnbJetsT[CutIndex]->Fill(nbtag,EvWeight);
+	    FakeRatePtIncTight[etaBin][CutIndex]->Fill(tauV.Pt(),EvWeight);
+
+
+	}
+
+
+
+
+
+	}
+
+
+  }
 
 
 
@@ -1415,6 +1492,43 @@ if (pzetavis !=0) dzetaR = pzetamiss/pzetavis;
 
 
 
+if (CutIndex==17){
+   int nSR = GetSRIndex(muV, tauV, JetsV, MetV, Chimass, mIndex, tIndex, CutIndex,dogenMET);
+
+
+hnJetByBin[CutIndex][nSR]->Fill(njets,EvWeight);
+
+if (mIndex!=-1){
+hMuptByBin[CutIndex][nSR]->Fill(mu_pt[mIndex],EvWeight);
+hMuetaByBin[CutIndex][nSR]->Fill(mu_eta[mIndex],EvWeight);
+}
+if(tIndex!=-1){
+hTauetaByBin[CutIndex][nSR]->Fill(ta_pt[tIndex],EvWeight);
+hTauptByBin[CutIndex][nSR]->Fill(ta_eta[tIndex],EvWeight);
+}
+
+if (Mt2as>0){
+hMt2lesterByBin[CutIndex][nSR]->Fill(Mt2as,EvWeight);
+hMt2lesterFBByBin[CutIndex][nSR]->Fill(Mt2as,EvWeight);
+}
+
+if (dzeta>-500){
+hDZetaByBin[CutIndex][nSR]->Fill(dzeta,EvWeight);
+hDZetaFBByBin[CutIndex][nSR]->Fill(dzeta,EvWeight);
+}
+
+hMETByBin[CutIndex][nSR]->Fill(met,EvWeight);
+hMETFBByBin[CutIndex][nSR]->Fill(met,EvWeight);
+
+if (eIndex!=-1){
+hElptByBin[CutIndex][nSR]->Fill(el_pt[eIndex],EvWeight);
+hEletaByBin[CutIndex][nSR]->Fill(el_eta[eIndex],EvWeight);
+
+}
+
+
+}////////////nSR
+
     if (dzeta > -500 && met>0 && Mt2as>0 && JetsV.size()==0){
 	
 	if (met<40){
@@ -2068,9 +2182,9 @@ if (dogenMET) { met = sqrt(genmet_Ex*genmet_Ex + genmet_Ey*genmet_Ey);
 	}///met 120 bin & < 250
 	if (met>250){
 							
-	  if (Mt2as>80 && Mt2as<100)  binIndex=nB+27;
-	  if (Mt2as>100 && Mt2as<120) binIndex=nB+28;
-	  if (Mt2as>120) binIndex=nB+29;
+	  if (Mt2as>80 )  binIndex=nB+27;
+	//  if (Mt2as>100 && Mt2as<120) binIndex=nB+28;
+	//  if (Mt2as>120) binIndex=nB+29;
 
 	}///met 250 bin
 	
