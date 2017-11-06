@@ -48,10 +48,14 @@ process.maxEvents = cms.untracked.PSet(
 # Define the input source
 process.source = cms.Source("PoolSource", 
   fileNames = cms.untracked.vstring(
-        '/store/data/Run2017F/SingleMuon/MINIAOD/PromptReco-v1/000/305/040/00000/20B42404-12B2-E711-9A88-02163E012830.root',
-        '/store/data/Run2017F/SingleMuon/MINIAOD/PromptReco-v1/000/305/040/00000/522D0FB1-42B2-E711-A0A9-02163E011E2E.root',
-        '/store/data/Run2017F/SingleMuon/MINIAOD/PromptReco-v1/000/305/040/00000/5CB428C1-32B2-E711-A75D-02163E0128ED.root',
-        '/store/data/Run2017F/SingleMuon/MINIAOD/PromptReco-v1/000/305/040/00000/6EEED559-1EB2-E711-8F22-02163E019D3B.root',
+        '/store/data/Run2017B/SingleMuon/MINIAOD/PromptReco-v1/000/297/046/00000/6847F7C4-D359-E711-93A1-02163E011BB7.root',
+        '/store/data/Run2017B/SingleMuon/MINIAOD/PromptReco-v1/000/297/046/00000/90ABE68B-5D56-E711-9FDE-02163E0133D0.root',
+        '/store/data/Run2017B/SingleMuon/MINIAOD/PromptReco-v1/000/297/046/00000/98001923-C356-E711-9664-02163E01A6FE.root',
+        '/store/data/Run2017B/SingleMuon/MINIAOD/PromptReco-v1/000/297/046/00000/DED1732D-A557-E711-B67F-02163E011939.root',
+        '/store/data/Run2017B/SingleMuon/MINIAOD/PromptReco-v1/000/297/046/00000/F0DEF14D-1B5B-E711-B587-02163E013750.root',
+        '/store/data/Run2017B/SingleMuon/MINIAOD/PromptReco-v1/000/297/047/00000/46EB4C7E-5056-E711-B936-02163E019C19.root',
+        '/store/data/Run2017B/SingleMuon/MINIAOD/PromptReco-v1/000/297/050/00000/00A69AF7-5056-E711-9C82-02163E0139CD.root',
+
         ),
   skipEvents = cms.untracked.uint32(0)
 )
@@ -274,7 +278,8 @@ RecElectronHLTriggerMatching = cms.untracked.vstring(
 'HLT_Ele32_WPTight_Gsf_v.*:hltEle32WPTightGsfTrackIsoFilter',
 'HLT_Ele35_WPTight_Gsf_v.*:hltEle35noerWPTightGsfTrackIsoFilter',
 'HLT_Ele38_WPTight_Gsf_v.*:hltEle38noerWPTightGsfTrackIsoFilter',
-'HLT_Ele24_eta2p1_WPTight_Gsf_LooseChargedIsoPFTau30_eta2p1_CrossL1_v.*:hltL1sBigORLooseIsoEGXXerIsoTauYYerdRMin0p3',
+'HLT_Ele24_eta2p1_WPTight_Gsf_LooseChargedIsoPFTau30_eta2p1_CrossL1_v.*:hltL1sBigORLooseIsoEGXXerIsoTauYYerdRMin0p3,hltL1sIsoEG22erIsoTau26erdEtaMin0p2',
+#'HLT_Ele24_eta2p1_WPTight_Gsf_LooseChargedIsoPFTau30_eta2p1_CrossL1_v.*:hltL1sBigORLooseIsoEGXXerIsoTauYYerdRMin0p3',
 'HLT_Ele24_eta2p1_WPTight_Gsf_LooseChargedIsoPFTau30_eta2p1_CrossL1_v.*:hltEle24erWPTightGsfTrackIsoFilterForTau',
 'HLT_Ele24_eta2p1_WPTight_Gsf_LooseChargedIsoPFTau30_eta2p1_CrossL1_v.*:hltOverlapFilterIsoEle24WPTightGsfLooseIsoPFTau30',
 'HLT_DoubleEle24_eta2p1_WPTight_Gsf_v.*:hltDoubleEle24erWPTightGsfTrackIsoFilterForTau',
@@ -293,7 +298,8 @@ RecTauHLTriggerMatching = cms.untracked.vstring(
 'HLT_IsoMu20_eta2p1_LooseChargedIsoPFTau27_eta2p1_Cross1_v.*:hltOverlapFilterIsoMu20LooseChargedIsoPFTau27L1Seeded',
 'HLT_IsoMu24_eta2p1_LooseChargedIsoPFTau20_SingleL1_v.*:hltPFTau20TrackLooseChargedIsoAgainstMuon',
 'HLT_IsoMu24_eta2p1_LooseChargedIsoPFTau20_SingleL1_v.*:hltOverlapFilterIsoMu24LooseChargedIsoPFTau20',
-'HLT_Ele24_eta2p1_WPTight_Gsf_LooseChargedIsoPFTau30_eta2p1_CrossL1_v.*:hltL1sBigORLooseIsoEGXXerIsoTauYYerdRMin0p3',
+'HLT_Ele24_eta2p1_WPTight_Gsf_LooseChargedIsoPFTau30_eta2p1_CrossL1_v.*:hltL1sBigORLooseIsoEGXXerIsoTauYYerdRMin0p3,hltL1sIsoEG22erIsoTau26erdEtaMin0p2',
+#'HLT_Ele24_eta2p1_WPTight_Gsf_LooseChargedIsoPFTau30_eta2p1_CrossL1_v.*:hltL1sBigORLooseIsoEGXXerIsoTauYYerdRMin0p3',
 'HLT_Ele24_eta2p1_WPTight_Gsf_LooseChargedIsoPFTau30_eta2p1_CrossL1_v.*:hltPFTau30TrackLooseChargedIso',
 'HLT_Ele24_eta2p1_WPTight_Gsf_LooseChargedIsoPFTau30_eta2p1_CrossL1_v.*:hltOverlapFilterIsoEle24WPTightGsfLooseIsoPFTau30'
 ),
