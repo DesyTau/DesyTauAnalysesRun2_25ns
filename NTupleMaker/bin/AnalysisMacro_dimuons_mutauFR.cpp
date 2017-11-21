@@ -40,8 +40,8 @@ int main(int argc, char * argv[]) {
   Config cfg(argv[1]);
 
     const bool isData = cfg.get<bool>("IsData");
-    const bool isData2016BCDEF = cfg.get<bool>("IsData2016BCDEF");
-    const bool isData2016GH = cfg.get<bool>("IsData2016GH");
+    //const bool isData2016BCDEF = cfg.get<bool>("IsData2016BCDEF");
+    //const bool isData2016GH = cfg.get<bool>("IsData2016GH");
     const bool isDY = cfg.get<bool>("IsDY");
     const bool applyGoodRunSelection = cfg.get<bool>("ApplyGoodRunSelection");
 
@@ -183,6 +183,9 @@ int main(int argc, char * argv[]) {
     //Float_t m_vis_probemuon_scale_down;
     
     
+    Float_t m_vis_probemuon_scale_up;
+    Float_t m_vis_probemuon_scale_down;
+
     Float_t m_vis_probetau_scale_up;
     Float_t m_vis_probetau_scale_down;
     
@@ -198,6 +201,10 @@ int main(int argc, char * argv[]) {
     Float_t EtaTag;
     Float_t PtProbe;
     Float_t EtaProbe;
+    Int_t   DecayModeProbe;
+    Bool_t          isBad;
+    Bool_t          isDuplicate;
+    
     Float_t met;
     UInt_t  npartons;
 
@@ -223,12 +230,14 @@ int main(int argc, char * argv[]) {
     
     //muonTree->Branch("m_vis_tagmuon_scale_up",&m_vis_tagmuon_scale_up,"m_vis_tagmuon_scale_up/F");
     //muonTree->Branch("m_vis_tagmuon_scale_down",&m_vis_tagmuon_scale_down,"m_vis_tagmuon_scale_down/F");
-    //muonTree->Branch("m_vis_probemuon_scale_up",&m_vis_probemuon_scale_up,"m_vis_probemuon_scale_up/F");
-    //muonTree->Branch("m_vis_probemuon_scale_down",&m_vis_probemuon_scale_down,"m_vis_probemuon_scale_down/F");
+    muonTree->Branch("m_vis_probemuon_scale_up",&m_vis_probemuon_scale_up,"m_vis_probemuon_scale_up/F");
+    muonTree->Branch("m_vis_probemuon_scale_down",&m_vis_probemuon_scale_down,"m_vis_probemuon_scale_down/F");
     muonTree->Branch("m_vis_probetau_scale_up",&m_vis_probetau_scale_up,"m_vis_probetau_scale_up/F");
     muonTree->Branch("m_vis_probetau_scale_down",&m_vis_probetau_scale_down,"m_vis_probetau_scale_down/F");
     
     muonTree->Branch("mt_1",&mt_1,"mt_1/F");
+    muonTree->Branch("isBad",&isBad,"isBad/O");
+    muonTree->Branch("isDuplicate",&isDuplicate,"isDuplicate/O");
     muonTree->Branch("os",&os,"os/O");
     muonTree->Branch("tauagainstMuonLoose",&tauagainstMuonLoose,"tauagainstMuonLoose/O");
     muonTree->Branch("tauagainstMuonTight",&tauagainstMuonTight,"tauagainstMuonTight/O");
@@ -239,6 +248,7 @@ int main(int argc, char * argv[]) {
     muonTree->Branch("EtaTag",&EtaTag,"EtaTag/F");
     muonTree->Branch("PtProbe",&PtProbe,"PtProbe/F");
     muonTree->Branch("EtaProbe",&EtaProbe,"EtaProbe/F");
+    muonTree->Branch("DecayModeProbe",&DecayModeProbe,"DecayModeProbe/I");
     muonTree->Branch("met",&met,"met/F");
     muonTree->Branch("npartons",&npartons,"npartons/i");
 
@@ -349,25 +359,24 @@ int main(int argc, char * argv[]) {
       //------------------------------------------------
 
         if (!isData)
-          weight *=analysisTree.genweight;
-        npartons = analysisTree.genparticles_noutgoing;
-
-        
-        if (!isData) {
-
-          //	cout << analysisTree.numtruepileupinteractions << endl;
-
-
-        if (applyPUreweighting) {
-	  nTruePUInteractionsH->Fill(analysisTree.numtruepileupinteractions,weight);
-	  double Ninteractions = analysisTree.numtruepileupinteractions;
-	  double PUweight = PUofficial->get_PUweight(Ninteractions);
-	  weight *= float(PUweight);
-	  PUweightsOfficialH->Fill(PUweight);
-	  //	  cout << PUweight << endl;
+        {
+            weight *=analysisTree.genweight;
+            npartons = analysisTree.genparticles_noutgoing;
         }
-	
-      }
+        
+        if (!isData)
+        {
+            //	cout << analysisTree.numtruepileupinteractions << endl;
+            if (applyPUreweighting)
+            {
+                nTruePUInteractionsH->Fill(analysisTree.numtruepileupinteractions,weight);
+                double Ninteractions = analysisTree.numtruepileupinteractions;
+                double PUweight = PUofficial->get_PUweight(Ninteractions);
+                weight *= float(PUweight);
+                PUweightsOfficialH->Fill(PUweight);
+                //	  cout << PUweight << endl;
+            }
+        }
 
       if (isData && applyGoodRunSelection){
 	bool lumi = false;
@@ -491,6 +500,7 @@ int main(int argc, char * argv[]) {
 	if (fabs(analysisTree.muon_dxy[im])>dxyMuonTagCut) muPassed = false;
 	if (fabs(analysisTree.muon_dz[im])>dzMuonTagCut) muPassed = false;
     // Muon POG suggestions for Muon ID for Moriond17
+    /*
     if(isData && isData2016BCDEF)
     {
         if (!analysisTree.muon_isICHEP[im]) muPassed = false;
@@ -502,7 +512,8 @@ int main(int argc, char * argv[]) {
     if(!isData)
     {
         if (!analysisTree.muon_isMedium[im]) muPassed = false;
-    }
+    }*/
+    if (!analysisTree.muon_isMedium[im]) muPassed = false;
     if (muPassed) idMuons.push_back(im);
 	float absIso = 0;
 	if (isoDR03) { 
@@ -531,6 +542,33 @@ int main(int argc, char * argv[]) {
 	//	cout << "pt:" << analysisTree.muon_pt[im] << "  passed:" << muPassed << endl;
 	isMuonPassedIdIso.push_back(muPassed);
       }
+        
+        //study on bad muon filter
+        // bad muon selection
+        vector<int> badmuons; badmuons.clear();
+        for (unsigned int im = 0; im<analysisTree.muon_count; ++im) {
+            if (analysisTree.muon_pt[im]<ptMuonTagCut) continue;
+            if (fabs(analysisTree.muon_eta[im])>etaMuonTagCut) continue;
+            if (fabs(analysisTree.muon_dxy[im])>dxyMuonTagCut) continue;
+            if (fabs(analysisTree.muon_dz[im])>dzMuonTagCut) continue;
+            bool muonbad = analysisTree.muon_isBad[im];
+            bool muonduplicate = analysisTree.muon_isDuplicate[im];
+            if (muonbad || muonduplicate)
+                badmuons.push_back(im);
+        }
+        
+        if (badmuons.size()>0)
+        {
+            isBad = 1;
+            isDuplicate = 1;
+            //cout << "bad muon number: " << badmuons.size() << endl;
+            
+        }
+        else
+        {
+            isBad = 0;
+            isDuplicate = 0;
+        }
         
         //tau selection
         vector<unsigned int> goodTaus; goodTaus.clear();
@@ -720,26 +758,7 @@ int main(int argc, char * argv[]) {
                         if(genRecoProbeTauMatched)
                             TPmatching_status = 2;
                         
-                        
                         //cout << "TP mathing status:" << TPmatching_status << endl;
-                        // choosing mva met
-                        unsigned int metMuTau = 0;
-                        bool mvaMetFound = false;
-                        for (unsigned int iMet=0; iMet<analysisTree.mvamet_count; ++iMet)
-                        {
-                            //cout << iMet << endl;
-                            if (analysisTree.mvamet_channel[iMet]==3)
-                            {
-                                if (analysisTree.mvamet_lep1[iMet]==indexProbe &&analysisTree.mvamet_lep2[iMet]==index1)
-                                {
-                                    metMuTau = iMet;
-                                    mvaMetFound = true;
-                                }
-                            }
-                        }
-                        float mvamet_ex = analysisTree.mvamet_ex[metMuTau];
-                        float mvamet_ey = analysisTree.mvamet_ey[metMuTau];
-                        float mvamet = TMath::Sqrt(mvamet_ex*mvamet_ex+mvamet_ey*mvamet_ey);
                         
                         met = TMath::Sqrt(analysisTree.pfmetcorr_ex*analysisTree.pfmetcorr_ex + analysisTree.pfmetcorr_ey*analysisTree.pfmetcorr_ey);
                         float dPhiMETMuon = dPhiFrom2P(analysisTree.muon_px[index1],analysisTree.muon_py[index1],analysisTree.pfmetcorr_ex,analysisTree.pfmetcorr_ey);
@@ -755,10 +774,10 @@ int main(int argc, char * argv[]) {
                         
                         TLorentzVector tau2;
                         tau2.SetXYZM(analysisTree.tau_px[indexProbe],analysisTree.tau_py[indexProbe],analysisTree.tau_pz[indexProbe],analysisTree.tau_mass[indexProbe]);
-                        //TLorentzVector probemuon2_Up;
-                        //probemuon2_Up.SetXYZM((1+probemuonScale)*analysisTree.tau_px[indexProbe],(1+probemuonScale)*analysisTree.tau_py[indexProbe],(1+probemuonScale)*analysisTree.tau_pz[indexProbe],(1+probemuonScale)*analysisTree.tau_mass[indexProbe]);
-                        //TLorentzVector probemuon2_Down;
-                        //probemuon2_Down.SetXYZM((1-probemuonScale)*analysisTree.tau_px[indexProbe],(1-probemuonScale)*analysisTree.tau_py[indexProbe],(1-probemuonScale)*analysisTree.tau_pz[indexProbe],(1-probemuonScale)*analysisTree.tau_mass[indexProbe]);
+                        TLorentzVector probemuon2_Up;
+                        probemuon2_Up.SetXYZM((1+probemuonScale)*analysisTree.tau_px[indexProbe],(1+probemuonScale)*analysisTree.tau_py[indexProbe],(1+probemuonScale)*analysisTree.tau_pz[indexProbe],(1+probemuonScale)*analysisTree.tau_mass[indexProbe]);
+                        TLorentzVector probemuon2_Down;
+                        probemuon2_Down.SetXYZM((1-probemuonScale)*analysisTree.tau_px[indexProbe],(1-probemuonScale)*analysisTree.tau_py[indexProbe],(1-probemuonScale)*analysisTree.tau_pz[indexProbe],(1-probemuonScale)*analysisTree.tau_mass[indexProbe]);
                         
                         TLorentzVector tau2_Up;
                         tau2_Up.SetXYZM((1+probetauScale)*analysisTree.tau_px[indexProbe],(1+probetauScale)*analysisTree.tau_py[indexProbe],(1+probetauScale)*analysisTree.tau_pz[indexProbe],(1+probetauScale)*analysisTree.tau_mass[indexProbe]);
@@ -790,10 +809,19 @@ int main(int argc, char * argv[]) {
                         if(paircharge == 1) os = false;
                         
                         m_vis = (muon1+tau2).M();
-                        //m_vis_tagmuon_scale_up = (tagmuon1_Up+tau2).M();
-                        //m_vis_tagmuon_scale_down = (tagmuon1_Down+tau2).M();
-                        //m_vis_probemuon_scale_up = (muon1+probemuon2_Up).M();
-                        //m_vis_probemuon_scale_down = (muon1+probemuon2_Down).M();
+                        
+                        if(TPmatching_status==1)
+                        {
+                            m_vis_probemuon_scale_up = (muon1+probemuon2_Up).M();
+                            m_vis_probemuon_scale_down = (muon1+probemuon2_Down).M();
+                        }
+                        else
+                        {
+                            m_vis_probemuon_scale_up = m_vis;
+                            m_vis_probemuon_scale_down = m_vis;
+                        }
+ 
+
                         if(TPmatching_status==2)
                         {
                             m_vis_probetau_scale_up = (muon1+tau2_Up).M();
@@ -804,14 +832,18 @@ int main(int argc, char * argv[]) {
                             m_vis_probetau_scale_up = m_vis;
                             m_vis_probetau_scale_down = m_vis;
                         }
+                        
                         if(TPmatching_status==1)
                         {
                             m_vis_gen = (genMuon1+genMuon2).M();
                             //cout <<"m_vis_gen:"<< m_vis_gen<< endl;
-                            
+                            //cout <<"m_vis:"<< m_vis<< endl;
+                            //cout <<"muon number in an event:"<<isoMuons.size() << endl;
                             //cout <<"----------" << endl;
-                            m_vis_reso_scale_up = m_vis_gen + (1+resoScale)*(m_vis-m_vis_gen);
-                            m_vis_reso_scale_down = m_vis_gen + (1-resoScale)*(m_vis-m_vis_gen);
+                            //m_vis_reso_scale_up = m_vis_gen + (1+resoScale)*(m_vis-m_vis_gen);
+                            //m_vis_reso_scale_down = m_vis_gen + (1-resoScale)*(m_vis-m_vis_gen);
+                            m_vis_reso_scale_up = 91.03 + (1+resoScale)*(m_vis-91.03);
+                            m_vis_reso_scale_down = 91.03 + (1-resoScale)*(m_vis-91.03);
                             //cout <<"m_vis_reso_up:"<< m_vis_reso_scale_up<< endl;
                             //cout <<"m_vis_reso_down:"<< m_vis_reso_scale_down<< endl;
                             //cout <<"--------------------------------------------" << endl;
@@ -836,7 +868,7 @@ int main(int argc, char * argv[]) {
                         EtaTag = analysisTree.muon_eta[index1];
                         PtProbe = analysisTree.tau_pt[indexProbe];
                         EtaProbe = analysisTree.tau_eta[indexProbe];
-                        
+                        DecayModeProbe = analysisTree.tau_decayMode[indexProbe];
                         muonTree->Fill();
                         selEventsIsoMuons++;
                     }
