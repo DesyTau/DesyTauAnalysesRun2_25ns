@@ -759,9 +759,10 @@ int main(int argc, char * argv[]) {
                             TPmatching_status = 2;
                         
                         //cout << "TP mathing status:" << TPmatching_status << endl;
-                        
-                        met = TMath::Sqrt(analysisTree.pfmetcorr_ex*analysisTree.pfmetcorr_ex + analysisTree.pfmetcorr_ey*analysisTree.pfmetcorr_ey);
-                        float dPhiMETMuon = dPhiFrom2P(analysisTree.muon_px[index1],analysisTree.muon_py[index1],analysisTree.pfmetcorr_ex,analysisTree.pfmetcorr_ey);
+                        //cout << "met x: " << analysisTree.pfmet_ex << endl;
+                        //NO Corrected PFMet available at the moment, used PFMet instead
+                        met = TMath::Sqrt(analysisTree.pfmet_ex*analysisTree.pfmet_ex + analysisTree.pfmet_ey*analysisTree.pfmet_ey);
+                        float dPhiMETMuon = dPhiFrom2P(analysisTree.muon_px[index1],analysisTree.muon_py[index1],analysisTree.pfmet_ex,analysisTree.pfmet_ey);
                         
                         mt_1 = TMath::Sqrt(2*met*analysisTree.muon_pt[index1]*(1-TMath::Cos(dPhiMETMuon)));
             

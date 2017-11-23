@@ -192,6 +192,9 @@ int main(int argc, char * argv[]) {
     Float_t m_vis_probetau_scale_up;
     Float_t m_vis_probetau_scale_down;
     
+    Float_t m_vis_Up[50];
+    Float_t m_vis_Down[50];
+    
     Float_t mt_1;
     Bool_t os;
     Float_t iso_1;
@@ -204,15 +207,18 @@ int main(int argc, char * argv[]) {
 
     Bool_t taubyLooseCombinedIsolationDeltaBetaCorr3Hits;
     Bool_t taubyLooseIsolationMVArun2v1DBoldDMwLT;
+    Bool_t taubyTightIsolationMVArun2v1DBoldDMwLT;
+
     
     Float_t PtTag;
     Float_t EtaTag;
     Float_t PtProbe;
     Float_t EtaProbe;
-    Float_t met;
+    Int_t   DecayModeProbe;
     
-    Bool_t tagAndProbeGenMatched;
-    Bool_t tagAndProbeGenTauMatched;
+    Float_t met;
+    UInt_t  npartons;
+    
     
     eleTree->Branch("isZLL",&isZLL,"isZLL/O");
     eleTree->Branch("isZEE",&isZEE,"isZEE/O");
@@ -239,6 +245,9 @@ int main(int argc, char * argv[]) {
     eleTree->Branch("m_vis_probeele_scale_down",&m_vis_probeele_scale_down,"m_vis_probeele_scale_down/F");
     eleTree->Branch("m_vis_probetau_scale_up",&m_vis_probetau_scale_up,"m_vis_probetau_scale_up/F");
     eleTree->Branch("m_vis_probetau_scale_down",&m_vis_probetau_scale_down,"m_vis_probetau_scale_down/F");
+    eleTree->Branch("m_vis_Up",&m_vis_Up,"m_vis_Up[50]/F");
+    eleTree->Branch("m_vis_Down",&m_vis_Down,"m_vis_Down[50]/F");
+
     
     eleTree->Branch("mt_1",&mt_1,"mt_1/F");
     eleTree->Branch("os",&os,"os/O");
@@ -252,48 +261,16 @@ int main(int argc, char * argv[]) {
 
     eleTree->Branch("taubyLooseCombinedIsolationDeltaBetaCorr3Hits",&taubyLooseCombinedIsolationDeltaBetaCorr3Hits,"taubyLooseCombinedIsolationDeltaBetaCorr3Hits/O");
     eleTree->Branch("taubyLooseIsolationMVArun2v1DBoldDMwLT",&taubyLooseIsolationMVArun2v1DBoldDMwLT,"taubyLooseIsolationMVArun2v1DBoldDMwLT/O");
+    eleTree->Branch("taubyTightIsolationMVArun2v1DBoldDMwLT",&taubyTightIsolationMVArun2v1DBoldDMwLT,"taubyTightIsolationMVArun2v1DBoldDMwLT/O");
+
     eleTree->Branch("PtTag",&PtTag,"PtTag/F");
     eleTree->Branch("EtaTag",&EtaTag,"EtaTag/F");
     eleTree->Branch("PtProbe",&PtProbe,"PtProbe/F");
     eleTree->Branch("EtaProbe",&EtaProbe,"EtaProbe/F");
+    eleTree->Branch("DecayModeProbe",&DecayModeProbe,"DecayModeProbe/I");
+
     eleTree->Branch("met",&met,"met/F");
-
-    eleTree->Branch("tagAndProbeGenMatched",&tagAndProbeGenMatched,"tagAndProbeGenMatched/O");
-    eleTree->Branch("tagAndProbeGenTauMatched",&tagAndProbeGenTauMatched,"tagAndProbeGenTauMatched/O");
-
-    
-  int nPtBins = 3;
-  float ptBins[4] = {25,30,40,1000};
- 
-  
-  int nEtaBins = 3;
-  float etaBins[4] = {0,1.2,1.7,2.3};
-  
-  TString PtBins[3] = {"Pt25to30","Pt30to40","PtGt40"};
-  
-
-  TString EtaBins[3] = {"EtaLt1p2","Eta1p2to1p7","EtaGt1p7"};
-
-  //*****  create eta histogram with eta ranges associated to their names (eg. endcap, barrel)   ***** //
-
-  TH1D * etaBinsH = new TH1D("etaBinsH", "etaBinsH", nEtaBins, etaBins);
-  etaBinsH->Draw();
-  etaBinsH->GetXaxis()->Set(nEtaBins, etaBins);
-  for (int i=0; i<nEtaBins; i++){ etaBinsH->GetXaxis()->SetBinLabel(i+1, EtaBins[i]);}
-  etaBinsH->Draw();
-  file->cd();
-  etaBinsH->Write("etaBinsH");
-
-
-  //*****  create pt histogram_s with pt ranges associated to their names (eg. Pt10to13, ..)   ***** //
-
-  TH1D * ptBinsH =  new TH1D("ptBinsH", "ptBinsH", nPtBins, ptBins);
-  ptBinsH->Draw();
-  ptBinsH->GetXaxis()->Set(nPtBins, ptBins);
-  for (int i=0; i<nPtBins; i++){ ptBinsH->GetXaxis()->SetBinLabel(i+1, PtBins[i]);}
-  ptBinsH->Draw();
-  file->cd();
-  ptBinsH->Write("ptBinsH");
+    eleTree->Branch("npartons",&npartons,"npartons/i");
     
   TH1D * PUweightsOfficialH = new TH1D("PUweightsOfficialH","PU weights w/ official reweighting",1000, 0, 10);
   TH1D * nTruePUInteractionsH = new TH1D("nTruePUInteractionsH","",50,-0.5,49.5);
@@ -380,9 +357,8 @@ int main(int argc, char * argv[]) {
     
       analysisTree.GetEntry(iEntry);
       nEvents++;
-      
-      if (nEvents%10000==0) 
-	cout << "      processed " << nEvents << " events" << endl; 
+      if (nEvents%10000==0)
+	  cout << "      processed " << nEvents << " events" << endl;
 
         float weight = 1;
         
@@ -405,6 +381,7 @@ int main(int argc, char * argv[]) {
         if (!isData)
           weight *=analysisTree.genweight;
 
+        npartons = analysisTree.genparticles_noutgoing;
 
         
         
@@ -545,7 +522,7 @@ int main(int argc, char * argv[]) {
 	allEles.push_back(ie);
 	if (fabs(analysisTree.electron_dxy[ie])>dxyEleTagCut) elePassed = false;
 	if (fabs(analysisTree.electron_dz[ie])>dzEleTagCut) elePassed = false;
-	if (!analysisTree.electron_mva_wp80_nontrig_Spring15_v1[ie]) elePassed = false;
+	if (!analysisTree.electron_mva_wp80_general_Spring16_v1[ie]) elePassed = false;
     if (!analysisTree.electron_pass_conversion[ie]) elePassed = false;
 	if (elePassed) idEles.push_back(ie);
 	float absIso = 0;
@@ -675,8 +652,8 @@ int main(int argc, char * argv[]) {
             for (unsigned int ie1=0; ie1<isoEles.size(); ++ie1) {
                 unsigned int index1 = isoEles[ie1];
                 bool isEle1matched = false;
-                if(isData)
-                {
+                //if(isData)
+                //{
                     for (unsigned int iT=0; iT<analysisTree.trigobject_count; ++iT)
                     {
                         float dRtrig = deltaR(analysisTree.electron_eta[index1],analysisTree.electron_phi[index1],analysisTree.trigobject_eta[iT],analysisTree.trigobject_phi[iT]);
@@ -684,7 +661,7 @@ int main(int argc, char * argv[]) {
                         if (analysisTree.trigobject_filters[iT][nEleFilter] && analysisTree.electron_pt[index1] > ptEleTagCut && fabs(analysisTree.electron_eta[index1]) < etaEleTagCut)
                         isEle1matched = true;
                     }
-                }
+                //}
                 bool genRecoTagEleMatched = false;
                 TLorentzVector genEle1;
                 float indexGen1 = -9999;
@@ -705,20 +682,15 @@ int main(int argc, char * argv[]) {
                         }
                     }
                 }
-                
-                if (isEle1matched || (!isData)) {
+                //if (isEle1matched || (!isData)) {
+                if (isEle1matched) {
                     for (unsigned int iTau=0; iTau<goodTaus.size(); ++iTau) {
                         unsigned int indexProbe = goodTaus[iTau];
                         float q1 = analysisTree.electron_charge[index1];
                         float q2 = analysisTree.tau_charge[indexProbe];
                         float dR = deltaR(analysisTree.electron_eta[index1],analysisTree.electron_phi[index1],analysisTree.tau_eta[indexProbe],analysisTree.tau_phi[indexProbe]);
                         if (dR<dRleptonsCut) continue;
-                        float ptProbe = TMath::Min(float(analysisTree.tau_pt[indexProbe]),float(ptBins[nPtBins]-0.1));
-                        float absEtaProbe = fabs(analysisTree.tau_eta[indexProbe]);
-                        int ptBin = binNumber(ptProbe,nPtBins,ptBins);
-                        if (ptBin<0) continue;
-                        int etaBin = binNumber(absEtaProbe,nEtaBins,etaBins);
-                        if (etaBin<0) continue;
+
                         bool genRecoProbeEleMatched = false;
                         TLorentzVector genEle2;
                         for(unsigned int iEleGen=0; iEleGen<genEles.size();++iEleGen)
@@ -788,8 +760,10 @@ int main(int argc, char * argv[]) {
                             }
                         }
                         
-                        met = TMath::Sqrt(analysisTree.pfmetcorr_ex*analysisTree.pfmetcorr_ex + analysisTree.pfmetcorr_ey*analysisTree.pfmetcorr_ey);
-                        float dPhiMETEle = dPhiFrom2P(analysisTree.electron_px[index1],analysisTree.electron_py[index1],analysisTree.pfmetcorr_ex,analysisTree.pfmetcorr_ey);
+                        //using uncorrected MET for now in 2017
+                        
+                        met = TMath::Sqrt(analysisTree.pfmet_ex*analysisTree.pfmet_ex + analysisTree.pfmet_ey*analysisTree.pfmet_ey);
+                        float dPhiMETEle = dPhiFrom2P(analysisTree.electron_px[index1],analysisTree.electron_py[index1],analysisTree.pfmet_ex,analysisTree.pfmet_ey);
 
                         mt_1 = TMath::Sqrt(2*met*analysisTree.electron_pt[index1]*(1-TMath::Cos(dPhiMETEle)));
             
@@ -817,9 +791,22 @@ int main(int argc, char * argv[]) {
                         
                         TLorentzVector tau2;
                         tau2.SetXYZM(analysisTree.tau_px[indexProbe],analysisTree.tau_py[indexProbe],analysisTree.tau_pz[indexProbe],analysisTree.tau_mass[indexProbe]);
-                        TLorentzVector probeele2_Up;
-                        probeele2_Up.SetXYZM((1+probeeleScale)*analysisTree.tau_px[indexProbe],(1+probeeleScale)*analysisTree.tau_py[indexProbe],(1+probeeleScale)*analysisTree.tau_pz[indexProbe],(1+probeeleScale)*analysisTree.tau_mass[indexProbe]);
+                        TLorentzVector probeele2_Up;//electron fake tau energy scale
                         TLorentzVector probeele2_Down;
+
+                        TLorentzVector EleFakeTau_Up;// electron fake tau energy scale study
+                        TLorentzVector EleFakeTau_Down;// electron fake tau energy scale study
+
+                        for(int i=0;i<50;++i)
+                        {
+                            EleFakeTau_Up.SetXYZM((1.0+probeeleScale*(i/50.0))*analysisTree.tau_px[indexProbe],(1.0+probeeleScale*(i/50.0))*analysisTree.tau_py[indexProbe],(1.0+probeeleScale*(i/50.0))*analysisTree.tau_pz[indexProbe],(1.0+probeeleScale*(i/50.0))*analysisTree.tau_mass[indexProbe]);
+                            EleFakeTau_Down.SetXYZM((1.0-probeeleScale*(i/50.0))*analysisTree.tau_px[indexProbe],(1.0-probeeleScale*(i/50.0))*analysisTree.tau_py[indexProbe],(1.0-probeeleScale*(i/50.0))*analysisTree.tau_pz[indexProbe],(1.0-probeeleScale*(i/50.0))*analysisTree.tau_mass[indexProbe]);
+                            m_vis_Up[i] = (ele1+EleFakeTau_Up).M();
+                            m_vis_Down[i] = (ele1+EleFakeTau_Down).M();
+
+                        }
+
+                        probeele2_Up.SetXYZM((1+probeeleScale)*analysisTree.tau_px[indexProbe],(1+probeeleScale)*analysisTree.tau_py[indexProbe],(1+probeeleScale)*analysisTree.tau_pz[indexProbe],(1+probeeleScale)*analysisTree.tau_mass[indexProbe]);
                         probeele2_Down.SetXYZM((1-probeeleScale)*analysisTree.tau_px[indexProbe],(1-probeeleScale)*analysisTree.tau_py[indexProbe],(1-probeeleScale)*analysisTree.tau_pz[indexProbe],(1-probeeleScale)*analysisTree.tau_mass[indexProbe]);
                         
                         TLorentzVector tau2inZTT_Up;
@@ -884,8 +871,10 @@ int main(int argc, char * argv[]) {
                         if(TPmatching_status==1)
                         {
                             m_vis_gen = (genEle1+genEle2).M();
-                            m_vis_reso_scale_up = m_vis_gen + (1+resoScale)*(m_vis-m_vis_gen);
-                            m_vis_reso_scale_down = m_vis_gen + (1-resoScale)*(m_vis-m_vis_gen);
+                            m_vis_reso_scale_up = 90.99 + (1+resoScale)*(m_vis-90.99);
+                            m_vis_reso_scale_down = 90.99 + (1-resoScale)*(m_vis-90.99);
+                            //m_vis_reso_scale_up = m_vis_gen + (1+resoScale)*(m_vis-m_vis_gen);
+                            //m_vis_reso_scale_down = m_vis_gen + (1-resoScale)*(m_vis-m_vis_gen);
                         }
                         else
                         {
@@ -905,8 +894,6 @@ int main(int argc, char * argv[]) {
                             m_vis_probetau_scale_down = m_vis;
                         }
                         
-                        tagAndProbeGenMatched = genRecoProbeEleMatched && genRecoTagEleMatched;
-                        tagAndProbeGenTauMatched = genRecoProbeTauMatched && genRecoTagEleMatched;
                         //cout <<"m_vis_gen:"<< m_vis_gen<< endl;
                         
                         //cout <<"----------" << endl;
@@ -918,10 +905,14 @@ int main(int argc, char * argv[]) {
                         tauagainstEleVTight = analysisTree.tau_againstElectronVTightMVA6[indexProbe];
                         taubyLooseCombinedIsolationDeltaBetaCorr3Hits = analysisTree.tau_byLooseCombinedIsolationDeltaBetaCorr3Hits[indexProbe];
                         taubyLooseIsolationMVArun2v1DBoldDMwLT = analysisTree.tau_byLooseIsolationMVArun2v1DBoldDMwLT[indexProbe];
+                        taubyTightIsolationMVArun2v1DBoldDMwLT = analysisTree.tau_byTightIsolationMVArun2v1DBoldDMwLT[indexProbe];
+
                         PtTag = analysisTree.electron_pt[index1];
                         EtaTag = analysisTree.electron_eta[index1];
                         PtProbe = analysisTree.electron_pt[indexProbe];
                         EtaProbe = analysisTree.electron_eta[indexProbe];
+                        DecayModeProbe = analysisTree.tau_decayMode[indexProbe];
+
                         
                         eleTree->Fill();
                         selEventsIsoEles++;
