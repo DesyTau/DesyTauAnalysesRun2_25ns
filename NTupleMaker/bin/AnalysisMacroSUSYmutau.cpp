@@ -114,7 +114,6 @@ int main(int argc, char * argv[]) {
   const double  vertexz =  cfg.get<double>("vertexz");
   const double  byCombinedIsolationDeltaBetaCorrRaw3Hits = cfg.get<double>("byCombinedIsolationDeltaBetaCorrRaw3Hits");
 
-
   // veto muons
   const float ptVetoMuonCut   = cfg.get<float>("ptVetoMuonCut");
   const float etaVetoMuonCut  = cfg.get<float>("etaVetoMuonCut");
@@ -232,7 +231,7 @@ int main(int argc, char * argv[]) {
   bool SUSY = false;
   float SusyMotherMassF;
   float SusyLSPMassF;
-  char ff[100];
+  char ff[200];
   sprintf(ff,"%s/%s",argv[3],argv[2]);
 
   std::string rootFileName(argv[2]);
@@ -425,19 +424,19 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 					      analysisTree.genparticles_pz[igen],
 					      analysisTree.genparticles_e[igen]);
 
-	  if (string::npos != datasetName.find("C1N2")) {
+	  if (string::npos != datasetName.find("C1N2") || string::npos != datasetName.find("Chi")) {
 			  if (abs(analysisTree.genparticles_pdgid[igen])==1000024 && abs(analysisTree.genparticles_status[igen])==62) BlobA = genLV;
 	  		  if (analysisTree.genparticles_pdgid[igen]==1000023 && abs(analysisTree.genparticles_status[igen])==62) BlobB = genLV;
 
 //			  cout<<"   BlobA "<<BlobA.Pt()<<"  BlobB  "<<BlobB.Pt()<<endl;
 			  }
 
-	  if (string::npos != datasetName.find("C1C1") || string::npos != datasetName.find("Chi")) {
+	  if (string::npos != datasetName.find("C1C1") ) {
 			  if (analysisTree.genparticles_pdgid[igen]==1000024 && abs(analysisTree.genparticles_status[igen])==62) BlobA = genLV;
 	  		  if (analysisTree.genparticles_pdgid[igen]==-1000024 && abs(analysisTree.genparticles_status[igen])==62) BlobB = genLV;
 			  }
 
-	  if (string::npos != datasetName.find("left")) {
+	  if (string::npos != datasetName.find("left") || string::npos != datasetName.find("max") ) {
 			  if (analysisTree.genparticles_pdgid[igen]==1000015 && abs(analysisTree.genparticles_status[igen])==62) BlobA = genLV;
 	  		  if (analysisTree.genparticles_pdgid[igen]==-1000015 && abs(analysisTree.genparticles_status[igen])==62) BlobB = genLV;
 			  }
@@ -482,7 +481,6 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
 
     for (Long64_t iEntry=0; iEntry<numberOfEntries; ++iEntry) { 
-
 
       Float_t weight = 1.;
       Float_t puweight = 1.;
@@ -677,7 +675,6 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	for (unsigned int igen=0; igen < analysisTree.genparticles_count; ++igen) {
 
 
-
 	  TLorentzVector genLV; genLV.SetXYZT(analysisTree.genparticles_px[igen],
 					      analysisTree.genparticles_py[igen],
 					      analysisTree.genparticles_pz[igen],
@@ -685,21 +682,25 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
 	if (SUSY){
 
-	  if (string::npos != datasetName.find("C1N2")) {
+	  if (string::npos != datasetName.find("C1N2") || string::npos != datasetName.find("Chi")) {
 			  if (abs(analysisTree.genparticles_pdgid[igen])==1000024 && abs(analysisTree.genparticles_status[igen])==62) BlobA = genLV;
 	  		  if (analysisTree.genparticles_pdgid[igen]==1000023 && abs(analysisTree.genparticles_status[igen])==62) BlobB = genLV;
 			  }
 
-	  if (string::npos != datasetName.find("C1C1") || string::npos != datasetName.find("Chi")) {
+	  if (string::npos != datasetName.find("C1C1")) {
 			  if (analysisTree.genparticles_pdgid[igen]==1000024 && abs(analysisTree.genparticles_status[igen])==62) BlobA = genLV;
 	  		  if (analysisTree.genparticles_pdgid[igen]==-1000024 && abs(analysisTree.genparticles_status[igen])==62) BlobB = genLV;
 			  }
 
-	  if (string::npos != datasetName.find("stau")) {
+
+	  if (string::npos != datasetName.find("left") || string::npos != datasetName.find("max") ) {
 			  if (analysisTree.genparticles_pdgid[igen]==1000015 && abs(analysisTree.genparticles_status[igen])==62) BlobA = genLV;
 	  		  if (analysisTree.genparticles_pdgid[igen]==-1000015 && abs(analysisTree.genparticles_status[igen])==62) BlobB = genLV;
 			  }
-
+	  if (string::npos != datasetName.find("right")) {
+			  if (analysisTree.genparticles_pdgid[igen]==2000015 && abs(analysisTree.genparticles_status[igen])==62) BlobA = genLV;
+	  		  if (analysisTree.genparticles_pdgid[igen]==-2000015 && abs(analysisTree.genparticles_status[igen])==62) BlobB = genLV;
+			  }
 		
 	if (BlobA.M()>0 && BlobB.M()>0) PairLV = BlobA+BlobB;
 	
@@ -1245,8 +1246,6 @@ if (!CutBasedTauId){
 
 	if (!TauId) continue;
 
-        //    std::cout << "mIndex = " << mu_index << "   tau_index = " << tau_index << std::endl;
-
       if ((int)tau_index<0) continue;
       if ((int)mu_index<0) continue;
 
@@ -1418,18 +1417,11 @@ if (!CutBasedTauId){
 
       float EffFromData = 1.;
       float EffFromMC = 1.;
-      float Lumi,LumiA,LumiB;
-      Lumi=36590.;
-      LumiA = 16357.;
-      LumiB = 20233.;
-      
       
 	      
       if (!isData) {
 	EffFromData = (float)SF_muonTrigger->get_EfficiencyData(double(ptMu1),double(etaMu1));
         EffFromMC   = (float)SF_muonTrigger->get_EfficiencyMC(double(ptMu1),double(etaMu1));
-	
-
 
 	if (EffFromMC>1e-6)
 	  trigweight = EffFromData / EffFromMC;
@@ -1444,13 +1436,15 @@ if (!CutBasedTauId){
 	 IdIsoSF_mu =  SF_muonIdIso->get_ScaleFactor(ptMu1, etaMu1);
 
 	LSF_weight = IdIsoSF_mu;
-
 	weight *= LSF_weight;
       }
+
+      ///////////////Check if the selected tau has a gen matched - if not, apply Tau Fake Rate
 
 
       if (!isData){
 	genTauMatched = false;
+	genLeptonMatched = false;
 	genLeptonMatchedPromptEl = false;
 	genLeptonMatchedPromptMu = false;
 	genLeptonMatchedPromptTau = false;
@@ -1476,7 +1470,7 @@ if (!CutBasedTauId){
 	genTauDecayMode1=-1;
 	genTauDecayMode2=-1;
 	TLorentzVector genTauV;  
-	TLorentzVector genLepV;  
+	TLorentzVector genPartV;  
 
 	bool FoundFirstMatchedTau = false;
 
@@ -1487,7 +1481,7 @@ if (!CutBasedTauId){
 	  double Drr=deltaR(analysisTree.tau_eta[tau_index],analysisTree.tau_phi[tau_index],
 			    genTauV.Eta(), genTauV.Phi());
 
-	  if (Drr < 0.2 && ( analysisTree.gentau_isPrompt[gt] > 0.5  ) && genTauV.Pt() > 15. ) genTauMatched = true;
+	  if (Drr < 0.5 && ( analysisTree.gentau_isPrompt[gt] > 0.5  ) && genTauV.Pt() > 15. ) genTauMatched = true;
 	  if (genTauMatched && !FoundFirstMatchedTau) {genTauDecayMode1 = analysisTree.gentau_decayMode[gt]; FoundFirstMatchedTau = true;}
 	  if (genTauMatched && FoundFirstMatchedTau)   genTauDecayMode2 = analysisTree.gentau_decayMode[gt];
 
@@ -1497,17 +1491,18 @@ if (!CutBasedTauId){
 
       		  if ( (abs(analysisTree.genparticles_pdgid[igen])==11 || abs(analysisTree.genparticles_pdgid[igen])==13 || abs(analysisTree.genparticles_pdgid[igen])==15 || abs(analysisTree.genparticles_pdgid[igen])<6 || abs(analysisTree.genparticles_pdgid[igen])==21)){
 
-	  genLepV.SetXYZT(analysisTree.genparticles_px[igen], analysisTree.genparticles_py[igen], analysisTree.genparticles_pz[igen], analysisTree.genparticles_e[igen]);
+	  genPartV.SetXYZT(analysisTree.genparticles_px[igen], analysisTree.genparticles_py[igen], analysisTree.genparticles_pz[igen], analysisTree.genparticles_e[igen]);
 
 	  double Drl=deltaR(analysisTree.muon_eta[mu_index],analysisTree.muon_phi[mu_index],
-			  genLepV.Eta(),genLepV.Phi());
+			  genPartV.Eta(),genPartV.Phi());
 
 	double DrTauLepton=deltaR(analysisTree.tau_eta[tau_index],analysisTree.tau_phi[tau_index],
-			  genLepV.Eta(),genLepV.Phi());
+			  genPartV.Eta(),genPartV.Phi());
 
-		if (Drl < 0.2 && genLepV.Pt() > 8){
+		if (Drl < 0.5 && genPartV.Pt() > 8){
 //if ( abs(analysisTree.genparticles_pdgid[igen])==13)
-//cout<<analysisTree.genparticles_pdgid[igen]<<" isDirectHadronDecayProduct "<<analysisTree.genparticles_isDirectHadronDecayProduct[igen]<<" isTauDecay "<<analysisTree.genparticles_isTauDecayProduct[igen]<<" isDirectTau  "<<analysisTree.genparticles_isDirectTauDecayProduct[igen]<<"  isPrompt  "<<analysisTree.genparticles_isPrompt[igen]<<"  isDecayeLepton "<<analysisTree.genparticles_isDecayedLeptonHadron[igen]<<" is there gentau matched ?  "<<genTauMatched<<endl;
+//cout<<analysisTree.genparticles_pdgid[igen]<<" isDirectHadronDecayProduct "<<analysisTree.genparticles_isDirectHadronDecayProduct[igen]<<" isTauDecay "<<analysisTree.genparticles_isTauDecayProduct[igen]<<" isDirectTau  "<<analysisTree.genparticles_isDirectTauDecayProduct[igen]<<"  isPrompt  "<<analysisTree.genparticles_isPrompt[igen]<<"  isDecayedLeptonHadron "<<analysisTree.genparticles_isDecayedLeptonHadron[igen]<<" is there gentau matched ?  "<<genTauMatched<<endl;
+			genLeptonMatched = true;
 
 		if ( abs(analysisTree.genparticles_pdgid[igen])==11 && analysisTree.genparticles_isPrompt[igen] > 0.5) genLeptonMatchedPromptEl = true;
 		if ( abs(analysisTree.genparticles_pdgid[igen])==13 && analysisTree.genparticles_isPrompt[igen] > 0.5) genLeptonMatchedPromptMu = true;
@@ -1518,7 +1513,7 @@ if (!CutBasedTauId){
 		if (abs(analysisTree.genparticles_pdgid[igen])==15 && analysisTree.genparticles_isDirectPromptTauDecayProduct[igen] > 0.5 ) genTauMatchedToTauDecay = true;
 		
 		if (abs(analysisTree.genparticles_pdgid[igen])==11 && analysisTree.genparticles_isDirectHadronDecayProduct[igen] > 0.5 ) genElMatchedHadrDecay = true;
-		if (abs(analysisTree.genparticles_pdgid[igen])==13 && analysisTree.genparticles_isDirectHadronDecayProduct[igen] > 0.5 ) genMuMatchedHadrDecay = true;
+		if (abs(analysisTree.genparticles_pdgid[igen])==13 && (analysisTree.genparticles_isDirectHadronDecayProduct[igen] > 0.5 ||  analysisTree.genparticles_isDecayedLeptonHadron[igen] >0.5 )) genMuMatchedHadrDecay = true;
 		if (abs(analysisTree.genparticles_pdgid[igen])==15 && analysisTree.genparticles_isDirectHadronDecayProduct[igen] > 0.5 ) genTauMatchedHadrDecay = true;
 		
 		if ( (abs(analysisTree.genparticles_pdgid[igen])==1 || abs(analysisTree.genparticles_pdgid[igen])==5) && analysisTree.genparticles_isDirectHadronDecayProduct[igen] > 0.5) genLeptonMatchedHFQ = true;
@@ -1528,10 +1523,9 @@ if (!CutBasedTauId){
 
 		}
 
-		if (DrTauLepton < 0.2 && genLepV.Pt() > 8. ) 
+		if (DrTauLepton < 0.5 && genPartV.Pt() > 8. ) 
 			
 		{
-			genLeptonMatched = true;
 
 		if ( abs(analysisTree.genparticles_pdgid[igen])==11 && analysisTree.genparticles_isPrompt[igen] > 0.5 ) matchedTauToPromptEl = true;
 		if ( abs(analysisTree.genparticles_pdgid[igen])==13 && analysisTree.genparticles_isPrompt[igen] > 0.5 ) matchedTauToPromptMu = true;
@@ -1540,6 +1534,10 @@ if (!CutBasedTauId){
 		if ( abs(analysisTree.genparticles_pdgid[igen])==11 && analysisTree.gentau_isDirectHadronDecayProduct[igen] > 0.5 ) matchedTauToElHadronDec= true;
 		if ( abs(analysisTree.genparticles_pdgid[igen])==13 && analysisTree.gentau_isDirectHadronDecayProduct[igen] > 0.5 ) matchedTauToMuHadronDec= true;
 		if ( abs(analysisTree.genparticles_pdgid[igen])==15 && analysisTree.gentau_isDirectHadronDecayProduct[igen] > 0.5 ) matchedTauToTauHadronDec= true;
+		if ( abs(analysisTree.genparticles_pdgid[igen])==21 && analysisTree.gentau_isDirectHadronDecayProduct[igen] > 0.5 ) matchedTauToGluon= true;
+		if ( (abs(analysisTree.genparticles_pdgid[igen])==1  || abs(analysisTree.genparticles_pdgid[igen])==5 ) && analysisTree.gentau_isDirectHadronDecayProduct[igen] > 0.5 ) matchedTauToHFQ= true;
+		if ( (abs(analysisTree.genparticles_pdgid[igen])>1  && abs(analysisTree.genparticles_pdgid[igen])<5 ) && analysisTree.gentau_isDirectHadronDecayProduct[igen] > 0.5 ) matchedTauToLFQ= true;
+
 		}
 
 		}//loop for gen 11 13 15
@@ -1577,11 +1575,11 @@ if (!CutBasedTauId){
         mu_chargedHadIso[im] = analysisTree.muon_r04_sumChargedHadronPt[mIndex];
         mu_puIso[im] = analysisTree.muon_r04_sumPUPt[mIndex];
  
-        double neutralIso = mu_neutralHadIso[im] + mu_photonIso[im] - 0.5*mu_puIso[im];
+        double neutralIso = mu_neutralHadIso[mIndex] + mu_photonIso[mIndex] - 0.5*mu_puIso[mIndex];
         neutralIso = max(double(0),neutralIso);
-	mu_neutralIso[im] = neutralIso;
-        mu_absIsoMu[im] = mu_chargedHadIso[im] + neutralIso;
-	mu_relIsoMu[im]  = mu_absIsoMu[im]/mu_pt[im] ;
+	mu_neutralIso[mIndex] = neutralIso;
+        mu_absIsoMu[im] = mu_chargedHadIso[mIndex] + neutralIso;
+	if (int(mIndex)>-1) mu_relIsoMu[im]  = mu_absIsoMu[mIndex]/mu_pt[mIndex] ;
    
      	}
 
@@ -1622,17 +1620,10 @@ if (!CutBasedTauId){
 
 
 
-      ////////jets cleaning 
-      TLorentzVector leptonsV, muonJ, jetsLV;
-
-
-      //JetsV.SetPxPyPzE(analysisTree.pfjet_px[ij], analysisTree.pfjet_py[ij], analysisTree.pfjet_pz[ij], analysisTree.pfjet_e[ij]);
-
-
-
 
       float jetEta = 2.4;
       float DRmax = 0.5;
+
       float bJetEtaCut = jetEta;
 
       vector<unsigned int> jets; jets.clear();
@@ -1652,6 +1643,38 @@ if (!CutBasedTauId){
 
 
       for (unsigned int jet=0; jet<analysisTree.pfjet_count; ++jet) {
+
+	double drr=deltaR(analysisTree.tau_eta[tau_index],analysisTree.tau_phi[tau_index],
+						  analysisTree.pfjet_eta[jet],analysisTree.pfjet_phi[jet]);
+
+
+
+		if (drr < 0.5 && !isData) 
+		{
+			
+	     if (analysisTree.pfjet_flavour[jet] == 21) matchedTauToGluon = true;
+	     if (abs(analysisTree.pfjet_flavour[jet]) == 1 || abs(analysisTree.pfjet_flavour[jet]) == 5) matchedTauToHFQ = true;
+	     if (abs(analysisTree.pfjet_flavour[jet]) > 1 && abs(analysisTree.pfjet_flavour[jet]) < 5) matchedTauToLFQ = true;
+	     if (abs(analysisTree.pfjet_flavour[jet]) == 1 ) matchedTauToDownQ = true;
+             if (abs(analysisTree.pfjet_flavour[jet]) == 2 ) matchedTauToUpQ = true;
+             if (abs(analysisTree.pfjet_flavour[jet]) == 3 ) matchedTauToStrangeQ = true;
+             if (abs(analysisTree.pfjet_flavour[jet]) == 4 ) matchedTauToCharmQ = true;
+             if (abs(analysisTree.pfjet_flavour[jet]) == 5 ) matchedTauToBottomQ = true;
+
+			}
+
+	  double drl=deltaR(analysisTree.muon_eta[mu_index],analysisTree.muon_phi[mu_index],
+						  analysisTree.pfjet_eta[jet],analysisTree.pfjet_phi[jet]);
+
+
+		if (drl < 0.5 && !isData) 
+		{
+			
+	     if (analysisTree.pfjet_flavour[jet] == 21) genLeptonMatchedGluon = true;
+	     if (abs(analysisTree.pfjet_flavour[jet]) == 1 || abs(analysisTree.pfjet_flavour[jet]) == 5) genLeptonMatchedHFQ = true;
+	     if (abs(analysisTree.pfjet_flavour[jet]) > 1 && abs(analysisTree.pfjet_flavour[jet]) < 5) genLeptonMatchedLFQ = true;
+
+			}
 
 	if (fabs(analysisTree.pfjet_pt[jet])<ptJetCut) continue;
         float absJetEta = fabs(analysisTree.pfjet_eta[jet]);
@@ -1676,16 +1699,6 @@ if (!CutBasedTauId){
 						  analysisTree.pfjet_eta[jet],analysisTree.pfjet_phi[jet]);
 
 	if ( Drr < DRmax) cleanedJet=false;
-
-
-		if (Drr < 0.5 && !genTauMatched && !isData) 
-		{
-			
-	     if (analysisTree.pfjet_flavour[jet] == 21) matchedTauToGluon = true;
-	     if (abs(analysisTree.pfjet_flavour[jet]) == 1 || abs(analysisTree.pfjet_flavour[jet]) == 5) matchedTauToHFQ = true;
-	     if (abs(analysisTree.pfjet_flavour[jet]) > 1 && abs(analysisTree.pfjet_flavour[jet]) < 5) matchedTauToLFQ = true;
-
-			}
 
 	if (!cleanedJet) continue;
 
@@ -1785,6 +1798,7 @@ if (!CutBasedTauId){
       pfmet_corr_y = analysisTree.pfmetcorr_ey;
       met_x = analysisTree.pfmetcorr_ex;
       met_y = analysisTree.pfmetcorr_ey;
+
 
       if ((isW || isDY) && !isData) {
 

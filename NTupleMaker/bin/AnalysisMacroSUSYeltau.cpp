@@ -148,9 +148,9 @@ int main(int argc, char * argv[]) {
 
 
 
-  const string ElectronIdIsoFile = cfg.get<string>("ElectronIdIsoEffFile");
-  const string SingleElectronTriggerFile = cfg.get<string>("ElectrontrigEffFile");
-
+  const string ElectronIdIsoEffFile = cfg.get<string>("ElectronIdIsoEffFile");
+  const string ElectronTriggerEffFile = cfg.get<string>("ElectrontrigEffFile");
+  
 
   const string Region  = cfg.get<string>("Region");
   const string Sign  = cfg.get<string>("Sign");
@@ -181,8 +181,6 @@ int main(int argc, char * argv[]) {
 
 
   // Lepton Scale Factors 
-
-
 
   const string jsonFile = cfg.get<string>("jsonFile");
 
@@ -218,6 +216,8 @@ int main(int argc, char * argv[]) {
 
   const double bTag   = cfg.get<double>("bTag");
 
+
+
   xs=1;fact=1;fact2=1;
 
   unsigned int RunMin = 9999999;
@@ -235,7 +235,7 @@ int main(int argc, char * argv[]) {
   bool SUSY = false;
   float SusyMotherMassF;
   float SusyLSPMassF;
-  char ff[100];
+  char ff[200];
   sprintf(ff,"%s/%s",argv[3],argv[2]);
 
   std::string rootFileName(argv[2]);
@@ -249,8 +249,6 @@ int main(int argc, char * argv[]) {
 
   string SaveDir=argv[3];
 
-if (string::npos != rootFileName.find("SMS-") || string::npos != rootFileName.find("stau") || string::npos != rootFileName.find("C1") || string::npos != rootFileName.find("Chi"))
-	SUSY = true;
 
   if (string::npos == Systematic.find("Nominal")) {SaveDir.append("_");SaveDir.append(argv[5]);}
 
@@ -259,7 +257,7 @@ if (string::npos != rootFileName.find("SMS-") || string::npos != rootFileName.fi
   std::cout <<" The filename will be "<<TStrName <<"  "<<datasetName<<"  The systematic will be "<<Systematic<<"  and save dir will be  "<<SaveDir<<endl;
 
 
-
+if (string::npos != datasetName.find("SMS-") || string::npos != datasetName.find("stau") || string::npos != datasetName.find("C1") || string::npos != datasetName.find("Chi")) SUSY = true;
 
 
 // PU reweighting
@@ -328,20 +326,19 @@ if (string::npos != rootFileName.find("SMS-") || string::npos != rootFileName.fi
   }
 
 
-
   // Lepton Scale Factors 
 
-cout<<" Initializing iD SF files....."<<endl;
-    ScaleFactor * SF_elIdIso = new ScaleFactor();
-    SF_elIdIso->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(ElectronIdIsoFile));
 
-	cout<<" Initializing Trigger SF files....."<<endl;
+  cout<<"  Initializing iD SF files....."<<endl;
+    ScaleFactor * SF_elIdIso = new ScaleFactor();
+   SF_elIdIso->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(ElectronIdIsoEffFile));
+
+  cout<<"  Initializing Trigger SF files....."<<endl;
   ScaleFactor * SF_electronTrigger = new ScaleFactor();
-  SF_electronTrigger->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(SingleElectronTriggerFile));
+  SF_electronTrigger->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(ElectronTriggerEffFile));
 
 
   cout<<" ended initialization here "<<endl;
-
 
 
   TFile * file;
@@ -373,19 +370,7 @@ for (int iF=0; iF<nTotalFiles; ++iF) {
 
     std::cout << "file " << iF+1 << " out of " << nTotalFiles << " filename : " << filen << std::endl;
 //////////// for SUSY!!!
-//if (SUSY){
-//if (iF+1 != nTotalFiles) continue;}
     TFile * file_ = TFile::Open(TString(filen));
-
-/*    TH1D * histoInputEvents = NULL;
-    histoInputEvents = (TH1D*)file_->Get("makeroottree/nEvents");
-    if (histoInputEvents==NULL) continue;
-    int NE = (int)histoInputEvents->GetEntries();
-    for (int iE=0;iE<NE;++iE)
-      inputEventsH->Fill(0.);
-
-    std::cout << "      number of input events         = " << NE << std::endl;
-*/
 
 
 bool WithInit = true;
@@ -419,6 +404,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
     Long64_t numberOfEntries = _tree->GetEntries();
     std::cout << "      number of entries in Tree      = " << numberOfEntries << std::endl;
     AC1B analysisTree(_tree);
+
       TLorentzVector BlobA; BlobA.SetXYZT(0,0,0,0);
       TLorentzVector BlobB; BlobB.SetXYZT(0,0,0,0);
       TLorentzVector PairLV; PairLV.SetXYZT(0,0,0,0);
@@ -430,6 +416,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 			{
 			analysisTree.GetEntry(iEntry);
 			histWeightsH->Fill(0.,analysisTree.genweight);
+
 	if (SUSY){
 		BlobA.SetXYZT(0,0,0,0);
 		BlobB.SetXYZT(0,0,0,0);
@@ -441,17 +428,19 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 					      analysisTree.genparticles_pz[igen],
 					      analysisTree.genparticles_e[igen]);
 
-	  if (string::npos != datasetName.find("C1N2")) {
+	  if (string::npos != datasetName.find("C1N2") || string::npos != datasetName.find("Chi")) {
 			  if (abs(analysisTree.genparticles_pdgid[igen])==1000024 && abs(analysisTree.genparticles_status[igen])==62) BlobA = genLV;
 	  		  if (analysisTree.genparticles_pdgid[igen]==1000023 && abs(analysisTree.genparticles_status[igen])==62) BlobB = genLV;
+
+//			  cout<<"   BlobA "<<BlobA.Pt()<<"  BlobB  "<<BlobB.Pt()<<endl;
 			  }
 
-	  if (string::npos != datasetName.find("C1C1") || string::npos != datasetName.find("Chi")) {
+	  if (string::npos != datasetName.find("C1C1")) {
 			  if (analysisTree.genparticles_pdgid[igen]==1000024 && abs(analysisTree.genparticles_status[igen])==62) BlobA = genLV;
 	  		  if (analysisTree.genparticles_pdgid[igen]==-1000024 && abs(analysisTree.genparticles_status[igen])==62) BlobB = genLV;
 			  }
 
-	  if (string::npos != datasetName.find("left")) {
+	  if (string::npos != datasetName.find("left") || string::npos != datasetName.find("max") ) {
 			  if (analysisTree.genparticles_pdgid[igen]==1000015 && abs(analysisTree.genparticles_status[igen])==62) BlobA = genLV;
 	  		  if (analysisTree.genparticles_pdgid[igen]==-1000015 && abs(analysisTree.genparticles_status[igen])==62) BlobB = genLV;
 			  }
@@ -469,8 +458,12 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	
 
 				}
+
 			}
 		}
+
+
+
   	float genweights=1.;
 
     if(!isData && WithInit) 
@@ -479,18 +472,16 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	genweightsTree->SetBranchAddress("genweight",&genweights);
 
 
+
 	Long64_t numberOfEntriesInit = genweightsTree->GetEntries();
 	for (Long64_t iEntryInit=0; iEntryInit<numberOfEntriesInit; ++iEntryInit) { 
 	  genweightsTree->GetEntry(iEntryInit);
 	  histWeightsH->Fill(0.,genweights);
-	}
+
     
       }
 
-
-
-
-
+      }
 
 
     for (Long64_t iEntry=0; iEntry<numberOfEntries; ++iEntry) { 
@@ -592,11 +583,6 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
 ///////////////////////////////////////////////////////////////////////////// systematic study end
 
-
-
-
-
-
       float topPt = 0;
       float antitopPt = 0;
       LSF_weight = 1.;
@@ -692,6 +678,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
 	for (unsigned int igen=0; igen < analysisTree.genparticles_count; ++igen) {
 
+
 	  TLorentzVector genLV; genLV.SetXYZT(analysisTree.genparticles_px[igen],
 					      analysisTree.genparticles_py[igen],
 					      analysisTree.genparticles_pz[igen],
@@ -699,28 +686,31 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
 	if (SUSY){
 
-	  if (string::npos != datasetName.find("C1N2")) {
+	  if (string::npos != datasetName.find("C1N2") || string::npos != datasetName.find("Chi")) {
 			  if (abs(analysisTree.genparticles_pdgid[igen])==1000024 && abs(analysisTree.genparticles_status[igen])==62) BlobA = genLV;
 	  		  if (analysisTree.genparticles_pdgid[igen]==1000023 && abs(analysisTree.genparticles_status[igen])==62) BlobB = genLV;
 			  }
 
-	  if (string::npos != datasetName.find("C1C1") || string::npos != datasetName.find("Chi")) {
+	  if (string::npos != datasetName.find("C1C1")) {
 			  if (analysisTree.genparticles_pdgid[igen]==1000024 && abs(analysisTree.genparticles_status[igen])==62) BlobA = genLV;
 	  		  if (analysisTree.genparticles_pdgid[igen]==-1000024 && abs(analysisTree.genparticles_status[igen])==62) BlobB = genLV;
 			  }
 
-	  if (string::npos != datasetName.find("stau")) {
+
+	  if (string::npos != datasetName.find("left") || string::npos != datasetName.find("max") ) {
 			  if (analysisTree.genparticles_pdgid[igen]==1000015 && abs(analysisTree.genparticles_status[igen])==62) BlobA = genLV;
 	  		  if (analysisTree.genparticles_pdgid[igen]==-1000015 && abs(analysisTree.genparticles_status[igen])==62) BlobB = genLV;
 			  }
-
+	  if (string::npos != datasetName.find("right")) {
+			  if (analysisTree.genparticles_pdgid[igen]==2000015 && abs(analysisTree.genparticles_status[igen])==62) BlobA = genLV;
+	  		  if (analysisTree.genparticles_pdgid[igen]==-2000015 && abs(analysisTree.genparticles_status[igen])==62) BlobB = genLV;
+			  }
 		
 	if (BlobA.M()>0 && BlobB.M()>0) PairLV = BlobA+BlobB;
 	
 
 	PtSystem = PairLV.Pt();
 	}
-
 
 	  if (analysisTree.genparticles_pdgid[igen]==22 && analysisTree.genparticles_status[igen]==44)
 	    isGSfound = true;
@@ -773,10 +763,11 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	    }
 	  }
 	  
-
 /////////Matching ISR Jets
 
 	}
+
+
 
 /*	if (isGSfound) {
 	  //	  std::cout << "gamma* found : " << std::endl;
@@ -892,6 +883,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       histTopPtSq->Fill(0.,topptweight*topptweight*analysisTree.genweight);
 
 	}
+					
 	  if (!isData ) {
 	    weight *= analysisTree.genweight;
 	    gen_weight *=analysisTree.genweight;
@@ -918,19 +910,19 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	    histWeightsPDFDown->Fill(0.,analysisTree.genweight*analysisTree.weightPDFdown);
 
 	    lumi=true;
-       	    wScale0 = analysisTree.weightScale0;
-	    wScale1 = analysisTree.weightScale1;
-	    wScale2 = analysisTree.weightScale2;
-	    wScale3 = analysisTree.weightScale3;
-	    wScale4 = analysisTree.weightScale4;
-	    wScale5 = analysisTree.weightScale5;
-	    wScale6 = analysisTree.weightScale6;
-	    wScale7 = analysisTree.weightScale7;
-	    wScale8 = analysisTree.weightScale8;
-	    wPDFUp = analysisTree.weightPDFup;
-	    wPDFDown = analysisTree.weightPDFdown;
+            wScale0 = analysisTree.weightScale0;
+            wScale1 = analysisTree.weightScale1;
+  	    wScale2 = analysisTree.weightScale2;
+            wScale3 = analysisTree.weightScale3;
+            wScale4 = analysisTree.weightScale4;
+            wScale5 = analysisTree.weightScale5;
+            wScale6 = analysisTree.weightScale6;
+            wScale7 = analysisTree.weightScale7;
+            wScale8 = analysisTree.weightScale8;
+            wPDFUp = analysisTree.weightPDFup;
+            wPDFDown = analysisTree.weightPDFdown;
+
 	  }
-					
 
       if (isData)  {
 	XSec = 1.;
@@ -1105,6 +1097,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
       if (taus.size()==0) continue;
 
+//      cout<<"  electrons  "<<electrons.size()<< "  "<<taus.size()<<endl;
 
       int tau_index = -1;
       int el_index = -1;
@@ -1294,11 +1287,9 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       double q = analysisTree.tau_charge[tau_index] * analysisTree.electron_charge[el_index];
       event_sign  = q;
 
-
 	double dReltau = deltaR(analysisTree.tau_eta[(int)tau_index],analysisTree.tau_phi[(int)tau_index],
 				analysisTree.electron_eta[(int)el_index],analysisTree.electron_phi[(int)el_index]);
 	if (dReltau < 0.5) continue;
-
 
 
   bool          dilepton_veto=false;
@@ -1307,8 +1298,6 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       
   event_secondLeptonVeto = false;
   event_thirdLeptonVeto = false;
-
-
 
       // looking for extra muon
       bool foundExtraMuon = false;
@@ -1343,8 +1332,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       bool foundExtraElectron = false;
       vector<unsigned int> e_dielectrons; e_dielectrons.clear(); 
       for (unsigned int im = 0; im<analysisTree.electron_count; ++im) {
-
-      	      if ((int)im==(int)el_index) continue;
+      	   if ((int)im==(int)el_index) continue;
 
 	float neutralHadIsoElec = analysisTree.electron_neutralHadIso[im];
 	float photonIsoElec = analysisTree.electron_photonIso[im];
@@ -1444,7 +1432,8 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	trig_weight = trigweight;
 
 
-      double IdIsoSF_el = SF_elIdIso->get_ScaleFactor(ptEl1, etaEl1);
+      double IdIsoSF_el = 1;
+      IdIsoSF_el = SF_elIdIso->get_ScaleFactor(ptEl1, etaEl1);
 
 	LSF_weight = IdIsoSF_el;
 	weight *= LSF_weight;
@@ -1456,6 +1445,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
       if (!isData){
 	genTauMatched = false;
+	genLeptonMatched = false;
 	genLeptonMatchedPromptEl = false;
 	genLeptonMatchedPromptMu = false;
 	genLeptonMatchedPromptTau = false;
@@ -1481,40 +1471,40 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	genTauDecayMode1=-1;
 	genTauDecayMode2=-1;
 	TLorentzVector genTauV;  
-	TLorentzVector genLepV;  
+	TLorentzVector genPartV;  
 
 	bool FoundFirstMatchedTau = false;
+
 	for (unsigned int gt = 0 ; gt < analysisTree.gentau_count; ++gt){
 
-	 // genTauV.SetXYZT(0.,0.,0.,0.);
 	  genTauV.SetXYZT(analysisTree.gentau_px[gt], analysisTree.gentau_py[gt], analysisTree.gentau_pz[gt], analysisTree.gentau_e[gt]);
-
 
 	  double Drr=deltaR(analysisTree.tau_eta[tau_index],analysisTree.tau_phi[tau_index],
 			    genTauV.Eta(), genTauV.Phi());
 
-	  if (Drr < 0.2 && ( analysisTree.gentau_isPrompt[gt] > 0.5  ) && genTauV.Pt() > 15. ) genTauMatched = true;
+	  if (Drr < 0.5 && ( analysisTree.gentau_isPrompt[gt] > 0.5  ) && genTauV.Pt() > 15. ) genTauMatched = true;
 	  if (genTauMatched && !FoundFirstMatchedTau) {genTauDecayMode1 = analysisTree.gentau_decayMode[gt]; FoundFirstMatchedTau = true;}
 	  if (genTauMatched && FoundFirstMatchedTau)   genTauDecayMode2 = analysisTree.gentau_decayMode[gt];
 
 	}
 
-      
 	  for (unsigned int igen=0; igen<analysisTree.genparticles_count; ++igen) {
 
       		  if ( (abs(analysisTree.genparticles_pdgid[igen])==11 || abs(analysisTree.genparticles_pdgid[igen])==13 || abs(analysisTree.genparticles_pdgid[igen])==15 || abs(analysisTree.genparticles_pdgid[igen])<6 || abs(analysisTree.genparticles_pdgid[igen])==21)){
 
-	  genLepV.SetXYZT(analysisTree.genparticles_px[igen], analysisTree.genparticles_py[igen], analysisTree.genparticles_pz[igen], analysisTree.genparticles_e[igen]);
+	  genPartV.SetXYZT(analysisTree.genparticles_px[igen], analysisTree.genparticles_py[igen], analysisTree.genparticles_pz[igen], analysisTree.genparticles_e[igen]);
 
 	  double Drl=deltaR(analysisTree.electron_eta[el_index],analysisTree.electron_phi[el_index],
-			  genLepV.Eta(),genLepV.Phi());
+			  genPartV.Eta(),genPartV.Phi());
 
 	double DrTauLepton=deltaR(analysisTree.tau_eta[tau_index],analysisTree.tau_phi[tau_index],
-			  genLepV.Eta(),genLepV.Phi());
+			  genPartV.Eta(),genPartV.Phi());
 
-		if (Drl < 0.2 && genLepV.Pt() > 8){
+
+		if (Drl < 0.5 && genPartV.Pt() > 8){
 //if ( abs(analysisTree.genparticles_pdgid[igen])==13)
-//cout<<analysisTree.genparticles_pdgid[igen]<<" isDirectHadronDecayProduct "<<analysisTree.genparticles_isDirectHadronDecayProduct[igen]<<" isTauDecay "<<analysisTree.genparticles_isTauDecayProduct[igen]<<" isDirectTau  "<<analysisTree.genparticles_isDirectTauDecayProduct[igen]<<"  isPrompt  "<<analysisTree.genparticles_isPrompt[igen]<<"  isDecayeLepton "<<analysisTree.genparticles_isDecayedLeptonHadron[igen]<<" is there gentau matched ?  "<<genTauMatched<<endl;
+//cout<<analysisTree.genparticles_pdgid[igen]<<" isDirectHadronDecayProduct "<<analysisTree.genparticles_isDirectHadronDecayProduct[igen]<<" isTauDecay "<<analysisTree.genparticles_isTauDecayProduct[igen]<<" isDirectTau  "<<analysisTree.genparticles_isDirectTauDecayProduct[igen]<<"  isPrompt  "<<analysisTree.genparticles_isPrompt[igen]<<"  isDecayedLeptonHadron "<<analysisTree.genparticles_isDecayedLeptonHadron[igen]<<" is there gentau matched ?  "<<genTauMatched<<endl;
+			genLeptonMatched = true;
 
 		if ( abs(analysisTree.genparticles_pdgid[igen])==11 && analysisTree.genparticles_isPrompt[igen] > 0.5) genLeptonMatchedPromptEl = true;
 		if ( abs(analysisTree.genparticles_pdgid[igen])==13 && analysisTree.genparticles_isPrompt[igen] > 0.5) genLeptonMatchedPromptMu = true;
@@ -1525,7 +1515,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 		if (abs(analysisTree.genparticles_pdgid[igen])==15 && analysisTree.genparticles_isDirectPromptTauDecayProduct[igen] > 0.5 ) genTauMatchedToTauDecay = true;
 		
 		if (abs(analysisTree.genparticles_pdgid[igen])==11 && analysisTree.genparticles_isDirectHadronDecayProduct[igen] > 0.5 ) genElMatchedHadrDecay = true;
-		if (abs(analysisTree.genparticles_pdgid[igen])==13 && analysisTree.genparticles_isDirectHadronDecayProduct[igen] > 0.5 ) genMuMatchedHadrDecay = true;
+		if (abs(analysisTree.genparticles_pdgid[igen])==13 && (analysisTree.genparticles_isDirectHadronDecayProduct[igen] > 0.5 ||  analysisTree.genparticles_isDecayedLeptonHadron[igen] >0.5 )) genMuMatchedHadrDecay = true;
 		if (abs(analysisTree.genparticles_pdgid[igen])==15 && analysisTree.genparticles_isDirectHadronDecayProduct[igen] > 0.5 ) genTauMatchedHadrDecay = true;
 		
 		if ( (abs(analysisTree.genparticles_pdgid[igen])==1 || abs(analysisTree.genparticles_pdgid[igen])==5) && analysisTree.genparticles_isDirectHadronDecayProduct[igen] > 0.5) genLeptonMatchedHFQ = true;
@@ -1535,10 +1525,9 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
 		}
 
-		if (DrTauLepton < 0.2 && genLepV.Pt() > 8. ) 
+		if (DrTauLepton < 0.5 && genPartV.Pt() > 8. ) 
 			
 		{
-			genLeptonMatched = true;
 
 		if ( abs(analysisTree.genparticles_pdgid[igen])==11 && analysisTree.genparticles_isPrompt[igen] > 0.5 ) matchedTauToPromptEl = true;
 		if ( abs(analysisTree.genparticles_pdgid[igen])==13 && analysisTree.genparticles_isPrompt[igen] > 0.5 ) matchedTauToPromptMu = true;
@@ -1547,12 +1536,15 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 		if ( abs(analysisTree.genparticles_pdgid[igen])==11 && analysisTree.gentau_isDirectHadronDecayProduct[igen] > 0.5 ) matchedTauToElHadronDec= true;
 		if ( abs(analysisTree.genparticles_pdgid[igen])==13 && analysisTree.gentau_isDirectHadronDecayProduct[igen] > 0.5 ) matchedTauToMuHadronDec= true;
 		if ( abs(analysisTree.genparticles_pdgid[igen])==15 && analysisTree.gentau_isDirectHadronDecayProduct[igen] > 0.5 ) matchedTauToTauHadronDec= true;
+		if ( abs(analysisTree.genparticles_pdgid[igen])==21 && analysisTree.gentau_isDirectHadronDecayProduct[igen] > 0.5 ) matchedTauToGluon= true;
+		if ( (abs(analysisTree.genparticles_pdgid[igen])==1  || abs(analysisTree.genparticles_pdgid[igen])==5 ) && analysisTree.gentau_isDirectHadronDecayProduct[igen] > 0.5 ) matchedTauToHFQ= true;
+		if ( (abs(analysisTree.genparticles_pdgid[igen])>1  && abs(analysisTree.genparticles_pdgid[igen])<5 ) && analysisTree.gentau_isDirectHadronDecayProduct[igen] > 0.5 ) matchedTauToLFQ= true;
+
 		}
 
 		}//loop for gen 11 13 15
       
 	  }
-      
       
       
       }//!isData
@@ -1564,34 +1556,33 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       electron_index = (int)el_index;
       taus_index = (int)tau_index;
 
-
       el_count=(int)electrons.size();
-      for (unsigned int ie=0;ie<electrons.size(); ++ie){
-	  unsigned int iee = electrons[iee];
-	el_px[ie]=analysisTree.electron_px[iee];
-	el_py[ie]=analysisTree.electron_py[iee];
-	el_pz[ie]=analysisTree.electron_pz[iee];
-	el_eta[ie]=analysisTree.electron_eta[iee];
-	el_pt[ie]=analysisTree.electron_pt[iee];
-	el_phi[ie]=analysisTree.electron_phi[iee];
-	el_charge[ie]=analysisTree.electron_charge[iee];
-	el_dxy[ie]=analysisTree.electron_dxy[iee];
-	el_dz[ie]=analysisTree.electron_dz[iee];
-	el_dxyerr[ie]=analysisTree.electron_dxyerr[iee];
-	el_dzerr[ie]=analysisTree.electron_dzerr[iee];
 
-        el_neutralHadIso[ie] = analysisTree.electron_r03_sumNeutralHadronEt[iee];
-        el_photonIso[ie] = analysisTree.electron_r03_sumPhotonEt[iee];
-        el_chargedHadIso[ie] = analysisTree.electron_r03_sumChargedHadronPt[iee];
-        el_puIso[ie] = analysisTree.electron_r03_sumPUPt[iee];
+      for (unsigned int ie=0;ie<electrons.size(); ++ie){
+	  unsigned int eIndex = electrons[ie];
+	el_px[ie]=analysisTree.electron_px[eIndex];
+	el_py[ie]=analysisTree.electron_py[eIndex];
+	el_pz[ie]=analysisTree.electron_pz[eIndex];
+	el_eta[ie]=analysisTree.electron_eta[eIndex];
+	el_pt[ie]=analysisTree.electron_pt[eIndex];
+	el_phi[ie]=analysisTree.electron_phi[eIndex];
+	el_charge[ie]=analysisTree.electron_charge[eIndex];
+	el_dxy[ie]=analysisTree.electron_dxy[eIndex];
+	el_dz[ie]=analysisTree.electron_dz[eIndex];
+	el_dxyerr[ie]=analysisTree.electron_dxyerr[eIndex];
+	el_dzerr[ie]=analysisTree.electron_dzerr[eIndex];
+
+        el_neutralHadIso[ie] = analysisTree.electron_r03_sumNeutralHadronEt[eIndex];
+        el_photonIso[ie] = analysisTree.electron_r03_sumPhotonEt[eIndex];
+        el_chargedHadIso[ie] = analysisTree.electron_r03_sumChargedHadronPt[eIndex];
+        el_puIso[ie] = analysisTree.electron_r03_sumPUPt[eIndex];
  
-        double neutralIso = el_neutralHadIso[ie] + el_photonIso[ie] - 0.5*el_puIso[ie];
+        double neutralIso = el_neutralHadIso[eIndex] + el_photonIso[eIndex] - 0.5*el_puIso[eIndex];
         neutralIso = max(double(0),neutralIso);
         el_neutralIso[ie] = neutralIso ;
-        el_absIsoEl[ie] = el_chargedHadIso[ie] + el_neutralIso[ie];
-	el_relIsoEl[ie]  = el_absIsoEl[ie]/el_pt[ie] ;
-
-      }
+        el_absIsoEl[ie] = el_chargedHadIso[eIndex] + el_neutralIso[eIndex];
+	if ( (int)eIndex>-1)el_relIsoEl[ie]  = el_absIsoEl[eIndex]/el_pt[eIndex] ;
+}
 
       ta_count=(int)taus.size();
       for (unsigned int it=0;it<taus.size(); ++it){
@@ -1629,13 +1620,11 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       }
 
 
-      TLorentzVector leptonsV, muonJ, jetsLV;
-
-
 
 
       float jetEta = 2.4;
       float DRmax = 0.5;
+
       float bJetEtaCut = jetEta;
 
       vector<unsigned int> jets; jets.clear();
@@ -1654,9 +1643,38 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	int counter_cleaned_jets = 0;
 
 
-
-
       for (unsigned int jet=0; jet<analysisTree.pfjet_count; ++jet) {
+
+	double drr=deltaR(analysisTree.tau_eta[tau_index],analysisTree.tau_phi[tau_index],
+						  analysisTree.pfjet_eta[jet],analysisTree.pfjet_phi[jet]);
+
+
+		if (drr < 0.5 && !isData) 
+		{
+			
+	     if (analysisTree.pfjet_flavour[jet] == 21) matchedTauToGluon = true;
+	     if (abs(analysisTree.pfjet_flavour[jet]) == 1 || abs(analysisTree.pfjet_flavour[jet]) == 5) matchedTauToHFQ = true;
+	     if (abs(analysisTree.pfjet_flavour[jet]) > 1 && abs(analysisTree.pfjet_flavour[jet]) < 5) matchedTauToLFQ = true;
+	     if (abs(analysisTree.pfjet_flavour[jet]) == 1 ) matchedTauToDownQ = true;
+             if (abs(analysisTree.pfjet_flavour[jet]) == 2 ) matchedTauToUpQ = true;
+             if (abs(analysisTree.pfjet_flavour[jet]) == 3 ) matchedTauToStrangeQ = true;
+             if (abs(analysisTree.pfjet_flavour[jet]) == 4 ) matchedTauToCharmQ = true;
+             if (abs(analysisTree.pfjet_flavour[jet]) == 5 ) matchedTauToBottomQ = true;
+
+			}
+
+	  double drl=deltaR(analysisTree.electron_eta[el_index],analysisTree.electron_phi[el_index],
+						  analysisTree.pfjet_eta[jet],analysisTree.pfjet_phi[jet]);
+
+
+		if (drl < 0.5 && !isData) 
+		{
+			
+	     if (analysisTree.pfjet_flavour[jet] == 21) genLeptonMatchedGluon = true;
+	     if (abs(analysisTree.pfjet_flavour[jet]) == 1 || abs(analysisTree.pfjet_flavour[jet]) == 5) genLeptonMatchedHFQ = true;
+	     if (abs(analysisTree.pfjet_flavour[jet]) > 1 && abs(analysisTree.pfjet_flavour[jet]) < 5) genLeptonMatchedLFQ = true;
+
+			}
 
 	if (fabs(analysisTree.pfjet_pt[jet])<ptJetCut) continue;
         float absJetEta = fabs(analysisTree.pfjet_eta[jet]);
@@ -1672,8 +1690,8 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	if (!isPFJetId) continue;
 	bool cleanedJet = true;
 
-	double Dr=deltaR(analysisTree.electron_eta[el_index],analysisTree.electron_phi[el_index],
-			  analysisTree.pfjet_eta[jet],analysisTree.pfjet_phi[jet]);
+       double Dr=deltaR(analysisTree.electron_eta[el_index],analysisTree.electron_phi[el_index],
+			 analysisTree.pfjet_eta[jet],analysisTree.pfjet_phi[jet]);
 	if (  Dr  < DRmax)  cleanedJet=false;
 
 
@@ -1681,16 +1699,6 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 						  analysisTree.pfjet_eta[jet],analysisTree.pfjet_phi[jet]);
 
 	if ( Drr < DRmax) cleanedJet=false;
-
-
-		if (Drr < 0.5 && !genTauMatched && !isData) 
-		{
-			
-	     if (analysisTree.pfjet_flavour[jet] == 21) matchedTauToGluon = true;
-	     if (abs(analysisTree.pfjet_flavour[jet]) == 1 || abs(analysisTree.pfjet_flavour[jet]) == 5) matchedTauToHFQ = true;
-	     if (abs(analysisTree.pfjet_flavour[jet]) > 1 && abs(analysisTree.pfjet_flavour[jet]) < 5) matchedTauToLFQ = true;
-
-			}
 
 	if (!cleanedJet) continue;
 
@@ -1941,9 +1949,6 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
       genmet_Ey = analysisTree.genmet_ey;
 
       genHT = analysisTree.genparticles_lheHt;
-
-
-       genHT = analysisTree.genparticles_lheHt;
 
 
       T->Fill();

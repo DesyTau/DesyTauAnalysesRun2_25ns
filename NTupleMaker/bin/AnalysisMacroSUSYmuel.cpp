@@ -455,17 +455,17 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 					      analysisTree.genparticles_pz[igen],
 					      analysisTree.genparticles_e[igen]);
 
-	  if (string::npos != datasetName.find("C1N2")) {
+	  if (string::npos != datasetName.find("C1N2") || string::npos != datasetName.find("Chi")) {
 			  if (abs(analysisTree.genparticles_pdgid[igen])==1000024 && abs(analysisTree.genparticles_status[igen])==62) BlobA = genLV;
 	  		  if (analysisTree.genparticles_pdgid[igen]==1000023 && abs(analysisTree.genparticles_status[igen])==62) BlobB = genLV;
 			  }
 
-	  if (string::npos != datasetName.find("C1C1") || string::npos != datasetName.find("Chi")) {
+	  if (string::npos != datasetName.find("C1C1")) {
 			  if (analysisTree.genparticles_pdgid[igen]==1000024 && abs(analysisTree.genparticles_status[igen])==62) BlobA = genLV;
 	  		  if (analysisTree.genparticles_pdgid[igen]==-1000024 && abs(analysisTree.genparticles_status[igen])==62) BlobB = genLV;
 			  }
 
-	  if (string::npos != datasetName.find("left")) {
+	  if (string::npos != datasetName.find("left") || string::npos != datasetName.find("max") ) {
 			  if (analysisTree.genparticles_pdgid[igen]==1000015 && abs(analysisTree.genparticles_status[igen])==62) BlobA = genLV;
 	  		  if (analysisTree.genparticles_pdgid[igen]==-1000015 && abs(analysisTree.genparticles_status[igen])==62) BlobB = genLV;
 			  }
@@ -712,19 +712,24 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 					      analysisTree.genparticles_e[igen]);
 	if (SUSY){
 
-	  if (string::npos != datasetName.find("C1N2")) {
+	  if (string::npos != datasetName.find("C1N2") || string::npos != datasetName.find("Chi")) {
 			  if (abs(analysisTree.genparticles_pdgid[igen])==1000024 && abs(analysisTree.genparticles_status[igen])==62) BlobA = genLV;
 	  		  if (analysisTree.genparticles_pdgid[igen]==1000023 && abs(analysisTree.genparticles_status[igen])==62) BlobB = genLV;
 			  }
 
-	  if (string::npos != datasetName.find("C1C1") || string::npos != datasetName.find("Chi")) {
+	  if (string::npos != datasetName.find("C1C1") ) {
 			  if (analysisTree.genparticles_pdgid[igen]==1000024 && abs(analysisTree.genparticles_status[igen])==62) BlobA = genLV;
 	  		  if (analysisTree.genparticles_pdgid[igen]==-1000024 && abs(analysisTree.genparticles_status[igen])==62) BlobB = genLV;
 			  }
 
-	  if (string::npos != datasetName.find("stau")) {
+	  if (string::npos != datasetName.find("left") || string::npos != datasetName.find("max") ) {
 			  if (analysisTree.genparticles_pdgid[igen]==1000015 && abs(analysisTree.genparticles_status[igen])==62) BlobA = genLV;
 	  		  if (analysisTree.genparticles_pdgid[igen]==-1000015 && abs(analysisTree.genparticles_status[igen])==62) BlobB = genLV;
+			  }
+
+	  if (string::npos != datasetName.find("right")) {
+			  if (analysisTree.genparticles_pdgid[igen]==2000015 && abs(analysisTree.genparticles_status[igen])==62) BlobA = genLV;
+	  		  if (analysisTree.genparticles_pdgid[igen]==-2000015 && abs(analysisTree.genparticles_status[igen])==62) BlobB = genLV;
 			  }
 
 		
@@ -1535,7 +1540,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
       el_count=(int)electrons.size();
       for (unsigned int ie=0;ie<electrons.size(); ++ie){
-	  unsigned int iee = electrons[iee];
+	  unsigned int iee = electrons[ie];
 	el_px[ie]=analysisTree.electron_px[iee];
 	el_py[ie]=analysisTree.electron_py[iee];
 	el_pz[ie]=analysisTree.electron_pz[iee];

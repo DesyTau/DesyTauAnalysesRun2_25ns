@@ -949,7 +949,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	for (unsigned int iT1=0; iT1<analysisTree.trigobject_count; ++iT1) {
 	  if (analysisTree.trigobject_filters[iT1][nMainTrigger]
 	      &&analysisTree.tau_pt[it1]>ptTauCutTauTau&&
-	      analysisTree.trigobject_pt[iT1]>MuonTriggerPtCut) { // 1st tau
+	      analysisTree.trigobject_pt[iT1]>ptTauCutTauTau) { // 1st tau
 	    float dRtrig1 = deltaR(analysisTree.tau_eta[it1],analysisTree.tau_phi[it1],
 				  analysisTree.trigobject_eta[iT1],analysisTree.trigobject_phi[iT1]);
 	    if (dRtrig1<deltaRTrigMatch) {
@@ -958,7 +958,7 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	for (unsigned int iT2=0; iT2<analysisTree.trigobject_count; ++iT2) {
  		if (analysisTree.trigobject_filters[iT2][nMainTrigger]
 			&&analysisTree.tau_pt[it2]>ptTauCutTauTau&&
-	      		analysisTree.trigobject_pt[iT2]>MuonTriggerPtCut && iT2!=iT1) { //2nd tayu
+	      		analysisTree.trigobject_pt[iT2]>ptTauCutTauTau && iT2!=iT1) { //2nd tayu
 	    	float dRtrig2 = deltaR(analysisTree.tau_eta[it2],analysisTree.tau_phi[it2],
 			analysisTree.trigobject_eta[iT2],analysisTree.trigobject_phi[iT2]);
 	    	if (dRtrig2<deltaRTrigMatch) 
@@ -974,7 +974,8 @@ if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 	 }
 	}
 
-      if (!isData/* &&  ( string::npos != filen.find("stau") || string::npos != filen.find("C1"))*/ )  {isTauFilterNameMatch1 = true;isTauFilterNameMatch2 = true;}
+      if (!isData)  {isTauFilterNameMatch1 = true;isTauFilterNameMatch2 = true;}
+
 	trigMatch = isTauFilterNameMatch1 && isTauFilterNameMatch2;	
 	 if (!trigMatch) continue;
 	tau_index1 = (int)tIndex1;
