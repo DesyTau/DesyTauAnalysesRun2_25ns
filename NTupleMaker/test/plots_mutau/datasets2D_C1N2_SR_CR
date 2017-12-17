@@ -1,11 +1,8 @@
  SingleMuon_RunBCDEFGH_35invfb 1.
- stau-stau_left_100_LSP1 0.27079
- stau-stau_right_100_LSP1 0.09651
+ stau-stau_left_90_LSP1 0.47069
  C1N2_100_LSP1 22.504
- C1N2_100_LSP25 22.504
- C1N2_100_LSP50 22.504
- C1N2_100_LSP75 22.504
  C1N2_400_LSP1  0.11822
+ C1N2_400_LSP175  0.11822
  ST_t-channel_antitop_4f_inclusiveDecays_13TeV-powhegV2-madspin-pythia8 80.95
  ST_t-channel_top_4f_inclusiveDecays_13TeV-powhegV2-madspin-pythia8 136.02
  ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8 35.6
@@ -39,20 +36,33 @@
  ZZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8 3.22
  ZZTo2Q2Nu_13TeV_amcatnloFXFX_madspin_pythia8 4.04
  WGToLNuG_TuneCUETP8M1_13TeV-madgraphMLM-pythia8 405.271
- DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8 5765.4 0.9611
+ Fakes_DataDriven 1.
+ W1JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8 1.221 9644.5 0.8853
+ W2JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8 1.221 3144.5 0.8853
+ W3JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8 1.221 954.8 0.8853
+ W4JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8 1.221 485.6 0.8853
+ WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_0Parton 61526.7  0.8853
+ WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_1Parton 61526.7  0.8853
+ WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_2Parton 61526.7  0.8853
+ WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_3Parton 61526.7  0.8853
+ WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_4Parton 61526.7  0.8853
+ DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_isZTT_0Parton 5765.4 0.9611
+ DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_isZTT_1Parton 5765.4 0.9611
+ DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_isZTT_2Parton 5765.4 0.9611
+ DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_isZTT_3Parton 5765.4 0.9611
+ DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_isZTT_4Parton 5765.4 0.9611
+ DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_0Parton 5765.4 0.9611
+ DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_1Parton 5765.4 0.9611
+ DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_2Parton 5765.4 0.9611
+ DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_3Parton 5765.4 0.9611
+ DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_4Parton 5765.4 0.9611
  DY1JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8 1.1637 1012.5 0.9611
  DY2JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8 1.1637 332.8 0.9611
  DY3JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8 1.1637 101.8 0.9611
  DY4JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8 1.1637 54.8 0.9611
- DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8 18610. 0.9611
- DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_isZTT 5765.4 0.9611
  DY1JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_isZTT 1.1637 1012.5 0.9611
  DY2JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_isZTT 1.1637 332.8 0.9611
  DY3JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_isZTT 1.1637 101.8 0.9611
  DY4JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_isZTT 1.1637 54.8 0.9611
  DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_isZTT 18610. 0.9611
- QCD_DataDriven 1.
- W1JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8 1.221 9644.5 0.8853
- W2JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8 1.221 3144.5 0.8853
- W3JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8 1.221 954.8 0.8853
- W4JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8 1.221 485.6 0.8853
+ DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8 18610. 0.9611
