@@ -44,7 +44,8 @@ git cms-merge-topic ikrav:egm_id_80X_v3_photons
 cd $CMSSW_BASE/src
 
 ### Tau MVA ID (https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePFTauID#Rerunning_of_the_tau_ID_on_MiniA)
-git cms-merge-topic -u cms-tau-pog:CMSSW_8_0_X_tau-pog_miniAOD-backport-tauID
+#git cms-merge-topic -u cms-tau-pog:CMSSW_8_0_X_tau-pog_miniAOD-backport-tauID
+git cms-merge-topic -u cms-tau-pog:CMSSW_8_0_X_tau-pog_tauIDOnMiniAOD-legacy-backport-81X
 
 ### SVfit
 git clone https://github.com/veelken/SVfit_standalone.git ${CMSSW_BASE}/src/TauAnalysis/SVfitStandalone
@@ -75,9 +76,19 @@ git clone https://github.com/CMS-HTT/QCDModelingEMu.git HTT-utilities/QCDModelin
 ### DesyTau
 cd ${CMSSW_BASE}/src
 git clone https://github.com/DesyTau/DesyTauAnalysesRun2_25ns.git ${CMSSW_BASE}/src/DesyTauAnalyses
+cd ${CMSSW_BASE}/src/DesyTauAnalyses
+git checkout NTuple_80X_MiniAODv2
+cd ${CMSSW_BASE}/src 
 
 #### patch for MVAMET
 # cp ${CMSSW_BASE}/src/DesyTauAnalyses/patch/MVAMEt/MVAMET.cc ${CMSSW_BASE}/src/RecoMET/METPUSubtraction/plugins/.
+
+### patch for SVFit 
+cp ${CMSSW_BASE}/src/DesyTauAnalyses/patch/SVFit/SVfitStandaloneAlgorithm.h TauAnalysis/SVfitStandalone/interface/ 
+cp ${CMSSW_BASE}/src/DesyTauAnalyses/patch/SVFit/SVfitStandaloneAlgorithm.cc TauAnalysis/SVfitStandalone/src 
+cp ${CMSSW_BASE}/src/DesyTauAnalyses/patch/SVFit/testSVfitStandalone.cc TauAnalysis/SVfitStandalone/bin 
+rm TauAnalysis/SVfitStandalone/interface/SVfitStandaloneQuantities.h 
+rm TauAnalysis/SVfitStandalone/src/SVfitStandaloneQuantities.cc 
 
 scram b -j 32
 scram b -j 32
