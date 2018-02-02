@@ -411,6 +411,17 @@ class NTupleMaker : public edm::EDAnalyzer{
   //// New for Spring16
   edm::EDGetTokenT<edm::ValueMap<bool> >  eleMvaWP90GeneralMapToken_;
   edm::EDGetTokenT<edm::ValueMap<bool> >  eleMvaWP80GeneralMapToken_;
+  //// New for Fall17
+  edm::EDGetTokenT<edm::ValueMap<float> > mvaValuesIsoFall17MapToken_;
+  edm::EDGetTokenT<edm::ValueMap<float> > mvaValuesnoIsoFall17MapToken_;
+  edm::EDGetTokenT<edm::ValueMap<bool> >  eleMvanoIsoWP90Fall17MapToken_;
+  edm::EDGetTokenT<edm::ValueMap<bool> >  eleMvanoIsoWP80Fall17MapToken_;
+  edm::EDGetTokenT<edm::ValueMap<bool> >  eleMvanoIsoWPLooseFall17MapToken_;
+  edm::EDGetTokenT<edm::ValueMap<bool> >  eleMvaIsoWP90Fall17MapToken_;
+  edm::EDGetTokenT<edm::ValueMap<bool> >  eleMvaIsoWP80Fall17MapToken_;
+  edm::EDGetTokenT<edm::ValueMap<bool> >  eleMvaIsoWPLooseFall17MapToken_;
+    
+    
   //// New for Spring16
   edm::EDGetTokenT<pat::TauCollection> TauCollectionToken_;
   edm::EDGetTokenT<pat::PATTauDiscriminator> TauMVAIsolationRawToken_;
@@ -744,6 +755,16 @@ class NTupleMaker : public edm::EDAnalyzer{
   Float_t electron_mva_wp80_general_Spring16_v1[M_electronmaxcount];
   Float_t electron_mva_wp90_general_Spring16_v1[M_electronmaxcount];
   Int_t electron_mva_category_Spring16_v1[M_electronmaxcount];
+    
+    //new for 9.4.0 Fall17
+  Float_t electron_mva_value_Iso_Fall17_v1[M_electronmaxcount];
+  Float_t electron_mva_value_noIso_Fall17_v1[M_electronmaxcount];
+  Float_t electron_mva_wp90_Iso_Fall17_v1[M_electronmaxcount];
+  Float_t electron_mva_wp80_Iso_Fall17_v1[M_electronmaxcount];
+  Float_t electron_mva_Loose_Iso_Fall17_v1[M_electronmaxcount];
+  Float_t electron_mva_wp90_noIso_Fall17_v1[M_electronmaxcount];
+  Float_t electron_mva_wp80_noIso_Fall17_v1[M_electronmaxcount];
+  Float_t electron_mva_Loose_noIso_Fall17_v1[M_electronmaxcount];
 
   Bool_t electron_mva_wp80_nontrig_Spring15_v1[M_electronmaxcount];
   Bool_t electron_mva_wp90_nontrig_Spring15_v1[M_electronmaxcount];

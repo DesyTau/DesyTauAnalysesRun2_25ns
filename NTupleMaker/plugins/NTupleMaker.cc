@@ -172,6 +172,18 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
   mvaCategoriesMapSpring16MapToken_(consumes<edm::ValueMap<int> >(iConfig.getParameter<edm::InputTag>("mvaCategoriesMapSpring16"))),
   eleMvaWP90GeneralMapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleMvaWP90GeneralMap"))),
   eleMvaWP80GeneralMapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleMvaWP80GeneralMap"))),
+
+  //new for 9.4.0, electron Fall17 ID
+  mvaValuesIsoFall17MapToken_(consumes<edm::ValueMap<float> >(iConfig.getParameter<edm::InputTag>("mvaValuesIsoFall17Map"))),
+  mvaValuesnoIsoFall17MapToken_(consumes<edm::ValueMap<float> >(iConfig.getParameter<edm::InputTag>("mvaValuesnoIsoFall17Map"))),
+  eleMvanoIsoWP90Fall17MapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleMvanoIsoWP90Fall17Map"))),
+  eleMvanoIsoWP80Fall17MapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleMvanoIsoWP80Fall17Map"))),
+  eleMvanoIsoWPLooseFall17MapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleMvanoIsoWPLooseFall17Map"))),
+  eleMvaIsoWP90Fall17MapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleMvaIsoWP90Fall17Map"))),
+  eleMvaIsoWP80Fall17MapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleMvaIsoWP80Fall17Map"))),
+  eleMvaIsoWPLooseFall17MapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleMvaIsoWPLooseFall17Map"))),
+
+
   TauCollectionToken_(consumes<pat::TauCollection>(iConfig.getParameter<edm::InputTag>("TauCollectionTag"))),
   TauMVAIsolationRawToken_(consumes<pat::PATTauDiscriminator>(edm::InputTag("rerunDiscriminationByIsolationMVArun2v1raw","","TreeProducer"))),
   TauMVAIsolationVLooseToken_(consumes<pat::PATTauDiscriminator>(edm::InputTag("rerunDiscriminationByIsolationMVArun2v1VLoose","","TreeProducer"))),
@@ -558,7 +570,18 @@ void NTupleMaker::beginJob(){
     tree->Branch("electron_mva_wp90_general_Spring16_v1", electron_mva_wp90_general_Spring16_v1, "electron_mva_wp90_general_Spring16_v1[electron_count]/F");
     tree->Branch("electron_mva_wp80_general_Spring16_v1", electron_mva_wp80_general_Spring16_v1, "electron_mva_wp80_general_Spring16_v1[electron_count]/F");
 
-
+    //new for 9.4.0
+    tree->Branch("electron_mva_value_Iso_Fall17_v1", electron_mva_value_Iso_Fall17_v1, "electron_mva_value_Iso_Fall17_v1[electron_count]/F");
+    tree->Branch("electron_mva_value_noIso_Fall17_v1", electron_mva_value_noIso_Fall17_v1, "electron_mva_value_noIso_Fall17_v1[electron_count]/F");
+    
+    tree->Branch("electron_mva_wp90_Iso_Fall17_v1", electron_mva_wp90_Iso_Fall17_v1, "electron_mva_wp90_Iso_Fall17_v1[electron_count]/F");
+    tree->Branch("electron_mva_wp80_Iso_Fall17_v1", electron_mva_wp80_Iso_Fall17_v1, "electron_mva_wp80_Iso_Fall17_v1[electron_count]/F");
+    tree->Branch("electron_mva_Loose_Iso_Fall17_v1", electron_mva_Loose_Iso_Fall17_v1, "electron_mva_Loose_Iso_Fall17_v1[electron_count]/F");
+    tree->Branch("electron_mva_wp90_noIso_Fall17_v1", electron_mva_wp90_noIso_Fall17_v1, "electron_mva_wp90_noIso_Fall17_v1[electron_count]/F");
+    tree->Branch("electron_mva_wp80_noIso_Fall17_v1", electron_mva_wp80_noIso_Fall17_v1, "electron_mva_wp80_noIso_Fall17_v1[electron_count]/F");
+    tree->Branch("electron_mva_Loose_noIso_Fall17_v1", electron_mva_Loose_noIso_Fall17_v1, "electron_mva_Loose_noIso_Fall17_v1[electron_count]/F");
+    //end of new
+      
     tree->Branch("electron_pass_conversion", electron_pass_conversion, "electron_pass_conversion[electron_count]/O");
 
     tree->Branch("electron_genmatch", electron_genmatch, "electron_genmatch[electron_count]/I");
@@ -3856,8 +3879,31 @@ unsigned int NTupleMaker::AddElectrons(const edm::Event& iEvent, const edm::Even
 	edm::Handle<edm::ValueMap<bool> > mva_wp80_general_decisions;
 	edm::Handle<edm::ValueMap<bool> > mva_wp90_general_decisions;
       	iEvent.getByToken(eleMvaWP90GeneralMapToken_,mva_wp90_general_decisions);
-        iEvent.getByToken(eleMvaWP80GeneralMapToken_,mva_wp80_general_decisions); 
+        iEvent.getByToken(eleMvaWP80GeneralMapToken_,mva_wp80_general_decisions);
+    
+    //mva Fall17
+    edm::Handle<edm::ValueMap<float> > mvaValuesIsoFall17Map;
+    edm::Handle<edm::ValueMap<float> > mvaValuesnoIsoFall17Map;
 
+    edm::Handle<edm::ValueMap<bool> > mva_wp90_noIso_Fall17_decisions;
+    edm::Handle<edm::ValueMap<bool> > mva_wp80_noIso_Fall17_decisions;
+    edm::Handle<edm::ValueMap<bool> > mva_Loose_noIso_Fall17_decisions;
+    edm::Handle<edm::ValueMap<bool> > mva_wp90_Iso_Fall17_decisions;
+    edm::Handle<edm::ValueMap<bool> > mva_wp80_Iso_Fall17_decisions;
+    edm::Handle<edm::ValueMap<bool> > mva_Loose_Iso_Fall17_decisions;
+    
+    iEvent.getByToken(mvaValuesIsoFall17MapToken_,mvaValuesIsoFall17Map);
+    iEvent.getByToken(mvaValuesnoIsoFall17MapToken_,mvaValuesnoIsoFall17Map);
+
+    iEvent.getByToken(eleMvanoIsoWP90Fall17MapToken_,mva_wp90_noIso_Fall17_decisions);
+    iEvent.getByToken(eleMvanoIsoWP80Fall17MapToken_,mva_wp80_noIso_Fall17_decisions);
+    iEvent.getByToken(eleMvanoIsoWPLooseFall17MapToken_,mva_Loose_noIso_Fall17_decisions);
+    iEvent.getByToken(eleMvaIsoWP90Fall17MapToken_,mva_wp90_Iso_Fall17_decisions);
+    iEvent.getByToken(eleMvaIsoWP80Fall17MapToken_,mva_wp80_Iso_Fall17_decisions);
+    iEvent.getByToken(eleMvaIsoWPLooseFall17MapToken_,mva_Loose_Iso_Fall17_decisions);
+
+    
+    
 	/*if(crecelectrontrigger)
 	{
 		iEvent.getByLabel(edm::InputTag("l1extraParticles", "NonIsolated"), L1Electrons);
@@ -3976,7 +4022,7 @@ unsigned int NTupleMaker::AddElectrons(const edm::Event& iEvent, const edm::Even
 	  electron_npixellayers[electron_count]   = (gsfTr_e->hitPattern()).pixelLayersWithMeasurement();
 	  electron_nstriplayers[electron_count]   = (gsfTr_e->hitPattern()).stripLayersWithMeasurement();
 	  //electron_nmissinginnerhits[electron_count] = gsfTr_e->trackerExpectedHitsInner().numberOfHits();
-	  electron_nmissinginnerhits[electron_count] = gsfTr_e->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS);
+	  electron_nmissinginnerhits[electron_count] = gsfTr_e->hitPattern().numberOfAllHits(reco::HitPattern::MISSING_INNER_HITS);
 
 	  electron_dxy[electron_count]          = gsfTr_e->dxy(pv_position);
 	  electron_dxyerr[electron_count]       = gsfTr_e->dxyError();
@@ -4008,7 +4054,23 @@ unsigned int NTupleMaker::AddElectrons(const edm::Event& iEvent, const edm::Even
 	  electron_mva_wp90_nontrig_Spring15_v1[electron_count] = (*nontrig_wp90_decisions)[el];
 	  electron_mva_wp80_trig_Spring15_v1[electron_count] = (*trig_wp80_decisions)[el];
 	  electron_mva_wp90_trig_Spring15_v1[electron_count] = (*trig_wp90_decisions)[el];
-	  
+        
+        
+        //new for 9.4.0 Fall17 Electron id
+        
+        electron_mva_value_Iso_Fall17_v1[electron_count] = (*mvaValuesIsoFall17Map)[el];
+        electron_mva_value_noIso_Fall17_v1[electron_count] = (*mvaValuesnoIsoFall17Map)[el];
+
+        electron_mva_wp90_Iso_Fall17_v1[electron_count] = (*mva_wp90_Iso_Fall17_decisions)[el];
+        electron_mva_wp80_Iso_Fall17_v1[electron_count] = (*mva_wp80_Iso_Fall17_decisions)[el];
+        electron_mva_Loose_Iso_Fall17_v1[electron_count] = (*mva_Loose_Iso_Fall17_decisions)[el];
+        
+        electron_mva_wp90_noIso_Fall17_v1[electron_count] = (*mva_wp90_noIso_Fall17_decisions)[el];
+        electron_mva_wp80_noIso_Fall17_v1[electron_count] = (*mva_wp80_noIso_Fall17_decisions)[el];
+        electron_mva_Loose_noIso_Fall17_v1[electron_count] = (*mva_Loose_noIso_Fall17_decisions)[el];
+	    //ending for 9.4.0 electron id
+        
+        
 	  electron_pass_conversion[electron_count] = (*Electrons)[i].passConversionVeto();
 	  
 	  //	  std::cout << "  passed conversion veto = " << electron_pass_conversion[electron_count] << std::endl;

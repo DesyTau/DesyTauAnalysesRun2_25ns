@@ -219,6 +219,16 @@ public :
    Int_t           electron_mva_category_Spring16_v1[50];   //[electron_count]
    Float_t         electron_mva_wp90_general_Spring16_v1[50];   //[electron_count]
    Float_t         electron_mva_wp80_general_Spring16_v1[50];   //[electron_count]
+    Float_t         electron_mva_value_Iso_Fall17_v1[50];
+    Float_t         electron_mva_value_noIso_Fall17_v1[50];
+    Float_t         electron_mva_wp90_Iso_Fall17_v1[50];
+    Float_t         electron_mva_wp80_Iso_Fall17_v1[50];
+    Float_t         electron_mva_Loose_Iso_Fall17_v1[50];
+    Float_t         electron_mva_wp90_noIso_Fall17_v1[50];
+    Float_t         electron_mva_wp80_noIso_Fall17_v1[50];
+    Float_t         electron_mva_Loose_noIso_Fall17_v1[50];
+
+    
    Bool_t          electron_pass_conversion[50];   //[electron_count]
    Int_t           electron_genmatch[50];   //[electron_count]
    Float_t         electron_detaInSeed[50];   //[electron_count]
@@ -850,6 +860,14 @@ public :
    TBranch        *b_electron_mva_category_Spring16_v1;   //!
    TBranch        *b_electron_mva_wp90_general_Spring16_v1;   //!
    TBranch        *b_electron_mva_wp80_general_Spring16_v1;   //!
+    TBranch        *b_electron_mva_value_Iso_Fall17_v1;   //!
+    TBranch        *b_electron_mva_value_noIso_Fall17_v1;   //!
+    TBranch        *b_electron_mva_wp90_Iso_Fall17_v1;
+    TBranch        *b_electron_mva_wp80_Iso_Fall17_v1;
+    TBranch        *b_electron_mva_Loose_Iso_Fall17_v1;
+    TBranch        *b_electron_mva_wp90_noIso_Fall17_v1;
+    TBranch        *b_electron_mva_wp80_noIso_Fall17_v1;
+    TBranch        *b_electron_mva_Loose_noIso_Fall17_v1;
    TBranch        *b_electron_pass_conversion;   //!
    TBranch        *b_electron_genmatch;   //!
    TBranch        *b_electron_detaInSeed;   //!
@@ -1581,6 +1599,15 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("electron_mva_category_Spring16_v1", electron_mva_category_Spring16_v1, &b_electron_mva_category_Spring16_v1);
    fChain->SetBranchAddress("electron_mva_wp90_general_Spring16_v1", electron_mva_wp90_general_Spring16_v1, &b_electron_mva_wp90_general_Spring16_v1);
    fChain->SetBranchAddress("electron_mva_wp80_general_Spring16_v1", electron_mva_wp80_general_Spring16_v1, &b_electron_mva_wp80_general_Spring16_v1);
+    fChain->SetBranchAddress("electron_mva_value_Iso_Fall17_v1", electron_mva_value_Iso_Fall17_v1, &b_electron_mva_value_Iso_Fall17_v1);
+    fChain->SetBranchAddress("electron_mva_value_noIso_Fall17_v1", electron_mva_value_noIso_Fall17_v1, &b_electron_mva_value_noIso_Fall17_v1);
+    fChain->SetBranchAddress("electron_mva_wp90_Iso_Fall17_v1", electron_mva_wp90_Iso_Fall17_v1, &b_electron_mva_wp90_Iso_Fall17_v1);
+    fChain->SetBranchAddress("electron_mva_wp80_Iso_Fall17_v1", electron_mva_wp80_Iso_Fall17_v1, &b_electron_mva_wp80_Iso_Fall17_v1);
+    fChain->SetBranchAddress("electron_mva_Loose_Iso_Fall17_v1", electron_mva_Loose_Iso_Fall17_v1, &b_electron_mva_Loose_Iso_Fall17_v1);
+    fChain->SetBranchAddress("electron_mva_wp90_noIso_Fall17_v1", electron_mva_wp90_noIso_Fall17_v1, &b_electron_mva_wp90_noIso_Fall17_v1);
+    fChain->SetBranchAddress("electron_mva_wp80_noIso_Fall17_v1", electron_mva_wp80_noIso_Fall17_v1, &b_electron_mva_wp80_noIso_Fall17_v1);
+    fChain->SetBranchAddress("electron_mva_Loose_noIso_Fall17_v1", electron_mva_Loose_noIso_Fall17_v1, &b_electron_mva_Loose_noIso_Fall17_v1);
+
    fChain->SetBranchAddress("electron_pass_conversion", electron_pass_conversion, &b_electron_pass_conversion);
    fChain->SetBranchAddress("electron_genmatch", electron_genmatch, &b_electron_genmatch);
    fChain->SetBranchAddress("electron_detaInSeed", electron_detaInSeed, &b_electron_detaInSeed);
