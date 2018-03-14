@@ -64,8 +64,8 @@ void analyzer::Loop(){
 	CutList.push_back("ExtraCuts");
 	CutList.push_back("TightImpacts");
 
-	string channel = "mumu";
-	string Channel = "mumu";
+	string channel = "elel";
+	string Channel = "elel";
 
 	ChiMass = 0.;
 	//cout<<" THE MASS IS ========================= "<<ChiMass<<endl;
@@ -212,11 +212,11 @@ void analyzer::Loop(){
 	//isZTT = ISZTTHERE;
 
 	TH1D * histW   , *histPt;
-	if (systematic == "ScalesUp" ) histW = (TH1D*)filein->Get("mumu/histWeightsScalesUp");
-	else if (systematic == "ScalesDown" ) histW = (TH1D*)filein->Get("mumu/histWeightsScalesDown");
-	else if (systematic == "PDFUp" ) histW = (TH1D*)filein->Get("mumu/histWeightsPDFUp");
-	else if (systematic == "PDFDown" ) histW = (TH1D*)filein->Get("mumu/histWeightsPDFDown");
-	else  {histW = (TH1D*)filein->Get("mumu/histWeightsH");}
+	if (systematic == "ScalesUp" ) histW = (TH1D*)filein->Get("elel/histWeightsScalesUp");
+	else if (systematic == "ScalesDown" ) histW = (TH1D*)filein->Get("elel/histWeightsScalesDown");
+	else if (systematic == "PDFUp" ) histW = (TH1D*)filein->Get("elel/histWeightsPDFUp");
+	else if (systematic == "PDFDown" ) histW = (TH1D*)filein->Get("elel/histWeightsPDFDown");
+	else  {histW = (TH1D*)filein->Get("elel/histWeightsH");}
 
 	if (string::npos != fln.find(N0part) && (isWJ || isWNJ)) isW0Part= true;
 	if (string::npos != fln.find(N1part) && (isWJ || isWNJ)) isW1Part= true;
@@ -233,17 +233,17 @@ void analyzer::Loop(){
 	histW->SetName("histWeightsH");
 	histW->SetTitle("histWeightsH");
 
-	if (isSUSY) histPt = (TH1D*)filein->Get("mumu/histPt");
+	if (isSUSY) histPt = (TH1D*)filein->Get("elel/histPt");
 	float Nw = 1;
 	if (isSUSY) { Nw = 1/histPt->GetSumOfWeights(); Nw *=histW->GetSumOfWeights();}
 
 	cout<<" The Systematic "<<systematic<<" histW "<<histW->GetSumOfWeights()<<endl;
 
 	TH1D * histTop , *histTopSq;
-	if (isTT) histTop = (TH1D*)filein->Get("mumu/histTopPt");
-	if (isTT && systematic == "TopPtUp" ) histTopSq = (TH1D*)filein->Get("mumu/histTopPtSq");
+	if (isTT) histTop = (TH1D*)filein->Get("elel/histTopPt");
+	if (isTT && systematic == "TopPtUp" ) histTopSq = (TH1D*)filein->Get("elel/histTopPtSq");
 	
-	//TH1D * CutFlow = (TH1D*)filein->Get("mumu/CutFlowUnW");
+	//TH1D * CutFlow = (TH1D*)filein->Get("elel/CutFlowUnW");
 
 	//cout<<"  "<<old<<"  "<<datasetName->c_str()<<"  "<<hist_<<"  "<<CutFlow->GetName()<<"  "<<CutFlow->GetBinContent(1)<<endl;
 		
@@ -289,8 +289,8 @@ void analyzer::Loop(){
 		////////////////// IMPORTANT///////////////////
 
 
-		if (mu_relIso[0] > 0.15) continue;
-		if (mu_relIso[1] > 0.15) continue;
+		if (el_relIso[0] > 0.1) continue;
+		if (el_relIso[1] > 0.1) continue;
 
 		bool isDYTauTau = false;
 		bool isDYll = false;
@@ -307,10 +307,10 @@ void analyzer::Loop(){
 		if ((isDY || isDYNJ) && !isZTT && !isDYll) continue;
 
 
-	if (muon_index_1 <0 || muon_index_2 <0) continue;
+	if (electron_index_1 <0 || electron_index_2 <0) continue;
 
 
-		float charge_ =mu_charge[muon_index_1]  * mu_charge[muon_index_2];
+		float charge_ =el_charge[electron_index_1]  * el_charge[electron_index_2];
 
 		if ( charge_ < 0. && Sign == "SS") continue;
 		if ( charge_ > 0. && Sign == "OS") continue;
@@ -386,8 +386,8 @@ void analyzer::Loop(){
 		}
 
 
-if(muon_index_1>-1 )			LeptV1.SetPtEtaPhiM(mu_pt[muon_index_1], mu_eta[muon_index_1], mu_phi[muon_index_1], muonMass);
-if(muon_index_2>-1 )			LeptV2.SetPtEtaPhiM(mu_pt[muon_index_2], mu_eta[muon_index_2], mu_phi[muon_index_2], muonMass);
+if(electron_index_1>-1 )			LeptV1.SetPtEtaPhiM(el_pt[electron_index_1], el_eta[electron_index_1], el_phi[electron_index_1], muonMass);
+if(electron_index_2>-1 )			LeptV2.SetPtEtaPhiM(el_pt[electron_index_2], el_eta[electron_index_2], el_phi[electron_index_2], muonMass);
 		int iCut = 1;
 
 		if (!isData) all_weights = pu_weight * gen_weight ;
@@ -430,30 +430,28 @@ if(muon_index_2>-1 )			LeptV2.SetPtEtaPhiM(mu_pt[muon_index_2], mu_eta[muon_inde
 		int CutN = 8;
 		
 		if (iCut>CutN) 
-		FillHistsDiL(iCut, all_weights, LeptV1, LeptV2, JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index_1,muon_index_2);
+		FillHistsDiL(iCut, all_weights, LeptV1, LeptV2, JetsMV, METV, ChiMass,mIntermediate, Channel, electron_index_1,electron_index_2);
 		CFCounter[iCut]+= all_weights;
 		CFCounter_[iCut]+= all_weights;
                 iCFCounter[iCut]++;
 		iCut++;
 		
-		if (mu_relIso[0] > 0.15 && !InvertLeptonIso) continue;
-		if (mu_relIso[0] < 0.15 && InvertLeptonIso) continue;
+		if (el_relIso[0] > 0.1 && !InvertLeptonIso) continue;
+		if (el_relIso[0] < 0.1 && InvertLeptonIso) continue;
 		
-		if (mu_relIso[0] > 0.3) continue;
-		if (mu_relIso[1] > 0.3) continue;
 		
 
-		if ( fabs(mu_dz[muon_index_1]) > 0.2) continue;
-		if ( fabs(mu_dxy[muon_index_1]) > 0.045) continue;
-		if ( fabs(mu_dz[muon_index_2]) > 0.2) continue;
-		if ( fabs(mu_dxy[muon_index_2]) > 0.045) continue;
+		if ( fabs(el_dz[electron_index_1]) > 0.2) continue;
+		if ( fabs(el_dxy[electron_index_1]) > 0.045) continue;
+		if ( fabs(el_dz[electron_index_2]) > 0.2) continue;
+		if ( fabs(el_dxy[electron_index_2]) > 0.045) continue;
 
-		if ( fabs(mu_charge[muon_index_1]) !=1 ) continue;
-		if ( fabs(mu_charge[muon_index_2]) !=1 ) continue;
+		if ( fabs(el_charge[electron_index_1]) !=1 ) continue;
+		if ( fabs(el_charge[electron_index_2]) !=1 ) continue;
 
 
 		if (iCut>CutN) 
-		FillHistsDiL(iCut, all_weights, LeptV1, LeptV2, JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index_1,muon_index_2);
+		FillHistsDiL(iCut, all_weights, LeptV1, LeptV2, JetsMV, METV, ChiMass,mIntermediate, Channel, electron_index_1,electron_index_2);
 		CFCounter[iCut]+= all_weights;
 		CFCounter_[iCut]+= all_weights;
                 iCFCounter[iCut]++;
@@ -462,7 +460,7 @@ if(muon_index_2>-1 )			LeptV2.SetPtEtaPhiM(mu_pt[muon_index_2], mu_eta[muon_inde
 
 		if (event_thirdLeptonVeto >0.5) continue;
 		if (iCut>CutN) 
-		FillHistsDiL(iCut, all_weights, LeptV1, LeptV2, JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index_1,muon_index_2);
+		FillHistsDiL(iCut, all_weights, LeptV1, LeptV2, JetsMV, METV, ChiMass,mIntermediate, Channel, electron_index_1,electron_index_2);
 		CFCounter[iCut]+= all_weights;
 		CFCounter_[iCut]+= all_weights;
                 iCFCounter[iCut]++;
@@ -470,7 +468,7 @@ if(muon_index_2>-1 )			LeptV2.SetPtEtaPhiM(mu_pt[muon_index_2], mu_eta[muon_inde
 		
 		if (!isData) all_weights *= trig_weight;
 		if (iCut>CutN) 
-		FillHistsDiL(iCut, all_weights, LeptV1, LeptV2, JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index_1,muon_index_2);
+		FillHistsDiL(iCut, all_weights, LeptV1, LeptV2, JetsMV, METV, ChiMass,mIntermediate, Channel, electron_index_1,electron_index_2);
 		CFCounter[iCut]+= all_weights;
 		CFCounter_[iCut]+= all_weights;
                 iCFCounter[iCut]++;
@@ -478,7 +476,7 @@ if(muon_index_2>-1 )			LeptV2.SetPtEtaPhiM(mu_pt[muon_index_2], mu_eta[muon_inde
 
 		if (!isData) all_weights *= LSF_weight;
 		if (iCut>CutN) 
-		FillHistsDiL(iCut, all_weights, LeptV1, LeptV2, JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index_1,muon_index_2);
+		FillHistsDiL(iCut, all_weights, LeptV1, LeptV2, JetsMV, METV, ChiMass,mIntermediate, Channel, electron_index_1,electron_index_2);
 		CFCounter[iCut]+= all_weights;
 		CFCounter_[iCut]+= all_weights;
                 iCFCounter[iCut]++;
@@ -544,7 +542,7 @@ if(muon_index_2>-1 )			LeptV2.SetPtEtaPhiM(mu_pt[muon_index_2], mu_eta[muon_inde
 
 
 		if (iCut>CutN) 
-		FillHistsDiL(iCut, all_weights, LeptV1, LeptV2, JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index_1,muon_index_2);
+		FillHistsDiL(iCut, all_weights, LeptV1, LeptV2, JetsMV, METV, ChiMass,mIntermediate, Channel, electron_index_1,electron_index_2);
 		CFCounter[iCut]+= all_weights;
 		CFCounter_[iCut]+= all_weights;
                 iCFCounter[iCut]++;
@@ -557,7 +555,7 @@ if(muon_index_2>-1 )			LeptV2.SetPtEtaPhiM(mu_pt[muon_index_2], mu_eta[muon_inde
 
 
 		if (iCut>CutN) 
-		FillHistsDiL(iCut, all_weights, LeptV1, LeptV2, JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index_1,muon_index_2);
+		FillHistsDiL(iCut, all_weights, LeptV1, LeptV2, JetsMV, METV, ChiMass,mIntermediate, Channel, electron_index_1,electron_index_2);
 		CFCounter[iCut]+= all_weights;
 		CFCounter_[iCut]+= all_weights;
                 iCFCounter[iCut]++;
@@ -569,7 +567,7 @@ if(muon_index_2>-1 )			LeptV2.SetPtEtaPhiM(mu_pt[muon_index_2], mu_eta[muon_inde
 		if (systematic =="TopPtDown") all_weights *= 1;
 		}
 		if (iCut>CutN) 
-		FillHistsDiL(iCut, all_weights, LeptV1, LeptV2, JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index_1,muon_index_2);
+		FillHistsDiL(iCut, all_weights, LeptV1, LeptV2, JetsMV, METV, ChiMass,mIntermediate, Channel, electron_index_1,electron_index_2);
 		CFCounter[iCut]+= all_weights;
 		CFCounter_[iCut]+= all_weights;
                 iCFCounter[iCut]++;
@@ -612,7 +610,7 @@ if(muon_index_2>-1 )			LeptV2.SetPtEtaPhiM(mu_pt[muon_index_2], mu_eta[muon_inde
 
 		if (DoNoCut !=iCut && njets==0) continue;
 		if (iCut>CutN) 
-		FillHistsDiL(iCut, all_weights, LeptV1, LeptV2, JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index_1,muon_index_2);
+		FillHistsDiL(iCut, all_weights, LeptV1, LeptV2, JetsMV, METV, ChiMass,mIntermediate, Channel, electron_index_1,electron_index_2);
 		CFCounter[iCut]+= all_weights;
 		CFCounter_[iCut]+= all_weights;
                 iCFCounter[iCut]++;
@@ -620,7 +618,7 @@ if(muon_index_2>-1 )			LeptV2.SetPtEtaPhiM(mu_pt[muon_index_2], mu_eta[muon_inde
 
 		if (DoNoCut !=iCut && nbtag>1) continue;
 		if (iCut>CutN) 
-		FillHistsDiL(iCut, all_weights, LeptV1, LeptV2, JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index_1,muon_index_2);
+		FillHistsDiL(iCut, all_weights, LeptV1, LeptV2, JetsMV, METV, ChiMass,mIntermediate, Channel, electron_index_1,electron_index_2);
 		CFCounter[iCut]+= all_weights;
 		CFCounter_[iCut]+= all_weights;
                 iCFCounter[iCut]++;
@@ -632,7 +630,7 @@ if(muon_index_2>-1 )			LeptV2.SetPtEtaPhiM(mu_pt[muon_index_2], mu_eta[muon_inde
 		if (DoNoCut !=iCut && MTt<120) continue;
 		if (  DiL.M() < 105 && DiL.M()>75) continue;
 		if (iCut>CutN) 
-		FillHistsDiL(iCut, all_weights, LeptV1, LeptV2, JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index_1,muon_index_2);
+		FillHistsDiL(iCut, all_weights, LeptV1, LeptV2, JetsMV, METV, ChiMass,mIntermediate, Channel, electron_index_1,electron_index_2);
 		CFCounter[iCut]+= all_weights;
 		CFCounter_[iCut]+= all_weights;
                 iCFCounter[iCut]++;
@@ -640,7 +638,7 @@ if(muon_index_2>-1 )			LeptV2.SetPtEtaPhiM(mu_pt[muon_index_2], mu_eta[muon_inde
 
 		if (DoNoCut !=iCut && njets>4) continue;
 		if (iCut>CutN) 
-		FillHistsDiL(iCut, all_weights, LeptV1, LeptV2, JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index_1,muon_index_2);
+		FillHistsDiL(iCut, all_weights, LeptV1, LeptV2, JetsMV, METV, ChiMass,mIntermediate, Channel, electron_index_1,electron_index_2);
 		CFCounter[iCut]+= all_weights;
 		CFCounter_[iCut]+= all_weights;
                 iCFCounter[iCut]++;
@@ -657,19 +655,19 @@ if(muon_index_2>-1 )			LeptV2.SetPtEtaPhiM(mu_pt[muon_index_2], mu_eta[muon_inde
 
 		if (DoNoCut !=iCut && !Cutb) continue;
 		if (iCut>CutN) 
-		FillHistsDiL(iCut, all_weights, LeptV1, LeptV2, JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index_1,muon_index_2);
+		FillHistsDiL(iCut, all_weights, LeptV1, LeptV2, JetsMV, METV, ChiMass,mIntermediate, Channel, electron_index_1,electron_index_2);
 		CFCounter[iCut]+= all_weights;
 		CFCounter_[iCut]+= all_weights;
                 iCFCounter[iCut]++;
 		iCut++;
 
 
-		if (DoNoCut !=iCut && fabs(mu_dz[muon_index_1]) > 0.02) continue;
-		if (DoNoCut !=iCut && fabs(mu_dxy[muon_index_1]) > 0.0045) continue;
-		if (DoNoCut !=iCut && fabs(mu_dz[muon_index_2]) > 0.02) continue;
-		if (DoNoCut !=iCut && fabs(mu_dxy[muon_index_2]) > 0.0045) continue;
+		if (DoNoCut !=iCut && fabs(el_dz[electron_index_1]) > 0.02) continue;
+		if (DoNoCut !=iCut && fabs(el_dxy[electron_index_1]) > 0.0045) continue;
+		if (DoNoCut !=iCut && fabs(el_dz[electron_index_2]) > 0.02) continue;
+		if (DoNoCut !=iCut && fabs(el_dxy[electron_index_2]) > 0.0045) continue;
 		if (iCut>CutN) 
-		FillHistsDiL(iCut, all_weights, LeptV1, LeptV2, JetsMV, METV, ChiMass,mIntermediate, Channel, muon_index_1,muon_index_2);
+		FillHistsDiL(iCut, all_weights, LeptV1, LeptV2, JetsMV, METV, ChiMass,mIntermediate, Channel, electron_index_1,electron_index_2);
 		CFCounter[iCut]+= all_weights;
 		CFCounter_[iCut]+= all_weights;
                 iCFCounter[iCut]++;
