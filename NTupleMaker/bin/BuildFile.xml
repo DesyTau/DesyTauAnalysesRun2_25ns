@@ -143,6 +143,18 @@
  <use name="HTT-utilities/LepEffInterface"/>
 </bin>
 
+<bin name="AnalysisNTupleProducer_TauID" file="AnalysisNTupleProducer_TauID.cpp">
+ <use name="PhysicsTools/Utilities"/>
+ <use name="rootgraphics"/>
+ <use name="root"/>
+ <use name="rootmath"/>
+ <use name="roottmva"/>
+ <use name="boost" />
+ <use name="boost_program_options"/>
+ <use name="DesyTauAnalyses/NTupleMaker"/>
+ <use name="HTT-utilities/LepEffInterface"/>
+</bin>
+
 <bin name="AnalysisNTupleFakeRate" file="AnalysisNTupleFakeRate.cpp">
  <use name="PhysicsTools/Utilities"/>
  <use name="rootgraphics"/>
