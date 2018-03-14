@@ -24,15 +24,11 @@
 
 wdir=`pwd`
 
-cd /nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/CMSSW_8_0_20/src/DesyTauAnalyses/NTupleMaker/test ;  eval `scramv1 runtime -sh` ;
-
-#find /nfs/dust/cms/user/alkaloge/ACD/NAFtools-RunOnProcessed/CMSSW_7_4_4/src/FastSim/Output/*/*/ -type f -name "*.root" > filesMC
+cd /nfs/dust/cms/user/alkaloge/TauAnalysis/new/new/StauAnalysis/New8025/CMSSW_8_0_25/src/DesyTauAnalyses/NTupleMaker/test ;  eval `scramv1 runtime -sh` ;
 
 #ls FastSim_Stau > filesMC
-#ls /nfs/dust/cms/user/alkaloge/ACD/NAFtools-RunOnProcessed/CMSSW_8_0_12/src/miniAOD/Output/StauScanv2/*stau1* > filesMC
-#ls /nfs/dust/cms/user/alkaloge/ACD/NAFtools-RunOnProcessed/CMSSW_8_0_12/src/miniAOD/Output/StauScanv2/*stau2* >> filesMC
-ls /nfs/dust/cms/user/alkaloge/ACD/NAFtools-RunOnProcessed/CMSSW_7_6_3/src/miniAOD/Output/Scan/$1*.root > filesMC
-#ls /nfs/dust/cms/user/alkaloge/ACD/NAFtools-RunOnProcessed/CMSSW_7_4_4/src/FastSim/Output/f > filesMC
+\ls /nfs/dust/cms/user/alkaloge/ACD/NAFtools-RunOnProcessed/CMSSW_8_0_21/src/FastSim/Output_mAOD/files/$1*.root > filesMC
+
 #cat filesMC | head -1  > t 
 #mv t filesMC
 while read line 
@@ -40,18 +36,18 @@ do
 
 	fname=$(basename $line)
 	echo the name is $fname
-	if [[ ! -f $PWD/FastSim_Stau_Out/${fname} ]]  && [[ ! -f $PWD/FastSim_Stau_Out/RootFiles/${fname} ]]; then 
+	if [[ ! -f $PWD/FastSim_Stau_Out/${fname} ]]  && [[ ! -f $PWD/Skims/${fname} ]]; then 
 	cat bssFast > ${fname}_exec.sh
 
-	echo cmsRun TreeProducerFromMiniAOD_76x_MC25ns_signal_${fname}.py >> ${fname}_exec.sh
+	echo cmsRun TreeProducerFromMiniAOD_80x_MC25ns_signal_${fname}.py >> ${fname}_exec.sh
 
 
-	cp TreeProducerFromMiniAOD_76x_MC25ns_signal_template.py TreeProducerFromMiniAOD_76x_MC25ns_signal_${fname}.py
+	cp TreeProducerFromMiniAOD_80x_MC25ns_FastSim_noHLT.py TreeProducerFromMiniAOD_80x_MC25ns_signal_${fname}.py
 
 
-	sed -i 's/FILEIN/'${fname}'/g' TreeProducerFromMiniAOD_76x_MC25ns_signal_${fname}.py
-	sed -i 's/FILEOUT/'${fname}'/g' TreeProducerFromMiniAOD_76x_MC25ns_signal_${fname}.py
-	mv TreeProducerFromMiniAOD_76x_MC25ns_signal_${fname}.py FastSim_Stau
+	sed -i 's/FILEIN/'${fname}'/g' TreeProducerFromMiniAOD_80x_MC25ns_signal_${fname}.py
+	sed -i 's/FILEOUT/'${fname}'/g' TreeProducerFromMiniAOD_80x_MC25ns_signal_${fname}.py
+	mv TreeProducerFromMiniAOD_80x_MC25ns_signal_${fname}.py FastSim_Stau
 	echo $fname
 	qsub ${fname}_exec.sh
 
