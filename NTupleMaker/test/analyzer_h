@@ -889,7 +889,7 @@ if (dogenMET) { met = sqrt(genmet_Ex*genmet_Ex + genmet_Ey*genmet_Ey);
       //mt2_event.set_mn(Chimass);
       //double mt2_value = 0;//= mt2_event.get_mt2();
 				 
-      double MT2v =0 ; MT2v = mt2(v1,v2,vds,ptm,ecm,mxlo);
+      double MT2v =-1 ; MT2v = mt2(v1,v2,vds,ptm,ecm,mxlo);
 
       //cout<<" new mt2 "<<mt2_value<<"  "<<MT2v<<endl;
 
@@ -1165,7 +1165,7 @@ if (Mt2as>40 && Mt2as<120)
       double pb[3] ={tauV.M(), tauV.Px(),tauV.Py()};
       double pmiss[3] ={0., metx,mety};
 				 
-      double MT2v =0 ; MT2v = mt2(v1,v2,vds,ptm,ecm,mxlo);
+      double MT2v =-1 ; MT2v = mt2(v1,v2,vds,ptm,ecm,mxlo);
 
 
       hMt2tautau[CutIndex]->Fill(MT2v,EvWeight);
