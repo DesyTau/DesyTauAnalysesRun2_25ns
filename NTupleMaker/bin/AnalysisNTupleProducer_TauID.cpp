@@ -63,37 +63,6 @@ double dPhiFromLV(TLorentzVector v1, TLorentzVector v2) {
   return dPhiFrom2P(v1.Px(),v1.Py(),v2.Px(),v2.Py());
 
 }
-std::map<TString,TH2D*> GetFakeRates(TString filename) {
-
-  TFile *f1 = TFile::Open(filename);
-  if(!f1){
-    cout<<"File "<<filename<<" does not exists. Exiting."<<endl;
-    exit(-1);
-  }
-  
-  std::vector<TString> isolations;
-  isolations.push_back("Loose");
-  isolations.push_back("Medium");
-  isolations.push_back("Tight");
-  isolations.push_back("LooseMva");
-  isolations.push_back("MediumMva");
-  isolations.push_back("TightMva");
-  isolations.push_back("VTightMva");
-
-  std::map<TString,TH2D*> fakerates;
-
-  int nIso = isolations.size();
-
-  for (int iIso=0; iIso<nIso; ++iIso) {
-    TH2D *g = (TH2D*) f1->Get(isolations.at(iIso));
-    std::cout << isolations.at(iIso) << " : " << g << "  bins = " << g->GetNbinsX() << ":" << g->GetNbinsY() << std::endl;
-    fakerates[isolations.at(iIso)] = g;
-  }
-
-  return fakerates;
-
-}
-
 
 int main(int argc, char * argv[]) {
 
@@ -112,48 +81,28 @@ int main(int argc, char * argv[]) {
   const bool debug = cfg.get<bool>("Debug");
   const bool isData = cfg.get<bool>("IsData");
   const bool applyGoodRunSelection = cfg.get<bool>("ApplyGoodRunSelection");
-  const bool applyHT100Cut = cfg.get<bool>("ApplyHT100Cut");
   const string jsonFile = cfg.get<string>("jsonFile");
   
-  // tau cuts
-  const float ptTauCut  = cfg.get<float>("PtTauCut");
-  const float etaTauCut = cfg.get<float>("EtaTauCut");
-
   // trigger information
   const string metHTLName        = cfg.get<string>("MetHLTName");
   const string singleMuonHLTName = cfg.get<string>("SingleMuonHLTName");
   const string singleMuonHLTFilterName = cfg.get<string>("SingleMuonHLTFilterName");
-  const string singleMuonHLTFilterName1 = cfg.get<string>("SingleMuonHLTFilterName1");
-  const string singleTkMuonHLTFilterName = cfg.get<string>("SingleTkMuonHLTFilterName");
-  const string singleTkMuonHLTFilterName1 = cfg.get<string>("SingleTkMuonHLTFilterName1");
-
-  const string pfJet40HLTFilterName = cfg.get<string>("PFJet40HLTFilterName"); 
   const string pfJet60HLTFilterName = cfg.get<string>("PFJet60HLTFilterName"); 
   const string pfJet80HLTFilterName = cfg.get<string>("PFJet80HLTFilterName"); 
   const string pfJet140HLTFilterName = cfg.get<string>("PFJet140HLTFilterName"); 
-  const string pfJet200HLTFilterName = "";//cfg.get<string>("PFJet200HLTFilterName"); 
-  const string pfJet260HLTFilterName = "";//cfg.get<string>("PFJet260HLTFilterName"); 
-  const string pfJet320HLTFilterName = "";//cfg.get<string>("PFJet320HLTFilterName"); 
-  const string pfJet400HLTFilterName = "";//cfg.get<string>("PFJet400HLTFilterName"); 
-  const string pfJet450HLTFilterName = "";//cfg.get<string>("PFJet450HLTFilterName"); 
-  const string pfJet500HLTFilterName = "";//cfg.get<string>("PFJet500HLTFilterName"); 
+  const string pfJet200HLTFilterName = cfg.get<string>("PFJet200HLTFilterName"); 
 
   TString MetHLTName(metHTLName);
   TString SingleMuonHLTName(singleMuonHLTName);
   TString SingleMuonHLTFilterName(singleMuonHLTFilterName);
-  TString SingleTkMuonHLTFilterName(singleTkMuonHLTFilterName);
-  TString SingleMuonHLTFilterName1(singleMuonHLTFilterName1);
-  TString SingleTkMuonHLTFilterName1(singleTkMuonHLTFilterName1);
-  TString PFJet40HLTFilterName(pfJet40HLTFilterName);
   TString PFJet60HLTFilterName(pfJet60HLTFilterName);
   TString PFJet80HLTFilterName(pfJet80HLTFilterName);
   TString PFJet140HLTFilterName(pfJet140HLTFilterName);
   TString PFJet200HLTFilterName(pfJet200HLTFilterName);
-  TString PFJet260HLTFilterName(pfJet260HLTFilterName);
-  TString PFJet320HLTFilterName(pfJet320HLTFilterName);
-  TString PFJet400HLTFilterName(pfJet400HLTFilterName);
-  TString PFJet450HLTFilterName(pfJet450HLTFilterName);
-  TString PFJet500HLTFilterName(pfJet500HLTFilterName);
+
+  // tau cuts
+  const float ptTauCut  = cfg.get<float>("PtTauCut");
+  const float etaTauCut = cfg.get<float>("EtaTauCut");
 
   // muon selection
   const float ptMuCut       = cfg.get<float>("PtMuCut");
@@ -175,15 +124,11 @@ int main(int argc, char * argv[]) {
   const float dzEleCut   = cfg.get<float>("dzEleCut");
   
   // topological cuts (W*->tau+v)
-  const float ptTauMetRatioLowerCut_WTauNu  = cfg.get<float>("PtTauMetRatioLowerCut_WTauNu"); 
-  const float ptTauMetRatioUpperCut_WTauNu  = cfg.get<float>("PtTauMetRatioUpperCut_WTauNu"); 
   const float deltaPhiTauMetCut_WTauNu      = cfg.get<float>("DeltaPhiTauMetCut_WTauNu");
   const float metCut_WTauNu                 = cfg.get<float>("MetCut_WTauNu");
 
   // topological cuts (W*->mu+v)
   const float ptMuCut_WMuNu               = cfg.get<float>("PtMuCut_WMuNu");
-  const float ptMuMetRatioLowerCut_WMuNu  = cfg.get<float>("PtMuMetRatioLowerCut_WMuNu");
-  const float ptMuMetRatioUpperCut_WMuNu  = cfg.get<float>("PtMuMetRatioUpperCut_WMuNu");
   const float deltaPhiMuMetCut_WMuNu      = cfg.get<float>("DeltaPhiMuMetCut_WMuNu");
   const float metCut_WMuNu                = cfg.get<float>("MetCut_WMuNu");
 
@@ -192,37 +137,24 @@ int main(int argc, char * argv[]) {
   const float ptTrailingMuCut_ZJet     = cfg.get<float>("PtTrailingMuCut_ZJet");
   const float ZMassLowerCut_ZJet       = cfg.get<float>("ZMassLowerCut_ZJet");
   const float ZMassUpperCut_ZJet       = cfg.get<float>("ZMassUpperCut_ZJet");
-  const float ptJetZRatioLowerCut_ZJet = cfg.get<float>("PtJetZRatioLowerCut_ZJet");
-  const float ptJetZRatioUpperCut_ZJet = cfg.get<float>("PtJetZRatioUpperCut_ZJet");
   const float deltaPhiZJetCut_ZJet     = cfg.get<float>("DeltaPhiZJetCut_ZJet");
 
   // topological cuts (W->muv+Jet)
   const float ptMuCut_WJet              = cfg.get<float>("PtMuCut_WJet");
   const float mtCut_WJet                = cfg.get<float>("MtCut_WJet");
-  const float ptJetWRatioLowerCut_WJet  = cfg.get<float>("PtJetWRatioLowerCut_WJet");
-  const float ptJetWRatioUpperCut_WJet  = cfg.get<float>("PtJetWRatioUpperCut_WJet");
   const float deltaPhiWJetCut_WJet      = cfg.get<float>("DeltaPhiWJetCut_WJet");
 
   // topological cuts (dijet)
   const float ptJetCut_DiJet              = cfg.get<float>("PtJetCut_DiJet");
   const float etaJetCut_DiJet             = cfg.get<float>("EtaJetCut_DiJet");
-  const float ptTauJetRatioLowerCut_DiJet = cfg.get<float>("PtTauJetRatioLowerCut_DiJet");
-  const float ptTauJetRatioUpperCut_DiJet = cfg.get<float>("PtTauJetRatioUpperCut_DiJet");
   const float deltaPhiTauJetCut_DiJet     = cfg.get<float>("DeltaPhiTauJetCut_DiJet");
 
   // topological cuts (trigger study)
   const float ZMassCut_Trig = cfg.get<float>("ZMassCut_Trig");
   const float mtCut_Trig = cfg.get<float>("MtCut_Trig");
 
-  // weighting (tau fake rate)
-  const string tauFakeRateFileName = cfg.get<string>("TauFakeRateFileName");
-  const string tauFakeRate1prongFileName = cfg.get<string>("TauFakeRate1prongFileName");
-  const string tauFakeRate1prongPi0FileName = cfg.get<string>("TauFakeRate1prongPi0FileName");
-  const string tauFakeRate3prongFileName = cfg.get<string>("TauFakeRate3prongFileName");
-
   // trigger eff filename
   const string trigEffFileName = cfg.get<string>("TrigEffFileName");
-  const string trigEffFileName74X = cfg.get<string>("TrigEffFileName74X");
 
   // momentum scales
   const float tauMomScale = cfg.get<float>("TauMomScale");
@@ -281,7 +213,6 @@ int main(int argc, char * argv[]) {
   Float_t puWeight_;
   Float_t genWeight_;
   Float_t trigWeight_;
-  Float_t trigWeight74X_;
   Float_t weight_;
 
   UInt_t nVert_;
@@ -309,54 +240,6 @@ int main(int argc, char * argv[]) {
   Float_t tauMatchJetPt_;
   Float_t tauMatchJetEta_;
   Float_t tauMatchJetPhi_;
-
-  //  Float_t effLoose_;
-  //  Float_t effMedium_;
-  //  Float_t effTight_;
-
-  //  Float_t effAntiLLoose_;
-  //  Float_t effAntiLMedium_;
-  //  Float_t effAntiLTight_;
-
-  //  Float_t fakeLoose_;
-  //  Float_t fakeMedium_;
-  //  Float_t fakeTight_;
-
-  Float_t fakeAntiLLoose_;
-  Float_t fakeAntiLMedium_;
-  Float_t fakeAntiLTight_;
-
-  Float_t fakeAntiLLooseUp_[20];
-  Float_t fakeAntiLMediumUp_[20];
-  Float_t fakeAntiLTightUp_[20];
-
-  Float_t fakeAntiLLooseMva_;
-  Float_t fakeAntiLMediumMva_;
-  Float_t fakeAntiLTightMva_;
-  Float_t fakeAntiLVTightMva_;
-
-  Float_t fakeAntiLLooseMvaUp_[20];
-  Float_t fakeAntiLMediumMvaUp_[20];
-  Float_t fakeAntiLTightMvaUp_[20];
-  Float_t fakeAntiLVTightMvaUp_[20];
-
-  Float_t fakeDMAntiLLoose_;
-  Float_t fakeDMAntiLMedium_;
-  Float_t fakeDMAntiLTight_;
-
-  Float_t fakeDMAntiLLooseUp_[20];
-  Float_t fakeDMAntiLMediumUp_[20];
-  Float_t fakeDMAntiLTightUp_[20];
-
-  Float_t fakeDMAntiLLooseMva_;
-  Float_t fakeDMAntiLMediumMva_;
-  Float_t fakeDMAntiLTightMva_;
-  Float_t fakeDMAntiLVTightMva_;
-
-  Float_t fakeDMAntiLLooseMvaUp_[20];
-  Float_t fakeDMAntiLMediumMvaUp_[20];
-  Float_t fakeDMAntiLTightMvaUp_[20];
-  Float_t fakeDMAntiLVTightMvaUp_[20];
 
   Float_t met_;
   Float_t metphi_;
@@ -496,27 +379,15 @@ int main(int argc, char * argv[]) {
   // 11 : single jet + MEt
   // 12 : dijet sample
 
-  Bool_t pfJet40_;
   Bool_t pfJet60_;
   Bool_t pfJet80_;
   Bool_t pfJet140_;
   Bool_t pfJet200_;
-  Bool_t pfJet260_;
-  Bool_t pfJet320_;
-  Bool_t pfJet400_;
-  Bool_t pfJet450_;
-  Bool_t pfJet500_;
 
-  Bool_t pf2Jet40_;
   Bool_t pf2Jet60_;
   Bool_t pf2Jet80_;
   Bool_t pf2Jet140_;
   Bool_t pf2Jet200_;
-  Bool_t pf2Jet260_;
-  Bool_t pf2Jet320_;
-  Bool_t pf2Jet400_;
-  Bool_t pf2Jet450_;
-  Bool_t pf2Jet500_;
 
   UInt_t nJets20_;
   Float_t jet20Pt_[10];
@@ -567,7 +438,6 @@ int main(int argc, char * argv[]) {
   ntuple_->Branch("puWeight",  &puWeight_,  "puWeight/F");
   ntuple_->Branch("genWeight", &genWeight_, "genWeight/F");
   ntuple_->Branch("trigWeight",&trigWeight_,"trigWeight/F");
-  ntuple_->Branch("trigWeight74X",&trigWeight74X_,"trigWeight74X/F");
   ntuple_->Branch("weight",    &weight_,    "weight/F");
   ntuple_->Branch("mueffweight", &mueffweight, "mueffweight/F");
   ntuple_->Branch("mutrigweight",&mutrigweight,"mutrigweight/F");
@@ -592,25 +462,6 @@ int main(int argc, char * argv[]) {
   ntuple_->Branch("nuWEta",&nuWEta_,"nuWEta/F");
   ntuple_->Branch("nuWPhi",&nuWPhi_,"nuWPhi/F");
 
-  ntuple_->Branch("fakeAntiLLoose", &fakeAntiLLoose_, "fakeAntiLLoose/F");
-  ntuple_->Branch("fakeAntiLMedium",&fakeAntiLMedium_,"fakeAntiLMedium/F");
-  ntuple_->Branch("fakeAntiLTight", &fakeAntiLTight_, "fakeAntiLTight/F");
-
-  ntuple_->Branch("fakeAntiLLooseMva", &fakeAntiLLooseMva_, "fakeAntiLLooseMva/F");
-  ntuple_->Branch("fakeAntiLMediumMva",&fakeAntiLMediumMva_,"fakeAntiLMediumMva/F");
-  ntuple_->Branch("fakeAntiLTightMva", &fakeAntiLTightMva_, "fakeAntiLTightMva/F");
-  ntuple_->Branch("fakeAntiLVTightMva", &fakeAntiLVTightMva_, "fakeAntiLVTightMva/F");
-
-  ntuple_->Branch("fakeDMAntiLLoose", &fakeDMAntiLLoose_, "fakeDMAntiLLoose/F");
-  ntuple_->Branch("fakeDMAntiLMedium",&fakeDMAntiLMedium_,"fakeDMAntiLMedium/F");
-  ntuple_->Branch("fakeAntiLTight", &fakeDMAntiLTight_, "fakeDMAntiLTight/F");
-
-  ntuple_->Branch("fakeDMAntiLLooseMva", &fakeDMAntiLLooseMva_, "fakeDMAntiLLooseMva/F");
-  ntuple_->Branch("fakeDMAntiLMediumMva",&fakeDMAntiLMediumMva_,"fakeDMAntiLMediumMva/F");
-  ntuple_->Branch("fakeDMAntiLTightMva", &fakeDMAntiLTightMva_, "fakeDMAntiLTightMva/F");
-  ntuple_->Branch("fakeDMAntiLVTightMva", &fakeDMAntiLVTightMva_, "fakeDMAntiLVTightMva/F");
-
-
   TString numbers[20];
 
   for (int number=0; number<20; ++number) {
@@ -622,24 +473,6 @@ int main(int argc, char * argv[]) {
       sprintf(Number,"%2i",NN);
 
     numbers[number] = TString(Number);
-
-    ntuple_->Branch("fakeAntiLLooseUp"+numbers[number], &fakeAntiLLooseUp_[number], "fakeAntiLLooseUp"+numbers[number]+"/F");
-    ntuple_->Branch("fakeAntiLMediumUp"+numbers[number], &fakeAntiLMediumUp_[number], "fakeAntiLMediumUp"+numbers[number]+"/F");
-    ntuple_->Branch("fakeAntiLTightUp"+numbers[number], &fakeAntiLTightUp_[number], "fakeAntiLTightUp"+numbers[number]+"/F");
-
-    ntuple_->Branch("fakeAntiLLooseMvaUp"+numbers[number], &fakeAntiLLooseMvaUp_[number], "fakeAntiLLooseMvaUp"+numbers[number]+"/F");
-    ntuple_->Branch("fakeAntiLMediumMvaUp"+numbers[number], &fakeAntiLMediumMvaUp_[number], "fakeAntiLMediumMvaUp"+numbers[number]+"/F");
-    ntuple_->Branch("fakeAntiLTightMvaUp"+numbers[number], &fakeAntiLTightMvaUp_[number], "fakeAntiLTightMvaUp"+numbers[number]+"/F");
-    ntuple_->Branch("fakeAntiLVTightMvaUp"+numbers[number], &fakeAntiLVTightMvaUp_[number], "fakeAntiLVTightMvaUp"+numbers[number]+"/F");
-
-    ntuple_->Branch("fakeDMAntiLLooseUp"+numbers[number], &fakeDMAntiLLooseUp_[number], "fakeDMAntiLLooseUp"+numbers[number]+"/F");
-    ntuple_->Branch("fakeDMAntiLMediumUp"+numbers[number], &fakeDMAntiLMediumUp_[number], "fakeDMAntiLMediumUp"+numbers[number]+"/F");
-    ntuple_->Branch("fakeDMAntiLTightUp"+numbers[number], &fakeDMAntiLTightUp_[number], "fakeDMAntiLTightUp"+numbers[number]+"/F");
-
-    ntuple_->Branch("fakeDMAntiLLooseMvaUp"+numbers[number], &fakeDMAntiLLooseMvaUp_[number], "fakeDMAntiLLooseMvaUp"+numbers[number]+"/F");
-    ntuple_->Branch("fakeDMAntiLMediumMvaUp"+numbers[number], &fakeDMAntiLMediumMvaUp_[number], "fakeDMAntiLMediumMvaUp"+numbers[number]+"/F");
-    ntuple_->Branch("fakeDMAntiLTightMvaUp"+numbers[number], &fakeDMAntiLTightMvaUp_[number], "fakeDMAntiLTightMvaUp"+numbers[number]+"/F");
-    ntuple_->Branch("fakeDMAntiLVTightMvaUp"+numbers[number], &fakeDMAntiLVTightMvaUp_[number], "fakeDMAntiLVTightMvaUp"+numbers[number]+"/F");
 
   }
 
@@ -769,27 +602,15 @@ int main(int argc, char * argv[]) {
   ntuple_->Branch("mhtNoMu",&mhtNoMu_,"mhtNoMu/F");
   ntuple_->Branch("metNoMu",&metNoMu_,"metNoMu/F");
 
-  ntuple_->Branch("pfJet40",&pfJet40_,"pfJet40/O");
   ntuple_->Branch("pfJet60",&pfJet60_,"pfJet60/O");
   ntuple_->Branch("pfJet80",&pfJet80_,"pfJet80/O");
   ntuple_->Branch("pfJet140",&pfJet140_,"pfJet140/O");
   ntuple_->Branch("pfJet200",&pfJet200_,"pfJet200/O");
-  ntuple_->Branch("pfJet260",&pfJet260_,"pfJet260/O");
-  ntuple_->Branch("pfJet320",&pfJet320_,"pfJet320/O");
-  ntuple_->Branch("pfJet400",&pfJet400_,"pfJet400/O");
-  ntuple_->Branch("pfJet450",&pfJet450_,"pfJet450/O");
-  ntuple_->Branch("pfJet500",&pfJet500_,"pfJet500/O");
 
-  ntuple_->Branch("pf2Jet40",&pf2Jet40_,"pf2Jet40/O");
   ntuple_->Branch("pf2Jet60",&pf2Jet60_,"pf2Jet60/O");
   ntuple_->Branch("pf2Jet80",&pf2Jet80_,"pf2Jet80/O");
   ntuple_->Branch("pf2Jet140",&pf2Jet140_,"p2fJet140/O");
   ntuple_->Branch("pf2Jet200",&pf2Jet200_,"p2fJet200/O");
-  ntuple_->Branch("pf2Jet260",&pf2Jet260_,"p2fJet260/O");
-  ntuple_->Branch("pf2Jet320",&pf2Jet320_,"p2fJet320/O");
-  ntuple_->Branch("pf2Jet400",&pf2Jet400_,"p2fJet400/O");
-  ntuple_->Branch("pf2Jet450",&pf2Jet450_,"p2fJet450/O");
-  ntuple_->Branch("pf2Jet500",&pf2Jet500_,"p2fJet500/O");
 
   ntuple_->Branch("Selection",&selection_,"Selection/I");
 
@@ -827,7 +648,7 @@ int main(int argc, char * argv[]) {
 
   // Good run selection
   std::vector<Period> periods;
-  string fullPathToJsonFile = cmsswBase + "/src/DesyTauAnalyses/NTupleMaker/test/json/" + jsonFile;
+  string fullPathToJsonFile = cmsswBase + "/src/" + jsonFile;
   
   if (isData) {
     std::fstream inputFileStream(fullPathToJsonFile.c_str(), std::ios::in);
@@ -844,16 +665,18 @@ int main(int argc, char * argv[]) {
 	ss >> periods.back();
       }
   }
-  
-  // Official PU reweighting
-  PileUp * PUofficial = new PileUp();
-  TFile * filePUOfficial_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/"+PUDataFile,"read");
-  TFile * filePUOfficial_MC = new TFile (TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/"+PUMCFile, "read");
-  TH1D * PUOfficial_data = (TH1D *)filePUOfficial_data->Get("pileup");
-  TString NamePUHistMC = samplenameForPUHist + "_pileup";
-  TH1D * PUOfficial_mc = (TH1D *)filePUOfficial_MC->Get(NamePUHistMC);
-  PUofficial->set_h_data(PUOfficial_data);
-  PUofficial->set_h_MC(PUOfficial_mc);
+ 
+  PileUp * PUofficial = new PileUp(); 
+  if (!isData){
+    // Official PU reweighting
+    TFile * filePUOfficial_data = new TFile(TString(cmsswBase)+"/src/"+PUDataFile,"read");
+    TFile * filePUOfficial_MC = new TFile (TString(cmsswBase)+"/src/"+PUMCFile, "read");
+    TH1D * PUOfficial_data = (TH1D *)filePUOfficial_data->Get("pileup");
+    TString NamePUHistMC = samplenameForPUHist + "_pileup";
+    TH1D * PUOfficial_mc = (TH1D *)filePUOfficial_MC->Get(NamePUHistMC);
+    PUofficial->set_h_data(PUOfficial_data);
+    PUofficial->set_h_MC(PUOfficial_mc);
+  }
   
   ScaleFactor * SF_muonIdIso = new ScaleFactor();
   ScaleFactor * SF_muonTrig = new ScaleFactor();
@@ -866,12 +689,6 @@ int main(int argc, char * argv[]) {
   TF1 * trigEffDataUpperMt = (TF1*)trigEffFile->Get("MhtGt130_data");
   TF1 * trigEffMCLowerMt   = (TF1*)trigEffFile->Get("MhtLt130_mc");
   TF1 * trigEffMCUpperMt   = (TF1*)trigEffFile->Get("MhtGt130_mc");
-  
-  TFile * trigEffFile_74X = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/"+trigEffFileName74X);
-  TF1 * trigEffDataLowerMt_74X = (TF1*)trigEffFile_74X->Get("MhtLt100_data");
-  TF1 * trigEffDataUpperMt_74X = (TF1*)trigEffFile_74X->Get("MhtGt100_data");
-  TF1 * trigEffMCLowerMt_74X   = (TF1*)trigEffFile_74X->Get("MhtLt100_mc");
-  TF1 * trigEffMCUpperMt_74X   = (TF1*)trigEffFile_74X->Get("MhtGt100_mc");
   
   // MEt filters
   std::vector<TString> metFlags; metFlags.clear();
@@ -888,25 +705,6 @@ int main(int argc, char * argv[]) {
   metFlags.push_back("Flag_BadPFMuonFilter");
   metFlags.push_back("Flag_ecalBadCalibFilter");
   
-  // Read fake rates
-  TString file_tauFakeRate = TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/"+tauFakeRateFileName;
-  std::map<TString,TH2D*>  fakerates = GetFakeRates(file_tauFakeRate);
-
-  file_tauFakeRate = TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/"+tauFakeRate1prongFileName;
-  std::map<TString,TH2D*>  fakerates1prong = GetFakeRates(file_tauFakeRate);
-
-  file_tauFakeRate = TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/"+tauFakeRate1prongPi0FileName;
-  std::map<TString,TH2D*>  fakerates1prongPi0 = GetFakeRates(file_tauFakeRate);
-
-  file_tauFakeRate = TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/"+tauFakeRate3prongFileName;
-  std::map<TString,TH2D*>  fakerates3prong = GetFakeRates(file_tauFakeRate);
-
-  int nBins = fakerates["Loose"]->GetNbinsX();
-  double bins[20];
-  for (int iBin=0; iBin<=nBins; iBin++)
-    bins[iBin] = fakerates["Loose"]->GetYaxis()->GetBinLowEdge(iBin+1);
-  TH1D * binsH = new TH1D("binsH","",nBins,bins);
-
   int nFiles = 0;
   int nEvents = 0;
   int ZJetEvents = 0;
@@ -970,7 +768,6 @@ int main(int argc, char * argv[]) {
       weight_ = 1;
       genWeight_ = 1;
       trigWeight_ = 1;
-      trigWeight74X_ = 1;
       puWeight_ = 1;
 
       trig_ = false;
@@ -991,31 +788,6 @@ int main(int argc, char * argv[]) {
       nuWPt_ = -1;
       nuWEta_ = 0;
       nuWPhi_ = 0;
-
-      //      fakeLoose_ = 1.;
-      //      fakeMedium_ = 1.;
-      //      fakeTight_ = 1.;
-
-
-      fakeAntiLLoose_ = 1.;
-      fakeAntiLMedium_ = 1.;
-      fakeAntiLTight_ = 1.;
-
-      fakeAntiLLooseMva_ = 1.;
-      fakeAntiLMediumMva_ = 1.;
-      fakeAntiLTightMva_ = 1.;
-      fakeAntiLVTightMva_ = 1.;
-
-      
-      for (int in=0; in<6; ++in) {
-	fakeAntiLLooseMvaUp_[in] = 1.0;
-	fakeAntiLMediumMvaUp_[in] = 1.0;
-	fakeAntiLTightMvaUp_[in] = 1.0;
-	fakeAntiLVTightMvaUp_[in] = 1.0;
-	fakeAntiLLooseUp_[in] = 1.0;
-	fakeAntiLMediumUp_[in] = 1.0;
-	fakeAntiLTightUp_[in] = 1.0;
-      }
 
       met_ =  -1;
       metphi_ =  0;
@@ -1140,27 +912,15 @@ int main(int argc, char * argv[]) {
 
       selection_ = -1;
 
-      pfJet40_ = false;
       pfJet60_ = false;
       pfJet80_ = false;
       pfJet140_ = false;
       pfJet200_ = false;
-      pfJet260_ = false;
-      pfJet320_ = false;
-      pfJet400_ = false;
-      pfJet450_ = false;
-      pfJet500_ = false;
 
-      pf2Jet40_ = false;
       pf2Jet60_ = false;
       pf2Jet80_ = false;
       pf2Jet140_ = false;
       pf2Jet200_ = false;
-      pf2Jet260_ = false;
-      pf2Jet320_ = false;
-      pf2Jet400_ = false;
-      pf2Jet450_ = false;
-      pf2Jet500_ = false;
 
       mueffweight = 1;
       mutrigweight = 1;
@@ -1205,8 +965,6 @@ int main(int argc, char * argv[]) {
       }
       histWeightsH->Fill(double(0.),double(genWeight_));
       
-      if (applyHT100Cut && !isData && analysisTree.genparticles_lheHt>100) continue; 
-
       // **********************************
       // *** Analysis of generator info ***
       // **********************************
@@ -1419,12 +1177,6 @@ int main(int argc, char * argv[]) {
       unsigned int nSingleMuonHLTFilter = 0;
       bool isSingleMuonHLTFilter = false;
 
-      unsigned int nSingleTkMuonHLTFilter = 0;
-      bool isSingleTkMuonHLTFilter = false;
-
-      unsigned int nPFJet40HLTFilter = 0;
-      bool isPFJet40HLTFilter = false;
-
       unsigned int nPFJet60HLTFilter = 0;
       bool isPFJet60HLTFilter = false;
       
@@ -1437,35 +1189,12 @@ int main(int argc, char * argv[]) {
       unsigned int nPFJet200HLTFilter = 0;
       bool isPFJet200HLTFilter = false;
 
-      unsigned int nPFJet260HLTFilter = 0;
-      bool isPFJet260HLTFilter = false;
-
-      unsigned int nPFJet320HLTFilter = 0;
-      bool isPFJet320HLTFilter = false;
-
-      unsigned int nPFJet400HLTFilter = 0;
-      bool isPFJet400HLTFilter = false;
-
-      unsigned int nPFJet450HLTFilter = 0;
-      bool isPFJet450HLTFilter = false;
-
-      unsigned int nPFJet500HLTFilter = 0;
-      bool isPFJet500HLTFilter = false;
-      
       for (unsigned int i=0; i<analysisTree.run_hltfilters->size(); ++i) {
 	//	std::cout << "HLT Filter : " << i << " = " << analysisTree.run_hltfilters->at(i) << std::endl;
 	TString HLTFilter(analysisTree.run_hltfilters->at(i));
-	if (HLTFilter==SingleMuonHLTFilterName||HLTFilter==SingleMuonHLTFilterName1) {
+	if (HLTFilter==SingleMuonHLTFilterName) {
 	  nSingleMuonHLTFilter = i;
 	  isSingleMuonHLTFilter = true;
-	}
-	if (HLTFilter==SingleTkMuonHLTFilterName||HLTFilter==SingleTkMuonHLTFilterName1) {
-	  nSingleTkMuonHLTFilter = i;
-	  isSingleTkMuonHLTFilter = true;
-	}
-	if (HLTFilter==PFJet40HLTFilterName) {
-	  nPFJet40HLTFilter = i;
-	  isPFJet40HLTFilter = true;
 	}
 	if (HLTFilter==PFJet60HLTFilterName) {
 	  nPFJet60HLTFilter = i;
@@ -1483,38 +1212,10 @@ int main(int argc, char * argv[]) {
 	  nPFJet200HLTFilter = i;
 	  isPFJet200HLTFilter = true;
 	}
-	if (HLTFilter==PFJet260HLTFilterName) {
-	  nPFJet260HLTFilter = i;
-	  isPFJet260HLTFilter = true;
-	}
-	if (HLTFilter==PFJet320HLTFilterName) {
-	  nPFJet320HLTFilter = i;
-	  isPFJet320HLTFilter = true;
-	}
-	if (HLTFilter==PFJet400HLTFilterName) {
-	  nPFJet400HLTFilter = i;
-	  isPFJet400HLTFilter = true;
-	}
-	if (HLTFilter==PFJet450HLTFilterName) {
-	  nPFJet450HLTFilter = i;
-	  isPFJet450HLTFilter = true;
-	}
-	if (HLTFilter==PFJet500HLTFilterName) {
-	  nPFJet500HLTFilter = i;
-	  isPFJet500HLTFilter = true;
-	}
       }
       //      if (isData) {
       if (!isSingleMuonHLTFilter) {
 	std::cout << "HLT filter " << SingleMuonHLTFilterName << " not found" << std::endl;
-	exit(-1);
-      }
-      if (!isSingleTkMuonHLTFilter) {
-	std::cout << "HLT filter " << SingleTkMuonHLTFilterName << " not found" << std::endl;
-	exit(-1);
-      }
-      if (!isPFJet40HLTFilter) {
-	std::cout << "HLT filter " << PFJet40HLTFilterName << " not found" << std::endl;
 	exit(-1);
       }
       if (!isPFJet60HLTFilter) {
@@ -1529,34 +1230,11 @@ int main(int argc, char * argv[]) {
 	std::cout << "HLT filter " << PFJet140HLTFilterName << " not found" << std::endl;
 	exit(-1);
       }
-      /*
+
       if (!isPFJet200HLTFilter) {
 	std::cout << "HLT filter " << PFJet200HLTFilterName << " not found" << std::endl;
 	exit(-1);
       }
-      if (!isPFJet260HLTFilter) {
-	std::cout << "HLT filter " << PFJet260HLTFilterName << " not found" << std::endl;
-	exit(-1);
-      }
-      if (!isPFJet320HLTFilter) {
-	std::cout << "HLT filter " << PFJet320HLTFilterName << " not found" << std::endl;
-	exit(-1);
-      }
-      if (!isPFJet400HLTFilter) {
-	std::cout << "HLT filter " << PFJet400HLTFilterName << " not found" << std::endl;
-	exit(-1);
-      }
-      if (!isPFJet450HLTFilter) {
-	std::cout << "HLT filter " << PFJet450HLTFilterName << " not found" << std::endl;
-	exit(-1);
-      }
-      if (!isPFJet500HLTFilter) {
-	std::cout << "HLT filter " << PFJet500HLTFilterName << " not found" << std::endl;
-	exit(-1);
-      }
-      */
-      //    }
-
       // ************************************
       // **** end accessing trigger info ****
       // ************************************
@@ -1686,8 +1364,7 @@ int main(int argc, char * argv[]) {
 	    float dRtrig = deltaR(analysisTree.muon_eta[imuon],analysisTree.muon_phi[imuon],
 				  analysisTree.trigobject_eta[iT],analysisTree.trigobject_phi[iT]);
 	    if (dRtrig>0.5) continue;
-	    if (analysisTree.trigobject_filters[iT][nSingleMuonHLTFilter]||
-		analysisTree.trigobject_filters[iT][nSingleTkMuonHLTFilter]) trigMatch = true;
+	    if (analysisTree.trigobject_filters[iT][nSingleMuonHLTFilter]) trigMatch = true;
 
 	  }
 	  if (trigMatch&&analysisTree.muon_pt[imuon]>ptTriggerMu) {
@@ -1833,18 +1510,11 @@ int main(int argc, char * argv[]) {
       float htForward20 = 0;
       float htForward30 = 0;
       std::vector<unsigned int> triggerJetsIndexes; triggerJetsIndexes.clear();
-      std::vector<bool> jets40trigger; jets40trigger.clear();
       std::vector<bool> jets60trigger; jets60trigger.clear();
       std::vector<bool> jets80trigger; jets80trigger.clear();
       std::vector<bool> jets140trigger; jets140trigger.clear();
       std::vector<bool> jets200trigger; jets200trigger.clear();
-      std::vector<bool> jets260trigger; jets260trigger.clear();
-      std::vector<bool> jets320trigger; jets320trigger.clear();
-      std::vector<bool> jets400trigger; jets400trigger.clear();
-      std::vector<bool> jets450trigger; jets450trigger.clear();
-      std::vector<bool> jets500trigger; jets500trigger.clear();
-      //      if (analysisTree.pfjet_count>100)
-	//	std::cout << "pfjet_count = " << analysisTree.pfjet_count << endl;
+
       for (unsigned int ijet=0; ijet<analysisTree.pfjet_count; ++ijet) {
 
 	float scaleJ = 1;
@@ -1948,55 +1618,31 @@ int main(int argc, char * argv[]) {
 	// triggering jets
 	if (analysisTree.pfjet_pt[ijet]<ptJetCut_DiJet) continue;
 	if (absJetEta>etaJetCut_DiJet) continue;
-	bool trigMatch40 = false;
 	bool trigMatch60 = false;
 	bool trigMatch80 = false;
 	bool trigMatch140 = false;
 	bool trigMatch200 = false;
-	bool trigMatch260 = false;
-	bool trigMatch320 = false;
-	bool trigMatch400 = false;
-	bool trigMatch450 = false;
-	bool trigMatch500 = false;
 	for (unsigned int iT=0; iT<analysisTree.trigobject_count; ++iT) {
 	  float dRtrig = deltaR(analysisTree.pfjet_eta[ijet],analysisTree.pfjet_phi[ijet],
 				analysisTree.trigobject_eta[iT],analysisTree.trigobject_phi[iT]);
 	  if (dRtrig>0.5) continue;
-	  if ((analysisTree.trigobject_filters[iT][nPFJet40HLTFilter]&&isPFJet40HLTFilter))   trigMatch40 = true; 
+
 	  if ((analysisTree.trigobject_filters[iT][nPFJet60HLTFilter]&&isPFJet60HLTFilter))   trigMatch60 = true;
 	  if ((analysisTree.trigobject_filters[iT][nPFJet80HLTFilter]&&isPFJet80HLTFilter))   trigMatch80 = true; 
 	  if ((analysisTree.trigobject_filters[iT][nPFJet140HLTFilter]&&isPFJet140HLTFilter)) trigMatch140 = true;
 	  if ((analysisTree.trigobject_filters[iT][nPFJet200HLTFilter]&&isPFJet200HLTFilter)) trigMatch200 = true;
-	  if ((analysisTree.trigobject_filters[iT][nPFJet260HLTFilter]&&isPFJet260HLTFilter)) trigMatch260 = true;
-	  if ((analysisTree.trigobject_filters[iT][nPFJet320HLTFilter]&&isPFJet320HLTFilter)) trigMatch320 = true;
-	  if ((analysisTree.trigobject_filters[iT][nPFJet400HLTFilter]&&isPFJet400HLTFilter)) trigMatch400 = true;
-	  if ((analysisTree.trigobject_filters[iT][nPFJet450HLTFilter]&&isPFJet450HLTFilter)) trigMatch450 = true;
-	  if ((analysisTree.trigobject_filters[iT][nPFJet500HLTFilter]&&isPFJet500HLTFilter)) trigMatch500 = true;
-	  
 	}
 	if (!isData) {
-	  trigMatch40 = true;
 	  trigMatch60 = true;
 	  trigMatch80 = true;
 	  trigMatch140 = true;
 	  trigMatch200 = true;
-	  trigMatch260 = true;
-	  trigMatch320 = true;
-	  trigMatch400 = true;
-	  trigMatch450 = true;
-	  trigMatch500 = true;
 	}
 	triggerJetsIndexes.push_back(ijet);
-	jets40trigger.push_back(trigMatch40);
 	jets60trigger.push_back(trigMatch60);
 	jets80trigger.push_back(trigMatch80);
 	jets140trigger.push_back(trigMatch140);
 	jets200trigger.push_back(trigMatch200);
-	jets260trigger.push_back(trigMatch260);
-	jets320trigger.push_back(trigMatch320);
-	jets400trigger.push_back(trigMatch400);
-	jets450trigger.push_back(trigMatch450);
-	jets500trigger.push_back(trigMatch500);
       }
       nJetsCentral20_ = centralJets20Indexes.size();
       nJetsCentral30_ = centralJets30Indexes.size();
@@ -2020,16 +1666,10 @@ int main(int argc, char * argv[]) {
 	jetChargedHadMult_ = analysisTree.pfjet_chargedhadronmulti[indexJet0];
 	jetNeutralEMEnergyFraction_  = analysisTree.pfjet_neutralemenergy[indexJet0]/analysisTree.pfjet_e[indexJet0];
 	jetNeutralHadEnergyFraction_ = analysisTree.pfjet_neutralhadronicenergy[indexJet0]/analysisTree.pfjet_e[indexJet0];  
-	pfJet40_ = false;
 	pfJet60_ = false;
 	pfJet80_ = false;
 	pfJet140_ = false;
 	pfJet200_ = false;
-	pfJet260_ = false;
-	pfJet320_ = false;
-	pfJet400_ = false;
-	pfJet450_ = false;
-	pfJet500_ = false;
 	lorentzVectorJet.SetXYZT(analysisTree.pfjet_px[indexJet0],
 				 analysisTree.pfjet_py[indexJet0],
 				 analysisTree.pfjet_pz[indexJet0],
@@ -2038,16 +1678,10 @@ int main(int argc, char * argv[]) {
 	  float dRtrig = deltaR(analysisTree.pfjet_eta[indexJet0],analysisTree.pfjet_phi[indexJet0],
 				analysisTree.trigobject_eta[iT],analysisTree.trigobject_phi[iT]);
 	  if (dRtrig>0.5) continue;
-	  if ((analysisTree.trigobject_filters[iT][nPFJet40HLTFilter]&&isPFJet40HLTFilter))   pfJet40_  = true; 
 	  if ((analysisTree.trigobject_filters[iT][nPFJet60HLTFilter]&&isPFJet60HLTFilter))   pfJet60_  = true;
 	  if ((analysisTree.trigobject_filters[iT][nPFJet80HLTFilter]&&isPFJet80HLTFilter))   pfJet80_  = true; 
 	  if ((analysisTree.trigobject_filters[iT][nPFJet140HLTFilter]&&isPFJet140HLTFilter)) pfJet140_ = true;
 	  if ((analysisTree.trigobject_filters[iT][nPFJet200HLTFilter]&&isPFJet200HLTFilter)) pfJet200_ = true;
-	  if ((analysisTree.trigobject_filters[iT][nPFJet260HLTFilter]&&isPFJet260HLTFilter)) pfJet260_ = true;
-	  if ((analysisTree.trigobject_filters[iT][nPFJet320HLTFilter]&&isPFJet320HLTFilter)) pfJet320_ = true;
-	  if ((analysisTree.trigobject_filters[iT][nPFJet400HLTFilter]&&isPFJet400HLTFilter)) pfJet400_ = true;
-	  if ((analysisTree.trigobject_filters[iT][nPFJet450HLTFilter]&&isPFJet450HLTFilter)) pfJet450_ = true;
-	  if ((analysisTree.trigobject_filters[iT][nPFJet500HLTFilter]&&isPFJet500HLTFilter)) pfJet500_ = true;
 	}
       }
       if (nJetsCentral30_>1) {
@@ -2060,16 +1694,10 @@ int main(int argc, char * argv[]) {
 	jet2ChargedHadMult_ = analysisTree.pfjet_chargedhadronmulti[indexJet1];
 	jet2NeutralEMEnergyFraction_  = analysisTree.pfjet_neutralemenergy[indexJet1]/analysisTree.pfjet_e[indexJet1];
 	jet2NeutralHadEnergyFraction_ = analysisTree.pfjet_neutralhadronicenergy[indexJet1]/analysisTree.pfjet_e[indexJet1];  
-	pf2Jet40_ = false;
 	pf2Jet60_ = false;
 	pf2Jet80_ = false;
 	pf2Jet140_ = false;
 	pf2Jet200_ = false;
-	pf2Jet260_ = false;
-	pf2Jet320_ = false;
-	pf2Jet400_ = false;
-	pf2Jet450_ = false;
-	pf2Jet500_ = false;
 	lorentzVectorJet2.SetXYZT(analysisTree.pfjet_px[indexJet1],
 				  analysisTree.pfjet_py[indexJet1],
 				  analysisTree.pfjet_pz[indexJet1],
@@ -2078,16 +1706,10 @@ int main(int argc, char * argv[]) {
 	  float dRtrig = deltaR(analysisTree.pfjet_eta[indexJet1],analysisTree.pfjet_phi[indexJet1],
 				analysisTree.trigobject_eta[iT],analysisTree.trigobject_phi[iT]);
 	  if (dRtrig>0.5) continue;
-	  if ((analysisTree.trigobject_filters[iT][nPFJet40HLTFilter]&&isPFJet40HLTFilter))   pf2Jet40_  = true;
 	  if ((analysisTree.trigobject_filters[iT][nPFJet60HLTFilter]&&isPFJet60HLTFilter))   pf2Jet60_  = true;
 	  if ((analysisTree.trigobject_filters[iT][nPFJet80HLTFilter]&&isPFJet80HLTFilter))   pf2Jet80_  = true;
 	  if ((analysisTree.trigobject_filters[iT][nPFJet140HLTFilter]&&isPFJet140HLTFilter)) pf2Jet140_ = true;
 	  if ((analysisTree.trigobject_filters[iT][nPFJet200HLTFilter]&&isPFJet200HLTFilter)) pf2Jet200_ = true;
-	  if ((analysisTree.trigobject_filters[iT][nPFJet260HLTFilter]&&isPFJet260HLTFilter)) pf2Jet260_ = true;
-	  if ((analysisTree.trigobject_filters[iT][nPFJet320HLTFilter]&&isPFJet320HLTFilter)) pf2Jet320_ = true;
-	  if ((analysisTree.trigobject_filters[iT][nPFJet400HLTFilter]&&isPFJet400HLTFilter)) pf2Jet400_ = true;
-	  if ((analysisTree.trigobject_filters[iT][nPFJet450HLTFilter]&&isPFJet450HLTFilter)) pf2Jet450_ = true;
-	  if ((analysisTree.trigobject_filters[iT][nPFJet500HLTFilter]&&isPFJet500HLTFilter)) pf2Jet500_ = true;
 	}
       }
       
@@ -2364,147 +1986,6 @@ int main(int argc, char * argv[]) {
 	tauJetPhi_ = lorentzVectorTauJet.Phi();
 	tauJetTightId_ = tightJetiD(analysisTree,indexMatchingJet);
 
-	// Add fake rates to tree
-	// check pt bin
-	double tauJetPtRatio = TMath::Min(double(tauPt_ / tauJetPt_), double(1.5));
-	double tauJetPtX = TMath::Max(double(101.),TMath::Min(double(tauJetPt_),double(999.)));
-	int ptBin = fakerates[TString("Loose")]->FindBin(tauJetPtRatio,tauJetPtX);
-	std::map<TString,TH2D*> fakeratesDM;
-	if (tauDecay_==0) 
-	  fakeratesDM = fakerates1prong;
-	else if (tauDecay_>=10)
-	  fakeratesDM = fakerates3prong;
-	else
-	  fakeratesDM = fakerates1prongPi0;
-
-	fakeAntiLLoose_  = fakerates[TString("Loose")]->GetBinContent(ptBin);
-	fakeAntiLMedium_ = fakerates[TString("Medium")]->GetBinContent(ptBin);
-	fakeAntiLTight_  = fakerates[TString("Tight")]->GetBinContent(ptBin);
-	
-	fakeAntiLLooseMva_   = fakerates[TString("LooseMva")]->GetBinContent(ptBin);
-	fakeAntiLMediumMva_  = fakerates[TString("MediumMva")]->GetBinContent(ptBin);
-	fakeAntiLTightMva_   = fakerates[TString("TightMva")]->GetBinContent(ptBin);
-	fakeAntiLVTightMva_  = fakerates[TString("VTightMva")]->GetBinContent(ptBin);
-	
-	fakeDMAntiLLoose_  = fakeratesDM[TString("Loose")]->GetBinContent(ptBin);
-	fakeDMAntiLMedium_ = fakeratesDM[TString("Medium")]->GetBinContent(ptBin);
-	fakeDMAntiLTight_  = fakeratesDM[TString("Tight")]->GetBinContent(ptBin);
-	
-	fakeDMAntiLLooseMva_   = fakeratesDM[TString("LooseMva")]->GetBinContent(ptBin);
-	fakeDMAntiLMediumMva_  = fakeratesDM[TString("MediumMva")]->GetBinContent(ptBin);
-	fakeDMAntiLTightMva_   = fakeratesDM[TString("TightMva")]->GetBinContent(ptBin);
-	fakeDMAntiLVTightMva_  = fakeratesDM[TString("VTightMva")]->GetBinContent(ptBin);
-	
-	float fakeAntiLLooseE_  = fakerates[TString("Loose")]->GetBinError(ptBin);
-	float fakeAntiLMediumE_ = fakerates[TString("Medium")]->GetBinError(ptBin);
-	float fakeAntiLTightE_  = fakerates[TString("Tight")]->GetBinError(ptBin);
-	
-	float fakeAntiLLooseMvaE_   = fakerates[TString("LooseMva")]->GetBinError(ptBin);
-	float fakeAntiLMediumMvaE_  = fakerates[TString("MediumMva")]->GetBinError(ptBin);
-	float fakeAntiLTightMvaE_   = fakerates[TString("TightMva")]->GetBinError(ptBin);
-	float fakeAntiLVTightMvaE_  = fakerates[TString("VTightMva")]->GetBinError(ptBin);
-
-	float fakeDMAntiLLooseE_  = fakeratesDM[TString("Loose")]->GetBinError(ptBin);
-	float fakeDMAntiLMediumE_ = fakeratesDM[TString("Medium")]->GetBinError(ptBin);
-	float fakeDMAntiLTightE_  = fakeratesDM[TString("Tight")]->GetBinError(ptBin);
-	
-	float fakeDMAntiLLooseMvaE_   = fakeratesDM[TString("LooseMva")]->GetBinError(ptBin);
-	float fakeDMAntiLMediumMvaE_  = fakeratesDM[TString("MediumMva")]->GetBinError(ptBin);
-	float fakeDMAntiLTightMvaE_   = fakeratesDM[TString("TightMva")]->GetBinError(ptBin);
-	float fakeDMAntiLVTightMvaE_  = fakeratesDM[TString("VTightMva")]->GetBinError(ptBin);
-
-	int binRatio = 0;
-	int binPt = 0;
-	if (tauJetPtRatio<0.75)
-	  binRatio = 0;
-	else if (tauJetPtRatio<0.825)
-	  binRatio = 1;
-	else if (tauJetPtRatio<0.9)
-	  binRatio = 2;
-	else
-	  binRatio = 3;
-
-	if (tauJetPtX<150.)
-	  binPt = 0;
-	else if (tauJetPtX<200.)
-	  binPt = 1;
-	else if (tauJetPtX<350.)
-	  binPt = 2;
-	else if (tauJetPtX<500.)
-	  binPt = 3;
-	else
-	  binPt = 4;
-
-	int bin2D = 4*binPt + binRatio;
-	//	std::cout << bin2D << std::endl;
-
-
-	/*
-	if (tauMediumMvaIso_>0.5) { 
-	  std::cout << " tauPt/jetPt = " << tauJetPtRatio << "  jetPt = " << tauJetPtX << "   bin = " << ptBin << std::endl;
-	  std::cout << "       Loose  = " << fakeAntiLLooseE_/fakeAntiLLoose_ << std::endl;
-	  std::cout << "       Medium = " << fakeAntiLMediumE_/fakeAntiLMedium_<< std::endl;
-	  std::cout << "       Tight = " << fakeAntiLTightE_ /fakeAntiLTight_<< std::endl;
-	  std::cout << "       MvaLoose  = " << fakeAntiLLooseMvaE_  / fakeAntiLLooseMva_<< std::endl;
-	  std::cout << "       MvaMedium = " << fakeAntiLMediumMvaE_ / fakeAntiLMediumMva_<< std::endl;
-	  std::cout << "       MvaTight   = " << fakeAntiLTightMvaE_ / fakeAntiLTightMva_<< std::endl;
-	  std::cout << "       MvaVTight = " << fakeAntiLVTightMvaE_ / fakeAntiLVTightMva_<< std::endl;
-	  std::cout << std::endl;
-	}
-
-	*/
-	for (int in=0; in<20; ++in) {
-
-	  fakeAntiLLooseUp_[in]  = fakeAntiLLoose_;
-	  fakeAntiLMediumUp_[in] = fakeAntiLMedium_;
-	  fakeAntiLTightUp_[in]  = fakeAntiLTight_;
-	  
-	  fakeAntiLLooseMvaUp_[in]   = fakeAntiLLooseMva_;
-	  fakeAntiLMediumMvaUp_[in]  = fakeAntiLMediumMva_;
-	  fakeAntiLTightMvaUp_[in]   = fakeAntiLTightMva_;
-	  fakeAntiLVTightMvaUp_[in]  = fakeAntiLVTightMva_;
-
-	  fakeDMAntiLLooseUp_[in]  = fakeDMAntiLLoose_;
-	  fakeDMAntiLMediumUp_[in] = fakeDMAntiLMedium_;
-	  fakeDMAntiLTightUp_[in]  = fakeDMAntiLTight_;
-	  
-	  fakeDMAntiLLooseMvaUp_[in]   = fakeDMAntiLLooseMva_;
-	  fakeDMAntiLMediumMvaUp_[in]  = fakeDMAntiLMediumMva_;
-	  fakeDMAntiLTightMvaUp_[in]   = fakeDMAntiLTightMva_;
-	  fakeDMAntiLVTightMvaUp_[in]  = fakeDMAntiLVTightMva_;
-
-	  if (in==bin2D) {
-
-	    fakeAntiLLooseUp_[in] += fakeAntiLLooseE_;
-	    fakeAntiLMediumUp_[in] += fakeAntiLMediumE_;
-	    fakeAntiLTightUp_[in] += fakeAntiLTightE_;
-	    fakeAntiLLooseMvaUp_[in] += fakeAntiLLooseMvaE_;
-	    fakeAntiLMediumMvaUp_[in] += fakeAntiLMediumMvaE_;
-	    fakeAntiLTightMvaUp_[in] += fakeAntiLTightMvaE_;
-	    fakeAntiLVTightMvaUp_[in] += fakeAntiLVTightMvaE_;
-
-	    fakeDMAntiLLooseUp_[in] += fakeDMAntiLLooseE_;
-	    fakeDMAntiLMediumUp_[in] += fakeDMAntiLMediumE_;
-	    fakeDMAntiLTightUp_[in] += fakeDMAntiLTightE_;
-	    fakeDMAntiLLooseMvaUp_[in] += fakeDMAntiLLooseMvaE_;
-	    fakeDMAntiLMediumMvaUp_[in] += fakeDMAntiLMediumMvaE_;
-	    fakeDMAntiLTightMvaUp_[in] += fakeDMAntiLTightMvaE_;
-	    fakeDMAntiLVTightMvaUp_[in] += fakeDMAntiLVTightMvaE_;
-
-	  }
-	  //	  else {
-	  //	    std::cout << "Nothing !" << std::endl;
-	  //	  }
-
-
-	}
-	
-	//	std::cout << " pt(tau)/pt(jet) = " << tauJetPtRatio
-	//		  << "  pt(jet) = " << tauJetPtX
-	//		  << "    -> fake rates : Loose = " << fakeAntiLLoose_
-	//		  << "    Medium = " << fakeAntiLMedium_
-	//		  << "    Tight  = " << fakeAntiLTight_ << std::endl;
-
       }
       // ****************************
       // **** end accessing taus ****
@@ -2518,11 +1999,8 @@ int main(int argc, char * argv[]) {
       // ****************************
       float trigEffData = 1.0;
       float trigEffMC   = 1.0;
-      float trigEffData_74X = 1.0;
-      float trigEffMC_74X   = 1.0;
 
       trigWeight_ = 1;
-      trigWeight74X_ = 1;
 
       if (mhtNoMu_<130) {
 	if (metNoMu_>100&&metNoMu_<300) {
@@ -2598,7 +2076,7 @@ int main(int argc, char * argv[]) {
 	recoilJetDPhi_ = dPhiFromLV(lorentzVectorW,lorentzVectorTauJet);
 	isWJet = ptTriggerMu>ptMuCut_WJet; 
 	isWJet = isWJet && mtmuon_ > mtCut_WJet;
-	isWJet = isWJet && recoilRatio_>ptJetWRatioLowerCut_WJet && recoilRatio_<ptJetWRatioUpperCut_WJet;
+	//isWJet = isWJet && recoilRatio_>ptJetWRatioLowerCut_WJet && recoilRatio_<ptJetWRatioUpperCut_WJet;
 	isWJet = isWJet && recoilDPhi_>deltaPhiWJetCut_WJet;
 	isWJet = isWJet && nMuon_ == 1;
 	isWJet = isWJet && nElec_ == 0;
@@ -2636,7 +2114,7 @@ int main(int argc, char * argv[]) {
 	recoilJetDPhi_  = 0;
 	isWMuNu = ptTriggerMu>ptMuCut_WMuNu;
 	isWMuNu = isWMuNu && met_>metCut_WMuNu;
-	isWMuNu = isWMuNu && recoilRatio_>ptMuMetRatioLowerCut_WMuNu && recoilRatio_<ptMuMetRatioUpperCut_WMuNu;
+	//isWMuNu = isWMuNu && recoilRatio_>ptMuMetRatioLowerCut_WMuNu && recoilRatio_<ptMuMetRatioUpperCut_WMuNu;
 	isWMuNu = isWMuNu && recoilDPhi_>deltaPhiMuMetCut_WMuNu;
 	isWMuNu = isWMuNu && nMuon_ == 1;
 	isWMuNu = isWMuNu && nElec_ == 0;
@@ -2671,7 +2149,7 @@ int main(int argc, char * argv[]) {
 	recoilJetRatio_ = lorentzVectorTauJet.Pt()/lorentzVectorMet.Pt();
 	recoilJetDPhi_ = dPhiFromLV(lorentzVectorMet,lorentzVectorTauJet);
 	isWTauNu = met_>metCut_WTauNu;
-	isWTauNu = isWTauNu && recoilRatio_>ptTauMetRatioLowerCut_WTauNu && recoilRatio_<ptTauMetRatioUpperCut_WTauNu;
+	//	isWTauNu = isWTauNu && recoilRatio_>ptTauMetRatioLowerCut_WTauNu && recoilRatio_<ptTauMetRatioUpperCut_WTauNu;
 	isWTauNu = isWTauNu && recoilDPhi_>deltaPhiTauMetCut_WTauNu;
 	isWTauNu = isWTauNu && nSelTaus_ >= 1;
 	//isWTauNu = isWTauNu && tauPt_>100;
@@ -2727,8 +2205,8 @@ int main(int argc, char * argv[]) {
 	    if (jetLV.Pt()<ptJetCut_DiJet) continue;
 	    if (fabs(jetLV.Eta())>etaJetCut_DiJet) continue;
 	    float ptTauJetRatio = tauLV.Pt() / jetLV.Pt();
-	    if (ptTauJetRatio<ptTauJetRatioLowerCut_DiJet) continue;
-	    if (ptTauJetRatio>ptTauJetRatioUpperCut_DiJet) continue;
+	    //if (ptTauJetRatio<ptTauJetRatioLowerCut_DiJet) continue;
+	    //if (ptTauJetRatio>ptTauJetRatioUpperCut_DiJet) continue;
 	    float dPhiTauJet = dPhiFromLV(tauLV,jetLV);
 	    if (dPhiTauJet>dPhiTauJetMax) {
 	      acceptedJetIndex = int(indexJet);
@@ -2803,16 +2281,10 @@ int main(int argc, char * argv[]) {
 	    if (tauGenDecay_<0) tauGenDecay_ = -1;
 	    if (tauGenMatchDecay_<0) tauGenMatchDecay_ = -1;
 
-	    pfJet40_ = jets40trigger.at(acceptedJetDirIndex);
 	    pfJet60_ = jets60trigger.at(acceptedJetDirIndex);
 	    pfJet80_ = jets80trigger.at(acceptedJetDirIndex);
 	    pfJet140_ = jets140trigger.at(acceptedJetDirIndex);
 	    pfJet200_ = jets200trigger.at(acceptedJetDirIndex);
-	    pfJet260_ = jets260trigger.at(acceptedJetDirIndex);
-	    pfJet320_ = jets320trigger.at(acceptedJetDirIndex);
-	    pfJet400_ = jets400trigger.at(acceptedJetDirIndex);
-	    pfJet450_ = jets450trigger.at(acceptedJetDirIndex);
-	    pfJet500_ = jets500trigger.at(acceptedJetDirIndex);
 
 	    tauDM_ = analysisTree.tau_decayModeFinding[indexTau] > 0.5;
 	    tauNewDM_ = analysisTree.tau_decayModeFindingNewDMs[indexTau] > 0.5;
