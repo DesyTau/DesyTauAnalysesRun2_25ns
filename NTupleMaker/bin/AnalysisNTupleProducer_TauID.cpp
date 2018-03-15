@@ -417,16 +417,19 @@ int main(int argc, char * argv[]) {
   Bool_t  tauMediumIso_;
   Bool_t  tauTightIso_;
 
+  Bool_t  tauVLooseMvaIso_;
   Bool_t  tauLooseMvaIso_;
   Bool_t  tauMediumMvaIso_;
   Bool_t  tauTightMvaIso_;
   Bool_t  tauVTightMvaIso_;
+  Bool_t  tauVVTightMvaIso_;
 
   Bool_t tauAntiMuonLoose3_;
   Bool_t tauAntiMuonTight3_;
 
   Bool_t tauAntiElectronVLooseMVA6_;
   Bool_t tauAntiElectronLooseMVA6_;
+  Bool_t tauAntiElectronMediumMVA6_;
   Bool_t tauAntiElectronTightMVA6_;
   Bool_t tauAntiElectronVTightMVA6_;
 
@@ -705,16 +708,19 @@ int main(int argc, char * argv[]) {
   ntuple_->Branch("tauMediumIso",&tauMediumIso_,"tauMediumIso/O");
   ntuple_->Branch("tauTightIso", &tauTightIso_, "tauTightIso/O");
 
+  ntuple_->Branch("tauVLooseMvaIso", &tauVLooseMvaIso_, "tauVLooseMvaIso/O");
   ntuple_->Branch("tauLooseMvaIso", &tauLooseMvaIso_, "tauLooseMvaIso/O");
   ntuple_->Branch("tauMediumMvaIso",&tauMediumMvaIso_,"tauMediumMvaIso/O");
   ntuple_->Branch("tauTightMvaIso", &tauTightMvaIso_, "tauTightMvaIso/O");
   ntuple_->Branch("tauVTightMvaIso", &tauVTightMvaIso_, "tauVTightMvaIso/O");
+  ntuple_->Branch("tauVVTightMvaIso", &tauVVTightMvaIso_, "tauVVTightMvaIso/O");
 
   ntuple_->Branch("tauAntiMuonLoose3",&tauAntiMuonLoose3_,"tauAntiMuonLoose3/O");
   ntuple_->Branch("tauAntiMuonTight3",&tauAntiMuonTight3_,"tauAntiMuonTight3/O");
 
   ntuple_->Branch("tauAntiElectronVLooseMVA6",&tauAntiElectronVLooseMVA6_,"tauAntiElectronVLooseMVA6/O");
   ntuple_->Branch("tauAntiElectronLooseMVA6", &tauAntiElectronLooseMVA6_, "tauAntiElectronLooseMVA6/O");
+  ntuple_->Branch("tauAntiElectronMediumMVA6", &tauAntiElectronMediumMVA6_, "tauAntiElectronMediumMVA6/O");
   ntuple_->Branch("tauAntiElectronTightMVA6",&tauAntiElectronTightMVA6_,"tauAntiElectronTightMVA6/O");
   ntuple_->Branch("tauAntiElectronVTightMVA6", &tauAntiElectronVTightMVA6_, "tauAntiElectronVTightMVA6/O");
 
@@ -1071,16 +1077,19 @@ int main(int argc, char * argv[]) {
       tauMediumIso_ = false;
       tauTightIso_ = false;
 
+      tauVLooseMvaIso_ = false;
       tauLooseMvaIso_ = false;
       tauMediumMvaIso_ = false;
       tauTightMvaIso_ = false;
       tauVTightMvaIso_ = false;
-      
+      tauVVTightMvaIso_ = false;
+
       tauAntiMuonLoose3_ = false;
       tauAntiMuonTight3_ = false;
 
       tauAntiElectronVLooseMVA6_ = false;
       tauAntiElectronLooseMVA6_ = false;
+      tauAntiElectronMediumMVA6_ = false;
       tauAntiElectronTightMVA6_ = false;
       tauAntiElectronVTightMVA6_ = false;
       
@@ -1778,7 +1787,7 @@ int main(int argc, char * argv[]) {
         analysisTree.electron_pz[ielec] *= eleMomScale;
         analysisTree.electron_pt[ielec] *= eleMomScale;
 	bool passedId = 
-	  analysisTree.electron_cutId_veto_Spring15[ielec] &&
+	  analysisTree.electron_cutId_veto_Summer16[ielec] &&
           analysisTree.electron_pass_conversion[ielec] &&
           analysisTree.electron_nmissinginnerhits[ielec] <= 1;
 	bool passedIpCuts = 
@@ -2304,10 +2313,12 @@ int main(int argc, char * argv[]) {
 	tauMediumIso_ = analysisTree.tau_byMediumCombinedIsolationDeltaBetaCorr3Hits[indexTau] > 0.5;
 	tauTightIso_ = analysisTree.tau_byTightCombinedIsolationDeltaBetaCorr3Hits[indexTau] > 0.5;
 
+   tauVLooseMvaIso_ = analysisTree.tau_byVLooseIsolationMVArun2v1DBoldDMwLT[indexTau] > 0.5;
 	tauLooseMvaIso_ = analysisTree.tau_byLooseIsolationMVArun2v1DBoldDMwLT[indexTau] > 0.5;
 	tauMediumMvaIso_ = analysisTree.tau_byMediumIsolationMVArun2v1DBoldDMwLT[indexTau] > 0.5;
 	tauTightMvaIso_ = analysisTree.tau_byTightIsolationMVArun2v1DBoldDMwLT[indexTau] > 0.5;
 	tauVTightMvaIso_ = analysisTree.tau_byVTightIsolationMVArun2v1DBoldDMwLT[indexTau] > 0.5;
+   tauVVTightMvaIso_ = analysisTree.tau_byVVTightIsolationMVArun2v1DBoldDMwLT[indexTau] > 0.5;
 
 	//	std::cout << "TauMva : Loose = " << tauLooseMvaIso_
 	//		  << "  Medium = " << tauMediumMvaIso_
@@ -2319,6 +2330,7 @@ int main(int argc, char * argv[]) {
 
 	tauAntiElectronVLooseMVA6_ = analysisTree.tau_againstElectronVLooseMVA6[indexTau] > 0.5;
 	tauAntiElectronLooseMVA6_  = analysisTree.tau_againstElectronLooseMVA6[indexTau] > 0.5;
+   tauAntiElectronMediumMVA6_  = analysisTree.tau_againstElectronMediumMVA6[indexTau] > 0.5;
 	tauAntiElectronTightMVA6_  = analysisTree.tau_againstElectronTightMVA6[indexTau] > 0.5;
 	tauAntiElectronVTightMVA6_ = analysisTree.tau_againstElectronVTightMVA6[indexTau] > 0.5;
 
@@ -2809,10 +2821,12 @@ int main(int argc, char * argv[]) {
 	    tauMediumIso_ = analysisTree.tau_byMediumCombinedIsolationDeltaBetaCorr3Hits[indexTau] > 0.5;
 	    tauTightIso_ = analysisTree.tau_byTightCombinedIsolationDeltaBetaCorr3Hits[indexTau] > 0.5;
 
-	    tauLooseMvaIso_ = analysisTree.tau_byLooseIsolationMVArun2v1DBoldDMwLT[indexTau] > 0.5;
+	    tauVLooseMvaIso_ = analysisTree.tau_byVLooseIsolationMVArun2v1DBoldDMwLT[indexTau] > 0.5;
+       tauLooseMvaIso_ = analysisTree.tau_byLooseIsolationMVArun2v1DBoldDMwLT[indexTau] > 0.5;
 	    tauMediumMvaIso_ = analysisTree.tau_byMediumIsolationMVArun2v1DBoldDMwLT[indexTau] > 0.5;
 	    tauTightMvaIso_ = analysisTree.tau_byTightIsolationMVArun2v1DBoldDMwLT[indexTau] > 0.5;
 	    tauVTightMvaIso_ = analysisTree.tau_byVTightIsolationMVArun2v1DBoldDMwLT[indexTau] > 0.5;
+       tauVVTightMvaIso_ = analysisTree.tau_byVVTightIsolationMVArun2v1DBoldDMwLT[indexTau] > 0.5;
  
 	    tauAntiMuonLoose3_ = analysisTree.tau_againstMuonLoose3[indexTau] > 0.5;
 	    tauAntiMuonTight3_ = analysisTree.tau_againstMuonTight3[indexTau] > 0.5;
