@@ -114,7 +114,6 @@ int main(int argc, char * argv[]) {
   const float ptSelMuCut    = cfg.get<float>("PtSelMuCut");
   const float ptTrigMuCut   = cfg.get<float>("PtTrigMuCut");
   const bool  isDRIso03 = cfg.get<bool>("IsDRIso03");
-  const bool  isMuonIdICHEP = cfg.get<bool>("IsMuonIdICHEP"); 
 
   // electron selection
   const float ptEleCut   = cfg.get<float>("PtEleCut");
@@ -131,13 +130,6 @@ int main(int argc, char * argv[]) {
   const float ptMuCut_WMuNu               = cfg.get<float>("PtMuCut_WMuNu");
   const float deltaPhiMuMetCut_WMuNu      = cfg.get<float>("DeltaPhiMuMetCut_WMuNu");
   const float metCut_WMuNu                = cfg.get<float>("MetCut_WMuNu");
-
-  // topological cuts (Z->mumu+Jet)
-  const float ptLeadingMuCut_ZJet      = cfg.get<float>("PtLeadingMuCut_ZJet");
-  const float ptTrailingMuCut_ZJet     = cfg.get<float>("PtTrailingMuCut_ZJet");
-  const float ZMassLowerCut_ZJet       = cfg.get<float>("ZMassLowerCut_ZJet");
-  const float ZMassUpperCut_ZJet       = cfg.get<float>("ZMassUpperCut_ZJet");
-  const float deltaPhiZJetCut_ZJet     = cfg.get<float>("DeltaPhiZJetCut_ZJet");
 
   // topological cuts (W->muv+Jet)
   const float ptMuCut_WJet              = cfg.get<float>("PtMuCut_WJet");
@@ -707,7 +699,6 @@ int main(int argc, char * argv[]) {
   
   int nFiles = 0;
   int nEvents = 0;
-  int ZJetEvents = 0;
   int WJetEvents = 0;
   int WProdEvents = 0;
   int WMuNuEvents = 0;
@@ -926,7 +917,6 @@ int main(int argc, char * argv[]) {
       mutrigweight = 1;
 
       // booleans 
-      bool isZJet = false;
       bool isWJet = false;
       bool isWTauNu = false;
       bool isWMuNu  = false;
@@ -1296,18 +1286,8 @@ int main(int argc, char * argv[]) {
 	analysisTree.muon_pt[imuon] *= muonMomScale;
 	if (analysisTree.muon_pt[imuon]<ptMuCut) continue;
 	if (fabs(analysisTree.muon_eta[imuon])>etaMuCut) continue;
+	
 	bool passedId = analysisTree.muon_isMedium[imuon];
-	if (isMuonIdICHEP) {
-	  bool goodGlob =
-	    analysisTree.muon_isGlobal[imuon] &&
-	    analysisTree.muon_normChi2[imuon] < 3 &&
-	    analysisTree.muon_combQ_chi2LocalPosition[imuon] < 12 &&
-	    analysisTree.muon_combQ_trkKink[imuon] < 20;
-	  passedId =
-	    analysisTree.muon_isLoose[imuon] &&
-	    analysisTree.muon_validFraction[imuon] >0.49 &&
-	    analysisTree.muon_segmentComp[imuon] > (goodGlob ? 0.303 : 0.451);
-	}
 	if (!passedId) continue;
 	bool passedIpCuts = 
 	  fabs(analysisTree.muon_dxy[imuon]) < dxyMuCut &&
@@ -2034,38 +2014,6 @@ int main(int argc, char * argv[]) {
       // setting met filters
       metFilters_ = metFiltersPasses(analysisTree,metFlags,isData);
 
-      // ******************************
-      // ********* ZJet selection *****
-      // ******************************
-      /*
-      if (lorentzVectorZ.Pt()>1e-4) {
-	recoilRatio_ = tauPt_ / lorentzVectorZ.Pt();
-	recoilDPhi_  = dPhiFromLV(lorentzVectorZ,lorentzVectorTau);
-	isZJet = ptLeadingMu>ptLeadingMuCut_ZJet;
-	isZJet = isZJet && ptTrailingMu>ptTrailingMuCut_ZJet;
-	isZJet = isZJet && lorentzVectorZ.M()>ZMassLowerCut_ZJet && lorentzVectorZ.M()<ZMassUpperCut_ZJet;
-	isZJet = isZJet && recoilRatio_>ptJetZRatioLowerCut_ZJet && recoilRatio_<ptJetZRatioUpperCut_ZJet;
-	isZJet = isZJet && recoilDPhi_>deltaPhiZJetCut_ZJet;
-	if (isZJet) { 
-	  float leadMuIso = SF_muonIdIso->get_ScaleFactor(ptLeadingMu, etaLeadingMu);
-	  float trailMuIso = SF_muonIdIso->get_ScaleFactor(ptTrailingMu, etaTrailingMu);
-	  mueffweight = leadMuIso*trailMuIso;
-	  //	  float leadMuTrig = SF_muonTrig->get_EfficiencyData(ptLeadingMu, etaLeadingMu);
-	  //	  float trailMuTrig = SF_muonTrig->get_EfficiencyData(ptTrailingMu, etaTrailingMu);
-	  //	  mutrigweight = 1 - (1-leadMuTrig)*(1-trailMuTrig);
-	  mutrigweight = SF_muonTrig->get_EfficiencyData(ptTriggerMu, etaTriggerMu);
-	  HtNoRecoil_     = Ht_     - ptTriggerMu - ptSecondMu;
-	  SoftHtNoRecoil_ = SoftHt_ - ptTriggerMu - ptSecondMu;
-	  recoilM_   = lorentzVectorZ.M();
-	  recoilPt_  = lorentzVectorZ.Pt();
-	  recoilEta_ = lorentzVectorZ.Eta();
-	  recoilPhi_ = lorentzVectorZ.Phi();
-	  selection_ = 0;
-	  ntuple_->Fill();
-	  ZJetEvents++;
-	}
-      }
-      */
       // ***************************
       // ******* WJet selection ****
       // ***************************
@@ -2076,7 +2024,6 @@ int main(int argc, char * argv[]) {
 	recoilJetDPhi_ = dPhiFromLV(lorentzVectorW,lorentzVectorTauJet);
 	isWJet = ptTriggerMu>ptMuCut_WJet; 
 	isWJet = isWJet && mtmuon_ > mtCut_WJet;
-	//isWJet = isWJet && recoilRatio_>ptJetWRatioLowerCut_WJet && recoilRatio_<ptJetWRatioUpperCut_WJet;
 	isWJet = isWJet && recoilDPhi_>deltaPhiWJetCut_WJet;
 	isWJet = isWJet && nMuon_ == 1;
 	isWJet = isWJet && nElec_ == 0;
@@ -2084,7 +2031,6 @@ int main(int argc, char * argv[]) {
 	isWJet = isWJet && nJetsCentral30_ == 1;
 	isWJet = isWJet && nJetsForward30_ == 0;
 	isWJet = isWJet && tauPt_>50.;
-	//isWJet = isWJet && tauPt_>100.;
 	isWJet = isWJet && abs(muonEta_)<2.1;
 
 	if (isWJet) {
@@ -2333,7 +2279,6 @@ int main(int argc, char * argv[]) {
   std::cout << "Total weight sum                  = " << sumOfWeights << std::endl;
   std::cout << "Total number of events in Tree    = " << nEvents << std::endl;
   std::cout << "Total number of trigger events    = " << TrigEvents << std::endl;
-  std::cout << "Total number of Z+Jet events      = " << ZJetEvents << std::endl;
   std::cout << "Total number of W+Jet events      = " << WJetEvents << std::endl;
   std::cout << "Total number of W->muv events     = " << WMuNuEvents << std::endl;
   std::cout << "Total number of W->tauv events    = " << WTauNuEvents << std::endl;
