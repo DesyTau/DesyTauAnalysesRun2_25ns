@@ -1235,29 +1235,29 @@ int main(int argc, char * argv[]) {
       // ***************************************************
 
 
-      float pfmet_ex = analysisTree.pfmetcorr_ex;
-      float pfmet_ey = analysisTree.pfmetcorr_ey;
+      float pfmet_ex = analysisTree.pfmet_ex;
+      float pfmet_ey = analysisTree.pfmet_ey;
 
       if (!isData) {
 	if (jetES<0) {
-	  pfmet_ex = analysisTree.pfmetcorr_ex_JetEnDown;
-	  pfmet_ey = analysisTree.pfmetcorr_ey_JetEnDown;
+	  pfmet_ex = analysisTree.pfmet_ex_JetEnDown;
+	  pfmet_ey = analysisTree.pfmet_ey_JetEnDown;
 	}
 	else if (jetES>0) {
-	  pfmet_ex = analysisTree.pfmetcorr_ex_JetEnUp;
-	  pfmet_ey = analysisTree.pfmetcorr_ey_JetEnUp;
+	  pfmet_ex = analysisTree.pfmet_ex_JetEnUp;
+	  pfmet_ey = analysisTree.pfmet_ey_JetEnUp;
 	}
 	else if (unclusteredES<0) {
-	  pfmet_ex = analysisTree.pfmetcorr_ex_UnclusteredEnDown;
-	  pfmet_ey = analysisTree.pfmetcorr_ey_UnclusteredEnDown;
+	  pfmet_ex = analysisTree.pfmet_ex_UnclusteredEnDown;
+	  pfmet_ey = analysisTree.pfmet_ey_UnclusteredEnDown;
 	}
 	else if (unclusteredES>0) {
-	  pfmet_ex = analysisTree.pfmetcorr_ex_UnclusteredEnUp;
-	  pfmet_ey = analysisTree.pfmetcorr_ey_UnclusteredEnUp;
+	  pfmet_ex = analysisTree.pfmet_ex_UnclusteredEnUp;
+	  pfmet_ey = analysisTree.pfmet_ey_UnclusteredEnUp;
 	}
 	else {
-	  pfmet_ex = analysisTree.pfmetcorr_ex;
-	  pfmet_ey = analysisTree.pfmetcorr_ey;
+	  pfmet_ex = analysisTree.pfmet_ex;
+	  pfmet_ey = analysisTree.pfmet_ey;
 	}
       }
 
