@@ -39,15 +39,15 @@ do
 	if [[ ! -f $PWD/FastSim_Stau_Out/${fname} ]]  && [[ ! -f $PWD/Skims/${fname} ]]; then 
 	cat bssFast > ${fname}_exec.sh
 
-	echo cmsRun TreeProducerFromMiniAOD_80x_MC25ns_signal_${fname}.py >> ${fname}_exec.sh
+	echo cmsRun FastSim_Stau/TreeProducerFromMiniAOD_80x_MC25ns_signal_${fname}.py >> ${fname}_exec.sh
 
 
-	cp TreeProducerFromMiniAOD_80x_MC25ns_FastSim_noHLT.py TreeProducerFromMiniAOD_80x_MC25ns_signal_${fname}.py
+	cp TreeProducerFromMiniAOD_80x_MC25ns_FastSim_noHLT_template.py TreeProducerFromMiniAOD_80x_MC25ns_signal_${fname}.py
 
 
 	sed -i 's/FILEIN/'${fname}'/g' TreeProducerFromMiniAOD_80x_MC25ns_signal_${fname}.py
 	sed -i 's/FILEOUT/'${fname}'/g' TreeProducerFromMiniAOD_80x_MC25ns_signal_${fname}.py
-	mv TreeProducerFromMiniAOD_80x_MC25ns_signal_${fname}.py FastSim_Stau
+	mv TreeProducerFromMiniAOD_80x_MC25ns_signal_${fname}.py FastSim_Stau/.
 	echo $fname
 	qsub ${fname}_exec.sh
 

@@ -137,22 +137,29 @@ class analyzer {
   Float_t         LSF_weight;
   Float_t         LSF_weight_el;
   Float_t         LSF_weight_mu;
-  Float_t         LSF_weight_2;
   Float_t         LSF_weight_1;
+  Float_t         LSF_weight_2;
+  Float_t         LSF_weight_3;
   Float_t         TFR_weight;
   Float_t         top_weight;
   Float_t         all_weight;
   Float_t         trig_weight;
   Float_t         trig_weight_1;
   Float_t         trig_weight_2;
+  Float_t         trig_weight_1looseAC;
+  Float_t         trig_weight_2looseAC;
+  Float_t         trig_weight_1looseBC;
+  Float_t         trig_weight_2looseBC;
   Float_t         zptmassweight;
   Float_t         xsecs;
   Int_t           muon_index;
   Int_t           muon_index_1;
   Int_t           muon_index_2;
+  Int_t           muon_index_3;
   Int_t           electron_index;
   Int_t           electron_index_1;
   Int_t           electron_index_2;
+  Int_t           electron_index_3;
   Int_t           taus_index;
   Int_t           taus_index_1;
   Int_t           taus_index_2;
@@ -364,20 +371,27 @@ class analyzer {
   TBranch        *b_LSF_weight_el;   //!
   TBranch        *b_LSF_weight_1;   //!
   TBranch        *b_LSF_weight_2;   //!
+  TBranch        *b_LSF_weight_3;   //!
   TBranch        *b_TFR_weight;   //!
   TBranch        *b_top_weight;   //!
   TBranch        *b_all_weight;   //!
   TBranch        *b_trig_weight;   //!
   TBranch        *b_trig_weight_1;   //!
   TBranch        *b_trig_weight_2;   //!
+  TBranch        *b_trig_weight_1looseAC;   //!
+  TBranch        *b_trig_weight_2looseAC;   //!
+  TBranch        *b_trig_weight_1looseBC;   //!
+  TBranch        *b_trig_weight_2looseBC;   //!
   TBranch        *b_zptmassweight;   //!
   TBranch        *b_xsecs;   //!
   TBranch        *b_muon_index;   //!
   TBranch        *b_muon_index_1;   //!
   TBranch        *b_muon_index_2;   //!
+  TBranch        *b_muon_index_3;   //!
   TBranch        *b_electron_index;   //!
   TBranch        *b_electron_index_1;   //!
   TBranch        *b_electron_index_2;   //!
+  TBranch        *b_electron_index_3;   //!
   TBranch        *b_taus_index;   //!
   TBranch        *b_taus_index_1;   //!
   TBranch        *b_taus_index_2;   //!
@@ -2493,6 +2507,7 @@ if (njj==1)    hCSVv2_b2[CutIndex]->Fill(jet_btag[njj],EvWeight);
 	double cosT2 = cosAngle(bV,muV);
 //if (CutIndex==10 && bV.Pt()>0 && muV.Pt()>0)	cout<<"  cosTheta  "<<cosT<<"   "<<cosT2<<endl;
 	hCosbl[CutIndex]->Fill(cosT2,EvWeight);
+
         double pl_4[4] = { muV.E(), muV.Px(), muV.Py(),muV.Pz()};
         double pb1_4[4] = {bV.E(), bV.Px(), bV.Py(), bV.Pz()};
         double pb2_4[4] = {tauV.E(), tauV.Px(),tauV.Py(),tauV.Pz()};
@@ -3049,7 +3064,7 @@ if (dogenMET) { met = sqrt(genmet_Ex*genmet_Ex + genmet_Ey*genmet_Ey);
       double mcta = sqrt( 2* LeptV1.Pt()* LeptV2.Pt()*(1+cos( LeptV1.Phi()- LeptV2.Phi())) );
 				
 				 
-      double MT2v =0 ; MT2v = mt2(v1,v2,vds,ptm,ecm,mxlo);
+      double MT2v =-1 ; MT2v = mt2(v1,v2,vds,ptm,ecm,mxlo);
 
       hMt2Dil[CutIndex]->Fill(MT2v,EvWeight);
       hMt2lesterDil[CutIndex]->Fill(Mt2as,EvWeight);
@@ -3301,11 +3316,12 @@ if (pzetavis !=0) dzetaR = pzetamiss/pzetavis;
 		if (nbtag==0) nBb=0;
 		if (nbtag==1) nBb=9;
 
-	if (met<200 && MTDil<300){
+	if (met<200 ){
 
 		if (MTDil<100 ) {hmet_MTDil[CutIndex]->Fill(nBb+1,EvWeight); hMTDil[nBb+1][CutIndex]->Fill(MTDil,EvWeight);}
 		if (MTDil>100 && MTDil<200) {hmet_MTDil[CutIndex]->Fill(nBb+2,EvWeight); hMTDil[nBb+2][CutIndex]->Fill(MTDil,EvWeight); }
-		if (MTDil>200 && MTDil<300) {hmet_MTDil[CutIndex]->Fill(nBb+3,EvWeight);  hMTDil[nBb+3][CutIndex]->Fill(MTDil,EvWeight);}
+		//if (MTDil>200 && MTDil<300) {hmet_MTDil[CutIndex]->Fill(nBb+3,EvWeight);  hMTDil[nBb+3][CutIndex]->Fill(MTDil,EvWeight);}
+		if (MTDil>200) {hmet_MTDil[CutIndex]->Fill(nBb+3,EvWeight);  hMTDil[nBb+3][CutIndex]->Fill(MTDil,EvWeight);}
 
 		}
 
@@ -3524,20 +3540,27 @@ void analyzer::Init(TTree *tree)
   fChain->SetBranchAddress("LSF_weight_el", &LSF_weight_el, &b_LSF_weight_el);
   fChain->SetBranchAddress("LSF_weight_1", &LSF_weight_1, &b_LSF_weight_1);
   fChain->SetBranchAddress("LSF_weight_2", &LSF_weight_2, &b_LSF_weight_2);
+  fChain->SetBranchAddress("LSF_weight_3", &LSF_weight_3, &b_LSF_weight_3);
   fChain->SetBranchAddress("TFR_weight", &TFR_weight, &b_TFR_weight);
   fChain->SetBranchAddress("top_weight", &top_weight, &b_top_weight);
   fChain->SetBranchAddress("all_weight", &all_weight, &b_all_weight);
   fChain->SetBranchAddress("trig_weight", &trig_weight, &b_trig_weight);
   fChain->SetBranchAddress("trig_weight_1", &trig_weight_1, &b_trig_weight_1);
   fChain->SetBranchAddress("trig_weight_2", &trig_weight_2, &b_trig_weight_2);
+  fChain->SetBranchAddress("trig_weight_1looseAC", &trig_weight_1looseAC, &b_trig_weight_1looseAC);
+  fChain->SetBranchAddress("trig_weight_2looseAC", &trig_weight_2looseAC, &b_trig_weight_2looseAC);
+  fChain->SetBranchAddress("trig_weight_1looseBC", &trig_weight_1looseBC, &b_trig_weight_1looseBC);
+  fChain->SetBranchAddress("trig_weight_2looseBC", &trig_weight_2looseBC, &b_trig_weight_2looseBC);
   fChain->SetBranchAddress("zptmassweight", &zptmassweight, &b_zptmassweight);
   fChain->SetBranchAddress("xsecs", &xsecs, &b_xsecs);
   fChain->SetBranchAddress("muon_index", &muon_index, &b_muon_index);
   fChain->SetBranchAddress("muon_index_1", &muon_index_1, &b_muon_index_1);
   fChain->SetBranchAddress("muon_index_2", &muon_index_2, &b_muon_index_2);
+  fChain->SetBranchAddress("muon_index_3", &muon_index_3, &b_muon_index_3);
   fChain->SetBranchAddress("electron_index", &electron_index, &b_electron_index);
   fChain->SetBranchAddress("electron_index_1", &electron_index_1, &b_electron_index_1);
   fChain->SetBranchAddress("electron_index_2", &electron_index_2, &b_electron_index_2);
+  fChain->SetBranchAddress("electron_index_3", &electron_index_3, &b_electron_index_3);
   fChain->SetBranchAddress("taus_index", &taus_index, &b_taus_index);
   fChain->SetBranchAddress("taus_index_1", &taus_index_1, &b_taus_index_1);
   fChain->SetBranchAddress("taus_index_2", &taus_index_2, &b_taus_index_2);

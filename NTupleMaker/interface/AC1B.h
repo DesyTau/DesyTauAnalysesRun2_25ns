@@ -1990,7 +1990,7 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("tau_photonPtSumOutsideSignalConedR03", tau_photonPtSumOutsideSignalConedR03, &b_tau_photonPtSumOutsideSignalConedR03);
    fChain->SetBranchAddress("tau_puCorrPtSum", tau_puCorrPtSum, &b_tau_puCorrPtSum);
 
-
+/*
    fChain->SetBranchAddress("track_count", &track_count);
    fChain->SetBranchAddress("track_ID", track_ID);
    fChain->SetBranchAddress("track_px", track_px);
@@ -2006,7 +2006,7 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("track_dz", track_dz);
    fChain->SetBranchAddress("track_dzerr",track_dzerr);
 
-
+*/
 
 
 
