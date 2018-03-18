@@ -19,32 +19,47 @@
 #include "TCanvas.h"
 #include "TPaveText.h"
 #include "TRandom.h"
-#include "TRandom3.h"
 #include "TGraphAsymmErrors.h"
 #include <stdlib.h>
+#include "TRandom.h"
 
 #include "DesyTauAnalyses/NTupleMaker/interface/json.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/PileUp.h"
 #include "HTT-utilities/LepEffInterface/interface/ScaleFactor.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/Jets.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/AnalysisMacro.h"
+#include "HTT-utilities/QCDModelingEMu/interface/QCDModelForEMu.h"
 #include "CondFormats/BTauObjects/interface/BTagCalibration.h"
 #include "CondTools/BTau/interface/BTagCalibrationReader.h"
 #include "HTT-utilities/RecoilCorrections/interface/RecoilCorrector.h"
 #include "HTT-utilities/RecoilCorrections/interface/MEtSys.h"
+
 int main(int argc, char * argv[]) {
-
-
 
   // **** configuration
   Config cfg(argv[1]);
-  string Channel="mumu";
+  string Channel="muel";
 
   // kinematic cuts on electrons
+  bool fillplots= false;
   const bool isData = cfg.get<bool>("IsData");
-  
-  
-  const bool applyLeptonSF = cfg.get<bool>("ApplyLeptonSF");
+
+//////////systematics
+  /*
+  const bool ApplyTauEnergyScaleUnc     = cfg.get<bool>("ApplyTauEnergyScaleUnc");
+  const double TauEnergyScaleUnc   = cfg.get<double>("TauEnergyScaleUnc");
+  const bool ApplyMuEnergyScaleUnc     = cfg.get<bool>("ApplyMuEnergyScaleUnc");
+  const double MuEnergyScaleUnc   = cfg.get<double>("MuEnergyScaleUnc");
+  const bool ApplyElEnergyScaleUnc     = cfg.get<bool>("ApplyElEnergyScaleUnc");
+  const double ElEnergyScaleUncBarrel   = cfg.get<double>("ElEnergyScaleUncBarrel");
+  const double ElEnergyScaleUncEndcaps   = cfg.get<double>("ElEnergyScaleUncEndcaps");
+  const bool ApplyJetEnergyCorrectionUnc     = cfg.get<bool>("ApplyJetEnergyCorrectionUnc");
+  const bool ApplyJetEnergyCorrectionUncSignPositive     = cfg.get<bool>("ApplyJetEnergyCorrectionUncSignPositive");
+  const bool ApplyElectronCorrectionUncSignPositive     = cfg.get<bool>("ApplyElectronCorrectionUncSignPositive");
+  const bool ApplyMuonCorrectionUncSignPositive     = cfg.get<bool>("ApplyMuonCorrectionUncSignPositive");
+  const bool ApplyTauCorrectionUncSignPositive     = cfg.get<bool>("ApplyTauCorrectionUncSignPositive");
+*/
+
 
   bool ApplyTauEnergyScaleUnc = false;
   bool ApplyTauCorrectionUncSignPositive = false;
@@ -62,7 +77,8 @@ int main(int argc, char * argv[]) {
 //_Nominal _JetEnUp _JetEnDown  _ElEnUp _ElEnDown _MuEnUp _MuEnDown
 
 
-  	string BTag_ = "central";
+	string BTag_ = "central";
+
   	string Systematic=argv[5];
 	if (Systematic=="1" || Systematic=="" || isData) Systematic = "Nominal";
 
@@ -81,24 +97,29 @@ int main(int argc, char * argv[]) {
 	if (string::npos != Systematic.find("BTagUp")){ BTag_ = "up";}
 	if (string::npos != Systematic.find("BTagDown")){ BTag_ = "down";}
 
+
 ////////////muons
 
-  const double ptMuonCut   = cfg.get<double>("ptMuonCut");
-  const double etaMuonCut     = cfg.get<double>("etaMuonCut");
+  const float ptMuonLowCut   = cfg.get<float>("ptMuonLowCutmuel");
+  const double ptMuonHighCut  = cfg.get<double>("ptMuonHighCutmuel");
+  const double etaMuonCut     = cfg.get<double>("etaMuonCutmuel");
   const double dxyMuonCut     = cfg.get<double>("dxyMuonCut");
   const double dzMuonCut      = cfg.get<double>("dzMuonCut");
-  const double isoMuonLowCut  = cfg.get<double>("isoMuonLowCut");
-  const bool applyMuonId     = cfg.get<bool>("ApplyMuonId");
+  const double isoMuonHighCut = cfg.get<double>("isoMuonHighCutmuel");
 
-////// tau
-  const double ptTauCut = cfg.get<double>("ptTauCut"); 
-  const double etaTauCut = cfg.get<double>("etaTauCut"); 
-  const double decayModeFinding    = cfg.get<double>("decayModeFinding");
-  const double  againstElectronVLooseMVA6  = cfg.get<double>("againstElectronVLooseMVA6");
-  const double  againstMuonTight3  = cfg.get<double>("againstMuonTight3");
-  const double  vertexz =  cfg.get<double>("vertexz");
-  const double  byCombinedIsolationDeltaBetaCorrRaw3Hits = cfg.get<double>("byCombinedIsolationDeltaBetaCorrRaw3Hits");
-
+  // kinematic cuts on electrons
+  const float ptElectronLowCut   = cfg.get<float>("ptElectronLowCutmuel");
+  const float ptElectronHighCut  = cfg.get<float>("ptElectronHighCutmuel");
+  const float etaElectronCut     = cfg.get<float>("etaElectronCutmuel");
+  const float dxyElectronCut     = cfg.get<float>("dxyElectronCutmuel");
+  const float dzElectronCut      = cfg.get<float>("dzElectronCutmuel");
+  const float isoElectronLowCut  = cfg.get<float>("isoElectronLowCutmuel");
+  const float isoElectronHighCut = cfg.get<float>("isoElectronHighCutmuel");
+  const bool applyElectronId     = cfg.get<bool>("ApplyElectronIdmuel");
+  const string lowPtLegElectron  = cfg.get<string>("LowPtLegElectron");
+  const string highPtLegElectron = cfg.get<string>("HighPtLegElectron");
+  const string mu8Ele23DZ = cfg.get<string>("Mu8Ele23DZ");
+  const string mu23Ele12DZ = cfg.get<string>("Mu23Ele12DZ");
 
   // veto muons
   const float ptVetoMuonCut   = cfg.get<float>("ptVetoMuonCut");
@@ -107,14 +128,8 @@ int main(int argc, char * argv[]) {
   const float dzVetoMuonCut   = cfg.get<float>("dzVetoMuonCut");
   const float isoVetoMuonCut   = cfg.get<float>("isoVetoMuonCut");
   const bool applyVetoMuonId     = cfg.get<bool>("ApplyVetoMuonId");
-
-  // dilemuon veto 
-  const float ptDilepMuonCut = cfg.get<float>("ptDilepMuonCut");
-  const float etaDilepMuonCut = cfg.get<float>("etaDilepMuonCut");
-  const float dxyDilepMuonCut = cfg.get<float>("dxyDilepMuonCut");
-  const float dzDilepMuonCut = cfg.get<float>("dzDilepMuonCut");
-  const float isoDilepMuonCut = cfg.get<float>("isoDilepMuonCut");
-  const float dRDilepVetoCut = cfg.get<float>("dRDilepVetoCut");
+  const string lowPtLegMuon  = cfg.get<string>("LowPtLegMuon");
+  const string highPtLegMuon = cfg.get<string>("HighPtLegMuon");
 
 
 //veto electrons
@@ -136,32 +151,20 @@ int main(int argc, char * argv[]) {
 
 
 
-  const string MuonidIsoEffFile = cfg.get<string>("MuonidIsoEffFile");
-  const string MuontrigEffFile = cfg.get<string>("MuontrigEffFile");
-
-
   const string Region  = cfg.get<string>("Region");
   const string Sign  = cfg.get<string>("Sign");
-
-
-  const double leadchargedhadrcand_dz = cfg.get<double>("leadchargedhadrcand_dz");
-  const double leadchargedhadrcand_dxy = cfg.get<double>("leadchargedhadrcand_dxy");
-
 
 
   // kinematic cuts on Jets
   const double etaJetCut   = cfg.get<double>("etaJetCut");
   const double ptJetCut   = cfg.get<double>("ptJetCut");
-
   // topSingleMuonTriggerFile
-  const double dRleptonsCut   = cfg.get<double>("dRleptonsCut");
   const double deltaRTrigMatch = cfg.get<double>("DRTrigMatch");
+  const bool oppositeSign    = cfg.get<bool>("oppositeSign");
   const bool isIsoR03 = cfg.get<bool>("IsIsoR03");
+  const float dRleptonsCut   = cfg.get<float>("dRleptonsCutmuel");
+  const bool applyTriggerMatch = cfg.get<bool>("ApplyTriggerMatch");
 
-  const string TrigLeg  = cfg.get<string>("SingleMuonFilterName") ;
-  const double SingleMuonTriggerPtCut = cfg.get<double>("SingleMuonTriggerPtCut");
-
-  // vertex distributions filenames and histname
 
 
   const string jsonFile = cfg.get<string>("jsonFile");
@@ -169,11 +172,39 @@ int main(int argc, char * argv[]) {
   string cmsswBase = (getenv ("CMSSW_BASE"));
   string fullPathToJsonFile = cmsswBase + "/src/DesyTauAnalyses/NTupleMaker/test/json/" + jsonFile;
  
+
   RecoilCorrector recoilMetCorrector("DesyTauAnalyses/NTupleMaker/data/TypeI-PFMet_Run2016BtoH.root");
 
   MEtSys metSys("HTT-utilities/RecoilCorrections/data/MEtSys.root");
 
-//  const string TauFakeRateFile = cfg.get<string>("TauFakeRateEff");
+
+  //const string TauFakeRateFile = cfg.get<string>("TauFakeRateEff");
+
+////////// Triggers 
+  TString LowPtLegElectron(lowPtLegElectron);
+  TString HighPtLegElectron(highPtLegElectron);
+  TString Mu23Ele12DZ(mu23Ele12DZ);
+  TString Mu8Ele23DZ(mu8Ele23DZ);
+  
+  TString LowPtLegMuon(lowPtLegMuon);
+  TString HighPtLegMuon(highPtLegMuon);
+
+  
+  const string Muon8TriggerFile0p15 = cfg.get<string>("Muon8TriggerEff0p15");
+  const string Muon23TriggerFile0p15 = cfg.get<string>("Muon23TriggerEff0p15");
+  const string Electron12TriggerFile0p1 = cfg.get<string>("Electron12TriggerEff0p1");
+  const string Electron23TriggerFile0p1 = cfg.get<string>("Electron23TriggerEff0p1");
+
+
+  const string MuonidIsoEffFile = cfg.get<string>("MuonidIsoEffFile");
+  const string ElectronIdIsoFile = cfg.get<string>("ElectronIdIsoEffFile");
+
+  /////////////////////////////////////////////
+
+
+
+
+
 
   // Run-lumi selector
   std::vector<Period> periods;  
@@ -192,26 +223,11 @@ int main(int argc, char * argv[]) {
       ss >> periods.back();
     }
   }
-  TString MainTrigger(TrigLeg);
+
 
 
   const double bTag   = cfg.get<double>("bTag");
 
-  CutList.clear();
-  CutList.push_back("No cut");
-  CutList.push_back("No cut after PU");
-  CutList.push_back("mu-tau");
-  CutList.push_back("2nd lepV");
-  CutList.push_back("3rd lepV");
-  CutList.push_back("Trigger");
-  CutList.push_back("Lepton SF");
-  CutList.push_back("TauFakeRate");
-  CutList.push_back("topPtRwgt");
-  CutList.push_back("Cleaned jets");
-  CutList.push_back("b-Veto");
-
-
-  int CutNumb = (int)CutList.size();
   xs=1;fact=1;fact2=1;
 
   unsigned int RunMin = 9999999;
@@ -219,34 +235,6 @@ int main(int argc, char * argv[]) {
 
   ifstream ifs("xsecs");
   string line;
-/*
-  while(std::getline(ifs, line)) // read one line from ifs
-    {
-
-      fact=fact2=1;
-      istringstream iss(line); // access line as a stream
-
-      // we only need the first two columns
-      string dt;
-      iss >> dt >> xs >> fact >> fact2;
-      //datasetName = dt.c_str();
-      //ifs >> dt >> xs; // no need to read further
-      //cout<< " "<<dt<<"  "<<endl;
-      //cout<< "For sample ========================"<<dt<<" xsecs is "<<xs<<" XSec "<<XSec<<"  "<<fact<<"  "<<fact2<<endl;
-      if (  dt == argv[2]) {
-	XSec= xs*fact*fact2;
-	cout<<" Found the correct cross section "<<xs<<" for Dataset "<<dt<<" XSec "<<XSec<<" number of expected events for Lumi "<<Lumi <<" /pb  = " <<XSec*Lumi<<endl;
-      }
-      
-	if ( argv[2] == st1) {ChiMass=100;mIntermediate=200;}
-	else if (argv[2] == st2) {ChiMass=200;mIntermediate=500;}
-      
-      XSec=1.;
-      ChiMass=0.0;
-    }
-
-  if (XSec<0&& !isData) {cout<<" Something probably wrong with the xsecs...please check  - the input was "<<argv[2]<<endl;XSec = 1;}
-*/	
 
       XSec=1.;
    xsecs=XSec;
@@ -262,16 +250,14 @@ int main(int argc, char * argv[]) {
 
   std::string rootFileName(argv[2]);
   std::string NrootFile(argv[4]);
-  //std::ifstream fileList(argv[2]);
   std::ifstream fileList(ff);
-  //std::ifstream fileList0(argv[2]);
   std::ifstream fileList0(ff);
   std::string ntupleName("makeroottree/AC1B");
   std::string initNtupleName("initroottree/AC1B");
 
   int nTotalFiles = 0;
-  string SaveDir=argv[3];
 
+  string SaveDir=argv[3];
 
   if (string::npos == Systematic.find("Nominal")) {SaveDir.append("_");SaveDir.append(argv[5]);}
 
@@ -280,10 +266,16 @@ int main(int argc, char * argv[]) {
   std::cout <<" The filename will be "<<TStrName <<"  "<<datasetName<<"  The systematic will be "<<Systematic<<"  and save dir will be  "<<SaveDir<<endl;
 
 
-  string era=argv[3];
 
-if (string::npos != rootFileName.find("SMS-") || string::npos != rootFileName.find("stau") || string::npos != rootFileName.find("C1") || string::npos != rootFileName.find("Stop"))
-	SUSY = true;
+if (string::npos != datasetName.find("SMS-") || string::npos != datasetName.find("stau") || string::npos != datasetName.find("C1") || string::npos != rootFileName.find("Stop")) SUSY = true;
+
+
+  // qcd weight (dzeta cut)
+  QCDModelForEMu qcdWeight("HTT-utilities/QCDModelingEMu/data/QCD_weight_emu.root");
+  // qcd weight DZeta cut
+QCDModelForEMu qcdWeightNoDzeta("HTT-utilities/QCDModelingEMu/data/QCD_weight_emu_nodzeta.root");
+
+
 
 // PU reweighting
   PileUp * PUofficial = new PileUp();
@@ -295,7 +287,7 @@ if (string::npos != rootFileName.find("SMS-") || string::npos != rootFileName.fi
   PUofficial->set_h_MC(PU_mc);
 
 
-  string BtagCVS = "CSVv2Moriond17_2017_1_26_BtoH.csv" ;  
+ string BtagCVS = "CSVv2Moriond17_2017_1_26_BtoH.csv" ;  
   if (SUSY) BtagCVS = "fastsim_csvv2_ttbar_26_1_2017.csv";
 
   BTagCalibration calib("csvv2", cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/"+BtagCVS);
@@ -305,11 +297,11 @@ if (string::npos != rootFileName.find("SMS-") || string::npos != rootFileName.fi
   BTagCalibrationReader reader_C(BTagEntry::OP_MEDIUM,BTag_);
   BTagCalibrationReader reader_Light(BTagEntry::OP_MEDIUM,BTag_);
   if (!SUSY){reader_B.load(calib,BTagEntry::FLAV_B,"comb");
-    reader_C.load(calib,BTagEntry::FLAV_C,"comb");
-    reader_Light.load(calib,BTagEntry::FLAV_UDSG,"incl");}
+  reader_C.load(calib,BTagEntry::FLAV_C,"comb");
+  reader_Light.load(calib,BTagEntry::FLAV_UDSG,"incl");}
   if (SUSY){reader_B.load(calib,BTagEntry::FLAV_B,"fastsim");
-    reader_C.load(calib,BTagEntry::FLAV_C,"fastsim");
-    reader_Light.load(calib,BTagEntry::FLAV_UDSG,"fastsim");}
+  reader_C.load(calib,BTagEntry::FLAV_C,"fastsim");
+  reader_Light.load(calib,BTagEntry::FLAV_UDSG,"fastsim");}
 
 
   float etaBTAG[2] = {0.5,2.1};
@@ -351,25 +343,38 @@ if (string::npos != rootFileName.find("SMS-") || string::npos != rootFileName.fi
 
 
 
-  // Lepton Scale Factors 
+	cout<<" Initializing iD SF files....."<<endl;
+
+  ScaleFactor * SF_muon80p15 = new ScaleFactor();
+  ScaleFactor * SF_muon230p15 = new ScaleFactor();
+
+  SF_muon80p15->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(Muon8TriggerFile0p15));
+  SF_muon230p15->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(Muon23TriggerFile0p15));
+
+  ScaleFactor * SF_electron120p1 = new ScaleFactor();
+  ScaleFactor * SF_electron230p1 = new ScaleFactor();
+
+  SF_electron120p1->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(Electron12TriggerFile0p1));
+  SF_electron230p1->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(Electron23TriggerFile0p1));
 
 
-  cout<<"  Initializing iD SF files....."<<endl;
-  ScaleFactor * SF_muonIdIso = new ScaleFactor();
-  SF_muonIdIso->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(MuonidIsoEffFile));
 
-  cout<<"  Initializing Trigger SF files....."<<endl;
-  ScaleFactor * SF_muonTrigger = new ScaleFactor();
-  SF_muonTrigger->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(MuontrigEffFile));
+  cout<<" Initializing iD SF files....."<<endl;
+    ScaleFactor * SF_muonIdIso0p15 = new ScaleFactor();
+    SF_muonIdIso0p15->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(MuonidIsoEffFile));
+  
+    ScaleFactor * SF_electronIdIso0p1 = new ScaleFactor();
+SF_electronIdIso0p1->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(ElectronIdIsoFile));
+
 
 
   cout<<" ended initialization here "<<endl;
 
 
+
   TFile * file;
   if (isData) file = new TFile(SaveDir+"/"+TStrName+TString("_DataDriven.root"),"update");
-  else file = new TFile(SaveDir+"/"+TStrName+TString(".root"),"update");
-
+  if (!isData) file = new TFile(SaveDir+"/"+TStrName+TString(".root"),"update");
   file->mkdir(Channel.c_str());
   file->cd(Channel.c_str());
 
@@ -383,31 +388,30 @@ if (string::npos != rootFileName.find("SMS-") || string::npos != rootFileName.fi
   std::string dummy;
   // count number of files --->
   while (fileList0 >> dummy) nTotalFiles++;
-
+  
   SetupTree(); 
 
   if (argv[4] != NULL  && atoi(argv[4])< nTotalFiles) nTotalFiles=atoi(argv[4]);
-
-  for (int iF=0; iF<nTotalFiles; ++iF) {
+ 
+for (int iF=0; iF<nTotalFiles; ++iF) {
 
     std::string filen;
     fileList >> filen;
 
     std::cout << "file " << iF+1 << " out of " << nTotalFiles << " filename : " << filen << std::endl;
-    //////////// for SUSY!!!
+//////////// for SUSY!!!
     TFile * file_ = TFile::Open(TString(filen));
 
+bool WithInit = true;
+if (SUSY) WithInit=false;
 
-    bool WithInit = true;
-    if (SUSY) WithInit=false;
-
-    if (WithInit) cout << "With initroottree"<<endl;
-    if (!WithInit) cout << "Without initroottree ================="<<endl;
+if (WithInit) cout << "With initroottree"<<endl;
+if (!WithInit) cout << "Without initroottree"<<endl;
 
 
     TTree * _inittree = NULL;
-    if (!WithInit)  _inittree = (TTree*)file_->Get(TString(ntupleName));
-    if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
+if (!WithInit)  _inittree = (TTree*)file_->Get(TString(ntupleName));
+if (WithInit)  _inittree = (TTree*)file_->Get(TString(initNtupleName));
 
     if (_inittree==NULL) continue;
     Float_t genweight;
@@ -430,94 +434,87 @@ if (string::npos != rootFileName.find("SMS-") || string::npos != rootFileName.fi
     std::cout << "      number of entries in Tree      = " << numberOfEntries << std::endl;
     AC1B analysisTree(_tree);
 
-    TLorentzVector BlobA; BlobA.SetXYZT(0,0,0,0);
-    TLorentzVector BlobB; BlobB.SetXYZT(0,0,0,0);
-    TLorentzVector PairLV; PairLV.SetXYZT(0,0,0,0);
+      TLorentzVector BlobA; BlobA.SetXYZT(0,0,0,0);
+      TLorentzVector BlobB; BlobB.SetXYZT(0,0,0,0);
+      TLorentzVector PairLV; PairLV.SetXYZT(0,0,0,0);
 
-    if (!isData && !WithInit)
-      //if (!isData)
-      {    
-	for (Long64_t iEntry=0; iEntry<numberOfEntries; ++iEntry) 
-	  {
-	    analysisTree.GetEntry(iEntry);
-	    histWeightsH->Fill(0.,analysisTree.genweight);
+	if (!isData && !WithInit)
+		{    
+		for (Long64_t iEntry=0; iEntry<numberOfEntries; ++iEntry) 
+			{
+			analysisTree.GetEntry(iEntry);
+			histWeightsH->Fill(0.,analysisTree.genweight);
+	if (SUSY){
+		BlobA.SetXYZT(0,0,0,0);
+		BlobB.SetXYZT(0,0,0,0);
+		PairLV.SetXYZT(0,0,0,0);
+	for (unsigned int igen=0; igen < analysisTree.genparticles_count; ++igen) {
 
-	    if (SUSY){
-	      BlobA.SetXYZT(0,0,0,0);
-	      BlobB.SetXYZT(0,0,0,0);
-	      PairLV.SetXYZT(0,0,0,0);
-	      for (unsigned int igen=0; igen < analysisTree.genparticles_count; ++igen) {
+	  TLorentzVector genLV; genLV.SetXYZT(analysisTree.genparticles_px[igen],
+					      analysisTree.genparticles_py[igen],
+					      analysisTree.genparticles_pz[igen],
+					      analysisTree.genparticles_e[igen]);
 
-		TLorentzVector genLV; genLV.SetXYZT(analysisTree.genparticles_px[igen],
-						    analysisTree.genparticles_py[igen],
-						    analysisTree.genparticles_pz[igen],
-						    analysisTree.genparticles_e[igen]);
+	  if (string::npos != datasetName.find("C1N2") || string::npos != datasetName.find("Chi")) {
+			  if (abs(analysisTree.genparticles_pdgid[igen])==1000024 && abs(analysisTree.genparticles_status[igen])==62) BlobA = genLV;
+	  		  if (analysisTree.genparticles_pdgid[igen]==1000023 && abs(analysisTree.genparticles_status[igen])==62) BlobB = genLV;
+			  }
 
-		if (string::npos != datasetName.find("C1N2") || string::npos != datasetName.find("Chi")) {
-		  if (abs(analysisTree.genparticles_pdgid[igen])==1000024 && abs(analysisTree.genparticles_status[igen])==62) BlobA = genLV;
-		  if (analysisTree.genparticles_pdgid[igen]==1000023 && abs(analysisTree.genparticles_status[igen])==62) BlobB = genLV;
+	  if (string::npos != datasetName.find("C1C1")) {
+			  if (analysisTree.genparticles_pdgid[igen]==1000024 && abs(analysisTree.genparticles_status[igen])==62) BlobA = genLV;
+	  		  if (analysisTree.genparticles_pdgid[igen]==-1000024 && abs(analysisTree.genparticles_status[igen])==62) BlobB = genLV;
+			  }
 
-		  //			  cout<<"   BlobA "<<BlobA.Pt()<<"  BlobB  "<<BlobB.Pt()<<endl;
+	  if (string::npos != datasetName.find("left") || string::npos != datasetName.find("max") ) {
+			  if (analysisTree.genparticles_pdgid[igen]==1000015 && abs(analysisTree.genparticles_status[igen])==62) BlobA = genLV;
+	  		  if (analysisTree.genparticles_pdgid[igen]==-1000015 && abs(analysisTree.genparticles_status[igen])==62) BlobB = genLV;
+			  }
+
+	  if (string::npos != datasetName.find("right")) {
+			  if (analysisTree.genparticles_pdgid[igen]==2000015 && abs(analysisTree.genparticles_status[igen])==62) BlobA = genLV;
+	  		  if (analysisTree.genparticles_pdgid[igen]==-2000015 && abs(analysisTree.genparticles_status[igen])==62) BlobB = genLV;
+			  }
+
+	  if (string::npos != datasetName.find("Stop")) {
+			  if (fabs(analysisTree.genparticles_pdgid[igen])==1000006 && abs(analysisTree.genparticles_status[igen])==62) BlobA = genLV;
+	  		  if (fabs(analysisTree.genparticles_pdgid[igen])==1000024 && abs(analysisTree.genparticles_status[igen])==62) BlobB = genLV;
+			  }
+
+	}
+		
+	if (BlobA.M()>0 && BlobB.M()>0) PairLV = BlobA+BlobB;
+	
+
+	if (PairLV.Pt()>0) histPt->Fill(PairLV.Pt());
+	
+
+				}
+			}
 		}
-
-		if (string::npos != datasetName.find("C1C1") ) {
-		  if (analysisTree.genparticles_pdgid[igen]==1000024 && abs(analysisTree.genparticles_status[igen])==62) BlobA = genLV;
-		  if (analysisTree.genparticles_pdgid[igen]==-1000024 && abs(analysisTree.genparticles_status[igen])==62) BlobB = genLV;
-		}
-
-		if (string::npos != datasetName.find("left") || string::npos != datasetName.find("max") ) {
-		  if (analysisTree.genparticles_pdgid[igen]==1000015 && abs(analysisTree.genparticles_status[igen])==62) BlobA = genLV;
-		  if (analysisTree.genparticles_pdgid[igen]==-1000015 && abs(analysisTree.genparticles_status[igen])==62) BlobB = genLV;
-		}
-		if (string::npos != datasetName.find("right")) {
-		  if (analysisTree.genparticles_pdgid[igen]==2000015 && abs(analysisTree.genparticles_status[igen])==62) BlobA = genLV;
-		  if (analysisTree.genparticles_pdgid[igen]==-2000015 && abs(analysisTree.genparticles_status[igen])==62) BlobB = genLV;
-		}
-		if (string::npos != datasetName.find("Stop")) {
-		  if (abs(analysisTree.genparticles_pdgid[igen])==1000006 && abs(analysisTree.genparticles_status[igen])==62) BlobA = genLV;
-		  if (abs(analysisTree.genparticles_pdgid[igen])==1000024 && abs(analysisTree.genparticles_status[igen])==62) BlobB = genLV;
-		}
-
-	      }
-
-	      if (BlobA.M()>0 && BlobB.M()>0) PairLV = BlobA+BlobB;
-
-
-	      if (PairLV.Pt()>0) histPt->Fill(PairLV.Pt());
-
-
-	    }
-
-	  }
-      }
-
-
-
-    float genweights=1.;
-
+  	float genweights=1.;
     if(!isData && WithInit) 
       {
+
 	TTree *genweightsTree = (TTree*)file_->Get("initroottree/AC1B");
 	genweightsTree->SetBranchAddress("genweight",&genweights);
-
 
 
 	Long64_t numberOfEntriesInit = genweightsTree->GetEntries();
 	for (Long64_t iEntryInit=0; iEntryInit<numberOfEntriesInit; ++iEntryInit) { 
 	  genweightsTree->GetEntry(iEntryInit);
 	  histWeightsH->Fill(0.,genweights);
-
-
 	}
-
+    
       }
+
 
 
     for (Long64_t iEntry=0; iEntry<numberOfEntries; ++iEntry) { 
 
-      Float_t weight = 1.;
-      Float_t puweight = 1.;
-      Float_t topptweight = 1.;
+
+      Float_t weight = 1;
+      Float_t puweight = 1;
+      Float_t topptweight = 1;
       analysisTree.GetEntry(iEntry);
       nEvents++;
 
@@ -534,88 +531,89 @@ if (string::npos != rootFileName.find("SMS-") || string::npos != rootFileName.fi
       if (analysisTree.primvertex_count<2) continue;  
 
       
-      //isData= false;
       bool lumi=false;
       bool CutBasedTauId = false;
 
-      ///////////////////////////////////////////////////////////////////////////// systematic study
-      if (ApplyTauEnergyScaleUnc && !isData)
-	{
-	  double ApplyTauCorrectionUncSign=1;
-	  if (!ApplyTauCorrectionUncSignPositive) ApplyTauCorrectionUncSign = -1;
+///////////////////////////////////////////////////////////////////////////// systematic study
+	if (ApplyTauEnergyScaleUnc && !isData)
+		{
+			double ApplyTauCorrectionUncSign=1;
+			if (!ApplyTauCorrectionUncSignPositive) ApplyTauCorrectionUncSign = -1;
 
-	  for (unsigned int it = 0; it<analysisTree.tau_count; ++it) 
-	    {
+		for (unsigned int it = 0; it<analysisTree.tau_count; ++it) 
+			{
 
-	      analysisTree.tau_pt[it] *= (1 +ApplyTauCorrectionUncSign*TauEnergyScaleUnc);
-	      analysisTree.tau_px[it] *= (1 +ApplyTauCorrectionUncSign*TauEnergyScaleUnc);
-	      analysisTree.tau_py[it] *= (1 +ApplyTauCorrectionUncSign*TauEnergyScaleUnc);
-	      analysisTree.tau_pz[it] *= (1 +ApplyTauCorrectionUncSign*TauEnergyScaleUnc);
-	      analysisTree.tau_e[it] *= (1 +ApplyTauCorrectionUncSign*TauEnergyScaleUnc);
+			analysisTree.tau_pt[it] *= (1 +ApplyTauCorrectionUncSign*TauEnergyScaleUnc);
+			analysisTree.tau_px[it] *= (1 +ApplyTauCorrectionUncSign*TauEnergyScaleUnc);
+			analysisTree.tau_py[it] *= (1 +ApplyTauCorrectionUncSign*TauEnergyScaleUnc);
+			analysisTree.tau_pz[it] *= (1 +ApplyTauCorrectionUncSign*TauEnergyScaleUnc);
+			analysisTree.tau_e[it] *= (1 +ApplyTauCorrectionUncSign*TauEnergyScaleUnc);
 
-	      //analysisTree.pfmet_ex = analysisTree.pfmet_ex+((analysisTree.tau_px[it]/TauEnergyScaleUnc)-analysisTree.tau_px[it]);
-	      //analysisTree.pfmet_ey = analysisTree.pfmet_ey+((analysisTree.tau_py[it]/TauEnergyScaleUnc)-analysisTree.tau_py[it]);
-	    }
+			//analysisTree.pfmet_ex = analysisTree.pfmet_ex+((analysisTree.tau_px[it]/TauEnergyScaleUnc)-analysisTree.tau_px[it]);
+			//analysisTree.pfmet_ey = analysisTree.pfmet_ey+((analysisTree.tau_py[it]/TauEnergyScaleUnc)-analysisTree.tau_py[it]);
+			}
+		
+		} 
 
-	} 
+	if (ApplyJetEnergyCorrectionUnc && !isData)
+		{
+		double ApplyJetEnergyCorrectionUncSign=1;
+		for (unsigned int it = 0; it<analysisTree.pfjet_count; ++it) 
+			{
+			if (!ApplyJetEnergyCorrectionUncSignPositive) ApplyJetEnergyCorrectionUncSign = -1;
+			analysisTree.pfjet_pt[it] *=(1 + ApplyJetEnergyCorrectionUncSign*analysisTree.pfjet_jecUncertainty[it]);
+			analysisTree.pfjet_px[it] *=(1 + ApplyJetEnergyCorrectionUncSign*analysisTree.pfjet_jecUncertainty[it]);
+			analysisTree.pfjet_py[it] *=(1 + ApplyJetEnergyCorrectionUncSign*analysisTree.pfjet_jecUncertainty[it]);
+			analysisTree.pfjet_pz[it] *=(1 + ApplyJetEnergyCorrectionUncSign*analysisTree.pfjet_jecUncertainty[it]);
+			analysisTree.pfjet_e[it] *=(1 + ApplyJetEnergyCorrectionUncSign*analysisTree.pfjet_jecUncertainty[it]);
+			}
+		
+		} 
 
-      if (ApplyJetEnergyCorrectionUnc && !isData)
-	{
-	  double ApplyJetEnergyCorrectionUncSign=1;
-	  for (unsigned int it = 0; it<analysisTree.pfjet_count; ++it) 
-	    {
-	      if (!ApplyJetEnergyCorrectionUncSignPositive) ApplyJetEnergyCorrectionUncSign = -1;
-	      analysisTree.pfjet_pt[it] *=(1 + ApplyJetEnergyCorrectionUncSign*analysisTree.pfjet_jecUncertainty[it]);
-	      analysisTree.pfjet_px[it] *=(1 + ApplyJetEnergyCorrectionUncSign*analysisTree.pfjet_jecUncertainty[it]);
-	      analysisTree.pfjet_py[it] *=(1 + ApplyJetEnergyCorrectionUncSign*analysisTree.pfjet_jecUncertainty[it]);
-	      analysisTree.pfjet_pz[it] *=(1 + ApplyJetEnergyCorrectionUncSign*analysisTree.pfjet_jecUncertainty[it]);
-	      analysisTree.pfjet_e[it] *=(1 + ApplyJetEnergyCorrectionUncSign*analysisTree.pfjet_jecUncertainty[it]);
-	    }
+	if (ApplyElEnergyScaleUnc && !isData)
+		{
+		double ElEnergyScaleUnc=1;
+			double ApplyElectronCorrectionUncSign=1;
+			if (!ApplyElectronCorrectionUncSignPositive) ApplyElectronCorrectionUncSign = -1;
 
-	} 
+		for (unsigned int it = 0; it<analysisTree.electron_count; ++it) 
+			{
 
-      if (ApplyElEnergyScaleUnc && !isData)
-	{
-	  double ElEnergyScaleUnc=1;
-	  double ApplyElectronCorrectionUncSign=1;
-	  if (!ApplyElectronCorrectionUncSignPositive) ApplyElectronCorrectionUncSign = -1;
+			if (analysisTree.electron_eta[it] < 1.48)  ElEnergyScaleUnc = ElEnergyScaleUncBarrel;
+			if (analysisTree.electron_eta[it] > 1.48)  ElEnergyScaleUnc = ElEnergyScaleUncEndcaps;
 
-	  for (unsigned int it = 0; it<analysisTree.electron_count; ++it) 
-	    {
+			analysisTree.electron_pt[it] *=(1 + ApplyElectronCorrectionUncSign*ElEnergyScaleUnc);
+			analysisTree.electron_px[it] *=(1 + ApplyElectronCorrectionUncSign*ElEnergyScaleUnc);
+			analysisTree.electron_py[it] *=(1 + ApplyElectronCorrectionUncSign*ElEnergyScaleUnc);
+			analysisTree.electron_pz[it] *=(1 + ApplyElectronCorrectionUncSign*ElEnergyScaleUnc);
 
-	      if (analysisTree.electron_eta[it] < 1.48)  ElEnergyScaleUnc = ElEnergyScaleUncBarrel;
-	      if (analysisTree.electron_eta[it] > 1.48)  ElEnergyScaleUnc = ElEnergyScaleUncEndcaps;
+			}
+		
+		} 
 
-	      analysisTree.electron_pt[it] *=(1 + ApplyElectronCorrectionUncSign*ElEnergyScaleUnc);
-	      analysisTree.electron_px[it] *=(1 + ApplyElectronCorrectionUncSign*ElEnergyScaleUnc);
-	      analysisTree.electron_py[it] *=(1 + ApplyElectronCorrectionUncSign*ElEnergyScaleUnc);
-	      analysisTree.electron_pz[it] *=(1 + ApplyElectronCorrectionUncSign*ElEnergyScaleUnc);
+	if (ApplyMuEnergyScaleUnc && !isData)
+		{
+			double ApplyMuonCorrectionUncSign=1;
+			if (!ApplyMuonCorrectionUncSignPositive) ApplyMuonCorrectionUncSign = -1;
 
-	    }
+		for (unsigned int it = 0; it<analysisTree.muon_count; ++it) 
+			{
 
-	} 
+			analysisTree.muon_pt[it] *= (1 + ApplyMuonCorrectionUncSign*MuEnergyScaleUnc);
+			analysisTree.muon_px[it] *= (1 + ApplyMuonCorrectionUncSign*MuEnergyScaleUnc);
+			analysisTree.muon_py[it] *= (1 + ApplyMuonCorrectionUncSign*MuEnergyScaleUnc);
+			analysisTree.muon_pz[it] *= (1 + ApplyMuonCorrectionUncSign*MuEnergyScaleUnc);
+			}
+		
+		} 
 
-      if (ApplyMuEnergyScaleUnc && !isData)
-	{
-	  double ApplyMuonCorrectionUncSign=1;
-	  if (!ApplyMuonCorrectionUncSignPositive) ApplyMuonCorrectionUncSign = -1;
-
-	  for (unsigned int it = 0; it<analysisTree.muon_count; ++it) 
-	    {
-
-	      analysisTree.muon_pt[it] *= (1 + ApplyMuonCorrectionUncSign*MuEnergyScaleUnc);
-	      analysisTree.muon_px[it] *= (1 + ApplyMuonCorrectionUncSign*MuEnergyScaleUnc);
-	      analysisTree.muon_py[it] *= (1 + ApplyMuonCorrectionUncSign*MuEnergyScaleUnc);
-	      analysisTree.muon_pz[it] *= (1 + ApplyMuonCorrectionUncSign*MuEnergyScaleUnc);
-	    }
-
-	} 
-
-      ///////////////////////////////////////////////////////////////////////////// systematic study end
+///////////////////////////////////////////////////////////////////////////// systematic study end
 
       float topPt = 0;
       float antitopPt = 0;
       LSF_weight = 1.;
+      LSF_weight_mu = 1.;
+      LSF_weight_el = 1.;
       LSF_weight_1 = 1.;
       LSF_weight_2 = 1.;
       TFR_weight = 1.;
@@ -623,10 +621,11 @@ if (string::npos != rootFileName.find("SMS-") || string::npos != rootFileName.fi
       all_weight = 1.;
       pu_weight = 1.;
       gen_weight = 1.;
-      trig_weight = 1.;
       trig_weight_1 = 1.;
       trig_weight_2 = 1.;
-/////////needed for Recoil
+      trig_weight = 1.;
+
+//needed for Recoil
       bool isW = false;
       bool isDY = false;
       bool isZTT = false;
@@ -706,6 +705,9 @@ if (string::npos != rootFileName.find("SMS-") || string::npos != rootFileName.fi
 	  }
 	  
 	}
+		BlobA.SetXYZT(0,0,0,0);
+		BlobB.SetXYZT(0,0,0,0);
+		PairLV.SetXYZT(0,0,0,0);
 
 	for (unsigned int igen=0; igen < analysisTree.genparticles_count; ++igen) {
 
@@ -713,38 +715,39 @@ if (string::npos != rootFileName.find("SMS-") || string::npos != rootFileName.fi
 					      analysisTree.genparticles_py[igen],
 					      analysisTree.genparticles_pz[igen],
 					      analysisTree.genparticles_e[igen]);
+	if (SUSY){
 
-	  if (SUSY){
+	  if (string::npos != datasetName.find("C1N2") || string::npos != datasetName.find("Chi")) {
+			  if (abs(analysisTree.genparticles_pdgid[igen])==1000024 && abs(analysisTree.genparticles_status[igen])==62) BlobA = genLV;
+	  		  if (analysisTree.genparticles_pdgid[igen]==1000023 && abs(analysisTree.genparticles_status[igen])==62) BlobB = genLV;
+			  }
 
-	    if (string::npos != datasetName.find("C1N2") || string::npos != datasetName.find("Chi")) {
-	      if (abs(analysisTree.genparticles_pdgid[igen])==1000024 && abs(analysisTree.genparticles_status[igen])==62) BlobA = genLV;
-	      if (analysisTree.genparticles_pdgid[igen]==1000023 && abs(analysisTree.genparticles_status[igen])==62) BlobB = genLV;
-	    }
+	  if (string::npos != datasetName.find("C1C1") ) {
+			  if (analysisTree.genparticles_pdgid[igen]==1000024 && abs(analysisTree.genparticles_status[igen])==62) BlobA = genLV;
+	  		  if (analysisTree.genparticles_pdgid[igen]==-1000024 && abs(analysisTree.genparticles_status[igen])==62) BlobB = genLV;
+			  }
 
-	    if (string::npos != datasetName.find("C1C1")) {
-	      if (analysisTree.genparticles_pdgid[igen]==1000024 && abs(analysisTree.genparticles_status[igen])==62) BlobA = genLV;
-	      if (analysisTree.genparticles_pdgid[igen]==-1000024 && abs(analysisTree.genparticles_status[igen])==62) BlobB = genLV;
-	    }
+	  if (string::npos != datasetName.find("left") || string::npos != datasetName.find("max") ) {
+			  if (analysisTree.genparticles_pdgid[igen]==1000015 && abs(analysisTree.genparticles_status[igen])==62) BlobA = genLV;
+	  		  if (analysisTree.genparticles_pdgid[igen]==-1000015 && abs(analysisTree.genparticles_status[igen])==62) BlobB = genLV;
+			  }
 
+	  if (string::npos != datasetName.find("right")) {
+			  if (analysisTree.genparticles_pdgid[igen]==2000015 && abs(analysisTree.genparticles_status[igen])==62) BlobA = genLV;
+	  		  if (analysisTree.genparticles_pdgid[igen]==-2000015 && abs(analysisTree.genparticles_status[igen])==62) BlobB = genLV;
+			  }
 
-	    if (string::npos != datasetName.find("left") || string::npos != datasetName.find("max") ) {
-	      if (analysisTree.genparticles_pdgid[igen]==1000015 && abs(analysisTree.genparticles_status[igen])==62) BlobA = genLV;
-	      if (analysisTree.genparticles_pdgid[igen]==-1000015 && abs(analysisTree.genparticles_status[igen])==62) BlobB = genLV;
-	    }
-	    if (string::npos != datasetName.find("right")) {
-	      if (analysisTree.genparticles_pdgid[igen]==2000015 && abs(analysisTree.genparticles_status[igen])==62) BlobA = genLV;
-	      if (analysisTree.genparticles_pdgid[igen]==-2000015 && abs(analysisTree.genparticles_status[igen])==62) BlobB = genLV;
-	    }
-	    if (string::npos != datasetName.find("Stop")) {
-	      if (abs(analysisTree.genparticles_pdgid[igen])==1000006 && abs(analysisTree.genparticles_status[igen])==62) BlobA = genLV;
-	      if (abs(analysisTree.genparticles_pdgid[igen])==1000024 && abs(analysisTree.genparticles_status[igen])==62) BlobB = genLV;
-	    }
+	  if (string::npos != datasetName.find("Stop")) {
+			  if (fabs(analysisTree.genparticles_pdgid[igen])==1000006 && abs(analysisTree.genparticles_status[igen])==62) BlobA = genLV;
+	  		  if (fabs(analysisTree.genparticles_pdgid[igen])==1000024 && abs(analysisTree.genparticles_status[igen])==62) BlobB = genLV;
+			  }
 
-	    if (BlobA.M()>0 && BlobB.M()>0) PairLV = BlobA+BlobB;
+		
+	if (BlobA.M()>0 && BlobB.M()>0) PairLV = BlobA+BlobB;
+	
 
-
-	    PtSystem = PairLV.Pt();
-	  }
+	PtSystem = PairLV.Pt();
+	}
 
 
 	  if (analysisTree.genparticles_pdgid[igen]==22 && analysisTree.genparticles_status[igen]==44)
@@ -797,8 +800,10 @@ if (string::npos != rootFileName.find("SMS-") || string::npos != rootFileName.fi
 	      tauNeutrinosLV += genLV;
 	    }
 	  }
+	  
 
 /////////Matching ISR Jets
+
 
 	}
 
@@ -812,18 +817,6 @@ if (string::npos != rootFileName.find("SMS-") || string::npos != rootFileName.fi
 	isDYLL=false;
 	isDYEE=false;
 	isDYMM=false;
-
-	if (!isData){
-
-	  if (promptTausFirstCopy.size()==2) isFromTauTau = true;
-	  else if (promptTausFirstCopy.size()==1 && promptMuons.size()==1) isFromTauMuon = true;
-	  else if (promptTausFirstCopy.size()==1 && promptElectrons.size()==1) isFromTauEl = true;
-	  else if (promptMuons.size()==2) isFromMuonMuon = true;
-	  else if (promptElectrons.size()==2) isFromElEl = true;
-	  else isFromOther = true;
-
-
-	}
 	if (isDY) {
 	  
 	  if (promptTausFirstCopy.size()==2) {
@@ -884,6 +877,8 @@ if (string::npos != rootFileName.find("SMS-") || string::npos != rootFileName.fi
 
 	bosonPt = TMath::Sqrt(bosonPx*bosonPx+bosonPy*bosonPy);
 
+
+
       }
 
 	if (isDY) { // applying Z pt mass weights
@@ -901,7 +896,6 @@ if (string::npos != rootFileName.find("SMS-") || string::npos != rootFileName.fi
 
 
 
-
       if (!isData && ( string::npos != filen.find("TTJets")  || string::npos != filen.find("TT_TuneCUETP8M2T4_13TeV-powheg-pythia8") || string::npos != filen.find("TT_TuneCUETP8M1_13TeV-powheg-pythia8")) ) 
 	{
 	  for (unsigned int igen=0; igen<analysisTree.genparticles_count; ++igen) {
@@ -914,6 +908,7 @@ if (string::npos != rootFileName.find("SMS-") || string::npos != rootFileName.fi
 	      antitopPt = TMath::Sqrt(analysisTree.genparticles_px[igen]*analysisTree.genparticles_px[igen]+
 				      analysisTree.genparticles_py[igen]*analysisTree.genparticles_py[igen]);
 
+
 	  }
 
 	  if (topPt>0.&&antitopPt>0.) {
@@ -922,7 +917,6 @@ if (string::npos != rootFileName.find("SMS-") || string::npos != rootFileName.fi
 	    top_weight = topptweight;
 	     // cout<<"  "<<topPt<<"  "<<antitopPt<<"  "<<topptweight<<endl;
 	  }
-
 
       histTopPt->Fill(0.,topptweight*analysisTree.genweight);
       histTopPtSq->Fill(0.,topptweight*topptweight*analysisTree.genweight);
@@ -954,20 +948,9 @@ if (string::npos != rootFileName.find("SMS-") || string::npos != rootFileName.fi
 	    histWeightsPDFDown->Fill(0.,analysisTree.genweight*analysisTree.weightPDFdown);
 
 	    lumi=true;
-	wScale0 = analysisTree.weightScale0;
-	wScale1 = analysisTree.weightScale1;
-	wScale2 = analysisTree.weightScale2;
-	wScale3 = analysisTree.weightScale3;
-	wScale4 = analysisTree.weightScale4;
-	wScale5 = analysisTree.weightScale5;
-	wScale6 = analysisTree.weightScale6;
-	wScale7 = analysisTree.weightScale7;
-	wScale8 = analysisTree.weightScale8;
-	wPDFUp = analysisTree.weightPDFup;
-	wPDFDown = analysisTree.weightPDFdown;
 	  }
-					
 
+					
       if (isData)  {
 	XSec = 1.;
 	histRuns->Fill(analysisTree.event_run);
@@ -1000,7 +983,6 @@ if (string::npos != rootFileName.find("SMS-") || string::npos != rootFileName.fi
 	//if (lumi ) cout<<"  =============  Found good run"<<"  "<<n<<"  "<<lum<<endl;
       }
 
-
       if (analysisTree.event_run<RunMin)
 	RunMin = analysisTree.event_run;
 
@@ -1021,6 +1003,7 @@ if (string::npos != rootFileName.find("SMS-") || string::npos != rootFileName.fi
 
       if (isNewRun) 
 	allRuns.push_back(analysisTree.event_run);
+
 
 
       if (!lumi) continue;
@@ -1053,11 +1036,14 @@ if (string::npos != rootFileName.find("SMS-") || string::npos != rootFileName.fi
 	if (Run2016B || Run2016C || Run2016D || Run2016E || Run2016F) RunBCDEF = true;
 	if (Run2016G || Run2016H) RunGH = true;
 	}
+
+
+	//cout<<" BCDEF  "<<RunBCDEF<<" GH "<<RunGH<<endl;
+
 	std::vector<TString> metFlags; metFlags.clear();
      //////////////MET filters flag
-//      if (!SUSY && isData){
 
-	 
+
 	 metFlags.push_back("Flag_HBHENoiseFilter");
 	 metFlags.push_back("Flag_HBHENoiseIsoFilter");
 	 metFlags.push_back("Flag_EcalDeadCellTriggerPrimitiveFilter");
@@ -1070,7 +1056,6 @@ if (string::npos != rootFileName.find("SMS-") || string::npos != rootFileName.fi
 	 metFlags.push_back("Flag_muonBadTrackFilter");
 	 metFlags.push_back("Flag_chargedHadronTrackResolutionFilter");
 
-  //    }
 
 	bool METflag = metFiltersPasses2(analysisTree, metFlags);
 	met_flag = METflag;
@@ -1092,182 +1077,281 @@ if (string::npos != rootFileName.find("SMS-") || string::npos != rootFileName.fi
       unsigned int nMainTrigger = 0;
       bool isMainTrigger = false;
 
+
+      unsigned int nLowPtLegElectron = 0;
+      bool isLowPtLegElectron = false;
+      
+      unsigned int nHighPtLegElectron = 0;
+      bool isHighPtLegElectron = false;
+
+      unsigned int nLowPtLegMuon = 0;
+      bool isLowPtLegMuon = false;
+      
+      unsigned int nHighPtLegMuon = 0;
+      bool isHighPtLegMuon = false;
+
+      unsigned int nMu8Ele23DZ = 0;
+      bool isMu8Ele23DZ = false;
+
+      unsigned int nMu23Ele12DZ = 0;
+      bool isMu23Ele12DZ = false;
+
       if (!SUSY){
       unsigned int nfilters = analysisTree.run_hltfilters->size();
-      //  std::cout << "nfiltres = " << nfilters << std::endl;
+      //      std::cout << "nfiltres = " << nfilters << std::endl;
       for (unsigned int i=0; i<nfilters; ++i) {
 	//	std::cout << "HLT Filter : " << i << " = " << analysisTree.run_hltfilters->at(i) << std::endl;
 	TString HLTFilter(analysisTree.run_hltfilters->at(i));
-	if (HLTFilter==MainTrigger) {
-	  nMainTrigger = i;
-	  isMainTrigger = true;
+	if (HLTFilter==LowPtLegElectron) {
+	  nLowPtLegElectron = i;
+	  isLowPtLegElectron = true;
+	}
+	if (HLTFilter==HighPtLegElectron) {
+	  nHighPtLegElectron = i;
+	  isHighPtLegElectron = true;
+	}
+	if (HLTFilter==LowPtLegMuon) {
+	  nLowPtLegMuon = i;
+	  isLowPtLegMuon = true;
+	}
+	if (HLTFilter==HighPtLegMuon) {
+	  nHighPtLegMuon = i;
+	  isHighPtLegMuon = true;
 	}
 
-
-
+	if (HLTFilter==Mu23Ele12DZ) {
+	  nMu23Ele12DZ = i;
+	  isMu23Ele12DZ = true;
+	}
+	if (HLTFilter==Mu8Ele23DZ) {
+	  nMu8Ele23DZ = i;
+	  isMu8Ele23DZ = true;
+	}
       }
-	}//if isData check for filters
-
-      if (SUSY) isMainTrigger = true;
-
-      if (!isMainTrigger) {
-	std::cout << "HLT filter for Mu Trigger " << MainTrigger << " not found" << std::endl;
-	return(-1);
+      if (!isLowPtLegElectron) {
+	std::cout << "HLT filter " << LowPtLegElectron << " not found" << std::endl;
+	exit(-1);
       }
+      if (!isHighPtLegElectron) {
+	std::cout << "HLT filter " << HighPtLegElectron << " not found" << std::endl;
+	exit(-1);
+      }
+      if (!isLowPtLegMuon) {
+	std::cout << "HLT filter " << LowPtLegMuon << " not found" << std::endl;
+	exit(-1);
+      }
+      if (!isHighPtLegMuon) {
+	std::cout << "HLT filter " << HighPtLegMuon << " not found" << std::endl;
+	exit(-1);
+      }
+
+      if (RunNo > 278820-1 && !isMu23Ele12DZ) {
+	std::cout << "HLT filter " << Mu23Ele12DZ << " not found" << std::endl;
+	exit(-1);
+      }
+      }
+
 
 	
-      vector<unsigned int> allMuons; allMuons.clear();
-      vector<unsigned int> idMuons; idMuons.clear();
-      vector<unsigned int> isoMuons; isoMuons.clear();
-      vector<float> isoMuonsValue; isoMuonsValue.clear();
-      vector<bool> isMuonMatchedSingleMuFilter; isMuonMatchedSingleMuFilter.clear();
+
+      vector<int> electrons; electrons.clear();
+      for (unsigned int ie = 0; ie<analysisTree.electron_count; ++ie) {
+	if (analysisTree.electron_pt[ie]<ptElectronLowCut) continue;
+	if (fabs(analysisTree.electron_eta[ie])>etaElectronCut) continue;
+	if (fabs(analysisTree.electron_dxy[ie])>dxyElectronCut) continue;
+	if (fabs(analysisTree.electron_dz[ie])>dzElectronCut) continue;
+	bool electronMvaId = analysisTree.electron_mva_wp80_general_Spring16_v1[ie];
+	if (!electronMvaId&&applyElectronId) continue;
+	if (applyElectronId && !analysisTree.electron_pass_conversion[ie]) continue;
+	if (applyElectronId && analysisTree.electron_nmissinginnerhits[ie]>1) continue;
+	if (fabs(analysisTree.electron_charge[ie]) !=1) continue;
+	electrons.push_back(ie);
+      }
+      if (electrons.size()==0) continue;
+
+      // muon selection
       vector<int> muons; muons.clear();
-	bool isMu1matched = false;
       for (unsigned int im = 0; im<analysisTree.muon_count; ++im) {
-	allMuons.push_back(im);
 	if (isData && analysisTree.muon_isDuplicate[im]) continue;
 	if (isData && analysisTree.muon_isBad[im]) continue;
-	if (analysisTree.muon_pt[im]<SingleMuonTriggerPtCut) continue;
+	if (analysisTree.muon_pt[im]<ptMuonLowCut) continue;
 	if (fabs(analysisTree.muon_eta[im])>etaMuonCut) continue;
 	if (fabs(analysisTree.muon_dxy[im])>dxyMuonCut) continue;
 	if (fabs(analysisTree.muon_dz[im])>dzMuonCut) continue;
-	if (applyMuonId && !analysisTree.muon_isMedium[im]) continue;
-        if ( fabs(analysisTree.muon_charge[im]) != 1) continue;
-	idMuons.push_back((int)im);
-	float absIso = analysisTree.muon_r04_sumChargedHadronPt[im];
-	float neutralIso = analysisTree.muon_r04_sumNeutralHadronEt[im] + 
-	  analysisTree.muon_r04_sumPhotonEt[im] - 
-	  0.5*analysisTree.muon_r04_sumPUPt[im];
-	neutralIso = TMath::Max(float(0),neutralIso); 
-	absIso += neutralIso;
-	float relIso = absIso/analysisTree.muon_pt[im];
-	if (relIso>0.15) continue;
-	  isoMuons.push_back(im);
-	  isoMuonsValue.push_back(relIso);
-	  muons.push_back((int)im);
-
-	if (!SUSY)
-	{
-		for (unsigned int iT=0; iT<analysisTree.trigobject_count; ++iT) {
-	  	if (analysisTree.trigobject_filters[iT][nMainTrigger]
-	      	&& analysisTree.muon_pt[im]>SingleMuonTriggerPtCut &&
-	      	analysisTree.trigobject_pt[iT]>SingleMuonTriggerPtCut) { // IsoMu Leg
-		
-			float dRtrig = deltaR(analysisTree.muon_eta[im],analysisTree.muon_phi[im],
-				  analysisTree.trigobject_eta[iT],analysisTree.trigobject_phi[iT]);
-	    	if (dRtrig<deltaRTrigMatch) 
-	      	isMu1matched = true;
-	    	
-	  	}
-
-		}
-	}
-
-
+	if (!analysisTree.muon_isMedium[im]) continue;
+	if (fabs(analysisTree.muon_charge[im]) != 1) continue;
+	muons.push_back(im);
       }
 
-        if (SUSY) isMu1matched = true;
-	if (!isMu1matched) continue;
-      	if (muons.size()==0) continue;
 
-      // MC study
-      vector<unsigned int> nonpromptMuons; nonpromptMuons.clear();
-      //      std::cout << "GenParticles = " << analysisTree.genparticles_count << std::endl;
-      if (!isData) {
-	for (unsigned int igen=0; igen<analysisTree.genparticles_count; ++igen) {
-	  if (fabs(analysisTree.genparticles_pdgid[igen])==13&&analysisTree.genparticles_status[igen]==1) {
-	    //	  float pxGen = analysisTree.genparticles_px[igen];
-	    //	  float pyGen = analysisTree.genparticles_py[igen];
-	    //	  float pzGen = analysisTree.genparticles_pz[igen];
-	    //	  float etaGen = PtoEta(pxGen,pyGen,pzGen);
-	    //	  float ptGen  = PtoPt(pxGen,pyGen);
-	    //	  std::cout << analysisTree.genparticles_pdgid[igen] << " : "
-	    //		    << "  pt = " << ptGen
-	    //		    << "  eta = " << etaGen
-	    //		    << "  info = " << analysisTree.genparticles_info[igen] << std::endl;
-	  }
+      if (muons.size()==0) continue;
+
+      int el_index=-1;
+      int mu_index=-1;
+      int tau_index=-1;
+
+      float isoMuMin = 1e+10;
+      float isoEleMin = 1e+10;
+
+      bool isMuon23matched = false;
+      bool isMuon8matched  = false;
+      bool isElectron23matched = false;
+      bool isElectron12matched = false;
+      for (unsigned int im=0; im<muons.size(); ++im) {
+	bool isMu23 = false;
+	bool isMu8 = false;
+	unsigned int mIndex  = muons.at(im);
+	float neutralHadIsoMu = analysisTree.muon_neutralHadIso[mIndex];
+	float photonIsoMu = analysisTree.muon_photonIso[mIndex];
+	float chargedHadIsoMu = analysisTree.muon_chargedHadIso[mIndex];
+	float puIsoMu = analysisTree.muon_puIso[mIndex];
+	if (isIsoR03) {
+	  neutralHadIsoMu = analysisTree.muon_r04_sumNeutralHadronEt[mIndex];
+	  photonIsoMu = analysisTree.muon_r04_sumPhotonEt[mIndex];
+	  chargedHadIsoMu = analysisTree.muon_r04_sumChargedHadronPt[mIndex];
+	  puIsoMu = analysisTree.muon_r04_sumPUPt[mIndex];
 	}
-      }	
-
-
-      int indx1 = -1;
-      int indx2 = -1;
-      bool isIsoMuonsPair = false;
-      float isoMin = 9999;
-      if (isoMuons.size()>0) {
-	for (unsigned int im1=0; im1<isoMuons.size(); ++im1) {
-	  unsigned int index1 = isoMuons[im1];
-	    for (unsigned int iMu=0; iMu<allMuons.size(); ++iMu) {
-	      unsigned int indexProbe = allMuons[iMu];
-	      if (index1==indexProbe) continue;
-	      float q1 = analysisTree.muon_charge[index1];
-	      float q2 = analysisTree.muon_charge[indexProbe];
-	      if (q1*q2>0) continue;
-	      float dR = deltaR(analysisTree.muon_eta[index1],analysisTree.muon_phi[index1],
-				analysisTree.muon_eta[indexProbe],analysisTree.muon_phi[indexProbe]);
-	      if (dR<dRleptonsCut) continue; 
-	    }
-
-	  for (unsigned int im2=im1+1; im2<isoMuons.size(); ++im2) {
-	    unsigned int index2 = isoMuons[im2];
-	    float q1 = analysisTree.muon_charge[index1];
-	    float q2 = analysisTree.muon_charge[index2];
-	      if (q1*q2>0) continue;
-	    bool isMu2matched = false;
+	float neutralIsoMu = neutralHadIsoMu + photonIsoMu - 0.5*puIsoMu;
+	neutralIsoMu = TMath::Max(float(0),neutralIsoMu); 
+	float absIsoMu = chargedHadIsoMu + neutralIsoMu;
+	float relIsoMu = absIsoMu/analysisTree.muon_pt[mIndex];
 
 	if (!SUSY){
-		for (unsigned int iT=0; iT<analysisTree.trigobject_count; ++iT) {
-	  	if (analysisTree.trigobject_filters[iT][nMainTrigger]
-	      	&& analysisTree.muon_pt[index2]>SingleMuonTriggerPtCut &&  analysisTree.trigobject_pt[iT]>SingleMuonTriggerPtCut) { // IsoMu Leg
-	    	float dRtrig = deltaR(analysisTree.muon_eta[index2],analysisTree.muon_phi[index2],
-				  analysisTree.trigobject_eta[iT],analysisTree.trigobject_phi[iT]);
-	   if (dRtrig<deltaRTrigMatch) 
-	      	isMu2matched = true;
-	  		}
-		}
+	for (unsigned int iT=0; iT<analysisTree.trigobject_count; ++iT) {
+	  float dRtrig = deltaR(analysisTree.muon_eta[mIndex],analysisTree.muon_phi[mIndex],
+				analysisTree.trigobject_eta[iT],analysisTree.trigobject_phi[iT]);
+	  if (dRtrig<deltaRTrigMatch) {
+	    if (analysisTree.trigobject_filters[iT][nHighPtLegMuon]&&
+		analysisTree.muon_pt[mIndex]>ptMuonHighCut) { // Mu23 Leg
+	      isMu23 = true;
+	    }
+	    if (analysisTree.trigobject_filters[iT][nLowPtLegMuon]&&
+		analysisTree.muon_pt[mIndex]>ptMuonLowCut) { // Mu8 Leg
+	      isMu8 = true;
+	    }
+	  }
 	}
+      }//isData
+
+	  if (SUSY && analysisTree.muon_pt[mIndex]>ptMuonHighCut) isMu23 = true;
+	  if (SUSY && analysisTree.muon_pt[mIndex]>ptMuonLowCut) isMu8 = true;
+
+	  bool trigMuMatch = (isMu23) || (isMu8);
+
+	if (applyTriggerMatch && !isMu23 && !isMu8) continue;
+	  bool isEle23 = false;
+	  bool isEle12 = false;
 
 
-	    bool isTriggerMatch = (isMu1matched || isMu2matched);
-		if (SUSY) isTriggerMatch=true;
+	for (unsigned int ie=0; ie<electrons.size(); ++ie) {
 
-	    float dRmumu = deltaR(analysisTree.muon_eta[index1],analysisTree.muon_phi[index1],
-				  analysisTree.muon_eta[index2],analysisTree.muon_phi[index2]);
-	    if (isTriggerMatch && dRmumu>dRleptonsCut) {
-	      bool sumIso = isoMuonsValue[im1]+isoMuonsValue[im2];
-	      if (sumIso<isoMin) {
-		isIsoMuonsPair = true;
-		isoMin = sumIso;
-		if (analysisTree.muon_pt[index1]>analysisTree.muon_pt[index2]) {
-		  indx1 = (int)index1;
-		  indx2 = (int)index2;
-		}
-		else {
-		  indx2 = (int)index1;
-		  indx1 = (int)index2;
-		}
+	  unsigned int eIndex = electrons.at(ie);
+
+	  float dR = deltaR(analysisTree.electron_eta[eIndex],analysisTree.electron_phi[eIndex],
+			    analysisTree.muon_eta[mIndex],analysisTree.muon_phi[mIndex]);
+
+	  if (dR<dRleptonsCut) continue;
+
+
+	if (!SUSY){
+	  for (unsigned int iT=0; iT<analysisTree.trigobject_count; ++iT) {
+	    float dRtrig = deltaR(analysisTree.electron_eta[eIndex],analysisTree.electron_phi[eIndex],
+				  analysisTree.trigobject_eta[iT],analysisTree.trigobject_phi[iT]);
+	    if (dRtrig<deltaRTrigMatch) {
+	      if (analysisTree.trigobject_filters[iT][nHighPtLegElectron]&&
+		  analysisTree.electron_pt[eIndex]>ptElectronHighCut) { // Ele23 Leg
+		isEle23 = true;
+	      }
+	      if (analysisTree.trigobject_filters[iT][nLowPtLegElectron]&&
+		  analysisTree.electron_pt[eIndex]>ptElectronLowCut) { // Ele12 Leg
+		isEle12 = true;
 	      }
 	    }
 	  }
+	}//SUSY
+	  
+	  if (SUSY && analysisTree.electron_pt[eIndex]>ptElectronHighCut) isEle23 = true;
+	  if (SUSY && analysisTree.electron_pt[eIndex]>ptElectronLowCut) isEle12 = true;
+	  bool trigMatchA = (isMu23 && isEle12) ;
+	  bool trigMatchB = (isMu8 && isEle23);
+
+	  if (applyTriggerMatch && !isEle23 && !isEle12) continue;
+
+	  if (!trigMatchA && !trigMatchB) continue;
+
+	  float neutralHadIsoEle = analysisTree.electron_neutralHadIso[eIndex];
+	  float photonIsoEle = analysisTree.electron_photonIso[eIndex];
+	  float chargedHadIsoEle = analysisTree.electron_chargedHadIso[eIndex];
+	  float puIsoEle = analysisTree.electron_puIso[eIndex];
+	  if (isIsoR03) {
+	    neutralHadIsoEle = analysisTree.electron_r03_sumNeutralHadronEt[eIndex];
+	    photonIsoEle = analysisTree.electron_r03_sumPhotonEt[eIndex];
+	    chargedHadIsoEle = analysisTree.electron_r03_sumChargedHadronPt[eIndex];
+	    puIsoEle = analysisTree.electron_r03_sumPUPt[eIndex];
+	  }
+	  float neutralIsoEle = neutralHadIsoEle + photonIsoEle - 0.5*puIsoEle;
+	  neutralIsoEle = TMath::Max(float(0),neutralIsoEle); 
+	  float absIsoEle =  chargedHadIsoEle + neutralIsoEle;
+	  float relIsoEle = absIsoEle/analysisTree.electron_pt[eIndex];
+
+	  if ((int)mIndex!=(int)mu_index) {
+	    if (relIsoMu==isoMuMin) {
+	      if (analysisTree.muon_pt[mIndex]>analysisTree.muon_pt[mu_index]) {
+		isoMuMin  = relIsoMu;
+		mu_index = (int)mIndex;
+		isoEleMin = relIsoEle;
+		el_index = (int)eIndex;
+		isMuon23matched = isMu23;
+		isMuon8matched = isMu8;
+		isElectron23matched = isEle23;
+		isElectron12matched = isEle12;
+	      }
+	    }
+	    else if (relIsoMu<isoMuMin) {
+	      isoMuMin  = relIsoMu;
+	      mu_index = (int)mIndex;
+	      isoEleMin = relIsoEle;
+	      el_index = (int)eIndex;
+	      isMuon23matched = isMu23;
+	      isMuon8matched = isMu8;
+	      isElectron23matched = isEle23;
+	      isElectron12matched = isEle12;
+	    }
+	  }
+	  else {
+	    if (relIsoEle==isoEleMin) {
+	      if (analysisTree.electron_pt[eIndex]>analysisTree.electron_pt[el_index]) {
+		isoEleMin = relIsoEle;
+		el_index = (int)eIndex;
+		isElectron23matched = isEle23;
+		isElectron12matched = isEle12;
+	      }
+	    }
+	    else if (relIsoEle<isoEleMin) {
+	      isoEleMin = relIsoEle;
+	      el_index = (int)eIndex;
+	      isElectron23matched = isEle23;
+	      isElectron12matched = isEle12;
+	    }
+	  }
+	  
 	}
-      }//isMuons
+      }
+
+       //     cout << "mIndex = " << mu_index << "   eIndex = " << el_index << std::endl;
+
+      if ((int)el_index<0) continue;
+      if ((int)mu_index<0) continue;
 
 
 
-      int mu_index_1 = indx1;
-      int mu_index_2 = indx2;
+      el_relIso[0]=isoEleMin;
+      mu_relIso[0]=isoMuMin;
 
-      if (mu_index_1 <0 || mu_index_2 <0)continue;
-
-
-      mu_relIso[0]=isoMuonsValue[mu_index_1];
-      mu_relIso[1]=isoMuonsValue[mu_index_2];
+      if (isoEleMin>0.3 || isoMuMin>0.3) continue;
       
-      double q = analysisTree.muon_charge[mu_index_1] * analysisTree.muon_charge[mu_index_2];
+      double q = analysisTree.electron_charge[el_index] * analysisTree.muon_charge[mu_index];
       event_sign  = q;
-	
-      if (event_sign >0) continue;
-
 
 
   bool          dilepton_veto=false;
@@ -1280,14 +1364,15 @@ if (string::npos != rootFileName.find("SMS-") || string::npos != rootFileName.fi
       // looking for extra electron
       bool foundExtraElectron = false;
       for (unsigned int ie = 0; ie<analysisTree.electron_count; ++ie) {
+	if (int(ie)==(int)el_index) continue;
 	if (analysisTree.electron_pt[ie]<ptVetoElectronCut) continue;
 	if (fabs(analysisTree.electron_eta[ie])>etaVetoElectronCut) continue;
 	if (fabs(analysisTree.electron_dxy[ie])>dxyVetoElectronCut) continue;
 	if (fabs(analysisTree.electron_dz[ie])>dzVetoElectronCut) continue;
 	bool electronMvaId = analysisTree.electron_mva_wp90_general_Spring16_v1[ie];
 	if (!electronMvaId&&applyVetoElectronId) continue;
-	if (!analysisTree.electron_pass_conversion[ie]&&applyVetoElectronId) continue;
-	if (analysisTree.electron_nmissinginnerhits[ie]>1&&applyVetoElectronId) continue;
+	if (!analysisTree.electron_pass_conversion[ie]&&applyVetoElectronId&&applyVetoElectronId) continue;
+	if (analysisTree.electron_nmissinginnerhits[ie]>1&&applyVetoElectronId&&applyVetoElectronId) continue;
 	float neutralHadIsoEle = analysisTree.electron_neutralHadIso[ie];
 	float photonIsoEle = analysisTree.electron_photonIso[ie];
 	float chargedHadIsoEle = analysisTree.electron_chargedHadIso[ie];
@@ -1298,21 +1383,18 @@ if (string::npos != rootFileName.find("SMS-") || string::npos != rootFileName.fi
 	  chargedHadIsoEle = analysisTree.electron_r03_sumChargedHadronPt[ie];
 	  puIsoEle = analysisTree.electron_r03_sumPUPt[ie];
 	}
-	double neutralIsoEleN = neutralHadIsoEle + photonIsoEle - 0.5*puIsoEle;
-	double neutralIsoEle = max(double(0),neutralIsoEleN); 
+	float neutralIsoEle = neutralHadIsoEle + photonIsoEle - 0.5*puIsoEle;
+	neutralIsoEle = TMath::Max(float(0),neutralIsoEle); 
 	float absIsoEle =  chargedHadIsoEle + neutralIsoEle;
 	float relIsoEle = absIsoEle/analysisTree.electron_pt[ie];	
 	if (relIsoEle>isoVetoElectronCut) continue;
 	foundExtraElectron = true;
       }
 
-
       // looking for extra muon
       bool foundExtraMuon = false;
-      int foundThirdLepton =0;
       for (unsigned int im = 0; im<analysisTree.muon_count; ++im) {
-	if (int(im)==(int)mu_index_1) continue;
-	if (int(im)==(int)mu_index_2) continue;
+	if (int(im)==(int)mu_index) continue;
 	if (isData && analysisTree.muon_isDuplicate[im]) continue;
 	if (isData && analysisTree.muon_isBad[im]) continue;
 	if (analysisTree.muon_pt[im]<ptVetoMuonCut) continue;
@@ -1336,7 +1418,6 @@ if (string::npos != rootFileName.find("SMS-") || string::npos != rootFileName.fi
 	float relIsoMu = absIsoMu/analysisTree.muon_pt[im];
 	if (relIsoMu>isoVetoMuonCut) continue;
 	foundExtraMuon = true;
-	if (foundThirdLepton==1) muon_index_3 = (int)im;
       }
 
 
@@ -1345,132 +1426,101 @@ if (string::npos != rootFileName.find("SMS-") || string::npos != rootFileName.fi
 
 
       // applying inclusive selection
+
+   	event_secondLeptonVeto = false;
+
 	
 	if(extraelec_veto || extramuon_veto)   event_thirdLeptonVeto = true;
 
-	//if (event_thirdLeptonVeto) continue;
-	if (event_thirdLeptonVeto && foundThirdLepton>1) continue;
-
-      if (foundThirdLepton==1) mu_relIso[2]=isoMuonsValue[muon_index_3];
-
-      if (isIsoMuonsPair) {      
-	//match to genparticles
-	bool genmatch_m1 = false, genmatch_m2 = false;
-	if (!isData) {
-	  for (unsigned int igen=0; igen<analysisTree.genparticles_count; ++igen) {
-	    if (fabs(analysisTree.genparticles_pdgid[igen])==13 &&
-		analysisTree.genparticles_status[igen]==1) {
-
-	       TLorentzVector gen_mu1; gen_mu1.SetPxPyPzE(analysisTree.genparticles_px[igen],
-							 analysisTree.genparticles_py[igen],
-							 analysisTree.genparticles_pz[igen],
-							  analysisTree.genparticles_e[igen]);
-	       TLorentzVector gen_mu2; gen_mu2.SetPxPyPzE(analysisTree.genparticles_px[igen],
-							 analysisTree.genparticles_py[igen],
-							 analysisTree.genparticles_pz[igen],
-							  analysisTree.genparticles_e[igen]);
-	      double deltaR_mu1 = deltaR(gen_mu1.Eta(), gen_mu1.Phi(),
-					 analysisTree.muon_eta[indx1],analysisTree.muon_phi[indx1]);
-	      if(deltaR_mu1 < 0.3)genmatch_m1 = true;
-
-	      double deltaR_mu2 = deltaR(gen_mu2.Eta(), gen_mu2.Phi(),
-					 analysisTree.muon_eta[indx2],analysisTree.muon_phi[indx2]);
-	      if(deltaR_mu2 < 0.3)genmatch_m2 = true;
-   
-	    }
-	  }
-	}
-      }//isIsoMuon
+//	if (event_thirdLeptonVeto) continue;
 
 
 ///////////////Trigger weight 
-      double ptMu1 = (double)analysisTree.muon_pt[mu_index_1];
-      double etaMu1 = (double)analysisTree.muon_eta[mu_index_1];
-      double ptMu2 = (double)analysisTree.muon_pt[mu_index_2];
-      double etaMu2 = (double)analysisTree.muon_eta[mu_index_2];
-      double ptMu3=0;
-      double etaMu3=0;
-      if (foundThirdLepton ==1){
-      ptMu3 = (double)analysisTree.muon_pt[muon_index_3];
-      etaMu3 = (double)analysisTree.muon_eta[muon_index_3];
+//
+//
+     float  pt_2 = analysisTree.muon_pt[mu_index];
+     float  eta_2 = analysisTree.muon_eta[mu_index];
+     float  phi_2 = analysisTree.muon_phi[mu_index];
+      
+     float pt_1 = analysisTree.electron_pt[el_index];
+     float eta_1 = analysisTree.electron_eta[el_index];
+     float phi_1 = analysisTree.electron_phi[el_index];
 
-      }
-      float trigweightD = 1.;
-      float trigweightM = 1.;
-      float trigweightDloose = 1.;
-      float trigweightMloose = 1.;
-      float trigweightDlooseB = 1.;
-      float trigweightMlooseB = 1.;
+     float Ele23EffData0p1 = 1.;
+     float Ele12EffData0p1 = 1.;
+     float Mu8EffData0p15 = 1.;
+     float Mu23EffData0p15 = 1.;
+     float Ele23EffMC0p1 = 1.;
+     float Ele12EffMC0p1 = 1.;
+     float Mu8EffMC0p15 = 1.;
+     float Mu23EffMC0p15 = 1.;
+
+	trig_weight_1 = 0;
+	trig_weight_2 = 0;
+     float LumiA, LumiB, Lumi;
+      Lumi = 36590.; LumiA = 20233.; LumiB = 16357.;
+
+      if (!isData) {
+     //// Ele_0p1 Muon_0p15
+
+      Ele12EffData0p1 = (float)SF_electron120p1->get_EfficiencyData(double(pt_1),double(eta_1));
+      Ele23EffData0p1 = (float)SF_electron230p1->get_EfficiencyData(double(pt_1),double(eta_1));
+      Ele12EffMC0p1 = (float)SF_electron120p1->get_EfficiencyMC(double(pt_1),double(eta_1));
+      Ele23EffMC0p1 = (float)SF_electron230p1->get_EfficiencyMC(double(pt_1),double(eta_1));
+
+      Mu8EffData0p15 = (float)SF_muon80p15->get_EfficiencyData(double(pt_2),double(eta_2));
+      Mu23EffData0p15 = (float)SF_muon230p15->get_EfficiencyData(double(pt_2),double(eta_2));
+      Mu8EffMC0p15 = (float)SF_muon80p15->get_EfficiencyMC(double(pt_2),double(eta_2));
+      Mu23EffMC0p15 = (float)SF_muon230p15->get_EfficiencyMC(double(pt_2),double(eta_2));
+
+	float termA =0;   termA = (Mu23EffData0p15*Ele12EffData0p1) ; 
+	float termB =0;   termB = (Mu8EffData0p15*Ele23EffData0p1); 
+	float termC =0;   termC = (Mu23EffData0p15*Ele23EffData0p1);
+
+	float termAMC =0;   termAMC =  (Mu23EffMC0p15*Ele12EffMC0p1) ; 
+	float termBMC =0;   termBMC = (Mu8EffMC0p15*Ele23EffMC0p1) ; 
+	float termCMC =0;   termCMC = (Mu23EffMC0p15*Ele23EffMC0p1);
+
+	
+	 float trigWeight = 0;//
+	 if (termAMC + termBMC - termCMC >0.001) trigWeight = (termA + termB - termC)/ (termAMC + termBMC - termCMC); 
+
+	 //if ( (termA==0 && termB==0) || (termAMC==0 && termBMC==0)) trigWeight =0;
+
+	// cout<<"  "<<trigWeight<<"  "<<termA<<"  "<<termAMC<<"  "<<termB<<"  "<<termBMC<<"  "<<termC<<"  "<<termCMC<<endl;
+
+         if (SUSY) trigWeight = Mu23EffData0p15*Ele12EffData0p1 + Mu8EffData0p15*Ele23EffData0p1 - Mu23EffData0p15*Ele23EffData0p1;
+
+	trig_weight = (trigWeight)/Lumi + 0.953 * (trigWeight)/Lumi;
+	trig_weight_1 = (trigWeight) ;
+	trig_weight_2 =  0.953*(trigWeight) ;
+	weight *= trig_weight;
 
 
-      float EffFromData1 = (float)SF_muonTrigger->get_EfficiencyData(double(ptMu1),double(etaMu1));
-      float EffFromData2 = (float)SF_muonTrigger->get_EfficiencyData(double(ptMu2),double(etaMu2));
-      float  EffFromMC1   = (float)SF_muonTrigger->get_EfficiencyMC(double(ptMu1),double(etaMu1));
-      float  EffFromMC2   = (float)SF_muonTrigger->get_EfficiencyMC(double(ptMu2),double(etaMu2));
-      float EffFromData3=0;
-      float EffFromMC3=0;
-      if (foundThirdLepton ==1){
-      EffFromData3 = (float)SF_muonTrigger->get_EfficiencyData(double(ptMu3),double(etaMu3));
-      EffFromMC3   = (float)SF_muonTrigger->get_EfficiencyMC(double(ptMu3),double(etaMu3));
-      }
-
-
-	if (!SUSY) {
-		trigweightD = 1 -  (1-EffFromData1) * (1 -EffFromData2);
-		trigweightM = 1 -  (1-EffFromMC1) * (1 -EffFromMC2);
-
-		trigweightDloose = 1 -  (1-EffFromData1) * (1 -EffFromData3);
-		trigweightMloose = 1 -  (1-EffFromMC1) * (1 -EffFromMC3);
-
-		trigweightDlooseB = 1 -  (1-EffFromData2) * (1 -EffFromData3);
-		trigweightMlooseB = 1 -  (1-EffFromMC2) * (1 -EffFromMC3);
- 		
-
-
-      weight *= trigweightD/trigweightM;
-      trig_weight_1 = trigweightD;
-      trig_weight_2 = trigweightM;
-      //when you use the 1rst and loose
-      trig_weight_1looseAC = trigweightDloose;
-      trig_weight_2looseAC = trigweightMloose;
-
-      //when you use the 2nd and loose
-      trig_weight_1looseBC = trigweightDlooseB;
-      trig_weight_2looseBC = trigweightMlooseB;
-
-
-
-	}
 
 	///LSF 
-      if (!isData && applyLeptonSF) {
 
-	float IdIsoSF_mu1 = SF_muonIdIso->get_ScaleFactor(ptMu1, etaMu1);
-	float IdIsoSF_mu2 = SF_muonIdIso->get_ScaleFactor(ptMu2, etaMu2);
-	float IdIsoSF_mu3 = 0;
+ 	float  isoweight_1 = 1;
+      	float  isoweight_2 = 1;
 
-	if (foundThirdLepton ==1)  IdIsoSF_mu3 = SF_muonIdIso->get_ScaleFactor(ptMu3, etaMu3);
+        isoweight_1 = SF_muonIdIso0p15->get_ScaleFactor(pt_2,eta_2);
+        isoweight_2 = SF_electronIdIso0p1->get_ScaleFactor(pt_1,eta_1);
 
-	weight *= IdIsoSF_mu1 * IdIsoSF_mu2;
-	LSF_weight = IdIsoSF_mu1 * IdIsoSF_mu2;
-	LSF_weight_1 = IdIsoSF_mu1 ;
-	LSF_weight_2 = IdIsoSF_mu2;
-	if (foundThirdLepton ==1) LSF_weight_3 = IdIsoSF_mu3;
+	LSF_weight_mu = isoweight_1 ;
+	LSF_weight_el = isoweight_2 ;
+	LSF_weight = LSF_weight_mu * LSF_weight_el;
       }
 
-
-      
-
       //////////////////////////////////////////////
-      muon_index_1 = (int)mu_index_1;
-      muon_index_2 = (int)mu_index_2;
+      muon_index = (int)mu_index;
       electron_index = (int)el_index;
       taus_index = (int)tau_index;
 
-      mu_count= (int)analysisTree.muon_count;
-      //cout<<" here ============================> "<<iEntry<<"  "<<mu_count<<"  "<<(int)analysisTree.muon_count<<"  "<<analysisTree.muon_count<<endl;
+
+
+      mu_count= (int)muons.size();
       for (unsigned int im=0;im<muons.size(); ++im){
-	unsigned int mIndex = muons[im];
+	  unsigned int mIndex = muons[im];
 	mu_px[im]=analysisTree.muon_px[mIndex];
 	mu_py[im]=analysisTree.muon_py[mIndex];
 	mu_pz[im]=analysisTree.muon_pz[mIndex];
@@ -1483,25 +1533,52 @@ if (string::npos != rootFileName.find("SMS-") || string::npos != rootFileName.fi
 	mu_dxyerr[im]=analysisTree.muon_dxyerr[mIndex];
 	mu_dzerr[im]=analysisTree.muon_dzerr[mIndex];
 
-	mu_neutralHadIso[im] = analysisTree.muon_r04_sumNeutralHadronEt[mIndex];
-	mu_photonIso[im] = analysisTree.muon_r04_sumPhotonEt[mIndex];
-	mu_chargedHadIso[im] = analysisTree.muon_r04_sumChargedHadronPt[mIndex];
-	mu_puIso[im] = analysisTree.muon_r04_sumPUPt[mIndex];
+        mu_neutralHadIso[im] = analysisTree.muon_r04_sumNeutralHadronEt[mIndex];
+        mu_photonIso[im] = analysisTree.muon_r04_sumPhotonEt[mIndex];
+        mu_chargedHadIso[im] = analysisTree.muon_r04_sumChargedHadronPt[mIndex];
+        mu_puIso[im] = analysisTree.muon_r04_sumPUPt[mIndex];
+ 
+        double neutralIso = mu_neutralHadIso[im] + mu_photonIso[im] - 0.5*mu_puIso[im];
+        neutralIso = max(double(0),neutralIso);
+	mu_neutralIso[im] = neutralIso;
+        mu_absIsoMu[im] = mu_chargedHadIso[im] + neutralIso;
+	mu_relIsoMu[im]  = mu_absIsoMu[im]/mu_pt[im] ;
+   
+     	}
 
-	double neutralIso = mu_neutralHadIso[mIndex] + mu_photonIso[mIndex] - 0.5*mu_puIso[mIndex];
-	neutralIso = max(double(0),neutralIso);
-	mu_neutralIso[mIndex] = neutralIso;
-	mu_absIsoMu[im] = mu_chargedHadIso[mIndex] + neutralIso;
-	mu_relIsoMu[im]  = mu_absIsoMu[mIndex]/mu_pt[mIndex] ;
+
+
+      el_count=(int)electrons.size();
+      for (unsigned int ie=0;ie<electrons.size(); ++ie){
+	  unsigned int iee = electrons[ie];
+	el_px[ie]=analysisTree.electron_px[iee];
+	el_py[ie]=analysisTree.electron_py[iee];
+	el_pz[ie]=analysisTree.electron_pz[iee];
+	el_eta[ie]=analysisTree.electron_eta[iee];
+	el_pt[ie]=analysisTree.electron_pt[iee];
+	el_phi[ie]=analysisTree.electron_phi[iee];
+	el_charge[ie]=analysisTree.electron_charge[iee];
+	el_dxy[ie]=analysisTree.electron_dxy[iee];
+	el_dz[ie]=analysisTree.electron_dz[iee];
+	el_dxyerr[ie]=analysisTree.electron_dxyerr[iee];
+	el_dzerr[ie]=analysisTree.electron_dzerr[iee];
+
+        el_neutralHadIso[ie] = analysisTree.electron_r03_sumNeutralHadronEt[iee];
+        el_photonIso[ie] = analysisTree.electron_r03_sumPhotonEt[iee];
+        el_chargedHadIso[ie] = analysisTree.electron_r03_sumChargedHadronPt[iee];
+        el_puIso[ie] = analysisTree.electron_r03_sumPUPt[iee];
+ 
+        double neutralIso = el_neutralHadIso[ie] + el_photonIso[ie] - 0.5*el_puIso[ie];
+        neutralIso = max(double(0),neutralIso);
+        el_neutralIso[ie] = neutralIso ;
+        el_absIsoEl[ie] = el_chargedHadIso[ie] + el_neutralIso[ie];
+	el_relIsoEl[ie]  = el_absIsoEl[ie]/el_pt[ie] ;
 
       }
 
 
-      el_count=(int)analysisTree.electron_count;
-
-
+				
       jet_count=(int)analysisTree.pfjet_count;
-
       for (unsigned int jj=0;jj<analysisTree.pfjet_count; ++jj){
 
 	jet_e[jj] = analysisTree.pfjet_e[jj];
@@ -1515,14 +1592,14 @@ if (string::npos != rootFileName.find("SMS-") || string::npos != rootFileName.fi
 	jet_btag[jj] = analysisTree.pfjet_btag[jj][0];
       }
 
+      float dr_tt = deltaR(analysisTree.muon_eta[mu_index],analysisTree.muon_phi[mu_index],
+		    analysisTree.electron_eta[el_index],analysisTree.electron_phi[el_index]);
+      qcdweight     = qcdWeightNoDzeta.getWeight(pt_1,pt_2,dr_tt);
+      qcdweightup   = qcdWeightNoDzeta.getWeightUp(pt_1,pt_2,dr_tt);
+      qcdweightdown = qcdWeightNoDzeta.getWeightDown(pt_1,pt_2,dr_tt);
 
 
-      ////////jets cleaning 
       TLorentzVector leptonsV, muonJ, jetsLV;
-
-
-
-      /////////////////////////////////////////////////
 
 
       float jetEta = 2.4;
@@ -1540,7 +1617,7 @@ if (string::npos != rootFileName.find("SMS-") || string::npos != rootFileName.fi
 
       int indexSubLeadingJet = -1;
       float ptSubLeadingJet = -1;
-
+      
       int indexLeadingBJet = -1;
 
       int counter_cleaned_jets = 0;
@@ -1554,17 +1631,14 @@ if (string::npos != rootFileName.find("SMS-") || string::npos != rootFileName.fi
       }
 
 
-
-
-
-
       for (unsigned int jet=0; jet<analysisTree.pfjet_count; ++jet) {
-        float absJetEta = fabs(analysisTree.pfjet_eta[jet]);
 
-	if (absJetEta > etaJetCut) continue;
 	if (fabs(analysisTree.pfjet_pt[jet])<ptJetCut) continue;
+        float absJetEta = fabs(analysisTree.pfjet_eta[jet]);
+	if (absJetEta > etaJetCut) continue;
 
 	float jetPt = analysisTree.pfjet_pt[jet];
+
 
 	bool isPFJetId = false ; 
 	isPFJetId =looseJetiD(analysisTree,jet);
@@ -1573,21 +1647,21 @@ if (string::npos != rootFileName.find("SMS-") || string::npos != rootFileName.fi
 	if (!isPFJetId) continue;
 	bool cleanedJet = true;
 
-	double Dr=deltaR(analysisTree.muon_eta[mu_index_1],analysisTree.muon_phi[mu_index_1],
+
+	double Dr=deltaR(analysisTree.muon_eta[mu_index],analysisTree.muon_phi[mu_index],
 			 analysisTree.pfjet_eta[jet],analysisTree.pfjet_phi[jet]);
 	if (  Dr  < DRmax)  cleanedJet=false;
 
+	double Dre=deltaR(analysisTree.electron_eta[el_index],analysisTree.electron_phi[el_index],
+			  analysisTree.pfjet_eta[jet],analysisTree.pfjet_phi[jet]);
 
-	double Drr=deltaR(analysisTree.muon_eta[mu_index_2],analysisTree.muon_phi[mu_index_2],
-						  analysisTree.pfjet_eta[jet],analysisTree.pfjet_phi[jet]);
-
-	if ( Drr < DRmax) cleanedJet=false;
+	if (  Dre  < DRmax )  cleanedJet=false;
 
 	if (!cleanedJet) continue;
 
 	if (absJetEta<bJetEtaCut) { // jet within b-tagging acceptance
 
-	bool btaggedTight  (analysisTree.pfjet_btag[jet][0]  > 0.9535) ;
+	  bool btaggedTight  (analysisTree.pfjet_btag[jet][0]  > 0.9535) ;
       	bool btagged  (analysisTree.pfjet_btag[jet][0]  > bTag) ;
 	
 	  if (!isData) {
@@ -1635,6 +1709,7 @@ if (string::npos != rootFileName.find("SMS-") || string::npos != rootFileName.fi
 		//		std::cout << "upgrading " << std::endl;
 	      }
 	    }
+
 	    if (jet_scalefactor<1 && btaggedTight) { // downgrade
 	      double fraction = 1-jet_scalefactor;
 	      if (rannum<fraction) {
@@ -1649,9 +1724,12 @@ if (string::npos != rootFileName.find("SMS-") || string::npos != rootFileName.fi
 		//		std::cout << "upgrading " << std::endl;
 	      }
 	    }
+
+
+
 	  } //is Data
 
-	  if (btagged && cleanedJet) 	   	   bjets.push_back(jet);
+	  if (btagged && cleanedJet) 	   bjets.push_back(jet);
 	  if (btaggedTight && cleanedJet) 	   bjetsTight.push_back(jet);
 
 	  if (btaggedTight && cleanedJet) bjets_cleanedTight[counter_cleaned_jets]=(int)jet;
@@ -1674,14 +1752,15 @@ if (string::npos != rootFileName.find("SMS-") || string::npos != rootFileName.fi
 
       njets = jets.size();
       jet_count = jets.size();
+      //njetspt20 = jetspt20.size();
       nbtag = bjets.size();
-      nbtagTight = bjetsTight.size();
+      //nbtag_nocleaned = bjets_nocleaned.size();
 
       npv =  analysisTree.primvertex_count;
       npu = analysisTree.numtruepileupinteractions;
 	
-      //SusyMother = SusyMotherMassF;
-      //SusyLSP = SusyLSPMassF;
+      SusyMother = SusyMotherMassF;
+      SusyLSP = SusyLSPMassF;
 
 
 /////////////////// Recoil corrections
@@ -1842,31 +1921,30 @@ cout<<""<<endl;
 */
       float genmet_ex = analysisTree.genmet_ex;
       float genmet_ey = analysisTree.genmet_ey;
+      genHT = analysisTree.genparticles_lheHt;
 
       genmet = TMath::Sqrt(genmet_ex*genmet_ex + genmet_ey*genmet_ey);
       genmetphi = TMath::ATan2(genmet_ey,genmet_ex);
 
       if (!isData) npartons = analysisTree.genparticles_noutgoing;
 
- //     if (npartons>0 && npartons<5 && string::npos != filen.find("DYJetsToLL")) continue;
       all_weight = weight;
 
-      event_run = analysisTree.event_run;
-      event_lumi = analysisTree.event_luminosityblock;
-      NuPx = nuPx;
-      NuPy = nuPy;
-      NuPz = nuPz;
-      NuPt = nuPt;
-      NuPhi = nuPhi;
-      genmet_Ex = analysisTree.genmet_ex;
-      genmet_Ey = analysisTree.genmet_ey;
-
-      genHT = analysisTree.genparticles_lheHt;
-
+       wScale0 = analysisTree.weightScale0;
+       wScale1 = analysisTree.weightScale1;
+       wScale2 = analysisTree.weightScale2;
+       wScale3 = analysisTree.weightScale3;
+       wScale4 = analysisTree.weightScale4;
+       wScale5 = analysisTree.weightScale5;
+       wScale6 = analysisTree.weightScale6;
+       wScale7 = analysisTree.weightScale7;
+       wScale8 = analysisTree.weightScale8;
+       wPDFUp = analysisTree.weightPDFup;
+       wPDFDown = analysisTree.weightPDFdown;
       T->Fill();
 	
       selEvents++;
-
+      /////////////////////////////////////////////////
 
 
     } // end of file processing (loop over events in one file)
@@ -1877,9 +1955,10 @@ cout<<""<<endl;
     file_->Close();
     delete file_;
   }
-
+  cout<<"done"<<endl;
 
   cout<<" Run range from -----> "<<RunMin<<" to  "<<RunMax<<endl;
+
 
 
   std::cout << std::endl;
@@ -1902,16 +1981,15 @@ cout<<""<<endl;
   histTopPt->Write();
   histTopPtSq->Write();
   histRuns->Write();
-  CutFlowUnW->Write();
   histPt->Write();
+  CutFlowUnW->Write();
+  CutFlow->Write();
   file->Write();
   file->Close();
-
-
-
-
 
   cout<<"done"<<endl;
   delete file;
 
 }
+
+
