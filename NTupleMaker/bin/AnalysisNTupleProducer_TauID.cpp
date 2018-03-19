@@ -633,6 +633,7 @@ int main(int argc, char * argv[]) {
   trigNTuple_->Branch("IsZ",&isZTrig_,"IsZ/O");
   trigNTuple_->Branch("nMuon",&nMuonTrig_,"nMuon/i");
   trigNTuple_->Branch("nSelMuon",&nSelMuonTrig_,"nSelMuon/i");
+  trigNTuple_->Branch("npartons",&npartons_,"npartons/i");
 
 
   // project directory
