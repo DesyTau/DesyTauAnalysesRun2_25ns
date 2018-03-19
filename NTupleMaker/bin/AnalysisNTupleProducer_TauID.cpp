@@ -357,6 +357,7 @@ int main(int argc, char * argv[]) {
   Float_t SoftHt_           ; // sumJetPtCentral20 + sumJetPtForward30 + sumLeptonPt
   Float_t HtNoRecoil_       ; // sumJetPtCentral30 + sumJetPtForward30 + sumLeptonPt - sumPtRecoil
   Float_t SoftHtNoRecoil_   ; // sumJetPtCentral20 + sumJetPtForward30 + sumLeptonPt - sumPtRecoil 
+  Float_t mht_;
   Float_t mhtNoMu_;
   Float_t metNoMu_;
   
@@ -591,6 +592,7 @@ int main(int argc, char * argv[]) {
   ntuple_->Branch("SoftHt",&SoftHt_,"SoftHt/F");
   ntuple_->Branch("HtNoRecoil",&HtNoRecoil_,"HtNoRecoil/F");
   ntuple_->Branch("SoftHtNoRecoil",&SoftHtNoRecoil_,"SoftHtNoRecoil/F");
+  ntuple_->Branch("mht",&mht_,"mht/F");
   ntuple_->Branch("mhtNoMu",&mhtNoMu_,"mhtNoMu/F");
   ntuple_->Branch("metNoMu",&metNoMu_,"metNoMu/F");
 
@@ -634,6 +636,11 @@ int main(int argc, char * argv[]) {
   trigNTuple_->Branch("nMuon",&nMuonTrig_,"nMuon/i");
   trigNTuple_->Branch("nSelMuon",&nSelMuonTrig_,"nSelMuon/i");
   trigNTuple_->Branch("npartons",&npartons_,"npartons/i");
+  trigNTuple_->Branch("met",&met_,"met/F");
+  trigNTuple_->Branch("mht",&mht_,"mht/F");
+  trigNTuple_->Branch("mtmuon",&mtmuon_,"mtmuon/F");
+  trigNTuple_->Branch("muonPt",&muonPt_,"muonPt/F");
+  trigNTuple_->Branch("muonEta",&muonEta_,"muonEta/F");
 
 
   // project directory
@@ -927,6 +934,7 @@ int main(int argc, char * argv[]) {
       isWTrig_ = false;
       isZTrig_ = false;
       metNoMu_ = 0;
+      mht_ = 0;
       mhtNoMu_ = 0;
       metNoSelMu_ = 0;
       mhtNoSelMu_ = 0;
@@ -1633,6 +1641,7 @@ int main(int argc, char * argv[]) {
       SoftJetHt_ = htCentral20 + htForward30;
       Ht_        = JetHt_     + muonHt + elecHt;
       SoftHt_    = SoftJetHt_ + muonHt + elecHt;
+      mht_        = (lorentzVectorAllJetsForMht).Pt();
       mhtNoMu_    = (lorentzVectorAllJetsForMht - lorentzVectorAllMuons).Pt();
       mhtNoSelMu_ = (lorentzVectorAllJetsForMht - lorentzVectorAllSelMuons).Pt();
       TLorentzVector lorentzVectorJet; lorentzVectorJet.SetXYZT(0,0,0,0);
