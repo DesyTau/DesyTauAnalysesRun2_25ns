@@ -620,6 +620,7 @@ int main(int argc, char * argv[]) {
   Float_t mhtNoSelMu_;
   UInt_t nMuonTrig_;
   UInt_t nSelMuonTrig_;
+  Float_t dPhiMetMuon_;
 
   TTree * trigNTuple_ = new TTree("TriggerNTuple","TriggerNTuple");
   trigNTuple_->Branch("event",&event_,"event/i"); 
@@ -641,6 +642,7 @@ int main(int argc, char * argv[]) {
   trigNTuple_->Branch("mtmuon",&mtmuon_,"mtmuon/F");
   trigNTuple_->Branch("muonPt",&muonPt_,"muonPt/F");
   trigNTuple_->Branch("muonEta",&muonEta_,"muonEta/F");
+  trigNTuple_->Branch("dPhiMetMuon",&dPhiMetMuon_,"dPhiMetMuon/F");
 
 
   // project directory
@@ -684,11 +686,9 @@ int main(int argc, char * argv[]) {
   SF_muonTrig->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(MuonTrigFile));
   
  // Trigger efficiencies
-  TFile * trigEffFile = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/"+trigEffFileName);
-  TF1 * trigEffDataLowerMt = (TF1*)trigEffFile->Get("MhtLt130_data");
-  TF1 * trigEffDataUpperMt = (TF1*)trigEffFile->Get("MhtGt130_data");
-  TF1 * trigEffMCLowerMt   = (TF1*)trigEffFile->Get("MhtLt130_mc");
-  TF1 * trigEffMCUpperMt   = (TF1*)trigEffFile->Get("MhtGt130_mc");
+  TFile * trigEffFile = new TFile(TString(cmsswBase)+"/src/"+trigEffFileName);
+  TGraphAsymmErrors * graph_trigEffData = (TGraphAsymmErrors*) trigEffFile->Get("data");
+  TGraphAsymmErrors * graph_trigEffMC   = (TGraphAsymmErrors*) trigEffFile->Get("mc");
   
   // MEt filters
   std::vector<TString> metFlags; metFlags.clear();
@@ -798,6 +798,7 @@ int main(int argc, char * argv[]) {
       muonEta_ = 0;
       muonPhi_ = 0;
       muonQ_ = 0;
+      dPhiMetMuon_ = 0;
 
       muon2Pt_ =  -1;
       muon2Eta_ = 0;
@@ -1159,15 +1160,8 @@ int main(int argc, char * argv[]) {
       bool isMetHLT = false;
       for (std::map<string,int>::iterator it=analysisTree.hltriggerresults->begin(); it!=analysisTree.hltriggerresults->end(); ++it) {
 	TString trigName(it->first);
-	//	if (trigName.Contains(SingleMuonHLTName)) {
-	  //	  std::cout << it->first << " : " << it->second << std::endl;
-	//	  if (it->second==1)
-	//	    isSingleMuonHLT = true;
-	//	}
 	if (trigName.Contains(MetHLTName)) {
-	  //	  std::cout << it->first << " : " << it->second << std::endl;
-          if (it->second==1)
-            isMetHLT = true;
+          if (it->second==1) isMetHLT = true;
         }
       }
       trigger_ = isMetHLT;
@@ -1394,6 +1388,7 @@ int main(int argc, char * argv[]) {
 	metphi_ = TMath::ATan2(pfmet_ey,pfmet_ex);
 	lorentzVectorMet.SetXYZT(pfmet_ex,pfmet_ey,0,met_);
 	mtmuon_  = mT(lorentzVectorTriggerMu,lorentzVectorMet);
+	dPhiMetMuon_ = dPhiFromLV(lorentzVectorTriggerMu,lorentzVectorMet); 
 	lorentzVectorW = lorentzVectorTriggerMu + lorentzVectorMet;
 	for (unsigned int iMu = 0; iMu < selMuonIndexes.size(); ++iMu) {
 	  int indexMu = int(selMuonIndexes.at(iMu));
@@ -1992,23 +1987,14 @@ int main(int argc, char * argv[]) {
 
       trigWeight_ = 1;
 
-      if (mhtNoMu_<130) {
-	if (metNoMu_>100&&metNoMu_<300) {
-	  trigEffData = trigEffDataLowerMt->Eval(metNoMu_);
-	  trigEffMC   = trigEffMCLowerMt->Eval(metNoMu_);
-	  trigWeight_ = trigEffData / trigEffMC;
-	}
-      }
-      if (mhtNoMu_>=130) {
-	if (metNoMu_>90&&metNoMu_<400) {
-	  trigEffData = trigEffDataUpperMt->Eval(metNoMu_);
-          trigEffMC   = trigEffMCUpperMt->Eval(metNoMu_);
-	  trigWeight_ = trigEffData / trigEffMC;
-	}
+      if (met_>60&&met_<800) {
+	trigEffData = graph_trigEffData -> Eval(met_);
+	trigEffMC   = graph_trigEffMC   -> Eval(met_);
+	trigWeight_ = trigEffData / trigEffMC;
       }
       if (debug) {
-	cout << "MetNoMu = " << metNoMu_ 
-	     << "  MhtNoMu = " << mhtNoMu_ 
+	cout << "Met  = " << met_ 
+	     << "  Mht  = " << mht_ 
 	     << "  trigWeight = " << trigWeight_ << endl;
       }
       weight_ *= trigWeight_;
