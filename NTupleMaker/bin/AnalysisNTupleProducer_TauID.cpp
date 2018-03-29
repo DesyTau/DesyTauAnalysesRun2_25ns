@@ -91,6 +91,10 @@ int main(int argc, char * argv[]) {
   const string pfJet80HLTFilterName = cfg.get<string>("PFJet80HLTFilterName"); 
   const string pfJet140HLTFilterName = cfg.get<string>("PFJet140HLTFilterName"); 
   const string pfJet200HLTFilterName = cfg.get<string>("PFJet200HLTFilterName"); 
+  const string pfJet260HLTFilterName = cfg.get<string>("PFJet260HLTFilterName"); 
+  const string pfJet320HLTFilterName = cfg.get<string>("PFJet320HLTFilterName"); 
+  const string pfJet400HLTFilterName = cfg.get<string>("PFJet400HLTFilterName"); 
+  const string pfJet450HLTFilterName = cfg.get<string>("PFJet450HLTFilterName"); 
 
   TString MetHLTName(metHTLName);
   TString SingleMuonHLTName(singleMuonHLTName);
@@ -99,6 +103,10 @@ int main(int argc, char * argv[]) {
   TString PFJet80HLTFilterName(pfJet80HLTFilterName);
   TString PFJet140HLTFilterName(pfJet140HLTFilterName);
   TString PFJet200HLTFilterName(pfJet200HLTFilterName);
+  TString PFJet260HLTFilterName(pfJet260HLTFilterName);
+  TString PFJet320HLTFilterName(pfJet320HLTFilterName);
+  TString PFJet400HLTFilterName(pfJet400HLTFilterName);
+  TString PFJet450HLTFilterName(pfJet450HLTFilterName);
 
   // tau cuts
   const float ptTauCut  = cfg.get<float>("PtTauCut");
@@ -376,6 +384,10 @@ int main(int argc, char * argv[]) {
   Bool_t pfJet80_;
   Bool_t pfJet140_;
   Bool_t pfJet200_;
+  Bool_t pfJet260_;
+  Bool_t pfJet320_;
+  Bool_t pfJet400_;
+  Bool_t pfJet450_;
 
   Bool_t pf2Jet60_;
   Bool_t pf2Jet80_;
@@ -600,6 +612,10 @@ int main(int argc, char * argv[]) {
   ntuple_->Branch("pfJet80",&pfJet80_,"pfJet80/O");
   ntuple_->Branch("pfJet140",&pfJet140_,"pfJet140/O");
   ntuple_->Branch("pfJet200",&pfJet200_,"pfJet200/O");
+  ntuple_->Branch("pfJet260",&pfJet260_,"pfJet260/O");
+  ntuple_->Branch("pfJet320",&pfJet320_,"pfJet320/O");
+  ntuple_->Branch("pfJet400",&pfJet400_,"pfJet400/O");
+  ntuple_->Branch("pfJet450",&pfJet450_,"pfJet450/O");
 
   ntuple_->Branch("pf2Jet60",&pf2Jet60_,"pf2Jet60/O");
   ntuple_->Branch("pf2Jet80",&pf2Jet80_,"pf2Jet80/O");
@@ -916,6 +932,10 @@ int main(int argc, char * argv[]) {
       pfJet80_ = false;
       pfJet140_ = false;
       pfJet200_ = false;
+      pfJet260_ = false;
+      pfJet320_ = false;
+      pfJet400_ = false;
+      pfJet450_ = false;
 
       pf2Jet60_ = false;
       pf2Jet80_ = false;
@@ -1182,6 +1202,18 @@ int main(int argc, char * argv[]) {
       unsigned int nPFJet200HLTFilter = 0;
       bool isPFJet200HLTFilter = false;
 
+      unsigned int nPFJet260HLTFilter = 0;
+      bool isPFJet260HLTFilter = false;
+
+      unsigned int nPFJet320HLTFilter = 0;
+      bool isPFJet320HLTFilter = false;
+
+      unsigned int nPFJet400HLTFilter = 0;
+      bool isPFJet400HLTFilter = false;
+
+      unsigned int nPFJet450HLTFilter = 0;
+      bool isPFJet450HLTFilter = false;
+
       for (unsigned int i=0; i<analysisTree.run_hltfilters->size(); ++i) {
 	//	std::cout << "HLT Filter : " << i << " = " << analysisTree.run_hltfilters->at(i) << std::endl;
 	TString HLTFilter(analysisTree.run_hltfilters->at(i));
@@ -1205,6 +1237,22 @@ int main(int argc, char * argv[]) {
 	  nPFJet200HLTFilter = i;
 	  isPFJet200HLTFilter = true;
 	}
+	if (HLTFilter==PFJet260HLTFilterName) {
+	  nPFJet260HLTFilter = i;
+	  isPFJet260HLTFilter = true;
+	}
+	if (HLTFilter==PFJet320HLTFilterName) {
+	  nPFJet320HLTFilter = i;
+	  isPFJet320HLTFilter = true;
+	}
+	if (HLTFilter==PFJet400HLTFilterName) {
+	  nPFJet400HLTFilter = i;
+	  isPFJet400HLTFilter = true;
+	}
+	if (HLTFilter==PFJet450HLTFilterName) {
+	  nPFJet450HLTFilter = i;
+	  isPFJet450HLTFilter = true;
+	}
       }
       //      if (isData) {
       if (!isSingleMuonHLTFilter) {
@@ -1223,9 +1271,24 @@ int main(int argc, char * argv[]) {
 	std::cout << "HLT filter " << PFJet140HLTFilterName << " not found" << std::endl;
 	exit(-1);
       }
-
       if (!isPFJet200HLTFilter) {
 	std::cout << "HLT filter " << PFJet200HLTFilterName << " not found" << std::endl;
+	exit(-1);
+      }
+      if (!isPFJet260HLTFilter) {
+	std::cout << "HLT filter " << PFJet260HLTFilterName << " not found" << std::endl;
+	exit(-1);
+      }
+      if (!isPFJet320HLTFilter) {
+	std::cout << "HLT filter " << PFJet320HLTFilterName << " not found" << std::endl;
+	exit(-1);
+      }
+      if (!isPFJet400HLTFilter) {
+	std::cout << "HLT filter " << PFJet400HLTFilterName << " not found" << std::endl;
+	exit(-1);
+      }
+      if (!isPFJet450HLTFilter) {
+	std::cout << "HLT filter " << PFJet450HLTFilterName << " not found" << std::endl;
 	exit(-1);
       }
       // ************************************
@@ -1498,6 +1561,10 @@ int main(int argc, char * argv[]) {
       std::vector<bool> jets80trigger; jets80trigger.clear();
       std::vector<bool> jets140trigger; jets140trigger.clear();
       std::vector<bool> jets200trigger; jets200trigger.clear();
+      std::vector<bool> jets260trigger; jets260trigger.clear();
+      std::vector<bool> jets320trigger; jets320trigger.clear();
+      std::vector<bool> jets400trigger; jets400trigger.clear();
+      std::vector<bool> jets450trigger; jets450trigger.clear();
 
       for (unsigned int ijet=0; ijet<analysisTree.pfjet_count; ++ijet) {
 
@@ -1606,6 +1673,10 @@ int main(int argc, char * argv[]) {
 	bool trigMatch80 = false;
 	bool trigMatch140 = false;
 	bool trigMatch200 = false;
+	bool trigMatch260 = false;
+	bool trigMatch320 = false;
+	bool trigMatch400 = false;
+	bool trigMatch450 = false;
 	for (unsigned int iT=0; iT<analysisTree.trigobject_count; ++iT) {
 	  float dRtrig = deltaR(analysisTree.pfjet_eta[ijet],analysisTree.pfjet_phi[ijet],
 				analysisTree.trigobject_eta[iT],analysisTree.trigobject_phi[iT]);
@@ -1615,18 +1686,30 @@ int main(int argc, char * argv[]) {
 	  if ((analysisTree.trigobject_filters[iT][nPFJet80HLTFilter]&&isPFJet80HLTFilter))   trigMatch80 = true; 
 	  if ((analysisTree.trigobject_filters[iT][nPFJet140HLTFilter]&&isPFJet140HLTFilter)) trigMatch140 = true;
 	  if ((analysisTree.trigobject_filters[iT][nPFJet200HLTFilter]&&isPFJet200HLTFilter)) trigMatch200 = true;
+	  if ((analysisTree.trigobject_filters[iT][nPFJet260HLTFilter]&&isPFJet260HLTFilter)) trigMatch260 = true;
+	  if ((analysisTree.trigobject_filters[iT][nPFJet320HLTFilter]&&isPFJet320HLTFilter)) trigMatch320 = true;
+	  if ((analysisTree.trigobject_filters[iT][nPFJet400HLTFilter]&&isPFJet400HLTFilter)) trigMatch400 = true;
+	  if ((analysisTree.trigobject_filters[iT][nPFJet450HLTFilter]&&isPFJet450HLTFilter)) trigMatch450 = true;
 	}
 	if (!isData) {
 	  trigMatch60 = true;
 	  trigMatch80 = true;
 	  trigMatch140 = true;
 	  trigMatch200 = true;
+	  trigMatch260 = true;
+	  trigMatch320 = true;
+	  trigMatch400 = true;
+	  trigMatch450 = true;
 	}
 	triggerJetsIndexes.push_back(ijet);
 	jets60trigger.push_back(trigMatch60);
 	jets80trigger.push_back(trigMatch80);
 	jets140trigger.push_back(trigMatch140);
 	jets200trigger.push_back(trigMatch200);
+	jets260trigger.push_back(trigMatch260);
+	jets320trigger.push_back(trigMatch320);
+	jets400trigger.push_back(trigMatch400);
+	jets450trigger.push_back(trigMatch450);
       }
       nJetsCentral20_ = centralJets20Indexes.size();
       nJetsCentral30_ = centralJets30Indexes.size();
@@ -1655,6 +1738,10 @@ int main(int argc, char * argv[]) {
 	pfJet80_ = false;
 	pfJet140_ = false;
 	pfJet200_ = false;
+	pfJet260_ = false;
+	pfJet320_ = false;
+	pfJet400_ = false;
+	pfJet450_ = false;
 	lorentzVectorJet.SetXYZT(analysisTree.pfjet_px[indexJet0],
 				 analysisTree.pfjet_py[indexJet0],
 				 analysisTree.pfjet_pz[indexJet0],
@@ -1667,6 +1754,10 @@ int main(int argc, char * argv[]) {
 	  if ((analysisTree.trigobject_filters[iT][nPFJet80HLTFilter]&&isPFJet80HLTFilter))   pfJet80_  = true; 
 	  if ((analysisTree.trigobject_filters[iT][nPFJet140HLTFilter]&&isPFJet140HLTFilter)) pfJet140_ = true;
 	  if ((analysisTree.trigobject_filters[iT][nPFJet200HLTFilter]&&isPFJet200HLTFilter)) pfJet200_ = true;
+	  if ((analysisTree.trigobject_filters[iT][nPFJet260HLTFilter]&&isPFJet260HLTFilter)) pfJet260_ = true;
+	  if ((analysisTree.trigobject_filters[iT][nPFJet320HLTFilter]&&isPFJet320HLTFilter)) pfJet320_ = true;
+	  if ((analysisTree.trigobject_filters[iT][nPFJet400HLTFilter]&&isPFJet400HLTFilter)) pfJet400_ = true;
+	  if ((analysisTree.trigobject_filters[iT][nPFJet450HLTFilter]&&isPFJet450HLTFilter)) pfJet450_ = true;
 	}
       }
       if (nJetsCentral30_>1) {
@@ -2227,6 +2318,10 @@ int main(int argc, char * argv[]) {
 	    pfJet80_ = jets80trigger.at(acceptedJetDirIndex);
 	    pfJet140_ = jets140trigger.at(acceptedJetDirIndex);
 	    pfJet200_ = jets200trigger.at(acceptedJetDirIndex);
+	    pfJet260_ = jets260trigger.at(acceptedJetDirIndex);
+	    pfJet320_ = jets320trigger.at(acceptedJetDirIndex);
+	    pfJet400_ = jets400trigger.at(acceptedJetDirIndex);
+	    pfJet450_ = jets450trigger.at(acceptedJetDirIndex);
 
 	    tauDM_ = analysisTree.tau_decayModeFinding[indexTau] > 0.5;
 	    tauNewDM_ = analysisTree.tau_decayModeFindingNewDMs[indexTau] > 0.5;
