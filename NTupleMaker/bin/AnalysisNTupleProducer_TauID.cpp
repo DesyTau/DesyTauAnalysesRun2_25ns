@@ -2185,10 +2185,10 @@ int main(int argc, char * argv[]) {
 	//	isWTauNu = isWTauNu && recoilRatio_>ptTauMetRatioLowerCut_WTauNu && recoilRatio_<ptTauMetRatioUpperCut_WTauNu;
 	isWTauNu = isWTauNu && recoilDPhi_>deltaPhiTauMetCut_WTauNu;
 	isWTauNu = isWTauNu && nSelTaus_ >= 1;
-	//isWTauNu = isWTauNu && tauPt_>100;
-	//isWTauNu = isWTauNu && nJetsCentral30_<=2;
-	//isWTauNu = isWTauNu && nMuon_ == 0;
-	//isWTauNu = isWTauNu && nElec_ == 0;
+	isWTauNu = isWTauNu && tauPt_>100;
+	isWTauNu = isWTauNu && nJetsCentral30_<=2;
+	isWTauNu = isWTauNu && nMuon_ == 0;
+	isWTauNu = isWTauNu && nElec_ == 0;
 	if (isWTauNu) {
 	  HtNoRecoil_     = Ht_;
 	  SoftHtNoRecoil_ = SoftHt_;
