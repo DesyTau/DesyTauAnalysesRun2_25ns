@@ -368,6 +368,7 @@ int main(int argc, char * argv[]) {
   Float_t mht_;
   Float_t mhtNoMu_;
   Float_t metNoMu_;
+  Float_t dPhiMetTau_;
   
   Int_t selection_; 
   UInt_t npartons_; 
@@ -607,6 +608,7 @@ int main(int argc, char * argv[]) {
   ntuple_->Branch("mht",&mht_,"mht/F");
   ntuple_->Branch("mhtNoMu",&mhtNoMu_,"mhtNoMu/F");
   ntuple_->Branch("metNoMu",&metNoMu_,"metNoMu/F");
+  ntuple_->Branch("dPhiMetTau",&dPhiMetTau_,"dPhiMetTau/F");
 
   ntuple_->Branch("pfJet60",&pfJet60_,"pfJet60/O");
   ntuple_->Branch("pfJet80",&pfJet80_,"pfJet80/O");
@@ -955,6 +957,7 @@ int main(int argc, char * argv[]) {
       isWTrig_ = false;
       isZTrig_ = false;
       metNoMu_ = 0;
+      dPhiMetTau_ = 0;
       mht_ = 0;
       mhtNoMu_ = 0;
       metNoSelMu_ = 0;
@@ -2131,6 +2134,7 @@ int main(int argc, char * argv[]) {
           recoilPt_  = lorentzVectorW.Pt();
           recoilEta_ = lorentzVectorW.Eta();
           recoilPhi_ = lorentzVectorW.Phi();
+	  dPhiMetTau_= dPhiFromLV(lorentzVectorMet,lorentzVectorTau);
 	  selection_ = 1;
 	  ntuple_->Fill();
 	  WJetEvents++;
@@ -2196,6 +2200,7 @@ int main(int argc, char * argv[]) {
           recoilPt_  = lorentzVectorMet.Pt();
           recoilEta_ = lorentzVectorMet.Eta();
           recoilPhi_ = lorentzVectorMet.Phi();
+	  dPhiMetTau_= dPhiFromLV(lorentzVectorMet,lorentzVectorTau);
 	  selection_ = 3;
 	  ntuple_->Fill();
 	  WTauNuEvents++;
@@ -2351,6 +2356,7 @@ int main(int argc, char * argv[]) {
 	    recoilPhi_ = recoilJetLV.Phi();
 	    HtNoRecoil_     = Ht_     - recoilJetLV.Pt();
 	    SoftHtNoRecoil_ = SoftHt_ - recoilJetLV.Pt();
+	    dPhiMetTau_= dPhiFromLV(lorentzVectorMet,lorentzVectorTau);
 	    selection_ = 4;
 	    ntuple_->Fill();
 	  }
