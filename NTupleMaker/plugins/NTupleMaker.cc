@@ -917,6 +917,7 @@ void NTupleMaker::beginJob(){
 
     // generated particles
     tree->Branch("genparticles_lheHt", &genparticles_lheHt, "genparticles_lheHt/F");
+    tree->Branch("genparticles_lheWPt", &genparticles_lheWPt, "genparticles_lheWPt/F");
     tree->Branch("genparticles_noutgoing", &genparticles_noutgoing, "genparticles_noutgoing/i");
     tree->Branch("genparticles_count", &genparticles_count, "genparticles_count/i");
     tree->Branch("genparticles_e", genparticles_e, "genparticles_e[genparticles_count]/F");
@@ -2166,7 +2167,7 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   if(doDebug)  cout<<"add gen info"<< endl; 
   if(cgen && !cdata)
     {
-      AddGenHt(iEvent);
+      AddLHEInformation(iEvent);
 
       bool haveGenParticles = AddGenParticles(iEvent);
       bool haveGenJets      = AddGenJets(iEvent);
@@ -2384,9 +2385,10 @@ bool NTupleMaker::AddFlags(const edm::Event& iEvent, const char* module, const c
   return true;
 }
 
-bool NTupleMaker::AddGenHt(const edm::Event& iEvent) {
+bool NTupleMaker::AddLHEInformation(const edm::Event& iEvent) {
   genparticles_lheHt = 0.;
   genparticles_noutgoing = 0;
+  genparticles_lheWPt = 0.;
 
   edm::Handle<LHEEventProduct> lheEventProduct;  
   iEvent.getByToken(LHEToken_, lheEventProduct);
@@ -2398,15 +2400,32 @@ bool NTupleMaker::AddGenHt(const edm::Event& iEvent) {
   std::vector<lhef::HEPEUP::FiveVector> lheParticles = lheEvent.PUP;
 
   size_t numParticles = lheParticles.size();
+
+  LorentzVector lepLV(0,0,0,0);
+  LorentzVector nuLV(0,0,0,0);
+
   for ( size_t idxParticle = 0; idxParticle < numParticles; ++idxParticle ) {
    int absPdgId = TMath::Abs(lheEvent.IDUP[idxParticle]);
    int status = lheEvent.ISTUP[idxParticle];
+   if ( absPdgId == 24 ){
+     genparticles_lheWPt = TMath::Sqrt(TMath::Power(lheParticles[idxParticle][0], 2.) + TMath::Power(lheParticles[idxParticle][1], 2.)); // first entry is px, second py
+   }
+   if ( absPdgId == 11 || absPdgId == 13 || absPdgId == 15 ){
+     if( status == 1) lepLV.SetPxPyPzE(lheParticles[idxParticle][0],lheParticles[idxParticle][1],lheParticles[idxParticle][2],lheParticles[idxParticle][3]); // see:  SimDataFormats/GeneratorProducts/interface/LesHouches.h
+   }
+   if ( absPdgId == 12 || absPdgId == 14 || absPdgId == 16 ){
+     if( status == 1) nuLV.SetPxPyPzE(lheParticles[idxParticle][0],lheParticles[idxParticle][1],lheParticles[idxParticle][2],lheParticles[idxParticle][3]); // see:  SimDataFormats/GeneratorProducts/interface/LesHouches.h
+   }
    if ( status == 1 && ((absPdgId >= 1 && absPdgId <= 6) || absPdgId == 21) ) { // quarks and gluons
        genparticles_lheHt += TMath::Sqrt(TMath::Power(lheParticles[idxParticle][0], 2.) + TMath::Power(lheParticles[idxParticle][1], 2.)); // first entry is px, second py
        ++genparticles_noutgoing;
-   } 
+   }
   }
-   
+
+  // Calculate w-boson pt from decay products
+  LorentzVector wLV = lepLV + nuLV;
+  if(genparticles_lheWPt == 0)  genparticles_lheWPt = wLV.Pt();
+
   weightPDFmax = 0.1;
   weightPDFmin = 10; 
   
