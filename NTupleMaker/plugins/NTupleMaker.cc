@@ -698,6 +698,9 @@ void NTupleMaker::beginJob(){
     tree->Branch("track_dxyerr", track_dxyerr, "track_dxyerr[track_count]/F");
     tree->Branch("track_dz", track_dz, "track_dz[track_count]/F");
     tree->Branch("track_dzerr", track_dzerr, "track_dzerr[track_count]/F");
+    tree->Branch("track_vx", track_vx, "track_vx[track_count]/F");
+    tree->Branch("track_vy", track_vy, "track_vy[track_count]/F");
+    tree->Branch("track_vz", track_vz, "track_vz[track_count]/F");
     tree->Branch("track_ID", track_ID, "track_ID[track_count]/I");
     tree->Branch("track_highPurity", track_highPurity, "track_highPurity[track_count]/O");
   }
@@ -2806,6 +2809,9 @@ unsigned int NTupleMaker::AddPFCand(const edm::Event& iEvent, const edm::EventSe
         track_dz[track_count] = (*Tracks)[i].dz();
         track_dxyerr[track_count] = (*Tracks)[i].dxyError();
         track_dzerr[track_count] = (*Tracks)[i].dzError();
+	track_vx[track_count] = (*Tracks)[i].vertex().x();
+	track_vy[track_count] = (*Tracks)[i].vertex().y();
+	track_vz[track_count] = (*Tracks)[i].vertex().z();
         track_ID[track_count] = (*Tracks)[i].pdgId();
 	const reco::Track * trkRef = (*Tracks)[i].bestTrack();
 	track_highPurity[track_count] = false;

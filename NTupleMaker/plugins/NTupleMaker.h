@@ -558,6 +558,9 @@ class NTupleMaker : public edm::EDAnalyzer{
   UChar_t track_nstriplayers[M_trackmaxcount];
   Int_t track_ID[M_trackmaxcount];
   Bool_t track_highPurity[M_trackmaxcount];
+  Float_t track_vx[M_trackmaxcount];
+  Float_t track_vy[M_trackmaxcount];
+  Float_t track_vz[M_trackmaxcount];
   
   
   // pat muons
