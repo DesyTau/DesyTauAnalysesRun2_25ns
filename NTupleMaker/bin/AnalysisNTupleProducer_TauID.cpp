@@ -187,6 +187,9 @@ int main(int argc, char * argv[]) {
   TString TStrName(rootFileName);
   std::cout <<TStrName <<std::endl;  
 
+  // Check if WJet sample is processed
+  const bool isWJetsSample = (rootFileName.find("WJets") == rootFileName.rfind("/")+1) || (rootFileName.find("W1Jets") == rootFileName.rfind("/")+1) || (rootFileName.find("W2Jets") == rootFileName.rfind("/")+1) || (rootFileName.find("W3Jets") == rootFileName.rfind("/")+1) || (rootFileName.find("W4Jets") == rootFileName.rfind("/")+1) || (rootFileName.find("EWK") == rootFileName.rfind("/")+1);
+
   // output fileName
   TFile * file = new TFile(TStrName+TString(".root"),"recreate");
 
@@ -335,6 +338,7 @@ int main(int argc, char * argv[]) {
   Float_t jetPt_;
   Float_t jetEta_;
   Float_t jetPhi_;
+  Float_t jetBtag_;
 
   UInt_t jetChargedMult_;
   UInt_t jetNeutralMult_;
@@ -345,6 +349,7 @@ int main(int argc, char * argv[]) {
   Float_t jet2Pt_;
   Float_t jet2Eta_;
   Float_t jet2Phi_;
+  Float_t jet2Btag_;
 
   UInt_t jet2ChargedMult_;
   UInt_t jet2NeutralMult_;
@@ -372,6 +377,7 @@ int main(int argc, char * argv[]) {
   
   Int_t selection_; 
   UInt_t npartons_; 
+  Float_t lheWPt_;
   //  0 : Z->mumu+Jet, 
   //  1 : W->muv+Jet
   //  2 : W*->muv 
@@ -576,6 +582,7 @@ int main(int argc, char * argv[]) {
   ntuple_->Branch("jetPt", &jetPt_, "jetPt/F");
   ntuple_->Branch("jetEta",&jetEta_,"jetEta/F");
   ntuple_->Branch("jetPhi",&jetPhi_,"jetPhi/F");
+  ntuple_->Branch("jetBtag",&jetBtag_,"jetBtag/F");
 
   ntuple_->Branch("jetChargedMult",   &jetChargedMult_,   "jetChargedMult/i");
   ntuple_->Branch("jetNeutralMult",   &jetNeutralMult_,   "jetNeutralMult/i");
@@ -587,6 +594,7 @@ int main(int argc, char * argv[]) {
   ntuple_->Branch("jet2Pt", &jet2Pt_, "jet2Pt/F");
   ntuple_->Branch("jet2Eta",&jet2Eta_,"jet2Eta/F");
   ntuple_->Branch("jet2Phi",&jet2Phi_,"jet2Phi/F");
+  ntuple_->Branch("jet2Btag",&jet2Btag_,"jet2Btag/F");
 
   ntuple_->Branch("jet2ChargedMult",   &jet2ChargedMult_,   "jet2ChargedMult/i");
   ntuple_->Branch("jet2NeutralMult",   &jet2NeutralMult_,   "jet2NeutralMult/i");
@@ -627,6 +635,7 @@ int main(int argc, char * argv[]) {
   ntuple_->Branch("Selection",&selection_,"Selection/I");
 
   ntuple_->Branch("npartons",&npartons_,"npartons/i");
+  ntuple_->Branch("lheWPt",&lheWPt_,"lheWPt/F");
 
   TH1D * dRtauCentralJetH = new TH1D("dRtauCentralJetH","",50,0.,5.0);
   TH1D * dRtauForwardJetH = new TH1D("dRtauForwardJetH","",50,0.,5.0);
@@ -655,6 +664,7 @@ int main(int argc, char * argv[]) {
   trigNTuple_->Branch("nMuon",&nMuonTrig_,"nMuon/i");
   trigNTuple_->Branch("nSelMuon",&nSelMuonTrig_,"nSelMuon/i");
   trigNTuple_->Branch("npartons",&npartons_,"npartons/i");
+  trigNTuple_->Branch("lheWPt",&lheWPt_,"lheWPt/F");
   trigNTuple_->Branch("met",&met_,"met/F");
   trigNTuple_->Branch("mht",&mht_,"mht/F");
   trigNTuple_->Branch("mtmuon",&mtmuon_,"mtmuon/F");
@@ -896,6 +906,7 @@ int main(int argc, char * argv[]) {
       jetPt_ = 0;
       jetEta_ = 0;
       jetPhi_ = 0;
+      jetBtag_ = 0;
 
       jetChargedMult_ = 0;
       jetNeutralMult_ = 0;
@@ -907,6 +918,7 @@ int main(int argc, char * argv[]) {
       jet2Pt_ = 0;
       jet2Eta_ = 0;
       jet2Phi_ = 0;
+      jet2Btag_ = 0;
 
       jet2ChargedMult_ = 0;
       jet2NeutralMult_ = 0;
@@ -966,6 +978,7 @@ int main(int argc, char * argv[]) {
       nSelMuonTrig_ = 0;
 
       npartons_ = 9999;
+      lheWPt_ = -1;
 
       if (debug) {
 	std::cout << "Run = " << analysisTree.event_nr << "    Event = " << analysisTree.event_run << std::endl; 
@@ -985,6 +998,7 @@ int main(int argc, char * argv[]) {
 	weight_ *= genWeight_;
 
 	npartons_ = analysisTree.genparticles_noutgoing;
+	if(isWJetsSample) lheWPt_   = analysisTree.genparticles_lheWPt;
       }
       histWeightsH->Fill(double(0.),double(genWeight_));
       
@@ -1732,6 +1746,7 @@ int main(int argc, char * argv[]) {
 	jetPt_ = analysisTree.pfjet_pt[indexJet0];
 	jetEta_ = analysisTree.pfjet_eta[indexJet0];
 	jetPhi_ = analysisTree.pfjet_phi[indexJet0];
+	jetBtag_ = analysisTree.pfjet_btag[indexJet0][0];
 	jetChargedMult_ = analysisTree.pfjet_chargedmulti[indexJet0];
 	jetNeutralMult_ = analysisTree.pfjet_neutralmulti[indexJet0];
 	jetChargedHadMult_ = analysisTree.pfjet_chargedhadronmulti[indexJet0];
@@ -1768,6 +1783,7 @@ int main(int argc, char * argv[]) {
 	jet2Pt_ = analysisTree.pfjet_pt[indexJet1];
 	jet2Eta_ = analysisTree.pfjet_eta[indexJet1];
 	jet2Phi_ = analysisTree.pfjet_phi[indexJet1];
+	jet2Btag_ = analysisTree.pfjet_btag[indexJet1][0];
 	jet2ChargedMult_ = analysisTree.pfjet_chargedmulti[indexJet1];
 	jet2NeutralMult_ = analysisTree.pfjet_neutralmulti[indexJet1];
 	jet2ChargedHadMult_ = analysisTree.pfjet_chargedhadronmulti[indexJet1];
