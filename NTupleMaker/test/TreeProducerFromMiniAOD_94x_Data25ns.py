@@ -48,12 +48,13 @@ process.maxEvents = cms.untracked.PSet(
 # Define the input source
 process.source = cms.Source("PoolSource", 
   fileNames = cms.untracked.vstring(
-        '/store/data/Run2017D/MuonEG/MINIAOD/17Nov2017-v1/50000/0C144772-16E5-E711-B272-001E673971CA.root',
-        '/store/data/Run2017D/MuonEG/MINIAOD/17Nov2017-v1/50000/10A7ED13-90EB-E711-8BE5-484D7E8DF114.root',
-                                    '/store/data/Run2017D/MuonEG/MINIAOD/17Nov2017-v1/50000/2E4A57CA-71E7-E711-A7A1-A4BF0112BC3E.root',
-                                    '/store/data/Run2017D/MuonEG/MINIAOD/17Nov2017-v1/50000/3E5F02AC-33E7-E711-AE42-A0369FC5FBA4.root',
-                                    '/store/data/Run2017D/MuonEG/MINIAOD/17Nov2017-v1/50000/3E7110F5-07E6-E711-A856-44A842CF057E.root',
-                                    '/store/data/Run2017D/MuonEG/MINIAOD/17Nov2017-v1/50000/424CDDA0-E7E5-E711-B839-44A842CFD5F2.root'
+        '/store/data/Run2017F/SingleMuon/MINIAOD/PromptReco-v1/000/305/040/00000/20B42404-12B2-E711-9A88-02163E012830.root',
+        '/store/data/Run2017F/SingleMuon/MINIAOD/PromptReco-v1/000/305/040/00000/522D0FB1-42B2-E711-A0A9-02163E011E2E.root',
+        '/store/data/Run2017F/SingleMuon/MINIAOD/PromptReco-v1/000/305/040/00000/5CB428C1-32B2-E711-A75D-02163E0128ED.root',
+        '/store/data/Run2017F/SingleMuon/MINIAOD/PromptReco-v1/000/305/040/00000/6EEED559-1EB2-E711-8F22-02163E019D3B.root',
+#        '/store/mc/RunIIFall17MiniAOD/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/RECOSIMstep_94X_mc2017_realistic_v10-v1/00000/0293A280-B5F3-E711-8303-3417EBE33927.root',
+#        '/store/mc/RunIIFall17MiniAOD/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/RECOSIMstep_94X_mc2017_realistic_v10-v1/00000/0A2CBAA9-5DF1-E711-AFD4-0CC47AD99112.root',
+#        '/store/mc/RunIIFall17MiniAOD/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/RECOSIMstep_94X_mc2017_realistic_v10-v1/00000/0CCEA775-09F2-E711-9833-0025905B85BE.root',
         ),
   skipEvents = cms.untracked.uint32(0)
 )
@@ -72,7 +73,6 @@ else :
     dataFormat = DataFormat.MiniAOD
 
 switchOnVIDElectronIdProducer(process, dataFormat)
-
 
 # define which IDs we want to produce
 my_id_modules = ['RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_Spring15_25ns_V1_cff',
@@ -213,7 +213,8 @@ HLTriggerPaths = cms.untracked.vstring(
 'HLT_PFMET140_PFMHT140_IDTight_v',
 'HLT_PFMET110NoMu_PFMHT110NoMu_IDTight_v',
 'HLT_PFMET120NoMu_PFMHT120NoMu_IDTight_v',
-# Jet Triggers
+# Single-Jet Triggers
+'HLT_PFJet40_v',
 'HLT_PFJet60_v',
 'HLT_PFJet80_v',
 'HLT_PFJet140_v',
@@ -223,7 +224,17 @@ HLTriggerPaths = cms.untracked.vstring(
 'HLT_PFJet400_v',
 'HLT_PFJet450_v',
 'HLT_PFJet500_v',
-'HLT_PFJet550_v'
+'HLT_PFJet550_v',
+# Di-Jet Triggers
+'HLT_DiPFJetAve40_',
+'HLT_DiPFJetAve60_',
+'HLT_DiPFJetAve80_',
+'HLT_DiPFJetAve140_',
+'HLT_DiPFJetAve200_',
+'HLT_DiPFJetAve260_',
+'HLT_DiPFJetAve320_',
+'HLT_DiPFJetAve400_',
+'HLT_DiPFJetAve500_'
 ),
 TriggerProcess = cms.untracked.string("HLT"),
 Flags = cms.untracked.vstring(
@@ -321,6 +332,7 @@ RecTauNum = cms.untracked.int32(0),
 RecJetPtMin = cms.untracked.double(18.),
 RecJetEtaMax = cms.untracked.double(5.2),
 RecJetHLTriggerMatching = cms.untracked.vstring(
+'HLT_PFJet40_v.*:hltSinglePFJet40',
 'HLT_PFJet60_v.*:hltSinglePFJet60',
 'HLT_PFJet80_v.*:hltSinglePFJet80',
 'HLT_PFJet140_v.*:hltSinglePFJet140',
@@ -330,7 +342,16 @@ RecJetHLTriggerMatching = cms.untracked.vstring(
 'HLT_PFJet400_v.*:hltSinglePFJet400',
 'HLT_PFJet450_v.*:hltSinglePFJet450',
 'HLT_PFJet500_v.*:hltSinglePFJet500',
-'HLT_PFJet550_v.*:hltSinglePFJet550'
+'HLT_PFJet550_v.*:hltSinglePFJet550',
+'HLT_DiPFJetAve40_v.*:hltDiPFJetAve40',
+'HLT_DiPFJetAve60_v.*:hltDiPFJetAve60',
+'HLT_DiPFJetAve80_v.*:hltDiPFJetAve80',
+'HLT_DiPFJetAve140_v.*:hltDiPFJetAve140',
+'HLT_DiPFJetAve200_v.*:hltDiPFJetAve200',
+'HLT_DiPFJetAve260_v.*:hltDiPFJetAve260',
+'HLT_DiPFJetAve320_v.*:hltDiPFJetAve320',
+'HLT_DiPFJetAve400_v.*:hltDiPFJetAve400',
+'HLT_DiPFJetAve500_v.*:hltDiPFJetAve500'
 ),
 RecJetBtagDiscriminators = cms.untracked.vstring(
 'pfCombinedInclusiveSecondaryVertexV2BJetTags',

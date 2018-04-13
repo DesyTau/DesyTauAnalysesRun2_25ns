@@ -42,7 +42,7 @@ process.options = cms.untracked.PSet(
 
 # How many events to process
 process.maxEvents = cms.untracked.PSet( 
-   input = cms.untracked.int32(10000)
+   input = cms.untracked.int32(100)
 )
 
 # Define the input source
@@ -91,7 +91,6 @@ for idmod in my_id_modules:
 ### END Electron ID ====================================================================================
 
 
-
 # NTuple Maker =======================================================================
 
 process.initroottree = cms.EDAnalyzer("InitAnalyzer",
@@ -137,7 +136,6 @@ eleMvaIsoWP80Fall17Map = cms.InputTag("egmGsfElectronIDs:mvaEleID-Fall17-iso-V1-
 eleMvaIsoWPLooseFall17Map = cms.InputTag("egmGsfElectronIDs:mvaEleID-Fall17-iso-V1-wpLoose"),
 mvaValuesIsoFall17Map = cms.InputTag("electronMVAValueMapProducer:ElectronMVAEstimatorRun2Fall17IsoV1Values"),
 mvaValuesnoIsoFall17Map = cms.InputTag("electronMVAValueMapProducer:ElectronMVAEstimatorRun2Fall17NoIsoV1Values"),
-
 #######new in 8.0.25
 eleMvaWP90GeneralMap = cms.InputTag("egmGsfElectronIDs:mvaEleID-Spring16-GeneralPurpose-V1-wp90"),
 eleMvaWP80GeneralMap = cms.InputTag("egmGsfElectronIDs:mvaEleID-Spring16-GeneralPurpose-V1-wp80"),
@@ -215,7 +213,8 @@ HLTriggerPaths = cms.untracked.vstring(
 'HLT_PFMET140_PFMHT140_IDTight_v',
 'HLT_PFMET110NoMu_PFMHT110NoMu_IDTight_v',
 'HLT_PFMET120NoMu_PFMHT120NoMu_IDTight_v',
-# Jet Triggers
+# Single-Jet Triggers
+'HLT_PFJet40_v',
 'HLT_PFJet60_v',
 'HLT_PFJet80_v',
 'HLT_PFJet140_v',
@@ -225,7 +224,17 @@ HLTriggerPaths = cms.untracked.vstring(
 'HLT_PFJet400_v',
 'HLT_PFJet450_v',
 'HLT_PFJet500_v',
-'HLT_PFJet550_v'
+'HLT_PFJet550_v',
+# Di-Jet Triggers
+'HLT_DiPFJetAve40_',
+'HLT_DiPFJetAve60_',
+'HLT_DiPFJetAve80_',
+'HLT_DiPFJetAve140_',
+'HLT_DiPFJetAve200_',
+'HLT_DiPFJetAve260_',
+'HLT_DiPFJetAve320_',
+'HLT_DiPFJetAve400_',
+'HLT_DiPFJetAve500_'
 ),
 TriggerProcess = cms.untracked.string("HLT"),
 Flags = cms.untracked.vstring(
@@ -321,6 +330,7 @@ RecTauNum = cms.untracked.int32(0),
 RecJetPtMin = cms.untracked.double(18.),
 RecJetEtaMax = cms.untracked.double(5.2),
 RecJetHLTriggerMatching = cms.untracked.vstring(
+'HLT_PFJet40_v.*:hltSinglePFJet40',
 'HLT_PFJet60_v.*:hltSinglePFJet60',
 'HLT_PFJet80_v.*:hltSinglePFJet80',
 'HLT_PFJet140_v.*:hltSinglePFJet140',
@@ -330,7 +340,16 @@ RecJetHLTriggerMatching = cms.untracked.vstring(
 'HLT_PFJet400_v.*:hltSinglePFJet400',
 'HLT_PFJet450_v.*:hltSinglePFJet450',
 'HLT_PFJet500_v.*:hltSinglePFJet500',
-'HLT_PFJet550_v.*:hltSinglePFJet550'
+'HLT_PFJet550_v.*:hltSinglePFJet550',
+'HLT_DiPFJetAve40_v.*:hltDiPFJetAve40',
+'HLT_DiPFJetAve60_v.*:hltDiPFJetAve60',
+'HLT_DiPFJetAve80_v.*:hltDiPFJetAve80',
+'HLT_DiPFJetAve140_v.*:hltDiPFJetAve140',
+'HLT_DiPFJetAve200_v.*:hltDiPFJetAve200',
+'HLT_DiPFJetAve260_v.*:hltDiPFJetAve260',
+'HLT_DiPFJetAve320_v.*:hltDiPFJetAve320',
+'HLT_DiPFJetAve400_v.*:hltDiPFJetAve400',
+'HLT_DiPFJetAve500_v.*:hltDiPFJetAve500'
 ),
 RecJetBtagDiscriminators = cms.untracked.vstring(
 'pfCombinedInclusiveSecondaryVertexV2BJetTags',
