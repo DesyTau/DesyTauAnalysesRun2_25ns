@@ -2138,6 +2138,7 @@ int main(int argc, char * argv[]) {
 	isWJet = isWJet && nJetsForward30_ == 0;
 	isWJet = isWJet && tauPt_>100.;
 	isWJet = isWJet && abs(muonEta_)<2.1;
+	isWJet = isWJet && tauDM_;
 
 	if (isWJet) {
 	  if (!isData) {
@@ -2209,6 +2210,8 @@ int main(int argc, char * argv[]) {
 	isWTauNu = isWTauNu && nJetsCentral30_<=2;
 	isWTauNu = isWTauNu && nMuon_ == 0;
 	isWTauNu = isWTauNu && nElec_ == 0;
+	isWTauNu = isWTauNu && tauDM_;
+
 	if (isWTauNu) {
 	  HtNoRecoil_     = Ht_;
 	  SoftHtNoRecoil_ = SoftHt_;
@@ -2352,11 +2355,11 @@ int main(int argc, char * argv[]) {
 	    tauTightIso_ = analysisTree.tau_byTightCombinedIsolationDeltaBetaCorr3Hits[indexTau] > 0.5;
 
 	    tauVLooseMvaIso_ = analysisTree.tau_byVLooseIsolationMVArun2v1DBoldDMwLT[indexTau] > 0.5;
-       tauLooseMvaIso_ = analysisTree.tau_byLooseIsolationMVArun2v1DBoldDMwLT[indexTau] > 0.5;
+	    tauLooseMvaIso_ = analysisTree.tau_byLooseIsolationMVArun2v1DBoldDMwLT[indexTau] > 0.5;
 	    tauMediumMvaIso_ = analysisTree.tau_byMediumIsolationMVArun2v1DBoldDMwLT[indexTau] > 0.5;
 	    tauTightMvaIso_ = analysisTree.tau_byTightIsolationMVArun2v1DBoldDMwLT[indexTau] > 0.5;
 	    tauVTightMvaIso_ = analysisTree.tau_byVTightIsolationMVArun2v1DBoldDMwLT[indexTau] > 0.5;
-       tauVVTightMvaIso_ = analysisTree.tau_byVVTightIsolationMVArun2v1DBoldDMwLT[indexTau] > 0.5;
+	    tauVVTightMvaIso_ = analysisTree.tau_byVVTightIsolationMVArun2v1DBoldDMwLT[indexTau] > 0.5;
  
 	    tauAntiMuonLoose3_ = analysisTree.tau_againstMuonLoose3[indexTau] > 0.5;
 	    tauAntiMuonTight3_ = analysisTree.tau_againstMuonTight3[indexTau] > 0.5;
@@ -2374,6 +2377,7 @@ int main(int argc, char * argv[]) {
 	    SoftHtNoRecoil_ = SoftHt_ - recoilJetLV.Pt();
 	    dPhiMetTau_= dPhiFromLV(lorentzVectorMet,lorentzVectorTau);
 	    selection_ = 4;
+	    if(!tauDM_) continue;
 	    ntuple_->Fill();
 	  }
 	} // END: loop over tau
