@@ -1164,6 +1164,7 @@ class NTupleMaker : public edm::EDAnalyzer{
   Float_t genparticles_lheHt;
   Float_t genparticles_lheWPt;
   UInt_t genparticles_noutgoing;
+  Int_t genparticles_noutgoing_NLO;
   UInt_t genparticles_count;
   Float_t genparticles_e[M_genparticlesmaxcount];
   Float_t genparticles_px[M_genparticlesmaxcount];

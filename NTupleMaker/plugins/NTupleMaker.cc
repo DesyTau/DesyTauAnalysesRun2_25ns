@@ -922,6 +922,7 @@ void NTupleMaker::beginJob(){
     tree->Branch("genparticles_lheHt", &genparticles_lheHt, "genparticles_lheHt/F");
     tree->Branch("genparticles_lheWPt", &genparticles_lheWPt, "genparticles_lheWPt/F");
     tree->Branch("genparticles_noutgoing", &genparticles_noutgoing, "genparticles_noutgoing/i");
+    tree->Branch("genparticles_noutgoing_NLO", &genparticles_noutgoing_NLO, "genparticles_noutgoing_NLO/I");
     tree->Branch("genparticles_count", &genparticles_count, "genparticles_count/i");
     tree->Branch("genparticles_e", genparticles_e, "genparticles_e[genparticles_count]/F");
     tree->Branch("genparticles_px", genparticles_px, "genparticles_px[genparticles_count]/F");
@@ -2165,6 +2166,7 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 
   genparticles_lheHt = 0.;
   genparticles_noutgoing = 0;
+  genparticles_noutgoing_NLO = 0;
 
   // generator info and generated particles 
   if(doDebug)  cout<<"add gen info"<< endl; 
@@ -2391,6 +2393,7 @@ bool NTupleMaker::AddFlags(const edm::Event& iEvent, const char* module, const c
 bool NTupleMaker::AddLHEInformation(const edm::Event& iEvent) {
   genparticles_lheHt = 0.;
   genparticles_noutgoing = 0;
+  genparticles_noutgoing_NLO = 0;
   genparticles_lheWPt = 0.;
 
   edm::Handle<LHEEventProduct> lheEventProduct;  
@@ -2428,6 +2431,8 @@ bool NTupleMaker::AddLHEInformation(const edm::Event& iEvent) {
   // Calculate w-boson pt from decay products
   LorentzVector wLV = lepLV + nuLV;
   if(genparticles_lheWPt == 0)  genparticles_lheWPt = wLV.Pt();
+
+  genparticles_noutgoing_NLO = lheEventProduct->npNLO();
 
   weightPDFmax = 0.1;
   weightPDFmin = 10; 
