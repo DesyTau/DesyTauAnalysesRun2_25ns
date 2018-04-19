@@ -420,7 +420,11 @@ class NTupleMaker : public edm::EDAnalyzer{
   edm::EDGetTokenT<edm::ValueMap<bool> >  eleMvaIsoWP90Fall17MapToken_;
   edm::EDGetTokenT<edm::ValueMap<bool> >  eleMvaIsoWP80Fall17MapToken_;
   edm::EDGetTokenT<edm::ValueMap<bool> >  eleMvaIsoWPLooseFall17MapToken_;
-    
+  edm::EDGetTokenT<edm::ValueMap<bool> > eleVetoIdFall17MapToken_;
+  edm::EDGetTokenT<edm::ValueMap<bool> > eleLooseIdFall17MapToken_;
+  edm::EDGetTokenT<edm::ValueMap<bool> > eleMediumIdFall17MapToken_;
+  edm::EDGetTokenT<edm::ValueMap<bool> > eleTightIdFall17MapToken_;
+ 
     
   //// New for Spring16
   edm::EDGetTokenT<pat::TauCollection> TauCollectionToken_;
@@ -783,6 +787,11 @@ class NTupleMaker : public edm::EDAnalyzer{
   Bool_t electron_cutId_loose_Summer16[M_electronmaxcount];
   Bool_t electron_cutId_medium_Summer16[M_electronmaxcount];
   Bool_t electron_cutId_tight_Summer16[M_electronmaxcount];
+   
+  Bool_t electron_cutId_veto_Fall17[M_electronmaxcount];
+  Bool_t electron_cutId_loose_Fall17[M_electronmaxcount];
+  Bool_t electron_cutId_medium_Fall17[M_electronmaxcount];
+  Bool_t electron_cutId_tight_Fall17[M_electronmaxcount];
 
   Bool_t electron_pass_conversion[M_electronmaxcount];
 
