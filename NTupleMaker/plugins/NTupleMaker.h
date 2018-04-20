@@ -865,15 +865,6 @@ class NTupleMaker : public edm::EDAnalyzer{
   Float_t tau_genjet_pz[M_taumaxcount];
   Int_t tau_genmatch[M_taumaxcount];
 
-  Float_t tau_byIsolationMVArun2v1Raw[M_taumaxcount];
-  Float_t tau_byIsolationMVArun2v1VLoose[M_taumaxcount];
-  Float_t tau_byIsolationMVArun2v1Loose[M_taumaxcount];
-  Float_t tau_byIsolationMVArun2v1Medium[M_taumaxcount];
-  Float_t tau_byIsolationMVArun2v1Tight[M_taumaxcount];
-  Float_t tau_byIsolationMVArun2v1VTight[M_taumaxcount];
-  Float_t tau_byIsolationMVArun2v1VVTight[M_taumaxcount];
-
-
   // main tau discriminators
   bool setTauBranches;
   std::vector<std::pair<std::string, unsigned int> >tauIdIndx;

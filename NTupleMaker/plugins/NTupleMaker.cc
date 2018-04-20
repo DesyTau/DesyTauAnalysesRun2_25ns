@@ -660,13 +660,6 @@ void NTupleMaker::beginJob(){
     tree->Branch("tau_genjet_pz", tau_genjet_pz, "tau_genjet_pz[tau_count]/F");
     tree->Branch("tau_genjet_e", tau_genjet_e, "tau_genjet_e[tau_count]/F");
     tree->Branch("tau_genmatch", tau_genmatch, "tau_genmatch[tau_count]/I");
-    tree->Branch("tau_byIsolationMVArun2v1Raw", tau_byIsolationMVArun2v1Raw, "tau_byIsolationMVArun2v1Raw[tau_count]/F");
-    tree->Branch("tau_byIsolationMVArun2v1VLoose", tau_byIsolationMVArun2v1VLoose, "tau_byIsolationMVArun2v1VLoose[tau_count]/F");
-    tree->Branch("tau_byIsolationMVArun2v1Loose", tau_byIsolationMVArun2v1Loose, "tau_byIsolationMVArun2v1Loose[tau_count]/F");
-    tree->Branch("tau_byIsolationMVArun2v1Medium", tau_byIsolationMVArun2v1Medium, "tau_byIsolationMVArun2v1Medium[tau_count]/F");
-    tree->Branch("tau_byIsolationMVArun2v1Tight", tau_byIsolationMVArun2v1Tight, "tau_byIsolationMVArun2v1Tight[tau_count]/F");
-    tree->Branch("tau_byIsolationMVArun2v1VTight", tau_byIsolationMVArun2v1VTight, "tau_byIsolationMVArun2v1VTight[tau_count]/F");
-    tree->Branch("tau_byIsolationMVArun2v1VVTight", tau_byIsolationMVArun2v1VVTight, "tau_byIsolationMVArun2v1VVTight[tau_count]/F");
 
     tree->Branch("tau_leadchargedhadrcand_px",  tau_leadchargedhadrcand_px,  "tau_leadchargedhadrcand_px[tau_count]/F");
     tree->Branch("tau_leadchargedhadrcand_py",  tau_leadchargedhadrcand_py,  "tau_leadchargedhadrcand_py[tau_count]/F");
@@ -3614,17 +3607,6 @@ unsigned int NTupleMaker::AddTaus(const edm::Event& iEvent, const edm::EventSetu
 	  
 	  for(unsigned int id = 0; id < tauIdIndx.size(); id++)
 	    tau_ids[tauIdIndx[id].second][tau_count]=(*Taus)[i].tauID(tauIdIndx[id].first);
-
-	  /*
-	  pat::TauRef tau(Taus,i);
-	  tau_byIsolationMVArun2v1Raw[tau_count]     = (*mvaIsoRaw)[tau];
-	  tau_byIsolationMVArun2v1VLoose[tau_count]  = (*mvaIsoVLoose)[tau];
-	  tau_byIsolationMVArun2v1Loose[tau_count]   = (*mvaIsoLoose)[tau];
-	  tau_byIsolationMVArun2v1Medium[tau_count]  = (*mvaIsoMedium)[tau];
-	  tau_byIsolationMVArun2v1Tight[tau_count]   = (*mvaIsoTight)[tau];
-	  tau_byIsolationMVArun2v1VTight[tau_count]  = (*mvaIsoVTight)[tau];
-	  tau_byIsolationMVArun2v1VVTight[tau_count] = (*mvaIsoVVTight)[tau];
-	  */
 
 	  if( ((*Taus)[i].genJet())) {
 	    std::string genTauDecayMode = JetMCTagUtils::genTauDecayMode(*((*Taus)[i].genJet()));
