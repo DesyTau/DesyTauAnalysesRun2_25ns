@@ -900,6 +900,19 @@ class NTupleMaker : public edm::EDAnalyzer{
   string tau_decayMode_name[M_taumaxcount];
   Int_t tau_decayMode[M_taumaxcount];
 
+  // tau consituents
+  UInt_t tau_constituents_count[M_taumaxcount];
+  Float_t tau_constituents_px[M_taumaxcount][50];
+  Float_t tau_constituents_py[M_taumaxcount][50];
+  Float_t tau_constituents_pz[M_taumaxcount][50];
+  Float_t tau_constituents_e[M_taumaxcount][50];
+  Float_t tau_constituents_mass[M_taumaxcount][50];
+  Int_t tau_constituents_charge[M_taumaxcount][50];
+  Float_t tau_constituents_vx[M_taumaxcount][50];
+  Float_t tau_constituents_vy[M_taumaxcount][50];
+  Float_t tau_constituents_vz[M_taumaxcount][50];
+  UInt_t tau_constituents_type[M_taumaxcount][50];
+
   // generated tau
   UInt_t gentau_count;
   Float_t gentau_px[M_taumaxcount];

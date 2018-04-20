@@ -694,7 +694,18 @@ void NTupleMaker::beginJob(){
     tree->Branch("tau_genDecayMode", tau_genDecayMode, "tau_genDecayMode[tau_count]/I");
     tree->Branch("tau_decayMode_name", tau_decayMode_name, "tau_decayMode_name[tau_count]/C");
     tree->Branch("tau_decayMode", tau_decayMode, "tau_decayMode[tau_count]/I");
-    
+
+    tree->Branch("tau_constituents_count", tau_constituents_count, "tau_constituents_count[tau_count]/i");
+    tree->Branch("tau_constituents_px", tau_constituents_px, "tau_constituents_px[tau_count][50]/F");
+    tree->Branch("tau_constituents_py", tau_constituents_py, "tau_constituents_py[tau_count][50]/F");
+    tree->Branch("tau_constituents_pz", tau_constituents_pz, "tau_constituents_pz[tau_count][50]/F");
+    tree->Branch("tau_constituents_e", tau_constituents_e, "tau_constituents_e[tau_count][50]/F");
+    tree->Branch("tau_constituents_mass", tau_constituents_mass, "tau_constituents_mass[tau_count][50]/F");
+    tree->Branch("tau_constituents_charge", tau_constituents_charge, "tau_constituents_charge[tau_count][50]/I");
+    tree->Branch("tau_constituents_vx", tau_constituents_vx, "tau_constituents_vx[tau_count][50]/F");
+    tree->Branch("tau_constituents_vy", tau_constituents_vy, "tau_constituents_vy[tau_count][50]/F");
+    tree->Branch("tau_constituents_vz", tau_constituents_vz, "tau_constituents_vz[tau_count][50]/F");
+    tree->Branch("tau_constituents_type", tau_constituents_type, "tau_constituents_type[tau_count][50]/i");
   }
 
   if (crectrack) { 
@@ -3521,6 +3532,62 @@ unsigned int NTupleMaker::AddTaus(const edm::Event& iEvent, const edm::EventSetu
 	  tau_isolationChargedHadrCands_size[tau_count]           = (*Taus)[i].isolationChargedHadrCands().size();
 	  tau_isolationNeutralHadrCands_size[tau_count]           = (*Taus)[i].isolationNeutrHadrCands().size();
           tau_isolationGammaCands_size[tau_count]                 = (*Taus)[i].isolationGammaCands().size();
+
+	  // tau constituents
+	  // Set all entries first -999
+	  for(unsigned int m=0; m<50; m++){
+	    tau_constituents_px[tau_count][m]     = -9999;
+	    tau_constituents_py[tau_count][m]     = -9999;
+	    tau_constituents_pz[tau_count][m]     = -9999;
+	    tau_constituents_e[tau_count][m]      = -9999;
+	    tau_constituents_mass[tau_count][m]   = -9999;
+	    tau_constituents_charge[tau_count][m] = -9999;
+	    tau_constituents_vx[tau_count][m]     = -9999;
+	    tau_constituents_vy[tau_count][m]     = -9999;
+	    tau_constituents_vz[tau_count][m]     = -9999;
+	    tau_constituents_type[tau_count][m]   = -9999;
+	  }
+	  UInt_t tau_constituents_count_ = 0;
+	  for(unsigned int m=0; m<(*Taus)[i].signalChargedHadrCands().size(); m++){
+	    tau_constituents_px[tau_count][tau_constituents_count_]     = (*Taus)[i].signalChargedHadrCands()[m]->px();
+	    tau_constituents_py[tau_count][tau_constituents_count_]     = (*Taus)[i].signalChargedHadrCands()[m]->py();
+	    tau_constituents_pz[tau_count][tau_constituents_count_]     = (*Taus)[i].signalChargedHadrCands()[m]->pz();
+	    tau_constituents_e[tau_count][tau_constituents_count_]      = (*Taus)[i].signalChargedHadrCands()[m]->energy();
+	    tau_constituents_mass[tau_count][tau_constituents_count_]   = (*Taus)[i].signalChargedHadrCands()[m]->mass();
+	    tau_constituents_charge[tau_count][tau_constituents_count_] = (*Taus)[i].signalChargedHadrCands()[m]->charge();
+	    tau_constituents_vx[tau_count][tau_constituents_count_]     = (*Taus)[i].signalChargedHadrCands()[m]->vx();
+	    tau_constituents_vy[tau_count][tau_constituents_count_]     = (*Taus)[i].signalChargedHadrCands()[m]->vy();
+	    tau_constituents_vz[tau_count][tau_constituents_count_]     = (*Taus)[i].signalChargedHadrCands()[m]->vz();
+	    tau_constituents_type[tau_count][tau_constituents_count_]   = 1;
+	    tau_constituents_count_ ++;
+	  }
+	  for(unsigned int m=0; m<(*Taus)[i].signalNeutrHadrCands().size(); m++){
+	    tau_constituents_px[tau_count][tau_constituents_count_]     = (*Taus)[i].signalNeutrHadrCands()[m]->px();
+	    tau_constituents_py[tau_count][tau_constituents_count_]     = (*Taus)[i].signalNeutrHadrCands()[m]->py();
+	    tau_constituents_pz[tau_count][tau_constituents_count_]     = (*Taus)[i].signalNeutrHadrCands()[m]->pz();
+	    tau_constituents_e[tau_count][tau_constituents_count_]      = (*Taus)[i].signalNeutrHadrCands()[m]->energy();
+	    tau_constituents_mass[tau_count][tau_constituents_count_]   = (*Taus)[i].signalNeutrHadrCands()[m]->mass();
+	    tau_constituents_charge[tau_count][tau_constituents_count_] = (*Taus)[i].signalNeutrHadrCands()[m]->charge();
+	    tau_constituents_vx[tau_count][tau_constituents_count_]     = (*Taus)[i].signalNeutrHadrCands()[m]->vx();
+	    tau_constituents_vy[tau_count][tau_constituents_count_]     = (*Taus)[i].signalNeutrHadrCands()[m]->vy();
+	    tau_constituents_vz[tau_count][tau_constituents_count_]     = (*Taus)[i].signalNeutrHadrCands()[m]->vz();
+	    tau_constituents_type[tau_count][tau_constituents_count_]   = 2;
+	    tau_constituents_count_ ++;
+	  }
+	  for(unsigned int m=0; m<(*Taus)[i].signalGammaCands().size(); m++){
+	    tau_constituents_px[tau_count][tau_constituents_count_]     = (*Taus)[i].signalGammaCands()[m]->px();
+	    tau_constituents_py[tau_count][tau_constituents_count_]     = (*Taus)[i].signalGammaCands()[m]->py();
+	    tau_constituents_pz[tau_count][tau_constituents_count_]     = (*Taus)[i].signalGammaCands()[m]->pz();
+	    tau_constituents_e[tau_count][tau_constituents_count_]      = (*Taus)[i].signalGammaCands()[m]->energy();
+	    tau_constituents_mass[tau_count][tau_constituents_count_]   = (*Taus)[i].signalGammaCands()[m]->mass();
+	    tau_constituents_charge[tau_count][tau_constituents_count_] = (*Taus)[i].signalGammaCands()[m]->charge();
+	    tau_constituents_vx[tau_count][tau_constituents_count_]     = (*Taus)[i].signalGammaCands()[m]->vx();
+	    tau_constituents_vy[tau_count][tau_constituents_count_]     = (*Taus)[i].signalGammaCands()[m]->vy();
+	    tau_constituents_vz[tau_count][tau_constituents_count_]     = (*Taus)[i].signalGammaCands()[m]->vz();
+	    tau_constituents_type[tau_count][tau_constituents_count_]   = 3;
+	    tau_constituents_count_ ++;
+	  }
+	  tau_constituents_count[tau_count] = tau_constituents_count_;
 
 	  // discriminators
 	  if(setTauBranches){
