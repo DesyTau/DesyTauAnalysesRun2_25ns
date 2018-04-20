@@ -596,6 +596,9 @@ class NTupleMaker : public edm::EDAnalyzer{
   Float_t muon_dzerr[M_muonmaxcount];
   Float_t muon_dxy[M_muonmaxcount];
   Float_t muon_dxyerr[M_muonmaxcount];
+  Float_t muon_vx[M_muonmaxcount];
+  Float_t muon_vy[M_muonmaxcount];
+  Float_t muon_vz[M_muonmaxcount];
 
   Float_t muon_chargedHadIso[M_muonmaxcount];
   Float_t muon_neutralHadIso[M_muonmaxcount];
@@ -688,9 +691,9 @@ class NTupleMaker : public edm::EDAnalyzer{
   Float_t electron_outerx[M_electronmaxcount];
   Float_t electron_outery[M_electronmaxcount];
   Float_t electron_outerz[M_electronmaxcount];
-  Float_t electron_closestpointx[M_electronmaxcount];
-  Float_t electron_closestpointy[M_electronmaxcount];
-  Float_t electron_closestpointz[M_electronmaxcount];
+  Float_t electron_vx[M_electronmaxcount];
+  Float_t electron_vy[M_electronmaxcount];
+  Float_t electron_vz[M_electronmaxcount];
   Float_t electron_esuperclusterovertrack[M_electronmaxcount];
   Float_t electron_eseedclusterovertrack[M_electronmaxcount];
   Float_t electron_deltaetasuperclustertrack[M_electronmaxcount];

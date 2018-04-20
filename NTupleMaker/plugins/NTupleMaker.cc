@@ -398,6 +398,9 @@ void NTupleMaker::beginJob(){
     tree->Branch("muon_dxyerr",muon_dxyerr,"muon_dxyerr[muon_count]/F");
     tree->Branch("muon_dz",muon_dz,"muon_dz[muon_count]/F");
     tree->Branch("muon_dzerr",muon_dzerr,"muon_dzerr[muon_count]/F");
+    tree->Branch("muon_vx",muon_vx,"muon_vx[muon_count]/F");
+    tree->Branch("muon_vy",muon_vy,"muon_vy[muon_count]/F");
+    tree->Branch("muon_vz",muon_vz,"muon_vz[muon_count]/F");
     tree->Branch("muon_chargedHadIso",muon_chargedHadIso,"muon_chargedHadIso[muon_count]/F");
     tree->Branch("muon_neutralHadIso",muon_neutralHadIso,"muon_neutralHadIso[muon_count]/F");
     tree->Branch("muon_photonIso",muon_photonIso,"muon_photonIso[muon_count]/F");
@@ -487,9 +490,9 @@ void NTupleMaker::beginJob(){
     tree->Branch("electron_outerx", electron_outerx, "electron_outerx[electron_count]/F");
     tree->Branch("electron_outery", electron_outery, "electron_outery[electron_count]/F");
     tree->Branch("electron_outerz", electron_outerz, "electron_outerz[electron_count]/F");
-    tree->Branch("electron_closestpointx", electron_closestpointx, "electron_closestpointx[electron_count]/F");
-    tree->Branch("electron_closestpointy", electron_closestpointy, "electron_closestpointy[electron_count]/F");
-    tree->Branch("electron_closestpointz", electron_closestpointz, "electron_closestpointz[electron_count]/F");
+    tree->Branch("electron_vx", electron_vx, "electron_vx[electron_count]/F");
+    tree->Branch("electron_vy", electron_vy, "electron_vy[electron_count]/F");
+    tree->Branch("electron_vz", electron_vz, "electron_vz[electron_count]/F");
     tree->Branch("electron_esuperclusterovertrack", electron_esuperclusterovertrack, "electron_esuperclusterovertrack[electron_count]/F");
     tree->Branch("electron_eseedclusterovertrack", electron_eseedclusterovertrack, "electron_eseedclusterovertrack[electron_count]/F");
     tree->Branch("electron_deltaetasuperclustertrack", electron_deltaetasuperclustertrack, "electron_deltaetasuperclustertrack[electron_count]/F");
@@ -2887,6 +2890,9 @@ unsigned int NTupleMaker::AddMuons(const edm::Event& iEvent, const edm::EventSet
 	muon_eta[muon_count] = (*Muons)[i].eta();
 	muon_phi[muon_count] = (*Muons)[i].phi();
 	muon_charge[muon_count] = (*Muons)[i].charge();
+	muon_vx[muon_count] = (*Muons)[i].vx(); // gives the same as (*Muons)[i].muonBestTrack()->vx()
+	muon_vy[muon_count] = (*Muons)[i].vy();
+	muon_vz[muon_count] = (*Muons)[i].vz();
 
 	const pat::Muon &lep = (*Muons)[i];
 	muon_miniISO[muon_count]=getPFIsolation(pfcands, dynamic_cast<const reco::Candidate *>(&lep), 0.05, 0.2, 10., false);
@@ -4060,9 +4066,9 @@ unsigned int NTupleMaker::AddElectrons(const edm::Event& iEvent, const edm::Even
 	  
 	  electron_trackchi2[electron_count] = gsfTr_e->chi2();
 	  electron_trackndof[electron_count] = gsfTr_e->ndof();
-	  electron_closestpointx[electron_count] = gsfTr_e->vx();
-	  electron_closestpointy[electron_count] = gsfTr_e->vy();
-	  electron_closestpointz[electron_count] = gsfTr_e->vz();
+	  electron_vx[electron_count] = gsfTr_e->vx();
+	  electron_vy[electron_count] = gsfTr_e->vy();
+	  electron_vz[electron_count] = gsfTr_e->vz();
 	  
 	  electron_nhits[electron_count]        = gsfTr_e->numberOfValidHits();
 	  electron_nmissinghits[electron_count] = gsfTr_e->numberOfLostHits();
