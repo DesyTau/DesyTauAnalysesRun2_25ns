@@ -1761,8 +1761,7 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       // }  
     }
 
-  if (crectrack)
-    AddPFCand(iEvent, iSetup);
+  if (crectrack) AddPFCand(iEvent, iSetup);
 
   edm::Handle<BXVector<l1t::Muon> > l1muons;
   iEvent.getByToken( L1MuonCollectionToken_, l1muons);
@@ -2836,17 +2835,23 @@ unsigned int NTupleMaker::AddPFCand(const edm::Event& iEvent, const edm::EventSe
         track_mass[track_count] = (*Tracks)[i].mass();
         track_dxy[track_count] = (*Tracks)[i].dxy();
         track_dz[track_count] = (*Tracks)[i].dz();
-        track_dxyerr[track_count] = (*Tracks)[i].dxyError();
-        track_dzerr[track_count] = (*Tracks)[i].dzError();
+	if((*Tracks)[i].hasTrackDetails()){
+	  track_dxyerr[track_count] = (*Tracks)[i].dxyError();
+	  track_dzerr[track_count] = (*Tracks)[i].dzError();
+	}
+	else{
+	  track_dxyerr[track_count] = -9999;
+	  track_dzerr[track_count] = -9999;
+	}
 	track_vx[track_count] = (*Tracks)[i].vertex().x();
 	track_vy[track_count] = (*Tracks)[i].vertex().y();
 	track_vz[track_count] = (*Tracks)[i].vertex().z();
         track_ID[track_count] = (*Tracks)[i].pdgId();
 	const reco::Track * trkRef = (*Tracks)[i].bestTrack();
 	track_highPurity[track_count] = false;
-	if (trkRef != NULL) 
+	if (trkRef != NULL) {
 	  track_highPurity[track_count] = trkRef->quality(reco::Track::highPurity);
-
+	}
         track_count++;
 
         if (track_count==M_trackmaxcount) {
