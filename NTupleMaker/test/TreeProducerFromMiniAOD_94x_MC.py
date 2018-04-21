@@ -437,7 +437,8 @@ RecJetHLTriggerMatching = cms.untracked.vstring(
 ),
 RecJetBtagDiscriminators = cms.untracked.vstring(
 'pfCombinedInclusiveSecondaryVertexV2BJetTags',
-'pfJetProbabilityBJetTags'
+'pfDeepCSVJetTags:probb',
+'pfDeepCSVJetTags:probbb'
 ),
 RecJetNum = cms.untracked.int32(0),
 SampleName = cms.untracked.string("Data") 
