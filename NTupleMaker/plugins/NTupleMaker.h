@@ -868,7 +868,7 @@ class NTupleMaker : public edm::EDAnalyzer{
   // main tau discriminators
   bool setTauBranches;
   std::vector<std::pair<std::string, unsigned int> >tauIdIndx;
-  Float_t tau_ids[100][M_taumaxcount];
+  Float_t tau_ids[200][M_taumaxcount];
   
   // number of tracks around 
   UInt_t tau_ntracks_pt05[M_taumaxcount];

@@ -133,6 +133,14 @@ for idmod in my_id_modules:
 
 ### END Electron ID ====================================================================================
 
+# Tau ID ===============================================================================================
+from DesyTauAnalyses.NTupleMaker.runTauIdMVA import *
+na = TauIDEmbedder(process, cms, # pass tour process object
+    debug=True,
+    toKeep = ["2017v1", "2017v2", "newDM2017v2", "dR0p32017v2", "2016v1", "newDM2016v1"]
+)
+na.runTauID()
+# END Tau ID ===========================================================================================
 
 # NTuple Maker =======================================================================
 
@@ -205,7 +213,7 @@ mvaNonTrigValuesMap     = cms.InputTag("electronMVAValueMapProducer:ElectronMVAE
 mvaNonTrigCategoriesMap = cms.InputTag("electronMVAValueMapProducer:ElectronMVAEstimatorRun2Spring15NonTrig25nsV1Categories"),
 mvaTrigValuesMap     = cms.InputTag("electronMVAValueMapProducer:ElectronMVAEstimatorRun2Spring15Trig25nsV1Values"),
 mvaTrigCategoriesMap = cms.InputTag("electronMVAValueMapProducer:ElectronMVAEstimatorRun2Spring15Trig25nsV1Categories"),
-TauCollectionTag = cms.InputTag("slimmedTaus"),
+TauCollectionTag = cms.InputTag("NewTauIDsEmbedded"),
 L1MuonCollectionTag = cms.InputTag("gmtStage2Digis:Muon"),
 L1EGammaCollectionTag = cms.InputTag("caloStage2Digis:EGamma"),
 L1TauCollectionTag = cms.InputTag("caloStage2Digis:Tau"),
@@ -448,11 +456,13 @@ process.p = cms.Path(
   process.puppiMETSequence *
   process.fullPatMetSequencePuppi *
   process.egmGsfElectronIDSequence * 
-#  process.rerunMvaIsolation2SeqRun2 * 
+  process.rerunMvaIsolationSequence *      # add new tau ids
+  process.NewTauIDsEmbedded *              # add new tau ids
+  #process.rerunMvaIsolation2SeqRun2 *
   #process.mvaMetSequence *
   #process.HBHENoiseFilterResultProducer* #produces HBHE bools baseline
   #process.ApplyBaselineHBHENoiseFilter*  #reject events based 
-  #process.ApplyBaselineHBHEISONoiseFilter*  #reject events based -- disable the module, performance is being investigated fu
+  #process.ApplyBaselineHBHEISONoiseFilter*  #reject events based -- disable the module, performance is being investigated
   process.makeroottree
 )
 
