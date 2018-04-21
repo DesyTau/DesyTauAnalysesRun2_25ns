@@ -273,7 +273,7 @@ HLTriggerPaths = cms.untracked.vstring(
 'HLT_PFMET140_PFMHT140_IDTight_v',
 'HLT_PFMET110NoMu_PFMHT110NoMu_IDTight_v',
 'HLT_PFMET120NoMu_PFMHT120NoMu_IDTight_v',
-'HLT_PFMET130NoMu_PFMHT140NoMu_IDTight_v',
+'HLT_PFMET130NoMu_PFMHT130NoMu_IDTight_v',
 'HLT_PFMET140NoMu_PFMHT140NoMu_IDTight_v',
 # Single-Jet Triggers
 'HLT_PFJet40_v',
