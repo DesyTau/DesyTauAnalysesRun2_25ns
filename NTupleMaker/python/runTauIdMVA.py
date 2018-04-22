@@ -187,7 +187,6 @@ class TauIDEmbedder(object):
 
 
 		if "2017v2" in self.toKeep:
-			print "v2 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 			self.tauIdDiscrMVA_2017_version = "v2"
 			self.tauIdDiscrMVA_trainings_run2_2017 = {
 				'tauIdMVAIsoDBoldDMwLT2017' : "tauIdMVAIsoDBoldDMwLT2017",
