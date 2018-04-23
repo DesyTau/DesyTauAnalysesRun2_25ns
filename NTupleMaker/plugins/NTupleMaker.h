@@ -902,7 +902,7 @@ class NTupleMaker : public edm::EDAnalyzer{
   Float_t tau_constituents_vx[M_taumaxcount][50];
   Float_t tau_constituents_vy[M_taumaxcount][50];
   Float_t tau_constituents_vz[M_taumaxcount][50];
-  UInt_t tau_constituents_type[M_taumaxcount][50];
+  Int_t tau_constituents_pdgId[M_taumaxcount][50];
 
   // generated tau
   UInt_t gentau_count;
