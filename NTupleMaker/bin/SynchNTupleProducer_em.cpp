@@ -2387,7 +2387,7 @@ int main(int argc, char * argv[]) {
             q_1 = -1;
             if (analysisTree.electron_charge[electronIndex]>0)
                 q_1 = 1;
-            mva_1 = analysisTree.electron_mva_id_nontrigPhys14[electronIndex];
+            mva_1 = analysisTree.electron_mva_wp80_general_Spring16_v1[electronIndex];
             d0_1 = analysisTree.electron_dxy[electronIndex];
             dZ_1 = analysisTree.electron_dz[electronIndex];
             iso_1 = isoEleMin;
@@ -2779,7 +2779,7 @@ int main(int argc, char * argv[]) {
                 jeta_1 = analysisTree.pfjet_eta[indexLeadingJet];
                 jphi_1 = analysisTree.pfjet_phi[indexLeadingJet];
                 jptraw_1 = analysisTree.pfjet_pt[indexLeadingJet]*analysisTree.pfjet_energycorr[indexLeadingJet];
-                jmva_1 = analysisTree.pfjet_pu_jet_full_mva[indexLeadingJet];
+                jmva_1 = -1;//analysisTree.pfjet_pu_jet_full_mva[indexLeadingJet];
 		//		cout << "Leading jet pt = " << jpt_1 << "   eta = " << jeta_1 << endl;
 		//		for (auto const& Name : uncertNames) {
 		//		  cout << "    " << Name << " : " << jecUncertainties->getUncertainty(Name,jpt_1,jeta_1) << endl;
@@ -2805,7 +2805,7 @@ int main(int argc, char * argv[]) {
                 jeta_2 = analysisTree.pfjet_eta[indexSubLeadingJet];
                 jphi_2 = analysisTree.pfjet_phi[indexSubLeadingJet];
                 jptraw_2 = analysisTree.pfjet_pt[indexSubLeadingJet]*analysisTree.pfjet_energycorr[indexSubLeadingJet];
-                jmva_2 = analysisTree.pfjet_pu_jet_full_mva[indexSubLeadingJet];
+                jmva_2 = -1; //analysisTree.pfjet_pu_jet_full_mva[indexSubLeadingJet];
             }
             
             mjj =  -9999;
