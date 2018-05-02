@@ -1347,36 +1347,36 @@ int main(int argc, char * argv[]) {
       // ***************************************************
 
 
-      float pfmet_ex = analysisTree.pfmet_ex;
-      float pfmet_ey = analysisTree.pfmet_ey;
+      float pfmetcorr_ex = analysisTree.pfmetcorr_ex;
+      float pfmetcorr_ey = analysisTree.pfmetcorr_ey;
 
       if (!isData) {
 	if (jetES<0) {
-	  pfmet_ex = analysisTree.pfmet_ex_JetEnDown;
-	  pfmet_ey = analysisTree.pfmet_ey_JetEnDown;
+	  pfmetcorr_ex = analysisTree.pfmetcorr_ex_JetEnDown;
+	  pfmetcorr_ey = analysisTree.pfmetcorr_ey_JetEnDown;
 	}
 	else if (jetES>0) {
-	  pfmet_ex = analysisTree.pfmet_ex_JetEnUp;
-	  pfmet_ey = analysisTree.pfmet_ey_JetEnUp;
+	  pfmetcorr_ex = analysisTree.pfmetcorr_ex_JetEnUp;
+	  pfmetcorr_ey = analysisTree.pfmetcorr_ey_JetEnUp;
 	}
 	else if (unclusteredES<0) {
-	  pfmet_ex = analysisTree.pfmet_ex_UnclusteredEnDown;
-	  pfmet_ey = analysisTree.pfmet_ey_UnclusteredEnDown;
+	  pfmetcorr_ex = analysisTree.pfmetcorr_ex_UnclusteredEnDown;
+	  pfmetcorr_ey = analysisTree.pfmetcorr_ey_UnclusteredEnDown;
 	}
 	else if (unclusteredES>0) {
-	  pfmet_ex = analysisTree.pfmet_ex_UnclusteredEnUp;
-	  pfmet_ey = analysisTree.pfmet_ey_UnclusteredEnUp;
+	  pfmetcorr_ex = analysisTree.pfmetcorr_ex_UnclusteredEnUp;
+	  pfmetcorr_ey = analysisTree.pfmetcorr_ey_UnclusteredEnUp;
 	}
 	else {
-	  pfmet_ex = analysisTree.pfmet_ex;
-	  pfmet_ey = analysisTree.pfmet_ey;
+	  pfmetcorr_ex = analysisTree.pfmetcorr_ex;
+	  pfmetcorr_ey = analysisTree.pfmetcorr_ey;
 	}
       }
 
-      met_ = TMath::Sqrt(pfmet_ex*pfmet_ex+pfmet_ey*pfmet_ey);
+      met_ = TMath::Sqrt(pfmetcorr_ex*pfmetcorr_ex+pfmetcorr_ey*pfmetcorr_ey);
       if (met_<1e-4) met_ = 1e-4;
-      metphi_ = TMath::ATan2(pfmet_ey,pfmet_ex);
-      TLorentzVector lorentzVectorMet; lorentzVectorMet.SetXYZT(pfmet_ex,pfmet_ey,0,met_);
+      metphi_ = TMath::ATan2(pfmetcorr_ey,pfmetcorr_ex);
+      TLorentzVector lorentzVectorMet; lorentzVectorMet.SetXYZT(pfmetcorr_ex,pfmetcorr_ey,0,met_);
 
       // *************************
       // **** accessing muons ****
@@ -1491,11 +1491,11 @@ int main(int argc, char * argv[]) {
 	muonEta_ = lorentzVectorTriggerMu.Eta();
 	muonPhi_ = lorentzVectorTriggerMu.Phi();
 	muonQ_   = int(analysisTree.muon_charge[indexTriggerMu]);
-	pfmet_ex = pfmet_ex + lorentzVectorTriggerMu.Px() - lorentzVectorTriggerMu.Px();
-	pfmet_ey = pfmet_ey + lorentzVectorTriggerMu.Py() - lorentzVectorTriggerMu.Py();
-	met_ = TMath::Sqrt(pfmet_ex*pfmet_ex+pfmet_ey*pfmet_ey);
-	metphi_ = TMath::ATan2(pfmet_ey,pfmet_ex);
-	lorentzVectorMet.SetXYZT(pfmet_ex,pfmet_ey,0,met_);
+	pfmetcorr_ex = pfmetcorr_ex + lorentzVectorTriggerMu.Px() - lorentzVectorTriggerMu.Px();
+	pfmetcorr_ey = pfmetcorr_ey + lorentzVectorTriggerMu.Py() - lorentzVectorTriggerMu.Py();
+	met_ = TMath::Sqrt(pfmetcorr_ex*pfmetcorr_ex+pfmetcorr_ey*pfmetcorr_ey);
+	metphi_ = TMath::ATan2(pfmetcorr_ey,pfmetcorr_ex);
+	lorentzVectorMet.SetXYZT(pfmetcorr_ex,pfmetcorr_ey,0,met_);
 	mtmuon_  = mT(lorentzVectorTriggerMu,lorentzVectorMet);
 	dPhiMetMuon_ = dPhiFromLV(lorentzVectorTriggerMu,lorentzVectorMet); 
 	lorentzVectorW = lorentzVectorTriggerMu + lorentzVectorMet;
@@ -1983,11 +1983,11 @@ int main(int argc, char * argv[]) {
 				 analysisTree.tau_py[indexTau],
 				 analysisTree.tau_pz[indexTau],
 				 analysisTree.tau_mass[indexTau]);
-	pfmet_ex = pfmet_ex + lorentzVectorTau.Px() - lorentzVectorTau.Px();
-	pfmet_ey = pfmet_ey + lorentzVectorTau.Py() - lorentzVectorTau.Py();
-	met_ = TMath::Sqrt(pfmet_ex*pfmet_ex+pfmet_ey*pfmet_ey);
-	metphi_ = TMath::ATan2(pfmet_ey,pfmet_ex);
-	lorentzVectorMet.SetXYZT(pfmet_ex,pfmet_ey,0,met_);
+	pfmetcorr_ex = pfmetcorr_ex + lorentzVectorTau.Px() - lorentzVectorTau.Px();
+	pfmetcorr_ey = pfmetcorr_ey + lorentzVectorTau.Py() - lorentzVectorTau.Py();
+	met_ = TMath::Sqrt(pfmetcorr_ex*pfmetcorr_ex+pfmetcorr_ey*pfmetcorr_ey);
+	metphi_ = TMath::ATan2(pfmetcorr_ey,pfmetcorr_ex);
+	lorentzVectorMet.SetXYZT(pfmetcorr_ex,pfmetcorr_ey,0,met_);
 	mttau_ = mT(lorentzVectorTau,lorentzVectorMet);
 	mtgen_ = mT(wgentauLV,wnuLV);
 	tauPt_ = analysisTree.tau_pt[indexTau];
