@@ -691,6 +691,9 @@ int main(int argc, char * argv[]) {
   trigNTuple_->Branch("muonEta",&muonEta_,"muonEta/F");
   trigNTuple_->Branch("dPhiMetMuon",&dPhiMetMuon_,"dPhiMetMuon/F");
   trigNTuple_->Branch("WMass",&wMass_,   "WMass/F");
+  trigNTuple_->Branch("puWeight",  &puWeight_,  "puWeight/F");
+  trigNTuple_->Branch("genWeight", &genWeight_, "genWeight/F");
+
 
   // project directory
   string cmsswBase = (getenv ("CMSSW_BASE"));
