@@ -187,9 +187,6 @@ int main(int argc, char * argv[]) {
   TString TStrName(rootFileName);
   std::cout <<TStrName <<std::endl;  
 
-  // Check if WJet sample is processed
-  const bool isWJetsSample = (rootFileName.find("WJets") == rootFileName.rfind("/")+1) || (rootFileName.find("W1Jets") == rootFileName.rfind("/")+1) || (rootFileName.find("W2Jets") == rootFileName.rfind("/")+1) || (rootFileName.find("W3Jets") == rootFileName.rfind("/")+1) || (rootFileName.find("W4Jets") == rootFileName.rfind("/")+1) || (rootFileName.find("EWK") == rootFileName.rfind("/")+1);
-
   // output fileName
   TFile * file = new TFile(TStrName+TString(".root"),"recreate");
 
@@ -691,6 +688,9 @@ int main(int argc, char * argv[]) {
   trigNTuple_->Branch("muonEta",&muonEta_,"muonEta/F");
   trigNTuple_->Branch("dPhiMetMuon",&dPhiMetMuon_,"dPhiMetMuon/F");
   trigNTuple_->Branch("WMass",&wMass_,   "WMass/F");
+  trigNTuple_->Branch("puWeight",  &puWeight_,  "puWeight/F");
+  trigNTuple_->Branch("genWeight", &genWeight_, "genWeight/F");
+
 
   // project directory
   string cmsswBase = (getenv ("CMSSW_BASE"));
@@ -1017,17 +1017,14 @@ int main(int argc, char * argv[]) {
 	std::cout << "Number of electrons     = " << analysisTree.electron_count << std::endl;
       }	
 
-      // applying genweight 
+      // Set MC relevant variables
       if (!isData) {
-	if (analysisTree.genweight<0)
-	  genWeight_ = -1;
-	else
-	  genWeight_ = 1;
+	genWeight_ = analysisTree.genweight;
 	weight_ *= genWeight_;
 
 	npartons_ = analysisTree.genparticles_noutgoing;
 	npartonsNLO_ = analysisTree.genparticles_noutgoing_NLO;
-	if(isWJetsSample) lheWPt_   = analysisTree.genparticles_lheWPt;
+	lheWPt_   = analysisTree.genparticles_lheWPt;
       }
       histWeightsH->Fill(double(0.),double(genWeight_));
       
