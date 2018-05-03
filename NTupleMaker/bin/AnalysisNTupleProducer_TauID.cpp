@@ -798,6 +798,21 @@ int main(int argc, char * argv[]) {
 
       if (nEvents%10000==0) cout << "Processed " << nEvents << endl;
 
+      if(debug){
+	cout<<"muon_count = "<<analysisTree.muon_count<<endl;
+	cout<<"electron_count = "<<analysisTree.electron_count<<endl;
+	cout<<"track_count = "<<analysisTree.track_count<<endl;
+	cout<<"tau_count = "<<analysisTree.tau_count<<endl;
+	cout<<"gentau_count = "<<analysisTree.gentau_count<<endl;
+	cout<<"trigobject_count = "<<analysisTree.trigobject_count<<endl;
+	cout<<"l1tau_count = "<<analysisTree.l1tau_count<<endl;
+	cout<<"l1egamma_count = "<<analysisTree.l1egamma_count<<endl;
+	cout<<"l1muon_count = "<<analysisTree.l1muon_count<<endl;
+	cout<<"pfjet_count = "<<analysisTree.pfjet_count<<endl;
+	cout<<"genparticles_count = "<<analysisTree.genparticles_count<<endl;
+	cout<<"dimuon_count = "<<analysisTree.dimuon_count<<endl;
+      }
+
       // ***************************
       // initialize ntuple variables
       // ***************************
