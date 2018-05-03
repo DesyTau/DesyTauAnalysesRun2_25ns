@@ -690,7 +690,7 @@ int main(int argc, char * argv[]) {
   trigNTuple_->Branch("muonPt",&muonPt_,"muonPt/F");
   trigNTuple_->Branch("muonEta",&muonEta_,"muonEta/F");
   trigNTuple_->Branch("dPhiMetMuon",&dPhiMetMuon_,"dPhiMetMuon/F");
-
+  trigNTuple_->Branch("WMass",&wMass_,   "WMass/F");
 
   // project directory
   string cmsswBase = (getenv ("CMSSW_BASE"));
@@ -714,7 +714,7 @@ int main(int argc, char * argv[]) {
 	ss >> periods.back();
       }
   }
- 
+
   PileUp * PUofficial = new PileUp(); 
   if (!isData){
     // Official PU reweighting
@@ -797,7 +797,7 @@ int main(int argc, char * argv[]) {
       nEvents++;
 
       if (nEvents%10000==0) cout << "Processed " << nEvents << endl;
-      
+
       // ***************************
       // initialize ntuple variables
       // ***************************
@@ -1227,8 +1227,8 @@ int main(int argc, char * argv[]) {
       for (std::map<string,int>::iterator it=analysisTree.hltriggerresults->begin(); it!=analysisTree.hltriggerresults->end(); ++it) {
 	TString trigName(it->first);
 	if (trigName.Contains(MetHLTName)) {
-          if (it->second==1) isMetHLT = true;
-        }
+	  if (it->second==1) isMetHLT = true;
+	}
       }
       trigger_ = isMetHLT;
       trig_ = isMetHLT;
@@ -1998,7 +1998,7 @@ int main(int argc, char * argv[]) {
 	tauNtrk1_ = analysisTree.tau_ntracks_pt1[indexTau];
 	tauNtrk05_ = analysisTree.tau_ntracks_pt05[indexTau];
 	tauNtrk08_ = analysisTree.tau_ntracks_pt08[indexTau];
-	
+
 	tauLeadingTrackPt_ = PtoPt(analysisTree.tau_leadchargedhadrcand_px[indexTau],
 				   analysisTree.tau_leadchargedhadrcand_py[indexTau]);
 
