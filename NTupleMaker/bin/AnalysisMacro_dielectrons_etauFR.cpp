@@ -744,6 +744,7 @@ int main(int argc, char * argv[]) {
                         
                        //cout << "TP matching status:" << TPmatching_status << endl;
                         
+			/*
                         // choosing mva met
                         unsigned int metEleTau = 0;
                         bool mvaMetFound = false;
@@ -759,7 +760,7 @@ int main(int argc, char * argv[]) {
                                 }
                             }
                         }
-                        
+                        */
                         //using uncorrected MET for now in 2017
                         
                         met = TMath::Sqrt(analysisTree.pfmet_ex*analysisTree.pfmet_ex + analysisTree.pfmet_ey*analysisTree.pfmet_ey);

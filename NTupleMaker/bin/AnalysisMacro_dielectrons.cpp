@@ -1567,40 +1567,11 @@ int main(int argc, char * argv[]) {
 	  TLorentzVector dielectron = electron1+electron2;
 	  float mass = dielectron.M();
 
-	  // accessing Mva Met
-	  bool mvaMetFound = false;
-	  unsigned int metMuMu = 0; 
-	  for (unsigned int iMet=0; iMet<analysisTree.mvamet_count; ++iMet) {
-	    if (analysisTree.mvamet_channel[iMet]==6) {
-	      if (analysisTree.mvamet_lep1[iMet]==iE1&&
-		  analysisTree.mvamet_lep2[iMet]==iE2) {
-		metMuMu = iMet;
-		mvaMetFound = true;
-		break;
-	      }
-	    }
-	  }
-	  float mvamet = 0;
-	  float mvamet_phi = 0;
-	  float mvamet_ex = 0;
-	  float mvamet_ey = 0;
-	  if (analysisTree.mvamet_count>0) {
-	    mvamet_ex = analysisTree.mvamet_ex[metMuMu];
-	    mvamet_ey = analysisTree.mvamet_ey[metMuMu];
-	    float mvamet_ex2 = mvamet_ex * mvamet_ex;
-	    float mvamet_ey2 = mvamet_ey * mvamet_ey;
-
-	    mvamet = TMath::Sqrt(mvamet_ex2+mvamet_ey2);
-	    mvamet_phi = TMath::ATan2(mvamet_ey,mvamet_ex);
-	  }
-	  else {
-	    std::cout << "mva_count = " << analysisTree.mvamet_count << std::endl;
-	  }
-	  //	  if (!mvaMetFound)
-	  //	    std::cout << "MVA MEt not found" << std::endl;
-
-	  //	  std::cout << "pfmet = " << pfmet << "   mvamet = " << mvamet << std::endl;
-
+	  float mvamet = analysisTree.pfmetcorr_pt;
+	  float mvamet_phi = analysisTree.pfmetcorr_phi;
+	  float mvamet_ex = analysisTree.pfmetcorr_ex;
+	  float mvamet_ey = analysisTree.pfmetcorr_ey;
+	  
 	  // applying electron scale factors
 	  if (!isData&&applyLeptonSF) {
 	    // insert code for leptons SF here
