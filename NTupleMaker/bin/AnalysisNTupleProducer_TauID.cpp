@@ -734,8 +734,14 @@ int main(int argc, char * argv[]) {
   
  // Trigger efficiencies
   TFile * trigEffFile = new TFile(TString(cmsswBase)+"/src/"+trigEffFileName);
-  TGraphAsymmErrors * graph_trigEffData = (TGraphAsymmErrors*) trigEffFile->Get("data");
-  TGraphAsymmErrors * graph_trigEffMC   = (TGraphAsymmErrors*) trigEffFile->Get("mc");
+  TGraphAsymmErrors * graph_trigEffData_0To120   = (TGraphAsymmErrors*) trigEffFile->Get("data_0To120");
+  TGraphAsymmErrors * graph_trigEffMC_0To120     = (TGraphAsymmErrors*) trigEffFile->Get("mc_0To120");
+  TGraphAsymmErrors * graph_trigEffData_120To160 = (TGraphAsymmErrors*) trigEffFile->Get("data_120To160");
+  TGraphAsymmErrors * graph_trigEffMC_120To160   = (TGraphAsymmErrors*) trigEffFile->Get("mc_120To160");
+  TGraphAsymmErrors * graph_trigEffData_160To200 = (TGraphAsymmErrors*) trigEffFile->Get("data_160To200");
+  TGraphAsymmErrors * graph_trigEffMC_160To200   = (TGraphAsymmErrors*) trigEffFile->Get("mc_160To200");
+  TGraphAsymmErrors * graph_trigEffData_200ToInf = (TGraphAsymmErrors*) trigEffFile->Get("data_200ToInf");
+  TGraphAsymmErrors * graph_trigEffMC_200ToInf   = (TGraphAsymmErrors*) trigEffFile->Get("mc_200ToInf");
   
   // MEt filters
   std::vector<TString> metFlags; metFlags.clear();
@@ -2141,14 +2147,29 @@ int main(int argc, char * argv[]) {
 
       trigWeight_ = 1;
 
-      if (met_>60&&met_<800) {
-	trigEffData = graph_trigEffData -> Eval(met_);
-	trigEffMC   = graph_trigEffMC   -> Eval(met_);
-	trigWeight_ = trigEffData / trigEffMC;
+      if(mhtNoMu_<120){
+	trigEffData = graph_trigEffData_0To120   -> Eval(metNoMu_);
+	trigEffMC   = graph_trigEffMC_0To120     -> Eval(metNoMu_);
       }
+      else if(mhtNoMu_>120 && mhtNoMu_<160){
+	trigEffData = graph_trigEffData_120To160 -> Eval(metNoMu_);
+	trigEffMC   = graph_trigEffMC_120To160   -> Eval(metNoMu_);
+      }
+      else if(mhtNoMu_>160 && mhtNoMu_<200){
+	trigEffData = graph_trigEffData_160To200 -> Eval(metNoMu_);
+	trigEffMC   = graph_trigEffMC_160To200   -> Eval(metNoMu_);
+      }
+      else if(mhtNoMu_>200){
+	trigEffData = graph_trigEffData_200ToInf -> Eval(metNoMu_);
+	trigEffMC   = graph_trigEffMC_200ToInf   -> Eval(metNoMu_);
+      }
+      if(trigEffMC !=0 ) trigWeight_ = trigEffData / trigEffMC;
+
+      if(trigWeight_ < 0) trigWeight_=0;
+
       if (debug) {
-	cout << "Met  = " << met_ 
-	     << "  Mht  = " << mht_ 
+	cout << "MetNoMu  = " << metNoMu_
+	     << "  MhtNoMu  = " << mhtNoMu_
 	     << "  trigWeight = " << trigWeight_ << endl;
       }
       weight_ *= trigWeight_;
