@@ -1040,7 +1040,9 @@ int main(int argc, char * argv[]) {
 
       // Set MC relevant variables
       if (!isData) {
-	genWeight_ = analysisTree.genweight;
+	if (analysisTree.genweight<0) genWeight_ = -1;
+	else                          genWeight_ = 1;
+
 	weight_ *= genWeight_;
 
 	npartons_ = analysisTree.genparticles_noutgoing;
