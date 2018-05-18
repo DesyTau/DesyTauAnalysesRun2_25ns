@@ -812,8 +812,6 @@ int main(int argc, char * argv[]) {
     Long64_t numberOfEntries = analysisTree.GetEntries();
     std::cout << "      number of entries in Tree = " << numberOfEntries << std::endl;
 
-    numberOfEntries=100;
-    
     for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) { 
     
       analysisTree.GetEntry(iEntry);
@@ -2165,18 +2163,13 @@ int main(int argc, char * argv[]) {
       float trigEffMC   = 1.0;
 
       trigWeight_ = 1;
-      cout<<"1"<<endl;
+
       for (auto const& it : map_trigEffMC)
 	{
 	  if( mhtNoMu_ < it.first)
 	    {
-	      cout<<it.first<<endl;
-	      cout<<"2"<<endl;
-	      cout<<it.second<<endl;
 	      trigEffMC    =  it.second->Eval(metNoMu_);
-	      cout<<"3"<<endl;
 	      trigEffData  =  map_trigEffData[it.first]->Eval(metNoMu_);
-	      cout<<"3"<<endl;
 	      break;
 	    }
 	}
