@@ -732,17 +732,32 @@ int main(int argc, char * argv[]) {
   SF_muonIdIso->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(MuonIdIsoFile));
   SF_muonTrig->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(MuonTrigFile));
   
- // Trigger efficiencies
+  // Trigger efficiencies
+  map<int,TGraphAsymmErrors*>  map_trigEffData;
+  map<int,TGraphAsymmErrors*>  map_trigEffMC;
   TFile * trigEffFile = new TFile(TString(cmsswBase)+"/src/"+trigEffFileName);
-  TGraphAsymmErrors * graph_trigEffData_0To120   = (TGraphAsymmErrors*) trigEffFile->Get("data_0To120");
-  TGraphAsymmErrors * graph_trigEffMC_0To120     = (TGraphAsymmErrors*) trigEffFile->Get("mc_0To120");
-  TGraphAsymmErrors * graph_trigEffData_120To160 = (TGraphAsymmErrors*) trigEffFile->Get("data_120To160");
-  TGraphAsymmErrors * graph_trigEffMC_120To160   = (TGraphAsymmErrors*) trigEffFile->Get("mc_120To160");
-  TGraphAsymmErrors * graph_trigEffData_160To200 = (TGraphAsymmErrors*) trigEffFile->Get("data_160To200");
-  TGraphAsymmErrors * graph_trigEffMC_160To200   = (TGraphAsymmErrors*) trigEffFile->Get("mc_160To200");
-  TGraphAsymmErrors * graph_trigEffData_200ToInf = (TGraphAsymmErrors*) trigEffFile->Get("data_200ToInf");
-  TGraphAsymmErrors * graph_trigEffMC_200ToInf   = (TGraphAsymmErrors*) trigEffFile->Get("mc_200ToInf");
-  
+  if(!trigEffFile){
+    cout<<"Trigger file "<<trigEffFileName<<" does not exists. Exiting."<<endl;
+    exit(-1);
+  }
+  TIter next(trigEffFile->GetListOfKeys());
+  TKey *key = 0;
+
+  while ((key = (TKey*)next()))
+    {
+      TClass *c = gROOT->GetClass(key->GetClassName());
+      if (!c->InheritsFrom("TGraphAsymmErrors")) continue;
+      TGraphAsymmErrors *g = (TGraphAsymmErrors*) key->ReadObj();
+      TString gName = g->GetName();
+      Ssiz_t pos    = gName.First("To");
+      Int_t  len    = gName.Length();
+      int upperBound   = atoi( (TString) gName(pos+2,len));
+      if(gName.Contains("data"))    map_trigEffData.insert( std::make_pair( upperBound , (TGraphAsymmErrors*) g->Clone() ) );
+      else if(gName.Contains("mc")) map_trigEffMC.insert(   std::make_pair( upperBound , (TGraphAsymmErrors*) g->Clone() ) );
+      delete g;
+    }
+  delete key;
+
   // MEt filters
   std::vector<TString> metFlags; metFlags.clear();
   metFlags.push_back("Flag_HBHENoiseFilter");
@@ -796,6 +811,8 @@ int main(int argc, char * argv[]) {
     AC1B analysisTree(tree_);
     Long64_t numberOfEntries = analysisTree.GetEntries();
     std::cout << "      number of entries in Tree = " << numberOfEntries << std::endl;
+
+    numberOfEntries=100;
     
     for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) { 
     
@@ -2148,25 +2165,23 @@ int main(int argc, char * argv[]) {
       float trigEffMC   = 1.0;
 
       trigWeight_ = 1;
+      cout<<"1"<<endl;
+      for (auto const& it : map_trigEffMC)
+	{
+	  if( mhtNoMu_ < it.first)
+	    {
+	      cout<<it.first<<endl;
+	      cout<<"2"<<endl;
+	      cout<<it.second<<endl;
+	      trigEffMC    =  it.second->Eval(metNoMu_);
+	      cout<<"3"<<endl;
+	      trigEffData  =  map_trigEffData[it.first]->Eval(metNoMu_);
+	      cout<<"3"<<endl;
+	      break;
+	    }
+	}
 
-      if(mhtNoMu_<120){
-	trigEffData = graph_trigEffData_0To120   -> Eval(metNoMu_);
-	trigEffMC   = graph_trigEffMC_0To120     -> Eval(metNoMu_);
-      }
-      else if(mhtNoMu_>120 && mhtNoMu_<160){
-	trigEffData = graph_trigEffData_120To160 -> Eval(metNoMu_);
-	trigEffMC   = graph_trigEffMC_120To160   -> Eval(metNoMu_);
-      }
-      else if(mhtNoMu_>160 && mhtNoMu_<200){
-	trigEffData = graph_trigEffData_160To200 -> Eval(metNoMu_);
-	trigEffMC   = graph_trigEffMC_160To200   -> Eval(metNoMu_);
-      }
-      else if(mhtNoMu_>200){
-	trigEffData = graph_trigEffData_200ToInf -> Eval(metNoMu_);
-	trigEffMC   = graph_trigEffMC_200ToInf   -> Eval(metNoMu_);
-      }
       if(trigEffMC !=0 ) trigWeight_ = trigEffData / trigEffMC;
-
       if(trigWeight_ < 0) trigWeight_=0;
 
       if (debug) {
