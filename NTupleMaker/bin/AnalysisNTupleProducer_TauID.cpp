@@ -1649,17 +1649,13 @@ int main(int argc, char * argv[]) {
 
       for (unsigned int ijet=0; ijet<analysisTree.pfjet_count; ++ijet) {
 
+
+	// Scale for sys uncertainties
 	float scaleJ = 1;
-	//	cout << "Jet " << ijet << " Pt = " << analysisTree.pfjet_pt[ijet] << "  Unc = " << analysisTree.pfjet_jecUncertainty[ijet] << endl;
 
-	if (jetES<0)
-	  scaleJ = 1.0 - analysisTree.pfjet_jecUncertainty[ijet];
-	else if (jetES>0)
-	  scaleJ = 1.0 + analysisTree.pfjet_jecUncertainty[ijet];
-	else
-	  scaleJ = 1.0;
-
-	//	std::cout << ijet << "  :  " << scaleJ << std::endl;
+	if (jetES<0)      scaleJ = 1.0 - analysisTree.pfjet_jecUncertainty[ijet];
+	else if (jetES>0) scaleJ = 1.0 + analysisTree.pfjet_jecUncertainty[ijet];
+	else 	          scaleJ = 1.0;
 
 	analysisTree.pfjet_px[ijet] *= scaleJ;
 	analysisTree.pfjet_py[ijet] *= scaleJ;
@@ -1671,25 +1667,21 @@ int main(int argc, char * argv[]) {
 
 	if (absJetEta>5.2) continue;
 	if (analysisTree.pfjet_pt[ijet]<20.0) continue; 
-	
-	// jetId
-	bool isPFLooseJetId = looseJetiD(analysisTree,int(ijet));
+
+
+
+	// jetID : accept only jets with tight id for 2017 analysis
 	bool isPFTightJetId = tightJetiD_2017(analysisTree,int(ijet));
-	//	bool isPULooseJetId = looseJetPUiD(analysisTree,int(ijet));
+	if (!isPFTightJetId) continue;
 
 	// jet four-vector
 	TLorentzVector jetLV; jetLV.SetXYZT(analysisTree.pfjet_px[ijet],
 					    analysisTree.pfjet_py[ijet],
 					    analysisTree.pfjet_pz[ijet],
 					    analysisTree.pfjet_e[ijet]);
-	// counting jets for Mht
-	if (isPFTightJetId) {
-	  lorentzVectorAllJetsForMht += jetLV;
-	}
 
-	// accept only jets with looseId and loosePUId
-	if (!isPFTightJetId) continue;
-	//	if (!isPULooseJetId) continue;
+	// counting jets for Mht
+	lorentzVectorAllJetsForMht += jetLV;
 
 	// checking overlap with muons
 	bool overlapWithMuon = false;
@@ -2146,7 +2138,7 @@ int main(int argc, char * argv[]) {
 	tauJetPt_  = lorentzVectorTauJet.Pt();
 	tauJetEta_ = lorentzVectorTauJet.Eta();
 	tauJetPhi_ = lorentzVectorTauJet.Phi();
-	tauJetTightId_ = tightJetiD(analysisTree,indexMatchingJet);
+	tauJetTightId_ = tightJetiD_2017(analysisTree,indexMatchingJet);
 
       }
       // ****************************
@@ -2390,7 +2382,7 @@ int main(int argc, char * argv[]) {
 	    tauJetPt_  = lorentzVectorTauJet.Pt();
 	    tauJetEta_ = lorentzVectorTauJet.Eta();
 	    tauJetPhi_ = lorentzVectorTauJet.Phi();
-	    tauJetTightId_ = tightJetiD(analysisTree,indexMatchingJet);
+	    tauJetTightId_ = tightJetiD_2017(analysisTree,indexMatchingJet);
 
 	    tauLeadingTrackPt_ = PtoPt(analysisTree.tau_leadchargedhadrcand_px[indexTau],
 				       analysisTree.tau_leadchargedhadrcand_py[indexTau]);
