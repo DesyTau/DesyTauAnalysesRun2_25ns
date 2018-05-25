@@ -690,7 +690,7 @@ int main(int argc, char * argv[]) {
   trigNTuple_->Branch("WMass",&wMass_,   "WMass/F");
   trigNTuple_->Branch("puWeight",  &puWeight_,  "puWeight/F");
   trigNTuple_->Branch("genWeight", &genWeight_, "genWeight/F");
-
+  trigNTuple_->Branch("metFilters",&metFilters_,"metFilters/O");
 
   // project directory
   string cmsswBase = (getenv ("CMSSW_BASE"));
@@ -2176,6 +2176,9 @@ int main(int argc, char * argv[]) {
       }
       weight_ *= trigWeight_;
 
+      // setting met filters
+      metFilters_ = metFiltersPasses(analysisTree,metFlags,isData);
+
       // ********************************
       // **** filling trigger ntuple ****
       // ********************************
@@ -2184,9 +2187,6 @@ int main(int argc, char * argv[]) {
 	TrigEvents++;
       }
       
-      // setting met filters
-      metFilters_ = metFiltersPasses(analysisTree,metFlags,isData);
-
       // ***************************
       // ******* WJet selection ****
       // ***************************
