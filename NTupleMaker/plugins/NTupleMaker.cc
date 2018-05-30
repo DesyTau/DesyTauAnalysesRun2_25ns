@@ -19,6 +19,7 @@
 #include "RecoVertex/KinematicFitPrimitives/interface/KinematicParticleFactoryFromTransientTrack.h"
 #include "RecoEgamma/EgammaTools/interface/ConversionTools.h"
 #include "RecoVertex/AdaptiveVertexFit/interface/AdaptiveVertexFitter.h"
+#include "RecoVertex/KalmanVertexFit/interface/KalmanVertexFitter.h"
 #include "TrackingTools/TransientTrack/interface/TransientTrackBuilder.h"
 #include "TrackingTools/Records/interface/TransientTrackRecord.h"
 #include "RecoVertex/VertexPrimitives/interface/TransientVertex.h"
@@ -650,10 +651,17 @@ void NTupleMaker::beginJob(){
     tree->Branch("tau_vertexz", tau_vertexz, "tau_vertexz[tau_count]/F");
 
     tree->Branch("tau_dxy", tau_dxy, "tau_dxy[tau_count]/F");
+    tree->Branch("tau_dxySig", tau_dxySig, "tau_dxySig[tau_count]/F");
     tree->Branch("tau_dz", tau_dz, "tau_dz[tau_count]/F");
     tree->Branch("tau_ip3d", tau_ip3d, "tau_ip3d[tau_count]/F");
     tree->Branch("tau_ip3dSig", tau_ip3dSig, "tau_ip3dSig[tau_count]/F");
     tree->Branch("tau_charge", tau_charge, "tau_charge[tau_count]/F");
+
+    tree->Branch("tau_flightLength", tau_flightLength, "tau_flightLength[tau_count]/F");
+    tree->Branch("tau_flightLengthSig", tau_flightLengthSig, "tau_flightLengthSig[tau_count]/F");
+    tree->Branch("tau_SV_x", tau_SV_x, "tau_SV_x[tau_count]/F");
+    tree->Branch("tau_SV_y", tau_SV_y, "tau_SV_y[tau_count]/F");
+    tree->Branch("tau_SV_z", tau_SV_z, "tau_SV_z[tau_count]/F");
     
     tree->Branch("tau_genjet_px", tau_genjet_px, "tau_genjet_px[tau_count]/F");
     tree->Branch("tau_genjet_py", tau_genjet_py, "tau_genjet_py[tau_count]/F");
@@ -3653,11 +3661,64 @@ unsigned int NTupleMaker::AddTaus(const edm::Event& iEvent, const edm::EventSetu
 	  tau_ip3d[tau_count]    = -1.0f;
 	  tau_ip3dSig[tau_count] = -1.0f;
 	  tau_dxy[tau_count] = (*Taus)[i].dxy();
+	  tau_dxySig[tau_count] = (*Taus)[i].dxy_Sig();
+	  tau_ip3d[tau_count] = (*Taus)[i].ip3d();
+	  tau_ip3dSig[tau_count] = (*Taus)[i].ip3d_Sig();
 
 	  // tau vertex
 	  tau_vertexx[tau_count] = (*Taus)[i].vertex().x();
 	  tau_vertexy[tau_count] = (*Taus)[i].vertex().y();
 	  tau_vertexz[tau_count] = (*Taus)[i].vertex().z();
+
+	  // tau secondary vertex
+	  if( (*Taus)[i].hasSecondaryVertex() ){
+	    tau_flightLength[tau_count] = sqrt( (*Taus)[i].flightLength().mag2() );
+	    tau_flightLengthSig[tau_count] = (*Taus)[i].flightLengthSig();
+	    // (*Taus)[i].secondaryVertex() is a reference (edm::Ref) to
+	    //  a vertex collection which is not stored in MiniAOD,
+	    //  so the SV of Tau should be refit:
+	    //  1) Get tracks form Tau signal charged candidates
+	    std::vector<reco::TransientTrack> transTrk;
+	    TransientVertex transVtx;
+	    const reco::CandidatePtrVector cands = (*Taus)[i].signalChargedHadrCands();
+	    for(const auto& cand : cands) {
+	      if(cand.isNull()) continue;
+	      const pat::PackedCandidate* pCand = dynamic_cast<const pat::PackedCandidate*>(cand.get());
+	      if (pCand != nullptr && pCand->hasTrackDetails())
+		transTrk.push_back(transTrackBuilder->build(&pCand->pseudoTrack()));
+	    }
+	    // 2) Fit the secondary vertex
+	    bool fitOK(true);
+	    KalmanVertexFitter kvf(true);
+	    if(transTrk.size() > 1){
+	      try{
+		transVtx = kvf.vertex(transTrk); //KalmanVertexFitter
+	      } catch(...){
+		fitOK = false;
+	      }
+	    } else{
+	      fitOK = false;
+	    }
+	    if(!transVtx.hasRefittedTracks()) fitOK = false;
+	    if(transVtx.refittedTracks().size()!=transTrk.size()) fitOK = false;
+	    if(fitOK){
+	      tau_SV_x[tau_count] = transVtx.position().x();
+	      tau_SV_y[tau_count] = transVtx.position().y();
+	      tau_SV_z[tau_count] = transVtx.position().z();
+	    }
+	    else{
+	      tau_SV_x[tau_count] = tau_vertexx[tau_count];
+	      tau_SV_y[tau_count] = tau_vertexy[tau_count];
+	      tau_SV_z[tau_count] = tau_vertexz[tau_count];
+	    }
+	  }
+	  else{
+	    tau_flightLength[tau_count] = -1.0f;
+	    tau_flightLengthSig[tau_count] = -1.0f;
+	    tau_SV_x[tau_count] = tau_vertexx[tau_count];
+	    tau_SV_y[tau_count] = tau_vertexy[tau_count];
+	    tau_SV_z[tau_count] = tau_vertexz[tau_count];
+	  }
 
 	  // l1 match
 	  if(l1jets!=0 && l1taus!=0)
