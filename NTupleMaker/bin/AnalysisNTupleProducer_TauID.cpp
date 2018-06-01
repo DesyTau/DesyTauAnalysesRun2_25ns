@@ -690,7 +690,11 @@ int main(int argc, char * argv[]) {
   trigNTuple_->Branch("WMass",&wMass_,   "WMass/F");
   trigNTuple_->Branch("puWeight",  &puWeight_,  "puWeight/F");
   trigNTuple_->Branch("genWeight", &genWeight_, "genWeight/F");
-
+  trigNTuple_->Branch("metFilters",&metFilters_,"metFilters/O");
+  trigNTuple_->Branch("nJetsCentral20",&nJetsCentral20_,"nJetsCentral20/i");
+  trigNTuple_->Branch("nJetsCentral30",&nJetsCentral30_,"nJetsCentral30/i");
+  trigNTuple_->Branch("nJetsForward20",&nJetsForward20_,"nJetsForward20/i");
+  trigNTuple_->Branch("nJetsForward30",&nJetsForward30_,"nJetsForward30/i");
 
   // project directory
   string cmsswBase = (getenv ("CMSSW_BASE"));
@@ -2176,6 +2180,9 @@ int main(int argc, char * argv[]) {
       }
       weight_ *= trigWeight_;
 
+      // setting met filters
+      metFilters_ = metFiltersPasses(analysisTree,metFlags,isData);
+
       // ********************************
       // **** filling trigger ntuple ****
       // ********************************
@@ -2184,9 +2191,6 @@ int main(int argc, char * argv[]) {
 	TrigEvents++;
       }
       
-      // setting met filters
-      metFilters_ = metFiltersPasses(analysisTree,metFlags,isData);
-
       // ***************************
       // ******* WJet selection ****
       // ***************************
@@ -2197,15 +2201,15 @@ int main(int argc, char * argv[]) {
 	recoilJetDPhi_ = dPhiFromLV(lorentzVectorW,lorentzVectorTauJet);
 	isWJet = ptTriggerMu>ptMuCut_WJet; 
 	isWJet = isWJet && mtmuon_ > mtCut_WJet;
-	isWJet = isWJet && recoilDPhi_>deltaPhiWJetCut_WJet;
+	//isWJet = isWJet && recoilDPhi_>deltaPhiWJetCut_WJet;
 	isWJet = isWJet && nMuon_ == 1;
 	isWJet = isWJet && nElec_ == 0;
-	isWJet = isWJet && nSelTaus_ == 1;
+	//isWJet = isWJet && nSelTaus_ == 1;
 	isWJet = isWJet && nJetsCentral30_ == 1;
 	isWJet = isWJet && nJetsForward30_ == 0;
-	isWJet = isWJet && tauPt_>100.;
+	//isWJet = isWJet && tauPt_>100.;
 	isWJet = isWJet && abs(muonEta_)<2.1;
-	isWJet = isWJet && tauDM_;
+	//isWJet = isWJet && tauDM_;
 
 	if (isWJet) {
 	  if (!isData) {
