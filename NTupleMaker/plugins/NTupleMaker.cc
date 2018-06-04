@@ -662,6 +662,7 @@ void NTupleMaker::beginJob(){
     tree->Branch("tau_SV_x", tau_SV_x, "tau_SV_x[tau_count]/F");
     tree->Branch("tau_SV_y", tau_SV_y, "tau_SV_y[tau_count]/F");
     tree->Branch("tau_SV_z", tau_SV_z, "tau_SV_z[tau_count]/F");
+    tree->Branch("tau_SV_cov", tau_SV_cov, "tau_SV_cov[tau_count][6]/F");
     
     tree->Branch("tau_genjet_px", tau_genjet_px, "tau_genjet_px[tau_count]/F");
     tree->Branch("tau_genjet_py", tau_genjet_py, "tau_genjet_py[tau_count]/F");
@@ -3705,11 +3706,23 @@ unsigned int NTupleMaker::AddTaus(const edm::Event& iEvent, const edm::EventSetu
 	      tau_SV_x[tau_count] = transVtx.position().x();
 	      tau_SV_y[tau_count] = transVtx.position().y();
 	      tau_SV_z[tau_count] = transVtx.position().z();
+	      tau_SV_cov[tau_count][0] = transVtx.positionError().cxx(); // xError()
+	      tau_SV_cov[tau_count][1] = transVtx.positionError().cyx(); 
+	      tau_SV_cov[tau_count][2] = transVtx.positionError().czx();
+	      tau_SV_cov[tau_count][3] = transVtx.positionError().cyy(); // yError()
+	      tau_SV_cov[tau_count][4] = transVtx.positionError().czy();
+	      tau_SV_cov[tau_count][5] = transVtx.positionError().czz(); // zError()
 	    }
 	    else{
 	      tau_SV_x[tau_count] = tau_vertexx[tau_count];
 	      tau_SV_y[tau_count] = tau_vertexy[tau_count];
 	      tau_SV_z[tau_count] = tau_vertexz[tau_count];
+	      tau_SV_cov[tau_count][0] = 0.;
+	      tau_SV_cov[tau_count][1] = 0.;
+	      tau_SV_cov[tau_count][2] = 0.;
+	      tau_SV_cov[tau_count][3] = 0.;
+	      tau_SV_cov[tau_count][4] = 0.;
+	      tau_SV_cov[tau_count][5] = 0.;
 	    }
 	  }
 	  else{
@@ -3718,6 +3731,12 @@ unsigned int NTupleMaker::AddTaus(const edm::Event& iEvent, const edm::EventSetu
 	    tau_SV_x[tau_count] = tau_vertexx[tau_count];
 	    tau_SV_y[tau_count] = tau_vertexy[tau_count];
 	    tau_SV_z[tau_count] = tau_vertexz[tau_count];
+	    tau_SV_cov[tau_count][0] = 0.;
+	    tau_SV_cov[tau_count][1] = 0.;
+	    tau_SV_cov[tau_count][2] = 0.;
+	    tau_SV_cov[tau_count][3] = 0.;
+	    tau_SV_cov[tau_count][4] = 0.;
+	    tau_SV_cov[tau_count][5] = 0.;
 	  }
 
 	  // l1 match
