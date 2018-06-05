@@ -27,10 +27,9 @@ void acott(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, int tau
   tau1Prong=chargedPivec(analysisTree,tauIndex1);
   tau2Prong=chargedPivec(analysisTree,tauIndex2);
 
-  if(analysisTree->tau_decayMode[tauIndex1]==1||analysisTree->tau_decayMode[tauIndex2]==1){
-    tau1Pi0orIP=neutralPivec(analysisTree,tauIndex1);
-    tau2Pi0orIP=neutralPivec(analysisTree,tauIndex2);
-  }
+  if(analysisTree->tau_decayMode[tauIndex1]==1)tau1Pi0orIP=neutralPivec(analysisTree,tauIndex1);
+  if(analysisTree->tau_decayMode[tauIndex2]==1)tau2Pi0orIP=neutralPivec(analysisTree,tauIndex2);
+  
   TLorentzVector Prongsum;
   //finding the boosting vector to the charged Pi ZMF
   Prongsum=tau1Prong+tau2Prong;
