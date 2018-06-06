@@ -369,6 +369,7 @@ void NTupleMaker::beginJob(){
     tree->Branch("primvertex_ptq", &primvertex_ptq, "primvertex_pdf/F");
     tree->Branch("primvertex_ntracks", &primvertex_ntracks, "primvertex_ntracks/I");
     tree->Branch("primvertex_cov", primvertex_cov, "primvertex_cov[6]/F");
+    tree->Branch("primvertex_mindz", &primvertex_mindz, "primvertex_mindz/F");
   }  
 
   // muons
@@ -677,6 +678,8 @@ void NTupleMaker::beginJob(){
     tree->Branch("tau_leadchargedhadrcand_id",  tau_leadchargedhadrcand_id,  "tau_leadchargedhadrcand_id[tau_count]/I");
     tree->Branch("tau_leadchargedhadrcand_dxy", tau_leadchargedhadrcand_dxy, "tau_leadchargedhadrcand_dxy[tau_count]/F");
     tree->Branch("tau_leadchargedhadrcand_dz",  tau_leadchargedhadrcand_dz,  "tau_leadchargedhadrcand_dz[tau_count]/F");
+    tree->Branch("tau_leadchargedhadrcand_lostPixelHits", tau_leadchargedhadrcand_lostPixelHits, "tau_leadchargedhadrcand_lostPixelHits[tau_count]/I");
+    tree->Branch("tau_leadchargedhadrcand_pvAssocQ", tau_leadchargedhadrcand_pvAssocQ, "tau_leadchargedhadrcand_pvAssocQ[tau_count]/I");
  
     tree->Branch("tau_ntracks_pt05", tau_ntracks_pt05, "tau_ntracks_pt05[tau_count]/i");
     tree->Branch("tau_ntracks_pt08", tau_ntracks_pt05, "tau_ntracks_pt05[tau_count]/i");
@@ -708,6 +711,7 @@ void NTupleMaker::beginJob(){
     tree->Branch("tau_constituents_vy", tau_constituents_vy, "tau_constituents_vy[tau_count][50]/F");
     tree->Branch("tau_constituents_vz", tau_constituents_vz, "tau_constituents_vz[tau_count][50]/F");
     tree->Branch("tau_constituents_pdgId", tau_constituents_pdgId, "tau_constituents_pdgId[tau_count][50]/I");
+    tree->Branch("tau_constituents_lostPixelHits", tau_constituents_lostPixelHits, "tau_constituents_lostPixelHits[tau_count][50]/I");
   }
 
   if (crectrack) { 
@@ -1687,6 +1691,7 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       edm::Handle<VertexCollection> Vertex;
       iEvent.getByToken(PVToken_, Vertex);
       if(Vertex.isValid()) {
+	primvertex_mindz = 999;
 	for(unsigned i = 0 ; i < Vertex->size(); i++) {
 	  primvertex_count++;
 	  if(i == 0) {
@@ -1711,6 +1716,9 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	    
 	    pv_position = (*Vertex)[i].position();
 	    primvertex = (*Vertex)[i];
+	  } else {
+	    if(std::abs((*Vertex)[i].z()-(*Vertex)[0].z()) < primvertex_mindz)
+	      primvertex_mindz = std::abs((*Vertex)[i].z()-(*Vertex)[0].z()); //minimal longitudinal distance between the PV and other vertex 
 	  }
 	  if((*Vertex)[i].isValid() && !(*Vertex)[i].isFake() && (*Vertex)[i].ndof() >= 4 && (*Vertex)[i].z() > -24 && (*Vertex)[i].z() < 24 && (*Vertex)[i].position().Rho() < 2.)
 	    goodprimvertex_count++;
@@ -3553,6 +3561,7 @@ unsigned int NTupleMaker::AddTaus(const edm::Event& iEvent, const edm::EventSetu
 	    tau_constituents_vy[tau_count][m]     = -9999;
 	    tau_constituents_vz[tau_count][m]     = -9999;
 	    tau_constituents_pdgId[tau_count][m]  = -9999;
+	    tau_constituents_lostPixelHits[tau_count][m]  = -9999;
 	  }
 	  UInt_t tau_constituents_count_ = 0;
 	  for(unsigned int m=0; m<(*Taus)[i].signalCands().size(); m++){
@@ -3566,6 +3575,15 @@ unsigned int NTupleMaker::AddTaus(const edm::Event& iEvent, const edm::EventSetu
 	    tau_constituents_vy[tau_count][tau_constituents_count_]     = (*Taus)[i].signalCands()[m]->vy();
 	    tau_constituents_vz[tau_count][tau_constituents_count_]     = (*Taus)[i].signalCands()[m]->vz();
 	    tau_constituents_pdgId[tau_count][tau_constituents_count_]  = (*Taus)[i].signalCands()[m]->pdgId();
+	    if((*Taus)[i].signalCands()[m]->charge()!=0){
+	      //Pixel his information: 
+	      // -1: valid hit in 1st pixel barrel layer,
+	      //  0: noLostInnerHits - no hit in 1st pixel barrel layer, but not expected there e.g. due to geometry,
+	      //  1: one lost hit, 2: two or more lost hits
+	      const pat::PackedCandidate* pCand = dynamic_cast<const pat::PackedCandidate*>((*Taus)[i].signalCands()[m].get());
+	      if(pCand!=nullptr)
+		tau_constituents_lostPixelHits[tau_count][tau_constituents_count_] = pCand->lostInnerHits();
+	    }
 	    tau_constituents_count_ ++;
 	  }
 	  tau_constituents_count[tau_count] = tau_constituents_count_;
@@ -3642,9 +3660,18 @@ unsigned int NTupleMaker::AddTaus(const edm::Event& iEvent, const edm::EventSetu
 	      tau_leadchargedhadrcand_id[tau_count]   = (*Taus)[i].leadChargedHadrCand()->pdgId();
 
 	      pat::PackedCandidate const* packedLeadTauCand = dynamic_cast<pat::PackedCandidate const*>((*Taus)[i].leadChargedHadrCand().get());
-	      tau_leadchargedhadrcand_dxy[tau_count]   = packedLeadTauCand->dxy();
-	      tau_leadchargedhadrcand_dz[tau_count]   = packedLeadTauCand->dz();
-
+	      if(packedLeadTauCand!=nullptr){
+		tau_leadchargedhadrcand_dxy[tau_count]   = packedLeadTauCand->dxy();
+		tau_leadchargedhadrcand_dz[tau_count]    = packedLeadTauCand->dz();
+		tau_leadchargedhadrcand_lostPixelHits[tau_count] = packedLeadTauCand->lostInnerHits();
+		if(packedLeadTauCand->vertexRef().key()==0){//the PV
+		  //documented at https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookMiniAOD2017#PV_Assignment
+		  //and DataFormats/PatCandidates/interface/PackedCandidate.h
+		  tau_leadchargedhadrcand_pvAssocQ[tau_count] = packedLeadTauCand->pvAssociationQuality();
+		} else {
+		  tau_leadchargedhadrcand_pvAssocQ[tau_count] = -1;
+		}
+	      }
 	    }
 	  else
 	    {
@@ -3655,6 +3682,8 @@ unsigned int NTupleMaker::AddTaus(const edm::Event& iEvent, const edm::EventSetu
 	      tau_leadchargedhadrcand_id[tau_count]   = -999;
 	      tau_leadchargedhadrcand_dxy[tau_count]  = -999;
 	      tau_leadchargedhadrcand_dz[tau_count]   = -999;
+	      tau_leadchargedhadrcand_lostPixelHits[tau_count] = -999;
+	      tau_leadchargedhadrcand_pvAssocQ[tau_count] = -999;
 	    }
 	  
 	  tau_dxy[tau_count]     = -100.0f;
