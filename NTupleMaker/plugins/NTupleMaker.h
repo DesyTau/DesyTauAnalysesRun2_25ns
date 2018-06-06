@@ -851,6 +851,7 @@ class NTupleMaker : public edm::EDAnalyzer{
   Float_t tau_leadchargedhadrcand_dxy[M_taumaxcount];
   Float_t tau_leadchargedhadrcand_dz[M_taumaxcount];
   Int_t   tau_leadchargedhadrcand_lostPixelHits[M_taumaxcount];
+  Int_t   tau_leadchargedhadrcand_pvAssocQ[M_taumaxcount];
 
   Float_t tau_vertexx[M_taumaxcount];
   Float_t tau_vertexy[M_taumaxcount];

@@ -679,6 +679,7 @@ void NTupleMaker::beginJob(){
     tree->Branch("tau_leadchargedhadrcand_dxy", tau_leadchargedhadrcand_dxy, "tau_leadchargedhadrcand_dxy[tau_count]/F");
     tree->Branch("tau_leadchargedhadrcand_dz",  tau_leadchargedhadrcand_dz,  "tau_leadchargedhadrcand_dz[tau_count]/F");
     tree->Branch("tau_leadchargedhadrcand_lostPixelHits", tau_leadchargedhadrcand_lostPixelHits, "tau_leadchargedhadrcand_lostPixelHits[tau_count]/I");
+    tree->Branch("tau_leadchargedhadrcand_pvAssocQ", tau_leadchargedhadrcand_pvAssocQ, "tau_leadchargedhadrcand_pvAssocQ[tau_count]/I");
  
     tree->Branch("tau_ntracks_pt05", tau_ntracks_pt05, "tau_ntracks_pt05[tau_count]/i");
     tree->Branch("tau_ntracks_pt08", tau_ntracks_pt05, "tau_ntracks_pt05[tau_count]/i");
@@ -3663,6 +3664,13 @@ unsigned int NTupleMaker::AddTaus(const edm::Event& iEvent, const edm::EventSetu
 		tau_leadchargedhadrcand_dxy[tau_count]   = packedLeadTauCand->dxy();
 		tau_leadchargedhadrcand_dz[tau_count]    = packedLeadTauCand->dz();
 		tau_leadchargedhadrcand_lostPixelHits[tau_count] = packedLeadTauCand->lostInnerHits();
+		if(packedLeadTauCand->vertexRef().key()==0){//the PV
+		  //documented at https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookMiniAOD2017#PV_Assignment
+		  //and DataFormats/PatCandidates/interface/PackedCandidate.h
+		  tau_leadchargedhadrcand_pvAssocQ[tau_count] = packedLeadTauCand->pvAssociationQuality();
+		} else {
+		  tau_leadchargedhadrcand_pvAssocQ[tau_count] = -1;
+		}
 	      }
 	    }
 	  else
@@ -3675,6 +3683,7 @@ unsigned int NTupleMaker::AddTaus(const edm::Event& iEvent, const edm::EventSetu
 	      tau_leadchargedhadrcand_dxy[tau_count]  = -999;
 	      tau_leadchargedhadrcand_dz[tau_count]   = -999;
 	      tau_leadchargedhadrcand_lostPixelHits[tau_count] = -999;
+	      tau_leadchargedhadrcand_pvAssocQ[tau_count] = -999;
 	    }
 	  
 	  tau_dxy[tau_count]     = -100.0f;
