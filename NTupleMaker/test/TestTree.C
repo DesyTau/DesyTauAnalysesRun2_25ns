@@ -6,8 +6,8 @@ void TestTree(int numberOfEvents = 10) {
  // TFile * file = new TFile("/nfs/dust/cms/group/higgs-kit/80x_v3/SingleElectron__Run2016B-PromptReco-v2/SingleElectron__Run2016B-PromptReco-v2_489.root");
 
 //"/nfs/dust/cms/group/higgs-kit/80x_v2/SingleElectron__Run2016B-PromptReco-v2/SingleElectron__Run2016B-PromptReco-v2_3000.root");
-//  TFile * file = new TFile("output_DATA.root");
-  TFile * file = new TFile("output_MC.root");
+  TFile * file = new TFile("output_DATA.root");
+  //TFile * file = new TFile("/nfs/dust/cms/user/ywen/Storage/ReReco2017/SingleMuon__Run2017B-17Nov2017-v1/SingleMuon__Run2017B-17Nov2017-v1_1428.root");
 //  TFile * file = new TFile("/nfs/dust/cms/user/rasp/ntuples/Run2017/SingleElectron_Run2017B_23Jun2017/SingleElectron_Run2017B_23Jun2017_1934.root");
 
   TTree * tree = (TTree*)file->Get("makeroottree/AC1B");
@@ -18,7 +18,7 @@ void TestTree(int numberOfEvents = 10) {
   std::map<std::string, int>* hltriggerresults = new std::map<std::string, int>();
   std::map<std::string, int>* hltprescales = new std::map<std::string, int>();
   std::map<std::string, int>* flags = new std::map<std::string, int>();
-  UInt_t event_nr;
+  ULong64_t event_nr;
 
   tree->SetBranchAddress("event_nr",&event_nr);
   tree->SetBranchAddress("run_hltnames",&hltpaths);

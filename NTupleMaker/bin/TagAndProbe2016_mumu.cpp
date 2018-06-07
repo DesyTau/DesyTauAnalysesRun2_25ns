@@ -108,6 +108,7 @@ int main(int argc, char * argv[]){
     read_json(TString(TString(cmsswBase)+"/src/"+TString(json_name)).Data(), json);
   }
 
+  const string sampleName = cfg.get<string>("sampleName");
 
   const float ptProbeMuonCut = cfg.get<float>("ptProbeMuonCut");
   const float etaProbeMuonCut = cfg.get<float>("etaProbeMuonCut");
@@ -222,6 +223,9 @@ int main(int argc, char * argv[]){
     p_pass_hlt[i2]=0;
     p_tot_hlt[i2]=0;
   }
+    
+    TString puHistName(sampleName);
+    puHistName += "_pileup";
 
   // PU reweighting - initialization
   PileUp * PUofficial = new PileUp();
@@ -229,10 +233,10 @@ int main(int argc, char * argv[]){
     TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/"+TString(pileUpInDataFile),"read");
     TFile * filePUdistribution_MC = new TFile (TString(cmsswBase)+"/src/"+TString(pileUpInMCFile), "read");
     TH1D * PU_data = (TH1D *)filePUdistribution_data->Get("pileup");
-    TH1D * PU_mc = (TH1D *)filePUdistribution_MC->Get("pileup");
+    TH1D * PU_mc = (TH1D *)filePUdistribution_MC->Get(puHistName);
     PUofficial->set_h_data(PU_data);
     PUofficial->set_h_MC(PU_mc);
-  }  
+  }
 
   file->cd("");  
   TTree * tree = new TTree("TagProbe","TagProbe");
@@ -283,6 +287,8 @@ int main(int argc, char * argv[]){
         }
       }
 
+        //cout << "events num:" << iEntry << endl;
+        
       nEvents++;
 	  if (nEvents>nEventsMax && nEventsMax !=-1) break; 
       //filters
@@ -334,9 +340,9 @@ int main(int argc, char * argv[]){
       otree->pu_weight=1;
 
       if(ApplyPUweight) {
-        otree->pu_weight = 0;
-        otree->pu_weight = float(PUofficial->get_PUweight(double(analysisTree.numtruepileupinteractions)));
-      } 
+        otree->pu_weight = double (PUofficial->get_PUweight(double(analysisTree.numtruepileupinteractions)));
+      }
+       // cout << "pu_weight: " << otree->pu_weight << endl;
 
 
       //tag selection
