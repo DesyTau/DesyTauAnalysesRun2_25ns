@@ -272,7 +272,7 @@ class NTupleMaker : public edm::EDAnalyzer{
   virtual void endLuminosityBlock(const edm::LuminosityBlock& iLumiBlock, const edm::EventSetup& iSetup);
   virtual void analyze( const edm::Event& iEvent, const edm::EventSetup& iSetup );
 
-  bool AddGenHt(const edm::Event& iEvent);
+  bool AddLHEInformation(const edm::Event& iEvent);
   bool AddGenParticles(const edm::Event& iEvent);
   bool AddGenJets(const edm::Event& iEvent);
   unsigned int AddElectrons(const edm::Event& iEvent, const edm::EventSetup& iSetup);
@@ -420,7 +420,11 @@ class NTupleMaker : public edm::EDAnalyzer{
   edm::EDGetTokenT<edm::ValueMap<bool> >  eleMvaIsoWP90Fall17MapToken_;
   edm::EDGetTokenT<edm::ValueMap<bool> >  eleMvaIsoWP80Fall17MapToken_;
   edm::EDGetTokenT<edm::ValueMap<bool> >  eleMvaIsoWPLooseFall17MapToken_;
-    
+  edm::EDGetTokenT<edm::ValueMap<bool> > eleVetoIdFall17MapToken_;
+  edm::EDGetTokenT<edm::ValueMap<bool> > eleLooseIdFall17MapToken_;
+  edm::EDGetTokenT<edm::ValueMap<bool> > eleMediumIdFall17MapToken_;
+  edm::EDGetTokenT<edm::ValueMap<bool> > eleTightIdFall17MapToken_;
+ 
     
   //// New for Spring16
   edm::EDGetTokenT<pat::TauCollection> TauCollectionToken_;
@@ -527,6 +531,7 @@ class NTupleMaker : public edm::EDAnalyzer{
   Float_t primvertex_ptq;
   Int_t   primvertex_ntracks;
   Float_t primvertex_cov[6];
+  Float_t primvertex_mindz;
 
   // tracks
   UInt_t track_count;
@@ -558,6 +563,9 @@ class NTupleMaker : public edm::EDAnalyzer{
   UChar_t track_nstriplayers[M_trackmaxcount];
   Int_t track_ID[M_trackmaxcount];
   Bool_t track_highPurity[M_trackmaxcount];
+  Float_t track_vx[M_trackmaxcount];
+  Float_t track_vy[M_trackmaxcount];
+  Float_t track_vz[M_trackmaxcount];
   
   
   // pat muons
@@ -589,6 +597,9 @@ class NTupleMaker : public edm::EDAnalyzer{
   Float_t muon_dzerr[M_muonmaxcount];
   Float_t muon_dxy[M_muonmaxcount];
   Float_t muon_dxyerr[M_muonmaxcount];
+  Float_t muon_vx[M_muonmaxcount];
+  Float_t muon_vy[M_muonmaxcount];
+  Float_t muon_vz[M_muonmaxcount];
 
   Float_t muon_chargedHadIso[M_muonmaxcount];
   Float_t muon_neutralHadIso[M_muonmaxcount];
@@ -681,9 +692,9 @@ class NTupleMaker : public edm::EDAnalyzer{
   Float_t electron_outerx[M_electronmaxcount];
   Float_t electron_outery[M_electronmaxcount];
   Float_t electron_outerz[M_electronmaxcount];
-  Float_t electron_closestpointx[M_electronmaxcount];
-  Float_t electron_closestpointy[M_electronmaxcount];
-  Float_t electron_closestpointz[M_electronmaxcount];
+  Float_t electron_vx[M_electronmaxcount];
+  Float_t electron_vy[M_electronmaxcount];
+  Float_t electron_vz[M_electronmaxcount];
   Float_t electron_esuperclusterovertrack[M_electronmaxcount];
   Float_t electron_eseedclusterovertrack[M_electronmaxcount];
   Float_t electron_deltaetasuperclustertrack[M_electronmaxcount];
@@ -780,6 +791,11 @@ class NTupleMaker : public edm::EDAnalyzer{
   Bool_t electron_cutId_loose_Summer16[M_electronmaxcount];
   Bool_t electron_cutId_medium_Summer16[M_electronmaxcount];
   Bool_t electron_cutId_tight_Summer16[M_electronmaxcount];
+   
+  Bool_t electron_cutId_veto_Fall17[M_electronmaxcount];
+  Bool_t electron_cutId_loose_Fall17[M_electronmaxcount];
+  Bool_t electron_cutId_medium_Fall17[M_electronmaxcount];
+  Bool_t electron_cutId_tight_Fall17[M_electronmaxcount];
 
   Bool_t electron_pass_conversion[M_electronmaxcount];
 
@@ -834,15 +850,25 @@ class NTupleMaker : public edm::EDAnalyzer{
   Int_t   tau_leadchargedhadrcand_id[M_taumaxcount];
   Float_t tau_leadchargedhadrcand_dxy[M_taumaxcount];
   Float_t tau_leadchargedhadrcand_dz[M_taumaxcount];
+  Int_t   tau_leadchargedhadrcand_lostPixelHits[M_taumaxcount];
+  Int_t   tau_leadchargedhadrcand_pvAssocQ[M_taumaxcount];
 
   Float_t tau_vertexx[M_taumaxcount];
   Float_t tau_vertexy[M_taumaxcount];
   Float_t tau_vertexz[M_taumaxcount];
 
   Float_t tau_dxy[M_taumaxcount];
+  Float_t tau_dxySig[M_taumaxcount];
   Float_t tau_dz[M_taumaxcount];
   Float_t tau_ip3d[M_taumaxcount];
   Float_t tau_ip3dSig[M_taumaxcount];
+  Float_t tau_flightLength[M_taumaxcount];
+  Float_t tau_flightLengthSig[M_taumaxcount];
+  Float_t tau_SV_x[M_taumaxcount];
+  Float_t tau_SV_y[M_taumaxcount];
+  Float_t tau_SV_z[M_taumaxcount];
+  Float_t tau_SV_cov[M_taumaxcount][6];
+
   Float_t tau_charge[M_taumaxcount];
   Float_t tau_genjet_e[M_taumaxcount];
   Float_t tau_genjet_px[M_taumaxcount];
@@ -850,19 +876,10 @@ class NTupleMaker : public edm::EDAnalyzer{
   Float_t tau_genjet_pz[M_taumaxcount];
   Int_t tau_genmatch[M_taumaxcount];
 
-  Float_t tau_byIsolationMVArun2v1Raw[M_taumaxcount];
-  Float_t tau_byIsolationMVArun2v1VLoose[M_taumaxcount];
-  Float_t tau_byIsolationMVArun2v1Loose[M_taumaxcount];
-  Float_t tau_byIsolationMVArun2v1Medium[M_taumaxcount];
-  Float_t tau_byIsolationMVArun2v1Tight[M_taumaxcount];
-  Float_t tau_byIsolationMVArun2v1VTight[M_taumaxcount];
-  Float_t tau_byIsolationMVArun2v1VVTight[M_taumaxcount];
-
-
   // main tau discriminators
   bool setTauBranches;
   std::vector<std::pair<std::string, unsigned int> >tauIdIndx;
-  Float_t tau_ids[100][M_taumaxcount];
+  Float_t tau_ids[200][M_taumaxcount];
   
   // number of tracks around 
   UInt_t tau_ntracks_pt05[M_taumaxcount];
@@ -884,6 +901,20 @@ class NTupleMaker : public edm::EDAnalyzer{
 
   string tau_decayMode_name[M_taumaxcount];
   Int_t tau_decayMode[M_taumaxcount];
+
+  // tau consituents
+  UInt_t tau_constituents_count[M_taumaxcount];
+  Float_t tau_constituents_px[M_taumaxcount][50];
+  Float_t tau_constituents_py[M_taumaxcount][50];
+  Float_t tau_constituents_pz[M_taumaxcount][50];
+  Float_t tau_constituents_e[M_taumaxcount][50];
+  Float_t tau_constituents_mass[M_taumaxcount][50];
+  Int_t tau_constituents_charge[M_taumaxcount][50];
+  Float_t tau_constituents_vx[M_taumaxcount][50];
+  Float_t tau_constituents_vy[M_taumaxcount][50];
+  Float_t tau_constituents_vz[M_taumaxcount][50];
+  Int_t tau_constituents_pdgId[M_taumaxcount][50];
+  Int_t tau_constituents_lostPixelHits[M_taumaxcount][50];
 
   // generated tau
   UInt_t gentau_count;
@@ -1159,7 +1190,9 @@ class NTupleMaker : public edm::EDAnalyzer{
   Int_t hepNUP_;
   
   Float_t genparticles_lheHt;
+  Float_t genparticles_lheWPt;
   UInt_t genparticles_noutgoing;
+  Int_t genparticles_noutgoing_NLO;
   UInt_t genparticles_count;
   Float_t genparticles_e[M_genparticlesmaxcount];
   Float_t genparticles_px[M_genparticlesmaxcount];

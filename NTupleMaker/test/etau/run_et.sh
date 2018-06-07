@@ -1,0 +1,34 @@
+#!/bin/bash
+
+./condorsub_seq_leptau.sh SynchNTupleProducer_2017 analysisMacroSynch_lept_et_DYJetsToLL.conf DYJetsToLL et 20
+./condorsub_seq_leptau.sh SynchNTupleProducer_2017 analysisMacroSynch_lept_et_DYJetsToLL_ext1.conf DYJetsToLL_ext1 et 20
+./condorsub_seq_leptau.sh SynchNTupleProducer_2017 analysisMacroSynch_lept_et_DY1JetsToLL.conf DY1JetsToLL et 20
+./condorsub_seq_leptau.sh SynchNTupleProducer_2017 analysisMacroSynch_lept_et_DY1JetsToLL_ext1.conf DY1JetsToLL_ext1 et 20
+./condorsub_seq_leptau.sh SynchNTupleProducer_2017 analysisMacroSynch_lept_et_DY2JetsToLL.conf DY2JetsToLL et 20
+./condorsub_seq_leptau.sh SynchNTupleProducer_2017 analysisMacroSynch_lept_et_DY2JetsToLL_ext1.conf DY2JetsToLL_ext1 et 20
+./condorsub_seq_leptau.sh SynchNTupleProducer_2017 analysisMacroSynch_lept_et_DY3JetsToLL.conf DY3JetsToLL et 20
+./condorsub_seq_leptau.sh SynchNTupleProducer_2017 analysisMacroSynch_lept_et_DY3JetsToLL_ext1.conf DY3JetsToLL_ext1 et 20
+./condorsub_seq_leptau.sh SynchNTupleProducer_2017 analysisMacroSynch_lept_et_DY4JetsToLL.conf DY4JetsToLL et 20
+
+./condorsub_seq_leptau.sh SynchNTupleProducer_2017 analysisMacroSynch_lept_et_ST_t-channel_antitop.conf ST_t_antitop et 10
+./condorsub_seq_leptau.sh SynchNTupleProducer_2017 analysisMacroSynch_lept_et_ST_t-channel_top.conf ST_t_top et 10
+./condorsub_seq_leptau.sh SynchNTupleProducer_2017 analysisMacroSynch_lept_et_ST_tW_antitop.conf ST_tW_antitop et 10
+./condorsub_seq_leptau.sh SynchNTupleProducer_2017 analysisMacroSynch_lept_et_ST_tW_top.conf ST_tW_top et 10
+./condorsub_seq_leptau.sh SynchNTupleProducer_2017 analysisMacroSynch_lept_et_TTToHadronic.conf TTToHadronic et 10
+./condorsub_seq_leptau.sh SynchNTupleProducer_2017 analysisMacroSynch_lept_et_TTToSemiLeptonic.conf TTToSemiLeptonic et 10
+./condorsub_seq_leptau.sh SynchNTupleProducer_2017 analysisMacroSynch_lept_et_TTTo2L2Nu.conf TTTo2L2Nu et 10
+
+
+
+./condorsub_seq_leptau.sh SynchNTupleProducer_2017 analysisMacroSynch_lept_et_WW.conf WW et 20
+./condorsub_seq_leptau.sh SynchNTupleProducer_2017 analysisMacroSynch_lept_et_WZ.conf WZ et 20
+./condorsub_seq_leptau.sh SynchNTupleProducer_2017 analysisMacroSynch_lept_et_ZZ.conf ZZ et 20
+
+./condorsub_seq_leptau.sh SynchNTupleProducer_2017 analysisMacroSynch_lept_et_WJetsToLNu.conf WJetsToLNu et 20
+./condorsub_seq_leptau.sh SynchNTupleProducer_2017 analysisMacroSynch_lept_et_W1JetsToLNu.conf W1JetsToLNu et 20
+./condorsub_seq_leptau.sh SynchNTupleProducer_2017 analysisMacroSynch_lept_et_W2JetsToLNu.conf W2JetsToLNu et 20
+./condorsub_seq_leptau.sh SynchNTupleProducer_2017 analysisMacroSynch_lept_et_W3JetsToLNu.conf W3JetsToLNu et 20
+./condorsub_seq_leptau.sh SynchNTupleProducer_2017 analysisMacroSynch_lept_et_W4JetsToLNu.conf W4JetsToLNu et 20
+
+./condorsub_seq_leptau.sh SynchNTupleProducer_2017 analysisMacroSynch_lept_et_DATA_SingleElectron.conf DATA_SingleElectron et 20
+#./condorsub_seq_leptau.sh SynchNTupleProducer_2017 analysisMacroSynch_lept_et_DATA_SingleMuon.conf DATA_SingleMuon et 20

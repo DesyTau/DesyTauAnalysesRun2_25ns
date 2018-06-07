@@ -123,9 +123,7 @@ int main(int argc, char * argv[]) {
 
   // HLT filters
   const string isoMuonLeg       = cfg.get<string>("IsoMuonLeg");
-  const string isoTkMuonLeg     = cfg.get<string>("IsoTkMuonLeg");
-  const string isoMuonEtaLeg    = cfg.get<string>("IsoMuonEtaLeg");
-  const string isoTkMuonEtaLeg  = cfg.get<string>("IsoTkMuonEtaLeg");
+  const string isoMuonLeg2      = cfg.get<string>("IsoMuonLeg2");
   const string muonTauMuonLeg   = cfg.get<string>("MuonTauMuonLeg");
   const string muonTauOverlap   = cfg.get<string>("MuonTauOverlap");
   const string muonTauTauLeg    = cfg.get<string>("MuonTauTauLeg");
@@ -173,9 +171,7 @@ int main(int argc, char * argv[]) {
   const bool applyJetPuId = cfg.get<bool>("ApplyJetPuId");
 
   TString IsoMuonLeg(isoMuonLeg);
-  TString IsoTkMuonLeg(isoTkMuonLeg);
-  TString IsoMuonEtaLeg(isoMuonEtaLeg);
-  TString IsoTkMuonEtaLeg(isoTkMuonEtaLeg);
+  TString IsoMuonLeg2(isoMuonLeg2);
   TString MuonTauMuonLeg(muonTauMuonLeg);
   TString MuonTauOverlap(muonTauOverlap);
   TString MuonTauTauLeg(muonTauTauLeg);
@@ -1167,14 +1163,8 @@ int main(int argc, char * argv[]) {
       unsigned int nIsoMuonLeg = 0;
       bool isIsoMuonLeg = false;
 
-      unsigned int nIsoTkMuonLeg = 0;
-      bool isIsoTkMuonLeg = false;
-
-      unsigned int nIsoMuonEtaLeg = 0;
-      bool isIsoMuonEtaLeg = false;
-
-      unsigned int nIsoTkMuonEtaLeg = 0;
-      bool isIsoTkMuonEtaLeg = false;
+      unsigned int nIsoMuonLeg2 = 0;
+      bool isIsoMuonLeg2 = false;
 
       unsigned int nMuonTauMuonLeg = 0;
       bool isMuonTauMuonLeg = false;
@@ -1194,17 +1184,9 @@ int main(int argc, char * argv[]) {
 	  nIsoMuonLeg = i;
 	  isIsoMuonLeg = true;
 	}
-	if (HLTFilter==IsoTkMuonLeg) {
-	  nIsoTkMuonLeg = i;
-	  isIsoTkMuonLeg = true;
-	}
-	if (HLTFilter==IsoMuonEtaLeg) {
-	  nIsoMuonEtaLeg = i;
-	  isIsoMuonEtaLeg = true;
-	}
-	if (HLTFilter==IsoTkMuonEtaLeg) {
-	  nIsoTkMuonEtaLeg = i;
-	  isIsoTkMuonEtaLeg = true;
+	if (HLTFilter==IsoMuonLeg2) {
+	  nIsoMuonLeg2 = i;
+	  isIsoMuonLeg2 = true;
 	}
 	if (HLTFilter==MuonTauMuonLeg) {
 	  nMuonTauMuonLeg = i;
@@ -1219,14 +1201,12 @@ int main(int argc, char * argv[]) {
 	  isMuonTauTauLeg = true;
 	}
       }
-      if (!isIsoMuonLeg && !isIsoMuonEtaLeg) {
-	if (!isIsoMuonLeg) std::cout << "HLT filter " << IsoMuonLeg << " not found" << std::endl;
-	if (!isIsoMuonEtaLeg) std::cout << "HLT filter " << IsoMuonEtaLeg << " not found" << std::endl;
+      if (!isIsoMuonLeg ) {
+	std::cout << "HLT filter " << IsoMuonLeg << " not found" << std::endl;
 	exit(-1);
       }
-      if (!isIsoTkMuonLeg && !isIsoTkMuonEtaLeg) {
-	if (!isIsoTkMuonLeg) std::cout << "HLT filter " << IsoTkMuonLeg << " not found" << std::endl;
-	if (!isIsoTkMuonEtaLeg) std::cout << "HLT filter " << IsoTkMuonEtaLeg << " not found" << std::endl;
+      if (!isIsoMuonLeg2 ) {
+	std::cout << "HLT filter " << IsoMuonLeg2 << " not found" << std::endl;
 	exit(-1);
       }
       if (!isMuonTauMuonLeg) {
@@ -1292,7 +1272,7 @@ int main(int argc, char * argv[]) {
       //      std::cout << "muons = " << muons.size() << "  taus = " << taus.size() << std::endl;
       for (unsigned int im=0; im<muons.size(); ++im) {
 	bool isIsoMuonLegMatch = false;
-	bool isIsoTkMuonLegMatch = false;
+	bool isIsoMuonLeg2Match = false;
 	bool isMuonTauMuonLegMatch = false;
 	bool isMuonTauOverlapMuonMatch = false;
 	unsigned int mIndex  = muons.at(im);
@@ -1314,20 +1294,13 @@ int main(int argc, char * argv[]) {
 	  float dRtrig = deltaR(analysisTree.muon_eta[mIndex],analysisTree.muon_phi[mIndex],
 				analysisTree.trigobject_eta[iT],analysisTree.trigobject_phi[iT]);
 	  if (dRtrig<deltaRTrigMatch) {
-	    bool etaCut = fabs(analysisTree.trigobject_eta[iT]) < etaMuonTriggerCut;
-	    bool ptSingleLCut  = analysisTree.muon_pt[mIndex] > ptMuonTriggerCut;
-	    bool ptXCut = analysisTree.muon_pt[mIndex] >ptMuonXTriggerCut;
-	    if (((analysisTree.trigobject_filters[iT][nIsoMuonLeg]&&isIsoMuonLeg)||
-		 (analysisTree.trigobject_filters[iT][nIsoMuonEtaLeg]&&isIsoMuonEtaLeg))
-		&&etaCut&&ptSingleLCut)  // IsoMu leg
+	    if (analysisTree.trigobject_filters[iT][nIsoMuonLeg]&&isIsoMuonLeg) // IsoMu leg
 	      isIsoMuonLegMatch = true;
-	    if (((analysisTree.trigobject_filters[iT][nIsoTkMuonLeg]&&isIsoTkMuonLeg)||
-		 (analysisTree.trigobject_filters[iT][nIsoTkMuonEtaLeg]&&isIsoTkMuonEtaLeg))
-		&&etaCut&&ptSingleLCut)// IsoTkMu leg
-	      isIsoTkMuonLegMatch = true;
-	    if (analysisTree.trigobject_filters[iT][nMuonTauMuonLeg]&&ptXCut)  // MuonTau Muon Leg
+	    if (analysisTree.trigobject_filters[iT][nIsoMuonLeg2]&&isIsoMuonLeg2) // IsoMu leg2
+	      isIsoMuonLeg2Match = true;
+	    if (analysisTree.trigobject_filters[iT][nMuonTauMuonLeg]&&isMuonTauMuonLeg)  // MuonTau Muon Leg
 	      isMuonTauMuonLegMatch = true;
-	    if (analysisTree.trigobject_filters[iT][nMuonTauOverlap]&&analysisTree.trigobject_isMuon[iT]&&ptXCut)  // MuonTau Overlap Muon 
+	    if (analysisTree.trigobject_filters[iT][nMuonTauOverlap]&&analysisTree.trigobject_isMuon[iT]&&isMuonTauOverlap)  // MuonTau Overlap Muon 
 	      isMuonTauOverlapMuonMatch = true;
 	  }
 	}
@@ -1348,17 +1321,17 @@ int main(int argc, char * argv[]) {
 	    float dRtrig = deltaR(analysisTree.tau_eta[tIndex],analysisTree.tau_phi[tIndex],
 				  analysisTree.trigobject_eta[iT],analysisTree.trigobject_phi[iT]);
 	    if (dRtrig<deltaRTrigMatch) {
-	      bool ptCut = analysisTree.tau_pt[tIndex] > ptTauTriggerCut;
-	      if (analysisTree.trigobject_filters[iT][nMuonTauOverlap]&&analysisTree.trigobject_isTau[iT]&&ptCut)  // MuonTau Overlap Tau
+	      if (analysisTree.trigobject_filters[iT][nMuonTauOverlap]&&analysisTree.trigobject_isTau[iT])  // MuonTau Overlap Tau
 		isMuonTauOverlapTauMatch = true;
-	      if (analysisTree.trigobject_filters[iT][nMuonTauTauLeg]&&ptCut)  // MuonTau Tau Leg
+	      if (analysisTree.trigobject_filters[iT][nMuonTauTauLeg])  // MuonTau Tau Leg
 		isMuonTauTauLegMatch = true;
 
 	    }
 	  }
 	  bool trigMatch = 
-	    (isIsoMuonLegMatch||isIsoTkMuonLegMatch)
-	    || (isMuonTauMuonLegMatch&&isMuonTauOverlapTauMatch);
+	    (isIsoMuonLegMatch||isIsoMuonLeg2Match)
+	    || (isMuonTauMuonLegMatch&&isMuonTauOverlapMuonMatch&&
+		isMuonTauOverlapTauMatch&&isMuonTauTauLegMatch);
 
 	  if (!trigMatch) continue;
 
@@ -1865,7 +1838,7 @@ int main(int argc, char * argv[]) {
 
       // trigger pattern 
       bool isIsoMuonLegMatch = false;
-      bool isIsoTkMuonLegMatch = false;
+      bool isIsoMuonLeg2Match = false;
       bool isMuonTauMuonLegMatch = false;
       bool isMuonTauOverlapMuonMatch = false;
       bool isMuonTauTauLegMatch = false;
@@ -1882,30 +1855,26 @@ int main(int argc, char * argv[]) {
 	bool ptTauXTriggerCut = analysisTree.tau_pt[tauIndex] > ptTauTriggerCut;
 
 	if (dRMuTrig<deltaRTrigMatch) {
-	  if (((analysisTree.trigobject_filters[iT][nIsoMuonLeg]&&isIsoMuonLeg)||
-	       (analysisTree.trigobject_filters[iT][nIsoMuonEtaLeg]&&isIsoMuonEtaLeg))
-	      &&etaSingleLTriggerCut&&ptMuSingleLTriggerCut)  // IsoMu leg
+	  if (analysisTree.trigobject_filters[iT][nIsoMuonLeg]&&isIsoMuonLeg)
 	    isIsoMuonLegMatch = true;
-	  if (((analysisTree.trigobject_filters[iT][nIsoTkMuonLeg]&&isIsoTkMuonLeg)||
-	       (analysisTree.trigobject_filters[iT][nIsoTkMuonEtaLeg]&&isIsoTkMuonEtaLeg))
-	      &&etaSingleLTriggerCut&&ptMuSingleLTriggerCut)  // IsoTkMu leg
-	    isIsoTkMuonLegMatch = true;
-	  if (analysisTree.trigobject_filters[iT][nMuonTauMuonLeg]&&ptMuXTriggerCut)  // MuonTau Muon Leg
+	  if (analysisTree.trigobject_filters[iT][nIsoMuonLeg2]&&isIsoMuonLeg2)
+	    isIsoMuonLeg2Match = true;
+	  if (analysisTree.trigobject_filters[iT][nMuonTauMuonLeg]) 
 	    isMuonTauMuonLegMatch = true;
-	  if (analysisTree.trigobject_filters[iT][nMuonTauOverlap]&&analysisTree.trigobject_isMuon[iT]&&ptMuXTriggerCut)  // MuonTau Overlap Muon 
+	  if (analysisTree.trigobject_filters[iT][nMuonTauOverlap]&&analysisTree.trigobject_isMuon[iT])
 	    isMuonTauOverlapMuonMatch = true;
 	}
 	if (dRTauTrig<deltaRTrigMatch) {
-	  if (analysisTree.trigobject_filters[iT][nMuonTauOverlap]&&analysisTree.trigobject_isTau[iT]&&ptTauXTriggerCut)  // MuonTau Overlap Tau
+	  if (analysisTree.trigobject_filters[iT][nMuonTauOverlap]&&analysisTree.trigobject_isTau[iT]) 
 	    isMuonTauOverlapTauMatch = true;
-	  if (analysisTree.trigobject_filters[iT][nMuonTauTauLeg]&&ptTauXTriggerCut)  // MuonTau Tau Leg
+	  if (analysisTree.trigobject_filters[iT][nMuonTauTauLeg]) 
 	    isMuonTauTauLegMatch = true;
-	  
 	}
       }
 
-      bool L_fired = isIsoMuonLegMatch || isIsoTkMuonLegMatch;
-      bool X_fired = isMuonTauMuonLegMatch && isMuonTauOverlapTauMatch;
+      bool L_fired = isIsoMuonLegMatch || isIsoMuonLeg2Match;
+      bool X_fired = isMuonTauMuonLegMatch && isMuonTauOverlapMuonMatch 
+	&& isMuonTauOverlapTauMatch && isMuonTauTauLegMatch;
 
       float eff_L_data = (float)SF_muonTrig->get_EfficiencyData(double(pt_1),double(eta_1));
       float eff_L_mc = (float)SF_muonTrig->get_EfficiencyMC(double(pt_1),double(eta_1));
@@ -1921,7 +1890,6 @@ int main(int argc, char * argv[]) {
 
       float eff_tau_data = (float)w_XTrigTauLegSF->function("t_genuine_TightIso_mt_data")->getVal();
       float eff_tau_mc = w_XTrigTauLegSF->function("t_genuine_TightIso_mt_mc")->getVal();
-
      
       if (analysisTree.tau_pt[tauIndex] < ptTauTriggerCut) {
 	eff_tau_mc = 0;
