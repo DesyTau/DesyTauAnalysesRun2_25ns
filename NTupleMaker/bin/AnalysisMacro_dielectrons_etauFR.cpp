@@ -820,28 +820,8 @@ int main(int argc, char * argv[]) {
                         if(genRecoProbeTauMatched)
                             TPmatching_status = 2;
                         
-                       //cout << "TP matching status:" << TPmatching_status << endl;
-                        
-<<<<<<< HEAD
-=======
-			/*
-                        // choosing mva met
-                        unsigned int metEleTau = 0;
-                        bool mvaMetFound = false;
-                        for (unsigned int iMet=0; iMet<analysisTree.mvamet_count; ++iMet)
-                        {
-                            //cout << iMet << endl;
-                            if (analysisTree.mvamet_channel[iMet]==3)
-                            {
-                                if (analysisTree.mvamet_lep1[iMet]==indexProbe &&analysisTree.mvamet_lep2[iMet]==index1)
-                                {
-                                    metEleTau = iMet;
-                                    mvaMetFound = true;
-                                }
-                            }
-                        }
-                        */
->>>>>>> c4c314265c7fb92b31aaba1dcf701ed9c2ee8bd0
+			//cout << "TP matching status:" << TPmatching_status << endl;
+
                         //using uncorrected MET for now in 2017
                         
                         met = TMath::Sqrt(analysisTree.pfmet_ex*analysisTree.pfmet_ex + analysisTree.pfmet_ey*analysisTree.pfmet_ey);
