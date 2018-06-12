@@ -111,7 +111,7 @@ int main(int argc, char * argv[]){
   TString ch = argv[3];
   std::string lep;
 
-  if ((ch != "mt" ) && (ch != "et")) {
+  if ((ch != "mt" ) && (ch != "et") && (ch != "tt")) {
 	std::cout << " Channel " << ch << " is not a valid choice. Please try again with 'mt' or 'et'.Exiting. " << std::endl;
     exit(0);
   }
@@ -301,14 +301,27 @@ int main(int argc, char * argv[]){
   const bool  applyLeptonId    = cfg.get<bool>("Apply"+lep+"Id");
 
   //dilepton veto
-  const float ptDiLeptonVeto     = cfg.get<float>("ptDi"+lep+"Veto");  
-  const float etaDiLeptonVeto    = cfg.get<float>("etaDi"+lep+"Veto");
-  const float dxyDiLeptonVeto    = cfg.get<float>("dxyDi"+lep+"Veto");  
-  const float dzDiLeptonVeto     = cfg.get<float>("dzDi"+lep+"Veto"); 
-  const bool applyDiLeptonVetoId = cfg.get<bool>("applyDi"+lep+"VetoId");
-  const bool applyDiLeptonOS     = cfg.get<bool>("applyDi"+lep+"OS");
-  const float isoDiLeptonVeto    = cfg.get<float>("isoDi"+lep+"Veto");
-  const float drDiLeptonVeto     = cfg.get<float>("drDi"+lep+"Veto"); 
+  /*
+  float ptDiLeptonVeto     = 15.;
+  float etaDiLeptonVeto    = 2.4;
+  float dxyDiLeptonVeto    = 0.05;
+  float dzDiLeptonVeto     = 0.2;
+  bool applyDiLeptonVetoId = true;
+  bool applyDiLeptonOS     = true;
+  float isoDiLeptonVeto    = 0.3;
+  float drDiLeptonVeto     = 0.3;
+
+  if (ch == "mt" || ch == "et") {
+    ptDiLeptonVeto     = cfg.get<float>("ptDi"+lep+"Veto");  
+    etaDiLeptonVeto    = cfg.get<float>("etaDi"+lep+"Veto");
+    dxyDiLeptonVeto    = cfg.get<float>("dxyDi"+lep+"Veto");  
+    dzDiLeptonVeto     = cfg.get<float>("dzDi"+lep+"Veto"); 
+    applyDiLeptonVetoId = cfg.get<bool>("applyDi"+lep+"VetoId");
+    applyDiLeptonOS     = cfg.get<bool>("applyDi"+lep+"OS");
+    isoDiLeptonVeto    = cfg.get<float>("isoDi"+lep+"Veto");
+    drDiLeptonVeto     = cfg.get<float>("drDi"+lep+"Veto"); 
+  }
+  */
 
   const float deltaRTrigMatch = cfg.get<float>("DRTrigMatch");
   const float dRiso = cfg.get<float>("dRiso");
@@ -391,6 +404,9 @@ int main(int argc, char * argv[]){
     TFile * filePUdistribution_MC = new TFile (TString(cmsswBase)+"/src/"+TString(pileUpInMCFile), "read");
     TH1D * PU_data = (TH1D *)filePUdistribution_data->Get("pileup");
     TH1D * PU_mc = (TH1D *)filePUdistribution_MC->Get(TString(pileUpforMC));
+    if (PU_mc==NULL) {
+      std::cout << "Histogram " << pileUpforMC << " is not present in pileup file" << std::endl;
+    }
     PUofficial->set_h_data(PU_data);
     PUofficial->set_h_MC(PU_mc);
   }  
@@ -721,9 +737,11 @@ int main(int argc, char * argv[]){
       }
       counter[4]++;
 
-      if (leptons.size()==0) continue;
+
+      if (ch == "mt" || ch == "et")
+	if (leptons.size()==0) continue;
       if (taus.size()==0) continue;
-      counter[5]++;//
+      counter[5]++;
 
       // selecting electron and tau pair (OS or SS) or ditau pair;
 
@@ -759,10 +777,11 @@ int main(int argc, char * argv[]){
 	unsigned int Size = leptons.size();
 	if(ch=="tt")Size = taus.size();
 
-
 	for (unsigned int il=0; il<Size; ++il) {
-	  unsigned int lIndex  = leptons.at(il);
+	  unsigned int lIndex  = 0;
 	  if(ch=="tt") lIndex  = taus.at(il);
+	  else lIndex  = leptons.at(il);
+
 	  float relIsoLep  = -9999.;
 	  if(ch=="mt")  relIsoLep = (abs_Iso_mt(lIndex, &analysisTree, dRiso) / analysisTree.muon_pt[lIndex] );
 	  else if(ch=="et")  relIsoLep = (abs_Iso_et(lIndex, &analysisTree, dRiso) / analysisTree.electron_pt[lIndex] );
@@ -1089,6 +1108,7 @@ int main(int argc, char * argv[]){
       if (!isData && analysisTree.tau_genmatch[tauIndex]==5) otree->idisoweight_2 = 1.; 
 
       otree->effweight = (otree->idisoweight_1)*(otree->idisoweight_2)*(otree->trigweight);
+      otree->weight = otree->effweight * otree->puweight * otree->mcweight; 
 
       //counting jet
       jets::counting_jets(&analysisTree, otree, &cfg, &inputs_btag_scaling_medium);
@@ -1302,7 +1322,7 @@ int main(int argc, char * argv[]){
       if(otree->iso_1<0.35 && otree->byLooseIsolationMVArun2v1DBoldDMwLT_2>0.5 && 
 	 otree->againstMuonLoose3_2>0.5 && otree->againstElectronTightMVA6_2>0.5 ) counter[18]++;
 
-      if (!Synch && !passedBaselineSel) continue;
+      //      if (!Synch && !passedBaselineSel) continue;
 
       if (ApplySVFit && otree->njetspt20>0) svfit_variables(ch, &analysisTree, otree, &cfg, inputFile_visPtResolution);
 
@@ -1333,8 +1353,8 @@ int main(int argc, char * argv[]){
     file_->Close();
     delete file_;
    }
-  std::cout << "COUNTERS" << std::endl;
-  for(int iC=0;iC<20;iC++) std::cout << "Counter " << iC << ":    " << counter[iC] << std::endl;
+  //  std::cout << "COUNTERS" << std::endl;
+  //  for(int iC=0;iC<20;iC++) std::cout << "Counter " << iC << ":    " << counter[iC] << std::endl;
 
   std::cout << std::endl;
   int allEvents = int(inputEventsH->GetEntries());
