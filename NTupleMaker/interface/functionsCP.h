@@ -13,6 +13,7 @@ void acott(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, int tau
 TLorentzVector chargedPivec(const AC1B * analysisTree, int tauIndex);
 TLorentzVector neutralPivec(const AC1B * analysisTree, int tauIndex);
 TLorentzVector ipVec(const AC1B * analysisTree, int tauIndex);
+int chargedPiIndex(const AC1B * analysisTree, int tauIndex);
 
 double acoCP(TLorentzVector Pi1, TLorentzVector Pi2, 
 	     TLorentzVector ref1, TLorentzVector ref2) {
@@ -62,8 +63,12 @@ void acott(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, int tau
     return;
   }
   //4-momenta of charged and neutral Pi
-  TLorentzVector tau1Prong=chargedPivec(analysisTree,tauIndex1);
-  TLorentzVector tau2Prong=chargedPivec(analysisTree,tauIndex2);
+  TLorentzVector tau1Prong;
+
+  tau1Prong=chargedPivec(analysisTree,tauIndex1);
+  TLorentzVector tau2Prong;
+  tau2Prong=chargedPivec(analysisTree,tauIndex2);
+
   TLorentzVector tau1ref;
   TLorentzVector tau2ref;
   double y1 = 1;
@@ -98,22 +103,10 @@ void acott(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, int tau
 };
 
 TLorentzVector chargedPivec(const AC1B * analysisTree, int tauIndex){
-
-  int ncomponents = analysisTree->tau_constituents_count[tauIndex];
   int piIndex=-1;
-  float maxPt=-1;
-  for(int i=0;i<ncomponents;i++){//selects the highest energy Pi with the same sign of the tau
-    TLorentzVector lvector; lvector.SetXYZT(analysisTree->tau_constituents_px[tauIndex][i],
-					    analysisTree->tau_constituents_py[tauIndex][i],
-					    analysisTree->tau_constituents_pz[tauIndex][i],
-					    analysisTree->tau_constituents_e[tauIndex][i]);
-    double Pt = lvector.Pt();
-    if(fabs(double(analysisTree->tau_constituents_charge[tauIndex][i]))>0.5&&Pt>maxPt){
-      piIndex=i;
-      maxPt = Pt;
-    }
-  }
-  TLorentzVector chargedPi; chargedPi.SetXYZT(0,0,0,0);
+  piIndex=chargedPiIndex(analysisTree,tauIndex);
+  TLorentzVector chargedPi;
+  chargedPi.SetXYZT(0,0,0,0);
   if (piIndex>-1) {
     chargedPi.SetPxPyPzE(analysisTree->tau_constituents_px[tauIndex][piIndex],
 			 analysisTree->tau_constituents_py[tauIndex][piIndex],
@@ -122,6 +115,39 @@ TLorentzVector chargedPivec(const AC1B * analysisTree, int tauIndex){
   }  
 
   return chargedPi;
+};
+
+int chargedPiIndex(const AC1B * analysisTree, int tauIndex){
+
+  int ncomponents = analysisTree->tau_constituents_count[tauIndex];
+  int piIndex=-1;
+  float maxPt=-1;
+  int sign = -1;
+  if(analysisTree->tau_charge[tauIndex]>0) sign = 1; 
+  for(int i=0;i<ncomponents;i++){//selects the highest energy Pi with the same sign of the tau 
+    if((analysisTree->tau_constituents_pdgId[tauIndex][i]*sign)==211){
+      TLorentzVector lvector; lvector.SetXYZT(analysisTree->tau_constituents_px[tauIndex][i],
+					      analysisTree->tau_constituents_py[tauIndex][i],
+					      analysisTree->tau_constituents_pz[tauIndex][i],
+					      analysisTree->tau_constituents_e[tauIndex][i]);
+      double Pt = lvector.Pt();
+      if(Pt>maxPt){
+	piIndex=i;
+	maxPt = Pt;
+      }
+    }
+  }
+  /*
+  TLorentzVector chargedPi;
+  chargedPi.SetXYZT(0,0,0,0);
+  if (piIndex>-1) {
+    chargedPi.SetPxPyPzE(analysisTree->tau_constituents_px[tauIndex][piIndex],
+			 analysisTree->tau_constituents_py[tauIndex][piIndex],
+			 analysisTree->tau_constituents_pz[tauIndex][piIndex],
+			 analysisTree->tau_constituents_e[tauIndex][piIndex]);
+  }  
+  */
+  return piIndex;
 };
 
 TLorentzVector neutralPivec(const AC1B * analysisTree, int tauIndex){
@@ -149,24 +175,15 @@ TLorentzVector neutralPivec(const AC1B * analysisTree, int tauIndex){
 TLorentzVector ipVec(const AC1B * analysisTree, int tauIndex) {
 
   int ncomponents = analysisTree->tau_constituents_count[tauIndex];
-  TLorentzVector vec; vec.SetXYZT(0.,0.,0.,0.);
+  TLorentzVector vec;
+  vec.SetXYZT(0.,0.,0.,0.);
+  int piIndex=-1;
+  piIndex=chargedPiIndex(analysisTree,tauIndex);
 
-  int piIndex = -1;
-  float maxPt = -1;
-  for(int i=0;i<ncomponents;i++){//selects the highest energy Pi with the same sign of the tau
 
-    TLorentzVector lvector; lvector.SetXYZT(analysisTree->tau_constituents_px[tauIndex][i],
-                                            analysisTree->tau_constituents_py[tauIndex][i],
-                                            analysisTree->tau_constituents_pz[tauIndex][i],
-                                            analysisTree->tau_constituents_e[tauIndex][i]);
-    double Pt = lvector.Pt();
-    if(fabs(double(analysisTree->tau_constituents_charge[tauIndex][i]))>0.5&&Pt>maxPt){
-      piIndex=i;
-      maxPt = Pt;
-    }
-  }
 
   if (piIndex>-1) {
+    /*//Both methods are equivalent and correct, I simply prefer working with vectors compared to arrays. I can switch back to the previous version any time.
     double vert[3]  = {analysisTree->primvertex_x, analysisTree->primvertex_y, analysisTree->primvertex_z} ; 
     double vpart[3] = {analysisTree->tau_constituents_vx[tauIndex][piIndex],
 		       analysisTree->tau_constituents_vy[tauIndex][piIndex],
@@ -191,7 +208,27 @@ TLorentzVector ipVec(const AC1B * analysisTree, int tauIndex) {
       ip[ic] = vpart[ic] + ppart[ic]*time - vert[ic]; 
 
     vec.SetXYZT(ip[0],ip[1],ip[2],0.);
+    */
 
+    TVector3 vertex(analysisTree->primvertex_x,
+		    analysisTree->primvertex_y,
+		    analysisTree->primvertex_z);
+    
+    TVector3 secvertex(analysisTree->tau_constituents_vx[tauIndex][piIndex],
+		       analysisTree->tau_constituents_vy[tauIndex][piIndex],
+		       analysisTree->tau_constituents_vz[tauIndex][piIndex]);
+    
+    TVector3 momenta(analysisTree->tau_constituents_px[tauIndex][piIndex],
+		     analysisTree->tau_constituents_py[tauIndex][piIndex],
+		     analysisTree->tau_constituents_pz[tauIndex][piIndex]);
+
+    TVector3 r(0.,0.,0.);
+    r=secvertex-vertex;
+    double projection=r*momenta/momenta.Mag2();
+    TVector3 IP;    
+    IP=r-momenta*projection;
+    vec.SetVect(IP);
+    vec.SetT(0.);
   }
 
   return vec;
