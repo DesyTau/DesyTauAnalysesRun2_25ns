@@ -690,7 +690,11 @@ int main(int argc, char * argv[]) {
   trigNTuple_->Branch("WMass",&wMass_,   "WMass/F");
   trigNTuple_->Branch("puWeight",  &puWeight_,  "puWeight/F");
   trigNTuple_->Branch("genWeight", &genWeight_, "genWeight/F");
-
+  trigNTuple_->Branch("metFilters",&metFilters_,"metFilters/O");
+  trigNTuple_->Branch("nJetsCentral20",&nJetsCentral20_,"nJetsCentral20/i");
+  trigNTuple_->Branch("nJetsCentral30",&nJetsCentral30_,"nJetsCentral30/i");
+  trigNTuple_->Branch("nJetsForward20",&nJetsForward20_,"nJetsForward20/i");
+  trigNTuple_->Branch("nJetsForward30",&nJetsForward30_,"nJetsForward30/i");
 
   // project directory
   string cmsswBase = (getenv ("CMSSW_BASE"));
@@ -732,17 +736,32 @@ int main(int argc, char * argv[]) {
   SF_muonIdIso->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(MuonIdIsoFile));
   SF_muonTrig->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(MuonTrigFile));
   
- // Trigger efficiencies
+  // Trigger efficiencies
+  map<int,TGraphAsymmErrors*>  map_trigEffData;
+  map<int,TGraphAsymmErrors*>  map_trigEffMC;
   TFile * trigEffFile = new TFile(TString(cmsswBase)+"/src/"+trigEffFileName);
-  TGraphAsymmErrors * graph_trigEffData_0To120   = (TGraphAsymmErrors*) trigEffFile->Get("data_0To120");
-  TGraphAsymmErrors * graph_trigEffMC_0To120     = (TGraphAsymmErrors*) trigEffFile->Get("mc_0To120");
-  TGraphAsymmErrors * graph_trigEffData_120To160 = (TGraphAsymmErrors*) trigEffFile->Get("data_120To160");
-  TGraphAsymmErrors * graph_trigEffMC_120To160   = (TGraphAsymmErrors*) trigEffFile->Get("mc_120To160");
-  TGraphAsymmErrors * graph_trigEffData_160To200 = (TGraphAsymmErrors*) trigEffFile->Get("data_160To200");
-  TGraphAsymmErrors * graph_trigEffMC_160To200   = (TGraphAsymmErrors*) trigEffFile->Get("mc_160To200");
-  TGraphAsymmErrors * graph_trigEffData_200ToInf = (TGraphAsymmErrors*) trigEffFile->Get("data_200ToInf");
-  TGraphAsymmErrors * graph_trigEffMC_200ToInf   = (TGraphAsymmErrors*) trigEffFile->Get("mc_200ToInf");
-  
+  if(!trigEffFile){
+    cout<<"Trigger file "<<trigEffFileName<<" does not exists. Exiting."<<endl;
+    exit(-1);
+  }
+  TIter next(trigEffFile->GetListOfKeys());
+  TKey *key = 0;
+
+  while ((key = (TKey*)next()))
+    {
+      TClass *c = gROOT->GetClass(key->GetClassName());
+      if (!c->InheritsFrom("TGraphAsymmErrors")) continue;
+      TGraphAsymmErrors *g = (TGraphAsymmErrors*) key->ReadObj();
+      TString gName = g->GetName();
+      Ssiz_t pos    = gName.First("To");
+      Int_t  len    = gName.Length();
+      int upperBound   = atoi( (TString) gName(pos+2,len));
+      if(gName.Contains("data"))    map_trigEffData.insert( std::make_pair( upperBound , (TGraphAsymmErrors*) g->Clone() ) );
+      else if(gName.Contains("mc")) map_trigEffMC.insert(   std::make_pair( upperBound , (TGraphAsymmErrors*) g->Clone() ) );
+      delete g;
+    }
+  delete key;
+
   // MEt filters
   std::vector<TString> metFlags; metFlags.clear();
   metFlags.push_back("Flag_HBHENoiseFilter");
@@ -796,7 +815,7 @@ int main(int argc, char * argv[]) {
     AC1B analysisTree(tree_);
     Long64_t numberOfEntries = analysisTree.GetEntries();
     std::cout << "      number of entries in Tree = " << numberOfEntries << std::endl;
-    
+
     for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) { 
     
       analysisTree.GetEntry(iEntry);
@@ -1040,7 +1059,9 @@ int main(int argc, char * argv[]) {
 
       // Set MC relevant variables
       if (!isData) {
-	genWeight_ = analysisTree.genweight;
+	if (analysisTree.genweight<0) genWeight_ = -1;
+	else                          genWeight_ = 1;
+
 	weight_ *= genWeight_;
 
 	npartons_ = analysisTree.genparticles_noutgoing;
@@ -1632,17 +1653,13 @@ int main(int argc, char * argv[]) {
 
       for (unsigned int ijet=0; ijet<analysisTree.pfjet_count; ++ijet) {
 
+
+	// Scale for sys uncertainties
 	float scaleJ = 1;
-	//	cout << "Jet " << ijet << " Pt = " << analysisTree.pfjet_pt[ijet] << "  Unc = " << analysisTree.pfjet_jecUncertainty[ijet] << endl;
 
-	if (jetES<0)
-	  scaleJ = 1.0 - analysisTree.pfjet_jecUncertainty[ijet];
-	else if (jetES>0)
-	  scaleJ = 1.0 + analysisTree.pfjet_jecUncertainty[ijet];
-	else
-	  scaleJ = 1.0;
-
-	//	std::cout << ijet << "  :  " << scaleJ << std::endl;
+	if (jetES<0)      scaleJ = 1.0 - analysisTree.pfjet_jecUncertainty[ijet];
+	else if (jetES>0) scaleJ = 1.0 + analysisTree.pfjet_jecUncertainty[ijet];
+	else 	          scaleJ = 1.0;
 
 	analysisTree.pfjet_px[ijet] *= scaleJ;
 	analysisTree.pfjet_py[ijet] *= scaleJ;
@@ -1654,25 +1671,21 @@ int main(int argc, char * argv[]) {
 
 	if (absJetEta>5.2) continue;
 	if (analysisTree.pfjet_pt[ijet]<20.0) continue; 
-	
-	// jetId
-	bool isPFLooseJetId = looseJetiD(analysisTree,int(ijet));
+
+
+
+	// jetID : accept only jets with tight id for 2017 analysis
 	bool isPFTightJetId = tightJetiD_2017(analysisTree,int(ijet));
-	//	bool isPULooseJetId = looseJetPUiD(analysisTree,int(ijet));
+	if (!isPFTightJetId) continue;
 
 	// jet four-vector
 	TLorentzVector jetLV; jetLV.SetXYZT(analysisTree.pfjet_px[ijet],
 					    analysisTree.pfjet_py[ijet],
 					    analysisTree.pfjet_pz[ijet],
 					    analysisTree.pfjet_e[ijet]);
-	// counting jets for Mht
-	if (isPFTightJetId) {
-	  lorentzVectorAllJetsForMht += jetLV;
-	}
 
-	// accept only jets with looseId and loosePUId
-	if (!isPFTightJetId) continue;
-	//	if (!isPULooseJetId) continue;
+	// counting jets for Mht
+	lorentzVectorAllJetsForMht += jetLV;
 
 	// checking overlap with muons
 	bool overlapWithMuon = false;
@@ -2129,7 +2142,7 @@ int main(int argc, char * argv[]) {
 	tauJetPt_  = lorentzVectorTauJet.Pt();
 	tauJetEta_ = lorentzVectorTauJet.Eta();
 	tauJetPhi_ = lorentzVectorTauJet.Phi();
-	tauJetTightId_ = tightJetiD(analysisTree,indexMatchingJet);
+	tauJetTightId_ = tightJetiD_2017(analysisTree,indexMatchingJet);
 
       }
       // ****************************
@@ -2147,24 +2160,17 @@ int main(int argc, char * argv[]) {
 
       trigWeight_ = 1;
 
-      if(mhtNoMu_<120){
-	trigEffData = graph_trigEffData_0To120   -> Eval(metNoMu_);
-	trigEffMC   = graph_trigEffMC_0To120     -> Eval(metNoMu_);
-      }
-      else if(mhtNoMu_>120 && mhtNoMu_<160){
-	trigEffData = graph_trigEffData_120To160 -> Eval(metNoMu_);
-	trigEffMC   = graph_trigEffMC_120To160   -> Eval(metNoMu_);
-      }
-      else if(mhtNoMu_>160 && mhtNoMu_<200){
-	trigEffData = graph_trigEffData_160To200 -> Eval(metNoMu_);
-	trigEffMC   = graph_trigEffMC_160To200   -> Eval(metNoMu_);
-      }
-      else if(mhtNoMu_>200){
-	trigEffData = graph_trigEffData_200ToInf -> Eval(metNoMu_);
-	trigEffMC   = graph_trigEffMC_200ToInf   -> Eval(metNoMu_);
-      }
-      if(trigEffMC !=0 ) trigWeight_ = trigEffData / trigEffMC;
+      for (auto const& it : map_trigEffMC)
+	{
+	  if( mhtNoMu_ < it.first)
+	    {
+	      trigEffMC    =  it.second->Eval(metNoMu_);
+	      trigEffData  =  map_trigEffData[it.first]->Eval(metNoMu_);
+	      break;
+	    }
+	}
 
+      if(trigEffMC !=0 ) trigWeight_ = trigEffData / trigEffMC;
       if(trigWeight_ < 0) trigWeight_=0;
 
       if (debug) {
@@ -2174,6 +2180,9 @@ int main(int argc, char * argv[]) {
       }
       weight_ *= trigWeight_;
 
+      // setting met filters
+      metFilters_ = metFiltersPasses(analysisTree,metFlags,isData);
+
       // ********************************
       // **** filling trigger ntuple ****
       // ********************************
@@ -2182,9 +2191,6 @@ int main(int argc, char * argv[]) {
 	TrigEvents++;
       }
       
-      // setting met filters
-      metFilters_ = metFiltersPasses(analysisTree,metFlags,isData);
-
       // ***************************
       // ******* WJet selection ****
       // ***************************
@@ -2195,15 +2201,15 @@ int main(int argc, char * argv[]) {
 	recoilJetDPhi_ = dPhiFromLV(lorentzVectorW,lorentzVectorTauJet);
 	isWJet = ptTriggerMu>ptMuCut_WJet; 
 	isWJet = isWJet && mtmuon_ > mtCut_WJet;
-	isWJet = isWJet && recoilDPhi_>deltaPhiWJetCut_WJet;
+	//isWJet = isWJet && recoilDPhi_>deltaPhiWJetCut_WJet;
 	isWJet = isWJet && nMuon_ == 1;
 	isWJet = isWJet && nElec_ == 0;
-	isWJet = isWJet && nSelTaus_ == 1;
+	//isWJet = isWJet && nSelTaus_ == 1;
 	isWJet = isWJet && nJetsCentral30_ == 1;
 	isWJet = isWJet && nJetsForward30_ == 0;
-	isWJet = isWJet && tauPt_>100.;
+	//isWJet = isWJet && tauPt_>100.;
 	isWJet = isWJet && abs(muonEta_)<2.1;
-	isWJet = isWJet && tauDM_;
+	//isWJet = isWJet && tauDM_;
 
 	if (isWJet) {
 	  if (!isData) {
@@ -2380,7 +2386,7 @@ int main(int argc, char * argv[]) {
 	    tauJetPt_  = lorentzVectorTauJet.Pt();
 	    tauJetEta_ = lorentzVectorTauJet.Eta();
 	    tauJetPhi_ = lorentzVectorTauJet.Phi();
-	    tauJetTightId_ = tightJetiD(analysisTree,indexMatchingJet);
+	    tauJetTightId_ = tightJetiD_2017(analysisTree,indexMatchingJet);
 
 	    tauLeadingTrackPt_ = PtoPt(analysisTree.tau_leadchargedhadrcand_px[indexTau],
 				       analysisTree.tau_leadchargedhadrcand_py[indexTau]);

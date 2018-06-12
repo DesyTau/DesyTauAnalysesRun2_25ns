@@ -531,6 +531,7 @@ class NTupleMaker : public edm::EDAnalyzer{
   Float_t primvertex_ptq;
   Int_t   primvertex_ntracks;
   Float_t primvertex_cov[6];
+  Float_t primvertex_mindz;
 
   // tracks
   UInt_t track_count;
@@ -849,15 +850,25 @@ class NTupleMaker : public edm::EDAnalyzer{
   Int_t   tau_leadchargedhadrcand_id[M_taumaxcount];
   Float_t tau_leadchargedhadrcand_dxy[M_taumaxcount];
   Float_t tau_leadchargedhadrcand_dz[M_taumaxcount];
+  Int_t   tau_leadchargedhadrcand_lostPixelHits[M_taumaxcount];
+  Int_t   tau_leadchargedhadrcand_pvAssocQ[M_taumaxcount];
 
   Float_t tau_vertexx[M_taumaxcount];
   Float_t tau_vertexy[M_taumaxcount];
   Float_t tau_vertexz[M_taumaxcount];
 
   Float_t tau_dxy[M_taumaxcount];
+  Float_t tau_dxySig[M_taumaxcount];
   Float_t tau_dz[M_taumaxcount];
   Float_t tau_ip3d[M_taumaxcount];
   Float_t tau_ip3dSig[M_taumaxcount];
+  Float_t tau_flightLength[M_taumaxcount];
+  Float_t tau_flightLengthSig[M_taumaxcount];
+  Float_t tau_SV_x[M_taumaxcount];
+  Float_t tau_SV_y[M_taumaxcount];
+  Float_t tau_SV_z[M_taumaxcount];
+  Float_t tau_SV_cov[M_taumaxcount][6];
+
   Float_t tau_charge[M_taumaxcount];
   Float_t tau_genjet_e[M_taumaxcount];
   Float_t tau_genjet_px[M_taumaxcount];
@@ -903,6 +914,7 @@ class NTupleMaker : public edm::EDAnalyzer{
   Float_t tau_constituents_vy[M_taumaxcount][50];
   Float_t tau_constituents_vz[M_taumaxcount][50];
   Int_t tau_constituents_pdgId[M_taumaxcount][50];
+  Int_t tau_constituents_lostPixelHits[M_taumaxcount][50];
 
   // generated tau
   UInt_t gentau_count;

@@ -19,6 +19,7 @@
 #include "RecoVertex/KinematicFitPrimitives/interface/KinematicParticleFactoryFromTransientTrack.h"
 #include "RecoEgamma/EgammaTools/interface/ConversionTools.h"
 #include "RecoVertex/AdaptiveVertexFit/interface/AdaptiveVertexFitter.h"
+#include "RecoVertex/KalmanVertexFit/interface/KalmanVertexFitter.h"
 #include "TrackingTools/TransientTrack/interface/TransientTrackBuilder.h"
 #include "TrackingTools/Records/interface/TransientTrackRecord.h"
 #include "RecoVertex/VertexPrimitives/interface/TransientVertex.h"
@@ -368,6 +369,7 @@ void NTupleMaker::beginJob(){
     tree->Branch("primvertex_ptq", &primvertex_ptq, "primvertex_pdf/F");
     tree->Branch("primvertex_ntracks", &primvertex_ntracks, "primvertex_ntracks/I");
     tree->Branch("primvertex_cov", primvertex_cov, "primvertex_cov[6]/F");
+    tree->Branch("primvertex_mindz", &primvertex_mindz, "primvertex_mindz/F");
   }  
 
   // muons
@@ -650,10 +652,18 @@ void NTupleMaker::beginJob(){
     tree->Branch("tau_vertexz", tau_vertexz, "tau_vertexz[tau_count]/F");
 
     tree->Branch("tau_dxy", tau_dxy, "tau_dxy[tau_count]/F");
+    tree->Branch("tau_dxySig", tau_dxySig, "tau_dxySig[tau_count]/F");
     tree->Branch("tau_dz", tau_dz, "tau_dz[tau_count]/F");
     tree->Branch("tau_ip3d", tau_ip3d, "tau_ip3d[tau_count]/F");
     tree->Branch("tau_ip3dSig", tau_ip3dSig, "tau_ip3dSig[tau_count]/F");
     tree->Branch("tau_charge", tau_charge, "tau_charge[tau_count]/F");
+
+    tree->Branch("tau_flightLength", tau_flightLength, "tau_flightLength[tau_count]/F");
+    tree->Branch("tau_flightLengthSig", tau_flightLengthSig, "tau_flightLengthSig[tau_count]/F");
+    tree->Branch("tau_SV_x", tau_SV_x, "tau_SV_x[tau_count]/F");
+    tree->Branch("tau_SV_y", tau_SV_y, "tau_SV_y[tau_count]/F");
+    tree->Branch("tau_SV_z", tau_SV_z, "tau_SV_z[tau_count]/F");
+    tree->Branch("tau_SV_cov", tau_SV_cov, "tau_SV_cov[tau_count][6]/F");
     
     tree->Branch("tau_genjet_px", tau_genjet_px, "tau_genjet_px[tau_count]/F");
     tree->Branch("tau_genjet_py", tau_genjet_py, "tau_genjet_py[tau_count]/F");
@@ -668,6 +678,8 @@ void NTupleMaker::beginJob(){
     tree->Branch("tau_leadchargedhadrcand_id",  tau_leadchargedhadrcand_id,  "tau_leadchargedhadrcand_id[tau_count]/I");
     tree->Branch("tau_leadchargedhadrcand_dxy", tau_leadchargedhadrcand_dxy, "tau_leadchargedhadrcand_dxy[tau_count]/F");
     tree->Branch("tau_leadchargedhadrcand_dz",  tau_leadchargedhadrcand_dz,  "tau_leadchargedhadrcand_dz[tau_count]/F");
+    tree->Branch("tau_leadchargedhadrcand_lostPixelHits", tau_leadchargedhadrcand_lostPixelHits, "tau_leadchargedhadrcand_lostPixelHits[tau_count]/I");
+    tree->Branch("tau_leadchargedhadrcand_pvAssocQ", tau_leadchargedhadrcand_pvAssocQ, "tau_leadchargedhadrcand_pvAssocQ[tau_count]/I");
  
     tree->Branch("tau_ntracks_pt05", tau_ntracks_pt05, "tau_ntracks_pt05[tau_count]/i");
     tree->Branch("tau_ntracks_pt08", tau_ntracks_pt05, "tau_ntracks_pt05[tau_count]/i");
@@ -699,6 +711,7 @@ void NTupleMaker::beginJob(){
     tree->Branch("tau_constituents_vy", tau_constituents_vy, "tau_constituents_vy[tau_count][50]/F");
     tree->Branch("tau_constituents_vz", tau_constituents_vz, "tau_constituents_vz[tau_count][50]/F");
     tree->Branch("tau_constituents_pdgId", tau_constituents_pdgId, "tau_constituents_pdgId[tau_count][50]/I");
+    tree->Branch("tau_constituents_lostPixelHits", tau_constituents_lostPixelHits, "tau_constituents_lostPixelHits[tau_count][50]/I");
   }
 
   if (crectrack) { 
@@ -1678,6 +1691,7 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       edm::Handle<VertexCollection> Vertex;
       iEvent.getByToken(PVToken_, Vertex);
       if(Vertex.isValid()) {
+	primvertex_mindz = 999;
 	for(unsigned i = 0 ; i < Vertex->size(); i++) {
 	  primvertex_count++;
 	  if(i == 0) {
@@ -1702,6 +1716,9 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	    
 	    pv_position = (*Vertex)[i].position();
 	    primvertex = (*Vertex)[i];
+	  } else {
+	    if(std::abs((*Vertex)[i].z()-(*Vertex)[0].z()) < primvertex_mindz)
+	      primvertex_mindz = std::abs((*Vertex)[i].z()-(*Vertex)[0].z()); //minimal longitudinal distance between the PV and other vertex 
 	  }
 	  if((*Vertex)[i].isValid() && !(*Vertex)[i].isFake() && (*Vertex)[i].ndof() >= 4 && (*Vertex)[i].z() > -24 && (*Vertex)[i].z() < 24 && (*Vertex)[i].position().Rho() < 2.)
 	    goodprimvertex_count++;
@@ -3544,6 +3561,7 @@ unsigned int NTupleMaker::AddTaus(const edm::Event& iEvent, const edm::EventSetu
 	    tau_constituents_vy[tau_count][m]     = -9999;
 	    tau_constituents_vz[tau_count][m]     = -9999;
 	    tau_constituents_pdgId[tau_count][m]  = -9999;
+	    tau_constituents_lostPixelHits[tau_count][m]  = -9999;
 	  }
 	  UInt_t tau_constituents_count_ = 0;
 	  for(unsigned int m=0; m<(*Taus)[i].signalCands().size(); m++){
@@ -3557,6 +3575,15 @@ unsigned int NTupleMaker::AddTaus(const edm::Event& iEvent, const edm::EventSetu
 	    tau_constituents_vy[tau_count][tau_constituents_count_]     = (*Taus)[i].signalCands()[m]->vy();
 	    tau_constituents_vz[tau_count][tau_constituents_count_]     = (*Taus)[i].signalCands()[m]->vz();
 	    tau_constituents_pdgId[tau_count][tau_constituents_count_]  = (*Taus)[i].signalCands()[m]->pdgId();
+	    if((*Taus)[i].signalCands()[m]->charge()!=0){
+	      //Pixel his information: 
+	      // -1: valid hit in 1st pixel barrel layer,
+	      //  0: noLostInnerHits - no hit in 1st pixel barrel layer, but not expected there e.g. due to geometry,
+	      //  1: one lost hit, 2: two or more lost hits
+	      const pat::PackedCandidate* pCand = dynamic_cast<const pat::PackedCandidate*>((*Taus)[i].signalCands()[m].get());
+	      if(pCand!=nullptr)
+		tau_constituents_lostPixelHits[tau_count][tau_constituents_count_] = pCand->lostInnerHits();
+	    }
 	    tau_constituents_count_ ++;
 	  }
 	  tau_constituents_count[tau_count] = tau_constituents_count_;
@@ -3633,9 +3660,18 @@ unsigned int NTupleMaker::AddTaus(const edm::Event& iEvent, const edm::EventSetu
 	      tau_leadchargedhadrcand_id[tau_count]   = (*Taus)[i].leadChargedHadrCand()->pdgId();
 
 	      pat::PackedCandidate const* packedLeadTauCand = dynamic_cast<pat::PackedCandidate const*>((*Taus)[i].leadChargedHadrCand().get());
-	      tau_leadchargedhadrcand_dxy[tau_count]   = packedLeadTauCand->dxy();
-	      tau_leadchargedhadrcand_dz[tau_count]   = packedLeadTauCand->dz();
-
+	      if(packedLeadTauCand!=nullptr){
+		tau_leadchargedhadrcand_dxy[tau_count]   = packedLeadTauCand->dxy();
+		tau_leadchargedhadrcand_dz[tau_count]    = packedLeadTauCand->dz();
+		tau_leadchargedhadrcand_lostPixelHits[tau_count] = packedLeadTauCand->lostInnerHits();
+		if(packedLeadTauCand->vertexRef().key()==0){//the PV
+		  //documented at https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookMiniAOD2017#PV_Assignment
+		  //and DataFormats/PatCandidates/interface/PackedCandidate.h
+		  tau_leadchargedhadrcand_pvAssocQ[tau_count] = packedLeadTauCand->pvAssociationQuality();
+		} else {
+		  tau_leadchargedhadrcand_pvAssocQ[tau_count] = -1;
+		}
+	      }
 	    }
 	  else
 	    {
@@ -3646,6 +3682,8 @@ unsigned int NTupleMaker::AddTaus(const edm::Event& iEvent, const edm::EventSetu
 	      tau_leadchargedhadrcand_id[tau_count]   = -999;
 	      tau_leadchargedhadrcand_dxy[tau_count]  = -999;
 	      tau_leadchargedhadrcand_dz[tau_count]   = -999;
+	      tau_leadchargedhadrcand_lostPixelHits[tau_count] = -999;
+	      tau_leadchargedhadrcand_pvAssocQ[tau_count] = -999;
 	    }
 	  
 	  tau_dxy[tau_count]     = -100.0f;
@@ -3653,11 +3691,82 @@ unsigned int NTupleMaker::AddTaus(const edm::Event& iEvent, const edm::EventSetu
 	  tau_ip3d[tau_count]    = -1.0f;
 	  tau_ip3dSig[tau_count] = -1.0f;
 	  tau_dxy[tau_count] = (*Taus)[i].dxy();
+	  tau_dxySig[tau_count] = (*Taus)[i].dxy_Sig();
+	  tau_ip3d[tau_count] = (*Taus)[i].ip3d();
+	  tau_ip3dSig[tau_count] = (*Taus)[i].ip3d_Sig();
 
 	  // tau vertex
 	  tau_vertexx[tau_count] = (*Taus)[i].vertex().x();
 	  tau_vertexy[tau_count] = (*Taus)[i].vertex().y();
 	  tau_vertexz[tau_count] = (*Taus)[i].vertex().z();
+
+	  // tau secondary vertex
+	  if( (*Taus)[i].hasSecondaryVertex() ){
+	    tau_flightLength[tau_count] = sqrt( (*Taus)[i].flightLength().mag2() );
+	    tau_flightLengthSig[tau_count] = (*Taus)[i].flightLengthSig();
+	    // (*Taus)[i].secondaryVertex() is a reference (edm::Ref) to
+	    //  a vertex collection which is not stored in MiniAOD,
+	    //  so the SV of Tau should be refit:
+	    //  1) Get tracks form Tau signal charged candidates
+	    std::vector<reco::TransientTrack> transTrk;
+	    TransientVertex transVtx;
+	    const reco::CandidatePtrVector cands = (*Taus)[i].signalChargedHadrCands();
+	    for(const auto& cand : cands) {
+	      if(cand.isNull()) continue;
+	      const pat::PackedCandidate* pCand = dynamic_cast<const pat::PackedCandidate*>(cand.get());
+	      if (pCand != nullptr && pCand->hasTrackDetails())
+		transTrk.push_back(transTrackBuilder->build(&pCand->pseudoTrack()));
+	    }
+	    // 2) Fit the secondary vertex
+	    bool fitOK(true);
+	    KalmanVertexFitter kvf(true);
+	    if(transTrk.size() > 1){
+	      try{
+		transVtx = kvf.vertex(transTrk); //KalmanVertexFitter
+	      } catch(...){
+		fitOK = false;
+	      }
+	    } else{
+	      fitOK = false;
+	    }
+	    if(!transVtx.hasRefittedTracks()) fitOK = false;
+	    if(transVtx.refittedTracks().size()!=transTrk.size()) fitOK = false;
+	    if(fitOK){
+	      tau_SV_x[tau_count] = transVtx.position().x();
+	      tau_SV_y[tau_count] = transVtx.position().y();
+	      tau_SV_z[tau_count] = transVtx.position().z();
+	      tau_SV_cov[tau_count][0] = transVtx.positionError().cxx(); // xError()
+	      tau_SV_cov[tau_count][1] = transVtx.positionError().cyx(); 
+	      tau_SV_cov[tau_count][2] = transVtx.positionError().czx();
+	      tau_SV_cov[tau_count][3] = transVtx.positionError().cyy(); // yError()
+	      tau_SV_cov[tau_count][4] = transVtx.positionError().czy();
+	      tau_SV_cov[tau_count][5] = transVtx.positionError().czz(); // zError()
+	    }
+	    else{
+	      tau_SV_x[tau_count] = tau_vertexx[tau_count];
+	      tau_SV_y[tau_count] = tau_vertexy[tau_count];
+	      tau_SV_z[tau_count] = tau_vertexz[tau_count];
+	      tau_SV_cov[tau_count][0] = 0.;
+	      tau_SV_cov[tau_count][1] = 0.;
+	      tau_SV_cov[tau_count][2] = 0.;
+	      tau_SV_cov[tau_count][3] = 0.;
+	      tau_SV_cov[tau_count][4] = 0.;
+	      tau_SV_cov[tau_count][5] = 0.;
+	    }
+	  }
+	  else{
+	    tau_flightLength[tau_count] = -1.0f;
+	    tau_flightLengthSig[tau_count] = -1.0f;
+	    tau_SV_x[tau_count] = tau_vertexx[tau_count];
+	    tau_SV_y[tau_count] = tau_vertexy[tau_count];
+	    tau_SV_z[tau_count] = tau_vertexz[tau_count];
+	    tau_SV_cov[tau_count][0] = 0.;
+	    tau_SV_cov[tau_count][1] = 0.;
+	    tau_SV_cov[tau_count][2] = 0.;
+	    tau_SV_cov[tau_count][3] = 0.;
+	    tau_SV_cov[tau_count][4] = 0.;
+	    tau_SV_cov[tau_count][5] = 0.;
+	  }
 
 	  // l1 match
 	  if(l1jets!=0 && l1taus!=0)

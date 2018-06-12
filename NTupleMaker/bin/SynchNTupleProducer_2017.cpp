@@ -55,6 +55,8 @@
 #include "DesyTauAnalyses/NTupleMaker/interface/JetEnergyScaleSys_WIP.h"
 //#include "DesyTauAnalyses/NTupleMaker/interface/JESUncertainties.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/LepTauFakeRate.h"
+#include "DesyTauAnalyses/NTupleMaker/interface/functionsCP.h"
+#include "HTT-utilities/TauTriggerSFs2017/interface/TauTriggerSFs2017.h"
 
 #define pi 	3.14159265358979312
 #define d2r 1.74532925199432955e-02
@@ -149,6 +151,9 @@ int main(int argc, char * argv[]){
   const string idIsoEffFile_antiiso = cfg.get<string>("idIsoEffFile_antiiso");
   const string singleLepTrigEffFile_antiiso = cfg.get<string>("singleLepTrigEffFile_antiiso");
   const string xTrigLepLegEffFile_antiiso   = cfg.get<string>("xTrigLepLegEffFile_antiiso");
+
+  // tau trigger efficiency
+  TauTriggerSFs2017 * tauTriggerSF = new TauTriggerSFs2017(cmsswBase+"/src/HTT-utilities/TauTriggerSFs2017/data/tauTriggerEfficiencies2017.root","tight");
   	
   //svfit
   //const string svFitPtResFile = cfg.get<string>("svFitPtResFile");
@@ -206,7 +211,7 @@ int main(int argc, char * argv[]){
   
   
   RecoilCorrector* recoilPFMetCorrector = (RecoilCorrector*) malloc(sizeof(*recoilPFMetCorrector));
-  RecoilCorrector* recoilMvaMetCorrector = (RecoilCorrector*) malloc(sizeof(*recoilMvaMetCorrector));
+  //  RecoilCorrector* recoilMvaMetCorrector = (RecoilCorrector*) malloc(sizeof(*recoilMvaMetCorrector));
   
   if(!isData && applyRecoilCorrections && (isDY || isWJets || isVBForGGHiggs || isMSSMsignal) ){
     TString RecoilDir("HTT-utilities/RecoilCorrections/data/");
@@ -216,22 +221,26 @@ int main(int argc, char * argv[]){
     recoilPFMetCorrector = new RecoilCorrector( RecoilFileName);
         
   
-    RecoilFileName = RecoilDir; RecoilFileName += "MvaMET_2016BCD.root";
-    std::cout<<RecoilFileName<<std::endl;
-    recoilMvaMetCorrector = new RecoilCorrector( RecoilFileName);
+    //    RecoilFileName = RecoilDir; RecoilFileName += "MvaMET_2016BCD.root";
+    //    std::cout<<RecoilFileName<<std::endl;
+    //    recoilMvaMetCorrector = new RecoilCorrector( RecoilFileName);
   }
   
   // Read in HLT filter
   vector<string> filterSingleLep;
   vector<string> filterXtriggerLepLeg;
   vector<string> filterXtriggerTauLeg;
+  vector<string> filterDiTau;
   if(ch == "mt"){
     filterSingleLep.push_back(cfg.get<string>("filterSingleLep1"));
+    filterSingleLep.push_back(cfg.get<string>("filterSingleLep2"));
     filterXtriggerLepLeg.push_back(cfg.get<string>("filterXtriggerLepLeg1"));
-    filterXtriggerTauLeg.push_back(cfg.get<string>("filterXtriggerTauLeg"));
     filterXtriggerLepLeg.push_back(cfg.get<string>("filterXtriggerLepLeg2"));
+    filterXtriggerTauLeg.push_back(cfg.get<string>("filterXtriggerTauLeg1"));
+    filterXtriggerTauLeg.push_back(cfg.get<string>("filterXtriggerTauLeg2"));
   }else if(ch == "et"){
     filterSingleLep.push_back(cfg.get<string>("filterSingleLep1"));
+    filterSingleLep.push_back(cfg.get<string>("filterSingleLep2"));
     
     filterXtriggerLepLeg.push_back(cfg.get<string>("filterXtriggerLepLeg1"));
     filterXtriggerLepLeg.push_back(cfg.get<string>("filterXtriggerLepLeg2"));
@@ -239,23 +248,20 @@ int main(int argc, char * argv[]){
     filterXtriggerTauLeg.push_back(cfg.get<string>("filterXtriggerTauLeg2"));
     
   }else if(ch == "tt"){
-    filterSingleLep.push_back(cfg.get<string>("filterDiTau"));
+    filterDiTau.push_back(cfg.get<string>("filterDiTau1"));
+    filterDiTau.push_back(cfg.get<string>("filterDiTau2"));
+    filterDiTau.push_back(cfg.get<string>("filterDiTau3"));
   }
-  cout<<"Number of single lepton triggers = "<<filterSingleLep.size()<<endl;
-  cout<<"Number of X triggers (lep leg)   = "<<filterXtriggerLepLeg.size()<<endl;
-  cout<<"Number of X triggers (tau leg)   = "<<filterXtriggerTauLeg.size()<<endl;
-  
+  cout<<"Number of single lepton trigger legs = "<<filterSingleLep.size()<<endl;
+  cout<<"Number of X trigger legs (lep leg)   = "<<filterXtriggerLepLeg.size()<<endl;
+  cout<<"Number of X trigger legs (tau leg)   = "<<filterXtriggerTauLeg.size()<<endl;
+  cout<<"Number of ditau trigger legs         = "<<filterDiTau.size()<<endl;
+
   // tau cuts
   const float ptTauLowCut    = cfg.get<float>("ptTauLowCut");
   const float etaTauCut      = cfg.get<float>("etaTauCut");
   const float dzTauCut       = cfg.get<float>("dzTauCut");
   const bool  applyTauId     = cfg.get<bool>("ApplyTauId");
-  if(ch=="tt"){
-    ptTauLowCut    = cfg.get<float>("ptTau2LowCut");
-    etaTauCut      = cfg.get<float>("etaTau2Cut");
-    dzTauCut       = cfg.get<float>("dzTau2Cut");
-  }
-
 
   // tau energy scale corrections
   const float shift_tes_1prong = cfg.get<float>("TauEnergyScaleShift_OneProng");
@@ -407,11 +413,7 @@ int main(int argc, char * argv[]){
     SF_XTriggerLepLeg_antiiso   -> init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(xTrigLepLegEffFile_antiiso));
   }
   // For tau leg of cross-trigger a different implementation is used
-  TString filename_XTrigTauLegSF = TString(cmsswBase)+"/src/HTT-utilities/CorrectionsWorkspace/htt_scalefactors_sm_moriond_v1.root";
-  TFile f_XTrigTauLegSF(filename_XTrigTauLegSF);
-  if (f_XTrigTauLegSF.IsZombie()) {std::cout << " workspace file " << filename_XTrigTauLegSF << " not found. Please check. " << std::endl; exit(1);}
-  RooWorkspace *w_XTrigTauLegSF = (RooWorkspace*)f_XTrigTauLegSF.Get("w");
-  f_XTrigTauLegSF.Close();
+
 
   //Lepton Scale Factors from KIT - for MSSM 2016
   TString filename_kitLeptonSF = TString(cmsswBase)+"/src/HTT-utilities/CorrectionsWorkspace/htt_scalefactors_v16_4.root";
@@ -570,16 +572,16 @@ int main(int argc, char * argv[]){
 
     AC1B analysisTree(_tree, isData);
 
-	// set AC1B for JES systematics
-	if (!isData && ApplySystShift && jetEnergyScaleSys.size() >0){
-		for (unsigned int i=0; i<jetEnergyScaleSys.size(); i++)
-			(jetEnergyScaleSys.at(i))->SetAC1B(&analysisTree);
-	}
+    // set AC1B for JES systematics
+    if (!isData && ApplySystShift && jetEnergyScaleSys.size() >0){
+      for (unsigned int i=0; i<jetEnergyScaleSys.size(); i++)
+	(jetEnergyScaleSys.at(i))->SetAC1B(&analysisTree);
+    }
     
     Long64_t numberOfEntries = analysisTree.GetEntries();
     
     std::cout << "      number of entries in Tree = " << numberOfEntries << std::endl;
-  ///////////////EVENT LOOP///////////////
+    ///////////////EVENT LOOP///////////////
     
 
     for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) {       
@@ -588,9 +590,9 @@ int main(int argc, char * argv[]){
       nEvents++;
 
       if (isData)
-	       nWeightedEventsH->Fill(0., 1.);
+	nWeightedEventsH->Fill(0., 1.);
       else
-	       nWeightedEventsH->Fill(0., analysisTree.genweight);
+	nWeightedEventsH->Fill(0., analysisTree.genweight);
 
 	  //Skip events not passing the MET filters, if applied
       if (ApplyMetFilters && !passedAllMetFilters(&analysisTree, met_filters_list, isData)) continue;
@@ -600,12 +602,14 @@ int main(int argc, char * argv[]){
       vector<int> nSingleLepTrig(filterSingleLep.size(),-1);
       vector<int> nXTrigLepLeg(filterXtriggerLepLeg.size(),-1);
       vector<int> nXTrigTauLeg(filterXtriggerTauLeg.size(),-1);
+      vector<int> nDiTauTrig(filterDiTau.size(),-1);
 
       if(ApplyTrigger){
 
 	vector<bool> checkFilterSingleLep(filterSingleLep.size(), false); 
 	vector<bool> checkFilterXTrigLepLeg(filterXtriggerLepLeg.size(), false); 
 	vector<bool> checkFilterXTrigTauLeg(filterXtriggerTauLeg.size(), false);
+	vector<bool> checkFilterDiTauTrig(filterDiTau.size(), false);
 	unsigned int nfilters = analysisTree.run_hltfilters->size();
 
 	for (unsigned int i=0; i<nfilters; ++i) {
@@ -618,6 +622,9 @@ int main(int argc, char * argv[]){
 	  }
 	  for(unsigned int i_trig=0; i_trig<filterXtriggerTauLeg.size(); i_trig++){
 	    if (HLTFilter==filterXtriggerTauLeg.at(i_trig)){ nXTrigTauLeg.at(i_trig) = i; checkFilterXTrigTauLeg.at(i_trig) = true;}
+	  }
+	  for(unsigned int i_trig=0; i_trig<filterDiTau.size(); i_trig++){
+	    if (HLTFilter==filterDiTau.at(i_trig)){ nDiTauTrig.at(i_trig) = i; checkFilterDiTauTrig.at(i_trig) = true;}
 	  }
 	}
       }
@@ -663,6 +670,8 @@ int main(int argc, char * argv[]){
         if (fabs(fabs(analysisTree.tau_charge[it])-1)>0.001) continue;
         if (fabs(analysisTree.tau_leadchargedhadrcand_dz[it])>=dzTauCut) continue;
 
+	if (analysisTree.tau_byVVLooseIsolationMVArun2017v2DBoldDMwLT2017[it] < 0.5) continue;
+
         if (applyTauId && analysisTree.tau_decayModeFinding[it] < 0.5) continue;
         taus.push_back(it);
       }
@@ -675,7 +684,7 @@ int main(int argc, char * argv[]){
 
         for (unsigned int ie = 0; ie<analysisTree.electron_count; ++ie) {
 			
-          bool electronMvaId = analysisTree.electron_mva_wp80_general_Spring16_v1[ie];
+          bool electronMvaId = analysisTree.electron_mva_wp80_Iso_Fall17_v1[ie];
 
           if (analysisTree.electron_pt[ie]<=ptLeptonLowCut) continue;
 
@@ -696,7 +705,8 @@ int main(int argc, char * argv[]){
       if(ch == "mt"){
         for (unsigned int im = 0; im<analysisTree.muon_count; ++im) {
 
-	  bool muonMediumId = isIdentifiedMediumMuon(im, &analysisTree, isData);
+	  bool is2016Data = false;
+	  bool muonMediumId = isIdentifiedMediumMuon(im, &analysisTree, is2016Data);
   			
           if (analysisTree.muon_pt[im]<=ptLeptonLowCut) continue;
           if (fabs(analysisTree.muon_eta[im])>=etaLeptonCut) continue;
@@ -715,20 +725,26 @@ int main(int argc, char * argv[]){
       if (taus.size()==0) continue;
       counter[5]++;//
 
-      // selecting electron and tau pair (OS or SS);
+      // selecting electron and tau pair (OS or SS) or ditau pair;
+
       int leptonIndex = -1;
       int tauIndex = -1;
       
-      float isoLepMin = 1e+10;
-      float isoTauMax = -1;      
-      float lep_pt_max =  -1;
-      float tau_pt_max =  -1;
-
+      float isoLepMin   = 1e+10;
+      float isoTauMax   = -1;      
+      float isoTau2Max  = -1;
+      float lep_pt_max  = -1;
+      float tau_pt_max  = -1;
+      float tau2_pt_max = -1;
 
       bool isSingleLepTrigStored = false;
       bool isXTrigStored         = false;
-      
+      bool isDiTauTrigStored     = false;
+
       bool isSingleLepTrig = false;
+      bool isDiTauTrig     = false;
+      bool isTauTrig       = false;
+      bool isTau2Trig      = false;
       vector<bool> isXTrigLepLeg(filterXtriggerLepLeg.size(), false);
       vector<bool> isXTrigTauLeg(filterXtriggerTauLeg.size(), false);
       bool isXTrig         = false;
@@ -770,13 +786,18 @@ int main(int argc, char * argv[]){
 	    lep_phi =     analysisTree.tau_phi[lIndex];
 	    if(lIndex==tIndex)continue;
 	  }
-	  
-	  if(ApplyTrigger){  //TO FIX
+
+	  if(ApplyTrigger){ 
 	    
 	    isSingleLepTrig = false;
 	    isXTrigLepLeg.assign(isXTrigLepLeg.size(), false);
 	    isXTrigTauLeg.assign(isXTrigTauLeg.size(), false);
-	    isXTrig         = false;
+	    bool isXTrigLep      = true;
+	    bool isXTrigTau      = true;
+
+	    // ************************
+	    // implement l1tau matching
+	    // ************************
 	    
 	    for (unsigned int iT=0; iT<analysisTree.trigobject_count; ++iT) {
 	      float dRtrigLep = deltaR(lep_eta, lep_phi, analysisTree.trigobject_eta[iT],analysisTree.trigobject_phi[iT]);        
@@ -785,94 +806,140 @@ int main(int argc, char * argv[]){
  	      if (dRtrigLep < deltaRTrigMatch){
 		
 		for(unsigned int i_trig = 0; i_trig<filterSingleLep.size(); i_trig++){
-		  if(ch=="mt" && lep_pt<23) continue;
 		  if (nSingleLepTrig.at(i_trig) == -1) continue;
 		  if (analysisTree.trigobject_filters[iT][nSingleLepTrig.at(i_trig)]) isSingleLepTrig = true;
 		  
 		}
 		for(unsigned int i_trig = 0; i_trig<filterXtriggerLepLeg.size(); i_trig++){
-		  if(ch=="mt" && lep_pt>=23) continue;
 		  if (nXTrigLepLeg.at(i_trig) == -1) continue;
 		  if (analysisTree.trigobject_filters[iT][nXTrigLepLeg.at(i_trig)]) isXTrigLepLeg.at(i_trig) = true;
 		}
-		
+		for(unsigned int i_trig = 0; i_trig<filterDiTau.size(); i_trig++){
+                  if (nDiTauTrig.at(i_trig) == -1) continue;
+                  if (analysisTree.trigobject_filters[iT][nDiTauTrig.at(i_trig)]) isTau2Trig = true;
+                }
+
 	      }
 	      
-	      if (dRtrigTau < deltaRTrigMatch && ch=="mt"){
+	      if (dRtrigTau < deltaRTrigMatch){
 		
 		for(unsigned int i_trig = 0; i_trig<filterXtriggerTauLeg.size(); i_trig++){
 		  if (nXTrigTauLeg.at(i_trig) == -1) continue;
 		  if (analysisTree.trigobject_filters[iT][nXTrigTauLeg.at(i_trig)]) isXTrigTauLeg.at(i_trig) = true;
 		}
+                for(unsigned int i_trig = 0; i_trig<filterDiTau.size(); i_trig++){
+                  if (nDiTauTrig.at(i_trig) == -1) continue;
+                  if (analysisTree.trigobject_filters[iT][nDiTauTrig.at(i_trig)]) isTauTrig = true;
+                }
+
 	      }
 	      
 	    }
 	    
-	    for(unsigned int i_trig = 0; i_trig<filterXtriggerTauLeg.size(); i_trig++){
-	      if(isXTrigLepLeg.at(i_trig) && isXTrigTauLeg.at(i_trig)) isXTrig = true;
+	    for(unsigned int i_trig = 0; i_trig<filterXtriggerTauLeg.size(); i_trig++)
+	      isXTrigTau = isXTrigTau && isXTrigTauLeg.at(i_trig);
+	    for(unsigned int i_trig = 0; i_trig<filterXtriggerLepLeg.size(); i_trig++)
+              isXTrigLep = isXTrigLep && isXTrigLepLeg.at(i_trig);
+	    isXTrig = isXTrigTau && isXTrigLep;
+	    isDiTauTrig = isTauTrig && isTau2Trig;
+
+	    // trigger selection
+	    if (ch=="tt") {
+	      if (!isDiTauTrig) continue;
 	    }
-	    
-	    if ( !(isSingleLepTrig || isXTrig) ) continue;
-	    
+	    else {
+	      if ( !(isSingleLepTrig || isXTrig) ) continue;
+	    }
+
 	    if (isSingleLepTrig){
-			if (ch=="mt") otree->trg_singlemuon = true;
-			else if (ch=="et") otree->trg_singleelectron = true;
-			
+	      if (ch=="mt") otree->trg_singlemuon = true;
+	      else if (ch=="et") otree->trg_singleelectron = true;
 	    }
 	    
 	  }
-        
-	  
+
 	  counter[7]++;
 	  
           float absIsoTau = analysisTree.tau_byIsolationMVArun2v1DBoldDMwLTraw[tIndex];
           float relIsoTau = absIsoTau / analysisTree.tau_pt[tIndex];
 
+	  float absIsoTau2 = -1;
+	  if (ch=="tt") absIsoTau2 = analysisTree.tau_byIsolationMVArun2v1DBoldDMwLTraw[lIndex];
+
           
           float dR = deltaR(analysisTree.tau_eta[tIndex],analysisTree.tau_phi[tIndex],
-                lep_eta, lep_phi);
+			    lep_eta, lep_phi);
 
           if (dR<dRleptonsCut) continue;
 
-          // kinematic match
-          if (lep_pt<=ptLeptonHighCut) continue;
+          // kinematic match (what we need it for?
+	  //	  if (ch=="mt"||ch=="et") {if (lep_pt<=ptLeptonHighCut) continue;}
 
           // change pair
 //        cout<<iEntry<<". "<<lIndex<<", "<<tauIndex<<". "<<lep_pt<<" - "<<lep_pt_max;
           bool changePair =  false;
-          if (relIsoLep<isoLepMin) {
-
-            changePair = true;
-          }
-          else if (fabs(relIsoLep - isoLepMin) < 1.e-5) {
-            if (lep_pt > lep_pt_max) {
-
-              changePair = true;
-            }     
-            else if (fabs(lep_pt - lep_pt_max) < 1.e-5) {
-              if (absIsoTau > isoTauMax) {   
-
-                changePair = true;
-              }
-              else if ((absIsoTau - isoTauMax) < 1.e-5){
-                if (analysisTree.tau_pt[tIndex] > tau_pt_max){
-
-                  changePair = true;
-                }
-              }
-            }
-          }
+	  if (ch=="tt") {
+	    if (absIsoTau>isoTauMax) {
+	      changePair = true;
+	    }
+	    else if (fabs(absIsoTau-isoTauMax) < 1.e-5) {
+	      if (analysisTree.tau_pt[tIndex] > tau_pt_max) {
+		changePair = true;
+	      }
+	      else if (fabs(analysisTree.tau_pt[tIndex]-tau_pt_max)<1.e-5) {
+		if (absIsoTau2>isoTau2Max) {
+		  changePair = true;
+		}
+		else if ( fabs(absIsoTau2-isoTau2Max) < 1.e-5) {
+		  if (analysisTree.tau_pt[lIndex] > tau2_pt_max) {
+		    changePair = true;
+		  }
+		}
+	      }
+	    }
+	  }
+	  else {
+	    if (relIsoLep<isoLepMin) {
+	      changePair = true;
+	    }
+	    else if (fabs(relIsoLep - isoLepMin) < 1.e-5) {
+	      if (lep_pt > lep_pt_max) {
+		changePair = true;
+	      }     
+	      else if (fabs(lep_pt - lep_pt_max) < 1.e-5) {
+		if (absIsoTau > isoTauMax) {   
+		  changePair = true;
+		}
+		else if ((absIsoTau - isoTauMax) < 1.e-5){
+		  if (analysisTree.tau_pt[tIndex] > tau_pt_max){
+		    changePair = true;
+		  }
+		}
+	      }
+	    }
+	  }
 	  counter[8]++;
 	  
           if (changePair){
-	    isoLepMin  = relIsoLep;
-	    lep_pt_max=lep_pt;
-	    tau_pt_max=analysisTree.tau_pt[tIndex];
-	    leptonIndex = lIndex;
-	    isoTauMax = absIsoTau;
-	    tauIndex = tIndex;
-	    isSingleLepTrigStored = isSingleLepTrig;
-	    isXTrigStored = isXTrig;
+	    if (ch=="tt") {
+	      isoTauMax = absIsoTau;
+	      isoTau2Max = absIsoTau2;
+	      tauIndex = tIndex;
+	      leptonIndex = lIndex;
+	      tau_pt_max=analysisTree.tau_pt[tIndex];
+	      tau2_pt_max=analysisTree.tau_pt[lIndex];
+	      isDiTauTrigStored = isDiTauTrig;
+	    }
+	    else { 
+	      isoLepMin  = relIsoLep;
+	      lep_pt_max=lep_pt;
+	      tau_pt_max=analysisTree.tau_pt[tIndex];
+	      leptonIndex = lIndex;
+	      isoTauMax = absIsoTau;
+	      tauIndex = tIndex;
+	      isSingleLepTrigStored = isSingleLepTrig;
+	      isXTrigStored = isXTrig;
+	    }
           }
         }
       }
@@ -881,14 +948,26 @@ int main(int argc, char * argv[]){
       if (tauIndex<0) continue;
       counter[9]++;
 
+      if (ch=="tt") { // order taus by their pT in the ditau channel
+	if (analysisTree.tau_pt[tauIndex]<analysisTree.tau_pt[leptonIndex]) {
+	  int tmp = leptonIndex;
+	  leptonIndex = tauIndex;
+	  tauIndex = tmp;
+	}
+      }
+
       //filling variables
       TLorentzVector leptonLV;
 
       // used for trigger weights
-      w_XTrigTauLegSF->var("t_pt")  -> setVal(analysisTree.tau_pt[tauIndex]);
-      w_XTrigTauLegSF->var("t_eta") -> setVal(analysisTree.tau_eta[tauIndex]);
-      w_XTrigTauLegSF->var("t_dm")  -> setVal(analysisTree.tau_decayMode[tauIndex]);
-      double sf_trig_t = 0;
+      double eff_data_trig_lt_tau = 1;
+      double eff_mc_trig_lt_tau   = 1;
+      double eff_data_trig_lt_l   = 1;
+      double eff_mc_trig_lt_l     = 1;
+      double eff_data_trig_L      = 1;
+      double eff_mc_trig_L        = 1;
+      double sf_trig_ditau_tau1   = 1;
+      double sf_trig_ditau_tau2   = 1;
       
       if(ch=="mt") {
       	FillMuTau(&analysisTree, otree, leptonIndex, dRiso);
@@ -899,9 +978,7 @@ int main(int argc, char * argv[]){
 			 muonMass);
 	
 	// used for trigger weights: channel dependent settings
-	sf_trig_t  = w_XTrigTauLegSF -> function("t_genuine_TightIso_mt_ratio")->getVal();
-
-
+	
 	
 	// tracking efficiency weight	
         if (!isData && ApplyLepSF) {
@@ -918,7 +995,6 @@ int main(int argc, char * argv[]){
 			 electronMass);
 	
 	// used for trigger weights: channel dependent settings
-	sf_trig_t  = w_XTrigTauLegSF -> function("t_genuine_TightIso_et_ratio")->getVal();
 
 	// tracking efficiency weight
         if (!isData && ApplyLepSF) {
@@ -934,47 +1010,53 @@ int main(int argc, char * argv[]){
 			 analysisTree.tau_py[leptonIndex],
 			 analysisTree.tau_pz[leptonIndex],
 			 tauMass);
-	/*TO FIX
-	// used for trigger weights: channel dependent settings
-	sf_trig_t  = w_XTrigTauLegSF -> function("t_genuine_TightIso_et_ratio")->getVal();
-
-	// tracking efficiency weight
-        if (!isData && ApplyLepSF) {
-	  w->var("e_eta")->setVal(analysisTree.tau_eta[leptonIndex]); 
-	  w->var("e_pt")->setVal(analysisTree.tau_pt[leptonIndex]); 	
-	  otree->trkeffweight = (double)( w->function("e_trk_ratio")->getVal());
-	  }*/
       }
       
-      if (!isData && ApplyLepSF) {//TO FIX
+      if (!isData && ApplyLepSF) {
 	//std::cout<< iEntry <<std::endl;
-	otree->idisoweight_1 = SF_lepIdIso->get_ScaleFactor(leptonLV.Pt(), leptonLV.Eta());
-	//std::cout<< "SF_lepIdIso" <<std::endl;
+	if (ch=="tt") {
+	  
+	}
+	else {
+	  //std::cout<< "SF_lepIdIso" <<std::endl;
+	  eff_data_trig_lt_tau = tauTriggerSF->getMuTauEfficiencyData(analysisTree.tau_pt[tauIndex],
+								      analysisTree.tau_eta[tauIndex],
+								      analysisTree.tau_phi[tauIndex]);
+	  eff_mc_trig_lt_tau = tauTriggerSF->getMuTauEfficiencyMC(analysisTree.tau_pt[tauIndex],
+								  analysisTree.tau_eta[tauIndex],
+								  analysisTree.tau_phi[tauIndex]);
 
-	// calculation of trigger weights
-	double scalefactor = 1;
-	if(isSingleLepTrigStored && !isXTrigStored)  //std::cout<< "isSingleLepTrigStored && !isXTrigStored:" << std::endl , std::cout<< "  leptonLV.Pt():  " << leptonLV.Pt() << "   leptonLV.Eta(): " << leptonLV.Eta() << std::endl ,
-	  scalefactor = SF_SingleLepTrigger -> get_ScaleFactor(leptonLV.Pt(), leptonLV.Eta());
-	else if(isXTrigStored && !isSingleLepTrigStored) scalefactor = SF_XTriggerLepLeg   -> get_ScaleFactor(leptonLV.Pt(), leptonLV.Eta())*sf_trig_t;
-	else if(isXTrigStored && isSingleLepTrigStored){
-	  cout<<"Both triggers returned true. This should not happen. Please check. Exiting"<<endl;
-	  exit(-1);
-	}  
-	otree->trigweight_1 = scalefactor;
-	otree->singleLepTrigger = isSingleLepTrigStored;
-	otree->xTrigger = isXTrigStored;
+	  eff_data_trig_lt_l = SF_XTriggerLepLeg->get_EfficiencyData(leptonLV.Pt(),
+								     leptonLV.Eta());
+	  eff_mc_trig_lt_l = SF_XTriggerLepLeg->get_EfficiencyMC(leptonLV.Pt(),
+								 leptonLV.Eta());
 
-	if (otree->iso_1>=0.15 && otree->iso_1<=0.3){  
-	  otree->idisoweight_antiiso_1 = SF_lepIdIso_antiiso->get_ScaleFactor(leptonLV.Pt(), leptonLV.Eta());
-	  //std::cout<< "SF_lepIdIso_antiiso" << std::endl;
-	  scalefactor = 1;
-	  if(isSingleLepTrigStored && !isXTrigStored)      scalefactor = SF_SingleLepTrigger_antiiso -> get_ScaleFactor(leptonLV.Pt(), leptonLV.Eta());
-	  else if(isXTrigStored && !isSingleLepTrigStored) scalefactor = SF_XTriggerLepLeg_antiiso   -> get_ScaleFactor(leptonLV.Pt(), leptonLV.Eta())*sf_trig_t;
-	  else if(isXTrigStored && isSingleLepTrigStored){
-	    cout<<"Both triggers returned true. This should not happen. Please check. Exiting"<<endl;
-	    exit(-1);
-	  }
-	  otree->trigweight_antiiso_1 = scalefactor;
+	  eff_data_trig_L = SF_SingleLepTrigger->get_EfficiencyData(leptonLV.Pt(),
+								    leptonLV.Eta());
+	  eff_mc_trig_L = SF_SingleLepTrigger->get_EfficiencyData(leptonLV.Pt(),
+								  leptonLV.Eta());
+	  
+	  otree->singleLepTrigger = isSingleLepTrigStored;
+	  otree->xTrigger = isXTrigStored;
+	  otree->ditauTrigger = isDiTauTrigStored;
+	  
+	  otree->idisoweight_1 = SF_lepIdIso->get_ScaleFactor(leptonLV.Pt(),
+							      leptonLV.Eta());
+
+	  otree->idisoweight_antiiso_1 = SF_lepIdIso_antiiso->get_ScaleFactor(leptonLV.Pt(),
+									      leptonLV.Eta());
+	  
+	  otree->trigweight_1 = SF_SingleLepTrigger->get_ScaleFactor(leptonLV.Pt(),
+								     leptonLV.Eta());
+	  otree->trigweight_antiiso_1 = SF_SingleLepTrigger_antiiso->get_ScaleFactor(leptonLV.Pt(),
+										     leptonLV.Eta());
+
+	  double eff_data_trig = eff_data_trig_L + (eff_data_trig_lt_l-eff_data_trig_L)*eff_data_trig_lt_tau;
+	  double eff_mc_trig = eff_mc_trig_L + (eff_mc_trig_lt_l-eff_mc_trig_L)*eff_mc_trig_lt_tau;
+
+	  if (eff_data_trig>1e-4&&eff_mc_trig>1e-4)
+	    otree->trigweight = eff_data_trig/eff_mc_trig;
+
 	}
 
 	// use lepton SF from KIT workspace - for MSSM 
@@ -1003,10 +1085,10 @@ int main(int argc, char * argv[]){
       if(ch=="mt"||ch=="et") FillTau(&analysisTree, otree, tauIndex);
       else if(ch=="tt") FillTau_leading(&analysisTree, otree, tauIndex);
 	  
-      // tauID weight
+      // tauID weight (for the moment 1)
       if (!isData && analysisTree.tau_genmatch[tauIndex]==5) otree->idisoweight_2 = 1.; 
 
-      otree->effweight = (otree->trigweight_1)*(otree->idisoweight_1)*(otree->trigweight_2)*(otree->idisoweight_2);
+      otree->effweight = (otree->idisoweight_1)*(otree->idisoweight_2)*(otree->trigweight);
 
       //counting jet
       jets::counting_jets(&analysisTree, otree, &cfg, &inputs_btag_scaling_medium);
@@ -1024,12 +1106,12 @@ int main(int argc, char * argv[]){
       }
 
       // topPt weight
-	  otree->topptweight =1.;
+      otree->topptweight =1.;
       if(!isData){
-		otree->topptweight = genTools::topPtWeight(analysisTree, lhc_run_era);
+	otree->topptweight = genTools::topPtWeight(analysisTree, lhc_run_era);
       }
 
-	  // weights for ttbar samples to estimate uncertianties
+      // weights for ttbar samples to estimate uncertianties
       //fillTTbarUncWeights(&analysisTree, otree, isData, includeTTbarUncWeights);
 
       counter[11]++;
@@ -1037,15 +1119,15 @@ int main(int argc, char * argv[]){
       // lepton tau fakerates
       otree->mutaufakeweight = 1.;
       otree->etaufakeweight = 1.;
-	  if (!isData){
-	  	if (ch == "et") {
-			otree->etaufakeweight = leptauFR->get_fakerate("electron", "Tight", otree->eta_2, otree->gen_match_2);
-			otree->mutaufakeweight = leptauFR->get_fakerate("muon", "Loose", otree->eta_2, otree->gen_match_2);
-		}
-		else if (ch == "mt") {
-			otree->etaufakeweight = leptauFR->get_fakerate("electron", "VLoose", otree->eta_2, otree->gen_match_2);
-			otree->mutaufakeweight = leptauFR->get_fakerate("muon", "Tight", otree->eta_2, otree->gen_match_2);
-	    }
+      if (!isData){
+	if (ch == "et") {
+	  otree->etaufakeweight = leptauFR->get_fakerate("electron", "Tight", otree->eta_2, otree->gen_match_2);
+	  otree->mutaufakeweight = leptauFR->get_fakerate("muon", "Loose", otree->eta_2, otree->gen_match_2);
+	}
+	else if (ch == "mt") {
+	  otree->etaufakeweight = leptauFR->get_fakerate("electron", "VLoose", otree->eta_2, otree->gen_match_2);
+	  otree->mutaufakeweight = leptauFR->get_fakerate("muon", "Tight", otree->eta_2, otree->gen_match_2);
+	}
       }
       ////////////////////////////////////////////////////////////
       // MET Recoil Corrections
@@ -1053,25 +1135,24 @@ int main(int argc, char * argv[]){
 
       otree->njetshad = otree->njets;
       if (!isData && applyRecoilCorrections && (isDY || isWJets || isVBForGGHiggs || isMSSMsignal) ){
-				genV = genTools::genV(analysisTree);
-				genL = genTools::genL(analysisTree);
-				if(isWJets) otree->njetshad += 1;
+	genV = genTools::genV(analysisTree);
+	genL = genTools::genL(analysisTree);
+	if(isWJets) otree->njetshad += 1;
       }
-
+      
       // PF MET
       genTools::RecoilCorrections( *recoilPFMetCorrector, (!isData && applyRecoilCorrections && (isDY || isWJets || isVBForGGHiggs || isMSSMsignal)) * genTools::MeanResolution,
-			                     otree->met, otree->metphi,
-			                     genV.Px(), genV.Py(),
-			                     genL.Px(), genL.Py(),
-			                     otree->njetshad,
-			                     otree->met_rcmr, otree->metphi_rcmr
-			                     );
-
+				   otree->met, otree->metphi,
+				   genV.Px(), genV.Py(),
+				   genL.Px(), genL.Py(),
+				   otree->njetshad,
+				   otree->met_rcmr, otree->metphi_rcmr
+				   );
+      
       // overwriting with recoil-corrected values 
       otree->met = otree->met_rcmr;
       otree->metphi = otree->metphi_rcmr;   
-
-
+      
       //ditau sytem
       TLorentzVector tauLV; tauLV.SetXYZM(analysisTree.tau_px[tauIndex],
 					     analysisTree.tau_py[tauIndex],
@@ -1086,62 +1167,62 @@ int main(int argc, char * argv[]){
 					  TMath::Sqrt( otree->met*TMath::Sin(otree->metphi)*otree->met*TMath::Sin(otree->metphi) +
 				          otree->met*TMath::Cos(otree->metphi)*otree->met*TMath::Cos(otree->metphi)));
 
-	  if (ch == "mt" && checkDuplicateMuons && duplicatemuons.size()!=0 && isData){
-		// add to the MET LV the duplicate muons pt
-		TLorentzVector duplicateMuonsLV;
-		float duplicatemu_px = 0; 
-		float duplicatemu_py = 0; 
-		for (unsigned int i=0; i<duplicatemuons.size(); i++){
-			duplicatemu_px += analysisTree.muon_px[duplicatemuons[i]];
-			duplicatemu_py += analysisTree.muon_py[duplicatemuons[i]];
-			}
-	    // add duplicate muons pT to MET
-		float tot_px = metLV.Px()+ duplicatemu_px;
-		float tot_py = metLV.Py() + duplicatemu_py;
-		metLV.SetPx(tot_px);
-		metLV.SetPy(tot_py);
-		// save to otree
-		otree->met= metLV.Pt();
-		otree->metphi = metLV.Phi();
-	  }
-	  counter[12]++;
+      if (ch == "mt" && checkDuplicateMuons && duplicatemuons.size()!=0 && isData){
+	// add to the MET LV the duplicate muons pt
+	TLorentzVector duplicateMuonsLV;
+	float duplicatemu_px = 0; 
+	float duplicatemu_py = 0; 
+	for (unsigned int i=0; i<duplicatemuons.size(); i++){
+	  duplicatemu_px += analysisTree.muon_px[duplicatemuons[i]];
+	  duplicatemu_py += analysisTree.muon_py[duplicatemuons[i]];
+	}
+	// add duplicate muons pT to MET
+	float tot_px = metLV.Px()+ duplicatemu_px;
+	float tot_py = metLV.Py() + duplicatemu_py;
+	metLV.SetPx(tot_px);
+	metLV.SetPy(tot_py);
+	// save to otree
+	otree->met= metLV.Pt();
+	otree->metphi = metLV.Phi();
+      }
+      counter[12]++;
 
-	  // shift the tau energy scale by decay mode and propagate to the met. 
-	  if (!isData) {
-	    bool isOneProng = false;
-	    float shift_tes = 0.0;
-		if (otree->gen_match_2 >=5){
-	    	if (otree->tau_decay_mode_2 == 0){      shift_tes=shift_tes_1prong; isOneProng=true; }
-	    	else if (otree->tau_decay_mode_2 ==1){  shift_tes=shift_tes_1p1p0; }
-	    	else if (otree->tau_decay_mode_2 ==10){ shift_tes=shift_tes_3prong; }
-		}
-
-		else if (otree->gen_match_2 <5) {
-	    	if (otree->tau_decay_mode_2 == 0){      shift_tes=shift_tes_lepfake_1prong; isOneProng=true; }
-	    	else if (otree->tau_decay_mode_2 ==1){  shift_tes=shift_tes_lepfake_1p1p0; }
-	    	else if (otree->tau_decay_mode_2 ==10){ shift_tes=shift_tes_lepfake_3prong; }
-		}
-
-	    correctTauES(tauLV, metLV, shift_tes, isOneProng);	    
-	    otree->pt_2 = tauLV.Pt();
-	    otree->m_2 = tauLV.M();
-	    otree->met = metLV.Pt();
-	    otree->metphi = metLV.Phi();
-	  }
-
+      // shift the tau energy scale by decay mode and propagate to the met. 
+      if (!isData) {
+	bool isOneProng = false;
+	float shift_tes = 0.0;
+	if (otree->gen_match_2 >=5){
+	  if (otree->tau_decay_mode_2 == 0){      shift_tes=shift_tes_1prong; isOneProng=true; }
+	  else if (otree->tau_decay_mode_2 ==1){  shift_tes=shift_tes_1p1p0; }
+	  else if (otree->tau_decay_mode_2 ==10){ shift_tes=shift_tes_3prong; }
+	}
+	
+	else if (otree->gen_match_2 <5) {
+	  if (otree->tau_decay_mode_2 == 0){      shift_tes=shift_tes_lepfake_1prong; isOneProng=true; }
+	  else if (otree->tau_decay_mode_2 ==1){  shift_tes=shift_tes_lepfake_1p1p0; }
+	  else if (otree->tau_decay_mode_2 ==10){ shift_tes=shift_tes_lepfake_3prong; }
+	}
+	
+	correctTauES(tauLV, metLV, shift_tes, isOneProng);	    
+	otree->pt_2 = tauLV.Pt();
+	otree->m_2 = tauLV.M();
+	otree->met = metLV.Pt();
+	otree->metphi = metLV.Phi();
+      }
+      
       TLorentzVector dileptonLV = leptonLV + tauLV;
-
+      
       // visible mass
       otree->m_vis = dileptonLV.M();
-
-	  // ditau pt
+      
+      // ditau pt
       otree->pt_tt = (dileptonLV+metLV).Pt();   
 
-	  // mt TOT
-      float mtTOT = 2*(otree->pt_1)*metLV.Pt()*(1-cos(DeltaPhi(otree->phi_1,otree->metphi)));
-      mtTOT += 2*(otree->pt_2)*metLV.Pt()*(1-cos(DeltaPhi(otree->phi_2,otree->metphi))); 
-      mtTOT += 2*(otree->pt_1)*(otree->pt_2)*(1-cos(DeltaPhi(otree->phi_1,otree->phi_2))); 
-	  otree->mt_tot = TMath::Sqrt(mtTOT);
+      // mt TOT
+      float mtTOT = 2*(otree->pt_1)*metLV.Pt()*(1-cos(DeltaPhi(leptonLV,metLV)));
+      mtTOT += 2*(otree->pt_2)*metLV.Pt()*(1-cos(DeltaPhi(tauLV,metLV))); 
+      mtTOT += 2*(otree->pt_1)*(otree->pt_2)*(1-cos(DeltaPhi(leptonLV,tauLV))); 
+      otree->mt_tot = TMath::Sqrt(mtTOT);
 
       // opposite charge
       otree->os = (otree->q_1 * otree->q_2) < 0.;
