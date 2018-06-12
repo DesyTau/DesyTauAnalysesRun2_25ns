@@ -2,7 +2,14 @@
 
 MCdir_VJets=/pnfs/desy.de/cms/tier2/store/user/telenz/13TeV/NTuples/MC/RunIIFall17MiniAOD-94X_mc2017_realistic/
 MCdir_DY=/nfs/dust/cms/group/higgs-kit/rasp/MC_2017
-MCdir_TTVV=/nfs/dust/cms/user/rasp/ntuples/MC_2017
+MCdir_TTVV=/nfs/dust/cms/user/rasp/ntuples/MC_2017_v2
+MCdir_Signal=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/MCFall17/Signals
+MCdir_ST=/nfs/dust/cms/user/rasp/ntuples/MC_2017
+
+# Signal
+
+ls $MCdir_Signal/GluGluHToTauTau_M125_13TeV_powheg_pythia8/*.root > ggH_125
+ls $MCdir_Signal/VBFHToTauTau_M125_13TeV_powheg_pythia8/*.root > VBF_125
 
 #DY
 
@@ -32,10 +39,13 @@ ls $MCdir_VJets/W4JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/*.root > W4JetsToL
 ls $MCdir_TTVV/TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powheg-pythia8/*.root > TTToSemiLeptonic
 ls $MCdir_TTVV/TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8/*.root > TTTo2L2Nu
 ls $MCdir_TTVV/TTToHadronic_TuneCP5_PSweights_13TeV-powheg-pythia8/*.root > TTToHadronic
-ls $MCdir_TTVV/ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8/*.root > ST_tW_top
-ls $MCdir_TTVV/ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8/*.root > ST_tW_antitop
-ls $MCdir_TTVV/ST_t-channel_top_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8/*.root > ST_t_top
-ls $MCdir_TTVV/ST_t-channel_antitop_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8/*.root > ST_t_antitop
+
+# ST
+
+ls $MCdir_ST/ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8/*.root > ST_tW_top
+ls $MCdir_ST/ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8/*.root > ST_tW_antitop
+ls $MCdir_ST/ST_t-channel_top_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8/*.root > ST_t_top
+ls $MCdir_ST/ST_t-channel_antitop_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8/*.root > ST_t_antitop
 
 
 #VV
