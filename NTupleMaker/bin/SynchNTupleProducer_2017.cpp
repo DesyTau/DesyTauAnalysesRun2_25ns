@@ -406,6 +406,7 @@ int main(int argc, char * argv[]){
     TH1D * PU_mc = (TH1D *)filePUdistribution_MC->Get(TString(pileUpforMC));
     if (PU_mc==NULL) {
       std::cout << "Histogram " << pileUpforMC << " is not present in pileup file" << std::endl;
+      exit(-1);
     }
     PUofficial->set_h_data(PU_data);
     PUofficial->set_h_MC(PU_mc);
