@@ -7,6 +7,7 @@
 <use   name="DesyTauAnalyses/CandidateTools"/>
 <use   name="HTT-utilities/LepEffInterface"/>
 <use   name="HTT-utilities/RecoilCorrections"/>
+<use   name="HTT-utilities/TauTriggerSFs2017"/>
 <use   name="TauAnalysis/SVfitStandalone"/> 
 <use   name="CondFormats/BTauObjects"/>
 <use   name="CondTools/BTau"/>

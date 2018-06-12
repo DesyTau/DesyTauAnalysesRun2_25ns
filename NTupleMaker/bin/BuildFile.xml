@@ -103,6 +103,7 @@
  <use name="CondTools/BTau"/>
  <use name="HTT-utilities/LepEffInterface"/>
  <use name="HTT-utilities/RecoilCorrections"/>
+ <use name="HTT-utilities/TauTriggerSFs2017"/>
 </bin>
 
 <bin name="SynchNTupleProducer_2017" file="SynchNTupleProducer_2017.cpp">
@@ -483,19 +484,3 @@
  <use name="HTT-utilities/RecoilCorrections"/>
 </bin>
 
-<bin name="SynchNTupleProducer_Spring15_lept" file="SynchNTupleProducer_Spring15_lept.cpp">
- <use name="PhysicsTools/Utilities"/>
- <use name="rootgraphics"/>
- <use name="root"/>
- <use name="rootmath"/>
- <use name="roottmva"/>
- <use name="boost" />
- <use name="boost_program_options"/>
- <use name="DesyTauAnalyses/NTupleMaker"/>
- <use name="FWCore/ParameterSet"/>
- <use name="TauAnalysis/SVfitStandalone"/>
- <use name="CondFormats/BTauObjects"/>
- <use name="CondTools/BTau"/>
- <use name="HTT-utilities/LepEffInterface"/>
- <use name="HTT-utilities/RecoilCorrections"/>
-</bin>
