@@ -18,6 +18,14 @@ int chargedPiIndex(const AC1B * analysisTree, int tauIndex);
 double acoCP(TLorentzVector Pi1, TLorentzVector Pi2, 
 	     TLorentzVector ref1, TLorentzVector ref2) {
 
+  double y1 = 1;
+  double y2 = 1;
+  y1 = Pi1.E() - ref1.E();
+  y2 = Pi2.E() - ref2.E();
+
+  double y = y1*y2; 
+
+
 
   TLorentzVector Prongsum = Pi1 + Pi2;
   TVector3 boost = -Prongsum.BoostVector();
@@ -44,9 +52,16 @@ double acoCP(TLorentzVector Pi1, TLorentzVector Pi2,
 
   double acop = TMath::ACos(vecRef1transv*vecRef1transv);
 
+  if (y<0) {
+    acop = acop + TMath::Pi();
+  }
+  if (acop>2*TMath::Pi()) {
+    acop = acop - 2*TMath::Pi();
+  }
+
   double sign = vecPi2 * vecRef1transv.Cross(vecRef2transv);
-  if (sign<0)
-    acop = 2.0*TMath::Pi() - acop;
+  if (sign<0) acop = 2.0*TMath::Pi() - acop;
+
 
   return acop;
 
@@ -59,7 +74,10 @@ void acott(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, int tau
   bool correctDecay = correctDecay1 && correctDecay2;
 
   if(!correctDecay){
-    otree->acotautau = -9999;
+    otree->acotautau_00 = -9999;
+    otree->acotautau_10 = -9999;
+    otree->acotautau_01 = -9999;
+    otree->acotautau_11 = -9999;
     return;
   }
   //4-momenta of charged and neutral Pi
@@ -69,36 +87,31 @@ void acott(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, int tau
   TLorentzVector tau2Prong;
   tau2Prong=chargedPivec(analysisTree,tauIndex2);
 
-  TLorentzVector tau1ref;
-  TLorentzVector tau2ref;
-  double y1 = 1;
-  double y2 = 1;
-  if (analysisTree->tau_decayMode[tauIndex1]==0) 
-    tau1ref = ipVec(analysisTree,tauIndex1);
-  else {
-    tau1ref = neutralPivec(analysisTree,tauIndex1);
-    y1 = tau1Prong.E() - tau1ref.E();
-  }
-  if (analysisTree->tau_decayMode[tauIndex2]==0)
-    tau2ref = ipVec(analysisTree,tauIndex1);
-  else {
-    tau2ref = neutralPivec(analysisTree,tauIndex2);
-    y2 = tau2Prong.E() - tau2ref.E();
-  }
+  TLorentzVector tau1IP;
+  tau1IP = ipVec(analysisTree,tauIndex1);
+  TLorentzVector tau1Pi0;
+  tau1Pi0.SetXYZT(0.,0.,0.,0.);
+  TLorentzVector tau2IP;
+  tau2IP = ipVec(analysisTree,tauIndex2);
+  TLorentzVector tau2Pi0;
+  tau2Pi0.SetXYZT(0.,0.,0.,0.);
+ 
+  if (analysisTree->tau_decayMode[tauIndex1]==1) tau1Pi0 = neutralPivec(analysisTree,tauIndex1);
+  
+  if (analysisTree->tau_decayMode[tauIndex2]==1) tau2Pi0 = neutralPivec(analysisTree,tauIndex2);
 
-  double y = y1*y2; 
+  double acop = 0.; 
+  
+  otree->acotautau_00=acoCP(tau1Prong,tau2Prong,tau1IP,tau2IP);
 
-  //filling the variables for the CP measurement
-  double acop = acoCP(tau1Prong,tau2Prong,
-		      tau1ref,tau2ref);
-  if (y<0) {
-    acop = acop + TMath::Pi();
-  }
-  if (acop>2*TMath::Pi()) {
-    acop = acop - 2*TMath::Pi();
-  }
+  if (analysisTree->tau_decayMode[tauIndex1]==1&&analysisTree->tau_decayMode[tauIndex2]==0)
+    otree->acotautau_10=acoCP(tau1Prong,tau2Prong,tau1Pi0,tau2IP);
 
-  otree->acotautau = acop;
+  if (analysisTree->tau_decayMode[tauIndex1]==0&&analysisTree->tau_decayMode[tauIndex2]==1)
+    otree->acotautau_01=acoCP(tau1Prong,tau2Prong,tau1IP,tau2Pi0);
+
+  if (analysisTree->tau_decayMode[tauIndex1]==1&&analysisTree->tau_decayMode[tauIndex2]==1)
+    otree->acotautau_11=acoCP(tau1Prong,tau2Prong,tau1Pi0,tau2Pi0);
 
 };
 

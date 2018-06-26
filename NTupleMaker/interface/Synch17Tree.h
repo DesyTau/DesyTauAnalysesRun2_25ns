@@ -211,7 +211,10 @@ public :
   Float_t         tau2DecayPlaneX;
   Float_t         tau2DecayPlaneY;
   Float_t         tau2DecayPlaneZ;
-  Float_t         acotautau;
+  Float_t         acotautau_00;
+  Float_t         acotautau_10;
+  Float_t         acotautau_01;
+  Float_t         acotautau_11;
   
   
 
@@ -406,7 +409,10 @@ public :
   TBranch        *b_tau2DecayPlaneX;
   TBranch        *b_tau2DecayPlaneY;
   TBranch        *b_tau2DecayPlaneZ;
-  TBranch        *b_acotautau;
+  TBranch        *b_acotautau_00;
+  TBranch        *b_acotautau_10;
+  TBranch        *b_acotautau_01;
+  TBranch        *b_acotautau_11;
   
   Synch17Tree(TTree *tree=0);
   virtual ~Synch17Tree();
