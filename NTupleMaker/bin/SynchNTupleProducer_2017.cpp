@@ -922,11 +922,11 @@ int main(int argc, char * argv[]){
       otree->xTriggerLep = false;
       otree->xTriggerTau = false;
 
-      // ************************
-      // implement l1tau matching
-      // ************************
-      bool matchedTau1L1 = false; 
-      bool matchedTau2L1 = false;
+      // ********************************
+      // FIXME : implement l1tau matching
+      // ********************************
+      //      bool matchedTau1L1 = false; 
+      //      bool matchedTau2L1 = false;
 
       for (unsigned int iT=0; iT<analysisTree.trigobject_count; ++iT) {
 	float dRtrigLep = deltaR(lep_eta, lep_phi, analysisTree.trigobject_eta[iT],analysisTree.trigobject_phi[iT]);        
@@ -981,6 +981,10 @@ int main(int argc, char * argv[]){
 	otree->singleLepTrigger = isSingleLepTrig;
 	otree->xTriggerLep = isXTrigLep;
 	otree->xTriggerTau = isXTrigTau;
+	otree->xTrigger = isXTrig;
+      }
+      if (ch=="tt") {
+	otree->ditauTrigger = isDiTauTrig;
       }
 
       //filling variables
@@ -1042,7 +1046,13 @@ int main(int argc, char * argv[]){
       if (!isData && ApplyLepSF) {
 	//std::cout<< iEntry <<std::endl;
 	if (ch=="tt") {
-	  
+	  otree->trigweight_1 = tauTriggerSF->getDiTauScaleFactor(analysisTree.tau_pt[tauIndex],
+								  analysisTree.tau_eta[tauIndex],
+								  analysisTree.tau_phi[tauIndex]);
+	  otree->trigweight_2 = tauTriggerSF->getDiTauScaleFactor(analysisTree.tau_pt[leptonIndex],
+                                                                  analysisTree.tau_eta[leptonIndex],
+                                                                  analysisTree.tau_phi[leptonIndex]);
+	  otree->trigweight = otree->trigweight_1 * otree->trigweight_2;
 	}
 	else {
 	  //std::cout<< "SF_lepIdIso" <<std::endl;
