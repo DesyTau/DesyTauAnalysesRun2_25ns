@@ -142,6 +142,8 @@ public :
   Bool_t	  trg_singleelectron;
   Bool_t          singleLepTrigger;
   Bool_t          ditauTrigger;
+  Bool_t          xTriggerLep;
+  Bool_t          xTriggerTau;
 
   //MET
   Float_t         met;
@@ -332,6 +334,8 @@ public :
   TBranch	 *b_mutaufakeweight;
 
   TBranch	 *b_xTrigger;
+  TBranch        *b_xTriggerLep;
+  TBranch        *b_xTriggerTau;
   TBranch	 *b_trg_singlemuon;
   TBranch	 *b_trg_singleelectron;
   TBranch	 *b_singleLepTrigger;

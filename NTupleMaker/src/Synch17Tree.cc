@@ -165,9 +165,12 @@ void Synch17Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("mutaufakeweight", &mutaufakeweight, &b_mutaufakeweight);
 
    fChain->SetBranchAddress("xTrigger",  &xTrigger, &b_xTrigger);
+   fChain->SetBranchAddress("xTriggerLep",  &xTriggerLep, &b_xTriggerLep);
+   fChain->SetBranchAddress("xTriggerTau",  &xTriggerTau, &b_xTriggerTau);
    fChain->SetBranchAddress("trg_singlemuon",  &trg_singlemuon, &b_trg_singlemuon);
    fChain->SetBranchAddress("trg_singleelectron",  &trg_singleelectron, &b_trg_singleelectron);
    fChain->SetBranchAddress("singleLepTrigger",  &singleLepTrigger, &b_singleLepTrigger);
+   fChain->SetBranchAddress("ditauTrigger", &ditauTrigger, &b_ditauTrigger);
 
    //MET
    fChain->SetBranchAddress("met", &met, &b_met);
@@ -417,7 +420,9 @@ void Synch17Tree::WriteInit(TTree *tree) {
    fChain->Branch("etaufakeweight", &etaufakeweight, "etaufakeweight/F");
    fChain->Branch("mutaufakeweight", &mutaufakeweight, "mutaufakeweight/F");
 
-   fChain->Branch("xTrigger",  &xTrigger, "xTrigger /O");
+   fChain->Branch("xTrigger",  &xTrigger, "xTrigger/O");
+   fChain->Branch("xTriggerLep",  &xTriggerLep, "xTriggerLep/O");
+   fChain->Branch("xTriggerTau",  &xTriggerTau, "xTriggerTau/O");
    fChain->Branch("trg_singlemuon",  &trg_singlemuon, "trg_singlemuon/O");
    fChain->Branch("trg_singleelectron",  &trg_singleelectron, "trg_singleelectron/O");
    fChain->Branch("singleLepTrigger",  &singleLepTrigger, "singleLepTrigger/O");
