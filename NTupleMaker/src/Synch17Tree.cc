@@ -238,7 +238,10 @@ void Synch17Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("tau2DecayPlaneX", &tau2DecayPlaneX, &b_tau2DecayPlaneX);
    fChain->SetBranchAddress("tau2DecayPlaneY", &tau2DecayPlaneY, &b_tau2DecayPlaneY);
    fChain->SetBranchAddress("tau2DecayPlaneZ", &tau2DecayPlaneZ, &b_tau2DecayPlaneZ);
-   fChain->SetBranchAddress("acotautau", &acotautau, &b_acotautau);
+   fChain->SetBranchAddress("acotautau_00", &acotautau_00, &b_acotautau_00);
+   fChain->SetBranchAddress("acotautau_10", &acotautau_10, &b_acotautau_10);
+   fChain->SetBranchAddress("acotautau_01", &acotautau_01, &b_acotautau_01);
+   fChain->SetBranchAddress("acotautau_11", &acotautau_11, &b_acotautau_11);
    
    lock=true;
 }
@@ -495,7 +498,10 @@ void Synch17Tree::WriteInit(TTree *tree) {
    fChain->Branch("tau2DecayPlaneX", &tau2DecayPlaneX, "tau2DecayPlaneX/F");
    fChain->Branch("tau2DecayPlaneY", &tau2DecayPlaneY, "tau2DecayPlaneY/F");
    fChain->Branch("tau2DecayPlaneZ", &tau2DecayPlaneZ, "tau2DecayPlaneZ/F");
-   fChain->Branch("acotautau", &acotautau, "acotautau/F");
+   fChain->Branch("acotautau_00", &acotautau_00, "acotautau_00/F");
+   fChain->Branch("acotautau_10", &acotautau_10, "acotautau_10/F");
+   fChain->Branch("acotautau_01", &acotautau_01, "acotautau_01/F");
+   fChain->Branch("acotautau_11", &acotautau_11, "acotautau_11/F");
 
 }
 
