@@ -1599,7 +1599,10 @@ void FillTau(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex){
 }
 
 void initializeCPvar(Synch17Tree *otree){
-  otree->acotautau=-9999;
+  otree->acotautau_00=-9999;
+  otree->acotautau_01=-9999;
+  otree->acotautau_10=-9999;
+  otree->acotautau_11=-9999;
 
   otree->tau1DecayPlaneX=-9999;
   otree->tau1DecayPlaneY=-9999;
