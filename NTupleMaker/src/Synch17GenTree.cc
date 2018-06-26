@@ -1,0 +1,159 @@
+/////////////////////////////////////////////////////////////
+// Read and Write Synch Ntuple for CP measurement in h->tau tau
+// Author: Andrea Cardini <andrea.cardini@desy.de>
+// 
+// Based on Spring15Tree by Francesco Costanza
+//////////////////////////////////////////////////////////
+
+
+#define Synch17Tree_cxx
+#include "DesyTauAnalyses/NTupleMaker/interface/Synch17Tree.h"
+
+// Initialization
+Synch17GenTree::Synch17GenTree(TTree *tree) : fChain(0) {
+  lock = false;
+  ientry = -2;
+  
+  if (!tree) return;
+  
+  Init(tree);
+}
+
+void Synch17GenTree::Init(TTree *tree){
+  if(!tree) return;
+	      
+  if(tree->GetEntries())
+    ReadInit(tree);
+  else
+    WriteInit(tree);
+}
+
+// Destructors
+Synch17GenTree::~Synch17GenTree(){
+   if (!fChain) return;
+   delete fChain->GetCurrentFile();
+}
+
+// Read methods
+void Synch17GenTree::ReadInit(TTree *tree)
+{
+   // The Init() function is called when the selector needs to initialize
+   // a new tree or chain. Typically here the branch addresses and branch
+   // pointers of the tree will be set.
+   // It is normally not necessary to make changes to the generated
+   // code, but the routine can be extended by the user if needed.
+   // Init() will be called many times when running on PROOF
+   // (once per file to be processed).
+
+   // Set branch addresses and branch pointers
+   if (!tree) return;
+   if (lock) return;
+   ReadReset();
+   
+   fChain = tree;
+   fCurrent = -1;
+   fChain->SetMakeClass(1);
+
+   fChain->SetBranchAddress("genpt_1", &genpt_1, &b_genpt_1);
+   fChain->SetBranchAddress("genphi_1", &genphi_1, &b_genphi_1);
+   fChain->SetBranchAddress("geneta_1", &geneta_1, &b_geneta_1);
+   fChain->SetBranchAddress("genpt_2", &genpt_2, &b_genpt_2);
+   fChain->SetBranchAddress("genphi_2", &genphi_2, &b_genphi_2);
+   fChain->SetBranchAddress("geneta_2", &geneta_2, &b_geneta_2);
+   fChain->SetBranchAddress("acotautau_00", &acotautau_00, &b_acotautau_00);
+   fChain->SetBranchAddress("acotautau_10", &acotautau_10, &b_acotautau_10);
+   fChain->SetBranchAddress("acotautau_01", &acotautau_01, &b_acotautau_01);
+   fChain->SetBranchAddress("acotautau_11", &acotautau_11, &b_acotautau_11);
+   
+   lock=true;
+}
+
+void Synch17GenTree::ReadReset(){
+  ientry = -2;
+}
+
+Long64_t Synch17GenTree::GetEntries(){
+  if (!fChain) return -1;
+  
+  return fChain->GetEntriesFast();
+}
+
+Long64_t Synch17GenTree::LoadTree(Long64_t entry){
+  // Set the environment to read one entry
+  if (!fChain) return -5;
+  
+  Long64_t centry = fChain->LoadTree(entry);
+  if (centry < 0) return centry;
+  
+  if (fChain->GetTreeNumber() != fCurrent)
+    fCurrent = fChain->GetTreeNumber();
+
+  ientry = entry;
+  return centry;
+}
+
+Long64_t Synch17GenTree::GetEntry(Long64_t entry){
+  // Read contents of entry.
+  // Sequential reading if entry < 0
+  
+  if (!fChain) return -1;
+
+  if (entry < 0){
+    if(ientry < 0) ientry = -1;
+
+    ++ientry;
+    entry = ientry;
+  }
+
+  if (LoadTree(entry) < 0) return -1;
+
+  return fChain->GetEntry(entry);
+}
+
+Long64_t Synch17GenTree::LoadedEntryId(){
+  return ientry;
+}
+    
+
+void Synch17GenTree::Show(Long64_t entry){
+  // Print contents of entry.
+  // If entry is not specified, print current entry
+  if (!fChain) return;
+  fChain->Show(entry);
+}
+
+Int_t Synch17GenTree::Cut(Long64_t entry){
+  // This function may be called from Loop.
+  // returns  1 if entry is accepted.
+  // returns -1 otherwise.
+  return 1;
+}
+
+
+//Write Methods
+void Synch17GenTree::WriteInit(TTree *tree) {
+  if (!tree) return;
+   
+  fChain = tree;
+  fCurrent = -1;
+
+   fChain->Branch("genpt_1", &genpt_1, "genpt_1/F");
+   fChain->Branch("genphi_1", &genphi_1, "genphi_1/F");
+   fChain->Branch("geneta_1", &geneta_1, "geneta_1/F");
+   fChain->Branch("genpt_2", &genpt_2, "genpt_2/F");
+   fChain->Branch("genphi_2", &genphi_2, "genphi_2/F");
+   fChain->Branch("geneta_2", &geneta_2, "geneta_2/F");
+   fChain->Branch("acotautau_00", &acotautau_00, "acotautau_00/F");
+   fChain->Branch("acotautau_10", &acotautau_10, "acotautau_10/F");
+   fChain->Branch("acotautau_01", &acotautau_01, "acotautau_01/F");
+   fChain->Branch("acotautau_11", &acotautau_11, "acotautau_11/F");
+
+}
+
+void Synch17GenTree::Fill(){
+  if(!fChain) return;
+  if(lock) return;
+
+  fChain->Fill();
+}
+
