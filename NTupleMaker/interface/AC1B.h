@@ -25,7 +25,7 @@ public :
 
    // Declaration of leaf types
    UInt_t          errors;
-   UInt_t          event_nr;
+   ULong64_t       event_nr;
    UInt_t          event_run;
    UInt_t          event_timeunix;
    UInt_t          event_timemicrosec;
@@ -56,7 +56,7 @@ public :
    Float_t         muon_normChi2[50];   //[muon_count]
    Float_t         muon_ndof[50];   //[muon_count]
    Float_t         muon_charge[50];   //[muon_count]
-   Float_t         muon_miniISO[50];   //[muon_count]
+   Float_t         muon_puIso[50];   //[muon_count]
    Float_t         muon_combQ_chi2LocalPosition[50];   //[muon_count]
    Float_t         muon_combQ_trkKink[50];   //[muon_count]
    Float_t         muon_validFraction[50];   //[muon_count]
@@ -72,7 +72,7 @@ public :
    Float_t         muon_chargedHadIso[50];   //[muon_count]
    Float_t         muon_neutralHadIso[50];   //[muon_count]
    Float_t         muon_photonIso[50];   //[muon_count]
-   Float_t         muon_puIso[50];   //[muon_count]
+   Float_t         muon_relIso[50];   //[muon_count]
    Float_t         muon_r03_sumChargedHadronPt[50];   //[muon_count]
    Float_t         muon_r03_sumChargedParticlePt[50];   //[muon_count]
    Float_t         muon_r03_sumNeutralHadronEt[50];   //[muon_count]
@@ -163,7 +163,7 @@ public :
    Float_t         electron_ehcaloverecaldepth2[50];   //[electron_count]
    Float_t         electron_full5x5_sigmaietaieta[50];   //[electron_count]
    Float_t         electron_ooemoop[50];   //[electron_count]
-   Float_t         electron_miniISO[50];   //[electron_count]
+   Float_t         electron_puIso[50];   //[electron_count]
    Float_t         electron_superclusterEta[50];   //[electron_count]
    Float_t         electron_superclusterPhi[50];   //[electron_count]
    Float_t         electron_superclusterX[50];   //[electron_count]
@@ -172,7 +172,7 @@ public :
    Float_t         electron_chargedHadIso[50];   //[electron_count]
    Float_t         electron_neutralHadIso[50];   //[electron_count]
    Float_t         electron_photonIso[50];   //[electron_count]
-   Float_t         electron_puIso[50];   //[electron_count]
+   Float_t         electron_relIso[50];   //[electron_count]
    Float_t         electron_r03_sumChargedHadronPt[50];   //[electron_count]
    Float_t         electron_r03_sumChargedParticlePt[50];   //[electron_count]
    Float_t         electron_r03_sumNeutralHadronEt[50];   //[electron_count]
@@ -361,15 +361,7 @@ public :
    Float_t         mvamet_lep1_pt[50];   //[mvamet_count]
    Float_t         mvamet_lep2_pt[50];   //[mvamet_count]
    Float_t         genweight;
-   Float_t         genid1;
-   Float_t         genx1;
-   Float_t         genid2;
-   Float_t         genx2;
-   Float_t         genScale;
-   Int_t           numpileupinteractionsminus;
-   Int_t           numpileupinteractions;
-   Int_t           numpileupinteractionsplus;
-   Float_t         numtruepileupinteractions;
+
    Float_t         weightScale0;
    Float_t         weightScale1;
    Float_t         weightScale2;
@@ -379,9 +371,19 @@ public :
    Float_t         weightScale6;
    Float_t         weightScale7;
    Float_t         weightScale8;
+
    Float_t         weightPDFup;
    Float_t         weightPDFdown;
 
+   Float_t         genid1;
+   Float_t         genx1;
+   Float_t         genid2;
+   Float_t         genx2;
+   Float_t         genScale;
+   Int_t           numpileupinteractionsminus;
+   Int_t           numpileupinteractions;
+   Int_t           numpileupinteractionsplus;
+   Float_t         numtruepileupinteractions;
    UInt_t          gentau_count;
    Float_t         gentau_e[50];   //[gentau_count]
    Float_t         gentau_px[50];   //[gentau_count]
@@ -581,7 +583,8 @@ public :
    Float_t         tau_againstMuonLoose3[50];   //[tau_count]
    Float_t         tau_againstMuonTight3[50];   //[tau_count]
    Float_t         tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[50];   //[tau_count]
-   Float_t         tau_byIsolationMVArun2v1DBdR03oldDMwLTraw[50];   //[tau_count]
+   Float_t         tau_byIsolationMVArun2v1Tight[50];   //[tau_count]
+   Float_t         tau_byIsolationMVArun2v1Medium[50];   //[tau_count]
    Float_t         tau_byIsolationMVArun2v1DBnewDMwLTraw[50];   //[tau_count]
    Float_t         tau_byIsolationMVArun2v1DBoldDMwLTraw[50];   //[tau_count]
    Float_t         tau_byIsolationMVArun2v1PWdR03oldDMwLTraw[50];   //[tau_count]
@@ -639,28 +642,18 @@ public :
    Float_t         tau_photonPtSumOutsideSignalConedR03[50];   //[tau_count]
    Float_t         tau_photonPtSumOutsideSignalConed[50];
    Float_t         tau_puCorrPtSum[50];   //[tau_count]
-
-   UInt_t track_count;
-  int track_ID[1000];
-  Float_t track_px[1000];
-  Float_t track_py[1000];
-  Float_t track_pz[1000];
-  Float_t track_pt[1000];
-  Float_t track_eta[1000];
-  Float_t track_phi[1000];
-  Float_t track_charge[1000];
-  Float_t track_mass[1000];
-  Float_t track_dxy[1000];
-  Float_t track_dxyerr[1000];
-  Float_t track_dz[1000];
-  Float_t track_dzerr[1000];
-
-
-
-
-
-
-
+   // weights for ttbar uncertainty 
+   /*Float_t         weightScale0;
+   Float_t         weightScale1;
+   Float_t         weightScale2;
+   Float_t         weightScale3;
+   Float_t         weightScale4;
+   Float_t         weightScale5;
+   Float_t         weightScale6;
+   Float_t         weightScale7;
+   Float_t         weightScale8;
+   Float_t         weightPDFup;
+   Float_t         weightPDFdown;*/
 
 
    // List of branches
@@ -696,7 +689,7 @@ public :
    TBranch        *b_muon_normChi2;   //!
    TBranch        *b_muon_ndof;   //!
    TBranch        *b_muon_charge;   //!
-   TBranch        *b_muon_miniISO;   //!
+   TBranch        *b_muon_puIso;   //!
    TBranch        *b_muon_combQ_chi2LocalPosition;   //!
    TBranch        *b_muon_combQ_trkKink;   //!
    TBranch        *b_muon_validFraction;   //!
@@ -712,7 +705,7 @@ public :
    TBranch        *b_muon_chargedHadIso;   //!
    TBranch        *b_muon_neutralHadIso;   //!
    TBranch        *b_muon_photonIso;   //!
-   TBranch        *b_muon_puIso;   //!
+   TBranch        *b_muon_relIso;   //!
    TBranch        *b_muon_r03_sumChargedHadronPt;   //!
    TBranch        *b_muon_r03_sumChargedParticlePt;   //!
    TBranch        *b_muon_r03_sumNeutralHadronEt;   //!
@@ -802,7 +795,7 @@ public :
    TBranch        *b_electron_ehcaloverecaldepth2;   //!
    TBranch        *b_electron_full5x5_sigmaietaieta;   //!
    TBranch        *b_electron_ooemoop;   //!
-   TBranch        *b_electron_miniISO;   //!
+   TBranch        *b_electron_puIso;   //!
    TBranch        *b_electron_superclusterEta;   //!
    TBranch        *b_electron_superclusterPhi;   //!
    TBranch        *b_electron_superclusterX;   //!
@@ -811,7 +804,7 @@ public :
    TBranch        *b_electron_chargedHadIso;   //!
    TBranch        *b_electron_neutralHadIso;   //!
    TBranch        *b_electron_photonIso;   //!
-   TBranch        *b_electron_puIso;   //!
+   TBranch        *b_electron_relIso;   //!
    TBranch        *b_electron_r03_sumChargedHadronPt;   //!
    TBranch        *b_electron_r03_sumChargedParticlePt;   //!
    TBranch        *b_electron_r03_sumNeutralHadronEt;   //!
@@ -999,11 +992,7 @@ public :
    TBranch        *b_mvamet_lep1_pt;   //!
    TBranch        *b_mvamet_lep2_pt;   //!
    TBranch        *b_genweight;   //!
-   TBranch        *b_genid1;   //!
-   TBranch        *b_genx1;   //!
-   TBranch        *b_genid2;   //!
-   TBranch        *b_genx2;   //!
-   TBranch        *b_genScale;   //!
+
    TBranch        *b_weightScale0;
    TBranch        *b_weightScale1;
    TBranch        *b_weightScale2;
@@ -1013,11 +1002,15 @@ public :
    TBranch        *b_weightScale6;
    TBranch        *b_weightScale7;
    TBranch        *b_weightScale8;
-   TBranch        *b_weightScale9;
 
    TBranch        *b_weightPDFup;
    TBranch        *b_weightPDFdown;
 
+   TBranch        *b_genid1;   //!
+   TBranch        *b_genx1;   //!
+   TBranch        *b_genid2;   //!
+   TBranch        *b_genx2;   //!
+   TBranch        *b_genScale;   //!
    TBranch        *b_numpileupinteractionsminus;   //!
    TBranch        *b_numpileupinteractions;   //!
    TBranch        *b_numpileupinteractionsplus;   //!
@@ -1206,7 +1199,8 @@ public :
    TBranch        *b_tau_againstMuonLoose3;   //!
    TBranch        *b_tau_againstMuonTight3;   //!
    TBranch        *b_tau_byCombinedIsolationDeltaBetaCorrRaw3Hits;   //!
-   TBranch        *b_tau_byIsolationMVArun2v1DBdR03oldDMwLTraw;   //!
+   TBranch        *b_tau_byIsolationMVArun2v1Tight;   //!
+   TBranch        *b_tau_byIsolationMVArun2v1Medium;   //!
    TBranch        *b_tau_byIsolationMVArun2v1DBnewDMwLTraw;   //!
    TBranch        *b_tau_byIsolationMVArun2v1DBoldDMwLTraw;   //!
    TBranch        *b_tau_byIsolationMVArun2v1PWdR03oldDMwLTraw;   //!
@@ -1264,6 +1258,19 @@ public :
    TBranch        *b_tau_neutralIsoPtSumdR03;   //!
    TBranch        *b_tau_photonPtSumOutsideSignalConedR03;   //!
    TBranch        *b_tau_puCorrPtSum;   //!
+   // weights for ttbar uncertainty 
+   /*TBranch         *b_weightScale0;
+   TBranch         *b_weightScale1;
+   TBranch         *b_weightScale2;
+   TBranch         *b_weightScale3;
+   TBranch         *b_weightScale4;
+   TBranch         *b_weightScale5;
+   TBranch         *b_weightScale6;
+   TBranch         *b_weightScale7;
+   TBranch         *b_weightScale8;
+   TBranch         *b_weightPDFup;
+   TBranch         *b_weightPDFdown;*/
+
 
    AC1B(TTree *tree=0, bool isData=false);
    virtual ~AC1B();
@@ -1308,7 +1315,7 @@ Int_t AC1B::GetEntry(Long64_t entry)
 // Read contents of entry.
    if (!fChain) return 0;
    Int_t entryX = fChain->GetEntry(entry);
-   
+   /*
    if (entry>0) {
        hltriggerresults_first.clear();
        hltriggerresults_second.clear();
@@ -1332,7 +1339,7 @@ Int_t AC1B::GetEntry(Long64_t entry)
 	 flags_second.push_back(it->second);
        }
 
-   }
+   }*/
    return entryX;
 }
 Long64_t AC1B::LoadTree(Long64_t entry)
@@ -1413,7 +1420,7 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("muon_normChi2", muon_normChi2, &b_muon_normChi2);
    fChain->SetBranchAddress("muon_ndof", muon_ndof, &b_muon_ndof);
    fChain->SetBranchAddress("muon_charge", muon_charge, &b_muon_charge);
-   fChain->SetBranchAddress("muon_miniISO", muon_miniISO, &b_muon_miniISO);
+   fChain->SetBranchAddress("muon_puIso", muon_puIso, &b_muon_puIso);
    fChain->SetBranchAddress("muon_combQ_chi2LocalPosition", muon_combQ_chi2LocalPosition, &b_muon_combQ_chi2LocalPosition);
    fChain->SetBranchAddress("muon_combQ_trkKink", muon_combQ_trkKink, &b_muon_combQ_trkKink);
    fChain->SetBranchAddress("muon_validFraction", muon_validFraction, &b_muon_validFraction);
@@ -1429,7 +1436,7 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("muon_chargedHadIso", muon_chargedHadIso, &b_muon_chargedHadIso);
    fChain->SetBranchAddress("muon_neutralHadIso", muon_neutralHadIso, &b_muon_neutralHadIso);
    fChain->SetBranchAddress("muon_photonIso", muon_photonIso, &b_muon_photonIso);
-   fChain->SetBranchAddress("muon_puIso", muon_puIso, &b_muon_puIso);
+   fChain->SetBranchAddress("muon_relIso", muon_relIso, &b_muon_relIso);
    fChain->SetBranchAddress("muon_r03_sumChargedHadronPt", muon_r03_sumChargedHadronPt, &b_muon_r03_sumChargedHadronPt);
    fChain->SetBranchAddress("muon_r03_sumChargedParticlePt", muon_r03_sumChargedParticlePt, &b_muon_r03_sumChargedParticlePt);
    fChain->SetBranchAddress("muon_r03_sumNeutralHadronEt", muon_r03_sumNeutralHadronEt, &b_muon_r03_sumNeutralHadronEt);
@@ -1520,7 +1527,7 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("electron_ehcaloverecaldepth2", electron_ehcaloverecaldepth2, &b_electron_ehcaloverecaldepth2);
    fChain->SetBranchAddress("electron_full5x5_sigmaietaieta", electron_full5x5_sigmaietaieta, &b_electron_full5x5_sigmaietaieta);
    fChain->SetBranchAddress("electron_ooemoop", electron_ooemoop, &b_electron_ooemoop);
-   fChain->SetBranchAddress("electron_miniISO", electron_miniISO, &b_electron_miniISO);
+   fChain->SetBranchAddress("electron_puIso", electron_puIso, &b_electron_puIso);
    fChain->SetBranchAddress("electron_superclusterEta", electron_superclusterEta, &b_electron_superclusterEta);
    fChain->SetBranchAddress("electron_superclusterPhi", electron_superclusterPhi, &b_electron_superclusterPhi);
    fChain->SetBranchAddress("electron_superclusterX", electron_superclusterX, &b_electron_superclusterX);
@@ -1529,7 +1536,7 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("electron_chargedHadIso", electron_chargedHadIso, &b_electron_chargedHadIso);
    fChain->SetBranchAddress("electron_neutralHadIso", electron_neutralHadIso, &b_electron_neutralHadIso);
    fChain->SetBranchAddress("electron_photonIso", electron_photonIso, &b_electron_photonIso);
-   fChain->SetBranchAddress("electron_puIso", electron_puIso, &b_electron_puIso);
+   fChain->SetBranchAddress("electron_relIso", electron_relIso, &b_electron_relIso);
    fChain->SetBranchAddress("electron_r03_sumChargedHadronPt", electron_r03_sumChargedHadronPt, &b_electron_r03_sumChargedHadronPt);
    fChain->SetBranchAddress("electron_r03_sumChargedParticlePt", electron_r03_sumChargedParticlePt, &b_electron_r03_sumChargedParticlePt);
    fChain->SetBranchAddress("electron_r03_sumNeutralHadronEt", electron_r03_sumNeutralHadronEt, &b_electron_r03_sumNeutralHadronEt);
@@ -1549,12 +1556,6 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("electron_dzerr", electron_dzerr, &b_electron_dzerr);
    fChain->SetBranchAddress("electron_convdist", electron_convdist, &b_electron_convdist);
    fChain->SetBranchAddress("electron_gapinfo", electron_gapinfo, &b_electron_gapinfo);
-   fChain->SetBranchAddress("electron_chargeinfo", electron_chargeinfo, &b_electron_chargeinfo);
-   fChain->SetBranchAddress("electron_fbrems", electron_fbrems, &b_electron_fbrems);
-   fChain->SetBranchAddress("electron_numbrems", electron_numbrems, &b_electron_numbrems);
-   fChain->SetBranchAddress("electron_charge", electron_charge, &b_electron_charge);
-   fChain->SetBranchAddress("electron_superclusterindex", electron_superclusterindex, &b_electron_superclusterindex);
-   fChain->SetBranchAddress("electron_info", electron_info, &b_electron_info);
    fChain->SetBranchAddress("electron_chargeinfo", electron_chargeinfo, &b_electron_chargeinfo);
    fChain->SetBranchAddress("electron_fbrems", electron_fbrems, &b_electron_fbrems);
    fChain->SetBranchAddress("electron_numbrems", electron_numbrems, &b_electron_numbrems);
@@ -1723,12 +1724,6 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("mvamet_lep1_pt", &mvamet_lep1_pt, &b_mvamet_lep1_pt);
    fChain->SetBranchAddress("mvamet_lep2_pt", &mvamet_lep2_pt, &b_mvamet_lep2_pt);
    fChain->SetBranchAddress("genweight", &genweight, &b_genweight);
-   fChain->SetBranchAddress("genid1", &genid1, &b_genid1);
-   fChain->SetBranchAddress("genx1", &genx1, &b_genx1);
-   fChain->SetBranchAddress("genid2", &genid2, &b_genid2);
-   fChain->SetBranchAddress("genx2", &genx2, &b_genx2);
-   fChain->SetBranchAddress("genScale", &genScale, &b_genScale);
-
 
    fChain->SetBranchAddress("weightScale0", &weightScale0, &b_weightScale0);
    fChain->SetBranchAddress("weightScale1", &weightScale1, &b_weightScale1);
@@ -1743,6 +1738,11 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("weightPDFup", &weightPDFup, &b_weightPDFup);
    fChain->SetBranchAddress("weightPDFdown", &weightPDFdown, &b_weightPDFdown);
 
+   fChain->SetBranchAddress("genid1", &genid1, &b_genid1);
+   fChain->SetBranchAddress("genx1", &genx1, &b_genx1);
+   fChain->SetBranchAddress("genid2", &genid2, &b_genid2);
+   fChain->SetBranchAddress("genx2", &genx2, &b_genx2);
+   fChain->SetBranchAddress("genScale", &genScale, &b_genScale);
    fChain->SetBranchAddress("numpileupinteractionsminus", &numpileupinteractionsminus, &b_numpileupinteractionsminus);
    fChain->SetBranchAddress("numpileupinteractions", &numpileupinteractions, &b_numpileupinteractions);
    fChain->SetBranchAddress("numpileupinteractionsplus", &numpileupinteractionsplus, &b_numpileupinteractionsplus);
@@ -1931,7 +1931,8 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("tau_againstMuonLoose3", tau_againstMuonLoose3, &b_tau_againstMuonLoose3);
    fChain->SetBranchAddress("tau_againstMuonTight3", tau_againstMuonTight3, &b_tau_againstMuonTight3);
    fChain->SetBranchAddress("tau_byCombinedIsolationDeltaBetaCorrRaw3Hits", tau_byCombinedIsolationDeltaBetaCorrRaw3Hits, &b_tau_byCombinedIsolationDeltaBetaCorrRaw3Hits);
-   fChain->SetBranchAddress("tau_byIsolationMVArun2v1DBdR03oldDMwLTraw", tau_byIsolationMVArun2v1DBdR03oldDMwLTraw, &b_tau_byIsolationMVArun2v1DBdR03oldDMwLTraw);
+   fChain->SetBranchAddress("tau_byIsolationMVArun2v1Tight", tau_byIsolationMVArun2v1Tight, &b_tau_byIsolationMVArun2v1Tight);
+   fChain->SetBranchAddress("tau_byIsolationMVArun2v1Medium", tau_byIsolationMVArun2v1Medium, &b_tau_byIsolationMVArun2v1Medium);
    fChain->SetBranchAddress("tau_byIsolationMVArun2v1DBnewDMwLTraw", tau_byIsolationMVArun2v1DBnewDMwLTraw, &b_tau_byIsolationMVArun2v1DBnewDMwLTraw);
    fChain->SetBranchAddress("tau_byIsolationMVArun2v1DBoldDMwLTraw", tau_byIsolationMVArun2v1DBoldDMwLTraw, &b_tau_byIsolationMVArun2v1DBoldDMwLTraw);
    fChain->SetBranchAddress("tau_byIsolationMVArun2v1PWdR03oldDMwLTraw", tau_byIsolationMVArun2v1PWdR03oldDMwLTraw, &b_tau_byIsolationMVArun2v1PWdR03oldDMwLTraw);
@@ -1989,27 +1990,18 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("tau_neutralIsoPtSumdR03", tau_neutralIsoPtSumdR03, &b_tau_neutralIsoPtSumdR03);
    fChain->SetBranchAddress("tau_photonPtSumOutsideSignalConedR03", tau_photonPtSumOutsideSignalConedR03, &b_tau_photonPtSumOutsideSignalConedR03);
    fChain->SetBranchAddress("tau_puCorrPtSum", tau_puCorrPtSum, &b_tau_puCorrPtSum);
-
-/*
-   fChain->SetBranchAddress("track_count", &track_count);
-   fChain->SetBranchAddress("track_ID", track_ID);
-   fChain->SetBranchAddress("track_px", track_px);
-   fChain->SetBranchAddress("track_py", track_py);
-   fChain->SetBranchAddress("track_pz", track_pz);
-   fChain->SetBranchAddress("track_pt", track_pt);
-   fChain->SetBranchAddress("track_eta", track_eta);
-   fChain->SetBranchAddress("track_phi", track_phi);
-   fChain->SetBranchAddress("track_mass", track_mass);
-   fChain->SetBranchAddress("track_charge", track_charge);
-   fChain->SetBranchAddress("track_dxy", track_dxy);
-   fChain->SetBranchAddress("track_dxyerr", track_dxyerr);
-   fChain->SetBranchAddress("track_dz", track_dz);
-   fChain->SetBranchAddress("track_dzerr",track_dzerr);
-
-*/
-
-
-
+     // weights for ttbar uncertainty
+   /*fChain->SetBranchAddress("weightScale0",  &weightScale0, &b_weightScale0);
+   fChain->SetBranchAddress("weightScale1",  &weightScale1, &b_weightScale1);
+   fChain->SetBranchAddress("weightScale2",  &weightScale2, &b_weightScale2);
+   fChain->SetBranchAddress("weightScale3",  &weightScale3, &b_weightScale3);
+   fChain->SetBranchAddress("weightScale4",  &weightScale4, &b_weightScale4);
+   fChain->SetBranchAddress("weightScale5",  &weightScale5, &b_weightScale5);
+   fChain->SetBranchAddress("weightScale6",  &weightScale6, &b_weightScale6);
+   fChain->SetBranchAddress("weightScale7",  &weightScale7, &b_weightScale7);
+   fChain->SetBranchAddress("weightScale8",  &weightScale8, &b_weightScale8);
+   fChain->SetBranchAddress("weightPDFup",   &weightPDFup, &b_weightPDFup);
+   fChain->SetBranchAddress("weightPDFdown", &weightPDFdown, &b_weightPDFdown);*/
    Notify();
 }
 

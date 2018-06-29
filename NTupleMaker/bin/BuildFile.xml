@@ -7,90 +7,6 @@
   <use name="root"/>
 </bin>
 
-<bin name="SynchNTupleProducer_mt" file="SynchNTupleProducer_mt.cpp">
- <use name="PhysicsTools/Utilities"/>
- <use name="rootgraphics"/>
- <use name="root"/>
- <use name="rootmath"/>
- <use name="roottmva"/>
- <use name="boost" />
- <use name="boost_program_options"/>
- <use name="DesyTauAnalyses/NTupleMaker"/>
- <use name="FWCore/ParameterSet"/>
- <use name="TauAnalysis/SVfitStandalone"/>
- <use name="CondFormats/BTauObjects"/>
- <use name="CondTools/BTau"/>
- <use name="TauAnalysis/SVfitStandalone"/>
- <use name="HTT-utilities/LepEffInterface"/>
- <use name="HTT-utilities/RecoilCorrections"/>
-</bin>
-
-<bin name="SynchNTupleProducer_em" file="SynchNTupleProducer_em.cpp">
- <use name="PhysicsTools/Utilities"/>
- <use name="rootgraphics"/>
- <use name="root"/>
- <use name="rootmath"/>
- <use name="roottmva"/>
- <use name="boost" />
- <use name="boost_program_options"/>
- <use name="DesyTauAnalyses/NTupleMaker"/>
- <use name="FWCore/ParameterSet"/>
- <use name="CondFormats/BTauObjects"/>
- <use name="CondTools/BTau"/>
- <use name="TauAnalysis/SVfitStandalone"/>
- <use name="HTT-utilities/LepEffInterface"/>
- <use name="HTT-utilities/RecoilCorrections"/>
- <use name="HTT-utilities/QCDModelingEMu"/>
-</bin>
-
-<bin name="SynchNTupleProducer_Spring15_lept" file="SynchNTupleProducer_Spring15_lept.cpp">
- <use name="PhysicsTools/Utilities"/>
- <use name="rootgraphics"/>
- <use name="root"/>
- <use name="rootmath"/>
- <use name="roottmva"/>
- <use name="roofit"/>
- <use name="boost" />
- <use name="boost_program_options"/>
- <use name="DesyTauAnalyses/NTupleMaker"/>
-</bin>
-
-<bin name="EffUpdater" file="EffUpdater.cpp">
- <use name="PhysicsTools/Utilities"/>
- <use name="rootgraphics"/>
- <use name="root"/>
- <use name="rootmath"/>
- <use name="roottmva"/>
- <use name="roofit"/>
- <use name="boost" />
- <use name="boost_program_options"/>
- <use name="DesyTauAnalyses/NTupleMaker"/>
-</bin>
-
-
-<bin name="AnalysisNTupleProducer" file="AnalysisNTupleProducer.cpp">
- <use name="PhysicsTools/Utilities"/>
- <use name="rootgraphics"/>
- <use name="root"/>
- <use name="rootmath"/>
- <use name="roottmva"/>
- <use name="boost" />
- <use name="boost_program_options"/>
- <use name="DesyTauAnalyses/NTupleMaker"/>
- <use name="HTT-utilities/LepEffInterface"/>
-</bin>
-
-<bin name="AnalysisNTupleFakeRate" file="AnalysisNTupleFakeRate.cpp">
- <use name="PhysicsTools/Utilities"/>
- <use name="rootgraphics"/>
- <use name="root"/>
- <use name="rootmath"/>
- <use name="roottmva"/>
- <use name="boost" />
- <use name="boost_program_options"/>
- <use name="DesyTauAnalyses/NTupleMaker"/>
- <use name="HTT-utilities/LepEffInterface"/>
-</bin>
 
 <bin name="AnalysisMacro_dimuons" file="AnalysisMacro_dimuons.cpp">
  <use name="HTT-utilities/RecoilCorrections"/>
@@ -119,167 +35,9 @@
  <use name="HTT-utilities/LepEffInterface"/>
 </bin>
 
-<bin name="AnalysisMacro_EMu" file="AnalysisMacro_EMu.cpp">
- <use name="PhysicsTools/Utilities"/>
- <use name="rootgraphics"/>
- <use name="root"/>
- <use name="rootmath"/>
- <use name="roottmva"/>
- <use name="boost" />
- <use name="boost_program_options"/>
- <use name="DesyTauAnalyses/NTupleMaker"/>
-</bin>
-
-<bin name="AnalysisMacro_ZTauTauMuMu" file="AnalysisMacro_ZTauTauMuMu.cpp">
- <use name="PhysicsTools/Utilities"/>
- <use name="rootgraphics"/>
- <use name="root"/>
- <use name="rootmath"/>
- <use name="roottmva"/>
- <use name="boost" />
- <use name="boost_program_options"/>
- <use name="DesyTauAnalyses/NTupleMaker"/>
- <use name="TauAnalysis/SVfitStandalone"/>
- <use name="CondFormats/BTauObjects"/>
- <use name="HTT-utilities/LepEffInterface"/>
- <use name="HTT-utilities/RecoilCorrections"/>
- <use name="HTT-utilities/QCDModelingEMu"/>
-</bin>
-
-<bin name="AnalysisMacro_ZTTMM" file="AnalysisMacro_ZTTMM.cpp">
- <use name="PhysicsTools/Utilities"/>
- <use name="rootgraphics"/>
- <use name="root"/>
- <use name="rootmath"/>
- <use name="roottmva"/>
- <use name="boost" />
- <use name="boost_program_options"/>
- <use name="DesyTauAnalyses/NTupleMaker"/>
- <use name="HTT-utilities/LepEffInterface"/>
- <use name="HTT-utilities/RecoilCorrections"/>
-</bin>
-
-<bin name="AnalysisMacro_SV" file="AnalysisMacro_zttmmSV.cpp">
- <use name="PhysicsTools/Utilities"/>
- <use name="rootgraphics"/>
- <use name="root"/>
- <use name="rootmath"/>
- <use name="roottmva"/>
- <use name="boost" />
- <use name="boost_program_options"/>
- <use name="DesyTauAnalyses/NTupleMaker"/>
- <use name="TauAnalysis/SVfitStandalone"/>
- <use name="HTT-utilities/LepEffInterface"/>
- <use name="HTT-utilities/RecoilCorrections"/>
-</bin>
 
 
-
-<bin   file="preAnalyzerTauTau_Summer15.cc"  name="preAnalyzerTauTau">
-  <use   name="DataFormats/FWLite"/>
-  <use   name="FWCore/FWLite"/>
-  <use   name="FWCore/ParameterSet"/>
-  <use   name="FWCore/PythonParameterSet"/>
-  <use   name="TauAnalysis/SVfitStandalone"/>
-  <use   name="PhysicsTools/FWLite"/>
-  <use   name="PhysicsTools/Utilities"/>
-  <use   name="roofit"/>
-  <use   name="root"/>
-  <use   name="rootgraphics"/>
-</bin>
-
-
-<bin name="TagAndProbe2016_mumu" file="TagAndProbe2016_mumu.cpp">
- <use name="PhysicsTools/Utilities"/>
- <use name="rootgraphics"/>
- <use name="root"/>
- <use name="rootmath"/>
- <use name="roottmva"/>
- <use name="boost" />
- <use name="boost_program_options"/>
- <use name="DesyTauAnalyses/NTupleMaker"/>
-</bin>
-
-<bin name="TagAndProbe2016_ee" file="TagAndProbe2016_ee.cpp">
- <use name="PhysicsTools/Utilities"/>
- <use name="rootgraphics"/>
- <use name="root"/>
- <use name="rootmath"/>
- <use name="roottmva"/>
- <use name="boost" />
- <use name="boost_program_options"/>
- <use name="DesyTauAnalyses/NTupleMaker"/>
- <use name="TauAnalysis/SVfitStandalone"/> 
-</bin>
-
-<bin name="diMuon2016" file="diMuon2016.cpp">
- <use name="PhysicsTools/Utilities"/>
- <use name="rootgraphics"/>
- <use name="root"/>
- <use name="rootmath"/>
- <use name="roottmva"/>
- <use name="boost" />
- <use name="boost_program_options"/>
- <use name="DesyTauAnalyses/NTupleMaker"/>
- <use name="TauAnalysis/SVfitStandalone"/> 
-</bin>
-
-
-<bin name="SingleMu" file="SingleMu.cpp">
- <use name="PhysicsTools/Utilities"/>
- <use name="rootgraphics"/>
- <use name="root"/>
- <use name="rootmath"/>
- <use name="roottmva"/>
- <use name="boost" />
- <use name="boost_program_options"/>
- <use name="DesyTauAnalyses/NTupleMaker"/>
- <use name="HTT-utilities/LepEffInterface"/>
- <use name="HTT-utilities/RecoilCorrections"/>
- <use name="HTT-utilities/TrackEff"/>
- <use name="TauAnalysis/SVfitStandalone"/>
- <use name="CondFormats/BTauObjects"/>
- <use name="CondTools/BTau"/>
-</bin>
-
-
-<bin   file="analyzerTauTau_Summer15.cc"  name="analyzerTauTau">
-  <use   name="DataFormats/FWLite"/>
-  <use   name="FWCore/FWLite"/>
-  <use   name="FWCore/ParameterSet"/>
-  <use   name="FWCore/PythonParameterSet"/>
-  <use   name="TauAnalysis/SVfitStandalone"/>
-  <use   name="PhysicsTools/FWLite"/>
-  <use   name="PhysicsTools/Utilities"/>
-  <use   name="roofit"/>
-  <use   name="root"/>
-  <use   name="rootgraphics"/>
-</bin>
-
-<bin name="AnalysisMacro_dimuonsMET" file="AnalysisMacro_dimuonsMET.cpp">
- <use name="PhysicsTools/Utilities"/>
- <use name="rootgraphics"/>
- <use name="root"/>
- <use name="rootmath"/>
- <use name="roottmva"/>
- <use name="boost" />
- <use name="boost_program_options"/>
- <use name="DesyTauAnalyses/NTupleMaker"/>
-</bin>
-
-<bin name="AnalysisMacro_dijet" file="AnalysisMacro_dijet.cpp">
- <use name="PhysicsTools/Utilities"/>
- <use name="rootgraphics"/>
- <use name="root"/>
- <use name="rootmath"/>
- <use name="roottmva"/>
- <use name="boost" />
- <use name="boost_program_options"/>
- <use name="DesyTauAnalyses/NTupleMaker"/>
-</bin>
-
-
-<bin name="nmssm" file="analysis_macro_v2.cpp">
+<bin name="HZZmumu" file="AnalysisMacroHZZmumuXX.cpp">
  <use name="PhysicsTools/Utilities"/>
  <use name="rootgraphics"/>
  <use name="root"/>
@@ -289,7 +47,134 @@
  <use name="HTT-utilities/LepEffInterface"/>
  <use name="roottmva"/>
  <use name="DesyTauAnalyses/NTupleMaker"/>
+ <use name="CondFormats/BTauObjects"/>
+ <use name="CondTools/BTau"/>
 </bin>
+
+<bin name="SUSYWJetsCR" file="AnalysisMacroWJetsCR.cpp">
+ <use name="PhysicsTools/Utilities"/>
+ <use name="rootgraphics"/>
+ <use name="root"/>
+ <use name="rootmath"/>
+ <use name="CondFormats/BTauObjects"/>
+ <use name="FWCore/ParameterSet"/>
+ <use name="HTT-utilities/LepEffInterface"/>
+ <use name="roottmva"/>
+ <use name="DesyTauAnalyses/NTupleMaker"/>
+ <use name="CondFormats/BTauObjects"/>
+ <use name="CondTools/BTau"/>
+</bin>
+
+<bin name="SUSYmumuStop" file="AnalysisMacroSUSYmumuStop.cpp">
+ <use name="PhysicsTools/Utilities"/>
+ <use name="rootgraphics"/>
+ <use name="root"/>
+ <use name="rootmath"/>
+ <use name="CondFormats/BTauObjects"/>
+ <use name="FWCore/ParameterSet"/>
+ <use name="HTT-utilities/LepEffInterface"/>
+ <use name="roottmva"/>
+ <use name="DesyTauAnalyses/NTupleMaker"/>
+ <use name="CondFormats/BTauObjects"/>
+ <use name="CondTools/BTau"/>
+</bin>
+
+
+<bin name="SUSYelelStop" file="AnalysisMacroSUSYelelStop.cpp">
+ <use name="PhysicsTools/Utilities"/>
+ <use name="rootgraphics"/>
+ <use name="root"/>
+ <use name="rootmath"/>
+ <use name="CondFormats/BTauObjects"/>
+ <use name="FWCore/ParameterSet"/>
+ <use name="HTT-utilities/LepEffInterface"/>
+ <use name="roottmva"/>
+ <use name="DesyTauAnalyses/NTupleMaker"/>
+ <use name="CondFormats/BTauObjects"/>
+ <use name="CondTools/BTau"/>
+</bin>
+
+
+
+
+
+<bin name="SUSYtautauStop" file="AnalysisMacroSUSYtautauStop.cpp">
+ <use name="PhysicsTools/Utilities"/>
+ <use name="rootgraphics"/>
+ <use name="root"/>
+ <use name="rootmath"/>
+ <use name="CondFormats/BTauObjects"/>
+ <use name="FWCore/ParameterSet"/>
+ <use name="HTT-utilities/LepEffInterface"/>
+ <use name="roottmva"/>
+ <use name="DesyTauAnalyses/NTupleMaker"/>
+ <use name="CondFormats/BTauObjects"/>
+ <use name="CondTools/BTau"/>
+</bin>
+
+
+
+<bin name="SUSYmutauStopHL" file="AnalysisMacroSUSYmutauStopHL.cpp">
+ <use name="PhysicsTools/Utilities"/>
+ <use name="rootgraphics"/>
+ <use name="root"/>
+ <use name="rootmath"/>
+ <use name="CondFormats/BTauObjects"/>
+ <use name="FWCore/ParameterSet"/>
+ <use name="HTT-utilities/LepEffInterface"/>
+ <use name="roottmva"/>
+ <use name="DesyTauAnalyses/NTupleMaker"/>
+ <use name="CondFormats/BTauObjects"/>
+ <use name="CondTools/BTau"/>
+</bin>
+
+
+<bin name="SUSYmumuStopHL" file="AnalysisMacroSUSYmumuStopHL.cpp">
+ <use name="PhysicsTools/Utilities"/>
+ <use name="rootgraphics"/>
+ <use name="root"/>
+ <use name="rootmath"/>
+ <use name="CondFormats/BTauObjects"/>
+ <use name="FWCore/ParameterSet"/>
+ <use name="HTT-utilities/LepEffInterface"/>
+ <use name="roottmva"/>
+ <use name="DesyTauAnalyses/NTupleMaker"/>
+ <use name="CondFormats/BTauObjects"/>
+ <use name="CondTools/BTau"/>
+</bin>
+
+
+
+
+<bin name="SUSYmutauStop" file="AnalysisMacroSUSYmutauStop.cpp">
+ <use name="PhysicsTools/Utilities"/>
+ <use name="rootgraphics"/>
+ <use name="root"/>
+ <use name="rootmath"/>
+ <use name="CondFormats/BTauObjects"/>
+ <use name="FWCore/ParameterSet"/>
+ <use name="HTT-utilities/LepEffInterface"/>
+ <use name="roottmva"/>
+ <use name="DesyTauAnalyses/NTupleMaker"/>
+ <use name="CondFormats/BTauObjects"/>
+ <use name="CondTools/BTau"/>
+</bin>
+
+
+<bin name="SUSYmutauVStop" file="AnalysisMacroSUSYmutauVStop.cpp">
+ <use name="PhysicsTools/Utilities"/>
+ <use name="rootgraphics"/>
+ <use name="root"/>
+ <use name="rootmath"/>
+ <use name="CondFormats/BTauObjects"/>
+ <use name="FWCore/ParameterSet"/>
+ <use name="HTT-utilities/LepEffInterface"/>
+ <use name="roottmva"/>
+ <use name="DesyTauAnalyses/NTupleMaker"/>
+ <use name="CondFormats/BTauObjects"/>
+ <use name="CondTools/BTau"/>
+</bin>
+
 
 
 
@@ -352,6 +237,20 @@
  <use name="CondTools/BTau"/>
 </bin>
 
+<bin name="SUSYeltauStop" file="AnalysisMacroSUSYeltauStop.cpp">
+ <use name="PhysicsTools/Utilities"/>
+ <use name="rootgraphics"/>
+ <use name="root"/>
+ <use name="rootmath"/>
+ <use name="roottmva"/>
+ <use name="FWCore/ParameterSet"/>
+ <use name="CondFormats/BTauObjects"/>
+ <use name="HTT-utilities/LepEffInterface"/>
+ <use name="DesyTauAnalyses/NTupleMaker"/>
+ <use name="CondFormats/BTauObjects"/>
+ <use name="CondTools/BTau"/>
+</bin>
+
 <bin name="SUSYmuel" file="AnalysisMacroSUSYmuel.cpp">
  <use name="PhysicsTools/Utilities"/>
  <use name="rootgraphics"/>
@@ -367,6 +266,20 @@
  <use name="CondTools/BTau"/>
 </bin>
 
+<bin name="SUSYmuelStop" file="AnalysisMacroSUSYmuelStop.cpp">
+ <use name="PhysicsTools/Utilities"/>
+ <use name="rootgraphics"/>
+ <use name="root"/>
+ <use name="rootmath"/>
+ <use name="roottmva"/>
+ <use name="FWCore/ParameterSet"/>
+ <use name="CondFormats/BTauObjects"/>
+ <use name="HTT-utilities/LepEffInterface"/>
+ <use name="DesyTauAnalyses/NTupleMaker"/>
+ <use name="HTT-utilities/QCDModelingEMu"/>
+ <use name="CondFormats/BTauObjects"/>
+ <use name="CondTools/BTau"/>
+</bin>
 <bin name="SUSYtautau" file="AnalysisMacroSUSYtautau.cpp">
  <use name="PhysicsTools/Utilities"/>
  <use name="rootgraphics"/>
@@ -395,39 +308,4 @@
  <use name="CondTools/BTau"/>
 </bin>
 
-<bin name="SUSYTFREl" file="AnalysisMacro_taufakerateEl.cpp">
- <use name="rootgraphics"/>
- <use name="root"/>
- <use name="rootmath"/>
- <use name="roottmva"/>
- <use name="FWCore/ParameterSet"/>
- <use name="CondFormats/BTauObjects"/>
- <use name="HTT-utilities/LepEffInterface"/>
- <use name="DesyTauAnalyses/NTupleMaker"/>
- <use name="CondFormats/BTauObjects"/>
- <use name="CondTools/BTau"/>
-</bin>
 
-<bin name="MuTauFR" file="AnalysisMacro_dimuons_mutauFR.cpp">
-    <use name="PhysicsTools/Utilities"/>
-    <use name="rootgraphics"/>
-    <use name="root"/>
-    <use name="rootmath"/>
-    <use name="roottmva"/>
-    <use name="boost" />
-    <use name="boost_program_options"/>
-    <use name="DesyTauAnalyses/NTupleMaker"/>
-    <use name="HTT-utilities/LepEffInterface"/>
-</bin>
-
-<bin name="EleTauFR" file="AnalysisMacro_dielectrons_etauFR.cpp">
- <use name="PhysicsTools/Utilities"/>
- <use name="rootgraphics"/>
- <use name="root"/>
- <use name="rootmath"/>
- <use name="roottmva"/>
- <use name="boost" />
- <use name="boost_program_options"/>
- <use name="DesyTauAnalyses/NTupleMaker"/>
- <use name="HTT-utilities/LepEffInterface"/>
-</bin>
