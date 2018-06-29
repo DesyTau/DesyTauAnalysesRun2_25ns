@@ -32,6 +32,7 @@
 #include "DesyTauAnalyses/NTupleMaker/interface/AC1B.h"
 
 #include "DesyTauAnalyses/NTupleMaker/interface/Synch17Tree.h"
+#include "DesyTauAnalyses/NTupleMaker/interface/Synch17GenTree.h"
 
 #include "TauAnalysis/SVfitStandalone/interface/SVfitStandaloneAlgorithm.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/functions.h"
@@ -74,6 +75,8 @@ void FillETau(const AC1B * analysisTree, Synch17Tree *otree, int leptonIndex, fl
 void FillTau(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex);
 void FillTau_leading(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex);
 void initializeCPvar(Synch17Tree *otree);
+void initializeGenTree(Synch17GenTree *gentree);
+void FillGenTree(const AC1B * analysisTree, Synch17GenTree *gentree, TString ch);
 //void fillTTbarUncWeights(const AC1B * analysisTree, Synch17Tree *otree, bool isData, bool includeTTbarUncWeights);
 
 int main(int argc, char * argv[]){
@@ -473,6 +476,7 @@ int main(int argc, char * argv[]){
 
   Synch17Tree *otree = new Synch17Tree(tree);
   initializeCPvar(otree);
+  Synch17GenTree *gentree = new Synch17GenTree(tree);
 
   int nTotalFiles = 0;
 
@@ -669,6 +673,9 @@ int main(int argc, char * argv[]){
       if (isData && !isGoodLumi(otree->run, otree->lumi, json))
       	continue;
 
+      initializeGenTree(gentree);
+      if(!isData)FillGenTree(&analysisTree,gentree,ch);
+      gentree->Fill();
       // weights
       if(ApplyPUweight) fill_weight(&analysisTree, otree, PUofficial, isData);
       
@@ -755,13 +762,15 @@ int main(int argc, char * argv[]){
       float lep_pt_max  = -1;
       float tau_pt_max  = -1;
       float tau2_pt_max = -1;
-
+      //////////////LOOP on Taus/////////////
       for (unsigned int it=0; it<taus.size(); ++it) {
 	counter[6]++;
 
 	unsigned int tIndex = taus.at(it);
 	unsigned int Size = leptons.size();
 	if(ch=="tt")Size = taus.size();
+	
+	//////////////LOOP on Leptons or second Tau/////////////
 
 	for (unsigned int il=0; il<Size; ++il) {
 	  unsigned int lIndex  = 0;
@@ -1622,3 +1631,110 @@ void initializeCPvar(Synch17Tree *otree){
   otree->tau2DecayPlaneZ=-9999;
 }
 
+void initializeGenTree(Synch17GenTree *gentree){
+  gentree->Higgs_pt=-9999;
+  gentree->Higgs_eta=-9999;
+  gentree->Higgs_phi=-9999;
+  gentree->Higgs_mass=-9999;
+  gentree->genpt_1=-9999;
+  gentree->geneta_1=-9999;
+  gentree->genphi_1=-9999;
+  gentree->genpt_2=-9999;
+  gentree->geneta_2=-9999;
+  gentree->genphi_2=-9999;
+  gentree->acotautau_00 = -9999;
+  gentree->acotautau_10 = -9999;
+  gentree->acotautau_01 = -9999;
+  gentree->acotautau_11 = -9999;
+}
+
+void FillGenTree(const AC1B * analysisTree, Synch17GenTree *gentree, TString ch){
+  int ntaus=analysisTree->gentau_count;
+  int npart=analysisTree->genparticles_count;
+  int leptonid=15;
+  TLorentzVector Tau1,Tau2,Tau;
+  TLorentzVector Lepton;
+  TLorentzVector lvector;
+  int tauHIndex=-1;
+  int tauLIndex=-1;
+  int LeadingtauIndex=-1;
+  int TrailingtauIndex=-1;
+  bool wrongtau[ntaus];
+  double taumaxpt=-1;
+  
+
+
+
+  for(int itau=0;itau<ntaus;itau++){
+    if(analysisTree->gentau_isLastCopy[itau]==1&&analysisTree->gentau_isPrompt[itau]==1){
+      wrongtau[itau]=false;
+      if(analysisTree->gentau_visible_pt[itau]>=taumaxpt)LeadingtauIndex=itau, taumaxpt=analysisTree->gentau_visible_pt[itau];
+    }else wrongtau[itau]=true;
+  }
+  double dR;
+  const double dRcut=0.3;
+    for(int ipart=0;ipart<npart;ipart++){
+      if((abs(analysisTree->genparticles_pdgid[ipart])==25||abs(analysisTree->genparticles_pdgid[ipart])==35||abs(analysisTree->genparticles_pdgid[ipart])==36)&&analysisTree->genparticles_status[ipart]==1){
+	TLorentzVector Higgs;
+	Higgs.SetPxPyPzE(analysisTree->genparticles_px[ipart],
+			 analysisTree->genparticles_py[ipart],
+			 analysisTree->genparticles_pz[ipart],
+			 analysisTree->genparticles_e[ipart]);
+	gentree->Higgs_pt=Higgs.Pt();
+	gentree->Higgs_eta=Higgs.Eta();
+	gentree->Higgs_phi=Higgs.Phi();
+	gentree->Higgs_mass=Higgs.M();
+      }
+    }
+
+  if(ch=="et")leptonid=11;
+  if(ch=="mt")leptonid=13;
+  if(ch!="tt"){
+    for(int ipart=0;ipart<npart;ipart++){
+      if(abs(analysisTree->genparticles_pdgid[ipart])==leptonid&&(analysisTree->genparticles_info[ipart]==12||analysisTree->genparticles_info[ipart]==5)&&analysisTree->genparticles_status[ipart]==1){
+	lvector.SetPxPyPzE(analysisTree->genparticles_px[ipart],
+			   analysisTree->genparticles_py[ipart],
+			   analysisTree->genparticles_pz[ipart],
+			   analysisTree->genparticles_e[ipart]);
+	for(int itau=0;itau<ntaus;itau++){
+	  if(wrongtau[itau])continue;
+	  Tau.SetPxPyPzE(analysisTree->gentau_visible_px[itau],
+			 analysisTree->gentau_visible_py[itau],
+			 analysisTree->gentau_visible_pz[itau],
+			 analysisTree->gentau_visible_e[itau]);
+	  dR=deltaR(Tau.Eta(),Tau.Phi(),lvector.Eta(),lvector.Phi());
+     
+	  if(dR<dRcut){
+	    tauLIndex=itau;
+	    gentree->genpt_1=lvector.Pt();
+	    gentree->geneta_1=lvector.Eta();
+	    gentree->genphi_1=lvector.Phi();
+	  }
+	}
+      }
+    }
+    for(int itau=0;itau<ntaus;itau++){
+      if(wrongtau[itau]||itau==tauLIndex)continue;
+      tauHIndex=itau;
+      gentree->genpt_2=analysisTree->gentau_visible_pt[itau];
+      gentree->geneta_2=analysisTree->gentau_visible_eta[itau];
+      gentree->genphi_2=analysisTree->gentau_visible_phi[itau];
+    }
+    gen_acott(analysisTree,gentree,tauLIndex,tauHIndex);
+
+  }else{
+    gentree->genpt_1=analysisTree->gentau_visible_pt[LeadingtauIndex];
+    gentree->geneta_1=analysisTree->gentau_visible_eta[LeadingtauIndex];
+    gentree->genphi_1=analysisTree->gentau_visible_phi[LeadingtauIndex];
+    
+    for(int itau=0;itau<ntaus;itau++){
+      if(wrongtau[itau]||itau==LeadingtauIndex)continue;
+      TrailingtauIndex=itau;
+      gentree->genpt_2=analysisTree->gentau_visible_pt[itau];
+      gentree->geneta_2=analysisTree->gentau_visible_eta[itau];
+      gentree->genphi_2=analysisTree->gentau_visible_phi[itau];
+    }
+    gen_acott(analysisTree,gentree,LeadingtauIndex,TrailingtauIndex);
+  }
+
+}

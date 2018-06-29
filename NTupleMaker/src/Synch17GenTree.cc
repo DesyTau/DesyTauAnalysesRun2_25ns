@@ -7,7 +7,7 @@
 
 
 #define Synch17Tree_cxx
-#include "DesyTauAnalyses/NTupleMaker/interface/Synch17Tree.h"
+#include "DesyTauAnalyses/NTupleMaker/interface/Synch17GenTree.h"
 
 // Initialization
 Synch17GenTree::Synch17GenTree(TTree *tree) : fChain(0) {
@@ -53,6 +53,11 @@ void Synch17GenTree::ReadInit(TTree *tree)
    fChain = tree;
    fCurrent = -1;
    fChain->SetMakeClass(1);
+
+   fChain->SetBranchAddress("Higgs_pt", &Higgs_pt, &b_Higgs_pt);
+   fChain->SetBranchAddress("Higgs_eta", &Higgs_eta, &b_Higgs_eta);
+   fChain->SetBranchAddress("Higgs_phi", &Higgs_phi, &b_Higgs_phi);
+   fChain->SetBranchAddress("Higgs_mass", &Higgs_mass, &b_Higgs_mass);
 
    fChain->SetBranchAddress("genpt_1", &genpt_1, &b_genpt_1);
    fChain->SetBranchAddress("genphi_1", &genphi_1, &b_genphi_1);
@@ -136,6 +141,11 @@ void Synch17GenTree::WriteInit(TTree *tree) {
    
   fChain = tree;
   fCurrent = -1;
+
+   fChain->Branch("Higgs_pt", &Higgs_pt, "Higgs_pt/F");
+   fChain->Branch("Higgs_eta", &Higgs_eta, "Higgs_eta/F");
+   fChain->Branch("Higgs_phi", &Higgs_phi, "Higgs_phi/F");
+   fChain->Branch("Higgs_mass", &Higgs_mass, "Higgs_mass/F");
 
    fChain->Branch("genpt_1", &genpt_1, "genpt_1/F");
    fChain->Branch("genphi_1", &genphi_1, "genphi_1/F");
