@@ -33,8 +33,7 @@
 
 #include "DesyTauAnalyses/NTupleMaker/interface/Synch17Tree.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/Synch17GenTree.h"
-
-#include "TauAnalysis/SVfitStandalone/interface/SVfitStandaloneAlgorithm.h"
+#include "TauAnalysis/ClassicSVfit/interface/ClassicSVfit.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/functions.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/leptau_jets_WIP.h"
 #include "HTT-utilities/LepEffInterface/interface/ScaleFactor.h"
