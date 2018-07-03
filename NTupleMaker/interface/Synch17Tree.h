@@ -88,11 +88,11 @@ public :
   Float_t 	  byTightIsolationMVArun2v1DBoldDMwLT_1;
   Float_t 	  byVTightIsolationMVArun2v1DBoldDMwLT_1;
   Float_t 	  byVVTightIsolationMVArun2v1DBoldDMwLT_1;
-
   Float_t         idisoweight_1;
   Float_t         idisoweight_antiiso_1;
   Float_t         trigweight_1;
   Float_t         trigweight_antiiso_1;
+
   Float_t         againstElectronLooseMVA6_2;
   Float_t         againstElectronMediumMVA6_2;
   Float_t         againstElectronTightMVA6_2;
@@ -119,21 +119,18 @@ public :
   Float_t 	  byTightIsolationMVArun2v1DBoldDMwLT_2;
   Float_t 	  byVTightIsolationMVArun2v1DBoldDMwLT_2;
   Float_t 	  byVVTightIsolationMVArun2v1DBoldDMwLT_2;
-
+  // new 
   Float_t         idisoweight_2;
   Float_t         idisoweight_antiiso_2;
   Float_t         trigweight_2;
   Float_t         trigweight_antiiso_2;
   
-  
-
-
   //Trig and weights
   Float_t         weight;
   Float_t         mcweight;
   Float_t         puweight;
   Float_t         effweight;
-  
+  Float_t         trigweight;
   
   Float_t         topptweight;
   Double_t 	  zptweight;
@@ -144,6 +141,9 @@ public :
   Bool_t          trg_singlemuon;
   Bool_t	  trg_singleelectron;
   Bool_t          singleLepTrigger;
+  Bool_t          ditauTrigger;
+  Bool_t          xTriggerLep;
+  Bool_t          xTriggerTau;
 
   //MET
   Float_t         met;
@@ -213,7 +213,10 @@ public :
   Float_t         tau2DecayPlaneX;
   Float_t         tau2DecayPlaneY;
   Float_t         tau2DecayPlaneZ;
-  Float_t         acotautau;
+  Float_t         acotautau_00;
+  Float_t         acotautau_10;
+  Float_t         acotautau_01;
+  Float_t         acotautau_11;
   
   
 
@@ -319,16 +322,14 @@ public :
   TBranch	 *b_idisoweight_antiiso_2;
   TBranch	 *b_trigweight_2;
   TBranch	 *b_trigweight_antiiso_2;
-  
-  
-
 
   //Trig and weights
   TBranch	 *b_weight;
   TBranch	 *b_mcweight;
   TBranch	 *b_puweight;
   TBranch	 *b_effweight;
-
+  TBranch        *b_trigweight;
+  
   TBranch	 *b_topptweight;
   TBranch	 *b_zptweight;
   TBranch	 *b_trkeffweight;
@@ -336,9 +337,12 @@ public :
   TBranch	 *b_mutaufakeweight;
 
   TBranch	 *b_xTrigger;
+  TBranch        *b_xTriggerLep;
+  TBranch        *b_xTriggerTau;
   TBranch	 *b_trg_singlemuon;
   TBranch	 *b_trg_singleelectron;
   TBranch	 *b_singleLepTrigger;
+  TBranch        *b_ditauTrigger;
 
   //MET
   TBranch	 *b_met;
@@ -409,7 +413,10 @@ public :
   TBranch        *b_tau2DecayPlaneX;
   TBranch        *b_tau2DecayPlaneY;
   TBranch        *b_tau2DecayPlaneZ;
-  TBranch        *b_acotautau;
+  TBranch        *b_acotautau_00;
+  TBranch        *b_acotautau_10;
+  TBranch        *b_acotautau_01;
+  TBranch        *b_acotautau_11;
   
   Synch17Tree(TTree *tree=0);
   virtual ~Synch17Tree();

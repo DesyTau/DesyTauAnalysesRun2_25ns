@@ -277,8 +277,8 @@ cout << "warning : indexLeadingJet ==indexSubLeadingJet = " << indexSubLeadingJe
     otree->mjj = (jet1+jet2).M();
     otree->jdeta = abs(analysisTree->pfjet_eta[indexLeadingJet]-
           analysisTree->pfjet_eta[indexSubLeadingJet]);
-    otree->jdphi = DeltaPhi(analysisTree->pfjet_phi[indexLeadingJet],
-          analysisTree->pfjet_phi[indexSubLeadingJet]);
+    otree->jdphi = dPhiFrom2P(jet1.Px(),jet1.Py(),
+			      jet2.Px(),jet2.Py());
    
     float etamax = analysisTree->pfjet_eta[indexLeadingJet];
     float etamin = analysisTree->pfjet_eta[indexSubLeadingJet];

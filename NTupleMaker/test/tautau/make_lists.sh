@@ -6,10 +6,8 @@ MCdir_TTVV=/nfs/dust/cms/user/rasp/ntuples/MC_2017_v2
 MCdir_Signal=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/MCFall17/Signals
 MCdir_ST=/nfs/dust/cms/user/rasp/ntuples/MC_2017
 
-# Signal
+#Signals
 
-ls $MCdir_Signal/GluGluHToTauTau_M125_13TeV_powheg_pythia8/*.root > ggH_125
-ls $MCdir_Signal/VBFHToTauTau_M125_13TeV_powheg_pythia8/*.root > VBF_125
 
 #DY
 
@@ -40,7 +38,7 @@ ls $MCdir_TTVV/TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powheg-pythia8/*.root > 
 ls $MCdir_TTVV/TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8/*.root > TTTo2L2Nu
 ls $MCdir_TTVV/TTToHadronic_TuneCP5_PSweights_13TeV-powheg-pythia8/*.root > TTToHadronic
 
-# ST
+#ST
 
 ls $MCdir_ST/ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8/*.root > ST_tW_top
 ls $MCdir_ST/ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8/*.root > ST_tW_antitop
@@ -57,16 +55,13 @@ ls $MCdir_TTVV/ZZ_TuneCP5_13TeV-pythia8/*.root > ZZ
 
 #DATA
 
-Data17dir1=/nfs/dust/cms/user/mameyer/SM_HiggsTauTau/ntuples/Run2017_Nov17ReReco/SingleMuon_v2
-Data17dir2=/nfs/dust/cms/user/mameyer/SM_HiggsTauTau/ntuples/Run2017_Nov17ReReco 
-Data17dir3=/nfs/dust/cms/user/mameyer/SM_HiggsTauTau/ntuples/Run2017_Nov17ReReco/JetHT
-Data17dir4=/nfs/dust/cms/user/mameyer/SM_HiggsTauTau/ntuples/Run2017_Nov17ReReco/MET
+Data17dirTau=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/Run2017_Nov17ReReco/Tau
 
-ls $Data17dir1/SingleMuon_Run2017B*/*.root > DATA_MuB 
-ls $Data17dir1/SingleMuon_Run2017C*/*.root > DATA_MuC
-ls $Data17dir1/SingleMuon_Run2017D*/*.root > DATA_MuD
-ls $Data17dir1/SingleMuon_Run2017E*/*.root > DATA_MuE
-ls $Data17dir1/SingleMuon_Run2017F*/*.root > DATA_MuF
+ls $Data17dirTau/Tau_Run2017B_ReReco/*root > DATA_TauB
+ls $Data17dirTau/Tau_Run2017C_ReReco/*root > DATA_TauC
+ls $Data17dirTau/Tau_Run2017D_ReReco/*root > DATA_TauD
+ls $Data17dirTau/Tau_Run2017E_ReReco/*root > DATA_TauE
+
 #ls $Data17dir2/SingleElectron/SingleElectron_Run2017B*/*.root > DATA_ElB
 #ls $Data17dir2/SingleElectron/SingleElectron_Run2017C*/*.root > DATA_ElC
 #ls $Data17dir2/SingleElectron/SingleElectron_Run2017D*/*.root > DATA_ElD
