@@ -216,6 +216,7 @@ int main(int argc, char * argv[]) {
   Float_t weight_;
 
   UInt_t nVert_;
+  Float_t genHt_;
 
   Bool_t  trig_;
 
@@ -499,6 +500,7 @@ int main(int argc, char * argv[]) {
   ntuple_->Branch("mttau",  &mttau_, "mttau/F");
   ntuple_->Branch("mtgen",  &mtgen_, "mtgen/F");
   ntuple_->Branch("mtmuon", &mtmuon_,"mtmuon/F");
+  ntuple_->Branch("genHt",&genHt_,"genHt/F");
 
   ntuple_->Branch("muonPt",  &muonPt_,  "muonPt/F");
   ntuple_->Branch("muonEta", &muonEta_, "muonEta/F");
@@ -855,6 +857,8 @@ int main(int argc, char * argv[]) {
       genWeight_ = 1;
       trigWeight_ = 1;
       puWeight_ = 1;
+
+      genHt_ = analysisTree.genparticles_lheHt;
 
       trig_ = false;
       metFilters_ = true;
