@@ -4,7 +4,9 @@
 #include "DesyTauAnalyses/NTupleMaker/interface/Config.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/AC1B.h"
 #include "HTT-utilities/RecoilCorrections/interface/RecoilCorrector.h"
-#include "TauAnalysis/SVfitStandalone/interface/SVfitStandaloneAlgorithm.h"
+#include "TauAnalysis/ClassicSVfit/interface/ClassicSVfit.h"
+#include "TauAnalysis/ClassicSVfit/interface/svFitHistogramAdapter.h"
+#include "TauAnalysis/ClassicSVfit/interface/MeasuredTauLepton.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/Synch17Tree.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/functions.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/PileUp.h"
@@ -353,7 +355,9 @@ void fillMET(TString ch, int leptonIndex, int tauIndex, const AC1B * analysisTre
 ///////////////////////////////////
 
 void svfit_variables(TString ch, const AC1B *analysisTree, Synch17Tree *otree, const Config *cfg, TFile * inputFile_visPtResolution){
-
+  double measuredMETx =  otree->met * cos(otree->metphi);
+  double measuredMETy =  otree->met * sin(otree->metphi);
+  
   // define MET covariance
   TMatrixD covMET(2, 2);
 
@@ -363,33 +367,41 @@ void svfit_variables(TString ch, const AC1B *analysisTree, Synch17Tree *otree, c
   covMET[0][1] = otree->metcov01;
   covMET[1][1] = otree->metcov11;
 
-  svFitStandalone::kDecayType type_ = svFitStandalone::kUndefinedDecayType;
-  if (ch == "mt")      type_ = svFitStandalone::kTauToMuDecay;
-  else if (ch == "et") type_ = svFitStandalone::kTauToElecDecay;
+  std::vector<classic_svFit::MeasuredTauLepton> measuredTauLeptons;
+  classic_svFit::MeasuredTauLepton::kDecayType type_ = classic_svFit::MeasuredTauLepton::kUndefinedDecayType;
+  
+  if (ch == "mt") type_ = classic_svFit::MeasuredTauLepton::kTauToMuDecay;
+  if (ch == "et") type_ = classic_svFit::MeasuredTauLepton::kTauToElecDecay;
+  if (ch == "tt") type_ = classic_svFit::MeasuredTauLepton::kTauToHadDecay;
   // define lepton four vectors
-  std::vector<svFitStandalone::MeasuredTauLepton> measuredTauLeptons;
-  measuredTauLeptons.push_back(svFitStandalone::MeasuredTauLepton(type_,
-								  otree->pt_1,
-								  otree->eta_1,
-								  otree->phi_1,
-								  otree->m_1)); 
-  measuredTauLeptons.push_back(svFitStandalone::MeasuredTauLepton(svFitStandalone::kTauToHadDecay,
-								  otree->pt_2,
-								  otree->eta_2,
-								  otree->phi_2,
-								  otree->m_2,
-								  otree->tau_decay_mode_2));
+  measuredTauLeptons.push_back(classic_svFit::MeasuredTauLepton(type_,
+						 otree->pt_1,
+						 otree->eta_1,
+						 otree->phi_1,
+						 otree->m_1)); 
+  measuredTauLeptons.push_back(classic_svFit::MeasuredTauLepton(classic_svFit::MeasuredTauLepton::kTauToHadDecay,
+						 otree->pt_2,
+						 otree->eta_2,
+						 otree->phi_2,
+						 otree->m_2,
+						 otree->tau_decay_mode_2));
+  
+  int verbosity = 1;
+  ClassicSVfit svFitAlgo(verbosity);
+  double kappa = 4.; // use 3 for emu, 4 for etau and mutau, 5 for tautau channel
+  if(ch=="tt")kappa=5.;
 
-  SVfitStandaloneAlgorithm algo(measuredTauLeptons, otree->met * cos(otree->metphi), otree->met * sin(otree->metphi), covMET, 0); // using PF MET
-  algo.shiftVisPt(true, inputFile_visPtResolution);
-  algo.integrateMarkovChain();
-
-  otree->m_sv   = algo.mass();
-  otree->pt_sv  = algo.pt();
-  otree->eta_sv = algo.eta();
-  otree->phi_sv = algo.phi();      
-  otree->met_sv = algo.fittedMET().Rho();
-  otree->mt_sv  = algo.transverseMass();
+  svFitAlgo.addLogM_fixed(true, kappa);
+  svFitAlgo.integrate(measuredTauLeptons, measuredMETx, measuredMETy, covMET);
+  bool isValidSolution = svFitAlgo.isValidSolution();
+  
+  
+  otree->m_sv   = static_cast<classic_svFit::HistogramAdapterDiTau*>(svFitAlgo.getHistogramAdapter())->getMass();
+  otree->pt_sv  = static_cast<classic_svFit::HistogramAdapterDiTau*>(svFitAlgo.getHistogramAdapter())->getPt();
+  otree->eta_sv = static_cast<classic_svFit::HistogramAdapterDiTau*>(svFitAlgo.getHistogramAdapter())->getEta();
+  otree->phi_sv = static_cast<classic_svFit::HistogramAdapterDiTau*>(svFitAlgo.getHistogramAdapter())->getPhi();      
+  //otree->met_sv = static_cast<HistogramAdapterDiTau*>(svFitAlgo.getHistogramAdapter())->getfittedMET().Rho();
+  otree->mt_sv  = static_cast<classic_svFit::HistogramAdapterDiTau*>(svFitAlgo.getHistogramAdapter())->getTransverseMass();
 }
 
 
