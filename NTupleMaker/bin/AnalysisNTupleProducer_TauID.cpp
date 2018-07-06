@@ -249,6 +249,7 @@ int main(int argc, char * argv[]) {
   Float_t mtmuon_;
 
   Float_t muonPt_;
+  Float_t muonPz_;
   Float_t muonEta_;
   Float_t muonPhi_;
   Int_t   muonQ_;
@@ -268,6 +269,7 @@ int main(int argc, char * argv[]) {
   Float_t tauPhi_;
   Float_t tauMass_;
   Int_t   tauQ_;
+  Float_t tauPz_;
 
   Float_t genTauWPt_;
   Float_t genTauWEta_;
@@ -440,6 +442,7 @@ int main(int argc, char * argv[]) {
   wntuple_->Branch("jet20Phi",jet20Phi_,"jet20Phi[nJets20]/F");
 
   wntuple_->Branch("tauPt",  &tauPt_,  "tauPt/F");
+  wntuple_->Branch("tauPz",  &tauPz_,  "tauPz/F");
   wntuple_->Branch("tauEta", &tauEta_, "tauEta/F");
   wntuple_->Branch("tauPhi", &tauPhi_, "tauPhi/F");
 
@@ -503,6 +506,7 @@ int main(int argc, char * argv[]) {
   ntuple_->Branch("genHt",&genHt_,"genHt/F");
 
   ntuple_->Branch("muonPt",  &muonPt_,  "muonPt/F");
+  ntuple_->Branch("muonPz",  &muonPz_,  "muonPz/F");
   ntuple_->Branch("muonEta", &muonEta_, "muonEta/F");
   ntuple_->Branch("muonPhi", &muonPhi_, "muonPhi/F");
   ntuple_->Branch("muonQ",   &muonQ_,   "muonQ/I");
@@ -513,6 +517,7 @@ int main(int argc, char * argv[]) {
   ntuple_->Branch("muon2Q",   &muon2Q_,   "muon2Q/I");
 
   ntuple_->Branch("tauPt",  &tauPt_,  "tauPt/F");
+  ntuple_->Branch("tauPz",  &tauPz_,  "tauPz/F");
   ntuple_->Branch("tauEta", &tauEta_, "tauEta/F");
   ntuple_->Branch("tauPhi", &tauPhi_, "tauPhi/F");
   ntuple_->Branch("tauMass",&tauMass_,"tauMass/F");
@@ -886,6 +891,7 @@ int main(int argc, char * argv[]) {
       mtmuon_ = 0;
 
       muonPt_ =  -1;
+      muonPz_ =  -1;
       muonEta_ = 0;
       muonPhi_ = 0;
       muonQ_ = 0;
@@ -897,6 +903,7 @@ int main(int argc, char * argv[]) {
       muon2Q_ = 0;
 
       tauPt_ = 0;
+      tauPz_ = 0;
       tauEta_ = 0;
       tauPhi_ = 0;
       tauMass_ = 0;
@@ -1531,6 +1538,7 @@ int main(int argc, char * argv[]) {
 				       analysisTree.muon_pz[indexTriggerMu],
 				       muonMass);
 	muonPt_  = lorentzVectorTriggerMu.Pt();
+   muonPz_  = lorentzVectorTriggerMu.Pz();
 	muonEta_ = lorentzVectorTriggerMu.Eta();
 	muonPhi_ = lorentzVectorTriggerMu.Phi();
 	muonQ_   = int(analysisTree.muon_charge[indexTriggerMu]);
@@ -2026,6 +2034,7 @@ int main(int argc, char * argv[]) {
 	mttau_ = mT(lorentzVectorTau,lorentzVectorMet);
 	mtgen_ = mT(wgentauLV,wnuLV);
 	tauPt_ = analysisTree.tau_pt[indexTau];
+   tauPz_ = analysisTree.tau_pz[indexTau];
 	tauEta_ = analysisTree.tau_eta[indexTau];
 	tauPhi_ = analysisTree.tau_phi[indexTau];
 	tauMass_ = analysisTree.tau_mass[indexTau];
@@ -2281,7 +2290,7 @@ int main(int argc, char * argv[]) {
 	//	isWTauNu = isWTauNu && recoilRatio_>ptTauMetRatioLowerCut_WTauNu && recoilRatio_<ptTauMetRatioUpperCut_WTauNu;
 	isWTauNu = isWTauNu && recoilDPhi_>deltaPhiTauMetCut_WTauNu;
 	isWTauNu = isWTauNu && nSelTaus_ >= 1;
-	isWTauNu = isWTauNu && tauPt_>100;
+	isWTauNu = isWTauNu && tauPt_>80;
 	isWTauNu = isWTauNu && nJetsCentral30_<=2;
 	isWTauNu = isWTauNu && nMuon_ == 0;
 	isWTauNu = isWTauNu && nElec_ == 0;
@@ -2354,6 +2363,7 @@ int main(int argc, char * argv[]) {
 	    mttau_ = mT(tauLV,lorentzVectorMet);
 	    mtgen_ = mT(wgentauLV,wnuLV);
 	    tauPt_ = analysisTree.tau_pt[indexTau];
+       tauPz_ = analysisTree.tau_pz[indexTau];
 	    tauEta_ = analysisTree.tau_eta[indexTau];
 	    tauPhi_ = analysisTree.tau_phi[indexTau];
 	    tauMass_ = analysisTree.tau_mass[indexTau];
