@@ -36,6 +36,10 @@
 #include "CondFormats/BTauObjects/interface/BTagCalibration.h"
 #include "CondTools/BTau/interface/BTagCalibrationReader.h"
 
+#include "RooWorkspace.h"
+#include "RooAbsReal.h"
+#include "RooRealVar.h"
+
 float topPtWeight(float pt1,
 		  float pt2) {
 
@@ -126,30 +130,26 @@ int main(int argc, char * argv[]) {
   const bool applyGoodRunSelection = cfg.get<bool>("ApplyGoodRunSelection");
 
   // pile up reweighting
-  const bool applyPUreweighting_vertices = cfg.get<bool>("ApplyPUreweighting_vertices");
   const bool applyPUreweighting_official = cfg.get<bool>("ApplyPUreweighting_official");
 
-  //const bool applyPUreweighting = cfg.get<bool>("ApplyPUreweighting");
   const bool applyLeptonSF = cfg.get<bool>("ApplyLeptonSF");
   const bool applyRecoilCorrections = cfg.get<bool>("ApplyRecoilCorrections");
   const bool applyRecoilOnGenerator = cfg.get<bool>("ApplyRecoilOnGenerator");
   const bool applySimpleRecoilCorrections = cfg.get<bool>("ApplySimpleRecoilCorrections");
   const bool applyTopPtReweighting = cfg.get<bool>("ApplyTopPtReweighting");
-  const bool applyNJetReweighting = cfg.get<bool>("ApplyNJetReweighting");
   const bool applyZMassPtReweighting = cfg.get<bool>("ApplyZMassPtReweighting");
   const bool interpolateZMassPtWeight = cfg.get<bool>("InterpolateZMassPtWeight");
 
   // kinematic cuts on muons
-  const float ptMuonLowCut   = cfg.get<float>("ptMuonLowCut");
-  const float ptMuonHighCut  = cfg.get<float>("ptMuonHighCut");
-  const float etaMuonHighCut = cfg.get<float>("etaMuonHighCut");
-  const float etaMuonLowCut = cfg.get<float>("etaMuonLowCut");
-  const float dxyMuonCut     = cfg.get<float>("dxyMuonCut");
-  const float dzMuonCut      = cfg.get<float>("dzMuonCut");
-  const float dxyMuonLooseCut     = cfg.get<float>("dxyMuonLooseCut");
-  const float dzMuonLooseCut      = cfg.get<float>("dzMuonLooseCut");
-  const float isoMuonCut     = cfg.get<float>("isoMuonCut");
-  const float isoMuonProbeCut = cfg.get<float>("isoMuonProbeCut");
+  const float ptMuonCut        = cfg.get<float>("ptMuonCut");
+  const float ptMuonProbeCut   = cfg.get<float>("ptMuonProbeCut");
+  const float etaMuonCut       = cfg.get<float>("etaMuonCut");
+  const float etaMuonProbeCut  = cfg.get<float>("etaMuonProbeCut");
+  const float dxyMuonCut       = cfg.get<float>("dxyMuonCut");
+  const float dzMuonCut        = cfg.get<float>("dzMuonCut");
+  const float dxyMuonProbeCut  = cfg.get<float>("dxyMuonProbeCut");
+  const float dzMuonProbeCut   = cfg.get<float>("dzMuonProbeCut");
+  const float isoMuonCut       = cfg.get<float>("isoMuonCut");
   const bool  applyTauTauSelection = cfg.get<bool>("ApplyTauTauSelection");
   const bool  selectZToTauTauMuMu = cfg.get<bool>("SelectZToTauTauMuMu");
 
@@ -165,21 +165,9 @@ int main(int argc, char * argv[]) {
   const bool applyTrigger = cfg.get<bool>("ApplyTrigger");
   const string muonTriggerName  = cfg.get<string>("MuonTriggerName");
   const string muonFilterName   = cfg.get<string>("MuonFilterName");
-  const string muon17FilterName = cfg.get<string>("Muon17FilterName"); 
-  const string muon8FilterName1 = cfg.get<string>("Muon8FilterName1"); 
-  const string muon8FilterName2 = cfg.get<string>("Muon8FilterName2"); 
-  const string singleMuonFilterName = cfg.get<string>("SingleMuonFilterName");
-  const float singleMuonTriggerPtCut = cfg.get<float>("SingleMuonTriggerPtCut");
-  const float singleMuonTriggerEtaCut = cfg.get<float>("SingleMuonTriggerEtaCut");
-  
 
   TString MuonTriggerName(muonTriggerName);
   TString MuonFilterName(muonFilterName);
-
-  TString Muon17FilterName(muon17FilterName);
-  TString Muon8FilterName1(muon8FilterName1);
-  TString Muon8FilterName2(muon8FilterName2);
-  TString SingleMuonFilterName(singleMuonFilterName);
 
   // vertex cuts
   const float ndofVertexCut  = cfg.get<float>("NdofVertexCut");   
@@ -200,45 +188,30 @@ int main(int argc, char * argv[]) {
 
   const string MuonIdIsoFile = cfg.get<string>("MuonIdIsoEff");
   const string MuonTrigFile  = cfg.get<string>("MuonTrigEff"); 
-  const string trackingSFFile = cfg.get<string>("TrackingSFFile");
+  const string correctionWorkspaceFile = cfg.get<string>("CorrectionWorkspaceFile");
+  TString CorrectionWorkspaceFile(correctionWorkspaceFile);
 
   const string recoilFileName   = cfg.get<string>("RecoilFileName");
   TString RecoilFileName(recoilFileName);
 
-  const string recoilPuppiFileName   = cfg.get<string>("RecoilPuppiFileName");
-  TString RecoilPuppiFileName(recoilPuppiFileName);
-
-  const string recoilMvaFileName   = cfg.get<string>("RecoilMvaFileName");
-  TString RecoilMvaFileName(recoilMvaFileName);
-
-  // systematics
-  const string metsysFileName   = cfg.get<string>("MetSysFileName");
-  TString MetSysFileName(metsysFileName);
-
-  const string metsysPuppiFileName   = cfg.get<string>("MetSysPuppiFileName");
-  TString MetSysPuppiFileName(metsysPuppiFileName);
-
-  const string metsysMvaFileName   = cfg.get<string>("MetSysMvaFileName");
-  TString MetSysMvaFileName(metsysMvaFileName);
-
+  // Z (mass,pt) reweighting
   const string zMassPtWeightsFileName   = cfg.get<string>("ZMassPtWeightsFileName");
   TString ZMassPtWeightsFileName(zMassPtWeightsFileName);
-
   const string zMassPtWeightsHistName   = cfg.get<string>("ZMassPtWeightsHistName");
   TString ZMassPtWeightsHistName(zMassPtWeightsHistName);
 
   const string jsonFile = cfg.get<string>("jsonFile");
   const int applyJES = cfg.get<int>("applyJES");
-  const float metScale = cfg.get<float>("MetScale");
-  const float metResolution = cfg.get<float>("MetResolution");
   const float muonMomScale = cfg.get<float>("MuonMomentumScale");
-  const int bkgdType =  cfg.get<float>("BkgdType");
 
   const string pileUpDataFile = cfg.get<string>("PileUpDataFileName");
   const string pileUpMCFile = cfg.get<string>("PileUpMCFileName");
+  const string pileUpMCHist = cfg.get<string>("PileUpMCHistName");
+
 
   TString PileUpDataFile(pileUpDataFile);
   TString PileUpMCFile(pileUpMCFile);
+  TString PileUpMCHist(pileUpMCHist);
 
   // **** end of configuration
 
@@ -263,7 +236,6 @@ int main(int argc, char * argv[]) {
     }
   }
 
-
   // file name and tree name
   std::string rootFileName(argv[2]);
   std::ifstream fileList(argv[2]);
@@ -278,53 +250,6 @@ int main(int argc, char * argv[]) {
 
   TFile * file = new TFile(TStrName+TString(".root"),"recreate");
   file->cd("");
-
-  int eventNumber;
-  int runNumber;
-  bool IsoMu17;
-
-  float ptTag;
-  float etaTag;
-  float phiTag;
-  float dxyTag;
-  float dzTag;
-  float chargeTag;
-  float isoTag;
-  bool isMediumTag;
-
-  float ptProbe;
-  float etaProbe;
-  float phiProbe;
-  float dxyProbe;
-  float dzProbe;
-  float chargeProbe;
-  float isoProbe;
-  bool isMediumProbe;
-
-  float massTagProbe;
-
-  TTree * events = new TTree("events","events");
-  events->Branch("eventNumber",&eventNumber,"eventNumber/I");
-  events->Branch("runNumber",&runNumber,"runNumber/I");
-  events->Branch("IsoMu17",&IsoMu17,"IsoMu17/O");
-  events->Branch("ptTag",&ptTag,"ptTag/F");
-  events->Branch("etaTag",&etaTag,"etaTag/F");
-  events->Branch("phiTag",&phiTag,"phiTag/F");
-  events->Branch("dxyTag",&dxyTag,"dxyTag/F");
-  events->Branch("dzTag",&dzTag,"dzTag/F");
-  events->Branch("chargeTag",&chargeTag,"chargeTag/F");
-  events->Branch("isoTag",&isoTag,"isoTag/F");
-  events->Branch("isMediumTag",&isMediumTag,"isMediumTag/O");
-  events->Branch("ptProbe",&ptProbe,"ptProbe/F");
-  events->Branch("etaProbe",&etaProbe,"etaProbe/F");
-  events->Branch("phiProbe",&phiProbe,"phiProbe/F");
-  events->Branch("dxyProbe",&dxyProbe,"dxyProbe/F");
-  events->Branch("dzProbe",&dzProbe,"dzProbe/F");
-  events->Branch("chargeProbe",&chargeProbe,"chargeProbe/F");
-  events->Branch("isoProbe",&isoProbe,"isoProbe/F");
-  events->Branch("isMediumProbe",&isMediumProbe,"isMediumProbe/O");
-  events->Branch("massTagProbe",&massTagProbe,"massTagProbe/F");
-
 
   TH1D * inputEventsH = new TH1D("inputEventsH","",1,-0.5,0.5);
   TH1D * histWeightsH = new TH1D("histWeightsH","",1,-0.5,0.5);
@@ -349,15 +274,12 @@ int main(int argc, char * argv[]) {
   TH1D * dimuonEtaSelH = new TH1D("dimuonEtaSelH","",120,-6,6);
   TH1D * metSelH  = new TH1D("metSelH","",200,0,400);
   TH1D * puppimetSelH = new TH1D("puppimetSelH","",200,0,400);
-  TH1D * mvametSelH = new TH1D("mvametSelH","",200,0,400);
 
   TH1D * metZSelH  = new TH1D("metZSelH","",200,0,400);
   TH1D * puppimetZSelH = new TH1D("puppimetZSelH","",200,0,400);
-  TH1D * mvametZSelH = new TH1D("mvametZSelH","",200,0,400);
 
   TH1D * metTopSelH  = new TH1D("metTopSelH","",200,0,400);
   TH1D * puppimetTopSelH = new TH1D("puppimetTopSelH","",200,0,400);
-  TH1D * mvametTopSelH = new TH1D("mvametTopSelH","",200,0,400);
 
   TH1D * numberOfVerticesH = new TH1D("numberOfVerticesH","",100,-0.5,99.5);
 
@@ -393,12 +315,10 @@ int main(int argc, char * argv[]) {
   TH1D * massSelScaleH[21];
   TH1D * metSelScaleH[21];
   TH1D * puppimetSelScaleH[21];
-  TH1D * mvametSelScaleH[21];
   for (int iScale=0; iScale<21; ++iScale) {    
     massSelScaleH[iScale] = new TH1D("massSel"+scales[iScale]+"H","",200,0,200);
     metSelScaleH[iScale] = new TH1D("metSel"+scales[iScale]+"H","",200,0,400);
     puppimetSelScaleH[iScale] = new TH1D("puppimetSel"+scales[iScale]+"H","",200,0,400);
-    mvametSelScaleH[iScale] = new TH1D("mvametSel"+scales[iScale]+"H","",200,0,400);
   }
 
 
@@ -423,88 +343,30 @@ int main(int argc, char * argv[]) {
   TH1D * HT20SelH       = new TH1D("HT20SelH","",50,0,500);
   TH1D * HT20etaCutSelH = new TH1D("HT20etaCutSelH","",50,0,500);
   
-  //Discriminiant histos
-  TH1D * h_dimuonEta = new TH1D("dimuonEta","",120,-6,+6);//21Aug
-  TH1D * h_dimuonEta_genMuMatch = new TH1D("dimuonEta_genMuMatch","",50,-6,+6);//21Aug
-  TH1D * h_ptRatio = new TH1D ("ptRatio","",50,0,1);
-  TH1D * h_dxy_muon1 =new TH1D ("dxy_muon1","",50,-0.02,0.02);
-  TH1D * h_dxy_muon2 =new TH1D ("dxy_muon2","",50,-0.02,0.02);
-  TH1D * h_dz_muon1 = new TH1D ("dz_muon1","",50,-0.1,0.1);
-  TH1D * h_dz_muon2 = new TH1D ("dz_muon2","",50,-0.1,0.1);
-  TH1D * h_dcaSigdxy_mu1 = new TH1D ("dcaSigdxy_mu1","",50,-4,4);
-  TH1D * h_dcaSigdxy_mu2 = new TH1D ("dcaSigdxy_mu2","",50,-4,4);
-  TH1D * h_dcaSigdz_mu1 = new TH1D ("dcaSigdz_mu1","",50,-4,4);
-  TH1D * h_dcaSigdz_mu2 = new TH1D ("dcaSigdz_mu2","",50,-4,4);
-  TH1D * h_dcaSigdxy_muon1 = new TH1D ("dcaSigdxy_muon1","",50,-4,4);
-  TH1D * h_dcaSigdxy_muon2 = new TH1D ("dcaSigdxy_muon2","",50,-4,4);
-  TH1D * h_dcaSigdz_muon1 = new TH1D ("dcaSigdz_muon1","",50,-4,4);
-  TH1D * h_dcaSigdz_muon2 = new TH1D ("dcaSigdz_muon2","",50,-4,4);
-  TH1D * h_dcaSigdxy_mu1_genMuMatch = new TH1D ("dcaSigdxy_mu1_genMuMatch","",50,-4,4);
-  TH1D * h_dcaSigdxy_mu2_genMuMatch = new TH1D ("dcaSigdxy_mu2_genMuMatch","",50,-4,4);
-  TH1D * h_dcaSigdz_mu1_genMuMatch = new TH1D ("dcaSigdz_mu1_genMuMatch","",50,-4,4);
-  TH1D * h_dcaSigdz_mu2_genMuMatch = new TH1D ("dcaSigdz_mu2_genMuMatch","",50,-4,4);
-  TH1D * h_phi_leadingMu_MET =new TH1D ("phi_leadingMu_MET","",50,0,3);
-  TH1D * h_phi_trailingMu_MET =new TH1D ("phi_trailingMu_MET","",50,0,3);
-  TH1D * h_dxy_muon1_dcaCut =new TH1D ("dxy_muon1_dcaCut","",50,-0.02,0.02);
-  TH1D * h_dxy_muon2_dcaCut =new TH1D ("dxy_muon2_dcaCut","",50,-0.02,0.02);
-  TH1D * h_dimuonEta_dcaCut = new TH1D("dimuonEta_dcaCut","",50,-6,+6);
-  TH1D * h_ptRatio_dcaCut = new TH1D ("ptRatio_dcaCut","",50,0,1);
-
   TH1D * NumberOfVerticesH = new TH1D("NumberOfVerticesH","",51,-0.5,50.5);
 
   TH1D * MuSF_IdIso_Mu1H = new TH1D("MuIdIsoSF_Mu1H", "MuIdIsoSF_Mu1", 100, 0.5,1.5);
   TH1D * MuSF_IdIso_Mu2H = new TH1D("MuIdIsoSF_Mu2H", "MuIdIsoSF_Mu2", 100, 0.5,1.5);
 
-  int nPtBins = 7;
-  float ptBins[8] = {10,15,20,25,30,40,60,1000};
+  // tag and probe 
+  int nPtBins = 11;
+  float ptBins[12] = {10., 15., 20., 25., 30., 40., 50., 60., 80., 100., 200., 1000.};
 
-  int nPtBinsTrig = 16;
-  float ptBinsTrig[17] = {10,
-			  13,
-			  16,
-			  19,
-			  22,
-			  25,
-			  28,
-			  31,
-			  34,
-			  37,
-			  40,
-			  45,
-			  50,
-			  60,
-			  70,
-			  100,
-			  1000};  
-  
   int nEtaBins = 4;
   float etaBins[5] = {0,0.9,1.2,2.1,2.4}; 
   
-  TString PtBins[7] = {"Pt10to15",
-		       "Pt15to20",
-		       "Pt20to25",
-		       "Pt25to30",
-		       "Pt30to40",
-		       "Pt40to60",
-		       "PtGt60"};
+  TString PtBins[11] = {"Pt10to15",
+			"Pt15to20",
+			"Pt20to25",
+			"Pt25to30",
+			"Pt30to40",
+			"Pt40to50",
+			"Pt50to60",
+			"Pt60to80",
+			"Pt80to100",
+			"Pt100to200",
+			"PtGt200"};
   
-  TString PtBinsTrig[16] = {"Pt10to13",
-			    "Pt13to16",
-			    "Pt16to19",
-			    "Pt19to22",
-			    "Pt22to25",
-			    "Pt25to28",
-			    "Pt28to31",
-			    "Pt31to34",
-			    "Pt34to37",
-			    "Pt37to40",
-			    "Pt40to45",
-			    "Pt45to50",
-			    "Pt50to60",
-			    "Pt60to70",
-			    "Pt70to100",
-			    "PtGt100"};
-
   TString EtaBins[4] = {"EtaLt0p9",
 			"Eta0p9to1p2",
 			"Eta1p2to2p1",
@@ -512,8 +374,21 @@ int main(int argc, char * argv[]) {
 
   TString JetBins[3] = {"Jet0","Jet1","JetGe2"};
 
-  //*****  create eta histogram with eta ranges associated to their names (eg. endcap, barrel)   ***** //
+  int nIso1Bins = 4;
+  float iso1Bins[5] = {-0.01,0.15,0.2,0.5,1.0}; 
+  TString Iso1Bins[4] = {"Iso1Lt0p15",
+			 "Iso10p15to0p2",
+			 "Iso10p2to0p5",
+			 "Iso1Gt0p5"};
 
+  int nIso2Bins = 4;
+  float iso2Bins[5] = {-0.01,0.2,0.3,0.5,1.0}; 
+  TString Iso2Bins[4] = {"Iso2Lt0p2",
+			 "Iso20p2to0p3",
+			 "Iso20p3to0p5",
+			 "Iso2Gt0p5"};
+
+  //*****  create eta histogram with eta ranges associated to their names (eg. endcap, barrel)   ***** //
   TH1D * etaBinsH = new TH1D("etaBinsH", "etaBinsH", nEtaBins, etaBins);
   etaBinsH->Draw();
   etaBinsH->GetXaxis()->Set(nEtaBins, etaBins);
@@ -523,9 +398,7 @@ int main(int argc, char * argv[]) {
   etaBinsH->Write("etaBinsH");
 
 
-  //*****  create pt histogram_s with pt ranges associated to their names (eg. Pt10to13, ..)   ***** //
-  //*****  two different pT binning, one for IdIso and one for trigger   ***** //
-
+  //*****  create pt histogram_s with pt ranges associated to their names ***** //
   TH1D * ptBinsH =  new TH1D("ptBinsH", "ptBinsH", nPtBins, ptBins);
   ptBinsH->Draw();
   ptBinsH->GetXaxis()->Set(nPtBins, ptBins);
@@ -534,85 +407,55 @@ int main(int argc, char * argv[]) {
   file->cd();
   ptBinsH->Write("ptBinsH");
 
-  TH1D * ptBinsTrigH =  new TH1D("ptBinsTrigH", "ptBinsTrigH", nPtBinsTrig, ptBinsTrig);
-  ptBinsTrigH->Draw();
-  ptBinsTrigH->GetXaxis()->Set(nPtBinsTrig, ptBinsTrig);
-  for (int i=0; i<nPtBinsTrig; i++){ ptBinsTrigH->GetXaxis()->SetBinLabel(i+1, PtBinsTrig[i]);}
-  ptBinsTrigH->Draw();
+  // create histograms with isolation binning 1 (single e channel)
+  TH1D * iso1BinsH =  new TH1D("iso1BinsH", "iso1BinsH", nIso1Bins, iso1Bins);
+  iso1BinsH->Draw();
+  iso1BinsH->GetXaxis()->Set(nIso1Bins, iso1Bins);
+  for (int i=0; i<nIso1Bins; i++){ iso1BinsH->GetXaxis()->SetBinLabel(i+1, Iso1Bins[i]);}
+  iso1BinsH->Draw();
   file->cd();
-  ptBinsTrigH->Write("ptBinsTrigH");
+  iso1BinsH->Write("iso1BinsH");
 
-  TH1D * ZMassEtaPtPass[4][7];
-  TH1D * ZMassEtaPtFail[4][7];
-
-  TH1D * ZMassJetEtaPtPass[4][3][7];
-  TH1D * ZMassJetEtaPtFail[4][3][7];
-
-  TH1D * PromptPtPass[4];
-  TH1D * PromptPtFail[4];
-
-  TH1D * NonPromptPtPass[4];
-  TH1D * NonPromptPtFail[4];
-
-  TH1D * PromptSelPtPass[4];
-  TH1D * PromptSelPtFail[4];
-
-  TH1D * NonPromptSelPtPass[4];
-  TH1D * NonPromptSelPtFail[4];
-
-  TH1D * PromptSelJetPtPass[4][3];
-  TH1D * PromptSelJetPtFail[4][3];
-
-  TH1D * NonPromptSelJetPtPass[4][3];
-  TH1D * NonPromptSelJetPtFail[4][3];
-
-  TH1D * ZMassMu23EtaPtPass[4][16];
-  TH1D * ZMassMu23EtaPtFail[4][16];
-
-  TH1D * ZMassMu17EtaPtPass[4][16];
-  TH1D * ZMassMu17EtaPtFail[4][16];
-
-  TH1D * ZMassMu8EtaPtPass[4][16];
-  TH1D * ZMassMu8EtaPtFail[4][16];
-
-  TH1D * ZMassIsoMuEtaPtPass[4][16];
-  TH1D * ZMassIsoMuEtaPtFail[4][16];
+  // create histograms with isolation binning 2 (e+mu channel)
+  TH1D * iso2BinsH =  new TH1D("iso2BinsH", "iso2BinsH", nIso2Bins, iso2Bins);
+  iso2BinsH->Draw();
+  iso2BinsH->GetXaxis()->Set(nIso2Bins, iso2Bins);
+  for (int i=0; i<nIso2Bins; i++){ iso2BinsH->GetXaxis()->SetBinLabel(i+1, Iso2Bins[i]);}
+  iso2BinsH->Draw();
+  file->cd();
+  iso2BinsH->Write("iso2BinsH");
 
   TH1D * ZMassPass = new TH1D("ZMassPass","",80,50,130);
   TH1D * ZMassFail = new TH1D("ZMassFail","",80,50,130);
 
+  TH1D * ZMassEtaPtPass[4][11];
+  TH1D * ZMassEtaPtFail[4][11];
+
+  TH1D * ZMassJetEtaPtPass[3][4][11];
+  TH1D * ZMassJetEtaPtFail[3][4][11];
+
+  TH1F * ZMassIso1EtaPtPass[4][4][11];
+  TH1F * ZMassIso1EtaPtFail[4][4][11];
+
+  TH1F * ZMassIso2EtaPtPass[4][4][11];
+  TH1F * ZMassIso2EtaPtFail[4][4][11];
+
   for (int iEta=0; iEta<nEtaBins; ++iEta) {
-    PromptPtPass[iEta] = new TH1D("PromptPt"+EtaBins[iEta]+"Pass","",nPtBins,ptBins);
-    PromptPtFail[iEta] = new TH1D("PromptPt"+EtaBins[iEta]+"Fail","",nPtBins,ptBins);
-    NonPromptPtPass[iEta] = new TH1D("NonPromptPt"+EtaBins[iEta]+"Pass","",nPtBins,ptBins);
-    NonPromptPtFail[iEta] = new TH1D("NonPromptPt"+EtaBins[iEta]+"Fail","",nPtBins,ptBins);
-    PromptSelPtPass[iEta] = new TH1D("PromptSelPt"+EtaBins[iEta]+"Pass","",nPtBins,ptBins);
-    PromptSelPtFail[iEta] = new TH1D("PromptSelPt"+EtaBins[iEta]+"Fail","",nPtBins,ptBins);
-    NonPromptSelPtPass[iEta] = new TH1D("NonPromptSelPt"+EtaBins[iEta]+"Pass","",nPtBins,ptBins);
-    NonPromptSelPtFail[iEta] = new TH1D("NonPromptSelPt"+EtaBins[iEta]+"Fail","",nPtBins,ptBins);
-    for (int iJet=0; iJet<3; ++iJet) {
-      PromptSelJetPtPass[iEta][iJet] = new TH1D("PromptSelPt"+EtaBins[iEta]+JetBins[iJet]+"Pass","",nPtBins,ptBins);
-      PromptSelJetPtFail[iEta][iJet] = new TH1D("PromptSelPt"+EtaBins[iEta]+JetBins[iJet]+"Fail","",nPtBins,ptBins);
-      NonPromptSelJetPtPass[iEta][iJet] = new TH1D("NonPromptSelPt"+EtaBins[iEta]+JetBins[iJet]+"Pass","",nPtBins,ptBins);
-      NonPromptSelJetPtFail[iEta][iJet] = new TH1D("NonPromptSelPt"+EtaBins[iEta]+JetBins[iJet]+"Fail","",nPtBins,ptBins);
-    }
     for (int iPt=0; iPt<nPtBins; ++iPt) {
       ZMassEtaPtPass[iEta][iPt] = new TH1D("ZMass"+EtaBins[iEta]+PtBins[iPt]+"Pass","",80,50,130);
       ZMassEtaPtFail[iEta][iPt] = new TH1D("ZMass"+EtaBins[iEta]+PtBins[iPt]+"Fail","",80,50,130);
       for (int iJet=0; iJet<3; ++iJet) {
-	ZMassJetEtaPtPass[iEta][iJet][iPt] = new TH1D("ZMass"+EtaBins[iEta]+JetBins[iJet]+PtBins[iPt]+"Pass","",80,50,130);
-	ZMassJetEtaPtFail[iEta][iJet][iPt] = new TH1D("ZMass"+EtaBins[iEta]+JetBins[iJet]+PtBins[iPt]+"Fail","",80,50,130);
+	ZMassJetEtaPtPass[iJet][iEta][iPt] = new TH1D("ZMass"+JetBins[iJet]+EtaBins[iEta]+PtBins[iPt]+"Pass","",80,50,130);
+	ZMassJetEtaPtFail[iJet][iEta][iPt] = new TH1D("ZMass"+JetBins[iJet]+EtaBins[iEta]+PtBins[iPt]+"Fail","",80,50,130);
       }
-    }
-    for (int iPt=0; iPt<nPtBinsTrig; ++iPt) {
-      ZMassMu23EtaPtPass[iEta][iPt] = new TH1D("ZMassMu23"+EtaBins[iEta]+PtBinsTrig[iPt]+"Pass","",80,50,130);
-      ZMassMu23EtaPtFail[iEta][iPt] = new TH1D("ZMassMu23"+EtaBins[iEta]+PtBinsTrig[iPt]+"Fail","",80,50,130);
-      ZMassMu17EtaPtPass[iEta][iPt] = new TH1D("ZMassMu17"+EtaBins[iEta]+PtBinsTrig[iPt]+"Pass","",80,50,130);
-      ZMassMu17EtaPtFail[iEta][iPt] = new TH1D("ZMassMu17"+EtaBins[iEta]+PtBinsTrig[iPt]+"Fail","",80,50,130);
-      ZMassMu8EtaPtPass[iEta][iPt]  = new TH1D("ZMassMu8"+EtaBins[iEta]+PtBinsTrig[iPt]+"Pass","",80,50,130);
-      ZMassMu8EtaPtFail[iEta][iPt]  = new TH1D("ZMassMu8"+EtaBins[iEta]+PtBinsTrig[iPt]+"Fail","",80,50,130);
-      ZMassIsoMuEtaPtPass[iEta][iPt]  = new TH1D("ZMassIsoMu"+EtaBins[iEta]+PtBinsTrig[iPt]+"Pass","",80,50,130);
-      ZMassIsoMuEtaPtFail[iEta][iPt]  = new TH1D("ZMassIsoMu"+EtaBins[iEta]+PtBinsTrig[iPt]+"Fail","",80,50,130);
+      for (int iIso=0; iIso<nIso1Bins; iIso++) {
+	ZMassIso1EtaPtPass[iIso][iEta][iPt] = new TH1F("ZMass"+Iso1Bins[iIso]+EtaBins[iEta]+PtBins[iPt]+"Pass","",80,50,130);
+        ZMassIso1EtaPtFail[iIso][iEta][iPt] = new TH1F("ZMass"+Iso1Bins[iIso]+EtaBins[iEta]+PtBins[iPt]+"Fail","",80,50,130);
+      }
+      for (int iIso=0; iIso<nIso2Bins; iIso++) {
+	ZMassIso1EtaPtPass[iIso][iEta][iPt] = new TH1F("ZMass"+Iso2Bins[iIso]+EtaBins[iEta]+PtBins[iPt]+"Pass","",80,50,130);
+        ZMassIso1EtaPtFail[iIso][iEta][iPt] = new TH1F("ZMass"+Iso2Bins[iIso]+EtaBins[iEta]+PtBins[iPt]+"Fail","",80,50,130);
+      }
     }
   }
 
@@ -635,15 +478,11 @@ int main(int argc, char * argv[]) {
   TString RecoilZPerp("recoilZPerp_");
   TString RecoilPuppiZParal("recoilPuppiZParal_");
   TString RecoilPuppiZPerp("recoilPuppiZPerp_");
-  TString RecoilMvaZParal("recoilMvaZParal_");
-  TString RecoilMvaZPerp("recoilMvaZPerp_");
 
   TString RecoilTopParal("recoilTopParal_");
   TString RecoilTopPerp("recoilTopPerp_");
   TString RecoilPuppiTopParal("recoilPuppiTopParal_");
   TString RecoilPuppiTopPerp("recoilPuppiTopPerp_");
-  TString RecoilMvaTopParal("recoilMvaTopParal_");
-  TString RecoilMvaTopPerp("recoilMvaTopPerp_");
 
   // Saving Z pt bins
   TH1D * ZPtBinsH = new TH1D("ZPtBinsH","ZPtBinsH",nZPtBins,zPtBins);
@@ -657,45 +496,33 @@ int main(int argc, char * argv[]) {
 
   TH1D * metSelNJetsH[3];
   TH1D * puppimetSelNJetsH[3];
-  TH1D * mvametSelNJetsH[3];
 
   TH1D * metZSelNJetsH[3];
   TH1D * puppimetZSelNJetsH[3];
-  TH1D * mvametZSelNJetsH[3];
 
   TH1D * metTopSelNJetsH[3];
   TH1D * puppimetTopSelNJetsH[3];
-  TH1D * mvametTopSelNJetsH[3];
 
   TH1D * recoilZParalH[3];
   TH1D * recoilZPerpH[3];
   TH1D * recoilPuppiZParalH[3];
   TH1D * recoilPuppiZPerpH[3];
-  TH1D * recoilMvaZParalH[3];
-  TH1D * recoilMvaZPerpH[3];
 
   TH1D * recoilTopParalH[3];
   TH1D * recoilTopPerpH[3];
   TH1D * recoilPuppiTopParalH[3];
   TH1D * recoilPuppiTopPerpH[3];
-  TH1D * recoilMvaTopParalH[3];
-  TH1D * recoilMvaTopPerpH[3];
 
   TH1D * recoilZParal_Ptbins_nJetsH[3][5];
   TH1D * recoilZPerp_Ptbins_nJetsH[3][5];
   TH1D * recoilPuppiZParal_Ptbins_nJetsH[3][5];
   TH1D * recoilPuppiZPerp_Ptbins_nJetsH[3][5];
-  TH1D * recoilMvaZParal_Ptbins_nJetsH[3][5];
-  TH1D * recoilMvaZPerp_Ptbins_nJetsH[3][5];
 
   TH1D * recoilResponse_nJets[3];
   TH1D * recoilResponse_Ptbins_nJets[3][5];
 
   TH1D * recoilPuppiResponse_nJets[3];
   TH1D * recoilPuppiResponse_Ptbins_nJets[3][5];
-
-  TH1D * recoilMvaResponse_nJets[3];
-  TH1D * recoilMvaResponse_Ptbins_nJets[3][5];
 
   TH1D * recoilResponseMC_Ptbins[5];
   TH1D * recoilResponseMC_nJets[3];
@@ -705,33 +532,13 @@ int main(int argc, char * argv[]) {
   TH1D * recoilPuppiResponseMC_nJets[3];
   TH1D * recoilPuppiResponseMC_Ptbins_nJets[3][5];
 
-  TH1D * recoilMvaResponseMC_Ptbins[5];
-  TH1D * recoilMvaResponseMC_nJets[3];
-  TH1D * recoilMvaResponseMC_Ptbins_nJets[3][5];
-  
-  // systematics ===>
-
-  TH1D * recoilMvaZParalSysH[3][4][2];
-  TH1D * recoilMvaZPerpSysH[3][4][2];
-
-  TH1D * recoilMvaTopParalSysH[3][4][2];
-  TH1D * recoilMvaTopPerpSysH[3][4][2];
-
-  TH1D * mvametZSelNJetsSysH[3][4][2];
-  TH1D * mvametTopSelNJetsSysH[3][4][2];
-
-  TString sysNames[4] = {"JES","MEtScale","MEtReso","MuonMom"};
-  TString UpDown[2] = {"Up","Down"};
-
   for (int iBin=0; iBin<nJetBins; ++iBin) {
+
     recoilZParalH[iBin] = new TH1D(RecoilZParal+NJetBins[iBin]+"H","",200,-400,400);
     recoilZPerpH[iBin] = new TH1D(RecoilZPerp+NJetBins[iBin]+"H","",200,-400,400);
 
     recoilPuppiZParalH[iBin] = new TH1D(RecoilPuppiZParal+NJetBins[iBin]+"H","",200,-400,400);
     recoilPuppiZPerpH[iBin] = new TH1D(RecoilPuppiZPerp+NJetBins[iBin]+"H","",200,-400,400);
-
-    recoilMvaZParalH[iBin] = new TH1D(RecoilMvaZParal+NJetBins[iBin]+"H","",200,-400,400);
-    recoilMvaZPerpH[iBin] = new TH1D(RecoilMvaZPerp+NJetBins[iBin]+"H","",200,-400,400);
 
     recoilTopParalH[iBin] = new TH1D(RecoilTopParal+NJetBins[iBin]+"H","",200,-400,400);
     recoilTopPerpH[iBin] = new TH1D(RecoilTopPerp+NJetBins[iBin]+"H","",200,-400,400);
@@ -739,50 +546,25 @@ int main(int argc, char * argv[]) {
     recoilPuppiTopParalH[iBin] = new TH1D(RecoilPuppiTopParal+NJetBins[iBin]+"H","",200,-400,400);
     recoilPuppiTopPerpH[iBin] = new TH1D(RecoilPuppiTopPerp+NJetBins[iBin]+"H","",200,-400,400);
 
-    recoilMvaTopParalH[iBin] = new TH1D(RecoilMvaTopParal+NJetBins[iBin]+"H","",200,-400,400);
-    recoilMvaTopPerpH[iBin] = new TH1D(RecoilMvaTopPerp+NJetBins[iBin]+"H","",200,-400,400);
-
     metSelNJetsH[iBin] = new TH1D("metSel"+NJetBins[iBin]+"H","",200,0.,400.);
     puppimetSelNJetsH[iBin] = new TH1D("puppimetSel"+NJetBins[iBin]+"H","",200,0.,400.);
-    mvametSelNJetsH[iBin] = new TH1D("mvametSel"+NJetBins[iBin]+"H","",200,0.,400.);
 
     metZSelNJetsH[iBin] = new TH1D("metZSel"+NJetBins[iBin]+"H","",200,0.,400.);
     puppimetZSelNJetsH[iBin] = new TH1D("puppimetZSel"+NJetBins[iBin]+"H","",200,0.,400.);
-    mvametZSelNJetsH[iBin] = new TH1D("mvametZSel"+NJetBins[iBin]+"H","",200,0.,400.);
 
     metTopSelNJetsH[iBin] = new TH1D("metTopSel"+NJetBins[iBin]+"H","",200,0.,400.);
     puppimetTopSelNJetsH[iBin] = new TH1D("puppimetTopSel"+NJetBins[iBin]+"H","",200,0.,400.);
-    mvametTopSelNJetsH[iBin] = new TH1D("mvametTopSel"+NJetBins[iBin]+"H","",200,0.,400.);
 
     recoilResponse_nJets[iBin] = new TH1D("recoilResponse"+NJetBins[iBin],"",400,-20,20);
     recoilPuppiResponse_nJets[iBin] = new TH1D("recoilPuppiResponse"+NJetBins[iBin],"",400,-20,20);
-    recoilMvaResponse_nJets[iBin] = new TH1D("recoilMvaResponse"+NJetBins[iBin],"",400,-20,20);
 
     recoilResponseMC_nJets[iBin] = new TH1D("recoilResponseMC"+NJetBins[iBin],"",400,-20,20);
     recoilPuppiResponseMC_nJets[iBin] = new TH1D("recoilPuppiResponseMC"+NJetBins[iBin],"",400,-20,20);
-    recoilMvaResponseMC_nJets[iBin] = new TH1D("recoilMvaResponseMC"+NJetBins[iBin],"",400,-20,20);
-
-    for (int iSys=0; iSys<4; ++iSys) {
-      for (int iUD=0; iUD<2; ++iUD) {
-
-	mvametZSelNJetsSysH[iBin][iSys][iUD] = new TH1D("mvametZSel"+NJetBins[iBin]+sysNames[iSys]+UpDown[iUD]+"H","",200,0.,400.);
-	mvametTopSelNJetsSysH[iBin][iSys][iUD] = new TH1D("mvametTopSel"+NJetBins[iBin]+sysNames[iSys]+UpDown[iUD]+"H","",200,0.,400.);
-	
-	recoilMvaZParalSysH[iBin][iSys][iUD] = new TH1D(RecoilMvaZParal+NJetBins[iBin]+sysNames[iSys]+UpDown[iUD]+"H","",200,-400,400);
-	recoilMvaZPerpSysH[iBin][iSys][iUD] = new TH1D(RecoilMvaZPerp+NJetBins[iBin]+sysNames[iSys]+UpDown[iUD]+"H","",200,-400,400);
-
-	recoilMvaTopParalSysH[iBin][iSys][iUD] = new TH1D(RecoilMvaTopParal+NJetBins[iBin]+sysNames[iSys]+UpDown[iUD]+"H","",200,-400,400);
-	recoilMvaTopPerpSysH[iBin][iSys][iUD] = new TH1D(RecoilMvaTopPerp+NJetBins[iBin]+sysNames[iSys]+UpDown[iUD]+"H","",200,-400,400);
-
-      }
-    }
 
   }
-
   for (int iPtBins=0; iPtBins<nZPtBins; ++iPtBins){
     recoilResponseMC_Ptbins[iPtBins] = new TH1D("recoilResponseMC"+ZPtBins[iPtBins],"",400,-20,20);
     recoilPuppiResponseMC_Ptbins[iPtBins] = new TH1D("recoilPuppiResponseMC"+ZPtBins[iPtBins],"",400,-20,20);
-    recoilMvaResponseMC_Ptbins[iPtBins] = new TH1D("recoilMvaResponseMC"+ZPtBins[iPtBins],"",400,-20,20);
   }
 
   for (int iJets=0; iJets<nJetBins; ++iJets) {
@@ -794,103 +576,14 @@ int main(int argc, char * argv[]) {
       recoilPuppiZParal_Ptbins_nJetsH[iJets][iPtBins] = new TH1D(RecoilPuppiZParal+NJetBins[iJets]+ZPtBins[iPtBins],"",100,-200,200);
       recoilPuppiZPerp_Ptbins_nJetsH[iJets][iPtBins] = new TH1D(RecoilPuppiZPerp+NJetBins[iJets]+ZPtBins[iPtBins],"",100,-200,200);
 
-      recoilMvaZParal_Ptbins_nJetsH[iJets][iPtBins] = new TH1D(RecoilMvaZParal+NJetBins[iJets]+ZPtBins[iPtBins],"",100,-200,200);
-      recoilMvaZPerp_Ptbins_nJetsH[iJets][iPtBins] = new TH1D(RecoilMvaZPerp+NJetBins[iJets]+ZPtBins[iPtBins],"",100,-200,200);
-
       recoilResponse_Ptbins_nJets[iJets][iPtBins] = new TH1D("recoilResponse"+NJetBins[iJets]+ZPtBins[iPtBins],"",400,-20,20);
       recoilPuppiResponse_Ptbins_nJets[iJets][iPtBins] = new TH1D("recoilPuppiResponse"+NJetBins[iJets]+ZPtBins[iPtBins],"",400,-20,20);
-      recoilMvaResponse_Ptbins_nJets[iJets][iPtBins] = new TH1D("recoilMvaResponse"+NJetBins[iJets]+ZPtBins[iPtBins],"",400,-20,20);
 
       recoilResponseMC_Ptbins_nJets[iJets][iPtBins] = new TH1D("recoilResponseMC"+NJetBins[iJets]+ZPtBins[iPtBins],"",400,-20,20);
       recoilPuppiResponseMC_Ptbins_nJets[iJets][iPtBins] = new TH1D("recoilPuppiResponseMC"+NJetBins[iJets]+ZPtBins[iPtBins],"",400,-20,20);
-      recoilMvaResponseMC_Ptbins_nJets[iJets][iPtBins] = new TH1D("recoilMvaResponseMC"+NJetBins[iJets]+ZPtBins[iPtBins],"",400,-20,20);
 
     }
   }
-
-  ULong64_t evt;
-  float pt_1;
-  float pt_2;
-  float eta_1;
-  float eta_2;
-  float phi_1;
-  float phi_2;
-
-  float dilepton_pt;
-  float dilepton_eta;
-  float dilepton_phi;
-
-  float mvametX;
-  float metX;
-  float metuncorrX;
-  float puppimetX;
-
-  float u1_mvametX;
-  float u1_metX;
-  float u1_metuncorrX;
-
-  float u2_mvametX;
-  float u2_metX;
-  float u2_metuncorrX;
-
-  int njets;
-  bool match_1;
-  bool match_2;
-
-  TTree * synch_tree = new TTree("TauCheck","TauChek");
-
-  synch_tree->Branch("evt", &evt, "evt/I");
-
-  synch_tree->Branch("dilepton_pt",&dilepton_pt,"dilepton_pt/F");
-  synch_tree->Branch("dilepton_eta",&dilepton_eta,"dilepton_eta/F");
-  synch_tree->Branch("dilepton_phi",&dilepton_phi,"dilepton_phi/F");
-
-  synch_tree->Branch("pt_1",&pt_1,"pt_1/F");
-  synch_tree->Branch("pt_2",&pt_2,"pt_2/F");
-
-  synch_tree->Branch("eta_1",&eta_1,"eta_1/F");
-  synch_tree->Branch("eta_2",&eta_2,"eta_2/F");
-
-  synch_tree->Branch("phi_1",&phi_1,"phi_1/F");
-  synch_tree->Branch("phi_2",&phi_2,"phi_2/F");
-  
-  synch_tree->Branch("match_1",&match_1,"match_1/O");
-  synch_tree->Branch("match_2",&match_2,"match_2/O");
-
-  synch_tree->Branch("mvamet",&mvametX,"mvamet/F");
-  synch_tree->Branch("met",&metX,"met/F");
-  synch_tree->Branch("metuncorr",&metuncorrX,"metuncorr/F");
-  synch_tree->Branch("puppimet",&puppimetX,"puppimet/F");
-
-  synch_tree->Branch("u1_mvamet",&u1_mvametX,"u1_mvamet/F");
-  synch_tree->Branch("u1_met",&u1_metX,"u1_met/F");
-  synch_tree->Branch("u1_metuncorr",&u1_metuncorrX,"u1_metuncorr/F");
-
-  synch_tree->Branch("u2_mvamet",&u2_mvametX,"u2_mvamet/F");
-  synch_tree->Branch("u2_met",&u2_metX,"u2_met/F");
-  synch_tree->Branch("u2_metuncorr",&u2_metuncorrX,"u2_metuncorr/F");
-
-  synch_tree->Branch("njets", &njets, "njets/I");
-
-  // PILE UP REWEIGHTING - OPTIONS
-
-  if (applyPUreweighting_vertices and applyPUreweighting_official) 
-	{std::cout<<"ERROR: Choose only ONE PU reweighting method (vertices or official, not both!) " <<std::endl; exit(-1);}
-
-  // reweighting with vertices
-
-  // reading vertex weights
-  TFile * fileDataNVert = new TFile(TString(cmsswBase)+"/src/"+vertDataFileName);
-  TFile * fileMcNVert   = new TFile(TString(cmsswBase)+"/src/"+vertMcFileName);
-
-  TH1D * vertexDataH = (TH1D*)fileDataNVert->Get(TString(vertHistName));
-  TH1D * vertexMcH   = (TH1D*)fileMcNVert->Get(TString(vertHistName));
-
-  float normVertexData = vertexDataH->GetSumOfWeights();
-  float normVertexMc   = vertexMcH->GetSumOfWeights();
-
-  vertexDataH->Scale(1/normVertexData);
-  vertexMcH->Scale(1/normVertexMc);
 
 
   // reweighting official recipe 
@@ -901,25 +594,13 @@ int main(int argc, char * argv[]) {
     TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/"+PileUpDataFile,"read"); 
     TFile * filePUdistribution_MC = new TFile (TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/"+PileUpMCFile, "read"); 
     TH1D * PU_data = (TH1D *)filePUdistribution_data->Get("pileup");
-    TH1D * PU_mc = (TH1D *)filePUdistribution_MC->Get("pileup");
+    TH1D * PU_mc = (TH1D *)filePUdistribution_MC->Get(PileUpMCHist+"_pileup");
     PUofficial->set_h_data(PU_data); 
     PUofficial->set_h_MC(PU_mc);
   }
 
   // HTT Met recoil corrections
-  //  RecoilCorrector recoilPFMetCorrector("HTT-utilities/RecoilCorrections/data/recoilPFMet.root");
-  //  RecoilCorrector recoilMvaMetCorrector("HTT-utilities/RecoilCorrections/data/recoilMvaMet.root");
-  //  RecoilCorrector recoilPuppiMetCorrector("HTT-utilities/RecoilCorrections/data/recoilPuppiMet.root");
-
   RecoilCorrector recoilPFMetCorrector(RecoilFileName);
-  RecoilCorrector recoilMvaMetCorrector(RecoilMvaFileName);
-  RecoilCorrector recoilPuppiMetCorrector(RecoilPuppiFileName);
-
-  // MetResponse
-  MEtSys metSys(MetSysFileName);
-  MEtSys metSysPuppi(MetSysPuppiFileName);
-  MEtSys metSysMva(MetSysMvaFileName);
-
 
   // Lepton Scale Factors 
 
@@ -933,8 +614,8 @@ int main(int argc, char * argv[]) {
   }
 
   // tracking efficiency SF
-  TFile * fileTrackingSF = new TFile(TString(cmsswBase)+"/src/"+TString(trackingSFFile));
-  TH1D * trackEffMuonH = (TH1D*)fileTrackingSF->Get("effTrackingMu");
+  TFile * workspaceFile = new TFile(TString(cmsswBase)+"/src/"+CorrectionWorkspaceFile);
+  RooWorkspace *correctionWS = (RooWorkspace*)workspaceFile->Get("w");
 
   // Z mass pt weights
   TFile * fileZMassPtWeights = new TFile(TString(cmsswBase)+"/src/"+ZMassPtWeightsFileName); 
@@ -948,7 +629,7 @@ int main(int argc, char * argv[]) {
     exit(-1);
   }
 
-  // BTag scale factors                                                                                                                                                                                                                    
+  // BTag scale factors                                                                                                                                                    
   BTagCalibration calib("csvv2", cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/CSVv2_ichep.csv");
   BTagCalibrationReader reader_B(BTagEntry::OP_MEDIUM,"central",{"up","down"});
   BTagCalibrationReader reader_C(BTagEntry::OP_MEDIUM,"central",{"up","down"});
@@ -983,8 +664,6 @@ int main(int argc, char * argv[]) {
         }
   }
 
-  //  exit(0);
-
   TFile * fileTagging = new TFile(TString(cmsswBase)+TString("/src/DesyTauAnalyses/NTupleMaker/data/tagging_efficiencies_ichep2016.root"));
   TH2F * tagEff_B = (TH2F*)fileTagging->Get("btag_eff_b");
   TH2F * tagEff_C = (TH2F*)fileTagging->Get("btag_eff_c");
@@ -1001,7 +680,6 @@ int main(int argc, char * argv[]) {
   int selEventsIdMuons = 0;
   int selEventsIsoMuons = 0;
 
-
   int nTotalFiles = 0;
   std::string dummy;
   // count number of files --->
@@ -1012,12 +690,6 @@ int main(int argc, char * argv[]) {
 
   std::vector<unsigned int> allRuns; allRuns.clear();
  
-  //----Attention----//
-  //if(XSec!=1) nTotalFiles=20;
-  //nTotalFiles=5;
-
-
-
   for (int iF=0; iF<nTotalFiles; ++iF) {
   
     std::string filen;
@@ -1026,33 +698,6 @@ int main(int argc, char * argv[]) {
     std::cout << "file " << iF+1 << " out of " << nTotalFiles << " filename : " << filen << std::endl;
     TFile * file_ = TFile::Open(TString(filen));
     
-    /*
-    TH1D * histoInputEvents = NULL;
-    histoInputEvents = (TH1D*)file_->Get("makeroottree/nEvents");
-    if (histoInputEvents==NULL) continue;
-    int NE = int(histoInputEvents->GetEntries());
-    for (int iE=0;iE<NE;++iE)
-      inputEventsH->Fill(0.);
-    std::cout << "      number of input events         = " << NE << std::endl;
-
-
-    TTree * _inittree = NULL;
-    _inittree = (TTree*)file_->Get(TString(initNtupleName));
-    if (_inittree!=NULL) {
-      Float_t genweight;
-      if (!isData)
-	_inittree->SetBranchAddress("genweight",&genweight);
-      Long64_t numberOfEntriesInitTree = _inittree->GetEntries();
-      std::cout << "      number of entries in Init Tree = " << numberOfEntriesInitTree << std::endl;
-      for (Long64_t iEntry=0; iEntry<numberOfEntriesInitTree; iEntry++) {
-	_inittree->GetEntry(iEntry);
-	if (isData)
-	  histWeightsH->Fill(0.,1.);
-	else
-	  histWeightsH->Fill(0.,genweight);
-      }
-    }
-    */
     TTree * _tree = NULL;
     _tree = (TTree*)file_->Get(TString(ntupleName));
     if (_tree==NULL) continue;
@@ -1211,16 +856,6 @@ int main(int argc, char * argv[]) {
 	
 	//	cout << "PUinteractions = " << analysisTree.numtruepileupinteractions << endl;
 
-	if (applyPUreweighting_vertices) {
-	  int binNvert = vertexDataH->FindBin(analysisTree.primvertex_count);
-	  float_t dataNvert = vertexDataH->GetBinContent(binNvert);
-	  float_t mcNvert = vertexMcH->GetBinContent(binNvert);
-	  if (mcNvert < 1e-10){mcNvert=1e-10;}
-	  float_t vertWeight = dataNvert/mcNvert;
-	  weight *= vertWeight;
-	  //	  cout << "NVert = " << analysisTree.primvertex_count << "   weight = " << vertWeight << endl;
-	}
-
         if (applyPUreweighting_official) {
 	  nTruePUInteractionsH->Fill(analysisTree.numtruepileupinteractions,weight);
 	  double Ninteractions = analysisTree.numtruepileupinteractions;
@@ -1359,15 +994,6 @@ int main(int argc, char * argv[]) {
       unsigned int nMuonFilter = 0;
       bool isMuonFilter = false;
 
-      unsigned int nMuon17Filter = 0;
-      bool isMuon17Filter = false;
-
-      unsigned int nMuon8Filter = 0;
-      bool isMuon8Filter = false;
-
-      unsigned int nSingleMuonFilter = 0;
-      bool isSingleMuonFilter = false;
-
       unsigned int nfilters = analysisTree.run_hltfilters->size();
       for (unsigned int i=0; i<nfilters; ++i) {
 	TString HLTFilter(analysisTree.run_hltfilters->at(i));
@@ -1376,78 +1002,39 @@ int main(int argc, char * argv[]) {
 	  nMuonFilter = i;
 	  isMuonFilter = true;
 	}
-	if (HLTFilter==Muon17FilterName) {
-	  nMuon17Filter = i;
-	  isMuon17Filter = true;
-	}
-	if (HLTFilter==Muon8FilterName1||HLTFilter==Muon8FilterName2) {
-	  nMuon8Filter = i;
-	  isMuon8Filter = true;
-	}
-	if (HLTFilter==SingleMuonFilterName) {
-          nSingleMuonFilter = i;
-          isSingleMuonFilter = true;
-        }
       }
+
       if (applyTrigger) {
 	if (!isMuonFilter) {
 	  cout << "Filter " << MuonFilterName << " not found " << endl;
 	  continue;
 	}
-	if (!isMuon17Filter) {
-	  cout << "Filter " << Muon17FilterName << " not found " << endl;
-	  //	  continue;
-	}
-	if (!isMuon8Filter) {
-	  cout << "Filter " << Muon8FilterName1 << " or " << Muon8FilterName2 << " not found " << endl;
-	  //	  continue;
-	}
-	if (!isSingleMuonFilter) {
-	  cout << "Filter " << SingleMuonFilterName << " not found " << endl;
-	  continue;
-	}
       }
-      //      std::cout << "Filters found " << std::endl;
+
+
 
       float pfmet_ex = analysisTree.pfmetcorr_ex;
       float pfmet_ey = analysisTree.pfmetcorr_ey;
       float pfmet_phi = analysisTree.pfmetcorr_phi;
-      if (!isData) {
-	pfmet_ex = analysisTree.pfmet_ex;
-	pfmet_ey = analysisTree.pfmet_ey;
-	pfmet_phi = analysisTree.pfmet_phi;
-      }
-
       float pfmet = TMath::Sqrt(pfmet_ex*pfmet_ex+pfmet_ey*pfmet_ey);
-      //      TLorentzVector MetLV; MetLV.SetPx(pfmet_ex); MetLV.SetPy(pfmet_ey);
-      //      std::cout << "pfmet = " << pfmet << " : " << analysisTree.pfmet_pt << " : " << MetLV.Pt() << std::endl;
 
       float puppimet_ex = analysisTree.puppimet_ex;
       float puppimet_ey = analysisTree.puppimet_ey;
       float puppimet_phi = analysisTree.puppimet_phi;
       float puppimet = TMath::Sqrt(puppimet_ex*puppimet_ex+puppimet_ey*puppimet_ey);
       
-      // vertex cuts
-      //      if (fabs(analysisTree.primvertex_z)>zVertexCut) continue;
-      //      if (analysisTree.primvertex_ndof<ndofVertexCut) continue;
-      //      float dVertex = (analysisTree.primvertex_x*analysisTree.primvertex_x+
-      //		       analysisTree.primvertex_y*analysisTree.primvertex_y);
-      //      if (dVertex>dVertexCut) continue;
-      
       // muon selection
 
+      // probe muons
       vector<unsigned int> allMuons; allMuons.clear();
-      vector<unsigned int> idMuons; idMuons.clear();
-      vector<unsigned int> isoMuons; isoMuons.clear();
-      vector<float> isoMuonsValue; isoMuonsValue.clear();
       vector<float> allMuonsIso; allMuonsIso.clear();
-      vector<bool> isMuonPassedIdIso; isMuonPassedIdIso.clear();
-      vector<bool> isMuonMatched23Filter; isMuonMatched23Filter.clear();
-      vector<bool> isMuonMatched17Filter; isMuonMatched17Filter.clear();
-      vector<bool> isMuonMatched8Filter; isMuonMatched8Filter.clear();
-      vector<bool> isMuonMatchedSingleMuFilter; isMuonMatchedSingleMuFilter.clear();
+      vector<bool> allMuonsPassedId; allMuonsPassedId.clear();
+      vector<bool> allMuonsPassedIdIso; allMuonsPassedIdIso.clear();
 
-      //      std::cout << "number of muons = " << analysisTree.muon_count << std::endl;
+      // tag muons
+      vector<unsigned int> isoIdMuons; isoIdMuons.clear();
+      vector<bool> isoIdMuonsIsTriggerMatched; isoIdMuonsIsTriggerMatched.clear();
+      vector<float> isoIdMuonsIso; isoIdMuonsIso.clear();
 
       for (unsigned int im = 0; im<analysisTree.muon_count; ++im) {
 	if (!isData&&fabs(muonMomScale-1.0)>0.001) {
@@ -1456,32 +1043,16 @@ int main(int argc, char * argv[]) {
 	  analysisTree.muon_pz[im] *= muonMomScale;
 	  analysisTree.muon_pt[im] *= muonMomScale;
 	} 
-	bool muPassed    = true;
-	bool mu23Matched = false;
-	bool mu17Matched = false;
-	bool mu8Matched  = false;
-	bool muSingleMatched = false;
-	if (analysisTree.muon_pt[im]<ptBins[0]) continue;
-	if (fabs(analysisTree.muon_eta[im])>etaBins[nEtaBins]) continue;
-	if (fabs(analysisTree.muon_dxy[im])>dxyMuonLooseCut) continue;
-	if (fabs(analysisTree.muon_dz[im])>dzMuonLooseCut) continue;
-	allMuons.push_back(im);
-	if (fabs(analysisTree.muon_dxy[im])>dxyMuonCut) muPassed = false;
-	if (fabs(analysisTree.muon_dz[im])>dzMuonCut) muPassed = false;
-	//	bool goodGlob =
-	//          analysisTree.muon_isGlobal[im] &&
-	//          analysisTree.muon_normChi2[im] < 3 &&
-	//          analysisTree.muon_combQ_chi2LocalPosition[im] < 12 &&
-	//          analysisTree.muon_combQ_trkKink[im] < 20;
-	//	bool ichepMed = 
-	//	  analysisTree.muon_isLoose[im] &&
-	//          analysisTree.muon_validFraction[im] >0.49 &&
-	//          analysisTree.muon_segmentComp[im] > (goodGlob ? 0.303 : 0.451);
-	//	bool ichepMed = analysisTree.muon_isICHEP[im];
-	bool ichepMed = analysisTree.muon_isMedium[im];
-	if (!ichepMed) muPassed = false;
-	//	if (!analysisTree.muon_isMedium[im]) muPassed = false;
-	if (muPassed) idMuons.push_back(im);
+
+	if (analysisTree.muon_pt[im]<ptMuonProbeCut) continue;
+	if (fabs(analysisTree.muon_eta[im])>etaMuonProbeCut) continue;
+	if (fabs(analysisTree.muon_dxy[im])>dxyMuonProbeCut) continue;
+	if (fabs(analysisTree.muon_dz[im])>dzMuonProbeCut) continue;
+
+	bool isMedium = analysisTree.muon_isMedium[im];
+	bool isPassed = true;
+        if (fabs(analysisTree.muon_dxy[im])>dxyMuonCut) isPassed = false;
+        if (fabs(analysisTree.muon_dz[im])>dzMuonCut)  isPassed = false;
 	float absIso = 0;
 	if (isoDR03) { 
 	  absIso = analysisTree.muon_r03_sumChargedHadronPt[im];
@@ -1500,153 +1071,41 @@ int main(int argc, char * argv[]) {
           absIso += neutralIso;
 	}
 	float relIso = absIso/analysisTree.muon_pt[im];
-	allMuonsIso.push_back(relIso);
-	if (muPassed && relIso<isoMuonCut) { 
-	  isoMuons.push_back(im);
-	  isoMuonsValue.push_back(relIso);
-	}
-	if (relIso>isoMuonProbeCut) muPassed = false;
-	isMuonPassedIdIso.push_back(muPassed);
+	bool isPassedId = isMedium && isPassed;
+	bool isPassedIdIso = isMedium && isPassed && relIso<isoMuonCut; 
+	allMuons.push_back(im);
+        allMuonsPassedId.push_back(isPassedId);
+        allMuonsPassedIdIso.push_back(isPassedIdIso);
+        allMuonsIso.push_back(relIso);
+
+	bool isTriggerMatched = false;
 	for (unsigned int iT=0; iT<analysisTree.trigobject_count; ++iT) {
 	  float dRtrig = deltaR(analysisTree.muon_eta[im],analysisTree.muon_phi[im],
 				analysisTree.trigobject_eta[iT],analysisTree.trigobject_phi[iT]);
 	  if (dRtrig>DRTrigMatch) continue;
-	  if (analysisTree.trigobject_filters[iT][nMuon17Filter]&&analysisTree.trigobject_pt[iT]>23) 
-	    mu23Matched = true;
-	  if (analysisTree.trigobject_filters[iT][nMuon17Filter])
-	    mu17Matched = true;
-	  if (analysisTree.trigobject_filters[iT][nSingleMuonFilter] 
-	      && analysisTree.trigobject_pt[iT]>singleMuonTriggerPtCut
-	      && fabs(analysisTree.trigobject_eta[iT])<singleMuonTriggerEtaCut)
-	    muSingleMatched = true;
-	  if (analysisTree.trigobject_filters[iT][nMuon8Filter]) 
-	    mu8Matched = true;
-	  if (!applyTrigger) {
-	    mu23Matched = true;
-	    mu17Matched = true;
-	    mu8Matched = true;
-	    muSingleMatched = true;
-	  }
-
+	  if (analysisTree.trigobject_filters[iT][nMuonFilter])
+	    isTriggerMatched = true;
 	}
-	isMuonMatched23Filter.push_back(mu23Matched);
-	isMuonMatched17Filter.push_back(mu17Matched);
-	isMuonMatched8Filter.push_back(mu8Matched);
-	isMuonMatchedSingleMuFilter.push_back(muSingleMatched);
+	
+	if (isPassedIdIso) {
+	  isoIdMuons.push_back(im);
+	  isoIdMuonsIso.push_back(relIso);
+	  isoIdMuonsIsTriggerMatched.push_back(isTriggerMatched);
+	}
+
       }
       //      std::cout << "muons processed" << std::endl;
-
-      // MC study
-      vector<unsigned int> promptMuons; promptMuons.clear();
-      vector<unsigned int> nonpromptMuons; nonpromptMuons.clear();
-      //      std::cout << "GenParticles = " << analysisTree.genparticles_count << std::endl;
-      if (!isData) {
-	for (unsigned int igen=0; igen<analysisTree.genparticles_count; ++igen) {
-	  if (fabs(analysisTree.genparticles_pdgid[igen])==13&&analysisTree.genparticles_status[igen]==1) {
-	    //	  float pxGen = analysisTree.genparticles_px[igen];
-	    //	  float pyGen = analysisTree.genparticles_py[igen];
-	    //	  float pzGen = analysisTree.genparticles_pz[igen];
-	    //	  float etaGen = PtoEta(pxGen,pyGen,pzGen);
-	    //	  float ptGen  = PtoPt(pxGen,pyGen);
-	    //	  std::cout << analysisTree.genparticles_pdgid[igen] << " : "
-	    //		    << "  pt = " << ptGen
-	    //		    << "  eta = " << etaGen
-	    //		    << "  info = " << analysisTree.genparticles_info[igen] << std::endl;
-	    if (analysisTree.genparticles_info[igen]==1)
-	      promptMuons.push_back(igen);
-	    if (analysisTree.genparticles_info[igen]==5)
-	      nonpromptMuons.push_back(igen);
-	  }
-	}
-      }	
-
-      vector<bool> isMuonPrompt; isMuonPrompt.clear();
-      for (unsigned int iRecoMuons=0; iRecoMuons<allMuons.size(); iRecoMuons++) {
-	unsigned int irec = allMuons[iRecoMuons];
-	bool isPrompt = false;
-	TLorentzVector recMuon; recMuon.SetXYZM(analysisTree.muon_px[irec],
-						analysisTree.muon_py[irec],
-						analysisTree.muon_pz[irec],
-						muonMass);
-
-	for (unsigned int iMuons=0; iMuons<promptMuons.size(); ++iMuons) {
-	  unsigned int igen = promptMuons[iMuons];
-	  TLorentzVector genMuon; genMuon.SetXYZM(analysisTree.genparticles_px[igen],
-						  analysisTree.genparticles_py[igen],
-						  analysisTree.genparticles_pz[igen],
-						  muonMass);
-	  
-	  
-	  float relativeDifference = (genMuon-recMuon).P()/genMuon.P();
-	  if (relativeDifference<0.05) {
-	    isPrompt = true;
-	    float absEtaProbe = TMath::Abs(genMuon.Eta());
-	    if (absEtaProbe>=etaMuonLowCut) absEtaProbe = fabs(etaBins[nEtaBins]) - 0.01;
-	    int iEta = binNumber(absEtaProbe,nEtaBins,etaBins);
-	    if (isMuonPassedIdIso[iRecoMuons]) 
-	      PromptPtPass[iEta]->Fill(genMuon.Pt(),weight);
-	    else
-	      PromptPtFail[iEta]->Fill(genMuon.Pt(),weight);
-	  }
-	}
-	isMuonPrompt.push_back(isPrompt);
-      }
-
-      vector<bool> isMuonNonPrompt; isMuonNonPrompt.clear();
-      for (unsigned int iRecoMuons=0; iRecoMuons<allMuons.size(); iRecoMuons++) {
-	unsigned int irec = allMuons[iRecoMuons];
-	bool isNonPrompt = false;
-	TLorentzVector recMuon; recMuon.SetXYZM(analysisTree.muon_px[irec],
-						analysisTree.muon_py[irec],
-						analysisTree.muon_pz[irec],
-						muonMass);
-
-	for (unsigned int iMuons=0; iMuons<nonpromptMuons.size(); ++iMuons) {
-	  unsigned int igen = nonpromptMuons[iMuons];
-	  TLorentzVector genMuon; genMuon.SetXYZM(analysisTree.genparticles_px[igen],
-						  analysisTree.genparticles_py[igen],
-						  analysisTree.genparticles_pz[igen],
-						  muonMass);
-	  
-	  
-	  float relativeDifference = (genMuon-recMuon).P()/genMuon.P();
-	  if (relativeDifference<0.05) {
-	    isNonPrompt = true;
-	    float absEtaProbe = TMath::Abs(genMuon.Eta());
-	    if (absEtaProbe>=etaMuonLowCut) absEtaProbe = fabs(etaBins[nEtaBins]) - 0.01;
-            int iEta = binNumber(absEtaProbe,nEtaBins,etaBins);
- 	    if (isMuonPassedIdIso[iRecoMuons]) 
-	      NonPromptPtPass[iEta]->Fill(genMuon.Pt(),weight);
-	    else
-	      NonPromptPtFail[iEta]->Fill(genMuon.Pt(),weight);
-	  }
-	}
-	isMuonNonPrompt.push_back(isNonPrompt);
-      }
-
 
       unsigned int indx1 = 0;
       unsigned int indx2 = 0;
       bool isIsoMuonsPair = false;
       bool firstTrigger = true;
       float isoMin = 9999;
-      if (isoMuons.size()>0) {
-	for (unsigned int im1=0; im1<isoMuons.size(); ++im1) {
-	  unsigned int index1 = isoMuons[im1];
-	  bool isMu1matched = false;
-	  for (unsigned int iT=0; iT<analysisTree.trigobject_count; ++iT) {
-	    float dRtrig = deltaR(analysisTree.muon_eta[index1],analysisTree.muon_phi[index1],
-				  analysisTree.trigobject_eta[iT],analysisTree.trigobject_phi[iT]);
-	    if (dRtrig>DRTrigMatch) continue;
-	    if (analysisTree.trigobject_filters[iT][nMuonFilter] && 
-		analysisTree.muon_pt[index1] > ptMuonHighCut &&
-		fabs(analysisTree.muon_eta[index1]) < etaMuonHighCut) 
-	      isMu1matched = true;
-	  }
-	  if (!applyTrigger && 
-	      analysisTree.muon_pt[index1] > ptMuonHighCut && 
-	      fabs(analysisTree.muon_eta[index1]) < etaMuonHighCut) isMu1matched = true;
-	  if (isMu1matched) {
+      if (isoIdMuons.size()>0) {
+	for (unsigned int im1=0; im1<isoIdMuons.size(); ++im1) {
+	  unsigned int index1 = isoIdMuons[im1];
+	  bool isTriggerMatched = isoIdMuonsIsTriggerMatched[im1];
+	  if (isTriggerMatched &&  analysisTree.muon_pt[index1] > ptMuonCut && fabs(analysisTree.muon_eta[index1]) < etaMuonCut) {
 	    for (unsigned int iMu=0; iMu<allMuons.size(); ++iMu) {
 	      unsigned int indexProbe = allMuons[iMu];
 	      if (index1==indexProbe) continue;
@@ -1661,11 +1120,15 @@ int main(int argc, char * argv[]) {
 	      if (dPhi>dPhileptonsCut) continue;
 	      float ptProbe = TMath::Min(float(analysisTree.muon_pt[indexProbe]),float(ptBins[nPtBins]-0.1));
 	      float absEtaProbe = fabs(analysisTree.muon_eta[indexProbe]);
+	      float isoProbe = TMath::Min(allMuonsIso[iMu],float(iso1Bins[nIso1Bins]-0.001));
 	      int ptBin = binNumber(ptProbe,nPtBins,ptBins);
-	      if (ptBin<0) continue;
-	      int ptBinTrig = binNumber(ptProbe,nPtBinsTrig,ptBinsTrig);
-	      if (ptBinTrig<0) continue;
 	      int etaBin = binNumber(absEtaProbe,nEtaBins,etaBins);
+	      int iso1Bin = binNumber(isoProbe,nIso1Bins,iso1Bins);
+              int iso2Bin = binNumber(isoProbe,nIso2Bins,iso2Bins);
+
+	      bool passId = allMuonsPassedId[iMu];
+
+	      if (ptBin<0) continue;
 	      if (etaBin<0) continue;
 
 	      TLorentzVector muon1; muon1.SetXYZM(analysisTree.muon_px[index1],
@@ -1694,7 +1157,7 @@ int main(int argc, char * argv[]) {
 		if (dR2<dRJetLeptonCut) continue;
 	  
 		// pfJetId
-		bool isPFJetId = looseJetiD(analysisTree,int(jet));
+		bool isPFJetId = tightJetiD_2017(analysisTree,int(jet));
 		if (!isPFJetId) continue;
 		
 		if (analysisTree.pfjet_pt[jet]>jetPtHighCut) {
@@ -1710,137 +1173,47 @@ int main(int argc, char * argv[]) {
 	      if (JetBin>2) JetBin = 2;
  
 	      float mass = (muon1+muon2).M();
-	      if (isMuonPassedIdIso[iMu]) { 
+	      if (allMuonsPassedIdIso[iMu]) { 
 		ZMassPass->Fill(mass,weight);
 		ZMassEtaPtPass[etaBin][ptBin]->Fill(mass,weight);
-		ZMassJetEtaPtPass[etaBin][JetBin][ptBin]->Fill(mass,weight);
-		if (isMuonPrompt[iMu]) {
-		  PromptSelPtPass[etaBin]->Fill(ptProbe,weight); 
-		  PromptSelJetPtPass[etaBin][JetBin]->Fill(ptProbe,weight);
-		}
-		if (isMuonNonPrompt[iMu]) {
-		  NonPromptSelPtPass[etaBin]->Fill(ptProbe,weight);
-		  NonPromptSelJetPtPass[etaBin][JetBin]->Fill(ptProbe,weight);
-		}
-		// muon23 filter
-		if (isMuonMatched23Filter[iMu]) 
-		  ZMassMu23EtaPtPass[etaBin][ptBinTrig]->Fill(mass,weight); 
-		else
-		  ZMassMu23EtaPtFail[etaBin][ptBinTrig]->Fill(mass,weight); 
-		// muon17 filter
-		if (isMuonMatched17Filter[iMu]) 
-		  ZMassMu17EtaPtPass[etaBin][ptBinTrig]->Fill(mass,weight); 
-		else
-		  ZMassMu17EtaPtFail[etaBin][ptBinTrig]->Fill(mass,weight); 
-		// muon8 filter
-		if (isMuonMatched8Filter[iMu]) 
-		  ZMassMu8EtaPtPass[etaBin][ptBinTrig]->Fill(mass,weight); 
-		else
-		  ZMassMu8EtaPtFail[etaBin][ptBinTrig]->Fill(mass,weight); 
-		// single muon filter
-		if (absEtaProbe<singleMuonTriggerEtaCut) { 
-		  if (isMuonMatchedSingleMuFilter[iMu]) 
-		    ZMassIsoMuEtaPtPass[etaBin][ptBinTrig]->Fill(mass,weight); 
-		  else
-		    ZMassIsoMuEtaPtFail[etaBin][ptBinTrig]->Fill(mass,weight);
-		}
+		ZMassJetEtaPtPass[JetBin][etaBin][ptBin]->Fill(mass,weight);
 	      }
 	      else {
 		ZMassFail->Fill(mass,weight);
 		ZMassEtaPtFail[etaBin][ptBin]->Fill(mass,weight);
-		ZMassJetEtaPtFail[etaBin][JetBin][ptBin]->Fill(mass,weight);
-		if (isMuonPrompt[iMu]) {
-                  PromptSelPtFail[etaBin]->Fill(ptProbe,weight);
-                  PromptSelJetPtFail[etaBin][JetBin]->Fill(ptProbe,weight);
-                }
-                if (isMuonNonPrompt[iMu]) {
-                  NonPromptSelPtFail[etaBin]->Fill(ptProbe,weight);
-                  NonPromptSelJetPtFail[etaBin][JetBin]->Fill(ptProbe,weight);
-                }
-		// filling events tree
-		if (!isData&&etaBin==0&&ptBin==6) {
-
-		  eventNumber = analysisTree.event_nr;
-		  runNumber = analysisTree.event_run;
-		  IsoMu17 = isTriggerMuon;
-
-		  ptTag = analysisTree.muon_pt[index1];
-		  etaTag = analysisTree.muon_eta[index1];
-		  phiTag = analysisTree.muon_phi[index1];
-		  dxyTag = analysisTree.muon_dxy[index1];
-		  dzTag = analysisTree.muon_dz[index1];
-		  chargeTag = analysisTree.muon_charge[index1];
-		  isoTag = isoMuonsValue[im1];
-		  //		  isMediumTag = isICHEPmed(index1,analysisTree);
-		  //		  isMediumTag = analysisTree.muon_isMedium[index1];
-		  bool goodGlobTag =
-		    analysisTree.muon_isGlobal[index1] &&
-		    analysisTree.muon_normChi2[index1] < 3 &&
-		    analysisTree.muon_combQ_chi2LocalPosition[index1] < 12 &&
-		    analysisTree.muon_combQ_trkKink[index1] < 20;
-		  isMediumTag =
-		    analysisTree.muon_isLoose[index1] &&
-		    analysisTree.muon_validFraction[index1] >0.49 &&
-		    analysisTree.muon_segmentComp[index1] > (goodGlobTag ? 0.303 : 0.451);
-		  
-		  ptProbe = analysisTree.muon_pt[indexProbe];
-		  etaProbe = analysisTree.muon_eta[indexProbe];
-		  phiProbe = analysisTree.muon_phi[indexProbe];
-		  dxyProbe = analysisTree.muon_dxy[indexProbe];
-		  dzProbe = analysisTree.muon_dz[indexProbe];
-		  chargeProbe = analysisTree.muon_charge[indexProbe];
-		  isoProbe = allMuonsIso[iMu];
-		  //		  isMediumProbe = isICHEPmed(indexProbe,analysisTree);
-		  //		  isMediumProbe = analysisTree.muon_isMedium[indexProbe];;
-		  bool goodGlobProbe =
-                    analysisTree.muon_isGlobal[indexProbe] &&
-                    analysisTree.muon_normChi2[indexProbe] < 3 &&
-                    analysisTree.muon_combQ_chi2LocalPosition[indexProbe] < 12 &&
-                    analysisTree.muon_combQ_trkKink[indexProbe] < 20;
-                  isMediumProbe =
-                    analysisTree.muon_isLoose[indexProbe] &&
-                    analysisTree.muon_validFraction[indexProbe] >0.49 &&
-                    analysisTree.muon_segmentComp[indexProbe] > (goodGlobProbe ? 0.303 : 0.451);
-		  
-		  massTagProbe = mass;
-		  //		  events->Fill();
-		}
+		ZMassJetEtaPtFail[JetBin][etaBin][ptBin]->Fill(mass,weight);
+	      }
+	      for (int iIso=0; iIso<nIso1Bins; ++iIso) {
+		if (iIso==iso1Bin && passId) 
+		  ZMassIso1EtaPtPass[iso1Bin][etaBin][ptBin]->Fill(mass,weight);
+		else
+		  ZMassIso1EtaPtFail[iso1Bin][etaBin][ptBin]->Fill(mass,weight);
+	      }
+	      for (int iIso=0; iIso<nIso2Bins; ++iIso) {
+		if (iIso==iso2Bin && passId) 
+		  ZMassIso2EtaPtPass[iso2Bin][etaBin][ptBin]->Fill(mass,weight);
+		else
+		  ZMassIso2EtaPtFail[iso2Bin][etaBin][ptBin]->Fill(mass,weight);
 	      }
 	    }
 	  }
-	  for (unsigned int im2=im1+1; im2<isoMuons.size(); ++im2) {
-	    unsigned int index2 = isoMuons[im2];
+	  for (unsigned int im2=im1+1; im2<isoIdMuons.size(); ++im2) {
+	    unsigned int index2 = isoIdMuons[im2];
 	    float q1 = analysisTree.muon_charge[index1];
 	    float q2 = analysisTree.muon_charge[index2];
-	    bool isMu2matched = false;
-	    for (unsigned int iT=0; iT<analysisTree.trigobject_count; ++iT) {
-	      float dRtrig = deltaR(analysisTree.muon_eta[index2],analysisTree.muon_phi[index2],
-				    analysisTree.trigobject_eta[iT],analysisTree.trigobject_phi[iT]);
-	      if (dRtrig>DRTrigMatch) continue;
-	      if (analysisTree.trigobject_filters[iT][nMuonFilter] && 
-		  analysisTree.muon_pt[index2] > ptMuonHighCut &&
-		  fabs(analysisTree.muon_eta[index2]) < etaMuonHighCut) 
-		isMu2matched = true;
-	    }
-	    if (!applyTrigger && 
-		analysisTree.muon_pt[index2] > ptMuonHighCut &&
-		fabs(analysisTree.muon_eta[index2]) < etaMuonHighCut) isMu2matched = true;
+	    bool isTriggerMatched1 = isoIdMuonsIsTriggerMatched[im1] &&
+              analysisTree.muon_pt[index1]>ptMuonCut&&
+	      fabs(analysisTree.electron_eta[index1])<etaMuonCut;
+            bool isTriggerMatched2 = isoIdMuonsIsTriggerMatched[im2]&&
+              analysisTree.muon_pt[index2]>ptMuonCut &&
+              fabs(analysisTree.muon_eta[index2])<etaMuonCut;
+            bool isTriggerMatched = isTriggerMatched1 || isTriggerMatched2;
 	    bool isPairSelected = q1*q2 > 0;
 	    if (oppositeSign) isPairSelected = q1*q2 < 0;
-	    //	    bool isTriggerMatch = (isMu1matched || isMu2matched);
-	    bool isTriggerMatch = false;
-	    if (analysisTree.muon_pt[index1]>analysisTree.muon_pt[index2]) {
-	      isTriggerMatch = isMu1matched;
-	      firstTrigger = true;
-	    }
-	    else {
-	      isTriggerMatch = isMu2matched;
-	      firstTrigger = false;
-	    }
 	    float dRmumu = deltaR(analysisTree.muon_eta[index1],analysisTree.muon_phi[index1],
 				  analysisTree.muon_eta[index2],analysisTree.muon_phi[index2]);
-	    if (isTriggerMatch && isPairSelected && dRmumu>dRleptonsCut) {
-	      bool sumIso = isoMuonsValue[im1]+isoMuonsValue[im2];
+	    if (isTriggerMatched && isPairSelected && dRmumu>dRleptonsCut) {
+	      bool sumIso = isoIdMuonsIso[im1]+isoIdMuonsIso[im2];
 	      if (sumIso<isoMin) {
 		isIsoMuonsPair = true;
 		isoMin = sumIso;
@@ -1877,70 +1250,6 @@ int main(int argc, char * argv[]) {
 	TLorentzVector dimuon = mu1 + mu2;
 
 	float massSel = dimuon.M();
-	//	cout << "massSel = " << massSel << endl;
-	if (!isData) {
-	
-	  for (unsigned int igen=0; igen<analysisTree.genparticles_count; ++igen) {
-	    if (fabs(analysisTree.genparticles_pdgid[igen])==13 &&
-		analysisTree.genparticles_status[igen]==1) {
-	      
-	      TLorentzVector gen_mu1; gen_mu1.SetPxPyPzE(analysisTree.genparticles_px[igen],
-							 analysisTree.genparticles_py[igen],
-							 analysisTree.genparticles_pz[igen],
-							 analysisTree.genparticles_e[igen]);
-	      TLorentzVector gen_mu2; gen_mu2.SetPxPyPzE(analysisTree.genparticles_px[igen],
-							 analysisTree.genparticles_py[igen],
-							 analysisTree.genparticles_pz[igen],
-							 analysisTree.genparticles_e[igen]);
-	      double deltaR_mu1 = deltaR(gen_mu1.Eta(), gen_mu1.Phi(),
-					 analysisTree.muon_eta[indx1],analysisTree.muon_phi[indx1]);
-	      if(deltaR_mu1 < 0.3)genmatch_m1 = true;
-	      
-	      double deltaR_mu2 = deltaR(gen_mu2.Eta(), gen_mu2.Phi(),
-					 analysisTree.muon_eta[indx2],analysisTree.muon_phi[indx2]);
-	      if(deltaR_mu2 < 0.3)genmatch_m2 = true;
-	      
-	    }
-	  }
-	}
-
-	// accessing Mva Met
-	/*
-	bool mvaMetFound = false;
-	unsigned int metMuMu = 0; 
-	for (unsigned int iMet=0; iMet<analysisTree.mvamet_count; ++iMet) {
-	  if (analysisTree.mvamet_channel[iMet]==5) {
-	    if (analysisTree.mvamet_lep1[iMet]==indx1&&
-		analysisTree.mvamet_lep2[iMet]==indx2) {
-	      metMuMu = iMet;
-	      mvaMetFound = true;
-	    }
-	  }
-	}
-	if (!mvaMetFound)
-	  std::cout << "MVA MEt not found" << std::endl;
-	//	else
-	//	  std::cout << "MVA MEt found" << std::endl;
-	float mvamet = 0;
-	float mvamet_phi = 0;
-	float mvamet_ex = 0;
-	float mvamet_ey = 0;
-	if (analysisTree.mvamet_count>0) {
-	  mvamet_ex = analysisTree.mvamet_ex[metMuMu];
-	  mvamet_ey = analysisTree.mvamet_ey[metMuMu];
-	  float mvamet_ex2 = mvamet_ex * mvamet_ex;
-	  float mvamet_ey2 = mvamet_ey * mvamet_ey;
-
-	  mvamet = TMath::Sqrt(mvamet_ex2+mvamet_ey2);
-	  mvamet_phi = TMath::ATan2(mvamet_ey,mvamet_ex);
-	}
-	*/
-	float mvamet     = analysisTree.pfmet_pt;
-	float mvamet_ex  = analysisTree.pfmet_ex;
-	float mvamet_ey  = analysisTree.pfmet_ey;
-	float mvamet_phi = TMath::ATan2(analysisTree.pfmet_ey,analysisTree.pfmet_ex);
-
-	// selecting good jets --->
 
 	// HT variables
 	float HT30 = 0;
@@ -1994,7 +1303,7 @@ int main(int argc, char * argv[]) {
 	  if (dR2<dRJetLeptonCut) continue;
 	  
 	  // pfJetId
-	  bool isPFJetId = looseJetiD(analysisTree,int(jet));
+	  bool isPFJetId = tightJetiD_2017(analysisTree,int(jet));
 	  if (!isPFJetId) continue;
 	  
 	  if (analysisTree.pfjet_pt[jet]>jetPtHighCut) {
@@ -2014,8 +1323,6 @@ int main(int argc, char * argv[]) {
 	      indexLeadingJet = jet;
 	      ptLeadingJet = jetPt; 
 	    }
-
-
 
 	    if (fabs(analysisTree.pfjet_eta[jet])<jetEtaTrkCut) {
 	      HT30etaCut += analysisTree.pfjet_pt[jet];
@@ -2130,7 +1437,7 @@ int main(int argc, char * argv[]) {
 
 	if (!isData && applyLeptonSF) {
 
-	//leptonSFweight = SF_yourScaleFactor->get_ScaleFactor(pt, eta)	
+	  //leptonSFweight = SF_yourScaleFactor->get_ScaleFactor(pt, eta)	
 	  double ptMu1 = (double)analysisTree.muon_pt[indx1];
 	  double ptMu2 = (double)analysisTree.muon_pt[indx2];
 	  double etaMu1 = (double)analysisTree.muon_eta[indx1];
@@ -2138,8 +1445,14 @@ int main(int argc, char * argv[]) {
 	  double IdIsoSF_mu1 = SF_muonIdIso->get_ScaleFactor(ptMu1, etaMu1);
 	  double IdIsoSF_mu2 = SF_muonIdIso->get_ScaleFactor(ptMu2, etaMu2);
 
-	  double trackSF_mu1 = trackEffMuonH->GetBinContent(trackEffMuonH->FindBin(etaMu1));
-	  double trackSF_mu2 = trackEffMuonH->GetBinContent(trackEffMuonH->FindBin(etaMu2));
+
+	  correctionWS->var("m_eta")->setVal(etaMu1);
+	  correctionWS->var("m_pt")->setVal(ptMu1);
+	  double trackSF_mu1 = correctionWS->function("m_trk_ratio")->getVal();
+
+	  correctionWS->var("m_eta")->setVal(etaMu2);
+          correctionWS->var("m_pt")->setVal(ptMu2);
+	  double trackSF_mu2 = correctionWS->function("m_trk_ratio")->getVal();
 
 	  MuSF_IdIso_Mu1H->Fill(IdIsoSF_mu1);
 	  MuSF_IdIso_Mu2H->Fill(IdIsoSF_mu2);
@@ -2155,28 +1468,17 @@ int main(int argc, char * argv[]) {
 		  std::cout << std::endl;
 		  } 
 	  */
-	  //	  weight = weight*IdIsoSF_mu1*IdIsoSF_mu2*trackSF_mu1*trackSF_mu2;
-	  weight = weight*IdIsoSF_mu1*IdIsoSF_mu2;
+	  weight = weight*IdIsoSF_mu1*IdIsoSF_mu2*trackSF_mu1*trackSF_mu2;
 
 	  double effDataTrig1 = SF_muonTrig->get_EfficiencyData(ptMu1, etaMu1);  
 	  double effDataTrig2 = SF_muonTrig->get_EfficiencyData(ptMu2, etaMu2);  
-	  //	  double effTrigData = 1.0 - (1-effDataTrig1)*(1-effDataTrig2);
-	  double effTrigData = 1.0;
-	  if (firstTrigger) 
-	    effTrigData = effDataTrig1;
-	  else
-	    effTrigData = effDataTrig2;
+	  double effTrigData = 1.0 - (1-effDataTrig1)*(1-effDataTrig2);
 
 	  double weightTrig = 1;
 	  if (applyTrigger) {
 	    double effMcTrig1 = SF_muonTrig->get_EfficiencyMC(ptMu1, etaMu1);
 	    double effMcTrig2 = SF_muonTrig->get_EfficiencyMC(ptMu2, etaMu2);
-	    //	    double effMcTrig = 1 - (1-effMcTrig1)*(1-effMcTrig2);
-	    double effMcTrig = 1;
-	    if (firstTrigger)
-	      effMcTrig = effMcTrig1;
-	    else
-	      effMcTrig = effMcTrig2;
+	    double effMcTrig = 1 - (1-effMcTrig1)*(1-effMcTrig2);
 	    if (effTrigData>0&&effMcTrig>0) {
 	      weightTrig = effTrigData/effMcTrig;
 	      weight = weight*weightTrig;
@@ -2186,16 +1488,6 @@ int main(int argc, char * argv[]) {
 	    weightTrig = effTrigData;
 	    weight = weight*weightTrig;
 	  }
-	  /*
-	  std::cout << "mu 1 ->  pt = " << ptMu1 << "   eta = " << etaMu1 << std::endl;                                                                                      
-	  std::cout << "mu 2 ->  pt = " << ptMu2 << "   eta = " << etaMu2 << std::endl;                                                                                      
-	  std::cout << "WeightTrig = " << weightTrig << std::endl;
-	  */
-	}
-
-	if (!isData&&applyNJetReweighting) {
-	  float njetWeight = nJetsWeight(nJets30);
-	  weight *= njetWeight;
 	}
 
 	float visiblePx = dimuon.Px();
@@ -2210,10 +1502,7 @@ int main(int argc, char * argv[]) {
 	  float pfmetcorr_ex = pfmet_ex;
 	  float pfmetcorr_ey = pfmet_ey;
 
-	  // float pfmetcorr_ex_1 = pfmet_ex;
-	  // float pfmetcorr_ey_1 = pfmet_ey;
 	  if (applySimpleRecoilCorrections)
-	    //	    recoilPFMetCorrector.CorrectByMeanResolution(pfmet_ex,pfmet_ey,genV.Px(),genV.Py(),visiblePx,visiblePy,nJets30,pfmetcorr_ex_1,pfmetcorr_ey_1);
 	    recoilPFMetCorrector.CorrectByMeanResolution(pfmet_ex,pfmet_ey,genV.Px(),genV.Py(),visiblePx,visiblePy,nJets30,pfmetcorr_ex,pfmetcorr_ey);
 	  else 
 	    recoilPFMetCorrector.Correct(pfmet_ex,pfmet_ey,genV.Px(),genV.Py(),visiblePx,visiblePy,nJets30,pfmetcorr_ex,pfmetcorr_ey);
@@ -2226,220 +1515,7 @@ int main(int argc, char * argv[]) {
 	  pfmet_ex = pfmetcorr_ex;
 	  pfmet_ey = pfmetcorr_ey;
 	  
-	  float puppimetcorr_ex = puppimet_ex;
-          float puppimetcorr_ey = puppimet_ey;
-	  //	  float puppimetcorr_ex_1 = puppimet_ex;
-	  //      float puppimetcorr_ey_1 = puppimet_ey;
-	  if (applySimpleRecoilCorrections)
-	    //	    recoilPuppiMetCorrector.CorrectByMeanResolution(puppimet_ex,puppimet_ey,genV.Px(),genV.Py(),visiblePx,visiblePy,nJets30,puppimetcorr_ex_1,puppimetcorr_ey_1);
-	    recoilPuppiMetCorrector.CorrectByMeanResolution(puppimet_ex,puppimet_ey,genV.Px(),genV.Py(),visiblePx,visiblePy,nJets30,puppimetcorr_ex,puppimetcorr_ey);
-	  else 
-	    recoilPuppiMetCorrector.Correct(puppimet_ex,puppimet_ey,genV.Px(),genV.Py(),visiblePx,visiblePy,nJets30,puppimetcorr_ex,puppimetcorr_ey);
-	  //	  std::cout << "PuppiMet : (" << puppimet_ex << "," << puppimet_ey << ")  "
-	  //		    << "  Quantile = (" << puppimetcorr_ex << "," << puppimetcorr_ey << ")" 
-	  //		    << "  MeanReso = (" << puppimetcorr_ex_1 << "," << puppimetcorr_ey_1 << ")"  
-	  //		    << std::endl; 
-	  puppimet_phi = TMath::ATan2(puppimetcorr_ey,puppimetcorr_ex);
-	  puppimet = TMath::Sqrt(puppimetcorr_ex*puppimetcorr_ex+puppimetcorr_ey*puppimetcorr_ey);
-	  
-	  puppimet_ex = puppimetcorr_ex;
-	  puppimet_ey = puppimetcorr_ey;
-
-          float mvametcorr_ex = mvamet_ex;
-          float mvametcorr_ey = mvamet_ey;
-	  //          float mvametcorr_ex_1 = mvamet_ex;
-	  //          float mvametcorr_ey_1 = mvamet_ey;
-	  if (applySimpleRecoilCorrections)
-	    //	    recoilMvaMetCorrector.CorrectByMeanResolution(mvamet_ex,mvamet_ey,genV.Px(),genV.Py(),visiblePx,visiblePy,nJets30,mvametcorr_ex_1,mvametcorr_ey_1);
-	    recoilMvaMetCorrector.CorrectByMeanResolution(mvamet_ex,mvamet_ey,genV.Px(),genV.Py(),visiblePx,visiblePy,nJets30,mvametcorr_ex,mvametcorr_ey);
-	  else 
-	    recoilMvaMetCorrector.Correct(mvamet_ex,mvamet_ey,genV.Px(),genV.Py(),visiblePx,visiblePy,nJets30,mvametcorr_ex,mvametcorr_ey);
-	  //	  std::cout << "MvaMet : (" << mvamet_ex << "," << mvamet_ey << ")  "
-	  //		    << "  Quantile = (" << mvametcorr_ex << "," << mvametcorr_ey << ")" 
-	  //		    << "  MeanReso = (" << mvametcorr_ex_1 << "," << mvametcorr_ey_1 << ")"
-	  //		    << std::endl;
-	  //	  std::cout << std::endl;
-          mvamet_phi = TMath::ATan2(mvametcorr_ey,mvametcorr_ex);
-          mvamet = TMath::Sqrt(mvametcorr_ex*mvametcorr_ex+mvametcorr_ey*mvametcorr_ey);
-
-	  mvamet_ex = mvametcorr_ex;
-	  mvamet_ey = mvametcorr_ey; 
-
 	}
-
-	if (!isData&&fabs(metScale-1)>0.001) { // applying met scale systematics
-
-	  float mvametcorr_ex = mvamet_ex;
-	  float mvametcorr_ey = mvamet_ey;
-	  metSysMva.ShiftMEt(mvamet_ex,mvamet_ey,
-			     genV.Px(),genV.Py(),
-			     visiblePx,visiblePy,
-			     nJets30,
-			     bkgdType,
-			     MEtSys::SysType::Response,
-			     metScale,
-			     mvametcorr_ex,mvametcorr_ey);
-	  mvamet_phi = TMath::ATan2(mvametcorr_ey,mvametcorr_ex);
-          mvamet = TMath::Sqrt(mvametcorr_ex*mvametcorr_ex+mvametcorr_ey*mvametcorr_ey);
-	  mvamet_ex = mvametcorr_ex;
-	  mvamet_ey = mvametcorr_ey;
-	  
-	  float pfmetcorr_ex = pfmet_ex;
-	  float pfmetcorr_ey = pfmet_ey;
-	  metSys.ShiftMEt(pfmet_ex,pfmet_ey,
-			  genV.Px(),genV.Py(),
-			  visiblePx,visiblePy,
-			  nJets30,
-			  bkgdType,
-			  MEtSys::SysType::Response,
-			  metScale,
-			  pfmetcorr_ex,pfmetcorr_ey);
-	  pfmet_phi = TMath::ATan2(pfmetcorr_ey,pfmetcorr_ex);
-          pfmet = TMath::Sqrt(pfmetcorr_ex*pfmetcorr_ex+pfmetcorr_ey*pfmetcorr_ey);
-	  pfmet_ex = pfmetcorr_ex;
-	  pfmet_ey = pfmetcorr_ey;
-	  
-	  float puppimetcorr_ex = puppimet_ex;
-	  float puppimetcorr_ey = puppimet_ey;
-	  metSysPuppi.ShiftMEt(puppimet_ex,puppimet_ey,
-			       genV.Px(),genV.Py(),
-			       visiblePx,visiblePy,
-			       nJets30,
-			       bkgdType,
-			       MEtSys::SysType::Response,
-			       metScale,
-			       puppimetcorr_ex,puppimetcorr_ey);
-	  puppimet_phi = TMath::ATan2(puppimetcorr_ey,puppimetcorr_ex);
-          puppimet = TMath::Sqrt(puppimetcorr_ex*puppimetcorr_ex+puppimetcorr_ey*puppimetcorr_ey);
-	  puppimet_ex = puppimetcorr_ex;
-	  puppimet_ey = puppimetcorr_ey;
-	  
-
-	}
-
-	if (!isData&&fabs(metResolution-1)>0.001) { // applying met resolution systematics
-	  float mvametcorr_ex = mvamet_ex;
-	  float mvametcorr_ey = mvamet_ey;
-	  metSysMva.ShiftMEt(mvamet_ex,mvamet_ey,
-			     genV.Px(),genV.Py(),
-			     visiblePx,visiblePy,
-			     nJets30,
-			     bkgdType,
-			     MEtSys::SysType::Resolution,
-			     metResolution,
-			     mvametcorr_ex,mvametcorr_ey);
-	  mvamet_phi = TMath::ATan2(mvametcorr_ey,mvametcorr_ex);
-          mvamet = TMath::Sqrt(mvametcorr_ex*mvametcorr_ex+mvametcorr_ey*mvametcorr_ey);
-	  mvamet_ex = mvametcorr_ex;
-	  mvamet_ey = mvametcorr_ey;
-	  
-	  float pfmetcorr_ex = pfmet_ex;
-	  float pfmetcorr_ey = pfmet_ey;
-	  metSys.ShiftMEt(pfmet_ex,pfmet_ey,
-			  genV.Px(),genV.Py(),
-			  visiblePx,visiblePy,
-			  nJets30,
-			  bkgdType,
-			  MEtSys::SysType::Resolution,
-			  metResolution,
-			  pfmetcorr_ex,pfmetcorr_ey);
-	  pfmet_phi = TMath::ATan2(pfmetcorr_ey,pfmetcorr_ex);
-          pfmet = TMath::Sqrt(pfmetcorr_ex*pfmetcorr_ex+pfmetcorr_ey*pfmetcorr_ey);
-	  pfmet_ex = pfmetcorr_ex;
-	  pfmet_ey = pfmetcorr_ey;
-	  
-	  float puppimetcorr_ex = puppimet_ex;
-	  float puppimetcorr_ey = puppimet_ey;
-	  metSysPuppi.ShiftMEt(puppimet_ex,puppimet_ey,
-			       genV.Px(),genV.Py(),
-			       visiblePx,visiblePy,
-			       nJets30,
-			       bkgdType,
-			       MEtSys::SysType::Resolution,
-			       metResolution,
-			       puppimetcorr_ex,puppimetcorr_ey);
-	  puppimet_phi = TMath::ATan2(puppimetcorr_ey,puppimetcorr_ex);
-          puppimet = TMath::Sqrt(puppimetcorr_ex*puppimetcorr_ex+puppimetcorr_ey*puppimetcorr_ey);
-	  puppimet_ex = puppimetcorr_ex;
-	  puppimet_ey = puppimetcorr_ey;
-	}
-
-	// systematic shifts in mva met --->
-
-	float mvamet_ex_ScaleUp   = mvamet_ex;
-	float mvamet_ex_ScaleDown = mvamet_ex;
-	float mvamet_ex_ResoUp    = mvamet_ex;
-	float mvamet_ex_ResoDown  = mvamet_ex;
-	float mvamet_ex_MuonUp    = mvamet_ex - 0.01*dimuon.Px();
-	float mvamet_ex_MuonDown  = mvamet_ex + 0.01*dimuon.Px();
-	
-	float mvamet_ey_ScaleUp   = mvamet_ey;
-	float mvamet_ey_ScaleDown = mvamet_ey;
-	float mvamet_ey_ResoUp    = mvamet_ey;
-	float mvamet_ey_ResoDown  = mvamet_ey;
-	float mvamet_ey_MuonUp    = mvamet_ey - 0.01*dimuon.Py();
-	float mvamet_ey_MuonDown  = mvamet_ey + 0.01*dimuon.Py();
-
-	float dimuonPtUp   = 1.01*dimuon.Pt();
-	float dimuonPtDown = 0.99*dimuon.Pt();
-	
-
-	metSysMva.ShiftMEt(mvamet_ex,mvamet_ey,
-			   genV.Px(),genV.Py(),
-			   visiblePx,visiblePy,
-			   nJets30,
-			   bkgdType,
-			   MEtSys::SysType::Response,
-			   1.10,
-			   mvamet_ex_ScaleUp,mvamet_ey_ScaleUp);
-
-	metSysMva.ShiftMEt(mvamet_ex,mvamet_ey,
-			   genV.Px(),genV.Py(),
-			   visiblePx,visiblePy,
-			   nJets30,
-			   bkgdType,
-			   MEtSys::SysType::Response,
-			   0.90,
-			   mvamet_ex_ScaleDown,mvamet_ey_ScaleDown);
-	
-	metSysMva.ShiftMEt(mvamet_ex,mvamet_ey,
-			   genV.Px(),genV.Py(),
-			   visiblePx,visiblePy,
-			   nJets30,
-			   bkgdType,
-			   MEtSys::SysType::Resolution,
-			   1.10,
-			   mvamet_ex_ResoUp,mvamet_ey_ResoUp);
-
-	metSysMva.ShiftMEt(mvamet_ex,mvamet_ey,
-			   genV.Px(),genV.Py(),
-			   visiblePx,visiblePy,
-			   nJets30,
-			   bkgdType,
-			   MEtSys::SysType::Resolution,
-			   0.90,
-			   mvamet_ex_ResoDown,mvamet_ey_ResoDown);
-	
-	float mvamet_ScaleUp = TMath::Sqrt(mvamet_ex_ScaleUp*mvamet_ex_ScaleUp+
-					   mvamet_ey_ScaleUp*mvamet_ey_ScaleUp);
-
-	float mvamet_ScaleDown = TMath::Sqrt(mvamet_ex_ScaleDown*mvamet_ex_ScaleDown+
-					     mvamet_ey_ScaleDown*mvamet_ey_ScaleDown);
-
-	float mvamet_ResoUp = TMath::Sqrt(mvamet_ex_ResoUp*mvamet_ex_ResoUp+
-					  mvamet_ey_ResoUp*mvamet_ey_ResoUp);
-
-	float mvamet_ResoDown = TMath::Sqrt(mvamet_ex_ResoDown*mvamet_ex_ResoDown+
-					    mvamet_ey_ResoDown*mvamet_ey_ResoDown);
-
-	float mvamet_MuonUp = TMath::Sqrt(mvamet_ex_MuonUp*mvamet_ex_MuonUp+
-					    mvamet_ey_MuonUp*mvamet_ey_MuonUp);
-
-	float mvamet_MuonDown = TMath::Sqrt(mvamet_ex_MuonDown*mvamet_ex_MuonDown+
-					    mvamet_ey_MuonDown*mvamet_ey_MuonDown);
-
-
-	//	std::cout << "Mass = " << massSel << std::endl;
 
 	// selection on mass
 	if (massSel>dimuonMassCut) {
@@ -2502,152 +1578,23 @@ int main(int argc, char * argv[]) {
 	    ptRatio = (dimuonPt/sumMuonPt);
 
 	  dimuonMassPtH->Fill(massSel,dimuonPt,weight);
-
-	  float dcaSigdxy_muon1 = 0.0;
-	  float dcaSigdxy_muon2 = 0.0;
-	  float dcaSigdz_muon1  = 0.0;
-	  float dcaSigdz_muon2  =0.0;
-	  float dcaSigdxy_mu1 = 0.0;
-	  float dcaSigdxy_mu2 = 0.0;
-          float dcaSigdz_mu1  = 0.0;
-          float dcaSigdz_mu2  =0.0;
-	  float dcaSigdxy_mu1_genMuMatch = 0.0;
-          float dcaSigdxy_mu2_genMuMatch = 0.0;
-          float dcaSigdz_mu1_genMuMatch  = 0.0;
-          float dcaSigdz_mu2_genMuMatch  =0.0;
-	  if (analysisTree.muon_dxyerr[indx1] != 0){
-	    dcaSigdxy_mu1=(analysisTree.muon_dxy[indx1]/analysisTree.muon_dxyerr[indx1]);
-	    dcaSigdxy_muon1= log10(analysisTree.muon_dxy[indx1]/analysisTree.muon_dxyerr[indx1]);
-	  }
-		      
-	  if (analysisTree.muon_dxyerr[indx2] != 0){
-	    dcaSigdxy_mu2=(analysisTree.muon_dxy[indx2]/analysisTree.muon_dxyerr[indx2]);
-	    dcaSigdxy_muon2= log10(analysisTree.muon_dxy[indx2]/analysisTree.muon_dxyerr[indx2]);
-	  }
-
-	  if (analysisTree.muon_dzerr[indx1] != 0){
-	    dcaSigdz_mu1 =(analysisTree.muon_dz[indx1]/analysisTree.muon_dzerr[indx1]);
-	    dcaSigdz_muon1 = log10(analysisTree.muon_dz[indx1]/analysisTree.muon_dzerr[indx1]);
-	  }
-	  
-	  if (analysisTree.muon_dzerr[indx2] != 0){
-	    dcaSigdz_mu2 = (analysisTree.muon_dz[indx2]/analysisTree.muon_dzerr[indx2]);
-	    dcaSigdz_muon2 = log10(analysisTree.muon_dz[indx2]/analysisTree.muon_dzerr[indx2]);
-	  }
-	  	
 	  dimuonPtSelH->Fill(dimuon.Pt(),weight);
 	  dimuonEtaSelH->Fill(dimuon.Eta(),weight);
 
-	  //filling the histograms for discriminators
-	  h_dimuonEta->Fill(dimuonEta,weight);
-          if (genmatch_m1 && genmatch_m2) h_dimuonEta_genMuMatch->Fill(dimuonEta,weight);
-	  h_ptRatio->Fill(ptRatio,weight);
-	  h_dxy_muon1->Fill(analysisTree.muon_dxy[indx1],weight);
-	  h_dxy_muon2->Fill(analysisTree.muon_dxy[indx2],weight);
-	  h_dz_muon1->Fill(analysisTree.muon_dz[indx1],weight);
-	  h_dz_muon2->Fill(analysisTree.muon_dz[indx2],weight);
-	  h_dcaSigdxy_muon1->Fill(dcaSigdxy_muon1,weight);
-	  h_dcaSigdxy_muon2->Fill(dcaSigdxy_muon2,weight);
-	  h_dcaSigdz_muon1->Fill(dcaSigdz_muon1,weight);
-	  h_dcaSigdz_muon2->Fill(dcaSigdz_muon2,weight);
-	  h_dcaSigdxy_mu1->Fill(dcaSigdxy_mu1,weight);
-          h_dcaSigdxy_mu2->Fill(dcaSigdxy_mu2,weight);
-          h_dcaSigdz_mu1->Fill(dcaSigdz_mu1,weight);
-          h_dcaSigdz_mu2->Fill(dcaSigdz_mu2,weight);
-
-	  if (genmatch_m1 && genmatch_m2) h_dcaSigdxy_mu1_genMuMatch->Fill(dcaSigdxy_mu1,weight);
-          if (genmatch_m1 && genmatch_m2) h_dcaSigdxy_mu2_genMuMatch->Fill(dcaSigdxy_mu2,weight);
-          if (genmatch_m1 && genmatch_m2) h_dcaSigdz_mu1_genMuMatch->Fill(dcaSigdz_mu1,weight);
-          if (genmatch_m1 && genmatch_m2) h_dcaSigdz_mu2_genMuMatch->Fill(dcaSigdz_mu2,weight);
-	  
-	  h_phi_leadingMu_MET->Fill((analysisTree.muon_phi[indx1]-pfmet_phi),weight);
-	  h_phi_trailingMu_MET->Fill((analysisTree.muon_phi[indx2]-pfmet_phi),weight);
-	  
-	  if(!isData){
-	    if (dcaSigdxy_muon1<1.8 && dcaSigdxy_muon1>0.2) h_dxy_muon1_dcaCut->Fill(analysisTree.muon_dxy[indx1],weight);
-	    if (dcaSigdxy_muon1<1.8 && dcaSigdxy_muon1>0.2) h_dxy_muon2_dcaCut->Fill(analysisTree.muon_dxy[indx2],weight);
-	    if (dcaSigdxy_muon1<1.8 && dcaSigdxy_muon1>0.2) h_dimuonEta_dcaCut->Fill(dimuonEta,weight);
-	    if (dcaSigdxy_muon1<1.8 && dcaSigdxy_muon1>0.2) h_ptRatio_dcaCut->Fill(ptRatio,weight);
-	  }
-	  
 	  NumberOfVerticesH->Fill(float(analysisTree.primvertex_count),weight);
 	  metSelH->Fill(pfmet,weight);
 	  puppimetSelH->Fill(puppimet,weight);
-	  mvametSelH->Fill(mvamet,weight);
 
-	  // ************************
-	  // ** Filling MET NTuple **
-	  // ************************
-	  
-	  evt = analysisTree.event_nr;
-	  pt_1 = analysisTree.muon_pt[indx1];
-	  eta_1 = analysisTree.muon_eta[indx1];
-	  phi_1 = analysisTree.muon_phi[indx1];
-	  match_1 = false;
-	  pt_2 = analysisTree.muon_pt[indx2];
-	  eta_2 = analysisTree.muon_eta[indx2];
-	  phi_2 = analysisTree.muon_phi[indx2];
-	  match_2 = false;
-	  njets = nJets30;
-	  mvametX = mvamet;
-	  metX = pfmet;
-	  metuncorrX = TMath::Sqrt(analysisTree.pfmet_ex*analysisTree.pfmet_ex+analysisTree.pfmet_ey*analysisTree.pfmet_ey);
-	  puppimetX = puppimet;
-	  if (genMuons.size()==2) {
-	    for (unsigned int iGen=0; iGen<genMuons.size(); ++iGen) {
-	      unsigned int igen = genMuons[iGen];
-	      TLorentzVector genLV; genLV.SetXYZT(analysisTree.genparticles_px[igen],
-						  analysisTree.genparticles_py[igen],
-						  analysisTree.genparticles_pz[igen],
-						  analysisTree.genparticles_e[igen]);
-	      float deltaRLeading = deltaR(eta_1,phi_1,
-					   genLV.Eta(),genLV.Phi());
-	      float deltaRTrailing = deltaR(eta_2,phi_2,
-					    genLV.Eta(),genLV.Phi());
-	      if (deltaRLeading<0.2)
-		match_1 = true;
-	      if (deltaRTrailing<0.2)
-		match_2 = true;
-	      
-	    }
-	  }
-	  
-	  dilepton_pt = dimuonPt;
-	  dilepton_eta = dimuonEta;
-	  dilepton_phi = dimuonPhi;
-	  
 	  float unitX = dimuon.Px()/dimuon.Pt();
 	  float unitY = dimuon.Py()/dimuon.Pt();
 	  float phiUnit = TMath::ATan2(unitY,unitX);
 	  float perpUnitX = TMath::Cos(phiUnit+0.5*TMath::Pi());
 	  float perpUnitY = TMath::Sin(phiUnit+0.5*TMath::Pi());
 	  
-	  //	  float pfmetcorr_ex = analysisTree.pfmetcorr_ex;
-	  //	  float pfmetcorr_ey = analysisTree.pfmetcorr_ey;
-	  
-	  float u1 = 0;
-	  float u2  = 0;
-	  float rH = 0;
-
-	  computeRecoil(pfmet_ex,pfmet_ey,unitX,unitY,perpUnitX,perpUnitY,dimuonPt,u1,u2,rH);
-	  u1_metuncorrX = u1;
-	  u2_metuncorrX = u2;
-	  
-	  computeRecoil(pfmet_ex,pfmet_ey,unitX,unitY,perpUnitX,perpUnitY,dimuonPt,u1,u2,rH);
-	  u1_metX = u1;
-	  u2_metX = u2;
-	  
-	  computeRecoil(mvamet_ex,mvamet_ey,unitX,unitY,perpUnitX,perpUnitY,dimuonPt,u1,u2,rH);
-	  u1_mvametX = u1;
-	  u2_mvametX = u2;
-	  
-	  synch_tree->Fill();
-	  
 	  for (int iScale=0; iScale<21; ++ iScale) {
 	    float scaleFactor = 0.7 + 0.03*float(iScale);
 	    metSelScaleH[iScale]->Fill(pfmet*scaleFactor,weight);
 	    puppimetSelScaleH[iScale]->Fill(puppimet*scaleFactor,weight);
-	    mvametSelScaleH[iScale]->Fill(mvamet*scaleFactor,weight);
 	  }
 
 	  // jet pt bin
@@ -2657,44 +1604,12 @@ int main(int argc, char * argv[]) {
 	  else if (nJets30>1)
 	    jetBin = 2;
 
-	  int jetBinUp = 0;
-	  if (nJets30Up==1)
-	    jetBinUp = 1;
-	  if (nJets30Up>1)
-	    jetBinUp = 2;
-
-	  int jetBinDown = 0;
-	  if (nJets30Down==1)
-	    jetBinDown = 1;
-	  if (nJets30Down>1)
-	    jetBinDown = 2;
-
-
 	  int ptBin = binNumber(TMath::Min(float(dimuonPt),float(999)),nZPtBins,zPtBins);
 
 	  metSelNJetsH[jetBin]->Fill(pfmet,weight);
 	  puppimetSelNJetsH[jetBin]->Fill(puppimet,weight);
-	  mvametSelNJetsH[jetBin]->Fill(mvamet,weight);
 
 	  if (!isData) {
-	    // std::cout << "GenV = (" 
-	    // 	      << genV.Px() << "," 
-	    // 	      << genV.Py() << "," 
-	    // 	      << genV.Pz() << ")   mass = "
-	    // 	      << genV.M()
-	    // 	      << std::endl;
-	    // std::cout << "GenL = (" 
-	    // 	      << genL.Px() << "," 
-	    // 	      << genL.Py() << "," 
-	    // 	      << genL.Pz() << ")   mass = "
-	    // 	      << genL.M() 
-	    //  	      << std::endl;
-	    // std::cout << "GenZ = (" 
-	    // 	      << genZ.Px() << "," 
-	    // 	      << genZ.Py() << "," 
-	    // 	      << genZ.Pz() << ")   mass = "
-	    // 	      << genZ.M() 
-	    // 	      << std::endl;
 
 	    int ptBinV = binNumber(TMath::Min(float(genV.Pt()),float(999)),nZPtBins,zPtBins);
 	    float Hparal = 0;
@@ -2707,14 +1622,6 @@ int main(int argc, char * argv[]) {
 	    recoilResponseMC_nJets[jetBin]->Fill(response,weight);
 	    recoilResponseMC_Ptbins_nJets[jetBin][ptBinV]->Fill(response,weight);
 	    //	    std::cout << "PFMet : Had(paral) = " << Hparal << "  Had(perp) = " << Hperp << std::endl;
-
-	    // mvamet ->
-	    ComputeHadRecoilFromMet(mvamet_ex,mvamet_ey,genV.Px(),genV.Py(),genL.Px(),genL.Py(),Hparal,Hperp);
-	    response = - Hparal/genV.Pt();
-	    recoilMvaResponseMC_Ptbins[ptBinV]->Fill(response,weight);
-	    recoilMvaResponseMC_nJets[jetBin]->Fill(response,weight);
-	    recoilMvaResponseMC_Ptbins_nJets[jetBin][ptBinV]->Fill(response,weight);
-	    //	    std::cout << "MVAMet : Had(paral) = " << Hparal << "  Had(perp) = " << Hperp << std::endl;
 
 	    // puppi met ->
 	    ComputeHadRecoilFromMet(puppimet_ex,puppimet_ey,genV.Px(),genV.Py(),genL.Px(),genL.Py(),Hparal,Hperp);
@@ -2736,50 +1643,13 @@ int main(int argc, char * argv[]) {
 	  float responsePuppiHad = 0;
 	  computeRecoil(puppimet_ex,puppimet_ey,unitX,unitY,perpUnitX,perpUnitY,dimuonPt,recoilPuppiParal,recoilPuppiPerp,responsePuppiHad);
 
-	  float recoilMvaParal = 0;
-	  float recoilMvaPerp  = 0;
-	  float responseMvaHad = 0;
-	  computeRecoil(mvamet_ex,mvamet_ey,unitX,unitY,perpUnitX,perpUnitY,dimuonPt,recoilMvaParal,recoilMvaPerp,responseMvaHad);
-
-	  float recoilMvaScaleUpParal = 0;
-	  float recoilMvaScaleUpPerp  = 0;
-	  float responseMvaScaleUpHad = 0;
-	  computeRecoil(mvamet_ex_ScaleUp,mvamet_ey_ScaleUp,unitX,unitY,perpUnitX,perpUnitY,dimuonPt,recoilMvaScaleUpParal,recoilMvaScaleUpPerp,responseMvaScaleUpHad);
-
-	  float recoilMvaScaleDownParal = 0;
-	  float recoilMvaScaleDownPerp  = 0;
-	  float responseMvaScaleDownHad = 0;
-	  computeRecoil(mvamet_ex_ScaleDown,mvamet_ey_ScaleDown,unitX,unitY,perpUnitX,perpUnitY,dimuonPt,recoilMvaScaleDownParal,recoilMvaScaleDownPerp,responseMvaScaleDownHad);
-
-	  float recoilMvaResoUpParal = 0;
-	  float recoilMvaResoUpPerp  = 0;
-	  float responseMvaResoUpHad = 0;
-	  computeRecoil(mvamet_ex_ResoUp,mvamet_ey_ResoUp,unitX,unitY,perpUnitX,perpUnitY,dimuonPt,recoilMvaResoUpParal,recoilMvaResoUpPerp,responseMvaResoUpHad);
-
-	  float recoilMvaResoDownParal = 0;
-	  float recoilMvaResoDownPerp  = 0;
-	  float responseMvaResoDownHad = 0;
-	  computeRecoil(mvamet_ex_ResoDown,mvamet_ey_ResoDown,unitX,unitY,perpUnitX,perpUnitY,dimuonPt,recoilMvaResoDownParal,recoilMvaResoDownPerp,responseMvaResoDownHad);
-
-	  float recoilMvaMuonUpParal = 0;
-	  float recoilMvaMuonUpPerp  = 0;
-	  float responseMvaMuonUpHad = 0;
-	  computeRecoil(mvamet_ex_MuonUp,mvamet_ey_MuonUp,unitX,unitY,perpUnitX,perpUnitY,dimuonPtUp,recoilMvaMuonUpParal,recoilMvaMuonUpPerp,responseMvaMuonUpHad);
-
-	  float recoilMvaMuonDownParal = 0;
-	  float recoilMvaMuonDownPerp  = 0;
-	  float responseMvaMuonDownHad = 0;
-	  computeRecoil(mvamet_ex_MuonDown,mvamet_ey_MuonDown,unitX,unitY,perpUnitX,perpUnitY,dimuonPtDown,recoilMvaMuonDownParal,recoilMvaMuonDownPerp,responseMvaMuonDownHad);
-
 	  if (massSel>70&&massSel<110) { // Z Region
 
 	    metZSelH->Fill(pfmet,weight);
 	    puppimetZSelH->Fill(puppimet,weight);
-	    mvametZSelH->Fill(mvamet,weight);
 
 	    metZSelNJetsH[jetBin]->Fill(pfmet,weight);
 	    puppimetZSelNJetsH[jetBin]->Fill(puppimet,weight);
-	    mvametZSelNJetsH[jetBin]->Fill(mvamet,weight);
 
 	    nJets20BTagLooseZSelH->Fill(double(nJets20BTagLoose),weight);
 	    nJets20BTagMediumZSelH->Fill(double(nJets20BTagMedium),weight);
@@ -2822,67 +1692,15 @@ int main(int argc, char * argv[]) {
 	    recoilPuppiResponse_nJets[jetBin]->Fill(responsePuppiHad,weight);
 	    recoilPuppiResponse_Ptbins_nJets[jetBin][ptBin]->Fill(responsePuppiHad,weight);
 
-	    // mvamet
-            recoilMvaZParalH[jetBin]->Fill(recoilMvaParal,weight);
-            recoilMvaZPerpH[jetBin]->Fill(recoilMvaPerp,weight);
-            recoilMvaZParal_Ptbins_nJetsH[jetBin][ptBin]->Fill(recoilMvaParal,weight);
-            recoilMvaZPerp_Ptbins_nJetsH[jetBin][ptBin]->Fill(recoilMvaPerp,weight);
-            recoilMvaResponse_nJets[jetBin]->Fill(responseMvaHad,weight);
-            recoilMvaResponse_Ptbins_nJets[jetBin][ptBin]->Fill(responseMvaHad,weight);
-
-	    // systematic changes
-
-	    // JES
-	    mvametZSelNJetsSysH[jetBinUp][0][0]->Fill(mvamet,weight);
-	    mvametZSelNJetsSysH[jetBinDown][0][1]->Fill(mvamet,weight);
-
-            recoilMvaZParalSysH[jetBinUp][0][0]->Fill(recoilMvaParal,weight);
-            recoilMvaZParalSysH[jetBinDown][0][1]->Fill(recoilMvaParal,weight);
-
-            recoilMvaZPerpSysH[jetBinUp][0][0]->Fill(recoilMvaPerp,weight);
-            recoilMvaZPerpSysH[jetBinDown][0][1]->Fill(recoilMvaPerp,weight);
-
-	    // MEt scale 
-	    mvametZSelNJetsSysH[jetBin][1][0]->Fill(mvamet_ScaleUp,weight);
-	    mvametZSelNJetsSysH[jetBin][1][1]->Fill(mvamet_ScaleDown,weight);
-
-            recoilMvaZParalSysH[jetBin][1][0]->Fill(recoilMvaScaleUpParal,weight);
-            recoilMvaZParalSysH[jetBin][1][1]->Fill(recoilMvaScaleDownParal,weight);
-
-            recoilMvaZPerpSysH[jetBin][1][0]->Fill(recoilMvaScaleUpPerp,weight);
-            recoilMvaZPerpSysH[jetBin][1][1]->Fill(recoilMvaScaleDownPerp,weight);
-
-	    // MEt resolution 
-	    mvametZSelNJetsSysH[jetBin][2][0]->Fill(mvamet_ResoUp,weight);
-	    mvametZSelNJetsSysH[jetBin][2][1]->Fill(mvamet_ResoDown,weight);
-
-            recoilMvaZParalSysH[jetBin][2][0]->Fill(recoilMvaResoUpParal,weight);
-            recoilMvaZParalSysH[jetBin][2][1]->Fill(recoilMvaResoDownParal,weight);
-
-            recoilMvaZPerpSysH[jetBin][2][0]->Fill(recoilMvaResoUpPerp,weight);
-            recoilMvaZPerpSysH[jetBin][2][1]->Fill(recoilMvaResoDownPerp,weight);
-
-	    // Muon momentum
-	    mvametZSelNJetsSysH[jetBin][3][0]->Fill(mvamet_MuonUp,weight);
-	    mvametZSelNJetsSysH[jetBin][3][1]->Fill(mvamet_MuonDown,weight);
-
-            recoilMvaZParalSysH[jetBin][3][0]->Fill(recoilMvaMuonUpParal,weight);
-            recoilMvaZParalSysH[jetBin][3][1]->Fill(recoilMvaMuonDownParal,weight);
-
-            recoilMvaZPerpSysH[jetBin][3][0]->Fill(recoilMvaMuonUpPerp,weight);
-            recoilMvaZPerpSysH[jetBin][3][1]->Fill(recoilMvaMuonDownPerp,weight);
-
 	  }
 
 	  if (massSel<70||massSel>110) { // Z-depleted region
 
 	    metTopSelH->Fill(pfmet,weight);
 	    puppimetTopSelH->Fill(puppimet,weight);
-	    mvametTopSelH->Fill(mvamet,weight);
 
 	    metTopSelNJetsH[jetBin]->Fill(pfmet,weight);
 	    puppimetTopSelNJetsH[jetBin]->Fill(puppimet,weight);
-	    mvametTopSelNJetsH[jetBin]->Fill(mvamet,weight);
 
 	    // pfmet
 	    recoilTopParalH[jetBin]->Fill(recoilParal,weight);
@@ -2891,53 +1709,6 @@ int main(int argc, char * argv[]) {
 	    // puppimet
 	    recoilPuppiTopParalH[jetBin]->Fill(recoilPuppiParal,weight);
 	    recoilPuppiTopPerpH[jetBin]->Fill(recoilPuppiPerp,weight);
-
-	    // mvamet
-            recoilMvaTopParalH[jetBin]->Fill(recoilMvaParal,weight);
-            recoilMvaTopPerpH[jetBin]->Fill(recoilMvaPerp,weight);
-
-
-	    // systematic changes
-
-	    // JES
-	    mvametTopSelNJetsSysH[jetBinUp][0][0]->Fill(mvamet,weight);
-	    mvametTopSelNJetsSysH[jetBinDown][0][1]->Fill(mvamet,weight);
-
-            recoilMvaTopParalSysH[jetBinUp][0][0]->Fill(recoilMvaParal,weight);
-            recoilMvaTopParalSysH[jetBinDown][0][1]->Fill(recoilMvaParal,weight);
-
-            recoilMvaTopPerpSysH[jetBinUp][0][0]->Fill(recoilMvaPerp,weight);
-            recoilMvaTopPerpSysH[jetBinDown][0][1]->Fill(recoilMvaPerp,weight);
-
-	    // MEt scale 
-	    mvametTopSelNJetsSysH[jetBin][1][0]->Fill(mvamet_ScaleUp,weight);
-	    mvametTopSelNJetsSysH[jetBin][1][1]->Fill(mvamet_ScaleDown,weight);
-
-            recoilMvaTopParalSysH[jetBin][1][0]->Fill(recoilMvaScaleUpParal,weight);
-            recoilMvaTopParalSysH[jetBin][1][1]->Fill(recoilMvaScaleDownParal,weight);
-
-            recoilMvaTopPerpSysH[jetBin][1][0]->Fill(recoilMvaScaleUpPerp,weight);
-            recoilMvaTopPerpSysH[jetBin][1][1]->Fill(recoilMvaScaleDownPerp,weight);
-
-	    // MEt resolution 
-	    mvametTopSelNJetsSysH[jetBin][2][0]->Fill(mvamet_ResoUp,weight);
-	    mvametTopSelNJetsSysH[jetBin][2][1]->Fill(mvamet_ResoDown,weight);
-
-            recoilMvaTopParalSysH[jetBin][2][0]->Fill(recoilMvaResoUpParal,weight);
-            recoilMvaTopParalSysH[jetBin][2][1]->Fill(recoilMvaResoDownParal,weight);
-
-            recoilMvaTopPerpSysH[jetBin][2][0]->Fill(recoilMvaResoUpPerp,weight);
-            recoilMvaTopPerpSysH[jetBin][2][1]->Fill(recoilMvaResoDownPerp,weight);
-
-	    // Muon momentum
-	    mvametTopSelNJetsSysH[jetBin][3][0]->Fill(mvamet_MuonUp,weight);
-	    mvametTopSelNJetsSysH[jetBin][3][1]->Fill(mvamet_MuonDown,weight);
-
-            recoilMvaTopParalSysH[jetBin][3][0]->Fill(recoilMvaMuonUpParal,weight);
-            recoilMvaTopParalSysH[jetBin][3][1]->Fill(recoilMvaMuonDownParal,weight);
-
-            recoilMvaTopPerpSysH[jetBin][3][0]->Fill(recoilMvaMuonUpPerp,weight);
-            recoilMvaTopPerpSysH[jetBin][3][1]->Fill(recoilMvaMuonDownPerp,weight);
 
 	  }
 

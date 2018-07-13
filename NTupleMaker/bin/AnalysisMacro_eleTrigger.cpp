@@ -84,9 +84,11 @@ int main(int argc, char * argv[]) {
   const string jsonFile = cfg.get<string>("jsonFile");
   const string puDataFile = cfg.get<string>("PileUpDataFile");
   const string puMCFile = cfg.get<string>("PileUpMCFile");
+  const string puMCHist = cfg.get<string>("PileUpMCHist");
 
   TString PUDataFile(puDataFile);
   TString PUMCFile(puMCFile);
+  TString PUMCHist(puMCHist);
 
   TString HLTSingleEle(hltSingleEle);
 
@@ -98,6 +100,8 @@ int main(int argc, char * argv[]) {
   const float ndofVertexCut  = cfg.get<float>("NdofVertexCut");   
   const float zVertexCut     = cfg.get<float>("ZVertexCut");
   const float dVertexCut     = cfg.get<float>("DVertexCut");
+
+  const float isoCone = 0.3;
 
   // **** end of configuration
 
@@ -203,14 +207,27 @@ int main(int argc, char * argv[]) {
   for (int iB=0; iB<nPtBins; ++iB)
     PtBinsH->GetXaxis()->SetBinLabel(iB+1,PtBins[iB]);
 
+  int nIsoBins = 4;
+  float isoBins[5] = {-0.01,0.10,0.2,0.5,1.0};
+  TString IsoBins[4] = {"IsoLt0p1",
+			"Iso0p1to0p2",
+			"Iso0p2to0p5",
+			"IsoGt0p5"};
+
+  TH1F * isoBinsH = new TH1F("isoBinsH","",nIsoBins,isoBins);
+  for (int iB=0; iB<nIsoBins; ++iB)
+    isoBinsH->GetXaxis()->SetBinLabel(iB+1,IsoBins[iB]);
+
   // (Pt,Eta)
 
-  TH1F * ZMassSingleEleLegPtEtaPassH[4][18];
-  TH1F * ZMassSingleEleLegPtEtaFailH[4][18];
+  TH1F * ZMassSingleEleLegPtEtaPassH[3][18];
+  TH1F * ZMassSingleEleLegPtEtaFailH[3][18];
 
+  TH1F * ZMassSingleEleLegIsoPtEtaPassH[4][3][18];
+  TH1F * ZMassSingleEleLegIsoPtEtaFailH[4][3][18];
 
-  TH1F * ZMassSingleEleLegEtaPassH[4];
-  TH1F * ZMassSingleEleLegEtaFailH[4];
+  TH1F * ZMassSingleEleLegEtaPassH[3];
+  TH1F * ZMassSingleEleLegEtaFailH[3];
 
   TH1F * ZMassSingleEleLegEtaFinePassH[10];
   TH1F * ZMassSingleEleLegEtaFineFailH[10];
@@ -239,6 +256,11 @@ int main(int argc, char * argv[]) {
     for (int iPt=0; iPt<nPtBins; ++iPt) {
       ZMassSingleEleLegPtEtaPassH[iEta][iPt] = new TH1F("ZMassSingleEleLeg_"+EtaBins[iEta]+"_"+PtBins[iPt]+"_PassH","",60,60,120);
       ZMassSingleEleLegPtEtaFailH[iEta][iPt] = new TH1F("ZMassSingleEleLeg_"+EtaBins[iEta]+"_"+PtBins[iPt]+"_FailH","",60,60,120);
+      for (int iIso=0; iIso<nIsoBins; ++iIso) {
+	ZMassSingleEleLegIsoPtEtaPassH[iIso][iEta][iPt] = new TH1F("ZMassSingleEleLeg_"+IsoBins[iIso]+EtaBins[iEta]+"_"+PtBins[iPt]+"_PassH","",60,60,120);
+	ZMassSingleEleLegIsoPtEtaFailH[iIso][iEta][iPt] = new TH1F("ZMassSingleEleLeg_"+IsoBins[iIso]+EtaBins[iEta]+"_"+PtBins[iPt]+"_FailH","",60,60,120);
+	
+      }
     }
 
   }
@@ -274,7 +296,7 @@ int main(int argc, char * argv[]) {
   TFile * filePUOfficial_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/"+PUDataFile,"read");
   TFile * filePUOfficial_MC = new TFile (TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/"+PUMCFile, "read");
   TH1D * PUOfficial_data = (TH1D *)filePUOfficial_data->Get("pileup");
-  TH1D * PUOfficial_mc = (TH1D *)filePUOfficial_MC->Get("pileup");
+  TH1D * PUOfficial_mc = (TH1D *)filePUOfficial_MC->Get(PUMCHist+"_pileup");
   //  PUofficial->set_h_data(PUOfficial_data);
   //  PUofficial->set_h_MC(PUOfficial_mc);
 
@@ -460,7 +482,7 @@ int main(int argc, char * argv[]) {
 	if (fabs(analysisTree.electron_dxy[im])>dxyElecCut) continue;
 	if (fabs(analysisTree.electron_dz[im])>dzElecCut) continue;
 	bool eleId = 
-	  analysisTree.electron_cutId_tight_Spring15[im] &&
+	  analysisTree.electron_mva_wp80_Iso_Fall17_v1[im]>0.5 &&
 	  analysisTree.electron_pass_conversion[im] > 0.5 &&
 	  analysisTree.electron_nmissinginnerhits[im] <= 1;
 	if (applyElecId && !eleId) continue;
@@ -541,19 +563,27 @@ int main(int argc, char * argv[]) {
 	  float mass = (ele1lv+ele2lv).M();
 
 	  float absIso1 = analysisTree.electron_r03_sumChargedHadronPt[ele1Index];
+	  //	  float neutralIso1 = 
+	  //	    analysisTree.electron_r03_sumNeutralHadronEt[ele1Index] +
+	  //            analysisTree.electron_r03_sumPhotonEt[ele1Index] -
+	  //            0.5*analysisTree.electron_r03_sumPUPt[ele1Index];
 	  float neutralIso1 = 
 	    analysisTree.electron_r03_sumNeutralHadronEt[ele1Index] +
-            analysisTree.electron_r03_sumPhotonEt[ele1Index] -
-            0.5*analysisTree.electron_r03_sumPUPt[ele1Index];
+	    analysisTree.electron_r03_sumPhotonEt[ele1Index] -
+	    analysisTree.rho*TMath::Pi()*isoCone*isoCone;
           neutralIso1 = TMath::Max(float(0),neutralIso1);
           absIso1 += neutralIso1;
 	  float relIso1 = absIso1/analysisTree.electron_pt[ele1Index];
 
 	  float absIso2 = analysisTree.electron_r03_sumChargedHadronPt[ele2Index];
+	  //	  float neutralIso2 = 
+	  //	    analysisTree.electron_r03_sumNeutralHadronEt[ele2Index] +
+	  //            analysisTree.electron_r03_sumPhotonEt[ele2Index] -
+	  //            0.5*analysisTree.electron_r03_sumPUPt[ele2Index];
 	  float neutralIso2 = 
 	    analysisTree.electron_r03_sumNeutralHadronEt[ele2Index] +
-            analysisTree.electron_r03_sumPhotonEt[ele2Index] -
-            0.5*analysisTree.electron_r03_sumPUPt[ele2Index];
+	    analysisTree.electron_r03_sumPhotonEt[ele2Index] -
+	    analysisTree.rho*TMath::Pi()*isoCone*isoCone;
           neutralIso2 = TMath::Max(float(0),neutralIso2);
           absIso2 += neutralIso2;
 	  float relIso2 = absIso2/analysisTree.electron_pt[ele2Index];
@@ -609,7 +639,7 @@ int main(int argc, char * argv[]) {
 	  if (!matchL1Tau) foundL1Seed = true;
 	  //	  std::cout << "foundL1Seed : " << << std::endl;
 
-	  if (isHLTSingleEle && ele1SingleEle && foundL1Seed && dRmumu>dRleptonsCut) { // Single electron selection
+	  if (ele2RelIso<isoElecCut && isHLTSingleEle && ele1SingleEle && foundL1Seed && dRmumu>dRleptonsCut) { // Single electron selection
 
 	    float ele2AbsEta = fabs(analysisTree.electron_eta[ele2Index]);
 	    float ele2Pt = TMath::Max(float(5.01),TMath::Min(float(analysisTree.electron_pt[ele2Index]),float(99.9)));
@@ -619,34 +649,44 @@ int main(int argc, char * argv[]) {
 	    int etaFineBin = binNumber(etaFine,nEtaFineBins,etaFineBins);
 	    int etaBin  = binNumber(ele2AbsEta,nEtaBins,etaBins);
 	    int ptBin   = binNumber(ele2Pt,nPtBins,ptBins);
+	    int isoBin  = binNumber(ele2RelIso,nIsoBins,isoBins);
 
 	    isPairSelected = true;
 	    selPairs++;
 
-	    if ( (ele2AbsEta<etaElecHighCut) && (ele2RelIso<isoElecCut) ) { // isolated electron path
-	      
+	    if (ele2AbsEta<etaElecHighCut) { 
+
 	      if (ele2MatchSingleEleProbe) {
-		ZMassSingleEleLegPtEtaPassH[etaBin][ptBin]->Fill(mass,weight);
-		ZMassSingleEleLegPtPassH[ptBin]->Fill(mass,weight);
+		ZMassSingleEleLegIsoPtEtaPassH[isoBin][etaBin][ptBin]->Fill(mass,weight);
 	      }
 	      else {
-		ZMassSingleEleLegPtEtaFailH[etaBin][ptBin]->Fill(mass,weight);
-		ZMassSingleEleLegPtFailH[ptBin]->Fill(mass,weight);
-	      }
-	      
-	      if (ele2Pt>ptElecHighCut) {
-		if (ele2MatchSingleEleProbe) {
-		  ZMassSingleEleLegEtaPassH[etaBin]->Fill(mass,weight);
-		  ZMassSingleEleLegEtaFinePassH[etaFineBin]->Fill(mass,weight);
-		  ZMassSingleEleLegPassH->Fill(mass,weight);
-		} 
-		else {
-		  ZMassSingleEleLegEtaFailH[etaBin]->Fill(mass,weight);
-		  ZMassSingleEleLegEtaFineFailH[etaFineBin]->Fill(mass,weight);
-		  ZMassSingleEleLegFailH->Fill(mass,weight);
-		}
+		ZMassSingleEleLegIsoPtEtaFailH[isoBin][etaBin][ptBin]->Fill(mass,weight);
 	      }
 
+	      if (ele2RelIso<isoElecCut) { // isolated electron path
+
+		if (ele2MatchSingleEleProbe) {
+		  ZMassSingleEleLegPtEtaPassH[etaBin][ptBin]->Fill(mass,weight);
+		  ZMassSingleEleLegPtPassH[ptBin]->Fill(mass,weight);
+		}
+		else {
+		  ZMassSingleEleLegPtEtaFailH[etaBin][ptBin]->Fill(mass,weight);
+		  ZMassSingleEleLegPtFailH[ptBin]->Fill(mass,weight);
+		}
+		
+		if (ele2Pt>ptElecHighCut) {
+		  if (ele2MatchSingleEleProbe) {
+		    ZMassSingleEleLegEtaPassH[etaBin]->Fill(mass,weight);
+		    ZMassSingleEleLegEtaFinePassH[etaFineBin]->Fill(mass,weight);
+		    ZMassSingleEleLegPassH->Fill(mass,weight);
+		  } 
+		  else {
+		    ZMassSingleEleLegEtaFailH[etaBin]->Fill(mass,weight);
+		    ZMassSingleEleLegEtaFineFailH[etaFineBin]->Fill(mass,weight);
+		    ZMassSingleEleLegFailH->Fill(mass,weight);
+		  }
+		}
+	      }
 	    }
 	  }
 	}

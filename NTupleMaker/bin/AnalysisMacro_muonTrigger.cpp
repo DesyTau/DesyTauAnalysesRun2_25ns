@@ -39,8 +39,6 @@ int main(int argc, char * argv[]) {
   // **** configuration
   Config cfg(argv[1]);
 
-  std::cout << "What the fuck" << std::endl;
-
   // Data
   const bool isData = cfg.get<bool>("IsData");
   const bool applyGoodRunSelection = cfg.get<bool>("ApplyGoodRunSelection"); 
@@ -97,9 +95,11 @@ int main(int argc, char * argv[]) {
   const string jsonFile = cfg.get<string>("jsonFile");
   const string puDataFile = cfg.get<string>("PileUpDataFile");
   const string puMCFile = cfg.get<string>("PileUpMCFile");
+  const string puMCHist = cfg.get<string>("PileUpMCHist");
 
   TString PUDataFile(puDataFile);
   TString PUMCFile(puMCFile);
+  TString PUMCHist(puMCHist);
 
   TString L1Seed(l1seed);
   TString HLTIsoSingleMu(hltIsoSingleMu);
@@ -283,13 +283,24 @@ int main(int argc, char * argv[]) {
   for (int iB=0; iB<nDzBins; ++iB)
     DzBinsH->GetXaxis()->SetBinLabel(iB+1,DzBins[iB]);
 
+  int nIsoBins = 4;
+  float isoBins[5] = {-0.01,0.15,0.2,0.5,1.0};
+  TString IsoBins[4] = {"IsoLt0p15",
+			"Iso0p15to0p2",
+			"Iso0p2to0p5",
+			"IsoGt0p5"};
+
+  TH1F * isoBinsH = new TH1F("isoBinsH","",nIsoBins,isoBins);
+  for (int iB=0; iB<nIsoBins; ++iB)
+    isoBinsH->GetXaxis()->SetBinLabel(iB+1,IsoBins[iB]);
+
   // (Pt,Eta)
 
   TH1F * ZMassIsoMuLegPtEtaPassH[4][18];
   TH1F * ZMassIsoMuLegPtEtaFailH[4][18];
 
-  TH1F * ZMassLowPtLegPtEtaPassH[4][18];
-  TH1F * ZMassLowPtLegPtEtaFailH[4][18];
+  TH1F * ZMassIsoMuLegIsoPtEtaPassH[4][4][18];
+  TH1F * ZMassIsoMuLegIsoPtEtaFailH[4][4][18];
 
   TH1F * ZMassIsoMuLegEtaPassH[4];
   TH1F * ZMassIsoMuLegEtaFailH[4];
@@ -444,6 +455,10 @@ int main(int argc, char * argv[]) {
     for (int iPt=0; iPt<nPtBins; ++iPt) {
       ZMassIsoMuLegPtEtaPassH[iEta][iPt] = new TH1F("ZMassIsoMuLeg_"+EtaBins[iEta]+"_"+PtBins[iPt]+"_PassH","",60,60,120);
       ZMassIsoMuLegPtEtaFailH[iEta][iPt] = new TH1F("ZMassIsoMuLeg_"+EtaBins[iEta]+"_"+PtBins[iPt]+"_FailH","",60,60,120);
+      for (int iIso=0; iIso<nIsoBins; ++iIso) {
+	ZMassIsoMuLegIsoPtEtaPassH[iIso][iEta][iPt] = new TH1F("ZMassIsoMuLeg_"+IsoBins[iIso]+EtaBins[iEta]+"_"+PtBins[iPt]+"_PassH","",60,60,120);
+	ZMassIsoMuLegIsoPtEtaFailH[iIso][iEta][iPt] = new TH1F("ZMassIsoMuLeg_"+IsoBins[iIso]+EtaBins[iEta]+"_"+PtBins[iPt]+"_FailH","",60,60,120);
+      }
     }
 
     for (int iPt=0; iPt<nPtBins50; ++iPt) {
@@ -484,7 +499,7 @@ int main(int argc, char * argv[]) {
   TFile * filePUOfficial_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/"+PUDataFile,"read");
   TFile * filePUOfficial_MC = new TFile (TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/"+PUMCFile, "read");
   TH1D * PUOfficial_data = (TH1D *)filePUOfficial_data->Get("pileup");
-  TH1D * PUOfficial_mc = (TH1D *)filePUOfficial_MC->Get("pileup");
+  TH1D * PUOfficial_mc = (TH1D *)filePUOfficial_MC->Get(PUMCHist+"_pileup");
   //  PUofficial->set_h_data(PUOfficial_data);
   //  PUofficial->set_h_MC(PUOfficial_mc);
 
@@ -705,7 +720,7 @@ int main(int argc, char * argv[]) {
 	if (fabs(analysisTree.muon_eta[im])>etaMuonCut) continue;
 	if (fabs(analysisTree.muon_dxy[im])>dxyMuonCut) continue;
 	if (fabs(analysisTree.muon_dz[im])>dzMuonCut) continue;
-	if (applyMuonId && !analysisTree.muon_isTight[im]) continue;
+	if (applyMuonId && !analysisTree.muon_isMedium[im]) continue;
 	muons.push_back(im);
       }
 
@@ -897,80 +912,7 @@ int main(int argc, char * argv[]) {
 	    */
             foundL1Seed = true;
           }
-	  bool printEvent = analysisTree.event_run==297487 && analysisTree.event_nr==77934257;
-	  printEvent = printEvent || (analysisTree.event_run==297488 && analysisTree.event_nr==270262596);
-	  printEvent = printEvent || (analysisTree.event_run==297488 && analysisTree.event_nr==269862269);
-	  
-	  if (printEvent) {
-	    std::cout << "Run = " << analysisTree.event_run 
-		      << "     Lumi = " << analysisTree.event_luminosityblock 
-		      << "     Event = " << analysisTree.event_nr << std::endl;
-	    printf("muon1 : pt = %6.2f   eta = %5.2f   phi = %5.2f   iso = %5.2f\n",
-		   mu1lv.Pt(),
-		   mu1lv.Eta(),
-		   mu1lv.Phi(),
-		   relIso1);
 
-	    printf("muon2 : pt = %6.2f   eta = %5.2f   phi = %5.2f   iso = %5.2f   HLTMatch = %1i    L1Match = %1i\n",
-		   mu2lv.Pt(),
-		   mu2lv.Eta(),
-		   mu2lv.Phi(),
-		   relIso2,
-		   mu2MatchIsoMuProbe,
-		   mu2MatchL1Seed);
-
-	    printf("mass = %6.2f\n",mass);
-
-	    // Check of L1 Seeds
-	    for (unsigned int imu=0; imu<analysisTree.l1muon_count; ++imu) {
-	      TLorentzVector l1muonLV; l1muonLV.SetXYZM(analysisTree.l1muon_px[imu],
-							analysisTree.l1muon_py[imu],
-							analysisTree.l1muon_pz[imu],
-							muonMass);
-	      if (l1muonLV.Pt()>20&&fabs(l1muonLV.Eta())<2.1) {
-		printf("l1muon : pt = %6.2f   eta = %5.2f   phi = %5.2f   iso = %2i\n",
-		       l1muonLV.Pt(),
-		       l1muonLV.Eta(),
-		       l1muonLV.Phi(),
-		       analysisTree.l1muon_iso[imu]);
-	      }
-	    }
-	    
-	    for (unsigned int itau=0; itau<analysisTree.l1tau_count; ++itau) {
-	      TLorentzVector l1tauLV; l1tauLV.SetXYZM(analysisTree.l1tau_px[itau],
-						      analysisTree.l1tau_py[itau],
-						      analysisTree.l1tau_pz[itau],
-						      pionMass);
-	      if (l1tauLV.Pt()>24&&fabs(l1tauLV.Eta())<2.1) {
-		printf("l1tau  : pt = %6.2f   eta = %5.2f   phi = %5.2f   iso = %2i\n",
-		       l1tauLV.Pt(),
-		       l1tauLV.Eta(),
-		       l1tauLV.Phi(),
-		       analysisTree.l1tau_iso[itau]);
-	      }
-	    }
-	    
-	    for (unsigned int iT=0; iT<analysisTree.trigobject_count; ++iT) {
-	      if (analysisTree.trigobject_filters[iT][nL1Seed]) 
-		printf("L1Seed object : pt = %6.2f   eta = %5.2f   phi = %5.2f\n",
-		       analysisTree.trigobject_pt[iT],
-		       analysisTree.trigobject_eta[iT],
-		       analysisTree.trigobject_phi[iT]);
-	    }
-	    for (unsigned int iT=0; iT<analysisTree.trigobject_count; ++iT) {
-	      if (analysisTree.trigobject_filters[iT][nIsoMuProbeFilter]) 
-		printf("IsoMu20 object : pt = %6.2f   eta = %5.2f   phi = %5.2f\n",
-		       analysisTree.trigobject_pt[iT],
-		       analysisTree.trigobject_eta[iT],
-		       analysisTree.trigobject_phi[iT]);
-	    }
-	    std::cout << "deltaPhi(mu1,mu2) = " << dPhiMuMu << std::endl;
-	    std::cout << "L1 tau found = " << foundL1Seed << std::endl;
-	    std::cout << "+++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
-	    std::cout << std::endl;
-	    std::cout << std::endl;
-	  }
-	 
 	  if (!matchL1Tau) foundL1Seed = true;
 
 	  float mu2AbsEta = fabs(analysisTree.muon_eta[mu2Index]);
@@ -982,6 +924,8 @@ int main(int argc, char * argv[]) {
 	  int etaFineBin = binNumber(etaFine,nEtaFineBins,etaFineBins);
 	  int ptBin   = binNumber(mu2Pt,nPtBins,ptBins);
 	  int ptBin50 = binNumber(mu2Pt,nPtBins50,ptBins50);
+	  float mu2Iso = TMath::Min(mu2RelIso,float(0.99));
+	  int isoBin  = binNumber(mu2Iso,nIsoBins,isoBins);
 
 	  float mu1AbsEta = fabs(analysisTree.muon_eta[mu1Index]);
 	  float mu1Pt = TMath::Max(float(5.01),TMath::Min(float(analysisTree.muon_pt[mu1Index]),float(99.9)));
@@ -1071,58 +1015,46 @@ int main(int argc, char * argv[]) {
 	    isPairSelected = true;
 	    selPairs++;
 
-	    if ( (mu2AbsEta<etaMuonHighCut) && (mu2RelIso<isoMuonCut) ) { // isolated muon path
 
-	      if (mu2MatchL1Seed) ZMassL1SeedLegPtPassH[ptBin]->Fill(mass,weight);
-	      else ZMassL1SeedLegPtFailH[ptBin]->Fill(mass,weight);
+	    if (mu2AbsEta<etaMuonHighCut) { // eta cut 
 
 	      if (mu2MatchIsoMuProbe) {
-		ZMassIsoMuLegPtEtaPassH[etaBin][ptBin]->Fill(mass,weight);
+		ZMassIsoMuLegIsoPtEtaPassH[isoBin][etaBin][ptBin]->Fill(mass,weight);
+	      }
+	      else {
+		ZMassIsoMuLegIsoPtEtaFailH[isoBin][etaBin][ptBin]->Fill(mass,weight);
+	      }
+
+	      if (mu2RelIso<isoMuonCut) { // isolated muon path
+
+		if (mu2MatchL1Seed) ZMassL1SeedLegPtPassH[ptBin]->Fill(mass,weight);
+		else ZMassL1SeedLegPtFailH[ptBin]->Fill(mass,weight);
+
+		if (mu2MatchIsoMuProbe) {
+		  ZMassIsoMuLegPtEtaPassH[etaBin][ptBin]->Fill(mass,weight);
 		ZMassIsoMuLegPtPassH[ptBin]->Fill(mass,weight);
-	      }
-	      else {
-		ZMassIsoMuLegPtEtaFailH[etaBin][ptBin]->Fill(mass,weight);
-		ZMassIsoMuLegPtFailH[ptBin]->Fill(mass,weight);
-	      }
-	      
-	      if (mu2Pt>ptMuonHighCut) {
-		if (mu2MatchIsoMuProbe) {
-		  ZMassIsoMuLegEtaPassH[etaBin]->Fill(mass,weight);
-		  ZMassIsoMuLegEtaFinePassH[etaFineBin]->Fill(mass,weight);
-		  ZMassIsoMuLegPassH->Fill(mass,weight);
-		} 
+		}
 		else {
-		  ZMassIsoMuLegEtaFailH[etaBin]->Fill(mass,weight);
-		  ZMassIsoMuLegEtaFineFailH[etaFineBin]->Fill(mass,weight);
-		  ZMassIsoMuLegFailH->Fill(mass,weight);
+		  ZMassIsoMuLegPtEtaFailH[etaBin][ptBin]->Fill(mass,weight);
+		  ZMassIsoMuLegPtFailH[ptBin]->Fill(mass,weight);
 		}
-	      }
-
-
-	    }
-	      
-	    if(mu2AbsEta<2.4) { // Mu50 path
-	      
-	      if (mu2MatchMu50) {
-		ZMassMu50LegPtEtaPassH[etaBin][ptBin50]->Fill(mass,weight);
-		ZMassMu50LegPtPassH[ptBin50]->Fill(mass,weight);
-	      }
-	      else {
-		ZMassMu50LegPtEtaFailH[etaBin][ptBin50]->Fill(mass,weight);
-		ZMassMu50LegPtFailH[ptBin50]->Fill(mass,weight);
-	      }
-	      
-	      if (analysisTree.muon_pt[mu2Index]>55) {
-		if (mu2MatchIsoMuProbe) {
-		  ZMassMu50LegEtaPassH[etaBin]->Fill(mass,weight);
-		  ZMassMu50LegPassH->Fill(mass,weight);
-		}
-                  else {
-                    ZMassMu50LegEtaFailH[etaBin]->Fill(mass,weight);
-		    ZMassMu50LegFailH->Fill(mass,weight);
+		
+		if (mu2Pt>ptMuonHighCut) {
+		  if (mu2MatchIsoMuProbe) {
+		    ZMassIsoMuLegEtaPassH[etaBin]->Fill(mass,weight);
+		    ZMassIsoMuLegEtaFinePassH[etaFineBin]->Fill(mass,weight);
+		    ZMassIsoMuLegPassH->Fill(mass,weight);
+		  } 
+		  else {
+		    ZMassIsoMuLegEtaFailH[etaBin]->Fill(mass,weight);
+		    ZMassIsoMuLegEtaFineFailH[etaFineBin]->Fill(mass,weight);
+		    ZMassIsoMuLegFailH->Fill(mass,weight);
 		  }
+		}
 	      }
+
 	    }
+
 	  }
 	}
       }
