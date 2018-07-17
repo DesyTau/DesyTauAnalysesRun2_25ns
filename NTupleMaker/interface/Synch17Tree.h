@@ -40,6 +40,7 @@ public :
   Int_t           q_1;
   Float_t         iso_1;
   Float_t         mva_1;
+  Float_t         mva17_1;
   Float_t         d0_1;
   Float_t         dZ_1;
   Float_t         d0err_1;
@@ -54,6 +55,7 @@ public :
   Int_t           q_2;
   Float_t         iso_2;
   Float_t         mva_2;
+  Float_t         mva17_2;
   Float_t         d0_2;
   Float_t         dZ_2;
   Float_t         d0err_2;
@@ -239,6 +241,7 @@ public :
   TBranch	 *b_q_1;
   TBranch	 *b_iso_1;
   TBranch	 *b_mva_1;
+  TBranch	 *b_mva17_1;
   TBranch	 *b_d0_1;
   TBranch	 *b_dZ_1;
   TBranch	 *b_d0err_1;
@@ -253,6 +256,7 @@ public :
   TBranch	 *b_q_2;
   TBranch	 *b_iso_2;
   TBranch	 *b_mva_2;
+  TBranch	 *b_mva17_2;
   TBranch	 *b_d0_2;
   TBranch	 *b_dZ_2;
   TBranch	 *b_d0err_2;

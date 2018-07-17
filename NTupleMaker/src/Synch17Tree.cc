@@ -69,6 +69,7 @@ void Synch17Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("q_1", &q_1, &b_q_1);
    fChain->SetBranchAddress("iso_1", &iso_1, &b_iso_1);
    fChain->SetBranchAddress("mva_1", &mva_1, &b_mva_1);
+   fChain->SetBranchAddress("mva17_1", &mva17_1, &b_mva17_1);
    fChain->SetBranchAddress("d0_1", &d0_1, &b_d0_1);
    fChain->SetBranchAddress("dZ_1", &dZ_1, &b_dZ_1);
    fChain->SetBranchAddress("d0err_1", &d0err_1, &b_d0err_1);
@@ -83,6 +84,7 @@ void Synch17Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("q_2", &q_2, &b_q_2);
    fChain->SetBranchAddress("iso_2", &iso_2, &b_iso_2);
    fChain->SetBranchAddress("mva_2", &mva_2, &b_mva_2);
+   fChain->SetBranchAddress("mva17_2", &mva17_2, &b_mva17_2);
    fChain->SetBranchAddress("d0_2", &d0_2, &b_d0_2);
    fChain->SetBranchAddress("dZ_2", &dZ_2, &b_dZ_2);
    fChain->SetBranchAddress("d0err_2", &d0err_2, &b_d0err_2);
@@ -330,6 +332,7 @@ void Synch17Tree::WriteInit(TTree *tree) {
    fChain->Branch("q_1", &q_1, "q_1/I");
    fChain->Branch("iso_1", &iso_1, "iso_1/F");
    fChain->Branch("mva_1", &mva_1, "mva_1/F");
+   fChain->Branch("mva17_1", &mva17_1, "mva17_1/F");
    fChain->Branch("d0_1", &d0_1, "d0_1/F");
    fChain->Branch("dZ_1", &dZ_1, "dZ_1/F");
    fChain->Branch("d0err_1", &d0err_1, "d0err_1/F");
@@ -344,6 +347,7 @@ void Synch17Tree::WriteInit(TTree *tree) {
    fChain->Branch("q_2", &q_2, "q_2/I");
    fChain->Branch("iso_2", &iso_2, "iso_2/F");
    fChain->Branch("mva_2", &mva_2, "mva_2/F");
+   fChain->Branch("mva17_2", &mva17_2, "mva17_2/F");
    fChain->Branch("d0_2", &d0_2, "d0_2/F");
    fChain->Branch("dZ_2", &dZ_2, "dZ_2/F");
    fChain->Branch("d0err_2", &d0err_2, "d0err_2/F");
