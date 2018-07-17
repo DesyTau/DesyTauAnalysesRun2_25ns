@@ -101,6 +101,16 @@ int main(int argc, char * argv[]){
     exit( -1 );
   }
 
+  if(argc<4){
+    std::cout << "RUN ERROR: wrong number of arguments"<< std::endl;
+    std::cout << "Please run the code in the following way:"<< std::endl;
+    std::cout << "SynchNtupleProducer_2017 NameOfTheConfigurationFile FileList Channel" << std::endl;
+    std::cout << "example: SynchNtupleProducer_2017 analysisMacroSynch_lept_mt_DATA_SingleMuon.conf DATA_SingleMuon mt" << std::endl;
+
+    exit( -1 );
+  }
+
+
   // **** configuration analysis
 
   Config cfg(argv[1]);
@@ -114,7 +124,7 @@ int main(int argc, char * argv[]){
   std::string lep;
 
   if ((ch != "mt" ) && (ch != "et") && (ch != "tt")) {
-	std::cout << " Channel " << ch << " is not a valid choice. Please try again with 'mt' or 'et'.Exiting. " << std::endl;
+	std::cout << " Channel " << ch << " is not a valid choice. Please try again with 'mt', 'et' or 'tt'.Exiting. " << std::endl;
     exit(0);
   }
 
@@ -226,6 +236,7 @@ int main(int argc, char * argv[]){
     //    RecoilFileName = RecoilDir; RecoilFileName += "MvaMET_2016BCD.root";
     //    std::cout<<RecoilFileName<<std::endl;
     //    recoilMvaMetCorrector = new RecoilCorrector( RecoilFileName);
+
   }
   
   // Read in HLT filter
@@ -242,7 +253,7 @@ int main(int argc, char * argv[]){
     filterXtriggerTauLeg.push_back(cfg.get<string>("filterXtriggerTauLeg2"));
   }else if(ch == "et"){
     filterSingleLep.push_back(cfg.get<string>("filterSingleLep1"));
-    filterSingleLep.push_back(cfg.get<string>("filterSingleLep2"));
+    //filterSingleLep.push_back(cfg.get<string>("filterSingleLep2"));
     
     filterXtriggerLepLeg.push_back(cfg.get<string>("filterXtriggerLepLeg1"));
     filterXtriggerLepLeg.push_back(cfg.get<string>("filterXtriggerLepLeg2"));
@@ -405,6 +416,8 @@ int main(int argc, char * argv[]){
     TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/"+TString(pileUpInDataFile),"read");
     TFile * filePUdistribution_MC = new TFile (TString(cmsswBase)+"/src/"+TString(pileUpInMCFile), "read");
     TH1D * PU_data = (TH1D *)filePUdistribution_data->Get("pileup");
+    //std::cout << filePUdistribution_data << std::endl;
+    //std::cout << filePUdistribution_MC << std::endl;
     TH1D * PU_mc = (TH1D *)filePUdistribution_MC->Get(TString(pileUpforMC));
     if (PU_mc==NULL) {
       std::cout << "Histogram " << pileUpforMC << " is not present in pileup file" << std::endl;
@@ -472,10 +485,11 @@ int main(int argc, char * argv[]){
   TH1D * nWeightedEventsH = new TH1D("nWeightedEvents", "", 1, -0.5,0.5);
   
   TTree * tree = new TTree("TauCheck","TauCheck");
+  TTree * gtree = new TTree("GenTauCheck","GenTauCheck");
 
   Synch17Tree *otree = new Synch17Tree(tree);
   initializeCPvar(otree);
-  Synch17GenTree *gentree = new Synch17GenTree(tree);
+  Synch17GenTree *gentree = new Synch17GenTree(gtree);
 
   int nTotalFiles = 0;
 
@@ -728,8 +742,7 @@ int main(int argc, char * argv[]){
       if(ch == "mt"){
         for (unsigned int im = 0; im<analysisTree.muon_count; ++im) {
 
-	  bool is2016Data = false;
-	  bool muonMediumId = isIdentifiedMediumMuon(im, &analysisTree, is2016Data);
+	  bool muonMediumId = isIdentifiedMediumMuon(im, &analysisTree, isData);
   			
           if (analysisTree.muon_pt[im]<=ptLeptonLowCut) continue;
           if (fabs(analysisTree.muon_eta[im])>=etaLeptonCut) continue;
@@ -1376,8 +1389,8 @@ int main(int argc, char * argv[]){
     file_->Close();
     delete file_;
    }
-  //  std::cout << "COUNTERS" << std::endl;
-  //  for(int iC=0;iC<20;iC++) std::cout << "Counter " << iC << ":    " << counter[iC] << std::endl;
+    std::cout << "COUNTERS" << std::endl;
+    for(int iC=0;iC<20;iC++) std::cout << "Counter " << iC << ":    " << counter[iC] << std::endl;
 
   std::cout << std::endl;
   int allEvents = int(inputEventsH->GetEntries());
@@ -1550,6 +1563,7 @@ void FillTau_leading(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex
   otree->q_1 = analysisTree->tau_charge[tauIndex];
   otree->gen_match_1 = analysisTree->tau_genmatch[tauIndex];
   otree->mva_1 = analysisTree->tau_byTightIsolationMVArun2v1DBoldDMwLT[tauIndex];
+  otree->mva17_1= analysisTree->tau_byTightIsolationMVArun2017v2DBoldDMwLT2017[tauIndex];
   otree->d0_1 = analysisTree->tau_leadchargedhadrcand_dxy[tauIndex];
   otree->dZ_1 = analysisTree->tau_leadchargedhadrcand_dz[tauIndex];      
   otree->iso_1 = analysisTree->tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[tauIndex];
@@ -1587,6 +1601,7 @@ void FillTau(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex){
   otree->q_2 = analysisTree->tau_charge[tauIndex];
   otree->gen_match_2 = analysisTree->tau_genmatch[tauIndex];
   otree->mva_2 = analysisTree->tau_byTightIsolationMVArun2v1DBoldDMwLT[tauIndex];
+  otree->mva17_2= analysisTree->tau_byTightIsolationMVArun2017v2DBoldDMwLT2017[tauIndex];
   otree->d0_2 = analysisTree->tau_leadchargedhadrcand_dxy[tauIndex];
   otree->dZ_2 = analysisTree->tau_leadchargedhadrcand_dz[tauIndex];      
   otree->iso_2 = analysisTree->tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[tauIndex];
