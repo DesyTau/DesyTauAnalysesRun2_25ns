@@ -22,13 +22,13 @@ void Plot_lept_mutau(TString Variable = "mt_tot",
 		     float xmax =  300,
 		     TString Weight = "puweight*effweight*mcweight*",//mcweight*",
           //TString Cuts = "&&iso_1<0.15&&iso_2<0.2&&extraelec_veto<0.5&&extramuon_veto<0.5&&pt_1>13&&pt_2>10&&TMath::Max(pt_1,pt_2)>24",
-		     TString Cuts = "&&iso_1<0.15&&extraelec_veto<0.5&&extramuon_veto<0.5&&pt_1>20&&pt_2>20&&mt_1<50&&mva_2>0.5&&againstMuonTight3_2>0.5&&againstElectronVLooseMVA6_2>0.5",
+		     TString Cuts = "&&iso_1<0.15&&extraelec_veto<0.5&&extramuon_veto<0.5&&pt_1>20&&pt_2>20&&mva17>0.5&&mt_1<60&&againstMuonTight3_2>0.5&&againstElectronVLooseMVA6_2>0.5&&(singleLepTrigger>0.5||xTrigger>0.5)",//&&(singleLepTrigger>0.5)//
 		     //TString Cuts = "&&dzeta_mvamet>-20&&iso_1<0.15&&iso_2<0.2&&extraelec_veto<0.5&&extramuon_veto<0.5&&pt_1>13&&pt_2>10&&TMath::Max(pt_1,pt_2)>24",
 		     //	  TString Cuts = "&&dzeta_mvamet<-60&&mvamet>80&&iso_1<0.15&&iso_2<0.2&&extraelec_veto<0.5&&extramuon_veto<0.5&&pt_1>13&&pt_2>10&&TMath::Max(pt_1,pt_2)>24",
 		     TString ytitle = "Events",
 		     TString DataFile = "DATA_SingleMuon",
 		     TString directory = "/nfs/dust/cms/user/cardinia/HtoTauTau/CMSSW_9_4_0_patch1/src/DesyTauAnalyses/NTupleMaker/test/mutau/",
-		     TString Suffix = "CR_lept2017_mt_",        // for name of pdf
+		     TString Suffix = "CR_leptMC17_mt_",        // for name of pdf
 		     TString suffix = "",                      // for name of pdf
 		     TString category = "inclusive",
 		     bool logY = false, 
@@ -147,7 +147,8 @@ void Plot_lept_mutau(TString Variable = "mt_tot",
       cutsSS[i] = Weight+qcdweight+"(os<0.5"+Cuts+")";
    }
    TString zptmassweight="1.0*";                  //TO DO: CHANGE WEIGHTs
-   //cuts[0] = "(os>0.5"+Cuts+"&&metFilters>0.5)"; //DATA
+   cuts[0] = "(os>0.5"+Cuts+"&&metFilters>0.5)"; //DATA
+   //cuts[0] = "(os>0.5&&iso_1<0.15&&extraelec_veto<0.5&&extramuon_veto<0.5&&pt_1>20&&pt_2>20&&mva_2>0.5&&againstMuonTight3_2>0.5&&againstElectronVLooseMVA6_2>0.5&&(singleLepTrigger>0.5))"; //DATA
    cuts[0] = "(os>0.5"+Cuts+")"; //DATA
    cuts[1] = Weight+zptmassweight+"(os>0.5"+Cuts+isZTT+")";
    cuts[2] = Weight+zptmassweight+"(os>0.5"+Cuts+isZLL+")";
@@ -155,7 +156,8 @@ void Plot_lept_mutau(TString Variable = "mt_tot",
    cuts[5]  = Weight+topweight+"(os>0.5"+Cuts+")";
    cuts[6]  = Weight+topweight+"(os>0.5"+Cuts+")";
    
-   //cutsSS[0] = qcdweight+"(os<0.5"+Cuts+"&&metFilters>0.5)";
+   cutsSS[0] = qcdweight+"(os<0.5"+Cuts+"&&metFilters>0.5)";
+   //cutsSS[0] = qcdweight+"(os<0.5&&iso_1<0.15&&extraelec_veto<0.5&&extramuon_veto<0.5&&pt_1>20&&pt_2>20&&mva_2>0.5&&againstMuonTight3_2>0.5&&againstElectronVLooseMVA6_2>0.5&&(singleLepTrigger>0.5))";
    cutsSS[0] = qcdweight+"(os<0.5"+Cuts+")";
    cutsSS[1] = Weight+zptmassweight+qcdweight+"(os<0.5"+Cuts+isZTT+")";
    cutsSS[2] = Weight+zptmassweight+qcdweight+"(os<0.5"+Cuts+isZLL+")";
@@ -236,9 +238,9 @@ void Plot_lept_mutau(TString Variable = "mt_tot",
         ""
     };
     
-    TString refSamples[5];
-    double refXSec[5];
-    double refEvents[5] = {0,0,0,0,0};
+    TString refSamples[6];
+    double refXSec[6];
+    double refEvents[6] = {0,0,0,0,0,0};
     // redefine reference cross sections
     // and reference samples
     refSamples[0] = "WJetsToLNu";
@@ -349,20 +351,22 @@ void Plot_lept_mutau(TString Variable = "mt_tot",
     refSamples[2] = "DY2JetsToLL";
     refSamples[3] = "DY3JetsToLL";
     refSamples[4] = "DY4JetsToLL";
+    refSamples[5] = "DYJetsToLL_M-10to50";
 
     refXSec[0] = 5765;
     refXSec[1] = 1.164*1012.5;
     refXSec[2] = 1.164*332.8;
     refXSec[3] = 1.164*101.8;
     refXSec[4] = 1.164*54.8;
+    refXSec[5] = 15820;
     
-    for (int iDY=0; iDY<5; ++iDY) {
+    for (int iDY=0; iDY<6; ++iDY) {
         TFile * file = new TFile(directory+refSamples[iDY]+".root");
         TH1D * nWeightedEvents = (TH1D*)file->Get("nWeightedEvents");
         refEvents[iDY] = nWeightedEvents->GetSumOfWeights();
     }
    
-     TString npartonCutsDY[9] = {"&&(gen_noutgoing==0||gen_noutgoing>4)", //cut on inclusive sample
+     TString npartonCutsDY[10] = {"&&(gen_noutgoing==0||gen_noutgoing>4)", //cut on inclusive sample
         "&&gen_noutgoing==1",//cut on inclusive sample
         "&&gen_noutgoing==2",//cut on inclusive sample
         "&&gen_noutgoing==3",//cut on inclusive sample
@@ -371,21 +375,23 @@ void Plot_lept_mutau(TString Variable = "mt_tot",
         "",
         "",
         "",
+        ""
      };
 
     
-    TString dySampleNames[9] = {"DYJetsToLL",
+    TString dySampleNames[10] = {"DYJetsToLL",
         "DYJetsToLL",
         "DYJetsToLL",
         "DYJetsToLL",
         "DYJetsToLL",
         "DY1JetsToLL",
         "DY2JetsToLL",
-        "DY3JetsToLL",
-        "DY4JetsToLL"
+	"DY3JetsToLL",
+	"DY4JetsToLL",
+        "DYJetsToLL_M-10to50"
     };
     
-    double dyNorm[9];
+    double dyNorm[10];
     dyNorm[0] = lumi*refXSec[0]/refEvents[0];
     dyNorm[1] = lumi/(refEvents[0]/refXSec[0]+refEvents[1]/refXSec[1]);
     dyNorm[2] = lumi/(refEvents[0]/refXSec[0]+refEvents[2]/refXSec[2]);
@@ -395,22 +401,24 @@ void Plot_lept_mutau(TString Variable = "mt_tot",
     dyNorm[6] = lumi/(refEvents[0]/refXSec[0]+refEvents[2]/refXSec[2]);
     dyNorm[7] = lumi/(refEvents[0]/refXSec[0]+refEvents[3]/refXSec[3]);
     dyNorm[8] = lumi/(refEvents[0]/refXSec[0]+refEvents[4]/refXSec[4]);
+    dyNorm[9] = lumi*refXSec[5]/refEvents[5];
     
     
-    TString cutsZtt[9];
-    TString cutsZttSS[9];
+    TString cutsZtt[10];
+    TString cutsZttSS[10];
 
-    TString cutsZll[9];
-    TString cutsZllSS[9];
+    TString cutsZll[10];
+    TString cutsZllSS[10];
   
-    for (int iDY=0; iDY<9; ++iDY) {
+    for (int iDY=0; iDY<10; ++iDY) {
         cutsZtt[iDY]   = Weight+zptmassweight+"(os>0.5"+Cuts+npartonCutsDY[iDY]+isZTT+")";
-        cutsZttSS[iDY] = Weight+zptmassweight+qcdweight+"(os<0.5"+Cuts+npartonCuts[iDY]+isZTT+")";
+        cutsZttSS[iDY] = Weight+zptmassweight+qcdweight+"(os<0.5"+Cuts+npartonCutsDY[iDY]+isZTT+")";
         cutsZll[iDY]   = Weight+zptmassweight+"(os>0.5"+Cuts+npartonCutsDY[iDY]+isZLL+")";
-        cutsZllSS[iDY] = Weight+zptmassweight+qcdweight+"(os<0.5"+Cuts+npartonCuts[iDY]+isZLL+")";
+        cutsZllSS[iDY] = Weight+zptmassweight+qcdweight+"(os<0.5"+Cuts+npartonCutsDY[iDY]+isZLL+")";
+	//std::cout << iDY << ": " << cutsZtt[iDY] << "      "  << cutsZttSS[iDY] << "      "  << cutsZll[iDY] << "      "  << cutsZllSS[iDY] << "      " << std::endl;
     }
     
-    nSamplesDY = 9;
+    nSamplesDY = 10;
     
     // filling histograms for DY samples
     for (int i=0; i<nSamplesDY; ++i) { // run over samples
@@ -464,7 +472,7 @@ void Plot_lept_mutau(TString Variable = "mt_tot",
     hist[2]   = histZll[0];
     histSS[2] = histZllSS[0];
     
-    for (int iDY=1; iDY<9; ++iDY) {
+    for (int iDY=1; iDY<10; ++iDY) {
         hist[1]->Add(hist[1],histZtt[iDY]);
         hist[2]->Add(hist[2],histZll[iDY]);
         histSS[1]->Add(histSS[1],histZttSS[iDY]);
