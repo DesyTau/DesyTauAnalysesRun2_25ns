@@ -169,15 +169,15 @@ float abs_Iso_et (int Index, const AC1B * analysisTree, float dRiso){
   float puIso         = -9999.;
   float absIso        = -9999.;
   float isoCone = 0.3;
-
+  /*
   absIso  = analysisTree->electron_r03_sumChargedHadronPt[Index];
   float neutralIso =
     analysisTree->electron_r03_sumNeutralHadronEt[Index] +
     analysisTree->electron_r03_sumPhotonEt[Index] - 
     analysisTree->rho*TMath::Pi()*isoCone*isoCone;
   neutralIso = TMath::Max(float(0),neutralIso);
+  */
   
-  /*
   neutralHadIso = analysisTree->electron_neutralHadIso[Index];
   photonIso =     analysisTree->electron_photonIso[Index];
   chargedHadIso = analysisTree->electron_chargedHadIso[Index];
@@ -192,8 +192,8 @@ float abs_Iso_et (int Index, const AC1B * analysisTree, float dRiso){
   float neutralIso = neutralHadIso + photonIso -0.5*puIso;
   neutralIso = TMath::Max(float(0), neutralIso);
   return(chargedHadIso + neutralIso);
-  */
-  return(absIso + neutralIso);
+  
+  //return(absIso + neutralIso);
 }
 
 
