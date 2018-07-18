@@ -57,38 +57,15 @@ ls $MCdir_TTVV/ZZ_TuneCP5_13TeV-pythia8/*.root > ZZ
 
 #DATA
 
-Data17dir1=/nfs/dust/cms/user/mameyer/SM_HiggsTauTau/ntuples/Run2017_Nov17ReReco/SingleMuon_v2
-Data17dir2=/nfs/dust/cms/user/mameyer/SM_HiggsTauTau/ntuples/Run2017_Nov17ReReco 
-Data17dir3=/nfs/dust/cms/user/mameyer/SM_HiggsTauTau/ntuples/Run2017_Nov17ReReco/JetHT
-Data17dir4=/nfs/dust/cms/user/mameyer/SM_HiggsTauTau/ntuples/Run2017_Nov17ReReco/MET
+Data17dirMu=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/Run2017_Nov17ReReco/SingleMuon/
 
-ls $Data17dir1/SingleMuon_Run2017B*/*.root > DATA_MuB 
-ls $Data17dir1/SingleMuon_Run2017C*/*.root > DATA_MuC
-ls $Data17dir1/SingleMuon_Run2017D*/*.root > DATA_MuD
-ls $Data17dir1/SingleMuon_Run2017E*/*.root > DATA_MuE
-ls $Data17dir1/SingleMuon_Run2017F*/*.root > DATA_MuF
-#ls $Data17dir2/SingleElectron/SingleElectron_Run2017B*/*.root > DATA_ElB
-#ls $Data17dir2/SingleElectron/SingleElectron_Run2017C*/*.root > DATA_ElC
-#ls $Data17dir2/SingleElectron/SingleElectron_Run2017D*/*.root > DATA_ElD
-#ls $Data17dir2/SingleElectron/SingleElectron_Run2017E*/*.root > DATA_ElE
-#ls $Data17dir2/SingleElectron/SingleElectron_Run2017F*/*.root > DATA_ElF
-#ls $Data17dir2/MuonEG/MuonEG_Run2017B*/*.root > DATA_MuEGB
-#ls $Data17dir2/MuonEG/MuonEG_Run2017C*/*.root > DATA_MuEGC
-#ls $Data17dir2/MuonEG/MuonEG_Run2017D*/*.root > DATA_MuEGD
-#ls $Data17dir2/MuonEG/MuonEG_Run2017E*/*.root > DATA_MuEGE
-#ls $Data17dir2/MuonEG/MuonEG_Run2017F*/*.root > DATA_MuEGF
-#ls $Data17dir3/JetHT_Run2017B*/*.root > DATA_JHTB
-#ls $Data17dir3/JetHT_Run2017C*/*.root > DATA_JHTC
-#ls $Data17dir3/JetHT_Run2017D*/*.root > DATA_JHTD
-#ls $Data17dir3/JetHT_Run2017E*/*.root > DATA_JHTE
-#ls $Data17dir3/JetHT_Run2017F*/*.root > DATA_JHTF
-#ls $Data17dir4/MET_Run2017B*/*.root > DATA_METB
-#ls $Data17dir4/MET_Run2017C*/*.root > DATA_METC
-#ls $Data17dir4/MET_Run2017D*/*.root > DATA_METD
-#ls $Data17dir4/MET_Run2017E*/*.root > DATA_METE
-#ls $Data17dir4/MET_Run2017F*/*.root > DATA_METF
+ls $Data17dirMu/SingleMuon_Run2017B*/*.root > DATA_MuB 
+ls $Data17dirMu/SingleMuon_Run2017C*/*.root > DATA_MuC
+ls $Data17dirMu/SingleMuon_Run2017D*/*.root > DATA_MuD
+ls $Data17dirMu/SingleMuon_Run2017E*/*.root > DATA_MuE
+ls $Data17dirMu/SingleMuon_Run2017F*/*.root > DATA_MuF
 
-cat DATA_MuB  DATA_MuC DATA_MuD DATA_MuE DATA_MuF > DATA_SingleMuon
+cat DATA_MuB DATA_MuC DATA_MuD DATA_MuE DATA_MuF > DATA_SingleMuon
 
 #cat DATA_El* > DATA_SingleElectron
 
