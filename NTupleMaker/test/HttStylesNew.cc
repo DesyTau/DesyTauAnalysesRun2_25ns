@@ -199,7 +199,7 @@ void InitHist(TH1 *hist, int color)
     hist->SetLineWidth(2);
     hist->SetMarkerColor(1);
     hist->SetMarkerStyle(21);
-    hist->SetMarkerSize(0.8);
+    hist->SetMarkerSize(0.0);
     hist->SetStats(false);
     
   return;
