@@ -21,11 +21,11 @@ void Plot_lept_mutau(TString Variable = "m_vis",
 		     float xmin =    0,
 		     float xmax =  300,
 		     TString Weight = "puweight*effweight*mcweight*",
-		     TString Cuts = "&&iso_1<0.15&&extraelec_veto<0.5&&extramuon_veto<0.5&&pt_1>20&&pt_2>20&&againstMuonTight3_2>0.5&&againstElectronVLooseMVA6_2>0.5&&(singleLepTrigger>0.5||xTrigger>0.5)",//&&mva17_2>0.5&&mt_1<60
+		     TString Cuts = "&&iso_1<0.15&&extraelec_veto<0.5&&extramuon_veto<0.5&&pt_1>20&&pt_2>20&&mva17_2>0.5&&mt_1<60&&againstMuonTight3_2>0.5&&againstElectronVLooseMVA6_2>0.5&&(singleLepTrigger>0.5||xTrigger>0.5)",//&&mva17_2>0.5&&mt_1<60
 		     TString ytitle = "Events",
-		     TString DataFile = "DATA_SingleElectron",
-		     TString directory = "/nfs/dust/cms/user/cardinia/HtoTauTau/CMSSW_9_4_0_patch1/src/DesyTauAnalyses/NTupleMaker/test/etau/",
-		     TString Suffix = "ETau_",        // for name of pdf
+		     TString DataFile = "DATA_SingleMuon",
+		     TString directory = "/nfs/dust/cms/user/cardinia/HtoTauTau/CMSSW_9_4_0_patch1/src/DesyTauAnalyses/NTupleMaker/test/mutau/",
+		     TString Suffix = "MuTau_",        // for name of pdf
 		     TString suffix = "",                      // for name of pdf
 		     TString category = "inclusive",
 		     bool logY = false, 
@@ -777,7 +777,7 @@ void Plot_lept_mutau(TString Variable = "m_vis",
     else if (lumi== 13960) DrawTitle(pads[0], "14.0 fb^{-1} (13 TeV, 2017)", 3);
     else if (lumi== 41465) DrawTitle(pads[0], "41.5 fb^{-1} (13 TeV, 2017)", 3);
     else DrawTitle(pads[0], "42.8 fb^{-1} (13 TeV, 2017)", 3);
-    DrawTitle(pads[0], "e#tau", 1);
+    DrawTitle(pads[0], "#mu#tau", 1);
     FixBoxPadding(pads[0], legend, 0.05);
     legend->Draw();
     FixOverlay();
