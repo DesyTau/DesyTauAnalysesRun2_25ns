@@ -49,7 +49,7 @@ void Plot_lept_mutau(TString Variable = "m_vis",
    //double lumi =42810;
    double TTnorm = 1.0;   //scale factors for normalization of ttbar and wjets
    //double Wnorm  = 1.28; //from 80 GeV < mt_1 < 150 GeV
-   double Wnorm  = 1.033;
+   double Wnorm  = 1.0;
 
    //weights
    //TString topweight("topptweightRun2*");
