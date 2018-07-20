@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <map>
+#include <iomanip>
 #include "boost/lexical_cast.hpp"
 #include "boost/algorithm/string.hpp"
 #include "boost/format.hpp"
@@ -82,7 +83,6 @@ void Plot_lept_mutau_Updated(TString Variable = "m_vis",
 		     Wnorm*61526.7,// WJets (3)
 		     TTnorm*87.31,  // TT  (4)
 		     TTnorm*380.1,  // TT Hadronic  (5)
-		     //TTnorm*365.35,  // TT Semilept  (6)
 		     TTnorm*364.4,  // TT Semilept  (6)
 		     38.09,           // ST_tW_antitop (7)
 		     38.09,           // ST_tW_top_5f (8)
@@ -91,7 +91,7 @@ void Plot_lept_mutau_Updated(TString Variable = "m_vis",
 		     63.21, // WW   (11)
 		     22.82,  // WZ    (12)
 		     10.32,  // ZZ      (13)
-		     43.92*0.0632  // signal gg->Higgs (14)
+		     43.92*0.0632*10  // signal gg->Higgs times 10 !!! (14)
   };     
 
 
@@ -107,7 +107,7 @@ void Plot_lept_mutau_Updated(TString Variable = "m_vis",
   TString isZLL="&&!(((gen_match_1==3||gen_match_1==4)&&gen_match_2==5)||((gen_match_2==3||gen_match_2==4)&&gen_match_1==5))";
 
   // Selection cuts applied to all samples
-  for (int i=0; i<14; ++i) {
+  for (int i=0; i<15; ++i) {
     cuts[i]   = Weight+"(os>0.5"+Cuts+")";
     cutsSS[i] = Weight+qcdweight+"(os<0.5"+Cuts+")";
   }
@@ -169,7 +169,7 @@ void Plot_lept_mutau_Updated(TString Variable = "m_vis",
     tree->Draw(Variable+">>"+histNameSS,cutsSS[i]);
 
     if (i>0) // if sample is MC sample -> Scale to xsec and luminosity
-      { 
+      {
 	hist[i]   -> Scale(norm);
 	histSS[i] -> Scale(norm);
       }
@@ -202,8 +202,8 @@ void Plot_lept_mutau_Updated(TString Variable = "m_vis",
   TString refSamples[6];
   double refXSec[6];
   double refEvents[6] = {0,0,0,0,0,0};
-  // redefine reference cross sections
-  // and reference samples
+
+  // redefine reference cross sections and reference samples
   refSamples[0] = "WJetsToLNu";
   refSamples[1] = "W1JetsToLNu";
   refSamples[2] = "W2JetsToLNu";
@@ -390,9 +390,9 @@ void Plot_lept_mutau_Updated(TString Variable = "m_vis",
     histZll[i]   -> Scale(norm);
     histZllSS[i] -> Scale(norm);
 
-    cout << dySampleNames[i] << " -> ZTT : Entries = " << histZtt[i]->GetEntries()
-	 << " : Sum of weights = " << histZtt[i]->GetSumOfWeights()
-	 << "    ZLL : Entries = " << histZll[i]->GetEntries() << " : Sum of weights = " << histZll[i]->GetSumOfWeights() << endl;
+    // cout << dySampleNames[i] << " -> ZTT : Entries = " << histZtt[i]->GetEntries()
+    // 	 << " : Sum of weights = " << histZtt[i]->GetSumOfWeights()
+    // 	 << "    ZLL : Entries = " << histZll[i]->GetEntries() << " : Sum of weights = " << histZll[i]->GetSumOfWeights() << endl;
   }
 
   hist[1]   = histZtt[0];
@@ -421,8 +421,6 @@ void Plot_lept_mutau_Updated(TString Variable = "m_vis",
   // Adding top
   hist[4]->Add(hist[4],hist[5]);
   hist[4]->Add(hist[4],hist[6]);
-  // Scale signal 
-  hist[14] -> Scale(100);
 
 
   // ********************************************
@@ -440,7 +438,8 @@ void Plot_lept_mutau_Updated(TString Variable = "m_vis",
   float nonQCDfraction     = nonQCD/dataSS;
   float nonQCDfractionFull = nonQCDfull/dataSSfull;
 
-  cout << "SS region" << endl;
+  cout << endl;
+  cout << "SS region :    " << endl;
   cout << "W  (MC)      : " << histSS[4]->GetSumOfWeights() << " : "<< histSS[4]->Integral(0,nBins+1) << endl;
   cout << "non-QCD (MC) : " << nonQCD << " : " << nonQCDfull << endl;
   cout << "data         : " << dataSS << " : " << dataSSfull << endl;
@@ -460,9 +459,10 @@ void Plot_lept_mutau_Updated(TString Variable = "m_vis",
   TH1D * VV       = (TH1D*)hist[7]   -> Clone("VV");
   TH1D * SMH      = (TH1D*)hist[14]  -> Clone("SMH");
   for(int i=0;i<15;i++){
-    cout << sampleNames[i] << " : Entries = " << hist[i]->GetEntries() << " : Integral = " << hist[i]->Integral(0,nBins+1) << endl;
+    cout << setw(15) << sampleNames[i] << " : Entries = " << hist[i]->GetEntries() << " : Integral = " << hist[i]->Integral(0,nBins+1) << endl;
   }
 
+  cout << endl;
   cout << "QCD : Sum of weights = " << QCD->GetSumOfWeights() << " : Integral = " << QCD->Integral(1,nBins+1) << endl;
   cout << "VV  : Sum of weights = " << VV->GetSumOfWeights()  << " : Integral = " << VV->Integral(1,nBins+1)  << endl;
   cout << "W   : Sum of weights = " << W->GetSumOfWeights()   << " : Integral = " << W->Integral(1,nBins+1)   << endl;
@@ -483,11 +483,12 @@ void Plot_lept_mutau_Updated(TString Variable = "m_vis",
   float WScaleE  = eData/nW;
   float WbkgE    = 0.3*nNonW/nW;
 
+  cout << endl;
   cout << "************************" << endl;
   cout << "TT scale factor = " << ttScale << " +/- " << ttScaleE << " +/- " << bkgE << endl;
   cout << "W scale factor = " << WScale << " +/- " << WScaleE << " +/- " << WbkgE << endl;
   cout << "************************" << endl;
-
+  cout << endl;
 
   // ***********************************
   // **** Systematic uncertainties *****
@@ -500,18 +501,17 @@ void Plot_lept_mutau_Updated(TString Variable = "m_vis",
   float errTT  = 0.07; // ad-hoc sys uncertainty of TT background
 
   for (int iB=1; iB<=nBins; ++iB) {   // Add general systematic uncertainties to each bin as error
-    float eQCD = errQCD*QCD->GetBinContent(iB);
-    float eVV = errVV*VV->GetBinContent(iB);
-    float eW = errW*W->GetBinContent(iB);
-    float eTT = errTT*TT->GetBinContent(iB);
-    float err2 = eQCD*eQCD+eVV*eVV + eW*eW + eTT*eTT;     //TO DO: WAS IST MIT DEM FEHLER AUF DY?
-    cout<<"eQCD: "<<eQCD<<"  eVV: "<<eVV<<"  eW: "<<eW<<"  eTT: "<<eTT<<endl;
+    float eQCD   = errQCD*QCD->GetBinContent(iB);
+    float eVV    = errVV*VV->GetBinContent(iB);
+    float eW     = errW*W->GetBinContent(iB);
+    float eTT    = errTT*TT->GetBinContent(iB);
+    float err2   = eQCD*eQCD+eVV*eVV + eW*eW + eTT*eTT;     //TO DO: WAS IST MIT DEM FEHLER AUF DY?
     float errTot = TMath::Sqrt(err2);
-    cout<<errTot<<endl;
-    dummy->SetBinError(iB,errTot);
-    SMH->SetBinError(iB,0);
+    cout << "eQCD: " << eQCD << "  eVV: " << eVV << "  eW: " << eW << "  eTT: " << eTT << "  eTotal: " << errTot << endl;
+    dummy -> SetBinError(iB,errTot);
+    SMH   -> SetBinError(iB,0);
   }
-
+  cout << endl;
 
   ///////////////////////////////////////////////////////////////////////////////////////////////
   // FINAL PLOTTING 
@@ -592,7 +592,7 @@ void Plot_lept_mutau_Updated(TString Variable = "m_vis",
   InitSignal(SMH,2);
   if (showSignal)
     {
-      legend->AddEntry(SMH,"SM Higgs(125) #times 100","f");
+      legend->AddEntry(SMH,"SM Higgs(125) #times 10","f");
       SMH->Draw("hsame");
     }
 
