@@ -1275,16 +1275,16 @@ int main(int argc, char * argv[]){
       if (!isData) {
 	if(otree->gen_match_2==5&&tauLV.E()<=400&&tauLV.E()>=20){
 	  if (otree->tau_decay_mode_2 == 0) tauLV*=(1-0.03);
-	  else if (otree->gen_match_2 <5) tauLV*=(1-0.02);
-	  else if (otree->tau_decay_mode_2 ==10)tauLV*=(1-0.01);
+	  else if (otree->tau_decay_mode_2 < 5) tauLV*=(1-0.02);
+	  else if (otree->tau_decay_mode_2 == 10)tauLV*=(1-0.01);
 	  otree->pt_2 = tauLV.Pt();
 	  otree->m_2 = tauLV.M();
 	}
 	if(ch=="tt"){
 	  if(otree->gen_match_1==5&&leptonLV.E()<=400&&leptonLV.E()>=20){
 	    if (otree->tau_decay_mode_1 == 0) leptonLV*=(1-0.03);
-	    else if (otree->tau_decay_mode_1 <5) leptonLV*=(1-0.02);
-	    else if (otree->tau_decay_mode_1 ==10)leptonLV*=(1-0.01);
+	    else if (otree->tau_decay_mode_1 < 5) leptonLV*=(1-0.02);
+	    else if (otree->tau_decay_mode_1 == 10)leptonLV*=(1-0.01);
 	    otree->pt_1 = leptonLV.Pt();
 	    otree->m_1 = leptonLV.M();
 	  }
