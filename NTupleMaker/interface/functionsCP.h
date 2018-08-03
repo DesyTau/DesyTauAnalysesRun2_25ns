@@ -57,6 +57,9 @@ double acoCP(TLorentzVector Pi1, TLorentzVector Pi2,
   TVector3 vecRef2transv = vecRef2 - vecPi2*(vecPi2*vecRef2);
 
   double acop = TMath::ACos(vecRef1transv*vecRef1transv);
+  
+ double sign = vecPi2 * vecRef1transv.Cross(vecRef2transv);
+  if (sign<0) acop = 2.0*TMath::Pi() - acop;
 
   if (y<0) {
     acop = acop + TMath::Pi();
@@ -64,10 +67,8 @@ double acoCP(TLorentzVector Pi1, TLorentzVector Pi2,
   if (acop>2*TMath::Pi()) {
     acop = acop - 2*TMath::Pi();
   }
-
-  double sign = vecPi2 * vecRef1transv.Cross(vecRef2transv);
-  if (sign<0) acop = 2.0*TMath::Pi() - acop;
-
+  
+ 
 
   return acop;
 
@@ -102,9 +103,9 @@ void acott(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, int tau
   TLorentzVector tau2Pi0;
   tau2Pi0.SetXYZT(0.,0.,0.,0.);
  
-  if (analysisTree->tau_decayMode[tauIndex1]==1) tau1Pi0 = neutralPivec(analysisTree,tauIndex1);
+  if (analysisTree->tau_decayMode[tauIndex1]>=1&&analysisTree->tau_decayMode[tauIndex1]<=4) tau1Pi0 = neutralPivec(analysisTree,tauIndex1);
   
-  if (analysisTree->tau_decayMode[tauIndex2]==1) tau2Pi0 = neutralPivec(analysisTree,tauIndex2);
+  if (analysisTree->tau_decayMode[tauIndex2]>=1&&analysisTree->tau_decayMode[tauIndex2]<=4) tau2Pi0 = neutralPivec(analysisTree,tauIndex2);
 
   double acop = 0.; 
   
@@ -300,9 +301,11 @@ void gen_acott(const AC1B * analysisTree, Synch17GenTree *gentree, int tauIndex1
   if (analysisTree->tau_decayMode[tauIndex1]==0&&analysisTree->tau_decayMode[tauIndex2]==1)
     gentree->acotautau_01=acoCP(tau1Prong,tau2Prong,tau1IP,tau2Pi0);
 
-  if (analysisTree->tau_decayMode[tauIndex1]==1&&analysisTree->tau_decayMode[tauIndex2]==1)
+  if (analysisTree->tau_decayMode[tauIndex1]==1&&analysisTree->tau_decayMode[tauIndex2]==1){
+    gentree->acotautau_10=acoCP(tau1Prong,tau2Prong,tau1Pi0,tau2IP);
+    gentree->acotautau_01=acoCP(tau1Prong,tau2Prong,tau1IP,tau2Pi0);
     gentree->acotautau_11=acoCP(tau1Prong,tau2Prong,tau1Pi0,tau2Pi0);
-
+  }
 };
 
 
@@ -334,8 +337,8 @@ int gen_chargedPiIndex(const AC1B * analysisTree, int tauIndex){
 		 analysisTree->gentau_visible_pz[tauIndex],
 		 analysisTree->gentau_visible_e[tauIndex]);
   
-  for(int i=0;i<npart;i++){//selects the highest energy Pi with the same sign of the tau 
-    if(analysisTree->genparticles_pdgid[i]==211&&(analysisTree->genparticles_info[i]==12||analysisTree->genparticles_info[i]==5)){
+  for(int i=0;i<npart;i++){//selects the highest energy Pi
+    if(abs(analysisTree->genparticles_pdgid[i])==211&&(analysisTree->genparticles_info[i]==12||analysisTree->genparticles_info[i]==5)){
       TLorentzVector lvector;
       lvector.SetXYZT(analysisTree->genparticles_px[i],
 		      analysisTree->genparticles_py[i],

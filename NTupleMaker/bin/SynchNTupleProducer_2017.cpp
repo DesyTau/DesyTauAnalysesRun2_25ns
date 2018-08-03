@@ -314,7 +314,7 @@ int main(int argc, char * argv[]){
   const bool  applyLeptonId    = cfg.get<bool>("Apply"+lep+"Id");
 
   //dilepton veto
-  /*
+  
   float ptDiLeptonVeto     = 15.;
   float etaDiLeptonVeto    = 2.4;
   float dxyDiLeptonVeto    = 0.05;
@@ -323,7 +323,7 @@ int main(int argc, char * argv[]){
   bool applyDiLeptonOS     = true;
   float isoDiLeptonVeto    = 0.3;
   float drDiLeptonVeto     = 0.3;
-
+  
   if (ch == "mt" || ch == "et") {
     ptDiLeptonVeto     = cfg.get<float>("ptDi"+lep+"Veto");  
     etaDiLeptonVeto    = cfg.get<float>("etaDi"+lep+"Veto");
@@ -334,7 +334,7 @@ int main(int argc, char * argv[]){
     isoDiLeptonVeto    = cfg.get<float>("isoDi"+lep+"Veto");
     drDiLeptonVeto     = cfg.get<float>("drDi"+lep+"Veto"); 
   }
-  */
+  
 
   const float deltaRTrigMatch = cfg.get<float>("DRTrigMatch");
   const float dRiso = cfg.get<float>("dRiso");
@@ -456,7 +456,8 @@ int main(int argc, char * argv[]){
 
 
   // Workspace containing tracking efficiency weights 
-  TString workspace_filename = TString(cmsswBase)+"/src/HTT-utilities/CorrectionsWorkspace/htt_scalefactors_v16_3.root";
+  //TString workspace_filename = TString(cmsswBase)+"/src/HTT-utilities/CorrectionsWorkspace/htt_scalefactors_v16_3.root";
+  TString workspace_filename = TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/htt_scalefactors_v17_1.root";
   TFile *f_workspace = new TFile(workspace_filename,"read");
   if (f_workspace->IsZombie()) {std::cout << " workspace file " << workspace_filename << " not found. Please check. " << std::endl; exit(1);}
   RooWorkspace *w = (RooWorkspace*)f_workspace->Get("w");
@@ -687,9 +688,7 @@ int main(int argc, char * argv[]){
       	continue;
 
       initializeGenTree(gentree);
-      if(!isData)FillGenTree(&analysisTree,gentree,ch);
-      gentree->Fill();
-      // weights
+       // weights
       if(ApplyPUweight) fill_weight(&analysisTree, otree, PUofficial, isData);
       
       otree->npv = analysisTree.primvertex_count;
@@ -722,6 +721,7 @@ int main(int argc, char * argv[]){
         for (unsigned int ie = 0; ie<analysisTree.electron_count; ++ie) {
 			
           bool electronMvaId = analysisTree.electron_mva_wp80_Iso_Fall17_v1[ie];
+	  // bool electronMvaId = analysisTree.electron_mva_wp80_general_Spring16_v1[ie];
 
           if (analysisTree.electron_pt[ie]<=ptLeptonLowCut) continue;
 
@@ -1150,6 +1150,12 @@ int main(int argc, char * argv[]){
       //MET
       fillMET(ch, leptonIndex, tauIndex, &analysisTree, otree);
 
+      //CP calculation
+      if(ch=="tt")acott(&analysisTree,otree,tauIndex,leptonIndex);
+
+      if(!isData)FillGenTree(&analysisTree,gentree,ch);
+      gentree->Fill();
+     
       TLorentzVector genV( 0., 0., 0., 0.);
       TLorentzVector genL( 0., 0., 0., 0.);
 
@@ -1265,7 +1271,25 @@ int main(int argc, char * argv[]){
 	otree->met = metLV.Pt();
 	otree->metphi = metLV.Phi();
       }
-      
+
+      if (!isData) {
+	if(otree->gen_match_2==5&&tauLV.E()<=400&&tauLV.E()>=20){
+	  if (otree->tau_decay_mode_2 == 0) tauLV*=(1-0.03);
+	  else if (otree->gen_match_2 <5) tauLV*=(1-0.02);
+	  else if (otree->tau_decay_mode_2 ==10)tauLV*=(1-0.01);
+	  otree->pt_2 = tauLV.Pt();
+	  otree->m_2 = tauLV.M();
+	}
+	if(ch=="tt"){
+	  if(otree->gen_match_1==5&&leptonLV.E()<=400&&leptonLV.E()>=20){
+	    if (otree->tau_decay_mode_1 == 0) leptonLV*=(1-0.03);
+	    else if (otree->tau_decay_mode_1 <5) leptonLV*=(1-0.02);
+	    else if (otree->tau_decay_mode_1 ==10)leptonLV*=(1-0.01);
+	    otree->pt_1 = leptonLV.Pt();
+	    otree->m_1 = leptonLV.M();
+	  }
+	}
+      }
       TLorentzVector dileptonLV = leptonLV + tauLV;
       
       // visible mass
@@ -1358,7 +1382,7 @@ int main(int argc, char * argv[]){
       if(otree->iso_1<0.35 && otree->byLooseIsolationMVArun2v1DBoldDMwLT_2>0.5 && 
 	 otree->againstMuonLoose3_2>0.5 && otree->againstElectronTightMVA6_2>0.5 ) counter[18]++;
 
-      //      if (!Synch && !passedBaselineSel) continue;
+      //if (!Synch && !passedBaselineSel) continue;
 
       if (ApplySVFit && otree->njetspt20>0) svfit_variables(ch, &analysisTree, otree, &cfg, inputFile_visPtResolution);
 
@@ -1591,6 +1615,64 @@ void FillTau_leading(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex
   otree->puCorrPtSum_1 = analysisTree->tau_puCorrPtSum[tauIndex];
   //otree->isolationGammaCands_size_1 = analysisTree->tau_isolationGammaCands_size[tauIndex];
   //otree->signalGammaCands_size_1 = analysisTree->tau_signalGammaCands_size[tauIndex];
+
+  otree->correction_againstElectronVLooseMVA6_1 = 1;
+  //otree->correction_againstElectronLooseMVA6_1 = 1;
+  //otree->correction_againstElectronMediumMVA6_1 = 1;
+  otree->correction_againstElectronTightMVA6_1 = 1;
+  //otree->correction_againstElectronVTightMVA6_1 = 1;
+  otree->correction_againstMuonLoose3_1 = 1;
+  otree->correction_againstMuonTight3_1 = 1;
+
+  if (analysisTree->tau_genmatch[tauIndex]==1){
+    if (abs(otree->eta_1)<1.460){
+      otree->correction_againstElectronVLooseMVA6_1 = 1.09;
+      //		otree->correction_againstElectronLooseMVA6_1 = 1.17;
+      //		otree->correction_againstElectronMediumMVA6_1 = 1.40;
+      otree->correction_againstElectronTightMVA6_1 = 1.80;
+      //		otree->correction_againstElectronVTightMVA6_1 = 1.96;
+    }else if (abs(otree->eta_1)>1.558){
+      otree->correction_againstElectronVLooseMVA6_1 = 1.19;
+      //		otree->correction_againstElectronLooseMVA6_1 = 1.25;
+      //		otree->correction_againstElectronMediumMVA6_1 = 1.21;
+      otree->correction_againstElectronTightMVA6_1 = 1.53;
+      //		otree->correction_againstElectronVTightMVA6_1 = 1.66;
+    }
+  }
+  
+  if (analysisTree->tau_genmatch[tauIndex]==2){
+    if ((0 < abs(otree->eta_1))&&(abs(otree->eta_1)<= 0.4)){
+      otree->correction_againstMuonLoose3_1 = 1.06;
+      otree->correction_againstMuonTight3_1 = 1.17;
+    }else if ((0.4 < abs(otree->eta_1))&&(abs(otree->eta_1) <= 0.8)){
+      otree->correction_againstMuonLoose3_1 = 1.02;
+      otree->correction_againstMuonTight3_1 = 1.14;
+    }else if ((0.8 < abs(otree->eta_1))&&(abs(otree->eta_1) <= 1.2)){
+      otree->correction_againstMuonLoose3_1 = 1.10;
+      otree->correction_againstMuonTight3_1 = 1.14;
+    }else if ((1.2 < abs(otree->eta_1))&&(abs(otree->eta_1) <= 1.7)){
+      otree->correction_againstMuonLoose3_1 = 1.03;
+      otree->correction_againstMuonTight3_1 = 0.93;
+    }else if ((1.7 < abs(otree->eta_1))&&(abs(otree->eta_1) <= 2.3)){
+      otree->correction_againstMuonLoose3_1 = 1.94;
+      otree->correction_againstMuonTight3_1 = 1.61;
+    }
+  }
+  ///////////////////////////////////////////////////////NEW
+  otree->efficiency_byVVLooseIsolationMVArun2017v2DBoldDMwLT2017_1 = 1;
+  //  otree->efficiency_byLooseIsolationMVArun2017v2DBoldDMwLT2017_1 = 1;
+  //  otree->efficiency_byMediumIsolationMVArun2017v2DBoldDMwLT2017_1 = 1;
+  otree->efficiency_byTightIsolationMVArun2017v2DBoldDMwLT2017_1 = 1;
+  //  otree->efficiency_byVTightIsolationMVArun2017v2DBoldDMwLT2017_1 = 1;
+  //  otree->efficiency_byVVTightIsolationMVArun2017v2DBoldDMwLT2017_1 = 1;
+  if (analysisTree->tau_genmatch[tauIndex]==5){
+    otree->efficiency_byVVLooseIsolationMVArun2017v2DBoldDMwLT2017_1 = 0.88;
+    //  otree->efficiency_byLooseIsolationMVArun2017v2DBoldDMwLT2017_1 = 0.89;
+    //  otree->efficiency_byMediumIsolationMVArun2017v2DBoldDMwLT2017_1 = 0.89;
+    otree->efficiency_byTightIsolationMVArun2017v2DBoldDMwLT2017_1 = 0.89;
+    //  otree->efficiency_byVTightIsolationMVArun2017v2DBoldDMwLT2017_1 = 0.86;
+    //  otree->efficiency_byVVTightIsolationMVArun2017v2DBoldDMwLT2017_1 = 0.84;
+  }
 }
 
 //fill the otree with the tau variables 
@@ -1629,8 +1711,66 @@ void FillTau(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex){
   otree->puCorrPtSum_2 = analysisTree->tau_puCorrPtSum[tauIndex];
   //otree->isolationGammaCands_size_2 = analysisTree->tau_isolationGammaCands_size[tauIndex];
   //otree->signalGammaCands_size_2 = analysisTree->tau_signalGammaCands_size[tauIndex];
-}
 
+  otree->correction_againstElectronVLooseMVA6_2 = 1;
+  //otree->correction_againstElectronLooseMVA6_2 = 1;
+  //otree->correction_againstElectronMediumMVA6_2 = 1;
+  otree->correction_againstElectronTightMVA6_2 = 1;
+  //otree->correction_againstElectronVTightMVA6_2 = 1;
+  otree->correction_againstMuonLoose3_2 = 1;
+  otree->correction_againstMuonTight3_2 = 1;
+
+  if (analysisTree->tau_genmatch[tauIndex]==1){
+    if (abs(otree->eta_2)<1.460){
+      otree->correction_againstElectronVLooseMVA6_2 = 1.09;
+      //		otree->correction_againstElectronLooseMVA6_2 = 1.17;
+      //		otree->correction_againstElectronMediumMVA6_2 = 1.40;
+      otree->correction_againstElectronTightMVA6_2 = 1.80;
+      //		otree->correction_againstElectronVTightMVA6_2 = 1.96;
+    }else if (abs(otree->eta_2)>1.558){
+      otree->correction_againstElectronVLooseMVA6_2 = 1.19;
+      //		otree->correction_againstElectronLooseMVA6_2 = 1.25;
+      //		otree->correction_againstElectronMediumMVA6_2 = 1.21;
+      otree->correction_againstElectronTightMVA6_2 = 1.53;
+      //		otree->correction_againstElectronVTightMVA6_2 = 1.66;
+    }
+  }
+  
+  if (analysisTree->tau_genmatch[tauIndex]==2){
+    if ((0 < abs(otree->eta_2))&&(abs(otree->eta_2)<= 0.4)){
+      otree->correction_againstMuonLoose3_2 = 1.06;
+      otree->correction_againstMuonTight3_2 = 1.17;
+    }else if ((0.4 < abs(otree->eta_2))&&(abs(otree->eta_2) <= 0.8)){
+      otree->correction_againstMuonLoose3_2 = 1.02;
+      otree->correction_againstMuonTight3_2 = 1.14;
+    }else if ((0.8 < abs(otree->eta_2))&&(abs(otree->eta_2) <= 1.2)){
+      otree->correction_againstMuonLoose3_2 = 1.10;
+      otree->correction_againstMuonTight3_2 = 1.14;
+    }else if ((1.2 < abs(otree->eta_2))&&(abs(otree->eta_2) <= 1.7)){
+      otree->correction_againstMuonLoose3_2 = 1.03;
+      otree->correction_againstMuonTight3_2 = 0.93;
+    }else if ((1.7 < abs(otree->eta_2))&&(abs(otree->eta_2) <= 2.3)){
+      otree->correction_againstMuonLoose3_2 = 1.94;
+      otree->correction_againstMuonTight3_2 = 1.61;
+    }
+  }
+  ///////////////////////////////////////////////////////NEW
+  otree->efficiency_byVVLooseIsolationMVArun2017v2DBoldDMwLT2017_2 = 1;
+  //  otree->efficiency_byLooseIsolationMVArun2017v2DBoldDMwLT2017_2 = 1;
+  //  otree->efficiency_byMediumIsolationMVArun2017v2DBoldDMwLT2017_2 = 1;
+  otree->efficiency_byTightIsolationMVArun2017v2DBoldDMwLT2017_2 = 1;
+  //  otree->efficiency_byVTightIsolationMVArun2017v2DBoldDMwLT2017_2 = 1;
+  //  otree->efficiency_byVVTightIsolationMVArun2017v2DBoldDMwLT2017_2 = 1;
+  if (analysisTree->tau_genmatch[tauIndex]==5){
+    otree->efficiency_byVVLooseIsolationMVArun2017v2DBoldDMwLT2017_2 = 0.88;
+    //  otree->efficiency_byLooseIsolationMVArun2017v2DBoldDMwLT2017_2 = 0.89;
+    //  otree->efficiency_byMediumIsolationMVArun2017v2DBoldDMwLT2017_2 = 0.89;
+    otree->efficiency_byTightIsolationMVArun2017v2DBoldDMwLT2017_2 = 0.89;
+    //  otree->efficiency_byVTightIsolationMVArun2017v2DBoldDMwLT2017_2 = 0.86;
+    //  otree->efficiency_byVVTightIsolationMVArun2017v2DBoldDMwLT2017_2 = 0.84;
+  }
+
+}
 void initializeCPvar(Synch17Tree *otree){
   otree->acotautau_00=-9999;
   otree->acotautau_01=-9999;
@@ -1680,7 +1820,7 @@ void FillGenTree(const AC1B * analysisTree, Synch17GenTree *gentree, TString ch)
 
 
   for(int itau=0;itau<ntaus;itau++){
-    if(analysisTree->gentau_isLastCopy[itau]==1&&analysisTree->gentau_isPrompt[itau]==1){
+    if(analysisTree->gentau_isLastCopy[itau]==1&&analysisTree->gentau_isPrompt[itau]==1&&analysisTree->gentau_mother[itau]==1){
       wrongtau[itau]=false;
       if(analysisTree->gentau_visible_pt[itau]>=taumaxpt)LeadingtauIndex=itau, taumaxpt=analysisTree->gentau_visible_pt[itau];
     }else wrongtau[itau]=true;
@@ -1688,7 +1828,7 @@ void FillGenTree(const AC1B * analysisTree, Synch17GenTree *gentree, TString ch)
   double dR;
   const double dRcut=0.3;
     for(int ipart=0;ipart<npart;ipart++){
-      if((abs(analysisTree->genparticles_pdgid[ipart])==25||abs(analysisTree->genparticles_pdgid[ipart])==35||abs(analysisTree->genparticles_pdgid[ipart])==36)&&analysisTree->genparticles_status[ipart]==1){
+      if((abs(analysisTree->genparticles_pdgid[ipart])==25||abs(analysisTree->genparticles_pdgid[ipart])==35||abs(analysisTree->genparticles_pdgid[ipart])==36)&&analysisTree->genparticles_isLastCopy[ipart]==1){
 	TLorentzVector Higgs;
 	Higgs.SetPxPyPzE(analysisTree->genparticles_px[ipart],
 			 analysisTree->genparticles_py[ipart],
