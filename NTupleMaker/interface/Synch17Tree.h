@@ -126,7 +126,39 @@ public :
   Float_t         idisoweight_antiiso_2;
   Float_t         trigweight_2;
   Float_t         trigweight_antiiso_2;
-  
+  /////////////////////////////////////////////////////////////// NEW NEW
+  Float_t	 efficiency_byVVLooseIsolationMVArun2017v2DBoldDMwLT2017_1;
+//  Float_t	 efficiency_byLooseIsolationMVArun2017v2DBoldDMwLT2017_1;
+//  Float_t	 efficiency_byMediumIsolationMVArun2017v2DBoldDMwLT2017_1;
+  Float_t	 efficiency_byTightIsolationMVArun2017v2DBoldDMwLT2017_1;
+//  Float_t	 efficiency_byVTightIsolationMVArun2017v2DBoldDMwLT2017_1;
+//  Float_t	 efficiency_byVVTightIsolationMVArun2017v2DBoldDMwLT2017_1;
+  ////////////////////////////////////////////////////////////
+  Float_t	 efficiency_byVVLooseIsolationMVArun2017v2DBoldDMwLT2017_2;
+//  Float_t	 efficiency_byLooseIsolationMVArun2017v2DBoldDMwLT2017_2;
+//  Float_t	 efficiency_byMediumIsolationMVArun2017v2DBoldDMwLT2017_2;
+  Float_t	 efficiency_byTightIsolationMVArun2017v2DBoldDMwLT2017_2;
+//  Float_t	 efficiency_byVTightIsolationMVArun2017v2DBoldDMwLT2017_2;
+//  Float_t	 efficiency_byVVTightIsolationMVArun2017v2DBoldDMwLT2017_2;
+  ////////////////////////////////////////////////////////////
+  Float_t	 correction_againstElectronVLooseMVA6_1;
+//  Float_t	 correction_againstElectronLooseMVA6_1;
+//  Float_t	 correction_againstElectronMediumMVA6_1;
+  Float_t	 correction_againstElectronTightMVA6_1;
+//  Float_t	 correction_againstElectronVTightMVA6_1;
+  ////////////////////////////////////////////////////////////
+  Float_t	 correction_againstElectronVLooseMVA6_2;
+//  Float_t	 correction_againstElectronLooseMVA6_2;
+//  Float_t	 correction_againstElectronMediumMVA6_2;
+  Float_t	 correction_againstElectronTightMVA6_2;
+//  Float_t	 correction_againstElectronVTightMVA6_2;
+  ////////////////////////////////////////////////////////////
+  Float_t	 correction_againstMuonLoose3_1;
+  Float_t	 correction_againstMuonTight3_1;
+  ////////////////////////////////////////////////////////////
+  Float_t	 correction_againstMuonLoose3_2;
+  Float_t	 correction_againstMuonTight3_2;
+  ////////////////////////////////////////////////////////////
   //Trig and weights
   Float_t         weight;
   Float_t         mcweight;
@@ -291,7 +323,40 @@ public :
   TBranch	 *b_byTightIsolationMVArun2v1DBoldDMwLT_1;
   TBranch	 *b_byVTightIsolationMVArun2v1DBoldDMwLT_1;
   TBranch	 *b_byVVTightIsolationMVArun2v1DBoldDMwLT_1;
-  
+
+  ///////////////////////////////////////////////////////////NEW
+  TBranch	 *b_efficiency_byVVLooseIsolationMVArun2017v2DBoldDMwLT2017_1;
+//  TBranch	 *b_efficiency_byLooseIsolationMVArun2017v2DBoldDMwLT2017_1;
+//  TBranch	 *b_efficiency_byMediumIsolationMVArun2017v2DBoldDMwLT2017_1;
+  TBranch	 *b_efficiency_byTightIsolationMVArun2017v2DBoldDMwLT2017_1;
+//  TBranch	 *b_efficiency_byVTightIsolationMVArun2017v2DBoldDMwLT2017_1;
+//  TBranch	 *b_efficiency_byVVTightIsolationMVArun2017v2DBoldDMwLT2017_1;
+  ////////////////////////////////////////////////////////////
+  TBranch	 *b_efficiency_byVVLooseIsolationMVArun2017v2DBoldDMwLT2017_2;
+//  TBranch	 *b_efficiency_byLooseIsolationMVArun2017v2DBoldDMwLT2017_2;
+//  TBranch	 *b_efficiency_byMediumIsolationMVArun2017v2DBoldDMwLT2017_2;
+  TBranch	 *b_efficiency_byTightIsolationMVArun2017v2DBoldDMwLT2017_2;
+//  TBranch	 *b_efficiency_byVTightIsolationMVArun2017v2DBoldDMwLT2017_2;
+//  TBranch	 *b_efficiency_byVVTightIsolationMVArun2017v2DBoldDMwLT2017_2;
+  ////////////////////////////////////////////////////////////
+  TBranch	 *b_correction_againstElectronVLooseMVA6_1;
+//  TBranch	 *b_correction_againstElectronLooseMVA6_1;
+//  TBranch	 *b_correction_againstElectronMediumMVA6_1;
+  TBranch	 *b_correction_againstElectronTightMVA6_1;
+//  TBranch	 *b_correction_againstElectronVTightMVA6_1;
+  ////////////////////////////////////////////////////////////
+  TBranch	 *b_correction_againstElectronVLooseMVA6_2;
+//  TBranch	 *b_correction_againstElectronLooseMVA6_2;
+//  TBranch	 *b_correction_againstElectronMediumMVA6_2;
+  TBranch	 *b_correction_againstElectronTightMVA6_2;
+//  TBranch	 *b_correction_againstElectronVTightMVA6_2;
+  ////////////////////////////////////////////////////////////
+  TBranch	 *b_correction_againstMuonLoose3_1;
+  TBranch	 *b_correction_againstMuonTight3_1;
+  ////////////////////////////////////////////////////////////
+  TBranch	 *b_correction_againstMuonLoose3_2;
+  TBranch	 *b_correction_againstMuonTight3_2;
+  ////////////////////////////////////////////////////////////
   TBranch	 *b_idisoweight_1;
   TBranch	 *b_idisoweight_antiiso_1;
   TBranch	 *b_trigweight_1;

@@ -41,7 +41,7 @@ float abs_Iso_et(int Index, const AC1B * analysisTree, float dRiso);
 bool passedSummer16VetoId(const AC1B * analysisTree, int index);
 bool isICHEPmed(int Index, const AC1B * analysisTree);
 bool isIdentifiedMediumMuon(int Index, const AC1B * analysisTree, bool isData);
-
+float getEffectiveArea(float eta);
 
 ///////////////////////////////////////////////
 //////////////FUNCTION DEFINITION//////////////
@@ -113,6 +113,18 @@ bool isGoodLumi(int run, int lumi, const lumi_json& json){
   return isGoodLumi(run_lumi, json);
 }
 
+float getEffectiveArea(float eta) {
+    float effArea = 0.1440;
+    if (eta<=0) eta=fabs(eta);
+    if (eta > 1.0 && eta < 1.4790) effArea = 0.1562;
+    else if (eta < 2.0)    effArea = 0.1032;
+    else if (eta < 2.2)    effArea = 0.0859;
+    else if (eta < 2.3)    effArea = 0.1116;
+    else if (eta < 2.4)    effArea = 0.1321;
+    else if (eta < 2.5)    effArea = 0.1654;
+    return effArea;
+
+  } 
 
 //////////////////////////////////////////////
 //            channel dependent             //
@@ -168,7 +180,8 @@ float abs_Iso_et (int Index, const AC1B * analysisTree, float dRiso){
   float chargedHadIso = -9999.;
   float puIso         = -9999.;
   float absIso        = -9999.;
-  float isoCone = 0.3;
+  float isoCone       = 0.3;
+  float neutralIso    = -9999.;
   /*
   absIso  = analysisTree->electron_r03_sumChargedHadronPt[Index];
   float neutralIso =
@@ -176,8 +189,23 @@ float abs_Iso_et (int Index, const AC1B * analysisTree, float dRiso){
     analysisTree->electron_r03_sumPhotonEt[Index] - 
     analysisTree->rho*TMath::Pi()*isoCone*isoCone;
   neutralIso = TMath::Max(float(0),neutralIso);
+  return(absIso + neutralIso);
+
   */
-  
+ 
+  float  eA = getEffectiveArea( fabs(analysisTree->electron_superclusterEta[Index]) );
+ 
+  absIso = analysisTree->electron_r03_sumChargedHadronPt[Index];
+
+  neutralIso = analysisTree->electron_r03_sumNeutralHadronEt[Index] +
+    analysisTree->electron_r03_sumPhotonEt[Index] -
+    eA*analysisTree->rho;
+
+  return (absIso+TMath::Max(float(0),neutralIso));
+
+
+  /*
+
   neutralHadIso = analysisTree->electron_neutralHadIso[Index];
   photonIso =     analysisTree->electron_photonIso[Index];
   chargedHadIso = analysisTree->electron_chargedHadIso[Index];
@@ -192,8 +220,7 @@ float abs_Iso_et (int Index, const AC1B * analysisTree, float dRiso){
   float neutralIso = neutralHadIso + photonIso -0.5*puIso;
   neutralIso = TMath::Max(float(0), neutralIso);
   return(chargedHadIso + neutralIso);
-  
-  //return(absIso + neutralIso);
+  */
 }
 
 

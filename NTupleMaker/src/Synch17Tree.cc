@@ -122,7 +122,39 @@ void Synch17Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("byTightIsolationMVArun2v1DBoldDMwLT_1", &byTightIsolationMVArun2v1DBoldDMwLT_1, &b_byTightIsolationMVArun2v1DBoldDMwLT_1);
    fChain->SetBranchAddress("byVTightIsolationMVArun2v1DBoldDMwLT_1", &byVTightIsolationMVArun2v1DBoldDMwLT_1, &b_byVTightIsolationMVArun2v1DBoldDMwLT_1);
    fChain->SetBranchAddress("byVVTightIsolationMVArun2v1DBoldDMwLT_1", &byVVTightIsolationMVArun2v1DBoldDMwLT_1, &b_byVVTightIsolationMVArun2v1DBoldDMwLT_1);
-
+//////////////////////////////////////////////////////////////NEW///////////////////////
+   fChain->SetBranchAddress("efficiency_byVVLooseIsolationMVArun2017v2DBoldDMwLT2017_1", &efficiency_byVVLooseIsolationMVArun2017v2DBoldDMwLT2017_1, &b_efficiency_byVVLooseIsolationMVArun2017v2DBoldDMwLT2017_1);
+//   fChain->SetBranchAddress("efficiency_byLooseIsolationMVArun2017v2DBoldDMwLT2017_1", &efficiency_byLooseIsolationMVArun2017v2DBoldDMwLT2017_1, &b_efficiency_byLooseIsolationMVArun2017v2DBoldDMwLT2017_1);
+//   fChain->SetBranchAddress("efficiency_byMediumIsolationMVArun2017v2DBoldDMwLT2017_1", &efficiency_byMediumIsolationMVArun2017v2DBoldDMwLT2017_1, &b_efficiency_byMediumIsolationMVArun2017v2DBoldDMwLT2017_1);
+   fChain->SetBranchAddress("efficiency_byTightIsolationMVArun2017v2DBoldDMwLT2017_1", &efficiency_byTightIsolationMVArun2017v2DBoldDMwLT2017_1, &b_efficiency_byTightIsolationMVArun2017v2DBoldDMwLT2017_1);
+//   fChain->SetBranchAddress("efficiency_byVTightIsolationMVArun2017v2DBoldDMwLT2017_1", &efficiency_byVTightIsolationMVArun2017v2DBoldDMwLT2017_1, &b_efficiency_byVTightIsolationMVArun2017v2DBoldDMwLT2017_1);
+//   fChain->SetBranchAddress("efficiency_byVVTightIsolationMVArun2017v2DBoldDMwLT2017_1", &efficiency_byVVTightIsolationMVArun2017v2DBoldDMwLT2017_1, &b_efficiency_byVVTightIsolationMVArun2017v2DBoldDMwLT2017_1);
+//////////////////////////////////////////////////////////////
+   fChain->SetBranchAddress("efficiency_byVVLooseIsolationMVArun2017v2DBoldDMwLT2017_2", &efficiency_byVVLooseIsolationMVArun2017v2DBoldDMwLT2017_2, &b_efficiency_byVVLooseIsolationMVArun2017v2DBoldDMwLT2017_2);
+//   fChain->SetBranchAddress("efficiency_byLooseIsolationMVArun2017v2DBoldDMwLT2017_2", &efficiency_byLooseIsolationMVArun2017v2DBoldDMwLT2017_2, &b_efficiency_byLooseIsolationMVArun2017v2DBoldDMwLT2017_2);
+//   fChain->SetBranchAddress("efficiency_byMediumIsolationMVArun2017v2DBoldDMwLT2017_2", &efficiency_byMediumIsolationMVArun2017v2DBoldDMwLT2017_2, &b_efficiency_byMediumIsolationMVArun2017v2DBoldDMwLT2017_2);
+   fChain->SetBranchAddress("efficiency_byTightIsolationMVArun2017v2DBoldDMwLT2017_2", &efficiency_byTightIsolationMVArun2017v2DBoldDMwLT2017_2, &b_efficiency_byTightIsolationMVArun2017v2DBoldDMwLT2017_2);
+//   fChain->SetBranchAddress("efficiency_byVTightIsolationMVArun2017v2DBoldDMwLT2017_2", &efficiency_byVTightIsolationMVArun2017v2DBoldDMwLT2017_2, &b_efficiency_byVTightIsolationMVArun2017v2DBoldDMwLT2017_2);
+//   fChain->SetBranchAddress("efficiency_byVVTightIsolationMVArun2017v2DBoldDMwLT2017_2", &efficiency_byVVTightIsolationMVArun2017v2DBoldDMwLT2017_2, &b_efficiency_byVVTightIsolationMVArun2017v2DBoldDMwLT2017_2);
+//////////////////////////////////////////////////////////////////////////////////////////
+  fChain->SetBranchAddress("correction_againstElectronVLooseMVA6_1", &correction_againstElectronVLooseMVA6_1, &b_correction_againstElectronVLooseMVA6_1);
+//  fChain->SetBranchAddress("correction_againstElectronLooseMVA6_1", &correction_againstElectronLooseMVA6_1, &b_correction_againstElectronLooseMVA6_1);
+//  fChain->SetBranchAddress("correction_againstElectronMediumMVA6_1", &correction_againstElectronMediumMVA6_1, &b_correction_againstElectronMediumMVA6_1);
+  fChain->SetBranchAddress("correction_againstElectronTightMVA6_1", &correction_againstElectronTightMVA6_1, &b_correction_againstElectronTightMVA6_1);
+//  fChain->SetBranchAddress("correction_againstElectronVTightMVA6_1", &correction_againstElectronVTightMVA6_1, &b_correction_againstElectronVTightMVA6_1);
+//////////////////////////////////////////////////////////////////////////////////////////
+  fChain->SetBranchAddress("correction_againstElectronVLooseMVA6_2", &correction_againstElectronVLooseMVA6_2, &b_correction_againstElectronVLooseMVA6_2);
+//  fChain->SetBranchAddress("correction_againstElectronLooseMVA6_2", &correction_againstElectronLooseMVA6_2, &b_correction_againstElectronLooseMVA6_2);
+//  fChain->SetBranchAddress("correction_againstElectronMediumMVA6_2", &correction_againstElectronMediumMVA6_2, &b_correction_againstElectronMediumMVA6_2);
+  fChain->SetBranchAddress("correction_againstElectronTightMVA6_2", &correction_againstElectronTightMVA6_2, &b_correction_againstElectronTightMVA6_2);
+//  fChain->SetBranchAddress("correction_againstElectronVTightMVA6_2", &correction_againstElectronVTightMVA6_2, &b_correction_againstElectronVTightMVA6_2);
+//////////////////////////////////////////////////////////////////////////////////////////
+  fChain->SetBranchAddress("correction_againstMuonLoose3_1", &correction_againstMuonLoose3_1, &b_correction_againstMuonLoose3_1);
+  fChain->SetBranchAddress("correction_againstMuonTight3_1", &correction_againstMuonTight3_1, &b_correction_againstMuonTight3_1);
+//////////////////////////////////////////////////////////////////////////////////////////
+  fChain->SetBranchAddress("correction_againstMuonLoose3_2", &correction_againstMuonLoose3_2, &b_correction_againstMuonLoose3_2);
+  fChain->SetBranchAddress("correction_againstMuonTight3_2", &correction_againstMuonTight3_2, &b_correction_againstMuonTight3_2);
+//////////////////////////////////////////////////////////////////////////////////////////
    fChain->SetBranchAddress("trigweight_2", &trigweight_2, &b_trigweight_2);
    fChain->SetBranchAddress("trigweight_antiiso_2", &trigweight_antiiso_2, &b_trigweight_antiiso_2);
    fChain->SetBranchAddress("idisoweight_2", &idisoweight_2, &b_idisoweight_2);
@@ -380,6 +412,39 @@ void Synch17Tree::WriteInit(TTree *tree) {
   fChain->Branch("byTightIsolationMVArun2v1DBoldDMwLT_1", &byTightIsolationMVArun2v1DBoldDMwLT_1, "byTightIsolationMVArun2v1DBoldDMwLT_1/F");
   fChain->Branch("byVTightIsolationMVArun2v1DBoldDMwLT_1", &byVTightIsolationMVArun2v1DBoldDMwLT_1, "byVTightIsolationMVArun2v1DBoldDMwLT_1/F");
   fChain->Branch("byVVTightIsolationMVArun2v1DBoldDMwLT_1", &byVVTightIsolationMVArun2v1DBoldDMwLT_1, "byVVTightIsolationMVArun2v1DBoldDMwLT_1/F");
+//////////////////////////////////////////////////////////////////////////////NEW
+  fChain->Branch("efficiency_byVVLooseIsolationMVArun2017v2DBoldDMwLT2017_1", &efficiency_byVVLooseIsolationMVArun2017v2DBoldDMwLT2017_1, "efficiency_byVVLooseIsolationMVArun2017v2DBoldDMwLT2017_1/F");
+//  fChain->Branch("efficiency_byLooseIsolationMVArun2017v2DBoldDMwLT2017_1", &efficiency_byLooseIsolationMVArun2017v2DBoldDMwLT2017_1, "efficiency_byLooseIsolationMVArun2017v2DBoldDMwLT2017_1/F");
+//  fChain->Branch("efficiency_byMediumIsolationMVArun2017v2DBoldDMwLT2017_1", &efficiency_byMediumIsolationMVArun2017v2DBoldDMwLT2017_1, "efficiency_byMediumIsolationMVArun2017v2DBoldDMwLT2017_1/F");
+  fChain->Branch("efficiency_byTightIsolationMVArun2017v2DBoldDMwLT2017_1", &efficiency_byTightIsolationMVArun2017v2DBoldDMwLT2017_1, "efficiency_byTightIsolationMVArun2017v2DBoldDMwLT2017_1/F");
+//  fChain->Branch("efficiency_byVTightIsolationMVArun2017v2DBoldDMwLT2017_1", &efficiency_byVTightIsolationMVArun2017v2DBoldDMwLT2017_1, "efficiency_byVTightIsolationMVArun2017v2DBoldDMwLT2017_1/F");
+//  fChain->Branch("efficiency_byVVTightIsolationMVArun2017v2DBoldDMwLT2017_1", &efficiency_byVVTightIsolationMVArun2017v2DBoldDMwLT2017_1, "efficiency_byVVTightIsolationMVArun2017v2DBoldDMwLT2017_1/F");
+//////////////////////////////////////////////////////////////////////////////
+  fChain->Branch("efficiency_byVVLooseIsolationMVArun2017v2DBoldDMwLT2017_2", &efficiency_byVVLooseIsolationMVArun2017v2DBoldDMwLT2017_2, "efficiency_byVVLooseIsolationMVArun2017v2DBoldDMwLT2017_2/F");
+//  fChain->Branch("efficiency_byLooseIsolationMVArun2017v2DBoldDMwLT2017_2", &efficiency_byLooseIsolationMVArun2017v2DBoldDMwLT2017_2, "efficiency_byLooseIsolationMVArun2017v2DBoldDMwLT2017_2/F");
+//  fChain->Branch("efficiency_byMediumIsolationMVArun2017v2DBoldDMwLT2017_2", &efficiency_byMediumIsolationMVArun2017v2DBoldDMwLT2017_2, "efficiency_byMediumIsolationMVArun2017v2DBoldDMwLT2017_2/F");
+  fChain->Branch("efficiency_byTightIsolationMVArun2017v2DBoldDMwLT2017_2", &efficiency_byTightIsolationMVArun2017v2DBoldDMwLT2017_2, "efficiency_byTightIsolationMVArun2017v2DBoldDMwLT2017_2/F");
+//  fChain->Branch("efficiency_byVTightIsolationMVArun2017v2DBoldDMwLT2017_2", &efficiency_byVTightIsolationMVArun2017v2DBoldDMwLT2017_2, "efficiency_byVTightIsolationMVArun2017v2DBoldDMwLT2017_2/F");
+//  fChain->Branch("efficiency_byVVTightIsolationMVArun2017v2DBoldDMwLT2017_2", &efficiency_byVVTightIsolationMVArun2017v2DBoldDMwLT2017_2, "efficiency_byVVTightIsolationMVArun2017v2DBoldDMwLT2017_2/F");
+//////////////////////////////////////////////////////////////////////////////
+  fChain->Branch("correction_againstElectronVLooseMVA6_1", &correction_againstElectronVLooseMVA6_1, "correction_againstElectronVLooseMVA6_1/F");
+//  fChain->Branch("correction_againstElectronLooseMVA6_1", &correction_againstElectronLooseMVA6_1, "correction_againstElectronLooseMVA6_1/F");
+//  fChain->Branch("correction_againstElectronMediumMVA6_1", &correction_againstElectronMediumMVA6_1, "correction_againstElectronMediumMVA6_1/F");
+  fChain->Branch("correction_againstElectronTightMVA6_1", &correction_againstElectronTightMVA6_1, "correction_againstElectronTightMVA6_1/F");
+//  fChain->Branch("correction_againstElectronVTightMVA6_1", &correction_againstElectronVTightMVA6_1, "correction_againstElectronVTightMVA6_1/F");
+//////////////////////////////////////////////////////////////////////////////
+  fChain->Branch("correction_againstElectronVLooseMVA6_2", &correction_againstElectronVLooseMVA6_2, "correction_againstElectronVLooseMVA6_2/F");
+//  fChain->Branch("correction_againstElectronLooseMVA6_2", &correction_againstElectronLooseMVA6_2, "correction_againstElectronLooseMVA6_2/F");
+//  fChain->Branch("correction_againstElectronMediumMVA6_2", &correction_againstElectronMediumMVA6_2, "correction_againstElectronMediumMVA6_2/F");
+  fChain->Branch("correction_againstElectronTightMVA6_2", &correction_againstElectronTightMVA6_2, "correction_againstElectronTightMVA6_2/F");
+//  fChain->Branch("correction_againstElectronVTightMVA6_2", &correction_againstElectronVTightMVA6_2, "correction_againstElectronVTightMVA6_2/F");
+//////////////////////////////////////////////////////////////////////////////
+  fChain->Branch("correction_againstMuonLoose3_1", &correction_againstMuonLoose3_1, "correction_againstMuonLoose3_1/F");
+  fChain->Branch("correction_againstMuonTight3_1", &correction_againstMuonTight3_1, "correction_againstMuonTight3_1/F");
+//////////////////////////////////////////////////////////////////////////////
+  fChain->Branch("correction_againstMuonLoose3_2", &correction_againstMuonLoose3_2, "correction_againstMuonLoose3_2/F");
+  fChain->Branch("correction_againstMuonTight3_2", &correction_againstMuonTight3_2, "correction_againstMuonTight3_2/F");
+//////////////////////////////////////////////////////////////////////////////
 
    fChain->Branch("trigweight_1", &trigweight_1, "trigweight_1/F");
    fChain->Branch("trigweight_antiiso_1", &trigweight_antiiso_1, "trigweight_antiiso_1/F");
