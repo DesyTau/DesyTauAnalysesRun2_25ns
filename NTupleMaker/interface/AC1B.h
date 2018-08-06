@@ -416,6 +416,7 @@ public :
    Float_t         numtruepileupinteractions;
    UInt_t          gentau_count;
    Float_t         gentau_e[100];   //[gentau_count]
+   Float_t         gentau_charge[100];   //[gentau_count]
    Float_t         gentau_px[100];   //[gentau_count]
    Float_t         gentau_py[100];   //[gentau_count]
    Float_t         gentau_pz[100];   //[gentau_count]
@@ -1101,6 +1102,7 @@ public :
    TBranch        *b_numtruepileupinteractions;   //!
    TBranch        *b_gentau_count;   //!
    TBranch        *b_gentau_e;   //!
+   TBranch        *b_gentau_charge;   //!
    TBranch        *b_gentau_px;   //!
    TBranch        *b_gentau_py;   //!
    TBranch        *b_gentau_pz;   //!
@@ -1875,6 +1877,7 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("numtruepileupinteractions", &numtruepileupinteractions, &b_numtruepileupinteractions);
    fChain->SetBranchAddress("gentau_count", &gentau_count, &b_gentau_count);
    fChain->SetBranchAddress("gentau_e", gentau_e, &b_gentau_e);
+   fChain->SetBranchAddress("gentau_charge", gentau_charge, &b_gentau_charge);
    fChain->SetBranchAddress("gentau_px", gentau_px, &b_gentau_px);
    fChain->SetBranchAddress("gentau_py", gentau_py, &b_gentau_py);
    fChain->SetBranchAddress("gentau_pz", gentau_pz, &b_gentau_pz);
