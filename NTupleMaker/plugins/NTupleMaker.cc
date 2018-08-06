@@ -903,6 +903,7 @@ void NTupleMaker::beginJob(){
     // generated taus
     tree->Branch("gentau_count", &gentau_count, "gentau_count/i");
     tree->Branch("gentau_e",  gentau_e,  "tau_e[gentau_count]/F");
+    tree->Branch("gentau_charge",  gentau_charge,  "tau_charge[gentau_count]/F");
     tree->Branch("gentau_px", gentau_px, "tau_px[gentau_count]/F");
     tree->Branch("gentau_py", gentau_py, "tau_py[gentau_count]/F");
     tree->Branch("gentau_pz", gentau_pz, "tau_pz[gentau_count]/F");
@@ -2587,6 +2588,7 @@ bool NTupleMaker::AddGenParticles(const edm::Event& iEvent) {
 	      gentau_py[gentau_count] = (*GenParticles)[i].py();
 	      gentau_pz[gentau_count] = (*GenParticles)[i].pz();
 	      gentau_e[gentau_count]  = (*GenParticles)[i].energy();
+	      gentau_charge[gentau_count]  = (*GenParticles)[i].charge();
 	      gentau_status[gentau_count] = (*GenParticles)[i].status();
 
 	      gentau_visible_px[gentau_count] = tau_visible_p4.px();
