@@ -1052,7 +1052,8 @@ int main(int argc, char * argv[]){
         if (!isData && ApplyLepSF) {
 	  w->var("e_eta")->setVal(analysisTree.electron_eta[leptonIndex]); 
 	  w->var("e_pt")->setVal(analysisTree.electron_pt[leptonIndex]); 	
-	  otree->trkeffweight = (double)( w->function("e_trk_ratio")->getVal());
+	  //otree->trkeffweight = (double)( w->function("e_trk_ratio")->getVal());
+	  otree->trkeffweight = (double)( w->function("e_reco_ratio")->getVal());
 	}
       }
       else if(ch=="tt"){
