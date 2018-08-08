@@ -62,9 +62,13 @@ void Synch17GenTree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("genpt_1", &genpt_1, &b_genpt_1);
    fChain->SetBranchAddress("genphi_1", &genphi_1, &b_genphi_1);
    fChain->SetBranchAddress("geneta_1", &geneta_1, &b_geneta_1);
+   fChain->SetBranchAddress("genmode_1", &genmode_1, &b_genmode_1);
+
    fChain->SetBranchAddress("genpt_2", &genpt_2, &b_genpt_2);
    fChain->SetBranchAddress("genphi_2", &genphi_2, &b_genphi_2);
    fChain->SetBranchAddress("geneta_2", &geneta_2, &b_geneta_2);
+   fChain->SetBranchAddress("genmode_2", &genmode_2, &b_genmode_2);
+
    fChain->SetBranchAddress("acotautau_00", &acotautau_00, &b_acotautau_00);
    fChain->SetBranchAddress("acotautau_10", &acotautau_10, &b_acotautau_10);
    fChain->SetBranchAddress("acotautau_01", &acotautau_01, &b_acotautau_01);
@@ -150,9 +154,13 @@ void Synch17GenTree::WriteInit(TTree *tree) {
    fChain->Branch("genpt_1", &genpt_1, "genpt_1/F");
    fChain->Branch("genphi_1", &genphi_1, "genphi_1/F");
    fChain->Branch("geneta_1", &geneta_1, "geneta_1/F");
+   fChain->Branch("genmode_1", &genmode_1, "genmode_1/I");
+
    fChain->Branch("genpt_2", &genpt_2, "genpt_2/F");
    fChain->Branch("genphi_2", &genphi_2, "genphi_2/F");
    fChain->Branch("geneta_2", &geneta_2, "geneta_2/F");
+   fChain->Branch("genmode_2", &genmode_2, "genmode_2/I");
+
    fChain->Branch("acotautau_00", &acotautau_00, "acotautau_00/F");
    fChain->Branch("acotautau_10", &acotautau_10, "acotautau_10/F");
    fChain->Branch("acotautau_01", &acotautau_01, "acotautau_01/F");

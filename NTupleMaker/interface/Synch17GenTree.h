@@ -33,9 +33,11 @@ public :
   Float_t         genpt_1;
   Float_t         genphi_1;
   Float_t         geneta_1;
+  Int_t           genmode_1;
   Float_t         genpt_2;
   Float_t         genphi_2;
   Float_t         geneta_2;
+  Int_t           genmode_2;
   Float_t         acotautau_00;
   Float_t         acotautau_10;
   Float_t         acotautau_01;
@@ -53,9 +55,11 @@ public :
   TBranch	 *b_genpt_1;
   TBranch	 *b_genphi_1;
   TBranch	 *b_geneta_1;
+  TBranch	 *b_genmode_1;
   TBranch	 *b_genpt_2;
   TBranch	 *b_genphi_2;
   TBranch	 *b_geneta_2;
+  TBranch	 *b_genmode_2;
   TBranch        *b_acotautau_00;
   TBranch        *b_acotautau_10;
   TBranch        *b_acotautau_01;

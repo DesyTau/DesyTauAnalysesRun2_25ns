@@ -626,8 +626,11 @@ int main(int argc, char * argv[]){
 
       if (isData)
 	nWeightedEventsH->Fill(0., 1.);
-      else
+      else {
 	nWeightedEventsH->Fill(0., analysisTree.genweight);
+	FillGenTree(&analysisTree,gentree,ch);
+	gentree->Fill();
+      }
 
       //Skip events not passing the MET filters, if applied
       if (ApplyMetFilters && !passedAllMetFilters(&analysisTree, met_filters_list, isData)) continue;
@@ -1154,8 +1157,6 @@ int main(int argc, char * argv[]){
       //CP calculation
       if(ch=="tt")acott(&analysisTree,otree,tauIndex,leptonIndex);
 
-      if(!isData)FillGenTree(&analysisTree,gentree,ch);
-      gentree->Fill();
      
       TLorentzVector genV( 0., 0., 0., 0.);
       TLorentzVector genL( 0., 0., 0., 0.);
@@ -1814,82 +1815,79 @@ void FillGenTree(const AC1B * analysisTree, Synch17GenTree *gentree, TString ch)
   int tauLIndex=-1;
   int LeadingtauIndex=-1;
   int TrailingtauIndex=-1;
-  bool wrongtau[ntaus];
   double taumaxpt=-1;
   
-
-
-
   for(int itau=0;itau<ntaus;itau++){
-    if(analysisTree->gentau_isLastCopy[itau]==1&&analysisTree->gentau_isPrompt[itau]==1&&analysisTree->gentau_mother[itau]==1){
-      wrongtau[itau]=false;
-      if(analysisTree->gentau_visible_pt[itau]>=taumaxpt)LeadingtauIndex=itau, taumaxpt=analysisTree->gentau_visible_pt[itau];
-    }else wrongtau[itau]=true;
+    if(analysisTree->gentau_isLastCopy[itau]==1&&analysisTree->gentau_isPrompt[itau]==1){
+      if(analysisTree->gentau_visible_pt[itau]>=taumaxpt) {
+	LeadingtauIndex=itau; 
+	taumaxpt=analysisTree->gentau_visible_pt[itau];
+      }
+    }
   }
+
+  taumaxpt=-1; 
+  for(int itau=0;itau<ntaus;itau++){
+    if(analysisTree->gentau_isLastCopy[itau]==1&&analysisTree->gentau_isPrompt[itau]==1&&itau!=LeadingtauIndex){
+      if(analysisTree->gentau_visible_pt[itau]>=taumaxpt) {
+	TrailingtauIndex=itau; 
+	taumaxpt=analysisTree->gentau_visible_pt[itau];
+      }
+    }
+  }
+
+  TLorentzVector genTauVis1; genTauVis1.SetXYZT(0,0,0,0);
+  TLorentzVector genTauVis2; genTauVis2.SetXYZT(0,0,0,0);
+  gentree->genmode_1 = -1;
+  gentree->genmode_2 = -1;
+  if (LeadingtauIndex>-1) {
+    genTauVis1.SetXYZT(analysisTree->gentau_visible_px[LeadingtauIndex],
+		       analysisTree->gentau_visible_py[LeadingtauIndex],
+		       analysisTree->gentau_visible_pz[LeadingtauIndex],
+		       analysisTree->gentau_visible_e[LeadingtauIndex]);
+    gentree->genmode_1 = analysisTree->gentau_decayMode[LeadingtauIndex];
+  }
+  if (TrailingtauIndex>-1) {
+    genTauVis2.SetXYZT(analysisTree->gentau_visible_px[TrailingtauIndex],
+		       analysisTree->gentau_visible_py[TrailingtauIndex],
+		       analysisTree->gentau_visible_pz[TrailingtauIndex],
+		       analysisTree->gentau_visible_e[TrailingtauIndex]);
+    gentree->genmode_2 = analysisTree->gentau_decayMode[TrailingtauIndex];
+  }
+  gentree->genpt_1 = genTauVis1.Pt();
+  gentree->geneta_1 = genTauVis1.Eta();
+  gentree->genphi_1 = genTauVis1.Phi();
+
+  gentree->genpt_2 = genTauVis2.Pt();
+  gentree->geneta_2 = genTauVis2.Eta();
+  gentree->genphi_2 = genTauVis2.Phi();
+
   double dR;
   const double dRcut=0.3;
-    for(int ipart=0;ipart<npart;ipart++){
-      if((abs(analysisTree->genparticles_pdgid[ipart])==25||abs(analysisTree->genparticles_pdgid[ipart])==35||abs(analysisTree->genparticles_pdgid[ipart])==36)&&analysisTree->genparticles_isLastCopy[ipart]==1){
-	TLorentzVector Higgs;
-	Higgs.SetPxPyPzE(analysisTree->genparticles_px[ipart],
-			 analysisTree->genparticles_py[ipart],
-			 analysisTree->genparticles_pz[ipart],
-			 analysisTree->genparticles_e[ipart]);
-	gentree->Higgs_pt=Higgs.Pt();
-	gentree->Higgs_eta=Higgs.Eta();
-	gentree->Higgs_phi=Higgs.Phi();
-	gentree->Higgs_mass=Higgs.M();
-      }
+  for(int ipart=0;ipart<npart;ipart++){
+    if((abs(analysisTree->genparticles_pdgid[ipart])==25||
+	abs(analysisTree->genparticles_pdgid[ipart])==35||
+	abs(analysisTree->genparticles_pdgid[ipart])==36)&&
+       analysisTree->genparticles_isLastCopy[ipart]==1){
+      TLorentzVector Higgs;
+      Higgs.SetPxPyPzE(analysisTree->genparticles_px[ipart],
+		       analysisTree->genparticles_py[ipart],
+		       analysisTree->genparticles_pz[ipart],
+		       analysisTree->genparticles_e[ipart]);
+      gentree->Higgs_pt=Higgs.Pt();
+      gentree->Higgs_eta=Higgs.Eta();
+      gentree->Higgs_phi=Higgs.Phi();
+      gentree->Higgs_mass=Higgs.M();
     }
-
-  if(ch=="et")leptonid=11;
-  if(ch=="mt")leptonid=13;
-  if(ch!="tt"){
-    for(int ipart=0;ipart<npart;ipart++){
-      if(abs(analysisTree->genparticles_pdgid[ipart])==leptonid&&(analysisTree->genparticles_info[ipart]==12||analysisTree->genparticles_info[ipart]==5)&&analysisTree->genparticles_status[ipart]==1){
-	lvector.SetPxPyPzE(analysisTree->genparticles_px[ipart],
-			   analysisTree->genparticles_py[ipart],
-			   analysisTree->genparticles_pz[ipart],
-			   analysisTree->genparticles_e[ipart]);
-	for(int itau=0;itau<ntaus;itau++){
-	  if(wrongtau[itau])continue;
-	  Tau.SetPxPyPzE(analysisTree->gentau_visible_px[itau],
-			 analysisTree->gentau_visible_py[itau],
-			 analysisTree->gentau_visible_pz[itau],
-			 analysisTree->gentau_visible_e[itau]);
-	  dR=deltaR(Tau.Eta(),Tau.Phi(),lvector.Eta(),lvector.Phi());
-     
-	  if(dR<dRcut){
-	    tauLIndex=itau;
-	    gentree->genpt_1=lvector.Pt();
-	    gentree->geneta_1=lvector.Eta();
-	    gentree->genphi_1=lvector.Phi();
-	  }
-	}
-      }
-    }
-    for(int itau=0;itau<ntaus;itau++){
-      if(wrongtau[itau]||itau==tauLIndex)continue;
-      tauHIndex=itau;
-      gentree->genpt_2=analysisTree->gentau_visible_pt[itau];
-      gentree->geneta_2=analysisTree->gentau_visible_eta[itau];
-      gentree->genphi_2=analysisTree->gentau_visible_phi[itau];
-    }
-    gen_acott(analysisTree,gentree,tauLIndex,tauHIndex);
-
-  }else{
-    gentree->genpt_1=analysisTree->gentau_visible_pt[LeadingtauIndex];
-    gentree->geneta_1=analysisTree->gentau_visible_eta[LeadingtauIndex];
-    gentree->genphi_1=analysisTree->gentau_visible_phi[LeadingtauIndex];
-    
-    for(int itau=0;itau<ntaus;itau++){
-      if(wrongtau[itau]||itau==LeadingtauIndex)continue;
-      TrailingtauIndex=itau;
-      gentree->genpt_2=analysisTree->gentau_visible_pt[itau];
-      gentree->geneta_2=analysisTree->gentau_visible_eta[itau];
-      gentree->genphi_2=analysisTree->gentau_visible_phi[itau];
-    }
-    gen_acott(analysisTree,gentree,LeadingtauIndex,TrailingtauIndex);
   }
+
+  
+  gentree->acotautau_00 = -9999;
+  gentree->acotautau_01 = -9999;
+  gentree->acotautau_10 = -9999;
+  gentree->acotautau_11 = -9999;
+  if (LeadingtauIndex>-1&&TrailingtauIndex>-1)
+    gen_acott(analysisTree,gentree,LeadingtauIndex,TrailingtauIndex);
+
 
 }
