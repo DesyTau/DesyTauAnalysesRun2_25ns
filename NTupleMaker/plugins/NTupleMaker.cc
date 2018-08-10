@@ -91,7 +91,7 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
   cgen(iConfig.getUntrackedParameter<bool>("GenParticles", false)),
   csusyinfo(iConfig.getUntrackedParameter<bool>("SusyInfo", false)),
   ctrigger(iConfig.getUntrackedParameter<bool>("Trigger", false)),
-  cbeamspot(iConfig.getUntrackedParameter<bool>("BeamSpot", false)),
+  cbeamspot(iConfig.getUntrackedParameter<bool>("RecBeamSpot", false)),
   crectrack(iConfig.getUntrackedParameter<bool>("RecTrack", false)),
   crecprimvertex(iConfig.getUntrackedParameter<bool>("RecPrimVertex", false)),
   crecmuon(iConfig.getUntrackedParameter<bool>("RecMuon", false)),
