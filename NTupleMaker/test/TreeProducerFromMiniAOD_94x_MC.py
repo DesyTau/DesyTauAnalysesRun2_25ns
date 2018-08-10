@@ -81,7 +81,9 @@ from PhysicsTools.PatUtils.tools.runMETCorrectionsAndUncertainties import runMet
 
 # If you only want to re-correct and get the proper uncertainties
 runMetCorAndUncFromMiniAOD(process,
-                           isData=runOnData
+                           isData=runOnData,
+                           fixEE2017 = True,
+                           postfix = "ModifiedMET"
                            )
 
 #PuppiMET
@@ -224,7 +226,7 @@ MetCollectionTag = cms.InputTag("slimmedMETs::@skipCurrentProcess"),
 #MetCorrCollectionTag = cms.InputTag("slimmedMETs::@skipCurrentProcess"),
 #PuppiMetCollectionTag = cms.InputTag("slimmedMETsPuppi::@skipCurrentProcess"),
 #MetCollectionTag = cms.InputTag("slimmedMETs::TreeProducer"),
-MetCorrCollectionTag = cms.InputTag("slimmedMETs::TreeProducer"),
+MetCorrCollectionTag = cms.InputTag("slimmedMETsModifiedMET::TreeProducer"),
 PuppiMetCollectionTag = cms.InputTag("slimmedMETsPuppi::TreeProducer"),
 MvaMetCollectionsTag = cms.VInputTag(cms.InputTag("MVAMET","MVAMET","TreeProducer")),
 TrackCollectionTag = cms.InputTag("generalTracks"),
@@ -470,10 +472,10 @@ process.p = cms.Path(
 #  process.BadGlobalMuonFilter *
 #  process.pileupJetIdUpdated * 
   process.patJetCorrFactorsReapplyJEC * process.patJetsReapplyJEC *
-  process.fullPatMetSequence * 
 #  process.egmPhotonIDSequence *
   process.puppiMETSequence *
   process.fullPatMetSequencePuppi *
+  process.fullPatMetSequenceModifiedMET *
   process.egmGsfElectronIDSequence * 
   process.rerunMvaIsolationSequence *      # add new tau ids
   process.NewTauIDsEmbedded *              # add new tau ids
