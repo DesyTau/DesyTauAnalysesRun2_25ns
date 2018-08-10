@@ -573,7 +573,7 @@ public :
    Float_t         trigobject_pt[1000];   //[trigobject_count]
    Float_t         trigobject_eta[1000];   //[trigobject_count]
    Float_t         trigobject_phi[1000];   //[trigobject_count]
-   Bool_t          trigobject_filters[1000][1000];   //[trigobject_count]
+   Bool_t          trigobject_filters[1000][200];   //[trigobject_count]
    Bool_t          trigobject_isMuon[1000];   //[trigobject_count]
    Bool_t          trigobject_isElectron[1000];   //[trigobject_count]
    Bool_t          trigobject_isTau[1000];   //[trigobject_count]
