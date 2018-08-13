@@ -388,29 +388,16 @@ class NTupleMaker : public edm::EDAnalyzer{
   // Electron Configuration
   edm::EDGetTokenT<edm::View<pat::Electron> > ElectronCollectionToken_;
   //// ID decisions objects
-  edm::EDGetTokenT<edm::ValueMap<bool> > eleVetoIdMapToken_;
-  edm::EDGetTokenT<edm::ValueMap<bool> > eleLooseIdMapToken_;
-  edm::EDGetTokenT<edm::ValueMap<bool> > eleMediumIdMapToken_;
-  edm::EDGetTokenT<edm::ValueMap<bool> > eleTightIdMapToken_;
-  edm::EDGetTokenT<edm::ValueMap<bool> > eleVetoIdSummer16MapToken_;
-  edm::EDGetTokenT<edm::ValueMap<bool> > eleLooseIdSummer16MapToken_;
-  edm::EDGetTokenT<edm::ValueMap<bool> > eleMediumIdSummer16MapToken_;
-  edm::EDGetTokenT<edm::ValueMap<bool> > eleTightIdSummer16MapToken_;
-  edm::EDGetTokenT<edm::ValueMap<bool> > eleMvaNonTrigWP80MapToken_;
-  edm::EDGetTokenT<edm::ValueMap<bool> > eleMvaNonTrigWP90MapToken_;
-  edm::EDGetTokenT<edm::ValueMap<bool> > eleMvaTrigWP80MapToken_;
-  edm::EDGetTokenT<edm::ValueMap<bool> > eleMvaTrigWP90MapToken_;
-  //// MVA values and categories
-  edm::EDGetTokenT<edm::ValueMap<float> > mvaNonTrigValuesMapToken_;
-  edm::EDGetTokenT<edm::ValueMap<int> >   mvaNonTrigCategoriesMapToken_;
-  edm::EDGetTokenT<edm::ValueMap<float> > mvaTrigValuesMapToken_;
-  edm::EDGetTokenT<edm::ValueMap<int> >   mvaTrigCategoriesMapToken_;
+  //edm::EDGetTokenT<edm::ValueMap<bool> > eleVetoIdSummer16MapToken_;
+  //edm::EDGetTokenT<edm::ValueMap<bool> > eleLooseIdSummer16MapToken_;
+  //edm::EDGetTokenT<edm::ValueMap<bool> > eleMediumIdSummer16MapToken_;
+  //edm::EDGetTokenT<edm::ValueMap<bool> > eleTightIdSummer16MapToken_;
   //// New for Spring16
-  edm::EDGetTokenT<edm::ValueMap<float> > mvaValuesMapSpring16MapToken_;
-  edm::EDGetTokenT<edm::ValueMap<int> >   mvaCategoriesMapSpring16MapToken_;
+  //edm::EDGetTokenT<edm::ValueMap<float> > mvaValuesMapSpring16MapToken_;
+  //edm::EDGetTokenT<edm::ValueMap<int> >   mvaCategoriesMapSpring16MapToken_;
   //// New for Spring16
-  edm::EDGetTokenT<edm::ValueMap<bool> >  eleMvaWP90GeneralMapToken_;
-  edm::EDGetTokenT<edm::ValueMap<bool> >  eleMvaWP80GeneralMapToken_;
+  //edm::EDGetTokenT<edm::ValueMap<bool> >  eleMvaWP90GeneralMapToken_;
+  //edm::EDGetTokenT<edm::ValueMap<bool> >  eleMvaWP80GeneralMapToken_;
   //// New for Fall17
   edm::EDGetTokenT<edm::ValueMap<float> > mvaValuesIsoFall17MapToken_;
   edm::EDGetTokenT<edm::ValueMap<float> > mvaValuesnoIsoFall17MapToken_;
