@@ -125,6 +125,15 @@ for idmod in my_id_modules:
 
 ### END Electron ID ====================================================================================
 
+### Electron scale and smearing =======================================================================
+from RecoEgamma.EgammaTools.EgammaPostRecoTools import setupEgammaPostRecoSeq
+setupEgammaPostRecoSeq(process,
+                       applyEnergyCorrections=False,
+                       applyVIDOnCorrectedEgamma=False,
+                       isMiniAOD=True,
+                       era='2017-Nov17ReReco')
+### END Electron scale and smearing ====================================================================
+
 # Tau ID ===============================================================================================
 from DesyTauAnalyses.NTupleMaker.runTauIdMVA import *
 na = TauIDEmbedder(process, cms, # pass tour process object

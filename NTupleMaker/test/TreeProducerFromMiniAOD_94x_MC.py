@@ -93,6 +93,14 @@ runMetCorAndUncFromMiniAOD(process,
                            jetFlavor="AK4PFPuppi",
                            postfix="Puppi"
                            )
+### Electron scale and smearing =======================================================================
+from RecoEgamma.EgammaTools.EgammaPostRecoTools import setupEgammaPostRecoSeq
+setupEgammaPostRecoSeq(process,
+                       applyEnergyCorrections=False,
+                       applyVIDOnCorrectedEgamma=False,
+                       isMiniAOD=True,
+                       era='2017-Nov17ReReco')
+### END Electron scale and smearing ====================================================================
 
 # Electron ID ==========================================================================================
 

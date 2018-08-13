@@ -4054,14 +4054,20 @@ unsigned int NTupleMaker::AddElectrons(const edm::Event& iEvent, const edm::Even
 	  if (el->pt()<cElPtMin) continue;
 	  if (fabs(el->eta())>cElEtaMax) continue;
 
-	  electron_px[electron_count] = el->px();
-	  electron_py[electron_count] = el->py();
-	  electron_pz[electron_count] = el->pz();
-	  electron_pt[electron_count] = el->pt();
+	  // Electron scale and smearing corrections
+	  auto corrP4  = el->p4() * el->userFloat("ecalTrkEnergyPostCorr") / el->energy();
+	  electron_px[electron_count] = corrP4.Px();
+	  electron_py[electron_count] = corrP4.Py();
+	  electron_pz[electron_count] = corrP4.Pz();
+	  electron_pt[electron_count] = corrP4.Pt();
+	  //electron_px[electron_count] = el->px();
+	  //electron_py[electron_count] = el->py();
+	  //electron_pz[electron_count] = el->pz();
+	  //electron_pt[electron_count] = el->pt();
 	  electron_eta[electron_count] = el->eta();
 	  electron_phi[electron_count] = el->phi(); 
 	  electron_charge[electron_count] = el->charge();
-	  
+
 	  const pat::Electron &lep = (*Electrons)[i];
           electron_miniISO[electron_count]=getPFIsolation(pfcands, dynamic_cast<const reco::Candidate *>(&lep), 0.05, 0.2, 10., false);
 
