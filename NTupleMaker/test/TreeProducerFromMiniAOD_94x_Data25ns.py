@@ -38,7 +38,7 @@ process.options = cms.untracked.PSet(
 
 # How many events to process
 process.maxEvents = cms.untracked.PSet( 
-   input = cms.untracked.int32(100)
+   input = cms.untracked.int32(2000)
 )
 
 # Define the input source
@@ -96,6 +96,15 @@ runMetCorAndUncFromMiniAOD(process,
                            postfix="Puppi"
                            )
 
+### Electron scale and smearing =======================================================================
+from RecoEgamma.EgammaTools.EgammaPostRecoTools import setupEgammaPostRecoSeq
+setupEgammaPostRecoSeq(process,
+                       applyEnergyCorrections=False,
+                       applyVIDOnCorrectedEgamma=False,
+                       isMiniAOD=True,
+                       era='2017-Nov17ReReco')
+### END Electron scale and smearing ====================================================================
+
 # Electron ID ==========================================================================================
 
 from PhysicsTools.SelectorUtils.tools.vid_id_tools import *
@@ -124,15 +133,6 @@ for idmod in my_id_modules:
     setupAllVIDIdsInModule(process,idmod,setupVIDElectronSelection)
 
 ### END Electron ID ====================================================================================
-
-### Electron scale and smearing =======================================================================
-from RecoEgamma.EgammaTools.EgammaPostRecoTools import setupEgammaPostRecoSeq
-setupEgammaPostRecoSeq(process,
-                       applyEnergyCorrections=False,
-                       applyVIDOnCorrectedEgamma=False,
-                       isMiniAOD=True,
-                       era='2017-Nov17ReReco')
-### END Electron scale and smearing ====================================================================
 
 # Tau ID ===============================================================================================
 from DesyTauAnalyses.NTupleMaker.runTauIdMVA import *
@@ -192,6 +192,10 @@ eleVetoIdFall17Map = cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-Fall17-9
 eleLooseIdFall17Map = cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-Fall17-94X-V1-loose"),
 eleMediumIdFall17Map = cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-Fall17-94X-V1-medium"),
 eleTightIdFall17Map = cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-Fall17-94X-V1-tight"),
+eleVetoIdFall17V2Map = cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-Fall17-94X-V2-veto"),
+eleLooseIdFall17V2Map = cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-Fall17-94X-V2-loose"),
+eleMediumIdFall17V2Map = cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-Fall17-94X-V2-medium"),
+eleTightIdFall17V2Map = cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-Fall17-94X-V2-tight"),
 #######new in 8.0.25
 #eleMvaWP90GeneralMap = cms.InputTag("egmGsfElectronIDs:mvaEleID-Spring16-GeneralPurpose-V1-wp90"),
 #eleMvaWP80GeneralMap = cms.InputTag("egmGsfElectronIDs:mvaEleID-Spring16-GeneralPurpose-V1-wp80"),

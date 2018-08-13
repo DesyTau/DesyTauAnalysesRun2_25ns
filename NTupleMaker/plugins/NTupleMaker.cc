@@ -175,6 +175,11 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
   eleLooseIdFall17MapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleLooseIdFall17Map"))),
   eleMediumIdFall17MapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleMediumIdFall17Map"))),
   eleTightIdFall17MapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleTightIdFall17Map"))),
+  //cut based electron Fall17V2 ID
+  eleVetoIdFall17V2MapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleVetoIdFall17V2Map"))),
+  eleLooseIdFall17V2MapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleLooseIdFall17V2Map"))),
+  eleMediumIdFall17V2MapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleMediumIdFall17V2Map"))),
+  eleTightIdFall17V2MapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleTightIdFall17V2Map"))),
 
   TauCollectionToken_(consumes<pat::TauCollection>(iConfig.getParameter<edm::InputTag>("TauCollectionTag"))),
   TauMVAIsolationRawToken_(consumes<pat::PATTauDiscriminator>(edm::InputTag("rerunDiscriminationByIsolationMVArun2v1raw","","TreeProducer"))),
@@ -564,6 +569,11 @@ void NTupleMaker::beginJob(){
     tree->Branch("electron_cutId_loose_Fall17", electron_cutId_loose_Fall17, "electron_cutId_loose_Fall17[electron_count]/O");
     tree->Branch("electron_cutId_medium_Fall17", electron_cutId_medium_Fall17, "electron_cutId_medium_Fall17[electron_count]/O");
     tree->Branch("electron_cutId_tight_Fall17", electron_cutId_tight_Fall17, "electron_cutId_tight_Fall17[electron_count]/O");
+    //cut-based Fall17V2
+    tree->Branch("electron_cutId_veto_Fall17V2", electron_cutId_veto_Fall17V2, "electron_cutId_veto_Fall17V2[electron_count]/O");
+    tree->Branch("electron_cutId_loose_Fall17V2", electron_cutId_loose_Fall17V2, "electron_cutId_loose_Fall17V2[electron_count]/O");
+    tree->Branch("electron_cutId_medium_Fall17V2", electron_cutId_medium_Fall17V2, "electron_cutId_medium_Fall17V2[electron_count]/O");
+    tree->Branch("electron_cutId_tight_Fall17V2", electron_cutId_tight_Fall17V2, "electron_cutId_tight_Fall17V2[electron_count]/O");
     //end of new
       
     tree->Branch("electron_pass_conversion", electron_pass_conversion, "electron_pass_conversion[electron_count]/O");
@@ -4003,6 +4013,15 @@ unsigned int NTupleMaker::AddElectrons(const edm::Event& iEvent, const edm::Even
         iEvent.getByToken(eleLooseIdFall17MapToken_,loose_id_fall17_decisions);
         iEvent.getByToken(eleMediumIdFall17MapToken_,medium_id_fall17_decisions);
         iEvent.getByToken(eleTightIdFall17MapToken_,tight_id_fall17_decisions);
+	// cut-based (Fall17V2)
+        edm::Handle<edm::ValueMap<bool> > veto_id_fall17v2_decisions;
+        edm::Handle<edm::ValueMap<bool> > loose_id_fall17v2_decisions;
+        edm::Handle<edm::ValueMap<bool> > medium_id_fall17v2_decisions;
+        edm::Handle<edm::ValueMap<bool> > tight_id_fall17v2_decisions;
+        iEvent.getByToken(eleVetoIdFall17V2MapToken_,veto_id_fall17v2_decisions);
+        iEvent.getByToken(eleLooseIdFall17V2MapToken_,loose_id_fall17v2_decisions);
+        iEvent.getByToken(eleMediumIdFall17V2MapToken_,medium_id_fall17v2_decisions);
+        iEvent.getByToken(eleTightIdFall17V2MapToken_,tight_id_fall17v2_decisions);
 	// mva
 	// edm::Handle<edm::ValueMap<float> > mvaValuesMapSpring16;
 	// edm::Handle<edm::ValueMap<int> > mvaCategoriesMapSpring16;
@@ -4191,6 +4210,11 @@ unsigned int NTupleMaker::AddElectrons(const edm::Event& iEvent, const edm::Even
 	  electron_cutId_loose_Fall17[electron_count] = (*loose_id_fall17_decisions)[el];
 	  electron_cutId_medium_Fall17[electron_count] = (*medium_id_fall17_decisions)[el];
 	  electron_cutId_tight_Fall17[electron_count] = (*tight_id_fall17_decisions)[el];
+
+	  electron_cutId_veto_Fall17V2[electron_count] = (*veto_id_fall17v2_decisions)[el];
+	  electron_cutId_loose_Fall17V2[electron_count] = (*loose_id_fall17v2_decisions)[el];
+	  electron_cutId_medium_Fall17V2[electron_count] = (*medium_id_fall17v2_decisions)[el];
+	  electron_cutId_tight_Fall17V2[electron_count] = (*tight_id_fall17v2_decisions)[el];
 	  //ending for 9.4.0 electron id
         
 	  electron_pass_conversion[electron_count] = (*Electrons)[i].passConversionVeto();
