@@ -435,12 +435,12 @@ void svfit_variables(TString ch, const AC1B *analysisTree, Synch17Tree *otree, c
   bool isValidSolution = svFitAlgo.isValidSolution();
   
   
-  otree->m_sv   = static_cast<classic_svFit::HistogramAdapterDiTau*>(svFitAlgo.getHistogramAdapter())->getMass();
-  otree->pt_sv  = static_cast<classic_svFit::HistogramAdapterDiTau*>(svFitAlgo.getHistogramAdapter())->getPt();
-  otree->eta_sv = static_cast<classic_svFit::HistogramAdapterDiTau*>(svFitAlgo.getHistogramAdapter())->getEta();
-  otree->phi_sv = static_cast<classic_svFit::HistogramAdapterDiTau*>(svFitAlgo.getHistogramAdapter())->getPhi();      
-  //otree->met_sv = static_cast<HistogramAdapterDiTau*>(svFitAlgo.getHistogramAdapter())->getfittedMET().Rho();
-  otree->mt_sv  = static_cast<classic_svFit::HistogramAdapterDiTau*>(svFitAlgo.getHistogramAdapter())->getTransverseMass();
+  otree->m_sv   = static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(svFitAlgo.getHistogramAdapter())->getMass();
+  otree->pt_sv  = static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(svFitAlgo.getHistogramAdapter())->getPt();
+  otree->eta_sv = static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(svFitAlgo.getHistogramAdapter())->getEta();
+  otree->phi_sv = static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(svFitAlgo.getHistogramAdapter())->getPhi();      
+  //otree->met_sv = static_cast<DiTauSystemHistogramAdapter*>(svFitAlgo.getHistogramAdapter())->getfittedMET().Rho();
+  otree->mt_sv  = static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(svFitAlgo.getHistogramAdapter())->getTransverseMass();
 }
 
 
