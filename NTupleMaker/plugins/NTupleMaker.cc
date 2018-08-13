@@ -153,14 +153,14 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
   BadGlobalMuonsToken_(consumes<edm::PtrVector<reco::Muon>>(iConfig.getParameter<edm::InputTag>("BadGlobalMuons"))),
   BadDuplicateMuonsToken_(consumes<edm::PtrVector<reco::Muon>>(iConfig.getParameter<edm::InputTag>("BadDuplicateMuons"))),
   ElectronCollectionToken_(consumes<edm::View<pat::Electron> >(iConfig.getParameter<edm::InputTag>("ElectronCollectionTag"))),
-  // eleVetoIdSummer16MapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleVetoIdSummer16Map"))),
-  // eleLooseIdSummer16MapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleLooseIdSummer16Map"))),
-  // eleMediumIdSummer16MapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleMediumIdSummer16Map"))),
-  // eleTightIdSummer16MapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleTightIdSummer16Map"))),
-  // mvaValuesMapSpring16MapToken_(consumes<edm::ValueMap<float> >(iConfig.getParameter<edm::InputTag>("mvaValuesMapSpring16"))),
-  // mvaCategoriesMapSpring16MapToken_(consumes<edm::ValueMap<int> >(iConfig.getParameter<edm::InputTag>("mvaCategoriesMapSpring16"))),
-  // eleMvaWP90GeneralMapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleMvaWP90GeneralMap"))),
-  // eleMvaWP80GeneralMapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleMvaWP80GeneralMap"))),
+  eleVetoIdSummer16MapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleVetoIdSummer16Map"))),
+  eleLooseIdSummer16MapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleLooseIdSummer16Map"))),
+  eleMediumIdSummer16MapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleMediumIdSummer16Map"))),
+  eleTightIdSummer16MapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleTightIdSummer16Map"))),
+  mvaValuesMapSpring16MapToken_(consumes<edm::ValueMap<float> >(iConfig.getParameter<edm::InputTag>("mvaValuesMapSpring16"))),
+  mvaCategoriesMapSpring16MapToken_(consumes<edm::ValueMap<int> >(iConfig.getParameter<edm::InputTag>("mvaCategoriesMapSpring16"))),
+  eleMvaWP90GeneralMapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleMvaWP90GeneralMap"))),
+  eleMvaWP80GeneralMapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleMvaWP80GeneralMap"))),
   //new for 9.4.0, electron Fall17 ID
   mvaValuesIsoFall17MapToken_(consumes<edm::ValueMap<float> >(iConfig.getParameter<edm::InputTag>("mvaValuesIsoFall17Map"))),
   mvaValuesnoIsoFall17MapToken_(consumes<edm::ValueMap<float> >(iConfig.getParameter<edm::InputTag>("mvaValuesnoIsoFall17Map"))),
@@ -546,14 +546,14 @@ void NTupleMaker::beginJob(){
     tree->Branch("electron_superclusterindex", electron_superclusterindex, "electron_superclusterindex[electron_count]/I");
     tree->Branch("electron_info", electron_info, "electron_info[electron_count]/b");
 
-    // tree->Branch("electron_cutId_veto_Summer16", electron_cutId_veto_Summer16, "electron_cutId_veto_Summer16[electron_count]/O");
-    // tree->Branch("electron_cutId_loose_Summer16", electron_cutId_loose_Summer16, "electron_cutId_loose_Summer16[electron_count]/O");
-    // tree->Branch("electron_cutId_medium_Summer16", electron_cutId_medium_Summer16, "electron_cutId_medium_Summer16[electron_count]/O");
-    // tree->Branch("electron_cutId_tight_Summer16", electron_cutId_tight_Summer16, "electron_cutId_tight_Summer16[electron_count]/O");
-    // tree->Branch("electron_mva_value_Spring16_v1", electron_mva_value_Spring16_v1, "electron_mva_value_Spring16_v1[electron_count]/F");
-    // tree->Branch("electron_mva_category_Spring16_v1", electron_mva_category_Spring16_v1, "electron_mva_category_Spring16_v1[electron_count]/I");
-    // tree->Branch("electron_mva_wp90_general_Spring16_v1", electron_mva_wp90_general_Spring16_v1, "electron_mva_wp90_general_Spring16_v1[electron_count]/F");
-    // tree->Branch("electron_mva_wp80_general_Spring16_v1", electron_mva_wp80_general_Spring16_v1, "electron_mva_wp80_general_Spring16_v1[electron_count]/F");
+    tree->Branch("electron_cutId_veto_Summer16", electron_cutId_veto_Summer16, "electron_cutId_veto_Summer16[electron_count]/O");
+    tree->Branch("electron_cutId_loose_Summer16", electron_cutId_loose_Summer16, "electron_cutId_loose_Summer16[electron_count]/O");
+    tree->Branch("electron_cutId_medium_Summer16", electron_cutId_medium_Summer16, "electron_cutId_medium_Summer16[electron_count]/O");
+    tree->Branch("electron_cutId_tight_Summer16", electron_cutId_tight_Summer16, "electron_cutId_tight_Summer16[electron_count]/O");
+    tree->Branch("electron_mva_value_Spring16_v1", electron_mva_value_Spring16_v1, "electron_mva_value_Spring16_v1[electron_count]/F");
+    tree->Branch("electron_mva_category_Spring16_v1", electron_mva_category_Spring16_v1, "electron_mva_category_Spring16_v1[electron_count]/I");
+    tree->Branch("electron_mva_wp90_general_Spring16_v1", electron_mva_wp90_general_Spring16_v1, "electron_mva_wp90_general_Spring16_v1[electron_count]/F");
+    tree->Branch("electron_mva_wp80_general_Spring16_v1", electron_mva_wp80_general_Spring16_v1, "electron_mva_wp80_general_Spring16_v1[electron_count]/F");
 
     //new for 9.4.0
     tree->Branch("electron_mva_value_Iso_Fall17_v1", electron_mva_value_Iso_Fall17_v1, "electron_mva_value_Iso_Fall17_v1[electron_count]/F");
@@ -3996,14 +3996,14 @@ unsigned int NTupleMaker::AddElectrons(const edm::Event& iEvent, const edm::Even
         iEvent.getByToken( PackedCantidateCollectionToken_, pfcands);
 
 	// cut-based (Summer16)
-	// edm::Handle<edm::ValueMap<bool> > veto_id_summer16_decisions;
-	// edm::Handle<edm::ValueMap<bool> > loose_id_summer16_decisions;
-	// edm::Handle<edm::ValueMap<bool> > medium_id_summer16_decisions;
-	// edm::Handle<edm::ValueMap<bool> > tight_id_summer16_decisions;
-	// iEvent.getByToken(eleVetoIdSummer16MapToken_,veto_id_summer16_decisions);
-	// iEvent.getByToken(eleLooseIdSummer16MapToken_,loose_id_summer16_decisions);
-	// iEvent.getByToken(eleMediumIdSummer16MapToken_,medium_id_summer16_decisions);
-	// iEvent.getByToken(eleTightIdSummer16MapToken_,tight_id_summer16_decisions);
+	edm::Handle<edm::ValueMap<bool> > veto_id_summer16_decisions;
+	edm::Handle<edm::ValueMap<bool> > loose_id_summer16_decisions;
+	edm::Handle<edm::ValueMap<bool> > medium_id_summer16_decisions;
+	edm::Handle<edm::ValueMap<bool> > tight_id_summer16_decisions;
+	iEvent.getByToken(eleVetoIdSummer16MapToken_,veto_id_summer16_decisions);
+	iEvent.getByToken(eleLooseIdSummer16MapToken_,loose_id_summer16_decisions);
+	iEvent.getByToken(eleMediumIdSummer16MapToken_,medium_id_summer16_decisions);
+	iEvent.getByToken(eleTightIdSummer16MapToken_,tight_id_summer16_decisions);
 	// cut-based (Fall17)
         edm::Handle<edm::ValueMap<bool> > veto_id_fall17_decisions;
         edm::Handle<edm::ValueMap<bool> > loose_id_fall17_decisions;
@@ -4023,15 +4023,15 @@ unsigned int NTupleMaker::AddElectrons(const edm::Event& iEvent, const edm::Even
         iEvent.getByToken(eleMediumIdFall17V2MapToken_,medium_id_fall17v2_decisions);
         iEvent.getByToken(eleTightIdFall17V2MapToken_,tight_id_fall17v2_decisions);
 	// mva
-	// edm::Handle<edm::ValueMap<float> > mvaValuesMapSpring16;
-	// edm::Handle<edm::ValueMap<int> > mvaCategoriesMapSpring16;
-	// iEvent.getByToken(mvaValuesMapSpring16MapToken_,mvaValuesMapSpring16);
-	// iEvent.getByToken(mvaCategoriesMapSpring16MapToken_,mvaCategoriesMapSpring16);
+	edm::Handle<edm::ValueMap<float> > mvaValuesMapSpring16;
+	edm::Handle<edm::ValueMap<int> > mvaCategoriesMapSpring16;
+	iEvent.getByToken(mvaValuesMapSpring16MapToken_,mvaValuesMapSpring16);
+	iEvent.getByToken(mvaCategoriesMapSpring16MapToken_,mvaCategoriesMapSpring16);
 	//mva general Spring16
-	// edm::Handle<edm::ValueMap<bool> > mva_wp80_general_decisions;
-	// edm::Handle<edm::ValueMap<bool> > mva_wp90_general_decisions;
-	// iEvent.getByToken(eleMvaWP90GeneralMapToken_,mva_wp90_general_decisions);
-	// iEvent.getByToken(eleMvaWP80GeneralMapToken_,mva_wp80_general_decisions);
+	edm::Handle<edm::ValueMap<bool> > mva_wp80_general_decisions;
+	edm::Handle<edm::ValueMap<bool> > mva_wp90_general_decisions;
+	iEvent.getByToken(eleMvaWP90GeneralMapToken_,mva_wp90_general_decisions);
+	iEvent.getByToken(eleMvaWP80GeneralMapToken_,mva_wp80_general_decisions);
 	//mva Fall17
 	edm::Handle<edm::ValueMap<float> > mvaValuesIsoFall17Map;
 	edm::Handle<edm::ValueMap<float> > mvaValuesnoIsoFall17Map;
@@ -4185,14 +4185,14 @@ unsigned int NTupleMaker::AddElectrons(const edm::Event& iEvent, const edm::Even
 	  //	  std::cout << "   dxy = " << electron_dxy[electron_count] << "   dz = " << electron_dz[electron_count] << std::endl;
 
 	  // Electron Ids
-	  // electron_mva_value_Spring16_v1[electron_count] = (*mvaValuesMapSpring16)[el];
-	  // electron_mva_category_Spring16_v1[electron_count] = (*mvaCategoriesMapSpring16)[el];
-	  // electron_cutId_veto_Summer16[electron_count] = (*veto_id_summer16_decisions)[el];
-	  // electron_cutId_loose_Summer16[electron_count] = (*loose_id_summer16_decisions)[el];
-	  // electron_cutId_medium_Summer16[electron_count] = (*medium_id_summer16_decisions)[el];
-	  // electron_cutId_tight_Summer16[electron_count] = (*tight_id_summer16_decisions)[el];
-	  // electron_mva_wp90_general_Spring16_v1[electron_count] = (*mva_wp90_general_decisions)[el];
-	  // electron_mva_wp80_general_Spring16_v1[electron_count] = (*mva_wp80_general_decisions)[el];
+	  electron_mva_value_Spring16_v1[electron_count] = (*mvaValuesMapSpring16)[el];
+	  electron_mva_category_Spring16_v1[electron_count] = (*mvaCategoriesMapSpring16)[el];
+	  electron_cutId_veto_Summer16[electron_count] = (*veto_id_summer16_decisions)[el];
+	  electron_cutId_loose_Summer16[electron_count] = (*loose_id_summer16_decisions)[el];
+	  electron_cutId_medium_Summer16[electron_count] = (*medium_id_summer16_decisions)[el];
+	  electron_cutId_tight_Summer16[electron_count] = (*tight_id_summer16_decisions)[el];
+	  electron_mva_wp90_general_Spring16_v1[electron_count] = (*mva_wp90_general_decisions)[el];
+	  electron_mva_wp80_general_Spring16_v1[electron_count] = (*mva_wp80_general_decisions)[el];
         
 	  //new for 9.4.0 Fall17 Electron id
 	  electron_mva_value_Iso_Fall17_v1[electron_count] = (*mvaValuesIsoFall17Map)[el];

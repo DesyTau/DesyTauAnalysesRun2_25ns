@@ -388,16 +388,16 @@ class NTupleMaker : public edm::EDAnalyzer{
   // Electron Configuration
   edm::EDGetTokenT<edm::View<pat::Electron> > ElectronCollectionToken_;
   //// ID decisions objects
-  //edm::EDGetTokenT<edm::ValueMap<bool> > eleVetoIdSummer16MapToken_;
-  //edm::EDGetTokenT<edm::ValueMap<bool> > eleLooseIdSummer16MapToken_;
-  //edm::EDGetTokenT<edm::ValueMap<bool> > eleMediumIdSummer16MapToken_;
-  //edm::EDGetTokenT<edm::ValueMap<bool> > eleTightIdSummer16MapToken_;
+  edm::EDGetTokenT<edm::ValueMap<bool> > eleVetoIdSummer16MapToken_;
+  edm::EDGetTokenT<edm::ValueMap<bool> > eleLooseIdSummer16MapToken_;
+  edm::EDGetTokenT<edm::ValueMap<bool> > eleMediumIdSummer16MapToken_;
+  edm::EDGetTokenT<edm::ValueMap<bool> > eleTightIdSummer16MapToken_;
   //// New for Spring16
-  //edm::EDGetTokenT<edm::ValueMap<float> > mvaValuesMapSpring16MapToken_;
-  //edm::EDGetTokenT<edm::ValueMap<int> >   mvaCategoriesMapSpring16MapToken_;
+  edm::EDGetTokenT<edm::ValueMap<float> > mvaValuesMapSpring16MapToken_;
+  edm::EDGetTokenT<edm::ValueMap<int> >   mvaCategoriesMapSpring16MapToken_;
   //// New for Spring16
-  //edm::EDGetTokenT<edm::ValueMap<bool> >  eleMvaWP90GeneralMapToken_;
-  //edm::EDGetTokenT<edm::ValueMap<bool> >  eleMvaWP80GeneralMapToken_;
+  edm::EDGetTokenT<edm::ValueMap<bool> >  eleMvaWP90GeneralMapToken_;
+  edm::EDGetTokenT<edm::ValueMap<bool> >  eleMvaWP80GeneralMapToken_;
   //// New for Fall17
   edm::EDGetTokenT<edm::ValueMap<float> > mvaValuesIsoFall17MapToken_;
   edm::EDGetTokenT<edm::ValueMap<float> > mvaValuesnoIsoFall17MapToken_;
@@ -766,16 +766,6 @@ class NTupleMaker : public edm::EDAnalyzer{
   Float_t electron_mva_wp90_noIso_Fall17_v1[M_electronmaxcount];
   Float_t electron_mva_wp80_noIso_Fall17_v1[M_electronmaxcount];
   Float_t electron_mva_Loose_noIso_Fall17_v1[M_electronmaxcount];
-
-  Bool_t electron_mva_wp80_nontrig_Spring15_v1[M_electronmaxcount];
-  Bool_t electron_mva_wp90_nontrig_Spring15_v1[M_electronmaxcount];
-  Bool_t electron_mva_wp80_trig_Spring15_v1[M_electronmaxcount];
-  Bool_t electron_mva_wp90_trig_Spring15_v1[M_electronmaxcount];
-
-  Bool_t electron_cutId_veto_Spring15[M_electronmaxcount];
-  Bool_t electron_cutId_loose_Spring15[M_electronmaxcount];
-  Bool_t electron_cutId_medium_Spring15[M_electronmaxcount];
-  Bool_t electron_cutId_tight_Spring15[M_electronmaxcount];
 
   Bool_t electron_cutId_veto_Summer16[M_electronmaxcount];
   Bool_t electron_cutId_loose_Summer16[M_electronmaxcount];
