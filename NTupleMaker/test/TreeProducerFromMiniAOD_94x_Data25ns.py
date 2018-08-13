@@ -44,17 +44,11 @@ process.maxEvents = cms.untracked.PSet(
 # Define the input source
 process.source = cms.Source("PoolSource", 
   fileNames = cms.untracked.vstring(
-#        '/store/data/Run2017F/SingleMuon/MINIAOD/PromptReco-v1/000/305/040/00000/20B42404-12B2-E711-9A88-02163E012830.root',
-#        '/store/data/Run2017F/SingleMuon/MINIAOD/PromptReco-v1/000/305/040/00000/522D0FB1-42B2-E711-A0A9-02163E011E2E.root',
-#        '/store/data/Run2017F/SingleMuon/MINIAOD/PromptReco-v1/000/305/040/00000/5CB428C1-32B2-E711-A75D-02163E0128ED.root',
-#        '/store/data/Run2017F/SingleMuon/MINIAOD/PromptReco-v1/000/305/040/00000/6EEED559-1EB2-E711-8F22-02163E019D3B.root',
-        '/store/data/Run2017F/SingleMuon/MINIAOD/17Nov2017-v1/70001/482D748C-46EB-E711-B13F-FA163EC94FD9.root',
-        '/store/data/Run2017F/SingleMuon/MINIAOD/17Nov2017-v1/70001/4893E924-46EB-E711-AB19-1866DA85E0F8.root',
-        '/store/data/Run2017F/SingleMuon/MINIAOD/17Nov2017-v1/70001/4C4C024D-75EB-E711-9286-A4BF01025C16.root',
-
-#        '/store/mc/RunIIFall17MiniAOD/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/RECOSIMstep_94X_mc2017_realistic_v10-v1/00000/0293A280-B5F3-E711-8303-3417EBE33927.root',
-#        '/store/mc/RunIIFall17MiniAOD/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/RECOSIMstep_94X_mc2017_realistic_v10-v1/00000/0A2CBAA9-5DF1-E711-AFD4-0CC47AD99112.root',
-#        '/store/mc/RunIIFall17MiniAOD/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/RECOSIMstep_94X_mc2017_realistic_v10-v1/00000/0CCEA775-09F2-E711-9833-0025905B85BE.root',
+        #'/store/data/Run2017F/SingleMuon/MINIAOD/17Nov2017-v1/70001/482D748C-46EB-E711-B13F-FA163EC94FD9.root',
+        #'/store/data/Run2017F/SingleMuon/MINIAOD/17Nov2017-v1/70001/4893E924-46EB-E711-AB19-1866DA85E0F8.root',
+        #'/store/data/Run2017F/SingleMuon/MINIAOD/17Nov2017-v1/70001/4C4C024D-75EB-E711-9286-A4BF01025C16.root',
+        '/store/data/Run2017B/SingleMuon/MINIAOD/31Mar2018-v1/100000/1E2B3868-DF38-E811-912C-003048FFD798.root',
+        '/store/data/Run2017F/SingleMuon/MINIAOD/31Mar2018-v1/30003/0615E7CA-9337-E811-83E8-1C6A7A2634E3.root',
         ),
   skipEvents = cms.untracked.uint32(0)
 )
@@ -368,7 +362,7 @@ RecMuonHLTriggerMatching = cms.untracked.vstring(
 'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v.*:hltMu23TrkIsoVVLEle12CaloIdLTrackIdLIsoVLDZFilter',
 'HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v.*:hltMu12TrkIsoVVLEle23CaloIdLTrackIdLIsoVLMuonlegL3IsoFiltered12',
 'HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v.*:hltMu12TrkIsoVVLEle23CaloIdLTrackIdLIsoVLDZFilter',
-'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v.*:hltMu8TrkIsoVVLEle23CaloIdLTrackIdLIsoVLMuonlegL3IsoFiltered8',
+'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v.*:hltMu8TrkIsoVVLEle23CaloIdLTrackIdLIsoVLMuonlegL3IsoFiltered8,hltL3fL1sMu7EG23f0Filtered8',
 'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v.*:hltMu8TrkIsoVVLEle23CaloIdLTrackIdLIsoVLDZFilter',
 'HLT_Mu18_Mu9_SameSign_DZ_v.*:hltL1sDoubleMu125to157',
 'HLT_Mu18_Mu9_SameSign_DZ_v.*:hltL3fL1DoubleMu157fFiltered9',
