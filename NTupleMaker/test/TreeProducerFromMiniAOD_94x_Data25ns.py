@@ -23,7 +23,7 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 process.load("TrackingTools/TransientTrack/TransientTrackBuilder_cfi")
 
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff')
-process.GlobalTag.globaltag = '94X_dataRun2_v6'
+process.GlobalTag.globaltag = '94X_dataRun2_ReReco_EOY17_v6'
 
 # Message Logger settings
 process.load("FWCore.MessageService.MessageLogger_cfi")
