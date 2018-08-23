@@ -78,7 +78,11 @@ int main(int argc, char * argv[]) {
   const bool isData = cfg.get<bool>("IsData");
   const bool applyGoodRunSelection = cfg.get<bool>("ApplyGoodRunSelection");
   const string jsonFile = cfg.get<string>("jsonFile");
-  
+
+  // generator cuts
+  const int nPartons = cfg.get<int>("nPartons");
+  const int WPtMax = cfg.get<int>("WPtMax");
+
   // tau cuts
   const float ptTauCut  = cfg.get<float>("PtTauCut");
   const float etaTauCut = cfg.get<float>("EtaTauCut");
@@ -110,7 +114,6 @@ int main(int argc, char * argv[]) {
   const float ptSelMuCut    = cfg.get<float>("PtSelMuCut");
   const float ptTrigMuCut   = cfg.get<float>("PtTrigMuCut");
   const bool  isDRIso03 = cfg.get<bool>("IsDRIso03");
-  const bool  isMuonIdICHEP = cfg.get<bool>("IsMuonIdICHEP"); 
 
   // electron selection
   const float ptEleCut   = cfg.get<float>("PtEleCut");
@@ -158,12 +161,14 @@ int main(int argc, char * argv[]) {
   const string MuonTrigFile  = cfg.get<string>("MuonTrigEff");
 
   const string puDataFile = cfg.get<string>("PileUpDataFile");
-  const string puMCFile = cfg.get<string>("PileUpMCFile");
+  const string puMCFile   = cfg.get<string>("PileUpMCFile");
+  const string puMCHist   = cfg.get<string>("PileUpMCHist");
 
   const bool JetLeptonFake = cfg.get<bool>("JetLeptonFake");
 
   TString PUDataFile(puDataFile);
   TString PUMCFile(puMCFile);
+  TString PUMCHist(puMCHist);
   // **** end of configuration
 
   // file name and tree name
@@ -536,25 +541,35 @@ int main(int argc, char * argv[]) {
       }
   }
   
+  std::cout << "OK " << std::endl;
+
   // Official PU reweighting
   PileUp * PUofficial = new PileUp();
   TFile * filePUOfficial_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/"+PUDataFile,"read");
   TFile * filePUOfficial_MC = new TFile (TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/"+PUMCFile, "read");
   TH1D * PUOfficial_data = (TH1D *)filePUOfficial_data->Get("pileup");
-  TH1D * PUOfficial_mc = (TH1D *)filePUOfficial_MC->Get("pileup");
+  TH1D * PUOfficial_mc = (TH1D *)filePUOfficial_MC->Get(PUMCHist);
+  if (PUOfficial_mc->IsZombie()) {
+    std::cout << "Histogram " << PUMCHist << "_pileup is not found in file " << PUMCFile << std::endl;
+    exit(-1);
+  }
   PUofficial->set_h_data(PUOfficial_data);
   PUofficial->set_h_MC(PUOfficial_mc);
+
+  std::cout << "OK1 " << std::endl;
 
   ScaleFactor * SF_muonIdIso = new ScaleFactor();
   ScaleFactor * SF_muonTrig = new ScaleFactor();
   SF_muonIdIso->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(MuonIdIsoFile));
   SF_muonTrig->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(MuonTrigFile));
 
+  std::cout << "OK2 " << std::endl;
+
   // MEt filters
   std::vector<TString> metFlags; metFlags.clear();
   metFlags.push_back("Flag_HBHENoiseFilter");
   metFlags.push_back("Flag_HBHENoiseIsoFilter");
-  metFlags.push_back("Flag_globalTightHalo2016Filter");
+  //  metFlags.push_back("Flag_globalTightHalo2016Filter");
   metFlags.push_back("Flag_EcalDeadCellTriggerPrimitiveFilter");
   metFlags.push_back("Flag_goodVertices");
   metFlags.push_back("Flag_eeBadScFilter");
@@ -775,6 +790,13 @@ int main(int argc, char * argv[]) {
 	weight_ *= genWeight_;
       }
       histWeightsH->Fill(double(0.),double(genWeight_));
+
+      // applying generator cuts
+      if (!isData) {
+	if (nPartons>0 && int(analysisTree.genparticles_noutgoing)!=nPartons) continue;
+	if (WPtMax>0 && analysisTree.genparticles_lheWPt>WPtMax) continue;
+      }
+
       
       // **********************************
       // *** Analysis of generator info ***
@@ -1020,27 +1042,27 @@ int main(int argc, char * argv[]) {
       // ***************************************************
       // accessing PF MET and changing momentum scale of met
       // ***************************************************
-      float pfmet_ex = analysisTree.pfmet_ex;
-      float pfmet_ey = analysisTree.pfmet_ey;
+      float pfmet_ex = analysisTree.pfmetcorr_ex;
+      float pfmet_ey = analysisTree.pfmetcorr_ey;
       if (jetES<0) {
-	pfmet_ex = analysisTree.pfmet_ex_JetEnDown;
-	pfmet_ey = analysisTree.pfmet_ey_JetEnDown;
+	pfmet_ex = analysisTree.pfmetcorr_ex_JetEnDown;
+	pfmet_ey = analysisTree.pfmetcorr_ey_JetEnDown;
       }
       else if (jetES>0) {
-	pfmet_ex = analysisTree.pfmet_ex_JetEnUp;
-        pfmet_ey = analysisTree.pfmet_ey_JetEnUp;
+	pfmet_ex = analysisTree.pfmetcorr_ex_JetEnUp;
+        pfmet_ey = analysisTree.pfmetcorr_ey_JetEnUp;
       }
       else if (unclusteredES<0) {
-	pfmet_ex = analysisTree.pfmet_ex_UnclusteredEnDown;
-	pfmet_ey = analysisTree.pfmet_ey_UnclusteredEnDown;
+	pfmet_ex = analysisTree.pfmetcorr_ex_UnclusteredEnDown;
+	pfmet_ey = analysisTree.pfmetcorr_ey_UnclusteredEnDown;
       }
       else if (unclusteredES>0) {
-	pfmet_ex = analysisTree.pfmet_ex_UnclusteredEnUp;
-        pfmet_ey = analysisTree.pfmet_ey_UnclusteredEnUp;
+	pfmet_ex = analysisTree.pfmetcorr_ex_UnclusteredEnUp;
+        pfmet_ey = analysisTree.pfmetcorr_ey_UnclusteredEnUp;
       }
       else {
-	pfmet_ex = analysisTree.pfmet_ex;
-	pfmet_ey = analysisTree.pfmet_ey;
+	pfmet_ex = analysisTree.pfmetcorr_ex;
+	pfmet_ey = analysisTree.pfmetcorr_ey;
       }
       //      cout << endl;
       //      cout << "metx            = " << pfmet_ex << endl;
@@ -1083,7 +1105,6 @@ int main(int argc, char * argv[]) {
 	if (analysisTree.muon_pt[imuon]<ptMuCut) continue;
 	if (fabs(analysisTree.muon_eta[imuon])>etaMuCut) continue;
 	bool passedId = analysisTree.muon_isMedium[imuon];
-	if (isMuonIdICHEP) passedId = analysisTree.muon_isICHEP[imuon];
 	if (!passedId) continue;
 	bool passedIpCuts = 
 	  fabs(analysisTree.muon_dxy[imuon]) < dxyMuCut &&
@@ -1236,10 +1257,10 @@ int main(int argc, char * argv[]) {
         analysisTree.electron_pz[ielec] *= eleMomScale;
         analysisTree.electron_pt[ielec] *= eleMomScale;
 	bool passedId = 
-	  analysisTree.electron_cutId_veto_Spring15[ielec] &&
+	  analysisTree.electron_mva_Loose_Iso_Fall17_v1[ielec] &&
           analysisTree.electron_pass_conversion[ielec] &&
           analysisTree.electron_nmissinginnerhits[ielec] <= 1;
-	bool passedIdSel = analysisTree.electron_mva_wp80_general_Spring16_v1[ielec]>0.5 &&
+	bool passedIdSel = analysisTree.electron_mva_wp80_Iso_Fall17_v1[ielec]>0.5 &&
 	  analysisTree.electron_pass_conversion[ielec] &&
           analysisTree.electron_nmissinginnerhits[ielec] <= 1;
 	bool passedIpCuts = 
