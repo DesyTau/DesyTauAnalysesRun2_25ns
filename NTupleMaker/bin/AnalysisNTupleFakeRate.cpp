@@ -79,10 +79,6 @@ int main(int argc, char * argv[]) {
   const bool applyGoodRunSelection = cfg.get<bool>("ApplyGoodRunSelection");
   const string jsonFile = cfg.get<string>("jsonFile");
 
-  // generator cuts
-  const int nPartons = cfg.get<int>("nPartons");
-  const int WPtMax = cfg.get<int>("WPtMax");
-
   // tau cuts
   const float ptTauCut  = cfg.get<float>("PtTauCut");
   const float etaTauCut = cfg.get<float>("EtaTauCut");
@@ -209,6 +205,9 @@ int main(int argc, char * argv[]) {
   Float_t genWeight_;
   Float_t weight_;
   Float_t genHt_;
+  Int_t nPartons_;
+  Int_t nPartonsNLO_;
+  Float_t genWPt_;
 
   UInt_t nVert_;
 
@@ -378,6 +377,9 @@ int main(int argc, char * argv[]) {
   ntuple_->Branch("mutrigweight",&mutrigweight,"mutrigweight/F");
 
   ntuple_->Branch("genHt",&genHt_,"genHt/F");
+  ntuple_->Branch("genWPt",&genWPt_,"genWPt/F");
+  ntuple_->Branch("nPartons",&nPartons_,"nPartons/I");
+  ntuple_->Branch("nPartonsNLO",&nPartonsNLO_,"nPartonsNLO/I");
 
   ntuple_->Branch("NVert",&nVert_,"NVert/i");
   ntuple_->Branch("metFilters",&metFilters_,"metFilters/O");
@@ -640,7 +642,11 @@ int main(int argc, char * argv[]) {
       puWeight_ = 1;
 
       genHt_ = analysisTree.genparticles_lheHt;
+      genWPt_ = analysisTree.genparticles_lheWPt;
       metFilters_ = metFiltersPasses(analysisTree,metFlags);
+
+      nPartons_ = int(analysisTree.genparticles_noutgoing);
+      nPartonsNLO_ = int(analysisTree.genparticles_noutgoing_NLO);
 
       wMass_ = -1;
       wPt_ = -1;
@@ -791,13 +797,6 @@ int main(int argc, char * argv[]) {
       }
       histWeightsH->Fill(double(0.),double(genWeight_));
 
-      // applying generator cuts
-      if (!isData) {
-	if (nPartons>0 && int(analysisTree.genparticles_noutgoing)!=nPartons) continue;
-	if (WPtMax>0 && analysisTree.genparticles_lheWPt>WPtMax) continue;
-      }
-
-      
       // **********************************
       // *** Analysis of generator info ***
       // **********************************
