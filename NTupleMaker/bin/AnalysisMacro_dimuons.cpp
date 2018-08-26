@@ -453,8 +453,8 @@ int main(int argc, char * argv[]) {
         ZMassIso1EtaPtFail[iIso][iEta][iPt] = new TH1F("ZMass"+Iso1Bins[iIso]+EtaBins[iEta]+PtBins[iPt]+"Fail","",80,50,130);
       }
       for (int iIso=0; iIso<nIso2Bins; iIso++) {
-	ZMassIso1EtaPtPass[iIso][iEta][iPt] = new TH1F("ZMass"+Iso2Bins[iIso]+EtaBins[iEta]+PtBins[iPt]+"Pass","",80,50,130);
-        ZMassIso1EtaPtFail[iIso][iEta][iPt] = new TH1F("ZMass"+Iso2Bins[iIso]+EtaBins[iEta]+PtBins[iPt]+"Fail","",80,50,130);
+	ZMassIso2EtaPtPass[iIso][iEta][iPt] = new TH1F("ZMass"+Iso2Bins[iIso]+EtaBins[iEta]+PtBins[iPt]+"Pass","",80,50,130);
+        ZMassIso2EtaPtFail[iIso][iEta][iPt] = new TH1F("ZMass"+Iso2Bins[iIso]+EtaBins[iEta]+PtBins[iPt]+"Fail","",80,50,130);
       }
     }
   }
@@ -1011,8 +1011,6 @@ int main(int argc, char * argv[]) {
 	}
       }
 
-
-
       float pfmet_ex = analysisTree.pfmetcorr_ex;
       float pfmet_ey = analysisTree.pfmetcorr_ey;
       float pfmet_phi = analysisTree.pfmetcorr_phi;
@@ -1094,7 +1092,6 @@ int main(int argc, char * argv[]) {
 	}
 
       }
-      //      std::cout << "muons processed" << std::endl;
 
       unsigned int indx1 = 0;
       unsigned int indx2 = 0;
@@ -1130,7 +1127,9 @@ int main(int argc, char * argv[]) {
 
 	      if (ptBin<0) continue;
 	      if (etaBin<0) continue;
-
+	      if (iso1Bin<0) continue;
+	      if (iso2Bin<0) continue;
+	      
 	      TLorentzVector muon1; muon1.SetXYZM(analysisTree.muon_px[index1],
 						  analysisTree.muon_py[index1],
 						  analysisTree.muon_pz[index1],
@@ -1139,6 +1138,7 @@ int main(int argc, char * argv[]) {
 						  analysisTree.muon_py[indexProbe],
 						  analysisTree.muon_pz[indexProbe],
 						  muonMass);
+
 	      // number of jets
 	      int nJets30 = 0;
 	      int nJets30etaCut = 0;
@@ -1182,7 +1182,7 @@ int main(int argc, char * argv[]) {
 		ZMassFail->Fill(mass,weight);
 		ZMassEtaPtFail[etaBin][ptBin]->Fill(mass,weight);
 		ZMassJetEtaPtFail[JetBin][etaBin][ptBin]->Fill(mass,weight);
-	      }
+	      }	      
 	      for (int iIso=0; iIso<nIso1Bins; ++iIso) {
 		if (iIso==iso1Bin && passId) 
 		  ZMassIso1EtaPtPass[iso1Bin][etaBin][ptBin]->Fill(mass,weight);
