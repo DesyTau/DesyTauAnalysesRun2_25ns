@@ -287,10 +287,17 @@ int main(int argc, char * argv[]) {
   Bool_t  jettauMediumIso_;
   Bool_t  jettauTightIso_;
 
+  Bool_t  jettauVLooseMvaIso_;
   Bool_t  jettauLooseMvaIso_;
   Bool_t  jettauMediumMvaIso_;
   Bool_t  jettauTightMvaIso_;
   Bool_t  jettauVTightMvaIso_;
+
+  Bool_t  jettauVLooseMva2017Iso_;
+  Bool_t  jettauLooseMva2017Iso_;
+  Bool_t  jettauMediumMva2017Iso_;
+  Bool_t  jettauTightMva2017Iso_;
+  Bool_t  jettauVTightMva2017Iso_;
 
   Bool_t jettauAntiMuonLoose3_;
   Bool_t jettauAntiMuonTight3_;
@@ -448,10 +455,17 @@ int main(int argc, char * argv[]) {
   ntuple_->Branch("jettauMediumIso",&jettauMediumIso_,"jettauMediumIso/O");
   ntuple_->Branch("jettauTightIso", &jettauTightIso_, "jettauTightIso/O");
 
+  ntuple_->Branch("jettauVLooseMvaIso", &jettauVLooseMvaIso_, "jettauVLooseMvaIso/O");
   ntuple_->Branch("jettauLooseMvaIso", &jettauLooseMvaIso_, "jettauLooseMvaIso/O");
   ntuple_->Branch("jettauMediumMvaIso",&jettauMediumMvaIso_,"jettauMediumMvaIso/O");
   ntuple_->Branch("jettauTightMvaIso", &jettauTightMvaIso_, "jettauTightMvaIso/O");
   ntuple_->Branch("jettauVTightMvaIso", &jettauVTightMvaIso_, "jettauVTightMvaIso/O");
+
+  ntuple_->Branch("jettauVLooseMva2017Iso", &jettauVLooseMva2017Iso_, "jettauVLooseMva2017Iso/O");
+  ntuple_->Branch("jettauLooseMva2017Iso", &jettauLooseMva2017Iso_, "jettauLooseMva2017Iso/O");
+  ntuple_->Branch("jettauMediumMva2017Iso",&jettauMediumMva2017Iso_,"jettauMediumMva2017Iso/O");
+  ntuple_->Branch("jettauTightMva2017Iso", &jettauTightMva2017Iso_, "jettauTightMva2017Iso/O");
+  ntuple_->Branch("jettauVTightMva2017Iso", &jettauVTightMva2017Iso_, "jettauVTightMva2017Iso/O");
 
   ntuple_->Branch("jettauAntiMuonLoose3",&jettauAntiMuonLoose3_,"jettauAntiMuonLoose3/O");
   ntuple_->Branch("jettauAntiMuonTight3",&jettauAntiMuonTight3_,"jettauAntiMuonTight3/O");
@@ -711,10 +725,19 @@ int main(int argc, char * argv[]) {
       jettauLooseIso_ = false;
       jettauMediumIso_ = false;
       jettauTightIso_ = false;
+
+      jettauVLooseMvaIso_ = false;
       jettauLooseMvaIso_ = false;
       jettauMediumMvaIso_ = false;
       jettauTightMvaIso_ = false;
       jettauVTightMvaIso_ = false;
+
+      jettauVLooseMva2017Iso_ = false;
+      jettauLooseMva2017Iso_ = false;
+      jettauMediumMva2017Iso_ = false;
+      jettauTightMva2017Iso_ = false;
+      jettauVTightMva2017Iso_ = false;
+
       jettauAntiMuonLoose3_ = false;
       jettauAntiMuonTight3_ = false;
 
@@ -1522,10 +1545,17 @@ int main(int argc, char * argv[]) {
 	  jettauMediumIso_ = analysisTree.tau_byMediumCombinedIsolationDeltaBetaCorr3Hits[taujetIndex] > 0.5;
 	  jettauTightIso_ = analysisTree.tau_byTightCombinedIsolationDeltaBetaCorr3Hits[taujetIndex] > 0.5;
 	  
+	  jettauVLooseMvaIso_ = analysisTree.tau_byVLooseIsolationMVArun2v1DBoldDMwLT[taujetIndex] > 0.5;
 	  jettauLooseMvaIso_ = analysisTree.tau_byLooseIsolationMVArun2v1DBoldDMwLT[taujetIndex] > 0.5;
 	  jettauMediumMvaIso_ = analysisTree.tau_byMediumIsolationMVArun2v1DBoldDMwLT[taujetIndex] > 0.5;
 	  jettauTightMvaIso_ = analysisTree.tau_byTightIsolationMVArun2v1DBoldDMwLT[taujetIndex] > 0.5;
 	  jettauVTightMvaIso_ = analysisTree.tau_byVTightIsolationMVArun2v1DBoldDMwLT[taujetIndex] > 0.5;
+	  
+	  jettauVLooseMva2017Iso_ = analysisTree.tau_byVLooseIsolationMVArun2017v2DBoldDMwLT2017[taujetIndex] > 0.5;
+	  jettauLooseMva2017Iso_ = analysisTree.tau_byLooseIsolationMVArun2017v2DBoldDMwLT2017[taujetIndex] > 0.5;
+	  jettauMediumMva2017Iso_ = analysisTree.tau_byMediumIsolationMVArun2017v2DBoldDMwLT2017[taujetIndex] > 0.5;
+	  jettauTightMva2017Iso_ = analysisTree.tau_byTightIsolationMVArun2017v2DBoldDMwLT2017[taujetIndex] > 0.5;
+	  jettauVTightMva2017Iso_ = analysisTree.tau_byVTightIsolationMVArun2017v2DBoldDMwLT2017[taujetIndex] > 0.5;
 	  
 	  jettauAntiMuonLoose3_ = analysisTree.tau_againstMuonLoose3[taujetIndex] > 0.5;
 	  jettauAntiMuonTight3_ = analysisTree.tau_againstMuonTight3[taujetIndex] > 0.5;
@@ -1811,3 +1841,5 @@ int main(int argc, char * argv[]) {
 
 
 
+
+//  LocalWords:  taujetIndex
