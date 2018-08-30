@@ -72,7 +72,12 @@ void Synch17GenTree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("acotautau_00", &acotautau_00, &b_acotautau_00);
    fChain->SetBranchAddress("acotautau_10", &acotautau_10, &b_acotautau_10);
    fChain->SetBranchAddress("acotautau_01", &acotautau_01, &b_acotautau_01);
-   fChain->SetBranchAddress("acotautau_11", &acotautau_11, &b_acotautau_11);
+   fChain->SetBranchAddress("acotautau_11", &acotautau_11, &b_acotautau_11);   
+   fChain->SetBranchAddress("acotautau_02", &acotautau_02, &b_acotautau_02);
+   fChain->SetBranchAddress("acotautau_12", &acotautau_12, &b_acotautau_12);
+   fChain->SetBranchAddress("acotautau_20", &acotautau_20, &b_acotautau_20);
+   fChain->SetBranchAddress("acotautau_21", &acotautau_21, &b_acotautau_21);
+   fChain->SetBranchAddress("acotautau_22", &acotautau_22, &b_acotautau_22);
    
    lock=true;
 }
@@ -165,6 +170,11 @@ void Synch17GenTree::WriteInit(TTree *tree) {
    fChain->Branch("acotautau_10", &acotautau_10, "acotautau_10/F");
    fChain->Branch("acotautau_01", &acotautau_01, "acotautau_01/F");
    fChain->Branch("acotautau_11", &acotautau_11, "acotautau_11/F");
+   fChain->Branch("acotautau_02", &acotautau_02, "acotautau_02/F");
+   fChain->Branch("acotautau_12", &acotautau_12, "acotautau_12/F");
+   fChain->Branch("acotautau_20", &acotautau_20, "acotautau_20/F");
+   fChain->Branch("acotautau_21", &acotautau_21, "acotautau_21/F");
+   fChain->Branch("acotautau_22", &acotautau_22, "acotautau_22/F");
 
 }
 
