@@ -42,6 +42,7 @@ bool passedSummer16VetoId(const AC1B * analysisTree, int index);
 bool isICHEPmed(int Index, const AC1B * analysisTree);
 bool isIdentifiedMediumMuon(int Index, const AC1B * analysisTree, bool isData);
 float getEffectiveArea(float eta);
+int ZDecay(const AC1B * analysisTree);
 
 ///////////////////////////////////////////////
 //////////////FUNCTION DEFINITION//////////////
@@ -177,12 +178,17 @@ float GenMatch(const AC1B * analysisTree, bool isData, TString particleType, int
 	  else if (type4) gen_match = 4;
 	}	
       }
-      
+    }
+    if (gen_match<1||gen_match>4) {
       for (unsigned int igen=0; igen < analysisTree->gentau_count; ++igen) {
 	
 	if (analysisTree->gentau_visibleNoLep_pt[igen]>15.) {
+	  TLorentzVector genTauLV; genTauLV.SetXYZT(analysisTree->gentau_px[igen],
+						    analysisTree->gentau_py[igen],
+						    analysisTree->gentau_pz[igen],
+						    analysisTree->gentau_e[igen]);
 	  float dR = deltaR(eta,phi,
-				analysisTree->gentau_visibleNoLep_eta[igen],analysisTree->gentau_visibleNoLep_phi[igen]);
+			    genTauLV.Eta(),genTauLV.Phi());
 	  if (dR<minDR) {
 	    minDR = dR;
 	    gen_match = 5;
@@ -603,3 +609,32 @@ void fill_weight(const AC1B * analysisTree, Synch17Tree *otree, PileUp *PUoffici
   otree->gen_noutgoing = analysisTree->genparticles_noutgoing;
 }
 
+// defines decay mode of the Z 
+// 1 : Z->ee
+// 2 : Z->mumu
+// 3 : Z->tautau
+int ZDecay(const AC1B * analysisTree) {
+  int zdecay = 0;
+  unsigned int ngen = analysisTree->genparticles_count;
+  unsigned int nPromptMuons = 0;
+  unsigned int nPromptElectrons = 0;
+  for (unsigned int igen =0; igen<ngen; ++igen) {
+    bool isMuon = TMath::Abs(analysisTree->genparticles_pdgid[igen])==13;
+    bool isElectron = TMath::Abs(analysisTree->genparticles_pdgid[igen])==11;
+    //    if (TMath::Abs(analysisTree.genparticles_pdgId[igen])==23) isZfound = true; 
+    //    bool isDaughterOfZ = analysisTree.genparticles_info[igen] == 1;
+    if (analysisTree->genparticles_fromHardProcess[igen]&&analysisTree->genparticles_status[igen]==1) {
+      if (isMuon) nPromptMuons++;
+      if (isElectron) nPromptElectrons++;
+    }
+  }
+  if (nPromptElectrons==2)
+    zdecay = 1;
+  else if (nPromptMuons==2)
+    zdecay = 2;    
+  else
+    zdecay = 3;
+
+  return zdecay;
+
+}
