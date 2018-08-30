@@ -273,18 +273,27 @@ TLorentzVector ipVec(const AC1B * analysisTree, int tauIndex) {
  
 void gen_acott(const AC1B * analysisTree, Synch17GenTree *gentree, int tauIndex1, int tauIndex2){
 
-  bool correctDecay1 = analysisTree->gentau_decayMode[tauIndex1]<=2||analysisTree->gentau_decayMode[tauIndex1]==8||analysisTree->gentau_decayMode[tauIndex1]==9;
-  bool correctDecay2 = analysisTree->gentau_decayMode[tauIndex2]<=2||analysisTree->gentau_decayMode[tauIndex2]==8||analysisTree->gentau_decayMode[tauIndex2]==9;
+  bool correctDecay1 = analysisTree->gentau_decayMode[tauIndex1]<=6||analysisTree->gentau_decayMode[tauIndex1]==8||analysisTree->gentau_decayMode[tauIndex1]==9;
+  bool correctDecay2 = analysisTree->gentau_decayMode[tauIndex2]<=6||analysisTree->gentau_decayMode[tauIndex2]==8||analysisTree->gentau_decayMode[tauIndex2]==9;
   bool correctDecay = correctDecay1 && correctDecay2;
   
   bool oneProngPi01 = analysisTree->gentau_decayMode[tauIndex1]<=2 && analysisTree->gentau_decayMode[tauIndex1]>=1;
   bool oneProngPi02 = analysisTree->gentau_decayMode[tauIndex2]<=2 && analysisTree->gentau_decayMode[tauIndex2]>=1;
+
+  bool threeProngPi01 = analysisTree->gentau_decayMode[tauIndex1]<=6 && analysisTree->gentau_decayMode[tauIndex1]>=4;
+  bool threeProngPi02 = analysisTree->gentau_decayMode[tauIndex2]<=6 && analysisTree->gentau_decayMode[tauIndex2]>=4;
   
   gentree->acotautau_00 = -9999;
   gentree->acotautau_10 = -9999;
   gentree->acotautau_01 = -9999;
   gentree->acotautau_11 = -9999;
-
+  /* 
+  gentree->acotautau_20 = -9999;
+  gentree->acotautau_02 = -9999;
+  gentree->acotautau_21 = -9999;
+  gentree->acotautau_12 = -9999;
+  gentree->acotautau_22 = -9999;
+  */
   gentree->genmode_1 = analysisTree->gentau_decayMode[tauIndex1];
   gentree->genmode_2 = analysisTree->gentau_decayMode[tauIndex2];
 
@@ -349,6 +358,23 @@ void gen_acott(const AC1B * analysisTree, Synch17GenTree *gentree, int tauIndex1
   if (oneProngPi01&&oneProngPi02)
     gentree->acotautau_11=acoCP(tau1Prong,tau2Prong,tau1Pi0,tau2Pi0,firstNegative,true,true);
   
+
+  if(threeProngPi01)
+    gentree->acotautau_20=acoCP(tau1Prong,tau2Prong,tau1IP,tau2IP,firstNegative,false,false);
+
+  if(threeProngPi02)
+    gentree->acotautau_02=acoCP(tau1Prong,tau2Prong,tau1IP,tau2IP,firstNegative,false,false);
+
+  if (oneProngPi01&&threeProngPi02)
+    gentree->acotautau_12=acoCP(tau1Prong,tau2Prong,tau1Pi0,tau2IP,firstNegative,true,false);
+
+  if (threeProngPi01&&oneProngPi02)
+    gentree->acotautau_21=acoCP(tau1Prong,tau2Prong,tau1IP,tau2Pi0,firstNegative,false,true);
+
+  if(threeProngPi01&&threeProngPi02)
+    gentree->acotautau_22=acoCP(tau1Prong,tau2Prong,tau1IP,tau2IP,firstNegative,false,false);
+
+
 };
 
 
@@ -368,7 +394,7 @@ TLorentzVector gen_chargedPivec(const AC1B * analysisTree, int tauIndex, int par
 };
 
 int gen_chargedPiIndex(const AC1B * analysisTree, int tauIndex, int partId){
-
+  //TO FIX: once the tau charge at gen level has been added, select the Prong with the correct charge
   int npart = analysisTree->genparticles_count;
   int piIndex=-1;
   float maxPt=-1;
@@ -381,7 +407,7 @@ int gen_chargedPiIndex(const AC1B * analysisTree, int tauIndex, int partId){
 		 analysisTree->gentau_visible_e[tauIndex]);
   
   for(int i=0;i<npart;i++){//selects the highest energy Pi
-    if(abs(analysisTree->genparticles_pdgid[i])==partId&&(analysisTree->genparticles_info[i]==12||analysisTree->genparticles_info[i]==5)){
+    if(abs(analysisTree->genparticles_pdgid[i])==partId&&(analysisTree->genparticles_info[i]==12||analysisTree->genparticles_info[i]==5)&&analysisTree->genparticles_isLastCopy[i]){
       TLorentzVector lvector;
       lvector.SetXYZT(analysisTree->genparticles_px[i],
 		      analysisTree->genparticles_py[i],
@@ -424,7 +450,7 @@ TLorentzVector gen_neutralPivec(const AC1B * analysisTree, int tauIndex){
 		 analysisTree->gentau_visible_e[tauIndex]);
   int npi0=0;
   for(int i=0;i<npart;i++){
-    if(analysisTree->genparticles_pdgid[i]==111&&(analysisTree->genparticles_info[i]==12||analysisTree->genparticles_info[i]==5)){
+    if(analysisTree->genparticles_pdgid[i]==111&&(analysisTree->genparticles_info[i]==12||analysisTree->genparticles_info[i]==5)&&analysisTree->genparticles_isLastCopy[i]){
       TLorentzVector lvector;
       lvector.SetXYZT(analysisTree->genparticles_px[i],
 		      analysisTree->genparticles_py[i],
@@ -496,4 +522,79 @@ TLorentzVector gen_ipVec(const AC1B * analysisTree, int tauIndex, int piIndex, T
 
   return vec;
 
+};
+
+
+
+vector<int> gen_ThreeProngIndices(const AC1B * analysisTree, int tauIndex){
+  //TO FIX: once the tau charge at gen level has been added, select the Prong with the correct charge
+  int npart = analysisTree->genparticles_count;
+  int piIndex=-1;
+  TLorentzVector Tau;
+  double dR;
+  double dRcut=0.5;
+  vector<int> ThreeProngIndices;
+  Tau.SetPxPyPzE(analysisTree->gentau_visible_px[tauIndex],
+		 analysisTree->gentau_visible_py[tauIndex],
+		 analysisTree->gentau_visible_pz[tauIndex],
+		 analysisTree->gentau_visible_e[tauIndex]);
+  
+  for(int i=0;i<npart;i++){//selects the highest energy Pi
+    if((abs(analysisTree->genparticles_pdgid[i])==211||analysisTree->genparticles_pdgid[i]==111)&&(analysisTree->genparticles_info[i]==12||analysisTree->genparticles_info[i]==5)&&analysisTree->genparticles_isLastCopy[i]){
+      TLorentzVector lvector;
+      lvector.SetXYZT(analysisTree->genparticles_px[i],
+		      analysisTree->genparticles_py[i],
+		      analysisTree->genparticles_pz[i],
+		      analysisTree->genparticles_e[i]);
+
+      dR=deltaR(Tau.Eta(),Tau.Phi(),lvector.Eta(),lvector.Phi());
+      if(dR<dRcut){
+	ThreeProngIndices.push_back(i);
+      }
+    }
+  }
+  /*
+  TLorentzVector chargedPi;
+  chargedPi.SetXYZT(0,0,0,0);
+  if (piIndex>-1) {
+    chargedPi.SetPxPyPzE(analysisTree->tau_constituents_px[tauIndex][piIndex],
+			 analysisTree->tau_constituents_py[tauIndex][piIndex],
+			 analysisTree->tau_constituents_pz[tauIndex][piIndex],
+			 analysisTree->tau_constituents_e[tauIndex][piIndex]);
+  }  
+  */
+
+  return ThreeProngIndices;
+};
+
+TLorentzVector gen_ThreeProngVec(const AC1B * analysisTree, vector<int> ThreeProngIndices){
+  //TO FIX: once the tau charge at gen level has been added, select the Prong with the correct charge
+  int npart = ThreeProngIndices.size();
+  TLorentzVector ThreeProngVec;
+  ThreeProngVec.SetXYZT(0.,0.,0.,0.);
+  
+  if(npart==0) return ThreeProngVec;
+  
+  for(int i=0;i<npart;i++){//selects the highest energy Pi
+    TLorentzVector lvector;
+    lvector.SetXYZT(analysisTree->genparticles_px[i],
+		    analysisTree->genparticles_py[i],
+		    analysisTree->genparticles_pz[i],
+		    analysisTree->genparticles_e[i]);
+    
+    ThreeProngVec+=lvector;
+  }
+
+  /*
+  TLorentzVector chargedPi;
+  chargedPi.SetXYZT(0,0,0,0);
+  if (piIndex>-1) {
+    chargedPi.SetPxPyPzE(analysisTree->tau_constituents_px[tauIndex][piIndex],
+			 analysisTree->tau_constituents_py[tauIndex][piIndex],
+			 analysisTree->tau_constituents_pz[tauIndex][piIndex],
+			 analysisTree->tau_constituents_e[tauIndex][piIndex]);
+  }  
+  */
+
+  return ThreeProngVec;
 };
