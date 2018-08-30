@@ -126,6 +126,75 @@ float getEffectiveArea(float eta) {
 
   } 
 
+
+float GenMatch(const AC1B * analysisTree, bool isData, TString particleType, int Index){
+
+  float gen_match = 6;
+  
+  // isZTT = false;
+  // isZL  = false;
+  // isZJ  = false;
+  
+  float minDR = 0.2;
+  float pt,eta,phi;
+  if(particleType=="m"){
+    pt =      analysisTree->muon_pt[Index]; 
+    eta =     analysisTree->muon_eta[Index]; 
+    phi =     analysisTree->muon_phi[Index];}
+  if(particleType=="e"){         
+    pt =      analysisTree->electron_pt[Index];
+    eta =     analysisTree->electron_eta[Index]; 
+    phi =     analysisTree->electron_phi[Index];}
+  if(particleType=="t"){         
+    pt =      analysisTree->tau_pt[Index];
+    eta =     analysisTree->tau_eta[Index]; 
+    phi =     analysisTree->tau_phi[Index];
+  }
+  
+  if (!isData){
+    for (unsigned int igen=0; igen < analysisTree->genparticles_count; ++igen) {
+      
+      TLorentzVector genLV; genLV.SetXYZT(analysisTree->genparticles_px[igen],
+					  analysisTree->genparticles_py[igen],
+					  analysisTree->genparticles_pz[igen],
+					  analysisTree->genparticles_e[igen]);
+      float ptGen = genLV.Pt();
+      bool type1 = abs(analysisTree->genparticles_pdgid[igen])==11 && analysisTree->genparticles_isPrompt[igen] && ptGen>8;
+      bool type2 = abs(analysisTree->genparticles_pdgid[igen])==13 && analysisTree->genparticles_isPrompt[igen] && ptGen>8;
+      bool type3 = abs(analysisTree->genparticles_pdgid[igen])==11 && analysisTree->genparticles_isDirectPromptTauDecayProduct[igen] && ptGen>8;
+      bool type4 = abs(analysisTree->genparticles_pdgid[igen])==13 && analysisTree->genparticles_isDirectPromptTauDecayProduct[igen] && ptGen>8;
+      
+      bool isAnyType = type1 || type2 || type3 || type4;
+      if (isAnyType && analysisTree->genparticles_status[igen]==1) {
+	float etaGen = genLV.Eta();
+	float phigen = genLV.Phi();
+	float dR = deltaR(eta,phi,etaGen,phigen);
+	if (dR<minDR) {
+	  minDR = dR;
+	  if (type1) gen_match = 1;
+	  else if (type2) gen_match = 2;
+	  else if (type3) gen_match = 3;
+	  else if (type4) gen_match = 4;
+	}	
+      }
+      
+      for (unsigned int igen=0; igen < analysisTree->gentau_count; ++igen) {
+	
+	if (analysisTree->gentau_visibleNoLep_pt[igen]>15.) {
+	  float dR = deltaR(eta,phi,
+				analysisTree->gentau_visibleNoLep_eta[igen],analysisTree->gentau_visibleNoLep_phi[igen]);
+	  if (dR<minDR) {
+	    minDR = dR;
+	    gen_match = 5;
+	  }
+	}
+      }
+    }
+  } 
+
+  return gen_match;  
+}
+
 //////////////////////////////////////////////
 //            channel dependent             //
 //////////////////////////////////////////////
