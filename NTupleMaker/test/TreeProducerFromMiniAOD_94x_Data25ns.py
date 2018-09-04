@@ -138,9 +138,12 @@ for idmod in my_id_modules:
 from DesyTauAnalyses.NTupleMaker.runTauIdMVA import *
 na = TauIDEmbedder(process, cms, # pass tour process object
     debug=True,
-    toKeep = ["2017v1", "2017v2", "newDM2017v2", "dR0p32017v2", "2016v1", "newDM2016v1"]
-)
+     toKeep = ["2017v1", "2017v2", "newDM2017v2", "dR0p32017v2", "2016v1", "newDM2016v1", "deepTau2017v1", "DPFTau_2016_v0","DPFTau_2016_v1"] 
+		  )
 na.runTauID()
+
+
+tauSrc = cms.InputTag('NewTauIDsEmbedded')
 # END Tau ID ===========================================================================================
 
 # NTuple Maker =======================================================================
