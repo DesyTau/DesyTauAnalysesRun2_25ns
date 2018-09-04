@@ -253,7 +253,7 @@ int main(int argc, char * argv[]){
     filterXtriggerTauLeg.push_back(cfg.get<string>("filterXtriggerTauLeg2"));
   }else if(ch == "et"){
     filterSingleLep.push_back(cfg.get<string>("filterSingleLep1"));
-    //filterSingleLep.push_back(cfg.get<string>("filterSingleLep2"));
+    filterSingleLep.push_back(cfg.get<string>("filterSingleLep2"));
     
     filterXtriggerLepLeg.push_back(cfg.get<string>("filterXtriggerLepLeg1"));
     filterXtriggerLepLeg.push_back(cfg.get<string>("filterXtriggerLepLeg2"));
@@ -284,6 +284,8 @@ int main(int argc, char * argv[]){
   const float shift_tes_lepfake_1prong = cfg.get<float>("TauEnergyScaleShift_LepFake_OneProng");
   const float shift_tes_lepfake_1p1p0 = cfg.get<float>("TauEnergyScaleShift_LepFake_OneProngOnePi0");
   const float shift_tes_lepfake_3prong = cfg.get<float>("TauEnergyScaleShift_LepFake_ThreeProng");
+  // for tau Id efficiency
+  const float tau_id_sf = cfg.get<float>("TauIdSF");
 
   // pair selection
   const float dRleptonsCut   = cfg.get<float>("dRleptonsCut");
@@ -945,6 +947,15 @@ int main(int argc, char * argv[]){
       otree->xTrigger = false;
       otree->xTriggerLep = false;
       otree->xTriggerTau = false;
+      
+      // setting weights to 1
+      otree->trkeffweight = 1;
+      otree->trigweight_1 = 1;
+      otree->trigweight_2 = 1;
+      otree->effweight = 1;
+      otree->trigweight = 1;
+      otree->idisoweight_1 = 1;
+      otree->idisoweight_2 = 1;
 
       // ********************************
       // FIXME : implement l1tau matching
@@ -1023,7 +1034,8 @@ int main(int argc, char * argv[]){
       double eff_mc_trig_L        = 1;
       double sf_trig_ditau_tau1   = 1;
       double sf_trig_ditau_tau2   = 1;
-      
+      // reset efficiency weights
+
       if(ch=="mt") {
       	FillMuTau(&analysisTree, otree, leptonIndex, dRiso);
       	
@@ -1078,15 +1090,29 @@ int main(int argc, char * argv[]){
                                                                   analysisTree.tau_eta[leptonIndex],
                                                                   analysisTree.tau_phi[leptonIndex]);
 	  otree->trigweight = otree->trigweight_1 * otree->trigweight_2;
+	  otree->idisoweight_1 = tau_id_sf;
+	  otree->idisoweight_2 = tau_id_sf;
+	  
 	}
 	else {
 	  //std::cout<< "SF_lepIdIso" <<std::endl;
-	  eff_data_trig_lt_tau = tauTriggerSF->getMuTauEfficiencyData(analysisTree.tau_pt[tauIndex],
-								      analysisTree.tau_eta[tauIndex],
-								      analysisTree.tau_phi[tauIndex]);
-	  eff_mc_trig_lt_tau = tauTriggerSF->getMuTauEfficiencyMC(analysisTree.tau_pt[tauIndex],
-								  analysisTree.tau_eta[tauIndex],
-								  analysisTree.tau_phi[tauIndex]);
+	  if (ch=="mt") {
+	    eff_data_trig_lt_tau = tauTriggerSF->getMuTauEfficiencyData(analysisTree.tau_pt[tauIndex],
+									analysisTree.tau_eta[tauIndex],
+									analysisTree.tau_phi[tauIndex]);
+	    eff_mc_trig_lt_tau = tauTriggerSF->getMuTauEfficiencyMC(analysisTree.tau_pt[tauIndex],
+								    analysisTree.tau_eta[tauIndex],
+								    analysisTree.tau_phi[tauIndex]);
+	  }
+	  else {
+	    eff_data_trig_lt_tau = tauTriggerSF->getETauEfficiencyData(analysisTree.tau_pt[tauIndex],
+									analysisTree.tau_eta[tauIndex],
+									analysisTree.tau_phi[tauIndex]);
+	    eff_mc_trig_lt_tau = tauTriggerSF->getETauEfficiencyMC(analysisTree.tau_pt[tauIndex],
+								    analysisTree.tau_eta[tauIndex],
+								    analysisTree.tau_phi[tauIndex]);
+	    
+	  }
 
 	  eff_data_trig_lt_l = SF_XTriggerLepLeg->get_EfficiencyData(leptonLV.Pt(),
 								     leptonLV.Eta());
@@ -1144,9 +1170,9 @@ int main(int argc, char * argv[]){
       else if(ch=="tt") FillTau_leading(&analysisTree, otree, tauIndex);
 	  
       // tauID weight (for the moment 1)
-      if (!isData && analysisTree.tau_genmatch[tauIndex]==5) otree->idisoweight_2 = 1.; 
+      if (!isData && analysisTree.tau_genmatch[tauIndex]==5) otree->idisoweight_2 = tau_id_sf; 
 
-      otree->effweight = (otree->idisoweight_1)*(otree->idisoweight_2)*(otree->trigweight);
+      otree->effweight = (otree->idisoweight_1)*(otree->trkeffweight)*(otree->idisoweight_2)*(otree->trigweight);
       otree->weight = otree->effweight * otree->puweight * otree->mcweight; 
 
       //counting jet

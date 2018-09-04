@@ -1,7 +1,7 @@
 #!/bin/bash
 
 MCdir_VJets=/pnfs/desy.de/cms/tier2/store/user/telenz/13TeV/NTuples/MC/RunIIFall17MiniAOD-94X_mc2017_realistic/
-MCdir_DY=/nfs/dust/cms/group/higgs-kit/rasp/MC_2017
+MCdir_DY=/nfs/dust/cms/user/rasp/ntuples/MC_2017_v3
 MCdir_TTVV=/nfs/dust/cms/user/rasp/ntuples/MC_2017_v2
 MCdir_Signal=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/MCFall17/Signals
 MCdir_ST=/nfs/dust/cms/user/rasp/ntuples/MC_2017_v2
@@ -10,6 +10,8 @@ MCdir_ST=/nfs/dust/cms/user/rasp/ntuples/MC_2017_v2
 
 ls $MCdir_Signal/GluGluHToTauTau_M125_13TeV_powheg_pythia8/*.root > ggH_125
 ls $MCdir_Signal/VBFHToTauTau_M125_13TeV_powheg_pythia8/*.root > VBF_125
+ls $MCdir_Signal/SUSYGluGluToHToTauTau_M-120_TuneCP5_13TeV-pythia8/*.root > SUSYGluGluHTauTau_120
+
 
 #DY
 

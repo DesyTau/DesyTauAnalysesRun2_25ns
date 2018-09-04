@@ -42,7 +42,11 @@ public :
   Float_t         acotautau_10;
   Float_t         acotautau_01;
   Float_t         acotautau_11;
-  
+  Float_t         acotautau_02;
+  Float_t         acotautau_20;
+  Float_t         acotautau_12;
+  Float_t         acotautau_21;
+  Float_t         acotautau_22;
   
 
   //////////////////////////////////////////////
@@ -64,7 +68,12 @@ public :
   TBranch        *b_acotautau_10;
   TBranch        *b_acotautau_01;
   TBranch        *b_acotautau_11;
-  
+  TBranch        *b_acotautau_02;
+  TBranch        *b_acotautau_20;
+  TBranch        *b_acotautau_12;
+  TBranch        *b_acotautau_21;
+  TBranch        *b_acotautau_22;
+
   Synch17GenTree(TTree *tree=0);
   virtual ~Synch17GenTree();
 

@@ -42,6 +42,7 @@ bool passedSummer16VetoId(const AC1B * analysisTree, int index);
 bool isICHEPmed(int Index, const AC1B * analysisTree);
 bool isIdentifiedMediumMuon(int Index, const AC1B * analysisTree, bool isData);
 float getEffectiveArea(float eta);
+int ZDecay(const AC1B * analysisTree);
 
 ///////////////////////////////////////////////
 //////////////FUNCTION DEFINITION//////////////
@@ -125,6 +126,80 @@ float getEffectiveArea(float eta) {
     return effArea;
 
   } 
+
+
+float GenMatch(const AC1B * analysisTree, bool isData, TString particleType, int Index){
+
+  float gen_match = 6;
+  
+  // isZTT = false;
+  // isZL  = false;
+  // isZJ  = false;
+  
+  float minDR = 0.2;
+  float pt,eta,phi;
+  if(particleType=="m"){
+    pt =      analysisTree->muon_pt[Index]; 
+    eta =     analysisTree->muon_eta[Index]; 
+    phi =     analysisTree->muon_phi[Index];}
+  if(particleType=="e"){         
+    pt =      analysisTree->electron_pt[Index];
+    eta =     analysisTree->electron_eta[Index]; 
+    phi =     analysisTree->electron_phi[Index];}
+  if(particleType=="t"){         
+    pt =      analysisTree->tau_pt[Index];
+    eta =     analysisTree->tau_eta[Index]; 
+    phi =     analysisTree->tau_phi[Index];
+  }
+  
+  if (!isData){
+    for (unsigned int igen=0; igen < analysisTree->genparticles_count; ++igen) {
+      
+      TLorentzVector genLV; genLV.SetXYZT(analysisTree->genparticles_px[igen],
+					  analysisTree->genparticles_py[igen],
+					  analysisTree->genparticles_pz[igen],
+					  analysisTree->genparticles_e[igen]);
+      float ptGen = genLV.Pt();
+      bool type1 = abs(analysisTree->genparticles_pdgid[igen])==11 && analysisTree->genparticles_isPrompt[igen] && ptGen>8;
+      bool type2 = abs(analysisTree->genparticles_pdgid[igen])==13 && analysisTree->genparticles_isPrompt[igen] && ptGen>8;
+      bool type3 = abs(analysisTree->genparticles_pdgid[igen])==11 && analysisTree->genparticles_isDirectPromptTauDecayProduct[igen] && ptGen>8;
+      bool type4 = abs(analysisTree->genparticles_pdgid[igen])==13 && analysisTree->genparticles_isDirectPromptTauDecayProduct[igen] && ptGen>8;
+      
+      bool isAnyType = type1 || type2 || type3 || type4;
+      if (isAnyType && analysisTree->genparticles_status[igen]==1) {
+	float etaGen = genLV.Eta();
+	float phigen = genLV.Phi();
+	float dR = deltaR(eta,phi,etaGen,phigen);
+	if (dR<minDR) {
+	  minDR = dR;
+	  if (type1) gen_match = 1;
+	  else if (type2) gen_match = 2;
+	  else if (type3) gen_match = 3;
+	  else if (type4) gen_match = 4;
+	}	
+      }
+    }
+    if (gen_match<1||gen_match>4) {
+      for (unsigned int igen=0; igen < analysisTree->gentau_count; ++igen) {
+	
+	if (analysisTree->gentau_visibleNoLep_pt[igen]>15.) {
+	  TLorentzVector genTauLV; genTauLV.SetXYZT(analysisTree->gentau_px[igen],
+						    analysisTree->gentau_py[igen],
+						    analysisTree->gentau_pz[igen],
+						    analysisTree->gentau_e[igen]);
+	  float dR = deltaR(eta,phi,
+			    genTauLV.Eta(),genTauLV.Phi());
+	  if (dR<minDR) {
+	    minDR = dR;
+	    gen_match = 5;
+	  }
+	}
+      }
+    }
+  } 
+
+  return gen_match;  
+}
 
 //////////////////////////////////////////////
 //            channel dependent             //
@@ -534,3 +609,32 @@ void fill_weight(const AC1B * analysisTree, Synch17Tree *otree, PileUp *PUoffici
   otree->gen_noutgoing = analysisTree->genparticles_noutgoing;
 }
 
+// defines decay mode of the Z 
+// 1 : Z->ee
+// 2 : Z->mumu
+// 3 : Z->tautau
+int ZDecay(const AC1B * analysisTree) {
+  int zdecay = 0;
+  unsigned int ngen = analysisTree->genparticles_count;
+  unsigned int nPromptMuons = 0;
+  unsigned int nPromptElectrons = 0;
+  for (unsigned int igen =0; igen<ngen; ++igen) {
+    bool isMuon = TMath::Abs(analysisTree->genparticles_pdgid[igen])==13;
+    bool isElectron = TMath::Abs(analysisTree->genparticles_pdgid[igen])==11;
+    //    if (TMath::Abs(analysisTree.genparticles_pdgId[igen])==23) isZfound = true; 
+    //    bool isDaughterOfZ = analysisTree.genparticles_info[igen] == 1;
+    if (analysisTree->genparticles_fromHardProcess[igen]&&analysisTree->genparticles_status[igen]==1) {
+      if (isMuon) nPromptMuons++;
+      if (isElectron) nPromptElectrons++;
+    }
+  }
+  if (nPromptElectrons==2)
+    zdecay = 1;
+  else if (nPromptMuons==2)
+    zdecay = 2;    
+  else
+    zdecay = 3;
+
+  return zdecay;
+
+}

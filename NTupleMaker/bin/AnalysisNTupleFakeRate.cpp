@@ -78,7 +78,7 @@ int main(int argc, char * argv[]) {
   const bool isData = cfg.get<bool>("IsData");
   const bool applyGoodRunSelection = cfg.get<bool>("ApplyGoodRunSelection");
   const string jsonFile = cfg.get<string>("jsonFile");
-  
+
   // tau cuts
   const float ptTauCut  = cfg.get<float>("PtTauCut");
   const float etaTauCut = cfg.get<float>("EtaTauCut");
@@ -110,7 +110,6 @@ int main(int argc, char * argv[]) {
   const float ptSelMuCut    = cfg.get<float>("PtSelMuCut");
   const float ptTrigMuCut   = cfg.get<float>("PtTrigMuCut");
   const bool  isDRIso03 = cfg.get<bool>("IsDRIso03");
-  const bool  isMuonIdICHEP = cfg.get<bool>("IsMuonIdICHEP"); 
 
   // electron selection
   const float ptEleCut   = cfg.get<float>("PtEleCut");
@@ -158,12 +157,14 @@ int main(int argc, char * argv[]) {
   const string MuonTrigFile  = cfg.get<string>("MuonTrigEff");
 
   const string puDataFile = cfg.get<string>("PileUpDataFile");
-  const string puMCFile = cfg.get<string>("PileUpMCFile");
+  const string puMCFile   = cfg.get<string>("PileUpMCFile");
+  const string puMCHist   = cfg.get<string>("PileUpMCHist");
 
   const bool JetLeptonFake = cfg.get<bool>("JetLeptonFake");
 
   TString PUDataFile(puDataFile);
   TString PUMCFile(puMCFile);
+  TString PUMCHist(puMCHist);
   // **** end of configuration
 
   // file name and tree name
@@ -204,6 +205,9 @@ int main(int argc, char * argv[]) {
   Float_t genWeight_;
   Float_t weight_;
   Float_t genHt_;
+  Int_t nPartons_;
+  Int_t nPartonsNLO_;
+  Float_t genWPt_;
 
   UInt_t nVert_;
 
@@ -283,10 +287,17 @@ int main(int argc, char * argv[]) {
   Bool_t  jettauMediumIso_;
   Bool_t  jettauTightIso_;
 
+  Bool_t  jettauVLooseMvaIso_;
   Bool_t  jettauLooseMvaIso_;
   Bool_t  jettauMediumMvaIso_;
   Bool_t  jettauTightMvaIso_;
   Bool_t  jettauVTightMvaIso_;
+
+  Bool_t  jettauVLooseMva2017Iso_;
+  Bool_t  jettauLooseMva2017Iso_;
+  Bool_t  jettauMediumMva2017Iso_;
+  Bool_t  jettauTightMva2017Iso_;
+  Bool_t  jettauVTightMva2017Iso_;
 
   Bool_t jettauAntiMuonLoose3_;
   Bool_t jettauAntiMuonTight3_;
@@ -373,6 +384,9 @@ int main(int argc, char * argv[]) {
   ntuple_->Branch("mutrigweight",&mutrigweight,"mutrigweight/F");
 
   ntuple_->Branch("genHt",&genHt_,"genHt/F");
+  ntuple_->Branch("genWPt",&genWPt_,"genWPt/F");
+  ntuple_->Branch("nPartons",&nPartons_,"nPartons/I");
+  ntuple_->Branch("nPartonsNLO",&nPartonsNLO_,"nPartonsNLO/I");
 
   ntuple_->Branch("NVert",&nVert_,"NVert/i");
   ntuple_->Branch("metFilters",&metFilters_,"metFilters/O");
@@ -441,10 +455,17 @@ int main(int argc, char * argv[]) {
   ntuple_->Branch("jettauMediumIso",&jettauMediumIso_,"jettauMediumIso/O");
   ntuple_->Branch("jettauTightIso", &jettauTightIso_, "jettauTightIso/O");
 
+  ntuple_->Branch("jettauVLooseMvaIso", &jettauVLooseMvaIso_, "jettauVLooseMvaIso/O");
   ntuple_->Branch("jettauLooseMvaIso", &jettauLooseMvaIso_, "jettauLooseMvaIso/O");
   ntuple_->Branch("jettauMediumMvaIso",&jettauMediumMvaIso_,"jettauMediumMvaIso/O");
   ntuple_->Branch("jettauTightMvaIso", &jettauTightMvaIso_, "jettauTightMvaIso/O");
   ntuple_->Branch("jettauVTightMvaIso", &jettauVTightMvaIso_, "jettauVTightMvaIso/O");
+
+  ntuple_->Branch("jettauVLooseMva2017Iso", &jettauVLooseMva2017Iso_, "jettauVLooseMva2017Iso/O");
+  ntuple_->Branch("jettauLooseMva2017Iso", &jettauLooseMva2017Iso_, "jettauLooseMva2017Iso/O");
+  ntuple_->Branch("jettauMediumMva2017Iso",&jettauMediumMva2017Iso_,"jettauMediumMva2017Iso/O");
+  ntuple_->Branch("jettauTightMva2017Iso", &jettauTightMva2017Iso_, "jettauTightMva2017Iso/O");
+  ntuple_->Branch("jettauVTightMva2017Iso", &jettauVTightMva2017Iso_, "jettauVTightMva2017Iso/O");
 
   ntuple_->Branch("jettauAntiMuonLoose3",&jettauAntiMuonLoose3_,"jettauAntiMuonLoose3/O");
   ntuple_->Branch("jettauAntiMuonTight3",&jettauAntiMuonTight3_,"jettauAntiMuonTight3/O");
@@ -536,25 +557,35 @@ int main(int argc, char * argv[]) {
       }
   }
   
+  std::cout << "OK " << std::endl;
+
   // Official PU reweighting
   PileUp * PUofficial = new PileUp();
   TFile * filePUOfficial_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/"+PUDataFile,"read");
   TFile * filePUOfficial_MC = new TFile (TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/"+PUMCFile, "read");
   TH1D * PUOfficial_data = (TH1D *)filePUOfficial_data->Get("pileup");
-  TH1D * PUOfficial_mc = (TH1D *)filePUOfficial_MC->Get("pileup");
+  TH1D * PUOfficial_mc = (TH1D *)filePUOfficial_MC->Get(PUMCHist);
+  if (PUOfficial_mc->IsZombie()) {
+    std::cout << "Histogram " << PUMCHist << "_pileup is not found in file " << PUMCFile << std::endl;
+    exit(-1);
+  }
   PUofficial->set_h_data(PUOfficial_data);
   PUofficial->set_h_MC(PUOfficial_mc);
+
+  std::cout << "OK1 " << std::endl;
 
   ScaleFactor * SF_muonIdIso = new ScaleFactor();
   ScaleFactor * SF_muonTrig = new ScaleFactor();
   SF_muonIdIso->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(MuonIdIsoFile));
   SF_muonTrig->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(MuonTrigFile));
 
+  std::cout << "OK2 " << std::endl;
+
   // MEt filters
   std::vector<TString> metFlags; metFlags.clear();
   metFlags.push_back("Flag_HBHENoiseFilter");
   metFlags.push_back("Flag_HBHENoiseIsoFilter");
-  metFlags.push_back("Flag_globalTightHalo2016Filter");
+  //  metFlags.push_back("Flag_globalTightHalo2016Filter");
   metFlags.push_back("Flag_EcalDeadCellTriggerPrimitiveFilter");
   metFlags.push_back("Flag_goodVertices");
   metFlags.push_back("Flag_eeBadScFilter");
@@ -625,7 +656,11 @@ int main(int argc, char * argv[]) {
       puWeight_ = 1;
 
       genHt_ = analysisTree.genparticles_lheHt;
+      genWPt_ = analysisTree.genparticles_lheWPt;
       metFilters_ = metFiltersPasses(analysisTree,metFlags);
+
+      nPartons_ = int(analysisTree.genparticles_noutgoing);
+      nPartonsNLO_ = int(analysisTree.genparticles_noutgoing_NLO);
 
       wMass_ = -1;
       wPt_ = -1;
@@ -690,10 +725,19 @@ int main(int argc, char * argv[]) {
       jettauLooseIso_ = false;
       jettauMediumIso_ = false;
       jettauTightIso_ = false;
+
+      jettauVLooseMvaIso_ = false;
       jettauLooseMvaIso_ = false;
       jettauMediumMvaIso_ = false;
       jettauTightMvaIso_ = false;
       jettauVTightMvaIso_ = false;
+
+      jettauVLooseMva2017Iso_ = false;
+      jettauLooseMva2017Iso_ = false;
+      jettauMediumMva2017Iso_ = false;
+      jettauTightMva2017Iso_ = false;
+      jettauVTightMva2017Iso_ = false;
+
       jettauAntiMuonLoose3_ = false;
       jettauAntiMuonTight3_ = false;
 
@@ -775,7 +819,7 @@ int main(int argc, char * argv[]) {
 	weight_ *= genWeight_;
       }
       histWeightsH->Fill(double(0.),double(genWeight_));
-      
+
       // **********************************
       // *** Analysis of generator info ***
       // **********************************
@@ -1020,27 +1064,27 @@ int main(int argc, char * argv[]) {
       // ***************************************************
       // accessing PF MET and changing momentum scale of met
       // ***************************************************
-      float pfmet_ex = analysisTree.pfmet_ex;
-      float pfmet_ey = analysisTree.pfmet_ey;
+      float pfmet_ex = analysisTree.pfmetcorr_ex;
+      float pfmet_ey = analysisTree.pfmetcorr_ey;
       if (jetES<0) {
-	pfmet_ex = analysisTree.pfmet_ex_JetEnDown;
-	pfmet_ey = analysisTree.pfmet_ey_JetEnDown;
+	pfmet_ex = analysisTree.pfmetcorr_ex_JetEnDown;
+	pfmet_ey = analysisTree.pfmetcorr_ey_JetEnDown;
       }
       else if (jetES>0) {
-	pfmet_ex = analysisTree.pfmet_ex_JetEnUp;
-        pfmet_ey = analysisTree.pfmet_ey_JetEnUp;
+	pfmet_ex = analysisTree.pfmetcorr_ex_JetEnUp;
+        pfmet_ey = analysisTree.pfmetcorr_ey_JetEnUp;
       }
       else if (unclusteredES<0) {
-	pfmet_ex = analysisTree.pfmet_ex_UnclusteredEnDown;
-	pfmet_ey = analysisTree.pfmet_ey_UnclusteredEnDown;
+	pfmet_ex = analysisTree.pfmetcorr_ex_UnclusteredEnDown;
+	pfmet_ey = analysisTree.pfmetcorr_ey_UnclusteredEnDown;
       }
       else if (unclusteredES>0) {
-	pfmet_ex = analysisTree.pfmet_ex_UnclusteredEnUp;
-        pfmet_ey = analysisTree.pfmet_ey_UnclusteredEnUp;
+	pfmet_ex = analysisTree.pfmetcorr_ex_UnclusteredEnUp;
+        pfmet_ey = analysisTree.pfmetcorr_ey_UnclusteredEnUp;
       }
       else {
-	pfmet_ex = analysisTree.pfmet_ex;
-	pfmet_ey = analysisTree.pfmet_ey;
+	pfmet_ex = analysisTree.pfmetcorr_ex;
+	pfmet_ey = analysisTree.pfmetcorr_ey;
       }
       //      cout << endl;
       //      cout << "metx            = " << pfmet_ex << endl;
@@ -1083,7 +1127,6 @@ int main(int argc, char * argv[]) {
 	if (analysisTree.muon_pt[imuon]<ptMuCut) continue;
 	if (fabs(analysisTree.muon_eta[imuon])>etaMuCut) continue;
 	bool passedId = analysisTree.muon_isMedium[imuon];
-	if (isMuonIdICHEP) passedId = analysisTree.muon_isICHEP[imuon];
 	if (!passedId) continue;
 	bool passedIpCuts = 
 	  fabs(analysisTree.muon_dxy[imuon]) < dxyMuCut &&
@@ -1236,10 +1279,10 @@ int main(int argc, char * argv[]) {
         analysisTree.electron_pz[ielec] *= eleMomScale;
         analysisTree.electron_pt[ielec] *= eleMomScale;
 	bool passedId = 
-	  analysisTree.electron_cutId_veto_Spring15[ielec] &&
+	  analysisTree.electron_mva_Loose_Iso_Fall17_v1[ielec] &&
           analysisTree.electron_pass_conversion[ielec] &&
           analysisTree.electron_nmissinginnerhits[ielec] <= 1;
-	bool passedIdSel = analysisTree.electron_mva_wp80_general_Spring16_v1[ielec]>0.5 &&
+	bool passedIdSel = analysisTree.electron_mva_wp80_Iso_Fall17_v1[ielec]>0.5 &&
 	  analysisTree.electron_pass_conversion[ielec] &&
           analysisTree.electron_nmissinginnerhits[ielec] <= 1;
 	bool passedIpCuts = 
@@ -1502,10 +1545,17 @@ int main(int argc, char * argv[]) {
 	  jettauMediumIso_ = analysisTree.tau_byMediumCombinedIsolationDeltaBetaCorr3Hits[taujetIndex] > 0.5;
 	  jettauTightIso_ = analysisTree.tau_byTightCombinedIsolationDeltaBetaCorr3Hits[taujetIndex] > 0.5;
 	  
+	  jettauVLooseMvaIso_ = analysisTree.tau_byVLooseIsolationMVArun2v1DBoldDMwLT[taujetIndex] > 0.5;
 	  jettauLooseMvaIso_ = analysisTree.tau_byLooseIsolationMVArun2v1DBoldDMwLT[taujetIndex] > 0.5;
 	  jettauMediumMvaIso_ = analysisTree.tau_byMediumIsolationMVArun2v1DBoldDMwLT[taujetIndex] > 0.5;
 	  jettauTightMvaIso_ = analysisTree.tau_byTightIsolationMVArun2v1DBoldDMwLT[taujetIndex] > 0.5;
 	  jettauVTightMvaIso_ = analysisTree.tau_byVTightIsolationMVArun2v1DBoldDMwLT[taujetIndex] > 0.5;
+	  
+	  jettauVLooseMva2017Iso_ = analysisTree.tau_byVLooseIsolationMVArun2017v2DBoldDMwLT2017[taujetIndex] > 0.5;
+	  jettauLooseMva2017Iso_ = analysisTree.tau_byLooseIsolationMVArun2017v2DBoldDMwLT2017[taujetIndex] > 0.5;
+	  jettauMediumMva2017Iso_ = analysisTree.tau_byMediumIsolationMVArun2017v2DBoldDMwLT2017[taujetIndex] > 0.5;
+	  jettauTightMva2017Iso_ = analysisTree.tau_byTightIsolationMVArun2017v2DBoldDMwLT2017[taujetIndex] > 0.5;
+	  jettauVTightMva2017Iso_ = analysisTree.tau_byVTightIsolationMVArun2017v2DBoldDMwLT2017[taujetIndex] > 0.5;
 	  
 	  jettauAntiMuonLoose3_ = analysisTree.tau_againstMuonLoose3[taujetIndex] > 0.5;
 	  jettauAntiMuonTight3_ = analysisTree.tau_againstMuonTight3[taujetIndex] > 0.5;
@@ -1791,3 +1841,5 @@ int main(int argc, char * argv[]) {
 
 
 
+
+//  LocalWords:  taujetIndex

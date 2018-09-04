@@ -57,6 +57,9 @@ sed 's/pileUpforMC =/pileUpforMC = GluGluHToTauTau_M125_13TeV_powheg_pythia8_pil
 
 sed 's/pileUpforMC =/pileUpforMC = VBFHToTauTau_M125_13TeV_powheg_pythia8_pileup/' analysisMacroSynch_lept_mt_MC17.conf > analysisMacroSynch_lept_mt_VBF125.conf
 
+sed 's/pileUpforMC =/pileUpforMC = SUSYGluGluToHToTauTau_M-120_TuneCP5_13TeV-pythia8_pileup/' analysisMacroSynch_lept_mt_MC17.conf > analysisMacroSynch_lept_mt_SUSYGluGluHTauTau_120.conf
+
+
 
 for file in $(ls *.conf)
 do
