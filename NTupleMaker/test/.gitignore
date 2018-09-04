@@ -1,2 +1,5 @@
 *.pyc
 *~
+
+#Merijn added *.root, since in test/mutau are many large syncNTuples now:
+*.root

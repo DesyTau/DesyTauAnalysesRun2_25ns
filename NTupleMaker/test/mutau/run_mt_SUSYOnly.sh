@@ -34,7 +34,7 @@
 
 ./condorsub_seq_leptau.sh SynchNTupleProducer_2017 analysisMacroSynch_lept_mt_ggH125.conf ggH_125
 #Merijn: here should be mt 20 or something. Also we could add the VBF here:
-#./condorsub_seq_leptau.sh SynchNTupleProducer_2017 analysisMacroSynch_lept_mt_VBF125.conf VBF_125 mt 20
+./condorsub_seq_leptau.sh SynchNTupleProducer_2017 analysisMacroSynch_lept_mt_VBF125.conf VBF_125 mt 20
 
 ./condorsub_seq_leptau.sh SynchNTupleProducer_2017 analysisMacroSynch_lept_mt_DATA_SingleMuon.conf DATA_MuB mt 20
 ./condorsub_seq_leptau.sh SynchNTupleProducer_2017 analysisMacroSynch_lept_mt_DATA_SingleMuon.conf DATA_MuC mt 20

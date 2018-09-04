@@ -4,7 +4,7 @@ MCdir_VJets=/pnfs/desy.de/cms/tier2/store/user/telenz/13TeV/NTuples/MC/RunIIFall
 MCdir_DY=/nfs/dust/cms/group/higgs-kit/rasp/MC_2017
 MCdir_TTVV=/nfs/dust/cms/user/rasp/ntuples/MC_2017_v2
 MCdir_Signal=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/MCFall17/Signals
-MCdir_ST=/nfs/dust/cms/user/rasp/ntuples/MC_2017
+MCdir_ST=/nfs/dust/cms/user/rasp/ntuples/MC_2017_v2
 
 # Signal
 

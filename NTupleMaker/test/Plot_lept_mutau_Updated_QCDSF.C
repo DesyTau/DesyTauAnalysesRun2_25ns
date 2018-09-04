@@ -39,7 +39,7 @@ void Plot_lept_mutau_Updated_QCDSF(TString Variable = "m_vis",
 			     TString outputDir = "./mutau/output/",
 			     TString Suffix = "MuTau_",        // for name of pdf
 			     TString suffix = "",                      // for name of pdf
-			     bool logY = false, 
+			     bool logY = true, 
 			     //double lumi = 14350  //RunsBC
 			     //double lumi = 13463  //MuF
 			     //double lumi = 27835 //RunsBCDE
@@ -544,6 +544,10 @@ cout<<endl;
     float eVV    = errVV*VV->GetBinContent(iB);
     float eW     = errW*W->GetBinContent(iB);
     float eTT    = errTT*TT->GetBinContent(iB);
+    cout<<"TT->GetBinContent(iB) "<<ZTT->GetBinContent(iB) <<endl;
+    cout<<"TLL->GetBinContent(iB) "<<ZLL->GetBinContent(iB) <<endl;
+//    cout<<" "<< <<endl;
+
     float err2   = eQCD*eQCD+eVV*eVV + eW*eW + eTT*eTT;     //TO DO: WAS IST MIT DEM FEHLER AUF DY?
     float errTot = TMath::Sqrt(err2);
     cout << "eQCD: " << eQCD << "  eVV: " << eVV << "  eW: " << eW << "  eTT: " << eTT << "  eTotal: " << errTot << endl;
