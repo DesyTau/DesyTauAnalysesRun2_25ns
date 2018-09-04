@@ -35,18 +35,32 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 100
 # Set the process options -- Display summary at the end, enable unscheduled execution
 process.options = cms.untracked.PSet( 
     allowUnscheduled = cms.untracked.bool(True),
-    wantSummary = cms.untracked.bool(True) 
+    wantSummary = cms.untracked.bool(True), 
+#     susyInfo = cms.untracked.bool(True)	
 )
 
 # How many events to process
 process.maxEvents = cms.untracked.PSet( 
    input = cms.untracked.int32(100)
 )
-
+#process.SusyInfo = cms.untracked.bool(True)
 # Define the input source
 process.source = cms.Source("PoolSource", 
   fileNames = cms.untracked.vstring(
-        '/store/mc/RunIIFall17MiniAODv2/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14-v2/100000/24D39640-AB96-E811-819F-008CFA0A5808.root',
+"/store/mc/RunIIFall17MiniAODv2/WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14-v2/70000/8A8B3345-2A67-E811-AE81-F04DA274BB9C.root"
+#"root://xrootd-cms.infn.it//store/mc/RunIISummer16MiniAODv2/SMS-TStauStau_lefthanded_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUMoriond17_GridpackScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/30000/B841EB59-E8A7-E811-BD9B-5C260AFFFB63.root",
+#"root://xrootd-cms.infn.it//store/mc/RunIISummer16MiniAODv2/SMS-TStauStau_lefthanded_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUMoriond17_GridpackScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/30000/C489E8CA-6BA8-E811-BECF-782BCB539693.root"]
+
+
+#"/store/mc/RunIISummer16MiniAODv2/SMS-TStauStau_righthanded_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUMoriond17_GridpackScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/10000/B04DDCBB-83A6-E811-B42F-24BE05CE1E01.root"
+#"root://xrootd-cms.infn.it//store/mc/RunIIFall17MiniAODv2/SMS-TStauStau_righthanded_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/PU2017_12Apr2018_GridpackScan_94X_mc2017_realistic_v14-v1/20000/3ACAD4A7-5F7B-E811-8ECA-1866DA89035E.root"
+
+#	"/store/mc/RunIIFall17MiniAODv2/SMS-TStauStau_righthanded_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/PU2017_12Apr2018_GridpackScan_94X_mc2017_realistic_v14-v1/20000/DA4DCFB4-887C-E811-826E-FA163E013FB3.root"
+
+#	"/store/mc/RunIIFall17MiniAODv2/SMS-TStauStau_righthanded_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/PU2017_12Apr2018_GridpackScan_94X_mc2017_realistic_v14-v1/20000/007DE983-907C-E811-9C8D-FA163E1E165A.root"
+#	"/store/mc/RunIIFall17MiniAODv2/SMS-TStauStau_ctau-0p01to10_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/PU2017_12Apr2018_GridpackScan_94X_mc2017_realistic_v14-v1/40000/F849A417-D58D-E811-9A4E-0CC47A4C8EEA.root",
+#	"/store/mc/RunIIFall17MiniAOD/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/RECOSIMstep_94X_mc2017_realistic_v10-v1/00000/0CCEA775-09F2-E711-9833-0025905B85BE.root",
+#        '/store/mc/RunIIFall17MiniAODv2/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14-v2/100000/24D39640-AB96-E811-819F-008CFA0A5808.root',
         ),
   skipEvents = cms.untracked.uint32(0)
 )
@@ -134,11 +148,16 @@ for idmod in my_id_modules:
 
 # Tau ID ===============================================================================================
 from DesyTauAnalyses.NTupleMaker.runTauIdMVA import *
+
 na = TauIDEmbedder(process, cms, # pass tour process object
     debug=True,
-    toKeep = ["2017v1", "2017v2", "newDM2017v2", "dR0p32017v2", "2016v1", "newDM2016v1"]
+    toKeep = ["2017v1", "2017v2", "newDM2017v2", "dR0p32017v2", "2016v1", "newDM2016v1", "deepTau2017v1", "DPFTau_2016_v0","DPFTau_2016_v1"]
 )
+
 na.runTauID()
+
+tauSrc = cms.InputTag('NewTauIDsEmbedded')
+
 # END Tau ID ===========================================================================================
 
 # NTuple Maker =======================================================================
@@ -159,7 +178,7 @@ Skim = cms.untracked.uint32(0),
 # switches of collections
 GenParticles = cms.untracked.bool(not isData),
 GenJets = cms.untracked.bool(not isData),
-SusyInfo = cms.untracked.bool(False),
+SusyInfo = cms.untracked.bool(True),
 Trigger = cms.untracked.bool(True),
 RecPrimVertex = cms.untracked.bool(True),
 RecBeamSpot = cms.untracked.bool(True),
@@ -460,6 +479,8 @@ process.p = cms.Path(
 #  process.BadPFMuonFilter *
 #  process.BadGlobalMuonFilter *
 #  process.pileupJetIdUpdated * 
+#  process.rerunMvaIsolationSequence*
+
   process.patJetCorrFactorsReapplyJEC * process.patJetsReapplyJEC *
 #  process.egmPhotonIDSequence *
   process.puppiMETSequence *
