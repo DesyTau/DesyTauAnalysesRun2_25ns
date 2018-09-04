@@ -2358,6 +2358,26 @@ bool NTupleMaker::AddSusyInfo(const edm::Event& iEvent) {
   SusyLSPMass = -1;
 
   bool success = true;
+  
+  
+    edm::Handle<reco::GenParticleCollection> GenParticles;
+  iEvent.getByToken(GenParticleCollectionToken_, GenParticles);
+  
+  
+    if(GenParticles.isValid())
+    {
+      //bool count_partons = false;
+      //passed = true;
+      for(unsigned i = 0 ; i < GenParticles->size() ; i++)
+	{
+  
+    if(abs((*GenParticles)[i].pdgId()) == 1000015 ) SusyMotherMass =  (*GenParticles)[i].mass();
+    if(abs((*GenParticles)[i].pdgId()) == 1000022 ) SusyLSPMass =  (*GenParticles)[i].mass();
+	}
+	}
+    return success;
+    
+  /*
   edm::Handle<double> susyMotherMass;
   iEvent.getByToken(SusyMotherMassToken_,susyMotherMass);
   if (susyMotherMass.isValid()) {
@@ -2375,7 +2395,7 @@ bool NTupleMaker::AddSusyInfo(const edm::Event& iEvent) {
     success = false;
   }
 
-  return success;
+  return success;*/
 
 }
 
