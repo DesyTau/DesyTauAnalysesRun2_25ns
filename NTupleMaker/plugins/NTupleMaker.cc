@@ -153,6 +153,7 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
   BadGlobalMuonsToken_(consumes<edm::PtrVector<reco::Muon>>(iConfig.getParameter<edm::InputTag>("BadGlobalMuons"))),
   BadDuplicateMuonsToken_(consumes<edm::PtrVector<reco::Muon>>(iConfig.getParameter<edm::InputTag>("BadDuplicateMuons"))),
   ElectronCollectionToken_(consumes<edm::View<pat::Electron> >(iConfig.getParameter<edm::InputTag>("ElectronCollectionTag"))),
+  applyElectronESShift_(iConfig.getUntrackedParameter<bool>("applyElectronESShift")),
   eleVetoIdSummer16MapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleVetoIdSummer16Map"))),
   eleLooseIdSummer16MapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleLooseIdSummer16Map"))),
   eleMediumIdSummer16MapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleMediumIdSummer16Map"))),
@@ -4094,15 +4095,19 @@ unsigned int NTupleMaker::AddElectrons(const edm::Event& iEvent, const edm::Even
 	  if (fabs(el->eta())>cElEtaMax) continue;
 
 	  // Electron scale and smearing corrections
-	  auto corrP4  = el->p4() * el->userFloat("ecalTrkEnergyPostCorr") / el->energy();
-	  electron_px[electron_count] = corrP4.Px();
-	  electron_py[electron_count] = corrP4.Py();
-	  electron_pz[electron_count] = corrP4.Pz();
-	  electron_pt[electron_count] = corrP4.Pt();
-	  //electron_px[electron_count] = el->px();
-	  //electron_py[electron_count] = el->py();
-	  //electron_pz[electron_count] = el->pz();
-	  //electron_pt[electron_count] = el->pt();
+	  if (applyElectronESShift_) {
+	    auto corrP4  = el->p4() * el->userFloat("ecalTrkEnergyPostCorr") / el->energy();
+	    electron_px[electron_count] = corrP4.Px();
+	    electron_py[electron_count] = corrP4.Py();
+	    electron_pz[electron_count] = corrP4.Pz();
+	    electron_pt[electron_count] = corrP4.Pt();
+	  }
+	  else {
+	    electron_px[electron_count] = el->px();
+	    electron_py[electron_count] = el->py();
+	    electron_pz[electron_count] = el->pz();
+	    electron_pt[electron_count] = el->pt();
+	  }
 	  electron_eta[electron_count] = el->eta();
 	  electron_phi[electron_count] = el->phi(); 
 	  electron_charge[electron_count] = el->charge();

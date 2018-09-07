@@ -182,6 +182,7 @@ RecJet = cms.untracked.bool(True),
 # collections
 MuonCollectionTag = cms.InputTag("slimmedMuons"), 
 ElectronCollectionTag = cms.InputTag("slimmedElectrons"),
+applyElectronESShift = cms.untracked.bool(True),
 #######new in 9.4.0
 eleMvanoIsoWP90Fall17Map = cms.InputTag("egmGsfElectronIDs:mvaEleID-Fall17-noIso-V1-wp90"),
 eleMvanoIsoWP80Fall17Map = cms.InputTag("egmGsfElectronIDs:mvaEleID-Fall17-noIso-V1-wp80"),

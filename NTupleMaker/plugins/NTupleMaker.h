@@ -387,7 +387,9 @@ class NTupleMaker : public edm::EDAnalyzer{
   
   // Electron Configuration
   edm::EDGetTokenT<edm::View<pat::Electron> > ElectronCollectionToken_;
-  //// ID decisions objects
+  // Apply electron energy scale shift  
+  bool applyElectronESShift_;
+  // ID decisions objects
   edm::EDGetTokenT<edm::ValueMap<bool> > eleVetoIdSummer16MapToken_;
   edm::EDGetTokenT<edm::ValueMap<bool> > eleLooseIdSummer16MapToken_;
   edm::EDGetTokenT<edm::ValueMap<bool> > eleMediumIdSummer16MapToken_;
