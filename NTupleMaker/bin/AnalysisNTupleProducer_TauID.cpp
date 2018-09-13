@@ -734,6 +734,10 @@ int main(int argc, char * argv[]) {
     TH1D * PUOfficial_data = (TH1D *)filePUOfficial_data->Get("pileup");
     TString NamePUHistMC = samplenameForPUHist + "_pileup";
     TH1D * PUOfficial_mc = (TH1D *)filePUOfficial_MC->Get(NamePUHistMC);
+    if( !PUOfficial_mc) {
+      cout<<endl<<"MC pileup histogram "<<NamePUHistMC<<" does not exist in root file "<<PUMCFile<<". Exiting."<<endl<<endl;
+      exit(-1);
+    }
     PUofficial->set_h_data(PUOfficial_data);
     PUofficial->set_h_MC(PUOfficial_mc);
   }
