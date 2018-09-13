@@ -2214,15 +2214,15 @@ int main(int argc, char * argv[]) {
 	recoilJetDPhi_ = dPhiFromLV(lorentzVectorW,lorentzVectorTauJet);
 	isWJet = ptTriggerMu>ptMuCut_WJet; 
 	isWJet = isWJet && mtmuon_ > mtCut_WJet;
-	//isWJet = isWJet && recoilDPhi_>deltaPhiWJetCut_WJet;
+	isWJet = isWJet && recoilDPhi_>deltaPhiWJetCut_WJet;
 	isWJet = isWJet && nMuon_ == 1;
 	isWJet = isWJet && nElec_ == 0;
-	//isWJet = isWJet && nSelTaus_ == 1;
+	isWJet = isWJet && nSelTaus_ == 1;
 	isWJet = isWJet && nJetsCentral30_ == 1;
 	isWJet = isWJet && nJetsForward30_ == 0;
-	//isWJet = isWJet && tauPt_>100.;
+	isWJet = isWJet && tauPt_>100.;
 	isWJet = isWJet && abs(muonEta_)<2.1;
-	//isWJet = isWJet && tauDM_;
+	isWJet = isWJet && tauDM_;
 
 	if (isWJet) {
 	  if (!isData) {
