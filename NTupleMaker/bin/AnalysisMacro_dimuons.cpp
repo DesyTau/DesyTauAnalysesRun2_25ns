@@ -594,10 +594,12 @@ int main(int argc, char * argv[]) {
     TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/"+PileUpDataFile,"read"); 
     TFile * filePUdistribution_MC = new TFile (TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/"+PileUpMCFile, "read"); 
     TH1D * PU_data = (TH1D *)filePUdistribution_data->Get("pileup");
-    TH1D * PU_mc = (TH1D *)filePUdistribution_MC->Get(PileUpMCHist+"_pileup");
+    TH1D * PU_mc = (TH1D *)filePUdistribution_MC->Get(PileUpMCHist);
     PUofficial->set_h_data(PU_data); 
     PUofficial->set_h_MC(PU_mc);
   }
+  std::cout << "PU file successfully opened" << std::endl;
+
 
   // HTT Met recoil corrections
   RecoilCorrector recoilPFMetCorrector(RecoilFileName);
@@ -612,10 +614,12 @@ int main(int argc, char * argv[]) {
     SF_muonTrig = new ScaleFactor();
     SF_muonTrig->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(MuonTrigFile));
   }
+  std::cout << "lepton SF provider is ucessfully initialized" << std::endl;
 
   // tracking efficiency SF
   TFile * workspaceFile = new TFile(TString(cmsswBase)+"/src/"+CorrectionWorkspaceFile);
   RooWorkspace *correctionWS = (RooWorkspace*)workspaceFile->Get("w");
+  std::cout << "correction workspace is successfully opened" << std::endl;
 
   // Z mass pt weights
   TFile * fileZMassPtWeights = new TFile(TString(cmsswBase)+"/src/"+ZMassPtWeightsFileName); 

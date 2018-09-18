@@ -671,37 +671,37 @@ int main(int argc, char * argv[]) {
   UInt_t nSelMuonTrig_;
   Float_t dPhiMetMuon_;
 
-  TTree * trigNTuple_ = new TTree("TriggerNTuple","TriggerNTuple");
-  trigNTuple_->Branch("event",&event_,"event/i"); 
-  trigNTuple_->Branch("run",  &run_,  "run/i");
-  trigNTuple_->Branch("luminosityBlock", &lumi_,  "luminosityBlock/i");
-  trigNTuple_->Branch("trigger",&trigger_,"trigger/O");
-  trigNTuple_->Branch("NVert",&nVert_,"NVert/i");
-  trigNTuple_->Branch("metNoMu",&metNoMu_,"metNoMu/F");
-  trigNTuple_->Branch("mhtNoMu",&mhtNoMu_,"mhtNoMu/F");
-  trigNTuple_->Branch("metNoSelMu",&metNoSelMu_,"metNoSelMu/F");
-  trigNTuple_->Branch("mhtNoSelMu",&mhtNoSelMu_,"mhtNoSelMu/F");
-  trigNTuple_->Branch("IsW",&isWTrig_,"IsW/O");
-  trigNTuple_->Branch("IsZ",&isZTrig_,"IsZ/O");
-  trigNTuple_->Branch("nMuon",&nMuonTrig_,"nMuon/i");
-  trigNTuple_->Branch("nSelMuon",&nSelMuonTrig_,"nSelMuon/i");
-  trigNTuple_->Branch("npartons",&npartons_,"npartons/i");
-  trigNTuple_->Branch("npartonsNLO",&npartonsNLO_,"npartonsNLO/i");
-  trigNTuple_->Branch("lheWPt",&lheWPt_,"lheWPt/F");
-  trigNTuple_->Branch("met",&met_,"met/F");
-  trigNTuple_->Branch("mht",&mht_,"mht/F");
-  trigNTuple_->Branch("mtmuon",&mtmuon_,"mtmuon/F");
-  trigNTuple_->Branch("muonPt",&muonPt_,"muonPt/F");
-  trigNTuple_->Branch("muonEta",&muonEta_,"muonEta/F");
-  trigNTuple_->Branch("dPhiMetMuon",&dPhiMetMuon_,"dPhiMetMuon/F");
-  trigNTuple_->Branch("WMass",&wMass_,   "WMass/F");
-  trigNTuple_->Branch("puWeight",  &puWeight_,  "puWeight/F");
-  trigNTuple_->Branch("genWeight", &genWeight_, "genWeight/F");
-  trigNTuple_->Branch("metFilters",&metFilters_,"metFilters/O");
-  trigNTuple_->Branch("nJetsCentral20",&nJetsCentral20_,"nJetsCentral20/i");
-  trigNTuple_->Branch("nJetsCentral30",&nJetsCentral30_,"nJetsCentral30/i");
-  trigNTuple_->Branch("nJetsForward20",&nJetsForward20_,"nJetsForward20/i");
-  trigNTuple_->Branch("nJetsForward30",&nJetsForward30_,"nJetsForward30/i");
+  // TTree * trigNTuple_ = new TTree("TriggerNTuple","TriggerNTuple");
+  // trigNTuple_->Branch("event",&event_,"event/i"); 
+  // trigNTuple_->Branch("run",  &run_,  "run/i");
+  // trigNTuple_->Branch("luminosityBlock", &lumi_,  "luminosityBlock/i");
+  // trigNTuple_->Branch("trigger",&trigger_,"trigger/O");
+  // trigNTuple_->Branch("NVert",&nVert_,"NVert/i");
+  // trigNTuple_->Branch("metNoMu",&metNoMu_,"metNoMu/F");
+  // trigNTuple_->Branch("mhtNoMu",&mhtNoMu_,"mhtNoMu/F");
+  // trigNTuple_->Branch("metNoSelMu",&metNoSelMu_,"metNoSelMu/F");
+  // trigNTuple_->Branch("mhtNoSelMu",&mhtNoSelMu_,"mhtNoSelMu/F");
+  // trigNTuple_->Branch("IsW",&isWTrig_,"IsW/O");
+  // trigNTuple_->Branch("IsZ",&isZTrig_,"IsZ/O");
+  // trigNTuple_->Branch("nMuon",&nMuonTrig_,"nMuon/i");
+  // trigNTuple_->Branch("nSelMuon",&nSelMuonTrig_,"nSelMuon/i");
+  // trigNTuple_->Branch("npartons",&npartons_,"npartons/i");
+  // trigNTuple_->Branch("npartonsNLO",&npartonsNLO_,"npartonsNLO/i");
+  // trigNTuple_->Branch("lheWPt",&lheWPt_,"lheWPt/F");
+  // trigNTuple_->Branch("met",&met_,"met/F");
+  // trigNTuple_->Branch("mht",&mht_,"mht/F");
+  // trigNTuple_->Branch("mtmuon",&mtmuon_,"mtmuon/F");
+  // trigNTuple_->Branch("muonPt",&muonPt_,"muonPt/F");
+  // trigNTuple_->Branch("muonEta",&muonEta_,"muonEta/F");
+  // trigNTuple_->Branch("dPhiMetMuon",&dPhiMetMuon_,"dPhiMetMuon/F");
+  // trigNTuple_->Branch("WMass",&wMass_,   "WMass/F");
+  // trigNTuple_->Branch("puWeight",  &puWeight_,  "puWeight/F");
+  // trigNTuple_->Branch("genWeight", &genWeight_, "genWeight/F");
+  // trigNTuple_->Branch("metFilters",&metFilters_,"metFilters/O");
+  // trigNTuple_->Branch("nJetsCentral20",&nJetsCentral20_,"nJetsCentral20/i");
+  // trigNTuple_->Branch("nJetsCentral30",&nJetsCentral30_,"nJetsCentral30/i");
+  // trigNTuple_->Branch("nJetsForward20",&nJetsForward20_,"nJetsForward20/i");
+  // trigNTuple_->Branch("nJetsForward30",&nJetsForward30_,"nJetsForward30/i");
 
   // project directory
   string cmsswBase = (getenv ("CMSSW_BASE"));
@@ -734,6 +734,10 @@ int main(int argc, char * argv[]) {
     TH1D * PUOfficial_data = (TH1D *)filePUOfficial_data->Get("pileup");
     TString NamePUHistMC = samplenameForPUHist + "_pileup";
     TH1D * PUOfficial_mc = (TH1D *)filePUOfficial_MC->Get(NamePUHistMC);
+    if( !PUOfficial_mc) {
+      cout<<endl<<"MC pileup histogram "<<NamePUHistMC<<" does not exist in root file "<<PUMCFile<<". Exiting."<<endl<<endl;
+      exit(-1);
+    }
     PUofficial->set_h_data(PUOfficial_data);
     PUofficial->set_h_MC(PUOfficial_mc);
   }
@@ -2199,10 +2203,10 @@ int main(int argc, char * argv[]) {
       // ********************************
       // **** filling trigger ntuple ****
       // ********************************
-      if (ptTriggerMu>ptTrigMuCut) {
-	trigNTuple_->Fill();
-	TrigEvents++;
-      }
+      // if (ptTriggerMu>ptTrigMuCut) {
+      // 	trigNTuple_->Fill();
+      // 	TrigEvents++;
+      // }
       
       // ***************************
       // ******* WJet selection ****
@@ -2214,15 +2218,15 @@ int main(int argc, char * argv[]) {
 	recoilJetDPhi_ = dPhiFromLV(lorentzVectorW,lorentzVectorTauJet);
 	isWJet = ptTriggerMu>ptMuCut_WJet; 
 	isWJet = isWJet && mtmuon_ > mtCut_WJet;
-	//isWJet = isWJet && recoilDPhi_>deltaPhiWJetCut_WJet;
+	isWJet = isWJet && recoilDPhi_>deltaPhiWJetCut_WJet;
 	isWJet = isWJet && nMuon_ == 1;
 	isWJet = isWJet && nElec_ == 0;
-	//isWJet = isWJet && nSelTaus_ == 1;
+	isWJet = isWJet && nSelTaus_ == 1;
 	isWJet = isWJet && nJetsCentral30_ == 1;
-	isWJet = isWJet && nJetsForward30_ == 0;
-	//isWJet = isWJet && tauPt_>100.;
+	//isWJet = isWJet && nJetsForward30_ == 0;
+	isWJet = isWJet && tauPt_>100.;
 	isWJet = isWJet && abs(muonEta_)<2.1;
-	//isWJet = isWJet && tauDM_;
+	isWJet = isWJet && tauDM_;
 
 	if (isWJet) {
 	  if (!isData) {
@@ -2257,8 +2261,8 @@ int main(int argc, char * argv[]) {
 	isWMuNu = isWMuNu && nMuon_ == 1;
 	isWMuNu = isWMuNu && nElec_ == 0;
 	isWMuNu = isWMuNu && nSelTaus_ == 0;
-	isWMuNu = isWMuNu && nJetsCentral30_ == 0;
-	isWMuNu = isWMuNu && nJetsForward30_ == 0;
+	//isWMuNu = isWMuNu && nJetsCentral30_ == 0;
+	//isWMuNu = isWMuNu && nJetsForward30_ == 0;
 	isWMuNu = isWMuNu && abs(muonEta_)<2.1;
 
 	if (isWMuNu) {
