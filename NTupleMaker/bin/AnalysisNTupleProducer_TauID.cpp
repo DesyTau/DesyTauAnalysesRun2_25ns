@@ -750,8 +750,8 @@ int main(int argc, char * argv[]) {
   // Trigger efficiencies
   map<int,TGraphAsymmErrors*>  map_trigEffData;
   map<int,TGraphAsymmErrors*>  map_trigEffMC;
-  TFile * trigEffFile = new TFile(TString(cmsswBase)+"/src/"+trigEffFileName);
-  if(!trigEffFile){
+  TFile * trigEffFile = new TFile(TString(cmsswBase)+"/src/"+trigEffFileName,"read");
+  if(trigEffFile->IsZombie()){
     cout<<"Trigger file "<<trigEffFileName<<" does not exists. Exiting."<<endl;
     exit(-1);
   }
