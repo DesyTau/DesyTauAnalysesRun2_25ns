@@ -453,7 +453,7 @@ int main(int argc, char * argv[]) {
 
   TTree * ntuple_ = new TTree("NTuple","NTuple");
 
-  ntuple_->Branch("event",&event_,"event/i"); 
+  ntuple_->Branch("event",&event_,"event/i");
   ntuple_->Branch("run",  &run_,  "run/i");
   ntuple_->Branch("luminosityBlock", &lumi_,  "luminosityBlock/i");
 
@@ -671,37 +671,41 @@ int main(int argc, char * argv[]) {
   UInt_t nSelMuonTrig_;
   Float_t dPhiMetMuon_;
 
-  // TTree * trigNTuple_ = new TTree("TriggerNTuple","TriggerNTuple");
-  // trigNTuple_->Branch("event",&event_,"event/i"); 
-  // trigNTuple_->Branch("run",  &run_,  "run/i");
-  // trigNTuple_->Branch("luminosityBlock", &lumi_,  "luminosityBlock/i");
-  // trigNTuple_->Branch("trigger",&trigger_,"trigger/O");
-  // trigNTuple_->Branch("NVert",&nVert_,"NVert/i");
-  // trigNTuple_->Branch("metNoMu",&metNoMu_,"metNoMu/F");
-  // trigNTuple_->Branch("mhtNoMu",&mhtNoMu_,"mhtNoMu/F");
-  // trigNTuple_->Branch("metNoSelMu",&metNoSelMu_,"metNoSelMu/F");
-  // trigNTuple_->Branch("mhtNoSelMu",&mhtNoSelMu_,"mhtNoSelMu/F");
-  // trigNTuple_->Branch("IsW",&isWTrig_,"IsW/O");
-  // trigNTuple_->Branch("IsZ",&isZTrig_,"IsZ/O");
-  // trigNTuple_->Branch("nMuon",&nMuonTrig_,"nMuon/i");
-  // trigNTuple_->Branch("nSelMuon",&nSelMuonTrig_,"nSelMuon/i");
-  // trigNTuple_->Branch("npartons",&npartons_,"npartons/i");
-  // trigNTuple_->Branch("npartonsNLO",&npartonsNLO_,"npartonsNLO/i");
-  // trigNTuple_->Branch("lheWPt",&lheWPt_,"lheWPt/F");
-  // trigNTuple_->Branch("met",&met_,"met/F");
-  // trigNTuple_->Branch("mht",&mht_,"mht/F");
-  // trigNTuple_->Branch("mtmuon",&mtmuon_,"mtmuon/F");
-  // trigNTuple_->Branch("muonPt",&muonPt_,"muonPt/F");
-  // trigNTuple_->Branch("muonEta",&muonEta_,"muonEta/F");
-  // trigNTuple_->Branch("dPhiMetMuon",&dPhiMetMuon_,"dPhiMetMuon/F");
-  // trigNTuple_->Branch("WMass",&wMass_,   "WMass/F");
-  // trigNTuple_->Branch("puWeight",  &puWeight_,  "puWeight/F");
-  // trigNTuple_->Branch("genWeight", &genWeight_, "genWeight/F");
-  // trigNTuple_->Branch("metFilters",&metFilters_,"metFilters/O");
-  // trigNTuple_->Branch("nJetsCentral20",&nJetsCentral20_,"nJetsCentral20/i");
-  // trigNTuple_->Branch("nJetsCentral30",&nJetsCentral30_,"nJetsCentral30/i");
-  // trigNTuple_->Branch("nJetsForward20",&nJetsForward20_,"nJetsForward20/i");
-  // trigNTuple_->Branch("nJetsForward30",&nJetsForward30_,"nJetsForward30/i");
+  TTree * trigNTuple_ = new TTree("TriggerNTuple","TriggerNTuple");
+  trigNTuple_->Branch("event",&event_,"event/i");
+  trigNTuple_->Branch("run",  &run_,  "run/i");
+  trigNTuple_->Branch("luminosityBlock", &lumi_,  "luminosityBlock/i");
+  trigNTuple_->Branch("trigger",&trigger_,"trigger/O");
+  trigNTuple_->Branch("NVert",&nVert_,"NVert/i");
+  trigNTuple_->Branch("metNoMu",&metNoMu_,"metNoMu/F");
+  trigNTuple_->Branch("mhtNoMu",&mhtNoMu_,"mhtNoMu/F");
+  trigNTuple_->Branch("metNoSelMu",&metNoSelMu_,"metNoSelMu/F");
+  trigNTuple_->Branch("mhtNoSelMu",&mhtNoSelMu_,"mhtNoSelMu/F");
+  trigNTuple_->Branch("IsW",&isWTrig_,"IsW/O");
+  trigNTuple_->Branch("IsZ",&isZTrig_,"IsZ/O");
+  trigNTuple_->Branch("nMuon",&nMuonTrig_,"nMuon/i");
+  trigNTuple_->Branch("nSelMuon",&nSelMuonTrig_,"nSelMuon/i");
+  trigNTuple_->Branch("npartons",&npartons_,"npartons/i");
+  trigNTuple_->Branch("npartonsNLO",&npartonsNLO_,"npartonsNLO/i");
+  trigNTuple_->Branch("lheWPt",&lheWPt_,"lheWPt/F");
+  trigNTuple_->Branch("met",&met_,"met/F");
+  trigNTuple_->Branch("mht",&mht_,"mht/F");
+  trigNTuple_->Branch("mtmuon",&mtmuon_,"mtmuon/F");
+  trigNTuple_->Branch("muonPt",&muonPt_,"muonPt/F");
+  trigNTuple_->Branch("muonEta",&muonEta_,"muonEta/F");
+  trigNTuple_->Branch("dPhiMetMuon",&dPhiMetMuon_,"dPhiMetMuon/F");
+  trigNTuple_->Branch("WMass",&wMass_,   "WMass/F");
+  trigNTuple_->Branch("puWeight",  &puWeight_,  "puWeight/F");
+  trigNTuple_->Branch("genWeight", &genWeight_, "genWeight/F");
+  trigNTuple_->Branch("metFilters",&metFilters_,"metFilters/O");
+  trigNTuple_->Branch("nJetsCentral20",&nJetsCentral20_,"nJetsCentral20/i");
+  trigNTuple_->Branch("nJetsCentral30",&nJetsCentral30_,"nJetsCentral30/i");
+  trigNTuple_->Branch("nJetsForward20",&nJetsForward20_,"nJetsForward20/i");
+  trigNTuple_->Branch("nJetsForward30",&nJetsForward30_,"nJetsForward30/i");
+  trigNTuple_->Branch("nElec",&nElec_,"nElec/i");
+  trigNTuple_->Branch("nSelTaus",&nSelTaus_,"nSelTaus/i");
+
+
 
   // project directory
   string cmsswBase = (getenv ("CMSSW_BASE"));
@@ -2189,6 +2193,7 @@ int main(int argc, char * argv[]) {
 
       if(trigEffMC !=0 ) trigWeight_ = trigEffData / trigEffMC;
       if(trigWeight_ < 0) trigWeight_=0;
+      if(mhtNoMu_<120 || metNoMu_< 120) trigWeight_=0;
 
       if (debug) {
 	cout << "MetNoMu  = " << metNoMu_
@@ -2203,10 +2208,10 @@ int main(int argc, char * argv[]) {
       // ********************************
       // **** filling trigger ntuple ****
       // ********************************
-      // if (ptTriggerMu>ptTrigMuCut) {
-      // 	trigNTuple_->Fill();
-      // 	TrigEvents++;
-      // }
+      if (ptTriggerMu>ptTrigMuCut && metNoMu_>120 && mhtNoMu_>120) {
+	trigNTuple_->Fill();
+	TrigEvents++;
+      }
       
       // ***************************
       // ******* WJet selection ****
