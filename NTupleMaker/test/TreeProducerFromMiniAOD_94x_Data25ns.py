@@ -38,7 +38,7 @@ process.options = cms.untracked.PSet(
 
 # How many events to process
 process.maxEvents = cms.untracked.PSet( 
-   input = cms.untracked.int32(100)
+   input = cms.untracked.int32(1000)
 )
 
 # Define the input source
@@ -79,6 +79,7 @@ from PhysicsTools.PatUtils.tools.runMETCorrectionsAndUncertainties import runMet
 runMetCorAndUncFromMiniAOD(process,
                            isData=runOnData,
                            fixEE2017 = True,
+                           fixEE2017Params = {'userawPt': True, 'PtThreshold':50.0, 'MinEtaThreshold':2.65, 'MaxEtaThreshold': 3.139} ,
                            postfix = "ModifiedMET"
                            )
 
