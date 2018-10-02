@@ -3,7 +3,7 @@
 # $2 - filelist 
 
 cat > $2.submit <<EOF
-+RequestRuntime=100000
++RequestRuntime=10000
 
 RequestMemory = 2000
 
