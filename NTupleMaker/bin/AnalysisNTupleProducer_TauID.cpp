@@ -150,7 +150,6 @@ int main(int argc, char * argv[]) {
   const float deltaPhiTauJetCut_DiJet     = cfg.get<float>("DeltaPhiTauJetCut_DiJet");
 
   // topological cuts (trigger study)
-  const float ZMassCut_Trig = cfg.get<float>("ZMassCut_Trig");
   const float mtCut_Trig = cfg.get<float>("MtCut_Trig");
 
   // trigger eff filename
@@ -202,7 +201,6 @@ int main(int argc, char * argv[]) {
   TH1D * WPtH       = new TH1D("WPtH",  "",100,0,1000);
   TH1D * WDecayH    = new TH1D("WTauDecayH","",5,-1.5,3.5);
   TH1D * WTauDecayH = new TH1D("WDecayH","",11,-1.5,9.5);
-  TH1D * nVerticesH = new TH1D("nVerticesH","",50,-0.5,49.5);
 
   // ntuple variables
 
@@ -281,7 +279,6 @@ int main(int argc, char * argv[]) {
   Float_t tauJetPhi_;
   Bool_t  tauJetTightId_;
 
-  Float_t recoilRatio_;
   Float_t recoilDPhi_;
 
   Float_t recoilJetRatio_;
@@ -539,7 +536,6 @@ int main(int argc, char * argv[]) {
   ntuple_->Branch("tauLeadingTrackDz",&tauLeadingTrackDz_,"tauLeadingTrackDz/F");
   ntuple_->Branch("tauLeadingTrackDxy",&tauLeadingTrackDxy_,"tauLeadingTrackDxy/F");
 
-  ntuple_->Branch("recoilRatio",&recoilRatio_,"recoilRatio/F");
   ntuple_->Branch("recoilDPhi",&recoilDPhi_,"recoilDPhi/F");
 
   ntuple_->Branch("recoilJetRatio",&recoilJetRatio_,"recoilJetRatio/F");
@@ -922,7 +918,6 @@ int main(int argc, char * argv[]) {
       tauJetPhi_ = 0;
       tauJetTightId_ = false;
 
-      recoilRatio_ = -1;
       recoilDPhi_ = 0;
 
       recoilJetRatio_ = -1;
@@ -1579,22 +1574,15 @@ int main(int argc, char * argv[]) {
 	  muon2Eta_ = lorentzVectorSecondMu.Eta();
 	  muon2Phi_ = lorentzVectorSecondMu.Phi();
 	  muon2Q_   = int(analysisTree.muon_charge[indexSecondMu]);
-	  float zmass = lorentzVectorZ.M();
-	  if (zmass>60&&zmass<120) nVerticesH->Fill(double(analysisTree.primvertex_count),weight_); // vertex distribution in Z->mumu
 	}
-	isZTrig_ = lorentzVectorZ.M()  > ZMassCut_Trig;
 	isWTrig_ = mtmuon_ >  mtCut_Trig;
       }
       float ptLeadingMu = ptTriggerMu;
       float ptTrailingMu = ptSecondMu;
-      //float etaLeadingMu = etaTriggerMu;
-      //float etaTrailingMu = etaSecondMu;
 
       if (ptTrailingMu>ptLeadingMu) {
 	ptLeadingMu = ptSecondMu;
 	ptTrailingMu = ptTriggerMu;
-	//etaLeadingMu = etaSecondMu;
-	//etaTrailingMu = etaTriggerMu;
       }
       // *****************************
       // **** end accessing muons ****
@@ -2023,8 +2011,6 @@ int main(int argc, char * argv[]) {
       nTaus20_ = tau20Indexes.size();
       nTaus30_ = tau30Indexes.size();
       nSelTaus_ = tauIndexes.size();
-      bool isSingleJet = nSelTaus_==1 && nJetsCentral30_<=1 && nJetsForward30_==0;
-      bool isNoJets    = nSelTaus_==0 && nJetsCentral30_==0 && nJetsForward30_==0;
       TLorentzVector lorentzVectorTau; lorentzVectorTau.SetXYZT(0,0,0,0);
       TLorentzVector lorentzVectorTauJet; lorentzVectorTauJet.SetXYZT(0,0,0,0);
       if (nSelTaus_>0) {
@@ -2217,7 +2203,6 @@ int main(int argc, char * argv[]) {
       // ******* WJet selection ****
       // ***************************
       if (lorentzVectorW.Pt()>1e-4) {
-	recoilRatio_ = tauPt_ / lorentzVectorW.Pt();
 	recoilDPhi_  = dPhiFromLV(lorentzVectorW,lorentzVectorTau);
 	recoilJetRatio_ = lorentzVectorTauJet.Pt()/lorentzVectorW.Pt();
 	recoilJetDPhi_ = dPhiFromLV(lorentzVectorW,lorentzVectorTauJet);
@@ -2228,7 +2213,6 @@ int main(int argc, char * argv[]) {
 	isWJet = isWJet && nElec_ == 0;
 	isWJet = isWJet && nSelTaus_ == 1;
 	isWJet = isWJet && nJetsCentral30_ == 1;
-	//isWJet = isWJet && nJetsForward30_ == 0;
 	isWJet = isWJet && tauPt_>100.;
 	isWJet = isWJet && abs(muonEta_)<2.1;
 	isWJet = isWJet && tauDM_;
@@ -2255,19 +2239,16 @@ int main(int argc, char * argv[]) {
       // ******* W*->MuNu selection *****
       // ********************************
       if (lorentzVectorMet.Pt()>1e-4) {
-	recoilRatio_ = ptTriggerMu/lorentzVectorMet.Pt();
 	recoilDPhi_  = dPhiFromLV(lorentzVectorTriggerMu,lorentzVectorMet);
 	recoilJetRatio_ = -1;
 	recoilJetDPhi_  = 0;
 	isWMuNu = ptTriggerMu>ptMuCut_WMuNu;
 	isWMuNu = isWMuNu && met_>metCut_WMuNu;
-	//isWMuNu = isWMuNu && recoilRatio_>ptMuMetRatioLowerCut_WMuNu && recoilRatio_<ptMuMetRatioUpperCut_WMuNu;
 	isWMuNu = isWMuNu && recoilDPhi_>deltaPhiMuMetCut_WMuNu;
 	isWMuNu = isWMuNu && nMuon_ == 1;
 	isWMuNu = isWMuNu && nElec_ == 0;
 	isWMuNu = isWMuNu && nSelTaus_ == 0;
 	//isWMuNu = isWMuNu && nJetsCentral30_ == 0;
-	//isWMuNu = isWMuNu && nJetsForward30_ == 0;
 	isWMuNu = isWMuNu && abs(muonEta_)<2.1;
 
 	if (isWMuNu) {
@@ -2291,12 +2272,10 @@ int main(int argc, char * argv[]) {
       // ****** W*->TauNu selection *****
       // ******************************** 
       if (lorentzVectorMet.Pt()>1e-4) {
-	recoilRatio_ = tauPt_ / lorentzVectorMet.Pt();
 	recoilDPhi_  = dPhiFromLV(lorentzVectorTau,lorentzVectorMet);
 	recoilJetRatio_ = lorentzVectorTauJet.Pt()/lorentzVectorMet.Pt();
 	recoilJetDPhi_ = dPhiFromLV(lorentzVectorMet,lorentzVectorTauJet);
 	isWTauNu = met_>metCut_WTauNu;
-	//	isWTauNu = isWTauNu && recoilRatio_>ptTauMetRatioLowerCut_WTauNu && recoilRatio_<ptTauMetRatioUpperCut_WTauNu;
 	isWTauNu = isWTauNu && recoilDPhi_>deltaPhiTauMetCut_WTauNu;
 	isWTauNu = isWTauNu && nSelTaus_ >= 1;
 	isWTauNu = isWTauNu && tauPt_>80;
@@ -2467,7 +2446,6 @@ int main(int argc, char * argv[]) {
 	    tauAntiMuonTight3_ = analysisTree.tau_againstMuonTight3[indexTau] > 0.5;
 
 
-	    recoilRatio_ = tauPt_/recoilJetLV.Pt();
 	    recoilDPhi_ = dPhiFromLV(tauLV,recoilJetLV);
 	    recoilJetRatio_ = lorentzVectorTauJet.Pt()/recoilJetLV.Pt();
 	    recoilJetDPhi_ = dPhiFromLV(lorentzVectorTauJet,recoilJetLV);
