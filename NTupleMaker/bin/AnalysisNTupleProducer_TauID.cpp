@@ -2285,6 +2285,7 @@ int main(int argc, char * argv[]) {
 	isWTauNu = isWTauNu && nMuon_ == 0;
 	isWTauNu = isWTauNu && nElec_ == 0;
 	isWTauNu = isWTauNu && tauDM_;
+	isWTauNu = isWTauNu && trigger_;
 
 	if (isWTauNu) {
 	  HtNoRecoil_     = Ht_;
