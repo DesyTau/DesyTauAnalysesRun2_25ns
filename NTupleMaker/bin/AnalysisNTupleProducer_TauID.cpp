@@ -2317,6 +2317,7 @@ int main(int argc, char * argv[]) {
 	  if(nSelTaus_!=1)       continue;
 	  if(nJetsCentral30_!=2) continue;
 	  if(analysisTree.tau_pt[indexTau]<ptTauCut_DiJet) continue;
+	  if(!pfJet60_ && !pfJet80_ && !pfJet140_ && !pfJet200_ && !pfJet260_ && !pfJet320_ && !pfJet400_ && !pfJet450_ ) continue;
 
 	  TLorentzVector tauLV; tauLV.SetXYZM(analysisTree.tau_px[indexTau],
 					      analysisTree.tau_py[indexTau],
