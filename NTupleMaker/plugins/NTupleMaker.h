@@ -314,7 +314,8 @@ class NTupleMaker : public edm::EDAnalyzer{
   //Configuration (steering cards)
 
   bool cdata;
-  bool cFastSim;
+  bool cembedded;
+  bool cFastSim;  
   unsigned int cYear;
   std::string cPeriod;
   unsigned int cSkim;

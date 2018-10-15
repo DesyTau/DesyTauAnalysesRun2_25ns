@@ -83,6 +83,7 @@ Int_t NTupleMaker::find_lep(const Int_t nlep, const Float_t px[], const Float_t 
 NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :  
   // data, year, period, skim
   cdata(iConfig.getUntrackedParameter<bool>("IsData", false)),
+  cembedded(iConfig.getUntrackedParameter<bool>("IsEmbedded", false)),
   cFastSim(iConfig.getUntrackedParameter<bool>("IsFastSim", false)),
   cYear(iConfig.getUntrackedParameter<unsigned int>("Year")),
   cPeriod(iConfig.getUntrackedParameter<std::string>("Period")),
@@ -853,131 +854,139 @@ void NTupleMaker::beginJob(){
   }
 
   // generator info
-  if (cgen && !cdata) {
-    tree->Branch("genweight", &genweight, "genweight/F");
-    tree->Branch("genid1", &genid1, "genid1/F");
-    tree->Branch("genx1", &genx1, "genx1/F");
-    tree->Branch("genid2", &genid2, "genid2/F");
-    tree->Branch("genx2", &genx2, "genx2/F");
-    tree->Branch("genScale", &genScale, "genScale/F");
 
-    for (int iScale=0; iScale<9; ++iScale) {
-      char number[4];
-      sprintf(number,"%1i",iScale);
-      TString Number(number);
-      tree->Branch("weightScale"+Number,&weightScale[iScale],"weightScale"+Number+"/F");
+  if (cgen) {
+
+    if (!cdata) {
+      tree->Branch("genid1", &genid1, "genid1/F");
+      tree->Branch("genx1", &genx1, "genx1/F");
+      tree->Branch("genid2", &genid2, "genid2/F");
+      tree->Branch("genx2", &genx2, "genx2/F");
+      tree->Branch("genScale", &genScale, "genScale/F");
+
+      for (int iScale=0; iScale<9; ++iScale) {
+	char number[4];
+	sprintf(number,"%1i",iScale);
+	TString Number(number);
+	tree->Branch("weightScale"+Number,&weightScale[iScale],"weightScale"+Number+"/F");
+      }
+
+      tree->Branch("weightPDFmax",&weightPDFmax,"weightPDFmax/F");
+      tree->Branch("weightPDFmin",&weightPDFmin,"weightPDFmin/F");
+      tree->Branch("weightPDFmean",&weightPDFmean,"weightPDFmean/F");
+      tree->Branch("weightPDFup",&weightPDFup,"weightPDFup/F");
+      tree->Branch("weightPDFdown",&weightPDFdown,"weightPDFdown/F");
+      tree->Branch("weightPDFvar",&weightPDFvar,"weightPDFvar/F");
+    
+      tree->Branch("numpileupinteractionsminus", &numpileupinteractionsminus, "numpileupinteractionsminus/I");
+      tree->Branch("numpileupinteractions", &numpileupinteractions, "numpileupinteractions/I");
+      tree->Branch("numpileupinteractionsplus", &numpileupinteractionsplus, "numpileupinteractionsplus/I");
+      tree->Branch("numtruepileupinteractions", &numtruepileupinteractions, "numtruepileupinteractions/F");
+      
     }
 
-    tree->Branch("weightPDFmax",&weightPDFmax,"weightPDFmax/F");
-    tree->Branch("weightPDFmin",&weightPDFmin,"weightPDFmin/F");
-    tree->Branch("weightPDFmean",&weightPDFmean,"weightPDFmean/F");
-    tree->Branch("weightPDFup",&weightPDFup,"weightPDFup/F");
-    tree->Branch("weightPDFdown",&weightPDFdown,"weightPDFdown/F");
-    tree->Branch("weightPDFvar",&weightPDFvar,"weightPDFvar/F");
+    if (!cdata || cembedded) {
+
+      tree->Branch("genweight", &genweight, "genweight/F");
+      
+      // generated taus
+      tree->Branch("gentau_count", &gentau_count, "gentau_count/i");
+      tree->Branch("gentau_e",  gentau_e,  "tau_e[gentau_count]/F");
+      tree->Branch("gentau_charge",  gentau_charge,  "tau_charge[gentau_count]/F");
+      tree->Branch("gentau_px", gentau_px, "tau_px[gentau_count]/F");
+      tree->Branch("gentau_py", gentau_py, "tau_py[gentau_count]/F");
+      tree->Branch("gentau_pz", gentau_pz, "tau_pz[gentau_count]/F");
+      
+      tree->Branch("gentau_visible_e",  gentau_visible_e,  "tau_visible_e[gentau_count]/F");
+      tree->Branch("gentau_visible_px", gentau_visible_px, "tau_visible_px[gentau_count]/F");
+      tree->Branch("gentau_visible_py", gentau_visible_py, "tau_visible_py[gentau_count]/F");
+      tree->Branch("gentau_visible_pz", gentau_visible_pz, "tau_visible_pz[gentau_count]/F");
+      
+      tree->Branch("gentau_visible_pt",  gentau_visible_pt,  "tau_visible_pt[gentau_count]/F");
+      tree->Branch("gentau_visible_eta", gentau_visible_eta, "tau_visible_eta[gentau_count]/F");
+      tree->Branch("gentau_visible_phi", gentau_visible_phi, "tau_visible_phi[gentau_count]/F");
+      tree->Branch("gentau_visible_mass", gentau_visible_mass, "tau_visible_mass[gentau_count]/F");
+
+      tree->Branch("gentau_visibleNoLep_e",  gentau_visibleNoLep_e,  "tau_visibleNoLep_e[gentau_count]/F");
+      tree->Branch("gentau_visibleNoLep_px", gentau_visibleNoLep_px, "tau_visibleNoLep_px[gentau_count]/F");
+      tree->Branch("gentau_visibleNoLep_py", gentau_visibleNoLep_py, "tau_visibleNoLep_py[gentau_count]/F");
+      tree->Branch("gentau_visibleNoLep_pz", gentau_visibleNoLep_pz, "tau_visibleNoLep_pz[gentau_count]/F");
+      
+      tree->Branch("gentau_visibleNoLep_pt",  gentau_visibleNoLep_pt,  "tau_visibleNoLep_pt[gentau_count]/F");
+      tree->Branch("gentau_visibleNoLep_eta", gentau_visibleNoLep_eta, "tau_visibleNoLep_eta[gentau_count]/F");
+      tree->Branch("gentau_visibleNoLep_phi", gentau_visibleNoLep_phi, "tau_visibleNoLep_phi[gentau_count]/F");
+      tree->Branch("gentau_visibleNoLep_mass", gentau_visibleNoLep_mass, "tau_visibleNoLep_mass[gentau_count]/F");
     
-    tree->Branch("numpileupinteractionsminus", &numpileupinteractionsminus, "numpileupinteractionsminus/I");
-    tree->Branch("numpileupinteractions", &numpileupinteractions, "numpileupinteractions/I");
-    tree->Branch("numpileupinteractionsplus", &numpileupinteractionsplus, "numpileupinteractionsplus/I");
-    tree->Branch("numtruepileupinteractions", &numtruepileupinteractions, "numtruepileupinteractions/F");
+      tree->Branch("gentau_status", gentau_status, "gentau_status[gentau_count]/I");
+      tree->Branch("gentau_fromHardProcess", gentau_fromHardProcess, "gentau_fromHardProcess[gentau_count]/I");
+      tree->Branch("gentau_fromHardProcessBeforeFSR", gentau_fromHardProcessBeforeFSR, "gentau_fromHardProcessBeforeFSR[gentau_count]/I");
+      tree->Branch("gentau_isDecayedLeptonHadron", gentau_isDecayedLeptonHadron, "gentau_isDecayedLeptonHadron[gentau_count]/I");
+      tree->Branch("gentau_isDirectHadronDecayProduct", gentau_isDirectHadronDecayProduct, "gentau_isDirectHadronDecayProduct[gentau_count]/I");
+      tree->Branch("gentau_isDirectHardProcessTauDecayProduct", gentau_isDirectHardProcessTauDecayProduct, "gentau_isDirectHardProcessTauDecayProduct[gentau_count]/I");
+      tree->Branch("gentau_isDirectPromptTauDecayProduct", gentau_isDirectPromptTauDecayProduct, "gentau_isDirectPromptTauDecayProduct[gentau_count]/I");
+      tree->Branch("gentau_isDirectTauDecayProduct", gentau_isDirectTauDecayProduct, "gentau_isDirectTauDecayProduct[gentau_count]/I");
+      tree->Branch("gentau_isFirstCopy", gentau_isFirstCopy, "gentau_isFirstCopy[gentau_count]/I");
+      tree->Branch("gentau_isHardProcess", gentau_isHardProcess, "gentau_isHardProcess[gentau_count]/I");
+      tree->Branch("gentau_isHardProcessTauDecayProduct", gentau_isHardProcessTauDecayProduct, "gentau_isHardProcessTauDecayProduct[gentau_count]/I");
+      tree->Branch("gentau_isLastCopy", gentau_isLastCopy, "gentau_isLastCopy[gentau_count]/I");
+      tree->Branch("gentau_isLastCopyBeforeFSR", gentau_isLastCopyBeforeFSR, "gentau_isLastCopyBeforeFSR[gentau_count]/I");
+      tree->Branch("gentau_isPrompt", gentau_isPrompt, "gentau_isPrompt[gentau_count]/I");
+      tree->Branch("gentau_isPromptTauDecayProduct", gentau_isPromptTauDecayProduct, "gentau_isPromptTauDecayProduct[gentau_count]/I");
+      tree->Branch("gentau_isTauDecayProduct", gentau_isTauDecayProduct, "gentau_isTauDecayProduct[gentau_count]/I");
+      
+      tree->Branch("gentau_decayMode",  gentau_decayMode,  "tau_decayMode[gentau_count]/I");
+      tree->Branch("gentau_decayMode_name",  gentau_decayMode_name,  "tau_decayMode_name[gentau_count]/C");
+      tree->Branch("gentau_mother",gentau_mother,"gentau_mother[gentau_count]/b");
 
-    // generated taus
-    tree->Branch("gentau_count", &gentau_count, "gentau_count/i");
-    tree->Branch("gentau_e",  gentau_e,  "tau_e[gentau_count]/F");
-    tree->Branch("gentau_charge",  gentau_charge,  "tau_charge[gentau_count]/F");
-    tree->Branch("gentau_px", gentau_px, "tau_px[gentau_count]/F");
-    tree->Branch("gentau_py", gentau_py, "tau_py[gentau_count]/F");
-    tree->Branch("gentau_pz", gentau_pz, "tau_pz[gentau_count]/F");
+      // generated particles
+      tree->Branch("genparticles_lheHt", &genparticles_lheHt, "genparticles_lheHt/F");
+      tree->Branch("genparticles_lheWPt", &genparticles_lheWPt, "genparticles_lheWPt/F");
+      tree->Branch("genparticles_noutgoing", &genparticles_noutgoing, "genparticles_noutgoing/i");
+      tree->Branch("genparticles_noutgoing_NLO", &genparticles_noutgoing_NLO, "genparticles_noutgoing_NLO/I");
+      tree->Branch("genparticles_count", &genparticles_count, "genparticles_count/i");
+      tree->Branch("genparticles_e", genparticles_e, "genparticles_e[genparticles_count]/F");
+      tree->Branch("genparticles_px", genparticles_px, "genparticles_px[genparticles_count]/F");
+      tree->Branch("genparticles_py", genparticles_py, "genparticles_py[genparticles_count]/F");
+      tree->Branch("genparticles_pz", genparticles_pz, "genparticles_pz[genparticles_count]/F");
+      tree->Branch("genparticles_vx", genparticles_vx, "genparticles_vx[genparticles_count]/F");
+      tree->Branch("genparticles_vy", genparticles_vy, "genparticles_vy[genparticles_count]/F");
+      tree->Branch("genparticles_vz", genparticles_vz, "genparticles_vz[genparticles_count]/F");
+      tree->Branch("genparticles_pdgid", genparticles_pdgid, "genparticles_pdgid[genparticles_count]/I");
+      tree->Branch("genparticles_status", genparticles_status, "genparticles_status[genparticles_count]/I");
+      tree->Branch("genparticles_info", genparticles_info, "genparticles_info[genparticles_count]/i");
 
-    tree->Branch("gentau_visible_e",  gentau_visible_e,  "tau_visible_e[gentau_count]/F");
-    tree->Branch("gentau_visible_px", gentau_visible_px, "tau_visible_px[gentau_count]/F");
-    tree->Branch("gentau_visible_py", gentau_visible_py, "tau_visible_py[gentau_count]/F");
-    tree->Branch("gentau_visible_pz", gentau_visible_pz, "tau_visible_pz[gentau_count]/F");
+      tree->Branch("genparticles_fromHardProcess", genparticles_fromHardProcess, "genparticles_fromHardProcess[genparticles_count]/I");
+      tree->Branch("genparticles_fromHardProcessBeforeFSR", genparticles_fromHardProcessBeforeFSR, "genparticles_fromHardProcessBeforeFSR[genparticles_count]/I");
+      tree->Branch("genparticles_isDecayedLeptonHadron", genparticles_isDecayedLeptonHadron, "genparticles_isDecayedLeptonHadron[genparticles_count]/I");
+      tree->Branch("genparticles_isDirectHadronDecayProduct", genparticles_isDirectHadronDecayProduct, "genparticles_isDirectHadronDecayProduct[genparticles_count]/I");
+      tree->Branch("genparticles_isDirectHardProcessTauDecayProduct", genparticles_isDirectHardProcessTauDecayProduct, "genparticles_isDirectHardProcessTauDecayProduct[genparticles_count]/I");
+      tree->Branch("genparticles_isDirectPromptTauDecayProduct", genparticles_isDirectPromptTauDecayProduct, "genparticles_isDirectPromptTauDecayProduct[genparticles_count]/I");
+      tree->Branch("genparticles_isDirectTauDecayProduct", genparticles_isDirectTauDecayProduct, "genparticles_isDirectTauDecayProduct[genparticles_count]/I");
+      tree->Branch("genparticles_isFirstCopy", genparticles_isFirstCopy, "genparticles_isFirstCopy[genparticles_count]/I");
+      tree->Branch("genparticles_isHardProcess", genparticles_isHardProcess, "genparticles_isHardProcess[genparticles_count]/I");
+      tree->Branch("genparticles_isHardProcessTauDecayProduct", genparticles_isHardProcessTauDecayProduct, "genparticles_isHardProcessTauDecayProduct[genparticles_count]/I");
+      tree->Branch("genparticles_isLastCopy", genparticles_isLastCopy, "genparticles_isLastCopy[genparticles_count]/I");
+      tree->Branch("genparticles_isLastCopyBeforeFSR", genparticles_isLastCopyBeforeFSR, "genparticles_isLastCopyBeforeFSR[genparticles_count]/I");
+      tree->Branch("genparticles_isPrompt", genparticles_isPrompt, "genparticles_isPrompt[genparticles_count]/I");
+      tree->Branch("genparticles_isPromptTauDecayProduct", genparticles_isPromptTauDecayProduct, "genparticles_isPromptTauDecayProduct[genparticles_count]/I");
+      tree->Branch("genparticles_isTauDecayProduct", genparticles_isTauDecayProduct, "genparticles_isTauDecayProduct[genparticles_count]/I");
+      tree->Branch("genparticles_mother", genparticles_mother, "genparticles_mother[genparticles_count]/b");
 
-    tree->Branch("gentau_visible_pt",  gentau_visible_pt,  "tau_visible_pt[gentau_count]/F");
-    tree->Branch("gentau_visible_eta", gentau_visible_eta, "tau_visible_eta[gentau_count]/F");
-    tree->Branch("gentau_visible_phi", gentau_visible_phi, "tau_visible_phi[gentau_count]/F");
-    tree->Branch("gentau_visible_mass", gentau_visible_mass, "tau_visible_mass[gentau_count]/F");
-
-    tree->Branch("gentau_visibleNoLep_e",  gentau_visibleNoLep_e,  "tau_visibleNoLep_e[gentau_count]/F");
-    tree->Branch("gentau_visibleNoLep_px", gentau_visibleNoLep_px, "tau_visibleNoLep_px[gentau_count]/F");
-    tree->Branch("gentau_visibleNoLep_py", gentau_visibleNoLep_py, "tau_visibleNoLep_py[gentau_count]/F");
-    tree->Branch("gentau_visibleNoLep_pz", gentau_visibleNoLep_pz, "tau_visibleNoLep_pz[gentau_count]/F");
-
-    tree->Branch("gentau_visibleNoLep_pt",  gentau_visibleNoLep_pt,  "tau_visibleNoLep_pt[gentau_count]/F");
-    tree->Branch("gentau_visibleNoLep_eta", gentau_visibleNoLep_eta, "tau_visibleNoLep_eta[gentau_count]/F");
-    tree->Branch("gentau_visibleNoLep_phi", gentau_visibleNoLep_phi, "tau_visibleNoLep_phi[gentau_count]/F");
-    tree->Branch("gentau_visibleNoLep_mass", gentau_visibleNoLep_mass, "tau_visibleNoLep_mass[gentau_count]/F");
-    
-    tree->Branch("gentau_status", gentau_status, "gentau_status[gentau_count]/I");
-    tree->Branch("gentau_fromHardProcess", gentau_fromHardProcess, "gentau_fromHardProcess[gentau_count]/I");
-    tree->Branch("gentau_fromHardProcessBeforeFSR", gentau_fromHardProcessBeforeFSR, "gentau_fromHardProcessBeforeFSR[gentau_count]/I");
-    tree->Branch("gentau_isDecayedLeptonHadron", gentau_isDecayedLeptonHadron, "gentau_isDecayedLeptonHadron[gentau_count]/I");
-    tree->Branch("gentau_isDirectHadronDecayProduct", gentau_isDirectHadronDecayProduct, "gentau_isDirectHadronDecayProduct[gentau_count]/I");
-    tree->Branch("gentau_isDirectHardProcessTauDecayProduct", gentau_isDirectHardProcessTauDecayProduct, "gentau_isDirectHardProcessTauDecayProduct[gentau_count]/I");
-    tree->Branch("gentau_isDirectPromptTauDecayProduct", gentau_isDirectPromptTauDecayProduct, "gentau_isDirectPromptTauDecayProduct[gentau_count]/I");
-    tree->Branch("gentau_isDirectTauDecayProduct", gentau_isDirectTauDecayProduct, "gentau_isDirectTauDecayProduct[gentau_count]/I");
-    tree->Branch("gentau_isFirstCopy", gentau_isFirstCopy, "gentau_isFirstCopy[gentau_count]/I");
-    tree->Branch("gentau_isHardProcess", gentau_isHardProcess, "gentau_isHardProcess[gentau_count]/I");
-    tree->Branch("gentau_isHardProcessTauDecayProduct", gentau_isHardProcessTauDecayProduct, "gentau_isHardProcessTauDecayProduct[gentau_count]/I");
-    tree->Branch("gentau_isLastCopy", gentau_isLastCopy, "gentau_isLastCopy[gentau_count]/I");
-    tree->Branch("gentau_isLastCopyBeforeFSR", gentau_isLastCopyBeforeFSR, "gentau_isLastCopyBeforeFSR[gentau_count]/I");
-    tree->Branch("gentau_isPrompt", gentau_isPrompt, "gentau_isPrompt[gentau_count]/I");
-    tree->Branch("gentau_isPromptTauDecayProduct", gentau_isPromptTauDecayProduct, "gentau_isPromptTauDecayProduct[gentau_count]/I");
-    tree->Branch("gentau_isTauDecayProduct", gentau_isTauDecayProduct, "gentau_isTauDecayProduct[gentau_count]/I");
-
-    tree->Branch("gentau_decayMode",  gentau_decayMode,  "tau_decayMode[gentau_count]/I");
-    tree->Branch("gentau_decayMode_name",  gentau_decayMode_name,  "tau_decayMode_name[gentau_count]/C");
-    tree->Branch("gentau_mother",gentau_mother,"gentau_mother[gentau_count]/b");
-
-    // generated particles
-    tree->Branch("genparticles_lheHt", &genparticles_lheHt, "genparticles_lheHt/F");
-    tree->Branch("genparticles_lheWPt", &genparticles_lheWPt, "genparticles_lheWPt/F");
-    tree->Branch("genparticles_noutgoing", &genparticles_noutgoing, "genparticles_noutgoing/i");
-    tree->Branch("genparticles_noutgoing_NLO", &genparticles_noutgoing_NLO, "genparticles_noutgoing_NLO/I");
-    tree->Branch("genparticles_count", &genparticles_count, "genparticles_count/i");
-    tree->Branch("genparticles_e", genparticles_e, "genparticles_e[genparticles_count]/F");
-    tree->Branch("genparticles_px", genparticles_px, "genparticles_px[genparticles_count]/F");
-    tree->Branch("genparticles_py", genparticles_py, "genparticles_py[genparticles_count]/F");
-    tree->Branch("genparticles_pz", genparticles_pz, "genparticles_pz[genparticles_count]/F");
-    tree->Branch("genparticles_vx", genparticles_vx, "genparticles_vx[genparticles_count]/F");
-    tree->Branch("genparticles_vy", genparticles_vy, "genparticles_vy[genparticles_count]/F");
-    tree->Branch("genparticles_vz", genparticles_vz, "genparticles_vz[genparticles_count]/F");
-    tree->Branch("genparticles_pdgid", genparticles_pdgid, "genparticles_pdgid[genparticles_count]/I");
-    tree->Branch("genparticles_status", genparticles_status, "genparticles_status[genparticles_count]/I");
-    tree->Branch("genparticles_info", genparticles_info, "genparticles_info[genparticles_count]/i");
-
-    tree->Branch("genparticles_fromHardProcess", genparticles_fromHardProcess, "genparticles_fromHardProcess[genparticles_count]/I");
-    tree->Branch("genparticles_fromHardProcessBeforeFSR", genparticles_fromHardProcessBeforeFSR, "genparticles_fromHardProcessBeforeFSR[genparticles_count]/I");
-    tree->Branch("genparticles_isDecayedLeptonHadron", genparticles_isDecayedLeptonHadron, "genparticles_isDecayedLeptonHadron[genparticles_count]/I");
-    tree->Branch("genparticles_isDirectHadronDecayProduct", genparticles_isDirectHadronDecayProduct, "genparticles_isDirectHadronDecayProduct[genparticles_count]/I");
-    tree->Branch("genparticles_isDirectHardProcessTauDecayProduct", genparticles_isDirectHardProcessTauDecayProduct, "genparticles_isDirectHardProcessTauDecayProduct[genparticles_count]/I");
-    tree->Branch("genparticles_isDirectPromptTauDecayProduct", genparticles_isDirectPromptTauDecayProduct, "genparticles_isDirectPromptTauDecayProduct[genparticles_count]/I");
-    tree->Branch("genparticles_isDirectTauDecayProduct", genparticles_isDirectTauDecayProduct, "genparticles_isDirectTauDecayProduct[genparticles_count]/I");
-    tree->Branch("genparticles_isFirstCopy", genparticles_isFirstCopy, "genparticles_isFirstCopy[genparticles_count]/I");
-    tree->Branch("genparticles_isHardProcess", genparticles_isHardProcess, "genparticles_isHardProcess[genparticles_count]/I");
-    tree->Branch("genparticles_isHardProcessTauDecayProduct", genparticles_isHardProcessTauDecayProduct, "genparticles_isHardProcessTauDecayProduct[genparticles_count]/I");
-    tree->Branch("genparticles_isLastCopy", genparticles_isLastCopy, "genparticles_isLastCopy[genparticles_count]/I");
-    tree->Branch("genparticles_isLastCopyBeforeFSR", genparticles_isLastCopyBeforeFSR, "genparticles_isLastCopyBeforeFSR[genparticles_count]/I");
-    tree->Branch("genparticles_isPrompt", genparticles_isPrompt, "genparticles_isPrompt[genparticles_count]/I");
-    tree->Branch("genparticles_isPromptTauDecayProduct", genparticles_isPromptTauDecayProduct, "genparticles_isPromptTauDecayProduct[genparticles_count]/I");
-    tree->Branch("genparticles_isTauDecayProduct", genparticles_isTauDecayProduct, "genparticles_isTauDecayProduct[genparticles_count]/I");
-    tree->Branch("genparticles_mother", genparticles_mother, "genparticles_mother[genparticles_count]/b");
-
-    tree->Branch("genjets_count", &genjets_count, "genjets_count/i");
-    tree->Branch("genjets_e", genjets_e, "genjets_e[genjets_count]/F");
-    tree->Branch("genjets_px", genjets_px, "genjets_px[genjets_count]/F");
-    tree->Branch("genjets_py", genjets_py, "genjets_py[genjets_count]/F");
-    tree->Branch("genjets_pz", genjets_pz, "genjets_pz[genjets_count]/F");
-    tree->Branch("genjets_pt", genjets_pt, "genjets_pt[genjets_count]/F");
-    tree->Branch("genjets_eta", genjets_eta, "genjets_eta[genjets_count]/F");
-    tree->Branch("genjets_phi", genjets_phi, "genjets_phi[genjets_count]/F");
-    tree->Branch("genjets_pdgid", genjets_pdgid, "genjets_pdgid[genjets_count]/I");
-    tree->Branch("genjets_status", genjets_status, "genjets_status[genjets_count]/I");
-    tree->Branch("genjets_em_energy", genjets_em_energy, "genjets_em_energy[genjets_count]/F");
-    tree->Branch("genjets_had_energy", genjets_had_energy, "genjets_had_energy[genjets_count]/F");
-    tree->Branch("genjets_invisible_energy", genjets_invisible_energy, "genjets_invisible_energy[genjets_count]/F");
-    tree->Branch("genjets_auxiliary_energy", genjets_auxiliary_energy, "genjets_auxiliary_energy[genjets_count]/F");
-
+      tree->Branch("genjets_count", &genjets_count, "genjets_count/i");
+      tree->Branch("genjets_e", genjets_e, "genjets_e[genjets_count]/F");
+      tree->Branch("genjets_px", genjets_px, "genjets_px[genjets_count]/F");
+      tree->Branch("genjets_py", genjets_py, "genjets_py[genjets_count]/F");
+      tree->Branch("genjets_pz", genjets_pz, "genjets_pz[genjets_count]/F");
+      tree->Branch("genjets_pt", genjets_pt, "genjets_pt[genjets_count]/F");
+      tree->Branch("genjets_eta", genjets_eta, "genjets_eta[genjets_count]/F");
+      tree->Branch("genjets_phi", genjets_phi, "genjets_phi[genjets_count]/F");
+      tree->Branch("genjets_pdgid", genjets_pdgid, "genjets_pdgid[genjets_count]/I");
+      tree->Branch("genjets_status", genjets_status, "genjets_status[genjets_count]/I");
+      tree->Branch("genjets_em_energy", genjets_em_energy, "genjets_em_energy[genjets_count]/F");
+      tree->Branch("genjets_had_energy", genjets_had_energy, "genjets_had_energy[genjets_count]/F");
+      tree->Branch("genjets_invisible_energy", genjets_invisible_energy, "genjets_invisible_energy[genjets_count]/F");
+      tree->Branch("genjets_auxiliary_energy", genjets_auxiliary_energy, "genjets_auxiliary_energy[genjets_count]/F");
+    }
   }    
   // SUSY Info
   if (csusyinfo) {
@@ -2184,6 +2193,12 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 
   // generator info and generated particles 
   if(doDebug)  cout<<"add gen info"<< endl; 
+  if(cembedded) {
+    bool haveGenParticles = AddGenParticles(iEvent);
+    edm::Handle<GenEventInfoProduct> GenEventInfo;
+    iEvent.getByLabel(edm::InputTag("generator"), GenEventInfo);
+    genweight = GenEventInfo->weight();
+  }
   if(cgen && !cdata)
     {
       AddLHEInformation(iEvent);
@@ -3017,7 +3032,7 @@ unsigned int NTupleMaker::AddMuons(const edm::Event& iEvent, const edm::EventSet
 	//	muon_isMedium[muon_count] =  muon_isLoose[muon_count] && muon_validFraction[muon_count] > 0.8 && muon_segmentComp[muon_count] > (goodGlb ? 0.303 : 0.451);
 
 	muon_genmatch[muon_count] = 0;
-	if(cgen && !cdata){
+	if(cgen && (!cdata || cembedded)){
 	  edm::Handle<reco::GenParticleCollection> GenParticles;
 	  iEvent.getByToken(GenParticleCollectionToken_, GenParticles);
 	  if(GenParticles.isValid())
@@ -3782,7 +3797,7 @@ unsigned int NTupleMaker::AddTaus(const edm::Event& iEvent, const edm::EventSetu
 	  tau_ntracks_pt1[tau_count]  = 0;
 
 	  tau_genmatch[tau_count] = 0;
-	  if(cgen && !cdata){
+	  if(cgen && (!cdata || cembedded)){
 	    edm::Handle<reco::GenParticleCollection> GenParticles;
 	    iEvent.getByToken(GenParticleCollectionToken_, GenParticles);
 	    if(GenParticles.isValid()) tau_genmatch[tau_count] = utils_genMatch::genMatch( (*Taus)[i].p4(), *GenParticles);
@@ -4247,7 +4262,7 @@ unsigned int NTupleMaker::AddElectrons(const edm::Event& iEvent, const edm::Even
 	  //	  std::cout << "  passed conversion veto = " << electron_pass_conversion[electron_count] << std::endl;
 
 	  electron_genmatch[electron_count] = 0;
-	  if(cgen && !cdata){
+	  if(cgen && (!cdata || cembedded)){
 	    edm::Handle<reco::GenParticleCollection> GenParticles;
 	    iEvent.getByToken(GenParticleCollectionToken_, GenParticles);
 	    if(GenParticles.isValid())
