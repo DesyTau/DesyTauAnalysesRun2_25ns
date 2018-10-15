@@ -133,6 +133,7 @@ int main(int argc, char * argv[]) {
   const bool applyPUreweighting_official = cfg.get<bool>("ApplyPUreweighting_official");
 
   const bool applyLeptonSF = cfg.get<bool>("ApplyLeptonSF");
+  const bool applyKITCorrection = cfg.get<bool>("ApplyKITCorrection");
   const bool applyRecoilCorrections = cfg.get<bool>("ApplyRecoilCorrections");
   const bool applyRecoilOnGenerator = cfg.get<bool>("ApplyRecoilOnGenerator");
   const bool applySimpleRecoilCorrections = cfg.get<bool>("ApplySimpleRecoilCorrections");
@@ -598,8 +599,6 @@ int main(int argc, char * argv[]) {
     PUofficial->set_h_data(PU_data); 
     PUofficial->set_h_MC(PU_mc);
   }
-  std::cout << "PU file successfully opened" << std::endl;
-
 
   // HTT Met recoil corrections
   RecoilCorrector recoilPFMetCorrector(RecoilFileName);
@@ -614,12 +613,10 @@ int main(int argc, char * argv[]) {
     SF_muonTrig = new ScaleFactor();
     SF_muonTrig->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(MuonTrigFile));
   }
-  std::cout << "lepton SF provider is ucessfully initialized" << std::endl;
 
   // tracking efficiency SF
   TFile * workspaceFile = new TFile(TString(cmsswBase)+"/src/"+CorrectionWorkspaceFile);
   RooWorkspace *correctionWS = (RooWorkspace*)workspaceFile->Get("w");
-  std::cout << "correction workspace is successfully opened" << std::endl;
 
   // Z mass pt weights
   TFile * fileZMassPtWeights = new TFile(TString(cmsswBase)+"/src/"+ZMassPtWeightsFileName); 
@@ -1309,6 +1306,10 @@ int main(int argc, char * argv[]) {
 	  // pfJetId
 	  bool isPFJetId = tightJetiD_2017(analysisTree,int(jet));
 	  if (!isPFJetId) continue;
+
+	  bool noisyJet = analysisTree.pfjet_pt[jet]<50 && absJetEta > 2.65 && absJetEta < 3.139;
+
+	  if (noisyJet) continue;
 	  
 	  if (analysisTree.pfjet_pt[jet]>jetPtHighCut) {
 	    nJets30++;
@@ -1453,10 +1454,15 @@ int main(int argc, char * argv[]) {
 	  correctionWS->var("m_eta")->setVal(etaMu1);
 	  correctionWS->var("m_pt")->setVal(ptMu1);
 	  double trackSF_mu1 = correctionWS->function("m_trk_ratio")->getVal();
+	  if (applyKITCorrection)
+	    IdIsoSF_mu1 = correctionWS->function("m_id_ratio")->getVal()*correctionWS->function("m_iso_ratio")->getVal();
+
 
 	  correctionWS->var("m_eta")->setVal(etaMu2);
           correctionWS->var("m_pt")->setVal(ptMu2);
 	  double trackSF_mu2 = correctionWS->function("m_trk_ratio")->getVal();
+	  if (applyKITCorrection)
+	    IdIsoSF_mu2 = correctionWS->function("m_id_ratio")->getVal()*correctionWS->function("m_iso_ratio")->getVal();
 
 	  MuSF_IdIso_Mu1H->Fill(IdIsoSF_mu1);
 	  MuSF_IdIso_Mu2H->Fill(IdIsoSF_mu2);
@@ -1657,6 +1663,11 @@ int main(int argc, char * argv[]) {
 
 	    nJets20BTagLooseZSelH->Fill(double(nJets20BTagLoose),weight);
 	    nJets20BTagMediumZSelH->Fill(double(nJets20BTagMedium),weight);
+
+	    nJets30ZSelH->Fill(double(nJets30),weight);
+	    nJets20ZSelH->Fill(double(nJets20),weight);
+	    nJets30etaCutZSelH->Fill(double(nJets30etaCut),weight);
+	    nJets20etaCutZSelH->Fill(double(nJets20etaCut),weight);
 
 	    if (nJets30>0) {
 	      leadingJetPtH->Fill(ptLeadingJet,weight);
