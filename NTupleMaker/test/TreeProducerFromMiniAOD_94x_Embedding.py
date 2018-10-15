@@ -47,8 +47,9 @@ process.source = cms.Source("PoolSource",
         #'/store/data/Run2017F/SingleMuon/MINIAOD/17Nov2017-v1/70001/482D748C-46EB-E711-B13F-FA163EC94FD9.root',
         #'/store/data/Run2017F/SingleMuon/MINIAOD/17Nov2017-v1/70001/4893E924-46EB-E711-AB19-1866DA85E0F8.root',
         #'/store/data/Run2017F/SingleMuon/MINIAOD/17Nov2017-v1/70001/4C4C024D-75EB-E711-9286-A4BF01025C16.root',
-        '/store/data/Run2017B/SingleMuon/MINIAOD/31Mar2018-v1/100000/1E2B3868-DF38-E811-912C-003048FFD798.root',
-        '/store/data/Run2017F/SingleMuon/MINIAOD/31Mar2018-v1/30003/0615E7CA-9337-E811-83E8-1C6A7A2634E3.root',
+        #'/store/data/Run2017B/SingleMuon/MINIAOD/31Mar2018-v1/100000/1E2B3868-DF38-E811-912C-003048FFD798.root',
+        #'/store/data/Run2017F/SingleMuon/MINIAOD/31Mar2018-v1/30003/0615E7CA-9337-E811-83E8-1C6A7A2634E3.root',
+        '/store/user/sbrommer/gc_storage/ElMu_data_2017_CMSSW944/TauEmbedding_ElMu_data_2017_CMSSW944_Run2017E/99/merged_9998.root_'
         ),
   skipEvents = cms.untracked.uint32(0)
 )
@@ -159,12 +160,12 @@ GenJets = cms.untracked.bool(not isData)
 process.makeroottree = cms.EDAnalyzer("NTupleMaker",
 # data, year, period, skim
 IsData = cms.untracked.bool(isData),
-IsEmbedded = cms.untracked.bool(False),
+IsEmbedded = cms.untracked.bool(True),
 Year = cms.untracked.uint32(year),
 Period = cms.untracked.string(period),
 Skim = cms.untracked.uint32(0),
 # switches of collections
-GenParticles = cms.untracked.bool(not isData),
+GenParticles = cms.untracked.bool(True),
 GenJets = cms.untracked.bool(not isData),
 SusyInfo = cms.untracked.bool(False),
 Trigger = cms.untracked.bool(True),
@@ -184,7 +185,7 @@ RecJet = cms.untracked.bool(True),
 # collections
 MuonCollectionTag = cms.InputTag("slimmedMuons"), 
 ElectronCollectionTag = cms.InputTag("slimmedElectrons"),
-applyElectronESShift = cms.untracked.bool(True),
+applyElectronESShift = cms.untracked.bool(False),
 #######new in 9.4.0
 eleMvanoIsoWP90Fall17Map = cms.InputTag("egmGsfElectronIDs:mvaEleID-Fall17-noIso-V1-wp90"),
 eleMvanoIsoWP80Fall17Map = cms.InputTag("egmGsfElectronIDs:mvaEleID-Fall17-noIso-V1-wp80"),
@@ -314,7 +315,7 @@ HLTriggerPaths = cms.untracked.vstring(
 'HLT_DiPFJetAve400_',
 'HLT_DiPFJetAve500_'
 ),
-TriggerProcess = cms.untracked.string("HLT"),
+TriggerProcess = cms.untracked.string("SIMembedding"),
 Flags = cms.untracked.vstring(
   'Flag_HBHENoiseFilter',
   'Flag_HBHENoiseIsoFilter',
