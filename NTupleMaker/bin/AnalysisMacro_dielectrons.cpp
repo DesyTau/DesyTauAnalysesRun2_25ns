@@ -36,6 +36,8 @@
 #include "RooAbsReal.h"
 #include "RooRealVar.h"
 
+#include "DesyTauAnalyses/NTupleMaker/interface/functionsSynch2017.h"
+
 float topPtWeight(float pt1,
 		  float pt2) {
 
@@ -318,6 +320,28 @@ int main(int argc, char * argv[]) {
   TH1D * recoilPuppiResponse_Ptbins_nJetsH[3][5];
   
   for (int iJets=0; iJets<nJetBins; ++iJets) {
+
+    metZSelNJets[iJets] = new TH1D("metZSel_"+NJetBins[iJets],"",400,0,400);
+    metTopSelNJets[iJets] = new TH1D("metTopSel_"+NJetBins[iJets],"",400,0,400);
+    metSelNJets[iJets] = new TH1D("metSel_"+NJetBins[iJets],"",400,0,400);
+
+    puppimetZSelNJets[iJets] = new TH1D("puppimetZSel_"+NJetBins[iJets],"",400,0,400);
+    puppimetTopSelNJets[iJets] = new TH1D("puppimetTopSel_"+NJetBins[iJets],"",400,0,400);
+    puppimetSelNJets[iJets] = new TH1D("puppimetSel_"+NJetBins[iJets],"",400,0,400);
+
+    recoilZParalH[iJets] = new TH1D(RecoilZParal+NJetBins[iJets],"",200,-400,400);
+    recoilZPerpH[iJets] = new TH1D(RecoilZPerp+NJetBins[iJets],"",200,-400,400);
+    recoilPuppiZParalH[iJets] = new TH1D(RecoilPuppiZParal+NJetBins[iJets],"",200,-400,400);
+    recoilPuppiZPerpH[iJets] = new TH1D(RecoilPuppiZPerp+NJetBins[iJets],"",200,-400,400);
+
+    recoilTopParalH[iJets] = new TH1D(RecoilTopParal+NJetBins[iJets],"",200,-400,400);
+    recoilTopPerpH[iJets] = new TH1D(RecoilTopPerp+NJetBins[iJets],"",200,-400,400);
+    recoilPuppiTopParalH[iJets] = new TH1D(RecoilPuppiTopParal+NJetBins[iJets],"",200,-400,400);
+    recoilPuppiTopPerpH[iJets] = new TH1D(RecoilPuppiTopPerp+NJetBins[iJets],"",200,-400,400);
+
+    recoilResponse[iJets] = new TH1D("recoilResponse"+NJetBins[iJets],"",200,-10,10);
+    recoilPuppiResponse[iJets] = new TH1D("recoilPuppiResponse"+NJetBins[iJets],"",200,-10,10);
+
     for (int iPtBins=0; iPtBins<nZPtBins; ++iPtBins){
 
       recoilZParal_Ptbins_nJetsH[iJets][iPtBins] = new TH1D(RecoilZParal+NJetBins[iJets]+ZPtBins[iPtBins],"",200,-400,400);
@@ -449,8 +473,8 @@ int main(int argc, char * argv[]) {
         ZMassIso1EtaPtFail[iIso][iEta][iPt] = new TH1F("ZMass"+Iso1Bins[iIso]+EtaBins[iEta]+PtBins[iPt]+"Fail","",80,50,130);
       }
       for (int iIso=0; iIso<nIso2Bins; iIso++) {
-	ZMassIso1EtaPtPass[iIso][iEta][iPt] = new TH1F("ZMass"+Iso2Bins[iIso]+EtaBins[iEta]+PtBins[iPt]+"Pass","",80,50,130);
-        ZMassIso1EtaPtFail[iIso][iEta][iPt] = new TH1F("ZMass"+Iso2Bins[iIso]+EtaBins[iEta]+PtBins[iPt]+"Fail","",80,50,130);
+	ZMassIso2EtaPtPass[iIso][iEta][iPt] = new TH1F("ZMass"+Iso2Bins[iIso]+EtaBins[iEta]+PtBins[iPt]+"Pass","",80,50,130);
+        ZMassIso2EtaPtFail[iIso][iEta][iPt] = new TH1F("ZMass"+Iso2Bins[iIso]+EtaBins[iEta]+PtBins[iPt]+"Fail","",80,50,130);
       }
     }
   }
@@ -467,7 +491,7 @@ int main(int argc, char * argv[]) {
     TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/"+PileUpDataFile,"read"); 
     TFile * filePUdistribution_MC = new TFile (TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/"+PileUpMCFile, "read"); 
     TH1D * PU_data = (TH1D *)filePUdistribution_data->Get("pileup");
-    TH1D * PU_mc = (TH1D *)filePUdistribution_MC->Get(PileUpMCHist+"_pileup");
+    TH1D * PU_mc = (TH1D *)filePUdistribution_MC->Get(PileUpMCHist);
     PUofficial->set_h_data(PU_data); 
     PUofficial->set_h_MC(PU_mc);
   }
@@ -831,6 +855,8 @@ int main(int argc, char * argv[]) {
 	}
       }
 
+      //      std::cout << "HLT Filters " << std::endl; 
+
       float pfmet_ex = analysisTree.pfmetcorr_ex;
       float pfmet_ey = analysisTree.pfmetcorr_ey;
       float pfmet_phi = analysisTree.pfmetcorr_phi;
@@ -889,14 +915,7 @@ int main(int argc, char * argv[]) {
 	// isolation
 	float absIso = 0; 
 	if (applyRhoCorrectedIso) {
-	  absIso = analysisTree.electron_r03_sumChargedHadronPt[im];
-	  float neutralIso =
-	    analysisTree.electron_r03_sumNeutralHadronEt[im] +
-	    analysisTree.electron_r03_sumPhotonEt[im] - 
-	    analysisTree.rho*TMath::Pi()*isoCone*isoCone;
-	  neutralIso = TMath::Max(float(0),neutralIso);
-	  absIso += neutralIso;
-	    
+	  absIso = abs_Iso_et(im, &analysisTree, isoCone);
 	}
 	else {
 	  if(isoDR03) {
@@ -949,6 +968,8 @@ int main(int argc, char * argv[]) {
       }
       // end of electron selection
 
+      //      std::cout << "Electron selection -> " << std::endl;
+
       bool isElectronsPair = false;
       bool firstTrigger = true;
       if (isoIdElectrons.size()>0) {
@@ -984,6 +1005,12 @@ int main(int argc, char * argv[]) {
 
 	      if (ptBin<0) continue;
 	      if (etaBin<0) continue;
+
+
+	      //	      std::cout << "ptBin = " << ptBin
+	      //			<< "   etaBin = " << etaBin
+	      //			<< "   iso1Bin = " << iso1Bin
+	      //			<< "   iso2Bin = " << iso2Bin << std::endl;
 
 	      TLorentzVector electron1; electron1.SetXYZM(analysisTree.electron_px[index1],
 							  analysisTree.electron_py[index1],
@@ -1051,6 +1078,7 @@ int main(int argc, char * argv[]) {
 	      }
 	    }
 	  }
+
 	  for (unsigned int im2=im1+1; im2<isoIdElectrons.size(); ++im2) {
 	    unsigned int index2 = isoIdElectrons[im2];
 	    float q1 = analysisTree.electron_charge[index1];
@@ -1166,6 +1194,8 @@ int main(int argc, char * argv[]) {
 	    
 	  }
 	   
+	  //	  std::cout << "Ok1" << std::endl;
+
 	  // selecting good jets --->
 	  
 	  // HT variables
@@ -1205,6 +1235,12 @@ int main(int argc, char * argv[]) {
 	    // pfJetId
 	    bool isPFJetId = tightJetiD_2017(analysisTree,int(jet));
 	    if (!isPFJetId) continue;
+
+	    bool noisyJet = analysisTree.pfjet_pt[jet]<50 && absJetEta > 2.65 && absJetEta < 3.139;
+
+	    if (noisyJet) continue;
+
+
 	    
 	    if (analysisTree.pfjet_pt[jet]>jetPtHighCut) {
 	      nJets30++;
@@ -1230,6 +1266,8 @@ int main(int argc, char * argv[]) {
 	    visiblePx = genL.Px();
 	    visiblePy = genL.Py();
 	  }
+
+	  //	  std::cout << "Ok2" << std::endl;
 
 	  if (!isData && applyRecoilCorrections) {
 	    
@@ -1280,6 +1318,8 @@ int main(int argc, char * argv[]) {
 	      float scaleFactor = 0.98 + 0.002*float(iScale);
 	      massSelScaleH[iScale]->Fill(mass*scaleFactor,weight);
 	    }
+
+	    //	    std::cout << "Ok3" << std::endl;
 
 	    nJets30SelH->Fill(nJets30,weight);
 	    nJets20SelH->Fill(nJets20,weight);
