@@ -114,7 +114,6 @@ void createDNNinput_2016(TString inputDir="/nfs/dust/cms/user/mameyer/SM_HiggsTa
       TFile *inFile  = new TFile( inputDir + "/" + subsample + ".root" ,"READ");
       TTree *inTree  = (TTree*) inFile -> Get("TauCheck");
       double nevents = getNEventsProcessed( inputDir + "/" + subsample + ".root" );
-      cout << "      nevents = " << nevents << endl;
 
       // SetBranchAddress for variables that need are needed for preselection or stitching
       unsigned int npartons;
