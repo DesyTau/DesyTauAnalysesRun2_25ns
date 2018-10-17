@@ -23,7 +23,7 @@ void createDNNinput_2017(TString inputDir="/nfs/dust/cms/user/mameyer/SM_HiggsTa
   // Define the subsamples that belong to a certain proccess
   vector<TString> DYJets          = { "DY1JetsToLL_M-50" , "DY2JetsToLL_M-50" , "DY3JetsToLL_M-50" , "DY4JetsToLL_M-50" , "DYJetsToLL_M-50" , "DYJetsToLL_M-10to50" /*, "EWKZ2Jets_ZToLL_M-50"*/ };
   vector<TString> WJets           = { "W1JetsToLNu" , "W2JetsToLNu" , "W3JetsToLNu" , "W4JetsToLNu" , "WJetsToLNu" , "WGToLNuG" , "WGstarToLNuEE" , "WGstarToLNuMuMu" /*, "EWKWPlus2Jets_WToLNu" , "EWKWMinus2Jets_WToLNu"*/ };
-  vector<TString> TTbar           = { "TTbar" };
+  vector<TString> TTbar           = { "TTTo2L2Nu" , "TTToHadronic" , "TTToSemiLeptonic" };
   vector<TString> SingleTop       = { "ST_t-channel_antitop" , "ST_t-channel_top" , "ST_tW_antitop" , "ST_tW_antitop" };
   vector<TString> Diboson         = { "VVTo2L2Nu" , "WZJToLLLNu" , "WZTo1L1Nu2Q" , "WZTo1L3Nu" , "WZTo2L2Q" , "ZZTo2L2Q" , "ZZTo4L" , "WWToLNuQQ" };
   vector<TString> GluGluHToTauTau = { "GluGluHToTauTau_M125" };
@@ -40,24 +40,26 @@ void createDNNinput_2017(TString inputDir="/nfs/dust/cms/user/mameyer/SM_HiggsTa
     { "VBFH_dnn"        , VBFHToTauTau  }
   };
 
-  // Cross-section map (taken from AN2016_355_v10 with minor unrelevant deviations - everything was checked)
+  // Cross-section map (needs to be checked again)
   map<TString, double> xsec_map = {
-    { "DYJetsToLL_M-10to50"      , 18610 },
-    { "DYJetsToLL_M-50"          , 5765 },
-    { "DY1JetsToLL_M-50"         , 1.164*1012.5 },
-    { "DY2JetsToLL_M-50"         , 1.164*332.8 },
-    { "DY3JetsToLL_M-50"         , 1.164*101.8 },
-    { "DY4JetsToLL_M-50"         , 1.164*54.8 },
-    { "WJetsToLNu"               , 61526.7 },
-    { "W1JetsToLNu"              , 1.221*9644.5 },
-    { "W2JetsToLNu"              , 1.221*3144.5 },
-    { "W3JetsToLNu"              , 1.221*954.8 },
-    { "W4JetsToLNu"              , 1.221*485.6 },
-    { "TTbar"                    , 831.76 },
-    { "ST_t-channel_antitop"     , 80.95 },
-    { "ST_t-channel_top"         , 136.02 },
-    { "ST_tW_antitop"            , 35.6 },
-    { "ST_tW_top"                , 35.6 },
+    { "DYJetsToLL_M-10to50"      , 15820*1.079 },
+    { "DYJetsToLL_M-50"          , 5345*1.079 },
+    { "DY1JetsToLL_M-50"         , 875.7*1.079 },
+    { "DY2JetsToLL_M-50"         , 306.9*1.079 },
+    { "DY3JetsToLL_M-50"         , 111.9*1.079 },
+    { "DY4JetsToLL_M-50"         , 43.97*1.079 },
+    { "WJetsToLNu"               , 52760*1.166 },
+    { "W1JetsToLNu"              , 8104.*1.166 },
+    { "W2JetsToLNu"              , 2796.*1.166 },
+    { "W3JetsToLNu"              , 993.5*1.166 },
+    { "W4JetsToLNu"              , 544.4*1.166 },
+    { "TTTo2L2Nu"                , 88.29 },
+    { "TTToHadronic"             , 377.96 },
+    { "TTToSemiLeptonic"         , 365.34 },
+    { "ST_t-channel_antitop"     , 26.38 },
+    { "ST_t-channel_top"         , 44.33 },
+    { "ST_tW_antitop"            , 35.85 },
+    { "ST_tW_top"                , 35.85 },
     { "VVTo2L2Nu"                , 11.95 },
     { "WWToLNuQQ"                , 49.997 },
     { "WZTo2L2Q"                 , 5.595 },
