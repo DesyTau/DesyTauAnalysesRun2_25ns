@@ -53,7 +53,7 @@ void createDNNinput(TString inputDir="/nfs/dust/cms/user/mameyer/SM_HiggsTauTau/
     { "W2JetsToLNu"              , -1},
     { "W3JetsToLNu"              , -1},
     { "W4JetsToLNu"              , -1},
-    { "TTBar"                    , 831.76},
+    { "TTbar"                    , 831.76},
     { "ST_t-channel_antitop"     , -1 },
     { "ST_t-channel_top"         , -1 },
     { "ST_tW_antitop"            , -1 },
