@@ -21,6 +21,7 @@ double getNEventsProcessed(TString filename)
 void createDNNinput_2016(TString inputDir="/nfs/dust/cms/user/mameyer/SM_HiggsTauTau/CMSSW_8_0_29/src/DesyTauAnalyses/NTupleMaker/test/HTauTau_EMu_2016/NTuples"){
 
   // Define the subsamples that belong to a certain proccess
+  vector<TString> MuonEG_Run2016  = { "MuonEG_Run2016B" , "MuonEG_Run2016C" , "MuonEG_Run2016D" , "MuonEG_Run2016E" , "MuonEG_Run2016F" , "MuonEG_Run2016G" , "MuonEG_Run2016H" };
   vector<TString> DYJets          = { "DY1JetsToLL_M-50" , "DY2JetsToLL_M-50" , "DY3JetsToLL_M-50" , "DY4JetsToLL_M-50" , "DYJetsToLL_M-50" , "DYJetsToLL_M-10to50" /*, "EWKZ2Jets_ZToLL_M-50"*/ };
   vector<TString> WJets           = { "W1JetsToLNu" , "W2JetsToLNu" , "W3JetsToLNu" , "W4JetsToLNu" , "WJetsToLNu" , "WGToLNuG" , "WGstarToLNuEE" , "WGstarToLNuMuMu" /*, "EWKWPlus2Jets_WToLNu" , "EWKWMinus2Jets_WToLNu"*/ };
   vector<TString> TTbar           = { "TTbar" };
@@ -31,13 +32,14 @@ void createDNNinput_2016(TString inputDir="/nfs/dust/cms/user/mameyer/SM_HiggsTa
 
   // Mapping of subsamples to output root-file
   map< TString , vector<TString> > samples_map = {
-    { "DYJets_dnn"      , DYJets  },
-    { "WJets_dnn"       , WJets  },
-    { "TTbar_dnn"       , TTbar },
-    { "SingleTop_dnn"   , SingleTop },
-    { "Diboson_dnn"     , Diboson },
-    { "ggH_dnn"         , GluGluHToTauTau  },
-    { "VBFH_dnn"        , VBFHToTauTau  }
+    { "MuonEG_Run2016_dnn"  , MuonEG_Run2016 },
+    { "DYJets_dnn"          , DYJets  },
+    { "WJets_dnn"           , WJets  },
+    { "TTbar_dnn"           , TTbar },
+    { "SingleTop_dnn"       , SingleTop },
+    { "Diboson_dnn"         , Diboson },
+    { "ggH_dnn"             , GluGluHToTauTau  },
+    { "VBFH_dnn"            , VBFHToTauTau  }
   };
 
   // Cross-section map (taken from AN2016_355_v10 with minor unrelevant deviations - everything was checked)
@@ -158,7 +160,7 @@ void createDNNinput_2016(TString inputDir="/nfs/dust/cms/user/mameyer/SM_HiggsTa
 	if( trg_muonelectron < 0.5 )    continue;
 
 	// lumi-xsec-weight added
-	if( xsec_map.find(subsample) == xsec_map.end() ){
+	if( xsec_map.find(subsample) == xsec_map.end() && !sample.first.Contains("MuonEG")){
 	  cout << endl << endl << "Sample " << subsample << " is missing in xsec_map. Exit code." << endl << endl ;
 	  exit(-1);
 	}
@@ -179,6 +181,8 @@ void createDNNinput_2016(TString inputDir="/nfs/dust/cms/user/mameyer/SM_HiggsTa
 	  else if(npartons == 4) lumi_xsec_weight = luminosity / ( neventsDY4Jets/xsecDY4Jets + neventsDYIncl/xsecDYIncl );
 	  else                   lumi_xsec_weight = luminosity / ( neventsDYIncl/xsecDYIncl );
 	}
+
+	if( sample.first.Contains("MuonEG")) lumi_xsec_weight = 1.;
 
 	outTree->Fill();
       }
