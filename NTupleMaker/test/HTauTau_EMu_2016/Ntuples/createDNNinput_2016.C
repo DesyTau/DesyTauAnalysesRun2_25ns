@@ -31,15 +31,17 @@ void createDNNinput_2016(TString inputDir="/nfs/dust/cms/user/mameyer/SM_HiggsTa
   vector<TString> VBFHToTauTau    = { "VBFHToTauTau_M125" };
 
   // Mapping of subsamples to output root-file
+  TString version = "v1";
+  TString channel = "em";
   map< TString , vector<TString> > samples_map = {
-    { "MuonEG_Run2016_dnn"  , MuonEG_Run2016 },
-    { "DYJets_dnn"          , DYJets  },
-    { "WJets_dnn"           , WJets  },
-    { "TTbar_dnn"           , TTbar },
-    { "SingleTop_dnn"       , SingleTop },
-    { "Diboson_dnn"         , Diboson },
-    { "ggH_dnn"             , GluGluHToTauTau  },
-    { "VBFH_dnn"            , VBFHToTauTau  }
+    { "MuonEG_Run2016_dnn_" + channel + "_" + version , MuonEG_Run2016 },
+    { "DYJets_dnn_" + channel + "_" +version          , DYJets  },
+    { "WJets_dnn_" + channel + "_" +version           , WJets  },
+    { "TTbar_dnn_" + channel + "_" +version           , TTbar },
+    { "SingleTop_dnn_" + channel + "_" +version       , SingleTop },
+    { "Diboson_dnn_" + channel + "_" +version         , Diboson },
+    { "ggH_dnn_" + channel + "_" +version             , GluGluHToTauTau  },
+    { "VBFH_dnn_" + channel + "_" +version            , VBFHToTauTau  }
   };
 
   // Cross-section map (taken from AN2016_355_v10 with minor unrelevant deviations - everything was checked)
