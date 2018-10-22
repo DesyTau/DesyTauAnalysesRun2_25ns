@@ -2908,9 +2908,9 @@ int main(int argc, char * argv[]) {
                //		   << "   weight(down) = " << btag0weight_Down << endl;
             }
             
-            bpt = -9999;
-            beta = -9999;
-            bphi = -9999;
+            bpt = -10;
+            beta = -10;
+            bphi = -10;
             
             //store pt and eta of the leading bjet
             if (indexLeadingBJet>=0) {
@@ -2919,17 +2919,17 @@ int main(int argc, char * argv[]) {
                bphi = analysisTree.pfjet_phi[indexLeadingBJet];
             }
             
-            jpt_1 = -9999;
-            jpt_1_Up = -9999;
-            jpt_1_Down = -9999;
+            jpt_1 = -10;
+            jpt_1_Up = -10;
+            jpt_1_Down = -10;
             
-            jeta_1 = -9999;
-            jphi_1 = -9999;
-            jptraw_1 = -9999;
-            jptunc_1 = -9999;
-            jmva_1 = -9999;
-            jlrm_1 = -9999;
-            jctm_1 = -9999;
+            jeta_1 = -10;
+            jphi_1 = -10;
+            jptraw_1 = -10;
+            jptunc_1 = -10;
+            jmva_1 = -10;
+            jlrm_1 = -10;
+            jctm_1 = -10;
             
             if (indexLeadingJet>=0&&indexSubLeadingJet>=0&&indexLeadingJet==indexSubLeadingJet)
                 cout << "warning : indexLeadingJet ==indexSubLeadingJet = " << indexSubLeadingJet << endl;
@@ -2949,17 +2949,17 @@ int main(int argc, char * argv[]) {
                //		}
             }
             //store pt and eta of the subleading jet
-            jpt_2 = -9999;
-            jpt_2_Up = -9999;
-            jpt_2_Down = -9999;
+            jpt_2 = -10;
+            jpt_2_Up = -10;
+            jpt_2_Down = -10;
             
-            jeta_2 = -9999;
-            jphi_2 = -9999;
-            jptraw_2 = -9999;
-            jptunc_2 = -9999;
-            jmva_2 = -9999;
-            jlrm_2 = -9999;
-            jctm_2 = -9999;
+            jeta_2 = -10;
+            jphi_2 = -10;
+            jptraw_2 = -10;
+            jptunc_2 = -10;
+            jmva_2 = -10;
+            jlrm_2 = -10;
+            jctm_2 = -10;
             
             if (indexSubLeadingJet>=0) {
                jpt_2 = analysisTree.pfjet_pt[indexSubLeadingJet];
@@ -2971,8 +2971,10 @@ int main(int argc, char * argv[]) {
                jmva_2 = -1;//analysisTree.pfjet_pu_jet_full_mva[indexSubLeadingJet];
             }
             
-            mjj =  -9999;
-            jdeta =  -9999;
+            mjj =  -10;
+            mjj_Up = -10;
+            mjj_Down = -10;
+            jdeta =  -10;
             njetingap = 0;
             if (indexLeadingJet>=0 && indexSubLeadingJet>=0) {
                
@@ -3386,26 +3388,38 @@ int main(int argc, char * argv[]) {
             //      std::cout << "BDT (bbH) = " << bdt_bbh << std::endl;
             //      std::cout << "BDT (ggH) = " << bdt_ggh << std::endl;
             
-            m_sv           = -9999;
-            m_sv_muUp      = -9999;
-            m_sv_muDown    = -9999;
-            m_sv_eUp       = -9999;
-            m_sv_eDown     = -9999;
-            m_sv_scaleUp   = -9999;
-            m_sv_scaleDown = -9999;
-            m_sv_resoUp    = -9999;
-            m_sv_resoDown  = -9999;
+            m_sv           = -10;
+            m_sv_muUp      = -10;
+            m_sv_muDown    = -10;
+            m_sv_eUp       = -10;
+            m_sv_eDown     = -10;
+            m_sv_scaleUp   = -10;
+            m_sv_scaleDown = -10;
+            m_sv_resoUp    = -10;
+            m_sv_resoDown  = -10;
             
-            mt_sv           = -9999;
-            mt_sv_muUp      = -9999;
-            mt_sv_muDown    = -9999;
-            mt_sv_eUp       = -9999;
-            mt_sv_eDown     = -9999;
-            mt_sv_scaleUp   = -9999;
-            mt_sv_scaleDown = -9999;
-            mt_sv_resoUp    = -9999;
-            mt_sv_resoDown  = -9999;
+            mt_sv           = -10;
+            mt_sv_muUp      = -10;
+            mt_sv_muDown    = -10;
+            mt_sv_eUp       = -10;
+            mt_sv_eDown     = -10;
+            mt_sv_scaleUp   = -10;
+            mt_sv_scaleDown = -10;
+            mt_sv_resoUp    = -10;
+            mt_sv_resoDown  = -10;
             
+            pt_sv   = -10;
+            eta_sv  = -10;
+            phi_sv  = -10;
+            
+            pt_sv_eUp  = -10;
+            eta_sv_eUp = -10;
+            phi_sv_eUp = -10;
+            
+            pt_sv_eDown  = -10;
+            eta_sv_eDown = -10;
+            phi_sv_eDown = -10;
+
             //calculate SV mass only for certain events
             //if (computeSVFitMass && dzeta>-40 && iso_1<0.5 && iso_2<0.5 && njetsMax>0) {
                 if (computeSVFitMass) {
