@@ -72,7 +72,7 @@ bool ComparePt(TLorentzVector a, TLorentzVector b) { return a.Pt() > b.Pt(); }
 
 int binNumber(float x, int nbins, float * bins) {
 
-  int binN = -1;
+  int binN = nbins-1;
 
   for (int iB=0; iB<nbins; ++iB) {
     if (x>=bins[iB]&&x<bins[iB+1]) {

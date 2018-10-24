@@ -191,17 +191,17 @@ int main(int argc, char * argv[]) {
    
    Config cfg(argv[1]);                                                       //why argv[1]?
     
-   const bool applyInclusiveSelection = cfg.get<bool>("ApplyInclusiveSelection");
    const bool computeSVFitMass = cfg.get<bool>("ComputeSVFitMass");
    const bool removeGammaStar = cfg.get<bool>("RemoveGammaStar");
     
    const bool isData = cfg.get<bool>("IsData");
    const bool isDY   = cfg.get<bool>("IsDY");
    const bool isSignal   = cfg.get<bool>("IsSignal");
+   const bool isEmbedded = cfg.get<bool>("IsEmbedded");
    const bool isW    = cfg.get<bool>("IsW");
-   const bool isTOP    = cfg.get<bool>("IsTOP");
    const bool applyGoodRunSelection = cfg.get<bool>("ApplyGoodRunSelection");
    const string jsonFile = cfg.get<string>("jsonFile");
+   const bool applyRecoilCorrections = cfg.get<bool>("ApplyRecoilCorrections");
    const bool applySimpleRecoilCorrections = cfg.get<bool>("ApplySimpleRecoilCorrections");
    
    // kinematic cuts on electrons
@@ -212,7 +212,7 @@ int main(int argc, char * argv[]) {
    const float dzElectronCut      = cfg.get<float>("dzElectronCut");
    const float isoElectronLowCut  = cfg.get<float>("isoElectronLowCut");
    const float isoElectronHighCut = cfg.get<float>("isoElectronHighCut");
-   const bool applySpring16ElectronId     = cfg.get<bool>("ApplySpring16ElectronId");
+   const bool applyIsoElectronId  = cfg.get<bool>("ApplyIsoElectronId");
    const string lowPtLegElectron  = cfg.get<string>("LowPtLegElectron");
    const string highPtLegElectron = cfg.get<string>("HighPtLegElectron");
     
@@ -290,7 +290,6 @@ int main(int argc, char * argv[]) {
    const string Electron23TriggerFile = cfg.get<string>("Electron23TriggerEff");
    const string Electron12TriggerFile = cfg.get<string>("Electron12TriggerEff");
    
-   const string trackingSFFile = cfg.get<string>("TrackingSFFile");
    
    const float muonScale = cfg.get<float>("MuonScale");
    const float eleScaleBarrel = cfg.get<float>("EleScaleBarrel");
@@ -315,7 +314,9 @@ int main(int argc, char * argv[]) {
    const string samplenameForPUHist = cfg.get<string>("SampleNameForPUHist");
    TString PileUpDataFile(pileUpDataFile);
    TString PileUpMCFile(pileUpMCFile);
-   
+
+   const bool applyWSCorr = cfg.get<bool>("applyWorkspaceCorrection");
+   const string correctionWSFile = cfg.get<string>("CorrectionWSFile");
  
     // **** end of configuration
 
@@ -1305,108 +1306,98 @@ int main(int argc, char * argv[]) {
     ScaleFactor * SF_electron12 = new ScaleFactor();
     SF_electron12->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(Electron12TriggerFile));
     
-    // tracking efficiency SF
-   TFile * fileTrackingSF = new TFile(TString(cmsswBase)+"/src/"+TString(trackingSFFile));
-   TH1D * trackEffMuonH = (TH1D*)fileTrackingSF->Get("effTrackingMu");
-   TH1D * trackEffEleH = (TH1D*)fileTrackingSF->Get("effTrackingE");
-    
     // MEt filters                                 //set MET Filters
-    std::vector<TString> metFlags; metFlags.clear();
-    metFlags.push_back("Flag_HBHENoiseFilter");//ok
-    metFlags.push_back("Flag_HBHENoiseIsoFilter");//ok
-    metFlags.push_back("Flag_globalTightHalo2016Filter"); //ok
-    metFlags.push_back("Flag_EcalDeadCellTriggerPrimitiveFilter");//ok
-    metFlags.push_back("Flag_goodVertices");  //ok
-    if (isData)
-      metFlags.push_back("Flag_eeBadScFilter");//ok
-    metFlags.push_back("Flag_BadPFMuonFilter");//ok
-    metFlags.push_back("Flag_BadChargedCandidateFilter");//ok
-    metFlags.push_back("Flag_ecalBadCalibFilter");//ok
+   std::vector<TString> metFlags; metFlags.clear();
+   metFlags.push_back("Flag_HBHENoiseFilter");//ok
+   metFlags.push_back("Flag_HBHENoiseIsoFilter");//ok
+   metFlags.push_back("Flag_globalTightHalo2016Filter"); //ok
+   metFlags.push_back("Flag_EcalDeadCellTriggerPrimitiveFilter");//ok
+   metFlags.push_back("Flag_goodVertices");  //ok
+   if (isData)
+     metFlags.push_back("Flag_eeBadScFilter");//ok
+   metFlags.push_back("Flag_BadPFMuonFilter");//ok
+   metFlags.push_back("Flag_BadChargedCandidateFilter");//ok
+   metFlags.push_back("Flag_ecalBadCalibFilter");//ok
 
-    std::vector<TString> badGlobalMuonFlag; badGlobalMuonFlag.clear();
-    badGlobalMuonFlag.push_back("Flag_BadGlobalMuonFilter");
-    std::vector<TString> muonBadTrackFlag; muonBadTrackFlag.clear();
-    muonBadTrackFlag.push_back("Flag_muonBadTrackFilter");
-    std::vector<TString> chargedHadronTrackResolutionFlag; chargedHadronTrackResolutionFlag.clear();
-    chargedHadronTrackResolutionFlag.push_back("Flag_chargedHadronTrackResolutionFilter");
-
-    RecoilCorrector recoilMvaMetCorrector(RecoilMvaFileName); //improve description of MET in MC events without genuine MET
-    MEtSys metSys(MetSysFileName);
+   std::vector<TString> badGlobalMuonFlag; badGlobalMuonFlag.clear();
+   badGlobalMuonFlag.push_back("Flag_BadGlobalMuonFilter");
+   std::vector<TString> muonBadTrackFlag; muonBadTrackFlag.clear();
+   muonBadTrackFlag.push_back("Flag_muonBadTrackFilter");
+   std::vector<TString> chargedHadronTrackResolutionFlag; chargedHadronTrackResolutionFlag.clear();
+   chargedHadronTrackResolutionFlag.push_back("Flag_chargedHadronTrackResolutionFilter");
+   
+   RecoilCorrector recoilMvaMetCorrector(RecoilMvaFileName); //improve description of MET in MC events without genuine MET
+   MEtSys metSys(MetSysFileName);
     
-    RecoilCorrector recoilMetCorrector(RecoilFileName);
+   RecoilCorrector recoilMetCorrector(RecoilFileName);
     
-    // SV fit mass
-    edm::FileInPath inputFileName_visPtResolution("TauAnalysis/SVfitStandalone/data/svFitVisMassAndPtResolutionPDF.root"); //TO DO: NOT NEEDED ANYMORE?
-    TH1::AddDirectory(false);
-    TFile * inputFile_visPtResolution = new TFile(inputFileName_visPtResolution.fullPath().data());
+   // SV fit mass
+   edm::FileInPath inputFileName_visPtResolution("TauAnalysis/SVfitStandalone/data/svFitVisMassAndPtResolutionPDF.root"); //TO DO: NOT NEEDED ANYMORE?
+   TH1::AddDirectory(false);
+   TFile * inputFile_visPtResolution = new TFile(inputFileName_visPtResolution.fullPath().data());
     
     // qcd weight (dzeta cut)
-    QCDModelForEMu qcdWeight("HTT-utilities/QCDModelingEMu/data/QCD_weight_emu_2016BtoH.root"); 
-    // qcd weight DZeta cut
-    QCDModelForEMu qcdWeightNoDzeta("HTT-utilities/QCDModelingEMu/data/QCD_weight_emu_2016BtoH.root");
+   QCDModelForEMu qcdWeight("HTT-utilities/QCDModelingEMu/data/QCD_weight_emu_2016BtoH.root"); 
+   // qcd weight DZeta cut
+   QCDModelForEMu qcdWeightNoDzeta("HTT-utilities/QCDModelingEMu/data/QCD_weight_emu_2016BtoH.root");
+   
+   // BTag scale factors
+   BTagCalibration calib("csvv2", cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/CSVv2_Moriond17_B_H.csv");  //read out SF for btagging
+   BTagCalibrationReader reader_B(BTagEntry::OP_MEDIUM,"central",{"up","down"});
+   BTagCalibrationReader reader_C(BTagEntry::OP_MEDIUM,"central",{"up","down"});
+   BTagCalibrationReader reader_Light(BTagEntry::OP_MEDIUM,"central",{"up","down"});
+   reader_B.load(calib,BTagEntry::FLAV_B,"comb");
+   reader_C.load(calib,BTagEntry::FLAV_C,"comb");
+   reader_Light.load(calib,BTagEntry::FLAV_UDSG,"incl");
     
-    // BTag scale factors
-    BTagCalibration calib("csvv2", cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/CSVv2_Moriond17_B_H.csv");  //read out SF for btagging
-    BTagCalibrationReader reader_B(BTagEntry::OP_MEDIUM,"central",{"up","down"});
-    BTagCalibrationReader reader_C(BTagEntry::OP_MEDIUM,"central",{"up","down"});
-    BTagCalibrationReader reader_Light(BTagEntry::OP_MEDIUM,"central",{"up","down"});
-    reader_B.load(calib,BTagEntry::FLAV_B,"comb");
-    reader_C.load(calib,BTagEntry::FLAV_C,"comb");
-    reader_Light.load(calib,BTagEntry::FLAV_UDSG,"incl");
-    
-    float etaBTAG[2] = {0.5,2.1};
-    float ptBTAG[5] = {25.,35.,50.,100.,200.};
-    
-    std::cout << std::endl;
-    for (int iEta=0; iEta<2; ++iEta) {
-        for (int iPt=0; iPt<5; ++iPt) {
-            float sfB = reader_B.eval_auto_bounds("central",BTagEntry::FLAV_B, etaBTAG[iEta], ptBTAG[iPt]);
-            float sfC = reader_C.eval_auto_bounds("central",BTagEntry::FLAV_C, etaBTAG[iEta], ptBTAG[iPt]);
-            float sfLight = reader_Light.eval_auto_bounds("central",BTagEntry::FLAV_UDSG, etaBTAG[iEta], ptBTAG[iPt]);
-            printf("pT = %3.0f   eta = %3.1f  ->  SFb = %5.3f   SFc = %5.3f   SFl = %5.3f\n",ptBTAG[iPt],etaBTAG[iEta],sfB,sfC,sfLight);
-        }
-    }
-    std::cout << std::endl;
-    // read out efficiencies for btagging
-    TFile * fileTagging = new TFile(TString(cmsswBase)+TString("/src/DesyTauAnalyses/NTupleMaker/data/tagging_efficiencies_Moriond2017.root"));
-    TH1F * tagEff_B = (TH1F*)fileTagging->Get("btag_eff_b");
-    TH1F * tagEff_C = (TH1F*)fileTagging->Get("btag_eff_c");
-    TH1F * tagEff_Light = (TH1F*)fileTagging->Get("btag_eff_oth");
-    TRandom3 rand;
-    
-    float MaxBJetPt = 1000.;
-    float MaxLJetPt = 1000.;
-    float MinLJetPt = 20.;
-    float MinBJetPt = 20.; // !!!!!
-    
-    // Z pt mass weights
-    TFile * fileZMassPtWeights = new TFile(TString(cmsswBase)+"/src/"+ZMassPtWeightsFileName);
-    if (fileZMassPtWeights->IsZombie()) {
-        std::cout << "File " << TString(cmsswBase) << "/src/" << ZMassPtWeightsFileName << "  does not exist!" << std::endl;
-        exit(-1);
-    }
-    TH2D * histZMassPtWeights = (TH2D*)fileZMassPtWeights->Get(ZMassPtWeightsHistName);
-    if (histZMassPtWeights==NULL) {
-        std::cout << "histogram " << ZMassPtWeightsHistName << " is not found in file " << TString(cmsswBase) << "/src/DesyTauAnalyses/NTupleMaker/data/" << ZMassPtWeightsFileName
-        << std::endl;
-        exit(-1);
-    }
-    
-    // Z-pt weights from correction WS
-    //TString correctionsWorkspaceFileName = TString(cmsswBase)+"/src/HTT-utilities/CorrectionsWorkspace/htt_scalefactors_v16_5.root";
-    //TFile * correctionWorkSpaceFile = new TFile(correctionsWorkspaceFileName);
-    //RooWorkspace *correctionWS = (RooWorkspace*)correctionWorkSpaceFile->Get("w");
-
-    // trackig weights from correction WS
-    TString correctionsWorkspaceFileName = TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/htt_scalefactors_v17_1.root";
-    TFile * correctionWorkSpaceFile = new TFile(correctionsWorkspaceFileName);
-    RooWorkspace *correctionWS = (RooWorkspace*)correctionWorkSpaceFile->Get("w");
+   float etaBTAG[2] = {0.5,2.1};
+   float ptBTAG[5] = {25.,35.,50.,100.,200.};
+   
+   std::cout << std::endl;
+   for (int iEta=0; iEta<2; ++iEta) {
+     for (int iPt=0; iPt<5; ++iPt) {
+       float sfB = reader_B.eval_auto_bounds("central",BTagEntry::FLAV_B, etaBTAG[iEta], ptBTAG[iPt]);
+       float sfC = reader_C.eval_auto_bounds("central",BTagEntry::FLAV_C, etaBTAG[iEta], ptBTAG[iPt]);
+       float sfLight = reader_Light.eval_auto_bounds("central",BTagEntry::FLAV_UDSG, etaBTAG[iEta], ptBTAG[iPt]);
+       printf("pT = %3.0f   eta = %3.1f  ->  SFb = %5.3f   SFc = %5.3f   SFl = %5.3f\n",ptBTAG[iPt],etaBTAG[iEta],sfB,sfC,sfLight);
+     }
+   }
+   std::cout << std::endl;
+   // read out efficiencies for btagging
+   TFile * fileTagging = new TFile(TString(cmsswBase)+TString("/src/DesyTauAnalyses/NTupleMaker/data/tagging_efficiencies_Moriond2017.root"));
+   TH1F * tagEff_B = (TH1F*)fileTagging->Get("btag_eff_b");
+   TH1F * tagEff_C = (TH1F*)fileTagging->Get("btag_eff_c");
+   TH1F * tagEff_Light = (TH1F*)fileTagging->Get("btag_eff_oth");
+   TRandom3 rand;
+   
+   float MaxBJetPt = 1000.;
+   float MaxLJetPt = 1000.;
+   float MinLJetPt = 20.;
+   float MinBJetPt = 20.; // !!!!!
+   
+   // Z pt mass weights
+   TFile * fileZMassPtWeights = new TFile(TString(cmsswBase)+"/src/"+ZMassPtWeightsFileName);
+   if (fileZMassPtWeights->IsZombie()) {
+     std::cout << "File " << TString(cmsswBase) << "/src/" << ZMassPtWeightsFileName << "  does not exist!" << std::endl;
+     exit(-1);
+   }
+   TH2D * histZMassPtWeights = (TH2D*)fileZMassPtWeights->Get(ZMassPtWeightsHistName);
+   if (histZMassPtWeights==NULL) {
+     std::cout << "histogram " << ZMassPtWeightsHistName << " is not found in file " << TString(cmsswBase) << "/src/DesyTauAnalyses/NTupleMaker/data/" << ZMassPtWeightsFileName
+	       << std::endl;
+     exit(-1);
+   }
+   
+   // correction WS
+   TString correctionsWorkspaceFileName = TString(cmsswBase)+"/src/"+correctionWSFile;
+   TFile * correctionWorkSpaceFile = new TFile(correctionsWorkspaceFileName);
+   RooWorkspace *correctionWS = (RooWorkspace*)correctionWorkSpaceFile->Get("w");
     
     int nEvents = 0;
     int selEvents = 0;
     int nFiles = 0;
         
-    for (int iF=0; iF<nTotalFiles; ++iF) {             // loop over input file names
+    for (int iF=0; iF<nTotalFiles; ++iF) { // loop over input file names
         
        std::string filen;
        fileList >> filen;
@@ -1475,6 +1466,7 @@ int main(int argc, char * argv[]) {
           
           // weights
           mcweight = analysisTree.genweight;           //store genweights
+
           
           weightScale1 = analysisTree.weightScale1;    //weights for scale uncertainty
           weightScale2 = analysisTree.weightScale2;
@@ -1561,6 +1553,7 @@ int main(int argc, char * argv[]) {
           higgsPt = 0;
           higgsEta = 0;
           higgsMass = -1;
+
           
           metFilters_ = true;
           
@@ -1902,7 +1895,7 @@ int main(int argc, char * argv[]) {
              zptmassweight =1.0;
           }
             
-            //      if (isZEE&&isZMM) {
+            //  if (isZEE&&isZMM) {
             //	cout << "Warning : isZEE && isZMM simultaneously" << endl;
             //	cout << "Mu+:" << isPrompMuPlus
             //	     << "  Mu-:"  << isPrompMuMinus
@@ -1914,7 +1907,7 @@ int main(int argc, char * argv[]) {
             //      if ((isPrompMuPlus&&!isPrompMuMinus)||(!isPrompMuPlus&&isPrompMuMinus))
             //	cout << "Warning : only one prompt muon!" << endl;
             
-            //      cout << "Ok" << endl;
+            //  cout << "Ok" << endl;
             
 	    
 
@@ -1923,6 +1916,8 @@ int main(int argc, char * argv[]) {
           lumi = int(analysisTree.event_luminosityblock);
           evt = int(analysisTree.event_nr);
       
+	  // embedded weight
+
           if (debug) std::cout<<"check good run selection"<<std::endl;
           if (isData && applyGoodRunSelection) { //apply good run selection, periods: vector filled from JSON file
              if (debug) std::cout<<"in good run list"<<std::endl;
@@ -2129,8 +2124,9 @@ int main(int argc, char * argv[]) {
                //	bool electronMvaId = electronMvaIdWP80(analysisTree.electron_pt[ie],
                //					       analysisTree.electron_superclusterEta[ie],
                //					       analysisTree.electron_mva_id_nontrigPhys14[ie]);
-               bool electronMvaId = analysisTree.electron_mva_wp80_nontrig_Spring15_v1[ie];
-               if (applySpring16ElectronId) electronMvaId = analysisTree.electron_mva_wp80_Iso_Fall17_v1[ie]>0.5;   
+               bool electronMvaId = true;
+               if (applyIsoElectronId) electronMvaId = analysisTree.electron_mva_wp80_Iso_Fall17_v1[ie]>0.5;   
+	       else electronMvaId = analysisTree.electron_mva_wp80_noIso_Fall17_v1[ie]>0.5;
                if (!electronMvaId) continue;
                if (!analysisTree.electron_pass_conversion[ie]) continue;
                if (analysisTree.electron_nmissinginnerhits[ie]>1) continue;
@@ -2265,7 +2261,7 @@ int main(int argc, char * argv[]) {
                   float rhoNeutral = analysisTree.rho;
                   float  eA = getEffectiveArea( fabs(analysisTree.electron_superclusterEta[eIndex]) );
                   float absIsoEle = analysisTree.electron_r03_sumChargedHadronPt[eIndex] +
-	    TMath::Max(0.0f,analysisTree.electron_r03_sumNeutralHadronEt[eIndex]+analysisTree.electron_r03_sumPhotonEt[eIndex]-eA*rhoNeutral);
+		    TMath::Max(0.0f,analysisTree.electron_r03_sumNeutralHadronEt[eIndex]+analysisTree.electron_r03_sumPhotonEt[eIndex]-eA*rhoNeutral);
                   float relIsoEle = absIsoEle/analysisTree.electron_pt[eIndex];
                   
                   //store most isolated muons and electrons
@@ -2390,8 +2386,9 @@ int main(int argc, char * argv[]) {
                if (fabs(analysisTree.electron_eta[ie])>etaVetoElectronCut) continue;
                if (fabs(analysisTree.electron_dxy[ie])>dxyVetoElectronCut) continue;
                if (fabs(analysisTree.electron_dz[ie])>dzVetoElectronCut) continue;
-               bool electronMvaId = analysisTree.electron_mva_wp90_nontrig_Spring15_v1[ie];
-               if (applySpring16ElectronId) electronMvaId = analysisTree.electron_mva_wp90_Iso_Fall17_v1[ie]>0.5;
+               bool electronMvaId = true;
+               if (applyIsoElectronId) electronMvaId = analysisTree.electron_mva_wp90_Iso_Fall17_v1[ie]>0.5;
+	       else electronMvaId = analysisTree.electron_mva_wp90_noIso_Fall17_v1[ie]>0.5;
                if (!electronMvaId&&applyVetoElectronId) continue;
                if (!analysisTree.electron_pass_conversion[ie]&&applyVetoElectronId) continue;
                if (analysisTree.electron_nmissinginnerhits[ie]>1&&applyVetoElectronId) continue;
@@ -2518,83 +2515,125 @@ int main(int argc, char * argv[]) {
             effweight = 1;
             
             //isoweight also includes tracking SF
-            if (!isData) {
+            if (!isData || isEmbedded) {
                 
+	      correctionWS->var("e_pt")->setVal(pt_1);
+	      correctionWS->var("e_eta")->setVal(eta_1);
+	      correctionWS->var("e_iso")->setVal(iso_1);
+	      correctionWS->var("m_pt")->setVal(pt_2);
+	      correctionWS->var("m_eta")->setVal(eta_2);
+	      correctionWS->var("m_iso")->setVal(iso_2);
+
                // scale factors
-               double eta_trig = eta_1;
-               if (abs(eta_1)>2.1) eta_trig = 2.0999;
-               isoweight_1 = (float)SF_electronIdIso->get_ScaleFactor(double(pt_1),double(eta_trig));
-               isoweight_2 = (float)SF_muonIdIso->get_ScaleFactor(double(pt_2),double(eta_2));
-               // correctionWS->var("e_pt")->setVal(pt_1);
-               // correctionWS->var("e_eta")->setVal(eta_1);
-               // isoweight_1 = correctionWS->function("e_id_data_eff_ratio")->getVal()*correctionWS->function("e_iso_data_eff_ratio")->getVal();
-               // correctionWS->var("m_pt")->setVal(pt_2);
-               // correctionWS->var("m_eta")->setVal(eta_2);
-               // isoweight_2 = correctionWS->function("m_id_data_eff_ratio")->getVal()*correctionWS->function("m_iso_data_eff_ratio")->getVal();
-               
+	       if (applyWSCorr) {
+		 if (isEmbedded) {
+		   isoweight_1 = correctionWS->function("e_idiso_binned_embed_ratio")->getVal();
+                   isoweight_2 = correctionWS->function("m_idiso_binned_embed_ratio")->getVal();
+
+		 }
+		 else {
+		   isoweight_1 = correctionWS->function("e_idiso_binned_ratio")->getVal();
+		   isoweight_2 = correctionWS->function("m_idiso_binned_ratio")->getVal();
+		 }
+	       }               
+	       else {
+		 isoweight_1 = (float)SF_electronIdIso->get_ScaleFactor(double(pt_1),double(eta_1));
+		 isoweight_2 = (float)SF_muonIdIso->get_ScaleFactor(double(pt_2),double(eta_2));
+	       }
+
                float eta1_sf = eta_1;
                if (eta1_sf<=-2.5) eta1_sf = -2.49;
                if (eta1_sf>=2.5) eta1_sf = 2.49;
-                correctionWS->var("e_pt")->setVal(pt_1);
-                correctionWS->var("e_eta")->setVal(eta1_sf);
-                idweight_1 = correctionWS->function("e_reco_ratio")->getVal();
-               //idweight_1 = trackEffEleH->GetBinContent(trackEffEleH->FindBin(eta1_sf));
+	       correctionWS->var("e_pt")->setVal(pt_1);
+	       correctionWS->var("e_eta")->setVal(eta1_sf);
+	       idweight_1 = correctionWS->function("e_reco_ratio")->getVal();
                
                float eta2_sf = eta_2;
                if (eta2_sf<=-2.4) eta2_sf = -2.39;
                if (eta2_sf>=2.4) eta2_sf = 2.39;
-               //idweight_2 = trackEffMuonH->GetBinContent(trackEffMuonH->FindBin(eta2_sf));
-                correctionWS->var("m_eta")->setVal(eta2_sf);
-                correctionWS->var("m_pt")->setVal(pt_2);
-                idweight_2 = correctionWS->function("m_trk_ratio")->getVal();
+	       correctionWS->var("m_eta")->setVal(eta2_sf);
+	       correctionWS->var("m_pt")->setVal(pt_2);
+	       idweight_2 = correctionWS->function("m_trk_ratio")->getVal();
                               
                isoweight_1 *= idweight_1;
                isoweight_2 *= idweight_2;
                 
-               //		cout << "isoweight_1 = " << isoweight_1
-               //		     << "isoweight_2 = " << isoweight_2 << endl;
-                              // float Ele23EffData = (float)SF_electron23->get_EfficiencyData(double(pt_1),double(eta_1));
-               // float Ele12EffData = (float)SF_electron12->get_EfficiencyData(double(pt_1),double(eta_1));
-               // float Mu23EffData = (float)SF_muon23->get_EfficiencyData(double(pt_2),double(eta_2));
-               // float Mu8EffData = (float)SF_muon8->get_EfficiencyData(double(pt_2),double(eta_2));
-               // float trigWeightData = Mu23EffData*Ele12EffData + Mu8EffData*Ele23EffData - Mu23EffData*Ele23EffData;
+	       //	       cout << "isoweight_1 = " << isoweight_1
+	       //		    << "isoweight_2 = " << isoweight_2 << endl;
+	       //
+	       float Ele23EffData = 1;
+	       float Ele12EffData = 1;
+	       float Mu23EffData = 1;
+	       float Mu8EffData = 1;
+
+	       float Ele23EffMC = 1;
+	       float Ele12EffMC = 1;
+	       float Mu23EffMC = 1;
+	       float Mu8EffMC = 1;
+
+	       if (applyWSCorr) {
+		 Ele23EffData = correctionWS->function("e_trg23_binned_ic_data")->getVal();
+		 Ele12EffData = correctionWS->function("e_trg12_binned_ic_data")->getVal(); 
+		 Mu23EffData  = correctionWS->function("m_trg23_binned_ic_data")->getVal();
+		 Mu8EffData = correctionWS->function("m_trg8_binned_ic_data")->getVal();
+		 if (isEmbedded) {
+		   Ele23EffMC = correctionWS->function("e_trg23_binned_ic_embed")->getVal();
+		   Ele12EffMC = correctionWS->function("e_trg12_binned_ic_embed")->getVal(); 
+		   Mu23EffMC  = correctionWS->function("m_trg23_binned_ic_embed")->getVal();
+		   Mu8EffMC = correctionWS->function("m_trg8_binned_ic_embed")->getVal();
+		 }
+		 else {
+		   Ele23EffMC = correctionWS->function("e_trg23_binned_ic_mc")->getVal();
+                   Ele12EffMC = correctionWS->function("e_trg12_binned_ic_mc")->getVal();
+                   Mu23EffMC  = correctionWS->function("m_trg23_binned_ic_mc")->getVal();
+                   Mu8EffMC = correctionWS->function("m_trg8_binned_ic_mc")->getVal();
+		 }
+	       }
+	       else {
+		 Ele23EffData = (float)SF_electron23->get_EfficiencyData(double(pt_1),double(eta_1));
+		 Ele12EffData = (float)SF_electron12->get_EfficiencyData(double(pt_1),double(eta_1));
+		 Mu23EffData = (float)SF_muon23->get_EfficiencyData(double(pt_2),double(eta_2));
+		 Mu8EffData = (float)SF_muon8->get_EfficiencyData(double(pt_2),double(eta_2));
+		 Ele23EffMC   = (float)SF_electron23->get_EfficiencyMC(double(pt_1),double(eta_1));
+		 Ele12EffMC   = (float)SF_electron12->get_EfficiencyMC(double(pt_1),double(eta_1));
+		 Mu23EffMC   = (float)SF_muon23->get_EfficiencyMC(double(pt_2),double(eta_2));
+		 Mu8EffMC   = (float)SF_muon8->get_EfficiencyMC(double(pt_2),double(eta_2));
+	       }
+
+	       float trigWeightData = Mu23EffData*Ele12EffData + Mu8EffData*Ele23EffData - Mu23EffData*Ele23EffData;
                
-               // if (applyTriggerMatch && !isData) {
-               //    float Ele23EffMC   = (float)SF_electron23->get_EfficiencyMC(double(pt_1),double(eta_1));
-               //    float Ele12EffMC   = (float)SF_electron12->get_EfficiencyMC(double(pt_1),double(eta_1));
-               //    float Mu23EffMC   = (float)SF_muon23->get_EfficiencyMC(double(pt_2),double(eta_2));
-               //    float Mu8EffMC   = (float)SF_muon8->get_EfficiencyMC(double(pt_2),double(eta_2));
-               //    float trigWeightMC   = Mu23EffMC*Ele12EffMC     + Mu8EffMC*Ele23EffMC     - Mu23EffMC*Ele23EffMC;
+	       if (applyTriggerMatch && !isData) {
+		 float trigWeightMC   = Mu23EffMC*Ele12EffMC     + Mu8EffMC*Ele23EffMC     - Mu23EffMC*Ele23EffMC;
                
-               //    if (isMuon23matched && isElectron12matched) {
-               //       trigweight_1 = (float)SF_electron12->get_ScaleFactor(double(pt_1),double(eta_1));
-               //       trigweight_2 = (float)SF_muon23->get_ScaleFactor(double(pt_2),double(eta_2));
-               //    }
-               //    else if (isMuon8matched && isElectron23matched) {
-               //       trigweight_1 = (float)SF_electron23->get_ScaleFactor(double(pt_1),double(eta_1));
-               //       trigweight_2 = (float)SF_muon8->get_ScaleFactor(double(pt_2),double(eta_2));
-               //    }
+		 /*
+		 if (isMuon23matched && isElectron12matched) {
+		 trigweight_1 = (float)SF_electron12->get_ScaleFactor(double(pt_1),double(eta_1));
+		   trigweight_2 = (float)SF_muon23->get_ScaleFactor(double(pt_2),double(eta_2));
+		 }
+		 else if (isMuon8matched && isElectron23matched) {
+		   trigweight_1 = (float)SF_electron23->get_ScaleFactor(double(pt_1),double(eta_1));
+		   trigweight_2 = (float)SF_muon8->get_ScaleFactor(double(pt_2),double(eta_2));
+		 }
+		 */
+		 if (trigWeightMC>1e-6)
+		   trigweight = trigWeightData / trigWeightMC;
                
-               //    if (trigWeightMC>1e-6)
-               //       trigweight = trigWeightData / trigWeightMC;
-               
-               //  }
-               // else {
-               //    trigweight = trigWeightData;
-               //    if (isMuon23matched && isElectron12matched) {
-               //       trigweight_1 = (float)SF_electron12->get_EfficiencyData(double(pt_1),double(eta_1));
-               //       trigweight_2 = (float)SF_muon23->get_EfficiencyData(double(pt_2),double(eta_2));
-               //    }
-               //    else if (isMuon8matched && isElectron23matched) {
-               //       trigweight_1 = (float)SF_electron23->get_EfficiencyData(double(pt_1),double(eta_1));
-               //       trigweight_2 = (float)SF_muon8->get_EfficiencyData(double(pt_2),double(eta_2));
-               //    }
-               // }
-               
-               //effweight = trigweight;
-               trigweight = 1.0;
+	       }
+	       else {
+		 trigweight = trigWeightData;
+		 //    if (isMuon23matched && isElectron12matched) {
+		 //       trigweight_1 = (float)SF_electron12->get_EfficiencyData(double(pt_1),double(eta_1));
+		 //       trigweight_2 = (float)SF_muon23->get_EfficiencyData(double(pt_2),double(eta_2));
+		 //    }
+		 //    else if (isMuon8matched && isElectron23matched) {
+		 //       trigweight_1 = (float)SF_electron23->get_EfficiencyData(double(pt_1),double(eta_1));
+		 //       trigweight_2 = (float)SF_muon8->get_EfficiencyData(double(pt_2),double(eta_2));
+	       }
+	       
+	       
             }
-            
+
+	    effweight = trigweight*isoweight_1*isoweight_2;
             // cout << "effweight = " << effweight << endl;
             
             // dilepton system
@@ -3145,7 +3184,7 @@ int main(int argc, char * argv[]) {
             float pfmet_corr_x = met_x;
             float pfmet_corr_y = met_y;
             
-            if ((isW||isDY||isSignal )&&!isData) {
+            if ( (isW||isDY||isSignal) &&!isData && applyRecoilCorrections ) {
                //store corrected MET
                if (applySimpleRecoilCorrections) {
                   //                    recoilMvaMetCorrector.CorrectByMeanResolution(mvamet_x,mvamet_y,bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,mvamet_corr_x,mvamet_corr_y);
