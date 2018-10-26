@@ -1282,10 +1282,10 @@ int main(int argc, char * argv[]) {
     
     // PU reweighting
     PileUp * PUofficial = new PileUp();  
-    if (!isData){
+    if (!isData && !isEmbedded){
        TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/"+PileUpDataFile,"read");
        TFile * filePUdistribution_MC = new TFile (TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/"+PileUpMCFile, "read");
-       TString NamePUHistMC = samplenameForPUHist + "_pileup";
+       TString NamePUHistMC = samplenameForPUHist;
        TH1D * PU_data = (TH1D *)filePUdistribution_data->Get("pileup");
        TH1D * PU_mc = (TH1D *)filePUdistribution_MC->Get(NamePUHistMC);
        PUofficial->set_h_data(PU_data);               
@@ -1950,7 +1950,7 @@ int main(int argc, char * argv[]) {
           
           npartons = analysisTree.genparticles_noutgoing;
           
-          if (!isData) { //PU re-weighting, top pT re-reweighting, store weights
+          if (!isData && !isEmbedded) { //PU re-weighting, top pT re-reweighting, store weights
              puweight = float(PUofficial->get_PUweight(double(analysisTree.numtruepileupinteractions)));
                      
              //std::cout<<"puweight applied"<<std::endl;
@@ -2022,28 +2022,28 @@ int main(int argc, char * argv[]) {
             if (applyTriggerMatch) {
                if (!isLowPtLegElectron) {
                     std::cout << "HLT filter " << LowPtLegElectron << " not found" << std::endl;
-                    exit(-1);
+                    continue;
                 }
                 if (!isHighPtLegElectron) {
                     std::cout << "HLT filter " << HighPtLegElectron << " not found" << std::endl;
-                    exit(-1);
+                    continue;
                 }
                 if (!isLowPtLegMuon) {
                     std::cout << "HLT filter " << LowPtLegMuon << " not found" << std::endl;
-                    exit(-1);
+                    continue;
                 }
                 if (!isHighPtLegMuon) {
                     std::cout << "HLT filter " << HighPtLegMuon << " not found" << std::endl;
-                    exit(-1);
+                    continue;
                 }
                 if (applyDzFilterMatch) {
                    if (!isMu23Ele12DzFilter) {
                       std::cout << "HLT filter " << Mu23Ele12DzFilter << " not found" << std::endl;
-                      exit(-1);
+                      continue;
                    }
                    if (!isMu8Ele23DzFilter) {
                       std::cout << "HLT filter " << Mu8Ele23DzFilter << " not found" << std::endl;
-                      exit(-1);
+                      continue;
                    }
                 }
             }
@@ -2481,6 +2481,7 @@ int main(int argc, char * argv[]) {
             
             float eleScale = eleScaleBarrel;
             if (fabs(analysisTree.electron_eta[electronIndex])>1.479) eleScale = eleScaleEndcap;
+
             // filling electron variables
             pt_1 = analysisTree.electron_pt[electronIndex];
             pt_Up_1 = (1+eleScale)*pt_1;
@@ -2540,26 +2541,16 @@ int main(int argc, char * argv[]) {
 		 isoweight_1 = (float)SF_electronIdIso->get_ScaleFactor(double(pt_1),double(eta_1));
 		 isoweight_2 = (float)SF_muonIdIso->get_ScaleFactor(double(pt_2),double(eta_2));
 	       }
-
-               float eta1_sf = eta_1;
-               if (eta1_sf<=-2.5) eta1_sf = -2.49;
-               if (eta1_sf>=2.5) eta1_sf = 2.49;
-	       correctionWS->var("e_pt")->setVal(pt_1);
-	       correctionWS->var("e_eta")->setVal(eta1_sf);
-	       idweight_1 = correctionWS->function("e_reco_ratio")->getVal();
-               
-               float eta2_sf = eta_2;
-               if (eta2_sf<=-2.4) eta2_sf = -2.39;
-               if (eta2_sf>=2.4) eta2_sf = 2.39;
-	       correctionWS->var("m_eta")->setVal(eta2_sf);
-	       correctionWS->var("m_pt")->setVal(pt_2);
+	       
+	       idweight_1 = correctionWS->function("e_trk_ratio")->getVal();
 	       idweight_2 = correctionWS->function("m_trk_ratio")->getVal();
+
                               
                isoweight_1 *= idweight_1;
                isoweight_2 *= idweight_2;
                 
 	       //	       cout << "isoweight_1 = " << isoweight_1
-	       //		    << "isoweight_2 = " << isoweight_2 << endl;
+	       //		    << "   isoweight_2 = " << isoweight_2 << endl;
 	       //
 	       float Ele23EffData = 1;
 	       float Ele12EffData = 1;
@@ -2572,21 +2563,21 @@ int main(int argc, char * argv[]) {
 	       float Mu8EffMC = 1;
 
 	       if (applyWSCorr) {
-		 Ele23EffData = correctionWS->function("e_trg23_binned_ic_data")->getVal();
-		 Ele12EffData = correctionWS->function("e_trg12_binned_ic_data")->getVal(); 
-		 Mu23EffData  = correctionWS->function("m_trg23_binned_ic_data")->getVal();
-		 Mu8EffData = correctionWS->function("m_trg8_binned_ic_data")->getVal();
+		 Ele23EffData = correctionWS->function("e_trg_binned_23_data")->getVal();
+		 Ele12EffData = correctionWS->function("e_trg_binned_12_data")->getVal(); 
+		 Mu23EffData  = correctionWS->function("m_trg_binned_23_data")->getVal();
+		 Mu8EffData   = correctionWS->function("m_trg_binned_8_data")->getVal();
 		 if (isEmbedded) {
-		   Ele23EffMC = correctionWS->function("e_trg23_binned_ic_embed")->getVal();
-		   Ele12EffMC = correctionWS->function("e_trg12_binned_ic_embed")->getVal(); 
-		   Mu23EffMC  = correctionWS->function("m_trg23_binned_ic_embed")->getVal();
-		   Mu8EffMC = correctionWS->function("m_trg8_binned_ic_embed")->getVal();
+		   Ele23EffMC = correctionWS->function("e_trg_binned_23_embed")->getVal();
+		   Ele12EffMC = correctionWS->function("e_trg_binned_12_embed")->getVal(); 
+		   Mu23EffMC  = correctionWS->function("m_trg_binned_23_embed")->getVal();
+		   Mu8EffMC   = correctionWS->function("m_trg_binned_8_embed" )->getVal();
 		 }
 		 else {
-		   Ele23EffMC = correctionWS->function("e_trg23_binned_ic_mc")->getVal();
-                   Ele12EffMC = correctionWS->function("e_trg12_binned_ic_mc")->getVal();
-                   Mu23EffMC  = correctionWS->function("m_trg23_binned_ic_mc")->getVal();
-                   Mu8EffMC = correctionWS->function("m_trg8_binned_ic_mc")->getVal();
+		   Ele23EffMC = correctionWS->function("e_trg_binned_23_mc")->getVal();
+                   Ele12EffMC = correctionWS->function("e_trg_binned_12_mc")->getVal();
+                   Mu23EffMC  = correctionWS->function("m_trg_binned_23_mc")->getVal();
+                   Mu8EffMC   = correctionWS->function("m_trg_binned_8_mc" )->getVal();
 		 }
 	       }
 	       else {
@@ -2630,11 +2621,10 @@ int main(int argc, char * argv[]) {
 		 //       trigweight_2 = (float)SF_muon8->get_EfficiencyData(double(pt_2),double(eta_2));
 	       }
 	       
-	       
+	       //	       std::cout << "trigweight = " << trigweight << std::endl;
             }
-
 	    effweight = trigweight*isoweight_1*isoweight_2;
-            // cout << "effweight = " << effweight << endl;
+
             
             // dilepton system
             TLorentzVector muonLV; muonLV.SetXYZM(analysisTree.muon_px[muonIndex],
@@ -3723,6 +3713,7 @@ int main(int argc, char * argv[]) {
                   isZLL = true;
                }
                
+	       /*
                double weightE = 1;   //weights for jet electron fake rate
                double weightEUp = 1;
                double weightEDown = 1;
@@ -3795,9 +3786,9 @@ int main(int argc, char * argv[]) {
                effweight_jetMuDown = effweight0 * weightE     * weightMuDown; 
                effweight_jetEUp    = effweight0 * weightEUp   * weightMu;
                effweight_jetEDown  = effweight0 * weightEDown * weightMu; 
-            }
-            
-            tree->Fill();
+	       */
+	    }
+	    tree->Fill();
             selEvents++;
             
        } // end of file processing (loop over events in one file)
