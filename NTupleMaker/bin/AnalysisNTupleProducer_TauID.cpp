@@ -2108,7 +2108,7 @@ int main(int argc, char * argv[]) {
 	tauVTightMvaIso_ = analysisTree.tau_byVTightIsolationMVArun2v1DBoldDMwLT[indexTau] > 0.5;
 	tauVVTightMvaIso_ = analysisTree.tau_byVVTightIsolationMVArun2v1DBoldDMwLT[indexTau] > 0.5;
 
-	tauVLooseMva2017v2Iso_ = analysisTree.tau_byVVLooseIsolationMVArun2017v2DBoldDMwLT2017[indexTau] > 0.5;
+	tauVVLooseMva2017v2Iso_ = analysisTree.tau_byVVLooseIsolationMVArun2017v2DBoldDMwLT2017[indexTau] > 0.5;
 	tauVLooseMva2017v2Iso_ = analysisTree.tau_byVLooseIsolationMVArun2017v2DBoldDMwLT2017[indexTau] > 0.5;
 	tauLooseMva2017v2Iso_ = analysisTree.tau_byLooseIsolationMVArun2017v2DBoldDMwLT2017[indexTau] > 0.5;
 	tauMediumMva2017v2Iso_ = analysisTree.tau_byMediumIsolationMVArun2017v2DBoldDMwLT2017[indexTau] > 0.5;
@@ -2438,7 +2438,7 @@ int main(int argc, char * argv[]) {
 	    tauVTightMvaIso_ = analysisTree.tau_byVTightIsolationMVArun2v1DBoldDMwLT[indexTau] > 0.5;
 	    tauVVTightMvaIso_ = analysisTree.tau_byVVTightIsolationMVArun2v1DBoldDMwLT[indexTau] > 0.5;
 
-	    tauVLooseMva2017v2Iso_ = analysisTree.tau_byVVLooseIsolationMVArun2017v2DBoldDMwLT2017[indexTau] > 0.5;
+	    tauVVLooseMva2017v2Iso_ = analysisTree.tau_byVVLooseIsolationMVArun2017v2DBoldDMwLT2017[indexTau] > 0.5;
 	    tauVLooseMva2017v2Iso_ = analysisTree.tau_byVLooseIsolationMVArun2017v2DBoldDMwLT2017[indexTau] > 0.5;
 	    tauLooseMva2017v2Iso_ = analysisTree.tau_byLooseIsolationMVArun2017v2DBoldDMwLT2017[indexTau] > 0.5;
 	    tauMediumMva2017v2Iso_ = analysisTree.tau_byMediumIsolationMVArun2017v2DBoldDMwLT2017[indexTau] > 0.5;
