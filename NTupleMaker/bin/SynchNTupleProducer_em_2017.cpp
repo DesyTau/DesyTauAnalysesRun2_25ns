@@ -1599,6 +1599,7 @@ int main(int argc, char * argv[]) {
              
              // computing boson 4-vector
              // store generator taus from LV, also for visible tau
+	     //	std::cout << "gentaus : " << analysisTree.gentau_count << std::endl;
              for (unsigned int igentau=0; igentau < analysisTree.gentau_count; ++igentau) {
                 TLorentzVector tauLV; tauLV.SetXYZT(analysisTree.gentau_px[igentau],
                                                     analysisTree.gentau_py[igentau],
@@ -1712,7 +1713,7 @@ int main(int argc, char * argv[]) {
                 if (removeGammaStar) continue;
              }
              
-             if (isDY) { //if DY than check which decay mode and store gen-Info of the Boson
+             if (isDY||isEmbedded) { //if DY than check which decay mode and store gen-Info of the Boson
                 
                 if (promptTausFirstCopy.size()==2) {
                    isZTT = true; isZMM = false; isZEE = false;
@@ -1721,6 +1722,27 @@ int main(int argc, char * argv[]) {
                    bosonEta  = promptTausLV.Eta();
                    lepPx = promptVisTausLV.Px(); lepPy = promptVisTausLV.Py(); lepPz = promptVisTausLV.Pz();
                    mtBoson_gen = mT(promptTausFirstCopy[0],promptTausFirstCopy[1]);
+		   double gt1_pt  = promptTausFirstCopy[0].Pt();
+		   double gt1_eta = promptTausFirstCopy[0].Eta();
+		   double gt2_pt  = promptTausFirstCopy[1].Pt();
+		   double gt2_eta = promptTausFirstCopy[1].Eta();
+		   
+		   correctionWS->var("gt_pt")->setVal(gt1_pt);
+		   correctionWS->var("gt_eta")->setVal(gt1_eta);
+		   double id1_embed = correctionWS->function("m_sel_idEmb_ratio")->getVal();
+		   correctionWS->var("gt_pt")->setVal(gt2_pt);
+                   correctionWS->var("gt_eta")->setVal(gt2_eta);
+		   double id2_embed = correctionWS->function("m_sel_idEmb_ratio")->getVal();
+		   correctionWS->var("gt1_pt")->setVal(gt1_pt);
+                   correctionWS->var("gt1_eta")->setVal(gt1_eta);
+		   correctionWS->var("gt2_pt")->setVal(gt2_pt);
+                   correctionWS->var("gt2_eta")->setVal(gt2_eta);
+		   double trg_embed = correctionWS->function("m_sel_trg_ratio")->getVal();
+		   embeddedWeight = id1_embed * id2_embed * trg_embed;
+		   //		   std::cout << "id1 embedded  = " << id1_embed << std::endl;
+		   //		   std::cout << "id2 embedded  = " << id2_embed << std::endl;
+		   //		   std::cout << "trig embedded = " << trg_embed << std::endl;
+		   //		   std::cout << "embedded weight = " << embeddedWeight << std::endl;
                 }
                 else if (promptMuons.size()==2) {
                    isZTT = false; isZMM = true; isZEE = false;
