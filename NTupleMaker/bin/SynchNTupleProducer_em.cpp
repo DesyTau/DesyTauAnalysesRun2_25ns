@@ -3625,14 +3625,15 @@ int main(int argc, char * argv[]) {
       std::cout<<"e tracking: "<<idweight_1<<std::endl;
       std::cout<<"mu tracking: "<<idweight_2<<std::endl;
             }
-                   
-            if (!isData){
-               d0_1_cal=0;
-               dZ_1_cal=0;
-               d0_2_cal=0;
-               dZ_2_cal=0;
-               
-               //check if particle is prompt or non-prompt
+
+	    // First set the calibrated variables to the uncalibrated versions -> necessary for data
+	    d0_1_cal=d0_1;
+	    dZ_1_cal=dZ_1;
+	    d0_2_cal=d0_2;
+	    dZ_2_cal=dZ_2;
+
+	    if (!isData){               
+	       //check if particle is prompt or non-prompt
                if (gen_match_1 == 3) {  
                   calibrateIP.DoCalibrationForNonPromptLeptons(pt_1,eta_1,"d0_1",d0_1, d0_1_cal);
                   calibrateIP.DoCalibrationForNonPromptLeptons(pt_1,eta_1,"dZ_1",dZ_1, dZ_1_cal);
