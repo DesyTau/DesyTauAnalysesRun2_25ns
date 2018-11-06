@@ -505,8 +505,8 @@ int main(int argc, char * argv[]) {
     Float_t         mt_1;
     
     Float_t         pt_2;
-    Float_t         pt_Up_2;
-    Float_t         pt_Down_2;
+    Float_t         pt_2_muUp;
+    Float_t         pt_2_muDown;
     
     Float_t         phi_2;
     Float_t         eta_2;
@@ -924,8 +924,8 @@ int main(int argc, char * argv[]) {
     tree->Branch("gen_match_1",&gen_match_1,"gen_match_1/I");
     
     tree->Branch("pt_2", &pt_2, "pt_2/F");
-    tree->Branch("pt_Up_2", &pt_Up_2, "pt_Up_2/F");
-    tree->Branch("pt_Down_2", &pt_Down_2, "pt_Down_2/F");
+    tree->Branch("pt_2_muUp", &pt_2_muUp, "pt_2_muUp/F");
+    tree->Branch("pt_2_muDown", &pt_2_muDown, "pt_2_muDown/F");
     
     tree->Branch("phi_2", &phi_2, "phi_2/F");
     tree->Branch("eta_2", &eta_2, "eta_2/F");
@@ -2381,8 +2381,8 @@ int main(int argc, char * argv[]) {
            
             // filling muon variables
             pt_2 = analysisTree.muon_pt[muonIndex];
-            pt_Up_2   = (1+muonScale)*pt_2;
-            pt_Down_2 = (1-muonScale)*pt_2;
+            pt_2_muUp   = (1+muonScale)*pt_2;
+            pt_2_muDown = (1-muonScale)*pt_2;
             
             
             eta_2 = analysisTree.muon_eta[muonIndex];
