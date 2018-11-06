@@ -420,8 +420,8 @@ int main(int argc, char * argv[]) {
     Float_t         m_vis;
     Float_t         m_vis_muUp;
     Float_t         m_vis_muDown;
-    Float_t         m_vis_eUp;
-    Float_t         m_vis_eDown;
+    Float_t         m_vis_escaleUp;
+    Float_t         m_vis_escaleDown;
     Float_t         m_vis_jesUp;
     Float_t         m_vis_jesDown;
     Float_t         m_vis_resoUp;
@@ -430,8 +430,8 @@ int main(int argc, char * argv[]) {
     Float_t         mTtot;
     Float_t         mTtot_muUp;
     Float_t         mTtot_muDown;
-    Float_t         mTtot_eUp;
-    Float_t         mTtot_eDown;
+    Float_t         mTtot_escaleUp;
+    Float_t         mTtot_escaleDown;
     Float_t         mTtot_jesUp;
     Float_t         mTtot_jesDown;
     Float_t         mTtot_resoUp;
@@ -441,8 +441,8 @@ int main(int argc, char * argv[]) {
     Float_t         mTdileptonMET;
     Float_t         mTdileptonMET_muUp;
     Float_t         mTdileptonMET_muDown;
-    Float_t         mTdileptonMET_eUp;
-    Float_t         mTdileptonMET_eDown;
+    Float_t         mTdileptonMET_escaleUp;
+    Float_t         mTdileptonMET_escaleDown;
     Float_t         mTdileptonMET_jesUp;
     Float_t         mTdileptonMET_jesDown;
     Float_t         mTdileptonMET_resoUp;
@@ -459,20 +459,20 @@ int main(int argc, char * argv[]) {
     Float_t         eta_sv;
     Float_t         phi_sv;
 
-    Float_t         pt_sv_eUp;
-    Float_t         eta_sv_eUp;
-    Float_t         phi_sv_eUp;
+    Float_t         pt_sv_escaleUp;
+    Float_t         eta_sv_escaleUp;
+    Float_t         phi_sv_escaleUp;
 
-    Float_t         pt_sv_eDown;
-    Float_t         eta_sv_eDown;
-    Float_t         phi_sv_eDown;
+    Float_t         pt_sv_escaleDown;
+    Float_t         eta_sv_escaleDown;
+    Float_t         phi_sv_escaleDown;
     
     Float_t         pt_sv_gen;
     Float_t         eta_sv_gen;
     Float_t         phi_sv_gen;
     
-    Float_t         m_sv_eUp;
-    Float_t         m_sv_eDown;
+    Float_t         m_sv_escaleUp;
+    Float_t         m_sv_escaleDown;
     Float_t         m_sv_muUp;
     Float_t         m_sv_muDown;
     Float_t         m_sv_jesUp;
@@ -480,8 +480,8 @@ int main(int argc, char * argv[]) {
     Float_t         m_sv_resoUp;
     Float_t         m_sv_resoDown;
     
-    Float_t         mt_sv_eUp;
-    Float_t         mt_sv_eDown;
+    Float_t         mt_sv_escaleUp;
+    Float_t         mt_sv_escaleDown;
     Float_t         mt_sv_muUp;
     Float_t         mt_sv_muDown;
     Float_t         mt_sv_jesUp;
@@ -491,8 +491,8 @@ int main(int argc, char * argv[]) {
     
     
     Float_t         pt_1;
-    Float_t         pt_Up_1;
-    Float_t         pt_Down_1;
+    Float_t         pt_1_escaleUp;
+    Float_t         pt_1_escaleDown;
     
     Float_t         phi_1;
     Float_t         eta_1;
@@ -615,14 +615,14 @@ int main(int argc, char * argv[]) {
     Float_t         pzetamiss_resoDown;
     Float_t         dzeta_resoDown;
 
-    Float_t         dzeta_eUp;
-    Float_t         dzeta_eDown;
+    Float_t         dzeta_escaleUp;
+    Float_t         dzeta_escaleDown;
     
-    Float_t         pzetavis_eUp;
-    Float_t         pzetavis_eDown;
+    Float_t         pzetavis_escaleUp;
+    Float_t         pzetavis_escaleDown;
 
-    Float_t         pzetamiss_eUp;
-    Float_t         pzetamiss_eDown;
+    Float_t         pzetamiss_escaleUp;
+    Float_t         pzetamiss_escaleDown;
 
     Float_t         pzetamiss_genmet;
     Float_t         dzeta_genmet;
@@ -840,8 +840,8 @@ int main(int argc, char * argv[]) {
     tree->Branch("m_vis",        &m_vis,        "m_vis/F");
     tree->Branch("m_vis_muUp",   &m_vis_muUp,   "m_vis_muUp/F");
     tree->Branch("m_vis_muDown", &m_vis_muDown, "m_vis_muDown/F");
-    tree->Branch("m_vis_eUp",    &m_vis_eUp,    "m_vis_eUp/F");
-    tree->Branch("m_vis_eDown",  &m_vis_eDown,  "m_vis_eDown/F");
+    tree->Branch("m_vis_escaleUp",    &m_vis_escaleUp,    "m_vis_escaleUp/F");
+    tree->Branch("m_vis_escaleDown",  &m_vis_escaleDown,  "m_vis_escaleDown/F");
     tree->Branch("m_vis_jesUp",   &m_vis_jesUp,   "m_vis_jesUp/F");
     tree->Branch("m_vis_jesDown", &m_vis_jesDown, "m_vis_jesDown/F");
     tree->Branch("m_vis_resoUp",    &m_vis_resoUp,    "m_vis_resoUp/F");
@@ -851,8 +851,8 @@ int main(int argc, char * argv[]) {
     tree->Branch("mCDF",         &mCDF,         "mCDF/F");
     tree->Branch("mTtot_muUp",   &mTtot_muUp,   "mTtot_muUp/F");
     tree->Branch("mTtot_muDown", &mTtot_muDown, "mTtot_muDown/F");
-    tree->Branch("mTtot_eUp",    &mTtot_eUp,    "mTtot_eUp/F");
-    tree->Branch("mTtot_eDown",  &mTtot_eDown,  "mTtot_eDown/F");
+    tree->Branch("mTtot_escaleUp",    &mTtot_escaleUp,    "mTtot_escaleUp/F");
+    tree->Branch("mTtot_escaleDown",  &mTtot_escaleDown,  "mTtot_escaleDown/F");
     tree->Branch("mTtot_jesUp",   &mTtot_jesUp,   "mTtot_jesUp/F");
     tree->Branch("mTtot_jesDown", &mTtot_jesDown, "mTtot_jesDown/F");
     tree->Branch("mTtot_resoUp",    &mTtot_resoUp,    "mTtot_resoUp/F");
@@ -861,8 +861,8 @@ int main(int argc, char * argv[]) {
     tree->Branch("mTdileptonMET", &mTdileptonMET, "mTdileptonMET/F");
     tree->Branch("mTdileptonMET_muUp", &mTdileptonMET_muUp, "mTdileptonMET_muUp/F");
     tree->Branch("mTdileptonMET_muDown", &mTdileptonMET_muDown, "mTdileptonMET_muDown/F");
-    tree->Branch("mTdileptonMET_eUp", &mTdileptonMET_eUp, "mTdileptonMET_eUp/F");
-    tree->Branch("mTdileptonMET_eDown", &mTdileptonMET_eDown, "mTdileptonMET_eDown/F");
+    tree->Branch("mTdileptonMET_escaleUp", &mTdileptonMET_escaleUp, "mTdileptonMET_escaleUp/F");
+    tree->Branch("mTdileptonMET_escaleDown", &mTdileptonMET_escaleDown, "mTdileptonMET_escaleDown/F");
     tree->Branch("mTdileptonMET_jesUp", &mTdileptonMET_jesUp, "mTdileptonMET_jesUp/F");
     tree->Branch("mTdileptonMET_jesDown", &mTdileptonMET_jesDown, "mTdileptonMET_jesDown/F");
     tree->Branch("mTdileptonMET_resoUp", &mTdileptonMET_resoUp, "mTdileptonMET_resoUp/F");
@@ -879,13 +879,13 @@ int main(int argc, char * argv[]) {
     tree->Branch("eta_sv",  &eta_sv, "eta_sv/F");
     tree->Branch("phi_sv",  &phi_sv, "phi_sv/F");
     
-    tree->Branch("pt_sv_eUp",   &pt_sv_eUp,  "pt_sv_eUp/F");
-    tree->Branch("eta_sv_eUp",  &eta_sv_eUp, "eta_sv_eUp/F");
-    tree->Branch("phi_sv_eUp",  &phi_sv_eUp, "phi_sv_eUp/F");
+    tree->Branch("pt_sv_escaleUp",   &pt_sv_escaleUp,  "pt_sv_escaleUp/F");
+    tree->Branch("eta_sv_escaleUp",  &eta_sv_escaleUp, "eta_sv_escaleUp/F");
+    tree->Branch("phi_sv_escaleUp",  &phi_sv_escaleUp, "phi_sv_escaleUp/F");
     
-    tree->Branch("pt_sv_eDown",   &pt_sv_eDown,  "pt_sv_eDown/F");
-    tree->Branch("eta_sv_eDown",  &eta_sv_eDown, "eta_sv_eDown/F");
-    tree->Branch("phi_sv_eDown",  &phi_sv_eDown, "phi_sv_eDown/F");
+    tree->Branch("pt_sv_escaleDown",   &pt_sv_escaleDown,  "pt_sv_escaleDown/F");
+    tree->Branch("eta_sv_escaleDown",  &eta_sv_escaleDown, "eta_sv_escaleDown/F");
+    tree->Branch("phi_sv_escaleDown",  &phi_sv_escaleDown, "phi_sv_escaleDown/F");
     
     tree->Branch("pt_sv_gen",   &pt_sv_gen,  "pt_sv_gen/F");
     tree->Branch("eta_sv_gen",  &eta_sv_gen, "eta_sv_gen/F");
@@ -895,8 +895,8 @@ int main(int argc, char * argv[]) {
     tree->Branch("m_sv_jesDown", &m_sv_jesDown, "m_sv_jesDown/F");
     tree->Branch("m_sv_resoUp",    &m_sv_resoUp,    "m_sv_resoUp/F");
     tree->Branch("m_sv_resoDown",  &m_sv_resoDown,  "m_sv_resoDown/F");
-    tree->Branch("m_sv_eUp",       &m_sv_eUp,       "m_sv_eUp/F");
-    tree->Branch("m_sv_eDown",     &m_sv_eDown,     "m_sv_eDown/F");
+    tree->Branch("m_sv_escaleUp",       &m_sv_escaleUp,       "m_sv_escaleUp/F");
+    tree->Branch("m_sv_escaleDown",     &m_sv_escaleDown,     "m_sv_escaleDown/F");
     tree->Branch("m_sv_muUp",      &m_sv_muUp,      "m_sv_muUp/F");
     tree->Branch("m_sv_muDown",    &m_sv_muDown,    "m_sv_muDown/F");
     
@@ -904,14 +904,14 @@ int main(int argc, char * argv[]) {
     tree->Branch("mt_sv_jesDown", &mt_sv_jesDown, "mt_sv_jesDown/F");
     tree->Branch("mt_sv_resoUp",    &mt_sv_resoUp,    "mt_sv_resoUp/F");
     tree->Branch("mt_sv_resoDown",  &mt_sv_resoDown,  "mt_sv_resoDown/F");
-    tree->Branch("mt_sv_eUp",       &mt_sv_eUp,       "mt_sv_eUp/F");
-    tree->Branch("mt_sv_eDown",     &mt_sv_eDown,     "mt_sv_eDown/F");
+    tree->Branch("mt_sv_escaleUp",       &mt_sv_escaleUp,       "mt_sv_escaleUp/F");
+    tree->Branch("mt_sv_escaleDown",     &mt_sv_escaleDown,     "mt_sv_escaleDown/F");
     tree->Branch("mt_sv_muUp",      &mt_sv_muUp,      "mt_sv_muUp/F");
     tree->Branch("mt_sv_muDown",    &mt_sv_muDown,    "mt_sv_muDown/F");
     
     tree->Branch("pt_1", &pt_1, "pt_1/F");
-    tree->Branch("pt_Up_1", &pt_Up_1, "pt_Up_1/F");
-    tree->Branch("pt_Down_1", &pt_Down_1, "pt_Down_1/F");
+    tree->Branch("pt_1_escaleUp", &pt_1_escaleUp, "pt_1_escaleUp/F");
+    tree->Branch("pt_1_escaleDown", &pt_1_escaleDown, "pt_1_escaleDown/F");
     tree->Branch("phi_1", &phi_1, "phi_1/F");
     tree->Branch("eta_1", &eta_1, "eta_1/F");
     tree->Branch("m_1", &m_1, "m_1/F");
@@ -1011,17 +1011,17 @@ int main(int argc, char * argv[]) {
     tree->Branch("dphi_tt", &dphi_tt, "dphi_tt/F");
     
     tree->Branch("pzetavis", &pzetavis, "pzetavis/F");
-    tree->Branch("pzetavis_eUp", &pzetavis_eUp, "pzetavis_eUp/F");
-    tree->Branch("pzetavis_eDown", &pzetavis_eDown, "pzetavis_eDown/F");
+    tree->Branch("pzetavis_escaleUp", &pzetavis_escaleUp, "pzetavis_escaleUp/F");
+    tree->Branch("pzetavis_escaleDown", &pzetavis_escaleDown, "pzetavis_escaleDown/F");
     
 
     tree->Branch("pzetamiss", &pzetamiss, "pzetamiss/F");
-    tree->Branch("pzetamiss_eUp", &pzetamiss_eUp, "pzetamiss_eUp/F");
-    tree->Branch("pzetamiss_eDown", &pzetamiss_eDown, "pzetamiss_eDown/F");
+    tree->Branch("pzetamiss_escaleUp", &pzetamiss_escaleUp, "pzetamiss_escaleUp/F");
+    tree->Branch("pzetamiss_escaleDown", &pzetamiss_escaleDown, "pzetamiss_escaleDown/F");
 
     tree->Branch("dzeta",&dzeta,"dzeta/F");    
-    tree->Branch("dzeta_eUp",&dzeta_eUp,"dzeta_eUp/F");
-    tree->Branch("dzeta_eDown",&dzeta_eDown,"dzeta_eDown/F");
+    tree->Branch("dzeta_escaleUp",&dzeta_escaleUp,"dzeta_escaleUp/F");
+    tree->Branch("dzeta_escaleDown",&dzeta_escaleDown,"dzeta_escaleDown/F");
 
 
     tree->Branch("pzetamiss_resoUp", &pzetamiss_resoUp, "pzetamiss_resoUp/F");
@@ -2400,8 +2400,8 @@ int main(int argc, char * argv[]) {
             if (fabs(analysisTree.electron_eta[electronIndex])>1.479) eleScale = eleScaleEndcap;
             // filling electron variables
             pt_1 = analysisTree.electron_pt[electronIndex];
-            pt_Up_1 = (1+eleScale)*pt_1;
-            pt_Down_1 = (1-eleScale)*pt_1;
+            pt_1_escaleUp = (1+eleScale)*pt_1;
+            pt_1_escaleDown = (1-eleScale)*pt_1;
             
             eta_1 = analysisTree.electron_eta[electronIndex];
             phi_1 = analysisTree.electron_phi[electronIndex];
@@ -2532,8 +2532,8 @@ int main(int argc, char * argv[]) {
             
             m_vis_muUp    = (muonUpLV+electronLV).M();
             m_vis_muDown  = (muonDownLV+electronLV).M();
-            m_vis_eUp     = (muonLV+electronUpLV).M();
-            m_vis_eDown   = (muonLV+electronDownLV).M();
+            m_vis_escaleUp     = (muonLV+electronUpLV).M();
+            m_vis_escaleDown   = (muonLV+electronDownLV).M();
             m_vis_jesUp   = m_vis;
             m_vis_jesDown = m_vis;
             m_vis_resoUp    = m_vis;
@@ -2542,8 +2542,8 @@ int main(int argc, char * argv[]) {
             // std::cout << "m_vis        = " << m_vis << std::endl;
             // std::cout << "m_vis_muUp   = " << m_vis_muUp << std::endl;
             // std::cout << "m_vis_muDown = " << m_vis_muDown << std::endl;
-            // std::cout << "m_vis_eUp    = " << m_vis_eUp << std::endl;
-            // std::cout << "m_vis_eDown  = " << m_vis_eDown << std::endl;
+            // std::cout << "m_vis_escaleUp    = " << m_vis_escaleUp << std::endl;
+            // std::cout << "m_vis_escaleDown  = " << m_vis_escaleDown << std::endl;
             // std::cout << std::endl;
             
 	    //            pt_tt = dileptonLV.Pt();
@@ -3120,30 +3120,30 @@ int main(int argc, char * argv[]) {
             float vectorVisX = muonLV.Px() + electronLV.Px();
             float vectorVisY = muonLV.Py() + electronLV.Py();
 
-            float vectorVisX_eUp = muonLV.Px() + electronUpLV.Px();
-            float vectorVisY_eUp = muonLV.Py() + electronUpLV.Py();
+            float vectorVisX_escaleUp = muonLV.Px() + electronUpLV.Px();
+            float vectorVisY_escaleUp = muonLV.Py() + electronUpLV.Py();
 
-            float vectorVisX_eDown = muonLV.Px() + electronDownLV.Px();
-            float vectorVisY_eDown = muonLV.Py() + electronDownLV.Py();
+            float vectorVisX_escaleDown = muonLV.Px() + electronDownLV.Px();
+            float vectorVisY_escaleDown = muonLV.Py() + electronDownLV.Py();
             
             pzetavis = vectorVisX*zetaX + vectorVisY*zetaY;
-            pzetavis_eUp = vectorVisX_eUp*zetaX + vectorVisY_eUp*zetaY;
-            pzetavis_eDown = vectorVisX_eDown*zetaX + vectorVisY_eDown*zetaY;
+            pzetavis_escaleUp = vectorVisX_escaleUp*zetaX + vectorVisY_escaleUp*zetaY;
+            pzetavis_escaleDown = vectorVisX_escaleDown*zetaX + vectorVisY_escaleDown*zetaY;
 
-	    double px_eUp = (1+eleScale) * pt_1 * TMath::Cos(phi_1);
-	    double py_eUp = (1+eleScale) * pt_1 * TMath::Sin(phi_1);
+	    double px_escaleUp = (1+eleScale) * pt_1 * TMath::Cos(phi_1);
+	    double py_escaleUp = (1+eleScale) * pt_1 * TMath::Sin(phi_1);
 	    
 	    double px_e = pt_1 * TMath::Cos(phi_1);
 	    double py_e = pt_1 * TMath::Sin(phi_1);
 	    
-	    double px_eDown = (1-eleScale) * pt_1 * TMath::Cos(phi_1);
-	    double py_eDown = (1-eleScale) * pt_1 * TMath::Sin(phi_1);
+	    double px_escaleDown = (1-eleScale) * pt_1 * TMath::Cos(phi_1);
+	    double py_escaleDown = (1-eleScale) * pt_1 * TMath::Sin(phi_1);
 	    
-	    double metx_eUp = met_x + px_e - px_eUp;
-	    double mety_eUp = met_y + py_e - py_eUp;
+	    double metx_escaleUp = met_x + px_e - px_escaleUp;
+	    double mety_escaleUp = met_y + py_e - py_escaleUp;
 	    
-	    double metx_eDown = met_x + px_e - px_eDown;
-	    double mety_eDown = met_y + py_e - py_eDown;
+	    double metx_escaleDown = met_x + px_e - px_escaleDown;
+	    double mety_escaleDown = met_y + py_e - py_escaleDown;
 
             // computation of DZeta variable
             // pfmet
@@ -3158,10 +3158,10 @@ int main(int argc, char * argv[]) {
                          zetaX,zetaY,pzetavis,pzetamiss_resoUp,dzeta_resoUp); // resoUp
             computeDzeta(met_resoDown_x,met_resoDown_y,
                          zetaX,zetaY,pzetavis,pzetamiss_resoDown,dzeta_resoDown); // resoDown
-            computeDzeta(metx_eUp,mety_eUp,
-                         zetaX,zetaY,pzetavis_eUp,pzetamiss_eUp,dzeta_eUp); // eUp
-            computeDzeta(metx_eDown,mety_eDown,
-                         zetaX,zetaY,pzetavis_eDown,pzetamiss_eDown,dzeta_eDown); // eDown
+            computeDzeta(metx_escaleUp,mety_escaleUp,
+                         zetaX,zetaY,pzetavis_escaleUp,pzetamiss_escaleUp,dzeta_escaleUp); // eUp
+            computeDzeta(metx_escaleDown,mety_escaleDown,
+                         zetaX,zetaY,pzetavis_escaleDown,pzetamiss_escaleDown,dzeta_escaleDown); // eDown
             
             // mvamet
             computeDzeta(mvamet_x,mvamet_y,
@@ -3186,11 +3186,11 @@ int main(int argc, char * argv[]) {
 	    //            float PFETmis = TMath::Sqrt(met_x*met_x+met_y*met_y);
             TLorentzVector metLV; metLV.SetXYZT(met_x,met_y,0.,met);
 
-	    float met_eUp = TMath::Sqrt(metx_eUp*metx_eUp+mety_eUp*mety_eUp);
-	    float met_eDown = TMath::Sqrt(metx_eDown*metx_eDown+mety_eDown*mety_eDown);
+	    float met_escaleUp = TMath::Sqrt(metx_escaleUp*metx_escaleUp+mety_escaleUp*mety_escaleUp);
+	    float met_escaleDown = TMath::Sqrt(metx_escaleDown*metx_escaleDown+mety_escaleDown*mety_escaleDown);
             
-            TLorentzVector metEleUpLV; metEleUpLV.SetXYZT(metx_eUp,mety_eUp,0.,met_eUp);
-            TLorentzVector metEleDownLV; metEleDownLV.SetXYZT(metx_eDown,mety_eDown,0.,met_eDown);
+            TLorentzVector metEleUpLV; metEleUpLV.SetXYZT(metx_escaleUp,mety_escaleUp,0.,met_escaleUp);
+            TLorentzVector metEleDownLV; metEleDownLV.SetXYZT(metx_escaleDown,mety_escaleDown,0.,met_escaleDown);
 
             mt_1 = mT(electronLV,metLV);
             mt_2 = mT(muonLV,metLV);
@@ -3210,8 +3210,8 @@ int main(int argc, char * argv[]) {
             mTtot_muUp   =  totalTransverseMass( muonUpLV ,   electronLV , metLV);
             mTtot_muDown =  totalTransverseMass( muonDownLV , electronLV , metLV);
             
-            mTtot_eUp   =  totalTransverseMass ( muonLV , electronUpLV   , metLV);
-            mTtot_eDown =  totalTransverseMass ( muonLV , electronDownLV , metLV);
+            mTtot_escaleUp   =  totalTransverseMass ( muonLV , electronUpLV   , metLV);
+            mTtot_escaleDown =  totalTransverseMass ( muonLV , electronDownLV , metLV);
             
             mTtot_jesUp   =  totalTransverseMass ( muonLV , electronLV , metScaleUpLV);
             mTtot_jesDown =  totalTransverseMass ( muonLV , electronLV , metScaleDownLV);
@@ -3241,8 +3241,8 @@ int main(int argc, char * argv[]) {
 
 	    mTdileptonMET_muUp = mT(muonUpLV+electronLV,metLV);
 	    mTdileptonMET_muDown = mT(muonDownLV+electronLV,metLV);
-	    mTdileptonMET_eUp = mT(muonLV+electronUpLV,metEleUpLV);
-	    mTdileptonMET_eDown = mT(muonLV+electronDownLV,metEleDownLV);
+	    mTdileptonMET_escaleUp = mT(muonLV+electronUpLV,metEleUpLV);
+	    mTdileptonMET_escaleDown = mT(muonLV+electronDownLV,metEleDownLV);
 
 	    //	    std::cout << "mT(ll,MET) = " << mTdileptonMET << "  mTtot = " << mTtot << std::endl;
             //      std::cout << "BDT       = " << bdt << std::endl;
@@ -3252,8 +3252,8 @@ int main(int argc, char * argv[]) {
             m_sv           = -10;
             m_sv_muUp      = -10;
             m_sv_muDown    = -10;
-            m_sv_eUp       = -10;
-            m_sv_eDown     = -10;
+            m_sv_escaleUp       = -10;
+            m_sv_escaleDown     = -10;
             m_sv_jesUp   = -10;
             m_sv_jesDown = -10;
             m_sv_resoUp    = -10;
@@ -3262,8 +3262,8 @@ int main(int argc, char * argv[]) {
             mt_sv           = -10;
             mt_sv_muUp      = -10;
             mt_sv_muDown    = -10;
-            mt_sv_eUp       = -10;
-            mt_sv_eDown     = -10;
+            mt_sv_escaleUp       = -10;
+            mt_sv_escaleDown     = -10;
             mt_sv_jesUp   = -10;
             mt_sv_jesDown = -10;
             mt_sv_resoUp    = -10;
@@ -3273,13 +3273,13 @@ int main(int argc, char * argv[]) {
             eta_sv = -10;
             phi_sv = -10;
             
-            pt_sv_eUp  = -10;
-            eta_sv_eUp = -10;
-            phi_sv_eUp = -10;
+            pt_sv_escaleUp  = -10;
+            eta_sv_escaleUp = -10;
+            phi_sv_escaleUp = -10;
             
-            pt_sv_eDown  = -10;
-            eta_sv_eDown = -10;
-            phi_sv_eDown = -10;
+            pt_sv_escaleDown  = -10;
+            eta_sv_escaleDown = -10;
+            phi_sv_escaleDown = -10;
 
             bool checkSV = false;
             if (sync) checkSV = computeSVFitMass;
@@ -3365,8 +3365,8 @@ int main(int argc, char * argv[]) {
                     m_sv_jesDown = m_sv;
                     m_sv_resoUp    = m_sv;
                     m_sv_resoDown  = m_sv;
-                    m_sv_eUp       = m_sv;
-                    m_sv_eDown     = m_sv;
+                    m_sv_escaleUp       = m_sv;
+                    m_sv_escaleDown     = m_sv;
                     m_sv_muUp      = m_sv;
                     m_sv_muDown    = m_sv;
                     
@@ -3374,8 +3374,8 @@ int main(int argc, char * argv[]) {
                     mt_sv_jesDown = mt_sv;
                     mt_sv_resoUp    = mt_sv;
                     mt_sv_resoDown  = mt_sv;
-                    mt_sv_eUp       = mt_sv;
-                    mt_sv_eDown     = mt_sv;
+                    mt_sv_escaleUp       = mt_sv;
+                    mt_sv_escaleDown     = mt_sv;
                     mt_sv_muUp      = mt_sv;
                     mt_sv_muDown    = mt_sv;
                 
@@ -3387,40 +3387,40 @@ int main(int argc, char * argv[]) {
 		      /*		      		      
 		      std::cout << "Event = " << analysisTree.event_nr << std::endl;
 		      std::cout << "MetX = " << met_x << "   MetY = " << met_y << std::endl;
-		      std::cout << "MetX_eUp = " << metx_eUp << "   MetY_eUp = " << mety_eUp << std::endl;
-		      std::cout << "MetX_ = " << metx_eDown << "   MetY_eDown = " << mety_eDown << std::endl;
+		      std::cout << "MetX_escaleUp = " << metx_escaleUp << "   MetY_escaleUp = " << mety_escaleUp << std::endl;
+		      std::cout << "MetX_ = " << metx_escaleDown << "   MetY_escaleDown = " << mety_escaleDown << std::endl;
 
 		      std::cout << "eta1 = " << eta_1 << std::endl;
-		      std::cout << "pt1 = " << pt_1 << "  pt1_eUp = " << (1.0+eleScale)*pt_1 << "  pt1_eDown = " << (1.0-eleScale)*pt_1 << std::endl;
+		      std::cout << "pt1 = " << pt_1 << "  pt1_escaleUp = " << (1.0+eleScale)*pt_1 << "  pt1_escaleDown = " << (1.0-eleScale)*pt_1 << std::endl;
 		      std::cout << "cov00 = " << metcov00 << "  cov01 = " << metcov01 << "   cov11 = " << metcov11 << std::endl; 
 		      */
 
-                        ClassicSVfit algo_eUp = SVFitMassComputation(svFitEleUp, svFitMu,
-                                                                                 metx_eUp, mety_eUp,
+                        ClassicSVfit algo_escaleUp = SVFitMassComputation(svFitEleUp, svFitMu,
+                                                                                 metx_escaleUp, mety_escaleUp,
                                                                                  covMET, inputFile_visPtResolution);
-                        ClassicSVfit algo_eDown = SVFitMassComputation(svFitEleDown, svFitMu,
-                                                                                   metx_eDown, mety_eDown,
+                        ClassicSVfit algo_escaleDown = SVFitMassComputation(svFitEleDown, svFitMu,
+                                                                                   metx_escaleDown, mety_escaleDown,
                                                                                    covMET, inputFile_visPtResolution);
                         
                         
-                        m_sv_eUp    = static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(algo_eUp.getHistogramAdapter())->getMass();
-                        mt_sv_eUp   = static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(algo_eUp.getHistogramAdapter())->getTransverseMass();
+                        m_sv_escaleUp    = static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(algo_escaleUp.getHistogramAdapter())->getMass();
+                        mt_sv_escaleUp   = static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(algo_escaleUp.getHistogramAdapter())->getTransverseMass();
 
-                        m_sv_eDown  = static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(algo_eDown.getHistogramAdapter())->getMass();
-                        mt_sv_eDown = static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(algo_eDown.getHistogramAdapter())->getTransverseMass();
+                        m_sv_escaleDown  = static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(algo_escaleDown.getHistogramAdapter())->getMass();
+                        mt_sv_escaleDown = static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(algo_escaleDown.getHistogramAdapter())->getTransverseMass();
 
-			pt_sv_eUp  = static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(algo_eUp.getHistogramAdapter())->getPt(); 
-			eta_sv_eUp = static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(algo_eUp.getHistogramAdapter())->getEta(); 
-			phi_sv_eUp = static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(algo_eUp.getHistogramAdapter())->getPhi(); 
+			pt_sv_escaleUp  = static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(algo_escaleUp.getHistogramAdapter())->getPt(); 
+			eta_sv_escaleUp = static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(algo_escaleUp.getHistogramAdapter())->getEta(); 
+			phi_sv_escaleUp = static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(algo_escaleUp.getHistogramAdapter())->getPhi(); 
 
-			pt_sv_eDown  = static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(algo_eDown.getHistogramAdapter())->getPt(); 
-			eta_sv_eDown = static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(algo_eDown.getHistogramAdapter())->getEta(); 
-			phi_sv_eDown = static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(algo_eDown.getHistogramAdapter())->getPhi(); 
+			pt_sv_escaleDown  = static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(algo_escaleDown.getHistogramAdapter())->getPt(); 
+			eta_sv_escaleDown = static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(algo_escaleDown.getHistogramAdapter())->getEta(); 
+			phi_sv_escaleDown = static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(algo_escaleDown.getHistogramAdapter())->getPhi(); 
 
 			/*
 			std::cout << "msv = " << m_sv 
-				  << "   msv_eUp = " << m_sv_eUp 
-				  << "   msv_eDown = " << m_sv_eDown << std::endl;
+				  << "   msv_escaleUp = " << m_sv_escaleUp 
+				  << "   msv_escaleDown = " << m_sv_escaleDown << std::endl;
 			std::cout << std::endl;
 			*/
 
@@ -3457,10 +3457,10 @@ int main(int argc, char * argv[]) {
 			//                    }
                     //	  std::cout << "eta(e) = " << eta_1 << "   escale = " << eleScale << std::endl;
                     //	  std::cout << "msv = " << m_sv << std::endl;
-                    //	  std::cout << "msv(eES)      : up = " << m_sv_eUp << "   down = " << m_sv_eDown << std::endl;
+                    //	  std::cout << "msv(eES)      : up = " << m_sv_escaleUp << "   down = " << m_sv_escaleDown << std::endl;
                     //	  std::cout << "msv(metScale) : up = " << m_sv_jesUp << "   down = " << m_sv_jesDown << std::endl;
                     //	  std::cout << "mtsv = " << mt_sv << std::endl;
-                    //	  std::cout << "mtsv(eES)      : up = " << mt_sv_eUp << "   down = " << mt_sv_eDown << std::endl;
+                    //	  std::cout << "mtsv(eES)      : up = " << mt_sv_escaleUp  << "   down = " << mt_sv_escaleDown << std::endl;
                     //	  std::cout << "mtsv(metScale) : up = " << mt_sv_jesUp << "   down = " << mt_sv_jesDown << std::endl;
                     //	  std::cout << std::endl;
 		    }
