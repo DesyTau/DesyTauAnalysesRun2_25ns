@@ -1665,6 +1665,8 @@ int main(int argc, char * argv[]) {
 
       for (unsigned int ijet=0; ijet<analysisTree.pfjet_count; ++ijet) {
 
+	// Clean for EEnoise jets
+	if( analysisTree.pfjet_pt[ijet] < 50 && fabs(analysisTree.pfjet_eta[ijet]) < 3.139 && fabs(analysisTree.pfjet_eta[ijet]) > 2.65) continue;
 
 	// Scale for sys uncertainties
 	float scaleJ = 1;
