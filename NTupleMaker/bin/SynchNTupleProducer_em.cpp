@@ -1197,6 +1197,14 @@ int main(int argc, char * argv[]) {
         }
     }
 
+    // Load CrystalBallEfficiency class
+    TString pathToCrystalLib = (TString) cmsswBase + "/src/HTT-utilities/CorrectionsWorkspace/CrystalBallEfficiency_cxx.so";
+    int openSuccessful = gSystem->Load( pathToCrystalLib );
+    if (openSuccessful !=0 ) {
+      cout<<pathToCrystalLib<<" not found. Please create this file by running \"root -l -q CrystalBallEfficiency.cxx++\" in src/HTT-utilities/CorrectionsWorkspace/. "<<endl;
+      exit( -1 );
+    }
+
     //*****************
     //****** BDT ******
     TH1F * histMva =  new TH1F("MVA_BDT", "MVA_BDT",100 , -1.0, 1.0);
