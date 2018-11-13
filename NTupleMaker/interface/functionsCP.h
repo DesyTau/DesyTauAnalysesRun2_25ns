@@ -10,7 +10,18 @@
 #include "DesyTauAnalyses/NTupleMaker/interface/functions.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/PileUp.h"
 
+
+/*Updates Merijn 2018 11 13
+-added acott_Impr, which is improved version of acott. Note it takes the decay channel as input also. 
+If the channel is e-t or mu-t, it will calculate the lepton vx etc. 
+-added ipVec_Lepton. it uses the reco vx, vy ,and vz to calculate the leptonic tau impact vector.
+-looking into potential issue with acoCPCOUT
+*/
+
+
 void acott(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, int tauIndex2);
+
+void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, int tauIndex2,TString ch);
 TLorentzVector chargedPivec(const AC1B * analysisTree, int tauIndex);
 TLorentzVector neutralPivec(const AC1B * analysisTree, int tauIndex);
 TLorentzVector ipVec(const AC1B * analysisTree, int tauIndex);
@@ -22,6 +33,8 @@ TLorentzVector gen_neutralPivec(const AC1B * analysisTree, int tauIndex);
 TLorentzVector gen_ipVec(const AC1B * analysisTree, int tauIndex, int piIndex, TVector3 vertex);
 int gen_chargedPiIndex(const AC1B * analysisTree, int tauIndex, int partId);
 
+TLorentzVector ipVec_Lepton(const AC1B * analysisTree, int tauIndex, TString ch);
+  
 double acoCP(TLorentzVector Pi1, TLorentzVector Pi2, 
 	     TLorentzVector ref1, TLorentzVector ref2,
 	     bool firstNegative, bool pi01, bool pi02) {
@@ -32,6 +45,7 @@ double acoCP(TLorentzVector Pi1, TLorentzVector Pi2,
     y1 = Pi1.E() - ref1.E();
   if (pi02)
     y2 = Pi2.E() - ref2.E();
+
 
   double y = y1*y2; 
 
@@ -81,11 +95,24 @@ double acoCP(TLorentzVector Pi1, TLorentzVector Pi2,
     }
   }  
 
+//cout<<"acop before return from function "<<acop<<endl;
   return acop;
 
 }
 
+//Merijn added these functions for debugging purposes
+double acoCP2(TLorentzVector Pi1, TLorentzVector Pi2, 
+	     TLorentzVector ref1, TLorentzVector ref2,
+	     bool firstNegative, bool pi01, bool pi02);
+
+
+
+double acoCPCOUT(TLorentzVector Pi1, TLorentzVector Pi2, 
+	     TLorentzVector ref1, TLorentzVector ref2,
+		 bool firstNegative, bool pi01, bool pi02);
+
 void acott(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, int tauIndex2){
+  //cout<<"tauIndex1 "<<tauIndex1<<"  tauIndex2 "<<tauIndex2<<endl;
 
   bool correctDecay1 = analysisTree->tau_decayMode[tauIndex1]<10;
   bool correctDecay2 = analysisTree->tau_decayMode[tauIndex2]<10;
@@ -120,9 +147,10 @@ void acott(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, int tau
   if (analysisTree->tau_decayMode[tauIndex1]>=1&&analysisTree->tau_decayMode[tauIndex1]<=3) tau1Pi0 = neutralPivec(analysisTree,tauIndex1);
   if (analysisTree->tau_decayMode[tauIndex2]>=1&&analysisTree->tau_decayMode[tauIndex2]<=3) tau2Pi0 = neutralPivec(analysisTree,tauIndex2);
 
-  double acop = 0.; 
+//  double acop = 0.; //Merijn: it is used nowhere in this function..?
   
   otree->acotautau_00=acoCP(tau1Prong,tau2Prong,tau1IP,tau2IP,firstNegative,false,false);
+cout<<"otree->acotautau_00 "<<otree->acotautau_00<<endl;
 
   if (analysisTree->tau_decayMode[tauIndex1]==1&&analysisTree->tau_decayMode[tauIndex2]==0)
     otree->acotautau_10=acoCP(tau1Prong,tau2Prong,tau1Pi0,tau2IP,firstNegative,true,false);
@@ -137,11 +165,93 @@ void acott(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, int tau
   }
 };
 
+//Merijn: updated function to do CP calculations
+void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, int tauIndex2, TString channel){
+cout<<"start acott_impr "<<endl;
+
+  //make here a scan if the second decay contains a charged pion, since not always the case
+  bool decay2haspion=false;
+  for(unsigned int pindex=0;pindex<analysisTree->tau_constituents_count[tauIndex2];pindex++){
+    if(abs(analysisTree->tau_constituents_pdgId[tauIndex2][pindex])==211){
+      decay2haspion=true;
+      break;}
+  }
+    
+//Merijn: these definitions can be discussed and adjusted to include 3 prong decays, the allow for mode 10 as well
+  bool correctDecay1 = analysisTree->tau_decayMode[tauIndex1]<10;
+  bool correctDecay2 = analysisTree->tau_decayMode[tauIndex2]<10&&decay2haspion; 
+  bool correctDecay = correctDecay1 && correctDecay2;
+
+//properly inintialise to -9999 if decay not correct
+  if(!correctDecay){
+    otree->acotautau_00 = -9999;
+    otree->acotautau_10 = -9999;
+    otree->acotautau_01 = -9999;
+    otree->acotautau_11 = -9999;
+    return;
+  }
+	
+  //Merijn: here set 4-momentum of tau1. For tt case, currently take the highest pt charged  pion
+  TLorentzVector tau1Prong; //the mectric convention used elsehwere for reference. Its in form px, py, pz, E.
+
+  if(channel=="tt") tau1Prong=chargedPivec(analysisTree,tauIndex1);// one could consider to use the function below instead to use the RECO estimate of the momentum of the hadronically decaying tau directly..
+
+  //Merijn: tauindex1 may point to electron or muon. So use the switch and index to obtain correct kinematics, assuming electron and muon masses
+  if(channel=="mt"){    
+    double muenergy=TMath::Sqrt(TMath::Power(analysisTree->muon_px[tauIndex1],2)+TMath::Power(analysisTree->muon_py[tauIndex1],2)+TMath::Power(analysisTree->muon_pz[tauIndex1],2)+TMath::Power(0.105658,2));//reconstruct energy from 3 momenta + mass
+    tau1Prong.SetPxPyPzE(analysisTree->muon_px[tauIndex1],analysisTree->muon_py[tauIndex1],analysisTree->muon_pz[tauIndex1],muenergy);}
+  
+  if(channel=="et"){
+    double elecenergy=TMath::Sqrt(TMath::Power(analysisTree->electron_px[tauIndex1],2)+TMath::Power(analysisTree->electron_py[tauIndex1],2)+TMath::Power(analysisTree->electron_pz[tauIndex1],2)+TMath::Power(0.000511,2));
+    tau1Prong.SetPxPyPzE(analysisTree->electron_px[tauIndex1],analysisTree->electron_py[tauIndex1],analysisTree->electron_pz[tauIndex1],elecenergy);}
+  
+//merijn: we vetoed already if the second tau didn't contain a pion, so can safely calculate the momentum of 2nd prong from hadrons
+  TLorentzVector tau2Prong;
+  tau2Prong=chargedPivec(analysisTree,tauIndex2);
+  
+  bool firstNegative = false;
+  if (analysisTree->tau_charge[tauIndex1]<0.0)
+    firstNegative = true;
+
+  TLorentzVector tau1IP;
+//Merijn: for leptonic decay calculate in different way than for hadronic
+  if(channel=="et"||channel=="mt") tau1IP = ipVec_Lepton(analysisTree,tauIndex1,channel);
+  else{tau1IP = ipVec(analysisTree,tauIndex1);}//tt
+  TLorentzVector tau1Pi0;
+  tau1Pi0.SetXYZT(0.,0.,0.,0.);
+  
+  TLorentzVector tau2IP;
+  tau2IP = ipVec(analysisTree,tauIndex2);
+  TLorentzVector tau2Pi0;
+  tau2Pi0.SetXYZT(0.,0.,0.,0.);
+
+  //Merijn: here calculate neutral pion vectors. Only look for pions in first tau if channel is tt.
+  if(channel=="tt"){ if (analysisTree->tau_decayMode[tauIndex1]>=1&&analysisTree->tau_decayMode[tauIndex1]<=3) tau1Pi0 = neutralPivec(analysisTree,tauIndex1);}
+  if (analysisTree->tau_decayMode[tauIndex2]>=1&&analysisTree->tau_decayMode[tauIndex2]<=3) tau2Pi0 = neutralPivec(analysisTree,tauIndex2);
+  
+//here can proceed with CP calculation
+  otree->acotautau_00=acoCPCOUT(tau1Prong,tau2Prong,tau1IP,tau2IP,firstNegative,false,false); // cout<<"otree->acotautau_00 "<<otree->acotautau_00<<endl;
+
+  if (analysisTree->tau_decayMode[tauIndex1]==1&&analysisTree->tau_decayMode[tauIndex2]==0)
+    otree->acotautau_10=acoCP(tau1Prong,tau2Prong,tau1Pi0,tau2IP,firstNegative,true,false);
+
+  if (analysisTree->tau_decayMode[tauIndex1]==0&&analysisTree->tau_decayMode[tauIndex2]==1)
+    otree->acotautau_01=acoCP(tau1Prong,tau2Prong,tau1IP,tau2Pi0,firstNegative,false,true);
+
+  if (analysisTree->tau_decayMode[tauIndex1]==1&&analysisTree->tau_decayMode[tauIndex2]==1){
+    otree->acotautau_10=acoCP(tau1Prong,tau2Prong,tau1Pi0,tau2IP,firstNegative,true,false);
+    otree->acotautau_01=acoCP(tau1Prong,tau2Prong,tau1IP,tau2Pi0,firstNegative,false,true);
+    otree->acotautau_11=acoCP(tau1Prong,tau2Prong,tau1Pi0,tau2Pi0,firstNegative,true,true);
+  }
+};
+
+
 TLorentzVector chargedPivec(const AC1B * analysisTree, int tauIndex){
   int piIndex=-1;
   piIndex=chargedPiIndex(analysisTree,tauIndex);
   TLorentzVector chargedPi;
   chargedPi.SetXYZT(0,0,0,0);
+  //cout<<"piIndex "<<piIndex <<endl;
   if (piIndex>-1) {
     chargedPi.SetPxPyPzE(analysisTree->tau_constituents_px[tauIndex][piIndex],
 			 analysisTree->tau_constituents_py[tauIndex][piIndex],
@@ -153,14 +263,19 @@ TLorentzVector chargedPivec(const AC1B * analysisTree, int tauIndex){
 };
 
 int chargedPiIndex(const AC1B * analysisTree, int tauIndex){
+  //  cout<<"tauIndex "<<tauIndex<<endl;
+  // cout<<"from chargedPiIndex: analysisTree->tau_decayMode[tauIndex]; "<<analysisTree->tau_decayMode[tauIndex]<<endl;
 
   int ncomponents = analysisTree->tau_constituents_count[tauIndex];
   int piIndex=-1;
   float maxPt=-1;
   int sign = -1;
   if(analysisTree->tau_charge[tauIndex]>0) sign = 1; 
-  for(int i=0;i<ncomponents;i++){//selects the highest energy Pi with the same sign of the tau 
-    if((analysisTree->tau_constituents_pdgId[tauIndex][i]*sign)==211){
+  for(int i=0;i<ncomponents;i++){ //selects the highest energy Pi with the same sign of the tau. 
+    //    cout<<"analysisTree->tau_constituents_pdgId[tauIndex][i] "<<analysisTree->tau_constituents_pdgId[tauIndex][i]<<endl;
+
+if((analysisTree->tau_constituents_pdgId[tauIndex][i]*sign)==211){
+//    if((analysisTree->tau_constituents_pdgId[tauIndex][i]*sign)==211||(analysisTree->tau_constituents_pdgId[tauIndex][i]*sign)==-13||(analysisTree->tau_constituents_pdgId[tauIndex][i]*sign)==-11){
       TLorentzVector lvector; lvector.SetXYZT(analysisTree->tau_constituents_px[tauIndex][i],
 					      analysisTree->tau_constituents_py[tauIndex][i],
 					      analysisTree->tau_constituents_pz[tauIndex][i],
@@ -172,16 +287,7 @@ int chargedPiIndex(const AC1B * analysisTree, int tauIndex){
       }
     }
   }
-  /*
-  TLorentzVector chargedPi;
-  chargedPi.SetXYZT(0,0,0,0);
-  if (piIndex>-1) {
-    chargedPi.SetPxPyPzE(analysisTree->tau_constituents_px[tauIndex][piIndex],
-			 analysisTree->tau_constituents_py[tauIndex][piIndex],
-			 analysisTree->tau_constituents_pz[tauIndex][piIndex],
-			 analysisTree->tau_constituents_e[tauIndex][piIndex]);
-  }  
-  */
+  
   return piIndex;
 };
 
@@ -214,7 +320,6 @@ TLorentzVector ipVec(const AC1B * analysisTree, int tauIndex) {
   vec.SetXYZT(0.,0.,0.,0.);
   int piIndex=-1;
   piIndex=chargedPiIndex(analysisTree,tauIndex);
-
 
 
   if (piIndex>-1) {
@@ -270,8 +375,55 @@ TLorentzVector ipVec(const AC1B * analysisTree, int tauIndex) {
 
 };
 
+
+//Merijn: added function to calculate the ipvec for leptons
+TLorentzVector ipVec_Lepton(const AC1B * analysisTree, int tauIndex, TString ch) {
+//now the tauindex is for mu or electron!
+
+  TLorentzVector vec;
+  vec.SetXYZT(0.,0.,0.,0.);
+
+TVector3 vertex(analysisTree->primvertex_x,
+		    analysisTree->primvertex_y,
+		    analysisTree->primvertex_z);
+    
+TVector3 secvertex(0.,0.,0.);
+TVector3 momenta(0.,0.,0.);    
+
+if(ch=="et"){
+secvertex.SetXYZ(analysisTree->electron_vx[tauIndex],
+		       analysisTree->electron_vy[tauIndex],
+		       analysisTree->electron_vz[tauIndex]);
+
+
+momenta.SetXYZ(analysisTree->electron_px[tauIndex],
+		       analysisTree->electron_py[tauIndex],
+		       analysisTree->electron_pz[tauIndex]);}
+
+if(ch=="mt"){
+secvertex.SetXYZ(analysisTree->muon_vx[tauIndex],
+		       analysisTree->muon_vy[tauIndex],
+		       analysisTree->muon_vz[tauIndex]);
+
+
+momenta.SetXYZ(analysisTree->muon_px[tauIndex],
+		       analysisTree->muon_py[tauIndex],
+		       analysisTree->muon_pz[tauIndex]);}
+
+    TVector3 r(0.,0.,0.);
+    r=secvertex-vertex;
+    double projection=r*momenta/momenta.Mag2();
+    TVector3 IP;    
+    IP=r-momenta*projection;
+    vec.SetVect(IP);
+    vec.SetT(0.);
+
+  return vec;
+};
+
  
 void gen_acott(const AC1B * analysisTree, Synch17GenTree *gentree, int tauIndex1, int tauIndex2){
+cout<<"start gen_acott "<<endl;
 
   bool correctDecay1 = analysisTree->gentau_decayMode[tauIndex1]<=6||analysisTree->gentau_decayMode[tauIndex1]==8||analysisTree->gentau_decayMode[tauIndex1]==9;
   bool correctDecay2 = analysisTree->gentau_decayMode[tauIndex2]<=6||analysisTree->gentau_decayMode[tauIndex2]==8||analysisTree->gentau_decayMode[tauIndex2]==9;
@@ -347,7 +499,7 @@ void gen_acott(const AC1B * analysisTree, Synch17GenTree *gentree, int tauIndex1
   if (analysisTree->genparticles_pdgid[piIndex1]==11) firstNegative = true;
   if (analysisTree->genparticles_pdgid[piIndex1]==13) firstNegative = true;
   
-  gentree->acotautau_00=acoCP(tau1Prong,tau2Prong,tau1IP,tau2IP,firstNegative,false,false);
+  gentree->acotautau_00=acoCPCOUT(tau1Prong,tau2Prong,tau1IP,tau2IP,firstNegative,false,false);
 
   if (oneProngPi01)
     gentree->acotautau_10=acoCP(tau1Prong,tau2Prong,tau1Pi0,tau2IP,firstNegative,true,false);
@@ -598,3 +750,171 @@ TLorentzVector gen_ThreeProngVec(const AC1B * analysisTree, vector<int> ThreePro
 
   return ThreeProngVec;
 };
+
+
+
+
+double acoCP2(TLorentzVector Pi1, TLorentzVector Pi2, 
+	     TLorentzVector ref1, TLorentzVector ref2,
+	     bool firstNegative, bool pi01, bool pi02) {
+
+  double y1 = 1;
+  double y2 = 1;
+  if (pi01)
+    y1 = Pi1.E() - ref1.E();
+  if (pi02)
+    y2 = Pi2.E() - ref2.E();
+
+  double y = y1*y2; 
+
+  /*
+cout<<"Pi1[0] "<<Pi1[0] <<endl;
+cout<<"Pi1[1] "<<Pi1[1] <<endl;
+cout<<"Pi1[2] "<<Pi1[2] <<endl;
+cout<<"Pi1[3] "<<Pi1[3] <<endl;
+
+cout<<"Pi2[0] "<<Pi2[0] <<endl;
+cout<<"Pi2[1] "<<Pi2[1] <<endl;
+cout<<"Pi2[2] "<<Pi2[2] <<endl;
+cout<<"Pi2[3] "<<Pi2[3] <<endl;
+
+if(Pi1[1]==Pi2[1]&&Pi1[1]!=0)cout<<"BIG  strange issue, we're using one vector for acoplanarity calculation "<<endl;
+  */
+
+
+  TLorentzVector Prongsum = Pi1 + Pi2;
+  TVector3 boost = -Prongsum.BoostVector();
+  Pi1.Boost(boost);
+  Pi2.Boost(boost);
+  ref1.Boost(boost);
+  ref2.Boost(boost);
+
+  //  std::cout << "First negative = " << firstNegative << "  pi01 = " << pi01 << "   pi02 = " << pi02 << std::endl;
+  //  std::cout << "Px(1) = " << Pi1.Px() << "  Py(1) = " << Pi1.Py() << "  Pz(1) = " << Pi1.Pz() << std::endl;
+  //  std::cout << "Px(2) = " << Pi2.Px() << "  Py(2) = " << Pi2.Py() << "  Pz(2) = " << Pi2.Pz() << std::endl;
+  //  std::cout << "Ux(1) = " << ref1.Px() << "  Uy(1) = " << ref1.Py() << "  Uz(1) = " << ref1.Pz() << std::endl;
+  //  std::cout << "Ux(2) = " << ref2.Px() << "  Uy(2) = " << ref2.Py() << "  Uz(2) = " << ref2.Pz() << std::endl;
+  //  std::cout << std::endl;
+  // get 3-vectors
+  TVector3 vecPi1 = Pi1.Vect();
+  TVector3 vecPi2 = Pi2.Vect();
+  TVector3 vecRef1 = ref1.Vect();
+  TVector3 vecRef2 = ref2.Vect();
+
+  // normalize them 
+  vecPi1 *= 1/vecPi1.Mag();
+  vecPi2 *= 1/vecPi2.Mag();
+  vecRef1 *= 1/vecRef1.Mag();
+  vecRef2 *= 1/vecRef2.Mag();
+
+  // transverse components  
+  TVector3 vecRef1transv = vecRef1 - vecPi1*(vecPi1*vecRef1);
+  TVector3 vecRef2transv = vecRef2 - vecPi2*(vecPi2*vecRef2);
+  
+  /*
+    cout<<"vecRef1transv.Mag() "<<vecRef1transv.Mag() <<endl;
+    cout<<"vecRef2transv.Mag() "<<vecRef2transv.Mag() <<endl;
+    cout<<"vecRef1transv[0] "<<vecRef1transv[0] <<endl;
+    cout<<"vecRef1transv[1] "<<vecRef1transv[1] <<endl;
+    cout<<"vecRef1transv[2] "<<vecRef1transv[2] <<endl;
+    cout<<"vecRef2transv[0] "<<vecRef2transv[0] <<endl;
+    cout<<"vecRef2transv[1] "<<vecRef2transv[1] <<endl;
+    cout<<"vecRef2transv[2] "<<vecRef2transv[2] <<endl;
+  */
+
+  vecRef1transv *= 1/vecRef1transv.Mag();
+  vecRef2transv *= 1/vecRef2transv.Mag();
+
+  double acop = TMath::ACos(vecRef1transv*vecRef2transv);
+  
+  double sign = vecPi2 * vecRef1transv.Cross(vecRef2transv);
+  if (firstNegative)
+    sign = vecPi1 * vecRef2transv.Cross(vecRef1transv);
+  if (sign<0) acop = 2.0*TMath::Pi() - acop;
+
+  if (y<0) {
+    acop = acop + TMath::Pi();
+    if (acop>2*TMath::Pi()) {
+      acop = acop - 2*TMath::Pi();
+    }
+  }  
+
+  //cout<<"acop before return from function "<<acop<<endl;
+  return acop;
+
+}
+
+
+//this is addapted function by Merijn with lots of output for debugging purposes
+double acoCPCOUT(TLorentzVector Pi1, TLorentzVector Pi2, 
+	     TLorentzVector ref1, TLorentzVector ref2,
+	     bool firstNegative, bool pi01, bool pi02) {
+
+  double y1 = 1;
+  double y2 = 1;
+  if (pi01)
+    y1 = Pi1.E() - ref1.E();
+  if (pi02)
+    y2 = Pi2.E() - ref2.E();
+
+  //y2=-1; //Merijn this is currently the only difference w.r.t. the original..
+
+ cout<<"pi01 "<<pi01<<" pi02 "<<pi02<<endl;
+ cout<<"ref1.E() "<<ref1.E()<<" ref2.E() " <<ref2.E()<<endl;
+  
+  double y = y1*y2;
+
+  TLorentzVector Prongsum = Pi1 + Pi2;
+  TVector3 boost = -Prongsum.BoostVector();
+  Pi1.Boost(boost);
+  Pi2.Boost(boost);
+  ref1.Boost(boost);
+  ref2.Boost(boost);
+
+  std::cout << "First negative = " << firstNegative << "  pi01 = " << pi01 << "   pi02 = " << pi02 << std::endl;
+  //  std::cout << "Px(1) = " << Pi1.Px() << "  Py(1) = " << Pi1.Py() << "  Pz(1) = " << Pi1.Pz() << std::endl;
+  //  std::cout << "Px(2) = " << Pi2.Px() << "  Py(2) = " << Pi2.Py() << "  Pz(2) = " << Pi2.Pz() << std::endl;
+  //  std::cout << "Ux(1) = " << ref1.Px() << "  Uy(1) = " << ref1.Py() << "  Uz(1) = " << ref1.Pz() << std::endl;
+  //  std::cout << "Ux(2) = " << ref2.Px() << "  Uy(2) = " << ref2.Py() << "  Uz(2) = " << ref2.Pz() << std::endl;
+  //  std::cout << std::endl;
+  // get 3-vectors
+  TVector3 vecPi1 = Pi1.Vect();
+  TVector3 vecPi2 = Pi2.Vect();
+  TVector3 vecRef1 = ref1.Vect();
+  TVector3 vecRef2 = ref2.Vect();
+
+  // normalize them 
+  vecPi1 *= 1/vecPi1.Mag();
+  vecPi2 *= 1/vecPi2.Mag();
+  vecRef1 *= 1/vecRef1.Mag();
+  vecRef2 *= 1/vecRef2.Mag();
+
+  // transverse components  
+  TVector3 vecRef1transv = vecRef1 - vecPi1*(vecPi1*vecRef1);
+  TVector3 vecRef2transv = vecRef2 - vecPi2*(vecPi2*vecRef2);
+
+  vecRef1transv *= 1/vecRef1transv.Mag();
+  vecRef2transv *= 1/vecRef2transv.Mag();
+
+  double acop = TMath::ACos(vecRef1transv*vecRef2transv);
+  
+  double sign = vecPi2 * vecRef1transv.Cross(vecRef2transv);
+  if (firstNegative)
+    sign = vecPi1 * vecRef2transv.Cross(vecRef1transv);
+  if (sign<0) acop = 2.0*TMath::Pi() - acop;
+
+  if (y<0) {
+    acop = acop + TMath::Pi();
+    if (acop>2*TMath::Pi()) {
+      acop = acop - 2*TMath::Pi();
+    }
+  }  
+
+  cout<<"acop before return from function "<<acop<<endl;
+  return acop;
+
+}
+
+
+
+
