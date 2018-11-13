@@ -1238,6 +1238,14 @@ int main(int argc, char * argv[]) {
              ss >> periods.back();
           }
     }
+
+    // Load CrystalBallEfficiency class
+    TString pathToCrystalLib = (TString) cmsswBase + "/src/HTT-utilities/CorrectionsWorkspace/CrystalBallEfficiency_cxx.so";
+    int openSuccessful = gSystem->Load( pathToCrystalLib );
+    if (openSuccessful !=0 ) {
+      cout<<pathToCrystalLib<<" not found. Please create this file by running \"root -l -q CrystalBallEfficiency.cxx++\" in src/HTT-utilities/CorrectionsWorkspace/. "<<endl;
+      exit( -1 );
+    }
     
     //*****************
     //****** BDT ******                         
