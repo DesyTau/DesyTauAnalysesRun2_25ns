@@ -439,8 +439,8 @@ int main(int argc, char * argv[]) {
     Float_t         m_vis_escaleDown;
     Float_t         m_vis_jesUp;
     Float_t         m_vis_jesDown;
-    Float_t         m_vis_resoUp;
-    Float_t         m_vis_resoDown;
+    Float_t         m_vis_unclMetUp;
+    Float_t         m_vis_unclMetDown;
     
     Float_t         mTtot;
     Float_t         mTtot_muUp;
@@ -449,8 +449,8 @@ int main(int argc, char * argv[]) {
     Float_t         mTtot_escaleDown;
     Float_t         mTtot_jesUp;
     Float_t         mTtot_jesDown;
-    Float_t         mTtot_resoUp;
-    Float_t         mTtot_resoDown;
+    Float_t         mTtot_unclMetUp;
+    Float_t         mTtot_unclMetDown;
     Float_t         mCDF;
 
     Float_t         mTdileptonMET;
@@ -460,8 +460,8 @@ int main(int argc, char * argv[]) {
     Float_t         mTdileptonMET_escaleDown;
     Float_t         mTdileptonMET_jesUp;
     Float_t         mTdileptonMET_jesDown;
-    Float_t         mTdileptonMET_resoUp;
-    Float_t         mTdileptonMET_resoDown;
+    Float_t         mTdileptonMET_unclMetUp;
+    Float_t         mTdileptonMET_unclMetDown;
     
     Float_t         mTemu;
     Float_t         mTemet;
@@ -492,8 +492,8 @@ int main(int argc, char * argv[]) {
     Float_t         m_sv_muDown;
     Float_t         m_sv_jesUp;
     Float_t         m_sv_jesDown;
-    Float_t         m_sv_resoUp;
-    Float_t         m_sv_resoDown;
+    Float_t         m_sv_unclMetUp;
+    Float_t         m_sv_unclMetDown;
     
     Float_t         mt_sv_escaleUp;
     Float_t         mt_sv_escaleDown;
@@ -501,8 +501,8 @@ int main(int argc, char * argv[]) {
     Float_t         mt_sv_muDown;
     Float_t         mt_sv_jesUp;
     Float_t         mt_sv_jesDown;
-    Float_t         mt_sv_resoUp;
-    Float_t         mt_sv_resoDown;
+    Float_t         mt_sv_unclMetUp;
+    Float_t         mt_sv_unclMetDown;
     
     
     Float_t         pt_1;
@@ -566,11 +566,11 @@ int main(int argc, char * argv[]) {
     Float_t         met_uncorr;
     Float_t         metphi_uncorr;
     
-    Float_t         met_resoUp;
-    Float_t         metphi_resoUp;
+    Float_t         met_unclMetUp;
+    Float_t         metphi_unclMetUp;
     
-    Float_t         met_resoDown;
-    Float_t         metphi_resoDown;
+    Float_t         met_unclMetDown;
+    Float_t         metphi_unclMetDown;
     
     Float_t         met_jesUp;
     Float_t         metphi_jesUp;
@@ -588,11 +588,11 @@ int main(int argc, char * argv[]) {
     Float_t         mvamet_uncorr;
     Float_t         mvametphi_uncorr;
     
-    Float_t         mvamet_resoUp;
-    Float_t         mvametphi_resoUp;
+    Float_t         mvamet_unclMetUp;
+    Float_t         mvametphi_unclMetUp;
     
-    Float_t         mvamet_resoDown;
-    Float_t         mvametphi_resoDown;
+    Float_t         mvamet_unclMetDown;
+    Float_t         mvametphi_unclMetDown;
     
     Float_t         mvamet_jesUp;
     Float_t         mvametphi_jesUp;
@@ -627,11 +627,11 @@ int main(int argc, char * argv[]) {
     Float_t         pzetamiss_mvamet_jesDown;
     Float_t         dzeta_mvamet_jesDown;
     
-    Float_t         pzetamiss_mvamet_resoUp;
-    Float_t         dzeta_mvamet_resoUp;
+    Float_t         pzetamiss_mvamet_unclMetUp;
+    Float_t         dzeta_mvamet_unclMetUp;
     
-    Float_t         pzetamiss_mvamet_resoDown;
-    Float_t         dzeta_mvamet_resoDown;
+    Float_t         pzetamiss_mvamet_unclMetDown;
+    Float_t         dzeta_mvamet_unclMetDown;
 
     Float_t         pzetamiss_jesUp;
     Float_t         dzeta_jesUp;
@@ -639,11 +639,11 @@ int main(int argc, char * argv[]) {
     Float_t         pzetamiss_jesDown;
     Float_t         dzeta_jesDown;
     
-    Float_t         pzetamiss_resoUp;
-    Float_t         dzeta_resoUp;
+    Float_t         pzetamiss_unclMetUp;
+    Float_t         dzeta_unclMetUp;
     
-    Float_t         pzetamiss_resoDown;
-    Float_t         dzeta_resoDown;
+    Float_t         pzetamiss_unclMetDown;
+    Float_t         dzeta_unclMetDown;
 
     Float_t         dzeta_escaleUp;
     Float_t         dzeta_escaleDown;
@@ -875,8 +875,8 @@ int main(int argc, char * argv[]) {
     tree->Branch("m_vis_escaleDown",  &m_vis_escaleDown,  "m_vis_escaleDown/F");
     tree->Branch("m_vis_jesUp",   &m_vis_jesUp,   "m_vis_jesUp/F");
     tree->Branch("m_vis_jesDown", &m_vis_jesDown, "m_vis_jesDown/F");
-    tree->Branch("m_vis_resoUp",    &m_vis_resoUp,    "m_vis_resoUp/F");
-    tree->Branch("m_vis_resoDown",  &m_vis_resoDown,  "m_vis_resoDown/F");
+    tree->Branch("m_vis_unclMetUp",    &m_vis_unclMetUp,    "m_vis_unclMetUp/F");
+    tree->Branch("m_vis_unclMetDown",  &m_vis_unclMetDown,  "m_vis_unclMetDown/F");
     
     tree->Branch("mTtot",        &mTtot,        "mTtot/F");
     tree->Branch("mCDF",         &mCDF,         "mCDF/F");
@@ -886,8 +886,8 @@ int main(int argc, char * argv[]) {
     tree->Branch("mTtot_escaleDown",  &mTtot_escaleDown,  "mTtot_escaleDown/F");
     tree->Branch("mTtot_jesUp",   &mTtot_jesUp,   "mTtot_jesUp/F");
     tree->Branch("mTtot_jesDown", &mTtot_jesDown, "mTtot_jesDown/F");
-    tree->Branch("mTtot_resoUp",    &mTtot_resoUp,    "mTtot_resoUp/F");
-    tree->Branch("mTtot_resoDown",  &mTtot_resoDown,  "mTtot_resoDown/F");
+    tree->Branch("mTtot_unclMetUp",    &mTtot_unclMetUp,    "mTtot_unclMetUp/F");
+    tree->Branch("mTtot_unclMetDown",  &mTtot_unclMetDown,  "mTtot_unclMetDown/F");
     
     tree->Branch("mTdileptonMET", &mTdileptonMET, "mTdileptonMET/F");
     tree->Branch("mTdileptonMET_muUp", &mTdileptonMET_muUp, "mTdileptonMET_muUp/F");
@@ -896,8 +896,8 @@ int main(int argc, char * argv[]) {
     tree->Branch("mTdileptonMET_escaleDown", &mTdileptonMET_escaleDown, "mTdileptonMET_escaleDown/F");
     tree->Branch("mTdileptonMET_jesUp", &mTdileptonMET_jesUp, "mTdileptonMET_jesUp/F");
     tree->Branch("mTdileptonMET_jesDown", &mTdileptonMET_jesDown, "mTdileptonMET_jesDown/F");
-    tree->Branch("mTdileptonMET_resoUp", &mTdileptonMET_resoUp, "mTdileptonMET_resoUp/F");
-    tree->Branch("mTdileptonMET_resoDown", &mTdileptonMET_resoDown, "mTdileptonMET_resoDown/F");
+    tree->Branch("mTdileptonMET_unclMetUp", &mTdileptonMET_unclMetUp, "mTdileptonMET_unclMetUp/F");
+    tree->Branch("mTdileptonMET_unclMetDown", &mTdileptonMET_unclMetDown, "mTdileptonMET_unclMetDown/F");
 
     tree->Branch("mTemu",        &mTemu,        "mTemu/F");
     tree->Branch("mTemet",       &mTemet,       "mTemet/F");
@@ -924,8 +924,8 @@ int main(int argc, char * argv[]) {
     
     tree->Branch("m_sv_jesUp",   &m_sv_jesUp,   "m_sv_jesUp/F");
     tree->Branch("m_sv_jesDown", &m_sv_jesDown, "m_sv_jesDown/F");
-    tree->Branch("m_sv_resoUp",    &m_sv_resoUp,    "m_sv_resoUp/F");
-    tree->Branch("m_sv_resoDown",  &m_sv_resoDown,  "m_sv_resoDown/F");
+    tree->Branch("m_sv_unclMetUp",    &m_sv_unclMetUp,    "m_sv_unclMetUp/F");
+    tree->Branch("m_sv_unclMetDown",  &m_sv_unclMetDown,  "m_sv_unclMetDown/F");
     tree->Branch("m_sv_escaleUp",       &m_sv_escaleUp,       "m_sv_escaleUp/F");
     tree->Branch("m_sv_escaleDown",     &m_sv_escaleDown,     "m_sv_escaleDown/F");
     tree->Branch("m_sv_muUp",      &m_sv_muUp,      "m_sv_muUp/F");
@@ -933,8 +933,8 @@ int main(int argc, char * argv[]) {
     
     tree->Branch("mt_sv_jesUp",   &mt_sv_jesUp,   "mt_sv_jesUp/F");
     tree->Branch("mt_sv_jesDown", &mt_sv_jesDown, "mt_sv_jesDown/F");
-    tree->Branch("mt_sv_resoUp",    &mt_sv_resoUp,    "mt_sv_resoUp/F");
-    tree->Branch("mt_sv_resoDown",  &mt_sv_resoDown,  "mt_sv_resoDown/F");
+    tree->Branch("mt_sv_unclMetUp",    &mt_sv_unclMetUp,    "mt_sv_unclMetUp/F");
+    tree->Branch("mt_sv_unclMetDown",  &mt_sv_unclMetDown,  "mt_sv_unclMetDown/F");
     tree->Branch("mt_sv_escaleUp",       &mt_sv_escaleUp,       "mt_sv_escaleUp/F");
     tree->Branch("mt_sv_escaleDown",     &mt_sv_escaleDown,     "mt_sv_escaleDown/F");
     tree->Branch("mt_sv_muUp",      &mt_sv_muUp,      "mt_sv_muUp/F");
@@ -1000,11 +1000,11 @@ int main(int argc, char * argv[]) {
     tree->Branch("met_uncorr", &met_uncorr, "met_uncorr/F");
     tree->Branch("metphi_uncorr", &metphi_uncorr, "metphi_uncorr/F");
     
-    tree->Branch("met_resoUp", &met_resoUp, "met_resoUp/F");
-    tree->Branch("metphi_resoUp", &metphi_resoUp, "metphi_resoUp/F");
+    tree->Branch("met_unclMetUp", &met_unclMetUp, "met_unclMetUp/F");
+    tree->Branch("metphi_unclMetUp", &metphi_unclMetUp, "metphi_unclMetUp/F");
     
-    tree->Branch("met_resoDown", &met_resoDown, "met_resoDown/F");
-    tree->Branch("metphi_resoDown", &metphi_resoDown, "metphi_resoDown/F");
+    tree->Branch("met_unclMetDown", &met_unclMetDown, "met_unclMetDown/F");
+    tree->Branch("metphi_unclMetDown", &metphi_unclMetDown, "metphi_unclMetDown/F");
     
     tree->Branch("met_jesUp", &met_jesUp, "met_jesUp/F");
     tree->Branch("metphi_jesUp", &metphi_jesUp, "metphi_jesUp/F");
@@ -1022,11 +1022,11 @@ int main(int argc, char * argv[]) {
     tree->Branch("mvamet_uncorr", &mvamet_uncorr, "mvamet_uncorr/F");
     tree->Branch("mvametphi_uncorr", &mvametphi_uncorr, "mvametphi_uncorr/F");
     
-    tree->Branch("mvamet_resoUp", &mvamet_resoUp, "mvamet_resoUp/F");
-    tree->Branch("mvametphi_resoUp", &mvametphi_resoUp, "mvametphi_resoUp/F");
+    tree->Branch("mvamet_unclMetUp", &mvamet_unclMetUp, "mvamet_unclMetUp/F");
+    tree->Branch("mvametphi_unclMetUp", &mvametphi_unclMetUp, "mvametphi_unclMetUp/F");
     
-    tree->Branch("mvamet_resoDown", &mvamet_resoDown, "mvamet_resoDown/F");
-    tree->Branch("mvametphi_resoDown", &mvametphi_resoDown, "mvametphi_resoDown/F");
+    tree->Branch("mvamet_unclMetDown", &mvamet_unclMetDown, "mvamet_unclMetDown/F");
+    tree->Branch("mvametphi_unclMetDown", &mvametphi_unclMetDown, "mvametphi_unclMetDown/F");
     
     tree->Branch("mvamet_jesUp", &mvamet_jesUp, "mvamet_jesUp/F");
     tree->Branch("mvametphi_jesUp", &mvametphi_jesUp, "mvametphi_jesUp/F");
@@ -1070,11 +1070,11 @@ int main(int argc, char * argv[]) {
     tree->Branch("dzeta_escaleDown",&dzeta_escaleDown,"dzeta_escaleDown/F");
 
 
-    tree->Branch("pzetamiss_resoUp", &pzetamiss_resoUp, "pzetamiss_resoUp/F");
-    tree->Branch("dzeta_resoUp",&dzeta_resoUp,"dzeta_resoUp/F");
+    tree->Branch("pzetamiss_unclMetUp", &pzetamiss_unclMetUp, "pzetamiss_unclMetUp/F");
+    tree->Branch("dzeta_unclMetUp",&dzeta_unclMetUp,"dzeta_unclMetUp/F");
     
-    tree->Branch("pzetamiss_resoDown", &pzetamiss_resoDown, "pzetamiss_resoDown/F");
-    tree->Branch("dzeta_resoDown",&dzeta_resoDown,"dzeta_resoDown/F");
+    tree->Branch("pzetamiss_unclMetDown", &pzetamiss_unclMetDown, "pzetamiss_unclMetDown/F");
+    tree->Branch("dzeta_unclMetDown",&dzeta_unclMetDown,"dzeta_unclMetDown/F");
     
     tree->Branch("pzetamiss_jesUp", &pzetamiss_jesUp, "pzetamiss_jesUp/F");
     tree->Branch("dzeta_jesUp",&dzeta_jesUp,"dzeta_jesUp/F");
@@ -1090,11 +1090,11 @@ int main(int argc, char * argv[]) {
     tree->Branch("pzetamiss_mvamet_uncorr", &pzetamiss_mvamet_uncorr, "pzetamiss_mvamet_uncorr/F");
     tree->Branch("dzeta_mvamet_uncorr",&dzeta_mvamet_uncorr,"dzeta_mvamet_uncorr/F");
     
-    tree->Branch("pzetamiss_mvamet_resoUp", &pzetamiss_mvamet_resoUp, "pzetamiss_mvamet_resoUp/F");
-    tree->Branch("dzeta_mvamet_resoUp",&dzeta_mvamet_resoUp,"dzeta_mvamet_resoUp/F");
+    tree->Branch("pzetamiss_mvamet_unclMetUp", &pzetamiss_mvamet_unclMetUp, "pzetamiss_mvamet_unclMetUp/F");
+    tree->Branch("dzeta_mvamet_unclMetUp",&dzeta_mvamet_unclMetUp,"dzeta_mvamet_unclMetUp/F");
     
-    tree->Branch("pzetamiss_mvamet_resoDown", &pzetamiss_mvamet_resoDown, "pzetamiss_mvamet_resoDown/F");
-    tree->Branch("dzeta_mvamet_resoDown",&dzeta_mvamet_resoDown,"dzeta_mvamet_resoDown/F");
+    tree->Branch("pzetamiss_mvamet_unclMetDown", &pzetamiss_mvamet_unclMetDown, "pzetamiss_mvamet_unclMetDown/F");
+    tree->Branch("dzeta_mvamet_unclMetDown",&dzeta_mvamet_unclMetDown,"dzeta_mvamet_unclMetDown/F");
     
     tree->Branch("pzetamiss_mvamet_jesUp", &pzetamiss_mvamet_jesUp, "pzetamiss_mvamet_jesUp/F");
     tree->Branch("dzeta_mvamet_jesUp",&dzeta_mvamet_jesUp,"dzeta_mvamet_jesUp/F");
@@ -2687,8 +2687,8 @@ int main(int argc, char * argv[]) {
             m_vis_escaleDown   = (muonLV+electronDownLV).M();
             m_vis_jesUp   = m_vis;
             m_vis_jesDown = m_vis;
-            m_vis_resoUp    = m_vis;
-            m_vis_resoDown  = m_vis;
+            m_vis_unclMetUp    = m_vis;
+            m_vis_unclMetDown  = m_vis;
             
             // std::cout << "m_vis        = " << m_vis << std::endl;
             // std::cout << "m_vis_muUp   = " << m_vis_muUp << std::endl;
@@ -3100,19 +3100,19 @@ int main(int argc, char * argv[]) {
             float met_jesUp_y   = analysisTree.pfmetcorr_ey_JetEnUp;
             float met_jesDown_x = analysisTree.pfmetcorr_ex_JetEnDown;
             float met_jesDown_y = analysisTree.pfmetcorr_ey_JetEnDown;
-            float met_resoUp_x    = analysisTree.pfmetcorr_ex_UnclusteredEnUp;
-            float met_resoUp_y    = analysisTree.pfmetcorr_ey_UnclusteredEnUp;
-            float met_resoDown_x  = analysisTree.pfmetcorr_ex_UnclusteredEnDown;
-            float met_resoDown_y  = analysisTree.pfmetcorr_ey_UnclusteredEnDown;
+            float met_unclMetUp_x    = analysisTree.pfmetcorr_ex_UnclusteredEnUp;
+            float met_unclMetUp_y    = analysisTree.pfmetcorr_ey_UnclusteredEnUp;
+            float met_unclMetDown_x  = analysisTree.pfmetcorr_ex_UnclusteredEnDown;
+            float met_unclMetDown_y  = analysisTree.pfmetcorr_ey_UnclusteredEnDown;
             
             float metcorr_jesUp_x   = analysisTree.pfmetcorr_ex_JetEnUp;
             float metcorr_jesUp_y   = analysisTree.pfmetcorr_ey_JetEnUp;
             float metcorr_jesDown_x = analysisTree.pfmetcorr_ex_JetEnDown;
             float metcorr_jesDown_y = analysisTree.pfmetcorr_ey_JetEnDown;
-            float metcorr_resoUp_x    = analysisTree.pfmetcorr_ex_UnclusteredEnUp;
-            float metcorr_resoUp_y    = analysisTree.pfmetcorr_ey_UnclusteredEnUp;
-            float metcorr_resoDown_x  = analysisTree.pfmetcorr_ex_UnclusteredEnDown;
-            float metcorr_resoDown_y  = analysisTree.pfmetcorr_ey_UnclusteredEnDown;
+            float metcorr_unclMetUp_x    = analysisTree.pfmetcorr_ex_UnclusteredEnUp;
+            float metcorr_unclMetUp_y    = analysisTree.pfmetcorr_ey_UnclusteredEnUp;
+            float metcorr_unclMetDown_x  = analysisTree.pfmetcorr_ex_UnclusteredEnDown;
+            float metcorr_unclMetDown_y  = analysisTree.pfmetcorr_ey_UnclusteredEnDown;
             
             met = TMath::Sqrt(met_x*met_x + met_y*met_y);
             metphi = TMath::ATan2(met_y,met_x);
@@ -3200,8 +3200,8 @@ int main(int argc, char * argv[]) {
                   recoilMetCorrector.CorrectByMeanResolution(met_x,met_y,bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,pfmet_corr_x,pfmet_corr_y);
                   recoilMetCorrector.CorrectByMeanResolution(metcorr_jesUp_x,  metcorr_jesUp_y,  bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,met_jesUp_x,  met_jesUp_y);
                   recoilMetCorrector.CorrectByMeanResolution(metcorr_jesDown_x,metcorr_jesDown_y,bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,met_jesDown_x,met_jesDown_y);
-                  recoilMetCorrector.CorrectByMeanResolution(metcorr_resoUp_x,   metcorr_resoUp_y,   bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,met_resoUp_x,   met_resoUp_y);
-                  recoilMetCorrector.CorrectByMeanResolution(metcorr_resoDown_x, metcorr_resoDown_y, bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,met_resoDown_x, met_resoDown_y);
+                  recoilMetCorrector.CorrectByMeanResolution(metcorr_unclMetUp_x,   metcorr_unclMetUp_y,   bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,met_unclMetUp_x,   met_unclMetUp_y);
+                  recoilMetCorrector.CorrectByMeanResolution(metcorr_unclMetDown_x, metcorr_unclMetDown_y, bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,met_unclMetDown_x, met_unclMetDown_y);
                   
                }
                else {
@@ -3230,10 +3230,10 @@ int main(int argc, char * argv[]) {
             float mvamet_jesUp_y   = mvamet_y;
             float mvamet_jesDown_x = mvamet_x;
             float mvamet_jesDown_y = mvamet_y;
-            float mvamet_resoUp_x    = mvamet_x;
-            float mvamet_resoUp_y    = mvamet_y;
-            float mvamet_resoDown_x  = mvamet_x;
-            float mvamet_resoDown_y  = mvamet_y;
+            float mvamet_unclMetUp_x    = mvamet_x;
+            float mvamet_unclMetUp_y    = mvamet_y;
+            float mvamet_unclMetDown_x  = mvamet_x;
+            float mvamet_unclMetDown_y  = mvamet_y;
 
             mvamet_jesUp = TMath::Sqrt(mvamet_jesUp_x*mvamet_jesUp_x+
                                          mvamet_jesUp_y*mvamet_jesUp_y);
@@ -3243,13 +3243,13 @@ int main(int argc, char * argv[]) {
                                            mvamet_jesDown_y*mvamet_jesDown_y);
             mvametphi_jesDown = TMath::ATan2(mvamet_jesDown_y,mvamet_jesDown_x);
             
-            mvamet_resoUp = TMath::Sqrt(mvamet_resoUp_x*mvamet_resoUp_x+
-                                        mvamet_resoUp_y*mvamet_resoUp_y);
-            mvametphi_resoUp = TMath::ATan2(mvamet_resoUp_y,mvamet_resoUp_x);
+            mvamet_unclMetUp = TMath::Sqrt(mvamet_unclMetUp_x*mvamet_unclMetUp_x+
+                                        mvamet_unclMetUp_y*mvamet_unclMetUp_y);
+            mvametphi_unclMetUp = TMath::ATan2(mvamet_unclMetUp_y,mvamet_unclMetUp_x);
             
-            mvamet_resoDown = TMath::Sqrt(mvamet_resoDown_x*mvamet_resoDown_x+
-                                          mvamet_resoDown_y*mvamet_resoDown_y);
-            mvametphi_resoDown = TMath::ATan2(mvamet_resoDown_y,mvamet_resoDown_x);
+            mvamet_unclMetDown = TMath::Sqrt(mvamet_unclMetDown_x*mvamet_unclMetDown_x+
+                                          mvamet_unclMetDown_y*mvamet_unclMetDown_y);
+            mvametphi_unclMetDown = TMath::ATan2(mvamet_unclMetDown_y,mvamet_unclMetDown_x);
             
  
             met_jesUp = TMath::Sqrt(met_jesUp_x*met_jesUp_x+
@@ -3260,21 +3260,21 @@ int main(int argc, char * argv[]) {
 					met_jesDown_y*met_jesDown_y);
             metphi_jesDown = TMath::ATan2(met_jesDown_y,met_jesDown_x);
             
-            met_resoUp = TMath::Sqrt(met_resoUp_x*met_resoUp_x+
-				     met_resoUp_y*met_resoUp_y);
-            metphi_resoUp = TMath::ATan2(met_resoUp_y,met_resoUp_x);
+            met_unclMetUp = TMath::Sqrt(met_unclMetUp_x*met_unclMetUp_x+
+				     met_unclMetUp_y*met_unclMetUp_y);
+            metphi_unclMetUp = TMath::ATan2(met_unclMetUp_y,met_unclMetUp_x);
             
-            met_resoDown = TMath::Sqrt(met_resoDown_x*met_resoDown_x+
-				       met_resoDown_y*met_resoDown_y);
-            metphi_resoDown = TMath::ATan2(met_resoDown_y,met_resoDown_x);
+            met_unclMetDown = TMath::Sqrt(met_unclMetDown_x*met_unclMetDown_x+
+				       met_unclMetDown_y*met_unclMetDown_y);
+            metphi_unclMetDown = TMath::ATan2(met_unclMetDown_y,met_unclMetDown_x);
             
             
             //      printf("Uncorrected    :  %7.2f  %7.2f\n",mvamet_uncorr_x,mvamet_uncorr_y);
             //      printf("Central        :  %7.2f  %7.2f\n",mvamet_x,mvamet_y);
             //      printf("ScaleUp        :  %7.2f  %7.2f\n",mvamet_jesUp_x,mvamet_jesUp_y);
             //      printf("ScaleDown      :  %7.2f  %7.2f\n",mvamet_jesDown_x,mvamet_jesDown_y);
-            //      printf("ResoUp         :  %7.2f  %7.2f\n",mvamet_resoUp_x,mvamet_resoUp_y);
-            //      printf("ResoDown       :  %7.2f  %7.2f\n",mvamet_resoDown_x,mvamet_resoDown_y);
+            //      printf("ResoUp         :  %7.2f  %7.2f\n",mvamet_unclMetUp_x,mvamet_unclMetUp_y);
+            //      printf("ResoDown       :  %7.2f  %7.2f\n",mvamet_unclMetDown_x,mvamet_unclMetDown_y);
             //      std::cout << std::endl;
            
             //store genmet
@@ -3339,10 +3339,10 @@ int main(int argc, char * argv[]) {
                          zetaX,zetaY,pzetavis,pzetamiss_jesUp,dzeta_jesUp); // scaleUp
             computeDzeta(met_jesDown_x,met_jesDown_y,
                          zetaX,zetaY,pzetavis,pzetamiss_jesDown,dzeta_jesDown); // scaleDown
-            computeDzeta(met_resoUp_x,met_resoUp_y,
-                         zetaX,zetaY,pzetavis,pzetamiss_resoUp,dzeta_resoUp); // resoUp
-            computeDzeta(met_resoDown_x,met_resoDown_y,
-                         zetaX,zetaY,pzetavis,pzetamiss_resoDown,dzeta_resoDown); // resoDown
+            computeDzeta(met_unclMetUp_x,met_unclMetUp_y,
+                         zetaX,zetaY,pzetavis,pzetamiss_unclMetUp,dzeta_unclMetUp); // resoUp
+            computeDzeta(met_unclMetDown_x,met_unclMetDown_y,
+                         zetaX,zetaY,pzetavis,pzetamiss_unclMetDown,dzeta_unclMetDown); // resoDown
             computeDzeta(metx_escaleUp,mety_escaleUp,
                          zetaX,zetaY,pzetavis_escaleUp,pzetamiss_escaleUp,dzeta_escaleUp); // eUp
             computeDzeta(metx_escaleDown,mety_escaleDown,
@@ -3357,10 +3357,10 @@ int main(int argc, char * argv[]) {
                          zetaX,zetaY,pzetavis,pzetamiss_mvamet_jesUp,dzeta_mvamet_jesUp); // scaleUp
             computeDzeta(mvamet_jesDown_x,mvamet_jesDown_y,
                          zetaX,zetaY,pzetavis,pzetamiss_mvamet_jesDown,dzeta_mvamet_jesDown); // scaleDown
-            computeDzeta(mvamet_resoUp_x,mvamet_resoUp_y,
-                         zetaX,zetaY,pzetavis,pzetamiss_mvamet_resoUp,dzeta_mvamet_resoUp); // resoUp
-            computeDzeta(mvamet_resoDown_x,mvamet_resoDown_y,
-                         zetaX,zetaY,pzetavis,pzetamiss_mvamet_resoDown,dzeta_mvamet_resoDown); // resoDown
+            computeDzeta(mvamet_unclMetUp_x,mvamet_unclMetUp_y,
+                         zetaX,zetaY,pzetavis,pzetamiss_mvamet_unclMetUp,dzeta_mvamet_unclMetUp); // resoUp
+            computeDzeta(mvamet_unclMetDown_x,mvamet_unclMetDown_y,
+                         zetaX,zetaY,pzetavis,pzetamiss_mvamet_unclMetDown,dzeta_mvamet_unclMetDown); // resoDown
             
             // genmet
             computeDzeta(analysisTree.genmet_ex,analysisTree.genmet_ey,
@@ -3387,8 +3387,8 @@ int main(int argc, char * argv[]) {
             m_leptons = (muonLV+electronLV).M();
             
             
-            TLorentzVector metResoUpLV; metResoUpLV.SetXYZT(met_resoUp_x,met_resoUp_y,0.,met_resoUp);
-            TLorentzVector metResoDownLV; metResoDownLV.SetXYZT(met_resoDown_x,met_resoDown_y,0.,met_resoDown);
+            TLorentzVector metResoUpLV; metResoUpLV.SetXYZT(met_unclMetUp_x,met_unclMetUp_y,0.,met_unclMetUp);
+            TLorentzVector metResoDownLV; metResoDownLV.SetXYZT(met_unclMetDown_x,met_unclMetDown_y,0.,met_unclMetDown);
             TLorentzVector metScaleUpLV; metScaleUpLV.SetXYZT(met_jesUp_x,met_jesUp_y,0.,met_jesUp);
             TLorentzVector metScaleDownLV; metScaleDownLV.SetXYZT(met_jesDown_x,met_jesDown_y,0.,met_jesDown);
             // computing total transverse mass
@@ -3403,8 +3403,8 @@ int main(int argc, char * argv[]) {
             mTtot_jesUp   =  totalTransverseMass ( muonLV , electronLV , metScaleUpLV);
             mTtot_jesDown =  totalTransverseMass ( muonLV , electronLV , metScaleDownLV);
            
-            mTtot_resoUp   =  totalTransverseMass ( muonLV , electronLV , metResoUpLV);
-            mTtot_resoDown =  totalTransverseMass ( muonLV , electronLV , metResoDownLV);
+            mTtot_unclMetUp   =  totalTransverseMass ( muonLV , electronLV , metResoUpLV);
+            mTtot_unclMetDown =  totalTransverseMass ( muonLV , electronLV , metResoDownLV);
             
             mTemu   = mT(electronLV,muonLV);
             mTemet  = mT(electronLV,metLV);
@@ -3423,8 +3423,8 @@ int main(int argc, char * argv[]) {
 
             mTdileptonMET_jesUp = mT(dileptonLV,metScaleUpLV);
             mTdileptonMET_jesDown = mT(dileptonLV,metScaleDownLV);
-            mTdileptonMET_resoUp = mT(dileptonLV,metResoUpLV);
-            mTdileptonMET_resoDown = mT(dileptonLV,metResoDownLV);
+            mTdileptonMET_unclMetUp = mT(dileptonLV,metResoUpLV);
+            mTdileptonMET_unclMetDown = mT(dileptonLV,metResoDownLV);
             
             mTdileptonMET_muUp = mT(muonUpLV+electronLV,metLV);
             mTdileptonMET_muDown = mT(muonDownLV+electronLV,metLV);
@@ -3443,8 +3443,8 @@ int main(int argc, char * argv[]) {
             m_sv_escaleDown     = -10;
             m_sv_jesUp   = -10;
             m_sv_jesDown = -10;
-            m_sv_resoUp    = -10;
-            m_sv_resoDown  = -10;
+            m_sv_unclMetUp    = -10;
+            m_sv_unclMetDown  = -10;
             
             mt_sv           = -10;
             mt_sv_muUp      = -10;
@@ -3453,8 +3453,8 @@ int main(int argc, char * argv[]) {
             mt_sv_escaleDown     = -10;
             mt_sv_jesUp   = -10;
             mt_sv_jesDown = -10;
-            mt_sv_resoUp    = -10;
-            mt_sv_resoDown  = -10;
+            mt_sv_unclMetUp    = -10;
+            mt_sv_unclMetDown  = -10;
             
             pt_sv   = -10;
             eta_sv  = -10;
@@ -3546,8 +3546,8 @@ int main(int argc, char * argv[]) {
                     
                     m_sv_jesUp   = m_sv;
                     m_sv_jesDown = m_sv;
-                    m_sv_resoUp    = m_sv;
-                    m_sv_resoDown  = m_sv;
+                    m_sv_unclMetUp    = m_sv;
+                    m_sv_unclMetDown  = m_sv;
                     m_sv_escaleUp       = m_sv;
                     m_sv_escaleDown     = m_sv;
                     m_sv_muUp      = m_sv;
@@ -3555,8 +3555,8 @@ int main(int argc, char * argv[]) {
                     
                     mt_sv_jesUp   = mt_sv;
                     mt_sv_jesDown = mt_sv;
-                    mt_sv_resoUp    = mt_sv;
-                    mt_sv_resoDown  = mt_sv;
+                    mt_sv_unclMetUp    = mt_sv;
+                    mt_sv_unclMetDown  = mt_sv;
                     mt_sv_escaleUp       = mt_sv;
                     mt_sv_escaleDown     = mt_sv;
                     mt_sv_muUp      = mt_sv;
@@ -3617,12 +3617,12 @@ int main(int argc, char * argv[]) {
                                                   mvamet_jesDown_x, mvamet_jesDown_y,
                                                   covMET, inputFile_visPtResolution);
                                                   
-                                                  // SVfitStandaloneAlgorithm algo_resoUp = SVFitMassComputation(svFitEle, svFitMu,
-                                                  // 								mvamet_resoUp_x, mvamet_resoUp_y,
+                                                  // SVfitStandaloneAlgorithm algo_unclMetUp = SVFitMassComputation(svFitEle, svFitMu,
+                                                  // 								mvamet_unclMetUp_x, mvamet_unclMetUp_y,
                                                   // 								covMVAMET, inputFile_visPtResolution);
                                                   
-                                                  // SVfitStandaloneAlgorithm algo_resoDown = SVFitMassComputation(svFitEle, svFitMu,
-                                                  // 								  mvamet_resoDown_x, mvamet_resoDown_y,
+                                                  // SVfitStandaloneAlgorithm algo_unclMetDown = SVFitMassComputation(svFitEle, svFitMu,
+                                                  // 								  mvamet_unclMetDown_x, mvamet_unclMetDown_y,
                                                   // 								  covMVAMET, inputFile_visPtResolution);
                                                   
                                                   m_sv_jesUp    = algo_jesUp.getMass();
@@ -3630,10 +3630,10 @@ int main(int argc, char * argv[]) {
                                                   m_sv_jesDown  = algo_jesDown.getMass();
                                                   mt_sv_jesDown = algo_jesDown.transverseMass();
                                                   
-                                                  // m_sv_resoUp     = algo_resoUp.getMass();
-                                                  // mt_sv_resoUp    = algo_resoUp.transverseMass();
-                                                  // m_sv_resoDown   = algo_resoDown.getMass();
-                                                  // mt_sv_resoDown  = algo_resoDown.transverseMass();
+                                                  // m_sv_unclMetUp     = algo_unclMetUp.getMass();
+                                                  // mt_sv_unclMetUp    = algo_unclMetUp.transverseMass();
+                                                  // m_sv_unclMetDown   = algo_unclMetDown.getMass();
+                                                  // mt_sv_unclMetDown  = algo_unclMetDown.transverseMass();
                                                   
                                                   }
                         */
