@@ -437,8 +437,8 @@ int main(int argc, char * argv[]) {
     Float_t         m_vis_muDown;
     Float_t         m_vis_escaleUp;
     Float_t         m_vis_escaleDown;
-    Float_t         m_vis_scaleUp;
-    Float_t         m_vis_scaleDown;
+    Float_t         m_vis_jesUp;
+    Float_t         m_vis_jesDown;
     Float_t         m_vis_resoUp;
     Float_t         m_vis_resoDown;
     
@@ -447,8 +447,8 @@ int main(int argc, char * argv[]) {
     Float_t         mTtot_muDown;
     Float_t         mTtot_escaleUp;
     Float_t         mTtot_escaleDown;
-    Float_t         mTtot_scaleUp;
-    Float_t         mTtot_scaleDown;
+    Float_t         mTtot_jesUp;
+    Float_t         mTtot_jesDown;
     Float_t         mTtot_resoUp;
     Float_t         mTtot_resoDown;
     Float_t         mCDF;
@@ -458,8 +458,8 @@ int main(int argc, char * argv[]) {
     Float_t         mTdileptonMET_muDown;
     Float_t         mTdileptonMET_escaleUp;
     Float_t         mTdileptonMET_escaleDown;
-    Float_t         mTdileptonMET_scaleUp;
-    Float_t         mTdileptonMET_scaleDown;
+    Float_t         mTdileptonMET_jesUp;
+    Float_t         mTdileptonMET_jesDown;
     Float_t         mTdileptonMET_resoUp;
     Float_t         mTdileptonMET_resoDown;
     
@@ -490,8 +490,8 @@ int main(int argc, char * argv[]) {
     Float_t         m_sv_escaleDown;
     Float_t         m_sv_muUp;
     Float_t         m_sv_muDown;
-    Float_t         m_sv_scaleUp;
-    Float_t         m_sv_scaleDown;
+    Float_t         m_sv_jesUp;
+    Float_t         m_sv_jesDown;
     Float_t         m_sv_resoUp;
     Float_t         m_sv_resoDown;
     
@@ -499,8 +499,8 @@ int main(int argc, char * argv[]) {
     Float_t         mt_sv_escaleDown;
     Float_t         mt_sv_muUp;
     Float_t         mt_sv_muDown;
-    Float_t         mt_sv_scaleUp;
-    Float_t         mt_sv_scaleDown;
+    Float_t         mt_sv_jesUp;
+    Float_t         mt_sv_jesDown;
     Float_t         mt_sv_resoUp;
     Float_t         mt_sv_resoDown;
     
@@ -572,11 +572,11 @@ int main(int argc, char * argv[]) {
     Float_t         met_resoDown;
     Float_t         metphi_resoDown;
     
-    Float_t         met_scaleUp;
-    Float_t         metphi_scaleUp;
+    Float_t         met_jesUp;
+    Float_t         metphi_jesUp;
     
-    Float_t         met_scaleDown;
-    Float_t         metphi_scaleDown;
+    Float_t         met_jesDown;
+    Float_t         metphi_jesDown;
     
     Float_t         mvamet;
     Float_t         mvametphi;
@@ -594,11 +594,11 @@ int main(int argc, char * argv[]) {
     Float_t         mvamet_resoDown;
     Float_t         mvametphi_resoDown;
     
-    Float_t         mvamet_scaleUp;
-    Float_t         mvametphi_scaleUp;
+    Float_t         mvamet_jesUp;
+    Float_t         mvametphi_jesUp;
     
-    Float_t         mvamet_scaleDown;
-    Float_t         mvametphi_scaleDown;
+    Float_t         mvamet_jesDown;
+    Float_t         mvametphi_jesDown;
     
     Float_t         genmet;
     Float_t         genmetphi;
@@ -621,11 +621,11 @@ int main(int argc, char * argv[]) {
     Float_t         pzetamiss_mvamet_uncorr;
     Float_t         dzeta_mvamet_uncorr;
     
-    Float_t         pzetamiss_mvamet_scaleUp;
-    Float_t         dzeta_mvamet_scaleUp;
+    Float_t         pzetamiss_mvamet_jesUp;
+    Float_t         dzeta_mvamet_jesUp;
     
-    Float_t         pzetamiss_mvamet_scaleDown;
-    Float_t         dzeta_mvamet_scaleDown;
+    Float_t         pzetamiss_mvamet_jesDown;
+    Float_t         dzeta_mvamet_jesDown;
     
     Float_t         pzetamiss_mvamet_resoUp;
     Float_t         dzeta_mvamet_resoUp;
@@ -633,11 +633,11 @@ int main(int argc, char * argv[]) {
     Float_t         pzetamiss_mvamet_resoDown;
     Float_t         dzeta_mvamet_resoDown;
 
-    Float_t         pzetamiss_scaleUp;
-    Float_t         dzeta_scaleUp;
+    Float_t         pzetamiss_jesUp;
+    Float_t         dzeta_jesUp;
     
-    Float_t         pzetamiss_scaleDown;
-    Float_t         dzeta_scaleDown;
+    Float_t         pzetamiss_jesDown;
+    Float_t         dzeta_jesDown;
     
     Float_t         pzetamiss_resoUp;
     Float_t         dzeta_resoUp;
@@ -660,15 +660,15 @@ int main(int argc, char * argv[]) {
     Float_t         mva_gf;
     
     Int_t           njets;
-    Int_t           njets_Up;
-    Int_t           njets_Down;
+    Int_t           njets_jesUp;
+    Int_t           njets_jesDown;
 
     Int_t           njetspt20;
 
 
     Float_t         jpt_1;
-    Float_t         jpt_1_Up;
-    Float_t         jpt_1_Down;
+    Float_t         jpt_1_jesUp;
+    Float_t         jpt_1_jesDown;
 
     Float_t         jeta_1;
     Float_t         jphi_1;
@@ -680,8 +680,8 @@ int main(int argc, char * argv[]) {
     Int_t           gen_match_1;
     
     Float_t         jpt_2;
-    Float_t         jpt_2_Up;
-    Float_t         jpt_2_Down;
+    Float_t         jpt_2_jesUp;
+    Float_t         jpt_2_jesDown;
 
 
     Float_t         jeta_2;
@@ -694,8 +694,8 @@ int main(int argc, char * argv[]) {
     Int_t           gen_match_2;
     
     Float_t         mjj;
-    Float_t         mjj_Up;
-    Float_t         mjj_Down;
+    Float_t         mjj_jesUp;
+    Float_t         mjj_jesDown;
 
     Float_t         jdeta;
     Int_t           njetingap;
@@ -873,8 +873,8 @@ int main(int argc, char * argv[]) {
     tree->Branch("m_vis_muDown", &m_vis_muDown, "m_vis_muDown/F");
     tree->Branch("m_vis_escaleUp",    &m_vis_escaleUp,    "m_vis_escaleUp/F");
     tree->Branch("m_vis_escaleDown",  &m_vis_escaleDown,  "m_vis_escaleDown/F");
-    tree->Branch("m_vis_scaleUp",   &m_vis_scaleUp,   "m_vis_scaleUp/F");
-    tree->Branch("m_vis_scaleDown", &m_vis_scaleDown, "m_vis_scaleDown/F");
+    tree->Branch("m_vis_jesUp",   &m_vis_jesUp,   "m_vis_jesUp/F");
+    tree->Branch("m_vis_jesDown", &m_vis_jesDown, "m_vis_jesDown/F");
     tree->Branch("m_vis_resoUp",    &m_vis_resoUp,    "m_vis_resoUp/F");
     tree->Branch("m_vis_resoDown",  &m_vis_resoDown,  "m_vis_resoDown/F");
     
@@ -884,8 +884,8 @@ int main(int argc, char * argv[]) {
     tree->Branch("mTtot_muDown", &mTtot_muDown, "mTtot_muDown/F");
     tree->Branch("mTtot_escaleUp",    &mTtot_escaleUp,    "mTtot_escaleUp/F");
     tree->Branch("mTtot_escaleDown",  &mTtot_escaleDown,  "mTtot_escaleDown/F");
-    tree->Branch("mTtot_scaleUp",   &mTtot_scaleUp,   "mTtot_scaleUp/F");
-    tree->Branch("mTtot_scaleDown", &mTtot_scaleDown, "mTtot_scaleDown/F");
+    tree->Branch("mTtot_jesUp",   &mTtot_jesUp,   "mTtot_jesUp/F");
+    tree->Branch("mTtot_jesDown", &mTtot_jesDown, "mTtot_jesDown/F");
     tree->Branch("mTtot_resoUp",    &mTtot_resoUp,    "mTtot_resoUp/F");
     tree->Branch("mTtot_resoDown",  &mTtot_resoDown,  "mTtot_resoDown/F");
     
@@ -894,8 +894,8 @@ int main(int argc, char * argv[]) {
     tree->Branch("mTdileptonMET_muDown", &mTdileptonMET_muDown, "mTdileptonMET_muDown/F");
     tree->Branch("mTdileptonMET_escaleUp", &mTdileptonMET_escaleUp, "mTdileptonMET_escaleUp/F");
     tree->Branch("mTdileptonMET_escaleDown", &mTdileptonMET_escaleDown, "mTdileptonMET_escaleDown/F");
-    tree->Branch("mTdileptonMET_scaleUp", &mTdileptonMET_scaleUp, "mTdileptonMET_scaleUp/F");
-    tree->Branch("mTdileptonMET_scaleDown", &mTdileptonMET_scaleDown, "mTdileptonMET_scaleDown/F");
+    tree->Branch("mTdileptonMET_jesUp", &mTdileptonMET_jesUp, "mTdileptonMET_jesUp/F");
+    tree->Branch("mTdileptonMET_jesDown", &mTdileptonMET_jesDown, "mTdileptonMET_jesDown/F");
     tree->Branch("mTdileptonMET_resoUp", &mTdileptonMET_resoUp, "mTdileptonMET_resoUp/F");
     tree->Branch("mTdileptonMET_resoDown", &mTdileptonMET_resoDown, "mTdileptonMET_resoDown/F");
 
@@ -922,8 +922,8 @@ int main(int argc, char * argv[]) {
     tree->Branch("eta_sv_gen",  &eta_sv_gen, "eta_sv_gen/F");
     tree->Branch("phi_sv_gen",  &phi_sv_gen, "phi_sv_gen/F");
     
-    tree->Branch("m_sv_scaleUp",   &m_sv_scaleUp,   "m_sv_scaleUp/F");
-    tree->Branch("m_sv_scaleDown", &m_sv_scaleDown, "m_sv_scaleDown/F");
+    tree->Branch("m_sv_jesUp",   &m_sv_jesUp,   "m_sv_jesUp/F");
+    tree->Branch("m_sv_jesDown", &m_sv_jesDown, "m_sv_jesDown/F");
     tree->Branch("m_sv_resoUp",    &m_sv_resoUp,    "m_sv_resoUp/F");
     tree->Branch("m_sv_resoDown",  &m_sv_resoDown,  "m_sv_resoDown/F");
     tree->Branch("m_sv_escaleUp",       &m_sv_escaleUp,       "m_sv_escaleUp/F");
@@ -931,8 +931,8 @@ int main(int argc, char * argv[]) {
     tree->Branch("m_sv_muUp",      &m_sv_muUp,      "m_sv_muUp/F");
     tree->Branch("m_sv_muDown",    &m_sv_muDown,    "m_sv_muDown/F");
     
-    tree->Branch("mt_sv_scaleUp",   &mt_sv_scaleUp,   "mt_sv_scaleUp/F");
-    tree->Branch("mt_sv_scaleDown", &mt_sv_scaleDown, "mt_sv_scaleDown/F");
+    tree->Branch("mt_sv_jesUp",   &mt_sv_jesUp,   "mt_sv_jesUp/F");
+    tree->Branch("mt_sv_jesDown", &mt_sv_jesDown, "mt_sv_jesDown/F");
     tree->Branch("mt_sv_resoUp",    &mt_sv_resoUp,    "mt_sv_resoUp/F");
     tree->Branch("mt_sv_resoDown",  &mt_sv_resoDown,  "mt_sv_resoDown/F");
     tree->Branch("mt_sv_escaleUp",       &mt_sv_escaleUp,       "mt_sv_escaleUp/F");
@@ -1006,11 +1006,11 @@ int main(int argc, char * argv[]) {
     tree->Branch("met_resoDown", &met_resoDown, "met_resoDown/F");
     tree->Branch("metphi_resoDown", &metphi_resoDown, "metphi_resoDown/F");
     
-    tree->Branch("met_scaleUp", &met_scaleUp, "met_scaleUp/F");
-    tree->Branch("metphi_scaleUp", &metphi_scaleUp, "metphi_scaleUp/F");
+    tree->Branch("met_jesUp", &met_jesUp, "met_jesUp/F");
+    tree->Branch("metphi_jesUp", &metphi_jesUp, "metphi_jesUp/F");
     
-    tree->Branch("met_scaleDown", &met_scaleDown, "met_scaleDown/F");
-    tree->Branch("metphi_scaleDown", &metphi_scaleDown, "metphi_scaleDown/F");
+    tree->Branch("met_jesDown", &met_jesDown, "met_jesDown/F");
+    tree->Branch("metphi_jesDown", &metphi_jesDown, "metphi_jesDown/F");
     
     tree->Branch("mvamet", &mvamet, "mvamet/F");
     tree->Branch("mvametphi", &mvametphi, "mvametphi/F");
@@ -1028,11 +1028,11 @@ int main(int argc, char * argv[]) {
     tree->Branch("mvamet_resoDown", &mvamet_resoDown, "mvamet_resoDown/F");
     tree->Branch("mvametphi_resoDown", &mvametphi_resoDown, "mvametphi_resoDown/F");
     
-    tree->Branch("mvamet_scaleUp", &mvamet_scaleUp, "mvamet_scaleUp/F");
-    tree->Branch("mvametphi_scaleUp", &mvametphi_scaleUp, "mvametphi_scaleUp/F");
+    tree->Branch("mvamet_jesUp", &mvamet_jesUp, "mvamet_jesUp/F");
+    tree->Branch("mvametphi_jesUp", &mvametphi_jesUp, "mvametphi_jesUp/F");
     
-    tree->Branch("mvamet_scaleDown", &mvamet_scaleDown, "mvamet_scaleDown/F");
-    tree->Branch("mvametphi_scaleDown", &mvametphi_scaleDown, "mvametphi_scaleDown/F");
+    tree->Branch("mvamet_jesDown", &mvamet_jesDown, "mvamet_jesDown/F");
+    tree->Branch("mvametphi_jesDown", &mvametphi_jesDown, "mvametphi_jesDown/F");
     
     tree->Branch("genmet", &genmet, "genmet/F");
     tree->Branch("genmetphi", &genmetphi, "genmetphi/F");
@@ -1076,11 +1076,11 @@ int main(int argc, char * argv[]) {
     tree->Branch("pzetamiss_resoDown", &pzetamiss_resoDown, "pzetamiss_resoDown/F");
     tree->Branch("dzeta_resoDown",&dzeta_resoDown,"dzeta_resoDown/F");
     
-    tree->Branch("pzetamiss_scaleUp", &pzetamiss_scaleUp, "pzetamiss_scaleUp/F");
-    tree->Branch("dzeta_scaleUp",&dzeta_scaleUp,"dzeta_scaleUp/F");
+    tree->Branch("pzetamiss_jesUp", &pzetamiss_jesUp, "pzetamiss_jesUp/F");
+    tree->Branch("dzeta_jesUp",&dzeta_jesUp,"dzeta_jesUp/F");
     
-    tree->Branch("pzetamiss_scaleDown", &pzetamiss_scaleDown, "pzetamiss_scaleDown/F");
-    tree->Branch("dzeta_scaleDown",&dzeta_scaleDown,"dzeta_scaleDown/F");
+    tree->Branch("pzetamiss_jesDown", &pzetamiss_jesDown, "pzetamiss_jesDown/F");
+    tree->Branch("dzeta_jesDown",&dzeta_jesDown,"dzeta_jesDown/F");
     
 
 
@@ -1096,11 +1096,11 @@ int main(int argc, char * argv[]) {
     tree->Branch("pzetamiss_mvamet_resoDown", &pzetamiss_mvamet_resoDown, "pzetamiss_mvamet_resoDown/F");
     tree->Branch("dzeta_mvamet_resoDown",&dzeta_mvamet_resoDown,"dzeta_mvamet_resoDown/F");
     
-    tree->Branch("pzetamiss_mvamet_scaleUp", &pzetamiss_mvamet_scaleUp, "pzetamiss_mvamet_scaleUp/F");
-    tree->Branch("dzeta_mvamet_scaleUp",&dzeta_mvamet_scaleUp,"dzeta_mvamet_scaleUp/F");
+    tree->Branch("pzetamiss_mvamet_jesUp", &pzetamiss_mvamet_jesUp, "pzetamiss_mvamet_jesUp/F");
+    tree->Branch("dzeta_mvamet_jesUp",&dzeta_mvamet_jesUp,"dzeta_mvamet_jesUp/F");
     
-    tree->Branch("pzetamiss_mvamet_scaleDown", &pzetamiss_mvamet_scaleDown, "pzetamiss_mvamet_scaleDown/F");
-    tree->Branch("dzeta_mvamet_scaleDown",&dzeta_mvamet_scaleDown,"dzeta_mvamet_scaleDown/F");
+    tree->Branch("pzetamiss_mvamet_jesDown", &pzetamiss_mvamet_jesDown, "pzetamiss_mvamet_jesDown/F");
+    tree->Branch("dzeta_mvamet_jesDown",&dzeta_mvamet_jesDown,"dzeta_mvamet_jesDown/F");
     
 
     tree->Branch("pzetamiss_genmet", &pzetamiss_genmet, "pzetamiss_genmet/F");
@@ -1109,8 +1109,8 @@ int main(int argc, char * argv[]) {
     tree->Branch("mva_gf", &mva_gf, "mva_gf/F");
     
     tree->Branch("njets", &njets, "njets/I");
-    tree->Branch("njets_Up", &njets_Up, "njets_Up/I");
-    tree->Branch("njets_Down", &njets_Down, "njets_Down/I");
+    tree->Branch("njets_jesUp", &njets_jesUp, "njets_jesUp/I");
+    tree->Branch("njets_jesDown", &njets_jesDown, "njets_jesDown/I");
 
 
     tree->Branch("njetspt20", &njetspt20, "njetspt20/I");
@@ -1120,8 +1120,8 @@ int main(int argc, char * argv[]) {
     tree->Branch("bdt_ggh",&bdt_ggh,"bdt_ggh/F");
     
     tree->Branch("jpt_1", &jpt_1, "jpt_1/F");
-    tree->Branch("jpt_1_Up", &jpt_1_Up, "jpt_1_Up/F");
-    tree->Branch("jpt_1_Down",&jpt_1_Down, "jpt_1_Down/F");
+    tree->Branch("jpt_1_jesUp", &jpt_1_jesUp, "jpt_1_jesUp/F");
+    tree->Branch("jpt_1_jesDown",&jpt_1_jesDown, "jpt_1_jesDown/F");
 
     tree->Branch("jeta_1", &jeta_1, "jeta_1/F");
     tree->Branch("jphi_1", &jphi_1, "jphi_1/F");
@@ -1132,8 +1132,8 @@ int main(int argc, char * argv[]) {
     tree->Branch("jctm_1", &jctm_1, "jctm_1/I");
     
     tree->Branch("jpt_2", &jpt_2, "jpt_2/F");
-    tree->Branch("jpt_2_Up", &jpt_2_Up, "jpt_2_Up/F");
-    tree->Branch("jpt_2_Down", &jpt_2_Down, "jpt_2_Down/F");
+    tree->Branch("jpt_2_jesUp", &jpt_2_jesUp, "jpt_2_jesUp/F");
+    tree->Branch("jpt_2_jesDown", &jpt_2_jesDown, "jpt_2_jesDown/F");
 
     tree->Branch("jeta_2", &jeta_2, "jeta_2/F");
     tree->Branch("jphi_2", &jphi_2, "jphi_2/F");
@@ -1144,8 +1144,8 @@ int main(int argc, char * argv[]) {
     tree->Branch("jctm_2", &jctm_2, "jctm_2/I");
     
     tree->Branch("mjj", &mjj, "mjj/F");
-    tree->Branch("mjj_Up", &mjj_Up, "mjj_Up/F");
-    tree->Branch("mjj_Down", &mjj_Down, "mjj_Down/F");
+    tree->Branch("mjj_jesUp", &mjj_jesUp, "mjj_jesUp/F");
+    tree->Branch("mjj_jesDown", &mjj_jesDown, "mjj_jesDown/F");
 
     tree->Branch("jdeta", &jdeta, "jdeta/F");
     tree->Branch("njetingap", &njetingap, "njetingap/I");
@@ -2685,8 +2685,8 @@ int main(int argc, char * argv[]) {
             m_vis_muDown  = (muonDownLV+electronLV).M();
             m_vis_escaleUp     = (muonLV+electronUpLV).M();
             m_vis_escaleDown   = (muonLV+electronDownLV).M();
-            m_vis_scaleUp   = m_vis;
-            m_vis_scaleDown = m_vis;
+            m_vis_jesUp   = m_vis;
+            m_vis_jesDown = m_vis;
             m_vis_resoUp    = m_vis;
             m_vis_resoDown  = m_vis;
             
@@ -2877,8 +2877,8 @@ int main(int argc, char * argv[]) {
             }
             
             njets = jets.size();
-            njets_Up = jetsUp.size();
-            njets_Down = jetsDown.size();
+            njets_jesUp = jetsUp.size();
+            njets_jesDown = jetsDown.size();
             
             int njetsMax = njets;
             //check if number of jets changes when uncertainties are applied, if yes store this as njetsmax
@@ -2968,8 +2968,8 @@ int main(int argc, char * argv[]) {
             }
             
             jpt_1 = -10;
-            jpt_1_Up = -10;
-            jpt_1_Down = -10;
+            jpt_1_jesUp = -10;
+            jpt_1_jesDown = -10;
             
             jeta_1 = -10;
             jphi_1 = -10;
@@ -2985,8 +2985,8 @@ int main(int argc, char * argv[]) {
             //store pt and eta of the leading jet
             if (indexLeadingJet>=0) {
                jpt_1 = analysisTree.pfjet_pt[indexLeadingJet];
-               jpt_1_Up = analysisTree.pfjet_pt[indexLeadingJet]*(1+analysisTree.pfjet_jecUncertainty[indexLeadingJet]);
-               jpt_1_Down = analysisTree.pfjet_pt[indexLeadingJet]*(1-analysisTree.pfjet_jecUncertainty[indexLeadingJet]);
+               jpt_1_jesUp = analysisTree.pfjet_pt[indexLeadingJet]*(1+analysisTree.pfjet_jecUncertainty[indexLeadingJet]);
+               jpt_1_jesDown = analysisTree.pfjet_pt[indexLeadingJet]*(1-analysisTree.pfjet_jecUncertainty[indexLeadingJet]);
                jeta_1 = analysisTree.pfjet_eta[indexLeadingJet];
                jphi_1 = analysisTree.pfjet_phi[indexLeadingJet];
                jptraw_1 = analysisTree.pfjet_pt[indexLeadingJet]*analysisTree.pfjet_energycorr[indexLeadingJet];
@@ -2998,8 +2998,8 @@ int main(int argc, char * argv[]) {
             }
             //store pt and eta of the subleading jet
             jpt_2 = -10;
-            jpt_2_Up = -10;
-            jpt_2_Down = -10;
+            jpt_2_jesUp = -10;
+            jpt_2_jesDown = -10;
             
             jeta_2 = -10;
             jphi_2 = -10;
@@ -3011,8 +3011,8 @@ int main(int argc, char * argv[]) {
             
             if (indexSubLeadingJet>=0) {
                jpt_2 = analysisTree.pfjet_pt[indexSubLeadingJet];
-               jpt_2_Up = analysisTree.pfjet_pt[indexSubLeadingJet]*(1+analysisTree.pfjet_jecUncertainty[indexSubLeadingJet]);
-               jpt_2_Down = analysisTree.pfjet_pt[indexSubLeadingJet]*(1-analysisTree.pfjet_jecUncertainty[indexSubLeadingJet]);
+               jpt_2_jesUp = analysisTree.pfjet_pt[indexSubLeadingJet]*(1+analysisTree.pfjet_jecUncertainty[indexSubLeadingJet]);
+               jpt_2_jesDown = analysisTree.pfjet_pt[indexSubLeadingJet]*(1-analysisTree.pfjet_jecUncertainty[indexSubLeadingJet]);
                jeta_2 = analysisTree.pfjet_eta[indexSubLeadingJet];
                jphi_2 = analysisTree.pfjet_phi[indexSubLeadingJet];
                jptraw_2 = analysisTree.pfjet_pt[indexSubLeadingJet]*analysisTree.pfjet_energycorr[indexSubLeadingJet];
@@ -3020,8 +3020,8 @@ int main(int argc, char * argv[]) {
             }
             
             mjj =  -10;
-            mjj_Up = -10;
-            mjj_Down = -10;
+            mjj_jesUp = -10;
+            mjj_jesDown = -10;
             jdeta =  -10;
             njetingap = 0;
             if (indexLeadingJet>=0 && indexSubLeadingJet>=0) {
@@ -3064,8 +3064,8 @@ int main(int argc, char * argv[]) {
                                                             analysisTree.pfjet_e[indexSubLeadingJet]*unc2Down);
                //store mjj, jdeta, etamax etamin
                mjj = (jet1+jet2).M();
-               mjj_Up = (jet1Up+jet2Up).M();
-               mjj_Down = (jet1Down+jet2Down).M();
+               mjj_jesUp = (jet1Up+jet2Up).M();
+               mjj_jesDown = (jet1Down+jet2Down).M();
                
                jdeta = fabs(analysisTree.pfjet_eta[indexLeadingJet]-
                             analysisTree.pfjet_eta[indexSubLeadingJet]);
@@ -3096,19 +3096,19 @@ int main(int argc, char * argv[]) {
             //            }
             met_x = analysisTree.pfmetcorr_ex;
             met_y = analysisTree.pfmetcorr_ey;
-            float met_scaleUp_x   = analysisTree.pfmetcorr_ex_JetEnUp;
-            float met_scaleUp_y   = analysisTree.pfmetcorr_ey_JetEnUp;
-            float met_scaleDown_x = analysisTree.pfmetcorr_ex_JetEnDown;
-            float met_scaleDown_y = analysisTree.pfmetcorr_ey_JetEnDown;
+            float met_jesUp_x   = analysisTree.pfmetcorr_ex_JetEnUp;
+            float met_jesUp_y   = analysisTree.pfmetcorr_ey_JetEnUp;
+            float met_jesDown_x = analysisTree.pfmetcorr_ex_JetEnDown;
+            float met_jesDown_y = analysisTree.pfmetcorr_ey_JetEnDown;
             float met_resoUp_x    = analysisTree.pfmetcorr_ex_UnclusteredEnUp;
             float met_resoUp_y    = analysisTree.pfmetcorr_ey_UnclusteredEnUp;
             float met_resoDown_x  = analysisTree.pfmetcorr_ex_UnclusteredEnDown;
             float met_resoDown_y  = analysisTree.pfmetcorr_ey_UnclusteredEnDown;
             
-            float metcorr_scaleUp_x   = analysisTree.pfmetcorr_ex_JetEnUp;
-            float metcorr_scaleUp_y   = analysisTree.pfmetcorr_ey_JetEnUp;
-            float metcorr_scaleDown_x = analysisTree.pfmetcorr_ex_JetEnDown;
-            float metcorr_scaleDown_y = analysisTree.pfmetcorr_ey_JetEnDown;
+            float metcorr_jesUp_x   = analysisTree.pfmetcorr_ex_JetEnUp;
+            float metcorr_jesUp_y   = analysisTree.pfmetcorr_ey_JetEnUp;
+            float metcorr_jesDown_x = analysisTree.pfmetcorr_ex_JetEnDown;
+            float metcorr_jesDown_y = analysisTree.pfmetcorr_ey_JetEnDown;
             float metcorr_resoUp_x    = analysisTree.pfmetcorr_ex_UnclusteredEnUp;
             float metcorr_resoUp_y    = analysisTree.pfmetcorr_ey_UnclusteredEnUp;
             float metcorr_resoDown_x  = analysisTree.pfmetcorr_ex_UnclusteredEnDown;
@@ -3198,8 +3198,8 @@ int main(int argc, char * argv[]) {
                if (applySimpleRecoilCorrections) {
                   //                    recoilMvaMetCorrector.CorrectByMeanResolution(mvamet_x,mvamet_y,bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,mvamet_corr_x,mvamet_corr_y);
                   recoilMetCorrector.CorrectByMeanResolution(met_x,met_y,bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,pfmet_corr_x,pfmet_corr_y);
-                  recoilMetCorrector.CorrectByMeanResolution(metcorr_scaleUp_x,  metcorr_scaleUp_y,  bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,met_scaleUp_x,  met_scaleUp_y);
-                  recoilMetCorrector.CorrectByMeanResolution(metcorr_scaleDown_x,metcorr_scaleDown_y,bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,met_scaleDown_x,met_scaleDown_y);
+                  recoilMetCorrector.CorrectByMeanResolution(metcorr_jesUp_x,  metcorr_jesUp_y,  bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,met_jesUp_x,  met_jesUp_y);
+                  recoilMetCorrector.CorrectByMeanResolution(metcorr_jesDown_x,metcorr_jesDown_y,bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,met_jesDown_x,met_jesDown_y);
                   recoilMetCorrector.CorrectByMeanResolution(metcorr_resoUp_x,   metcorr_resoUp_y,   bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,met_resoUp_x,   met_resoUp_y);
                   recoilMetCorrector.CorrectByMeanResolution(metcorr_resoDown_x, metcorr_resoDown_y, bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,met_resoDown_x, met_resoDown_y);
                   
@@ -3226,22 +3226,22 @@ int main(int argc, char * argv[]) {
             mvamet = TMath::Sqrt(mvamet_x*mvamet_x+mvamet_y*mvamet_y); 
             mvametphi = TMath::ATan2(mvamet_y,mvamet_x);
         
-            float mvamet_scaleUp_x   = mvamet_x;
-            float mvamet_scaleUp_y   = mvamet_y;
-            float mvamet_scaleDown_x = mvamet_x;
-            float mvamet_scaleDown_y = mvamet_y;
+            float mvamet_jesUp_x   = mvamet_x;
+            float mvamet_jesUp_y   = mvamet_y;
+            float mvamet_jesDown_x = mvamet_x;
+            float mvamet_jesDown_y = mvamet_y;
             float mvamet_resoUp_x    = mvamet_x;
             float mvamet_resoUp_y    = mvamet_y;
             float mvamet_resoDown_x  = mvamet_x;
             float mvamet_resoDown_y  = mvamet_y;
 
-            mvamet_scaleUp = TMath::Sqrt(mvamet_scaleUp_x*mvamet_scaleUp_x+
-                                         mvamet_scaleUp_y*mvamet_scaleUp_y);
-            mvametphi_scaleUp = TMath::ATan2(mvamet_scaleUp_y,mvamet_scaleUp_x);
+            mvamet_jesUp = TMath::Sqrt(mvamet_jesUp_x*mvamet_jesUp_x+
+                                         mvamet_jesUp_y*mvamet_jesUp_y);
+            mvametphi_jesUp = TMath::ATan2(mvamet_jesUp_y,mvamet_jesUp_x);
             
-            mvamet_scaleDown = TMath::Sqrt(mvamet_scaleDown_x*mvamet_scaleDown_x+
-                                           mvamet_scaleDown_y*mvamet_scaleDown_y);
-            mvametphi_scaleDown = TMath::ATan2(mvamet_scaleDown_y,mvamet_scaleDown_x);
+            mvamet_jesDown = TMath::Sqrt(mvamet_jesDown_x*mvamet_jesDown_x+
+                                           mvamet_jesDown_y*mvamet_jesDown_y);
+            mvametphi_jesDown = TMath::ATan2(mvamet_jesDown_y,mvamet_jesDown_x);
             
             mvamet_resoUp = TMath::Sqrt(mvamet_resoUp_x*mvamet_resoUp_x+
                                         mvamet_resoUp_y*mvamet_resoUp_y);
@@ -3252,13 +3252,13 @@ int main(int argc, char * argv[]) {
             mvametphi_resoDown = TMath::ATan2(mvamet_resoDown_y,mvamet_resoDown_x);
             
  
-            met_scaleUp = TMath::Sqrt(met_scaleUp_x*met_scaleUp_x+
-				      met_scaleUp_y*met_scaleUp_y);
-            metphi_scaleUp = TMath::ATan2(met_scaleUp_y,met_scaleUp_x);
+            met_jesUp = TMath::Sqrt(met_jesUp_x*met_jesUp_x+
+				      met_jesUp_y*met_jesUp_y);
+            metphi_jesUp = TMath::ATan2(met_jesUp_y,met_jesUp_x);
             
-            met_scaleDown = TMath::Sqrt(met_scaleDown_x*met_scaleDown_x+
-					met_scaleDown_y*met_scaleDown_y);
-            metphi_scaleDown = TMath::ATan2(met_scaleDown_y,met_scaleDown_x);
+            met_jesDown = TMath::Sqrt(met_jesDown_x*met_jesDown_x+
+					met_jesDown_y*met_jesDown_y);
+            metphi_jesDown = TMath::ATan2(met_jesDown_y,met_jesDown_x);
             
             met_resoUp = TMath::Sqrt(met_resoUp_x*met_resoUp_x+
 				     met_resoUp_y*met_resoUp_y);
@@ -3271,8 +3271,8 @@ int main(int argc, char * argv[]) {
             
             //      printf("Uncorrected    :  %7.2f  %7.2f\n",mvamet_uncorr_x,mvamet_uncorr_y);
             //      printf("Central        :  %7.2f  %7.2f\n",mvamet_x,mvamet_y);
-            //      printf("ScaleUp        :  %7.2f  %7.2f\n",mvamet_scaleUp_x,mvamet_scaleUp_y);
-            //      printf("ScaleDown      :  %7.2f  %7.2f\n",mvamet_scaleDown_x,mvamet_scaleDown_y);
+            //      printf("ScaleUp        :  %7.2f  %7.2f\n",mvamet_jesUp_x,mvamet_jesUp_y);
+            //      printf("ScaleDown      :  %7.2f  %7.2f\n",mvamet_jesDown_x,mvamet_jesDown_y);
             //      printf("ResoUp         :  %7.2f  %7.2f\n",mvamet_resoUp_x,mvamet_resoUp_y);
             //      printf("ResoDown       :  %7.2f  %7.2f\n",mvamet_resoDown_x,mvamet_resoDown_y);
             //      std::cout << std::endl;
@@ -3335,10 +3335,10 @@ int main(int argc, char * argv[]) {
             computeDzeta(met_x,met_y,
                          zetaX,zetaY,pzetavis,pzetamiss,dzeta);
 
-            computeDzeta(met_scaleUp_x,met_scaleUp_y,
-                         zetaX,zetaY,pzetavis,pzetamiss_scaleUp,dzeta_scaleUp); // scaleUp
-            computeDzeta(met_scaleDown_x,met_scaleDown_y,
-                         zetaX,zetaY,pzetavis,pzetamiss_scaleDown,dzeta_scaleDown); // scaleDown
+            computeDzeta(met_jesUp_x,met_jesUp_y,
+                         zetaX,zetaY,pzetavis,pzetamiss_jesUp,dzeta_jesUp); // scaleUp
+            computeDzeta(met_jesDown_x,met_jesDown_y,
+                         zetaX,zetaY,pzetavis,pzetamiss_jesDown,dzeta_jesDown); // scaleDown
             computeDzeta(met_resoUp_x,met_resoUp_y,
                          zetaX,zetaY,pzetavis,pzetamiss_resoUp,dzeta_resoUp); // resoUp
             computeDzeta(met_resoDown_x,met_resoDown_y,
@@ -3353,10 +3353,10 @@ int main(int argc, char * argv[]) {
                          zetaX,zetaY,pzetavis,pzetamiss_mvamet,dzeta_mvamet); // corrected
             computeDzeta(mvamet_uncorr_x,mvamet_uncorr_y,
                          zetaX,zetaY,pzetavis,pzetamiss_mvamet_uncorr,dzeta_mvamet_uncorr); // uncorrected
-            computeDzeta(mvamet_scaleUp_x,mvamet_scaleUp_y,
-                         zetaX,zetaY,pzetavis,pzetamiss_mvamet_scaleUp,dzeta_mvamet_scaleUp); // scaleUp
-            computeDzeta(mvamet_scaleDown_x,mvamet_scaleDown_y,
-                         zetaX,zetaY,pzetavis,pzetamiss_mvamet_scaleDown,dzeta_mvamet_scaleDown); // scaleDown
+            computeDzeta(mvamet_jesUp_x,mvamet_jesUp_y,
+                         zetaX,zetaY,pzetavis,pzetamiss_mvamet_jesUp,dzeta_mvamet_jesUp); // scaleUp
+            computeDzeta(mvamet_jesDown_x,mvamet_jesDown_y,
+                         zetaX,zetaY,pzetavis,pzetamiss_mvamet_jesDown,dzeta_mvamet_jesDown); // scaleDown
             computeDzeta(mvamet_resoUp_x,mvamet_resoUp_y,
                          zetaX,zetaY,pzetavis,pzetamiss_mvamet_resoUp,dzeta_mvamet_resoUp); // resoUp
             computeDzeta(mvamet_resoDown_x,mvamet_resoDown_y,
@@ -3389,8 +3389,8 @@ int main(int argc, char * argv[]) {
             
             TLorentzVector metResoUpLV; metResoUpLV.SetXYZT(met_resoUp_x,met_resoUp_y,0.,met_resoUp);
             TLorentzVector metResoDownLV; metResoDownLV.SetXYZT(met_resoDown_x,met_resoDown_y,0.,met_resoDown);
-            TLorentzVector metScaleUpLV; metScaleUpLV.SetXYZT(met_scaleUp_x,met_scaleUp_y,0.,met_scaleUp);
-            TLorentzVector metScaleDownLV; metScaleDownLV.SetXYZT(met_scaleDown_x,met_scaleDown_y,0.,met_scaleDown);
+            TLorentzVector metScaleUpLV; metScaleUpLV.SetXYZT(met_jesUp_x,met_jesUp_y,0.,met_jesUp);
+            TLorentzVector metScaleDownLV; metScaleDownLV.SetXYZT(met_jesDown_x,met_jesDown_y,0.,met_jesDown);
             // computing total transverse mass
             mTtot = totalTransverseMass        ( muonLV ,     electronLV , metLV);
             
@@ -3400,8 +3400,8 @@ int main(int argc, char * argv[]) {
             mTtot_escaleUp   =  totalTransverseMass ( muonLV , electronUpLV   , metLV);
             mTtot_escaleDown =  totalTransverseMass ( muonLV , electronDownLV , metLV);
             
-            mTtot_scaleUp   =  totalTransverseMass ( muonLV , electronLV , metScaleUpLV);
-            mTtot_scaleDown =  totalTransverseMass ( muonLV , electronLV , metScaleDownLV);
+            mTtot_jesUp   =  totalTransverseMass ( muonLV , electronLV , metScaleUpLV);
+            mTtot_jesDown =  totalTransverseMass ( muonLV , electronLV , metScaleDownLV);
            
             mTtot_resoUp   =  totalTransverseMass ( muonLV , electronLV , metResoUpLV);
             mTtot_resoDown =  totalTransverseMass ( muonLV , electronLV , metResoDownLV);
@@ -3421,8 +3421,8 @@ int main(int argc, char * argv[]) {
             
             mTdileptonMET = mT(dileptonLV,metLV);
 
-            mTdileptonMET_scaleUp = mT(dileptonLV,metScaleUpLV);
-            mTdileptonMET_scaleDown = mT(dileptonLV,metScaleDownLV);
+            mTdileptonMET_jesUp = mT(dileptonLV,metScaleUpLV);
+            mTdileptonMET_jesDown = mT(dileptonLV,metScaleDownLV);
             mTdileptonMET_resoUp = mT(dileptonLV,metResoUpLV);
             mTdileptonMET_resoDown = mT(dileptonLV,metResoDownLV);
             
@@ -3441,8 +3441,8 @@ int main(int argc, char * argv[]) {
             m_sv_muDown    = -10;
             m_sv_escaleUp       = -10;
             m_sv_escaleDown     = -10;
-            m_sv_scaleUp   = -10;
-            m_sv_scaleDown = -10;
+            m_sv_jesUp   = -10;
+            m_sv_jesDown = -10;
             m_sv_resoUp    = -10;
             m_sv_resoDown  = -10;
             
@@ -3451,8 +3451,8 @@ int main(int argc, char * argv[]) {
             mt_sv_muDown    = -10;
             mt_sv_escaleUp       = -10;
             mt_sv_escaleDown     = -10;
-            mt_sv_scaleUp   = -10;
-            mt_sv_scaleDown = -10;
+            mt_sv_jesUp   = -10;
+            mt_sv_jesDown = -10;
             mt_sv_resoUp    = -10;
             mt_sv_resoDown  = -10;
             
@@ -3544,8 +3544,8 @@ int main(int argc, char * argv[]) {
                     //	  nuPt_msv = TMath::Sqrt(nuPx_msv*nuPx_msv+nuPy_msv*nuPy_msv);
                     //	  nuPhi_msv = TMath::ATan2(nuPy_msv,nuPx_msv);
                     
-                    m_sv_scaleUp   = m_sv;
-                    m_sv_scaleDown = m_sv;
+                    m_sv_jesUp   = m_sv;
+                    m_sv_jesDown = m_sv;
                     m_sv_resoUp    = m_sv;
                     m_sv_resoDown  = m_sv;
                     m_sv_escaleUp       = m_sv;
@@ -3553,8 +3553,8 @@ int main(int argc, char * argv[]) {
                     m_sv_muUp      = m_sv;
                     m_sv_muDown    = m_sv;
                     
-                    mt_sv_scaleUp   = mt_sv;
-                    mt_sv_scaleDown = mt_sv;
+                    mt_sv_jesUp   = mt_sv;
+                    mt_sv_jesDown = mt_sv;
                     mt_sv_resoUp    = mt_sv;
                     mt_sv_resoDown  = mt_sv;
                     mt_sv_escaleUp       = mt_sv;
@@ -3609,12 +3609,12 @@ int main(int argc, char * argv[]) {
                         
                         /*                        
                                                   if (isDY || isW) {
-                                                  SVfitStandaloneAlgorithm algo_scaleUp = SVFitMassComputation(svFitEle, svFitMu,
-                                                  mvamet_scaleUp_x, mvamet_scaleUp_y,
+                                                  SVfitStandaloneAlgorithm algo_jesUp = SVFitMassComputation(svFitEle, svFitMu,
+                                                  mvamet_jesUp_x, mvamet_jesUp_y,
                                                   covMET, inputFile_visPtResolution);
                                                   
-                                                  SVfitStandaloneAlgorithm algo_scaleDown = SVFitMassComputation(svFitEle, svFitMu,
-                                                  mvamet_scaleDown_x, mvamet_scaleDown_y,
+                                                  SVfitStandaloneAlgorithm algo_jesDown = SVFitMassComputation(svFitEle, svFitMu,
+                                                  mvamet_jesDown_x, mvamet_jesDown_y,
                                                   covMET, inputFile_visPtResolution);
                                                   
                                                   // SVfitStandaloneAlgorithm algo_resoUp = SVFitMassComputation(svFitEle, svFitMu,
@@ -3625,10 +3625,10 @@ int main(int argc, char * argv[]) {
                                                   // 								  mvamet_resoDown_x, mvamet_resoDown_y,
                                                   // 								  covMVAMET, inputFile_visPtResolution);
                                                   
-                                                  m_sv_scaleUp    = algo_scaleUp.getMass();
-                                                  mt_sv_scaleUp   = algo_scaleUp.transverseMass();
-                                                  m_sv_scaleDown  = algo_scaleDown.getMass();
-                                                  mt_sv_scaleDown = algo_scaleDown.transverseMass();
+                                                  m_sv_jesUp    = algo_jesUp.getMass();
+                                                  mt_sv_jesUp   = algo_jesUp.transverseMass();
+                                                  m_sv_jesDown  = algo_jesDown.getMass();
+                                                  mt_sv_jesDown = algo_jesDown.transverseMass();
                                                   
                                                   // m_sv_resoUp     = algo_resoUp.getMass();
                                                   // mt_sv_resoUp    = algo_resoUp.transverseMass();
@@ -3641,10 +3641,10 @@ int main(int argc, char * argv[]) {
                         //	  std::cout << "eta(e) = " << eta_1 << "   escale = " << eleScale << std::endl;
                         //	  std::cout << "msv = " << m_sv << std::endl;
                         //	  std::cout << "msv(eES)      : up = " << m_sv_escaleUp << "   down = " << m_sv_escaleDown << std::endl;
-                        //	  std::cout << "msv(metScale) : up = " << m_sv_scaleUp << "   down = " << m_sv_scaleDown << std::endl;
+                        //	  std::cout << "msv(metScale) : up = " << m_sv_jesUp << "   down = " << m_sv_jesDown << std::endl;
                         //	  std::cout << "mtsv = " << mt_sv << std::endl;
                         //	  std::cout << "mtsv(eES)      : up = " << mt_sv_escaleUp << "   down = " << mt_sv_escaleDown << std::endl;
-                        //	  std::cout << "mtsv(metScale) : up = " << mt_sv_scaleUp << "   down = " << mt_sv_scaleDown << std::endl;
+                        //	  std::cout << "mtsv(metScale) : up = " << mt_sv_jesUp << "   down = " << mt_sv_jesDown << std::endl;
                         //	  std::cout << std::endl;
                     }
             }
