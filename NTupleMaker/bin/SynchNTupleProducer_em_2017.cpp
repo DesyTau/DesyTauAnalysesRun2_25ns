@@ -1466,7 +1466,6 @@ int main(int argc, char * argv[]) {
           
           // weights
           mcweight = analysisTree.genweight;           //store genweights
-
           
           weightScale1 = analysisTree.weightScale1;    //weights for scale uncertainty
           weightScale2 = analysisTree.weightScale2;
@@ -1739,10 +1738,10 @@ int main(int argc, char * argv[]) {
                    correctionWS->var("gt2_eta")->setVal(gt2_eta);
 		   double trg_embed = correctionWS->function("m_sel_trg_ratio")->getVal();
 		   embeddedWeight = id1_embed * id2_embed * trg_embed;
-		   //		   std::cout << "id1 embedded  = " << id1_embed << std::endl;
-		   //		   std::cout << "id2 embedded  = " << id2_embed << std::endl;
-		   //		   std::cout << "trig embedded = " << trg_embed << std::endl;
-		   //		   std::cout << "embedded weight = " << embeddedWeight << std::endl;
+		   //              std::cout << "id1 embedded  = " << id1_embed << std::endl;
+		   //              std::cout << "id2 embedded  = " << id2_embed << std::endl;
+		   //              std::cout << "trig embedded = " << trg_embed << std::endl;
+		   //              std::cout << "embedded weight = " << embeddedWeight << std::endl;
                 }
                 else if (promptMuons.size()==2) {
                    isZTT = false; isZMM = true; isZEE = false;
@@ -1937,7 +1936,7 @@ int main(int argc, char * argv[]) {
           run = int(analysisTree.event_run);
           lumi = int(analysisTree.event_luminosityblock);
           evt = int(analysisTree.event_nr);
-      
+
 	  // embedded weight
 
           if (debug) std::cout<<"check good run selection"<<std::endl;
@@ -2147,8 +2146,8 @@ int main(int argc, char * argv[]) {
                //					       analysisTree.electron_superclusterEta[ie],
                //					       analysisTree.electron_mva_id_nontrigPhys14[ie]);
                bool electronMvaId = true;
-               if (applyIsoElectronId) electronMvaId = analysisTree.electron_mva_wp80_Iso_Fall17_v1[ie]>0.5;   
-	       else electronMvaId = analysisTree.electron_mva_wp80_noIso_Fall17_v1[ie]>0.5;
+               if (applyIsoElectronId) electronMvaId = analysisTree.electron_mva_wp80_Iso_Fall17_v1[ie]>0.5;
+              else electronMvaId = analysisTree.electron_mva_wp90_noIso_Fall17_v1[ie]>0.5;
                if (!electronMvaId) continue;
                if (!analysisTree.electron_pass_conversion[ie]) continue;
                if (analysisTree.electron_nmissinginnerhits[ie]>1) continue;
@@ -2539,38 +2538,36 @@ int main(int argc, char * argv[]) {
             
             //isoweight also includes tracking SF
             if (!isData || isEmbedded) {
-                
-	      correctionWS->var("e_pt")->setVal(pt_1);
-	      correctionWS->var("e_eta")->setVal(eta_1);
-	      correctionWS->var("e_iso")->setVal(iso_1);
-	      correctionWS->var("m_pt")->setVal(pt_2);
-	      correctionWS->var("m_eta")->setVal(eta_2);
-	      correctionWS->var("m_iso")->setVal(iso_2);
 
+             correctionWS->var("e_pt")->setVal(pt_1);
+             correctionWS->var("e_eta")->setVal(eta_1);
+             correctionWS->var("e_iso")->setVal(iso_1);
+             correctionWS->var("m_pt")->setVal(pt_2);
+             correctionWS->var("m_eta")->setVal(eta_2);
+             correctionWS->var("m_iso")->setVal(iso_2);
+               
                // scale factors
-	       if (applyWSCorr) {
-		 if (isEmbedded) {
-		   isoweight_1 = correctionWS->function("e_idiso_binned_embed_ratio")->getVal();
-                   isoweight_2 = correctionWS->function("m_idiso_binned_embed_ratio")->getVal();
+               if (applyWSCorr) {
+                  if (isEmbedded) {
+                     isoweight_1 = correctionWS->function("e_idiso_binned_embed_ratio")->getVal();
+                     isoweight_2 = correctionWS->function("m_looseiso_binned_embed_ratio")->getVal() * correctionWS->function("m_id_embed_ratio")->getVal();
+                  }
+                  else {
+                     isoweight_1 = correctionWS->function("e_idiso_binned_ratio")->getVal();
+                     isoweight_2 = correctionWS->function("m_idiso_binned_ratio")->getVal();
+                  }
+               }
+               else {
+                  isoweight_1 = (float)SF_electronIdIso->get_ScaleFactor(double(pt_1),double(eta_1));
+                  isoweight_2 = (float)SF_muonIdIso->get_ScaleFactor(double(pt_2),double(eta_2));
+               }
 
-		 }
-		 else {
-		   isoweight_1 = correctionWS->function("e_idiso_binned_ratio")->getVal();
-		   isoweight_2 = correctionWS->function("m_idiso_binned_ratio")->getVal();
-		 }
-	       }               
-	       else {
-		 isoweight_1 = (float)SF_electronIdIso->get_ScaleFactor(double(pt_1),double(eta_1));
-		 isoweight_2 = (float)SF_muonIdIso->get_ScaleFactor(double(pt_2),double(eta_2));
-	       }
-	       
-	       idweight_1 = correctionWS->function("e_trk_ratio")->getVal();
-	       idweight_2 = correctionWS->function("m_trk_ratio")->getVal();
+               idweight_1 = correctionWS->function("e_trk_ratio")->getVal();
+               idweight_2 = correctionWS->function("m_trk_ratio")->getVal();
 
-                              
                isoweight_1 *= idweight_1;
                isoweight_2 *= idweight_2;
-                
+
 	       //	       cout << "isoweight_1 = " << isoweight_1
 	       //		    << "   isoweight_2 = " << isoweight_2 << endl;
 	       //
@@ -2585,32 +2582,32 @@ int main(int argc, char * argv[]) {
 	       float Mu8EffMC = 1;
 
 	       if (applyWSCorr) {
-		 Ele23EffData = correctionWS->function("e_trg_binned_23_data")->getVal();
-		 Ele12EffData = correctionWS->function("e_trg_binned_12_data")->getVal(); 
-		 Mu23EffData  = correctionWS->function("m_trg_binned_23_data")->getVal();
-		 Mu8EffData   = correctionWS->function("m_trg_binned_8_data")->getVal();
-		 if (isEmbedded) {
-		   Ele23EffMC = correctionWS->function("e_trg_binned_23_embed")->getVal();
-		   Ele12EffMC = correctionWS->function("e_trg_binned_12_embed")->getVal(); 
-		   Mu23EffMC  = correctionWS->function("m_trg_binned_23_embed")->getVal();
-		   Mu8EffMC   = correctionWS->function("m_trg_binned_8_embed" )->getVal();
-		 }
-		 else {
-		   Ele23EffMC = correctionWS->function("e_trg_binned_23_mc")->getVal();
-                   Ele12EffMC = correctionWS->function("e_trg_binned_12_mc")->getVal();
-                   Mu23EffMC  = correctionWS->function("m_trg_binned_23_mc")->getVal();
-                   Mu8EffMC   = correctionWS->function("m_trg_binned_8_mc" )->getVal();
-		 }
+             Ele23EffData = correctionWS->function("e_trg_binned_23_data")->getVal();
+             Ele12EffData = correctionWS->function("e_trg_binned_12_data")->getVal(); 
+             Mu23EffData  = correctionWS->function("m_trg_binned_23_data")->getVal();
+             Mu8EffData   = correctionWS->function("m_trg_binned_8_data")->getVal();
+             if (isEmbedded) {
+                Ele23EffMC = correctionWS->function("e_trg_binned_23_embed")->getVal();
+                Ele12EffMC = correctionWS->function("e_trg_binned_12_embed")->getVal(); 
+                Mu23EffMC  = correctionWS->function("m_trg_binned_23_embed")->getVal();
+                Mu8EffMC   = correctionWS->function("m_trg_binned_8_embed" )->getVal();
+             }
+             else {
+                Ele23EffMC = correctionWS->function("e_trg_binned_23_mc")->getVal();
+                Ele12EffMC = correctionWS->function("e_trg_binned_12_mc")->getVal();
+                Mu23EffMC  = correctionWS->function("m_trg_binned_23_mc")->getVal();
+                Mu8EffMC   = correctionWS->function("m_trg_binned_8_mc" )->getVal();
+             }
 	       }
 	       else {
-		 Ele23EffData = (float)SF_electron23->get_EfficiencyData(double(pt_1),double(eta_1));
-		 Ele12EffData = (float)SF_electron12->get_EfficiencyData(double(pt_1),double(eta_1));
-		 Mu23EffData = (float)SF_muon23->get_EfficiencyData(double(pt_2),double(eta_2));
-		 Mu8EffData = (float)SF_muon8->get_EfficiencyData(double(pt_2),double(eta_2));
-		 Ele23EffMC   = (float)SF_electron23->get_EfficiencyMC(double(pt_1),double(eta_1));
-		 Ele12EffMC   = (float)SF_electron12->get_EfficiencyMC(double(pt_1),double(eta_1));
-		 Mu23EffMC   = (float)SF_muon23->get_EfficiencyMC(double(pt_2),double(eta_2));
-		 Mu8EffMC   = (float)SF_muon8->get_EfficiencyMC(double(pt_2),double(eta_2));
+             Ele23EffData = (float)SF_electron23->get_EfficiencyData(double(pt_1),double(eta_1));
+             Ele12EffData = (float)SF_electron12->get_EfficiencyData(double(pt_1),double(eta_1));
+             Mu23EffData = (float)SF_muon23->get_EfficiencyData(double(pt_2),double(eta_2));
+             Mu8EffData = (float)SF_muon8->get_EfficiencyData(double(pt_2),double(eta_2));
+             Ele23EffMC   = (float)SF_electron23->get_EfficiencyMC(double(pt_1),double(eta_1));
+             Ele12EffMC   = (float)SF_electron12->get_EfficiencyMC(double(pt_1),double(eta_1));
+             Mu23EffMC   = (float)SF_muon23->get_EfficiencyMC(double(pt_2),double(eta_2));
+             Mu8EffMC   = (float)SF_muon8->get_EfficiencyMC(double(pt_2),double(eta_2));
 	       }
 
 	       float trigWeightData = Mu23EffData*Ele12EffData + Mu8EffData*Ele23EffData - Mu23EffData*Ele23EffData;
@@ -2767,7 +2764,7 @@ int main(int argc, char * argv[]) {
                float jetPtUp   = analysisTree.pfjet_pt[jet]*(1.0+analysisTree.pfjet_jecUncertainty[jet]);
                //std::cout << jet << " : uncertainty = " << analysisTree.pfjet_jecUncertainty[jet] << std::endl;
                //if (jetPtDown<jetPtLowCut) continue;
-               if (jetPt<jetPtLowCut) continue;
+               if (jetPtDown<jetPtLowCut) continue;
 
                bool isPFJetId = tightJetiD_2017(analysisTree,int(jet));
                if (!isPFJetId) continue;
