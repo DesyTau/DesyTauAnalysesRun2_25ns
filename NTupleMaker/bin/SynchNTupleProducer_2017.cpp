@@ -508,6 +508,10 @@ int main(int argc, char * argv[]){
   TTree * tree = new TTree("TauCheck","TauCheck");
   TTree * gtree = new TTree("GenTauCheck","GenTauCheck");
 
+  //Merijn added a histogram to spot the pdg codes of the decaying hadronic tau
+  TH1F* ConstitsPDG=new TH1F("ConstitsPDG","ConstitsPDG",500,-250,250);
+  int nonpionphotonctr=0;
+
   Synch17Tree *otree = new Synch17Tree(tree);
   initializeCPvar(otree);
   Synch17GenTree *gentree = new Synch17GenTree(gtree);
@@ -1489,7 +1493,7 @@ if((analysisTree.tau_constituents_pdgId[tauIndex][i]*sign)>0){
 
     } // end of file processing (loop over events in one file)
 
-ConstitsPDG->Write();
+
     nFiles++;
     delete _tree;
     file_->Close();
@@ -1977,10 +1981,18 @@ void FillGenTree(const AC1B * analysisTree, Synch17GenTree *gentree, TString ch)
 
 
 //here fill the generator vertices to have the information present in tree
+//Note: we may want to add constraint that the W and Z are prompt. If we remove these, may get in trouble with a DY or W MC sample..
 
+/*
+bool isPrompt = true;
+	if (analysisTree.genparticles_info[index]==5||
+	    analysisTree.genparticles_info[index]==6) 
+isPrompt = false;
+
+*/
   for (unsigned int igen=0; igen<analysisTree->genparticles_count; ++igen) {
-    if (analysisTree->genparticles_pdgid[igen]==23||analysisTree->genparticles_pdgid[igen]==24||
-	analysisTree->genparticles_pdgid[igen]==25||analysisTree->genparticles_pdgid[igen]==35||analysisTree->genparticles_pdgid[igen]==36) {
+    if ((analysisTree->genparticles_pdgid[igen]==23||analysisTree->genparticles_pdgid[igen]==24||
+	analysisTree->genparticles_pdgid[igen]==25||analysisTree->genparticles_pdgid[igen]==35||analysisTree->genparticles_pdgid[igen]==36)&&analysisTree->genparticles_isLastCopy[igen]==1) {
       gentree->GenVertexX=analysisTree->genparticles_vx[igen];
       gentree->GenVertexY=analysisTree->genparticles_vy[igen];
       gentree->GenVertexZ=analysisTree->genparticles_vz[igen];
@@ -2001,8 +2013,20 @@ void SaveRECOVertices(const AC1B * analysisTree, Synch17Tree *otree, const bool 
 
 if(!isData){
   for (unsigned int igen=0; igen<analysisTree->genparticles_count; ++igen) {
-    if (analysisTree->genparticles_pdgid[igen]==23||analysisTree->genparticles_pdgid[igen]==24||
-	analysisTree->genparticles_pdgid[igen]==25||analysisTree->genparticles_pdgid[igen]==35||analysisTree->genparticles_pdgid[igen]==36) {
+
+//here fill the generator vertices to have the information present in tree
+//Note: we may want to add constraint that the W and Z are prompt. If we remove these, may get in trouble with a DY or W MC sample..
+
+/*
+bool isPrompt = true;
+	if (analysisTree.genparticles_info[index]==5||
+	    analysisTree.genparticles_info[index]==6) 
+isPrompt = false;
+
+*/
+
+    if ((analysisTree->genparticles_pdgid[igen]==23||analysisTree->genparticles_pdgid[igen]==24||
+	analysisTree->genparticles_pdgid[igen]==25||analysisTree->genparticles_pdgid[igen]==35||analysisTree->genparticles_pdgid[igen]==36)&&analysisTree->genparticles_isLastCopy[igen]==1) {
       otree->GenVertexX=analysisTree->genparticles_vx[igen];
       otree->GenVertexY=analysisTree->genparticles_vy[igen];
       otree->GenVertexZ=analysisTree->genparticles_vz[igen];
