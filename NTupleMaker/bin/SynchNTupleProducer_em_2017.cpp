@@ -260,7 +260,8 @@ int main(int argc, char * argv[]) {
    const string mu8ele23DzFilter = cfg.get<string>("Mu8Ele23DzFilter");
     
     // jets
-   const string bTagDiscriminator = cfg.get<string>("BTagDiscriminator");
+   const string bTagDiscriminator1 = cfg.get<string>("BTagDiscriminator1");
+   const string bTagDiscriminator2 = cfg.get<string>("BTagDiscriminator2");
    const float jetEtaCut = cfg.get<float>("JetEtaCut");
    const float jetPtLowCut = cfg.get<float>("JetPtLowCut");
    const float jetPtHighCut = cfg.get<float>("JetPtHighCut");
@@ -279,7 +280,8 @@ int main(int argc, char * argv[]) {
    TString Mu23Ele12DzFilter(mu23ele12DzFilter);
    TString Mu8Ele23DzFilter(mu8ele23DzFilter);
    
-   TString BTagDiscriminator(bTagDiscriminator);
+   TString BTagDiscriminator1(bTagDiscriminator1);
+   TString BTagDiscriminator2(bTagDiscriminator2);
    
    const string MuonIdIsoFile = cfg.get<string>("MuonIdIsoEff");
    const string ElectronIdIsoFile = cfg.get<string>("ElectronIdIsoEff");
@@ -418,6 +420,19 @@ int main(int argc, char * argv[]) {
     Float_t         qcdweightup_nodzeta;
     Float_t         qcdweightdown_nodzeta;
     
+    Float_t         qcdweight_0jet_rate_up;
+    Float_t         qcdweight_0jet_rate_down;
+    Float_t         qcdweight_1jet_rate_up;
+    Float_t         qcdweight_1jet_rate_down;
+    Float_t         qcdweight_0jet_shape_up;
+    Float_t         qcdweight_0jet_shape_down;
+    Float_t         qcdweight_1jet_shape_up;
+    Float_t         qcdweight_1jet_shape_down;
+
+    Float_t         qcdweight_iso_up;
+    Float_t         qcdweight_iso_down;
+
+
     Float_t         zptmassweight;
     Float_t         zptmassweight_esup;
     Float_t         zptmassweight_esdown;
@@ -433,6 +448,9 @@ int main(int argc, char * argv[]) {
     Float_t         weight;
     
     Float_t         m_vis;
+    Float_t         pt_vis;
+    Float_t         pt_vis_escaleUp;
+    Float_t         pt_vis_escaleDown;
     Float_t         m_vis_muUp;
     Float_t         m_vis_muDown;
     Float_t         m_vis_escaleUp;
@@ -607,9 +625,22 @@ int main(int argc, char * argv[]) {
     Float_t         msvmetphi;
     
     Float_t         pt_tt;
+    Float_t         pt_tt_escaleUp;
+    Float_t         pt_tt_escaleDown;
+    Float_t         pt_tt_unclMetUp;
+    Float_t         pt_tt_unclMetDown;
+
     Float_t         dr_tt;
     Float_t         dphi_tt;
     Float_t         m_leptons;
+
+    Float_t         pt_ttjj;
+    Float_t         pt_ttjj_jesUp;
+    Float_t         pt_ttjj_jesDown;
+    Float_t         pt_ttjj_escaleUp;
+    Float_t         pt_ttjj_escaleDown;
+    Float_t         pt_ttjj_unclMetUp;
+    Float_t         pt_ttjj_unclMetDown;
     
     Float_t         pzetavis;
     Float_t         pzetamiss;
@@ -697,6 +728,14 @@ int main(int argc, char * argv[]) {
     Float_t         mjj_jesUp;
     Float_t         mjj_jesDown;
 
+    Float_t         dijetphi;
+    Float_t         dijetphi_jesUp;
+    Float_t         dijetphi_jesDown;
+
+    Float_t         dijetpt;
+    Float_t         dijetpt_jesUp;
+    Float_t         dijetpt_jesDown;
+
     Float_t         jdeta;
     Int_t           njetingap;
     
@@ -744,7 +783,7 @@ int main(int argc, char * argv[]) {
     
     Float_t         dphi_mumet;
     Float_t         dphi_emet;
-    
+
     UInt_t          npartons;
     
     Bool_t isZLL;
@@ -775,7 +814,7 @@ int main(int argc, char * argv[]) {
     Float_t weightPDFup;
     Float_t weightPDFdown;
     
-
+    Bool_t veto_embedded;
 
     tree->Branch("run", &run, "run/I");                                  // I=int, F=Float, O=bool
     tree->Branch("lumi", &lumi, "lumi/I");
@@ -788,7 +827,8 @@ int main(int argc, char * argv[]) {
     tree->Branch("isZEE",&isZEE,"iEE/O");
     tree->Branch("isZMM",&isZMM,"isZMM/O");
     tree->Branch("isZTT",&isZTT,"isZTT/O");
-    
+    tree->Branch("veto_embedded",&veto_embedded,"veto_embedded/O");
+
     tree->Branch("weightScale1",&weightScale1,"weightScale1/F");
     tree->Branch("weightScale2",&weightScale2,"weightScale2/F");
     tree->Branch("weightScale3",&weightScale3,"weightScale3/F");
@@ -839,6 +879,18 @@ int main(int argc, char * argv[]) {
     tree->Branch("qcdweightup_nodzeta", &qcdweightup_nodzeta, "qcdweightup_nodzeta/F");
     tree->Branch("qcdweightdown_nodzeta", &qcdweightdown_nodzeta, "qcdweightdown_nodzeta/F");
     
+    tree->Branch("qcdweight_0jet_rate_up",&qcdweight_0jet_rate_up,"qcdweight_0jet_rate_up/F");
+    tree->Branch("qcdweight_0jet_rate_down ",&qcdweight_0jet_rate_down,"qcdweight_0jet_rate_down/F");
+    tree->Branch("qcdweight_1jet_rate_up ",&qcdweight_1jet_rate_up,"qcdweight_1jet_rate_up/F");
+    tree->Branch("qcdweight_1jet_rate_down",&qcdweight_1jet_rate_down,"qcdweight_1jet_rate_down/F");
+    tree->Branch("qcdweight_0jet_shape_up",&qcdweight_0jet_shape_up,"qcdweight_0jet_shape_up/F");
+    tree->Branch("qcdweight_0jet_shape_down",&qcdweight_0jet_shape_down,"qcdweight_0jet_shape_down/F");  
+    tree->Branch("qcdweight_1jet_shape_up ",&qcdweight_1jet_shape_up,"qcdweight_1jet_shape_up/F");
+    tree->Branch("qcdweight_1jet_shape_down",&qcdweight_1jet_shape_down,"qcdweight_1jet_shape_down/F");
+
+    tree->Branch("qcdweight_iso_up",&qcdweight_iso_up,"qcdweight_iso_up/F");
+    tree->Branch("qcdweight_iso_down",&qcdweight_iso_down,"qcdweight_iso_down/F");
+
     tree->Branch("zptmassweight",&zptmassweight,"zptmassweight/F");
 
     tree->Branch("zptmassweight_esup",&zptmassweight_esup,"zptmassweight_esup/F");
@@ -869,6 +921,7 @@ int main(int argc, char * argv[]) {
     tree->Branch("duplicateMuonFilter",&duplicateMuonFilter_,"duplicateMuonFilter/O");
     
     tree->Branch("m_vis",        &m_vis,        "m_vis/F");
+    tree->Branch("pt_vis",        &pt_vis,        "pt_vis/F");
     tree->Branch("m_vis_muUp",   &m_vis_muUp,   "m_vis_muUp/F");
     tree->Branch("m_vis_muDown", &m_vis_muDown, "m_vis_muDown/F");
     tree->Branch("m_vis_escaleUp",    &m_vis_escaleUp,    "m_vis_escaleUp/F");
@@ -1047,14 +1100,27 @@ int main(int argc, char * argv[]) {
     
     tree->Branch("dphi_mumet",&dphi_mumet,"dphi_mumet/F");
     tree->Branch("dphi_emet",&dphi_emet,"dphi_emet/F");
-    
+
     tree->Branch("msvmet", &msvmet, "msvmet/F");
     tree->Branch("msvmetphi", &msvmetphi, "msvmetphi/F");
     
     tree->Branch("pt_tt", &pt_tt, "pt_tt/F");
+    tree->Branch("pt_tt_escaleUp", &pt_tt_escaleUp, "pt_tt_escaleUp/F");
+    tree->Branch("pt_tt_escaleDown", &pt_tt_escaleDown, "pt_tt_escaleDown/F");
+    tree->Branch("pt_tt_unclMetUp", &pt_tt_unclMetUp, "pt_tt_unclMetUp/F");
+    tree->Branch("pt_tt_unclMetDown", &pt_tt_unclMetDown, "pt_tt_unclMetDown/F");
+
     tree->Branch("dr_tt", &dr_tt, "dr_tt/F");
     tree->Branch("dphi_tt", &dphi_tt, "dphi_tt/F");
     tree->Branch("m_leptons", &m_leptons, "m_leptons/F");
+
+    tree->Branch("pt_ttjj", &pt_ttjj, "pt_ttjj/F");
+    tree->Branch("pt_ttjj_jesUp", &pt_ttjj_jesUp, "pt_ttjj_jesUp/F");
+    tree->Branch("pt_ttjj_jesDown", &pt_ttjj_jesDown, "pt_ttjj_jesDown/F");
+    tree->Branch("pt_ttjj_escaleUp", &pt_ttjj_escaleUp, "pt_ttjj_escaleUp/F");
+    tree->Branch("pt_ttjj_escaleDown", &pt_ttjj_escaleDown, "pt_ttjj_escaleDown/F");
+    tree->Branch("pt_ttjj_unclMetUp", &pt_ttjj_unclMetUp, "pt_ttjj_unclMetUp/F");
+    tree->Branch("pt_ttjj_unclMetDown", &pt_ttjj_unclMetDown, "pt_ttjj_unclMetDown/F");
     
     tree->Branch("pzetavis", &pzetavis, "pzetavis/F");
     tree->Branch("pzetavis_escaleUp", &pzetavis_escaleUp, "pzetavis_escaleUp/F");
@@ -1146,6 +1212,14 @@ int main(int argc, char * argv[]) {
     tree->Branch("mjj", &mjj, "mjj/F");
     tree->Branch("mjj_jesUp", &mjj_jesUp, "mjj_jesUp/F");
     tree->Branch("mjj_jesDown", &mjj_jesDown, "mjj_jesDown/F");
+
+    tree->Branch("dijetphi", &dijetphi, "dijetphi/F");
+    tree->Branch("dijetphi_jesUp", &dijetphi_jesUp, "dijetphi_jesUp/F");
+    tree->Branch("dijetphi_jesDown", &dijetphi_jesDown, "dijetphi_jesDown/F");
+
+    tree->Branch("dijetpt", &dijetpt, "dijetpt/F");
+    tree->Branch("dijetpt_jesUp", &dijetpt_jesUp, "dijetpt_jesUp/F");
+    tree->Branch("dijetpt_jesDown", &dijetpt_jesDown, "dijetpt_jesDown/F");
 
     tree->Branch("jdeta", &jdeta, "jdeta/F");
     tree->Branch("njetingap", &njetingap, "njetingap/I");
@@ -1345,12 +1419,12 @@ int main(int argc, char * argv[]) {
    TFile * inputFile_visPtResolution = new TFile(inputFileName_visPtResolution.fullPath().data());
     
     // qcd weight (dzeta cut)
-   QCDModelForEMu qcdWeight("HTT-utilities/QCDModelingEMu/data/QCD_weight_emu_2016BtoH.root"); 
+   //QCDModelForEMu qcdWeight("HTT-utilities/QCDModelingEMu/data/QCD_weight_emu_2016BtoH.root"); 
    // qcd weight DZeta cut
-   QCDModelForEMu qcdWeightNoDzeta("HTT-utilities/QCDModelingEMu/data/QCD_weight_emu_2016BtoH.root");
+   //QCDModelForEMu qcdWeightNoDzeta("HTT-utilities/QCDModelingEMu/data/QCD_weight_emu_2016BtoH.root");
    
    // BTag scale factors
-   BTagCalibration calib("csvv2", cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/CSVv2_Moriond17_B_H.csv");  //read out SF for btagging
+   BTagCalibration calib("DeepCSV", cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/DeepCSV_2017data.csv");  //read out SF for btagging
    BTagCalibrationReader reader_B(BTagEntry::OP_MEDIUM,"central",{"up","down"});
    BTagCalibrationReader reader_C(BTagEntry::OP_MEDIUM,"central",{"up","down"});
    BTagCalibrationReader reader_Light(BTagEntry::OP_MEDIUM,"central",{"up","down"});
@@ -1372,7 +1446,7 @@ int main(int argc, char * argv[]) {
    }
    std::cout << std::endl;
    // read out efficiencies for btagging
-   TFile * fileTagging = new TFile(TString(cmsswBase)+TString("/src/DesyTauAnalyses/NTupleMaker/data/tagging_efficiencies_Moriond2017.root"));
+   TFile * fileTagging = new TFile(TString(cmsswBase)+TString("/src/DesyTauAnalyses/NTupleMaker/data/tagging_efficiencies_march2018_btageff-all_samp-inc-DeepCSV_medium.root"));
    TH1F * tagEff_B = (TH1F*)fileTagging->Get("btag_eff_b");
    TH1F * tagEff_C = (TH1F*)fileTagging->Get("btag_eff_c");
    TH1F * tagEff_Light = (TH1F*)fileTagging->Get("btag_eff_oth");
@@ -1466,7 +1540,7 @@ int main(int argc, char * argv[]) {
           isZEE = false;
           isZMM = false;
           isZTT = false;
-          
+          veto_embedded = false;
           //      bool isPrompMuPlus = false;
           //      bool isPrompMuMinus = false;
           //      bool isPrompElePlus = false;
@@ -1515,13 +1589,27 @@ int main(int argc, char * argv[]) {
           btag2weight = 1;
           btag2weight_Up = 1;
           btag2weight_Down = 1;
-          
+
           qcdweight = 1;
           qcdweightup = 1;
           qcdweightdown = 1;
           qcdweight_nodzeta = 1;
           qcdweightup_nodzeta = 1;
           qcdweightdown_nodzeta = 1;
+
+          qcdweight = 1;
+          qcdweight_0jet_rate_up =  1;
+          qcdweight_0jet_rate_down =  1;
+          qcdweight_1jet_rate_up =  1;
+          qcdweight_1jet_rate_down =  1;
+          qcdweight_0jet_shape_up =  1;
+          qcdweight_0jet_shape_down =  1;
+          qcdweight_1jet_shape_up =  1;
+          qcdweight_1jet_shape_down =  1;
+
+          qcdweight_iso_up =  1;
+          qcdweight_iso_down =  1;
+
           zptmassweight = 1;
           zptmassweight_esup = 1;
           zptmassweight_esdown = 1;
@@ -2078,13 +2166,17 @@ int main(int argc, char * argv[]) {
             }
             //std::cout<<"before btag"<<std::endl;
             //find the right b tag discriminant  
-            unsigned int nBTagDiscriminant = 0;
+            unsigned int nBTagDiscriminant1 = 0;
+            unsigned int nBTagDiscriminant2 = 0;
             for (unsigned int iBTag=0; iBTag < analysisTree.run_btagdiscriminators->size(); ++iBTag) {
                TString discr(analysisTree.run_btagdiscriminators->at(iBTag));
-               if (discr.Contains(BTagDiscriminator))
-                  nBTagDiscriminant = iBTag;
+               if (discr == BTagDiscriminator1)
+                  nBTagDiscriminant1 = iBTag;
+               if (discr == BTagDiscriminator2)
+                  nBTagDiscriminant2 = iBTag;
             }
-            
+            std::cout<<"nBTagDiscriminant1 " <<nBTagDiscriminant1<<"nBTagDiscriminant2 " <<nBTagDiscriminant2<<std::endl;
+
             //std::cout<<"before met filters"<<std::endl; 
             // MET Filters //store if event passes the met filters
             metFilters_ = metFiltersPasses(analysisTree,metFlags);
@@ -2688,7 +2780,10 @@ int main(int argc, char * argv[]) {
             
             //store variables for visible mass
             m_vis = dileptonLV.M();
-            
+            pt_vis = dileptonLV.Pt();
+            pt_vis_escaleUp = (muonLV+electronUpLV).Pt();
+            pt_vis_escaleDown = (muonLV+electronDownLV).Pt();
+
             m_vis_muUp    = (muonUpLV+electronLV).M();
             m_vis_muDown  = (muonDownLV+electronLV).M();
             m_vis_escaleUp     = (muonLV+electronUpLV).M();
@@ -2713,25 +2808,7 @@ int main(int argc, char * argv[]) {
             
             dr_tt = deltaR(muonLV.Eta(),muonLV.Phi(),
                            electronLV.Eta(),electronLV.Phi());
-            
-            // qcd scale factor
-            // no dzeta cut
-            qcdweight     = qcdWeight.getWeight(pt_1,pt_2,dr_tt);
-            qcdweightup   = qcdWeight.getWeight(pt_1,pt_2,dr_tt);
-            qcdweightdown = qcdWeight.getWeight(pt_1,pt_2,dr_tt);
-            // dzeta cut
-            qcdweight_nodzeta     = qcdWeightNoDzeta.getWeight(pt_1,pt_2,dr_tt);
-            qcdweightup_nodzeta   = qcdWeightNoDzeta.getWeight(pt_1,pt_2,dr_tt);
-            qcdweightdown_nodzeta = qcdWeightNoDzeta.getWeight(pt_1,pt_2,dr_tt);
-            
-            qcdweight     = 1.0;
-            qcdweightup   = 1.0;
-            qcdweightdown = 1.0;
-            // dzeta cut
-            qcdweight_nodzeta     = 1.0;
-            qcdweightup_nodzeta   = 1.0;
-            qcdweightdown_nodzeta = 1.0;
-
+           
 
             //      if (os<0.5) {
             //	printf("QCD weights  : pt_1 = %6.1f ; pt_2 = %6.1f ; dr_tt = %4.2f\n",pt_1,pt_2,dr_tt);
@@ -2751,6 +2828,13 @@ int main(int argc, char * argv[]) {
             vector<unsigned int> bjets_nocleaned; bjets_nocleaned.clear();
             vector<unsigned int> bjetsRaw; bjetsRaw.clear();
             
+            TLorentzVector jet1;
+            TLorentzVector jet2;
+            TLorentzVector jet1Up;
+            TLorentzVector jet1Down;
+            TLorentzVector jet2Up;
+            TLorentzVector jet2Down;
+
             int indexLeadingJet = -1;
             float ptLeadingJet = -1;
             
@@ -2759,7 +2843,7 @@ int main(int argc, char * argv[]) {
             
             int indexLeadingBJet = -1;
             float ptLeadingBJet = -1;
-          
+
             //impose cuts on jets
             for (unsigned int jet=0; jet<analysisTree.pfjet_count; ++jet) {
                
@@ -2777,6 +2861,8 @@ int main(int argc, char * argv[]) {
                bool isPFJetId = tightJetiD_2017(analysisTree,int(jet));
                if (!isPFJetId) continue;
          
+               if (jetPt < 50 && absJetEta > 2.65 && absJetEta < 3.139) continue;
+
                //check distance of jet to leptons
                bool cleanedJet = true;
                
@@ -2792,12 +2878,16 @@ int main(int argc, char * argv[]) {
                
                if (!cleanedJet) continue;
                
+
                if (jetPt>jetPtLowCut)
                   jetspt20.push_back(jet);
                //b-jet tagged?
                 if (absJetEta<bJetEtaCut) { // jet within b-tagging acceptance
                    
-                   bool tagged = analysisTree.pfjet_btag[jet][nBTagDiscriminant]>btagCut; // b-jet
+                   bool tagged = analysisTree.pfjet_btag[jet][nBTagDiscriminant1] + analysisTree.pfjet_btag[jet][nBTagDiscriminant2] >btagCut; // b-jet
+                   std::cout<<"tagged jet: "<<tagged<<std::endl;
+                   std::cout<<"tagged jet 1: "<< analysisTree.pfjet_btag[jet][nBTagDiscriminant1]<<std::endl;
+                   std::cout<<"tagged jet 2: "<< analysisTree.pfjet_btag[jet][nBTagDiscriminant2]<<std::endl;
                    bool taggedRaw = tagged;
                    
                    if (!isData) {
@@ -2865,7 +2955,7 @@ int main(int argc, char * argv[]) {
                 
                 if (jetPtDown>jetPtHighCut)
                    jetsDown.push_back(jet);
-
+               
                 if (jetPt>jetPtHighCut)
                    jets.push_back(jet);
                 //also store subleading jets
@@ -2883,7 +2973,7 @@ int main(int argc, char * argv[]) {
                    ptLeadingJet = jetPt;
                 }
             }
-            
+           
             njets = jets.size();
             njets_jesUp = jetsUp.size();
             njets_jesDown = jetsDown.size();
@@ -3026,12 +3116,21 @@ int main(int argc, char * argv[]) {
                jptraw_2 = analysisTree.pfjet_pt[indexSubLeadingJet]*analysisTree.pfjet_energycorr[indexSubLeadingJet];
                jmva_2 = -1;//analysisTree.pfjet_pu_jet_full_mva[indexSubLeadingJet];
             }
-            
+         
             mjj =  -10;
             mjj_jesUp = -10;
             mjj_jesDown = -10;
             jdeta =  -10;
             njetingap = 0;
+
+            dijetpt = -10;
+            dijetpt_jesUp = -10;
+            dijetpt_jesDown = -10;
+               
+            dijetphi = -10;
+            dijetphi_jesUp = -10;
+            dijetphi_jesDown = -10;
+        
             if (indexLeadingJet>=0 && indexSubLeadingJet>=0) {
                
                float unc1Up   = 1 + analysisTree.pfjet_jecUncertainty[indexLeadingJet]; 
@@ -3040,33 +3139,33 @@ int main(int argc, char * argv[]) {
                float unc2Up   = 1 + analysisTree.pfjet_jecUncertainty[indexSubLeadingJet];
                float unc2Down = 1 - analysisTree.pfjet_jecUncertainty[indexSubLeadingJet];
                
-               TLorentzVector jet1; jet1.SetPxPyPzE(analysisTree.pfjet_px[indexLeadingJet],
+               jet1.SetPxPyPzE(analysisTree.pfjet_px[indexLeadingJet],
                                                     analysisTree.pfjet_py[indexLeadingJet],
                                                     analysisTree.pfjet_pz[indexLeadingJet],
                                                     analysisTree.pfjet_e[indexLeadingJet]);
                
-               TLorentzVector jet1Up; jet1Up.SetPxPyPzE(analysisTree.pfjet_px[indexLeadingJet]*unc1Up,
+               jet1Up.SetPxPyPzE(analysisTree.pfjet_px[indexLeadingJet]*unc1Up,
                                                         analysisTree.pfjet_py[indexLeadingJet]*unc1Up,
                                                         analysisTree.pfjet_pz[indexLeadingJet]*unc1Up,
                                                         analysisTree.pfjet_e[indexLeadingJet]*unc1Up);
                
-               TLorentzVector jet1Down; jet1Down.SetPxPyPzE(analysisTree.pfjet_px[indexLeadingJet]*unc1Down,
+               jet1Down.SetPxPyPzE(analysisTree.pfjet_px[indexLeadingJet]*unc1Down,
                                                             analysisTree.pfjet_py[indexLeadingJet]*unc1Down,
                                                             analysisTree.pfjet_pz[indexLeadingJet]*unc1Down,
                                                             analysisTree.pfjet_e[indexLeadingJet]*unc1Down);
                
-               TLorentzVector jet2; jet2.SetPxPyPzE(analysisTree.pfjet_px[indexSubLeadingJet],
+               jet2.SetPxPyPzE(analysisTree.pfjet_px[indexSubLeadingJet],
                                                     analysisTree.pfjet_py[indexSubLeadingJet],
                                                     analysisTree.pfjet_pz[indexSubLeadingJet],
                                                     analysisTree.pfjet_e[indexSubLeadingJet]);
                
                
-               TLorentzVector jet2Up; jet2Up.SetPxPyPzE(analysisTree.pfjet_px[indexSubLeadingJet]*unc2Up,
+               jet2Up.SetPxPyPzE(analysisTree.pfjet_px[indexSubLeadingJet]*unc2Up,
                                                         analysisTree.pfjet_py[indexSubLeadingJet]*unc2Up,
                                                         analysisTree.pfjet_pz[indexSubLeadingJet]*unc2Up,
                                                         analysisTree.pfjet_e[indexSubLeadingJet]*unc2Up);
                
-               TLorentzVector jet2Down; jet2Down.SetPxPyPzE(analysisTree.pfjet_px[indexSubLeadingJet]*unc2Down,
+               jet2Down.SetPxPyPzE(analysisTree.pfjet_px[indexSubLeadingJet]*unc2Down,
                                                             analysisTree.pfjet_py[indexSubLeadingJet]*unc2Down,
                                                             analysisTree.pfjet_pz[indexSubLeadingJet]*unc2Down,
                                                             analysisTree.pfjet_e[indexSubLeadingJet]*unc2Down);
@@ -3074,7 +3173,15 @@ int main(int argc, char * argv[]) {
                mjj = (jet1+jet2).M();
                mjj_jesUp = (jet1Up+jet2Up).M();
                mjj_jesDown = (jet1Down+jet2Down).M();
+            
+               dijetpt = (jet1+jet2).Pt();
+               dijetpt_jesUp = (jet1Up+jet2Up).Pt();
+               dijetpt_jesDown = (jet1Down+jet2Down).Pt();
                
+               dijetphi = (jet1+jet2).Phi();
+               dijetphi_jesUp = (jet1Up+jet2Up).Phi();
+               dijetphi_jesDown = (jet1Down+jet2Down).Phi();
+           
                jdeta = fabs(analysisTree.pfjet_eta[indexLeadingJet]-
                             analysisTree.pfjet_eta[indexSubLeadingJet]);
 	      
@@ -3094,6 +3201,45 @@ int main(int argc, char * argv[]) {
                
                
             }
+                           // qcd scale factor
+            correctionWS->var("e_pt")->setVal(pt_1);
+            correctionWS->var("m_pt")->setVal(pt_2);
+            double_t em_qcd_extrap_uncert = correctionWS->function("em_qcd_extrap_uncert")->getVal();
+         
+            correctionWS->var("e_pt")->setVal(pt_1);
+            correctionWS->var("m_pt")->setVal(pt_2);
+            correctionWS->var("njets")->setVal(njets);
+            correctionWS->var("dR")->setVal(dr_tt);
+            double_t em_qcd_osss_binned = correctionWS->function("em_qcd_osss_binned")->getVal();
+            double_t em_qcd_osss_binned_0jet_rate_up = correctionWS->function("em_qcd_osss_0jet_rateup")->getVal();
+            double_t em_qcd_osss_binned_0jet_rate_down = correctionWS->function("em_qcd_osss_0jet_ratedown")->getVal();
+            double_t em_qcd_osss_binned_1jet_rate_up = correctionWS->function("em_qcd_osss_1jet_rateup")->getVal();
+            double_t em_qcd_osss_binned_1jet_rate_down = correctionWS->function("em_qcd_osss_1jet_ratedown")->getVal();
+            double_t em_qcd_osss_binned_0jet_shape_up = correctionWS->function("em_qcd_osss_0jet_shapeup")->getVal();
+            double_t em_qcd_osss_binned_0jet_shape_down = correctionWS->function("em_qcd_osss_0jet_shapedown")->getVal();
+            double_t em_qcd_osss_binned_1jet_shape_up = correctionWS->function("em_qcd_osss_1jet_shapeup")->getVal();
+            double_t em_qcd_osss_binned_1jet_shape_down = correctionWS->function("em_qcd_osss_1jet_shapedown")->getVal();
+                        
+            qcdweight = em_qcd_extrap_uncert * em_qcd_osss_binned;
+            qcdweight_0jet_rate_up = em_qcd_extrap_uncert * em_qcd_osss_binned_0jet_rate_up;
+            qcdweight_0jet_rate_down = em_qcd_extrap_uncert * em_qcd_osss_binned_0jet_rate_down;   
+            qcdweight_1jet_rate_up = em_qcd_extrap_uncert * em_qcd_osss_binned_1jet_rate_up;
+            qcdweight_1jet_rate_down = em_qcd_extrap_uncert * em_qcd_osss_binned_1jet_rate_down;
+            qcdweight_0jet_shape_up = em_qcd_extrap_uncert * em_qcd_osss_binned_0jet_shape_up;
+            qcdweight_0jet_shape_down = em_qcd_extrap_uncert * em_qcd_osss_binned_0jet_shape_down;   
+            qcdweight_1jet_shape_up = em_qcd_extrap_uncert * em_qcd_osss_binned_1jet_shape_up;
+            qcdweight_1jet_shape_down = em_qcd_extrap_uncert * em_qcd_osss_binned_1jet_shape_down;
+
+            qcdweight_iso_up = em_qcd_extrap_uncert * em_qcd_extrap_uncert * em_qcd_osss_binned;
+            qcdweight_iso_down = em_qcd_osss_binned;
+            
+            // qcdweight     = qcdWeight.getWeight(pt_1,pt_2,dr_tt);
+            // qcdweightup   = qcdWeight.getWeight(pt_1,pt_2,dr_tt);
+            // qcdweightdown = qcdWeight.getWeight(pt_1,pt_2,dr_tt);
+            // dzeta cut
+            // qcdweight_nodzeta     = qcdWeightNoDzeta.getWeight(pt_1,pt_2,dr_tt);
+            // qcdweightup_nodzeta   = qcdWeightNoDzeta.getWeight(pt_1,pt_2,dr_tt);
+            // qcdweightdown_nodzeta = qcdWeightNoDzeta.getWeight(pt_1,pt_2,dr_tt);
             
             // METs
             float met_x = analysisTree.pfmetcorr_ex;
@@ -3391,7 +3537,7 @@ int main(int argc, char * argv[]) {
             //transverse mass of muon + electron +met
             mCDF = (muonLV+electronLV+metLV).M();
             //transverse momentum of muon + electron +met
-            pt_tt = (muonLV+electronLV+metLV).Pt();
+
             m_leptons = (muonLV+electronLV).M();
             
             
@@ -3443,7 +3589,28 @@ int main(int argc, char * argv[]) {
             //      std::cout << "BDT       = " << bdt << std::endl;
             //      std::cout << "BDT (bbH) = " << bdt_bbh << std::endl;
             //      std::cout << "BDT (ggH) = " << bdt_ggh << std::endl;
-            
+            pt_ttjj = -10;
+            pt_ttjj_jesUp = -10;
+            pt_ttjj_jesDown = -10;
+            pt_ttjj_escaleUp = -10;
+            pt_ttjj_escaleDown = -10;
+            pt_ttjj_unclMetUp=-10;
+            pt_ttjj_unclMetDown=  -10;
+            if (indexLeadingJet>=0 && indexSubLeadingJet>=0) {
+            pt_ttjj = (muonLV+electronLV+metLV+jet1+jet2).Pt();
+            pt_ttjj_jesUp = (muonLV+electronLV+metLV+jet1Up+jet2Up).Pt();
+            pt_ttjj_jesDown = (muonLV+electronLV+metLV+jet1Down+jet2Down).Pt();
+            pt_ttjj_escaleUp = (muonLV+electronUpLV+metLV+jet1+jet2).Pt();
+            pt_ttjj_escaleDown = (muonLV+electronDownLV+metLV+jet1+jet2).Pt();
+            pt_ttjj_unclMetUp=(muonLV+electronLV+metResoUpLV+jet1+jet2).Pt();
+            pt_ttjj_unclMetDown=  (muonLV+electronLV+metResoDownLV+jet1+jet2).Pt(); 
+            }
+            pt_tt = (muonLV+electronLV+metLV).Pt();
+            pt_tt_escaleUp = (muonLV+electronUpLV+metLV).Pt();
+            pt_tt_escaleDown = (muonLV+electronDownLV+metLV).Pt();
+            pt_tt_unclMetUp=(muonLV+electronLV+metResoUpLV).Pt();
+            pt_tt_unclMetDown=  (muonLV+electronLV+metResoDownLV).Pt();
+
             m_sv           = -10;
             m_sv_muUp      = -10;
             m_sv_muDown    = -10;
@@ -3739,6 +3906,9 @@ int main(int argc, char * argv[]) {
                   isZTT = false;
                   isZLL = true;
                }
+               
+               if (gen_match_1 == 3 && gen_match_2 ==4) veto_embedded = true;
+
                
 	       /*
                double weightE = 1;   //weights for jet electron fake rate
