@@ -105,6 +105,7 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
   crecpfmetcorr(iConfig.getUntrackedParameter<bool>("RecPFMetCorr", false)),
   crecpuppimet(iConfig.getUntrackedParameter<bool>("RecPuppiMet", false)),
   crecmvamet(iConfig.getUntrackedParameter<bool>("RecMvaMet", false)),
+  crecstxs(iConfig.getUntrackedParameter<bool>("stxs", false)),
   // triggers
   cHLTriggerPaths(iConfig.getUntrackedParameter<vector<string> >("HLTriggerPaths")),
   cTriggerProcess(iConfig.getUntrackedParameter<string>("TriggerProcess", "HLT")),
@@ -203,6 +204,7 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
   L1ExtraTauCollectionToken_(consumes<l1extra::L1JetParticleCollection>(edm::InputTag("l1extraParticles","Tau"))),
   PackedCantidateCollectionToken_(consumes<pat::PackedCandidateCollection>(edm::InputTag("packedPFCandidates"))),
   TriggerObjectCollectionToken_(consumes<pat::TriggerObjectStandAloneCollection>(iConfig.getParameter<edm::InputTag>("TriggerObjectCollectionTag"))),
+  htxsToken_(consumes<HTXS::HiggsClassification>(iConfig.getParameter<edm::InputTag>("htxsInfo"))),
   BeamSpotToken_(consumes<BeamSpot>(iConfig.getParameter<edm::InputTag>("BeamSpotCollectionTag"))),
   PVToken_(consumes<VertexCollection>(iConfig.getParameter<edm::InputTag>("PVCollectionTag"))),
   LHEToken_(consumes<LHEEventProduct>(iConfig.getParameter<edm::InputTag>("LHEEventProductTag"))),
@@ -882,7 +884,12 @@ void NTupleMaker::beginJob(){
       tree->Branch("numpileupinteractions", &numpileupinteractions, "numpileupinteractions/I");
       tree->Branch("numpileupinteractionsplus", &numpileupinteractionsplus, "numpileupinteractionsplus/I");
       tree->Branch("numtruepileupinteractions", &numtruepileupinteractions, "numtruepileupinteractions/F");
-      
+    }
+    if(crecstxs){
+      tree->Branch("htxs_stage0cat",&htxs_stage0cat,"htxs_stage0cat/I");
+      tree->Branch("htxs_stage1cat",&htxs_stage1cat,"htxs_stage1cat/I");
+      tree->Branch("htxs_higgsPt",&htxs_higgsPt,"htxs_higgsPt/F");
+      tree->Branch("htxs_njets30",&htxs_njets30,"htxs_njets30/I");
     }
 
     if (!cdata || cembedded) {
@@ -2250,6 +2257,16 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       //      std::cout << std::endl;
     } // ctrigger
 
+  if(crecstxs)
+    {
+      // Get STXS infos
+      edm::Handle<HTXS::HiggsClassification> htxs;
+      iEvent.getByToken(htxsToken_, htxs);
+      htxs_stage0cat = htxs->stage0_cat;
+      htxs_stage1cat = htxs->stage1_cat_pTjet30GeV;
+      htxs_higgsPt = htxs->higgs.Pt();
+      htxs_njets30 = htxs->jets30.size();
+    }
   tree->Fill();
 
   //Store Tau embedding information
