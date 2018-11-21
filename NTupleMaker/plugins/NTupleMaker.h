@@ -78,6 +78,7 @@
 #include "JetMETCorrections/Objects/interface/JetCorrector.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
+#include "VertexRefit/TauRefit/interface/RefitVertex.h"
 #include "DataFormats/Candidate/interface/VertexCompositeCandidate.h"
 #include "DataFormats/Candidate/interface/VertexCompositeCandidateFwd.h"
 #include "DataFormats/RecoCandidate/interface/RecoChargedCandidate.h"
@@ -168,6 +169,7 @@ using namespace reco;
 #define M_genjetsmaxcount 1000
 #define M_trigobjectmaxcount 1000
 #define M_hltfiltersmax 200
+#define M_refitvtxmaxcount 1000
 typedef ROOT::Math::PositionVector3D<ROOT::Math::Cartesian3D<double>,ROOT::Math::DefaultCoordinateSystemTag> Point3D;
 typedef ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> > LorentzVector;
 typedef ROOT::Math::SMatrix<double, 2, 2, ROOT::Math::MatRepSym<double, 2> > CovMatrix2D;
@@ -327,6 +329,7 @@ class NTupleMaker : public edm::EDAnalyzer{
   bool cbeamspot;
   bool crectrack;
   bool crecprimvertex;
+  bool crefittedvertex;
   bool crecmuon;
   bool crecelectron;
   bool crectau;
@@ -453,6 +456,7 @@ class NTupleMaker : public edm::EDAnalyzer{
   edm::EDGetTokenT<pat::TriggerObjectStandAloneCollection> myTriggerObjectCollectionToken_;
   edm::EDGetTokenT<BeamSpot> BeamSpotToken_;
   edm::EDGetTokenT<VertexCollection> PVToken_;
+  edm::EDGetTokenT<RefitVertexCollection>RefittedPVToken_;
   edm::EDGetTokenT<LHEEventProduct> LHEToken_;
   edm::EDGetTokenT<double> SusyMotherMassToken_;
   edm::EDGetTokenT<double> SusyLSPMassToken_;
@@ -525,6 +529,20 @@ class NTupleMaker : public edm::EDAnalyzer{
   Int_t   primvertex_ntracks;
   Float_t primvertex_cov[6];
   Float_t primvertex_mindz;
+
+  // re-fitted vertex
+  UInt_t  refitvertex_count;
+  Float_t refitvertex_x[M_refitvtxmaxcount];
+  Float_t refitvertex_y[M_refitvtxmaxcount];
+  Float_t refitvertex_z[M_refitvtxmaxcount];
+  Float_t refitvertex_chi2[M_refitvtxmaxcount];
+  Float_t refitvertex_ndof[M_refitvtxmaxcount];
+  Int_t   refitvertex_ntracks[M_refitvtxmaxcount];
+  Float_t refitvertex_cov[M_refitvtxmaxcount][6];
+  Float_t refitvertex_mindz[M_refitvtxmaxcount];
+  Int_t   refitvertex_eleIndex[M_refitvtxmaxcount][2];
+  Int_t   refitvertex_muIndex[M_refitvtxmaxcount][2];
+  Int_t   refitvertex_tauIndex[M_refitvtxmaxcount][2];
 
   // tracks
   UInt_t track_count;
