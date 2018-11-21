@@ -251,8 +251,17 @@ public :
   Float_t         acotautau_10;
   Float_t         acotautau_01;
   Float_t         acotautau_11;
-  
-  
+  Int_t		  pdgcodetau2;
+
+  //reco vertices
+  Float_t RecoVertexX;
+  Float_t RecoVertexY;
+  Float_t RecoVertexZ;
+
+  Float_t GenVertexX;
+  Float_t GenVertexY;
+  Float_t GenVertexZ;
+
 
   //////////////////////////////////////////////
   //            List of branches              //
@@ -486,7 +495,20 @@ public :
   TBranch        *b_acotautau_10;
   TBranch        *b_acotautau_01;
   TBranch        *b_acotautau_11;
-  
+  TBranch	 *b_pdgcodetau2;
+
+  //reco vertices
+  //RECO vertex info is practical to have
+
+  TBranch        *b_RecoVertexX;
+  TBranch        *b_RecoVertexY;
+  TBranch        *b_RecoVertexZ;  
+
+//gen vertex info is practical to have
+  TBranch        *b_GenVertexX;
+  TBranch        *b_GenVertexY;
+  TBranch        *b_GenVertexZ;
+
   Synch17Tree(TTree *tree=0);
   virtual ~Synch17Tree();
 

@@ -3,6 +3,9 @@
 // Author: Andrea Cardini <andrea.cardini@desy.de>
 // 
 // Based on Spring15Tree by Francesco Costanza
+
+//Merijn van de Klundert <merijn.van.de.klundert@desy.de>
+
 //////////////////////////////////////////////////////////
 
 
@@ -78,6 +81,12 @@ void Synch17GenTree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("acotautau_20", &acotautau_20, &b_acotautau_20);
    fChain->SetBranchAddress("acotautau_21", &acotautau_21, &b_acotautau_21);
    fChain->SetBranchAddress("acotautau_22", &acotautau_22, &b_acotautau_22);
+
+  //gen vertex info useful to have
+   fChain->SetBranchAddress("GenVertexX", &GenVertexX, &b_GenVertexX);
+   fChain->SetBranchAddress("GenVertexY", &GenVertexY, &b_GenVertexY);
+   fChain->SetBranchAddress("GenVertexZ", &GenVertexZ, &b_GenVertexZ);
+
    
    lock=true;
 }
@@ -175,6 +184,10 @@ void Synch17GenTree::WriteInit(TTree *tree) {
    fChain->Branch("acotautau_20", &acotautau_20, "acotautau_20/F");
    fChain->Branch("acotautau_21", &acotautau_21, "acotautau_21/F");
    fChain->Branch("acotautau_22", &acotautau_22, "acotautau_22/F");
+
+   fChain->Branch("GenVertexX", &GenVertexX, "GenVertexX/F");
+   fChain->Branch("GenVertexY", &GenVertexY, "GenVertexY/F");
+   fChain->Branch("GenVertexZ", &GenVertexZ, "GenVertexZ/F");
 
 }
 

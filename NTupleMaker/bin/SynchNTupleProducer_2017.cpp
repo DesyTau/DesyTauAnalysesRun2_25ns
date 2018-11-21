@@ -68,15 +68,29 @@
 #define pionMass 		   0.1396
 
 
-
 void FillMuTau(const AC1B * analysisTree, Synch17Tree *otree, int leptonIndex, float dRiso);
 void FillETau(const AC1B * analysisTree, Synch17Tree *otree, int leptonIndex, float dRiso);
 void FillTau(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex);
 void FillTau_leading(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex);
 void initializeCPvar(Synch17Tree *otree);
+void SaveRECOVertices(const AC1B * analysisTree,Synch17Tree *otree, const bool isData);
 void initializeGenTree(Synch17GenTree *gentree);
 void FillGenTree(const AC1B * analysisTree, Synch17GenTree *gentree, TString ch);
 //void fillTTbarUncWeights(const AC1B * analysisTree, Synch17Tree *otree, bool isData, bool includeTTbarUncWeights);
+
+
+/*Notifications Merijn
+-to my experience currently macro only works for mu-tau (unless udpated in the meantime)
+-added a histogram and leafs in the otree to keep track of the pdg codes of the hadronically decaying tau, and ctr to keep track how often 2nd tau does NOT decay hadronically
+-we call an improved CP function, in which a number of bugs are solved. It takes the decay mode also as argument, to construct certain kinematic variables
+-Merijn suspects that second reco tau in mu-tau is currently not necessarily hadronically decaying, since RECO decay products substatial fraction 
+-see functionsCP.h for updates on the CP calculation
+*/
+
+
+//Merijn added a histogram to spot the pdg codes of the decaying hadronic tau
+TH1F* ConstitsPDG=new TH1F("ConstitsPDG","ConstitsPDG",500,-250,250);
+int nonpionphotonctr=0;
 
 int main(int argc, char * argv[]){
 
@@ -313,6 +327,10 @@ int main(int argc, char * argv[]){
   const float dxyLeptonCut     = cfg.get<float>("dxy"+lep+"Cut");
   const float dzLeptonCut      = cfg.get<float>("dz"+lep+"Cut");
 
+  cout<<"dxyLeptonCut "<<dxyLeptonCut<<endl;
+  cout<<"dzLeptonCut "<<dzLeptonCut<<endl;
+
+  
   const bool  applyLeptonId    = cfg.get<bool>("Apply"+lep+"Id");
 
   //dilepton veto
@@ -490,6 +508,10 @@ int main(int argc, char * argv[]){
   TTree * tree = new TTree("TauCheck","TauCheck");
   TTree * gtree = new TTree("GenTauCheck","GenTauCheck");
 
+  //Merijn added a histogram to spot the pdg codes of the decaying hadronic tau
+  TH1F* ConstitsPDG=new TH1F("ConstitsPDG","ConstitsPDG",500,-250,250);
+  int nonpionphotonctr=0;
+
   Synch17Tree *otree = new Synch17Tree(tree);
   initializeCPvar(otree);
   Synch17GenTree *gentree = new Synch17GenTree(gtree);
@@ -609,7 +631,7 @@ int main(int argc, char * argv[]){
 
     AC1B analysisTree(_tree, isData);
 
-    // set AC1B for JES systematics
+    // set AC1B for JES systematicsf_
     if (!isData && ApplySystShift && jetEnergyScaleSys.size() >0){
       for (unsigned int i=0; i<jetEnergyScaleSys.size(); i++)
 	(jetEnergyScaleSys.at(i))->SetAC1B(&analysisTree);
@@ -620,8 +642,8 @@ int main(int argc, char * argv[]){
     std::cout << "      number of entries in Tree = " << numberOfEntries << std::endl;
     ///////////////EVENT LOOP///////////////
     
-
-    for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) {       
+//for (Long64_t iEntry=0; iEntry<1000; iEntry++) {
+ for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) {       
       counter[0]++;
       analysisTree.GetEntry(iEntry);
       nEvents++;
@@ -633,6 +655,7 @@ int main(int argc, char * argv[]){
 	FillGenTree(&analysisTree,gentree,ch);
 	gentree->Fill();
       }
+
 
       //Skip events not passing the MET filters, if applied
       if (ApplyMetFilters && !passedAllMetFilters(&analysisTree, met_filters_list, isData)) continue;
@@ -675,7 +698,10 @@ int main(int argc, char * argv[]){
       otree->run  = analysisTree.event_run;
       otree->lumi = analysisTree.event_luminosityblock;
       otree->evt  = analysisTree.event_nr;
-	  
+     
+     //we fill vertices here;	
+     SaveRECOVertices(&analysisTree,otree, isData);
+		  
 
       bool overlapEvent = true;
       for (unsigned int iEvent=0; iEvent<runList.size(); ++iEvent) {
@@ -693,6 +719,7 @@ int main(int argc, char * argv[]){
       	continue;
 
       initializeGenTree(gentree);
+
        // weights
       if(ApplyPUweight) fill_weight(&analysisTree, otree, PUofficial, isData);
       
@@ -995,10 +1022,8 @@ int main(int argc, char * argv[]){
 	  for(unsigned int i_trig = 0; i_trig<filterDiTau.size(); i_trig++){
 	    if (nDiTauTrig.at(i_trig) == -1) continue;
 	    if (analysisTree.trigobject_filters[iT][nDiTauTrig.at(i_trig)]) isTauTrig = true;
-	  }
-	  
-	}
-	  
+	  }	  
+	}	  
       }
 	
       for(unsigned int i_trig = 0; i_trig<filterXtriggerTauLeg.size(); i_trig++)
@@ -1179,10 +1204,6 @@ int main(int argc, char * argv[]){
       jets::counting_jets(&analysisTree, otree, &cfg, &inputs_btag_scaling_medium);
       //MET
       fillMET(ch, leptonIndex, tauIndex, &analysisTree, otree);
-
-      //CP calculation
-      if(ch=="tt")acott(&analysisTree,otree,tauIndex,leptonIndex);
-
      
       TLorentzVector genV( 0., 0., 0., 0.);
       TLorentzVector genL( 0., 0., 0., 0.);
@@ -1414,7 +1435,36 @@ int main(int argc, char * argv[]){
 
       if (ApplySVFit && otree->njetspt20>0) svfit_variables(ch, &analysisTree, otree, &cfg, inputFile_visPtResolution);
 
-      otree->Fill();
+
+//addition Merijn: here we select the constituent of the tau with highest pT
+ int ncomponents = analysisTree.tau_constituents_count[tauIndex];
+  float maxPt=-1;
+  int sign = -1;
+  int pdgcode=-9999;
+  if(analysisTree.tau_charge[tauIndex]>0) sign = 1; 
+  for(int i=0;i<ncomponents;i++){  
+
+if((analysisTree.tau_constituents_pdgId[tauIndex][i]*sign)>0){
+
+      TLorentzVector lvector; lvector.SetXYZT(analysisTree.tau_constituents_px[tauIndex][i],
+					      analysisTree.tau_constituents_py[tauIndex][i],
+					      analysisTree.tau_constituents_pz[tauIndex][i],
+					      analysisTree.tau_constituents_e[tauIndex][i]);
+
+      double Pt = lvector.Pt();
+      if(Pt>maxPt){
+	pdgcode=analysisTree.tau_constituents_pdgId[tauIndex][i];
+	maxPt = Pt;
+	}
+    }
+  }
+
+ otree->pdgcodetau2=pdgcode; //Merijn tried here to assign to our tree. Not working yet so put in histogam..
+ ConstitsPDG->Fill(pdgcode);
+ if(abs(pdgcode)!=211&&abs(pdgcode)!=22) nonpionphotonctr++;
+// cout<<"nonpionphotonctr ="<<nonpionphotonctr<<endl;
+
+  otree->Fill();
 
 	  // evaluate systematics for MC 
       if(!isData && ApplySystShift){
@@ -1431,10 +1481,18 @@ int main(int argc, char * argv[]){
       }
       counter[19]++;
 
+
+  //CP calculation. Updates Merijn: placed calculation at end, when all kinematic corrections are performed. Removed statement to only do calculation for tt. Created the acott_Impr function, which takes ch as input as well. See the funcrtion in functionsCP.h to see my updates to the function itself
+
+      //if(ch=="tt")
+      acott_Impr(&analysisTree,otree,tauIndex,leptonIndex, ch);
+
+
       selEvents++;
       //std::cout << "*************SelEv " << selEvents << "************" << std::endl;
 
     } // end of file processing (loop over events in one file)
+
 
     nFiles++;
     delete _tree;
@@ -1451,8 +1509,11 @@ int main(int argc, char * argv[]){
   std::cout << "Total number of selected events = " << selEvents << std::endl;
   std::cout << std::endl;
   
+  cout<<"nonpionphotonctr ="<<nonpionphotonctr<<endl;
+
   file->cd("");
   file->Write();
+ConstitsPDG->Write();
 
   // delete systematics objects
 
@@ -1512,11 +1573,8 @@ int main(int argc, char * argv[]){
 
   file->Close();
   delete file;
-    
 
 }
-
-
 
 
 ////FILLING FUNCTIONS//////
@@ -1828,6 +1886,12 @@ void initializeGenTree(Synch17GenTree *gentree){
   gentree->acotautau_10 = -9999;
   gentree->acotautau_01 = -9999;
   gentree->acotautau_11 = -9999;
+
+  //init the new vertex variables to something nonsensible also
+  gentree->GenVertexX=-9999;
+  gentree->GenVertexY=-9999;
+  gentree->GenVertexZ=-99999;
+
 }
 
 void FillGenTree(const AC1B * analysisTree, Synch17GenTree *gentree, TString ch){
@@ -1914,6 +1978,64 @@ void FillGenTree(const AC1B * analysisTree, Synch17GenTree *gentree, TString ch)
   gentree->acotautau_11 = -9999;
   if (LeadingtauIndex>-1&&TrailingtauIndex>-1)
     gen_acott(analysisTree,gentree,LeadingtauIndex,TrailingtauIndex);
+
+
+//here fill the generator vertices to have the information present in tree
+//Note: we may want to add constraint that the W and Z are prompt. If we remove these, may get in trouble with a DY or W MC sample..
+
+
+  for (unsigned int igen=0; igen<analysisTree->genparticles_count; ++igen) {
+
+bool isPrompt = true;
+	if (analysisTree->genparticles_isPrompt) 
+isPrompt = false;
+
+    if ((analysisTree->genparticles_pdgid[igen]==23||analysisTree->genparticles_pdgid[igen]==24||
+	analysisTree->genparticles_pdgid[igen]==25||analysisTree->genparticles_pdgid[igen]==35||analysisTree->genparticles_pdgid[igen]==36)&&analysisTree->genparticles_isLastCopy[igen]==1&&isPrompt) {
+      gentree->GenVertexX=analysisTree->genparticles_vx[igen];
+      gentree->GenVertexY=analysisTree->genparticles_vy[igen];
+      gentree->GenVertexZ=analysisTree->genparticles_vz[igen];
+      break;
+    }
+  }
+
+
+}
+
+//add a dedicated function to fill the reco vertices. It is called after the 
+void SaveRECOVertices(const AC1B * analysisTree, Synch17Tree *otree, const bool isData){
+
+  otree->RecoVertexX=analysisTree->primvertex_x;
+  otree->RecoVertexY=analysisTree->primvertex_y;
+  otree->RecoVertexZ=analysisTree->primvertex_z;
+
+
+if(!isData){
+  for (unsigned int igen=0; igen<analysisTree->genparticles_count; ++igen) {
+
+//here fill the generator vertices to have the gen information present in tree PER GOOD RECO EVENT
+//Note: we may want to add constraint that the W and Z are prompt. If we remove these, may get in trouble with a DY or W MC sample..
+
+
+bool isPrompt = true;
+	if (analysisTree->genparticles_isPrompt) 
+isPrompt = false;
+
+
+
+    if ((analysisTree->genparticles_pdgid[igen]==23||analysisTree->genparticles_pdgid[igen]==24||
+	analysisTree->genparticles_pdgid[igen]==25||analysisTree->genparticles_pdgid[igen]==35||analysisTree->genparticles_pdgid[igen]==36)&&analysisTree->genparticles_isLastCopy[igen]==1&&isPrompt) {
+      otree->GenVertexX=analysisTree->genparticles_vx[igen];
+      otree->GenVertexY=analysisTree->genparticles_vy[igen];
+      otree->GenVertexZ=analysisTree->genparticles_vz[igen];
+      break;
+    }
+  }
+}
+else{//if it is data, fill with something recognisable nonsensible
+      otree->GenVertexX=-9999;
+      otree->GenVertexY=-9999;
+      otree->GenVertexZ=-9999;}
 
 
 }

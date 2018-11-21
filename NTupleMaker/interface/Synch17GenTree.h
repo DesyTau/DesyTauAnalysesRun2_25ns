@@ -3,6 +3,8 @@
 // Author: Andrea Cardini <andrea.cardini@desy.de>
 // 
 // Based on Spring15Tree by Francesco Costanza
+
+//Merijn added some changes <merijn.van.de.klundert@desy.de>
 //////////////////////////////////////////////////////////
 
 #ifndef Synch17GenTree_h
@@ -47,6 +49,11 @@ public :
   Float_t         acotautau_12;
   Float_t         acotautau_21;
   Float_t         acotautau_22;
+
+//gen vertex info is practical to have
+  Float_t GenVertexX;
+  Float_t GenVertexY;
+  Float_t GenVertexZ;
   
 
   //////////////////////////////////////////////
@@ -73,6 +80,11 @@ public :
   TBranch        *b_acotautau_12;
   TBranch        *b_acotautau_21;
   TBranch        *b_acotautau_22;
+
+//gen vertex info is practical to have
+  TBranch        *b_GenVertexX;
+  TBranch        *b_GenVertexY;
+  TBranch        *b_GenVertexZ;
 
   Synch17GenTree(TTree *tree=0);
   virtual ~Synch17GenTree();
