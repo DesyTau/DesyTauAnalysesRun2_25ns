@@ -1983,16 +1983,15 @@ void FillGenTree(const AC1B * analysisTree, Synch17GenTree *gentree, TString ch)
 //here fill the generator vertices to have the information present in tree
 //Note: we may want to add constraint that the W and Z are prompt. If we remove these, may get in trouble with a DY or W MC sample..
 
-/*
+
+  for (unsigned int igen=0; igen<analysisTree->genparticles_count; ++igen) {
+
 bool isPrompt = true;
-	if (analysisTree.genparticles_info[index]==5||
-	    analysisTree.genparticles_info[index]==6) 
+	if (analysisTree->genparticles_isPrompt) 
 isPrompt = false;
 
-*/
-  for (unsigned int igen=0; igen<analysisTree->genparticles_count; ++igen) {
     if ((analysisTree->genparticles_pdgid[igen]==23||analysisTree->genparticles_pdgid[igen]==24||
-	analysisTree->genparticles_pdgid[igen]==25||analysisTree->genparticles_pdgid[igen]==35||analysisTree->genparticles_pdgid[igen]==36)&&analysisTree->genparticles_isLastCopy[igen]==1) {
+	analysisTree->genparticles_pdgid[igen]==25||analysisTree->genparticles_pdgid[igen]==35||analysisTree->genparticles_pdgid[igen]==36)&&analysisTree->genparticles_isLastCopy[igen]==1&&isPrompt) {
       gentree->GenVertexX=analysisTree->genparticles_vx[igen];
       gentree->GenVertexY=analysisTree->genparticles_vy[igen];
       gentree->GenVertexZ=analysisTree->genparticles_vz[igen];
@@ -2014,19 +2013,18 @@ void SaveRECOVertices(const AC1B * analysisTree, Synch17Tree *otree, const bool 
 if(!isData){
   for (unsigned int igen=0; igen<analysisTree->genparticles_count; ++igen) {
 
-//here fill the generator vertices to have the information present in tree
+//here fill the generator vertices to have the gen information present in tree PER GOOD RECO EVENT
 //Note: we may want to add constraint that the W and Z are prompt. If we remove these, may get in trouble with a DY or W MC sample..
 
-/*
+
 bool isPrompt = true;
-	if (analysisTree.genparticles_info[index]==5||
-	    analysisTree.genparticles_info[index]==6) 
+	if (analysisTree->genparticles_isPrompt) 
 isPrompt = false;
 
-*/
+
 
     if ((analysisTree->genparticles_pdgid[igen]==23||analysisTree->genparticles_pdgid[igen]==24||
-	analysisTree->genparticles_pdgid[igen]==25||analysisTree->genparticles_pdgid[igen]==35||analysisTree->genparticles_pdgid[igen]==36)&&analysisTree->genparticles_isLastCopy[igen]==1) {
+	analysisTree->genparticles_pdgid[igen]==25||analysisTree->genparticles_pdgid[igen]==35||analysisTree->genparticles_pdgid[igen]==36)&&analysisTree->genparticles_isLastCopy[igen]==1&&isPrompt) {
       otree->GenVertexX=analysisTree->genparticles_vx[igen];
       otree->GenVertexY=analysisTree->genparticles_vy[igen];
       otree->GenVertexZ=analysisTree->genparticles_vz[igen];
