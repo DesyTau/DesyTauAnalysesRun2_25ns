@@ -148,6 +148,7 @@
 #include "DataFormats/L1Trigger/interface/EGamma.h"
 #include "DataFormats/L1Trigger/interface/Tau.h"
 #include "DataFormats/L1Trigger/interface/Jet.h"
+#include "SimDataFormats/HTXS/interface/HiggsTemplateCrossSections.h"
 
 using namespace std;
 using namespace reco;
@@ -337,6 +338,7 @@ class NTupleMaker : public edm::EDAnalyzer{
   bool crecpfmetcorr;
   bool crecpuppimet;
   bool crecmvamet;
+  bool crecstxs;
 
   vector<string> cHLTriggerPaths;
   string cTriggerProcess;
@@ -441,6 +443,7 @@ class NTupleMaker : public edm::EDAnalyzer{
   edm::EDGetTokenT<BXVector<l1t::Tau> > L1TauCollectionToken_;
   edm::EDGetTokenT<pat::PackedCandidateCollection> PackedCantidateCollectionToken_;
   edm::EDGetTokenT<pat::TriggerObjectStandAloneCollection> TriggerObjectCollectionToken_;
+  edm::EDGetTokenT<HTXS::HiggsClassification> htxsToken_;
   edm::EDGetTokenT<BeamSpot> BeamSpotToken_;
   edm::EDGetTokenT<VertexCollection> PVToken_;
   edm::EDGetTokenT<LHEEventProduct> LHEToken_;
@@ -1128,7 +1131,12 @@ class NTupleMaker : public edm::EDAnalyzer{
   Int_t numpileupinteractionsplus;
   Float_t numtruepileupinteractions;
   Int_t hepNUP_;
-  
+
+  Int_t htxs_stage0cat;
+  Int_t htxs_stage1cat;
+  Float_t htxs_higgsPt;
+  Int_t htxs_njets30;
+
   Float_t genparticles_lheHt;
   UInt_t genparticles_noutgoing;
   UInt_t genparticles_count;
