@@ -95,6 +95,7 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
   cbeamspot(iConfig.getUntrackedParameter<bool>("RecBeamSpot", false)),
   crectrack(iConfig.getUntrackedParameter<bool>("RecTrack", false)),
   crecprimvertex(iConfig.getUntrackedParameter<bool>("RecPrimVertex", false)),
+  crefittedvertex(iConfig.getUntrackedParameter<bool>("RefittedVertex", false)),
   crecmuon(iConfig.getUntrackedParameter<bool>("RecMuon", false)),
   crecelectron(iConfig.getUntrackedParameter<bool>("RecElectron", false)),
   crectau(iConfig.getUntrackedParameter<bool>("RecTau", false)),
@@ -205,6 +206,7 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
   TriggerObjectCollectionToken_(consumes<pat::TriggerObjectStandAloneCollection>(iConfig.getParameter<edm::InputTag>("TriggerObjectCollectionTag"))),
   BeamSpotToken_(consumes<BeamSpot>(iConfig.getParameter<edm::InputTag>("BeamSpotCollectionTag"))),
   PVToken_(consumes<VertexCollection>(iConfig.getParameter<edm::InputTag>("PVCollectionTag"))),
+  RefittedPVToken_(consumes<RefitVertexCollection>(iConfig.getParameter<edm::InputTag>("RefittedPVCollectionTag"))),
   LHEToken_(consumes<LHEEventProduct>(iConfig.getParameter<edm::InputTag>("LHEEventProductTag"))),
   SusyMotherMassToken_(consumes<double>(iConfig.getParameter<edm::InputTag>("SusyMotherMassTag"))),
   SusyLSPMassToken_(consumes<double>(iConfig.getParameter<edm::InputTag>("SusyLSPMassTag"))),
@@ -365,6 +367,20 @@ void NTupleMaker::beginJob(){
     tree->Branch("primvertex_cov", primvertex_cov, "primvertex_cov[6]/F");
     tree->Branch("primvertex_mindz", &primvertex_mindz, "primvertex_mindz/F");
   }  
+  // refitted primary vertex
+  if(crefittedvertex) {
+    tree->Branch("refitvertex_count", &refitvertex_count, "refitvertex_count/i");
+    tree->Branch("refitvertex_x", refitvertex_x, "refitvertex_x[refitvertex_count]/F");
+    tree->Branch("refitvertex_y", refitvertex_y, "refitvertex_y[refitvertex_count]/F");
+    tree->Branch("refitvertex_z", refitvertex_z, "refitvertex_z[refitvertex_count]/F");
+    tree->Branch("refitvertex_chi2", refitvertex_chi2, "refitvertex_chi2[refitvertex_count]/F");
+    tree->Branch("refitvertex_ndof", refitvertex_ndof, "refitvertex_ndof[refitvertex_count]/F");
+    tree->Branch("refitvertex_ntracks", refitvertex_ntracks, "refitvertex_ntracks[refitvertex_count]/I");
+    tree->Branch("refitvertex_cov", refitvertex_cov, "refitvertex_cov[refitvertex_count][6]/F");
+    tree->Branch("refitvertex_eleIndex", refitvertex_eleIndex, "refitvertex_eleIndex[refitvertex_count][2]/I");
+    tree->Branch("refitvertex_muIndex", refitvertex_muIndex, "refitvertex_muIndex[refitvertex_count][2]/I");
+    tree->Branch("refitvertex_tauIndex", refitvertex_tauIndex, "refitvertex_tauIndex[refitvertex_count][2]/I");
+  }
 
   // muons
   if (crecmuon) {
@@ -1519,6 +1535,7 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   track_count = 0;
   goodprimvertex_count = 0;
   primvertex_count = 0;
+  refitvertex_count = 0;
   muon_count = 0;
   dimuon_count = 0;
   tau_count = 0;
@@ -1759,6 +1776,81 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       // 	}
       // 	if (!goodTaus) return;
       // }  
+    }
+
+  //add refitted vertex with tracks removed from pair of leptons
+  if (crefittedvertex)
+    {
+      edm::Handle<RefitVertexCollection> RFVertex;
+      iEvent.getByToken(RefittedPVToken_, RFVertex);
+      if(RFVertex.isValid()) {
+        for(unsigned i = 0 ; i < RFVertex->size(); i++) {
+
+          //Find pair of leptons
+          const std::vector<std::string> leptonPairNames = (*RFVertex)[i].userCandNames();
+          if(leptonPairNames.size() < 2) continue;
+          int nMu = 0, nEle = 0, nTau = 0;
+          int muon1 = -1, muon2 = -1, ele1 = -1, ele2 = -1, tau1 = -1, tau2 = -1;
+          for(size_t il = 0; il < leptonPairNames.size(); il++){
+            const std::string leptonName = leptonPairNames[il];
+	    edm::Ptr<reco::Candidate> leptonCand = (*RFVertex)[i].userCand(leptonName);
+            if(std::abs(leptonCand->pdgId())==11 ){
+              for(size_t ie = 0; ie < electron_count; ie++){
+                if(TMath::Abs(leptonCand->pt() - electron_pt[ie]) < 0.01 && 
+                   TMath::Abs(leptonCand->eta() - electron_eta[ie]) < 0.001 &&
+                   TMath::Abs(leptonCand->phi() - electron_phi[ie]) < 0.001){
+                  nEle++;
+                  if(nEle == 1)ele1 = ie;
+                  else if(nEle == 2) ele2 = ie;
+                }
+              }
+            }
+            else if(std::abs(leptonCand->pdgId())==13 ){
+              for(size_t im = 0; im < muon_count; im++){
+                if(TMath::Abs(leptonCand->pt() - muon_pt[im]) < 0.01 &&
+                   TMath::Abs(leptonCand->eta() - muon_eta[im]) < 0.001 &&
+                   TMath::Abs(leptonCand->phi() - muon_phi[im]) < 0.001){
+                  nMu++;
+                  if(nMu == 1)muon1 = im;
+                  else if(nMu == 2) muon2 = im;
+                }
+              } 
+            }
+            else { //for tau
+              for(size_t it = 0; it < tau_count; it++){
+                if(TMath::Abs(leptonCand->pt() - tau_pt[it]) < 0.01 &&
+                   TMath::Abs(leptonCand->eta() - tau_eta[it]) < 0.001 &&
+                   TMath::Abs(leptonCand->phi() - tau_phi[it]) < 0.001){
+                  nTau++;
+                  if(nTau == 1)tau1 = it;
+                  else if(nTau == 2) tau2 = it;
+                }
+              }
+            }
+          } //end of lepton pair
+          if((nEle + nMu + nTau) < 2) continue;  //should have a pair of selected leptons
+
+          refitvertex_eleIndex[refitvertex_count][0] = ele1;
+          refitvertex_eleIndex[refitvertex_count][1] = ele2;
+          refitvertex_muIndex[refitvertex_count][0] = muon1;
+          refitvertex_muIndex[refitvertex_count][1] = muon2;
+          refitvertex_tauIndex[refitvertex_count][0] = tau1;
+          refitvertex_tauIndex[refitvertex_count][1] = tau2;
+          refitvertex_x[refitvertex_count] = (*RFVertex)[i].x();
+          refitvertex_y[refitvertex_count] = (*RFVertex)[i].y();
+          refitvertex_z[refitvertex_count] = (*RFVertex)[i].z();
+          refitvertex_chi2[refitvertex_count] = (*RFVertex)[i].chi2();
+          refitvertex_ndof[refitvertex_count] = (*RFVertex)[i].ndof();
+          refitvertex_ntracks[refitvertex_count] = (*RFVertex)[i].tracksSize();
+          refitvertex_cov[refitvertex_count][0] = (*RFVertex)[i].covariance(0,0); // xError()
+          refitvertex_cov[refitvertex_count][1] = (*RFVertex)[i].covariance(0,1);
+          refitvertex_cov[refitvertex_count][2] = (*RFVertex)[i].covariance(0,2);
+          refitvertex_cov[refitvertex_count][3] = (*RFVertex)[i].covariance(1,1); // yError()
+          refitvertex_cov[refitvertex_count][4] = (*RFVertex)[i].covariance(1,2);
+          refitvertex_cov[refitvertex_count][5] = (*RFVertex)[i].covariance(2,2); // zError()
+          refitvertex_count++;
+        }
+      }
     }
 
   if (crectrack) AddPFCand(iEvent, iSetup);
