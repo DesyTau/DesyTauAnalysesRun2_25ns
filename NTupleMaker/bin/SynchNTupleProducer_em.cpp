@@ -395,9 +395,9 @@ int main(int argc, char * argv[]) {
     Float_t         topptweight;
     Float_t         topptweightRun2;
 
-    Float_t         btag0weight;
-    Float_t         btag0weight_Up;
-    Float_t         btag0weight_Down;
+    // Float_t         btag0weight;
+    // Float_t         btag0weight_Up;
+    // Float_t         btag0weight_Down;
     
     Float_t         qcdweight;
     Float_t         qcdweightup;
@@ -675,6 +675,10 @@ int main(int argc, char * argv[]) {
     Int_t           njetingap;
     
     Int_t           nbtag;
+    Int_t           nbtag_mistagUp;
+    Int_t           nbtag_mistagDown;
+    Int_t           nbtag_btagUp;
+    Int_t           nbtag_btagDown;
     Int_t           nbtag_noSF;
     Double_t         bpt;
     Double_t         beta;
@@ -801,9 +805,9 @@ int main(int argc, char * argv[]) {
     tree->Branch("topptweight", &topptweight, "topptweight/F");
     tree->Branch("topptweightRun2", &topptweightRun2, "topptweightRun2/F");
 
-    tree->Branch("btag0weight",&btag0weight,"btag0weight/F");
-    tree->Branch("btag0weight_Up",&btag0weight_Up,"btag0weight_Up/F");
-    tree->Branch("btag0weight_Down",&btag0weight_Down,"btag0weight_Down/F");
+    // tree->Branch("btag0weight",&btag0weight,"btag0weight/F");
+    // tree->Branch("btag0weight_Up",&btag0weight_Up,"btag0weight_Up/F");
+    // tree->Branch("btag0weight_Down",&btag0weight_Down,"btag0weight_Down/F");
     
     tree->Branch("qcdweight", &qcdweight, "qcdweight/F");
     tree->Branch("qcdweightup", &qcdweightup, "qcdweightup/F");
@@ -1112,6 +1116,10 @@ int main(int argc, char * argv[]) {
     tree->Branch("njetingap", &njetingap, "njetingap/I");
     
     tree->Branch("nbtag", &nbtag, "nbtag/I");
+    tree->Branch("nbtag_mistagUp", &nbtag_mistagUp, "nbtag_mistagUp/I");
+    tree->Branch("nbtag_mistagDown", &nbtag_mistagDown, "nbtag_mistagDown/I");
+    tree->Branch("nbtag_btagUp", &nbtag_btagUp, "nbtag_btagUp/I");
+    tree->Branch("nbtag_btagDown", &nbtag_btagDown, "nbtag_btagDown/I");
     tree->Branch("nbtag_noSF", &nbtag_noSF, "nbtag_noSF/I");
     tree->Branch("bpt_1",   &bpt,   "bpt/D");
     tree->Branch("beta_1",  &beta,  "beta/D");
@@ -1326,12 +1334,10 @@ int main(int argc, char * argv[]) {
     
     // BTag scale factors
     BTagCalibration calib("csvv2", cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/CSVv2_Moriond17_B_H.csv");
-    BTagCalibrationReader reader_B(BTagEntry::OP_MEDIUM,"central",{"up","down"});
-    BTagCalibrationReader reader_C(BTagEntry::OP_MEDIUM,"central",{"up","down"});
-    BTagCalibrationReader reader_Light(BTagEntry::OP_MEDIUM,"central",{"up","down"});
-    reader_B.load(calib,BTagEntry::FLAV_B,"comb");
-    reader_C.load(calib,BTagEntry::FLAV_C,"comb");
-    reader_Light.load(calib,BTagEntry::FLAV_UDSG,"incl");
+    BTagCalibrationReader reader_BTAG(BTagEntry::OP_MEDIUM,"central",{"up","down"});
+    reader_BTAG.load(calib,BTagEntry::FLAV_B,"comb");
+    reader_BTAG.load(calib,BTagEntry::FLAV_C,"comb");
+    reader_BTAG.load(calib,BTagEntry::FLAV_UDSG,"incl");
     
     float etaBTAG[2] = {0.5,2.1};
     float ptBTAG[5] = {25.,35.,50.,100.,200.};
@@ -1339,9 +1345,9 @@ int main(int argc, char * argv[]) {
     std::cout << std::endl;
     for (int iEta=0; iEta<2; ++iEta) {
         for (int iPt=0; iPt<5; ++iPt) {
-            float sfB = reader_B.eval_auto_bounds("central",BTagEntry::FLAV_B, etaBTAG[iEta], ptBTAG[iPt]);
-            float sfC = reader_C.eval_auto_bounds("central",BTagEntry::FLAV_C, etaBTAG[iEta], ptBTAG[iPt]);
-            float sfLight = reader_Light.eval_auto_bounds("central",BTagEntry::FLAV_UDSG, etaBTAG[iEta], ptBTAG[iPt]);
+            float sfB = reader_BTAG.eval_auto_bounds("central",BTagEntry::FLAV_B, etaBTAG[iEta], ptBTAG[iPt]);
+            float sfC = reader_BTAG.eval_auto_bounds("central",BTagEntry::FLAV_C, etaBTAG[iEta], ptBTAG[iPt]);
+            float sfLight = reader_BTAG.eval_auto_bounds("central",BTagEntry::FLAV_UDSG, etaBTAG[iEta], ptBTAG[iPt]);
             printf("pT = %3.0f   eta = %3.1f  ->  SFb = %5.3f   SFc = %5.3f   SFl = %5.3f\n",ptBTAG[iPt],etaBTAG[iEta],sfB,sfC,sfLight);
         }
     }
@@ -1434,7 +1440,8 @@ int main(int argc, char * argv[]) {
         Long64_t numberOfEntries = analysisTree.GetEntries();
         
         std::cout << "      number of entries in Tree = " << numberOfEntries << std::endl;
-        
+	// numberOfEntries = 100;
+
         for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) {
             
             analysisTree.GetEntry(iEntry);
@@ -1493,9 +1500,9 @@ int main(int argc, char * argv[]) {
             topptweight = 1;
 	    topptweightRun2 = 1;
 
-	    btag0weight = 1;
-	    btag0weight_Up = 1;
-	    btag0weight_Down = 1;
+	    // btag0weight = 1;
+	    // btag0weight_Up = 1;
+	    // btag0weight_Down = 1;
             qcdweight = 1;
             qcdweightup = 1;
             qcdweightdown = 1;
@@ -2670,6 +2677,10 @@ int main(int argc, char * argv[]) {
             vector<unsigned int> jetsDown; jetsDown.clear();
             vector<unsigned int> jetspt20; jetspt20.clear();
             vector<unsigned int> bjets; bjets.clear();
+            vector<unsigned int> bjets_mistagUp; bjets_mistagUp.clear();
+            vector<unsigned int> bjets_mistagDown; bjets_mistagDown.clear();
+            vector<unsigned int> bjets_btagUp; bjets_btagUp.clear();
+            vector<unsigned int> bjets_btagDown; bjets_btagDown.clear();
             vector<unsigned int> bjets_nocleaned; bjets_nocleaned.clear();
             vector<unsigned int> bjetsRaw; bjetsRaw.clear();
             
@@ -2721,31 +2732,57 @@ int main(int argc, char * argv[]) {
                if (absJetEta<bJetEtaCut) { // jet within b-tagging acceptance
                   
                   bool tagged = analysisTree.pfjet_btag[jet][nBTagDiscriminant]>btagCut; // b-jet
+                  bool tagged_mistagUp = analysisTree.pfjet_btag[jet][nBTagDiscriminant]>btagCut; // b-jet
+                  bool tagged_mistagDown = analysisTree.pfjet_btag[jet][nBTagDiscriminant]>btagCut; // b-jet
+                  bool tagged_btagUp = analysisTree.pfjet_btag[jet][nBTagDiscriminant]>btagCut; // b-jet
+                  bool tagged_btagDown = analysisTree.pfjet_btag[jet][nBTagDiscriminant]>btagCut; // b-jet
                   bool taggedRaw = tagged;
                   
                   if (!isData) {
                      int flavor = abs(analysisTree.pfjet_flavour[jet]);
                      
                      double jet_scalefactor = 1;
+                     double jet_scalefactor_mistagUp = 1;
+                     double jet_scalefactor_mistagDown = 1;
+                     double jet_scalefactor_btagUp = 1;
+                     double jet_scalefactor_btagDown = 1;
                      double JetPtForBTag = jetPt;
                      double tageff = 1;
                      
                      if (flavor==5) {
                         if (JetPtForBTag>MaxBJetPt) JetPtForBTag = MaxBJetPt - 0.1;
                         if (JetPtForBTag<MinBJetPt) JetPtForBTag = MinBJetPt + 0.1;
-                        jet_scalefactor = reader_B.eval_auto_bounds("central",BTagEntry::FLAV_B, absJetEta, JetPtForBTag);
+                        jet_scalefactor = reader_BTAG.eval_auto_bounds("central",BTagEntry::FLAV_B, absJetEta, JetPtForBTag);
+			jet_scalefactor_btagUp   = reader_BTAG.eval_auto_bounds("up" ,BTagEntry::FLAV_B, absJetEta, JetPtForBTag);
+			jet_scalefactor_btagDown = reader_BTAG.eval_auto_bounds("down" ,BTagEntry::FLAV_B, absJetEta, JetPtForBTag);
+			if(tagged){
+			  jet_scalefactor_mistagUp   = reader_BTAG.eval_auto_bounds("up" ,BTagEntry::FLAV_B, absJetEta, JetPtForBTag);
+			  jet_scalefactor_mistagDown = reader_BTAG.eval_auto_bounds("down" ,BTagEntry::FLAV_B, absJetEta, JetPtForBTag);
+			}
                         tageff = tagEff_B->Interpolate(JetPtForBTag,absJetEta);
                      }
                      else if (flavor==4) {
                         if (JetPtForBTag>MaxBJetPt) JetPtForBTag = MaxBJetPt - 0.1;
                         if (JetPtForBTag<MinBJetPt) JetPtForBTag = MinBJetPt + 0.1;
-                        jet_scalefactor = reader_C.eval_auto_bounds("central",BTagEntry::FLAV_C, absJetEta, JetPtForBTag);
+                        jet_scalefactor = reader_BTAG.eval_auto_bounds("central",BTagEntry::FLAV_C, absJetEta, JetPtForBTag);
+			jet_scalefactor_btagUp = reader_BTAG.eval_auto_bounds("up" ,BTagEntry::FLAV_C, absJetEta, JetPtForBTag);
+			jet_scalefactor_btagDown = reader_BTAG.eval_auto_bounds("down" ,BTagEntry::FLAV_C, absJetEta, JetPtForBTag);
+			if(tagged){
+			  jet_scalefactor_mistagUp = reader_BTAG.eval_auto_bounds("up" ,BTagEntry::FLAV_C, absJetEta, JetPtForBTag);
+			  jet_scalefactor_mistagDown = reader_BTAG.eval_auto_bounds("down" ,BTagEntry::FLAV_C, absJetEta, JetPtForBTag);
+			}
                         tageff = tagEff_C->Interpolate(JetPtForBTag,absJetEta);
                      }
                      else {
                         if (JetPtForBTag>MaxLJetPt) JetPtForBTag = MaxLJetPt - 0.1;
                         if (JetPtForBTag<MinLJetPt) JetPtForBTag = MinLJetPt + 0.1;
-                        jet_scalefactor = reader_Light.eval_auto_bounds("central",BTagEntry::FLAV_UDSG, absJetEta, JetPtForBTag);
+			jet_scalefactor = reader_BTAG.eval_auto_bounds("central",BTagEntry::FLAV_UDSG, absJetEta, JetPtForBTag);
+			jet_scalefactor_btagUp = reader_BTAG.eval_auto_bounds("up" ,BTagEntry::FLAV_UDSG, absJetEta, JetPtForBTag);
+			jet_scalefactor_btagDown = reader_BTAG.eval_auto_bounds("down" ,BTagEntry::FLAV_UDSG, absJetEta, JetPtForBTag);
+			if(tagged){
+			  jet_scalefactor_mistagUp = reader_BTAG.eval_auto_bounds("up" ,BTagEntry::FLAV_UDSG, absJetEta, JetPtForBTag);
+			  jet_scalefactor_mistagDown = reader_BTAG.eval_auto_bounds("down" ,BTagEntry::FLAV_UDSG, absJetEta, JetPtForBTag);
+			}
                         tageff = tagEff_Light->Interpolate(JetPtForBTag,absJetEta);
                      }
                      
@@ -2754,24 +2791,42 @@ int main(int argc, char * argv[]) {
                      rand.SetSeed((int)((jetEta+5)*100000));
                      double rannum = rand.Rndm();
                      
-                     if (jet_scalefactor<1 && tagged) { // downgrade
-                        double fraction = 1-jet_scalefactor;
-                        if (rannum<fraction) {
-                           tagged = false;
-                           //		std::cout << "downgrading " << std::endl;
-                        }
+                     if (tagged) { // downgrade
+		       if(jet_scalefactor<1){
+			 double fraction            = 1-jet_scalefactor;
+			 if (rannum<fraction)          tagged = false;
+		       }
+		       if(jet_scalefactor_mistagUp<1){
+			 double fraction_mistagUp     = 1-jet_scalefactor_mistagUp;
+			 if (rannum<fraction_mistagUp)   tagged_mistagUp = false;
+		       }
+		       if(jet_scalefactor_mistagDown<1){
+			 double fraction_mistagDown   = 1-jet_scalefactor_mistagDown;
+			 if (rannum<fraction_mistagDown) tagged_mistagDown = false;
+		       }
+		       tagged_btagUp = tagged;
+		       tagged_btagDown = tagged;
                      }
-                     if (jet_scalefactor>1 && !tagged) { // upgrade
-                        double fraction = (jet_scalefactor-1.0)/(1.0/tageff-1.0);
-                        if (rannum<fraction) {
-                           tagged = true;
-                           //		std::cout << "upgrading " << std::endl;
-                        }
+
+                     if (!tagged) { // upgrade
+		       if(jet_scalefactor>1){
+			 double fraction = (jet_scalefactor-1.0)/(1.0/tageff-1.0);
+			 if (rannum<fraction) tagged = true;
+		       }
+		       if(jet_scalefactor_btagUp>1){
+			 double fraction_btagUp   = (jet_scalefactor_btagUp-1.0)/(1.0/tageff-1.0);
+			 if (rannum<fraction_btagUp)   tagged_btagUp = true;
+		       }
+		       if(jet_scalefactor_btagDown>1){
+			 double fraction_btagDown = (jet_scalefactor_btagDown-1.0)/(1.0/tageff-1.0);
+			 if (jet_scalefactor_btagDown>1 && rannum<fraction_btagDown) tagged_btagDown = true;
+		       }
+		       tagged_mistagUp = tagged;
+		       tagged_mistagDown = tagged;
                      }
                   }
                   
-                  if (taggedRaw)
-                     bjetsRaw.push_back(jet);
+                  if (taggedRaw) bjetsRaw.push_back(jet);
                   
                   if (tagged) {
                      bjets.push_back(jet);
@@ -2780,6 +2835,11 @@ int main(int argc, char * argv[]) {
                         indexLeadingBJet = jet;
                      }
                   }
+
+		  if(tagged_mistagUp)   bjets_mistagUp.push_back(jet);
+		  if(tagged_mistagDown) bjets_mistagDown.push_back(jet);
+		  if(tagged_btagUp)     bjets_btagUp.push_back(jet);
+		  if(tagged_btagDown)   bjets_btagDown.push_back(jet);
                   
                }
 
@@ -2832,13 +2892,17 @@ int main(int argc, char * argv[]) {
             
             njetspt20 = jetspt20.size();
             nbtag = bjets.size();
+            nbtag_mistagUp   = bjets_mistagUp.size();
+            nbtag_mistagDown = bjets_mistagDown.size();
+            nbtag_btagUp   = bjets_btagUp.size();
+            nbtag_btagDown = bjets_btagDown.size();
             nbtag_noSF = bjetsRaw.size();
             
             if (!isData) {
                int nnbtag = nbtag_noSF;
-               btag0weight = 0;
-               btag0weight_Up = 0;
-               btag0weight_Down = 0;
+               // btag0weight = 0;
+               // btag0weight_Up = 0;
+               // btag0weight_Down = 0;
                
                if (nnbtag<=2) {
                   
@@ -2857,9 +2921,9 @@ int main(int argc, char * argv[]) {
                      b2Flav = analysisTree.pfjet_flavour[b2index];
                   }
                   
-                  btag0weight = float(bTagEventWeight(nnbtag,b1Pt,b1Flav,b2Pt,b2Flav,1,0,0));
-                  btag0weight_Up = float(bTagEventWeight(nnbtag,b1Pt,b1Flav,b2Pt,b2Flav,1,1,0));
-                  btag0weight_Down = float(bTagEventWeight(nnbtag,b1Pt,b1Flav,b2Pt,b2Flav,1,-1,0));
+                  // btag0weight = float(bTagEventWeight(nnbtag,b1Pt,b1Flav,b2Pt,b2Flav,1,0,0));
+                  // btag0weight_Up = float(bTagEventWeight(nnbtag,b1Pt,b1Flav,b2Pt,b2Flav,1,1,0));
+                  // btag0weight_Down = float(bTagEventWeight(nnbtag,b1Pt,b1Flav,b2Pt,b2Flav,1,-1,0));
                   
                }
                
@@ -3414,7 +3478,7 @@ int main(int argc, char * argv[]) {
                         std::cout << "sorry -- status of NLL is not valid [" << algo.isValidSolution() << "]" << std::endl;
                     
                     pt_sv  = static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(algo.getHistogramAdapter())->getPt(); 
-                    std::cout<<"pt: "<<pt_sv<<std::endl;
+                    // std::cout<<"pt: "<<pt_sv<<std::endl;
                     eta_sv = static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(algo.getHistogramAdapter())->getEta();
                     phi_sv = static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(algo.getHistogramAdapter())->getPhi();
                     
@@ -3712,10 +3776,10 @@ int main(int argc, char * argv[]) {
 		effweight_jetEDown  = effweight0 * weightEDown * weightMu; 
             
       if (sync) weight = effweight * puweight * 0.979;
-      std::cout<<"effweight: "<<effweight/(idweight_1*idweight_2)<<std::endl;
-      std::cout<<"puweight: "<<puweight<<std::endl;
-      std::cout<<"e tracking: "<<idweight_1<<std::endl;
-      std::cout<<"mu tracking: "<<idweight_2<<std::endl;
+      // std::cout<<"effweight: "<<effweight/(idweight_1*idweight_2)<<std::endl;
+      // std::cout<<"puweight: "<<puweight<<std::endl;
+      // std::cout<<"e tracking: "<<idweight_1<<std::endl;
+      // std::cout<<"mu tracking: "<<idweight_2<<std::endl;
             }
 
 	    // First set the calibrated variables to the uncalibrated versions -> necessary for data
