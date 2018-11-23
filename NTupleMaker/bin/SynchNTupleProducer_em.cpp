@@ -1495,7 +1495,6 @@ int main(int argc, char * argv[]) {
 	    effweight_jetEDown = 1;
             fakeweight = 1;
             embeddedWeight = 1;
-            embeddedWeight = 1;
             signalWeight = 1;
             topptweight = 1;
 	    topptweightRun2 = 1;
@@ -1714,25 +1713,17 @@ int main(int argc, char * argv[]) {
                         lepPx = promptVisTausLV.Px(); lepPy = promptVisTausLV.Py(); lepPz = promptVisTausLV.Pz();
                         mtBoson_gen = mT(promptTausFirstCopy[0],promptTausFirstCopy[1]);
                         
-                        // double gt1_pt  = promptTausFirstCopy[0].Pt();
-                        // double gt1_eta = promptTausFirstCopy[0].Eta();
-                        // double gt2_pt  = promptTausFirstCopy[1].Pt();
-                        // double gt2_eta = promptTausFirstCopy[1].Eta();
-                        // correctionWS_embedded->var("gt_pt")->setVal(gt1_pt);
-                        // correctionWS_embedded->var("gt_eta")->setVal(gt1_eta);
-                        // // TO DO: UPDATE
-                        // double id1_embed = correctionWS_embedded->function("m_sel_idEmb_ratio")->getVal();
-                        // correctionWS_embedded->var("gt_pt")->setVal(gt2_pt);
-                        // correctionWS_embedded->var("gt_eta")->setVal(gt2_eta);
-                        // double id2_embed = correctionWS_embedded->function("m_sel_idEmb_ratio")->getVal();
-                        // correctionWS_embedded->var("gt1_pt")->setVal(gt1_pt);
-                        // correctionWS_embedded->var("gt1_eta")->setVal(gt1_eta);
-                        // correctionWS_embedded->var("gt2_pt")->setVal(gt2_pt);
-                        // correctionWS_embedded->var("gt2_eta")->setVal(gt2_eta);
-                        // double trg_embed = correctionWS_embedded->function("m_sel_trg_ratio")->getVal();
-                        // embeddedWeight = id1_embed * id2_embed * trg_embed;
-                        // std::cout<<"Hallo 2"<<std::endl;
-                        // std::cout<<embeddedWeight<<std::endl;
+                        double gt1_pt  = promptTausFirstCopy[0].Pt();
+                        double gt1_eta = promptTausFirstCopy[0].Eta();
+                        double gt2_pt  = promptTausFirstCopy[1].Pt();
+                        double gt2_eta = promptTausFirstCopy[1].Eta();
+                        correctionWS_embedded->var("gt1_pt")->setVal(gt1_pt);
+                        correctionWS_embedded->var("gt1_eta")->setVal(gt1_eta);
+                        correctionWS_embedded->var("gt2_pt")->setVal(gt2_pt);
+                        correctionWS_embedded->var("gt2_eta")->setVal(gt2_eta);
+                        double trg_embed = correctionWS_embedded->function("m_sel_trg_ratio")->getVal();
+                        embeddedWeight = trg_embed;
+                        
                     }
                     else if (promptMuons.size()==2) {
                         isZTT = false; isZMM = true; isZEE = false;
@@ -2480,16 +2471,16 @@ int main(int argc, char * argv[]) {
             
             if (!isData || isEmbedded) {
            
-               correctionWS->var("e_pt")->setVal(pt_1);
-               correctionWS->var("e_eta")->setVal(eta_1);
-               correctionWS->var("e_iso")->setVal(iso_1);
-               correctionWS->var("m_pt")->setVal(pt_2);
-               correctionWS->var("m_eta")->setVal(eta_2);
-               correctionWS->var("m_iso")->setVal(iso_2);
+               correctionWS_embedded->var("e_pt")->setVal(pt_1);
+               correctionWS_embedded->var("e_eta")->setVal(eta_1);
+               correctionWS_embedded->var("e_iso")->setVal(iso_1);
+               correctionWS_embedded->var("m_pt")->setVal(pt_2);
+               correctionWS_embedded->var("m_eta")->setVal(eta_2);
+               correctionWS_embedded->var("m_iso")->setVal(iso_2);
                 // scale factors
                if (isEmbedded) {
-                  isoweight_1 = correctionWS->function("e_looseiso_ratio")->getVal() * correctionWS->function("e_id_ratio")->getVal();
-                  isoweight_2 = correctionWS->function("m_looseiso_ratio")->getVal() * correctionWS->function("m_id_ratio")->getVal();
+                  isoweight_1 = correctionWS_embedded->function("e_looseiso_ratio")->getVal() * correctionWS_embedded->function("e_id_ratio")->getVal();
+                  isoweight_2 = correctionWS_embedded->function("m_looseiso_ratio")->getVal() * correctionWS_embedded->function("m_id_ratio")->getVal();
                }
                else {
                   isoweight_1 = (float)SF_electronIdIso->get_ScaleFactor(double(pt_1),double(eta_1));
@@ -2534,14 +2525,19 @@ int main(int argc, char * argv[]) {
                 Mu23EffData = (float)SF_muon23->get_EfficiencyData(double(pt_2),double(eta_2));
                 Mu8EffData = (float)SF_muon8->get_EfficiencyData(double(pt_2),double(eta_2));
               
+                correctionWS_embedded_trigger->var("e_pt")->setVal(pt_1);
+                correctionWS_embedded_trigger->var("e_eta")->setVal(eta_1);
+                correctionWS_embedded_trigger->var("m_pt")->setVal(pt_2);
+                correctionWS_embedded_trigger->var("m_eta")->setVal(eta_2);
+                
                 if (isEmbedded){
-                   Ele23EffData = correctionWS->function("e_trg23_binned_ic_data")->getVal();
-                   Ele12EffData = correctionWS->function("e_trg12_binned_ic_data")->getVal(); 
-                   Mu23EffData  = correctionWS->function("m_trg23_binned_ic_data")->getVal();
-                   Mu8EffData   = correctionWS->function("m_trg8_binned_ic_data")->getVal();
+                   Ele23EffData = correctionWS_embedded_trigger->function("e_trg23_binned_ic_data")->getVal();
+                   Ele12EffData = correctionWS_embedded_trigger->function("e_trg12_binned_ic_data")->getVal(); 
+                   Mu23EffData  = correctionWS_embedded_trigger->function("m_trg23_binned_ic_data")->getVal();
+                   Mu8EffData   = correctionWS_embedded_trigger->function("m_trg8_binned_ic_data")->getVal();
                 }
                 float trigWeightData = Mu23EffData*Ele12EffData + Mu8EffData*Ele23EffData - Mu23EffData*Ele23EffData;
-
+                
                 if (applyTriggerMatch && !isData) {
                    if (!isEmbedded){
                       Ele23EffMC   = (float)SF_electron23->get_EfficiencyMC(double(pt_1),double(eta_1));
@@ -2550,12 +2546,13 @@ int main(int argc, char * argv[]) {
                       Mu8EffMC   = (float)SF_muon8->get_EfficiencyMC(double(pt_2),double(eta_2));
                    }
                    else {
-                      Ele23EffData = correctionWS->function("e_trg23_binned_ic_embed")->getVal();
-                      Ele12EffData = correctionWS->function("e_trg12_binned_ic_embed")->getVal(); 
-                      Mu23EffData  = correctionWS->function("m_trg23_binned_ic_embed")->getVal();
-                      Mu8EffData   = correctionWS->function("m_trg8_binned_ic_embed")->getVal();
+                      Ele23EffMC = correctionWS_embedded_trigger->function("e_trg23_binned_ic_embed")->getVal();
+                      Ele12EffMC = correctionWS_embedded_trigger->function("e_trg12_binned_ic_embed")->getVal(); 
+                      Mu23EffMC  = correctionWS_embedded_trigger->function("m_trg23_binned_ic_embed")->getVal();
+                      Mu8EffMC   = correctionWS_embedded_trigger->function("m_trg8_binned_ic_embed")->getVal();
                    }
                    float trigWeightMC   = Mu23EffMC*Ele12EffMC     + Mu8EffMC*Ele23EffMC     - Mu23EffMC*Ele23EffMC;
+           
                    // TO DO: SET ALSO FOR EMBEDDED SAMPLES
                     // if (isMuon23matched && isElectron12matched) {
                     //    if (!isEmbedded){
