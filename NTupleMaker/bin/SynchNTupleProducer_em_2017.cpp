@@ -2033,8 +2033,7 @@ int main(int argc, char * argv[]) {
           lumi = int(analysisTree.event_luminosityblock);
           evt = int(analysisTree.event_nr);
           
-          if (evt!=603113147 && evt!=604255562 && evt!=606283081) continue;
-          std::cout<<"Event ist : "<<evt<<std::endl;
+          
 	  // embedded weight
 
           if (debug) std::cout<<"check good run selection"<<std::endl;
