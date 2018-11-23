@@ -109,7 +109,7 @@ ClassicSVfit SVFitMassComputation(classic_svFit::MeasuredTauLepton svFitEle,
     measuredTauLeptons.push_back(svFitEle);
     measuredTauLeptons.push_back(svFitMu);
     
-    int verbosity = 1;
+    int verbosity = 0;
     ClassicSVfit svFitAlgo(verbosity);
     double kappa = 3.; // use 3 for emu, 4 for etau and mutau, 5 for tautau channel
     svFitAlgo.addLogM_fixed(true, kappa);
@@ -815,7 +815,7 @@ int main(int argc, char * argv[]) {
     Float_t weightPDFdown;
     
     Bool_t veto_embedded;
-
+   
     tree->Branch("run", &run, "run/I");                                  // I=int, F=Float, O=bool
     tree->Branch("lumi", &lumi, "lumi/I");
     tree->Branch("evt", &evt, "evt/I");
@@ -1480,7 +1480,7 @@ int main(int argc, char * argv[]) {
     int nFiles = 0;
         
     for (int iF=0; iF<nTotalFiles; ++iF) { // loop over input file names
-        
+    //for (int iF=0; iF<2; ++iF) {     
        std::string filen;
        fileList >> filen;
        
@@ -1523,7 +1523,7 @@ int main(int argc, char * argv[]) {
        std::cout << "      number of entries in Tree = " << numberOfEntries << std::endl;
        
        for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) {
-          
+          // for (Long64_t iEntry=0; iEntry<10000; iEntry++) {  
           analysisTree.GetEntry(iEntry);                //store maxRun and minRun
           nEvents++;
           if (analysisTree.event_run>maxRun)
@@ -2032,7 +2032,9 @@ int main(int argc, char * argv[]) {
           run = int(analysisTree.event_run);
           lumi = int(analysisTree.event_luminosityblock);
           evt = int(analysisTree.event_nr);
-
+          
+          if (evt!=603113147 && evt!=604255562 && evt!=606283081) continue;
+          std::cout<<"Event ist : "<<evt<<std::endl;
 	  // embedded weight
 
           if (debug) std::cout<<"check good run selection"<<std::endl;
@@ -2175,8 +2177,7 @@ int main(int argc, char * argv[]) {
                if (discr == BTagDiscriminator2)
                   nBTagDiscriminant2 = iBTag;
             }
-            std::cout<<"nBTagDiscriminant1 " <<nBTagDiscriminant1<<"nBTagDiscriminant2 " <<nBTagDiscriminant2<<std::endl;
-
+          
             //std::cout<<"before met filters"<<std::endl; 
             // MET Filters //store if event passes the met filters
             metFilters_ = metFiltersPasses(analysisTree,metFlags);
@@ -2649,7 +2650,7 @@ int main(int argc, char * argv[]) {
                // scale factors
                if (applyWSCorr) {
                   if (isEmbedded) {
-                     isoweight_1 = correctionWS->function("e_idiso_binned_embed_ratio")->getVal();
+                     isoweight_1 = correctionWS->function("e_id_embed_ratio")->getVal() * correctionWS->function("e_iso_binned_embed_ratio")->getVal();
                      isoweight_2 = correctionWS->function("m_looseiso_binned_embed_ratio")->getVal() * correctionWS->function("m_id_embed_ratio")->getVal();
                   }
                   else {
@@ -2885,9 +2886,6 @@ int main(int argc, char * argv[]) {
                 if (absJetEta<bJetEtaCut) { // jet within b-tagging acceptance
                    
                    bool tagged = analysisTree.pfjet_btag[jet][nBTagDiscriminant1] + analysisTree.pfjet_btag[jet][nBTagDiscriminant2] >btagCut; // b-jet
-                   std::cout<<"tagged jet: "<<tagged<<std::endl;
-                   std::cout<<"tagged jet 1: "<< analysisTree.pfjet_btag[jet][nBTagDiscriminant1]<<std::endl;
-                   std::cout<<"tagged jet 2: "<< analysisTree.pfjet_btag[jet][nBTagDiscriminant2]<<std::endl;
                    bool taggedRaw = tagged;
                    
                    if (!isData) {
@@ -3240,7 +3238,11 @@ int main(int argc, char * argv[]) {
             // qcdweight_nodzeta     = qcdWeightNoDzeta.getWeight(pt_1,pt_2,dr_tt);
             // qcdweightup_nodzeta   = qcdWeightNoDzeta.getWeight(pt_1,pt_2,dr_tt);
             // qcdweightdown_nodzeta = qcdWeightNoDzeta.getWeight(pt_1,pt_2,dr_tt);
-            
+            std::cout<<"qcdweight: "<<qcdweight<<std::endl;
+            std::cout<<"pt_1: "<<pt_1<<std::endl;
+            std::cout<<"pt_2: "<<pt_2<<std::endl;
+            std::cout<<"njets: "<<njets<<std::endl;
+            std::cout<<"dr_tt: "<<dr_tt<<std::endl;
             // METs
             float met_x = analysisTree.pfmetcorr_ex;
             float met_y = analysisTree.pfmetcorr_ey;
