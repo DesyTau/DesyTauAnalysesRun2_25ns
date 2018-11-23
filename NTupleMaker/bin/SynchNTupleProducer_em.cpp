@@ -133,7 +133,7 @@ ClassicSVfit SVFitMassComputation(classic_svFit::MeasuredTauLepton svFitEle,
     measuredTauLeptons.push_back(svFitEle);
     measuredTauLeptons.push_back(svFitMu);
     
-    int verbosity = 1;
+    int verbosity = 0;
     ClassicSVfit svFitAlgo(verbosity);
     double kappa = 3.; // use 3 for emu, 4 for etau and mutau, 5 for tautau channel
     svFitAlgo.addLogM_fixed(true, kappa);
@@ -194,6 +194,7 @@ int main(int argc, char * argv[]) {
     const bool isDY   = cfg.get<bool>("IsDY");
     const bool isW    = cfg.get<bool>("IsW");
     const bool isTOP    = cfg.get<bool>("IsTOP");
+    const bool isEmbedded = cfg.get<bool>("IsEmbedded");
     const bool applyGoodRunSelection = cfg.get<bool>("ApplyGoodRunSelection");
     const string jsonFile = cfg.get<string>("jsonFile");
     const bool applySimpleRecoilCorrections = cfg.get<bool>("ApplySimpleRecoilCorrections");
@@ -310,6 +311,9 @@ int main(int argc, char * argv[]) {
     TString PileUpDataFile(pileUpDataFile);
     TString PileUpMCFile(pileUpMCFile);
     
+    const string correctionWSFile_embedded = cfg.get<string>("CorrectionWSFile_embedded");
+    const string correctionWSFile_embedded_trigger = cfg.get<string>("CorrectionWSFile_trigger");
+
     // **** end of configuration
 
     const float a_jetMu = 0.902;
@@ -750,6 +754,8 @@ int main(int argc, char * argv[]) {
     Float_t dZ_1_cal;
     Float_t dZ_2_cal;
 
+    Bool_t veto_embedded;
+
     tree->Branch("run", &run, "run/I");
     tree->Branch("lumi", &lumi, "lumi/I");
     tree->Branch("evt", &evt, "evt/I");
@@ -761,7 +767,8 @@ int main(int argc, char * argv[]) {
     tree->Branch("isZEE",&isZEE,"isZEE/O");
     tree->Branch("isZMM",&isZMM,"isZMM/O");
     tree->Branch("isZTT",&isZTT,"isZTT/O");
-    
+    tree->Branch("veto_embedded",&veto_embedded,"veto_embedded/O");
+     
     tree->Branch("weightScale1",&weightScale1,"weightScale1/F");
     tree->Branch("weightScale2",&weightScale2,"weightScale2/F");
     tree->Branch("weightScale3",&weightScale3,"weightScale3/F");
@@ -1248,13 +1255,14 @@ int main(int argc, char * argv[]) {
     
     // PU reweighting
     PileUp * PUofficial = new PileUp();
-    TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/"+PileUpDataFile,"read");
-    TFile * filePUdistribution_MC = new TFile (TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/"+PileUpMCFile, "read");
-    TH1D * PU_data = (TH1D *)filePUdistribution_data->Get("pileup");
-    TH1D * PU_mc = (TH1D *)filePUdistribution_MC->Get("pileup");
-    PUofficial->set_h_data(PU_data);
-    PUofficial->set_h_MC(PU_mc);
-    
+    if (!isData && !isEmbedded){
+       TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/"+PileUpDataFile,"read");
+       TFile * filePUdistribution_MC = new TFile (TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/"+PileUpMCFile, "read");
+       TH1D * PU_data = (TH1D *)filePUdistribution_data->Get("pileup");
+       TH1D * PU_mc = (TH1D *)filePUdistribution_MC->Get("pileup");
+       PUofficial->set_h_data(PU_data);
+       PUofficial->set_h_MC(PU_mc);
+    }
     // Lepton Scale Factors
     ScaleFactor * SF_muonIdIso = new ScaleFactor();
     SF_muonIdIso->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(MuonIdIsoFile));
@@ -1369,6 +1377,17 @@ int main(int argc, char * argv[]) {
     RooWorkspace *correctionWS = (RooWorkspace*)correctionWorkSpaceFile->Get("w");
     //  exit(-1);
 
+    // correction WS
+    TString correctionsWorkspaceFileName_embedded = TString(cmsswBase)+"/src/"+correctionWSFile_embedded;
+    TFile * correctionWorkSpaceFile_embedded  = new TFile(correctionsWorkspaceFileName_embedded);
+    RooWorkspace *correctionWS_embedded  = (RooWorkspace*)correctionWorkSpaceFile_embedded->Get("w");
+
+    TString correctionsWorkspaceFileName_embedded_trigger = TString(cmsswBase)+"/src/"+correctionWSFile_embedded_trigger;
+    TFile * correctionWorkSpaceFile_embedded_trigger  = new TFile(correctionsWorkspaceFileName_embedded_trigger);
+    RooWorkspace *correctionWS_embedded_trigger  = (RooWorkspace*)correctionWorkSpaceFile_embedded_trigger->Get("w");
+
+
+
     int nEvents = 0;
     int selEvents = 0;
     int nFiles = 0;
@@ -1433,7 +1452,7 @@ int main(int argc, char * argv[]) {
             isZEE = false;
             isZMM = false;
             isZTT = false;
-            
+            veto_embedded = false;
             //      bool isPrompMuPlus = false;
             //      bool isPrompMuMinus = false;
             //      bool isPrompElePlus = false;
@@ -1468,6 +1487,7 @@ int main(int argc, char * argv[]) {
 	    effweight_jetEUp = 1;
 	    effweight_jetEDown = 1;
             fakeweight = 1;
+            embeddedWeight = 1;
             embeddedWeight = 1;
             signalWeight = 1;
             topptweight = 1;
@@ -1677,8 +1697,8 @@ int main(int argc, char * argv[]) {
                     if (removeGammaStar) continue;
                 }
                 
-                if (isDY) {
-                    
+                if (isDY||isEmbedded) {
+                   
                     if (promptTausFirstCopy.size()==2) {
                         isZTT = true; isZMM = false; isZEE = false;
                         bosonPx = promptTausLV.Px(); bosonPy = promptTausLV.Py(); bosonPz = promptTausLV.Pz();
@@ -1686,6 +1706,26 @@ int main(int argc, char * argv[]) {
                         bosonEta  = promptTausLV.Eta();
                         lepPx = promptVisTausLV.Px(); lepPy = promptVisTausLV.Py(); lepPz = promptVisTausLV.Pz();
                         mtBoson_gen = mT(promptTausFirstCopy[0],promptTausFirstCopy[1]);
+                        
+                        // double gt1_pt  = promptTausFirstCopy[0].Pt();
+                        // double gt1_eta = promptTausFirstCopy[0].Eta();
+                        // double gt2_pt  = promptTausFirstCopy[1].Pt();
+                        // double gt2_eta = promptTausFirstCopy[1].Eta();
+                        // correctionWS_embedded->var("gt_pt")->setVal(gt1_pt);
+                        // correctionWS_embedded->var("gt_eta")->setVal(gt1_eta);
+                        // // TO DO: UPDATE
+                        // double id1_embed = correctionWS_embedded->function("m_sel_idEmb_ratio")->getVal();
+                        // correctionWS_embedded->var("gt_pt")->setVal(gt2_pt);
+                        // correctionWS_embedded->var("gt_eta")->setVal(gt2_eta);
+                        // double id2_embed = correctionWS_embedded->function("m_sel_idEmb_ratio")->getVal();
+                        // correctionWS_embedded->var("gt1_pt")->setVal(gt1_pt);
+                        // correctionWS_embedded->var("gt1_eta")->setVal(gt1_eta);
+                        // correctionWS_embedded->var("gt2_pt")->setVal(gt2_pt);
+                        // correctionWS_embedded->var("gt2_eta")->setVal(gt2_eta);
+                        // double trg_embed = correctionWS_embedded->function("m_sel_trg_ratio")->getVal();
+                        // embeddedWeight = id1_embed * id2_embed * trg_embed;
+                        // std::cout<<"Hallo 2"<<std::endl;
+                        // std::cout<<embeddedWeight<<std::endl;
                     }
                     else if (promptMuons.size()==2) {
                         isZTT = false; isZMM = true; isZEE = false;
@@ -1914,7 +1954,7 @@ int main(int argc, char * argv[]) {
             
             npartons = analysisTree.genparticles_noutgoing;
             
-            if (!isData) {
+            if (!isData && !isEmbedded) {
                 puweight = float(PUofficial->get_PUweight(double(analysisTree.numtruepileupinteractions)));
                 //      cout << "puweight = " << puweight << endl;
                 if (topPt>0&&antitopPt>0) {
@@ -2430,12 +2470,24 @@ int main(int argc, char * argv[]) {
             trigweight = 1;
             effweight = 1;
             
-            if (!isData) {
-                
+            
+            if (!isData || isEmbedded) {
+           
+               correctionWS->var("e_pt")->setVal(pt_1);
+               correctionWS->var("e_eta")->setVal(eta_1);
+               correctionWS->var("e_iso")->setVal(iso_1);
+               correctionWS->var("m_pt")->setVal(pt_2);
+               correctionWS->var("m_eta")->setVal(eta_2);
+               correctionWS->var("m_iso")->setVal(iso_2);
                 // scale factors
-                isoweight_1 = (float)SF_electronIdIso->get_ScaleFactor(double(pt_1),double(eta_1));
-                isoweight_2 = (float)SF_muonIdIso->get_ScaleFactor(double(pt_2),double(eta_2));
-                
+               if (isEmbedded) {
+                  isoweight_1 = correctionWS->function("e_looseiso_ratio")->getVal() * correctionWS->function("e_id_ratio")->getVal();
+                  isoweight_2 = correctionWS->function("m_looseiso_ratio")->getVal() * correctionWS->function("m_id_ratio")->getVal();
+               }
+               else {
+                  isoweight_1 = (float)SF_electronIdIso->get_ScaleFactor(double(pt_1),double(eta_1));
+                  isoweight_2 = (float)SF_muonIdIso->get_ScaleFactor(double(pt_2),double(eta_2));
+               }
 		
                 //float eta1_sf = eta_1;
                 //if (eta1_sf<-2.5) eta1_sf = -2.49;
@@ -2460,42 +2512,70 @@ int main(int argc, char * argv[]) {
                 //		cout << "isoweight_1 = " << isoweight_1
                 //		     << "isoweight_2 = " << isoweight_2 << endl;
                 
-                float Ele23EffData = (float)SF_electron23->get_EfficiencyData(double(pt_1),double(eta_1));
-                float Ele12EffData = (float)SF_electron12->get_EfficiencyData(double(pt_1),double(eta_1));
-                float Mu23EffData = (float)SF_muon23->get_EfficiencyData(double(pt_2),double(eta_2));
-                float Mu8EffData = (float)SF_muon8->get_EfficiencyData(double(pt_2),double(eta_2));
-                float trigWeightData = Mu23EffData*Ele12EffData + Mu8EffData*Ele23EffData - Mu23EffData*Ele23EffData;
+                float Ele23EffData = 1;
+                float Ele12EffData = 1;
+                float Mu23EffData = 1;
+                float Mu8EffData = 1;
                 
+                float Ele23EffMC = 1;
+                float Ele12EffMC = 1;
+                float Mu23EffMC = 1;
+                float Mu8EffMC = 1;
+                
+                Ele23EffData = (float)SF_electron23->get_EfficiencyData(double(pt_1),double(eta_1));
+                Ele12EffData = (float)SF_electron12->get_EfficiencyData(double(pt_1),double(eta_1));
+                Mu23EffData = (float)SF_muon23->get_EfficiencyData(double(pt_2),double(eta_2));
+                Mu8EffData = (float)SF_muon8->get_EfficiencyData(double(pt_2),double(eta_2));
+              
+                if (isEmbedded){
+                   Ele23EffData = correctionWS->function("e_trg23_binned_ic_data")->getVal();
+                   Ele12EffData = correctionWS->function("e_trg12_binned_ic_data")->getVal(); 
+                   Mu23EffData  = correctionWS->function("m_trg23_binned_ic_data")->getVal();
+                   Mu8EffData   = correctionWS->function("m_trg8_binned_ic_data")->getVal();
+                }
+                float trigWeightData = Mu23EffData*Ele12EffData + Mu8EffData*Ele23EffData - Mu23EffData*Ele23EffData;
+
                 if (applyTriggerMatch && !isData) {
-                   float Ele23EffMC   = (float)SF_electron23->get_EfficiencyMC(double(pt_1),double(eta_1));
-                   float Ele12EffMC   = (float)SF_electron12->get_EfficiencyMC(double(pt_1),double(eta_1));
-                   float Mu23EffMC   = (float)SF_muon23->get_EfficiencyMC(double(pt_2),double(eta_2));
-                   float Mu8EffMC   = (float)SF_muon8->get_EfficiencyMC(double(pt_2),double(eta_2));
+                   if (!isEmbedded){
+                      Ele23EffMC   = (float)SF_electron23->get_EfficiencyMC(double(pt_1),double(eta_1));
+                      Ele12EffMC   = (float)SF_electron12->get_EfficiencyMC(double(pt_1),double(eta_1));
+                      Mu23EffMC   = (float)SF_muon23->get_EfficiencyMC(double(pt_2),double(eta_2));
+                      Mu8EffMC   = (float)SF_muon8->get_EfficiencyMC(double(pt_2),double(eta_2));
+                   }
+                   else {
+                      Ele23EffData = correctionWS->function("e_trg23_binned_ic_embed")->getVal();
+                      Ele12EffData = correctionWS->function("e_trg12_binned_ic_embed")->getVal(); 
+                      Mu23EffData  = correctionWS->function("m_trg23_binned_ic_embed")->getVal();
+                      Mu8EffData   = correctionWS->function("m_trg8_binned_ic_embed")->getVal();
+                   }
                    float trigWeightMC   = Mu23EffMC*Ele12EffMC     + Mu8EffMC*Ele23EffMC     - Mu23EffMC*Ele23EffMC;
-                    
-                    if (isMuon23matched && isElectron12matched) {
-                        trigweight_1 = (float)SF_electron12->get_ScaleFactor(double(pt_1),double(eta_1));
-                        trigweight_2 = (float)SF_muon23->get_ScaleFactor(double(pt_2),double(eta_2));
-                    }
-                    else if (isMuon8matched && isElectron23matched) {
-                        trigweight_1 = (float)SF_electron23->get_ScaleFactor(double(pt_1),double(eta_1));
-                        trigweight_2 = (float)SF_muon8->get_ScaleFactor(double(pt_2),double(eta_2));
-                    }
-                    
+                   // TO DO: SET ALSO FOR EMBEDDED SAMPLES
+                    // if (isMuon23matched && isElectron12matched) {
+                    //    if (!isEmbedded){
+                    //       trigweight_1 = (float)SF_electron12->get_ScaleFactor(double(pt_1),double(eta_1));
+                    //       trigweight_2 = (float)SF_muon23->get_ScaleFactor(double(pt_2),double(eta_2));
+                    //    }
+                    // }
+                    // else if (isMuon8matched && isElectron23matched) {
+                    //    if (!isEmbedded){
+                    //       trigweight_1 = (float)SF_electron23->get_ScaleFactor(double(pt_1),double(eta_1));
+                    //       trigweight_2 = (float)SF_muon8->get_ScaleFactor(double(pt_2),double(eta_2));
+                    //    }     
+                    // }
                     if (trigWeightMC>1e-6)
                         trigweight = trigWeightData / trigWeightMC;
                     
                 }
                 else {
                     trigweight = trigWeightData;
-                    if (isMuon23matched && isElectron12matched) {
-                        trigweight_1 = (float)SF_electron12->get_EfficiencyData(double(pt_1),double(eta_1));
-                        trigweight_2 = (float)SF_muon23->get_EfficiencyData(double(pt_2),double(eta_2));
-                    }
-                    else if (isMuon8matched && isElectron23matched) {
-                        trigweight_1 = (float)SF_electron23->get_EfficiencyData(double(pt_1),double(eta_1));
-                        trigweight_2 = (float)SF_muon8->get_EfficiencyData(double(pt_2),double(eta_2));
-                    }
+                    // if (isMuon23matched && isElectron12matched) {
+                    //     trigweight_1 = (float)SF_electron12->get_EfficiencyData(double(pt_1),double(eta_1));
+                    //     trigweight_2 = (float)SF_muon23->get_EfficiencyData(double(pt_2),double(eta_2));
+                    // }
+                    // else if (isMuon8matched && isElectron23matched) {
+                    //     trigweight_1 = (float)SF_electron23->get_EfficiencyData(double(pt_1),double(eta_1));
+                    //     trigweight_2 = (float)SF_muon8->get_EfficiencyData(double(pt_2),double(eta_2));
+                    // }
                 }
                 
                 effweight = trigweight;
@@ -2565,8 +2645,11 @@ int main(int argc, char * argv[]) {
             // qcd scale factor
             // no dzeta cut
             qcdweight     = qcdWeight.getWeight(pt_1,pt_2,dr_tt);
+            //std::cout<<"qcdweight "<<qcdweight<<std::endl;
             qcdweightup   = qcdWeight.getWeight(pt_1,pt_2,dr_tt);
+            //std::cout<<"qcdweight Up"<<qcdweight<<std::endl;
             qcdweightdown = qcdWeight.getWeight(pt_1,pt_2,dr_tt);
+            //std::cout<<"qcdweight down"<<qcdweight<<std::endl;
             // dzeta cut
             qcdweight_nodzeta     = qcdWeightNoDzeta.getWeight(pt_1,pt_2,dr_tt);
             qcdweightup_nodzeta   = qcdWeightNoDzeta.getWeight(pt_1,pt_2,dr_tt);
@@ -3555,6 +3638,7 @@ int main(int argc, char * argv[]) {
                     isZTT = false;
                     isZLL = true;
                 }
+                if (gen_match_1 == 3 && gen_match_2 ==4) veto_embedded = true;
     
 		double weightE = 1;
 		double weightEUp = 1;
