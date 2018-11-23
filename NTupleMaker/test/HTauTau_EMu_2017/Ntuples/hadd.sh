@@ -14,3 +14,5 @@ do
     fi
 done
 
+hadd -f MuonEG.root MuonEG_Run2017CtoF.root MuonEG_Run2017B.root
+
