@@ -541,6 +541,11 @@ int main(int argc, char * argv[]) {
     Float_t         metcov01;
     Float_t         metcov10;
     Float_t         metcov11;
+
+    Float_t         met_recoilscaleUp;
+    Float_t         met_recoilscaleDown;
+    Float_t         met_recoilresoUp;
+    Float_t         met_recoilresoDown;
     
     Float_t         met_uncorr;
     Float_t         metphi_uncorr;
@@ -987,6 +992,11 @@ int main(int argc, char * argv[]) {
     tree->Branch("metcov01", &metcov01, "metcov01/F");
     tree->Branch("metcov10", &metcov10, "metcov10/F");
     tree->Branch("metcov11", &metcov11, "metcov11/F");
+
+    tree->Branch("met_recoilscaleUp", &met_recoilscaleUp, "met_recoilscaleUp/F");
+    tree->Branch("met_recoilscaleDown", &met_recoilscaleDown, "met_recoilscaleDown/F");
+    tree->Branch("met_recoilresoUp", &met_recoilresoUp, "met_recoilresoUp/F");
+    tree->Branch("met_recoilresoDown", &met_recoilresoDown, "met_recoilresoDown/F");
     
     tree->Branch("met_uncorr", &met_uncorr, "met_uncorr/F");
     tree->Branch("metphi_uncorr", &metphi_uncorr, "metphi_uncorr/F");
@@ -3130,6 +3140,15 @@ int main(int argc, char * argv[]) {
             // METs
             float met_x = analysisTree.pfmetcorr_ex;
             float met_y = analysisTree.pfmetcorr_ey;
+            float met_x_recoilscaleUp = analysisTree.pfmetcorr_ex;
+            float met_x_recoilscaleDown = analysisTree.pfmetcorr_ex;
+            float met_y_recoilscaleUp = analysisTree.pfmetcorr_ey;
+            float met_y_recoilscaleDown = analysisTree.pfmetcorr_ey;
+            float met_x_recoilresoUp = analysisTree.pfmetcorr_ex;
+            float met_x_recoilresoDown = analysisTree.pfmetcorr_ex;
+            float met_y_recoilresoUp = analysisTree.pfmetcorr_ey;
+            float met_y_recoilresoDown = analysisTree.pfmetcorr_ey;
+
 	    //            if (!isData) {
 	    //                met_x = analysisTree.pfmet_ex;
 	    //                met_y = analysisTree.pfmet_ey;
@@ -3233,31 +3252,29 @@ int main(int argc, char * argv[]) {
             
             if ((isW||isDY)&&!isData) {
                 if (applySimpleRecoilCorrections) {
-		  //                    recoilMvaMetCorrector.CorrectByMeanResolution(mvamet_x,mvamet_y,bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,mvamet_corr_x,mvamet_corr_y);
                     recoilMetCorrector.CorrectByMeanResolution(met_x,met_y,bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,pfmet_corr_x,pfmet_corr_y);
-                    recoilMetCorrector.CorrectByMeanResolution(metcorr_jesUp_x,  metcorr_jesUp_y,  bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,met_jesUp_x,  met_jesUp_y);
-                    recoilMetCorrector.CorrectByMeanResolution(metcorr_jesDown_x,metcorr_jesDown_y,bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,met_jesDown_x,met_jesDown_y);
-                    recoilMetCorrector.CorrectByMeanResolution(metcorr_unclMetUp_x,   metcorr_unclMetUp_y,   bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,met_unclMetUp_x,   met_unclMetUp_y);
-                    recoilMetCorrector.CorrectByMeanResolution(metcorr_unclMetDown_x, metcorr_unclMetDown_y, bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,met_unclMetDown_x, met_unclMetDown_y);
-
+		    metSys.ApplyMEtSys(pfmet_corr_x, pfmet_corr_y, bosonPx, bosonPy, lepPx, lepPy, njetsforrecoil, MEtSys::ProcessType::BOSON, MEtSys::SysType::Response, MEtSys::SysShift::Up, met_x_recoilscaleUp, met_y_recoilscaleUp);
+		    metSys.ApplyMEtSys(pfmet_corr_x, pfmet_corr_y, bosonPx, bosonPy, lepPx, lepPy, njetsforrecoil, MEtSys::ProcessType::BOSON, MEtSys::SysType::Response, MEtSys::SysShift::Down, met_x_recoilscaleDown, met_y_recoilscaleDown);
+		    metSys.ApplyMEtSys(pfmet_corr_x, pfmet_corr_y, bosonPx, bosonPy, lepPx, lepPy, njetsforrecoil, MEtSys::ProcessType::BOSON, MEtSys::SysType::Resolution, MEtSys::SysShift::Up, met_x_recoilresoUp, met_y_recoilresoUp);
+		    metSys.ApplyMEtSys(pfmet_corr_x, pfmet_corr_y, bosonPx, bosonPy, lepPx, lepPy, njetsforrecoil, MEtSys::ProcessType::BOSON, MEtSys::SysType::Resolution, MEtSys::SysShift::Down, met_x_recoilresoDown, met_y_recoilresoDown);
                 }
                 else {
-		  //                    recoilMvaMetCorrector.Correct(mvamet_x,mvamet_y,bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,mvamet_corr_x,mvamet_corr_y);
                     recoilMetCorrector.Correct(met_x,met_y,bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,pfmet_corr_x,pfmet_corr_y);
                 }
             }
+
             met_x = pfmet_corr_x;
             met_y = pfmet_corr_y;
             met = TMath::Sqrt(met_x*met_x+met_y*met_y);
             metphi = TMath::ATan2(met_y,met_x);
-            
-            //      printf("Before correction : mvamet_x = %7.2f   mvamet_y = %7.2f\n",mvamet_x,mvamet_y);
-            //      printf("After correction  : mvamet_x = %7.2f   mvamet_y = %7.2f\n",mvamet_corr_x,mvamet_corr_y);
-            //      std::cout << std::endl;
-            
+            met_recoilscaleUp   = TMath::Sqrt(met_x_recoilscaleUp*met_x_recoilscaleUp+met_y_recoilscaleUp*met_y_recoilscaleUp);
+            met_recoilscaleDown = TMath::Sqrt(met_x_recoilscaleDown*met_x_recoilscaleDown+met_y_recoilscaleDown*met_y_recoilscaleDown);
+            met_recoilresoUp    = TMath::Sqrt(met_x_recoilresoUp*met_x_recoilresoUp+met_y_recoilresoUp*met_y_recoilresoUp);
+            met_recoilresoDown  = TMath::Sqrt(met_x_recoilresoDown*met_x_recoilresoDown+met_y_recoilresoDown*met_y_recoilresoDown);
+
             mvamet_x = mvamet_corr_x;
             mvamet_y = mvamet_corr_y;
-            
+
             mvamet = TMath::Sqrt(mvamet_x*mvamet_x+mvamet_y*mvamet_y); 
             mvametphi = TMath::ATan2(mvamet_y,mvamet_x);
             
