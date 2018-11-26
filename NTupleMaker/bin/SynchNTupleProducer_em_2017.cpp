@@ -922,6 +922,8 @@ int main(int argc, char * argv[]) {
     
     tree->Branch("m_vis",        &m_vis,        "m_vis/F");
     tree->Branch("pt_vis",        &pt_vis,        "pt_vis/F");
+    tree->Branch("pt_vis_escaleUp",        &pt_vis_escaleUp,        "pt_vis_escaleUp/F");
+    tree->Branch("pt_vis_escaleDown",        &pt_vis_escaleDown,        "pt_vis_escaleDown/F");
     tree->Branch("m_vis_muUp",   &m_vis_muUp,   "m_vis_muUp/F");
     tree->Branch("m_vis_muDown", &m_vis_muDown, "m_vis_muDown/F");
     tree->Branch("m_vis_escaleUp",    &m_vis_escaleUp,    "m_vis_escaleUp/F");
@@ -3237,11 +3239,11 @@ int main(int argc, char * argv[]) {
             // qcdweight_nodzeta     = qcdWeightNoDzeta.getWeight(pt_1,pt_2,dr_tt);
             // qcdweightup_nodzeta   = qcdWeightNoDzeta.getWeight(pt_1,pt_2,dr_tt);
             // qcdweightdown_nodzeta = qcdWeightNoDzeta.getWeight(pt_1,pt_2,dr_tt);
-            std::cout<<"qcdweight: "<<qcdweight<<std::endl;
-            std::cout<<"pt_1: "<<pt_1<<std::endl;
-            std::cout<<"pt_2: "<<pt_2<<std::endl;
-            std::cout<<"njets: "<<njets<<std::endl;
-            std::cout<<"dr_tt: "<<dr_tt<<std::endl;
+            // std::cout<<"qcdweight: "<<qcdweight<<std::endl;
+            // std::cout<<"pt_1: "<<pt_1<<std::endl;
+            // std::cout<<"pt_2: "<<pt_2<<std::endl;
+            // std::cout<<"njets: "<<njets<<std::endl;
+            // std::cout<<"dr_tt: "<<dr_tt<<std::endl;
             // METs
             float met_x = analysisTree.pfmetcorr_ex;
             float met_y = analysisTree.pfmetcorr_ey;
