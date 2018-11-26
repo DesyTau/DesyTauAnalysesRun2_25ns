@@ -407,6 +407,19 @@ int main(int argc, char * argv[]) {
     Float_t         qcdweightup_nodzeta;
     Float_t         qcdweightdown_nodzeta;
     
+    Float_t         qcdweight_0jet_rate_up;
+    Float_t         qcdweight_0jet_rate_down;
+    Float_t         qcdweight_1jet_rate_up;
+    Float_t         qcdweight_1jet_rate_down;
+    Float_t         qcdweight_0jet_shape_up;
+    Float_t         qcdweight_0jet_shape_down;
+    Float_t         qcdweight_1jet_shape_up;
+    Float_t         qcdweight_1jet_shape_down;
+    
+    Float_t         qcdweight_iso_up;
+    Float_t         qcdweight_iso_down;
+
+
     Float_t         zptmassweight;
     Float_t         zptmassweight_esup;
     Float_t         zptmassweight_esdown;
@@ -845,6 +858,18 @@ int main(int argc, char * argv[]) {
     tree->Branch("qcdweightup_nodzeta", &qcdweightup_nodzeta, "qcdweightup_nodzeta/F");
     tree->Branch("qcdweightdown_nodzeta", &qcdweightdown_nodzeta, "qcdweightdown_nodzeta/F");
     
+    tree->Branch("qcdweight_0jet_rate_up",&qcdweight_0jet_rate_up,"qcdweight_0jet_rate_up/F");
+    tree->Branch("qcdweight_0jet_rate_down ",&qcdweight_0jet_rate_down,"qcdweight_0jet_rate_down/F");
+    tree->Branch("qcdweight_1jet_rate_up ",&qcdweight_1jet_rate_up,"qcdweight_1jet_rate_up/F");
+    tree->Branch("qcdweight_1jet_rate_down",&qcdweight_1jet_rate_down,"qcdweight_1jet_rate_down/F");
+    tree->Branch("qcdweight_0jet_shape_up",&qcdweight_0jet_shape_up,"qcdweight_0jet_shape_up/F");
+    tree->Branch("qcdweight_0jet_shape_down",&qcdweight_0jet_shape_down,"qcdweight_0jet_shape_down/F");  
+    tree->Branch("qcdweight_1jet_shape_up ",&qcdweight_1jet_shape_up,"qcdweight_1jet_shape_up/F");
+    tree->Branch("qcdweight_1jet_shape_down",&qcdweight_1jet_shape_down,"qcdweight_1jet_shape_down/F");
+
+    tree->Branch("qcdweight_iso_up",&qcdweight_iso_up,"qcdweight_iso_up/F");
+    tree->Branch("qcdweight_iso_down",&qcdweight_iso_down,"qcdweight_iso_down/F");
+
     tree->Branch("zptmassweight",&zptmassweight,"zptmassweight/F");
 
     tree->Branch("zptmassweight_esup",&zptmassweight_esup,"zptmassweight_esup/F");
@@ -1380,10 +1405,13 @@ int main(int argc, char * argv[]) {
     TFile * inputFile_visPtResolution = new TFile(inputFileName_visPtResolution.fullPath().data());
     
     // qcd weight (dzeta cut)
-    QCDModelForEMu qcdWeight("HTT-utilities/QCDModelingEMu/data/QCD_weight_emu_2016BtoH.root");
+    //QCDModelForEMu qcdWeight("HTT-utilities/QCDModelingEMu/data/QCD_weight_emu_2016BtoH.root");
     // qcd weight DZeta cut
-    QCDModelForEMu qcdWeightNoDzeta("HTT-utilities/QCDModelingEMu/data/QCD_weight_emu_2016BtoH.root");
+    //QCDModelForEMu qcdWeightNoDzeta("HTT-utilities/QCDModelingEMu/data/QCD_weight_emu_2016BtoH.root");
     
+    TString correctionsWorkspaceFileName_qcd = cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/htt_scalefactors_v16_5_2.root";
+    TFile * correctionWorkSpaceFile_qcd = new TFile(correctionsWorkspaceFileName_qcd);
+    RooWorkspace *correctionWS_qcd = (RooWorkspace*)correctionWorkSpaceFile_qcd->Get("w");
     // BTag scale factors
     BTagCalibration calib("csvv2", cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/CSVv2_Moriond17_B_H.csv");
     BTagCalibrationReader reader_BTAG(BTagEntry::OP_MEDIUM,"central",{"up","down"});
@@ -1560,6 +1588,18 @@ int main(int argc, char * argv[]) {
             qcdweight_nodzeta = 1;
             qcdweightup_nodzeta = 1;
             qcdweightdown_nodzeta = 1;
+
+            qcdweight_0jet_rate_up =  1;
+            qcdweight_0jet_rate_down =  1;
+            qcdweight_1jet_rate_up =  1;
+            qcdweight_1jet_rate_down =  1;
+            qcdweight_0jet_shape_up =  1;
+            qcdweight_0jet_shape_down =  1;
+            qcdweight_1jet_shape_up =  1;
+            qcdweight_1jet_shape_down =  1;
+            
+            qcdweight_iso_up =  1;
+            qcdweight_iso_down =  1;
             zptmassweight = 1;
 	    zptmassweight_esup = 1;
 	    zptmassweight_esdown = 1;
@@ -2704,17 +2744,63 @@ int main(int argc, char * argv[]) {
             
             // qcd scale factor
             // no dzeta cut
-            qcdweight     = qcdWeight.getWeight(pt_1,pt_2,dr_tt);
+            //qcdweight     = qcdWeight.getWeight(pt_1,pt_2,dr_tt);
             //std::cout<<"qcdweight "<<qcdweight<<std::endl;
-            qcdweightup   = qcdWeight.getWeight(pt_1,pt_2,dr_tt);
+            //qcdweightup   = qcdWeight.getWeight(pt_1,pt_2,dr_tt);
             //std::cout<<"qcdweight Up"<<qcdweight<<std::endl;
-            qcdweightdown = qcdWeight.getWeight(pt_1,pt_2,dr_tt);
+            //qcdweightdown = qcdWeight.getWeight(pt_1,pt_2,dr_tt);
             //std::cout<<"qcdweight down"<<qcdweight<<std::endl;
             // dzeta cut
-            qcdweight_nodzeta     = qcdWeightNoDzeta.getWeight(pt_1,pt_2,dr_tt);
-            qcdweightup_nodzeta   = qcdWeightNoDzeta.getWeight(pt_1,pt_2,dr_tt);
-            qcdweightdown_nodzeta = qcdWeightNoDzeta.getWeight(pt_1,pt_2,dr_tt);
+            //qcdweight_nodzeta     = qcdWeightNoDzeta.getWeight(pt_1,pt_2,dr_tt);
+            //qcdweightup_nodzeta   = qcdWeightNoDzeta.getWeight(pt_1,pt_2,dr_tt);
+            //qcdweightdown_nodzeta = qcdWeightNoDzeta.getWeight(pt_1,pt_2,dr_tt);
+         
+            correctionWS_qcd->var("e_pt")->setVal(pt_1);
+            correctionWS_qcd->var("m_pt")->setVal(pt_2);
+            correctionWS_qcd->var("njets")->setVal(njets);
+            correctionWS_qcd->var("dR")->setVal(dr_tt);
+            double_t em_qcd_osss_binned = correctionWS_qcd->function("em_qcd_osss_binned")->getVal();
+         
+            double_t em_qcd_osss_binned_0jet_rate_up = correctionWS_qcd->function("em_qcd_osss_rateup_binned")->getVal();
+            double_t em_qcd_osss_binned_0jet_rate_down = correctionWS_qcd->function("em_qcd_osss_ratedown_binned")->getVal();
+            double_t em_qcd_osss_binned_1jet_rate_up = correctionWS_qcd->function("em_qcd_osss_rateup_binned")->getVal();
+            double_t em_qcd_osss_binned_1jet_rate_down = correctionWS_qcd->function("em_qcd_osss_ratedown_binned")->getVal();
+            //double_t em_qcd_osss_binned_0jet_shape_up = correctionWS_qcd->function("em_qcd_osss_shapeup_binned")->getVal();
+            //double_t em_qcd_osss_binned_0jet_shape_down = correctionWS_qcd->function("em_qcd_osss_shapedown_binned")->getVal();
+            double_t em_qcd_osss_binned_shape_up = correctionWS_qcd->function("em_qcd_osss_shapeup_binned")->getVal();
+            double_t em_qcd_osss_binned_shape_down = correctionWS_qcd->function("em_qcd_osss_shapedown_binned")->getVal();
+                        
+            qcdweight = em_qcd_osss_binned;
             
+            if (njets==0) {
+               qcdweight_0jet_rate_up =  em_qcd_osss_binned_0jet_rate_up;
+               qcdweight_0jet_rate_down = em_qcd_osss_binned_0jet_rate_down;   
+               qcdweight_0jet_shape_up = em_qcd_osss_binned_shape_up;
+               qcdweight_0jet_shape_down =  em_qcd_osss_binned_shape_down;
+            }   
+            else {
+               qcdweight_0jet_rate_up =  em_qcd_osss_binned;
+               qcdweight_0jet_rate_down = em_qcd_osss_binned;
+               qcdweight_0jet_shape_up = em_qcd_osss_binned;
+               qcdweight_0jet_shape_down =  em_qcd_osss_binned;
+            }
+            if (njets>=1){
+               qcdweight_1jet_rate_up =  em_qcd_osss_binned_1jet_rate_up;
+               qcdweight_1jet_rate_down =  em_qcd_osss_binned_1jet_rate_down;
+               qcdweight_1jet_shape_up = em_qcd_osss_binned_shape_up;
+               qcdweight_1jet_shape_down =  em_qcd_osss_binned_shape_down;
+            }
+            else {
+               qcdweight_1jet_rate_up =  em_qcd_osss_binned;
+               qcdweight_1jet_rate_down = em_qcd_osss_binned; 
+               qcdweight_1jet_shape_up = em_qcd_osss_binned;
+               qcdweight_1jet_shape_down = em_qcd_osss_binned;
+            }
+         
+            qcdweight_iso_up = correctionWS_qcd->function("em_qcd_bothaiso_extrap_up")->getVal();
+            qcdweight_iso_down = correctionWS_qcd->function("em_qcd_bothaiso_extrap_down")->getVal();
+         
+
             //      if (os<0.5) {
             //	printf("QCD weights  : pt_1 = %6.1f ; pt_2 = %6.1f ; dr_tt = %4.2f\n",pt_1,pt_2,dr_tt);
             //	printf("2016         : central = %4.2f ; up = %4.2f ; down = %4.2f\n",qcdweight,qcdweightup,qcdweightdown);
