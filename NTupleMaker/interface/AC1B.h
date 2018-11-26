@@ -44,6 +44,18 @@ public :
    Float_t         primvertex_ptq;
    Int_t           primvertex_ntracks;
    Float_t         primvertex_cov[6];
+   //Declaration of refitted vertices
+   UInt_t          refitvertex_count;
+   //UInt_t          goodrefitvertex_count;
+   Float_t         refitvertex_x[100];
+   Float_t         refitvertex_y[100];
+   Float_t         refitvertex_z[100];
+   Float_t         refitvertex_chi2[100];
+   Float_t         refitvertex_ndof[100];
+   Float_t         refitvertex_ptq[100];
+   Int_t           refitvertex_ntracks[100];
+   Float_t         refitvertex_cov[100][6];
+   //...................................   
    UInt_t          muon_count;
    Float_t         muon_px[100];   //[muon_count]
    Float_t         muon_py[100];   //[muon_count]
@@ -730,6 +742,16 @@ public :
    TBranch        *b_primvertex_pdf;   //!
    TBranch        *b_primvertex_ntracks;   //!
    TBranch        *b_primvertex_cov;   //!
+   //refitvertix
+   TBranch        *b_refitvertex_count;   //!
+   TBranch        *b_refitvertex_x;   //!
+   TBranch        *b_refitvertex_y;   //!
+   TBranch        *b_refitvertex_z;   //!
+   TBranch        *b_refitvertex_chi2;   //!
+   TBranch        *b_refitvertex_ndof;   //!
+   TBranch        *b_refitvertex_pdf;   //!
+   TBranch        *b_refitvertex_ntracks;   //!
+   TBranch        *b_refitvertex_cov;   //!
    TBranch        *b_muon_count;   //!
    TBranch        *b_muon_px;   //!
    TBranch        *b_muon_py;   //!
@@ -1505,6 +1527,16 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("primvertex_ptq", &primvertex_ptq, &b_primvertex_pdf);
    fChain->SetBranchAddress("primvertex_ntracks", &primvertex_ntracks, &b_primvertex_ntracks);
    fChain->SetBranchAddress("primvertex_cov", primvertex_cov, &b_primvertex_cov);
+   //refit vertices
+   fChain->SetBranchAddress("refitvertex_count", &refitvertex_count, &b_refitvertex_count);
+   //fChain->SetBranchAddress("goodrefitvertex_count", &goodrefitvertex_count, &b_goodrefitvertex_count);
+   fChain->SetBranchAddress("refitvertex_x", refitvertex_x, &b_refitvertex_x);
+   fChain->SetBranchAddress("refitvertex_y", refitvertex_y, &b_refitvertex_y);
+   fChain->SetBranchAddress("refitvertex_z", refitvertex_z, &b_refitvertex_z);
+   fChain->SetBranchAddress("refitvertex_chi2", refitvertex_chi2, &b_refitvertex_chi2);
+   fChain->SetBranchAddress("refitvertex_ndof", refitvertex_ndof, &b_refitvertex_ndof);
+   fChain->SetBranchAddress("refitvertex_ptq", refitvertex_ptq, &b_refitvertex_pdf);
+   fChain->SetBranchAddress("refitvertex_ntracks",refitvertex_ntracks, &b_refitvertex_ntracks);
    fChain->SetBranchAddress("muon_count", &muon_count, &b_muon_count);
    fChain->SetBranchAddress("muon_px", muon_px, &b_muon_px);
    fChain->SetBranchAddress("muon_py", muon_py, &b_muon_py);
