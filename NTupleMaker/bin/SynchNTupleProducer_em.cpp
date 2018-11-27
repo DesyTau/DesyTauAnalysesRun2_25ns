@@ -2761,42 +2761,34 @@ int main(int argc, char * argv[]) {
             correctionWS_qcd->var("dR")->setVal(dr_tt);
             double_t em_qcd_osss_binned = correctionWS_qcd->function("em_qcd_osss_binned")->getVal();
          
-            double_t em_qcd_osss_binned_0jet_rate_up = correctionWS_qcd->function("em_qcd_osss_rateup_binned")->getVal();
-            double_t em_qcd_osss_binned_0jet_rate_down = correctionWS_qcd->function("em_qcd_osss_ratedown_binned")->getVal();
-            double_t em_qcd_osss_binned_1jet_rate_up = correctionWS_qcd->function("em_qcd_osss_rateup_binned")->getVal();
-            double_t em_qcd_osss_binned_1jet_rate_down = correctionWS_qcd->function("em_qcd_osss_ratedown_binned")->getVal();
-            //double_t em_qcd_osss_binned_0jet_shape_up = correctionWS_qcd->function("em_qcd_osss_shapeup_binned")->getVal();
-            //double_t em_qcd_osss_binned_0jet_shape_down = correctionWS_qcd->function("em_qcd_osss_shapedown_binned")->getVal();
+            double_t em_qcd_osss_binned_rate_up = correctionWS_qcd->function("em_qcd_osss_rateup_binned")->getVal();
+            double_t em_qcd_osss_binned_rate_down = correctionWS_qcd->function("em_qcd_osss_ratedown_binned")->getVal();
             double_t em_qcd_osss_binned_shape_up = correctionWS_qcd->function("em_qcd_osss_shapeup_binned")->getVal();
             double_t em_qcd_osss_binned_shape_down = correctionWS_qcd->function("em_qcd_osss_shapedown_binned")->getVal();
                         
             qcdweight = em_qcd_osss_binned;
             
             if (njets==0) {
-               qcdweight_0jet_rate_up =  em_qcd_osss_binned_0jet_rate_up;
-               qcdweight_0jet_rate_down = em_qcd_osss_binned_0jet_rate_down;   
+               qcdweight_0jet_rate_up =  em_qcd_osss_binned_rate_up;
+               qcdweight_0jet_rate_down = em_qcd_osss_binned_rate_down;   
                qcdweight_0jet_shape_up = em_qcd_osss_binned_shape_up;
                qcdweight_0jet_shape_down =  em_qcd_osss_binned_shape_down;
+               qcdweight_1jet_rate_up =  em_qcd_osss_binned;
+               qcdweight_1jet_rate_down = em_qcd_osss_binned; 
+               qcdweight_1jet_shape_up = em_qcd_osss_binned;
+               qcdweight_1jet_shape_down = em_qcd_osss_binned;
             }   
             else {
                qcdweight_0jet_rate_up =  em_qcd_osss_binned;
                qcdweight_0jet_rate_down = em_qcd_osss_binned;
                qcdweight_0jet_shape_up = em_qcd_osss_binned;
                qcdweight_0jet_shape_down =  em_qcd_osss_binned;
-            }
-            if (njets>=1){
-               qcdweight_1jet_rate_up =  em_qcd_osss_binned_1jet_rate_up;
-               qcdweight_1jet_rate_down =  em_qcd_osss_binned_1jet_rate_down;
+               qcdweight_1jet_rate_up =  em_qcd_osss_binned_rate_up;
+               qcdweight_1jet_rate_down =  em_qcd_osss_binned_rate_down;
                qcdweight_1jet_shape_up = em_qcd_osss_binned_shape_up;
                qcdweight_1jet_shape_down =  em_qcd_osss_binned_shape_down;
             }
-            else {
-               qcdweight_1jet_rate_up =  em_qcd_osss_binned;
-               qcdweight_1jet_rate_down = em_qcd_osss_binned; 
-               qcdweight_1jet_shape_up = em_qcd_osss_binned;
-               qcdweight_1jet_shape_down = em_qcd_osss_binned;
-            }
-         
+            
             qcdweight_iso_up = correctionWS_qcd->function("em_qcd_bothaiso_extrap_up")->getVal();
             qcdweight_iso_down = correctionWS_qcd->function("em_qcd_bothaiso_extrap_down")->getVal();
          
