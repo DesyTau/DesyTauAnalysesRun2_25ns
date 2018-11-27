@@ -468,11 +468,9 @@ int main(int argc, char * argv[]) {
     Float_t         mTdileptonMET_jesDown;
     Float_t         mTdileptonMET_unclMetUp;
     Float_t         mTdileptonMET_unclMetDown;
-    
+
     Float_t         mTemu;
-    Float_t         mTemet;
-    Float_t         mTmumet;
-    
+
     Float_t         m_sv;
     Float_t         mt_sv;
 
@@ -935,9 +933,7 @@ int main(int argc, char * argv[]) {
     tree->Branch("mTdileptonMET_unclMetDown", &mTdileptonMET_unclMetDown, "mTdileptonMET_unclMetDown/F");
 
     tree->Branch("mTemu",        &mTemu,        "mTemu/F");
-    tree->Branch("mTemet",       &mTemet,       "mTemet/F");
-    tree->Branch("mTmumet",      &mTmumet,      "mTmumet/F");
-    
+
     tree->Branch("m_sv",    &m_sv,   "m_sv/F");
     tree->Branch("mt_sv",   &mt_sv,  "mt_sv/F");
 
@@ -3517,8 +3513,6 @@ int main(int argc, char * argv[]) {
             mTtot_unclMetDown =  totalTransverseMass ( muonLV , electronLV , metResoDownLV);
             
             mTemu   = mT(electronLV,muonLV);
-            mTemet  = mT(electronLV,metLV);
-            mTmumet = mT(muonLV,metLV);
             
             dphi_mumet = dPhiFrom2P(muonLV.Px(),muonLV.Py(),
                                     metLV.Px(),metLV.Py());
