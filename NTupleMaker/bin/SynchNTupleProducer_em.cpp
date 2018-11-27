@@ -37,11 +37,8 @@
 #include "HTT-utilities/QCDModelingEMu/interface/QCDModelForEMu.h"
 #include "CondFormats/BTauObjects/interface/BTagCalibration.h"
 #include "CondTools/BTau/interface/BTagCalibrationReader.h"
-#include "TauAnalysis/ClassicSVfit/interface/ClassicSVfit.h"
-#include "TauAnalysis/ClassicSVfit/interface/svFitHistogramAdapter.h"
-#include "TauAnalysis/ClassicSVfit/interface/MeasuredTauLepton.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/CalibrationOfImpactParameters.h"
-
+#include "DesyTauAnalyses/NTupleMaker/interface/helper_functions_em.h"
 
 #include "TCut.h"
 
@@ -57,103 +54,6 @@
 #include "RooAbsReal.h"
 #include "RooRealVar.h"
 
-
-float totalTransverseMass(TLorentzVector l1,
-                          TLorentzVector l2,
-                          TLorentzVector l3) {
-    
-    TLorentzVector totalLV = l1 + l2 + l3;
-    float    totalET = l1.Pt() +  l2.Pt() + l3.Pt();
-    float     mTtot = TMath::Sqrt(totalET*totalET-totalLV.Pt()*totalLV.Pt());
-    return    mTtot;
-    
-}
-
-void computeDzeta(float metX,  float metY,
-                  float zetaX, float zetaY,
-                  float pzetavis,
-                  float & pzetamiss,
-                  float & dzeta) {
-    
-    pzetamiss = metX*zetaX + metY*zetaY;
-    dzeta = pzetamiss - 0.85*pzetavis;
-    
-}
-
-
-float topPtWeight(float pt1,
-                  float pt2,
-		  bool run1) {
-    
-  float a = 0.0615;    // Run2 a parameter
-  float b = -0.0005;  // Run2 b parameter
-
-  if (run1) {
-    if (pt1>400) pt1 = 400;
-    if (pt2>400) pt2 = 400;
-    a = 0.156;    // Run1 a parameter
-    b = -0.00137;  // Run1 b parameter
-  }
-  float w1 = TMath::Exp(a+b*pt1);
-  float w2 = TMath::Exp(a+b*pt2);
-  
-  return TMath::Sqrt(w1*w2);
-    
-}
-
-ClassicSVfit SVFitMassComputation(classic_svFit::MeasuredTauLepton svFitEle,
-                                              classic_svFit::MeasuredTauLepton svFitMu,
-                                              double measuredMVAMETx,
-                                              double measuredMVAMETy,
-                                              TMatrixD covMVAMET,
-                                              TFile * inputFile_visPtResolution
-                                              ) {
-    
-    std::vector<classic_svFit::MeasuredTauLepton> measuredTauLeptons;
-    measuredTauLeptons.push_back(svFitEle);
-    measuredTauLeptons.push_back(svFitMu);
-    
-    int verbosity = 0;
-    ClassicSVfit svFitAlgo(verbosity);
-    double kappa = 3.; // use 3 for emu, 4 for etau and mutau, 5 for tautau channel
-    svFitAlgo.addLogM_fixed(true, kappa);
-    svFitAlgo.integrate(measuredTauLeptons, measuredMVAMETx, measuredMVAMETy, covMVAMET);
-    
-    return svFitAlgo;
-    
-}
-
-
-
-bool metFiltersPasses(AC1B &tree_, std::vector<TString> metFlags) {
-    
-    bool passed = true;
-    unsigned int nFlags = metFlags.size();
-    //  std::cout << "MEt filters : " << std::endl;
-    for (std::map<string,int>::iterator it=tree_.flags->begin(); it!=tree_.flags->end(); ++it) {
-        TString flagName(it->first);
-        //    std::cout << it->first << " : " << it->second << std::endl;
-        for (unsigned int iFilter=0; iFilter<nFlags; ++iFilter) {
-            if (flagName.Contains(metFlags[iFilter])) {
-                if (it->second==0) {
-                    passed = false;
-                    break;
-                }
-            }
-        }
-    }
-    //  std::cout << "Passed : " << passed << std::endl;
-    return passed;
-    
-}
-
-//struct myclass {
-//  bool operator() (int i,int j) { return (i<j);}
-//} myobject, myobjectX;
-
-//const float electronMass = 0;
-//const float muonMass = 0.10565837;
-//const float pionMass = 0.1396;
 
 int main(int argc, char * argv[]) {
     
@@ -407,11 +307,7 @@ int main(int argc, char * argv[]) {
     Float_t         m_vis_muDown;
     Float_t         m_vis_escaleUp;
     Float_t         m_vis_escaleDown;
-    Float_t         m_vis_jesUp;
-    Float_t         m_vis_jesDown;
-    Float_t         m_vis_unclMetUp;
-    Float_t         m_vis_unclMetDown;
-    
+
     Float_t         pt_vis;
     Float_t         pt_vis_escaleUp;
     Float_t         pt_vis_escaleDown;
@@ -827,10 +723,6 @@ int main(int argc, char * argv[]) {
     tree->Branch("m_vis_muDown", &m_vis_muDown, "m_vis_muDown/F");
     tree->Branch("m_vis_escaleUp",    &m_vis_escaleUp,    "m_vis_escaleUp/F");
     tree->Branch("m_vis_escaleDown",  &m_vis_escaleDown,  "m_vis_escaleDown/F");
-    tree->Branch("m_vis_jesUp",   &m_vis_jesUp,   "m_vis_jesUp/F");
-    tree->Branch("m_vis_jesDown", &m_vis_jesDown, "m_vis_jesDown/F");
-    tree->Branch("m_vis_unclMetUp",    &m_vis_unclMetUp,    "m_vis_unclMetUp/F");
-    tree->Branch("m_vis_unclMetDown",  &m_vis_unclMetDown,  "m_vis_unclMetDown/F");
     tree->Branch("pt_vis",        &pt_vis,        "pt_vis/F");
     tree->Branch("pt_vis_escaleUp",        &pt_vis_escaleUp,        "pt_vis_escaleUp/F");
     tree->Branch("pt_vis_escaleDown",        &pt_vis_escaleDown,        "pt_vis_escaleDown/F");
@@ -1385,7 +1277,7 @@ int main(int argc, char * argv[]) {
         Long64_t numberOfEntries = analysisTree.GetEntries();
         
         std::cout << "      number of entries in Tree = " << numberOfEntries << std::endl;
-	// numberOfEntries = 10000;
+	numberOfEntries = 10000;
 
         for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) {
             
@@ -2337,11 +2229,7 @@ int main(int argc, char * argv[]) {
             m_vis_muDown  = (muonDownLV+electronLV).M();
             m_vis_escaleUp     = (muonLV+electronUpLV).M();
             m_vis_escaleDown   = (muonLV+electronDownLV).M();
-            m_vis_jesUp   = m_vis;
-            m_vis_jesDown = m_vis;
-            m_vis_unclMetUp    = m_vis;
-            m_vis_unclMetDown  = m_vis;
-            
+
             pt_vis = dileptonLV.Pt();
             pt_vis_escaleUp = (muonLV+electronUpLV).Pt();
             pt_vis_escaleDown = (muonLV+electronDownLV).Pt();
@@ -2911,7 +2799,6 @@ int main(int argc, char * argv[]) {
             // pfmet
             computeDzeta(met_x,met_y,
                          zetaX,zetaY,pzetavis,pzetamiss,dzeta);
-
             computeDzeta(met_jesUp_x,met_jesUp_y,
                          zetaX,zetaY,pzetavis,pzetamiss_jesUp,dzeta_jesUp); // jesUp
             computeDzeta(met_jesDown_x,met_jesDown_y,
@@ -3012,7 +2899,6 @@ int main(int argc, char * argv[]) {
        pt_tt_escaleDown = (muonLV+electronDownLV+metLV).Pt();
        pt_tt_unclMetUp=(muonLV+electronLV+metResoUpLV).Pt();
        pt_tt_unclMetDown=  (muonLV+electronLV+metResoDownLV).Pt();
-
      
             m_sv           = -10;
             m_sv_muUp      = -10;
@@ -3336,13 +3222,33 @@ int main(int argc, char * argv[]) {
                   d0_2_cal =d0_2;
                   dZ_2_cal =dZ_2;
                }
-               
             }       
 
+	    // Add for all relevant variables the met uncertainty
+	    float unclMetUp[20]; // this array is used as a container for the shifted variables in the propagate_met_uncertainty function
+	    propagate_met_uncertainty("check_unclMetUp", tree, met_unclMetUp_x, met_unclMetUp_y, muonLV, electronLV, jet1, jet2, unclMetUp);
+	    float unclMetDown[20];
+	    propagate_met_uncertainty("check_unclMetDown", tree, met_unclMetDown_x, met_unclMetDown_y, muonLV, electronLV, jet1, jet2, unclMetDown);
+	    float escaleUp[20];
+	    propagate_met_uncertainty("check_escaleUp", tree, metx_escaleUp, mety_escaleUp, muonLV, electronLV, jet1, jet2, escaleUp);
+	    float escaleDown[20];
+	    propagate_met_uncertainty("check_escaleDown", tree, metx_escaleDown, mety_escaleDown, muonLV, electronLV, jet1, jet2, escaleDown);
+	    float recoilscaleUp[20];
+	    propagate_met_uncertainty("check_recoilscaleUp", tree, met_x_recoilscaleUp, met_y_recoilscaleUp, muonLV, electronLV, jet1, jet2, recoilscaleUp);
+	    float recoilscaleDown[20];
+	    propagate_met_uncertainty("check_recoilscaleDown", tree, met_x_recoilscaleDown, met_y_recoilscaleDown, muonLV, electronLV, jet1, jet2, recoilscaleDown);
+	    float recoilresoUp[20];
+	    propagate_met_uncertainty("check_recoilresoUp", tree, met_x_recoilresoUp, met_y_recoilresoUp, muonLV, electronLV, jet1, jet2, recoilresoUp);
+	    float recoilresoDown[20];
+	    propagate_met_uncertainty("check_recoilresoDown", tree, met_x_recoilresoDown, met_y_recoilresoDown, muonLV, electronLV, jet1, jet2, recoilresoUp);
+	    float jesUp[20];
+	    propagate_met_uncertainty("check_jesUp", tree, met_jesUp_x, met_jesUp_y, muonLV, electronLV, jet1, jet2, jesUp);
+	    float jesDown[20];
+	    propagate_met_uncertainty("check_jesDown", tree, met_jesDown_x, met_jesDown_y, muonLV, electronLV, jet1, jet2, jesDown);
 
             tree->Fill();
             selEvents++;
-            
+
         } // end of file processing (loop over events in one file)
         nFiles++;
         delete _tree;
