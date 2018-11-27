@@ -1520,7 +1520,7 @@ int main(int argc, char * argv[]) {
         Long64_t numberOfEntries = analysisTree.GetEntries();
         
         std::cout << "      number of entries in Tree = " << numberOfEntries << std::endl;
-	// numberOfEntries = 100;
+	// numberOfEntries = 10000;
 
         for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) {
             
@@ -2879,91 +2879,76 @@ int main(int argc, char * argv[]) {
                   if (!isData) {
                      int flavor = abs(analysisTree.pfjet_flavour[jet]);
                      
-                     double jet_scalefactor = 1;
-                     double jet_scalefactor_mistagUp = 1;
-                     double jet_scalefactor_mistagDown = 1;
-                     double jet_scalefactor_btagUp = 1;
-                     double jet_scalefactor_btagDown = 1;
+                     double jet_scalefactor      = 1;
+                     double jet_scalefactor_up   = 1;
+                     double jet_scalefactor_down = 1;
                      double JetPtForBTag = jetPt;
                      double tageff = 1;
                      
                      if (flavor==5) {
-                        if (JetPtForBTag>MaxBJetPt) JetPtForBTag = MaxBJetPt - 0.1;
-                        if (JetPtForBTag<MinBJetPt) JetPtForBTag = MinBJetPt + 0.1;
-                        jet_scalefactor = reader_BTAG.eval_auto_bounds("central",BTagEntry::FLAV_B, absJetEta, JetPtForBTag);
-			jet_scalefactor_btagUp   = reader_BTAG.eval_auto_bounds("up" ,BTagEntry::FLAV_B, absJetEta, JetPtForBTag);
-			jet_scalefactor_btagDown = reader_BTAG.eval_auto_bounds("down" ,BTagEntry::FLAV_B, absJetEta, JetPtForBTag);
-			if(tagged){
-			  jet_scalefactor_mistagUp   = reader_BTAG.eval_auto_bounds("up" ,BTagEntry::FLAV_B, absJetEta, JetPtForBTag);
-			  jet_scalefactor_mistagDown = reader_BTAG.eval_auto_bounds("down" ,BTagEntry::FLAV_B, absJetEta, JetPtForBTag);
-			}
-                        tageff = tagEff_B->Interpolate(JetPtForBTag,absJetEta);
+		       if (JetPtForBTag>MaxBJetPt) JetPtForBTag = MaxBJetPt - 0.1;
+		       if (JetPtForBTag<MinBJetPt) JetPtForBTag = MinBJetPt + 0.1;
+		       jet_scalefactor      = reader_BTAG.eval_auto_bounds("central",BTagEntry::FLAV_B, absJetEta, JetPtForBTag);
+		       jet_scalefactor_up   = reader_BTAG.eval_auto_bounds("up"     ,BTagEntry::FLAV_B, absJetEta, JetPtForBTag);
+		       jet_scalefactor_down = reader_BTAG.eval_auto_bounds("down"   ,BTagEntry::FLAV_B, absJetEta, JetPtForBTag);
+		       tageff = tagEff_B->Interpolate(JetPtForBTag,absJetEta);
                      }
                      else if (flavor==4) {
-                        if (JetPtForBTag>MaxBJetPt) JetPtForBTag = MaxBJetPt - 0.1;
-                        if (JetPtForBTag<MinBJetPt) JetPtForBTag = MinBJetPt + 0.1;
-                        jet_scalefactor = reader_BTAG.eval_auto_bounds("central",BTagEntry::FLAV_C, absJetEta, JetPtForBTag);
-			jet_scalefactor_btagUp = reader_BTAG.eval_auto_bounds("up" ,BTagEntry::FLAV_C, absJetEta, JetPtForBTag);
-			jet_scalefactor_btagDown = reader_BTAG.eval_auto_bounds("down" ,BTagEntry::FLAV_C, absJetEta, JetPtForBTag);
-			if(tagged){
-			  jet_scalefactor_mistagUp = reader_BTAG.eval_auto_bounds("up" ,BTagEntry::FLAV_C, absJetEta, JetPtForBTag);
-			  jet_scalefactor_mistagDown = reader_BTAG.eval_auto_bounds("down" ,BTagEntry::FLAV_C, absJetEta, JetPtForBTag);
-			}
-                        tageff = tagEff_C->Interpolate(JetPtForBTag,absJetEta);
+		       if (JetPtForBTag>MaxBJetPt) JetPtForBTag = MaxBJetPt - 0.1;
+		       if (JetPtForBTag<MinBJetPt) JetPtForBTag = MinBJetPt + 0.1;
+		       jet_scalefactor      = reader_BTAG.eval_auto_bounds("central", BTagEntry::FLAV_C, absJetEta, JetPtForBTag);
+		       jet_scalefactor_up   = reader_BTAG.eval_auto_bounds("up"     , BTagEntry::FLAV_C, absJetEta, JetPtForBTag);
+		       jet_scalefactor_down = reader_BTAG.eval_auto_bounds("down"   , BTagEntry::FLAV_C, absJetEta, JetPtForBTag);
+		       tageff = tagEff_C->Interpolate(JetPtForBTag,absJetEta);
                      }
                      else {
-                        if (JetPtForBTag>MaxLJetPt) JetPtForBTag = MaxLJetPt - 0.1;
-                        if (JetPtForBTag<MinLJetPt) JetPtForBTag = MinLJetPt + 0.1;
-			jet_scalefactor = reader_BTAG.eval_auto_bounds("central",BTagEntry::FLAV_UDSG, absJetEta, JetPtForBTag);
-			jet_scalefactor_btagUp = reader_BTAG.eval_auto_bounds("up" ,BTagEntry::FLAV_UDSG, absJetEta, JetPtForBTag);
-			jet_scalefactor_btagDown = reader_BTAG.eval_auto_bounds("down" ,BTagEntry::FLAV_UDSG, absJetEta, JetPtForBTag);
-			if(tagged){
-			  jet_scalefactor_mistagUp = reader_BTAG.eval_auto_bounds("up" ,BTagEntry::FLAV_UDSG, absJetEta, JetPtForBTag);
-			  jet_scalefactor_mistagDown = reader_BTAG.eval_auto_bounds("down" ,BTagEntry::FLAV_UDSG, absJetEta, JetPtForBTag);
-			}
-                        tageff = tagEff_Light->Interpolate(JetPtForBTag,absJetEta);
+		       if (JetPtForBTag>MaxLJetPt) JetPtForBTag = MaxLJetPt - 0.1;
+		       if (JetPtForBTag<MinLJetPt) JetPtForBTag = MinLJetPt + 0.1;
+		       jet_scalefactor      = reader_BTAG.eval_auto_bounds("central", BTagEntry::FLAV_UDSG, absJetEta, JetPtForBTag);
+		       jet_scalefactor_up   = reader_BTAG.eval_auto_bounds("up"     , BTagEntry::FLAV_UDSG, absJetEta, JetPtForBTag);
+		       jet_scalefactor_down = reader_BTAG.eval_auto_bounds("down"   , BTagEntry::FLAV_UDSG, absJetEta, JetPtForBTag);
+		       tageff = tagEff_Light->Interpolate(JetPtForBTag,absJetEta);
                      }
                      
                      if (tageff<1e-5)      tageff = 1e-5;
                      if (tageff>0.99999)   tageff = 0.99999;
                      rand.SetSeed((int)((jetEta+5)*100000));
                      double rannum = rand.Rndm();
-                     
-                     if (tagged) { // downgrade
+
+                     if (tagged) { // demote
 		       if(jet_scalefactor<1){
-			 double fraction            = 1-jet_scalefactor;
-			 if (rannum<fraction)          tagged = false;
+			 double fraction = 1-jet_scalefactor;
+			 if (rannum<fraction) tagged = false;
 		       }
-		       if(jet_scalefactor_mistagUp<1){
-			 double fraction_mistagUp     = 1-jet_scalefactor_mistagUp;
-			 if (rannum<fraction_mistagUp)   tagged_mistagUp = false;
+		       if(jet_scalefactor_up<1){
+			 double fraction_up = 1-jet_scalefactor_up;
+			 if (rannum<fraction_up) tagged_mistagUp = false;
 		       }
-		       if(jet_scalefactor_mistagDown<1){
-			 double fraction_mistagDown   = 1-jet_scalefactor_mistagDown;
-			 if (rannum<fraction_mistagDown) tagged_mistagDown = false;
+		       if(jet_scalefactor_down<1){
+			 double fraction_down = 1-jet_scalefactor_down;
+			 if (rannum<fraction_down) tagged_mistagDown = false;
 		       }
-		       tagged_btagUp = tagged;
+		       tagged_btagUp   = tagged;
 		       tagged_btagDown = tagged;
                      }
-
-                     if (!tagged) { // upgrade
+                     else if (!tagged) { // promote
 		       if(jet_scalefactor>1){
 			 double fraction = (jet_scalefactor-1.0)/(1.0/tageff-1.0);
 			 if (rannum<fraction) tagged = true;
 		       }
-		       if(jet_scalefactor_btagUp>1){
-			 double fraction_btagUp   = (jet_scalefactor_btagUp-1.0)/(1.0/tageff-1.0);
-			 if (rannum<fraction_btagUp)   tagged_btagUp = true;
+		       if(jet_scalefactor_up>1){
+			 double fraction_up = (jet_scalefactor_up-1.0)/(1.0/tageff-1.0);
+			 if (rannum<fraction_up) tagged_btagUp = true;
 		       }
-		       if(jet_scalefactor_btagDown>1){
-			 double fraction_btagDown = (jet_scalefactor_btagDown-1.0)/(1.0/tageff-1.0);
-			 if (jet_scalefactor_btagDown>1 && rannum<fraction_btagDown) tagged_btagDown = true;
+		       if(jet_scalefactor_down>1){
+			 double fraction_down = (jet_scalefactor_down-1.0)/(1.0/tageff-1.0);
+			 if (rannum<fraction_down) tagged_btagDown = true;
 		       }
-		       tagged_mistagUp = tagged;
+		       tagged_mistagUp   = tagged;
 		       tagged_mistagDown = tagged;
                      }
                   }
-                  
+
                   if (taggedRaw) bjetsRaw.push_back(jet);
                   
                   if (tagged) {
@@ -2978,7 +2963,6 @@ int main(int argc, char * argv[]) {
 		  if(tagged_mistagDown) bjets_mistagDown.push_back(jet);
 		  if(tagged_btagUp)     bjets_btagUp.push_back(jet);
 		  if(tagged_btagDown)   bjets_btagDown.push_back(jet);
-                  
                }
 
                if (jetPtUp>jetPtHighCut)
