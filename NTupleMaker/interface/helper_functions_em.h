@@ -86,7 +86,7 @@ bool metFiltersPasses(AC1B &tree_, std::vector<TString> metFlags) {
 
 //class MetPropagatedToVariable :
 
-void propagate_met_uncertainty(TString uncertainty_name,
+void propagate_uncertainty(TString uncertainty_name,
 			       TTree* out_tree,
 			       float met_x , float met_y,
 			       TLorentzVector muonLV,
@@ -158,7 +158,7 @@ void propagate_met_uncertainty(TString uncertainty_name,
   out_tree->Branch("pt_ttjj_"+uncertainty_name, &uncertainty_container[5], "pt_ttjj_"+uncertainty_name+"/F");
   if(jet1.E()!=0 && jet2.E()!=0) uncertainty_container[5] = (muonLV+electronLV+metLV+jet1+jet2).Pt();
 
-  // pzetamiss
+  // pzetamiss + dzeta
   out_tree->Branch("pzetamiss_"+uncertainty_name, &uncertainty_container[6], "pzetamiss_"+uncertainty_name+"/F");
   out_tree->Branch("dzeta_"+uncertainty_name, &uncertainty_container[7], "dzeta_"+uncertainty_name+"/F");
   computeDzeta(met_x, met_y, zetaX, zetaY, pzetavis, uncertainty_container[6], uncertainty_container[7]);
@@ -182,4 +182,24 @@ void propagate_met_uncertainty(TString uncertainty_name,
   // dphi_mumet
   out_tree->Branch("dphi_mumet_"+uncertainty_name, &uncertainty_container[12], "dphi_mumet_"+uncertainty_name+"/F");
   uncertainty_container[12] = dPhiFrom2P(muonLV.Px(), muonLV.Py(), met_x, met_y);
+
+  // pzetavis
+  out_tree->Branch("pzetavis_"+uncertainty_name, &uncertainty_container[13], "pzetavis_"+uncertainty_name+"/F");
+  uncertainty_container[13] = pzetavis;
+
+  // m_vis
+  out_tree->Branch("m_vis_"+uncertainty_name, &uncertainty_container[14], "m_vis_"+uncertainty_name+"/F");
+  uncertainty_container[14] = dileptonLV.M();
+
+  // pt_vis
+  out_tree->Branch("pt_vis_"+uncertainty_name, &uncertainty_container[15], "pt_vis_"+uncertainty_name+"/F");
+  uncertainty_container[15] = dileptonLV.Pt();
+
+  // pt_1
+  out_tree->Branch("pt_1_"+uncertainty_name, &uncertainty_container[15], "pt_1_"+uncertainty_name+"/F");
+  uncertainty_container[15] = electronLV.Pt();
+
+  // pt_2
+  out_tree->Branch("pt_2_"+uncertainty_name, &uncertainty_container[16], "pt_2_"+uncertainty_name+"/F");
+  uncertainty_container[16] = muonLV.Pt();
 }

@@ -3225,26 +3225,26 @@ int main(int argc, char * argv[]) {
             }       
 
 	    // Add for all relevant variables the met uncertainty
-	    float unclMetUp[20]; // this array is used as a container for the shifted variables in the propagate_met_uncertainty function
-	    propagate_met_uncertainty("check_unclMetUp", tree, met_unclMetUp_x, met_unclMetUp_y, muonLV, electronLV, jet1, jet2, unclMetUp);
+	    float unclMetUp[20]; // this array is used as a container for the shifted variables in the propagate_uncertainty function
+	    propagate_uncertainty("check_unclMetUp", tree, met_unclMetUp_x, met_unclMetUp_y, muonLV, electronLV, jet1, jet2, unclMetUp);
 	    float unclMetDown[20];
-	    propagate_met_uncertainty("check_unclMetDown", tree, met_unclMetDown_x, met_unclMetDown_y, muonLV, electronLV, jet1, jet2, unclMetDown);
+	    propagate_uncertainty("check_unclMetDown", tree, met_unclMetDown_x, met_unclMetDown_y, muonLV, electronLV, jet1, jet2, unclMetDown);
 	    float escaleUp[20];
-	    propagate_met_uncertainty("check_escaleUp", tree, metx_escaleUp, mety_escaleUp, muonLV, electronUpLV, jet1, jet2, escaleUp);
+	    propagate_uncertainty("check_escaleUp", tree, metx_escaleUp, mety_escaleUp, muonLV, electronUpLV, jet1, jet2, escaleUp);
 	    float escaleDown[20];
-	    propagate_met_uncertainty("check_escaleDown", tree, metx_escaleDown, mety_escaleDown, muonLV, electronDownLV, jet1, jet2, escaleDown);
+	    propagate_uncertainty("check_escaleDown", tree, metx_escaleDown, mety_escaleDown, muonLV, electronDownLV, jet1, jet2, escaleDown);
 	    float recoilscaleUp[20];
-	    propagate_met_uncertainty("check_recoilscaleUp", tree, met_x_recoilscaleUp, met_y_recoilscaleUp, muonLV, electronLV, jet1, jet2, recoilscaleUp);
+	    propagate_uncertainty("check_recoilscaleUp", tree, met_x_recoilscaleUp, met_y_recoilscaleUp, muonLV, electronLV, jet1, jet2, recoilscaleUp);
 	    float recoilscaleDown[20];
-	    propagate_met_uncertainty("check_recoilscaleDown", tree, met_x_recoilscaleDown, met_y_recoilscaleDown, muonLV, electronLV, jet1, jet2, recoilscaleDown);
+	    propagate_uncertainty("check_recoilscaleDown", tree, met_x_recoilscaleDown, met_y_recoilscaleDown, muonLV, electronLV, jet1, jet2, recoilscaleDown);
 	    float recoilresoUp[20];
-	    propagate_met_uncertainty("check_recoilresoUp", tree, met_x_recoilresoUp, met_y_recoilresoUp, muonLV, electronLV, jet1, jet2, recoilresoUp);
+	    propagate_uncertainty("check_recoilresoUp", tree, met_x_recoilresoUp, met_y_recoilresoUp, muonLV, electronLV, jet1, jet2, recoilresoUp);
 	    float recoilresoDown[20];
-	    propagate_met_uncertainty("check_recoilresoDown", tree, met_x_recoilresoDown, met_y_recoilresoDown, muonLV, electronLV, jet1, jet2, recoilresoUp);
+	    propagate_uncertainty("check_recoilresoDown", tree, met_x_recoilresoDown, met_y_recoilresoDown, muonLV, electronLV, jet1, jet2, recoilresoUp);
 	    float jesUp[20];
-	    propagate_met_uncertainty("check_jesUp", tree, met_jesUp_x, met_jesUp_y, muonLV, electronLV, jet1Up, jet2Up, jesUp);
+	    propagate_uncertainty("check_jesUp", tree, met_jesUp_x, met_jesUp_y, muonLV, electronLV, jet1Up, jet2Up, jesUp);
 	    float jesDown[20];
-	    propagate_met_uncertainty("check_jesDown", tree, met_jesDown_x, met_jesDown_y, muonLV, electronLV, jet1Down, jet2Down, jesDown);
+	    propagate_uncertainty("check_jesDown", tree, met_jesDown_x, met_jesDown_y, muonLV, electronLV, jet1Down, jet2Down, jesDown);
 
             tree->Fill();
             selEvents++;
