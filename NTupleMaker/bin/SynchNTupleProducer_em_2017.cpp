@@ -40,6 +40,7 @@
 #include "TauAnalysis/ClassicSVfit/interface/ClassicSVfit.h"
 #include "TauAnalysis/ClassicSVfit/interface/svFitHistogramAdapter.h"
 #include "TauAnalysis/ClassicSVfit/interface/MeasuredTauLepton.h"
+#include "DesyTauAnalyses/NTupleMaker/interface/ggF_qcd_uncertainty_2017.h"
 
 #include "TCut.h"
 
@@ -365,7 +366,8 @@ int main(int argc, char * argv[]) {
     /*    
     TTree * treeGen = new TTree("GenHiggs","GenHiggs");
     */    
-
+    const bool apply_ggh_reweighting = cfg.get<bool>("ApplygghReweighting");
+   
     Float_t higgsMass;
     Float_t higgsPt;
     Float_t higgsEta;
@@ -446,7 +448,8 @@ int main(int argc, char * argv[]) {
     Float_t         zptmassweight_statpt80down;
 
     Float_t         weight;
-    
+    Float_t         weight_ggh_NNLOPS;
+
     Float_t         m_vis;
     Float_t         pt_vis;
     Float_t         pt_vis_escaleUp;
@@ -815,6 +818,21 @@ int main(int argc, char * argv[]) {
     Float_t weightPDFdown;
     
     Bool_t veto_embedded;
+
+    Float_t higgspt_HTXS;
+    Int_t njets_HTXS;
+    Int_t htxs_stage0cat;
+    Int_t htxs_stage1cat;
+
+    Float_t THU_ggH_Mu;
+    Float_t THU_ggH_Res;
+    Float_t THU_ggH_Mig01;
+    Float_t THU_ggH_Mig12;
+    Float_t THU_ggH_VBF2j;
+    Float_t THU_ggH_VBF3j;
+    Float_t THU_ggH_PT60;
+    Float_t THU_ggH_PT120;
+    Float_t THU_ggH_qmtop;
    
     tree->Branch("run", &run, "run/I");                                  // I=int, F=Float, O=bool
     tree->Branch("lumi", &lumi, "lumi/I");
@@ -828,7 +846,7 @@ int main(int argc, char * argv[]) {
     tree->Branch("isZMM",&isZMM,"isZMM/O");
     tree->Branch("isZTT",&isZTT,"isZTT/O");
     tree->Branch("veto_embedded",&veto_embedded,"veto_embedded/O");
-
+ 
     tree->Branch("weightScale1",&weightScale1,"weightScale1/F");
     tree->Branch("weightScale2",&weightScale2,"weightScale2/F");
     tree->Branch("weightScale3",&weightScale3,"weightScale3/F");
@@ -840,7 +858,8 @@ int main(int argc, char * argv[]) {
 
     tree->Branch("weightPDFup",&weightPDFup,"weightPDFup/F");
     tree->Branch("weightPDFdown",&weightPDFdown,"weightPDFdown/F");
-
+    
+    tree->Branch("weight_ggh_NNLOPS", &weight_ggh_NNLOPS, "weight_ggh_NNLOPS/F");
     tree->Branch("mcweight", &mcweight, "mcweight/F");
     tree->Branch("puweight", &puweight, "puweight/F");
     tree->Branch("trigweight_1", &trigweight_1, "trigweight_1/F");
@@ -910,6 +929,16 @@ int main(int argc, char * argv[]) {
 
     tree->Branch("weight", &weight, "weight/F");
     
+    tree->Branch("THU_ggH_Mu", &THU_ggH_Mu, "THU_ggH_Mu/F");
+    tree->Branch("THU_ggH_Res", &THU_ggH_Res, "THU_ggH_Res/F");
+    tree->Branch("THU_ggH_Mig01", &THU_ggH_Mig01, "THU_ggH_Mig01/F");
+    tree->Branch("THU_ggH_Mig12", &THU_ggH_Mig12, "THU_ggH_Mig12/F");
+    tree->Branch("THU_ggH_VBF2j", &THU_ggH_VBF2j, "THU_ggH_VBF2j/F");
+    tree->Branch("THU_ggH_VBF3j", &THU_ggH_VBF3j, "THU_ggH_VBF3j/F");
+    tree->Branch("THU_ggH_PT60" , &THU_ggH_PT60, "THU_ggH_PT60/F");
+    tree->Branch("THU_ggH_PT120", &THU_ggH_PT120, "THU_ggH_PT120/F");
+    tree->Branch("THU_ggH_qmtop", &THU_ggH_qmtop, "THU_ggH_qmtop/F");
+
     tree->Branch("metFilters",&metFilters_,"metFilters/O");
     tree->Branch("trg_muonelectron",&trg_muonelectron,"trg_muonelectron/O");
 
@@ -1256,6 +1285,12 @@ int main(int argc, char * argv[]) {
     
     tree->Branch("npartons",&npartons,"npartons/i");
 
+    tree->Branch("higgspt_HTXS",&higgspt_HTXS,"higgspt_HTXS/F");
+    tree->Branch("njets_HTXS",&njets_HTXS,"njets_HTXS/I");
+    tree->Branch("htxs_stage0cat",&htxs_stage0cat,"htxs_stage0cat/I");
+    tree->Branch("htxs_stage1cat",&htxs_stage1cat,"htxs_stage1cat/I");
+
+
     //set JES uncertainties, TO DO: UPDATE FOR 2017
     JESUncertainties * jecUncertainties = new JESUncertainties("DesyTauAnalyses/NTupleMaker/data/Summer16_UncertaintySources_AK4PFchs.txt");
     std::vector<std::string> uncertNames = jecUncertainties->getUncertNames();
@@ -1459,6 +1494,12 @@ int main(int argc, char * argv[]) {
    float MinLJetPt = 20.;
    float MinBJetPt = 20.; // !!!!!
    
+   TFile *file_ggh_reweighting = new TFile(TString(cmsswBase)+TString("/src/DesyTauAnalyses/NTupleMaker/data/NNLOPS_reweight.root"));
+   TGraph * gr_NNLOPSratio_pt_mcatnlo_0jet  = (TGraph*) file_ggh_reweighting->Get("gr_NNLOPSratio_pt_mcatnlo_0jet");
+   TGraph * gr_NNLOPSratio_pt_mcatnlo_1jet  = (TGraph*) file_ggh_reweighting->Get("gr_NNLOPSratio_pt_mcatnlo_1jet");
+   TGraph * gr_NNLOPSratio_pt_mcatnlo_2jet  = (TGraph*) file_ggh_reweighting->Get("gr_NNLOPSratio_pt_mcatnlo_2jet");
+   TGraph * gr_NNLOPSratio_pt_mcatnlo_3jet  = (TGraph*) file_ggh_reweighting->Get("gr_NNLOPSratio_pt_mcatnlo_3jet");
+
    // Z pt mass weights
    TFile * fileZMassPtWeights = new TFile(TString(cmsswBase)+"/src/"+ZMassPtWeightsFileName);
    if (fileZMassPtWeights->IsZombie()) {
@@ -1563,6 +1604,7 @@ int main(int argc, char * argv[]) {
           weightPDFup   = analysisTree.weightPDFup;   //store pdf weights
           weightPDFdown = analysisTree.weightPDFdown;
           
+          weight_ggh_NNLOPS = 1.;
           puweight = 1;                               //set default values for variables
           trigweight_1 = 1;
           trigweight_2 = 1;
@@ -1582,6 +1624,17 @@ int main(int argc, char * argv[]) {
           topptweight = 1;
           topptweightRun2 = 1;
           
+          THU_ggH_Mu = 1.0;
+          THU_ggH_Res = 1.0;
+          THU_ggH_Mig01 = 1.0;
+          THU_ggH_Mig12 = 1.0;
+          THU_ggH_VBF2j = 1.0;
+          THU_ggH_VBF3j = 1.0;
+          THU_ggH_PT60 = 1.0;
+          THU_ggH_PT120 = 1.0;
+          THU_ggH_qmtop = 1.0;
+
+
           btag0weight = 1;
           btag0weight_Up = 1;
           btag0weight_Down = 1;
@@ -1650,7 +1703,11 @@ int main(int argc, char * argv[]) {
           higgsPt = 0;
           higgsEta = 0;
           higgsMass = -1;
-
+          
+          njets_HTXS = -1.;
+          higgspt_HTXS = -1.;
+          htxs_stage0cat = -1.;
+          htxs_stage1cat = -1.;
           
           metFilters_ = true;
           
@@ -1965,8 +2022,33 @@ int main(int argc, char * argv[]) {
                << "        pz = " << nuPz << std::endl;
              */
              
-             
-             
+           
+             if (isSignal){
+                 njets_HTXS = analysisTree.htxs_njets30;
+                 higgspt_HTXS = analysisTree.htxs_higgsPt;
+                 htxs_stage0cat = analysisTree.htxs_stage0cat;
+                 htxs_stage1cat = analysisTree.htxs_stage1cat;
+                 if (apply_ggh_reweighting)
+                    {
+                       if      (njets_HTXS==0) weight_ggh_NNLOPS = gr_NNLOPSratio_pt_mcatnlo_0jet->Eval(TMath::Min(higgspt_HTXS,125.0));
+                       else if (njets_HTXS==1) weight_ggh_NNLOPS = gr_NNLOPSratio_pt_mcatnlo_1jet->Eval(TMath::Min(higgspt_HTXS,625.0));
+                       else if (njets_HTXS==2) weight_ggh_NNLOPS = gr_NNLOPSratio_pt_mcatnlo_2jet->Eval(TMath::Min(higgspt_HTXS,800.0));
+                       else if (njets_HTXS>=3) weight_ggh_NNLOPS = gr_NNLOPSratio_pt_mcatnlo_3jet->Eval(TMath::Min(higgspt_HTXS,925.0));
+                       else weight_ggh_NNLOPS = 1.0;
+
+                       std::vector<double> ggF_unc = qcd_ggF_uncertSF_2017(njets_HTXS, higgspt_HTXS, htxs_stage1cat, 1.0);
+                       THU_ggH_Mu = ggF_unc[0];
+                       THU_ggH_Res = ggF_unc[1];
+                       THU_ggH_Mig01 = ggF_unc[2];
+                       THU_ggH_Mig12 = ggF_unc[3];
+                       THU_ggH_VBF2j = ggF_unc[4];
+                       THU_ggH_VBF3j = ggF_unc[5];
+                       THU_ggH_PT60 = ggF_unc[6];
+                       THU_ggH_PT120 = ggF_unc[7];
+                       THU_ggH_qmtop = ggF_unc[8];
+                    }
+             }
+                          
              if (isDY) { // applying Z pt mass weights
                 zptmassweight = 1;
                 if (bosonMass>50.0) {
