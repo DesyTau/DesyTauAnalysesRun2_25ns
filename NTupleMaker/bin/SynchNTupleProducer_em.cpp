@@ -24,6 +24,8 @@
 
 #include "TRandom.h"
 #include "FWCore/ParameterSet/interface/FileInPath.h"
+#include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
+#include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
 
 #include "DesyTauAnalyses/NTupleMaker/interface/Config.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/AC1B.h"
@@ -373,13 +375,7 @@ int main(int argc, char * argv[]) {
     
     Float_t         met_unclMetDown;
     Float_t         metphi_unclMetDown;
-    
-    Float_t         met_jesUp;
-    Float_t         metphi_jesUp;
-    
-    Float_t         met_jesDown;
-    Float_t         metphi_jesDown;
-    
+
     Float_t         genmet;
     Float_t         genmetphi;
     
@@ -402,8 +398,14 @@ int main(int argc, char * argv[]) {
     Float_t         mva_gf;
     
     Int_t           njets;
-    Int_t           njets_jesUp;
-    Int_t           njets_jesDown;
+    Int_t           njets_jecUncEta0To5Up;
+    Int_t           njets_jecUncEta0To5Down;
+    Int_t           njets_jecUncEta0To3Up;
+    Int_t           njets_jecUncEta0To3Down;
+    Int_t           njets_jecUncEta3To5Up;
+    Int_t           njets_jecUncEta3To5Down;
+    Int_t           njets_jecUncRelativeBalUp;
+    Int_t           njets_jecUncRelativeBalDown;
 
     Int_t           njetspt20;
 
@@ -688,13 +690,7 @@ int main(int argc, char * argv[]) {
     
     tree->Branch("met_unclMetDown", &met_unclMetDown, "met_unclMetDown/F");
     tree->Branch("metphi_unclMetDown", &metphi_unclMetDown, "metphi_unclMetDown/F");
-    
-    tree->Branch("met_jesUp", &met_jesUp, "met_jesUp/F");
-    tree->Branch("metphi_jesUp", &metphi_jesUp, "metphi_jesUp/F");
-    
-    tree->Branch("met_jesDown", &met_jesDown, "met_jesDown/F");
-    tree->Branch("metphi_jesDown", &metphi_jesDown, "metphi_jesDown/F");
-    
+
     tree->Branch("genmet", &genmet, "genmet/F");
     tree->Branch("genmetphi", &genmetphi, "genmetphi/F");
     
@@ -729,8 +725,14 @@ int main(int argc, char * argv[]) {
     tree->Branch("mva_gf", &mva_gf, "mva_gf/F");
     
     tree->Branch("njets", &njets, "njets/I");
-    tree->Branch("njets_jesUp", &njets_jesUp, "njets_jesUp/I");
-    tree->Branch("njets_jesDown", &njets_jesDown, "njets_jesDown/I");
+    tree->Branch("njets_jecUncEta0To5Up", &njets_jecUncEta0To5Up, "njets_jecUncEta0To5Up/I");
+    tree->Branch("njets_jecUncEta0To5Down", &njets_jecUncEta0To5Down, "njets_jecUncEta0To5Down/I");
+    tree->Branch("njets_jecUncEta0To3Up", &njets_jecUncEta0To3Up, "njets_jecUncEta0To3Up/I");
+    tree->Branch("njets_jecUncEta0To3Down", &njets_jecUncEta0To3Down, "njets_jecUncEta0To3Down/I");
+    tree->Branch("njets_jecUncEta3To5Up", &njets_jecUncEta3To5Up, "njets_jecUncEta3To5Up/I");
+    tree->Branch("njets_jecUncEta3To5Down", &njets_jecUncEta3To5Down, "njets_jecUncEta3To5Down/I");
+    tree->Branch("njets_jecUncRelativeBalUp", &njets_jecUncRelativeBalUp, "njets_jecUncRelativeBalUp/I");
+    tree->Branch("njets_jecUncRelativeBalDown", &njets_jecUncRelativeBalDown, "njets_jecUncRelativeBalDown/I");
 
     tree->Branch("njetspt20", &njetspt20, "njetspt20/I");
 
@@ -803,30 +805,164 @@ int main(int argc, char * argv[]) {
     tree->Branch("dZ_1_cal",&dZ_1_cal,"dZ_1_cal/F");
     tree->Branch("dZ_2_cal",&dZ_2_cal,"dZ_2_cal/F");
 
-    JESUncertainties * jecUncertainties = new JESUncertainties("DesyTauAnalyses/NTupleMaker/data/Summer16_UncertaintySources_AK4PFchs.txt");
-    std::vector<std::string> uncertNames = jecUncertainties->getUncertNames();
+    // START : Prepare uncertainties (NEW) ================================================================================================================
 
-    std::cout << "Number of uncertainties = " << uncertNames.size() << std::endl;
+    vector<TString> unc_vars= {"met",  // 0
+			       "metphi", // 1
+			       "mTtot",  // 2
+			       "mTdileptonMET",  // 3
+			       "pt_tt",  // 4
+			       "pt_ttjj", // 5
+			       "pzetamiss", // 6
+			       "dzeta", // 7
+			       "mt_1", // 8
+			       "mt_2", // 9
+			       "mtmax", // 10
+			       "dphi_emet", // 11
+			       "dphi_mumet", // 12
+			       "pzetavis", // 13
+			       "m_vis", // 14
+			       "pt_vis", // 15
+			       "pt_1", // 16
+			       "pt_2", // 17
+			       "jpt_1", // 18
+			       "jpt_2", // 19
+			       "mjj", // 20
+			       "dijetphi", // 21
+			       "dijetpt", // 22
+			       "m_sv", // 23
+			       "mTemu"}; // 24
 
-    int njetsUncUp[30];
-    int njetsUncDown[30];
-    float mjjUncUp[30];
-    float mjjUncDown[30];
-    
-    int iUncert = 0;
-    if (!isData) {
-      for (auto const& Name : uncertNames) {
-	TString name(Name);
-	cout << name << endl;
-	tree->Branch("njets_"+name+"Up",&njetsUncUp[iUncert],"njets_"+name+"Up/I");
-	tree->Branch("njets_"+name+"Down",&njetsUncDown[iUncert],"njets_"+name+"Down/I");
-	tree->Branch("mjj_"+name+"Up",&mjjUncUp[iUncert],"njets_"+name+"Up/F");
-	tree->Branch("mjj_"+name+"Down",&mjjUncDown[iUncert],"njets_"+name+"Down/F");
-	iUncert++;
+    struct inputs {
+      float container[50]; // this array is used as a container for the shifted variables in the propagate_uncertainty function
+      TLorentzVector electronLV;
+      TLorentzVector muonLV;
+      TLorentzVector metLV;
+      TLorentzVector jet1LV;
+      TLorentzVector jet2LV;
+    };
+
+    inputs unclMetUp;
+    inputs unclMetDown;
+    inputs escaleUp;
+    inputs escaleDown;
+    inputs mscaleUp;
+    inputs mscaleDown;
+    inputs recoilscaleUp;
+    inputs recoilscaleDown;
+    inputs recoilresoUp;
+    inputs recoilresoDown;
+    inputs jecUncEta0To5Up;
+    inputs jecUncEta0To5Down;
+    inputs jecUncEta0To3Up;
+    inputs jecUncEta0To3Down;
+    inputs jecUncEta3To5Up;
+    inputs jecUncEta3To5Down;
+    inputs jecUncRelativeBalUp;
+    inputs jecUncRelativeBalDown;
+
+    map<TString, inputs> uncertainty_map = { { "unclMetUp" , unclMetUp },
+					     { "unclMetDown" , unclMetDown },
+					     { "escaleUp" , escaleUp },
+					     { "escaleDown" , escaleDown },
+					     { "mscaleUp" , mscaleUp },
+					     { "mscaleDown" , mscaleDown },
+					     { "recoilscaleUp" , recoilscaleUp },
+					     { "recoilscaleDown" , recoilscaleDown },
+					     { "recoilresoUp" , recoilresoUp },
+					     { "recoilresoDown" , recoilresoDown },
+					     { "jecUncEta0To5Up" , jecUncEta0To5Up },
+					     { "jecUncEta0To5Down" , jecUncEta0To5Down },
+					     { "jecUncEta0To3Up" , jecUncEta0To3Up },
+					     { "jecUncEta0To3Down" , jecUncEta0To3Down },
+					     { "jecUncEta3To5Up" , jecUncEta3To5Up },
+					     { "jecUncEta3To5Down" , jecUncEta3To5Down },
+					     { "jecUncRelativeBalUp" , jecUncRelativeBalUp },
+					     { "jecUncRelativeBalDown" , jecUncRelativeBalDown },
+    };
+
+    for(auto &uncert : uncertainty_map){
+      int count_unc = 0;
+      for(auto &unc_var : unc_vars){
+	tree->Branch(unc_var+"_"+uncert.first,
+		     &uncert.second.container[count_unc],
+		     unc_var+"_"+uncert.first+"/F");
+	count_unc += 1;
       }
-      cout << endl;
     }
-    
+    // START : Prepare uncertainties (NEW) ================================================================================================================
+
+    // START : JEC uncertainties (NEW) ================================================================================================================
+    const int nsrc_Eta0To5 = 13;
+    const char* srcnames_Eta0To5[nsrc_Eta0To5] = {"SinglePionECAL",
+						  "SinglePionHCAL",
+						  "AbsoluteFlavMap",
+						  "AbsoluteMPFBias",
+						  "AbsoluteScale",
+						  "AbsoluteStat",
+						  "Fragmentation",
+						  "FlavorQCD",
+						  "TimePtEta",
+						  "PileUpDataMC",
+						  "RelativeFSR",
+						  "RelativeStatFSR",
+						  "PileUpPtRef"};
+    const int nsrc_Eta0To3 = 9;
+    const char* srcnames_Eta0To3[nsrc_Eta0To3] = {"PileUpPtEC1",
+						  "PileUpPtEC2",
+						  "PileUpPtBB",
+						  "RelativeJEREC1",
+						  "RelativeJEREC2",
+						  "RelativePtEC1",
+						  "RelativePtEC2",
+						  "RelativeStatEC",
+						  "RelativePtBB"};
+    const int nsrc_Eta3To5 = 4;
+    const char* srcnames_Eta3To5[nsrc_Eta3To5] = {"RelativeStatHF",
+						  "RelativePtHF",
+						  "PileUpPtHF",
+						  "RelativeJERHF"};
+    const int nsrc_RelativeBal = 1;
+    const char* srcnames_RelativeBal[nsrc_RelativeBal] = {"RelativeBal"};
+
+    std::vector<JetCorrectionUncertainty*> vsrc_Eta0To5(nsrc_Eta0To5);
+    std::vector<JetCorrectionUncertainty*> vsrc_Eta0To3(nsrc_Eta0To3);
+    std::vector<JetCorrectionUncertainty*> vsrc_Eta3To5(nsrc_Eta3To5);
+    std::vector<JetCorrectionUncertainty*> vsrc_RelativeBal(nsrc_RelativeBal);
+
+    for (int isrc = 0; isrc < nsrc_Eta0To5; isrc++) {
+      const char *name = srcnames_Eta0To5[isrc];
+      JetCorrectorParameters const *p = new JetCorrectorParameters("data/Summer16_23Sep2016V4_DATA_UncertaintySources_AK4PFchs.txt", name);
+      JetCorrectionUncertainty *unc = new JetCorrectionUncertainty(*p);
+      vsrc_Eta0To5[isrc] = unc;
+    }
+    for (int isrc = 0; isrc < nsrc_Eta0To3; isrc++) {
+      const char *name = srcnames_Eta0To3[isrc];
+      JetCorrectorParameters const *p = new JetCorrectorParameters("data/Summer16_23Sep2016V4_DATA_UncertaintySources_AK4PFchs.txt", name);
+      JetCorrectionUncertainty *unc = new JetCorrectionUncertainty(*p);
+      vsrc_Eta0To3[isrc] = unc;
+    }
+    for (int isrc = 0; isrc < nsrc_Eta3To5; isrc++) {
+      const char *name = srcnames_Eta3To5[isrc];
+      JetCorrectorParameters const *p = new JetCorrectorParameters("data/Summer16_23Sep2016V4_DATA_UncertaintySources_AK4PFchs.txt", name);
+      JetCorrectionUncertainty *unc = new JetCorrectionUncertainty(*p);
+      vsrc_Eta3To5[isrc] = unc;
+    }
+    for (int isrc = 0; isrc < nsrc_RelativeBal; isrc++) {
+      const char *name = srcnames_RelativeBal[isrc];
+      JetCorrectorParameters const *p = new JetCorrectorParameters("data/Summer16_23Sep2016V4_DATA_UncertaintySources_AK4PFchs.txt", name);
+      JetCorrectionUncertainty *unc = new JetCorrectionUncertainty(*p);
+      vsrc_RelativeBal[isrc] = unc;
+    }
+
+    map< TString , vector<JetCorrectionUncertainty*> > jec_unc_map = {
+      { "jecUncEta0To5"     , vsrc_Eta0To5 },
+      { "jecUncEta0To3"     , vsrc_Eta0To3 },
+      { "jecUncEta3To5"     , vsrc_Eta3To5 },
+      { "jecUncRelativeBal" , vsrc_RelativeBal }};
+
+    // END : JEC uncertainties (NEW) ================================================================================================================
+
     int nTotalFiles = 0;
     std::string dummy;
     // count number of files --->
@@ -1463,9 +1599,6 @@ int main(int argc, char * argv[]) {
                 
             }
             
-         
-            //      std::cout << "passed lumi" << endl;
-            
             npv = analysisTree.primvertex_count;
             npu = analysisTree.numtruepileupinteractions;
             rho = analysisTree.rho;
@@ -1474,13 +1607,10 @@ int main(int argc, char * argv[]) {
             
             if (!isData && !isEmbedded) {
                 puweight = float(PUofficial->get_PUweight(double(analysisTree.numtruepileupinteractions)));
-                //      cout << "puweight = " << puweight << endl;
+
                 if (topPt>0&&antitopPt>0) {
 		  topptweight = topPtWeight(topPt,antitopPt,true);
 		  topptweightRun2 = topPtWeight(topPt,antitopPt,false);
-                    //	  std::cout << "topPt = " << topPt
-                    //		    << "   antitopPt = " << antitopPt
-                    //		    << "   weight = " << topptweight << std::endl;
                 }
                 histWeightsSkimH->Fill(double(0),double(mcweight));
                 histWeightsTTH->Fill(double(0),double(mcweight*topptweight));
@@ -2083,8 +2213,6 @@ int main(int argc, char * argv[]) {
 
             // counting jets
             vector<unsigned int> jets; jets.clear();
-            vector<unsigned int> jetsUp; jetsUp.clear();
-            vector<unsigned int> jetsDown; jetsDown.clear();
             vector<unsigned int> jetspt20; jetspt20.clear();
             vector<unsigned int> bjets; bjets.clear();
             vector<unsigned int> bjets_mistagUp; bjets_mistagUp.clear();
@@ -2093,13 +2221,28 @@ int main(int argc, char * argv[]) {
             vector<unsigned int> bjets_btagDown; bjets_btagDown.clear();
             vector<unsigned int> bjets_nocleaned; bjets_nocleaned.clear();
             vector<unsigned int> bjetsRaw; bjetsRaw.clear();
-            
+
+	    njets = 0;
+	    njets_jecUncEta0To5Up   = 0;
+	    njets_jecUncEta0To5Down = 0;
+	    njets_jecUncEta0To3Up   = 0;
+	    njets_jecUncEta0To3Down = 0;
+	    njets_jecUncEta3To5Up   = 0;
+	    njets_jecUncEta3To5Down = 0;
+	    njets_jecUncRelativeBalUp   = 0;
+	    njets_jecUncRelativeBalDown = 0;
+
+	    TLorentzVector jetLV;
             TLorentzVector jet1;
             TLorentzVector jet2;
-            TLorentzVector jet1Up;
-            TLorentzVector jet1Down;
-            TLorentzVector jet2Up;
-            TLorentzVector jet2Down;
+	    map<TString,TLorentzVector> jet1LV_jecUnc;
+	    map<TString,TLorentzVector> jet2LV_jecUnc;
+	    map<TString,TLorentzVector> metLV_jecUnc;
+	    TLorentzVector metLV;
+            float met_x = analysisTree.pfmetcorr_ex;
+            float met_y = analysisTree.pfmetcorr_ey;
+            met = TMath::Sqrt(met_x*met_x + met_y*met_y);
+	    metLV.SetXYZT(met_x,met_y,0.,met);
 
             int indexLeadingJet = -1;
             float ptLeadingJet = -1;
@@ -2117,18 +2260,49 @@ int main(int argc, char * argv[]) {
                if (absJetEta>jetEtaCut) continue;
                 
                float jetPt = analysisTree.pfjet_pt[jet];
-               float jetPtDown = analysisTree.pfjet_pt[jet]*(1.0-analysisTree.pfjet_jecUncertainty[jet]);
-               float jetPtUp   = analysisTree.pfjet_pt[jet]*(1.0+analysisTree.pfjet_jecUncertainty[jet]);
-               //std::cout << jet << " : uncertainty = " << analysisTree.pfjet_jecUncertainty[jet] << std::endl;
-               
-               float jetPt_tocheck;
+
+	       jetLV.SetPxPyPzE(analysisTree.pfjet_px[jet],
+				analysisTree.pfjet_py[jet],
+				analysisTree.pfjet_pz[jet],
+				analysisTree.pfjet_e[jet]);
+
+	       map<TString,TLorentzVector> jetLV_jecUnc;
+
+	       // Include variations for jec uncertainties
+	       for (auto uncer_split : jec_unc_map) {
+		 float sum_unc   = 0;
+		 for (auto single_jec_unc : uncer_split.second){
+		   JetCorrectionUncertainty *unc = single_jec_unc;
+		   unc->setJetPt(jetPt);
+		   unc->setJetEta(jetEta);
+		   double unc_ = unc->getUncertainty(true);
+		   sum_unc  += pow(unc_,2);
+		 }
+		 float unc_total  = TMath::Sqrt(sum_unc);
+		 jetLV_jecUnc[uncer_split.first + "Up"]   = jetLV * ( 1 + unc_total);
+		 jetLV_jecUnc[uncer_split.first + "Down"] = jetLV * ( 1 - unc_total);
+		 // Propagate jec uncertainties to met
+		 if( metLV_jecUnc.find(uncer_split.first+"Up") == metLV_jecUnc.end()) metLV_jecUnc[uncer_split.first+"Up"] = metLV;
+		 if( metLV_jecUnc.find(uncer_split.first+"Down") == metLV_jecUnc.end()) metLV_jecUnc[uncer_split.first+"Down"] = metLV;
+		 metLV_jecUnc[uncer_split.first + "Up"]   += jetLV* unc_total;
+		 metLV_jecUnc[uncer_split.first + "Down"] += jetLV* unc_total;
+	       }
+
+               float jetPt_tocheck = jetPt;
                if (sync) jetPt_tocheck = jetPt;
-               else jetPt_tocheck = jetPtDown;
-               if (jetPt_tocheck<jetPtLowCut) continue;   
+	       else{
+	       	 float jetPtmin = jetPt;
+	       	 if(jetLV_jecUnc.at("jecUncEta0To5Down").Pt() < jetPtmin) jetPtmin = jetLV_jecUnc.at("jecUncEta0To5Down").Pt();
+	       	 if(jetLV_jecUnc.at("jecUncEta0To3Down").Pt() < jetPtmin) jetPtmin = jetLV_jecUnc.at("jecUncEta0To3Down").Pt();
+	       	 if(jetLV_jecUnc.at("jecUncEta3To5Down").Pt() < jetPtmin) jetPtmin = jetLV_jecUnc.at("jecUncEta3To5Down").Pt();
+	       	 if(jetLV_jecUnc.at("jecUncRelativeBalDown").Pt() < jetPtmin) jetPtmin = jetLV_jecUnc.at("jecUncRelativeBalDown").Pt();
+	       	 jetPt_tocheck = jetPtmin;
+	       }
+	       if (jetPt_tocheck<jetPtLowCut) continue;   
              
                bool isPFJetId = looseJetiD(analysisTree,int(jet));
                if (!isPFJetId) continue;
-               
+
                bool cleanedJet = true;
                
                float dR1 = deltaR(analysisTree.pfjet_eta[jet],analysisTree.pfjet_phi[jet],
@@ -2145,7 +2319,7 @@ int main(int argc, char * argv[]) {
               
                if (jetPt>jetPtLowCut)
                   jetspt20.push_back(jet);
-                
+
                if (absJetEta<bJetEtaCut) { // jet within b-tagging acceptance
                   
                   bool tagged = analysisTree.pfjet_btag[jet][nBTagDiscriminant]>btagCut; // b-jet
@@ -2244,15 +2418,17 @@ int main(int argc, char * argv[]) {
 		  if(tagged_btagDown)   bjets_btagDown.push_back(jet);
                }
 
-               if (jetPtUp>jetPtHighCut)
-                  jetsUp.push_back(jet);
+	       if (jetLV_jecUnc.at("jecUncEta0To5Up").Pt()>jetPtHighCut) njets_jecUncEta0To5Up += 1;
+	       if (jetLV_jecUnc.at("jecUncEta0To5Down").Pt()>jetPtHighCut) njets_jecUncEta0To5Down += 1;
+	       if (jetLV_jecUnc.at("jecUncEta0To3Up").Pt()>jetPtHighCut) njets_jecUncEta0To3Up += 1;
+	       if (jetLV_jecUnc.at("jecUncEta0To3Down").Pt()>jetPtHighCut) njets_jecUncEta0To3Down += 1;
+	       if (jetLV_jecUnc.at("jecUncEta3To5Up").Pt()>jetPtHighCut) njets_jecUncEta3To5Up += 1;
+	       if (jetLV_jecUnc.at("jecUncEta3To5Down").Pt()>jetPtHighCut) njets_jecUncEta3To5Down += 1;
+	       if (jetLV_jecUnc.at("jecUncRelativeBalUp").Pt()>jetPtHighCut) njets_jecUncRelativeBalUp += 1;
+	       if (jetLV_jecUnc.at("jecUncRelativeBalDown").Pt()>jetPtHighCut) njets_jecUncRelativeBalDown += 1;
 
-               if (jetPtDown>jetPtHighCut)
-                  jetsDown.push_back(jet);
-               
                if (jetPt>jetPtHighCut)
-                  jets.push_back(jet); 
-                
+		 jets.push_back(jet); 
                if (indexLeadingJet>=0) {
                   if (jetPt<ptLeadingJet&&jetPt>ptSubLeadingJet) {
                      indexSubLeadingJet = jet;
@@ -2269,27 +2445,7 @@ int main(int argc, char * argv[]) {
             }
             
             njets = jets.size();
-            njets_jesUp = jetsUp.size();
-            njets_jesDown = jetsDown.size();
-            
             int njetsMax = njets;
-            
-            if (!isData) {
-               jecUncertainties->runOnEvent(analysisTree,eta_1,phi_1,eta_2,phi_2);
-               
-               iUncert = 0;
-               for (auto const& Name : uncertNames) {
-                  njetsUncUp[iUncert] = jecUncertainties->getNJets(Name,true);
-                  njetsUncDown[iUncert] = jecUncertainties->getNJets(Name,false);
-                  mjjUncUp[iUncert] = jecUncertainties->getMjj(Name,true);
-                  mjjUncDown[iUncert] = jecUncertainties->getMjj(Name,false);
-                  if (njetsUncUp[iUncert]>njetsMax) njetsMax = njetsUncUp[iUncert];
-                  if (njetsUncDown[iUncert]>njetsMax) njetsMax = njetsUncDown[iUncert];
-                  iUncert++;
-               }
-            }
-
-            int njetsCheckup = jecUncertainties->getNJets();
             
             njetspt20 = jetspt20.size();
             nbtag = bjets.size();
@@ -2353,50 +2509,49 @@ int main(int argc, char * argv[]) {
             jdeta =  -10;
             njetingap = 0;
             if (indexLeadingJet>=0 && indexSubLeadingJet>=0) {
-                
-	      float unc1Up   = 1 + analysisTree.pfjet_jecUncertainty[indexLeadingJet]; 
-	      float unc1Down = 1 - analysisTree.pfjet_jecUncertainty[indexLeadingJet];
-
-	      float unc2Up   = 1 + analysisTree.pfjet_jecUncertainty[indexSubLeadingJet];
-	      float unc2Down = 1 - analysisTree.pfjet_jecUncertainty[indexSubLeadingJet];
 
 	      jet1.SetPxPyPzE(analysisTree.pfjet_px[indexLeadingJet],
-						   analysisTree.pfjet_py[indexLeadingJet],
-						   analysisTree.pfjet_pz[indexLeadingJet],
-						   analysisTree.pfjet_e[indexLeadingJet]);
-                
-         jet1Up.SetPxPyPzE(analysisTree.pfjet_px[indexLeadingJet]*unc1Up,
-						       analysisTree.pfjet_py[indexLeadingJet]*unc1Up,
-						       analysisTree.pfjet_pz[indexLeadingJet]*unc1Up,
-						       analysisTree.pfjet_e[indexLeadingJet]*unc1Up);
-	      
-	      jet1Down.SetPxPyPzE(analysisTree.pfjet_px[indexLeadingJet]*unc1Down,
-							   analysisTree.pfjet_py[indexLeadingJet]*unc1Down,
-							   analysisTree.pfjet_pz[indexLeadingJet]*unc1Down,
-							   analysisTree.pfjet_e[indexLeadingJet]*unc1Down);
+			      analysisTree.pfjet_py[indexLeadingJet],
+			      analysisTree.pfjet_pz[indexLeadingJet],
+			      analysisTree.pfjet_e[indexLeadingJet]);
+
+	      for (auto uncer_split : jec_unc_map) {
+		float sum_unc   = 0;
+		for (auto single_jec_unc : uncer_split.second){
+		  JetCorrectionUncertainty *unc = single_jec_unc;
+		  unc->setJetPt(jet1.Pt());
+		  unc->setJetEta(jet1.Eta());
+		  double unc_ = unc->getUncertainty(true);
+		  sum_unc  += pow(unc_,2);
+		}
+		float unc_total = TMath::Sqrt(sum_unc);
+		jet1LV_jecUnc[uncer_split.first+"Up"]   = jet1*(1+unc_total);
+		jet1LV_jecUnc[uncer_split.first+"Down"] = jet1*(1-unc_total);
+	      }
 
 	      jet2.SetPxPyPzE(analysisTree.pfjet_px[indexSubLeadingJet],
-						   analysisTree.pfjet_py[indexSubLeadingJet],
-						   analysisTree.pfjet_pz[indexSubLeadingJet],
-						   analysisTree.pfjet_e[indexSubLeadingJet]);
-                
-	      
-	      jet2Up.SetPxPyPzE(analysisTree.pfjet_px[indexSubLeadingJet]*unc2Up,
-						     analysisTree.pfjet_py[indexSubLeadingJet]*unc2Up,
-						     analysisTree.pfjet_pz[indexSubLeadingJet]*unc2Up,
-						     analysisTree.pfjet_e[indexSubLeadingJet]*unc2Up);
-                
-	      jet2Down.SetPxPyPzE(analysisTree.pfjet_px[indexSubLeadingJet]*unc2Down,
-						       analysisTree.pfjet_py[indexSubLeadingJet]*unc2Down,
-						       analysisTree.pfjet_pz[indexSubLeadingJet]*unc2Down,
-						       analysisTree.pfjet_e[indexSubLeadingJet]*unc2Down);
-                
-	      mjj = (jet1+jet2).M();
-	      dijetpt = (jet1+jet2).Pt();
+			      analysisTree.pfjet_py[indexSubLeadingJet],
+			      analysisTree.pfjet_pz[indexSubLeadingJet],
+			      analysisTree.pfjet_e[indexSubLeadingJet]);
+
+	      for (auto uncer_split : jec_unc_map) {
+		float sum_unc   = 0;
+		for (auto single_jec_unc : uncer_split.second){
+		  JetCorrectionUncertainty *unc = single_jec_unc;
+		  unc->setJetPt(jet2.Pt());
+		  unc->setJetEta(jet2.Eta());
+		  double unc_ = unc->getUncertainty(true);
+		  sum_unc  += pow(unc_,2);
+		}
+		float unc_total = TMath::Sqrt(sum_unc);
+		jet2LV_jecUnc[uncer_split.first+"Up"]   = jet2*(1+unc_total);
+		jet2LV_jecUnc[uncer_split.first+"Down"] = jet2*(1-unc_total);
+	      }
+
+	      mjj      = (jet1+jet2).M();
+	      dijetpt  = (jet1+jet2).Pt();
 	      dijetphi = (jet1+jet2).Phi();
-	      jdeta = fabs(analysisTree.pfjet_eta[indexLeadingJet]-
-			   analysisTree.pfjet_eta[indexSubLeadingJet]);
-	      
+	      jdeta = fabs(analysisTree.pfjet_eta[indexLeadingJet]-analysisTree.pfjet_eta[indexSubLeadingJet]);
 
 	      float etamax = analysisTree.pfjet_eta[indexLeadingJet];
 	      float etamin = analysisTree.pfjet_eta[indexSubLeadingJet];
@@ -2416,8 +2571,6 @@ int main(int argc, char * argv[]) {
             }
 
             // METs
-            float met_x = analysisTree.pfmetcorr_ex;
-            float met_y = analysisTree.pfmetcorr_ey;
             float met_x_recoilscaleUp = analysisTree.pfmetcorr_ex;
             float met_x_recoilscaleDown = analysisTree.pfmetcorr_ex;
             float met_y_recoilscaleUp = analysisTree.pfmetcorr_ey;
@@ -2427,15 +2580,6 @@ int main(int argc, char * argv[]) {
             float met_y_recoilresoUp = analysisTree.pfmetcorr_ey;
             float met_y_recoilresoDown = analysisTree.pfmetcorr_ey;
 
-	    //            if (!isData) {
-	    //                met_x = analysisTree.pfmet_ex;
-	    //                met_y = analysisTree.pfmet_ey;
-	    //            }
-
-	    float met_jesUp_x   = analysisTree.pfmetcorr_ex_JetEnUp;
-            float met_jesUp_y   = analysisTree.pfmetcorr_ey_JetEnUp;
-            float met_jesDown_x = analysisTree.pfmetcorr_ex_JetEnDown;
-            float met_jesDown_y = analysisTree.pfmetcorr_ey_JetEnDown;
             float met_unclMetUp_x    = analysisTree.pfmetcorr_ex_UnclusteredEnUp;
             float met_unclMetUp_y    = analysisTree.pfmetcorr_ey_UnclusteredEnUp;
             float met_unclMetDown_x  = analysisTree.pfmetcorr_ex_UnclusteredEnDown;
@@ -2447,7 +2591,7 @@ int main(int argc, char * argv[]) {
             metcov01 = analysisTree.pfmetcorr_sigxy;
             metcov10 = analysisTree.pfmetcorr_sigyx;
             metcov11 = analysisTree.pfmetcorr_sigyy;
-            
+
             int njetsforrecoil = njets;
             if (isW) njetsforrecoil = njets + 1;
             
@@ -2474,43 +2618,35 @@ int main(int argc, char * argv[]) {
             met_y = pfmet_corr_y;
             met = TMath::Sqrt(met_x*met_x+met_y*met_y);
             metphi = TMath::ATan2(met_y,met_x);
+	    // update metLV (regognize changes if present)
+	    metLV.SetXYZT(met_x,met_y,0.,met);
             met_recoilscaleUp   = TMath::Sqrt(met_x_recoilscaleUp*met_x_recoilscaleUp+met_y_recoilscaleUp*met_y_recoilscaleUp);
             met_recoilscaleDown = TMath::Sqrt(met_x_recoilscaleDown*met_x_recoilscaleDown+met_y_recoilscaleDown*met_y_recoilscaleDown);
             met_recoilresoUp    = TMath::Sqrt(met_x_recoilresoUp*met_x_recoilresoUp+met_y_recoilresoUp*met_y_recoilresoUp);
             met_recoilresoDown  = TMath::Sqrt(met_x_recoilresoDown*met_x_recoilresoDown+met_y_recoilresoDown*met_y_recoilresoDown);
+	    TLorentzVector metLV_recoilscaleUp; metLV_recoilscaleUp.SetXYZT(met_x_recoilscaleUp, met_y_recoilscaleUp, 0., met_recoilscaleUp);
+	    TLorentzVector metLV_recoilscaleDown; metLV_recoilscaleDown.SetXYZT(met_x_recoilscaleDown, met_y_recoilscaleDown, 0., met_recoilscaleDown);
+	    TLorentzVector metLV_recoilresoUp; metLV_recoilresoUp.SetXYZT(met_x_recoilresoUp, met_y_recoilresoUp, 0., met_recoilresoUp);
+	    TLorentzVector metLV_recoilresoDown; metLV_recoilresoDown.SetXYZT(met_x_recoilresoDown, met_y_recoilresoDown, 0., met_recoilresoDown);
 
-	    met_jesUp = TMath::Sqrt(met_jesUp_x*met_jesUp_x+
-				      met_jesUp_y*met_jesUp_y);
-            metphi_jesUp = TMath::ATan2(met_jesUp_y,met_jesUp_x);
-            
-            met_jesDown = TMath::Sqrt(met_jesDown_x*met_jesDown_x+
-					met_jesDown_y*met_jesDown_y);
-            metphi_jesDown = TMath::ATan2(met_jesDown_y,met_jesDown_x);
-            
-            met_unclMetUp = TMath::Sqrt(met_unclMetUp_x*met_unclMetUp_x+
-				     met_unclMetUp_y*met_unclMetUp_y);
+            met_unclMetUp = TMath::Sqrt(met_unclMetUp_x*met_unclMetUp_x+met_unclMetUp_y*met_unclMetUp_y);
             metphi_unclMetUp = TMath::ATan2(met_unclMetUp_y,met_unclMetUp_x);
-            
-            met_unclMetDown = TMath::Sqrt(met_unclMetDown_x*met_unclMetDown_x+
-				       met_unclMetDown_y*met_unclMetDown_y);
+            met_unclMetDown = TMath::Sqrt(met_unclMetDown_x*met_unclMetDown_x+met_unclMetDown_y*met_unclMetDown_y);
             metphi_unclMetDown = TMath::ATan2(met_unclMetDown_y,met_unclMetDown_x);
-            
+
             float genmet_ex = analysisTree.genmet_ex;
             float genmet_ey = analysisTree.genmet_ey;
-            
+
             genmet = TMath::Sqrt(genmet_ex*genmet_ex + genmet_ey*genmet_ey);
             genmetphi = TMath::ATan2(genmet_ey,genmet_ex);
        
             // bisector of electron and muon transverse momenta
             float electronUnitX = electronLV.Px()/electronLV.Pt();
             float electronUnitY = electronLV.Py()/electronLV.Pt();
-            
             float muonUnitX = muonLV.Px()/muonLV.Pt();
             float muonUnitY = muonLV.Py()/muonLV.Pt();
-            
             float zetaX = electronUnitX + muonUnitX;
             float zetaY = electronUnitY + muonUnitY;
-            
             float normZeta = TMath::Sqrt(zetaX*zetaX+zetaY*zetaY);
             
             zetaX = zetaX/normZeta;
@@ -2518,16 +2654,8 @@ int main(int argc, char * argv[]) {
             
             float vectorX = met_x + muonLV.Px() + electronLV.Px();
             float vectorY = met_y + muonLV.Py() + electronLV.Py();
-            
             float vectorVisX = muonLV.Px() + electronLV.Px();
             float vectorVisY = muonLV.Py() + electronLV.Py();
-
-            float vectorVisX_escaleUp = muonLV.Px() + electronUpLV.Px();
-            float vectorVisY_escaleUp = muonLV.Py() + electronUpLV.Py();
-
-            float vectorVisX_escaleDown = muonLV.Px() + electronDownLV.Px();
-            float vectorVisY_escaleDown = muonLV.Py() + electronDownLV.Py();
-            
             pzetavis = vectorVisX*zetaX + vectorVisY*zetaY;
 
 	    double px_escaleUp = (1+eleScale) * pt_1 * TMath::Cos(phi_1);
@@ -2541,7 +2669,6 @@ int main(int argc, char * argv[]) {
 	    
 	    double metx_escaleUp = met_x + px_e - px_escaleUp;
 	    double mety_escaleUp = met_y + py_e - py_escaleUp;
-	    
 	    double metx_escaleDown = met_x + px_e - px_escaleDown;
 	    double mety_escaleDown = met_y + py_e - py_escaleDown;
 
@@ -2554,13 +2681,11 @@ int main(int argc, char * argv[]) {
             computeDzeta(analysisTree.genmet_ex,analysisTree.genmet_ey,
                          zetaX,zetaY,pzetavis,pzetamiss_genmet,dzeta_genmet);
             
-            TLorentzVector metLV; metLV.SetXYZT(met_x,met_y,0.,met);
-
 	    float met_escaleUp = TMath::Sqrt(metx_escaleUp*metx_escaleUp+mety_escaleUp*mety_escaleUp);
 	    float met_escaleDown = TMath::Sqrt(metx_escaleDown*metx_escaleDown+mety_escaleDown*mety_escaleDown);
             
-            TLorentzVector metEleUpLV; metEleUpLV.SetXYZT(metx_escaleUp,mety_escaleUp,0.,met_escaleUp);
-            TLorentzVector metEleDownLV; metEleDownLV.SetXYZT(metx_escaleDown,mety_escaleDown,0.,met_escaleDown);
+            TLorentzVector metLV_escaleUp; metLV_escaleUp.SetXYZT(metx_escaleUp,mety_escaleUp,0.,met_escaleUp);
+            TLorentzVector metLV_escaleDown; metLV_escaleDown.SetXYZT(metx_escaleDown,mety_escaleDown,0.,met_escaleDown);
 
             mt_1 = mT(electronLV,metLV);
             mt_2 = mT(muonLV,metLV);
@@ -2568,11 +2693,8 @@ int main(int argc, char * argv[]) {
             
             mCDF = (muonLV+electronLV+metLV).M();
 
-	                
-            TLorentzVector metResoUpLV; metResoUpLV.SetXYZT(met_unclMetUp_x,met_unclMetUp_y,0.,met_unclMetUp);
-            TLorentzVector metResoDownLV; metResoDownLV.SetXYZT(met_unclMetDown_x,met_unclMetDown_y,0.,met_unclMetDown);
-            TLorentzVector metScaleUpLV; metScaleUpLV.SetXYZT(met_jesUp_x,met_jesUp_y,0.,met_jesUp);
-            TLorentzVector metScaleDownLV; metScaleDownLV.SetXYZT(met_jesDown_x,met_jesDown_y,0.,met_jesDown);
+            TLorentzVector metLV_unclMetUp; metLV_unclMetUp.SetXYZT(met_unclMetUp_x,met_unclMetUp_y,0.,met_unclMetUp);
+            TLorentzVector metLV_unclMetDown; metLV_unclMetDown.SetXYZT(met_unclMetDown_x,met_unclMetDown_y,0.,met_unclMetDown);
             // computing total transverse mass
             mTtot = totalTransverseMass        ( muonLV ,     electronLV , metLV);
             mTemu   = mT(electronLV,muonLV);
@@ -2614,16 +2736,9 @@ int main(int argc, char * argv[]) {
                     // define electron 4-vector
                     classic_svFit::MeasuredTauLepton svFitEle(classic_svFit::MeasuredTauLepton::kTauToElecDecay, 
                                                  pt_1, eta_1, phi_1, 0.51100e-3); 
-                    classic_svFit::MeasuredTauLepton svFitEleUp(classic_svFit::MeasuredTauLepton::kTauToElecDecay, 
-                                                   (1.0+eleScale)*pt_1, eta_1, phi_1, 0.51100e-3); 
-                    classic_svFit::MeasuredTauLepton svFitEleDown(classic_svFit::MeasuredTauLepton::kTauToElecDecay, 
-                                                                    (1.0-eleScale)*pt_1, eta_1, phi_1, 0.51100e-3); 
                     // define muon 4-vector
                     classic_svFit::MeasuredTauLepton svFitMu(classic_svFit::MeasuredTauLepton::kTauToMuDecay,  
                                                                 pt_2, eta_2, phi_2, 105.658e-3); 
-
-                   
-                    
                     
                     // central value
                     ClassicSVfit algo = SVFitMassComputation(svFitEle, svFitMu,
@@ -2846,31 +2961,62 @@ int main(int argc, char * argv[]) {
             }       
 
 	    // Add for all relevant variables the met uncertainty
-	    float unclMetUp[50]; // this array is used as a container for the shifted variables in the propagate_uncertainty function
-	    propagate_uncertainty("unclMetUp", tree, met_unclMetUp_x, met_unclMetUp_y, covMET, inputFile_visPtResolution, muonLV, electronLV, jet1, jet2, unclMetUp, isData, checkSV);
-	    float unclMetDown[50];
-	    propagate_uncertainty("unclMetDown", tree, met_unclMetDown_x, met_unclMetDown_y, covMET, inputFile_visPtResolution, muonLV, electronLV, jet1, jet2, unclMetDown, isData, checkSV);
-	    float escaleUp[50];
-	    propagate_uncertainty("escaleUp", tree, metx_escaleUp, mety_escaleUp, covMET, inputFile_visPtResolution, muonLV, electronUpLV, jet1, jet2, escaleUp, isData, checkSV);
-	    float escaleDown[50];
-	    propagate_uncertainty("escaleDown", tree, metx_escaleDown, mety_escaleDown, covMET, inputFile_visPtResolution, muonLV, electronDownLV, jet1, jet2, escaleDown, isData, checkSV);
-	    float mscaleUp[50];
-	    propagate_uncertainty("mscaleUp", tree, met_x, met_y, covMET, inputFile_visPtResolution, muonUpLV, electronLV, jet1, jet2, mscaleUp, isData, checkSV);
-	    float mscaleDown[50];
-	    propagate_uncertainty("mscaleDown", tree, met_x, met_y, covMET, inputFile_visPtResolution, muonDownLV, electronLV, jet1, jet2, mscaleDown, isData, checkSV);
-	    float recoilscaleUp[50];
-	    propagate_uncertainty("recoilscaleUp", tree, met_x_recoilscaleUp, met_y_recoilscaleUp, covMET, inputFile_visPtResolution, muonLV, electronLV, jet1, jet2, recoilscaleUp, isData, checkSV);
-	    float recoilscaleDown[50];
-	    propagate_uncertainty("recoilscaleDown", tree, met_x_recoilscaleDown, met_y_recoilscaleDown, covMET, inputFile_visPtResolution, muonLV, electronLV, jet1, jet2, recoilscaleDown, isData, checkSV);
-	    float recoilresoUp[50];
-	    propagate_uncertainty("recoilresoUp", tree, met_x_recoilresoUp, met_y_recoilresoUp, covMET, inputFile_visPtResolution, muonLV, electronLV, jet1, jet2, recoilresoUp, isData, checkSV);
-	    float recoilresoDown[50];
-	    propagate_uncertainty("recoilresoDown", tree, met_x_recoilresoDown, met_y_recoilresoDown, covMET, inputFile_visPtResolution, muonLV, electronLV, jet1, jet2, recoilresoUp, isData, checkSV);
-	    float jesUp[50];
-	    propagate_uncertainty("jesUp", tree, met_jesUp_x, met_jesUp_y, covMET, inputFile_visPtResolution, muonLV, electronLV, jet1Up, jet2Up, jesUp, isData, checkSV);
-	    float jesDown[50];
-	    propagate_uncertainty("jesDown", tree, met_jesDown_x, met_jesDown_y, covMET, inputFile_visPtResolution, muonLV, electronLV, jet1Down, jet2Down, jesDown, isData, checkSV);
+	    for(auto &uncert : uncertainty_map){
+	      uncert.second.electronLV = electronLV;
+	      uncert.second.muonLV     = muonLV;
+	      uncert.second.metLV      = metLV;
+	      uncert.second.jet1LV     = jet1;
+	      uncert.second.jet2LV     = jet2;
+	    }
 
+	    uncertainty_map.at("unclMetUp").metLV = metLV_unclMetUp;
+	    uncertainty_map.at("unclMetDown").metLV = metLV_unclMetDown;
+	    uncertainty_map.at("escaleUp").metLV = metLV_escaleUp;
+	    uncertainty_map.at("escaleUp").electronLV = electronUpLV;
+	    uncertainty_map.at("escaleDown").metLV = metLV_escaleDown;
+	    uncertainty_map.at("escaleDown").electronLV = electronDownLV;
+	    uncertainty_map.at("mscaleUp").muonLV = muonUpLV;
+	    uncertainty_map.at("mscaleDown").muonLV = muonDownLV;
+	    uncertainty_map.at("recoilscaleUp").metLV = metLV_recoilscaleUp;
+	    uncertainty_map.at("recoilscaleDown").metLV = metLV_recoilscaleDown;
+	    uncertainty_map.at("recoilresoUp").metLV = metLV_recoilresoUp;
+	    uncertainty_map.at("recoilresoDown").metLV = metLV_recoilresoDown;
+	    uncertainty_map.at("jecUncEta0To5Up").metLV = metLV_jecUnc.at("jecUncEta0To5Up");
+	    if(jet1.E() != 0) uncertainty_map.at("jecUncEta0To5Up").jet1LV = jet1LV_jecUnc.at("jecUncEta0To5Up");
+	    if(jet2.E() != 0) uncertainty_map.at("jecUncEta0To5Up").jet2LV = jet2LV_jecUnc.at("jecUncEta0To5Up");
+	    uncertainty_map.at("jecUncEta0To5Down").metLV = metLV_jecUnc.at("jecUncEta0To5Down");
+	    if(jet1.E() != 0) uncertainty_map.at("jecUncEta0To5Down").jet1LV = jet1LV_jecUnc.at("jecUncEta0To5Down");
+	    if(jet2.E() != 0) uncertainty_map.at("jecUncEta0To5Down").jet2LV = jet2LV_jecUnc.at("jecUncEta0To5Down");
+	    uncertainty_map.at("jecUncEta0To3Up").metLV = metLV_jecUnc.at("jecUncEta0To3Up");
+	    if(jet1.E() != 0) uncertainty_map.at("jecUncEta0To3Up").jet1LV = jet1LV_jecUnc.at("jecUncEta0To3Up");
+	    if(jet2.E() != 0) uncertainty_map.at("jecUncEta0To3Up").jet2LV = jet2LV_jecUnc.at("jecUncEta0To3Up");
+	    uncertainty_map.at("jecUncEta0To3Down").metLV = metLV_jecUnc.at("jecUncEta0To3Down");
+	    if(jet1.E() != 0) uncertainty_map.at("jecUncEta0To3Down").jet1LV = jet1LV_jecUnc.at("jecUncEta0To3Down");
+	    if(jet2.E() != 0) uncertainty_map.at("jecUncEta0To3Down").jet2LV = jet2LV_jecUnc.at("jecUncEta0To3Down");
+	    uncertainty_map.at("jecUncEta3To5Up").metLV = metLV_jecUnc.at("jecUncEta3To5Up");
+	    if(jet1.E() != 0) uncertainty_map.at("jecUncEta3To5Up").jet1LV = jet1LV_jecUnc.at("jecUncEta3To5Up");
+	    if(jet2.E() != 0) uncertainty_map.at("jecUncEta3To5Up").jet2LV = jet2LV_jecUnc.at("jecUncEta3To5Up");
+	    uncertainty_map.at("jecUncEta3To5Down").metLV = metLV_jecUnc.at("jecUncEta3To5Down");
+	    if(jet1.E() != 0) uncertainty_map.at("jecUncEta3To5Down").jet1LV = jet1LV_jecUnc.at("jecUncEta3To5Down");
+	    if(jet2.E() != 0) uncertainty_map.at("jecUncEta3To5Down").jet2LV = jet2LV_jecUnc.at("jecUncEta3To5Down");
+	    uncertainty_map.at("jecUncRelativeBalUp").metLV = metLV_jecUnc.at("jecUncRelativeBalUp");
+	    if(jet1.E() != 0) uncertainty_map.at("jecUncRelativeBalUp").jet1LV = jet1LV_jecUnc.at("jecUncRelativeBalUp");
+	    if(jet2.E() != 0) uncertainty_map.at("jecUncRelativeBalUp").jet2LV = jet2LV_jecUnc.at("jecUncRelativeBalUp");
+	    uncertainty_map.at("jecUncRelativeBalDown").metLV = metLV_jecUnc.at("jecUncRelativeBalDown");
+	    if(jet1.E() != 0) uncertainty_map.at("jecUncRelativeBalDown").jet1LV = jet1LV_jecUnc.at("jecUncRelativeBalDown");
+	    if(jet2.E() != 0) uncertainty_map.at("jecUncRelativeBalDown").jet2LV = jet2LV_jecUnc.at("jecUncRelativeBalDown");
+
+	    for(auto &uncert : uncertainty_map){
+
+	      propagate_uncertainty( uncert.first,
+				     uncert.second.metLV, covMET, inputFile_visPtResolution,
+				     uncert.second.muonLV,
+				     uncert.second.electronLV,
+				     uncert.second.jet1LV,
+				     uncert.second.jet2LV,
+				     uncert.second.container,
+				     isData, checkSV);
+	    }
             tree->Fill();
             selEvents++;
 

@@ -87,20 +87,17 @@ bool metFiltersPasses(AC1B &tree_, std::vector<TString> metFlags) {
 //class MetPropagatedToVariable :
 
 void propagate_uncertainty(TString uncertainty_name,
-			   TTree* out_tree,
-			   float met_x , float met_y, TMatrixD covMET, TFile* inputFile_visPtResolution,
+			   TLorentzVector metLV, TMatrixD covMET, TFile* inputFile_visPtResolution,
 			   TLorentzVector muonLV,
 			   TLorentzVector electronLV,
-			   TLorentzVector jet1,
-			   TLorentzVector jet2,
+			   TLorentzVector jet1LV,
+			   TLorentzVector jet2LV,
 			   float uncertainty_container[],
 			   bool isData,
 			   bool svfit_on
 			   )
 {
 
-
-  TLorentzVector metLV; metLV.SetXYZT(met_x, met_y, 0., TMath::Sqrt( met_x*met_x + met_y*met_y ));
   TLorentzVector dileptonLV = muonLV + electronLV;
   float electronUnitX = electronLV.Px()/electronLV.Pt();
   float electronUnitY = electronLV.Py()/electronLV.Pt();
@@ -118,101 +115,57 @@ void propagate_uncertainty(TString uncertainty_name,
   // initliaze all values to -10
   for (int i = 0; i < 50; ++i) uncertainty_container[i] = -10;
 
-  // met
-  out_tree->Branch("met_"+uncertainty_name, &uncertainty_container[0], "met_"+uncertainty_name+"/F");
+  // met // 0
   uncertainty_container[0] = metLV.E();
-
-  // metphi
-  out_tree->Branch("metphi_"+uncertainty_name, &uncertainty_container[1], "metphi_"+uncertainty_name+"/F");
+  // metphi // 1
   uncertainty_container[1] = metLV.Phi();
-  
-  // mTtot
-  out_tree->Branch("mTtot_"+uncertainty_name, &uncertainty_container[2], "mTtot_" + uncertainty_name+"/F");
+  // mTtot // 2
   uncertainty_container[2] = totalTransverseMass( muonLV, electronLV, metLV);
-
-  // mTdileptonMET
-  out_tree->Branch("mTdileptonMET_"+uncertainty_name, &uncertainty_container[3], "mTdileptonMET_"+uncertainty_name+"/F");
+  // mTdileptonMET // 3
   uncertainty_container[3] = mT(dileptonLV,metLV);
-
-  // pt_tt
-  out_tree->Branch("pt_tt_"+uncertainty_name, &uncertainty_container[4], "pt_tt_"+uncertainty_name+"/F");
+  // pt_tt // 4
   uncertainty_container[4] = (muonLV+electronLV+metLV).Pt();
-
-  // pt_ttjj
-  out_tree->Branch("pt_ttjj_"+uncertainty_name, &uncertainty_container[5], "pt_ttjj_"+uncertainty_name+"/F");
-  if(jet1.E()!=0 && jet2.E()!=0) uncertainty_container[5] = (muonLV+electronLV+metLV+jet1+jet2).Pt();
-
-  // pzetamiss + dzeta
-  out_tree->Branch("pzetamiss_"+uncertainty_name, &uncertainty_container[6], "pzetamiss_"+uncertainty_name+"/F");
-  out_tree->Branch("dzeta_"+uncertainty_name, &uncertainty_container[7], "dzeta_"+uncertainty_name+"/F");
-  computeDzeta(met_x, met_y, zetaX, zetaY, pzetavis, uncertainty_container[6], uncertainty_container[7]);
-
-  // mt_1
-  out_tree->Branch("mt_1_"+uncertainty_name, &uncertainty_container[8], "mt_1_"+uncertainty_name+"/F");
+  // pt_ttjj // 5
+  if(jet1LV.E()!=0 && jet2LV.E()!=0) uncertainty_container[5] = (muonLV+electronLV+metLV+jet1LV+jet2LV).Pt();
+  // pzetamiss // 6 + dzeta // 7
+  computeDzeta(metLV.Px(), metLV.Py(), zetaX, zetaY, pzetavis, uncertainty_container[6], uncertainty_container[7]);
+  // mt_1 // 8
   uncertainty_container[8] = mT(electronLV,metLV);
-
-  // mt_2
-  out_tree->Branch("mt_2_"+uncertainty_name, &uncertainty_container[9], "mt_2_"+uncertainty_name+"/F");
+  // mt_2 // 9
   uncertainty_container[9] = mT(muonLV,metLV);
-
-  // mtmax
-  out_tree->Branch("mtmax_"+uncertainty_name, &uncertainty_container[10], "mtmax_"+uncertainty_name+"/F");
-  uncertainty_container[10] = TMath::Max(float(uncertainty_container[8]),float(uncertainty_container[9]));
-
-  // dphi_emet
-  out_tree->Branch("dphi_emet_"+uncertainty_name, &uncertainty_container[11], "dphi_emet_"+uncertainty_name+"/F");
-  uncertainty_container[11] = dPhiFrom2P(electronLV.Px(), electronLV.Py(), met_x, met_y);
-
-  // dphi_mumet
-  out_tree->Branch("dphi_mumet_"+uncertainty_name, &uncertainty_container[12], "dphi_mumet_"+uncertainty_name+"/F");
-  uncertainty_container[12] = dPhiFrom2P(muonLV.Px(), muonLV.Py(), met_x, met_y);
-
-  // pzetavis
-  out_tree->Branch("pzetavis_"+uncertainty_name, &uncertainty_container[13], "pzetavis_"+uncertainty_name+"/F");
+  // mtmax // 10
+  uncertainty_container[10] = TMath::Max(float(mT(electronLV,metLV)),float(mT(muonLV,metLV)));
+  // dphi_emet // 11
+  uncertainty_container[11] = dPhiFrom2P(electronLV.Px(), electronLV.Py(), metLV.Px(), metLV.Py());
+  // dphi_mumet // 12
+  uncertainty_container[12] = dPhiFrom2P(muonLV.Px(), muonLV.Py(), metLV.Px(), metLV.Py());
+  // pzetavis // 13
   uncertainty_container[13] = pzetavis;
-
-  // m_vis
-  out_tree->Branch("m_vis_"+uncertainty_name, &uncertainty_container[14], "m_vis_"+uncertainty_name+"/F");
+  // m_vis // 14
   uncertainty_container[14] = dileptonLV.M();
-
-  // pt_vis
-  out_tree->Branch("pt_vis_"+uncertainty_name, &uncertainty_container[15], "pt_vis_"+uncertainty_name+"/F");
+  // pt_vis // 15
   uncertainty_container[15] = dileptonLV.Pt();
-
-  // pt_1
-  out_tree->Branch("pt_1_"+uncertainty_name, &uncertainty_container[16], "pt_1_"+uncertainty_name+"/F");
+  // pt_1 // 16
   uncertainty_container[16] = electronLV.Pt();
-
-  // pt_2
-  out_tree->Branch("pt_2_"+uncertainty_name, &uncertainty_container[17], "pt_2_"+uncertainty_name+"/F");
+  // pt_2 // 17
   uncertainty_container[17] = muonLV.Pt();
-
-  // jpt_1
-  out_tree->Branch("jpt_1_"+uncertainty_name, &uncertainty_container[18], "jpt_1_"+uncertainty_name+"/F");
-  if(jet1.E()!=0) uncertainty_container[18] = jet1.Pt();
-
-  // jpt_2
-  out_tree->Branch("jpt_2_"+uncertainty_name, &uncertainty_container[19], "jpt_2_"+uncertainty_name+"/F");
-  if(jet2.E()!=0) uncertainty_container[19] = jet2.Pt();
-
-  // mjj
-  out_tree->Branch("mjj_"+uncertainty_name, &uncertainty_container[20], "mjj_"+uncertainty_name+"/F");
-  if(jet1.E()!=0 && jet2.E()!=0) uncertainty_container[20] = (jet1+jet2).M();;
-
-  // dijetphi
-  out_tree->Branch("dijetphi_"+uncertainty_name, &uncertainty_container[21], "dijetphi_"+uncertainty_name+"/F");
-  if(jet1.E()!=0 && jet2.E()!=0) uncertainty_container[21] = (jet1+jet2).Phi();;
-
-  // dijetpt
-  out_tree->Branch("dijetpt_"+uncertainty_name, &uncertainty_container[22], "dijetpt_"+uncertainty_name+"/F");
-  if(jet1.E()!=0 && jet2.E()!=0) uncertainty_container[22] = (jet1+jet2).Pt();;
-
-  // m_sv
-  out_tree->Branch("m_sv_"+uncertainty_name, &uncertainty_container[23], "m_sv_"+uncertainty_name+"/F");
+  // jpt_1 // 18
+  if(jet1LV.E()!=0) uncertainty_container[18] = jet1LV.Pt();
+  // jpt_2 // 19
+  if(jet2LV.E()!=0) uncertainty_container[19] = jet2LV.Pt();
+  // mjj // 20
+  if(jet1LV.E()!=0 && jet2LV.E()!=0) uncertainty_container[20] = (jet1LV+jet2LV).M();;
+  // dijetphi // 21
+  if(jet1LV.E()!=0 && jet2LV.E()!=0) uncertainty_container[21] = (jet1LV+jet2LV).Phi();;
+  // dijetpt // 22
+  if(jet1LV.E()!=0 && jet2LV.E()!=0) uncertainty_container[22] = (jet1LV+jet2LV).Pt();;
+  // m_sv // 23
   if(!isData && svfit_on){
     classic_svFit::MeasuredTauLepton svFitEle(classic_svFit::MeasuredTauLepton::kTauToElecDecay, electronLV.Pt(), electronLV.Eta(), electronLV.Phi(), 0.51100e-3);
     classic_svFit::MeasuredTauLepton svFitMu(classic_svFit::MeasuredTauLepton::kTauToMuDecay, muonLV.Pt(), muonLV.Eta(), muonLV.Phi(), 105.658e-3);
-    ClassicSVfit algo = SVFitMassComputation(svFitEle, svFitMu, met_x, met_y, covMET, inputFile_visPtResolution);
+    ClassicSVfit algo = SVFitMassComputation(svFitEle, svFitMu, metLV.Px(), metLV.Py(), covMET, inputFile_visPtResolution);
     uncertainty_container[23] = static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(algo.getHistogramAdapter())->getMass();
   }
+  // mTemu // 24
+  uncertainty_container[24] = mT(electronLV,muonLV);
 }
