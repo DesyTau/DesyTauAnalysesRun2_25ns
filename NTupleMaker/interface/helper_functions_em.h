@@ -196,10 +196,11 @@ void propagate_uncertainty(TString uncertainty_name,
   uncertainty_container[15] = dileptonLV.Pt();
 
   // pt_1
-  out_tree->Branch("pt_1_"+uncertainty_name, &uncertainty_container[15], "pt_1_"+uncertainty_name+"/F");
-  uncertainty_container[15] = electronLV.Pt();
+  out_tree->Branch("pt_1_"+uncertainty_name, &uncertainty_container[16], "pt_1_"+uncertainty_name+"/F");
+  uncertainty_container[16] = electronLV.Pt();
 
   // pt_2
-  out_tree->Branch("pt_2_"+uncertainty_name, &uncertainty_container[16], "pt_2_"+uncertainty_name+"/F");
-  uncertainty_container[16] = muonLV.Pt();
+  out_tree->Branch("pt_2_"+uncertainty_name, &uncertainty_container[17], "pt_2_"+uncertainty_name+"/F");
+  uncertainty_container[17] = muonLV.Pt();
+
 }
