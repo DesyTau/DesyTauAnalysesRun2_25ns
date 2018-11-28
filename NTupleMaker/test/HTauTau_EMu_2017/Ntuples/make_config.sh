@@ -32,7 +32,8 @@ sed 's/SampleNameForPUHist =/SampleNameForPUHist = WW_TuneCP5_13TeV-pythia8_pile
 sed 's/SampleNameForPUHist =/SampleNameForPUHist = WZ_TuneCP5_13TeV-pythia8_pileup/' analysisMacroSynch_em_MC.conf > analysisMacroSynch_em_WZ_TuneCP5_13TeV-pythia8.conf
 sed 's/SampleNameForPUHist =/SampleNameForPUHist = ZZ_TuneCP5_13TeV-pythia8_pileup/' analysisMacroSynch_em_MC.conf > analysisMacroSynch_em_ZZ_TuneCP5_13TeV-pythia8.conf
 
-sed 's/SampleNameForPUHist =/SampleNameForPUHist = GGHToTauTau_M125_pileup/' analysisMacroSynch_em_Signal.conf > analysisMacroSynch_em_Signal_GGH_Htautau_M125.conf
+sed 's/SampleNameForPUHist =/SampleNameForPUHist = GluGluHToTauTau_M125_13TeV_powheg_pythia8_pileup/' analysisMacroSynch_em_Signal.conf > analysisMacroSynch_em_Signal_GGH_Htautau_M125.conf
+sed -i 's/ApplygghReweighting = false/ApplygghReweighting = true/g' analysisMacroSynch_em_Signal_GGH_Htautau_M125.conf 
 sed 's/SampleNameForPUHist =/SampleNameForPUHist = VBFHToTauTau_M125_pileup/' analysisMacroSynch_em_Signal.conf > analysisMacroSynch_em_Signal_VBF_Htautau_M125.conf
 
 
