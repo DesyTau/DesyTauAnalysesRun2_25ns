@@ -87,36 +87,20 @@ bool metFiltersPasses(AC1B &tree_, std::vector<TString> metFlags) {
 //class MetPropagatedToVariable :
 
 void propagate_uncertainty(TString uncertainty_name,
-			       TTree* out_tree,
-			       float met_x , float met_y,
-			       TLorentzVector muonLV,
-			       TLorentzVector electronLV,
-			       TLorentzVector jet1,
-			       TLorentzVector jet2,
-			       float uncertainty_container[]
-			       )
+			   TTree* out_tree,
+			   float met_x , float met_y, TMatrixD covMET, TFile* inputFile_visPtResolution,
+			   TLorentzVector muonLV,
+			   TLorentzVector electronLV,
+			   TLorentzVector jet1,
+			   TLorentzVector jet2,
+			   float uncertainty_container[],
+			   bool isData,
+			   bool svfit_on
+			   )
 {
 
 
   TLorentzVector metLV; metLV.SetXYZT(met_x, met_y, 0., TMath::Sqrt( met_x*met_x + met_y*met_y ));
-  /* TLorentzVector muonLV; muonLV.SetXYZM(analysisTree.muon_px[muonIndex], */
-  /* 					analysisTree.muon_py[muonIndex], */
-  /* 					analysisTree.muon_pz[muonIndex], */
-  /* 					classic_svFit::muonMass); */
-  /* TLorentzVector electronLV; electronLV.SetXYZM(analysisTree.electron_px[electronIndex], */
-  /* 						analysisTree.electron_py[electronIndex], */
-  /* 						analysisTree.electron_pz[electronIndex], */
-  /* 						classic_svFit::electronMass); */
-  /* TLorentzVector jet1; jet1.SetPxPyPzE(analysisTree.pfjet_px[indexLeadingJet], */
-  /* 						   analysisTree.pfjet_py[indexLeadingJet], */
-  /* 						   analysisTree.pfjet_pz[indexLeadingJet], */
-  /* 						   analysisTree.pfjet_e[indexLeadingJet]); */
-
-  /* TLorentzVector jet2; jet2.SetPxPyPzE(analysisTree.pfjet_px[indexSubLeadingJet], */
-  /* 						   analysisTree.pfjet_py[indexSubLeadingJet], */
-  /* 						   analysisTree.pfjet_pz[indexSubLeadingJet], */
-  /* 						   analysisTree.pfjet_e[indexSubLeadingJet]); */
-
   TLorentzVector dileptonLV = muonLV + electronLV;
   float electronUnitX = electronLV.Px()/electronLV.Pt();
   float electronUnitY = electronLV.Py()/electronLV.Pt();
@@ -132,7 +116,7 @@ void propagate_uncertainty(TString uncertainty_name,
   float pzetavis = vectorVisX*zetaX+vectorVisY*zetaY;
 
   // initliaze all values to -10
-  for (int i = 0; i < 10; ++i) uncertainty_container[i] = -10;
+  for (int i = 0; i < 50; ++i) uncertainty_container[i] = -10;
 
   // met
   out_tree->Branch("met_"+uncertainty_name, &uncertainty_container[0], "met_"+uncertainty_name+"/F");
@@ -203,4 +187,32 @@ void propagate_uncertainty(TString uncertainty_name,
   out_tree->Branch("pt_2_"+uncertainty_name, &uncertainty_container[17], "pt_2_"+uncertainty_name+"/F");
   uncertainty_container[17] = muonLV.Pt();
 
+  // jpt_1
+  out_tree->Branch("jpt_1_"+uncertainty_name, &uncertainty_container[18], "jpt_1_"+uncertainty_name+"/F");
+  if(jet1.E()!=0) uncertainty_container[18] = jet1.Pt();
+
+  // jpt_2
+  out_tree->Branch("jpt_2_"+uncertainty_name, &uncertainty_container[19], "jpt_2_"+uncertainty_name+"/F");
+  if(jet2.E()!=0) uncertainty_container[19] = jet2.Pt();
+
+  // mjj
+  out_tree->Branch("mjj_"+uncertainty_name, &uncertainty_container[20], "mjj_"+uncertainty_name+"/F");
+  if(jet1.E()!=0 && jet2.E()!=0) uncertainty_container[20] = (jet1+jet2).M();;
+
+  // dijetphi
+  out_tree->Branch("dijetphi_"+uncertainty_name, &uncertainty_container[21], "dijetphi_"+uncertainty_name+"/F");
+  if(jet1.E()!=0 && jet2.E()!=0) uncertainty_container[21] = (jet1+jet2).Phi();;
+
+  // dijetpt
+  out_tree->Branch("dijetpt_"+uncertainty_name, &uncertainty_container[22], "dijetpt_"+uncertainty_name+"/F");
+  if(jet1.E()!=0 && jet2.E()!=0) uncertainty_container[22] = (jet1+jet2).Pt();;
+
+  // m_sv
+  out_tree->Branch("m_sv_"+uncertainty_name, &uncertainty_container[23], "m_sv_"+uncertainty_name+"/F");
+  if(!isData && svfit_on){
+    classic_svFit::MeasuredTauLepton svFitEle(classic_svFit::MeasuredTauLepton::kTauToElecDecay, electronLV.Pt(), electronLV.Eta(), electronLV.Phi(), 0.51100e-3);
+    classic_svFit::MeasuredTauLepton svFitMu(classic_svFit::MeasuredTauLepton::kTauToMuDecay, muonLV.Pt(), muonLV.Eta(), muonLV.Phi(), 105.658e-3);
+    ClassicSVfit algo = SVFitMassComputation(svFitEle, svFitMu, met_x, met_y, covMET, inputFile_visPtResolution);
+    uncertainty_container[23] = static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(algo.getHistogramAdapter())->getMass();
+  }
 }
