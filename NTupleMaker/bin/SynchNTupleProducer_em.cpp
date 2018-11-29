@@ -41,6 +41,7 @@
 #include "CondTools/BTau/interface/BTagCalibrationReader.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/CalibrationOfImpactParameters.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/helper_functions_em.h"
+#include "DesyTauAnalyses/NTupleMaker/interface/ggF_qcd_uncertainty_2017.h"
 
 #include "TCut.h"
 
@@ -80,7 +81,8 @@ int main(int argc, char * argv[]) {
     const bool applyGoodRunSelection = cfg.get<bool>("ApplyGoodRunSelection");
     const string jsonFile = cfg.get<string>("jsonFile");
     const bool applySimpleRecoilCorrections = cfg.get<bool>("ApplySimpleRecoilCorrections");
-    
+    const bool isSignal = cfg.get<bool>("IsSignal");
+
     // kinematic cuts on electrons
     const float ptElectronLowCut   = cfg.get<float>("ptElectronLowCut");
     const float ptElectronHighCut  = cfg.get<float>("ptElectronHighCut");
@@ -196,6 +198,7 @@ int main(int argc, char * argv[]) {
     const string correctionWSFile_embedded = cfg.get<string>("CorrectionWSFile_embedded");
     const string correctionWSFile_embedded_trigger = cfg.get<string>("CorrectionWSFile_trigger");
 
+    const bool apply_ggh_reweighting = cfg.get<bool>("ApplygghReweighting");
     // **** end of configuration
 
     const float a_jetMu = 0.902;
@@ -303,6 +306,7 @@ int main(int argc, char * argv[]) {
     Float_t         zptmassweight_statpt80down;
 
     Float_t         weight;
+    Float_t         weight_ggh_NNLOPS;
     
     Float_t         m_vis;
     Float_t         pt_vis;
@@ -522,6 +526,21 @@ int main(int argc, char * argv[]) {
 
     Bool_t veto_embedded;
 
+    Float_t higgspt_HTXS;
+    Int_t njets_HTXS;
+    Int_t htxs_stage0cat;
+    Int_t htxs_stage1cat;
+
+    Float_t THU_ggH_Mu;
+    Float_t THU_ggH_Res;
+    Float_t THU_ggH_Mig01;
+    Float_t THU_ggH_Mig12;
+    Float_t THU_ggH_VBF2j;
+    Float_t THU_ggH_VBF3j;
+    Float_t THU_ggH_PT60;
+    Float_t THU_ggH_PT120;
+    Float_t THU_ggH_qmtop;
+
     tree->Branch("run", &run, "run/I");
     tree->Branch("lumi", &lumi, "lumi/I");
     tree->Branch("evt", &evt, "evt/I");
@@ -546,6 +565,22 @@ int main(int argc, char * argv[]) {
 
     tree->Branch("weightPDFup",&weightPDFup,"weightPDFup/F");
     tree->Branch("weightPDFdown",&weightPDFdown,"weightPDFdown/F");
+
+    tree->Branch("weight_ggh_NNLOPS", &weight_ggh_NNLOPS, "weight_ggh_NNLOPS/F");
+    tree->Branch("THU_ggH_Mu", &THU_ggH_Mu, "THU_ggH_Mu/F");
+    tree->Branch("THU_ggH_Res", &THU_ggH_Res, "THU_ggH_Res/F");
+    tree->Branch("THU_ggH_Mig01", &THU_ggH_Mig01, "THU_ggH_Mig01/F");
+    tree->Branch("THU_ggH_Mig12", &THU_ggH_Mig12, "THU_ggH_Mig12/F");
+    tree->Branch("THU_ggH_VBF2j", &THU_ggH_VBF2j, "THU_ggH_VBF2j/F");
+    tree->Branch("THU_ggH_VBF3j", &THU_ggH_VBF3j, "THU_ggH_VBF3j/F");
+    tree->Branch("THU_ggH_PT60" , &THU_ggH_PT60, "THU_ggH_PT60/F");
+    tree->Branch("THU_ggH_PT120", &THU_ggH_PT120, "THU_ggH_PT120/F");
+    tree->Branch("THU_ggH_qmtop", &THU_ggH_qmtop, "THU_ggH_qmtop/F");
+
+    tree->Branch("higgspt_HTXS",&higgspt_HTXS,"higgspt_HTXS/F");
+    tree->Branch("njets_HTXS",&njets_HTXS,"njets_HTXS/I");
+    tree->Branch("htxs_stage0cat",&htxs_stage0cat,"htxs_stage0cat/I");
+    tree->Branch("htxs_stage1cat",&htxs_stage1cat,"htxs_stage1cat/I");
 
     tree->Branch("mcweight", &mcweight, "mcweight/F");
     tree->Branch("puweight", &puweight, "puweight/F");
@@ -805,6 +840,8 @@ int main(int argc, char * argv[]) {
     tree->Branch("dZ_1_cal",&dZ_1_cal,"dZ_1_cal/F");
     tree->Branch("dZ_2_cal",&dZ_2_cal,"dZ_2_cal/F");
 
+    string cmsswBase = (getenv ("CMSSW_BASE"));
+
     // START : Prepare uncertainties (NEW) ================================================================================================================
 
     vector<TString> unc_vars= {"met",  // 0
@@ -846,8 +883,8 @@ int main(int argc, char * argv[]) {
     inputs unclMetDown;
     inputs escaleUp;
     inputs escaleDown;
-    inputs mscaleUp;
-    inputs mscaleDown;
+    //inputs mscaleUp;
+    //inputs mscaleDown;
     inputs recoilscaleUp;
     inputs recoilscaleDown;
     inputs recoilresoUp;
@@ -865,8 +902,8 @@ int main(int argc, char * argv[]) {
 					     { "unclMetDown" , unclMetDown },
 					     { "escaleUp" , escaleUp },
 					     { "escaleDown" , escaleDown },
-					     { "mscaleUp" , mscaleUp },
-					     { "mscaleDown" , mscaleDown },
+                  //{ "mscaleUp" , mscaleUp },
+					   //{ "mscaleDown" , mscaleDown },
 					     { "recoilscaleUp" , recoilscaleUp },
 					     { "recoilscaleDown" , recoilscaleDown },
 					     { "recoilresoUp" , recoilresoUp },
@@ -932,25 +969,25 @@ int main(int argc, char * argv[]) {
 
     for (int isrc = 0; isrc < nsrc_Eta0To5; isrc++) {
       const char *name = srcnames_Eta0To5[isrc];
-      JetCorrectorParameters const *p = new JetCorrectorParameters("data/Summer16_23Sep2016V4_DATA_UncertaintySources_AK4PFchs.txt", name);
+      JetCorrectorParameters const *p = new JetCorrectorParameters(cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/Summer16_23Sep2016V4_DATA_UncertaintySources_AK4PFchs.txt", name);
       JetCorrectionUncertainty *unc = new JetCorrectionUncertainty(*p);
       vsrc_Eta0To5[isrc] = unc;
     }
     for (int isrc = 0; isrc < nsrc_Eta0To3; isrc++) {
       const char *name = srcnames_Eta0To3[isrc];
-      JetCorrectorParameters const *p = new JetCorrectorParameters("data/Summer16_23Sep2016V4_DATA_UncertaintySources_AK4PFchs.txt", name);
+      JetCorrectorParameters const *p = new JetCorrectorParameters(cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/Summer16_23Sep2016V4_DATA_UncertaintySources_AK4PFchs.txt", name);
       JetCorrectionUncertainty *unc = new JetCorrectionUncertainty(*p);
       vsrc_Eta0To3[isrc] = unc;
     }
     for (int isrc = 0; isrc < nsrc_Eta3To5; isrc++) {
       const char *name = srcnames_Eta3To5[isrc];
-      JetCorrectorParameters const *p = new JetCorrectorParameters("data/Summer16_23Sep2016V4_DATA_UncertaintySources_AK4PFchs.txt", name);
+      JetCorrectorParameters const *p = new JetCorrectorParameters(cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/Summer16_23Sep2016V4_DATA_UncertaintySources_AK4PFchs.txt", name);
       JetCorrectionUncertainty *unc = new JetCorrectionUncertainty(*p);
       vsrc_Eta3To5[isrc] = unc;
     }
     for (int isrc = 0; isrc < nsrc_RelativeBal; isrc++) {
       const char *name = srcnames_RelativeBal[isrc];
-      JetCorrectorParameters const *p = new JetCorrectorParameters("data/Summer16_23Sep2016V4_DATA_UncertaintySources_AK4PFchs.txt", name);
+      JetCorrectorParameters const *p = new JetCorrectorParameters(cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/Summer16_23Sep2016V4_DATA_UncertaintySources_AK4PFchs.txt", name);
       JetCorrectionUncertainty *unc = new JetCorrectionUncertainty(*p);
       vsrc_RelativeBal[isrc] = unc;
     }
@@ -968,7 +1005,6 @@ int main(int argc, char * argv[]) {
     // count number of files --->
     while (fileList0 >> dummy) nTotalFiles++;
     std::vector<Period> periods;
-    string cmsswBase = (getenv ("CMSSW_BASE"));
     string fullPathToJsonFile = cmsswBase + "/src/DesyTauAnalyses/NTupleMaker/test/json/" + jsonFile; 
     
     if (isData) {
@@ -1141,6 +1177,12 @@ int main(int argc, char * argv[]) {
     float MinLJetPt = 20.;
     float MinBJetPt = 20.; // !!!!!
     
+    TFile *file_ggh_reweighting = new TFile(TString(cmsswBase)+TString("/src/DesyTauAnalyses/NTupleMaker/data/NNLOPS_reweight.root"));
+    TGraph * gr_NNLOPSratio_pt_mcatnlo_0jet  = (TGraph*) file_ggh_reweighting->Get("gr_NNLOPSratio_pt_mcatnlo_0jet");
+    TGraph * gr_NNLOPSratio_pt_mcatnlo_1jet  = (TGraph*) file_ggh_reweighting->Get("gr_NNLOPSratio_pt_mcatnlo_1jet");
+    TGraph * gr_NNLOPSratio_pt_mcatnlo_2jet  = (TGraph*) file_ggh_reweighting->Get("gr_NNLOPSratio_pt_mcatnlo_2jet");
+    TGraph * gr_NNLOPSratio_pt_mcatnlo_3jet  = (TGraph*) file_ggh_reweighting->Get("gr_NNLOPSratio_pt_mcatnlo_3jet");
+
     // Z pt mass weights 
     TFile * fileZMassPtWeights = new TFile(TString(cmsswBase)+"/src/"+ZMassPtWeightsFileName);
     if (fileZMassPtWeights->IsZombie()) {
@@ -1257,6 +1299,7 @@ int main(int argc, char * argv[]) {
 	    weightPDFup   = analysisTree.weightPDFup;
 	    weightPDFdown = analysisTree.weightPDFdown;
 
+       weight_ggh_NNLOPS = 1.;
             puweight = 1;
             trigweight_1 = 1;
             trigweight_2 = 1;
@@ -1276,6 +1319,15 @@ int main(int argc, char * argv[]) {
             topptweight = 1;
 	    topptweightRun2 = 1;
 
+       THU_ggH_Mu = 1.0;
+       THU_ggH_Res = 1.0;
+       THU_ggH_Mig01 = 1.0;
+       THU_ggH_Mig12 = 1.0;
+       THU_ggH_VBF2j = 1.0;
+       THU_ggH_VBF3j = 1.0;
+       THU_ggH_PT60 = 1.0;
+       THU_ggH_PT120 = 1.0;
+       THU_ggH_qmtop = 1.0;
             qcdweight = 1;
             qcdweightup = 1;
             qcdweightdown = 1;
@@ -1329,6 +1381,12 @@ int main(int argc, char * argv[]) {
             bosonPt = 0;
             bosonMass = -1;
             
+            njets_HTXS = -1.;
+            higgspt_HTXS = -1.;
+            htxs_stage0cat = -1.;
+            htxs_stage1cat = -1.;
+
+
             metFilters_ = true;
 
 	    badChargedCandidateFilter_ = true;
@@ -1492,12 +1550,18 @@ int main(int argc, char * argv[]) {
                         double gt1_eta = promptTausFirstCopy[0].Eta();
                         double gt2_pt  = promptTausFirstCopy[1].Pt();
                         double gt2_eta = promptTausFirstCopy[1].Eta();
+                        correctionWS_embedded->var("gt_pt")->setVal(gt1_pt);
+                        correctionWS_embedded->var("gt_eta")->setVal(gt1_eta);
+                        double id1_embed = correctionWS_embedded->function("m_sel_idEmb_ratio")->getVal();
+                        correctionWS_embedded->var("gt_pt")->setVal(gt2_pt);
+                        correctionWS_embedded->var("gt_eta")->setVal(gt2_eta);
+                        double id2_embed = correctionWS_embedded->function("m_sel_idEmb_ratio")->getVal();
                         correctionWS_embedded->var("gt1_pt")->setVal(gt1_pt);
                         correctionWS_embedded->var("gt1_eta")->setVal(gt1_eta);
                         correctionWS_embedded->var("gt2_pt")->setVal(gt2_pt);
                         correctionWS_embedded->var("gt2_eta")->setVal(gt2_eta);
                         double trg_embed = correctionWS_embedded->function("m_sel_trg_ratio")->getVal();
-                        embeddedWeight = trg_embed;
+                        embeddedWeight = id1_embed * id2_embed * trg_embed;
                         
                     }
                     else if (promptMuons.size()==2) {
@@ -1551,7 +1615,9 @@ int main(int argc, char * argv[]) {
 
                 nuPt = TMath::Sqrt(nuPx*nuPx+nuPy*nuPy);
                 nuPhi = TMath::ATan2(nuPy,nuPx);
-
+                
+                
+                
                 if (isDY) { // applying Z pt mass weights
                     zptmassweight = 1;
                     if (bosonMass>50.0) {
@@ -1570,6 +1636,35 @@ int main(int argc, char * argv[]) {
                 if (isZEE) ZEE->Fill(0.);
                 if (isZTT) ZTT->Fill(0.);
                 isZLL = isZMM || isZEE;
+            }
+
+            if (isSignal){
+               njets_HTXS = analysisTree.htxs_njets30;
+               higgspt_HTXS = analysisTree.htxs_higgsPt;
+               htxs_stage0cat = analysisTree.htxs_stage0cat;
+               htxs_stage1cat = analysisTree.htxs_stage1cat;
+               if (apply_ggh_reweighting)
+                  {
+                     if      (njets_HTXS==0) weight_ggh_NNLOPS = gr_NNLOPSratio_pt_mcatnlo_0jet->Eval(TMath::Min(higgspt_HTXS,(Float_t)125.0));
+                     else if (njets_HTXS==1) weight_ggh_NNLOPS = gr_NNLOPSratio_pt_mcatnlo_1jet->Eval(TMath::Min(higgspt_HTXS,(Float_t)625.0));
+                     else if (njets_HTXS==2) weight_ggh_NNLOPS = gr_NNLOPSratio_pt_mcatnlo_2jet->Eval(TMath::Min(higgspt_HTXS,(Float_t)800.0));
+                     else if (njets_HTXS>=3) weight_ggh_NNLOPS = gr_NNLOPSratio_pt_mcatnlo_3jet->Eval(TMath::Min(higgspt_HTXS,(Float_t)925.0));
+                     else weight_ggh_NNLOPS = 1.0;
+                     std::cout<<weight_ggh_NNLOPS<<std::endl;
+                     std::vector<double> ggF_unc = qcd_ggF_uncertSF_2017(njets_HTXS, higgspt_HTXS, htxs_stage1cat, 1.0);
+                     THU_ggH_Mu = ggF_unc[0];
+                     THU_ggH_Res = ggF_unc[1];
+                     THU_ggH_Mig01 = ggF_unc[2];
+                     THU_ggH_Mig12 = ggF_unc[3];
+                     THU_ggH_VBF2j = ggF_unc[4];
+                     THU_ggH_VBF3j = ggF_unc[5];
+                     THU_ggH_PT60 = ggF_unc[6];
+                     THU_ggH_PT120 = ggF_unc[7];
+                     THU_ggH_qmtop = ggF_unc[8];
+                     std::cout<<"THU 1: "<<ggF_unc[0]<<std::endl;
+                     std::cout<<"THU 2: "<<ggF_unc[1]<<std::endl;
+                     std::cout<<"THU 3: "<<ggF_unc[2]<<std::endl;
+                  }
             }
 
             run = int(analysisTree.event_run);
@@ -2173,44 +2268,7 @@ int main(int argc, char * argv[]) {
             //qcdweightup_nodzeta   = qcdWeightNoDzeta.getWeight(pt_1,pt_2,dr_tt);
             //qcdweightdown_nodzeta = qcdWeightNoDzeta.getWeight(pt_1,pt_2,dr_tt);
          
-            correctionWS_qcd->var("e_pt")->setVal(pt_1);
-            correctionWS_qcd->var("m_pt")->setVal(pt_2);
-            correctionWS_qcd->var("njets")->setVal(njets);
-            correctionWS_qcd->var("dR")->setVal(dr_tt);
-            double_t em_qcd_osss_binned = correctionWS_qcd->function("em_qcd_osss_binned")->getVal();
-         
-            double_t em_qcd_osss_binned_rate_up = correctionWS_qcd->function("em_qcd_osss_rateup_binned")->getVal();
-            double_t em_qcd_osss_binned_rate_down = correctionWS_qcd->function("em_qcd_osss_ratedown_binned")->getVal();
-            double_t em_qcd_osss_binned_shape_up = correctionWS_qcd->function("em_qcd_osss_shapeup_binned")->getVal();
-            double_t em_qcd_osss_binned_shape_down = correctionWS_qcd->function("em_qcd_osss_shapedown_binned")->getVal();
-                        
-            qcdweight = em_qcd_osss_binned;
             
-            if (njets==0) {
-               qcdweight_0jet_rate_up =  em_qcd_osss_binned_rate_up;
-               qcdweight_0jet_rate_down = em_qcd_osss_binned_rate_down;   
-               qcdweight_0jet_shape_up = em_qcd_osss_binned_shape_up;
-               qcdweight_0jet_shape_down =  em_qcd_osss_binned_shape_down;
-               qcdweight_1jet_rate_up =  em_qcd_osss_binned;
-               qcdweight_1jet_rate_down = em_qcd_osss_binned; 
-               qcdweight_1jet_shape_up = em_qcd_osss_binned;
-               qcdweight_1jet_shape_down = em_qcd_osss_binned;
-            }   
-            else {
-               qcdweight_0jet_rate_up =  em_qcd_osss_binned;
-               qcdweight_0jet_rate_down = em_qcd_osss_binned;
-               qcdweight_0jet_shape_up = em_qcd_osss_binned;
-               qcdweight_0jet_shape_down =  em_qcd_osss_binned;
-               qcdweight_1jet_rate_up =  em_qcd_osss_binned_rate_up;
-               qcdweight_1jet_rate_down =  em_qcd_osss_binned_rate_down;
-               qcdweight_1jet_shape_up = em_qcd_osss_binned_shape_up;
-               qcdweight_1jet_shape_down =  em_qcd_osss_binned_shape_down;
-            }
-            
-            qcdweight_iso_up = correctionWS_qcd->function("em_qcd_bothaiso_extrap_up")->getVal();
-            qcdweight_iso_down = correctionWS_qcd->function("em_qcd_bothaiso_extrap_down")->getVal();
-         
-
             // counting jets
             vector<unsigned int> jets; jets.clear();
             vector<unsigned int> jetspt20; jetspt20.clear();
@@ -2270,22 +2328,24 @@ int main(int argc, char * argv[]) {
 
 	       // Include variations for jec uncertainties
 	       for (auto uncer_split : jec_unc_map) {
-		 float sum_unc   = 0;
-		 for (auto single_jec_unc : uncer_split.second){
-		   JetCorrectionUncertainty *unc = single_jec_unc;
-		   unc->setJetPt(jetPt);
-		   unc->setJetEta(jetEta);
-		   double unc_ = unc->getUncertainty(true);
-		   sum_unc  += pow(unc_,2);
-		 }
-		 float unc_total  = TMath::Sqrt(sum_unc);
-		 jetLV_jecUnc[uncer_split.first + "Up"]   = jetLV * ( 1 + unc_total);
-		 jetLV_jecUnc[uncer_split.first + "Down"] = jetLV * ( 1 - unc_total);
-		 // Propagate jec uncertainties to met
-		 if( metLV_jecUnc.find(uncer_split.first+"Up") == metLV_jecUnc.end()) metLV_jecUnc[uncer_split.first+"Up"] = metLV;
-		 if( metLV_jecUnc.find(uncer_split.first+"Down") == metLV_jecUnc.end()) metLV_jecUnc[uncer_split.first+"Down"] = metLV;
-		 metLV_jecUnc[uncer_split.first + "Up"]   += jetLV* unc_total;
-		 metLV_jecUnc[uncer_split.first + "Down"] += jetLV* unc_total;
+             float sum_unc   = 0;
+             for (auto single_jec_unc : uncer_split.second){
+                JetCorrectionUncertainty *unc = single_jec_unc;
+                unc->setJetPt(jetPt);
+                unc->setJetEta(jetEta);
+                double unc_ = unc->getUncertainty(true);
+                sum_unc  += pow(unc_,2);
+             }
+             float unc_total  = TMath::Sqrt(sum_unc);
+             jetLV_jecUnc[uncer_split.first + "Up"]   = jetLV * ( 1 + unc_total);
+             jetLV_jecUnc[uncer_split.first + "Down"] = jetLV * ( 1 - unc_total);
+             // Propagate jec uncertainties to met
+             if( metLV_jecUnc.find(uncer_split.first+"Up") == metLV_jecUnc.end()) metLV_jecUnc[uncer_split.first+"Up"] = metLV;
+             if( metLV_jecUnc.find(uncer_split.first+"Down") == metLV_jecUnc.end()) metLV_jecUnc[uncer_split.first+"Down"] = metLV;
+             if ( !((isW||isDY||isSignal)&&!isData && applySimpleRecoilCorrections)) {
+                metLV_jecUnc[uncer_split.first + "Up"]   -= jetLV* unc_total;
+                metLV_jecUnc[uncer_split.first + "Down"] += jetLV* unc_total;
+             }
 	       }
 
                float jetPt_tocheck = jetPt;
@@ -2601,7 +2661,7 @@ int main(int argc, char * argv[]) {
             float pfmet_corr_x = met_x;
             float pfmet_corr_y = met_y;
             
-            if ((isW||isDY)&&!isData) {
+            if ((isW||isDY||isSignal)&&!isData) {
                 if (applySimpleRecoilCorrections) {
                     recoilMetCorrector.CorrectByMeanResolution(met_x,met_y,bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,pfmet_corr_x,pfmet_corr_y);
 		    metSys.ApplyMEtSys(pfmet_corr_x, pfmet_corr_y, bosonPx, bosonPy, lepPx, lepPy, njetsforrecoil, MEtSys::ProcessType::BOSON, MEtSys::SysType::Response, MEtSys::SysShift::Up, met_x_recoilscaleUp, met_y_recoilscaleUp);
@@ -2723,7 +2783,7 @@ int main(int argc, char * argv[]) {
             
             bool checkSV = false;
             if (sync) checkSV = computeSVFitMass;
-            else checkSV = computeSVFitMass && dzeta>-40 && iso_1<0.5 && iso_2<0.5 && njetsMax>0;
+            else checkSV = computeSVFitMass && dzeta>-50 && iso_1<0.15 && iso_2<0.2 && trg_muonelectron > 0.5;
             
 	    TMatrixD covMET(2, 2);
             if (checkSV) {
@@ -2844,6 +2904,47 @@ int main(int argc, char * argv[]) {
                 }
                 if (gen_match_1 == 3 && gen_match_2 ==4) veto_embedded = true;
     
+            correctionWS_qcd->var("e_pt")->setVal(pt_1);
+            correctionWS_qcd->var("m_pt")->setVal(pt_2);
+            correctionWS_qcd->var("njets")->setVal(njets);
+            correctionWS_qcd->var("dR")->setVal(dr_tt);
+            double_t em_qcd_osss_binned = correctionWS_qcd->function("em_qcd_osss_binned")->getVal();
+         
+            double_t em_qcd_osss_binned_rate_up = correctionWS_qcd->function("em_qcd_osss_rateup_binned")->getVal();
+            double_t em_qcd_osss_binned_rate_down = correctionWS_qcd->function("em_qcd_osss_ratedown_binned")->getVal();
+            double_t em_qcd_osss_binned_shape_up = correctionWS_qcd->function("em_qcd_osss_shapeup_binned")->getVal();
+            double_t em_qcd_osss_binned_shape_down = correctionWS_qcd->function("em_qcd_osss_shapedown_binned")->getVal();
+                        
+            qcdweight = em_qcd_osss_binned;
+            
+            if (njets==0) {
+               qcdweight_0jet_rate_up =  em_qcd_osss_binned_rate_up;
+               qcdweight_0jet_rate_down = em_qcd_osss_binned_rate_down;   
+               qcdweight_0jet_shape_up = em_qcd_osss_binned_shape_up;
+               qcdweight_0jet_shape_down =  em_qcd_osss_binned_shape_down;
+               qcdweight_1jet_rate_up =  em_qcd_osss_binned;
+               qcdweight_1jet_rate_down = em_qcd_osss_binned; 
+               qcdweight_1jet_shape_up = em_qcd_osss_binned;
+               qcdweight_1jet_shape_down = em_qcd_osss_binned;
+            }   
+            else {
+               qcdweight_0jet_rate_up =  em_qcd_osss_binned;
+               qcdweight_0jet_rate_down = em_qcd_osss_binned;
+               qcdweight_0jet_shape_up = em_qcd_osss_binned;
+               qcdweight_0jet_shape_down =  em_qcd_osss_binned;
+               qcdweight_1jet_rate_up =  em_qcd_osss_binned_rate_up;
+               qcdweight_1jet_rate_down =  em_qcd_osss_binned_rate_down;
+               qcdweight_1jet_shape_up = em_qcd_osss_binned_shape_up;
+               qcdweight_1jet_shape_down =  em_qcd_osss_binned_shape_down;
+            }
+            
+            qcdweight_iso_up = correctionWS_qcd->function("em_qcd_bothaiso_extrap_up")->getVal();
+            qcdweight_iso_down = correctionWS_qcd->function("em_qcd_bothaiso_extrap_down")->getVal();
+         
+
+
+
+
 		double weightE = 1;
 		double weightEUp = 1;
 		double weightEDown = 1;
@@ -2923,42 +3024,42 @@ int main(int argc, char * argv[]) {
 	    d0_2_cal=d0_2;
 	    dZ_2_cal=dZ_2;
 
-	    if (!isData){               
-	       //check if particle is prompt or non-prompt
-               if (gen_match_1 == 3) {  
-                  calibrateIP.DoCalibrationForNonPromptLeptons(pt_1,eta_1,"d0_1",d0_1, d0_1_cal);
-                  calibrateIP.DoCalibrationForNonPromptLeptons(pt_1,eta_1,"dZ_1",dZ_1, dZ_1_cal);
-                  //d0_1_cal = doquantileshift_d01_np.shift(d0_1, 0.55);
-                  //dZ_1_cal = doquantileshift_dZ1_np.shift(dZ_1, 0.55);
+	    // if (!isData){               
+	    //    //check if particle is prompt or non-prompt
+       //         if (gen_match_1 == 3) {  
+       //            calibrateIP.DoCalibrationForNonPromptLeptons(pt_1,eta_1,"d0_1",d0_1, d0_1_cal);
+       //            calibrateIP.DoCalibrationForNonPromptLeptons(pt_1,eta_1,"dZ_1",dZ_1, dZ_1_cal);
+       //            //d0_1_cal = doquantileshift_d01_np.shift(d0_1, 0.55);
+       //            //dZ_1_cal = doquantileshift_dZ1_np.shift(dZ_1, 0.55);
                   
-               }
-               else if (gen_match_1 == 1){
-                  calibrateIP.DoCalibrationForPromptElectrons(pt_1,eta_1,"d0_1",d0_1, d0_1_cal);
-                  calibrateIP.DoCalibrationForPromptElectrons(pt_1,eta_1,"dZ_1",dZ_1, dZ_1_cal);
-                  //d0_1_cal = doquantileshift_d01_pele.shift(d0_1, 0.55);
-                  //dZ_1_cal = doquantileshift_dZ1_pele.shift(dZ_1, 0.55);
-               }
-               else {
-                  d0_1_cal = d0_1;
-                  dZ_1_cal = dZ_1;
-               }
-               if (gen_match_2 == 4) {  
-                  calibrateIP.DoCalibrationForNonPromptLeptons(pt_2,eta_2,"d0_2",d0_2,d0_2_cal);
-                  calibrateIP.DoCalibrationForNonPromptLeptons(pt_2,eta_2,"dZ_2",dZ_2,dZ_2_cal);
-                  //d0_2_cal = doquantileshift_d02_np.shift(d0_2, 0.55);
-                  //dZ_2_cal = doquantileshift_dZ2_np.shift(dZ_2, 0.55);
-               }
-               else if (gen_match_2 == 2){
-                  calibrateIP.DoCalibrationForPromptMuons(pt_2,eta_2,"d0_2",d0_2, d0_2_cal);
-                  calibrateIP.DoCalibrationForPromptMuons(pt_2,eta_2,"dZ_2",dZ_2, dZ_2_cal);
-                  //d0_2_cal = doquantileshift_d02_pmu.shift(d0_2, 0.55);
-                  //dZ_2_cal = doquantileshift_dZ2_pmu.shift(dZ_2, 0.55);
-               }
-               else{
-                  d0_2_cal =d0_2;
-                  dZ_2_cal =dZ_2;
-               }
-            }       
+       //         }
+       //         else if (gen_match_1 == 1){
+       //            calibrateIP.DoCalibrationForPromptElectrons(pt_1,eta_1,"d0_1",d0_1, d0_1_cal);
+       //            calibrateIP.DoCalibrationForPromptElectrons(pt_1,eta_1,"dZ_1",dZ_1, dZ_1_cal);
+       //            //d0_1_cal = doquantileshift_d01_pele.shift(d0_1, 0.55);
+       //            //dZ_1_cal = doquantileshift_dZ1_pele.shift(dZ_1, 0.55);
+       //         }
+       //         else {
+       //            d0_1_cal = d0_1;
+       //            dZ_1_cal = dZ_1;
+       //         }
+       //         if (gen_match_2 == 4) {  
+       //            calibrateIP.DoCalibrationForNonPromptLeptons(pt_2,eta_2,"d0_2",d0_2,d0_2_cal);
+       //            calibrateIP.DoCalibrationForNonPromptLeptons(pt_2,eta_2,"dZ_2",dZ_2,dZ_2_cal);
+       //            //d0_2_cal = doquantileshift_d02_np.shift(d0_2, 0.55);
+       //            //dZ_2_cal = doquantileshift_dZ2_np.shift(dZ_2, 0.55);
+       //         }
+       //         else if (gen_match_2 == 2){
+       //            calibrateIP.DoCalibrationForPromptMuons(pt_2,eta_2,"d0_2",d0_2, d0_2_cal);
+       //            calibrateIP.DoCalibrationForPromptMuons(pt_2,eta_2,"dZ_2",dZ_2, dZ_2_cal);
+       //            //d0_2_cal = doquantileshift_d02_pmu.shift(d0_2, 0.55);
+       //            //dZ_2_cal = doquantileshift_dZ2_pmu.shift(dZ_2, 0.55);
+       //         }
+       //         else{
+       //            d0_2_cal =d0_2;
+       //            dZ_2_cal =dZ_2;
+       //         }
+       //      }       
 
 	    // Add for all relevant variables the met uncertainty
 	    for(auto &uncert : uncertainty_map){
@@ -2975,8 +3076,8 @@ int main(int argc, char * argv[]) {
 	    uncertainty_map.at("escaleUp").electronLV = electronUpLV;
 	    uncertainty_map.at("escaleDown").metLV = metLV_escaleDown;
 	    uncertainty_map.at("escaleDown").electronLV = electronDownLV;
-	    uncertainty_map.at("mscaleUp").muonLV = muonUpLV;
-	    uncertainty_map.at("mscaleDown").muonLV = muonDownLV;
+	    //uncertainty_map.at("mscaleUp").muonLV = muonUpLV;
+	    //uncertainty_map.at("mscaleDown").muonLV = muonDownLV;
 	    uncertainty_map.at("recoilscaleUp").metLV = metLV_recoilscaleUp;
 	    uncertainty_map.at("recoilscaleDown").metLV = metLV_recoilscaleDown;
 	    uncertainty_map.at("recoilresoUp").metLV = metLV_recoilresoUp;

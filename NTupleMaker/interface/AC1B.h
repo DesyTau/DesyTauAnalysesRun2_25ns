@@ -653,6 +653,10 @@ public :
    Float_t         weightScale8;
    Float_t         weightPDFup;
    Float_t         weightPDFdown;*/
+   Int_t           htxs_stage0cat;
+   Int_t           htxs_stage1cat;
+   Float_t         htxs_higgsPt;
+   Int_t           htxs_njets30;
 
 
    // List of branches
@@ -1268,7 +1272,10 @@ public :
    TBranch         *b_weightScale8;
    TBranch         *b_weightPDFup;
    TBranch         *b_weightPDFdown;*/
-
+   TBranch        *b_htxs_stage0cat;   //!
+   TBranch        *b_htxs_stage1cat;   //!
+   TBranch        *b_htxs_higgsPt;   //!
+   TBranch        *b_htxs_njets30;   //!
 
    AC1B(TTree *tree=0, bool isData=false);
    virtual ~AC1B();
@@ -1999,6 +2006,10 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("weightScale8",  &weightScale8, &b_weightScale8);
    fChain->SetBranchAddress("weightPDFup",   &weightPDFup, &b_weightPDFup);
    fChain->SetBranchAddress("weightPDFdown", &weightPDFdown, &b_weightPDFdown);*/
+   fChain->SetBranchAddress("htxs_stage0cat",&htxs_stage0cat, &b_htxs_stage0cat);
+   fChain->SetBranchAddress("htxs_stage1cat",&htxs_stage1cat , &b_htxs_stage1cat);
+   fChain->SetBranchAddress("htxs_higgsPt",&htxs_higgsPt , &b_htxs_higgsPt);
+   fChain->SetBranchAddress("htxs_njets30", &htxs_njets30, &b_htxs_njets30);
    Notify();
 }
 
