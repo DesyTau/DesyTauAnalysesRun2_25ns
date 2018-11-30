@@ -3109,6 +3109,8 @@ int main(int argc, char * argv[]) {
 
 	    for(auto &uncert : uncertainty_map){
 
+	      bool is_data_or_embedded = isData || isEmbedded;
+
 	      propagate_uncertainty( uncert.first,
 				     uncert.second.metLV, covMET, inputFile_visPtResolution,
 				     uncert.second.muonLV,
@@ -3116,7 +3118,7 @@ int main(int argc, char * argv[]) {
 				     uncert.second.jet1LV,
 				     uncert.second.jet2LV,
 				     uncert.second.container,
-				     isData, checkSV);
+				     is_data_or_embedded, checkSV);
 	    }
             tree->Fill();
             selEvents++;
