@@ -219,6 +219,8 @@ int main(int argc, char * argv[]) {
     const float a_jetEleDown = 0.702;
     const float b_jetEleDown = 0.0;
 
+
+    const bool applyRecoilCorrections = (isW||isDY||isSignal)&&!isData;
     // file name and tree name
     std::string rootFileName(argv[2]);
     std::ifstream fileList(argv[2]);
@@ -2328,24 +2330,24 @@ int main(int argc, char * argv[]) {
 
 	       // Include variations for jec uncertainties
 	       for (auto uncer_split : jec_unc_map) {
-             float sum_unc   = 0;
-             for (auto single_jec_unc : uncer_split.second){
-                JetCorrectionUncertainty *unc = single_jec_unc;
-                unc->setJetPt(jetPt);
-                unc->setJetEta(jetEta);
-                double unc_ = unc->getUncertainty(true);
-                sum_unc  += pow(unc_,2);
-             }
-             float unc_total  = TMath::Sqrt(sum_unc);
-             jetLV_jecUnc[uncer_split.first + "Up"]   = jetLV * ( 1 + unc_total);
-             jetLV_jecUnc[uncer_split.first + "Down"] = jetLV * ( 1 - unc_total);
-             // Propagate jec uncertainties to met
-             if( metLV_jecUnc.find(uncer_split.first+"Up") == metLV_jecUnc.end()) metLV_jecUnc[uncer_split.first+"Up"] = metLV;
-             if( metLV_jecUnc.find(uncer_split.first+"Down") == metLV_jecUnc.end()) metLV_jecUnc[uncer_split.first+"Down"] = metLV;
-             if ( !((isW||isDY||isSignal)&&!isData && applySimpleRecoilCorrections)) {
-                metLV_jecUnc[uncer_split.first + "Up"]   -= jetLV* unc_total;
-                metLV_jecUnc[uncer_split.first + "Down"] += jetLV* unc_total;
-             }
+		 float sum_unc   = 0;
+		    for (auto single_jec_unc : uncer_split.second){
+		      JetCorrectionUncertainty *unc = single_jec_unc;
+		   unc->setJetPt(jetPt);
+		   unc->setJetEta(jetEta);
+		   double unc_ = unc->getUncertainty(true);
+		   sum_unc  += pow(unc_,2);
+		 }
+		 float unc_total  = TMath::Sqrt(sum_unc);
+		 jetLV_jecUnc[uncer_split.first + "Up"]   = jetLV * ( 1 + unc_total);
+		 jetLV_jecUnc[uncer_split.first + "Down"] = jetLV * ( 1 - unc_total);
+		 // Propagate jec uncertainties to met (only if recoil corrections are not applied)
+		 if( metLV_jecUnc.find(uncer_split.first+"Up") == metLV_jecUnc.end()) metLV_jecUnc[uncer_split.first+"Up"] = metLV;
+		 if( metLV_jecUnc.find(uncer_split.first+"Down") == metLV_jecUnc.end()) metLV_jecUnc[uncer_split.first+"Down"] = metLV;
+		 if ( !applyRecoilCorrections ) {
+		   metLV_jecUnc[uncer_split.first + "Up"]   -= jetLV* unc_total;
+		   metLV_jecUnc[uncer_split.first + "Down"] += jetLV* unc_total;
+		 }
 	       }
 
                float jetPt_tocheck = jetPt;
@@ -2693,6 +2695,10 @@ int main(int argc, char * argv[]) {
             metphi_unclMetUp = TMath::ATan2(met_unclMetUp_y,met_unclMetUp_x);
             met_unclMetDown = TMath::Sqrt(met_unclMetDown_x*met_unclMetDown_x+met_unclMetDown_y*met_unclMetDown_y);
             metphi_unclMetDown = TMath::ATan2(met_unclMetDown_y,met_unclMetDown_x);
+	    if( applyRecoilCorrections ){
+	      met_unclMetUp = met;
+	      met_unclMetDown = met;
+	    }
 
             float genmet_ex = analysisTree.genmet_ex;
             float genmet_ey = analysisTree.genmet_ey;
@@ -3059,28 +3065,28 @@ int main(int argc, char * argv[]) {
 	    uncertainty_map.at("recoilscaleDown").metLV = metLV_recoilscaleDown;
 	    uncertainty_map.at("recoilresoUp").metLV = metLV_recoilresoUp;
 	    uncertainty_map.at("recoilresoDown").metLV = metLV_recoilresoDown;
-	    uncertainty_map.at("jecUncEta0To5Up").metLV = metLV_jecUnc.at("jecUncEta0To5Up");
+	    if(!applyRecoilCorrections) uncertainty_map.at("jecUncEta0To5Up").metLV = metLV_jecUnc.at("jecUncEta0To5Up");
 	    if(jet1.E() != 0) uncertainty_map.at("jecUncEta0To5Up").jet1LV = jet1LV_jecUnc.at("jecUncEta0To5Up");
 	    if(jet2.E() != 0) uncertainty_map.at("jecUncEta0To5Up").jet2LV = jet2LV_jecUnc.at("jecUncEta0To5Up");
-	    uncertainty_map.at("jecUncEta0To5Down").metLV = metLV_jecUnc.at("jecUncEta0To5Down");
+	    if(!applyRecoilCorrections) uncertainty_map.at("jecUncEta0To5Down").metLV = metLV_jecUnc.at("jecUncEta0To5Down");
 	    if(jet1.E() != 0) uncertainty_map.at("jecUncEta0To5Down").jet1LV = jet1LV_jecUnc.at("jecUncEta0To5Down");
 	    if(jet2.E() != 0) uncertainty_map.at("jecUncEta0To5Down").jet2LV = jet2LV_jecUnc.at("jecUncEta0To5Down");
-	    uncertainty_map.at("jecUncEta0To3Up").metLV = metLV_jecUnc.at("jecUncEta0To3Up");
+	    if(!applyRecoilCorrections) uncertainty_map.at("jecUncEta0To3Up").metLV = metLV_jecUnc.at("jecUncEta0To3Up");
 	    if(jet1.E() != 0) uncertainty_map.at("jecUncEta0To3Up").jet1LV = jet1LV_jecUnc.at("jecUncEta0To3Up");
 	    if(jet2.E() != 0) uncertainty_map.at("jecUncEta0To3Up").jet2LV = jet2LV_jecUnc.at("jecUncEta0To3Up");
-	    uncertainty_map.at("jecUncEta0To3Down").metLV = metLV_jecUnc.at("jecUncEta0To3Down");
+	    if(!applyRecoilCorrections) uncertainty_map.at("jecUncEta0To3Down").metLV = metLV_jecUnc.at("jecUncEta0To3Down");
 	    if(jet1.E() != 0) uncertainty_map.at("jecUncEta0To3Down").jet1LV = jet1LV_jecUnc.at("jecUncEta0To3Down");
 	    if(jet2.E() != 0) uncertainty_map.at("jecUncEta0To3Down").jet2LV = jet2LV_jecUnc.at("jecUncEta0To3Down");
-	    uncertainty_map.at("jecUncEta3To5Up").metLV = metLV_jecUnc.at("jecUncEta3To5Up");
+	    if(!applyRecoilCorrections) uncertainty_map.at("jecUncEta3To5Up").metLV = metLV_jecUnc.at("jecUncEta3To5Up");
 	    if(jet1.E() != 0) uncertainty_map.at("jecUncEta3To5Up").jet1LV = jet1LV_jecUnc.at("jecUncEta3To5Up");
 	    if(jet2.E() != 0) uncertainty_map.at("jecUncEta3To5Up").jet2LV = jet2LV_jecUnc.at("jecUncEta3To5Up");
-	    uncertainty_map.at("jecUncEta3To5Down").metLV = metLV_jecUnc.at("jecUncEta3To5Down");
+	    if(!applyRecoilCorrections) uncertainty_map.at("jecUncEta3To5Down").metLV = metLV_jecUnc.at("jecUncEta3To5Down");
 	    if(jet1.E() != 0) uncertainty_map.at("jecUncEta3To5Down").jet1LV = jet1LV_jecUnc.at("jecUncEta3To5Down");
 	    if(jet2.E() != 0) uncertainty_map.at("jecUncEta3To5Down").jet2LV = jet2LV_jecUnc.at("jecUncEta3To5Down");
-	    uncertainty_map.at("jecUncRelativeBalUp").metLV = metLV_jecUnc.at("jecUncRelativeBalUp");
+	    if(!applyRecoilCorrections) uncertainty_map.at("jecUncRelativeBalUp").metLV = metLV_jecUnc.at("jecUncRelativeBalUp");
 	    if(jet1.E() != 0) uncertainty_map.at("jecUncRelativeBalUp").jet1LV = jet1LV_jecUnc.at("jecUncRelativeBalUp");
 	    if(jet2.E() != 0) uncertainty_map.at("jecUncRelativeBalUp").jet2LV = jet2LV_jecUnc.at("jecUncRelativeBalUp");
-	    uncertainty_map.at("jecUncRelativeBalDown").metLV = metLV_jecUnc.at("jecUncRelativeBalDown");
+	    if(!applyRecoilCorrections) uncertainty_map.at("jecUncRelativeBalDown").metLV = metLV_jecUnc.at("jecUncRelativeBalDown");
 	    if(jet1.E() != 0) uncertainty_map.at("jecUncRelativeBalDown").jet1LV = jet1LV_jecUnc.at("jecUncRelativeBalDown");
 	    if(jet2.E() != 0) uncertainty_map.at("jecUncRelativeBalDown").jet2LV = jet2LV_jecUnc.at("jecUncRelativeBalDown");
 
