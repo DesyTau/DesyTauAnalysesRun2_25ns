@@ -2793,7 +2793,7 @@ int main(int argc, char * argv[]) {
             
             bool checkSV = false;
             if (sync) checkSV = computeSVFitMass;
-            else checkSV = computeSVFitMass && dzeta>-50 && iso_1<0.15 && iso_2<0.2 && trg_muonelectron > 0.5 && extraelec_veto<0.5 && extramuon_veto<0.5;
+            else checkSV = computeSVFitMass && dzeta>-50 && iso_1<0.15 && iso_2<0.2 && trg_muonelectron > 0.5 && extraelec_veto<0.5 && extramuon_veto<0.5 && mTdilepton<90;
             
 	    TMatrixD covMET(2, 2);
             if (checkSV) {
