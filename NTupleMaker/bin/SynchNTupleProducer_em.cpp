@@ -248,7 +248,7 @@ int main(int argc, char * argv[]) {
     unsigned int maxRun = 0;
     Int_t           run;
     Int_t           lumi;
-    Int_t           evt;
+    ULong64_t       evt;
     Int_t           npv;
     Int_t           npu;
     Float_t         rho;
@@ -543,7 +543,7 @@ int main(int argc, char * argv[]) {
 
     tree->Branch("run", &run, "run/I");
     tree->Branch("lumi", &lumi, "lumi/I");
-    tree->Branch("evt", &evt, "evt/I");
+    tree->Branch("evt", &evt, "evt/l");
     tree->Branch("npv", &npv, "npv/I");
     tree->Branch("npu", &npu, "npu/I");
     tree->Branch("rho", &rho, "rho/F");
@@ -1669,7 +1669,7 @@ int main(int argc, char * argv[]) {
 
             run = int(analysisTree.event_run);
             lumi = int(analysisTree.event_luminosityblock);
-            evt = int(analysisTree.event_nr);
+            evt = analysisTree.event_nr;
 
             if (isData && applyGoodRunSelection) {
                 bool lumi = false;
@@ -2783,7 +2783,7 @@ int main(int argc, char * argv[]) {
             
             bool checkSV = false;
             if (sync) checkSV = computeSVFitMass;
-            else checkSV = computeSVFitMass && dzeta>-50 && iso_1<0.15 && iso_2<0.2 && trg_muonelectron > 0.5;
+            else checkSV = computeSVFitMass && dzeta>-50 && iso_1<0.15 && iso_2<0.2 && trg_muonelectron > 0.5 && extraelec_veto<0.5 && extramuon_veto<0.5;
             
 	    TMatrixD covMET(2, 2);
             if (checkSV) {
@@ -2835,188 +2835,165 @@ int main(int argc, char * argv[]) {
             bool bgen_2 = false;
             
             if (!isData) {
-                for (unsigned int igen=0; igen < analysisTree.genparticles_count; ++igen) {
-                    TLorentzVector genLV; genLV.SetXYZT(analysisTree.genparticles_px[igen],
-                                                        analysisTree.genparticles_py[igen],
-                                                        analysisTree.genparticles_pz[igen],
-                                                        analysisTree.genparticles_e[igen]);
-                    float ptGen = genLV.Pt();
-                    bool type1 = abs(analysisTree.genparticles_pdgid[igen])==11 && analysisTree.genparticles_isPrompt[igen] && ptGen>8;
-                    bool type2 = abs(analysisTree.genparticles_pdgid[igen])==13 && analysisTree.genparticles_isPrompt[igen] && ptGen>8;
-                    bool type3 = abs(analysisTree.genparticles_pdgid[igen])==11 && analysisTree.genparticles_isDirectPromptTauDecayProduct[igen] && ptGen>8;
-                    bool type4 = abs(analysisTree.genparticles_pdgid[igen])==13 && analysisTree.genparticles_isDirectPromptTauDecayProduct[igen] && ptGen>8;
-                    bool isAnyType = type1 || type2 || type3 || type4;
-                    if (isAnyType && analysisTree.genparticles_status[igen]==1) {
-                        float etaGen = genLV.Eta();
-                        float phiGen = genLV.Phi();
-                        float deltaR_1 = deltaR(eta_1,phi_1,
-                                                etaGen,phiGen);
-                        if (deltaR_1<minDR_1) {
-                            minDR_1 = deltaR_1;
-                            gen_1 = igen;
-                            bgen_1 = true;
-                            if (type1) gen_match_1 = 1;
-                            else if (type2) gen_match_1 = 2;
-                            else if (type3) gen_match_1 = 3;
-                            else if (type4) gen_match_1 = 4;
-                        }
-                        
-                        float deltaR_2 = deltaR(eta_2,phi_2,
-                                                etaGen,phiGen);
-                        if (deltaR_2<minDR_2) {
-                            minDR_2 = deltaR_2;
-                            gen_2 = igen;
-                            bgen_2 = true;
-                            if (type1) gen_match_2 = 1;
-                            else if (type2) gen_match_2 = 2;
-                            else if (type3) gen_match_2 = 3;
-                            else if (type4) gen_match_2 = 4;
-                        }
-                    }
-                }
-                TLorentzVector genElectronLV; genElectronLV.SetPtEtaPhiM(pt_1,eta_1,phi_1,0.51100e-3);
-                TLorentzVector genMuonLV; genMuonLV.SetPtEtaPhiM(pt_2,eta_2,phi_2,105.658e-3);
-                if (bgen_1) genElectronLV.SetXYZT(analysisTree.genparticles_px[gen_1],
-                                                  analysisTree.genparticles_py[gen_1],
-                                                  analysisTree.genparticles_pz[gen_1],
-                                                  analysisTree.genparticles_e[gen_1]);
-                if (bgen_2) genMuonLV.SetXYZT(analysisTree.genparticles_px[gen_2],
-                                              analysisTree.genparticles_py[gen_2],
-                                              analysisTree.genparticles_pz[gen_2],
-                                              analysisTree.genparticles_e[gen_2]);
-                
-                //	TLorentzVector genDileptonLV = genElectronLV + genMuonLV;
-                TLorentzVector genMetLV; genMetLV.SetXYZM(genmet_ex,genmet_ey,
-                                                          0,0);
-                
-                mTemu_gen = mT(genElectronLV,genMuonLV);
-                mTemet_gen = mT(genElectronLV,genMetLV);
-                mTmumet_gen = mT(genMuonLV,genMetLV);
-                mTtot_gen = totalTransverseMass(genElectronLV,genMuonLV,genMetLV);
-                
-                if (gen_match_1>2&&gen_match_2>3) { 
-                    isZTT = true;
-                    isZLL = false;
-                }
-                else {
-                    isZTT = false;
-                    isZLL = true;
-                }
-                if (gen_match_1 == 3 && gen_match_2 ==4) veto_embedded = true;
-    
+	      for (unsigned int igen=0; igen < analysisTree.genparticles_count; ++igen) {
+		TLorentzVector genLV; genLV.SetXYZT(analysisTree.genparticles_px[igen],
+						    analysisTree.genparticles_py[igen],
+						    analysisTree.genparticles_pz[igen],
+						    analysisTree.genparticles_e[igen]);
+		float ptGen = genLV.Pt();
+		bool type1 = abs(analysisTree.genparticles_pdgid[igen])==11 && analysisTree.genparticles_isPrompt[igen] && ptGen>8;
+		bool type2 = abs(analysisTree.genparticles_pdgid[igen])==13 && analysisTree.genparticles_isPrompt[igen] && ptGen>8;
+		bool type3 = abs(analysisTree.genparticles_pdgid[igen])==11 && analysisTree.genparticles_isDirectPromptTauDecayProduct[igen] && ptGen>8;
+		bool type4 = abs(analysisTree.genparticles_pdgid[igen])==13 && analysisTree.genparticles_isDirectPromptTauDecayProduct[igen] && ptGen>8;
+		bool isAnyType = type1 || type2 || type3 || type4;
+		if (isAnyType && analysisTree.genparticles_status[igen]==1) {
+		  float etaGen = genLV.Eta();
+		  float phiGen = genLV.Phi();
+		  float deltaR_1 = deltaR(eta_1,phi_1,etaGen,phiGen);
+		  if (deltaR_1<minDR_1) {
+		    minDR_1 = deltaR_1;
+		    gen_1 = igen;
+		    bgen_1 = true;
+		    if (type1) gen_match_1 = 1;
+		    else if (type2) gen_match_1 = 2;
+		    else if (type3) gen_match_1 = 3;
+		    else if (type4) gen_match_1 = 4;
+		  }
+		  float deltaR_2 = deltaR(eta_2,phi_2,etaGen,phiGen);
+		  if (deltaR_2<minDR_2) {
+		    minDR_2 = deltaR_2;
+		    gen_2 = igen;
+		    bgen_2 = true;
+		    if (type1) gen_match_2 = 1;
+		    else if (type2) gen_match_2 = 2;
+		    else if (type3) gen_match_2 = 3;
+		    else if (type4) gen_match_2 = 4;
+		  }
+		}
+	      }// finished igen loop
+	      TLorentzVector genElectronLV; genElectronLV.SetPtEtaPhiM(pt_1,eta_1,phi_1,0.51100e-3);
+	      TLorentzVector genMuonLV; genMuonLV.SetPtEtaPhiM(pt_2,eta_2,phi_2,105.658e-3);
+	      if (bgen_1) genElectronLV.SetXYZT(analysisTree.genparticles_px[gen_1],
+						analysisTree.genparticles_py[gen_1],
+						analysisTree.genparticles_pz[gen_1],
+						analysisTree.genparticles_e[gen_1]);
+	      if (bgen_2) genMuonLV.SetXYZT(analysisTree.genparticles_px[gen_2],
+					    analysisTree.genparticles_py[gen_2],
+					    analysisTree.genparticles_pz[gen_2],
+					    analysisTree.genparticles_e[gen_2]);
+
+	      TLorentzVector genMetLV; genMetLV.SetXYZM(genmet_ex,genmet_ey,0,0);
+
+	      mTemu_gen = mT(genElectronLV,genMuonLV);
+	      mTemet_gen = mT(genElectronLV,genMetLV);
+	      mTmumet_gen = mT(genMuonLV,genMetLV);
+	      mTtot_gen = totalTransverseMass(genElectronLV,genMuonLV,genMetLV);
+
+	      if (gen_match_1>2&&gen_match_2>3) { 
+		isZTT = true;
+		isZLL = false;
+	      }
+	      else {
+		isZTT = false;
+		isZLL = true;
+	      }
+	      if (gen_match_1 == 3 && gen_match_2 ==4) veto_embedded = true;
+
+	      double weightE = 1;
+	      double weightEUp = 1;
+	      double weightEDown = 1;
+	      if (gen_match_1==6) {
+		double dRmin = 0.5;
+		double ptJet = pt_1;
+		for (unsigned int ijet=0; ijet<analysisTree.pfjet_count; ++ijet) {
+		  double etaJet = analysisTree.pfjet_eta[ijet];
+		  double phiJet = analysisTree.pfjet_phi[ijet];
+		  double dRjetE = deltaR(etaJet,phiJet,eta_1,phi_1);
+		  if (dRjetE<dRmin) {
+		    dRmin = dRjetE;
+		    ptJet = analysisTree.pfjet_pt[ijet];
+		  }
+		}
+		weightE     = a_jetEle + b_jetEle*ptJet;
+		weightEUp   = a_jetEleUp + b_jetEleUp*ptJet;
+		weightEDown = a_jetEleDown + b_jetEleDown*ptJet;
+		fakeweight *= weightE;
+	      }
+	      else {
+		weightE = isoweight_1;
+		weightEUp = isoweight_1;
+		weightEDown = isoweight_1;
+	      }
+
+	      double weightMu = 1;
+	      double weightMuUp = 1;
+	      double weightMuDown = 1;
+	      if (gen_match_2==6) {
+		double dRmin = 0.5;
+		double ptJet = pt_2;
+		for (unsigned int ijet=0; ijet<analysisTree.pfjet_count; ++ijet) {
+		  double etaJet = analysisTree.pfjet_eta[ijet];
+		  double phiJet = analysisTree.pfjet_phi[ijet];
+		  double dRjetM = deltaR(etaJet,phiJet,eta_2,phi_2);
+		  if (dRjetM<dRmin) {
+		    dRmin = dRjetM;
+		    ptJet = analysisTree.pfjet_pt[ijet];
+		  }
+		}
+		weightMu     = a_jetMu     + b_jetMu*ptJet;
+		weightMuUp   = a_jetMuUp   + b_jetMuUp*ptJet;
+		weightMuDown = a_jetMuDown + b_jetMuDown*ptJet;
+		fakeweight *= weightMu;
+	      }
+	      else {
+		weightMu = isoweight_2;
+		weightMuUp = isoweight_2;
+		weightMuDown = isoweight_2;
+	      }
+	      float effweight0 = effweight;
+	      effweight = effweight0 * weightE * weightMu;
+	      effweight_jetMuUp   = effweight0 * weightE     * weightMuUp;
+	      effweight_jetMuDown = effweight0 * weightE     * weightMuDown;
+	      effweight_jetEUp    = effweight0 * weightEUp   * weightMu;
+	      effweight_jetEDown  = effweight0 * weightEDown * weightMu;
+
+	      if (sync) weight = effweight * puweight * 0.979;
+            }// finished if(!isData)
+
             correctionWS_qcd->var("e_pt")->setVal(pt_1);
             correctionWS_qcd->var("m_pt")->setVal(pt_2);
             correctionWS_qcd->var("njets")->setVal(njets);
             correctionWS_qcd->var("dR")->setVal(dr_tt);
             double_t em_qcd_osss_binned = correctionWS_qcd->function("em_qcd_osss_binned")->getVal();
-         
             double_t em_qcd_osss_binned_rate_up = correctionWS_qcd->function("em_qcd_osss_rateup_binned")->getVal();
             double_t em_qcd_osss_binned_rate_down = correctionWS_qcd->function("em_qcd_osss_ratedown_binned")->getVal();
             double_t em_qcd_osss_binned_shape_up = correctionWS_qcd->function("em_qcd_osss_shapeup_binned")->getVal();
             double_t em_qcd_osss_binned_shape_down = correctionWS_qcd->function("em_qcd_osss_shapedown_binned")->getVal();
-                        
             qcdweight = em_qcd_osss_binned;
-            
+
             if (njets==0) {
-               qcdweight_0jet_rate_up =  em_qcd_osss_binned_rate_up;
-               qcdweight_0jet_rate_down = em_qcd_osss_binned_rate_down;   
-               qcdweight_0jet_shape_up = em_qcd_osss_binned_shape_up;
-               qcdweight_0jet_shape_down =  em_qcd_osss_binned_shape_down;
-               qcdweight_1jet_rate_up =  em_qcd_osss_binned;
-               qcdweight_1jet_rate_down = em_qcd_osss_binned; 
-               qcdweight_1jet_shape_up = em_qcd_osss_binned;
-               qcdweight_1jet_shape_down = em_qcd_osss_binned;
-            }   
-            else {
-               qcdweight_0jet_rate_up =  em_qcd_osss_binned;
-               qcdweight_0jet_rate_down = em_qcd_osss_binned;
-               qcdweight_0jet_shape_up = em_qcd_osss_binned;
-               qcdweight_0jet_shape_down =  em_qcd_osss_binned;
-               qcdweight_1jet_rate_up =  em_qcd_osss_binned_rate_up;
-               qcdweight_1jet_rate_down =  em_qcd_osss_binned_rate_down;
-               qcdweight_1jet_shape_up = em_qcd_osss_binned_shape_up;
-               qcdweight_1jet_shape_down =  em_qcd_osss_binned_shape_down;
+	      qcdweight_0jet_rate_up =  em_qcd_osss_binned_rate_up;
+	      qcdweight_0jet_rate_down = em_qcd_osss_binned_rate_down;
+	      qcdweight_0jet_shape_up = em_qcd_osss_binned_shape_up;
+	      qcdweight_0jet_shape_down =  em_qcd_osss_binned_shape_down;
+	      qcdweight_1jet_rate_up =  em_qcd_osss_binned;
+	      qcdweight_1jet_rate_down = em_qcd_osss_binned;
+	      qcdweight_1jet_shape_up = em_qcd_osss_binned;
+	      qcdweight_1jet_shape_down = em_qcd_osss_binned;
             }
-            
+            else {
+	      qcdweight_0jet_rate_up =  em_qcd_osss_binned;
+	      qcdweight_0jet_rate_down = em_qcd_osss_binned;
+	      qcdweight_0jet_shape_up = em_qcd_osss_binned;
+	      qcdweight_0jet_shape_down =  em_qcd_osss_binned;
+	      qcdweight_1jet_rate_up =  em_qcd_osss_binned_rate_up;
+	      qcdweight_1jet_rate_down =  em_qcd_osss_binned_rate_down;
+	      qcdweight_1jet_shape_up = em_qcd_osss_binned_shape_up;
+	      qcdweight_1jet_shape_down =  em_qcd_osss_binned_shape_down;
+            }
+
             qcdweight_iso_up = correctionWS_qcd->function("em_qcd_bothaiso_extrap_up")->getVal();
             qcdweight_iso_down = correctionWS_qcd->function("em_qcd_bothaiso_extrap_down")->getVal();
-         
-
-
-
-
-		double weightE = 1;
-		double weightEUp = 1;
-		double weightEDown = 1;
-		if (gen_match_1==6) {
-		  double dRmin = 0.5;
-		  double ptJet = pt_1;
-		  for (unsigned int ijet=0; ijet<analysisTree.pfjet_count; ++ijet) {
-		    double etaJet = analysisTree.pfjet_eta[ijet];
-		    double phiJet = analysisTree.pfjet_phi[ijet];
-		    double dRjetE = deltaR(etaJet,phiJet,eta_1,phi_1);
-		    if (dRjetE<dRmin) {
-		      dRmin = dRjetE;
-		      ptJet = analysisTree.pfjet_pt[ijet];
-		    }
-		  }
-		  // if (isTOP) {
-		  //   weightE = 1;
-		  //   weightEUp = 1;
-		  //   weightEDown = 1;
-		  // }
-		  
-        weightE     = a_jetEle + b_jetEle*ptJet;
-        weightEUp   = a_jetEleUp + b_jetEleUp*ptJet;
-        weightEDown = a_jetEleDown + b_jetEleDown*ptJet;
-		  
-		  fakeweight *= weightE;
-		}
-		else {
-		  weightE = isoweight_1;
-		  weightEUp = isoweight_1;
-		  weightEDown = isoweight_1;
-      }
-
-		double weightMu = 1;
-		double weightMuUp = 1;
-		double weightMuDown = 1;
-		if (gen_match_2==6) {
-		  double dRmin = 0.5;
-		  double ptJet = pt_2;
-		  for (unsigned int ijet=0; ijet<analysisTree.pfjet_count; ++ijet) {
-		    double etaJet = analysisTree.pfjet_eta[ijet];
-		    double phiJet = analysisTree.pfjet_phi[ijet];
-		    double dRjetM = deltaR(etaJet,phiJet,eta_2,phi_2);
-		    if (dRjetM<dRmin) {
-		      dRmin = dRjetM;
-		      ptJet = analysisTree.pfjet_pt[ijet];
-		    }
-		  }
-        weightMu     = a_jetMu     + b_jetMu*ptJet;
-        weightMuUp   = a_jetMuUp   + b_jetMuUp*ptJet;
-        weightMuDown = a_jetMuDown + b_jetMuDown*ptJet;
-        
-		  fakeweight *= weightMu;
-		}
-		else {
-		  weightMu = isoweight_2;
-		  weightMuUp = isoweight_2;
-		  weightMuDown = isoweight_2;
-      }
-		float effweight0 = effweight;
-		effweight = effweight0 * weightE * weightMu;
-		effweight_jetMuUp   = effweight0 * weightE     * weightMuUp;
-		effweight_jetMuDown = effweight0 * weightE     * weightMuDown; 
-		effweight_jetEUp    = effweight0 * weightEUp   * weightMu;
-		effweight_jetEDown  = effweight0 * weightEDown * weightMu; 
-            
-      if (sync) weight = effweight * puweight * 0.979;
-      // std::cout<<"effweight: "<<effweight/(idweight_1*idweight_2)<<std::endl;
-      // std::cout<<"puweight: "<<puweight<<std::endl;
-      // std::cout<<"e tracking: "<<idweight_1<<std::endl;
-      // std::cout<<"mu tracking: "<<idweight_2<<std::endl;
-            }
 
 	    // First set the calibrated variables to the uncalibrated versions -> necessary for data
 	    d0_1_cal=d0_1;
