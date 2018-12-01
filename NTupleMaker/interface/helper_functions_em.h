@@ -165,7 +165,11 @@ void propagate_uncertainty(TString uncertainty_name,
     classic_svFit::MeasuredTauLepton svFitMu(classic_svFit::MeasuredTauLepton::kTauToMuDecay, muonLV.Pt(), muonLV.Eta(), muonLV.Phi(), 105.658e-3);
     ClassicSVfit algo = SVFitMassComputation(svFitEle, svFitMu, metLV.Px(), metLV.Py(), covMET, inputFile_visPtResolution);
     uncertainty_container[23] = static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(algo.getHistogramAdapter())->getMass();
+    uncertainty_container[24] = static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(algo.getHistogramAdapter())->getPt(); 
+    uncertainty_container[25]= static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(algo.getHistogramAdapter())->getEta();
+    uncertainty_container[26]= static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(algo.getHistogramAdapter())->getPhi();
+    uncertainty_container[27]= static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(algo.getHistogramAdapter())->getTransverseMass();
   }
   // mTemu // 24
-  uncertainty_container[24] = mT(electronLV,muonLV);
+  uncertainty_container[28] = mT(electronLV,muonLV);
 }

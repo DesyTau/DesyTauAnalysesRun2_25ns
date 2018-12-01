@@ -870,7 +870,11 @@ int main(int argc, char * argv[]) {
 			       "dijetphi", // 21
 			       "dijetpt", // 22
 			       "m_sv", // 23
-			       "mTemu"}; // 24
+			       "pt_sv", // 24
+			       "eta_sv", // 25
+			       "phi_sv", // 26
+			       "mt_sv", // 27
+			       "mTemu"}; // 28
 
     struct inputs {
       float container[50]; // this array is used as a container for the shifted variables in the propagate_uncertainty function
