@@ -2793,7 +2793,7 @@ int main(int argc, char * argv[]) {
             
             bool checkSV = false;
             if (sync) checkSV = computeSVFitMass;
-            else checkSV = computeSVFitMass && dzeta>-50 && iso_1<0.15 && iso_2<0.2 && trg_muonelectron > 0.5 && extraelec_veto<0.5 && extramuon_veto<0.5 && mTdilepton<90;
+            else checkSV = computeSVFitMass && dzeta>-50 && iso_1<0.15 && iso_2<0.2 && trg_muonelectron > 0.5 && extraelec_veto<0.5 && extramuon_veto<0.5 && mTdileptonMET<90;
             
 	    TMatrixD covMET(2, 2);
             if (checkSV) {
@@ -3002,8 +3002,8 @@ int main(int argc, char * argv[]) {
 	      qcdweight_1jet_shape_down =  em_qcd_osss_binned_shape_down;
             }
 
-            qcdweight_iso_up = correctionWS_qcd->function("em_qcd_bothaiso_extrap_up")->getVal();
-            qcdweight_iso_down = correctionWS_qcd->function("em_qcd_bothaiso_extrap_down")->getVal();
+            qcdweight_iso_up = correctionWS_qcd->function("em_qcd_extrap_up")->getVal();
+            qcdweight_iso_down = correctionWS_qcd->function("em_qcd_extrap_down")->getVal();
 
 	    // First set the calibrated variables to the uncalibrated versions -> necessary for data
 	    d0_1_cal=d0_1;
