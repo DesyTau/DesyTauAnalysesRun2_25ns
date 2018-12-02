@@ -613,12 +613,12 @@ int main(int argc, char * argv[]) {
     tree->Branch("qcdweightdown_nodzeta", &qcdweightdown_nodzeta, "qcdweightdown_nodzeta/F");
     
     tree->Branch("qcdweight_0jet_rate_up",&qcdweight_0jet_rate_up,"qcdweight_0jet_rate_up/F");
-    tree->Branch("qcdweight_0jet_rate_down ",&qcdweight_0jet_rate_down,"qcdweight_0jet_rate_down/F");
-    tree->Branch("qcdweight_1jet_rate_up ",&qcdweight_1jet_rate_up,"qcdweight_1jet_rate_up/F");
+    tree->Branch("qcdweight_0jet_rate_down",&qcdweight_0jet_rate_down,"qcdweight_0jet_rate_down/F");
+    tree->Branch("qcdweight_1jet_rate_up",&qcdweight_1jet_rate_up,"qcdweight_1jet_rate_up/F");
     tree->Branch("qcdweight_1jet_rate_down",&qcdweight_1jet_rate_down,"qcdweight_1jet_rate_down/F");
     tree->Branch("qcdweight_0jet_shape_up",&qcdweight_0jet_shape_up,"qcdweight_0jet_shape_up/F");
     tree->Branch("qcdweight_0jet_shape_down",&qcdweight_0jet_shape_down,"qcdweight_0jet_shape_down/F");  
-    tree->Branch("qcdweight_1jet_shape_up ",&qcdweight_1jet_shape_up,"qcdweight_1jet_shape_up/F");
+    tree->Branch("qcdweight_1jet_shape_up",&qcdweight_1jet_shape_up,"qcdweight_1jet_shape_up/F");
     tree->Branch("qcdweight_1jet_shape_down",&qcdweight_1jet_shape_down,"qcdweight_1jet_shape_down/F");
 
     tree->Branch("qcdweight_iso_up",&qcdweight_iso_up,"qcdweight_iso_up/F");
