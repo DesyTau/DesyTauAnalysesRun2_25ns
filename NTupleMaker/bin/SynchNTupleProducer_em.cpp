@@ -2700,8 +2700,12 @@ int main(int argc, char * argv[]) {
             met_unclMetDown = TMath::Sqrt(met_unclMetDown_x*met_unclMetDown_x+met_unclMetDown_y*met_unclMetDown_y);
             metphi_unclMetDown = TMath::ATan2(met_unclMetDown_y,met_unclMetDown_x);
 	    if( applyRecoilCorrections ){
-	      met_unclMetUp = met;
-	      met_unclMetDown = met;
+	      met_unclMetUp_x   = met_x;
+	      met_unclMetDown_x = met_x;
+	      met_unclMetUp_y   = met_y;
+	      met_unclMetDown_y = met_y;
+	      met_unclMetUp     = met;
+	      met_unclMetDown   = met;
 	    }
 
             float genmet_ex = analysisTree.genmet_ex;
