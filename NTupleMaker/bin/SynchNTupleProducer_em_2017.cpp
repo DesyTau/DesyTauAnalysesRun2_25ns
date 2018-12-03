@@ -1918,6 +1918,7 @@ int main(int argc, char * argv[]) {
                 //store momentum from neutrino of tau lepton decays
                 nuPx = tauNeutrinosLV.Px(); nuPy = tauNeutrinosLV.Py(); nuPz = tauNeutrinosLV.Pz();
                 }
+             
              else if (isW) { //store geninfo for W+jets events
                 bosonPx = wDecayProductsLV.Px(); bosonPy = wDecayProductsLV.Py(); bosonPz = wDecayProductsLV.Pz();
                 bosonMass = wDecayProductsLV.M();
@@ -2030,10 +2031,10 @@ int main(int argc, char * argv[]) {
                  htxs_stage1cat = analysisTree.htxs_stage1cat;
                  if (apply_ggh_reweighting)
                     {
-                       if      (njets_HTXS==0) weight_ggh_NNLOPS = gr_NNLOPSratio_pt_mcatnlo_0jet->Eval(TMath::Min(higgspt_HTXS,125.0));
-                       else if (njets_HTXS==1) weight_ggh_NNLOPS = gr_NNLOPSratio_pt_mcatnlo_1jet->Eval(TMath::Min(higgspt_HTXS,625.0));
-                       else if (njets_HTXS==2) weight_ggh_NNLOPS = gr_NNLOPSratio_pt_mcatnlo_2jet->Eval(TMath::Min(higgspt_HTXS,800.0));
-                       else if (njets_HTXS>=3) weight_ggh_NNLOPS = gr_NNLOPSratio_pt_mcatnlo_3jet->Eval(TMath::Min(higgspt_HTXS,925.0));
+                       if      (njets_HTXS==0) weight_ggh_NNLOPS = gr_NNLOPSratio_pt_mcatnlo_0jet->Eval(TMath::Min(higgspt_HTXS,(Float_t)125.0));
+                       else if (njets_HTXS==1) weight_ggh_NNLOPS = gr_NNLOPSratio_pt_mcatnlo_1jet->Eval(TMath::Min(higgspt_HTXS,(Float_t)625.0));
+                       else if (njets_HTXS==2) weight_ggh_NNLOPS = gr_NNLOPSratio_pt_mcatnlo_2jet->Eval(TMath::Min(higgspt_HTXS,(Float_t)800.0));
+                       else if (njets_HTXS>=3) weight_ggh_NNLOPS = gr_NNLOPSratio_pt_mcatnlo_3jet->Eval(TMath::Min(higgspt_HTXS,(Float_t)925.0));
                        else weight_ggh_NNLOPS = 1.0;
 
                        std::vector<double> ggF_unc = qcd_ggF_uncertSF_2017(njets_HTXS, higgspt_HTXS, htxs_stage1cat, 1.0);
@@ -2577,7 +2578,7 @@ int main(int argc, char * argv[]) {
                (isMu23&&isEle12&&analysisTree.muon_pt[muonIndex]>ptMuonHighCut) ||
                (isMu8&&isEle23&&analysisTree.electron_pt[electronIndex]>ptElectronHighCut);
             //event stored if trigger matching is true and a match to one of the triggers has been found
-            //if (applyTriggerMatch&&trg_muonelectron<0.5) continue;
+            if (applyTriggerMatch&&trg_muonelectron<0.5) continue;
             if (debug) std::cout<<"A trigger match has been found"<<std::endl;
             
             //OS Muon-Ele pair?
@@ -3729,8 +3730,8 @@ int main(int argc, char * argv[]) {
             phi_sv_escaleDown = -10;
 
             //calculate SV mass only for certain events
-            //if (computeSVFitMass && dzeta>-40 && iso_1<0.5 && iso_2<0.5 && njetsMax>0) {
-                if (computeSVFitMass) {
+            if (computeSVFitMass && dzeta>-40 && iso_1<0.15 && iso_2<0.2 && trg_muonelectron > 0.5) {
+               //    if (computeSVFitMass) {
                //                if (mvaMetFound) {
                // covariance matrix MET
                     TMatrixD covMET(2, 2);

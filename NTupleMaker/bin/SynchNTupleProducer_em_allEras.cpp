@@ -2174,6 +2174,12 @@ int main(int argc, char * argv[]) {
                      isoweight_2 = (float)SF_muonIdIso->get_ScaleFactor(double(pt_2),double(eta_2));
                   }
                   else {
+                     correctionWS_tracking->var("e_pt")->setVal(pt_1);
+                     correctionWS_tracking->var("e_eta")->setVal(eta_1);
+                     correctionWS_tracking->var("e_iso")->setVal(iso_1);
+                     correctionWS_tracking->var("m_pt")->setVal(pt_2);
+                     correctionWS_tracking->var("m_eta")->setVal(eta_2);
+                     correctionWS_tracking->var("m_iso")->setVal(iso_2);
                      isoweight_1 = correctionWS_tracking->function("e_idiso_binned_ratio")->getVal();
                      isoweight_2 = correctionWS_tracking->function("m_idiso_binned_ratio")->getVal();
                   } 
@@ -2202,6 +2208,13 @@ int main(int argc, char * argv[]) {
                 float Mu23EffMC = 1;
                 float Mu8EffMC = 1;
                 
+                correctionWS_embedded_trigger->var("e_pt")->setVal(pt_1);
+                correctionWS_embedded_trigger->var("e_eta")->setVal(eta_1);
+                correctionWS_embedded_trigger->var("m_pt")->setVal(pt_2);
+                correctionWS_embedded_trigger->var("m_eta")->setVal(eta_2);
+                correctionWS_embedded_trigger->var("m_iso")->setVal(iso_2);
+                correctionWS_embedded_trigger->var("e_iso")->setVal(iso_1);
+
                 if (is2016){
                    Ele23EffData = (float)SF_electron23->get_EfficiencyData(double(pt_1),double(eta_1));
                    Ele12EffData = (float)SF_electron12->get_EfficiencyData(double(pt_1),double(eta_1));
@@ -2214,12 +2227,7 @@ int main(int argc, char * argv[]) {
                    Mu23EffData  = correctionWS_embedded_trigger->function("m_trg_binned_23_data")->getVal();
                    Mu8EffData   = correctionWS_embedded_trigger->function("m_trg_binned_8_data")->getVal();
                 }
-                
-                correctionWS_embedded_trigger->var("e_pt")->setVal(pt_1);
-                correctionWS_embedded_trigger->var("e_eta")->setVal(eta_1);
-                correctionWS_embedded_trigger->var("m_pt")->setVal(pt_2);
-                correctionWS_embedded_trigger->var("m_eta")->setVal(eta_2);
-                
+                     
                 if (isEmbedded){
                    if (is2016){
                       Ele23EffData = correctionWS_embedded_trigger->function("e_trg23_binned_ic_data")->getVal();
