@@ -1656,7 +1656,7 @@ int main(int argc, char * argv[]) {
                      else if (njets_HTXS==2) weight_ggh_NNLOPS = gr_NNLOPSratio_pt_mcatnlo_2jet->Eval(TMath::Min(higgspt_HTXS,(Float_t)800.0));
                      else if (njets_HTXS>=3) weight_ggh_NNLOPS = gr_NNLOPSratio_pt_mcatnlo_3jet->Eval(TMath::Min(higgspt_HTXS,(Float_t)925.0));
                      else weight_ggh_NNLOPS = 1.0;
-                     std::cout<<weight_ggh_NNLOPS<<std::endl;
+                     // std::cout<<weight_ggh_NNLOPS<<std::endl;
                      std::vector<double> ggF_unc = qcd_ggF_uncertSF_2017(njets_HTXS, higgspt_HTXS, htxs_stage1cat, 1.0);
                      THU_ggH_Mu = ggF_unc[0];
                      THU_ggH_Res = ggF_unc[1];
