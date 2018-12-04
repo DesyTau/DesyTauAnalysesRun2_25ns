@@ -2550,6 +2550,25 @@ int main(int argc, char * argv[]) {
                 jphi_1 = analysisTree.pfjet_phi[indexLeadingJet];
                 jptraw_1 = analysisTree.pfjet_pt[indexLeadingJet]*analysisTree.pfjet_energycorr[indexLeadingJet];
                 jmva_1 = analysisTree.pfjet_pu_jet_full_mva[indexLeadingJet];
+
+		jet1.SetPxPyPzE(analysisTree.pfjet_px[indexLeadingJet],
+				analysisTree.pfjet_py[indexLeadingJet],
+				analysisTree.pfjet_pz[indexLeadingJet],
+				analysisTree.pfjet_e[indexLeadingJet]);
+
+		for (auto uncer_split : jec_unc_map) {
+		  float sum_unc   = 0;
+		  for (auto single_jec_unc : uncer_split.second){
+		    JetCorrectionUncertainty *unc = single_jec_unc;
+		    unc->setJetPt(jet1.Pt());
+		    unc->setJetEta(jet1.Eta());
+		    double unc_ = unc->getUncertainty(true);
+		    sum_unc  += pow(unc_,2);
+		  }
+		  float unc_total = TMath::Sqrt(sum_unc);
+		  jet1LV_jecUnc[uncer_split.first+"Up"]   = jet1*(1+unc_total);
+		  jet1LV_jecUnc[uncer_split.first+"Down"] = jet1*(1-unc_total);
+		}
             }
             
             jpt_2 = -10;
@@ -2567,6 +2586,25 @@ int main(int argc, char * argv[]) {
                 jphi_2 = analysisTree.pfjet_phi[indexSubLeadingJet];
                 jptraw_2 = analysisTree.pfjet_pt[indexSubLeadingJet]*analysisTree.pfjet_energycorr[indexSubLeadingJet];
                 jmva_2 = analysisTree.pfjet_pu_jet_full_mva[indexSubLeadingJet];
+
+		jet2.SetPxPyPzE(analysisTree.pfjet_px[indexSubLeadingJet],
+				analysisTree.pfjet_py[indexSubLeadingJet],
+				analysisTree.pfjet_pz[indexSubLeadingJet],
+				analysisTree.pfjet_e[indexSubLeadingJet]);
+
+		for (auto uncer_split : jec_unc_map) {
+		  float sum_unc   = 0;
+		  for (auto single_jec_unc : uncer_split.second){
+		    JetCorrectionUncertainty *unc = single_jec_unc;
+		    unc->setJetPt(jet2.Pt());
+		    unc->setJetEta(jet2.Eta());
+		    double unc_ = unc->getUncertainty(true);
+		    sum_unc  += pow(unc_,2);
+		  }
+		  float unc_total = TMath::Sqrt(sum_unc);
+		  jet2LV_jecUnc[uncer_split.first+"Up"]   = jet2*(1+unc_total);
+		  jet2LV_jecUnc[uncer_split.first+"Down"] = jet2*(1-unc_total);
+		}
             }
             
             mjj =  -10;
@@ -2575,44 +2613,6 @@ int main(int argc, char * argv[]) {
             jdeta =  -10;
             njetingap = 0;
             if (indexLeadingJet>=0 && indexSubLeadingJet>=0) {
-
-	      jet1.SetPxPyPzE(analysisTree.pfjet_px[indexLeadingJet],
-			      analysisTree.pfjet_py[indexLeadingJet],
-			      analysisTree.pfjet_pz[indexLeadingJet],
-			      analysisTree.pfjet_e[indexLeadingJet]);
-
-	      for (auto uncer_split : jec_unc_map) {
-		float sum_unc   = 0;
-		for (auto single_jec_unc : uncer_split.second){
-		  JetCorrectionUncertainty *unc = single_jec_unc;
-		  unc->setJetPt(jet1.Pt());
-		  unc->setJetEta(jet1.Eta());
-		  double unc_ = unc->getUncertainty(true);
-		  sum_unc  += pow(unc_,2);
-		}
-		float unc_total = TMath::Sqrt(sum_unc);
-		jet1LV_jecUnc[uncer_split.first+"Up"]   = jet1*(1+unc_total);
-		jet1LV_jecUnc[uncer_split.first+"Down"] = jet1*(1-unc_total);
-	      }
-
-	      jet2.SetPxPyPzE(analysisTree.pfjet_px[indexSubLeadingJet],
-			      analysisTree.pfjet_py[indexSubLeadingJet],
-			      analysisTree.pfjet_pz[indexSubLeadingJet],
-			      analysisTree.pfjet_e[indexSubLeadingJet]);
-
-	      for (auto uncer_split : jec_unc_map) {
-		float sum_unc   = 0;
-		for (auto single_jec_unc : uncer_split.second){
-		  JetCorrectionUncertainty *unc = single_jec_unc;
-		  unc->setJetPt(jet2.Pt());
-		  unc->setJetEta(jet2.Eta());
-		  double unc_ = unc->getUncertainty(true);
-		  sum_unc  += pow(unc_,2);
-		}
-		float unc_total = TMath::Sqrt(sum_unc);
-		jet2LV_jecUnc[uncer_split.first+"Up"]   = jet2*(1+unc_total);
-		jet2LV_jecUnc[uncer_split.first+"Down"] = jet2*(1-unc_total);
-	      }
 
 	      mjj      = (jet1+jet2).M();
 	      dijetpt  = (jet1+jet2).Pt();
@@ -2632,8 +2632,6 @@ int main(int argc, char * argv[]) {
 		if (index!=indexLeadingJet&&index!=indexSubLeadingJet&&etaX>etamin&&etaX<etamax)
 		  njetingap++;
 	      }
-	      
-              
             }
 
             // METs
