@@ -113,7 +113,7 @@ void propagate_uncertainty(TString uncertainty_name,
   float pzetavis = vectorVisX*zetaX+vectorVisY*zetaY;
 
   // initliaze all values to -10
-  for (int i = 0; i < 50; ++i) uncertainty_container[i] = -10;
+  //for (int i = 0; i < 50; ++i) uncertainty_container[i] = -10;
 
   // met // 0
   uncertainty_container[0] = metLV.E();
@@ -170,6 +170,7 @@ void propagate_uncertainty(TString uncertainty_name,
     uncertainty_container[26]= static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(algo.getHistogramAdapter())->getPhi();
     uncertainty_container[27]= static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(algo.getHistogramAdapter())->getTransverseMass();
   }
+
   // mTemu // 28
   uncertainty_container[28] = mT(electronLV,muonLV);
 }
