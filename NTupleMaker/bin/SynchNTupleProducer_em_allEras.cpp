@@ -3266,6 +3266,37 @@ int main(int argc, char * argv[]) {
 	    for(auto &uncert : uncertainty_map){
 
           bool is_data_or_embedded = isData || (isEmbedded && !uncert.first.Contains("escale"));
+          
+          uncert.second.container[0] = met;
+          uncert.second.container[1] = metphi;
+          uncert.second.container[2] = mTtot;
+          uncert.second.container[3] = mTdileptonMET;
+          uncert.second.container[4] = pt_tt;
+          uncert.second.container[5] = pt_ttjj;
+          uncert.second.container[6] = pzetamiss;
+          uncert.second.container[7] = dzeta;
+          uncert.second.container[8] = mt_1;
+          uncert.second.container[9] = mt_2;
+          uncert.second.container[10] = mtmax;
+          uncert.second.container[11] = dphi_emet;
+          uncert.second.container[12] = dphi_mumet;
+          uncert.second.container[13] = pzetavis;
+          uncert.second.container[14] = m_vis;
+          uncert.second.container[15] = pt_vis;
+          uncert.second.container[16] = pt_1;
+          uncert.second.container[17] = pt_2;
+          uncert.second.container[18] = jpt_1;
+          uncert.second.container[19] = jpt_2;
+          uncert.second.container[20] = mjj;
+          uncert.second.container[21] = dijetphi;
+          uncert.second.container[22] = dijetpt;
+          uncert.second.container[23] = m_sv;
+          uncert.second.container[24] = pt_sv;
+          uncert.second.container[25]= eta_sv;
+          uncert.second.container[26]= phi_sv;
+          uncert.second.container[27]= mt_sv;
+          uncert.second.container[28]= mTemu;
+          
           propagate_uncertainty( uncert.first,
                                  uncert.second.metLV, covMET, inputFile_visPtResolution,
                                  uncert.second.muonLV,

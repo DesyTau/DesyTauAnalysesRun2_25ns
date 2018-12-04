@@ -113,7 +113,7 @@ void propagate_uncertainty(TString uncertainty_name,
   float pzetavis = vectorVisX*zetaX+vectorVisY*zetaY;
 
   // initliaze all values to -10
-  for (int i = 0; i < 50; ++i) uncertainty_container[i] = -10;
+  //for (int i = 0; i < 50; ++i) uncertainty_container[i] = -10;
 
   // met // 0
   uncertainty_container[0] = metLV.E();
