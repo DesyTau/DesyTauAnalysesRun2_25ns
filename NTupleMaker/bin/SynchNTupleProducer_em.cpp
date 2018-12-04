@@ -1667,9 +1667,9 @@ int main(int argc, char * argv[]) {
                      THU_ggH_PT60 = ggF_unc[6];
                      THU_ggH_PT120 = ggF_unc[7];
                      THU_ggH_qmtop = ggF_unc[8];
-                     std::cout<<"THU 1: "<<ggF_unc[0]<<std::endl;
-                     std::cout<<"THU 2: "<<ggF_unc[1]<<std::endl;
-                     std::cout<<"THU 3: "<<ggF_unc[2]<<std::endl;
+                     // std::cout<<"THU 1: "<<ggF_unc[0]<<std::endl;
+                     // std::cout<<"THU 2: "<<ggF_unc[1]<<std::endl;
+                     // std::cout<<"THU 3: "<<ggF_unc[2]<<std::endl;
                   }
             }
 
@@ -2795,7 +2795,7 @@ int main(int argc, char * argv[]) {
             
             bool checkSV = false;
             if (sync) checkSV = computeSVFitMass;
-            else checkSV = computeSVFitMass && dzeta>-50 && iso_1<0.15 && iso_2<0.2 && trg_muonelectron > 0.5 && extraelec_veto<0.5 && extramuon_veto<0.5 && mTdileptonMET<90;
+            else checkSV = computeSVFitMass && dzeta>-35 && iso_1<0.15 && iso_2<0.2 && trg_muonelectron > 0.5 && extraelec_veto<0.5 && extramuon_veto<0.5 && mTdileptonMET<60 && (nbtag==0||nbtag_mistagUp==0||nbtag_mistagDown==0||nbtag_btagUp==0||nbtag_btagDown==0);
             
 	    TMatrixD covMET(2, 2);
             if (checkSV) {

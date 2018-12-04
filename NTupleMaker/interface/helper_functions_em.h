@@ -160,7 +160,8 @@ void propagate_uncertainty(TString uncertainty_name,
   // dijetpt // 22
   if(jet1LV.E()!=0 && jet2LV.E()!=0) uncertainty_container[22] = (jet1LV+jet2LV).Pt();;
   // m_sv // 23, pt_sv // 24, eta_sv // 25, phi_sv // 26, mt_sv // 27
-  if(!isData && svfit_on){
+  bool checkSV = svfit_on && uncertainty_container[7]>-35 && uncertainty_container[3]<60;
+  if(!isData && checkSV){
     classic_svFit::MeasuredTauLepton svFitEle(classic_svFit::MeasuredTauLepton::kTauToElecDecay, electronLV.Pt(), electronLV.Eta(), electronLV.Phi(), 0.51100e-3);
     classic_svFit::MeasuredTauLepton svFitMu(classic_svFit::MeasuredTauLepton::kTauToMuDecay, muonLV.Pt(), muonLV.Eta(), muonLV.Phi(), 105.658e-3);
     ClassicSVfit algo = SVFitMassComputation(svFitEle, svFitMu, metLV.Px(), metLV.Py(), covMET, inputFile_visPtResolution);
