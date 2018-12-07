@@ -613,12 +613,12 @@ int main(int argc, char * argv[]) {
     tree->Branch("qcdweightdown_nodzeta", &qcdweightdown_nodzeta, "qcdweightdown_nodzeta/F");
     
     tree->Branch("qcdweight_0jet_rate_up",&qcdweight_0jet_rate_up,"qcdweight_0jet_rate_up/F");
-    tree->Branch("qcdweight_0jet_rate_down ",&qcdweight_0jet_rate_down,"qcdweight_0jet_rate_down/F");
-    tree->Branch("qcdweight_1jet_rate_up ",&qcdweight_1jet_rate_up,"qcdweight_1jet_rate_up/F");
+    tree->Branch("qcdweight_0jet_rate_down",&qcdweight_0jet_rate_down,"qcdweight_0jet_rate_down/F");
+    tree->Branch("qcdweight_1jet_rate_up",&qcdweight_1jet_rate_up,"qcdweight_1jet_rate_up/F");
     tree->Branch("qcdweight_1jet_rate_down",&qcdweight_1jet_rate_down,"qcdweight_1jet_rate_down/F");
     tree->Branch("qcdweight_0jet_shape_up",&qcdweight_0jet_shape_up,"qcdweight_0jet_shape_up/F");
     tree->Branch("qcdweight_0jet_shape_down",&qcdweight_0jet_shape_down,"qcdweight_0jet_shape_down/F");  
-    tree->Branch("qcdweight_1jet_shape_up ",&qcdweight_1jet_shape_up,"qcdweight_1jet_shape_up/F");
+    tree->Branch("qcdweight_1jet_shape_up",&qcdweight_1jet_shape_up,"qcdweight_1jet_shape_up/F");
     tree->Branch("qcdweight_1jet_shape_down",&qcdweight_1jet_shape_down,"qcdweight_1jet_shape_down/F");
 
     tree->Branch("qcdweight_iso_up",&qcdweight_iso_up,"qcdweight_iso_up/F");
@@ -1656,7 +1656,7 @@ int main(int argc, char * argv[]) {
                      else if (njets_HTXS==2) weight_ggh_NNLOPS = gr_NNLOPSratio_pt_mcatnlo_2jet->Eval(TMath::Min(higgspt_HTXS,(Float_t)800.0));
                      else if (njets_HTXS>=3) weight_ggh_NNLOPS = gr_NNLOPSratio_pt_mcatnlo_3jet->Eval(TMath::Min(higgspt_HTXS,(Float_t)925.0));
                      else weight_ggh_NNLOPS = 1.0;
-                     std::cout<<weight_ggh_NNLOPS<<std::endl;
+                     // std::cout<<weight_ggh_NNLOPS<<std::endl;
                      std::vector<double> ggF_unc = qcd_ggF_uncertSF_2017(njets_HTXS, higgspt_HTXS, htxs_stage1cat, 1.0);
                      THU_ggH_Mu = ggF_unc[0];
                      THU_ggH_Res = ggF_unc[1];
@@ -1667,9 +1667,9 @@ int main(int argc, char * argv[]) {
                      THU_ggH_PT60 = ggF_unc[6];
                      THU_ggH_PT120 = ggF_unc[7];
                      THU_ggH_qmtop = ggF_unc[8];
-                     std::cout<<"THU 1: "<<ggF_unc[0]<<std::endl;
-                     std::cout<<"THU 2: "<<ggF_unc[1]<<std::endl;
-                     std::cout<<"THU 3: "<<ggF_unc[2]<<std::endl;
+                     // std::cout<<"THU 1: "<<ggF_unc[0]<<std::endl;
+                     // std::cout<<"THU 2: "<<ggF_unc[1]<<std::endl;
+                     // std::cout<<"THU 3: "<<ggF_unc[2]<<std::endl;
                   }
             }
 
@@ -2550,6 +2550,25 @@ int main(int argc, char * argv[]) {
                 jphi_1 = analysisTree.pfjet_phi[indexLeadingJet];
                 jptraw_1 = analysisTree.pfjet_pt[indexLeadingJet]*analysisTree.pfjet_energycorr[indexLeadingJet];
                 jmva_1 = analysisTree.pfjet_pu_jet_full_mva[indexLeadingJet];
+
+		jet1.SetPxPyPzE(analysisTree.pfjet_px[indexLeadingJet],
+				analysisTree.pfjet_py[indexLeadingJet],
+				analysisTree.pfjet_pz[indexLeadingJet],
+				analysisTree.pfjet_e[indexLeadingJet]);
+
+		for (auto uncer_split : jec_unc_map) {
+		  float sum_unc   = 0;
+		  for (auto single_jec_unc : uncer_split.second){
+		    JetCorrectionUncertainty *unc = single_jec_unc;
+		    unc->setJetPt(jet1.Pt());
+		    unc->setJetEta(jet1.Eta());
+		    double unc_ = unc->getUncertainty(true);
+		    sum_unc  += pow(unc_,2);
+		  }
+		  float unc_total = TMath::Sqrt(sum_unc);
+		  jet1LV_jecUnc[uncer_split.first+"Up"]   = jet1*(1+unc_total);
+		  jet1LV_jecUnc[uncer_split.first+"Down"] = jet1*(1-unc_total);
+		}
             }
             
             jpt_2 = -10;
@@ -2567,6 +2586,25 @@ int main(int argc, char * argv[]) {
                 jphi_2 = analysisTree.pfjet_phi[indexSubLeadingJet];
                 jptraw_2 = analysisTree.pfjet_pt[indexSubLeadingJet]*analysisTree.pfjet_energycorr[indexSubLeadingJet];
                 jmva_2 = analysisTree.pfjet_pu_jet_full_mva[indexSubLeadingJet];
+
+		jet2.SetPxPyPzE(analysisTree.pfjet_px[indexSubLeadingJet],
+				analysisTree.pfjet_py[indexSubLeadingJet],
+				analysisTree.pfjet_pz[indexSubLeadingJet],
+				analysisTree.pfjet_e[indexSubLeadingJet]);
+
+		for (auto uncer_split : jec_unc_map) {
+		  float sum_unc   = 0;
+		  for (auto single_jec_unc : uncer_split.second){
+		    JetCorrectionUncertainty *unc = single_jec_unc;
+		    unc->setJetPt(jet2.Pt());
+		    unc->setJetEta(jet2.Eta());
+		    double unc_ = unc->getUncertainty(true);
+		    sum_unc  += pow(unc_,2);
+		  }
+		  float unc_total = TMath::Sqrt(sum_unc);
+		  jet2LV_jecUnc[uncer_split.first+"Up"]   = jet2*(1+unc_total);
+		  jet2LV_jecUnc[uncer_split.first+"Down"] = jet2*(1-unc_total);
+		}
             }
             
             mjj =  -10;
@@ -2575,44 +2613,6 @@ int main(int argc, char * argv[]) {
             jdeta =  -10;
             njetingap = 0;
             if (indexLeadingJet>=0 && indexSubLeadingJet>=0) {
-
-	      jet1.SetPxPyPzE(analysisTree.pfjet_px[indexLeadingJet],
-			      analysisTree.pfjet_py[indexLeadingJet],
-			      analysisTree.pfjet_pz[indexLeadingJet],
-			      analysisTree.pfjet_e[indexLeadingJet]);
-
-	      for (auto uncer_split : jec_unc_map) {
-		float sum_unc   = 0;
-		for (auto single_jec_unc : uncer_split.second){
-		  JetCorrectionUncertainty *unc = single_jec_unc;
-		  unc->setJetPt(jet1.Pt());
-		  unc->setJetEta(jet1.Eta());
-		  double unc_ = unc->getUncertainty(true);
-		  sum_unc  += pow(unc_,2);
-		}
-		float unc_total = TMath::Sqrt(sum_unc);
-		jet1LV_jecUnc[uncer_split.first+"Up"]   = jet1*(1+unc_total);
-		jet1LV_jecUnc[uncer_split.first+"Down"] = jet1*(1-unc_total);
-	      }
-
-	      jet2.SetPxPyPzE(analysisTree.pfjet_px[indexSubLeadingJet],
-			      analysisTree.pfjet_py[indexSubLeadingJet],
-			      analysisTree.pfjet_pz[indexSubLeadingJet],
-			      analysisTree.pfjet_e[indexSubLeadingJet]);
-
-	      for (auto uncer_split : jec_unc_map) {
-		float sum_unc   = 0;
-		for (auto single_jec_unc : uncer_split.second){
-		  JetCorrectionUncertainty *unc = single_jec_unc;
-		  unc->setJetPt(jet2.Pt());
-		  unc->setJetEta(jet2.Eta());
-		  double unc_ = unc->getUncertainty(true);
-		  sum_unc  += pow(unc_,2);
-		}
-		float unc_total = TMath::Sqrt(sum_unc);
-		jet2LV_jecUnc[uncer_split.first+"Up"]   = jet2*(1+unc_total);
-		jet2LV_jecUnc[uncer_split.first+"Down"] = jet2*(1-unc_total);
-	      }
 
 	      mjj      = (jet1+jet2).M();
 	      dijetpt  = (jet1+jet2).Pt();
@@ -2632,8 +2632,6 @@ int main(int argc, char * argv[]) {
 		if (index!=indexLeadingJet&&index!=indexSubLeadingJet&&etaX>etamin&&etaX<etamax)
 		  njetingap++;
 	      }
-	      
-              
             }
 
             // METs
@@ -2797,7 +2795,7 @@ int main(int argc, char * argv[]) {
             
             bool checkSV = false;
             if (sync) checkSV = computeSVFitMass;
-            else checkSV = computeSVFitMass && dzeta>-50 && iso_1<0.15 && iso_2<0.2 && trg_muonelectron > 0.5 && extraelec_veto<0.5 && extramuon_veto<0.5 && mTdileptonMET<90;
+            else checkSV = computeSVFitMass && dzeta>-35 && iso_1<0.15 && iso_2<0.2 && trg_muonelectron > 0.5 && extraelec_veto<0.5 && extramuon_veto<0.5 && mTdileptonMET<60 && (nbtag==0||nbtag_mistagUp==0||nbtag_mistagDown==0||nbtag_btagUp==0||nbtag_btagDown==0);
             
 	    TMatrixD covMET(2, 2);
             if (checkSV) {
@@ -3101,36 +3099,7 @@ int main(int argc, char * argv[]) {
 	    for(auto &uncert : uncertainty_map){
 
 	      bool is_data_or_embedded = isData || (isEmbedded && !uncert.first.Contains("escale"));
-   
-         uncert.second.container[0] = met;
-         uncert.second.container[1] = metphi;
-         uncert.second.container[2] = mTtot;
-         uncert.second.container[3] = mTdileptonMET;
-         uncert.second.container[4] = pt_tt;
-         uncert.second.container[5] = pt_ttjj;
-         uncert.second.container[6] = pzetamiss;
-         uncert.second.container[7] = dzeta;
-         uncert.second.container[8] = mt_1;
-         uncert.second.container[9] = mt_2;
-         uncert.second.container[10] = mtmax;
-         uncert.second.container[11] = dphi_emet;
-         uncert.second.container[12] = dphi_mumet;
-         uncert.second.container[13] = pzetavis;
-         uncert.second.container[14] = m_vis;
-         uncert.second.container[15] = pt_vis;
-         uncert.second.container[16] = pt_1;
-         uncert.second.container[17] = pt_2;
-         uncert.second.container[18] = jpt_1;
-         uncert.second.container[19] = jpt_2;
-         uncert.second.container[20] = mjj;
-         uncert.second.container[21] = dijetphi;
-         uncert.second.container[22] = dijetpt;
-         uncert.second.container[23] = m_sv;
-         uncert.second.container[24] = pt_sv;
-         uncert.second.container[25]= eta_sv;
-         uncert.second.container[26]= phi_sv;
-         uncert.second.container[27]= mt_sv;
-        
+
 	      propagate_uncertainty( uncert.first,
 				     uncert.second.metLV, covMET, inputFile_visPtResolution,
 				     uncert.second.muonLV,
