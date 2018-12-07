@@ -939,7 +939,7 @@ int main(int argc, char * argv[]) {
                     { "jecUncRelativeSampleUp" , jecUncRelativeSampleUp },
 					     { "jecUncRelativeSampleDown" , jecUncRelativeSampleDown },                         
     };
-
+   
     for(auto &uncert : uncertainty_map){
       int count_unc = 0;
       for(auto &unc_var : unc_vars){
@@ -949,6 +949,7 @@ int main(int argc, char * argv[]) {
 	count_unc += 1;
       }
     }
+    
     // START : Prepare uncertainties (NEW) ================================================================================================================
 
     // START : JEC uncertainties (NEW) ================================================================================================================
@@ -1410,7 +1411,7 @@ int main(int argc, char * argv[]) {
 
 	    badMuonFilter_ = true;
 	    duplicateMuonFilter_ = true;
-
+      
             float topPt = -1;
             float antitopPt = -1;
             
@@ -1492,7 +1493,7 @@ int main(int argc, char * argv[]) {
                     if (abs(analysisTree.genparticles_pdgid[igen])==24) {
                         wBosonLV = genLV;
                     }
-
+                   
 		    bool fromHardProcessFinalState = analysisTree.genparticles_fromHardProcess[igen]&&analysisTree.genparticles_status[igen]==1;
 		    bool isMuon = false;
 		    bool isElectron = false;
@@ -1630,7 +1631,7 @@ int main(int argc, char * argv[]) {
                 nuPhi = TMath::ATan2(nuPy,nuPx);
                 
                 
-                
+               
                 if (isDY) { // applying Z pt mass weights
                     zptmassweight = 1;
                     if (bosonMass>50.0) {
@@ -1675,7 +1676,6 @@ int main(int argc, char * argv[]) {
                      THU_ggH_qmtop = ggF_unc[8];
                   }
             }
-
             run = int(analysisTree.event_run);
             lumi = int(analysisTree.event_luminosityblock);
             evt = analysisTree.event_nr;
@@ -1702,7 +1702,7 @@ int main(int argc, char * argv[]) {
                 if (!lumi) continue;
                 
             }
-            
+       
             npv = analysisTree.primvertex_count;
             npu = analysisTree.numtruepileupinteractions;
             rho = analysisTree.rho;
@@ -2382,6 +2382,7 @@ int main(int argc, char * argv[]) {
        njets_jecUncRelativeSampleUp   = 0;
 	    njets_jecUncRelativeSampleDown = 0;
 
+   
 	    TLorentzVector jetLV;
             TLorentzVector jet1;
             TLorentzVector jet2;
@@ -2393,7 +2394,7 @@ int main(int argc, char * argv[]) {
             float met_y = analysisTree.pfmetcorr_ey;
             met = TMath::Sqrt(met_x*met_x + met_y*met_y);
 	    metLV.SetXYZT(met_x,met_y,0.,met);
-
+    
             int indexLeadingJet = -1;
             float ptLeadingJet = -1;
             
@@ -2402,22 +2403,22 @@ int main(int argc, char * argv[]) {
             
             int indexLeadingBJet = -1;
             float ptLeadingBJet = -1;
-            
+          
             for (unsigned int jet=0; jet<analysisTree.pfjet_count; ++jet) {
                 
                double absJetEta = fabs(analysisTree.pfjet_eta[jet]);
                double jetEta = analysisTree.pfjet_eta[jet];
                if (absJetEta>jetEtaCut) continue;
-                
+          
                float jetPt = analysisTree.pfjet_pt[jet];
 
 	       jetLV.SetPxPyPzE(analysisTree.pfjet_px[jet],
 				analysisTree.pfjet_py[jet],
 				analysisTree.pfjet_pz[jet],
 				analysisTree.pfjet_e[jet]);
-
+        
 	       map<TString,TLorentzVector> jetLV_jecUnc;
-
+        
 	       // Include variations for jec uncertainties
 	       for (auto uncer_split : jec_unc_map) {
              float sum_unc   = 0;
@@ -2439,7 +2440,7 @@ int main(int argc, char * argv[]) {
                 metLV_jecUnc[uncer_split.first + "Down"] += jetLV* unc_total;
              }
 	       }
-
+         
                float jetPt_tocheck = jetPt;
                if (sync) jetPt_tocheck = jetPt;
 	       else{
@@ -2655,9 +2656,10 @@ int main(int argc, char * argv[]) {
             jlrm_1 = -10;
             jctm_1 = -10;
             
+           
             if (indexLeadingJet>=0&&indexSubLeadingJet>=0&&indexLeadingJet==indexSubLeadingJet)
                 cout << "warning : indexLeadingJet ==indexSubLeadingJet = " << indexSubLeadingJet << endl;
-            
+           
             if (indexLeadingJet>=0) {
                 jpt_1 = analysisTree.pfjet_pt[indexLeadingJet];
                 jeta_1 = analysisTree.pfjet_eta[indexLeadingJet];
@@ -2682,7 +2684,7 @@ int main(int argc, char * argv[]) {
                    jet1LV_jecUnc[uncer_split.first+"Down"] = jet1*(1-unc_total);
                 }
             }
-            
+         
             jpt_2 = -10;
             jeta_2 = -10;
             jphi_2 = -10;
@@ -2690,7 +2692,7 @@ int main(int argc, char * argv[]) {
             jptunc_2 = -10;
             jlrm_2 = -10;
             jctm_2 = -10;
-            
+         
             if (indexSubLeadingJet>=0) {
                 jpt_2 = analysisTree.pfjet_pt[indexSubLeadingJet];
                 jeta_2 = analysisTree.pfjet_eta[indexSubLeadingJet];
@@ -2723,12 +2725,12 @@ int main(int argc, char * argv[]) {
             jdeta =  -10;
             njetingap = 0;
             if (indexLeadingJet>=0 && indexSubLeadingJet>=0) {
-
+              
 	      mjj      = (jet1+jet2).M();
 	      dijetpt  = (jet1+jet2).Pt();
 	      dijetphi = (jet1+jet2).Phi();
 	      jdeta = fabs(analysisTree.pfjet_eta[indexLeadingJet]-analysisTree.pfjet_eta[indexSubLeadingJet]);
-
+         
 	      float etamax = analysisTree.pfjet_eta[indexLeadingJet];
 	      float etamin = analysisTree.pfjet_eta[indexSubLeadingJet];
 	      if (etamax<etamin) {
@@ -2736,16 +2738,16 @@ int main(int argc, char * argv[]) {
 		etamax = etamin;
 		etamin = tmp;
 	      }
+      
 	      for (unsigned int jet=0; jet<jetspt20.size(); ++jet) {
 		int index = jetspt20.at(jet);
 		float etaX = analysisTree.pfjet_eta[index];
 		if (index!=indexLeadingJet&&index!=indexSubLeadingJet&&etaX>etamin&&etaX<etamax)
 		  njetingap++;
 	      }
-	      
-              
+	                  
             }
-
+       
             // METs
             float met_x_recoilscaleUp = analysisTree.pfmetcorr_ex;
             float met_x_recoilscaleDown = analysisTree.pfmetcorr_ex;
@@ -2789,7 +2791,7 @@ int main(int argc, char * argv[]) {
                     recoilMetCorrector.Correct(met_x,met_y,bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,pfmet_corr_x,pfmet_corr_y);
                 }
             }
-
+          
             met_x = pfmet_corr_x;
             met_y = pfmet_corr_y;
             met = TMath::Sqrt(met_x*met_x+met_y*met_y);
@@ -3097,7 +3099,7 @@ int main(int argc, char * argv[]) {
                qcdweight_iso_up = em_qcd_extrap_uncert * em_qcd_extrap_uncert * em_qcd_osss_binned;
                qcdweight_iso_down = em_qcd_osss_binned;
             }
-
+         
             if (!isData){
                if (is2016)
                   {
@@ -3207,7 +3209,7 @@ int main(int argc, char * argv[]) {
        //            dZ_2_cal =dZ_2;
        //         }
        //      }       
-
+      
 	    // Add for all relevant variables the met uncertainty
 	    for(auto &uncert : uncertainty_map){
 	      uncert.second.electronLV = electronLV;
@@ -3216,7 +3218,7 @@ int main(int argc, char * argv[]) {
 	      uncert.second.jet1LV     = jet1;
 	      uncert.second.jet2LV     = jet2;
 	    }
-
+       
 	    uncertainty_map.at("unclMetUp").metLV = metLV_unclMetUp;
 	    uncertainty_map.at("unclMetDown").metLV = metLV_unclMetDown;
 	    uncertainty_map.at("escaleUp").metLV = metLV_escaleUp;
@@ -3229,41 +3231,42 @@ int main(int argc, char * argv[]) {
 	    uncertainty_map.at("recoilscaleDown").metLV = metLV_recoilscaleDown;
 	    uncertainty_map.at("recoilresoUp").metLV = metLV_recoilresoUp;
 	    uncertainty_map.at("recoilresoDown").metLV = metLV_recoilresoDown;
-	    if (!isSampleForRecoilCorrection) uncertainty_map.at("jecUncEta0To5Up").metLV = metLV_jecUnc.at("jecUncEta0To5Up");
-	    if(jet1.E() != 0) uncertainty_map.at("jecUncEta0To5Up").jet1LV = jet1LV_jecUnc.at("jecUncEta0To5Up");
-	    if(jet2.E() != 0) uncertainty_map.at("jecUncEta0To5Up").jet2LV = jet2LV_jecUnc.at("jecUncEta0To5Up");
-	    if (!isSampleForRecoilCorrection) uncertainty_map.at("jecUncEta0To5Down").metLV = metLV_jecUnc.at("jecUncEta0To5Down");
+  
+	    if (!isSampleForRecoilCorrection && jet1.E() != 0) uncertainty_map.at("jecUncEta0To5Up").metLV = metLV_jecUnc.at("jecUncEta0To5Up");
+  	    if(jet1.E() != 0) uncertainty_map.at("jecUncEta0To5Up").jet1LV = jet1LV_jecUnc.at("jecUncEta0To5Up");
+  	    if(jet2.E() != 0) uncertainty_map.at("jecUncEta0To5Up").jet2LV = jet2LV_jecUnc.at("jecUncEta0To5Up");
+  	    if (!isSampleForRecoilCorrection && jet1.E() != 0) uncertainty_map.at("jecUncEta0To5Down").metLV = metLV_jecUnc.at("jecUncEta0To5Down");
 	    if(jet1.E() != 0) uncertainty_map.at("jecUncEta0To5Down").jet1LV = jet1LV_jecUnc.at("jecUncEta0To5Down");
 	    if(jet2.E() != 0) uncertainty_map.at("jecUncEta0To5Down").jet2LV = jet2LV_jecUnc.at("jecUncEta0To5Down");
-	    if (!isSampleForRecoilCorrection) uncertainty_map.at("jecUncEta0To3Up").metLV = metLV_jecUnc.at("jecUncEta0To3Up");
+  	    if (!isSampleForRecoilCorrection && jet1.E() != 0) uncertainty_map.at("jecUncEta0To3Up").metLV = metLV_jecUnc.at("jecUncEta0To3Up");
 	    if(jet1.E() != 0) uncertainty_map.at("jecUncEta0To3Up").jet1LV = jet1LV_jecUnc.at("jecUncEta0To3Up");
 	    if(jet2.E() != 0) uncertainty_map.at("jecUncEta0To3Up").jet2LV = jet2LV_jecUnc.at("jecUncEta0To3Up");
-	    if (!isSampleForRecoilCorrection) uncertainty_map.at("jecUncEta0To3Down").metLV = metLV_jecUnc.at("jecUncEta0To3Down");
+  	    if (!isSampleForRecoilCorrection && jet1.E() != 0) uncertainty_map.at("jecUncEta0To3Down").metLV = metLV_jecUnc.at("jecUncEta0To3Down");
 	    if(jet1.E() != 0) uncertainty_map.at("jecUncEta0To3Down").jet1LV = jet1LV_jecUnc.at("jecUncEta0To3Down");
 	    if(jet2.E() != 0) uncertainty_map.at("jecUncEta0To3Down").jet2LV = jet2LV_jecUnc.at("jecUncEta0To3Down");
-	    if (!isSampleForRecoilCorrection) uncertainty_map.at("jecUncEta3To5Up").metLV = metLV_jecUnc.at("jecUncEta3To5Up");
+	    if (!isSampleForRecoilCorrection && jet1.E() != 0) uncertainty_map.at("jecUncEta3To5Up").metLV = metLV_jecUnc.at("jecUncEta3To5Up");
 	    if(jet1.E() != 0) uncertainty_map.at("jecUncEta3To5Up").jet1LV = jet1LV_jecUnc.at("jecUncEta3To5Up");
 	    if(jet2.E() != 0) uncertainty_map.at("jecUncEta3To5Up").jet2LV = jet2LV_jecUnc.at("jecUncEta3To5Up");
-	    if (!isSampleForRecoilCorrection) uncertainty_map.at("jecUncEta3To5Down").metLV = metLV_jecUnc.at("jecUncEta3To5Down");
+  	    if (!isSampleForRecoilCorrection && jet1.E() != 0) uncertainty_map.at("jecUncEta3To5Down").metLV = metLV_jecUnc.at("jecUncEta3To5Down");
 	    if(jet1.E() != 0) uncertainty_map.at("jecUncEta3To5Down").jet1LV = jet1LV_jecUnc.at("jecUncEta3To5Down");
 	    if(jet2.E() != 0) uncertainty_map.at("jecUncEta3To5Down").jet2LV = jet2LV_jecUnc.at("jecUncEta3To5Down");
-	    if (!isSampleForRecoilCorrection) uncertainty_map.at("jecUncRelativeBalUp").metLV = metLV_jecUnc.at("jecUncRelativeBalUp");
+	    if (!isSampleForRecoilCorrection && jet1.E() != 0) uncertainty_map.at("jecUncRelativeBalUp").metLV = metLV_jecUnc.at("jecUncRelativeBalUp");
 	    if(jet1.E() != 0) uncertainty_map.at("jecUncRelativeBalUp").jet1LV = jet1LV_jecUnc.at("jecUncRelativeBalUp");
 	    if(jet2.E() != 0) uncertainty_map.at("jecUncRelativeBalUp").jet2LV = jet2LV_jecUnc.at("jecUncRelativeBalUp");
-	    if (!isSampleForRecoilCorrection) uncertainty_map.at("jecUncRelativeBalDown").metLV = metLV_jecUnc.at("jecUncRelativeBalDown");
+       if (!isSampleForRecoilCorrection && jet1.E() != 0) uncertainty_map.at("jecUncRelativeBalDown").metLV = metLV_jecUnc.at("jecUncRelativeBalDown");
 	    if(jet1.E() != 0) uncertainty_map.at("jecUncRelativeBalDown").jet1LV = jet1LV_jecUnc.at("jecUncRelativeBalDown");
 	    if(jet2.E() != 0) uncertainty_map.at("jecUncRelativeBalDown").jet2LV = jet2LV_jecUnc.at("jecUncRelativeBalDown");
-
        if (!is2016){
-          if (!isSampleForRecoilCorrection) uncertainty_map.at("jecUncRelativeSampleUp").metLV = metLV_jecUnc.at("jecUncRelativeSampleUp");
+          if (!isSampleForRecoilCorrection && jet1.E() != 0) uncertainty_map.at("jecUncRelativeSampleUp").metLV = metLV_jecUnc.at("jecUncRelativeSampleUp");
           if(jet1.E() != 0) uncertainty_map.at("jecUncRelativeSampleUp").jet1LV = jet1LV_jecUnc.at("jecUncRelativeSampleUp");
           if(jet2.E() != 0) uncertainty_map.at("jecUncRelativeSampleUp").jet2LV = jet2LV_jecUnc.at("jecUncRelativeSampleUp");
-          if (!isSampleForRecoilCorrection) uncertainty_map.at("jecUncRelativeSampleDown").metLV = metLV_jecUnc.at("jecUncRelativeSampleDown");
+          if (!isSampleForRecoilCorrection && jet1.E() != 0) uncertainty_map.at("jecUncRelativeSampleDown").metLV = metLV_jecUnc.at("jecUncRelativeSampleDown");
           if(jet1.E() != 0) uncertainty_map.at("jecUncRelativeSampleDown").jet1LV = jet1LV_jecUnc.at("jecUncRelativeSampleDown");
           if(jet2.E() != 0) uncertainty_map.at("jecUncRelativeSampleDown").jet2LV = jet2LV_jecUnc.at("jecUncRelativeSampleDown");
        }
+  
 	    for(auto &uncert : uncertainty_map){
-
+  
           bool is_data_or_embedded = isData || (isEmbedded && !uncert.first.Contains("escale"));
           
           propagate_uncertainty( uncert.first,
@@ -3274,6 +3277,7 @@ int main(int argc, char * argv[]) {
                                  uncert.second.jet2LV,
                                  uncert.second.container,
                                  is_data_or_embedded, checkSV);
+          
 	    }
        tree->Fill();
             selEvents++;
