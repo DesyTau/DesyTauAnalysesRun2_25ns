@@ -27,6 +27,7 @@ sed 's/SampleNameForPUHist =/SampleNameForPUHist = W2JetsToLNu_TuneCP5_13TeV-mad
 sed 's/SampleNameForPUHist =/SampleNameForPUHist = W3JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_pileup/' analysisMacroSynch_em_W.conf > analysisMacroSynch_em_W3JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8.conf
 sed 's/SampleNameForPUHist =/SampleNameForPUHist = W4JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_pileup/' analysisMacroSynch_em_W.conf > analysisMacroSynch_em_W4JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8.conf
 sed 's/SampleNameForPUHist =/SampleNameForPUHist = WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_pileup/' analysisMacroSynch_em_W.conf > analysisMacroSynch_em_WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8.conf
+sed 's/SampleNameForPUHist =/SampleNameForPUHist = MC_PU2017_pileup/' analysisMacroSynch_em_W.conf > analysisMacroSynch_em_DYJetsToLL_M-5to50_13TeV-12Apr2018.conf
 
 sed 's/SampleNameForPUHist =/SampleNameForPUHist = WW_TuneCP5_13TeV-pythia8_pileup/' analysisMacroSynch_em_MC.conf > analysisMacroSynch_em_WW_TuneCP5_13TeV-pythia8.conf
 sed 's/SampleNameForPUHist =/SampleNameForPUHist = WZ_TuneCP5_13TeV-pythia8_pileup/' analysisMacroSynch_em_MC.conf > analysisMacroSynch_em_WZ_TuneCP5_13TeV-pythia8.conf
@@ -36,10 +37,18 @@ sed 's/SampleNameForPUHist =/SampleNameForPUHist = GluGluHToTauTau_M125_13TeV_po
 sed -i 's/ApplygghReweighting = false/ApplygghReweighting = true/g' analysisMacroSynch_em_Signal_GGH_Htautau_M125.conf 
 sed 's/SampleNameForPUHist =/SampleNameForPUHist = VBFHToTauTau_M125_pileup/' analysisMacroSynch_em_Signal.conf > analysisMacroSynch_em_Signal_VBF_Htautau_M125.conf
 
+sed 's/SampleNameForPUHist =/SampleNameForPUHist = MC_PU2017_pileup/' analysisMacroSynch_em_Signal.conf > analysisMacroSynch_em_Signal_ZH.conf
 
+sed 's/SampleNameForPUHist =/SampleNameForPUHist = WminusHToTauTau_M125_13TeV_powheg_pythia8_pileup/' analysisMacroSynch_em_Signal.conf > analysisMacroSynch_em_Signal_WMinunsH.conf
 
+sed 's/SampleNameForPUHist =/SampleNameForPUHist = WplusHToTauTau_M125_13TeV_powheg_pythia8_pileup/' analysisMacroSynch_em_Signal.conf > analysisMacroSynch_em_Signal_WPlusH.conf
 
+sed 's/SampleNameForPUHist =/SampleNameForPUHist = MC_PU2017_pileup/' analysisMacroSynch_em_W.conf > analysisMacroSynch_em_WGToLNuG.conf
 
+sed 's/SampleNameForPUHist =/SampleNameForPUHist = EWKWMinus2Jets_WToLNu_M-50_TuneCP5_13TeV-madgraph-pythia8_pileup/' analysisMacroSynch_em_W.conf > analysisMacroSynch_em_EWKWMinus.conf
+sed 's/SampleNameForPUHist =/SampleNameForPUHist = EWKWPlus2Jets_WToLNu_M-50_TuneCP5_13TeV-madgraph-pythia8_pileup/' analysisMacroSynch_em_W.conf > analysisMacroSynch_em_EWKWPlus.conf
+sed 's/SampleNameForPUHist =/SampleNameForPUHist =  EWKZ2Jets_ZToLL_M-50_TuneCP5_13TeV-madgraph-pythia8_pileup/' analysisMacroSynch_em_DY.conf > analysisMacroSynch_em_EWKZ2Jets_ZToLL.conf
+sed 's/SampleNameForPUHist =/SampleNameForPUHist =  EWKZ2Jets_ZToNuNu_TuneCP5_13TeV-madgraph-pythia8_pileup/' analysisMacroSynch_em_DY.conf > analysisMacroSynch_em_EWKZ2Jets_ZToNuNu.conf
 
 
 
