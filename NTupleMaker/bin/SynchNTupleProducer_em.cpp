@@ -497,6 +497,12 @@ int main(int argc, char * argv[]) {
     Bool_t isZMM;
     Bool_t isZEE;
     Bool_t isZTT;
+
+    Bool_t isPromptZMM;
+    Bool_t isPromptZEE;
+    Bool_t isZTTMM;
+    Bool_t isZTTEE;
+    Bool_t isZTTEM;
     
     Bool_t metFilters_;
 
@@ -554,6 +560,11 @@ int main(int argc, char * argv[]) {
     tree->Branch("isZEE",&isZEE,"isZEE/O");
     tree->Branch("isZMM",&isZMM,"isZMM/O");
     tree->Branch("isZTT",&isZTT,"isZTT/O");
+    tree->Branch("isPromptZMM",&isPromptZMM,"isPromptZMM/O");
+    tree->Branch("isPromptZEE",&isPromptZEE,"isPromptZEE/O");
+    tree->Branch("isZTTEM",&isZTTEM,"isZTTEM/O");
+    tree->Branch("isZTTMM",&isZTTMM,"isZTTMM/O");
+    tree->Branch("isZTTEE",&isZTTEE,"isZTTEE/O");
     tree->Branch("veto_embedded",&veto_embedded,"veto_embedded/O");
      
     tree->Branch("weightScale1",&weightScale1,"weightScale1/F");
@@ -1184,10 +1195,10 @@ int main(int argc, char * argv[]) {
     float MinBJetPt = 20.; // !!!!!
     
     TFile *file_ggh_reweighting = new TFile(TString(cmsswBase)+TString("/src/DesyTauAnalyses/NTupleMaker/data/NNLOPS_reweight.root"));
-    TGraph * gr_NNLOPSratio_pt_mcatnlo_0jet  = (TGraph*) file_ggh_reweighting->Get("gr_NNLOPSratio_pt_mcatnlo_0jet");
-    TGraph * gr_NNLOPSratio_pt_mcatnlo_1jet  = (TGraph*) file_ggh_reweighting->Get("gr_NNLOPSratio_pt_mcatnlo_1jet");
-    TGraph * gr_NNLOPSratio_pt_mcatnlo_2jet  = (TGraph*) file_ggh_reweighting->Get("gr_NNLOPSratio_pt_mcatnlo_2jet");
-    TGraph * gr_NNLOPSratio_pt_mcatnlo_3jet  = (TGraph*) file_ggh_reweighting->Get("gr_NNLOPSratio_pt_mcatnlo_3jet");
+    TGraph * gr_NNLOPSratio_pt_powheg_0jet  = (TGraph*) file_ggh_reweighting->Get("gr_NNLOPSratio_pt_powheg_0jet");
+    TGraph * gr_NNLOPSratio_pt_powheg_1jet  = (TGraph*) file_ggh_reweighting->Get("gr_NNLOPSratio_pt_powheg_1jet");
+    TGraph * gr_NNLOPSratio_pt_powheg_2jet  = (TGraph*) file_ggh_reweighting->Get("gr_NNLOPSratio_pt_powheg_2jet");
+    TGraph * gr_NNLOPSratio_pt_powheg_3jet  = (TGraph*) file_ggh_reweighting->Get("gr_NNLOPSratio_pt_powheg_3jet");
 
     // Z pt mass weights 
     TFile * fileZMassPtWeights = new TFile(TString(cmsswBase)+"/src/"+ZMassPtWeightsFileName);
@@ -1285,6 +1296,12 @@ int main(int argc, char * argv[]) {
             isZMM = false;
             isZTT = false;
             veto_embedded = false;
+            isPromptZMM = false;
+            isPromptZEE = false;
+            isZTTMM = false;
+            isZTTEE = false;
+            isZTTEM = false;
+
             //      bool isPrompMuPlus = false;
             //      bool isPrompMuMinus = false;
             //      bool isPrompElePlus = false;
@@ -1651,10 +1668,10 @@ int main(int argc, char * argv[]) {
                htxs_stage1cat = analysisTree.htxs_stage1cat;
                if (apply_ggh_reweighting)
                   {
-                     if      (njets_HTXS==0) weight_ggh_NNLOPS = gr_NNLOPSratio_pt_mcatnlo_0jet->Eval(TMath::Min(higgspt_HTXS,(Float_t)125.0));
-                     else if (njets_HTXS==1) weight_ggh_NNLOPS = gr_NNLOPSratio_pt_mcatnlo_1jet->Eval(TMath::Min(higgspt_HTXS,(Float_t)625.0));
-                     else if (njets_HTXS==2) weight_ggh_NNLOPS = gr_NNLOPSratio_pt_mcatnlo_2jet->Eval(TMath::Min(higgspt_HTXS,(Float_t)800.0));
-                     else if (njets_HTXS>=3) weight_ggh_NNLOPS = gr_NNLOPSratio_pt_mcatnlo_3jet->Eval(TMath::Min(higgspt_HTXS,(Float_t)925.0));
+                     if      (njets_HTXS==0) weight_ggh_NNLOPS = gr_NNLOPSratio_pt_powheg_0jet->Eval(TMath::Min(higgspt_HTXS,(Float_t)125.0));
+                     else if (njets_HTXS==1) weight_ggh_NNLOPS = gr_NNLOPSratio_pt_powheg_1jet->Eval(TMath::Min(higgspt_HTXS,(Float_t)625.0));
+                     else if (njets_HTXS==2) weight_ggh_NNLOPS = gr_NNLOPSratio_pt_powheg_2jet->Eval(TMath::Min(higgspt_HTXS,(Float_t)800.0));
+                     else if (njets_HTXS>=3) weight_ggh_NNLOPS = gr_NNLOPSratio_pt_powheg_3jet->Eval(TMath::Min(higgspt_HTXS,(Float_t)925.0));
                      else weight_ggh_NNLOPS = 1.0;
                      // std::cout<<weight_ggh_NNLOPS<<std::endl;
                      std::vector<double> ggF_unc = qcd_ggF_uncertSF_2017(njets_HTXS, higgspt_HTXS, htxs_stage1cat, 1.0);
@@ -2910,6 +2927,12 @@ int main(int argc, char * argv[]) {
 		isZLL = true;
 	      }
 	      if (gen_match_1 == 3 && gen_match_2 ==4) veto_embedded = true;
+
+         if (gen_match_1 == 3 && gen_match_2 ==4) isZTTEM = true;
+         if (gen_match_1 == 4 && gen_match_2 ==4) isZTTMM = true;
+         if (gen_match_1 == 3 && gen_match_2 ==3) isZTTEE = true;
+         if (gen_match_1 == 1 && gen_match_2 ==1) isPromptZEE = true;
+         if (gen_match_1 == 2 && gen_match_2 ==2) isPromptZMM = true;
 
 	      double weightE = 1;
 	      double weightEUp = 1;
