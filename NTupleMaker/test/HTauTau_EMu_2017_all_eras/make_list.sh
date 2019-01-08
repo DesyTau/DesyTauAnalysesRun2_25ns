@@ -43,7 +43,7 @@ ls $dirVV/ZZ_TuneCP5_13TeV-pythia8/*root > ZZ_TuneCP5_13TeV-pythia8
 ls $dirSignal/GluGluHToTauTau_M125_13TeV_powheg_pythia8/*root > GluGluHToTauTau_M125_13TeV_powheg_pythia8
 ls $dirSignal/GluGluHToTauTau_M125_13TeV_powheg_pythia8_ext1/*root >> GluGluHToTauTau_M125_13TeV_powheg_pythia8
 ls $dirSignal/VBFHToTauTau_M125_13TeV_powheg_pythia8/*root > VBFHToTauTau_M125_13TeV_powheg_pythia8
-
+ls $dirSignal/GluGluHToWWTo2L2Nu_M125_13TeV_powheg2_JHUGenV714_pythia8/*root > GluGluHToWWTo2L2Nu
 
 ls $dirData/MuonEG_Run2017B/*root > MuonEG_Run2017B
 ls $dirData/MuonEG_Run2017C/*root > MuonEG_Run2017CtoF

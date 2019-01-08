@@ -2,6 +2,8 @@
 #./HTC_submit_seq.sh SynchNTupleProducer_em_allEras analysisMacroSynch_em_Signal_VBF_Htautau_M125.conf VBFHToTauTau_M125_13TeV_powheg_pythia8 1
 #./HTC_submit_seq.sh SynchNTupleProducer_em_allEras analysisMacroSynch_em_Signal_GGH_Htautau_M125.conf GluGluHToTauTau_M125_13TeV_powheg_pythia8 1
 
+./HTC_submit_seq.sh SynchNTupleProducer_em_allEras analysisMacroSynch_em_Signal_GGH_HWW_M125.conf GluGluHToWWTo2L2Nu 1
+
 #./HTC_submit_seq.sh SynchNTupleProducer_em_allEras analysisMacroSynch_em_DY1JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8.conf DY1JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8 1 
 #./HTC_submit_seq.sh SynchNTupleProducer_em_allEras analysisMacroSynch_em_DY2JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8.conf DY2JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8  1
 #./HTC_submit_seq.sh SynchNTupleProducer_em_allEras analysisMacroSynch_em_DY3JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8.conf DY3JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8  1
@@ -37,7 +39,7 @@
 
 #./HTC_submit_seq.sh SynchNTupleProducer_em_allEras analysisMacroSynch_em_WGToLNuG.conf WGToLNuG_TuneCP5_13TeV-madgraphMLM-pythia8 1
 
-./HTC_submit_seq.sh SynchNTupleProducer_em_allEras analysisMacroSynch_em_EWKZ2Jets_ZToLL.conf EWKZ2Jets_ZToLL_M-50_TuneCP5_13TeV-madgraph-pythia8 1
-./HTC_submit_seq.sh SynchNTupleProducer_em_allEras analysisMacroSynch_em_EWKZ2Jets_ZToNuNu.conf EWKZ2Jets_ZToNuNu_TuneCP5_13TeV-madgraph-pythia8 1
-./HTC_submit_seq.sh SynchNTupleProducer_em_allEras analysisMacroSynch_em_EWKWMinus.conf EWKWMinus2Jets_WToLNu_M-50_TuneCP5_13TeV-madgraph-pythia8 1
-./HTC_submit_seq.sh SynchNTupleProducer_em_allEras analysisMacroSynch_em_EWKWPlus.conf EWKWPlus2Jets_WToLNu_M-50_TuneCP5_13TeV-madgraph-pythia8 1
+#./HTC_submit_seq.sh SynchNTupleProducer_em_allEras analysisMacroSynch_em_EWKZ2Jets_ZToLL.conf EWKZ2Jets_ZToLL_M-50_TuneCP5_13TeV-madgraph-pythia8 1
+#./HTC_submit_seq.sh SynchNTupleProducer_em_allEras analysisMacroSynch_em_EWKZ2Jets_ZToNuNu.conf EWKZ2Jets_ZToNuNu_TuneCP5_13TeV-madgraph-pythia8 1
+#./HTC_submit_seq.sh SynchNTupleProducer_em_allEras analysisMacroSynch_em_EWKWMinus.conf EWKWMinus2Jets_WToLNu_M-50_TuneCP5_13TeV-madgraph-pythia8 1
+#./HTC_submit_seq.sh SynchNTupleProducer_em_allEras analysisMacroSynch_em_EWKWPlus.conf EWKWPlus2Jets_WToLNu_M-50_TuneCP5_13TeV-madgraph-pythia8 1
