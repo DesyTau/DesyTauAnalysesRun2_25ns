@@ -166,35 +166,60 @@ cout<<"otree->acotautau_00 "<<otree->acotautau_00<<endl;
 };
 
 //Merijn: updated function to do CP calculations
-void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, int tauIndex2, TString channel){
-cout<<"start acott_impr "<<endl;
+//called with: acott_Impr(&analysisTree,otree,tauIndex,leptonIndex, ch);
+//Update call instead with: acott_Impr(&analysisTree,otree,leptonIndex, tauIndex, ch). Throughout code we'll switch between mt, et and tt case!
+//in later case, the lepton index must be treated as a tau instead of leptonic index
+//currently we'll ignore e-mu
 
-  //make here a scan if the second decay contains a charged pion, since not always the case
+void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, int tauIndex2, TString channel){
+  cout<<"Start acott_Impr"<<endl;
+  //Merijn 2019 1 10: there may be situations where we pass correctdecay, but ultimately the acotau does NOT get calculated. For these situations, currently acotau seems not initialised.
+  otree->acotautau_00 = -9999;
+  otree->acotautau_10 = -9999;
+  otree->acotautau_01 = -9999;
+  otree->acotautau_11 = -9999;
+
+  bool decay1haspion=false;
   bool decay2haspion=false;
+
+  //make here a scan if the first decay is hadronic. Only do for tt case, to avoid possible segfaults if tau not present
+
+  if(channel=="tt"){
+  for(unsigned int pindex=0;pindex<analysisTree->tau_constituents_count[tauIndex1];pindex++){
+    if(abs(analysisTree->tau_constituents_pdgId[tauIndex1][pindex])==211){
+      decay1haspion=true;
+      break;}}}
+  
+  //make here a scan if the second decay is hadronic. Only for e-mu would not require this..
+  if(channel=="mt"||channel=="et"){
   for(unsigned int pindex=0;pindex<analysisTree->tau_constituents_count[tauIndex2];pindex++){
     if(abs(analysisTree->tau_constituents_pdgId[tauIndex2][pindex])==211){
       decay2haspion=true;
-      break;}
-  }
-    
+      break;}}}
+  
+  
 //Merijn: these definitions can be discussed and adjusted to include 3 prong decays, the allow for mode 10 as well
-  bool correctDecay1 = analysisTree->tau_decayMode[tauIndex1]<10;
-  bool correctDecay2 = analysisTree->tau_decayMode[tauIndex2]<10&&decay2haspion; 
+  bool correctDecay1=false;
+  bool correctDecay2=false;
+  //now fix for the tree cases. Note: currently we EXCLUDE 3 prong, since NOT implemented yet. 
+
+  if(channel=="mt"||channel=="et"){
+    correctDecay1=true;
+    correctDecay2 = analysisTree->tau_decayMode[tauIndex2]<10&&decay2haspion;}
+
+  if(channel=="tt"){//just require both to be hadronic
+    correctDecay1 = analysisTree->tau_decayMode[tauIndex1]<10&&decay1haspion; 
+    correctDecay2 = analysisTree->tau_decayMode[tauIndex2]<10&&decay2haspion;}
+  
   bool correctDecay = correctDecay1 && correctDecay2;
 
 //properly inintialise to -9999 if decay not correct
   if(!correctDecay){
-    otree->acotautau_00 = -9999;
-    otree->acotautau_10 = -9999;
-    otree->acotautau_01 = -9999;
-    otree->acotautau_11 = -9999;
     return;
   }
-	
+  
   //Merijn: here set 4-momentum of tau1. For tt case, currently take the highest pt charged  pion
   TLorentzVector tau1Prong; //the mectric convention used elsehwere for reference. Its in form px, py, pz, E.
-
-  if(channel=="tt") tau1Prong=chargedPivec(analysisTree,tauIndex1);// one could consider to use the function below instead to use the RECO estimate of the momentum of the hadronically decaying tau directly..
 
   //Merijn: tauindex1 may point to electron or muon. So use the switch and index to obtain correct kinematics, assuming electron and muon masses
   if(channel=="mt"){    
@@ -204,45 +229,80 @@ cout<<"start acott_impr "<<endl;
   if(channel=="et"){
     double elecenergy=TMath::Sqrt(TMath::Power(analysisTree->electron_px[tauIndex1],2)+TMath::Power(analysisTree->electron_py[tauIndex1],2)+TMath::Power(analysisTree->electron_pz[tauIndex1],2)+TMath::Power(0.000511,2));
     tau1Prong.SetPxPyPzE(analysisTree->electron_px[tauIndex1],analysisTree->electron_py[tauIndex1],analysisTree->electron_pz[tauIndex1],elecenergy);}
+
+  if(channel=="tt") tau1Prong=chargedPivec(analysisTree,tauIndex1);//Merijn: changed to index1. Only works if call for tt!
+
   
 //merijn: we vetoed already if the second tau didn't contain a pion, so can safely calculate the momentum of 2nd prong from hadrons
   TLorentzVector tau2Prong;
   tau2Prong=chargedPivec(analysisTree,tauIndex2);
   
-  bool firstNegative = false;
-  if (analysisTree->tau_charge[tauIndex1]<0.0)
+  bool firstNegative = false;//Merijn 2019 1 10: instead I ask if the second is positive. WON'T WORK FOR E-MU CASE!
+  if (analysisTree->tau_charge[tauIndex2]>0.0)
     firstNegative = true;
 
   TLorentzVector tau1IP;
-//Merijn: for leptonic decay calculate in different way than for hadronic
+  //Merijn: for leptonic decay calculate in different way than for hadronic
   if(channel=="et"||channel=="mt") tau1IP = ipVec_Lepton(analysisTree,tauIndex1,channel);
-  else{tau1IP = ipVec(analysisTree,tauIndex1);}//tt
+  else{tau1IP = ipVec(analysisTree,tauIndex1);}//tt: treat as tau index..
   TLorentzVector tau1Pi0;
   tau1Pi0.SetXYZT(0.,0.,0.,0.);
-  
+
+  //Merijn: have to assume here we WON'T look into e-mu case! 
   TLorentzVector tau2IP;
   tau2IP = ipVec(analysisTree,tauIndex2);
   TLorentzVector tau2Pi0;
   tau2Pi0.SetXYZT(0.,0.,0.,0.);
 
   //Merijn: here calculate neutral pion vectors. Only look for pions in first tau if channel is tt.
-  if(channel=="tt"){ if (analysisTree->tau_decayMode[tauIndex1]>=1&&analysisTree->tau_decayMode[tauIndex1]<=3) tau1Pi0 = neutralPivec(analysisTree,tauIndex1);}
+  if(channel=="tt"){ if(analysisTree->tau_decayMode[tauIndex1]>=1&&analysisTree->tau_decayMode[tauIndex1]<=3) tau1Pi0 = neutralPivec(analysisTree,tauIndex1);}
+
   if (analysisTree->tau_decayMode[tauIndex2]>=1&&analysisTree->tau_decayMode[tauIndex2]<=3) tau2Pi0 = neutralPivec(analysisTree,tauIndex2);
   
-//here can proceed with CP calculation
-  otree->acotautau_00=acoCPCOUT(tau1Prong,tau2Prong,tau1IP,tau2IP,firstNegative,false,false); // cout<<"otree->acotautau_00 "<<otree->acotautau_00<<endl;
+  //here can proceed with CP calculation. Merijn: for tau index 1 it makes no sense to ask for a mode!
+  /*
+    cout<<endl;
+    // std::cout << "Mode1 = " << analysisTree->tau_decayMode[tauIndex1] << "  Mode2 = " << analysisTree->tau_decayMode[tauIndex2] << std::endl;
+    //perhaps 
+    cout<<endl;//perhaps the pdf of the constit of 1nd decaying tau. Perhaps it is pionic?
+  */
 
-  if (analysisTree->tau_decayMode[tauIndex1]==1&&analysisTree->tau_decayMode[tauIndex2]==0)
-    otree->acotautau_10=acoCP(tau1Prong,tau2Prong,tau1Pi0,tau2IP,firstNegative,true,false);
+  //if (analysisTree->tau_decayMode[tauIndex2]==0){
 
-  if (analysisTree->tau_decayMode[tauIndex1]==0&&analysisTree->tau_decayMode[tauIndex2]==1)
-    otree->acotautau_01=acoCP(tau1Prong,tau2Prong,tau1IP,tau2Pi0,firstNegative,false,true);
+  otree->acotautau_00=acoCPCOUT(tau1Prong,tau2Prong,tau1IP,tau2IP,firstNegative,false,false);
+   //I think it should work since everything assigned for 3 cases. Note: aco_00 will be filled with mu x 1-prong and mu x 1.1-prong
 
-  if (analysisTree->tau_decayMode[tauIndex1]==1&&analysisTree->tau_decayMode[tauIndex2]==1){
-    otree->acotautau_10=acoCP(tau1Prong,tau2Prong,tau1Pi0,tau2IP,firstNegative,true,false);
-    otree->acotautau_01=acoCP(tau1Prong,tau2Prong,tau1IP,tau2Pi0,firstNegative,false,true);
-    otree->acotautau_11=acoCP(tau1Prong,tau2Prong,tau1Pi0,tau2Pi0,firstNegative,true,true);
+  
+  if(channel=="et"||channel=="mt"){//we only fill aco_01 for et and mt
+    if (analysisTree->tau_decayMode[tauIndex2]==1){
+      //  cout<<"from filling 01: analysisTree->tau_decayMode[tauIndex2] "<<analysisTree->tau_decayMode[tauIndex2]<<endl;
+      otree->acotautau_01=acoCP(tau1Prong,tau2Prong,tau1IP,tau2Pi0,firstNegative,false,true);
+    }    
   }
+
+  if(channel=="tt"){//merijn 2019 1 10: only for tt we can use the index to assess a tau, otherwise its a lepton!
+    cout<<"accident"<<endl;
+    if (analysisTree->tau_decayMode[tauIndex1]==1&&analysisTree->tau_decayMode[tauIndex2]==0)
+      otree->acotautau_10=acoCP(tau1Prong,tau2Prong,tau1Pi0,tau2IP,firstNegative,true,false);
+    
+    if (analysisTree->tau_decayMode[tauIndex1]==0&&analysisTree->tau_decayMode[tauIndex2]==1){
+      otree->acotautau_01=acoCP(tau1Prong,tau2Prong,tau1IP,tau2Pi0,firstNegative,false,true);
+    }
+    
+    if (analysisTree->tau_decayMode[tauIndex1]==1&&analysisTree->tau_decayMode[tauIndex2]==1){
+      otree->acotautau_10=acoCP(tau1Prong,tau2Prong,tau1Pi0,tau2IP,firstNegative,true,false);
+      otree->acotautau_01=acoCP(tau1Prong,tau2Prong,tau1IP,tau2Pi0,firstNegative,false,true);
+      otree->acotautau_11=acoCP(tau1Prong,tau2Prong,tau1Pi0,tau2Pi0,firstNegative,true,true);
+    }
+  }
+
+  if(otree->acotautau_01!=-9999&&otree->tau_decay_mode_2!=1){
+    cout<<endl;
+    cout<<"Genuinely Bizar :analysisTree->tau_decayMode[tauIndex2] "<< analysisTree->tau_decayMode[tauIndex2]<<endl;
+    cout<<endl;}
+
+  cout<<"End acott_Impr"<<endl;
+
 };
 
 
@@ -423,7 +483,7 @@ momenta.SetXYZ(analysisTree->muon_px[tauIndex],
 
  
 void gen_acott(const AC1B * analysisTree, Synch17GenTree *gentree, int tauIndex1, int tauIndex2){
-cout<<"start gen_acott "<<endl;
+  //cout<<"start gen_acott "<<endl;
 
   bool correctDecay1 = analysisTree->gentau_decayMode[tauIndex1]<=6||analysisTree->gentau_decayMode[tauIndex1]==8||analysisTree->gentau_decayMode[tauIndex1]==9;
   bool correctDecay2 = analysisTree->gentau_decayMode[tauIndex2]<=6||analysisTree->gentau_decayMode[tauIndex2]==8||analysisTree->gentau_decayMode[tauIndex2]==9;
@@ -503,9 +563,9 @@ cout<<"start gen_acott "<<endl;
 
   if (oneProngPi01)
     gentree->acotautau_10=acoCP(tau1Prong,tau2Prong,tau1Pi0,tau2IP,firstNegative,true,false);
-
-  if (oneProngPi02)
-    gentree->acotautau_01=acoCP(tau1Prong,tau2Prong,tau1IP,tau2Pi0,firstNegative,false,true);
+  
+  if (oneProngPi02){
+    gentree->acotautau_01=acoCP(tau1Prong,tau2Prong,tau1IP,tau2Pi0,firstNegative,false,true);}
 
   if (oneProngPi01&&oneProngPi02)
     gentree->acotautau_11=acoCP(tau1Prong,tau2Prong,tau1Pi0,tau2Pi0,firstNegative,true,true);
@@ -857,10 +917,11 @@ double acoCPCOUT(TLorentzVector Pi1, TLorentzVector Pi2,
   if (pi02)
     y2 = Pi2.E() - ref2.E();
 
+  /*
   //y2=-1; //Merijn this is currently the only difference w.r.t. the original..
-
  cout<<"pi01 "<<pi01<<" pi02 "<<pi02<<endl;
  cout<<"ref1.E() "<<ref1.E()<<" ref2.E() " <<ref2.E()<<endl;
+  */
   
   double y = y1*y2;
 
@@ -871,7 +932,7 @@ double acoCPCOUT(TLorentzVector Pi1, TLorentzVector Pi2,
   ref1.Boost(boost);
   ref2.Boost(boost);
 
-  std::cout << "First negative = " << firstNegative << "  pi01 = " << pi01 << "   pi02 = " << pi02 << std::endl;
+  // std::cout << "First negative = " << firstNegative << "  pi01 = " << pi01 << "   pi02 = " << pi02 << std::endl;
   //  std::cout << "Px(1) = " << Pi1.Px() << "  Py(1) = " << Pi1.Py() << "  Pz(1) = " << Pi1.Pz() << std::endl;
   //  std::cout << "Px(2) = " << Pi2.Px() << "  Py(2) = " << Pi2.Py() << "  Pz(2) = " << Pi2.Pz() << std::endl;
   //  std::cout << "Ux(1) = " << ref1.Px() << "  Uy(1) = " << ref1.Py() << "  Uz(1) = " << ref1.Pz() << std::endl;
@@ -910,7 +971,7 @@ double acoCPCOUT(TLorentzVector Pi1, TLorentzVector Pi2,
     }
   }  
 
-  cout<<"acop before return from function "<<acop<<endl;
+  //  cout<<"acop before return from function "<<acop<<endl;
   return acop;
 
 }

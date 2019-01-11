@@ -94,6 +94,7 @@ int nonpionphotonctr=0;
 
 int main(int argc, char * argv[]){
 
+  cout<<"main 1"<<endl;
   // first argument - config file for analysis
   // second argument - file list (MUST BE IN THE SAME DIRECTORY OF THE EXECUTABLE)
   // third argument - channel ("et" or "mt")
@@ -224,6 +225,8 @@ int main(int argc, char * argv[]){
   TRandom3 *rand = new TRandom3();
 
   const struct btag_scaling_inputs inputs_btag_scaling_medium = { reader_B, reader_C, reader_Light, tagEff_B, tagEff_C, tagEff_Light, rand };
+
+  cout<<"main 2"<<endl;
 
   // MET Recoil Corrections
   const bool applyRecoilCorrections = cfg.get<bool>("ApplyRecoilCorrections");
@@ -379,6 +382,8 @@ int main(int argc, char * argv[]){
 
   bool includeTTbarUncWeights = true;
 
+  cout<<"main 3"<<endl;
+
   //file list creation
 
   int ifile = 0;
@@ -426,7 +431,8 @@ int main(int argc, char * argv[]){
     std::cout<<fileList[iF]<<std::endl;
   }
 
-  
+  cout<<"main 4"<<endl;
+
   TString rootFileName(sample);
   std::string ntupleName("makeroottree/AC1B");
 
@@ -497,6 +503,8 @@ int main(int argc, char * argv[]){
   rootFileName += ifile;
   rootFileName += "_" + ch + "_Sync.root";
 
+  cout<<"main 5"<<endl;
+    
   std::cout <<rootFileName <<std::endl;  
 
   TFile * file = new TFile( rootFileName ,"recreate");
@@ -590,7 +598,9 @@ int main(int argc, char * argv[]){
     }
     
   }
-  
+
+  cout<<"main 6"<<endl;
+
   // list of met filters
   std::vector<TString> met_filters_list ;
   met_filters_list.push_back("Flag_HBHENoiseFilter");
@@ -602,6 +612,7 @@ int main(int argc, char * argv[]){
   met_filters_list.push_back("Flag_BadPFMuonFilter");
   met_filters_list.push_back("Flag_BadChargedCandidateFilter");
 
+  cout<<"main 6.0.1"<<endl;
 
   int counter[20];
 
@@ -610,14 +621,18 @@ int main(int argc, char * argv[]){
   for (int iF=ifile; iF<jfile; ++iF) {
     std::cout << "file " << iF+1 << " out of " << fileList.size() << " filename : " << fileList[iF] << std::endl;
     TFile * file_ = TFile::Open(fileList[iF].data());
+    cout<<"main 6.0.2"<<endl;
     
     TTree * _tree = NULL;
     _tree = (TTree*)file_->Get(TString(ntupleName));
-  
+    
+    cout<<"main 6.0.3"<<endl;
+    
     if (_tree==NULL) continue;
     
     TH1D * histoInputEvents = NULL;
-   
+
+    cout<<"main 6.1"<<endl;
     histoInputEvents = (TH1D*)file_->Get("makeroottree/nEvents");
     
     if (histoInputEvents==NULL) continue;
@@ -630,20 +645,26 @@ int main(int argc, char * argv[]){
       inputEventsH->Fill(0.);
 
     AC1B analysisTree(_tree, isData);
+    cout<<"main 6.2"<<endl;
 
     // set AC1B for JES systematicsf_
     if (!isData && ApplySystShift && jetEnergyScaleSys.size() >0){
       for (unsigned int i=0; i<jetEnergyScaleSys.size(); i++)
 	(jetEnergyScaleSys.at(i))->SetAC1B(&analysisTree);
     }
-    
+
+    cout<<"main 6.3"<<endl;
+
     Long64_t numberOfEntries = analysisTree.GetEntries();
     
     std::cout << "      number of entries in Tree = " << numberOfEntries << std::endl;
     ///////////////EVENT LOOP///////////////
-    
+
+    cout<<"main 7"<<endl;
+
 //for (Long64_t iEntry=0; iEntry<1000; iEntry++) {
- for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) {       
+
+for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) {       
       counter[0]++;
       analysisTree.GetEntry(iEntry);
       nEvents++;
@@ -702,6 +723,7 @@ int main(int argc, char * argv[]){
      //we fill vertices here;	
      SaveRECOVertices(&analysisTree,otree, isData);
 		  
+    cout<<"main 8"<<endl;
 
       bool overlapEvent = true;
       for (unsigned int iEvent=0; iEvent<runList.size(); ++iEvent) {
@@ -770,6 +792,8 @@ int main(int argc, char * argv[]){
         }
 
       }
+
+      cout<<"main 9"<<endl;
 
       if(ch == "mt"){
         for (unsigned int im = 0; im<analysisTree.muon_count; ++im) {
@@ -984,6 +1008,8 @@ int main(int argc, char * argv[]){
       otree->idisoweight_1 = 1;
       otree->idisoweight_2 = 1;
 
+      cout<<"main 10"<<endl;
+
       // ********************************
       // FIXME : implement l1tau matching
       // ********************************
@@ -1163,6 +1189,8 @@ int main(int argc, char * argv[]){
 	  double eff_data_trig = eff_data_trig_L + (eff_data_trig_lt_l-eff_data_trig_L)*eff_data_trig_lt_tau;
 	  double eff_mc_trig = eff_mc_trig_L + (eff_mc_trig_lt_l-eff_mc_trig_L)*eff_mc_trig_lt_tau;
 
+	  cout<<"main 11"<<endl;
+	      		
 	  if (eff_data_trig>1e-4&&eff_mc_trig>1e-4)
 	    otree->trigweight = eff_data_trig/eff_mc_trig;
 
@@ -1402,6 +1430,8 @@ int main(int argc, char * argv[]){
       otree->met_sv = -9999;
       otree->mt_sv = -9999;
 
+      cout<<"main 12"<<endl;
+
       //calculate SV fit only for events passing baseline selection and mt cut
       // fill otree only for events passing baseline selection 
       // for synchronisation, take all events
@@ -1458,13 +1488,15 @@ if((analysisTree.tau_constituents_pdgId[tauIndex][i]*sign)>0){
 	}
     }
   }
+  
+  cout<<"main 13"<<endl;
 
  otree->pdgcodetau2=pdgcode; //Merijn tried here to assign to our tree. Not working yet so put in histogam..
  ConstitsPDG->Fill(pdgcode);
  if(abs(pdgcode)!=211&&abs(pdgcode)!=22) nonpionphotonctr++;
 // cout<<"nonpionphotonctr ="<<nonpionphotonctr<<endl;
 
-  otree->Fill();
+//  otree->Fill();
 
 	  // evaluate systematics for MC 
       if(!isData && ApplySystShift){
@@ -1485,14 +1517,32 @@ if((analysisTree.tau_constituents_pdgId[tauIndex][i]*sign)>0){
   //CP calculation. Updates Merijn: placed calculation at end, when all kinematic corrections are performed. Removed statement to only do calculation for tt. Created the acott_Impr function, which takes ch as input as well. See the funcrtion in functionsCP.h to see my updates to the function itself
 
       //if(ch=="tt")
-      acott_Impr(&analysisTree,otree,tauIndex,leptonIndex, ch);
+      //   acott_Impr(&analysisTree,otree,tauIndex,leptonIndex, ch);
+      //Merijn 2019 1 10 debug: a major source of problems was that indices were innertwined from the beginning...
+      //one should note that in et or mt case,
+
+      //cout<<"iEntry "<<iEntry <<endl;
+      acott_Impr(&analysisTree,otree,leptonIndex,tauIndex, ch);
 
 
       selEvents++;
       //std::cout << "*************SelEv " << selEvents << "************" << std::endl;
 
-    } // end of file processing (loop over events in one file)
+      if(analysisTree.tau_decayMode[tauIndex]!=otree->tau_decay_mode_2) cout<<"Massive inconsistency"<<endl;
+      
+      if(otree->acotautau_01>0&&otree->tau_decay_mode_2!=1){
+	cout<<endl;
+	cout<<"Genuinely Bizar :analysisTree->tau_decayMode[tauIndex] "<< analysisTree.tau_decayMode[tauIndex]<<endl;
+	cout<<endl;}
 
+      //Merijn 2019 1 10: perhaps this should be called before moving to next event..
+        otree->Fill();
+
+        cout<<"main 14"<<endl;
+
+ } // end of file processing (loop over events in one file)
+
+ cout<<"main 15"<<endl;
 
     nFiles++;
     delete _tree;
@@ -1598,8 +1648,9 @@ void FillMuTau(const AC1B * analysisTree, Synch17Tree *otree, int leptonIndex, f
   //otree->dZerr_1 = analysisTree->muon_dzerr[leptonIndex];
   
 
-  otree->tau_decay_mode_1 = -9999;
-
+  otree->tau_decay_mode_1 = -9999; 
+  // otree->tau_decay_mode_1=analysisTree->tau_decayMode[leptonIndex]; can;'t do since its a lepton not a tau index
+ 
   otree->byCombinedIsolationDeltaBetaCorrRaw3Hits_1 = -9999;
   otree->byLooseCombinedIsolationDeltaBetaCorr3Hits_1 = -9999;
   otree->byMediumCombinedIsolationDeltaBetaCorr3Hits_1 = -9999;
@@ -1641,6 +1692,7 @@ void FillETau(const AC1B * analysisTree, Synch17Tree *otree, int leptonIndex, fl
   //otree->dZerr_1 = analysisTree->electron_dzerr[leptonIndex]; 
 
   otree->tau_decay_mode_1 = -9999;
+  // otree->tau_decay_mode_1=analysisTree->tau_decayMode[leptonIndex];// can;t do since its a lepton index..
 
   otree->byCombinedIsolationDeltaBetaCorrRaw3Hits_1 = -9999;
   otree->byLooseCombinedIsolationDeltaBetaCorr3Hits_1 = -9999;
@@ -1775,7 +1827,8 @@ void FillTau(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex){
   otree->iso_2 = analysisTree->tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[tauIndex];
   otree->m_2 = analysisTree->tau_mass[tauIndex];
   otree->tau_decay_mode_2 = analysisTree->tau_decayMode[tauIndex];
-
+  //  cout<<"from FillTau : otree->tau_decay_mode_2 "<<otree->tau_decay_mode_2 <<endl;
+  
   otree->byCombinedIsolationDeltaBetaCorrRaw3Hits_2 = analysisTree->tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[tauIndex];
   otree->byLooseCombinedIsolationDeltaBetaCorr3Hits_2 = analysisTree->tau_byLooseCombinedIsolationDeltaBetaCorr3Hits[tauIndex];
   otree->byMediumCombinedIsolationDeltaBetaCorr3Hits_2 = analysisTree->tau_byMediumCombinedIsolationDeltaBetaCorr3Hits[tauIndex];
@@ -2024,6 +2077,5 @@ else{//if it is data, fill with something recognisable nonsensible
       otree->GenVertexX=-9999;
       otree->GenVertexY=-9999;
       otree->GenVertexZ=-9999;}
-
 
 }
