@@ -38,6 +38,8 @@ sed -i 's/ApplygghReweighting = false/ApplygghReweighting = true/g' analysisMacr
 sed 's/SampleNameForPUHist =/SampleNameForPUHist = VBFHToTauTau_M125_pileup/' analysisMacroSynch_em_Signal.conf > analysisMacroSynch_em_Signal_VBF_Htautau_M125.conf
 
 sed 's/SampleNameForPUHist =/SampleNameForPUHist = GluGluHToWWTo2L2Nu_pileup/' analysisMacroSynch_em_Signal.conf > analysisMacroSynch_em_Signal_GGH_HWW_M125.conf
+sed -i 's/ApplygghReweighting = false/ApplygghReweighting = true/g' analysisMacroSynch_em_Signal_GGH_HWW_M125.conf 
+sed 's/SampleNameForPUHist =/SampleNameForPUHist = MC_PU2017_pileup/' analysisMacroSynch_em_Signal.conf > analysisMacroSynch_em_Signal_VBF_HWW_M125.conf
 
 sed 's/SampleNameForPUHist =/SampleNameForPUHist = MC_PU2017_pileup/' analysisMacroSynch_em_Signal.conf > analysisMacroSynch_em_Signal_ZH.conf
 

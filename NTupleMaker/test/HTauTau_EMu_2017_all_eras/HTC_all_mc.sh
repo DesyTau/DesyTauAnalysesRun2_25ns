@@ -3,6 +3,7 @@
 #./HTC_submit_seq.sh SynchNTupleProducer_em_allEras analysisMacroSynch_em_Signal_GGH_Htautau_M125.conf GluGluHToTauTau_M125_13TeV_powheg_pythia8 1
 
 ./HTC_submit_seq.sh SynchNTupleProducer_em_allEras analysisMacroSynch_em_Signal_GGH_HWW_M125.conf GluGluHToWWTo2L2Nu 1
+./HTC_submit_seq.sh SynchNTupleProducer_em_allEras analysisMacroSynch_em_Signal_VBF_HWW_M125.conf analysisMacroSynch_em_Signal_VBF_HWW_M125.conf 1
 
 #./HTC_submit_seq.sh SynchNTupleProducer_em_allEras analysisMacroSynch_em_DY1JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8.conf DY1JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8 1 
 #./HTC_submit_seq.sh SynchNTupleProducer_em_allEras analysisMacroSynch_em_DY2JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8.conf DY2JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8  1
