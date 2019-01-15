@@ -266,8 +266,10 @@ HLTriggerPaths = cms.untracked.vstring(
 'HLT_Mu20_Mu10_DZ_v',
 'HLT_Mu20_Mu10_SameSign_v',
 'HLT_Mu20_Mu10_SameSign_DZ_v',
+'HLT_Mu37_TkMu27_v',
 # Triple muon
 'HLT_TripleMu_12_10_5_v',
+'HLT_TripleMu_10_5_5_DZ_v',
 # Muon+Electron triggers
 'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v',
 'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v',
@@ -340,7 +342,7 @@ RecTrackDxyMax = cms.untracked.double(1.0),
 RecTrackDzMax = cms.untracked.double(1.0),
 RecTrackNum = cms.untracked.int32(0),
 # muons
-RecMuonPtMin = cms.untracked.double(5.),
+RecMuonPtMin = cms.untracked.double(2.),
 RecMuonEtaMax = cms.untracked.double(2.5),
 RecMuonHLTriggerMatching = cms.untracked.vstring(
 #SingleMuon
@@ -374,10 +376,20 @@ RecMuonHLTriggerMatching = cms.untracked.vstring(
 'HLT_Mu20_Mu10_SameSign_DZ_v.*:hltL3fL1DoubleMu157fFiltered20',
 'HLT_Mu20_Mu10_SameSign_DZ_v.*:hltDiMuon2010SameSignFiltered',
 'HLT_Mu20_Mu10_SameSign_DZ_v.*:hltDiMuon2010SameSignDzFiltered0p2',
+'HLT_Mu37_TkMu27_v.*:hltDiMuonGlbFiltered37TrkFiltered27',
+'HLT_Mu37_TkMu27_v.*:hltPreMu37TkMu27',
+'HLT_Mu37_TkMu27_v.*:hltL3fL1sMu16orMu25L1f0L2f25L3Filtered37',
+'HLT_Mu37_TkMu27_v.*:hltDiMuonGlb37Trk27DzFiltered0p2',
+'HLT_Mu37_TkMu27_v.*:hltL1sSingleMu22IorSingleMu25',
 'HLT_TripleMu_12_10_5_v.*:hltL1sTripleMu0IorTripleMu553',
 'HLT_TripleMu_12_10_5_v.*:hltL3fL1TripleMu553f0PreFiltered555',
 'HLT_TripleMu_12_10_5_v.*:hltL3fL1TripleMu553f0Filtered10105',
-'HLT_TripleMu_12_10_5_v.*:hltL3fL1TripleMu553f0Filtered12105'
+'HLT_TripleMu_12_10_5_v.*:hltL3fL1TripleMu553f0Filtered12105',
+'HLT_TripleMu_10_5_5_DZ_v.*:hltL1sTripleMu0IorTripleMu553',
+'HLT_TripleMu_10_5_5_DZ_v.*:hltL3fL1TripleMu553f0Filtered1055',
+'HLT_TripleMu_10_5_5_DZ_v.*:hltL3fL1TripleMu553f0PreFiltered555',
+'HLT_TripleMu_10_5_5_DZ_v.*:hltPreTripleMu1055DZ',
+'HLT_TripleMu_10_5_5_DZ_v.*:hltTripleMu555TripleDZ0p2'
 ),
 RecMuonNum = cms.untracked.int32(0),
 # photons
