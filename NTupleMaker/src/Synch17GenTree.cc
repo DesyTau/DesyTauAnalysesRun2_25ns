@@ -82,6 +82,16 @@ void Synch17GenTree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("acotautau_21", &acotautau_21, &b_acotautau_21);
    fChain->SetBranchAddress("acotautau_22", &acotautau_22, &b_acotautau_22);
 
+   fChain->SetBranchAddress("acotautauPsi_00", &acotautauPsi_00, &b_acotautauPsi_00);
+   fChain->SetBranchAddress("acotautauPsi_10", &acotautauPsi_10, &b_acotautauPsi_10);
+   fChain->SetBranchAddress("acotautauPsi_01", &acotautauPsi_01, &b_acotautauPsi_01);
+   fChain->SetBranchAddress("acotautauPsi_11", &acotautauPsi_11, &b_acotautauPsi_11);   
+   fChain->SetBranchAddress("acotautauPsi_02", &acotautauPsi_02, &b_acotautauPsi_02);
+   fChain->SetBranchAddress("acotautauPsi_12", &acotautauPsi_12, &b_acotautauPsi_12);
+   fChain->SetBranchAddress("acotautauPsi_20", &acotautauPsi_20, &b_acotautauPsi_20);
+   fChain->SetBranchAddress("acotautauPsi_21", &acotautauPsi_21, &b_acotautauPsi_21);
+   fChain->SetBranchAddress("acotautauPsi_22", &acotautauPsi_22, &b_acotautauPsi_22);
+
   //gen vertex info useful to have
    fChain->SetBranchAddress("GenVertexX", &GenVertexX, &b_GenVertexX);
    fChain->SetBranchAddress("GenVertexY", &GenVertexY, &b_GenVertexY);
@@ -184,6 +194,16 @@ void Synch17GenTree::WriteInit(TTree *tree) {
    fChain->Branch("acotautau_20", &acotautau_20, "acotautau_20/F");
    fChain->Branch("acotautau_21", &acotautau_21, "acotautau_21/F");
    fChain->Branch("acotautau_22", &acotautau_22, "acotautau_22/F");
+
+   fChain->Branch("acotautauPsi_00", &acotautauPsi_00, "acotautauPsi_00/F");
+   fChain->Branch("acotautauPsi_10", &acotautauPsi_10, "acotautauPsi_10/F");
+   fChain->Branch("acotautauPsi_01", &acotautauPsi_01, "acotautauPsi_01/F");
+   fChain->Branch("acotautauPsi_11", &acotautauPsi_11, "acotautauPsi_11/F");
+   fChain->Branch("acotautauPsi_02", &acotautauPsi_02, "acotautauPsi_02/F");
+   fChain->Branch("acotautauPsi_12", &acotautauPsi_12, "acotautauPsi_12/F");
+   fChain->Branch("acotautauPsi_20", &acotautauPsi_20, "acotautauPsi_20/F");
+   fChain->Branch("acotautauPsi_21", &acotautauPsi_21, "acotautauPsi_21/F");
+   fChain->Branch("acotautauPsi_22", &acotautauPsi_22, "acotautauPsi_22/F");
 
    fChain->Branch("GenVertexX", &GenVertexX, "GenVertexX/F");
    fChain->Branch("GenVertexY", &GenVertexY, "GenVertexY/F");

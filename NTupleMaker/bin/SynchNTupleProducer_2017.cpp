@@ -94,7 +94,6 @@ int nonpionphotonctr=0;
 
 int main(int argc, char * argv[]){
 
-  cout<<"main 1"<<endl;
   // first argument - config file for analysis
   // second argument - file list (MUST BE IN THE SAME DIRECTORY OF THE EXECUTABLE)
   // third argument - channel ("et" or "mt")
@@ -226,7 +225,6 @@ int main(int argc, char * argv[]){
 
   const struct btag_scaling_inputs inputs_btag_scaling_medium = { reader_B, reader_C, reader_Light, tagEff_B, tagEff_C, tagEff_Light, rand };
 
-  cout<<"main 2"<<endl;
 
   // MET Recoil Corrections
   const bool applyRecoilCorrections = cfg.get<bool>("ApplyRecoilCorrections");
@@ -382,8 +380,6 @@ int main(int argc, char * argv[]){
 
   bool includeTTbarUncWeights = true;
 
-  cout<<"main 3"<<endl;
-
   //file list creation
 
   int ifile = 0;
@@ -430,8 +426,6 @@ int main(int argc, char * argv[]){
   for (int iF=ifile; iF<jfile; ++iF) {
     std::cout<<fileList[iF]<<std::endl;
   }
-
-  cout<<"main 4"<<endl;
 
   TString rootFileName(sample);
   std::string ntupleName("makeroottree/AC1B");
@@ -502,8 +496,6 @@ int main(int argc, char * argv[]){
   rootFileName += "_";
   rootFileName += ifile;
   rootFileName += "_" + ch + "_Sync.root";
-
-  cout<<"main 5"<<endl;
     
   std::cout <<rootFileName <<std::endl;  
 
@@ -599,8 +591,6 @@ int main(int argc, char * argv[]){
     
   }
 
-  cout<<"main 6"<<endl;
-
   // list of met filters
   std::vector<TString> met_filters_list ;
   met_filters_list.push_back("Flag_HBHENoiseFilter");
@@ -612,8 +602,6 @@ int main(int argc, char * argv[]){
   met_filters_list.push_back("Flag_BadPFMuonFilter");
   met_filters_list.push_back("Flag_BadChargedCandidateFilter");
 
-  cout<<"main 6.0.1"<<endl;
-
   int counter[20];
 
   ///////////////FILE LOOP///////////////
@@ -621,18 +609,14 @@ int main(int argc, char * argv[]){
   for (int iF=ifile; iF<jfile; ++iF) {
     std::cout << "file " << iF+1 << " out of " << fileList.size() << " filename : " << fileList[iF] << std::endl;
     TFile * file_ = TFile::Open(fileList[iF].data());
-    cout<<"main 6.0.2"<<endl;
     
     TTree * _tree = NULL;
     _tree = (TTree*)file_->Get(TString(ntupleName));
-    
-    cout<<"main 6.0.3"<<endl;
-    
+        
     if (_tree==NULL) continue;
     
     TH1D * histoInputEvents = NULL;
 
-    cout<<"main 6.1"<<endl;
     histoInputEvents = (TH1D*)file_->Get("makeroottree/nEvents");
     
     if (histoInputEvents==NULL) continue;
@@ -645,7 +629,6 @@ int main(int argc, char * argv[]){
       inputEventsH->Fill(0.);
 
     AC1B analysisTree(_tree, isData);
-    cout<<"main 6.2"<<endl;
 
     // set AC1B for JES systematicsf_
     if (!isData && ApplySystShift && jetEnergyScaleSys.size() >0){
@@ -653,14 +636,10 @@ int main(int argc, char * argv[]){
 	(jetEnergyScaleSys.at(i))->SetAC1B(&analysisTree);
     }
 
-    cout<<"main 6.3"<<endl;
-
     Long64_t numberOfEntries = analysisTree.GetEntries();
     
     std::cout << "      number of entries in Tree = " << numberOfEntries << std::endl;
     ///////////////EVENT LOOP///////////////
-
-    cout<<"main 7"<<endl;
 
 //for (Long64_t iEntry=0; iEntry<1000; iEntry++) {
 
@@ -723,8 +702,6 @@ for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) {
      //we fill vertices here;	
      SaveRECOVertices(&analysisTree,otree, isData);
 		  
-    cout<<"main 8"<<endl;
-
       bool overlapEvent = true;
       for (unsigned int iEvent=0; iEvent<runList.size(); ++iEvent) {
       	if (runList.at(iEvent)==otree->run && eventList.at(iEvent)==otree->evt) {
@@ -792,8 +769,6 @@ for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) {
         }
 
       }
-
-      cout<<"main 9"<<endl;
 
       if(ch == "mt"){
         for (unsigned int im = 0; im<analysisTree.muon_count; ++im) {
@@ -1008,7 +983,6 @@ for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) {
       otree->idisoweight_1 = 1;
       otree->idisoweight_2 = 1;
 
-      cout<<"main 10"<<endl;
 
       // ********************************
       // FIXME : implement l1tau matching
@@ -1188,8 +1162,6 @@ for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) {
 
 	  double eff_data_trig = eff_data_trig_L + (eff_data_trig_lt_l-eff_data_trig_L)*eff_data_trig_lt_tau;
 	  double eff_mc_trig = eff_mc_trig_L + (eff_mc_trig_lt_l-eff_mc_trig_L)*eff_mc_trig_lt_tau;
-
-	  cout<<"main 11"<<endl;
 	      		
 	  if (eff_data_trig>1e-4&&eff_mc_trig>1e-4)
 	    otree->trigweight = eff_data_trig/eff_mc_trig;
@@ -1430,8 +1402,6 @@ for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) {
       otree->met_sv = -9999;
       otree->mt_sv = -9999;
 
-      cout<<"main 12"<<endl;
-
       //calculate SV fit only for events passing baseline selection and mt cut
       // fill otree only for events passing baseline selection 
       // for synchronisation, take all events
@@ -1489,8 +1459,6 @@ if((analysisTree.tau_constituents_pdgId[tauIndex][i]*sign)>0){
     }
   }
   
-  cout<<"main 13"<<endl;
-
  otree->pdgcodetau2=pdgcode; //Merijn tried here to assign to our tree. Not working yet so put in histogam..
  ConstitsPDG->Fill(pdgcode);
  if(abs(pdgcode)!=211&&abs(pdgcode)!=22) nonpionphotonctr++;
@@ -1528,21 +1496,17 @@ if((analysisTree.tau_constituents_pdgId[tauIndex][i]*sign)>0){
       selEvents++;
       //std::cout << "*************SelEv " << selEvents << "************" << std::endl;
 
+      /* old debugging code Merijn
       if(analysisTree.tau_decayMode[tauIndex]!=otree->tau_decay_mode_2) cout<<"Massive inconsistency"<<endl;
-      
       if(otree->acotautau_01>0&&otree->tau_decay_mode_2!=1){
 	cout<<endl;
 	cout<<"Genuinely Bizar :analysisTree->tau_decayMode[tauIndex] "<< analysisTree.tau_decayMode[tauIndex]<<endl;
-	cout<<endl;}
+	cout<<endl;}*/
 
       //Merijn 2019 1 10: perhaps this should be called before moving to next event..
-        otree->Fill();
-
-        cout<<"main 14"<<endl;
+      otree->Fill();
 
  } // end of file processing (loop over events in one file)
-
- cout<<"main 15"<<endl;
 
     nFiles++;
     delete _tree;
@@ -1916,6 +1880,19 @@ void initializeCPvar(Synch17Tree *otree){
   otree->acotautau_10=-9999;
   otree->acotautau_11=-9999;
 
+  //Merijn added the angle psi, currently for debugging purpose. Later may extend to 3-prong..
+  otree->acotautauPsi_00=-9999;
+  otree->acotautauPsi_01=-9999;
+  otree->acotautauPsi_10=-9999;
+  otree->acotautauPsi_11=-9999;
+
+  /*
+  otree->acotautauPsi_20=-9999;
+  otree->acotautauPsi_02=-9999;
+  otree->acotautauPsi_21=-9999;
+  otree->acotautauPsi_12=-9999;
+  otree->acotautauPsi_22=-9999;
+  */
   otree->tau1DecayPlaneX=-9999;
   otree->tau1DecayPlaneY=-9999;
   otree->tau1DecayPlaneZ=-9999;
@@ -1939,6 +1916,17 @@ void initializeGenTree(Synch17GenTree *gentree){
   gentree->acotautau_10 = -9999;
   gentree->acotautau_01 = -9999;
   gentree->acotautau_11 = -9999;
+
+   //Merijn added the angle psi, currently for debugging purpose. Later may extend to 3-prong..
+  gentree->acotautauPsi_00=-9999;
+  gentree->acotautauPsi_01=-9999;
+  gentree->acotautauPsi_10=-9999;
+  gentree->acotautauPsi_11=-9999;
+  gentree->acotautauPsi_02=-9999;
+  gentree->acotautauPsi_20=-9999;
+  gentree->acotautauPsi_12=-9999;
+  gentree->acotautauPsi_21=-9999;
+  gentree->acotautauPsi_22=-9999;
 
   //init the new vertex variables to something nonsensible also
   gentree->GenVertexX=-9999;
@@ -2029,6 +2017,13 @@ void FillGenTree(const AC1B * analysisTree, Synch17GenTree *gentree, TString ch)
   gentree->acotautau_01 = -9999;
   gentree->acotautau_10 = -9999;
   gentree->acotautau_11 = -9999;
+
+  //Meirjn not sure why init it appears again here..
+  gentree->acotautauPsi_00 = -9999;
+  gentree->acotautauPsi_01 = -9999;
+  gentree->acotautauPsi_10 = -9999;
+  gentree->acotautauPsi_11 = -9999;
+  
   if (LeadingtauIndex>-1&&TrailingtauIndex>-1)
     gen_acott(analysisTree,gentree,LeadingtauIndex,TrailingtauIndex);
 

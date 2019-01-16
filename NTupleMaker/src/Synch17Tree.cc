@@ -276,6 +276,13 @@ void Synch17Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("acotautau_10", &acotautau_10, &b_acotautau_10);
    fChain->SetBranchAddress("acotautau_01", &acotautau_01, &b_acotautau_01);
    fChain->SetBranchAddress("acotautau_11", &acotautau_11, &b_acotautau_11);
+
+   fChain->SetBranchAddress("acotautauPsi_00", &acotautauPsi_00, &b_acotautauPsi_00);
+   fChain->SetBranchAddress("acotautauPsi_10", &acotautauPsi_10, &b_acotautauPsi_10);
+   fChain->SetBranchAddress("acotautauPsi_01", &acotautauPsi_01, &b_acotautauPsi_01);
+   fChain->SetBranchAddress("acotautauPsi_11", &acotautauPsi_11, &b_acotautauPsi_11);
+
+
    fChain->SetBranchAddress("pdgcodetau2", &pdgcodetau2, &b_pdgcodetau2);
 
   //RECO vertex info useful to have
@@ -582,6 +589,12 @@ void Synch17Tree::WriteInit(TTree *tree) {
    fChain->Branch("acotautau_10", &acotautau_10, "acotautau_10/F");
    fChain->Branch("acotautau_01", &acotautau_01, "acotautau_01/F");
    fChain->Branch("acotautau_11", &acotautau_11, "acotautau_11/F");
+
+   fChain->Branch("acotautauPsi_00", &acotautauPsi_00, "acotautauPsi_00/F");
+   fChain->Branch("acotautauPsi_10", &acotautauPsi_10, "acotautauPsi_10/F");
+   fChain->Branch("acotautauPsi_01", &acotautauPsi_01, "acotautauPsi_01/F");
+   fChain->Branch("acotautauPsi_11", &acotautauPsi_11, "acotautauPsi_11/F");
+
    fChain->Branch("pdgcodetau2", &pdgcodetau2, "pdgcodetau2/F");
 
    fChain->Branch("RecoVertexX", &RecoVertexX, "RecoVertexX/F");

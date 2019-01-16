@@ -94,29 +94,36 @@ int PlotMacro(){
 
   gStyle->SetOptStat(0);
   
-  int sample=1;
+  int sample=2;
   int GenReco=0; //1 is RECO
   int Prong=0;//specifies calculation of hadronic vertex acotauta_0*prong*. 0 is impact param, 1 is rho or a particle.
-  int DecayMode=0; //Note: genmode1=8. For first reco tau no need to specify anything per def.. 
-  
-  TString CutReco="&&iso_1<0.15&&extraelec_veto<0.5&&extramuon_veto<0.5&&mva17_2>0.5&&mt_1<60&&againstMuonTight3_2>0.5&&againstElectronVLooseMVA6_2>0.5&&(singleLepTrigger>0.5||xTrigger>0.5)&&(os>0.5)";
+  int DecayMode=8; //Note: genmode1=8. For first reco tau no need to specify anything per def.. 
+  int PhiorPsi=0;	  
+
+ TString CutReco="&&iso_1<0.15&&extraelec_veto<0.5&&extramuon_veto<0.5&&mva17_2>0.5&&mt_1<60&&againstMuonTight3_2>0.5&&againstElectronVLooseMVA6_2>0.5&&(singleLepTrigger>0.5||xTrigger>0.5)&&(os>0.5)";
+//  TString CutReco="";
 
   TString CutGen="genmode_1==8"; 
   
   TString samplename="";   
-//  if(sample==0)samplename="ggH_125"; ggH_125_0_mt_Sync
-  if(sample==0)samplename="ggH_125_0_mt_Sync"; //for checking use line below..
+ // if(sample==0)samplename="ggH_125"; //ggH_125_0_mt_Sync
+ // if(sample==0)samplename="ggH_125_0_mt_Sync"; //for checking use line below..
   //  if(sample==0)samplename="ggH_125_SingleFile_PubLoc_0_mt_Sync";	
+  if(sample==0)samplename="ggH_125_SingleFile_0_mt_Sync";	
   //  if(sample==1)samplename="SUSYGluGluHTauTau_120";
   if(sample==1)samplename="SUSYGluGluHTauTau_120_0_mt_Sync";
 
-  if(sample==2)samplename="DYJetsToLL";
+//  if(sample==2)samplename="DYJetsToLL"; //old DY sample..
+  if(sample==2)samplename="DYJetsToLL_2019_1_14";
+//  if(sample==2)samplename="DYJetsToLL_2019_1_14_SingleFile_0_mt_Sync";
 
   TString GenRecoString="";
   if(GenReco==0) GenRecoString="GEN";
   if(GenReco==1) GenRecoString="RECO";  
 
-  TString RECOObs="acotautau_0";
+  TString RECOObs;
+if(PhiorPsi==0) RECOObs="acotautau_0";
+if(PhiorPsi==1) RECOObs="acotautauPsi_0";
   RECOObs+=Prong;
   RECOObs+=">>CPhist";
 
@@ -133,7 +140,7 @@ int PlotMacro(){
   inputfile+=samplename;
   inputfile+=".root";
 
-  TString outputfile="/nfs/dust/cms/user/klundert/HiggsCPTauProject/DTSoft_2018_9_18/CMSSW_9_4_9/src/DesyTauAnalyses/NTupleMaker/test/Plots/2019_1_10/";  
+  TString outputfile="/nfs/dust/cms/user/klundert/HiggsCPTauProject/DTSoft_2018_9_18/CMSSW_9_4_9/src/DesyTauAnalyses/NTupleMaker/test/Plots/2019_1_15/";  
 
 cout<<"inputfile "<<inputfile<<endl;
 
@@ -144,10 +151,13 @@ cout<<"inputfile "<<inputfile<<endl;
   if(GenReco==1) tree= (TTree*)f->Get("TauCheck");
 
   
-  TCanvas* CPCanvas=new TCanvas("CPCanvas","CPCanvas",500,300);
+  TCanvas* CPCanvas=new TCanvas("CPCanvas","CPCanvas",700,500);
 
-  int NBins=10;
-  TH1D * CPhist = new TH1D("CPhist",samplename,NBins,0,2*TMath::Pi());
+  int NBins=20;
+  TH1D * CPhist;
+if(PhiorPsi==0) CPhist= new TH1D("CPhist",samplename,NBins,-2*TMath::Pi(),2*TMath::Pi());
+if(PhiorPsi==1) CPhist= new TH1D("CPhist",samplename,NBins,-1.2,1.2);
+
   CPhist->GetXaxis()->SetTitle("#Phi_{CP}");
   CPhist->GetYaxis()->SetTitle("N/Integral");
 
@@ -169,14 +179,23 @@ cout<<"RECOCUTString "<<RECOCUTString<<endl;
   TString LegendString=GenRecoString;
   LegendString+=" ";
   LegendString+=AmpBaseRatio;
+
+TString LegendString2="Integral ";
+double integralhist=CPhist->Integral();
+LegendString2+=integral;
+
   
   cout<<"LegendString 1 "<<LegendString<<endl;
   Int_t dot = LegendString.First('.'); Int_t len = LegendString.Length(); LegendString.Remove(dot+3,len-dot);
-  cout<<"LegendString 2 "<<LegendString<<endl;
+  cout<<"LegendString after cut: "<<LegendString<<endl;
+
+
 
   TLegend *Legend=new TLegend(0.7,0.7,0.9,0.9);
   Legend->SetHeader("Ampl/baseline");
   Legend->AddEntry(CPhist,LegendString,"l");
+  Legend->AddEntry(CPhist,LegendString2,"l");
+
   Legend->Draw();
   CPCanvas->Update();
 

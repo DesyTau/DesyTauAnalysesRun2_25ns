@@ -50,6 +50,17 @@ public :
   Float_t         acotautau_21;
   Float_t         acotautau_22;
 
+  Float_t         acotautauPsi_00;
+  Float_t         acotautauPsi_10;
+  Float_t         acotautauPsi_01;
+  Float_t         acotautauPsi_11;
+  Float_t         acotautauPsi_02;
+  Float_t         acotautauPsi_20;
+  Float_t         acotautauPsi_12;
+  Float_t         acotautauPsi_21;
+  Float_t         acotautauPsi_22;
+
+
 //gen vertex info is practical to have
   Float_t GenVertexX;
   Float_t GenVertexY;
@@ -80,6 +91,16 @@ public :
   TBranch        *b_acotautau_12;
   TBranch        *b_acotautau_21;
   TBranch        *b_acotautau_22;
+
+  TBranch        *b_acotautauPsi_00;
+  TBranch        *b_acotautauPsi_10;
+  TBranch        *b_acotautauPsi_01;
+  TBranch        *b_acotautauPsi_11;
+  TBranch        *b_acotautauPsi_02;
+  TBranch        *b_acotautauPsi_20;
+  TBranch        *b_acotautauPsi_12;
+  TBranch        *b_acotautauPsi_21;
+  TBranch        *b_acotautauPsi_22;
 
 //gen vertex info is practical to have
   TBranch        *b_GenVertexX;

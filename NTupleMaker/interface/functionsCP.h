@@ -34,83 +34,17 @@ TLorentzVector gen_ipVec(const AC1B * analysisTree, int tauIndex, int piIndex, T
 int gen_chargedPiIndex(const AC1B * analysisTree, int tauIndex, int partId);
 
 TLorentzVector ipVec_Lepton(const AC1B * analysisTree, int tauIndex, TString ch);
-  
+
 double acoCP(TLorentzVector Pi1, TLorentzVector Pi2, 
 	     TLorentzVector ref1, TLorentzVector ref2,
-	     bool firstNegative, bool pi01, bool pi02) {
+	     bool firstNegative, bool pi01, bool pi02, Synch17Tree *otree);
 
-  double y1 = 1;
-  double y2 = 1;
-  if (pi01)
-    y1 = Pi1.E() - ref1.E();
-  if (pi02)
-    y2 = Pi2.E() - ref2.E();
-
-
-  double y = y1*y2; 
-
-  TLorentzVector Prongsum = Pi1 + Pi2;
-  TVector3 boost = -Prongsum.BoostVector();
-  Pi1.Boost(boost);
-  Pi2.Boost(boost);
-  ref1.Boost(boost);
-  ref2.Boost(boost);
-
-  //  std::cout << "First negative = " << firstNegative << "  pi01 = " << pi01 << "   pi02 = " << pi02 << std::endl;
-  //  std::cout << "Px(1) = " << Pi1.Px() << "  Py(1) = " << Pi1.Py() << "  Pz(1) = " << Pi1.Pz() << std::endl;
-  //  std::cout << "Px(2) = " << Pi2.Px() << "  Py(2) = " << Pi2.Py() << "  Pz(2) = " << Pi2.Pz() << std::endl;
-  //  std::cout << "Ux(1) = " << ref1.Px() << "  Uy(1) = " << ref1.Py() << "  Uz(1) = " << ref1.Pz() << std::endl;
-  //  std::cout << "Ux(2) = " << ref2.Px() << "  Uy(2) = " << ref2.Py() << "  Uz(2) = " << ref2.Pz() << std::endl;
-  //  std::cout << std::endl;
-  // get 3-vectors
-  TVector3 vecPi1 = Pi1.Vect();
-  TVector3 vecPi2 = Pi2.Vect();
-  TVector3 vecRef1 = ref1.Vect();
-  TVector3 vecRef2 = ref2.Vect();
-
-  // normalize them 
-  vecPi1 *= 1/vecPi1.Mag();
-  vecPi2 *= 1/vecPi2.Mag();
-  vecRef1 *= 1/vecRef1.Mag();
-  vecRef2 *= 1/vecRef2.Mag();
-
-  // transverse components  
-  TVector3 vecRef1transv = vecRef1 - vecPi1*(vecPi1*vecRef1);
-  TVector3 vecRef2transv = vecRef2 - vecPi2*(vecPi2*vecRef2);
-
-  vecRef1transv *= 1/vecRef1transv.Mag();
-  vecRef2transv *= 1/vecRef2transv.Mag();
-
-  double acop = TMath::ACos(vecRef1transv*vecRef2transv);
-  
-  double sign = vecPi2 * vecRef1transv.Cross(vecRef2transv);
-  if (firstNegative)
-    sign = vecPi1 * vecRef2transv.Cross(vecRef1transv);
-  if (sign<0) acop = 2.0*TMath::Pi() - acop;
-
-  if (y<0) {
-    acop = acop + TMath::Pi();
-    if (acop>2*TMath::Pi()) {
-      acop = acop - 2*TMath::Pi();
-    }
-  }  
-
-//cout<<"acop before return from function "<<acop<<endl;
-  return acop;
-
-}
-
-//Merijn added these functions for debugging purposes
-double acoCP2(TLorentzVector Pi1, TLorentzVector Pi2, 
+double acoCP(TLorentzVector Pi1, TLorentzVector Pi2, 
 	     TLorentzVector ref1, TLorentzVector ref2,
-	     bool firstNegative, bool pi01, bool pi02);
+	     bool firstNegative, bool pi01, bool pi02, Synch17GenTree *otree);
 
 
-
-double acoCPCOUT(TLorentzVector Pi1, TLorentzVector Pi2, 
-	     TLorentzVector ref1, TLorentzVector ref2,
-		 bool firstNegative, bool pi01, bool pi02);
-
+/*
 void acott(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, int tauIndex2){
   //cout<<"tauIndex1 "<<tauIndex1<<"  tauIndex2 "<<tauIndex2<<endl;
 
@@ -164,6 +98,7 @@ cout<<"otree->acotautau_00 "<<otree->acotautau_00<<endl;
     otree->acotautau_11=acoCP(tau1Prong,tau2Prong,tau1Pi0,tau2Pi0,firstNegative,true,true);
   }
 };
+*/
 
 //Merijn: updated function to do CP calculations
 //called with: acott_Impr(&analysisTree,otree,tauIndex,leptonIndex, ch);
@@ -172,7 +107,8 @@ cout<<"otree->acotautau_00 "<<otree->acotautau_00<<endl;
 //currently we'll ignore e-mu
 
 void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, int tauIndex2, TString channel){
-  cout<<"Start acott_Impr"<<endl;
+  // cout<<"Start acott_Impr"<<endl;
+  
   //Merijn 2019 1 10: there may be situations where we pass correctdecay, but ultimately the acotau does NOT get calculated. For these situations, currently acotau seems not initialised.
   otree->acotautau_00 = -9999;
   otree->acotautau_10 = -9999;
@@ -257,7 +193,9 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
   //Merijn: here calculate neutral pion vectors. Only look for pions in first tau if channel is tt.
   if(channel=="tt"){ if(analysisTree->tau_decayMode[tauIndex1]>=1&&analysisTree->tau_decayMode[tauIndex1]<=3) tau1Pi0 = neutralPivec(analysisTree,tauIndex1);}
 
-  if (analysisTree->tau_decayMode[tauIndex2]>=1&&analysisTree->tau_decayMode[tauIndex2]<=3) tau2Pi0 = neutralPivec(analysisTree,tauIndex2);
+  if (analysisTree->tau_decayMode[tauIndex2]>=1&&analysisTree->tau_decayMode[tauIndex2]<=3){ tau2Pi0 = neutralPivec(analysisTree,tauIndex2);
+    if(tau2Pi0.E()==0) cout<<"VERY STRANGE ISSUE: DECAY INDEX >0 BUT pion energy=0"<<endl;
+  }
   
   //here can proceed with CP calculation. Merijn: for tau index 1 it makes no sense to ask for a mode!
   /*
@@ -269,39 +207,41 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
 
   //if (analysisTree->tau_decayMode[tauIndex2]==0){
 
-  otree->acotautau_00=acoCPCOUT(tau1Prong,tau2Prong,tau1IP,tau2IP,firstNegative,false,false);
+  otree->acotautau_00=acoCP(tau1Prong,tau2Prong,tau1IP,tau2IP,firstNegative,false,false,otree);
    //I think it should work since everything assigned for 3 cases. Note: aco_00 will be filled with mu x 1-prong and mu x 1.1-prong
 
   
   if(channel=="et"||channel=="mt"){//we only fill aco_01 for et and mt
     if (analysisTree->tau_decayMode[tauIndex2]==1){
       //  cout<<"from filling 01: analysisTree->tau_decayMode[tauIndex2] "<<analysisTree->tau_decayMode[tauIndex2]<<endl;
-      otree->acotautau_01=acoCP(tau1Prong,tau2Prong,tau1IP,tau2Pi0,firstNegative,false,true);
+      otree->acotautau_01=acoCP(tau1Prong,tau2Prong,tau1IP,tau2Pi0,firstNegative,false,true,otree);
     }    
   }
 
   if(channel=="tt"){//merijn 2019 1 10: only for tt we can use the index to assess a tau, otherwise its a lepton!
     cout<<"accident"<<endl;
     if (analysisTree->tau_decayMode[tauIndex1]==1&&analysisTree->tau_decayMode[tauIndex2]==0)
-      otree->acotautau_10=acoCP(tau1Prong,tau2Prong,tau1Pi0,tau2IP,firstNegative,true,false);
+      otree->acotautau_10=acoCP(tau1Prong,tau2Prong,tau1Pi0,tau2IP,firstNegative,true,false,otree);
     
     if (analysisTree->tau_decayMode[tauIndex1]==0&&analysisTree->tau_decayMode[tauIndex2]==1){
-      otree->acotautau_01=acoCP(tau1Prong,tau2Prong,tau1IP,tau2Pi0,firstNegative,false,true);
+      otree->acotautau_01=acoCP(tau1Prong,tau2Prong,tau1IP,tau2Pi0,firstNegative,false,true,otree);
     }
     
     if (analysisTree->tau_decayMode[tauIndex1]==1&&analysisTree->tau_decayMode[tauIndex2]==1){
-      otree->acotautau_10=acoCP(tau1Prong,tau2Prong,tau1Pi0,tau2IP,firstNegative,true,false);
-      otree->acotautau_01=acoCP(tau1Prong,tau2Prong,tau1IP,tau2Pi0,firstNegative,false,true);
-      otree->acotautau_11=acoCP(tau1Prong,tau2Prong,tau1Pi0,tau2Pi0,firstNegative,true,true);
+      otree->acotautau_10=acoCP(tau1Prong,tau2Prong,tau1Pi0,tau2IP,firstNegative,true,false,otree);
+      otree->acotautau_01=acoCP(tau1Prong,tau2Prong,tau1IP,tau2Pi0,firstNegative,false,true,otree);
+      otree->acotautau_11=acoCP(tau1Prong,tau2Prong,tau1Pi0,tau2Pi0,firstNegative,true,true,otree);
     }
   }
 
+  /*
   if(otree->acotautau_01!=-9999&&otree->tau_decay_mode_2!=1){
     cout<<endl;
     cout<<"Genuinely Bizar :analysisTree->tau_decayMode[tauIndex2] "<< analysisTree->tau_decayMode[tauIndex2]<<endl;
     cout<<endl;}
+  */
 
-  cout<<"End acott_Impr"<<endl;
+  //  cout<<"End acott_Impr"<<endl;
 
 };
 
@@ -424,12 +364,19 @@ TLorentzVector ipVec(const AC1B * analysisTree, int tauIndex) {
 
     TVector3 r(0.,0.,0.);
     r=secvertex-vertex;
+    cout<<"reco vx pion "<< analysisTree->tau_constituents_vx[tauIndex][piIndex] <<endl;
+
+    //Merijn 2019 1 13: comment the projection out; appears to me we need to project AFTER the boost.
+   
     double projection=r*momenta/momenta.Mag2();
     TVector3 IP;    
     IP=r-momenta*projection;
     vec.SetVect(IP);
+    
+    //vec.SetVect(r);
     vec.SetT(0.);
   }
+  else{cout<<"GENUINELY BIZAR: THERE WAS NO CHARGED PION FOUND.. "<<endl;}
 
   return vec;
 
@@ -468,14 +415,23 @@ secvertex.SetXYZ(analysisTree->muon_vx[tauIndex],
 
 momenta.SetXYZ(analysisTree->muon_px[tauIndex],
 		       analysisTree->muon_py[tauIndex],
-		       analysisTree->muon_pz[tauIndex]);}
+		       analysisTree->muon_pz[tauIndex]);
+
+ cout<<"reco vx muon "<< analysisTree->muon_px[tauIndex] <<endl;
+ }
+
+
 
     TVector3 r(0.,0.,0.);
     r=secvertex-vertex;
+
+    //Merijn 2019 1 13: comment the projection out; appears to me we need to project AFTER the boost.
+    
     double projection=r*momenta/momenta.Mag2();
     TVector3 IP;    
     IP=r-momenta*projection;
-    vec.SetVect(IP);
+    vec.SetVect(IP);   
+    //    vec.SetVect(r);
     vec.SetT(0.);
 
   return vec;
@@ -559,32 +515,32 @@ void gen_acott(const AC1B * analysisTree, Synch17GenTree *gentree, int tauIndex1
   if (analysisTree->genparticles_pdgid[piIndex1]==11) firstNegative = true;
   if (analysisTree->genparticles_pdgid[piIndex1]==13) firstNegative = true;
   
-  gentree->acotautau_00=acoCPCOUT(tau1Prong,tau2Prong,tau1IP,tau2IP,firstNegative,false,false);
+  gentree->acotautau_00=acoCP(tau1Prong,tau2Prong,tau1IP,tau2IP,firstNegative,false,false,gentree);
 
   if (oneProngPi01)
-    gentree->acotautau_10=acoCP(tau1Prong,tau2Prong,tau1Pi0,tau2IP,firstNegative,true,false);
+    gentree->acotautau_10=acoCP(tau1Prong,tau2Prong,tau1Pi0,tau2IP,firstNegative,true,false,gentree);
   
   if (oneProngPi02){
-    gentree->acotautau_01=acoCP(tau1Prong,tau2Prong,tau1IP,tau2Pi0,firstNegative,false,true);}
+    gentree->acotautau_01=acoCP(tau1Prong,tau2Prong,tau1IP,tau2Pi0,firstNegative,false,true,gentree);}
 
   if (oneProngPi01&&oneProngPi02)
-    gentree->acotautau_11=acoCP(tau1Prong,tau2Prong,tau1Pi0,tau2Pi0,firstNegative,true,true);
+    gentree->acotautau_11=acoCP(tau1Prong,tau2Prong,tau1Pi0,tau2Pi0,firstNegative,true,true,gentree);
   
 
   if(threeProngPi01)
-    gentree->acotautau_20=acoCP(tau1Prong,tau2Prong,tau1IP,tau2IP,firstNegative,false,false);
+    gentree->acotautau_20=acoCP(tau1Prong,tau2Prong,tau1IP,tau2IP,firstNegative,false,false,gentree);
 
   if(threeProngPi02)
-    gentree->acotautau_02=acoCP(tau1Prong,tau2Prong,tau1IP,tau2IP,firstNegative,false,false);
+    gentree->acotautau_02=acoCP(tau1Prong,tau2Prong,tau1IP,tau2IP,firstNegative,false,false,gentree);
 
   if (oneProngPi01&&threeProngPi02)
-    gentree->acotautau_12=acoCP(tau1Prong,tau2Prong,tau1Pi0,tau2IP,firstNegative,true,false);
+    gentree->acotautau_12=acoCP(tau1Prong,tau2Prong,tau1Pi0,tau2IP,firstNegative,true,false,gentree);
 
   if (threeProngPi01&&oneProngPi02)
-    gentree->acotautau_21=acoCP(tau1Prong,tau2Prong,tau1IP,tau2Pi0,firstNegative,false,true);
+    gentree->acotautau_21=acoCP(tau1Prong,tau2Prong,tau1IP,tau2Pi0,firstNegative,false,true,gentree);
 
   if(threeProngPi01&&threeProngPi02)
-    gentree->acotautau_22=acoCP(tau1Prong,tau2Prong,tau1IP,tau2IP,firstNegative,false,false);
+    gentree->acotautau_22=acoCP(tau1Prong,tau2Prong,tau1IP,tau2IP,firstNegative,false,false,gentree);
 
 
 };
@@ -725,10 +681,14 @@ TLorentzVector gen_ipVec(const AC1B * analysisTree, int tauIndex, int piIndex, T
 
     TVector3 r(0.,0.,0.);
     r=secvertex-vertex;
+
+    //Merijn 2019 1 13: comment the projection out; appears to me we need to project AFTER the boost.
     double projection=r*momenta/momenta.Mag2();
     TVector3 IP;    
     IP=r-momenta*projection;
     vec.SetVect(IP);
+    
+    //  vec.SetVect(r);
     vec.SetT(0.);
   }
 
@@ -812,11 +772,10 @@ TLorentzVector gen_ThreeProngVec(const AC1B * analysisTree, vector<int> ThreePro
 };
 
 
-
-
-double acoCP2(TLorentzVector Pi1, TLorentzVector Pi2, 
+//Merijn: adjust to take otree as well, conventient for debguggin..
+double acoCP(TLorentzVector Pi1, TLorentzVector Pi2, 
 	     TLorentzVector ref1, TLorentzVector ref2,
-	     bool firstNegative, bool pi01, bool pi02) {
+	     bool firstNegative, bool pi01, bool pi02, Synch17Tree *otree) {
 
   double y1 = 1;
   double y2 = 1;
@@ -825,22 +784,9 @@ double acoCP2(TLorentzVector Pi1, TLorentzVector Pi2,
   if (pi02)
     y2 = Pi2.E() - ref2.E();
 
+
   double y = y1*y2; 
-
-  /*
-cout<<"Pi1[0] "<<Pi1[0] <<endl;
-cout<<"Pi1[1] "<<Pi1[1] <<endl;
-cout<<"Pi1[2] "<<Pi1[2] <<endl;
-cout<<"Pi1[3] "<<Pi1[3] <<endl;
-
-cout<<"Pi2[0] "<<Pi2[0] <<endl;
-cout<<"Pi2[1] "<<Pi2[1] <<endl;
-cout<<"Pi2[2] "<<Pi2[2] <<endl;
-cout<<"Pi2[3] "<<Pi2[3] <<endl;
-
-if(Pi1[1]==Pi2[1]&&Pi1[1]!=0)cout<<"BIG  strange issue, we're using one vector for acoplanarity calculation "<<endl;
-  */
-
+  //double y = -1; 
 
   TLorentzVector Prongsum = Pi1 + Pi2;
   TVector3 boost = -Prongsum.BoostVector();
@@ -855,41 +801,35 @@ if(Pi1[1]==Pi2[1]&&Pi1[1]!=0)cout<<"BIG  strange issue, we're using one vector f
   //  std::cout << "Ux(1) = " << ref1.Px() << "  Uy(1) = " << ref1.Py() << "  Uz(1) = " << ref1.Pz() << std::endl;
   //  std::cout << "Ux(2) = " << ref2.Px() << "  Uy(2) = " << ref2.Py() << "  Uz(2) = " << ref2.Pz() << std::endl;
   //  std::cout << std::endl;
+  
   // get 3-vectors
   TVector3 vecPi1 = Pi1.Vect();
   TVector3 vecPi2 = Pi2.Vect();
   TVector3 vecRef1 = ref1.Vect();
   TVector3 vecRef2 = ref2.Vect();
 
-  // normalize them 
+  // normalize them
+  
   vecPi1 *= 1/vecPi1.Mag();
   vecPi2 *= 1/vecPi2.Mag();
   vecRef1 *= 1/vecRef1.Mag();
   vecRef2 *= 1/vecRef2.Mag();
-
+    
   // transverse components  
   TVector3 vecRef1transv = vecRef1 - vecPi1*(vecPi1*vecRef1);
   TVector3 vecRef2transv = vecRef2 - vecPi2*(vecPi2*vecRef2);
-  
-  /*
-    cout<<"vecRef1transv.Mag() "<<vecRef1transv.Mag() <<endl;
-    cout<<"vecRef2transv.Mag() "<<vecRef2transv.Mag() <<endl;
-    cout<<"vecRef1transv[0] "<<vecRef1transv[0] <<endl;
-    cout<<"vecRef1transv[1] "<<vecRef1transv[1] <<endl;
-    cout<<"vecRef1transv[2] "<<vecRef1transv[2] <<endl;
-    cout<<"vecRef2transv[0] "<<vecRef2transv[0] <<endl;
-    cout<<"vecRef2transv[1] "<<vecRef2transv[1] <<endl;
-    cout<<"vecRef2transv[2] "<<vecRef2transv[2] <<endl;
-  */
 
   vecRef1transv *= 1/vecRef1transv.Mag();
   vecRef2transv *= 1/vecRef2transv.Mag();
 
   double acop = TMath::ACos(vecRef1transv*vecRef2transv);
-  
+  double acoporiginal=acop;
   double sign = vecPi2 * vecRef1transv.Cross(vecRef2transv);
+  double psioriginal =sign;//
+
   if (firstNegative)
     sign = vecPi1 * vecRef2transv.Cross(vecRef1transv);
+  
   if (sign<0) acop = 2.0*TMath::Pi() - acop;
 
   if (y<0) {
@@ -897,18 +837,37 @@ if(Pi1[1]==Pi2[1]&&Pi1[1]!=0)cout<<"BIG  strange issue, we're using one vector f
     if (acop>2*TMath::Pi()) {
       acop = acop - 2*TMath::Pi();
     }
-  }  
+  }
 
-  //cout<<"acop before return from function "<<acop<<endl;
+  //Merijn added a flag for events where sign is bad. in generator level generally ~5%. 
+  if(isinf(sign)) sign=-3;
+  if(sign!=sign) sign=-3;
+
+  //Merijn: I think this is correct..
+  if(!pi01&&!pi02)  otree->acotautauPsi_00=sign;
+  //  cout<<"sign 00 rec"<<sign<<endl;
+
+  if (pi01){ otree->acotautauPsi_10=sign;
+    //    cout<<"otree->acotautauPsi_10 "<<otree->acotautauPsi_10<<endl;
+  }
+  if (pi02){
+    otree->acotautauPsi_01=sign;
+    // cout<<"otree->acotautauPsi_01 "<<otree->acotautauPsi_01<<endl;
+  }
+  if (pi01&&pi02){ otree->acotautauPsi_11=sign;
+    //   cout<<"otree->acotautauPsi_11 "<<otree->acotautauPsi_11<<endl;
+  }
+
+//cout<<"acop before return from function "<<acop<<endl;
   return acop;
-
 }
 
 
-//this is addapted function by Merijn with lots of output for debugging purposes
-double acoCPCOUT(TLorentzVector Pi1, TLorentzVector Pi2, 
+//Merijn: quick and dirty overload with Synch17GenTree
+//Merijn: adjust to take otree as well, conventient for debguggin..
+double acoCP(TLorentzVector Pi1, TLorentzVector Pi2, 
 	     TLorentzVector ref1, TLorentzVector ref2,
-	     bool firstNegative, bool pi01, bool pi02) {
+	     bool firstNegative, bool pi01, bool pi02, Synch17GenTree *otree) {
 
   double y1 = 1;
   double y2 = 1;
@@ -917,13 +876,8 @@ double acoCPCOUT(TLorentzVector Pi1, TLorentzVector Pi2,
   if (pi02)
     y2 = Pi2.E() - ref2.E();
 
-  /*
-  //y2=-1; //Merijn this is currently the only difference w.r.t. the original..
- cout<<"pi01 "<<pi01<<" pi02 "<<pi02<<endl;
- cout<<"ref1.E() "<<ref1.E()<<" ref2.E() " <<ref2.E()<<endl;
-  */
-  
-  double y = y1*y2;
+
+  double y = y1*y2; 
 
   TLorentzVector Prongsum = Pi1 + Pi2;
   TVector3 boost = -Prongsum.BoostVector();
@@ -932,24 +886,25 @@ double acoCPCOUT(TLorentzVector Pi1, TLorentzVector Pi2,
   ref1.Boost(boost);
   ref2.Boost(boost);
 
-  // std::cout << "First negative = " << firstNegative << "  pi01 = " << pi01 << "   pi02 = " << pi02 << std::endl;
+  //  std::cout << "First negative = " << firstNegative << "  pi01 = " << pi01 << "   pi02 = " << pi02 << std::endl;
   //  std::cout << "Px(1) = " << Pi1.Px() << "  Py(1) = " << Pi1.Py() << "  Pz(1) = " << Pi1.Pz() << std::endl;
   //  std::cout << "Px(2) = " << Pi2.Px() << "  Py(2) = " << Pi2.Py() << "  Pz(2) = " << Pi2.Pz() << std::endl;
   //  std::cout << "Ux(1) = " << ref1.Px() << "  Uy(1) = " << ref1.Py() << "  Uz(1) = " << ref1.Pz() << std::endl;
   //  std::cout << "Ux(2) = " << ref2.Px() << "  Uy(2) = " << ref2.Py() << "  Uz(2) = " << ref2.Pz() << std::endl;
   //  std::cout << std::endl;
+  
   // get 3-vectors
   TVector3 vecPi1 = Pi1.Vect();
   TVector3 vecPi2 = Pi2.Vect();
   TVector3 vecRef1 = ref1.Vect();
   TVector3 vecRef2 = ref2.Vect();
 
-  // normalize them 
+  // normalize them
   vecPi1 *= 1/vecPi1.Mag();
   vecPi2 *= 1/vecPi2.Mag();
   vecRef1 *= 1/vecRef1.Mag();
   vecRef2 *= 1/vecRef2.Mag();
-
+  
   // transverse components  
   TVector3 vecRef1transv = vecRef1 - vecPi1*(vecPi1*vecRef1);
   TVector3 vecRef2transv = vecRef2 - vecPi2*(vecPi2*vecRef2);
@@ -958,10 +913,13 @@ double acoCPCOUT(TLorentzVector Pi1, TLorentzVector Pi2,
   vecRef2transv *= 1/vecRef2transv.Mag();
 
   double acop = TMath::ACos(vecRef1transv*vecRef2transv);
-  
+  double acoporiginal=acop;
   double sign = vecPi2 * vecRef1transv.Cross(vecRef2transv);
+  double psioriginal =sign;//
+
   if (firstNegative)
     sign = vecPi1 * vecRef2transv.Cross(vecRef1transv);
+  
   if (sign<0) acop = 2.0*TMath::Pi() - acop;
 
   if (y<0) {
@@ -969,13 +927,26 @@ double acoCPCOUT(TLorentzVector Pi1, TLorentzVector Pi2,
     if (acop>2*TMath::Pi()) {
       acop = acop - 2*TMath::Pi();
     }
-  }  
+  }
 
-  //  cout<<"acop before return from function "<<acop<<endl;
+  if(isinf(sign)) sign=-3;
+  if(sign!=sign) sign=-3;
+      
+  //Merijn: I think this is correct..
+  //Merijn: I think this is correct..
+  if(!pi01&&!pi02)  otree->acotautauPsi_00=sign;
+  //  cout<<"sign 00 gen"<<sign<<endl;
+  if (pi01){ otree->acotautauPsi_10=sign;
+    // cout<<"gen: otree->acotautauPsi_10 "<<otree->acotautauPsi_10<<endl;
+  }
+  if (pi02){
+    otree->acotautauPsi_01=sign;
+    // cout<<"gen: otree->acotautauPsi_01 "<<otree->acotautauPsi_01<<endl;
+  }
+  if (pi01&&pi02){ otree->acotautauPsi_11=sign;
+    // cout<<"gen: otree->acotautauPsi_11 "<<otree->acotautauPsi_11<<endl;
+  }
+
+//cout<<"acop before return from function "<<acop<<endl;
   return acop;
-
 }
-
-
-
-

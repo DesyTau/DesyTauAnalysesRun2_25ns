@@ -251,6 +251,13 @@ public :
   Float_t         acotautau_10;
   Float_t         acotautau_01;
   Float_t         acotautau_11;
+
+  //Merijn add acotau for psi:
+  Float_t         acotautauPsi_00;
+  Float_t         acotautauPsi_10;
+  Float_t         acotautauPsi_01;
+  Float_t         acotautauPsi_11;
+
   Int_t		  pdgcodetau2;
 
   //reco vertices
@@ -495,6 +502,11 @@ public :
   TBranch        *b_acotautau_10;
   TBranch        *b_acotautau_01;
   TBranch        *b_acotautau_11;
+
+  TBranch        *b_acotautauPsi_00;
+  TBranch        *b_acotautauPsi_10;
+  TBranch        *b_acotautauPsi_01;
+  TBranch        *b_acotautauPsi_11;
   TBranch	 *b_pdgcodetau2;
 
   //reco vertices
