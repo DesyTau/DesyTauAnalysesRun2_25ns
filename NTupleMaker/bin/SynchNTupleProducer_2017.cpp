@@ -506,6 +506,8 @@ int main(int argc, char * argv[]){
   TH1D * nWeightedEventsH = new TH1D("nWeightedEvents", "", 1, -0.5,0.5);
   
   TTree * tree = new TTree("TauCheck","TauCheck");
+  TTree * testtree = new TTree("TauChecktest","TauChecktest");
+
   TTree * gtree = new TTree("GenTauCheck","GenTauCheck");
 
   //Merijn added a histogram to spot the pdg codes of the decaying hadronic tau
@@ -514,7 +516,10 @@ int main(int argc, char * argv[]){
 
   Synch17Tree *otree = new Synch17Tree(tree);
   initializeCPvar(otree);
+  //  Synch17GenTree *gentree = new Synch17GenTree(gtree);
   Synch17GenTree *gentree = new Synch17GenTree(gtree);
+  Synch17GenTree *gentreeForGoodRecoEvtsOnly = new Synch17GenTree(testtree);
+    
 
   int nTotalFiles = 0;
 
@@ -1103,6 +1108,12 @@ for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) {
 			 analysisTree.tau_py[leptonIndex],
 			 analysisTree.tau_pz[leptonIndex],
 			 tauMass);
+      }
+
+      //Merijn: save here all gen information for the good RECO events. Note that no selection on gen level is applied..
+      if (!isData){
+      	FillGenTree(&analysisTree,gentreeForGoodRecoEvtsOnly,ch);
+	gentreeForGoodRecoEvtsOnly->Fill();
       }
       
       if (!isData && ApplyLepSF) {
