@@ -65,6 +65,14 @@ public :
   Float_t GenVertexX;
   Float_t GenVertexY;
   Float_t GenVertexZ;
+
+    Float_t VxConstitTau1;
+    Float_t VyConstitTau1;
+    Float_t VzConstitTau1;
+
+    Float_t VxConstitTau2;
+    Float_t VyConstitTau2;
+    Float_t VzConstitTau2;
   
 
   //////////////////////////////////////////////
@@ -106,6 +114,14 @@ public :
   TBranch        *b_GenVertexX;
   TBranch        *b_GenVertexY;
   TBranch        *b_GenVertexZ;
+
+  //Merijn: branches for the tau decay product constituent vx etc.
+  TBranch        *b_VxConstitTau1;
+  TBranch        *b_VyConstitTau1;
+  TBranch        *b_VzConstitTau1;
+  TBranch        *b_VxConstitTau2;
+  TBranch        *b_VyConstitTau2;
+  TBranch        *b_VzConstitTau2;
 
   Synch17GenTree(TTree *tree=0);
   virtual ~Synch17GenTree();

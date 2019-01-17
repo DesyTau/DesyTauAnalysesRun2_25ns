@@ -115,6 +115,15 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
   otree->acotautau_01 = -9999;
   otree->acotautau_11 = -9999;
 
+  //currently needed since cp initialiser only called once..
+  otree->VxConstitTau1=-9999;
+  otree->VyConstitTau1=-9999;
+  otree->VzConstitTau1=-9999;
+  
+  otree->VxConstitTau2=-9999;
+  otree->VyConstitTau2=-9999;
+  otree->VzConstitTau2=-9999;
+
   bool decay1haspion=false;
   bool decay2haspion=false;
 
@@ -160,18 +169,42 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
   //Merijn: tauindex1 may point to electron or muon. So use the switch and index to obtain correct kinematics, assuming electron and muon masses
   if(channel=="mt"){    
     double muenergy=TMath::Sqrt(TMath::Power(analysisTree->muon_px[tauIndex1],2)+TMath::Power(analysisTree->muon_py[tauIndex1],2)+TMath::Power(analysisTree->muon_pz[tauIndex1],2)+TMath::Power(0.105658,2));//reconstruct energy from 3 momenta + mass
-    tau1Prong.SetPxPyPzE(analysisTree->muon_px[tauIndex1],analysisTree->muon_py[tauIndex1],analysisTree->muon_pz[tauIndex1],muenergy);}
+    tau1Prong.SetPxPyPzE(analysisTree->muon_px[tauIndex1],analysisTree->muon_py[tauIndex1],analysisTree->muon_pz[tauIndex1],muenergy);
+    //save the dx, dy, dz for tau1:
+    otree->VxConstitTau1=analysisTree->muon_vx[tauIndex1];
+    otree->VyConstitTau1=analysisTree->muon_vy[tauIndex1];
+    otree->VzConstitTau1=analysisTree->muon_vz[tauIndex1];
+  }
+
   
   if(channel=="et"){
     double elecenergy=TMath::Sqrt(TMath::Power(analysisTree->electron_px[tauIndex1],2)+TMath::Power(analysisTree->electron_py[tauIndex1],2)+TMath::Power(analysisTree->electron_pz[tauIndex1],2)+TMath::Power(0.000511,2));
-    tau1Prong.SetPxPyPzE(analysisTree->electron_px[tauIndex1],analysisTree->electron_py[tauIndex1],analysisTree->electron_pz[tauIndex1],elecenergy);}
+    tau1Prong.SetPxPyPzE(analysisTree->electron_px[tauIndex1],analysisTree->electron_py[tauIndex1],analysisTree->electron_pz[tauIndex1],elecenergy);
+    //save the dx, dy, dz for tau1:
+    otree->VxConstitTau1=analysisTree->electron_vx[tauIndex1];
+    otree->VyConstitTau1=analysisTree->electron_vy[tauIndex1];
+    otree->VzConstitTau1=analysisTree->electron_vz[tauIndex1];
+  }
 
-  if(channel=="tt") tau1Prong=chargedPivec(analysisTree,tauIndex1);//Merijn: changed to index1. Only works if call for tt!
-
+  if(channel=="tt"){
+    tau1Prong=chargedPivec(analysisTree,tauIndex1);//Merijn: changed to index1. Only works if call for tt!
+    int piIndex_=chargedPiIndex(analysisTree,tauIndex1);
+    if(piIndex_>-1){
+      otree->VxConstitTau1=analysisTree->tau_constituents_vx[tauIndex1][piIndex_];
+      otree->VyConstitTau1=analysisTree->tau_constituents_vy[tauIndex1][piIndex_];   
+      otree->VzConstitTau1=analysisTree->tau_constituents_vz[tauIndex1][piIndex_];      
+    }
+  }
   
 //merijn: we vetoed already if the second tau didn't contain a pion, so can safely calculate the momentum of 2nd prong from hadrons
   TLorentzVector tau2Prong;
   tau2Prong=chargedPivec(analysisTree,tauIndex2);
+  int piIndexfortau2=chargedPiIndex(analysisTree,tauIndex2);
+  if(piIndexfortau2>-1){
+    otree->VxConstitTau2=analysisTree->tau_constituents_vx[tauIndex2][piIndexfortau2];
+    otree->VyConstitTau2=analysisTree->tau_constituents_vy[tauIndex2][piIndexfortau2];   
+    otree->VzConstitTau2=analysisTree->tau_constituents_vz[tauIndex2][piIndexfortau2];      
+  }
   
   bool firstNegative = false;//Merijn 2019 1 10: instead I ask if the second is positive. WON'T WORK FOR E-MU CASE!
   if (analysisTree->tau_charge[tauIndex2]>0.0)
@@ -189,6 +222,18 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
   tau2IP = ipVec(analysisTree,tauIndex2);
   TLorentzVector tau2Pi0;
   tau2Pi0.SetXYZT(0.,0.,0.,0.);
+
+  
+  /*Merijn here want to set the angles..
+  otree->VxConstitTau1=-9999;
+  otree->VyConstitTau1=-9999;
+  otree->VzConstitTau1=-9999;
+  
+  otree->VxConstitTau2=-9999;
+  otree->VyConstitTau2=-9999;
+  otree->VzConstitTau2=-9999;
+   */
+  
 
   //Merijn: here calculate neutral pion vectors. Only look for pions in first tau if channel is tt.
   if(channel=="tt"){ if(analysisTree->tau_decayMode[tauIndex1]>=1&&analysisTree->tau_decayMode[tauIndex1]<=3) tau1Pi0 = neutralPivec(analysisTree,tauIndex1);}
@@ -364,7 +409,7 @@ TLorentzVector ipVec(const AC1B * analysisTree, int tauIndex) {
 
     TVector3 r(0.,0.,0.);
     r=secvertex-vertex;
-    cout<<"reco vx pion "<< analysisTree->tau_constituents_vx[tauIndex][piIndex] <<endl;
+   // cout<<"reco vx pion "<< analysisTree->tau_constituents_vx[tauIndex][piIndex] <<endl;
 
     //Merijn 2019 1 13: comment the projection out; appears to me we need to project AFTER the boost.
    
@@ -417,7 +462,7 @@ momenta.SetXYZ(analysisTree->muon_px[tauIndex],
 		       analysisTree->muon_py[tauIndex],
 		       analysisTree->muon_pz[tauIndex]);
 
- cout<<"reco vx muon "<< analysisTree->muon_px[tauIndex] <<endl;
+// cout<<"reco vx muon "<< analysisTree->muon_px[tauIndex] <<endl;
  }
 
 
@@ -455,6 +500,16 @@ void gen_acott(const AC1B * analysisTree, Synch17GenTree *gentree, int tauIndex1
   gentree->acotautau_10 = -9999;
   gentree->acotautau_01 = -9999;
   gentree->acotautau_11 = -9999;
+
+  //Merijn: initialise. It shouldn't be needed though?
+  gentree->VxConstitTau1=-9999;
+  gentree->VyConstitTau1=-9999;
+  gentree->VzConstitTau1=-9999;
+
+  gentree->VxConstitTau2=-9999;
+  gentree->VyConstitTau2=-9999;
+  gentree->VzConstitTau2=-9999;
+
   /* 
   gentree->acotautau_20 = -9999;
   gentree->acotautau_02 = -9999;
@@ -505,6 +560,16 @@ void gen_acott(const AC1B * analysisTree, Synch17GenTree *gentree, int tauIndex1
   tau2IP = gen_ipVec(analysisTree,tauIndex2,piIndex2,vertex);
   TLorentzVector tau2Pi0;
   tau2Pi0.SetXYZT(0.,0.,0.,0.);
+
+  //Merijn: add to extract the charged pion info..
+  //Merijn: add to extract the charged pion info..
+  gentree->VxConstitTau1=analysisTree->genparticles_vx[piIndex1];
+  gentree->VyConstitTau1=analysisTree->genparticles_vy[piIndex1];
+  gentree->VzConstitTau1=analysisTree->genparticles_vz[piIndex1];
+
+  gentree->VxConstitTau2=analysisTree->genparticles_vx[piIndex2];
+  gentree->VyConstitTau2=analysisTree->genparticles_vy[piIndex2];
+  gentree->VzConstitTau2=analysisTree->genparticles_vz[piIndex2];
  
   if (oneProngPi01) tau1Pi0 = gen_neutralPivec(analysisTree,tauIndex1);  
   if (oneProngPi02) tau2Pi0 = gen_neutralPivec(analysisTree,tauIndex2);

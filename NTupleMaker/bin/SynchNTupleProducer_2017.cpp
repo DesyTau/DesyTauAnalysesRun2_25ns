@@ -1899,6 +1899,15 @@ void initializeCPvar(Synch17Tree *otree){
   otree->tau2DecayPlaneX=-9999;
   otree->tau2DecayPlaneY=-9999;
   otree->tau2DecayPlaneZ=-9999;
+
+  otree->VxConstitTau1=-9999;
+  otree->VyConstitTau1=-9999;
+  otree->VzConstitTau1=-9999;
+  
+  otree->VxConstitTau2=-9999;
+  otree->VyConstitTau2=-9999;
+  otree->VzConstitTau2=-9999;
+  
 }
 
 void initializeGenTree(Synch17GenTree *gentree){
@@ -1932,6 +1941,14 @@ void initializeGenTree(Synch17GenTree *gentree){
   gentree->GenVertexX=-9999;
   gentree->GenVertexY=-9999;
   gentree->GenVertexZ=-99999;
+
+  gentree->VxConstitTau1=-9999;
+  gentree->VyConstitTau1=-9999;
+  gentree->VzConstitTau1=-9999;
+  
+  gentree->VxConstitTau2=-9999;
+  gentree->VyConstitTau2=-9999;
+  gentree->VzConstitTau2=-9999;
 
 }
 
