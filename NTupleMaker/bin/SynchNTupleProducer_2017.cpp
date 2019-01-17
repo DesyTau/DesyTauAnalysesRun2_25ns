@@ -330,8 +330,8 @@ int main(int argc, char * argv[]){
 
   cout<<"dxyLeptonCut "<<dxyLeptonCut<<endl;
   cout<<"dzLeptonCut "<<dzLeptonCut<<endl;
+  cout<<"dzTauCut "<<dzTauCut<<endl;
 
-  
   const bool  applyLeptonId    = cfg.get<bool>("Apply"+lep+"Id");
 
   //dilepton veto
@@ -506,8 +506,7 @@ int main(int argc, char * argv[]){
   TH1D * nWeightedEventsH = new TH1D("nWeightedEvents", "", 1, -0.5,0.5);
   
   TTree * tree = new TTree("TauCheck","TauCheck");
-  TTree * testtree = new TTree("TauChecktest","TauChecktest");
-
+  // TTree * testtree = new TTree("TauChecktest","TauChecktest");
   TTree * gtree = new TTree("GenTauCheck","GenTauCheck");
 
   //Merijn added a histogram to spot the pdg codes of the decaying hadronic tau
@@ -516,9 +515,11 @@ int main(int argc, char * argv[]){
 
   Synch17Tree *otree = new Synch17Tree(tree);
   initializeCPvar(otree);
-  //  Synch17GenTree *gentree = new Synch17GenTree(gtree);
+  
+  //Synch17GenTree *gentree = new Synch17GenTree(gtree);
+  
   Synch17GenTree *gentree = new Synch17GenTree(gtree);
-  Synch17GenTree *gentreeForGoodRecoEvtsOnly = new Synch17GenTree(testtree);
+  // Synch17GenTree *gentreeForGoodRecoEvtsOnly = new Synch17GenTree(tree);
     
 
   int nTotalFiles = 0;
@@ -704,8 +705,6 @@ for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) {
       otree->lumi = analysisTree.event_luminosityblock;
       otree->evt  = analysisTree.event_nr;
      
-     //we fill vertices here;	
-     SaveRECOVertices(&analysisTree,otree, isData);
 		  
       bool overlapEvent = true;
       for (unsigned int iEvent=0; iEvent<runList.size(); ++iEvent) {
@@ -1066,6 +1065,15 @@ for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) {
       double sf_trig_ditau_tau2   = 1;
       // reset efficiency weights
 
+     //all criterua passed, we fill vertices here;	
+     SaveRECOVertices(&analysisTree,otree, isData);
+     //Merijn: save here all gen information for the good RECO events. Note that no selection on gen level is applied..
+     /*
+     if (!isData){
+       FillGenTree(&analysisTree,gentreeForGoodRecoEvtsOnly,ch);
+       gentreeForGoodRecoEvtsOnly->Fill();
+       }*/
+      
       if(ch=="mt") {
       	FillMuTau(&analysisTree, otree, leptonIndex, dRiso);
       	
@@ -1110,11 +1118,6 @@ for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) {
 			 tauMass);
       }
 
-      //Merijn: save here all gen information for the good RECO events. Note that no selection on gen level is applied..
-      if (!isData){
-      	FillGenTree(&analysisTree,gentreeForGoodRecoEvtsOnly,ch);
-	gentreeForGoodRecoEvtsOnly->Fill();
-      }
       
       if (!isData && ApplyLepSF) {
 	//std::cout<< iEntry <<std::endl;
@@ -1493,8 +1496,8 @@ if((analysisTree.tau_constituents_pdgId[tauIndex][i]*sign)>0){
       counter[19]++;
 
 
-  //CP calculation. Updates Merijn: placed calculation at end, when all kinematic corrections are performed. Removed statement to only do calculation for tt. Created the acott_Impr function, which takes ch as input as well. See the funcrtion in functionsCP.h to see my updates to the function itself
-
+      //CP calculation. Updates Merijn: placed calculation at end, when all kinematic corrections are performed. Removed statement to only do calculation for tt. Created the acott_Impr function, which takes ch as input as well. See the funcrtion in functionsCP.h to see my updates to the function itself
+      
       //if(ch=="tt")
       //   acott_Impr(&analysisTree,otree,tauIndex,leptonIndex, ch);
       //Merijn 2019 1 10 debug: a major source of problems was that indices were innertwined from the beginning...
