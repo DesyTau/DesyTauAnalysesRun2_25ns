@@ -115,6 +115,11 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
   otree->acotautau_01 = -9999;
   otree->acotautau_11 = -9999;
 
+  otree->acotautauPsi_00=-9999;
+  otree->acotautauPsi_01=-9999;
+  otree->acotautauPsi_10=-9999;
+  otree->acotautauPsi_11=-9999;
+
   //currently needed since cp initialiser only called once..
   otree->VxConstitTau1=-9999;
   otree->VyConstitTau1=-9999;
@@ -501,6 +506,11 @@ void gen_acott(const AC1B * analysisTree, Synch17GenTree *gentree, int tauIndex1
   gentree->acotautau_01 = -9999;
   gentree->acotautau_11 = -9999;
 
+  gentree->acotautauPsi_00=-9999;
+  gentree->acotautauPsi_01=-9999;
+  gentree->acotautauPsi_10=-9999;
+  gentree->acotautauPsi_11=-9999;
+
   //Merijn: initialise. It shouldn't be needed though?
   gentree->VxConstitTau1=-9999;
   gentree->VyConstitTau1=-9999;
@@ -570,6 +580,11 @@ void gen_acott(const AC1B * analysisTree, Synch17GenTree *gentree, int tauIndex1
   gentree->VxConstitTau2=analysisTree->genparticles_vx[piIndex2];
   gentree->VyConstitTau2=analysisTree->genparticles_vy[piIndex2];
   gentree->VzConstitTau2=analysisTree->genparticles_vz[piIndex2];
+
+  //  cout<<"gentree->VxConstitTau2 "<<gentree->VxConstitTau2<<endl;
+  if(gentree->VyConstitTau1>20) cout<<"gentree->VyConstitTau1 >20 "<<gentree->VyConstitTau1<<endl;
+  
+  // cout<<"gentree->VzConstitTau2 "<<gentree->VzConstitTau2<<endl;  
  
   if (oneProngPi01) tau1Pi0 = gen_neutralPivec(analysisTree,tauIndex1);  
   if (oneProngPi02) tau2Pi0 = gen_neutralPivec(analysisTree,tauIndex2);
@@ -606,6 +621,9 @@ void gen_acott(const AC1B * analysisTree, Synch17GenTree *gentree, int tauIndex1
 
   if(threeProngPi01&&threeProngPi02)
     gentree->acotautau_22=acoCP(tau1Prong,tau2Prong,tau1IP,tau2IP,firstNegative,false,false,gentree);
+  
+  // if(gentree->acotautau_01!=gentree->acotautau_01) cout<<"gentree->acotautau_01 strange "<<gentree->acotautau_01<<endl;
+  // if(isinf(gentree->acotautau_01)) cout<<"gentree->acotautau_01 strange "<<gentree->acotautau_01<<endl;
 
 
 };

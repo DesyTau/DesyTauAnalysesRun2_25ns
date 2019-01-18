@@ -649,7 +649,8 @@ int main(int argc, char * argv[]){
 
 //for (Long64_t iEntry=0; iEntry<1000; iEntry++) {
 
-for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) {       
+for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) {
+  // cout<<"iEntry "<<iEntry<<endl;
       counter[0]++;
       analysisTree.GetEntry(iEntry);
       nEvents++;
@@ -2043,7 +2044,8 @@ void FillGenTree(const AC1B * analysisTree, Synch17GenTree *gentree, TString ch)
     }
   }
 
-  
+  //Merijn: this is all done also in gen_acott, so don't do here..
+  /*
   gentree->acotautau_00 = -9999;
   gentree->acotautau_01 = -9999;
   gentree->acotautau_10 = -9999;
@@ -2054,6 +2056,7 @@ void FillGenTree(const AC1B * analysisTree, Synch17GenTree *gentree, TString ch)
   gentree->acotautauPsi_01 = -9999;
   gentree->acotautauPsi_10 = -9999;
   gentree->acotautauPsi_11 = -9999;
+  */
   
   if (LeadingtauIndex>-1&&TrailingtauIndex>-1)
     gen_acott(analysisTree,gentree,LeadingtauIndex,TrailingtauIndex);
@@ -2090,8 +2093,8 @@ if(!isData){
 //here fill the generator vertices to have the gen information present in tree PER GOOD RECO EVENT
 //Note: we may want to add constraint that the W and Z are prompt. If we remove these, may get in trouble with a DY or W MC sample..
 
-	  if ((analysisTree->genparticles_pdgid[igen]==23||analysisTree->genparticles_pdgid[igen]==24||
-	analysisTree->genparticles_pdgid[igen]==25||analysisTree->genparticles_pdgid[igen]==35||analysisTree->genparticles_pdgid[igen]==36)&&analysisTree->genparticles_isLastCopy[igen]==1&&analysisTree->genparticles_isPrompt[igen]==1) {
+    if ((analysisTree->genparticles_pdgid[igen]==23||analysisTree->genparticles_pdgid[igen]==24||
+	 analysisTree->genparticles_pdgid[igen]==25||analysisTree->genparticles_pdgid[igen]==35||analysisTree->genparticles_pdgid[igen]==36)&&analysisTree->genparticles_isLastCopy[igen]==1&&analysisTree->genparticles_isPrompt[igen]==1) {
       otree->GenVertexX=analysisTree->genparticles_vx[igen];
       otree->GenVertexY=analysisTree->genparticles_vy[igen];
       otree->GenVertexZ=analysisTree->genparticles_vz[igen];
