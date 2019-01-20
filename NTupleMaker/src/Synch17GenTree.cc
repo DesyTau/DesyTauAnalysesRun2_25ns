@@ -193,7 +193,7 @@ void Synch17GenTree::WriteInit(TTree *tree) {
    fChain->Branch("GEN_eta_2", &geneta_2, "GEN_geneta_2/F");
    fChain->Branch("GEN_mode_2", &genmode_2, "GEN_genmode_2/I");
 
-   fChain->Branch("GEN_acotautau_00", &acotautau_00, "GEN_vacotautau_00/F");
+   fChain->Branch("GEN_acotautau_00", &acotautau_00, "GEN_acotautau_00/F");
    fChain->Branch("GEN_acotautau_10", &acotautau_10, "GEN_acotautau_10/F");
    fChain->Branch("GEN_acotautau_01", &acotautau_01, "GEN_acotautau_01/F");
    fChain->Branch("GEN_acotautau_11", &acotautau_11, "GEN_acotautau_11/F");

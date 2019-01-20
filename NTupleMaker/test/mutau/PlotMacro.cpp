@@ -114,8 +114,8 @@ int PlotMacro(){
   if(sample==1)samplename="SUSYGluGluHTauTau_120_0_mt_Sync";
 
 //  if(sample==2)samplename="DYJetsToLL"; //old DY sample..
-//  if(sample==2)samplename="DYJetsToLL_2019_1_14";
-  if(sample==2)samplename="DYJetsToLL_2019_1_14_SingleFile_0_mt_Sync";
+ // if(sample==2)samplename="DYJetsToLL_2019_1_14";
+ if(sample==2)samplename="DYJetsToLL_2019_1_14_SingleFile_0_mt_Sync";
 
   TString GenRecoString="";
   if(GenReco==0) GenRecoString="GEN";

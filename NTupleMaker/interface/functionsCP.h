@@ -26,6 +26,7 @@ TLorentzVector chargedPivec(const AC1B * analysisTree, int tauIndex);
 TLorentzVector neutralPivec(const AC1B * analysisTree, int tauIndex);
 TLorentzVector ipVec(const AC1B * analysisTree, int tauIndex);
 int chargedPiIndex(const AC1B * analysisTree, int tauIndex);
+int chargedMuIndex(const AC1B * analysisTree, int tauIndex);
 
 void gen_acott(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, int tauIndex2);
 TLorentzVector gen_chargedPivec(const AC1B * analysisTree, int tauIndex, int partId);
@@ -143,7 +144,8 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
   //make here a scan if the second decay is hadronic. Only for e-mu would not require this..
   if(channel=="mt"||channel=="et"){
   for(unsigned int pindex=0;pindex<analysisTree->tau_constituents_count[tauIndex2];pindex++){
-    if(abs(analysisTree->tau_constituents_pdgId[tauIndex2][pindex])==211){
+    //        if(abs(analysisTree->tau_constituents_pdgId[tauIndex2][pindex])==211){
+    if(abs(analysisTree->tau_constituents_pdgId[tauIndex2][pindex])==13){
       decay2haspion=true;
       break;}}}
   
@@ -202,6 +204,7 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
   }
   
 //merijn: we vetoed already if the second tau didn't contain a pion, so can safely calculate the momentum of 2nd prong from hadrons
+  /*
   TLorentzVector tau2Prong;
   tau2Prong=chargedPivec(analysisTree,tauIndex2);
   int piIndexfortau2=chargedPiIndex(analysisTree,tauIndex2);
@@ -210,6 +213,19 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
     otree->VyConstitTau2=analysisTree->tau_constituents_vy[tauIndex2][piIndexfortau2];   
     otree->VzConstitTau2=analysisTree->tau_constituents_vz[tauIndex2][piIndexfortau2];      
   }
+  */
+
+  //check if there's a muon..
+  TLorentzVector tau2Prong;
+  tau2Prong=chargedPivec(analysisTree,tauIndex2);
+  int piIndexfortau2=chargedMuIndex(analysisTree,tauIndex2);
+  if(piIndexfortau2>-1){
+    otree->VxConstitTau2=analysisTree->tau_constituents_vx[tauIndex2][piIndexfortau2];
+    otree->VyConstitTau2=analysisTree->tau_constituents_vy[tauIndex2][piIndexfortau2];   
+    otree->VzConstitTau2=analysisTree->tau_constituents_vz[tauIndex2][piIndexfortau2];      
+  }
+  
+  
   
   bool firstNegative = false;//Merijn 2019 1 10: instead I ask if the second is positive. WON'T WORK FOR E-MU CASE!
   if (analysisTree->tau_charge[tauIndex2]>0.0)
@@ -256,6 +272,9 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
   */
 
   //if (analysisTree->tau_decayMode[tauIndex2]==0){
+
+  //Merijn 2019 1 18: try here to temporarily only fill dimuon case..
+  //  if()  cout<<" "<< <<endl;
 
   otree->acotautau_00=acoCP(tau1Prong,tau2Prong,tau1IP,tau2IP,firstNegative,false,false,otree);
    //I think it should work since everything assigned for 3 cases. Note: aco_00 will be filled with mu x 1-prong and mu x 1.1-prong
@@ -325,6 +344,35 @@ int chargedPiIndex(const AC1B * analysisTree, int tauIndex){
     //    cout<<"analysisTree->tau_constituents_pdgId[tauIndex][i] "<<analysisTree->tau_constituents_pdgId[tauIndex][i]<<endl;
 
 if((analysisTree->tau_constituents_pdgId[tauIndex][i]*sign)==211){
+//    if((analysisTree->tau_constituents_pdgId[tauIndex][i]*sign)==211||(analysisTree->tau_constituents_pdgId[tauIndex][i]*sign)==-13||(analysisTree->tau_constituents_pdgId[tauIndex][i]*sign)==-11){
+      TLorentzVector lvector; lvector.SetXYZT(analysisTree->tau_constituents_px[tauIndex][i],
+					      analysisTree->tau_constituents_py[tauIndex][i],
+					      analysisTree->tau_constituents_pz[tauIndex][i],
+					      analysisTree->tau_constituents_e[tauIndex][i]);
+      double Pt = lvector.Pt();
+      if(Pt>maxPt){
+	piIndex=i;
+	maxPt = Pt;
+      }
+    }
+  }
+  
+  return piIndex;
+};
+
+int chargedMuIndex(const AC1B * analysisTree, int tauIndex){
+  //  cout<<"tauIndex "<<tauIndex<<endl;
+  // cout<<"from chargedPiIndex: analysisTree->tau_decayMode[tauIndex]; "<<analysisTree->tau_decayMode[tauIndex]<<endl;
+
+  int ncomponents = analysisTree->tau_constituents_count[tauIndex];
+  int piIndex=-1;
+  float maxPt=-1;
+  int sign = -1;
+  if(analysisTree->tau_charge[tauIndex]>0) sign = 1; 
+  for(int i=0;i<ncomponents;i++){ //selects the highest energy Pi with the same sign of the tau. 
+    //    cout<<"analysisTree->tau_constituents_pdgId[tauIndex][i] "<<analysisTree->tau_constituents_pdgId[tauIndex][i]<<endl;
+
+if((analysisTree->tau_constituents_pdgId[tauIndex][i]*sign)==13){
 //    if((analysisTree->tau_constituents_pdgId[tauIndex][i]*sign)==211||(analysisTree->tau_constituents_pdgId[tauIndex][i]*sign)==-13||(analysisTree->tau_constituents_pdgId[tauIndex][i]*sign)==-11){
       TLorentzVector lvector; lvector.SetXYZT(analysisTree->tau_constituents_px[tauIndex][i],
 					      analysisTree->tau_constituents_py[tauIndex][i],
