@@ -95,7 +95,7 @@ int PlotMacro(){
   gStyle->SetOptStat(0);
   
   int sample=2;
-  int GenReco=1; //1 is RECO
+  int GenReco=0; //1 is RECO
   int Prong=0;//specifies calculation of hadronic vertex acotauta_0*prong*. 0 is impact param, 1 is rho or a particle.
   int DecayMode=0; //Note: genmode1=8. For first reco tau no need to specify anything per def.. 
   int PhiorPsi=0;	  
@@ -103,7 +103,7 @@ int PlotMacro(){
  TString CutReco="&&iso_1<0.15&&extraelec_veto<0.5&&extramuon_veto<0.5&&mva17_2>0.5&&mt_1<60&&againstMuonTight3_2>0.5&&againstElectronVLooseMVA6_2>0.5&&(singleLepTrigger>0.5||xTrigger>0.5)&&(os>0.5)";
 //  TString CutReco="";
 
-  TString CutGen="genmode_1==8"; 
+  TString CutGen="GEN_mode_1==8"; 
   
   TString samplename="";   
  // if(sample==0)samplename="ggH_125"; //ggH_125_0_mt_Sync
@@ -114,16 +114,22 @@ int PlotMacro(){
   if(sample==1)samplename="SUSYGluGluHTauTau_120_0_mt_Sync";
 
 //  if(sample==2)samplename="DYJetsToLL"; //old DY sample..
- // if(sample==2)samplename="DYJetsToLL_2019_1_14";
- if(sample==2)samplename="DYJetsToLL_2019_1_14_SingleFile_0_mt_Sync";
+  if(sample==2)samplename="DYJetsToLL_2019_1_14";
+// if(sample==2)samplename="DYJetsToLL_2019_1_14_SingleFile_0_mt_Sync";
 
   TString GenRecoString="";
   if(GenReco==0) GenRecoString="GEN";
   if(GenReco==1) GenRecoString="RECO";  
 
   TString RECOObs;
-if(PhiorPsi==0) RECOObs="acotautau_0";
-if(PhiorPsi==1) RECOObs="acotautauPsi_0";
+  if(GenReco==0){
+   if(PhiorPsi==0) RECOObs="GEN_acotautau_0";
+   if(PhiorPsi==1) RECOObs="GEN_acotautauPsi_0";}
+
+  if(GenReco==1){
+   if(PhiorPsi==0) RECOObs="acotautau_0";
+   if(PhiorPsi==1) RECOObs="acotautauPsi_0";}
+
   RECOObs+=Prong;
   RECOObs+=">>CPhist";
 
@@ -132,7 +138,7 @@ if(PhiorPsi==1) RECOObs="acotautauPsi_0";
   RECOCUTString+=CutReco;
 
   TString CutGenString=CutGen;
-  CutGenString+="&&genmode_2==";
+  CutGenString+="&&GEN_mode_2==";
   CutGenString+=DecayMode;
   cout<<"CutGenString "<<CutGenString<<endl;
  
@@ -155,7 +161,7 @@ cout<<"inputfile "<<inputfile<<endl;
 
   int NBins=20;
   TH1D * CPhist;
-if(PhiorPsi==0) CPhist= new TH1D("CPhist",samplename,NBins,-2*TMath::Pi(),2*TMath::Pi());
+if(PhiorPsi==0) CPhist= new TH1D("CPhist",samplename,NBins,0,2*TMath::Pi());
 if(PhiorPsi==1) CPhist= new TH1D("CPhist",samplename,NBins,-1.2,1.2);
 
   CPhist->GetXaxis()->SetTitle("#Phi_{CP}");
@@ -165,8 +171,12 @@ if(PhiorPsi==1) CPhist= new TH1D("CPhist",samplename,NBins,-1.2,1.2);
   if(GenReco==1)  tree->Draw(RECOObs,RECOCUTString);
 //  if(GenReco==1)  tree->Draw(RECOObs);
 
-cout<<"RECOObs "<<RECOObs<<endl;
+cout<<"Obsservable "<<RECOObs<<endl;
 cout<<"RECOCUTString "<<RECOCUTString<<endl;
+
+cout<<"GEN CUTString "<<CutGenString<<endl;
+
+
 
   //  if(GenReco==0)  tree->Draw("acotautau_01>>CPhist","tau_decay_mode_2==1&&iso_1<0.15&&extraelec_veto<0.5&&extramuon_veto<0.5&&mva17_2>0.5&&mt_1<60&&againstMuonTight3_2>0.5&&againstElectronVLooseMVA6_2>0.5&&(singleLepTrigger>0.5||xTrigger>0.5)&&(os>0.5)");
 

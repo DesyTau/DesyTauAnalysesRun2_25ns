@@ -144,8 +144,8 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
   //make here a scan if the second decay is hadronic. Only for e-mu would not require this..
   if(channel=="mt"||channel=="et"){
   for(unsigned int pindex=0;pindex<analysisTree->tau_constituents_count[tauIndex2];pindex++){
-    //        if(abs(analysisTree->tau_constituents_pdgId[tauIndex2][pindex])==211){
-    if(abs(analysisTree->tau_constituents_pdgId[tauIndex2][pindex])==13){
+    if(abs(analysisTree->tau_constituents_pdgId[tauIndex2][pindex])==211){
+    //if(abs(analysisTree->tau_constituents_pdgId[tauIndex2][pindex])==13){
       decay2haspion=true;
       break;}}}
   
@@ -204,7 +204,7 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
   }
   
 //merijn: we vetoed already if the second tau didn't contain a pion, so can safely calculate the momentum of 2nd prong from hadrons
-  /*
+  
   TLorentzVector tau2Prong;
   tau2Prong=chargedPivec(analysisTree,tauIndex2);
   int piIndexfortau2=chargedPiIndex(analysisTree,tauIndex2);
@@ -213,8 +213,8 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
     otree->VyConstitTau2=analysisTree->tau_constituents_vy[tauIndex2][piIndexfortau2];   
     otree->VzConstitTau2=analysisTree->tau_constituents_vz[tauIndex2][piIndexfortau2];      
   }
-  */
-
+  
+  /*
   //check if there's a muon..
   TLorentzVector tau2Prong;
   tau2Prong=chargedPivec(analysisTree,tauIndex2);
@@ -224,7 +224,7 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
     otree->VyConstitTau2=analysisTree->tau_constituents_vy[tauIndex2][piIndexfortau2];   
     otree->VzConstitTau2=analysisTree->tau_constituents_vz[tauIndex2][piIndexfortau2];      
   }
-  
+  */
   
   
   bool firstNegative = false;//Merijn 2019 1 10: instead I ask if the second is positive. WON'T WORK FOR E-MU CASE!
