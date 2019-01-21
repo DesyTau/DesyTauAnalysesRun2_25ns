@@ -205,6 +205,18 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
   
 //merijn: we vetoed already if the second tau didn't contain a pion, so can safely calculate the momentum of 2nd prong from hadrons
   
+  /*original
+  TLorentzVector tau2Prong;
+  tau2Prong=chargedPivec(analysisTree,tauIndex2);
+  int piIndexfortau2=chargedPiIndex(analysisTree,tauIndex2);
+  if(piIndexfortau2>-1){
+    otree->VxConstitTau2=analysisTree->tau_constituents_vx[tauIndex2][piIndexfortau2];
+    otree->VyConstitTau2=analysisTree->tau_constituents_vy[tauIndex2][piIndexfortau2];   
+    otree->VzConstitTau2=analysisTree->tau_constituents_vz[tauIndex2][piIndexfortau2];      
+  }
+  */
+
+  //Merijn:s
   TLorentzVector tau2Prong;
   tau2Prong=chargedPivec(analysisTree,tauIndex2);
   int piIndexfortau2=chargedPiIndex(analysisTree,tauIndex2);
@@ -214,7 +226,8 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
     otree->VzConstitTau2=analysisTree->tau_constituents_vz[tauIndex2][piIndexfortau2];      
   }
   
-  /*
+  
+  /* obsolete calc..
   //check if there's a muon..
   TLorentzVector tau2Prong;
   tau2Prong=chargedPivec(analysisTree,tauIndex2);
@@ -448,9 +461,24 @@ TLorentzVector ipVec(const AC1B * analysisTree, int tauIndex) {
     vec.SetXYZT(ip[0],ip[1],ip[2],0.);
     */
 
+    
     TVector3 vertex(analysisTree->primvertex_x,
 		    analysisTree->primvertex_y,
 		    analysisTree->primvertex_z);
+
+    /*
+    //Merijn: temporarily add gen vertex instead..
+    TVector3 vertex;
+    for (unsigned int igen=0; igen<analysisTree->genparticles_count; ++igen) {
+      if (analysisTree->genparticles_pdgid[igen]==23||analysisTree->genparticles_pdgid[igen]==24||
+	  analysisTree->genparticles_pdgid[igen]==25||analysisTree->genparticles_pdgid[igen]==35||analysisTree->genparticles_pdgid[igen]==36) {
+	vertex.SetX(analysisTree->genparticles_vx[igen]);
+	vertex.SetY(analysisTree->genparticles_vy[igen]);
+	vertex.SetZ(analysisTree->genparticles_vz[igen]);
+	break;
+      }
+    }
+    */
     
     TVector3 secvertex(analysisTree->tau_constituents_vx[tauIndex][piIndex],
 		       analysisTree->tau_constituents_vy[tauIndex][piIndex],
@@ -488,9 +516,24 @@ TLorentzVector ipVec_Lepton(const AC1B * analysisTree, int tauIndex, TString ch)
   TLorentzVector vec;
   vec.SetXYZT(0.,0.,0.,0.);
 
+  
 TVector3 vertex(analysisTree->primvertex_x,
 		    analysisTree->primvertex_y,
 		    analysisTree->primvertex_z);
+
+  /*
+  //Merijn: temporarily replace vertex with gen level info
+  TVector3 vertex;
+  for (unsigned int igen=0; igen<analysisTree->genparticles_count; ++igen) {
+    if (analysisTree->genparticles_pdgid[igen]==23||analysisTree->genparticles_pdgid[igen]==24||
+	analysisTree->genparticles_pdgid[igen]==25||analysisTree->genparticles_pdgid[igen]==35||analysisTree->genparticles_pdgid[igen]==36) {
+      vertex.SetX(analysisTree->genparticles_vx[igen]);
+      vertex.SetY(analysisTree->genparticles_vy[igen]);
+      vertex.SetZ(analysisTree->genparticles_vz[igen]);
+      break;
+    }
+  }
+  */
     
 TVector3 secvertex(0.,0.,0.);
 TVector3 momenta(0.,0.,0.);    
