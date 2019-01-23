@@ -300,6 +300,7 @@ int main(int argc, char * argv[]) {
   Bool_t  tauDM_;
   Bool_t  tauNewDM_;
 
+  Float_t tauIso_;
   Bool_t  tauLooseIso_;
   Bool_t  tauMediumIso_;
   Bool_t  tauTightIso_;
@@ -562,6 +563,7 @@ int main(int argc, char * argv[]) {
   ntuple_->Branch("tauDM",&tauDM_,"tauDM/O");
   ntuple_->Branch("tauNewDM",&tauNewDM_,"tauNewDM/O");
 
+  ntuple_->Branch("tauIso", &tauIso_, "tauIso/F");
   ntuple_->Branch("tauLooseIso", &tauLooseIso_, "tauLooseIso/O");
   ntuple_->Branch("tauMediumIso",&tauMediumIso_,"tauMediumIso/O");
   ntuple_->Branch("tauTightIso", &tauTightIso_, "tauTightIso/O");
@@ -950,6 +952,7 @@ int main(int argc, char * argv[]) {
       tauDM_ = false;
       tauNewDM_ = false;
       
+      tauIso_ = 0;
       tauLooseIso_ = false;
       tauMediumIso_ = false;
       tauTightIso_ = false;
@@ -2099,6 +2102,7 @@ int main(int argc, char * argv[]) {
 	tauDM_ = analysisTree.tau_decayModeFinding[indexTau] > 0.5;
 	tauNewDM_ = analysisTree.tau_decayModeFindingNewDMs[indexTau] > 0.5;
 
+   tauIso_ = analysisTree.tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[indexTau];
 	tauLooseIso_ = analysisTree.tau_byLooseCombinedIsolationDeltaBetaCorr3Hits[indexTau] > 0.5;
 	tauMediumIso_ = analysisTree.tau_byMediumCombinedIsolationDeltaBetaCorr3Hits[indexTau] > 0.5;
 	tauTightIso_ = analysisTree.tau_byTightCombinedIsolationDeltaBetaCorr3Hits[indexTau] > 0.5;
@@ -2429,6 +2433,7 @@ int main(int argc, char * argv[]) {
 	    tauDM_ = analysisTree.tau_decayModeFinding[indexTau] > 0.5;
 	    tauNewDM_ = analysisTree.tau_decayModeFindingNewDMs[indexTau] > 0.5;
 
+       tauIso_ =  analysisTree.tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[indexTau];
 	    tauLooseIso_ = analysisTree.tau_byLooseCombinedIsolationDeltaBetaCorr3Hits[indexTau] > 0.5;
 	    tauMediumIso_ = analysisTree.tau_byMediumCombinedIsolationDeltaBetaCorr3Hits[indexTau] > 0.5;
 	    tauTightIso_ = analysisTree.tau_byTightCombinedIsolationDeltaBetaCorr3Hits[indexTau] > 0.5;
