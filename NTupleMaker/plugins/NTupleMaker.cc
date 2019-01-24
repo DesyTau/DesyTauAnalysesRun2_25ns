@@ -3885,7 +3885,7 @@ unsigned int NTupleMaker::AddTaus(const edm::Event& iEvent, const edm::EventSetu
 
 	} // for(unsigned i = 0 ; i < Taus->size() ; i++)
     }
-  std::cout << std::endl;
+  //  std::cout << std::endl;
   return tau_count;
 }
 
