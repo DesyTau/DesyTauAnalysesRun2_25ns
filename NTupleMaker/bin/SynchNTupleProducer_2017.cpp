@@ -1680,6 +1680,15 @@ void FillTau_leading(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex
   otree->m_1 = analysisTree->tau_mass[tauIndex];
   otree->tau_decay_mode_1 = analysisTree->tau_decayMode[tauIndex];
 
+
+  otree->tau_pca2D_x_1 = analysisTree->tau_pca2D_x[tauIndex];
+  otree->tau_pca2D_y_1 = analysisTree->tau_pca2D_y[tauIndex];
+  otree->tau_pca2D_z_1 = analysisTree->tau_pca2D_z[tauIndex];
+  otree->tau_pca3D_x_1 = analysisTree->tau_pca3D_x[tauIndex];
+  otree->tau_pca3D_y_1 = analysisTree->tau_pca3D_y[tauIndex];
+  otree->tau_pca3D_z_1 = analysisTree->tau_pca3D_z[tauIndex];
+
+
   otree->byCombinedIsolationDeltaBetaCorrRaw3Hits_1 = analysisTree->tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[tauIndex];
   otree->byLooseCombinedIsolationDeltaBetaCorr3Hits_1 = analysisTree->tau_byLooseCombinedIsolationDeltaBetaCorr3Hits[tauIndex];
   otree->byMediumCombinedIsolationDeltaBetaCorr3Hits_1 = analysisTree->tau_byMediumCombinedIsolationDeltaBetaCorr3Hits[tauIndex];
@@ -1775,6 +1784,15 @@ void FillTau(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex){
   otree->iso_2 = analysisTree->tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[tauIndex];
   otree->m_2 = analysisTree->tau_mass[tauIndex];
   otree->tau_decay_mode_2 = analysisTree->tau_decayMode[tauIndex];
+
+  otree->tau_pca2D_x_2 = analysisTree->tau_pca2D_x[tauIndex];
+  otree->tau_pca2D_y_2 = analysisTree->tau_pca2D_y[tauIndex];
+  otree->tau_pca2D_z_2 = analysisTree->tau_pca2D_z[tauIndex];
+  otree->tau_pca3D_x_2 = analysisTree->tau_pca3D_x[tauIndex];
+  otree->tau_pca3D_y_2 = analysisTree->tau_pca3D_y[tauIndex];
+  otree->tau_pca3D_z_2 = analysisTree->tau_pca3D_z[tauIndex];
+
+
 
   otree->byCombinedIsolationDeltaBetaCorrRaw3Hits_2 = analysisTree->tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[tauIndex];
   otree->byLooseCombinedIsolationDeltaBetaCorr3Hits_2 = analysisTree->tau_byLooseCombinedIsolationDeltaBetaCorr3Hits[tauIndex];

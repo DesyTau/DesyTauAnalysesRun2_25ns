@@ -358,9 +358,9 @@ TLorentzVector ipVec(const AC1B * analysisTree, int tauIndex) {
 		    analysisTree->primvertex_y,
 		    analysisTree->primvertex_z);
     
-    TVector3 secvertex(analysisTree->tau_constituents_vx[tauIndex][piIndex],
-		       analysisTree->tau_constituents_vy[tauIndex][piIndex],
-		       analysisTree->tau_constituents_vz[tauIndex][piIndex]);
+    TVector3 secvertex(analysisTree->tau_pca3D[tauIndex],
+		       analysisTree->tau_pca3D[tauIndex],
+		       analysisTree->tau_pca3D[tauIndex]);
     
     TVector3 momenta(analysisTree->tau_constituents_px[tauIndex][piIndex],
 		     analysisTree->tau_constituents_py[tauIndex][piIndex],

@@ -278,6 +278,24 @@ void Synch17Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("acotautau_11", &acotautau_11, &b_acotautau_11);
    fChain->SetBranchAddress("pdgcodetau2", &pdgcodetau2, &b_pdgcodetau2);
 
+  //Points of closest approach
+
+   fChain->SetBranchAddress("tau_pca2D_x_1", &tau_pca2D_x_1, &b_tau_pca2D_x_1);
+   fChain->SetBranchAddress("tau_pca2D_y_1", &tau_pca2D_y_1, &b_tau_pca2D_y_1);
+   fChain->SetBranchAddress("tau_pca2D_z_1", &tau_pca2D_z_1, &b_tau_pca2D_z_1);
+   fChain->SetBranchAddress("tau_pca3D_x_1", &tau_pca3D_x_1, &b_tau_pca3D_x_1);
+   fChain->SetBranchAddress("tau_pca3D_y_1", &tau_pca3D_y_1, &b_tau_pca3D_y_1);
+   fChain->SetBranchAddress("tau_pca3D_z_1", &tau_pca3D_z_1, &b_tau_pca3D_z_1);
+
+   fChain->SetBranchAddress("tau_pca2D_x_2", &tau_pca2D_x_2, &b_tau_pca2D_x_2);
+   fChain->SetBranchAddress("tau_pca2D_y_2", &tau_pca2D_y_2, &b_tau_pca2D_y_2);
+   fChain->SetBranchAddress("tau_pca2D_z_2", &tau_pca2D_z_2, &b_tau_pca2D_z_2);
+   fChain->SetBranchAddress("tau_pca3D_x_2", &tau_pca3D_x_2, &b_tau_pca3D_x_2);
+   fChain->SetBranchAddress("tau_pca3D_y_2", &tau_pca3D_y_2, &b_tau_pca3D_y_2);
+   fChain->SetBranchAddress("tau_pca3D_z_2", &tau_pca3D_z_2, &b_tau_pca3D_z_2);
+
+
+
   //RECO vertex info useful to have
    fChain->SetBranchAddress("RecoVertexX", &RecoVertexX, &b_RecoVertexX);
    fChain->SetBranchAddress("RecoVertexY", &RecoVertexY, &b_RecoVertexY);
@@ -583,6 +601,22 @@ void Synch17Tree::WriteInit(TTree *tree) {
    fChain->Branch("acotautau_01", &acotautau_01, "acotautau_01/F");
    fChain->Branch("acotautau_11", &acotautau_11, "acotautau_11/F");
    fChain->Branch("pdgcodetau2", &pdgcodetau2, "pdgcodetau2/F");
+
+  //Points of closest approach
+
+   fChain->Branch("tau_pca2D_x_1", &tau_pca2D_x_1, "tau_pca2D_x_1/F");
+   fChain->Branch("tau_pca2D_y_1", &tau_pca2D_y_1, "tau_pca2D_y_1/F");
+   fChain->Branch("tau_pca2D_z_1", &tau_pca2D_z_1, "tau_pca2D_z_1/F");
+   fChain->Branch("tau_pca3D_x_1", &tau_pca3D_x_1, "tau_pca3D_x_1/F");
+   fChain->Branch("tau_pca3D_y_1", &tau_pca3D_y_1, "tau_pca3D_y_1/F");
+   fChain->Branch("tau_pca3D_z_1", &tau_pca3D_z_1, "tau_pca3D_z_1/F");
+   fChain->Branch("tau_pca2D_x_2", &tau_pca2D_x_2, "tau_pca2D_x_2/F");
+   fChain->Branch("tau_pca2D_y_2", &tau_pca2D_y_2, "tau_pca2D_y_2/F");
+   fChain->Branch("tau_pca2D_z_2", &tau_pca2D_z_2, "tau_pca2D_z_2/F");
+   fChain->Branch("tau_pca3D_x_2", &tau_pca3D_x_2, "tau_pca3D_x_2/F");
+   fChain->Branch("tau_pca3D_y_2", &tau_pca3D_y_2, "tau_pca3D_y_2/F");
+   fChain->Branch("tau_pca3D_z_2", &tau_pca3D_z_2, "tau_pca3D_z_2/F");
+
 
    fChain->Branch("RecoVertexX", &RecoVertexX, "RecoVertexX/F");
    fChain->Branch("RecoVertexY", &RecoVertexY, "RecoVertexY/F");

@@ -253,6 +253,20 @@ public :
   Float_t         acotautau_11;
   Int_t		  pdgcodetau2;
 
+  //Points of closest approach
+  Float_t         tau_pca2D_x_1;
+  Float_t         tau_pca2D_y_1;
+  Float_t         tau_pca2D_z_1;
+  Float_t         tau_pca3D_x_1;
+  Float_t         tau_pca3D_y_1;
+  Float_t         tau_pca3D_z_1;
+  Float_t         tau_pca2D_x_2;
+  Float_t         tau_pca2D_y_2;
+  Float_t         tau_pca2D_z_2;
+  Float_t         tau_pca3D_x_2;
+  Float_t         tau_pca3D_y_2;
+  Float_t         tau_pca3D_z_2;
+
   //reco vertices
   Float_t RecoVertexX;
   Float_t RecoVertexY;
@@ -496,6 +510,20 @@ public :
   TBranch        *b_acotautau_01;
   TBranch        *b_acotautau_11;
   TBranch	 *b_pdgcodetau2;
+
+  //Points of closest approach
+  TBranch        *b_tau_pca2D_x_1;
+  TBranch        *b_tau_pca2D_y_1;
+  TBranch        *b_tau_pca2D_z_1;
+  TBranch        *b_tau_pca3D_x_1;
+  TBranch        *b_tau_pca3D_y_1;
+  TBranch        *b_tau_pca3D_z_1;
+  TBranch        *b_tau_pca2D_x_2;
+  TBranch        *b_tau_pca2D_y_2;
+  TBranch        *b_tau_pca2D_z_2;
+  TBranch        *b_tau_pca3D_x_2;
+  TBranch        *b_tau_pca3D_y_2;
+  TBranch        *b_tau_pca3D_z_2;
 
   //reco vertices
   //RECO vertex info is practical to have
