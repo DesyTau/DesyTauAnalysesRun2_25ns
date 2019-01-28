@@ -249,6 +249,12 @@ public :
    Float_t         tau_vertexx[100];   //[tau_count]
    Float_t         tau_vertexy[100];   //[tau_count]
    Float_t         tau_vertexz[100];   //[tau_count]
+   Float_t         tau_pca2D_x[100];   //[tau_count]
+   Float_t         tau_pca2D_y[100];   //[tau_count]
+   Float_t         tau_pca2D_z[100];   //[tau_count]
+   Float_t         tau_pca3D_x[100];   //[tau_count]
+   Float_t         tau_pca3D_y[100];   //[tau_count]
+   Float_t         tau_pca3D_z[100];   //[tau_count]
    Float_t         tau_dxy[100];   //[tau_count]
    Float_t         tau_dz[100];   //[tau_count]
    Float_t         tau_ip3d[100];   //[tau_count]
@@ -939,6 +945,12 @@ public :
    TBranch        *b_tau_vertexx;   //!
    TBranch        *b_tau_vertexy;   //!
    TBranch        *b_tau_vertexz;   //!
+   TBranch        *b_tau_pca2D_x;   //!
+   TBranch        *b_tau_pca2D_y;   //!
+   TBranch        *b_tau_pca2D_z;   //!
+   TBranch        *b_tau_pca3D_x;   //!
+   TBranch        *b_tau_pca3D_y;   //!
+   TBranch        *b_tau_pca3D_z;   //!
    TBranch        *b_tau_dxy;   //!
    TBranch        *b_tau_dz;   //!
    TBranch        *b_tau_ip3d;   //!
@@ -1718,6 +1730,12 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("tau_vertexx", tau_vertexx, &b_tau_vertexx);
    fChain->SetBranchAddress("tau_vertexy", tau_vertexy, &b_tau_vertexy);
    fChain->SetBranchAddress("tau_vertexz", tau_vertexz, &b_tau_vertexz);
+   fChain->SetBranchAddress("tau_pca2D_x", tau_pca2D_x, &b_tau_pca2D_x);
+   fChain->SetBranchAddress("tau_pca2D_y", tau_pca2D_y, &b_tau_pca2D_y);
+   fChain->SetBranchAddress("tau_pca2D_z", tau_pca2D_z, &b_tau_pca2D_z);
+   fChain->SetBranchAddress("tau_pca3D_x", tau_pca3D_x, &b_tau_pca3D_x);
+   fChain->SetBranchAddress("tau_pca3D_y", tau_pca3D_y, &b_tau_pca3D_y);
+   fChain->SetBranchAddress("tau_pca3D_z", tau_pca3D_z, &b_tau_pca3D_z);
    fChain->SetBranchAddress("tau_dxy", tau_dxy, &b_tau_dxy);
    fChain->SetBranchAddress("tau_dz", tau_dz, &b_tau_dz);
    fChain->SetBranchAddress("tau_ip3d", tau_ip3d, &b_tau_ip3d);
