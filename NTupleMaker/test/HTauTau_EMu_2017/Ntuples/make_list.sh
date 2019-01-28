@@ -5,7 +5,7 @@ dirW=/nfs/dust/cms/user/tlenz/13TeV/2017/NTuples/MC/12Apr2018_PU2017_METrecipe_v
 dirTT=/nfs/dust/cms/user/mameyer/SM_HiggsTauTau/ntuples/METRecipev2
 dirST=/nfs/dust/cms/user/mameyer/SM_HiggsTauTau/ntuples/METRecipev2
 dirVV=/nfs/dust/cms/user/mameyer/SM_HiggsTauTau/ntuples/METRecipev2
-dirSignal=/nfs/dust/cms/user/mameyer/SM_HiggsTauTau/ntuples/METRecipev2/Signals
+dirSignal=/nfs/dust/cms/user/tlenz/13TeV/2017/NTuples/MC/htt_signal_htxs_2017
 dirEm=/nfs/dust/cms/user/rasp/ntuples/Embedding_2017
 
 ls $dirDY/DYJetsToLL_M-50_13TeV-12Apr2018/*root > DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8
@@ -38,13 +38,15 @@ ls $dirVV/WZ_TuneCP5_13TeV-pythia8/*root > WZ_TuneCP5_13TeV-pythia8
 ls $dirVV/ZZ_TuneCP5_13TeV-pythia8/*root > ZZ_TuneCP5_13TeV-pythia8
 
 ls $dirSignal/GluGluHToTauTau_M125_13TeV_powheg_pythia8/*root > GluGluHToTauTau_M125_13TeV_powheg_pythia8
+ls $dirSignal/GluGluHToTauTau_M125_13TeV_powheg_pythia8_ext1/*root >> GluGluHToTauTau_M125_13TeV_powheg_pythia8
 ls $dirSignal/VBFHToTauTau_M125_13TeV_powheg_pythia8/*root > VBFHToTauTau_M125_13TeV_powheg_pythia8
 
-ls $dirData/MuonEG_Run2017B/*root > MuonEG_Run2017
-ls $dirData/MuonEG_Run2017C/*root >> MuonEG_Run2017
-ls $dirData/MuonEG_Run2017D/*root >> MuonEG_Run2017
-ls $dirData/MuonEG_Run2017E/*root >> MuonEG_Run2017
-ls $dirData/MuonEG_Run2017F/*root >> MuonEG_Run2017
+
+ls $dirData/MuonEG_Run2017B/*root > MuonEG_Run2017B
+ls $dirData/MuonEG_Run2017C/*root > MuonEG_Run2017CtoF
+ls $dirData/MuonEG_Run2017D/*root >> MuonEG_Run2017CtoF
+ls $dirData/MuonEG_Run2017E/*root >> MuonEG_Run2017CtoF
+ls $dirData/MuonEG_Run2017F/*root >> MuonEG_Run2017CtoF
 
 ls $dirEm/Embedding_Run2017B/*root > Embedding_Run2017
 ls $dirEm/Embedding_Run2017C/*root >> Embedding_Run2017

@@ -1,0 +1,28 @@
+/nfs/dust/cms/user/cardinia/HtoTauTau/HiggsCP/CMSSW_9_4_9/src/DesyTauAnalyses/NTupleMaker/test/mutau/GluGluHToTauTau_M125_13TeV_powheg_pythia8_files
+Number of single lepton trigger legs = 2
+Number of X trigger legs (lep leg)   = 2
+Number of X trigger legs (tau leg)   = 2
+Number of ditau trigger legs         = 0
+dxyLeptonCut 0.045
+dzLeptonCut 0.2
+/nfs/dust/cms/user/tlenz/13TeV/2017/NTuples/MC/htt_signal_htxs_2017/GluGluHToTauTau_M125_13TeV_powheg_pythia8_ext1/GluGluHToTauTau_M125_13TeV_powheg_pythia8_ext1_6.root
+/nfs/dust/cms/user/tlenz/13TeV/2017/NTuples/MC/htt_signal_htxs_2017/GluGluHToTauTau_M125_13TeV_powheg_pythia8_ext1/GluGluHToTauTau_M125_13TeV_powheg_pythia8_ext1_7.root
+/nfs/dust/cms/user/tlenz/13TeV/2017/NTuples/MC/htt_signal_htxs_2017/GluGluHToTauTau_M125_13TeV_powheg_pythia8_ext1/GluGluHToTauTau_M125_13TeV_powheg_pythia8_ext1_78.root
+/nfs/dust/cms/user/tlenz/13TeV/2017/NTuples/MC/htt_signal_htxs_2017/GluGluHToTauTau_M125_13TeV_powheg_pythia8_ext1/GluGluHToTauTau_M125_13TeV_powheg_pythia8_ext1_79.root
+/nfs/dust/cms/user/tlenz/13TeV/2017/NTuples/MC/htt_signal_htxs_2017/GluGluHToTauTau_M125_13TeV_powheg_pythia8_ext1/GluGluHToTauTau_M125_13TeV_powheg_pythia8_ext1_80.root
+/nfs/dust/cms/user/tlenz/13TeV/2017/NTuples/MC/htt_signal_htxs_2017/GluGluHToTauTau_M125_13TeV_powheg_pythia8_ext1/GluGluHToTauTau_M125_13TeV_powheg_pythia8_ext1_81.root
+/nfs/dust/cms/user/tlenz/13TeV/2017/NTuples/MC/htt_signal_htxs_2017/GluGluHToTauTau_M125_13TeV_powheg_pythia8_ext1/GluGluHToTauTau_M125_13TeV_powheg_pythia8_ext1_82.root
+/nfs/dust/cms/user/tlenz/13TeV/2017/NTuples/MC/htt_signal_htxs_2017/GluGluHToTauTau_M125_13TeV_powheg_pythia8_ext1/GluGluHToTauTau_M125_13TeV_powheg_pythia8_ext1_83.root
+/nfs/dust/cms/user/tlenz/13TeV/2017/NTuples/MC/htt_signal_htxs_2017/GluGluHToTauTau_M125_13TeV_powheg_pythia8_ext1/GluGluHToTauTau_M125_13TeV_powheg_pythia8_ext1_86.root
+/nfs/dust/cms/user/tlenz/13TeV/2017/NTuples/MC/htt_signal_htxs_2017/GluGluHToTauTau_M125_13TeV_powheg_pythia8_ext1/GluGluHToTauTau_M125_13TeV_powheg_pythia8_ext1_87.root
+/nfs/dust/cms/user/tlenz/13TeV/2017/NTuples/MC/htt_signal_htxs_2017/GluGluHToTauTau_M125_13TeV_powheg_pythia8_ext1/GluGluHToTauTau_M125_13TeV_powheg_pythia8_ext1_88.root
+/nfs/dust/cms/user/tlenz/13TeV/2017/NTuples/MC/htt_signal_htxs_2017/GluGluHToTauTau_M125_13TeV_powheg_pythia8_ext1/GluGluHToTauTau_M125_13TeV_powheg_pythia8_ext1_89.root
+/nfs/dust/cms/user/tlenz/13TeV/2017/NTuples/MC/htt_signal_htxs_2017/GluGluHToTauTau_M125_13TeV_powheg_pythia8_ext1/GluGluHToTauTau_M125_13TeV_powheg_pythia8_ext1_90.root
+/nfs/dust/cms/user/tlenz/13TeV/2017/NTuples/MC/htt_signal_htxs_2017/GluGluHToTauTau_M125_13TeV_powheg_pythia8_ext1/GluGluHToTauTau_M125_13TeV_powheg_pythia8_ext1_91.root
+/nfs/dust/cms/user/tlenz/13TeV/2017/NTuples/MC/htt_signal_htxs_2017/GluGluHToTauTau_M125_13TeV_powheg_pythia8_ext1/GluGluHToTauTau_M125_13TeV_powheg_pythia8_ext1_92.root
+/nfs/dust/cms/user/tlenz/13TeV/2017/NTuples/MC/htt_signal_htxs_2017/GluGluHToTauTau_M125_13TeV_powheg_pythia8_ext1/GluGluHToTauTau_M125_13TeV_powheg_pythia8_ext1_93.root
+/nfs/dust/cms/user/tlenz/13TeV/2017/NTuples/MC/htt_signal_htxs_2017/GluGluHToTauTau_M125_13TeV_powheg_pythia8_ext1/GluGluHToTauTau_M125_13TeV_powheg_pythia8_ext1_94.root
+/nfs/dust/cms/user/tlenz/13TeV/2017/NTuples/MC/htt_signal_htxs_2017/GluGluHToTauTau_M125_13TeV_powheg_pythia8_ext1/GluGluHToTauTau_M125_13TeV_powheg_pythia8_ext1_95.root
+/nfs/dust/cms/user/tlenz/13TeV/2017/NTuples/MC/htt_signal_htxs_2017/GluGluHToTauTau_M125_13TeV_powheg_pythia8_ext1/GluGluHToTauTau_M125_13TeV_powheg_pythia8_ext1_96.root
+/nfs/dust/cms/user/tlenz/13TeV/2017/NTuples/MC/htt_signal_htxs_2017/GluGluHToTauTau_M125_13TeV_powheg_pythia8_ext1/GluGluHToTauTau_M125_13TeV_powheg_pythia8_ext1_97.root
+Histogram GluGluHToTauTau_M125_13TeV_powheg_pythia8_pileup is not present in pileup file

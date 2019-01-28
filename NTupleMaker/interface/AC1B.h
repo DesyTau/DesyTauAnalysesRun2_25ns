@@ -261,6 +261,12 @@ public :
    Float_t         tau_vertexx[100];   //[tau_count]
    Float_t         tau_vertexy[100];   //[tau_count]
    Float_t         tau_vertexz[100];   //[tau_count]
+   Float_t         tau_pca2D_x[100];   //[tau_count]
+   Float_t         tau_pca2D_y[100];   //[tau_count]
+   Float_t         tau_pca2D_z[100];   //[tau_count]
+   Float_t         tau_pca3D_x[100];   //[tau_count]
+   Float_t         tau_pca3D_y[100];   //[tau_count]
+   Float_t         tau_pca3D_z[100];   //[tau_count]
    Float_t         tau_dxy[100];   //[tau_count]
    Float_t         tau_dz[100];   //[tau_count]
    Float_t         tau_ip3d[100];   //[tau_count]
@@ -720,6 +726,10 @@ public :
    Float_t         tau_byVVTightIsolationMVArun2017v2DBoldDMwLT2017[100];   //[tau_count]
    Float_t         tau_byVVTightIsolationMVArun2v1DBnewDMwLT2016[100];   //[tau_count]
    Float_t         tau_byVVTightIsolationMVArun2v1DBoldDMwLT2016[100];   //[tau_count]
+   Int_t           htxs_stage0cat;
+   Int_t           htxs_stage1cat;
+   Float_t         htxs_higgsPt;
+   Int_t           htxs_njets30;
 
    // List of branches
    TBranch        *b_errors;   //!
@@ -957,6 +967,12 @@ public :
    TBranch        *b_tau_vertexx;   //!
    TBranch        *b_tau_vertexy;   //!
    TBranch        *b_tau_vertexz;   //!
+   TBranch        *b_tau_pca2D_x;   //!
+   TBranch        *b_tau_pca2D_y;   //!
+   TBranch        *b_tau_pca2D_z;   //!
+   TBranch        *b_tau_pca3D_x;   //!
+   TBranch        *b_tau_pca3D_y;   //!
+   TBranch        *b_tau_pca3D_z;   //!
    TBranch        *b_tau_dxy;   //!
    TBranch        *b_tau_dz;   //!
    TBranch        *b_tau_ip3d;   //!
@@ -1416,7 +1432,11 @@ public :
    TBranch        *b_tau_byVVTightIsolationMVArun2017v2DBoldDMwLT2017;   //!
    TBranch        *b_tau_byVVTightIsolationMVArun2v1DBnewDMwLT2016;   //!
    TBranch        *b_tau_byVVTightIsolationMVArun2v1DBoldDMwLT2016;   //!
-
+   TBranch        *b_htxs_stage0cat;   //!
+   TBranch        *b_htxs_stage1cat;   //!
+   TBranch        *b_htxs_higgsPt;   //!
+   TBranch        *b_htxs_njets30;   //!
+   
    AC1B(TTree *tree=0, bool isData=false);
    virtual ~AC1B();
    virtual Int_t    Cut(Long64_t entry);
@@ -1742,6 +1762,12 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("tau_vertexx", tau_vertexx, &b_tau_vertexx);
    fChain->SetBranchAddress("tau_vertexy", tau_vertexy, &b_tau_vertexy);
    fChain->SetBranchAddress("tau_vertexz", tau_vertexz, &b_tau_vertexz);
+   fChain->SetBranchAddress("tau_pca2D_x", tau_pca2D_x, &b_tau_pca2D_x);
+   fChain->SetBranchAddress("tau_pca2D_y", tau_pca2D_y, &b_tau_pca2D_y);
+   fChain->SetBranchAddress("tau_pca2D_z", tau_pca2D_z, &b_tau_pca2D_z);
+   fChain->SetBranchAddress("tau_pca3D_x", tau_pca3D_x, &b_tau_pca3D_x);
+   fChain->SetBranchAddress("tau_pca3D_y", tau_pca3D_y, &b_tau_pca3D_y);
+   fChain->SetBranchAddress("tau_pca3D_z", tau_pca3D_z, &b_tau_pca3D_z);
    fChain->SetBranchAddress("tau_dxy", tau_dxy, &b_tau_dxy);
    fChain->SetBranchAddress("tau_dz", tau_dz, &b_tau_dz);
    fChain->SetBranchAddress("tau_ip3d", tau_ip3d, &b_tau_ip3d);
@@ -2200,7 +2226,11 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("tau_byVVTightIsolationMVArun2017v2DBoldDMdR0p3wLT2017", tau_byVVTightIsolationMVArun2017v2DBoldDMdR0p3wLT2017, &b_tau_byVVTightIsolationMVArun2017v2DBoldDMdR0p3wLT2017);
    fChain->SetBranchAddress("tau_byVVTightIsolationMVArun2017v2DBoldDMwLT2017", tau_byVVTightIsolationMVArun2017v2DBoldDMwLT2017, &b_tau_byVVTightIsolationMVArun2017v2DBoldDMwLT2017);
    fChain->SetBranchAddress("tau_byVVTightIsolationMVArun2v1DBnewDMwLT2016", tau_byVVTightIsolationMVArun2v1DBnewDMwLT2016, &b_tau_byVVTightIsolationMVArun2v1DBnewDMwLT2016);
-   fChain->SetBranchAddress("tau_byVVTightIsolationMVArun2v1DBoldDMwLT2016", tau_byVVTightIsolationMVArun2v1DBoldDMwLT2016, &b_tau_byVVTightIsolationMVArun2v1DBoldDMwLT2016);
+   fChain->SetBranchAddress("htxs_stage0cat",&htxs_stage0cat, &b_htxs_stage0cat);
+   fChain->SetBranchAddress("htxs_stage1cat",&htxs_stage1cat , &b_htxs_stage1cat);
+   fChain->SetBranchAddress("htxs_higgsPt",&htxs_higgsPt , &b_htxs_higgsPt);
+   fChain->SetBranchAddress("htxs_njets30", &htxs_njets30, &b_htxs_njets30);
+   
    Notify();
 }
 

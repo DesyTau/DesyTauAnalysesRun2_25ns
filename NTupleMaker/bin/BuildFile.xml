@@ -125,6 +125,24 @@
  <use name="HTT-utilities/QCDModelingEMu"/>
 </bin>
 
+<bin name="SynchNTupleProducer_em_allEras" file="SynchNTupleProducer_em_allEras.cpp">
+ <use name="PhysicsTools/Utilities"/>
+ <use name="rootgraphics"/>
+ <use name="root"/>
+ <use name="rootmath"/>
+ <use name="roottmva"/>
+ <use name="boost" />
+ <use name="boost_program_options"/>
+ <use name="DesyTauAnalyses/NTupleMaker"/>
+ <use name="FWCore/ParameterSet"/>
+ <use name="CondFormats/BTauObjects"/>
+ <use name="CondTools/BTau"/>
+ <use name="TauAnalysis/ClassicSVfit"/>
+ <use name="HTT-utilities/LepEffInterface"/>
+ <use name="HTT-utilities/RecoilCorrections"/>
+ <use name="HTT-utilities/QCDModelingEMu"/>
+</bin>
+
 <bin name="SynchNTupleProducer_em_2017" file="SynchNTupleProducer_em_2017.cpp">
  <use name="PhysicsTools/Utilities"/>
  <use name="rootgraphics"/>
