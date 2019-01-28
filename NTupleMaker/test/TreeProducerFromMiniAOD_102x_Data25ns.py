@@ -23,7 +23,7 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 process.load("TrackingTools/TransientTrack/TransientTrackBuilder_cfi")
 
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff')
-process.GlobalTag.globaltag = '94X_dataRun2_ReReco_EOY17_v6'
+process.GlobalTag.globaltag = '102X_dataRun2_Sep2018Rereco_v1'
 
 # Message Logger settings
 process.load("FWCore.MessageService.MessageLogger_cfi")
@@ -38,7 +38,7 @@ process.options = cms.untracked.PSet(
 
 # How many events to process
 process.maxEvents = cms.untracked.PSet( 
-   input = cms.untracked.int32(1000)
+   input = cms.untracked.int32(100)
 )
 
 # Define the input source
@@ -145,7 +145,6 @@ na = TauIDEmbedder(process, cms, # pass tour process object
 		  )
 na.runTauID()
 
-
 tauSrc = cms.InputTag('NewTauIDsEmbedded')
 # END Tau ID ===========================================================================================
 
@@ -174,7 +173,7 @@ RecPrimVertex = cms.untracked.bool(True),
 RecBeamSpot = cms.untracked.bool(True),
 RecTrack = cms.untracked.bool(True),
 RecPFMet = cms.untracked.bool(True),
-RecPFMetCorr = cms.untracked.bool(True),
+RecPFMetCorr = cms.untracked.bool(False),
 RecPuppiMet = cms.untracked.bool(False),
 RecMvaMet = cms.untracked.bool(False),                                      
 RecMuon = cms.untracked.bool(True),

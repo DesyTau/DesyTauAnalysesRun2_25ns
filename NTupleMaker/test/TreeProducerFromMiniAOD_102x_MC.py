@@ -12,8 +12,6 @@ useHFCandidates=True #create an additionnal NoHF slimmed MET collection if the o
 applyResiduals=True #application of residual corrections. Have to be set to True once the 13 TeV residual corrections are available. False to be kept meanwhile. Can be kept to False later for private tests or for analysis checks and developments (not the official recommendation!).
 #===================================================================
 
-
-
 # Define the CMSSW process
 process = cms.Process("TreeProducer")
 
@@ -36,14 +34,13 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 100
 process.options = cms.untracked.PSet( 
     allowUnscheduled = cms.untracked.bool(True),
     wantSummary = cms.untracked.bool(True), 
-#     susyInfo = cms.untracked.bool(True)	
 )
 
 # How many events to process
 process.maxEvents = cms.untracked.PSet( 
    input = cms.untracked.int32(100)
 )
-#process.SusyInfo = cms.untracked.bool(True)
+
 # Define the input source
 process.source = cms.Source("PoolSource", 
   fileNames = cms.untracked.vstring(
@@ -115,7 +112,6 @@ process.patJetsReapplyJEC = updatedPatJets.clone(
 #                       applyVIDOnCorrectedEgamma=False,
 #                       isMiniAOD=True,
 #                       era='2017-Nov17ReReco')
-
 ### END Electron scale and smearing ====================================================================
 
 # Electron ID ==========================================================================================
@@ -149,17 +145,14 @@ for idmod in my_id_modules:
 
 # Tau ID ===============================================================================================
 from DesyTauAnalyses.NTupleMaker.runTauIdMVA import *
-
 na = TauIDEmbedder(process, cms, # pass tour process object
     debug=True,
 #    toKeep = ["2017v1", "2017v2", "newDM2017v2", "dR0p32017v2", "2016v1", "newDM2016v1", "deepTau2017v1", "DPFTau_2016_v0","DPFTau_2016_v1"]
     toKeep = ["2017v1", "2017v2", "newDM2017v2", "dR0p32017v2", "2016v1", "newDM2016v1"]
-)
-
+                   )
 na.runTauID()
 
 tauSrc = cms.InputTag('NewTauIDsEmbedded')
-
 # END Tau ID ===========================================================================================
 
 # NTuple Maker =======================================================================
