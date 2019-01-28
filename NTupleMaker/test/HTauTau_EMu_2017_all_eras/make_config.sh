@@ -49,6 +49,8 @@ sed 's/SampleNameForPUHist =/SampleNameForPUHist = WplusHToTauTau_M125_13TeV_pow
 
 sed 's/SampleNameForPUHist =/SampleNameForPUHist = MC_PU2017_pileup/' analysisMacroSynch_em_W.conf > analysisMacroSynch_em_WGToLNuG.conf
 
+sed 's/SampleNameForPUHist =/SampleNameForPUHist = MC_PU2017_pileup/' analysisMacroSynch_em_Signal.conf > analysisMacroSynch_em_Signal_ttH.conf
+
 sed 's/SampleNameForPUHist =/SampleNameForPUHist = EWKWMinus2Jets_WToLNu_M-50_TuneCP5_13TeV-madgraph-pythia8_pileup/' analysisMacroSynch_em_W.conf > analysisMacroSynch_em_EWKWMinus.conf
 sed 's/SampleNameForPUHist =/SampleNameForPUHist = EWKWPlus2Jets_WToLNu_M-50_TuneCP5_13TeV-madgraph-pythia8_pileup/' analysisMacroSynch_em_W.conf > analysisMacroSynch_em_EWKWPlus.conf
 sed 's/SampleNameForPUHist =/SampleNameForPUHist =  EWKZ2Jets_ZToLL_M-50_TuneCP5_13TeV-madgraph-pythia8_pileup/' analysisMacroSynch_em_DY.conf > analysisMacroSynch_em_EWKZ2Jets_ZToLL.conf
