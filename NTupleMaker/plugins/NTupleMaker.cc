@@ -234,8 +234,8 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
   setTauBranches = true;
   
   //  propagatorWithMaterial = NULL;
-  if(cYear != 2015 && cYear != 2016 && cYear != 2017 )
-    throw cms::Exception("NTupleMaker") << "Invalid Year : 2015, 2016 and 2017 are allowed!";
+  if(cYear != 2015 && cYear != 2016 && cYear != 2017 && cYear != 2018)
+    throw cms::Exception("NTupleMaker") << "Invalid Year : 2015, 2016 2017 and 2018 are allowed!" << endl << "Why is this check even done?! You my dear shall PhD answer that when running on Run 3 data!";
   //if(cPeriod != "Summer11" && cPeriod != "Fall11" && cPeriod != "Summer12" && cPeriod != "PHYS14" && cPeriod != "Spring15" && cPeriod != "Run2015B" && cPeriod != "Run2015C" && cPeriod != "Run2015D")
   //  throw cms::Exception("NTupleMaker") << "Invalid period, only Summer11, Fall11, Summer12, PHYS14, Spring15, Run2015B, Run2015C and Run2015D are allowed!";
   
