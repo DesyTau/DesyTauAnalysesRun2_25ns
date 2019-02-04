@@ -21,7 +21,7 @@ process.load('Configuration.StandardSequences.GeometryDB_cff')
 process.load('Configuration.StandardSequences.MagneticField_38T_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 process.load("TrackingTools/TransientTrack/TransientTrackBuilder_cfi")
-
+process.load('RecoMET.METFilters.ecalBadCalibFilter_cfi')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff')
 process.GlobalTag.globaltag = '102X_dataRun2_Sep2018Rereco_v1'
 
@@ -29,7 +29,7 @@ process.GlobalTag.globaltag = '102X_dataRun2_Sep2018Rereco_v1'
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.destinations = ['cout', 'cerr']
 process.MessageLogger.cerr.threshold = cms.untracked.string('INFO')
-process.MessageLogger.cerr.FwkReport.reportEvery = 100
+process.MessageLogger.cerr.FwkReport.reportEvery = 10000
 # Set the process options -- Display summary at the end, enable unscheduled execution
 process.options = cms.untracked.PSet( 
     allowUnscheduled = cms.untracked.bool(True),
@@ -38,7 +38,7 @@ process.options = cms.untracked.PSet(
 
 # How many events to process
 process.maxEvents = cms.untracked.PSet( 
-   input = cms.untracked.int32(100)
+   input = cms.untracked.int32(10000)
 )
 
 # Define the input source
@@ -87,6 +87,31 @@ process.patJetsReapplyJEC = updatedPatJets.clone(
 #PuppiMET
 #from PhysicsTools.PatAlgos.slimming.puppiForMET_cff import makePuppiesFromMiniAOD
 #makePuppiesFromMiniAOD( process, True );
+
+#MET filter for 2018
+baddetEcallist = cms.vuint32(
+                             [872439604,872422825,872420274,872423218,
+                              872423215,872416066,872435036,872439336,
+                              872420273,872436907,872420147,872439731,
+                              872436657,872420397,872439732,872439339,
+                              872439603,872422436,872439861,872437051,
+                              872437052,872420649,872422436,872421950,
+                              872437185,872422564,872421566,872421695,
+                              872421955,872421567,872437184,872421951,
+                              872421694,872437056,872437057,872437313])
+
+
+#baddetEcallist = cms.vuint32( [872439604,872422825,872420274,872423218,872423215,872416066,872435036,872439336, 872420273,872436907,872420147,872439731,872436657,872420397,872439732,872439339, 872439603,872422436,872439861,872437051,872437052,872420649,872421950,872437185, 872422564,872421566,872421695,872421955,872421567,872437184,872421951,872421694, 872437056,872437057,872437313,872438182,872438951,872439990,872439864,872439609, 872437181,872437182,872437053,872436794,872436667,872436536,872421541,872421413, 872421414,872421031,872423083,872421439])
+#
+
+process.ecalBadCalibReducedMINIAODFilter = cms.EDFilter(
+                                                        "EcalBadCalibFilter",
+                                                        EcalRecHitSource = cms.InputTag("reducedEgamma:reducedEERecHits"),
+                                                        ecalMinEt        = cms.double(50.),
+                                                        baddetEcal    = baddetEcallist,
+                                                        taggingMode = cms.bool(True),
+                                                        debug = cms.bool(False)
+                                                        )
 
 # If you only want to re-cluster and get the proper uncertainties
 #runMetCorAndUncFromMiniAOD(process,
@@ -185,7 +210,7 @@ RecJet = cms.untracked.bool(True),
 # collections
 MuonCollectionTag = cms.InputTag("slimmedMuons"), 
 ElectronCollectionTag = cms.InputTag("slimmedElectrons"),
-applyElectronESShift = cms.untracked.bool(True),
+applyElectronESShift = cms.untracked.bool(False),
 #######new in 9.4.0
 eleMvanoIsoWP90Fall17Map = cms.InputTag("egmGsfElectronIDs:mvaEleID-Fall17-noIso-V1-wp90"),
 eleMvanoIsoWP80Fall17Map = cms.InputTag("egmGsfElectronIDs:mvaEleID-Fall17-noIso-V1-wp80"),
@@ -486,7 +511,8 @@ process.p = cms.Path(
 #  process.puppiMETSequence *
 #  process.fullPatMetSequencePuppi *
 #  process.fullPatMetSequenceModifiedMET *
-  process.egmGsfElectronIDSequence * 
+  process.ecalBadCalibReducedMINIAODFilter*
+  process.egmGsfElectronIDSequence *
   process.rerunMvaIsolationSequence *      # add new tau ids
   process.NewTauIDsEmbedded *              # add new tau ids
   #process.rerunMvaIsolation2SeqRun2 *
