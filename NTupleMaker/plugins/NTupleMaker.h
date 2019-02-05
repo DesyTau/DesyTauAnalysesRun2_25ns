@@ -350,6 +350,8 @@ class NTupleMaker : public edm::EDAnalyzer{
   edm::EDGetTokenT<bool> BadChCandFilterToken_;
   edm::EDGetTokenT<bool> BadPFMuonFilterToken_;  
 
+  edm::EDGetTokenT<bool> ecalBadCalibFilterUpdate_token;
+
   double cMuPtMin;
   double cMuEtaMax;
   vector<string> cMuHLTriggerMatching;
@@ -505,7 +507,7 @@ class NTupleMaker : public edm::EDAnalyzer{
   UChar_t trigger_level1bits[8];
   UChar_t trigger_level1[128];
   UChar_t trigger_HLT[128];
-
+  Bool_t _passecalBadCalibFilterUpdate;
   // beam spot   
   Float_t beamspot_x;
   Float_t beamspot_y;
