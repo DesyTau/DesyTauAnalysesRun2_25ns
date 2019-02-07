@@ -1,0 +1,17 @@
++RequestRuntime=10000
+
+RequestMemory = 2000
+
+executable = GluGluHToTauTau_M125_13TeV_powheg_pythia8_0.sh
+
+transfer_executable = True
+universe            = vanilla
+getenv              = True
+Requirements        = OpSysAndVer == "SL6"
+
+output              = GluGluHToTauTau_M125_13TeV_powheg_pythia8_0.out
+error               = GluGluHToTauTau_M125_13TeV_powheg_pythia8_0.error
+log                 = GluGluHToTauTau_M125_13TeV_powheg_pythia8_0.log
+
+queue
+

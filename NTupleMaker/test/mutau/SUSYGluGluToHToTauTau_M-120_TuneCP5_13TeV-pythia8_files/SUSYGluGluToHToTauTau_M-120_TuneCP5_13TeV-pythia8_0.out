@@ -1,0 +1,11 @@
+/nfs/dust/cms/user/cardinia/HtoTauTau/HiggsCP/CMSSW_9_4_9/src/DesyTauAnalyses/NTupleMaker/test/mutau/SUSYGluGluToHToTauTau_M-120_TuneCP5_13TeV-pythia8_files
+Number of single lepton trigger legs = 2
+Number of X trigger legs (lep leg)   = 2
+Number of X trigger legs (tau leg)   = 2
+Number of ditau trigger legs         = 0
+dxyLeptonCut 0.045
+dzLeptonCut 0.2
+/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/MCFall17/Signals//SUSYGluGluToHToTauTau_M-120_TuneCP5_13TeV-pythia8/SUSYGluGluToHToTauTau_M-120_TuneCP5_13TeV-pythia8_0.root
+/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/MCFall17/Signals//SUSYGluGluToHToTauTau_M-120_TuneCP5_13TeV-pythia8/SUSYGluGluToHToTauTau_M-120_TuneCP5_13TeV-pythia8_1.root
+/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/MCFall17/Signals//SUSYGluGluToHToTauTau_M-120_TuneCP5_13TeV-pythia8/SUSYGluGluToHToTauTau_M-120_TuneCP5_13TeV-pythia8_2.root
+Histogram GluGluHToTauTau_M125_13TeV_powheg_pythia8_pileup is not present in pileup file

@@ -1,0 +1,17 @@
++RequestRuntime=10000
+
+RequestMemory = 2000
+
+executable = SUSYGluGluToHToTauTau_M-120_TuneCP5_13TeV-pythia8_0.sh
+
+transfer_executable = True
+universe            = vanilla
+getenv              = True
+Requirements        = OpSysAndVer == "SL6"
+
+output              = SUSYGluGluToHToTauTau_M-120_TuneCP5_13TeV-pythia8_0.out
+error               = SUSYGluGluToHToTauTau_M-120_TuneCP5_13TeV-pythia8_0.error
+log                 = SUSYGluGluToHToTauTau_M-120_TuneCP5_13TeV-pythia8_0.log
+
+queue
+
