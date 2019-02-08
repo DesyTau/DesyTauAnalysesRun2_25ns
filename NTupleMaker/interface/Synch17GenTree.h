@@ -50,10 +50,29 @@ public :
   Float_t         acotautau_21;
   Float_t         acotautau_22;
 
+  Float_t         acotautauPsi_00;
+  Float_t         acotautauPsi_10;
+  Float_t         acotautauPsi_01;
+  Float_t         acotautauPsi_11;
+  Float_t         acotautauPsi_02;
+  Float_t         acotautauPsi_20;
+  Float_t         acotautauPsi_12;
+  Float_t         acotautauPsi_21;
+  Float_t         acotautauPsi_22;
+
+
 //gen vertex info is practical to have
   Float_t GenVertexX;
   Float_t GenVertexY;
   Float_t GenVertexZ;
+
+    Float_t VxConstitTau1;
+    Float_t VyConstitTau1;
+    Float_t VzConstitTau1;
+
+    Float_t VxConstitTau2;
+    Float_t VyConstitTau2;
+    Float_t VzConstitTau2;
   
 
   //////////////////////////////////////////////
@@ -81,10 +100,28 @@ public :
   TBranch        *b_acotautau_21;
   TBranch        *b_acotautau_22;
 
+  TBranch        *b_acotautauPsi_00;
+  TBranch        *b_acotautauPsi_10;
+  TBranch        *b_acotautauPsi_01;
+  TBranch        *b_acotautauPsi_11;
+  TBranch        *b_acotautauPsi_02;
+  TBranch        *b_acotautauPsi_20;
+  TBranch        *b_acotautauPsi_12;
+  TBranch        *b_acotautauPsi_21;
+  TBranch        *b_acotautauPsi_22;
+
 //gen vertex info is practical to have
   TBranch        *b_GenVertexX;
   TBranch        *b_GenVertexY;
   TBranch        *b_GenVertexZ;
+
+  //Merijn: branches for the tau decay product constituent vx etc.
+  TBranch        *b_VxConstitTau1;
+  TBranch        *b_VyConstitTau1;
+  TBranch        *b_VzConstitTau1;
+  TBranch        *b_VxConstitTau2;
+  TBranch        *b_VyConstitTau2;
+  TBranch        *b_VzConstitTau2;
 
   Synch17GenTree(TTree *tree=0);
   virtual ~Synch17GenTree();

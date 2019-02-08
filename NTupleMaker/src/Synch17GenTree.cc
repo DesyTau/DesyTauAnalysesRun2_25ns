@@ -57,7 +57,7 @@ void Synch17GenTree::ReadInit(TTree *tree)
    fCurrent = -1;
    fChain->SetMakeClass(1);
 
-   fChain->SetBranchAddress("Higgs_pt", &Higgs_pt, &b_Higgs_pt);
+   fChain->SetBranchAddress("GEN_Higgs_pt", &Higgs_pt, &b_Higgs_pt);
    fChain->SetBranchAddress("Higgs_eta", &Higgs_eta, &b_Higgs_eta);
    fChain->SetBranchAddress("Higgs_phi", &Higgs_phi, &b_Higgs_phi);
    fChain->SetBranchAddress("Higgs_mass", &Higgs_mass, &b_Higgs_mass);
@@ -82,11 +82,29 @@ void Synch17GenTree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("acotautau_21", &acotautau_21, &b_acotautau_21);
    fChain->SetBranchAddress("acotautau_22", &acotautau_22, &b_acotautau_22);
 
+   fChain->SetBranchAddress("acotautauPsi_00", &acotautauPsi_00, &b_acotautauPsi_00);
+   fChain->SetBranchAddress("acotautauPsi_10", &acotautauPsi_10, &b_acotautauPsi_10);
+   fChain->SetBranchAddress("acotautauPsi_01", &acotautauPsi_01, &b_acotautauPsi_01);
+   fChain->SetBranchAddress("acotautauPsi_11", &acotautauPsi_11, &b_acotautauPsi_11);   
+   fChain->SetBranchAddress("acotautauPsi_02", &acotautauPsi_02, &b_acotautauPsi_02);
+   fChain->SetBranchAddress("acotautauPsi_12", &acotautauPsi_12, &b_acotautauPsi_12);
+   fChain->SetBranchAddress("acotautauPsi_20", &acotautauPsi_20, &b_acotautauPsi_20);
+   fChain->SetBranchAddress("acotautauPsi_21", &acotautauPsi_21, &b_acotautauPsi_21);
+   fChain->SetBranchAddress("acotautauPsi_22", &acotautauPsi_22, &b_acotautauPsi_22);
+
   //gen vertex info useful to have
    fChain->SetBranchAddress("GenVertexX", &GenVertexX, &b_GenVertexX);
    fChain->SetBranchAddress("GenVertexY", &GenVertexY, &b_GenVertexY);
    fChain->SetBranchAddress("GenVertexZ", &GenVertexZ, &b_GenVertexZ);
 
+   //need to have vx tau constituents..
+   fChain->SetBranchAddress("VxConstitTau1", &VxConstitTau1, &b_VxConstitTau1);
+   fChain->SetBranchAddress("VyConstitTau1", &VyConstitTau1, &b_VyConstitTau1);
+   fChain->SetBranchAddress("VzConstitTau1", &VzConstitTau1, &b_VzConstitTau1);
+   
+   fChain->SetBranchAddress("VxConstitTau2", &VxConstitTau2, &b_VxConstitTau2);
+   fChain->SetBranchAddress("VyConstitTau2", &VyConstitTau2, &b_VyConstitTau2);
+   fChain->SetBranchAddress("VzConstitTau2", &VzConstitTau2, &b_VzConstitTau2);
    
    lock=true;
 }
@@ -160,34 +178,52 @@ void Synch17GenTree::WriteInit(TTree *tree) {
   fChain = tree;
   fCurrent = -1;
 
-   fChain->Branch("Higgs_pt", &Higgs_pt, "Higgs_pt/F");
-   fChain->Branch("Higgs_eta", &Higgs_eta, "Higgs_eta/F");
-   fChain->Branch("Higgs_phi", &Higgs_phi, "Higgs_phi/F");
-   fChain->Branch("Higgs_mass", &Higgs_mass, "Higgs_mass/F");
+   fChain->Branch("GEN_Higgs_pt", &Higgs_pt, "GEN_Higgs_pt/F");
+   fChain->Branch("GEN_Higgs_eta", &Higgs_eta, "GEN_Higgs_eta/F");
+   fChain->Branch("GEN_Higgs_phi", &Higgs_phi, "GEN_Higgs_phi/F");
+   fChain->Branch("GEN_Higgs_mass", &Higgs_mass, "GEN_Higgs_mass/F");
 
-   fChain->Branch("genpt_1", &genpt_1, "genpt_1/F");
-   fChain->Branch("genphi_1", &genphi_1, "genphi_1/F");
-   fChain->Branch("geneta_1", &geneta_1, "geneta_1/F");
-   fChain->Branch("genmode_1", &genmode_1, "genmode_1/I");
+   fChain->Branch("GEN_genpt_1", &genpt_1, "GEN_pt_1/F");
+   fChain->Branch("GEN_genphi_1", &genphi_1, "GEN_phi_1/F");
+   fChain->Branch("GEN_geneta_1", &geneta_1, "GEN_eta_1/F");
+   fChain->Branch("GEN_genmode_1", &genmode_1, "GEN_mode_1/I");
 
-   fChain->Branch("genpt_2", &genpt_2, "genpt_2/F");
-   fChain->Branch("genphi_2", &genphi_2, "genphi_2/F");
-   fChain->Branch("geneta_2", &geneta_2, "geneta_2/F");
-   fChain->Branch("genmode_2", &genmode_2, "genmode_2/I");
+   fChain->Branch("GEN_pt_2", &genpt_2, "GEN_pt_2/F");
+   fChain->Branch("GEN_phi_2", &genphi_2, "GEN_genphi_2/F");
+   fChain->Branch("GEN_eta_2", &geneta_2, "GEN_geneta_2/F");
+   fChain->Branch("GEN_mode_2", &genmode_2, "GEN_genmode_2/I");
 
-   fChain->Branch("acotautau_00", &acotautau_00, "acotautau_00/F");
-   fChain->Branch("acotautau_10", &acotautau_10, "acotautau_10/F");
-   fChain->Branch("acotautau_01", &acotautau_01, "acotautau_01/F");
-   fChain->Branch("acotautau_11", &acotautau_11, "acotautau_11/F");
-   fChain->Branch("acotautau_02", &acotautau_02, "acotautau_02/F");
-   fChain->Branch("acotautau_12", &acotautau_12, "acotautau_12/F");
-   fChain->Branch("acotautau_20", &acotautau_20, "acotautau_20/F");
-   fChain->Branch("acotautau_21", &acotautau_21, "acotautau_21/F");
-   fChain->Branch("acotautau_22", &acotautau_22, "acotautau_22/F");
+   fChain->Branch("GEN_acotautau_00", &acotautau_00, "GEN_acotautau_00/F");
+   fChain->Branch("GEN_acotautau_10", &acotautau_10, "GEN_acotautau_10/F");
+   fChain->Branch("GEN_acotautau_01", &acotautau_01, "GEN_acotautau_01/F");
+   fChain->Branch("GEN_acotautau_11", &acotautau_11, "GEN_acotautau_11/F");
+   fChain->Branch("GEN_acotautau_02", &acotautau_02, "GEN_acotautau_02/F");
+   fChain->Branch("GEN_acotautau_12", &acotautau_12, "GEN_acotautau_12/F");
+   fChain->Branch("GEN_acotautau_20", &acotautau_20, "GEN_acotautau_20/F");
+   fChain->Branch("GEN_acotautau_21", &acotautau_21, "GEN_acotautau_21/F");
+   fChain->Branch("GEN_acotautau_22", &acotautau_22, "GEN_acotautau_22/F");
 
-   fChain->Branch("GenVertexX", &GenVertexX, "GenVertexX/F");
-   fChain->Branch("GenVertexY", &GenVertexY, "GenVertexY/F");
-   fChain->Branch("GenVertexZ", &GenVertexZ, "GenVertexZ/F");
+   fChain->Branch("GEN_acotautauPsi_00", &acotautauPsi_00, "GEN_acotautauPsi_00/F");
+   fChain->Branch("GEN_acotautauPsi_10", &acotautauPsi_10, "GEN_acotautauPsi_10/F");
+   fChain->Branch("GEN_acotautauPsi_01", &acotautauPsi_01, "GEN_acotautauPsi_01/F");
+   fChain->Branch("GEN_acotautauPsi_11", &acotautauPsi_11, "GEN_acotautauPsi_11/F");
+   fChain->Branch("GEN_acotautauPsi_02", &acotautauPsi_02, "GEN_acotautauPsi_02/F");
+   fChain->Branch("GEN_acotautauPsi_12", &acotautauPsi_12, "GEN_acotautauPsi_12/F");
+   fChain->Branch("GEN_acotautauPsi_20", &acotautauPsi_20, "GEN_acotautauPsi_20/F");
+   fChain->Branch("GEN_acotautauPsi_21", &acotautauPsi_21, "GEN_acotautauPsi_21/F");
+   fChain->Branch("GEN_acotautauPsi_22", &acotautauPsi_22, "GEN_acotautauPsi_22/F");
+
+   fChain->Branch("GEN_VertexX", &GenVertexX, "GEN_VertexX/F");
+   fChain->Branch("GEN_VertexY", &GenVertexY, "GEN_VertexY/F");
+   fChain->Branch("GEN_VertexZ", &GenVertexZ, "GEN_VertexZ/F");
+
+   fChain->Branch("GEN_VxConstitTau1", &VxConstitTau1, "GEN_VxConstitTau1/F");
+   fChain->Branch("GEN_VyConstitTau1", &VyConstitTau1, "GEN_VyConstitTau1/F");
+   fChain->Branch("GEN_VzConstitTau1", &VzConstitTau1, "GEN_VzConstitTau1/F");
+   
+   fChain->Branch("GEN_VxConstitTau2", &VxConstitTau2, "GEN_VxConstitTau2/F");
+   fChain->Branch("GEN_VyConstitTau2", &VyConstitTau2, "GEN_VyConstitTau2/F");
+   fChain->Branch("GEN_VzConstitTau2", &VzConstitTau2, "GEN_VzConstitTau2/F");
 
 }
 

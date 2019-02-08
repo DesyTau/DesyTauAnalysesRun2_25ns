@@ -251,6 +251,13 @@ public :
   Float_t         acotautau_10;
   Float_t         acotautau_01;
   Float_t         acotautau_11;
+
+  //Merijn add acotau for psi:
+  Float_t         acotautauPsi_00;
+  Float_t         acotautauPsi_10;
+  Float_t         acotautauPsi_01;
+  Float_t         acotautauPsi_11;
+
   Int_t		  pdgcodetau2;
 
   //Points of closest approach
@@ -275,6 +282,15 @@ public :
   Float_t GenVertexX;
   Float_t GenVertexY;
   Float_t GenVertexZ;
+
+  //Merijn: add the vx of the tau decay products
+  Float_t VxConstitTau1;
+  Float_t VyConstitTau1;
+  Float_t VzConstitTau1;
+  
+  Float_t VxConstitTau2;
+  Float_t VyConstitTau2;
+  Float_t VzConstitTau2;
 
 
   //////////////////////////////////////////////
@@ -509,6 +525,11 @@ public :
   TBranch        *b_acotautau_10;
   TBranch        *b_acotautau_01;
   TBranch        *b_acotautau_11;
+
+  TBranch        *b_acotautauPsi_00;
+  TBranch        *b_acotautauPsi_10;
+  TBranch        *b_acotautauPsi_01;
+  TBranch        *b_acotautauPsi_11;
   TBranch	 *b_pdgcodetau2;
 
   //Points of closest approach
@@ -536,6 +557,14 @@ public :
   TBranch        *b_GenVertexX;
   TBranch        *b_GenVertexY;
   TBranch        *b_GenVertexZ;
+  
+  TBranch        *b_VxConstitTau1;
+  TBranch        *b_VyConstitTau1;
+  TBranch        *b_VzConstitTau1;
+
+  TBranch        *b_VxConstitTau2;
+  TBranch        *b_VyConstitTau2;
+  TBranch        *b_VzConstitTau2; 
 
   Synch17Tree(TTree *tree=0);
   virtual ~Synch17Tree();
