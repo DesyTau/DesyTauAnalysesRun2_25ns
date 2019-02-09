@@ -647,9 +647,9 @@ int main(int argc, char * argv[]){
     std::cout << "      number of entries in Tree = " << numberOfEntries << std::endl;
     ///////////////EVENT LOOP///////////////
 
-//for (Long64_t iEntry=0; iEntry<1000; iEntry++) {
+for (Long64_t iEntry=0; iEntry<10; iEntry++) {
 
-for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) {
+//for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) {
   // cout<<"iEntry "<<iEntry<<endl;
       counter[0]++;
       analysisTree.GetEntry(iEntry);
@@ -1909,6 +1909,13 @@ void initializeCPvar(Synch17Tree *otree){
   otree->acotautau_01=-9999;
   otree->acotautau_10=-9999;
   otree->acotautau_11=-9999;
+  /*
+  otree->acotautau_20=-9999;
+  otree->acotautau_02=-9999;
+  otree->acotautau_21=-9999;
+  otree->acotautau_12=-9999;
+  otree->acotautau_22=-9999;
+  */
 
   //Merijn added the angle psi, currently for debugging purpose. Later may extend to 3-prong..
   otree->acotautauPsi_00=-9999;
@@ -1916,13 +1923,8 @@ void initializeCPvar(Synch17Tree *otree){
   otree->acotautauPsi_10=-9999;
   otree->acotautauPsi_11=-9999;
 
-  /*
-  otree->acotautauPsi_20=-9999;
-  otree->acotautauPsi_02=-9999;
-  otree->acotautauPsi_21=-9999;
-  otree->acotautauPsi_12=-9999;
-  otree->acotautauPsi_22=-9999;
-  */
+  
+  
   otree->tau1DecayPlaneX=-9999;
   otree->tau1DecayPlaneY=-9999;
   otree->tau1DecayPlaneZ=-9999;
@@ -1945,32 +1947,32 @@ void initializeGenTree(Synch17GenTree *gentree){
   gentree->Higgs_eta=-9999;
   gentree->Higgs_phi=-9999;
   gentree->Higgs_mass=-9999;
-  gentree->genpt_1=-9999;
-  gentree->geneta_1=-9999;
-  gentree->genphi_1=-9999;
-  gentree->genpt_2=-9999;
-  gentree->geneta_2=-9999;
-  gentree->genphi_2=-9999;
+  gentree->pt_1=-9999;
+  gentree->eta_1=-9999;
+  gentree->phi_1=-9999;
+  gentree->pt_2=-9999;
+  gentree->eta_2=-9999;
+  gentree->phi_2=-9999;
   gentree->acotautau_00 = -9999;
   gentree->acotautau_10 = -9999;
   gentree->acotautau_01 = -9999;
   gentree->acotautau_11 = -9999;
+  gentree->acotautau_02=-9999;
+  gentree->acotautau_20=-9999;
+  gentree->acotautau_12=-9999;
+  gentree->acotautau_21=-9999;
+  gentree->acotautau_22=-9999;
 
    //Merijn added the angle psi, currently for debugging purpose. Later may extend to 3-prong..
   gentree->acotautauPsi_00=-9999;
   gentree->acotautauPsi_01=-9999;
   gentree->acotautauPsi_10=-9999;
   gentree->acotautauPsi_11=-9999;
-  gentree->acotautauPsi_02=-9999;
-  gentree->acotautauPsi_20=-9999;
-  gentree->acotautauPsi_12=-9999;
-  gentree->acotautauPsi_21=-9999;
-  gentree->acotautauPsi_22=-9999;
 
   //init the new vertex variables to something nonsensible also
-  gentree->GenVertexX=-9999;
-  gentree->GenVertexY=-9999;
-  gentree->GenVertexZ=-99999;
+  gentree->VertexX=-9999;
+  gentree->VertexY=-9999;
+  gentree->VertexZ=-99999;
 
   gentree->VxConstitTau1=-9999;
   gentree->VyConstitTau1=-9999;
@@ -2016,29 +2018,29 @@ void FillGenTree(const AC1B * analysisTree, Synch17GenTree *gentree, TString ch)
 
   TLorentzVector genTauVis1; genTauVis1.SetXYZT(0,0,0,0);
   TLorentzVector genTauVis2; genTauVis2.SetXYZT(0,0,0,0);
-  gentree->genmode_1 = -1;
-  gentree->genmode_2 = -1;
+  gentree->decaymode_1 = -1;
+  gentree->decaymode_2 = -1;
   if (LeadingtauIndex>-1) {
     genTauVis1.SetXYZT(analysisTree->gentau_visible_px[LeadingtauIndex],
 		       analysisTree->gentau_visible_py[LeadingtauIndex],
 		       analysisTree->gentau_visible_pz[LeadingtauIndex],
 		       analysisTree->gentau_visible_e[LeadingtauIndex]);
-    gentree->genmode_1 = analysisTree->gentau_decayMode[LeadingtauIndex];
+    gentree->decaymode_1 = analysisTree->gentau_decayMode[LeadingtauIndex];
   }
   if (TrailingtauIndex>-1) {
     genTauVis2.SetXYZT(analysisTree->gentau_visible_px[TrailingtauIndex],
 		       analysisTree->gentau_visible_py[TrailingtauIndex],
 		       analysisTree->gentau_visible_pz[TrailingtauIndex],
 		       analysisTree->gentau_visible_e[TrailingtauIndex]);
-    gentree->genmode_2 = analysisTree->gentau_decayMode[TrailingtauIndex];
+    gentree->decaymode_2 = analysisTree->gentau_decayMode[TrailingtauIndex];
   }
-  gentree->genpt_1 = genTauVis1.Pt();
-  gentree->geneta_1 = genTauVis1.Eta();
-  gentree->genphi_1 = genTauVis1.Phi();
+  gentree->pt_1 = genTauVis1.Pt();
+  gentree->eta_1 = genTauVis1.Eta();
+  gentree->phi_1 = genTauVis1.Phi();
 
-  gentree->genpt_2 = genTauVis2.Pt();
-  gentree->geneta_2 = genTauVis2.Eta();
-  gentree->genphi_2 = genTauVis2.Phi();
+  gentree->pt_2 = genTauVis2.Pt();
+  gentree->eta_2 = genTauVis2.Eta();
+  gentree->phi_2 = genTauVis2.Phi();
 
   double dR;
   const double dRcut=0.3;
@@ -2059,23 +2061,12 @@ void FillGenTree(const AC1B * analysisTree, Synch17GenTree *gentree, TString ch)
     }
   }
 
-  //Merijn: this is all done also in gen_acott, so don't do here..
-  /*
-  gentree->acotautau_00 = -9999;
-  gentree->acotautau_01 = -9999;
-  gentree->acotautau_10 = -9999;
-  gentree->acotautau_11 = -9999;
-
-  //Meirjn not sure why init it appears again here..
-  gentree->acotautauPsi_00 = -9999;
-  gentree->acotautauPsi_01 = -9999;
-  gentree->acotautauPsi_10 = -9999;
-  gentree->acotautauPsi_11 = -9999;
-  */
   
   if (LeadingtauIndex>-1&&TrailingtauIndex>-1)
     gen_acott(analysisTree,gentree,LeadingtauIndex,TrailingtauIndex);
 
+  gentree->a1polarization_1=gen_A1Polarization(analysisTree,LeadingtauIndex);
+  gentree->a1polarization_2=gen_A1Polarization(analysisTree,TrailingtauIndex);
 
 //here fill the generator vertices to have the information present in tree
 //Note: we may want to add constraint that the W and Z are prompt. If we remove these, may get in trouble with a DY or W MC sample..
@@ -2084,9 +2075,9 @@ void FillGenTree(const AC1B * analysisTree, Synch17GenTree *gentree, TString ch)
   for (unsigned int igen=0; igen<analysisTree->genparticles_count; ++igen) {
     if ((analysisTree->genparticles_pdgid[igen]==23||analysisTree->genparticles_pdgid[igen]==24||
 	analysisTree->genparticles_pdgid[igen]==25||analysisTree->genparticles_pdgid[igen]==35||analysisTree->genparticles_pdgid[igen]==36)&&analysisTree->genparticles_isLastCopy[igen]==1&&analysisTree->genparticles_isPrompt[igen]==1) {
-      gentree->GenVertexX=analysisTree->genparticles_vx[igen];
-      gentree->GenVertexY=analysisTree->genparticles_vy[igen];
-      gentree->GenVertexZ=analysisTree->genparticles_vz[igen];
+      gentree->VertexX=analysisTree->genparticles_vx[igen];
+      gentree->VertexY=analysisTree->genparticles_vy[igen];
+      gentree->VertexZ=analysisTree->genparticles_vz[igen];
       break;
     }
   }

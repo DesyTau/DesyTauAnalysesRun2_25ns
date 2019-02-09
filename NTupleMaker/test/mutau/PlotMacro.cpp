@@ -94,8 +94,8 @@ int PlotMacro(){
 
   gStyle->SetOptStat(0);
   
-  int sample=2;
-  int GenReco=1; //1 is RECO
+  int sample=0;
+  int GenReco=0; //1 is RECO
   int Prong=0;//specifies calculation of hadronic vertex acotauta_0*prong*. 0 is impact param, 1 is rho or a particle.
   int DecayMode=0; //Note: genmode1=8. For first reco tau no need to specify anything per def.. 
   int PhiorPsi=0;	  
@@ -107,7 +107,9 @@ int PlotMacro(){
   
   TString samplename="";   
  // if(sample==0)samplename="ggH_125"; //ggH_125_0_mt_Sync
-  if(sample==0)samplename="ggH_125_0_mt_Sync"; //for checking use line below..
+ // if(sample==0)samplename="ggH_125_0_mt_Sync"; //for checking use line below..
+if(sample==0)samplename="filelist_ggh_Update_SingleFile_0_mt_Sync";
+
   //  if(sample==0)samplename="ggH_125_SingleFile_PubLoc_0_mt_Sync";	
 //  if(sample==0)samplename="ggH_125_SingleFile_0_mt_Sync";	
   //  if(sample==1)samplename="SUSYGluGluHTauTau_120";

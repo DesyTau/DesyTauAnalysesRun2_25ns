@@ -10,6 +10,7 @@
 #include "DesyTauAnalyses/NTupleMaker/interface/functions.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/PileUp.h"
 
+#define PI_MASS  0.13957 //All energies and momenta are expressed in GeV
 
 /*Updates Merijn 2018 11 13
 -added acott_Impr, which is improved version of acott. Note it takes the decay channel as input also. 
@@ -18,7 +19,7 @@ If the channel is e-t or mu-t, it will calculate the lepton vx etc.
 -looking into potential issue with acoCPCOUT
 */
 
-double pimass=0.134; //Merijn 2019 2 8 in order to compile..
+double pimass=0.134; //Merijn 2019 2 8 in order to compile.. this is for neutral pion..
 
 void acott(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, int tauIndex2);
 
@@ -27,7 +28,6 @@ TLorentzVector chargedPivec(const AC1B * analysisTree, int tauIndex);
 TLorentzVector neutralPivec(const AC1B * analysisTree, int tauIndex);
 TLorentzVector ipVec(const AC1B * analysisTree, int tauIndex);
 int chargedPiIndex(const AC1B * analysisTree, int tauIndex);
-int chargedMuIndex(const AC1B * analysisTree, int tauIndex);
 
 void gen_acott(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, int tauIndex2);
 TLorentzVector gen_chargedPivec(const AC1B * analysisTree, int tauIndex, int partId);
@@ -47,7 +47,7 @@ double acoCP(TLorentzVector Pi1, TLorentzVector Pi2,
 
 double acoCP(TLorentzVector Pi1, TLorentzVector Pi2, 
 	     TLorentzVector ref1, TLorentzVector ref2,
-	     bool firstNegative, bool pi01, bool pi02, Synch17GenTree *otree);
+	     bool firstNegative, bool pi01, bool pi02, Synch17GenTree* gentree);
 
 
 //Merijn: updated function to do CP calculations
@@ -146,9 +146,17 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
     tau1Prong=chargedPivec(analysisTree,tauIndex1);//Merijn: changed to index1. Only works if call for tt!
     int piIndex_=chargedPiIndex(analysisTree,tauIndex1);
     if(piIndex_>-1){
+      
+      /*
       otree->VxConstitTau1=analysisTree->tau_constituents_vx[tauIndex1][piIndex_];
       otree->VyConstitTau1=analysisTree->tau_constituents_vy[tauIndex1][piIndex_];   
-      otree->VzConstitTau1=analysisTree->tau_constituents_vz[tauIndex1][piIndex_];      
+      otree->VzConstitTau1=analysisTree->tau_constituents_vz[tauIndex1][piIndex_];*/
+
+      //Merijn 2019 2 9: updated to new definition
+      otree->VxConstitTau1=analysisTree->tau_pca3D_x[tauIndex1];
+      otree->VyConstitTau1=analysisTree->tau_pca3D_y[tauIndex1];
+      otree->VzConstitTau1=analysisTree->tau_pca3D_z[tauIndex1];
+      
     }
   }
   
@@ -158,9 +166,16 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
   tau2Prong=chargedPivec(analysisTree,tauIndex2);
   int piIndexfortau2=chargedPiIndex(analysisTree,tauIndex2);
   if(piIndexfortau2>-1){
+    /*
     otree->VxConstitTau2=analysisTree->tau_constituents_vx[tauIndex2][piIndexfortau2];
     otree->VyConstitTau2=analysisTree->tau_constituents_vy[tauIndex2][piIndexfortau2];   
-    otree->VzConstitTau2=analysisTree->tau_constituents_vz[tauIndex2][piIndexfortau2];      
+    otree->VzConstitTau2=analysisTree->tau_constituents_vz[tauIndex2][piIndexfortau2]; */
+
+    //Merijn 2019 2 9: updated to new definition
+    otree->VxConstitTau2=analysisTree->tau_pca3D_x[tauIndex2];
+    otree->VyConstitTau2=analysisTree->tau_pca3D_y[tauIndex2];
+    otree->VzConstitTau2=analysisTree->tau_pca3D_z[tauIndex2];
+    
   }
     
   
@@ -264,35 +279,6 @@ if((analysisTree->tau_constituents_pdgId[tauIndex][i]*sign)==211){
   return piIndex;
 };
 
-int chargedMuIndex(const AC1B * analysisTree, int tauIndex){
-  //  cout<<"tauIndex "<<tauIndex<<endl;
-  // cout<<"from chargedPiIndex: analysisTree->tau_decayMode[tauIndex]; "<<analysisTree->tau_decayMode[tauIndex]<<endl;
-
-  int ncomponents = analysisTree->tau_constituents_count[tauIndex];
-  int piIndex=-1;
-  float maxPt=-1;
-  int sign = -1;
-  if(analysisTree->tau_charge[tauIndex]>0) sign = 1; 
-  for(int i=0;i<ncomponents;i++){ //selects the highest energy Pi with the same sign of the tau. 
-    //    cout<<"analysisTree->tau_constituents_pdgId[tauIndex][i] "<<analysisTree->tau_constituents_pdgId[tauIndex][i]<<endl;
-
-if((analysisTree->tau_constituents_pdgId[tauIndex][i]*sign)==13){
-//    if((analysisTree->tau_constituents_pdgId[tauIndex][i]*sign)==211||(analysisTree->tau_constituents_pdgId[tauIndex][i]*sign)==-13||(analysisTree->tau_constituents_pdgId[tauIndex][i]*sign)==-11){
-      TLorentzVector lvector; lvector.SetXYZT(analysisTree->tau_constituents_px[tauIndex][i],
-					      analysisTree->tau_constituents_py[tauIndex][i],
-					      analysisTree->tau_constituents_pz[tauIndex][i],
-					      analysisTree->tau_constituents_e[tauIndex][i]);
-      double Pt = lvector.Pt();
-      if(Pt>maxPt){
-	piIndex=i;
-	maxPt = Pt;
-      }
-    }
-  }
-  
-  return piIndex;
-};
-
 TLorentzVector neutralPivec(const AC1B * analysisTree, int tauIndex){
   int ncomponents = analysisTree->tau_constituents_count[tauIndex];
   int piIndex=-1;
@@ -375,6 +361,14 @@ TLorentzVector ipVec(const AC1B * analysisTree, int tauIndex) {
 		       analysisTree->tau_pca3D_y[tauIndex],
 		       analysisTree->tau_pca3D_z[tauIndex]);
     
+/* Merijn 2019 2 9: old merge conflict here, looks entirely innocent..
+<<<<<<< HEAD
+    
+=======
+     
+>>>>>>> aba59220157a5bd7311e6ee2c2d82aef877de870
+    */
+    
     TVector3 momenta(analysisTree->tau_constituents_px[tauIndex][piIndex],
 		     analysisTree->tau_constituents_py[tauIndex][piIndex],
 		     analysisTree->tau_constituents_pz[tauIndex][piIndex]);
@@ -450,7 +444,6 @@ momenta.SetXYZ(analysisTree->muon_px[tauIndex],
  }
 
 
-
     TVector3 r(0.,0.,0.);
     r=secvertex-vertex;
     
@@ -464,9 +457,7 @@ momenta.SetXYZ(analysisTree->muon_px[tauIndex],
   return vec;
 };
 
- 
 void gen_acott(const AC1B * analysisTree, Synch17GenTree *gentree, int tauIndex1, int tauIndex2){
-  //cout<<"start gen_acott "<<endl;
 
   bool correctDecay1 = analysisTree->gentau_decayMode[tauIndex1]<=6||analysisTree->gentau_decayMode[tauIndex1]==8||analysisTree->gentau_decayMode[tauIndex1]==9;
   bool correctDecay2 = analysisTree->gentau_decayMode[tauIndex2]<=6||analysisTree->gentau_decayMode[tauIndex2]==8||analysisTree->gentau_decayMode[tauIndex2]==9;
@@ -483,14 +474,12 @@ void gen_acott(const AC1B * analysisTree, Synch17GenTree *gentree, int tauIndex1
   gentree->acotautau_01 = -9999;
   gentree->acotautau_11 = -9999;
 
-//<<<<<<< HEAD Merijn 2019 2 7: like to keep the initialisation in the merging conflict..
+  gentree->acotautau_20 = -9999;
+  gentree->acotautau_02 = -9999;
+  gentree->acotautau_21 = -9999;
+  gentree->acotautau_12 = -9999;
+  gentree->acotautau_22 = -9999;
 
-  gentree->acotautauPsi_00=-9999;
-  gentree->acotautauPsi_01=-9999;
-  gentree->acotautauPsi_10=-9999;
-  gentree->acotautauPsi_11=-9999;
-
-  //Merijn: initialise. It shouldn't be needed though?
   gentree->VxConstitTau1=-9999;
   gentree->VyConstitTau1=-9999;
   gentree->VzConstitTau1=-9999;
@@ -499,17 +488,8 @@ void gen_acott(const AC1B * analysisTree, Synch17GenTree *gentree, int tauIndex1
   gentree->VyConstitTau2=-9999;
   gentree->VzConstitTau2=-9999;
 
-  //Merijn 2019 2 7: originally there was a /* token here. I removed it, it seemed out of place/merging problem
-
-
-  gentree->acotautau_20 = -9999;
-  gentree->acotautau_02 = -9999;
-  gentree->acotautau_21 = -9999;
-  gentree->acotautau_12 = -9999;
-  gentree->acotautau_22 = -9999;
-  
-  gentree->genmode_1 = analysisTree->gentau_decayMode[tauIndex1];
-  gentree->genmode_2 = analysisTree->gentau_decayMode[tauIndex2];
+  gentree->decaymode_1 = analysisTree->gentau_decayMode[tauIndex1];
+  gentree->decaymode_2 = analysisTree->gentau_decayMode[tauIndex2];
 
   if (!correctDecay)
     return;
@@ -529,10 +509,10 @@ void gen_acott(const AC1B * analysisTree, Synch17GenTree *gentree, int tauIndex1
   }
   int partId1 = 211;
   int partId2 = 211;
-  if (analysisTree->gentau_decayMode[tauIndex1]==8) partId1 = 13;
-  if (analysisTree->gentau_decayMode[tauIndex1]==9) partId1 = 11;
-  if (analysisTree->gentau_decayMode[tauIndex2]==8) partId2 = 13;
-  if (analysisTree->gentau_decayMode[tauIndex2]==9) partId2 = 11;
+  if (analysisTree->gentau_decayMode[tauIndex1]==8) partId1 = -13;
+  if (analysisTree->gentau_decayMode[tauIndex1]==9) partId1 = -11;
+  if (analysisTree->gentau_decayMode[tauIndex2]==8) partId2 = -13;
+  if (analysisTree->gentau_decayMode[tauIndex2]==9) partId2 = -11;
 
 
   //4-momenta of charged and neutral Pi
@@ -553,18 +533,6 @@ void gen_acott(const AC1B * analysisTree, Synch17GenTree *gentree, int tauIndex1
   TLorentzVector tau2Pi0;
   tau2Pi0.SetXYZT(0.,0.,0.,0.);
 
-//<<<<<<< HEAD Merijn 2019 2 7: want to keep this in merged conflict..
-  //Merijn: add to extract the charged pion info..
-  gentree->VxConstitTau1=analysisTree->genparticles_vx[piIndex1];
-  gentree->VyConstitTau1=analysisTree->genparticles_vy[piIndex1];
-  gentree->VzConstitTau1=analysisTree->genparticles_vz[piIndex1];
-
-  gentree->VxConstitTau2=analysisTree->genparticles_vx[piIndex2];
-  gentree->VyConstitTau2=analysisTree->genparticles_vy[piIndex2];
-  gentree->VzConstitTau2=analysisTree->genparticles_vz[piIndex2];
- 
-// >>>>>>> 773e02d1a8f2e699e17b3e7c57153f56b1fd3d4b
-
   if (oneProngPi01) tau1Pi0 = gen_neutralPivec(analysisTree,tauIndex1);  
   if (oneProngPi02) tau2Pi0 = gen_neutralPivec(analysisTree,tauIndex2);
 
@@ -581,68 +549,62 @@ void gen_acott(const AC1B * analysisTree, Synch17GenTree *gentree, int tauIndex1
     tau2IP = gen_ipVec(analysisTree,tauIndex2,vertex);
   }
 
+  gentree->VxConstitTau1=analysisTree->genparticles_vx[piIndex1];
+  gentree->VyConstitTau1=analysisTree->genparticles_vy[piIndex1];
+  gentree->VzConstitTau1=analysisTree->genparticles_vz[piIndex1];
+
+  gentree->VxConstitTau2=analysisTree->genparticles_vx[piIndex2];
+  gentree->VyConstitTau2=analysisTree->genparticles_vy[piIndex2];
+  gentree->VzConstitTau2=analysisTree->genparticles_vz[piIndex2];
+ 
+
   bool firstNegative = false;
   if (analysisTree->genparticles_pdgid[piIndex1]==-211) firstNegative = true;
   if (analysisTree->genparticles_pdgid[piIndex1]==11) firstNegative = true;
   if (analysisTree->genparticles_pdgid[piIndex1]==13) firstNegative = true;
   
-//<<<<<<< HEAD Merijn 2019 2 7: I keep the call with the gentree as argument. We decide to keep it for now, later implement in better way
-  gentree->acotautau_00=acoCP(tau1Prong,tau2Prong,tau1IP,tau2IP,firstNegative,false,false,gentree);
-//  gentree->acotautau_00=acoCP(tau1Prong,tau2Prong,tau1IP,tau2IP,firstNegative,false,false);
-//>>>>>>> 773e02d1a8f2e699e17b3e7c57153f56b1fd3d4b
+  gentree->acotautau_00=acoCP(tau1Prong,tau2Prong,tau1IP,tau2IP,firstNegative,false,false, gentree);
 
   if (oneProngPi01)
-    gentree->acotautau_10=acoCP(tau1Prong,tau2Prong,tau1Pi0,tau2IP,firstNegative,true,false,gentree);
-  
-  if (oneProngPi02){
-    gentree->acotautau_01=acoCP(tau1Prong,tau2Prong,tau1IP,tau2Pi0,firstNegative,false,true,gentree);}
+    gentree->acotautau_10=acoCP(tau1Prong,tau2Prong,tau1Pi0,tau2IP,firstNegative,true,false, gentree);
 
+  //Merijn: I think we need the other configuration also..
+    if (oneProngPi02)
+    gentree->acotautau_01=acoCP(tau1Prong,tau2Prong,tau1IP,tau2Pi0,firstNegative,false,true, gentree);
+  
+
+  //Merijn 2019 2 9: presume that this is code supposed to keep by Andrea..
+  //Merijn 2019 2 9: the gentree arugment was kept. I remove it now..
   if (oneProngPi01&&oneProngPi02)
-    gentree->acotautau_11=acoCP(tau1Prong,tau2Prong,tau1Pi0,tau2Pi0,firstNegative,true,true,gentree);
-  
-//Merijn 2019 2 7: I really don know which is correct, Andrea please pick..
-//<<<<<<< HEAD
-/*
-  if(threeProngPi01)
-    gentree->acotautau_20=acoCP(tau1Prong,tau2Prong,tau1IP,tau2IP,firstNegative,false,false,gentree);
+    gentree->acotautau_11=acoCP(tau1Prong,tau2Prong,tau1Pi0,tau2Pi0,firstNegative,true,true, gentree);
 
-  if(threeProngPi02)
-    gentree->acotautau_02=acoCP(tau1Prong,tau2Prong,tau1IP,tau2IP,firstNegative,false,false,gentree);
-
-  if (oneProngPi01&&threeProngPi02)
-    gentree->acotautau_12=acoCP(tau1Prong,tau2Prong,tau1Pi0,tau2IP,firstNegative,true,false,gentree);
-
-  if (threeProngPi01&&oneProngPi02)
-    gentree->acotautau_21=acoCP(tau1Prong,tau2Prong,tau1IP,tau2Pi0,firstNegative,false,true,gentree);
-
-  if(threeProngPi01&&threeProngPi02)
-    gentree->acotautau_22=acoCP(tau1Prong,tau2Prong,tau1IP,tau2IP,firstNegative,false,false,gentree);
-  
-  // if(gentree->acotautau_01!=gentree->acotautau_01) cout<<"gentree->acotautau_01 strange "<<gentree->acotautau_01<<endl;
-  // if(isinf(gentree->acotautau_01)) cout<<"gentree->acotautau_01 strange "<<gentree->acotautau_01<<endl;
-
-=======
-*/
   if(threeProng1)
-    gentree->acotautau_20=acoCP(tau1_3ProngVec,tau2Prong,tau1IP,tau2IP,firstNegative,false,false,gentree);
+    gentree->acotautau_20=acoCP(tau1_3ProngVec,tau2Prong,tau1IP,tau2IP,firstNegative,false,false, gentree);
 
   if(threeProng2)
-    gentree->acotautau_02=acoCP(tau1Prong,tau2_3ProngVec,tau1IP,tau2IP,firstNegative,false,false,gentree);
+    gentree->acotautau_02=acoCP(tau1Prong,tau2_3ProngVec,tau1IP,tau2IP,firstNegative,false,false, gentree);
 
   if (oneProngPi01&&threeProng2)
-    gentree->acotautau_12=acoCP(tau1Prong,tau2_3ProngVec,tau1Pi0,tau2IP,firstNegative,true,false,gentree);
+    gentree->acotautau_12=acoCP(tau1Prong,tau2_3ProngVec,tau1Pi0,tau2IP,firstNegative,true,false, gentree);
 
   if (threeProng1&&oneProngPi02)
-    gentree->acotautau_21=acoCP(tau1_3ProngVec,tau2Prong,tau1IP,tau2Pi0,firstNegative,false,true,gentree);
+    gentree->acotautau_21=acoCP(tau1_3ProngVec,tau2Prong,tau1IP,tau2Pi0,firstNegative,false,true, gentree);
 
   if(threeProng1&&threeProng2)
+    /*
+    //<<<<<<< HEAD
     gentree->acotautau_22=acoCP(tau1_3ProngVec,tau2_3ProngVec,tau1IP,tau2IP,firstNegative,false,false,gentree);
-
-//>>>>>>> 773e02d1a8f2e699e17b3e7c57153f56b1fd3d4b
-
+    
+    //>>>>>>> 773e02d1a8f2e699e17b3e7c57153f56b1fd3d4b
+    
+    =======
+    >>>>>>> aba59220157a5bd7311e6ee2c2d82aef877de870
+    */
+    //Meirjn 2019 2 9: assume this is what want to keep 
+    gentree->acotautau_22=acoCP(tau1_3ProngVec,tau2_3ProngVec,tau1IP,tau2IP,firstNegative,false,false, gentree);
 
 };
-
+ 
 
 TLorentzVector gen_chargedPivec(const AC1B * analysisTree, int tauIndex, int partId){
   int piIndex=-1;
@@ -833,10 +795,8 @@ TLorentzVector gen_ipVec(const AC1B * analysisTree, int tauIndex, TVector3 verte
 };
 
 
-
 vector<int> gen_ThreeProngIndices(const AC1B * analysisTree, int tauIndex){
   int npart = analysisTree->genparticles_count;
-  int piIndex=-1;
   TLorentzVector Tau;
   double dR;
   double dRcut=0.5;
@@ -848,6 +808,7 @@ vector<int> gen_ThreeProngIndices(const AC1B * analysisTree, int tauIndex){
   ThreeProngIndices.push_back(gen_chargedPiIndex(analysisTree,tauIndex,211));
   for(int i=0;i<npart;i++){
     if((analysisTree->genparticles_pdgid[i]*analysisTree->gentau_charge[tauIndex]==211)&&(analysisTree->genparticles_info[i]==12||analysisTree->genparticles_info[i]==5)&&analysisTree->genparticles_isLastCopy[i]){
+      if(i==ThreeProngIndices.at(0))continue;
       TLorentzVector lvector;
       lvector.SetXYZT(analysisTree->genparticles_px[i],
 		      analysisTree->genparticles_py[i],
@@ -885,7 +846,8 @@ TLorentzVector gen_ThreeProngVec(const AC1B * analysisTree, int tauIndex){
   ThreeProngVec.SetXYZT(0.,0.,0.,0.);
   
   if(npart!=3){
-    //    cout << "ERROR: found more than 3 prongs!" << endl;
+    //Meirjn 2010 2 9: Andrea and Merijn commented out a warning message here..
+    
     return ThreeProngVec;
   }
   
@@ -912,7 +874,7 @@ TVector3 gen_ThreeProngSVertex(const AC1B * analysisTree, int tauIndex){
   TVector3 ThreeProngSVertex={0.,0.,0.};
   
   if(npart!=3){ 
-    cout << "ERROR: found more than 3 prongs!" << endl;
+    //cout << "ERROR: found more than 3 prongs!" << endl;
     return ThreeProngSVertex;
   }  
   for(int piIndex : ThreeProngIndices){//selects the highest energy Pi
@@ -929,8 +891,7 @@ TVector3 gen_ThreeProngSVertex(const AC1B * analysisTree, int tauIndex){
 //WORK IN PROGRESS
 float Bfunction(TLorentzVector pi, TLorentzVector a1){
   float B = 0.;
-  B=(pow(pi.E()*a1.E()-a1.Vect().Dot(pi.Vect()),2)-a1.Mag2()*pimass)/a1.Mag2();
-
+  B=(pow(pi.E()*a1.E()-(a1.Vect()).Dot(pi.Vect()),2)-a1.Mag2()*PI_MASS*PI_MASS)/a1.Mag2();
   return B;
 };
 
@@ -938,8 +899,9 @@ Float_t gen_A1Polarization(const AC1B * analysisTree, int tauIndex){
   vector<int> ThreeProngIndices = gen_ThreeProngIndices(analysisTree,tauIndex);
   float pol=-9999.;
   int npart = ThreeProngIndices.size();
-  if(npart!=3){
-    cout << "ERROR: found more than 3 prongs!" << endl;
+  if(analysisTree->gentau_decayMode[tauIndex]!=4)return pol;
+  else if(npart!=3){
+    //cout << "ERROR: found " << npart << " prongs!" << endl;
     return pol;
   }
   TLorentzVector LVec[3];
@@ -948,24 +910,53 @@ Float_t gen_A1Polarization(const AC1B * analysisTree, int tauIndex){
   LVecSum.SetXYZT(0.,0.,0.,0.);
   int i=0;
   for(int piIndex : ThreeProngIndices){//selects the highest energy Pi
-    LVec[i].SetXYZT(analysisTree->genparticles_px[piIndex],
+    LVec[i].SetPxPyPzE(analysisTree->genparticles_px[piIndex],
 			 analysisTree->genparticles_py[piIndex],
 			 analysisTree->genparticles_pz[piIndex],
 			 analysisTree->genparticles_e[piIndex]);
-    // Vec[i]=LVec.Vect(); Merijn 2019 2 8: commented out due to compilation issue, can;'t resolve what is meant
+
+    //Merijn 2019 2 9: commented originally this out due to compilation issue.
+    Vec[i]=LVec[i].Vect();
     LVecSum+=LVec[i];
     i++;
   }
   TVector3 VecSum=LVecSum.Vect();
-  pol=Vec[3].Dot(Vec[1].Cross(Vec[2]))/VecSum.Mag();
+  //for(int j=0;j<3;j++) cout << "Pi" << j+1 << ": " << LVec[j].Px() << ": " << LVec[j].Py() << ": " << LVec[j].Pz() << ": " << LVec[j].E() << endl;
+  //cout << "a1: " << LVecSum.Px() << ": " << LVecSum.Py() << ": " << LVecSum.Pz() << ": " << LVecSum.E() << endl;
+
+  pol=Vec[2].Dot(Vec[0].Cross(Vec[1]))/VecSum.Mag();
+
+  //Lambda=1/2*sqrt(2 B1 B2 + 2 B2 B3 + 2 B3 B1 - B1^2 - B2^2 - B3^2)
   float Lambda=0.;
-  for(int j=0;j<3;j++)Lambda+=Bfunction(LVec[j],LVecSum);
-  Lambda=Lambda*Lambda;
-  for(int j=0;j<3;j++)Lambda+=-2*Bfunction(LVec[j],LVecSum);
+  bool problem=false;
+  for(int j=0;j<3;j++)Lambda+=Bfunction(LVec[j],LVecSum); 
+  Lambda=pow(Lambda,2);
+  //cout << endl;// << "B1+B2+B3: " << Lambda << endl;
+  //cout << "(B1+B2+B3)^2: " << Lambda << endl;
+  for(int j=0;j<3;j++)Lambda-=2*pow(Bfunction(LVec[j],LVecSum),2);
+  if(Lambda<0.) problem=true;
+
+  //Merijn 2019 2 9: comment out cout, since annoying when run over larger samples..
+  /*
+  if(problem){
+    cout << "PROBLEM" <<endl;
+    for(int j=0;j<3;j++)cout << " B" << j+1 << ": " << Bfunction(LVec[j],LVecSum);
+    cout << endl << "Lambda: " << Lambda <<endl;
+    }*/
   Lambda=0.5*pow(Lambda,0.5);
 
+  /*
+  if(problem){
+    cout << "pol: " << pol <<endl;
+    cout << "1/2 * sqrt(Lambda): " << Lambda <<endl;
+    cout << "cos(beta)= "<< pol/Lambda <<endl<<endl;
+  }
+  */
   return pol/Lambda;
 };
+
+
+
 
 //Merijn: adjust to take otree as well, conventient for debguggin..
 double acoCP(TLorentzVector Pi1, TLorentzVector Pi2, 
@@ -1053,10 +1044,9 @@ double acoCP(TLorentzVector Pi1, TLorentzVector Pi2,
 }
 
 
-//Merijn: quick and dirty overload with Synch17GenTree
 double acoCP(TLorentzVector Pi1, TLorentzVector Pi2, 
 	     TLorentzVector ref1, TLorentzVector ref2,
-	     bool firstNegative, bool pi01, bool pi02, Synch17GenTree *otree) {
+	     bool firstNegative, bool pi01, bool pi02, Synch17GenTree* otree) {
 
   double y1 = 1;
   double y2 = 1;
@@ -1074,13 +1064,6 @@ double acoCP(TLorentzVector Pi1, TLorentzVector Pi2,
   Pi2.Boost(boost);
   ref1.Boost(boost);
   ref2.Boost(boost);
-
-  //  std::cout << "First negative = " << firstNegative << "  pi01 = " << pi01 << "   pi02 = " << pi02 << std::endl;
-  //  std::cout << "Px(1) = " << Pi1.Px() << "  Py(1) = " << Pi1.Py() << "  Pz(1) = " << Pi1.Pz() << std::endl;
-  //  std::cout << "Px(2) = " << Pi2.Px() << "  Py(2) = " << Pi2.Py() << "  Pz(2) = " << Pi2.Pz() << std::endl;
-  //  std::cout << "Ux(1) = " << ref1.Px() << "  Uy(1) = " << ref1.Py() << "  Uz(1) = " << ref1.Pz() << std::endl;
-  //  std::cout << "Ux(2) = " << ref2.Px() << "  Uy(2) = " << ref2.Py() << "  Uz(2) = " << ref2.Pz() << std::endl;
-  //  std::cout << std::endl;
   
   // get 3-vectors
   TVector3 vecPi1 = Pi1.Vect();
@@ -1102,9 +1085,8 @@ double acoCP(TLorentzVector Pi1, TLorentzVector Pi2,
   vecRef2transv *= 1/vecRef2transv.Mag();
 
   double acop = TMath::ACos(vecRef1transv*vecRef2transv);
-  double acoporiginal=acop;
+
   double sign = vecPi2 * vecRef1transv.Cross(vecRef2transv);
-  double psioriginal =sign;//
 
   if (firstNegative)
     sign = vecPi1 * vecRef2transv.Cross(vecRef1transv);
@@ -1118,6 +1100,8 @@ double acoCP(TLorentzVector Pi1, TLorentzVector Pi2,
     }
   }
 
+  //Merijn 2019 2 9: I'd like to save the observables for inspection and thus oncommented this again. I added gentree to the argument everywhere.
+  
   if(isinf(sign)) sign=-3;
   if(sign!=sign) sign=-3;
       
@@ -1127,6 +1111,6 @@ double acoCP(TLorentzVector Pi1, TLorentzVector Pi2,
   if (pi01){ otree->acotautauPsi_10=sign; }
   if (pi02){ otree->acotautauPsi_01=sign;}
   if (pi01&&pi02){ otree->acotautauPsi_11=sign;}
-
+  
   return acop;
 }
