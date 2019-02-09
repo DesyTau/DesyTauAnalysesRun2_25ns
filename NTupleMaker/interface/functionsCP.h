@@ -18,6 +18,7 @@ If the channel is e-t or mu-t, it will calculate the lepton vx etc.
 -looking into potential issue with acoCPCOUT
 */
 
+double pimass=0.134; //Merijn 2019 2 8 in order to compile..
 
 void acott(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, int tauIndex2);
 
@@ -370,9 +371,9 @@ TLorentzVector ipVec(const AC1B * analysisTree, int tauIndex) {
     }
     */
     
-    TVector3 secvertex(analysisTree->tau_pca3D[tauIndex],
-		       analysisTree->tau_pca3D[tauIndex],
-		       analysisTree->tau_pca3D[tauIndex]);
+    TVector3 secvertex(analysisTree->tau_pca3D_x[tauIndex],
+		       analysisTree->tau_pca3D_y[tauIndex],
+		       analysisTree->tau_pca3D_z[tauIndex]);
     
     TVector3 momenta(analysisTree->tau_constituents_px[tauIndex][piIndex],
 		     analysisTree->tau_constituents_py[tauIndex][piIndex],
@@ -601,6 +602,7 @@ void gen_acott(const AC1B * analysisTree, Synch17GenTree *gentree, int tauIndex1
   
 //Merijn 2019 2 7: I really don know which is correct, Andrea please pick..
 //<<<<<<< HEAD
+/*
   if(threeProngPi01)
     gentree->acotautau_20=acoCP(tau1Prong,tau2Prong,tau1IP,tau2IP,firstNegative,false,false,gentree);
 
@@ -619,24 +621,25 @@ void gen_acott(const AC1B * analysisTree, Synch17GenTree *gentree, int tauIndex1
   // if(gentree->acotautau_01!=gentree->acotautau_01) cout<<"gentree->acotautau_01 strange "<<gentree->acotautau_01<<endl;
   // if(isinf(gentree->acotautau_01)) cout<<"gentree->acotautau_01 strange "<<gentree->acotautau_01<<endl;
 
-/*
 =======
+*/
   if(threeProng1)
-    gentree->acotautau_20=acoCP(tau1_3ProngVec,tau2Prong,tau1IP,tau2IP,firstNegative,false,false);
+    gentree->acotautau_20=acoCP(tau1_3ProngVec,tau2Prong,tau1IP,tau2IP,firstNegative,false,false,gentree);
 
   if(threeProng2)
-    gentree->acotautau_02=acoCP(tau1Prong,tau2_3ProngVec,tau1IP,tau2IP,firstNegative,false,false);
+    gentree->acotautau_02=acoCP(tau1Prong,tau2_3ProngVec,tau1IP,tau2IP,firstNegative,false,false,gentree);
 
   if (oneProngPi01&&threeProng2)
-    gentree->acotautau_12=acoCP(tau1Prong,tau2_3ProngVec,tau1Pi0,tau2IP,firstNegative,true,false);
+    gentree->acotautau_12=acoCP(tau1Prong,tau2_3ProngVec,tau1Pi0,tau2IP,firstNegative,true,false,gentree);
 
   if (threeProng1&&oneProngPi02)
-    gentree->acotautau_21=acoCP(tau1_3ProngVec,tau2Prong,tau1IP,tau2Pi0,firstNegative,false,true);
+    gentree->acotautau_21=acoCP(tau1_3ProngVec,tau2Prong,tau1IP,tau2Pi0,firstNegative,false,true,gentree);
 
   if(threeProng1&&threeProng2)
-    gentree->acotautau_22=acoCP(tau1_3ProngVec,tau2_3ProngVec,tau1IP,tau2IP,firstNegative,false,false);
->>>>>>> 773e02d1a8f2e699e17b3e7c57153f56b1fd3d4b
-*/
+    gentree->acotautau_22=acoCP(tau1_3ProngVec,tau2_3ProngVec,tau1IP,tau2IP,firstNegative,false,false,gentree);
+
+//>>>>>>> 773e02d1a8f2e699e17b3e7c57153f56b1fd3d4b
+
 
 };
 
@@ -882,7 +885,7 @@ TLorentzVector gen_ThreeProngVec(const AC1B * analysisTree, int tauIndex){
   ThreeProngVec.SetXYZT(0.,0.,0.,0.);
   
   if(npart!=3){
-    cout << "ERROR: found more than 3 prongs!" << endl;
+    //    cout << "ERROR: found more than 3 prongs!" << endl;
     return ThreeProngVec;
   }
   
@@ -924,7 +927,7 @@ TVector3 gen_ThreeProngSVertex(const AC1B * analysisTree, int tauIndex){
 
 
 //WORK IN PROGRESS
-float Bfunction(TLorentzVector pi; TLorentzVector a1){
+float Bfunction(TLorentzVector pi, TLorentzVector a1){
   float B = 0.;
   B=(pow(pi.E()*a1.E()-a1.Vect().Dot(pi.Vect()),2)-a1.Mag2()*pimass)/a1.Mag2();
 
@@ -949,7 +952,7 @@ Float_t gen_A1Polarization(const AC1B * analysisTree, int tauIndex){
 			 analysisTree->genparticles_py[piIndex],
 			 analysisTree->genparticles_pz[piIndex],
 			 analysisTree->genparticles_e[piIndex]);
-    Vec[i]=LVec.Vect();
+    // Vec[i]=LVec.Vect(); Merijn 2019 2 8: commented out due to compilation issue, can;'t resolve what is meant
     LVecSum+=LVec[i];
     i++;
   }
