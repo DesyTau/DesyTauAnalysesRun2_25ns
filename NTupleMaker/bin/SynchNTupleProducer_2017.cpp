@@ -519,7 +519,7 @@ int main(int argc, char * argv[]){
   //Synch17GenTree *gentree = new Synch17GenTree(gtree);
   
   Synch17GenTree *gentree = new Synch17GenTree(gtree);
-  // Synch17GenTree *gentreeForGoodRecoEvtsOnly = new Synch17GenTree(tree);
+  Synch17GenTree *gentreeForGoodRecoEvtsOnly = new Synch17GenTree(tree);
     
 
   int nTotalFiles = 0;
@@ -647,9 +647,8 @@ int main(int argc, char * argv[]){
     std::cout << "      number of entries in Tree = " << numberOfEntries << std::endl;
     ///////////////EVENT LOOP///////////////
 
-for (Long64_t iEntry=0; iEntry<10; iEntry++) {
-
-//for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) {
+//for (Long64_t iEntry=0; iEntry<150; iEntry++) {
+for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) {
   // cout<<"iEntry "<<iEntry<<endl;
       counter[0]++;
       analysisTree.GetEntry(iEntry);
@@ -1068,12 +1067,11 @@ for (Long64_t iEntry=0; iEntry<10; iEntry++) {
 
      //all criterua passed, we fill vertices here;	
      SaveRECOVertices(&analysisTree,otree, isData);
-     //Merijn: save here all gen information for the good RECO events. Note that no selection on gen level is applied..
-     /*
+
+     //Merijn: save here all gen information for the selected RECO events, gets stored for convenience in the taucheck tree ;-). Note that no selection on gen level is applied..     
      if (!isData){
-       FillGenTree(&analysisTree,gentreeForGoodRecoEvtsOnly,ch);
-       gentreeForGoodRecoEvtsOnly->Fill();
-       }*/
+      FillGenTree(&analysisTree,gentreeForGoodRecoEvtsOnly,ch);
+       }
       
       if(ch=="mt") {
       	FillMuTau(&analysisTree, otree, leptonIndex, dRiso);
