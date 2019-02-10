@@ -90,12 +90,12 @@
 */
 
 //int PlotMacro(int argc, char * argv[]){
-int PlotMacro(){
+int PlotMacro_GenwithRecoSel(){
 
   gStyle->SetOptStat(0);
   
   int sample=0;
-  int GenReco=1; //1 is RECO
+  int GenReco=1; //0 is gen, 1 is RECO. 2 is gen obnservable, but we pick the observable from the RECO branch with reco selection!
   int Prong=1;//specifies calculation of hadronic vertex acotauta_0*prong*. 0 is impact param, 1 is rho or a particle.
   int DecayMode=1; //Note: genmode1=8. For first reco tau no need to specify anything per def.. 
   int PhiorPsi=0;	  
@@ -108,7 +108,9 @@ int PlotMacro(){
   TString samplename="";   
  // if(sample==0)samplename="ggH_125"; //ggH_125_0_mt_Sync
  // if(sample==0)samplename="ggH_125_0_mt_Sync"; //for checking use line below..
- if(sample==0)samplename="ggh_Update_IP_0_mt_Sync";
+
+// if(sample==0)samplename="ggh_Update_IP_0_mt_Sync_DEFAULTSETTINGS";
+ if(sample==0)samplename="ggh_Update_IP_0_mt_Sync_GENVERTICES";
 
  //  if(sample==0)samplename="ggH_125_SingleFile_PubLoc_0_mt_Sync";	
  //  if(sample==0)samplename="ggH_125_SingleFile_0_mt_Sync";	
@@ -123,7 +125,9 @@ int PlotMacro(){
 
   TString GenRecoString="";
   if(GenReco==0) GenRecoString="GEN";
-  if(GenReco==1) GenRecoString="RECO";  
+  if(GenReco==1) GenRecoString="RECO";
+  if(GenReco==2) GenRecoString="GEN_RECOSelection";  
+
 
   TString RECOObs;
   if(GenReco==0){
@@ -134,6 +138,11 @@ int PlotMacro(){
    if(PhiorPsi==0) RECOObs="acotautau_0";
    if(PhiorPsi==1) RECOObs="acotautauPsi_0";}
 
+  if(GenReco==2){//look for gen observables in reco tree..
+   if(PhiorPsi==0) RECOObs="gen_acotautau_0";
+   if(PhiorPsi==1) RECOObs="gen_acotautauPsi_0";}
+
+  
   RECOObs+=Prong;
   RECOObs+=">>CPhist";
 
@@ -159,6 +168,7 @@ cout<<"inputfile "<<inputfile<<endl;
 
   if(GenReco==0) tree= (TTree*)f->Get("GenTauCheck");
   if(GenReco==1) tree= (TTree*)f->Get("TauCheck");
+  if(GenReco==2) tree= (TTree*)f->Get("TauCheck");//for option 2 we select gen observable from reco tree with reco selection
 
   
   TCanvas* CPCanvas=new TCanvas("CPCanvas","CPCanvas",700,500);
@@ -173,6 +183,8 @@ if(PhiorPsi==1) CPhist= new TH1D("CPhist",samplename,NBins,-1.2,1.2);
 
   if(GenReco==0)  tree->Draw(RECOObs,CutGenString);
   if(GenReco==1)  tree->Draw(RECOObs,RECOCUTString);
+  if(GenReco==2)  tree->Draw(RECOObs,RECOCUTString);//what do we want to select actually..? Perhaps combine?
+
 //  if(GenReco==1)  tree->Draw(RECOObs);
 
 cout<<"Obsservable "<<RECOObs<<endl;

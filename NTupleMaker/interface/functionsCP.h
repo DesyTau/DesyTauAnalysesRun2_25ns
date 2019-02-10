@@ -339,11 +339,12 @@ TLorentzVector ipVec(const AC1B * analysisTree, int tauIndex) {
     */
 
     
+
     TVector3 vertex(analysisTree->primvertex_x,
 		    analysisTree->primvertex_y,
 		    analysisTree->primvertex_z);
-
-    /*
+/*
+    
     //Merijn: temporarily add gen vertex instead.. please leave this code for future reference
     TVector3 vertex;
     for (unsigned int igen=0; igen<analysisTree->genparticles_count; ++igen) {
@@ -357,9 +358,25 @@ TLorentzVector ipVec(const AC1B * analysisTree, int tauIndex) {
     }
     */
     
+
+    
     TVector3 secvertex(analysisTree->tau_pca3D_x[tauIndex],
 		       analysisTree->tau_pca3D_y[tauIndex],
 		       analysisTree->tau_pca3D_z[tauIndex]);
+   
+
+/*
+    TVector3 secvertex;
+    secvertex.SetX(analysisTree->genparticles_vx[analysisTree->gen_match_2]);
+    secvertex.SetY(analysisTree->genparticles_vy[analysisTree->gen_match_2]);
+    secvertex.SetZ(analysisTree->genparticles_vz[analysisTree->gen_match_2]);
+*/
+
+    //Merijn 2019 could try to work here with the genmatch particles..
+
+    
+
+//    TVector3 secvertex(gentree->VxConstitTau1,gentree->VyConstitTau1,gentree->VzConstitTau1);
     
 /* Merijn 2019 2 9: old merge conflict here, looks entirely innocent..
 <<<<<<< HEAD
@@ -431,7 +448,7 @@ momenta.SetXYZ(analysisTree->electron_px[tauIndex],
 		       analysisTree->electron_pz[tauIndex]);}
 
 if(ch=="mt"){
-secvertex.SetXYZ(analysisTree->muon_vx[tauIndex],
+  secvertex.SetXYZ(analysisTree->muon_vx[tauIndex], //Merijn try somethin 2019 2 9
 		       analysisTree->muon_vy[tauIndex],
 		       analysisTree->muon_vz[tauIndex]);
 
