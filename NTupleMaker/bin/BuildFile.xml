@@ -1,5 +1,12 @@
 <Flags CXXFLAGS="-Wno-unused-variable -Wno-error=unused-but-set-variable -Wno-error=maybe-uninitialized" />
 
+<bin name="Splitter" file="Splitter.cpp">
+</bin>
+
+<bin name="checkRoot" file="checkRoot.C">
+  <use name="root"/>
+</bin>
+
 <bin name="EleTauFR" file="AnalysisMacro_dielectrons_etauFR.cpp">
  <use name="PhysicsTools/Utilities"/>
  <use name="rootgraphics"/>
@@ -12,7 +19,7 @@
  <use name="HTT-utilities/LepEffInterface"/>
 </bin>
 
-<bin name="producePUweight2017" file="producePUweight2017.cpp">
+<bin name="producePUweight2018" file="producePUweight2018.cpp">
     <use name="PhysicsTools/Utilities"/>
     <use name="rootgraphics"/>
     <use name="root"/>

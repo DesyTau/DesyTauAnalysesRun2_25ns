@@ -35,14 +35,16 @@ int main (int argc, char * argv[]) {
   std::cout << std::endl;
 
   for (int i=0; i<ncycles; ++i) {
-    char outputNumber[10];
-    if (i<10)
-      sprintf(outputNumber,"%1i",i);
-    else if (i<100)
+    string outputNumber;
+    //if (i<10)
+    outputNumber=to_string(i);
+    /*
+      else if (i<100)
       sprintf(outputNumber,"%2i",i);
     else 
       sprintf(outputNumber,"%3i",i);
-    std::string outputName = sampleName + "_files/" + sampleName + "_" + std::string(outputNumber);
+    */
+    std::string outputName = sampleName + "_files/" + sampleName + "_" + outputNumber;
     std::ofstream outputFile(outputName);
     for (int j=0; j<period; ++j) {
       input >> dummy;
@@ -51,14 +53,17 @@ int main (int argc, char * argv[]) {
     }
 
   }
-  char outputNumber[10];
+  string outputNumber;
+  outputNumber=to_string(ncycles);
+  /*
   if (ncycles<10)
     sprintf(outputNumber,"%1i",ncycles);
   else if (ncycles<100)
     sprintf(outputNumber,"%2i",ncycles);
   else
     sprintf(outputNumber,"%3i",ncycles);
-  std::string outputName = sampleName + "_files/" + sampleName + "_" + std::string(outputNumber);
+  */  
+  std::string outputName = sampleName + "_files/" + sampleName + "_" + outputNumber;
   std::ofstream outputFile(outputName);
   for (int j=0; j<nreminder; ++j) {
     input >> dummy;
