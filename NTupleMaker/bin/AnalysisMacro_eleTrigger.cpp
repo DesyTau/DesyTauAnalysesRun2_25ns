@@ -28,6 +28,7 @@
 #include "DesyTauAnalyses/NTupleMaker/interface/json.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/functions.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/PileUp.h"
+#include "DesyTauAnalyses/NTupleMaker/interface/functionsSynch2017.h"
 
 
 int main(int argc, char * argv[]) {
@@ -57,6 +58,7 @@ int main(int argc, char * argv[]) {
   const float dzElecCut      = cfg.get<float>("dzElecCut");
   const float isoElecCut     = cfg.get<float>("isoElecCut");
   const bool applyElecId     = cfg.get<bool>("ApplyElecId");
+  const bool applyRhoCorrectedIso = cfg.get<bool>("applyRhoCorrectedIso");
 
   // topological cuts
   const float dRleptonsCut   = cfg.get<float>("dRleptonsCut");
@@ -296,9 +298,9 @@ int main(int argc, char * argv[]) {
   TFile * filePUOfficial_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/"+PUDataFile,"read");
   TFile * filePUOfficial_MC = new TFile (TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/"+PUMCFile, "read");
   TH1D * PUOfficial_data = (TH1D *)filePUOfficial_data->Get("pileup");
-  TH1D * PUOfficial_mc = (TH1D *)filePUOfficial_MC->Get(PUMCHist+"_pileup");
-  //  PUofficial->set_h_data(PUOfficial_data);
-  //  PUofficial->set_h_MC(PUOfficial_mc);
+  TH1D * PUOfficial_mc = (TH1D *)filePUOfficial_MC->Get(PUMCHist);
+  PUofficial->set_h_data(PUOfficial_data);
+  PUofficial->set_h_MC(PUOfficial_mc);
 
   int nTotalFiles = 0;
   std::string dummy;
@@ -416,8 +418,8 @@ int main(int argc, char * argv[]) {
 
 
       if (!isData) {
-	//	float puWeight =  float(PUofficial->get_PUweight(double(analysisTree.numtruepileupinteractions)));
-	float puWeight =  float(PUOfficial_data->GetBinContent(PUOfficial_data->GetXaxis()->FindBin(analysisTree.numtruepileupinteractions)));
+	float puWeight =  float(PUofficial->get_PUweight(double(analysisTree.numtruepileupinteractions)));
+	//	float puWeight =  float(PUOfficial_data->GetBinContent(PUOfficial_data->GetXaxis()->FindBin(analysisTree.numtruepileupinteractions)));
 	weight *= puWeight;
       }
 
@@ -562,30 +564,34 @@ int main(int argc, char * argv[]) {
 
 	  float mass = (ele1lv+ele2lv).M();
 
-	  float absIso1 = analysisTree.electron_r03_sumChargedHadronPt[ele1Index];
-	  //	  float neutralIso1 = 
-	  //	    analysisTree.electron_r03_sumNeutralHadronEt[ele1Index] +
-	  //            analysisTree.electron_r03_sumPhotonEt[ele1Index] -
-	  //            0.5*analysisTree.electron_r03_sumPUPt[ele1Index];
-	  float neutralIso1 = 
-	    analysisTree.electron_r03_sumNeutralHadronEt[ele1Index] +
-	    analysisTree.electron_r03_sumPhotonEt[ele1Index] -
-	    analysisTree.rho*TMath::Pi()*isoCone*isoCone;
-          neutralIso1 = TMath::Max(float(0),neutralIso1);
-          absIso1 += neutralIso1;
+	  float absIso1 = 0;
+	  if (applyRhoCorrectedIso) {
+	    absIso1 = abs_Iso_et(ele1Index, &analysisTree, isoCone);
+	  } 
+	  else {
+	   absIso1 = analysisTree.electron_r03_sumChargedHadronPt[ele1Index];
+	   float neutralIso1 = 
+	     analysisTree.electron_r03_sumNeutralHadronEt[ele1Index] +
+	     analysisTree.electron_r03_sumPhotonEt[ele1Index] -
+	     0.5*analysisTree.electron_r03_sumPUPt[ele1Index];
+	   neutralIso1 = TMath::Max(float(0),neutralIso1);
+	   absIso1 += neutralIso1;
+	  }	  
 	  float relIso1 = absIso1/analysisTree.electron_pt[ele1Index];
 
-	  float absIso2 = analysisTree.electron_r03_sumChargedHadronPt[ele2Index];
-	  //	  float neutralIso2 = 
-	  //	    analysisTree.electron_r03_sumNeutralHadronEt[ele2Index] +
-	  //            analysisTree.electron_r03_sumPhotonEt[ele2Index] -
-	  //            0.5*analysisTree.electron_r03_sumPUPt[ele2Index];
-	  float neutralIso2 = 
-	    analysisTree.electron_r03_sumNeutralHadronEt[ele2Index] +
-	    analysisTree.electron_r03_sumPhotonEt[ele2Index] -
-	    analysisTree.rho*TMath::Pi()*isoCone*isoCone;
-          neutralIso2 = TMath::Max(float(0),neutralIso2);
-          absIso2 += neutralIso2;
+	  float absIso2 = 0;
+	  if (applyRhoCorrectedIso) {
+            absIso2 = abs_Iso_et(ele2Index, &analysisTree, isoCone);
+          }
+          else {
+	    absIso2 = analysisTree.electron_r03_sumChargedHadronPt[ele2Index];
+	    float neutralIso2 =
+	      analysisTree.electron_r03_sumNeutralHadronEt[ele2Index] +
+	      analysisTree.electron_r03_sumPhotonEt[ele2Index] -
+	      0.5*analysisTree.electron_r03_sumPUPt[ele2Index];
+	    neutralIso2 = TMath::Max(float(0),neutralIso2);
+	    absIso2 += neutralIso2;
+          }
 	  float relIso2 = absIso2/analysisTree.electron_pt[ele2Index];
 
 	  float ele1RelIso = relIso1;

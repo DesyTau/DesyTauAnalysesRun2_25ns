@@ -350,23 +350,21 @@ int main(int argc, char * argv[]) {
   TH1D * MuSF_IdIso_Mu2H = new TH1D("MuIdIsoSF_Mu2H", "MuIdIsoSF_Mu2", 100, 0.5,1.5);
 
   // tag and probe 
-  int nPtBins = 11;
-  float ptBins[12] = {10., 15., 20., 25., 30., 40., 50., 60., 80., 100., 200., 1000.};
+  int nPtBins = 9;
+  float ptBins[10] = {10., 15., 20., 25., 30., 40., 50., 60., 100., 1000.};
 
   int nEtaBins = 4;
   float etaBins[5] = {0,0.9,1.2,2.1,2.4}; 
   
-  TString PtBins[11] = {"Pt10to15",
-			"Pt15to20",
-			"Pt20to25",
-			"Pt25to30",
-			"Pt30to40",
-			"Pt40to50",
-			"Pt50to60",
-			"Pt60to80",
-			"Pt80to100",
-			"Pt100to200",
-			"PtGt200"};
+  TString PtBins[9] = {"Pt10to15",
+		       "Pt15to20",
+		       "Pt20to25",
+		       "Pt25to30",
+		       "Pt30to40",
+		       "Pt40to50",
+		       "Pt50to60",
+		       "Pt60to100",
+		       "PtGt100"};
   
   TString EtaBins[4] = {"EtaLt0p9",
 			"Eta0p9to1p2",

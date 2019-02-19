@@ -499,9 +499,9 @@ int main(int argc, char * argv[]) {
   TFile * filePUOfficial_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/"+PUDataFile,"read");
   TFile * filePUOfficial_MC = new TFile (TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/"+PUMCFile, "read");
   TH1D * PUOfficial_data = (TH1D *)filePUOfficial_data->Get("pileup");
-  TH1D * PUOfficial_mc = (TH1D *)filePUOfficial_MC->Get(PUMCHist+"_pileup");
-  //  PUofficial->set_h_data(PUOfficial_data);
-  //  PUofficial->set_h_MC(PUOfficial_mc);
+  TH1D * PUOfficial_mc = (TH1D *)filePUOfficial_MC->Get(PUMCHist);
+  PUofficial->set_h_data(PUOfficial_data);
+  PUofficial->set_h_MC(PUOfficial_mc);
 
   int nTotalFiles = 0;
   std::string dummy;
@@ -618,8 +618,9 @@ int main(int argc, char * argv[]) {
 
 
       if (!isData) {
-	//	float puWeight =  float(PUofficial->get_PUweight(double(analysisTree.numtruepileupinteractions)));
-	float puWeight =  float(PUOfficial_data->GetBinContent(PUOfficial_data->GetXaxis()->FindBin(analysisTree.numtruepileupinteractions)));
+	float puWeight =  float(PUofficial->get_PUweight(double(analysisTree.numtruepileupinteractions)));
+	//	float puWeight =  float(PUOfficial_data->GetBinContent(PUOfficial_data->GetXaxis()->FindBin(analysisTree.numtruepileupinteractions)));
+	//	std::cout << "Pileup weight = " << puWeight << std::endl;
 	weight *= puWeight;
       }
 
