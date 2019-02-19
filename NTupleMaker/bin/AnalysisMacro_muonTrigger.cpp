@@ -828,10 +828,6 @@ int main(int argc, char * argv[]) {
 	    }                                                                                                                                                                               
 	  }
 
-	  if (fabs(analysisTree.muon_eta[mu2Index])<ptMuonHighCut)
-
-
-	  bool mu2Mu50 = mu2MatchMu50;
 	  bool mu2IsoMuProbe = mu2MatchIsoMuProbe;
 
 	  float dZ = fabs(analysisTree.muon_dz[mu1Index]-analysisTree.muon_dz[mu2Index]);

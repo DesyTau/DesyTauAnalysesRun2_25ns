@@ -57,8 +57,8 @@ int main(int argc, char * argv[]) {
   const float dxyElecCut     = cfg.get<float>("dxyElecCut");
   const float dzElecCut      = cfg.get<float>("dzElecCut");
   const float isoElecCut     = cfg.get<float>("isoElecCut");
-  const bool applyElecId     = cfg.get<bool>("ApplyElecId");
-  const bool applyRhoCorrectedIso = cfg.get<bool>("applyRhoCorrectedIso");
+  const int  electronIdType  = cfg.get<int>("ElectronIdType");
+  const bool applyRhoCorrectedIso = cfg.get<bool>("ApplyRhoCorrectedIso");
 
   // topological cuts
   const float dRleptonsCut   = cfg.get<float>("dRleptonsCut");
@@ -150,8 +150,9 @@ int main(int argc, char * argv[]) {
   TH1F * inputEventsH = new TH1F("inputEventsH","",1,-0.5,0.5);
   TH1F * weightsH = new TH1F("weightsH","",1,-0.5,0.5);
 
-  int nEtaBins = 3;
-  float etaBins[4] = {-0.001, 1.48, 2.1, 2.5};
+  int nEtaBins = 5;
+  float etaBins[6] = {0, 1.0, 1.479, 1.653, 2.1, 2.5};
+
 
   int nEtaFineBins  = 10;
   float etaFineBins[11] = {-2.5, -2.1, -1.57, -1.44, -0.8, 0., 0.8, 1.44, 1.57, 2.1, 2.5};
@@ -170,7 +171,11 @@ int main(int argc, char * argv[]) {
   TH1F * ZMassSingleEleLegFailH = new TH1F("ZMassSingleEleLegFailH","",60,60,120);
 
 
-  TString EtaBins[3] = {"EtaLt1p48","Eta1p48to2p1","EtaGt2p1"};
+  TString EtaBins[5] = {"EtaLt1p0",
+                        "Eta1p0to1p48",
+                        "Eta1p48to1p65",
+                        "Eta1p65to2p1",
+                        "EtaGt2p1"};
 
   TString EtaFineBins[10];
   for (int iB=0; iB<nEtaFineBins; ++iB) {
@@ -222,14 +227,14 @@ int main(int argc, char * argv[]) {
 
   // (Pt,Eta)
 
-  TH1F * ZMassSingleEleLegPtEtaPassH[3][18];
-  TH1F * ZMassSingleEleLegPtEtaFailH[3][18];
+  TH1F * ZMassSingleEleLegPtEtaPassH[5][18];
+  TH1F * ZMassSingleEleLegPtEtaFailH[5][18];
 
-  TH1F * ZMassSingleEleLegIsoPtEtaPassH[4][3][18];
-  TH1F * ZMassSingleEleLegIsoPtEtaFailH[4][3][18];
+  TH1F * ZMassSingleEleLegIsoPtEtaPassH[4][5][18];
+  TH1F * ZMassSingleEleLegIsoPtEtaFailH[4][5][18];
 
-  TH1F * ZMassSingleEleLegEtaPassH[3];
-  TH1F * ZMassSingleEleLegEtaFailH[3];
+  TH1F * ZMassSingleEleLegEtaPassH[5];
+  TH1F * ZMassSingleEleLegEtaFailH[5];
 
   TH1F * ZMassSingleEleLegEtaFinePassH[10];
   TH1F * ZMassSingleEleLegEtaFineFailH[10];
@@ -421,6 +426,7 @@ int main(int argc, char * argv[]) {
 	float puWeight =  float(PUofficial->get_PUweight(double(analysisTree.numtruepileupinteractions)));
 	//	float puWeight =  float(PUOfficial_data->GetBinContent(PUOfficial_data->GetXaxis()->FindBin(analysisTree.numtruepileupinteractions)));
 	weight *= puWeight;
+	//	std::cout << "PU weight = " << puWeight << std::endl;
       }
 
       //      std::cout << "Triggers" << std::endl;
@@ -483,11 +489,18 @@ int main(int argc, char * argv[]) {
 	if (fabs(analysisTree.electron_eta[im])>etaElecCut) continue;
 	if (fabs(analysisTree.electron_dxy[im])>dxyElecCut) continue;
 	if (fabs(analysisTree.electron_dz[im])>dzElecCut) continue;
-	bool eleId = 
-	  analysisTree.electron_mva_wp80_Iso_Fall17_v1[im]>0.5 &&
-	  analysisTree.electron_pass_conversion[im] > 0.5 &&
+	bool electronId = true;
+	if (electronIdType==1)
+          electronId = analysisTree.electron_mva_wp80_Iso_Fall17_v1[im]>0.5;
+        else if (electronIdType==2)
+          electronId = analysisTree.electron_mva_wp90_Iso_Fall17_v1[im]>0.5;
+        else if (electronIdType==3)
+          electronId = analysisTree.electron_mva_wp80_general_Spring16_v1[im]>0.5;
+        else if (electronIdType==4)
+          electronId = analysisTree.electron_mva_wp90_general_Spring16_v1[im]>0.5;
+	electronId = electronId && analysisTree.electron_pass_conversion[im] > 0.5 &&
 	  analysisTree.electron_nmissinginnerhits[im] <= 1;
-	if (applyElecId && !eleId) continue;
+	if (!electronId) continue;
 	elecs.push_back(im);
       }
 
