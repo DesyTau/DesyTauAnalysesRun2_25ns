@@ -67,8 +67,13 @@ int main(int argc, char * argv[]) {
   const bool oppositeSign    = cfg.get<bool>("OppositeSign");
   const float ptL1TauCut     = cfg.get<float>("ptL1TauCut");
   const float etaL1TauCut    = cfg.get<float>("etaL1TauCut");
-  const float detaL1TauCut    = cfg.get<float>("detaL1TauCut");
+  const float detaL1TauCut   = cfg.get<float>("detaL1TauCut");
   const bool matchL1Tau      = cfg.get<bool>("matchL1Tau");
+
+  const bool matchL1Elec     = cfg.get<bool>("matchL1Elec");
+  const float ptL1ElecCut     = cfg.get<float>("ptL1ElecCut");
+  const float etaL1ElecCut    = cfg.get<float>("etaL1ElecCut");
+
 
   // triggers
   const bool applyTrigger = cfg.get<bool>("ApplyTrigger");
@@ -522,6 +527,21 @@ int main(int argc, char * argv[]) {
 	  if (analysisTree.trigobject_filters[iT][nSingleEleFilter]) 
 	    ele1MatchSingleEle = true;
 	}
+	bool foundL1ElecSeed = false;
+	for (unsigned int il1=0; il1<analysisTree.l1egamma_count; ++il1) {
+	  if (analysisTree.l1egamma_bx[il1]!=0) continue;
+	  TLorentzVector l1egammaLV; l1egammaLV.SetXYZM(analysisTree.l1egamma_px[il1],
+						       analysisTree.l1egamma_py[il1],
+						       analysisTree.l1egamma_pz[il1],
+						       0.1);
+	  if (l1egammaLV.Pt()<ptL1ElecCut) continue;
+	  if (fabs(l1egammaLV.Eta())>etaL1ElecCut) continue;
+	  float dRmatch = deltaR(analysisTree.electron_eta[ele1Index],analysisTree.electron_phi[ele1Index],
+				 l1egammaLV.Eta(),l1egammaLV.Phi());
+	  if (dRmatch<DRTrigMatch) 
+	    foundL1ElecSeed = true;
+	    
+	}
 
 	//	if (ele1MatchSingleEle)	std::cout << "ele1 match : " << ele1MatchSingleEle << std::endl;
 
@@ -530,6 +550,14 @@ int main(int argc, char * argv[]) {
 	  analysisTree.electron_pt[ele1Index]>ptElecTagCut && 
 	  fabs(analysisTree.electron_eta[ele1Index])<etaElecTagCut;
 
+	/*
+	if (ele1MatchSingleEle&&!foundL1ElecSeed) {
+	  std::cout << "Elec   pt = " << analysisTree.electron_pt[ele1Index] 
+		    << "   eta = " << analysisTree.electron_eta[ele1Index]
+		    << "   L1Seed = " << foundL1ElecSeed
+		    << "   HLTmatch = " << ele1MatchSingleEle << std::endl;
+	}
+	*/
 
 	float q1 = analysisTree.electron_charge[ele1Index];
 	
@@ -618,7 +646,7 @@ int main(int argc, char * argv[]) {
 
 	  bool dirIso = (relIso2<isoElecCut) && (relIso1<isoElecCut);
 
-	  bool foundL1Seed = false;
+	  bool foundL1TauSeed = false;
 	  /*
 	  std::cout << "mu1 :  pT = " << analysisTree.electron_pt[ele1Index]
 		    << "   eta = " << analysisTree.electron_eta[ele1Index]
@@ -649,16 +677,21 @@ int main(int argc, char * argv[]) {
 	    if (dRl1tau<DRTrigMatch) continue;
 	    float dEtal1tau = fabs(l1LV.Eta()-analysisTree.electron_eta[ele2Index]);
 	    if (dEtal1tau<detaL1TauCut) continue;
-	    foundL1Seed = true;
+	    foundL1TauSeed = true;
 	  }
 	  //	  std::cout << "L1 found = " << foundL1Seed << std::endl;
 	  //	  std::cout << std::endl;
 
 	  //	  std::cout << "Ok1" << std::endl;
-	  if (!matchL1Tau) foundL1Seed = true;
+	  bool foundL1Seed = true;
+	  if (matchL1Tau) foundL1Seed = foundL1TauSeed;
+	  if (matchL1Elec) foundL1Seed = foundL1ElecSeed;
 	  //	  std::cout << "foundL1Seed : " << << std::endl;
 
-	  if (ele2RelIso<isoElecCut && isHLTSingleEle && ele1SingleEle && foundL1Seed && dRmumu>dRleptonsCut) { // Single electron selection
+	  // **************************************
+	  // *********** Tag-&-Probe **************
+	  // **************************************
+	  if (isHLTSingleEle && ele1SingleEle && foundL1Seed && dRmumu>dRleptonsCut) { 
 
 	    float ele2AbsEta = fabs(analysisTree.electron_eta[ele2Index]);
 	    float ele2Pt = TMath::Max(float(5.01),TMath::Min(float(analysisTree.electron_pt[ele2Index]),float(99.9)));

@@ -371,16 +371,14 @@ int main(int argc, char * argv[]) {
   TH1D * EleSF_IdIso_Ele1H = new TH1D("EleIdIsoSF_Ele1H", "EleIdIsoSF_Ele1", 100, 0.5,1.5);
   TH1D * EleSF_IdIso_Ele2H = new TH1D("EleIdIsoSF_Ele2H", "EleIdIsoSF_Ele2", 100, 0.5,1.5);
 
-  int nPtBins = 8;
-  float ptBins[9] = {10,15,20,25,30,40,50,100,1000};
+  int nPtBins = 6;
+  float ptBins[7] = {10,20,30,40,50,100,1000};
 
   int nEtaBins = 5;
   float etaBins[6] = {0, 1.0, 1.479, 1.653, 2.1, 2.5}; 
 
-  TString PtBins[8] = {"Pt10to15",
-		       "Pt15to20",
-		       "Pt20to25",
-		       "Pt25to30",		       
+  TString PtBins[6] = {"Pt10to20",
+		       "Pt20to30",		       
 		       "Pt30to40",
 		       "Pt40to50",
 		       "Pt50to100",
