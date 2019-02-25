@@ -94,8 +94,8 @@ int PlotMacro_GenwithRecoSel(){
 
   gStyle->SetOptStat(0);
   
-  int sample=0;
-  int GenReco=1; //0 is gen, 1 is RECO. 2 is gen obnservable, but we pick the observable from the RECO branch with reco selection!
+  int sample=1;
+  int GenReco=2; //0 is gen, 1 is RECO. 2 is gen obnservable, but we pick the observable from the RECO branch with reco selection!
   int Prong=1;//specifies calculation of hadronic vertex acotauta_0*prong*. 0 is impact param, 1 is rho or a particle.
   int DecayMode=1; //Note: genmode1=8. For first reco tau no need to specify anything per def.. 
   int PhiorPsi=0;	  
@@ -109,13 +109,16 @@ int PlotMacro_GenwithRecoSel(){
  // if(sample==0)samplename="ggH_125"; //ggH_125_0_mt_Sync
  // if(sample==0)samplename="ggH_125_0_mt_Sync"; //for checking use line below..
 
-// if(sample==0)samplename="ggh_Update_IP_0_mt_Sync_DEFAULTSETTINGS";
- if(sample==0)samplename="ggh_Update_IP_0_mt_Sync_GENVERTICES";
+ if(sample==0)samplename="ggh_Update_IP_0_mt_Sync_DEFAULTSETTINGS";
+// if(sample==0)samplename="ggh_Update_IP_0_mt_Sync_GENVERTICES";
 
  //  if(sample==0)samplename="ggH_125_SingleFile_PubLoc_0_mt_Sync";	
  //  if(sample==0)samplename="ggH_125_SingleFile_0_mt_Sync";	
  //  if(sample==1)samplename="SUSYGluGluHTauTau_120";
- if(sample==1)samplename="SUSYGluGluHTauTau_120_0_mt_Sync";
+// if(sample==1)samplename="SUSYGluGluHTauTau_120_0_mt_Sync";
+
+//if(sample==1) samplename="SUSYggh_Update_IP_0_mt_Sync_DEFAULTSETTINGS";
+if(sample==1) samplename="SUSYggh_Update_IP_0_mt_Sync_GENVERTICES";
 
  //  if(sample==2)samplename="DYJetsToLL"; //old DY sample..
  // if(sample==2)samplename="DYJetsToLL_2019_1_14";

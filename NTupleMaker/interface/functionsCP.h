@@ -26,7 +26,7 @@ void acott(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, int tau
 void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, int tauIndex2,TString ch);
 TLorentzVector chargedPivec(const AC1B * analysisTree, int tauIndex);
 TLorentzVector neutralPivec(const AC1B * analysisTree, int tauIndex);
-TLorentzVector ipVec(const AC1B * analysisTree, int tauIndex);
+TLorentzVector ipVec(const AC1B * analysisTree, int tauIndex, Synch17Tree *otree);
 int chargedPiIndex(const AC1B * analysisTree, int tauIndex);
 
 void gen_acott(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, int tauIndex2);
@@ -187,13 +187,13 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
   TLorentzVector tau1IP;
   //Merijn: for leptonic decay calculate in different way than for hadronic
   if(channel=="et"||channel=="mt") tau1IP = ipVec_Lepton(analysisTree,tauIndex1,channel);
-  else{tau1IP = ipVec(analysisTree,tauIndex1);}//tt: treat as tau index..
+  else{tau1IP = ipVec(analysisTree,tauIndex1, otree);}//tt: treat as tau index..
   TLorentzVector tau1Pi0;
   tau1Pi0.SetXYZT(0.,0.,0.,0.);
 
   //Merijn: have to assume here we WON'T look into e-mu case! 
   TLorentzVector tau2IP;
-  tau2IP = ipVec(analysisTree,tauIndex2);
+  tau2IP = ipVec(analysisTree,tauIndex2, otree);
   TLorentzVector tau2Pi0;
   tau2Pi0.SetXYZT(0.,0.,0.,0.); 
 
@@ -301,7 +301,7 @@ TLorentzVector neutralPivec(const AC1B * analysisTree, int tauIndex){
   return neutralPi;
 };
 
-TLorentzVector ipVec(const AC1B * analysisTree, int tauIndex) {
+TLorentzVector ipVec(const AC1B * analysisTree, int tauIndex, Synch17Tree *otree) {
 
   int ncomponents = analysisTree->tau_constituents_count[tauIndex];
   TLorentzVector vec;
@@ -339,11 +339,11 @@ TLorentzVector ipVec(const AC1B * analysisTree, int tauIndex) {
     */
 
     
-
+    /*
     TVector3 vertex(analysisTree->primvertex_x,
 		    analysisTree->primvertex_y,
 		    analysisTree->primvertex_z);
-/*
+    */
     
     //Merijn: temporarily add gen vertex instead.. please leave this code for future reference
     TVector3 vertex;
@@ -356,21 +356,24 @@ TLorentzVector ipVec(const AC1B * analysisTree, int tauIndex) {
 	break;
       }
     }
-    */
-    
-
     
     TVector3 secvertex(analysisTree->tau_pca3D_x[tauIndex],
 		       analysisTree->tau_pca3D_y[tauIndex],
 		       analysisTree->tau_pca3D_z[tauIndex]);
-   
+    
 
-/*
+    /*this are all Higgs or proton matches, not what looking for..
+    cout<<"otree->gen_match_1 "<<otree->gen_match_1<<endl;
+    cout<<"analysisTree->genparticles_pdgid[otree->gen_match_1] "<<analysisTree->genparticles_pdgid[otree->gen_match_1]<<endl;
+    
+    cout<<"otree->gen_match_2 "<<otree->gen_match_2<<endl;
+    cout<<"analysisTree->genparticles_pdgid[otree->gen_match_2] "<<analysisTree->genparticles_pdgid[otree->gen_match_2]<<endl;
+    
     TVector3 secvertex;
-    secvertex.SetX(analysisTree->genparticles_vx[analysisTree->gen_match_2]);
-    secvertex.SetY(analysisTree->genparticles_vy[analysisTree->gen_match_2]);
-    secvertex.SetZ(analysisTree->genparticles_vz[analysisTree->gen_match_2]);
-*/
+    secvertex.SetX(analysisTree->genparticles_vx[otree->gen_match_2]);
+    secvertex.SetY(analysisTree->genparticles_vy[otree->gen_match_2]);
+    secvertex.SetZ(analysisTree->genparticles_vz[otree->gen_match_2]);
+    */
 
     //Merijn 2019 could try to work here with the genmatch particles..
 
@@ -415,12 +418,12 @@ TLorentzVector ipVec_Lepton(const AC1B * analysisTree, int tauIndex, TString ch)
   TLorentzVector vec;
   vec.SetXYZT(0.,0.,0.,0.);
 
-  
+  /*
 TVector3 vertex(analysisTree->primvertex_x,
 		    analysisTree->primvertex_y,
 		    analysisTree->primvertex_z);
-
-  /*
+  */
+  
   //Merijn: temporarily replace vertex with gen level info
   TVector3 vertex;
   for (unsigned int igen=0; igen<analysisTree->genparticles_count; ++igen) {
@@ -432,7 +435,7 @@ TVector3 vertex(analysisTree->primvertex_x,
       break;
     }
   }
-  */
+  
     
 TVector3 secvertex(0.,0.,0.);
 TVector3 momenta(0.,0.,0.);    
