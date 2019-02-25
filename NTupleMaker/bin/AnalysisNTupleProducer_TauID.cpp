@@ -96,6 +96,12 @@ int main(int argc, char * argv[]) {
   const string pfJet400HLTFilterName = cfg.get<string>("PFJet400HLTFilterName"); 
   const string pfJet450HLTFilterName = cfg.get<string>("PFJet450HLTFilterName"); 
 
+  const string singlePFTau180Trk50Name = cfg.get<string>("SinglePFTau180Trk50Name");
+  const string singlePFTau180Trk50oneprongName = cfg.get<string>("SinglePFTau180Trk50oneprongName");
+
+  TString SinglePFTau180Trk50Name(singlePFTau180Trk50Name);
+  TString SinglePFTau180Trk50oneprongName(singlePFTau180Trk50oneprongName);
+
   TString MetHLTName(metHTLName);
   TString SingleMuonHLTName(singleMuonHLTName);
   TString SingleMuonHLTFilterName(singleMuonHLTFilterName);
@@ -230,6 +236,7 @@ int main(int argc, char * argv[]) {
   Float_t wPhi_;
   Int_t   wDecay_;
   Int_t   wTauDecay_;
+  Float_t wCharge_;
 
   Float_t lepWPt_;
   Float_t lepWEta_;
@@ -282,6 +289,7 @@ int main(int argc, char * argv[]) {
   Float_t tauJetEta_;
   Float_t tauJetPhi_;
   Bool_t  tauJetTightId_;
+  Int_t tauJetFlavor_;
 
   Float_t recoilDPhi_;
 
@@ -300,6 +308,7 @@ int main(int argc, char * argv[]) {
   Bool_t  tauDM_;
   Bool_t  tauNewDM_;
 
+  Float_t tauIso_;
   Bool_t  tauLooseIso_;
   Bool_t  tauMediumIso_;
   Bool_t  tauTightIso_;
@@ -327,6 +336,9 @@ int main(int argc, char * argv[]) {
   Bool_t tauAntiElectronMediumMVA6_;
   Bool_t tauAntiElectronTightMVA6_;
   Bool_t tauAntiElectronVTightMVA6_;
+
+  Bool_t tauSinglePFTau180Trk50_;
+  Bool_t tauSinglePFTau180Trk50oneprong_;
 
   Float_t tauLeadingTrackPt_;
   Float_t tauLeadingTrackEta_;
@@ -474,6 +486,7 @@ int main(int argc, char * argv[]) {
   ntuple_->Branch("WEta", &wEta_,    "WEta/F");
   ntuple_->Branch("WPhi", &wPhi_,    "WPhi/F");
   ntuple_->Branch("WDecay", &wDecay_,"WDecay/I");
+  ntuple_->Branch("WCharge", &wCharge_, "WCharge/F");
   ntuple_->Branch("WTauDecay",&wTauDecay_, "WTauDecay/I");
 
   ntuple_->Branch("lepWPt",&lepWPt_,"lepWPt/F");
@@ -533,6 +546,7 @@ int main(int argc, char * argv[]) {
   ntuple_->Branch("tauJetEta", &tauJetEta_, "tauJetEta/F");
   ntuple_->Branch("tauJetPhi", &tauJetPhi_, "tauJetPhi/F");
   ntuple_->Branch("tauJetTightId", &tauJetTightId_, "tauJetTightId/O");
+  ntuple_->Branch("tauJetFlavor",&tauJetFlavor_,"tauJetFlavor/I");
 
   ntuple_->Branch("tauLeadingTrackPt",&tauLeadingTrackPt_,"tauLeadingTrackPt/F");
   ntuple_->Branch("tauLeadingTrackEta",&tauLeadingTrackEta_,"tauLeadingTrackEta/F");
@@ -562,6 +576,7 @@ int main(int argc, char * argv[]) {
   ntuple_->Branch("tauDM",&tauDM_,"tauDM/O");
   ntuple_->Branch("tauNewDM",&tauNewDM_,"tauNewDM/O");
 
+  ntuple_->Branch("tauIso", &tauIso_, "tauIso/F");
   ntuple_->Branch("tauLooseIso", &tauLooseIso_, "tauLooseIso/O");
   ntuple_->Branch("tauMediumIso",&tauMediumIso_,"tauMediumIso/O");
   ntuple_->Branch("tauTightIso", &tauTightIso_, "tauTightIso/O");
@@ -589,6 +604,10 @@ int main(int argc, char * argv[]) {
   ntuple_->Branch("tauAntiElectronMediumMVA6", &tauAntiElectronMediumMVA6_, "tauAntiElectronMediumMVA6/O");
   ntuple_->Branch("tauAntiElectronTightMVA6",&tauAntiElectronTightMVA6_,"tauAntiElectronTightMVA6/O");
   ntuple_->Branch("tauAntiElectronVTightMVA6", &tauAntiElectronVTightMVA6_, "tauAntiElectronVTightMVA6/O");
+
+  ntuple_->Branch("tauSinglePFTau180Trk50",&tauSinglePFTau180Trk50_,"tauSinglePFTau180Trk50/O");
+  ntuple_->Branch("tauSinglePFTau180Trk50oneprong",&tauSinglePFTau180Trk50oneprong_,"tauSinglePFTau180Trk50oneprong/O");
+  
 
   ntuple_->Branch("nMuon",&nMuon_,"nMuon/i");
   ntuple_->Branch("nSelMuon",&nSelMuon_,"nSelMuon/i");
@@ -882,6 +901,7 @@ int main(int argc, char * argv[]) {
       wPhi_ = 0;
       wDecay_ = -1;
       wTauDecay_ = -1;
+      wCharge_ = 0.0;
 
       lepWPt_ = -1;
       lepWEta_ = 0;
@@ -921,6 +941,7 @@ int main(int argc, char * argv[]) {
       tauJetEta_ = 0;
       tauJetPhi_ = 0;
       tauJetTightId_ = false;
+      tauJetFlavor_ = 0;
 
       recoilDPhi_ = 0;
 
@@ -950,6 +971,7 @@ int main(int argc, char * argv[]) {
       tauDM_ = false;
       tauNewDM_ = false;
       
+      tauIso_ = 0;
       tauLooseIso_ = false;
       tauMediumIso_ = false;
       tauTightIso_ = false;
@@ -977,7 +999,10 @@ int main(int argc, char * argv[]) {
       tauAntiElectronMediumMVA6_ = false;
       tauAntiElectronTightMVA6_ = false;
       tauAntiElectronVTightMVA6_ = false;
-      
+
+      tauSinglePFTau180Trk50_ = false;
+      tauSinglePFTau180Trk50oneprong_ = false;
+
       nMuon_ = 0;
       nSelMuon_ = 0;
       nElec_ = 0;
@@ -1199,6 +1224,8 @@ int main(int argc, char * argv[]) {
 				  analysisTree.genparticles_py[indexW],
 				  analysisTree.genparticles_pz[indexW],
 				  analysisTree.genparticles_e[indexW]);
+      
+      
 
       if (indexW>=0) {
 	wMass_ = lorentzVectorGenW.M();
@@ -1210,6 +1237,7 @@ int main(int argc, char * argv[]) {
 	nuWPhi_ = wnuLV.Phi();
 	wDecay_ = 0;
 	wTauDecay_ = -1;
+	wCharge_ = double(analysisTree.genparticles_pdgid[indexW])/TMath::Abs(double(analysisTree.genparticles_pdgid[indexW]));
 	if (indexMu>=0) {
 	  wDecay_ = 2;
 	  lepWPt_  = wmuonLV.Pt();
@@ -1317,6 +1345,12 @@ int main(int argc, char * argv[]) {
       unsigned int nPFJet450HLTFilter = 0;
       bool isPFJet450HLTFilter = false;
 
+      unsigned int nSinglePFTau180Trk50Filter = 0;
+      bool isSinglePFTau180Trk50Filter = false;
+
+      unsigned int nSinglePFTau180Trk50oneprongFilter = 0;
+      bool isSinglePFTau180Trk50oneprongFilter = false;
+
       for (unsigned int i=0; i<analysisTree.run_hltfilters->size(); ++i) {
 	//	std::cout << "HLT Filter : " << i << " = " << analysisTree.run_hltfilters->at(i) << std::endl;
 	TString HLTFilter(analysisTree.run_hltfilters->at(i));
@@ -1355,6 +1389,14 @@ int main(int argc, char * argv[]) {
 	if (HLTFilter==PFJet450HLTFilterName) {
 	  nPFJet450HLTFilter = i;
 	  isPFJet450HLTFilter = true;
+	}
+	if (HLTFilter==SinglePFTau180Trk50Name) {
+	  nSinglePFTau180Trk50Filter = i;
+	  isSinglePFTau180Trk50Filter = true;
+	}
+	if (HLTFilter==SinglePFTau180Trk50oneprongName) {
+	  nSinglePFTau180Trk50oneprongFilter = i;
+	  isSinglePFTau180Trk50oneprongFilter = true;
 	}
       }
       //      if (isData) {
@@ -2099,6 +2141,7 @@ int main(int argc, char * argv[]) {
 	tauDM_ = analysisTree.tau_decayModeFinding[indexTau] > 0.5;
 	tauNewDM_ = analysisTree.tau_decayModeFindingNewDMs[indexTau] > 0.5;
 
+   tauIso_ = analysisTree.tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[indexTau];
 	tauLooseIso_ = analysisTree.tau_byLooseCombinedIsolationDeltaBetaCorr3Hits[indexTau] > 0.5;
 	tauMediumIso_ = analysisTree.tau_byMediumCombinedIsolationDeltaBetaCorr3Hits[indexTau] > 0.5;
 	tauTightIso_ = analysisTree.tau_byTightCombinedIsolationDeltaBetaCorr3Hits[indexTau] > 0.5;
@@ -2127,6 +2170,22 @@ int main(int argc, char * argv[]) {
 	tauAntiElectronTightMVA6_  = analysisTree.tau_againstElectronTightMVA6[indexTau] > 0.5;
 	tauAntiElectronVTightMVA6_ = analysisTree.tau_againstElectronVTightMVA6[indexTau] > 0.5;
 
+	bool isSingleTau = false;
+	bool isSingleTauOneProng = false;
+	for (unsigned int iT=0; iT<analysisTree.trigobject_count;++iT) {
+	  double dR = deltaR(lorentzVectorTau.Eta(),lorentzVectorTau.Phi(),
+			     analysisTree.trigobject_eta[iT],analysisTree.trigobject_phi[iT]);
+	  if (dR>0.5) continue;
+	  if (isSinglePFTau180Trk50Filter) {
+	    if (analysisTree.trigobject_filters[iT][nSinglePFTau180Trk50Filter]) isSingleTau = true;
+	  }
+	  if (isSinglePFTau180Trk50oneprongFilter) {
+	    if (analysisTree.trigobject_filters[iT][nSinglePFTau180Trk50oneprongFilter]) isSingleTauOneProng = true;
+	  }
+	}
+	tauSinglePFTau180Trk50_ = isSingleTau;
+	tauSinglePFTau180Trk50oneprong_ = isSingleTauOneProng;
+
 	// finding matching jet
 	bool jetFound = false;
 	float dRmin = 0.4;
@@ -2147,15 +2206,19 @@ int main(int argc, char * argv[]) {
 	  }
 
 	}
-	if (!jetFound) {
+	tauJetFlavor_ = 0;
+	tauJetTightId_ = true;
+	if (jetFound) {
+	  tauJetFlavor_ = analysisTree.pfjet_flavour[indexMatchingJet];
+	  tauJetTightId_ = tightJetiD_2017(analysisTree,indexMatchingJet);
+	}
+	else {
 	  lorentzVectorTauJet = lorentzVectorTau;
-	  continue;
 	}
 
 	tauJetPt_  = lorentzVectorTauJet.Pt();
 	tauJetEta_ = lorentzVectorTauJet.Eta();
 	tauJetPhi_ = lorentzVectorTauJet.Phi();
-	tauJetTightId_ = tightJetiD_2017(analysisTree,indexMatchingJet);
 
       }
       // ****************************
@@ -2429,6 +2492,7 @@ int main(int argc, char * argv[]) {
 	    tauDM_ = analysisTree.tau_decayModeFinding[indexTau] > 0.5;
 	    tauNewDM_ = analysisTree.tau_decayModeFindingNewDMs[indexTau] > 0.5;
 
+       tauIso_ =  analysisTree.tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[indexTau];
 	    tauLooseIso_ = analysisTree.tau_byLooseCombinedIsolationDeltaBetaCorr3Hits[indexTau] > 0.5;
 	    tauMediumIso_ = analysisTree.tau_byMediumCombinedIsolationDeltaBetaCorr3Hits[indexTau] > 0.5;
 	    tauTightIso_ = analysisTree.tau_byTightCombinedIsolationDeltaBetaCorr3Hits[indexTau] > 0.5;

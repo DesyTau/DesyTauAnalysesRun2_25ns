@@ -274,6 +274,8 @@ class NTupleMaker : public edm::EDAnalyzer{
   virtual void endLuminosityBlock(const edm::LuminosityBlock& iLumiBlock, const edm::EventSetup& iSetup);
   virtual void analyze( const edm::Event& iEvent, const edm::EventSetup& iSetup );
 
+  void computePCA(double * pv, double * refPoint, double * mom, double * pca);
+
   bool AddLHEInformation(const edm::Event& iEvent);
   bool AddGenParticles(const edm::Event& iEvent);
   bool AddGenJets(const edm::Event& iEvent);
@@ -862,6 +864,14 @@ class NTupleMaker : public edm::EDAnalyzer{
   Float_t tau_vertexx[M_taumaxcount];
   Float_t tau_vertexy[M_taumaxcount];
   Float_t tau_vertexz[M_taumaxcount];
+
+  Float_t tau_pca2D_x[M_taumaxcount];
+  Float_t tau_pca2D_y[M_taumaxcount];
+  Float_t tau_pca2D_z[M_taumaxcount];
+
+  Float_t tau_pca3D_x[M_taumaxcount];
+  Float_t tau_pca3D_y[M_taumaxcount];
+  Float_t tau_pca3D_z[M_taumaxcount];
 
   Float_t tau_dxy[M_taumaxcount];
   Float_t tau_dxySig[M_taumaxcount];

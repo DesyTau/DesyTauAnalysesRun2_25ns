@@ -1,0 +1,35 @@
+000 (2509984.000.000) 01/17 11:47:04 Job submitted from host: <131.169.223.40:9618?addrs=131.169.223.40-9618+[2001-638-700-10df--1-28]-9618&noUDP&sock=7812_f5f0_32>
+...
+022 (2509984.000.000) 01/17 11:48:54 Job disconnected, attempting to reconnect
+    Socket between submit and execute hosts closed unexpectedly
+    Trying to reconnect to slot1@bird049.desy.de <131.169.77.69:40084?addrs=131.169.77.69-40084>
+...
+024 (2509984.000.000) 01/17 11:49:03 Job reconnection failed
+    Job not found at execution machine
+    Can not reconnect to slot1@bird049.desy.de, rescheduling job
+...
+001 (2509984.000.000) 01/17 11:49:34 Job executing on host: <131.169.77.221:32869?addrs=131.169.77.221-32869>
+...
+006 (2509984.000.000) 01/17 11:49:43 Image size of job updated: 153232
+	97  -  MemoryUsage of job (MB)
+	99164  -  ResidentSetSize of job (KB)
+...
+006 (2509984.000.000) 01/17 11:54:44 Image size of job updated: 600060
+	416  -  MemoryUsage of job (MB)
+	425212  -  ResidentSetSize of job (KB)
+...
+005 (2509984.000.000) 01/17 11:56:10 Job terminated.
+	(1) Normal termination (return value 0)
+		Usr 0 00:05:42, Sys 0 00:00:20  -  Run Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Run Local Usage
+		Usr 0 00:05:42, Sys 0 00:00:20  -  Total Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Total Local Usage
+	0  -  Run Bytes Sent By Job
+	0  -  Run Bytes Received By Job
+	0  -  Total Bytes Sent By Job
+	0  -  Total Bytes Received By Job
+	Partitionable Resources :    Usage  Request Allocated 
+	   Cpus                 :     0.81        1         1 
+	   Disk (KB)            :     1     3072000   3804992 
+	   Memory (MB)          :   416        2048      2048 
+...

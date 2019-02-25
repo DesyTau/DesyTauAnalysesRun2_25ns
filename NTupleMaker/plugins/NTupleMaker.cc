@@ -56,6 +56,26 @@ typedef ROOT::Math::SVector<double, 3> SVector3; //// SVector: vector of size 3
 
 #include "DesyTauAnalyses/NTupleMaker/interface/genMatch.h"
 
+void NTupleMaker::computePCA(double * pv, double * refPoint, double * mom, double * pca) {
+  
+  double diff[3];
+  double norm = 0;
+  for (int i=0; i<3; ++i) {
+    norm += mom[i]*mom[i];
+  }
+
+  norm = TMath::Sqrt(norm);
+  double n[3];
+  double time = 0;
+  for (int i=0; i<3; ++i) {
+    n[i] = mom[i]/norm;
+    time += n[i]*(pv[i]-refPoint[i]);
+  }
+  for (int i=0; i<3; ++i) {
+    pca[i] = refPoint[i]+time*n[i];
+  }
+
+}
 
 Int_t NTupleMaker::find_lep(const Int_t nlep, const Float_t px[], const Float_t py[], const Float_t pz[], const reco::Candidate::LorentzVector& refp4){
   Int_t ilep = -1;
@@ -647,6 +667,15 @@ void NTupleMaker::beginJob(){
     tree->Branch("tau_vertexx", tau_vertexx, "tau_vertexx[tau_count]/F");
     tree->Branch("tau_vertexy", tau_vertexy, "tau_vertexy[tau_count]/F");
     tree->Branch("tau_vertexz", tau_vertexz, "tau_vertexz[tau_count]/F");
+
+    tree->Branch("tau_pca2D_x", tau_pca2D_x, "tau_pca2D_x[tau_count]/F");
+    tree->Branch("tau_pca2D_y", tau_pca2D_y, "tau_pca2D_y[tau_count]/F");
+    tree->Branch("tau_pca2D_z", tau_pca2D_z, "tau_pca2D_z[tau_count]/F");
+
+    tree->Branch("tau_pca3D_x", tau_pca3D_x, "tau_pca3D_x[tau_count]/F");
+    tree->Branch("tau_pca3D_y", tau_pca3D_y, "tau_pca3D_y[tau_count]/F");
+    tree->Branch("tau_pca3D_z", tau_pca3D_z, "tau_pca3D_z[tau_count]/F");
+
 
     tree->Branch("tau_dxy", tau_dxy, "tau_dxy[tau_count]/F");
     tree->Branch("tau_dxySig", tau_dxySig, "tau_dxySig[tau_count]/F");
@@ -3620,6 +3649,11 @@ unsigned int NTupleMaker::AddTaus(const edm::Event& iEvent, const edm::EventSetu
   edm::Handle<pat::PATTauDiscriminator> mvaIsoVVTight;
   iEvent.getByToken(TauMVAIsolationVVTightToken_,mvaIsoVVTight);
   */
+  //  std::cout << "PV (x,y,z)=("
+  //	    << primvertex_x << ","
+  //	    << primvertex_y << ","
+  //	    << primvertex_z << ")" 
+  //	    << std::endl;
   if(Taus.isValid())
     {
       
@@ -3673,6 +3707,8 @@ unsigned int NTupleMaker::AddTaus(const edm::Event& iEvent, const edm::EventSetu
 	    tau_constituents_lostPixelHits[tau_count][m]  = -9999;
 	  }
 	  UInt_t tau_constituents_count_ = 0;
+	  double momHardestTrack[3];
+	  double momMax = -1;
 	  for(unsigned int m=0; m<(*Taus)[i].signalCands().size(); m++){
 	    tau_constituents_px[tau_count][tau_constituents_count_]     = (*Taus)[i].signalCands()[m]->px();
 	    tau_constituents_py[tau_count][tau_constituents_count_]     = (*Taus)[i].signalCands()[m]->py();
@@ -3685,6 +3721,12 @@ unsigned int NTupleMaker::AddTaus(const edm::Event& iEvent, const edm::EventSetu
 	    tau_constituents_vz[tau_count][tau_constituents_count_]     = (*Taus)[i].signalCands()[m]->vz();
 	    tau_constituents_pdgId[tau_count][tau_constituents_count_]  = (*Taus)[i].signalCands()[m]->pdgId();
 	    if((*Taus)[i].signalCands()[m]->charge()!=0){
+	      if ((*Taus)[i].signalCands()[m]->pt()>momMax) {
+		momMax = (*Taus)[i].signalCands()[m]->pt();
+		momHardestTrack[0] = (*Taus)[i].signalCands()[m]->px();
+		momHardestTrack[1] = (*Taus)[i].signalCands()[m]->py();
+		momHardestTrack[2] = (*Taus)[i].signalCands()[m]->pz();
+	      }
 	      //Pixel his information: 
 	      // -1: valid hit in 1st pixel barrel layer,
 	      //  0: noLostInnerHits - no hit in 1st pixel barrel layer, but not expected there e.g. due to geometry,
@@ -3693,8 +3735,49 @@ unsigned int NTupleMaker::AddTaus(const edm::Event& iEvent, const edm::EventSetu
 	      if(pCand!=nullptr)
 		tau_constituents_lostPixelHits[tau_count][tau_constituents_count_] = pCand->lostInnerHits();
 	    }
+	    /*
+	    std::cout << tau_count << ":" << tau_constituents_count_ 
+		      << "   (vx,vy,vz)=("
+		      << tau_constituents_vx[tau_count][tau_constituents_count_] << ","
+		      << tau_constituents_vy[tau_count][tau_constituents_count_] << ","
+		      << tau_constituents_vz[tau_count][tau_constituents_count_] << ")" << std::endl;
+	    */
 	    tau_constituents_count_ ++;
 	  }
+
+	  // tau vertex
+	  tau_vertexx[tau_count] = (*Taus)[i].vertex().x();
+	  tau_vertexy[tau_count] = (*Taus)[i].vertex().y();
+	  tau_vertexz[tau_count] = (*Taus)[i].vertex().z();
+
+	  double pv[3];
+	  pv[0] = primvertex_x;
+	  pv[1] = primvertex_y;
+	  pv[2] = primvertex_z;
+	  double refPoint[3];
+	  refPoint[0] = (*Taus)[i].dxy_PCA().X();
+	  refPoint[1] = (*Taus)[i].dxy_PCA().Y();
+	  refPoint[2] = (*Taus)[i].dxy_PCA().Z();
+	  double pca[3];
+	  computePCA(pv,refPoint,momHardestTrack,pca);
+	  tau_pca2D_x[tau_count] = (*Taus)[i].dxy_PCA().X();
+	  tau_pca2D_y[tau_count] = (*Taus)[i].dxy_PCA().Y();
+	  tau_pca2D_z[tau_count] = (*Taus)[i].dxy_PCA().Z();
+	  tau_pca3D_x[tau_count] = pca[0];
+	  tau_pca3D_y[tau_count] = pca[1];
+	  tau_pca3D_z[tau_count] = pca[2];
+	  /*
+	  std::cout << "tau-lepton " << tau_count << " -> PCA(xy) (x,y,z)=("
+		    << (*Taus)[i].dxy_PCA().X() << ","
+		    << (*Taus)[i].dxy_PCA().Y() << ","
+		    << (*Taus)[i].dxy_PCA().Z() << ") : PCA(3D) (x,y,z)=(" 
+		    << pca[0] << "," 
+		    << pca[1] << ","
+		    << pca[2] << ") : vertex (x,y,z)=(" 
+		    << tau_vertexx[tau_count] << ","
+		    << tau_vertexy[tau_count] << ","
+		    << tau_vertexz[tau_count] << ")" << std::endl;
+	  */
 	  tau_constituents_count[tau_count] = tau_constituents_count_;
 
 	  // discriminators
@@ -3804,11 +3887,6 @@ unsigned int NTupleMaker::AddTaus(const edm::Event& iEvent, const edm::EventSetu
 	  tau_ip3d[tau_count] = (*Taus)[i].ip3d();
 	  tau_ip3dSig[tau_count] = (*Taus)[i].ip3d_Sig();
 
-	  // tau vertex
-	  tau_vertexx[tau_count] = (*Taus)[i].vertex().x();
-	  tau_vertexy[tau_count] = (*Taus)[i].vertex().y();
-	  tau_vertexz[tau_count] = (*Taus)[i].vertex().z();
-
 	  // tau secondary vertex
 	  if( (*Taus)[i].hasSecondaryVertex() ){
 	    tau_flightLength[tau_count] = sqrt( (*Taus)[i].flightLength().mag2() );
@@ -3899,6 +3977,7 @@ unsigned int NTupleMaker::AddTaus(const edm::Event& iEvent, const edm::EventSetu
 
 	} // for(unsigned i = 0 ; i < Taus->size() ; i++)
     }
+  //  std::cout << std::endl;
   return tau_count;
 }
 

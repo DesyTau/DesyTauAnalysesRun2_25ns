@@ -40,6 +40,7 @@
 #include "TauAnalysis/ClassicSVfit/interface/ClassicSVfit.h"
 #include "TauAnalysis/ClassicSVfit/interface/svFitHistogramAdapter.h"
 #include "TauAnalysis/ClassicSVfit/interface/MeasuredTauLepton.h"
+#include "DesyTauAnalyses/NTupleMaker/interface/ggF_qcd_uncertainty_2017.h"
 
 #include "TCut.h"
 
@@ -109,7 +110,7 @@ ClassicSVfit SVFitMassComputation(classic_svFit::MeasuredTauLepton svFitEle,
     measuredTauLeptons.push_back(svFitEle);
     measuredTauLeptons.push_back(svFitMu);
     
-    int verbosity = 1;
+    int verbosity = 0;
     ClassicSVfit svFitAlgo(verbosity);
     double kappa = 3.; // use 3 for emu, 4 for etau and mutau, 5 for tautau channel
     svFitAlgo.addLogM_fixed(true, kappa);
@@ -365,7 +366,8 @@ int main(int argc, char * argv[]) {
     /*    
     TTree * treeGen = new TTree("GenHiggs","GenHiggs");
     */    
-
+    const bool apply_ggh_reweighting = cfg.get<bool>("ApplygghReweighting");
+   
     Float_t higgsMass;
     Float_t higgsPt;
     Float_t higgsEta;
@@ -446,7 +448,8 @@ int main(int argc, char * argv[]) {
     Float_t         zptmassweight_statpt80down;
 
     Float_t         weight;
-    
+    Float_t         weight_ggh_NNLOPS;
+
     Float_t         m_vis;
     Float_t         pt_vis;
     Float_t         pt_vis_escaleUp;
@@ -816,6 +819,21 @@ int main(int argc, char * argv[]) {
     
     Bool_t veto_embedded;
 
+    Float_t higgspt_HTXS;
+    Int_t njets_HTXS;
+    Int_t htxs_stage0cat;
+    Int_t htxs_stage1cat;
+
+    Float_t THU_ggH_Mu;
+    Float_t THU_ggH_Res;
+    Float_t THU_ggH_Mig01;
+    Float_t THU_ggH_Mig12;
+    Float_t THU_ggH_VBF2j;
+    Float_t THU_ggH_VBF3j;
+    Float_t THU_ggH_PT60;
+    Float_t THU_ggH_PT120;
+    Float_t THU_ggH_qmtop;
+   
     tree->Branch("run", &run, "run/I");                                  // I=int, F=Float, O=bool
     tree->Branch("lumi", &lumi, "lumi/I");
     tree->Branch("evt", &evt, "evt/I");
@@ -828,7 +846,7 @@ int main(int argc, char * argv[]) {
     tree->Branch("isZMM",&isZMM,"isZMM/O");
     tree->Branch("isZTT",&isZTT,"isZTT/O");
     tree->Branch("veto_embedded",&veto_embedded,"veto_embedded/O");
-
+ 
     tree->Branch("weightScale1",&weightScale1,"weightScale1/F");
     tree->Branch("weightScale2",&weightScale2,"weightScale2/F");
     tree->Branch("weightScale3",&weightScale3,"weightScale3/F");
@@ -840,7 +858,8 @@ int main(int argc, char * argv[]) {
 
     tree->Branch("weightPDFup",&weightPDFup,"weightPDFup/F");
     tree->Branch("weightPDFdown",&weightPDFdown,"weightPDFdown/F");
-
+    
+    tree->Branch("weight_ggh_NNLOPS", &weight_ggh_NNLOPS, "weight_ggh_NNLOPS/F");
     tree->Branch("mcweight", &mcweight, "mcweight/F");
     tree->Branch("puweight", &puweight, "puweight/F");
     tree->Branch("trigweight_1", &trigweight_1, "trigweight_1/F");
@@ -910,6 +929,16 @@ int main(int argc, char * argv[]) {
 
     tree->Branch("weight", &weight, "weight/F");
     
+    tree->Branch("THU_ggH_Mu", &THU_ggH_Mu, "THU_ggH_Mu/F");
+    tree->Branch("THU_ggH_Res", &THU_ggH_Res, "THU_ggH_Res/F");
+    tree->Branch("THU_ggH_Mig01", &THU_ggH_Mig01, "THU_ggH_Mig01/F");
+    tree->Branch("THU_ggH_Mig12", &THU_ggH_Mig12, "THU_ggH_Mig12/F");
+    tree->Branch("THU_ggH_VBF2j", &THU_ggH_VBF2j, "THU_ggH_VBF2j/F");
+    tree->Branch("THU_ggH_VBF3j", &THU_ggH_VBF3j, "THU_ggH_VBF3j/F");
+    tree->Branch("THU_ggH_PT60" , &THU_ggH_PT60, "THU_ggH_PT60/F");
+    tree->Branch("THU_ggH_PT120", &THU_ggH_PT120, "THU_ggH_PT120/F");
+    tree->Branch("THU_ggH_qmtop", &THU_ggH_qmtop, "THU_ggH_qmtop/F");
+
     tree->Branch("metFilters",&metFilters_,"metFilters/O");
     tree->Branch("trg_muonelectron",&trg_muonelectron,"trg_muonelectron/O");
 
@@ -922,6 +951,8 @@ int main(int argc, char * argv[]) {
     
     tree->Branch("m_vis",        &m_vis,        "m_vis/F");
     tree->Branch("pt_vis",        &pt_vis,        "pt_vis/F");
+    tree->Branch("pt_vis_escaleUp",        &pt_vis_escaleUp,        "pt_vis_escaleUp/F");
+    tree->Branch("pt_vis_escaleDown",        &pt_vis_escaleDown,        "pt_vis_escaleDown/F");
     tree->Branch("m_vis_muUp",   &m_vis_muUp,   "m_vis_muUp/F");
     tree->Branch("m_vis_muDown", &m_vis_muDown, "m_vis_muDown/F");
     tree->Branch("m_vis_escaleUp",    &m_vis_escaleUp,    "m_vis_escaleUp/F");
@@ -1254,6 +1285,12 @@ int main(int argc, char * argv[]) {
     
     tree->Branch("npartons",&npartons,"npartons/i");
 
+    tree->Branch("higgspt_HTXS",&higgspt_HTXS,"higgspt_HTXS/F");
+    tree->Branch("njets_HTXS",&njets_HTXS,"njets_HTXS/I");
+    tree->Branch("htxs_stage0cat",&htxs_stage0cat,"htxs_stage0cat/I");
+    tree->Branch("htxs_stage1cat",&htxs_stage1cat,"htxs_stage1cat/I");
+
+
     //set JES uncertainties, TO DO: UPDATE FOR 2017
     JESUncertainties * jecUncertainties = new JESUncertainties("DesyTauAnalyses/NTupleMaker/data/Summer16_UncertaintySources_AK4PFchs.txt");
     std::vector<std::string> uncertNames = jecUncertainties->getUncertNames();
@@ -1457,6 +1494,12 @@ int main(int argc, char * argv[]) {
    float MinLJetPt = 20.;
    float MinBJetPt = 20.; // !!!!!
    
+   TFile *file_ggh_reweighting = new TFile(TString(cmsswBase)+TString("/src/DesyTauAnalyses/NTupleMaker/data/NNLOPS_reweight.root"));
+   TGraph * gr_NNLOPSratio_pt_mcatnlo_0jet  = (TGraph*) file_ggh_reweighting->Get("gr_NNLOPSratio_pt_mcatnlo_0jet");
+   TGraph * gr_NNLOPSratio_pt_mcatnlo_1jet  = (TGraph*) file_ggh_reweighting->Get("gr_NNLOPSratio_pt_mcatnlo_1jet");
+   TGraph * gr_NNLOPSratio_pt_mcatnlo_2jet  = (TGraph*) file_ggh_reweighting->Get("gr_NNLOPSratio_pt_mcatnlo_2jet");
+   TGraph * gr_NNLOPSratio_pt_mcatnlo_3jet  = (TGraph*) file_ggh_reweighting->Get("gr_NNLOPSratio_pt_mcatnlo_3jet");
+
    // Z pt mass weights
    TFile * fileZMassPtWeights = new TFile(TString(cmsswBase)+"/src/"+ZMassPtWeightsFileName);
    if (fileZMassPtWeights->IsZombie()) {
@@ -1480,7 +1523,7 @@ int main(int argc, char * argv[]) {
     int nFiles = 0;
         
     for (int iF=0; iF<nTotalFiles; ++iF) { // loop over input file names
-        
+    //for (int iF=0; iF<2; ++iF) {     
        std::string filen;
        fileList >> filen;
        
@@ -1523,7 +1566,7 @@ int main(int argc, char * argv[]) {
        std::cout << "      number of entries in Tree = " << numberOfEntries << std::endl;
        
        for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) {
-          
+          // for (Long64_t iEntry=0; iEntry<10000; iEntry++) {  
           analysisTree.GetEntry(iEntry);                //store maxRun and minRun
           nEvents++;
           if (analysisTree.event_run>maxRun)
@@ -1561,6 +1604,7 @@ int main(int argc, char * argv[]) {
           weightPDFup   = analysisTree.weightPDFup;   //store pdf weights
           weightPDFdown = analysisTree.weightPDFdown;
           
+          weight_ggh_NNLOPS = 1.;
           puweight = 1;                               //set default values for variables
           trigweight_1 = 1;
           trigweight_2 = 1;
@@ -1580,6 +1624,17 @@ int main(int argc, char * argv[]) {
           topptweight = 1;
           topptweightRun2 = 1;
           
+          THU_ggH_Mu = 1.0;
+          THU_ggH_Res = 1.0;
+          THU_ggH_Mig01 = 1.0;
+          THU_ggH_Mig12 = 1.0;
+          THU_ggH_VBF2j = 1.0;
+          THU_ggH_VBF3j = 1.0;
+          THU_ggH_PT60 = 1.0;
+          THU_ggH_PT120 = 1.0;
+          THU_ggH_qmtop = 1.0;
+
+
           btag0weight = 1;
           btag0weight_Up = 1;
           btag0weight_Down = 1;
@@ -1648,7 +1703,11 @@ int main(int argc, char * argv[]) {
           higgsPt = 0;
           higgsEta = 0;
           higgsMass = -1;
-
+          
+          njets_HTXS = -1.;
+          higgspt_HTXS = -1.;
+          htxs_stage0cat = -1.;
+          htxs_stage1cat = -1.;
           
           metFilters_ = true;
           
@@ -1859,6 +1918,7 @@ int main(int argc, char * argv[]) {
                 //store momentum from neutrino of tau lepton decays
                 nuPx = tauNeutrinosLV.Px(); nuPy = tauNeutrinosLV.Py(); nuPz = tauNeutrinosLV.Pz();
                 }
+             
              else if (isW) { //store geninfo for W+jets events
                 bosonPx = wDecayProductsLV.Px(); bosonPy = wDecayProductsLV.Py(); bosonPz = wDecayProductsLV.Pz();
                 bosonMass = wDecayProductsLV.M();
@@ -1963,8 +2023,33 @@ int main(int argc, char * argv[]) {
                << "        pz = " << nuPz << std::endl;
              */
              
-             
-             
+           
+             if (isSignal){
+                 njets_HTXS = analysisTree.htxs_njets30;
+                 higgspt_HTXS = analysisTree.htxs_higgsPt;
+                 htxs_stage0cat = analysisTree.htxs_stage0cat;
+                 htxs_stage1cat = analysisTree.htxs_stage1cat;
+                 if (apply_ggh_reweighting)
+                    {
+                       if      (njets_HTXS==0) weight_ggh_NNLOPS = gr_NNLOPSratio_pt_mcatnlo_0jet->Eval(TMath::Min(higgspt_HTXS,(Float_t)125.0));
+                       else if (njets_HTXS==1) weight_ggh_NNLOPS = gr_NNLOPSratio_pt_mcatnlo_1jet->Eval(TMath::Min(higgspt_HTXS,(Float_t)625.0));
+                       else if (njets_HTXS==2) weight_ggh_NNLOPS = gr_NNLOPSratio_pt_mcatnlo_2jet->Eval(TMath::Min(higgspt_HTXS,(Float_t)800.0));
+                       else if (njets_HTXS>=3) weight_ggh_NNLOPS = gr_NNLOPSratio_pt_mcatnlo_3jet->Eval(TMath::Min(higgspt_HTXS,(Float_t)925.0));
+                       else weight_ggh_NNLOPS = 1.0;
+
+                       std::vector<double> ggF_unc = qcd_ggF_uncertSF_2017(njets_HTXS, higgspt_HTXS, htxs_stage1cat, 1.0);
+                       THU_ggH_Mu = ggF_unc[0];
+                       THU_ggH_Res = ggF_unc[1];
+                       THU_ggH_Mig01 = ggF_unc[2];
+                       THU_ggH_Mig12 = ggF_unc[3];
+                       THU_ggH_VBF2j = ggF_unc[4];
+                       THU_ggH_VBF3j = ggF_unc[5];
+                       THU_ggH_PT60 = ggF_unc[6];
+                       THU_ggH_PT120 = ggF_unc[7];
+                       THU_ggH_qmtop = ggF_unc[8];
+                    }
+             }
+                          
              if (isDY) { // applying Z pt mass weights
                 zptmassweight = 1;
                 if (bosonMass>50.0) {
@@ -2032,7 +2117,8 @@ int main(int argc, char * argv[]) {
           run = int(analysisTree.event_run);
           lumi = int(analysisTree.event_luminosityblock);
           evt = int(analysisTree.event_nr);
-
+          
+          
 	  // embedded weight
 
           if (debug) std::cout<<"check good run selection"<<std::endl;
@@ -2175,8 +2261,7 @@ int main(int argc, char * argv[]) {
                if (discr == BTagDiscriminator2)
                   nBTagDiscriminant2 = iBTag;
             }
-            std::cout<<"nBTagDiscriminant1 " <<nBTagDiscriminant1<<"nBTagDiscriminant2 " <<nBTagDiscriminant2<<std::endl;
-
+          
             //std::cout<<"before met filters"<<std::endl; 
             // MET Filters //store if event passes the met filters
             metFilters_ = metFiltersPasses(analysisTree,metFlags);
@@ -2493,7 +2578,7 @@ int main(int argc, char * argv[]) {
                (isMu23&&isEle12&&analysisTree.muon_pt[muonIndex]>ptMuonHighCut) ||
                (isMu8&&isEle23&&analysisTree.electron_pt[electronIndex]>ptElectronHighCut);
             //event stored if trigger matching is true and a match to one of the triggers has been found
-            //if (applyTriggerMatch&&trg_muonelectron<0.5) continue;
+            if (applyTriggerMatch&&trg_muonelectron<0.5) continue;
             if (debug) std::cout<<"A trigger match has been found"<<std::endl;
             
             //OS Muon-Ele pair?
@@ -2649,7 +2734,7 @@ int main(int argc, char * argv[]) {
                // scale factors
                if (applyWSCorr) {
                   if (isEmbedded) {
-                     isoweight_1 = correctionWS->function("e_idiso_binned_embed_ratio")->getVal();
+                     isoweight_1 = correctionWS->function("e_id_embed_ratio")->getVal() * correctionWS->function("e_iso_binned_embed_ratio")->getVal();
                      isoweight_2 = correctionWS->function("m_looseiso_binned_embed_ratio")->getVal() * correctionWS->function("m_id_embed_ratio")->getVal();
                   }
                   else {
@@ -2885,9 +2970,6 @@ int main(int argc, char * argv[]) {
                 if (absJetEta<bJetEtaCut) { // jet within b-tagging acceptance
                    
                    bool tagged = analysisTree.pfjet_btag[jet][nBTagDiscriminant1] + analysisTree.pfjet_btag[jet][nBTagDiscriminant2] >btagCut; // b-jet
-                   std::cout<<"tagged jet: "<<tagged<<std::endl;
-                   std::cout<<"tagged jet 1: "<< analysisTree.pfjet_btag[jet][nBTagDiscriminant1]<<std::endl;
-                   std::cout<<"tagged jet 2: "<< analysisTree.pfjet_btag[jet][nBTagDiscriminant2]<<std::endl;
                    bool taggedRaw = tagged;
                    
                    if (!isData) {
@@ -3240,7 +3322,11 @@ int main(int argc, char * argv[]) {
             // qcdweight_nodzeta     = qcdWeightNoDzeta.getWeight(pt_1,pt_2,dr_tt);
             // qcdweightup_nodzeta   = qcdWeightNoDzeta.getWeight(pt_1,pt_2,dr_tt);
             // qcdweightdown_nodzeta = qcdWeightNoDzeta.getWeight(pt_1,pt_2,dr_tt);
-            
+            // std::cout<<"qcdweight: "<<qcdweight<<std::endl;
+            // std::cout<<"pt_1: "<<pt_1<<std::endl;
+            // std::cout<<"pt_2: "<<pt_2<<std::endl;
+            // std::cout<<"njets: "<<njets<<std::endl;
+            // std::cout<<"dr_tt: "<<dr_tt<<std::endl;
             // METs
             float met_x = analysisTree.pfmetcorr_ex;
             float met_y = analysisTree.pfmetcorr_ey;
@@ -3644,8 +3730,8 @@ int main(int argc, char * argv[]) {
             phi_sv_escaleDown = -10;
 
             //calculate SV mass only for certain events
-            //if (computeSVFitMass && dzeta>-40 && iso_1<0.5 && iso_2<0.5 && njetsMax>0) {
-                if (computeSVFitMass) {
+            if (computeSVFitMass && dzeta>-40 && iso_1<0.15 && iso_2<0.2 && trg_muonelectron > 0.5) {
+               //    if (computeSVFitMass) {
                //                if (mvaMetFound) {
                // covariance matrix MET
                     TMatrixD covMET(2, 2);
