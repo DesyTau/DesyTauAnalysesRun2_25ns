@@ -64,12 +64,15 @@ int main(int argc, char * argv[]) {
   const bool oppositeSign    = cfg.get<bool>("OppositeSign");
   int chargeTagMuon          = cfg.get<int>("chargeTagMuon"); // -1/0/+1 (neg,all,pos)
 
+  // L1 objects cut
   const string l1seed        = cfg.get<string>("L1Seed");
   const float ptL1TauCut     = cfg.get<float>("ptL1TauCut");
   const float etaL1TauCut    = cfg.get<float>("etaL1TauCut");
-  const float detaL1TauCut   = cfg.get<float>("detaL1TauCut");
   const bool matchL1Tau      = cfg.get<bool>("matchL1Tau");
 
+  const float ptL1MuonCut     = cfg.get<float>("ptL1MuonCut");
+  const float etaL1MuonCut    = cfg.get<float>("etaL1MuonCut");
+  const bool matchL1Muon      = cfg.get<bool>("matchL1Muon");
 
   // tau
   const float ptTauCut  = cfg.get<float>("ptTauCut");
@@ -499,9 +502,9 @@ int main(int argc, char * argv[]) {
   TFile * filePUOfficial_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/"+PUDataFile,"read");
   TFile * filePUOfficial_MC = new TFile (TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/"+PUMCFile, "read");
   TH1D * PUOfficial_data = (TH1D *)filePUOfficial_data->Get("pileup");
-  TH1D * PUOfficial_mc = (TH1D *)filePUOfficial_MC->Get(PUMCHist+"_pileup");
-  //  PUofficial->set_h_data(PUOfficial_data);
-  //  PUofficial->set_h_MC(PUOfficial_mc);
+  TH1D * PUOfficial_mc = (TH1D *)filePUOfficial_MC->Get(PUMCHist);
+  PUofficial->set_h_data(PUOfficial_data);
+  PUofficial->set_h_MC(PUOfficial_mc);
 
   int nTotalFiles = 0;
   std::string dummy;
@@ -618,8 +621,9 @@ int main(int argc, char * argv[]) {
 
 
       if (!isData) {
-	//	float puWeight =  float(PUofficial->get_PUweight(double(analysisTree.numtruepileupinteractions)));
-	float puWeight =  float(PUOfficial_data->GetBinContent(PUOfficial_data->GetXaxis()->FindBin(analysisTree.numtruepileupinteractions)));
+	float puWeight =  float(PUofficial->get_PUweight(double(analysisTree.numtruepileupinteractions)));
+	//	float puWeight =  float(PUOfficial_data->GetBinContent(PUOfficial_data->GetXaxis()->FindBin(analysisTree.numtruepileupinteractions)));
+	//	std::cout << "Pileup weight = " << puWeight << std::endl;
 	weight *= puWeight;
       }
 
@@ -693,22 +697,7 @@ int main(int argc, char * argv[]) {
       //      if (!isL1Seed)
       //	std::cout << "L1Seed " << L1Seed << "  does not exist" << std::endl;
 
-      /*
-      int numL1muons = 0;
-      for (unsigned int imu=0; imu<analysisTree.l1muon_count; ++imu) {
-        TLorentzVector l1muonLV; l1muonLV.SetXYZM(analysisTree.l1muon_px[imu],
-                                                  analysisTree.l1muon_py[imu],
-                                                  analysisTree.l1muon_pz[imu],
-                                                  muonMass);
-        if (l1muonLV.Pt()>20&&fabs(l1muonLV.Eta())<2.1) {
-	  numL1muons++;
-	}
-      }
-
-      if (numL1muons>1) {
-
-      }
-      */
+     
 
       //
 
@@ -755,6 +744,29 @@ int main(int argc, char * argv[]) {
 
 	float q1 = analysisTree.muon_charge[mu1Index];
 	
+	bool foundL1MuonSeed = false;
+	for (unsigned int imu=0; imu<analysisTree.l1muon_count; ++imu) {                                                                                                                  
+	  TLorentzVector l1muonLV; l1muonLV.SetXYZM(analysisTree.l1muon_px[imu],
+						    analysisTree.l1muon_py[imu],
+						    analysisTree.l1muon_pz[imu],
+						    muonMass);                                                                                                                            
+	  if (l1muonLV.Pt()>ptL1MuonCut && fabs(l1muonLV.Eta())<etaL1MuonCut&&analysisTree.l1muon_bx[imu]==0) {
+	    double deltaRl1mu = deltaR(analysisTree.muon_eta[mu1Index],analysisTree.muon_phi[mu1Index],
+				       l1muonLV.Eta(),l1muonLV.Phi());
+	    if (deltaRl1mu<DRTrigMatch) { 
+	      mu1MatchL1object = true;
+	      foundL1MuonSeed = true;
+	    }
+	    
+	  }                                                                                                                                                                               
+	}
+	//	if (mu1MatchIsoSingleMu&&!foundL1MuonSeed) {
+	//	  std::cout << "Muon pt = " << analysisTree.muon_pt[mu1Index] 
+	//		    << "   eta = " << analysisTree.muon_pt[mu1Index] 
+	//		    << "   L1object = " << foundL1MuonSeed  
+	//		    << "   HLTmatch = " << mu1MatchIsoSingleMu << std::endl;
+	//	}
+
 	for (unsigned int im2=0; im2<muons.size(); ++im2) {
 
 	  if (im1==im2) continue;
@@ -773,6 +785,7 @@ int main(int argc, char * argv[]) {
 	  bool mu2MatchL1object = false;
 	  bool mu2MatchL1Seed   = false; 
 	  bool tauIsFound       = false;
+	  int mu2L1objectBx     = -999;
 
 	  for (unsigned int itau=0; itau<analysisTree.tau_count; ++itau) {
 	    if (analysisTree.tau_pt[itau]<ptTauCut) continue;
@@ -810,28 +823,6 @@ int main(int argc, char * argv[]) {
 	      mu2MatchL1Seed = true;
 	  }
 	  bool mu2MatchIsoMuProbe = mu2MatchIsoMuProbe1 || mu2MatchIsoMuProbe2;
-	  bool l1muonFound = false;
-	  for (unsigned int imu=0; imu<analysisTree.l1muon_count; ++imu) {                                                                                                                  
-	    TLorentzVector l1muonLV; l1muonLV.SetXYZM(analysisTree.l1muon_px[imu],                                                                                                          
-						      analysisTree.l1muon_py[imu],                                                                                                          
-						      analysisTree.l1muon_pz[imu],                                                                                                          
-						      muonMass);                                                                                                                            
-	    if (analysisTree.l1muon_iso[imu]>0 && l1muonLV.Pt()>20 && fabs(l1muonLV.Eta())<2.1) {
-	      float deltaRl1mu = deltaR(analysisTree.muon_eta[mu2Index],analysisTree.muon_phi[mu2Index],
-					l1muonLV.Eta(),l1muonLV.Phi());
-	      if (deltaRl1mu<DRTrigMatch) mu2MatchL1object = true;
-	      deltaRl1mu = deltaR(analysisTree.muon_eta[mu1Index],analysisTree.muon_phi[mu1Index],
-				  l1muonLV.Eta(),l1muonLV.Phi());
-	      if (deltaRl1mu<DRTrigMatch) mu1MatchL1object = true;
-
-	    }                                                                                                                                                                               
-	  }
-
-	  if (fabs(analysisTree.muon_eta[mu2Index])<ptMuonHighCut)
-
-
-	  bool mu2Mu50 = mu2MatchMu50;
-	  bool mu2IsoMuProbe = mu2MatchIsoMuProbe;
 
 	  float dZ = fabs(analysisTree.muon_dz[mu1Index]-analysisTree.muon_dz[mu2Index]);
 
@@ -844,7 +835,7 @@ int main(int argc, char * argv[]) {
                                               analysisTree.muon_pz[mu2Index],
                                               muonMass);
 
-	  float mass = (mu1lv+mu2lv).M();
+	  float mass = (mu1lv+mu2lv).M(); 
 
 	  if (mass<50.0) continue;
 
@@ -883,9 +874,7 @@ int main(int argc, char * argv[]) {
 	  float dPhiMuMuX = TMath::Max(float(0.001),TMath::Min(dPhiMuMu,float(TMath::Pi()-0.001)));
 	  int dPhiMuMuBin = binNumber(dPhiMuMuX,nDPhiBins,dPhiBins);
 
-
-	  bool foundL1Seed = false;
-
+	  bool foundL1TauSeed = false;
           for (unsigned int iT=0; iT<analysisTree.l1tau_count; ++iT) {
 
 	    TLorentzVector l1LV; l1LV.SetXYZM(analysisTree.l1tau_px[iT],
@@ -910,10 +899,12 @@ int main(int argc, char * argv[]) {
 		      << "   phi = " << analysisTree.l1isotau_phi[iT]
 		      << "   pt = "  << analysisTree.l1isotau_pt[iT] << std::endl;
 	    */
-            foundL1Seed = true;
+            foundL1TauSeed = true;
           }
 
-	  if (!matchL1Tau) foundL1Seed = true;
+	  bool foundL1Seed = true;
+	  if (matchL1Tau) foundL1Seed = foundL1TauSeed;
+	  if (matchL1Muon) foundL1Seed = foundL1MuonSeed;
 
 	  float mu2AbsEta = fabs(analysisTree.muon_eta[mu2Index]);
 	  float mu2Pt = TMath::Max(float(5.01),TMath::Min(float(analysisTree.muon_pt[mu2Index]),float(99.9)));
@@ -1009,7 +1000,9 @@ int main(int argc, char * argv[]) {
             }
           }
 
-	  // l1 tau presence
+	  // **********************************************
+	  // ************* Tag-&-Probe ********************
+	  // **********************************************
 	  if (isHLTIsoSingleMu && mu1IsoSingleMu && foundL1Seed && dRmumu>dRleptonsCut) { // Single muon selection
 
 	    isPairSelected = true;
@@ -1032,7 +1025,7 @@ int main(int argc, char * argv[]) {
 
 		if (mu2MatchIsoMuProbe) {
 		  ZMassIsoMuLegPtEtaPassH[etaBin][ptBin]->Fill(mass,weight);
-		ZMassIsoMuLegPtPassH[ptBin]->Fill(mass,weight);
+		  ZMassIsoMuLegPtPassH[ptBin]->Fill(mass,weight);
 		}
 		else {
 		  ZMassIsoMuLegPtEtaFailH[etaBin][ptBin]->Fill(mass,weight);

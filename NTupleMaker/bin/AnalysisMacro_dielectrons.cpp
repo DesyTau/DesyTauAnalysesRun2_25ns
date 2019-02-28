@@ -371,21 +371,18 @@ int main(int argc, char * argv[]) {
   TH1D * EleSF_IdIso_Ele1H = new TH1D("EleIdIsoSF_Ele1H", "EleIdIsoSF_Ele1", 100, 0.5,1.5);
   TH1D * EleSF_IdIso_Ele2H = new TH1D("EleIdIsoSF_Ele2H", "EleIdIsoSF_Ele2", 100, 0.5,1.5);
 
-  int nPtBins = 9;
-  float ptBins[10] = {10,15,20,25,30,40,50,100,200,1000};
+  int nPtBins = 6;
+  float ptBins[7] = {10,20,30,40,50,100,1000};
 
   int nEtaBins = 5;
   float etaBins[6] = {0, 1.0, 1.479, 1.653, 2.1, 2.5}; 
 
-  TString PtBins[9] = {"Pt10to15",
-		       "Pt15to20",
-		       "Pt20to25",
-		       "Pt25to30",		       
+  TString PtBins[6] = {"Pt10to20",
+		       "Pt20to30",		       
 		       "Pt30to40",
 		       "Pt40to50",
 		       "Pt50to100",
-		       "Pt100to200",
-		       "PtGt200"};
+		       "PtGt100"};
 
   TString EtaBins[5] = {"EtaLt1p0",
 			"Eta1p0to1p48",
@@ -448,17 +445,17 @@ int main(int argc, char * argv[]) {
   TH1D * ZMassPass = new TH1D("ZMassPass","",80,50,130);
   TH1D * ZMassFail = new TH1D("ZMassFail","",80,50,130);
 
-  TH1F * ZMassJetEtaPtPass[3][5][9];
-  TH1F * ZMassJetEtaPtFail[3][5][9];
+  TH1F * ZMassJetEtaPtPass[3][5][8];
+  TH1F * ZMassJetEtaPtFail[3][5][8];
 
-  TH1F * ZMassEtaPtPass[5][9];
-  TH1F * ZMassEtaPtFail[5][9];
+  TH1F * ZMassEtaPtPass[5][8];
+  TH1F * ZMassEtaPtFail[5][8];
 
-  TH1F * ZMassIso1EtaPtPass[4][5][9];
-  TH1F * ZMassIso1EtaPtFail[4][5][9];
+  TH1F * ZMassIso1EtaPtPass[4][5][8];
+  TH1F * ZMassIso1EtaPtFail[4][5][8];
 
-  TH1F * ZMassIso2EtaPtPass[4][5][9];
-  TH1F * ZMassIso2EtaPtFail[4][5][9];
+  TH1F * ZMassIso2EtaPtPass[4][5][8];
+  TH1F * ZMassIso2EtaPtFail[4][5][8];
 
   for (int iEta=0; iEta<nEtaBins; ++iEta) {
     for (int iPt=0; iPt<nPtBins; ++iPt) {

@@ -28,6 +28,7 @@
 #include "DesyTauAnalyses/NTupleMaker/interface/json.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/functions.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/PileUp.h"
+#include "DesyTauAnalyses/NTupleMaker/interface/functionsSynch2017.h"
 
 
 int main(int argc, char * argv[]) {
@@ -56,7 +57,8 @@ int main(int argc, char * argv[]) {
   const float dxyElecCut     = cfg.get<float>("dxyElecCut");
   const float dzElecCut      = cfg.get<float>("dzElecCut");
   const float isoElecCut     = cfg.get<float>("isoElecCut");
-  const bool applyElecId     = cfg.get<bool>("ApplyElecId");
+  const int  electronIdType  = cfg.get<int>("ElectronIdType");
+  const bool applyRhoCorrectedIso = cfg.get<bool>("ApplyRhoCorrectedIso");
 
   // topological cuts
   const float dRleptonsCut   = cfg.get<float>("dRleptonsCut");
@@ -65,8 +67,13 @@ int main(int argc, char * argv[]) {
   const bool oppositeSign    = cfg.get<bool>("OppositeSign");
   const float ptL1TauCut     = cfg.get<float>("ptL1TauCut");
   const float etaL1TauCut    = cfg.get<float>("etaL1TauCut");
-  const float detaL1TauCut    = cfg.get<float>("detaL1TauCut");
+  const float detaL1TauCut   = cfg.get<float>("detaL1TauCut");
   const bool matchL1Tau      = cfg.get<bool>("matchL1Tau");
+
+  const bool matchL1Elec     = cfg.get<bool>("matchL1Elec");
+  const float ptL1ElecCut     = cfg.get<float>("ptL1ElecCut");
+  const float etaL1ElecCut    = cfg.get<float>("etaL1ElecCut");
+
 
   // triggers
   const bool applyTrigger = cfg.get<bool>("ApplyTrigger");
@@ -148,8 +155,9 @@ int main(int argc, char * argv[]) {
   TH1F * inputEventsH = new TH1F("inputEventsH","",1,-0.5,0.5);
   TH1F * weightsH = new TH1F("weightsH","",1,-0.5,0.5);
 
-  int nEtaBins = 3;
-  float etaBins[4] = {-0.001, 1.48, 2.1, 2.5};
+  int nEtaBins = 5;
+  float etaBins[6] = {0, 1.0, 1.479, 1.653, 2.1, 2.5};
+
 
   int nEtaFineBins  = 10;
   float etaFineBins[11] = {-2.5, -2.1, -1.57, -1.44, -0.8, 0., 0.8, 1.44, 1.57, 2.1, 2.5};
@@ -168,7 +176,11 @@ int main(int argc, char * argv[]) {
   TH1F * ZMassSingleEleLegFailH = new TH1F("ZMassSingleEleLegFailH","",60,60,120);
 
 
-  TString EtaBins[3] = {"EtaLt1p48","Eta1p48to2p1","EtaGt2p1"};
+  TString EtaBins[5] = {"EtaLt1p0",
+                        "Eta1p0to1p48",
+                        "Eta1p48to1p65",
+                        "Eta1p65to2p1",
+                        "EtaGt2p1"};
 
   TString EtaFineBins[10];
   for (int iB=0; iB<nEtaFineBins; ++iB) {
@@ -220,14 +232,14 @@ int main(int argc, char * argv[]) {
 
   // (Pt,Eta)
 
-  TH1F * ZMassSingleEleLegPtEtaPassH[3][18];
-  TH1F * ZMassSingleEleLegPtEtaFailH[3][18];
+  TH1F * ZMassSingleEleLegPtEtaPassH[5][18];
+  TH1F * ZMassSingleEleLegPtEtaFailH[5][18];
 
-  TH1F * ZMassSingleEleLegIsoPtEtaPassH[4][3][18];
-  TH1F * ZMassSingleEleLegIsoPtEtaFailH[4][3][18];
+  TH1F * ZMassSingleEleLegIsoPtEtaPassH[4][5][18];
+  TH1F * ZMassSingleEleLegIsoPtEtaFailH[4][5][18];
 
-  TH1F * ZMassSingleEleLegEtaPassH[3];
-  TH1F * ZMassSingleEleLegEtaFailH[3];
+  TH1F * ZMassSingleEleLegEtaPassH[5];
+  TH1F * ZMassSingleEleLegEtaFailH[5];
 
   TH1F * ZMassSingleEleLegEtaFinePassH[10];
   TH1F * ZMassSingleEleLegEtaFineFailH[10];
@@ -296,9 +308,9 @@ int main(int argc, char * argv[]) {
   TFile * filePUOfficial_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/"+PUDataFile,"read");
   TFile * filePUOfficial_MC = new TFile (TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/"+PUMCFile, "read");
   TH1D * PUOfficial_data = (TH1D *)filePUOfficial_data->Get("pileup");
-  TH1D * PUOfficial_mc = (TH1D *)filePUOfficial_MC->Get(PUMCHist+"_pileup");
-  //  PUofficial->set_h_data(PUOfficial_data);
-  //  PUofficial->set_h_MC(PUOfficial_mc);
+  TH1D * PUOfficial_mc = (TH1D *)filePUOfficial_MC->Get(PUMCHist);
+  PUofficial->set_h_data(PUOfficial_data);
+  PUofficial->set_h_MC(PUOfficial_mc);
 
   int nTotalFiles = 0;
   std::string dummy;
@@ -416,9 +428,10 @@ int main(int argc, char * argv[]) {
 
 
       if (!isData) {
-	//	float puWeight =  float(PUofficial->get_PUweight(double(analysisTree.numtruepileupinteractions)));
-	float puWeight =  float(PUOfficial_data->GetBinContent(PUOfficial_data->GetXaxis()->FindBin(analysisTree.numtruepileupinteractions)));
+	float puWeight =  float(PUofficial->get_PUweight(double(analysisTree.numtruepileupinteractions)));
+	//	float puWeight =  float(PUOfficial_data->GetBinContent(PUOfficial_data->GetXaxis()->FindBin(analysisTree.numtruepileupinteractions)));
 	weight *= puWeight;
+	//	std::cout << "PU weight = " << puWeight << std::endl;
       }
 
       //      std::cout << "Triggers" << std::endl;
@@ -481,11 +494,18 @@ int main(int argc, char * argv[]) {
 	if (fabs(analysisTree.electron_eta[im])>etaElecCut) continue;
 	if (fabs(analysisTree.electron_dxy[im])>dxyElecCut) continue;
 	if (fabs(analysisTree.electron_dz[im])>dzElecCut) continue;
-	bool eleId = 
-	  analysisTree.electron_mva_wp80_Iso_Fall17_v1[im]>0.5 &&
-	  analysisTree.electron_pass_conversion[im] > 0.5 &&
+	bool electronId = true;
+	if (electronIdType==1)
+          electronId = analysisTree.electron_mva_wp80_Iso_Fall17_v1[im]>0.5;
+        else if (electronIdType==2)
+          electronId = analysisTree.electron_mva_wp90_Iso_Fall17_v1[im]>0.5;
+        else if (electronIdType==3)
+          electronId = analysisTree.electron_mva_wp80_general_Spring16_v1[im]>0.5;
+        else if (electronIdType==4)
+          electronId = analysisTree.electron_mva_wp90_general_Spring16_v1[im]>0.5;
+	electronId = electronId && analysisTree.electron_pass_conversion[im] > 0.5 &&
 	  analysisTree.electron_nmissinginnerhits[im] <= 1;
-	if (applyElecId && !eleId) continue;
+	if (!electronId) continue;
 	elecs.push_back(im);
       }
 
@@ -507,6 +527,21 @@ int main(int argc, char * argv[]) {
 	  if (analysisTree.trigobject_filters[iT][nSingleEleFilter]) 
 	    ele1MatchSingleEle = true;
 	}
+	bool foundL1ElecSeed = false;
+	for (unsigned int il1=0; il1<analysisTree.l1egamma_count; ++il1) {
+	  if (analysisTree.l1egamma_bx[il1]!=0) continue;
+	  TLorentzVector l1egammaLV; l1egammaLV.SetXYZM(analysisTree.l1egamma_px[il1],
+						       analysisTree.l1egamma_py[il1],
+						       analysisTree.l1egamma_pz[il1],
+						       0.1);
+	  if (l1egammaLV.Pt()<ptL1ElecCut) continue;
+	  if (fabs(l1egammaLV.Eta())>etaL1ElecCut) continue;
+	  float dRmatch = deltaR(analysisTree.electron_eta[ele1Index],analysisTree.electron_phi[ele1Index],
+				 l1egammaLV.Eta(),l1egammaLV.Phi());
+	  if (dRmatch<DRTrigMatch) 
+	    foundL1ElecSeed = true;
+	    
+	}
 
 	//	if (ele1MatchSingleEle)	std::cout << "ele1 match : " << ele1MatchSingleEle << std::endl;
 
@@ -515,6 +550,14 @@ int main(int argc, char * argv[]) {
 	  analysisTree.electron_pt[ele1Index]>ptElecTagCut && 
 	  fabs(analysisTree.electron_eta[ele1Index])<etaElecTagCut;
 
+	/*
+	if (ele1MatchSingleEle&&!foundL1ElecSeed) {
+	  std::cout << "Elec   pt = " << analysisTree.electron_pt[ele1Index] 
+		    << "   eta = " << analysisTree.electron_eta[ele1Index]
+		    << "   L1Seed = " << foundL1ElecSeed
+		    << "   HLTmatch = " << ele1MatchSingleEle << std::endl;
+	}
+	*/
 
 	float q1 = analysisTree.electron_charge[ele1Index];
 	
@@ -562,30 +605,34 @@ int main(int argc, char * argv[]) {
 
 	  float mass = (ele1lv+ele2lv).M();
 
-	  float absIso1 = analysisTree.electron_r03_sumChargedHadronPt[ele1Index];
-	  //	  float neutralIso1 = 
-	  //	    analysisTree.electron_r03_sumNeutralHadronEt[ele1Index] +
-	  //            analysisTree.electron_r03_sumPhotonEt[ele1Index] -
-	  //            0.5*analysisTree.electron_r03_sumPUPt[ele1Index];
-	  float neutralIso1 = 
-	    analysisTree.electron_r03_sumNeutralHadronEt[ele1Index] +
-	    analysisTree.electron_r03_sumPhotonEt[ele1Index] -
-	    analysisTree.rho*TMath::Pi()*isoCone*isoCone;
-          neutralIso1 = TMath::Max(float(0),neutralIso1);
-          absIso1 += neutralIso1;
+	  float absIso1 = 0;
+	  if (applyRhoCorrectedIso) {
+	    absIso1 = abs_Iso_et(ele1Index, &analysisTree, isoCone);
+	  } 
+	  else {
+	   absIso1 = analysisTree.electron_r03_sumChargedHadronPt[ele1Index];
+	   float neutralIso1 = 
+	     analysisTree.electron_r03_sumNeutralHadronEt[ele1Index] +
+	     analysisTree.electron_r03_sumPhotonEt[ele1Index] -
+	     0.5*analysisTree.electron_r03_sumPUPt[ele1Index];
+	   neutralIso1 = TMath::Max(float(0),neutralIso1);
+	   absIso1 += neutralIso1;
+	  }	  
 	  float relIso1 = absIso1/analysisTree.electron_pt[ele1Index];
 
-	  float absIso2 = analysisTree.electron_r03_sumChargedHadronPt[ele2Index];
-	  //	  float neutralIso2 = 
-	  //	    analysisTree.electron_r03_sumNeutralHadronEt[ele2Index] +
-	  //            analysisTree.electron_r03_sumPhotonEt[ele2Index] -
-	  //            0.5*analysisTree.electron_r03_sumPUPt[ele2Index];
-	  float neutralIso2 = 
-	    analysisTree.electron_r03_sumNeutralHadronEt[ele2Index] +
-	    analysisTree.electron_r03_sumPhotonEt[ele2Index] -
-	    analysisTree.rho*TMath::Pi()*isoCone*isoCone;
-          neutralIso2 = TMath::Max(float(0),neutralIso2);
-          absIso2 += neutralIso2;
+	  float absIso2 = 0;
+	  if (applyRhoCorrectedIso) {
+            absIso2 = abs_Iso_et(ele2Index, &analysisTree, isoCone);
+          }
+          else {
+	    absIso2 = analysisTree.electron_r03_sumChargedHadronPt[ele2Index];
+	    float neutralIso2 =
+	      analysisTree.electron_r03_sumNeutralHadronEt[ele2Index] +
+	      analysisTree.electron_r03_sumPhotonEt[ele2Index] -
+	      0.5*analysisTree.electron_r03_sumPUPt[ele2Index];
+	    neutralIso2 = TMath::Max(float(0),neutralIso2);
+	    absIso2 += neutralIso2;
+          }
 	  float relIso2 = absIso2/analysisTree.electron_pt[ele2Index];
 
 	  float ele1RelIso = relIso1;
@@ -599,7 +646,7 @@ int main(int argc, char * argv[]) {
 
 	  bool dirIso = (relIso2<isoElecCut) && (relIso1<isoElecCut);
 
-	  bool foundL1Seed = false;
+	  bool foundL1TauSeed = false;
 	  /*
 	  std::cout << "mu1 :  pT = " << analysisTree.electron_pt[ele1Index]
 		    << "   eta = " << analysisTree.electron_eta[ele1Index]
@@ -630,16 +677,21 @@ int main(int argc, char * argv[]) {
 	    if (dRl1tau<DRTrigMatch) continue;
 	    float dEtal1tau = fabs(l1LV.Eta()-analysisTree.electron_eta[ele2Index]);
 	    if (dEtal1tau<detaL1TauCut) continue;
-	    foundL1Seed = true;
+	    foundL1TauSeed = true;
 	  }
 	  //	  std::cout << "L1 found = " << foundL1Seed << std::endl;
 	  //	  std::cout << std::endl;
 
 	  //	  std::cout << "Ok1" << std::endl;
-	  if (!matchL1Tau) foundL1Seed = true;
+	  bool foundL1Seed = true;
+	  if (matchL1Tau) foundL1Seed = foundL1TauSeed;
+	  if (matchL1Elec) foundL1Seed = foundL1ElecSeed;
 	  //	  std::cout << "foundL1Seed : " << << std::endl;
 
-	  if (ele2RelIso<isoElecCut && isHLTSingleEle && ele1SingleEle && foundL1Seed && dRmumu>dRleptonsCut) { // Single electron selection
+	  // **************************************
+	  // *********** Tag-&-Probe **************
+	  // **************************************
+	  if (isHLTSingleEle && ele1SingleEle && foundL1Seed && dRmumu>dRleptonsCut) { 
 
 	    float ele2AbsEta = fabs(analysisTree.electron_eta[ele2Index]);
 	    float ele2Pt = TMath::Max(float(5.01),TMath::Min(float(analysisTree.electron_pt[ele2Index]),float(99.9)));
