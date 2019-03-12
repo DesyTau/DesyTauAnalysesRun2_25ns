@@ -77,7 +77,7 @@ void iniPU(PileUp *PUofficial, TFile *filePUOfficial_data, TFile *filePUOfficial
 {
    // Official PU reweighting
    TH1D * PUOfficial_data = (TH1D *)filePUOfficial_data->Get("pileup");
-   TString NamePUHistMC = samplenameForPUHist + "_pileup";
+   TString NamePUHistMC = samplenameForPUHist + "pileup";
    TH1D * PUOfficial_mc = (TH1D *)filePUOfficial_MC->Get(NamePUHistMC);
    if( !PUOfficial_mc) {
       cout<<endl<<"MC pileup histogram "<<NamePUHistMC<<" does not exist in root file. Exiting."<<endl<<endl;
@@ -156,7 +156,7 @@ bool PassesMuonSelection(AC1B &analysisTree, unsigned int imuon, const float ptM
    if (fabs(analysisTree.muon_eta[imuon])>etaMuCut) passes=false;
    
    bool passedId = false;
-   if (era=="2017") passedId = analysisTree.muon_isMedium[imuon];
+   if (era=="2017" || era=="2018") passedId = analysisTree.muon_isMedium[imuon];
    else {
       std::cout<<"Muon Id not defined for era "<<era<<std::endl;
       exit(-1);
@@ -213,6 +213,10 @@ bool PassesElectronSelection(AC1B &analysisTree, unsigned int ielec , const floa
                          analysisTree.electron_cutId_veto_Summer16[ielec] &&
                          analysisTree.electron_pass_conversion[ielec] &&
                          analysisTree.electron_nmissinginnerhits[ielec] <= 1;           
+   else if (era == "2018")  passedId =
+                         analysisTree.electron_cutId_veto_Fall17[ielec] &&
+                         analysisTree.electron_pass_conversion[ielec] &&
+                         analysisTree.electron_nmissinginnerhits[ielec] <= 1;
    else {
       std::cout<<"Electron Id not defined for era "<<era<<std::endl;
       exit(-1);
