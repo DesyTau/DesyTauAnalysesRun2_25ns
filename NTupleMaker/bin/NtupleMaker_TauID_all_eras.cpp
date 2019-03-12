@@ -180,7 +180,7 @@ int main(int argc, char * argv[]) {
   
   // ------------------- set MET filters ---------------------------------
   std::vector<TString> metFlags; metFlags.clear();
-  if (era == "2017"){
+  if (era == "2017"){                                      //FIXME: Recommendations changed, has to be updated
      metFlags.push_back("Flag_HBHENoiseFilter");
      metFlags.push_back("Flag_HBHENoiseIsoFilter");
      metFlags.push_back("Flag_globalTightHalo2016Filter");
@@ -193,6 +193,18 @@ int main(int argc, char * argv[]) {
      metFlags.push_back("Flag_BadChargedCandidateFilter");
      metFlags.push_back("Flag_BadPFMuonFilter");
      metFlags.push_back("Flag_ecalBadCalibFilter");
+  }
+  else if (era == "2018"){
+     metFlags.push_back("Flag_goodVertices");
+     metFlags.push_back("Flag_globalSuperTightHalo2016Filter");
+     metFlags.push_back("Flag_HBHENoiseFilter");
+     metFlags.push_back("Flag_HBHENoiseIsoFilter");
+     metFlags.push_back("Flag_EcalDeadCellTriggerPrimitiveFilter");
+     metFlags.push_back("Flag_BadPFMuonFilter");
+     metFlags.push_back("Flag_BadChargedCandidateFilter");
+     if (isData)
+        metFlags.push_back("Flag_eeBadScFilter");
+     metFlags.push_back("ecalBadCalibReducedMINIAODFilter");
   }
   else {
      std::cout << "MET filters not defined for era "<<era<<std::endl;
@@ -493,29 +505,29 @@ int main(int argc, char * argv[]) {
         // ***************************************************
         // accessing PF MET and changing momentum scale of met
         // ***************************************************
-        float pfmetcorr_ex = analysisTree.pfmetcorr_ex;
-        float pfmetcorr_ey = analysisTree.pfmetcorr_ey;
-        
+        float pfmetcorr_ex = analysisTree.pfmet_ex;
+        float pfmetcorr_ey = analysisTree.pfmet_ey;
+
         if (!isData) { 
            if (jetES<0) {
-              pfmetcorr_ex = analysisTree.pfmetcorr_ex_JetEnDown;
-              pfmetcorr_ey = analysisTree.pfmetcorr_ey_JetEnDown;
+              pfmetcorr_ex = analysisTree.pfmet_ex_JetEnDown;
+              pfmetcorr_ey = analysisTree.pfmet_ey_JetEnDown;
            }
            else if (jetES>0) {
-              pfmetcorr_ex = analysisTree.pfmetcorr_ex_JetEnUp;
-              pfmetcorr_ey = analysisTree.pfmetcorr_ey_JetEnUp;
+              pfmetcorr_ex = analysisTree.pfmet_ex_JetEnUp;
+              pfmetcorr_ey = analysisTree.pfmet_ey_JetEnUp;
            }
            else if (unclusteredES<0) {
-              pfmetcorr_ex = analysisTree.pfmetcorr_ex_UnclusteredEnDown;
-              pfmetcorr_ey = analysisTree.pfmetcorr_ey_UnclusteredEnDown;
+              pfmetcorr_ex = analysisTree.pfmet_ex_UnclusteredEnDown;
+              pfmetcorr_ey = analysisTree.pfmet_ey_UnclusteredEnDown;
            }
            else if (unclusteredES>0) {
-              pfmetcorr_ex = analysisTree.pfmetcorr_ex_UnclusteredEnUp;
-              pfmetcorr_ey = analysisTree.pfmetcorr_ey_UnclusteredEnUp;
+              pfmetcorr_ex = analysisTree.pfmet_ex_UnclusteredEnUp;
+              pfmetcorr_ey = analysisTree.pfmet_ey_UnclusteredEnUp;
            }
            else {
-              pfmetcorr_ex = analysisTree.pfmetcorr_ex;
-              pfmetcorr_ey = analysisTree.pfmetcorr_ey;
+              pfmetcorr_ex = analysisTree.pfmet_ex;
+              pfmetcorr_ey = analysisTree.pfmet_ey;
            }
         }
         
@@ -728,6 +740,7 @@ int main(int argc, char * argv[]) {
            // ----------------------- jet ID ----------------------- 
            bool isPFJetId = false;
            if (era == "2017") isPFJetId = tightJetiD_2017(analysisTree,int(ijet));
+           else if (era == "2018") isPFJetId = tightJetiD_2018(analysisTree,int(ijet));
            else {
               std::cout<<"No Jet Id specified for era "<<era<<std::endl;
               exit(-1);
@@ -1068,6 +1081,7 @@ int main(int argc, char * argv[]) {
            if (jetFound) {
               tauJetFlavor_ = analysisTree.pfjet_flavour[indexMatchingJet];
               if (era == "2017") tauJetTightId_ = tightJetiD_2017(analysisTree,indexMatchingJet);
+              else if (era == "2018") tauJetTightId_ = tightJetiD_2018(analysisTree,indexMatchingJet);
               else {
                  std::cout<<"Jet Id not set for jets faking taus in era "<<era<<std::endl;
                  exit(-1);
@@ -1317,6 +1331,7 @@ int main(int argc, char * argv[]) {
                  tauJetEta_ = lorentzVectorTauJet.Eta();
                  tauJetPhi_ = lorentzVectorTauJet.Phi();
                  if (era == "2017") tauJetTightId_ = tightJetiD_2017(analysisTree,indexMatchingJet);
+                 else if (era == "2018")  tauJetTightId_ = tightJetiD_2018(analysisTree,indexMatchingJet);
                  else {
                     std::cout<<"Jet Id for tau faking jets not set (in jet + tau selection) in era "<<era<<std::endl;
                     exit(-1);
