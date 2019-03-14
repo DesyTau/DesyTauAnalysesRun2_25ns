@@ -1565,6 +1565,7 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("refitvertex_ndof", refitvertex_ndof, &b_refitvertex_ndof);
    fChain->SetBranchAddress("refitvertex_ptq", refitvertex_ptq, &b_refitvertex_pdf);
    fChain->SetBranchAddress("refitvertex_ntracks",refitvertex_ntracks, &b_refitvertex_ntracks);
+   fChain->SetBranchAddress("refitvertex_cov",refitvertex_cov, &b_refitvertex_cov);
    fChain->SetBranchAddress("muon_count", &muon_count, &b_muon_count);
    fChain->SetBranchAddress("muon_px", muon_px, &b_muon_px);
    fChain->SetBranchAddress("muon_py", muon_py, &b_muon_py);
