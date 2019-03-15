@@ -1777,6 +1777,10 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("tau_pca3D_x", tau_pca3D_x, &b_tau_pca3D_x);
    fChain->SetBranchAddress("tau_pca3D_y", tau_pca3D_y, &b_tau_pca3D_y);
    fChain->SetBranchAddress("tau_pca3D_z", tau_pca3D_z, &b_tau_pca3D_z);
+   fChain->SetBranchAddress("tau_SV_x", tau_SV_x, &b_tau_SV_x);
+   fChain->SetBranchAddress("tau_SV_y", tau_SV_y, &b_tau_SV_y);
+   fChain->SetBranchAddress("tau_SV_z", tau_SV_z, &b_tau_SV_z);
+   fChain->SetBranchAddress("tau_SV_cov", tau_SV_cov, &b_tau_SV_cov);
    fChain->SetBranchAddress("tau_dxy", tau_dxy, &b_tau_dxy);
    fChain->SetBranchAddress("tau_dz", tau_dz, &b_tau_dz);
    fChain->SetBranchAddress("tau_ip3d", tau_ip3d, &b_tau_ip3d);
