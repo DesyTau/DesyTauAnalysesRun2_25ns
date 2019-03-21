@@ -416,34 +416,6 @@ TLorentzVector ipVec(const AC1B * analysisTree, int tauIndex, Synch17Tree *otree
 		       analysisTree->tau_pca3D_y[tauIndex],
 		       analysisTree->tau_pca3D_z[tauIndex]);
     
-
-    /*this are all Higgs or proton matches, not what looking for..
-    cout<<"otree->gen_match_1 "<<otree->gen_match_1<<endl;
-    cout<<"analysisTree->genparticles_pdgid[otree->gen_match_1] "<<analysisTree->genparticles_pdgid[otree->gen_match_1]<<endl;
-    
-    cout<<"otree->gen_match_2 "<<otree->gen_match_2<<endl;
-    cout<<"analysisTree->genparticles_pdgid[otree->gen_match_2] "<<analysisTree->genparticles_pdgid[otree->gen_match_2]<<endl;
-    
-    TVector3 secvertex;
-    secvertex.SetX(analysisTree->genparticles_vx[otree->gen_match_2]);
-    secvertex.SetY(analysisTree->genparticles_vy[otree->gen_match_2]);
-    secvertex.SetZ(analysisTree->genparticles_vz[otree->gen_match_2]);
-    */
-
-    //Merijn 2019 could try to work here with the genmatch particles..
-
-    
-
-//    TVector3 secvertex(gentree->VxConstitTau1,gentree->VyConstitTau1,gentree->VzConstitTau1);
-    
-/* Merijn 2019 2 9: old merge conflict here, looks entirely innocent..
-<<<<<<< HEAD
-    
-=======
-     
->>>>>>> aba59220157a5bd7311e6ee2c2d82aef877de870
-    */
-    
     TVector3 momenta(analysisTree->tau_constituents_px[tauIndex][piIndex],
 		     analysisTree->tau_constituents_py[tauIndex][piIndex],
 		     analysisTree->tau_constituents_pz[tauIndex][piIndex]);
@@ -456,7 +428,6 @@ TLorentzVector ipVec(const AC1B * analysisTree, int tauIndex, Synch17Tree *otree
     IP=r-momenta*projection;
     vec.SetVect(IP);
     
-    //vec.SetVect(r);
     vec.SetT(0.);
   }
   else{cout<<"GENUINELY BIZAR: THERE WAS NO CHARGED PION FOUND.. "<<endl;}
@@ -497,26 +468,25 @@ TVector3 secvertex(0.,0.,0.);
 TVector3 momenta(0.,0.,0.);    
 
 if(ch=="et"){
-secvertex.SetXYZ(analysisTree->electron_vx[tauIndex],
-		       analysisTree->electron_vy[tauIndex],
-		       analysisTree->electron_vz[tauIndex]);
-
-
-momenta.SetXYZ(analysisTree->electron_px[tauIndex],
-		       analysisTree->electron_py[tauIndex],
-		       analysisTree->electron_pz[tauIndex]);}
-
-if(ch=="mt"){
-  secvertex.SetXYZ(analysisTree->muon_vx[tauIndex], //Merijn try somethin 2019 2 9
-		       analysisTree->muon_vy[tauIndex],
-		       analysisTree->muon_vz[tauIndex]);
-
-
-momenta.SetXYZ(analysisTree->muon_px[tauIndex],
-		       analysisTree->muon_py[tauIndex],
-		       analysisTree->muon_pz[tauIndex]);
-
-// cout<<"reco vx muon "<< analysisTree->muon_px[tauIndex] <<endl;
+  secvertex.SetXYZ(analysisTree->electron_vx[tauIndex],
+		   analysisTree->electron_vy[tauIndex],
+		   analysisTree->electron_vz[tauIndex]);
+  
+  
+  momenta.SetXYZ(analysisTree->electron_px[tauIndex],
+		 analysisTree->electron_py[tauIndex],
+		 analysisTree->electron_pz[tauIndex]);}
+ 
+ if(ch=="mt"){
+   secvertex.SetXYZ(analysisTree->muon_vx[tauIndex], //Merijn try somethin 2019 2 9
+		    analysisTree->muon_vy[tauIndex],
+		    analysisTree->muon_vz[tauIndex]);
+   
+   
+   momenta.SetXYZ(analysisTree->muon_px[tauIndex],
+		  analysisTree->muon_py[tauIndex],
+		  analysisTree->muon_pz[tauIndex]);
+   
  }
 
 
@@ -527,7 +497,6 @@ momenta.SetXYZ(analysisTree->muon_px[tauIndex],
     TVector3 IP;    
     IP=r-momenta*projection;
     vec.SetVect(IP);   
-    //    vec.SetVect(r);
     vec.SetT(0.);
 
   return vec;
@@ -690,16 +659,7 @@ void gen_acott(const AC1B * analysisTree, Synch17GenTree *gentree, int tauIndex1
     gentree->acotautau_21=acoCP(tau1_3ProngVec,tau2Prong,tau1IP,tau2Pi0,firstNegative,false,true, gentree);
 
   if(threeProng1&&threeProng2)
-    /*
-    //<<<<<<< HEAD
-    gentree->acotautau_22=acoCP(tau1_3ProngVec,tau2_3ProngVec,tau1IP,tau2IP,firstNegative,false,false,gentree);
-    
-    //>>>>>>> 773e02d1a8f2e699e17b3e7c57153f56b1fd3d4b
-    
-    =======
-    >>>>>>> aba59220157a5bd7311e6ee2c2d82aef877de870
-    */
-    //Meirjn 2019 2 9: assume this is what want to keep 
+
     gentree->acotautau_22=acoCP(tau1_3ProngVec,tau2_3ProngVec,tau1IP,tau2IP,firstNegative,false,false, gentree);
 
   //Merijn 2 25: here calculate the alpha-minus observable
@@ -806,7 +766,6 @@ TLorentzVector gen_neutralPivec(const AC1B * analysisTree, int tauIndex){
       }
     }
   }
-  //  std::cout << "number of pi0's = " << npi0 << std::endl;
   return neutralPi;
 };
 
