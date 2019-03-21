@@ -1920,8 +1920,6 @@ void initializeCPvar(Synch17Tree *otree){
   otree->acotautauPsi_01=-9999;
   otree->acotautauPsi_10=-9999;
   otree->acotautauPsi_11=-9999;
-
-  
   
   otree->tau1DecayPlaneX=-9999;
   otree->tau1DecayPlaneY=-9999;
@@ -1937,7 +1935,17 @@ void initializeCPvar(Synch17Tree *otree){
   otree->VxConstitTau2=-9999;
   otree->VyConstitTau2=-9999;
   otree->VzConstitTau2=-9999;
+
+  //Merijn add initialiser for
+  otree->chconst_1_pt=-9999;
+  otree->chconst_1_eta=-9999;
+  otree->chconst_1_phi=-9999;
   
+  otree->chconst_2_pt=-9999;
+  otree->chconst_2_eta=-9999;
+  otree->chconst_2_phi=-9999;
+  otree->alphaminus=-9999;
+
 }
 
 void initializeGenTree(Synch17GenTree *gentree){
@@ -1979,6 +1987,16 @@ void initializeGenTree(Synch17GenTree *gentree){
   gentree->VxConstitTau2=-9999;
   gentree->VyConstitTau2=-9999;
   gentree->VzConstitTau2=-9999;
+
+  //Merijn add initialiser for
+  gentree->chconst_1_pt=-9999;
+  gentree->chconst_1_eta=-9999;
+  gentree->chconst_1_phi=-9999;
+  
+  gentree->chconst_2_pt=-9999;
+  gentree->chconst_2_eta=-9999;
+  gentree->chconst_2_phi=-9999;
+  gentree->alphaminus=-9999;
 
 }
 

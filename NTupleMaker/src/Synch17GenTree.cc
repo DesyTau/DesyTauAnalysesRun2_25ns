@@ -65,11 +65,21 @@ void Synch17GenTree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("pt_1", &pt_1, &b_pt_1);
    fChain->SetBranchAddress("phi_1", &phi_1, &b_phi_1);
    fChain->SetBranchAddress("eta_1", &eta_1, &b_eta_1);
+
+   fChain->SetBranchAddress("chconst_1_pt", &chconst_1_pt, &b_chconst_1_pt);
+   fChain->SetBranchAddress("chconst_1_eta", &chconst_1_eta, &b_chconst_1_eta);
+   fChain->SetBranchAddress("chconst_1_phi", &chconst_1_phi, &b_chconst_1_phi); 
+   
    fChain->SetBranchAddress("decaymode_1", &decaymode_1, &b_decaymode_1);
 
    fChain->SetBranchAddress("pt_2", &pt_2, &b_pt_2);
    fChain->SetBranchAddress("phi_2", &phi_2, &b_phi_2);
    fChain->SetBranchAddress("eta_2", &eta_2, &b_eta_2);
+
+   fChain->SetBranchAddress("chconst_2_pt", &chconst_2_pt, &b_chconst_2_pt);
+   fChain->SetBranchAddress("chconst_2_eta", &chconst_2_eta, &b_chconst_2_eta);
+   fChain->SetBranchAddress("chconst_2_phi", &chconst_2_phi, &b_chconst_2_phi); 
+   
    fChain->SetBranchAddress("decaymode_2", &decaymode_2, &b_decaymode_2);
 
    fChain->SetBranchAddress("acotautau_00", &acotautau_00, &b_acotautau_00);
@@ -108,6 +118,8 @@ void Synch17GenTree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("VxConstitTau2", &VxConstitTau2, &b_VxConstitTau2);
    fChain->SetBranchAddress("VyConstitTau2", &VyConstitTau2, &b_VyConstitTau2);
    fChain->SetBranchAddress("VzConstitTau2", &VzConstitTau2, &b_VzConstitTau2);
+
+   fChain->SetBranchAddress("alphaminus", &alphaminus, &b_alphaminus);
    
    lock=true;
 }
@@ -189,11 +201,19 @@ void Synch17GenTree::WriteInit(TTree *tree) {
    fChain->Branch("gen_pt_1", &pt_1, "gen_pt_1/F");
    fChain->Branch("gen_phi_1", &phi_1, "gen_phi_1/F");
    fChain->Branch("gen_eta_1", &eta_1, "gen_eta_1/F");
+   fChain->Branch("gen_chconst_1_pt", &chconst_1_pt, "gen_chconst_1_pt/F");
+   fChain->Branch("gen_chconst_1_phi", &chconst_1_phi, "gen_chconst_1_phi/F");
+   fChain->Branch("gen_chconst_1_eta", &chconst_1_eta, "gen_chconst_1_eta/F");
    fChain->Branch("gen_decaymode_1", &decaymode_1, "gen_decaymode_1/I");
 
    fChain->Branch("gen_pt_2", &pt_2, "gen_pt_2/F");
    fChain->Branch("gen_phi_2", &phi_2, "gen_phi_2/F");
    fChain->Branch("gen_eta_2", &eta_2, "gen_eta_2/F");
+
+   fChain->Branch("gen_chconst_2_pt", &chconst_2_pt, "gen_chconst_2_pt/F");
+   fChain->Branch("gen_chconst_2_phi", &chconst_2_phi, "gen_chconst_2_phi/F");
+   fChain->Branch("gen_chconst_2_eta", &chconst_2_eta, "gen_chconst_2_eta/F");
+   
    fChain->Branch("gen_decaymode_2", &decaymode_2, "gen_decaymode_2/I");
 
    fChain->Branch("gen_acotautau_00", &acotautau_00, "gen_acotautau_00/F");
@@ -227,6 +247,8 @@ void Synch17GenTree::WriteInit(TTree *tree) {
    fChain->Branch("gen_VxConstitTau2", &VxConstitTau2, "gen_VxConstitTau2/F");
    fChain->Branch("gen_VyConstitTau2", &VyConstitTau2, "gen_VyConstitTau2/F");
    fChain->Branch("gen_VzConstitTau2", &VzConstitTau2, "gen_VzConstitTau2/F");
+
+   fChain->Branch("gen_alphaminus", &alphaminus, "gen_alphaminus/F");
 
 }
 

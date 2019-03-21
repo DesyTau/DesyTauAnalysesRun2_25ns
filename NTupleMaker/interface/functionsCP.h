@@ -58,6 +58,8 @@ double acoCP(TLorentzVector Pi1, TLorentzVector Pi2,
 
 void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, int tauIndex2, TString channel){
   // cout<<"Start acott_Impr"<<endl;
+
+  TLorentzVector lvector1,lvector2;
   
   //Merijn 2019 1 10: there may be situations where we pass correctdecay, but ultimately the acotau does NOT get calculated. For these situations, currently acotau seems not initialised.
   otree->acotautau_00 = -9999;
@@ -130,6 +132,10 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
     otree->VxConstitTau1=analysisTree->muon_vx[tauIndex1];
     otree->VyConstitTau1=analysisTree->muon_vy[tauIndex1];
     otree->VzConstitTau1=analysisTree->muon_vz[tauIndex1];
+
+    otree->chconst_1_pt=analysisTree->muon_pt[tauIndex1];
+    otree->chconst_1_eta=analysisTree->muon_eta[tauIndex1];
+    otree->chconst_1_phi=analysisTree->muon_phi[tauIndex1];
   }
 
   
@@ -140,6 +146,10 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
     otree->VxConstitTau1=analysisTree->electron_vx[tauIndex1];
     otree->VyConstitTau1=analysisTree->electron_vy[tauIndex1];
     otree->VzConstitTau1=analysisTree->electron_vz[tauIndex1];
+
+    otree->chconst_1_pt=analysisTree->electron_pt[tauIndex1];
+    otree->chconst_1_eta=analysisTree->electron_eta[tauIndex1];
+    otree->chconst_1_phi=analysisTree->electron_phi[tauIndex1];
   }
 
   if(channel=="tt"){
@@ -156,7 +166,17 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
       otree->VxConstitTau1=analysisTree->tau_pca3D_x[tauIndex1];
       otree->VyConstitTau1=analysisTree->tau_pca3D_y[tauIndex1];
       otree->VzConstitTau1=analysisTree->tau_pca3D_z[tauIndex1];
+
+      //Merijn 2019 2 25 here we set that we get the correct kinematics for the tau constituent
+      lvector1.SetXYZT(analysisTree->tau_constituents_px[tauIndex1][piIndex_],
+					      analysisTree->tau_constituents_py[tauIndex1][piIndex_],
+					      analysisTree->tau_constituents_pz[tauIndex1][piIndex_],
+					      analysisTree->tau_constituents_e[tauIndex1][piIndex_]);
       
+      otree->chconst_1_pt=lvector1.Pt();
+      otree->chconst_1_phi=lvector1.Phi();
+      otree->chconst_1_eta=lvector1.Eta();
+                  
     }
   }
   
@@ -175,7 +195,15 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
     otree->VxConstitTau2=analysisTree->tau_pca3D_x[tauIndex2];
     otree->VyConstitTau2=analysisTree->tau_pca3D_y[tauIndex2];
     otree->VzConstitTau2=analysisTree->tau_pca3D_z[tauIndex2];
+
+    lvector2.SetXYZT(analysisTree->tau_constituents_px[tauIndex2][piIndexfortau2],
+					    analysisTree->tau_constituents_py[tauIndex2][piIndexfortau2],
+					    analysisTree->tau_constituents_pz[tauIndex2][piIndexfortau2],
+					    analysisTree->tau_constituents_e[tauIndex2][piIndexfortau2]);
     
+    otree->chconst_2_pt=lvector2.Pt();
+    otree->chconst_2_phi=lvector2.Phi();
+    otree->chconst_2_eta=lvector2.Eta();
   }
     
   
@@ -233,6 +261,34 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
 
   //  cout<<"End acott_Impr"<<endl;
 
+
+  //Merijn 2 25: here calculate the alpha-minus observable
+  //potentially some calculations could crash when divide by 0..
+  //Merijn 2 25: here calculate the alpha-minus observable
+  //potentially some calculations could crash when divide by 0..
+ 
+  TVector3 IPVEC, PVEC;
+  TVector3 ZVEC(0.,0.,1.);
+
+  if(firstNegative){
+     IPVEC=tau1IP.Vect();
+     PVEC=lvector1.Vect();}
+  else{
+    IPVEC=tau2IP.Vect();
+    PVEC=lvector2.Vect();}
+  
+  //normalise
+  IPVEC *= 1/IPVEC.Mag();
+  PVEC *= 1/PVEC.Mag();
+
+  TVector3 v1=ZVEC.Cross(PVEC);
+  v1*= 1/v1.Mag();
+
+  TVector3 v2=IPVEC.Cross(PVEC);
+  v2*= 1/v2.Mag();
+  double v3=v1.Dot(v2);
+  otree->alphaminus=TMath::ACos(abs(v3));
+  
 };
 
 
@@ -338,13 +394,11 @@ TLorentzVector ipVec(const AC1B * analysisTree, int tauIndex, Synch17Tree *otree
     vec.SetXYZT(ip[0],ip[1],ip[2],0.);
     */
 
-    
-    /*
     TVector3 vertex(analysisTree->primvertex_x,
 		    analysisTree->primvertex_y,
 		    analysisTree->primvertex_z);
-    */
-    
+
+    /*    
     //Merijn: temporarily add gen vertex instead.. please leave this code for future reference
     TVector3 vertex;
     for (unsigned int igen=0; igen<analysisTree->genparticles_count; ++igen) {
@@ -356,6 +410,7 @@ TLorentzVector ipVec(const AC1B * analysisTree, int tauIndex, Synch17Tree *otree
 	break;
       }
     }
+    */
     
     TVector3 secvertex(analysisTree->tau_pca3D_x[tauIndex],
 		       analysisTree->tau_pca3D_y[tauIndex],
@@ -418,12 +473,13 @@ TLorentzVector ipVec_Lepton(const AC1B * analysisTree, int tauIndex, TString ch)
   TLorentzVector vec;
   vec.SetXYZT(0.,0.,0.,0.);
 
-  /*
+  
 TVector3 vertex(analysisTree->primvertex_x,
 		    analysisTree->primvertex_y,
 		    analysisTree->primvertex_z);
-  */
   
+
+  /*
   //Merijn: temporarily replace vertex with gen level info
   TVector3 vertex;
   for (unsigned int igen=0; igen<analysisTree->genparticles_count; ++igen) {
@@ -435,7 +491,7 @@ TVector3 vertex(analysisTree->primvertex_x,
       break;
     }
   }
-  
+  */
     
 TVector3 secvertex(0.,0.,0.);
 TVector3 momenta(0.,0.,0.);    
@@ -538,8 +594,32 @@ void gen_acott(const AC1B * analysisTree, Synch17GenTree *gentree, int tauIndex1
   //4-momenta of charged and neutral Pi
   TLorentzVector tau1Prong=gen_chargedPivec(analysisTree,tauIndex1,partId1);
   int piIndex1 = gen_chargedPiIndex(analysisTree,tauIndex1,partId1);
+
+  //Merijn 2019 2 25: add the kinematic information of the constituents
+  TLorentzVector lvector1;
+  lvector1.SetXYZT(analysisTree->genparticles_px[piIndex1],
+		  analysisTree->genparticles_py[piIndex1],
+		  analysisTree->genparticles_pz[piIndex1],
+		  analysisTree->genparticles_e[piIndex1]);
+
+  gentree->chconst_1_pt=lvector1.Pt();
+  gentree->chconst_1_phi=lvector1.Phi();
+  gentree->chconst_1_eta=lvector1.Eta();
+  
   TLorentzVector tau2Prong=gen_chargedPivec(analysisTree,tauIndex2,partId2);
   int piIndex2 = gen_chargedPiIndex(analysisTree,tauIndex2,partId2);
+
+  //Merijn 2019 2 25: add the kinematic information of the constituents
+  TLorentzVector lvector2;
+  lvector2.SetXYZT(analysisTree->genparticles_px[piIndex2],
+		  analysisTree->genparticles_py[piIndex2],
+		  analysisTree->genparticles_pz[piIndex2],
+		  analysisTree->genparticles_e[piIndex2]);
+
+  gentree->chconst_2_pt=lvector2.Pt();
+  gentree->chconst_2_eta=lvector2.Eta();
+  gentree->chconst_2_phi=lvector2.Phi();
+  
 
   //  std::cout << "Mode1 = " << analysisTree->gentau_decayMode[tauIndex1] << "  Mode2 = " << analysisTree->gentau_decayMode[tauIndex2] << std::endl;
   //  std::cout << "pion1 = " << analysisTree->genparticles_pdgid[piIndex1] << "    pion2 = " << analysisTree->genparticles_pdgid[piIndex2] << std::endl;
@@ -577,7 +657,6 @@ void gen_acott(const AC1B * analysisTree, Synch17GenTree *gentree, int tauIndex1
   gentree->VyConstitTau2=analysisTree->genparticles_vy[piIndex2];
   gentree->VzConstitTau2=analysisTree->genparticles_vz[piIndex2];
  
-
   bool firstNegative = false;
   if (analysisTree->genparticles_pdgid[piIndex1]==-211) firstNegative = true;
   if (analysisTree->genparticles_pdgid[piIndex1]==11) firstNegative = true;
@@ -623,6 +702,30 @@ void gen_acott(const AC1B * analysisTree, Synch17GenTree *gentree, int tauIndex1
     //Meirjn 2019 2 9: assume this is what want to keep 
     gentree->acotautau_22=acoCP(tau1_3ProngVec,tau2_3ProngVec,tau1IP,tau2IP,firstNegative,false,false, gentree);
 
+  //Merijn 2 25: here calculate the alpha-minus observable
+  //potentially some calculations could crash when divide by 0..
+  TVector3 IPVEC, PVEC;
+  TVector3 ZVEC(0.,0.,1.);
+
+  if(firstNegative){
+     IPVEC=tau1IP.Vect();
+     PVEC=lvector1.Vect();}
+  else{
+    IPVEC=tau2IP.Vect();
+    PVEC=lvector2.Vect();}
+  
+  //normalise
+  IPVEC *= 1/IPVEC.Mag();
+  PVEC *= 1/PVEC.Mag();
+
+  TVector3 v1=ZVEC.Cross(PVEC);
+  v1*= 1/v1.Mag();
+
+  TVector3 v2=IPVEC.Cross(PVEC);
+  v2*= 1/v2.Mag();
+  double v3=v1.Dot(v2);
+  gentree->alphaminus=TMath::ACos(abs(v3));
+ 
 };
  
 

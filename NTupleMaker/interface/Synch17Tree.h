@@ -35,6 +35,9 @@ public :
   Float_t         pt_1;
   Float_t         phi_1;
   Float_t         eta_1;
+  Float_t         chconst_1_pt;
+  Float_t         chconst_1_eta;
+  Float_t         chconst_1_phi;   
   Float_t         m_1;
   Int_t           gen_match_1; 
   Int_t           q_1;
@@ -50,6 +53,9 @@ public :
   Float_t         pt_2;
   Float_t         phi_2;
   Float_t         eta_2;
+  Float_t         chconst_2_pt;
+  Float_t         chconst_2_eta;
+  Float_t         chconst_2_phi;     
   Float_t         m_2;
   Int_t           gen_match_2; 
   Int_t           q_2;
@@ -291,6 +297,7 @@ public :
   Float_t VxConstitTau2;
   Float_t VyConstitTau2;
   Float_t VzConstitTau2;
+  Float_t alphaminus;
 
 
   //////////////////////////////////////////////
@@ -307,6 +314,9 @@ public :
   TBranch	 *b_pt_1;
   TBranch	 *b_phi_1;
   TBranch	 *b_eta_1;
+  TBranch        *b_chconst_1_pt;
+  TBranch        *b_chconst_1_eta;
+  TBranch        *b_chconst_1_phi;     
   TBranch	 *b_m_1;
   TBranch	 *b_gen_match_1; 
   TBranch	 *b_q_1;
@@ -322,6 +332,9 @@ public :
   TBranch	 *b_pt_2;
   TBranch	 *b_phi_2;
   TBranch	 *b_eta_2;
+  TBranch        *b_chconst_2_pt;
+  TBranch        *b_chconst_2_eta;
+  TBranch        *b_chconst_2_phi; 
   TBranch	 *b_m_2;
   TBranch	 *b_gen_match_2; 
   TBranch	 *b_q_2;
@@ -564,7 +577,9 @@ public :
 
   TBranch        *b_VxConstitTau2;
   TBranch        *b_VyConstitTau2;
-  TBranch        *b_VzConstitTau2; 
+  TBranch        *b_VzConstitTau2;
+  TBranch        *b_alphaminus;
+
 
   Synch17Tree(TTree *tree=0);
   virtual ~Synch17Tree();

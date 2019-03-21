@@ -64,6 +64,11 @@ void Synch17Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("pt_1", &pt_1, &b_pt_1);
    fChain->SetBranchAddress("phi_1", &phi_1, &b_phi_1);
    fChain->SetBranchAddress("eta_1", &eta_1, &b_eta_1);
+
+   fChain->SetBranchAddress("chconst_1_pt", &chconst_1_pt, &b_chconst_1_pt);
+   fChain->SetBranchAddress("chconst_1_eta", &chconst_1_eta, &b_chconst_1_eta);
+   fChain->SetBranchAddress("chconst_1_phi", &chconst_1_phi, &b_chconst_1_phi); 
+   
    fChain->SetBranchAddress("m_1", &m_1, &b_m_1);
    fChain->SetBranchAddress("gen_match_1", &gen_match_1, &b_gen_match_1);
    fChain->SetBranchAddress("q_1", &q_1, &b_q_1);
@@ -79,6 +84,11 @@ void Synch17Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("pt_2", &pt_2, &b_pt_2);
    fChain->SetBranchAddress("phi_2", &phi_2, &b_phi_2);
    fChain->SetBranchAddress("eta_2", &eta_2, &b_eta_2);
+
+   fChain->SetBranchAddress("chconst_2_pt", &chconst_2_pt, &b_chconst_2_pt);
+   fChain->SetBranchAddress("chconst_2_eta", &chconst_2_eta, &b_chconst_2_eta);
+   fChain->SetBranchAddress("chconst_2_phi", &chconst_2_phi, &b_chconst_2_phi); 
+   
    fChain->SetBranchAddress("m_2", &m_2, &b_m_2);
    fChain->SetBranchAddress("gen_match_2", &gen_match_2, &b_gen_match_2);
    fChain->SetBranchAddress("q_2", &q_2, &b_q_2);
@@ -320,6 +330,8 @@ void Synch17Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("VxConstitTau2", &VxConstitTau2, &b_VxConstitTau2);
    fChain->SetBranchAddress("VyConstitTau2", &VyConstitTau2, &b_VyConstitTau2);
    fChain->SetBranchAddress("VzConstitTau2", &VzConstitTau2, &b_VzConstitTau2);
+   fChain->SetBranchAddress("alphaminus", &alphaminus, &b_alphaminus);
+
 
    lock=true;
 }
@@ -403,6 +415,11 @@ void Synch17Tree::WriteInit(TTree *tree) {
    fChain->Branch("pt_1", &pt_1, "pt_1/F");
    fChain->Branch("phi_1", &phi_1, "phi_1/F");
    fChain->Branch("eta_1", &eta_1, "eta_1/F");
+
+   fChain->Branch("chconst_1_pt", &chconst_1_pt, "chconst_1_pt/F");
+   fChain->Branch("chconst_1_eta", &chconst_1_eta, "chconst_1_eta/F");
+   fChain->Branch("chconst_1_phi", &chconst_1_phi, "chconst_1_phi/F");
+   
    fChain->Branch("m_1", &m_1, "m_1/F");
    fChain->Branch("gen_match_1", &gen_match_1, "gen_match_1/I");
    fChain->Branch("q_1", &q_1, "q_1/I");
@@ -418,6 +435,11 @@ void Synch17Tree::WriteInit(TTree *tree) {
    fChain->Branch("pt_2", &pt_2, "pt_2/F");
    fChain->Branch("phi_2", &phi_2, "phi_2/F");
    fChain->Branch("eta_2", &eta_2, "eta_2/F");
+
+   fChain->Branch("chconst_2_pt", &chconst_2_pt, "chconst_2_pt/F");
+   fChain->Branch("chconst_2_eta", &chconst_2_eta, "chconst_2_eta/F");
+   fChain->Branch("chconst_2_phi", &chconst_2_phi, "chconst_2_phi/F");
+   
    fChain->Branch("m_2", &m_2, "m_2/F");
    fChain->Branch("gen_match_2", &gen_match_2, "gen_match_2/I");
    fChain->Branch("q_2", &q_2, "q_2/I");
@@ -654,6 +676,8 @@ void Synch17Tree::WriteInit(TTree *tree) {
    fChain->Branch("VxConstitTau2", &VxConstitTau2, "VxConstitTau2/F");
    fChain->Branch("VyConstitTau2", &VyConstitTau2, "VyConstitTau2/F");
    fChain->Branch("VzConstitTau2", &VzConstitTau2, "VzConstitTau2/F");
+   fChain->Branch("alphaminus", &alphaminus, "alphaminus/F");
+
    
 }
 
