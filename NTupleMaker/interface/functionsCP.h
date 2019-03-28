@@ -174,31 +174,31 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
   else{tau1IP = ipVec(analysisTree,tauIndex1);}//tt: treat as tau index..
   TLorentzVector tau1Pi0;
   tau1Pi0.SetXYZT(0.,0.,0.,0.);
-
+  
   //Merijn: have to assume here we WON'T look into e-mu case! 
   TLorentzVector tau2IP;
   tau2IP = ipVec(analysisTree,tauIndex2);
   TLorentzVector tau2Pi0;
   tau2Pi0.SetXYZT(0.,0.,0.,0.); 
-
+  
   //Merijn: here calculate neutral pion vectors. Only look for pions in first tau if channel is tt.
   if(channel=="tt"){ if(analysisTree->tau_decayMode[tauIndex1]>=1&&analysisTree->tau_decayMode[tauIndex1]<=3) tau1Pi0 = neutralPivec(analysisTree,tauIndex1);}
-
+  
   if (analysisTree->tau_decayMode[tauIndex2]>=1&&analysisTree->tau_decayMode[tauIndex2]<=3){ 
-	tau2Pi0 = neutralPivec(analysisTree,tauIndex2);
+    tau2Pi0 = neutralPivec(analysisTree,tauIndex2);
   }
   
-
+  
   otree->acotautau_00=acoCP(tau1Prong,tau2Prong,tau1IP,tau2IP,firstNegative,false,false,otree);
-   //I think it should work since everything assigned for 3 cases. Note: aco_00 will be filled with mu x 1-prong and mu x 1.1-prong
-
+  //I think it should work since everything assigned for 3 cases. Note: aco_00 will be filled with mu x 1-prong and mu x 1.1-prong
+  
   
   if(channel=="et"||channel=="mt"){//we only fill aco_01 for et and mt
     if (analysisTree->tau_decayMode[tauIndex2]==1){
       otree->acotautau_01=acoCP(tau1Prong,tau2Prong,tau1IP,tau2Pi0,firstNegative,false,true,otree);
     }    
   }
-
+  //NOTE: Commented till DPG
   if(channel=="tt"){//merijn 2019 1 10: only for tt we can use the index to assess a tau, otherwise its a lepton!
     cout<<"accident"<<endl;
     if (analysisTree->tau_decayMode[tauIndex1]==1&&analysisTree->tau_decayMode[tauIndex2]==0)
@@ -214,7 +214,7 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
       otree->acotautau_11=acoCP(tau1Prong,tau2Prong,tau1Pi0,tau2Pi0,firstNegative,true,true,otree);
     }
   }
-
+  
   //  cout<<"End acott_Impr"<<endl;
 
 };
@@ -865,8 +865,8 @@ Float_t gen_A1Polarization(const AC1B * analysisTree, int tauIndex){
   int npart = ThreeProngIndices.size();
   if(analysisTree->gentau_decayMode[tauIndex]!=4)return pol;
   else if(npart!=3){
-    //cout << "ERROR: found " << npart << " prongs!" << endl;
-    return pol;
+    cout << "ERROR: found " << npart << " prongs!" << endl;
+    return npart*1000.;
   }
   TLorentzVector LVec[3];
   TVector3 Vec[3];
@@ -907,6 +907,7 @@ Float_t gen_A1Polarization(const AC1B * analysisTree, int tauIndex){
     cout << "pol: " << pol <<endl;
     cout << "1/2 * sqrt(Lambda): " << Lambda <<endl;
     cout << "cos(beta)= "<< pol/Lambda <<endl<<endl;
+    return 9999.;
   }
   return pol/Lambda;
 };

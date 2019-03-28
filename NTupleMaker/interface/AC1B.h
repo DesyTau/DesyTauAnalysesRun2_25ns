@@ -267,6 +267,10 @@ public :
    Float_t         tau_pca3D_x[100];   //[tau_count]
    Float_t         tau_pca3D_y[100];   //[tau_count]
    Float_t         tau_pca3D_z[100];   //[tau_count]
+   Float_t         tau_SV_x[100];   //[tau_count]
+   Float_t         tau_SV_y[100];   //[tau_count]
+   Float_t         tau_SV_z[100];   //[tau_count]
+   Float_t         tau_SV_cov[100][6]; //[tau_count]
    Float_t         tau_dxy[100];   //[tau_count]
    Float_t         tau_dz[100];   //[tau_count]
    Float_t         tau_ip3d[100];   //[tau_count]
@@ -973,6 +977,10 @@ public :
    TBranch        *b_tau_pca3D_x;   //!
    TBranch        *b_tau_pca3D_y;   //!
    TBranch        *b_tau_pca3D_z;   //!
+   TBranch        *b_tau_SV_x;   //!
+   TBranch        *b_tau_SV_y;   //!
+   TBranch        *b_tau_SV_z;   //!
+   TBranch        *b_tau_SV_cov;   //!
    TBranch        *b_tau_dxy;   //!
    TBranch        *b_tau_dz;   //!
    TBranch        *b_tau_ip3d;   //!
@@ -1557,6 +1565,7 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("refitvertex_ndof", refitvertex_ndof, &b_refitvertex_ndof);
    fChain->SetBranchAddress("refitvertex_ptq", refitvertex_ptq, &b_refitvertex_pdf);
    fChain->SetBranchAddress("refitvertex_ntracks",refitvertex_ntracks, &b_refitvertex_ntracks);
+   fChain->SetBranchAddress("refitvertex_cov",refitvertex_cov, &b_refitvertex_cov);
    fChain->SetBranchAddress("muon_count", &muon_count, &b_muon_count);
    fChain->SetBranchAddress("muon_px", muon_px, &b_muon_px);
    fChain->SetBranchAddress("muon_py", muon_py, &b_muon_py);
@@ -1768,6 +1777,10 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("tau_pca3D_x", tau_pca3D_x, &b_tau_pca3D_x);
    fChain->SetBranchAddress("tau_pca3D_y", tau_pca3D_y, &b_tau_pca3D_y);
    fChain->SetBranchAddress("tau_pca3D_z", tau_pca3D_z, &b_tau_pca3D_z);
+   fChain->SetBranchAddress("tau_SV_x", tau_SV_x, &b_tau_SV_x);
+   fChain->SetBranchAddress("tau_SV_y", tau_SV_y, &b_tau_SV_y);
+   fChain->SetBranchAddress("tau_SV_z", tau_SV_z, &b_tau_SV_z);
+   fChain->SetBranchAddress("tau_SV_cov", tau_SV_cov, &b_tau_SV_cov);
    fChain->SetBranchAddress("tau_dxy", tau_dxy, &b_tau_dxy);
    fChain->SetBranchAddress("tau_dz", tau_dz, &b_tau_dz);
    fChain->SetBranchAddress("tau_ip3d", tau_ip3d, &b_tau_ip3d);

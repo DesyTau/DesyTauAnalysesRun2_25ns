@@ -206,6 +206,9 @@ void Synch17GenTree::WriteInit(TTree *tree) {
    fChain->Branch("acotautau_21", &acotautau_21, "acotautau_21/F");
    fChain->Branch("acotautau_22", &acotautau_22, "acotautau_22/F");
 
+   fChain->Branch("a1polarization_1", &a1polarization_1, "a1polarization_1/F");
+   fChain->Branch("a1polarization_2", &a1polarization_2, "a1polarization_2/F");
+
    fChain->Branch("acotautauPsi_00", &acotautauPsi_00, "acotautauPsi_00/F");
    fChain->Branch("acotautauPsi_10", &acotautauPsi_10, "acotautauPsi_10/F");
    fChain->Branch("acotautauPsi_01", &acotautauPsi_01, "acotautauPsi_01/F");

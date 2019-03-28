@@ -1718,6 +1718,15 @@ void FillTau_leading(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex
   otree->tau_pca3D_x_1 = analysisTree->tau_pca3D_x[tauIndex];
   otree->tau_pca3D_y_1 = analysisTree->tau_pca3D_y[tauIndex];
   otree->tau_pca3D_z_1 = analysisTree->tau_pca3D_z[tauIndex];
+  otree->tau_SV_x_1 = analysisTree->tau_SV_x[tauIndex];
+  otree->tau_SV_y_1 = analysisTree->tau_SV_y[tauIndex];
+  otree->tau_SV_z_1 = analysisTree->tau_SV_z[tauIndex];
+  otree->tau_SV_covxx_1 = analysisTree->tau_SV_cov[tauIndex][0];
+  otree->tau_SV_covyx_1 = analysisTree->tau_SV_cov[tauIndex][1];
+  otree->tau_SV_covzx_1 = analysisTree->tau_SV_cov[tauIndex][2];
+  otree->tau_SV_covyy_1 = analysisTree->tau_SV_cov[tauIndex][3];
+  otree->tau_SV_covzy_1 = analysisTree->tau_SV_cov[tauIndex][4];
+  otree->tau_SV_covzz_1 = analysisTree->tau_SV_cov[tauIndex][5];
 
 
   otree->byCombinedIsolationDeltaBetaCorrRaw3Hits_1 = analysisTree->tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[tauIndex];
@@ -1822,6 +1831,15 @@ void FillTau(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex){
   otree->tau_pca3D_x_2 = analysisTree->tau_pca3D_x[tauIndex];
   otree->tau_pca3D_y_2 = analysisTree->tau_pca3D_y[tauIndex];
   otree->tau_pca3D_z_2 = analysisTree->tau_pca3D_z[tauIndex];
+  otree->tau_SV_x_2 = analysisTree->tau_SV_x[tauIndex];
+  otree->tau_SV_y_2 = analysisTree->tau_SV_y[tauIndex];
+  otree->tau_SV_z_2 = analysisTree->tau_SV_z[tauIndex];
+  otree->tau_SV_covxx_2 = analysisTree->tau_SV_cov[tauIndex][0];
+  otree->tau_SV_covyx_2 = analysisTree->tau_SV_cov[tauIndex][1];
+  otree->tau_SV_covzx_2 = analysisTree->tau_SV_cov[tauIndex][2];
+  otree->tau_SV_covyy_2 = analysisTree->tau_SV_cov[tauIndex][3];
+  otree->tau_SV_covzy_2 = analysisTree->tau_SV_cov[tauIndex][4];
+  otree->tau_SV_covzz_2 = analysisTree->tau_SV_cov[tauIndex][5];
 
   otree->byCombinedIsolationDeltaBetaCorrRaw3Hits_2 = analysisTree->tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[tauIndex];
   otree->byLooseCombinedIsolationDeltaBetaCorr3Hits_2 = analysisTree->tau_byLooseCombinedIsolationDeltaBetaCorr3Hits[tauIndex];

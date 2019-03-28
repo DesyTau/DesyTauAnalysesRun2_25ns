@@ -274,6 +274,26 @@ public :
   Float_t         tau_pca3D_y_2;
   Float_t         tau_pca3D_z_2;
 
+  //Secondary vertices
+  Float_t         tau_SV_x_1;
+  Float_t         tau_SV_y_1;
+  Float_t         tau_SV_z_1;
+  Float_t         tau_SV_covxx_1;
+  Float_t         tau_SV_covyx_1;
+  Float_t         tau_SV_covzx_1;
+  Float_t         tau_SV_covyy_1;
+  Float_t         tau_SV_covzy_1;
+  Float_t         tau_SV_covzz_1;
+  Float_t         tau_SV_x_2;
+  Float_t         tau_SV_y_2;
+  Float_t         tau_SV_z_2;
+  Float_t         tau_SV_covxx_2;
+  Float_t         tau_SV_covyx_2;
+  Float_t         tau_SV_covzx_2;
+  Float_t         tau_SV_covyy_2;
+  Float_t         tau_SV_covzy_2;
+  Float_t         tau_SV_covzz_2;
+
   //reco vertices
   Float_t RecoVertexX;
   Float_t RecoVertexY;
@@ -545,6 +565,27 @@ public :
   TBranch        *b_tau_pca3D_x_2;
   TBranch        *b_tau_pca3D_y_2;
   TBranch        *b_tau_pca3D_z_2;
+
+  //Secondary vertices
+  TBranch        *b_tau_SV_x_1;
+  TBranch        *b_tau_SV_y_1;
+  TBranch        *b_tau_SV_z_1;
+  TBranch        *b_tau_SV_covxx_1;
+  TBranch        *b_tau_SV_covyx_1;
+  TBranch        *b_tau_SV_covzx_1;
+  TBranch        *b_tau_SV_covyy_1;
+  TBranch        *b_tau_SV_covzy_1;
+  TBranch        *b_tau_SV_covzz_1;
+
+  TBranch        *b_tau_SV_x_2;
+  TBranch        *b_tau_SV_y_2;
+  TBranch        *b_tau_SV_z_2;
+  TBranch        *b_tau_SV_covxx_2;
+  TBranch        *b_tau_SV_covyx_2;
+  TBranch        *b_tau_SV_covzx_2;
+  TBranch        *b_tau_SV_covyy_2;
+  TBranch        *b_tau_SV_covzy_2;
+  TBranch        *b_tau_SV_covzz_2;
 
   //reco vertices
   //RECO vertex info is practical to have
