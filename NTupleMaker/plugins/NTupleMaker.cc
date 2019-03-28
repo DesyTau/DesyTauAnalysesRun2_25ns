@@ -115,6 +115,7 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
   cbeamspot(iConfig.getUntrackedParameter<bool>("RecBeamSpot", false)),
   crectrack(iConfig.getUntrackedParameter<bool>("RecTrack", false)),
   crecprimvertex(iConfig.getUntrackedParameter<bool>("RecPrimVertex", false)),
+  crecprimvertexwithbs(iConfig.getUntrackedParameter<bool>("RecPrimVertexWithBS", false)),
   crefittedvertex(iConfig.getUntrackedParameter<bool>("RefittedVertex", false)),
   crecmuon(iConfig.getUntrackedParameter<bool>("RecMuon", false)),
   crecelectron(iConfig.getUntrackedParameter<bool>("RecElectron", false)),
@@ -226,6 +227,7 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
   TriggerObjectCollectionToken_(consumes<pat::TriggerObjectStandAloneCollection>(iConfig.getParameter<edm::InputTag>("TriggerObjectCollectionTag"))),
   BeamSpotToken_(consumes<BeamSpot>(iConfig.getParameter<edm::InputTag>("BeamSpotCollectionTag"))),
   PVToken_(consumes<VertexCollection>(iConfig.getParameter<edm::InputTag>("PVCollectionTag"))),
+  PVwithBSToken_(consumes<RefitVertexCollection>(iConfig.getParameter<edm::InputTag>("PVwithBSCollectionTag"))),
   RefittedPVToken_(consumes<RefitVertexCollection>(iConfig.getParameter<edm::InputTag>("RefittedPVCollectionTag"))),
   LHEToken_(consumes<LHEEventProduct>(iConfig.getParameter<edm::InputTag>("LHEEventProductTag"))),
   SusyMotherMassToken_(consumes<double>(iConfig.getParameter<edm::InputTag>("SusyMotherMassTag"))),
@@ -387,6 +389,16 @@ void NTupleMaker::beginJob(){
     tree->Branch("primvertex_cov", primvertex_cov, "primvertex_cov[6]/F");
     tree->Branch("primvertex_mindz", &primvertex_mindz, "primvertex_mindz/F");
   }  
+  // primary vertex with BS
+  if (crecprimvertexwithbs) {
+    tree->Branch("primvertexwithbs_x", &primvertexwithbs_x, "primvertexwithbs_x/F");
+    tree->Branch("primvertexwithbs_y", &primvertexwithbs_y, "primvertexwithbs_y/F");
+    tree->Branch("primvertexwithbs_z", &primvertexwithbs_z, "primvertexwithbs_z/F");
+    tree->Branch("primvertexwithbs_chi2", &primvertexwithbs_chi2, "primvertexwithbs_chi2/F");
+    tree->Branch("primvertexwithbs_ndof", &primvertexwithbs_ndof, "primvertexwithbs_ndof/F");
+    tree->Branch("primvertexwithbs_ntracks", &primvertexwithbs_ntracks, "primvertexwithbs_ntracks/I");
+    tree->Branch("primvertexwithbs_cov", primvertexwithbs_cov, "primvertexwithbs_cov[6]/F");
+  }
   // refitted primary vertex
   if(crefittedvertex) {
     tree->Branch("refitvertex_count", &refitvertex_count, "refitvertex_count/i");
@@ -1762,6 +1774,29 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       }
     }
 
+  if(crecprimvertexwithbs)
+    {
+      edm::Handle<RefitVertexCollection> VertexWithBS;
+      iEvent.getByToken(PVwithBSToken_, VertexWithBS);
+      if(VertexWithBS.isValid()) {
+        for(unsigned i = 0 ; i < VertexWithBS->size(); i++) {
+          if(i == 0) {
+            primvertexwithbs_x = (*VertexWithBS)[i].x();
+            primvertexwithbs_y = (*VertexWithBS)[i].y();
+            primvertexwithbs_z = (*VertexWithBS)[i].z();
+            primvertexwithbs_chi2 = (*VertexWithBS)[i].chi2();
+            primvertexwithbs_ndof = (*VertexWithBS)[i].ndof();
+            primvertexwithbs_ntracks = (*VertexWithBS)[i].tracksSize();
+            primvertexwithbs_cov[0] = (*VertexWithBS)[i].covariance(0,0); // xError()
+            primvertexwithbs_cov[1] = (*VertexWithBS)[i].covariance(0,1);
+            primvertexwithbs_cov[2] = (*VertexWithBS)[i].covariance(0,2);
+            primvertexwithbs_cov[3] = (*VertexWithBS)[i].covariance(1,1); // yError()
+            primvertexwithbs_cov[4] = (*VertexWithBS)[i].covariance(1,2);
+            primvertexwithbs_cov[5] = (*VertexWithBS)[i].covariance(2,2); // zError()                                                                                                 
+	  }
+	}
+      }
+    }
   if (csusyinfo) {
     if(doDebug)  cout<<"add SUSY info"<< endl;
     AddSusyInfo(iEvent);
