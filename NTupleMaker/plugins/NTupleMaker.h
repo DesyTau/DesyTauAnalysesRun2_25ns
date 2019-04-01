@@ -333,6 +333,7 @@ class NTupleMaker : public edm::EDAnalyzer{
   bool crecprimvertex;
   bool crecprimvertexwithbs;
   bool crefittedvertex;
+  bool crefittedvertexwithbs;
   bool crecmuon;
   bool crecelectron;
   bool crectau;
@@ -461,6 +462,7 @@ class NTupleMaker : public edm::EDAnalyzer{
   edm::EDGetTokenT<VertexCollection> PVToken_;
   edm::EDGetTokenT<RefitVertexCollection> PVwithBSToken_;
   edm::EDGetTokenT<RefitVertexCollection>RefittedPVToken_;
+  edm::EDGetTokenT<RefitVertexCollection> RefittedwithBSPVToken_;
   edm::EDGetTokenT<LHEEventProduct> LHEToken_;
   edm::EDGetTokenT<double> SusyMotherMassToken_;
   edm::EDGetTokenT<double> SusyLSPMassToken_;
@@ -556,6 +558,20 @@ class NTupleMaker : public edm::EDAnalyzer{
   Int_t   refitvertex_eleIndex[M_refitvtxmaxcount][2];
   Int_t   refitvertex_muIndex[M_refitvtxmaxcount][2];
   Int_t   refitvertex_tauIndex[M_refitvtxmaxcount][2];
+	
+  // re-fitted vertex with bs
+  UInt_t  refitvertexwithbs_count;
+  Float_t refitvertexwithbs_x[M_refitvtxmaxcount];
+  Float_t refitvertexwithbs_y[M_refitvtxmaxcount];
+  Float_t refitvertexwithbs_z[M_refitvtxmaxcount];
+  Float_t refitvertexwithbs_chi2[M_refitvtxmaxcount];
+  Float_t refitvertexwithbs_ndof[M_refitvtxmaxcount];
+  Int_t   refitvertexwithbs_ntracks[M_refitvtxmaxcount];
+  Float_t refitvertexwithbs_cov[M_refitvtxmaxcount][6];
+  Float_t refitvertexwithbs_mindz[M_refitvtxmaxcount];
+  Int_t   refitvertexwithbs_eleIndex[M_refitvtxmaxcount][2];
+  Int_t   refitvertexwithbs_muIndex[M_refitvtxmaxcount][2];
+  Int_t   refitvertexwithbs_tauIndex[M_refitvtxmaxcount][2];
 
   // tracks
   UInt_t track_count;
