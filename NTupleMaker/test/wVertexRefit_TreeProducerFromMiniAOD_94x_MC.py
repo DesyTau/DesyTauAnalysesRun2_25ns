@@ -173,6 +173,8 @@ GenJets = cms.untracked.bool(not isData)
 process.load('VertexRefit.TauRefit.AdvancedRefitVertexProducer_cfi')
 process.AdvancedRefitVertexNoBSProducer.srcTaus = cms.InputTag("NewTauIDsEmbedded")
 process.AdvancedRefitVertexNoBSProducer.srcLeptons = cms.VInputTag(cms.InputTag("slimmedElectrons"), cms.InputTag("slimmedMuons"), cms.InputTag("NewTauIDsEmbedded"))
+process.AdvancedRefitVertexBSProducer.srcTaus = cms.InputTag("NewTauIDsEmbedded")
+process.AdvancedRefitVertexBSProducer.srcLeptons = cms.VInputTag(cms.InputTag("slimmedElectrons"), cms.InputTag("slimmedMuons"), cms.InputTag("NewTauIDsEmbedded"))
 process.load('VertexRefit.TauRefit.MiniAODRefitVertexProducer_cfi')
 
 process.makeroottree = cms.EDAnalyzer("NTupleMaker",
@@ -190,6 +192,7 @@ Trigger = cms.untracked.bool(True),
 RecPrimVertex = cms.untracked.bool(True),
 RecPrimVertexWithBS = cms.untracked.bool(True),
 RefittedVertex = cms.untracked.bool(False),
+RefittedVertexWithBS = cms.untracked.bool(True),
 RecBeamSpot = cms.untracked.bool(True),
 RecTrack = cms.untracked.bool(True),
 RecPFMet = cms.untracked.bool(True),
@@ -255,6 +258,7 @@ BeamSpotCollectionTag =  cms.InputTag("offlineBeamSpot"),
 PVCollectionTag = cms.InputTag("offlineSlimmedPrimaryVertices"),
 PVwithBSCollectionTag =  cms.InputTag("MiniAODRefitVertexBSProducer"),
 RefittedPVCollectionTag =  cms.InputTag("AdvancedRefitVertexNoBSProducer"),
+RefittedwithBSPVCollectionTag =  cms.InputTag("AdvancedRefitVertexBSProducer"),				      
 LHEEventProductTag = cms.InputTag("externalLHEProducer"),
 SusyMotherMassTag = cms.InputTag("susyInfo","SusyMotherMass"),
 SusyLSPMassTag = cms.InputTag("susyInfo","SusyLSPMass"),
@@ -519,6 +523,7 @@ process.p = cms.Path(
   #process.ApplyBaselineHBHENoiseFilter*  #reject events based 
   #process.ApplyBaselineHBHEISONoiseFilter*  #reject events based -- disable the module, performance is being investigated
   process.AdvancedRefitVertexNoBS *
+  process.AdvancedRefitVertexBS *	
   process.MiniAODRefitVertexBS*
   process.makeroottree
 )
