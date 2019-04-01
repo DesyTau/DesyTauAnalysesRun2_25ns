@@ -331,6 +331,7 @@ class NTupleMaker : public edm::EDAnalyzer{
   bool cbeamspot;
   bool crectrack;
   bool crecprimvertex;
+  bool crecprimvertexwithbs;
   bool crefittedvertex;
   bool crecmuon;
   bool crecelectron;
@@ -458,6 +459,7 @@ class NTupleMaker : public edm::EDAnalyzer{
   edm::EDGetTokenT<pat::TriggerObjectStandAloneCollection> myTriggerObjectCollectionToken_;
   edm::EDGetTokenT<BeamSpot> BeamSpotToken_;
   edm::EDGetTokenT<VertexCollection> PVToken_;
+  edm::EDGetTokenT<RefitVertexCollection> PVwithBSToken_;
   edm::EDGetTokenT<RefitVertexCollection>RefittedPVToken_;
   edm::EDGetTokenT<LHEEventProduct> LHEToken_;
   edm::EDGetTokenT<double> SusyMotherMassToken_;
@@ -531,6 +533,15 @@ class NTupleMaker : public edm::EDAnalyzer{
   Int_t   primvertex_ntracks;
   Float_t primvertex_cov[6];
   Float_t primvertex_mindz;
+
+  // primary vertex
+  Float_t primvertexwithbs_x;
+  Float_t primvertexwithbs_y;
+  Float_t primvertexwithbs_z;
+  Float_t primvertexwithbs_chi2;
+  Float_t primvertexwithbs_ndof;
+  Int_t   primvertexwithbs_ntracks;
+  Float_t primvertexwithbs_cov[6];
 
   // re-fitted vertex
   UInt_t  refitvertex_count;
