@@ -117,6 +117,7 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
   crecprimvertex(iConfig.getUntrackedParameter<bool>("RecPrimVertex", false)),
   crecprimvertexwithbs(iConfig.getUntrackedParameter<bool>("RecPrimVertexWithBS", false)),
   crefittedvertex(iConfig.getUntrackedParameter<bool>("RefittedVertex", false)),
+  crefittedvertexwithbs(iConfig.getUntrackedParameter<bool>("RefittedVertexWithBS", false)),
   crecmuon(iConfig.getUntrackedParameter<bool>("RecMuon", false)),
   crecelectron(iConfig.getUntrackedParameter<bool>("RecElectron", false)),
   crectau(iConfig.getUntrackedParameter<bool>("RecTau", false)),
@@ -229,6 +230,7 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
   PVToken_(consumes<VertexCollection>(iConfig.getParameter<edm::InputTag>("PVCollectionTag"))),
   PVwithBSToken_(consumes<RefitVertexCollection>(iConfig.getParameter<edm::InputTag>("PVwithBSCollectionTag"))),
   RefittedPVToken_(consumes<RefitVertexCollection>(iConfig.getParameter<edm::InputTag>("RefittedPVCollectionTag"))),
+  RefittedwithBSPVToken_(consumes<RefitVertexCollection>(iConfig.getParameter<edm::InputTag>("RefittedwithBSPVCollectionTag"))),
   LHEToken_(consumes<LHEEventProduct>(iConfig.getParameter<edm::InputTag>("LHEEventProductTag"))),
   SusyMotherMassToken_(consumes<double>(iConfig.getParameter<edm::InputTag>("SusyMotherMassTag"))),
   SusyLSPMassToken_(consumes<double>(iConfig.getParameter<edm::InputTag>("SusyLSPMassTag"))),
@@ -408,10 +410,24 @@ void NTupleMaker::beginJob(){
     tree->Branch("refitvertex_chi2", refitvertex_chi2, "refitvertex_chi2[refitvertex_count]/F");
     tree->Branch("refitvertex_ndof", refitvertex_ndof, "refitvertex_ndof[refitvertex_count]/F");
     tree->Branch("refitvertex_ntracks", refitvertex_ntracks, "refitvertex_ntracks[refitvertex_count]/I");
-    tree->Branch("refitvertex_cov", refitvertex_cov, "refitvertex_cov[refitvertex_count][6]/F");
+    //tree->Branch("refitvertex_cov", refitvertex_cov, "refitvertex_cov[refitvertex_count][6]/F");
     tree->Branch("refitvertex_eleIndex", refitvertex_eleIndex, "refitvertex_eleIndex[refitvertex_count][2]/I");
     tree->Branch("refitvertex_muIndex", refitvertex_muIndex, "refitvertex_muIndex[refitvertex_count][2]/I");
     tree->Branch("refitvertex_tauIndex", refitvertex_tauIndex, "refitvertex_tauIndex[refitvertex_count][2]/I");
+  }
+  // refitted primary vertex with bs
+  if(crefittedvertexwithbs) {
+    tree->Branch("refitvertexwithbs_count", &refitvertexwithbs_count, "refitvertexwithbs_count/i");
+    tree->Branch("refitvertexwithbs_x", refitvertexwithbs_x, "refitvertexwithbs_x[refitvertexwithbs_count]/F");
+    tree->Branch("refitvertexwithbs_y", refitvertexwithbs_y, "refitvertexwithbs_y[refitvertexwithbs_count]/F");
+    tree->Branch("refitvertexwithbs_z", refitvertexwithbs_z, "refitvertexwithbs_z[refitvertexwithbs_count]/F");
+    tree->Branch("refitvertexwithbs_chi2", refitvertexwithbs_chi2, "refitvertexwithbs_chi2[refitvertexwithbs_count]/F");
+    tree->Branch("refitvertexwithbs_ndof", refitvertexwithbs_ndof, "refitvertexwithbs_ndof[refitvertexwithbs_count]/F");
+    tree->Branch("refitvertexwithbs_ntracks", refitvertexwithbs_ntracks, "refitvertexwithbs_ntracks[refitvertexwithbs_count]/I");
+    //tree->Branch("refitvertexwithbs_cov", refitvertexwithbs_cov, "refitvertexwithbs_cov[refitvertexwithbs_count][6]/F");
+    tree->Branch("refitvertexwithbs_eleIndex", refitvertexwithbs_eleIndex, "refitvertexwithbs_eleIndex[refitvertexwithbs_count][2]/I");
+    tree->Branch("refitvertexwithbs_muIndex", refitvertexwithbs_muIndex, "refitvertexwithbs_muIndex[refitvertexwithbs_count][2]/I");
+    tree->Branch("refitvertexwithbs_tauIndex", refitvertexwithbs_tauIndex, "refitvertexwithbs_tauIndex[refitvertexwithbs_count][2]/I");
   }
 
   // muons
@@ -1577,6 +1593,7 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   goodprimvertex_count = 0;
   primvertex_count = 0;
   refitvertex_count = 0;
+  refitvertexwithbs_count = 0;
   muon_count = 0;
   dimuon_count = 0;
   tau_count = 0;
@@ -1916,6 +1933,82 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
         }
       }
     }
+	
+  //add refitted vertex with tracks removed from pair of leptons along with bs constraint
+  if (crefittedvertexwithbs)
+    {
+      edm::Handle<RefitVertexCollection> RFVertexwithbs;
+      iEvent.getByToken(RefittedwithBSPVToken_, RFVertexwithbs);
+      if(RFVertexwithbs.isValid()) {
+        for(unsigned i = 0 ; i < RFVertexwithbs->size(); i++) {
+
+          //Find pair of leptons
+          const std::vector<std::string> leptonPairNames = (*RFVertexwithbs)[i].userCandNames();
+          if(leptonPairNames.size() < 2) continue;
+          int nMu = 0, nEle = 0, nTau = 0;
+          int muon1 = -1, muon2 = -1, ele1 = -1, ele2 = -1, tau1 = -1, tau2 = -1;
+          for(size_t il = 0; il < leptonPairNames.size(); il++){
+            const std::string leptonName = leptonPairNames[il];
+	    edm::Ptr<reco::Candidate> leptonCand = (*RFVertexwithbs)[i].userCand(leptonName);
+            if(std::abs(leptonCand->pdgId())==11 ){
+              for(size_t ie = 0; ie < electron_count; ie++){
+                if(TMath::Abs(leptonCand->pt() - electron_pt[ie]) < 0.01 && 
+                   TMath::Abs(leptonCand->eta() - electron_eta[ie]) < 0.001 &&
+                   TMath::Abs(leptonCand->phi() - electron_phi[ie]) < 0.001){
+                  nEle++;
+                  if(nEle == 1)ele1 = ie;
+                  else if(nEle == 2) ele2 = ie;
+                }
+              }
+            }
+            else if(std::abs(leptonCand->pdgId())==13 ){
+              for(size_t im = 0; im < muon_count; im++){
+                if(TMath::Abs(leptonCand->pt() - muon_pt[im]) < 0.01 &&
+                   TMath::Abs(leptonCand->eta() - muon_eta[im]) < 0.001 &&
+                   TMath::Abs(leptonCand->phi() - muon_phi[im]) < 0.001){
+                  nMu++;
+                  if(nMu == 1)muon1 = im;
+                  else if(nMu == 2) muon2 = im;
+                }
+              } 
+            }
+            else { //for tau
+              for(size_t it = 0; it < tau_count; it++){
+                if(TMath::Abs(leptonCand->pt() - tau_pt[it]) < 0.01 &&
+                   TMath::Abs(leptonCand->eta() - tau_eta[it]) < 0.001 &&
+                   TMath::Abs(leptonCand->phi() - tau_phi[it]) < 0.001){
+                  nTau++;
+                  if(nTau == 1)tau1 = it;
+                  else if(nTau == 2) tau2 = it;
+                }
+              }
+            }
+          } //end of lepton pair
+          if((nEle + nMu + nTau) < 2) continue;  //should have a pair of selected leptons
+
+          refitvertexwithbs_eleIndex[refitvertexwithbs_count][0] = ele1;
+          refitvertexwithbs_eleIndex[refitvertexwithbs_count][1] = ele2;
+          refitvertexwithbs_muIndex[refitvertexwithbs_count][0] = muon1;
+          refitvertexwithbs_muIndex[refitvertexwithbs_count][1] = muon2;
+          refitvertexwithbs_tauIndex[refitvertexwithbs_count][0] = tau1;
+          refitvertexwithbs_tauIndex[refitvertexwithbs_count][1] = tau2;
+          refitvertexwithbs_x[refitvertexwithbs_count] = (*RFVertexwithbs)[i].x();
+          refitvertexwithbs_y[refitvertexwithbs_count] = (*RFVertexwithbs)[i].y();
+          refitvertexwithbs_z[refitvertexwithbs_count] = (*RFVertexwithbs)[i].z();
+          refitvertexwithbs_chi2[refitvertexwithbs_count] = (*RFVertexwithbs)[i].chi2();
+          refitvertexwithbs_ndof[refitvertexwithbs_count] = (*RFVertexwithbs)[i].ndof();
+          refitvertexwithbs_ntracks[refitvertexwithbs_count] = (*RFVertexwithbs)[i].tracksSize();
+          refitvertexwithbs_cov[refitvertexwithbs_count][0] = (*RFVertexwithbs)[i].covariance(0,0); // xError()
+          refitvertexwithbs_cov[refitvertexwithbs_count][1] = (*RFVertexwithbs)[i].covariance(0,1);
+          refitvertexwithbs_cov[refitvertexwithbs_count][2] = (*RFVertexwithbs)[i].covariance(0,2);
+          refitvertexwithbs_cov[refitvertexwithbs_count][3] = (*RFVertexwithbs)[i].covariance(1,1); // yError()
+          refitvertexwithbs_cov[refitvertexwithbs_count][4] = (*RFVertexwithbs)[i].covariance(1,2);
+          refitvertexwithbs_cov[refitvertexwithbs_count][5] = (*RFVertexwithbs)[i].covariance(2,2); // zError()
+          refitvertexwithbs_count++;
+        }
+      }
+    }
+
 
   if (crectrack) AddPFCand(iEvent, iSetup);
 
