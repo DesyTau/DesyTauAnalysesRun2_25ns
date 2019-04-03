@@ -311,6 +311,26 @@ void Synch17Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("tau_pca3D_y_2", &tau_pca3D_y_2, &b_tau_pca3D_y_2);
    fChain->SetBranchAddress("tau_pca3D_z_2", &tau_pca3D_z_2, &b_tau_pca3D_z_2);
 
+   //Secondary vertex
+   fChain->SetBranchAddress("tau_SV_x_1", &tau_SV_x_1, &b_tau_SV_x_1);
+   fChain->SetBranchAddress("tau_SV_y_1", &tau_SV_y_1, &b_tau_SV_y_1);
+   fChain->SetBranchAddress("tau_SV_z_1", &tau_SV_z_1, &b_tau_SV_z_1);
+   fChain->SetBranchAddress("tau_SV_covxx_1", &tau_SV_covxx_1, &b_tau_SV_covxx_1);
+   fChain->SetBranchAddress("tau_SV_covyx_1", &tau_SV_covyx_1, &b_tau_SV_covyx_1);
+   fChain->SetBranchAddress("tau_SV_covzx_1", &tau_SV_covzx_1, &b_tau_SV_covzx_1);
+   fChain->SetBranchAddress("tau_SV_covyy_1", &tau_SV_covyy_1, &b_tau_SV_covyy_1);
+   fChain->SetBranchAddress("tau_SV_covzy_1", &tau_SV_covzy_1, &b_tau_SV_covzy_1);
+   fChain->SetBranchAddress("tau_SV_covzz_1", &tau_SV_covzz_1, &b_tau_SV_covzz_1);
+
+   fChain->SetBranchAddress("tau_SV_x_2", &tau_SV_x_2, &b_tau_SV_x_2);
+   fChain->SetBranchAddress("tau_SV_y_2", &tau_SV_y_2, &b_tau_SV_y_2);
+   fChain->SetBranchAddress("tau_SV_z_2", &tau_SV_z_2, &b_tau_SV_z_2);
+   fChain->SetBranchAddress("tau_SV_covxx_2", &tau_SV_covxx_2, &b_tau_SV_covxx_2);
+   fChain->SetBranchAddress("tau_SV_covyx_2", &tau_SV_covyx_2, &b_tau_SV_covyx_2);
+   fChain->SetBranchAddress("tau_SV_covzx_2", &tau_SV_covzx_2, &b_tau_SV_covzx_2);
+   fChain->SetBranchAddress("tau_SV_covyy_2", &tau_SV_covyy_2, &b_tau_SV_covyy_2);
+   fChain->SetBranchAddress("tau_SV_covzy_2", &tau_SV_covzy_2, &b_tau_SV_covzy_2);
+   fChain->SetBranchAddress("tau_SV_covzz_2", &tau_SV_covzz_2, &b_tau_SV_covzz_2);
 
 
   //RECO vertex info useful to have
@@ -660,6 +680,25 @@ void Synch17Tree::WriteInit(TTree *tree) {
    fChain->Branch("tau_pca3D_y_2", &tau_pca3D_y_2, "tau_pca3D_y_2/F");
    fChain->Branch("tau_pca3D_z_2", &tau_pca3D_z_2, "tau_pca3D_z_2/F");
 
+   fChain->Branch("tau_SV_x_1", &tau_SV_x_1, "tau_SV_x_1/F");
+   fChain->Branch("tau_SV_y_1", &tau_SV_y_1, "tau_SV_y_1/F");
+   fChain->Branch("tau_SV_z_1", &tau_SV_z_1, "tau_SV_z_1/F");
+   fChain->Branch("tau_SV_covxx_1", &tau_SV_covxx_1, "tau_SV_covxx_1/F");
+   fChain->Branch("tau_SV_covyx_1", &tau_SV_covyx_1, "tau_SV_covyx_1/F");
+   fChain->Branch("tau_SV_covzx_1", &tau_SV_covzx_1, "tau_SV_covzx_1/F");
+   fChain->Branch("tau_SV_covyy_1", &tau_SV_covyy_1, "tau_SV_covyy_1/F");
+   fChain->Branch("tau_SV_covzy_1", &tau_SV_covzy_1, "tau_SV_covzy_1/F");
+   fChain->Branch("tau_SV_covzz_1", &tau_SV_covzz_1, "tau_SV_covzz_1/F");
+
+   fChain->Branch("tau_SV_x_2", &tau_SV_x_2, "tau_SV_x_2/F");
+   fChain->Branch("tau_SV_y_2", &tau_SV_y_2, "tau_SV_y_2/F");
+   fChain->Branch("tau_SV_z_2", &tau_SV_z_2, "tau_SV_z_2/F");
+   fChain->Branch("tau_SV_covxx_2", &tau_SV_covxx_2, "tau_SV_covxx_2/F");
+   fChain->Branch("tau_SV_covyx_2", &tau_SV_covyx_2, "tau_SV_covyx_2/F");
+   fChain->Branch("tau_SV_covzx_2", &tau_SV_covzx_2, "tau_SV_covzx_2/F");
+   fChain->Branch("tau_SV_covyy_2", &tau_SV_covyy_2, "tau_SV_covyy_2/F");
+   fChain->Branch("tau_SV_covzy_2", &tau_SV_covzy_2, "tau_SV_covzy_2/F");
+   fChain->Branch("tau_SV_covzz_2", &tau_SV_covzz_2, "tau_SV_covzz_2/F");
 
    fChain->Branch("RecoVertexX", &RecoVertexX, "RecoVertexX/F");
    fChain->Branch("RecoVertexY", &RecoVertexY, "RecoVertexY/F");
