@@ -57,10 +57,10 @@ void Synch17GenTree::ReadInit(TTree *tree)
    fCurrent = -1;
    fChain->SetMakeClass(1);
 
-   fChain->SetBranchAddress("gen_Higgs_pt", &Higgs_pt, &b_Higgs_pt);
-   fChain->SetBranchAddress("gen_Higgs_eta", &Higgs_eta, &b_Higgs_eta);
-   fChain->SetBranchAddress("gen_Higgs_phi", &Higgs_phi, &b_Higgs_phi);
-   fChain->SetBranchAddress("gen_Higgs_mass", &Higgs_mass, &b_Higgs_mass);
+   fChain->SetBranchAddress("Higgs_pt", &Higgs_pt, &b_Higgs_pt);
+   fChain->SetBranchAddress("Higgs_eta", &Higgs_eta, &b_Higgs_eta);
+   fChain->SetBranchAddress("Higgs_phi", &Higgs_phi, &b_Higgs_phi);
+   fChain->SetBranchAddress("Higgs_mass", &Higgs_mass, &b_Higgs_mass);
 
    fChain->SetBranchAddress("pt_1", &pt_1, &b_pt_1);
    fChain->SetBranchAddress("phi_1", &phi_1, &b_phi_1);
