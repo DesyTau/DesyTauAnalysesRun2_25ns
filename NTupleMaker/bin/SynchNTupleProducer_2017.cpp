@@ -1070,6 +1070,7 @@ for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) {
 
      //Merijn: save here all gen information for the selected RECO events, gets stored for convenience in the taucheck tree ;-). Note that no selection on gen level is applied..     
      if (!isData){
+	//Merijn 2019 4 3:note that a separate fill is not needed. We store in the otree now, which is Filled at the bottom! Filling here will make things out of synch..
       FillGenTree(&analysisTree,gentreeForGoodRecoEvtsOnly,ch);
        }
       

@@ -19,14 +19,13 @@ If the channel is e-t or mu-t, it will calculate the lepton vx etc.
 -looking into potential issue with acoCPCOUT
 */
 
-double pimass=0.134; //Merijn 2019 2 8 in order to compile.. this is for neutral pion..
-
 void acott(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, int tauIndex2);
 
 void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, int tauIndex2,TString ch);
 TLorentzVector chargedPivec(const AC1B * analysisTree, int tauIndex);
 TLorentzVector neutralPivec(const AC1B * analysisTree, int tauIndex);
-TLorentzVector ipVec(const AC1B * analysisTree, int tauIndex, Synch17Tree *otree);
+//TLorentzVector ipVec(const AC1B * analysisTree, int tauIndex, Synch17Tree *otree);
+TLorentzVector ipVec(const AC1B * analysisTree, int tauIndex); //merijn 2019 4 2: the otree argument is superfluous after all..
 int chargedPiIndex(const AC1B * analysisTree, int tauIndex);
 
 void gen_acott(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, int tauIndex2);
@@ -58,9 +57,7 @@ double acoCP(TLorentzVector Pi1, TLorentzVector Pi2,
 
 void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, int tauIndex2, TString channel){
   // cout<<"Start acott_Impr"<<endl;
-
-  TLorentzVector lvector1,lvector2;
-  
+ 
   //Merijn 2019 1 10: there may be situations where we pass correctdecay, but ultimately the acotau does NOT get calculated. For these situations, currently acotau seems not initialised.
   otree->acotautau_00 = -9999;
   otree->acotautau_10 = -9999;
@@ -167,21 +164,14 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
       otree->VyConstitTau1=analysisTree->tau_pca3D_y[tauIndex1];
       otree->VzConstitTau1=analysisTree->tau_pca3D_z[tauIndex1];
 
-      //Merijn 2019 2 25 here we set that we get the correct kinematics for the tau constituent
-      lvector1.SetXYZT(analysisTree->tau_constituents_px[tauIndex1][piIndex_],
-					      analysisTree->tau_constituents_py[tauIndex1][piIndex_],
-					      analysisTree->tau_constituents_pz[tauIndex1][piIndex_],
-					      analysisTree->tau_constituents_e[tauIndex1][piIndex_]);
-      
-      otree->chconst_1_pt=lvector1.Pt();
-      otree->chconst_1_phi=lvector1.Phi();
-      otree->chconst_1_eta=lvector1.Eta();
-                  
+      //Merijn 2019 4 2: comment out and replace with vector from above:    
+      otree->chconst_1_pt=tau1Prong.Pt();
+      otree->chconst_1_phi=tau1Prong.Phi();
+      otree->chconst_1_eta=tau1Prong.Eta();
     }
   }
   
 //merijn: we vetoed already if the second tau didn't contain a pion, so can safely calculate the momentum of 2nd prong from hadrons
-
   TLorentzVector tau2Prong;
   tau2Prong=chargedPivec(analysisTree,tauIndex2);
   int piIndexfortau2=chargedPiIndex(analysisTree,tauIndex2);
@@ -195,15 +185,12 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
     otree->VxConstitTau2=analysisTree->tau_pca3D_x[tauIndex2];
     otree->VyConstitTau2=analysisTree->tau_pca3D_y[tauIndex2];
     otree->VzConstitTau2=analysisTree->tau_pca3D_z[tauIndex2];
-
-    lvector2.SetXYZT(analysisTree->tau_constituents_px[tauIndex2][piIndexfortau2],
-					    analysisTree->tau_constituents_py[tauIndex2][piIndexfortau2],
-					    analysisTree->tau_constituents_pz[tauIndex2][piIndexfortau2],
-					    analysisTree->tau_constituents_e[tauIndex2][piIndexfortau2]);
     
-    otree->chconst_2_pt=lvector2.Pt();
-    otree->chconst_2_phi=lvector2.Phi();
-    otree->chconst_2_eta=lvector2.Eta();
+    //Merijn 2019 4 3: replace with the tau2Prong vector. Keep old code in case something broke:
+    otree->chconst_2_pt=tau2Prong.Pt();
+    otree->chconst_2_phi=tau2Prong.Phi();
+    otree->chconst_2_eta=tau2Prong.Eta();
+    
   }
     
   
@@ -215,13 +202,13 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
   TLorentzVector tau1IP;
   //Merijn: for leptonic decay calculate in different way than for hadronic
   if(channel=="et"||channel=="mt") tau1IP = ipVec_Lepton(analysisTree,tauIndex1,channel);
-  else{tau1IP = ipVec(analysisTree,tauIndex1, otree);}//tt: treat as tau index..
+  else{tau1IP = ipVec(analysisTree,tauIndex1);}//tt: treat as tau index..
   TLorentzVector tau1Pi0;
   tau1Pi0.SetXYZT(0.,0.,0.,0.);
 
   //Merijn: have to assume here we WON'T look into e-mu case! 
   TLorentzVector tau2IP;
-  tau2IP = ipVec(analysisTree,tauIndex2, otree);
+  tau2IP = ipVec(analysisTree,tauIndex2);
   TLorentzVector tau2Pi0;
   tau2Pi0.SetXYZT(0.,0.,0.,0.); 
 
@@ -229,10 +216,8 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
   if(channel=="tt"){ if(analysisTree->tau_decayMode[tauIndex1]>=1&&analysisTree->tau_decayMode[tauIndex1]<=3) tau1Pi0 = neutralPivec(analysisTree,tauIndex1);}
 
   if (analysisTree->tau_decayMode[tauIndex2]>=1&&analysisTree->tau_decayMode[tauIndex2]<=3){ 
-	tau2Pi0 = neutralPivec(analysisTree,tauIndex2);
-  }
+	tau2Pi0 = neutralPivec(analysisTree,tauIndex2); }
   
-
   otree->acotautau_00=acoCP(tau1Prong,tau2Prong,tau1IP,tau2IP,firstNegative,false,false,otree);
    //I think it should work since everything assigned for 3 cases. Note: aco_00 will be filled with mu x 1-prong and mu x 1.1-prong
 
@@ -264,18 +249,20 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
 
   //Merijn 2 25: here calculate the alpha-minus observable
   //potentially some calculations could crash when divide by 0..
-  //Merijn 2 25: here calculate the alpha-minus observable
-  //potentially some calculations could crash when divide by 0..
- 
+  //note: for anything else than mu-tau it is not very well defined.. we just pick the negative charged prong its track! this may not make sense in the end..
+  //an alternative is to just only fill if the pion of tau2 is negative
+
   TVector3 IPVEC, PVEC;
   TVector3 ZVEC(0.,0.,1.);
 
   if(firstNegative){
      IPVEC=tau1IP.Vect();
-     PVEC=lvector1.Vect();}
+     PVEC=tau1Prong.Vect();
+  }
   else{
     IPVEC=tau2IP.Vect();
-    PVEC=lvector2.Vect();}
+    PVEC=tau2Prong.Vect();
+  }
   
   //normalise
   IPVEC *= 1/IPVEC.Mag();
@@ -357,7 +344,7 @@ TLorentzVector neutralPivec(const AC1B * analysisTree, int tauIndex){
   return neutralPi;
 };
 
-TLorentzVector ipVec(const AC1B * analysisTree, int tauIndex, Synch17Tree *otree) {
+TLorentzVector ipVec(const AC1B * analysisTree, int tauIndex) {
 
   int ncomponents = analysisTree->tau_constituents_count[tauIndex];
   TLorentzVector vec;
@@ -565,6 +552,7 @@ void gen_acott(const AC1B * analysisTree, Synch17GenTree *gentree, int tauIndex1
   int piIndex1 = gen_chargedPiIndex(analysisTree,tauIndex1,partId1);
 
   //Merijn 2019 2 25: add the kinematic information of the constituents
+  /*
   TLorentzVector lvector1;
   lvector1.SetXYZT(analysisTree->genparticles_px[piIndex1],
 		  analysisTree->genparticles_py[piIndex1],
@@ -573,22 +561,33 @@ void gen_acott(const AC1B * analysisTree, Synch17GenTree *gentree, int tauIndex1
 
   gentree->chconst_1_pt=lvector1.Pt();
   gentree->chconst_1_phi=lvector1.Phi();
-  gentree->chconst_1_eta=lvector1.Eta();
+  gentree->chconst_1_eta=lvector1.Eta();*/
+
+  //Merijn 2019 4 2: replace with vector already defined..
+  gentree->chconst_1_pt=tau1Prong.Pt();
+  gentree->chconst_1_phi=tau1Prong.Phi();
+  gentree->chconst_1_eta=tau1Prong.Eta();
+  
   
   TLorentzVector tau2Prong=gen_chargedPivec(analysisTree,tauIndex2,partId2);
   int piIndex2 = gen_chargedPiIndex(analysisTree,tauIndex2,partId2);
 
   //Merijn 2019 2 25: add the kinematic information of the constituents
+  /*
   TLorentzVector lvector2;
   lvector2.SetXYZT(analysisTree->genparticles_px[piIndex2],
 		  analysisTree->genparticles_py[piIndex2],
 		  analysisTree->genparticles_pz[piIndex2],
 		  analysisTree->genparticles_e[piIndex2]);
-
   gentree->chconst_2_pt=lvector2.Pt();
   gentree->chconst_2_eta=lvector2.Eta();
   gentree->chconst_2_phi=lvector2.Phi();
+  */
   
+  //Merijn 2019 4 2: replace with vector already defined..
+  gentree->chconst_2_pt=tau2Prong.Pt();
+  gentree->chconst_2_eta=tau2Prong.Eta();
+  gentree->chconst_2_phi=tau2Prong.Phi();
 
   //  std::cout << "Mode1 = " << analysisTree->gentau_decayMode[tauIndex1] << "  Mode2 = " << analysisTree->gentau_decayMode[tauIndex2] << std::endl;
   //  std::cout << "pion1 = " << analysisTree->genparticles_pdgid[piIndex1] << "    pion2 = " << analysisTree->genparticles_pdgid[piIndex2] << std::endl;
@@ -669,10 +668,10 @@ void gen_acott(const AC1B * analysisTree, Synch17GenTree *gentree, int tauIndex1
 
   if(firstNegative){
      IPVEC=tau1IP.Vect();
-     PVEC=lvector1.Vect();}
+     PVEC=tau1Prong.Vect();}
   else{
     IPVEC=tau2IP.Vect();
-    PVEC=lvector2.Vect();}
+    PVEC=tau2Prong.Vect();}
   
   //normalise
   IPVEC *= 1/IPVEC.Mag();
@@ -934,9 +933,7 @@ TLorentzVector gen_ThreeProngVec(const AC1B * analysisTree, int tauIndex){
   }
   
   for(int piIndex : ThreeProngIndices){//selects the highest energy Pi
-    TLorentzVector lvector;
-
-    
+    TLorentzVector lvector;    
     lvector.SetXYZT(analysisTree->genparticles_px[piIndex],
 		    analysisTree->genparticles_py[piIndex],
 		    analysisTree->genparticles_pz[piIndex],
@@ -1036,8 +1033,6 @@ Float_t gen_A1Polarization(const AC1B * analysisTree, int tauIndex){
   */
   return pol/Lambda;
 };
-
-
 
 
 //Merijn: adjust to take otree as well, conventient for debguggin..
