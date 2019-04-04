@@ -13,7 +13,6 @@
 #include "TROOT.h"
 #include "TLorentzVector.h"
 #include "TVector3.h"
-#include "TRFIOFile.h"
 #include "TH1D.h"
 #include "TChain.h"
 #include "TGraphAsymmErrors.h"
@@ -500,8 +499,8 @@ int main(int argc, char * argv[]) {
   RecoilCorrector recoilPFMetCorrector(RecoilFileName);
 
   // Lepton Scale Factors 
-  ScaleFactor * SF_electronIdIso;
-  ScaleFactor * SF_electronTrig;
+  ScaleFactor * SF_electronIdIso = 0;
+  ScaleFactor * SF_electronTrig = 0;
   if (applyLeptonSF) {
     SF_electronIdIso = new ScaleFactor();
     SF_electronIdIso->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(ElectronIdIsoFile));
@@ -859,7 +858,6 @@ int main(int argc, char * argv[]) {
 
       float pfmet_ex = analysisTree.pfmetcorr_ex;
       float pfmet_ey = analysisTree.pfmetcorr_ey;
-      float pfmet_phi = analysisTree.pfmetcorr_phi;
       float pfmet = TMath::Sqrt(pfmet_ex*pfmet_ex+pfmet_ey*pfmet_ey);
 
       float puppimet_ex = analysisTree.puppimet_ex;
@@ -1279,7 +1277,6 @@ int main(int argc, char * argv[]) {
 	      recoilPFMetCorrector.CorrectByMeanResolution(pfmet_ex,pfmet_ey,genV.Px(),genV.Py(),visiblePx,visiblePy,nJets30,pfmetcorr_ex,pfmetcorr_ey);
 	    else 
 	      recoilPFMetCorrector.Correct(pfmet_ex,pfmet_ey,genV.Px(),genV.Py(),visiblePx,visiblePy,nJets30,pfmetcorr_ex,pfmetcorr_ey);
-	    pfmet_phi = TMath::ATan2(pfmetcorr_ey,pfmetcorr_ex);
 	    pfmet = TMath::Sqrt(pfmetcorr_ex*pfmetcorr_ex+pfmetcorr_ey*pfmetcorr_ey);
 	    pfmet_ex = pfmetcorr_ex;
 	    pfmet_ey = pfmetcorr_ey;

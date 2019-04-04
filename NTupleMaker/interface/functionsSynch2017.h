@@ -137,17 +137,15 @@ float GenMatch(const AC1B * analysisTree, bool isData, TString particleType, int
   // isZJ  = false;
   
   float minDR = 0.2;
-  float pt,eta,phi;
+  float eta = -9999;
+  float phi = -9999;
   if(particleType=="m"){
-    pt =      analysisTree->muon_pt[Index]; 
     eta =     analysisTree->muon_eta[Index]; 
     phi =     analysisTree->muon_phi[Index];}
   if(particleType=="e"){         
-    pt =      analysisTree->electron_pt[Index];
     eta =     analysisTree->electron_eta[Index]; 
     phi =     analysisTree->electron_phi[Index];}
   if(particleType=="t"){         
-    pt =      analysisTree->tau_pt[Index];
     eta =     analysisTree->tau_eta[Index]; 
     phi =     analysisTree->tau_phi[Index];
   }
