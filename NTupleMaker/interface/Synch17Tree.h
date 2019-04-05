@@ -308,6 +308,13 @@ public :
   Float_t GenVertexX;
   Float_t GenVertexY;
   Float_t GenVertexZ;
+  
+  //refit vertices
+  Float_t RefitVertexX;
+  Float_t RefitVertexY;
+  Float_t RefitVertexZ;
+  Int_t matched_pair;
+
 
   //Merijn: add the vx of the tau decay products
   Float_t VxConstitTau1;
@@ -611,6 +618,12 @@ public :
   TBranch        *b_GenVertexX;
   TBranch        *b_GenVertexY;
   TBranch        *b_GenVertexZ;
+  
+  //refit vertex info 
+  TBranch        *b_RefitVertexX;
+  TBranch        *b_RefitVertexY;
+  TBranch        *b_RefitVertexZ; 
+  TBranch        *b_matched_pair;
   
   TBranch        *b_VxConstitTau1;
   TBranch        *b_VyConstitTau1;
