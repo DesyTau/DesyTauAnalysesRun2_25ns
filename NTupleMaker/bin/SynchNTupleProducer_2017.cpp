@@ -519,7 +519,7 @@ int main(int argc, char * argv[]){
   //Synch17GenTree *gentree = new Synch17GenTree(gtree);
   
   Synch17GenTree *gentree = new Synch17GenTree(gtree);
-  // Synch17GenTree *gentreeForGoodRecoEvtsOnly = new Synch17GenTree(tree);
+  Synch17GenTree *gentreeForGoodRecoEvtsOnly = new Synch17GenTree(tree);
     
 
   int nTotalFiles = 0;
@@ -647,8 +647,7 @@ int main(int argc, char * argv[]){
     std::cout << "      number of entries in Tree = " << numberOfEntries << std::endl;
     ///////////////EVENT LOOP///////////////
 
-//for (Long64_t iEntry=0; iEntry<1000; iEntry++) {
-
+//for (Long64_t iEntry=0; iEntry<150; iEntry++) {
 for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) {
   // cout<<"iEntry "<<iEntry<<endl;
       counter[0]++;
@@ -1068,12 +1067,12 @@ for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) {
 
      //all criterua passed, we fill vertices here;	
      SaveRECOVertices(&analysisTree,otree, isData);
-     //Merijn: save here all gen information for the good RECO events. Note that no selection on gen level is applied..
-     /*
+
+     //Merijn: save here all gen information for the selected RECO events, gets stored for convenience in the taucheck tree ;-). Note that no selection on gen level is applied..     
      if (!isData){
-       FillGenTree(&analysisTree,gentreeForGoodRecoEvtsOnly,ch);
-       gentreeForGoodRecoEvtsOnly->Fill();
-       }*/
+	//Merijn 2019 4 3:note that a separate fill is not needed. We store in the otree now, which is Filled at the bottom! Filling here will make things out of synch..
+      FillGenTree(&analysisTree,gentreeForGoodRecoEvtsOnly,ch);
+       }
       
       if(ch=="mt") {
       	FillMuTau(&analysisTree, otree, leptonIndex, dRiso);
@@ -1940,8 +1939,6 @@ void initializeCPvar(Synch17Tree *otree){
   otree->acotautauPsi_01=-9999;
   otree->acotautauPsi_10=-9999;
   otree->acotautauPsi_11=-9999;
-
-  
   
   otree->tau1DecayPlaneX=-9999;
   otree->tau1DecayPlaneY=-9999;
@@ -1957,7 +1954,17 @@ void initializeCPvar(Synch17Tree *otree){
   otree->VxConstitTau2=-9999;
   otree->VyConstitTau2=-9999;
   otree->VzConstitTau2=-9999;
+
+  //Merijn add initialiser for
+  otree->chconst_1_pt=-9999;
+  otree->chconst_1_eta=-9999;
+  otree->chconst_1_phi=-9999;
   
+  otree->chconst_2_pt=-9999;
+  otree->chconst_2_eta=-9999;
+  otree->chconst_2_phi=-9999;
+  otree->alphaminus=-9999;
+
 }
 
 void initializeGenTree(Synch17GenTree *gentree){
@@ -1999,6 +2006,16 @@ void initializeGenTree(Synch17GenTree *gentree){
   gentree->VxConstitTau2=-9999;
   gentree->VyConstitTau2=-9999;
   gentree->VzConstitTau2=-9999;
+
+  //Merijn add initialiser for
+  gentree->chconst_1_pt=-9999;
+  gentree->chconst_1_eta=-9999;
+  gentree->chconst_1_phi=-9999;
+  
+  gentree->chconst_2_pt=-9999;
+  gentree->chconst_2_eta=-9999;
+  gentree->chconst_2_phi=-9999;
+  gentree->alphaminus=-9999;
 
 }
 
