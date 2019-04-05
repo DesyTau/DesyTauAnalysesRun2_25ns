@@ -36,9 +36,15 @@ public :
   Float_t         phi_1;
   Float_t         eta_1;
   Int_t           decaymode_1;
+  Float_t         chconst_1_pt;
+  Float_t         chconst_1_eta;
+  Float_t         chconst_1_phi; 
   Float_t         pt_2;
   Float_t         phi_2;
   Float_t         eta_2;
+  Float_t         chconst_2_pt;
+  Float_t         chconst_2_eta;
+  Float_t         chconst_2_phi;   
   Int_t           decaymode_2;
   Float_t         acotautau_00;
   Float_t         acotautau_10;
@@ -68,15 +74,17 @@ public :
   Float_t VertexX;
   Float_t VertexY;
   Float_t VertexZ;
-
-    Float_t VxConstitTau1;
-    Float_t VyConstitTau1;
-    Float_t VzConstitTau1;
-
-    Float_t VxConstitTau2;
-    Float_t VyConstitTau2;
-    Float_t VzConstitTau2;
   
+  Float_t VxConstitTau1;
+  Float_t VyConstitTau1;
+  Float_t VzConstitTau1;
+  
+  Float_t VxConstitTau2;
+  Float_t VyConstitTau2;
+  Float_t VzConstitTau2;
+  
+  Float_t alphaminus;
+
 
   //////////////////////////////////////////////
   //            List of branches              //
@@ -88,10 +96,16 @@ public :
   TBranch	 *b_pt_1;
   TBranch	 *b_phi_1;
   TBranch	 *b_eta_1;
+  TBranch        *b_chconst_1_pt;
+  TBranch        *b_chconst_1_eta;
+  TBranch        *b_chconst_1_phi;   
   TBranch	 *b_decaymode_1;
   TBranch	 *b_pt_2;
   TBranch	 *b_phi_2;
   TBranch	 *b_eta_2;
+  TBranch        *b_chconst_2_pt;
+  TBranch        *b_chconst_2_eta;
+  TBranch        *b_chconst_2_phi;    
   TBranch	 *b_decaymode_2;
   TBranch        *b_acotautau_00;
   TBranch        *b_acotautau_10;
@@ -128,6 +142,7 @@ public :
   TBranch        *b_VxConstitTau2;
   TBranch        *b_VyConstitTau2;
   TBranch        *b_VzConstitTau2;
+  TBranch        *b_alphaminus;
 
   Synch17GenTree(TTree *tree=0);
   virtual ~Synch17GenTree();
