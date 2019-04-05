@@ -76,6 +76,7 @@ void initializeCPvar(Synch17Tree *otree);
 void SaveRECOVertices(const AC1B * analysisTree,Synch17Tree *otree, const bool isData);
 void initializeGenTree(Synch17GenTree *gentree);
 void FillGenTree(const AC1B * analysisTree, Synch17GenTree *gentree, TString ch);
+void Refitting(const AC1B *analysisTree, Synch17Tree *otree, int tauIndex, int leptonIndex, int iEntry);
 //void fillTTbarUncWeights(const AC1B * analysisTree, Synch17Tree *otree, bool isData, bool includeTTbarUncWeights);
 
 
@@ -959,7 +960,9 @@ for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) {
 	lep_eta =     analysisTree.tau_eta[leptonIndex]; 
 	lep_phi =     analysisTree.tau_phi[leptonIndex];
       }
-	    
+	 
+      Refitting(&analysisTree, otree, tauIndex, leptonIndex, iEntry);	
+	
       bool isSingleLepTrig = false;
       bool isDiTauTrig     = false;
       bool isTauTrig       = false;
@@ -2148,4 +2151,43 @@ else{//if it is data, fill with something recognisable nonsensible
       otree->GenVertexY=-9999;
       otree->GenVertexZ=-9999;}
 
+}
+
+void Refitting(const AC1B *analysisTree, Synch17Tree *otree,int tauIndex, int leptonIndex, int iEntry)
+{
+//Int_t no_of_matches=0;
+ 
+  
+  otree->RefitVertexX = otree->RecoVertexX;
+  otree->RefitVertexY = otree->RecoVertexY;
+  otree->RefitVertexZ = otree->RecoVertexZ;
+
+ 
+  otree->matched_pair = -1;
+  cout<<endl<<"COUNT  "<<analysisTree->refitvertex_count<<endl;
+
+  cout<<endl<<"LEPTON INDEX "<<leptonIndex <<" TAU INDEX "<<tauIndex <<endl;
+  for(unsigned int i=0; i<analysisTree->refitvertex_count; i++)
+    {
+cout<<endl<<"refitvertex_muIndex1  "<<analysisTree->refitvertex_muIndex[i][0]<<"   refitvertex_muIndex2    "<<analysisTree->refitvertex_muIndex[i][1]<<"    refitvertex_tauIndex1   "<<analysisTree->refitvertex_tauIndex[i][0]<<"    refitvertex_tauIndex2   "<<analysisTree->refitvertex_tauIndex[i][1]<<endl;
+
+ 
+
+      if(
+((leptonIndex==(analysisTree->refitvertex_muIndex[i][0]))||(leptonIndex==(analysisTree->refitvertex_muIndex[i][1])))&&((tauIndex==(analysisTree->refitvertex_tauIndex[i][0]))||(tauIndex==(analysisTree->refitvertex_tauIndex[i][1])))
+	 )
+	{
+          
+          otree->RefitVertexX = analysisTree->refitvertex_x[i];
+          otree->RefitVertexY = analysisTree->refitvertex_y[i];
+          otree->RefitVertexZ = analysisTree->refitvertex_z[i];
+          otree->matched_pair = i;
+
+	  
+         
+          
+
+	}
+    }
+   cout<<endl<<"Matched pair = "<<otree->matched_pair<<endl;
 }
