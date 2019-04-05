@@ -22,7 +22,7 @@ void Plot_lept_mutau_Updated(TString Variable = "m_vis",
 			     int nBins  =   30,
 			     float xmin =    0,
 			     float xmax =  300,
-			     TString Weight = "puweight*effweight*mcweight*",
+			     TString Weight = "puweight*effweight*mcweight*correction_againstMuonTight3_2*",
 			     TString Cuts = "&&iso_1<0.15&&extraelec_veto<0.5&&extramuon_veto<0.5&&pt_1>20&&pt_2>20&&mva17_2>0.5&&mt_1<60&&againstMuonTight3_2>0.5&&againstElectronVLooseMVA6_2>0.5&&(singleLepTrigger>0.5||xTrigger>0.5)",//&&mva17_2>0.5&&mt_1<60&&(m_vis>60&&m_vis<90)
 			     TString ytitle = "Events",
 			     TString DataFile = "SingleMuon_Run2017",
@@ -560,7 +560,6 @@ void Plot_lept_mutau_Updated(TString Variable = "m_vis",
   // Setup legend
   TLegend *legend = PositionedLegend(0.25, 0.30, 3, 0.03);
   legend -> SetTextFont(42);
-
   histData -> SetMarkerColor(1);
   histData -> SetLineColor(1);
   histData -> SetFillColor(1);
