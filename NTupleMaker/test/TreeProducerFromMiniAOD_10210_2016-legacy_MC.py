@@ -21,7 +21,6 @@ process.load('Configuration.StandardSequences.GeometryDB_cff')
 process.load('Configuration.StandardSequences.MagneticField_38T_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 process.load("TrackingTools/TransientTrack/TransientTrackBuilder_cfi")
-process.load('RecoMET.METFilters.ecalBadCalibFilter_cfi')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff')
 process.GlobalTag.globaltag = '94X_mcRun2_asymptotic_v3'
 
@@ -68,43 +67,6 @@ process.patJetsReapplyJEC = updatedPatJets.clone(
     jetCorrFactorsSource = cms.VInputTag(cms.InputTag("patJetCorrFactorsReapplyJEC"))
     )
 
-#PFMET
-#from PhysicsTools.PatUtils.tools.runMETCorrectionsAndUncertainties import runMetCorAndUncFromMiniAOD
-
-# If you only want to re-correct and get the proper uncertainties
-#runMetCorAndUncFromMiniAOD(process,
-#                           isData=runOnData,
-#                           fixEE2017 = True,
-#                           fixEE2017Params = {'userawPt': True, 'PtThreshold':50.0, 'MinEtaThreshold':2.65, 'MaxEtaThreshold': 3.139} ,
-#                           postfix = "ModifiedMET"
-#                           )
-
-#PuppiMET
-#from PhysicsTools.PatAlgos.slimming.puppiForMET_cff import makePuppiesFromMiniAOD
-#makePuppiesFromMiniAOD( process, True );
-
-#MET filter for 2018
-baddetEcallist = cms.vuint32(
-                             [872439604,872422825,872420274,872423218,
-                              872423215,872416066,872435036,872439336,
-                              872420273,872436907,872420147,872439731,
-                              872436657,872420397,872439732,872439339,
-                              872439603,872422436,872439861,872437051,
-                              872437052,872420649,872422436,872421950,
-                              872437185,872422564,872421566,872421695,
-                              872421955,872421567,872437184,872421951,
-                              872421694,872437056,872437057,872437313])
-
-
-process.ecalBadCalibReducedMINIAODFilter = cms.EDFilter(
-                                                        "EcalBadCalibFilter",
-                                                        EcalRecHitSource = cms.InputTag("reducedEgamma:reducedEERecHits"),
-                                                        ecalMinEt        = cms.double(50.),
-                                                        baddetEcal    = baddetEcallist, 
-                                                        taggingMode = cms.bool(True),
-                                                        debug = cms.bool(False)
-                                                        )
-
 # If you only want to re-cluster and get the proper uncertainties
 #runMetCorAndUncFromMiniAOD(process,
 #                           isData=runOnData,
@@ -121,7 +83,7 @@ process.ecalBadCalibReducedMINIAODFilter = cms.EDFilter(
 #                       applyEnergyCorrections=False,
 #                       applyVIDOnCorrectedEgamma=False,
 #                       isMiniAOD=True,
-#                       era='2017-Nov17ReReco')
+#                       era='2016-Legacy')
 ### END Electron scale and smearing ====================================================================
 
 # Electron ID ==========================================================================================
@@ -145,7 +107,6 @@ my_id_modules = ['RecoEgamma.ElectronIdentification.Identification.cutBasedElect
                  'RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Fall17_iso_V1_cff',
                  'RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_Fall17_94X_V1_cff',
                  'RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_Fall17_94X_V2_cff']
-
 
 #add them to the VID producer
 for idmod in my_id_modules:
@@ -657,26 +618,10 @@ SampleName = cms.untracked.string("Data")
 
 process.p = cms.Path(
   process.initroottree*
-#  process.BadChargedCandidateFilter *
-#  process.BadPFMuonFilter *
-#  process.BadGlobalMuonFilter *
-#  process.pileupJetIdUpdated * 
-#  process.rerunMvaIsolationSequence*
-
   process.patJetCorrFactorsReapplyJEC * process.patJetsReapplyJEC *
-#  process.egmPhotonIDSequence *
-#  process.puppiMETSequence *
-#  process.fullPatMetSequencePuppi *
-#  process.fullPatMetSequenceModifiedMET *
-  process.ecalBadCalibReducedMINIAODFilter*
   process.egmGsfElectronIDSequence *
   process.rerunMvaIsolationSequence *      # add new tau ids
   process.NewTauIDsEmbedded *              # add new tau ids
-  #process.rerunMvaIsolation2SeqRun2 *
-  #process.mvaMetSequence *
-  #process.HBHENoiseFilterResultProducer* #produces HBHE bools baseline
-  #process.ApplyBaselineHBHENoiseFilter*  #reject events based 
-  #process.ApplyBaselineHBHEISONoiseFilter*  #reject events based -- disable the module, performance is being investigated
   process.makeroottree
 )
 
