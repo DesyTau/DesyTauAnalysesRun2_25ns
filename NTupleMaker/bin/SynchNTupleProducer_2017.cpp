@@ -961,7 +961,6 @@ for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) {
 	lep_phi =     analysisTree.tau_phi[leptonIndex];
       }
 	 
-      Refitting(&analysisTree, otree, tauIndex, leptonIndex, iEntry);	
 	
       bool isSingleLepTrig = false;
       bool isDiTauTrig     = false;
@@ -2210,9 +2209,9 @@ void Refitting(const AC1B *analysisTree, Synch17Tree *otree, int tauIndex, int l
    }
   }
  
- //End of identifying correct refiited vertex (WITHOUT bs)
+ //End of identifying correct refitted vertex (WITHOUT bs)
 
- //Begin of identifying correct refiited vertex (WITH bs)
+ //Begin of identifying correct refitted vertex (WITH bs)
 
   otree->RefitVertexX_with_bs = otree->RecoVertexX_with_bs;
   otree->RefitVertexY_with_bs = otree->RecoVertexY_with_bs;
@@ -2261,4 +2260,5 @@ void Refitting(const AC1B *analysisTree, Synch17Tree *otree, int tauIndex, int l
 	}
    }
   }
+  //End of identifying correct refitted vertex (WITH bs)
 }
