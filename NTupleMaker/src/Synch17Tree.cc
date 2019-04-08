@@ -337,6 +337,10 @@ void Synch17Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("RecoVertexX", &RecoVertexX, &b_RecoVertexX);
    fChain->SetBranchAddress("RecoVertexY", &RecoVertexY, &b_RecoVertexY);
    fChain->SetBranchAddress("RecoVertexZ", &RecoVertexZ, &b_RecoVertexZ);
+	
+   fChain->SetBranchAddress("RecoVertexX_with_bs", &RecoVertexX_with_bs, &b_RecoVertexX_with_bs);
+   fChain->SetBranchAddress("RecoVertexY_with_bs", &RecoVertexY_with_bs, &b_RecoVertexY_with_bs);
+   fChain->SetBranchAddress("RecoVertexZ_with_bs", &RecoVertexZ_with_bs, &b_RecoVertexZ_with_bs);
 
   //gen vertex info useful to have
    fChain->SetBranchAddress("GenVertexX", &GenVertexX, &b_GenVertexX);
@@ -348,6 +352,11 @@ void Synch17Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("RefitVertexY", &RefitVertexY, &b_RefitVertexY);
    fChain->SetBranchAddress("RefitVertexZ", &RefitVertexZ, &b_RefitVertexZ);
    fChain->SetBranchAddress("matched_pair", &matched_pair, &b_matched_pair);
+	
+   fChain->SetBranchAddress("RefitVertexX_with_bs", &RefitVertexX_with_bs, &b_RefitVertexX_with_bs);
+   fChain->SetBranchAddress("RefitVertexY_with_bs", &RefitVertexY_with_bs, &b_RefitVertexY_with_bs);
+   fChain->SetBranchAddress("RefitVertexZ_with_bs", &RefitVertexZ_with_bs, &b_RefitVertexZ_with_bs);
+   fChain->SetBranchAddress("matched_pair_with_bs", &matched_pair_with_bs, &b_matched_pair_with_bs);
    
    fChain->SetBranchAddress("VxConstitTau1", &VxConstitTau1, &b_VxConstitTau1);
    fChain->SetBranchAddress("VyConstitTau1", &VyConstitTau1, &b_VyConstitTau1);
@@ -709,6 +718,10 @@ void Synch17Tree::WriteInit(TTree *tree) {
    fChain->Branch("RecoVertexX", &RecoVertexX, "RecoVertexX/F");
    fChain->Branch("RecoVertexY", &RecoVertexY, "RecoVertexY/F");
    fChain->Branch("RecoVertexZ", &RecoVertexZ, "RecoVertexZ/F"); 
+	
+   fChain->Branch("RecoVertexX_with_bs", &RecoVertexX_with_bs, "RecoVertexX_with_bs/F");
+   fChain->Branch("RecoVertexY_with_bs", &RecoVertexY_with_bs, "RecoVertexY_with_bs/F");
+   fChain->Branch("RecoVertexZ_with_bs", &RecoVertexZ_with_bs, "RecoVertexZ_with_bs/F"); 
 
    fChain->Branch("GenVertexX", &GenVertexX, "GenVertexX/F");
    fChain->Branch("GenVertexY", &GenVertexY, "GenVertexY/F");
@@ -719,6 +732,11 @@ void Synch17Tree::WriteInit(TTree *tree) {
    fChain->Branch("RefitVertexY", &RefitVertexY, "RefitVertexY/F");
    fChain->Branch("RefitVertexZ", &RefitVertexZ, "RefitVertexZ/F");
    fChain->Branch("matched_pair", &matched_pair, "matched_pair/I");	
+	
+   fChain->Branch("RefitVertexX_with_bs", &RefitVertexX_with_bs, "RefitVertexX_with_bs/F");
+   fChain->Branch("RefitVertexY_with_bs", &RefitVertexY_with_bs, "RefitVertexY_with_bs/F");
+   fChain->Branch("RefitVertexZ_with_bs", &RefitVertexZ_with_bs, "RefitVertexZ_with_bs/F");
+   fChain->Branch("matched_pair_with_bs", &matched_pair_with_bs, "matched_pair_with_bs/I");	
 
    fChain->Branch("VxConstitTau1", &VxConstitTau1, "VxConstitTau1/F");
    fChain->Branch("VyConstitTau1", &VyConstitTau1, "VyConstitTau1/F");
