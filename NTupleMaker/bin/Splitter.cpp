@@ -24,8 +24,8 @@ int main (int argc, char * argv[]) {
   std::string dummy;
   while (input0>>dummy) nfiles++;
   
-  int ncycles = nfiles / period;
-  int nreminder = nfiles % period;
+  unsigned int ncycles = nfiles / period;
+  unsigned int nreminder = nfiles % period;
 
   std::cout << std::endl;
   std::cout << "number of files  = " << nfiles << std::endl;
@@ -34,7 +34,7 @@ int main (int argc, char * argv[]) {
   std::cout << "reminder         = " << nreminder << std::endl;
   std::cout << std::endl;
 
-  for (int i=0; i<ncycles; ++i) {
+  for (unsigned int i=0; i<ncycles; ++i) {
     char outputNumber[10];
     if (i<10)
       sprintf(outputNumber,"%1i",i);
@@ -60,7 +60,7 @@ int main (int argc, char * argv[]) {
     sprintf(outputNumber,"%3i",ncycles);
   std::string outputName = sampleName + "_files/" + sampleName + "_" + std::string(outputNumber);
   std::ofstream outputFile(outputName);
-  for (int j=0; j<nreminder; ++j) {
+  for (unsigned int j=0; j<nreminder; ++j) {
     input >> dummy;
     //    std::cout << dummy << std::endl;
     outputFile << dummy << std::endl;

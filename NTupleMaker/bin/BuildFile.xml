@@ -532,7 +532,7 @@
  <use name="boost_program_options"/>
  <use name="DesyTauAnalyses/NTupleMaker"/>
  <use name="FWCore/ParameterSet"/>
- <use name="TauAnalysis/SVfitStandalone"/>
+ <use name="TauAnalysis/ClassicSVfit"/>
  <use name="CondFormats/BTauObjects"/>
  <use name="CondTools/BTau"/>
  <use name="HTT-utilities/LepEffInterface"/>
