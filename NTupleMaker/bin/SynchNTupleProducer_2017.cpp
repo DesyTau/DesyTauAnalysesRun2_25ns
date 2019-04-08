@@ -2160,7 +2160,8 @@ else{//if it is data, fill with something recognisable nonsensible
 }
 
 void Refitting(const AC1B *analysisTree, Synch17Tree *otree, int tauIndex, int leptonIndex, TString ch)
-{	
+{
+  //Begin of identifying correct refitted vertex (WITHOUT bs)
   otree->RefitVertexX = otree->RecoVertexX;
   otree->RefitVertexY = otree->RecoVertexY;
   otree->RefitVertexZ = otree->RecoVertexZ;
