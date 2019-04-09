@@ -115,15 +115,16 @@ for idmod in my_id_modules:
 ### END Electron ID ====================================================================================
 
 # Tau ID ===============================================================================================
-from DesyTauAnalyses.NTupleMaker.runTauIdMVA import *
-na = TauIDEmbedder(process, cms, # pass tour process object
-    debug=True,
-#    toKeep = ["2017v1", "2017v2", "newDM2017v2", "dR0p32017v2", "2016v1", "newDM2016v1", "deepTau2017v1", "DPFTau_2016_v0","DPFTau_2016_v1"]
-    toKeep = ["2017v1", "2017v2", "newDM2017v2", "dR0p32017v2", "2016v1", "newDM2016v1"]
-                   )
-na.runTauID()
+# https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePFTauID#Running_of_the_DNN_based_tau_ID
+updatedTauName = "NewTauIDsEmbedded" #name of pat::Tau collection with new tau-Ids
+import RecoTauTag.RecoTau.tools.runTauIdMVA as tauIdConfig
+tauIdEmbedder = tauIdConfig.TauIDEmbedder(process, cms, debug = False,
+                                          updatedTauName = updatedTauName,
+                                          toKeep = [ "2017v1", "2017v2", "newDM2017v2", "dR0p32017v2", "2016v1", "newDM2016v1", "deepTau2017v1", "DPFTau_2016_v0", "DPFTau_2016_v1" ]
+                                          )
 
-tauSrc = cms.InputTag('NewTauIDsEmbedded')
+tauIdEmbedder.runTauID()
+
 # END Tau ID ===========================================================================================
 
 # NTuple Maker =======================================================================
@@ -621,7 +622,7 @@ process.p = cms.Path(
   process.patJetCorrFactorsReapplyJEC * process.patJetsReapplyJEC *
   process.egmGsfElectronIDSequence *
   process.rerunMvaIsolationSequence *      # add new tau ids
-  process.NewTauIDsEmbedded *              # add new tau ids
+  getattr(process,updatedTauName) *        # add new tau ids
   process.makeroottree
 )
 
