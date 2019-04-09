@@ -134,7 +134,9 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
   cFlagsProcesses(iConfig.getUntrackedParameter<vector<string> >("FlagsProcesses")),
   BadChCandFilterToken_(consumes<bool>(iConfig.getParameter<edm::InputTag>("BadChargedCandidateFilter"))),
   BadPFMuonFilterToken_(consumes<bool>(iConfig.getParameter<edm::InputTag>("BadPFMuonFilter"))),
-
+  ecalBadCalibFilterUpdate_token(consumes< bool >(edm::InputTag("ecalBadCalibReducedMINIAODFilter"))),
+  //ecalBadCalibFilterUpdate_token(iConfig.getUntrackedParameter<bool>("ecalBadCalibReducedMINIAODFilterTag")),
+  //ecalBadCalibFilterUpdate_token(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("ecalBadCalibReducedMINIAODFilterTag"))),
   // muons
   cMuPtMin(iConfig.getUntrackedParameter<double>("RecMuonPtMin", 10.)),
   cMuEtaMax(iConfig.getUntrackedParameter<double>("RecMuonEtaMax", 2.5)),
@@ -234,8 +236,8 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
   setTauBranches = true;
   
   //  propagatorWithMaterial = NULL;
-  if(cYear != 2015 && cYear != 2016 && cYear != 2017 )
-    throw cms::Exception("NTupleMaker") << "Invalid Year : 2015, 2016 and 2017 are allowed!";
+  if(cYear != 2015 && cYear != 2016 && cYear != 2017 && cYear != 2018)
+    throw cms::Exception("NTupleMaker") << "Invalid Year : 2015, 2016 2017 and 2018 are allowed!" << endl << "Why is this check even done?! You my dear shall PhD answer that when running on Run 3 data!";
   //if(cPeriod != "Summer11" && cPeriod != "Fall11" && cPeriod != "Summer12" && cPeriod != "PHYS14" && cPeriod != "Spring15" && cPeriod != "Run2015B" && cPeriod != "Run2015C" && cPeriod != "Run2015D")
   //  throw cms::Exception("NTupleMaker") << "Invalid period, only Summer11, Fall11, Summer12, PHYS14, Spring15, Run2015B, Run2015C and Run2015D are allowed!";
   
@@ -333,7 +335,7 @@ void NTupleMaker::beginJob(){
   tree->Branch("trigger_level1bits", &trigger_level1bits, "trigger_level1bits[8]/b");
   tree->Branch("trigger_level1", &trigger_level1, "trigger_level1[128]/b");
   tree->Branch("trigger_HLT", &trigger_HLT, "trigger_HLT[128]/b");
-  
+  tree->Branch("_passecalBadCalibFilterUpdate",&_passecalBadCalibFilterUpdate,"_passecalBadCalibFilterUpdate/b"); 
   // beam spot
   if (cbeamspot) {
     tree->Branch("beamspot_x", &beamspot_x, "beamspot_x/F");
@@ -1667,7 +1669,13 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     flags_->insert(std::pair<string, int>("Flag_BadGlobalMuonFilter", ifilterBadGlobalMuon));
     */
   }
+  //int _passecalBadCalibFilterUpdate;// = 0;
   
+  edm::Handle< bool > passecalBadCalibFilterUpdate ;
+  iEvent.getByToken(ecalBadCalibFilterUpdate_token,passecalBadCalibFilterUpdate);
+   _passecalBadCalibFilterUpdate = *passecalBadCalibFilterUpdate;
+
+ 
   if(cbeamspot)
     {
       edm::Handle<BeamSpot> TheBeamSpot;

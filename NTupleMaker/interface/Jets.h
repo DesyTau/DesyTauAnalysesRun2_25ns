@@ -56,6 +56,40 @@ bool tightJetiD_2017(AC1B &tree_ ,int jet){
 
 }
 
+bool tightJetiD_2018(AC1B &tree_ ,int jet){
+	bool tightJetID_2018 = false;
+		float energy = tree_.pfjet_e[jet];
+		float eta = tree_.pfjet_eta[jet];
+      float nhf = tree_.pfjet_neutralhadronicenergy[jet]/energy;
+      float nem = tree_.pfjet_neutralemenergy[jet]/energy;
+      float npr = tree_.pfjet_chargedmulti[jet] + tree_.pfjet_neutralmulti[jet];
+      float chm = tree_.pfjet_chargedmulti[jet] ;
+      float muf = tree_.pfjet_muonenergy[jet]/energy;
+      float chf = tree_.pfjet_chargedhadronicenergy[jet]/energy;
+      float elf = tree_.pfjet_chargedemenergy[jet]/energy;
+      float nm  = tree_.pfjet_neutralmulti[jet];
+		float nnpart = tree_.pfjet_neutralmulti[jet];
+
+      if (fabs(eta)<=2.6)
+         {
+            tightJetID_2018 = (nhf < 0.9 && nem < 0.9 && npr > 1 && chf>0 && chm > 0);
+         }
+      else if (fabs(eta)<=2.7)
+         {
+            tightJetID_2018 = (nhf < 0.9 && nem < 0.99 && chm>0);
+         }
+      else if (fabs(eta)<=3.0)
+         {
+            tightJetID_2018 = (nem < 0.99 && nem > 0.02 && nm > 2);
+         }
+      else
+         {
+            tightJetID_2018 = nem < 0.9 && nhf > 0.02 && nm > 10;
+         }
+      return tightJetID_2018;
+
+}
+
 bool looseJetiD(AC1B &tree_, int jet){  // updated recipe for 74x,76x,80x
 
         bool looseJetID = false;
