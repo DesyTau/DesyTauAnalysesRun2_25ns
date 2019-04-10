@@ -293,6 +293,9 @@ Float_t jet20Phi_[10];
 unsigned int nSingleMuonHLTFilter = 0;
 bool isSingleMuonHLTFilter = false;
 
+unsigned int nSingleMuonHLTFilter1 = 0;
+bool isSingleMuonHLTFilter1 = false;
+
 unsigned int nPFJet60HLTFilter = 0;
 bool isPFJet60HLTFilter = false;
 

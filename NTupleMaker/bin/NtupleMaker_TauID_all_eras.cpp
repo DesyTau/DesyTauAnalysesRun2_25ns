@@ -21,6 +21,18 @@ int main(int argc, char * argv[]) {
    const string metHTLName        = cfg.get<string>("MetHLTName");
    const string singleMuonHLTName = cfg.get<string>("SingleMuonHLTName");
    const string singleMuonHLTFilterName = cfg.get<string>("SingleMuonHLTFilterName");
+   string singleMuonHLTName1_ = "";
+   string singleMuonHLTFilterName1_ = "";
+   try{
+     singleMuonHLTName1_ = cfg.get<string>("SingleMuonHLTName1");
+     singleMuonHLTFilterName1_ = cfg.get<string>("SingleMuonHLTFilterName1");
+   }
+   catch(...){
+     singleMuonHLTName1_ = cfg.get<string>("SingleMuonHLTName");
+     singleMuonHLTFilterName1_ = cfg.get<string>("SingleMuonHLTFilterName");
+   }
+   const string singleMuonHLTName1       = singleMuonHLTName1_;
+   const string singleMuonHLTFilterName1 = singleMuonHLTFilterName1_;
    const string pfJet60HLTFilterName = cfg.get<string>("PFJet60HLTFilterName"); 
    const string pfJet80HLTFilterName = cfg.get<string>("PFJet80HLTFilterName"); 
    const string pfJet140HLTFilterName = cfg.get<string>("PFJet140HLTFilterName"); 
@@ -39,6 +51,8 @@ int main(int argc, char * argv[]) {
    TString MetHLTName(metHTLName);
    TString SingleMuonHLTName(singleMuonHLTName);
    TString SingleMuonHLTFilterName(singleMuonHLTFilterName);
+   TString SingleMuonHLTName1(singleMuonHLTName1);
+   TString SingleMuonHLTFilterName1(singleMuonHLTFilterName1);
    TString PFJet60HLTFilterName(pfJet60HLTFilterName);
    TString PFJet80HLTFilterName(pfJet80HLTFilterName);
    TString PFJet140HLTFilterName(pfJet140HLTFilterName);
@@ -498,6 +512,7 @@ int main(int argc, char * argv[]) {
         trig_ = isMetHLT;
         
         AccessTriggerInfo(analysisTree,SingleMuonHLTFilterName,nSingleMuonHLTFilter,isSingleMuonHLTFilter);
+        AccessTriggerInfo(analysisTree,SingleMuonHLTFilterName1,nSingleMuonHLTFilter1,isSingleMuonHLTFilter1);
         AccessTriggerInfo(analysisTree,PFJet60HLTFilterName,nPFJet60HLTFilter,isPFJet60HLTFilter);
         AccessTriggerInfo(analysisTree,PFJet80HLTFilterName,nPFJet80HLTFilter,isPFJet80HLTFilter);
         AccessTriggerInfo(analysisTree,PFJet140HLTFilterName,nPFJet140HLTFilter,isPFJet140HLTFilter);
@@ -593,7 +608,9 @@ int main(int argc, char * argv[]) {
          // triggering muon -->
          if (analysisTree.muon_pt[imuon]>ptTrigMuCut && 
              passedSelIso) {
-            bool trigMatch = TriggerMatching(analysisTree, analysisTree.muon_eta[imuon],analysisTree.muon_phi[imuon],nSingleMuonHLTFilter);
+            bool trigMatch1 = TriggerMatching(analysisTree, analysisTree.muon_eta[imuon],analysisTree.muon_phi[imuon],nSingleMuonHLTFilter);
+            bool trigMatch2 = TriggerMatching(analysisTree, analysisTree.muon_eta[imuon],analysisTree.muon_phi[imuon],nSingleMuonHLTFilter1);
+	    bool trigMatch = trigMatch1 || trigMatch2;
             if (trigMatch&&analysisTree.muon_pt[imuon]>ptTriggerMu) {
                ptTriggerMu = analysisTree.muon_pt[imuon];
                etaTriggerMu = analysisTree.muon_eta[imuon];
