@@ -206,6 +206,14 @@ int main(int argc, char * argv[]) {
         metFlags.push_back("Flag_eeBadScFilter");
      metFlags.push_back("ecalBadCalibReducedMINIAODFilter");
   }
+  else if (era == "2016"){
+    metFlags.push_back("Flag_goodVertices");
+    if(isData) metFlags.push_back("Flag_globalSuperTightHalo2016Filter");
+    metFlags.push_back("Flag_HBHENoiseFilter");
+    metFlags.push_back("Flag_HBHENoiseIsoFilter");
+    metFlags.push_back("Flag_EcalDeadCellTriggerPrimitiveFilter");
+    metFlags.push_back("Flag_BadPFMuonFilter");
+  }
   else {
      std::cout << "MET filters not defined for era "<<era<<std::endl;
      exit(-1);
@@ -738,9 +746,11 @@ int main(int argc, char * argv[]) {
            if (analysisTree.pfjet_pt[ijet]<20.0) continue; 
            
            // ----------------------- jet ID ----------------------- 
+	   // https://twiki.cern.ch/twiki/bin/viewauth/CMS/JetID
            bool isPFJetId = false;
            if (era == "2017") isPFJetId = tightJetiD_2017(analysisTree,int(ijet));
            else if (era == "2018") isPFJetId = tightJetiD_2018(analysisTree,int(ijet));
+	   else if (era == "2016") isPFJetId = looseJetiD_2016(analysisTree,int(ijet)); // https://twiki.cern.ch/twiki/bin/view/CMS/JetID13TeVRun2016
            else {
               std::cout<<"No Jet Id specified for era "<<era<<std::endl;
               exit(-1);
@@ -1082,6 +1092,7 @@ int main(int argc, char * argv[]) {
               tauJetFlavor_ = analysisTree.pfjet_flavour[indexMatchingJet];
               if (era == "2017") tauJetTightId_ = tightJetiD_2017(analysisTree,indexMatchingJet);
               else if (era == "2018") tauJetTightId_ = tightJetiD_2018(analysisTree,indexMatchingJet);
+	      else if (era == "2016") tauJetTightId_ = tightJetiD_2016(analysisTree,indexMatchingJet); // https://twiki.cern.ch/twiki/bin/view/CMS/JetID13TeVRun2016
               else {
                  std::cout<<"Jet Id not set for jets faking taus in era "<<era<<std::endl;
                  exit(-1);

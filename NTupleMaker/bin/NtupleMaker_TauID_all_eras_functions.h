@@ -155,8 +155,9 @@ bool PassesMuonSelection(AC1B &analysisTree, unsigned int imuon, const float ptM
    if (analysisTree.muon_pt[imuon]<ptMuCut) passes=false;
    if (fabs(analysisTree.muon_eta[imuon])>etaMuCut) passes=false;
    
+   // source  : https://twiki.cern.ch/twiki/bin/view/CMS/SWGuideMuonIdRun2
    bool passedId = false;
-   if (era=="2017" || era=="2018") passedId = analysisTree.muon_isMedium[imuon];
+   if (era=="2017" || era=="2018" || era=="2016") passedId = analysisTree.muon_isMedium[imuon];
    else {
       std::cout<<"Muon Id not defined for era "<<era<<std::endl;
       exit(-1);
@@ -208,6 +209,7 @@ bool PassesElectronSelection(AC1B &analysisTree, unsigned int ielec , const floa
 {
    bool passes = false;
    
+   // https://twiki.cern.ch/twiki/bin/view/CMS/EgammaRunIIRecommendations#Fall17v2
    bool passedId = false;
    if (era == "2017") passedId =
                          analysisTree.electron_cutId_veto_Summer16[ielec] &&
@@ -215,6 +217,10 @@ bool PassesElectronSelection(AC1B &analysisTree, unsigned int ielec , const floa
                          analysisTree.electron_nmissinginnerhits[ielec] <= 1;           
    else if (era == "2018")  passedId =
                          analysisTree.electron_cutId_veto_Fall17[ielec] &&
+                         analysisTree.electron_pass_conversion[ielec] &&
+                         analysisTree.electron_nmissinginnerhits[ielec] <= 1;
+   else if (era == "2016")  passedId =
+                         analysisTree.electron_cutId_veto_Fall17V2[ielec] &&
                          analysisTree.electron_pass_conversion[ielec] &&
                          analysisTree.electron_nmissinginnerhits[ielec] <= 1;
    else {
