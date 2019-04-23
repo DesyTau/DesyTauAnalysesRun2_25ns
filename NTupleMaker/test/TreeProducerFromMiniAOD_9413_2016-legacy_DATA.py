@@ -67,6 +67,16 @@ process.patJetsReapplyJEC = updatedPatJets.clone(
     jetCorrFactorsSource = cms.VInputTag(cms.InputTag("patJetCorrFactorsReapplyJEC"))
     )
 
+#PFMET
+from PhysicsTools.PatUtils.tools.runMETCorrectionsAndUncertainties import runMetCorAndUncFromMiniAOD
+
+# If you only want to re-correct and get the proper uncertainties
+runMetCorAndUncFromMiniAOD(process,
+                           isData=runOnData,
+                           fixEE2017 = False,
+                           postfix = "ModifiedMET"
+                           )
+
 # If you only want to re-cluster and get the proper uncertainties
 #runMetCorAndUncFromMiniAOD(process,
 #                           isData=runOnData,
@@ -620,6 +630,7 @@ SampleName = cms.untracked.string("Data")
 process.p = cms.Path(
   process.initroottree*
   process.patJetCorrFactorsReapplyJEC * process.patJetsReapplyJEC *
+  process.fullPatMetSequenceModifiedMET *
   process.egmGsfElectronIDSequence *
   process.rerunMvaIsolationSequence *      # add new tau ids
   getattr(process,updatedTauName) *        # add new tau ids
