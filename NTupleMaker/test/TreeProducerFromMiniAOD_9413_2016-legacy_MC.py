@@ -88,12 +88,11 @@ runMetCorAndUncFromMiniAOD(process,
 #                           )
 
 ### Electron scale and smearing =======================================================================
-#from RecoEgamma.EgammaTools.EgammaPostRecoTools import setupEgammaPostRecoSeq
-#setupEgammaPostRecoSeq(process,
-#                       applyEnergyCorrections=False,
-#                       applyVIDOnCorrectedEgamma=False,
-#                       isMiniAOD=True,
-#                       era='2016-Legacy')
+from RecoEgamma.EgammaTools.EgammaPostRecoTools import setupEgammaPostRecoSeq
+setupEgammaPostRecoSeq(process,
+                       runVID=True,
+                       runEnergyCorrections=False, #corrections by default are fine so no need to re-run
+                       era='2016-Legacy')  
 ### END Electron scale and smearing ====================================================================
 
 # Electron ID ==========================================================================================
@@ -627,10 +626,36 @@ SampleName = cms.untracked.string("Data")
 )
 #process.patJets.addBTagInfo = cms.bool(True)
 
+updateJetCollection(
+   process,
+   jetSource = cms.InputTag('slimmedJets'),
+   pvSource = cms.InputTag('offlineSlimmedPrimaryVertices'),
+   svSource = cms.InputTag('slimmedSecondaryVertices'),
+   jetCorrections = ('AK4PFchs', cms.vstring(['L1FastJet', 'L2Relative', 'L3Absolute']), 'None'),
+   btagDiscriminators = [
+      'pfDeepFlavourJetTags:probb',
+      'pfDeepFlavourJetTags:probbb',
+      'pfDeepFlavourJetTags:problepb',
+      'pfDeepFlavourJetTags:probc',
+      'pfDeepFlavourJetTags:probuds',
+      'pfDeepFlavourJetTags:probg'
+      ],
+   postfix='NewDFTraining'
+)
+
+from PhysicsTools.PatUtils.l1ECALPrefiringWeightProducer_cfi import l1ECALPrefiringWeightProducer
+process.prefiringweight = l1ECALPrefiringWeightProducer.clone(
+    DataEra = cms.string("2016BtoH"), #Use 2016BtoH for 2016
+    UseJetEMPt = cms.bool(False),
+    PrefiringRateSystematicUncty = cms.double(0.2),
+    SkipWarnings = False)
+
 process.p = cms.Path(
   process.initroottree*
   process.fullPatMetSequenceModifiedMET *
   process.patJetCorrFactorsReapplyJEC * process.patJetsReapplyJEC *
+  process.prefiringweight *
+  process.egammaPostRecoSeq *
   process.egmGsfElectronIDSequence *
   process.rerunMvaIsolationSequence *      # add new tau ids
   getattr(process,updatedTauName) *        # add new tau ids
