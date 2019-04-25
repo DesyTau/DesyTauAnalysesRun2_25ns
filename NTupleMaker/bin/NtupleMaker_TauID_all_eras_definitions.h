@@ -295,6 +295,7 @@ bool isSingleMuonHLTFilter = false;
 
 unsigned int nSingleMuonHLTFilter1 = 0;
 bool isSingleMuonHLTFilter1 = false;
+bool isSingleMuonHLTFilter2 = false;
 
 unsigned int nPFJet60HLTFilter = 0;
 bool isPFJet60HLTFilter = false;
@@ -570,6 +571,7 @@ void SetupTrees()
    trigNTuple_->Branch("nJetsForward30",&nJetsForward30_,"nJetsForward30/i");
    trigNTuple_->Branch("nElec",&nElec_,"nElec/i");
    trigNTuple_->Branch("nSelTaus",&nSelTaus_,"nSelTaus/i");
+   trigNTuple_->Branch("genHt",&genHt_,"genHt/F");
     
 }
 

@@ -511,16 +511,25 @@ int main(int argc, char * argv[]) {
         trigger_ = isMetHLT;
         trig_ = isMetHLT;
         
-        AccessTriggerInfo(analysisTree,SingleMuonHLTFilterName,nSingleMuonHLTFilter,isSingleMuonHLTFilter);
-        AccessTriggerInfo(analysisTree,SingleMuonHLTFilterName1,nSingleMuonHLTFilter1,isSingleMuonHLTFilter1);
-        AccessTriggerInfo(analysisTree,PFJet60HLTFilterName,nPFJet60HLTFilter,isPFJet60HLTFilter);
-        AccessTriggerInfo(analysisTree,PFJet80HLTFilterName,nPFJet80HLTFilter,isPFJet80HLTFilter);
-        AccessTriggerInfo(analysisTree,PFJet140HLTFilterName,nPFJet140HLTFilter,isPFJet140HLTFilter);
-        AccessTriggerInfo(analysisTree,PFJet200HLTFilterName,nPFJet200HLTFilter,isPFJet200HLTFilter);
-        AccessTriggerInfo(analysisTree,PFJet260HLTFilterName,nPFJet260HLTFilter,isPFJet260HLTFilter);
-        AccessTriggerInfo(analysisTree,PFJet320HLTFilterName,nPFJet320HLTFilter,isPFJet320HLTFilter);
-        AccessTriggerInfo(analysisTree,PFJet400HLTFilterName,nPFJet400HLTFilter,isPFJet400HLTFilter );
-        AccessTriggerInfo(analysisTree,PFJet450HLTFilterName,nPFJet450HLTFilter,isPFJet450HLTFilter);
+        isSingleMuonHLTFilter1= AccessTriggerInfo(analysisTree,SingleMuonHLTFilterName,nSingleMuonHLTFilter);
+        isSingleMuonHLTFilter2= AccessTriggerInfo(analysisTree,SingleMuonHLTFilterName1,nSingleMuonHLTFilter1);
+	isSingleMuonHLTFilter = isSingleMuonHLTFilter1 || isSingleMuonHLTFilter2;
+        if (!isSingleMuonHLTFilter) {
+	  std::cout << "Single Muon HLT filter not found" << std::endl;
+	  exit(-1);
+	}
+	isPFJet60HLTFilter  = AccessTriggerInfo(analysisTree,PFJet60HLTFilterName,nPFJet60HLTFilter);
+        isPFJet80HLTFilter  = AccessTriggerInfo(analysisTree,PFJet80HLTFilterName,nPFJet80HLTFilter);
+        isPFJet140HLTFilter = AccessTriggerInfo(analysisTree,PFJet140HLTFilterName,nPFJet140HLTFilter);
+        isPFJet200HLTFilter = AccessTriggerInfo(analysisTree,PFJet200HLTFilterName,nPFJet200HLTFilter);
+        isPFJet260HLTFilter = AccessTriggerInfo(analysisTree,PFJet260HLTFilterName,nPFJet260HLTFilter);
+        isPFJet320HLTFilter = AccessTriggerInfo(analysisTree,PFJet320HLTFilterName,nPFJet320HLTFilter);
+        isPFJet400HLTFilter = AccessTriggerInfo(analysisTree,PFJet400HLTFilterName,nPFJet400HLTFilter);
+        isPFJet450HLTFilter = AccessTriggerInfo(analysisTree,PFJet450HLTFilterName,nPFJet450HLTFilter);
+	if (!isPFJet60HLTFilter || !isPFJet80HLTFilter || !isPFJet140HLTFilter || !isPFJet200HLTFilter || !isPFJet260HLTFilter || !isPFJet320HLTFilter || !isPFJet400HLTFilter || !isPFJet450HLTFilter ) {
+	  std::cout << "PFJet HLT filter not found" << std::endl;
+	  exit(-1);
+	}
         //AccessTriggerInfo(analysisTree,SinglePFTau180Trk50Name,nSinglePFTau180Trk50Filter,isSinglePFTau180Trk50Filter);
         //AccessTriggerInfo(analysisTree,SinglePFTau180Trk50oneprongName,nSinglePFTau180Trk50oneprongFilter,isSinglePFTau180Trk50oneprongFilter);
         
@@ -1360,6 +1369,7 @@ int main(int argc, char * argv[]) {
                  tauJetPhi_ = lorentzVectorTauJet.Phi();
                  if (era == "2017") tauJetTightId_ = tightJetiD_2017(analysisTree,indexMatchingJet);
                  else if (era == "2018")  tauJetTightId_ = tightJetiD_2018(analysisTree,indexMatchingJet);
+		 else if (era == "2016") tauJetTightId_ = tightJetiD_2016(analysisTree,indexMatchingJet);
                  else {
                     std::cout<<"Jet Id for tau faking jets not set (in jet + tau selection) in era "<<era<<std::endl;
                     exit(-1);

@@ -132,8 +132,10 @@ bool GoodRunSelection(int n, int lum,std::vector<Period> &periods){
    return lumi;
 }  
 
-void AccessTriggerInfo(AC1B &analysisTree, TString HLTFilterName, unsigned int &nHLTFilter, bool &isHLTFilter)
+bool AccessTriggerInfo(AC1B &analysisTree, TString HLTFilterName, unsigned int &nHLTFilter)
 {
+   bool isHLTFilter = false;
+
    for (unsigned int i=0; i<analysisTree.run_hltfilters->size(); ++i) {
       TString HLTFilter(analysisTree.run_hltfilters->at(i));
       if (HLTFilter==HLTFilterName) {
@@ -141,11 +143,7 @@ void AccessTriggerInfo(AC1B &analysisTree, TString HLTFilterName, unsigned int &
          isHLTFilter = true;
       }
    }
-   
-   if (!isHLTFilter) {
-      std::cout << "HLT filter " << HLTFilterName << " not found" << std::endl;
-      exit(-1);
-   }
+   return isHLTFilter;
 }
 
 bool PassesMuonSelection(AC1B &analysisTree, unsigned int imuon, const float ptMuCut, const float etaMuCut,const float dxyMuCut,const float dzMuCut,const bool isDRIso03, const float isoMuCut, float &relIso, const string era)
