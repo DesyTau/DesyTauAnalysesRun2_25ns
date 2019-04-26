@@ -585,23 +585,23 @@ SampleName = cms.untracked.string("Data")
 )
 #process.patJets.addBTagInfo = cms.bool(True)
 
-from PhysicsTools.PatAlgos.tools.jetTools import updateJetCollection
-updateJetCollection(
-   process,
-   jetSource = cms.InputTag('slimmedJets'),
-   pvSource = cms.InputTag('offlineSlimmedPrimaryVertices'),
-   svSource = cms.InputTag('slimmedSecondaryVertices'),
-   jetCorrections = ('AK4PFchs', cms.vstring(['L1FastJet', 'L2Relative', 'L3Absolute']), 'None'),
-   btagDiscriminators = [
-      'pfDeepFlavourJetTags:probb',
-      'pfDeepFlavourJetTags:probbb',
-      'pfDeepFlavourJetTags:problepb',
-      'pfDeepFlavourJetTags:probc',
-      'pfDeepFlavourJetTags:probuds',
-      'pfDeepFlavourJetTags:probg'
-      ],
-   postfix='NewDFTraining'
-)
+#from PhysicsTools.PatAlgos.tools.jetTools import updateJetCollection
+#updateJetCollection(
+#   process,
+#   jetSource = cms.InputTag('slimmedJets'),
+#   pvSource = cms.InputTag('offlineSlimmedPrimaryVertices'),
+#   svSource = cms.InputTag('slimmedSecondaryVertices'),
+#   jetCorrections = ('AK4PFchs', cms.vstring(['L1FastJet', 'L2Relative', 'L3Absolute']), 'None'),
+#   btagDiscriminators = [
+#      'pfDeepFlavourJetTags:probb',
+#      'pfDeepFlavourJetTags:probbb',
+#      'pfDeepFlavourJetTags:problepb',
+#      'pfDeepFlavourJetTags:probc',
+#      'pfDeepFlavourJetTags:probuds',
+#      'pfDeepFlavourJetTags:probg'
+#      ],
+#   postfix='NewDFTraining'
+#)
 
 # pre-firing weights: https://twiki.cern.ch/twiki/bin/viewauth/CMS/L1ECALPrefiringWeightRecipe
 from PhysicsTools.PatUtils.l1ECALPrefiringWeightProducer_cfi import l1ECALPrefiringWeightProducer
