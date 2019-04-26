@@ -389,6 +389,9 @@ class NTupleMaker : public edm::EDAnalyzer{
   vector<string> cJetHLTriggerMatching;
   int cJetNum;
 
+  edm::EDGetTokenT< double > prefweight_token;
+  edm::EDGetTokenT< double > prefweightup_token;
+  edm::EDGetTokenT< double > prefweightdown_token;
   edm::EDGetTokenT<pat::MuonCollection> MuonCollectionToken_;
   edm::EDGetTokenT<edm::PtrVector<reco::Muon>> BadGlobalMuonsToken_;
   edm::EDGetTokenT<edm::PtrVector<reco::Muon>> BadDuplicateMuonsToken_;
@@ -397,35 +400,7 @@ class NTupleMaker : public edm::EDAnalyzer{
   edm::EDGetTokenT<edm::View<pat::Electron> > ElectronCollectionToken_;
   // Apply electron energy scale shift  
   bool applyElectronESShift_;
-  // ID decisions objects
-  edm::EDGetTokenT<edm::ValueMap<bool> > eleVetoIdSummer16MapToken_;
-  edm::EDGetTokenT<edm::ValueMap<bool> > eleLooseIdSummer16MapToken_;
-  edm::EDGetTokenT<edm::ValueMap<bool> > eleMediumIdSummer16MapToken_;
-  edm::EDGetTokenT<edm::ValueMap<bool> > eleTightIdSummer16MapToken_;
-  //// New for Spring16
-  edm::EDGetTokenT<edm::ValueMap<float> > mvaValuesMapSpring16MapToken_;
-  edm::EDGetTokenT<edm::ValueMap<int> >   mvaCategoriesMapSpring16MapToken_;
-  //// New for Spring16
-  edm::EDGetTokenT<edm::ValueMap<bool> >  eleMvaWP90GeneralMapToken_;
-  edm::EDGetTokenT<edm::ValueMap<bool> >  eleMvaWP80GeneralMapToken_;
-  //// New for Fall17
-  edm::EDGetTokenT<edm::ValueMap<float> > mvaValuesIsoFall17MapToken_;
-  edm::EDGetTokenT<edm::ValueMap<float> > mvaValuesnoIsoFall17MapToken_;
-  edm::EDGetTokenT<edm::ValueMap<bool> >  eleMvanoIsoWP90Fall17MapToken_;
-  edm::EDGetTokenT<edm::ValueMap<bool> >  eleMvanoIsoWP80Fall17MapToken_;
-  edm::EDGetTokenT<edm::ValueMap<bool> >  eleMvanoIsoWPLooseFall17MapToken_;
-  edm::EDGetTokenT<edm::ValueMap<bool> >  eleMvaIsoWP90Fall17MapToken_;
-  edm::EDGetTokenT<edm::ValueMap<bool> >  eleMvaIsoWP80Fall17MapToken_;
-  edm::EDGetTokenT<edm::ValueMap<bool> >  eleMvaIsoWPLooseFall17MapToken_;
-  edm::EDGetTokenT<edm::ValueMap<bool> > eleVetoIdFall17MapToken_;
-  edm::EDGetTokenT<edm::ValueMap<bool> > eleLooseIdFall17MapToken_;
-  edm::EDGetTokenT<edm::ValueMap<bool> > eleMediumIdFall17MapToken_;
-  edm::EDGetTokenT<edm::ValueMap<bool> > eleTightIdFall17MapToken_;
-  edm::EDGetTokenT<edm::ValueMap<bool> > eleVetoIdFall17V2MapToken_;
-  edm::EDGetTokenT<edm::ValueMap<bool> > eleLooseIdFall17V2MapToken_;
-  edm::EDGetTokenT<edm::ValueMap<bool> > eleMediumIdFall17V2MapToken_;
-  edm::EDGetTokenT<edm::ValueMap<bool> > eleTightIdFall17V2MapToken_;
-
+ 
   //// New for Spring16
   edm::EDGetTokenT<pat::TauCollection> TauCollectionToken_;
   edm::EDGetTokenT<pat::PATTauDiscriminator> TauMVAIsolationRawToken_;
@@ -805,8 +780,7 @@ class NTupleMaker : public edm::EDAnalyzer{
   Float_t electron_mva_value_Spring16_v1[M_electronmaxcount];
   Float_t electron_mva_wp80_general_Spring16_v1[M_electronmaxcount];
   Float_t electron_mva_wp90_general_Spring16_v1[M_electronmaxcount];
-  Int_t electron_mva_category_Spring16_v1[M_electronmaxcount];
-    
+     
     //new for 9.4.0 Fall17
   Float_t electron_mva_value_Iso_Fall17_v1[M_electronmaxcount];
   Float_t electron_mva_value_noIso_Fall17_v1[M_electronmaxcount];
@@ -816,6 +790,15 @@ class NTupleMaker : public edm::EDAnalyzer{
   Float_t electron_mva_wp90_noIso_Fall17_v1[M_electronmaxcount];
   Float_t electron_mva_wp80_noIso_Fall17_v1[M_electronmaxcount];
   Float_t electron_mva_Loose_noIso_Fall17_v1[M_electronmaxcount];
+
+  Float_t electron_mva_value_Iso_Fall17_v2[M_electronmaxcount];
+  Float_t electron_mva_value_noIso_Fall17_v2[M_electronmaxcount];
+  Float_t electron_mva_wp90_Iso_Fall17_v2[M_electronmaxcount];
+  Float_t electron_mva_wp80_Iso_Fall17_v2[M_electronmaxcount];
+  Float_t electron_mva_Loose_Iso_Fall17_v2[M_electronmaxcount];
+  Float_t electron_mva_wp90_noIso_Fall17_v2[M_electronmaxcount];
+  Float_t electron_mva_wp80_noIso_Fall17_v2[M_electronmaxcount];
+  Float_t electron_mva_Loose_noIso_Fall17_v2[M_electronmaxcount];
 
   Bool_t electron_cutId_veto_Summer16[M_electronmaxcount];
   Bool_t electron_cutId_loose_Summer16[M_electronmaxcount];
@@ -1343,6 +1326,10 @@ class NTupleMaker : public edm::EDAnalyzer{
   std::vector<std::string>hltriggerresultsV_;
   std::map<std::string, int>* flags_;
   float embeddingWeight_;
+
+  Float_t prefiringweight;
+  Float_t prefiringweightup;
+  Float_t prefiringweightdown; 
   //std::vector< double > embeddingWeights_; //for RhEmb
   //float TauSpinnerWeight_;
   EGammaMvaEleEstimatorCSA14* myMVAnonTrigPhys14;
