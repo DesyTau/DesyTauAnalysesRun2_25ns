@@ -28,7 +28,7 @@ process.GlobalTag.globaltag = '94X_mcRun2_asymptotic_v3'
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.destinations = ['cout', 'cerr']
 process.MessageLogger.cerr.threshold = cms.untracked.string('INFO')
-process.MessageLogger.cerr.FwkReport.reportEvery = 100
+process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 # Set the process options -- Display summary at the end, enable unscheduled execution
 process.options = cms.untracked.PSet( 
     allowUnscheduled = cms.untracked.bool(True),
@@ -37,7 +37,7 @@ process.options = cms.untracked.PSet(
 
 # How many events to process
 process.maxEvents = cms.untracked.PSet( 
-   input = cms.untracked.int32(1000)
+   input = cms.untracked.int32(100)
 )
 
 # Define the input source
@@ -49,25 +49,24 @@ process.source = cms.Source("PoolSource",
 )
 
 ### JECs =====================================================================================================
+# From :  https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookJetEnergyCorrections#CorrPatJets
 
-from PhysicsTools.PatAlgos.producersLayer1.jetUpdater_cff import updatedPatJetCorrFactors
-process.patJetCorrFactorsReapplyJEC = updatedPatJetCorrFactors.clone(
-  src = cms.InputTag("slimmedJets"),
-  levels = ['L1FastJet', 
-            'L2Relative', 
-            'L3Absolute'],
-  payload = 'AK4PFchs' ) # Make sure to choose the appropriate levels and payload here!
+from PhysicsTools.PatAlgos.tools.jetTools import updateJetCollection
 
-if runOnData:
-    process.patJetCorrFactorsReapplyJEC.levels.append("L2L3Residual")
+updateJetCollection(
+  process,
+  jetSource = cms.InputTag('slimmedJets'),
+  labelName = 'UpdatedJEC',
+  jetCorrections = ('AK4PFchs', cms.vstring(['L1FastJet', 'L2Relative', 'L3Absolute', 'L2L3Residual']), 'None')  # Update: Safe to always add 'L2L3Residual' as MC contains dummy L2L3Residual corrections (always set to 1)
+)
+process.jecSequence = cms.Sequence(process.patJetCorrFactorsUpdatedJEC * process.updatedPatJetsUpdatedJEC)
 
-from PhysicsTools.PatAlgos.producersLayer1.jetUpdater_cff import updatedPatJets
-process.patJetsReapplyJEC = updatedPatJets.clone(
-    jetSource = cms.InputTag("slimmedJets"),
-    jetCorrFactorsSource = cms.VInputTag(cms.InputTag("patJetCorrFactorsReapplyJEC"))
-    )
+### END JECs =====================================================================================================
 
-#PFMET
+### MET =====================================================================================================
+# from : https://twiki.cern.ch/twiki/bin/view/CMS/MissingETUncertaintyPrescription#We_have_a_tool_to_help_you_to_ap
+
+# PFMET
 from PhysicsTools.PatUtils.tools.runMETCorrectionsAndUncertainties import runMetCorAndUncFromMiniAOD
 
 # If you only want to re-correct and get the proper uncertainties
@@ -77,15 +76,20 @@ runMetCorAndUncFromMiniAOD(process,
                            postfix = "ModifiedMET"
                            )
 
-# If you only want to re-cluster and get the proper uncertainties
-#runMetCorAndUncFromMiniAOD(process,
-#                           isData=runOnData,
-#                           metType="Puppi",
-#                           pfCandColl=cms.InputTag("puppiForMET"),
-#                           recoMetFromPFCs=True,
-#                           jetFlavor="AK4PFPuppi",
-#                           postfix="Puppi"
-#                           )
+# PuppiMET (not used at the moment)
+# from PhysicsTools.PatAlgos.slimming.puppiForMET_cff import makePuppiesFromMiniAOD
+# makePuppiesFromMiniAOD( process, True );
+
+# # If you only want to re-correct MET and get the proper uncertainties [e.g. when updating JEC]
+# runMetCorAndUncFromMiniAOD(process,
+#                            isData=runOnData,
+#                            metType="Puppi",
+#                            postfix="Puppi",
+#                            jetFlavor="AK4PFPuppi"
+#                            )
+# process.puppiNoLep.useExistingWeights = False
+# process.puppi.useExistingWeights = False
+### END MET =====================================================================================================
 
 # Electron ID ==========================================================================================
 #https://twiki.cern.ch/twiki/bin/view/CMS/EgammaMiniAODV2#2017_MiniAOD_V2
@@ -137,7 +141,7 @@ RecPrimVertex = cms.untracked.bool(True),
 RecBeamSpot = cms.untracked.bool(True),
 RecTrack = cms.untracked.bool(True),
 RecPFMet = cms.untracked.bool(True),
-RecPFMetCorr = cms.untracked.bool(False),
+RecPFMetCorr = cms.untracked.bool(True),
 RecPuppiMet = cms.untracked.bool(False),
 RecMvaMet = cms.untracked.bool(False),                                      
 RecMuon = cms.untracked.bool(True),
@@ -156,7 +160,7 @@ L1EGammaCollectionTag = cms.InputTag("caloStage2Digis:EGamma"),
 L1TauCollectionTag = cms.InputTag("caloStage2Digis:Tau"),
 L1JetCollectionTag = cms.InputTag("caloStage2Digis:Jet"),
 #JetCollectionTag = cms.InputTag("slimmedJets"),
-JetCollectionTag = cms.InputTag("patJetsReapplyJEC::TreeProducer"),
+JetCollectionTag = cms.InputTag("updatedPatJetsUpdatedJEC::TreeProducer"),
 MetCollectionTag = cms.InputTag("slimmedMETs::@skipCurrentProcess"),
 #MetCorrCollectionTag = cms.InputTag("slimmedMETs::@skipCurrentProcess"),
 #PuppiMetCollectionTag = cms.InputTag("slimmedMETsPuppi::@skipCurrentProcess"),
@@ -610,9 +614,11 @@ process.prefiringweight = l1ECALPrefiringWeightProducer.clone(
 
 process.p = cms.Path(
   process.initroottree*
-  process.patJetCorrFactorsReapplyJEC * process.patJetsReapplyJEC *
-  process.prefiringweight *
+  process.jecSequence *
+  #process.puppiMETSequence *
+  #process.fullPatMetSequencePuppi *
   process.fullPatMetSequenceModifiedMET *
+  process.prefiringweight *
   process.egammaPostRecoSeq *
   process.rerunMvaIsolationSequence *      # add new tau ids
   getattr(process,updatedTauName) *        # add new tau ids
