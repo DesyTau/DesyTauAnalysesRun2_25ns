@@ -89,6 +89,8 @@ runMetCorAndUncFromMiniAOD(process,
 
 
 # Electron ID ==========================================================================================
+#https://twiki.cern.ch/twiki/bin/view/CMS/EgammaMiniAODV2#2017_MiniAOD_V2
+#https://twiki.cern.ch/twiki/bin/view/CMS/EgammaPostRecoRecipes
 
 from RecoEgamma.EgammaTools.EgammaPostRecoTools import setupEgammaPostRecoSeq
 setupEgammaPostRecoSeq(process,
