@@ -174,6 +174,7 @@ void Plot_lept_mutau_Updated_AdjVerbose(TString Variable = "m_vis",
 
     if (i>0) // if sample is MC sample -> Scale to xsec and luminosity
       {
+
 	hist[i]   -> Scale(norm);
 	histSS[i] -> Scale(norm);
 	cout << "sample " << sampleNames[i] << "  norm: "<<norm << endl;
@@ -387,6 +388,7 @@ void Plot_lept_mutau_Updated_AdjVerbose(TString Variable = "m_vis",
     tree -> Draw(Variable+">>"+histNameZttSS,cutsZttSS[i]);
     tree -> Draw(Variable+">>"+histNameZll,  cutsZll[i]);
     tree -> Draw(Variable+">>"+histNameZllSS,cutsZllSS[i]);
+
 
     histZtt[i]   -> Scale(norm);
     histZttSS[i] -> Scale(norm);

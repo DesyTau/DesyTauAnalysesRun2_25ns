@@ -17,11 +17,12 @@
 #include "TEfficiency.h"
 #include "TMath.h"
 
-void Plot_lept_mutau_Updated(TString Variable = "m_vis",
-			     TString xtitle = "m_{vis} [GeV]",
-			     int nBins  =   30,
-			     float xmin =    0,
-			     float xmax =  300,
+
+void FixObservable(int Observable, TString& Variable ,TString& xtitle,int& nBins,float& xmin,float& xmax);
+
+
+
+void Plot_lept_mutau_Updated_Seq(int Observable,
 			     TString Weight = "puweight*effweight*mcweight*",
 			     TString Cuts = "&&iso_1<0.15&&extraelec_veto<0.5&&extramuon_veto<0.5&&pt_1>20&&pt_2>30&&mva17_2>0.5&&mt_1<50&&againstMuonTight3_2>0.5&&againstElectronVLooseMVA6_2>0.5&&(singleLepTrigger>0.5||xTrigger>0.5)",//&&mva17_2>0.5&&mt_1<60&&(m_vis>60&&m_vis<90)
 			     TString ytitle = "Events",
@@ -36,6 +37,19 @@ void Plot_lept_mutau_Updated(TString Variable = "m_vis",
 			     //double lumi = 27835 //RunsBCDE
 			     double lumi = 41465 //SingleMuon
 			     ){
+
+  TString Variable = "m_vis";
+  TString xtitle = "m_{vis} [GeV]";
+  int nBins  = 30;
+  float xmin =    0;
+  float xmax =  300;
+  cout<<"Observable"<<Observable<<endl;
+  FixObservable(Observable, Variable, xtitle, nBins, xmin,xmax);
+
+  cout<<"Variable "<<Variable<<endl;     
+  cout<<"xtitle "<<xtitle<<endl;
+
+  
 
   TH1::SetDefaultSumw2();
   SetStyle();
@@ -691,4 +705,37 @@ void Plot_lept_mutau_Updated(TString Variable = "m_vis",
   canv1 -> Print( outputDir + Suffix + DataFile + "_" + Variable + suffix + ".pdf" );
   canv1 -> Print( outputDir + Suffix + DataFile + "_" + Variable + suffix + ".eps" );
   canv1 -> Print( outputDir + Suffix + DataFile + "_" + Variable + suffix + ".png" );
+}
+
+
+void FixObservable(int Observable, TString& Variable ,TString& xtitle,int& nBins,float& xmin,float& xmax){
+  cout<<"Observable from func"<<Observable<<endl;
+
+  //ordered according to appearance in the config file
+  if(Observable==0){Variable = "pt_2"; xtitle = "pt_2 [GeV]"; nBins  = 30; xmin=0;xmax=300;}
+  if(Observable==1){Variable = "jpt_1"; xtitle = " jpt_1 [GeV]"; nBins  = 30; xmin=0;xmax=300;}
+  if(Observable==2){Variable = "jpt_2"; xtitle = " jpt_2 [GeV]"; nBins  = 30; xmin=0;xmax=300;}
+  if(Observable==3){Variable = "bpt_1"; xtitle = "bpt_1 [GeV]"; nBins  = 30; xmin=0;xmax=300;}
+  if(Observable==4){Variable = "bpt_2"; xtitle = "bpt_2 [GeV]"; nBins  = 30; xmin=0;xmax=300;}
+  if(Observable==5){Variable = "njets"; xtitle = "njets"; nBins  = 10; xmin=0;xmax=10;}
+  if(Observable==6){Variable = "nbtag"; xtitle = "nbtag"; nBins  = 10; xmin=0;xmax=10;}
+  if(Observable==7){Variable = "m_sv"; xtitle = "m_sv [GeV]"; nBins  = 30; xmin=0;xmax=300;}
+  if(Observable==8){Variable = "mt_1"; xtitle = "mt_1 [GeV]"; nBins  = 30; xmin=0;xmax=300;}
+  if(Observable==9){Variable = "pt_tt"; xtitle = "pt_tt [GeV]"; nBins  = 20; xmin=0;xmax=200;}
+  if(Observable==10){Variable = "mjj"; xtitle = "mjj [GeV]"; nBins  = 30; xmin=0;xmax=300;}
+  if(Observable==11){Variable = "jdeta"; xtitle = "j#Delta#eta"; nBins  = 12; xmin=0;xmax=6;}
+  if(Observable==12){Variable = "dijetpt"; xtitle = "dijetpt [GeV]"; nBins  = 30; xmin=0;xmax=300;}
+
+  //things from the AN:
+ if(Observable==13){Variable = "m_vis"; xtitle = "m_{vis} [GeV]"; nBins  = 30; xmin=0;xmax=300;}
+ if(Observable==14){Variable = "pt_1"; xtitle = "muon pt [GeV]"; nBins  = 30; xmin=0;xmax=300;}
+ if(Observable==15){Variable = "eta_1"; xtitle = "muon eta [GeV]"; nBins  = 12; xmin=-6;xmax=6;}
+ if(Observable==16){Variable = "eta_2"; xtitle = "tau eta [GeV]"; nBins  = 12; xmin=-6;xmax=6;}
+
+ if(Observable==17){Variable = "met_sv"; xtitle = "met_sv [GeV]"; nBins  = 30; xmin=0;xmax=300;}
+ if(Observable==18){Variable = "pt_sv"; xtitle = "pt_sv [GeV]"; nBins  = 30; xmin=0;xmax=300;}
+ //?? pt_ttjj?
+ 
+  // if(Observable==14){Variable = "mt_tot"; xtitle = " mt_tot [GeV]"; nBins  = 30; xmin=0;xmax=300;}
+
 }
