@@ -35,15 +35,17 @@ sed 's/SampleNameForPUHist =/SampleNameForPUHist = ZZ_TuneCP5_13TeV-pythia8_pile
 
 sed 's/SampleNameForPUHist =/SampleNameForPUHist = GluGluHToTauTau_M125_13TeV_powheg_pythia8_pileup/' analysisMacroSynch_em_Signal.conf > analysisMacroSynch_em_Signal_GGH_Htautau_M125.conf
 sed -i 's/ApplygghReweighting = false/ApplygghReweighting = true/g' analysisMacroSynch_em_Signal_GGH_Htautau_M125.conf 
+sed -i 's/ApplygghUncertainties = false/ApplygghUncertainties = true/g' analysisMacroSynch_em_Signal_GGH_Htautau_M125.conf 
 sed 's/SampleNameForPUHist =/SampleNameForPUHist = VBFHToTauTau_M125_pileup/' analysisMacroSynch_em_Signal.conf > analysisMacroSynch_em_Signal_VBF_Htautau_M125.conf
 
 sed 's/SampleNameForPUHist =/SampleNameForPUHist = GluGluHToWWTo2L2Nu_pileup/' analysisMacroSynch_em_Signal.conf > analysisMacroSynch_em_Signal_GGH_HWW_M125.conf
-sed -i 's/ApplygghReweighting = false/ApplygghReweighting = true/g' analysisMacroSynch_em_Signal_GGH_HWW_M125.conf 
+sed -i 's/ApplygghReweighting = false/ApplygghReweighting = true/g' analysisMacroSynch_em_Signal_GGH_HWW_M125.conf
+sed -i 's/ApplygghUncertainties = false/ApplygghUncertainties = true/g' analysisMacroSynch_em_Signal_GGH_HWW_M125.conf  
 sed 's/SampleNameForPUHist =/SampleNameForPUHist = MC_PU2017_pileup/' analysisMacroSynch_em_Signal.conf > analysisMacroSynch_em_Signal_VBF_HWW_M125.conf
 
 sed 's/SampleNameForPUHist =/SampleNameForPUHist = MC_PU2017_pileup/' analysisMacroSynch_em_Signal.conf > analysisMacroSynch_em_Signal_ZH.conf
 
-sed 's/SampleNameForPUHist =/SampleNameForPUHist = WminusHToTauTau_M125_13TeV_powheg_pythia8_pileup/' analysisMacroSynch_em_Signal.conf > analysisMacroSynch_em_Signal_WMinunsH.conf
+sed 's/SampleNameForPUHist =/SampleNameForPUHist = WminusHToTauTau_M125_13TeV_powheg_pythia8_pileup/' analysisMacroSynch_em_Signal.conf > analysisMacroSynch_em_Signal_WMinusH.conf
 
 sed 's/SampleNameForPUHist =/SampleNameForPUHist = WplusHToTauTau_M125_13TeV_powheg_pythia8_pileup/' analysisMacroSynch_em_Signal.conf > analysisMacroSynch_em_Signal_WPlusH.conf
 
