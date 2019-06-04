@@ -682,13 +682,18 @@ int main(int argc, char * argv[]) {
          }
 
          // accessing trigger info =====================================================================================================================================
-         AccessTriggerInfo(analysisTree,LowPtLegElectron,nLowPtLegElectron,isLowPtLegElectron);
-         AccessTriggerInfo(analysisTree,HighPtLegElectron,nHighPtLegElectron,isHighPtLegElectron);
-         AccessTriggerInfo(analysisTree,LowPtLegMuon,nLowPtLegMuon,isLowPtLegMuon);
-         AccessTriggerInfo(analysisTree,HighPtLegMuon,nHighPtLegMuon,isHighPtLegMuon);
-         AccessTriggerInfo(analysisTree,Mu23Ele12DzFilter,nMu23Ele12DzFilter,isMu23Ele12DzFilter);
-         AccessTriggerInfo(analysisTree,Mu8Ele23DzFilter,nMu8Ele23DzFilter,isMu8Ele23DzFilter);
+         isLowPtLegElectron = AccessTriggerInfo(analysisTree,LowPtLegElectron,nLowPtLegElectron);
+         isHighPtLegElectron = AccessTriggerInfo(analysisTree,HighPtLegElectron,nHighPtLegElectron);
+         isLowPtLegMuon = AccessTriggerInfo(analysisTree,LowPtLegMuon,nLowPtLegMuon);
+         isHighPtLegMuon = AccessTriggerInfo(analysisTree,HighPtLegMuon,nHighPtLegMuon);
+         isMu23Ele12DzFilter = AccessTriggerInfo(analysisTree,Mu23Ele12DzFilter,nMu23Ele12DzFilter);
+         isMu8Ele23DzFilter = AccessTriggerInfo(analysisTree,Mu8Ele23DzFilter,nMu8Ele23DzFilter);
 
+         if (!isLowPtLegElectron || !isHighPtLegElectron || !isLowPtLegMuon || !isHighPtLegMuon || !isMu23Ele12DzFilter || !isMu8Ele23DzFilter ) {
+            std::cout << "PFJet HLT filter not found" << std::endl;
+            exit(-1);
+         }
+         
          // searching for btagging discriminant ========================================================================================================================
          unsigned int nBTagDiscriminant1 = 0;
          unsigned int nBTagDiscriminant2 = 0;
