@@ -1,5 +1,5 @@
 #!/bin/sh
-dirData=/nfs/dust/cms/user/mameyer/SM_HiggsTauTau/ntuples/METRecipev2/MuonEG
+dirData=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/METRecipev2/MuonEG/
 dirDY=/nfs/dust/cms/user/tlenz/13TeV/2017/NTuples/MC/12Apr2018_PU2017_METrecipe_v2
 dirW=/nfs/dust/cms/user/tlenz/13TeV/2017/NTuples/MC/12Apr2018_PU2017_METrecipe_v2
 dirTT=/nfs/dust/cms/user/mameyer/SM_HiggsTauTau/ntuples/METRecipev2
