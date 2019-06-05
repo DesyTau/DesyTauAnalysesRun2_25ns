@@ -21,74 +21,78 @@ process.load('Configuration.StandardSequences.GeometryDB_cff')
 process.load('Configuration.StandardSequences.MagneticField_38T_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 process.load("TrackingTools/TransientTrack/TransientTrackBuilder_cfi")
-process.load('RecoMET.METFilters.ecalBadCalibFilter_cfi')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff')
-process.GlobalTag.globaltag = '102X_dataRun2_Sep2018Rereco_v1'
+process.GlobalTag.globaltag = '102X_dataRun2_v10'
 
 # Message Logger settings
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.destinations = ['cout', 'cerr']
 process.MessageLogger.cerr.threshold = cms.untracked.string('INFO')
-process.MessageLogger.cerr.FwkReport.reportEvery = 10000
+process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 # Set the process options -- Display summary at the end, enable unscheduled execution
 process.options = cms.untracked.PSet( 
     allowUnscheduled = cms.untracked.bool(True),
-    wantSummary = cms.untracked.bool(True) 
+    wantSummary = cms.untracked.bool(True)
 )
 
 # How many events to process
 process.maxEvents = cms.untracked.PSet( 
-   input = cms.untracked.int32(10000)
+   input = cms.untracked.int32(100)
 )
 
 # Define the input source
 process.source = cms.Source("PoolSource", 
   fileNames = cms.untracked.vstring(
-        #'/store/data/Run2017F/SingleMuon/MINIAOD/17Nov2017-v1/70001/482D748C-46EB-E711-B13F-FA163EC94FD9.root',
-        #'/store/data/Run2017F/SingleMuon/MINIAOD/17Nov2017-v1/70001/4893E924-46EB-E711-AB19-1866DA85E0F8.root',
-        #'/store/data/Run2017F/SingleMuon/MINIAOD/17Nov2017-v1/70001/4C4C024D-75EB-E711-9286-A4BF01025C16.root',
-        #'/store/data/Run2017B/SingleMuon/MINIAOD/31Mar2018-v1/100000/1E2B3868-DF38-E811-912C-003048FFD798.root',
-        #'/store/data/Run2017F/SingleMuon/MINIAOD/31Mar2018-v1/30003/0615E7CA-9337-E811-83E8-1C6A7A2634E3.root',
         '/store/data/Run2018A/EGamma/MINIAOD/17Sep2018-v2/60000/FFD234BD-747F-9242-9EC3-4D3BC8E564B0.root'
         ),
   skipEvents = cms.untracked.uint32(0)
 )
 
-### JECs =====================================================================================================
+### JECs ==============================================================================================
+# From :  https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookJetEnergyCorrections#CorrPatJets
 
-from PhysicsTools.PatAlgos.producersLayer1.jetUpdater_cff import updatedPatJetCorrFactors
-process.patJetCorrFactorsReapplyJEC = updatedPatJetCorrFactors.clone(
-  src = cms.InputTag("slimmedJets"),
-  levels = ['L1FastJet', 
-            'L2Relative', 
-            'L3Absolute'],
-  payload = 'AK4PFchs' ) # Make sure to choose the appropriate levels and payload here!
+from PhysicsTools.PatAlgos.tools.jetTools import updateJetCollection
+updateJetCollection(
+  process,
+  jetSource = cms.InputTag('slimmedJets'),
+  labelName = 'UpdatedJEC',
+  jetCorrections = ('AK4PFchs', cms.vstring(['L1FastJet', 'L2Relative', 'L3Absolute', 'L2L3Residual']), 'None')  # Update: Safe to always add 'L2L3Residual' as MC contains dummy L2L3Residual corrections (always set to 1)
+)
+process.jecSequence = cms.Sequence(process.patJetCorrFactorsUpdatedJEC * process.updatedPatJetsUpdatedJEC)
 
-if runOnData:
-    process.patJetCorrFactorsReapplyJEC.levels.append("L2L3Residual")
+### END JECs ==========================================================================================
 
-from PhysicsTools.PatAlgos.producersLayer1.jetUpdater_cff import updatedPatJets
-process.patJetsReapplyJEC = updatedPatJets.clone(
-    jetSource = cms.InputTag("slimmedJets"),
-    jetCorrFactorsSource = cms.VInputTag(cms.InputTag("patJetCorrFactorsReapplyJEC"))
-    )
+### MET ===============================================================================================
+# from : https://twiki.cern.ch/twiki/bin/view/CMS/MissingETUncertaintyPrescription#We_have_a_tool_to_help_you_to_ap
 
-#PFMET
-#from PhysicsTools.PatUtils.tools.runMETCorrectionsAndUncertainties import runMetCorAndUncFromMiniAOD
+# PFMET
+from PhysicsTools.PatUtils.tools.runMETCorrectionsAndUncertainties import runMetCorAndUncFromMiniAOD
 
 # If you only want to re-correct and get the proper uncertainties
-#runMetCorAndUncFromMiniAOD(process,
-#                           isData=runOnData,
-#                           fixEE2017 = True,
-#                           fixEE2017Params = {'userawPt': True, 'PtThreshold':50.0, 'MinEtaThreshold':2.65, 'MaxEtaThreshold': 3.139} ,
-#                           postfix = "ModifiedMET"
-#                           )
+runMetCorAndUncFromMiniAOD(process,
+                           isData=runOnData,
+                           #fixEE2017 = False,
+                           #fixEE2017Params = {'userawPt': True, 'PtThreshold':50.0, 'MinEtaThreshold':2.65, 'MaxEtaThreshold': 3.139} ,
+                           postfix = "ModifiedMET"
+                           )
 
-#PuppiMET
-#from PhysicsTools.PatAlgos.slimming.puppiForMET_cff import makePuppiesFromMiniAOD
-#makePuppiesFromMiniAOD( process, True );
+# PuppiMET
+from PhysicsTools.PatAlgos.slimming.puppiForMET_cff import makePuppiesFromMiniAOD
+makePuppiesFromMiniAOD( process, True );
 
-#MET filter for 2018
+# If you only want to re-correct and get the proper uncertainties
+runMetCorAndUncFromMiniAOD(process,
+                           isData=runOnData,
+                           metType="Puppi",
+                           postfix="Puppi",
+                           jetFlavor="AK4PFPuppi",
+                           )
+
+process.puppiNoLep.useExistingWeights = False
+process.puppi.useExistingWeights = False
+
+# MET filter for 2018 (from : https://twiki.cern.ch/twiki/bin/viewauth/CMS/MissingETOptionalFiltersRun2#How_to_run_ecal_BadCalibReducedM)
+process.load('RecoMET.METFilters.ecalBadCalibFilter_cfi')
 baddetEcallist = cms.vuint32(
                              [872439604,872422825,872420274,872423218,
                               872423215,872416066,872435036,872439336,
@@ -100,28 +104,16 @@ baddetEcallist = cms.vuint32(
                               872421955,872421567,872437184,872421951,
                               872421694,872437056,872437057,872437313])
 
-
-#baddetEcallist = cms.vuint32( [872439604,872422825,872420274,872423218,872423215,872416066,872435036,872439336, 872420273,872436907,872420147,872439731,872436657,872420397,872439732,872439339, 872439603,872422436,872439861,872437051,872437052,872420649,872421950,872437185, 872422564,872421566,872421695,872421955,872421567,872437184,872421951,872421694, 872437056,872437057,872437313,872438182,872438951,872439990,872439864,872439609, 872437181,872437182,872437053,872436794,872436667,872436536,872421541,872421413, 872421414,872421031,872423083,872421439])
-#
-
 process.ecalBadCalibReducedMINIAODFilter = cms.EDFilter(
                                                         "EcalBadCalibFilter",
                                                         EcalRecHitSource = cms.InputTag("reducedEgamma:reducedEERecHits"),
                                                         ecalMinEt        = cms.double(50.),
-                                                        baddetEcal    = baddetEcallist,
+                                                        baddetEcal    = baddetEcallist, 
                                                         taggingMode = cms.bool(True),
                                                         debug = cms.bool(False)
                                                         )
 
-# If you only want to re-cluster and get the proper uncertainties
-#runMetCorAndUncFromMiniAOD(process,
-#                           isData=runOnData,
-#                           metType="Puppi",
-#                           pfCandColl=cms.InputTag("puppiForMET"),
-#                           recoMetFromPFCs=True,
-#                           jetFlavor="AK4PFPuppi",
-#                           postfix="Puppi"
-#                           )
+### END MET ===========================================================================================
 
 ### Electron scale and smearing =======================================================================
 #from RecoEgamma.EgammaTools.EgammaPostRecoTools import setupEgammaPostRecoSeq
@@ -162,18 +154,19 @@ for idmod in my_id_modules:
 ### END Electron ID ====================================================================================
 
 # Tau ID ===============================================================================================
-from DesyTauAnalyses.NTupleMaker.runTauIdMVA import *
-na = TauIDEmbedder(process, cms, # pass tour process object
-    debug=True,
-#     toKeep = ["2017v1", "2017v2", "newDM2017v2", "dR0p32017v2", "2016v1", "newDM2016v1", "deepTau2017v1", "DPFTau_2016_v0","DPFTau_2016_v1"] 
-     toKeep = ["2017v1", "2017v2", "newDM2017v2", "dR0p32017v2", "2016v1", "newDM2016v1"] 
-		  )
-na.runTauID()
+# https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePFTauID#Running_of_the_DNN_based_tau_ID
 
-tauSrc = cms.InputTag('NewTauIDsEmbedded')
+updatedTauName = "NewTauIDsEmbedded" #name of pat::Tau collection with new tau-Ids
+import RecoTauTag.RecoTau.tools.runTauIdMVA as tauIdConfig
+tauIdEmbedder = tauIdConfig.TauIDEmbedder(process, cms, debug = False,
+                                          updatedTauName = updatedTauName,
+                                          toKeep = [ "2017v1", "2017v2", "newDM2017v2", "dR0p32017v2", "2016v1", "newDM2016v1", "deepTau2017v1", "DPFTau_2016_v0", "DPFTau_2016_v1" ]
+                                          )
+
+tauIdEmbedder.runTauID()
 # END Tau ID ===========================================================================================
 
-# NTuple Maker =======================================================================
+# NTuple Maker =========================================================================================
 
 process.initroottree = cms.EDAnalyzer("InitAnalyzer",
 IsData = cms.untracked.bool(isData),
@@ -198,8 +191,8 @@ RecPrimVertex = cms.untracked.bool(True),
 RecBeamSpot = cms.untracked.bool(True),
 RecTrack = cms.untracked.bool(True),
 RecPFMet = cms.untracked.bool(True),
-RecPFMetCorr = cms.untracked.bool(False),
-RecPuppiMet = cms.untracked.bool(False),
+RecPFMetCorr = cms.untracked.bool(True),
+RecPuppiMet = cms.untracked.bool(True),
 RecMvaMet = cms.untracked.bool(False),                                      
 RecMuon = cms.untracked.bool(True),
 RecPhoton = cms.untracked.bool(False),
@@ -244,11 +237,8 @@ L1EGammaCollectionTag = cms.InputTag("caloStage2Digis:EGamma"),
 L1TauCollectionTag = cms.InputTag("caloStage2Digis:Tau"),
 L1JetCollectionTag = cms.InputTag("caloStage2Digis:Jet"),
 #JetCollectionTag = cms.InputTag("slimmedJets"),
-JetCollectionTag = cms.InputTag("patJetsReapplyJEC::TreeProducer"),
+JetCollectionTag = cms.InputTag("updatedPatJetsUpdatedJEC::TreeProducer"),
 MetCollectionTag = cms.InputTag("slimmedMETs::@skipCurrentProcess"),
-#MetCorrCollectionTag = cms.InputTag("slimmedMETs::@skipCurrentProcess"),
-#PuppiMetCollectionTag = cms.InputTag("slimmedMETsPuppi::@skipCurrentProcess"),
-#MetCollectionTag = cms.InputTag("slimmedMETs::TreeProducer"),
 MetCorrCollectionTag = cms.InputTag("slimmedMETsModifiedMET::TreeProducer"),
 PuppiMetCollectionTag = cms.InputTag("slimmedMETsPuppi::TreeProducer"),
 MvaMetCollectionsTag = cms.VInputTag(cms.InputTag("MVAMET","MVAMET","TreeProducer")),
@@ -501,25 +491,16 @@ SampleName = cms.untracked.string("Data")
 #process.patJets.addBTagInfo = cms.bool(True)
 
 process.p = cms.Path(
-  process.initroottree*
-#  process.BadChargedCandidateFilter *
-#  process.BadPFMuonFilter *
-#  process.BadGlobalMuonFilter *
-#  process.pileupJetIdUpdated * 
-  process.patJetCorrFactorsReapplyJEC * process.patJetsReapplyJEC *
-#  process.egmPhotonIDSequence *
-#  process.puppiMETSequence *
-#  process.fullPatMetSequencePuppi *
-#  process.fullPatMetSequenceModifiedMET *
-  process.ecalBadCalibReducedMINIAODFilter*
+  process.initroottree *
+  process.jecSequence *  # New JECs
+  process.egmPhotonIDSequence * # Puppi MET
+  process.puppiMETSequence *  # Puppi MET
+  process.fullPatMetSequencePuppi *  # Re-correcting Puppi MET
+  process.fullPatMetSequenceModifiedMET *  # Re-correcting PFMET
+  process.ecalBadCalibReducedMINIAODFilter *  # MET filter 2018
   process.egmGsfElectronIDSequence *
-  process.rerunMvaIsolationSequence *      # add new tau ids
-  process.NewTauIDsEmbedded *              # add new tau ids
-  #process.rerunMvaIsolation2SeqRun2 *
-  #process.mvaMetSequence *
-  #process.HBHENoiseFilterResultProducer* #produces HBHE bools baseline
-  #process.ApplyBaselineHBHENoiseFilter*  #reject events based 
-  #process.ApplyBaselineHBHEISONoiseFilter*  #reject events based -- disable the module, performance is being investigated
+  process.rerunMvaIsolationSequence *  # Tau IDs
+  getattr(process,updatedTauName) *  # Tau IDs
   process.makeroottree
 )
 
@@ -539,74 +520,3 @@ process.output = cms.OutputModule("PoolOutputModule",
                                   SelectEvents = cms.untracked.PSet(  SelectEvents = cms.vstring('p'))
 )
 
-#process.end = cms.EndPath(process.output)
-
-#processDumpFile = open('MyRootMaker.dump', 'w')
-#print >> processDumpFile, process.dumpPython()
-
-def miniAOD_customizeMETFiltersFastSim(process):
-    """Replace some MET filters that don't work in FastSim with trivial bools"""
-    for X in 'CSCTightHaloFilter', 'CSCTightHaloTrkMuUnvetoFilter','CSCTightHalo2015Filter','globalTightHalo2016Filter','globalSuperTightHalo2016Filter','HcalStripHaloFilter':
-        process.globalReplace(X, cms.EDFilter("HLTBool", result=cms.bool(True)))    
-    for X in 'manystripclus53X', 'toomanystripclus53X', 'logErrorTooManyClusters':
-        process.globalReplace(X, cms.EDFilter("HLTBool", result=cms.bool(False)))
-    return process
-
-
-
-def customise_for_gc(process):
-	import FWCore.ParameterSet.Config as cms
-	from IOMC.RandomEngine.RandomServiceHelper import RandomNumberServiceHelper
-
-	try:
-		maxevents = __MAX_EVENTS__
-		process.maxEvents = cms.untracked.PSet(
-			input = cms.untracked.int32(max(-1, maxevents))
-		)
-	except:
-		pass
-
-	# Dataset related setup
-	try:
-		primaryFiles = [__FILE_NAMES__]
-		process.source = cms.Source('PoolSource',
-			skipEvents = cms.untracked.uint32(__SKIP_EVENTS__),
-			fileNames = cms.untracked.vstring(primaryFiles)
-		)
-		try:
-			secondaryFiles = [__FILE_NAMES2__]
-			process.source.secondaryFileNames = cms.untracked.vstring(secondaryFiles)
-		except:
-			pass
-		try:
-			lumirange = [__LUMI_RANGE__]
-			if len(lumirange) > 0:
-				process.source.lumisToProcess = cms.untracked.VLuminosityBlockRange(lumirange)
-				process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(-1))
-		except:
-			pass
-	except:
-		pass
-
-	if hasattr(process, 'RandomNumberGeneratorService'):
-		randSvc = RandomNumberServiceHelper(process.RandomNumberGeneratorService)
-		randSvc.populate()
-
-	process.AdaptorConfig = cms.Service('AdaptorConfig',
-		enable = cms.untracked.bool(True),
-		stats = cms.untracked.bool(True),
-	)
-
-	# Generator related setup
-	try:
-		if hasattr(process, 'generator') and process.source.type_() != 'PoolSource':
-			process.source.firstLuminosityBlock = cms.untracked.uint32(1 + __MY_JOBID__)
-			print 'Generator random seed:', process.RandomNumberGeneratorService.generator.initialSeed
-	except:
-		pass
-
-	return (process)
-
-process = customise_for_gc(process)
-
-# grid-control: https://ekptrac.physik.uni-karlsruhe.de/trac/grid-control

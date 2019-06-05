@@ -21,19 +21,18 @@ process.load('Configuration.StandardSequences.GeometryDB_cff')
 process.load('Configuration.StandardSequences.MagneticField_38T_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 process.load("TrackingTools/TransientTrack/TransientTrackBuilder_cfi")
-process.load('RecoMET.METFilters.ecalBadCalibFilter_cfi')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff')
-process.GlobalTag.globaltag = '102X_upgrade2018_realistic_v12'
+process.GlobalTag.globaltag = '102X_upgrade2018_realistic_v18'
 
 # Message Logger settings
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.destinations = ['cout', 'cerr']
 process.MessageLogger.cerr.threshold = cms.untracked.string('INFO')
-process.MessageLogger.cerr.FwkReport.reportEvery = 100
+process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 # Set the process options -- Display summary at the end, enable unscheduled execution
 process.options = cms.untracked.PSet( 
     allowUnscheduled = cms.untracked.bool(True),
-    wantSummary = cms.untracked.bool(True), 
+    wantSummary = cms.untracked.bool(True)
 )
 
 # How many events to process
@@ -44,58 +43,56 @@ process.maxEvents = cms.untracked.PSet(
 # Define the input source
 process.source = cms.Source("PoolSource", 
   fileNames = cms.untracked.vstring(
-#"/store/mc/RunIIFall17MiniAODv2/WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14-v2/70000/8A8B3345-2A67-E811-AE81-F04DA274BB9C.root"
-#"root://xrootd-cms.infn.it//store/mc/RunIISummer16MiniAODv2/SMS-TStauStau_lefthanded_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUMoriond17_GridpackScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/30000/B841EB59-E8A7-E811-BD9B-5C260AFFFB63.root",
-#"root://xrootd-cms.infn.it//store/mc/RunIISummer16MiniAODv2/SMS-TStauStau_lefthanded_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUMoriond17_GridpackScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/30000/C489E8CA-6BA8-E811-BECF-782BCB539693.root"]
-#  "/store/mc/RunIIFall17MiniAODv2/WJetsToLNu_HT-600To800_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/70000/FC8E4220-0055-E811-A3C4-AC1F6B1AF188.root"
-#"/store/mc/RunIISummer16MiniAODv2/SMS-TStauStau_righthanded_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUMoriond17_GridpackScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/10000/B04DDCBB-83A6-E811-B42F-24BE05CE1E01.root"
-#"root://xrootd-cms.infn.it//store/mc/RunIIFall17MiniAODv2/SMS-TStauStau_righthanded_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/PU2017_12Apr2018_GridpackScan_94X_mc2017_realistic_v14-v1/20000/3ACAD4A7-5F7B-E811-8ECA-1866DA89035E.root"
-#	"/store/mc/RunIIFall17MiniAODv2/SMS-TStauStau_righthanded_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/PU2017_12Apr2018_GridpackScan_94X_mc2017_realistic_v14-v1/20000/DA4DCFB4-887C-E811-826E-FA163E013FB3.root"
-#	"/store/mc/RunIIFall17MiniAODv2/SMS-TStauStau_righthanded_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/PU2017_12Apr2018_GridpackScan_94X_mc2017_realistic_v14-v1/20000/007DE983-907C-E811-9C8D-FA163E1E165A.root"
-#	"/store/mc/RunIIFall17MiniAODv2/SMS-TStauStau_ctau-0p01to10_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/PU2017_12Apr2018_GridpackScan_94X_mc2017_realistic_v14-v1/40000/F849A417-D58D-E811-9A4E-0CC47A4C8EEA.root",
-#	"/store/mc/RunIIFall17MiniAOD/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/RECOSIMstep_94X_mc2017_realistic_v10-v1/00000/0CCEA775-09F2-E711-9833-0025905B85BE.root",
-#        '/store/mc/RunIIFall17MiniAODv2/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14-v2/100000/24D39640-AB96-E811-819F-008CFA0A5808.root',
-#        "/store/mc/RunIIFall17MiniAODv2/SUSYGluGluToHToAA_AToMuMu_AToTauTau_M-125_M-9_TuneCUETP8M1_13TeV_madgraph_pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14-v2/70000/E0D55D83-D26F-E811-B58D-44A842B298F1.root"
         "/store/mc/RunIIAutumn18MiniAOD/DY1JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v2/270000/53AAF1AF-2FCF-424D-BC07-8150E599971B.root "
         ),
   skipEvents = cms.untracked.uint32(0)
 )
 
-### JECs =====================================================================================================
+### JECs ==============================================================================================
+# From :  https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookJetEnergyCorrections#CorrPatJets
 
-from PhysicsTools.PatAlgos.producersLayer1.jetUpdater_cff import updatedPatJetCorrFactors
-process.patJetCorrFactorsReapplyJEC = updatedPatJetCorrFactors.clone(
-  src = cms.InputTag("slimmedJets"),
-  levels = ['L1FastJet', 
-            'L2Relative', 
-            'L3Absolute'],
-  payload = 'AK4PFchs' ) # Make sure to choose the appropriate levels and payload here!
+from PhysicsTools.PatAlgos.tools.jetTools import updateJetCollection
+updateJetCollection(
+  process,
+  jetSource = cms.InputTag('slimmedJets'),
+  labelName = 'UpdatedJEC',
+  jetCorrections = ('AK4PFchs', cms.vstring(['L1FastJet', 'L2Relative', 'L3Absolute', 'L2L3Residual']), 'None')  # Update: Safe to always add 'L2L3Residual' as MC contains dummy L2L3Residual corrections (always set to 1)
+)
+process.jecSequence = cms.Sequence(process.patJetCorrFactorsUpdatedJEC * process.updatedPatJetsUpdatedJEC)
 
-if runOnData:
-    process.patJetCorrFactorsReapplyJEC.levels.append("L2L3Residual")
+### END JECs ==========================================================================================
 
-from PhysicsTools.PatAlgos.producersLayer1.jetUpdater_cff import updatedPatJets
-process.patJetsReapplyJEC = updatedPatJets.clone(
-    jetSource = cms.InputTag("slimmedJets"),
-    jetCorrFactorsSource = cms.VInputTag(cms.InputTag("patJetCorrFactorsReapplyJEC"))
-    )
+### MET ===============================================================================================
+# from : https://twiki.cern.ch/twiki/bin/view/CMS/MissingETUncertaintyPrescription#We_have_a_tool_to_help_you_to_ap
 
-#PFMET
-#from PhysicsTools.PatUtils.tools.runMETCorrectionsAndUncertainties import runMetCorAndUncFromMiniAOD
+# PFMET
+from PhysicsTools.PatUtils.tools.runMETCorrectionsAndUncertainties import runMetCorAndUncFromMiniAOD
 
 # If you only want to re-correct and get the proper uncertainties
-#runMetCorAndUncFromMiniAOD(process,
-#                           isData=runOnData,
-#                           fixEE2017 = True,
-#                           fixEE2017Params = {'userawPt': True, 'PtThreshold':50.0, 'MinEtaThreshold':2.65, 'MaxEtaThreshold': 3.139} ,
-#                           postfix = "ModifiedMET"
-#                           )
+runMetCorAndUncFromMiniAOD(process,
+                           isData=runOnData,
+                           #fixEE2017 = False,
+                           #fixEE2017Params = {'userawPt': True, 'PtThreshold':50.0, 'MinEtaThreshold':2.65, 'MaxEtaThreshold': 3.139} ,
+                           postfix = "ModifiedMET"
+                           )
 
-#PuppiMET
-#from PhysicsTools.PatAlgos.slimming.puppiForMET_cff import makePuppiesFromMiniAOD
-#makePuppiesFromMiniAOD( process, True );
+# PuppiMET
+from PhysicsTools.PatAlgos.slimming.puppiForMET_cff import makePuppiesFromMiniAOD
+makePuppiesFromMiniAOD( process, True );
 
-#MET filter for 2018
+# If you only want to re-correct and get the proper uncertainties
+runMetCorAndUncFromMiniAOD(process,
+                           isData=runOnData,
+                           metType="Puppi",
+                           postfix="Puppi",
+                           jetFlavor="AK4PFPuppi",
+                           )
+
+process.puppiNoLep.useExistingWeights = False
+process.puppi.useExistingWeights = False
+
+# MET filter for 2018 (from : https://twiki.cern.ch/twiki/bin/viewauth/CMS/MissingETOptionalFiltersRun2#How_to_run_ecal_BadCalibReducedM)
+process.load('RecoMET.METFilters.ecalBadCalibFilter_cfi')
 baddetEcallist = cms.vuint32(
                              [872439604,872422825,872420274,872423218,
                               872423215,872416066,872435036,872439336,
@@ -107,7 +104,6 @@ baddetEcallist = cms.vuint32(
                               872421955,872421567,872437184,872421951,
                               872421694,872437056,872437057,872437313])
 
-
 process.ecalBadCalibReducedMINIAODFilter = cms.EDFilter(
                                                         "EcalBadCalibFilter",
                                                         EcalRecHitSource = cms.InputTag("reducedEgamma:reducedEERecHits"),
@@ -117,15 +113,7 @@ process.ecalBadCalibReducedMINIAODFilter = cms.EDFilter(
                                                         debug = cms.bool(False)
                                                         )
 
-# If you only want to re-cluster and get the proper uncertainties
-#runMetCorAndUncFromMiniAOD(process,
-#                           isData=runOnData,
-#                           metType="Puppi",
-#                           pfCandColl=cms.InputTag("puppiForMET"),
-#                           recoMetFromPFCs=True,
-#                           jetFlavor="AK4PFPuppi",
-#                           postfix="Puppi"
-#                           )
+### END MET ===========================================================================================
 
 ### Electron scale and smearing =======================================================================
 #from RecoEgamma.EgammaTools.EgammaPostRecoTools import setupEgammaPostRecoSeq
@@ -166,18 +154,19 @@ for idmod in my_id_modules:
 ### END Electron ID ====================================================================================
 
 # Tau ID ===============================================================================================
-from DesyTauAnalyses.NTupleMaker.runTauIdMVA import *
-na = TauIDEmbedder(process, cms, # pass tour process object
-    debug=True,
-#    toKeep = ["2017v1", "2017v2", "newDM2017v2", "dR0p32017v2", "2016v1", "newDM2016v1", "deepTau2017v1", "DPFTau_2016_v0","DPFTau_2016_v1"]
-    toKeep = ["2017v1", "2017v2", "newDM2017v2", "dR0p32017v2", "2016v1", "newDM2016v1"]
-                   )
-na.runTauID()
+# https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePFTauID#Running_of_the_DNN_based_tau_ID
 
-tauSrc = cms.InputTag('NewTauIDsEmbedded')
+updatedTauName = "NewTauIDsEmbedded" #name of pat::Tau collection with new tau-Ids
+import RecoTauTag.RecoTau.tools.runTauIdMVA as tauIdConfig
+tauIdEmbedder = tauIdConfig.TauIDEmbedder(process, cms, debug = False,
+                                          updatedTauName = updatedTauName,
+                                          toKeep = [ "2017v1", "2017v2", "newDM2017v2", "dR0p32017v2", "2016v1", "newDM2016v1", "deepTau2017v1", "DPFTau_2016_v0", "DPFTau_2016_v1" ]
+                                          )
+
+tauIdEmbedder.runTauID()
 # END Tau ID ===========================================================================================
 
-# NTuple Maker =======================================================================
+# NTuple Maker =========================================================================================
 
 process.initroottree = cms.EDAnalyzer("InitAnalyzer",
 IsData = cms.untracked.bool(isData),
@@ -202,8 +191,8 @@ RecPrimVertex = cms.untracked.bool(True),
 RecBeamSpot = cms.untracked.bool(True),
 RecTrack = cms.untracked.bool(True),
 RecPFMet = cms.untracked.bool(True),
-RecPFMetCorr = cms.untracked.bool(False),
-RecPuppiMet = cms.untracked.bool(False),
+RecPFMetCorr = cms.untracked.bool(True),
+RecPuppiMet = cms.untracked.bool(True),
 RecMvaMet = cms.untracked.bool(False),                                      
 RecMuon = cms.untracked.bool(True),
 RecPhoton = cms.untracked.bool(False),
@@ -248,11 +237,8 @@ L1EGammaCollectionTag = cms.InputTag("caloStage2Digis:EGamma"),
 L1TauCollectionTag = cms.InputTag("caloStage2Digis:Tau"),
 L1JetCollectionTag = cms.InputTag("caloStage2Digis:Jet"),
 #JetCollectionTag = cms.InputTag("slimmedJets"),
-JetCollectionTag = cms.InputTag("patJetsReapplyJEC::TreeProducer"),
+JetCollectionTag = cms.InputTag("updatedPatJetsUpdatedJEC::TreeProducer"),
 MetCollectionTag = cms.InputTag("slimmedMETs::@skipCurrentProcess"),
-#MetCorrCollectionTag = cms.InputTag("slimmedMETs::@skipCurrentProcess"),
-#PuppiMetCollectionTag = cms.InputTag("slimmedMETsPuppi::@skipCurrentProcess"),
-#MetCollectionTag = cms.InputTag("slimmedMETs::TreeProducer"),
 MetCorrCollectionTag = cms.InputTag("slimmedMETsModifiedMET::TreeProducer"),
 PuppiMetCollectionTag = cms.InputTag("slimmedMETsPuppi::TreeProducer"),
 MvaMetCollectionsTag = cms.VInputTag(cms.InputTag("MVAMET","MVAMET","TreeProducer")),
@@ -505,27 +491,16 @@ SampleName = cms.untracked.string("Data")
 #process.patJets.addBTagInfo = cms.bool(True)
 
 process.p = cms.Path(
-  process.initroottree*
-#  process.BadChargedCandidateFilter *
-#  process.BadPFMuonFilter *
-#  process.BadGlobalMuonFilter *
-#  process.pileupJetIdUpdated * 
-#  process.rerunMvaIsolationSequence*
-
-  process.patJetCorrFactorsReapplyJEC * process.patJetsReapplyJEC *
-#  process.egmPhotonIDSequence *
-#  process.puppiMETSequence *
-#  process.fullPatMetSequencePuppi *
-#  process.fullPatMetSequenceModifiedMET *
-  process.ecalBadCalibReducedMINIAODFilter*
+  process.initroottree *
+  process.jecSequence *  # New JECs
+  process.egmPhotonIDSequence * # Puppi MET
+  process.puppiMETSequence *  # Puppi MET
+  process.fullPatMetSequencePuppi *  # Re-correcting Puppi MET
+  process.fullPatMetSequenceModifiedMET *  # Re-correcting PFMET
+  process.ecalBadCalibReducedMINIAODFilter *  # MET filter 2018
   process.egmGsfElectronIDSequence *
-  process.rerunMvaIsolationSequence *      # add new tau ids
-  process.NewTauIDsEmbedded *              # add new tau ids
-  #process.rerunMvaIsolation2SeqRun2 *
-  #process.mvaMetSequence *
-  #process.HBHENoiseFilterResultProducer* #produces HBHE bools baseline
-  #process.ApplyBaselineHBHENoiseFilter*  #reject events based 
-  #process.ApplyBaselineHBHEISONoiseFilter*  #reject events based -- disable the module, performance is being investigated
+  process.rerunMvaIsolationSequence *  # Tau IDs
+  getattr(process,updatedTauName) *  # Tau IDs
   process.makeroottree
 )
 
@@ -544,75 +519,3 @@ process.output = cms.OutputModule("PoolOutputModule",
                                   ),        
                                   SelectEvents = cms.untracked.PSet(  SelectEvents = cms.vstring('p'))
 )
-
-#process.end = cms.EndPath(process.output)
-
-#processDumpFile = open('MyRootMaker.dump', 'w')
-#print >> processDumpFile, process.dumpPython()
-
-def miniAOD_customizeMETFiltersFastSim(process):
-    """Replace some MET filters that don't work in FastSim with trivial bools"""
-    for X in 'CSCTightHaloFilter', 'CSCTightHaloTrkMuUnvetoFilter','CSCTightHalo2015Filter','globalTightHalo2016Filter','globalSuperTightHalo2016Filter','HcalStripHaloFilter':
-        process.globalReplace(X, cms.EDFilter("HLTBool", result=cms.bool(True)))    
-    for X in 'manystripclus53X', 'toomanystripclus53X', 'logErrorTooManyClusters':
-        process.globalReplace(X, cms.EDFilter("HLTBool", result=cms.bool(False)))
-    return process
-
-
-
-def customise_for_gc(process):
-	import FWCore.ParameterSet.Config as cms
-	from IOMC.RandomEngine.RandomServiceHelper import RandomNumberServiceHelper
-
-	try:
-		maxevents = __MAX_EVENTS__
-		process.maxEvents = cms.untracked.PSet(
-			input = cms.untracked.int32(max(-1, maxevents))
-		)
-	except:
-		pass
-
-	# Dataset related setup
-	try:
-		primaryFiles = [__FILE_NAMES__]
-		process.source = cms.Source('PoolSource',
-			skipEvents = cms.untracked.uint32(__SKIP_EVENTS__),
-			fileNames = cms.untracked.vstring(primaryFiles)
-		)
-		try:
-			secondaryFiles = [__FILE_NAMES2__]
-			process.source.secondaryFileNames = cms.untracked.vstring(secondaryFiles)
-		except:
-			pass
-		try:
-			lumirange = [__LUMI_RANGE__]
-			if len(lumirange) > 0:
-				process.source.lumisToProcess = cms.untracked.VLuminosityBlockRange(lumirange)
-				process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(-1))
-		except:
-			pass
-	except:
-		pass
-
-	if hasattr(process, 'RandomNumberGeneratorService'):
-		randSvc = RandomNumberServiceHelper(process.RandomNumberGeneratorService)
-		randSvc.populate()
-
-	process.AdaptorConfig = cms.Service('AdaptorConfig',
-		enable = cms.untracked.bool(True),
-		stats = cms.untracked.bool(True),
-	)
-
-	# Generator related setup
-	try:
-		if hasattr(process, 'generator') and process.source.type_() != 'PoolSource':
-			process.source.firstLuminosityBlock = cms.untracked.uint32(1 + __MY_JOBID__)
-			print 'Generator random seed:', process.RandomNumberGeneratorService.generator.initialSeed
-	except:
-		pass
-
-	return (process)
-
-process = customise_for_gc(process)
-
-# grid-control: https://ekptrac.physik.uni-karlsruhe.de/trac/grid-control
