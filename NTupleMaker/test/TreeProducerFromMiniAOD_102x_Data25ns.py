@@ -162,15 +162,16 @@ for idmod in my_id_modules:
 ### END Electron ID ====================================================================================
 
 # Tau ID ===============================================================================================
-from DesyTauAnalyses.NTupleMaker.runTauIdMVA import *
-na = TauIDEmbedder(process, cms, # pass tour process object
+#from DesyTauAnalyses.NTupleMaker.runTauIdMVA import *
+import RecoTauTag.RecoTau.tools.runTauIdMVA as tauIdConfig
+updatedTauName = "slimmedTausNewID" #name of pat::Tau collection with new tau-Ids
+tauIdEmbedder = tauIdConfig.TauIDEmbedder(process, cms, # pass tour process object
     debug=True,
-#     toKeep = ["2017v1", "2017v2", "newDM2017v2", "dR0p32017v2", "2016v1", "newDM2016v1", "deepTau2017v1", "DPFTau_2016_v0","DPFTau_2016_v1"] 
-     toKeep = ["2017v1", "2017v2", "newDM2017v2", "dR0p32017v2", "2016v1", "newDM2016v1"] 
-		  )
-na.runTauID()
-
-tauSrc = cms.InputTag('NewTauIDsEmbedded')
+    updatedTauName = updatedTauName,
+#    toKeep = ["2017v1", "2017v2", "newDM2017v2", "dR0p32017v2", "2016v1", "newDM2016v1", "deepTau2017v1", "DPFTau_2016_v0","DPFTau_2016_v1"]
+    toKeep = ["deepTau2017v2"])
+tauIdEmbedder.runTauID()
+tauSrc = cms.InputTag('slimmedTausNewID')
 # END Tau ID ===========================================================================================
 
 # NTuple Maker =======================================================================
@@ -198,8 +199,8 @@ RecPrimVertex = cms.untracked.bool(True),
 RecBeamSpot = cms.untracked.bool(True),
 RecTrack = cms.untracked.bool(True),
 RecPFMet = cms.untracked.bool(True),
-RecPFMetCorr = cms.untracked.bool(False),
-RecPuppiMet = cms.untracked.bool(False),
+RecPFMetCorr = cms.untracked.bool(True),
+RecPuppiMet = cms.untracked.bool(True),
 RecMvaMet = cms.untracked.bool(False),                                      
 RecMuon = cms.untracked.bool(True),
 RecPhoton = cms.untracked.bool(False),
@@ -238,7 +239,7 @@ eleLooseIdSummer16Map = cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-Summe
 eleMediumIdSummer16Map = cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-Summer16-80X-V1-medium"),
 eleTightIdSummer16Map = cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-Summer16-80X-V1-tight"),
 ###############
-TauCollectionTag = cms.InputTag("NewTauIDsEmbedded"),
+TauCollectionTag = cms.InputTag("slimmedTausNewID"),
 L1MuonCollectionTag = cms.InputTag("gmtStage2Digis:Muon"),
 L1EGammaCollectionTag = cms.InputTag("caloStage2Digis:EGamma"),
 L1TauCollectionTag = cms.InputTag("caloStage2Digis:Tau"),
@@ -514,7 +515,8 @@ process.p = cms.Path(
   process.ecalBadCalibReducedMINIAODFilter*
   process.egmGsfElectronIDSequence *
   process.rerunMvaIsolationSequence *      # add new tau ids
-  process.NewTauIDsEmbedded *              # add new tau ids
+  getattr(process,updatedTauName)*  
+#process.NewTauIDsEmbedded *              # add new tau ids
   #process.rerunMvaIsolation2SeqRun2 *
   #process.mvaMetSequence *
   #process.HBHENoiseFilterResultProducer* #produces HBHE bools baseline
@@ -522,6 +524,19 @@ process.p = cms.Path(
   #process.ApplyBaselineHBHEISONoiseFilter*  #reject events based -- disable the module, performance is being investigated
   process.makeroottree
 )
+# Tau ID ===============================================================================================
+#from DesyTauAnalyses.NTupleMaker.runTauIdMVA import *
+
+import RecoTauTag.RecoTau.tools.runTauIdMVA as tauIdConfig
+updatedTauName = "slimmedTausNewID" #name of pat::Tau collection with new tau-Ids
+tauIdEmbedder = tauIdConfig.TauIDEmbedder(process, cms, # pass tour process object
+    debug=True,
+    updatedTauName = updatedTauName,
+#    toKeep = ["2017v1", "2017v2", "newDM2017v2", "dR0p32017v2", "2016v1", "newDM2016v1", "deepTau2017v1", "DPFTau_2016_v0","DPFTau_2016_v1"]
+    toKeep = ["deepTau2017v2"])
+tauIdEmbedder.runTauID()
+tauSrc = cms.InputTag('slimmedTausNewID')
+# END Tau ID ===========================================================================================)
 
 process.TFileService = cms.Service("TFileService",
                                    fileName = cms.string("output_DATA.root")

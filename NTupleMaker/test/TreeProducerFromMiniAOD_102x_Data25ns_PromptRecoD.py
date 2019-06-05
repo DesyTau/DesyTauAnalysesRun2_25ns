@@ -116,12 +116,12 @@ process.ecalBadCalibReducedMINIAODFilter = cms.EDFilter(
 # If you only want to re-cluster and get the proper uncertainties
 #runMetCorAndUncFromMiniAOD(process,
 #                           isData=runOnData,
-#                           metType="Puppi",
-#                           pfCandColl=cms.InputTag("puppiForMET"),
-#                           recoMetFromPFCs=True,
-#                           jetFlavor="AK4PFPuppi",
-#                           postfix="Puppi"
-#                           )
+ #                          metType="Puppi",
+ #                          pfCandColl=cms.InputTag("puppiForMET"),
+ #                          recoMetFromPFCs=True,
+ #                          jetFlavor="AK4PFPuppi",
+ #                          postfix="Puppi"
+ #                          )
 
 ### Electron scale and smearing =======================================================================
 #from RecoEgamma.EgammaTools.EgammaPostRecoTools import setupEgammaPostRecoSeq
@@ -162,19 +162,21 @@ for idmod in my_id_modules:
 ### END Electron ID ====================================================================================
 
 # Tau ID ===============================================================================================
-from DesyTauAnalyses.NTupleMaker.runTauIdMVA import *
+updatedTauName = "slimmedTausNewID" 
+#from DesyTauAnalyses.NTupleMaker.runTauIdMVA import *
+from RecoTauTag.RecoTau.tools.runTauIdMVA import *
 na = TauIDEmbedder(process, cms, # pass tour process object
     debug=True,
 #     toKeep = ["2017v1", "2017v2", "newDM2017v2", "dR0p32017v2", "2016v1", "newDM2016v1", "deepTau2017v1", "DPFTau_2016_v0","DPFTau_2016_v1"] 
-     toKeep = ["2017v1", "2017v2", "newDM2017v2", "dR0p32017v2", "2016v1", "newDM2016v1"] 
+#    toKeep = ["2017v1", "2017v2", "newDM2017v2", "dR0p32017v2", "2016v1", "newDM2016v1","DPFTau_2016_v1"] 
+	updatedTauName = updatedTauName,
+	toKeep=["deepTau2017v2"]
 		  )
 na.runTauID()
-
-tauSrc = cms.InputTag('NewTauIDsEmbedded')
+tauSrc = cms.InputTag('slimmedTausNewID')
 # END Tau ID ===========================================================================================
 
 # NTuple Maker =======================================================================
-
 process.initroottree = cms.EDAnalyzer("InitAnalyzer",
 IsData = cms.untracked.bool(isData),
 #IsData = cms.untracked.bool(False),
@@ -198,8 +200,8 @@ RecPrimVertex = cms.untracked.bool(True),
 RecBeamSpot = cms.untracked.bool(True),
 RecTrack = cms.untracked.bool(True),
 RecPFMet = cms.untracked.bool(True),
-RecPFMetCorr = cms.untracked.bool(False),
-RecPuppiMet = cms.untracked.bool(False),
+RecPFMetCorr = cms.untracked.bool(True),
+RecPuppiMet = cms.untracked.bool(True),
 RecMvaMet = cms.untracked.bool(False),                                      
 RecMuon = cms.untracked.bool(True),
 RecPhoton = cms.untracked.bool(False),
@@ -238,7 +240,7 @@ eleLooseIdSummer16Map = cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-Summe
 eleMediumIdSummer16Map = cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-Summer16-80X-V1-medium"),
 eleTightIdSummer16Map = cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-Summer16-80X-V1-tight"),
 ###############
-TauCollectionTag = cms.InputTag("NewTauIDsEmbedded"),
+TauCollectionTag = cms.InputTag("slimmedTausNewID"),
 L1MuonCollectionTag = cms.InputTag("gmtStage2Digis:Muon"),
 L1EGammaCollectionTag = cms.InputTag("caloStage2Digis:EGamma"),
 L1TauCollectionTag = cms.InputTag("caloStage2Digis:Tau"),
@@ -246,11 +248,11 @@ L1JetCollectionTag = cms.InputTag("caloStage2Digis:Jet"),
 #JetCollectionTag = cms.InputTag("slimmedJets"),
 JetCollectionTag = cms.InputTag("patJetsReapplyJEC::TreeProducer"),
 MetCollectionTag = cms.InputTag("slimmedMETs::@skipCurrentProcess"),
-#MetCorrCollectionTag = cms.InputTag("slimmedMETs::@skipCurrentProcess"),
-#PuppiMetCollectionTag = cms.InputTag("slimmedMETsPuppi::@skipCurrentProcess"),
+MetCorrCollectionTag = cms.InputTag("slimmedMETs::@skipCurrentProcess"),
+PuppiMetCollectionTag = cms.InputTag("slimmedMETsPuppi::@skipCurrentProcess"),
 #MetCollectionTag = cms.InputTag("slimmedMETs::TreeProducer"),
-MetCorrCollectionTag = cms.InputTag("slimmedMETsModifiedMET::TreeProducer"),
-PuppiMetCollectionTag = cms.InputTag("slimmedMETsPuppi::TreeProducer"),
+#MetCorrCollectionTag = cms.InputTag("slimmedMETsModifiedMET::TreeProducer"),
+#PuppiMetCollectionTag = cms.InputTag("slimmedMETsPuppi::TreeProducer"),
 MvaMetCollectionsTag = cms.VInputTag(cms.InputTag("MVAMET","MVAMET","TreeProducer")),
 TrackCollectionTag = cms.InputTag("generalTracks"),
 GenParticleCollectionTag = cms.InputTag("prunedGenParticles"),
@@ -514,7 +516,10 @@ process.p = cms.Path(
   process.ecalBadCalibReducedMINIAODFilter*
   process.egmGsfElectronIDSequence *
   process.rerunMvaIsolationSequence *      # add new tau ids
-  process.NewTauIDsEmbedded *              # add new tau ids
+  getattr(process,updatedTauName)*
+  #getattr(process,updatedTauName)
+#  process.NewTauIDsEmbedded *
+              # add new tau ids
   #process.rerunMvaIsolation2SeqRun2 *
   #process.mvaMetSequence *
   #process.HBHENoiseFilterResultProducer* #produces HBHE bools baseline
