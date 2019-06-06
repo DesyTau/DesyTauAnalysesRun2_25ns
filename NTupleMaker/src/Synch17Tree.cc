@@ -242,6 +242,7 @@ void Synch17Tree::ReadInit(TTree *tree)
    //VBF
    fChain->SetBranchAddress("mjj", &mjj, &b_mjj);
    fChain->SetBranchAddress("jdeta", &jdeta, &b_jdeta);
+   fChain->SetBranchAddress("dijetpt", &dijetpt, &b_dijetpt);
    fChain->SetBranchAddress("jdphi", &jdphi, &b_jdphi);
    fChain->SetBranchAddress("njetingap", &njetingap, &b_njetingap);
    fChain->SetBranchAddress("njetingap20", &njetingap20, &b_njetingap20);
@@ -612,6 +613,7 @@ void Synch17Tree::WriteInit(TTree *tree) {
    //VBF
    fChain->Branch("mjj", &mjj, "mjj/F");
    fChain->Branch("jdeta", &jdeta, "jdeta/F");
+   fChain->Branch("dijetpt", &dijetpt, "dijetpt/F");
    fChain->Branch("jdphi", &jdphi, "jdphi/F");
    fChain->Branch("njetingap", &njetingap, "njetingap/I");
    fChain->Branch("njetingap20", &njetingap20, "njetingap20/I");

@@ -17,7 +17,7 @@
 #include "TEfficiency.h"
 #include "TMath.h"
 
-void Plot_lept_mutau_Updated(TString Variable = "m_vis",
+void Plot_lept_mutau_Updated_AdjVerbose(TString Variable = "m_vis",
 			     TString xtitle = "m_{vis} [GeV]",
 			     int nBins  =   30,
 			     float xmin =    0,
@@ -174,6 +174,7 @@ void Plot_lept_mutau_Updated(TString Variable = "m_vis",
 
     if (i>0) // if sample is MC sample -> Scale to xsec and luminosity
       {
+
 	hist[i]   -> Scale(norm);
 	histSS[i] -> Scale(norm);
 	cout << "sample " << sampleNames[i] << "  norm: "<<norm << endl;
@@ -388,6 +389,7 @@ void Plot_lept_mutau_Updated(TString Variable = "m_vis",
     tree -> Draw(Variable+">>"+histNameZll,  cutsZll[i]);
     tree -> Draw(Variable+">>"+histNameZllSS,cutsZllSS[i]);
 
+
     histZtt[i]   -> Scale(norm);
     histZttSS[i] -> Scale(norm);
     histZll[i]   -> Scale(norm);
@@ -562,6 +564,7 @@ void Plot_lept_mutau_Updated(TString Variable = "m_vis",
   // Setup legend
   TLegend *legend = PositionedLegend(0.25, 0.30, 3, 0.03);
   legend -> SetTextFont(42);
+
   histData -> SetMarkerColor(1);
   histData -> SetLineColor(1);
   histData -> SetFillColor(1);

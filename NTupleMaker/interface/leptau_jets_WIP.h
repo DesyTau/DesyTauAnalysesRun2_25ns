@@ -263,6 +263,7 @@ cout << "warning : indexLeadingJet ==indexSubLeadingJet = " << indexSubLeadingJe
 
   otree->mjj =  -9999;
   otree->jdeta =  -9999;
+  otree->dijetpt =  -9999;
   otree->jdphi =  -9999;
   otree->njetingap = -1;
 
@@ -275,6 +276,7 @@ cout << "warning : indexLeadingJet ==indexSubLeadingJet = " << indexSubLeadingJe
 	jet2.SetPtEtaPhiE(otree->jpt_2, otree->jeta_2, otree->jphi_2, get_jetE(analysisTree, indexSubLeadingJet, JESname, direction, jecUncertainties));
 
     otree->mjj = (jet1+jet2).M();
+    otree->dijetpt = (jet1+jet2).Pt();//Merijn: added, needed for DNN inputs in mt
     otree->jdeta = abs(analysisTree->pfjet_eta[indexLeadingJet]-
           analysisTree->pfjet_eta[indexSubLeadingJet]);
     otree->jdphi = dPhiFrom2P(jet1.Px(),jet1.Py(),

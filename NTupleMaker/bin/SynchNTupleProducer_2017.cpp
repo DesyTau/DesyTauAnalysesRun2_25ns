@@ -683,6 +683,7 @@ for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) {
 
 	for (unsigned int i=0; i<nfilters; ++i) {
 	  TString HLTFilter(analysisTree.run_hltfilters->at(i));
+		//cout<<"HLTFilter "<< HLTFilter<<endl;
 	  for(unsigned int i_trig=0; i_trig<filterSingleLep.size(); i_trig++){
 	    if (HLTFilter==filterSingleLep.at(i_trig)){ nSingleLepTrig.at(i_trig) = i; checkFilterSingleLep.at(i_trig) = true;}
 	  }

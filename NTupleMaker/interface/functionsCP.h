@@ -381,12 +381,14 @@ TLorentzVector ipVec(const AC1B * analysisTree, int tauIndex) {
     vec.SetXYZT(ip[0],ip[1],ip[2],0.);
     */
 
+
     TVector3 vertex(analysisTree->primvertex_x,
 		    analysisTree->primvertex_y,
 		    analysisTree->primvertex_z);
 
-    /*    
+       
     //Merijn: temporarily add gen vertex instead.. please leave this code for future reference
+/*
     TVector3 vertex;
     for (unsigned int igen=0; igen<analysisTree->genparticles_count; ++igen) {
       if (analysisTree->genparticles_pdgid[igen]==23||analysisTree->genparticles_pdgid[igen]==24||
@@ -397,7 +399,7 @@ TLorentzVector ipVec(const AC1B * analysisTree, int tauIndex) {
 	break;
       }
     }
-    */
+*/
     
     TVector3 secvertex(analysisTree->tau_pca3D_x[tauIndex],
 		       analysisTree->tau_pca3D_y[tauIndex],
@@ -432,6 +434,7 @@ TLorentzVector ipVec_Lepton(const AC1B * analysisTree, int tauIndex, TString ch)
   vec.SetXYZT(0.,0.,0.,0.);
 
   
+
 TVector3 vertex(analysisTree->primvertex_x,
 		    analysisTree->primvertex_y,
 		    analysisTree->primvertex_z);
@@ -449,7 +452,7 @@ TVector3 vertex(analysisTree->primvertex_x,
       break;
     }
   }
-  */
+*/  
     
 TVector3 secvertex(0.,0.,0.);
 TVector3 momenta(0.,0.,0.);    

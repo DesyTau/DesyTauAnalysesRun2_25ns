@@ -212,6 +212,7 @@ public :
   Float_t         mjj;
   Float_t         jdeta;
   Float_t         jdphi;
+  Float_t         dijetpt; //Merijn added, needed for DNN inputs. THis name is consistent with 2016+2017 analysis
   Int_t           njetingap;
   Int_t           njetingap20;
 
@@ -511,6 +512,7 @@ public :
   //VBF
   TBranch	 *b_mjj;
   TBranch	 *b_jdeta;
+  TBranch	 *b_dijetpt;
   TBranch	 *b_jdphi;
   TBranch	 *b_njetingap;
   TBranch	 *b_njetingap20;
