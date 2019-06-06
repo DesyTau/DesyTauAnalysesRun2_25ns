@@ -215,6 +215,8 @@ void Synch17GenTree::WriteInit(TTree *tree) {
    fChain->Branch("gen_chconst_2_eta", &chconst_2_eta, "gen_chconst_2_eta/F");
    
    fChain->Branch("gen_decaymode_2", &decaymode_2, "gen_decaymode_2/I");
+   fChain->Branch("gen_a1polarization_1", &a1polarization_1, "a1polarization_1/F");
+   fChain->Branch("gen_a1polarization_2", &a1polarization_2, "a1polarization_2/F");
 
    fChain->Branch("gen_acotautau_00", &acotautau_00, "gen_acotautau_00/F");
    fChain->Branch("gen_acotautau_10", &acotautau_10, "gen_acotautau_10/F");
