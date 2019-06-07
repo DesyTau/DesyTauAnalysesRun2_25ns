@@ -22,7 +22,9 @@ process.load('Configuration.StandardSequences.MagneticField_38T_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 process.load("TrackingTools/TransientTrack/TransientTrackBuilder_cfi")
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff')
-process.GlobalTag.globaltag = '102X_dataRun2_v10'
+
+# Global tag (from : https://twiki.cern.ch/twiki/bin/viewauth/CMS/PdmVAnalysisSummaryTable)
+process.GlobalTag.globaltag = '102X_dataRun2_Sep2018ABC_v2'
 
 # Message Logger settings
 process.load("FWCore.MessageService.MessageLogger_cfi")
@@ -128,7 +130,7 @@ updatedTauName = "NewTauIDsEmbedded" #name of pat::Tau collection with new tau-I
 import RecoTauTag.RecoTau.tools.runTauIdMVA as tauIdConfig
 tauIdEmbedder = tauIdConfig.TauIDEmbedder(process, cms, debug = False,
                                           updatedTauName = updatedTauName,
-                                          toKeep = [ "2017v1", "2017v2", "newDM2017v2", "dR0p32017v2", "2016v1", "newDM2016v1", "deepTau2017v1", "DPFTau_2016_v0", "DPFTau_2016_v1" ]
+                                          toKeep = [ "2017v1", "2017v2", "newDM2017v2", "dR0p32017v2", "2016v1", "newDM2016v1", "deepTau2017v2" ]
                                           )
 
 tauIdEmbedder.runTauID()
