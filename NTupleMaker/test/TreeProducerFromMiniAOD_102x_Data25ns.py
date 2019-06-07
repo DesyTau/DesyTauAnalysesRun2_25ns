@@ -134,6 +134,20 @@ tauIdEmbedder = tauIdConfig.TauIDEmbedder(process, cms, debug = False,
 tauIdEmbedder.runTauID()
 # END Tau ID ===========================================================================================
 
+
+# Vertex Refitting ===============================================================================================
+
+#load vertex refitting excluding tau tracks
+process.load('VertexRefit.TauRefit.AdvancedRefitVertexProducer_cfi')
+process.AdvancedRefitVertexNoBSProducer.srcTaus = cms.InputTag("NewTauIDsEmbedded")
+process.AdvancedRefitVertexNoBSProducer.srcLeptons = cms.VInputTag(cms.InputTag("slimmedElectrons"), cms.InputTag("slimmedMuons"), cms.InputTag("NewTauIDsEmbedded"))
+process.AdvancedRefitVertexBSProducer.srcTaus = cms.InputTag("NewTauIDsEmbedded")
+process.AdvancedRefitVertexBSProducer.srcLeptons = cms.VInputTag(cms.InputTag("slimmedElectrons"), cms.InputTag("slimmedMuons"), cms.InputTag("NewTauIDsEmbedded"))
+process.load('VertexRefit.TauRefit.MiniAODRefitVertexProducer_cfi')
+# END Vertex Refitting ===========================================================================================
+
+
+
 # NTuple Maker =========================================================================================
 
 process.initroottree = cms.EDAnalyzer("InitAnalyzer",
@@ -156,6 +170,9 @@ GenJets = cms.untracked.bool(not isData),
 SusyInfo = cms.untracked.bool(False),
 Trigger = cms.untracked.bool(True),
 RecPrimVertex = cms.untracked.bool(True),
+RecPrimVertexWithBS = cms.untracked.bool(True),
+RefittedVertex = cms.untracked.bool(True),
+RefittedVertexWithBS = cms.untracked.bool(True),
 RecBeamSpot = cms.untracked.bool(True),
 RecTrack = cms.untracked.bool(True),
 RecPFMet = cms.untracked.bool(True),
@@ -189,6 +206,9 @@ GenJetCollectionTag = cms.InputTag("slimmedGenJets"),
 TriggerObjectCollectionTag = cms.InputTag("slimmedPatTrigger"),
 BeamSpotCollectionTag =  cms.InputTag("offlineBeamSpot"),
 PVCollectionTag = cms.InputTag("offlineSlimmedPrimaryVertices"),
+PVwithBSCollectionTag =  cms.InputTag("MiniAODRefitVertexBSProducer"),
+RefittedPVCollectionTag =  cms.InputTag("AdvancedRefitVertexNoBSProducer"),
+RefittedwithBSPVCollectionTag =  cms.InputTag("AdvancedRefitVertexBSProducer"),
 LHEEventProductTag = cms.InputTag("externalLHEProducer"),
 SusyMotherMassTag = cms.InputTag("susyInfo","SusyMotherMass"),
 SusyLSPMassTag = cms.InputTag("susyInfo","SusyLSPMass"),
@@ -449,6 +469,9 @@ process.p = cms.Path(
   process.egammaPostRecoSeq *               # electron energy corrections and Ids
   process.rerunMvaIsolationSequence *  # Tau IDs
   getattr(process,updatedTauName) *  # Tau IDs
+  process.AdvancedRefitVertexNoBS * # Vertex refit w/o BS
+  process.AdvancedRefitVertexBS * # Vertex refit w/ BS	
+  process.MiniAODRefitVertexBS* # PV with BS constraint
   process.makeroottree
 )
 
