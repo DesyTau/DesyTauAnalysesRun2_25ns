@@ -76,6 +76,7 @@ void initializeCPvar(Synch17Tree *otree);
 void SaveRECOVertices(const AC1B * analysisTree,Synch17Tree *otree, const bool isData);
 void initializeGenTree(Synch17GenTree *gentree);
 void FillGenTree(const AC1B * analysisTree, Synch17GenTree *gentree, TString ch);
+void Refitting(const AC1B *analysisTree, Synch17Tree *otree, int tauIndex, int leptonIndex, TString ch);
 //void fillTTbarUncWeights(const AC1B * analysisTree, Synch17Tree *otree, bool isData, bool includeTTbarUncWeights);
 
 
@@ -960,7 +961,8 @@ for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) {
 	lep_eta =     analysisTree.tau_eta[leptonIndex]; 
 	lep_phi =     analysisTree.tau_phi[leptonIndex];
       }
-	    
+	 
+	
       bool isSingleLepTrig = false;
       bool isDiTauTrig     = false;
       bool isTauTrig       = false;
@@ -1068,6 +1070,7 @@ for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) {
 
      //all criterua passed, we fill vertices here;	
      SaveRECOVertices(&analysisTree,otree, isData);
+     Refitting(&analysisTree, otree, tauIndex, leptonIndex, argv[3]);
 
      //Merijn: save here all gen information for the selected RECO events, gets stored for convenience in the taucheck tree ;-). Note that no selection on gen level is applied..     
      if (!isData){
@@ -2127,6 +2130,11 @@ void SaveRECOVertices(const AC1B * analysisTree, Synch17Tree *otree, const bool 
   otree->RecoVertexX=analysisTree->primvertex_x;
   otree->RecoVertexY=analysisTree->primvertex_y;
   otree->RecoVertexZ=analysisTree->primvertex_z;
+	
+  otree->RecoVertexX_with_bs=analysisTree->primvertexwithbs_x;
+  otree->RecoVertexY_with_bs=analysisTree->primvertexwithbs_y;
+  otree->RecoVertexZ_with_bs=analysisTree->primvertexwithbs_z;
+
 
 
 if(!isData){
@@ -2149,4 +2157,109 @@ else{//if it is data, fill with something recognisable nonsensible
       otree->GenVertexY=-9999;
       otree->GenVertexZ=-9999;}
 
+}
+
+void Refitting(const AC1B *analysisTree, Synch17Tree *otree, int tauIndex, int leptonIndex, TString ch)
+{
+  //Begin of identifying correct refitted vertex (WITHOUT bs)
+  otree->RefitVertexX = otree->RecoVertexX;
+  otree->RefitVertexY = otree->RecoVertexY;
+  otree->RefitVertexZ = otree->RecoVertexZ;
+ 
+  otree->matched_pair = -1;
+ 
+  for(unsigned int i=0; i<analysisTree->refitvertex_count; i++)
+  {
+   if(ch=="mt")
+   {
+      if(
+((leptonIndex==(analysisTree->refitvertex_muIndex[i][0]))||(leptonIndex==(analysisTree->refitvertex_muIndex[i][1])))&&((tauIndex==(analysisTree->refitvertex_tauIndex[i][0]))||(tauIndex==(analysisTree->refitvertex_tauIndex[i][1])))
+	 )
+	{
+          otree->RefitVertexX = analysisTree->refitvertex_x[i];
+          otree->RefitVertexY = analysisTree->refitvertex_y[i];
+          otree->RefitVertexZ = analysisTree->refitvertex_z[i];
+          otree->matched_pair = i;
+	}
+   }
+
+   if(ch=="et")
+   {
+      if(
+((leptonIndex==(analysisTree->refitvertex_eleIndex[i][0]))||(leptonIndex==(analysisTree->refitvertex_eleIndex[i][1])))&&((tauIndex==(analysisTree->refitvertex_tauIndex[i][0]))||(tauIndex==(analysisTree->refitvertex_tauIndex[i][1])))
+	 )
+	{
+          otree->RefitVertexX = analysisTree->refitvertex_x[i];
+          otree->RefitVertexY = analysisTree->refitvertex_y[i];
+          otree->RefitVertexZ = analysisTree->refitvertex_z[i];
+          otree->matched_pair = i;
+	}
+   }
+	  
+   if(ch=="tt")
+   {
+      if(
+((leptonIndex==(analysisTree->refitvertex_tauIndex[i][0]))||(leptonIndex==(analysisTree->refitvertex_tauIndex[i][1])))&&((tauIndex==(analysisTree->refitvertex_tauIndex[i][0]))||(tauIndex==(analysisTree->refitvertex_tauIndex[i][1])))
+	 )
+	{
+          otree->RefitVertexX = analysisTree->refitvertex_x[i];
+          otree->RefitVertexY = analysisTree->refitvertex_y[i];
+          otree->RefitVertexZ = analysisTree->refitvertex_z[i];
+          otree->matched_pair = i;
+	}
+   }
+  }
+ 
+ //End of identifying correct refitted vertex (WITHOUT bs)
+
+ //Begin of identifying correct refitted vertex (WITH bs)
+
+  otree->RefitVertexX_with_bs = otree->RecoVertexX_with_bs;
+  otree->RefitVertexY_with_bs = otree->RecoVertexY_with_bs;
+  otree->RefitVertexZ_with_bs = otree->RecoVertexZ_with_bs;
+
+  otree->matched_pair_with_bs = -1;
+  
+  for(unsigned int i=0; i<analysisTree->refitvertexwithbs_count; i++)
+  {
+   if(ch=="mt")
+   {
+      if(
+((leptonIndex==(analysisTree->refitvertexwithbs_muIndex[i][0]))||(leptonIndex==(analysisTree->refitvertexwithbs_muIndex[i][1])))&&((tauIndex==(analysisTree->refitvertexwithbs_tauIndex[i][0]))||(tauIndex==(analysisTree->refitvertexwithbs_tauIndex[i][1])))
+	 )
+	{
+          otree->RefitVertexX_with_bs = analysisTree->refitvertexwithbs_x[i];
+          otree->RefitVertexY_with_bs = analysisTree->refitvertexwithbs_y[i];
+          otree->RefitVertexZ_with_bs = analysisTree->refitvertexwithbs_z[i];
+          otree->matched_pair_with_bs = i;
+	}
+   }
+
+   if(ch=="et")
+   {
+      if(
+((leptonIndex==(analysisTree->refitvertexwithbs_eleIndex[i][0]))||(leptonIndex==(analysisTree->refitvertexwithbs_eleIndex[i][1])))&&((tauIndex==(analysisTree->refitvertexwithbs_tauIndex[i][0]))||(tauIndex==(analysisTree->refitvertexwithbs_tauIndex[i][1])))
+	 )
+	{
+          otree->RefitVertexX_with_bs = analysisTree->refitvertexwithbs_x[i];
+          otree->RefitVertexY_with_bs = analysisTree->refitvertexwithbs_y[i];
+          otree->RefitVertexZ_with_bs = analysisTree->refitvertexwithbs_z[i];
+          otree->matched_pair_with_bs = i;
+	}
+   }
+
+   if(ch=="tt")
+   {
+      if(
+((leptonIndex==(analysisTree->refitvertexwithbs_tauIndex[i][0]))||(leptonIndex==(analysisTree->refitvertexwithbs_tauIndex[i][1])))&&((tauIndex==(analysisTree->refitvertexwithbs_tauIndex[i][0]))||(tauIndex==(analysisTree->refitvertexwithbs_tauIndex[i][1])))
+	 )
+	{
+          otree->RefitVertexX_with_bs = analysisTree->refitvertexwithbs_x[i];
+          otree->RefitVertexY_with_bs = analysisTree->refitvertexwithbs_y[i];
+          otree->RefitVertexZ_with_bs = analysisTree->refitvertexwithbs_z[i];
+          otree->matched_pair_with_bs = i;
+	}
+   }
+  }
+  //End of identifying correct refitted vertex (WITH bs)
 }
