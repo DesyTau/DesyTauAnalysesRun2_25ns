@@ -90,8 +90,9 @@ runMetCorAndUncFromMiniAOD(process,
                            jetFlavor="AK4PFPuppi",
                            )
 
-process.puppiNoLep.useExistingWeights = False
-process.puppi.useExistingWeights = False
+# Re-calculation of Puppi weights only needed if the latest Tune (v11) was not applied on MiniAOD yet (see here: https://twiki.cern.ch/twiki/bin/view/CMS/PUPPI#PUPPI_Status_Release_notes)
+process.puppiNoLep.useExistingWeights = True
+process.puppi.useExistingWeights = True
 
 # MET filter for 2018 (from : https://twiki.cern.ch/twiki/bin/viewauth/CMS/MissingETOptionalFiltersRun2#How_to_run_ecal_BadCalibReducedM)
 process.load('RecoMET.METFilters.ecalBadCalibFilter_cfi')
