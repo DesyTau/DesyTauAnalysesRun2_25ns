@@ -174,8 +174,8 @@ SusyInfo = cms.untracked.bool(False),
 Trigger = cms.untracked.bool(True),
 RecPrimVertex = cms.untracked.bool(True),
 RecPrimVertexWithBS = cms.untracked.bool(True),
-RefittedVertex = cms.untracked.bool(True),
-RefittedVertexWithBS = cms.untracked.bool(True),
+RefittedVertex = cms.untracked.bool(False),
+RefittedVertexWithBS = cms.untracked.bool(False),
 RecBeamSpot = cms.untracked.bool(True),
 RecTrack = cms.untracked.bool(True),
 RecPFMet = cms.untracked.bool(True),
@@ -472,8 +472,8 @@ process.p = cms.Path(
   process.egammaPostRecoSeq *               # electron energy corrections and Ids
   process.rerunMvaIsolationSequence *  # Tau IDs
   getattr(process,updatedTauName) *  # Tau IDs
-  process.AdvancedRefitVertexNoBS * # Vertex refit w/o BS
-  process.AdvancedRefitVertexBS * # Vertex refit w/ BS	
+  #process.AdvancedRefitVertexNoBS * # Vertex refit w/o BS
+  #process.AdvancedRefitVertexBS * # Vertex refit w/ BS
   process.MiniAODRefitVertexBS* # PV with BS constraint
   process.makeroottree
 )
