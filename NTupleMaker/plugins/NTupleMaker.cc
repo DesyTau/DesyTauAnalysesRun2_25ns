@@ -128,6 +128,7 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
   crecpfmetcorr(iConfig.getUntrackedParameter<bool>("RecPFMetCorr", false)),
   crecpuppimet(iConfig.getUntrackedParameter<bool>("RecPuppiMet", false)),
   crecmvamet(iConfig.getUntrackedParameter<bool>("RecMvaMet", false)),
+  crecstxs(iConfig.getUntrackedParameter<bool>("RecHTXS", false)),
   // triggers
   cHLTriggerPaths(iConfig.getUntrackedParameter<vector<string> >("HLTriggerPaths")),
   cTriggerProcess(iConfig.getUntrackedParameter<string>("TriggerProcess", "HLT")),
@@ -209,6 +210,7 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
   LHEToken_(consumes<LHEEventProduct>(iConfig.getParameter<edm::InputTag>("LHEEventProductTag"))),
   SusyMotherMassToken_(consumes<double>(iConfig.getParameter<edm::InputTag>("SusyMotherMassTag"))),
   SusyLSPMassToken_(consumes<double>(iConfig.getParameter<edm::InputTag>("SusyLSPMassTag"))),
+  htxsToken_(consumes<HTXS::HiggsClassification>(iConfig.getParameter<edm::InputTag>("htxsInfo"))),
   sampleName(iConfig.getUntrackedParameter<std::string>("SampleName", "Higgs")),
   propagatorWithMaterial(0)
 {
@@ -909,6 +911,15 @@ void NTupleMaker::beginJob(){
   }
 
   // generator info
+
+  if(crecstxs){
+    tree->Branch("htxs_stage0cat",&htxs_stage0cat,"htxs_stage0cat/I");
+    tree->Branch("htxs_stage1p1cat_pTjet30GeV",&htxs_stage1p1cat_pTjet30GeV,"htxs_stage1p1cat_pTjet30GeV/I");
+    tree->Branch("htxs_stage1p1cat_pTjet25GeV",&htxs_stage1p1cat_pTjet25GeV,"htxs_stage1p1cat_pTjet25GeV/I");
+    tree->Branch("htxs_higgsPt",&htxs_higgsPt,"htxs_higgsPt/F");
+    tree->Branch("htxs_njets30",&htxs_njets30,"htxs_njets30/I");
+    tree->Branch("htxs_njets25",&htxs_njets30,"htxs_njets25/I");
+  }
 
   if (cgen) {
 
@@ -2486,6 +2497,20 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       int numberOfTriggerObjects = int(AddTriggerObjects(iEvent,TriggerObjectCollectionToken_,*HLTrigger));
       //      std::cout << std::endl;
     } // ctrigger
+
+  if(crecstxs)
+    {
+      // Get STXS infos
+      edm::Handle<HTXS::HiggsClassification> htxs;
+      iEvent.getByToken(htxsToken_, htxs);
+      htxs_stage0cat = htxs->stage0_cat;
+      htxs_stage1p1cat_pTjet30GeV = htxs->stage1_1_cat_pTjet30GeV;
+      htxs_stage1p1cat_pTjet25GeV = htxs->stage1_1_cat_pTjet25GeV;
+      htxs_higgsPt = htxs->higgs.Pt();
+      htxs_njets30 = htxs->jets30.size();
+      htxs_njets25 = htxs->jets25.size();
+    }
+
 
   tree->Fill();
 
