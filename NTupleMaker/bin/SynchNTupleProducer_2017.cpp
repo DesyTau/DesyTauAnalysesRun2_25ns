@@ -243,7 +243,9 @@ int main(int argc, char * argv[]){
   if(!isData && applyRecoilCorrections && (isDY || isWJets || isVBForGGHiggs || isMSSMsignal) ){
     TString RecoilDir("HTT-utilities/RecoilCorrections/data/");
     
-    TString RecoilFileName = RecoilDir; RecoilFileName += "TypeI-PFMet_Run2016BtoH.root";
+    //    TString RecoilFileName = RecoilDir; RecoilFileName += "TypeI-PFMet_Run2016BtoH.root"; Merijn update to 2017:
+    TString RecoilFileName = RecoilDir; RecoilFileName += "Type1_PFMET_2017.root";
+
     std::cout<<RecoilFileName<<std::endl;
     recoilPFMetCorrector = new RecoilCorrector( RecoilFileName);
         
@@ -486,6 +488,7 @@ int main(int argc, char * argv[]){
   // Zpt reweighting for LO DY samples 
   TFile * f_zptweight = new TFile(TString(cmsswBase)+"/src/"+ZptweightFile,"read");
   //TFile * f_zptweight = new TFile(TString(cmsswBase)+"/src/"+"DesyTauAnalyses/NTupleMaker/data/zpt_weights_2016_BtoH.root","read");
+  //Merijn: the file will point now for 2017  instead to DesyTauAnalyses/NTupleMaker/data/zpt_weights_2017.root
   TH2D * h_zptweight = (TH2D*)f_zptweight->Get("zptmass_histo");
 
   // lepton to tau fake init
@@ -598,16 +601,32 @@ int main(int argc, char * argv[]){
   }
 
   // list of met filters
+  /*
   std::vector<TString> met_filters_list ;
   met_filters_list.push_back("Flag_HBHENoiseFilter");
   met_filters_list.push_back("Flag_HBHENoiseIsoFilter");
   met_filters_list.push_back("Flag_EcalDeadCellTriggerPrimitiveFilter");
   met_filters_list.push_back("Flag_goodVertices");
   met_filters_list.push_back("Flag_eeBadScFilter");
-  met_filters_list.push_back("Flag_globalTightHalo2016Filter");
+  met_filters_list.push_back("Flag_globalTightHalo2016Filter"); ABSENT!
   met_filters_list.push_back("Flag_BadPFMuonFilter");
-  met_filters_list.push_back("Flag_BadChargedCandidateFilter");
+  met_filters_list.push_back("Flag_BadChargedCandidateFilter");*/ //ABSENT!
+  //Merijn: replace above with 2017 defs emu. Note we can fetch there 2016 as well..
 
+  //  else if (era=="2017"){ later catch from config file if generalise to other run..
+  std::vector<TString> met_filters_list ;
+    met_filters_list.push_back("Flag_HBHENoiseFilter");
+    met_filters_list.push_back("Flag_HBHENoiseIsoFilter");
+    met_filters_list.push_back("Flag_globalSuperTightHalo2016Filter");
+    met_filters_list.push_back("Flag_EcalDeadCellTriggerPrimitiveFilter");
+    met_filters_list.push_back("Flag_goodVertices");
+    if (isData)
+      met_filters_list.push_back("Flag_eeBadScFilter");
+    met_filters_list.push_back("Flag_BadPFMuonFilter");
+    //metFlags.push_back("Flag_BadChargedCandidateFilter");  // currently not recommended, under review
+    met_filters_list.push_back("ecalBadCalibReducedMINIAODFilter"); //WAS NOT IN LIST ABOVE
+  
+  
   int counter[20];
 
   ///////////////FILE LOOP///////////////
@@ -1225,10 +1244,24 @@ for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) {
 
       // Zpt weight
       otree->zptweight = 1.;
-      if (!isData && ((isDY && isMG ) || isEWKZ) ) {
+      if (!isData && ((isDY && isMG ) || isEWKZ)){
         genV = genTools::genV(analysisTree); // gen Z boson ?
-        otree->zptweight = h_zptweight->GetBinContent(h_zptweight->GetXaxis()->FindBin(genV.M()),h_zptweight->GetYaxis()->FindBin(genV.Pt()));
+	float bosonMass = genV.M();
+	float bosonPt = genV.Pt();
+
+	//Merijn 2019 6 13: adjust to T/M functions, to get boundaries right. Otherwise, for 2017 data we get few outliers that screw up the weight histogram dramatically.
+	Float_t zptmassweight = 1;
+	if (bosonMass>50.0) {
+	  float bosonMassX = bosonMass;
+	  float bosonPtX = bosonPt;
+	  if (bosonMassX>1000.) bosonMassX = 1000.;
+	  if (bosonPtX<1.)      bosonPtX = 1.;
+	  if (bosonPtX>1000.)   bosonPtX = 1000.;
+	  zptmassweight = h_zptweight->GetBinContent(h_zptweight->GetXaxis()->FindBin(bosonMassX),
+							    h_zptweight->GetYaxis()->FindBin(bosonPtX));}	
+        otree->zptweight =zptmassweight;
       }
+      
 
       // topPt weight
       otree->topptweight =1.;
