@@ -1,7 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 
 isData = True
-is25ns = True
+isHiggsSignal = False
 year = 2018
 period = '2018'
 
@@ -90,8 +90,9 @@ runMetCorAndUncFromMiniAOD(process,
                            jetFlavor="AK4PFPuppi",
                            )
 
-process.puppiNoLep.useExistingWeights = False
-process.puppi.useExistingWeights = False
+# Re-calculation of Puppi weights only needed if the latest Tune (v11) was not applied on MiniAOD yet (see here: https://twiki.cern.ch/twiki/bin/view/CMS/PUPPI#PUPPI_Status_Release_notes)
+process.puppiNoLep.useExistingWeights = True
+process.puppi.useExistingWeights = True
 
 # MET filter for 2018 (from : https://twiki.cern.ch/twiki/bin/viewauth/CMS/MissingETOptionalFiltersRun2#How_to_run_ecal_BadCalibReducedM)
 process.load('RecoMET.METFilters.ecalBadCalibFilter_cfi')
@@ -148,6 +149,27 @@ process.AdvancedRefitVertexBSProducer.srcLeptons = cms.VInputTag(cms.InputTag("s
 process.load('VertexRefit.TauRefit.MiniAODRefitVertexProducer_cfi')
 # END Vertex Refitting ===========================================================================================
 
+# HTXS ========================================================================================================
+if not isData and isHiggsSignal:
+    process.load("SimGeneral.HepPDTESSource.pythiapdt_cfi")
+    process.mergedGenParticles = cms.EDProducer("MergedGenParticleProducer",
+                                                inputPruned = cms.InputTag("prunedGenParticles"),
+                                                inputPacked = cms.InputTag("packedGenParticles"),
+                                                )
+    process.myGenerator = cms.EDProducer("GenParticles2HepMCConverter",
+                                         genParticles = cms.InputTag("mergedGenParticles"),
+                                         genEventInfo = cms.InputTag("generator"),
+                                         signalParticlePdgIds = cms.vint32(25),
+                                         )
+    process.rivetProducerHTXS = cms.EDProducer('HTXSRivetProducer',
+                                               HepMCCollection = cms.InputTag('myGenerator','unsmeared'),
+                                               LHERunInfo = cms.InputTag('externalLHEProducer'),
+                                               ProductionMode = cms.string('AUTO'),
+                                               )
+    process.htxsSequence = cms.Sequence(  process.mergedGenParticles * process.myGenerator * process.rivetProducerHTXS )
+else :
+    process.htxsSequence = cms.Sequence( )
+# END HTXS ====================================================================================================
 
 
 # NTuple Maker =========================================================================================
@@ -173,8 +195,8 @@ SusyInfo = cms.untracked.bool(False),
 Trigger = cms.untracked.bool(True),
 RecPrimVertex = cms.untracked.bool(True),
 RecPrimVertexWithBS = cms.untracked.bool(True),
-RefittedVertex = cms.untracked.bool(True),
-RefittedVertexWithBS = cms.untracked.bool(True),
+RefittedVertex = cms.untracked.bool(False),
+RefittedVertexWithBS = cms.untracked.bool(False),
 RecBeamSpot = cms.untracked.bool(True),
 RecTrack = cms.untracked.bool(True),
 RecPFMet = cms.untracked.bool(True),
@@ -187,6 +209,7 @@ RecElectron = cms.untracked.bool(True),
 RecTau = cms.untracked.bool(True),
 L1Objects = cms.untracked.bool(True),
 RecJet = cms.untracked.bool(True),
+RecHTXS = cms.untracked.bool(isHiggsSignal),
 # collections
 MuonCollectionTag = cms.InputTag("slimmedMuons"), 
 ElectronCollectionTag = cms.InputTag("slimmedElectrons"),
@@ -214,6 +237,7 @@ RefittedwithBSPVCollectionTag =  cms.InputTag("AdvancedRefitVertexBSProducer"),
 LHEEventProductTag = cms.InputTag("externalLHEProducer"),
 SusyMotherMassTag = cms.InputTag("susyInfo","SusyMotherMass"),
 SusyLSPMassTag = cms.InputTag("susyInfo","SusyLSPMass"),
+htxsInfo = cms.InputTag("rivetProducerHTXS", "HiggsClassification"),
 # trigger info
 HLTriggerPaths = cms.untracked.vstring(
 #SingleMuon
@@ -471,9 +495,10 @@ process.p = cms.Path(
   process.egammaPostRecoSeq *               # electron energy corrections and Ids
   process.rerunMvaIsolationSequence *  # Tau IDs
   getattr(process,updatedTauName) *  # Tau IDs
-  process.AdvancedRefitVertexNoBS * # Vertex refit w/o BS
-  process.AdvancedRefitVertexBS * # Vertex refit w/ BS	
+  #process.AdvancedRefitVertexNoBS * # Vertex refit w/o BS
+  #process.AdvancedRefitVertexBS * # Vertex refit w/ BS
   process.MiniAODRefitVertexBS* # PV with BS constraint
+  process.htxsSequence * # HTXS
   process.makeroottree
 )
 

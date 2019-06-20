@@ -150,6 +150,8 @@
 #include "DataFormats/L1Trigger/interface/Tau.h"
 #include "DataFormats/L1Trigger/interface/Jet.h"
 
+#include "SimDataFormats/HTXS/interface/HiggsTemplateCrossSections.h"
+
 using namespace std;
 using namespace reco;
 
@@ -345,6 +347,7 @@ class NTupleMaker : public edm::EDAnalyzer{
   bool crecpfmetcorr;
   bool crecpuppimet;
   bool crecmvamet;
+  bool crecstxs;
 
   vector<string> cHLTriggerPaths;
   string cTriggerProcess;
@@ -440,6 +443,7 @@ class NTupleMaker : public edm::EDAnalyzer{
   edm::EDGetTokenT<LHEEventProduct> LHEToken_;
   edm::EDGetTokenT<double> SusyMotherMassToken_;
   edm::EDGetTokenT<double> SusyLSPMassToken_;
+  edm::EDGetTokenT<HTXS::HiggsClassification> htxsToken_;
   std::string sampleName;
 
   PropagatorWithMaterial*               propagatorWithMaterial; 
@@ -1194,6 +1198,13 @@ class NTupleMaker : public edm::EDAnalyzer{
   Float_t genmet_ey;
 
   //Generator Information
+  Int_t htxs_stage0cat;
+  Int_t htxs_stage1p1cat_pTjet30GeV;
+  Int_t htxs_stage1p1cat_pTjet25GeV;
+  Float_t htxs_higgsPt;
+  Int_t htxs_njets30;
+  Int_t htxs_njets25;
+
   Float_t genweight;
   Float_t genid1;
   Float_t genx1;
