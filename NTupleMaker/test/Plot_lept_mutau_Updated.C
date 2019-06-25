@@ -562,7 +562,6 @@ void Plot_lept_mutau_Updated(TString Variable = "m_vis",
   // Setup legend
   TLegend *legend = PositionedLegend(0.25, 0.30, 3, 0.03);
   legend -> SetTextFont(42);
-
   histData -> SetMarkerColor(1);
   histData -> SetLineColor(1);
   histData -> SetFillColor(1);
