@@ -1,9 +1,9 @@
 import FWCore.ParameterSet.Config as cms
 
-isData = True
-isHiggsSignal = False
-year = 2018
-period = '2018'
+isData = False
+is25ns = True
+year = 2017
+period = '2017'
 
 #configurable options =======================================================================
 runOnData=isData #data/MC switch
@@ -11,6 +11,8 @@ usePrivateSQlite=False #use external JECs (sqlite file) /// OUTDATED for 25ns
 useHFCandidates=True #create an additionnal NoHF slimmed MET collection if the option is set to false  == existing as slimmedMETsNoHF
 applyResiduals=True #application of residual corrections. Have to be set to True once the 13 TeV residual corrections are available. False to be kept meanwhile. Can be kept to False later for private tests or for analysis checks and developments (not the official recommendation!).
 #===================================================================
+
+
 
 # Define the CMSSW process
 process = cms.Process("TreeProducer")
@@ -21,124 +23,151 @@ process.load('Configuration.StandardSequences.GeometryDB_cff')
 process.load('Configuration.StandardSequences.MagneticField_38T_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 process.load("TrackingTools/TransientTrack/TransientTrackBuilder_cfi")
-process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff')
 
-# Global tag (from : https://twiki.cern.ch/twiki/bin/viewauth/CMS/PdmVAnalysisSummaryTable)
-process.GlobalTag.globaltag = '102X_dataRun2_Sep2018ABC_v2'
+process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff')
+process.GlobalTag.globaltag = '94X_mc2017_realistic_v15'
 
 # Message Logger settings
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.destinations = ['cout', 'cerr']
 process.MessageLogger.cerr.threshold = cms.untracked.string('INFO')
-process.MessageLogger.cerr.FwkReport.reportEvery = 1000
+process.MessageLogger.cerr.FwkReport.reportEvery = 100
 # Set the process options -- Display summary at the end, enable unscheduled execution
 process.options = cms.untracked.PSet( 
     allowUnscheduled = cms.untracked.bool(True),
-    wantSummary = cms.untracked.bool(True)
+    wantSummary = cms.untracked.bool(True), 
+#     susyInfo = cms.untracked.bool(True)	
 )
 
 # How many events to process
 process.maxEvents = cms.untracked.PSet( 
-   input = cms.untracked.int32(100)
+   input = cms.untracked.int32(1000)
 )
-
+#process.SusyInfo = cms.untracked.bool(True)
 # Define the input source
 process.source = cms.Source("PoolSource", 
   fileNames = cms.untracked.vstring(
-        '/store/data/Run2018A/EGamma/MINIAOD/17Sep2018-v2/60000/FFD234BD-747F-9242-9EC3-4D3BC8E564B0.root'
+"/store/mc/RunIIFall17MiniAODv2/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/PU2017RECOSIMstep_12Apr2018_94X_mc2017_realistic_v14-v1/910000/C20C891B-F647-E811-A46A-001E67792600.root"
+#"/store/mc/RunIIFall17MiniAODv2/WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14-v2/70000/8A8B3345-2A67-E811-AE81-F04DA274BB9C.root"
+#"root://xrootd-cms.infn.it//store/mc/RunIISummer16MiniAODv2/SMS-TStauStau_lefthanded_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUMoriond17_GridpackScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/30000/B841EB59-E8A7-E811-BD9B-5C260AFFFB63.root",
+#"root://xrootd-cms.infn.it//store/mc/RunIISummer16MiniAODv2/SMS-TStauStau_lefthanded_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUMoriond17_GridpackScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/30000/C489E8CA-6BA8-E811-BECF-782BCB539693.root"]
+#  "/store/mc/RunIIFall17MiniAODv2/WJetsToLNu_HT-600To800_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/70000/FC8E4220-0055-E811-A3C4-AC1F6B1AF188.root"
+#"/store/mc/RunIISummer16MiniAODv2/SMS-TStauStau_righthanded_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUMoriond17_GridpackScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/10000/B04DDCBB-83A6-E811-B42F-24BE05CE1E01.root"
+#"root://xrootd-cms.infn.it//store/mc/RunIIFall17MiniAODv2/SMS-TStauStau_righthanded_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/PU2017_12Apr2018_GridpackScan_94X_mc2017_realistic_v14-v1/20000/3ACAD4A7-5F7B-E811-8ECA-1866DA89035E.root"
+#	"/store/mc/RunIIFall17MiniAODv2/SMS-TStauStau_righthanded_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/PU2017_12Apr2018_GridpackScan_94X_mc2017_realistic_v14-v1/20000/DA4DCFB4-887C-E811-826E-FA163E013FB3.root"
+#	"/store/mc/RunIIFall17MiniAODv2/SMS-TStauStau_righthanded_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/PU2017_12Apr2018_GridpackScan_94X_mc2017_realistic_v14-v1/20000/007DE983-907C-E811-9C8D-FA163E1E165A.root"
+#	"/store/mc/RunIIFall17MiniAODv2/SMS-TStauStau_ctau-0p01to10_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/PU2017_12Apr2018_GridpackScan_94X_mc2017_realistic_v14-v1/40000/F849A417-D58D-E811-9A4E-0CC47A4C8EEA.root",
+#	"/store/mc/RunIIFall17MiniAOD/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/RECOSIMstep_94X_mc2017_realistic_v10-v1/00000/0CCEA775-09F2-E711-9833-0025905B85BE.root",
+#        '/store/mc/RunIIFall17MiniAODv2/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14-v2/100000/24D39640-AB96-E811-819F-008CFA0A5808.root',
+        #"/store/mc/RunIIFall17MiniAODv2/SUSYGluGluToHToAA_AToMuMu_AToTauTau_M-125_M-9_TuneCUETP8M1_13TeV_madgraph_pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14-v2/70000/E0D55D83-D26F-E811-B58D-44A842B298F1.root"
         ),
   skipEvents = cms.untracked.uint32(0)
 )
 
-### JECs ==============================================================================================
-# From :  https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookJetEnergyCorrections#CorrPatJets
+### JECs =====================================================================================================
 
-from PhysicsTools.PatAlgos.tools.jetTools import updateJetCollection
-updateJetCollection(
-  process,
-  jetSource = cms.InputTag('slimmedJets'),
-  labelName = 'UpdatedJEC',
-  jetCorrections = ('AK4PFchs', cms.vstring(['L1FastJet', 'L2Relative', 'L3Absolute', 'L2L3Residual']), 'None')  # Update: Safe to always add 'L2L3Residual' as MC contains dummy L2L3Residual corrections (always set to 1)
-)
-process.jecSequence = cms.Sequence(process.patJetCorrFactorsUpdatedJEC * process.updatedPatJetsUpdatedJEC)
+from PhysicsTools.PatAlgos.producersLayer1.jetUpdater_cff import updatedPatJetCorrFactors
+process.patJetCorrFactorsReapplyJEC = updatedPatJetCorrFactors.clone(
+  src = cms.InputTag("slimmedJets"),
+  levels = ['L1FastJet', 
+            'L2Relative', 
+            'L3Absolute'],
+  payload = 'AK4PFchs' ) # Make sure to choose the appropriate levels and payload here!
 
-### END JECs ==========================================================================================
+if runOnData:
+    process.patJetCorrFactorsReapplyJEC.levels.append("L2L3Residual")
 
-### MET ===============================================================================================
-# from : https://twiki.cern.ch/twiki/bin/view/CMS/MissingETUncertaintyPrescription#We_have_a_tool_to_help_you_to_ap
+from PhysicsTools.PatAlgos.producersLayer1.jetUpdater_cff import updatedPatJets
+process.patJetsReapplyJEC = updatedPatJets.clone(
+    jetSource = cms.InputTag("slimmedJets"),
+    jetCorrFactorsSource = cms.VInputTag(cms.InputTag("patJetCorrFactorsReapplyJEC"))
+    )
 
-# PFMET
+#PFMET
 from PhysicsTools.PatUtils.tools.runMETCorrectionsAndUncertainties import runMetCorAndUncFromMiniAOD
 
 # If you only want to re-correct and get the proper uncertainties
 runMetCorAndUncFromMiniAOD(process,
                            isData=runOnData,
-                           #fixEE2017 = False,
-                           #fixEE2017Params = {'userawPt': True, 'PtThreshold':50.0, 'MinEtaThreshold':2.65, 'MaxEtaThreshold': 3.139} ,
+                           fixEE2017 = True,
+                           fixEE2017Params = {'userawPt': True, 'ptThreshold':50.0, 'minEtaThreshold':2.65, 'maxEtaThreshold': 3.139} ,
                            postfix = "ModifiedMET"
                            )
 
-# PuppiMET
+#PuppiMET
 from PhysicsTools.PatAlgos.slimming.puppiForMET_cff import makePuppiesFromMiniAOD
 makePuppiesFromMiniAOD( process, True );
 
-# If you only want to re-correct and get the proper uncertainties
+# If you only want to re-cluster and get the proper uncertainties
 runMetCorAndUncFromMiniAOD(process,
                            isData=runOnData,
                            metType="Puppi",
-                           postfix="Puppi",
+                           pfCandColl=cms.InputTag("puppiForMET"),
+                           recoMetFromPFCs=True,
                            jetFlavor="AK4PFPuppi",
+                           postfix="Puppi"
                            )
 
-# Re-calculation of Puppi weights only needed if the latest Tune (v11) was not applied on MiniAOD yet (see here: https://twiki.cern.ch/twiki/bin/view/CMS/PUPPI#PUPPI_Status_Release_notes)
-process.puppiNoLep.useExistingWeights = True
-process.puppi.useExistingWeights = True
-
-# MET filter for 2018 (from : https://twiki.cern.ch/twiki/bin/viewauth/CMS/MissingETOptionalFiltersRun2#How_to_run_ecal_BadCalibReducedM)
-process.load('RecoMET.METFilters.ecalBadCalibFilter_cfi')
-baddetEcallist = cms.vuint32(
-                             [872439604,872422825,872420274,872423218,
-                              872423215,872416066,872435036,872439336,
-                              872420273,872436907,872420147,872439731,
-                              872436657,872420397,872439732,872439339,
-                              872439603,872422436,872439861,872437051,
-                              872437052,872420649,872422436,872421950,
-                              872437185,872422564,872421566,872421695,
-                              872421955,872421567,872437184,872421951,
-                              872421694,872437056,872437057,872437313])
-
-process.ecalBadCalibReducedMINIAODFilter = cms.EDFilter(
-                                                        "EcalBadCalibFilter",
-                                                        EcalRecHitSource = cms.InputTag("reducedEgamma:reducedEERecHits"),
-                                                        ecalMinEt        = cms.double(50.),
-                                                        baddetEcal    = baddetEcallist, 
-                                                        taggingMode = cms.bool(True),
-                                                        debug = cms.bool(False)
-                                                        )
-
-### END MET ===========================================================================================
-
-### Electron ID, scale and smearing =======================================================================
-# from https://twiki.cern.ch/twiki/bin/view/CMS/EgammaMiniAODV2#2017_MiniAOD_V2%20#https://twiki.cern.ch/twiki/bin/view/CMS/EgammaPostRecoR
+### Electron scale and smearing =======================================================================
 from RecoEgamma.EgammaTools.EgammaPostRecoTools import setupEgammaPostRecoSeq
 setupEgammaPostRecoSeq(process,
-                       era='2018-Prompt')
+                       applyEnergyCorrections=False,
+                       applyVIDOnCorrectedEgamma=False,
+                       isMiniAOD=True,
+                       era='2017-Nov17ReReco')
+### END Electron scale and smearing ====================================================================
+
+# Electron ID ==========================================================================================
+
+from PhysicsTools.SelectorUtils.tools.vid_id_tools import *
+# turn on VID producer, indicate data format  to be
+# DataFormat.AOD or DataFormat.MiniAOD, as appropriate 
+useAOD = False
+
+if useAOD == True :
+    dataFormat = DataFormat.AOD
+else :
+    dataFormat = DataFormat.MiniAOD
+
+switchOnVIDElectronIdProducer(process, dataFormat)
+
+# define which IDs we want to produce
+my_id_modules = ['RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_Summer16_80X_V1_cff',
+                 'RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Spring16_GeneralPurpose_V1_cff',
+                 'RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Fall17_noIso_V1_cff',#new! Fall17ID
+                 'RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Fall17_iso_V1_cff',
+                 'RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_Fall17_94X_V1_cff',
+                 'RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_Fall17_94X_V2_cff']
+
+
+#add them to the VID producer
+for idmod in my_id_modules:
+    setupAllVIDIdsInModule(process,idmod,setupVIDElectronSelection)
+
+### END Electron ID ====================================================================================
 
 # Tau ID ===============================================================================================
-# https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePFTauID#Running_of_the_DNN_based_tau_ID
+from DesyTauAnalyses.NTupleMaker.runTauIdMVA import *
 
-updatedTauName = "NewTauIDsEmbedded" #name of pat::Tau collection with new tau-Ids
-import RecoTauTag.RecoTau.tools.runTauIdMVA as tauIdConfig
-tauIdEmbedder = tauIdConfig.TauIDEmbedder(process, cms, debug = False,
-                                          updatedTauName = updatedTauName,
-                                          toKeep = [ "2017v1", "2017v2", "newDM2017v2", "dR0p32017v2", "2016v1", "newDM2016v1", "deepTau2017v2" ]
-                                          )
+na = TauIDEmbedder(process, cms, # pass tour process object
+    debug=True,
+    toKeep = ["2017v1", "2017v2", "newDM2017v2", "dR0p32017v2", "2016v1", "newDM2016v1", "deepTau2017v1", "DPFTau_2016_v0","DPFTau_2016_v1"]
+)
 
-tauIdEmbedder.runTauID()
+na.runTauID()
+
+tauSrc = cms.InputTag('NewTauIDsEmbedded')
+
 # END Tau ID ===========================================================================================
 
+# NTuple Maker =======================================================================
 
-# Vertex Refitting ===============================================================================================
+process.initroottree = cms.EDAnalyzer("InitAnalyzer",
+IsData = cms.untracked.bool(isData),
+#IsData = cms.untracked.bool(False),
+GenParticles = cms.untracked.bool(not isData),
+GenJets = cms.untracked.bool(not isData)
+)
 
 #load vertex refitting excluding tau tracks
 process.load('VertexRefit.TauRefit.AdvancedRefitVertexProducer_cfi')
@@ -147,39 +176,6 @@ process.AdvancedRefitVertexNoBSProducer.srcLeptons = cms.VInputTag(cms.InputTag(
 process.AdvancedRefitVertexBSProducer.srcTaus = cms.InputTag("NewTauIDsEmbedded")
 process.AdvancedRefitVertexBSProducer.srcLeptons = cms.VInputTag(cms.InputTag("slimmedElectrons"), cms.InputTag("slimmedMuons"), cms.InputTag("NewTauIDsEmbedded"))
 process.load('VertexRefit.TauRefit.MiniAODRefitVertexProducer_cfi')
-# END Vertex Refitting ===========================================================================================
-
-# HTXS ========================================================================================================
-if not isData and isHiggsSignal:
-    process.load("SimGeneral.HepPDTESSource.pythiapdt_cfi")
-    process.mergedGenParticles = cms.EDProducer("MergedGenParticleProducer",
-                                                inputPruned = cms.InputTag("prunedGenParticles"),
-                                                inputPacked = cms.InputTag("packedGenParticles"),
-                                                )
-    process.myGenerator = cms.EDProducer("GenParticles2HepMCConverter",
-                                         genParticles = cms.InputTag("mergedGenParticles"),
-                                         genEventInfo = cms.InputTag("generator"),
-                                         signalParticlePdgIds = cms.vint32(25),
-                                         )
-    process.rivetProducerHTXS = cms.EDProducer('HTXSRivetProducer',
-                                               HepMCCollection = cms.InputTag('myGenerator','unsmeared'),
-                                               LHERunInfo = cms.InputTag('externalLHEProducer'),
-                                               ProductionMode = cms.string('AUTO'),
-                                               )
-    process.htxsSequence = cms.Sequence(  process.mergedGenParticles * process.myGenerator * process.rivetProducerHTXS )
-else :
-    process.htxsSequence = cms.Sequence( )
-# END HTXS ====================================================================================================
-
-
-# NTuple Maker =========================================================================================
-
-process.initroottree = cms.EDAnalyzer("InitAnalyzer",
-IsData = cms.untracked.bool(isData),
-#IsData = cms.untracked.bool(False),
-GenParticles = cms.untracked.bool(not isData),
-GenJets = cms.untracked.bool(not isData)
-)
 
 process.makeroottree = cms.EDAnalyzer("NTupleMaker",
 # data, year, period, skim
@@ -191,12 +187,12 @@ Skim = cms.untracked.uint32(0),
 # switches of collections
 GenParticles = cms.untracked.bool(not isData),
 GenJets = cms.untracked.bool(not isData),
-SusyInfo = cms.untracked.bool(False),
+SusyInfo = cms.untracked.bool(True),
 Trigger = cms.untracked.bool(True),
 RecPrimVertex = cms.untracked.bool(True),
 RecPrimVertexWithBS = cms.untracked.bool(True),
 RefittedVertex = cms.untracked.bool(False),
-RefittedVertexWithBS = cms.untracked.bool(False),
+RefittedVertexWithBS = cms.untracked.bool(True),
 RecBeamSpot = cms.untracked.bool(True),
 RecTrack = cms.untracked.bool(True),
 RecPFMet = cms.untracked.bool(True),
@@ -209,19 +205,48 @@ RecElectron = cms.untracked.bool(True),
 RecTau = cms.untracked.bool(True),
 L1Objects = cms.untracked.bool(True),
 RecJet = cms.untracked.bool(True),
-RecHTXS = cms.untracked.bool(isHiggsSignal),
 # collections
 MuonCollectionTag = cms.InputTag("slimmedMuons"), 
 ElectronCollectionTag = cms.InputTag("slimmedElectrons"),
 applyElectronESShift = cms.untracked.bool(True),
+#######new in 9.4.0
+eleMvanoIsoWP90Fall17Map = cms.InputTag("egmGsfElectronIDs:mvaEleID-Fall17-noIso-V1-wp90"),
+eleMvanoIsoWP80Fall17Map = cms.InputTag("egmGsfElectronIDs:mvaEleID-Fall17-noIso-V1-wp80"),
+eleMvanoIsoWPLooseFall17Map = cms.InputTag("egmGsfElectronIDs:mvaEleID-Fall17-noIso-V1-wpLoose"),
+eleMvaIsoWP90Fall17Map = cms.InputTag("egmGsfElectronIDs:mvaEleID-Fall17-iso-V1-wp90"),
+eleMvaIsoWP80Fall17Map = cms.InputTag("egmGsfElectronIDs:mvaEleID-Fall17-iso-V1-wp80"),
+eleMvaIsoWPLooseFall17Map = cms.InputTag("egmGsfElectronIDs:mvaEleID-Fall17-iso-V1-wpLoose"),
+mvaValuesIsoFall17Map = cms.InputTag("electronMVAValueMapProducer:ElectronMVAEstimatorRun2Fall17IsoV1Values"),
+mvaValuesnoIsoFall17Map = cms.InputTag("electronMVAValueMapProducer:ElectronMVAEstimatorRun2Fall17NoIsoV1Values"),
+eleVetoIdFall17Map = cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-Fall17-94X-V1-veto"),
+eleLooseIdFall17Map = cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-Fall17-94X-V1-loose"),
+eleMediumIdFall17Map = cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-Fall17-94X-V1-medium"),
+eleTightIdFall17Map = cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-Fall17-94X-V1-tight"),
+eleVetoIdFall17V2Map = cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-Fall17-94X-V2-veto"),
+eleLooseIdFall17V2Map = cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-Fall17-94X-V2-loose"),
+eleMediumIdFall17V2Map = cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-Fall17-94X-V2-medium"),
+eleTightIdFall17V2Map = cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-Fall17-94X-V2-tight"),
+#######new in 8.0.25
+eleMvaWP90GeneralMap = cms.InputTag("egmGsfElectronIDs:mvaEleID-Spring16-GeneralPurpose-V1-wp90"),
+eleMvaWP80GeneralMap = cms.InputTag("egmGsfElectronIDs:mvaEleID-Spring16-GeneralPurpose-V1-wp80"),
+mvaValuesMapSpring16     = cms.InputTag("electronMVAValueMapProducer:ElectronMVAEstimatorRun2Spring16GeneralPurposeV1Values"),
+mvaCategoriesMapSpring16 = cms.InputTag("electronMVAValueMapProducer:ElectronMVAEstimatorRun2Spring16GeneralPurposeV1Categories"),
+eleVetoIdSummer16Map = cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-Summer16-80X-V1-veto"),
+eleLooseIdSummer16Map = cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-Summer16-80X-V1-loose"),
+eleMediumIdSummer16Map = cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-Summer16-80X-V1-medium"),
+eleTightIdSummer16Map = cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-Summer16-80X-V1-tight"),
+###############
 TauCollectionTag = cms.InputTag("NewTauIDsEmbedded"),
 L1MuonCollectionTag = cms.InputTag("gmtStage2Digis:Muon"),
 L1EGammaCollectionTag = cms.InputTag("caloStage2Digis:EGamma"),
 L1TauCollectionTag = cms.InputTag("caloStage2Digis:Tau"),
 L1JetCollectionTag = cms.InputTag("caloStage2Digis:Jet"),
 #JetCollectionTag = cms.InputTag("slimmedJets"),
-JetCollectionTag = cms.InputTag("updatedPatJetsUpdatedJEC::TreeProducer"),
+JetCollectionTag = cms.InputTag("patJetsReapplyJEC::TreeProducer"),
 MetCollectionTag = cms.InputTag("slimmedMETs::@skipCurrentProcess"),
+#MetCorrCollectionTag = cms.InputTag("slimmedMETs::@skipCurrentProcess"),
+#PuppiMetCollectionTag = cms.InputTag("slimmedMETsPuppi::@skipCurrentProcess"),
+#MetCollectionTag = cms.InputTag("slimmedMETs::TreeProducer"),
 MetCorrCollectionTag = cms.InputTag("slimmedMETsModifiedMET::TreeProducer"),
 PuppiMetCollectionTag = cms.InputTag("slimmedMETsPuppi::TreeProducer"),
 MvaMetCollectionsTag = cms.VInputTag(cms.InputTag("MVAMET","MVAMET","TreeProducer")),
@@ -233,11 +258,10 @@ BeamSpotCollectionTag =  cms.InputTag("offlineBeamSpot"),
 PVCollectionTag = cms.InputTag("offlineSlimmedPrimaryVertices"),
 PVwithBSCollectionTag =  cms.InputTag("MiniAODRefitVertexBSProducer"),
 RefittedPVCollectionTag =  cms.InputTag("AdvancedRefitVertexNoBSProducer"),
-RefittedwithBSPVCollectionTag =  cms.InputTag("AdvancedRefitVertexBSProducer"),
+RefittedwithBSPVCollectionTag =  cms.InputTag("AdvancedRefitVertexBSProducer"),				      
 LHEEventProductTag = cms.InputTag("externalLHEProducer"),
 SusyMotherMassTag = cms.InputTag("susyInfo","SusyMotherMass"),
 SusyLSPMassTag = cms.InputTag("susyInfo","SusyLSPMass"),
-htxsInfo = cms.InputTag("rivetProducerHTXS", "HiggsClassification"),
 # trigger info
 HLTriggerPaths = cms.untracked.vstring(
 #SingleMuon
@@ -248,7 +272,7 @@ HLTriggerPaths = cms.untracked.vstring(
 'HLT_IsoMu30_v',
 'HLT_Mu50_v',
 # Muon-Tau triggers
-#'HLT_IsoMu20_eta2p1_LooseChargedIsoPFTau27_eta2p1_CrossL1_v',
+'HLT_IsoMu20_eta2p1_LooseChargedIsoPFTau27_eta2p1_CrossL1_v',
 'HLT_IsoMu24_eta2p1_LooseChargedIsoPFTau20_SingleL1_v',
 # SingleElectron
 'HLT_Ele27_WPTight_Gsf_v',
@@ -355,9 +379,9 @@ RecMuonHLTriggerMatching = cms.untracked.vstring(
 'HLT_IsoMu27_v.*:hltL3crIsoL1sMu22Or25L1f0L2f10QL3f27QL3trkIsoFiltered0p07',
 'HLT_IsoMu30_v.*:hltL3crIsoL1sMu22Or25L1f0L2f10QL3f30QL3trkIsoFiltered0p07',
 'HLT_Mu50_v.*:hltL3fL1sMu22Or25L1f0L2f10QL3Filtered50Q',
-#'HLT_IsoMu20_eta2p1_LooseChargedIsoPFTau27_eta2p1_CrossL1_v.*:hltL1sMu18erTau24erIorMu20erTau24er',
-#'HLT_IsoMu20_eta2p1_LooseChargedIsoPFTau27_eta2p1_CrossL1_v.*:hltL3crIsoL1sMu18erTau24erIorMu20erTau24erL1f0L2f10QL3f20QL3trkIsoFiltered0p07',
-#'HLT_IsoMu20_eta2p1_LooseChargedIsoPFTau27_eta2p1_CrossL1_v.*:hltOverlapFilterIsoMu20LooseChargedIsoPFTau27L1Seeded',
+'HLT_IsoMu20_eta2p1_LooseChargedIsoPFTau27_eta2p1_CrossL1_v.*:hltL1sMu18erTau24erIorMu20erTau24er',
+'HLT_IsoMu20_eta2p1_LooseChargedIsoPFTau27_eta2p1_CrossL1_v.*:hltL3crIsoL1sMu18erTau24erIorMu20erTau24erL1f0L2f10QL3f20QL3trkIsoFiltered0p07',
+'HLT_IsoMu20_eta2p1_LooseChargedIsoPFTau27_eta2p1_CrossL1_v.*:hltOverlapFilterIsoMu20LooseChargedIsoPFTau27L1Seeded',
 'HLT_IsoMu24_eta2p1_LooseChargedIsoPFTau20_SingleL1_v.*:hltL1sSingleMu22er',
 'HLT_IsoMu24_eta2p1_LooseChargedIsoPFTau20_SingleL1_v.*:hltL3crIsoL1sSingleMu22erL1f0L2f10QL3f24QL3trkIsoFiltered0p07',
 'HLT_IsoMu24_eta2p1_LooseChargedIsoPFTau20_SingleL1_v.*:hltOverlapFilterIsoMu24LooseChargedIsoPFTau20',
@@ -367,7 +391,7 @@ RecMuonHLTriggerMatching = cms.untracked.vstring(
 'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v.*:hltMu23TrkIsoVVLEle12CaloIdLTrackIdLIsoVLDZFilter',
 'HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v.*:hltMu12TrkIsoVVLEle23CaloIdLTrackIdLIsoVLMuonlegL3IsoFiltered12',
 'HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v.*:hltMu12TrkIsoVVLEle23CaloIdLTrackIdLIsoVLDZFilter',
-'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v.*:hltMu8TrkIsoVVLEle23CaloIdLTrackIdLIsoVLMuonlegL3IsoFiltered8,hltL3fL1sMu7EG23f0Filtered8',
+'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v.*:hltMu8TrkIsoVVLEle23CaloIdLTrackIdLIsoVLMuonlegL3IsoFiltered8',
 'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v.*:hltMu8TrkIsoVVLEle23CaloIdLTrackIdLIsoVLDZFilter',
 'HLT_Mu18_Mu9_SameSign_DZ_v.*:hltL1sDoubleMu125to157',
 'HLT_Mu18_Mu9_SameSign_DZ_v.*:hltL3fL1DoubleMu157fFiltered9',
@@ -409,7 +433,7 @@ RecElectronHLTriggerMatching = cms.untracked.vstring(
 'HLT_Ele32_WPTight_Gsf_v.*:hltEle32WPTightGsfTrackIsoFilter',
 'HLT_Ele35_WPTight_Gsf_v.*:hltEle35noerWPTightGsfTrackIsoFilter',
 'HLT_Ele38_WPTight_Gsf_v.*:hltEle38noerWPTightGsfTrackIsoFilter',
-'HLT_Ele24_eta2p1_WPTight_Gsf_LooseChargedIsoPFTau30_eta2p1_CrossL1_v.*:hltL1sBigORLooseIsoEGXXerIsoTauYYerdRMin0p3,hltL1sIsoEG22erIsoTau26erdEtaMin0p2',
+'HLT_Ele24_eta2p1_WPTight_Gsf_LooseChargedIsoPFTau30_eta2p1_CrossL1_v.*:hltL1sBigORLooseIsoEGXXerIsoTauYYerdRMin0p3',
 'HLT_Ele24_eta2p1_WPTight_Gsf_LooseChargedIsoPFTau30_eta2p1_CrossL1_v.*:hltEle24erWPTightGsfTrackIsoFilterForTau',
 'HLT_Ele24_eta2p1_WPTight_Gsf_LooseChargedIsoPFTau30_eta2p1_CrossL1_v.*:hltOverlapFilterIsoEle24WPTightGsfLooseIsoPFTau30',
 'HLT_DoubleEle24_eta2p1_WPTight_Gsf_v.*:hltDoubleEle24erWPTightGsfTrackIsoFilterForTau',
@@ -425,12 +449,12 @@ RecElectronNum = cms.untracked.int32(0),
 RecTauPtMin = cms.untracked.double(15),
 RecTauEtaMax = cms.untracked.double(2.5),
 RecTauHLTriggerMatching = cms.untracked.vstring(
-#'HLT_IsoMu20_eta2p1_LooseChargedIsoPFTau27_eta2p1_CrossL1_v.*:hltL1sMu18erTau24erIorMu20erTau24er',
-#'HLT_IsoMu20_eta2p1_LooseChargedIsoPFTau27_eta2p1_CrossL1_v.*:hltPFTau27TrackLooseChargedIsoAgainstMuon',
-#'HLT_IsoMu20_eta2p1_LooseChargedIsoPFTau27_eta2p1_CrossL1_v.*:hltOverlapFilterIsoMu20LooseChargedIsoPFTau27L1Seeded',
+'HLT_IsoMu20_eta2p1_LooseChargedIsoPFTau27_eta2p1_CrossL1_v.*:hltL1sMu18erTau24erIorMu20erTau24er',
+'HLT_IsoMu20_eta2p1_LooseChargedIsoPFTau27_eta2p1_CrossL1_v.*:hltPFTau27TrackLooseChargedIsoAgainstMuon',
+'HLT_IsoMu20_eta2p1_LooseChargedIsoPFTau27_eta2p1_CrossL1_v.*:hltOverlapFilterIsoMu20LooseChargedIsoPFTau27L1Seeded',
 'HLT_IsoMu24_eta2p1_LooseChargedIsoPFTau20_SingleL1_v.*:hltPFTau20TrackLooseChargedIsoAgainstMuon',
 'HLT_IsoMu24_eta2p1_LooseChargedIsoPFTau20_SingleL1_v.*:hltOverlapFilterIsoMu24LooseChargedIsoPFTau20',
-'HLT_Ele24_eta2p1_WPTight_Gsf_LooseChargedIsoPFTau30_eta2p1_CrossL1_v.*:hltL1sBigORLooseIsoEGXXerIsoTauYYerdRMin0p3,hltL1sIsoEG22erIsoTau26erdEtaMin0p2',
+'HLT_Ele24_eta2p1_WPTight_Gsf_LooseChargedIsoPFTau30_eta2p1_CrossL1_v.*:hltL1sBigORLooseIsoEGXXerIsoTauYYerdRMin0p3',
 'HLT_Ele24_eta2p1_WPTight_Gsf_LooseChargedIsoPFTau30_eta2p1_CrossL1_v.*:hltPFTau30TrackLooseChargedIso',
 'HLT_Ele24_eta2p1_WPTight_Gsf_LooseChargedIsoPFTau30_eta2p1_CrossL1_v.*:hltOverlapFilterIsoEle24WPTightGsfLooseIsoPFTau30',
 'HLT_DoubleTightChargedIsoPFTau35_Trk1_TightID_eta2p1_Reg_v.*:hltDoublePFTau35TrackPt1TightChargedIsolationAndTightOOSCPhotonsDz02Reg',
@@ -467,17 +491,10 @@ RecJetHLTriggerMatching = cms.untracked.vstring(
 'HLT_DiPFJetAve400_v.*:hltDiPFJetAve400',
 'HLT_DiPFJetAve500_v.*:hltDiPFJetAve500'
 ),
-#from https://twiki.cern.ch/twiki/bin/view/CMS/DeepJet
 RecJetBtagDiscriminators = cms.untracked.vstring(
 'pfCombinedInclusiveSecondaryVertexV2BJetTags',
 'pfDeepCSVJetTags:probb',
-'pfDeepCSVJetTags:probbb',
-'pfDeepFlavourJetTags:probb',
-'pfDeepFlavourJetTags:probbb',
-'pfDeepFlavourJetTags:problepb',
-'pfDeepFlavourJetTags:probc',
-'pfDeepFlavourJetTags:probuds',
-'pfDeepFlavourJetTags:probg'
+'pfDeepCSVJetTags:probbb'
 ),
 RecJetNum = cms.untracked.int32(0),
 SampleName = cms.untracked.string("Data") 
@@ -485,29 +502,38 @@ SampleName = cms.untracked.string("Data")
 #process.patJets.addBTagInfo = cms.bool(True)
 
 process.p = cms.Path(
-  process.initroottree *
-  process.jecSequence *  # New JECs
-  process.egmPhotonIDSequence * # Puppi MET
-  process.puppiMETSequence *  # Puppi MET
-  process.fullPatMetSequencePuppi *  # Re-correcting Puppi MET
-  process.fullPatMetSequenceModifiedMET *  # Re-correcting PFMET
-  process.ecalBadCalibReducedMINIAODFilter *  # MET filter 2018
-  process.egammaPostRecoSeq *               # electron energy corrections and Ids
-  process.rerunMvaIsolationSequence *  # Tau IDs
-  getattr(process,updatedTauName) *  # Tau IDs
-  #process.AdvancedRefitVertexNoBS * # Vertex refit w/o BS
-  #process.AdvancedRefitVertexBS * # Vertex refit w/ BS
-  process.MiniAODRefitVertexBS* # PV with BS constraint
-  process.htxsSequence * # HTXS
+  process.initroottree*
+#  process.BadChargedCandidateFilter *
+#  process.BadPFMuonFilter *
+#  process.BadGlobalMuonFilter *
+#  process.pileupJetIdUpdated * 
+#  process.rerunMvaIsolationSequence*
+
+  process.patJetCorrFactorsReapplyJEC * process.patJetsReapplyJEC *
+#  process.egmPhotonIDSequence *
+  process.puppiMETSequence *
+  process.fullPatMetSequencePuppi *
+  process.fullPatMetSequenceModifiedMET *
+  process.egmGsfElectronIDSequence * 
+  process.rerunMvaIsolationSequence *      # add new tau ids
+  process.NewTauIDsEmbedded *              # add new tau ids
+  #process.rerunMvaIsolation2SeqRun2 *
+  #process.mvaMetSequence *
+  #process.HBHENoiseFilterResultProducer* #produces HBHE bools baseline
+  #process.ApplyBaselineHBHENoiseFilter*  #reject events based 
+  #process.ApplyBaselineHBHEISONoiseFilter*  #reject events based -- disable the module, performance is being investigated
+  process.AdvancedRefitVertexNoBS *
+  process.AdvancedRefitVertexBS *	
+  process.MiniAODRefitVertexBS*
   process.makeroottree
 )
 
 process.TFileService = cms.Service("TFileService",
-                                   fileName = cms.string("output_DATA.root")
+                                   fileName = cms.string("output_MC.root")
                                  )
 
 process.output = cms.OutputModule("PoolOutputModule",
-                                  fileName = cms.untracked.string('output_particles_DATA.root'),
+                                  fileName = cms.untracked.string('output_particles_MC.root'),
                                   outputCommands = cms.untracked.vstring(
                                     'keep *_*_bad_TreeProducer'#,
                                     #'drop patJets*_*_*_*'
@@ -518,3 +544,74 @@ process.output = cms.OutputModule("PoolOutputModule",
                                   SelectEvents = cms.untracked.PSet(  SelectEvents = cms.vstring('p'))
 )
 
+#process.end = cms.EndPath(process.output)
+
+#processDumpFile = open('MyRootMaker.dump', 'w')
+#print >> processDumpFile, process.dumpPython()
+
+def miniAOD_customizeMETFiltersFastSim(process):
+    """Replace some MET filters that don't work in FastSim with trivial bools"""
+    for X in 'CSCTightHaloFilter', 'CSCTightHaloTrkMuUnvetoFilter','CSCTightHalo2015Filter','globalTightHalo2016Filter','globalSuperTightHalo2016Filter','HcalStripHaloFilter':
+        process.globalReplace(X, cms.EDFilter("HLTBool", result=cms.bool(True)))    
+    for X in 'manystripclus53X', 'toomanystripclus53X', 'logErrorTooManyClusters':
+        process.globalReplace(X, cms.EDFilter("HLTBool", result=cms.bool(False)))
+    return process
+
+
+
+def customise_for_gc(process):
+	import FWCore.ParameterSet.Config as cms
+	from IOMC.RandomEngine.RandomServiceHelper import RandomNumberServiceHelper
+
+	try:
+		maxevents = __MAX_EVENTS__
+		process.maxEvents = cms.untracked.PSet(
+			input = cms.untracked.int32(max(-1, maxevents))
+		)
+	except:
+		pass
+
+	# Dataset related setup
+	try:
+		primaryFiles = [__FILE_NAMES__]
+		process.source = cms.Source('PoolSource',
+			skipEvents = cms.untracked.uint32(__SKIP_EVENTS__),
+			fileNames = cms.untracked.vstring(primaryFiles)
+		)
+		try:
+			secondaryFiles = [__FILE_NAMES2__]
+			process.source.secondaryFileNames = cms.untracked.vstring(secondaryFiles)
+		except:
+			pass
+		try:
+			lumirange = [__LUMI_RANGE__]
+			if len(lumirange) > 0:
+				process.source.lumisToProcess = cms.untracked.VLuminosityBlockRange(lumirange)
+				process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(-1))
+		except:
+			pass
+	except:
+		pass
+
+	if hasattr(process, 'RandomNumberGeneratorService'):
+		randSvc = RandomNumberServiceHelper(process.RandomNumberGeneratorService)
+		randSvc.populate()
+
+	process.AdaptorConfig = cms.Service('AdaptorConfig',
+		enable = cms.untracked.bool(True),
+		stats = cms.untracked.bool(True),
+	)
+
+	# Generator related setup
+	try:
+		if hasattr(process, 'generator') and process.source.type_() != 'PoolSource':
+			process.source.firstLuminosityBlock = cms.untracked.uint32(1 + __MY_JOBID__)
+			print 'Generator random seed:', process.RandomNumberGeneratorService.generator.initialSeed
+	except:
+		pass
+
+	return (process)
+
+process = customise_for_gc(process)
+
+# grid-control: https://ekptrac.physik.uni-karlsruhe.de/trac/grid-control

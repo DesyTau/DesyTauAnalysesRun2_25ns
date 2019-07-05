@@ -67,15 +67,29 @@
 #define pionMass 		   0.1396
 
 
-
 void FillMuTau(const AC1B * analysisTree, Synch17Tree *otree, int leptonIndex, float dRiso);
 void FillETau(const AC1B * analysisTree, Synch17Tree *otree, int leptonIndex, float dRiso);
 void FillTau(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex);
 void FillTau_leading(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex);
 void initializeCPvar(Synch17Tree *otree);
+void SaveRECOVertices(const AC1B * analysisTree,Synch17Tree *otree, const bool isData);
 void initializeGenTree(Synch17GenTree *gentree);
 void FillGenTree(const AC1B * analysisTree, Synch17GenTree *gentree, TString ch);
 //void fillTTbarUncWeights(const AC1B * analysisTree, Synch17Tree *otree, bool isData, bool includeTTbarUncWeights);
+
+
+/*Notifications Merijn
+-to my experience currently macro only works for mu-tau (unless udpated in the meantime)
+-added a histogram and leafs in the otree to keep track of the pdg codes of the hadronically decaying tau, and ctr to keep track how often 2nd tau does NOT decay hadronically
+-we call an improved CP function, in which a number of bugs are solved. It takes the decay mode also as argument, to construct certain kinematic variables
+-Merijn suspects that second reco tau in mu-tau is currently not necessarily hadronically decaying, since RECO decay products substatial fraction 
+-see functionsCP.h for updates on the CP calculation
+*/
+
+
+//Merijn added a histogram to spot the pdg codes of the decaying hadronic tau
+TH1F* ConstitsPDG=new TH1F("ConstitsPDG","ConstitsPDG",500,-250,250);
+int nonpionphotonctr=0;
 
 int main(int argc, char * argv[]){
 
@@ -210,6 +224,7 @@ int main(int argc, char * argv[]){
 
   const struct btag_scaling_inputs inputs_btag_scaling_medium = { reader_B, reader_C, reader_Light, tagEff_B, tagEff_C, tagEff_Light, rand };
 
+
   // MET Recoil Corrections
   const bool applyRecoilCorrections = cfg.get<bool>("ApplyRecoilCorrections");
   const bool isDY = infiles.find("DY") == infiles.rfind("/")+1;
@@ -227,7 +242,7 @@ int main(int argc, char * argv[]){
   if(!isData && applyRecoilCorrections && (isDY || isWJets || isVBForGGHiggs || isMSSMsignal) ){
     TString RecoilDir("HTT-utilities/RecoilCorrections/data/");
     
-    TString RecoilFileName = RecoilDir; RecoilFileName += "TypeI-PFMet_Run2016BtoH.root";
+    TString RecoilFileName = RecoilDir; RecoilFileName += "TypeI-PFMet_Run2017.root";
     std::cout<<RecoilFileName<<std::endl;
     recoilPFMetCorrector = new RecoilCorrector( RecoilFileName);
         
@@ -311,6 +326,10 @@ int main(int argc, char * argv[]){
   const float etaLeptonCut     = cfg.get<float>("eta"+lep+"Cut");
   const float dxyLeptonCut     = cfg.get<float>("dxy"+lep+"Cut");
   const float dzLeptonCut      = cfg.get<float>("dz"+lep+"Cut");
+
+  cout<<"dxyLeptonCut "<<dxyLeptonCut<<endl;
+  cout<<"dzLeptonCut "<<dzLeptonCut<<endl;
+  cout<<"dzTauCut "<<dzTauCut<<endl;
 
   const bool  applyLeptonId    = cfg.get<bool>("Apply"+lep+"Id");
 
@@ -407,7 +426,6 @@ int main(int argc, char * argv[]){
     std::cout<<fileList[iF]<<std::endl;
   }
 
-  
   TString rootFileName(sample);
   std::string ntupleName("makeroottree/AC1B");
 
@@ -477,7 +495,7 @@ int main(int argc, char * argv[]){
   rootFileName += "_";
   rootFileName += ifile;
   rootFileName += "_" + ch + "_Sync.root";
-
+    
   std::cout <<rootFileName <<std::endl;  
 
   TFile * file = new TFile( rootFileName ,"recreate");
@@ -487,11 +505,21 @@ int main(int argc, char * argv[]){
   TH1D * nWeightedEventsH = new TH1D("nWeightedEvents", "", 1, -0.5,0.5);
   
   TTree * tree = new TTree("TauCheck","TauCheck");
+  // TTree * testtree = new TTree("TauChecktest","TauChecktest");
   TTree * gtree = new TTree("GenTauCheck","GenTauCheck");
+
+  //Merijn added a histogram to spot the pdg codes of the decaying hadronic tau
+  TH1F* ConstitsPDG=new TH1F("ConstitsPDG","ConstitsPDG",500,-250,250);
+  int nonpionphotonctr=0;
 
   Synch17Tree *otree = new Synch17Tree(tree);
   initializeCPvar(otree);
+  
+  //Synch17GenTree *gentree = new Synch17GenTree(gtree);
+  
   Synch17GenTree *gentree = new Synch17GenTree(gtree);
+  Synch17GenTree *gentreeForGoodRecoEvtsOnly = new Synch17GenTree(tree);
+    
 
   int nTotalFiles = 0;
 
@@ -567,7 +595,7 @@ int main(int argc, char * argv[]){
     }
     
   }
-  
+
   // list of met filters
   std::vector<TString> met_filters_list ;
   met_filters_list.push_back("Flag_HBHENoiseFilter");
@@ -579,7 +607,6 @@ int main(int argc, char * argv[]){
   met_filters_list.push_back("Flag_BadPFMuonFilter");
   met_filters_list.push_back("Flag_BadChargedCandidateFilter");
 
-
   int counter[20];
 
   ///////////////FILE LOOP///////////////
@@ -590,11 +617,11 @@ int main(int argc, char * argv[]){
     
     TTree * _tree = NULL;
     _tree = (TTree*)file_->Get(TString(ntupleName));
-  
+        
     if (_tree==NULL) continue;
     
     TH1D * histoInputEvents = NULL;
-   
+
     histoInputEvents = (TH1D*)file_->Get("makeroottree/nEvents");
     
     if (histoInputEvents==NULL) continue;
@@ -608,19 +635,20 @@ int main(int argc, char * argv[]){
 
     AC1B analysisTree(_tree, isData);
 
-    // set AC1B for JES systematics
+    // set AC1B for JES systematicsf_
     if (!isData && ApplySystShift && jetEnergyScaleSys.size() >0){
       for (unsigned int i=0; i<jetEnergyScaleSys.size(); i++)
 	(jetEnergyScaleSys.at(i))->SetAC1B(&analysisTree);
     }
-    
+
     Long64_t numberOfEntries = analysisTree.GetEntries();
     
     std::cout << "      number of entries in Tree = " << numberOfEntries << std::endl;
     ///////////////EVENT LOOP///////////////
-    
 
-    for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) {       
+//for (Long64_t iEntry=0; iEntry<150; iEntry++) {
+for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) {
+  // cout<<"iEntry "<<iEntry<<endl;
       counter[0]++;
       analysisTree.GetEntry(iEntry);
       nEvents++;
@@ -632,6 +660,7 @@ int main(int argc, char * argv[]){
 	FillGenTree(&analysisTree,gentree,ch);
 	gentree->Fill();
       }
+
 
       //Skip events not passing the MET filters, if applied
       if (ApplyMetFilters && !passedAllMetFilters(&analysisTree, met_filters_list, isData)) continue;
@@ -653,6 +682,7 @@ int main(int argc, char * argv[]){
 
 	for (unsigned int i=0; i<nfilters; ++i) {
 	  TString HLTFilter(analysisTree.run_hltfilters->at(i));
+		//cout<<"HLTFilter "<< HLTFilter<<endl;
 	  for(unsigned int i_trig=0; i_trig<filterSingleLep.size(); i_trig++){
 	    if (HLTFilter==filterSingleLep.at(i_trig)){ nSingleLepTrig.at(i_trig) = i; checkFilterSingleLep.at(i_trig) = true;}
 	  }
@@ -674,8 +704,8 @@ int main(int argc, char * argv[]){
       otree->run  = analysisTree.event_run;
       otree->lumi = analysisTree.event_luminosityblock;
       otree->evt  = analysisTree.event_nr;
-	  
-
+     
+		  
       bool overlapEvent = true;
       for (unsigned int iEvent=0; iEvent<runList.size(); ++iEvent) {
       	if (runList.at(iEvent)==otree->run && eventList.at(iEvent)==otree->evt) {
@@ -692,6 +722,7 @@ int main(int argc, char * argv[]){
       	continue;
 
       initializeGenTree(gentree);
+
        // weights
       if(ApplyPUweight) fill_weight(&analysisTree, otree, PUofficial, isData);
       
@@ -956,6 +987,7 @@ int main(int argc, char * argv[]){
       otree->idisoweight_1 = 1;
       otree->idisoweight_2 = 1;
 
+
       // ********************************
       // FIXME : implement l1tau matching
       // ********************************
@@ -994,10 +1026,8 @@ int main(int argc, char * argv[]){
 	  for(unsigned int i_trig = 0; i_trig<filterDiTau.size(); i_trig++){
 	    if (nDiTauTrig.at(i_trig) == -1) continue;
 	    if (analysisTree.trigobject_filters[iT][nDiTauTrig.at(i_trig)]) isTauTrig = true;
-	  }
-	  
-	}
-	  
+	  }	  
+	}	  
       }
 	
       for(unsigned int i_trig = 0; i_trig<filterXtriggerTauLeg.size(); i_trig++)
@@ -1035,6 +1065,15 @@ int main(int argc, char * argv[]){
       double sf_trig_ditau_tau2   = 1;
       // reset efficiency weights
 
+     //all criterua passed, we fill vertices here;	
+     SaveRECOVertices(&analysisTree,otree, isData);
+
+     //Merijn: save here all gen information for the selected RECO events, gets stored for convenience in the taucheck tree ;-). Note that no selection on gen level is applied..     
+     if (!isData){
+	//Merijn 2019 4 3:note that a separate fill is not needed. We store in the otree now, which is Filled at the bottom! Filling here will make things out of synch..
+      FillGenTree(&analysisTree,gentreeForGoodRecoEvtsOnly,ch);
+       }
+      
       if(ch=="mt") {
       	FillMuTau(&analysisTree, otree, leptonIndex, dRiso);
       	
@@ -1078,6 +1117,7 @@ int main(int argc, char * argv[]){
 			 analysisTree.tau_pz[leptonIndex],
 			 tauMass);
       }
+
       
       if (!isData && ApplyLepSF) {
 	//std::cout<< iEntry <<std::endl;
@@ -1136,7 +1176,7 @@ int main(int argc, char * argv[]){
 
 	  double eff_data_trig = eff_data_trig_L + (eff_data_trig_lt_l-eff_data_trig_L)*eff_data_trig_lt_tau;
 	  double eff_mc_trig = eff_mc_trig_L + (eff_mc_trig_lt_l-eff_mc_trig_L)*eff_mc_trig_lt_tau;
-
+	      		
 	  if (eff_data_trig>1e-4&&eff_mc_trig>1e-4)
 	    otree->trigweight = eff_data_trig/eff_mc_trig;
 
@@ -1178,10 +1218,6 @@ int main(int argc, char * argv[]){
       jets::counting_jets(&analysisTree, otree, &cfg, &inputs_btag_scaling_medium);
       //MET
       fillMET(ch, leptonIndex, tauIndex, &analysisTree, otree);
-
-      //CP calculation
-      if(ch=="tt")acott(&analysisTree,otree,tauIndex,leptonIndex);
-
      
       TLorentzVector genV( 0., 0., 0., 0.);
       TLorentzVector genL( 0., 0., 0., 0.);
@@ -1413,7 +1449,36 @@ int main(int argc, char * argv[]){
 
       if (ApplySVFit && otree->njetspt20>0) svfit_variables(ch, &analysisTree, otree, &cfg, inputFile_visPtResolution);
 
-      otree->Fill();
+
+//addition Merijn: here we select the constituent of the tau with highest pT
+ int ncomponents = analysisTree.tau_constituents_count[tauIndex];
+  float maxPt=-1;
+  int sign = -1;
+  int pdgcode=-9999;
+  if(analysisTree.tau_charge[tauIndex]>0) sign = 1; 
+  for(int i=0;i<ncomponents;i++){  
+
+if((analysisTree.tau_constituents_pdgId[tauIndex][i]*sign)>0){
+
+      TLorentzVector lvector; lvector.SetXYZT(analysisTree.tau_constituents_px[tauIndex][i],
+					      analysisTree.tau_constituents_py[tauIndex][i],
+					      analysisTree.tau_constituents_pz[tauIndex][i],
+					      analysisTree.tau_constituents_e[tauIndex][i]);
+
+      double Pt = lvector.Pt();
+      if(Pt>maxPt){
+	pdgcode=analysisTree.tau_constituents_pdgId[tauIndex][i];
+	maxPt = Pt;
+	}
+    }
+  }
+  
+ otree->pdgcodetau2=pdgcode; //Merijn tried here to assign to our tree. Not working yet so put in histogam..
+ ConstitsPDG->Fill(pdgcode);
+ if(abs(pdgcode)!=211&&abs(pdgcode)!=22) nonpionphotonctr++;
+// cout<<"nonpionphotonctr ="<<nonpionphotonctr<<endl;
+
+//  otree->Fill();
 
 	  // evaluate systematics for MC 
       if(!isData && ApplySystShift){
@@ -1430,10 +1495,32 @@ int main(int argc, char * argv[]){
       }
       counter[19]++;
 
+
+      //CP calculation. Updates Merijn: placed calculation at end, when all kinematic corrections are performed. Removed statement to only do calculation for tt. Created the acott_Impr function, which takes ch as input as well. See the funcrtion in functionsCP.h to see my updates to the function itself
+      
+      //if(ch=="tt")
+      //   acott_Impr(&analysisTree,otree,tauIndex,leptonIndex, ch);
+      //Merijn 2019 1 10 debug: a major source of problems was that indices were innertwined from the beginning...
+      //one should note that in et or mt case,
+
+      //cout<<"iEntry "<<iEntry <<endl;
+      acott_Impr(&analysisTree,otree,leptonIndex,tauIndex, ch);
+
+
       selEvents++;
       //std::cout << "*************SelEv " << selEvents << "************" << std::endl;
 
-    } // end of file processing (loop over events in one file)
+      /* old debugging code Merijn
+      if(analysisTree.tau_decayMode[tauIndex]!=otree->tau_decay_mode_2) cout<<"Massive inconsistency"<<endl;
+      if(otree->acotautau_01>0&&otree->tau_decay_mode_2!=1){
+	cout<<endl;
+	cout<<"Genuinely Bizar :analysisTree->tau_decayMode[tauIndex] "<< analysisTree.tau_decayMode[tauIndex]<<endl;
+	cout<<endl;}*/
+
+      //Merijn 2019 1 10: perhaps this should be called before moving to next event..
+      otree->Fill();
+
+ } // end of file processing (loop over events in one file)
 
     nFiles++;
     delete _tree;
@@ -1450,8 +1537,11 @@ int main(int argc, char * argv[]){
   std::cout << "Total number of selected events = " << selEvents << std::endl;
   std::cout << std::endl;
   
+  cout<<"nonpionphotonctr ="<<nonpionphotonctr<<endl;
+
   file->cd("");
   file->Write();
+ConstitsPDG->Write();
 
   // delete systematics objects
 
@@ -1511,11 +1601,8 @@ int main(int argc, char * argv[]){
 
   file->Close();
   delete file;
-    
 
 }
-
-
 
 
 ////FILLING FUNCTIONS//////
@@ -1539,8 +1626,9 @@ void FillMuTau(const AC1B * analysisTree, Synch17Tree *otree, int leptonIndex, f
   //otree->dZerr_1 = analysisTree->muon_dzerr[leptonIndex];
   
 
-  otree->tau_decay_mode_1 = -9999;
-
+  otree->tau_decay_mode_1 = -9999; 
+  // otree->tau_decay_mode_1=analysisTree->tau_decayMode[leptonIndex]; can;'t do since its a lepton not a tau index
+ 
   otree->byCombinedIsolationDeltaBetaCorrRaw3Hits_1 = -9999;
   otree->byLooseCombinedIsolationDeltaBetaCorr3Hits_1 = -9999;
   otree->byMediumCombinedIsolationDeltaBetaCorr3Hits_1 = -9999;
@@ -1582,6 +1670,7 @@ void FillETau(const AC1B * analysisTree, Synch17Tree *otree, int leptonIndex, fl
   //otree->dZerr_1 = analysisTree->electron_dzerr[leptonIndex]; 
 
   otree->tau_decay_mode_1 = -9999;
+  // otree->tau_decay_mode_1=analysisTree->tau_decayMode[leptonIndex];// can;t do since its a lepton index..
 
   otree->byCombinedIsolationDeltaBetaCorrRaw3Hits_1 = -9999;
   otree->byLooseCombinedIsolationDeltaBetaCorr3Hits_1 = -9999;
@@ -1620,6 +1709,24 @@ void FillTau_leading(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex
   otree->iso_1 = analysisTree->tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[tauIndex];
   otree->m_1 = analysisTree->tau_mass[tauIndex];
   otree->tau_decay_mode_1 = analysisTree->tau_decayMode[tauIndex];
+
+
+  otree->tau_pca2D_x_1 = analysisTree->tau_pca2D_x[tauIndex];
+  otree->tau_pca2D_y_1 = analysisTree->tau_pca2D_y[tauIndex];
+  otree->tau_pca2D_z_1 = analysisTree->tau_pca2D_z[tauIndex];
+  otree->tau_pca3D_x_1 = analysisTree->tau_pca3D_x[tauIndex];
+  otree->tau_pca3D_y_1 = analysisTree->tau_pca3D_y[tauIndex];
+  otree->tau_pca3D_z_1 = analysisTree->tau_pca3D_z[tauIndex];
+  otree->tau_SV_x_1 = analysisTree->tau_SV_x[tauIndex];
+  otree->tau_SV_y_1 = analysisTree->tau_SV_y[tauIndex];
+  otree->tau_SV_z_1 = analysisTree->tau_SV_z[tauIndex];
+  otree->tau_SV_covxx_1 = analysisTree->tau_SV_cov[tauIndex][0];
+  otree->tau_SV_covyx_1 = analysisTree->tau_SV_cov[tauIndex][1];
+  otree->tau_SV_covzx_1 = analysisTree->tau_SV_cov[tauIndex][2];
+  otree->tau_SV_covyy_1 = analysisTree->tau_SV_cov[tauIndex][3];
+  otree->tau_SV_covzy_1 = analysisTree->tau_SV_cov[tauIndex][4];
+  otree->tau_SV_covzz_1 = analysisTree->tau_SV_cov[tauIndex][5];
+
 
   otree->byCombinedIsolationDeltaBetaCorrRaw3Hits_1 = analysisTree->tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[tauIndex];
   otree->byLooseCombinedIsolationDeltaBetaCorr3Hits_1 = analysisTree->tau_byLooseCombinedIsolationDeltaBetaCorr3Hits[tauIndex];
@@ -1717,6 +1824,22 @@ void FillTau(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex){
   otree->m_2 = analysisTree->tau_mass[tauIndex];
   otree->tau_decay_mode_2 = analysisTree->tau_decayMode[tauIndex];
 
+  otree->tau_pca2D_x_2 = analysisTree->tau_pca2D_x[tauIndex];
+  otree->tau_pca2D_y_2 = analysisTree->tau_pca2D_y[tauIndex];
+  otree->tau_pca2D_z_2 = analysisTree->tau_pca2D_z[tauIndex];
+  otree->tau_pca3D_x_2 = analysisTree->tau_pca3D_x[tauIndex];
+  otree->tau_pca3D_y_2 = analysisTree->tau_pca3D_y[tauIndex];
+  otree->tau_pca3D_z_2 = analysisTree->tau_pca3D_z[tauIndex];
+  otree->tau_SV_x_2 = analysisTree->tau_SV_x[tauIndex];
+  otree->tau_SV_y_2 = analysisTree->tau_SV_y[tauIndex];
+  otree->tau_SV_z_2 = analysisTree->tau_SV_z[tauIndex];
+  otree->tau_SV_covxx_2 = analysisTree->tau_SV_cov[tauIndex][0];
+  otree->tau_SV_covyx_2 = analysisTree->tau_SV_cov[tauIndex][1];
+  otree->tau_SV_covzx_2 = analysisTree->tau_SV_cov[tauIndex][2];
+  otree->tau_SV_covyy_2 = analysisTree->tau_SV_cov[tauIndex][3];
+  otree->tau_SV_covzy_2 = analysisTree->tau_SV_cov[tauIndex][4];
+  otree->tau_SV_covzz_2 = analysisTree->tau_SV_cov[tauIndex][5];
+
   otree->byCombinedIsolationDeltaBetaCorrRaw3Hits_2 = analysisTree->tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[tauIndex];
   otree->byLooseCombinedIsolationDeltaBetaCorr3Hits_2 = analysisTree->tau_byLooseCombinedIsolationDeltaBetaCorr3Hits[tauIndex];
   otree->byMediumCombinedIsolationDeltaBetaCorr3Hits_2 = analysisTree->tau_byMediumCombinedIsolationDeltaBetaCorr3Hits[tauIndex];
@@ -1803,13 +1926,45 @@ void initializeCPvar(Synch17Tree *otree){
   otree->acotautau_01=-9999;
   otree->acotautau_10=-9999;
   otree->acotautau_11=-9999;
+  /*
+  otree->acotautau_20=-9999;
+  otree->acotautau_02=-9999;
+  otree->acotautau_21=-9999;
+  otree->acotautau_12=-9999;
+  otree->acotautau_22=-9999;
+  */
 
+  //Merijn added the angle psi, currently for debugging purpose. Later may extend to 3-prong..
+  otree->acotautauPsi_00=-9999;
+  otree->acotautauPsi_01=-9999;
+  otree->acotautauPsi_10=-9999;
+  otree->acotautauPsi_11=-9999;
+  
   otree->tau1DecayPlaneX=-9999;
   otree->tau1DecayPlaneY=-9999;
   otree->tau1DecayPlaneZ=-9999;
   otree->tau2DecayPlaneX=-9999;
   otree->tau2DecayPlaneY=-9999;
   otree->tau2DecayPlaneZ=-9999;
+
+  otree->VxConstitTau1=-9999;
+  otree->VyConstitTau1=-9999;
+  otree->VzConstitTau1=-9999;
+  
+  otree->VxConstitTau2=-9999;
+  otree->VyConstitTau2=-9999;
+  otree->VzConstitTau2=-9999;
+
+  //Merijn add initialiser for
+  otree->chconst_1_pt=-9999;
+  otree->chconst_1_eta=-9999;
+  otree->chconst_1_phi=-9999;
+  
+  otree->chconst_2_pt=-9999;
+  otree->chconst_2_eta=-9999;
+  otree->chconst_2_phi=-9999;
+  otree->alphaminus=-9999;
+
 }
 
 void initializeGenTree(Synch17GenTree *gentree){
@@ -1817,16 +1972,51 @@ void initializeGenTree(Synch17GenTree *gentree){
   gentree->Higgs_eta=-9999;
   gentree->Higgs_phi=-9999;
   gentree->Higgs_mass=-9999;
-  gentree->genpt_1=-9999;
-  gentree->geneta_1=-9999;
-  gentree->genphi_1=-9999;
-  gentree->genpt_2=-9999;
-  gentree->geneta_2=-9999;
-  gentree->genphi_2=-9999;
+  gentree->pt_1=-9999;
+  gentree->eta_1=-9999;
+  gentree->phi_1=-9999;
+  gentree->pt_2=-9999;
+  gentree->eta_2=-9999;
+  gentree->phi_2=-9999;
   gentree->acotautau_00 = -9999;
   gentree->acotautau_10 = -9999;
   gentree->acotautau_01 = -9999;
   gentree->acotautau_11 = -9999;
+  gentree->acotautau_02=-9999;
+  gentree->acotautau_20=-9999;
+  gentree->acotautau_12=-9999;
+  gentree->acotautau_21=-9999;
+  gentree->acotautau_22=-9999;
+
+   //Merijn added the angle psi, currently for debugging purpose. Later may extend to 3-prong..
+  gentree->acotautauPsi_00=-9999;
+  gentree->acotautauPsi_01=-9999;
+  gentree->acotautauPsi_10=-9999;
+  gentree->acotautauPsi_11=-9999;
+
+  //init the new vertex variables to something nonsensible also
+  gentree->VertexX=-9999;
+  gentree->VertexY=-9999;
+  gentree->VertexZ=-99999;
+
+  gentree->VxConstitTau1=-9999;
+  gentree->VyConstitTau1=-9999;
+  gentree->VzConstitTau1=-9999;
+  
+  gentree->VxConstitTau2=-9999;
+  gentree->VyConstitTau2=-9999;
+  gentree->VzConstitTau2=-9999;
+
+  //Merijn add initialiser for
+  gentree->chconst_1_pt=-9999;
+  gentree->chconst_1_eta=-9999;
+  gentree->chconst_1_phi=-9999;
+  
+  gentree->chconst_2_pt=-9999;
+  gentree->chconst_2_eta=-9999;
+  gentree->chconst_2_phi=-9999;
+  gentree->alphaminus=-9999;
+
 }
 
 void FillGenTree(const AC1B * analysisTree, Synch17GenTree *gentree, TString ch){
@@ -1863,29 +2053,29 @@ void FillGenTree(const AC1B * analysisTree, Synch17GenTree *gentree, TString ch)
 
   TLorentzVector genTauVis1; genTauVis1.SetXYZT(0,0,0,0);
   TLorentzVector genTauVis2; genTauVis2.SetXYZT(0,0,0,0);
-  gentree->genmode_1 = -1;
-  gentree->genmode_2 = -1;
+  gentree->decaymode_1 = -1;
+  gentree->decaymode_2 = -1;
   if (LeadingtauIndex>-1) {
     genTauVis1.SetXYZT(analysisTree->gentau_visible_px[LeadingtauIndex],
 		       analysisTree->gentau_visible_py[LeadingtauIndex],
 		       analysisTree->gentau_visible_pz[LeadingtauIndex],
 		       analysisTree->gentau_visible_e[LeadingtauIndex]);
-    gentree->genmode_1 = analysisTree->gentau_decayMode[LeadingtauIndex];
+    gentree->decaymode_1 = analysisTree->gentau_decayMode[LeadingtauIndex];
   }
   if (TrailingtauIndex>-1) {
     genTauVis2.SetXYZT(analysisTree->gentau_visible_px[TrailingtauIndex],
 		       analysisTree->gentau_visible_py[TrailingtauIndex],
 		       analysisTree->gentau_visible_pz[TrailingtauIndex],
 		       analysisTree->gentau_visible_e[TrailingtauIndex]);
-    gentree->genmode_2 = analysisTree->gentau_decayMode[TrailingtauIndex];
+    gentree->decaymode_2 = analysisTree->gentau_decayMode[TrailingtauIndex];
   }
-  gentree->genpt_1 = genTauVis1.Pt();
-  gentree->geneta_1 = genTauVis1.Eta();
-  gentree->genphi_1 = genTauVis1.Phi();
+  gentree->pt_1 = genTauVis1.Pt();
+  gentree->eta_1 = genTauVis1.Eta();
+  gentree->phi_1 = genTauVis1.Phi();
 
-  gentree->genpt_2 = genTauVis2.Pt();
-  gentree->geneta_2 = genTauVis2.Eta();
-  gentree->genphi_2 = genTauVis2.Phi();
+  gentree->pt_2 = genTauVis2.Pt();
+  gentree->eta_2 = genTauVis2.Eta();
+  gentree->phi_2 = genTauVis2.Phi();
 
   double dR;
   const double dRcut=0.3;
@@ -1907,12 +2097,55 @@ void FillGenTree(const AC1B * analysisTree, Synch17GenTree *gentree, TString ch)
   }
 
   
-  gentree->acotautau_00 = -9999;
-  gentree->acotautau_01 = -9999;
-  gentree->acotautau_10 = -9999;
-  gentree->acotautau_11 = -9999;
   if (LeadingtauIndex>-1&&TrailingtauIndex>-1)
     gen_acott(analysisTree,gentree,LeadingtauIndex,TrailingtauIndex);
 
+  gentree->a1polarization_1=gen_A1Polarization(analysisTree,LeadingtauIndex);
+  gentree->a1polarization_2=gen_A1Polarization(analysisTree,TrailingtauIndex);
+
+//here fill the generator vertices to have the information present in tree
+//Note: we may want to add constraint that the W and Z are prompt. If we remove these, may get in trouble with a DY or W MC sample..
+
+
+  for (unsigned int igen=0; igen<analysisTree->genparticles_count; ++igen) {
+    if ((analysisTree->genparticles_pdgid[igen]==23||analysisTree->genparticles_pdgid[igen]==24||
+	analysisTree->genparticles_pdgid[igen]==25||analysisTree->genparticles_pdgid[igen]==35||analysisTree->genparticles_pdgid[igen]==36)&&analysisTree->genparticles_isLastCopy[igen]==1&&analysisTree->genparticles_isPrompt[igen]==1) {
+      gentree->VertexX=analysisTree->genparticles_vx[igen];
+      gentree->VertexY=analysisTree->genparticles_vy[igen];
+      gentree->VertexZ=analysisTree->genparticles_vz[igen];
+      break;
+    }
+  }
+
+
+}
+
+//add a dedicated function to fill the reco vertices. It is called after the 
+void SaveRECOVertices(const AC1B * analysisTree, Synch17Tree *otree, const bool isData){
+
+  otree->RecoVertexX=analysisTree->primvertex_x;
+  otree->RecoVertexY=analysisTree->primvertex_y;
+  otree->RecoVertexZ=analysisTree->primvertex_z;
+
+
+if(!isData){
+  for (unsigned int igen=0; igen<analysisTree->genparticles_count; ++igen) {
+
+//here fill the generator vertices to have the gen information present in tree PER GOOD RECO EVENT
+//Note: we may want to add constraint that the W and Z are prompt. If we remove these, may get in trouble with a DY or W MC sample..
+
+    if ((analysisTree->genparticles_pdgid[igen]==23||analysisTree->genparticles_pdgid[igen]==24||
+	 analysisTree->genparticles_pdgid[igen]==25||analysisTree->genparticles_pdgid[igen]==35||analysisTree->genparticles_pdgid[igen]==36)&&analysisTree->genparticles_isLastCopy[igen]==1&&analysisTree->genparticles_isPrompt[igen]==1) {
+      otree->GenVertexX=analysisTree->genparticles_vx[igen];
+      otree->GenVertexY=analysisTree->genparticles_vy[igen];
+      otree->GenVertexZ=analysisTree->genparticles_vz[igen];
+      break;
+    }
+  }
+}
+else{//if it is data, fill with something recognisable nonsensible
+      otree->GenVertexX=-9999;
+      otree->GenVertexY=-9999;
+      otree->GenVertexZ=-9999;}
 
 }

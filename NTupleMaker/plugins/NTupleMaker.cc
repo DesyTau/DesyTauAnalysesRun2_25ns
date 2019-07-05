@@ -115,6 +115,9 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
   cbeamspot(iConfig.getUntrackedParameter<bool>("RecBeamSpot", false)),
   crectrack(iConfig.getUntrackedParameter<bool>("RecTrack", false)),
   crecprimvertex(iConfig.getUntrackedParameter<bool>("RecPrimVertex", false)),
+  crecprimvertexwithbs(iConfig.getUntrackedParameter<bool>("RecPrimVertexWithBS", false)),
+  crefittedvertex(iConfig.getUntrackedParameter<bool>("RefittedVertex", false)),
+  crefittedvertexwithbs(iConfig.getUntrackedParameter<bool>("RefittedVertexWithBS", false)),
   crecmuon(iConfig.getUntrackedParameter<bool>("RecMuon", false)),
   crecelectron(iConfig.getUntrackedParameter<bool>("RecElectron", false)),
   crectau(iConfig.getUntrackedParameter<bool>("RecTau", false)),
@@ -125,6 +128,7 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
   crecpfmetcorr(iConfig.getUntrackedParameter<bool>("RecPFMetCorr", false)),
   crecpuppimet(iConfig.getUntrackedParameter<bool>("RecPuppiMet", false)),
   crecmvamet(iConfig.getUntrackedParameter<bool>("RecMvaMet", false)),
+  crecstxs(iConfig.getUntrackedParameter<bool>("RecHTXS", false)),
   // triggers
   cHLTriggerPaths(iConfig.getUntrackedParameter<vector<string> >("HLTriggerPaths")),
   cTriggerProcess(iConfig.getUntrackedParameter<string>("TriggerProcess", "HLT")),
@@ -177,33 +181,6 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
   BadDuplicateMuonsToken_(consumes<edm::PtrVector<reco::Muon>>(iConfig.getParameter<edm::InputTag>("BadDuplicateMuons"))),
   ElectronCollectionToken_(consumes<edm::View<pat::Electron> >(iConfig.getParameter<edm::InputTag>("ElectronCollectionTag"))),
   applyElectronESShift_(iConfig.getUntrackedParameter<bool>("applyElectronESShift")),
-  eleVetoIdSummer16MapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleVetoIdSummer16Map"))),
-  eleLooseIdSummer16MapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleLooseIdSummer16Map"))),
-  eleMediumIdSummer16MapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleMediumIdSummer16Map"))),
-  eleTightIdSummer16MapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleTightIdSummer16Map"))),
-  mvaValuesMapSpring16MapToken_(consumes<edm::ValueMap<float> >(iConfig.getParameter<edm::InputTag>("mvaValuesMapSpring16"))),
-  mvaCategoriesMapSpring16MapToken_(consumes<edm::ValueMap<int> >(iConfig.getParameter<edm::InputTag>("mvaCategoriesMapSpring16"))),
-  eleMvaWP90GeneralMapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleMvaWP90GeneralMap"))),
-  eleMvaWP80GeneralMapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleMvaWP80GeneralMap"))),
-  //new for 9.4.0, electron Fall17 ID
-  mvaValuesIsoFall17MapToken_(consumes<edm::ValueMap<float> >(iConfig.getParameter<edm::InputTag>("mvaValuesIsoFall17Map"))),
-  mvaValuesnoIsoFall17MapToken_(consumes<edm::ValueMap<float> >(iConfig.getParameter<edm::InputTag>("mvaValuesnoIsoFall17Map"))),
-  eleMvanoIsoWP90Fall17MapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleMvanoIsoWP90Fall17Map"))),
-  eleMvanoIsoWP80Fall17MapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleMvanoIsoWP80Fall17Map"))),
-  eleMvanoIsoWPLooseFall17MapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleMvanoIsoWPLooseFall17Map"))),
-  eleMvaIsoWP90Fall17MapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleMvaIsoWP90Fall17Map"))),
-  eleMvaIsoWP80Fall17MapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleMvaIsoWP80Fall17Map"))),
-  eleMvaIsoWPLooseFall17MapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleMvaIsoWPLooseFall17Map"))),
-  //cut based electron Fall17 ID
-  eleVetoIdFall17MapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleVetoIdFall17Map"))),
-  eleLooseIdFall17MapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleLooseIdFall17Map"))),
-  eleMediumIdFall17MapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleMediumIdFall17Map"))),
-  eleTightIdFall17MapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleTightIdFall17Map"))),
-  //cut based electron Fall17V2 ID
-  eleVetoIdFall17V2MapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleVetoIdFall17V2Map"))),
-  eleLooseIdFall17V2MapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleLooseIdFall17V2Map"))),
-  eleMediumIdFall17V2MapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleMediumIdFall17V2Map"))),
-  eleTightIdFall17V2MapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleTightIdFall17V2Map"))),
 
   TauCollectionToken_(consumes<pat::TauCollection>(iConfig.getParameter<edm::InputTag>("TauCollectionTag"))),
   TauMVAIsolationRawToken_(consumes<pat::PATTauDiscriminator>(edm::InputTag("rerunDiscriminationByIsolationMVArun2v1raw","","TreeProducer"))),
@@ -227,9 +204,13 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
   TriggerObjectCollectionToken_(consumes<pat::TriggerObjectStandAloneCollection>(iConfig.getParameter<edm::InputTag>("TriggerObjectCollectionTag"))),
   BeamSpotToken_(consumes<BeamSpot>(iConfig.getParameter<edm::InputTag>("BeamSpotCollectionTag"))),
   PVToken_(consumes<VertexCollection>(iConfig.getParameter<edm::InputTag>("PVCollectionTag"))),
+  PVwithBSToken_(consumes<RefitVertexCollection>(iConfig.getParameter<edm::InputTag>("PVwithBSCollectionTag"))),
+  RefittedPVToken_(consumes<RefitVertexCollection>(iConfig.getParameter<edm::InputTag>("RefittedPVCollectionTag"))),
+  RefittedwithBSPVToken_(consumes<RefitVertexCollection>(iConfig.getParameter<edm::InputTag>("RefittedwithBSPVCollectionTag"))),
   LHEToken_(consumes<LHEEventProduct>(iConfig.getParameter<edm::InputTag>("LHEEventProductTag"))),
   SusyMotherMassToken_(consumes<double>(iConfig.getParameter<edm::InputTag>("SusyMotherMassTag"))),
   SusyLSPMassToken_(consumes<double>(iConfig.getParameter<edm::InputTag>("SusyLSPMassTag"))),
+  htxsToken_(consumes<HTXS::HiggsClassification>(iConfig.getParameter<edm::InputTag>("htxsInfo"))),
   sampleName(iConfig.getUntrackedParameter<std::string>("SampleName", "Higgs")),
   propagatorWithMaterial(0)
 {
@@ -387,6 +368,44 @@ void NTupleMaker::beginJob(){
     tree->Branch("primvertex_cov", primvertex_cov, "primvertex_cov[6]/F");
     tree->Branch("primvertex_mindz", &primvertex_mindz, "primvertex_mindz/F");
   }  
+  // primary vertex with BS
+  if (crecprimvertexwithbs) {
+    tree->Branch("primvertexwithbs_x", &primvertexwithbs_x, "primvertexwithbs_x/F");
+    tree->Branch("primvertexwithbs_y", &primvertexwithbs_y, "primvertexwithbs_y/F");
+    tree->Branch("primvertexwithbs_z", &primvertexwithbs_z, "primvertexwithbs_z/F");
+    tree->Branch("primvertexwithbs_chi2", &primvertexwithbs_chi2, "primvertexwithbs_chi2/F");
+    tree->Branch("primvertexwithbs_ndof", &primvertexwithbs_ndof, "primvertexwithbs_ndof/F");
+    tree->Branch("primvertexwithbs_ntracks", &primvertexwithbs_ntracks, "primvertexwithbs_ntracks/I");
+    tree->Branch("primvertexwithbs_cov", primvertexwithbs_cov, "primvertexwithbs_cov[6]/F");
+  }
+  // refitted primary vertex
+  if(crefittedvertex) {
+    tree->Branch("refitvertex_count", &refitvertex_count, "refitvertex_count/i");
+    tree->Branch("refitvertex_x", refitvertex_x, "refitvertex_x[refitvertex_count]/F");
+    tree->Branch("refitvertex_y", refitvertex_y, "refitvertex_y[refitvertex_count]/F");
+    tree->Branch("refitvertex_z", refitvertex_z, "refitvertex_z[refitvertex_count]/F");
+    tree->Branch("refitvertex_chi2", refitvertex_chi2, "refitvertex_chi2[refitvertex_count]/F");
+    tree->Branch("refitvertex_ndof", refitvertex_ndof, "refitvertex_ndof[refitvertex_count]/F");
+    tree->Branch("refitvertex_ntracks", refitvertex_ntracks, "refitvertex_ntracks[refitvertex_count]/I");
+    //tree->Branch("refitvertex_cov", refitvertex_cov, "refitvertex_cov[refitvertex_count][6]/F");
+    tree->Branch("refitvertex_eleIndex", refitvertex_eleIndex, "refitvertex_eleIndex[refitvertex_count][2]/I");
+    tree->Branch("refitvertex_muIndex", refitvertex_muIndex, "refitvertex_muIndex[refitvertex_count][2]/I");
+    tree->Branch("refitvertex_tauIndex", refitvertex_tauIndex, "refitvertex_tauIndex[refitvertex_count][2]/I");
+  }
+  // refitted primary vertex with bs
+  if(crefittedvertexwithbs) {
+    tree->Branch("refitvertexwithbs_count", &refitvertexwithbs_count, "refitvertexwithbs_count/i");
+    tree->Branch("refitvertexwithbs_x", refitvertexwithbs_x, "refitvertexwithbs_x[refitvertexwithbs_count]/F");
+    tree->Branch("refitvertexwithbs_y", refitvertexwithbs_y, "refitvertexwithbs_y[refitvertexwithbs_count]/F");
+    tree->Branch("refitvertexwithbs_z", refitvertexwithbs_z, "refitvertexwithbs_z[refitvertexwithbs_count]/F");
+    tree->Branch("refitvertexwithbs_chi2", refitvertexwithbs_chi2, "refitvertexwithbs_chi2[refitvertexwithbs_count]/F");
+    tree->Branch("refitvertexwithbs_ndof", refitvertexwithbs_ndof, "refitvertexwithbs_ndof[refitvertexwithbs_count]/F");
+    tree->Branch("refitvertexwithbs_ntracks", refitvertexwithbs_ntracks, "refitvertexwithbs_ntracks[refitvertexwithbs_count]/I");
+    //tree->Branch("refitvertexwithbs_cov", refitvertexwithbs_cov, "refitvertexwithbs_cov[refitvertexwithbs_count][6]/F");
+    tree->Branch("refitvertexwithbs_eleIndex", refitvertexwithbs_eleIndex, "refitvertexwithbs_eleIndex[refitvertexwithbs_count][2]/I");
+    tree->Branch("refitvertexwithbs_muIndex", refitvertexwithbs_muIndex, "refitvertexwithbs_muIndex[refitvertexwithbs_count][2]/I");
+    tree->Branch("refitvertexwithbs_tauIndex", refitvertexwithbs_tauIndex, "refitvertexwithbs_tauIndex[refitvertexwithbs_count][2]/I");
+  }
 
   // muons
   if (crecmuon) {
@@ -575,7 +594,6 @@ void NTupleMaker::beginJob(){
     tree->Branch("electron_cutId_medium_Summer16", electron_cutId_medium_Summer16, "electron_cutId_medium_Summer16[electron_count]/O");
     tree->Branch("electron_cutId_tight_Summer16", electron_cutId_tight_Summer16, "electron_cutId_tight_Summer16[electron_count]/O");
     tree->Branch("electron_mva_value_Spring16_v1", electron_mva_value_Spring16_v1, "electron_mva_value_Spring16_v1[electron_count]/F");
-    tree->Branch("electron_mva_category_Spring16_v1", electron_mva_category_Spring16_v1, "electron_mva_category_Spring16_v1[electron_count]/I");
     tree->Branch("electron_mva_wp90_general_Spring16_v1", electron_mva_wp90_general_Spring16_v1, "electron_mva_wp90_general_Spring16_v1[electron_count]/F");
     tree->Branch("electron_mva_wp80_general_Spring16_v1", electron_mva_wp80_general_Spring16_v1, "electron_mva_wp80_general_Spring16_v1[electron_count]/F");
 
@@ -588,6 +606,14 @@ void NTupleMaker::beginJob(){
     tree->Branch("electron_mva_wp90_noIso_Fall17_v1", electron_mva_wp90_noIso_Fall17_v1, "electron_mva_wp90_noIso_Fall17_v1[electron_count]/F");
     tree->Branch("electron_mva_wp80_noIso_Fall17_v1", electron_mva_wp80_noIso_Fall17_v1, "electron_mva_wp80_noIso_Fall17_v1[electron_count]/F");
     tree->Branch("electron_mva_Loose_noIso_Fall17_v1", electron_mva_Loose_noIso_Fall17_v1, "electron_mva_Loose_noIso_Fall17_v1[electron_count]/F");
+    tree->Branch("electron_mva_value_Iso_Fall17_v2", electron_mva_value_Iso_Fall17_v2, "electron_mva_value_Iso_Fall17_v2[electron_count]/F");
+    tree->Branch("electron_mva_value_noIso_Fall17_v2", electron_mva_value_noIso_Fall17_v2, "electron_mva_value_noIso_Fall17_v2[electron_count]/F");
+    tree->Branch("electron_mva_wp90_Iso_Fall17_v2", electron_mva_wp90_Iso_Fall17_v2, "electron_mva_wp90_Iso_Fall17_v2[electron_count]/F");
+    tree->Branch("electron_mva_wp80_Iso_Fall17_v2", electron_mva_wp80_Iso_Fall17_v2, "electron_mva_wp80_Iso_Fall17_v2[electron_count]/F");
+    tree->Branch("electron_mva_Loose_Iso_Fall17_v2", electron_mva_Loose_Iso_Fall17_v2, "electron_mva_Loose_Iso_Fall17_v2[electron_count]/F");
+    tree->Branch("electron_mva_wp90_noIso_Fall17_v2", electron_mva_wp90_noIso_Fall17_v2, "electron_mva_wp90_noIso_Fall17_v2[electron_count]/F");
+    tree->Branch("electron_mva_wp80_noIso_Fall17_v2", electron_mva_wp80_noIso_Fall17_v2, "electron_mva_wp80_noIso_Fall17_v2[electron_count]/F");
+    tree->Branch("electron_mva_Loose_noIso_Fall17_v2", electron_mva_Loose_noIso_Fall17_v2, "electron_mva_Loose_noIso_Fall17_v2[electron_count]/F");
     //cut-based Fall17
     tree->Branch("electron_cutId_veto_Fall17", electron_cutId_veto_Fall17, "electron_cutId_veto_Fall17[electron_count]/O");
     tree->Branch("electron_cutId_loose_Fall17", electron_cutId_loose_Fall17, "electron_cutId_loose_Fall17[electron_count]/O");
@@ -885,6 +911,15 @@ void NTupleMaker::beginJob(){
   }
 
   // generator info
+
+  if(crecstxs){
+    tree->Branch("htxs_stage0cat",&htxs_stage0cat,"htxs_stage0cat/I");
+    tree->Branch("htxs_stage1p1cat_pTjet30GeV",&htxs_stage1p1cat_pTjet30GeV,"htxs_stage1p1cat_pTjet30GeV/I");
+    tree->Branch("htxs_stage1p1cat_pTjet25GeV",&htxs_stage1p1cat_pTjet25GeV,"htxs_stage1p1cat_pTjet25GeV/I");
+    tree->Branch("htxs_higgsPt",&htxs_higgsPt,"htxs_higgsPt/F");
+    tree->Branch("htxs_njets30",&htxs_njets30,"htxs_njets30/I");
+    tree->Branch("htxs_njets25",&htxs_njets30,"htxs_njets25/I");
+  }
 
   if (cgen) {
 
@@ -1550,6 +1585,8 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   track_count = 0;
   goodprimvertex_count = 0;
   primvertex_count = 0;
+  refitvertex_count = 0;
+  refitvertexwithbs_count = 0;
   muon_count = 0;
   dimuon_count = 0;
   tau_count = 0;
@@ -1753,6 +1790,29 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       }
     }
 
+  if(crecprimvertexwithbs)
+    {
+      edm::Handle<RefitVertexCollection> VertexWithBS;
+      iEvent.getByToken(PVwithBSToken_, VertexWithBS);
+      if(VertexWithBS.isValid()) {
+        for(unsigned i = 0 ; i < VertexWithBS->size(); i++) {
+          if(i == 0) {
+            primvertexwithbs_x = (*VertexWithBS)[i].x();
+            primvertexwithbs_y = (*VertexWithBS)[i].y();
+            primvertexwithbs_z = (*VertexWithBS)[i].z();
+            primvertexwithbs_chi2 = (*VertexWithBS)[i].chi2();
+            primvertexwithbs_ndof = (*VertexWithBS)[i].ndof();
+            primvertexwithbs_ntracks = (*VertexWithBS)[i].tracksSize();
+            primvertexwithbs_cov[0] = (*VertexWithBS)[i].covariance(0,0); // xError()
+            primvertexwithbs_cov[1] = (*VertexWithBS)[i].covariance(0,1);
+            primvertexwithbs_cov[2] = (*VertexWithBS)[i].covariance(0,2);
+            primvertexwithbs_cov[3] = (*VertexWithBS)[i].covariance(1,1); // yError()
+            primvertexwithbs_cov[4] = (*VertexWithBS)[i].covariance(1,2);
+            primvertexwithbs_cov[5] = (*VertexWithBS)[i].covariance(2,2); // zError()                                                                                                 
+	  }
+	}
+      }
+    }
   if (csusyinfo) {
     if(doDebug)  cout<<"add SUSY info"<< endl;
     AddSusyInfo(iEvent);
@@ -1797,6 +1857,157 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       // 	if (!goodTaus) return;
       // }  
     }
+
+  //add refitted vertex with tracks removed from pair of leptons
+  if (crefittedvertex)
+    {
+      edm::Handle<RefitVertexCollection> RFVertex;
+      iEvent.getByToken(RefittedPVToken_, RFVertex);
+      if(RFVertex.isValid()) {
+        for(unsigned i = 0 ; i < RFVertex->size(); i++) {
+
+          //Find pair of leptons
+          const std::vector<std::string> leptonPairNames = (*RFVertex)[i].userCandNames();
+          if(leptonPairNames.size() < 2) continue;
+          int nMu = 0, nEle = 0, nTau = 0;
+          int muon1 = -1, muon2 = -1, ele1 = -1, ele2 = -1, tau1 = -1, tau2 = -1;
+          for(size_t il = 0; il < leptonPairNames.size(); il++){
+            const std::string leptonName = leptonPairNames[il];
+	    edm::Ptr<reco::Candidate> leptonCand = (*RFVertex)[i].userCand(leptonName);
+            if(std::abs(leptonCand->pdgId())==11 ){
+              for(size_t ie = 0; ie < electron_count; ie++){
+                if(TMath::Abs(leptonCand->pt() - electron_pt[ie]) < 0.01 && 
+                   TMath::Abs(leptonCand->eta() - electron_eta[ie]) < 0.001 &&
+                   TMath::Abs(leptonCand->phi() - electron_phi[ie]) < 0.001){
+                  nEle++;
+                  if(nEle == 1)ele1 = ie;
+                  else if(nEle == 2) ele2 = ie;
+                }
+              }
+            }
+            else if(std::abs(leptonCand->pdgId())==13 ){
+              for(size_t im = 0; im < muon_count; im++){
+                if(TMath::Abs(leptonCand->pt() - muon_pt[im]) < 0.01 &&
+                   TMath::Abs(leptonCand->eta() - muon_eta[im]) < 0.001 &&
+                   TMath::Abs(leptonCand->phi() - muon_phi[im]) < 0.001){
+                  nMu++;
+                  if(nMu == 1)muon1 = im;
+                  else if(nMu == 2) muon2 = im;
+                }
+              } 
+            }
+            else { //for tau
+              for(size_t it = 0; it < tau_count; it++){
+                if(TMath::Abs(leptonCand->pt() - tau_pt[it]) < 0.01 &&
+                   TMath::Abs(leptonCand->eta() - tau_eta[it]) < 0.001 &&
+                   TMath::Abs(leptonCand->phi() - tau_phi[it]) < 0.001){
+                  nTau++;
+                  if(nTau == 1)tau1 = it;
+                  else if(nTau == 2) tau2 = it;
+                }
+              }
+            }
+          } //end of lepton pair
+          if((nEle + nMu + nTau) < 2) continue;  //should have a pair of selected leptons
+
+          refitvertex_eleIndex[refitvertex_count][0] = ele1;
+          refitvertex_eleIndex[refitvertex_count][1] = ele2;
+          refitvertex_muIndex[refitvertex_count][0] = muon1;
+          refitvertex_muIndex[refitvertex_count][1] = muon2;
+          refitvertex_tauIndex[refitvertex_count][0] = tau1;
+          refitvertex_tauIndex[refitvertex_count][1] = tau2;
+          refitvertex_x[refitvertex_count] = (*RFVertex)[i].x();
+          refitvertex_y[refitvertex_count] = (*RFVertex)[i].y();
+          refitvertex_z[refitvertex_count] = (*RFVertex)[i].z();
+          refitvertex_chi2[refitvertex_count] = (*RFVertex)[i].chi2();
+          refitvertex_ndof[refitvertex_count] = (*RFVertex)[i].ndof();
+          refitvertex_ntracks[refitvertex_count] = (*RFVertex)[i].tracksSize();
+          refitvertex_cov[refitvertex_count][0] = (*RFVertex)[i].covariance(0,0); // xError()
+          refitvertex_cov[refitvertex_count][1] = (*RFVertex)[i].covariance(0,1);
+          refitvertex_cov[refitvertex_count][2] = (*RFVertex)[i].covariance(0,2);
+          refitvertex_cov[refitvertex_count][3] = (*RFVertex)[i].covariance(1,1); // yError()
+          refitvertex_cov[refitvertex_count][4] = (*RFVertex)[i].covariance(1,2);
+          refitvertex_cov[refitvertex_count][5] = (*RFVertex)[i].covariance(2,2); // zError()
+          refitvertex_count++;
+        }
+      }
+    }
+	
+  //add refitted vertex with tracks removed from pair of leptons along with bs constraint
+  if (crefittedvertexwithbs)
+    {
+      edm::Handle<RefitVertexCollection> RFVertexwithbs;
+      iEvent.getByToken(RefittedwithBSPVToken_, RFVertexwithbs);
+      if(RFVertexwithbs.isValid()) {
+        for(unsigned i = 0 ; i < RFVertexwithbs->size(); i++) {
+
+          //Find pair of leptons
+          const std::vector<std::string> leptonPairNames = (*RFVertexwithbs)[i].userCandNames();
+          if(leptonPairNames.size() < 2) continue;
+          int nMu = 0, nEle = 0, nTau = 0;
+          int muon1 = -1, muon2 = -1, ele1 = -1, ele2 = -1, tau1 = -1, tau2 = -1;
+          for(size_t il = 0; il < leptonPairNames.size(); il++){
+            const std::string leptonName = leptonPairNames[il];
+	    edm::Ptr<reco::Candidate> leptonCand = (*RFVertexwithbs)[i].userCand(leptonName);
+            if(std::abs(leptonCand->pdgId())==11 ){
+              for(size_t ie = 0; ie < electron_count; ie++){
+                if(TMath::Abs(leptonCand->pt() - electron_pt[ie]) < 0.01 && 
+                   TMath::Abs(leptonCand->eta() - electron_eta[ie]) < 0.001 &&
+                   TMath::Abs(leptonCand->phi() - electron_phi[ie]) < 0.001){
+                  nEle++;
+                  if(nEle == 1)ele1 = ie;
+                  else if(nEle == 2) ele2 = ie;
+                }
+              }
+            }
+            else if(std::abs(leptonCand->pdgId())==13 ){
+              for(size_t im = 0; im < muon_count; im++){
+                if(TMath::Abs(leptonCand->pt() - muon_pt[im]) < 0.01 &&
+                   TMath::Abs(leptonCand->eta() - muon_eta[im]) < 0.001 &&
+                   TMath::Abs(leptonCand->phi() - muon_phi[im]) < 0.001){
+                  nMu++;
+                  if(nMu == 1)muon1 = im;
+                  else if(nMu == 2) muon2 = im;
+                }
+              } 
+            }
+            else { //for tau
+              for(size_t it = 0; it < tau_count; it++){
+                if(TMath::Abs(leptonCand->pt() - tau_pt[it]) < 0.01 &&
+                   TMath::Abs(leptonCand->eta() - tau_eta[it]) < 0.001 &&
+                   TMath::Abs(leptonCand->phi() - tau_phi[it]) < 0.001){
+                  nTau++;
+                  if(nTau == 1)tau1 = it;
+                  else if(nTau == 2) tau2 = it;
+                }
+              }
+            }
+          } //end of lepton pair
+          if((nEle + nMu + nTau) < 2) continue;  //should have a pair of selected leptons
+
+          refitvertexwithbs_eleIndex[refitvertexwithbs_count][0] = ele1;
+          refitvertexwithbs_eleIndex[refitvertexwithbs_count][1] = ele2;
+          refitvertexwithbs_muIndex[refitvertexwithbs_count][0] = muon1;
+          refitvertexwithbs_muIndex[refitvertexwithbs_count][1] = muon2;
+          refitvertexwithbs_tauIndex[refitvertexwithbs_count][0] = tau1;
+          refitvertexwithbs_tauIndex[refitvertexwithbs_count][1] = tau2;
+          refitvertexwithbs_x[refitvertexwithbs_count] = (*RFVertexwithbs)[i].x();
+          refitvertexwithbs_y[refitvertexwithbs_count] = (*RFVertexwithbs)[i].y();
+          refitvertexwithbs_z[refitvertexwithbs_count] = (*RFVertexwithbs)[i].z();
+          refitvertexwithbs_chi2[refitvertexwithbs_count] = (*RFVertexwithbs)[i].chi2();
+          refitvertexwithbs_ndof[refitvertexwithbs_count] = (*RFVertexwithbs)[i].ndof();
+          refitvertexwithbs_ntracks[refitvertexwithbs_count] = (*RFVertexwithbs)[i].tracksSize();
+          refitvertexwithbs_cov[refitvertexwithbs_count][0] = (*RFVertexwithbs)[i].covariance(0,0); // xError()
+          refitvertexwithbs_cov[refitvertexwithbs_count][1] = (*RFVertexwithbs)[i].covariance(0,1);
+          refitvertexwithbs_cov[refitvertexwithbs_count][2] = (*RFVertexwithbs)[i].covariance(0,2);
+          refitvertexwithbs_cov[refitvertexwithbs_count][3] = (*RFVertexwithbs)[i].covariance(1,1); // yError()
+          refitvertexwithbs_cov[refitvertexwithbs_count][4] = (*RFVertexwithbs)[i].covariance(1,2);
+          refitvertexwithbs_cov[refitvertexwithbs_count][5] = (*RFVertexwithbs)[i].covariance(2,2); // zError()
+          refitvertexwithbs_count++;
+        }
+      }
+    }
+
 
   if (crectrack) AddPFCand(iEvent, iSetup);
 
@@ -2286,6 +2497,20 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       int numberOfTriggerObjects = int(AddTriggerObjects(iEvent,TriggerObjectCollectionToken_,*HLTrigger));
       //      std::cout << std::endl;
     } // ctrigger
+
+  if(crecstxs)
+    {
+      // Get STXS infos
+      edm::Handle<HTXS::HiggsClassification> htxs;
+      iEvent.getByToken(htxsToken_, htxs);
+      htxs_stage0cat = htxs->stage0_cat;
+      htxs_stage1p1cat_pTjet30GeV = htxs->stage1_1_cat_pTjet30GeV;
+      htxs_stage1p1cat_pTjet25GeV = htxs->stage1_1_cat_pTjet25GeV;
+      htxs_higgsPt = htxs->higgs.Pt();
+      htxs_njets30 = htxs->jets30.size();
+      htxs_njets25 = htxs->jets25.size();
+    }
+
 
   tree->Fill();
 
@@ -4118,62 +4343,6 @@ unsigned int NTupleMaker::AddElectrons(const edm::Event& iEvent, const edm::Even
         edm::Handle<pat::PackedCandidateCollection> pfcands;
         iEvent.getByToken( PackedCantidateCollectionToken_, pfcands);
 
-	// cut-based (Summer16)
-	edm::Handle<edm::ValueMap<bool> > veto_id_summer16_decisions;
-	edm::Handle<edm::ValueMap<bool> > loose_id_summer16_decisions;
-	edm::Handle<edm::ValueMap<bool> > medium_id_summer16_decisions;
-	edm::Handle<edm::ValueMap<bool> > tight_id_summer16_decisions;
-	iEvent.getByToken(eleVetoIdSummer16MapToken_,veto_id_summer16_decisions);
-	iEvent.getByToken(eleLooseIdSummer16MapToken_,loose_id_summer16_decisions);
-	iEvent.getByToken(eleMediumIdSummer16MapToken_,medium_id_summer16_decisions);
-	iEvent.getByToken(eleTightIdSummer16MapToken_,tight_id_summer16_decisions);
-	// cut-based (Fall17)
-        edm::Handle<edm::ValueMap<bool> > veto_id_fall17_decisions;
-        edm::Handle<edm::ValueMap<bool> > loose_id_fall17_decisions;
-        edm::Handle<edm::ValueMap<bool> > medium_id_fall17_decisions;
-        edm::Handle<edm::ValueMap<bool> > tight_id_fall17_decisions;
-        iEvent.getByToken(eleVetoIdFall17MapToken_,veto_id_fall17_decisions);
-        iEvent.getByToken(eleLooseIdFall17MapToken_,loose_id_fall17_decisions);
-        iEvent.getByToken(eleMediumIdFall17MapToken_,medium_id_fall17_decisions);
-        iEvent.getByToken(eleTightIdFall17MapToken_,tight_id_fall17_decisions);
-	// cut-based (Fall17V2)
-        edm::Handle<edm::ValueMap<bool> > veto_id_fall17v2_decisions;
-        edm::Handle<edm::ValueMap<bool> > loose_id_fall17v2_decisions;
-        edm::Handle<edm::ValueMap<bool> > medium_id_fall17v2_decisions;
-        edm::Handle<edm::ValueMap<bool> > tight_id_fall17v2_decisions;
-        iEvent.getByToken(eleVetoIdFall17V2MapToken_,veto_id_fall17v2_decisions);
-        iEvent.getByToken(eleLooseIdFall17V2MapToken_,loose_id_fall17v2_decisions);
-        iEvent.getByToken(eleMediumIdFall17V2MapToken_,medium_id_fall17v2_decisions);
-        iEvent.getByToken(eleTightIdFall17V2MapToken_,tight_id_fall17v2_decisions);
-	// mva
-	edm::Handle<edm::ValueMap<float> > mvaValuesMapSpring16;
-	edm::Handle<edm::ValueMap<int> > mvaCategoriesMapSpring16;
-	iEvent.getByToken(mvaValuesMapSpring16MapToken_,mvaValuesMapSpring16);
-	iEvent.getByToken(mvaCategoriesMapSpring16MapToken_,mvaCategoriesMapSpring16);
-	//mva general Spring16
-	edm::Handle<edm::ValueMap<bool> > mva_wp80_general_decisions;
-	edm::Handle<edm::ValueMap<bool> > mva_wp90_general_decisions;
-	iEvent.getByToken(eleMvaWP90GeneralMapToken_,mva_wp90_general_decisions);
-	iEvent.getByToken(eleMvaWP80GeneralMapToken_,mva_wp80_general_decisions);
-	//mva Fall17
-	edm::Handle<edm::ValueMap<float> > mvaValuesIsoFall17Map;
-	edm::Handle<edm::ValueMap<float> > mvaValuesnoIsoFall17Map;
-	edm::Handle<edm::ValueMap<bool> > mva_wp90_noIso_Fall17_decisions;
-	edm::Handle<edm::ValueMap<bool> > mva_wp80_noIso_Fall17_decisions;
-	edm::Handle<edm::ValueMap<bool> > mva_Loose_noIso_Fall17_decisions;
-	edm::Handle<edm::ValueMap<bool> > mva_wp90_Iso_Fall17_decisions;
-	edm::Handle<edm::ValueMap<bool> > mva_wp80_Iso_Fall17_decisions;
-	edm::Handle<edm::ValueMap<bool> > mva_Loose_Iso_Fall17_decisions;
-	iEvent.getByToken(mvaValuesIsoFall17MapToken_,mvaValuesIsoFall17Map);
-	iEvent.getByToken(mvaValuesnoIsoFall17MapToken_,mvaValuesnoIsoFall17Map);
-	iEvent.getByToken(eleMvanoIsoWP90Fall17MapToken_,mva_wp90_noIso_Fall17_decisions);
-	iEvent.getByToken(eleMvanoIsoWP80Fall17MapToken_,mva_wp80_noIso_Fall17_decisions);
-	iEvent.getByToken(eleMvanoIsoWPLooseFall17MapToken_,mva_Loose_noIso_Fall17_decisions);
-	iEvent.getByToken(eleMvaIsoWP90Fall17MapToken_,mva_wp90_Iso_Fall17_decisions);
-	iEvent.getByToken(eleMvaIsoWP80Fall17MapToken_,mva_wp80_Iso_Fall17_decisions);
-	iEvent.getByToken(eleMvaIsoWPLooseFall17MapToken_,mva_Loose_Iso_Fall17_decisions);
-    
-    
 	/*if(crecelectrontrigger)
 	{
 		iEvent.getByLabel(edm::InputTag("l1extraParticles", "NonIsolated"), L1Electrons);
@@ -4312,36 +4481,47 @@ unsigned int NTupleMaker::AddElectrons(const edm::Event& iEvent, const edm::Even
 	  //	  std::cout << "   dxy = " << electron_dxy[electron_count] << "   dz = " << electron_dz[electron_count] << std::endl;
 
 	  // Electron Ids
-	  electron_mva_value_Spring16_v1[electron_count] = (*mvaValuesMapSpring16)[el];
-	  electron_mva_category_Spring16_v1[electron_count] = (*mvaCategoriesMapSpring16)[el];
-	  electron_cutId_veto_Summer16[electron_count] = (*veto_id_summer16_decisions)[el];
-	  electron_cutId_loose_Summer16[electron_count] = (*loose_id_summer16_decisions)[el];
-	  electron_cutId_medium_Summer16[electron_count] = (*medium_id_summer16_decisions)[el];
-	  electron_cutId_tight_Summer16[electron_count] = (*tight_id_summer16_decisions)[el];
-	  electron_mva_wp90_general_Spring16_v1[electron_count] = (*mva_wp90_general_decisions)[el];
-	  electron_mva_wp80_general_Spring16_v1[electron_count] = (*mva_wp80_general_decisions)[el];
-        
+     electron_cutId_veto_Summer16[electron_count] = el ->electronID("cutBasedElectronID-Summer16-80X-V1-veto");
+     electron_cutId_loose_Summer16[electron_count] =  el ->electronID("cutBasedElectronID-Summer16-80X-V1-loose");
+     electron_cutId_medium_Summer16[electron_count] =  el ->electronID("cutBasedElectronID-Summer16-80X-V1-medium");
+     electron_cutId_tight_Summer16[electron_count]=  el ->electronID("cutBasedElectronID-Summer16-80X-V1-tight");
+     
+     electron_mva_value_Spring16_v1[electron_count] = el ->userFloat("ElectronMVAEstimatorRun2Spring16GeneralPurposeV1Values");
+     electron_mva_wp90_general_Spring16_v1[electron_count] = el ->electronID("mvaEleID-Spring16-GeneralPurpose-V1-wp90");
+	  electron_mva_wp80_general_Spring16_v1[electron_count] = el ->electronID("mvaEleID-Spring16-GeneralPurpose-V1-wp80");
+     
 	  //new for 9.4.0 Fall17 Electron id
-	  electron_mva_value_Iso_Fall17_v1[electron_count] = (*mvaValuesIsoFall17Map)[el];
-	  electron_mva_value_noIso_Fall17_v1[electron_count] = (*mvaValuesnoIsoFall17Map)[el];
-
-	  electron_mva_wp90_Iso_Fall17_v1[electron_count] = (*mva_wp90_Iso_Fall17_decisions)[el];
-	  electron_mva_wp80_Iso_Fall17_v1[electron_count] = (*mva_wp80_Iso_Fall17_decisions)[el];
-	  electron_mva_Loose_Iso_Fall17_v1[electron_count] = (*mva_Loose_Iso_Fall17_decisions)[el];
+	  electron_mva_value_Iso_Fall17_v1[electron_count] = el ->userFloat("ElectronMVAEstimatorRun2Fall17IsoV1Values");
+	  electron_mva_value_noIso_Fall17_v1[electron_count] = el ->userFloat("ElectronMVAEstimatorRun2Fall17NoIsoV1Values");
+     
+	  electron_mva_wp90_Iso_Fall17_v1[electron_count] = el ->electronID("mvaEleID-Fall17-iso-V1-wp90");
+	  electron_mva_wp80_Iso_Fall17_v1[electron_count] = el ->electronID("mvaEleID-Fall17-iso-V1-wp80");
+	  electron_mva_Loose_Iso_Fall17_v1[electron_count] = el ->electronID("mvaEleID-Fall17-iso-V1-wpLoose");
         
-	  electron_mva_wp90_noIso_Fall17_v1[electron_count] = (*mva_wp90_noIso_Fall17_decisions)[el];
-	  electron_mva_wp80_noIso_Fall17_v1[electron_count] = (*mva_wp80_noIso_Fall17_decisions)[el];
-	  electron_mva_Loose_noIso_Fall17_v1[electron_count] = (*mva_Loose_noIso_Fall17_decisions)[el];
-	    
-	  electron_cutId_veto_Fall17[electron_count] = (*veto_id_fall17_decisions)[el];
-	  electron_cutId_loose_Fall17[electron_count] = (*loose_id_fall17_decisions)[el];
-	  electron_cutId_medium_Fall17[electron_count] = (*medium_id_fall17_decisions)[el];
-	  electron_cutId_tight_Fall17[electron_count] = (*tight_id_fall17_decisions)[el];
+	  electron_mva_wp90_noIso_Fall17_v1[electron_count] = el ->electronID("mvaEleID-Fall17-noIso-V1-wp90");
+	  electron_mva_wp80_noIso_Fall17_v1[electron_count] = el ->electronID("mvaEleID-Fall17-noIso-V1-wp80");
+	  electron_mva_Loose_noIso_Fall17_v1[electron_count] = el ->electronID("mvaEleID-Fall17-noIso-V1-wpLoose");
 
-	  electron_cutId_veto_Fall17V2[electron_count] = (*veto_id_fall17v2_decisions)[el];
-	  electron_cutId_loose_Fall17V2[electron_count] = (*loose_id_fall17v2_decisions)[el];
-	  electron_cutId_medium_Fall17V2[electron_count] = (*medium_id_fall17v2_decisions)[el];
-	  electron_cutId_tight_Fall17V2[electron_count] = (*tight_id_fall17v2_decisions)[el];
+     electron_mva_value_Iso_Fall17_v2[electron_count] = el ->userFloat("ElectronMVAEstimatorRun2Fall17IsoV2Values");
+     electron_mva_value_noIso_Fall17_v2[electron_count] = el ->userFloat("ElectronMVAEstimatorRun2Fall17NoIsoV2Values");
+
+	  electron_mva_wp90_Iso_Fall17_v2[electron_count] = el ->electronID("mvaEleID-Fall17-iso-V2-wp90");
+	  electron_mva_wp80_Iso_Fall17_v2[electron_count] = el ->electronID("mvaEleID-Fall17-iso-V2-wp80");
+	  electron_mva_Loose_Iso_Fall17_v2[electron_count] = el ->electronID("mvaEleID-Fall17-iso-V2-wpLoose");
+        
+	  electron_mva_wp90_noIso_Fall17_v2[electron_count] = el ->electronID("mvaEleID-Fall17-noIso-V2-wp90");
+	  electron_mva_wp80_noIso_Fall17_v2[electron_count] = el ->electronID("mvaEleID-Fall17-noIso-V2-wp80");
+	  electron_mva_Loose_noIso_Fall17_v2[electron_count] = el ->electronID("mvaEleID-Fall17-noIso-V2-wpLoose");
+	    
+	  electron_cutId_veto_Fall17[electron_count] =  el ->electronID("cutBasedElectronID-Fall17-94X-V1-veto");
+	  electron_cutId_loose_Fall17[electron_count] =  el ->electronID("cutBasedElectronID-Fall17-94X-V1-loose"); 
+	  electron_cutId_medium_Fall17[electron_count] =  el ->electronID("cutBasedElectronID-Fall17-94X-V1-medium");
+	  electron_cutId_tight_Fall17[electron_count] =  el ->electronID("cutBasedElectronID-Fall17-94X-V1-tight");
+
+	  electron_cutId_veto_Fall17V2[electron_count] = el ->electronID("cutBasedElectronID-Fall17-94X-V2-veto");
+	  electron_cutId_loose_Fall17V2[electron_count] = el ->electronID("cutBasedElectronID-Fall17-94X-V2-loose");
+	  electron_cutId_medium_Fall17V2[electron_count] = el ->electronID("cutBasedElectronID-Fall17-94X-V2-medium");
+	  electron_cutId_tight_Fall17V2[electron_count] = el ->electronID("cutBasedElectronID-Fall17-94X-V2-tight");
 	  //ending for 9.4.0 electron id
         
 	  electron_pass_conversion[electron_count] = (*Electrons)[i].passConversionVeto();

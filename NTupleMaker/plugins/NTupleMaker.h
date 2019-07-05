@@ -78,6 +78,7 @@
 #include "JetMETCorrections/Objects/interface/JetCorrector.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
+#include "VertexRefit/TauRefit/interface/RefitVertex.h"
 #include "DataFormats/Candidate/interface/VertexCompositeCandidate.h"
 #include "DataFormats/Candidate/interface/VertexCompositeCandidateFwd.h"
 #include "DataFormats/RecoCandidate/interface/RecoChargedCandidate.h"
@@ -149,6 +150,8 @@
 #include "DataFormats/L1Trigger/interface/Tau.h"
 #include "DataFormats/L1Trigger/interface/Jet.h"
 
+#include "SimDataFormats/HTXS/interface/HiggsTemplateCrossSections.h"
+
 using namespace std;
 using namespace reco;
 
@@ -168,6 +171,7 @@ using namespace reco;
 #define M_genjetsmaxcount 1000
 #define M_trigobjectmaxcount 1000
 #define M_hltfiltersmax 200
+#define M_refitvtxmaxcount 1000
 typedef ROOT::Math::PositionVector3D<ROOT::Math::Cartesian3D<double>,ROOT::Math::DefaultCoordinateSystemTag> Point3D;
 typedef ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> > LorentzVector;
 typedef ROOT::Math::SMatrix<double, 2, 2, ROOT::Math::MatRepSym<double, 2> > CovMatrix2D;
@@ -329,6 +333,9 @@ class NTupleMaker : public edm::EDAnalyzer{
   bool cbeamspot;
   bool crectrack;
   bool crecprimvertex;
+  bool crecprimvertexwithbs;
+  bool crefittedvertex;
+  bool crefittedvertexwithbs;
   bool crecmuon;
   bool crecelectron;
   bool crectau;
@@ -340,6 +347,7 @@ class NTupleMaker : public edm::EDAnalyzer{
   bool crecpfmetcorr;
   bool crecpuppimet;
   bool crecmvamet;
+  bool crecstxs;
 
   vector<string> cHLTriggerPaths;
   string cTriggerProcess;
@@ -394,34 +402,6 @@ class NTupleMaker : public edm::EDAnalyzer{
   edm::EDGetTokenT<edm::View<pat::Electron> > ElectronCollectionToken_;
   // Apply electron energy scale shift  
   bool applyElectronESShift_;
-  // ID decisions objects
-  edm::EDGetTokenT<edm::ValueMap<bool> > eleVetoIdSummer16MapToken_;
-  edm::EDGetTokenT<edm::ValueMap<bool> > eleLooseIdSummer16MapToken_;
-  edm::EDGetTokenT<edm::ValueMap<bool> > eleMediumIdSummer16MapToken_;
-  edm::EDGetTokenT<edm::ValueMap<bool> > eleTightIdSummer16MapToken_;
-  //// New for Spring16
-  edm::EDGetTokenT<edm::ValueMap<float> > mvaValuesMapSpring16MapToken_;
-  edm::EDGetTokenT<edm::ValueMap<int> >   mvaCategoriesMapSpring16MapToken_;
-  //// New for Spring16
-  edm::EDGetTokenT<edm::ValueMap<bool> >  eleMvaWP90GeneralMapToken_;
-  edm::EDGetTokenT<edm::ValueMap<bool> >  eleMvaWP80GeneralMapToken_;
-  //// New for Fall17
-  edm::EDGetTokenT<edm::ValueMap<float> > mvaValuesIsoFall17MapToken_;
-  edm::EDGetTokenT<edm::ValueMap<float> > mvaValuesnoIsoFall17MapToken_;
-  edm::EDGetTokenT<edm::ValueMap<bool> >  eleMvanoIsoWP90Fall17MapToken_;
-  edm::EDGetTokenT<edm::ValueMap<bool> >  eleMvanoIsoWP80Fall17MapToken_;
-  edm::EDGetTokenT<edm::ValueMap<bool> >  eleMvanoIsoWPLooseFall17MapToken_;
-  edm::EDGetTokenT<edm::ValueMap<bool> >  eleMvaIsoWP90Fall17MapToken_;
-  edm::EDGetTokenT<edm::ValueMap<bool> >  eleMvaIsoWP80Fall17MapToken_;
-  edm::EDGetTokenT<edm::ValueMap<bool> >  eleMvaIsoWPLooseFall17MapToken_;
-  edm::EDGetTokenT<edm::ValueMap<bool> > eleVetoIdFall17MapToken_;
-  edm::EDGetTokenT<edm::ValueMap<bool> > eleLooseIdFall17MapToken_;
-  edm::EDGetTokenT<edm::ValueMap<bool> > eleMediumIdFall17MapToken_;
-  edm::EDGetTokenT<edm::ValueMap<bool> > eleTightIdFall17MapToken_;
-  edm::EDGetTokenT<edm::ValueMap<bool> > eleVetoIdFall17V2MapToken_;
-  edm::EDGetTokenT<edm::ValueMap<bool> > eleLooseIdFall17V2MapToken_;
-  edm::EDGetTokenT<edm::ValueMap<bool> > eleMediumIdFall17V2MapToken_;
-  edm::EDGetTokenT<edm::ValueMap<bool> > eleTightIdFall17V2MapToken_;
 
   //// New for Spring16
   edm::EDGetTokenT<pat::TauCollection> TauCollectionToken_;
@@ -457,9 +437,13 @@ class NTupleMaker : public edm::EDAnalyzer{
   edm::EDGetTokenT<pat::TriggerObjectStandAloneCollection> myTriggerObjectCollectionToken_;
   edm::EDGetTokenT<BeamSpot> BeamSpotToken_;
   edm::EDGetTokenT<VertexCollection> PVToken_;
+  edm::EDGetTokenT<RefitVertexCollection> PVwithBSToken_;
+  edm::EDGetTokenT<RefitVertexCollection>RefittedPVToken_;
+  edm::EDGetTokenT<RefitVertexCollection> RefittedwithBSPVToken_;
   edm::EDGetTokenT<LHEEventProduct> LHEToken_;
   edm::EDGetTokenT<double> SusyMotherMassToken_;
   edm::EDGetTokenT<double> SusyLSPMassToken_;
+  edm::EDGetTokenT<HTXS::HiggsClassification> htxsToken_;
   std::string sampleName;
 
   PropagatorWithMaterial*               propagatorWithMaterial; 
@@ -529,6 +513,43 @@ class NTupleMaker : public edm::EDAnalyzer{
   Int_t   primvertex_ntracks;
   Float_t primvertex_cov[6];
   Float_t primvertex_mindz;
+
+  // primary vertex
+  Float_t primvertexwithbs_x;
+  Float_t primvertexwithbs_y;
+  Float_t primvertexwithbs_z;
+  Float_t primvertexwithbs_chi2;
+  Float_t primvertexwithbs_ndof;
+  Int_t   primvertexwithbs_ntracks;
+  Float_t primvertexwithbs_cov[6];
+
+  // re-fitted vertex
+  UInt_t  refitvertex_count;
+  Float_t refitvertex_x[M_refitvtxmaxcount];
+  Float_t refitvertex_y[M_refitvtxmaxcount];
+  Float_t refitvertex_z[M_refitvtxmaxcount];
+  Float_t refitvertex_chi2[M_refitvtxmaxcount];
+  Float_t refitvertex_ndof[M_refitvtxmaxcount];
+  Int_t   refitvertex_ntracks[M_refitvtxmaxcount];
+  Float_t refitvertex_cov[M_refitvtxmaxcount][6];
+  Float_t refitvertex_mindz[M_refitvtxmaxcount];
+  Int_t   refitvertex_eleIndex[M_refitvtxmaxcount][2];
+  Int_t   refitvertex_muIndex[M_refitvtxmaxcount][2];
+  Int_t   refitvertex_tauIndex[M_refitvtxmaxcount][2];
+	
+  // re-fitted vertex with bs
+  UInt_t  refitvertexwithbs_count;
+  Float_t refitvertexwithbs_x[M_refitvtxmaxcount];
+  Float_t refitvertexwithbs_y[M_refitvtxmaxcount];
+  Float_t refitvertexwithbs_z[M_refitvtxmaxcount];
+  Float_t refitvertexwithbs_chi2[M_refitvtxmaxcount];
+  Float_t refitvertexwithbs_ndof[M_refitvtxmaxcount];
+  Int_t   refitvertexwithbs_ntracks[M_refitvtxmaxcount];
+  Float_t refitvertexwithbs_cov[M_refitvtxmaxcount][6];
+  Float_t refitvertexwithbs_mindz[M_refitvtxmaxcount];
+  Int_t   refitvertexwithbs_eleIndex[M_refitvtxmaxcount][2];
+  Int_t   refitvertexwithbs_muIndex[M_refitvtxmaxcount][2];
+  Int_t   refitvertexwithbs_tauIndex[M_refitvtxmaxcount][2];
 
   // tracks
   UInt_t track_count;
@@ -762,7 +783,6 @@ class NTupleMaker : public edm::EDAnalyzer{
   Float_t electron_mva_value_Spring16_v1[M_electronmaxcount];
   Float_t electron_mva_wp80_general_Spring16_v1[M_electronmaxcount];
   Float_t electron_mva_wp90_general_Spring16_v1[M_electronmaxcount];
-  Int_t electron_mva_category_Spring16_v1[M_electronmaxcount];
     
     //new for 9.4.0 Fall17
   Float_t electron_mva_value_Iso_Fall17_v1[M_electronmaxcount];
@@ -773,6 +793,15 @@ class NTupleMaker : public edm::EDAnalyzer{
   Float_t electron_mva_wp90_noIso_Fall17_v1[M_electronmaxcount];
   Float_t electron_mva_wp80_noIso_Fall17_v1[M_electronmaxcount];
   Float_t electron_mva_Loose_noIso_Fall17_v1[M_electronmaxcount];
+
+  Float_t electron_mva_value_Iso_Fall17_v2[M_electronmaxcount];
+  Float_t electron_mva_value_noIso_Fall17_v2[M_electronmaxcount];
+  Float_t electron_mva_wp90_Iso_Fall17_v2[M_electronmaxcount];
+  Float_t electron_mva_wp80_Iso_Fall17_v2[M_electronmaxcount];
+  Float_t electron_mva_Loose_Iso_Fall17_v2[M_electronmaxcount];
+  Float_t electron_mva_wp90_noIso_Fall17_v2[M_electronmaxcount];
+  Float_t electron_mva_wp80_noIso_Fall17_v2[M_electronmaxcount];
+  Float_t electron_mva_Loose_noIso_Fall17_v2[M_electronmaxcount]; 
 
   Bool_t electron_cutId_veto_Summer16[M_electronmaxcount];
   Bool_t electron_cutId_loose_Summer16[M_electronmaxcount];
@@ -1169,6 +1198,13 @@ class NTupleMaker : public edm::EDAnalyzer{
   Float_t genmet_ey;
 
   //Generator Information
+  Int_t htxs_stage0cat;
+  Int_t htxs_stage1p1cat_pTjet30GeV;
+  Int_t htxs_stage1p1cat_pTjet25GeV;
+  Float_t htxs_higgsPt;
+  Int_t htxs_njets30;
+  Int_t htxs_njets25;
+
   Float_t genweight;
   Float_t genid1;
   Float_t genx1;

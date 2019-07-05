@@ -58,7 +58,8 @@ process.source = cms.Source("PoolSource",
 #	"/store/mc/RunIIFall17MiniAODv2/SMS-TStauStau_ctau-0p01to10_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/PU2017_12Apr2018_GridpackScan_94X_mc2017_realistic_v14-v1/40000/F849A417-D58D-E811-9A4E-0CC47A4C8EEA.root",
 #	"/store/mc/RunIIFall17MiniAOD/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/RECOSIMstep_94X_mc2017_realistic_v10-v1/00000/0CCEA775-09F2-E711-9833-0025905B85BE.root",
 #        '/store/mc/RunIIFall17MiniAODv2/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14-v2/100000/24D39640-AB96-E811-819F-008CFA0A5808.root',
-        "/store/mc/RunIIFall17MiniAODv2/SUSYGluGluToHToAA_AToMuMu_AToTauTau_M-125_M-9_TuneCUETP8M1_13TeV_madgraph_pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14-v2/70000/E0D55D83-D26F-E811-B58D-44A842B298F1.root"
+#        "/store/mc/RunIIFall17MiniAODv2/SUSYGluGluToHToAA_AToMuMu_AToTauTau_M-125_M-9_TuneCUETP8M1_13TeV_madgraph_pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14-v2/70000/E0D55D83-D26F-E811-B58D-44A842B298F1.root"
+        "/store/mc/RunIIFall17MiniAODv2/GluGluHToTauTau_M125_13TeV_powheg_pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/90000/FE4D4DD9-5B42-E811-A066-0CC47A4D76B6.root"
         ),
   skipEvents = cms.untracked.uint32(0)
 )
@@ -167,6 +168,9 @@ IsData = cms.untracked.bool(isData),
 GenParticles = cms.untracked.bool(not isData),
 GenJets = cms.untracked.bool(not isData)
 )
+process.load('VertexRefit.TauRefit.AdvancedRefitVertexProducer_cfi')
+process.AdvancedRefitVertexNoBSProducer.srcTaus = cms.InputTag("NewTauIDsEmbedded")
+process.AdvancedRefitVertexNoBSProducer.srcLeptons = cms.VInputTag(cms.InputTag("slimmedElectrons"), cms.InputTag("slimmedMuons"), cms.InputTag("NewTauIDsEmbedded"))
 
 process.makeroottree = cms.EDAnalyzer("NTupleMaker",
 # data, year, period, skim
@@ -181,6 +185,7 @@ GenJets = cms.untracked.bool(not isData),
 SusyInfo = cms.untracked.bool(True),
 Trigger = cms.untracked.bool(True),
 RecPrimVertex = cms.untracked.bool(True),
+RefittedVertex = cms.untracked.bool(True),
 RecBeamSpot = cms.untracked.bool(True),
 RecTrack = cms.untracked.bool(True),
 RecPFMet = cms.untracked.bool(True),
@@ -244,6 +249,7 @@ GenJetCollectionTag = cms.InputTag("slimmedGenJets"),
 TriggerObjectCollectionTag = cms.InputTag("slimmedPatTrigger"),
 BeamSpotCollectionTag =  cms.InputTag("offlineBeamSpot"),
 PVCollectionTag = cms.InputTag("offlineSlimmedPrimaryVertices"),
+RefittedPVCollectionTag =  cms.InputTag("AdvancedRefitVertexNoBSProducer"),
 LHEEventProductTag = cms.InputTag("externalLHEProducer"),
 SusyMotherMassTag = cms.InputTag("susyInfo","SusyMotherMass"),
 SusyLSPMassTag = cms.InputTag("susyInfo","SusyLSPMass"),
@@ -507,6 +513,7 @@ process.p = cms.Path(
   #process.HBHENoiseFilterResultProducer* #produces HBHE bools baseline
   #process.ApplyBaselineHBHENoiseFilter*  #reject events based 
   #process.ApplyBaselineHBHEISONoiseFilter*  #reject events based -- disable the module, performance is being investigated
+  process.AdvancedRefitVertexNoBS *
   process.makeroottree
 )
 
