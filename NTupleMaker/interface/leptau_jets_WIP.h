@@ -65,7 +65,7 @@ float get_jetE(const AC1B *analysisTree, int jetIndex, TString JESname, TString 
 };
 
 
-//Merijn: made AC1B *analysisTree non-const, otherwise issues with calling a functions with analysisTree
+//Merijn: made AC1B *analysisTree non-const, otherwise issues with calling functions from jets.h with analysisTree
 void counting_jets(AC1B *analysisTree, Synch17Tree *otree, const Config *cfg, const btag_scaling_inputs *inputs_btag_scaling, TString JESname = "central", TString direction = "None",  JESUncertainties * jecUncertainties = dummyJEC){
 
   //Merijn 2019 6 7: define few things analogous to TM:
@@ -106,7 +106,7 @@ void counting_jets(AC1B *analysisTree, Synch17Tree *otree, const Config *cfg, co
     bool is2017=false;
     bool is2018=false;
     
-    //Merijn add the 2017 exclusion region due to prefiring
+    //Merijn read in year, a.o. for prefiring issue
     if(cfg->get<string>("era") == "2016") is2016=true;
     else if(cfg->get<string>("era") == "2017") is2017=true;
     else if(cfg->get<string>("era") == "2018") is2018=true;
@@ -231,7 +231,7 @@ void counting_jets(AC1B *analysisTree, Synch17Tree *otree, const Config *cfg, co
 	  tageff = histo_tageff_->GetBinContent(histo_tageff_->GetXaxis()->FindBin(JetPtForBTag), histo_tageff_->GetYaxis()->FindBin(absJetEta));
 	  }*/
 
-	//Merijn 2019 6 7 replace by the code of T/M. Likely this works automatically now since bounds adjusted upstream..
+	//Merijn 2019 6 7 replace by the code of T/M. Note: bounds adjusted upstream..
 	tageff =histo_tageff_->Interpolate(JetPtForBTag,absJetEta);
 	
 
@@ -253,7 +253,7 @@ void counting_jets(AC1B *analysisTree, Synch17Tree *otree, const Config *cfg, co
       if (tagged) {
 	bjets.push_back(jet);
 
-	if (indexLeadingBJet>=0) {//Merijn: not done in macro t/m..
+	if (indexLeadingBJet>=0) {//Merijn: not sure if also done in macro t/m..
 	  if (jetPt<ptLeadingBJet && jetPt>ptSubLeadingBJet) {
 	    indexSubLeadingBJet = jet;
 	    ptSubLeadingBJet = jetPt;
