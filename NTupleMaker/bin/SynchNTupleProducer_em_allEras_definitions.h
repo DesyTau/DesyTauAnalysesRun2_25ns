@@ -25,7 +25,6 @@
 #include "FWCore/ParameterSet/interface/FileInPath.h"
 #include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
 #include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
-
 #include "DesyTauAnalyses/NTupleMaker/interface/Config.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/AC1B.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/json.h"
@@ -49,6 +48,9 @@
 #include "RooWorkspace.h"
 #include "RooAbsReal.h"
 #include "RooRealVar.h"
+
+#include "ZZMatrixElement/MELA/interface/Mela.h"
+#include "ZZMatrixElement/MELA/interface/TUtil.hh"
 
 using namespace std;
 
@@ -150,10 +152,6 @@ Float_t         pt_sv;
 Float_t         eta_sv;
 Float_t         phi_sv;
 
-Float_t         pt_sv_gen;
-Float_t         eta_sv_gen;
-Float_t         phi_sv_gen;
-
 Float_t         pt_1;
 Float_t         phi_1;
 Float_t         eta_1;
@@ -207,9 +205,6 @@ Float_t         metphi_unclMetDown;
 
 Float_t         genmet;
 Float_t         genmetphi;
-
-Float_t         msvmet;
-Float_t         msvmetphi;
 
 Float_t         pt_tt;
 Float_t         dr_tt;
@@ -275,14 +270,6 @@ Float_t         nuPz;  // (x,y,z) components
 Float_t         nuPt;  // pT
 Float_t         nuPhi; // phi
 
-Float_t         nuPx_msv; // neutrinos after msv fit
-Float_t         nuPy_msv; //
-Float_t         nuPz_msv; //
-Float_t         nuPt_msv; //
-Float_t         nuPhi_msv; //
-
-Float_t         msv_gen;
-Float_t         mtsv_gen;
 Float_t         mtBoson_gen;
     
 Float_t         mTtot_gen;
@@ -593,6 +580,25 @@ float ptSubLeadingJet = -1;
 int indexLeadingBJet = -1;
 float ptLeadingBJet = -1;
 
+bool checkSV = false;
+bool checkFastMTT = false;
+bool passesPreSel = false; 
+
+bool isSVFitUsed = false;
+bool isFastMTTUsed = false;
+
+// MELA outputs
+// 1. Matrix element variables for different hypotheses (VBF Higgs, ggH + 2 jets, Z + 2 jets)
+float ME_vbf, ME_ggh, ME_z2j_1, ME_z2j_2;
+// 2. Energy transfer (Q^2) variables
+float ME_q2v1, ME_q2v2;
+// 3. Angle variables
+float ME_costheta1, ME_costheta2, ME_phi, ME_costhetastar, ME_phi1;
+// 4. Main BG vs. Higgs discriminators
+float ME_vbf_vs_Z, ME_ggh_vs_Z, ME_vbf_vs_ggh;
+
+
+
 void SetupTree(){
  
    tree->Branch("run", &run, "run/I");
@@ -721,17 +727,15 @@ void SetupTree(){
    
    tree->Branch("mTemu",        &mTemu,        "mTemu/F");
    
+   tree->Branch("isSVFitUsed",    &isSVFitUsed,   "isSVFitUsed/O");
+   tree->Branch("isFastMTTUsed",    &isFastMTTUsed,   "isFastMTTUsed/O");
    tree->Branch("m_sv",    &m_sv,   "m_sv/F");
    tree->Branch("mt_sv",   &mt_sv,  "mt_sv/F");
    
    tree->Branch("pt_sv",   &pt_sv,  "pt_sv/F");
    tree->Branch("eta_sv",  &eta_sv, "eta_sv/F");
    tree->Branch("phi_sv",  &phi_sv, "phi_sv/F");
-   
-   tree->Branch("pt_sv_gen",   &pt_sv_gen,  "pt_sv_gen/F");
-   tree->Branch("eta_sv_gen",  &eta_sv_gen, "eta_sv_gen/F");
-   tree->Branch("phi_sv_gen",  &phi_sv_gen, "phi_sv_gen/F");
-   
+    
    tree->Branch("pt_1", &pt_1, "pt_1/F");
    tree->Branch("phi_1", &phi_1, "phi_1/F");
    tree->Branch("eta_1", &eta_1, "eta_1/F");
@@ -791,16 +795,11 @@ void SetupTree(){
    tree->Branch("mTemu_gen",  &mTemu_gen,   "mTemu_gen/F");
    tree->Branch("mTemet_gen", &mTemet_gen,  "mTemet_gen/F");
    tree->Branch("mTmumet_gen",&mTmumet_gen, "mTmumet_gen/F");
-   tree->Branch("msv_gen",&msv_gen,"msv_gen/F");
-   tree->Branch("mtsv_gen",&mtsv_gen,"mtsv_gen/F");
    tree->Branch("mtBoson_gen",&mtBoson_gen,"mtBoson_gen/F");
     
    tree->Branch("dphi_mumet",&dphi_mumet,"dphi_mumet/F");
    tree->Branch("dphi_emet",&dphi_emet,"dphi_emet/F");
-   
-   tree->Branch("msvmet", &msvmet, "msvmet/F");
-   tree->Branch("msvmetphi", &msvmetphi, "msvmetphi/F");
-   
+      
    tree->Branch("pt_tt", &pt_tt, "pt_tt/F");
    
    tree->Branch("dr_tt", &dr_tt, "dr_tt/F");
@@ -863,12 +862,6 @@ void SetupTree(){
    tree->Branch("nuPt",&nuPt,"nuPt/F");
    tree->Branch("nuPhi",&nuPhi,"nuPhi/F");
     
-   tree->Branch("nuPx_msv",&nuPx_msv,"nuPx_msv/F");
-   tree->Branch("nuPy_msv",&nuPy_msv,"nuPy_msv/F");
-   tree->Branch("nuPz_msv",&nuPz_msv,"nuPz_msv/F");
-   tree->Branch("nuPt_msv",&nuPt_msv,"nuPt_msv/F");
-   tree->Branch("nuPhi_msv",&nuPhi_msv,"nuPhi_msv/F");
-   
    tree->Branch("lepPx",&lepPx,"lepPx/F");
    tree->Branch("lepPy",&lepPy,"lepPy/F");
    tree->Branch("lepPz",&lepPz,"lepPz/F");
@@ -885,6 +878,29 @@ void SetupTree(){
    tree->Branch("d0_2_cal",&d0_2_cal,"d0_2_cal/F");
    tree->Branch("dZ_1_cal",&dZ_1_cal,"dZ_1_cal/F");
    tree->Branch("dZ_2_cal",&dZ_2_cal,"dZ_2_cal/F");
+
+   // MELA outputs
+   // 1. Matrix element variables for different hypotheses (VBF Higgs, ggH + 2 jets, Z + 2 jets)
+   tree->Branch("ME_ggh", &ME_ggh, "ME_ggh/F");
+   tree->Branch("ME_vbf", &ME_vbf, "ME_vbf/F");
+   tree->Branch("ME_z2j_1", &ME_z2j_1, "ME_z2j_1/F");
+   tree->Branch("ME_z2j_2", &ME_z2j_2, "ME_z2j_2/F");
+
+   // 2. Energy transfer (Q^2) variables
+   tree->Branch("ME_q2v1", &ME_q2v1, "ME_q2v1/F");
+   tree->Branch("ME_q2v2", &ME_q2v2, "ME_q2v2/F");
+   
+   // 3. Angle variables
+   tree->Branch("ME_costheta1", &ME_costheta1, "ME_costheta1/F");
+   tree->Branch("ME_costheta2", &ME_costheta2, "ME_costheta2/F");
+   tree->Branch("ME_phi", &ME_phi, "ME_phi/F");
+   tree->Branch("ME_costhetastar", &ME_costhetastar, "ME_costhetastar/F");
+   tree->Branch("ME_phi1", &ME_phi1, "ME_phi1/F");
+   
+   // 4. Main BG vs. Higgs discriminators
+   tree->Branch("ME_vbf_vs_Z", &ME_vbf_vs_Z, "ME_vbf_vs_Z/F");
+   tree->Branch("ME_ggh_vs_Z", &ME_ggh_vs_Z, "ME_ggh_vs_Z/F");
+   tree->Branch("ME_vbf_vs_ggh", &ME_vbf_vs_ggh, "ME_vbf_vs_ggh/F");
 }
 
 void SetDefaultValues(){
@@ -967,38 +983,6 @@ void SetDefaultValues(){
    nuPt = 0;
    nuPhi = 0;
    
-   nuPx_msv = 0;
-   nuPy_msv = 0;
-   nuPz_msv = 0;
-   nuPt_msv = 0;
-   nuPhi_msv = 0;
-   
-   lepPx = 0;
-   lepPy = 0;
-   lepPz = 0;
-   bosonPx = 0;
-   bosonPy = 0;
-   bosonPz = 0;
-   bosonPt = 0;
-   bosonMass = -1;
-   
-   njets_HTXS = -1.;
-   higgspt_HTXS = -1.;
-   htxs_stage0cat = -1.;
-   htxs_stage1cat = -1.;
-   
-   metFilters_ = true;
-   badChargedCandidateFilter_ = true;
-   badPFMuonFilter_ = true;
-   badMuonFilter_ = true;
-   duplicateMuonFilter_ = true;
-         
-   nuPx_msv = 0;
-   nuPy_msv = 0;
-   nuPz_msv = 0;
-   nuPt_msv = 0;
-   nuPhi_msv = 0;
-   
    lepPx = 0;
    lepPy = 0;
    lepPz = 0;
@@ -1019,11 +1003,25 @@ void SetDefaultValues(){
    badMuonFilter_ = true;
    duplicateMuonFilter_ = true;
    
-   nuPx_msv = 0;
-   nuPy_msv = 0;
-   nuPz_msv = 0;
-   nuPt_msv = 0;
-   nuPhi_msv = 0;
+   lepPx = 0;
+   lepPy = 0;
+   lepPz = 0;
+   bosonPx = 0;
+   bosonPy = 0;
+   bosonPz = 0;
+   bosonPt = 0;
+   bosonMass = -1;
+   
+   njets_HTXS = -1.;
+   higgspt_HTXS = -1.;
+   htxs_stage0cat = -1.;
+   htxs_stage1cat = -1.;
+   
+   metFilters_ = true;
+   badChargedCandidateFilter_ = true;
+   badPFMuonFilter_ = true;
+   badMuonFilter_ = true;
+   duplicateMuonFilter_ = true;
    
    lepPx = 0;
    lepPy = 0;
@@ -1172,6 +1170,20 @@ void SetDefaultValues(){
    pt_sv  = -10;
    eta_sv = -10;
    phi_sv = -10;
-         
+        
+   ME_vbf= -10;
+   ME_q2v1 = -10;
+   ME_q2v2 = -10;
+   ME_costheta1 = -10;
+   ME_costheta2 = -10;
+   ME_phi = -10;
+   ME_costhetastar = -10;
+   ME_phi1 = -10;
+   ME_z2j_1 = -10;
+   ME_z2j_2 = -10;
+   ME_vbf_vs_Z = -10;
+   ME_ggh_vs_Z = -10;
+   ME_vbf_vs_ggh = -10;
+   ME_ggh  = -10;
 
 }
