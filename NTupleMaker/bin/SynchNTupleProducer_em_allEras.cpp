@@ -14,6 +14,7 @@ int main(int argc, char * argv[]) {
    const string era = cfg.get<string>("Era");
    
    const bool computeSVFitMass = cfg.get<bool>("ComputeSVFitMass");
+   const bool computeFastMTTMass = cfg.get<bool>("ComputeFastMTTMass");
    const bool removeGammaStar = cfg.get<bool>("RemoveGammaStar");
    
    const bool isData = cfg.get<bool>("IsData");
@@ -378,6 +379,17 @@ int main(int argc, char * argv[]) {
    TFile * correctionWorkSpaceFile_embedded_trigger  = new TFile(correctionsWorkspaceFileName_embedded_trigger);
    RooWorkspace *correctionWS_embedded_trigger  = (RooWorkspace*)correctionWorkSpaceFile_embedded_trigger->Get("w");
 
+   // store whether FastMTT or SVFit is used ===========================================================================================================================
+   isSVFitUsed = computeSVFitMass;
+   isFastMTTUsed = computeFastMTTMass;
+
+   // setup MELA =======================================================================================================================================================
+   const int erg_tev = 13;
+   const float mPOLE = 125.6;
+   TVar::VerbosityLevel verbosity = TVar::SILENT;
+   Mela mela(erg_tev, mPOLE, verbosity);
+
+
    // ==================================================================================================================================================================
    // open files =======================================================================================================================================================
    // ==================================================================================================================================================================
@@ -413,7 +425,7 @@ int main(int argc, char * argv[]) {
       
       // event loop ====================================================================================================================================================
       for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) {
-         std::cout<<"New event==========================================================================="<<std::endl;
+
          analysisTree.GetEntry(iEntry);
          nEvents++;
          
@@ -1035,25 +1047,29 @@ int main(int argc, char * argv[]) {
             float jetPt_tocheck = jetPt;
             if (sync) jetPt_tocheck = jetPt;
             else{
-               float jetPtmin = jetPt;
-               if(jetLV_jecUnc.at("jecUncEta0To5Down").Pt() < jetPtmin) jetPtmin = jetLV_jecUnc.at("jecUncEta0To5Down").Pt();
-               if(jetLV_jecUnc.at("jecUncEta0To3Down").Pt() < jetPtmin) jetPtmin = jetLV_jecUnc.at("jecUncEta0To3Down").Pt();
-               if(jetLV_jecUnc.at("jecUncEta3To5Down").Pt() < jetPtmin) jetPtmin = jetLV_jecUnc.at("jecUncEta3To5Down").Pt();
-               if(jetLV_jecUnc.at("jecUncRelativeBalDown").Pt() < jetPtmin) jetPtmin = jetLV_jecUnc.at("jecUncRelativeBalDown").Pt();
+               float jetPtmax = jetPt;
+               if(jetLV_jecUnc.at("jecUncEta0To5Down").Pt() > jetPtmax) jetPtmax = jetLV_jecUnc.at("jecUncEta0To5Down").Pt();
+               if(jetLV_jecUnc.at("jecUncEta0To5Up").Pt() > jetPtmax) jetPtmax = jetLV_jecUnc.at("jecUncEta0To5Up").Pt();
+               if(jetLV_jecUnc.at("jecUncEta0To3Down").Pt() > jetPtmax) jetPtmax = jetLV_jecUnc.at("jecUncEta0To3Down").Pt();
+               if(jetLV_jecUnc.at("jecUncEta0To3Up").Pt() > jetPtmax) jetPtmax = jetLV_jecUnc.at("jecUncEta0To3Up").Pt();
+               if(jetLV_jecUnc.at("jecUncEta3To5Down").Pt() > jetPtmax) jetPtmax = jetLV_jecUnc.at("jecUncEta3To5Down").Pt();
+               if(jetLV_jecUnc.at("jecUncEta3To5Up").Pt() > jetPtmax) jetPtmax = jetLV_jecUnc.at("jecUncEta3To5Up").Pt();
+               if(jetLV_jecUnc.at("jecUncRelativeBalDown").Pt() > jetPtmax) jetPtmax = jetLV_jecUnc.at("jecUncRelativeBalDown").Pt();
+               if(jetLV_jecUnc.at("jecUncRelativeBalUp").Pt() > jetPtmax) jetPtmax = jetLV_jecUnc.at("jecUncRelativeBalUp").Pt();
                if (era!="2016") {
-                  if(jetLV_jecUnc.at("jecUncRelativeSampleDown").Pt() < jetPtmin) jetPtmin = jetLV_jecUnc.at("jecUncRelativeSampleDown").Pt();
+                  if(jetLV_jecUnc.at("jecUncRelativeSampleDown").Pt() > jetPtmax) jetPtmax = jetLV_jecUnc.at("jecUncRelativeSampleDown").Pt();
+                  if(jetLV_jecUnc.at("jecUncRelativeSampleUp").Pt() > jetPtmax) jetPtmax = jetLV_jecUnc.at("jecUncRelativeSampleUp").Pt();
                }
-               jetPt_tocheck = jetPtmin;
+               jetPt_tocheck = jetPtmax;
             }
             if (jetPt_tocheck<jetPtLowCut) continue;   
-            std::cout<<"Jet passed low pt cut. Pt is "<<jetPt_tocheck<<std::endl;
+
             bool isPFJetId =false;
             if (era=="2016") isPFJetId= looseJetiD(analysisTree,int(jet));
             else if (era=="2017") isPFJetId = tightJetiD_2017(analysisTree,int(jet));
             else if (era=="2018") isPFJetId = tightJetiD_2018(analysisTree,int(jet));
-            
             if (!isPFJetId) continue;
-            std::cout<<"Jet passed jet id "<<jetPt_tocheck<<std::endl;
+
             if (era=="2017" && jetPt < 50 && absJetEta > 2.65 && absJetEta < 3.139) continue;
             
             bool cleanedJet = true;
@@ -1064,7 +1080,7 @@ int main(int argc, char * argv[]) {
                                eta_2,phi_2);
             if (dR2<dRJetLeptonCut) cleanedJet = false;
             if (!cleanedJet) continue;
-            std::cout<<"Jet passed cleaning "<<jetPt_tocheck<<std::endl;
+
             if (jetPt>jetPtLowCut) jetspt20.push_back(jet);
             
             if (absJetEta<bJetEtaCut) { // jet within b-tagging acceptance
@@ -1194,7 +1210,7 @@ int main(int argc, char * argv[]) {
                jets.push_back(jet); 
             
             if (jetPt_tocheck<jetPtHighCut) continue;
-            std::cout<<"Jet passed high pt cut. Pt is "<<jetPt_tocheck<<std::endl;
+
             if (indexLeadingJet>=0) {
                if (jetPt<ptLeadingJet&&jetPt>ptSubLeadingJet) {
                   indexSubLeadingJet = jet;
@@ -1237,10 +1253,7 @@ int main(int argc, char * argv[]) {
                             analysisTree.pfjet_py[indexLeadingJet],
                             analysisTree.pfjet_pz[indexLeadingJet],
                             analysisTree.pfjet_e[indexLeadingJet]);
-         std::cout<<"stored Jet pt "<<jpt_1<<std::endl;
-         std::cout<<"stored Jet eta "<<jeta_1<<std::endl;
-         std::cout<<"stored Jet phi "<<jphi_1<<std::endl;  
-         std::cout<<"stored Jet ptraw "<<jptraw_1<<std::endl;     
+
             for (auto uncer_split : jec_unc_map) {
                float sum_unc   = 0;
                for (auto single_jec_unc : uncer_split.second){
@@ -1255,19 +1268,13 @@ int main(int argc, char * argv[]) {
                jet1LV_jecUnc[uncer_split.first+"Down"] = jet1*(1-unc_total);
             }
          }
-          std::cout<<"stored Jet pt "<<jpt_1<<std::endl;
-         std::cout<<"stored Jet eta "<<jeta_1<<std::endl;
-         std::cout<<"stored Jet phi "<<jphi_1<<std::endl;  
-         std::cout<<"stored Jet ptraw "<<jptraw_1<<std::endl;  
+
          if (indexSubLeadingJet>=0) {
             jpt_2 = analysisTree.pfjet_pt[indexSubLeadingJet];
             jeta_2 = analysisTree.pfjet_eta[indexSubLeadingJet];
             jphi_2 = analysisTree.pfjet_phi[indexSubLeadingJet];
             jptraw_2 = analysisTree.pfjet_pt[indexSubLeadingJet]*analysisTree.pfjet_energycorr[indexSubLeadingJet];
-            std::cout<<"stored Jet pt 2 "<<jpt_2<<std::endl;
-         std::cout<<"stored Jet eta 2"<<jeta_2<<std::endl;
-         std::cout<<"stored Jet phi 2"<<jphi_2<<std::endl;  
-         std::cout<<"stored Jet ptraw 2"<<jptraw_2<<std::endl;     
+
             jet2.SetPxPyPzE(analysisTree.pfjet_px[indexSubLeadingJet],
                             analysisTree.pfjet_py[indexSubLeadingJet],
                             analysisTree.pfjet_pz[indexSubLeadingJet],
@@ -1287,10 +1294,6 @@ int main(int argc, char * argv[]) {
                jet2LV_jecUnc[uncer_split.first+"Down"] = jet2*(1-unc_total);
             }
          }
-               std::cout<<"stored Jet pt 2 "<<jpt_2<<std::endl;
-         std::cout<<"stored Jet eta 2"<<jeta_2<<std::endl;
-         std::cout<<"stored Jet phi 2"<<jphi_2<<std::endl;  
-         std::cout<<"stored Jet ptraw 2"<<jptraw_2<<std::endl;     
 
          if (indexLeadingJet>=0 && indexSubLeadingJet>=0) {
             
@@ -1298,15 +1301,8 @@ int main(int argc, char * argv[]) {
             dijetpt  = (jet1+jet2).Pt();
             dijetphi = (jet1+jet2).Phi();
             jdeta = fabs(analysisTree.pfjet_eta[indexLeadingJet]-analysisTree.pfjet_eta[indexSubLeadingJet]);
-         std::cout<<"stored Jet mjj "<<mjj<<std::endl;
-         std::cout<<"stored Jet dijetpt "<<dijetpt<<std::endl;
-         std::cout<<"stored Jet dijetphi "<<dijetphi<<std::endl;  
-         std::cout<<"stored Jet jdeta "<<jdeta<<std::endl;     
          }
-         std::cout<<"stored Jet mjj "<<mjj<<std::endl;
-         std::cout<<"stored Jet dijetpt "<<dijetpt<<std::endl;
-         std::cout<<"stored Jet dijetphi "<<dijetphi<<std::endl;  
-         std::cout<<"stored Jet jdeta "<<jdeta<<std::endl;   
+
          // METs =======================================================================================================================================================
          float met_x_recoilscaleUp = analysisTree.pfmetcorr_ex;
          float met_x_recoilscaleDown = analysisTree.pfmetcorr_ex;
@@ -1324,11 +1320,18 @@ int main(int argc, char * argv[]) {
          
          met = TMath::Sqrt(met_x*met_x + met_y*met_y);
          metphi = TMath::ATan2(met_y,met_x);
-         metcov00 = analysisTree.pfmetcorr_sigxx;
-         metcov01 = analysisTree.pfmetcorr_sigxy;
-         metcov10 = analysisTree.pfmetcorr_sigyx;
-         metcov11 = analysisTree.pfmetcorr_sigyy;
-         
+         if (era=="2018"){
+            metcov00 = analysisTree.pfmet_sigxx;
+            metcov01 = analysisTree.pfmet_sigxy;
+            metcov10 = analysisTree.pfmet_sigyx;
+            metcov11 = analysisTree.pfmet_sigyy;
+         }
+         else{
+            metcov00 = analysisTree.pfmetcorr_sigxx;
+            metcov01 = analysisTree.pfmetcorr_sigxy;
+            metcov10 = analysisTree.pfmetcorr_sigyx;
+            metcov11 = analysisTree.pfmetcorr_sigyy;
+         }
          // recoil corrections =========================================================================================================================================
          int njetsforrecoil = njets;
          if (isW) njetsforrecoil = njets + 1;
@@ -1459,13 +1462,29 @@ int main(int argc, char * argv[]) {
             pt_ttjj = (muonLV+electronLV+metLV+jet1+jet2).Pt();
          }
          pt_tt = (muonLV+electronLV+metLV).Pt();
-      std::cout<<"stored Jet pt_ttjj "<<pt_ttjj<<std::endl;
      
-         bool checkSV = false;
-         if (sync) checkSV = computeSVFitMass;
-         else checkSV = computeSVFitMass && dzeta>-35 && iso_1<0.15 && iso_2<0.2 && trg_muonelectron > 0.5 && extraelec_veto<0.5 && extramuon_veto<0.5&& mTdileptonMET<60 && (nbtag==0||nbtag_mistagUp==0||nbtag_mistagDown==0||nbtag_btagUp==0||nbtag_btagDown==0);
+         checkSV = false;
+         checkFastMTT = false;
+         passesPreSel = false;
+
+         if (sync) {
+            checkSV = computeSVFitMass;
+            checkFastMTT = computeFastMTTMass;
+         }
+         else {
+            passesPreSel = dzeta>-35 && iso_1<0.15 && iso_2<0.2 && trg_muonelectron > 0.5 && extraelec_veto<0.5 && extramuon_veto<0.5&& mTdileptonMET<60 && (nbtag==0||nbtag_mistagUp==0||nbtag_mistagDown==0||nbtag_btagUp==0||nbtag_btagDown==0);
+            checkSV = computeSVFitMass && passesPreSel;
+            checkFastMTT = computeFastMTTMass && passesPreSel;
+         }
+
          TMatrixD covMET(2, 2);
-         if (checkSV) {
+
+         if (checkSV || checkFastMTT) {
+
+            if (checkSV && checkFastMTT) {
+               std::cout<<"Both SVFit and FastMTT are switched on."<<std::endl;
+               exit(-1);
+            }
             // covariance matrix MET
             covMET[0][0] =  metcov00;
             covMET[1][0] =  metcov10;
@@ -1473,35 +1492,39 @@ int main(int argc, char * argv[]) {
             covMET[1][1] =  metcov11;
             
             // define electron 4-vector
-            classic_svFit::MeasuredTauLepton svFitEle(classic_svFit::MeasuredTauLepton::kTauToElecDecay, 
-                                                      pt_1, eta_1, phi_1, 0.51100e-3); 
+            classic_svFit::MeasuredTauLepton svFitEle(classic_svFit::MeasuredTauLepton::kTauToElecDecay, pt_1, eta_1, phi_1, 0.51100e-3);
             // define muon 4-vector
-            classic_svFit::MeasuredTauLepton svFitMu(classic_svFit::MeasuredTauLepton::kTauToMuDecay,  
-                                                     pt_2, eta_2, phi_2, 105.658e-3); 
+            classic_svFit::MeasuredTauLepton svFitMu(classic_svFit::MeasuredTauLepton::kTauToMuDecay, pt_2, eta_2, phi_2, 105.658e-3); 
             
-            // central value
-            ClassicSVfit algo = SVFitMassComputation(svFitEle, svFitMu,
-                                                     met_x, met_y,
-                                                     covMET, inputFile_visPtResolution);
-            
-            m_sv =static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(algo.getHistogramAdapter())->getMass();
-            mt_sv = static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(algo.getHistogramAdapter())->getTransverseMass(); // return value of transverse svfit mass is in units of GeV
-            if ( !algo.isValidSolution() ) 
-               std::cout << "sorry -- status of NLL is not valid [" << algo.isValidSolution() << "]" << std::endl;
-            pt_sv  = static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(algo.getHistogramAdapter())->getPt(); 
-            // std::cout<<"pt: "<<pt_sv<<std::endl;
-            eta_sv = static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(algo.getHistogramAdapter())->getEta();
-            phi_sv = static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(algo.getHistogramAdapter())->getPhi();
-            
-            float px_sv = pt_sv*TMath::Cos(phi_sv);
-            float py_sv = pt_sv*TMath::Sin(phi_sv);
-            
-            float msvmet_ex = px_sv - dileptonLV.Px();
-            float msvmet_ey = py_sv - dileptonLV.Py();
-            
-            msvmet = TMath::Sqrt(msvmet_ex*msvmet_ex+msvmet_ey*msvmet_ey);
-            msvmetphi = TMath::ATan2(msvmet_ey,msvmet_ex);
-            
+            if (checkSV){
+
+               std::cout<<"ClassicSVfit is used" <<std::endl;
+               ClassicSVfit algo = SVFitMassComputation(svFitEle, svFitMu, met_x, met_y, covMET, inputFile_visPtResolution);
+
+               if ( !algo.isValidSolution() )
+                  std::cout << "sorry -- status of NLL is not valid [" << algo.isValidSolution() << "]" << std::endl;
+
+               m_sv =static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(algo.getHistogramAdapter())->getMass();
+               mt_sv = static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(algo.getHistogramAdapter())->getTransverseMass(); // return value of transverse svfit mass is in units of GeV
+               pt_sv  = static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(algo.getHistogramAdapter())->getPt();
+               eta_sv = static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(algo.getHistogramAdapter())->getEta();
+               phi_sv = static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(algo.getHistogramAdapter())->getPhi();
+            }
+
+            if (checkFastMTT){
+
+               std::cout<<"FastMTT is used" <<std::endl;
+               LorentzVector tau1P4;
+               LorentzVector tau2P4;
+               LorentzVector ttP4 = FastMTTComputation(svFitEle, svFitMu, met_x, met_y, covMET, tau1P4, tau2P4);
+
+               m_sv = ttP4.M();
+               mt_sv = mT_LorentzVector(tau1P4,tau2P4);
+
+               pt_sv = ttP4.Pt();
+               eta_sv = ttP4.Eta();
+               phi_sv = ttP4.Phi();
+            }
          }
          gen_match_1 = 6;
          gen_match_2 = 6;
@@ -1837,12 +1860,101 @@ int main(int argc, char * argv[]) {
                                    uncert.second.jet1LV,
                                    uncert.second.jet2LV,
                                    uncert.second.container,
-                                   is_data_or_embedded, checkSV);
+                                   is_data_or_embedded, checkSV, checkFastMTT);
             
          }
+
+         //set MELA variables
+         if (njets>1){
+
+            TLorentzVector tau1, tau2;
+            tau1.SetPtEtaPhiM(pt_1, eta_1, phi_1, m_1);
+            tau2.SetPtEtaPhiM(pt_2, eta_2, phi_2, m_2);
+
+            // FIXME: TODO: Why do we not use the jet mass here? (comment from KIT)
+            TLorentzVector jet1, jet2;
+            jet1.SetPtEtaPhiM(jpt_1, jeta_1, jphi_1, 0);
+            jet2.SetPtEtaPhiM(jpt_2, jeta_2, jphi_2, 0);
+
+            // Run MELA
+            SimpleParticleCollection_t daughters;
+
+            if (q_1 * q_2 < 0){
+               daughters.push_back(SimpleParticle_t(15 * q_1, tau1));
+               daughters.push_back(SimpleParticle_t(15 * q_2, tau2));
+            }
+            else { //Sanitize charge for application on same-sign events
+               daughters.push_back(SimpleParticle_t(15 * q_1, tau1)); 
+               daughters.push_back(SimpleParticle_t(-15 * q_1, tau2));
+            }
+            SimpleParticleCollection_t associated;
+            associated.push_back(SimpleParticle_t(0, jet1));
+            associated.push_back(SimpleParticle_t(0, jet2));
+
+            SimpleParticleCollection_t associated2;
+            associated2.push_back(SimpleParticle_t(0, jet2));
+            associated2.push_back(SimpleParticle_t(0, jet1));
+
+            mela.resetInputEvent();
+            mela.setCandidateDecayMode(TVar::CandidateDecay_ff); //decay into fermions
+            mela.setInputEvent(&daughters, &associated, (SimpleParticleCollection_t *)0, false); //set the decay products and the associated jets
+
+            // Hypothesis: SM VBF Higgs
+            mela.setProcess(TVar::HSMHiggs, TVar::JHUGen, TVar::JJVBF);
+            mela.computeProdP(ME_vbf, false);
+            mela.computeVBFAngles(ME_q2v1, ME_q2v2, ME_costheta1, ME_costheta2, ME_phi, ME_costhetastar, ME_phi1);
+
+            // Hypothesis ggH + 2 jets
+            mela.setProcess(TVar::SelfDefine_spin0, TVar::JHUGen, TVar::JJQCD);
+            mela.selfDHggcoupl[0][gHIGGS_GG_2][0] = 1;
+            mela.computeProdP(ME_ggh, false);
+
+            // Hypothesis: Z + 2 jets
+            // Compute the Hypothesis with flipped jets and sum them up for the discriminator.
+            mela.setProcess(TVar::bkgZJets, TVar::MCFM, TVar::JJQCD);
+            mela.computeProdP(ME_z2j_1, false);
+
+            mela.resetInputEvent();
+            mela.setInputEvent(&daughters, &associated2, (SimpleParticleCollection_t *)0, false);
+            mela.computeProdP(ME_z2j_2, false);
+
+            // Compute discriminator for VBF vs Z
+            if ((ME_vbf + ME_z2j_1 + ME_z2j_2) != 0.0)
+               {
+                  ME_vbf_vs_Z = ME_vbf / (ME_vbf + ME_z2j_1 + ME_z2j_2);
+               }
+            else
+               {
+                  std::cout << "WARNING: ME_vbf_vs_Z = X / 0. Setting it to default " << -10 << std::endl;
+                  ME_vbf_vs_Z = -10;
+               }
+
+            // Compute discriminator for ggH vs Z
+            if ((ME_ggh + ME_z2j_1 + ME_z2j_2) != 0.0)
+               {
+                  ME_ggh_vs_Z = ME_ggh / (ME_ggh + ME_z2j_1 + ME_z2j_2);
+               }
+            else
+               {
+                  std::cout << "WARNING: ME_ggh_vs_Z = X / 0. Setting it to default " << -10 << std::endl;
+                  ME_ggh_vs_Z = -10;
+               }
+
+            // Compute discriminator for VBF vs ggH
+            if ((ME_vbf + ME_ggh) != 0.0)
+               {
+                  ME_vbf_vs_ggh = ME_vbf / (ME_vbf + ME_ggh);
+               }
+            else
+               {
+                  std::cout << "WARNING: ME_vbf_vs_ggh = X / 0. Setting it to default " << -10 << std::endl;
+                  ME_vbf_vs_ggh = -10;
+               }
+         }
+
          tree->Fill();
          selEvents++;
-         
+
       } // end of file processing (loop over events in one file)
       nFiles++;
       delete _tree;
