@@ -138,6 +138,7 @@
  <use name="CondFormats/BTauObjects"/>
  <use name="CondTools/BTau"/>
  <use name="TauAnalysis/ClassicSVfit"/>
+ <use name="ZZMatrixElement/MELA"/>
  <use name="HTT-utilities/LepEffInterface"/>
  <use name="HTT-utilities/RecoilCorrections"/>
  <use name="HTT-utilities/QCDModelingEMu"/>
