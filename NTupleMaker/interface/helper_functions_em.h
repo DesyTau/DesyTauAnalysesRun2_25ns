@@ -2,6 +2,7 @@
 #include "TauAnalysis/ClassicSVfit/interface/ClassicSVfit.h"
 #include "TauAnalysis/ClassicSVfit/interface/svFitHistogramAdapter.h"
 #include "TauAnalysis/ClassicSVfit/interface/MeasuredTauLepton.h"
+#include "TauAnalysis/ClassicSVfit/interface/FastMTT.h"
 
 void computeDzeta(float metX,  float metY, float zetaX, float zetaY, float pzetavis,
                   float & pzetamiss,
@@ -60,6 +61,22 @@ ClassicSVfit SVFitMassComputation(classic_svFit::MeasuredTauLepton svFitEle,
     
 }
 
+LorentzVector FastMTTComputation(classic_svFit::MeasuredTauLepton svFitEle, classic_svFit::MeasuredTauLepton svFitMu, double met_x, double met_y, TMatrixD covMET, LorentzVector &tau1P4, LorentzVector &tau2P4){
+
+   std::vector<classic_svFit::MeasuredTauLepton> measuredTauLeptons;
+   measuredTauLeptons.push_back(svFitEle);
+   measuredTauLeptons.push_back(svFitMu);
+
+   FastMTT aFastMTTAlgo;
+   aFastMTTAlgo.run(measuredTauLeptons, met_x, met_y, covMET);
+   LorentzVector ttP4 = aFastMTTAlgo.getBestP4();
+   tau1P4 = aFastMTTAlgo.getTau1P4();
+   tau2P4 = aFastMTTAlgo.getTau2P4();
+
+   return ttP4;
+}
+
+
 
 
 bool metFiltersPasses(AC1B &tree_, std::vector<TString> metFlags) {
@@ -84,6 +101,15 @@ bool metFiltersPasses(AC1B &tree_, std::vector<TString> metFlags) {
     
 }
 
+double mT_LorentzVector (LorentzVector v1, LorentzVector Metv){
+
+  double dPhimT=dPhiFrom2P( v1.Px(), v1.Py(), Metv.Px(),  Metv.Py() );
+
+  double MT = TMath::Sqrt(2*v1.Pt()*Metv.Pt()*(1-TMath::Cos(dPhimT)));
+  return MT;
+}
+
+
 //class MetPropagatedToVariable :
 
 void propagate_uncertainty(TString uncertainty_name,
@@ -94,7 +120,8 @@ void propagate_uncertainty(TString uncertainty_name,
 			   TLorentzVector jet2LV,
 			   float uncertainty_container[],
 			   bool isData,
-			   bool svfit_on
+            bool svfit_on,
+            bool fastmtt_on               
 			   )
 {
 
@@ -161,16 +188,31 @@ void propagate_uncertainty(TString uncertainty_name,
   if(jet1LV.E()!=0 && jet2LV.E()!=0) uncertainty_container[22] = (jet1LV+jet2LV).Pt();;
   // m_sv // 23, pt_sv // 24, eta_sv // 25, phi_sv // 26, mt_sv // 27
   bool checkSV = svfit_on && uncertainty_container[7]>-35 && uncertainty_container[3]<60;
-  if(!isData && checkSV){
+  bool checkFastMTT = fastmtt_on && uncertainty_container[7]>-35 && uncertainty_container[3]<60;
+  if(!isData && (checkSV || checkFastMTT) ){
     classic_svFit::MeasuredTauLepton svFitEle(classic_svFit::MeasuredTauLepton::kTauToElecDecay, electronLV.Pt(), electronLV.Eta(), electronLV.Phi(), 0.51100e-3);
     classic_svFit::MeasuredTauLepton svFitMu(classic_svFit::MeasuredTauLepton::kTauToMuDecay, muonLV.Pt(), muonLV.Eta(), muonLV.Phi(), 105.658e-3);
-    ClassicSVfit algo = SVFitMassComputation(svFitEle, svFitMu, metLV.Px(), metLV.Py(), covMET, inputFile_visPtResolution);
-    uncertainty_container[23] = static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(algo.getHistogramAdapter())->getMass();
-    uncertainty_container[24] = static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(algo.getHistogramAdapter())->getPt(); 
-    uncertainty_container[25]= static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(algo.getHistogramAdapter())->getEta();
-    uncertainty_container[26]= static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(algo.getHistogramAdapter())->getPhi();
-    uncertainty_container[27]= static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(algo.getHistogramAdapter())->getTransverseMass();
+    if (checkSV){
+       ClassicSVfit algo = SVFitMassComputation(svFitEle, svFitMu, metLV.Px(), metLV.Py(), covMET, inputFile_visPtResolution);
+       uncertainty_container[23] = static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(algo.getHistogramAdapter())->getMass();
+       uncertainty_container[24] = static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(algo.getHistogramAdapter())->getPt(); 
+       uncertainty_container[25]= static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(algo.getHistogramAdapter())->getEta();
+       uncertainty_container[26]= static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(algo.getHistogramAdapter())->getPhi();
+       uncertainty_container[27]= static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(algo.getHistogramAdapter())->getTransverseMass();
+    }
+    if (checkFastMTT){
+       LorentzVector tau1P4;
+       LorentzVector tau2P4;
+       LorentzVector ttP4 = FastMTTComputation(svFitEle, svFitMu, metLV.Px(), metLV.Py(), covMET, tau1P4, tau2P4);
+       uncertainty_container[23] = ttP4.M();
+       uncertainty_container[24] = ttP4.Pt();
+       uncertainty_container[25] = ttP4.Eta();
+       uncertainty_container[26] = ttP4.Phi();
+       uncertainty_container[27] = mT_LorentzVector(tau1P4,tau2P4);
+    }
   }
+  
   // mTemu // 28
   uncertainty_container[28] = mT(electronLV,muonLV);
 }
+
