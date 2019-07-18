@@ -996,14 +996,10 @@ int main(int argc, char * argv[]) {
          TLorentzVector metLV;
          float met_x;
          float met_y;
-         if (era == "2018") {
-            met_x = analysisTree.pfmet_ex;
-            met_y = analysisTree.pfmet_ey;
-         }
-         else{
-            met_x = analysisTree.pfmetcorr_ex;
-            met_y = analysisTree.pfmetcorr_ey;
-         }
+
+         met_x = analysisTree.pfmetcorr_ex;
+         met_y = analysisTree.pfmetcorr_ey;
+
          met = TMath::Sqrt(met_x*met_x + met_y*met_y);
          metLV.SetXYZT(met_x,met_y,0.,met);
 
@@ -1320,18 +1316,12 @@ int main(int argc, char * argv[]) {
          
          met = TMath::Sqrt(met_x*met_x + met_y*met_y);
          metphi = TMath::ATan2(met_y,met_x);
-         if (era=="2018"){
-            metcov00 = analysisTree.pfmet_sigxx;
-            metcov01 = analysisTree.pfmet_sigxy;
-            metcov10 = analysisTree.pfmet_sigyx;
-            metcov11 = analysisTree.pfmet_sigyy;
-         }
-         else{
-            metcov00 = analysisTree.pfmetcorr_sigxx;
-            metcov01 = analysisTree.pfmetcorr_sigxy;
-            metcov10 = analysisTree.pfmetcorr_sigyx;
-            metcov11 = analysisTree.pfmetcorr_sigyy;
-         }
+
+         metcov00 = analysisTree.pfmetcorr_sigxx;
+         metcov01 = analysisTree.pfmetcorr_sigxy;
+         metcov10 = analysisTree.pfmetcorr_sigyx;
+         metcov11 = analysisTree.pfmetcorr_sigyy;
+
          // recoil corrections =========================================================================================================================================
          int njetsforrecoil = njets;
          if (isW) njetsforrecoil = njets + 1;
