@@ -25,6 +25,7 @@
 #include "DesyTauAnalyses/NTupleMaker/interface/json.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/PileUp.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/Jets.h"
+#include "HTT-utilities/RecoilCorrections/interface/RecoilCorrector.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/functions.h"
 #include "HTT-utilities/LepEffInterface/interface/ScaleFactor.h"
 
@@ -37,20 +38,30 @@ int main(int argc, char * argv[]) {
 
   using namespace std;
 
-  // **** configuration
+  // Read Arguments
   Config cfg(argv[1]);
 
+  std::string rootFileName(argv[2]);
+  std::ifstream fileList(argv[2]);
+  std::ifstream fileList0(argv[2]);
+  const bool isDY = rootFileName.find("DY") == rootFileName.rfind("/")+1;
+  const bool isWJets = (rootFileName.find("WJets") == rootFileName.rfind("/")+1) || (rootFileName.find("W1Jets") == rootFileName.rfind("/")+1) || (rootFileName.find("W2Jets") == rootFileName.rfind("/")+1) || (rootFileName.find("W3Jets") == rootFileName.rfind("/")+1) || (rootFileName.find("W4Jets") == rootFileName.rfind("/")+1) || (rootFileName.find("EWK") == rootFileName.rfind("/")+1);
+
+  // Read config file
+
     const bool isData = cfg.get<bool>("IsData");
-    const bool isDY = cfg.get<bool>("IsDY");
     const bool applyGoodRunSelection = cfg.get<bool>("ApplyGoodRunSelection");
+    const bool slimNTuples = cfg.get<bool>("slimNTuples");
 
     const string jsonFile = cfg.get<string>("jsonFile");
+
+    const bool applyRecoilCorrections = cfg.get<bool>("ApplyRecoilCorrections");
+    const string recoilFileName   = cfg.get<string>("RecoilFileName");
     
     // pile up reweighting
     const bool applyPUreweighting_official = cfg.get<bool>("ApplyPUreweighting_official");
     const string dataPUFile = cfg.get<string>("DataPUFile");
     const string mcPUFile = cfg.get<string>("MCPUFile");
-    const string sampleName = cfg.get<string>("sampleName");
 
     // kinematic cuts on electrons
     const float ptEleTagCut  = cfg.get<float>("ptEleTagCut");
@@ -137,9 +148,6 @@ int main(int argc, char * argv[]) {
 
 
   // file name and tree name
-  std::string rootFileName(argv[2]);
-  std::ifstream fileList(argv[2]);
-  std::ifstream fileList0(argv[2]);
   std::string ntupleName("makeroottree/AC1B");
   std::string initNtupleName("initroottree/AC1B");
 
@@ -148,6 +156,9 @@ int main(int argc, char * argv[]) {
 
   TH1::SetDefaultSumw2(true);
 
+  RecoilCorrector* recoilPFMetCorrector = (RecoilCorrector*) malloc(sizeof(*recoilPFMetCorrector));
+  recoilPFMetCorrector = new RecoilCorrector( recoilFileName);
+  
   TFile * file = new TFile(TStrName+TString(".root"),"recreate");
   file->cd("");
 
@@ -221,7 +232,9 @@ int main(int argc, char * argv[]) {
     Int_t   DecayModeProbe;
     
     Float_t met;
+    Float_t metphi;
     UInt_t  npartons;
+    UInt_t  njets;
     
     
     eleTree->Branch("isZLL",&isZLL,"isZLL/O");
@@ -280,7 +293,9 @@ int main(int argc, char * argv[]) {
     eleTree->Branch("DecayModeProbe",&DecayModeProbe,"DecayModeProbe/I");
 
     eleTree->Branch("met",&met,"met/F");
+    eleTree->Branch("metphi",&metphi,"metphi/F");
     eleTree->Branch("npartons",&npartons,"npartons/i");
+    eleTree->Branch("njets",&njets,"njets/i");
     
   TH1D * PUweightsOfficialH = new TH1D("PUweightsOfficialH","PU weights w/ official reweighting",1000, 0, 10);
   TH1D * nTruePUInteractionsH = new TH1D("nTruePUInteractionsH","",50,-0.5,49.5);
@@ -291,14 +306,12 @@ int main(int argc, char * argv[]) {
   // reweighting official recipe 
   // initialize pile up object
   PileUp * PUofficial = new PileUp();
-    TString puHistName(sampleName);
-    puHistName += "_pileup";
 
   if (applyPUreweighting_official) {
     TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/"+TString(dataPUFile),"read");
     TFile * filePUdistribution_MC = new TFile (TString(cmsswBase)+"/src/"+TString(mcPUFile), "read");
     TH1D * PU_data = (TH1D *)filePUdistribution_data->Get("pileup");
-    TH1D * PU_mc = (TH1D *)filePUdistribution_MC->Get(puHistName);
+    TH1D * PU_mc = (TH1D *)filePUdistribution_MC->Get("pileup");
     PUofficial->set_h_data(PU_data);
     PUofficial->set_h_MC(PU_mc);
   }
@@ -396,7 +409,6 @@ int main(int argc, char * argv[]) {
           weight *=analysisTree.genweight;
 
         npartons = analysisTree.genparticles_noutgoing;
-
         
         
       if (!isData) {
@@ -428,7 +440,6 @@ int main(int argc, char * argv[]) {
 	    if ( num.c_str() ==  a.name ) {
 	      //std::cout<< " Eureka "<<num<<"  "<<a.name<<" ";
 	      //     std::cout <<"min "<< last->lower << "- max last " << last->bigger << std::endl;
-	      
 	      for(auto b = a.ranges.begin(); b != std::prev(a.ranges.end()); ++b) {
 		
 		//	cout<<b->lower<<"  "<<b->bigger<<endl;
@@ -442,12 +453,10 @@ int main(int argc, char * argv[]) {
 	    }
 	    
 	  }
-    
-	if (!lumi) continue;
+	if (!lumi){ continue;}
 	//if (lumi ) cout<<"  =============  Found good run"<<"  "<<n<<"  "<<lum<<endl;
 	//std::remove("myinputfile");
       }     
-
       if (analysisTree.event_run<RunMin)
 	RunMin = analysisTree.event_run;
       
@@ -536,7 +545,7 @@ int main(int argc, char * argv[]) {
 	allEles.push_back(ie);
 	if (fabs(analysisTree.electron_dxy[ie])>dxyEleTagCut) elePassed = false;
 	if (fabs(analysisTree.electron_dz[ie])>dzEleTagCut) elePassed = false;
-	if (!analysisTree.electron_mva_wp80_Iso_Fall17_v1[ie]) elePassed = false;
+	if (!analysisTree.electron_mva_wp90_noIso_Fall17_v1[ie]) elePassed = false;
     if (!analysisTree.electron_pass_conversion[ie]) elePassed = false;
 	if (elePassed) idEles.push_back(ie);
 	float absIso = 0;
@@ -824,12 +833,52 @@ int main(int argc, char * argv[]) {
                         //using uncorrected MET for now in 2017
                         
                         met = TMath::Sqrt(analysisTree.pfmet_ex*analysisTree.pfmet_ex + analysisTree.pfmet_ey*analysisTree.pfmet_ey);
+			metphi = analysisTree.pfmet_phi;
+
+
+
+			////////////////////////////////////////////////////////////
+			// MET Recoil Corrections
+			////////////////////////////////////////////////////////////
+		
+			TLorentzVector genV( 0., 0., 0., 0.);
+			TLorentzVector genL( 0., 0., 0., 0.);
+			njets=analysisTree.pfjet_count;
+			UInt_t njetshad=njets;
+ 		
+			if (!isData && applyRecoilCorrections && (isDY || isWJets ) ){
+			  genV = genTools::genV(analysisTree);
+			  genL = genTools::genL(analysisTree);
+			  if(isWJets) njetshad += 1;
+			  
+			  float met_rcmr=met;
+			  float metphi_rcmr=metphi;
+			  // PF MET
+			  genTools::RecoilCorrections( *recoilPFMetCorrector, 
+						       (!isData && applyRecoilCorrections && (isDY || isWJets)) * genTools::MeanResolution,
+						       met, metphi,
+						       genV.Px(), genV.Py(),
+						       genL.Px(), genL.Py(),
+						       njetshad,
+						       met_rcmr, metphi_rcmr
+						       );
+			  met=met_rcmr;
+			  metphi=metphi_rcmr;
+			}
+			TLorentzVector metLV; metLV.SetXYZT(met*TMath::Cos(metphi),
+							    met*TMath::Sin(metphi),
+							    0,
+							    TMath::Sqrt( met*TMath::Sin(metphi)*met*TMath::Sin(metphi) +
+									 met*TMath::Cos(metphi)*met*TMath::Cos(metphi)));
+			
+			/*
                         float dPhiMETEle = dPhiFrom2P(analysisTree.electron_px[index1],analysisTree.electron_py[index1],analysisTree.pfmet_ex,analysisTree.pfmet_ey);
 
                         mt_1 = TMath::Sqrt(2*met*analysisTree.electron_pt[index1]*(1-TMath::Cos(dPhiMETEle)));
-            
+			*/
                         TLorentzVector ele1;
                         ele1.SetXYZM(analysisTree.electron_px[index1],analysisTree.electron_py[index1],analysisTree.electron_pz[index1],electronMass);
+			mt_1=mT(ele1,metLV);
                         
                         TLorentzVector tagele1_Up;
                         TLorentzVector tagele1_Down;
@@ -940,13 +989,15 @@ int main(int argc, char * argv[]) {
                         tauagainstEleVTight = analysisTree.tau_againstElectronVTightMVA6[indexProbe];
                         tauagainstEleRaw = analysisTree.tau_againstElectronMVA6Raw[indexProbe];
                         taubyLooseCombinedIsolationDeltaBetaCorr3Hits = analysisTree.tau_byLooseCombinedIsolationDeltaBetaCorr3Hits[indexProbe];
-                        taubyLooseIsolationMVArun2v1DBoldDMwLT = analysisTree.tau_byLooseIsolationMVArun2v1DBoldDMwLT[indexProbe];
-                        taubyTightIsolationMVArun2v1DBoldDMwLT = analysisTree.tau_byTightIsolationMVArun2v1DBoldDMwLT[indexProbe];
+			//                        taubyLooseIsolationMVArun2v1DBoldDMwLT = analysisTree.tau_byLooseIsolationMVArun2v1DBoldDMwLT[indexProbe];
+                        taubyLooseIsolationMVArun2v1DBoldDMwLT = analysisTree.tau_byLooseIsolationMVArun2017v2DBoldDMwLT2017[indexProbe];
+                        taubyTightIsolationMVArun2v1DBoldDMwLT = analysisTree.tau_byTightIsolationMVArun2017v2DBoldDMwLT2017[indexProbe];
+			if(slimNTuples&&taubyTightIsolationMVArun2v1DBoldDMwLT<0.5)continue;
 
                         PtTag = analysisTree.electron_pt[index1];
                         EtaTag = analysisTree.electron_eta[index1];
-                        PtProbe = analysisTree.electron_pt[indexProbe];
-                        EtaProbe = analysisTree.electron_eta[indexProbe];
+                        PtProbe = analysisTree.tau_pt[indexProbe];
+                        EtaProbe = analysisTree.tau_eta[indexProbe];
                         DecayModeProbe = analysisTree.tau_decayMode[indexProbe];
 
                         
