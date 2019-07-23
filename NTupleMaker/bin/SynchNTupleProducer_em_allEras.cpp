@@ -902,10 +902,16 @@ int main(int argc, char * argv[]) {
             
             if (isEmbedded){
                if (era=="2016"){
-                      Ele23EffData = correctionWS_embedded_trigger->function("e_trg23_binned_ic_data")->getVal();
-                      Ele12EffData = correctionWS_embedded_trigger->function("e_trg12_binned_ic_data")->getVal(); 
-                      Mu23EffData  = correctionWS_embedded_trigger->function("m_trg23_binned_ic_data")->getVal();
-                      Mu8EffData   = correctionWS_embedded_trigger->function("m_trg8_binned_ic_data")->getVal();
+                  Ele23EffData = correctionWS_embedded_trigger->function("e_trg23_binned_ic_data")->getVal();
+                  Ele12EffData = correctionWS_embedded_trigger->function("e_trg12_binned_ic_data")->getVal(); 
+                  Mu23EffData  = correctionWS_embedded_trigger->function("m_trg23_binned_ic_data")->getVal();
+                  Mu8EffData   = correctionWS_embedded_trigger->function("m_trg8_binned_ic_data")->getVal();
+               }
+               if (era=="2018"){
+                  Ele23EffData = correctionWS_embedded_trigger->function("e_trg_binned_23_data")->getVal();
+                  Ele12EffData = correctionWS_embedded_trigger->function("e_trg_binned_12_data")->getVal(); 
+                  Mu23EffData  = correctionWS_embedded_trigger->function("m_trg_binned_23_data")->getVal();
+                  Mu8EffData   = correctionWS_embedded_trigger->function("m_trg_binned_8_data")->getVal();
                }
             }
             
