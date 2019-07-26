@@ -28,10 +28,33 @@
 ./HTC_submit_seq.sh SynchNTupleProducer_em_allEras  analysisMacroSynch_em_MC.conf  TTToHadronic_TuneCP5_13TeV_powheg_pythia8 10
 
 #Diboson 
-./HTC_submit_seq.sh SynchNTupleProducer_em_allEras  analysisMacroSynch_em_MC.conf  VVTo2L2Nu_13TeV_amcatnloFXFX_madspin_pythia8 10 
-./HTC_submit_seq.sh SynchNTupleProducer_em_allEras  analysisMacroSynch_em_MC.conf  WWTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8 10
-./HTC_submit_seq.sh SynchNTupleProducer_em_allEras  analysisMacroSynch_em_MC.conf  WWToLNuQQ_NNPDF31_TuneCP5_13TeV-powheg-pythia8 10
-./HTC_submit_seq.sh SynchNTupleProducer_em_allEras  analysisMacroSynch_em_MC.conf  WZTo3LNu_TuneCP5_13TeV-amcatnloFXFX-pythia8 10
-./HTC_submit_seq.sh SynchNTupleProducer_em_allEras  analysisMacroSynch_em_MC.conf  ZZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8 10
-./HTC_submit_seq.sh SynchNTupleProducer_em_allEras  analysisMacroSynch_em_MC.conf  ZZTo4L_TuneCP5_13TeV_powheg_pythia8 10
+./HTC_submit_seq.sh SynchNTupleProducer_em_allEras  analysisMacroSynch_em_MC.conf WW_TuneCP5_13TeV-pythia8 10
+./HTC_submit_seq.sh SynchNTupleProducer_em_allEras  analysisMacroSynch_em_MC.conf WZ_TuneCP5_13TeV-pythia8 10
+./HTC_submit_seq.sh SynchNTupleProducer_em_allEras  analysisMacroSynch_em_MC.conf ZZ_TuneCP5_13TeV-pythia8 10
 
+
+#Embedded
+./HTC_submit_seq.sh SynchNTupleProducer_em_allEras  analysisMacroSynch_em_Embedded.conf EmbeddingRun2018A 10
+./HTC_submit_seq.sh SynchNTupleProducer_em_allEras  analysisMacroSynch_em_Embedded.conf EmbeddingRun2018B 10
+./HTC_submit_seq.sh SynchNTupleProducer_em_allEras  analysisMacroSynch_em_Embedded.conf EmbeddingRun2018C 10
+./HTC_submit_seq.sh SynchNTupleProducer_em_allEras  analysisMacroSynch_em_Embedded.conf EmbeddingRun2018D 10
+
+
+#EWKZ
+./HTC_submit_seq.sh SynchNTupleProducer_em_allEras analysisMacroSynch_em_W.conf EWKWMinus2Jets_WToLNu_M-50_TuneCP5_13TeV-madgraph-pythia8 10
+./HTC_submit_seq.sh SynchNTupleProducer_em_allEras analysisMacroSynch_em_W.conf EWKWPlus2Jets_WToLNu_M-50_TuneCP5_13TeV-madgraph-pythia8 10
+./HTC_submit_seq.sh SynchNTupleProducer_em_allEras analysisMacroSynch_em_DY.conf EWKZ2Jets_ZToLL_M-50_TuneCP5_PSweights_13TeV-madgraph-pythia8 10
+./HTC_submit_seq.sh SynchNTupleProducer_em_allEras analysisMacroSynch_em_DY.conf EWKZ2Jets_ZToNuNu_TuneCP5_PSweights_13TeV-madgraph-pythia8 10
+
+#WGamma
+./HTC_submit_seq.sh SynchNTupleProducer_em_allEras analysisMacroSynch_em_W.conf WGToLNuG_TuneCP5_13TeV-madgraphMLM-pythia8 10
+
+#Signals
+./HTC_submit_seq.sh SynchNTupleProducer_em_allEras analysisMacroSynch_em_Signal_ggh.conf GluGluHToTauTau_M125_13TeV_powheg_pythia8  10
+./HTC_submit_seq.sh SynchNTupleProducer_em_allEras analysisMacroSynch_em_Signal_ggh.conf GluGluHToWWTo2L2Nu_M125_13TeV_powheg2_JHUGenV714_pythia8 10
+./HTC_submit_seq.sh SynchNTupleProducer_em_allEras analysisMacroSynch_em_Signal.conf VBFHToTauTau_M125_13TeV_powheg_pythia8 10
+./HTC_submit_seq.sh SynchNTupleProducer_em_allEras analysisMacroSynch_em_Signal.conf VBFHToWWTo2L2Nu_M125_13TeV_powheg2_JHUGenV714_pythia8 10
+./HTC_submit_seq.sh SynchNTupleProducer_em_allEras analysisMacroSynch_em_Signal.conf WminusHToTauTau_M125_13TeV_powheg_pythia8 10
+./HTC_submit_seq.sh SynchNTupleProducer_em_allEras analysisMacroSynch_em_Signal.conf WplusHToTauTau_M125_13TeV_powheg_pythia8 10
+./HTC_submit_seq.sh SynchNTupleProducer_em_allEras analysisMacroSynch_em_Signal.conf ZHToTauTau_M125_13TeV_powheg_pythia8 10
+./HTC_submit_seq.sh SynchNTupleProducer_em_allEras analysisMacroSynch_em_Signal.conf ttHToTauTau_M125_TuneCP5_13TeV-powheg-pythia8 10
