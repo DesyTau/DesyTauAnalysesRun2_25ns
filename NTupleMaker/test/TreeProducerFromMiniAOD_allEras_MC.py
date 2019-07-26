@@ -247,7 +247,10 @@ LHEEventProductTag = cms.InputTag("externalLHEProducer"),
 SusyMotherMassTag = cms.InputTag("susyInfo","SusyMotherMass"),
 SusyLSPMassTag = cms.InputTag("susyInfo","SusyLSPMass"),
 htxsInfo = cms.InputTag("rivetProducerHTXS", "HiggsClassification"),
-# trigger info
+
+
+# TRIGGER INFO  =========================================================================================
+# !!!!! WARNING : in 2018 all tau trigger names changes in the middle of the year -> please add also other names -> more information can be found here: https://twiki.cern.ch/twiki/bin/viewauth/CMS/TauTrigger#Trigger_table_for_2018 !!!!
 HLTriggerPaths = cms.untracked.vstring(
 #SingleMuon
 'HLT_IsoMu20_v',
