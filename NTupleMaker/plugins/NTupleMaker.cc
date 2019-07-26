@@ -1708,10 +1708,11 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   }
   //int _passecalBadCalibFilterUpdate;// = 0;
   
-  edm::Handle< bool > passecalBadCalibFilterUpdate ;
-  iEvent.getByToken(ecalBadCalibFilterUpdate_token,passecalBadCalibFilterUpdate);
-   _passecalBadCalibFilterUpdate = *passecalBadCalibFilterUpdate;
-
+  if(cYear == 2018){
+    edm::Handle< bool > passecalBadCalibFilterUpdate ;
+    iEvent.getByToken(ecalBadCalibFilterUpdate_token,passecalBadCalibFilterUpdate);
+    _passecalBadCalibFilterUpdate = *passecalBadCalibFilterUpdate;
+  }
  
   if(cbeamspot)
     {
