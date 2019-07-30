@@ -3,6 +3,8 @@ dirDataSingleMuon=/nfs/dust/cms/group/higgs-kit/2018_v2/data/SingleMuon
 dirMuonEG=/nfs/dust/cms/group/higgs-kit/2018_v2/data/MuonEG
 dirDataEGamma=/nfs/dust/cms/user/cardinia/gridjobs/2018/NTuples/DATA/Run2018-17Sep2018 # FIXME: still the 2018 v1 directory, update!
 dirMC=/nfs/dust/cms/group/higgs-kit/2018_v2/mc/RunIIAutumn18MiniAOD/
+dirEmbeddingABC=/nfs/dust/cms/group/higgs-kit/2018_v2/data/Embedding/
+dirEmbeddingD=/nfs/dust/cms/group/higgs-kit/2018_v2/data/Embedding_Run2018D/
 
 ls $dirMuonEG/MuonEG_Run2018A-17Sep2018-v1/*root > MuonEG_Run2018A
 ls $dirMuonEG/MuonEG_Run2018B-17Sep2018-v1/*root > MuonEG_Run2018B
@@ -21,6 +23,10 @@ ls $dirDataEGamma/EGamma_Run2018C-17Sep2018-v1/*root > EGamma_Run2018C   # FIXME
 ls $dirDataEGamma/EGamma_Run2018D-PromptReco-v2/*root > EGamma_Run2018D  # FIXME: still the 2018 v1 directory, update!
 ls $dirDataEGamma/EGamma_Run2018D-PromptReco-v1/*root >> EGamma_Run2018D # FIXME: still the 2018 v1 directory, update!
 
+ls $dirEmbeddingABC/EmbeddingRun2018A/*root > EmbeddingRun2018A
+ls $dirEmbeddingABC/EmbeddingRun2018B/*root > EmbeddingRun2018B
+ls $dirEmbeddingABC/EmbeddingRun2018C/*root > EmbeddingRun2018C
+ls $dirEmbeddingD/EmbeddingRun2018D/*root > EmbeddingRun2018D
 
 ls $dirMC/DYJetsToLL_M-10to50_TuneCP5_13TeV-madgraphMLM-pythia8/*root > DYJetsToLL_M-10to50_TuneCP5_13TeV-madgraphMLM-pythia8
 ls $dirMC/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/*root > DYJetsToLL_M-50_TuneCP5_13TeV_madgraphMLM_pythia8
@@ -28,7 +34,6 @@ ls $dirMC/DY1JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/*root > DY1JetsToLL
 ls $dirMC/DY2JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/*root > DY2JetsToLL_M-50_TuneCP5_13TeV_madgraphMLM_pythia8
 ls $dirMC/DY3JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/*root > DY3JetsToLL_M-50_TuneCP5_13TeV_madgraphMLM_pythia8
 ls $dirMC/DY4JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/*root > DY4JetsToLL_M-50_TuneCP5_13TeV_madgraphMLM_pythia8
-
 
 ls $dirMC/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/*root > TTTo2L2Nu_TuneCP5_13TeV_powheg_pythia8
 ls $dirMC/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/*root > TTToSemiLeptonic_TuneCP5_13TeV_powheg_pythia8
@@ -60,12 +65,10 @@ ls $dirMC/WplusHToTauTau_M125_13TeV_powheg_pythia8/*root > WplusHToTauTau_M125_1
 ls $dirMC/ZHToTauTau_M125_13TeV_powheg_pythia8/*root > ZHToTauTau_M125_13TeV_powheg_pythia8
 ls $dirMC/ttHToTauTau_M125_TuneCP5_13TeV-powheg-pythia8/*root > ttHToTauTau_M125_TuneCP5_13TeV-powheg-pythia8
 
-ls $dirMC/VVTo2L2Nu_13TeV_amcatnloFXFX_madspin_pythia8/*root > VVTo2L2Nu_13TeV_amcatnloFXFX_madspin_pythia8
 ls $dirMC/WGToLNuG_TuneCP5_13TeV-madgraphMLM-pythia8/*root > WGToLNuG_TuneCP5_13TeV-madgraphMLM-pythia8
-ls $dirMC/WWTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8/*root > WWTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8
-ls $dirMC/WWToLNuQQ_NNPDF31_TuneCP5_13TeV-powheg-pythia8/*root > WWToLNuQQ_NNPDF31_TuneCP5_13TeV-powheg-pythia8
-ls $dirMC/WZTo3LNu_TuneCP5_13TeV-amcatnloFXFX-pythia8/*root > WZTo3LNu_TuneCP5_13TeV-amcatnloFXFX-pythia8
-ls $dirMC/ZZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8/*root > ZZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8
-ls $dirMC/ZZTo4L_TuneCP5_13TeV_powheg_pythia8/*root > ZZTo4L_TuneCP5_13TeV_powheg_pythia8
+
+ls $dirMC/WW_TuneCP5_13TeV-pythia8/*root > WW_TuneCP5_13TeV-pythia8
+ls $dirMC/WZ_TuneCP5_13TeV-pythia8/*root > WZ_TuneCP5_13TeV-pythia8
+ls $dirMC/ZZ_TuneCP5_13TeV-pythia8/*root > ZZ_TuneCP5_13TeV-pythia8
 
 
