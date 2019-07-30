@@ -32,7 +32,7 @@ void PlotNtupleVariables_ETauFR(
                                  float xmax = 250,
 				 TString wp = "Medium",
 				 TString MCweight="effweight*mcweight*",
-				 TString Cut="(iso_1<0.1&&mt_1<30)",
+				 TString Cut="(iso_1<0.1&&mt_1<30&&tauagainstMuonLoose3>0.5)",
                                  TString ytitle = "Events",
                                  bool applyPU = true,
                                  bool passProbe = true,
@@ -41,19 +41,19 @@ void PlotNtupleVariables_ETauFR(
 {  
   const int nSamples = 20;
 
-  TString directory="./etau/wRecoilCorr/";
+  TString directory="./";
   TH1::SetDefaultSumw2();
   SetStyle();
     TString samples[nSamples] =
     {
         "EGamma_Run2018",//(0)data
-        "DYJetsToLL_M-50_TuneCP5_13TeV_madgraphMLM_pythia8",// (1)Drell-Yan Z->EE
-        "DYJetsToLL_M-50_TuneCP5_13TeV_madgraphMLM_pythia8", // (2)Drell-Yan ZJ
-        "DYJetsToLL_M-50_TuneCP5_13TeV_madgraphMLM_pythia8", // (3)Drell-Yan ZTT(tau -> lepton)
-        "DYJetsToLL_M-50_TuneCP5_13TeV_madgraphMLM_pythia8", // (4)Drell-Yan ZTT(hadronic tau)
-        "TTTo2L2Nu_TuneCP5_13TeV_powheg_pythia8",//(5)TTbar leptonic
-        "TTToSemiLeptonic_TuneCP5_13TeV_powheg_pythia8",//(6) semileptonic
-        "TTToHadronic_TuneCP5_13TeV_powheg_pythia8",//(7) hadronic
+        "DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8",// (1)Drell-Yan Z->EE
+        "DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8", // (2)Drell-Yan ZJ
+        "DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8", // (3)Drell-Yan ZTT(tau -> lepton)
+        "DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8", // (4)Drell-Yan ZTT(hadronic tau)
+        "TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8",//(5)TTbar leptonic
+        "TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8",//(6) semileptonic
+        "TTToHadronic_TuneCP5_13TeV-powheg-pythia8",//(7) hadronic
         "WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8",// (8)WJets
         "W1JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8",// (8)WJets
         "W2JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8",// (8)WJets
@@ -166,7 +166,7 @@ void PlotNtupleVariables_ETauFR(
 	  }
 	
 	for (int i=0; i<nSamples; ++i){
-	  
+	  	cout << directory+samples[i]+".root" << endl;
 	        TFile * file = new TFile(directory+samples[i]+".root");
 		TH1D * histWeightsH = (TH1D*)file->Get("histWeightsH");
 		TTree * tree = (TTree*)file->Get("ETauFR");
@@ -600,8 +600,8 @@ void PlotNtupleVariables_ETauFR(
   	canv1->Modified();
   	canv1->cd();
   	canv1->SetSelected(canv1);
-	canv1->Print("./Plots/wRecoilCorr/"+Variable+"_"+wp+".png");
-	canv1->Print("./Plots/wRecoilCorr/"+Variable+"_"+wp+".pdf","Portrait pdf");
+	canv1->Print("./Plots/"+Variable+"_"+wp+".png");
+	canv1->Print("./Plots/"+Variable+"_"+wp+".pdf","Portrait pdf");
 
 
 }

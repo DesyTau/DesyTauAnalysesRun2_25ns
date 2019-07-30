@@ -213,17 +213,36 @@ int main(int argc, char * argv[]) {
     Bool_t os;
     Float_t iso_1;
     
+    Bool_t tauagainstMuLooseDeepTau;
+    Bool_t tauagainstMuonLoose3;
+
     Bool_t tauagainstEleVLoose;
     Bool_t tauagainstEleLoose;
     Bool_t tauagainstEleMedium;
     Bool_t tauagainstEleTight;
     Bool_t tauagainstEleVTight;
     Float_t tauagainstEleRaw;
-
+	
     Bool_t taubyLooseCombinedIsolationDeltaBetaCorr3Hits;
     Bool_t taubyLooseIsolationMVArun2v1DBoldDMwLT;
     Bool_t taubyTightIsolationMVArun2v1DBoldDMwLT;
+    
+    Bool_t tauagainstEleVVVLooseDeepTau;
+    Bool_t tauagainstEleVVLooseDeepTau;
+    Bool_t tauagainstEleVLooseDeepTau;
+    Bool_t tauagainstEleLooseDeepTau;
+    Bool_t tauagainstEleMediumDeepTau;
+    Bool_t tauagainstEleTightDeepTau;
+    Bool_t tauagainstEleVTightDeepTau;
+    Bool_t tauagainstEleVVTightDeepTau;
+    Float_t tauagainstEleRawDeepTau;
+    
+    Bool_t taubyVLooseDeepTau2017v2VSjet;
+    Bool_t taubyLooseDeepTau2017v2VSjet;
+    Bool_t taubyMediumDeepTau2017v2VSjet;
+    Bool_t taubyTightDeepTau2017v2VSjet;
 
+    
     
     Float_t PtTag;
     Float_t EtaTag;
@@ -280,7 +299,25 @@ int main(int argc, char * argv[]) {
     eleTree->Branch("tauagainstEleVTight",&tauagainstEleVTight,"tauagainstEleVTight/O");
     eleTree->Branch("tauagainstEleRaw",&tauagainstEleRaw,"tauagainstEleRaw/F");
 
+    eleTree->Branch("tauagainstMuLooseDeepTau",&tauagainstMuLooseDeepTau,"tauagainstMuLooseDeepTau/O");
+    eleTree->Branch("tauagainstMuonLoose3",&tauagainstMuonLoose3,"tauagainstMuonLoose3/O");
     
+    
+    eleTree->Branch("tauagainstEleVVVLooseDeepTau",&tauagainstEleVVVLooseDeepTau,"tauagainstEleVVVLooseDeepTau/O");
+    eleTree->Branch("tauagainstEleVVLooseDeepTau",&tauagainstEleVVLooseDeepTau,"tauagainstEleVVLooseDeepTau/O");
+    eleTree->Branch("tauagainstEleVLooseDeepTau",&tauagainstEleVLooseDeepTau,"tauagainstEleVLooseDeepTau/O");
+    eleTree->Branch("tauagainstEleLooseDeepTau",&tauagainstEleLooseDeepTau,"tauagainstEleLooseDeepTau/O");
+    eleTree->Branch("tauagainstEleMediumDeepTau",&tauagainstEleMediumDeepTau,"tauagainstEleMediumDeepTau/O");
+    eleTree->Branch("tauagainstEleTightDeepTau",&tauagainstEleTightDeepTau,"tauagainstEleTightDeepTau/O");
+    eleTree->Branch("tauagainstEleVTightDeepTau",&tauagainstEleVTightDeepTau,"tauagainstEleVTightDeepTau/O");
+    eleTree->Branch("tauagainstEleVVTightDeepTau",&tauagainstEleVVTightDeepTau,"tauagainstEleVVTightDeepTau/O");
+    eleTree->Branch("tauagainstEleRawDeepTau",&tauagainstEleRawDeepTau,"tauagainstEleRawDeepTau/F");
+
+    eleTree->Branch("taubyVLooseDeepTau2017v2VSjet",&taubyVLooseDeepTau2017v2VSjet,"taubyVLooseDeepTau2017v2VSjet/O");
+    eleTree->Branch("taubyLooseDeepTau2017v2VSjet",&taubyLooseDeepTau2017v2VSjet,"taubyLooseDeepTau2017v2VSjet/O");
+    eleTree->Branch("taubyMediumDeepTau2017v2VSjet",&taubyMediumDeepTau2017v2VSjet,"taubyMediumDeepTau2017v2VSjet/O");
+    eleTree->Branch("taubyTightDeepTau2017v2VSjet",&taubyTightDeepTau2017v2VSjet,"taubyTightDeepTau2017v2VSjet/O");
+
 
     eleTree->Branch("taubyLooseCombinedIsolationDeltaBetaCorr3Hits",&taubyLooseCombinedIsolationDeltaBetaCorr3Hits,"taubyLooseCombinedIsolationDeltaBetaCorr3Hits/O");
     eleTree->Branch("taubyLooseIsolationMVArun2v1DBoldDMwLT",&taubyLooseIsolationMVArun2v1DBoldDMwLT,"taubyLooseIsolationMVArun2v1DBoldDMwLT/O");
@@ -585,7 +622,7 @@ int main(int argc, char * argv[]) {
             if (fabs(analysisTree.tau_eta[it])>etaTauCut) continue;
             if (fabs(analysisTree.tau_leadchargedhadrcand_dz[it])>dzTauCut) continue;
             if (fabs(analysisTree.tau_charge[it])<0.5||fabs(analysisTree.tau_charge[it])>1.5) continue;
-            if (analysisTree.tau_againstMuonLoose3[it] < 0.5) continue;
+            //if (analysisTree.tau_againstMuonLoose3[it] < 0.5) continue;
             goodTaus.push_back(it);
         }
         
@@ -981,7 +1018,7 @@ int main(int argc, char * argv[]) {
                         //cout <<"m_vis_gen:"<< m_vis_gen<< endl;
                         
                         //cout <<"----------" << endl;
-                        
+                       
                         tauagainstEleVLoose = analysisTree.tau_againstElectronVLooseMVA6[indexProbe];
                         tauagainstEleLoose = analysisTree.tau_againstElectronLooseMVA6[indexProbe];
                         tauagainstEleMedium = analysisTree.tau_againstElectronMediumMVA6[indexProbe];
@@ -1000,7 +1037,34 @@ int main(int argc, char * argv[]) {
                         EtaProbe = analysisTree.tau_eta[indexProbe];
                         DecayModeProbe = analysisTree.tau_decayMode[indexProbe];
 
+
+
+			tauagainstMuLooseDeepTau = analysisTree.tau_byLooseDeepTau2017v2VSmu[indexProbe];
+			tauagainstMuonLoose3 = analysisTree.tau_againstMuonLoose3[indexProbe];
                         
+			
+			
+			tauagainstEleVVVLooseDeepTau = analysisTree.tau_byVVVLooseDeepTau2017v2VSe[indexProbe];
+			tauagainstEleVVLooseDeepTau = analysisTree.tau_byVVLooseDeepTau2017v2VSe[indexProbe];
+			tauagainstEleVLooseDeepTau = analysisTree.tau_byVLooseDeepTau2017v2VSe[indexProbe];
+                        tauagainstEleLooseDeepTau = analysisTree.tau_byLooseDeepTau2017v2VSe[indexProbe];
+                        tauagainstEleMediumDeepTau = analysisTree.tau_byMediumDeepTau2017v2VSe[indexProbe];
+                        tauagainstEleTightDeepTau = analysisTree.tau_byTightDeepTau2017v2VSe[indexProbe];
+                        tauagainstEleVTightDeepTau = analysisTree.tau_byVTightDeepTau2017v2VSe[indexProbe];
+			tauagainstEleVVTightDeepTau = analysisTree.tau_byVVTightDeepTau2017v2VSe[indexProbe];                        
+			tauagainstEleRawDeepTau = analysisTree.tau_byDeepTau2017v2VSeraw[indexProbe];
+                        taubyLooseCombinedIsolationDeltaBetaCorr3Hits = analysisTree.tau_byLooseCombinedIsolationDeltaBetaCorr3Hits[indexProbe];
+			//              taubyLooseIsolationMVArun2v1DBoldDMwLT = analysisTree.tau_byLooseIsolationMVArun2v1DBoldDMwLT[indexProbe];
+			                        
+			taubyVLooseDeepTau2017v2VSjet = analysisTree.tau_byVLooseDeepTau2017v2VSjet[indexProbe];
+			taubyLooseDeepTau2017v2VSjet = analysisTree.tau_byLooseDeepTau2017v2VSjet[indexProbe];
+			taubyMediumDeepTau2017v2VSjet = analysisTree.tau_byMediumDeepTau2017v2VSjet[indexProbe];                        
+			taubyTightDeepTau2017v2VSjet = analysisTree.tau_byTightDeepTau2017v2VSjet[indexProbe];
+			//if(slimNTuples&&taubyTightIsolationMVArun2v1DBoldDMwLT<0.5)continue;
+
+                       
+                        
+
                         eleTree->Fill();
                         selEventsIsoEles++;
                     }
