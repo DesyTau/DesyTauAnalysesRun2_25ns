@@ -1444,7 +1444,7 @@ for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) {
       counter[14]++;
 
       // svfit variables
-      otree->m_sv   = -9999;
+      otree->m_sv   = -10;//Merijn updated for the DNN
       otree->pt_sv  = -9999;
       otree->eta_sv = -9999;
       otree->phi_sv = -9999;

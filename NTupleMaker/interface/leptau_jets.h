@@ -208,7 +208,7 @@ void counting_jets(const AC1B *analysisTree, Spring15Tree *otree, const Config *
   otree->njetspt20 = jetspt20.size();
   otree->nbtag = bjets.size();
   
-  otree->bpt_1   = -9999;
+  otree->bpt_1   = -10; //Merijn 2019 7 31: put to -10 since it is used in the DNN don't want to confuse with strange value
   otree->beta_1  = -9999;
   otree->bphi_1  = -9999;
   otree->brawf_1 = -9999;
@@ -230,7 +230,7 @@ void counting_jets(const AC1B *analysisTree, Spring15Tree *otree, const Config *
     otree->bpuid_tight_1  = analysisTree->pfjet_pu_jet_fullId_tight[indexLeadingBJet];
   }
 
-  otree->bpt_2   = -9999;
+  otree->bpt_2   = -10; //Merijn 2019 7 31: put to -10 since it is used in the DNN don't want to confuse with strange value
   otree->beta_2  = -9999;
   otree->bphi_2  = -9999;
   otree->brawf_2 = -9999;
