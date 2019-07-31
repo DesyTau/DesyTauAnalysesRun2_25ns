@@ -642,8 +642,7 @@ int main(int argc, char * argv[]) {
          if (isSignal){
             njets_HTXS = analysisTree.htxs_njets30;
             higgspt_HTXS = analysisTree.htxs_higgsPt;
-            htxs_stage0cat = analysisTree.htxs_stage0cat;
-            htxs_stage1cat = analysisTree.htxs_stage1cat;
+
             if (apply_ggh_reweighting)
                {
                   if      (njets_HTXS==0) weight_ggh_NNLOPS = gr_NNLOPSratio_pt_powheg_0jet->Eval(TMath::Min(higgspt_HTXS,(Float_t)125.0));
