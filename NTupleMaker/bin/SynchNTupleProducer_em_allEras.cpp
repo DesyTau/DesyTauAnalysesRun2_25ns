@@ -455,7 +455,7 @@ int main(int argc, char * argv[]) {
          
          weightPDFup   = analysisTree.weightPDFup;
          weightPDFdown = analysisTree.weightPDFdown;
-            
+
          // store gen-info  ============================================================================================================================================
          if (!isData) {
                 
@@ -480,7 +480,7 @@ int main(int argc, char * argv[]) {
                }
                
             }  // end of loop over gen-taus
-            
+
             for (unsigned int igen=0; igen < analysisTree.genparticles_count; ++igen) {
                
                TLorentzVector genLV; genLV.SetXYZT(analysisTree.genparticles_px[igen],
@@ -530,7 +530,7 @@ int main(int argc, char * argv[]) {
                      wDecayProductsLV += genLV;
                   }
                }
-               
+
                if (abs(analysisTree.genparticles_pdgid[igen])==12||
                    abs(analysisTree.genparticles_pdgid[igen])==14||
                    abs(analysisTree.genparticles_pdgid[igen])==16)  {
@@ -614,7 +614,7 @@ int main(int argc, char * argv[]) {
                lepPx = lepLV.Px(); lepPy = lepLV.Py(); lepPz = lepLV.Pz();
                nuPx = promptNeutrinosLV.Px(); nuPy = promptNeutrinosLV.Py(); nuPz = promptNeutrinosLV.Pz();
             }
-            
+
             bosonPx = genBosonLV.Px();
             bosonPy = genBosonLV.Py();
             bosonPz = genBosonLV.Pz();
@@ -742,7 +742,6 @@ int main(int argc, char * argv[]) {
             if (!muonId) continue;
             muons.push_back(im);
          }
-
          // select only events with at least one electron and one muon =================================================================================================
          if (electrons.size()==0) continue; 
          if (muons.size()==0) continue;          
@@ -793,7 +792,7 @@ int main(int argc, char * argv[]) {
 
          // check charge of electron & muon pair =======================================================================================================================
          os = (analysisTree.muon_charge[muonIndex]*analysisTree.electron_charge[electronIndex]) < 0;
-         
+
          // looking for extra leptons  =================================================================================================================================
          bool foundExtraElectron = false;
          bool foundExtraMuon = false;
@@ -814,7 +813,7 @@ int main(int argc, char * argv[]) {
          dZ_2 = analysisTree.muon_dz[muonIndex];
          iso_2 = isoMuMin;
          m_2 =  classic_svFit::muonMass;
-         
+
          // filling electron variables    ==============================================================================================================================
          float eleScale = eleScaleBarrel;
          if (fabs(analysisTree.electron_eta[electronIndex])>1.479) eleScale = eleScaleEndcap;
@@ -914,7 +913,7 @@ int main(int argc, char * argv[]) {
                   Mu8EffData   = correctionWS_embedded_trigger->function("m_trg_binned_8_data")->getVal();
                }
             }
-            
+
             float trigWeightData = Mu23EffData*Ele12EffData + Mu8EffData*Ele23EffData - Mu23EffData*Ele23EffData;
             
             if (applyTriggerMatch && !isData) {
@@ -1863,9 +1862,9 @@ int main(int argc, char * argv[]) {
          //set MELA variables
          if (njets>1){
 
-            TLorentzVector tau1, tau2;
-            tau1.SetPtEtaPhiM(pt_1, eta_1, phi_1, m_1);
-            tau2.SetPtEtaPhiM(pt_2, eta_2, phi_2, m_2);
+            // TLorentzVector tau1, tau2;
+            // tau1.SetPtEtaPhiM(pt_1, eta_1, phi_1, m_1);
+            // tau2.SetPtEtaPhiM(pt_2, eta_2, phi_2, m_2);
 
             // FIXME: TODO: Why do we not use the jet mass here? (comment from KIT)
             TLorentzVector jet1, jet2;
@@ -1875,6 +1874,10 @@ int main(int argc, char * argv[]) {
             // Run MELA
             SimpleParticleCollection_t daughters;
 
+            TLorentzVector tau1, tau2;
+
+            tau1.SetPtEtaPhiM(tau1P4.Pt(), tau1P4.Eta(), tau1P4.Phi(), tau1P4.M());
+            tau2.SetPtEtaPhiM(tau2P4.Pt(), tau2P4.Eta(), tau2P4.Phi(), tau2P4.M());
             if (q_1 * q_2 < 0){
                daughters.push_back(SimpleParticle_t(15 * q_1, tau1));
                daughters.push_back(SimpleParticle_t(15 * q_2, tau2));
