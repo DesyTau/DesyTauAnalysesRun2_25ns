@@ -41,7 +41,7 @@ public:
       it->second->Write();
   };
 
-void SetAC1B(const AC1B * tree){
+void SetAC1B(AC1B * tree){ 
   analysisTree = tree;
 }; 
 
@@ -92,12 +92,14 @@ protected:
     this->Fill("Down");
   };
   
+
   virtual void Fill(const char* shift){
     outTree[shift]->Fill();
 	jets::counting_jets(analysisTree, cenTree, cfg, inputs_btag_scaling, "central");
   }
 
-  const AC1B * analysisTree;
+  //const AC1B * analysisTree;
+  AC1B * analysisTree; //Merijn 2019 5 7: addapted to have consistent behaviour w.r.t. jets.h
   Config * cfg;
   const btag_scaling_inputs * inputs_btag_scaling;
   std::map< std::string, TTree* >  outTree;

@@ -32,6 +32,9 @@ sed 's/pileUpforMC =/pileUpforMC = ZZ_TuneCP5_13TeV-pythia8_pileup/' analysisMac
 sed 's/pileUpforMC =/pileUpforMC = GluGluHToTauTau_M125_13TeV_powheg_pythia8_pileup/' analysisMacroSynch_lept_mt_MC17.conf > analysisMacroSynch_lept_mt_GluGluHToTauTau_M125_13TeV_powheg_pythia8.conf
 sed 's/pileUpforMC =/pileUpforMC = GluGluHToTauTau_M125_13TeV_powheg_pythia8_pileup/' analysisMacroSynch_lept_mt_MC17.conf > analysisMacroSynch_lept_mt_SUSYGluGluToHToTauTau_M-120_TuneCP5_13TeV-pythia8.conf
 
+#Merijn: add a line for VBF:
+sed 's/pileUpforMC =/pileUpforMC = VBFHToTauTau_M125_pileup/' analysisMacroSynch_lept_mt_MC17.conf > analysisMacroSynch_lept_mt_VBF125.conf
+
 
 sed 's/pileUpforMC =/pileUpforMC = MC_PU2017_pileup/' analysisMacroSynch_lept_mt_MC17.conf > analysisMacroSynch_lept_mt_WGToLNuG.conf
 
