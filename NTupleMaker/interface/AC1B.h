@@ -787,6 +787,7 @@ public :
    Float_t	   tau_byVVVLooseDeepTau2017v2VSe[100];	//[tau_count]
    Float_t	   tau_byVVVLooseDeepTau2017v2VSjet[100];	//[tau_count]
    Int_t           htxs_stage0cat;
+   Int_t           htxs_stage1cat;
    Int_t           htxs_stage1p1cat_pTjet30GeV;
    Float_t         htxs_higgsPt;
    Int_t           htxs_njets30;
@@ -1553,6 +1554,7 @@ public :
    TBranch	  *b_tau_byVVVLooseDeepTau2017v2VSe;	//!
    TBranch	  *b_tau_byVVVLooseDeepTau2017v2VSjet;	//!
    TBranch        *b_htxs_stage0cat;   //!
+   TBranch        *b_htxs_stage1cat;   //!
    TBranch        *b_htxs_stage1p1cat_pTjet30GeV;
    TBranch        *b_htxs_higgsPt;   //!
    TBranch        *b_htxs_njets30;   //!
@@ -2409,6 +2411,7 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("tau_byVVVLooseDeepTau2017v2VSe", tau_byVVVLooseDeepTau2017v2VSe, &b_tau_byVVVLooseDeepTau2017v2VSe);	
    fChain->SetBranchAddress("tau_byVVVLooseDeepTau2017v2VSjet", tau_byVVVLooseDeepTau2017v2VSjet, &b_tau_byVVVLooseDeepTau2017v2VSjet);	
    fChain->SetBranchAddress("htxs_stage0cat",&htxs_stage0cat, &b_htxs_stage0cat);
+   fChain->SetBranchAddress("htxs_stage1cat",&htxs_stage1cat , &b_htxs_stage1cat);
    fChain->SetBranchAddress("htxs_stage1p1cat_pTjet30GeV",&htxs_stage1p1cat_pTjet30GeV , &b_htxs_stage1p1cat_pTjet30GeV);
    fChain->SetBranchAddress("htxs_higgsPt",&htxs_higgsPt , &b_htxs_higgsPt);
    fChain->SetBranchAddress("htxs_njets30", &htxs_njets30, &b_htxs_njets30);
