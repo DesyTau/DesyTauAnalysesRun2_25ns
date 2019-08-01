@@ -537,29 +537,29 @@ int main(int argc, char * argv[]) {
         // ***************************************************
         // accessing PF MET and changing momentum scale of met
         // ***************************************************
-        float pfmetcorr_ex = analysisTree.pfmet_ex;
-        float pfmetcorr_ey = analysisTree.pfmet_ey;
+        float pfmetcorr_ex = analysisTree.pfmetcorr_ex;
+        float pfmetcorr_ey = analysisTree.pfmetcorr_ey;
 
         if (!isData) { 
            if (jetES<0) {
-              pfmetcorr_ex = analysisTree.pfmet_ex_JetEnDown;
-              pfmetcorr_ey = analysisTree.pfmet_ey_JetEnDown;
+              pfmetcorr_ex = analysisTree.pfmetcorr_ex_JetEnDown;
+              pfmetcorr_ey = analysisTree.pfmetcorr_ey_JetEnDown;
            }
            else if (jetES>0) {
-              pfmetcorr_ex = analysisTree.pfmet_ex_JetEnUp;
-              pfmetcorr_ey = analysisTree.pfmet_ey_JetEnUp;
+              pfmetcorr_ex = analysisTree.pfmetcorr_ex_JetEnUp;
+              pfmetcorr_ey = analysisTree.pfmetcorr_ey_JetEnUp;
            }
            else if (unclusteredES<0) {
-              pfmetcorr_ex = analysisTree.pfmet_ex_UnclusteredEnDown;
-              pfmetcorr_ey = analysisTree.pfmet_ey_UnclusteredEnDown;
+              pfmetcorr_ex = analysisTree.pfmetcorr_ex_UnclusteredEnDown;
+              pfmetcorr_ey = analysisTree.pfmetcorr_ey_UnclusteredEnDown;
            }
            else if (unclusteredES>0) {
-              pfmetcorr_ex = analysisTree.pfmet_ex_UnclusteredEnUp;
-              pfmetcorr_ey = analysisTree.pfmet_ey_UnclusteredEnUp;
+              pfmetcorr_ex = analysisTree.pfmetcorr_ex_UnclusteredEnUp;
+              pfmetcorr_ey = analysisTree.pfmetcorr_ey_UnclusteredEnUp;
            }
            else {
-              pfmetcorr_ex = analysisTree.pfmet_ex;
-              pfmetcorr_ey = analysisTree.pfmet_ey;
+              pfmetcorr_ex = analysisTree.pfmetcorr_ex;
+              pfmetcorr_ey = analysisTree.pfmetcorr_ey;
            }
         }
         
@@ -963,7 +963,7 @@ int main(int argc, char * argv[]) {
            
            if( (tauDecayMode == "1prong0pizeros"     && analysisTree.tau_decayMode[itau]==0) ||
                (tauDecayMode == "1prongUpTo4pizeros" && analysisTree.tau_decayMode[itau]>=1 && analysisTree.tau_decayMode[itau]<=4) ||
-               (tauDecayMode == "3prong0pizeros"     && analysisTree.tau_decayMode[itau]==10) ){
+               (tauDecayMode == "3prong0pizeros"     && (analysisTree.tau_decayMode[itau]==10 || analysisTree.tau_decayMode[itau]==11)) ){
               
               analysisTree.tau_px[itau]   *= tauMomScale;
               analysisTree.tau_py[itau]   *= tauMomScale;
@@ -1092,6 +1092,30 @@ int main(int argc, char * argv[]) {
            tauAntiElectronTightMVA6_  = analysisTree.tau_againstElectronTightMVA6[indexTau] > 0.5;
            tauAntiElectronVTightMVA6_ = analysisTree.tau_againstElectronVTightMVA6[indexTau] > 0.5;
            
+           taubyDeepTau2017v2VSeraw_ = analysisTree.tau_byDeepTau2017v2VSeraw[indexTau] > 0.5;
+           taubyDeepTau2017v2VSjetraw_ = analysisTree.tau_byDeepTau2017v2VSjetraw[indexTau] > 0.5;
+           taubyDeepTau2017v2VSmuraw_ = analysisTree.tau_byDeepTau2017v2VSmuraw[indexTau] > 0.5;
+           taubyLooseDeepTau2017v2VSe_ = analysisTree.tau_byLooseDeepTau2017v2VSe[indexTau] > 0.5;
+           taubyLooseDeepTau2017v2VSjet_ = analysisTree.tau_byLooseDeepTau2017v2VSjet[indexTau] > 0.5;
+           taubyLooseDeepTau2017v2VSmu_ = analysisTree.tau_byLooseDeepTau2017v2VSmu[indexTau] > 0.5;
+           taubyMediumDeepTau2017v2VSe_ = analysisTree.tau_byMediumDeepTau2017v2VSe[indexTau] > 0.5;
+           taubyMediumDeepTau2017v2VSjet_ = analysisTree.tau_byMediumDeepTau2017v2VSjet[indexTau] > 0.5;
+           taubyMediumDeepTau2017v2VSmu_ = analysisTree.tau_byMediumDeepTau2017v2VSmu[indexTau] > 0.5;
+           taubyTightDeepTau2017v2VSe_ = analysisTree.tau_byTightDeepTau2017v2VSe[indexTau] > 0.5;
+           taubyTightDeepTau2017v2VSjet_ = analysisTree.tau_byTightDeepTau2017v2VSjet[indexTau] > 0.5;
+           taubyTightDeepTau2017v2VSmu_ = analysisTree.tau_byTightDeepTau2017v2VSmu[indexTau] > 0.5;
+           taubyVLooseDeepTau2017v2VSe_ = analysisTree.tau_byVLooseDeepTau2017v2VSe[indexTau] > 0.5;
+           taubyVLooseDeepTau2017v2VSjet_ = analysisTree.tau_byVLooseDeepTau2017v2VSjet[indexTau] > 0.5;
+           taubyVLooseDeepTau2017v2VSmu_ = analysisTree.tau_byVLooseDeepTau2017v2VSmu[indexTau] > 0.5;
+           taubyVTightDeepTau2017v2VSe_ = analysisTree.tau_byVTightDeepTau2017v2VSe[indexTau] > 0.5;
+           taubyVTightDeepTau2017v2VSjet_ = analysisTree.tau_byVTightDeepTau2017v2VSjet[indexTau] > 0.5;
+           taubyVVLooseDeepTau2017v2VSe_ = analysisTree.tau_byVVLooseDeepTau2017v2VSe[indexTau] > 0.5;
+           taubyVVLooseDeepTau2017v2VSjet_ = analysisTree.tau_byVVLooseDeepTau2017v2VSjet[indexTau] > 0.5;
+           taubyVVTightDeepTau2017v2VSe_ = analysisTree.tau_byVVTightDeepTau2017v2VSe[indexTau] > 0.5;
+           taubyVVTightDeepTau2017v2VSjet_ = analysisTree.tau_byVVTightDeepTau2017v2VSjet[indexTau] > 0.5;
+           taubyVVVLooseDeepTau2017v2VSe_ = analysisTree.tau_byVVVLooseDeepTau2017v2VSe[indexTau] > 0.5;
+           taubyVVVLooseDeepTau2017v2VSjet_ = analysisTree.tau_byVVVLooseDeepTau2017v2VSjet[indexTau] > 0.5;
+
            // bool isSingleTau = false;
            // bool isSingleTauOneProng = false;
            // for (unsigned int iT=0; iT<analysisTree.trigobject_count;++iT) {
@@ -1191,7 +1215,7 @@ int main(int argc, char * argv[]) {
            isWJet = isWJet && nSelTaus_ == 1;
            isWJet = isWJet && nJetsCentral30_ == 1;
            isWJet = isWJet && abs(muonEta_)<etaMuCut_WJet;
-           isWJet = isWJet && tauDM_;
+           isWJet = isWJet && (tauDM_ || tauNewDM_);
            
            
            if (isWJet) {
@@ -1257,7 +1281,7 @@ int main(int argc, char * argv[]) {
            isWTauNu = isWTauNu && nJetsCentral30_==1;
            isWTauNu = isWTauNu && nMuon_ == 0;
            isWTauNu = isWTauNu && nElec_ == 0;
-           isWTauNu = isWTauNu && tauDM_;
+           isWTauNu = isWTauNu && (tauDM_ || tauNewDM_);
            isWTauNu = isWTauNu && trigger_;
          
            if (isWTauNu) {
@@ -1430,7 +1454,31 @@ int main(int argc, char * argv[]) {
                  
                  tauAntiMuonLoose3_ = analysisTree.tau_againstMuonLoose3[indexTau] > 0.5;
                  tauAntiMuonTight3_ = analysisTree.tau_againstMuonTight3[indexTau] > 0.5;
-                 
+
+                 taubyDeepTau2017v2VSeraw_ = analysisTree.tau_byDeepTau2017v2VSeraw[indexTau] > 0.5;
+                 taubyDeepTau2017v2VSjetraw_ = analysisTree.tau_byDeepTau2017v2VSjetraw[indexTau] > 0.5;
+                 taubyDeepTau2017v2VSmuraw_ = analysisTree.tau_byDeepTau2017v2VSmuraw[indexTau] > 0.5;
+                 taubyLooseDeepTau2017v2VSe_ = analysisTree.tau_byLooseDeepTau2017v2VSe[indexTau] > 0.5;
+                 taubyLooseDeepTau2017v2VSjet_ = analysisTree.tau_byLooseDeepTau2017v2VSjet[indexTau] > 0.5;
+                 taubyLooseDeepTau2017v2VSmu_ = analysisTree.tau_byLooseDeepTau2017v2VSmu[indexTau] > 0.5;
+                 taubyMediumDeepTau2017v2VSe_ = analysisTree.tau_byMediumDeepTau2017v2VSe[indexTau] > 0.5;
+                 taubyMediumDeepTau2017v2VSjet_ = analysisTree.tau_byMediumDeepTau2017v2VSjet[indexTau] > 0.5;
+                 taubyMediumDeepTau2017v2VSmu_ = analysisTree.tau_byMediumDeepTau2017v2VSmu[indexTau] > 0.5;
+                 taubyTightDeepTau2017v2VSe_ = analysisTree.tau_byTightDeepTau2017v2VSe[indexTau] > 0.5;
+                 taubyTightDeepTau2017v2VSjet_ = analysisTree.tau_byTightDeepTau2017v2VSjet[indexTau] > 0.5;
+                 taubyTightDeepTau2017v2VSmu_ = analysisTree.tau_byTightDeepTau2017v2VSmu[indexTau] > 0.5;
+                 taubyVLooseDeepTau2017v2VSe_ = analysisTree.tau_byVLooseDeepTau2017v2VSe[indexTau] > 0.5;
+                 taubyVLooseDeepTau2017v2VSjet_ = analysisTree.tau_byVLooseDeepTau2017v2VSjet[indexTau] > 0.5;
+                 taubyVLooseDeepTau2017v2VSmu_ = analysisTree.tau_byVLooseDeepTau2017v2VSmu[indexTau] > 0.5;
+                 taubyVTightDeepTau2017v2VSe_ = analysisTree.tau_byVTightDeepTau2017v2VSe[indexTau] > 0.5;
+                 taubyVTightDeepTau2017v2VSjet_ = analysisTree.tau_byVTightDeepTau2017v2VSjet[indexTau] > 0.5;
+                 taubyVVLooseDeepTau2017v2VSe_ = analysisTree.tau_byVVLooseDeepTau2017v2VSe[indexTau] > 0.5;
+                 taubyVVLooseDeepTau2017v2VSjet_ = analysisTree.tau_byVVLooseDeepTau2017v2VSjet[indexTau] > 0.5;
+                 taubyVVTightDeepTau2017v2VSe_ = analysisTree.tau_byVVTightDeepTau2017v2VSe[indexTau] > 0.5;
+                 taubyVVTightDeepTau2017v2VSjet_ = analysisTree.tau_byVVTightDeepTau2017v2VSjet[indexTau] > 0.5;
+                 taubyVVVLooseDeepTau2017v2VSe_ = analysisTree.tau_byVVVLooseDeepTau2017v2VSe[indexTau] > 0.5;
+                 taubyVVVLooseDeepTau2017v2VSjet_ = analysisTree.tau_byVVVLooseDeepTau2017v2VSjet[indexTau] > 0.5;
+
                  recoilDPhi_ = dPhiFromLV(tauLV,recoilJetLV);
                  recoilJetRatio_ = lorentzVectorTauJet.Pt()/recoilJetLV.Pt();
                  recoilJetDPhi_ = dPhiFromLV(lorentzVectorTauJet,recoilJetLV);
@@ -1442,7 +1490,7 @@ int main(int argc, char * argv[]) {
                  SoftHtNoRecoil_ = SoftHt_ - recoilJetLV.Pt();
                  dPhiMetTau_= dPhiFromLV(lorentzVectorMet,lorentzVectorTau);
                  selection_ = 4;
-                 if(!tauDM_) continue;
+                 if(!tauDM_ && !tauNewDM_) continue;
                  ntuple_->Fill();
               }
            } // END: loop over tau
