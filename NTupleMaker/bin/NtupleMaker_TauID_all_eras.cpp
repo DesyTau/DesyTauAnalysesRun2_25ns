@@ -963,7 +963,7 @@ int main(int argc, char * argv[]) {
            
            if( (tauDecayMode == "1prong0pizeros"     && analysisTree.tau_decayMode[itau]==0) ||
                (tauDecayMode == "1prongUpTo4pizeros" && analysisTree.tau_decayMode[itau]>=1 && analysisTree.tau_decayMode[itau]<=4) ||
-               (tauDecayMode == "3prong0pizeros"     && (analysisTree.tau_decayMode[itau]==10 || analysisTree.tau_decayMode[itau]==11 || analysisTree.tau_decayMode[itau]==7 ) ){
+               (tauDecayMode == "3prong0pizeros"     && (analysisTree.tau_decayMode[itau]==10 || analysisTree.tau_decayMode[itau]==11 || analysisTree.tau_decayMode[itau]==7 ) ) ){
               
               analysisTree.tau_px[itau]   *= tauMomScale;
               analysisTree.tau_py[itau]   *= tauMomScale;
