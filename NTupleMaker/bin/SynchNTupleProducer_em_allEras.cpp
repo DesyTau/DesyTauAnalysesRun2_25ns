@@ -1508,8 +1508,6 @@ int main(int argc, char * argv[]) {
             if (checkFastMTT){
 
                std::cout<<"FastMTT is used" <<std::endl;
-               LorentzVector tau1P4;
-               LorentzVector tau2P4;
                LorentzVector ttP4 = FastMTTComputation(svFitEle, svFitMu, met_x, met_y, covMET, tau1P4, tau2P4);
 
                m_sv = ttP4.M();
