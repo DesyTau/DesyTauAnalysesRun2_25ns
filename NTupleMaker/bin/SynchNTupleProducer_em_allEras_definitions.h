@@ -72,6 +72,9 @@ const float b_jetEleUp = 0.003;
 const float a_jetEleDown = 0.702;
 const float b_jetEleDown = 0.0;
 
+LorentzVector tau1P4;
+LorentzVector tau2P4;
+
 unsigned int minRun = 99999999;
 unsigned int maxRun = 0;
 Int_t           run;
@@ -596,8 +599,6 @@ float ME_q2v1, ME_q2v2;
 float ME_costheta1, ME_costheta2, ME_phi, ME_costhetastar, ME_phi1;
 // 4. Main BG vs. Higgs discriminators
 float ME_vbf_vs_Z, ME_ggh_vs_Z, ME_vbf_vs_ggh;
-
-
 
 void SetupTree(){
  
