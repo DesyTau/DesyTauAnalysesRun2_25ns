@@ -1199,11 +1199,10 @@ class NTupleMaker : public edm::EDAnalyzer{
 
   //Generator Information
   Int_t htxs_stage0cat;
-  Int_t htxs_stage1p1cat_pTjet30GeV;
-  Int_t htxs_stage1p1cat_pTjet25GeV;
+  Int_t htxs_stage1cat;
+  Int_t htxs_stage1p1cat;
   Float_t htxs_higgsPt;
   Int_t htxs_njets30;
-  Int_t htxs_njets25;
 
   Float_t genweight;
   Float_t genid1;
