@@ -20,9 +20,10 @@ do
 	exit=$?
 	if [[ $exit -ne 0 ]]; then
 	    echo reason $exit
-	    echo "resubmit" $list
-	    condor_submit $list.submit
-	    echo ""
+	    #echo "resubmit" $list
+	    #condor_submit $list.submit
+	    mv ${aap}.root ${aap}___
+	echo ""
 	else
 	   echo "file 	${aap}.root looks in order"
 	fi
