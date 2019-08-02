@@ -641,7 +641,10 @@ int main(int argc, char * argv[]) {
          // ggh reweighting  ===========================================================================================================================================
          if (isSignal){
             njets_HTXS = analysisTree.htxs_njets30;
-            higgspt_HTXS = analysisTree.htxs_higgsPt;
+	    higgspt_HTXS = analysisTree.htxs_higgsPt;
+	    htxs_stage0cat = analysisTree.htxs_stage0cat;
+            htxs_stage1cat = analysisTree.htxs_stage1p1cat;
+            htxs_stage1p1cat = analysisTree.htxs_stage1p1cat;
 
             if (apply_ggh_reweighting)
                {

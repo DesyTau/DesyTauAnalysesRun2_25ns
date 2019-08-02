@@ -340,6 +340,7 @@ Float_t higgspt_HTXS;
 Int_t njets_HTXS;
 Int_t htxs_stage0cat;
 Int_t htxs_stage1cat;
+Int_t htxs_stage1p1cat;
 
 Float_t THU_ggH_Mu;
 Float_t THU_ggH_Res;
@@ -647,6 +648,7 @@ void SetupTree(){
    tree->Branch("njets_HTXS",&njets_HTXS,"njets_HTXS/I");
    tree->Branch("htxs_stage0cat",&htxs_stage0cat,"htxs_stage0cat/I");
    tree->Branch("htxs_stage1cat",&htxs_stage1cat,"htxs_stage1cat/I");
+   tree->Branch("htxs_stage1p1cat",&htxs_stage1p1cat,"htxs_stage1p1cat/I");
    
    tree->Branch("mcweight", &mcweight, "mcweight/F");
    tree->Branch("puweight", &puweight, "puweight/F");
@@ -997,46 +999,7 @@ void SetDefaultValues(){
    higgspt_HTXS = -1.;
    htxs_stage0cat = -1.;
    htxs_stage1cat = -1.;
-   
-   metFilters_ = true;
-   badChargedCandidateFilter_ = true;
-   badPFMuonFilter_ = true;
-   badMuonFilter_ = true;
-   duplicateMuonFilter_ = true;
-   
-   lepPx = 0;
-   lepPy = 0;
-   lepPz = 0;
-   bosonPx = 0;
-   bosonPy = 0;
-   bosonPz = 0;
-   bosonPt = 0;
-   bosonMass = -1;
-   
-   njets_HTXS = -1.;
-   higgspt_HTXS = -1.;
-   htxs_stage0cat = -1.;
-   htxs_stage1cat = -1.;
-   
-   metFilters_ = true;
-   badChargedCandidateFilter_ = true;
-   badPFMuonFilter_ = true;
-   badMuonFilter_ = true;
-   duplicateMuonFilter_ = true;
-   
-   lepPx = 0;
-   lepPy = 0;
-   lepPz = 0;
-   bosonPx = 0;
-   bosonPy = 0;
-   bosonPz = 0;
-   bosonPt = 0;
-   bosonMass = -1;
-   
-   njets_HTXS = -1.;
-   higgspt_HTXS = -1.;
-   htxs_stage0cat = -1.;
-   htxs_stage1cat = -1.;
+   htxs_stage1p1cat = -1.;
    
    metFilters_ = true;
    badChargedCandidateFilter_ = true;
