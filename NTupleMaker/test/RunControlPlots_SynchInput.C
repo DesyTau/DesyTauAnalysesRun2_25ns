@@ -70,7 +70,7 @@ TString cmd="Plot_lept_mutau_DNN(";
 
 gROOT->ProcessLine(".L Plot_lept_mutau_Updated_Seq.C++");
 
-for(int i=0; i<19;i++) gROOT->ProcessLine(Form("Plot_lept_mutau_Updated_Seq(%i)",i));
+for(int i=7; i<19;i++) gROOT->ProcessLine(Form("Plot_lept_mutau_Updated_Seq(%i)",i));
 
 
 //gROOT->ProcessLine(Form(".x Plot_lept_mutau_DNN.C++(%s)",aap2)); 
