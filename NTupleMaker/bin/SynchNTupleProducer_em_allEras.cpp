@@ -1463,6 +1463,7 @@ int main(int argc, char * argv[]) {
          checkSV = false;
          checkFastMTT = false;
          passesPreSel = false;
+         passesFastMTTPreSel = false;
 
          if (sync) {
             checkSV = computeSVFitMass;
@@ -1470,8 +1471,9 @@ int main(int argc, char * argv[]) {
          }
          else {
             passesPreSel = dzeta>-35 && iso_1<0.15 && iso_2<0.2 && trg_muonelectron > 0.5 && extraelec_veto<0.5 && extramuon_veto<0.5&& mTdileptonMET<60 && (nbtag==0||nbtag_mistagUp==0||nbtag_mistagDown==0||nbtag_btagUp==0||nbtag_btagDown==0);
+            passesFastMTTPreSel = iso_1<0.15 && iso_2<0.2 && trg_muonelectron > 0.5 && extraelec_veto<0.5 && extramuon_veto<0.5;
             checkSV = computeSVFitMass && passesPreSel;
-            checkFastMTT = computeFastMTTMass && passesPreSel;
+            checkFastMTT = computeFastMTTMass && passesFastMTTPreSel;
          }
 
          TMatrixD covMET(2, 2);

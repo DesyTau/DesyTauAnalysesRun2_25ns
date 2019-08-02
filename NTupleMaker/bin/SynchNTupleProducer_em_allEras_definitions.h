@@ -587,6 +587,7 @@ float ptLeadingBJet = -1;
 bool checkSV = false;
 bool checkFastMTT = false;
 bool passesPreSel = false; 
+bool passesFastMTTPreSel = false;
 
 bool isSVFitUsed = false;
 bool isFastMTTUsed = false;
