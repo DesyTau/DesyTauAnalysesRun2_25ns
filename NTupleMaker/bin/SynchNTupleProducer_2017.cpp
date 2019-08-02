@@ -15,7 +15,6 @@
 #include "TROOT.h"
 #include "TLorentzVector.h"
 #include "TVector3.h"
-#include "TRFIOFile.h"
 #include "TH1F.h"
 #include "TH1D.h"
 #include "TChain.h"
@@ -24,7 +23,7 @@
 #include "TError.h"
 #include "TLorentzVector.h"
 #include "TRandom.h"
-
+#include "TSystem.h"
 #include "RooRealVar.h"
 #include "RooWorkspace.h"
 
@@ -242,10 +241,8 @@ int main(int argc, char * argv[]){
   
   if(!isData && applyRecoilCorrections && (isDY || isWJets || isVBForGGHiggs || isMSSMsignal) ){
     TString RecoilDir("HTT-utilities/RecoilCorrections/data/");
-    
-    //    TString RecoilFileName = RecoilDir; RecoilFileName += "TypeI-PFMet_Run2016BtoH.root"; Merijn update to 2017:
-    TString RecoilFileName = RecoilDir; RecoilFileName += "Type1_PFMET_2017.root";
-
+  
+    TString RecoilFileName = RecoilDir; RecoilFileName += "TypeI-PFMet_2017.root";
     std::cout<<RecoilFileName<<std::endl;
     recoilPFMetCorrector = new RecoilCorrector( RecoilFileName);
         

@@ -276,6 +276,10 @@ public :
    Bool_t          electron_cutId_loose_Fall17[100];   //[electron_count]
    Bool_t          electron_cutId_medium_Fall17[100];   //[electron_count]
    Bool_t          electron_cutId_tight_Fall17[100];   //[electron_count]
+   Bool_t          electron_cutId_veto_Fall17V2[100];   //[electron_count]
+   Bool_t          electron_cutId_loose_Fall17V2[100];   //[electron_count]
+   Bool_t          electron_cutId_medium_Fall17V2[100];   //[electron_count]
+   Bool_t          electron_cutId_tight_Fall17V2[100];   //[electron_count]
    Bool_t          electron_pass_conversion[100];   //[electron_count]
    Int_t           electron_genmatch[100];   //[electron_count]
    UInt_t          tau_count;
@@ -1015,6 +1019,10 @@ public :
    TBranch        *b_electron_cutId_loose_Fall17;   //!
    TBranch        *b_electron_cutId_medium_Fall17;   //!
    TBranch        *b_electron_cutId_tight_Fall17;   //!
+   TBranch        *b_electron_cutId_veto_Fall17V2;   //!
+   TBranch        *b_electron_cutId_loose_Fall17V2;   //!
+   TBranch        *b_electron_cutId_medium_Fall17V2;   //!
+   TBranch        *b_electron_cutId_tight_Fall17V2;   //!
    TBranch        *b_electron_pass_conversion;   //!
    TBranch        *b_electron_genmatch;   //!
    TBranch        *b_tau_count;   //!
@@ -1845,6 +1853,10 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("electron_cutId_loose_Fall17", electron_cutId_loose_Fall17, &b_electron_cutId_loose_Fall17);
    fChain->SetBranchAddress("electron_cutId_medium_Fall17", electron_cutId_medium_Fall17, &b_electron_cutId_medium_Fall17);
    fChain->SetBranchAddress("electron_cutId_tight_Fall17", electron_cutId_tight_Fall17, &b_electron_cutId_tight_Fall17);
+   fChain->SetBranchAddress("electron_cutId_veto_Fall17V2", electron_cutId_veto_Fall17V2, &b_electron_cutId_veto_Fall17V2);
+   fChain->SetBranchAddress("electron_cutId_loose_Fall17V2", electron_cutId_loose_Fall17V2, &b_electron_cutId_loose_Fall17V2);
+   fChain->SetBranchAddress("electron_cutId_medium_Fall17V2", electron_cutId_medium_Fall17V2, &b_electron_cutId_medium_Fall17V2);
+   fChain->SetBranchAddress("electron_cutId_tight_Fall17V2", electron_cutId_tight_Fall17V2, &b_electron_cutId_tight_Fall17V2);
    fChain->SetBranchAddress("electron_pass_conversion", electron_pass_conversion, &b_electron_pass_conversion);
    fChain->SetBranchAddress("electron_genmatch", electron_genmatch, &b_electron_genmatch);
    fChain->SetBranchAddress("tau_count", &tau_count, &b_tau_count);

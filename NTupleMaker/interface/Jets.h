@@ -1,3 +1,5 @@
+// source : https://twiki.cern.ch/twiki/bin/viewauth/CMS/JetID#Recommendations_for_13_TeV_2016
+
 #ifndef Jets_h
 #define Jets_h
 #include "DesyTauAnalyses/NTupleMaker/interface/Config.h"
@@ -23,6 +25,67 @@ bool tightJetiD(AC1B &tree_ ,int jet){
 		
 		else    
 			tightJetID = (nem<0.90 && nnpart>10 && fabs(eta)>3.0 ) ;
+	return tightJetID;
+
+
+}
+
+bool tightJetiD_2016(AC1B &tree_ ,int jet){
+        // source : https://twiki.cern.ch/twiki/bin/view/CMS/JetID13TeVRun2016
+	bool tightJetID = false;
+	float energy = tree_.pfjet_e[jet];
+	float eta = tree_.pfjet_eta[jet];
+	float nhf = tree_.pfjet_neutralhadronicenergy[jet]/energy;
+	float nem = tree_.pfjet_neutralemenergy[jet]/energy;
+	float npr = tree_.pfjet_chargedmulti[jet] + tree_.pfjet_neutralmulti[jet];
+	float chm = tree_.pfjet_chargedmulti[jet] ;
+	float muf = tree_.pfjet_muonenergy[jet]/energy;
+	float chf = tree_.pfjet_chargedhadronicenergy[jet]/energy;
+	float elf = tree_.pfjet_chargedemenergy[jet]/energy;
+	float nm  = tree_.pfjet_neutralmulti[jet];
+	float nnpart = tree_.pfjet_neutralmulti[jet];
+	if (fabs(eta)<=2.7)
+	  {
+            tightJetID = (nhf<0.90 && nem<0.90 && npr>1) && ((abs(eta)<=2.4 && chf>0 && chm>0 && elf<0.99) || abs(eta)>2.4);
+	  }
+	else if (fabs(eta)<=3.0)
+	  {
+            tightJetID = nhf<0.98 && nem>0.01 && nm>2;
+	  }
+	else
+	  {
+            tightJetID = nem<0.90 && nm>10;
+	  }
+	return tightJetID;
+
+}
+
+bool looseJetiD_2016(AC1B &tree_ ,int jet){
+        // source : https://twiki.cern.ch/twiki/bin/view/CMS/JetID13TeVRun2016
+	bool tightJetID = false;
+	float energy = tree_.pfjet_e[jet];
+	float eta = tree_.pfjet_eta[jet];
+	float nhf = tree_.pfjet_neutralhadronicenergy[jet]/energy;
+	float nem = tree_.pfjet_neutralemenergy[jet]/energy;
+	float npr = tree_.pfjet_chargedmulti[jet] + tree_.pfjet_neutralmulti[jet];
+	float chm = tree_.pfjet_chargedmulti[jet] ;
+	float muf = tree_.pfjet_muonenergy[jet]/energy;
+	float chf = tree_.pfjet_chargedhadronicenergy[jet]/energy;
+	float elf = tree_.pfjet_chargedemenergy[jet]/energy;
+	float nm  = tree_.pfjet_neutralmulti[jet];
+	float nnpart = tree_.pfjet_neutralmulti[jet];
+	if (fabs(eta)<=2.7)
+	  {
+            tightJetID = (nhf<0.99 && nem<0.99 && npr>1) && ((abs(eta)<=2.4 && chf>0 && chm>0 && elf<0.99) || abs(eta)>2.4);
+	  }
+	else if (fabs(eta)<=3.0)
+	  {
+            tightJetID = nhf<0.98 && nem>0.01 && nm>2;
+	  }
+	else
+	  {
+            tightJetID = nem<0.90 && nm>10;
+	  }
 	return tightJetID;
 
 }
@@ -53,6 +116,40 @@ bool tightJetiD_2017(AC1B &tree_ ,int jet){
             tightJetID_2017 = nem < 0.9 && nhf > 0.02 && nm > 10;
          }   
       return tightJetID_2017;
+
+}
+
+bool tightJetiD_2018(AC1B &tree_ ,int jet){
+	bool tightJetID_2018 = false;
+		float energy = tree_.pfjet_e[jet];
+		float eta = tree_.pfjet_eta[jet];
+      float nhf = tree_.pfjet_neutralhadronicenergy[jet]/energy;
+      float nem = tree_.pfjet_neutralemenergy[jet]/energy;
+      float npr = tree_.pfjet_chargedmulti[jet] + tree_.pfjet_neutralmulti[jet];
+      float chm = tree_.pfjet_chargedmulti[jet] ;
+      float muf = tree_.pfjet_muonenergy[jet]/energy;
+      float chf = tree_.pfjet_chargedhadronicenergy[jet]/energy;
+      float elf = tree_.pfjet_chargedemenergy[jet]/energy;
+      float nm  = tree_.pfjet_neutralmulti[jet];
+		float nnpart = tree_.pfjet_neutralmulti[jet];
+
+      if (fabs(eta)<=2.6)
+         {
+            tightJetID_2018 = (nhf < 0.9 && nem < 0.9 && npr > 1 && chf>0 && chm > 0);
+         }
+      else if (fabs(eta)<=2.7)
+         {
+            tightJetID_2018 = (nhf < 0.9 && nem < 0.99 && chm>0);
+         }
+      else if (fabs(eta)<=3.0)
+         {
+            tightJetID_2018 = (nem < 0.99 && nem > 0.02 && nm > 2);
+         }
+      else
+         {
+            tightJetID_2018 = nem < 0.9 && nhf > 0.02 && nm > 10;
+         }
+      return tightJetID_2018;
 
 }
 
