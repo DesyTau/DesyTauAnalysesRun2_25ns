@@ -1,6 +1,6 @@
 #!/bin/bash
 
-for dir in $(ls | grep _files) 
+for dir in $(ls | grep TTTo2L2Nu*_files) 
 do  
     echo $dir
     cd $dir
