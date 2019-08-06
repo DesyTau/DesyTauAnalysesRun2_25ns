@@ -462,7 +462,7 @@ void fillMET(TString ch, int leptonIndex, int tauIndex, const AC1B * analysisTre
 
 }
 
-//Merijn 2019 6 20: adjust..
+//Merijn 2019 6 20: added overloaded function, takes era as argument. Will do MET correct for 2016 2017, will need later to extend to 2018
 void fillMET(TString ch, int leptonIndex, int tauIndex, const AC1B * analysisTree, Synch17Tree *otree, int era){
 
    // pfmet variables

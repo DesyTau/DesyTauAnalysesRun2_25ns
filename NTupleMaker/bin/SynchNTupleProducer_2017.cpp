@@ -24,6 +24,7 @@
 #include "TLorentzVector.h"
 #include "TRandom.h"
 #include "TSystem.h"
+
 #include "RooRealVar.h"
 #include "RooWorkspace.h"
 
@@ -241,8 +242,10 @@ int main(int argc, char * argv[]){
   
   if(!isData && applyRecoilCorrections && (isDY || isWJets || isVBForGGHiggs || isMSSMsignal) ){
     TString RecoilDir("HTT-utilities/RecoilCorrections/data/");
-  
-    TString RecoilFileName = RecoilDir; RecoilFileName += "TypeI-PFMet_2017.root";
+    
+    //    TString RecoilFileName = RecoilDir; RecoilFileName += "TypeI-PFMet_Run2016BtoH.root"; Merijn update to 2017:
+    TString RecoilFileName = RecoilDir; RecoilFileName += "Type1_PFMET_2017.root";
+
     std::cout<<RecoilFileName<<std::endl;
     recoilPFMetCorrector = new RecoilCorrector( RecoilFileName);
         
@@ -663,7 +666,7 @@ int main(int argc, char * argv[]){
     std::cout << "      number of entries in Tree = " << numberOfEntries << std::endl;
     ///////////////EVENT LOOP///////////////
 
-//for (Long64_t iEntry=0; iEntry<150; iEntry++) {
+//for (Long64_t iEntry=0; iEntry<1000; iEntry++) {
 for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) {
   // cout<<"iEntry "<<iEntry<<endl;
       counter[0]++;
@@ -1247,14 +1250,22 @@ for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) {
 	float bosonMass = genV.M();
 	float bosonPt = genV.Pt();
 
+  //Merijn determine here some min and max values:
+  double massxmin=h_zptweight->GetXaxis()->GetXmin();//Merijn
+  double massxmax=h_zptweight->GetXaxis()->GetXmax();
+
+  double ptxmin=h_zptweight->GetYaxis()->GetXmin();
+  double ptxmax=h_zptweight->GetYaxis()->GetXmax();
+
 	//Merijn 2019 6 13: adjust to T/M functions, to get boundaries right. Otherwise, for 2017 data we get few outliers that screw up the weight histogram dramatically.
 	Float_t zptmassweight = 1;
 	if (bosonMass>50.0) {
 	  float bosonMassX = bosonMass;
 	  float bosonPtX = bosonPt;
-	  if (bosonMassX>1000.) bosonMassX = 1000.;
-	  if (bosonPtX<1.)      bosonPtX = 1.;
-	  if (bosonPtX>1000.)   bosonPtX = 1000.;
+	  if (bosonMassX>massxmax) bosonMassX = massxmax-h_zptweight->GetXaxis()->GetBinWidth(h_zptweight->GetYaxis()->GetNbins())*0.5;//Merijn: if doesn't work, lower by 1/2 binwidth..
+	  if (bosonPtX<ptxmin)      bosonPtX = ptxmin+h_zptweight->GetYaxis()->GetBinWidth(1)*0.5;
+	  if (bosonPtX>ptxmax)   bosonPtX = ptxmax-h_zptweight->GetYaxis()->GetBinWidth(h_zptweight->GetYaxis()->GetNbins())*0.5;
+
 	  zptmassweight = h_zptweight->GetBinContent(h_zptweight->GetXaxis()->FindBin(bosonMassX),
 							    h_zptweight->GetYaxis()->FindBin(bosonPtX));}	
         otree->zptweight =zptmassweight;
@@ -1441,7 +1452,7 @@ for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) {
       counter[14]++;
 
       // svfit variables
-      otree->m_sv   = -9999;
+      otree->m_sv   = -10;//Merijn updated for the DNN
       otree->pt_sv  = -9999;
       otree->eta_sv = -9999;
       otree->phi_sv = -9999;
