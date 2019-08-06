@@ -35,7 +35,7 @@
 
 #TT
 
-./condorsub_seq_leptau.sh SynchNTupleProducer_2017 analysisMacroSynch_lept_mt_TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8.conf TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8 mt 5
+./condorsub_seq_leptau.sh SynchNTupleProducer_2017 analysisMacroSynch_lept_mt_TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8.conf TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8 mt 2
 ./condorsub_seq_leptau.sh SynchNTupleProducer_2017 analysisMacroSynch_lept_mt_TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powheg-pythia8.conf TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powheg-pythia8 mt 5
 ./condorsub_seq_leptau.sh SynchNTupleProducer_2017 analysisMacroSynch_lept_mt_TTToHadronic_TuneCP5_PSweights_13TeV-powheg-pythia8.conf TTToHadronic_TuneCP5_PSweights_13TeV-powheg-pythia8 mt 5
 
