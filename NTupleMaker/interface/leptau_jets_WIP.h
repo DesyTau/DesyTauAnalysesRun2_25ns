@@ -286,7 +286,7 @@ void counting_jets(AC1B *analysisTree, Synch17Tree *otree, const Config *cfg, co
   otree->njetspt20 = jetspt20.size();
   otree->nbtag = bjets.size();
   
-  otree->bpt_1   = -9999;
+  otree->bpt_1   = -10; //Merijn 2019 7 31: put to -10 since it is used in the DNN don't want to confuse with strange value
   otree->beta_1  = -9999;
   otree->bphi_1  = -9999;
   otree->bcsv_1  = -9999;
@@ -299,7 +299,7 @@ void counting_jets(AC1B *analysisTree, Synch17Tree *otree, const Config *cfg, co
     otree->bcsv_1  = analysisTree->pfjet_btag[indexLeadingBJet][0];
   }
 
-  otree->bpt_2   = -9999;
+  otree->bpt_2   = -10; //Merijn 2019 7 31: put to -10 since it is used in the DNN don't want to confuse with strange value
   otree->beta_2  = -9999;
   otree->bphi_2  = -9999;
   otree->bcsv_2  = -9999;

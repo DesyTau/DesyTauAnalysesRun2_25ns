@@ -160,7 +160,7 @@ protected:
     
     cenTree->m_vis = dileptonLV.M();
 
-    cenTree->m_sv = -9999;
+    cenTree->m_sv = -10;//Merijn adjust for DNN
     cenTree->pt_sv = -9999;
     cenTree->eta_sv = -9999;
     cenTree->phi_sv = -9999;

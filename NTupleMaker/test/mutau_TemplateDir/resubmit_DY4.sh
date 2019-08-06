@@ -2,7 +2,7 @@
 
 # This script loops over all folders in directory and checks if there is a *.root file in these folders that is corrupted. If it is it is resubmitted.
 
-for dir in $(find -maxdepth 1 -type d -name "DY2*_files")
+for dir in $(find -maxdepth 1 -type d -name "DY4*_files")
 do
     echo ''
     echo ''
