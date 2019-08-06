@@ -66,7 +66,8 @@ float get_jetE(const AC1B *analysisTree, int jetIndex, TString JESname, TString 
 
 
 //Merijn: made AC1B *analysisTree non-const, otherwise issues with calling functions from jets.h with analysisTree
-void counting_jets(AC1B *analysisTree, Synch17Tree *otree, const Config *cfg, const btag_scaling_inputs *inputs_btag_scaling, TString JESname = "central", TString direction = "None",  JESUncertainties * jecUncertainties = dummyJEC){
+//2019 8 2 changed back again
+void counting_jets(const AC1B *analysisTree, Synch17Tree *otree, const Config *cfg, const btag_scaling_inputs *inputs_btag_scaling, TString JESname = "central", TString direction = "None",  JESUncertainties * jecUncertainties = dummyJEC){
 
   //Merijn 2019 6 7: define few things analogous to TM:
   float MaxBJetPt = 1000.;
