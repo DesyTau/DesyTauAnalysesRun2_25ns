@@ -456,9 +456,11 @@ int main(int argc, char * argv[]) {
          weightPDFup   = analysisTree.weightPDFup;
          weightPDFdown = analysisTree.weightPDFdown;
 
-	 prefiringweight     = analysisTree.prefiringweight;
-	 prefiringweightup   = analysisTree.prefiringweightup;
-	 prefiringweightdown = analysisTree.prefiringweightdown;
+	 if(era=="2016" || era=="2017"){
+	   prefiringweight     = analysisTree.prefiringweight;
+	   prefiringweightup   = analysisTree.prefiringweightup;
+	   prefiringweightdown = analysisTree.prefiringweightdown;
+	 }
 
          // store gen-info  ============================================================================================================================================
          if (!isData) {

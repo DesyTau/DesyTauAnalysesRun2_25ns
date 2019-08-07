@@ -988,7 +988,11 @@ void SetDefaultValues(){
    zptmassweight_statpt80down = 1;
    
    weight = 1;
-   
+
+   prefiringweight     = 1.;
+   prefiringweightup   = 1.;
+   prefiringweightdown = 1.;
+
    nuPx = 0;
    nuPy = 0;
    nuPz = 0;
