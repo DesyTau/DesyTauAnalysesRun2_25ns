@@ -465,6 +465,9 @@ public :
    Float_t         weightPDFup;
    Float_t         weightPDFdown;
    Float_t         weightPDFvar;
+   Float_t         prefiringweight;
+   Float_t         prefiringweightup;
+   Float_t         prefiringweightdown;
    Int_t           numpileupinteractionsminus;
    Int_t           numpileupinteractions;
    Int_t           numpileupinteractionsplus;
@@ -1232,6 +1235,9 @@ public :
    TBranch        *b_weightPDFup;   //!
    TBranch        *b_weightPDFdown;   //!
    TBranch        *b_weightPDFvar;   //!
+   TBranch        *b_prefiringweight;
+   TBranch        *b_prefiringweightup;
+   TBranch        *b_prefiringweightdown;
    TBranch        *b_numpileupinteractionsminus;   //!
    TBranch        *b_numpileupinteractions;   //!
    TBranch        *b_numpileupinteractionsplus;   //!
@@ -2090,6 +2096,9 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("weightPDFup", &weightPDFup, &b_weightPDFup);
    fChain->SetBranchAddress("weightPDFdown", &weightPDFdown, &b_weightPDFdown);
    fChain->SetBranchAddress("weightPDFvar", &weightPDFvar, &b_weightPDFvar);
+   fChain->SetBranchAddress("prefiringweight", &prefiringweight, &b_prefiringweight);
+   fChain->SetBranchAddress("prefiringweightup", &prefiringweightup, &b_prefiringweightup);
+   fChain->SetBranchAddress("prefiringweightdown", &prefiringweightdown, &b_prefiringweightdown);
    fChain->SetBranchAddress("numpileupinteractionsminus", &numpileupinteractionsminus, &b_numpileupinteractionsminus);
    fChain->SetBranchAddress("numpileupinteractions", &numpileupinteractions, &b_numpileupinteractions);
    fChain->SetBranchAddress("numpileupinteractionsplus", &numpileupinteractionsplus, &b_numpileupinteractionsplus);

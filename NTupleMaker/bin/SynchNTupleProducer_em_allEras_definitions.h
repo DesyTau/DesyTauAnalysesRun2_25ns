@@ -139,6 +139,10 @@ Float_t         zptmassweight_statpt80down;
 Float_t         weight;
 Float_t         weight_ggh_NNLOPS;
 
+Float_t         prefiringweight;
+Float_t         prefiringweightup;
+Float_t         prefiringweightdown;
+
 Float_t         m_vis;
 Float_t         pt_vis;
 
@@ -709,6 +713,10 @@ void SetupTree(){
    tree->Branch("zptmassweight_statpt80down",&zptmassweight_statpt80down,"zptmassweight_statpt80down/F");
    
    tree->Branch("weight", &weight, "weight/F");
+
+   tree->Branch("prefiringweight", &prefiringweight, "prefiringweight/F");
+   tree->Branch("prefiringweightup", &prefiringweightup, "prefiringweightup/F");
+   tree->Branch("prefiringweightdown", &prefiringweightdown, "prefiringweightdown/F");
    
    tree->Branch("metFilters",&metFilters_,"metFilters/O");
    tree->Branch("trg_muonelectron",&trg_muonelectron,"trg_muonelectron/O");

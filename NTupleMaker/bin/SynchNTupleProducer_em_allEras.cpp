@@ -456,6 +456,10 @@ int main(int argc, char * argv[]) {
          weightPDFup   = analysisTree.weightPDFup;
          weightPDFdown = analysisTree.weightPDFdown;
 
+	 prefiringweight     = analysisTree.prefiringweight;
+	 prefiringweightup   = analysisTree.prefiringweightup;
+	 prefiringweightdown = analysisTree.prefiringweightdown;
+
          // store gen-info  ============================================================================================================================================
          if (!isData) {
                 
