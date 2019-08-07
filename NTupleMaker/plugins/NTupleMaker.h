@@ -394,6 +394,9 @@ class NTupleMaker : public edm::EDAnalyzer{
   vector<string> cJetHLTriggerMatching;
   int cJetNum;
 
+  edm::EDGetTokenT< double > prefweight_token;
+  edm::EDGetTokenT< double > prefweightup_token;
+  edm::EDGetTokenT< double > prefweightdown_token;
   edm::EDGetTokenT<pat::MuonCollection> MuonCollectionToken_;
   edm::EDGetTokenT<edm::PtrVector<reco::Muon>> BadGlobalMuonsToken_;
   edm::EDGetTokenT<edm::PtrVector<reco::Muon>> BadDuplicateMuonsToken_;
@@ -1335,6 +1338,10 @@ class NTupleMaker : public edm::EDAnalyzer{
   std::vector<std::string>hltriggerresultsV_;
   std::map<std::string, int>* flags_;
   float embeddingWeight_;
+
+  Float_t prefiringweight;
+  Float_t prefiringweightup;
+  Float_t prefiringweightdown;
   //std::vector< double > embeddingWeights_; //for RhEmb
   //float TauSpinnerWeight_;
   EGammaMvaEleEstimatorCSA14* myMVAnonTrigPhys14;

@@ -175,6 +175,10 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
   cBtagDiscriminators(iConfig.getUntrackedParameter<vector<string> >("RecJetBtagDiscriminators")),
   cJetHLTriggerMatching(iConfig.getUntrackedParameter<vector<string> >("RecJetHLTriggerMatching")),
   cJetNum(iConfig.getUntrackedParameter<int>("RecJetNum", 0)),
+  // pre-firing weights
+  prefweight_token(consumes< double >(edm::InputTag("prefiringweight:nonPrefiringProb"))),
+  prefweightup_token(consumes< double >(edm::InputTag("prefiringweight:nonPrefiringProbUp"))),
+  prefweightdown_token(consumes< double >(edm::InputTag("prefiringweight:nonPrefiringProbDown"))),
   // collections
   MuonCollectionToken_(consumes<pat::MuonCollection>(iConfig.getParameter<edm::InputTag>("MuonCollectionTag"))),
   BadGlobalMuonsToken_(consumes<edm::PtrVector<reco::Muon>>(iConfig.getParameter<edm::InputTag>("BadGlobalMuons"))),
@@ -1169,6 +1173,11 @@ void NTupleMaker::beginJob(){
   flags_ = new std::map<std::string, int>();
   tree->Branch("flags", "std::map<std::string, int>", &flags_);
   
+  // add pre-firing weights
+  tree->Branch("prefiringweight", &prefiringweight, "prefiringweight/F");
+  tree->Branch("prefiringweightup", &prefiringweightup, "prefiringweightup/F");
+  tree->Branch("prefiringweightdown", &prefiringweightdown, "prefiringweightdown/F");
+
   lumitree = FS->make<TTree>("AC1Blumi", "AC1Blumi", 1);
   lumitree->Branch("lumi_run", &lumi_run, "lumi_run/i");
   lumitree->Branch("lumi_block", &lumi_block, "lumi_block/i");
@@ -2497,6 +2506,24 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       int numberOfTriggerObjects = int(AddTriggerObjects(iEvent,TriggerObjectCollectionToken_,*HLTrigger));
       //      std::cout << std::endl;
     } // ctrigger
+
+  prefiringweight = 1.;
+  prefiringweightup = 1.;
+  prefiringweightdown = 1.;
+
+  if( cYear != 2018) {
+    edm::Handle< double > theprefweight;
+    iEvent.getByToken(prefweight_token, theprefweight ) ;
+    prefiringweight =(*theprefweight);
+
+    edm::Handle< double > theprefweightup;
+    iEvent.getByToken(prefweightup_token, theprefweightup ) ;
+    prefiringweightup =(*theprefweightup);
+
+    edm::Handle< double > theprefweightdown;
+    iEvent.getByToken(prefweightdown_token, theprefweightdown ) ;
+    prefiringweightdown =(*theprefweightdown);
+  }
 
   if(crecstxs)
     {

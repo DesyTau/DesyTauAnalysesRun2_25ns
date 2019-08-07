@@ -1,7 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 
 isData = False
-isHiggsSignal = True
+isHiggsSignal = False
 year = 2017
 period = '2017'
 
@@ -180,6 +180,24 @@ if not isData and isHiggsSignal:
 else :
     process.htxsSequence = cms.Sequence( )
 # END HTXS ====================================================================================================
+
+
+# Pre-firing weights ==========================================================================================
+# https://twiki.cern.ch/twiki/bin/viewauth/CMS/L1ECALPrefiringWeightRecipe
+from PhysicsTools.PatUtils.l1ECALPrefiringWeightProducer_cfi import l1ECALPrefiringWeightProducer
+if period == "2018" :
+    process.prefiringweight = cms.Sequence()
+else:
+    if period == '2016' :
+        data_era = "2016BtoH"
+    elif period=='2017':
+        data_era = "2017BtoF"
+    process.prefiringweight = l1ECALPrefiringWeightProducer.clone(
+        DataEra = cms.string(data_era),
+        UseJetEMPt = cms.bool(False),
+        PrefiringRateSystematicUncty = cms.double(0.2),
+        SkipWarnings = False)
+# END Pre-firing weights ======================================================================================
 
 
 # NTuple Maker =========================================================================================
@@ -496,6 +514,99 @@ SampleName = cms.untracked.string("Data")
 )
 #process.patJets.addBTagInfo = cms.bool(True)
 
+# Trigger filtering ===========================================================================================
+
+HLTlist = cms.vstring(
+    #SingleMuon
+    'HLT_IsoMu20_v*',
+    'HLT_IsoMu24_v*',
+    'HLT_IsoMu24_eta2p1_v*',
+    'HLT_IsoMu27_v*',
+    'HLT_IsoMu30_v*',
+    'HLT_Mu50_v*',
+    # Muon-Tau triggers
+    #'HLT_IsoMu20_eta2p1_LooseChargedIsoPFTau27_eta2p1_CrossL1_v*',
+    'HLT_IsoMu24_eta2p1_LooseChargedIsoPFTau20_SingleL1_v*',
+    # SingleElectron
+    'HLT_Ele27_WPTight_Gsf_v*',
+    'HLT_Ele32_WPTight_Gsf_v*',
+    'HLT_Ele35_WPTight_Gsf_v*',
+    'HLT_Ele38_WPTight_Gsf_v*',
+    # Electron-Tau triggers
+    'HLT_Ele24_eta2p1_WPTight_Gsf_LooseChargedIsoPFTau30_eta2p1_CrossL1_v*',
+    # Dilepton triggers
+    'HLT_DoubleEle24_eta2p1_WPTight_Gsf_v*',
+    'HLT_DoubleIsoMu20_eta2p1_v*',
+    'HLT_DoubleIsoMu24_eta2p1_v*',
+    'HLT_Mu18_Mu9_v*',
+    'HLT_Mu18_Mu9_DZ_v*',
+    'HLT_Mu18_Mu9_SameSign_v*',
+    'HLT_Mu18_Mu9_SameSign_DZ_v*',
+    'HLT_Mu20_Mu10_v*',
+    'HLT_Mu20_Mu10_DZ_v*',
+    'HLT_Mu20_Mu10_SameSign_v*',
+    'HLT_Mu20_Mu10_SameSign_DZ_v*',
+    'HLT_Mu37_TkMu27_v*',
+    # Triple muon
+    'HLT_TripleMu_12_10_5_v*',
+    'HLT_TripleMu_10_5_5_DZ_v*',
+    # Muon+Electron triggers
+    'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v*',
+    'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v*',
+    'HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v*',
+    'HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v*',
+    'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v*',
+    'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v*',
+    # Ditau triggers
+    'HLT_DoubleTightChargedIsoPFTau35_Trk1_TightID_eta2p1_Reg_v*',
+    'HLT_DoubleMediumChargedIsoPFTau40_Trk1_TightID_eta2p1_Reg_v*',
+    'HLT_DoubleTightChargedIsoPFTau40_Trk1_eta2p1_Reg_v*',
+    # Single tau triggers
+    'HLT_MediumChargedIsoPFTau180HighPtRelaxedIso_Trk50_eta2p1_v*',
+    'HLT_MediumChargedIsoPFTau180HighPtRelaxedIso_Trk50_eta2p1_1pr_v*',
+    # MET Triggers
+    'HLT_PFMET110_PFMHT110_IDTight_v*',
+    'HLT_PFMET120_PFMHT120_IDTight_v*',
+    'HLT_PFMET130_PFMHT130_IDTight_v*',
+    'HLT_PFMET140_PFMHT140_IDTight_v*',
+    'HLT_PFMETNoMu110_PFMHTNoMu110_IDTight_v*',
+    'HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_v*',
+    'HLT_PFMETNoMu130_PFMHTNoMu130_IDTight_v*',
+    'HLT_PFMETNoMu140_PFMHTNoMu140_IDTight_v*',
+    # Single-Jet Triggers
+    'HLT_PFJet40_v*',
+    'HLT_PFJet60_v*',
+    'HLT_PFJet80_v*',
+    'HLT_PFJet140_v*',
+    'HLT_PFJet200_v*',
+    'HLT_PFJet260_v*',
+    'HLT_PFJet320_v*',
+    'HLT_PFJet400_v*',
+    'HLT_PFJet450_v*',
+    'HLT_PFJet500_v*',
+    'HLT_PFJet550_v*',
+    # Di-Jet Triggers
+    'HLT_DiPFJetAve40_v*',
+    'HLT_DiPFJetAve60_v*',
+    'HLT_DiPFJetAve80_v*',
+    'HLT_DiPFJetAve140_v*',
+    'HLT_DiPFJetAve200_v*',
+    'HLT_DiPFJetAve260_v*',
+    'HLT_DiPFJetAve320_v*',
+    'HLT_DiPFJetAve400_v*',
+    'HLT_DiPFJetAve500_v*'
+)
+
+process.triggerSelection = cms.EDFilter("HLTHighLevel",
+                                        TriggerResultsTag = cms.InputTag("TriggerResults","","HLT"),
+                                        HLTPaths = cms.vstring(HLTlist),
+                                        andOr = cms.bool(True),   # multiple triggers: True (OR) accept if ANY is true, False (AND) accept if ALL are true
+                                        throw = cms.bool(True)    # throw exception on unknown path names
+                                        )
+# END Trigger filtering =======================================================================================
+
+
+
 process.p = cms.Path(
   process.initroottree *
   process.jecSequence *  # New JECs
@@ -511,6 +622,8 @@ process.p = cms.Path(
   #process.AdvancedRefitVertexBS * # Vertex refit w/ BS
   process.MiniAODRefitVertexBS* # PV with BS constraint
   process.htxsSequence * # HTXS
+  process.prefiringweight * # prefiring-weights for 2016/2017
+  #process.triggerSelection *  # trigger filtering
   process.makeroottree
 )
 
