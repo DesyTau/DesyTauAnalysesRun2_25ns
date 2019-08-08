@@ -334,28 +334,7 @@ int main(int argc, char * argv[]){
 
   const bool  applyLeptonId    = cfg.get<bool>("Apply"+lep+"Id");
 
-  //dilepton veto
-  
-  float ptDiLeptonVeto     = 15.;
-  float etaDiLeptonVeto    = 2.4;
-  float dxyDiLeptonVeto    = 0.05;
-  float dzDiLeptonVeto     = 0.2;
-  bool applyDiLeptonVetoId = true;
-  bool applyDiLeptonOS     = true;
-  float isoDiLeptonVeto    = 0.3;
-  float drDiLeptonVeto     = 0.3;
-  
-  if (ch == "mt" || ch == "et") {
-    ptDiLeptonVeto     = cfg.get<float>("ptDi"+lep+"Veto");  
-    etaDiLeptonVeto    = cfg.get<float>("etaDi"+lep+"Veto");
-    dxyDiLeptonVeto    = cfg.get<float>("dxyDi"+lep+"Veto");  
-    dzDiLeptonVeto     = cfg.get<float>("dzDi"+lep+"Veto"); 
-    applyDiLeptonVetoId = cfg.get<bool>("applyDi"+lep+"VetoId");
-    applyDiLeptonOS     = cfg.get<bool>("applyDi"+lep+"OS");
-    isoDiLeptonVeto    = cfg.get<float>("isoDi"+lep+"Veto");
-    drDiLeptonVeto     = cfg.get<float>("drDi"+lep+"Veto"); 
-  }
-  
+  //Merijn removed dimuon cut information since it is in the config file, best to have in one location only to avoid confusion
 
   const float deltaRTrigMatch = cfg.get<float>("DRTrigMatch");
   const float dRiso = cfg.get<float>("dRiso");
