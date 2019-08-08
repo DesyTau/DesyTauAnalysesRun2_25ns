@@ -406,17 +406,17 @@ bool extra_electron_veto(int leptonIndex, TString ch, const Config *cfg, const A
     if (fabs(analysisTree->electron_dxy[ie])>=cfg->get<float>("dxyVetoElectronCut")) continue;
     if (fabs(analysisTree->electron_dz[ie])>=cfg->get<float>("dzVetoElectronCut")) continue;
 
-    int era=cfg.get<int>("era");
+    int era=cfg->get<int>("era");
     bool electronMvaId;
 
-     if (era=="2016") {
-         electronMvaId = analysisTree.electron_mva_wp90_general_Spring16_v1[ie]>0.5; 
+     if (era==2016) {
+         electronMvaId = analysisTree->electron_mva_wp90_general_Spring16_v1[ie]>0.5; 
       }
-      else if (era == "2017"){
-         electronMvaId = analysisTree.electron_mva_wp90_noIso_Fall17_v1[ie]>0.5;
+      else if (era ==2017){
+         electronMvaId = analysisTree->electron_mva_wp90_noIso_Fall17_v1[ie]>0.5;
       }
-      else if (era == "2018"){
-         electronMvaId = analysisTree.electron_mva_wp90_noIso_Fall17_v1[ie]>0.5;
+      else if (era == 2018){
+         electronMvaId = analysisTree->electron_mva_wp90_noIso_Fall17_v1[ie]>0.5;
       }
 
      if (!electronMvaId && cfg->get<bool>("applyVetoElectronId")) continue;
