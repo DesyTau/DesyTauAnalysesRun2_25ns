@@ -763,7 +763,7 @@ for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) {
 	//merijn 2019 8 8: apply here all criteria on the tau selection. We don't want taus that don't pass to end up in the pair selection (although unlikely).
 	if (analysisTree.tau_byTightIsolationMVArun2017v2DBoldDMwLT2017[it] < 0.5) continue;//tight tau mva
 	if (analysisTree.tau_againstMuonTight3[it] < 0.5) continue;//tight mva aginst muon
-	if (analysisTree.tau_againstElectronVLooseMVA6_2[it] < 0.5) continue;//very loose mva agaist e
+	if (analysisTree.tau_againstElectronVLooseMVA6[it] < 0.5) continue;//very loose mva agaist e
 
         if (applyTauId && analysisTree.tau_decayModeFinding[it] < 0.5) continue;
         taus.push_back(it);
@@ -801,7 +801,7 @@ for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) {
         for (unsigned int im = 0; im<analysisTree.muon_count; ++im) {
 
 	  bool muonMediumId=true;
-	  if(ApplyMuonId){//2019 8 8: Merijn: impose that the flag from the config file is used
+	  if(applyMuonId){//2019 8 8: Merijn: impose that the flag from the config file is used
 	    muonMediumId= isIdentifiedMediumMuon(im, &analysisTree, isData);}
   			
           if (analysisTree.muon_pt[im]<=ptLeptonLowCut) continue;
