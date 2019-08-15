@@ -739,8 +739,8 @@ for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) {
         if (fabs(analysisTree.tau_leadchargedhadrcand_dz[it])>=dzTauCut) continue;
 
 	if (analysisTree.tau_byVVLooseIsolationMVArun2017v2DBoldDMwLT2017[it] < 0.5) continue;
-	//merijn 2019 8 8: apply here all criteria on the tau selection. We don't want taus that don't pass to end up in the pair selection (although unlikely).
-	if (analysisTree.tau_byTightIsolationMVArun2017v2DBoldDMwLT2017[it] < 0.5) continue;//tight tau mva
+	//merijn 2019 8 8: apply here all criteria on the tau selection. 
+//	if (analysisTree.tau_byTightIsolationMVArun2017v2DBoldDMwLT2017[it] < 0.5) continue;//tight tau mva. But we will apply this only in the DNN NTupler, it is better to do the cut there for ease of computing the fake fractions
 	if (analysisTree.tau_againstMuonTight3[it] < 0.5) continue;//tight mva aginst muon
 	if (analysisTree.tau_againstElectronVLooseMVA6[it] < 0.5) continue;//very loose mva agaist e
 
