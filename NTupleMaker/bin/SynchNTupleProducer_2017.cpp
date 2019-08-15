@@ -870,11 +870,11 @@ for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) {
 
 	  counter[7]++;
 	  
-          float absIsoTau = analysisTree.tau_byIsolationMVArun2v1DBoldDMwLTraw[tIndex];
+          float absIsoTau = analysisTree.tau_byIsolationMVArun2017v2DBoldDMwLTraw2017[tIndex];
           float relIsoTau = absIsoTau / analysisTree.tau_pt[tIndex];
 
 	  float absIsoTau2 = -1;
-	  if (ch=="tt") absIsoTau2 = analysisTree.tau_byIsolationMVArun2v1DBoldDMwLTraw[lIndex];
+	  if (ch=="tt") absIsoTau2 = analysisTree.tau_byIsolationMVArun2017v2DBoldDMwLTraw2017[lIndex];
 
           
           float dR = deltaR(analysisTree.tau_eta[tIndex],analysisTree.tau_phi[tIndex],
@@ -1468,24 +1468,24 @@ for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) {
 	  // for SM analysis
       
       if (ch=="mt") 
-        passedBaselineSel = ( otree->iso_1<0.35 && otree->byLooseIsolationMVArun2v1DBoldDMwLT_2>0.5 && 
+        passedBaselineSel = ( otree->iso_1<0.35 && otree->byLooseIsolationMVArun2017v2DBoldDMwLT2017_2>0.5 && 
 			      otree->againstElectronVLooseMVA6_2>0.5 && otree->againstMuonTight3_2>0.5  &&
 			      otree->dilepton_veto == 0 && otree->extraelec_veto == 0 && otree->extramuon_veto == 0);
       if (ch=="et") 
-        passedBaselineSel = ( otree->iso_1<0.35 && otree->byLooseIsolationMVArun2v1DBoldDMwLT_2>0.5 && 
+        passedBaselineSel = ( otree->iso_1<0.35 && otree->byLooseIsolationMVArun2017v2DBoldDMwLT2017_2>0.5 && 
                             otree->againstMuonLoose3_2>0.5 && otree->againstElectronTightMVA6_2>0.5 && 
                             otree->dilepton_veto == 0 && otree->extraelec_veto == 0 && otree->extramuon_veto == 0);
 
       if(otree->iso_1<0.35 && 
 	 otree->againstMuonLoose3_2>0.5 && otree->againstElectronTightMVA6_2>0.5 && 
 	 otree->dilepton_veto == 0 && otree->extraelec_veto == 0 && otree->extramuon_veto == 0) counter[15]++;
-      if(otree->iso_1<0.35 && otree->byLooseIsolationMVArun2v1DBoldDMwLT_2>0.5 && 
+      if(otree->iso_1<0.35 && otree->byLooseIsolationMVArun2017v2DBoldDMwLT2017_2>0.5 && 
 	 otree->againstElectronTightMVA6_2>0.5 && 
 	 otree->dilepton_veto == 0 && otree->extraelec_veto == 0 && otree->extramuon_veto == 0) counter[16]++;
-      if(otree->iso_1<0.35 && otree->byLooseIsolationMVArun2v1DBoldDMwLT_2>0.5 && 
+      if(otree->iso_1<0.35 && otree->byLooseIsolationMVArun2017v2DBoldDMwLT2017_2>0.5 && 
 	 otree->againstMuonLoose3_2>0.5 && 
 	 otree->dilepton_veto == 0 && otree->extraelec_veto == 0 && otree->extramuon_veto == 0) counter[17]++;
-      if(otree->iso_1<0.35 && otree->byLooseIsolationMVArun2v1DBoldDMwLT_2>0.5 && 
+      if(otree->iso_1<0.35 && otree->byLooseIsolationMVArun2017v2DBoldDMwLT2017_2>0.5 && 
 	 otree->againstMuonLoose3_2>0.5 && otree->againstElectronTightMVA6_2>0.5 ) counter[18]++;
 
       //if (!Synch && !passedBaselineSel) continue;
@@ -1681,13 +1681,13 @@ void FillMuTau(const AC1B * analysisTree, Synch17Tree *otree, int leptonIndex, f
   otree->againstElectronVLooseMVA6_1 = -9999;
   otree->againstElectronTightMVA6_1 = -9999;
 
-  otree->byVLooseIsolationMVArun2v1DBoldDMwLT_1 = -9999;
-  otree->byLooseIsolationMVArun2v1DBoldDMwLT_1 = -9999;
-  otree->byMediumIsolationMVArun2v1DBoldDMwLT_1 = -9999;
-  otree->byTightIsolationMVArun2v1DBoldDMwLT_1 = -9999;
-  otree->byVTightIsolationMVArun2v1DBoldDMwLT_1 = -9999;
-  otree->byVVTightIsolationMVArun2v1DBoldDMwLT_1 = -9999;
-  otree-> byIsolationMVArun2v1DBoldDMwLTraw_1 = -9999;
+  otree->byVLooseIsolationMVArun2017v2DBoldDMwLT2017_1 = -9999;
+  otree->byLooseIsolationMVArun2017v2DBoldDMwLT2017_1 = -9999;
+  otree->byMediumIsolationMVArun2017v2DBoldDMwLT2017_1 = -9999;
+  otree->byTightIsolationMVArun2017v2DBoldDMwLT2017_1 = -9999;
+  otree->byVTightIsolationMVArun2017v2DBoldDMwLT2017_1 = -9999;
+  otree->byVVTightIsolationMVArun2017v2DBoldDMwLT2017_1 = -9999;
+  otree-> byIsolationMVArun2017v2DBoldDMwLTraw2017_1 = -9999;
   otree->chargedIsoPtSum_1 = -9999;
   otree->neutralIsoPtSum_1 = -9999;
   otree->puCorrPtSum_1 = -9999;
@@ -1724,13 +1724,13 @@ void FillETau(const AC1B * analysisTree, Synch17Tree *otree, int leptonIndex, fl
   otree->againstElectronVLooseMVA6_1 = -9999;
   otree->againstElectronTightMVA6_1 = -9999;
 
-  otree->byVLooseIsolationMVArun2v1DBoldDMwLT_1 = -9999;
-  otree->byLooseIsolationMVArun2v1DBoldDMwLT_1 = -9999;
-  otree->byMediumIsolationMVArun2v1DBoldDMwLT_1 = -9999;
-  otree->byTightIsolationMVArun2v1DBoldDMwLT_1 = -9999;
-  otree->byVTightIsolationMVArun2v1DBoldDMwLT_1 = -9999;
-  otree->byVVTightIsolationMVArun2v1DBoldDMwLT_1 = -9999;
-  otree-> byIsolationMVArun2v1DBoldDMwLTraw_1 = -9999;
+  otree->byVLooseIsolationMVArun2017v2DBoldDMwLT2017_1 = -9999;
+  otree->byLooseIsolationMVArun2017v2DBoldDMwLT2017_1 = -9999;
+  otree->byMediumIsolationMVArun2017v2DBoldDMwLT2017_1 = -9999;
+  otree->byTightIsolationMVArun2017v2DBoldDMwLT2017_1 = -9999;
+  otree->byVTightIsolationMVArun2017v2DBoldDMwLT2017_1 = -9999;
+  otree->byVVTightIsolationMVArun2017v2DBoldDMwLT2017_1 = -9999;
+  otree-> byIsolationMVArun2017v2DBoldDMwLTraw2017_1 = -9999;
   otree->chargedIsoPtSum_1 = -9999;
   otree->neutralIsoPtSum_1 = -9999;
   otree->puCorrPtSum_1 = -9999;
@@ -1745,7 +1745,7 @@ void FillTau_leading(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex
   otree->phi_1 = analysisTree->tau_phi[tauIndex];
   otree->q_1 = analysisTree->tau_charge[tauIndex];
   otree->gen_match_1 = analysisTree->tau_genmatch[tauIndex];
-  otree->mva_1 = analysisTree->tau_byTightIsolationMVArun2v1DBoldDMwLT[tauIndex];
+  otree->mva_1 = analysisTree->tau_byTightIsolationMVArun2017v2DBoldDMwLT2017[tauIndex];
   otree->mva17_1= analysisTree->tau_byTightIsolationMVArun2017v2DBoldDMwLT2017[tauIndex];
   otree->d0_1 = analysisTree->tau_leadchargedhadrcand_dxy[tauIndex];
   otree->dZ_1 = analysisTree->tau_leadchargedhadrcand_dz[tauIndex];      
@@ -1780,13 +1780,13 @@ void FillTau_leading(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex
   otree->againstElectronVLooseMVA6_1 = analysisTree->tau_againstElectronVLooseMVA6[tauIndex];
   otree->againstElectronTightMVA6_1 = analysisTree->tau_againstElectronTightMVA6[tauIndex];
 
-  otree->byVLooseIsolationMVArun2v1DBoldDMwLT_1 = analysisTree->tau_byVLooseIsolationMVArun2v1DBoldDMwLT[tauIndex];
-  otree->byLooseIsolationMVArun2v1DBoldDMwLT_1 = analysisTree->tau_byLooseIsolationMVArun2v1DBoldDMwLT[tauIndex];
-  otree->byMediumIsolationMVArun2v1DBoldDMwLT_1 = analysisTree->tau_byMediumIsolationMVArun2v1DBoldDMwLT[tauIndex];
-  otree->byTightIsolationMVArun2v1DBoldDMwLT_1 = analysisTree->tau_byTightIsolationMVArun2v1DBoldDMwLT[tauIndex];
-  otree->byVTightIsolationMVArun2v1DBoldDMwLT_1 = analysisTree->tau_byVTightIsolationMVArun2v1DBoldDMwLT[tauIndex];
-  otree->byVVTightIsolationMVArun2v1DBoldDMwLT_1 = analysisTree->tau_byVVTightIsolationMVArun2v1DBoldDMwLT[tauIndex];
-  otree-> byIsolationMVArun2v1DBoldDMwLTraw_1 = analysisTree->tau_byIsolationMVArun2v1DBoldDMwLTraw[tauIndex];
+  otree->byVLooseIsolationMVArun2017v2DBoldDMwLT2017_1 = analysisTree->tau_byVLooseIsolationMVArun2017v2DBoldDMwLT2017[tauIndex];
+  otree->byLooseIsolationMVArun2017v2DBoldDMwLT2017_1 = analysisTree->tau_byLooseIsolationMVArun2017v2DBoldDMwLT2017[tauIndex];
+  otree->byMediumIsolationMVArun2017v2DBoldDMwLT2017_1 = analysisTree->tau_byMediumIsolationMVArun2017v2DBoldDMwLT2017[tauIndex];
+  otree->byTightIsolationMVArun2017v2DBoldDMwLT2017_1 = analysisTree->tau_byTightIsolationMVArun2017v2DBoldDMwLT2017[tauIndex];
+  otree->byVTightIsolationMVArun2017v2DBoldDMwLT2017_1 = analysisTree->tau_byVTightIsolationMVArun2017v2DBoldDMwLT2017[tauIndex];
+  otree->byVVTightIsolationMVArun2017v2DBoldDMwLT2017_1 = analysisTree->tau_byVVTightIsolationMVArun2017v2DBoldDMwLT2017[tauIndex];
+  otree-> byIsolationMVArun2017v2DBoldDMwLTraw2017_1 = analysisTree->tau_byIsolationMVArun2017v2DBoldDMwLTraw2017[tauIndex];
   otree->chargedIsoPtSum_1 = analysisTree->tau_chargedIsoPtSum[tauIndex];
   otree->neutralIsoPtSum_1 = analysisTree->tau_neutralIsoPtSum[tauIndex];
   otree->puCorrPtSum_1 = analysisTree->tau_puCorrPtSum[tauIndex];
@@ -1859,7 +1859,7 @@ void FillTau(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex){
   otree->phi_2 = analysisTree->tau_phi[tauIndex];
   otree->q_2 = analysisTree->tau_charge[tauIndex];
   otree->gen_match_2 = analysisTree->tau_genmatch[tauIndex];
-  otree->mva_2 = analysisTree->tau_byTightIsolationMVArun2v1DBoldDMwLT[tauIndex];
+  otree->mva_2 = analysisTree->tau_byTightIsolationMVArun2017v2DBoldDMwLT2017[tauIndex];
   otree->mva17_2= analysisTree->tau_byTightIsolationMVArun2017v2DBoldDMwLT2017[tauIndex];
   otree->d0_2 = analysisTree->tau_leadchargedhadrcand_dxy[tauIndex];
   otree->dZ_2 = analysisTree->tau_leadchargedhadrcand_dz[tauIndex];      
@@ -1892,13 +1892,13 @@ void FillTau(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex){
   otree->againstElectronVLooseMVA6_2 = analysisTree->tau_againstElectronVLooseMVA6[tauIndex];
   otree->againstElectronTightMVA6_2 = analysisTree->tau_againstElectronTightMVA6[tauIndex];
 
-  otree->byVLooseIsolationMVArun2v1DBoldDMwLT_2 = analysisTree->tau_byVLooseIsolationMVArun2v1DBoldDMwLT[tauIndex];
-  otree->byLooseIsolationMVArun2v1DBoldDMwLT_2 = analysisTree->tau_byLooseIsolationMVArun2v1DBoldDMwLT[tauIndex];
-  otree->byMediumIsolationMVArun2v1DBoldDMwLT_2 = analysisTree->tau_byMediumIsolationMVArun2v1DBoldDMwLT[tauIndex];
-  otree->byTightIsolationMVArun2v1DBoldDMwLT_2 = analysisTree->tau_byTightIsolationMVArun2v1DBoldDMwLT[tauIndex];
-  otree->byVTightIsolationMVArun2v1DBoldDMwLT_2 = analysisTree->tau_byVTightIsolationMVArun2v1DBoldDMwLT[tauIndex];
-  otree->byVVTightIsolationMVArun2v1DBoldDMwLT_2 = analysisTree->tau_byVVTightIsolationMVArun2v1DBoldDMwLT[tauIndex];
-  otree-> byIsolationMVArun2v1DBoldDMwLTraw_2 = analysisTree->tau_byIsolationMVArun2v1DBoldDMwLTraw[tauIndex];
+  otree->byVLooseIsolationMVArun2017v2DBoldDMwLT2017_2 = analysisTree->tau_byVLooseIsolationMVArun2017v2DBoldDMwLT2017[tauIndex];
+  otree->byLooseIsolationMVArun2017v2DBoldDMwLT2017_2 = analysisTree->tau_byLooseIsolationMVArun2017v2DBoldDMwLT2017[tauIndex];
+  otree->byMediumIsolationMVArun2017v2DBoldDMwLT2017_2 = analysisTree->tau_byMediumIsolationMVArun2017v2DBoldDMwLT2017[tauIndex];
+  otree->byTightIsolationMVArun2017v2DBoldDMwLT2017_2 = analysisTree->tau_byTightIsolationMVArun2017v2DBoldDMwLT2017[tauIndex];
+  otree->byVTightIsolationMVArun2017v2DBoldDMwLT2017_2 = analysisTree->tau_byVTightIsolationMVArun2017v2DBoldDMwLT2017[tauIndex];
+  otree->byVVTightIsolationMVArun2017v2DBoldDMwLT2017_2 = analysisTree->tau_byVVTightIsolationMVArun2017v2DBoldDMwLT2017[tauIndex];
+  otree-> byIsolationMVArun2017v2DBoldDMwLTraw2017_2 = analysisTree->tau_byIsolationMVArun2017v2DBoldDMwLTraw2017[tauIndex];
   otree->chargedIsoPtSum_2 = analysisTree->tau_chargedIsoPtSum[tauIndex];
   otree->neutralIsoPtSum_2 = analysisTree->tau_neutralIsoPtSum[tauIndex];
   otree->puCorrPtSum_2 = analysisTree->tau_puCorrPtSum[tauIndex];
