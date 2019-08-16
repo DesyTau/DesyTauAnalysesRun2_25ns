@@ -89,13 +89,13 @@ public :
   Float_t         byLooseCombinedIsolationDeltaBetaCorr3Hits_1;
   Float_t         byMediumCombinedIsolationDeltaBetaCorr3Hits_1;
   Float_t         byTightCombinedIsolationDeltaBetaCorr3Hits_1;
-  Float_t 	  byIsolationMVArun2v1DBoldDMwLTraw_1;
-  Float_t         byVLooseIsolationMVArun2v1DBoldDMwLT_1;
-  Float_t         byLooseIsolationMVArun2v1DBoldDMwLT_1;
-  Float_t         byMediumIsolationMVArun2v1DBoldDMwLT_1;
-  Float_t 	  byTightIsolationMVArun2v1DBoldDMwLT_1;
-  Float_t 	  byVTightIsolationMVArun2v1DBoldDMwLT_1;
-  Float_t 	  byVVTightIsolationMVArun2v1DBoldDMwLT_1;
+  Float_t 	  byIsolationMVArun2017v2DBoldDMwLTraw2017_1;
+  Float_t         byVLooseIsolationMVArun2017v2DBoldDMwLT2017_1;
+  Float_t         byLooseIsolationMVArun2017v2DBoldDMwLT2017_1;
+  Float_t         byMediumIsolationMVArun2017v2DBoldDMwLT2017_1;
+  Float_t 	  byTightIsolationMVArun2017v2DBoldDMwLT2017_1;
+  Float_t 	  byVTightIsolationMVArun2017v2DBoldDMwLT2017_1;
+  Float_t 	  byVVTightIsolationMVArun2017v2DBoldDMwLT2017_1;
   Float_t         idisoweight_1;
   Float_t         idisoweight_antiiso_1;
   Float_t         trigweight_1;
@@ -120,13 +120,13 @@ public :
   Float_t         byLooseCombinedIsolationDeltaBetaCorr3Hits_2;
   Float_t         byMediumCombinedIsolationDeltaBetaCorr3Hits_2;
   Float_t         byTightCombinedIsolationDeltaBetaCorr3Hits_2;
-  Float_t 	  byIsolationMVArun2v1DBoldDMwLTraw_2;
-  Float_t         byVLooseIsolationMVArun2v1DBoldDMwLT_2;
-  Float_t         byLooseIsolationMVArun2v1DBoldDMwLT_2;
-  Float_t         byMediumIsolationMVArun2v1DBoldDMwLT_2;
-  Float_t 	  byTightIsolationMVArun2v1DBoldDMwLT_2;
-  Float_t 	  byVTightIsolationMVArun2v1DBoldDMwLT_2;
-  Float_t 	  byVVTightIsolationMVArun2v1DBoldDMwLT_2;
+  Float_t 	  byIsolationMVArun2017v2DBoldDMwLTraw2017_2;
+  Float_t         byVLooseIsolationMVArun2017v2DBoldDMwLT2017_2;
+  Float_t         byLooseIsolationMVArun2017v2DBoldDMwLT2017_2;
+  Float_t         byMediumIsolationMVArun2017v2DBoldDMwLT2017_2;
+  Float_t 	  byTightIsolationMVArun2017v2DBoldDMwLT2017_2;
+  Float_t 	  byVTightIsolationMVArun2017v2DBoldDMwLT2017_2;
+  Float_t 	  byVVTightIsolationMVArun2017v2DBoldDMwLT2017_2;
   // new 
   Float_t         idisoweight_2;
   Float_t         idisoweight_antiiso_2;
@@ -389,13 +389,13 @@ public :
   TBranch        *b_byLooseCombinedIsolationDeltaBetaCorr3Hits_1;   //!
   TBranch        *b_byMediumCombinedIsolationDeltaBetaCorr3Hits_1;   //!
   TBranch        *b_byTightCombinedIsolationDeltaBetaCorr3Hits_1;   //!
-  TBranch 	 *b_byIsolationMVArun2v1DBoldDMwLTraw_1;
-  TBranch	 *b_byVLooseIsolationMVArun2v1DBoldDMwLT_1;
-  TBranch	 *b_byLooseIsolationMVArun2v1DBoldDMwLT_1;
-  TBranch	 *b_byMediumIsolationMVArun2v1DBoldDMwLT_1;
-  TBranch	 *b_byTightIsolationMVArun2v1DBoldDMwLT_1;
-  TBranch	 *b_byVTightIsolationMVArun2v1DBoldDMwLT_1;
-  TBranch	 *b_byVVTightIsolationMVArun2v1DBoldDMwLT_1;
+  TBranch 	 *b_byIsolationMVArun2017v2DBoldDMwLTraw2017_1;
+  TBranch	 *b_byVLooseIsolationMVArun2017v2DBoldDMwLT2017_1;
+  TBranch	 *b_byLooseIsolationMVArun2017v2DBoldDMwLT2017_1;
+  TBranch	 *b_byMediumIsolationMVArun2017v2DBoldDMwLT2017_1;
+  TBranch	 *b_byTightIsolationMVArun2017v2DBoldDMwLT2017_1;
+  TBranch	 *b_byVTightIsolationMVArun2017v2DBoldDMwLT2017_1;
+  TBranch	 *b_byVVTightIsolationMVArun2017v2DBoldDMwLT2017_1;
 
   ///////////////////////////////////////////////////////////NEW
   TBranch	 *b_efficiency_byVVLooseIsolationMVArun2017v2DBoldDMwLT2017_1;
@@ -453,13 +453,13 @@ public :
   TBranch        *b_byLooseCombinedIsolationDeltaBetaCorr3Hits_2;   //!
   TBranch        *b_byMediumCombinedIsolationDeltaBetaCorr3Hits_2;   //!
   TBranch        *b_byTightCombinedIsolationDeltaBetaCorr3Hits_2;   //!
-  TBranch 	 *b_byIsolationMVArun2v1DBoldDMwLTraw_2;
-  TBranch	 *b_byVLooseIsolationMVArun2v1DBoldDMwLT_2;
-  TBranch	 *b_byLooseIsolationMVArun2v1DBoldDMwLT_2;
-  TBranch	 *b_byMediumIsolationMVArun2v1DBoldDMwLT_2;
-  TBranch	 *b_byTightIsolationMVArun2v1DBoldDMwLT_2;
-  TBranch	 *b_byVTightIsolationMVArun2v1DBoldDMwLT_2;
-  TBranch	 *b_byVVTightIsolationMVArun2v1DBoldDMwLT_2;
+  TBranch 	 *b_byIsolationMVArun2017v2DBoldDMwLTraw2017_2;
+  TBranch	 *b_byVLooseIsolationMVArun2017v2DBoldDMwLT2017_2;
+  TBranch	 *b_byLooseIsolationMVArun2017v2DBoldDMwLT2017_2;
+  TBranch	 *b_byMediumIsolationMVArun2017v2DBoldDMwLT2017_2;
+  TBranch	 *b_byTightIsolationMVArun2017v2DBoldDMwLT2017_2;
+  TBranch	 *b_byVTightIsolationMVArun2017v2DBoldDMwLT2017_2;
+  TBranch	 *b_byVVTightIsolationMVArun2017v2DBoldDMwLT2017_2;
   TBranch	 *b_idisoweight_2;
   TBranch	 *b_idisoweight_antiiso_2;
   TBranch	 *b_trigweight_2;
