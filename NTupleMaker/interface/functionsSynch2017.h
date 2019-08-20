@@ -421,9 +421,9 @@ bool extra_electron_veto(int leptonIndex, TString ch, const Config *cfg, const A
 
      if (!electronMvaId && cfg->get<bool>("applyVetoElectronId")) continue;
 
-    /* merijn2019 8 8: this is not needed currently for 2016 2017. commmented out in case needed for 2018 still..
+    /* Merijn 2019 8 20: in the analysis note this is NOT mentioned for the mt channel, but it is mentioned in the twiki on legacy data. We keep it in */
     if (!analysisTree->electron_pass_conversion[ie] && cfg->get<bool>("applyVetoElectronId")) continue;
-    if (analysisTree->electron_nmissinginnerhits[ie]>1 && cfg->get<bool>("applyVetoElectronId")) continue;*/
+    if (analysisTree->electron_nmissinginnerhits[ie]>1 && cfg->get<bool>("applyVetoElectronId")) continue;
 
     float relIsoEle = abs_Iso_et(ie, analysisTree, cfg->get<float>("dRisoExtraElecVeto")) / analysisTree->electron_pt[ie];
     if (relIsoEle>=cfg->get<float>("isoVetoElectronCut")) continue;
