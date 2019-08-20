@@ -767,9 +767,9 @@ for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) {
 	  if (fabs(analysisTree.electron_dz[ie])>=dzLeptonCut) continue;
           if (!electronMvaId  &&  applyLeptonId) continue;
 
-	  //Meirjn 2019 8 8: for 2017 these are not needed, further no check on et channel made..
-	  //          if (!analysisTree.electron_pass_conversion[ie]  && applyLeptonId) continue;
-	  //          if (analysisTree.electron_nmissinginnerhits[ie]>1 && applyLeptonId) continue;
+	  //Meirjn 2019 8 20: reinstated. They are mentioned in the legacy twiki
+	  if (!analysisTree.electron_pass_conversion[ie]  && applyLeptonId) continue;
+	  if (analysisTree.electron_nmissinginnerhits[ie]>1 && applyLeptonId) continue;
 
           leptons.push_back(ie);
         }
