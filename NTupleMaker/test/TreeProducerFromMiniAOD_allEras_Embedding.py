@@ -1,9 +1,9 @@
 import FWCore.ParameterSet.Config as cms
 
-isData = False
+isData = True
 isHiggsSignal = False
-year = 2018
-period = '2018'
+year = 2017
+period = '2017'
 
 #configurable options =======================================================================
 runOnData=isData #data/MC switch
@@ -24,7 +24,12 @@ process.load("TrackingTools/TransientTrack/TransientTrackBuilder_cfi")
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff')
 
 # Global tag (from : https://twiki.cern.ch/twiki/bin/viewauth/CMS/PdmVAnalysisSummaryTable)
-process.GlobalTag.globaltag = '102X_upgrade2018_realistic_v18'
+if period is '2018' :
+    process.GlobalTag.globaltag = '102X_upgrade2018_realistic_v18'
+elif period is '2017' :
+    process.GlobalTag.globaltag = '102X_mc2017_realistic_v6'
+elif period is '2016' :
+    process.GlobalTag.globaltag = '102X_mcRun2_asymptotic_v6'
 
 # Message Logger settings
 process.load("FWCore.MessageService.MessageLogger_cfi")
@@ -45,8 +50,7 @@ process.maxEvents = cms.untracked.PSet(
 # Define the input source
 process.source = cms.Source("PoolSource", 
   fileNames = cms.untracked.vstring(
-        "/store/mc/RunIIAutumn18MiniAOD/WplusH_HToZZTo4L_M125_13TeV_tunedown_powheg2-minlo-HWJ_JHUGenV7011_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/30000/506681B7-DE8A-BF4E-9D9D-AE6C820B9734.root"
-        #"/store/mc/RunIIAutumn18MiniAOD/DY1JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v2/270000/53AAF1AF-2FCF-424D-BC07-8150E599971B.root "
+        '/store/user/jbechtel/gc_storage/MuTau_data_2017_CMSSW944/TauEmbedding_MuTau_data_2017_CMSSW944_Run2017B/76/merged_1475.root_'
         ),
   skipEvents = cms.untracked.uint32(0)
 )
@@ -74,8 +78,8 @@ from PhysicsTools.PatUtils.tools.runMETCorrectionsAndUncertainties import runMet
 # If you only want to re-correct and get the proper uncertainties
 runMetCorAndUncFromMiniAOD(process,
                            isData=runOnData,
-                           #fixEE2017 = False,
-                           #fixEE2017Params = {'userawPt': True, 'PtThreshold':50.0, 'MinEtaThreshold':2.65, 'MaxEtaThreshold': 3.139} ,
+                           fixEE2017 = bool(period=='2017'),
+                           fixEE2017Params = {'userawPt': True, 'ptThreshold':50.0, 'minEtaThreshold':2.65, 'maxEtaThreshold': 3.139} ,
                            postfix = "ModifiedMET"
                            )
 
@@ -108,14 +112,17 @@ baddetEcallist = cms.vuint32(
                               872421955,872421567,872437184,872421951,
                               872421694,872437056,872437057,872437313])
 
-process.ecalBadCalibReducedMINIAODFilter = cms.EDFilter(
-                                                        "EcalBadCalibFilter",
-                                                        EcalRecHitSource = cms.InputTag("reducedEgamma:reducedEERecHits"),
-                                                        ecalMinEt        = cms.double(50.),
-                                                        baddetEcal    = baddetEcallist, 
-                                                        taggingMode = cms.bool(True),
-                                                        debug = cms.bool(False)
-                                                        )
+if period == "2018" :
+    process.ecalBadCalibReducedMINIAODFilter = cms.EDFilter(
+        "EcalBadCalibFilter",
+        EcalRecHitSource = cms.InputTag("reducedEgamma:reducedEERecHits"),
+        ecalMinEt        = cms.double(50.),
+        baddetEcal    = baddetEcallist,
+        taggingMode = cms.bool(True),
+        debug = cms.bool(False)
+        )
+else :
+    process.ecalBadCalibReducedMINIAODFilter = cms.Sequence( )
 
 ### END MET ===========================================================================================
 
@@ -172,6 +179,23 @@ else :
     process.htxsSequence = cms.Sequence( )
 # END HTXS ====================================================================================================
 
+# Pre-firing weights ==========================================================================================
+# https://twiki.cern.ch/twiki/bin/viewauth/CMS/L1ECALPrefiringWeightRecipe
+from PhysicsTools.PatUtils.l1ECALPrefiringWeightProducer_cfi import l1ECALPrefiringWeightProducer
+if period == "2018" :
+    process.prefiringweight = cms.Sequence()
+else:
+    if period == '2016' :
+        data_era = "2016BtoH"
+    elif period=='2017':
+        data_era = "2017BtoF"
+    process.prefiringweight = l1ECALPrefiringWeightProducer.clone(
+        DataEra = cms.string(data_era),
+        UseJetEMPt = cms.bool(False),
+        PrefiringRateSystematicUncty = cms.double(0.2),
+        SkipWarnings = False)
+# END Pre-firing weights ======================================================================================
+
 
 # NTuple Maker =========================================================================================
 
@@ -181,17 +205,18 @@ IsData = cms.untracked.bool(isData),
 GenParticles = cms.untracked.bool(not isData),
 GenJets = cms.untracked.bool(not isData)
 )
+
 process.makeroottree = cms.EDAnalyzer("NTupleMaker",
 # data, year, period, skim
 IsData = cms.untracked.bool(isData),
-IsEmbedded = cms.untracked.bool(False),
+IsEmbedded = cms.untracked.bool(True),
 Year = cms.untracked.uint32(year),
 Period = cms.untracked.string(period),
 Skim = cms.untracked.uint32(0),
 # switches of collections
-GenParticles = cms.untracked.bool(not isData),
+GenParticles = cms.untracked.bool(True),
 GenJets = cms.untracked.bool(not isData),
-SusyInfo = cms.untracked.bool(True),
+SusyInfo = cms.untracked.bool(False),
 Trigger = cms.untracked.bool(True),
 RecPrimVertex = cms.untracked.bool(True),
 RecPrimVertexWithBS = cms.untracked.bool(True),
@@ -213,7 +238,7 @@ RecHTXS = cms.untracked.bool(isHiggsSignal),
 # collections
 MuonCollectionTag = cms.InputTag("slimmedMuons"), 
 ElectronCollectionTag = cms.InputTag("slimmedElectrons"),
-applyElectronESShift = cms.untracked.bool(True),
+applyElectronESShift = cms.untracked.bool(False),
 TauCollectionTag = cms.InputTag("NewTauIDsEmbedded"),
 L1MuonCollectionTag = cms.InputTag("gmtStage2Digis:Muon"),
 L1EGammaCollectionTag = cms.InputTag("caloStage2Digis:EGamma"),
@@ -238,7 +263,9 @@ LHEEventProductTag = cms.InputTag("externalLHEProducer"),
 SusyMotherMassTag = cms.InputTag("susyInfo","SusyMotherMass"),
 SusyLSPMassTag = cms.InputTag("susyInfo","SusyLSPMass"),
 htxsInfo = cms.InputTag("rivetProducerHTXS", "HiggsClassification"),
-# trigger info
+
+
+# TRIGGER INFO  =========================================================================================
 HLTriggerPaths = cms.untracked.vstring(
 #SingleMuon
 'HLT_IsoMu20_v',
@@ -319,7 +346,7 @@ HLTriggerPaths = cms.untracked.vstring(
 'HLT_DiPFJetAve400_',
 'HLT_DiPFJetAve500_'
 ),
-TriggerProcess = cms.untracked.string("HLT"),
+TriggerProcess = cms.untracked.string("SIMembedding"),
 Flags = cms.untracked.vstring(
   'Flag_HBHENoiseFilter',
   'Flag_HBHENoiseIsoFilter',
@@ -355,7 +382,7 @@ RecMuonHLTriggerMatching = cms.untracked.vstring(
 'HLT_IsoMu27_v.*:hltL3crIsoL1sMu22Or25L1f0L2f10QL3f27QL3trkIsoFiltered0p07',
 'HLT_IsoMu30_v.*:hltL3crIsoL1sMu22Or25L1f0L2f10QL3f30QL3trkIsoFiltered0p07',
 'HLT_Mu50_v.*:hltL3fL1sMu22Or25L1f0L2f10QL3Filtered50Q',
-#'HLT_IsoMu20_eta2p1_LooseChargedIsoPFTau27_eta2p1_CrossL1_v.*:hltL1sMu18erTau24erIorMu20erTau24er',
+#'HLT_IsoMu20_eta2p1_LooseChargedIsoPFTau27_eta2p1_CrossL1_v.*:hltL1sMu18erTau24erIorMu20erTau24er', FIXME: HAS TO BE UPDATED FOR 2018? SEE https://twiki.cern.ch/twiki/bin/viewauth/CMS/TauTrigger#Trigger_table_for_2018
 #'HLT_IsoMu20_eta2p1_LooseChargedIsoPFTau27_eta2p1_CrossL1_v.*:hltL3crIsoL1sMu18erTau24erIorMu20erTau24erL1f0L2f10QL3f20QL3trkIsoFiltered0p07',
 #'HLT_IsoMu20_eta2p1_LooseChargedIsoPFTau27_eta2p1_CrossL1_v.*:hltOverlapFilterIsoMu20LooseChargedIsoPFTau27L1Seeded',
 'HLT_IsoMu24_eta2p1_LooseChargedIsoPFTau20_SingleL1_v.*:hltL1sSingleMu22er',
@@ -367,7 +394,7 @@ RecMuonHLTriggerMatching = cms.untracked.vstring(
 'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v.*:hltMu23TrkIsoVVLEle12CaloIdLTrackIdLIsoVLDZFilter',
 'HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v.*:hltMu12TrkIsoVVLEle23CaloIdLTrackIdLIsoVLMuonlegL3IsoFiltered12',
 'HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v.*:hltMu12TrkIsoVVLEle23CaloIdLTrackIdLIsoVLDZFilter',
-'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v.*:hltMu8TrkIsoVVLEle23CaloIdLTrackIdLIsoVLMuonlegL3IsoFiltered8',
+'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v.*:hltMu8TrkIsoVVLEle23CaloIdLTrackIdLIsoVLMuonlegL3IsoFiltered8,hltL3fL1sMu7EG23f0Filtered8',
 'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v.*:hltMu8TrkIsoVVLEle23CaloIdLTrackIdLIsoVLDZFilter',
 'HLT_Mu18_Mu9_SameSign_DZ_v.*:hltL1sDoubleMu125to157',
 'HLT_Mu18_Mu9_SameSign_DZ_v.*:hltL3fL1DoubleMu157fFiltered9',
@@ -430,12 +457,12 @@ RecTauHLTriggerMatching = cms.untracked.vstring(
 #'HLT_IsoMu20_eta2p1_LooseChargedIsoPFTau27_eta2p1_CrossL1_v.*:hltOverlapFilterIsoMu20LooseChargedIsoPFTau27L1Seeded',
 'HLT_IsoMu24_eta2p1_LooseChargedIsoPFTau20_SingleL1_v.*:hltPFTau20TrackLooseChargedIsoAgainstMuon',
 'HLT_IsoMu24_eta2p1_LooseChargedIsoPFTau20_SingleL1_v.*:hltOverlapFilterIsoMu24LooseChargedIsoPFTau20',
-'HLT_Ele24_eta2p1_WPTight_Gsf_LooseChargedIsoPFTau30_eta2p1_CrossL1_v.*:hltL1sBigORLooseIsoEGXXerIsoTauYYerdRMin0p3',
+'HLT_Ele24_eta2p1_WPTight_Gsf_LooseChargedIsoPFTau30_eta2p1_CrossL1_v.*:hltL1sBigORLooseIsoEGXXerIsoTauYYerdRMin0p3,hltL1sIsoEG22erIsoTau26erdEtaMin0p2',
 'HLT_Ele24_eta2p1_WPTight_Gsf_LooseChargedIsoPFTau30_eta2p1_CrossL1_v.*:hltPFTau30TrackLooseChargedIso',
 'HLT_Ele24_eta2p1_WPTight_Gsf_LooseChargedIsoPFTau30_eta2p1_CrossL1_v.*:hltOverlapFilterIsoEle24WPTightGsfLooseIsoPFTau30',
-'HLT_DoubleTightChargedIsoPFTau35_Trk1_TightID_eta2p1_Reg_v.*:hltDoublePFTau35TrackPt1TightChargedIsolationAndTightOOSCPhotonsDz02Reg',
-'HLT_DoubleMediumChargedIsoPFTau40_Trk1_TightID_eta2p1_Reg_v.*:hltDoublePFTau40TrackPt1MediumChargedIsolationAndTightOOSCPhotonsDz02Reg',
-'HLT_DoubleTightChargedIsoPFTau40_Trk1_eta2p1_Reg_v.*:hltDoublePFTau40TrackPt1TightChargedIsolationDz02Reg',
+'HLT_DoubleTightChargedIsoPFTau35_Trk1_TightID_eta2p1_Reg_v.*:hltDoubleL2IsoTau26eta2p2',
+'HLT_DoubleMediumChargedIsoPFTau40_Trk1_TightID_eta2p1_Reg_v.*:hltDoubleL2IsoTau26eta2p2',
+'HLT_DoubleTightChargedIsoPFTau40_Trk1_eta2p1_Reg_v.*:hltDoubleL2IsoTau26eta2p2',
 'HLT_MediumChargedIsoPFTau180HighPtRelaxedIso_Trk50_eta2p1_v.*:hltSelectedPFTau180MediumChargedIsolationL1HLTMatched',
 'HLT_MediumChargedIsoPFTau180HighPtRelaxedIso_Trk50_eta2p1_1pr_v.*:hltSelectedPFTau180MediumChargedIsolationL1HLTMatched1Prong'
 ),
@@ -483,6 +510,97 @@ RecJetNum = cms.untracked.int32(0),
 SampleName = cms.untracked.string("Data") 
 )
 #process.patJets.addBTagInfo = cms.bool(True)
+# Trigger filtering ===========================================================================================
+
+HLTlist = cms.vstring(
+    #SingleMuon
+    'HLT_IsoMu20_v*',
+    'HLT_IsoMu24_v*',
+    'HLT_IsoMu24_eta2p1_v*',
+    'HLT_IsoMu27_v*',
+    'HLT_IsoMu30_v*',
+    'HLT_Mu50_v*',
+    # Muon-Tau triggers
+    #'HLT_IsoMu20_eta2p1_LooseChargedIsoPFTau27_eta2p1_CrossL1_v*',
+    'HLT_IsoMu24_eta2p1_LooseChargedIsoPFTau20_SingleL1_v*',
+    # SingleElectron
+    'HLT_Ele27_WPTight_Gsf_v*',
+    'HLT_Ele32_WPTight_Gsf_v*',
+    'HLT_Ele35_WPTight_Gsf_v*',
+    'HLT_Ele38_WPTight_Gsf_v*',
+    # Electron-Tau triggers
+    'HLT_Ele24_eta2p1_WPTight_Gsf_LooseChargedIsoPFTau30_eta2p1_CrossL1_v*',
+    # Dilepton triggers
+    'HLT_DoubleEle24_eta2p1_WPTight_Gsf_v*',
+    'HLT_DoubleIsoMu20_eta2p1_v*',
+    'HLT_DoubleIsoMu24_eta2p1_v*',
+    'HLT_Mu18_Mu9_v*',
+    'HLT_Mu18_Mu9_DZ_v*',
+    'HLT_Mu18_Mu9_SameSign_v*',
+    'HLT_Mu18_Mu9_SameSign_DZ_v*',
+    'HLT_Mu20_Mu10_v*',
+    'HLT_Mu20_Mu10_DZ_v*',
+    'HLT_Mu20_Mu10_SameSign_v*',
+    'HLT_Mu20_Mu10_SameSign_DZ_v*',
+    'HLT_Mu37_TkMu27_v*',
+    # Triple muon
+    'HLT_TripleMu_12_10_5_v*',
+    'HLT_TripleMu_10_5_5_DZ_v*',
+    # Muon+Electron triggers
+    'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v*',
+    'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v*',
+    'HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v*',
+    'HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v*',
+    'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v*',
+    'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v*',
+    # Ditau triggers
+    'HLT_DoubleTightChargedIsoPFTau35_Trk1_TightID_eta2p1_Reg_v*',
+    'HLT_DoubleMediumChargedIsoPFTau40_Trk1_TightID_eta2p1_Reg_v*',
+    'HLT_DoubleTightChargedIsoPFTau40_Trk1_eta2p1_Reg_v*',
+    # Single tau triggers
+    'HLT_MediumChargedIsoPFTau180HighPtRelaxedIso_Trk50_eta2p1_v*',
+    'HLT_MediumChargedIsoPFTau180HighPtRelaxedIso_Trk50_eta2p1_1pr_v*',
+    # MET Triggers
+    'HLT_PFMET110_PFMHT110_IDTight_v*',
+    'HLT_PFMET120_PFMHT120_IDTight_v*',
+    'HLT_PFMET130_PFMHT130_IDTight_v*',
+    'HLT_PFMET140_PFMHT140_IDTight_v*',
+    'HLT_PFMETNoMu110_PFMHTNoMu110_IDTight_v*',
+    'HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_v*',
+    'HLT_PFMETNoMu130_PFMHTNoMu130_IDTight_v*',
+    'HLT_PFMETNoMu140_PFMHTNoMu140_IDTight_v*',
+    # Single-Jet Triggers
+    'HLT_PFJet40_v*',
+    'HLT_PFJet60_v*',
+    'HLT_PFJet80_v*',
+    'HLT_PFJet140_v*',
+    'HLT_PFJet200_v*',
+    'HLT_PFJet260_v*',
+    'HLT_PFJet320_v*',
+    'HLT_PFJet400_v*',
+    'HLT_PFJet450_v*',
+    'HLT_PFJet500_v*',
+    'HLT_PFJet550_v*',
+    # Di-Jet Triggers
+    'HLT_DiPFJetAve40_v*',
+    'HLT_DiPFJetAve60_v*',
+    'HLT_DiPFJetAve80_v*',
+    'HLT_DiPFJetAve140_v*',
+    'HLT_DiPFJetAve200_v*',
+    'HLT_DiPFJetAve260_v*',
+    'HLT_DiPFJetAve320_v*',
+    'HLT_DiPFJetAve400_v*',
+    'HLT_DiPFJetAve500_v*'
+)
+
+process.triggerSelection = cms.EDFilter("HLTHighLevel",
+                                        TriggerResultsTag = cms.InputTag("TriggerResults","","HLT"),
+                                        HLTPaths = cms.vstring(HLTlist),
+                                        andOr = cms.bool(True),   # multiple triggers: True (OR) accept if ANY is true, False (AND) accept if ALL are true
+                                        throw = cms.bool(True)    # throw exception on unknown path names
+                                        )
+# END Trigger filtering =======================================================================================
+
 
 process.p = cms.Path(
   process.initroottree *
@@ -499,15 +617,16 @@ process.p = cms.Path(
   #process.AdvancedRefitVertexBS * # Vertex refit w/ BS
   process.MiniAODRefitVertexBS* # PV with BS constraint
   process.htxsSequence * # HTXS
+  process.prefiringweight * # prefiring-weights for 2016/2017
   process.makeroottree
 )
 
 process.TFileService = cms.Service("TFileService",
-                                   fileName = cms.string("output_MC.root")
+                                   fileName = cms.string("output_DATA.root")
                                  )
 
 process.output = cms.OutputModule("PoolOutputModule",
-                                  fileName = cms.untracked.string('output_particles_MC.root'),
+                                  fileName = cms.untracked.string('output_particles_DATA.root'),
                                   outputCommands = cms.untracked.vstring(
                                     'keep *_*_bad_TreeProducer'#,
                                     #'drop patJets*_*_*_*'
@@ -517,3 +636,4 @@ process.output = cms.OutputModule("PoolOutputModule",
                                   ),        
                                   SelectEvents = cms.untracked.PSet(  SelectEvents = cms.vstring('p'))
 )
+
