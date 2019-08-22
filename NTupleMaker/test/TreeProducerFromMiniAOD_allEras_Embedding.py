@@ -25,11 +25,11 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condD
 
 # Global tag (from : https://twiki.cern.ch/twiki/bin/viewauth/CMS/PdmVAnalysisSummaryTable)
 if period is '2018' :
-    process.GlobalTag.globaltag = '102X_upgrade2018_realistic_v18'
+    process.GlobalTag.globaltag = '102X_dataRun2_Sep2018Rereco_v1'
 elif period is '2017' :
-    process.GlobalTag.globaltag = '102X_mc2017_realistic_v6'
+    process.GlobalTag.globaltag = '94X_dataRun2_v10'
 elif period is '2016' :
-    process.GlobalTag.globaltag = '102X_mcRun2_asymptotic_v6'
+    process.GlobalTag.globaltag = '80X_dataRun2_2016SeptRepro_v7'
 
 # Message Logger settings
 process.load("FWCore.MessageService.MessageLogger_cfi")
@@ -280,6 +280,7 @@ HLTriggerPaths = cms.untracked.vstring(
 # SingleElectron
 'HLT_Ele27_WPTight_Gsf_v',
 'HLT_Ele32_WPTight_Gsf_v',
+'HLT_Ele32_WPTight_Gsf_DoubleL1EG_v',
 'HLT_Ele35_WPTight_Gsf_v',
 'HLT_Ele38_WPTight_Gsf_v',
 # Electron-Tau triggers
@@ -382,8 +383,8 @@ RecMuonHLTriggerMatching = cms.untracked.vstring(
 'HLT_IsoMu27_v.*:hltL3crIsoL1sMu22Or25L1f0L2f10QL3f27QL3trkIsoFiltered0p07',
 'HLT_IsoMu30_v.*:hltL3crIsoL1sMu22Or25L1f0L2f10QL3f30QL3trkIsoFiltered0p07',
 'HLT_Mu50_v.*:hltL3fL1sMu22Or25L1f0L2f10QL3Filtered50Q',
-#'HLT_IsoMu20_eta2p1_LooseChargedIsoPFTau27_eta2p1_CrossL1_v.*:hltL1sMu18erTau24erIorMu20erTau24er', FIXME: HAS TO BE UPDATED FOR 2018? SEE https://twiki.cern.ch/twiki/bin/viewauth/CMS/TauTrigger#Trigger_table_for_2018
-#'HLT_IsoMu20_eta2p1_LooseChargedIsoPFTau27_eta2p1_CrossL1_v.*:hltL3crIsoL1sMu18erTau24erIorMu20erTau24erL1f0L2f10QL3f20QL3trkIsoFiltered0p07',
+'HLT_IsoMu20_eta2p1_LooseChargedIsoPFTau27_eta2p1_CrossL1_v.*:hltL1sMu18erTau24erIorMu20erTau24er',
+'HLT_IsoMu20_eta2p1_LooseChargedIsoPFTau27_eta2p1_CrossL1_v.*:hltL3crIsoL1sMu18erTau24erIorMu20erTau24erL1f0L2f10QL3f20QL3trkIsoFiltered0p07',
 #'HLT_IsoMu20_eta2p1_LooseChargedIsoPFTau27_eta2p1_CrossL1_v.*:hltOverlapFilterIsoMu20LooseChargedIsoPFTau27L1Seeded',
 'HLT_IsoMu24_eta2p1_LooseChargedIsoPFTau20_SingleL1_v.*:hltL1sSingleMu22er',
 'HLT_IsoMu24_eta2p1_LooseChargedIsoPFTau20_SingleL1_v.*:hltL3crIsoL1sSingleMu22erL1f0L2f10QL3f24QL3trkIsoFiltered0p07',
@@ -434,6 +435,8 @@ RecElectronHLTriggerMatching = cms.untracked.vstring(
 #SingleElectron
 'HLT_Ele27_WPTight_Gsf_v.*:hltEle27WPTightGsfTrackIsoFilter',
 'HLT_Ele32_WPTight_Gsf_v.*:hltEle32WPTightGsfTrackIsoFilter',
+"HLT_Ele32_WPTight_Gsf_DoubleL1EG_v:hltEle32L1DoubleEGWPTightGsfTrackIsoFilter",
+"HLT_Ele32_WPTight_Gsf_DoubleL1EG_v:hltEGL1SingleEGOrFilter",
 'HLT_Ele35_WPTight_Gsf_v.*:hltEle35noerWPTightGsfTrackIsoFilter',
 'HLT_Ele38_WPTight_Gsf_v.*:hltEle38noerWPTightGsfTrackIsoFilter',
 'HLT_Ele24_eta2p1_WPTight_Gsf_LooseChargedIsoPFTau30_eta2p1_CrossL1_v.*:hltL1sBigORLooseIsoEGXXerIsoTauYYerdRMin0p3',
