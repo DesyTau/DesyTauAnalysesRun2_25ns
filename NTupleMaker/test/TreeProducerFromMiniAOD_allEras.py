@@ -56,7 +56,8 @@ process.maxEvents = cms.untracked.PSet(
 # Define the input source
 process.source = cms.Source("PoolSource", 
   fileNames = cms.untracked.vstring(
-        "/store/data/Run2017D/SingleMuon/MINIAOD/31Mar2018-v1/00000/2A2ADC80-2238-E811-B4F6-E0DB55FC11A5.root"
+        "/store/data/Run2017D/SingleMuon/MINIAOD/31Mar2018-v1/00000/2A2ADC80-2238-E811-B4F6-E0DB55FC11A5.root"  # use for testing
+        #"/store/mc/RunIIFall17MiniAODv2/TTToHadronic_TuneCP5_13TeV-powheg-pythia8/MINIAODSIM/PU2017_12Apr2018_new_pmx_94X_mc2017_realistic_v14-v2/120000/420D636B-4BBB-E811-B806-0025905C54C6.root"   # use for testing
         #"/store/mc/RunIIFall17MiniAODv2/GluGluHToTauTau_M125_13TeV_powheg_pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/90000/50FBFB5A-FE42-E811-A3E6-0025905A6092.root" #2017
         #"/store/mc/RunIIAutumn18MiniAOD/WplusH_HToZZTo4L_M125_13TeV_tunedown_powheg2-minlo-HWJ_JHUGenV7011_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/30000/506681B7-DE8A-BF4E-9D9D-AE6C820B9734.root"
         #"/store/mc/RunIIAutumn18MiniAOD/DY1JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v2/270000/53AAF1AF-2FCF-424D-BC07-8150E599971B.root "
