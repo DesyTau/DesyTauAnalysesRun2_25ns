@@ -536,7 +536,7 @@ process.triggerSelection = cms.EDFilter("HLTHighLevel",
                                         TriggerResultsTag = cms.InputTag("TriggerResults","","HLT"),
                                         HLTPaths = cms.vstring(HLTlist_for_filtering),
                                         andOr = cms.bool(True),   # multiple triggers: True (OR) accept if ANY is true, False (AND) accept if ALL are true
-                                        throw = cms.bool(True)    # throw exception on unknown path names
+                                        throw = cms.bool(False)   # throw exception on unknown path names
                                         )
 # END Trigger filtering =================================================================================
 
