@@ -1,6 +1,6 @@
 import FWCore.ParameterSet.Config as cms
 
-isData = True
+isData = False
 isRun2018D = False
 isHiggsSignal = False
 year = 2017
@@ -35,8 +35,6 @@ else:
     elif period is '2017' : process.GlobalTag.globaltag = '102X_mc2017_realistic_v7'
     elif period is '2018' : process.GlobalTag.globaltag = '102X_upgrade2018_realistic_v19'
 
-
-
 # Message Logger settings
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.destinations = ['cout', 'cerr']
@@ -54,15 +52,19 @@ process.maxEvents = cms.untracked.PSet(
 )
 
 # Define the input source
+import FWCore.PythonUtilities.LumiList as LumiList
+# https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideGoodLumiSectionsJSONFile#cmsRun
 process.source = cms.Source("PoolSource", 
   fileNames = cms.untracked.vstring(
-        "/store/data/Run2017D/SingleMuon/MINIAOD/31Mar2018-v1/00000/2A2ADC80-2238-E811-B4F6-E0DB55FC11A5.root"  # use for testing
-        #"/store/mc/RunIIFall17MiniAODv2/TTToHadronic_TuneCP5_13TeV-powheg-pythia8/MINIAODSIM/PU2017_12Apr2018_new_pmx_94X_mc2017_realistic_v14-v2/120000/420D636B-4BBB-E811-B806-0025905C54C6.root"   # use for testing
+        #"/store/data/Run2017D/SingleMuon/MINIAOD/31Mar2018-v1/00000/2A2ADC80-2238-E811-B4F6-E0DB55FC11A5.root"  # use for testing
+        "/store/mc/RunIIFall17MiniAODv2/TTToHadronic_TuneCP5_13TeV-powheg-pythia8/MINIAODSIM/PU2017_12Apr2018_new_pmx_94X_mc2017_realistic_v14-v2/120000/420D636B-4BBB-E811-B806-0025905C54C6.root"   # use for testing
+        #"/store/data/Run2018D/JetHT/MINIAOD/PromptReco-v2/000/320/853/00000/2C20B666-3A9A-E811-9D32-FA163EAC4172.root"  # From Run2018D with a lot of events not passing the json file
         #"/store/mc/RunIIFall17MiniAODv2/GluGluHToTauTau_M125_13TeV_powheg_pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/90000/50FBFB5A-FE42-E811-A3E6-0025905A6092.root" #2017
         #"/store/mc/RunIIAutumn18MiniAOD/WplusH_HToZZTo4L_M125_13TeV_tunedown_powheg2-minlo-HWJ_JHUGenV7011_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/30000/506681B7-DE8A-BF4E-9D9D-AE6C820B9734.root"
         #"/store/mc/RunIIAutumn18MiniAOD/DY1JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v2/270000/53AAF1AF-2FCF-424D-BC07-8150E599971B.root "
         ),
-  skipEvents = cms.untracked.uint32(0)
+  skipEvents = cms.untracked.uint32(0),
+  #lumisToProcess = LumiList.LumiList(filename = 'json/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt').getVLuminosityBlockRange()
 )
 
 ### JECs ==============================================================================================
@@ -523,6 +525,8 @@ SampleName = cms.untracked.string("Data")
 #process.patJets.addBTagInfo = cms.bool(True)
 
 # Trigger filtering ===========================================================================================
+# From : https://github.com/cms-sw/cmssw/blob/CMSSW_10_2_X/HLTrigger/HLTfilters/plugins/HLTHighLevel.cc
+# See also here: https://twiki.cern.ch/twiki/bin/view/CMS/TriggerResultsFilter
 
 HLTlist = cms.vstring(
     #SingleMuon
