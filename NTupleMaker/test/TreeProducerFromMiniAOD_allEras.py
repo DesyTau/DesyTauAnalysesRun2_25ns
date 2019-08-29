@@ -209,77 +209,9 @@ else:
         SkipWarnings = False)
 # END Pre-firing weights ======================================================================================
 
-
-# NTuple Maker =========================================================================================
-
-process.initroottree = cms.EDAnalyzer("InitAnalyzer",
-IsData = cms.untracked.bool(isData),
-#IsData = cms.untracked.bool(False),
-GenParticles = cms.untracked.bool(not isData),
-GenJets = cms.untracked.bool(not isData)
-)
-process.makeroottree = cms.EDAnalyzer("NTupleMaker",
-# data, year, period, skim
-IsData = cms.untracked.bool(isData),
-IsEmbedded = cms.untracked.bool(False),
-Year = cms.untracked.uint32(year),
-Period = cms.untracked.string(period),
-Skim = cms.untracked.uint32(0),
-# switches of collections
-GenParticles = cms.untracked.bool(not isData),
-GenJets = cms.untracked.bool(not isData),
-SusyInfo = cms.untracked.bool(not isData),
-Trigger = cms.untracked.bool(True),
-RecPrimVertex = cms.untracked.bool(True),
-RecPrimVertexWithBS = cms.untracked.bool(True),
-RefittedVertex = cms.untracked.bool(False),
-RefittedVertexWithBS = cms.untracked.bool(False),
-RecBeamSpot = cms.untracked.bool(True),
-RecTrack = cms.untracked.bool(True),
-RecPFMet = cms.untracked.bool(True),
-RecPFMetCorr = cms.untracked.bool(True),
-RecPuppiMet = cms.untracked.bool(True),
-RecMvaMet = cms.untracked.bool(False),                                      
-RecMuon = cms.untracked.bool(True),
-RecPhoton = cms.untracked.bool(False),
-RecElectron = cms.untracked.bool(True),
-RecTau = cms.untracked.bool(True),
-L1Objects = cms.untracked.bool(True),
-RecJet = cms.untracked.bool(True),
-RecHTXS = cms.untracked.bool(isHiggsSignal),
-# collections
-MuonCollectionTag = cms.InputTag("slimmedMuons"), 
-ElectronCollectionTag = cms.InputTag("slimmedElectrons"),
-applyElectronESShift = cms.untracked.bool(True),
-TauCollectionTag = cms.InputTag("NewTauIDsEmbedded"),
-L1MuonCollectionTag = cms.InputTag("gmtStage2Digis:Muon"),
-L1EGammaCollectionTag = cms.InputTag("caloStage2Digis:EGamma"),
-L1TauCollectionTag = cms.InputTag("caloStage2Digis:Tau"),
-L1JetCollectionTag = cms.InputTag("caloStage2Digis:Jet"),
-#JetCollectionTag = cms.InputTag("slimmedJets"),
-JetCollectionTag = cms.InputTag("updatedPatJetsUpdatedJEC::TreeProducer"),
-MetCollectionTag = cms.InputTag("slimmedMETs::@skipCurrentProcess"),
-MetCorrCollectionTag = cms.InputTag("slimmedMETsModifiedMET::TreeProducer"),
-PuppiMetCollectionTag = cms.InputTag("slimmedMETsPuppi::TreeProducer"),
-MvaMetCollectionsTag = cms.VInputTag(cms.InputTag("MVAMET","MVAMET","TreeProducer")),
-TrackCollectionTag = cms.InputTag("generalTracks"),
-GenParticleCollectionTag = cms.InputTag("prunedGenParticles"),
-GenJetCollectionTag = cms.InputTag("slimmedGenJets"),
-TriggerObjectCollectionTag = cms.InputTag("slimmedPatTrigger"),
-BeamSpotCollectionTag =  cms.InputTag("offlineBeamSpot"),
-PVCollectionTag = cms.InputTag("offlineSlimmedPrimaryVertices"),
-PVwithBSCollectionTag =  cms.InputTag("MiniAODRefitVertexBSProducer"),
-RefittedPVCollectionTag =  cms.InputTag("AdvancedRefitVertexNoBSProducer"),
-RefittedwithBSPVCollectionTag =  cms.InputTag("AdvancedRefitVertexBSProducer"),
-LHEEventProductTag = cms.InputTag("externalLHEProducer"),
-SusyMotherMassTag = cms.InputTag("susyInfo","SusyMotherMass"),
-SusyLSPMassTag = cms.InputTag("susyInfo","SusyLSPMass"),
-htxsInfo = cms.InputTag("rivetProducerHTXS", "HiggsClassification"),
-
-
-# TRIGGER INFO  =========================================================================================
+# Trigger list ================================================================================================
 # !!!!! WARNING : in 2018 all tau trigger names changes in the middle of the year -> please add also other names -> more information can be found here: https://twiki.cern.ch/twiki/bin/viewauth/CMS/TauTrigger#Trigger_table_for_2018 !!!!
-HLTriggerPaths = cms.untracked.vstring(
+HLTlist = cms.untracked.vstring(
 #SingleMuon
 'HLT_IsoMu20_v',
 'HLT_IsoMu24_v',
@@ -358,7 +290,76 @@ HLTriggerPaths = cms.untracked.vstring(
 'HLT_DiPFJetAve320_',
 'HLT_DiPFJetAve400_',
 'HLT_DiPFJetAve500_'
-),
+)
+# END Trigger list ============================================================================================
+
+# NTuple Maker =========================================================================================
+process.initroottree = cms.EDAnalyzer("InitAnalyzer",
+IsData = cms.untracked.bool(isData),
+#IsData = cms.untracked.bool(False),
+GenParticles = cms.untracked.bool(not isData),
+GenJets = cms.untracked.bool(not isData)
+)
+process.makeroottree = cms.EDAnalyzer("NTupleMaker",
+# data, year, period, skim
+IsData = cms.untracked.bool(isData),
+IsEmbedded = cms.untracked.bool(False),
+Year = cms.untracked.uint32(year),
+Period = cms.untracked.string(period),
+Skim = cms.untracked.uint32(0),
+# switches of collections
+GenParticles = cms.untracked.bool(not isData),
+GenJets = cms.untracked.bool(not isData),
+SusyInfo = cms.untracked.bool(not isData),
+Trigger = cms.untracked.bool(True),
+RecPrimVertex = cms.untracked.bool(True),
+RecPrimVertexWithBS = cms.untracked.bool(True),
+RefittedVertex = cms.untracked.bool(False),
+RefittedVertexWithBS = cms.untracked.bool(False),
+RecBeamSpot = cms.untracked.bool(True),
+RecTrack = cms.untracked.bool(True),
+RecPFMet = cms.untracked.bool(True),
+RecPFMetCorr = cms.untracked.bool(True),
+RecPuppiMet = cms.untracked.bool(True),
+RecMvaMet = cms.untracked.bool(False),
+RecMuon = cms.untracked.bool(True),
+RecPhoton = cms.untracked.bool(False),
+RecElectron = cms.untracked.bool(True),
+RecTau = cms.untracked.bool(True),
+L1Objects = cms.untracked.bool(True),
+RecJet = cms.untracked.bool(True),
+RecHTXS = cms.untracked.bool(isHiggsSignal),
+# collections
+MuonCollectionTag = cms.InputTag("slimmedMuons"),
+ElectronCollectionTag = cms.InputTag("slimmedElectrons"),
+applyElectronESShift = cms.untracked.bool(True),
+TauCollectionTag = cms.InputTag("NewTauIDsEmbedded"),
+L1MuonCollectionTag = cms.InputTag("gmtStage2Digis:Muon"),
+L1EGammaCollectionTag = cms.InputTag("caloStage2Digis:EGamma"),
+L1TauCollectionTag = cms.InputTag("caloStage2Digis:Tau"),
+L1JetCollectionTag = cms.InputTag("caloStage2Digis:Jet"),
+#JetCollectionTag = cms.InputTag("slimmedJets"),
+JetCollectionTag = cms.InputTag("updatedPatJetsUpdatedJEC::TreeProducer"),
+MetCollectionTag = cms.InputTag("slimmedMETs::@skipCurrentProcess"),
+MetCorrCollectionTag = cms.InputTag("slimmedMETsModifiedMET::TreeProducer"),
+PuppiMetCollectionTag = cms.InputTag("slimmedMETsPuppi::TreeProducer"),
+MvaMetCollectionsTag = cms.VInputTag(cms.InputTag("MVAMET","MVAMET","TreeProducer")),
+TrackCollectionTag = cms.InputTag("generalTracks"),
+GenParticleCollectionTag = cms.InputTag("prunedGenParticles"),
+GenJetCollectionTag = cms.InputTag("slimmedGenJets"),
+TriggerObjectCollectionTag = cms.InputTag("slimmedPatTrigger"),
+BeamSpotCollectionTag =  cms.InputTag("offlineBeamSpot"),
+PVCollectionTag = cms.InputTag("offlineSlimmedPrimaryVertices"),
+PVwithBSCollectionTag =  cms.InputTag("MiniAODRefitVertexBSProducer"),
+RefittedPVCollectionTag =  cms.InputTag("AdvancedRefitVertexNoBSProducer"),
+RefittedwithBSPVCollectionTag =  cms.InputTag("AdvancedRefitVertexBSProducer"),
+LHEEventProductTag = cms.InputTag("externalLHEProducer"),
+SusyMotherMassTag = cms.InputTag("susyInfo","SusyMotherMass"),
+SusyLSPMassTag = cms.InputTag("susyInfo","SusyLSPMass"),
+htxsInfo = cms.InputTag("rivetProducerHTXS", "HiggsClassification"),
+
+# TRIGGER INFO  =========================================================================================
+HLTriggerPaths = HLTlist,
 TriggerProcess = cms.untracked.string("HLT"),
 Flags = cms.untracked.vstring(
   'Flag_HBHENoiseFilter',
@@ -522,100 +523,22 @@ RecJetBtagDiscriminators = cms.untracked.vstring(
 RecJetNum = cms.untracked.int32(0),
 SampleName = cms.untracked.string("Data") 
 )
-#process.patJets.addBTagInfo = cms.bool(True)
+# END NTuple Maker ======================================================================================
 
-# Trigger filtering ===========================================================================================
+
+# Trigger filtering =====================================================================================
 # From : https://github.com/cms-sw/cmssw/blob/CMSSW_10_2_X/HLTrigger/HLTfilters/plugins/HLTHighLevel.cc
 # See also here: https://twiki.cern.ch/twiki/bin/view/CMS/TriggerResultsFilter
 
-HLTlist = cms.vstring(
-    #SingleMuon
-    'HLT_IsoMu20_v*',
-    'HLT_IsoMu24_v*',
-    'HLT_IsoMu24_eta2p1_v*',
-    'HLT_IsoMu27_v*',
-    'HLT_IsoMu30_v*',
-    'HLT_Mu50_v*',
-    # Muon-Tau triggers
-    'HLT_IsoMu20_eta2p1_LooseChargedIsoPFTau27_eta2p1_CrossL1_v*',
-    'HLT_IsoMu24_eta2p1_LooseChargedIsoPFTau20_SingleL1_v*',
-    # SingleElectron
-    'HLT_Ele27_WPTight_Gsf_v*',
-    'HLT_Ele32_WPTight_Gsf_v*',
-    'HLT_Ele35_WPTight_Gsf_v*',
-    'HLT_Ele38_WPTight_Gsf_v*',
-    # Electron-Tau triggers
-    'HLT_Ele24_eta2p1_WPTight_Gsf_LooseChargedIsoPFTau30_eta2p1_CrossL1_v*',
-    # Dilepton triggers
-    'HLT_DoubleEle24_eta2p1_WPTight_Gsf_v*',
-    'HLT_DoubleIsoMu20_eta2p1_v*',
-    'HLT_DoubleIsoMu24_eta2p1_v*',
-    'HLT_Mu18_Mu9_v*',
-    'HLT_Mu18_Mu9_DZ_v*',
-    'HLT_Mu18_Mu9_SameSign_v*',
-    'HLT_Mu18_Mu9_SameSign_DZ_v*',
-    'HLT_Mu20_Mu10_v*',
-    'HLT_Mu20_Mu10_DZ_v*',
-    'HLT_Mu20_Mu10_SameSign_v*',
-    'HLT_Mu20_Mu10_SameSign_DZ_v*',
-    'HLT_Mu37_TkMu27_v*',
-    # Triple muon
-    'HLT_TripleMu_12_10_5_v*',
-    'HLT_TripleMu_10_5_5_DZ_v*',
-    # Muon+Electron triggers
-    'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v*',
-    'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v*',
-    'HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v*',
-    'HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v*',
-    'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v*',
-    'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v*',
-    # Ditau triggers
-    'HLT_DoubleTightChargedIsoPFTau35_Trk1_TightID_eta2p1_Reg_v*',
-    'HLT_DoubleMediumChargedIsoPFTau40_Trk1_TightID_eta2p1_Reg_v*',
-    'HLT_DoubleTightChargedIsoPFTau40_Trk1_eta2p1_Reg_v*',
-    # Single tau triggers
-    'HLT_MediumChargedIsoPFTau180HighPtRelaxedIso_Trk50_eta2p1_v*',
-    'HLT_MediumChargedIsoPFTau180HighPtRelaxedIso_Trk50_eta2p1_1pr_v*',
-    # MET Triggers
-    'HLT_PFMET110_PFMHT110_IDTight_v*',
-    'HLT_PFMET120_PFMHT120_IDTight_v*',
-    'HLT_PFMET130_PFMHT130_IDTight_v*',
-    'HLT_PFMET140_PFMHT140_IDTight_v*',
-    'HLT_PFMETNoMu110_PFMHTNoMu110_IDTight_v*',
-    'HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_v*',
-    'HLT_PFMETNoMu130_PFMHTNoMu130_IDTight_v*',
-    'HLT_PFMETNoMu140_PFMHTNoMu140_IDTight_v*',
-    # Single-Jet Triggers
-    'HLT_PFJet40_v*',
-    'HLT_PFJet60_v*',
-    'HLT_PFJet80_v*',
-    'HLT_PFJet140_v*',
-    'HLT_PFJet200_v*',
-    'HLT_PFJet260_v*',
-    'HLT_PFJet320_v*',
-    'HLT_PFJet400_v*',
-    'HLT_PFJet450_v*',
-    'HLT_PFJet500_v*',
-    'HLT_PFJet550_v*',
-    # Di-Jet Triggers
-    'HLT_DiPFJetAve40_v*',
-    'HLT_DiPFJetAve60_v*',
-    'HLT_DiPFJetAve80_v*',
-    'HLT_DiPFJetAve140_v*',
-    'HLT_DiPFJetAve200_v*',
-    'HLT_DiPFJetAve260_v*',
-    'HLT_DiPFJetAve320_v*',
-    'HLT_DiPFJetAve400_v*',
-    'HLT_DiPFJetAve500_v*'
-)
+HLTlist_for_filtering = [i+"*" for i in HLTlist]
 
 process.triggerSelection = cms.EDFilter("HLTHighLevel",
                                         TriggerResultsTag = cms.InputTag("TriggerResults","","HLT"),
-                                        HLTPaths = cms.vstring(HLTlist),
+                                        HLTPaths = cms.vstring(HLTlist_for_filtering),
                                         andOr = cms.bool(True),   # multiple triggers: True (OR) accept if ANY is true, False (AND) accept if ALL are true
                                         throw = cms.bool(True)    # throw exception on unknown path names
                                         )
-# END Trigger filtering =======================================================================================
+# END Trigger filtering =================================================================================
 
 
 
@@ -635,7 +558,7 @@ process.p = cms.Path(
   process.MiniAODRefitVertexBS* # PV with BS constraint
   process.htxsSequence * # HTXS
   process.prefiringweight * # prefiring-weights for 2016/2017
-  #process.triggerSelection *  # trigger filtering
+  process.triggerSelection *  # trigger filtering
   process.makeroottree
 )
 
