@@ -35,6 +35,8 @@ else:
     elif period is '2017' : process.GlobalTag.globaltag = '102X_mc2017_realistic_v7'
     elif period is '2018' : process.GlobalTag.globaltag = '102X_upgrade2018_realistic_v19'
 
+print "\nGlobal Tag: " + str(process.GlobalTag.globaltag)
+
 # Message Logger settings
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.destinations = ['cout', 'cerr']
@@ -210,46 +212,30 @@ else:
 # END Pre-firing weights ======================================================================================
 
 # Trigger list ================================================================================================
-# !!!!! WARNING : in 2018 all tau trigger names changes in the middle of the year -> please add also other names -> more information can be found here: https://twiki.cern.ch/twiki/bin/viewauth/CMS/TauTrigger#Trigger_table_for_2018 !!!!
+# !!!!! WARNING : in 2018 all tau trigger names changed in the middle of the year -> please add also other names -> more information can be found here: https://twiki.cern.ch/twiki/bin/viewauth/CMS/TauTrigger#Trigger_table_for_2018 !!!!
 HLTlist = cms.untracked.vstring(
 #SingleMuon
 'HLT_IsoMu20_v',
 'HLT_IsoMu24_v',
-'HLT_IsoMu24_eta2p1_v',
 'HLT_IsoMu27_v',
-'HLT_IsoMu30_v',
-'HLT_Mu50_v',
 # Muon-Tau triggers
-#'HLT_IsoMu20_eta2p1_LooseChargedIsoPFTau27_eta2p1_CrossL1_v',
+'HLT_IsoMu20_eta2p1_LooseChargedIsoPFTau27_eta2p1_CrossL1_v',
 'HLT_IsoMu24_eta2p1_LooseChargedIsoPFTau20_SingleL1_v',
 # SingleElectron
-'HLT_Ele27_WPTight_Gsf_v',
 'HLT_Ele32_WPTight_Gsf_v',
 'HLT_Ele35_WPTight_Gsf_v',
-'HLT_Ele38_WPTight_Gsf_v',
 # Electron-Tau triggers
 'HLT_Ele24_eta2p1_WPTight_Gsf_LooseChargedIsoPFTau30_eta2p1_CrossL1_v',
 # Dilepton triggers
 'HLT_DoubleEle24_eta2p1_WPTight_Gsf_v',
-'HLT_DoubleIsoMu20_eta2p1_v',
 'HLT_DoubleIsoMu24_eta2p1_v',
-'HLT_Mu18_Mu9_v',
-'HLT_Mu18_Mu9_DZ_v',
 'HLT_Mu18_Mu9_SameSign_v',
 'HLT_Mu18_Mu9_SameSign_DZ_v',
-'HLT_Mu20_Mu10_v',
-'HLT_Mu20_Mu10_DZ_v',
-'HLT_Mu20_Mu10_SameSign_v',
-'HLT_Mu20_Mu10_SameSign_DZ_v',
-'HLT_Mu37_TkMu27_v',
 # Triple muon
 'HLT_TripleMu_12_10_5_v',
-'HLT_TripleMu_10_5_5_DZ_v',
 # Muon+Electron triggers
 'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v',
 'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v',
-'HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v',
-'HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v',
 'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v',
 'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v',
 # Ditau triggers
@@ -260,37 +246,27 @@ HLTlist = cms.untracked.vstring(
 'HLT_MediumChargedIsoPFTau180HighPtRelaxedIso_Trk50_eta2p1_v',
 'HLT_MediumChargedIsoPFTau180HighPtRelaxedIso_Trk50_eta2p1_1pr_v',
 # MET Triggers
-'HLT_PFMET110_PFMHT110_IDTight_v',
-'HLT_PFMET120_PFMHT120_IDTight_v',
-'HLT_PFMET130_PFMHT130_IDTight_v',
-'HLT_PFMET140_PFMHT140_IDTight_v',
 'HLT_PFMETNoMu110_PFMHTNoMu110_IDTight_v',
 'HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_v',
-'HLT_PFMETNoMu130_PFMHTNoMu130_IDTight_v',
-'HLT_PFMETNoMu140_PFMHTNoMu140_IDTight_v',
-# Single-Jet Triggers
-'HLT_PFJet40_v',
-'HLT_PFJet60_v',
-'HLT_PFJet80_v',
-'HLT_PFJet140_v',
-'HLT_PFJet200_v',
-'HLT_PFJet260_v',
-'HLT_PFJet320_v',
-'HLT_PFJet400_v',
-'HLT_PFJet450_v',
-'HLT_PFJet500_v',
-'HLT_PFJet550_v',
-# Di-Jet Triggers
-'HLT_DiPFJetAve40_',
-'HLT_DiPFJetAve60_',
-'HLT_DiPFJetAve80_',
-'HLT_DiPFJetAve140_',
-'HLT_DiPFJetAve200_',
-'HLT_DiPFJetAve260_',
-'HLT_DiPFJetAve320_',
-'HLT_DiPFJetAve400_',
-'HLT_DiPFJetAve500_'
 )
+
+if isData:
+    HLTlist += cms.untracked.vstring(
+        # Single-Jet Triggers
+        'HLT_PFJet60_v',
+        'HLT_PFJet80_v',
+        'HLT_PFJet140_v',
+        'HLT_PFJet200_v',
+        'HLT_PFJet260_v',
+        'HLT_PFJet320_v',
+        'HLT_PFJet400_v',
+        'HLT_PFJet450_v',
+        'HLT_PFJet500_v',
+)
+
+print "\nTriggers that will be recorded:"
+print HLTlist
+
 # END Trigger list ============================================================================================
 
 # NTuple Maker =========================================================================================
@@ -392,22 +368,16 @@ RecMuonHLTriggerMatching = cms.untracked.vstring(
 #SingleMuon
 'HLT_IsoMu20_v.*:hltL3crIsoL1sMu18L1f0L2f10QL3f20QL3trkIsoFiltered0p07',
 'HLT_IsoMu24_v.*:hltL3crIsoL1sSingleMu22L1f0L2f10QL3f24QL3trkIsoFiltered0p07',
-'HLT_IsoMu24_eta2p1_v.*:hltL3crIsoL1sSingleMu22erL1f0L2f10QL3f24QL3trkIsoFiltered0p07',
 'HLT_IsoMu27_v.*:hltL3crIsoL1sMu22Or25L1f0L2f10QL3f27QL3trkIsoFiltered0p07',
-'HLT_IsoMu30_v.*:hltL3crIsoL1sMu22Or25L1f0L2f10QL3f30QL3trkIsoFiltered0p07',
-'HLT_Mu50_v.*:hltL3fL1sMu22Or25L1f0L2f10QL3Filtered50Q',
-#'HLT_IsoMu20_eta2p1_LooseChargedIsoPFTau27_eta2p1_CrossL1_v.*:hltL1sMu18erTau24erIorMu20erTau24er',
-#'HLT_IsoMu20_eta2p1_LooseChargedIsoPFTau27_eta2p1_CrossL1_v.*:hltL3crIsoL1sMu18erTau24erIorMu20erTau24erL1f0L2f10QL3f20QL3trkIsoFiltered0p07',
-#'HLT_IsoMu20_eta2p1_LooseChargedIsoPFTau27_eta2p1_CrossL1_v.*:hltOverlapFilterIsoMu20LooseChargedIsoPFTau27L1Seeded',
+'HLT_IsoMu20_eta2p1_LooseChargedIsoPFTau27_eta2p1_CrossL1_v.*:hltL1sMu18erTau24erIorMu20erTau24er',
+'HLT_IsoMu20_eta2p1_LooseChargedIsoPFTau27_eta2p1_CrossL1_v.*:hltL3crIsoL1sMu18erTau24erIorMu20erTau24erL1f0L2f10QL3f20QL3trkIsoFiltered0p07',
+'HLT_IsoMu20_eta2p1_LooseChargedIsoPFTau27_eta2p1_CrossL1_v.*:hltOverlapFilterIsoMu20LooseChargedIsoPFTau27L1Seeded',
 'HLT_IsoMu24_eta2p1_LooseChargedIsoPFTau20_SingleL1_v.*:hltL1sSingleMu22er',
 'HLT_IsoMu24_eta2p1_LooseChargedIsoPFTau20_SingleL1_v.*:hltL3crIsoL1sSingleMu22erL1f0L2f10QL3f24QL3trkIsoFiltered0p07',
 'HLT_IsoMu24_eta2p1_LooseChargedIsoPFTau20_SingleL1_v.*:hltOverlapFilterIsoMu24LooseChargedIsoPFTau20',
-'HLT_DoubleIsoMu20_eta2p1_v.*:hltL3crIsoL1sDoubleMu18erL1f0L2f10QL3f20QL3trkIsoFiltered0p07',
 'HLT_DoubleIsoMu24_eta2p1_v.*:hltL3crIsoL1sDoubleMu22erL1f0L2f10QL3f24QL3trkIsoFiltered0p07',
 'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v.*:hltMu23TrkIsoVVLEle12CaloIdLTrackIdLIsoVLMuonlegL3IsoFiltered23',
 'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v.*:hltMu23TrkIsoVVLEle12CaloIdLTrackIdLIsoVLDZFilter',
-'HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v.*:hltMu12TrkIsoVVLEle23CaloIdLTrackIdLIsoVLMuonlegL3IsoFiltered12',
-'HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v.*:hltMu12TrkIsoVVLEle23CaloIdLTrackIdLIsoVLDZFilter',
 'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v.*:hltMu8TrkIsoVVLEle23CaloIdLTrackIdLIsoVLMuonlegL3IsoFiltered8,hltL3fL1sMu7EG23f0Filtered8',
 'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v.*:hltMu8TrkIsoVVLEle23CaloIdLTrackIdLIsoVLDZFilter',
 'HLT_Mu18_Mu9_SameSign_DZ_v.*:hltL1sDoubleMu125to157',
@@ -415,25 +385,10 @@ RecMuonHLTriggerMatching = cms.untracked.vstring(
 'HLT_Mu18_Mu9_SameSign_DZ_v.*:hltL3fL1DoubleMu157fFiltered18',
 'HLT_Mu18_Mu9_SameSign_DZ_v.*:hltDiMuon189SameSignFiltered',
 'HLT_Mu18_Mu9_SameSign_DZ_v.*:hltDiMuon189SameSignDzFiltered0p2',
-'HLT_Mu20_Mu10_SameSign_DZ_v.*:hltL1sDoubleMu125to157',
-'HLT_Mu20_Mu10_SameSign_DZ_v.*:hltL3fL1DoubleMu157fFiltered10',
-'HLT_Mu20_Mu10_SameSign_DZ_v.*:hltL3fL1DoubleMu157fFiltered20',
-'HLT_Mu20_Mu10_SameSign_DZ_v.*:hltDiMuon2010SameSignFiltered',
-'HLT_Mu20_Mu10_SameSign_DZ_v.*:hltDiMuon2010SameSignDzFiltered0p2',
-'HLT_Mu37_TkMu27_v.*:hltDiMuonGlbFiltered37TrkFiltered27',
-'HLT_Mu37_TkMu27_v.*:hltPreMu37TkMu27',
-'HLT_Mu37_TkMu27_v.*:hltL3fL1sMu16orMu25L1f0L2f25L3Filtered37',
-'HLT_Mu37_TkMu27_v.*:hltDiMuonGlb37Trk27DzFiltered0p2',
-'HLT_Mu37_TkMu27_v.*:hltL1sSingleMu22IorSingleMu25',
 'HLT_TripleMu_12_10_5_v.*:hltL1sTripleMu0IorTripleMu553',
 'HLT_TripleMu_12_10_5_v.*:hltL3fL1TripleMu553f0PreFiltered555',
 'HLT_TripleMu_12_10_5_v.*:hltL3fL1TripleMu553f0Filtered10105',
 'HLT_TripleMu_12_10_5_v.*:hltL3fL1TripleMu553f0Filtered12105',
-'HLT_TripleMu_10_5_5_DZ_v.*:hltL1sTripleMu0IorTripleMu553',
-'HLT_TripleMu_10_5_5_DZ_v.*:hltL3fL1TripleMu553f0Filtered1055',
-'HLT_TripleMu_10_5_5_DZ_v.*:hltL3fL1TripleMu553f0PreFiltered555',
-'HLT_TripleMu_10_5_5_DZ_v.*:hltPreTripleMu1055DZ',
-'HLT_TripleMu_10_5_5_DZ_v.*:hltTripleMu555TripleDZ0p2'
 ),
 RecMuonNum = cms.untracked.int32(0),
 # photons
@@ -446,18 +401,14 @@ RecElectronPtMin = cms.untracked.double(8.),
 RecElectronEtaMax = cms.untracked.double(2.6),
 RecElectronHLTriggerMatching = cms.untracked.vstring(
 #SingleElectron
-'HLT_Ele27_WPTight_Gsf_v.*:hltEle27WPTightGsfTrackIsoFilter',
 'HLT_Ele32_WPTight_Gsf_v.*:hltEle32WPTightGsfTrackIsoFilter',
 'HLT_Ele35_WPTight_Gsf_v.*:hltEle35noerWPTightGsfTrackIsoFilter',
-'HLT_Ele38_WPTight_Gsf_v.*:hltEle38noerWPTightGsfTrackIsoFilter',
 'HLT_Ele24_eta2p1_WPTight_Gsf_LooseChargedIsoPFTau30_eta2p1_CrossL1_v.*:hltL1sBigORLooseIsoEGXXerIsoTauYYerdRMin0p3,hltL1sIsoEG22erIsoTau26erdEtaMin0p2',
 'HLT_Ele24_eta2p1_WPTight_Gsf_LooseChargedIsoPFTau30_eta2p1_CrossL1_v.*:hltEle24erWPTightGsfTrackIsoFilterForTau',
 'HLT_Ele24_eta2p1_WPTight_Gsf_LooseChargedIsoPFTau30_eta2p1_CrossL1_v.*:hltOverlapFilterIsoEle24WPTightGsfLooseIsoPFTau30',
 'HLT_DoubleEle24_eta2p1_WPTight_Gsf_v.*:hltDoubleEle24erWPTightGsfTrackIsoFilterForTau',
 'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v.*:hltMu23TrkIsoVVLEle12CaloIdLTrackIdLIsoVLElectronlegTrackIsoFilter',
 'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v.*:hltMu23TrkIsoVVLEle12CaloIdLTrackIdLIsoVLDZFilter',
-'HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v.*:hltMu12TrkIsoVVLEle23CaloIdLTrackIdLIsoVLElectronlegTrackIsoFilter',
-'HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v.*:hltMu12TrkIsoVVLEle23CaloIdLTrackIdLIsoVLDZFilter',
 'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v.*:hltMu8TrkIsoVVLEle23CaloIdLTrackIdLIsoVLElectronlegTrackIsoFilter',
 'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v.*:hltMu8TrkIsoVVLEle23CaloIdLTrackIdLIsoVLDZFilter'
 ),
@@ -466,9 +417,9 @@ RecElectronNum = cms.untracked.int32(0),
 RecTauPtMin = cms.untracked.double(15),
 RecTauEtaMax = cms.untracked.double(2.5),
 RecTauHLTriggerMatching = cms.untracked.vstring(
-#'HLT_IsoMu20_eta2p1_LooseChargedIsoPFTau27_eta2p1_CrossL1_v.*:hltL1sMu18erTau24erIorMu20erTau24er',
-#'HLT_IsoMu20_eta2p1_LooseChargedIsoPFTau27_eta2p1_CrossL1_v.*:hltPFTau27TrackLooseChargedIsoAgainstMuon',
-#'HLT_IsoMu20_eta2p1_LooseChargedIsoPFTau27_eta2p1_CrossL1_v.*:hltOverlapFilterIsoMu20LooseChargedIsoPFTau27L1Seeded',
+'HLT_IsoMu20_eta2p1_LooseChargedIsoPFTau27_eta2p1_CrossL1_v.*:hltL1sMu18erTau24erIorMu20erTau24er',
+'HLT_IsoMu20_eta2p1_LooseChargedIsoPFTau27_eta2p1_CrossL1_v.*:hltPFTau27TrackLooseChargedIsoAgainstMuon',
+'HLT_IsoMu20_eta2p1_LooseChargedIsoPFTau27_eta2p1_CrossL1_v.*:hltOverlapFilterIsoMu20LooseChargedIsoPFTau27L1Seeded',
 'HLT_IsoMu24_eta2p1_LooseChargedIsoPFTau20_SingleL1_v.*:hltPFTau20TrackLooseChargedIsoAgainstMuon',
 'HLT_IsoMu24_eta2p1_LooseChargedIsoPFTau20_SingleL1_v.*:hltOverlapFilterIsoMu24LooseChargedIsoPFTau20',
 'HLT_Ele24_eta2p1_WPTight_Gsf_LooseChargedIsoPFTau30_eta2p1_CrossL1_v.*:hltL1sBigORLooseIsoEGXXerIsoTauYYerdRMin0p3,hltL1sIsoEG22erIsoTau26erdEtaMin0p2',
@@ -477,8 +428,8 @@ RecTauHLTriggerMatching = cms.untracked.vstring(
 'HLT_DoubleTightChargedIsoPFTau35_Trk1_TightID_eta2p1_Reg_v.*:hltDoublePFTau35TrackPt1TightChargedIsolationAndTightOOSCPhotonsDz02Reg',
 'HLT_DoubleMediumChargedIsoPFTau40_Trk1_TightID_eta2p1_Reg_v.*:hltDoublePFTau40TrackPt1MediumChargedIsolationAndTightOOSCPhotonsDz02Reg',
 'HLT_DoubleTightChargedIsoPFTau40_Trk1_eta2p1_Reg_v.*:hltDoublePFTau40TrackPt1TightChargedIsolationDz02Reg',
-'HLT_MediumChargedIsoPFTau180HighPtRelaxedIso_Trk50_eta2p1_v.*:hltSelectedPFTau180MediumChargedIsolationL1HLTMatched',
-'HLT_MediumChargedIsoPFTau180HighPtRelaxedIso_Trk50_eta2p1_1pr_v.*:hltSelectedPFTau180MediumChargedIsolationL1HLTMatched1Prong'
+'HLT_MediumChargedIsoPFTau180HighPtRelaxedIso_Trk50_eta2p1_v.*:hltPFTau180TrackPt50LooseAbsOrRelMediumHighPtRelaxedIsoIso,hltSelectedPFTau180MediumChargedIsolationL1HLTMatched',
+'HLT_MediumChargedIsoPFTau180HighPtRelaxedIso_Trk50_eta2p1_1pr_v.*:hltPFTau180TrackPt50LooseAbsOrRelMediumHighPtRelaxedIso1Prong,hltSelectedPFTau180MediumChargedIsolationL1HLTMatched1Prong'
 ),
 RecTauFloatDiscriminators = cms.untracked.vstring(),
 RecTauBinaryDiscriminators = cms.untracked.vstring(),
@@ -487,7 +438,6 @@ RecTauNum = cms.untracked.int32(0),
 RecJetPtMin = cms.untracked.double(18.),
 RecJetEtaMax = cms.untracked.double(5.2),
 RecJetHLTriggerMatching = cms.untracked.vstring(
-'HLT_PFJet40_v.*:hltSinglePFJet40',
 'HLT_PFJet60_v.*:hltSinglePFJet60',
 'HLT_PFJet80_v.*:hltSinglePFJet80',
 'HLT_PFJet140_v.*:hltSinglePFJet140',
@@ -497,16 +447,6 @@ RecJetHLTriggerMatching = cms.untracked.vstring(
 'HLT_PFJet400_v.*:hltSinglePFJet400',
 'HLT_PFJet450_v.*:hltSinglePFJet450',
 'HLT_PFJet500_v.*:hltSinglePFJet500',
-'HLT_PFJet550_v.*:hltSinglePFJet550',
-'HLT_DiPFJetAve40_v.*:hltDiPFJetAve40',
-'HLT_DiPFJetAve60_v.*:hltDiPFJetAve60',
-'HLT_DiPFJetAve80_v.*:hltDiPFJetAve80',
-'HLT_DiPFJetAve140_v.*:hltDiPFJetAve140',
-'HLT_DiPFJetAve200_v.*:hltDiPFJetAve200',
-'HLT_DiPFJetAve260_v.*:hltDiPFJetAve260',
-'HLT_DiPFJetAve320_v.*:hltDiPFJetAve320',
-'HLT_DiPFJetAve400_v.*:hltDiPFJetAve400',
-'HLT_DiPFJetAve500_v.*:hltDiPFJetAve500'
 ),
 #from https://twiki.cern.ch/twiki/bin/view/CMS/DeepJet
 RecJetBtagDiscriminators = cms.untracked.vstring(
