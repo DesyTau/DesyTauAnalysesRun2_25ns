@@ -161,9 +161,6 @@ int main(int argc, char * argv[]){
   const bool ApplySystShift   = cfg.get<bool>("ApplySystShift");
   const bool ApplyMetFilters  = cfg.get<bool>("ApplyMetFilters");
 
-  bool checkDuplicateMuons = false;
-  if (isData && ch == "mt") checkDuplicateMuons = cfg.get<bool>("checkDuplicateMuons");
-
   //pileup distrib
   const string pileUpInDataFile = cfg.get<string>("pileUpInDataFile");
   const string pileUpInMCFile = cfg.get<string>("pileUpInMCFile");
@@ -292,6 +289,7 @@ int main(int argc, char * argv[]){
   const float etaTauCut      = cfg.get<float>("etaTauCut");
   const float dzTauCut       = cfg.get<float>("dzTauCut");
   const bool  applyTauId     = cfg.get<bool>("ApplyTauId");
+  const bool  applyMuonId     = cfg.get<bool>("ApplyMuonId");//merijn 2019 8 8: make sure that the flag in the config is used
 
   // tau energy scale corrections
   const float shift_tes_1prong = cfg.get<float>("TauEnergyScaleShift_OneProng");
@@ -336,28 +334,7 @@ int main(int argc, char * argv[]){
 
   const bool  applyLeptonId    = cfg.get<bool>("Apply"+lep+"Id");
 
-  //dilepton veto
-  
-  float ptDiLeptonVeto     = 15.;
-  float etaDiLeptonVeto    = 2.4;
-  float dxyDiLeptonVeto    = 0.05;
-  float dzDiLeptonVeto     = 0.2;
-  bool applyDiLeptonVetoId = true;
-  bool applyDiLeptonOS     = true;
-  float isoDiLeptonVeto    = 0.3;
-  float drDiLeptonVeto     = 0.3;
-  
-  if (ch == "mt" || ch == "et") {
-    ptDiLeptonVeto     = cfg.get<float>("ptDi"+lep+"Veto");  
-    etaDiLeptonVeto    = cfg.get<float>("etaDi"+lep+"Veto");
-    dxyDiLeptonVeto    = cfg.get<float>("dxyDi"+lep+"Veto");  
-    dzDiLeptonVeto     = cfg.get<float>("dzDi"+lep+"Veto"); 
-    applyDiLeptonVetoId = cfg.get<bool>("applyDi"+lep+"VetoId");
-    applyDiLeptonOS     = cfg.get<bool>("applyDi"+lep+"OS");
-    isoDiLeptonVeto    = cfg.get<float>("isoDi"+lep+"Veto");
-    drDiLeptonVeto     = cfg.get<float>("drDi"+lep+"Veto"); 
-  }
-  
+  //Merijn removed dimuon cut information since it is in the config file, best to have in one location only to avoid confusion
 
   const float deltaRTrigMatch = cfg.get<float>("DRTrigMatch");
   const float dRiso = cfg.get<float>("dRiso");
@@ -762,6 +739,10 @@ for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) {
         if (fabs(analysisTree.tau_leadchargedhadrcand_dz[it])>=dzTauCut) continue;
 
 	if (analysisTree.tau_byVVLooseIsolationMVArun2017v2DBoldDMwLT2017[it] < 0.5) continue;
+	//merijn 2019 8 8: apply here all criteria on the tau selection. 
+//	if (analysisTree.tau_byTightIsolationMVArun2017v2DBoldDMwLT2017[it] < 0.5) continue;//tight tau mva. But we will apply this only in the DNN NTupler, it is better to do the cut there for ease of computing the fake fractions
+	if (analysisTree.tau_againstMuonTight3[it] < 0.5) continue;//tight mva aginst muon
+	if (analysisTree.tau_againstElectronVLooseMVA6[it] < 0.5) continue;//very loose mva agaist e
 
         if (applyTauId && analysisTree.tau_decayModeFinding[it] < 0.5) continue;
         taus.push_back(it);
@@ -785,9 +766,10 @@ for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) {
 
 	  if (fabs(analysisTree.electron_dz[ie])>=dzLeptonCut) continue;
           if (!electronMvaId  &&  applyLeptonId) continue;
-          if (!analysisTree.electron_pass_conversion[ie]  && applyLeptonId) continue;
 
-          if (analysisTree.electron_nmissinginnerhits[ie]>1 && applyLeptonId) continue;
+	  //Meirjn 2019 8 20: reinstated. They are mentioned in the legacy twiki
+	  if (!analysisTree.electron_pass_conversion[ie]  && applyLeptonId) continue;
+	  if (analysisTree.electron_nmissinginnerhits[ie]>1 && applyLeptonId) continue;
 
           leptons.push_back(ie);
         }
@@ -797,7 +779,9 @@ for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) {
       if(ch == "mt"){
         for (unsigned int im = 0; im<analysisTree.muon_count; ++im) {
 
-	  bool muonMediumId = isIdentifiedMediumMuon(im, &analysisTree, isData);
+	  bool muonMediumId=true;
+	  if(applyMuonId){//2019 8 8: Merijn: impose that the flag from the config file is used
+	    muonMediumId= isIdentifiedMediumMuon(im, &analysisTree, isData);}
   			
           if (analysisTree.muon_pt[im]<=ptLeptonLowCut) continue;
           if (fabs(analysisTree.muon_eta[im])>=etaLeptonCut) continue;
@@ -1335,25 +1319,6 @@ for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) {
 					  TMath::Sqrt( otree->met*TMath::Sin(otree->metphi)*otree->met*TMath::Sin(otree->metphi) +
 				          otree->met*TMath::Cos(otree->metphi)*otree->met*TMath::Cos(otree->metphi)));
 
-      if (ch == "mt" && checkDuplicateMuons && duplicatemuons.size()!=0 && isData){
-	// add to the MET LV the duplicate muons pt
-	TLorentzVector duplicateMuonsLV;
-	float duplicatemu_px = 0; 
-	float duplicatemu_py = 0; 
-	for (unsigned int i=0; i<duplicatemuons.size(); i++){
-	  duplicatemu_px += analysisTree.muon_px[duplicatemuons[i]];
-	  duplicatemu_py += analysisTree.muon_py[duplicatemuons[i]];
-	}
-	// add duplicate muons pT to MET
-	float tot_px = metLV.Px()+ duplicatemu_px;
-	float tot_py = metLV.Py() + duplicatemu_py;
-	metLV.SetPx(tot_px);
-	metLV.SetPy(tot_py);
-	// save to otree
-	otree->met= metLV.Pt();
-	otree->metphi = metLV.Phi();
-      }
-      counter[12]++;
 
       // shift the tau energy scale by decay mode and propagate to the met. 
       if (!isData) {

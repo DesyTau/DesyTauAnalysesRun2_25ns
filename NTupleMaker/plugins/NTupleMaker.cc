@@ -3200,6 +3200,12 @@ unsigned int NTupleMaker::AddMuons(const edm::Event& iEvent, const edm::EventSet
   iEvent.getByToken(BadGlobalMuonsToken_, BadGlobalMuons);
   */
 
+  //Merijn 2019 8 28: try to incorporate here the parameter vector and helecity parameters
+  //we need a property of the transient muon track
+
+
+
+  
   if(Muons.isValid())
     {
       for(unsigned i = 0 ; i < Muons->size() ; i++){
@@ -3213,6 +3219,35 @@ unsigned int NTupleMaker::AddMuons(const edm::Event& iEvent, const edm::EventSet
 	if (fabs(((*Muons)[i].eta()))>cMuEtaMax) continue;
 
 	//	std::cout << "Selected pat::Muon " << i << std::endl;
+
+
+	/*Merijn 2019 8 28: I'll try to 
+	  0) try to obtain transient track from pat muon
+	  1) convert the pat muon to RECO  https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePATFAQs#How_can_I_retrieve_the_reference
+	  2) obtain a transient track based on it
+	  3) extract the parameters we need, and save
+	  4) The last may require some work, if possible try to store as the objects they are.
+	 */
+
+	
+	edm::Ptr<reco::Candidate> originalRef = (*Muons)[i].originalObjectRef();
+	const reco::Muon *originalMu = dynamic_cast<const reco::Muon *>(originalRef.get());
+	if (originalMu == 0) { cout<<"... sorry, this was not a reco::Muon object ... "<<endl;}
+	else{ cout<<"... Yeehah, could get the muon reco object ... "<<endl; }
+
+	//try to get instead a transienttrack from PAT muon:
+	edm::ESHandle<TransientTrackBuilder> transTrackBuildertmp;
+	iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder",transTrackBuildertmp);
+	
+	reco::TrackRef leadTrk = (*Muons)[i].innerTrack();	
+	TransientTrack trLeadTrk = transTrackBuildertmp->build(*leadTrk);	
+	//	TrackBase::ParameterVector ParamVecMu=trLeadTrk.parameters();
+	//TrackBase::ParameterVector ParamVecMu=(*Muons)[i].parameters();
+
+	//	TrackBase::ParameterVector ParamVecMu=originalMu->parameters();
+	TrackBase::ParameterVector ParamVecMu=leadTrk->parameters();
+	
+
 	
 	muon_px[muon_count] = (*Muons)[i].px();
 	muon_py[muon_count] = (*Muons)[i].py();

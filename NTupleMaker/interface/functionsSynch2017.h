@@ -406,8 +406,22 @@ bool extra_electron_veto(int leptonIndex, TString ch, const Config *cfg, const A
     if (fabs(analysisTree->electron_dxy[ie])>=cfg->get<float>("dxyVetoElectronCut")) continue;
     if (fabs(analysisTree->electron_dz[ie])>=cfg->get<float>("dzVetoElectronCut")) continue;
 
-    bool electronMvaId = analysisTree->electron_mva_wp90_general_Spring16_v1[ie]; //analysisTree->electron_mva_wp90_nontrig_Synch17_v1[ie];
-    if (!electronMvaId && cfg->get<bool>("applyVetoElectronId")) continue;
+    int era=cfg->get<int>("era");
+    bool electronMvaId;
+
+     if (era==2016) {
+         electronMvaId = analysisTree->electron_mva_wp90_general_Spring16_v1[ie]>0.5; 
+      }
+      else if (era ==2017){
+         electronMvaId = analysisTree->electron_mva_wp90_noIso_Fall17_v1[ie]>0.5;
+      }
+      else if (era == 2018){
+         electronMvaId = analysisTree->electron_mva_wp90_noIso_Fall17_v1[ie]>0.5;
+      }
+
+     if (!electronMvaId && cfg->get<bool>("applyVetoElectronId")) continue;
+
+    /* Merijn 2019 8 20: in the analysis note this is NOT mentioned for the mt channel, but it is mentioned in the twiki on legacy data. We keep it in */
     if (!analysisTree->electron_pass_conversion[ie] && cfg->get<bool>("applyVetoElectronId")) continue;
     if (analysisTree->electron_nmissinginnerhits[ie]>1 && cfg->get<bool>("applyVetoElectronId")) continue;
 

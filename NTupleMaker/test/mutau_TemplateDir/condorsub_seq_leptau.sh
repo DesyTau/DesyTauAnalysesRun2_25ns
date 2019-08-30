@@ -17,7 +17,8 @@ for i in `ls -1v $3_*`
  echo submitting job $n for file $i from list $3
   cat > $3_$n.sh <<EOF
 source /cvmfs/cms.cern.ch/cmsset_default.sh
-export SCRAM_ARCH=slc6_amd64_gcc630
+export SCRAM_ARCH=slc6_amd64_gcc700
+# export SCRAM_ARCH=slc6_amd64_gcc630
 cd ${CMSSW_BASE}/src
 cmsenv
 cd -
