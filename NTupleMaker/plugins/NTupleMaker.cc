@@ -3216,7 +3216,7 @@ unsigned int NTupleMaker::AddMuons(const edm::Event& iEvent, const edm::EventSet
 	  4) The last may require some work, if possible try to store as the objects they are.
 	 */
 
-
+   /*
 	edm::Ptr<reco::Candidate> originalRef = (*Muons)[i].originalObjectRef();
 	const reco::Muon *originalMu = dynamic_cast<const reco::Muon *>(originalRef.get());
 	if (originalMu == 0) { cout<<"... sorry, this was not a reco::Muon object ... "<<endl;}
@@ -3233,7 +3233,7 @@ unsigned int NTupleMaker::AddMuons(const edm::Event& iEvent, const edm::EventSet
 
 	//	TrackBase::ParameterVector ParamVecMu=originalMu->parameters();
 	TrackBase::ParameterVector ParamVecMu=leadTrk->parameters();
-
+  */
 
 
 	muon_px[muon_count] = (*Muons)[i].px();
