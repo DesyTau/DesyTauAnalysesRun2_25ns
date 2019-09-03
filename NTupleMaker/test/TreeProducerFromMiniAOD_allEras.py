@@ -1,6 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 
 isData = False
+isEmbedded = False
 isRun2018D = False
 isHiggsSignal = False
 year = 2017
@@ -30,6 +31,11 @@ if isData:
     elif period is '2017' : process.GlobalTag.globaltag = '102X_dataRun2_v11'
     elif period is '2018' and not isRun2018D : process.GlobalTag.globaltag = '102X_dataRun2_v11'
     elif period is '2018' and isRun2018D     : process.GlobalTag.globaltag = '102X_dataRun2_Prompt_v14'
+elif isEmbedded:
+    if period is '2016'   : process.GlobalTag.globaltag = '80X_dataRun2_2016SeptRepro_v7'
+    elif period is '2017' : process.GlobalTag.globaltag = '94X_dataRun2_v10'
+    elif period is '2018' and not isRun2018D : process.GlobalTag.globaltag = '102X_dataRun2_Sep2018Rereco_v1'
+    elif period is '2018' and isRun2018D   : process.GlobalTag.globaltag = '102X_dataRun2_Prompt_v13'
 else:
     if period is '2016' :   process.GlobalTag.globaltag = '102X_mcRun2_asymptotic_v7'
     elif period is '2017' : process.GlobalTag.globaltag = '102X_mc2017_realistic_v7'
