@@ -224,6 +224,12 @@ HLTlist = cms.untracked.vstring(
 'HLT_IsoMu20_v',
 'HLT_IsoMu24_v',
 'HLT_IsoMu27_v',
+#Merijn add triggers for 2016, from the analysis note..
+'HLT_IsoMu22_v'
+'HLT_IsoMu22_eta2p1_v'
+'HLT_IsoTkMu22_v'
+'HLT_IsoTkMu22_eta2p1_v'
+
 # Muon-Tau triggers
 'HLT_IsoMu20_eta2p1_LooseChargedIsoPFTau27_eta2p1_CrossL1_v',
 'HLT_IsoMu24_eta2p1_LooseChargedIsoPFTau20_SingleL1_v',
@@ -372,7 +378,13 @@ RecTrackNum = cms.untracked.int32(0),
 RecMuonPtMin = cms.untracked.double(2.),
 RecMuonEtaMax = cms.untracked.double(2.5),
 RecMuonHLTriggerMatching = cms.untracked.vstring(
-#SingleMuon
+
+#Merijn add triggers for 2016, from the analysis note..
+'HLT_IsoMu22_v*hltL3crIsoL1sMu20L1f0L2f10QL3f22QL3trkIsoFiltered0p09'
+'HLT_IsoMu22_eta2p1_v*hltL3crIsoL1sSingleMu20erL1f0L2f10QL3f22QL3trkIsoFiltered0p09'
+'HLT_IsoTkMu22_v*hltL3fL1sMu20L1f0Tkf22QL3trkIsoFiltered0p09'
+'HLT_IsoTkMu22_eta2p1_v*hltL3fL1sMu20erL1f0Tkf22QL3trkIsoFiltered0p09'
+
 'HLT_IsoMu20_v.*:hltL3crIsoL1sMu18L1f0L2f10QL3f20QL3trkIsoFiltered0p07',
 'HLT_IsoMu24_v.*:hltL3crIsoL1sSingleMu22L1f0L2f10QL3f24QL3trkIsoFiltered0p07',
 'HLT_IsoMu27_v.*:hltL3crIsoL1sMu22Or25L1f0L2f10QL3f27QL3trkIsoFiltered0p07',
