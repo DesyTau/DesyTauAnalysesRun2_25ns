@@ -3259,7 +3259,9 @@ unsigned int NTupleMaker::AddMuons(const edm::Event& iEvent, const edm::EventSet
 //Merijn: try to store the track parameters and its covariance
 cout<<"Here mu 1"<<endl;
 	reco::TrackRef leadTrk = (*Muons)[i].innerTrack();	
+cout<<"Here mu 1.1"<<endl;
 	TrackBase::ParameterVector ParamVecMu=leadTrk->parameters();
+cout<<"Here mu 1.2"<<endl;
 	TrackBase::CovarianceMatrix CVMTrack=leadTrk->covariance();
 cout<<"Here mu 2"<<endl;
 
@@ -3911,7 +3913,7 @@ unsigned int NTupleMaker::AddTaus(const edm::Event& iEvent, const edm::EventSetu
 	     && (*Taus)[i].tauID("decayModeFindingNewDMs") < 0.5 ) continue; //remove this cut from here OR apply new DMF cuts
 
 	  if(doDebug) cout << "Skimmed events..."<< endl;
-/*
+
 //Merijn get helix parameters
 cout<<"Here tau 1"<<endl;
 	  reco::TrackRef leadTrk = (*Taus)[i].leadTrack();
@@ -3940,7 +3942,7 @@ cout<<"Here tau 3"<<endl;
 	  tau_Bfield[tau_count]=magneticField;
 cout<<"Here tau 4"<<endl;
 // end of obtaining helix parameters
-*/
+
 	  tau_e[tau_count]                                        = (*Taus)[i].energy();
 	  tau_px[tau_count]                                       = (*Taus)[i].px();
 	  tau_py[tau_count]                                       = (*Taus)[i].py();
