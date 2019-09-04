@@ -416,6 +416,15 @@ void NTupleMaker::beginJob(){
 
   // muons
   if (crecmuon) {
+    //Merijn add branches for the helicity parameters
+//Merijn: for some reason this trickery was needed, couldn't find good explanation yet..
+  tree->Branch("muon_helixparameters", muon_helixparameters,TString::Format("muon_helixparameters[%i][5]/F", muon_count));
+//    tree->Branch("muon_helixparameters", muon_helixparameters, "muon_helixparameters[muon_count][5]/F");
+    tree->Branch("muon_helixparameters_covar", muon_helixparameters_covar,TString::Format("muon_helixparameters_covar[%i][5][5]/F", muon_count));
+    tree->Branch("muon_referencePoint", muon_referencePoint,TString::Format("muon_referencePoint[%i][5]/F", muon_count));
+//    tree->Branch("muon_Bfield", muon_Bfield, "muon_Bfield[muon_count]/F");
+    tree->Branch("muon_Bfield", muon_Bfield, TString::Format("muon_Bfield[%i]/F",muon_count));
+
     tree->Branch("muon_count", &muon_count, "muon_count/i");
     tree->Branch("muon_px", muon_px, "muon_px[muon_count]/F");
     tree->Branch("muon_py", muon_py, "muon_py[muon_count]/F");
@@ -485,7 +494,8 @@ void NTupleMaker::beginJob(){
     tree->Branch("dimuon_dist3D", dimuon_dist3D, "dimuon_dist3D[dimuon_count]/F");
     tree->Branch("dimuon_dist3DE", dimuon_dist3DE, "dimuon_dist3DE[dimuon_count]/F");
     */
-  }
+
+}
 
   // pf jets
   if (crecpfjet) {
@@ -673,6 +683,17 @@ void NTupleMaker::beginJob(){
 
   // taus
   if (crectau) {
+    //Merijn add few branches
+/*
+    tree->Branch("tau_helixparameters", &tau_helixparameters, "tau_helixparameters[i][5]/F");
+    tree->Branch("tau_helixparameters_covar", &tau_helixparameters_covar, " tau_helixparameters_covar[i][i][5]/F");
+*/
+tree->Branch("tau_helixparameters", tau_helixparameters,TString::Format("tau_helixparameters[%i][5]/F", tau_count));
+    tree->Branch("tau_helixparameters_covar", tau_helixparameters_covar,TString::Format("tau_helixparameters_covar[%i][5][5]/F", tau_count));
+    tree->Branch("tau_referencePoint", tau_referencePoint,TString::Format("tau_referencePoint[%i][5]/F", tau_count));
+    tree->Branch("tau_Bfield", tau_Bfield, TString::Format("tau_Bfield[%i]/F",tau_count));
+
+
     tree->Branch("tau_count", &tau_count, "tau_count/i");
     tree->Branch("tau_e", tau_e, "tau_e[tau_count]/F");
     tree->Branch("tau_px", tau_px, "tau_px[tau_count]/F");
@@ -3235,6 +3256,33 @@ unsigned int NTupleMaker::AddMuons(const edm::Event& iEvent, const edm::EventSet
 	TrackBase::ParameterVector ParamVecMu=leadTrk->parameters();
   */
 
+//Merijn: try to store the track parameters and its covariance
+cout<<"Here mu 1"<<endl;
+	reco::TrackRef leadTrk = (*Muons)[i].innerTrack();	
+	TrackBase::ParameterVector ParamVecMu=leadTrk->parameters();
+	TrackBase::CovarianceMatrix CVMTrack=leadTrk->covariance();
+cout<<"Here mu 2"<<endl;
+
+	//store the parameters in the ntuple. should we ise muon_count as index instead of i?!
+	for(int index=0; index<ParamVecMu.kSize;index++){
+	  muon_helixparameters[muon_count][index]=ParamVecMu[index];
+	  for(int index2=0; index2<ParamVecMu.kSize;index2++){
+	    muon_helixparameters_covar[muon_count][index][index2]=CVMTrack[index][index2];
+	  }
+	}
+cout<<"Here mu 3"<<endl;	
+
+	//get reference point
+	TrackBase::Point RFptMu=leadTrk->referencePoint();
+	muon_referencePoint[muon_count][0]=RFptMu.X();
+	muon_referencePoint[muon_count][1]=RFptMu.Y();
+	muon_referencePoint[muon_count][2]=RFptMu.Z();
+
+//value magnetic field at ref pt..
+	double	magneticField = (TTrackBuilder.product() ? TTrackBuilder.product()->field()->inInverseGeV(GlobalPoint(RFptMu.X(), RFptMu.Y(), RFptMu.Z())).z() : 0.0);
+	muon_Bfield[muon_count]=magneticField;
+
+//Merijn helix parameters finish here..
 
 	muon_px[muon_count] = (*Muons)[i].px();
 	muon_py[muon_count] = (*Muons)[i].py();
@@ -3246,6 +3294,8 @@ unsigned int NTupleMaker::AddMuons(const edm::Event& iEvent, const edm::EventSet
 	muon_vx[muon_count] = (*Muons)[i].vx(); // gives the same as (*Muons)[i].muonBestTrack()->vx()
 	muon_vy[muon_count] = (*Muons)[i].vy();
 	muon_vz[muon_count] = (*Muons)[i].vz();
+
+cout<<"Here mu 5"<<endl;
 
 	const pat::Muon &lep = (*Muons)[i];
 	muon_miniISO[muon_count]=getPFIsolation(pfcands, dynamic_cast<const reco::Candidate *>(&lep), 0.05, 0.2, 10., false);
@@ -3861,7 +3911,36 @@ unsigned int NTupleMaker::AddTaus(const edm::Event& iEvent, const edm::EventSetu
 	     && (*Taus)[i].tauID("decayModeFindingNewDMs") < 0.5 ) continue; //remove this cut from here OR apply new DMF cuts
 
 	  if(doDebug) cout << "Skimmed events..."<< endl;
+/*
+//Merijn get helix parameters
+cout<<"Here tau 1"<<endl;
+	  reco::TrackRef leadTrk = (*Taus)[i].leadTrack();
+cout<<"Here tau 1.2"<<endl;
+	  TrackBase::ParameterVector ParamVecTau=leadTrk->parameters();
+cout<<"Here tau 1.3"<<endl;
+	  TrackBase::CovarianceMatrix CVMTrackTau=leadTrk->covariance();
+cout<<"Here tau 2"<<endl;
 
+	  //storage them
+	  for(int index=0; index<ParamVecTau.kSize;index++){
+	    tau_helixparameters[tau_count][index]=ParamVecTau[index];
+	    for(int index2=0; index2<ParamVecTau.kSize;index2++){
+	      tau_helixparameters_covar[tau_count][index][index2]=CVMTrackTau[index][index2];
+	    }}
+
+cout<<"Here tau 3"<<endl;
+	  //get reference point in track
+	  TrackBase::Point RFptTau=leadTrk->referencePoint();
+	  tau_referencePoint[tau_count][0]=RFptTau.X();
+	  tau_referencePoint[tau_count][1]=RFptTau.Y();
+	  tau_referencePoint[tau_count][2]=RFptTau.Z();
+	  
+//save b field for the ref pt..
+	  double magneticField = (TTrackBuilder.product() ? TTrackBuilder.product()->field()->inInverseGeV(GlobalPoint(RFptTau.X(), RFptTau.Y(), RFptTau.Z())).z() : 0.0);
+	  tau_Bfield[tau_count]=magneticField;
+cout<<"Here tau 4"<<endl;
+// end of obtaining helix parameters
+*/
 	  tau_e[tau_count]                                        = (*Taus)[i].energy();
 	  tau_px[tau_count]                                       = (*Taus)[i].px();
 	  tau_py[tau_count]                                       = (*Taus)[i].py();
