@@ -13,18 +13,32 @@
 #include <iostream>
 #include <math.h>
 void ProduceDatacardInputs_ETauFR(
-				  TString Variable = "m_vis",
+				 TString Variable = "m_vis",
                                  TString etaSuffix = "Lt1p460",
                                  TString wp = "Medium",
-                                 int nBins = 12,
+				 int nBins = 12,
                                  float xmin = 60,
                                  float xmax = 120,
                                  bool applyPU = true,
-                                 bool passProbe = true
+                                 bool passProbe = true,
+				 TString wpIso = "Tight",
+                                 bool DeepTau = true
                                  ){
-  using namespace std;
+	
+	TString tauIso = "tauby"+wpIso+"IsolationMVArun2v1DBoldDMwLT";  //Medium wpIso not in the Ntuple for MVA discriminator
+ 	TString againstMu = "tauagainstMuonLoose3";
+	TString DeepTauString ="MVA";
+
+	if(DeepTau>0.5){
+	   DeepTauString ="DeepTau";
+	   tauIso = "tauby"+wpIso+"DeepTau2017v2VSjet";
+	   againstMu = "tauagainstMuLooseDeepTau";
+	}
+  
+	
+using namespace std;
 	SetStyle();
-	TString directory="./etau/wRecoilCorr/";
+	TString directory="./";
 
 	TString MCweight="effweight*mcweight*";
 	const int nSamples = 20;
@@ -34,13 +48,13 @@ void ProduceDatacardInputs_ETauFR(
 	TString samples[nSamples] =
 	  {
 	    "EGamma_Run2018",//(0)data
-	    "DYJetsToLL_M-50_TuneCP5_13TeV_madgraphMLM_pythia8",// (1)Drell-Yan Z->EE
-	    "DYJetsToLL_M-50_TuneCP5_13TeV_madgraphMLM_pythia8", // (2)Drell-Yan ZJ
-	    "DYJetsToLL_M-50_TuneCP5_13TeV_madgraphMLM_pythia8", // (3)Drell-Yan ZTT(tau -> lepton)
-	    "DYJetsToLL_M-50_TuneCP5_13TeV_madgraphMLM_pythia8", // (4)Drell-Yan ZTT(hadronic tau)
-	    "TTTo2L2Nu_TuneCP5_13TeV_powheg_pythia8",//(5)TTbar leptonic
-	    "TTToSemiLeptonic_TuneCP5_13TeV_powheg_pythia8",//(6) semileptonic
-	    "TTToHadronic_TuneCP5_13TeV_powheg_pythia8",//(7) hadronic
+	    "DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8",// (1)Drell-Yan Z->EE
+	    "DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8", // (2)Drell-Yan ZJ
+	    "DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8", // (3)Drell-Yan ZTT(tau -> lepton)
+	    "DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8", // (4)Drell-Yan ZTT(hadronic tau)
+	    "TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8",//(5)TTbar leptonic
+	    "TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8",//(6) semileptonic
+	    "TTToHadronic_TuneCP5_13TeV-powheg-pythia8",//(7) hadronic
 	    "WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8",// (8)WJets
 	    "W1JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8",// (9)WJets
 	    "W2JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8",// (10)WJets
@@ -108,35 +122,50 @@ void ProduceDatacardInputs_ETauFR(
 	TString ZEEcut    = MCweight+Cut+"* (gen_match_1 == 1 && gen_match_2 == 1) ";
 	TString ZJcut     = MCweight+Cut+"* (gen_match_2 == 6) ";
 	TString ZTT_elcut = MCweight+Cut+"* (gen_match_1 == 3 && (gen_match_2 == 3 || gen_match_2 == 4)) ";
-	TString ZTT_etcut = MCweight+Cut+"* (gen_match_1 == 3 && gen_match_2 == 5) * 0.9"; // Applied tau ID eff
+	TString ZTT_etcut = MCweight+Cut+"* (gen_match_1 == 3 && gen_match_2 == 5)";
   	cuts[0] = Cut       +"*(os>0.5)";
 	cuts[1] = ZEEcut    +"*(os>0.5)";
 	cuts[2] = ZJcut     +"*(os>0.5)";
 	cuts[3] = ZTT_elcut +"*(os>0.5)";
 	cuts[4] = ZTT_etcut +"*(os>0.5)";
 
-    
+	if (DeepTau){
+		ZTT_etcut += "*0.83";
+	}else{
+		ZTT_etcut += "*0.9";
+	}
+   
 	cutsSS[0] = qcdweight+Cut       +"*(os<0.5)";
 	cutsSS[1] = qcdweight+ZEEcut    +"*(os<0.5)";
 	cutsSS[2] = qcdweight+ZJcut     +"*(os<0.5)";
 	cutsSS[3] = qcdweight+ZTT_elcut +"*(os<0.5)";
 	cutsSS[4] = qcdweight+ZTT_etcut +"*(os<0.5)";
   
-    if(passProbe)
-      {
-        for (int i=0; i<nSamples; ++i)
+	Cut+="*("+againstMu+">0.5&&"+tauIso+">0.5)";
+
+	if (DeepTau){
+		Cut="(DecayModeProbe!=5&&DecayModeProbe!=6)*"+Cut;
+			
+	}else{
+		Cut="(tau_decayModeFinding>0.5)*"+Cut;
+		
+	}	  
+
+	if(passProbe)	{
+        
+	for (int i=0; i<nSamples; ++i)
 	  {
-            cuts[i] ="(tauagainstEle"+wp+">0.5&&taubyTightIsolationMVArun2v1DBoldDMwLT>0.5)*"+cuts[i];
-            cutsSS[i] ="(tauagainstEle"+wp+">0.5&&taubyTightIsolationMVArun2v1DBoldDMwLT>0.5)*"+cutsSS[i];
+            cuts[i] ="(tauagainstEle"+wp+DeepTauString+">0.5&&"+tauIso+">0.5&&"+againstMu+">0.5)*"+cuts[i];
+            cutsSS[i] ="(tauagainstEle"+wp+DeepTauString+">0.5&&"+tauIso+">0.5&&"+againstMu+">0.5)*"+cutsSS[i];
         }
         
-    }
-    else
-    {
-        for (int i=0; i<nSamples; ++i)
+	}
+	else{
+        
+	for (int i=0; i<nSamples; ++i)
         {
-            cuts[i] ="(tauagainstEle"+wp+"<0.5 && taubyTightIsolationMVArun2v1DBoldDMwLT>0.5)*"+cuts[i];
-            cutsSS[i] ="(tauagainstEle"+wp+"<0.5 && taubyTightIsolationMVArun2v1DBoldDMwLT>0.5)*"+cutsSS[i];
+            cuts[i] ="(tauagainstEle"+wp+DeepTauString+"<0.5&&"+tauIso+">0.5&&tauagainstEleVVVLooseDeepTau>0.5&&"+againstMu+">0.5)*"+cuts[i];
+            cutsSS[i] ="(tauagainstEle"+wp+DeepTauString+"<0.5&&"+tauIso+">0.5&&tauagainstEleVVVLooseDeepTau>0.5&&"+againstMu+">0.5)*"+cutsSS[i];
         }
     }
 

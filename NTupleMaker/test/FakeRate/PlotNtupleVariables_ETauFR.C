@@ -24,15 +24,17 @@
 #include "TColor.h"
 #include "TEfficiency.h"
 #include "TMath.h"
-void PlotNtupleVariables_ETauFR(
+void PlotNtupleVariables_ETauFRwithDeepTau(
                                  TString Variable= "m_vis",
                                  TString xtitle = "visible mass [GeV] ",
                                  int nbins = 30,
                                  float xmin = 0,
                                  float xmax = 250,
 				 TString wp = "Medium",
+				 TString wpIso = "Tight",
+				 bool DeepTau = true,
 				 TString MCweight="effweight*mcweight*",
-				 TString Cut="(iso_1<0.1&&mt_1<30&&tauagainstMuonLoose3>0.5)",
+				 TString Cut="(iso_1<0.1&&mt_1<30)", 
                                  TString ytitle = "Events",
                                  bool applyPU = true,
                                  bool passProbe = true,
@@ -40,6 +42,17 @@ void PlotNtupleVariables_ETauFR(
                                  bool legLeft = false)
 {  
   const int nSamples = 20;
+
+  TString tauIso = "tauby"+wpIso+"IsolationMVArun2v1DBoldDMwLT";
+  TString againstMu = "tauagainstMuonLoose3";
+  TString DeepTauString ="";
+
+if(DeepTau>0.5){
+  DeepTauString ="DeepTau";
+  tauIso = "tauby"+wpIso+"DeepTau2017v2VSjet";
+  againstMu = "tauagainstMuLooseDeepTau";
+  }
+  
 
   TString directory="./";
   TH1::SetDefaultSumw2();
@@ -114,7 +127,18 @@ void PlotNtupleVariables_ETauFR(
 	TString cutsSS[nSamples];
 	
 	TString qcdweight ="1.06*";
-    
+    	
+	Cut+="*("+againstMu+">0.5&&"+tauIso+">0.5)";
+
+	if (DeepTau){
+		Cut="(DecayModeProbe!=5&&DecayModeProbe!=6)*"+Cut;
+			
+	}else{
+		Cut="(tau_decayModeFinding>0.5)*"+Cut;
+		
+	}	
+				
+
 	for (int i=0; i<nSamples; ++i)
 	{
 	  cuts[i] = MCweight+Cut+"*(os>0.5) ";
@@ -123,12 +147,21 @@ void PlotNtupleVariables_ETauFR(
 	TString ZEEcut    = MCweight+Cut+"* (gen_match_1 == 1 && gen_match_2 == 1) ";
 	TString ZJcut     = MCweight+Cut+"* (gen_match_2 == 6) ";
 	TString ZTT_elcut = MCweight+Cut+"* (gen_match_1 == 3 && (gen_match_2 == 3 || gen_match_2 == 4)) ";
-	TString ZTT_etcut = MCweight+Cut+"* (gen_match_1 == 3 && gen_match_2 == 5) * 0.9";
+	TString ZTT_etcut = MCweight+Cut+"* (gen_match_1 == 3 && gen_match_2 == 5)"; 
+	
+	//1= prompt ele at gen level 2=prompt mu 3= non prompt ele (from tau) 4= non promt mu (from tau) 5= tau at gen level 6= jet
+
+	if (DeepTau){
+		ZTT_etcut += "*0.83";
+	}else{
+		ZTT_etcut += "*0.9";
+	}
+
   	cuts[0] = Cut       +"*(os>0.5)";
 	cuts[1] = ZEEcut    +"*(os>0.5)";
 	cuts[2] = ZJcut     +"*(os>0.5)";
 	cuts[3] = ZTT_elcut +"*(os>0.5)";
-	cuts[4] = ZTT_etcut +"*(os>0.5)";
+	cuts[4] = ZTT_etcut +"* (os>0.5)";
 
     
 	cutsSS[0] = qcdweight+Cut       +"*(os<0.5)";
@@ -137,23 +170,23 @@ void PlotNtupleVariables_ETauFR(
 	cutsSS[3] = qcdweight+ZTT_elcut +"*(os<0.5)";
 	cutsSS[4] = qcdweight+ZTT_etcut +"*(os<0.5)";
 	
-	
+									//actual pass-fail selection
 	if(passProbe)
 	  {
 	    for (int i=0; i<nSamples; ++i)
 	      {
-		cuts[i] ="(tauagainstEle"+wp+">0.5&&taubyTightIsolationMVArun2v1DBoldDMwLT>0.5)*"+cuts[i];
-		cutsSS[i] ="(tauagainstEle"+wp+">0.5&&taubyTightIsolationMVArun2v1DBoldDMwLT>0.5)*"+cutsSS[i];
-	      }
+		cuts[i] ="(tauagainstEle"+wp+DeepTauString+">0.5)*"+cuts[i];
+		cutsSS[i] ="(tauagainstEle"+wp+DeepTauString+">0.5)*"+cutsSS[i];
+		}
 	    
 	  }
 	else
 	  {
 	    for (int i=0; i<nSamples; ++i)
 	      {
-		cuts[i] ="(tauagainstEleLoose<0.5&&taubyTightIsolationMVArun2v1DBoldDMwLT>0.5)*"+cuts[i];
-		cutsSS[i] ="(tauagainstEleLoose<0.5&&taubyTightIsolationMVArun2v1DBoldDMwLT>0.5)*"+cutsSS[i];
-	      }
+		cuts[i] ="(tauagainstEle"+wp+DeepTauString+"<0.5)*"+cuts[i];
+		cutsSS[i] ="(tauagainstEle"+wp+DeepTauString+"<0.5)*"+cutsSS[i];
+		}
 	  }
 	
 	if(applyPU)
@@ -498,7 +531,7 @@ void PlotNtupleVariables_ETauFR(
   	//plotchannel("e#mu");
     //	if (!applyPU) suffix = "_noPU";
 
-  	TLatex * cms = new TLatex(0.20,0.94,"CMS L = 59.9 fb^{-1} at #sqrt{s} = 13 TeV");
+  	TLatex * cms = new TLatex(0.20,0.94,"CMS 2018, L = 59.9 fb^{-1} at #sqrt{s} = 13 TeV");
 
   	cms->SetNDC();
   	cms->SetTextSize(0.05);
@@ -600,8 +633,8 @@ void PlotNtupleVariables_ETauFR(
   	canv1->Modified();
   	canv1->cd();
   	canv1->SetSelected(canv1);
-	canv1->Print("./Plots/"+Variable+"_"+wp+".png");
-	canv1->Print("./Plots/"+Variable+"_"+wp+".pdf","Portrait pdf");
+	canv1->Print("./Plots/"+Variable+"_"+wp+DeepTauString+"Iso"+wpIso+".png");
+	canv1->Print("./Plots/"+Variable+"_"+wp+DeepTauString+"Iso"+wpIso+".pdf","Portrait pdf");
 
 
 }
