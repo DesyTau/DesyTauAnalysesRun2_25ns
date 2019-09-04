@@ -65,7 +65,9 @@ import FWCore.PythonUtilities.LumiList as LumiList
 process.source = cms.Source("PoolSource", 
   fileNames = cms.untracked.vstring(
         #"/store/data/Run2017D/SingleMuon/MINIAOD/31Mar2018-v1/00000/2A2ADC80-2238-E811-B4F6-E0DB55FC11A5.root"  # use for testing
-        "/store/mc/RunIIFall17MiniAODv2/TTToHadronic_TuneCP5_13TeV-powheg-pythia8/MINIAODSIM/PU2017_12Apr2018_new_pmx_94X_mc2017_realistic_v14-v2/120000/420D636B-4BBB-E811-B806-0025905C54C6.root"   # use for testing
+        "/store/mc/RunIIFall17MiniAODv2/TTToHadronic_TuneCP5_13TeV-powheg-pythia8/MINIAODSIM/PU2017_12Apr2018_new_pmx_94X_mc2017_realistic_v14-v2/120000/420D636B-4BBB-E811-B806-0025905C54C6.root"   
+
+# use for testing
         #"/store/data/Run2018D/JetHT/MINIAOD/PromptReco-v2/000/320/853/00000/2C20B666-3A9A-E811-9D32-FA163EAC4172.root"  # From Run2018D with a lot of events not passing the json file
         #"/store/mc/RunIIFall17MiniAODv2/GluGluHToTauTau_M125_13TeV_powheg_pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/90000/50FBFB5A-FE42-E811-A3E6-0025905A6092.root" #2017
         #"/store/mc/RunIIAutumn18MiniAOD/WplusH_HToZZTo4L_M125_13TeV_tunedown_powheg2-minlo-HWJ_JHUGenV7011_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/30000/506681B7-DE8A-BF4E-9D9D-AE6C820B9734.root"
@@ -225,10 +227,10 @@ HLTlist = cms.untracked.vstring(
 'HLT_IsoMu24_v',
 'HLT_IsoMu27_v',
 #Merijn add triggers for 2016, from the analysis note..
-'HLT_IsoMu22_v'
-'HLT_IsoMu22_eta2p1_v'
-'HLT_IsoTkMu22_v'
-'HLT_IsoTkMu22_eta2p1_v'
+'HLT_IsoMu22_v',
+'HLT_IsoMu22_eta2p1_v',
+'HLT_IsoTkMu22_v',
+'HLT_IsoTkMu22_eta2p1_v',
 
 # Muon-Tau triggers
 'HLT_IsoMu20_eta2p1_LooseChargedIsoPFTau27_eta2p1_CrossL1_v',
@@ -380,10 +382,10 @@ RecMuonEtaMax = cms.untracked.double(2.5),
 RecMuonHLTriggerMatching = cms.untracked.vstring(
 
 #Merijn add triggers for 2016, from the analysis note..
-'HLT_IsoMu22_v*hltL3crIsoL1sMu20L1f0L2f10QL3f22QL3trkIsoFiltered0p09'
-'HLT_IsoMu22_eta2p1_v*hltL3crIsoL1sSingleMu20erL1f0L2f10QL3f22QL3trkIsoFiltered0p09'
-'HLT_IsoTkMu22_v*hltL3fL1sMu20L1f0Tkf22QL3trkIsoFiltered0p09'
-'HLT_IsoTkMu22_eta2p1_v*hltL3fL1sMu20erL1f0Tkf22QL3trkIsoFiltered0p09'
+'HLT_IsoMu22_v*:hltL3crIsoL1sMu20L1f0L2f10QL3f22QL3trkIsoFiltered0p09',
+'HLT_IsoMu22_eta2p1_v*:hltL3crIsoL1sSingleMu20erL1f0L2f10QL3f22QL3trkIsoFiltered0p09',
+'HLT_IsoTkMu22_v*:hltL3fL1sMu20L1f0Tkf22QL3trkIsoFiltered0p09',
+'HLT_IsoTkMu22_eta2p1_v*:hltL3fL1sMu20erL1f0Tkf22QL3trkIsoFiltered0p09',
 
 'HLT_IsoMu20_v.*:hltL3crIsoL1sMu18L1f0L2f10QL3f20QL3trkIsoFiltered0p07',
 'HLT_IsoMu24_v.*:hltL3crIsoL1sSingleMu22L1f0L2f10QL3f24QL3trkIsoFiltered0p07',
