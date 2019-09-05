@@ -416,6 +416,8 @@ void NTupleMaker::beginJob(){
 
   // muons
   if (crecmuon) {
+
+/*
     //Merijn add branches for the helicity parameters
 //Merijn: for some reason this trickery was needed, couldn't find good explanation yet..
   tree->Branch("muon_helixparameters", muon_helixparameters,TString::Format("muon_helixparameters[%d][5]/F", muon_count));
@@ -439,8 +441,15 @@ cout<<" muon_referencePoint branch 2"<<endl;
 //    tree->Branch("muon_Bfield", muon_Bfield, "muon_Bfield[muon_count]/F");
 //    tree->Branch("muon_Bfield", &muon_Bfield, TString::Format("muon_Bfield[%i]/F",muon_count));
     tree->Branch("muon_Bfield2", &muon_Bfield, "muon_Bfield2/F"	);
+*/
 
     tree->Branch("muon_count", &muon_count, "muon_count/i");
+
+    tree->Branch("muon_helixparameters", muon_helixparameters, "muon_helixparameters[muon_count][5]/F");
+    tree->Branch("muon_helixparameters_covar", muon_helixparameters_covar,"muon_helixparameters_covar[muon_count][5][5]/F");
+    tree->Branch("referencePoint", muon_referencePoint,"muon_referencePoint[muon_count][3]/F");
+    tree->Branch("muon_Bfield", muon_Bfield, "muon_Bfield[muon_count]/F");
+
     tree->Branch("muon_px", muon_px, "muon_px[muon_count]/F");
     tree->Branch("muon_py", muon_py, "muon_py[muon_count]/F");
     tree->Branch("muon_pz", muon_pz, "muon_pz[muon_count]/F");
@@ -703,13 +712,14 @@ cout<<" muon_referencePoint branch 2"<<endl;
     tree->Branch("tau_helixparameters", &tau_helixparameters, "tau_helixparameters[i][5]/F");
     tree->Branch("tau_helixparameters_covar", &tau_helixparameters_covar, " tau_helixparameters_covar[i][i][5]/F");
 */
-tree->Branch("tau_helixparameters", tau_helixparameters,TString::Format("tau_helixparameters[%i][5]/F", tau_count));
+
+    tree->Branch("tau_count", &tau_count, "tau_count/i");
+
+    tree->Branch("tau_helixparameters", tau_helixparameters,TString::Format("tau_helixparameters[%i][5]/F", tau_count));
     tree->Branch("tau_helixparameters_covar", tau_helixparameters_covar,TString::Format("tau_helixparameters_covar[%i][5][5]/F", tau_count));
     tree->Branch("tau_referencePoint", tau_referencePoint,TString::Format("tau_referencePoint[%i][5]/F", tau_count));
     tree->Branch("tau_Bfield", tau_Bfield, TString::Format("tau_Bfield[%i]/F",tau_count));
 
-
-    tree->Branch("tau_count", &tau_count, "tau_count/i");
     tree->Branch("tau_e", tau_e, "tau_e[tau_count]/F");
     tree->Branch("tau_px", tau_px, "tau_px[tau_count]/F");
     tree->Branch("tau_py", tau_py, "tau_py[tau_count]/F");
@@ -3272,11 +3282,12 @@ unsigned int NTupleMaker::AddMuons(const edm::Event& iEvent, const edm::EventSet
 //Merijn: try to store the track parameters and its covariance
 cout<<"Here mu 1"<<endl;
 //	reco::TrackRef leadTrk = (*Muons)[i].innerTrack();
-	reco::TrackRef leadTrk = (*Muons)[i].muonBestTrack();	
+//	reco::TrackRef leadTrk = (*Muons)[i].muonBestTrack();	
+
+	reco::TrackRef leadTrk = (*Muons)[i].innerTrack();
 	if (leadTrk.isNonnull()) {
 	TrackBase::ParameterVector ParamVecMu=leadTrk->parameters();
 	TrackBase::CovarianceMatrix CVMTrack=leadTrk->covariance();
-
 
 	//store the parameters in the ntuple. should we ise muon_count as index instead of i?!
 	for(int index=0; index<ParamVecMu.kSize;index++){
@@ -3290,26 +3301,19 @@ cout<<"Here mu 1"<<endl;
 	//get reference point
 	TrackBase::Point RFptMu=leadTrk->referencePoint();
 
-cout<<" ref pt out 1 "<<endl;
 	muon_referencePoint[muon_count][0]=RFptMu.X();
 	muon_referencePoint[muon_count][1]=RFptMu.Y();
 	muon_referencePoint[muon_count][2]=RFptMu.Z();
 
-	  tau_SV_cov2[tau_count][0]=RFptMu.X();
-	  tau_SV_cov2[tau_count][1]=RFptMu.Y();
-	  tau_SV_cov2[tau_count][2]=RFptMu.Z();
-
-cout<<" tau_SV_cov2[tau_count][2] "<<tau_SV_cov2[tau_count][2]<<endl;
-cout<<"muon_referencePoint[muon_count][2] "<<muon_referencePoint[muon_count][2]<<endl; 
-cout<<" ref pt out 2 "<<endl;
+	cout<<"muon_referencePoint[muon_count][2] "<<muon_referencePoint[muon_count][2]<<endl; 
+	
 
 //value magnetic field at ref pt..
 	double	magneticField = (TTrackBuilder.product() ? TTrackBuilder.product()->field()->inInverseGeV(GlobalPoint(RFptMu.X(), RFptMu.Y(), RFptMu.Z())).z() : 0.0);
 	muon_Bfield[muon_count]=magneticField;
-	cout<<"magneticField "<<magneticField<<endl;
-	
+	cout<<"magneticField "<<magneticField<<endl;	
 	}
-else{
+	else{
 	cout<<"init to a default"<<endl;
 	//init things to -999
 	//store the parameters in the ntuple. should we ise muon_count as index instead of i?!
@@ -3343,7 +3347,6 @@ else{
 	muon_vy[muon_count] = (*Muons)[i].vy();
 	muon_vz[muon_count] = (*Muons)[i].vz();
 
-cout<<"Here mu 5"<<endl;
 
 	const pat::Muon &lep = (*Muons)[i];
 	muon_miniISO[muon_count]=getPFIsolation(pfcands, dynamic_cast<const reco::Candidate *>(&lep), 0.05, 0.2, 10., false);
@@ -3975,7 +3978,6 @@ unsigned int NTupleMaker::AddTaus(const edm::Event& iEvent, const edm::EventSetu
 	      tau_helixparameters_covar[tau_count][index][index2]=CVMTrackTau[index][index2];
 	    }}
 
-cout<<"Here tau 3"<<endl;
 	  //get reference point in track
 	  TrackBase::Point RFptTau=leadTrk->referencePoint();
 	  tau_referencePoint[tau_count][0]=RFptTau.X();
@@ -3987,11 +3989,10 @@ cout<<"Here tau 3"<<endl;
 	  double magneticField = (TTrackBuilder.product() ? TTrackBuilder.product()->field()->inInverseGeV(GlobalPoint(RFptTau.X(), RFptTau.Y(), RFptTau.Z())).z() : 0.0);
 	  tau_Bfield[tau_count]=magneticField;
 	cout<<"magneticField "<<magneticField<<endl;
-cout<<"Here tau 4"<<endl;
 // end of obtaining helix parameters
 }
 else{
-cout<<"init to a default"<<endl;
+cout<<"init tau to a default"<<endl;
 	  for(int index=0; index<5;index++){
 	    tau_helixparameters[tau_count][index]=-999;
 	    for(int index2=0; index2<5;index2++){
