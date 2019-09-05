@@ -152,7 +152,6 @@
 
 //includes for Helix parameter calculations
 #include "DataFormats/TrackReco/interface/TrackBase.h"
-//#include "DataFormats/VertexReco/interface/Vertex.h" //Merijn included, needed for PV covar for helix calculations
 
 #include "SimDataFormats/HTXS/interface/HiggsTemplateCrossSections.h"
 
