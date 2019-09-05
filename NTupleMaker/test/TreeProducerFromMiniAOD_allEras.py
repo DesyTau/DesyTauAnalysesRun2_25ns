@@ -49,20 +49,20 @@ process.MessageLogger.destinations = ['cout', 'cerr']
 process.MessageLogger.cerr.threshold = cms.untracked.string('INFO')
 process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 # Set the process options -- Display summary at the end, enable unscheduled execution
-process.options = cms.untracked.PSet( 
+process.options = cms.untracked.PSet(
     allowUnscheduled = cms.untracked.bool(True),
     wantSummary = cms.untracked.bool(True)
 )
 
 # How many events to process
-process.maxEvents = cms.untracked.PSet( 
+process.maxEvents = cms.untracked.PSet(
    input = cms.untracked.int32(100)
 )
 
 # Define the input source
 import FWCore.PythonUtilities.LumiList as LumiList
 # https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideGoodLumiSectionsJSONFile#cmsRun
-process.source = cms.Source("PoolSource", 
+process.source = cms.Source("PoolSource",
   fileNames = cms.untracked.vstring(
         #"/store/data/Run2017D/SingleMuon/MINIAOD/31Mar2018-v1/00000/2A2ADC80-2238-E811-B4F6-E0DB55FC11A5.root"  # use for testing
         "/store/mc/RunIIFall17MiniAODv2/TTToHadronic_TuneCP5_13TeV-powheg-pythia8/MINIAODSIM/PU2017_12Apr2018_new_pmx_94X_mc2017_realistic_v14-v2/120000/420D636B-4BBB-E811-B806-0025905C54C6.root"   # use for testing
@@ -86,6 +86,14 @@ updateJetCollection(
   jetCorrections = ('AK4PFchs', cms.vstring(['L1FastJet', 'L2Relative', 'L3Absolute', 'L2L3Residual']), 'None')  # Update: Safe to always add 'L2L3Residual' as MC contains dummy L2L3Residual corrections (always set to 1)
 )
 process.jecSequence = cms.Sequence(process.patJetCorrFactorsUpdatedJEC * process.updatedPatJetsUpdatedJEC)
+
+updateJetCollection(
+  process,
+  jetSource = cms.InputTag('slimmedJetsPuppi'),
+  labelName = 'UpdatedJECPuppi',
+  jetCorrections = ('AK4PFPuppi', cms.vstring(['L1FastJet', 'L2Relative', 'L3Absolute', 'L2L3Residual']), 'None')  # Update: Safe to always add 'L2L3Residual' as MC contains dummy L2L3Residual corrections (always set to 1)
+)
+process.jecSequencepuppi = cms.Sequence(process.patJetCorrFactorsUpdatedJECPuppi * process.updatedPatJetsUpdatedJECPuppi)
 
 ### END JECs ==========================================================================================
 
@@ -159,7 +167,8 @@ updatedTauName = "NewTauIDsEmbedded" #name of pat::Tau collection with new tau-I
 import RecoTauTag.RecoTau.tools.runTauIdMVA as tauIdConfig
 tauIdEmbedder = tauIdConfig.TauIDEmbedder(process, cms, debug = False,
                                           updatedTauName = updatedTauName,
-                                          toKeep = [ "2017v2", "deepTau2017v2","MVADM_2016_v1","MVADM_2017_v1"]
+                                          #toKeep = [ "2017v2", "deepTau2017v2","MVADM_2016_v1","MVADM_2017_v1"]
+                                          toKeep = [ "2017v2", "deepTau2017v2p1"]
                                           )
 
 tauIdEmbedder.runTauID()
@@ -311,6 +320,7 @@ RecElectron = cms.untracked.bool(True),
 RecTau = cms.untracked.bool(True),
 L1Objects = cms.untracked.bool(True),
 RecJet = cms.untracked.bool(True),
+RecJetPuppi= cms.untracked.bool(True),
 RecHTXS = cms.untracked.bool(isHiggsSignal),
 # collections
 MuonCollectionTag = cms.InputTag("slimmedMuons"),
@@ -323,6 +333,7 @@ L1TauCollectionTag = cms.InputTag("caloStage2Digis:Tau"),
 L1JetCollectionTag = cms.InputTag("caloStage2Digis:Jet"),
 #JetCollectionTag = cms.InputTag("slimmedJets"),
 JetCollectionTag = cms.InputTag("updatedPatJetsUpdatedJEC::TreeProducer"),
+PuppiJetCollectionTag = cms.InputTag("updatedPatJetsUpdatedJECPuppi::TreeProducer"),
 MetCollectionTag = cms.InputTag("slimmedMETs::@skipCurrentProcess"),
 MetCorrCollectionTag = cms.InputTag("slimmedMETsModifiedMET::TreeProducer"),
 PuppiMetCollectionTag = cms.InputTag("slimmedMETsPuppi::TreeProducer"),
@@ -469,7 +480,7 @@ RecJetBtagDiscriminators = cms.untracked.vstring(
 'pfDeepFlavourJetTags:probg'
 ),
 RecJetNum = cms.untracked.int32(0),
-SampleName = cms.untracked.string("Data") 
+SampleName = cms.untracked.string("Data")
 )
 # END NTuple Maker ======================================================================================
 
@@ -493,6 +504,7 @@ process.triggerSelection = cms.EDFilter("HLTHighLevel",
 process.p = cms.Path(
   process.initroottree *
   process.jecSequence *  # New JECs
+  process.jecSequencepuppi *  # New JECs
   process.egmPhotonIDSequence * # Puppi MET
   process.puppiMETSequence *  # Puppi MET
   process.fullPatMetSequencePuppi *  # Re-correcting Puppi MET
@@ -525,6 +537,6 @@ process.output = cms.OutputModule("PoolOutputModule",
                                     #'keep *_slimmedMuons_*_*',
                                     #'drop *_selectedPatJetsForMetT1T2Corr_*_*',
                                     #'drop patJets_*_*_*'
-                                  ),        
+                                  ),
                                   SelectEvents = cms.untracked.PSet(  SelectEvents = cms.vstring('p'))
 )
