@@ -21,6 +21,18 @@ int main(int argc, char * argv[]) {
    const string metHTLName        = cfg.get<string>("MetHLTName");
    const string singleMuonHLTName = cfg.get<string>("SingleMuonHLTName");
    const string singleMuonHLTFilterName = cfg.get<string>("SingleMuonHLTFilterName");
+   string singleMuonHLTName1_ = "";
+   string singleMuonHLTFilterName1_ = "";
+   try{
+     singleMuonHLTName1_ = cfg.get<string>("SingleMuonHLTName1");
+     singleMuonHLTFilterName1_ = cfg.get<string>("SingleMuonHLTFilterName1");
+   }
+   catch(...){
+     singleMuonHLTName1_ = cfg.get<string>("SingleMuonHLTName");
+     singleMuonHLTFilterName1_ = cfg.get<string>("SingleMuonHLTFilterName");
+   }
+   const string singleMuonHLTName1       = singleMuonHLTName1_;
+   const string singleMuonHLTFilterName1 = singleMuonHLTFilterName1_;
    const string pfJet60HLTFilterName = cfg.get<string>("PFJet60HLTFilterName"); 
    const string pfJet80HLTFilterName = cfg.get<string>("PFJet80HLTFilterName"); 
    const string pfJet140HLTFilterName = cfg.get<string>("PFJet140HLTFilterName"); 
@@ -39,6 +51,8 @@ int main(int argc, char * argv[]) {
    TString MetHLTName(metHTLName);
    TString SingleMuonHLTName(singleMuonHLTName);
    TString SingleMuonHLTFilterName(singleMuonHLTFilterName);
+   TString SingleMuonHLTName1(singleMuonHLTName1);
+   TString SingleMuonHLTFilterName1(singleMuonHLTFilterName1);
    TString PFJet60HLTFilterName(pfJet60HLTFilterName);
    TString PFJet80HLTFilterName(pfJet80HLTFilterName);
    TString PFJet140HLTFilterName(pfJet140HLTFilterName);
@@ -180,7 +194,7 @@ int main(int argc, char * argv[]) {
   
   // ------------------- set MET filters ---------------------------------
   std::vector<TString> metFlags; metFlags.clear();
-  if (era == "2017"){
+  if (era == "2017"){                                      //FIXME: Recommendations changed, has to be updated
      metFlags.push_back("Flag_HBHENoiseFilter");
      metFlags.push_back("Flag_HBHENoiseIsoFilter");
      metFlags.push_back("Flag_globalTightHalo2016Filter");
@@ -193,6 +207,26 @@ int main(int argc, char * argv[]) {
      metFlags.push_back("Flag_BadChargedCandidateFilter");
      metFlags.push_back("Flag_BadPFMuonFilter");
      metFlags.push_back("Flag_ecalBadCalibFilter");
+  }
+  else if (era == "2018"){
+     metFlags.push_back("Flag_goodVertices");
+     metFlags.push_back("Flag_globalSuperTightHalo2016Filter");
+     metFlags.push_back("Flag_HBHENoiseFilter");
+     metFlags.push_back("Flag_HBHENoiseIsoFilter");
+     metFlags.push_back("Flag_EcalDeadCellTriggerPrimitiveFilter");
+     metFlags.push_back("Flag_BadPFMuonFilter");
+     metFlags.push_back("Flag_BadChargedCandidateFilter");
+     if (isData)
+        metFlags.push_back("Flag_eeBadScFilter");
+     metFlags.push_back("ecalBadCalibReducedMINIAODFilter");
+  }
+  else if (era == "2016"){
+    metFlags.push_back("Flag_goodVertices");
+    if(isData) metFlags.push_back("Flag_globalSuperTightHalo2016Filter");
+    metFlags.push_back("Flag_HBHENoiseFilter");
+    metFlags.push_back("Flag_HBHENoiseIsoFilter");
+    metFlags.push_back("Flag_EcalDeadCellTriggerPrimitiveFilter");
+    metFlags.push_back("Flag_BadPFMuonFilter");
   }
   else {
      std::cout << "MET filters not defined for era "<<era<<std::endl;
@@ -477,15 +511,25 @@ int main(int argc, char * argv[]) {
         trigger_ = isMetHLT;
         trig_ = isMetHLT;
         
-        AccessTriggerInfo(analysisTree,SingleMuonHLTFilterName,nSingleMuonHLTFilter,isSingleMuonHLTFilter);
-        AccessTriggerInfo(analysisTree,PFJet60HLTFilterName,nPFJet60HLTFilter,isPFJet60HLTFilter);
-        AccessTriggerInfo(analysisTree,PFJet80HLTFilterName,nPFJet80HLTFilter,isPFJet80HLTFilter);
-        AccessTriggerInfo(analysisTree,PFJet140HLTFilterName,nPFJet140HLTFilter,isPFJet140HLTFilter);
-        AccessTriggerInfo(analysisTree,PFJet200HLTFilterName,nPFJet200HLTFilter,isPFJet200HLTFilter);
-        AccessTriggerInfo(analysisTree,PFJet260HLTFilterName,nPFJet260HLTFilter,isPFJet260HLTFilter);
-        AccessTriggerInfo(analysisTree,PFJet320HLTFilterName,nPFJet320HLTFilter,isPFJet320HLTFilter);
-        AccessTriggerInfo(analysisTree,PFJet400HLTFilterName,nPFJet400HLTFilter,isPFJet400HLTFilter );
-        AccessTriggerInfo(analysisTree,PFJet450HLTFilterName,nPFJet450HLTFilter,isPFJet450HLTFilter);
+        isSingleMuonHLTFilter1= AccessTriggerInfo(analysisTree,SingleMuonHLTFilterName,nSingleMuonHLTFilter);
+        isSingleMuonHLTFilter2= AccessTriggerInfo(analysisTree,SingleMuonHLTFilterName1,nSingleMuonHLTFilter1);
+	isSingleMuonHLTFilter = isSingleMuonHLTFilter1 || isSingleMuonHLTFilter2;
+        if (!isSingleMuonHLTFilter) {
+	  std::cout << "Single Muon HLT filter not found" << std::endl;
+	  exit(-1);
+	}
+	isPFJet60HLTFilter  = AccessTriggerInfo(analysisTree,PFJet60HLTFilterName,nPFJet60HLTFilter);
+        isPFJet80HLTFilter  = AccessTriggerInfo(analysisTree,PFJet80HLTFilterName,nPFJet80HLTFilter);
+        isPFJet140HLTFilter = AccessTriggerInfo(analysisTree,PFJet140HLTFilterName,nPFJet140HLTFilter);
+        isPFJet200HLTFilter = AccessTriggerInfo(analysisTree,PFJet200HLTFilterName,nPFJet200HLTFilter);
+        isPFJet260HLTFilter = AccessTriggerInfo(analysisTree,PFJet260HLTFilterName,nPFJet260HLTFilter);
+        isPFJet320HLTFilter = AccessTriggerInfo(analysisTree,PFJet320HLTFilterName,nPFJet320HLTFilter);
+        isPFJet400HLTFilter = AccessTriggerInfo(analysisTree,PFJet400HLTFilterName,nPFJet400HLTFilter);
+        isPFJet450HLTFilter = AccessTriggerInfo(analysisTree,PFJet450HLTFilterName,nPFJet450HLTFilter);
+	if (!isPFJet60HLTFilter || !isPFJet80HLTFilter || !isPFJet140HLTFilter || !isPFJet200HLTFilter || !isPFJet260HLTFilter || !isPFJet320HLTFilter || !isPFJet400HLTFilter || !isPFJet450HLTFilter ) {
+	  std::cout << "PFJet HLT filter not found" << std::endl;
+	  exit(-1);
+	}
         //AccessTriggerInfo(analysisTree,SinglePFTau180Trk50Name,nSinglePFTau180Trk50Filter,isSinglePFTau180Trk50Filter);
         //AccessTriggerInfo(analysisTree,SinglePFTau180Trk50oneprongName,nSinglePFTau180Trk50oneprongFilter,isSinglePFTau180Trk50oneprongFilter);
         
@@ -495,7 +539,7 @@ int main(int argc, char * argv[]) {
         // ***************************************************
         float pfmetcorr_ex = analysisTree.pfmetcorr_ex;
         float pfmetcorr_ey = analysisTree.pfmetcorr_ey;
-        
+
         if (!isData) { 
            if (jetES<0) {
               pfmetcorr_ex = analysisTree.pfmetcorr_ex_JetEnDown;
@@ -573,7 +617,9 @@ int main(int argc, char * argv[]) {
          // triggering muon -->
          if (analysisTree.muon_pt[imuon]>ptTrigMuCut && 
              passedSelIso) {
-            bool trigMatch = TriggerMatching(analysisTree, analysisTree.muon_eta[imuon],analysisTree.muon_phi[imuon],nSingleMuonHLTFilter);
+            bool trigMatch1 = TriggerMatching(analysisTree, analysisTree.muon_eta[imuon],analysisTree.muon_phi[imuon],nSingleMuonHLTFilter);
+            bool trigMatch2 = TriggerMatching(analysisTree, analysisTree.muon_eta[imuon],analysisTree.muon_phi[imuon],nSingleMuonHLTFilter1);
+	    bool trigMatch = trigMatch1 || trigMatch2;
             if (trigMatch&&analysisTree.muon_pt[imuon]>ptTriggerMu) {
                ptTriggerMu = analysisTree.muon_pt[imuon];
                etaTriggerMu = analysisTree.muon_eta[imuon];
@@ -726,8 +772,11 @@ int main(int argc, char * argv[]) {
            if (analysisTree.pfjet_pt[ijet]<20.0) continue; 
            
            // ----------------------- jet ID ----------------------- 
+	   // https://twiki.cern.ch/twiki/bin/viewauth/CMS/JetID
            bool isPFJetId = false;
            if (era == "2017") isPFJetId = tightJetiD_2017(analysisTree,int(ijet));
+           else if (era == "2018") isPFJetId = tightJetiD_2018(analysisTree,int(ijet));
+	   else if (era == "2016") isPFJetId = looseJetiD_2016(analysisTree,int(ijet)); // https://twiki.cern.ch/twiki/bin/view/CMS/JetID13TeVRun2016
            else {
               std::cout<<"No Jet Id specified for era "<<era<<std::endl;
               exit(-1);
@@ -914,7 +963,7 @@ int main(int argc, char * argv[]) {
            
            if( (tauDecayMode == "1prong0pizeros"     && analysisTree.tau_decayMode[itau]==0) ||
                (tauDecayMode == "1prongUpTo4pizeros" && analysisTree.tau_decayMode[itau]>=1 && analysisTree.tau_decayMode[itau]<=4) ||
-               (tauDecayMode == "3prong0pizeros"     && analysisTree.tau_decayMode[itau]==10) ){
+               (tauDecayMode == "3prong0pizeros"     && (analysisTree.tau_decayMode[itau]==10 || analysisTree.tau_decayMode[itau]==11 || analysisTree.tau_decayMode[itau]==7 ) ) ){
               
               analysisTree.tau_px[itau]   *= tauMomScale;
               analysisTree.tau_py[itau]   *= tauMomScale;
@@ -1043,6 +1092,30 @@ int main(int argc, char * argv[]) {
            tauAntiElectronTightMVA6_  = analysisTree.tau_againstElectronTightMVA6[indexTau] > 0.5;
            tauAntiElectronVTightMVA6_ = analysisTree.tau_againstElectronVTightMVA6[indexTau] > 0.5;
            
+           taubyDeepTau2017v2VSeraw_ = analysisTree.tau_byDeepTau2017v2VSeraw[indexTau] > 0.5;
+           taubyDeepTau2017v2VSjetraw_ = analysisTree.tau_byDeepTau2017v2VSjetraw[indexTau] > 0.5;
+           taubyDeepTau2017v2VSmuraw_ = analysisTree.tau_byDeepTau2017v2VSmuraw[indexTau] > 0.5;
+           taubyLooseDeepTau2017v2VSe_ = analysisTree.tau_byLooseDeepTau2017v2VSe[indexTau] > 0.5;
+           taubyLooseDeepTau2017v2VSjet_ = analysisTree.tau_byLooseDeepTau2017v2VSjet[indexTau] > 0.5;
+           taubyLooseDeepTau2017v2VSmu_ = analysisTree.tau_byLooseDeepTau2017v2VSmu[indexTau] > 0.5;
+           taubyMediumDeepTau2017v2VSe_ = analysisTree.tau_byMediumDeepTau2017v2VSe[indexTau] > 0.5;
+           taubyMediumDeepTau2017v2VSjet_ = analysisTree.tau_byMediumDeepTau2017v2VSjet[indexTau] > 0.5;
+           taubyMediumDeepTau2017v2VSmu_ = analysisTree.tau_byMediumDeepTau2017v2VSmu[indexTau] > 0.5;
+           taubyTightDeepTau2017v2VSe_ = analysisTree.tau_byTightDeepTau2017v2VSe[indexTau] > 0.5;
+           taubyTightDeepTau2017v2VSjet_ = analysisTree.tau_byTightDeepTau2017v2VSjet[indexTau] > 0.5;
+           taubyTightDeepTau2017v2VSmu_ = analysisTree.tau_byTightDeepTau2017v2VSmu[indexTau] > 0.5;
+           taubyVLooseDeepTau2017v2VSe_ = analysisTree.tau_byVLooseDeepTau2017v2VSe[indexTau] > 0.5;
+           taubyVLooseDeepTau2017v2VSjet_ = analysisTree.tau_byVLooseDeepTau2017v2VSjet[indexTau] > 0.5;
+           taubyVLooseDeepTau2017v2VSmu_ = analysisTree.tau_byVLooseDeepTau2017v2VSmu[indexTau] > 0.5;
+           taubyVTightDeepTau2017v2VSe_ = analysisTree.tau_byVTightDeepTau2017v2VSe[indexTau] > 0.5;
+           taubyVTightDeepTau2017v2VSjet_ = analysisTree.tau_byVTightDeepTau2017v2VSjet[indexTau] > 0.5;
+           taubyVVLooseDeepTau2017v2VSe_ = analysisTree.tau_byVVLooseDeepTau2017v2VSe[indexTau] > 0.5;
+           taubyVVLooseDeepTau2017v2VSjet_ = analysisTree.tau_byVVLooseDeepTau2017v2VSjet[indexTau] > 0.5;
+           taubyVVTightDeepTau2017v2VSe_ = analysisTree.tau_byVVTightDeepTau2017v2VSe[indexTau] > 0.5;
+           taubyVVTightDeepTau2017v2VSjet_ = analysisTree.tau_byVVTightDeepTau2017v2VSjet[indexTau] > 0.5;
+           taubyVVVLooseDeepTau2017v2VSe_ = analysisTree.tau_byVVVLooseDeepTau2017v2VSe[indexTau] > 0.5;
+           taubyVVVLooseDeepTau2017v2VSjet_ = analysisTree.tau_byVVVLooseDeepTau2017v2VSjet[indexTau] > 0.5;
+
            // bool isSingleTau = false;
            // bool isSingleTauOneProng = false;
            // for (unsigned int iT=0; iT<analysisTree.trigobject_count;++iT) {
@@ -1068,6 +1141,8 @@ int main(int argc, char * argv[]) {
            if (jetFound) {
               tauJetFlavor_ = analysisTree.pfjet_flavour[indexMatchingJet];
               if (era == "2017") tauJetTightId_ = tightJetiD_2017(analysisTree,indexMatchingJet);
+              else if (era == "2018") tauJetTightId_ = tightJetiD_2018(analysisTree,indexMatchingJet);
+	      else if (era == "2016") tauJetTightId_ = tightJetiD_2016(analysisTree,indexMatchingJet); // https://twiki.cern.ch/twiki/bin/view/CMS/JetID13TeVRun2016
               else {
                  std::cout<<"Jet Id not set for jets faking taus in era "<<era<<std::endl;
                  exit(-1);
@@ -1140,7 +1215,7 @@ int main(int argc, char * argv[]) {
            isWJet = isWJet && nSelTaus_ == 1;
            isWJet = isWJet && nJetsCentral30_ == 1;
            isWJet = isWJet && abs(muonEta_)<etaMuCut_WJet;
-           isWJet = isWJet && tauDM_;
+           isWJet = isWJet && (tauDM_ || tauNewDM_);
            
            
            if (isWJet) {
@@ -1206,7 +1281,7 @@ int main(int argc, char * argv[]) {
            isWTauNu = isWTauNu && nJetsCentral30_==1;
            isWTauNu = isWTauNu && nMuon_ == 0;
            isWTauNu = isWTauNu && nElec_ == 0;
-           isWTauNu = isWTauNu && tauDM_;
+           isWTauNu = isWTauNu && (tauDM_ || tauNewDM_);
            isWTauNu = isWTauNu && trigger_;
          
            if (isWTauNu) {
@@ -1317,6 +1392,8 @@ int main(int argc, char * argv[]) {
                  tauJetEta_ = lorentzVectorTauJet.Eta();
                  tauJetPhi_ = lorentzVectorTauJet.Phi();
                  if (era == "2017") tauJetTightId_ = tightJetiD_2017(analysisTree,indexMatchingJet);
+                 else if (era == "2018")  tauJetTightId_ = tightJetiD_2018(analysisTree,indexMatchingJet);
+		 else if (era == "2016") tauJetTightId_ = tightJetiD_2016(analysisTree,indexMatchingJet);
                  else {
                     std::cout<<"Jet Id for tau faking jets not set (in jet + tau selection) in era "<<era<<std::endl;
                     exit(-1);
@@ -1377,7 +1454,31 @@ int main(int argc, char * argv[]) {
                  
                  tauAntiMuonLoose3_ = analysisTree.tau_againstMuonLoose3[indexTau] > 0.5;
                  tauAntiMuonTight3_ = analysisTree.tau_againstMuonTight3[indexTau] > 0.5;
-                 
+
+                 taubyDeepTau2017v2VSeraw_ = analysisTree.tau_byDeepTau2017v2VSeraw[indexTau] > 0.5;
+                 taubyDeepTau2017v2VSjetraw_ = analysisTree.tau_byDeepTau2017v2VSjetraw[indexTau] > 0.5;
+                 taubyDeepTau2017v2VSmuraw_ = analysisTree.tau_byDeepTau2017v2VSmuraw[indexTau] > 0.5;
+                 taubyLooseDeepTau2017v2VSe_ = analysisTree.tau_byLooseDeepTau2017v2VSe[indexTau] > 0.5;
+                 taubyLooseDeepTau2017v2VSjet_ = analysisTree.tau_byLooseDeepTau2017v2VSjet[indexTau] > 0.5;
+                 taubyLooseDeepTau2017v2VSmu_ = analysisTree.tau_byLooseDeepTau2017v2VSmu[indexTau] > 0.5;
+                 taubyMediumDeepTau2017v2VSe_ = analysisTree.tau_byMediumDeepTau2017v2VSe[indexTau] > 0.5;
+                 taubyMediumDeepTau2017v2VSjet_ = analysisTree.tau_byMediumDeepTau2017v2VSjet[indexTau] > 0.5;
+                 taubyMediumDeepTau2017v2VSmu_ = analysisTree.tau_byMediumDeepTau2017v2VSmu[indexTau] > 0.5;
+                 taubyTightDeepTau2017v2VSe_ = analysisTree.tau_byTightDeepTau2017v2VSe[indexTau] > 0.5;
+                 taubyTightDeepTau2017v2VSjet_ = analysisTree.tau_byTightDeepTau2017v2VSjet[indexTau] > 0.5;
+                 taubyTightDeepTau2017v2VSmu_ = analysisTree.tau_byTightDeepTau2017v2VSmu[indexTau] > 0.5;
+                 taubyVLooseDeepTau2017v2VSe_ = analysisTree.tau_byVLooseDeepTau2017v2VSe[indexTau] > 0.5;
+                 taubyVLooseDeepTau2017v2VSjet_ = analysisTree.tau_byVLooseDeepTau2017v2VSjet[indexTau] > 0.5;
+                 taubyVLooseDeepTau2017v2VSmu_ = analysisTree.tau_byVLooseDeepTau2017v2VSmu[indexTau] > 0.5;
+                 taubyVTightDeepTau2017v2VSe_ = analysisTree.tau_byVTightDeepTau2017v2VSe[indexTau] > 0.5;
+                 taubyVTightDeepTau2017v2VSjet_ = analysisTree.tau_byVTightDeepTau2017v2VSjet[indexTau] > 0.5;
+                 taubyVVLooseDeepTau2017v2VSe_ = analysisTree.tau_byVVLooseDeepTau2017v2VSe[indexTau] > 0.5;
+                 taubyVVLooseDeepTau2017v2VSjet_ = analysisTree.tau_byVVLooseDeepTau2017v2VSjet[indexTau] > 0.5;
+                 taubyVVTightDeepTau2017v2VSe_ = analysisTree.tau_byVVTightDeepTau2017v2VSe[indexTau] > 0.5;
+                 taubyVVTightDeepTau2017v2VSjet_ = analysisTree.tau_byVVTightDeepTau2017v2VSjet[indexTau] > 0.5;
+                 taubyVVVLooseDeepTau2017v2VSe_ = analysisTree.tau_byVVVLooseDeepTau2017v2VSe[indexTau] > 0.5;
+                 taubyVVVLooseDeepTau2017v2VSjet_ = analysisTree.tau_byVVVLooseDeepTau2017v2VSjet[indexTau] > 0.5;
+
                  recoilDPhi_ = dPhiFromLV(tauLV,recoilJetLV);
                  recoilJetRatio_ = lorentzVectorTauJet.Pt()/recoilJetLV.Pt();
                  recoilJetDPhi_ = dPhiFromLV(lorentzVectorTauJet,recoilJetLV);
@@ -1389,7 +1490,7 @@ int main(int argc, char * argv[]) {
                  SoftHtNoRecoil_ = SoftHt_ - recoilJetLV.Pt();
                  dPhiMetTau_= dPhiFromLV(lorentzVectorMet,lorentzVectorTau);
                  selection_ = 4;
-                 if(!tauDM_) continue;
+                 if(!tauDM_ && !tauNewDM_) continue;
                  ntuple_->Fill();
               }
            } // END: loop over tau

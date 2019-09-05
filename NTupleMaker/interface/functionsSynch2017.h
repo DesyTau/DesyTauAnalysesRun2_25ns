@@ -406,8 +406,22 @@ bool extra_electron_veto(int leptonIndex, TString ch, const Config *cfg, const A
     if (fabs(analysisTree->electron_dxy[ie])>=cfg->get<float>("dxyVetoElectronCut")) continue;
     if (fabs(analysisTree->electron_dz[ie])>=cfg->get<float>("dzVetoElectronCut")) continue;
 
-    bool electronMvaId = analysisTree->electron_mva_wp90_general_Spring16_v1[ie]; //analysisTree->electron_mva_wp90_nontrig_Synch17_v1[ie];
-    if (!electronMvaId && cfg->get<bool>("applyVetoElectronId")) continue;
+    int era=cfg->get<int>("era");
+    bool electronMvaId;
+
+     if (era==2016) {
+         electronMvaId = analysisTree->electron_mva_wp90_general_Spring16_v1[ie]>0.5; 
+      }
+      else if (era ==2017){
+         electronMvaId = analysisTree->electron_mva_wp90_noIso_Fall17_v1[ie]>0.5;
+      }
+      else if (era == 2018){
+         electronMvaId = analysisTree->electron_mva_wp90_noIso_Fall17_v1[ie]>0.5;
+      }
+
+     if (!electronMvaId && cfg->get<bool>("applyVetoElectronId")) continue;
+
+    /* Merijn 2019 8 20: in the analysis note this is NOT mentioned for the mt channel, but it is mentioned in the twiki on legacy data. We keep it in */
     if (!analysisTree->electron_pass_conversion[ie] && cfg->get<bool>("applyVetoElectronId")) continue;
     if (analysisTree->electron_nmissinginnerhits[ie]>1 && cfg->get<bool>("applyVetoElectronId")) continue;
 
@@ -459,6 +473,42 @@ void fillMET(TString ch, int leptonIndex, int tauIndex, const AC1B * analysisTre
 
   float met_x2 = met_x * met_x;
   float met_y2 = met_y * met_y;
+
+}
+
+//Merijn 2019 6 20: added overloaded function, takes era as argument. Will do MET correct for 2016 2017, will need later to extend to 2018
+void fillMET(TString ch, int leptonIndex, int tauIndex, const AC1B * analysisTree, Synch17Tree *otree, int era){
+
+   // pfmet variables
+  if(era==2018){
+  otree->met = TMath::Sqrt(analysisTree->pfmet_ex*analysisTree->pfmet_ex + analysisTree->pfmet_ey*analysisTree->pfmet_ey);
+  otree->metphi = TMath::ATan2(analysisTree->pfmet_ey,analysisTree->pfmet_ex);
+  otree->metcov00 = analysisTree->pfmet_sigxx;
+  otree->metcov01 = analysisTree->pfmet_sigxy;
+  otree->metcov10 = analysisTree->pfmet_sigyx;
+  otree->metcov11 = analysisTree->pfmet_sigyy;
+  float met_x = analysisTree->pfmet_ex;
+  float met_y = analysisTree->pfmet_ey;
+
+  float met_x2 = met_x * met_x;
+  float met_y2 = met_y * met_y;}
+else{
+//cout<<"use pfmetcorr, era = "<<era<<endl;
+  otree->met = TMath::Sqrt(analysisTree->pfmetcorr_ex*analysisTree->pfmetcorr_ex + analysisTree->pfmetcorr_ey*analysisTree->pfmetcorr_ey);
+  otree->metphi = TMath::ATan2(analysisTree->pfmetcorr_ey,analysisTree->pfmetcorr_ex);
+  otree->metcov00 = analysisTree->pfmetcorr_sigxx;
+  otree->metcov01 = analysisTree->pfmetcorr_sigxy;
+  otree->metcov10 = analysisTree->pfmetcorr_sigyx;
+  otree->metcov11 = analysisTree->pfmetcorr_sigyy;
+  float met_x = analysisTree->pfmetcorr_ex;
+  float met_y = analysisTree->pfmetcorr_ey;
+
+  float met_x2 = met_x * met_x;
+  float met_y2 = met_y * met_y;
+
+}
+
+
 
 }
 

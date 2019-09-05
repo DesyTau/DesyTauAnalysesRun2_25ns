@@ -13,7 +13,6 @@
 #include "TROOT.h"
 #include "TLorentzVector.h"
 #include "TVector3.h"
-#include "TRFIOFile.h"
 #include "TH1F.h"
 #include "TH1D.h"
 #include "TChain.h"
@@ -24,9 +23,14 @@
 #include "TGraphAsymmErrors.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/AC1B.h"
 #include "TLorentzVector.h"
-
+#include "TSystem.h"
 #include "TRandom.h"
+#include "CondFormats/BTauObjects/interface/BTagCalibration.h"
+#include "CondTools/BTau/interface/BTagCalibrationReader.h"
 
+#include "RooWorkspace.h"
+#include "RooAbsReal.h"
+#include "RooRealVar.h"
 
 bool metFiltersPasses(AC1B &tree_, std::vector<TString> metFlags, bool isData) {
 
@@ -78,7 +82,7 @@ void iniPU(PileUp *PUofficial, TFile *filePUOfficial_data, TFile *filePUOfficial
 {
    // Official PU reweighting
    TH1D * PUOfficial_data = (TH1D *)filePUOfficial_data->Get("pileup");
-   TString NamePUHistMC = samplenameForPUHist + "_pileup";
+   TString NamePUHistMC = samplenameForPUHist + "pileup";
    TH1D * PUOfficial_mc = (TH1D *)filePUOfficial_MC->Get(NamePUHistMC);
    if( !PUOfficial_mc) {
       cout<<endl<<"MC pileup histogram "<<NamePUHistMC<<" does not exist in root file. Exiting."<<endl<<endl;
@@ -133,8 +137,10 @@ bool GoodRunSelection(int n, int lum,std::vector<Period> &periods){
    return lumi;
 }  
 
-void AccessTriggerInfo(AC1B &analysisTree, TString HLTFilterName, unsigned int &nHLTFilter, bool &isHLTFilter)
+bool AccessTriggerInfo(AC1B &analysisTree, TString HLTFilterName, unsigned int &nHLTFilter)
 {
+   bool isHLTFilter = false;
+   
    for (unsigned int i=0; i<analysisTree.run_hltfilters->size(); ++i) {
       TString HLTFilter(analysisTree.run_hltfilters->at(i));
       if (HLTFilter==HLTFilterName) {
@@ -142,11 +148,7 @@ void AccessTriggerInfo(AC1B &analysisTree, TString HLTFilterName, unsigned int &
          isHLTFilter = true;
       }
    }
-   
-   if (!isHLTFilter) {
-      std::cout << "HLT filter " << HLTFilterName << " not found" << std::endl;
-      exit(-1);
-   }
+   return isHLTFilter;
 }
 
 bool PassesMuonSelection(AC1B &analysisTree, unsigned int imuon, const float ptMuCut, const float etaMuCut,const float dxyMuCut,const float dzMuCut,const bool isDRIso03, const float isoMuCut, float &relIso, const string era)
@@ -156,8 +158,9 @@ bool PassesMuonSelection(AC1B &analysisTree, unsigned int imuon, const float ptM
    if (analysisTree.muon_pt[imuon]<ptMuCut) passes=false;
    if (fabs(analysisTree.muon_eta[imuon])>etaMuCut) passes=false;
    
+   // source  : https://twiki.cern.ch/twiki/bin/view/CMS/SWGuideMuonIdRun2
    bool passedId = false;
-   if (era=="2017") passedId = analysisTree.muon_isMedium[imuon];
+   if (era=="2017" || era=="2018" || era=="2016") passedId = analysisTree.muon_isMedium[imuon];
    else {
       std::cout<<"Muon Id not defined for era "<<era<<std::endl;
       exit(-1);
@@ -192,12 +195,12 @@ bool PassesMuonSelection(AC1B &analysisTree, unsigned int imuon, const float ptM
    return passes;
 }
 
-bool TriggerMatching(AC1B &analysisTree, Float_t eta, Float_t phi, unsigned int nFilter)
+bool TriggerMatching(AC1B &analysisTree, Float_t eta, Float_t phi, unsigned int nFilter, float deltaRTrigMatch = 0.5)
 {
    bool trigMatch = false;
    for (unsigned int iT=0; iT<analysisTree.trigobject_count; ++iT) {
       float dRtrig = deltaR(eta,phi,analysisTree.trigobject_eta[iT],analysisTree.trigobject_phi[iT]);
-      if (dRtrig>0.5) continue;
+      if (dRtrig> deltaRTrigMatch) continue;
       if (analysisTree.trigobject_filters[iT][nFilter]) trigMatch = true;
       
    }
@@ -209,11 +212,20 @@ bool PassesElectronSelection(AC1B &analysisTree, unsigned int ielec , const floa
 {
    bool passes = false;
    
+   // https://twiki.cern.ch/twiki/bin/view/CMS/EgammaRunIIRecommendations#Fall17v2
    bool passedId = false;
    if (era == "2017") passedId =
                          analysisTree.electron_cutId_veto_Summer16[ielec] &&
                          analysisTree.electron_pass_conversion[ielec] &&
                          analysisTree.electron_nmissinginnerhits[ielec] <= 1;           
+   else if (era == "2016")  passedId =
+                         analysisTree.electron_cutId_veto_Fall17V2[ielec] &&
+                         analysisTree.electron_pass_conversion[ielec] &&
+                         analysisTree.electron_nmissinginnerhits[ielec] <= 1;
+   else if (era == "2018")  passedId =
+                         analysisTree.electron_cutId_veto_Fall17[ielec] &&
+                         analysisTree.electron_pass_conversion[ielec] &&
+                         analysisTree.electron_nmissinginnerhits[ielec] <= 1;
    else {
       std::cout<<"Electron Id not defined for era "<<era<<std::endl;
       exit(-1);
@@ -337,7 +349,7 @@ UInt_t FindTauGenMatch(AC1B &analysisTree, Float_t tauEta, Float_t tauPhi)
                            etaGen,phiGen);
          if (dR<minDR) {
             minDR = dR;
-            if (type1) tauGenMatch_ = 1;
+            if (type1) tauGenMatch = 1;
             else if (type2) tauGenMatch = 2;
             else if (type3) tauGenMatch = 3;
             else if (type4) tauGenMatch = 4;
@@ -370,7 +382,296 @@ int MatchingJet(AC1B &analysisTree, TLorentzVector lorentzVectorTau, bool &jetFo
    return indexMatchingJet;
 }
 
+float getEffectiveArea(float eta) {
+    float effArea = 0.1566;
+    float absEta = fabs(eta);
+    if (absEta<1.0) effArea = 0.1566;
+    else if (absEta < 1.4790) effArea = 0.1626;
+    else if (absEta < 2.0) effArea = 0.1073;
+    else if (absEta < 2.2) effArea = 0.0854;
+    else if (absEta < 2.3) effArea = 0.1051;
+    else if (absEta < 2.4) effArea = 0.1204;
+    else if (absEta < 5.0) effArea = 0.1524;
+    return effArea;
 
+  } 
 
-                  
+void LoadCrystalBallEfficiencyClass( TString pathToCrystalLib){
+   int openSuccessful = gSystem->Load( pathToCrystalLib );
+   if (openSuccessful !=0 ) {
+      cout<<pathToCrystalLib<<" not found. Please create this file by running \"root -l -q CrystalBallEfficiency.cxx++\" in src/HTT-utilities/CorrectionsWorkspace/. "<<endl;
+      exit( -1 );
+   }
+}                  
              
+
+void LoadZpTMassWeights(TFile *fileZMassPtWeights, TString ZMassPtWeightsFileName, TH2D* histZMassPtWeights, TString ZMassPtWeightsHistName){
+ 
+   if (fileZMassPtWeights->IsZombie()) {
+      std::cout << "File /src/" << ZMassPtWeightsFileName << "  does not exist!" << std::endl;
+      exit(-1);
+   }
+   if (histZMassPtWeights==NULL) {
+      std::cout << "histogram " << ZMassPtWeightsHistName << " is not found in file /src/DesyTauAnalyses/NTupleMaker/data/" << ZMassPtWeightsFileName
+                << std::endl;
+      exit(-1);
+   }
+}
+
+void  FillHistGenWeights( TTree *_inittree, TH1D* histWeightsH, bool isData){
+
+   if (_inittree!=NULL) {
+      Float_t genweight;
+      if (!isData)
+         _inittree->SetBranchAddress("genweight",&genweight);
+      Long64_t numberOfEntriesInitTree = _inittree->GetEntries();
+      std::cout << "      number of entries in Init Tree = " << numberOfEntriesInitTree << std::endl;
+      for (Long64_t iEntry=0; iEntry<numberOfEntriesInitTree; iEntry++) {
+         _inittree->GetEntry(iEntry);
+         if (isData)
+            histWeightsH->Fill(0.,1.);
+         else
+            histWeightsH->Fill(0.,genweight);
+      }
+   }
+}
+
+bool FillHistInputEvents(TFile *file_, TH1D*inputEventsH){
+   
+   bool hasInputEvents = true;
+   TH1D * histoInputEvents = NULL;
+   histoInputEvents = (TH1D*)file_->Get("makeroottree/nEvents");
+   if (histoInputEvents==NULL) hasInputEvents = false;
+   int NE = int(histoInputEvents->GetEntries());
+   std::cout << "      number of input events    = " << NE << std::endl;
+   for (int iE=0;iE<NE;++iE)
+      inputEventsH->Fill(0.);
+   return hasInputEvents;
+}
+
+Float_t GetEmbeddedWeight(std::vector<TLorentzVector> promptTausFirstCopy, RooWorkspace *correctionWS_embedded){
+   
+   Float_t embeddedWeight = 1.0;
+   double gt1_pt  = promptTausFirstCopy[0].Pt();
+   double gt1_eta = promptTausFirstCopy[0].Eta();
+   double gt2_pt  = promptTausFirstCopy[1].Pt();
+   double gt2_eta = promptTausFirstCopy[1].Eta();
+   correctionWS_embedded->var("gt_pt")->setVal(gt1_pt);
+   correctionWS_embedded->var("gt_eta")->setVal(gt1_eta);
+   double id1_embed = correctionWS_embedded->function("m_sel_idEmb_ratio")->getVal();
+   correctionWS_embedded->var("gt_pt")->setVal(gt2_pt);
+   correctionWS_embedded->var("gt_eta")->setVal(gt2_eta);
+   double id2_embed = correctionWS_embedded->function("m_sel_idEmb_ratio")->getVal();
+   correctionWS_embedded->var("gt1_pt")->setVal(gt1_pt);
+   correctionWS_embedded->var("gt1_eta")->setVal(gt1_eta);
+   correctionWS_embedded->var("gt2_pt")->setVal(gt2_pt);
+   correctionWS_embedded->var("gt2_eta")->setVal(gt2_eta);
+   double trg_embed = correctionWS_embedded->function("m_sel_trg_ratio")->getVal();
+   embeddedWeight = id1_embed * id2_embed * trg_embed;
+
+   return embeddedWeight;
+}
+
+Float_t GetZptMassWeight(Float_t bosonMass, Float_t bosonPt, TH2D * histZMassPtWeights){
+   
+   Float_t zptmassweight = 1;
+   if (bosonMass>50.0) {
+      float bosonMassX = bosonMass;
+      float bosonPtX = bosonPt;
+      if (bosonMassX>1000.) bosonMassX = 1000.;
+      if (bosonPtX<1.)      bosonPtX = 1.;
+      if (bosonPtX>1000.)   bosonPtX = 1000.;
+      zptmassweight = histZMassPtWeights->GetBinContent(histZMassPtWeights->GetXaxis()->FindBin(bosonMassX),
+                                                        histZMassPtWeights->GetYaxis()->FindBin(bosonPtX));
+   }
+   return zptmassweight;
+}
+
+
+void SearchForBtagDiscriminant(AC1B &analysisTree, TString BTagDiscriminator1, TString BTagDiscriminator2, unsigned int &nBTagDiscriminant1, unsigned int &nBTagDiscriminant2, TString era){
+
+   for (unsigned int iBTag=0; iBTag < analysisTree.run_btagdiscriminators->size(); ++iBTag) {
+      TString discr(analysisTree.run_btagdiscriminators->at(iBTag));
+      if (discr == BTagDiscriminator1)
+         nBTagDiscriminant1 = iBTag;
+      if (era!="2016" && discr == BTagDiscriminator2)
+         nBTagDiscriminant2 = iBTag;
+   }
+}
+
+void SelectMuonElePair(AC1B &analysisTree, vector<int> muons, vector<int> electrons, bool isMuonIsoR03, bool isElectronIsoR03, float dRleptonsCut, float ptMuonHighCut, float ptElectronHighCut, int &electronIndex, int &muonIndex, float &isoMuMin, float &isoEleMin, TString era){
+         
+   for (unsigned int im=0; im<muons.size(); ++im) {
+      unsigned int mIndex  = muons.at(im);
+      float neutralHadIsoMu = analysisTree.muon_neutralHadIso[mIndex];
+      float photonIsoMu = analysisTree.muon_photonIso[mIndex];
+      float chargedHadIsoMu = analysisTree.muon_chargedHadIso[mIndex];
+      float puIsoMu = analysisTree.muon_puIso[mIndex];
+      if (isMuonIsoR03) {
+         neutralHadIsoMu = analysisTree.muon_r03_sumNeutralHadronEt[mIndex];
+         photonIsoMu = analysisTree.muon_r03_sumPhotonEt[mIndex];
+         chargedHadIsoMu = analysisTree.muon_r03_sumChargedHadronPt[mIndex];
+         puIsoMu = analysisTree.muon_r03_sumPUPt[mIndex];
+      }
+      float neutralIsoMu = neutralHadIsoMu + photonIsoMu - 0.5*puIsoMu;
+      neutralIsoMu = TMath::Max(float(0),neutralIsoMu);
+      float absIsoMu = chargedHadIsoMu + neutralIsoMu;
+      float relIsoMu = absIsoMu/analysisTree.muon_pt[mIndex];
+      
+      for (unsigned int ie=0; ie<electrons.size(); ++ie) {
+         unsigned int eIndex = electrons.at(ie);
+         float dR = deltaR(analysisTree.electron_eta[eIndex],analysisTree.electron_phi[eIndex],
+                           analysisTree.muon_eta[mIndex],analysisTree.muon_phi[mIndex]);
+         
+         if (dR<dRleptonsCut) continue;
+         
+         bool trigMatch =
+            (analysisTree.muon_pt[mIndex]>ptMuonHighCut) ||
+            (analysisTree.electron_pt[eIndex]>ptElectronHighCut);
+         if (!trigMatch) continue;
+         
+         float absIsoEle; 
+         float relIsoEle;
+         if (era=="2016"){
+            float neutralHadIsoEle = analysisTree.electron_neutralHadIso[eIndex];
+            float photonIsoEle = analysisTree.electron_photonIso[eIndex];
+            float chargedHadIsoEle = analysisTree.electron_chargedHadIso[eIndex];
+            float puIsoEle = analysisTree.electron_puIso[eIndex];
+            if (isElectronIsoR03) {
+               neutralHadIsoEle = analysisTree.electron_r03_sumNeutralHadronEt[eIndex];
+               photonIsoEle = analysisTree.electron_r03_sumPhotonEt[eIndex];
+               chargedHadIsoEle = analysisTree.electron_r03_sumChargedHadronPt[eIndex];
+               puIsoEle = analysisTree.electron_r03_sumPUPt[eIndex];
+            }
+            float neutralIsoEle = neutralHadIsoEle + photonIsoEle - 0.5*puIsoEle;
+            neutralIsoEle = TMath::Max(float(0),neutralIsoEle);
+            absIsoEle =  chargedHadIsoEle + neutralIsoEle;
+            relIsoEle = absIsoEle/analysisTree.electron_pt[eIndex];
+         }
+         else {
+            float rhoNeutral = analysisTree.rho;
+            float  eA = getEffectiveArea( fabs(analysisTree.electron_superclusterEta[eIndex]) );
+            absIsoEle = analysisTree.electron_r03_sumChargedHadronPt[eIndex] +
+               TMath::Max(0.0f,analysisTree.electron_r03_sumNeutralHadronEt[eIndex]+analysisTree.electron_r03_sumPhotonEt[eIndex]-eA*rhoNeutral);
+            relIsoEle = absIsoEle/analysisTree.electron_pt[eIndex];
+         }
+         if (int(mIndex)!=muonIndex) {
+            if (relIsoMu==isoMuMin) {
+               if (analysisTree.muon_pt[mIndex]>analysisTree.muon_pt[muonIndex]) {
+                  isoMuMin  = relIsoMu;
+                  muonIndex = int(mIndex);
+                  isoEleMin = relIsoEle;
+                  electronIndex = int(eIndex);
+               }
+            }
+            else if (relIsoMu<isoMuMin) {
+               isoMuMin  = relIsoMu;
+               muonIndex = int(mIndex);
+               isoEleMin = relIsoEle;
+               electronIndex = int(eIndex);
+            }
+         }
+         else {
+            if (relIsoEle==isoEleMin) {
+               if (analysisTree.electron_pt[eIndex]>analysisTree.electron_pt[electronIndex]) {
+                  isoEleMin = relIsoEle;
+                  electronIndex = int(eIndex);
+               }
+            }
+            else if (relIsoEle<isoEleMin) {
+               isoEleMin = relIsoEle;
+               electronIndex = int(eIndex);
+            }
+         }
+      }
+   }
+}
+
+
+bool ElectronVeto(AC1B &analysisTree, int electronIndex, float ptVetoElectronCut, float etaVetoElectronCut, float dxyVetoElectronCut, float dzVetoElectronCut, TString era, bool applyVetoElectronId, bool isElectronIsoR03, float isoVetoElectronCut){
+ 
+   bool foundExtraElectron = false;
+   for (unsigned int ie = 0; ie<analysisTree.electron_count; ++ie) {
+      if (int(ie)==electronIndex) continue;
+      if (analysisTree.electron_pt[ie]<ptVetoElectronCut) continue;
+      if (fabs(analysisTree.electron_eta[ie])>etaVetoElectronCut) continue;
+      if (fabs(analysisTree.electron_dxy[ie])>dxyVetoElectronCut) continue;
+      if (fabs(analysisTree.electron_dz[ie])>dzVetoElectronCut) continue; 
+      bool electronMvaId = true;
+      if (era=="2016") {
+         electronMvaId = analysisTree.electron_mva_wp90_general_Spring16_v1[ie]>0.5; 
+      }
+      else if (era == "2017"){
+         electronMvaId = analysisTree.electron_mva_wp90_noIso_Fall17_v1[ie]>0.5;
+      }
+      else if (era == "2018"){
+         electronMvaId = analysisTree.electron_mva_wp90_noIso_Fall17_v1[ie]>0.5;
+      }
+      if (!electronMvaId&&applyVetoElectronId) continue;
+      if (!analysisTree.electron_pass_conversion[ie]&&applyVetoElectronId) continue;
+ 
+      if (analysisTree.electron_nmissinginnerhits[ie]>1&&applyVetoElectronId) continue;
+      float relIsoEle;
+      float absIsoEle;
+      if (era=="2016"){
+         float neutralHadIsoEle = analysisTree.electron_neutralHadIso[ie];
+         float photonIsoEle = analysisTree.electron_photonIso[ie];
+         float chargedHadIsoEle = analysisTree.electron_chargedHadIso[ie];
+         float puIsoEle = analysisTree.electron_puIso[ie];
+               if (isElectronIsoR03) {                                               
+                  neutralHadIsoEle = analysisTree.electron_r03_sumNeutralHadronEt[ie];
+                  photonIsoEle = analysisTree.electron_r03_sumPhotonEt[ie];
+                  chargedHadIsoEle = analysisTree.electron_r03_sumChargedHadronPt[ie];
+                  puIsoEle = analysisTree.electron_r03_sumPUPt[ie];
+               }
+               float neutralIsoEle = neutralHadIsoEle + photonIsoEle - 0.5*puIsoEle;
+               neutralIsoEle = TMath::Max(float(0),neutralIsoEle);
+               absIsoEle =  chargedHadIsoEle + neutralIsoEle;
+               relIsoEle = absIsoEle/analysisTree.electron_pt[ie];
+            }
+      else {
+         float rhoNeutral = analysisTree.rho;
+         float  eA = getEffectiveArea( fabs(analysisTree.electron_superclusterEta[ie]) );
+         absIsoEle = analysisTree.electron_r03_sumChargedHadronPt[ie] +
+            TMath::Max(0.0f,analysisTree.electron_r03_sumNeutralHadronEt[ie]+analysisTree.electron_r03_sumPhotonEt[ie]-eA*rhoNeutral);
+         relIsoEle = absIsoEle/analysisTree.electron_pt[ie];
+      }
+      if (relIsoEle>isoVetoElectronCut) continue;
+ 
+      foundExtraElectron = true;
+   }
+   return foundExtraElectron;
+}
+
+bool MuonVeto(AC1B &analysisTree, int muonIndex, float ptVetoMuonCut, float etaVetoMuonCut, float dxyVetoMuonCut, float dzVetoMuonCut, bool applyICHEPMuonId, bool applyVetoMuonId, bool isMuonIsoR03, float isoVetoMuonCut){
+   
+   bool foundExtraMuon = false;
+   for (unsigned int im = 0; im<analysisTree.muon_count; ++im) {
+      if (int(im)==muonIndex) continue;
+      if (analysisTree.muon_pt[im]<ptVetoMuonCut) continue;
+      if (fabs(analysisTree.muon_eta[im])>etaVetoMuonCut) continue;
+      if (fabs(analysisTree.muon_dxy[im])>dxyVetoMuonCut) continue;
+      if (fabs(analysisTree.muon_dz[im])>dzVetoMuonCut) continue;
+      bool muonId = analysisTree.muon_isMedium[im];
+      if (applyICHEPMuonId) muonId = analysisTree.muon_isICHEP[im];
+      if (!muonId&&applyVetoMuonId) continue;
+      float neutralHadIsoMu = analysisTree.muon_neutralHadIso[im];
+      float photonIsoMu = analysisTree.muon_photonIso[im];
+      float chargedHadIsoMu = analysisTree.muon_chargedHadIso[im];
+      float puIsoMu = analysisTree.muon_puIso[im];
+      if (isMuonIsoR03) {
+         neutralHadIsoMu = analysisTree.muon_r03_sumNeutralHadronEt[im];
+         photonIsoMu = analysisTree.muon_r03_sumPhotonEt[im];
+         chargedHadIsoMu = analysisTree.muon_r03_sumChargedHadronPt[im];
+         puIsoMu = analysisTree.muon_r03_sumPUPt[im];
+      }
+      float neutralIsoMu = neutralHadIsoMu + photonIsoMu - 0.5*puIsoMu;
+      neutralIsoMu = TMath::Max(float(0),neutralIsoMu);
+      float absIsoMu = chargedHadIsoMu + neutralIsoMu;
+      float relIsoMu = absIsoMu/analysisTree.muon_pt[im];
+      if (relIsoMu>isoVetoMuonCut) continue;
+      foundExtraMuon = true;
+   }
+   
+   return foundExtraMuon;
+}

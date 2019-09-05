@@ -23,13 +23,13 @@ void Plot_lept_mutau_Updated(TString Variable = "m_vis",
 			     float xmin =    0,
 			     float xmax =  300,
 			     TString Weight = "puweight*effweight*mcweight*",
-			     TString Cuts = "&&iso_1<0.15&&extraelec_veto<0.5&&extramuon_veto<0.5&&pt_1>20&&pt_2>20&&mva17_2>0.5&&mt_1<60&&againstMuonTight3_2>0.5&&againstElectronVLooseMVA6_2>0.5&&(singleLepTrigger>0.5||xTrigger>0.5)",//&&mva17_2>0.5&&mt_1<60
+			     TString Cuts = "&&iso_1<0.15&&extraelec_veto<0.5&&extramuon_veto<0.5&&pt_1>20&&pt_2>30&&mva17_2>0.5&&mt_1<50&&againstMuonTight3_2>0.5&&againstElectronVLooseMVA6_2>0.5&&(singleLepTrigger>0.5||xTrigger>0.5)",//&&mva17_2>0.5&&mt_1<60&&(m_vis>60&&m_vis<90)
 			     TString ytitle = "Events",
-			     TString DataFile = "DATA_SingleMuon",
-			     TString directory = "/nfs/dust/cms/user/cardinia/HtoTauTau/CMSSW_9_4_0_patch1/src/DesyTauAnalyses/NTupleMaker/test/mutau/",
-			     TString outputDir = "/nfs/dust/cms/user/tlenz/Plots/",
+			     TString DataFile = "DATA_SingleMuon",//"SingleMuon_Run2017",
+			     TString directory = "./mutau_2019_5_9_SVFit_DijetpT/",//"./mutau_2019_4_8/",
+			     TString outputDir = "./Plots/",
 			     TString Suffix = "MuTau_",        // for name of pdf
-			     TString suffix = "",                      // for name of pdf
+			     TString suffix = "_nocut",                      // for name of pdf
 			     bool logY = false, 
 			     //double lumi = 14350  //RunsBC
 			     //double lumi = 13463  //MuF
@@ -39,6 +39,7 @@ void Plot_lept_mutau_Updated(TString Variable = "m_vis",
 
   TH1::SetDefaultSumw2();
   SetStyle();
+  const int nSamples = 16;
 
   // some settings
   bool blindData = false;  
@@ -58,26 +59,28 @@ void Plot_lept_mutau_Updated(TString Variable = "m_vis",
   TString zptmassweight="1.0*";                  //TO DO: CHANGE WEIGHTs
    
   // These samples names should match the root file names (-> sampleNames[i].root is read in later)
-  TString sampleNames[15] = {
-    DataFile, // data (0)
-    "DYJetsToLL",     // isZTT  (1)
-    "DYJetsToLL",     // !isZTT (2)
-    "WJetsToLNu",      // (3)
-    "TTTo2L2Nu",               // (4)
-    "TTToHadronic",               // (5)
-    "TTToSemiLeptonic", //(6)
-    "ST_tW_antitop", // (7)
-    "ST_tW_top",     // (8)
-    "ST_t_antitop",//(9)
-    "ST_t_top",//(10)
-    "WW",  // (11)
-    "WZ",     // (12)
-    "ZZ",             // (13)
-    "ggH_125" // (14) 
+  TString sampleNames[16] = {
+        DataFile, // data (0)
+        "DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8",// (1)Drell-Yan Z->TT
+        "DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8", // (2)Drell-Yan Z->LL
+        "WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8",// (3)WJets
+        "TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8",//(4)TTbar leptonic
+        "TTToHadronic_TuneCP5_PSweights_13TeV-powheg-pythia8",//(5) hadronic
+        "TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powheg-pythia8",//(6) semileptonic
+        "ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8", // (7) SingleTop tW tbar
+        "ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8", // (8) SingleTop tW t
+        "ST_t-channel_antitop_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8",// (9) SingleTop t antitop
+        "ST_t-channel_top_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8",// (10) SingleTop t top
+        "WW_TuneCP5_13TeV-pythia8",// (11)WW
+        "WZ_TuneCP5_13TeV-pythia8",// (12)WZ
+        "ZZ_TuneCP5_13TeV-pythia8",// (13)ZZ
+	"GluGluHToTauTau_M125_13TeV_powheg_pythia8", // (14) Scalar
+	"GluGluHToTauTau_M125_13TeV_powheg_pythia8" // (14) Scalar
+	//	"HPseudoScalar" // (15) Pseudoscalar 
   };
 
   // Corresponding cross sections
-  double xsec[15] = {1, // data (0)
+  double xsec[16] = {1, // data (0)
 		     5765.4,  // DY(50) (1)
 		     5765.4,  // DY(50) (2)
 		     Wnorm*61526.7,// WJets (3)
@@ -91,7 +94,8 @@ void Plot_lept_mutau_Updated(TString Variable = "m_vis",
 		     63.21, // WW   (11)
 		     22.82,  // WZ    (12)
 		     10.32,  // ZZ      (13)
-		     43.92*0.0632*10  // signal gg->Higgs times 10 !!! (14)
+		     3.05*50,//43.92*0.0632*100,  // signal gg->Higgs times 10 ! (14)
+		     3.05*50//43.92*0.0632*100  // signal gg->Higgs times 10 ! (15)
   };     
 
 
@@ -99,15 +103,15 @@ void Plot_lept_mutau_Updated(TString Variable = "m_vis",
   // ***** Selection Cuts    *******
   // *******************************
 
-  TString cuts[15];
-  TString cutsSS[15];
+  TString cuts[16];
+  TString cutsSS[16];
 
   // MC specific cuts to select certain type of particle
   TString isZTT="&&(((gen_match_1==3||gen_match_1==4)&&gen_match_2==5)||((gen_match_2==3||gen_match_2==4)&&gen_match_1==5))";
   TString isZLL="&&!(((gen_match_1==3||gen_match_1==4)&&gen_match_2==5)||((gen_match_2==3||gen_match_2==4)&&gen_match_1==5))";
 
   // Selection cuts applied to all samples
-  for (int i=0; i<15; ++i) {
+  for (int i=0; i<nSamples; ++i) {
     cuts[i]   = Weight+"(os>0.5"+Cuts+")";
     cutsSS[i] = Weight+qcdweight+"(os<0.5"+Cuts+")";
   }
@@ -133,17 +137,16 @@ void Plot_lept_mutau_Updated(TString Variable = "m_vis",
   // ***** Filling Histograms ******
   // *******************************
 
-  TH1D * hist[15];
-  TH1D * histSS[15];
+  TH1D * hist[16];
+  TH1D * histSS[16];
 
-  int nSamples = 15;
 
   TCanvas * dummyCanv = new TCanvas("dummy","",500,500);
 
   // Draw main selection for all histograms in sampleNames
   for (int i=0; i<nSamples; ++i) {
 
-    cout << endl << sampleNames[i] << ":" << endl;
+   // cout << endl << sampleNames[i] << ":" << endl;
     // Reading input file
     TFile * file = new TFile( directory + sampleNames[i] + ".root");
 
@@ -154,9 +157,10 @@ void Plot_lept_mutau_Updated(TString Variable = "m_vis",
     // Calculate normalization of this sample
     double norm = xsec[i]*lumi/nWeightedEvents->GetSumOfWeights(); 
 
+/*
     cout << "xsec: " << xsec[i] << endl;
     cout << "lumi: " << lumi << endl;
-    cout << "norm: " << norm << endl;
+    cout << "norm: " << norm << endl;*/
 
     // Name and initialize histograms
     TString histName   = sampleNames[i] + Variable + "_ss";
@@ -164,7 +168,7 @@ void Plot_lept_mutau_Updated(TString Variable = "m_vis",
     hist[i]   = new TH1D(histName,"",nBins,xmin,xmax);
     histSS[i] = new TH1D(histNameSS,"",nBins,xmin,xmax);
 
-    cout << "Drawing ..." << endl;
+   // cout << "Drawing ..." << endl;
     tree->Draw(Variable+">>"+histName,cuts[i]);
     tree->Draw(Variable+">>"+histNameSS,cutsSS[i]);
 
@@ -172,9 +176,9 @@ void Plot_lept_mutau_Updated(TString Variable = "m_vis",
       {
 	hist[i]   -> Scale(norm);
 	histSS[i] -> Scale(norm);
+	cout << "sample " << sampleNames[i] << "  norm: "<<norm << endl;
       }
-
-    cout << sampleNames[i] << " : Entries = " << hist[i]->GetEntries() << " : Integral = " << hist[i]->Integral(0,nBins+1) << endl;
+	//    cout << sampleNames[i] << " : Entries = " << hist[i]->GetEntries() << " : Integral = " << hist[i]->Integral(0,nBins+1) << endl;
   }
   cout << endl;
   delete dummyCanv;
@@ -204,11 +208,11 @@ void Plot_lept_mutau_Updated(TString Variable = "m_vis",
   double refEvents[6] = {0,0,0,0,0,0};
 
   // redefine reference cross sections and reference samples
-  refSamples[0] = "WJetsToLNu";
-  refSamples[1] = "W1JetsToLNu";
-  refSamples[2] = "W2JetsToLNu";
-  refSamples[3] = "W3JetsToLNu";
-  refSamples[4] = "W4JetsToLNu";
+  refSamples[0] = "WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8";
+  refSamples[1] = "W1JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8";
+  refSamples[2] = "W2JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8";
+  refSamples[3] = "W3JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8";
+  refSamples[4] = "W4JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8";
   refXSec[0] = Wnorm*61527;
   refXSec[1] = Wnorm*1.221*9644.5;
   refXSec[2] = Wnorm*1.221*3144.5;
@@ -226,15 +230,15 @@ void Plot_lept_mutau_Updated(TString Variable = "m_vis",
     refEvents[iW] = nWeightedEvents->GetSumOfWeights();   //number of events with amc@NLO weight
   }
 
-  TString wSampleNames[9] = {"WJetsToLNu",
-			     "WJetsToLNu",
-			     "WJetsToLNu",
-			     "WJetsToLNu",
-			     "WJetsToLNu",
-			     "W1JetsToLNu",
-			     "W2JetsToLNu",
-			     "W3JetsToLNu",
-			     "W4JetsToLNu"
+  TString wSampleNames[9] = {"WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8",
+			     "WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8",
+			     "WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8",
+			     "WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8",
+			     "WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8",
+			     "W1JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8",
+			     "W2JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8",
+			     "W3JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8",
+			     "W4JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8"
   };
 
   double wNorm[9];
@@ -258,7 +262,7 @@ void Plot_lept_mutau_Updated(TString Variable = "m_vis",
 
   // filling histograms for WJets samples
   for (int i=0; i<nSamplesW; ++i) { // run over W+Jets samples
-
+    cout<< wSampleNames[i] <<endl;
     TFile * file = new TFile(directory+wSampleNames[i]+".root");
     TTree * tree = (TTree*)file->Get("TauCheck");
     double norm = wNorm[i];
@@ -288,33 +292,34 @@ void Plot_lept_mutau_Updated(TString Variable = "m_vis",
   // ********************************************
   // ***** Stitching of Drell-Yan samples *******
   // ********************************************
+  int nSamplesDY = 9;
 
-  TH1D * histZtt[10];
-  TH1D * histZttSS[10];
-  TH1D * histZll[10];
-  TH1D * histZllSS[10];
+  TH1D * histZtt[9];
+  TH1D * histZttSS[9];
+  TH1D * histZll[9];
+  TH1D * histZllSS[9];
 
-  refSamples[0] = "DYJetsToLL";
-  refSamples[1] = "DY1JetsToLL";
-  refSamples[2] = "DY2JetsToLL";
-  refSamples[3] = "DY3JetsToLL";
-  refSamples[4] = "DY4JetsToLL";
-  refSamples[5] = "DYJetsToLL_M-10to50";
+  refSamples[0] = "DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8";
+  refSamples[1] = "DY1JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8";
+  refSamples[2] = "DY2JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8";
+  refSamples[3] = "DY3JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8";
+  refSamples[4] = "DY4JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8";
+  //refSamples[5] = "DYJetsToLL_M-10to50";
 
   refXSec[0] = 5765;
   refXSec[1] = 1.164*1012.5;
   refXSec[2] = 1.164*332.8;
   refXSec[3] = 1.164*101.8;
   refXSec[4] = 1.164*54.8;
-  refXSec[5] = 15820;
+  //refXSec[5] = 15820;
 
-  for (int iDY=0; iDY<6; ++iDY) {
+  for (int iDY=0; iDY<5; ++iDY) {
     TFile * file = new TFile(directory+refSamples[iDY]+".root");
     TH1D * nWeightedEvents = (TH1D*)file->Get("nWeightedEvents");
     refEvents[iDY] = nWeightedEvents->GetSumOfWeights();
   }
 
-  TString npartonCutsDY[10] = {"&&(gen_noutgoing==0||gen_noutgoing>4)", //cut on inclusive sample
+  TString npartonCutsDY[9] = {"&&(gen_noutgoing==0||gen_noutgoing>4)", //cut on inclusive sample
 			       "&&gen_noutgoing==1",//cut on inclusive sample
 			       "&&gen_noutgoing==2",//cut on inclusive sample
 			       "&&gen_noutgoing==3",//cut on inclusive sample
@@ -322,23 +327,22 @@ void Plot_lept_mutau_Updated(TString Variable = "m_vis",
 			       "",
 			       "",
 			       "",
-			       "",
 			       ""
   };
 
-  TString dySampleNames[10] = {"DYJetsToLL",
-			       "DYJetsToLL",
-			       "DYJetsToLL",
-			       "DYJetsToLL",
-			       "DYJetsToLL",
-			       "DY1JetsToLL",
-			       "DY2JetsToLL",
-			       "DY3JetsToLL",
-			       "DY4JetsToLL",
-			       "DYJetsToLL_M-10to50"
+  TString dySampleNames[9] = {"DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8",
+			       "DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8",
+			       "DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8",
+			       "DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8",
+			       "DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8",
+			       "DY1JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8",
+			       "DY2JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8",
+			       "DY3JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8",
+			       "DY4JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8"//,
+			      //"DYJetsToLL_M-10to50"
   };
 
-  double dyNorm[10];
+  double dyNorm[9];
   dyNorm[0] = lumi*refXSec[0]/refEvents[0];
   dyNorm[1] = lumi/(refEvents[0]/refXSec[0]+refEvents[1]/refXSec[1]);
   dyNorm[2] = lumi/(refEvents[0]/refXSec[0]+refEvents[2]/refXSec[2]);
@@ -348,25 +352,24 @@ void Plot_lept_mutau_Updated(TString Variable = "m_vis",
   dyNorm[6] = lumi/(refEvents[0]/refXSec[0]+refEvents[2]/refXSec[2]);
   dyNorm[7] = lumi/(refEvents[0]/refXSec[0]+refEvents[3]/refXSec[3]);
   dyNorm[8] = lumi/(refEvents[0]/refXSec[0]+refEvents[4]/refXSec[4]);
-  dyNorm[9] = lumi*refXSec[5]/refEvents[5];
+  //dyNorm[9] = lumi*refXSec[5]/refEvents[5];
 
-  TString cutsZtt[10];
-  TString cutsZttSS[10];
-  TString cutsZll[10];
-  TString cutsZllSS[10];
+  TString cutsZtt[9];
+  TString cutsZttSS[9];
+  TString cutsZll[9];
+  TString cutsZllSS[9];
 
-  for (int iDY=0; iDY<10; ++iDY) {
+  for (int iDY=0; iDY<nSamplesDY; ++iDY) {
     cutsZtt[iDY]   = Weight+zptmassweight+"(os>0.5"+Cuts+npartonCutsDY[iDY]+isZTT+")";
     cutsZttSS[iDY] = Weight+zptmassweight+qcdweight+"(os<0.5"+Cuts+npartonCutsDY[iDY]+isZTT+")";
     cutsZll[iDY]   = Weight+zptmassweight+"(os>0.5"+Cuts+npartonCutsDY[iDY]+isZLL+")";
     cutsZllSS[iDY] = Weight+zptmassweight+qcdweight+"(os<0.5"+Cuts+npartonCutsDY[iDY]+isZLL+")";
   }
 
-  int nSamplesDY = 10;
 
   // filling histograms for DY samples
   for (int i=0; i<nSamplesDY; ++i) { // run over samples
-
+    cout<<dySampleNames[i]<<endl;
     TFile * file = new TFile(directory+dySampleNames[i]+".root");
     TTree * tree = (TTree*)file->Get("TauCheck");
     double norm = dyNorm[i];
@@ -400,7 +403,7 @@ void Plot_lept_mutau_Updated(TString Variable = "m_vis",
   hist[2]   = histZll[0];
   histSS[2] = histZllSS[0];
 
-  for (int iDY=1; iDY<10; ++iDY) {
+  for (int iDY=1; iDY<9; ++iDY) {
     hist[1]  -> Add(hist[1],histZtt[iDY]);
     hist[2]  -> Add(hist[2],histZll[iDY]);
     histSS[1]-> Add(histSS[1],histZttSS[iDY]);
@@ -458,8 +461,9 @@ void Plot_lept_mutau_Updated(TString Variable = "m_vis",
   TH1D * TT       = (TH1D*)hist[4]   -> Clone("TT");
   TH1D * VV       = (TH1D*)hist[7]   -> Clone("VV");
   TH1D * SMH      = (TH1D*)hist[14]  -> Clone("SMH");
-  for(int i=0;i<15;i++){
-    cout << setw(15) << sampleNames[i] << " : Entries = " << hist[i]->GetEntries() << " : Integral = " << hist[i]->Integral(0,nBins+1) << endl;
+  TH1D * BSMH     = (TH1D*)hist[15]  -> Clone("BSMH");
+  for(int i=0;i<nSamples;i++){
+    cout << setw(nSamples) << sampleNames[i] << " : Entries = " << hist[i]->GetEntries() << " : Integral = " << hist[i]->Integral(0,nBins+1) << endl;
   }
 
   cout << endl;
@@ -510,6 +514,7 @@ void Plot_lept_mutau_Updated(TString Variable = "m_vis",
     cout << "eQCD: " << eQCD << "  eVV: " << eVV << "  eW: " << eW << "  eTT: " << eTT << "  eTotal: " << errTot << endl;
     dummy -> SetBinError(iB,errTot);
     SMH   -> SetBinError(iB,0);
+    BSMH  -> SetBinError(iB,0);
   }
   cout << endl;
 
@@ -518,8 +523,10 @@ void Plot_lept_mutau_Updated(TString Variable = "m_vis",
   ///////////////////////////////////////////////////////////////////////////////////////////////
 
   ModTDRStyle();
-
-  TCanvas* canv1 = new TCanvas("c1", "c1");
+  bool LargeScale = true;  
+  TCanvas* canv1;
+  if(LargeScale)canv1 = new TCanvas("c1", "c1", 2000,800);
+  else canv1 = new TCanvas("c1", "c1", 1200,1000);
   canv1->cd();
   vector<TPad*> pads = TwoPadSplit(0.29, 0.00, 0.00);
   pads[0]->SetLogy(logY);
@@ -540,20 +547,21 @@ void Plot_lept_mutau_Updated(TString Variable = "m_vis",
   SetupTwoPadSplitAsRatio(pads, "Obs/Exp", true, 0.65, 1.35);
   StandardAxes(h[1]->GetXaxis(), h[0]->GetYaxis(),xtitle_ ,units);
   h[1] -> GetYaxis()->SetNdivisions(4);
-  h[1] -> GetXaxis()->SetTitleOffset(1.1);
+  h[1] -> GetXaxis()->SetTitleOffset(0.95);
   h[1] -> GetXaxis()->SetNdivisions(505);
-  h[1] -> GetYaxis()->SetTitleOffset(1.7);
+  h[1] -> GetYaxis()->SetTitleOffset(1.1);
+  if(LargeScale)  h[1] -> GetYaxis()->SetTitleOffset(0.9);
   pads[0] -> cd();
-  h[0] -> GetYaxis()->SetTitleOffset(2.1);
+  h[0] -> GetYaxis()->SetTitleOffset(1.6);
+  if(LargeScale)h[0] -> GetYaxis()->SetTitleOffset(1);
   pads[1] -> SetGrid(0,1);
   //it complains if the minimum is set to 0 and you try to set log y scale
   if(logY) h[0] -> SetMinimum(1);
   pads[0] -> cd();
 
   // Setup legend
-  TLegend *legend = PositionedLegend(0.40, 0.30, 3, 0.03);
+  TLegend *legend = PositionedLegend(0.25, 0.30, 3, 0.03);
   legend -> SetTextFont(42);
-
   histData -> SetMarkerColor(1);
   histData -> SetLineColor(1);
   histData -> SetFillColor(1);
@@ -589,11 +597,14 @@ void Plot_lept_mutau_Updated(TString Variable = "m_vis",
 
   canv1->Update();
 
-  InitSignal(SMH,2);
+  InitSignal(SMH ,2);
+  InitSignal(BSMH,4);
   if (showSignal)
     {
-      legend->AddEntry(SMH,"SM Higgs(125) #times 10","f");
+      legend->AddEntry(SMH,"SM Higgs(125) #times 50","f");
       SMH->Draw("hsame");
+      legend->AddEntry(BSMH,"BSM Higgs(125) #times 50","f");
+      BSMH->Draw("hsame");
     }
 
   canv1->Update();
@@ -668,8 +679,9 @@ void Plot_lept_mutau_Updated(TString Variable = "m_vis",
   else if (lumi== 13960) DrawTitle(pads[0], "14.0 fb^{-1} (13 TeV, 2017)", 3);
   else if (lumi== 41465) DrawTitle(pads[0], "41.5 fb^{-1} (13 TeV, 2017)", 3);
   else DrawTitle(pads[0], "42.8 fb^{-1} (13 TeV, 2017)", 3);
-  DrawTitle(pads[0], "#mu#tau", 1);
+  DrawTitle(pads[0], "#scale[1.2]{#bf{CMS} Work in progress}", 1);
   FixBoxPadding(pads[0], legend, 0.05);
+  //legend->SetNColumns(2);
   legend->Draw();
   FixOverlay();
   canv1->Update();
@@ -677,4 +689,5 @@ void Plot_lept_mutau_Updated(TString Variable = "m_vis",
 
   canv1 -> Print( outputDir + Suffix + DataFile + "_" + Variable + suffix + ".pdf" );
   canv1 -> Print( outputDir + Suffix + DataFile + "_" + Variable + suffix + ".eps" );
+  canv1 -> Print( outputDir + Suffix + DataFile + "_" + Variable + suffix + ".png" );
 }

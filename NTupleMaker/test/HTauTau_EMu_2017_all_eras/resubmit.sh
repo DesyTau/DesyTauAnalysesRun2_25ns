@@ -2,7 +2,7 @@
 
 # This script loops over all folders in directory and checks if there is a *.root file in these folders that is corrupted. If it is it is resubmitted.
 
-for dir in $(find -maxdepth 1 -type d -name "Emb*_files")
+for dir in $(find -maxdepth 1 -type d -name "*_files")
 do
     echo ''
     echo ''
@@ -18,7 +18,7 @@ do
 	if [[ $exit -ne 0 ]]; then
 	    echo reason $exit
 	    echo "resubmit" $list
-	    #condor_submit $list.submit
+	    condor_submit $list.submit
 	    echo ""
 	fi
     done

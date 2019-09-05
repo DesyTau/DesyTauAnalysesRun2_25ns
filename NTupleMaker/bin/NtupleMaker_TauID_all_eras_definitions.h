@@ -13,7 +13,6 @@
 #include "TROOT.h"
 #include "TLorentzVector.h"
 #include "TVector3.h"
-#include "TRFIOFile.h"
 #include "TH1F.h"
 #include "TH1D.h"
 #include "TChain.h"
@@ -203,6 +202,30 @@ Bool_t tauAntiElectronMediumMVA6_;
 Bool_t tauAntiElectronTightMVA6_;
 Bool_t tauAntiElectronVTightMVA6_;
 
+Bool_t taubyDeepTau2017v2VSeraw_;
+Bool_t taubyDeepTau2017v2VSjetraw_;
+Bool_t taubyDeepTau2017v2VSmuraw_;
+Bool_t taubyLooseDeepTau2017v2VSe_;
+Bool_t taubyLooseDeepTau2017v2VSjet_;
+Bool_t taubyLooseDeepTau2017v2VSmu_;
+Bool_t taubyMediumDeepTau2017v2VSe_;
+Bool_t taubyMediumDeepTau2017v2VSjet_;
+Bool_t taubyMediumDeepTau2017v2VSmu_;
+Bool_t taubyTightDeepTau2017v2VSe_;
+Bool_t taubyTightDeepTau2017v2VSjet_;
+Bool_t taubyTightDeepTau2017v2VSmu_;
+Bool_t taubyVLooseDeepTau2017v2VSe_;
+Bool_t taubyVLooseDeepTau2017v2VSjet_;
+Bool_t taubyVLooseDeepTau2017v2VSmu_;
+Bool_t taubyVTightDeepTau2017v2VSe_;
+Bool_t taubyVTightDeepTau2017v2VSjet_;
+Bool_t taubyVVLooseDeepTau2017v2VSe_;
+Bool_t taubyVVLooseDeepTau2017v2VSjet_;
+Bool_t taubyVVTightDeepTau2017v2VSe_;
+Bool_t taubyVVTightDeepTau2017v2VSjet_;
+Bool_t taubyVVVLooseDeepTau2017v2VSe_;
+Bool_t taubyVVVLooseDeepTau2017v2VSjet_;
+
 Bool_t tauSinglePFTau180Trk50_;
 Bool_t tauSinglePFTau180Trk50oneprong_;
 
@@ -293,6 +316,10 @@ Float_t jet20Phi_[10];
 
 unsigned int nSingleMuonHLTFilter = 0;
 bool isSingleMuonHLTFilter = false;
+
+unsigned int nSingleMuonHLTFilter1 = 0;
+bool isSingleMuonHLTFilter1 = false;
+bool isSingleMuonHLTFilter2 = false;
 
 unsigned int nPFJet60HLTFilter = 0;
 bool isPFJet60HLTFilter = false;
@@ -461,7 +488,31 @@ void SetupTrees()
    ntuple_->Branch("tauAntiElectronMediumMVA6", &tauAntiElectronMediumMVA6_, "tauAntiElectronMediumMVA6/O");
    ntuple_->Branch("tauAntiElectronTightMVA6",&tauAntiElectronTightMVA6_,"tauAntiElectronTightMVA6/O");
    ntuple_->Branch("tauAntiElectronVTightMVA6", &tauAntiElectronVTightMVA6_, "tauAntiElectronVTightMVA6/O");
-   
+
+   ntuple_->Branch("taubyDeepTau2017v2VSeraw",&taubyDeepTau2017v2VSeraw_,"taubyDeepTau2017v2VSeraw/O");
+   ntuple_->Branch("taubyDeepTau2017v2VSjetraw",&taubyDeepTau2017v2VSjetraw_,"taubyDeepTau2017v2VSjetraw/O");
+   ntuple_->Branch("taubyDeepTau2017v2VSmuraw",&taubyDeepTau2017v2VSmuraw_,"taubyDeepTau2017v2VSmuraw/O");
+   ntuple_->Branch("taubyLooseDeepTau2017v2VSe",&taubyLooseDeepTau2017v2VSe_,"taubyLooseDeepTau2017v2VSe/O");
+   ntuple_->Branch("taubyLooseDeepTau2017v2VSjet",&taubyLooseDeepTau2017v2VSjet_,"taubyLooseDeepTau2017v2VSjet/O");
+   ntuple_->Branch("taubyLooseDeepTau2017v2VSmu",&taubyLooseDeepTau2017v2VSmu_,"taubyLooseDeepTau2017v2VSmu/O");
+   ntuple_->Branch("taubyMediumDeepTau2017v2VSe",&taubyMediumDeepTau2017v2VSe_,"taubyMediumDeepTau2017v2VSe/O");
+   ntuple_->Branch("taubyMediumDeepTau2017v2VSjet",&taubyMediumDeepTau2017v2VSjet_,"taubyMediumDeepTau2017v2VSje/O");
+   ntuple_->Branch("taubyMediumDeepTau2017v2VSmu",&taubyMediumDeepTau2017v2VSmu_,"taubyMediumDeepTau2017v2VSmu/O");
+   ntuple_->Branch("taubyTightDeepTau2017v2VSe",&taubyTightDeepTau2017v2VSe_,"taubyTightDeepTau2017v2VSe/O");
+   ntuple_->Branch("taubyTightDeepTau2017v2VSjet",&taubyTightDeepTau2017v2VSjet_,"taubyTightDeepTau2017v2VSjet/O");
+   ntuple_->Branch("taubyTightDeepTau2017v2VSmu",&taubyTightDeepTau2017v2VSmu_,"taubyTightDeepTau2017v2VSmu/O");
+   ntuple_->Branch("taubyVLooseDeepTau2017v2VSe",&taubyVLooseDeepTau2017v2VSe_,"taubyVLooseDeepTau2017v2VSe/O");
+   ntuple_->Branch("taubyVLooseDeepTau2017v2VSjet",&taubyVLooseDeepTau2017v2VSjet_,"taubyVLooseDeepTau2017v2VSjet/O");
+   ntuple_->Branch("taubyVLooseDeepTau2017v2VSmu",&taubyVLooseDeepTau2017v2VSmu_,"taubyVLooseDeepTau2017v2VSmu/O");
+   ntuple_->Branch("taubyVTightDeepTau2017v2VSe",&taubyVTightDeepTau2017v2VSe_,"taubyVTightDeepTau2017v2VSe/O");
+   ntuple_->Branch("taubyVTightDeepTau2017v2VSjet",&taubyVTightDeepTau2017v2VSjet_,"taubyVTightDeepTau2017v2VSjet/O");
+   ntuple_->Branch("taubyVVLooseDeepTau2017v2VSe",&taubyVVLooseDeepTau2017v2VSe_,"taubyVVLooseDeepTau2017v2VSe/O");
+   ntuple_->Branch("taubyVVLooseDeepTau2017v2VSjet",&taubyVVLooseDeepTau2017v2VSjet_,"taubyVVLooseDeepTau2017v2VSjet/O");
+   ntuple_->Branch("taubyVVTightDeepTau2017v2VS",&taubyVVTightDeepTau2017v2VSe_,"taubyVVTightDeepTau2017v2VSe/O");
+   ntuple_->Branch("taubyVVTightDeepTau2017v2VSjet",&taubyVVTightDeepTau2017v2VSjet_,"taubyVVTightDeepTau2017v2VSjet/O");
+   ntuple_->Branch("taubyVVVLooseDeepTau2017v2VSe",&taubyVVVLooseDeepTau2017v2VSe_,"taubyVVVLooseDeepTau2017v2VSe/O");
+   ntuple_->Branch("taubyVVVLooseDeepTau2017v2VSjet",&taubyVVVLooseDeepTau2017v2VSjet_,"taubyVVVLooseDeepTau2017v2VSjet/O");
+
    ntuple_->Branch("tauSinglePFTau180Trk50",&tauSinglePFTau180Trk50_,"tauSinglePFTau180Trk50/O");
    ntuple_->Branch("tauSinglePFTau180Trk50oneprong",&tauSinglePFTau180Trk50oneprong_,"tauSinglePFTau180Trk50oneprong/O");
    
@@ -568,6 +619,7 @@ void SetupTrees()
    trigNTuple_->Branch("nJetsForward30",&nJetsForward30_,"nJetsForward30/i");
    trigNTuple_->Branch("nElec",&nElec_,"nElec/i");
    trigNTuple_->Branch("nSelTaus",&nSelTaus_,"nSelTaus/i");
+   trigNTuple_->Branch("genHt",&genHt_,"genHt/F");
     
 }
 
@@ -688,6 +740,31 @@ void SetDefaultValues(){
    tauAntiElectronTightMVA6_ = false;
    tauAntiElectronVTightMVA6_ = false;
    
+   taubyDeepTau2017v2VSeraw_= false;
+   taubyDeepTau2017v2VSjetraw_= false;
+   taubyDeepTau2017v2VSmuraw_= false;
+   taubyLooseDeepTau2017v2VSe_= false;
+   taubyLooseDeepTau2017v2VSjet_= false;
+   taubyLooseDeepTau2017v2VSmu_= false;
+   taubyMediumDeepTau2017v2VSe_= false;
+   taubyMediumDeepTau2017v2VSjet_= false;
+   taubyMediumDeepTau2017v2VSmu_= false;
+   taubyTightDeepTau2017v2VSe_= false;
+   taubyTightDeepTau2017v2VSjet_= false;
+   taubyTightDeepTau2017v2VSmu_= false;
+   taubyVLooseDeepTau2017v2VSe_= false;
+   taubyVLooseDeepTau2017v2VSjet_= false;
+   taubyVLooseDeepTau2017v2VSmu_= false;
+   taubyVTightDeepTau2017v2VSe_= false;
+   taubyVTightDeepTau2017v2VSjet_= false;
+   taubyVVLooseDeepTau2017v2VSe_= false;
+   taubyVVLooseDeepTau2017v2VSjet_= false;
+   taubyVVTightDeepTau2017v2VSe_= false;
+   taubyVVTightDeepTau2017v2VSjet_= false;
+   taubyVVVLooseDeepTau2017v2VSe_= false;
+   taubyVVVLooseDeepTau2017v2VSjet_= false;
+   
+
    tauSinglePFTau180Trk50_ = false;
    tauSinglePFTau180Trk50oneprong_ = false;
 

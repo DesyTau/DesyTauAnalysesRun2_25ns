@@ -13,7 +13,6 @@
 #include "TROOT.h"
 #include "TLorentzVector.h"
 #include "TVector3.h"
-#include "TRFIOFile.h"
 #include "TChain.h"
 #include "TMath.h"
 #include "Riostream.h"

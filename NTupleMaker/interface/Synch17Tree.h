@@ -35,6 +35,9 @@ public :
   Float_t         pt_1;
   Float_t         phi_1;
   Float_t         eta_1;
+  Float_t         chconst_1_pt;
+  Float_t         chconst_1_eta;
+  Float_t         chconst_1_phi;   
   Float_t         m_1;
   Int_t           gen_match_1; 
   Int_t           q_1;
@@ -50,6 +53,9 @@ public :
   Float_t         pt_2;
   Float_t         phi_2;
   Float_t         eta_2;
+  Float_t         chconst_2_pt;
+  Float_t         chconst_2_eta;
+  Float_t         chconst_2_phi;     
   Float_t         m_2;
   Int_t           gen_match_2; 
   Int_t           q_2;
@@ -83,13 +89,13 @@ public :
   Float_t         byLooseCombinedIsolationDeltaBetaCorr3Hits_1;
   Float_t         byMediumCombinedIsolationDeltaBetaCorr3Hits_1;
   Float_t         byTightCombinedIsolationDeltaBetaCorr3Hits_1;
-  Float_t 	  byIsolationMVArun2v1DBoldDMwLTraw_1;
-  Float_t         byVLooseIsolationMVArun2v1DBoldDMwLT_1;
-  Float_t         byLooseIsolationMVArun2v1DBoldDMwLT_1;
-  Float_t         byMediumIsolationMVArun2v1DBoldDMwLT_1;
-  Float_t 	  byTightIsolationMVArun2v1DBoldDMwLT_1;
-  Float_t 	  byVTightIsolationMVArun2v1DBoldDMwLT_1;
-  Float_t 	  byVVTightIsolationMVArun2v1DBoldDMwLT_1;
+  Float_t 	  byIsolationMVArun2017v2DBoldDMwLTraw2017_1;
+  Float_t         byVLooseIsolationMVArun2017v2DBoldDMwLT2017_1;
+  Float_t         byLooseIsolationMVArun2017v2DBoldDMwLT2017_1;
+  Float_t         byMediumIsolationMVArun2017v2DBoldDMwLT2017_1;
+  Float_t 	  byTightIsolationMVArun2017v2DBoldDMwLT2017_1;
+  Float_t 	  byVTightIsolationMVArun2017v2DBoldDMwLT2017_1;
+  Float_t 	  byVVTightIsolationMVArun2017v2DBoldDMwLT2017_1;
   Float_t         idisoweight_1;
   Float_t         idisoweight_antiiso_1;
   Float_t         trigweight_1;
@@ -114,13 +120,13 @@ public :
   Float_t         byLooseCombinedIsolationDeltaBetaCorr3Hits_2;
   Float_t         byMediumCombinedIsolationDeltaBetaCorr3Hits_2;
   Float_t         byTightCombinedIsolationDeltaBetaCorr3Hits_2;
-  Float_t 	  byIsolationMVArun2v1DBoldDMwLTraw_2;
-  Float_t         byVLooseIsolationMVArun2v1DBoldDMwLT_2;
-  Float_t         byLooseIsolationMVArun2v1DBoldDMwLT_2;
-  Float_t         byMediumIsolationMVArun2v1DBoldDMwLT_2;
-  Float_t 	  byTightIsolationMVArun2v1DBoldDMwLT_2;
-  Float_t 	  byVTightIsolationMVArun2v1DBoldDMwLT_2;
-  Float_t 	  byVVTightIsolationMVArun2v1DBoldDMwLT_2;
+  Float_t 	  byIsolationMVArun2017v2DBoldDMwLTraw2017_2;
+  Float_t         byVLooseIsolationMVArun2017v2DBoldDMwLT2017_2;
+  Float_t         byLooseIsolationMVArun2017v2DBoldDMwLT2017_2;
+  Float_t         byMediumIsolationMVArun2017v2DBoldDMwLT2017_2;
+  Float_t 	  byTightIsolationMVArun2017v2DBoldDMwLT2017_2;
+  Float_t 	  byVTightIsolationMVArun2017v2DBoldDMwLT2017_2;
+  Float_t 	  byVVTightIsolationMVArun2017v2DBoldDMwLT2017_2;
   // new 
   Float_t         idisoweight_2;
   Float_t         idisoweight_antiiso_2;
@@ -206,6 +212,7 @@ public :
   Float_t         mjj;
   Float_t         jdeta;
   Float_t         jdphi;
+  Float_t         dijetpt; //Merijn added, needed for DNN inputs. THis name is consistent with 2016+2017 analysis
   Int_t           njetingap;
   Int_t           njetingap20;
 
@@ -251,8 +258,68 @@ public :
   Float_t         acotautau_10;
   Float_t         acotautau_01;
   Float_t         acotautau_11;
+
+  //Merijn add acotau for psi:
+  Float_t         acotautauPsi_00;
+  Float_t         acotautauPsi_10;
+  Float_t         acotautauPsi_01;
+  Float_t         acotautauPsi_11;
+
+  Int_t		  pdgcodetau2;
+
+  //Points of closest approach
+  Float_t         tau_pca2D_x_1;
+  Float_t         tau_pca2D_y_1;
+  Float_t         tau_pca2D_z_1;
+  Float_t         tau_pca3D_x_1;
+  Float_t         tau_pca3D_y_1;
+  Float_t         tau_pca3D_z_1;
+  Float_t         tau_pca2D_x_2;
+  Float_t         tau_pca2D_y_2;
+  Float_t         tau_pca2D_z_2;
+  Float_t         tau_pca3D_x_2;
+  Float_t         tau_pca3D_y_2;
+  Float_t         tau_pca3D_z_2;
+
+  //Secondary vertices
+  Float_t         tau_SV_x_1;
+  Float_t         tau_SV_y_1;
+  Float_t         tau_SV_z_1;
+  Float_t         tau_SV_covxx_1;
+  Float_t         tau_SV_covyx_1;
+  Float_t         tau_SV_covzx_1;
+  Float_t         tau_SV_covyy_1;
+  Float_t         tau_SV_covzy_1;
+  Float_t         tau_SV_covzz_1;
+  Float_t         tau_SV_x_2;
+  Float_t         tau_SV_y_2;
+  Float_t         tau_SV_z_2;
+  Float_t         tau_SV_covxx_2;
+  Float_t         tau_SV_covyx_2;
+  Float_t         tau_SV_covzx_2;
+  Float_t         tau_SV_covyy_2;
+  Float_t         tau_SV_covzy_2;
+  Float_t         tau_SV_covzz_2;
+
+  //reco vertices
+  Float_t RecoVertexX;
+  Float_t RecoVertexY;
+  Float_t RecoVertexZ;
+
+  Float_t GenVertexX;
+  Float_t GenVertexY;
+  Float_t GenVertexZ;
+
+  //Merijn: add the vx of the tau decay products
+  Float_t VxConstitTau1;
+  Float_t VyConstitTau1;
+  Float_t VzConstitTau1;
   
-  
+  Float_t VxConstitTau2;
+  Float_t VyConstitTau2;
+  Float_t VzConstitTau2;
+  Float_t alphaminus;
+
 
   //////////////////////////////////////////////
   //            List of branches              //
@@ -268,6 +335,9 @@ public :
   TBranch	 *b_pt_1;
   TBranch	 *b_phi_1;
   TBranch	 *b_eta_1;
+  TBranch        *b_chconst_1_pt;
+  TBranch        *b_chconst_1_eta;
+  TBranch        *b_chconst_1_phi;     
   TBranch	 *b_m_1;
   TBranch	 *b_gen_match_1; 
   TBranch	 *b_q_1;
@@ -283,6 +353,9 @@ public :
   TBranch	 *b_pt_2;
   TBranch	 *b_phi_2;
   TBranch	 *b_eta_2;
+  TBranch        *b_chconst_2_pt;
+  TBranch        *b_chconst_2_eta;
+  TBranch        *b_chconst_2_phi; 
   TBranch	 *b_m_2;
   TBranch	 *b_gen_match_2; 
   TBranch	 *b_q_2;
@@ -316,13 +389,13 @@ public :
   TBranch        *b_byLooseCombinedIsolationDeltaBetaCorr3Hits_1;   //!
   TBranch        *b_byMediumCombinedIsolationDeltaBetaCorr3Hits_1;   //!
   TBranch        *b_byTightCombinedIsolationDeltaBetaCorr3Hits_1;   //!
-  TBranch 	 *b_byIsolationMVArun2v1DBoldDMwLTraw_1;
-  TBranch	 *b_byVLooseIsolationMVArun2v1DBoldDMwLT_1;
-  TBranch	 *b_byLooseIsolationMVArun2v1DBoldDMwLT_1;
-  TBranch	 *b_byMediumIsolationMVArun2v1DBoldDMwLT_1;
-  TBranch	 *b_byTightIsolationMVArun2v1DBoldDMwLT_1;
-  TBranch	 *b_byVTightIsolationMVArun2v1DBoldDMwLT_1;
-  TBranch	 *b_byVVTightIsolationMVArun2v1DBoldDMwLT_1;
+  TBranch 	 *b_byIsolationMVArun2017v2DBoldDMwLTraw2017_1;
+  TBranch	 *b_byVLooseIsolationMVArun2017v2DBoldDMwLT2017_1;
+  TBranch	 *b_byLooseIsolationMVArun2017v2DBoldDMwLT2017_1;
+  TBranch	 *b_byMediumIsolationMVArun2017v2DBoldDMwLT2017_1;
+  TBranch	 *b_byTightIsolationMVArun2017v2DBoldDMwLT2017_1;
+  TBranch	 *b_byVTightIsolationMVArun2017v2DBoldDMwLT2017_1;
+  TBranch	 *b_byVVTightIsolationMVArun2017v2DBoldDMwLT2017_1;
 
   ///////////////////////////////////////////////////////////NEW
   TBranch	 *b_efficiency_byVVLooseIsolationMVArun2017v2DBoldDMwLT2017_1;
@@ -380,13 +453,13 @@ public :
   TBranch        *b_byLooseCombinedIsolationDeltaBetaCorr3Hits_2;   //!
   TBranch        *b_byMediumCombinedIsolationDeltaBetaCorr3Hits_2;   //!
   TBranch        *b_byTightCombinedIsolationDeltaBetaCorr3Hits_2;   //!
-  TBranch 	 *b_byIsolationMVArun2v1DBoldDMwLTraw_2;
-  TBranch	 *b_byVLooseIsolationMVArun2v1DBoldDMwLT_2;
-  TBranch	 *b_byLooseIsolationMVArun2v1DBoldDMwLT_2;
-  TBranch	 *b_byMediumIsolationMVArun2v1DBoldDMwLT_2;
-  TBranch	 *b_byTightIsolationMVArun2v1DBoldDMwLT_2;
-  TBranch	 *b_byVTightIsolationMVArun2v1DBoldDMwLT_2;
-  TBranch	 *b_byVVTightIsolationMVArun2v1DBoldDMwLT_2;
+  TBranch 	 *b_byIsolationMVArun2017v2DBoldDMwLTraw2017_2;
+  TBranch	 *b_byVLooseIsolationMVArun2017v2DBoldDMwLT2017_2;
+  TBranch	 *b_byLooseIsolationMVArun2017v2DBoldDMwLT2017_2;
+  TBranch	 *b_byMediumIsolationMVArun2017v2DBoldDMwLT2017_2;
+  TBranch	 *b_byTightIsolationMVArun2017v2DBoldDMwLT2017_2;
+  TBranch	 *b_byVTightIsolationMVArun2017v2DBoldDMwLT2017_2;
+  TBranch	 *b_byVVTightIsolationMVArun2017v2DBoldDMwLT2017_2;
   TBranch	 *b_idisoweight_2;
   TBranch	 *b_idisoweight_antiiso_2;
   TBranch	 *b_trigweight_2;
@@ -439,6 +512,7 @@ public :
   //VBF
   TBranch	 *b_mjj;
   TBranch	 *b_jdeta;
+  TBranch	 *b_dijetpt;
   TBranch	 *b_jdphi;
   TBranch	 *b_njetingap;
   TBranch	 *b_njetingap20;
@@ -486,7 +560,70 @@ public :
   TBranch        *b_acotautau_10;
   TBranch        *b_acotautau_01;
   TBranch        *b_acotautau_11;
+
+  TBranch        *b_acotautauPsi_00;
+  TBranch        *b_acotautauPsi_10;
+  TBranch        *b_acotautauPsi_01;
+  TBranch        *b_acotautauPsi_11;
+  TBranch	 *b_pdgcodetau2;
+
+  //Points of closest approach
+  TBranch        *b_tau_pca2D_x_1;
+  TBranch        *b_tau_pca2D_y_1;
+  TBranch        *b_tau_pca2D_z_1;
+  TBranch        *b_tau_pca3D_x_1;
+  TBranch        *b_tau_pca3D_y_1;
+  TBranch        *b_tau_pca3D_z_1;
+  TBranch        *b_tau_pca2D_x_2;
+  TBranch        *b_tau_pca2D_y_2;
+  TBranch        *b_tau_pca2D_z_2;
+  TBranch        *b_tau_pca3D_x_2;
+  TBranch        *b_tau_pca3D_y_2;
+  TBranch        *b_tau_pca3D_z_2;
+
+  //Secondary vertices
+  TBranch        *b_tau_SV_x_1;
+  TBranch        *b_tau_SV_y_1;
+  TBranch        *b_tau_SV_z_1;
+  TBranch        *b_tau_SV_covxx_1;
+  TBranch        *b_tau_SV_covyx_1;
+  TBranch        *b_tau_SV_covzx_1;
+  TBranch        *b_tau_SV_covyy_1;
+  TBranch        *b_tau_SV_covzy_1;
+  TBranch        *b_tau_SV_covzz_1;
+
+  TBranch        *b_tau_SV_x_2;
+  TBranch        *b_tau_SV_y_2;
+  TBranch        *b_tau_SV_z_2;
+  TBranch        *b_tau_SV_covxx_2;
+  TBranch        *b_tau_SV_covyx_2;
+  TBranch        *b_tau_SV_covzx_2;
+  TBranch        *b_tau_SV_covyy_2;
+  TBranch        *b_tau_SV_covzy_2;
+  TBranch        *b_tau_SV_covzz_2;
+
+  //reco vertices
+  //RECO vertex info is practical to have
+
+  TBranch        *b_RecoVertexX;
+  TBranch        *b_RecoVertexY;
+  TBranch        *b_RecoVertexZ;  
+
+//gen vertex info is practical to have
+  TBranch        *b_GenVertexX;
+  TBranch        *b_GenVertexY;
+  TBranch        *b_GenVertexZ;
   
+  TBranch        *b_VxConstitTau1;
+  TBranch        *b_VyConstitTau1;
+  TBranch        *b_VzConstitTau1;
+
+  TBranch        *b_VxConstitTau2;
+  TBranch        *b_VyConstitTau2;
+  TBranch        *b_VzConstitTau2;
+  TBranch        *b_alphaminus;
+
+
   Synch17Tree(TTree *tree=0);
   virtual ~Synch17Tree();
 
