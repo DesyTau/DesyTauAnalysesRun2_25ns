@@ -707,18 +707,26 @@ cout<<" muon_referencePoint branch 2"<<endl;
 
   // taus
   if (crectau) {
-    //Merijn add few branches
-/*
-    tree->Branch("tau_helixparameters", &tau_helixparameters, "tau_helixparameters[i][5]/F");
-    tree->Branch("tau_helixparameters_covar", &tau_helixparameters_covar, " tau_helixparameters_covar[i][i][5]/F");
-*/
-
+ 
     tree->Branch("tau_count", &tau_count, "tau_count/i");
 
+/*
     tree->Branch("tau_helixparameters", tau_helixparameters,TString::Format("tau_helixparameters[%i][5]/F", tau_count));
     tree->Branch("tau_helixparameters_covar", tau_helixparameters_covar,TString::Format("tau_helixparameters_covar[%i][5][5]/F", tau_count));
     tree->Branch("tau_referencePoint", tau_referencePoint,TString::Format("tau_referencePoint[%i][5]/F", tau_count));
     tree->Branch("tau_Bfield", tau_Bfield, TString::Format("tau_Bfield[%i]/F",tau_count));
+
+    tree->Branch("tau_helixparameters", tau_helixparameters,"tau_helixparameters[tau_count][5]/F");
+    tree->Branch("tau_helixparameters_covar", tau_helixparameters_covar,"tau_helixparameters_covar[tau_count][5][5]/F");
+    tree->Branch("tau_referencePoint", tau_referencePoint,"tau_referencePoint[tau_count][5]/F");
+    tree->Branch("tau_Bfield", tau_Bfield,"tau_Bfield[tau_count]/F");*/
+
+cout<<"here tau 1"<<endl;
+    tree->Branch("tau_helixparameters", tau_helixparameters, "tau_helixparameters[tau_count][5]/F");
+    tree->Branch("tau_helixparameters_covar", tau_helixparameters_covar,"tau_helixparameters_covar[tau_count][5][5]/F");
+    tree->Branch("referencePoint", tau_referencePoint,"tau_referencePoint[tau_count][3]/F");
+    tree->Branch("tau_Bfield", tau_Bfield, "tau_Bfield[tau_count]/F");
+cout<<"here tau 2"<<endl;
 
     tree->Branch("tau_e", tau_e, "tau_e[tau_count]/F");
     tree->Branch("tau_px", tau_px, "tau_px[tau_count]/F");
@@ -3233,9 +3241,6 @@ unsigned int NTupleMaker::AddMuons(const edm::Event& iEvent, const edm::EventSet
   iEvent.getByToken(BadGlobalMuonsToken_, BadGlobalMuons);
   */
 
-  //Merijn 2019 8 28: try to incorporate here the parameter vector and helecity parameters
-  //we need a property of the transient muon track
-
 
   if(Muons.isValid())
     {
@@ -3249,47 +3254,14 @@ unsigned int NTupleMaker::AddMuons(const edm::Event& iEvent, const edm::EventSet
 	if ((*Muons)[i].pt() < cMuPtMin) continue;
 	if (fabs(((*Muons)[i].eta()))>cMuEtaMax) continue;
 
-	//	std::cout << "Selected pat::Muon " << i << std::endl;
 
-
-	/*Merijn 2019 8 28: I'll try to
-	  0) try to obtain transient track from pat muon
-	  1) convert the pat muon to RECO  https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePATFAQs#How_can_I_retrieve_the_reference
-	  2) obtain a transient track based on it
-	  3) extract the parameters we need, and save
-	  4) The last may require some work, if possible try to store as the objects they are.
-	 */
-
-   /*
-	edm::Ptr<reco::Candidate> originalRef = (*Muons)[i].originalObjectRef();
-	const reco::Muon *originalMu = dynamic_cast<const reco::Muon *>(originalRef.get());
-	if (originalMu == 0) { cout<<"... sorry, this was not a reco::Muon object ... "<<endl;}
-	else{ cout<<"... Yeehah, could get the muon reco object ... "<<endl; }
-
-	//try to get instead a transienttrack from PAT muon:
-	edm::ESHandle<TransientTrackBuilder> transTrackBuildertmp;
-	iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder",transTrackBuildertmp);
-
-	reco::TrackRef leadTrk = (*Muons)[i].innerTrack();
-	TransientTrack trLeadTrk = transTrackBuildertmp->build(*leadTrk);
-  //	TrackBase::ParameterVector ParamVecMu=trLeadTrk.parameters();
-	//TrackBase::ParameterVector ParamVecMu=(*Muons)[i].parameters();
-
-	//	TrackBase::ParameterVector ParamVecMu=originalMu->parameters();
-	TrackBase::ParameterVector ParamVecMu=leadTrk->parameters();
-  */
-
-//Merijn: try to store the track parameters and its covariance
-cout<<"Here mu 1"<<endl;
-//	reco::TrackRef leadTrk = (*Muons)[i].innerTrack();
-//	reco::TrackRef leadTrk = (*Muons)[i].muonBestTrack();	
+//code below is to store the track param vec + covariances, a references pt on track, and B field in ref pt. For CP measurement
 
 	reco::TrackRef leadTrk = (*Muons)[i].innerTrack();
 	if (leadTrk.isNonnull()) {
 	TrackBase::ParameterVector ParamVecMu=leadTrk->parameters();
 	TrackBase::CovarianceMatrix CVMTrack=leadTrk->covariance();
 
-	//store the parameters in the ntuple. should we ise muon_count as index instead of i?!
 	for(int index=0; index<ParamVecMu.kSize;index++){
 	  muon_helixparameters[muon_count][index]=ParamVecMu[index];
 	cout<<"muon_helixparameters[muon_count][index] "<<muon_helixparameters[muon_count][index]<<endl;
@@ -3298,25 +3270,17 @@ cout<<"Here mu 1"<<endl;
 	  }
 	}
 
-	//get reference point
 	TrackBase::Point RFptMu=leadTrk->referencePoint();
 
 	muon_referencePoint[muon_count][0]=RFptMu.X();
 	muon_referencePoint[muon_count][1]=RFptMu.Y();
 	muon_referencePoint[muon_count][2]=RFptMu.Z();
-
-	cout<<"muon_referencePoint[muon_count][2] "<<muon_referencePoint[muon_count][2]<<endl; 
 	
-
-//value magnetic field at ref pt..
 	double	magneticField = (TTrackBuilder.product() ? TTrackBuilder.product()->field()->inInverseGeV(GlobalPoint(RFptMu.X(), RFptMu.Y(), RFptMu.Z())).z() : 0.0);
 	muon_Bfield[muon_count]=magneticField;
-	cout<<"magneticField "<<magneticField<<endl;	
 	}
 	else{
-	cout<<"init to a default"<<endl;
-	//init things to -999
-	//store the parameters in the ntuple. should we ise muon_count as index instead of i?!
+	cout<<"init mu to a default"<<endl;
 	for(int index=0; index<5;index++){
 	  muon_helixparameters[muon_count][index]=-999;
 	  for(int index2=0; index2<5;index2++){
@@ -3324,17 +3288,11 @@ cout<<"Here mu 1"<<endl;
 	  }
 	}
 
-	//get reference point
 	muon_referencePoint[muon_count][0]=-999;
 	muon_referencePoint[muon_count][1]=-999;
 	muon_referencePoint[muon_count][2]=-999;	  
-
-	//value magnetic field at ref pt..
 	muon_Bfield[muon_count]=-999;
-	//end init
 }
-
-//Merijn helix parameters finish here..
 
 	muon_px[muon_count] = (*Muons)[i].px();
 	muon_py[muon_count] = (*Muons)[i].py();
@@ -3967,6 +3925,7 @@ unsigned int NTupleMaker::AddTaus(const edm::Event& iEvent, const edm::EventSetu
 	cout<<"Here tau 1"<<endl;
 	  reco::TrackRef leadTrk = (*Taus)[i].leadTrack();
 	  if(leadTrk.isNonnull()){
+	cout<<"Here tau in loop"<<endl;
 	  TrackBase::ParameterVector ParamVecTau=leadTrk->parameters();
 	  TrackBase::CovarianceMatrix CVMTrackTau=leadTrk->covariance();
 
@@ -3988,7 +3947,7 @@ unsigned int NTupleMaker::AddTaus(const edm::Event& iEvent, const edm::EventSetu
 //save b field for the ref pt..
 	  double magneticField = (TTrackBuilder.product() ? TTrackBuilder.product()->field()->inInverseGeV(GlobalPoint(RFptTau.X(), RFptTau.Y(), RFptTau.Z())).z() : 0.0);
 	  tau_Bfield[tau_count]=magneticField;
-	cout<<"magneticField "<<magneticField<<endl;
+	cout<<"tau magneticField "<<magneticField<<endl;
 // end of obtaining helix parameters
 }
 else{
