@@ -125,6 +125,7 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
   cl1objects(iConfig.getUntrackedParameter<bool>("L1Objects", false)),
   crecphoton(iConfig.getUntrackedParameter<bool>("RecPhoton", false)),
   crecpfjet(iConfig.getUntrackedParameter<bool>("RecJet", false)),
+  crecpfpuppijet(iConfig.getUntrackedParameter<bool>("RecJetPuppi", false)),
   crecpfmet(iConfig.getUntrackedParameter<bool>("RecPFMet", false)),
   crecpfmetcorr(iConfig.getUntrackedParameter<bool>("RecPFMetCorr", false)),
   crecpuppimet(iConfig.getUntrackedParameter<bool>("RecPuppiMet", false)),
@@ -196,6 +197,7 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
   TauMVAIsolationVTightToken_(consumes<pat::PATTauDiscriminator>(edm::InputTag("rerunDiscriminationByIsolationMVArun2v1VTight","","TreeProducer"))),
   TauMVAIsolationVVTightToken_(consumes<pat::PATTauDiscriminator>(edm::InputTag("rerunDiscriminationByIsolationMVArun2v1VVTight","","TreeProducer"))),
   JetCollectionToken_(consumes<pat::JetCollection>(iConfig.getParameter<edm::InputTag>("JetCollectionTag"))),
+  PuppiJetCollectionToken_(consumes<pat::JetCollection>(iConfig.getParameter<edm::InputTag>("PuppiJetCollectionTag"))),
   MetCollectionToken_(consumes<pat::METCollection>(iConfig.getParameter<edm::InputTag>("MetCollectionTag"))),
   MetCorrCollectionToken_(consumes<pat::METCollection>(iConfig.getParameter<edm::InputTag>("MetCorrCollectionTag"))),
   PuppiMetCollectionToken_(consumes<pat::METCollection>(iConfig.getParameter<edm::InputTag>("PuppiMetCollectionTag"))),
@@ -281,6 +283,7 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
 
   consumes<double>(edm::InputTag("fixedGridRhoFastjetAll"));
   consumes<pat::JetCollection>(edm::InputTag("slimmedJets"));
+  consumes<pat::JetCollection>(edm::InputTag("slimmedJetsPuppi"));
 
   for(std::vector<edm::InputTag>::iterator mit = MvaMetCollectionsTag_.begin();
       mit != MvaMetCollectionsTag_.end(); mit++){
@@ -528,6 +531,33 @@ void NTupleMaker::beginJob(){
     tree->Branch("pfjet_pu_jet_fullDisc_mva", pfjet_pu_jet_fullDisc_mva, "pfjet_pu_jet_fullDisc_mva[pfjet_count]/F");
   }
 
+  if (crecpfpuppijet) {
+    tree->Branch("pfjetpuppi_count", &pfjetpuppi_count, "pfjetpuppi_count/i");
+    tree->Branch("pfjetpuppi_e", pfjetpuppi_e, "pfjetpuppi_e[pfjetpuppi_count]/F");
+    tree->Branch("pfjetpuppi_px", pfjetpuppi_px, "pfjetpuppi_px[pfjetpuppi_count]/F");
+    tree->Branch("pfjetpuppi_py", pfjetpuppi_py, "pfjetpuppi_py[pfjetpuppi_count]/F");
+    tree->Branch("pfjetpuppi_pz", pfjetpuppi_pz, "pfjetpuppi_pz[pfjetpuppi_count]/F");
+    tree->Branch("pfjetpuppi_pt", pfjetpuppi_pt, "pfjetpuppi_pt[pfjetpuppi_count]/F");
+    tree->Branch("pfjetpuppi_eta", pfjetpuppi_eta, "pfjetpuppi_eta[pfjetpuppi_count]/F");
+    tree->Branch("pfjetpuppi_phi", pfjetpuppi_phi, "pfjetpuppi_phi[pfjetpuppi_count]/F");
+    tree->Branch("pfjetpuppi_neutralhadronicenergy", pfjetpuppi_neutralhadronicenergy, "pfjetpuppi_neutralhadronicenergy[pfjetpuppi_count]/F");
+    tree->Branch("pfjetpuppi_chargedhadronicenergy", pfjetpuppi_chargedhadronicenergy, "pfjetpuppi_chargedhadronicenergy[pfjetpuppi_count]/F");
+    tree->Branch("pfjetpuppi_neutralemenergy", pfjetpuppi_neutralemenergy, "pfjetpuppi_neutralemenergy[pfjetpuppi_count]/F");
+    tree->Branch("pfjetpuppi_chargedemenergy", pfjetpuppi_chargedemenergy, "pfjetpuppi_chargedemenergy[pfjetpuppi_count]/F");
+    tree->Branch("pfjetpuppi_muonenergy", pfjetpuppi_muonenergy, "pfjetpuppi_muonenergy[pfjetpuppi_count]/F");
+    tree->Branch("pfjetpuppi_chargedmuonenergy", pfjetpuppi_chargedmuonenergy, "pfjetpuppi_chargedmuonenergy[pfjetpuppi_count]/F");
+    tree->Branch("pfjetpuppi_chargedmulti", pfjetpuppi_chargedmulti, "pfjetpuppi_chargedmulti[pfjetpuppi_count]/i");
+    tree->Branch("pfjetpuppi_neutralmulti", pfjetpuppi_neutralmulti, "pfjetpuppi_neutralmulti[pfjetpuppi_count]/i");
+    tree->Branch("pfjetpuppi_chargedhadronmulti", pfjetpuppi_chargedhadronmulti, "pfjetpuppi_chargedhadronmulti[pfjetpuppi_count]/i");
+    tree->Branch("pfjetpuppi_energycorr", pfjetpuppi_energycorr, "pfjetpuppi_energycorr[pfjetpuppi_count]/F");
+    tree->Branch("pfjetpuppi_energycorr_l1fastjet", pfjetpuppi_energycorr_l1fastjet, "pfjetpuppi_energycorr_l1fastjet[pfjetpuppi_count]/F");
+    tree->Branch("pfjetpuppi_energycorr_l2relative", pfjetpuppi_energycorr_l2relative, "pfjetpuppi_energycorr_l2relative[pfjetpuppi_count]/F");
+    tree->Branch("pfjetpuppi_energycorr_l3absolute", pfjetpuppi_energycorr_l3absolute, "pfjetpuppi_energycorr_l3absolute[pfjetpuppi_count]/F");
+    tree->Branch("pfjetpuppi_energycorr_l2l3residual", pfjetpuppi_energycorr_l2l3residual, "pfjetpuppi_energycorr_l2l3residual[pfjetpuppi_count]/F");
+    tree->Branch("pfjetpuppi_flavour", pfjetpuppi_flavour, "pfjetpuppi_flavour[pfjetpuppi_count]/I");
+    tree->Branch("pfjetpuppi_btag", pfjetpuppi_btag,"pfjetpuppi_btag[pfjetpuppi_count][10]/F");
+    tree->Branch("pfjetpuppi_jecUncertainty",pfjetpuppi_jecUncertainty,"pfjetpuppi_jecUncertainty[pfjetpuppi_count]/F");
+  }
   // electrons
   if (crecelectron) {
     tree->Branch("electron_count", &electron_count, "electron_count/i");
@@ -537,6 +567,22 @@ void NTupleMaker::beginJob(){
     tree->Branch("electron_pt", electron_pt, "electron_pt[electron_count]/F");
     tree->Branch("electron_eta", electron_eta, "electron_eta[electron_count]/F");
     tree->Branch("electron_phi", electron_phi, "electron_phi[electron_count]/F");
+    tree->Branch("electron_px_energyscale_up", electron_px_energyscale_up, "electron_px_energyscale_up[electron_count]/F");
+    tree->Branch("electron_px_energyscale_down", electron_px_energyscale_down, "electron_px_energyscale_down[electron_count]/F");
+    tree->Branch("electron_py_energyscale_up", electron_py_energyscale_up, "electron_py_energyscale_up[electron_count]/F");
+    tree->Branch("electron_py_energyscale_down", electron_py_energyscale_down, "electron_py_energyscale_down[electron_count]/F");
+    tree->Branch("electron_pz_energyscale_up", electron_pz_energyscale_up, "electron_pz_energyscale_up[electron_count]/F");
+    tree->Branch("electron_pz_energyscale_down", electron_pz_energyscale_down, "electron_pz_energyscale_down[electron_count]/F");
+    tree->Branch("electron_pt_energyscale_up", electron_pt_energyscale_up, "electron_pt_energyscale_up[electron_count]/F");
+    tree->Branch("electron_pt_energyscale_down", electron_pt_energyscale_down, "electron_pt_energyscale_down[electron_count]/F");
+    tree->Branch("electron_px_energysigma_up", electron_px_energysigma_up, "electron_px_energysigma_up[electron_count]/F");
+    tree->Branch("electron_px_energysigma_down", electron_px_energysigma_down, "electron_px_energysigma_down[electron_count]/F");
+    tree->Branch("electron_py_energysigma_up", electron_py_energysigma_up, "electron_py_energysigma_up[electron_count]/F");
+    tree->Branch("electron_py_energysigma_down", electron_py_energysigma_down, "electron_py_energysigma_down[electron_count]/F");
+    tree->Branch("electron_pz_energysigma_up", electron_pz_energysigma_up, "electron_pz_energysigma_up[electron_count]/F");
+    tree->Branch("electron_pz_energysigma_down", electron_pz_energysigma_down, "electron_pz_energysigma_down[electron_count]/F");
+    tree->Branch("electron_pt_energysigma_up", electron_pt_energysigma_up, "electron_pt_energysigma_up[electron_count]/F");
+    tree->Branch("electron_pt_energysigma_down", electron_pt_energysigma_down, "electron_pt_energysigma_down[electron_count]/F");
     tree->Branch("electron_trackchi2", electron_trackchi2, "electron_trackchi2[electron_count]/F");
     tree->Branch("electron_trackndof", electron_trackndof, "electron_trackndof[electron_count]/F");
     tree->Branch("electron_outerx", electron_outerx, "electron_outerx[electron_count]/F");
@@ -1611,6 +1657,7 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   l1isotau_count = 0;
   gentau_count = 0;
   pfjet_count = 0;
+  pfjetpuppi_count = 0;
   electron_count = 0;
   photon_count = 0;
   genparticles_count = 0;
@@ -2194,6 +2241,12 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       // 	if (!goodJets) return;
       // }
     } // crecpfjet
+
+    if (crecpfpuppijet)
+      {
+        if(doDebug)  cout<<"add PF Puppi jets"<< endl;
+        int numberOfJetsPuppi = int(AddPFPuppiJets(iEvent,iSetup));
+      }
 
 
   if(crecpfmet)
@@ -4434,6 +4487,74 @@ unsigned int NTupleMaker::AddPFJets(const edm::Event& iEvent, const edm::EventSe
   return  pfjet_count;
 }
 
+unsigned int NTupleMaker::AddPFPuppiJets(const edm::Event& iEvent, const edm::EventSetup& iSetup)
+{
+  edm::Handle<pat::JetCollection> pfjetspuppi;
+  iEvent.getByToken(PuppiJetCollectionToken_, pfjetspuppi);
+
+  if(pfjetspuppi.isValid())
+    {
+      for(unsigned i = 0 ; i < pfjetspuppi->size() ; i++)
+	     {
+
+         if(pfjetpuppi_count == M_jetmaxcount){
+	          cerr << "number of pfjetspuppi > M_jetmaxcount. They are missing." << endl;
+	          errors |= 1<<4;
+	          break;
+	       }
+        if((*pfjetspuppi)[i].pt() < cJetPtMin) continue;
+	      if(fabs((*pfjetspuppi)[i].eta()) > cJetEtaMax) continue;
+
+	       pfjetpuppi_e[pfjetpuppi_count] = (*pfjetspuppi)[i].energy();
+	       pfjetpuppi_px[pfjetpuppi_count] = (*pfjetspuppi)[i].px();
+	      pfjetpuppi_py[pfjetpuppi_count] = (*pfjetspuppi)[i].py();
+	      pfjetpuppi_pz[pfjetpuppi_count] = (*pfjetspuppi)[i].pz();
+        pfjetpuppi_pt[pfjetpuppi_count] = (*pfjetspuppi)[i].pt();
+          pfjetpuppi_eta[pfjetpuppi_count] = (*pfjetspuppi)[i].eta();
+          pfjetpuppi_phi[pfjetpuppi_count] = (*pfjetspuppi)[i].phi();
+	  pfjetpuppi_neutralhadronicenergy[pfjetpuppi_count] = (*pfjetspuppi)[i].neutralHadronEnergy();
+	  pfjetpuppi_chargedhadronicenergy[pfjetpuppi_count] = (*pfjetspuppi)[i].chargedHadronEnergy();
+	  pfjetpuppi_neutralemenergy[pfjetpuppi_count] = (*pfjetspuppi)[i].neutralEmEnergy();
+	  pfjetpuppi_chargedemenergy[pfjetpuppi_count] = (*pfjetspuppi)[i].chargedEmEnergy();
+	  pfjetpuppi_muonenergy[pfjetpuppi_count] = (*pfjetspuppi)[i].muonEnergy();
+	  pfjetpuppi_chargedmuonenergy[pfjetpuppi_count] = (*pfjetspuppi)[i].chargedMuEnergy();
+	  pfjetpuppi_chargedmulti[pfjetpuppi_count] = (*pfjetspuppi)[i].chargedMultiplicity();
+	  pfjetpuppi_neutralmulti[pfjetpuppi_count] = (*pfjetspuppi)[i].neutralMultiplicity();
+	  pfjetpuppi_chargedhadronmulti[pfjetpuppi_count] = (*pfjetspuppi)[i].chargedHadronMultiplicity();
+
+	  pfjetpuppi_energycorr[pfjetpuppi_count] = -1.;
+	  pfjetpuppi_energycorr_l1fastjet[pfjetpuppi_count] = -1.;
+	  pfjetpuppi_energycorr_l2relative[pfjetpuppi_count] = -1.;
+	  pfjetpuppi_energycorr_l3absolute[pfjetpuppi_count] = -1.;
+	  pfjetpuppi_energycorr_l2l3residual[pfjetpuppi_count] = -1.;
+
+	  if((*pfjetspuppi)[i].jecSetsAvailable())
+	    {
+	      pfjetpuppi_energycorr[pfjetpuppi_count] = (*pfjetspuppi)[i].jecFactor("Uncorrected");
+	      pfjetpuppi_energycorr_l1fastjet[pfjetpuppi_count] = (*pfjetspuppi)[i].jecFactor("L1FastJet");
+	      pfjetpuppi_energycorr_l2relative[pfjetpuppi_count] = (*pfjetspuppi)[i].jecFactor("L2Relative");
+	      pfjetpuppi_energycorr_l3absolute[pfjetpuppi_count] = (*pfjetspuppi)[i].jecFactor("L3Absolute");
+	      if (cdata) pfjetpuppi_energycorr_l2l3residual[pfjetpuppi_count] = (*pfjetspuppi)[i].jecFactor("L2L3Residual");
+	    }
+
+	  jecUnc->setJetEta(pfjetpuppi_eta[pfjetpuppi_count]);
+	  jecUnc->setJetPt(pfjetpuppi_pt[pfjetpuppi_count]);
+	  pfjetpuppi_jecUncertainty[pfjetpuppi_count] = jecUnc->getUncertainty(true);
+	  pfjetpuppi_flavour[pfjetpuppi_count] = (*pfjetspuppi)[i].partonFlavour();
+
+	  for(unsigned n = 0 ; n < cBtagDiscriminators.size() ; n++)
+	    {
+	      pfjetpuppi_btag[pfjetpuppi_count][n] = -1000;
+	      if(cBtagDiscriminators[n] != "F"){
+		//		std::cout << " " << cBtagDiscriminators.at(n) << "  : " <<  (*pfjetspuppi)[i].bDiscriminator(cBtagDiscriminators[n]) << std::endl;
+		pfjetpuppi_btag[pfjetpuppi_count][n] = (*pfjetspuppi)[i].bDiscriminator(cBtagDiscriminators[n]) ;
+	      }
+	    }
+	  pfjetpuppi_count++;
+	}
+    }
+  return  pfjetpuppi_count;
+}
 
 unsigned int NTupleMaker::AddElectrons(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
@@ -4473,6 +4594,26 @@ unsigned int NTupleMaker::AddElectrons(const edm::Event& iEvent, const edm::Even
 	    electron_py[electron_count] = corrP4.Py();
 	    electron_pz[electron_count] = corrP4.Pz();
 	    electron_pt[electron_count] = corrP4.Pt();
+      auto corrP4_energyscale_up  = el->p4() * el->userFloat("energyScaleUp") / el->energy();
+      auto corrP4_energyscale_down  = el->p4() * el->userFloat("energyScaleDown") / el->energy();
+      electron_px_energyscale_up[electron_count] = corrP4_energyscale_up.Px();
+      electron_px_energyscale_down[electron_count] = corrP4_energyscale_down.Px();
+      electron_py_energyscale_up[electron_count] = corrP4_energyscale_up.Py();
+      electron_py_energyscale_down[electron_count] = corrP4_energyscale_down.Py();
+      electron_pz_energyscale_up[electron_count] = corrP4_energyscale_up.Pz();
+      electron_pz_energyscale_down[electron_count] = corrP4_energyscale_down.Pz();
+      electron_pt_energyscale_up[electron_count] = corrP4_energyscale_up.Pt();
+      electron_pt_energyscale_down[electron_count] = corrP4_energyscale_down.Pt();
+      auto corrP4_energysigma_up  = el->p4() * el->userFloat("energySigmaUp") / el->energy();
+      auto corrP4_energysigma_down = el->p4() * el->userFloat("energySigmaDown") / el->energy();
+      electron_px_energysigma_up[electron_count] = corrP4_energysigma_up.Px();
+      electron_px_energysigma_down[electron_count] = corrP4_energysigma_down.Px();
+      electron_py_energysigma_up[electron_count] = corrP4_energysigma_up.Py();
+      electron_py_energysigma_down[electron_count] = corrP4_energysigma_down.Py();
+      electron_pz_energysigma_up[electron_count] = corrP4_energysigma_up.Pz();
+      electron_pz_energysigma_down[electron_count] = corrP4_energysigma_down.Pz();
+      electron_pt_energysigma_up[electron_count] = corrP4_energysigma_up.Pt();
+      electron_pt_energysigma_down[electron_count] = corrP4_energysigma_down.Pt();
 	  }
 	  else {
 	    electron_px[electron_count] = el->px();

@@ -26,16 +26,11 @@ process.load("TrackingTools/TransientTrack/TransientTrackBuilder_cfi")
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff')
 
 # Global tag (from : https://twiki.cern.ch/twiki/bin/viewauth/CMS/PdmVAnalysisSummaryTable - version : 2019-07-17)
-if isData:
+if isData or isEmbedded:
     if period is '2016'   : process.GlobalTag.globaltag = '102X_dataRun2_v11'
     elif period is '2017' : process.GlobalTag.globaltag = '102X_dataRun2_v11'
     elif period is '2018' and not isRun2018D : process.GlobalTag.globaltag = '102X_dataRun2_v11'
     elif period is '2018' and isRun2018D     : process.GlobalTag.globaltag = '102X_dataRun2_Prompt_v14'
-elif isEmbedded:
-    if period is '2016'   : process.GlobalTag.globaltag = '80X_dataRun2_2016SeptRepro_v7'
-    elif period is '2017' : process.GlobalTag.globaltag = '94X_dataRun2_v10'
-    elif period is '2018' and not isRun2018D : process.GlobalTag.globaltag = '102X_dataRun2_Sep2018Rereco_v1'
-    elif period is '2018' and isRun2018D   : process.GlobalTag.globaltag = '102X_dataRun2_Prompt_v13'
 else:
     if period is '2016' :   process.GlobalTag.globaltag = '102X_mcRun2_asymptotic_v7'
     elif period is '2017' : process.GlobalTag.globaltag = '102X_mc2017_realistic_v7'
@@ -49,25 +44,27 @@ process.MessageLogger.destinations = ['cout', 'cerr']
 process.MessageLogger.cerr.threshold = cms.untracked.string('INFO')
 process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 # Set the process options -- Display summary at the end, enable unscheduled execution
-process.options = cms.untracked.PSet( 
+process.options = cms.untracked.PSet(
     allowUnscheduled = cms.untracked.bool(True),
     wantSummary = cms.untracked.bool(True)
 )
 
 # How many events to process
-process.maxEvents = cms.untracked.PSet( 
-   input = cms.untracked.int32(1000)
+process.maxEvents = cms.untracked.PSet(
+   input = cms.untracked.int32(100)
 )
 
 # Define the input source
 import FWCore.PythonUtilities.LumiList as LumiList
 # https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideGoodLumiSectionsJSONFile#cmsRun
-process.source = cms.Source("PoolSource", 
+process.source = cms.Source("PoolSource",
   fileNames = cms.untracked.vstring(
         #"/store/data/Run2017D/SingleMuon/MINIAOD/31Mar2018-v1/00000/2A2ADC80-2238-E811-B4F6-E0DB55FC11A5.root"  # use for testing
-#        "/store/mc/RunIIFall17MiniAODv2/TTToHadronic_TuneCP5_13TeV-powheg-pythia8/MINIAODSIM/PU2017_12Apr2018_new_pmx_94X_mc2017_realistic_v14-v2/120000/420D636B-4BBB-E811-B806-0025905C54C6.root"   # use for testing
+        "/store/mc/RunIIFall17MiniAODv2/TTToHadronic_TuneCP5_13TeV-powheg-pythia8/MINIAODSIM/PU2017_12Apr2018_new_pmx_94X_mc2017_realistic_v14-v2/120000/420D636B-4BBB-E811-B806-0025905C54C6.root"
+
+# use for testing
         #"/store/data/Run2018D/JetHT/MINIAOD/PromptReco-v2/000/320/853/00000/2C20B666-3A9A-E811-9D32-FA163EAC4172.root"  # From Run2018D with a lot of events not passing the json file
-      "/store/mc/RunIIFall17MiniAODv2/GluGluHToTauTau_M125_13TeV_powheg_pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/90000/50FBFB5A-FE42-E811-A3E6-0025905A6092.root" #2017
+        #"/store/mc/RunIIFall17MiniAODv2/GluGluHToTauTau_M125_13TeV_powheg_pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/90000/50FBFB5A-FE42-E811-A3E6-0025905A6092.root" #2017
         #"/store/mc/RunIIAutumn18MiniAOD/WplusH_HToZZTo4L_M125_13TeV_tunedown_powheg2-minlo-HWJ_JHUGenV7011_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/30000/506681B7-DE8A-BF4E-9D9D-AE6C820B9734.root"
         #"/store/mc/RunIIAutumn18MiniAOD/DY1JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v2/270000/53AAF1AF-2FCF-424D-BC07-8150E599971B.root "
         ),
@@ -86,6 +83,14 @@ updateJetCollection(
   jetCorrections = ('AK4PFchs', cms.vstring(['L1FastJet', 'L2Relative', 'L3Absolute', 'L2L3Residual']), 'None')  # Update: Safe to always add 'L2L3Residual' as MC contains dummy L2L3Residual corrections (always set to 1)
 )
 process.jecSequence = cms.Sequence(process.patJetCorrFactorsUpdatedJEC * process.updatedPatJetsUpdatedJEC)
+
+updateJetCollection(
+  process,
+  jetSource = cms.InputTag('slimmedJetsPuppi'),
+  labelName = 'UpdatedJECPuppi',
+  jetCorrections = ('AK4PFPuppi', cms.vstring(['L1FastJet', 'L2Relative', 'L3Absolute', 'L2L3Residual']), 'None')  # Update: Safe to always add 'L2L3Residual' as MC contains dummy L2L3Residual corrections (always set to 1)
+)
+process.jecSequencepuppi = cms.Sequence(process.patJetCorrFactorsUpdatedJECPuppi * process.updatedPatJetsUpdatedJECPuppi)
 
 ### END JECs ==========================================================================================
 
@@ -159,7 +164,7 @@ updatedTauName = "NewTauIDsEmbedded" #name of pat::Tau collection with new tau-I
 import RecoTauTag.RecoTau.tools.runTauIdMVA as tauIdConfig
 tauIdEmbedder = tauIdConfig.TauIDEmbedder(process, cms, debug = False,
                                           updatedTauName = updatedTauName,
-                                          toKeep = [ "2017v2", "deepTau2017v2"]
+                                          toKeep = [ "2017v2", "deepTau2017v2p1","MVADM_2016_v1","MVADM_2017_v1"]
                                           )
 
 tauIdEmbedder.runTauID()
@@ -224,6 +229,13 @@ HLTlist = cms.untracked.vstring(
 'HLT_IsoMu20_v',
 'HLT_IsoMu24_v',
 'HLT_IsoMu27_v',
+'HLT_IsoTkMu24_v',
+#Merijn add triggers for 2016, from the analysis note..
+'HLT_IsoMu22_v',
+'HLT_IsoMu22_eta2p1_v',
+'HLT_IsoTkMu22_v',
+'HLT_IsoTkMu22_eta2p1_v',
+
 # Muon-Tau triggers
 'HLT_IsoMu20_eta2p1_LooseChargedIsoPFTau27_eta2p1_CrossL1_v',
 'HLT_IsoMu24_eta2p1_LooseChargedIsoPFTau20_SingleL1_v',
@@ -236,6 +248,7 @@ HLTlist = cms.untracked.vstring(
 # Dilepton triggers
 'HLT_DoubleEle24_eta2p1_WPTight_Gsf_v',
 'HLT_DoubleIsoMu24_eta2p1_v',
+'HLT_Mu17_Mu8_SameSign_DZ_v',
 'HLT_Mu18_Mu9_SameSign_v',
 'HLT_Mu18_Mu9_SameSign_DZ_v',
 # Triple muon
@@ -246,6 +259,8 @@ HLTlist = cms.untracked.vstring(
 'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v',
 'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v',
 # Ditau triggers
+'HLT_DoubleMediumIsoPFTau35_Trk1_eta2p1_Reg_v', #2016
+'HLT_DoubleMediumCombinedIsoPFTau35_Trk1_eta2p1_Reg_v', #2016
 'HLT_DoubleTightChargedIsoPFTau35_Trk1_TightID_eta2p1_Reg_v',
 'HLT_DoubleMediumChargedIsoPFTau40_Trk1_TightID_eta2p1_Reg_v',
 'HLT_DoubleTightChargedIsoPFTau40_Trk1_eta2p1_Reg_v',
@@ -311,6 +326,7 @@ RecElectron = cms.untracked.bool(True),
 RecTau = cms.untracked.bool(True),
 L1Objects = cms.untracked.bool(True),
 RecJet = cms.untracked.bool(True),
+RecJetPuppi= cms.untracked.bool(True),
 RecHTXS = cms.untracked.bool(isHiggsSignal),
 # collections
 MuonCollectionTag = cms.InputTag("slimmedMuons"),
@@ -323,6 +339,7 @@ L1TauCollectionTag = cms.InputTag("caloStage2Digis:Tau"),
 L1JetCollectionTag = cms.InputTag("caloStage2Digis:Jet"),
 #JetCollectionTag = cms.InputTag("slimmedJets"),
 JetCollectionTag = cms.InputTag("updatedPatJetsUpdatedJEC::TreeProducer"),
+PuppiJetCollectionTag = cms.InputTag("updatedPatJetsUpdatedJECPuppi::TreeProducer"),
 MetCollectionTag = cms.InputTag("slimmedMETs::@skipCurrentProcess"),
 MetCorrCollectionTag = cms.InputTag("slimmedMETsModifiedMET::TreeProducer"),
 PuppiMetCollectionTag = cms.InputTag("slimmedMETsPuppi::TreeProducer"),
@@ -372,10 +389,17 @@ RecTrackNum = cms.untracked.int32(0),
 RecMuonPtMin = cms.untracked.double(2.),
 RecMuonEtaMax = cms.untracked.double(2.5),
 RecMuonHLTriggerMatching = cms.untracked.vstring(
-#SingleMuon
+
+#Merijn add triggers for 2016, from the analysis note..
+'HLT_IsoMu22_v.*:hltL3crIsoL1sMu20L1f0L2f10QL3f22QL3trkIsoFiltered0p09',
+'HLT_IsoMu22_eta2p1_v.*:hltL3crIsoL1sSingleMu20erL1f0L2f10QL3f22QL3trkIsoFiltered0p09',
+'HLT_IsoTkMu22_v.*:hltL3fL1sMu20L1f0Tkf22QL3trkIsoFiltered0p09',
+'HLT_IsoTkMu22_eta2p1_v.*:hltL3fL1sMu20erL1f0Tkf22QL3trkIsoFiltered0p09',
+
 'HLT_IsoMu20_v.*:hltL3crIsoL1sMu18L1f0L2f10QL3f20QL3trkIsoFiltered0p07',
 'HLT_IsoMu24_v.*:hltL3crIsoL1sSingleMu22L1f0L2f10QL3f24QL3trkIsoFiltered0p07',
 'HLT_IsoMu27_v.*:hltL3crIsoL1sMu22Or25L1f0L2f10QL3f27QL3trkIsoFiltered0p07',
+'HLT_IsoTkMu24_v.*:hltL3fL1sMu22L1f0Tkf24QL3trkIsoFiltered0p09',
 'HLT_IsoMu20_eta2p1_LooseChargedIsoPFTau27_eta2p1_CrossL1_v.*:hltL1sMu18erTau24erIorMu20erTau24er',
 'HLT_IsoMu20_eta2p1_LooseChargedIsoPFTau27_eta2p1_CrossL1_v.*:hltL3crIsoL1sMu18erTau24erIorMu20erTau24erL1f0L2f10QL3f20QL3trkIsoFiltered0p07',
 'HLT_IsoMu20_eta2p1_LooseChargedIsoPFTau27_eta2p1_CrossL1_v.*:hltOverlapFilterIsoMu20LooseChargedIsoPFTau27L1Seeded',
@@ -387,6 +411,10 @@ RecMuonHLTriggerMatching = cms.untracked.vstring(
 'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v.*:hltMu23TrkIsoVVLEle12CaloIdLTrackIdLIsoVLDZFilter',
 'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v.*:hltMu8TrkIsoVVLEle23CaloIdLTrackIdLIsoVLMuonlegL3IsoFiltered8,hltL3fL1sMu7EG23f0Filtered8',
 'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v.*:hltMu8TrkIsoVVLEle23CaloIdLTrackIdLIsoVLDZFilter',
+'HLT_Mu17_Mu8_SameSign_DZ_v.*:hltL3pfL1sDoubleMu114ORDoubleMu125L1f0L2pf0L3PreFiltered8,hltL3pfL1sDoubleMu114L1f0L2pf0L3PreFiltered8',
+'HLT_Mu17_Mu8_SameSign_DZ_v.*:hltL3fL1sDoubleMu114L1f0L2f10OneMuL3Filtered17',
+'HLT_Mu17_Mu8_SameSign_DZ_v.*:hltDiMuonGlb17Glb8DzFiltered0p2',
+'HLT_Mu17_Mu8_SameSign_DZ_v.*:hltDiMuonGlb17Glb8DzFiltered0p2SameSign',
 'HLT_Mu18_Mu9_SameSign_DZ_v.*:hltL1sDoubleMu125to157',
 'HLT_Mu18_Mu9_SameSign_DZ_v.*:hltL3fL1DoubleMu157fFiltered9',
 'HLT_Mu18_Mu9_SameSign_DZ_v.*:hltL3fL1DoubleMu157fFiltered18',
@@ -433,6 +461,8 @@ RecTauHLTriggerMatching = cms.untracked.vstring(
 'HLT_Ele24_eta2p1_WPTight_Gsf_LooseChargedIsoPFTau30_eta2p1_CrossL1_v.*:hltL1sBigORLooseIsoEGXXerIsoTauYYerdRMin0p3,hltL1sIsoEG22erIsoTau26erdEtaMin0p2',
 'HLT_Ele24_eta2p1_WPTight_Gsf_LooseChargedIsoPFTau30_eta2p1_CrossL1_v.*:hltPFTau30TrackLooseChargedIso',
 'HLT_Ele24_eta2p1_WPTight_Gsf_LooseChargedIsoPFTau30_eta2p1_CrossL1_v.*:hltOverlapFilterIsoEle24WPTightGsfLooseIsoPFTau30',
+'HLT_DoubleMediumIsoPFTau35_Trk1_eta2p1_Reg_v.*:hltDoublePFTau35TrackPt1MediumIsolationDz02Reg',
+'HLT_DoubleMediumCombinedIsoPFTau35_Trk1_eta2p1_Reg_v.*:hltDoublePFTau35TrackPt1MediumCombinedIsolationDz02Reg',
 'HLT_DoubleTightChargedIsoPFTau35_Trk1_TightID_eta2p1_Reg_v.*:hltDoublePFTau35TrackPt1TightChargedIsolationAndTightOOSCPhotonsDz02Reg',
 'HLT_DoubleMediumChargedIsoPFTau40_Trk1_TightID_eta2p1_Reg_v.*:hltDoublePFTau40TrackPt1MediumChargedIsolationAndTightOOSCPhotonsDz02Reg',
 'HLT_DoubleTightChargedIsoPFTau40_Trk1_eta2p1_Reg_v.*:hltDoublePFTau40TrackPt1TightChargedIsolationDz02Reg',
@@ -469,7 +499,7 @@ RecJetBtagDiscriminators = cms.untracked.vstring(
 'pfDeepFlavourJetTags:probg'
 ),
 RecJetNum = cms.untracked.int32(0),
-SampleName = cms.untracked.string("Data") 
+SampleName = cms.untracked.string("Data")
 )
 # END NTuple Maker ======================================================================================
 
@@ -493,6 +523,7 @@ process.triggerSelection = cms.EDFilter("HLTHighLevel",
 process.p = cms.Path(
   process.initroottree *
   process.jecSequence *  # New JECs
+  process.jecSequencepuppi *  # New JECs
   process.egmPhotonIDSequence * # Puppi MET
   process.puppiMETSequence *  # Puppi MET
   process.fullPatMetSequencePuppi *  # Re-correcting Puppi MET
@@ -525,6 +556,7 @@ process.output = cms.OutputModule("PoolOutputModule",
                                     #'keep *_slimmedMuons_*_*',
                                     #'drop *_selectedPatJetsForMetT1T2Corr_*_*',
                                     #'drop patJets_*_*_*'
-                                  ),        
+                                  ),
                                   SelectEvents = cms.untracked.PSet(  SelectEvents = cms.vstring('p'))
 )
+
