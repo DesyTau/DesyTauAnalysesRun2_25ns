@@ -417,32 +417,6 @@ void NTupleMaker::beginJob(){
   // muons
   if (crecmuon) {
 
-/*
-    //Merijn add branches for the helicity parameters
-//Merijn: for some reason this trickery was needed, couldn't find good explanation yet..
-  tree->Branch("muon_helixparameters", muon_helixparameters,TString::Format("muon_helixparameters[%d][5]/F", muon_count));
-//    tree->Branch("muon_helixparameters", muon_helixparameters, "muon_helixparameters[muon_count][5]/F");
-    tree->Branch("muon_helixparameters_covar", muon_helixparameters_covar,TString::Format("muon_helixparameters_covar[%i][5][5]/F", muon_count));
-
-//    tree->Branch("muon_referencePoint", muon_referencePoint,TString::Format("muon_referencePoint[%i][5]/F", muon_count));
-
-//    tree->Branch("muon_referencePoint", muon_referencePoint,"muon_referencePoint[100][5]/F");
-//    tree->Branch("referencePoint", muon_referencePoint,"muon_referencePoint[muon_count][3]/F");
-
-cout<<" muon_referencePoint branch "<<endl;
- //   tree->Branch("muon_referencePoint", muon_referencePoint, "muon_referencePoint[muon_count][3]/F");
-    tree->Branch("muon_referencePoint", &muon_referencePoint, Form("muon_referencePoint[%d][3]/F",muon_count));
-//Form("AA[%D]/F",TOTAL
-cout<<" muon_referencePoint branch 2"<<endl;
-
-    tree->Branch("tau_SV_cov2", tau_SV_cov2, "tau_SV_cov2[tau_count][3]/F");
-//    tree->Branch("tau_SV_cov", tau_SV_cov, "tau_SV_cov[tau_count][6]/F"); Merijn this declaration is allowed.. I don get it
-
-//    tree->Branch("muon_Bfield", muon_Bfield, "muon_Bfield[muon_count]/F");
-//    tree->Branch("muon_Bfield", &muon_Bfield, TString::Format("muon_Bfield[%i]/F",muon_count));
-    tree->Branch("muon_Bfield2", &muon_Bfield, "muon_Bfield2/F"	);
-*/
-
     tree->Branch("muon_count", &muon_count, "muon_count/i");
 
     tree->Branch("muon_helixparameters", muon_helixparameters, "muon_helixparameters[muon_count][5]/F");
@@ -709,17 +683,6 @@ cout<<" muon_referencePoint branch 2"<<endl;
   if (crectau) {
  
     tree->Branch("tau_count", &tau_count, "tau_count/i");
-
-/*
-    tree->Branch("tau_helixparameters", tau_helixparameters,TString::Format("tau_helixparameters[%i][5]/F", tau_count));
-    tree->Branch("tau_helixparameters_covar", tau_helixparameters_covar,TString::Format("tau_helixparameters_covar[%i][5][5]/F", tau_count));
-    tree->Branch("tau_referencePoint", tau_referencePoint,TString::Format("tau_referencePoint[%i][5]/F", tau_count));
-    tree->Branch("tau_Bfield", tau_Bfield, TString::Format("tau_Bfield[%i]/F",tau_count));
-
-    tree->Branch("tau_helixparameters", tau_helixparameters,"tau_helixparameters[tau_count][5]/F");
-    tree->Branch("tau_helixparameters_covar", tau_helixparameters_covar,"tau_helixparameters_covar[tau_count][5][5]/F");
-    tree->Branch("tau_referencePoint", tau_referencePoint,"tau_referencePoint[tau_count][5]/F");
-    tree->Branch("tau_Bfield", tau_Bfield,"tau_Bfield[tau_count]/F");*/
 
     tree->Branch("tau_helixparameters", tau_helixparameters, "tau_helixparameters[tau_count][5]/F");
     tree->Branch("tau_helixparameters_covar", tau_helixparameters_covar,"tau_helixparameters_covar[tau_count][5][5]/F");
@@ -4185,11 +4148,6 @@ else{
 	      const pat::PackedCandidate* pCand = dynamic_cast<const pat::PackedCandidate*>(cand.get());
 	      if (pCand != nullptr && pCand->hasTrackDetails())
 		transTrk.push_back(transTrackBuilder->build(&pCand->pseudoTrack()));
-/*
-	cout<<" pseudotrack!"<<endl;
-	  TrackBase::ParameterVector ParamVecTau=pCand->pseudoTrack()).parameters();
-	cout<<" ~pseudotrack!"<<endl;
-*/
 	    }
 	    // 2) Fit the secondary vertex
 	    bool fitOK(true);
