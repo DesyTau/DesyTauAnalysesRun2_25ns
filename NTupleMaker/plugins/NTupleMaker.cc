@@ -447,7 +447,7 @@ cout<<" muon_referencePoint branch 2"<<endl;
 
     tree->Branch("muon_helixparameters", muon_helixparameters, "muon_helixparameters[muon_count][5]/F");
     tree->Branch("muon_helixparameters_covar", muon_helixparameters_covar,"muon_helixparameters_covar[muon_count][5][5]/F");
-    tree->Branch("referencePoint", muon_referencePoint,"muon_referencePoint[muon_count][3]/F");
+    tree->Branch("muon_referencePoint", muon_referencePoint,"muon_referencePoint[muon_count][3]/F");
     tree->Branch("muon_Bfield", muon_Bfield, "muon_Bfield[muon_count]/F");
 
     tree->Branch("muon_px", muon_px, "muon_px[muon_count]/F");
@@ -721,12 +721,10 @@ cout<<" muon_referencePoint branch 2"<<endl;
     tree->Branch("tau_referencePoint", tau_referencePoint,"tau_referencePoint[tau_count][5]/F");
     tree->Branch("tau_Bfield", tau_Bfield,"tau_Bfield[tau_count]/F");*/
 
-cout<<"here tau 1"<<endl;
     tree->Branch("tau_helixparameters", tau_helixparameters, "tau_helixparameters[tau_count][5]/F");
     tree->Branch("tau_helixparameters_covar", tau_helixparameters_covar,"tau_helixparameters_covar[tau_count][5][5]/F");
-    tree->Branch("referencePoint", tau_referencePoint,"tau_referencePoint[tau_count][3]/F");
+    tree->Branch("tau_referencePoint", tau_referencePoint,"tau_referencePoint[tau_count][3]/F");
     tree->Branch("tau_Bfield", tau_Bfield, "tau_Bfield[tau_count]/F");
-cout<<"here tau 2"<<endl;
 
     tree->Branch("tau_e", tau_e, "tau_e[tau_count]/F");
     tree->Branch("tau_px", tau_px, "tau_px[tau_count]/F");
@@ -3264,7 +3262,6 @@ unsigned int NTupleMaker::AddMuons(const edm::Event& iEvent, const edm::EventSet
 
 	for(int index=0; index<ParamVecMu.kSize;index++){
 	  muon_helixparameters[muon_count][index]=ParamVecMu[index];
-	cout<<"muon_helixparameters[muon_count][index] "<<muon_helixparameters[muon_count][index]<<endl;
 	  for(int index2=0; index2<ParamVecMu.kSize;index2++){
 	    muon_helixparameters_covar[muon_count][index][index2]=CVMTrack[index][index2];
 	  }
@@ -3280,7 +3277,6 @@ unsigned int NTupleMaker::AddMuons(const edm::Event& iEvent, const edm::EventSet
 	muon_Bfield[muon_count]=magneticField;
 	}
 	else{
-	cout<<"init mu to a default"<<endl;
 	for(int index=0; index<5;index++){
 	  muon_helixparameters[muon_count][index]=-999;
 	  for(int index2=0; index2<5;index2++){
@@ -3873,7 +3869,7 @@ unsigned int NTupleMaker::AddTaus(const edm::Event& iEvent, const edm::EventSetu
       l1extrataus = l1extratausHandle.product();
   }
   else
-    l1taus = l1tausHandle.product();
+    l1taus = l1tausHandle.product();	
 
   //  iEvent.getByLabel(edm::InputTag("packedPFCandidates"),packedPFCandidates);
   //  assert(packedPFCandidates.isValid());
@@ -3921,18 +3917,17 @@ unsigned int NTupleMaker::AddTaus(const edm::Event& iEvent, const edm::EventSetu
 
 	  if(doDebug) cout << "Skimmed events..."<< endl;
 
-//Merijn get helix parameters
-	cout<<"Here tau 1"<<endl;
-	  reco::TrackRef leadTrk = (*Taus)[i].leadTrack();
-	  if(leadTrk.isNonnull()){
-	cout<<"Here tau in loop"<<endl;
+//calculation for helix parameters for tau. First get PackedCandidate, from this get reco::Track.
+	pat::PackedCandidate const* packedLeadTauCand = dynamic_cast<pat::PackedCandidate const*>((*Taus)[i].leadChargedHadrCand().get());
+const reco::Track* leadTrk=packedLeadTauCand->bestTrack();
+
+if (leadTrk != nullptr){ 
 	  TrackBase::ParameterVector ParamVecTau=leadTrk->parameters();
 	  TrackBase::CovarianceMatrix CVMTrackTau=leadTrk->covariance();
 
 	  //storage them
 	  for(int index=0; index<ParamVecTau.kSize;index++){
 	    tau_helixparameters[tau_count][index]=ParamVecTau[index];
-		cout<<"tau_helixparameters[tau_count][index] "<<tau_helixparameters[tau_count][index]<<endl;
 	    for(int index2=0; index2<ParamVecTau.kSize;index2++){
 	      tau_helixparameters_covar[tau_count][index][index2]=CVMTrackTau[index][index2];
 	    }}
@@ -3943,15 +3938,10 @@ unsigned int NTupleMaker::AddTaus(const edm::Event& iEvent, const edm::EventSetu
 	  tau_referencePoint[tau_count][1]=RFptTau.Y();
 	  tau_referencePoint[tau_count][2]=RFptTau.Z();
 
-
-//save b field for the ref pt..
 	  double magneticField = (TTrackBuilder.product() ? TTrackBuilder.product()->field()->inInverseGeV(GlobalPoint(RFptTau.X(), RFptTau.Y(), RFptTau.Z())).z() : 0.0);
 	  tau_Bfield[tau_count]=magneticField;
-	cout<<"tau magneticField "<<magneticField<<endl;
-// end of obtaining helix parameters
 }
 else{
-cout<<"init tau to a default"<<endl;
 	  for(int index=0; index<5;index++){
 	    tau_helixparameters[tau_count][index]=-999;
 	    for(int index2=0; index2<5;index2++){
@@ -4011,6 +4001,7 @@ cout<<"init tau to a default"<<endl;
 	    tau_constituents_vy[tau_count][tau_constituents_count_]     = (*Taus)[i].signalCands()[m]->vy();
 	    tau_constituents_vz[tau_count][tau_constituents_count_]     = (*Taus)[i].signalCands()[m]->vz();
 	    tau_constituents_pdgId[tau_count][tau_constituents_count_]  = (*Taus)[i].signalCands()[m]->pdgId();
+
 	    if((*Taus)[i].signalCands()[m]->charge()!=0){
 	      if ((*Taus)[i].signalCands()[m]->pt()>momMax) {
 		momMax = (*Taus)[i].signalCands()[m]->pt();
@@ -4194,6 +4185,11 @@ cout<<"init tau to a default"<<endl;
 	      const pat::PackedCandidate* pCand = dynamic_cast<const pat::PackedCandidate*>(cand.get());
 	      if (pCand != nullptr && pCand->hasTrackDetails())
 		transTrk.push_back(transTrackBuilder->build(&pCand->pseudoTrack()));
+/*
+	cout<<" pseudotrack!"<<endl;
+	  TrackBase::ParameterVector ParamVecTau=pCand->pseudoTrack()).parameters();
+	cout<<" ~pseudotrack!"<<endl;
+*/
 	    }
 	    // 2) Fit the secondary vertex
 	    bool fitOK(true);
