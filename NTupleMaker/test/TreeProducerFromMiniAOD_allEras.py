@@ -559,4 +559,3 @@ process.output = cms.OutputModule("PoolOutputModule",
                                   ),
                                   SelectEvents = cms.untracked.PSet(  SelectEvents = cms.vstring('p'))
 )
-

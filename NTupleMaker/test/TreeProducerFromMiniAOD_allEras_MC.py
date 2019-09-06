@@ -141,8 +141,6 @@ updatedTauName = "NewTauIDsEmbedded" #name of pat::Tau collection with new tau-I
 import RecoTauTag.RecoTau.tools.runTauIdMVA as tauIdConfig
 tauIdEmbedder = tauIdConfig.TauIDEmbedder(process, cms, debug = False,
                                           updatedTauName = updatedTauName,
-
-
                                           toKeep = [ "2017v1", "2017v2", "newDM2017v2", "dR0p32017v2", "2016v1", "newDM2016v1", "deepTau2017v2","MVADM_2016_v1","MVADM_2017_v1"]
                                           )
 
