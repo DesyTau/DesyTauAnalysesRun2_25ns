@@ -151,9 +151,18 @@ else :
 ### Electron ID, scale and smearing =======================================================================
 # from https://twiki.cern.ch/twiki/bin/view/CMS/EgammaMiniAODV2#2017_MiniAOD_V2%20#https://twiki.cern.ch/twiki/bin/view/CMS/EgammaPostRecoR
 from RecoEgamma.EgammaTools.EgammaPostRecoTools import setupEgammaPostRecoSeq
+if period is '2016' :
+    labelEra = '2016-Legacy'
+    rerun = False
+if period is '2017' :
+    labelEra = '2017-Nov17ReReco'
+    rerun = True
+if period is '2018' :
+    labelEra = '2018-Prompt'
+    rerun = True
 setupEgammaPostRecoSeq(process,
-                       era='2018-Prompt')
-
+                       runVID=rerun,
+                       era=labelEra)
 # Tau ID ===============================================================================================
 # https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePFTauID#Running_of_the_DNN_based_tau_ID
 
@@ -583,4 +592,3 @@ process.output = cms.OutputModule("PoolOutputModule",
                                   ),
                                   SelectEvents = cms.untracked.PSet(  SelectEvents = cms.vstring('p'))
 )
-
