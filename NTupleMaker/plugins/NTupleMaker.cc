@@ -419,7 +419,14 @@ void NTupleMaker::beginJob(){
 
   // muons
   if (crecmuon) {
+
     tree->Branch("muon_count", &muon_count, "muon_count/i");
+
+    tree->Branch("muon_helixparameters", muon_helixparameters, "muon_helixparameters[muon_count][5]/F");
+    tree->Branch("muon_helixparameters_covar", muon_helixparameters_covar,"muon_helixparameters_covar[muon_count][5][5]/F");
+    tree->Branch("muon_referencePoint", muon_referencePoint,"muon_referencePoint[muon_count][3]/F");
+    tree->Branch("muon_Bfield", muon_Bfield, "muon_Bfield[muon_count]/F");
+
     tree->Branch("muon_px", muon_px, "muon_px[muon_count]/F");
     tree->Branch("muon_py", muon_py, "muon_py[muon_count]/F");
     tree->Branch("muon_pz", muon_pz, "muon_pz[muon_count]/F");
@@ -488,7 +495,8 @@ void NTupleMaker::beginJob(){
     tree->Branch("dimuon_dist3D", dimuon_dist3D, "dimuon_dist3D[dimuon_count]/F");
     tree->Branch("dimuon_dist3DE", dimuon_dist3DE, "dimuon_dist3DE[dimuon_count]/F");
     */
-  }
+
+}
 
   // pf jets
   if (crecpfjet) {
@@ -559,6 +567,22 @@ void NTupleMaker::beginJob(){
     tree->Branch("electron_pt", electron_pt, "electron_pt[electron_count]/F");
     tree->Branch("electron_eta", electron_eta, "electron_eta[electron_count]/F");
     tree->Branch("electron_phi", electron_phi, "electron_phi[electron_count]/F");
+    tree->Branch("electron_px_energyscale_up", electron_px_energyscale_up, "electron_px_energyscale_up[electron_count]/F");
+    tree->Branch("electron_px_energyscale_down", electron_px_energyscale_down, "electron_px_energyscale_down[electron_count]/F");
+    tree->Branch("electron_py_energyscale_up", electron_py_energyscale_up, "electron_py_energyscale_up[electron_count]/F");
+    tree->Branch("electron_py_energyscale_down", electron_py_energyscale_down, "electron_py_energyscale_down[electron_count]/F");
+    tree->Branch("electron_pz_energyscale_up", electron_pz_energyscale_up, "electron_pz_energyscale_up[electron_count]/F");
+    tree->Branch("electron_pz_energyscale_down", electron_pz_energyscale_down, "electron_pz_energyscale_down[electron_count]/F");
+    tree->Branch("electron_pt_energyscale_up", electron_pt_energyscale_up, "electron_pt_energyscale_up[electron_count]/F");
+    tree->Branch("electron_pt_energyscale_down", electron_pt_energyscale_down, "electron_pt_energyscale_down[electron_count]/F");
+    tree->Branch("electron_px_energysigma_up", electron_px_energysigma_up, "electron_px_energysigma_up[electron_count]/F");
+    tree->Branch("electron_px_energysigma_down", electron_px_energysigma_down, "electron_px_energysigma_down[electron_count]/F");
+    tree->Branch("electron_py_energysigma_up", electron_py_energysigma_up, "electron_py_energysigma_up[electron_count]/F");
+    tree->Branch("electron_py_energysigma_down", electron_py_energysigma_down, "electron_py_energysigma_down[electron_count]/F");
+    tree->Branch("electron_pz_energysigma_up", electron_pz_energysigma_up, "electron_pz_energysigma_up[electron_count]/F");
+    tree->Branch("electron_pz_energysigma_down", electron_pz_energysigma_down, "electron_pz_energysigma_down[electron_count]/F");
+    tree->Branch("electron_pt_energysigma_up", electron_pt_energysigma_up, "electron_pt_energysigma_up[electron_count]/F");
+    tree->Branch("electron_pt_energysigma_down", electron_pt_energysigma_down, "electron_pt_energysigma_down[electron_count]/F");
     tree->Branch("electron_trackchi2", electron_trackchi2, "electron_trackchi2[electron_count]/F");
     tree->Branch("electron_trackndof", electron_trackndof, "electron_trackndof[electron_count]/F");
     tree->Branch("electron_outerx", electron_outerx, "electron_outerx[electron_count]/F");
@@ -703,7 +727,14 @@ void NTupleMaker::beginJob(){
 
   // taus
   if (crectau) {
+ 
     tree->Branch("tau_count", &tau_count, "tau_count/i");
+
+    tree->Branch("tau_helixparameters", tau_helixparameters, "tau_helixparameters[tau_count][5]/F");
+    tree->Branch("tau_helixparameters_covar", tau_helixparameters_covar,"tau_helixparameters_covar[tau_count][5][5]/F");
+    tree->Branch("tau_referencePoint", tau_referencePoint,"tau_referencePoint[tau_count][3]/F");
+    tree->Branch("tau_Bfield", tau_Bfield, "tau_Bfield[tau_count]/F");
+
     tree->Branch("tau_e", tau_e, "tau_e[tau_count]/F");
     tree->Branch("tau_px", tau_px, "tau_px[tau_count]/F");
     tree->Branch("tau_py", tau_py, "tau_py[tau_count]/F");
@@ -3224,11 +3255,6 @@ unsigned int NTupleMaker::AddMuons(const edm::Event& iEvent, const edm::EventSet
   iEvent.getByToken(BadGlobalMuonsToken_, BadGlobalMuons);
   */
 
-  //Merijn 2019 8 28: try to incorporate here the parameter vector and helecity parameters
-  //we need a property of the transient muon track
-
-
-
 
   if(Muons.isValid())
     {
@@ -3242,36 +3268,43 @@ unsigned int NTupleMaker::AddMuons(const edm::Event& iEvent, const edm::EventSet
 	if ((*Muons)[i].pt() < cMuPtMin) continue;
 	if (fabs(((*Muons)[i].eta()))>cMuEtaMax) continue;
 
-	//	std::cout << "Selected pat::Muon " << i << std::endl;
 
-
-	/*Merijn 2019 8 28: I'll try to
-	  0) try to obtain transient track from pat muon
-	  1) convert the pat muon to RECO  https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePATFAQs#How_can_I_retrieve_the_reference
-	  2) obtain a transient track based on it
-	  3) extract the parameters we need, and save
-	  4) The last may require some work, if possible try to store as the objects they are.
-	 */
-
-   /*
-	edm::Ptr<reco::Candidate> originalRef = (*Muons)[i].originalObjectRef();
-	const reco::Muon *originalMu = dynamic_cast<const reco::Muon *>(originalRef.get());
-	if (originalMu == 0) { cout<<"... sorry, this was not a reco::Muon object ... "<<endl;}
-	else{ cout<<"... Yeehah, could get the muon reco object ... "<<endl; }
-
-	//try to get instead a transienttrack from PAT muon:
-	edm::ESHandle<TransientTrackBuilder> transTrackBuildertmp;
-	iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder",transTrackBuildertmp);
+//code below is to store the track param vec + covariances, a references pt on track, and B field in ref pt. For CP measurement
 
 	reco::TrackRef leadTrk = (*Muons)[i].innerTrack();
-	TransientTrack trLeadTrk = transTrackBuildertmp->build(*leadTrk);
-  //	TrackBase::ParameterVector ParamVecMu=trLeadTrk.parameters();
-	//TrackBase::ParameterVector ParamVecMu=(*Muons)[i].parameters();
-
-	//	TrackBase::ParameterVector ParamVecMu=originalMu->parameters();
+	if (leadTrk.isNonnull()) {
 	TrackBase::ParameterVector ParamVecMu=leadTrk->parameters();
-  */
+	TrackBase::CovarianceMatrix CVMTrack=leadTrk->covariance();
 
+	for(int index=0; index<ParamVecMu.kSize;index++){
+	  muon_helixparameters[muon_count][index]=ParamVecMu[index];
+	  for(int index2=0; index2<ParamVecMu.kSize;index2++){
+	    muon_helixparameters_covar[muon_count][index][index2]=CVMTrack[index][index2];
+	  }
+	}
+
+	TrackBase::Point RFptMu=leadTrk->referencePoint();
+
+	muon_referencePoint[muon_count][0]=RFptMu.X();
+	muon_referencePoint[muon_count][1]=RFptMu.Y();
+	muon_referencePoint[muon_count][2]=RFptMu.Z();
+	
+	double	magneticField = (TTrackBuilder.product() ? TTrackBuilder.product()->field()->inInverseGeV(GlobalPoint(RFptMu.X(), RFptMu.Y(), RFptMu.Z())).z() : 0.0);
+	muon_Bfield[muon_count]=magneticField;
+	}
+	else{
+	for(int index=0; index<5;index++){
+	  muon_helixparameters[muon_count][index]=-999;
+	  for(int index2=0; index2<5;index2++){
+	    muon_helixparameters_covar[muon_count][index][index2]=-999;
+	  }
+	}
+
+	muon_referencePoint[muon_count][0]=-999;
+	muon_referencePoint[muon_count][1]=-999;
+	muon_referencePoint[muon_count][2]=-999;	  
+	muon_Bfield[muon_count]=-999;
+}
 
 	muon_px[muon_count] = (*Muons)[i].px();
 	muon_py[muon_count] = (*Muons)[i].py();
@@ -3283,6 +3316,7 @@ unsigned int NTupleMaker::AddMuons(const edm::Event& iEvent, const edm::EventSet
 	muon_vx[muon_count] = (*Muons)[i].vx(); // gives the same as (*Muons)[i].muonBestTrack()->vx()
 	muon_vy[muon_count] = (*Muons)[i].vy();
 	muon_vz[muon_count] = (*Muons)[i].vz();
+
 
 	const pat::Muon &lep = (*Muons)[i];
 	muon_miniISO[muon_count]=getPFIsolation(pfcands, dynamic_cast<const reco::Candidate *>(&lep), 0.05, 0.2, 10., false);
@@ -3851,7 +3885,7 @@ unsigned int NTupleMaker::AddTaus(const edm::Event& iEvent, const edm::EventSetu
       l1extrataus = l1extratausHandle.product();
   }
   else
-    l1taus = l1tausHandle.product();
+    l1taus = l1tausHandle.product();	
 
   //  iEvent.getByLabel(edm::InputTag("packedPFCandidates"),packedPFCandidates);
   //  assert(packedPFCandidates.isValid());
@@ -3898,6 +3932,43 @@ unsigned int NTupleMaker::AddTaus(const edm::Event& iEvent, const edm::EventSetu
 	     && (*Taus)[i].tauID("decayModeFindingNewDMs") < 0.5 ) continue; //remove this cut from here OR apply new DMF cuts
 
 	  if(doDebug) cout << "Skimmed events..."<< endl;
+
+//calculation for helix parameters for tau. First get PackedCandidate, from this get reco::Track.
+	pat::PackedCandidate const* packedLeadTauCand = dynamic_cast<pat::PackedCandidate const*>((*Taus)[i].leadChargedHadrCand().get());
+const reco::Track* leadTrk=packedLeadTauCand->bestTrack();
+
+if (leadTrk != nullptr){ 
+	  TrackBase::ParameterVector ParamVecTau=leadTrk->parameters();
+	  TrackBase::CovarianceMatrix CVMTrackTau=leadTrk->covariance();
+
+	  //storage them
+	  for(int index=0; index<ParamVecTau.kSize;index++){
+	    tau_helixparameters[tau_count][index]=ParamVecTau[index];
+	    for(int index2=0; index2<ParamVecTau.kSize;index2++){
+	      tau_helixparameters_covar[tau_count][index][index2]=CVMTrackTau[index][index2];
+	    }}
+
+	  //get reference point in track
+	  TrackBase::Point RFptTau=leadTrk->referencePoint();
+	  tau_referencePoint[tau_count][0]=RFptTau.X();
+	  tau_referencePoint[tau_count][1]=RFptTau.Y();
+	  tau_referencePoint[tau_count][2]=RFptTau.Z();
+
+	  double magneticField = (TTrackBuilder.product() ? TTrackBuilder.product()->field()->inInverseGeV(GlobalPoint(RFptTau.X(), RFptTau.Y(), RFptTau.Z())).z() : 0.0);
+	  tau_Bfield[tau_count]=magneticField;
+}
+else{
+	  for(int index=0; index<5;index++){
+	    tau_helixparameters[tau_count][index]=-999;
+	    for(int index2=0; index2<5;index2++){
+	      tau_helixparameters_covar[tau_count][index][index2]=-999;
+	    }}
+
+	  tau_referencePoint[tau_count][0]=-999;
+	  tau_referencePoint[tau_count][1]=-999;
+	  tau_referencePoint[tau_count][2]=-999;
+	  tau_Bfield[tau_count]=-999;
+}
 
 	  tau_e[tau_count]                                        = (*Taus)[i].energy();
 	  tau_px[tau_count]                                       = (*Taus)[i].px();
@@ -3946,6 +4017,7 @@ unsigned int NTupleMaker::AddTaus(const edm::Event& iEvent, const edm::EventSetu
 	    tau_constituents_vy[tau_count][tau_constituents_count_]     = (*Taus)[i].signalCands()[m]->vy();
 	    tau_constituents_vz[tau_count][tau_constituents_count_]     = (*Taus)[i].signalCands()[m]->vz();
 	    tau_constituents_pdgId[tau_count][tau_constituents_count_]  = (*Taus)[i].signalCands()[m]->pdgId();
+
 	    if((*Taus)[i].signalCands()[m]->charge()!=0){
 	      if ((*Taus)[i].signalCands()[m]->pt()>momMax) {
 		momMax = (*Taus)[i].signalCands()[m]->pt();
@@ -4522,6 +4594,26 @@ unsigned int NTupleMaker::AddElectrons(const edm::Event& iEvent, const edm::Even
 	    electron_py[electron_count] = corrP4.Py();
 	    electron_pz[electron_count] = corrP4.Pz();
 	    electron_pt[electron_count] = corrP4.Pt();
+      auto corrP4_energyscale_up  = el->p4() * el->userFloat("energyScaleUp") / el->energy();
+      auto corrP4_energyscale_down  = el->p4() * el->userFloat("energyScaleDown") / el->energy();
+      electron_px_energyscale_up[electron_count] = corrP4_energyscale_up.Px();
+      electron_px_energyscale_down[electron_count] = corrP4_energyscale_down.Px();
+      electron_py_energyscale_up[electron_count] = corrP4_energyscale_up.Py();
+      electron_py_energyscale_down[electron_count] = corrP4_energyscale_down.Py();
+      electron_pz_energyscale_up[electron_count] = corrP4_energyscale_up.Pz();
+      electron_pz_energyscale_down[electron_count] = corrP4_energyscale_down.Pz();
+      electron_pt_energyscale_up[electron_count] = corrP4_energyscale_up.Pt();
+      electron_pt_energyscale_down[electron_count] = corrP4_energyscale_down.Pt();
+      auto corrP4_energysigma_up  = el->p4() * el->userFloat("energySigmaUp") / el->energy();
+      auto corrP4_energysigma_down = el->p4() * el->userFloat("energySigmaDown") / el->energy();
+      electron_px_energysigma_up[electron_count] = corrP4_energysigma_up.Px();
+      electron_px_energysigma_down[electron_count] = corrP4_energysigma_down.Px();
+      electron_py_energysigma_up[electron_count] = corrP4_energysigma_up.Py();
+      electron_py_energysigma_down[electron_count] = corrP4_energysigma_down.Py();
+      electron_pz_energysigma_up[electron_count] = corrP4_energysigma_up.Pz();
+      electron_pz_energysigma_down[electron_count] = corrP4_energysigma_down.Pz();
+      electron_pt_energysigma_up[electron_count] = corrP4_energysigma_up.Pt();
+      electron_pt_energysigma_down[electron_count] = corrP4_energysigma_down.Pt();
 	  }
 	  else {
 	    electron_px[electron_count] = el->px();
