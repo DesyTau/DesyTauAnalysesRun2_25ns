@@ -1,20 +1,15 @@
 import FWCore.ParameterSet.Config as cms
 
+# Configurable options =======================================================================
 isData = False
 isEmbedded = False
 isRun2018D = False
 isHiggsSignal = False
 year = 2017
 period = '2017'
-
-#configurable options =======================================================================
-runOnData=isData #data/MC switch
-usePrivateSQlite=False #use external JECs (sqlite file) /// OUTDATED for 25ns
-useHFCandidates=True #create an additionnal NoHF slimmed MET collection if the option is set to false  == existing as slimmedMETsNoHF
-applyResiduals=True #application of residual corrections. Have to be set to True once the 13 TeV residual corrections are available. False to be kept meanwhile. Can be kept to False later for private tests or for analysis checks and developments (not the official recommendation!).
-#===================================================================
-if isEmbedded :
-    isData = True
+# ============================================================================================
+if isEmbedded : isData = True
+# ============================================================================================
 
 # Define the CMSSW process
 process = cms.Process("TreeProducer")
@@ -61,8 +56,10 @@ import FWCore.PythonUtilities.LumiList as LumiList
 # https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideGoodLumiSectionsJSONFile#cmsRun
 process.source = cms.Source("PoolSource",
   fileNames = cms.untracked.vstring(
-        #"/store/data/Run2017D/SingleMuon/MINIAOD/31Mar2018-v1/00000/2A2ADC80-2238-E811-B4F6-E0DB55FC11A5.root"  # use for testing
-        "/store/mc/RunIIFall17MiniAODv2/TTToHadronic_TuneCP5_13TeV-powheg-pythia8/MINIAODSIM/PU2017_12Apr2018_new_pmx_94X_mc2017_realistic_v14-v2/120000/420D636B-4BBB-E811-B806-0025905C54C6.root"  # use for testing
+        #"/store/data/Run2017D/SingleMuon/MINIAOD/31Mar2018-v1/00000/2A2ADC80-2238-E811-B4F6-E0DB55FC11A5.root"  # use for testing (2017)
+        "/store/mc/RunIIFall17MiniAODv2/TTToHadronic_TuneCP5_13TeV-powheg-pythia8/MINIAODSIM/PU2017_12Apr2018_new_pmx_94X_mc2017_realistic_v14-v2/120000/420D636B-4BBB-E811-B806-0025905C54C6.root"  # use for testing (2017)
+        #"/store/mc/RunIISummer16MiniAODv3/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/MINIAODSIM/PUMoriond17_94X_mcRun2_asymptotic_v3-v1/120000/FE7E7C9D-3CBF-E811-8BA6-44A84223FF3C.root" # use for testing (2016)
+        #"/store/data/Run2016C/SingleMuon/MINIAOD/17Jul2018-v1/20000/FEC97F81-0097-E811-A7B9-90E2BACC5EEC.root" # use for testing (2016)
         #"/store/data/Run2018D/JetHT/MINIAOD/PromptReco-v2/000/320/853/00000/2C20B666-3A9A-E811-9D32-FA163EAC4172.root"  # From Run2018D with a lot of events not passing the json file
         #"/store/mc/RunIIFall17MiniAODv2/GluGluHToTauTau_M125_13TeV_powheg_pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/90000/50FBFB5A-FE42-E811-A3E6-0025905A6092.root" #2017
         #"/store/mc/RunIIAutumn18MiniAOD/WplusH_HToZZTo4L_M125_13TeV_tunedown_powheg2-minlo-HWJ_JHUGenV7011_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/30000/506681B7-DE8A-BF4E-9D9D-AE6C820B9734.root"
@@ -102,7 +99,7 @@ from PhysicsTools.PatUtils.tools.runMETCorrectionsAndUncertainties import runMet
 
 # If you only want to re-correct and get the proper uncertainties
 runMetCorAndUncFromMiniAOD(process,
-                           isData=runOnData,
+                           isData=isData,
                            fixEE2017 = bool(period=='2017'),
                            fixEE2017Params = {'userawPt': True, 'ptThreshold':50.0, 'minEtaThreshold':2.65, 'maxEtaThreshold': 3.139} ,
                            postfix = "ModifiedMET"
@@ -114,7 +111,7 @@ makePuppiesFromMiniAOD( process, True );
 
 # If you only want to re-correct and get the proper uncertainties
 runMetCorAndUncFromMiniAOD(process,
-                           isData=runOnData,
+                           isData=isData,
                            metType="Puppi",
                            postfix="Puppi",
                            jetFlavor="AK4PFPuppi",
