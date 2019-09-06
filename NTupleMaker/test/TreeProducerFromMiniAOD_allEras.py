@@ -13,6 +13,8 @@ usePrivateSQlite=False #use external JECs (sqlite file) /// OUTDATED for 25ns
 useHFCandidates=True #create an additionnal NoHF slimmed MET collection if the option is set to false  == existing as slimmedMETsNoHF
 applyResiduals=True #application of residual corrections. Have to be set to True once the 13 TeV residual corrections are available. False to be kept meanwhile. Can be kept to False later for private tests or for analysis checks and developments (not the official recommendation!).
 #===================================================================
+if isEmbedded :
+    isData = True
 
 # Define the CMSSW process
 process = cms.Process("TreeProducer")
@@ -295,21 +297,31 @@ print HLTlist
 # END Trigger list ============================================================================================
 
 # NTuple Maker =========================================================================================
+storeGenParticles = False
+if isEmbedded or not isData :
+    storeGenParticles = True
+if isEmbedded :
+    triggerLabel = "SIMembedding"
+    minrecmuonpt = 5.
+else :
+    triggerLabel = "HLT"
+    minrecmuonpt = 2.
+
 process.initroottree = cms.EDAnalyzer("InitAnalyzer",
 IsData = cms.untracked.bool(isData),
 #IsData = cms.untracked.bool(False),
-GenParticles = cms.untracked.bool(not isData),
+GenParticles = cms.untracked.bool(storeGenParticles),
 GenJets = cms.untracked.bool(not isData)
 )
 process.makeroottree = cms.EDAnalyzer("NTupleMaker",
 # data, year, period, skim
-IsData = cms.untracked.bool(isData),
-IsEmbedded = cms.untracked.bool(False),
+IsData = cms.untracked.bool(storeGenParticles),
+IsEmbedded = cms.untracked.bool(isEmbedded),
 Year = cms.untracked.uint32(year),
 Period = cms.untracked.string(period),
 Skim = cms.untracked.uint32(0),
 # switches of collections
-GenParticles = cms.untracked.bool(not isData),
+GenParticles = cms.untracked.bool(storeGenParticles),
 GenJets = cms.untracked.bool(not isData),
 SusyInfo = cms.untracked.bool(not isData),
 Trigger = cms.untracked.bool(True),
@@ -319,7 +331,7 @@ RefittedVertex = cms.untracked.bool(False),
 RefittedVertexWithBS = cms.untracked.bool(False),
 RecBeamSpot = cms.untracked.bool(True),
 RecTrack = cms.untracked.bool(True),
-RecPFMet = cms.untracked.bool(True),
+RecPFMet = cms.untracked.bool(False),
 RecPFMetCorr = cms.untracked.bool(True),
 RecPuppiMet = cms.untracked.bool(True),
 RecMvaMet = cms.untracked.bool(False),
@@ -334,7 +346,7 @@ RecHTXS = cms.untracked.bool(isHiggsSignal),
 # collections
 MuonCollectionTag = cms.InputTag("slimmedMuons"),
 ElectronCollectionTag = cms.InputTag("slimmedElectrons"),
-applyElectronESShift = cms.untracked.bool(True),
+applyElectronESShift = cms.untracked.bool(not isData),
 TauCollectionTag = cms.InputTag("NewTauIDsEmbedded"),
 L1MuonCollectionTag = cms.InputTag("gmtStage2Digis:Muon"),
 L1EGammaCollectionTag = cms.InputTag("caloStage2Digis:EGamma"),
@@ -363,7 +375,7 @@ htxsInfo = cms.InputTag("rivetProducerHTXS", "HiggsClassification"),
 
 # TRIGGER INFO  =========================================================================================
 HLTriggerPaths = HLTlist,
-TriggerProcess = cms.untracked.string("HLT"),
+TriggerProcess = cms.untracked.string(triggerLabel),
 Flags = cms.untracked.vstring(
   'Flag_HBHENoiseFilter',
   'Flag_HBHENoiseIsoFilter',
@@ -389,7 +401,7 @@ RecTrackDxyMax = cms.untracked.double(1.0),
 RecTrackDzMax = cms.untracked.double(1.0),
 RecTrackNum = cms.untracked.int32(0),
 # muons
-RecMuonPtMin = cms.untracked.double(2.),
+RecMuonPtMin = cms.untracked.double(minrecmuonpt),
 RecMuonEtaMax = cms.untracked.double(2.5),
 RecMuonHLTriggerMatching = cms.untracked.vstring(
 'HLT_IsoMu22_v.*:hltL3crIsoL1sMu20L1f0L2f10QL3f22QL3trkIsoFiltered0p09',
