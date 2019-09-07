@@ -48,7 +48,7 @@ process.options = cms.untracked.PSet(
 
 # How many events to process
 process.maxEvents = cms.untracked.PSet(
-   input = cms.untracked.int32(100)
+   input = cms.untracked.int32(1000)
 )
 
 # Define the input source
@@ -181,10 +181,7 @@ tauIdEmbedder.runTauID()
 
 #load vertex refitting excluding tau tracks
 process.load('VertexRefit.TauRefit.AdvancedRefitVertexProducer_cfi')
-process.AdvancedRefitVertexNoBSProducer.srcTaus = cms.InputTag("NewTauIDsEmbedded")
-process.AdvancedRefitVertexNoBSProducer.srcLeptons = cms.VInputTag(cms.InputTag("slimmedElectrons"), cms.InputTag("slimmedMuons"), cms.InputTag("NewTauIDsEmbedded"))
-process.AdvancedRefitVertexBSProducer.srcTaus = cms.InputTag("NewTauIDsEmbedded")
-process.AdvancedRefitVertexBSProducer.srcLeptons = cms.VInputTag(cms.InputTag("slimmedElectrons"), cms.InputTag("slimmedMuons"), cms.InputTag("NewTauIDsEmbedded"))
+process.load('VertexRefit.TauRefit.LeptonPreSelections_cfi')
 process.load('VertexRefit.TauRefit.MiniAODRefitVertexProducer_cfi')
 # END Vertex Refitting ===========================================================================================
 
@@ -334,7 +331,7 @@ Trigger = cms.untracked.bool(True),
 RecPrimVertex = cms.untracked.bool(True),
 RecPrimVertexWithBS = cms.untracked.bool(True),
 RefittedVertex = cms.untracked.bool(False),
-RefittedVertexWithBS = cms.untracked.bool(False),
+RefittedVertexWithBS = cms.untracked.bool(True),
 RecBeamSpot = cms.untracked.bool(True),
 RecTrack = cms.untracked.bool(True),
 RecPFMet = cms.untracked.bool(False),
@@ -565,9 +562,9 @@ process.p = cms.Path(
   process.egammaPostRecoSeq *               # electron energy corrections and Ids
   process.rerunMvaIsolationSequence *  # Tau IDs
   getattr(process,updatedTauName) *  # Tau IDs
-  #process.AdvancedRefitVertexNoBS * # Vertex refit w/o BS
-  #process.AdvancedRefitVertexBS * # Vertex refit w/ BS
-  process.MiniAODRefitVertexBS* # PV with BS constraint
+  #process.AdvancedRefitVertexNoBSBSSequence * # Vertex refit w/o BS
+  process.AdvancedRefitVertexBSSequence * # Vertex refit w/ BS
+  process.MiniAODRefitVertexBS * # PV with BS constraint
   process.htxsSequence * # HTXS
   process.prefiringweight * # prefiring-weights for 2016/2017
   process.triggerSelection *  # trigger filtering
