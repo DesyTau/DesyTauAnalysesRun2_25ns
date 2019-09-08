@@ -151,17 +151,23 @@ else :
 ### Electron ID, scale and smearing =======================================================================
 # from https://twiki.cern.ch/twiki/bin/view/CMS/EgammaMiniAODV2#2017_MiniAOD_V2%20#https://twiki.cern.ch/twiki/bin/view/CMS/EgammaPostRecoR
 from RecoEgamma.EgammaTools.EgammaPostRecoTools import setupEgammaPostRecoSeq
+
 if period is '2016' :
     labelEra = '2016-Legacy'
-    rerun = False
-if period is '2017' :
+    rerunIDs = True
+    rerunEnergyCorrections = False
+elif period is '2017' :
     labelEra = '2017-Nov17ReReco'
-    rerun = True
-if period is '2018' :
+    rerunIDs = True
+    rerunEnergyCorrections = True
+elif period is '2018' :
     labelEra = '2018-Prompt'
-    rerun = True
+    rerunIDs = True
+    rerunEnergyCorrections = True
+
 setupEgammaPostRecoSeq(process,
-                       runVID=rerun,
+                       runVID=rerunIDs,
+                       runEnergyCorrections=rerunEnergyCorrections,
                        era=labelEra)
 # Tau ID ===============================================================================================
 # https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePFTauID#Running_of_the_DNN_based_tau_ID
@@ -237,7 +243,6 @@ HLTlist = cms.untracked.vstring(
 'HLT_IsoMu22_eta2p1_v',
 'HLT_IsoTkMu22_v',
 'HLT_IsoTkMu22_eta2p1_v',
-'HLT_IsoMu27_v',
 # Muon-Tau triggers
 'HLT_IsoMu19_eta2p1_LooseIsoPFTau20_SingleL1_v',
 'HLT_IsoMu20_eta2p1_LooseChargedIsoPFTau27_eta2p1_CrossL1_v',
