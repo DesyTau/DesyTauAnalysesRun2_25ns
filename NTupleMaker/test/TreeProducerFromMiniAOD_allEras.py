@@ -557,6 +557,7 @@ process.triggerSelection = cms.EDFilter("HLTHighLevel",
 
 
 process.p = cms.Path(
+  process.triggerSelection * # trigger filtering
   process.initroottree *
   process.jecSequence *  # New JECs
   process.jecSequencepuppi *  # New JECs
@@ -573,7 +574,6 @@ process.p = cms.Path(
   process.MiniAODRefitVertexBS * # PV with BS constraint
   process.htxsSequence * # HTXS
   process.prefiringweight * # prefiring-weights for 2016/2017
-  process.triggerSelection *  # trigger filtering
   process.makeroottree
 )
 
