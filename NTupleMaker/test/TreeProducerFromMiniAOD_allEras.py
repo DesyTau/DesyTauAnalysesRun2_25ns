@@ -2,9 +2,10 @@ import FWCore.ParameterSet.Config as cms
 
 # Configurable options =======================================================================
 isData = False
-isEmbedded = False
-isRun2018D = False
-isHiggsSignal = False
+isSingleMuonData = False # needed to record track collection for NMSSM ananlysis
+isEmbedded = False # set to true if you run over Z->TauTau embedded samples
+isRun2018D = False # needed for the correct Global Tag
+isHiggsSignal = False # Set to true if you run over higgs signal samples -> needed for STXS1p1 flags
 year = 2017
 period = '2017'
 # ============================================================================================
@@ -338,7 +339,7 @@ RecPrimVertexWithBS = cms.untracked.bool(True),
 RefittedVertex = cms.untracked.bool(False),
 RefittedVertexWithBS = cms.untracked.bool(True),
 RecBeamSpot = cms.untracked.bool(True),
-RecTrack = cms.untracked.bool(True),
+RecTrack = cms.untracked.bool(not isData or isSingleMuonData),
 RecPFMet = cms.untracked.bool(False),
 RecPFMetCorr = cms.untracked.bool(True),
 RecPuppiMet = cms.untracked.bool(True),
