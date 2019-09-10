@@ -43,12 +43,11 @@ DATA (RecTrack should be set to False for all data besides the SingleMuon datase
 
 EMBEDDING:
 
-/EmbeddingRun2017B/ElMuFinalState-inputDoubleMu_94X_miniAOD-v2/USER                 # Marked as INVALID !!!!
-/EmbeddingRun2017B/ElMuFinalState-StoreResults_inputDoubleMu_94X_miniAOD-v2/USER    # Still in PRODUCTION !!!!
-/EmbeddingRun2017C/ElMuFinalState-inputDoubleMu_94X_miniAOD-v2/USER   
-/EmbeddingRun2017D/ElMuFinalState-inputDoubleMu_94X_miniAOD-v2/USER
-/EmbeddingRun2017E/ElMuFinalState-inputDoubleMu_94X_miniAOD-v2/USER
-/EmbeddingRun2017F/ElMuFinalState-inputDoubleMu_94X_miniAOD-v2/USER
+/EmbeddingRun2017B/ElMuFinalState-inputDoubleMu_94X_miniAOD-v2/USER    # [dataset] dbs instance = phys03
+/EmbeddingRun2017C/ElMuFinalState-inputDoubleMu_94X_miniAOD-v2/USER    # [dataset] dbs instance = phys03
+/EmbeddingRun2017D/ElMuFinalState-inputDoubleMu_94X_miniAOD-v2/USER    # [dataset] dbs instance = phys03
+/EmbeddingRun2017E/ElMuFinalState-inputDoubleMu_94X_miniAOD-v2/USER    # [dataset] dbs instance = phys03
+/EmbeddingRun2017F/ElMuFinalState-inputDoubleMu_94X_miniAOD-v2/USER    # [dataset] dbs instance = phys03
 
 -------------------------------------------------------------------------------------
 
