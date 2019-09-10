@@ -1870,9 +1870,9 @@ int main(int argc, char * argv[]) {
          //set MELA variables
          if (njets>1){
 
-            // TLorentzVector tau1, tau2;
-            // tau1.SetPtEtaPhiM(pt_1, eta_1, phi_1, m_1);
-            // tau2.SetPtEtaPhiM(pt_2, eta_2, phi_2, m_2);
+            TLorentzVector tau1, tau2;
+            tau1.SetPtEtaPhiM(pt_1, eta_1, phi_1, m_1);
+            tau2.SetPtEtaPhiM(pt_2, eta_2, phi_2, m_2);
 
             // FIXME: TODO: Why do we not use the jet mass here? (comment from KIT)
             TLorentzVector jet1, jet2;
@@ -1881,11 +1881,6 @@ int main(int argc, char * argv[]) {
 
             // Run MELA
             SimpleParticleCollection_t daughters;
-
-            TLorentzVector tau1, tau2;
-
-            tau1.SetPtEtaPhiM(tau1P4.Pt(), tau1P4.Eta(), tau1P4.Phi(), tau1P4.M());
-            tau2.SetPtEtaPhiM(tau2P4.Pt(), tau2P4.Eta(), tau2P4.Phi(), tau2P4.M());
             if (q_1 * q_2 < 0){
                daughters.push_back(SimpleParticle_t(15 * q_1, tau1));
                daughters.push_back(SimpleParticle_t(15 * q_2, tau2));
