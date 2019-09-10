@@ -496,7 +496,7 @@ void SetupTrees()
    ntuple_->Branch("taubyLooseDeepTau2017v2VSjet",&taubyLooseDeepTau2017v2VSjet_,"taubyLooseDeepTau2017v2VSjet/O");
    ntuple_->Branch("taubyLooseDeepTau2017v2VSmu",&taubyLooseDeepTau2017v2VSmu_,"taubyLooseDeepTau2017v2VSmu/O");
    ntuple_->Branch("taubyMediumDeepTau2017v2VSe",&taubyMediumDeepTau2017v2VSe_,"taubyMediumDeepTau2017v2VSe/O");
-   ntuple_->Branch("taubyMediumDeepTau2017v2VSjet",&taubyMediumDeepTau2017v2VSjet_,"taubyMediumDeepTau2017v2VSje/O");
+   ntuple_->Branch("taubyMediumDeepTau2017v2VSjet",&taubyMediumDeepTau2017v2VSjet_,"taubyMediumDeepTau2017v2VSjet/O");
    ntuple_->Branch("taubyMediumDeepTau2017v2VSmu",&taubyMediumDeepTau2017v2VSmu_,"taubyMediumDeepTau2017v2VSmu/O");
    ntuple_->Branch("taubyTightDeepTau2017v2VSe",&taubyTightDeepTau2017v2VSe_,"taubyTightDeepTau2017v2VSe/O");
    ntuple_->Branch("taubyTightDeepTau2017v2VSjet",&taubyTightDeepTau2017v2VSjet_,"taubyTightDeepTau2017v2VSjet/O");
@@ -508,7 +508,7 @@ void SetupTrees()
    ntuple_->Branch("taubyVTightDeepTau2017v2VSjet",&taubyVTightDeepTau2017v2VSjet_,"taubyVTightDeepTau2017v2VSjet/O");
    ntuple_->Branch("taubyVVLooseDeepTau2017v2VSe",&taubyVVLooseDeepTau2017v2VSe_,"taubyVVLooseDeepTau2017v2VSe/O");
    ntuple_->Branch("taubyVVLooseDeepTau2017v2VSjet",&taubyVVLooseDeepTau2017v2VSjet_,"taubyVVLooseDeepTau2017v2VSjet/O");
-   ntuple_->Branch("taubyVVTightDeepTau2017v2VS",&taubyVVTightDeepTau2017v2VSe_,"taubyVVTightDeepTau2017v2VSe/O");
+   ntuple_->Branch("taubyVVTightDeepTau2017v2VSe",&taubyVVTightDeepTau2017v2VSe_,"taubyVVTightDeepTau2017v2VSe/O");
    ntuple_->Branch("taubyVVTightDeepTau2017v2VSjet",&taubyVVTightDeepTau2017v2VSjet_,"taubyVVTightDeepTau2017v2VSjet/O");
    ntuple_->Branch("taubyVVVLooseDeepTau2017v2VSe",&taubyVVVLooseDeepTau2017v2VSe_,"taubyVVVLooseDeepTau2017v2VSe/O");
    ntuple_->Branch("taubyVVVLooseDeepTau2017v2VSjet",&taubyVVVLooseDeepTau2017v2VSjet_,"taubyVVVLooseDeepTau2017v2VSjet/O");
