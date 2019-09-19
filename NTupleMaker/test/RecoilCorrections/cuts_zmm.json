@@ -1,0 +1,4 @@
+{
+    "masscut" : "iso_2 < 0.15 && m_ll > 70 && m_ll < 110",
+    "dimuon" :  "iso_2 < 0.15 "
+}
