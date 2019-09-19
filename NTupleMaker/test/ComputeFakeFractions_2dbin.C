@@ -22,9 +22,6 @@
 void ComputeFakeFractions_2dbin(TString directory = "./mutau/",
 				TString outputDir = "./Plots/",
 				TString suffix = "_antiIso",
-				//double lumi = 14350  //RunsBC
-				//double lumi = 13463  //MuF
-				//double lumi = 27835 //RunsBCDE
 				double lumi = 41465 //SingleMuon
 				) {
 
@@ -35,11 +32,11 @@ void ComputeFakeFractions_2dbin(TString directory = "./mutau/",
   TString Variable = "njets:m_vis";
   TString xtitle = "m_{vis} [GeV]";
   //const int nBins  =   9;
-  float binsX[12]={0,50,80,100,110,120,130,150,170,200,250,2000};//,700.,1000.,10000.};
-  float binsY[4]={-0.5,0.5,1.5,15};//,700.,1000.,10000.};
+  float binsX[12]={0,50,80,100,110,120,130,150,170,200,250,2000};
+  float binsY[4]={-0.5,0.5,1.5,15};
 
   TString Weight = "puweight*effweight*mcweight*";
-  TString Cuts = "(os>0.5&&iso_1<0.15&&mva17_2<0.5&&extraelec_veto<0.5&&extramuon_veto<0.5&&dilepton_veto<0.5&&pt_1>20&&pt_2>30&&mt_1<50&&againstMuonTight3_2>0.5&&againstElectronVLooseMVA6_2>0.5&&(singleLepTrigger>0.5||xTrigger>0.5))*(byVLooseIsolationMVArun2v1DBoldDMwLT_2>0.5)";//&&mva17_2>0.5&&mt_1<60&&(m_vis>60&&m_vis<90)
+  TString Cuts = "(os>0.5&&iso_1<0.15&&mva17_2<0.5&&extraelec_veto<0.5&&extramuon_veto<0.5&&dilepton_veto<0.5&&pt_1>20&&pt_2>30&&mt_1<50&&againstMuonTight3_2>0.5&&againstElectronVLooseMVA6_2>0.5&&(singleLepTrigger>0.5||xTrigger>0.5))*(byVLooseIsolationMVArun2017v2DBoldDMwLT2017_2>0.5)";
   TString ytitle = "njets";
   
   // scale factors
@@ -93,7 +90,6 @@ void ComputeFakeFractions_2dbin(TString directory = "./mutau/",
   TString cutstrueT[nSamples];
   TString fakeT="*(gen_match_2==6)";
   TString trueT="*((gen_match_2==5)*0.88+(gen_match_2<5))";
-  //TString fakeT="";(||gen_match_2==4)*correction_againstMuonTight3_2+(gen_match_2==1||gen_match_2==3)*correction_againstElectronVLooseMVA6_
 
   // MC specific cuts to select certain type of particle
   
