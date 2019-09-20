@@ -455,7 +455,7 @@ GenJets = cms.untracked.bool(not isData)
 )
 process.makeroottree = cms.EDAnalyzer("NTupleMaker",
 # data, year, period, skim
-IsData = cms.untracked.bool(storeGenParticles),
+IsData = cms.untracked.bool(isData),
 IsEmbedded = cms.untracked.bool(isEmbedded),
 Year = cms.untracked.uint32(year),
 Period = cms.untracked.string(period),
