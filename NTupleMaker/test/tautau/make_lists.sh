@@ -1,10 +1,11 @@
-#!/bin/bash
-
-MCdir_VJets=/pnfs/desy.de/cms/tier2/store/user/telenz/13TeV/NTuples/MC/RunIIFall17MiniAOD-94X_mc2017_realistic/
-MCdir_DY=/nfs/dust/cms/group/higgs-kit/rasp/MC_2017
-MCdir_TTVV=/nfs/dust/cms/user/rasp/ntuples/MC_2017_v2
-MCdir_Signal=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/MCFall17/Signals
-MCdir_ST=/nfs/dust/cms/user/rasp/ntuples/MC_2017
+MCdir_VJets=/nfs/dust/cms/user/cardinia/gridjobs/NTuples/2017/MC/RunIIFall17/
+#/pnfs/desy.de/cms/tier2/store/user/telenz/13TeV/NTuples/MC/RunIIFall17MiniAOD-94X_mc2017_realistic/
+MCdir_DY=/nfs/dust/cms/user/klundert/HiggsCPNTuples/2017/MC/ 
+#/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2017/mc
+MCdir_TTVV=/nfs/dust/cms/user/klundert/HiggsCPNTuples/2017/MC/
+#/nfs/dust/cms/user/rasp/ntuples/MC_2017_v2
+# MCdir_Signal=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/MCFall17/Signals
+# MCdir_ST=/nfs/dust/cms/user/rasp/ntuples/MC_2017
 
 #Signals
 
@@ -20,10 +21,10 @@ ls $MCdir_DY/DY2JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8_ext1/*.root > DY
 ls $MCdir_DY/DY3JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/*.root > DY3JetsToLL
 ls $MCdir_DY/DY3JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8_ext1/*.root > DY3JetsToLL_ext1
 ls $MCdir_DY/DY4JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/*.root > DY4JetsToLL
-ls $MCdir_DY/DYJetsToLL_M-10to50_TuneCP5_13TeV-madgraphMLM-pythia8/*.root > DYJetsToLL_M-10to50
+# ls $MCdir_DY/DYJetsToLL_M-10to50_TuneCP5_13TeV-madgraphMLM-pythia8/*.root > DYJetsToLL_M-10to50
 
 
-#Wjets
+# #Wjets
 
 ls $MCdir_VJets/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/*.root > WJetsToLNu
 ls $MCdir_VJets/W1JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/*.root > W1JetsToLNu
@@ -32,35 +33,35 @@ ls $MCdir_VJets/W3JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/*.root > W3JetsToL
 ls $MCdir_VJets/W4JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/*.root > W4JetsToLNu
 
 
-#Top
+# #Top
 
-ls $MCdir_TTVV/TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powheg-pythia8/*.root > TTToSemiLeptonic
-ls $MCdir_TTVV/TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8/*.root > TTTo2L2Nu
-ls $MCdir_TTVV/TTToHadronic_TuneCP5_PSweights_13TeV-powheg-pythia8/*.root > TTToHadronic
+# ls $MCdir_TTVV/TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powheg-pythia8/*.root > TTToSemiLeptonic
+ls $MCdir_TTVV/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/*.root > TTTo2L2Nu
+# ls $MCdir_TTVV/TTToHadronic_TuneCP5_PSweights_13TeV-powheg-pythia8/*.root > TTToHadronic
 
-#ST
+# #ST
 
-ls $MCdir_ST/ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8/*.root > ST_tW_top
-ls $MCdir_ST/ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8/*.root > ST_tW_antitop
-ls $MCdir_ST/ST_t-channel_top_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8/*.root > ST_t_top
-ls $MCdir_ST/ST_t-channel_antitop_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8/*.root > ST_t_antitop
-
-
-#VV
-
-ls $MCdir_TTVV/WW_TuneCP5_13TeV-pythia8/*.root > WW
-ls $MCdir_TTVV/WZ_TuneCP5_13TeV-pythia8/*.root > WZ
-ls $MCdir_TTVV/ZZ_TuneCP5_13TeV-pythia8/*.root > ZZ
+# ls $MCdir_ST/ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8/*.root > ST_tW_top
+# ls $MCdir_ST/ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8/*.root > ST_tW_antitop
+# ls $MCdir_ST/ST_t-channel_top_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8/*.root > ST_t_top
+# ls $MCdir_ST/ST_t-channel_antitop_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8/*.root > ST_t_antitop
 
 
-#DATA
+# #VV
 
-Data17dirTau=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/Run2017_Nov17ReReco/Tau
+# ls $MCdir_TTVV/WW_TuneCP5_13TeV-pythia8/*.root > WW
+# ls $MCdir_TTVV/WZ_TuneCP5_13TeV-pythia8/*.root > WZ
+# ls $MCdir_TTVV/ZZ_TuneCP5_13TeV-pythia8/*.root > ZZ
 
-ls $Data17dirTau/Tau_Run2017B_ReReco/*root > DATA_TauB
-ls $Data17dirTau/Tau_Run2017C_ReReco/*root > DATA_TauC
-ls $Data17dirTau/Tau_Run2017D_ReReco/*root > DATA_TauD
-ls $Data17dirTau/Tau_Run2017E_ReReco/*root > DATA_TauE
+
+# #DATA
+
+# Data17dirTau=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/Run2017_Nov17ReReco/Tau
+
+# ls $Data17dirTau/Tau_Run2017B_ReReco/*root > DATA_TauB
+# ls $Data17dirTau/Tau_Run2017C_ReReco/*root > DATA_TauC
+# ls $Data17dirTau/Tau_Run2017D_ReReco/*root > DATA_TauD
+# ls $Data17dirTau/Tau_Run2017E_ReReco/*root > DATA_TauE
 
 #ls $Data17dir2/SingleElectron/SingleElectron_Run2017B*/*.root > DATA_ElB
 #ls $Data17dir2/SingleElectron/SingleElectron_Run2017C*/*.root > DATA_ElC
@@ -83,7 +84,7 @@ ls $Data17dirTau/Tau_Run2017E_ReReco/*root > DATA_TauE
 #ls $Data17dir4/MET_Run2017E*/*.root > DATA_METE
 #ls $Data17dir4/MET_Run2017F*/*.root > DATA_METF
 
-cat DATA_MuB  DATA_MuC DATA_MuD DATA_MuE DATA_MuF > DATA_SingleMuon
+#cat DATA_MuB  DATA_MuC DATA_MuD DATA_MuE DATA_MuF > DATA_SingleMuon
 
 #cat DATA_El* > DATA_SingleElectron
 
