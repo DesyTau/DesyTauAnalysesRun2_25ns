@@ -57,6 +57,7 @@
 #include "DesyTauAnalyses/NTupleMaker/interface/LepTauFakeRate.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/functionsCP.h"
 #include "TauAnalysisTools/TauTriggerSFs/interface/TauTriggerSFs2017.h"
+//#include "HTT-utilities/TauTriggerSFs2017/interface/TauTriggerSFs2017.h"
 
 #define pi 3.14159265358979312
 #define d2r 1.74532925199432955e-02
@@ -145,20 +146,8 @@ int main(int argc, char * argv[]) {
   //pileup distrib
   const string pileUpInDataFile = cfg.get<string>("pileUpInDataFile");
   const string pileUpInMCFile = cfg.get<string>("pileUpInMCFile");
-  //const string pileUpforMC = cfg.get<string>("pileUpforMC");
-  TString pileUpforMC;
-  
-    if(isWJets){
-      pileUpforMC="WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_pileup";
-    }
-    else if(isDY){
-      pileUpforMC="DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8_pileup";
+  const string pileUpforMC = cfg.get<string>("pileUpforMC");
     
-    }
-    else {
-      pileUpforMC="TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8_pileup";
-    }
-  
   
   // tau trigger efficiency
   TauTriggerSFs2017 * tauTriggerSF = new TauTriggerSFs2017(cmsswBase+"/src/TauAnalysisTools/TauTriggerSFs/data/tauTriggerEfficiencies2017.root","ditau","2017","tight","MVAv2");
@@ -466,17 +455,18 @@ int main(int argc, char * argv[]) {
 	    LV temp_Leg1_(analysisTree.tau_px[tIndex1], analysisTree.tau_py[tIndex1], analysisTree.tau_pz[tIndex1], analysisTree.tau_e[tIndex1]);
 	    LV temp_Leg2_(analysisTree.tau_px[tIndex2], analysisTree.tau_py[tIndex2], analysisTree.tau_pz[tIndex2], analysisTree.tau_e[tIndex2]);
 	    LV Leg1P4_, Leg2P4_;
-	    if(analysisTree.tau_byIsolationMVArun2v1DBoldDMwLTraw[tIndex1] > analysisTree.tau_byIsolationMVArun2v1DBoldDMwLTraw[tIndex2]){
-	      Leg1P4_ = temp_Leg1_;
-	      Leg2P4_ = temp_Leg2_;
-	    }
-	    else if(analysisTree.tau_byIsolationMVArun2v1DBoldDMwLTraw[tIndex1] < analysisTree.tau_byIsolationMVArun2v1DBoldDMwLTraw[tIndex2]){
-	      Leg1P4_ = temp_Leg2_;tIndex1 = iter->index2_;
-	      Leg2P4_ = temp_Leg1_;tIndex2 = iter->index1_;
-	    }
-	    else if(temp_Leg1_.pt() > temp_Leg2_.pt()){
-	      Leg1P4_ = temp_Leg1_;
-	      Leg2P4_ = temp_Leg2_;
+	    // if(analysisTree.tau_byIsolationMVArun2v1DBoldDMwLTraw[tIndex1] > analysisTree.tau_byIsolationMVArun2v1DBoldDMwLTraw[tIndex2]){
+	    //   Leg1P4_ = temp_Leg1_;
+	    //   Leg2P4_ = temp_Leg2_;
+	    // }
+	    // else if(analysisTree.tau_byIsolationMVArun2v1DBoldDMwLTraw[tIndex1] < analysisTree.tau_byIsolationMVArun2v1DBoldDMwLTraw[tIndex2]){
+	    //   Leg1P4_ = temp_Leg2_;tIndex1 = iter->index2_;
+	    //   Leg2P4_ = temp_Leg1_;tIndex2 = iter->index1_;
+	    // }
+	    //else 
+	    if(temp_Leg1_.pt() > temp_Leg2_.pt()){
+	      Leg1P4_ = temp_Leg1_;tIndex1 = iter->index1_;
+	      Leg2P4_ = temp_Leg2_;tIndex2 = iter->index2_;
 	    }
 	    else {
 	      Leg1P4_ = temp_Leg2_; tIndex1 = iter->index2_;
@@ -595,7 +585,7 @@ int main(int argc, char * argv[]) {
       TLorentzVector diTauLV = tauLV_1 + tauLV_2;
       // visible mass
       otree->m_vis = diTauLV.M();
-      otree->pt_vis = diTauLV.Pt();
+      otree->pt_tt = diTauLV.Pt();
       
        
       //const AC1B * analysisTree;      
@@ -643,7 +633,10 @@ int main(int argc, char * argv[]) {
       otree->againstElectronVLooseMVA6_2 = analysisTree.tau_againstElectronVLooseMVA6[tauIndex_2];
       otree->againstElectronTightMVA6_2 = analysisTree.tau_againstElectronTightMVA6[tauIndex_2];
 
-      
+      (otree->pt_1>otree->pt_2)?otree->pt_lead=otree->pt_1:otree->pt_2;
+      (otree->pt_1<otree->pt_2)?otree->pt_trail=otree->pt_1:otree->pt_2;
+      (otree->pt_1>otree->pt_2)?otree->eta_lead=otree->eta_1:otree->eta_2;
+      (otree->pt_1<otree->pt_2)?otree->eta_trail=otree->eta_1:otree->eta_2;
       // opposite charge
       otree->os = (otree->q_1 * otree->q_2) < 0.;
       // svfit variables
@@ -654,10 +647,7 @@ int main(int argc, char * argv[]) {
       otree->met_sv = -9999;
       otree->mt_sv = -9999;
       if (otree->njetspt20>0) svfit_variables("tt", &analysisTree, otree, &cfg, inputFile_visPtResolution);
-      //QCD supresser parameter                                                                                                                                                                                    
-      double per_px=(analysisTree.tau_px[tauIndex_1]+analysisTree.tau_px[tauIndex_2]+otree->met*TMath::Cos(otree->metphi));
-      double per_py=(analysisTree.tau_py[tauIndex_1]+analysisTree.tau_py[tauIndex_2]+otree->met*TMath::Sin(otree->metphi));
-      otree->Prompt_pT=sqrt(per_px*per_px+per_py*per_py);
+      
 
       if(isDY||isWJets){
 	otree->gen_noutgoing=analysisTree.genparticles_noutgoing;
@@ -665,10 +655,7 @@ int main(int argc, char * argv[]) {
       }
 
       
-      (otree->pt_1>otree->pt_2)?otree->pt_lead=otree->pt_1:otree->pt_2;
-      (otree->pt_1<otree->pt_2)?otree->pt_trail=otree->pt_1:otree->pt_2;
-      (otree->pt_1>otree->pt_2)?otree->eta_lead=otree->eta_1:otree->eta_2;
-      (otree->pt_1<otree->pt_2)?otree->eta_trail=otree->eta_1:otree->eta_2;
+      
       
       //counting jet
       jets::counting_jets(&analysisTree, otree, &cfg, &inputs_btag_scaling_medium);
@@ -702,17 +689,21 @@ int main(int argc, char * argv[]) {
 					  0,
 					  TMath::Sqrt( otree->met*TMath::Sin(otree->metphi)*otree->met*TMath::Sin(otree->metphi) +
 						       otree->met*TMath::Cos(otree->metphi)*otree->met*TMath::Cos(otree->metphi)));
-      // ditau pt
-      otree->pt_tt = (diTauLV+metLV).Pt();
+      
       // mt TOT
 
       float mtTOT = 2*(otree->pt_1)*metLV.Pt()*(1-cos(DeltaPhi(tauLV_1,metLV)));
       mtTOT += 2*(otree->pt_2)*metLV.Pt()*(1-cos(DeltaPhi(tauLV_2,metLV))); 
       mtTOT += 2*(otree->pt_1)*(otree->pt_2)*(1-cos(DeltaPhi(tauLV_1,tauLV_2))); 
       otree->mt_tot = TMath::Sqrt(mtTOT);
-      otree->mt_1=(tauLV_1+metLV).M();
-      otree->mt_2=(tauLV_2+metLV).M();
-      //cout<<"bet pt "<<otree->bpt_1<<"     "<<otree->bpt_2<<"    "<<otree->pT_jj<<endl;
+      //QCD supresser parameter                                                                                                                                                                                    
+      double per_px=(analysisTree.tau_px[tauIndex_1]+analysisTree.tau_px[tauIndex_2]+otree->met*TMath::Cos(otree->metphi));
+      double per_py=(analysisTree.tau_py[tauIndex_1]+analysisTree.tau_py[tauIndex_2]+otree->met*TMath::Sin(otree->metphi));
+      otree->Prompt_pT=sqrt(per_px*per_px+per_py*per_py);
+      
+      //
+      otree->mt_1=mT(tauLV_1,metLV);
+      otree->mt_2=mT(tauLV_2,metLV);
       otree->Fill();
       selEvents++;
 

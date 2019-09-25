@@ -62,8 +62,10 @@ void Synch17Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("rho", &rho, &b_rho);
 
    fChain->SetBranchAddress("pt_1", &pt_1, &b_pt_1);
+   fChain->SetBranchAddress("pt_lead", &pt_lead, &b_pt_lead);
    fChain->SetBranchAddress("phi_1", &phi_1, &b_phi_1);
    fChain->SetBranchAddress("eta_1", &eta_1, &b_eta_1);
+   fChain->SetBranchAddress("eta_lead", &eta_lead, &b_eta_lead);
 
    fChain->SetBranchAddress("chconst_1_pt", &chconst_1_pt, &b_chconst_1_pt);
    fChain->SetBranchAddress("chconst_1_eta", &chconst_1_eta, &b_chconst_1_eta);
@@ -82,8 +84,10 @@ void Synch17Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("mt_1", &mt_1, &b_mt_1);
    fChain->SetBranchAddress("tau_decay_mode_1", &tau_decay_mode_1, &b_tau_decay_mode_1); 
    fChain->SetBranchAddress("pt_2", &pt_2, &b_pt_2);
+   fChain->SetBranchAddress("pt_trail", &pt_trail, &b_pt_trail);
    fChain->SetBranchAddress("phi_2", &phi_2, &b_phi_2);
    fChain->SetBranchAddress("eta_2", &eta_2, &b_eta_2);
+   fChain->SetBranchAddress("eta_trail", &eta_trail, &b_eta_trail);
 
    fChain->SetBranchAddress("chconst_2_pt", &chconst_2_pt, &b_chconst_2_pt);
    fChain->SetBranchAddress("chconst_2_eta", &chconst_2_eta, &b_chconst_2_eta);
@@ -237,7 +241,8 @@ void Synch17Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("eta_sv", &eta_sv, &b_eta_sv);
    fChain->SetBranchAddress("phi_sv", &phi_sv, &b_phi_sv);
    fChain->SetBranchAddress("met_sv", &met_sv, &b_met_sv);
-   fChain->SetBranchAddress("mt_sv", &mt_sv, &b_mt_sv);   
+   fChain->SetBranchAddress("mt_sv", &mt_sv, &b_mt_sv);
+   fChain->SetBranchAddress("Prompt_pT", &Prompt_pT, &b_Prompt_pT);   
 
    //VBF
    fChain->SetBranchAddress("mjj", &mjj, &b_mjj);
@@ -434,8 +439,10 @@ void Synch17Tree::WriteInit(TTree *tree) {
   fChain->Branch("rho", &rho, "rho/F");
 
    fChain->Branch("pt_1", &pt_1, "pt_1/F");
+   fChain->Branch("pt_lead", &pt_lead, "pt_lead/F");
    fChain->Branch("phi_1", &phi_1, "phi_1/F");
    fChain->Branch("eta_1", &eta_1, "eta_1/F");
+   fChain->Branch("eta_lead", &eta_lead, "eta_lead/F");
 
    fChain->Branch("chconst_1_pt", &chconst_1_pt, "chconst_1_pt/F");
    fChain->Branch("chconst_1_eta", &chconst_1_eta, "chconst_1_eta/F");
@@ -454,8 +461,10 @@ void Synch17Tree::WriteInit(TTree *tree) {
    fChain->Branch("mt_1", &mt_1, "mt_1/F");
    fChain->Branch("tau_decay_mode_1", &tau_decay_mode_1, "tau_decay_mode_1/I"); 
    fChain->Branch("pt_2", &pt_2, "pt_2/F");
+   fChain->Branch("pt_trail", &pt_trail, "pt_trail/F");
    fChain->Branch("phi_2", &phi_2, "phi_2/F");
    fChain->Branch("eta_2", &eta_2, "eta_2/F");
+   fChain->Branch("eta_trail", &eta_trail, "eta_trail/F");
 
    fChain->Branch("chconst_2_pt", &chconst_2_pt, "chconst_2_pt/F");
    fChain->Branch("chconst_2_eta", &chconst_2_eta, "chconst_2_eta/F");
@@ -608,7 +617,8 @@ void Synch17Tree::WriteInit(TTree *tree) {
    fChain->Branch("eta_sv", &eta_sv, "eta_sv/F");
    fChain->Branch("phi_sv", &phi_sv, "phi_sv/F");
    fChain->Branch("met_sv", &met_sv, "met_sv/F");
-   fChain->Branch("mt_sv", &mt_sv, "mt_sv/F");   
+   fChain->Branch("mt_sv", &mt_sv, "mt_sv/F");
+   fChain->Branch("Prompt_pT", &Prompt_pT, "Prompt_pT/F");   
 
    //VBF
    fChain->Branch("mjj", &mjj, "mjj/F");

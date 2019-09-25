@@ -33,8 +33,10 @@ public :
   Float_t         rho;
   //Leptons
   Float_t         pt_1;
+  Float_t         pt_lead;
   Float_t         phi_1;
   Float_t         eta_1;
+  Float_t         eta_lead;
   Float_t         chconst_1_pt;
   Float_t         chconst_1_eta;
   Float_t         chconst_1_phi;   
@@ -51,8 +53,10 @@ public :
   Float_t         mt_1;
   Int_t 	  tau_decay_mode_1;
   Float_t         pt_2;
+  Float_t         pt_trail;
   Float_t         phi_2;
   Float_t         eta_2;
+  Float_t         eta_trail;
   Float_t         chconst_2_pt;
   Float_t         chconst_2_eta;
   Float_t         chconst_2_phi;     
@@ -207,7 +211,7 @@ public :
   Float_t         phi_sv;
   Float_t         met_sv;
   Float_t         mt_sv;
-
+  Float_t         Prompt_pT;
   //VBF
   Float_t         mjj;
   Float_t         jdeta;
@@ -333,8 +337,10 @@ public :
   TBranch	 *b_rho;
   //Leptons
   TBranch	 *b_pt_1;
+  TBranch	 *b_pt_lead;
   TBranch	 *b_phi_1;
   TBranch	 *b_eta_1;
+  TBranch	 *b_eta_lead;
   TBranch        *b_chconst_1_pt;
   TBranch        *b_chconst_1_eta;
   TBranch        *b_chconst_1_phi;     
@@ -351,8 +357,10 @@ public :
   TBranch	 *b_mt_1;
   TBranch        *b_tau_decay_mode_1;
   TBranch	 *b_pt_2;
+  TBranch	 *b_pt_trail;
   TBranch	 *b_phi_2;
   TBranch	 *b_eta_2;
+  TBranch	 *b_eta_trail;
   TBranch        *b_chconst_2_pt;
   TBranch        *b_chconst_2_eta;
   TBranch        *b_chconst_2_phi; 
@@ -508,6 +516,7 @@ public :
   TBranch	 *b_phi_sv;
   TBranch	 *b_met_sv;
   TBranch	 *b_mt_sv;
+  TBranch        *b_Prompt_pT;
 
   //VBF
   TBranch	 *b_mjj;
