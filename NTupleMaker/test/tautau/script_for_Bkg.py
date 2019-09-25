@@ -3,7 +3,8 @@ import numpy as np
 import sys
 
 cmd = './condorsub_seq_leptau.sh SynchNTupleProducer_tt_2017'
-
+os.system('bash make_lists.sh')
+os.system('bash make_config.sh')
 def Synch(config,sample,job='20'):
     os.system(cmd+' '+config+' '+sample+ ' tt' +' '+job)
 
