@@ -1281,6 +1281,7 @@ void NTupleMaker::beginJob(){
 //http://www.boost.org/doc/libs/1_55_0/libs/regex/doc/html/boost_regex/introduction_and_overview.html
 void AddTriggerList(const edm::Run& run,
 		    const HLTConfigProvider& hltConfig,
+                    const std::vector<std::string> run_hltnames,
                     const std::vector<std::pair<boost::regex, std::string> >& regexes,
                     std::vector<std::pair<std::string, std::string> >& foundTriggers,
                     std::string& triggerNames   )
@@ -1298,8 +1299,21 @@ void AddTriggerList(const edm::Run& run,
       boost::cmatch what;
 
       if(boost::regex_match(hltConfig.triggerName(i), regexes[j].first))
-	//if(boost::regex_match(HLTConfiguration.triggerName(i).c_str(), what, muonregexes[j].first) && muontriggers.size() < 32)
 	{
+	  // NEW: Continue if trigger was not specified in the HLTriggerPaths in the TreeProducer
+	  // cout << "regexes[j].first = " << regexes[j].first << endl;
+	  // cout<<"regexes[j].second = "<<regexes[j].second<<endl;
+	  bool trigger_found = false;
+	  for(auto const& s:run_hltnames){
+	    if( boost::regex_match(s, regexes[j].first) ){
+              trigger_found = true;
+	    }
+	  }
+	  if(!trigger_found){
+	    // cout<< "TRIGGER not found in HLTlist in TreeProducer: " << regexes[j].first << endl;
+	    continue;
+	  }
+
 	  // Check for filter
 	  if(regexes[j].second.size() != 0)
 	      {
@@ -1485,11 +1499,11 @@ void NTupleMaker::beginRun(const edm::Run& iRun, const edm::EventSetup& iSetup)
   string allphotonnames;
   string alljetnames;
 
-  AddTriggerList(iRun, HLTConfiguration, muonregexes,     muontriggers,     allmuonnames);
-  AddTriggerList(iRun, HLTConfiguration, electronregexes, electrontriggers, allelectronnames);
-  AddTriggerList(iRun, HLTConfiguration, tauregexes,      tautriggers,      alltaunames);
-  AddTriggerList(iRun, HLTConfiguration, photonregexes,   photontriggers,   allphotonnames);
-  AddTriggerList(iRun, HLTConfiguration, jetregexes,      jettriggers,      alljetnames);
+  AddTriggerList(iRun, HLTConfiguration, run_hltnames, muonregexes,     muontriggers,     allmuonnames);
+  AddTriggerList(iRun, HLTConfiguration, run_hltnames, electronregexes, electrontriggers, allelectronnames);
+  AddTriggerList(iRun, HLTConfiguration, run_hltnames, tauregexes,      tautriggers,      alltaunames);
+  AddTriggerList(iRun, HLTConfiguration, run_hltnames, photonregexes,   photontriggers,   allphotonnames);
+  AddTriggerList(iRun, HLTConfiguration, run_hltnames, jetregexes,      jettriggers,      alljetnames);
 
 
   run_hltnames.clear();
