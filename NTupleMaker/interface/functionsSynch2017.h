@@ -620,15 +620,15 @@ bool SafeRatio(double denominator){
 
 }
 
-bool passedAllMetFilters(const AC1B *analysisTree, std::vector<TString> met_filters, bool isData){
+bool passedAllMetFilters(const AC1B *analysisTree, std::vector<TString> met_filters){
   bool passed = true;
   unsigned int nfilters = met_filters.size();
   for (std::map<string,int>::iterator it = analysisTree->flags->begin(); it != analysisTree->flags->end(); ++it) {
     TString filter_name(it->first);
     for (unsigned int iFilter = 0; iFilter < nfilters; ++iFilter){
-      if (filter_name.Contains(met_filters[iFilter])) {
-	       if (!isData && met_filters[iFilter].Contains("Flag_eeBadScFilter") ) continue; // this filter not applied in MC
-         if (it->second == 0){passed = false; break;}
+      if (filter_name.Contains(met_filters[iFilter]) && it->second == 0) {
+        passed = false;
+        break;
       }
     }      
   }

@@ -521,33 +521,12 @@ int main(int argc, char * argv[]){
     }    
   }
 
-  // list of met filters
-  /*
-  std::vector<TString> met_filters_list ;
-  met_filters_list.push_back("Flag_HBHENoiseFilter");
-  met_filters_list.push_back("Flag_HBHENoiseIsoFilter");
-  met_filters_list.push_back("Flag_EcalDeadCellTriggerPrimitiveFilter");
-  met_filters_list.push_back("Flag_goodVertices");
-  met_filters_list.push_back("Flag_eeBadScFilter");
-  met_filters_list.push_back("Flag_globalTightHalo2016Filter"); ABSENT!
-  met_filters_list.push_back("Flag_BadPFMuonFilter");
-  met_filters_list.push_back("Flag_BadChargedCandidateFilter");*/ //ABSENT!
-  //Merijn: replace above with 2017 defs emu. Note we can fetch there 2016 as well..
-
-  //  else if (era=="2017"){ later catch from config file if generalise to other run..
-  
+  // list of met filters from config
   std::vector<TString> met_filters_list;
-  met_filters_list.push_back("Flag_HBHENoiseFilter");
-  met_filters_list.push_back("Flag_HBHENoiseIsoFilter");
-  met_filters_list.push_back("Flag_globalSuperTightHalo2016Filter");
-  met_filters_list.push_back("Flag_EcalDeadCellTriggerPrimitiveFilter");
-  met_filters_list.push_back("Flag_goodVertices");
-  if (isData)
-    met_filters_list.push_back("Flag_eeBadScFilter");
-  met_filters_list.push_back("Flag_BadPFMuonFilter");
-  //metFlags.push_back("Flag_BadChargedCandidateFilter");  // currently not recommended, under review
-  met_filters_list.push_back("ecalBadCalibReducedMINIAODFilter"); //WAS NOT IN LIST ABOVE
-  int counter[20];
+  for (unsigned int i = 1; i < (unsigned int) cfg.get<int>("num_met_filters") + 1; i++) {
+    met_filters_list.push_back(cfg.get<string>("met_filter_" + std::to_string(i)));
+  }
+  int counter[20] = {0};
 
   ///////////////FILE LOOP///////////////
 
@@ -593,7 +572,7 @@ int main(int argc, char * argv[]){
       }
       
       //Skip events not passing the MET filters, if applied
-      if (ApplyMetFilters && !passedAllMetFilters(&analysisTree, met_filters_list, isData)) continue;
+      if (ApplyMetFilters && !passedAllMetFilters(&analysisTree, met_filters_list)) continue;
       counter[1]++;
       
       // Check if all triggers are existent in each event and save index
