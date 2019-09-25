@@ -1,7 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 
 # Configurable options =======================================================================
-isData = True
+isData = False
 isSingleMuonData = False # needed to record track collection for NMSSM ananlysis
 isEmbedded = False # set to true if you run over Z->TauTau embedded samples
 isRun2018D = False # needed for the correct Global Tag
@@ -49,7 +49,7 @@ process.options = cms.untracked.PSet(
 
 # How many events to process
 process.maxEvents = cms.untracked.PSet(
-   input = cms.untracked.int32(10)
+   input = cms.untracked.int32(1000)
 )
 
 # Define the input source
@@ -57,8 +57,8 @@ import FWCore.PythonUtilities.LumiList as LumiList
 # https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideGoodLumiSectionsJSONFile#cmsRun
 process.source = cms.Source("PoolSource",
   fileNames = cms.untracked.vstring(
-        "/store/data/Run2017B/Tau/MINIAOD/31Mar2018-v1/90000/FECFEF99-4F37-E811-8243-001E67792562.root"  # use for testing (2017)
-        #"/store/mc/RunIIFall17MiniAODv2/TTToHadronic_TuneCP5_13TeV-powheg-pythia8/MINIAODSIM/PU2017_12Apr2018_new_pmx_94X_mc2017_realistic_v14-v2/120000/420D636B-4BBB-E811-B806-0025905C54C6.root"  # use for testing (2017)
+        #"/store/data/Run2017B/Tau/MINIAOD/31Mar2018-v1/90000/FECFEF99-4F37-E811-8243-001E67792562.root"  # use for testing (2017)
+        "/store/mc/RunIIFall17MiniAODv2/TTToHadronic_TuneCP5_13TeV-powheg-pythia8/MINIAODSIM/PU2017_12Apr2018_new_pmx_94X_mc2017_realistic_v14-v2/120000/420D636B-4BBB-E811-B806-0025905C54C6.root"  # use for testing (2017)
         #"/store/mc/RunIISummer16MiniAODv3/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/MINIAODSIM/PUMoriond17_94X_mcRun2_asymptotic_v3-v1/120000/FE7E7C9D-3CBF-E811-8BA6-44A84223FF3C.root" # use for testing (2016)
         #"/store/data/Run2016C/SingleMuon/MINIAOD/17Jul2018-v1/20000/FEC97F81-0097-E811-A7B9-90E2BACC5EEC.root" # use for testing (2016)
         #"/store/data/Run2018D/JetHT/MINIAOD/PromptReco-v2/000/320/853/00000/2C20B666-3A9A-E811-9D32-FA163EAC4172.root"  # From Run2018D with a lot of events not passing the json file
