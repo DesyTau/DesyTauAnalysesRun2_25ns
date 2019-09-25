@@ -488,7 +488,7 @@ Float_t GetZptMassWeight(Float_t bosonMass, Float_t bosonPt, TH2D * histZMassPtW
 }
 
 
-void SearchForBtagDiscriminant(AC1B &analysisTree, TString BTagDiscriminator1, TString BTagDiscriminator2, unsigned int &nBTagDiscriminant1, unsigned int &nBTagDiscriminant2, TString era){
+void SearchForBtagDiscriminant(AC1B &analysisTree, TString BTagDiscriminator1, TString BTagDiscriminator2, TString BTagDiscriminator3, unsigned int &nBTagDiscriminant1, unsigned int &nBTagDiscriminant2, unsigned int &nBTagDiscriminant3, TString era){
 
    for (unsigned int iBTag=0; iBTag < analysisTree.run_btagdiscriminators->size(); ++iBTag) {
       TString discr(analysisTree.run_btagdiscriminators->at(iBTag));
@@ -496,6 +496,8 @@ void SearchForBtagDiscriminant(AC1B &analysisTree, TString BTagDiscriminator1, T
          nBTagDiscriminant1 = iBTag;
       if (era!="2016" && discr == BTagDiscriminator2)
          nBTagDiscriminant2 = iBTag;
+      if (era!="2016" && discr == BTagDiscriminator3)
+         nBTagDiscriminant3 = iBTag;
    }
 }
 

@@ -86,6 +86,7 @@ int main(int argc, char * argv[]) {
    const string bTagEffFile = cfg.get<string>("BTagEffFile");
    const string bTagDiscriminator1 = cfg.get<string>("BTagDiscriminator1");
    const string bTagDiscriminator2 = cfg.get<string>("BTagDiscriminator2");
+   const string bTagDiscriminator3 = cfg.get<string>("BTagDiscriminator3");
    const float jetEtaCut = cfg.get<float>("JetEtaCut");
    const float jetPtLowCut = cfg.get<float>("JetPtLowCut");
    const float jetPtHighCut = cfg.get<float>("JetPtHighCut");
@@ -108,6 +109,7 @@ int main(int argc, char * argv[]) {
    
    TString BTagDiscriminator1(bTagDiscriminator1);
    TString BTagDiscriminator2(bTagDiscriminator2);
+   TString BTagDiscriminator3(bTagDiscriminator3);
    
    const string MuonIdIsoFile = cfg.get<string>("MuonIdIsoEff");
    const string ElectronIdIsoFile = cfg.get<string>("ElectronIdIsoEff");
@@ -717,7 +719,8 @@ int main(int argc, char * argv[]) {
          // searching for btagging discriminant ========================================================================================================================
          unsigned int nBTagDiscriminant1 = 0;
          unsigned int nBTagDiscriminant2 = 0;
-         SearchForBtagDiscriminant(analysisTree, BTagDiscriminator1, BTagDiscriminator2, nBTagDiscriminant1, nBTagDiscriminant2, era);
+         unsigned int nBTagDiscriminant3 = 0;
+         SearchForBtagDiscriminant(analysisTree, BTagDiscriminator1, BTagDiscriminator2, BTagDiscriminator3, nBTagDiscriminant1, nBTagDiscriminant2, nBTagDiscriminant3, era);
          
          // electron selection =========================================================================================================================================
          vector<int> electrons; electrons.clear();
@@ -1107,11 +1110,11 @@ int main(int argc, char * argv[]) {
                   tagged_btagDown = analysisTree.pfjet_btag[jet][nBTagDiscriminant1]>btagCut; // b-jet
                }
                else {
-                  tagged = analysisTree.pfjet_btag[jet][nBTagDiscriminant1] + analysisTree.pfjet_btag[jet][nBTagDiscriminant2] >btagCut;
-                  tagged_mistagUp = analysisTree.pfjet_btag[jet][nBTagDiscriminant1] + analysisTree.pfjet_btag[jet][nBTagDiscriminant2] >btagCut;
-                  tagged_mistagDown = analysisTree.pfjet_btag[jet][nBTagDiscriminant1] + analysisTree.pfjet_btag[jet][nBTagDiscriminant2] >btagCut;
-                  tagged_btagUp = analysisTree.pfjet_btag[jet][nBTagDiscriminant1] + analysisTree.pfjet_btag[jet][nBTagDiscriminant2] >btagCut;
-                  tagged_btagDown = analysisTree.pfjet_btag[jet][nBTagDiscriminant1] + analysisTree.pfjet_btag[jet][nBTagDiscriminant2] >btagCut;
+                  tagged = analysisTree.pfjet_btag[jet][nBTagDiscriminant1] + analysisTree.pfjet_btag[jet][nBTagDiscriminant2] + analysisTree.pfjet_btag[jet][nBTagDiscriminant3]>btagCut;
+                  tagged_mistagUp = analysisTree.pfjet_btag[jet][nBTagDiscriminant1] + analysisTree.pfjet_btag[jet][nBTagDiscriminant2]  + analysisTree.pfjet_btag[jet][nBTagDiscriminant3] >btagCut;
+                  tagged_mistagDown = analysisTree.pfjet_btag[jet][nBTagDiscriminant1] + analysisTree.pfjet_btag[jet][nBTagDiscriminant2]  + analysisTree.pfjet_btag[jet][nBTagDiscriminant3] >btagCut;
+                  tagged_btagUp = analysisTree.pfjet_btag[jet][nBTagDiscriminant1] + analysisTree.pfjet_btag[jet][nBTagDiscriminant2]  + analysisTree.pfjet_btag[jet][nBTagDiscriminant3] >btagCut;
+                  tagged_btagDown = analysisTree.pfjet_btag[jet][nBTagDiscriminant1] + analysisTree.pfjet_btag[jet][nBTagDiscriminant2]  + analysisTree.pfjet_btag[jet][nBTagDiscriminant3] >btagCut;
                }
                bool taggedRaw = tagged;
 
@@ -1518,7 +1521,6 @@ int main(int argc, char * argv[]) {
 
             if (checkFastMTT){
 
-               std::cout<<"FastMTT is used" <<std::endl;
                LorentzVector ttP4 = FastMTTComputation(svFitEle, svFitMu, met_x, met_y, covMET, tau1P4, tau2P4);
 
                m_sv = ttP4.M();
