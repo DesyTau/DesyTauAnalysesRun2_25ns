@@ -1,13 +1,13 @@
 import FWCore.ParameterSet.Config as cms
 
 # Configurable options =======================================================================
-isData = True
+isData = False
 isSingleMuonData = False # needed to record track collection for NMSSM ananlysis
-isEmbedded = True # set to true if you run over Z->TauTau embedded samples
+isEmbedded = False # set to true if you run over Z->TauTau embedded samples
 isRun2018D = False # needed for the correct Global Tag
 isHiggsSignal = False # Set to true if you run over higgs signal samples -> needed for STXS1p1 flags
-year = 2016
-period = '2016'
+year = 2017
+period = '2017'
 # ============================================================================================
 if isEmbedded : isData = True
 # ============================================================================================
@@ -66,7 +66,8 @@ process.source = cms.Source("PoolSource",
         #"/store/mc/RunIIAutumn18MiniAOD/WplusH_HToZZTo4L_M125_13TeV_tunedown_powheg2-minlo-HWJ_JHUGenV7011_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/30000/506681B7-DE8A-BF4E-9D9D-AE6C820B9734.root"
         #"/store/mc/RunIIAutumn18MiniAOD/DY1JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v2/270000/53AAF1AF-2FCF-424D-BC07-8150E599971B.root "
 #	"root://cms-xrd-global.cern.ch///store/user/sbrommer/gc_storage/embedding_16_legacy_miniaod/ElMu_data_legacy_2016_CMSSW9414/TauEmbedding_ElMu_data_legacy_2016_CMSSW9414_Run2016B-v2/99/merged_miniaod_998.root" #emu embedded 16 test sample
-	"root://cms-xrd-global.cern.ch///store/user/jbechtel/gc_storage/embedding_16_legacy_miniaod/MuTau_data_legacy_2016_CMSSW9414/TauEmbedding_MuTau_data_legacy_2016_CMSSW9414_Run2016B-v4/99/merged_miniaod_998.root" #mt embedded 16 test sample
+#	"root://cms-xrd-global.cern.ch///store/user/jbechtel/gc_storage/embedding_16_legacy_miniaod/MuTau_data_legacy_2016_CMSSW9414/TauEmbedding_MuTau_data_legacy_2016_CMSSW9414_Run2016B-v4/99/merged_miniaod_998.root" #mt embedded 16 test sample
+	"root://cms-xrd-global.cern.ch///store/user/aakhmets/gc_storage/MuTau_data_2017_CMSSW944_gridka/TauEmbedding_MuTau_data_2017_CMSSW944_Run2017F/99/merged_9998.root"
 	),
   skipEvents = cms.untracked.uint32(0),
   #lumisToProcess = LumiList.LumiList(filename = 'json/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt').getVLuminosityBlockRange()
@@ -369,7 +370,7 @@ if not isEmbedded:
         'HLT_IsoMu24_v.*:hltL3crIsoL1sMu22L1f0L2f10QL3f24QL3trkIsoFiltered0p09,hltL3crIsoL1sSingleMu22L1f0L2f10QL3f24QL3trkIsoFiltered0p07'
     )
 #else: 
-if not isEmbedded and period is '2017':
+if period is '2017':
     muon_hlt_filters += cms.untracked.vstring(
         'HLT_IsoMu27_v.*:hltL3crIsoL1sMu22Or25L1f0L2f10QL3f27QL3trkIsoFiltered0p07',
         'HLT_IsoMu24_v.*:hltL3crIsoL1sSingleMu22L1f0L2f10QL3f24QL3trkIsoFiltered0p07',
