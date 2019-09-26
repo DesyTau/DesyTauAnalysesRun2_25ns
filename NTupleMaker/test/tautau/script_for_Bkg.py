@@ -2,9 +2,13 @@ import os
 import numpy as np
 import sys
 
+isData=True
+
 cmd = './condorsub_seq_leptau.sh SynchNTupleProducer_tt_2017'
-os.system('bash make_lists.sh')
-os.system('bash make_config.sh')
+
+
+# os.system('bash make_lists.sh')
+# os.system('bash make_config.sh')
 def Synch(config,sample,job='20'):
     os.system(cmd+' '+config+' '+sample+ ' tt' +' '+job)
 
@@ -29,9 +33,20 @@ samples = ['DY1JetsToLL','DY1JetsToLL_ext1','DY2JetsToLL','DY2JetsToLL_ext1',
                  'DYJetsToLL_ext1','TTTo2L2Nu','W1JetsToLNu','W2JetsToLNu',
                  'W3JetsToLNu','W4JetsToLNu','WJetsToLNu']
 
+data_samples = ['DATA_TauB','DATA_TauC','DATA_TauD','DATA_TauE','DATA_TauF']
 
-for i in range(len(configs)):
+data_conf = 'analysisMacroSynch_tautau_Data.conf'
+size=1
+if(isData):
+    size=len(data_samples)
+else:
+    size=len(samples)
+
+for i in range(size):
     print('Using '+samples[i])
-    Synch(configs[i],samples[i])
+    if(isData==False):
+        Synch(configs[i],samples[i])
+    else:
+        Synch(data_conf,data_samples[i])
 
     
