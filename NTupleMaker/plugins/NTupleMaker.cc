@@ -1499,11 +1499,11 @@ void NTupleMaker::beginRun(const edm::Run& iRun, const edm::EventSetup& iSetup)
   string allphotonnames;
   string alljetnames;
 
-  AddTriggerList(iRun, HLTConfiguration, run_hltnames, muonregexes,     muontriggers,     allmuonnames);
-  AddTriggerList(iRun, HLTConfiguration, run_hltnames, electronregexes, electrontriggers, allelectronnames);
-  AddTriggerList(iRun, HLTConfiguration, run_hltnames, tauregexes,      tautriggers,      alltaunames);
-  AddTriggerList(iRun, HLTConfiguration, run_hltnames, photonregexes,   photontriggers,   allphotonnames);
-  AddTriggerList(iRun, HLTConfiguration, run_hltnames, jetregexes,      jettriggers,      alljetnames);
+  AddTriggerList(iRun, HLTConfiguration, cHLTriggerPaths, muonregexes,     muontriggers,     allmuonnames);
+  AddTriggerList(iRun, HLTConfiguration, cHLTriggerPaths, electronregexes, electrontriggers, allelectronnames);
+  AddTriggerList(iRun, HLTConfiguration, cHLTriggerPaths, tauregexes,      tautriggers,      alltaunames);
+  AddTriggerList(iRun, HLTConfiguration, cHLTriggerPaths, photonregexes,   photontriggers,   allphotonnames);
+  AddTriggerList(iRun, HLTConfiguration, cHLTriggerPaths, jetregexes,      jettriggers,      alljetnames);
 
 
   run_hltnames.clear();
