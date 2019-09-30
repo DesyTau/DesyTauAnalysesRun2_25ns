@@ -428,60 +428,88 @@ struct myclass {
 
 namespace genTools{
   float topPtWeight(float pt1, float pt2) {
-    
+  
     if (pt1>400) pt1 = 400;
     if (pt2>400) pt2 = 400;
-    
+  
     float a = 0.0615;    // Run2 a parameter
     float b = -0.0005;   // Run2 b parameter
-
+  
     float w1 = TMath::Exp(a+b*pt1);
     float w2 = TMath::Exp(a+b*pt2);
-
+  
     return TMath::Sqrt(w1*w2);  
   }
-
+  
   float topPtWeight_Run1(float pt1, float pt2) {
-    
+  
     if (pt1>400) pt1 = 400;
     if (pt2>400) pt2 = 400;
-    
+  
     float a = 0.156;    // Run1 a parameter
     float b = -0.00137;  // Run1 b parameter
-
+  
     float w1 = TMath::Exp(a+b*pt1);
     float w2 = TMath::Exp(a+b*pt2);
-
+  
     return TMath::Sqrt(w1*w2);  
   }
-
-
+  
+  
   float topPtWeight(const AC1B& analysisTree, unsigned int LHC_runEra=2){
 	// argument LHC_runEra allows to switch between Run1 and Run2 weights. Default is Run2.
 	// for Run1 weights use "LHC_runEra =1", for Run2 weights use "LHC_runEra =2". 
-
+  
     float topPt = -1;
     float antitopPt = -1;
-    
+  
     for (unsigned int igen=0; igen < analysisTree.genparticles_count; ++igen) { 
       if (analysisTree.genparticles_pdgid[igen]==6)
 	topPt = TMath::Sqrt(analysisTree.genparticles_px[igen]*analysisTree.genparticles_px[igen]+
 			    analysisTree.genparticles_py[igen]*analysisTree.genparticles_py[igen]);
-      
+  
       if (analysisTree.genparticles_pdgid[igen]==-6)
 	antitopPt = TMath::Sqrt(analysisTree.genparticles_px[igen]*analysisTree.genparticles_px[igen]+
 				analysisTree.genparticles_py[igen]*analysisTree.genparticles_py[igen]);
     }
-
+  
     if(topPt > 0. && antitopPt > 0.){
 	  if (LHC_runEra ==2)
       	return topPtWeight(topPt, antitopPt);
 	  else if (LHC_runEra ==1)
 		return topPtWeight_Run1(topPt, antitopPt);
 	}
-
+  
     return 1.;
   };
+  
+  // these are functionally the same as above, logic rewritten
+  float calculate_topPtWeight(float pt1, float pt2, float a, float b) {
+    if (pt1 > 400) pt1 = 400; // approximation works only up to 400 GeV
+    if (pt2 > 400) pt2 = 400;
+    float w1 = TMath::Exp(a + b*pt1);
+    float w2 = TMath::Exp(a + b*pt2);
+    
+    return TMath::Sqrt(w1*w2);  
+  }
+
+  float return_topPtWeight(const AC1B &analysisTree, float a, float b){
+    float topPt = -1;
+    float antitopPt = -1;
+    
+    for (unsigned int igen=0; igen < analysisTree.genparticles_count; ++igen) { 
+      if (analysisTree.genparticles_pdgid[igen] == 6)
+        topPt = TMath::Sqrt(analysisTree.genparticles_px[igen] * analysisTree.genparticles_px[igen] + analysisTree.genparticles_py[igen] * analysisTree.genparticles_py[igen]);
+      if (analysisTree.genparticles_pdgid[igen] == -6)
+        antitopPt = TMath::Sqrt(analysisTree.genparticles_px[igen] * analysisTree.genparticles_px[igen] + analysisTree.genparticles_py[igen] * analysisTree.genparticles_py[igen]);
+    }
+    
+    if(topPt > 0. && antitopPt > 0.)
+      return calculate_topPtWeight(topPt, antitopPt, a, b);
+    else 
+      return 1.;
+  };
+  
   
   TLorentzVector genZ(const AC1B& analysisTree){
     TLorentzVector genZ; genZ.SetXYZM(0,0,0,91.2);

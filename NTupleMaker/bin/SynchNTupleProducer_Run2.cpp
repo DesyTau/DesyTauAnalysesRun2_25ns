@@ -135,6 +135,7 @@ int main(int argc, char * argv[]){
     read_json(TString(TString(cmsswBase) + "/src/" + TString(json_name)).Data(), json);
   }
 
+  const int era = cfg.get<int>("era");
   const bool ApplyPUweight    = cfg.get<bool>("ApplyPUweight"); 
   const bool ApplyLepSF       = cfg.get<bool>("ApplyLepSF"); 
   const bool ApplyTrigger     = cfg.get<bool>("ApplyTrigger"); 
@@ -142,7 +143,6 @@ int main(int argc, char * argv[]){
   const bool ApplyBTagScaling = cfg.get<bool>("ApplyBTagScaling");
   const bool ApplySystShift   = cfg.get<bool>("ApplySystShift");
   const bool ApplyMetFilters  = cfg.get<bool>("ApplyMetFilters");
-  const bool ApplyRun1topPtWeights  = cfg.get<bool>("ApplyRun1topPtWeights");
 
   //pileup distrib
   const string pileUpInDataFile = cfg.get<string>("pileUpInDataFile");
@@ -206,7 +206,7 @@ int main(int argc, char * argv[]){
   const struct btag_scaling_inputs inputs_btag_scaling_medium = {reader_B, reader_C, reader_Light, tagEff_B, tagEff_C, tagEff_Light, rand};
 
   // MET Recoil Corrections
-  const bool applyRecoilCorrections = cfg.get<bool>("ApplyRecoilCorrections");
+  const bool ApplyRecoilCorrections = cfg.get<bool>("ApplyRecoilCorrections");
   const bool isDY = infiles.find("DY") == infiles.rfind("/")+1;
   const bool isWJets = (infiles.find("WJets") == infiles.rfind("/")+1) || (infiles.find("W1Jets") == infiles.rfind("/")+1) || (infiles.find("W2Jets") == infiles.rfind("/")+1) || (infiles.find("W3Jets") == infiles.rfind("/")+1) || (infiles.find("W4Jets") == infiles.rfind("/")+1) || (infiles.find("EWK") == infiles.rfind("/")+1);
   const bool isVBForGGHiggs = (infiles.find("VBFHTo")== infiles.rfind("/")+1) || (infiles.find("GluGluHTo")== infiles.rfind("/")+1);
@@ -216,13 +216,12 @@ int main(int argc, char * argv[]){
   
   RecoilCorrector *recoilPFMetCorrector = (RecoilCorrector*) malloc(sizeof(*recoilPFMetCorrector));
   
-  if(!isData && applyRecoilCorrections && (isDY || isWJets || isVBForGGHiggs || isMSSMsignal) ){
+  if(!isData && ApplyRecoilCorrections && (isDY || isWJets || isVBForGGHiggs || isMSSMsignal) ){
     TString RecoilDir("HTT-utilities/RecoilCorrections/data/");
-    
+    TString RecoilFileName = RecoilDir + "Type1_PFMET_2017.root";
     //    TString RecoilFileName = RecoilDir; RecoilFileName += "TypeI-PFMet_Run2016BtoH.root"; Merijn update to 2017:
-    TString RecoilFileName = RecoilDir; RecoilFileName += "Type1_PFMET_2017.root";
 
-    std::cout<<RecoilFileName<<std::endl;
+    std::cout<<RecoilFileName << " with isDY = " << isDY << "and infiles.rfind+1 = " << infiles.rfind("/")+1 << std::endl;
     recoilPFMetCorrector = new RecoilCorrector( RecoilFileName);
         
     //    RecoilFileName = RecoilDir; RecoilFileName += "MvaMET_2016BCD.root";
@@ -251,8 +250,7 @@ int main(int argc, char * argv[]){
   const float ptTauLowCut    = cfg.get<float>("ptTauLowCut");
   const float etaTauCut      = cfg.get<float>("etaTauCut");
   const float dzTauCut       = cfg.get<float>("dzTauCut");
-  const bool  applyTauId     = cfg.get<bool>("ApplyTauId");
-  const bool  applyMuonId    = cfg.get<bool>("ApplyMuonId");//merijn 2019 8 8: make sure that the flag in the config is used
+  const bool  ApplyTauId     = cfg.get<bool>("ApplyTauId");
 
   // tau energy scale corrections
   const float shift_tes_1prong = cfg.get<float>("TauEnergyScaleShift_OneProng");
@@ -297,7 +295,7 @@ int main(int argc, char * argv[]){
   cout<<"dzLeptonCut "<<dzLeptonCut<<endl;
   cout<<"dzTauCut "<<dzTauCut<<endl;
 
-  const bool  applyLeptonId    = cfg.get<bool>("Apply" + lep + "Id");
+  const bool  ApplyLeptonId    = cfg.get<bool>("Apply" + lep + "Id");
 
   const float deltaRTrigMatch = cfg.get<float>("DRTrigMatch");
   const float dRiso = cfg.get<float>("dRiso");
@@ -316,11 +314,7 @@ int main(int argc, char * argv[]){
   
   // **** end of configuration analysis
 
-  unsigned int lhc_run_era = 2;
-  if (ApplyRun1topPtWeights) lhc_run_era = 1;
-
   //file list creation
-
   int ifile = 0;
   int jfile = -1;
 
@@ -375,7 +369,13 @@ int main(int argc, char * argv[]){
     TH1D *PU_data = (TH1D *)filePUdistribution_data->Get("pileup");
     //std::cout << filePUdistribution_data << std::endl;
     //std::cout << filePUdistribution_MC << std::endl;
-    TH1D *PU_mc = (TH1D *)filePUdistribution_MC->Get(TString(pileUpforMC));
+    
+    TH1D *PU_mc;
+    if (era == 2017) {
+      PU_mc = (TH1D *)filePUdistribution_MC->Get(TString(pileUpforMC));
+    } else {
+      PU_mc = (TH1D *)filePUdistribution_MC->Get(TString("pileup"));
+    }
     if (PU_mc == NULL) {
       std::cout << "Histogram " << pileUpforMC << " is not present in pileup file" << std::endl;
       exit(-1);
@@ -388,16 +388,16 @@ int main(int argc, char * argv[]){
   ScaleFactor *SF_lepIdIso = new ScaleFactor();
   ScaleFactor *SF_lepIdIso_antiiso = new ScaleFactor();
   ScaleFactor *SF_SingleLepTrigger = new ScaleFactor();
-  ScaleFactor *SF_XTriggerLepLeg   = new ScaleFactor();
   ScaleFactor *SF_SingleLepTrigger_antiiso = new ScaleFactor();
+  ScaleFactor *SF_XTriggerLepLeg   = new ScaleFactor();
   ScaleFactor *SF_XTriggerLepLeg_antiiso   = new ScaleFactor();
 
   if(ApplyLepSF){
     SF_lepIdIso->init_ScaleFactor(TString(cmsswBase) + "/src/" + TString(idIsoEffFile));
     SF_lepIdIso_antiiso->init_ScaleFactor(TString(cmsswBase) + "/src/" + TString(idIsoEffFile_antiiso));
     SF_SingleLepTrigger->init_ScaleFactor(TString(cmsswBase) + "/src/" + TString(singleLepTrigEffFile));
-    SF_XTriggerLepLeg->init_ScaleFactor(TString(cmsswBase) + "/src/" + TString(xTrigLepLegEffFile));
     SF_SingleLepTrigger_antiiso->init_ScaleFactor(TString(cmsswBase) + "/src/" + TString(singleLepTrigEffFile_antiiso));
+    SF_XTriggerLepLeg->init_ScaleFactor(TString(cmsswBase) + "/src/" + TString(xTrigLepLegEffFile));
     SF_XTriggerLepLeg_antiiso->init_ScaleFactor(TString(cmsswBase) + "/src/" + TString(xTrigLepLegEffFile_antiiso));
   }
   // For tau leg of cross-trigger a different implementation is used
@@ -644,7 +644,7 @@ int main(int argc, char * argv[]){
       	if (analysisTree.tau_againstMuonTight3[it] < 0.5) continue;//tight mva aginst muon
       	if (analysisTree.tau_againstElectronVLooseMVA6[it] < 0.5) continue;//very loose mva agaist e
     
-        if (applyTauId && analysisTree.tau_decayModeFinding[it] < 0.5) continue;
+        if (ApplyTauId && analysisTree.tau_decayModeFinding[it] < 0.5) continue;
         taus.push_back(it);
       }
       counter[3]++;
@@ -660,25 +660,23 @@ int main(int argc, char * argv[]){
           if (fabs(analysisTree.electron_eta[ie]) >= etaLeptonCut) continue;
           if (fabs(analysisTree.electron_dxy[ie]) >= dxyLeptonCut) continue;
       	  if (fabs(analysisTree.electron_dz[ie]) >= dzLeptonCut) continue;
-          if (!electronMvaId && applyLeptonId) continue;
+          if (!electronMvaId && ApplyLeptonId) continue;
     
       	  //Meirjn 2019 8 20: reinstated. They are mentioned in the legacy twiki
-      	  if (!analysisTree.electron_pass_conversion[ie] && applyLeptonId) continue;
-      	  if (analysisTree.electron_nmissinginnerhits[ie] > 1 && applyLeptonId) continue;
+      	  if (!analysisTree.electron_pass_conversion[ie] && ApplyLeptonId) continue;
+      	  if (analysisTree.electron_nmissinginnerhits[ie] > 1 && ApplyLeptonId) continue;
           leptons.push_back(ie);
         }
       }
     
       if(ch == "mt"){
         for (unsigned int im = 0; im < analysisTree.muon_count; ++im) {
-      	  bool muonMediumId = true;
-      	  if(applyMuonId) //2019 8 8: Merijn: impose that the flag from the config file is used
-      	    muonMediumId = isIdentifiedMediumMuon(im, &analysisTree, isData);	          
+          bool muonMediumId = isIdentifiedMediumMuon(im, &analysisTree, isData);	          
           if (analysisTree.muon_pt[im] <= ptLeptonLowCut) continue;
           if (fabs(analysisTree.muon_eta[im]) >= etaLeptonCut) continue;
           if (fabs(analysisTree.muon_dxy[im]) >= dxyLeptonCut) continue;
           if (fabs(analysisTree.muon_dz[im]) >= dzLeptonCut) continue;
-          if (!muonMediumId && applyLeptonId) continue;
+          if (!muonMediumId && ApplyLeptonId) continue;
           leptons.push_back(im);
           }
       }
@@ -935,7 +933,7 @@ int main(int argc, char * argv[]){
       jets::counting_jets(&analysisTree, otree, &cfg, &inputs_btag_scaling_medium);
       //MET
       //Merijn 2019 6 20: overloaded the function, it takes the era as arugment now, to take pfmetcorr for 2016 and 2017..
-      fillMET(ch, leptonIndex, tauIndex, &analysisTree, otree, cfg.get<int>("era"));
+      fillMET(ch, leptonIndex, tauIndex, &analysisTree, otree, era);
       
       TLorentzVector genV( 0., 0., 0., 0.);
       TLorentzVector genL( 0., 0., 0., 0.);
@@ -969,9 +967,11 @@ int main(int argc, char * argv[]){
       
       // topPt weight
       otree->topptweight = 1.;
-      if(!isData){
-         otree->topptweight = genTools::topPtWeight(analysisTree, lhc_run_era);
-      }
+      int a_topPtWeight = cfg.get<int>("a_topPtWeight");
+      int b_topPtWeight = cfg.get<int>("b_topPtWeight");
+      if(!isData)
+         // otree->topptweight = genTools::return_topPtWeight(analysisTree, a_topPtWeight, b_topPtWeight);
+         otree->topptweight = genTools::topPtWeight(analysisTree, 1); // 1 is for Run1 - use this reweighting as recommended by HTT 17
       counter[11]++;
       
       // lepton tau fakerates
@@ -993,7 +993,7 @@ int main(int argc, char * argv[]){
       ////////////////////////////////////////////////////////////
       
       otree->njetshad = otree->njets;
-      if (!isData && applyRecoilCorrections && (isDY || isWJets || isVBForGGHiggs || isMSSMsignal) ){
+      if (!isData && ApplyRecoilCorrections && (isDY || isWJets || isVBForGGHiggs || isMSSMsignal) ){
       	genV = genTools::genV(analysisTree);
       	genL = genTools::genL(analysisTree);
       	if(isWJets) otree->njetshad += 1;
@@ -1001,7 +1001,7 @@ int main(int argc, char * argv[]){
       
       // PF MET
       genTools::RecoilCorrections( *recoilPFMetCorrector, 
-  			   (!isData && applyRecoilCorrections && (isDY || isWJets || isVBForGGHiggs || isMSSMsignal)) * genTools::MeanResolution,
+  			   (!isData && ApplyRecoilCorrections && (isDY || isWJets || isVBForGGHiggs || isMSSMsignal)) * genTools::MeanResolution,
   			   otree->met, otree->metphi,
   			   genV.Px(), genV.Py(),
   			   genL.Px(), genL.Py(),
@@ -1289,27 +1289,27 @@ void SaveRECOVertices(const AC1B *analysisTree, Synch17Tree *otree, const bool i
   otree->RecoVertexZ = analysisTree->primvertex_z;
 
 
-if(!isData){
-  for (unsigned int igen=0; igen<analysisTree->genparticles_count; ++igen) {
+  if(!isData){
+    for (unsigned int igen = 0; igen < analysisTree->genparticles_count; ++igen) {
 
-//here fill the generator vertices to have the gen information present in tree PER GOOD RECO EVENT
-//Note: we may want to add constraint that the W and Z are prompt. If we remove these, may get in trouble with a DY or W MC sample..
+  //here fill the generator vertices to have the gen information present in tree PER GOOD RECO EVENT
+  //Note: we may want to add constraint that the W and Z are prompt. If we remove these, may get in trouble with a DY or W MC sample..
 
-    if ((analysisTree->genparticles_pdgid[igen] == 23 || analysisTree->genparticles_pdgid[igen] == 24 ||
-	       analysisTree->genparticles_pdgid[igen] == 25 || analysisTree->genparticles_pdgid[igen] == 35 || analysisTree->genparticles_pdgid[igen] == 36) && 
-         analysisTree->genparticles_isLastCopy[igen] == 1 && analysisTree->genparticles_isPrompt[igen] == 1) {
-      otree->GenVertexX = analysisTree->genparticles_vx[igen];
-      otree->GenVertexY = analysisTree->genparticles_vy[igen];
-      otree->GenVertexZ = analysisTree->genparticles_vz[igen];
-      break;
+      if ((analysisTree->genparticles_pdgid[igen] == 23 || analysisTree->genparticles_pdgid[igen] == 24 ||
+  	       analysisTree->genparticles_pdgid[igen] == 25 || analysisTree->genparticles_pdgid[igen] == 35 || analysisTree->genparticles_pdgid[igen] == 36) && 
+           analysisTree->genparticles_isLastCopy[igen] == 1 && analysisTree->genparticles_isPrompt[igen] == 1) {
+        otree->GenVertexX = analysisTree->genparticles_vx[igen];
+        otree->GenVertexY = analysisTree->genparticles_vy[igen];
+        otree->GenVertexZ = analysisTree->genparticles_vz[igen];
+        break;
+      }
     }
   }
-}
-else {//if it is data, fill with something recognisable nonsensible
-  otree->GenVertexX=-9999;
-  otree->GenVertexY=-9999;
-  otree->GenVertexZ=-9999;}
-
+  else {//if it is data, fill with something recognisable nonsensible
+    otree->GenVertexX = -9999;
+    otree->GenVertexY = -9999;
+    otree->GenVertexZ = -9999;
+  }
 }
 
 void initializeGenTree(Synch17GenTree *gentree){
