@@ -462,14 +462,14 @@ void fillMET(TString ch, int leptonIndex, int tauIndex, const AC1B * analysisTre
 
    // pfmet variables
   
-  otree->met = TMath::Sqrt(analysisTree->pfmet_ex*analysisTree->pfmet_ex + analysisTree->pfmet_ey*analysisTree->pfmet_ey);
-  otree->metphi = TMath::ATan2(analysisTree->pfmet_ey,analysisTree->pfmet_ex);
-  otree->metcov00 = analysisTree->pfmet_sigxx;
-  otree->metcov01 = analysisTree->pfmet_sigxy;
-  otree->metcov10 = analysisTree->pfmet_sigyx;
-  otree->metcov11 = analysisTree->pfmet_sigyy;
-  float met_x = analysisTree->pfmet_ex;
-  float met_y = analysisTree->pfmet_ey;
+  otree->met = TMath::Sqrt(analysisTree->pfmetcorr_ex*analysisTree->pfmetcorr_ex + analysisTree->pfmetcorr_ey*analysisTree->pfmetcorr_ey);
+  otree->metphi = TMath::ATan2(analysisTree->pfmetcorr_ey,analysisTree->pfmetcorr_ex);
+  otree->metcov00 = analysisTree->pfmetcorr_sigxx;
+  otree->metcov01 = analysisTree->pfmetcorr_sigxy;
+  otree->metcov10 = analysisTree->pfmetcorr_sigyx;
+  otree->metcov11 = analysisTree->pfmetcorr_sigyy;
+  float met_x = analysisTree->pfmetcorr_ex;
+  float met_y = analysisTree->pfmetcorr_ey;
 
   float met_x2 = met_x * met_x;
   float met_y2 = met_y * met_y;
@@ -481,21 +481,21 @@ void fillMET(TString ch, int leptonIndex, int tauIndex, const AC1B * analysisTre
 
    // pfmet variables
   if(era==2018){
-  otree->met = TMath::Sqrt(analysisTree->pfmet_ex*analysisTree->pfmet_ex + analysisTree->pfmet_ey*analysisTree->pfmet_ey);
-  otree->metphi = TMath::ATan2(analysisTree->pfmet_ey,analysisTree->pfmet_ex);
-  otree->metcov00 = analysisTree->pfmet_sigxx;
-  otree->metcov01 = analysisTree->pfmet_sigxy;
-  otree->metcov10 = analysisTree->pfmet_sigyx;
-  otree->metcov11 = analysisTree->pfmet_sigyy;
-  float met_x = analysisTree->pfmet_ex;
-  float met_y = analysisTree->pfmet_ey;
+  otree->met = TMath::Sqrt(analysisTree->pfmetcorr_ex*analysisTree->pfmetcorr_ex + analysisTree->pfmetcorr_ey*analysisTree->pfmetcorr_ey);
+  otree->metphi = TMath::ATan2(analysisTree->pfmetcorr_ey,analysisTree->pfmetcorr_ex);
+  otree->metcov00 = analysisTree->pfmetcorr_sigxx;
+  otree->metcov01 = analysisTree->pfmetcorr_sigxy;
+  otree->metcov10 = analysisTree->pfmetcorr_sigyx;
+  otree->metcov11 = analysisTree->pfmetcorr_sigyy;
+  float met_x = analysisTree->pfmetcorr_ex;
+  float met_y = analysisTree->pfmetcorr_ey;
 
   float met_x2 = met_x * met_x;
   float met_y2 = met_y * met_y;}
 else{
-//cout<<"use pfmetcorr, era = "<<era<<endl;
+//cout<<"use pfmetcorrcorr, era = "<<era<<endl;
   otree->met = TMath::Sqrt(analysisTree->pfmetcorr_ex*analysisTree->pfmetcorr_ex + analysisTree->pfmetcorr_ey*analysisTree->pfmetcorr_ey);
-  otree->metphi = TMath::ATan2(analysisTree->pfmetcorr_ey,analysisTree->pfmetcorr_ex);
+  otree->metphi = TMath::ATan2(analysisTree->pfmetcorrcorr_ey,analysisTree->pfmetcorr_ex);
   otree->metcov00 = analysisTree->pfmetcorr_sigxx;
   otree->metcov01 = analysisTree->pfmetcorr_sigxy;
   otree->metcov10 = analysisTree->pfmetcorr_sigyx;
