@@ -495,7 +495,7 @@ void fillMET(TString ch, int leptonIndex, int tauIndex, const AC1B * analysisTre
 else{
 //cout<<"use pfmetcorrcorr, era = "<<era<<endl;
   otree->met = TMath::Sqrt(analysisTree->pfmetcorr_ex*analysisTree->pfmetcorr_ex + analysisTree->pfmetcorr_ey*analysisTree->pfmetcorr_ey);
-  otree->metphi = TMath::ATan2(analysisTree->pfmetcorrcorr_ey,analysisTree->pfmetcorr_ex);
+  otree->metphi = TMath::ATan2(analysisTree->pfmetcorr_ey,analysisTree->pfmetcorr_ex);
   otree->metcov00 = analysisTree->pfmetcorr_sigxx;
   otree->metcov01 = analysisTree->pfmetcorr_sigxy;
   otree->metcov10 = analysisTree->pfmetcorr_sigyx;
