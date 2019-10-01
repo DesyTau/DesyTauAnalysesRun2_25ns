@@ -518,18 +518,20 @@ int main(int argc, char * argv[]) {
 	  std::cout << "Single Muon HLT filter not found" << std::endl;
 	  exit(-1);
 	}
-	isPFJet60HLTFilter  = AccessTriggerInfo(analysisTree,PFJet60HLTFilterName,nPFJet60HLTFilter);
-        isPFJet80HLTFilter  = AccessTriggerInfo(analysisTree,PFJet80HLTFilterName,nPFJet80HLTFilter);
-        isPFJet140HLTFilter = AccessTriggerInfo(analysisTree,PFJet140HLTFilterName,nPFJet140HLTFilter);
-        isPFJet200HLTFilter = AccessTriggerInfo(analysisTree,PFJet200HLTFilterName,nPFJet200HLTFilter);
-        isPFJet260HLTFilter = AccessTriggerInfo(analysisTree,PFJet260HLTFilterName,nPFJet260HLTFilter);
-        isPFJet320HLTFilter = AccessTriggerInfo(analysisTree,PFJet320HLTFilterName,nPFJet320HLTFilter);
-        isPFJet400HLTFilter = AccessTriggerInfo(analysisTree,PFJet400HLTFilterName,nPFJet400HLTFilter);
-        isPFJet450HLTFilter = AccessTriggerInfo(analysisTree,PFJet450HLTFilterName,nPFJet450HLTFilter);
-	if (!isPFJet60HLTFilter || !isPFJet80HLTFilter || !isPFJet140HLTFilter || !isPFJet200HLTFilter || !isPFJet260HLTFilter || !isPFJet320HLTFilter || !isPFJet400HLTFilter || !isPFJet450HLTFilter ) {
-	  std::cout << "PFJet HLT filter not found" << std::endl;
-	  exit(-1);
-	}
+        if(isData){
+          isPFJet60HLTFilter  = AccessTriggerInfo(analysisTree,PFJet60HLTFilterName,nPFJet60HLTFilter);
+          isPFJet80HLTFilter  = AccessTriggerInfo(analysisTree,PFJet80HLTFilterName,nPFJet80HLTFilter);
+          isPFJet140HLTFilter = AccessTriggerInfo(analysisTree,PFJet140HLTFilterName,nPFJet140HLTFilter);
+          isPFJet200HLTFilter = AccessTriggerInfo(analysisTree,PFJet200HLTFilterName,nPFJet200HLTFilter);
+          isPFJet260HLTFilter = AccessTriggerInfo(analysisTree,PFJet260HLTFilterName,nPFJet260HLTFilter);
+          isPFJet320HLTFilter = AccessTriggerInfo(analysisTree,PFJet320HLTFilterName,nPFJet320HLTFilter);
+          isPFJet400HLTFilter = AccessTriggerInfo(analysisTree,PFJet400HLTFilterName,nPFJet400HLTFilter);
+          isPFJet450HLTFilter = AccessTriggerInfo(analysisTree,PFJet450HLTFilterName,nPFJet450HLTFilter);
+          if (!isPFJet60HLTFilter || !isPFJet80HLTFilter || !isPFJet140HLTFilter || !isPFJet200HLTFilter || !isPFJet260HLTFilter || !isPFJet320HLTFilter || !isPFJet400HLTFilter || !isPFJet450HLTFilter ) {
+            std::cout << "PFJet HLT filter not found" << std::endl;
+            exit(-1);
+          }
+        }
         //AccessTriggerInfo(analysisTree,SinglePFTau180Trk50Name,nSinglePFTau180Trk50Filter,isSinglePFTau180Trk50Filter);
         //AccessTriggerInfo(analysisTree,SinglePFTau180Trk50oneprongName,nSinglePFTau180Trk50oneprongFilter,isSinglePFTau180Trk50oneprongFilter);
         
@@ -1092,29 +1094,29 @@ int main(int argc, char * argv[]) {
            tauAntiElectronTightMVA6_  = analysisTree.tau_againstElectronTightMVA6[indexTau] > 0.5;
            tauAntiElectronVTightMVA6_ = analysisTree.tau_againstElectronVTightMVA6[indexTau] > 0.5;
            
-           taubyDeepTau2017v2VSeraw_ = analysisTree.tau_byDeepTau2017v2VSeraw[indexTau] > 0.5;
-           taubyDeepTau2017v2VSjetraw_ = analysisTree.tau_byDeepTau2017v2VSjetraw[indexTau] > 0.5;
-           taubyDeepTau2017v2VSmuraw_ = analysisTree.tau_byDeepTau2017v2VSmuraw[indexTau] > 0.5;
-           taubyLooseDeepTau2017v2VSe_ = analysisTree.tau_byLooseDeepTau2017v2VSe[indexTau] > 0.5;
-           taubyLooseDeepTau2017v2VSjet_ = analysisTree.tau_byLooseDeepTau2017v2VSjet[indexTau] > 0.5;
-           taubyLooseDeepTau2017v2VSmu_ = analysisTree.tau_byLooseDeepTau2017v2VSmu[indexTau] > 0.5;
-           taubyMediumDeepTau2017v2VSe_ = analysisTree.tau_byMediumDeepTau2017v2VSe[indexTau] > 0.5;
-           taubyMediumDeepTau2017v2VSjet_ = analysisTree.tau_byMediumDeepTau2017v2VSjet[indexTau] > 0.5;
-           taubyMediumDeepTau2017v2VSmu_ = analysisTree.tau_byMediumDeepTau2017v2VSmu[indexTau] > 0.5;
-           taubyTightDeepTau2017v2VSe_ = analysisTree.tau_byTightDeepTau2017v2VSe[indexTau] > 0.5;
-           taubyTightDeepTau2017v2VSjet_ = analysisTree.tau_byTightDeepTau2017v2VSjet[indexTau] > 0.5;
-           taubyTightDeepTau2017v2VSmu_ = analysisTree.tau_byTightDeepTau2017v2VSmu[indexTau] > 0.5;
-           taubyVLooseDeepTau2017v2VSe_ = analysisTree.tau_byVLooseDeepTau2017v2VSe[indexTau] > 0.5;
-           taubyVLooseDeepTau2017v2VSjet_ = analysisTree.tau_byVLooseDeepTau2017v2VSjet[indexTau] > 0.5;
-           taubyVLooseDeepTau2017v2VSmu_ = analysisTree.tau_byVLooseDeepTau2017v2VSmu[indexTau] > 0.5;
-           taubyVTightDeepTau2017v2VSe_ = analysisTree.tau_byVTightDeepTau2017v2VSe[indexTau] > 0.5;
-           taubyVTightDeepTau2017v2VSjet_ = analysisTree.tau_byVTightDeepTau2017v2VSjet[indexTau] > 0.5;
-           taubyVVLooseDeepTau2017v2VSe_ = analysisTree.tau_byVVLooseDeepTau2017v2VSe[indexTau] > 0.5;
-           taubyVVLooseDeepTau2017v2VSjet_ = analysisTree.tau_byVVLooseDeepTau2017v2VSjet[indexTau] > 0.5;
-           taubyVVTightDeepTau2017v2VSe_ = analysisTree.tau_byVVTightDeepTau2017v2VSe[indexTau] > 0.5;
-           taubyVVTightDeepTau2017v2VSjet_ = analysisTree.tau_byVVTightDeepTau2017v2VSjet[indexTau] > 0.5;
-           taubyVVVLooseDeepTau2017v2VSe_ = analysisTree.tau_byVVVLooseDeepTau2017v2VSe[indexTau] > 0.5;
-           taubyVVVLooseDeepTau2017v2VSjet_ = analysisTree.tau_byVVVLooseDeepTau2017v2VSjet[indexTau] > 0.5;
+           taubyDeepTau2017v2p1VSeraw_ = analysisTree.tau_byDeepTau2017v2p1VSeraw[indexTau] > 0.5;
+           taubyDeepTau2017v2p1VSjetraw_ = analysisTree.tau_byDeepTau2017v2p1VSjetraw[indexTau] > 0.5;
+           taubyDeepTau2017v2p1VSmuraw_ = analysisTree.tau_byDeepTau2017v2p1VSmuraw[indexTau] > 0.5;
+           taubyLooseDeepTau2017v2p1VSe_ = analysisTree.tau_byLooseDeepTau2017v2p1VSe[indexTau] > 0.5;
+           taubyLooseDeepTau2017v2p1VSjet_ = analysisTree.tau_byLooseDeepTau2017v2p1VSjet[indexTau] > 0.5;
+           taubyLooseDeepTau2017v2p1VSmu_ = analysisTree.tau_byLooseDeepTau2017v2p1VSmu[indexTau] > 0.5;
+           taubyMediumDeepTau2017v2p1VSe_ = analysisTree.tau_byMediumDeepTau2017v2p1VSe[indexTau] > 0.5;
+           taubyMediumDeepTau2017v2p1VSjet_ = analysisTree.tau_byMediumDeepTau2017v2p1VSjet[indexTau] > 0.5;
+           taubyMediumDeepTau2017v2p1VSmu_ = analysisTree.tau_byMediumDeepTau2017v2p1VSmu[indexTau] > 0.5;
+           taubyTightDeepTau2017v2p1VSe_ = analysisTree.tau_byTightDeepTau2017v2p1VSe[indexTau] > 0.5;
+           taubyTightDeepTau2017v2p1VSjet_ = analysisTree.tau_byTightDeepTau2017v2p1VSjet[indexTau] > 0.5;
+           taubyTightDeepTau2017v2p1VSmu_ = analysisTree.tau_byTightDeepTau2017v2p1VSmu[indexTau] > 0.5;
+           taubyVLooseDeepTau2017v2p1VSe_ = analysisTree.tau_byVLooseDeepTau2017v2p1VSe[indexTau] > 0.5;
+           taubyVLooseDeepTau2017v2p1VSjet_ = analysisTree.tau_byVLooseDeepTau2017v2p1VSjet[indexTau] > 0.5;
+           taubyVLooseDeepTau2017v2p1VSmu_ = analysisTree.tau_byVLooseDeepTau2017v2p1VSmu[indexTau] > 0.5;
+           taubyVTightDeepTau2017v2p1VSe_ = analysisTree.tau_byVTightDeepTau2017v2p1VSe[indexTau] > 0.5;
+           taubyVTightDeepTau2017v2p1VSjet_ = analysisTree.tau_byVTightDeepTau2017v2p1VSjet[indexTau] > 0.5;
+           taubyVVLooseDeepTau2017v2p1VSe_ = analysisTree.tau_byVVLooseDeepTau2017v2p1VSe[indexTau] > 0.5;
+           taubyVVLooseDeepTau2017v2p1VSjet_ = analysisTree.tau_byVVLooseDeepTau2017v2p1VSjet[indexTau] > 0.5;
+           taubyVVTightDeepTau2017v2p1VSe_ = analysisTree.tau_byVVTightDeepTau2017v2p1VSe[indexTau] > 0.5;
+           taubyVVTightDeepTau2017v2p1VSjet_ = analysisTree.tau_byVVTightDeepTau2017v2p1VSjet[indexTau] > 0.5;
+           taubyVVVLooseDeepTau2017v2p1VSe_ = analysisTree.tau_byVVVLooseDeepTau2017v2p1VSe[indexTau] > 0.5;
+           taubyVVVLooseDeepTau2017v2p1VSjet_ = analysisTree.tau_byVVVLooseDeepTau2017v2p1VSjet[indexTau] > 0.5;
 
            // bool isSingleTau = false;
            // bool isSingleTauOneProng = false;
@@ -1455,29 +1457,29 @@ int main(int argc, char * argv[]) {
                  tauAntiMuonLoose3_ = analysisTree.tau_againstMuonLoose3[indexTau] > 0.5;
                  tauAntiMuonTight3_ = analysisTree.tau_againstMuonTight3[indexTau] > 0.5;
 
-                 taubyDeepTau2017v2VSeraw_ = analysisTree.tau_byDeepTau2017v2VSeraw[indexTau] > 0.5;
-                 taubyDeepTau2017v2VSjetraw_ = analysisTree.tau_byDeepTau2017v2VSjetraw[indexTau] > 0.5;
-                 taubyDeepTau2017v2VSmuraw_ = analysisTree.tau_byDeepTau2017v2VSmuraw[indexTau] > 0.5;
-                 taubyLooseDeepTau2017v2VSe_ = analysisTree.tau_byLooseDeepTau2017v2VSe[indexTau] > 0.5;
-                 taubyLooseDeepTau2017v2VSjet_ = analysisTree.tau_byLooseDeepTau2017v2VSjet[indexTau] > 0.5;
-                 taubyLooseDeepTau2017v2VSmu_ = analysisTree.tau_byLooseDeepTau2017v2VSmu[indexTau] > 0.5;
-                 taubyMediumDeepTau2017v2VSe_ = analysisTree.tau_byMediumDeepTau2017v2VSe[indexTau] > 0.5;
-                 taubyMediumDeepTau2017v2VSjet_ = analysisTree.tau_byMediumDeepTau2017v2VSjet[indexTau] > 0.5;
-                 taubyMediumDeepTau2017v2VSmu_ = analysisTree.tau_byMediumDeepTau2017v2VSmu[indexTau] > 0.5;
-                 taubyTightDeepTau2017v2VSe_ = analysisTree.tau_byTightDeepTau2017v2VSe[indexTau] > 0.5;
-                 taubyTightDeepTau2017v2VSjet_ = analysisTree.tau_byTightDeepTau2017v2VSjet[indexTau] > 0.5;
-                 taubyTightDeepTau2017v2VSmu_ = analysisTree.tau_byTightDeepTau2017v2VSmu[indexTau] > 0.5;
-                 taubyVLooseDeepTau2017v2VSe_ = analysisTree.tau_byVLooseDeepTau2017v2VSe[indexTau] > 0.5;
-                 taubyVLooseDeepTau2017v2VSjet_ = analysisTree.tau_byVLooseDeepTau2017v2VSjet[indexTau] > 0.5;
-                 taubyVLooseDeepTau2017v2VSmu_ = analysisTree.tau_byVLooseDeepTau2017v2VSmu[indexTau] > 0.5;
-                 taubyVTightDeepTau2017v2VSe_ = analysisTree.tau_byVTightDeepTau2017v2VSe[indexTau] > 0.5;
-                 taubyVTightDeepTau2017v2VSjet_ = analysisTree.tau_byVTightDeepTau2017v2VSjet[indexTau] > 0.5;
-                 taubyVVLooseDeepTau2017v2VSe_ = analysisTree.tau_byVVLooseDeepTau2017v2VSe[indexTau] > 0.5;
-                 taubyVVLooseDeepTau2017v2VSjet_ = analysisTree.tau_byVVLooseDeepTau2017v2VSjet[indexTau] > 0.5;
-                 taubyVVTightDeepTau2017v2VSe_ = analysisTree.tau_byVVTightDeepTau2017v2VSe[indexTau] > 0.5;
-                 taubyVVTightDeepTau2017v2VSjet_ = analysisTree.tau_byVVTightDeepTau2017v2VSjet[indexTau] > 0.5;
-                 taubyVVVLooseDeepTau2017v2VSe_ = analysisTree.tau_byVVVLooseDeepTau2017v2VSe[indexTau] > 0.5;
-                 taubyVVVLooseDeepTau2017v2VSjet_ = analysisTree.tau_byVVVLooseDeepTau2017v2VSjet[indexTau] > 0.5;
+                 taubyDeepTau2017v2p1VSeraw_ = analysisTree.tau_byDeepTau2017v2p1VSeraw[indexTau] > 0.5;
+                 taubyDeepTau2017v2p1VSjetraw_ = analysisTree.tau_byDeepTau2017v2p1VSjetraw[indexTau] > 0.5;
+                 taubyDeepTau2017v2p1VSmuraw_ = analysisTree.tau_byDeepTau2017v2p1VSmuraw[indexTau] > 0.5;
+                 taubyLooseDeepTau2017v2p1VSe_ = analysisTree.tau_byLooseDeepTau2017v2p1VSe[indexTau] > 0.5;
+                 taubyLooseDeepTau2017v2p1VSjet_ = analysisTree.tau_byLooseDeepTau2017v2p1VSjet[indexTau] > 0.5;
+                 taubyLooseDeepTau2017v2p1VSmu_ = analysisTree.tau_byLooseDeepTau2017v2p1VSmu[indexTau] > 0.5;
+                 taubyMediumDeepTau2017v2p1VSe_ = analysisTree.tau_byMediumDeepTau2017v2p1VSe[indexTau] > 0.5;
+                 taubyMediumDeepTau2017v2p1VSjet_ = analysisTree.tau_byMediumDeepTau2017v2p1VSjet[indexTau] > 0.5;
+                 taubyMediumDeepTau2017v2p1VSmu_ = analysisTree.tau_byMediumDeepTau2017v2p1VSmu[indexTau] > 0.5;
+                 taubyTightDeepTau2017v2p1VSe_ = analysisTree.tau_byTightDeepTau2017v2p1VSe[indexTau] > 0.5;
+                 taubyTightDeepTau2017v2p1VSjet_ = analysisTree.tau_byTightDeepTau2017v2p1VSjet[indexTau] > 0.5;
+                 taubyTightDeepTau2017v2p1VSmu_ = analysisTree.tau_byTightDeepTau2017v2p1VSmu[indexTau] > 0.5;
+                 taubyVLooseDeepTau2017v2p1VSe_ = analysisTree.tau_byVLooseDeepTau2017v2p1VSe[indexTau] > 0.5;
+                 taubyVLooseDeepTau2017v2p1VSjet_ = analysisTree.tau_byVLooseDeepTau2017v2p1VSjet[indexTau] > 0.5;
+                 taubyVLooseDeepTau2017v2p1VSmu_ = analysisTree.tau_byVLooseDeepTau2017v2p1VSmu[indexTau] > 0.5;
+                 taubyVTightDeepTau2017v2p1VSe_ = analysisTree.tau_byVTightDeepTau2017v2p1VSe[indexTau] > 0.5;
+                 taubyVTightDeepTau2017v2p1VSjet_ = analysisTree.tau_byVTightDeepTau2017v2p1VSjet[indexTau] > 0.5;
+                 taubyVVLooseDeepTau2017v2p1VSe_ = analysisTree.tau_byVVLooseDeepTau2017v2p1VSe[indexTau] > 0.5;
+                 taubyVVLooseDeepTau2017v2p1VSjet_ = analysisTree.tau_byVVLooseDeepTau2017v2p1VSjet[indexTau] > 0.5;
+                 taubyVVTightDeepTau2017v2p1VSe_ = analysisTree.tau_byVVTightDeepTau2017v2p1VSe[indexTau] > 0.5;
+                 taubyVVTightDeepTau2017v2p1VSjet_ = analysisTree.tau_byVVTightDeepTau2017v2p1VSjet[indexTau] > 0.5;
+                 taubyVVVLooseDeepTau2017v2p1VSe_ = analysisTree.tau_byVVVLooseDeepTau2017v2p1VSe[indexTau] > 0.5;
+                 taubyVVVLooseDeepTau2017v2p1VSjet_ = analysisTree.tau_byVVVLooseDeepTau2017v2p1VSjet[indexTau] > 0.5;
 
                  recoilDPhi_ = dPhiFromLV(tauLV,recoilJetLV);
                  recoilJetRatio_ = lorentzVectorTauJet.Pt()/recoilJetLV.Pt();
