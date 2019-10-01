@@ -766,29 +766,29 @@ public :
    Float_t         tau_byVVTightIsolationMVArun2017v2DBoldDMwLT2017[100];   //[tau_count]
    Float_t         tau_byVVTightIsolationMVArun2v1DBnewDMwLT2016[100];   //[tau_count]
    Float_t         tau_byVVTightIsolationMVArun2v1DBoldDMwLT2016[100];   //[tau_count]
-   Float_t	   tau_byDeepTau2017v2VSeraw[100];	//[tau_count]
-   Float_t	   tau_byDeepTau2017v2VSjetraw[100];	//[tau_count]
-   Float_t	   tau_byDeepTau2017v2VSmuraw[100];	//[tau_count]
-   Float_t	   tau_byLooseDeepTau2017v2VSe[100];	//[tau_count]
-   Float_t	   tau_byLooseDeepTau2017v2VSjet[100];	//[tau_count]
-   Float_t	   tau_byLooseDeepTau2017v2VSmu[100];	//[tau_count]
-   Float_t	   tau_byMediumDeepTau2017v2VSe[100];	//[tau_count]
-   Float_t	   tau_byMediumDeepTau2017v2VSjet[100];	//[tau_count]
-   Float_t	   tau_byMediumDeepTau2017v2VSmu[100];	//[tau_count]
-   Float_t	   tau_byTightDeepTau2017v2VSe[100];	//[tau_count]
-   Float_t	   tau_byTightDeepTau2017v2VSjet[100];	//[tau_count]
-   Float_t	   tau_byTightDeepTau2017v2VSmu[100];	//[tau_count]
-   Float_t	   tau_byVLooseDeepTau2017v2VSe[100];	//[tau_count]
-   Float_t	   tau_byVLooseDeepTau2017v2VSjet[100];	//[tau_count]
-   Float_t	   tau_byVLooseDeepTau2017v2VSmu[100];	//[tau_count]
-   Float_t	   tau_byVTightDeepTau2017v2VSe[100];	//[tau_count]
-   Float_t	   tau_byVTightDeepTau2017v2VSjet[100];	//[tau_count]
-   Float_t	   tau_byVVLooseDeepTau2017v2VSe[100];	//[tau_count]
-   Float_t	   tau_byVVLooseDeepTau2017v2VSjet[100];	//[tau_count]
-   Float_t	   tau_byVVTightDeepTau2017v2VSe[100];	//[tau_count]
-   Float_t	   tau_byVVTightDeepTau2017v2VSjet[100];	//[tau_count]
-   Float_t	   tau_byVVVLooseDeepTau2017v2VSe[100];	//[tau_count]
-   Float_t	   tau_byVVVLooseDeepTau2017v2VSjet[100];	//[tau_count]
+   Float_t	   tau_byDeepTau2017v2p1VSeraw[100];	//[tau_count]
+   Float_t	   tau_byDeepTau2017v2p1VSjetraw[100];	//[tau_count]
+   Float_t	   tau_byDeepTau2017v2p1VSmuraw[100];	//[tau_count]
+   Float_t	   tau_byLooseDeepTau2017v2p1VSe[100];	//[tau_count]
+   Float_t	   tau_byLooseDeepTau2017v2p1VSjet[100];	//[tau_count]
+   Float_t	   tau_byLooseDeepTau2017v2p1VSmu[100];	//[tau_count]
+   Float_t	   tau_byMediumDeepTau2017v2p1VSe[100];	//[tau_count]
+   Float_t	   tau_byMediumDeepTau2017v2p1VSjet[100];	//[tau_count]
+   Float_t	   tau_byMediumDeepTau2017v2p1VSmu[100];	//[tau_count]
+   Float_t	   tau_byTightDeepTau2017v2p1VSe[100];	//[tau_count]
+   Float_t	   tau_byTightDeepTau2017v2p1VSjet[100];	//[tau_count]
+   Float_t	   tau_byTightDeepTau2017v2p1VSmu[100];	//[tau_count]
+   Float_t	   tau_byVLooseDeepTau2017v2p1VSe[100];	//[tau_count]
+   Float_t	   tau_byVLooseDeepTau2017v2p1VSjet[100];	//[tau_count]
+   Float_t	   tau_byVLooseDeepTau2017v2p1VSmu[100];	//[tau_count]
+   Float_t	   tau_byVTightDeepTau2017v2p1VSe[100];	//[tau_count]
+   Float_t	   tau_byVTightDeepTau2017v2p1VSjet[100];	//[tau_count]
+   Float_t	   tau_byVVLooseDeepTau2017v2p1VSe[100];	//[tau_count]
+   Float_t	   tau_byVVLooseDeepTau2017v2p1VSjet[100];	//[tau_count]
+   Float_t	   tau_byVVTightDeepTau2017v2p1VSe[100];	//[tau_count]
+   Float_t	   tau_byVVTightDeepTau2017v2p1VSjet[100];	//[tau_count]
+   Float_t	   tau_byVVVLooseDeepTau2017v2p1VSe[100];	//[tau_count]
+   Float_t	   tau_byVVVLooseDeepTau2017v2p1VSjet[100];	//[tau_count]
    Int_t           htxs_stage0cat;
    Int_t           htxs_stage1cat;
    Int_t           htxs_stage1p1cat;
@@ -1536,29 +1536,29 @@ public :
    TBranch        *b_tau_byVVTightIsolationMVArun2017v2DBoldDMwLT2017;   //!
    TBranch        *b_tau_byVVTightIsolationMVArun2v1DBnewDMwLT2016;   //!
    TBranch        *b_tau_byVVTightIsolationMVArun2v1DBoldDMwLT2016;   //!
-   TBranch	  *b_tau_byDeepTau2017v2VSeraw;	//!
-   TBranch	  *b_tau_byDeepTau2017v2VSjetraw;	//!
-   TBranch	  *b_tau_byDeepTau2017v2VSmuraw;	//!
-   TBranch	  *b_tau_byLooseDeepTau2017v2VSe;	//!
-   TBranch	  *b_tau_byLooseDeepTau2017v2VSjet;	//!
-   TBranch	  *b_tau_byLooseDeepTau2017v2VSmu;	//!
-   TBranch	  *b_tau_byMediumDeepTau2017v2VSe;	//!
-   TBranch	  *b_tau_byMediumDeepTau2017v2VSjet;	//!
-   TBranch	  *b_tau_byMediumDeepTau2017v2VSmu;	//!
-   TBranch	  *b_tau_byTightDeepTau2017v2VSe;	//!
-   TBranch	  *b_tau_byTightDeepTau2017v2VSjet;	//!
-   TBranch	  *b_tau_byTightDeepTau2017v2VSmu;	//!
-   TBranch	  *b_tau_byVLooseDeepTau2017v2VSe;	//!
-   TBranch	  *b_tau_byVLooseDeepTau2017v2VSjet;	//!
-   TBranch	  *b_tau_byVLooseDeepTau2017v2VSmu;	//!
-   TBranch	  *b_tau_byVTightDeepTau2017v2VSe;	//!
-   TBranch	  *b_tau_byVTightDeepTau2017v2VSjet;	//!
-   TBranch	  *b_tau_byVVLooseDeepTau2017v2VSe;	//!
-   TBranch	  *b_tau_byVVLooseDeepTau2017v2VSjet;	//!
-   TBranch	  *b_tau_byVVTightDeepTau2017v2VSe;	//!
-   TBranch	  *b_tau_byVVTightDeepTau2017v2VSjet;	//!
-   TBranch	  *b_tau_byVVVLooseDeepTau2017v2VSe;	//!
-   TBranch	  *b_tau_byVVVLooseDeepTau2017v2VSjet;	//!
+   TBranch	  *b_tau_byDeepTau2017v2p1VSeraw;	//!
+   TBranch	  *b_tau_byDeepTau2017v2p1VSjetraw;	//!
+   TBranch	  *b_tau_byDeepTau2017v2p1VSmuraw;	//!
+   TBranch	  *b_tau_byLooseDeepTau2017v2p1VSe;	//!
+   TBranch	  *b_tau_byLooseDeepTau2017v2p1VSjet;	//!
+   TBranch	  *b_tau_byLooseDeepTau2017v2p1VSmu;	//!
+   TBranch	  *b_tau_byMediumDeepTau2017v2p1VSe;	//!
+   TBranch	  *b_tau_byMediumDeepTau2017v2p1VSjet;	//!
+   TBranch	  *b_tau_byMediumDeepTau2017v2p1VSmu;	//!
+   TBranch	  *b_tau_byTightDeepTau2017v2p1VSe;	//!
+   TBranch	  *b_tau_byTightDeepTau2017v2p1VSjet;	//!
+   TBranch	  *b_tau_byTightDeepTau2017v2p1VSmu;	//!
+   TBranch	  *b_tau_byVLooseDeepTau2017v2p1VSe;	//!
+   TBranch	  *b_tau_byVLooseDeepTau2017v2p1VSjet;	//!
+   TBranch	  *b_tau_byVLooseDeepTau2017v2p1VSmu;	//!
+   TBranch	  *b_tau_byVTightDeepTau2017v2p1VSe;	//!
+   TBranch	  *b_tau_byVTightDeepTau2017v2p1VSjet;	//!
+   TBranch	  *b_tau_byVVLooseDeepTau2017v2p1VSe;	//!
+   TBranch	  *b_tau_byVVLooseDeepTau2017v2p1VSjet;	//!
+   TBranch	  *b_tau_byVVTightDeepTau2017v2p1VSe;	//!
+   TBranch	  *b_tau_byVVTightDeepTau2017v2p1VSjet;	//!
+   TBranch	  *b_tau_byVVVLooseDeepTau2017v2p1VSe;	//!
+   TBranch	  *b_tau_byVVVLooseDeepTau2017v2p1VSjet;	//!
    TBranch        *b_htxs_stage0cat;   //!
    TBranch        *b_htxs_stage1cat;   //!
    TBranch        *b_htxs_stage1p1cat;
@@ -2396,29 +2396,29 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("tau_byVVTightIsolationMVArun2017v2DBoldDMdR0p3wLT2017", tau_byVVTightIsolationMVArun2017v2DBoldDMdR0p3wLT2017, &b_tau_byVVTightIsolationMVArun2017v2DBoldDMdR0p3wLT2017);
    fChain->SetBranchAddress("tau_byVVTightIsolationMVArun2017v2DBoldDMwLT2017", tau_byVVTightIsolationMVArun2017v2DBoldDMwLT2017, &b_tau_byVVTightIsolationMVArun2017v2DBoldDMwLT2017);
    fChain->SetBranchAddress("tau_byVVTightIsolationMVArun2v1DBnewDMwLT2016", tau_byVVTightIsolationMVArun2v1DBnewDMwLT2016, &b_tau_byVVTightIsolationMVArun2v1DBnewDMwLT2016);
-   fChain->SetBranchAddress("tau_byDeepTau2017v2VSeraw", tau_byDeepTau2017v2VSeraw, &b_tau_byDeepTau2017v2VSeraw);	
-   fChain->SetBranchAddress("tau_byDeepTau2017v2VSjetraw", tau_byDeepTau2017v2VSjetraw, &b_tau_byDeepTau2017v2VSjetraw);	
-   fChain->SetBranchAddress("tau_byDeepTau2017v2VSmuraw", tau_byDeepTau2017v2VSmuraw, &b_tau_byDeepTau2017v2VSmuraw);	
-   fChain->SetBranchAddress("tau_byLooseDeepTau2017v2VSe", tau_byLooseDeepTau2017v2VSe, &b_tau_byLooseDeepTau2017v2VSe);	
-   fChain->SetBranchAddress("tau_byLooseDeepTau2017v2VSjet", tau_byLooseDeepTau2017v2VSjet, &b_tau_byLooseDeepTau2017v2VSjet);	
-   fChain->SetBranchAddress("tau_byLooseDeepTau2017v2VSmu", tau_byLooseDeepTau2017v2VSmu, &b_tau_byLooseDeepTau2017v2VSmu);	
-   fChain->SetBranchAddress("tau_byMediumDeepTau2017v2VSe", tau_byMediumDeepTau2017v2VSe, &b_tau_byMediumDeepTau2017v2VSe);	
-   fChain->SetBranchAddress("tau_byMediumDeepTau2017v2VSjet", tau_byMediumDeepTau2017v2VSjet, &b_tau_byMediumDeepTau2017v2VSjet);	
-   fChain->SetBranchAddress("tau_byMediumDeepTau2017v2VSmu", tau_byMediumDeepTau2017v2VSmu, &b_tau_byMediumDeepTau2017v2VSmu);	
-   fChain->SetBranchAddress("tau_byTightDeepTau2017v2VSe", tau_byTightDeepTau2017v2VSe, &b_tau_byTightDeepTau2017v2VSe);	
-   fChain->SetBranchAddress("tau_byTightDeepTau2017v2VSjet", tau_byTightDeepTau2017v2VSjet, &b_tau_byTightDeepTau2017v2VSjet);	
-   fChain->SetBranchAddress("tau_byTightDeepTau2017v2VSmu", tau_byTightDeepTau2017v2VSmu, &b_tau_byTightDeepTau2017v2VSmu);	
-   fChain->SetBranchAddress("tau_byVLooseDeepTau2017v2VSe", tau_byVLooseDeepTau2017v2VSe, &b_tau_byVLooseDeepTau2017v2VSe);	
-   fChain->SetBranchAddress("tau_byVLooseDeepTau2017v2VSjet", tau_byVLooseDeepTau2017v2VSjet, &b_tau_byVLooseDeepTau2017v2VSjet);	
-   fChain->SetBranchAddress("tau_byVLooseDeepTau2017v2VSmu", tau_byVLooseDeepTau2017v2VSmu, &b_tau_byVLooseDeepTau2017v2VSmu);	
-   fChain->SetBranchAddress("tau_byVTightDeepTau2017v2VSe", tau_byVTightDeepTau2017v2VSe, &b_tau_byVTightDeepTau2017v2VSe);	
-   fChain->SetBranchAddress("tau_byVTightDeepTau2017v2VSjet", tau_byVTightDeepTau2017v2VSjet, &b_tau_byVTightDeepTau2017v2VSjet);	
-   fChain->SetBranchAddress("tau_byVVLooseDeepTau2017v2VSe", tau_byVVLooseDeepTau2017v2VSe, &b_tau_byVVLooseDeepTau2017v2VSe);	
-   fChain->SetBranchAddress("tau_byVVLooseDeepTau2017v2VSjet", tau_byVVLooseDeepTau2017v2VSjet, &b_tau_byVVLooseDeepTau2017v2VSjet);	
-   fChain->SetBranchAddress("tau_byVVTightDeepTau2017v2VSe", tau_byVVTightDeepTau2017v2VSe, &b_tau_byVVTightDeepTau2017v2VSe);	
-   fChain->SetBranchAddress("tau_byVVTightDeepTau2017v2VSjet", tau_byVVTightDeepTau2017v2VSjet, &b_tau_byVVTightDeepTau2017v2VSjet);	
-   fChain->SetBranchAddress("tau_byVVVLooseDeepTau2017v2VSe", tau_byVVVLooseDeepTau2017v2VSe, &b_tau_byVVVLooseDeepTau2017v2VSe);	
-   fChain->SetBranchAddress("tau_byVVVLooseDeepTau2017v2VSjet", tau_byVVVLooseDeepTau2017v2VSjet, &b_tau_byVVVLooseDeepTau2017v2VSjet);	
+   fChain->SetBranchAddress("tau_byDeepTau2017v2p1VSeraw", tau_byDeepTau2017v2p1VSeraw, &b_tau_byDeepTau2017v2p1VSeraw);
+   fChain->SetBranchAddress("tau_byDeepTau2017v2p1VSjetraw", tau_byDeepTau2017v2p1VSjetraw, &b_tau_byDeepTau2017v2p1VSjetraw);
+   fChain->SetBranchAddress("tau_byDeepTau2017v2p1VSmuraw", tau_byDeepTau2017v2p1VSmuraw, &b_tau_byDeepTau2017v2p1VSmuraw);
+   fChain->SetBranchAddress("tau_byLooseDeepTau2017v2p1VSe", tau_byLooseDeepTau2017v2p1VSe, &b_tau_byLooseDeepTau2017v2p1VSe);
+   fChain->SetBranchAddress("tau_byLooseDeepTau2017v2p1VSjet", tau_byLooseDeepTau2017v2p1VSjet, &b_tau_byLooseDeepTau2017v2p1VSjet);
+   fChain->SetBranchAddress("tau_byLooseDeepTau2017v2p1VSmu", tau_byLooseDeepTau2017v2p1VSmu, &b_tau_byLooseDeepTau2017v2p1VSmu);
+   fChain->SetBranchAddress("tau_byMediumDeepTau2017v2p1VSe", tau_byMediumDeepTau2017v2p1VSe, &b_tau_byMediumDeepTau2017v2p1VSe);
+   fChain->SetBranchAddress("tau_byMediumDeepTau2017v2p1VSjet", tau_byMediumDeepTau2017v2p1VSjet, &b_tau_byMediumDeepTau2017v2p1VSjet);
+   fChain->SetBranchAddress("tau_byMediumDeepTau2017v2p1VSmu", tau_byMediumDeepTau2017v2p1VSmu, &b_tau_byMediumDeepTau2017v2p1VSmu);
+   fChain->SetBranchAddress("tau_byTightDeepTau2017v2p1VSe", tau_byTightDeepTau2017v2p1VSe, &b_tau_byTightDeepTau2017v2p1VSe);
+   fChain->SetBranchAddress("tau_byTightDeepTau2017v2p1VSjet", tau_byTightDeepTau2017v2p1VSjet, &b_tau_byTightDeepTau2017v2p1VSjet);
+   fChain->SetBranchAddress("tau_byTightDeepTau2017v2p1VSmu", tau_byTightDeepTau2017v2p1VSmu, &b_tau_byTightDeepTau2017v2p1VSmu);
+   fChain->SetBranchAddress("tau_byVLooseDeepTau2017v2p1VSe", tau_byVLooseDeepTau2017v2p1VSe, &b_tau_byVLooseDeepTau2017v2p1VSe);
+   fChain->SetBranchAddress("tau_byVLooseDeepTau2017v2p1VSjet", tau_byVLooseDeepTau2017v2p1VSjet, &b_tau_byVLooseDeepTau2017v2p1VSjet);
+   fChain->SetBranchAddress("tau_byVLooseDeepTau2017v2p1VSmu", tau_byVLooseDeepTau2017v2p1VSmu, &b_tau_byVLooseDeepTau2017v2p1VSmu);
+   fChain->SetBranchAddress("tau_byVTightDeepTau2017v2p1VSe", tau_byVTightDeepTau2017v2p1VSe, &b_tau_byVTightDeepTau2017v2p1VSe);
+   fChain->SetBranchAddress("tau_byVTightDeepTau2017v2p1VSjet", tau_byVTightDeepTau2017v2p1VSjet, &b_tau_byVTightDeepTau2017v2p1VSjet);
+   fChain->SetBranchAddress("tau_byVVLooseDeepTau2017v2p1VSe", tau_byVVLooseDeepTau2017v2p1VSe, &b_tau_byVVLooseDeepTau2017v2p1VSe);
+   fChain->SetBranchAddress("tau_byVVLooseDeepTau2017v2p1VSjet", tau_byVVLooseDeepTau2017v2p1VSjet, &b_tau_byVVLooseDeepTau2017v2p1VSjet);
+   fChain->SetBranchAddress("tau_byVVTightDeepTau2017v2p1VSe", tau_byVVTightDeepTau2017v2p1VSe, &b_tau_byVVTightDeepTau2017v2p1VSe);
+   fChain->SetBranchAddress("tau_byVVTightDeepTau2017v2p1VSjet", tau_byVVTightDeepTau2017v2p1VSjet, &b_tau_byVVTightDeepTau2017v2p1VSjet);
+   fChain->SetBranchAddress("tau_byVVVLooseDeepTau2017v2p1VSe", tau_byVVVLooseDeepTau2017v2p1VSe, &b_tau_byVVVLooseDeepTau2017v2p1VSe);
+   fChain->SetBranchAddress("tau_byVVVLooseDeepTau2017v2p1VSjet", tau_byVVVLooseDeepTau2017v2p1VSjet, &b_tau_byVVVLooseDeepTau2017v2p1VSjet);
    fChain->SetBranchAddress("htxs_stage0cat",&htxs_stage0cat, &b_htxs_stage0cat);
    fChain->SetBranchAddress("htxs_stage1cat",&htxs_stage1cat , &b_htxs_stage1cat);
    fChain->SetBranchAddress("htxs_stage1p1cat",&htxs_stage1p1cat , &b_htxs_stage1p1cat);
