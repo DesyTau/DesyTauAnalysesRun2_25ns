@@ -5,7 +5,6 @@ int main(int argc, char * argv[]) {
    
     // first argument - config file
     // second argument - filelist
-   
    bool sync = false;  
    
    // read config file =======================================================================================================================================================
@@ -316,7 +315,6 @@ int main(int argc, char * argv[]) {
    // initialize recoil corrections ====================================================================================================================================
    MEtSys metSys(MetSysFileName);
    RecoilCorrector recoilMetCorrector(RecoilFileName);
-
    // initialize calibration of impact parameters ======================================================================================================================
    //CalibrationOfImpactParameters calibrateIP;
    
@@ -1347,14 +1345,13 @@ int main(int argc, char * argv[]) {
          
          float pfmet_corr_x = met_x;
          float pfmet_corr_y = met_y;
-         
          if ((isW||isDY||isSignal)&&!isData) {
             if (applySimpleRecoilCorrections) {
                recoilMetCorrector.CorrectByMeanResolution(met_x,met_y,bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,pfmet_corr_x,pfmet_corr_y);
-               metSys.ApplyMEtSys(pfmet_corr_x, pfmet_corr_y, bosonPx, bosonPy, lepPx, lepPy, njetsforrecoil, MEtSys::ProcessType::BOSON, MEtSys::SysType::Response, MEtSys::SysShift::Up, met_x_recoilscaleUp, met_y_recoilscaleUp);
-               metSys.ApplyMEtSys(pfmet_corr_x, pfmet_corr_y, bosonPx, bosonPy, lepPx, lepPy, njetsforrecoil, MEtSys::ProcessType::BOSON, MEtSys::SysType::Response, MEtSys::SysShift::Down, met_x_recoilscaleDown, met_y_recoilscaleDown);
-               metSys.ApplyMEtSys(pfmet_corr_x, pfmet_corr_y, bosonPx, bosonPy, lepPx, lepPy, njetsforrecoil, MEtSys::ProcessType::BOSON, MEtSys::SysType::Resolution, MEtSys::SysShift::Up, met_x_recoilresoUp, met_y_recoilresoUp);
-               metSys.ApplyMEtSys(pfmet_corr_x, pfmet_corr_y, bosonPx, bosonPy, lepPx, lepPy, njetsforrecoil, MEtSys::ProcessType::BOSON, MEtSys::SysType::Resolution, MEtSys::SysShift::Down, met_x_recoilresoDown, met_y_recoilresoDown);
+               metSys.ApplyMEtSys(pfmet_corr_x, pfmet_corr_y, bosonPx, bosonPy, lepPx, lepPy, njetsforrecoil, MEtSys::SysType::Response, MEtSys::SysShift::Up, met_x_recoilscaleUp, met_y_recoilscaleUp);
+               metSys.ApplyMEtSys(pfmet_corr_x, pfmet_corr_y, bosonPx, bosonPy, lepPx, lepPy, njetsforrecoil, MEtSys::SysType::Response, MEtSys::SysShift::Down, met_x_recoilscaleDown, met_y_recoilscaleDown);
+               metSys.ApplyMEtSys(pfmet_corr_x, pfmet_corr_y, bosonPx, bosonPy, lepPx, lepPy, njetsforrecoil, MEtSys::SysType::Resolution, MEtSys::SysShift::Up, met_x_recoilresoUp, met_y_recoilresoUp);
+               metSys.ApplyMEtSys(pfmet_corr_x, pfmet_corr_y, bosonPx, bosonPy, lepPx, lepPy, njetsforrecoil, MEtSys::SysType::Resolution, MEtSys::SysShift::Down, met_x_recoilresoDown, met_y_recoilresoDown);
             }
             else {
                recoilMetCorrector.Correct(met_x,met_y,bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,pfmet_corr_x,pfmet_corr_y);
