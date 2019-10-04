@@ -632,8 +632,8 @@ process.triggerSelection = cms.EDFilter("HLTHighLevel",
 
 
 process.p = cms.Path(
-  process.triggerSelection * # trigger filtering
   process.initroottree *
+  process.triggerSelection * # trigger filtering
   process.jecSequence *  # New JECs
   process.jecSequencepuppi *  # New JECs
   process.egmPhotonIDSequence * # Puppi MET

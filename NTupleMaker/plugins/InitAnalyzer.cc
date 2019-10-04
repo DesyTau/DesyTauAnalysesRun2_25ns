@@ -74,6 +74,7 @@ class InitAnalyzer : public edm::EDAnalyzer {
   edm::EDGetTokenT<std::vector<PileupSummaryInfo> > PUInfoToken_;
   edm::EDGetTokenT<GenEventInfoProduct > GenToken_;
   Float_t genweight;
+  Float_t fill_weight;
       //virtual void beginRun(edm::Run const&, edm::EventSetup const&) override;
       //virtual void endRun(edm::Run const&, edm::EventSetup const&) override;
       //virtual void beginLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&) override;
@@ -121,7 +122,9 @@ void
 InitAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
    using namespace edm;
-   nEvents->Fill(0);
+   fill_weight = +1;
+   if(!cdata && genweight<0) fill_weight = -1;
+   nEvents->Fill(0.,fill_weight);
 
   if (!cdata) {
      edm::Handle<vector<PileupSummaryInfo> > PUInfo;
