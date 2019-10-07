@@ -336,7 +336,7 @@ int main(int argc, char * argv[]){
 
   //Merijn removed dimuon cut information since it is in the config file, best to have in one location only to avoid confusion
 
-  const float deltaRTrigMatch = cfg.get<float>("DRTrigMatch");
+  const float deltaRTrigMatch = cfg.get<float>("dRTrigMatch");
   const float dRiso = cfg.get<float>("dRiso");
   
   const float jetEtaCut = cfg.get<float>("JetEtaCut");
@@ -1292,8 +1292,7 @@ for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) {
       }
       
       // PF MET
-      genTools::RecoilCorrections( *recoilPFMetCorrector, 
-				   (!isData && applyRecoilCorrections && (isDY || isWJets || isVBForGGHiggs || isMSSMsignal)) * genTools::MeanResolution,
+      genTools::RecoilCorrections( *recoilPFMetCorrector, 1,
 				   otree->met, otree->metphi,
 				   genV.Px(), genV.Py(),
 				   genL.Px(), genL.Py(),

@@ -217,16 +217,14 @@ int main(int argc, char * argv[]){
   RecoilCorrector *recoilPFMetCorrector = (RecoilCorrector*) malloc(sizeof(*recoilPFMetCorrector));
   
   if(!isData && ApplyRecoilCorrections && (isDY || isWJets || isVBForGGHiggs || isMSSMsignal) ){
-    TString RecoilDir("HTT-utilities/RecoilCorrections/data/");
-    TString RecoilFileName = RecoilDir + "Type1_PFMET_2017.root";
-    //    TString RecoilFileName = RecoilDir; RecoilFileName += "TypeI-PFMet_Run2016BtoH.root"; Merijn update to 2017:
-
-    std::cout<<RecoilFileName << " with isDY = " << isDY << "and infiles.rfind+1 = " << infiles.rfind("/")+1 << std::endl;
-    recoilPFMetCorrector = new RecoilCorrector( RecoilFileName);
+    TString RecoilFilePath = cfg.get<string>("RecoilFilePath");
+    //    TString RecoilFilePath = RecoilDir; RecoilFilePath += "TypeI-PFMet_Run2016BtoH.root"; Merijn update to 2017:
+    std::cout << RecoilFilePath << std::endl;
+    recoilPFMetCorrector = new RecoilCorrector( RecoilFilePath);
         
-    //    RecoilFileName = RecoilDir; RecoilFileName += "MvaMET_2016BCD.root";
-    //    std::cout<<RecoilFileName<<std::endl;
-    //    recoilMvaMetCorrector = new RecoilCorrector( RecoilFileName);
+    //    RecoilFilePath = RecoilDir; RecoilFilePath += "MvaMET_2016BCD.root";
+    //    std::cout<<RecoilFilePath<<std::endl;
+    //    recoilMvaMetCorrector = new RecoilCorrector( RecoilFilePath);
 
   }
   
@@ -297,7 +295,7 @@ int main(int argc, char * argv[]){
 
   const bool  ApplyLeptonId    = cfg.get<bool>("Apply" + lep + "Id");
 
-  const float deltaRTrigMatch = cfg.get<float>("DRTrigMatch");
+  const float dRTrigMatch = cfg.get<float>("dRTrigMatch");
   const float dRiso = cfg.get<float>("dRiso");
   
   const float jetEtaCut = cfg.get<float>("JetEtaCut");
@@ -812,7 +810,7 @@ int main(int argc, char * argv[]){
          float dRtrigLep = deltaR(lep_eta, lep_phi, analysisTree.trigobject_eta[iT], analysisTree.trigobject_phi[iT]);        
          float dRtrigTau = deltaR(analysisTree.tau_eta[tauIndex], analysisTree.tau_phi[tauIndex], analysisTree.trigobject_eta[iT], analysisTree.trigobject_phi[iT]);        
     
-         if (dRtrigLep < deltaRTrigMatch){
+         if (dRtrigLep < dRTrigMatch){
            for(unsigned int i_trig = 0; i_trig < filterSingleLep.size(); i_trig++)
            {
               if (nSingleLepTrig.at(i_trig) == -1) continue;
@@ -824,7 +822,7 @@ int main(int argc, char * argv[]){
               if (analysisTree.trigobject_filters[iT][nXTrigLepLeg.at(i_trig)]) isXTrigLepLeg.at(i_trig) = true;
             } 
           }
-         if (dRtrigTau < deltaRTrigMatch){ 
+         if (dRtrigTau < dRTrigMatch){ 
             for(unsigned int i_trig = 0; i_trig < filterXtriggerTauLeg.size(); i_trig++)
             {
                if (nXTrigTauLeg.at(i_trig) == -1) continue;
@@ -993,32 +991,30 @@ int main(int argc, char * argv[]){
       ////////////////////////////////////////////////////////////
       
       otree->njetshad = otree->njets;
+      
       if (!isData && ApplyRecoilCorrections && (isDY || isWJets || isVBForGGHiggs || isMSSMsignal) ){
       	genV = genTools::genV(analysisTree);
       	genL = genTools::genL(analysisTree);
       	if(isWJets) otree->njetshad += 1;
+
+        genTools::RecoilCorrections( *recoilPFMetCorrector, 1, // dummy parameter
+          otree->met, otree->metphi,
+          genV.Px(), genV.Py(),
+          genL.Px(), genL.Py(),
+          otree->njetshad,
+          otree->met_rcmr, otree->metphi_rcmr
+        );
+        
+        // overwriting with recoil-corrected values 
+        otree->met = otree->met_rcmr;
+        otree->metphi = otree->metphi_rcmr;   
       }
       
-      // PF MET
-      genTools::RecoilCorrections( *recoilPFMetCorrector, 
-  			   (!isData && ApplyRecoilCorrections && (isDY || isWJets || isVBForGGHiggs || isMSSMsignal)) * genTools::MeanResolution,
-  			   otree->met, otree->metphi,
-  			   genV.Px(), genV.Py(),
-  			   genL.Px(), genL.Py(),
-  			   otree->njetshad,
-  			   otree->met_rcmr, otree->metphi_rcmr
-  			   );
-    
-      // overwriting with recoil-corrected values 
-      otree->met = otree->met_rcmr;
-      otree->metphi = otree->metphi_rcmr;   
-    
       //ditau sytem
       TLorentzVector tauLV; tauLV.SetXYZM(analysisTree.tau_px[tauIndex],
   				     analysisTree.tau_py[tauIndex],
   				     analysisTree.tau_pz[tauIndex],
   				     analysisTree.tau_mass[tauIndex]);
-    
     
       // using PF MET
       TLorentzVector metLV; 

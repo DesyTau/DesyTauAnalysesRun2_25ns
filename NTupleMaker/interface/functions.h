@@ -512,28 +512,21 @@ namespace genTools{
   
   
   TLorentzVector genZ(const AC1B& analysisTree){
-    TLorentzVector genZ; genZ.SetXYZM(0,0,0,91.2);
-    TLorentzVector genPart; genPart.SetXYZM(0,0,0,0);
     
-    for (unsigned int igen=0; igen<analysisTree.genparticles_count; ++igen) {
-      genPart.SetXYZT(analysisTree.genparticles_px[igen],
-		      analysisTree.genparticles_py[igen],
-		      analysisTree.genparticles_pz[igen],
-		      analysisTree.genparticles_e[igen]);
-      if (analysisTree.genparticles_pdgid[igen]==23||analysisTree.genparticles_pdgid[igen]==22) {
-	if (analysisTree.genparticles_fromHardProcess[igen])
-	  genZ.SetXYZT(analysisTree.genparticles_px[igen],
-		       analysisTree.genparticles_py[igen],
-		       analysisTree.genparticles_pz[igen],
-		       analysisTree.genparticles_e[igen]);
-      }
+    TLorentzVector genZ; genZ.SetXYZM(0, 0, 0, 91.2);
+    for (unsigned int igen = 0; igen < analysisTree.genparticles_count; ++igen) {
+      if ((analysisTree.genparticles_pdgid[igen] == 22 || analysisTree.genparticles_pdgid[igen] == 23) && analysisTree.genparticles_fromHardProcess[igen]) 
+      	  genZ.SetXYZT(analysisTree.genparticles_px[igen],
+            		       analysisTree.genparticles_py[igen],
+            		       analysisTree.genparticles_pz[igen],
+            		       analysisTree.genparticles_e[igen]);
     }
     return genZ;
   }
 
   TLorentzVector genL(const AC1B& analysisTree){
-    TLorentzVector genL; genL.SetXYZM(0,0,0,0);
-    TLorentzVector genPart; genPart.SetXYZM(0,0,0,0);
+    TLorentzVector genL; genL.SetXYZM(0, 0, 0, 0);
+    TLorentzVector genPart; genPart.SetXYZM(0, 0, 0, 0);
      
     bool isMuon = 0;
     bool isElectron = 0;
@@ -542,17 +535,17 @@ namespace genTools{
     bool fromHardProcessFinalState = 0;
     //bool isDirectHardProcessTauDecayProduct = 0;
     
-    for (unsigned int igen=0; igen<analysisTree.genparticles_count; ++igen) {
+    for (unsigned int igen = 0; igen < analysisTree.genparticles_count; ++igen) {
       genPart.SetXYZT(analysisTree.genparticles_px[igen],
-		      analysisTree.genparticles_py[igen],
-		      analysisTree.genparticles_pz[igen],
-		      analysisTree.genparticles_e[igen]);
+            		      analysisTree.genparticles_py[igen],
+            		      analysisTree.genparticles_pz[igen],
+            		      analysisTree.genparticles_e[igen]);
       
-      isMuon = fabs(analysisTree.genparticles_pdgid[igen])==13;
-      isElectron = fabs(analysisTree.genparticles_pdgid[igen])==11;
+      isMuon = fabs(analysisTree.genparticles_pdgid[igen]) == 13;
+      isElectron = fabs(analysisTree.genparticles_pdgid[igen]) == 11;
       isChargedLepton = isMuon || isElectron;
       //isNeutrino = fabs(analysisTree.genparticles_pdgid[igen])==12||	fabs(analysisTree.genparticles_pdgid[igen])==14||	fabs(analysisTree.genparticles_pdgid[igen])==16;
-      fromHardProcessFinalState = analysisTree.genparticles_fromHardProcess[igen] && analysisTree.genparticles_status[igen]==1;
+      fromHardProcessFinalState = analysisTree.genparticles_fromHardProcess[igen] && analysisTree.genparticles_status[igen] == 1;
       //isDirectHardProcessTauDecayProduct = analysisTree.genparticles_isDirectHardProcessTauDecayProduct[igen];
 
       /*if((fromHardProcessFinalState && isChargedLepton) || (isDirectHardProcessTauDecayProduct && (!isNeutrino)))
@@ -562,24 +555,23 @@ namespace genTools{
     return genL;*/
 
       if(fromHardProcessFinalState && isChargedLepton)
-	genL += genPart;
+      	genL += genPart;
     }
     
     bool fromHardProcess = 0;
     bool isLastCopy = 0;
-    for (unsigned int itau=0; itau<analysisTree.gentau_count; ++itau) {
+    for (unsigned int itau = 0; itau < analysisTree.gentau_count; ++itau) {
       genPart.SetXYZT(analysisTree.gentau_visible_px[itau],
-		      analysisTree.gentau_visible_py[itau],
-		      analysisTree.gentau_visible_pz[itau],
-		      analysisTree.gentau_visible_e[itau]);
+            		      analysisTree.gentau_visible_py[itau],
+            		      analysisTree.gentau_visible_pz[itau],
+            		      analysisTree.gentau_visible_e[itau]);
       
       fromHardProcess = analysisTree.gentau_fromHardProcess[itau];
       isLastCopy = analysisTree.gentau_isLastCopy[itau];
 
       if (fromHardProcess && isLastCopy)
-	genL += genPart;
+      	genL += genPart;
     }
-      
     return genL;
       
   }
@@ -613,8 +605,8 @@ namespace genTools{
   }
 
   TLorentzVector genV(const AC1B& analysisTree){
-    TLorentzVector genV; genV.SetXYZM(0,0,0,0);
-    TLorentzVector genPart; genPart.SetXYZM(0,0,0,0);
+    TLorentzVector genV; genV.SetXYZM(0, 0, 0, 0);
+    TLorentzVector genPart; genPart.SetXYZM(0, 0, 0, 0);
     
     bool isMuon = 0;
     bool isElectron = 0;
@@ -623,27 +615,28 @@ namespace genTools{
     bool fromHardProcessFinalState = 0;
     bool isDirectHardProcessTauDecayProduct = 0;
     
-    for (unsigned int igen=0; igen<analysisTree.genparticles_count; ++igen) {
+    for (unsigned int igen=0; igen < analysisTree.genparticles_count; ++igen) {
       genPart.SetXYZT(analysisTree.genparticles_px[igen],
-		      analysisTree.genparticles_py[igen],
-		      analysisTree.genparticles_pz[igen],
-		      analysisTree.genparticles_e[igen]);
+            		      analysisTree.genparticles_py[igen],
+            		      analysisTree.genparticles_pz[igen],
+            		      analysisTree.genparticles_e[igen]);
       
-      isMuon = fabs(analysisTree.genparticles_pdgid[igen])==13;
-      isElectron = fabs(analysisTree.genparticles_pdgid[igen])==11;
+      isMuon = fabs(analysisTree.genparticles_pdgid[igen]) == 13;
+      isElectron = fabs(analysisTree.genparticles_pdgid[igen]) == 11;
       isChargedLepton = isMuon || isElectron;
-      isNeutrino = fabs(analysisTree.genparticles_pdgid[igen])==12||
-	           fabs(analysisTree.genparticles_pdgid[igen])==14||
-	           fabs(analysisTree.genparticles_pdgid[igen])==16;
-      fromHardProcessFinalState = analysisTree.genparticles_fromHardProcess[igen] && analysisTree.genparticles_status[igen]==1;
+      isNeutrino = fabs(analysisTree.genparticles_pdgid[igen]) == 12 ||
+      	           fabs(analysisTree.genparticles_pdgid[igen]) == 14 ||
+      	           fabs(analysisTree.genparticles_pdgid[igen]) == 16;
+      fromHardProcessFinalState = analysisTree.genparticles_fromHardProcess[igen] && analysisTree.genparticles_status[igen] == 1;
       isDirectHardProcessTauDecayProduct = analysisTree.genparticles_isDirectHardProcessTauDecayProduct[igen];
 
-      if((fromHardProcessFinalState && (isChargedLepton || isNeutrino)) || isDirectHardProcessTauDecayProduct){
-	genV += genPart;}
+      if((fromHardProcessFinalState && (isChargedLepton || isNeutrino)) || isDirectHardProcessTauDecayProduct)
+      	genV += genPart;
     }
     
-    if (genV.Pt()<0.1) genV.SetXYZM(0.1,0.1,0.,0.);
-    
+    if (genV.Pt() < 0.1) 
+      genV.SetXYZM(0.1, 0.1, 0., 0.);
+        
     return genV;
   }
 
@@ -730,23 +723,19 @@ namespace genTools{
     return njetshad;
   } 
   
-  enum RecoilCorrectionsMethod{QuantileRemap=1, MeanResolution};
-
   int RecoilCorrections( RecoilCorrector& corr, int method,
-			 float met, float metphi,
-			 float vx, float vy,
-			 float lx, float ly,
-			 int njets,
-			 float& metcorr, float& metphicorr ){
+                  			 float met, float metphi,
+                  			 float vx, float vy,
+                  			 float lx, float ly,
+                  			 int njets,
+                  			 float& metcorr, float& metphicorr ){
+         
     float metx = met*TMath::Cos(metphi);
     float mety = met*TMath::Sin(metphi);
     float metcorrx = metx;
     float metcorry = mety;
-    if (method == 1)
-      corr.Correct(metx, mety, vx, vy, lx, ly, njets, metcorrx, metcorry);
-    else if(method == 2)
-      corr.CorrectByMeanResolution(metx, mety, vx, vy, lx, ly, njets, metcorrx, metcorry);
 
+    corr.CorrectByMeanResolution(metx, mety, vx, vy, lx, ly, njets, metcorrx, metcorry);
     metcorr = TMath::Sqrt(metcorrx * metcorrx + metcorry * metcorry);
     metphicorr = TMath::ATan2(metcorry, metcorrx);
             
