@@ -27,12 +27,12 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condD
 if isData or isEmbedded:
     if period is '2016'   : process.GlobalTag.globaltag = '102X_dataRun2_v11'
     elif period is '2017' : process.GlobalTag.globaltag = '102X_dataRun2_v11'
-    elif period is '2018' and not isRun2018D : process.GlobalTag.globaltag = '102X_dataRun2_v11'
-    elif period is '2018' and isRun2018D     : process.GlobalTag.globaltag = '102X_dataRun2_Prompt_v14'
+    elif period is '2018' and not isRun2018D : process.GlobalTag.globaltag = '102X_dataRun2_v12'
+    elif period is '2018' and isRun2018D     : process.GlobalTag.globaltag = '102X_dataRun2_Prompt_v15'
 else:
     if period is '2016' :   process.GlobalTag.globaltag = '102X_mcRun2_asymptotic_v7'
     elif period is '2017' : process.GlobalTag.globaltag = '102X_mc2017_realistic_v7'
-    elif period is '2018' : process.GlobalTag.globaltag = '102X_upgrade2018_realistic_v19'
+    elif period is '2018' : process.GlobalTag.globaltag = '102X_upgrade2018_realistic_v20'
 
 print "\nGlobal Tag: " + str(process.GlobalTag.globaltag)
 
