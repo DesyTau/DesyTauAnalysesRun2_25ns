@@ -58,7 +58,7 @@
 #include "DesyTauAnalyses/NTupleMaker/interface/functionsCP.h"
 #include "TauAnalysisTools/TauTriggerSFs/interface/TauTriggerSFs2017.h"
 //#include "HTT-utilities/TauTriggerSFs2017/interface/TauTriggerSFs2017.h"
-
+#include "Math/GenVector/Boost.h"
 #define pi 3.14159265358979312
 #define d2r 1.74532925199432955e-02
 #define r2d 57.2957795130823229
@@ -68,6 +68,8 @@
 #define tauMass    1.77682
 #define pionMass 0.1396
 typedef ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> > LV;
+typedef ROOT::Math::XYZPointD Point3D;
+typedef ROOT::Math::XYZVectorD PV;
 struct DiTauInfo 
 { 
   DiTauInfo(){}; 
@@ -126,6 +128,7 @@ int main(int argc, char * argv[]) {
   // configuration process
   const string sample = argv[2];
   const bool isData = cfg.get<bool>("isData");
+  const bool isQCD = cfg.get<bool>("isQCD");
   const bool isDY = cfg.get<bool>("IsDY");
   const bool isWJets = cfg.get<bool>("IsW");
   const string infiles = argv[2];
@@ -280,7 +283,7 @@ int main(int argc, char * argv[]) {
   std::string ntupleName("makeroottree/AC1B");
   // PU reweighting - initialization
   PileUp * PUofficial = new PileUp();
-  if(ApplyPUweight){
+  if(ApplyPUweight && isData==false){
     TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/"+TString(pileUpInDataFile),"read");
     TFile * filePUdistribution_MC = new TFile (TString(cmsswBase)+"/src/"+TString(pileUpInMCFile), "read");
     TH1D * PU_data = (TH1D *)filePUdistribution_data->Get("pileup");
@@ -306,7 +309,7 @@ int main(int argc, char * argv[]) {
   rootFileName += "_";
   rootFileName += ifile;
   rootFileName += "_tt_Sync.root";
-    
+  
   std::cout <<rootFileName <<std::endl;  
 
   TFile * file = new TFile( rootFileName ,"recreate");
@@ -414,7 +417,7 @@ int main(int argc, char * argv[]) {
         if (fabs(fabs(analysisTree.tau_charge[it])-1)>0.001) continue;
         if (fabs(analysisTree.tau_leadchargedhadrcand_dz[it])>=dzTauCut) continue;
 
-	if (analysisTree.tau_byTightIsolationMVArun2017v2DBoldDMwLT2017[it] < 0.5) continue;//tight tau mva
+	if (analysisTree.tau_byVLooseIsolationMVArun2017v2DBoldDMwLT2017[it] < 0.5) continue;//tight tau mva
 	if (analysisTree.tau_againstMuonLoose3[it] < 0.5) continue;//Loose mva aginst muon
 	if (analysisTree.tau_againstElectronVLooseMVA6[it] < 0.5) continue;//very loose mva agaist e
 
@@ -444,40 +447,40 @@ int main(int argc, char * argv[]) {
           sortDiTauInfo.sumIso_ = sumIso;
           
           sortDiTauInfos.push_back(sortDiTauInfo);
-
-	  std::sort(sortDiTauInfos.begin(), sortDiTauInfos.end(), SortDiTauPairs());
-	  int diTauCounter = -1;
-	  for(std::vector<DiTauInfo>::iterator iter = sortDiTauInfos.begin(); iter != sortDiTauInfos.end() ; iter++){
-	    if(diTauCounter >= 0) continue;
-
-	    tIndex1 = iter->index1_;
-	    tIndex2 = iter->index2_;
-	    LV temp_Leg1_(analysisTree.tau_px[tIndex1], analysisTree.tau_py[tIndex1], analysisTree.tau_pz[tIndex1], analysisTree.tau_e[tIndex1]);
-	    LV temp_Leg2_(analysisTree.tau_px[tIndex2], analysisTree.tau_py[tIndex2], analysisTree.tau_pz[tIndex2], analysisTree.tau_e[tIndex2]);
-	    LV Leg1P4_, Leg2P4_;
-	    // if(analysisTree.tau_byIsolationMVArun2v1DBoldDMwLTraw[tIndex1] > analysisTree.tau_byIsolationMVArun2v1DBoldDMwLTraw[tIndex2]){
-	    //   Leg1P4_ = temp_Leg1_;
-	    //   Leg2P4_ = temp_Leg2_;
-	    // }
-	    // else if(analysisTree.tau_byIsolationMVArun2v1DBoldDMwLTraw[tIndex1] < analysisTree.tau_byIsolationMVArun2v1DBoldDMwLTraw[tIndex2]){
-	    //   Leg1P4_ = temp_Leg2_;tIndex1 = iter->index2_;
-	    //   Leg2P4_ = temp_Leg1_;tIndex2 = iter->index1_;
-	    // }
-	    //else 
-	    if(temp_Leg1_.pt() > temp_Leg2_.pt()){
-	      Leg1P4_ = temp_Leg1_;tIndex1 = iter->index1_;
-	      Leg2P4_ = temp_Leg2_;tIndex2 = iter->index2_;
-	    }
-	    else {
-	      Leg1P4_ = temp_Leg2_; tIndex1 = iter->index2_;
-	      Leg2P4_ = temp_Leg1_; tIndex2 = iter->index1_;
-	    }
-	    ++diTauCounter;
-	  }
-	  tauIndex_1=tIndex1;
-	  tauIndex_2=tIndex2;
 	}//tau-
       }//tau+
+
+      std::sort(sortDiTauInfos.begin(), sortDiTauInfos.end(), SortDiTauPairs());
+      int diTauCounter = -1;
+      for(std::vector<DiTauInfo>::iterator iter = sortDiTauInfos.begin(); iter != sortDiTauInfos.end() ; iter++){
+	if(diTauCounter >= 0) continue;
+
+	uint tIndex1 = iter->index1_;
+	uint tIndex2 = iter->index2_;
+	LV temp_Leg1_(analysisTree.tau_px[tIndex1], analysisTree.tau_py[tIndex1], analysisTree.tau_pz[tIndex1], analysisTree.tau_e[tIndex1]);
+	LV temp_Leg2_(analysisTree.tau_px[tIndex2], analysisTree.tau_py[tIndex2], analysisTree.tau_pz[tIndex2], analysisTree.tau_e[tIndex2]);
+	LV Leg1P4_, Leg2P4_;
+	// if(analysisTree.tau_byIsolationMVArun2v1DBoldDMwLTraw[tIndex1] > analysisTree.tau_byIsolationMVArun2v1DBoldDMwLTraw[tIndex2]){
+	//   Leg1P4_ = temp_Leg1_;
+	//   Leg2P4_ = temp_Leg2_;
+	// }
+	// else if(analysisTree.tau_byIsolationMVArun2v1DBoldDMwLTraw[tIndex1] < analysisTree.tau_byIsolationMVArun2v1DBoldDMwLTraw[tIndex2]){
+	//   Leg1P4_ = temp_Leg2_;tIndex1 = iter->index2_;
+	//   Leg2P4_ = temp_Leg1_;tIndex2 = iter->index1_;
+	// }
+	//else 
+	if(temp_Leg1_.pt() > temp_Leg2_.pt()){
+	  Leg1P4_ = temp_Leg1_;tIndex1 = iter->index1_;
+	  Leg2P4_ = temp_Leg2_;tIndex2 = iter->index2_;
+	}
+	else {
+	  Leg1P4_ = temp_Leg2_; tIndex1 = iter->index2_;
+	  Leg2P4_ = temp_Leg1_; tIndex2 = iter->index1_;
+	}
+	++diTauCounter;
+	tauIndex_1=tIndex1;
+	tauIndex_2=tIndex2;
+      }
       
       //make isTrigger to false                                                                                                                                                                             
       bool isDiTauTrig = false;
@@ -517,20 +520,35 @@ int main(int argc, char * argv[]) {
       otree->extraelec_veto = extra_electron_veto(tauIndex, "tt", &cfg, &analysisTree);
       otree->extramuon_veto = extra_muon_veto(tauIndex, "tt", &cfg, &analysisTree, isData);
       
-      //TriggerSF                                                                                                                                                                                                
+      //TriggerSF                                                                                                                                  
+      // bool AntiIso = false;
+      // if(isQCD && isData){
+      // 	if(analysisTree.tau_byVLooseIsolationMVArun2017v2DBoldDMwLT2017[tauIndex_1] > 0.5 && analysisTree.tau_byVLooseIsolationMVArun2017v2DBoldDMwLT2017[tauIndex_2] > 0.5){
+      // 	  if(analysisTree.tau_byVLooseIsolationMVArun2017v2DBoldDMwLT2017[tauIndex_1] > 0.5 && analysisTree.tau_byMediumIsolationMVArun2017v2DBoldDMwLT2017[tauIndex_2] < 0.5){
+      // 	    AntiIso = true;
+      // 	  }
+      // 	  else if(analysisTree.tau_byMediumIsolationMVArun2017v2DBoldDMwLT2017[tauIndex_1] < 0.5 && analysisTree.tau_byVLooseIsolationMVArun2017v2DBoldDMwLT2017[tauIndex_2] > 0.5){
+      // 	    AntiIso = true;
+      // 	  }
+      // 	  else if(analysisTree.tau_byMediumIsolationMVArun2017v2DBoldDMwLT2017[tauIndex_1] < 0.5 && analysisTree.tau_byMediumIsolationMVArun2017v2DBoldDMwLT2017[tauIndex_2] < 0.5){
+      // 	    AntiIso = true;
+      // 	  }
+      // 	  else
+      // 	    AntiIso = false;
+      // 	}                   
+      // 	if(AntiIso==false) continue;
+      // }
       if(!isData){
 	otree->trigweight_1=tauTriggerSF->getTriggerScaleFactor(analysisTree.tau_pt[tauIndex_1],analysisTree.tau_eta[tauIndex_1],analysisTree.tau_phi[tauIndex_1],analysisTree.tau_decayMode[tauIndex_1]);
 	otree->trigweight_2=tauTriggerSF->getTriggerScaleFactor(analysisTree.tau_pt[tauIndex_2],analysisTree.tau_eta[tauIndex_2],analysisTree.tau_phi[tauIndex_2],analysisTree.tau_decayMode[tauIndex_2]);
-	// otree->trig_err_up=tauTriggerSF->getTriggerScaleFactorUncert(analysisTree.tau_pt[tauIndex_1],
-	// 							     analysisTree.tau_eta[tauIndex_1],analysisTree.tau_phi[tauIndex_1],analysisTree.tau_decayMode[tauIndex_1],"Up");
-	// otree->trig_err_down=tauTriggerSF->getTriggerScaleFactorUncert(analysisTree.tau_pt[tauIndex_2],
-	// 							     analysisTree.tau_eta[tauIndex_2],analysisTree.tau_phi[tauIndex_2],analysisTree.tau_decayMode[tauIndex_2],"Down")
+	
 	otree->trigweight =  otree->trigweight_1* otree->trigweight_2;
 	otree->idisoweight_1 = tau_id_sf;
 	otree->idisoweight_2 = tau_id_sf;
+	//otree->mcweight = analysisTree.genweight;
 	otree->weight = otree->idisoweight_1 * otree->idisoweight_2 * otree->trigweight * otree->puweight * otree->mcweight;
       }
-      
+          
       //MET
       //Merijn 2019 6 20: overloaded the function, it takes the era as arugment now, to take pfmetcorr for 2016 and 2017..
       fillMET("tt", tauIndex_1, tauIndex_2, &analysisTree, otree);//,cfg.get<int>("era"));
@@ -587,7 +605,7 @@ int main(int argc, char * argv[]) {
       otree->m_vis = diTauLV.M();
       otree->pt_tt = diTauLV.Pt();
       
-       
+      acott_Impr(&analysisTree,otree,tauIndex_1,tauIndex_2,"tt"); 
       //const AC1B * analysisTree;      
   
       //tau1 
@@ -602,11 +620,33 @@ int main(int argc, char * argv[]) {
       otree->dZ_1 = analysisTree.tau_leadchargedhadrcand_dz[tauIndex_1];      
       otree->iso_1 = analysisTree.tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[tauIndex_1];
       otree->m_1 = analysisTree.tau_mass[tauIndex_1];
+      //CP measurement
       otree->tau_decay_mode_1 = analysisTree.tau_decayMode[tauIndex_1];
-      otree->byCombinedIsolationDeltaBetaCorrRaw3Hits_1 = analysisTree.tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[tauIndex_1];
-      otree->byLooseCombinedIsolationDeltaBetaCorr3Hits_1 = analysisTree.tau_byLooseCombinedIsolationDeltaBetaCorr3Hits[tauIndex_1];
-      otree->byMediumCombinedIsolationDeltaBetaCorr3Hits_1 = analysisTree.tau_byMediumCombinedIsolationDeltaBetaCorr3Hits[tauIndex_1];
-      otree->byTightCombinedIsolationDeltaBetaCorr3Hits_1 = analysisTree.tau_byTightCombinedIsolationDeltaBetaCorr3Hits[tauIndex_1];
+
+
+      otree->tau_pca2D_x_1 = analysisTree.tau_pca2D_x[tauIndex_1];
+      otree->tau_pca2D_y_1 = analysisTree.tau_pca2D_y[tauIndex_1];
+      otree->tau_pca2D_z_1 = analysisTree.tau_pca2D_z[tauIndex_1];
+      otree->tau_pca3D_x_1 = analysisTree.tau_pca3D_x[tauIndex_1];
+      otree->tau_pca3D_y_1 = analysisTree.tau_pca3D_y[tauIndex_1];
+      otree->tau_pca3D_z_1 = analysisTree.tau_pca3D_z[tauIndex_1];
+      otree->tau_SV_x_1 = analysisTree.tau_SV_x[tauIndex_1];
+      otree->tau_SV_y_1 = analysisTree.tau_SV_y[tauIndex_1];
+      otree->tau_SV_z_1 = analysisTree.tau_SV_z[tauIndex_1];
+      otree->tau_SV_covxx_1 = analysisTree.tau_SV_cov[tauIndex_1][0];
+      otree->tau_SV_covyx_1 = analysisTree.tau_SV_cov[tauIndex_1][1];
+      otree->tau_SV_covzx_1 = analysisTree.tau_SV_cov[tauIndex_1][2];
+      otree->tau_SV_covyy_1 = analysisTree.tau_SV_cov[tauIndex_1][3];
+      otree->tau_SV_covzy_1 = analysisTree.tau_SV_cov[tauIndex_1][4];
+      otree->tau_SV_covzz_1 = analysisTree.tau_SV_cov[tauIndex_1][5];
+
+      otree->byVLooseIsolationMVArun2017v2DBoldDMwLT2017_1 = analysisTree.tau_byVLooseIsolationMVArun2017v2DBoldDMwLT2017[tauIndex_1];
+      otree->byLooseIsolationMVArun2017v2DBoldDMwLT2017_1 = analysisTree.tau_byLooseIsolationMVArun2017v2DBoldDMwLT2017[tauIndex_1];
+      otree->byMediumIsolationMVArun2017v2DBoldDMwLT2017_1 = analysisTree.tau_byMediumIsolationMVArun2017v2DBoldDMwLT2017[tauIndex_1];
+      otree->byTightIsolationMVArun2017v2DBoldDMwLT2017_1 = analysisTree.tau_byTightIsolationMVArun2017v2DBoldDMwLT2017[tauIndex_1];
+      otree->byVTightIsolationMVArun2017v2DBoldDMwLT2017_1 = analysisTree.tau_byVTightIsolationMVArun2017v2DBoldDMwLT2017[tauIndex_1];
+      otree->byVVTightIsolationMVArun2017v2DBoldDMwLT2017_1 = analysisTree.tau_byVVTightIsolationMVArun2017v2DBoldDMwLT2017[tauIndex_1];
+      otree-> byIsolationMVArun2017v2DBoldDMwLTraw2017_1 = analysisTree.tau_byIsolationMVArun2017v2DBoldDMwLTraw2017[tauIndex_1];
       otree->againstMuonLoose3_1 = analysisTree.tau_againstMuonLoose3[tauIndex_1];
       otree->againstMuonTight3_1 = analysisTree.tau_againstMuonTight3[tauIndex_1];
       otree->againstElectronVLooseMVA6_1 = analysisTree.tau_againstElectronVLooseMVA6[tauIndex_1];
@@ -619,24 +659,44 @@ int main(int argc, char * argv[]) {
       otree->gen_match_2 = analysisTree.tau_genmatch[tauIndex_2];
       otree->mva_2 = analysisTree.tau_byTightIsolationMVArun2v1DBoldDMwLT[tauIndex_2];
       otree->mva17_2= analysisTree.tau_byTightIsolationMVArun2017v2DBoldDMwLT2017[tauIndex_2];
+      
       otree->d0_2 = analysisTree.tau_leadchargedhadrcand_dxy[tauIndex_2];
       otree->dZ_2 = analysisTree.tau_leadchargedhadrcand_dz[tauIndex_2];      
       otree->iso_2 = analysisTree.tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[tauIndex_2];
       otree->m_2 = analysisTree.tau_mass[tauIndex_2];
+      //CP measurement
       otree->tau_decay_mode_2 = analysisTree.tau_decayMode[tauIndex_2];
-      otree->byCombinedIsolationDeltaBetaCorrRaw3Hits_2 = analysisTree.tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[tauIndex_2];
-      otree->byLooseCombinedIsolationDeltaBetaCorr3Hits_2 = analysisTree.tau_byLooseCombinedIsolationDeltaBetaCorr3Hits[tauIndex_2];
-      otree->byMediumCombinedIsolationDeltaBetaCorr3Hits_2 = analysisTree.tau_byMediumCombinedIsolationDeltaBetaCorr3Hits[tauIndex_2];
-      otree->byTightCombinedIsolationDeltaBetaCorr3Hits_2 = analysisTree.tau_byTightCombinedIsolationDeltaBetaCorr3Hits[tauIndex_2];
+
+
+      otree->tau_pca2D_x_2 = analysisTree.tau_pca2D_x[tauIndex_2];
+      otree->tau_pca2D_y_2 = analysisTree.tau_pca2D_y[tauIndex_2];
+      otree->tau_pca2D_z_2 = analysisTree.tau_pca2D_z[tauIndex_2];
+      otree->tau_pca3D_x_2 = analysisTree.tau_pca3D_x[tauIndex_2];
+      otree->tau_pca3D_y_2 = analysisTree.tau_pca3D_y[tauIndex_2];
+      otree->tau_pca3D_z_2 = analysisTree.tau_pca3D_z[tauIndex_2];
+      otree->tau_SV_x_2 = analysisTree.tau_SV_x[tauIndex_2];
+      otree->tau_SV_y_2 = analysisTree.tau_SV_y[tauIndex_2];
+      otree->tau_SV_z_2 = analysisTree.tau_SV_z[tauIndex_2];
+      otree->tau_SV_covxx_2 = analysisTree.tau_SV_cov[tauIndex_2][0];
+      otree->tau_SV_covyx_2 = analysisTree.tau_SV_cov[tauIndex_2][1];
+      otree->tau_SV_covzx_2 = analysisTree.tau_SV_cov[tauIndex_2][2];
+      otree->tau_SV_covyy_2 = analysisTree.tau_SV_cov[tauIndex_2][3];
+      otree->tau_SV_covzy_2 = analysisTree.tau_SV_cov[tauIndex_2][4];
+      otree->tau_SV_covzz_2 = analysisTree.tau_SV_cov[tauIndex_2][5];
+
+      otree->byVLooseIsolationMVArun2017v2DBoldDMwLT2017_2 = analysisTree.tau_byVLooseIsolationMVArun2017v2DBoldDMwLT2017[tauIndex_2];
+      otree->byLooseIsolationMVArun2017v2DBoldDMwLT2017_2 = analysisTree.tau_byLooseIsolationMVArun2017v2DBoldDMwLT2017[tauIndex_2];
+      otree->byMediumIsolationMVArun2017v2DBoldDMwLT2017_2 = analysisTree.tau_byMediumIsolationMVArun2017v2DBoldDMwLT2017[tauIndex_2];
+      otree->byTightIsolationMVArun2017v2DBoldDMwLT2017_2 = analysisTree.tau_byTightIsolationMVArun2017v2DBoldDMwLT2017[tauIndex_2];
+      otree->byVTightIsolationMVArun2017v2DBoldDMwLT2017_2 = analysisTree.tau_byVTightIsolationMVArun2017v2DBoldDMwLT2017[tauIndex_2];
+      otree->byVVTightIsolationMVArun2017v2DBoldDMwLT2017_2 = analysisTree.tau_byVVTightIsolationMVArun2017v2DBoldDMwLT2017[tauIndex_2];
+      otree-> byIsolationMVArun2017v2DBoldDMwLTraw2017_2 = analysisTree.tau_byIsolationMVArun2017v2DBoldDMwLTraw2017[tauIndex_2];
       otree->againstMuonLoose3_2 = analysisTree.tau_againstMuonLoose3[tauIndex_2];
       otree->againstMuonTight3_2 = analysisTree.tau_againstMuonTight3[tauIndex_2];
       otree->againstElectronVLooseMVA6_2 = analysisTree.tau_againstElectronVLooseMVA6[tauIndex_2];
       otree->againstElectronTightMVA6_2 = analysisTree.tau_againstElectronTightMVA6[tauIndex_2];
 
-      (otree->pt_1>otree->pt_2)?otree->pt_lead=otree->pt_1:otree->pt_2;
-      (otree->pt_1<otree->pt_2)?otree->pt_trail=otree->pt_1:otree->pt_2;
-      (otree->pt_1>otree->pt_2)?otree->eta_lead=otree->eta_1:otree->eta_2;
-      (otree->pt_1<otree->pt_2)?otree->eta_trail=otree->eta_1:otree->eta_2;
+      
       // opposite charge
       otree->os = (otree->q_1 * otree->q_2) < 0.;
       // svfit variables
@@ -646,7 +706,8 @@ int main(int argc, char * argv[]) {
       otree->phi_sv = -9999;
       otree->met_sv = -9999;
       otree->mt_sv = -9999;
-      if (otree->njetspt20>0) svfit_variables("tt", &analysisTree, otree, &cfg, inputFile_visPtResolution);
+      if(ApplySVFit)
+	if (otree->njetspt20>0) svfit_variables("tt", &analysisTree, otree, &cfg, inputFile_visPtResolution);
       
 
       if(isDY||isWJets){
@@ -704,6 +765,105 @@ int main(int argc, char * argv[]) {
       //
       otree->mt_1=mT(tauLV_1,metLV);
       otree->mt_2=mT(tauLV_2,metLV);
+      
+      // Measurement of CP observable
+      otree->acotautau_00 = -999;
+      float pionPVtx_x=0,pionPVtx_y=0,pionPVtx_z=0;
+      float pionNVtx_x=0,pionNVtx_y=0,pionNVtx_z=0;
+      float pionP_px=0,pionP_py=0,pionP_pz=0,pionP_e=0;
+      float pionN_px=0,pionN_py=0,pionN_pz=0,pionN_e=0;
+      if(otree->q_1  * otree->q_2 < 0.5 && analysisTree.tau_decayMode[tauIndex_1]==0 && analysisTree.tau_decayMode[tauIndex_2]==0){
+	
+      	int rtau = -1;int stau = -1;
+      	if(otree->q_1 >0){
+	  rtau = tauIndex_1;
+	  stau = tauIndex_2;
+	}
+	else{
+	  rtau = tauIndex_2;
+	  stau = tauIndex_1;
+	}
+      	pionPVtx_x=analysisTree.tau_pca3D_x[rtau];
+      	pionPVtx_y=analysisTree.tau_pca3D_y[rtau];
+      	pionPVtx_z=analysisTree.tau_pca3D_z[rtau];
+      	pionP_px=analysisTree.tau_leadchargedhadrcand_px[rtau];
+      	pionP_py=analysisTree.tau_leadchargedhadrcand_py[rtau];
+      	pionP_pz=analysisTree.tau_leadchargedhadrcand_pz[rtau];
+      	pionP_e=sqrt(pionP_px*pionP_px+pionP_py*pionP_py+pionP_pz*pionP_pz+(analysisTree.tau_leadchargedhadrcand_mass[rtau]*analysisTree.tau_leadchargedhadrcand_mass[rtau]));
+      	
+      	pionNVtx_x=analysisTree.tau_pca3D_x[stau];
+      	pionNVtx_y=analysisTree.tau_pca3D_y[stau];
+      	pionNVtx_z=analysisTree.tau_pca3D_z[stau];
+      	pionN_px=analysisTree.tau_leadchargedhadrcand_px[stau];
+      	pionN_py=analysisTree.tau_leadchargedhadrcand_py[stau];
+      	pionN_pz=analysisTree.tau_leadchargedhadrcand_pz[stau];
+      	pionN_e=sqrt(pionN_px*pionN_px+pionN_py*pionN_py+pionN_pz*pionN_pz+(analysisTree.tau_leadchargedhadrcand_mass[stau]*analysisTree.tau_leadchargedhadrcand_mass[stau]));
+	cout<<"pione - energy "<<pionN_e<<"   "<<pionP_e<<endl;
+      }
+      
+      LV pionP_lab(pionP_px,pionP_py,pionP_pz,pionP_e);
+      LV pionN_lab(pionN_px,pionN_py,pionN_pz,pionN_e);
+      
+      if(pionP_lab.pt()>0 && pionN_lab.pt()>0){
+	cout<<"pi+_e "<<pionP_lab.pt()<<"  pi-_e "<<pionN_lab.pt()<<endl;	
+      	//compute phi_star in pi-pi+ rf.
+      	LV pion_pair_lab=pionP_lab+pionN_lab;
+      	ROOT::Math::Boost boost_to_rf_rec(pion_pair_lab.BoostToCM());
+      	//boost to rf of two pion system
+      	LV pionP_rf_2p=boost_to_rf_rec(pionP_lab);
+      	LV pionN_rf_2p=boost_to_rf_rec(pionN_lab);
+      	//get unit momentum vectors
+      	PV pionP_lab_3d=pionP_lab.Vect();
+      	PV pionN_lab_3d=pionN_lab.Vect();
+      	PV pionP_lab_3d_u=pionP_lab_3d/sqrt(pionP_lab_3d.mag2());
+      	PV pionN_lab_3d_u=pionN_lab_3d/sqrt(pionN_lab_3d.mag2());
+      	//Get PCAs, by extrapolating the line represented by pion vertex and pion momentum
+      	double tP=pionP_lab_3d_u.x()*(analysisTree.primvertex_x-pionPVtx_x)+pionP_lab_3d_u.y()*(analysisTree.primvertex_y-pionPVtx_y)+pionP_lab_3d_u.z()*(analysisTree.primvertex_z-pionPVtx_z);
+      	double tN=pionN_lab_3d_u.x()*(analysisTree.primvertex_x-pionNVtx_x)+pionN_lab_3d_u.y()*(analysisTree.primvertex_y-pionNVtx_y)+pionN_lab_3d_u.z()*(analysisTree.primvertex_z-pionNVtx_z);
+
+      	Point3D pcaP(pionPVtx_x+pionP_lab_3d_u.x()*tP,pionPVtx_y+pionP_lab_3d_u.y()*tP,pionPVtx_z+pionP_lab_3d_u.z()*tP);
+      	Point3D pcaN(pionNVtx_x+pionN_lab_3d_u.x()*tN,pionNVtx_y+pionN_lab_3d_u.y()*tN,pionNVtx_z+pionN_lab_3d_u.z()*tN);
+      	//Get the normalized IP vectors
+      	PV ipvP_lab_rec_3d(pcaP.x()-analysisTree.primvertex_x,pcaP.y()-analysisTree.primvertex_y,pcaP.z()-analysisTree.primvertex_z);
+      	PV ipvN_lab_rec_3d(pcaN.x()-analysisTree.primvertex_x,pcaN.y()-analysisTree.primvertex_y,pcaN.z()-analysisTree.primvertex_z);
+
+      	LV ipvP_lab_rec(ipvP_lab_rec_3d.x()/sqrt(ipvP_lab_rec_3d.mag2()),ipvP_lab_rec_3d.y()/sqrt(ipvP_lab_rec_3d.mag2()),ipvP_lab_rec_3d.z()/sqrt(ipvP_lab_rec_3d.mag2()),0);
+      	LV ipvN_lab_rec(ipvN_lab_rec_3d.x()/sqrt(ipvN_lab_rec_3d.mag2()),ipvN_lab_rec_3d.y()/sqrt(ipvN_lab_rec_3d.mag2()),ipvN_lab_rec_3d.z()/sqrt(ipvN_lab_rec_3d.mag2()),0);
+
+      	//boost to ZMF
+      	LV ipvP_rf_rec = boost_to_rf_rec(ipvP_lab_rec);
+      	LV ipvN_rf_rec = boost_to_rf_rec(ipvN_lab_rec);
+
+      	//Get only the position component of the vector
+      	PV ipvP_rf_rec_3d = ipvP_rf_rec.Vect();
+      	PV ipvN_rf_rec_3d = ipvN_rf_rec.Vect();
+      	PV pionP_rf_2p_3d = pionP_rf_2p.Vect();
+      	PV pionN_rf_2p_3d = pionN_rf_2p.Vect();
+
+      	//Get the unit (normalized) vector along pion momentum
+      	PV pionP_rf_2p_3d_u = pionP_rf_2p_3d/TMath::Sqrt(pionP_rf_2p_3d.mag2());
+      	PV pionN_rf_2p_3d_u = pionN_rf_2p_3d/TMath::Sqrt(pionN_rf_2p_3d.mag2());
+      	//Get the longitudinal component of IP vector parallel to pion momenta
+      	PV ipvP_rf_rec_3d_l = ipvP_rf_rec_3d.Dot(pionP_rf_2p_3d_u)*pionP_rf_2p_3d_u;
+      	PV ipvN_rf_rec_3d_l = ipvN_rf_rec_3d.Dot(pionN_rf_2p_3d_u)*pionN_rf_2p_3d_u;
+      	//Get IP vector normal to pion momenta
+      	PV ipvP_rf_rec_3d_t = ipvP_rf_rec_3d - ipvP_rf_rec_3d_l;
+      	PV ipvN_rf_rec_3d_t = ipvN_rf_rec_3d - ipvN_rf_rec_3d_l;
+      	//Get normalized normal IP vector
+      	PV ipvP_rf_rec_3d_t_u = ipvP_rf_rec_3d_t/TMath::Sqrt(ipvP_rf_rec_3d_t.mag2());
+      	PV ipvN_rf_rec_3d_t_u = ipvN_rf_rec_3d_t/TMath::Sqrt(ipvN_rf_rec_3d_t.mag2());
+
+      	//Get CP angle in ZMF
+      	double phi_star_rec = TMath::ACos(ipvP_rf_rec_3d_t_u.Dot(ipvN_rf_rec_3d_t_u));
+      	double OstarCP_gen = pionN_rf_2p_3d_u.Dot(ipvP_rf_rec_3d_t_u.Cross(ipvN_rf_rec_3d_t_u));
+      	double phi_star_gen_cp = (OstarCP_gen >= 0) ? phi_star_rec : (TMath::TwoPi() - phi_star_rec);
+      	//double phi_star_rec_deg=180*phi_star_rec/PI;
+	otree->acotautau_00=phi_star_gen_cp;	
+      }
+      if(otree->acotautau_00 > -999){
+	cout<<"***************************************"<<endl;
+	cout<<otree->acotautau_00<<endl;
+      }
       otree->Fill();
       selEvents++;
 
