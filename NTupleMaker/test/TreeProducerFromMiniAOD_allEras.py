@@ -249,7 +249,7 @@ HLTlist = cms.untracked.vstring(
 'HLT_IsoTkMu22_eta2p1_v',
 # Muon-Tau triggers
 'HLT_IsoMu19_eta2p1_LooseIsoPFTau20_SingleL1_v',
-'HLT_IsoMu20_eta2p1_LooseChargedIsoPFTau27_eta2p1_CrossL1_v',
+#'HLT_IsoMu20_eta2p1_LooseChargedIsoPFTau27_eta2p1_CrossL1_v',
 'HLT_IsoMu24_eta2p1_LooseChargedIsoPFTau20_SingleL1_v',
 'HLT_IsoMu19_eta2p1_LooseIsoPFTau20_v',
 # SingleElectron
