@@ -304,10 +304,12 @@ if isData:
 HLTlist_2016 = cms.untracked.vstring(
     'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v',
     'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v',
+    'HLT_IsoMu20_eta2p1_LooseChargedIsoPFTau27_eta2p1_CrossL1_v',
 )
 HLTlist_2017 = cms.untracked.vstring(
     #SingleElectron
     'HLT_Ele32_WPTight_Gsf_v',
+    'HLT_IsoMu20_eta2p1_LooseChargedIsoPFTau27_eta2p1_CrossL1_v',
     )
 HLTlist_2018 = cms.untracked.vstring()
 
