@@ -444,9 +444,6 @@ void NTupleMaker::beginJob(){
     tree->Branch("muon_validFraction", muon_validFraction, "muon_validFraction[muon_count]/F");
     tree->Branch("muon_segmentComp", muon_segmentComp, "muon_segmentComp[muon_count]/F");
 
-    tree->Branch("muon_caloCompatibility", muon_caloCompatibility, "muon_caloCompatibility[muon_count]/F");
-    tree->Branch("muon_pfEcalEnergy", muon_pfEcalEnergy, "muon_pfEcalEnergy[muon_count]/F");
-
     tree->Branch("muon_nMuonStations", muon_nMuonStations,"muon_nMuonStations[muon_count]/i");
     tree->Branch("muon_nMuonHits", muon_nMuonHits,"muon_nMuonHits[muon_count]/i");
     tree->Branch("muon_nPixelHits", muon_nPixelHits,"muon_nPixelHits[muon_count]/i");
@@ -643,54 +640,12 @@ void NTupleMaker::beginJob(){
     tree->Branch("electron_dxyerr", electron_dxyerr, "electron_dxyerr[electron_count]/F");
     tree->Branch("electron_dz", electron_dz, "electron_dz[electron_count]/F");
     tree->Branch("electron_dzerr", electron_dzerr, "electron_dzerr[electron_count]/F");
-
-    tree->Branch("electron_normalizedChi2", electron_normalizedChi2, "electron_normalizedChi2[electron_count]/F");
-    tree->Branch("electron_numberOfValidHits", electron_numberOfValidHits, "electron_numberOfValidHits[electron_count]/F");
-    tree->Branch("electron_gsfTr_pt", electron_gsfTr_pt, "electron_gsfTr_pt[electron_count]/F");
-    tree->Branch("electron_gsfTr_ptError", electron_gsfTr_ptError, "electron_gsfTr_ptError[electron_count]/F");
-
-
-
     tree->Branch("electron_convdist", electron_convdist, "electron_convdist[electron_count]/F");
 
     tree->Branch("electron_gapinfo", electron_gapinfo, "electron_gapinfo[electron_count]/i");
     tree->Branch("electron_chargeinfo", electron_chargeinfo, "electron_chargeinfo[electron_count]/i");
     tree->Branch("electron_fbrems", electron_fbrems, "electron_fbrems[electron_count]/F");
     tree->Branch("electron_numbrems", electron_numbrems, "electron_numbrems[electron_count]/I");
-
-
-    //Add Electons:
-    tree->Branch("electron_trackMomentumAtVtx", electron_trackMomentumAtVtx ,"electron_trackMomentumAtVtx[electron_count]/F");
-    tree->Branch("electron_trackMomentumAtCalo", electron_trackMomentumAtCalo,"electron_trackMomentumAtCalo[electron_count]/F");
-    tree->Branch("electron_trackMomentumOut", electron_trackMomentumOut,"electron_trackMomentumOut[electron_count]/F");  
-    tree->Branch("electron_trackMomentumAtEleClus", electron_trackMomentumAtEleClus,"electron_trackMomentumAtEleClus[electron_count]/F"); 
-    tree->Branch("electron_trackMomentumAtVtxWithConstraint", electron_trackMomentumAtVtxWithConstraint,"electron_trackMomentumAtVtxWithConstraint[electron_count]/F");
-    tree->Branch("electron_ecalEnergy", electron_ecalEnergy,"electron_ecalEnergy[electron_count]/F");
-    tree->Branch("electron_ecalEnergyError", electron_ecalEnergyError,"electron_ecalEnergyError[electron_count]/F");
-    tree->Branch("electron_eSuperClusterOverP",electron_eSuperClusterOverP,"electron_eSuperClusterOverP[electron_count]/F");
-    tree->Branch("electron_eSeedClusterOverP",electron_eSeedClusterOverP,"electron_eSeedClusterOverP[electron_count]/F");
-    tree->Branch("electron_eSeedClusterOverPout",electron_eSeedClusterOverPout,"electron_eSeedClusterOverPout[electron_count]/F");
-    tree->Branch("electron_eEleClusterOverPout",electron_eEleClusterOverPout,"electron_eEleClusterOverPout[electron_count]/F");
-
-
-    tree->Branch("electron_deltaEtaSuperClusterTrackAtVtx", electron_deltaEtaSuperClusterTrackAtVtx,"electron_deltaEtaSuperClusterTrackAtVtx[electron_count]/F");
-    tree->Branch("electron_deltaEtaSeedClusterTrackAtCalo", electron_deltaEtaSeedClusterTrackAtCalo,"electron_deltaEtaSeedClusterTrackAtCalo[electron_count]/F");
-    tree->Branch("electron_deltaEtaEleClusterTrackAtCalo", electron_deltaEtaEleClusterTrackAtCalo,"electron_deltaEtaEleClusterTrackAtCalo[electron_count]/F");
-    tree->Branch("electron_deltaPhiEleClusterTrackAtCalo", electron_deltaPhiEleClusterTrackAtCalo,"electron_deltaPhiEleClusterTrackAtCalo[electron_count]/F"); 
-    tree->Branch("electron_deltaPhiSuperClusterTrackAtVtx", electron_deltaPhiSuperClusterTrackAtVtx,"electron_deltaPhiSuperClusterTrackAtVtx[electron_count]/F");
-    tree->Branch("electron_deltaPhiSeedClusterTrackAtCalo", electron_deltaPhiSeedClusterTrackAtCalo,"electron_deltaPhiSeedClusterTrackAtCalo[electron_count]/F"); 
-
-    tree->Branch("electron_mvaInput_earlyBremcout", electron_mvaInput_earlyBremcout,"electron_mvaInput_earlyBremcout[electron_count]/F"); 
-    tree->Branch("electron_mvaInput_lateBrem", electron_mvaInput_lateBrem,"electron_mvaInput_lateBrem[electron_count]/F"); 
-    tree->Branch("electron_mvaInput_sigmaEtaEta", electron_mvaInput_sigmaEtaEta,"electron_mvaInput_sigmaEtaEta[electron_count]/F");
-    tree->Branch("electron_mvaInput_hadEnergy", electron_mvaInput_hadEnergy,"electron_mvaInput_hadEnergy[electron_count]/F");
-    tree->Branch("electron_mvaInput_deltaEta", electron_mvaInput_deltaEta,"electron_mvaInput_deltaEta[electron_count]/F"); 
-
-
-
-
-
-
     tree->Branch("electron_charge", electron_charge, "electron_charge[electron_count]/F");
     tree->Branch("electron_superclusterindex", electron_superclusterindex, "electron_superclusterindex[electron_count]/I");
     tree->Branch("electron_info", electron_info, "electron_info[electron_count]/b");
@@ -811,13 +766,6 @@ void NTupleMaker::beginJob(){
 
     tree->Branch("tau_flightLength", tau_flightLength, "tau_flightLength[tau_count]/F");
     tree->Branch("tau_flightLengthSig", tau_flightLengthSig, "tau_flightLengthSig[tau_count]/F");
-
-    tree->Branch("tau_flightLengthX", tau_flightLengthX, "tau_flightLengthX[tau_count]/F");
-    tree->Branch("tau_flightLengthY", tau_flightLengthY, "tau_flightLengthY[tau_count]/F");
-    tree->Branch("tau_flightLengthZ", tau_flightLengthZ, "tau_flightLengthZ[tau_count]/F");
-
-
-
     tree->Branch("tau_SV_x", tau_SV_x, "tau_SV_x[tau_count]/F");
     tree->Branch("tau_SV_y", tau_SV_y, "tau_SV_y[tau_count]/F");
     tree->Branch("tau_SV_z", tau_SV_z, "tau_SV_z[tau_count]/F");
@@ -849,12 +797,6 @@ void NTupleMaker::beginJob(){
     tree->Branch("tau_isolationNeutralHadrCands_size", tau_isolationNeutralHadrCands_size, "tau_isolationNeutralHadrCands_size[tau_count]/i");
     tree->Branch("tau_isolationGammaCands_size", tau_isolationGammaCands_size, "tau_isolationGammaCands_size[tau_count]/i");
 
-    tree->Branch("tau_emFraction_MVA", tau_emFraction_MVA, "tau_emFraction_MVA[tau_count]/F");
-    tree->Branch("tau_etaAtEcalEntranceLeadChargedCan", tau_etaAtEcalEntranceLeadChargedCan, "tau_etaAtEcalEntranceLeadChargedCan[tau_count]/F");
-    tree->Branch("tau_leadingTrackNormChi2", tau_leadingTrackNormChi2, "tau_leadingTrackNormChi2[tau_count]/F");
-
-
-
     tree->Branch("tau_genDecayMode_name", tau_genDecayMode_name, "tau_genDecayMode_name[tau_count]/C");
     tree->Branch("tau_genDecayMode", tau_genDecayMode, "tau_genDecayMode[tau_count]/I");
     tree->Branch("tau_decayMode_name", tau_decayMode_name, "tau_decayMode_name[tau_count]/C");
@@ -872,11 +814,7 @@ void NTupleMaker::beginJob(){
     tree->Branch("tau_constituents_vz", tau_constituents_vz, "tau_constituents_vz[tau_count][50]/F");
     tree->Branch("tau_constituents_pdgId", tau_constituents_pdgId, "tau_constituents_pdgId[tau_count][50]/I");
     tree->Branch("tau_constituents_lostPixelHits", tau_constituents_lostPixelHits, "tau_constituents_lostPixelHits[tau_count][50]/I");
-
-
-
-
-}
+  }
 
   if (crectrack) {
     tree->Branch("track_count", &track_count, "track_count/i");
@@ -892,27 +830,12 @@ void NTupleMaker::beginJob(){
     tree->Branch("track_dxyerr", track_dxyerr, "track_dxyerr[track_count]/F");
     tree->Branch("track_dz", track_dz, "track_dz[track_count]/F");
     tree->Branch("track_dzerr", track_dzerr, "track_dzerr[track_count]/F");
-
-    tree->Branch("track_pvAssociationQuality", track_pvAssociationQuality, "track_pvAssociationQuality[track_count]/F");
-    tree->Branch("track_fromPV", track_fromPV,"track_fromPV[track_count]/F");
-    tree->Branch("track_puWeight",track_puWeight,"track_puWeight[track_count]/F");
-    tree->Branch("track_puppiWeightNoLep",track_puppiWeightNoLep,"track_puppiWeightNoLep[track_count]/F");
-    tree->Branch("track_lostInnerHits",track_lostInnerHits,"track_lostInnerHits[track_count]/F");
-    tree->Branch("track_numberOfPixelHits",track_numberOfPixelHits,"track_numberOfPixelHits[track_count]/F");
-    tree->Branch("track_hcalFraction", track_hcalFraction,"track_hcalFraction[track_count]/F");
-    tree->Branch("track_rawCaloFraction", track_rawCaloFraction, "track_rawCaloFraction[track_count]/F");
-    tree->Branch("track_chi2", track_chi2, "track_chi2[track_count]/F");
-    tree->Branch("track_ndof", track_ndof,"track_ndof[track_count]/F");
-
-
     tree->Branch("track_vx", track_vx, "track_vx[track_count]/F");
     tree->Branch("track_vy", track_vy, "track_vy[track_count]/F");
     tree->Branch("track_vz", track_vz, "track_vz[track_count]/F");
     tree->Branch("track_ID", track_ID, "track_ID[track_count]/I");
     tree->Branch("track_highPurity", track_highPurity, "track_highPurity[track_count]/O");
- 
-
- }
+  }
 
   // Met
   if (crecpfmet) {
@@ -3296,19 +3219,6 @@ unsigned int NTupleMaker::AddPFCand(const edm::Event& iEvent, const edm::EventSe
         track_mass[track_count] = (*Tracks)[i].mass();
         track_dxy[track_count] = (*Tracks)[i].dxy();
         track_dz[track_count] = (*Tracks)[i].dz();
-
-	track_pvAssociationQuality[track_count] = (*Tracks)[i].pvAssociationQuality();
-	track_fromPV[track_count] = (*Tracks)[i].fromPV();
-	track_puWeight[track_count] = (*Tracks)[i].puppiWeight();
-        track_puppiWeightNoLep[track_count] = (*Tracks)[i].puppiWeightNoLep();
-	track_lostInnerHits[track_count] = (*Tracks)[i].lostInnerHits();
-	track_numberOfPixelHits[track_count] = (*Tracks)[i].numberOfPixelHits();
-  	track_hcalFraction[track_count] = (*Tracks)[i].hcalFraction();
-	track_rawCaloFraction[track_count] = (*Tracks)[i].rawCaloFraction();
-
-	track_chi2[track_count] = (*Tracks)[i].pseudoTrack().chi2();
-	track_ndof[track_count] = (*Tracks)[i].pseudoTrack().ndof();
-
 	if((*Tracks)[i].hasTrackDetails()){
 	  track_dxyerr[track_count] = (*Tracks)[i].dxyError();
 	  track_dzerr[track_count] = (*Tracks)[i].dzError();
@@ -3484,10 +3394,6 @@ unsigned int NTupleMaker::AddMuons(const edm::Event& iEvent, const edm::EventSet
 	muon_combQ_chi2LocalPosition[muon_count] = (*Muons)[i].combinedQuality().chi2LocalPosition;
 	muon_segmentComp[muon_count] = (*Muons)[i].segmentCompatibility();
 
-	muon_caloCompatibility[muon_count] = (*Muons)[i].caloCompatibility();
-        muon_pfEcalEnergy[muon_count] = (*Muons)[i].pfEcalEnergy();
-
-
 	if (bestTrack.isNonnull()) {
 	  muon_dxy[muon_count]    = bestTrack->dxy(pv_position);
 	  muon_dz[muon_count]     = bestTrack->dz(pv_position);
@@ -3507,8 +3413,6 @@ unsigned int NTupleMaker::AddMuons(const edm::Event& iEvent, const edm::EventSet
 	    muon_nPixelHits[muon_count] = innertrack->hitPattern().numberOfValidPixelHits();
 	    muon_nTrackerHits[muon_count] = innertrack->hitPattern().trackerLayersWithMeasurement();
 	    muon_validFraction[muon_count] = innertrack->validFraction();
-	    //innertrack->numberOfValidHits();;
-	    //
 	  }
 	else
 	  {
@@ -3516,7 +3420,6 @@ unsigned int NTupleMaker::AddMuons(const edm::Event& iEvent, const edm::EventSet
 	    muon_nPixelHits[muon_count] = 0;
 	    muon_nTrackerHits[muon_count] = 0;
 	    muon_validFraction[muon_count] = 0;
-	  //innertrack->numberOfValidHits();;
 	  }
 
 	//	bool goodGlb = muon_isGlobal[muon_count] && muon_normChi2[muon_count]  < 3 && muon_normChi2[muon_count] > 0
@@ -4098,13 +4001,7 @@ else{
 	  tau_isolationChargedHadrCands_size[tau_count]           = (*Taus)[i].isolationChargedHadrCands().size();
 	  tau_isolationNeutralHadrCands_size[tau_count]           = (*Taus)[i].isolationNeutrHadrCands().size();
           tau_isolationGammaCands_size[tau_count]                 = (*Taus)[i].isolationGammaCands().size();
-          //cout<<"chargedIsoPtSum :"<<(*Taus)[i].chargedIsoPtSum()<<endl;
-          //cout<<"chargedIsoPtSumdR03 :"<<(*Taus)[i].chargedIsoPtSumdR03()<<endl;
-          //cout<<"footprintCorrection :"<<(*Taus)[i].footprintCorrection()<<endl;
-	
-	 tau_emFraction_MVA[tau_count]                 = (*Taus)[i].emFraction_MVA();
-         tau_etaAtEcalEntranceLeadChargedCan[tau_count]                 = (*Taus)[i].etaAtEcalEntranceLeadChargedCand();
-         tau_leadingTrackNormChi2[tau_count]                 = (*Taus)[i].leadingTrackNormChi2();
+
 	  // tau constituents
 	  // Set all entries first -999
 	  for(unsigned int m=0; m<50; m++){
@@ -4134,14 +4031,13 @@ else{
 	    tau_constituents_vy[tau_count][tau_constituents_count_]     = (*Taus)[i].signalCands()[m]->vy();
 	    tau_constituents_vz[tau_count][tau_constituents_count_]     = (*Taus)[i].signalCands()[m]->vz();
 	    tau_constituents_pdgId[tau_count][tau_constituents_count_]  = (*Taus)[i].signalCands()[m]->pdgId();
-	    	
 
 	    if((*Taus)[i].signalCands()[m]->charge()!=0){
 	      if ((*Taus)[i].signalCands()[m]->pt()>momMax) {
-      		momMax = (*Taus)[i].signalCands()[m]->pt();
-      		momHardestTrack[0] = (*Taus)[i].signalCands()[m]->px();
-      		momHardestTrack[1] = (*Taus)[i].signalCands()[m]->py();
-      		momHardestTrack[2] = (*Taus)[i].signalCands()[m]->pz();
+		momMax = (*Taus)[i].signalCands()[m]->pt();
+		momHardestTrack[0] = (*Taus)[i].signalCands()[m]->px();
+		momHardestTrack[1] = (*Taus)[i].signalCands()[m]->py();
+		momHardestTrack[2] = (*Taus)[i].signalCands()[m]->pz();
 	      }
 	      //Pixel his information:
 	      // -1: valid hit in 1st pixel barrel layer,
@@ -4307,9 +4203,6 @@ else{
 	  if( (*Taus)[i].hasSecondaryVertex() ){
 	    tau_flightLength[tau_count] = sqrt( (*Taus)[i].flightLength().mag2() );
 	    tau_flightLengthSig[tau_count] = (*Taus)[i].flightLengthSig();
-	    tau_flightLengthX[tau_count] = (*Taus)[i].flightLength().x();
-	    tau_flightLengthY[tau_count] = (*Taus)[i].flightLength().y();
-	    tau_flightLengthZ[tau_count] = (*Taus)[i].flightLength().z();
 	    // (*Taus)[i].secondaryVertex() is a reference (edm::Ref) to
 	    //  a vertex collection which is not stored in MiniAOD,
 	    //  so the SV of Tau should be refit:
@@ -4363,9 +4256,6 @@ else{
 	  else{
 	    tau_flightLength[tau_count] = -1.0f;
 	    tau_flightLengthSig[tau_count] = -1.0f;
-	    tau_flightLengthX[tau_count] = -999;
-	    tau_flightLengthY[tau_count] = -999;
-	    tau_flightLengthZ[tau_count] = -999;
 	    tau_SV_x[tau_count] = tau_vertexx[tau_count];
 	    tau_SV_y[tau_count] = tau_vertexy[tau_count];
 	    tau_SV_z[tau_count] = tau_vertexz[tau_count];
@@ -4629,13 +4519,13 @@ unsigned int NTupleMaker::AddPFPuppiJets(const edm::Event& iEvent, const edm::Ev
         if((*pfjetspuppi)[i].pt() < cJetPtMin) continue;
 	      if(fabs((*pfjetspuppi)[i].eta()) > cJetEtaMax) continue;
 
-    pfjetpuppi_e[pfjetpuppi_count] = (*pfjetspuppi)[i].energy();
-    pfjetpuppi_px[pfjetpuppi_count] = (*pfjetspuppi)[i].px();
-    pfjetpuppi_py[pfjetpuppi_count] = (*pfjetspuppi)[i].py();
-    pfjetpuppi_pz[pfjetpuppi_count] = (*pfjetspuppi)[i].pz();
-    pfjetpuppi_pt[pfjetpuppi_count] = (*pfjetspuppi)[i].pt();
-    pfjetpuppi_eta[pfjetpuppi_count] = (*pfjetspuppi)[i].eta();
-    pfjetpuppi_phi[pfjetpuppi_count] = (*pfjetspuppi)[i].phi();
+	       pfjetpuppi_e[pfjetpuppi_count] = (*pfjetspuppi)[i].energy();
+	       pfjetpuppi_px[pfjetpuppi_count] = (*pfjetspuppi)[i].px();
+	      pfjetpuppi_py[pfjetpuppi_count] = (*pfjetspuppi)[i].py();
+	      pfjetpuppi_pz[pfjetpuppi_count] = (*pfjetspuppi)[i].pz();
+        pfjetpuppi_pt[pfjetpuppi_count] = (*pfjetspuppi)[i].pt();
+          pfjetpuppi_eta[pfjetpuppi_count] = (*pfjetspuppi)[i].eta();
+          pfjetpuppi_phi[pfjetpuppi_count] = (*pfjetspuppi)[i].phi();
 	  pfjetpuppi_neutralhadronicenergy[pfjetpuppi_count] = (*pfjetspuppi)[i].neutralHadronEnergy();
 	  pfjetpuppi_chargedhadronicenergy[pfjetpuppi_count] = (*pfjetspuppi)[i].chargedHadronEnergy();
 	  pfjetpuppi_neutralemenergy[pfjetpuppi_count] = (*pfjetspuppi)[i].neutralEmEnergy();
@@ -4817,36 +4707,6 @@ unsigned int NTupleMaker::AddElectrons(const edm::Event& iEvent, const edm::Even
 	  electron_fbrems[electron_count] = el->fbrem();
 	  electron_numbrems[electron_count] = el->numberOfBrems();
 
-	  //Add Electons:
-	  electron_trackMomentumAtVtx[electron_count] = el->trackMomentumAtVtx().R();
-	  electron_trackMomentumAtCalo[electron_count] =el->trackMomentumAtCalo().R();
-    electron_trackMomentumOut[electron_count] = el->trackMomentumOut().R();
-
-	  electron_trackMomentumAtEleClus[electron_count] = el->trackMomentumAtEleClus().R();
-	  electron_trackMomentumAtVtxWithConstraint[electron_count] = el->trackMomentumAtVtxWithConstraint().R();
-    electron_ecalEnergy[electron_count] = el-> ecalEnergy();
-	  electron_ecalEnergyError[electron_count] = el-> ecalEnergyError();
-	  electron_eSuperClusterOverP[electron_count] = el->eSuperClusterOverP();
-	  electron_eSeedClusterOverP[electron_count] = el->eSeedClusterOverP();
-    electron_eSeedClusterOverPout[electron_count] = el->eSeedClusterOverPout();
-	  electron_eEleClusterOverPout[electron_count] = el->eEleClusterOverPout();
-	
-
-	  electron_deltaEtaSuperClusterTrackAtVtx[electron_count] = el->deltaEtaSuperClusterTrackAtVtx();
-	  electron_deltaEtaSeedClusterTrackAtCalo[electron_count] = el->deltaEtaSeedClusterTrackAtCalo();
-	  electron_deltaEtaEleClusterTrackAtCalo[electron_count] = el->deltaEtaEleClusterTrackAtCalo();
-	  electron_deltaPhiEleClusterTrackAtCalo[electron_count] = el->deltaPhiEleClusterTrackAtCalo();
-	  electron_deltaPhiSuperClusterTrackAtVtx[electron_count] = el->deltaPhiSuperClusterTrackAtVtx();
-	  electron_deltaPhiSeedClusterTrackAtCalo[electron_count] = el->deltaPhiSeedClusterTrackAtCalo();
-	
-	
-	  electron_mvaInput_earlyBremcout[electron_count] = el->mvaInput().earlyBrem;
-	  electron_mvaInput_lateBrem[electron_count] = el->mvaInput().lateBrem;
-	  electron_mvaInput_sigmaEtaEta[electron_count] = el->mvaInput().sigmaEtaEta;
-	  electron_mvaInput_hadEnergy[electron_count] = el->mvaInput().hadEnergy;
-	  electron_mvaInput_deltaEta[electron_count] = el->mvaInput().deltaEta;
-
-
 	  GsfTrackRef gsfTr_e = el->gsfTrack();
 	  TransientTrack TTrack = TTrackBuilder->build(gsfTr_e);
 	  math::XYZPoint ecalPos = PositionOnECalSurface(TTrack);
@@ -4855,7 +4715,6 @@ unsigned int NTupleMaker::AddElectrons(const edm::Event& iEvent, const edm::Even
 	  electron_outerz[electron_count] = ecalPos.z();
 	  //TrajectoryStateClosestToPoint TTrackState = TTrack.trajectoryStateClosestToPoint(GlobalPoint(pv_position.x(), pv_position.y(), pv_position.z()));
 
-          
 	  electron_trackchi2[electron_count] = gsfTr_e->chi2();
 	  electron_trackndof[electron_count] = gsfTr_e->ndof();
 	  electron_vx[electron_count] = gsfTr_e->vx();
@@ -4874,14 +4733,6 @@ unsigned int NTupleMaker::AddElectrons(const edm::Event& iEvent, const edm::Even
 	  electron_dxyerr[electron_count]       = gsfTr_e->dxyError();
 	  electron_dz[electron_count]           = gsfTr_e->dz(pv_position);
 	  electron_dzerr[electron_count]        = gsfTr_e->dzError();
-	  
-    electron_normalizedChi2[electron_count]     =  gsfTr_e->normalizedChi2();
-    electron_numberOfValidHits[electron_count]  =  gsfTr_e->numberOfValidHits();
-    electron_gsfTr_pt[electron_count]           =  gsfTr_e->pt();
-    electron_gsfTr_ptError[electron_count]      =  gsfTr_e->ptError();
-
-
-
 
 	  //	  std::cout << "   dxy = " << electron_dxy[electron_count] << "   dz = " << electron_dz[electron_count] << std::endl;
 
@@ -4891,8 +4742,8 @@ unsigned int NTupleMaker::AddElectrons(const edm::Event& iEvent, const edm::Even
      //electron_cutId_medium_Summer16[electron_count] =  el ->electronID("cutBasedElectronID-Summer16-80X-V1-medium");
      //electron_cutId_tight_Summer16[electron_count]=  el ->electronID("cutBasedElectronID-Summer16-80X-V1-tight");
 
-    electron_mva_value_Spring16_v1[electron_count] = el ->userFloat("ElectronMVAEstimatorRun2Spring16GeneralPurposeV1Values");
-    electron_mva_wp90_general_Spring16_v1[electron_count] = el ->electronID("mvaEleID-Spring16-GeneralPurpose-V1-wp90");
+     electron_mva_value_Spring16_v1[electron_count] = el ->userFloat("ElectronMVAEstimatorRun2Spring16GeneralPurposeV1Values");
+     electron_mva_wp90_general_Spring16_v1[electron_count] = el ->electronID("mvaEleID-Spring16-GeneralPurpose-V1-wp90");
 	  electron_mva_wp80_general_Spring16_v1[electron_count] = el ->electronID("mvaEleID-Spring16-GeneralPurpose-V1-wp80");
 
 	  //new for 9.4.0 Fall17 Electron id
@@ -4907,8 +4758,8 @@ unsigned int NTupleMaker::AddElectrons(const edm::Event& iEvent, const edm::Even
 	  electron_mva_wp80_noIso_Fall17_v1[electron_count] = el ->electronID("mvaEleID-Fall17-noIso-V1-wp80");
 	  electron_mva_Loose_noIso_Fall17_v1[electron_count] = el ->electronID("mvaEleID-Fall17-noIso-V1-wpLoose");
 
-          electron_mva_value_Iso_Fall17_v2[electron_count] = el ->userFloat("ElectronMVAEstimatorRun2Fall17IsoV2Values");
-          electron_mva_value_noIso_Fall17_v2[electron_count] = el ->userFloat("ElectronMVAEstimatorRun2Fall17NoIsoV2Values");
+     electron_mva_value_Iso_Fall17_v2[electron_count] = el ->userFloat("ElectronMVAEstimatorRun2Fall17IsoV2Values");
+     electron_mva_value_noIso_Fall17_v2[electron_count] = el ->userFloat("ElectronMVAEstimatorRun2Fall17NoIsoV2Values");
 
 	  electron_mva_wp90_Iso_Fall17_v2[electron_count] = el ->electronID("mvaEleID-Fall17-iso-V2-wp90");
 	  electron_mva_wp80_Iso_Fall17_v2[electron_count] = el ->electronID("mvaEleID-Fall17-iso-V2-wp80");

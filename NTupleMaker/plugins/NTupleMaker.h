@@ -575,23 +575,12 @@ class NTupleMaker : public edm::EDAnalyzer{
   Float_t track_closestpointx[M_trackmaxcount];
   Float_t track_closestpointy[M_trackmaxcount];
   Float_t track_closestpointz[M_trackmaxcount];
+  Float_t track_chi2[M_trackmaxcount];
+  Float_t track_ndof[M_trackmaxcount];
   Float_t track_dxy[M_trackmaxcount];
   Float_t track_dxyerr[M_trackmaxcount];
   Float_t track_dz[M_trackmaxcount];
   Float_t track_dzerr[M_trackmaxcount];
-
-  Float_t track_pvAssociationQuality[M_trackmaxcount];
-  Float_t track_fromPV[M_trackmaxcount];
-  Float_t track_puWeight[M_trackmaxcount];
-  Float_t track_puppiWeightNoLep[M_trackmaxcount];
-  Float_t track_lostInnerHits[M_trackmaxcount];
-  Float_t track_numberOfPixelHits[M_trackmaxcount];
-  Float_t track_hcalFraction[M_trackmaxcount];
-  Float_t track_rawCaloFraction[M_trackmaxcount];
-  Float_t track_chi2[M_trackmaxcount];
-  Float_t track_ndof[M_trackmaxcount];
-
-
   Float_t track_dedxharmonic2[M_trackmaxcount];
   UChar_t track_nhits[M_trackmaxcount];
   UChar_t track_nmissinghits[M_trackmaxcount];
@@ -628,9 +617,6 @@ class NTupleMaker : public edm::EDAnalyzer{
   Float_t muon_combQ_trkKink[M_muonmaxcount];
   Float_t muon_validFraction[M_muonmaxcount];
   Float_t muon_segmentComp[M_muonmaxcount];
-
-  Float_t muon_caloCompatibility[M_muonmaxcount];
-  Float_t muon_pfEcalEnergy[M_muonmaxcount];
 
   UInt_t muon_nMuonStations[M_muonmaxcount];
   UInt_t muon_nMuonHits[M_muonmaxcount];
@@ -835,13 +821,6 @@ class NTupleMaker : public edm::EDAnalyzer{
   Float_t electron_dxyerr[M_electronmaxcount];
   Float_t electron_dz[M_electronmaxcount];
   Float_t electron_dzerr[M_electronmaxcount];
-
-  Float_t electron_normalizedChi2[M_electronmaxcount];
-  Float_t electron_numberOfValidHits[M_electronmaxcount];
-  Float_t electron_gsfTr_pt[M_electronmaxcount];
-  Float_t electron_gsfTr_ptError[M_electronmaxcount];
-
-
   Float_t electron_convdist[M_electronmaxcount];
   Float_t electron_convdcot[M_electronmaxcount];
   Float_t electron_convradius[M_electronmaxcount];
@@ -849,30 +828,6 @@ class NTupleMaker : public edm::EDAnalyzer{
   UInt_t electron_chargeinfo[M_electronmaxcount];
   Float_t electron_fbrems[M_electronmaxcount];
   Int_t electron_numbrems[M_electronmaxcount];
-
-  Float_t electron_trackMomentumAtVtx[M_electronmaxcount];
-  Float_t electron_trackMomentumAtCalo[M_electronmaxcount];
-  Float_t electron_trackMomentumOut[M_electronmaxcount];
-  Float_t electron_trackMomentumAtEleClus[M_electronmaxcount];
-  Float_t electron_trackMomentumAtVtxWithConstraint[M_electronmaxcount];
-  Float_t electron_ecalEnergy[M_electronmaxcount];
-  Float_t electron_ecalEnergyError[M_electronmaxcount];
-  Float_t electron_eSuperClusterOverP[M_electronmaxcount];
-  Float_t electron_eSeedClusterOverP[M_electronmaxcount];
-  Float_t electron_eSeedClusterOverPout[M_electronmaxcount];
-  Float_t electron_eEleClusterOverPout[M_electronmaxcount];
-  Float_t electron_deltaEtaSuperClusterTrackAtVtx[M_electronmaxcount];
-  Float_t electron_deltaEtaSeedClusterTrackAtCalo[M_electronmaxcount];
-  Float_t electron_deltaEtaEleClusterTrackAtCalo[M_electronmaxcount];
-  Float_t electron_deltaPhiEleClusterTrackAtCalo[M_electronmaxcount];
-  Float_t electron_deltaPhiSuperClusterTrackAtVtx[M_electronmaxcount];
-  Float_t electron_deltaPhiSeedClusterTrackAtCalo[M_electronmaxcount];
-  Float_t electron_mvaInput_earlyBremcout[M_electronmaxcount];
-  Float_t electron_mvaInput_lateBrem[M_electronmaxcount];
-  Float_t electron_mvaInput_sigmaEtaEta[M_electronmaxcount];
-  Float_t electron_mvaInput_hadEnergy[M_electronmaxcount];
-  Float_t electron_mvaInput_deltaEta[M_electronmaxcount];
-
   Int_t electron_superclusterindex[M_electronmaxcount];
   UChar_t electron_info[M_electronmaxcount];
 
@@ -994,12 +949,6 @@ class NTupleMaker : public edm::EDAnalyzer{
   Float_t tau_ip3dSig[M_taumaxcount];
   Float_t tau_flightLength[M_taumaxcount];
   Float_t tau_flightLengthSig[M_taumaxcount];
-
-  Float_t tau_flightLengthX[M_taumaxcount];
-  Float_t tau_flightLengthY[M_taumaxcount];
-  Float_t tau_flightLengthZ[M_taumaxcount];
-
-
   Float_t tau_SV_x[M_taumaxcount];
   Float_t tau_SV_y[M_taumaxcount];
   Float_t tau_SV_z[M_taumaxcount];
@@ -1027,11 +976,6 @@ class NTupleMaker : public edm::EDAnalyzer{
   UInt_t tau_isolationChargedHadrCands_size[M_taumaxcount];
   UInt_t tau_isolationNeutralHadrCands_size[M_taumaxcount];
   UInt_t tau_isolationGammaCands_size[M_taumaxcount];
-   
-  Float_t tau_emFraction_MVA[M_taumaxcount];
-  Float_t tau_etaAtEcalEntranceLeadChargedCan[M_taumaxcount];
-  Float_t tau_leadingTrackNormChi2[M_taumaxcount];
-
 
   string tau_genDecayMode_name[M_taumaxcount];
   Int_t tau_genDecayMode[M_taumaxcount];
