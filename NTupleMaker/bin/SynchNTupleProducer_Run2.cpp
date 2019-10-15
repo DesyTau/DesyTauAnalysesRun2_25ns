@@ -630,17 +630,18 @@ int main(int argc, char * argv[]){
     
       // tau selection
       vector<int> taus; taus.clear();
-      for (unsigned int it = 0; it<analysisTree.tau_count; ++it) { 
+      for (unsigned int it = 0; it < analysisTree.tau_count; ++it) { 
         if (analysisTree.tau_pt[it] <= ptTauLowCut) continue;
         if (fabs(analysisTree.tau_eta[it]) >= etaTauCut) continue;
-        if (fabs(fabs(analysisTree.tau_charge[it]) - 1) > 0.001) continue;
         if (fabs(analysisTree.tau_leadchargedhadrcand_dz[it]) >= dzTauCut) continue;
+        if (fabs(fabs(analysisTree.tau_charge[it]) - 1) > 0.001) continue;
     
-      	if (analysisTree.tau_byVVLooseIsolationMVArun2017v2DBoldDMwLT2017[it] < 0.5) continue;
-      	//merijn 2019 8 8: apply here all criteria on the tau selection. 
-      //	if (analysisTree.tau_byTightIsolationMVArun2017v2DBoldDMwLT2017[it] < 0.5) continue;//tight tau mva. But we will apply this only in the DNN NTupler, it is better to do the cut there for ease of computing the fake fractions
-      	if (analysisTree.tau_againstMuonTight3[it] < 0.5) continue;//tight mva aginst muon
-      	if (analysisTree.tau_againstElectronVLooseMVA6[it] < 0.5) continue;//very loose mva agaist e
+        // merijn 2019 8 8: apply here all criteria on the tau selection. 
+      	// if (analysisTree.tau_byVVLooseIsolationMVArun2017v2DBoldDMwLT2017[it] < 0.5) continue;
+        //if (analysisTree.tau_byTightIsolationMVArun2017v2DBoldDMwLT2017[it] < 0.5) continue;//tight tau mva. But we will apply this only in the DNN NTupler, it is better to do the cut there for ease of computing the fake fractions
+      	if (analysisTree.tau_byVVVLooseDeepTau2017v2p1VSjet[it] < 0.5) continue;
+      	if (analysisTree.tau_byVVVLooseDeepTau2017v2p1VSe[it] < 0.5) continue;
+      	if (analysisTree.tau_byVLooseDeepTau2017v2p1VSmu[it] < 0.5) continue;
     
         if (ApplyTauId && analysisTree.tau_decayModeFinding[it] < 0.5) continue;
         taus.push_back(it);
@@ -726,8 +727,7 @@ int main(int argc, char * argv[]){
           }
           counter[7]++;
     
-          float absIsoTau = analysisTree.tau_byIsolationMVArun2017v2DBoldDMwLTraw2017[tIndex];
-          float relIsoTau = absIsoTau / analysisTree.tau_pt[tIndex];
+          float sortIsoTau = analysisTree.tau_byDeepTau2017v2p1VSjetraw[tIndex];
           float dR = deltaR(analysisTree.tau_eta[tIndex], analysisTree.tau_phi[tIndex], lep_eta, lep_phi);
           if (dR < dRleptonsCut) continue;
     
@@ -741,9 +741,9 @@ int main(int argc, char * argv[]){
                   changePair = true;
                  else if (fabs(lep_pt - lep_pt_max) < 1.e-5) 
                  {
-        	              if (absIsoTau > isoTauMax)
+        	              if (sortIsoTau > isoTauMax)
                           changePair = true;
-        	              else if ((absIsoTau - isoTauMax) < 1.e-5)
+        	              else if ((sortIsoTau - isoTauMax) < 1.e-5)
                         {
         	                    if (analysisTree.tau_pt[tIndex] > tau_pt_max)
                                 changePair = true;
@@ -757,7 +757,7 @@ int main(int argc, char * argv[]){
             lep_pt_max = lep_pt;
             tau_pt_max = analysisTree.tau_pt[tIndex];
             leptonIndex = lIndex;
-            isoTauMax = absIsoTau;
+            isoTauMax = sortIsoTau;
             tauIndex = tIndex;
           }
         } // lepton loop

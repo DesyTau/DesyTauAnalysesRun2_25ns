@@ -211,10 +211,13 @@ float GenMatch(const AC1B * analysisTree, bool isData, TString particleType, int
 bool isIdentifiedMediumMuon(int Index, const AC1B * analysisTree, bool isData){
   bool isGoodMuon;
   if (isData){
-	if (analysisTree->event_run<=278808) isGoodMuon= isICHEPmed(Index, analysisTree);
-    else isGoodMuon=analysisTree->muon_isMedium[Index]; 
+  	if (analysisTree->event_run <= 278808) 
+      isGoodMuon = isICHEPmed(Index, analysisTree);
+    else 
+      isGoodMuon = analysisTree->muon_isMedium[Index]; 
 	}
-  else isGoodMuon=analysisTree->muon_isMedium[Index]; 
+  else 
+    isGoodMuon = analysisTree->muon_isMedium[Index]; 
   return isGoodMuon;
 }
 
