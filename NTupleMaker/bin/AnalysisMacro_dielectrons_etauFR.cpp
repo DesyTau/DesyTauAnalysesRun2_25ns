@@ -237,10 +237,10 @@ int main(int argc, char * argv[]) {
     Bool_t tauagainstEleVVTightDeepTau;
     Float_t tauagainstEleRawDeepTau;
     
-    Bool_t taubyVLooseDeepTau2017v2VSjet;
-    Bool_t taubyLooseDeepTau2017v2VSjet;
-    Bool_t taubyMediumDeepTau2017v2VSjet;
-    Bool_t taubyTightDeepTau2017v2VSjet;
+    Bool_t taubyVLooseDeepTau2017v2p1VSjet;
+    Bool_t taubyLooseDeepTau2017v2p1VSjet;
+    Bool_t taubyMediumDeepTau2017v2p1VSjet;
+    Bool_t taubyTightDeepTau2017v2p1VSjet;
 
     Bool_t tau_decayModeFinding;
     
@@ -313,10 +313,10 @@ int main(int argc, char * argv[]) {
     eleTree->Branch("tauagainstEleVVTightDeepTau",&tauagainstEleVVTightDeepTau,"tauagainstEleVVTightDeepTau/O");
     eleTree->Branch("tauagainstEleRawDeepTau",&tauagainstEleRawDeepTau,"tauagainstEleRawDeepTau/F");
 
-    eleTree->Branch("taubyVLooseDeepTau2017v2VSjet",&taubyVLooseDeepTau2017v2VSjet,"taubyVLooseDeepTau2017v2VSjet/O");
-    eleTree->Branch("taubyLooseDeepTau2017v2VSjet",&taubyLooseDeepTau2017v2VSjet,"taubyLooseDeepTau2017v2VSjet/O");
-    eleTree->Branch("taubyMediumDeepTau2017v2VSjet",&taubyMediumDeepTau2017v2VSjet,"taubyMediumDeepTau2017v2VSjet/O");
-    eleTree->Branch("taubyTightDeepTau2017v2VSjet",&taubyTightDeepTau2017v2VSjet,"taubyTightDeepTau2017v2VSjet/O");
+    eleTree->Branch("taubyVLooseDeepTau2017v2p1VSjet",&taubyVLooseDeepTau2017v2p1VSjet,"taubyVLooseDeepTau2017v2p1VSjet/O");
+    eleTree->Branch("taubyLooseDeepTau2017v2p1VSjet",&taubyLooseDeepTau2017v2p1VSjet,"taubyLooseDeepTau2017v2p1VSjet/O");
+    eleTree->Branch("taubyMediumDeepTau2017v2p1VSjet",&taubyMediumDeepTau2017v2p1VSjet,"taubyMediumDeepTau2017v2p1VSjet/O");
+    eleTree->Branch("taubyTightDeepTau2017v2p1VSjet",&taubyTightDeepTau2017v2p1VSjet,"taubyTightDeepTau2017v2p1VSjet/O");
 
 
     eleTree->Branch("taubyLooseCombinedIsolationDeltaBetaCorr3Hits",&taubyLooseCombinedIsolationDeltaBetaCorr3Hits,"taubyLooseCombinedIsolationDeltaBetaCorr3Hits/O");
@@ -1043,27 +1043,27 @@ int main(int argc, char * argv[]) {
 
 
 
-			tauagainstMuLooseDeepTau = analysisTree.tau_byLooseDeepTau2017v2VSmu[indexProbe];
+			tauagainstMuLooseDeepTau = analysisTree.tau_byLooseDeepTau2017v2p1VSmu[indexProbe];
 			tauagainstMuonLoose3 = analysisTree.tau_againstMuonLoose3[indexProbe];
                         
 			
 			
-			tauagainstEleVVVLooseDeepTau = analysisTree.tau_byVVVLooseDeepTau2017v2VSe[indexProbe];
-			tauagainstEleVVLooseDeepTau = analysisTree.tau_byVVLooseDeepTau2017v2VSe[indexProbe];
-			tauagainstEleVLooseDeepTau = analysisTree.tau_byVLooseDeepTau2017v2VSe[indexProbe];
-                        tauagainstEleLooseDeepTau = analysisTree.tau_byLooseDeepTau2017v2VSe[indexProbe];
-                        tauagainstEleMediumDeepTau = analysisTree.tau_byMediumDeepTau2017v2VSe[indexProbe];
-                        tauagainstEleTightDeepTau = analysisTree.tau_byTightDeepTau2017v2VSe[indexProbe];
-                        tauagainstEleVTightDeepTau = analysisTree.tau_byVTightDeepTau2017v2VSe[indexProbe];
-			tauagainstEleVVTightDeepTau = analysisTree.tau_byVVTightDeepTau2017v2VSe[indexProbe];                        
-			tauagainstEleRawDeepTau = analysisTree.tau_byDeepTau2017v2VSeraw[indexProbe];
+			tauagainstEleVVVLooseDeepTau = analysisTree.tau_byVVVLooseDeepTau2017v2p1VSe[indexProbe];
+			tauagainstEleVVLooseDeepTau = analysisTree.tau_byVVLooseDeepTau2017v2p1VSe[indexProbe];
+			tauagainstEleVLooseDeepTau = analysisTree.tau_byVLooseDeepTau2017v2p1VSe[indexProbe];
+                        tauagainstEleLooseDeepTau = analysisTree.tau_byLooseDeepTau2017v2p1VSe[indexProbe];
+                        tauagainstEleMediumDeepTau = analysisTree.tau_byMediumDeepTau2017v2p1VSe[indexProbe];
+                        tauagainstEleTightDeepTau = analysisTree.tau_byTightDeepTau2017v2p1VSe[indexProbe];
+                        tauagainstEleVTightDeepTau = analysisTree.tau_byVTightDeepTau2017v2p1VSe[indexProbe];
+			tauagainstEleVVTightDeepTau = analysisTree.tau_byVVTightDeepTau2017v2p1VSe[indexProbe];                        
+			tauagainstEleRawDeepTau = analysisTree.tau_byDeepTau2017v2p1VSeraw[indexProbe];
                         taubyLooseCombinedIsolationDeltaBetaCorr3Hits = analysisTree.tau_byLooseCombinedIsolationDeltaBetaCorr3Hits[indexProbe];
 			//              taubyLooseIsolationMVArun2v1DBoldDMwLT = analysisTree.tau_byLooseIsolationMVArun2v1DBoldDMwLT[indexProbe];
 			                        
-			taubyVLooseDeepTau2017v2VSjet = analysisTree.tau_byVLooseDeepTau2017v2VSjet[indexProbe];
-			taubyLooseDeepTau2017v2VSjet = analysisTree.tau_byLooseDeepTau2017v2VSjet[indexProbe];
-			taubyMediumDeepTau2017v2VSjet = analysisTree.tau_byMediumDeepTau2017v2VSjet[indexProbe];                        
-			taubyTightDeepTau2017v2VSjet = analysisTree.tau_byTightDeepTau2017v2VSjet[indexProbe];
+			taubyVLooseDeepTau2017v2p1VSjet = analysisTree.tau_byVLooseDeepTau2017v2p1VSjet[indexProbe];
+			taubyLooseDeepTau2017v2p1VSjet = analysisTree.tau_byLooseDeepTau2017v2p1VSjet[indexProbe];
+			taubyMediumDeepTau2017v2p1VSjet = analysisTree.tau_byMediumDeepTau2017v2p1VSjet[indexProbe];                        
+			taubyTightDeepTau2017v2p1VSjet = analysisTree.tau_byTightDeepTau2017v2p1VSjet[indexProbe];
 			//if(slimNTuples&&taubyTightIsolationMVArun2v1DBoldDMwLT<0.5)continue;
 
                        
