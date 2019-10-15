@@ -28,9 +28,9 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
 			       float xmax =  150,
 			       TString Weight = "xsec_lumi_weight*puweight*effweight*mcweight*",
 			       TString Cut="(mt_1<50)*",
-			       int categoryIndex=-1,
 			       TString ytitle = "Events",
-			       TString directory = "HtautauCP_mutau/Inputs/NTuples_mt_",
+			       int categoryIndex=-1,
+			       TString directory = "HtautauCP_mutau/Inputs/NTuples_mt_2017/",
 			       TString outputDir = "./Plots/",
 			       int year=2017,
 			       bool FFmethod = false,  
@@ -38,8 +38,8 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
 			       bool logY = false,
 			       bool showSignal = true,
 			       bool compareCP = true,
-			       int scaleSignal = 1.,
-			       bool blindData = false,
+			       int scaleSignal = 100.,
+			       bool blindData = true,
 			       bool FORCE = false
 			       )
 {
@@ -47,6 +47,7 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
   if(categoryIndex>=0){
     Cut+="(predicted_class=="+TString::Itoa(categoryIndex,10)+")*";
   }
+  TString VariableName=Variable;
   TString yVar,xVar;
   bool var2D=false;
   if(Variable.Contains(":")){
@@ -54,16 +55,21 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
     yVar=array->At(0)->GetName();
     xVar=array->At(1)->GetName();
     TString range=to_string(xmax-xmin).c_str();
-    nBins=nBins*3;
-    xmax+=2*(xmax-xmin);
-    Variable=xVar+"*("+yVar+"<0.4)+("+range+"+"+xVar+"*("+yVar+">=0.4&&"+yVar+"<0.7))+(2*"+range+"+"+xVar+"*("+yVar+">=0.7))";
+    if(categoryIndex==1){
+      nBins=nBins*5;
+      xmax+=4*(xmax-xmin);
+      Variable=xVar+"*("+yVar+"<0.2)+(("+range+"+"+xVar+")*("+yVar+">=0.2&&"+yVar+"<0.4))+((2*"+range+"+"+xVar+")*("+yVar+">=0.4&&"+yVar+"<0.6))+((3*"+range+"+"+xVar+")*("+yVar+">=0.6&&"+yVar+"<0.8))+((4*"+range+"+"+xVar+")*("+yVar+">=0.8))";
+    }else{
+      nBins=nBins*3;
+      xmax+=2*(xmax-xmin);
+      Variable=xVar+"*("+yVar+"<0.2)+(("+range+"+"+xVar+")*("+yVar+">=0.2&&"+yVar+"<0.4))+((2*"+range+"+"+xVar+")*("+yVar+">=0.4&&"+yVar+"<0.6))+((3*"+range+"+"+xVar+")*("+yVar+">=0.6))";
+    }
+    VariableName="Unrolled_"+xVar;
     var2D=true;
   }
   TString IsoCut=Cut+"(mva17_2>0.5)*";
   TString AntiIsoCut=Cut+"(mva17_2<0.5)*";
   directory="$CMSSW_BASE/src/"+directory;
-  directory+=year;
-  directory+="/";
   TH1::SetDefaultSumw2();
   SetStyle();
   const int nSamples = 10; //DY is used twice, for Zll and Ztt
@@ -79,19 +85,34 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
   TString qcdweight("1.06*");
   TString zptmassweight="*1.0";                  //TO DO: CHANGE WEIGHTs
  
-  TString sampleNames[nSamples] = {
-        "mt-NOMINAL_ntuple_Data", // data (0)
-        "mt-NOMINAL_ntuple_DY",// (1)Drell-Yan Z->TT
-        "mt-NOMINAL_ntuple_DY", // (2)Drell-Yan Z->LL
-        "mt-NOMINAL_ntuple_WJets",// (3)WJets
-        "mt-NOMINAL_ntuple_TT",//(4)TTbar leptonic, hadronic, + semileptonic
-        "mt-NOMINAL_ntuple_SingleTop", // (5) SingleTop tW tbar, SingleTop tW t, SingleTop t antitop, SingleTop t top
-        "mt-NOMINAL_ntuple_VV",// (6) WW, WZ, ZZ
-	"mt-NOMINAL_ntuple_ggH", // (7) Scalar ggH
-	"mt-NOMINAL_ntuple_qqH", // (8) Scalar VBF H
-	"mt-NOMINAL_ntuple_CPodd" // (9) Pseudoscalar 
-  };
-
+  vector<TString> sampleNames;
+  if(directory.Contains("Outputs")){
+    sampleNames = {
+      "mt-NOMINAL_ntuple_Data", // data (0)
+      "mt-NOMINAL_ntuple_DY",// (1)Drell-Yan Z->TT
+      "mt-NOMINAL_ntuple_DY", // (2)Drell-Yan Z->LL
+      "mt-NOMINAL_ntuple_W",// (3)WJets
+      "mt-NOMINAL_ntuple_TT",//(4)TTbar leptonic, hadronic, + semileptonic
+      "mt-NOMINAL_ntuple_ST", // (5) SingleTop tW tbar, SingleTop tW t, SingleTop t antitop, SingleTop t top
+      "mt-NOMINAL_ntuple_VV",// (6) WW, WZ, ZZ
+      "mt-NOMINAL_ntuple_ggH125", // (7) Scalar ggH
+      "mt-NOMINAL_ntuple_qqH125", // (8) Scalar VBF H
+      "mt-NOMINAL_ntuple_CPoddH125" // (9) Pseudoscalar 
+    };
+  }else{
+    sampleNames = {
+      "mt-NOMINAL_ntuple_Data", // data (0)
+      "mt-NOMINAL_ntuple_DY",// (1)Drell-Yan Z->TT
+      "mt-NOMINAL_ntuple_DY", // (2)Drell-Yan Z->LL
+      "mt-NOMINAL_ntuple_WJets",// (3)WJets
+      "mt-NOMINAL_ntuple_TT",//(4)TTbar leptonic, hadronic, + semileptonic
+      "mt-NOMINAL_ntuple_SingleTop", // (5) SingleTop tW tbar, SingleTop tW t, SingleTop t antitop, SingleTop t top
+      "mt-NOMINAL_ntuple_VV",// (6) WW, WZ, ZZ
+      "mt-NOMINAL_ntuple_ggH", // (7) Scalar ggH
+      "mt-NOMINAL_ntuple_VBF", // (8) Scalar VBF H
+      "mt-NOMINAL_ntuple_CPodd" // (9) Pseudoscalar 
+    }; 
+  }
   cout<<"this are the samples"<<endl;
   for (int i=0; i<nSamples; ++i) {
     cout << endl << sampleNames[i] << ":" << endl;}
@@ -161,9 +182,9 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
     TTree * tree = (TTree*)file->Get("TauCheck"); 
     
     // Name and initialize histograms
-    TString histName   = sampleNames[i] + Variable + "_os";
-    TString histNameSS = sampleNames[i] + Variable + "_ss";
-    TString histNameaIso   = sampleNames[i] + Variable + "_aIso";
+    TString histName   = sampleNames[i] + VariableName + "_os";
+    TString histNameSS = sampleNames[i] + VariableName + "_ss";
+    TString histNameaIso   = sampleNames[i] + VariableName + "_aIso";
 
     hist[i]   = new TH1D(histName,"",nBins,xmin,xmax);
     histSS[i] = new TH1D(histNameSS,"",nBins,xmin,xmax);
@@ -428,15 +449,6 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
 
   canv1->Update();
 
-  if (blindData)
-    {
-      for (int iB=0; iB<=nBins; ++iB)
-        {
-	  histData->SetBinContent(iB,-1);
-	  histData->SetBinError(iB,0);
-        }
-    }
-
   // Initialize a histogram which adds all error up
   TH1D * bkgdErr = (TH1D*)stack->GetStack()->Last()->Clone("bkgdErr");
   float errLumi = 0.03;
@@ -469,6 +481,23 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
   bkgdErr -> Draw("e2same");
   legend  -> AddEntry(bkgdErr, "Bkg. uncertainty" , "F" );
   canv1   -> Update();
+
+
+  if (blindData)
+    {
+      for (int iB=0; iB<=nBins; ++iB)
+        {
+	  float bkgYield = bkgdErr->GetBinContent(iB);
+	  float errbkg = max(0.1,bkgdErr->GetBinError(iB)/bkgYield);
+	  float signalYield = ggH->GetBinContent(iB)/scaleSignal;
+	  float ye = signalYield / sqrt(bkgYield+pow(bkgYield*errbkg,2));
+	  if(ye>=0.2){
+	    histData->SetBinContent(iB,-1);
+	    histData->SetBinError(iB,0);
+	  }
+        }
+    }
+
 
   TH1D * ratioH    = (TH1D*)histData -> Clone("ratioH");
   TH1D * ratioErrH = (TH1D*)bkgdErr  -> Clone("ratioErrH");
@@ -507,7 +536,6 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
   FixOverlay();
   canv1->Update();
   pads[0]->GetFrame()->Draw();
-  if(var2D)Variable="Unrolled_"+xVar;
-  canv1 -> Print( outputDir + "MuTau_" + Variable + (categoryIndex>=0 ? ((TString)"_Cat"+TString::Itoa(categoryIndex,10)+"_") : (TString)"_") +(FFmethod ? (TString)"fakes" : (TString)"MC") + ".pdf" );
-  canv1 -> Print( outputDir + "MuTau_" + Variable + (categoryIndex>=0 ? ((TString)"_Cat"+TString::Itoa(categoryIndex,10)+"_") : (TString)"_") +(FFmethod ? (TString)"fakes" : (TString)"MC") + ".png" );
+  canv1 -> Print( outputDir + "MuTau_" + VariableName + (categoryIndex>=0 ? ((TString)"_Cat"+TString::Itoa(categoryIndex,10)+"_") : (TString)"_") +(FFmethod ? (TString)"fakes" : (TString)"MC") + ".pdf" );
+  canv1 -> Print( outputDir + "MuTau_" + VariableName + (categoryIndex>=0 ? ((TString)"_Cat"+TString::Itoa(categoryIndex,10)+"_") : (TString)"_") +(FFmethod ? (TString)"fakes" : (TString)"MC") + ".png" );
 }

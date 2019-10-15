@@ -242,7 +242,7 @@ int main(int argc, char * argv[]) {
     Bool_t taubyMediumDeepTau2017v2VSjet;
     Bool_t taubyTightDeepTau2017v2VSjet;
 
-    Bool_t tau_decayModeFinding;
+    Bool_t tau_decayModeFinding
     
     Float_t PtTag;
     Float_t EtaTag;

@@ -1164,7 +1164,7 @@ for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) {
 
 	  eff_data_trig_L = SF_SingleLepTrigger->get_EfficiencyData(leptonLV.Pt(),
 								    leptonLV.Eta());
-	  eff_mc_trig_L = SF_SingleLepTrigger->get_EfficiencyData(leptonLV.Pt(),
+	  eff_mc_trig_L = SF_SingleLepTrigger->get_EfficiencyMC(leptonLV.Pt(),
 								  leptonLV.Eta());
 	  
 	  otree->idisoweight_1 = SF_lepIdIso->get_ScaleFactor(leptonLV.Pt(),
