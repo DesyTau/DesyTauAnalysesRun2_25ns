@@ -218,14 +218,8 @@ int main(int argc, char * argv[]){
   
   if(!isData && ApplyRecoilCorrections && (isDY || isWJets || isVBForGGHiggs || isMSSMsignal) ){
     TString RecoilFilePath = cfg.get<string>("RecoilFilePath");
-    //    TString RecoilFilePath = RecoilDir; RecoilFilePath += "TypeI-PFMet_Run2016BtoH.root"; Merijn update to 2017:
     std::cout << RecoilFilePath << std::endl;
     recoilPFMetCorrector = new RecoilCorrector( RecoilFilePath);
-        
-    //    RecoilFilePath = RecoilDir; RecoilFilePath += "MvaMET_2016BCD.root";
-    //    std::cout<<RecoilFilePath<<std::endl;
-    //    recoilMvaMetCorrector = new RecoilCorrector( RecoilFilePath);
-
   }
   
   // Read in HLT filter
@@ -248,7 +242,6 @@ int main(int argc, char * argv[]){
   const float ptTauLowCut    = cfg.get<float>("ptTauLowCut");
   const float etaTauCut      = cfg.get<float>("etaTauCut");
   const float dzTauCut       = cfg.get<float>("dzTauCut");
-  const bool  ApplyTauId     = cfg.get<bool>("ApplyTauId");
 
   // tau energy scale corrections
   const float shift_tes_1prong = cfg.get<float>("TauEnergyScaleShift_OneProng");
@@ -636,14 +629,13 @@ int main(int argc, char * argv[]){
         if (fabs(analysisTree.tau_leadchargedhadrcand_dz[it]) >= dzTauCut) continue;
         if (fabs(fabs(analysisTree.tau_charge[it]) - 1) > 0.001) continue;
     
-        // merijn 2019 8 8: apply here all criteria on the tau selection. 
-      	// if (analysisTree.tau_byVVLooseIsolationMVArun2017v2DBoldDMwLT2017[it] < 0.5) continue;
-        //if (analysisTree.tau_byTightIsolationMVArun2017v2DBoldDMwLT2017[it] < 0.5) continue;//tight tau mva. But we will apply this only in the DNN NTupler, it is better to do the cut there for ease of computing the fake fractions
       	if (analysisTree.tau_byVVVLooseDeepTau2017v2p1VSjet[it] < 0.5) continue;
       	if (analysisTree.tau_byVVVLooseDeepTau2017v2p1VSe[it] < 0.5) continue;
       	if (analysisTree.tau_byVLooseDeepTau2017v2p1VSmu[it] < 0.5) continue;
     
-        if (ApplyTauId && analysisTree.tau_decayModeFinding[it] < 0.5) continue;
+        if (analysisTree.tau_decayModeFindingNewDMs[it] < 0.5) continue; //always true, cut applied in NTupleMaker
+        if (analysisTree.tau_decayMode[it] == 5 || analysisTree.tau_decayMode[it] == 6) continue;
+    
         taus.push_back(it);
       }
       counter[3]++;
