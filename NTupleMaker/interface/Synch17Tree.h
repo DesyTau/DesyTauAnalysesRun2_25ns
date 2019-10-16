@@ -127,6 +127,31 @@ public :
   Float_t 	  byTightIsolationMVArun2017v2DBoldDMwLT2017_2;
   Float_t 	  byVTightIsolationMVArun2017v2DBoldDMwLT2017_2;
   Float_t 	  byVVTightIsolationMVArun2017v2DBoldDMwLT2017_2;
+    
+  Float_t	   byDeepTau2017v2p1VSeraw_2;	
+  Float_t	   byDeepTau2017v2p1VSjetraw_2;	
+  Float_t	   byDeepTau2017v2p1VSmuraw_2;	
+  Float_t	   byLooseDeepTau2017v2p1VSe_2;	
+  Float_t	   byLooseDeepTau2017v2p1VSjet_2;	
+  Float_t	   byLooseDeepTau2017v2p1VSmu_2;	
+  Float_t	   byMediumDeepTau2017v2p1VSe_2;	
+  Float_t	   byMediumDeepTau2017v2p1VSjet_2;	
+  Float_t	   byMediumDeepTau2017v2p1VSmu_2;	
+  Float_t	   byTightDeepTau2017v2p1VSe_2;	
+  Float_t	   byTightDeepTau2017v2p1VSjet_2;	
+  Float_t	   byTightDeepTau2017v2p1VSmu_2;	
+  Float_t	   byVLooseDeepTau2017v2p1VSe_2;	
+  Float_t	   byVLooseDeepTau2017v2p1VSjet_2;	
+  Float_t	   byVLooseDeepTau2017v2p1VSmu_2;	
+  Float_t	   byVTightDeepTau2017v2p1VSe_2;	
+  Float_t	   byVTightDeepTau2017v2p1VSjet_2;	
+  Float_t	   byVVLooseDeepTau2017v2p1VSe_2;	
+  Float_t	   byVVLooseDeepTau2017v2p1VSjet_2;	
+  Float_t	   byVVTightDeepTau2017v2p1VSe_2;	
+  Float_t	   byVVTightDeepTau2017v2p1VSjet_2;	
+  Float_t	   byVVVLooseDeepTau2017v2p1VSe_2;	
+  Float_t	   byVVVLooseDeepTau2017v2p1VSjet_2;	
+
   // new 
   Float_t         idisoweight_2;
   Float_t         idisoweight_antiiso_2;
@@ -396,6 +421,30 @@ public :
   TBranch	 *b_byTightIsolationMVArun2017v2DBoldDMwLT2017_1;
   TBranch	 *b_byVTightIsolationMVArun2017v2DBoldDMwLT2017_1;
   TBranch	 *b_byVVTightIsolationMVArun2017v2DBoldDMwLT2017_1;
+
+  TBranch	   *b_byDeepTau2017v2p1VSeraw_2;	
+  TBranch	   *b_byDeepTau2017v2p1VSjetraw_2;	
+  TBranch	   *b_byDeepTau2017v2p1VSmuraw_2;	
+  TBranch	   *b_byLooseDeepTau2017v2p1VSe_2;	
+  TBranch	   *b_byLooseDeepTau2017v2p1VSjet_2;	
+  TBranch	   *b_byLooseDeepTau2017v2p1VSmu_2;	
+  TBranch	   *b_byMediumDeepTau2017v2p1VSe_2;	
+  TBranch	   *b_byMediumDeepTau2017v2p1VSjet_2;	
+  TBranch	   *b_byMediumDeepTau2017v2p1VSmu_2;	
+  TBranch	   *b_byTightDeepTau2017v2p1VSe_2;	
+  TBranch	   *b_byTightDeepTau2017v2p1VSjet_2;	
+  TBranch	   *b_byTightDeepTau2017v2p1VSmu_2;	
+  TBranch	   *b_byVLooseDeepTau2017v2p1VSe_2;	
+  TBranch	   *b_byVLooseDeepTau2017v2p1VSjet_2;	
+  TBranch	   *b_byVLooseDeepTau2017v2p1VSmu_2;	
+  TBranch	   *b_byVTightDeepTau2017v2p1VSe_2;	
+  TBranch	   *b_byVTightDeepTau2017v2p1VSjet_2;	
+  TBranch	   *b_byVVLooseDeepTau2017v2p1VSe_2;	
+  TBranch	   *b_byVVLooseDeepTau2017v2p1VSjet_2;	
+  TBranch	   *b_byVVTightDeepTau2017v2p1VSe_2;	
+  TBranch	   *b_byVVTightDeepTau2017v2p1VSjet_2;	
+  TBranch	   *b_byVVVLooseDeepTau2017v2p1VSe_2;	
+  TBranch	   *b_byVVVLooseDeepTau2017v2p1VSjet_2;	
 
   ///////////////////////////////////////////////////////////NEW
   TBranch	 *b_efficiency_byVVLooseIsolationMVArun2017v2DBoldDMwLT2017_1;
