@@ -286,7 +286,7 @@ int main(int argc, char * argv[]){
   cout<<"dzLeptonCut "<<dzLeptonCut<<endl;
   cout<<"dzTauCut "<<dzTauCut<<endl;
 
-  const bool  ApplyLeptonId    = cfg.get<bool>("Apply" + lep + "Id");
+  // const bool  ApplyLeptonId    = cfg.get<bool>("Apply" + lep + "Id");
 
   const float dRTrigMatch = cfg.get<float>("dRTrigMatch");
   const float dRiso = cfg.get<float>("dRiso");
@@ -651,11 +651,11 @@ int main(int argc, char * argv[]){
           if (fabs(analysisTree.electron_eta[ie]) >= etaLeptonCut) continue;
           if (fabs(analysisTree.electron_dxy[ie]) >= dxyLeptonCut) continue;
       	  if (fabs(analysisTree.electron_dz[ie]) >= dzLeptonCut) continue;
-          if (!electronMvaId && ApplyLeptonId) continue;
+          if (!electronMvaId) continue;
     
       	  //Meirjn 2019 8 20: reinstated. They are mentioned in the legacy twiki
-      	  if (!analysisTree.electron_pass_conversion[ie] && ApplyLeptonId) continue;
-      	  if (analysisTree.electron_nmissinginnerhits[ie] > 1 && ApplyLeptonId) continue;
+      	  if (!analysisTree.electron_pass_conversion[ie]) continue;
+      	  if (analysisTree.electron_nmissinginnerhits[ie] > 1) continue;
           leptons.push_back(ie);
         }
       }
@@ -667,7 +667,7 @@ int main(int argc, char * argv[]){
           if (fabs(analysisTree.muon_eta[im]) >= etaLeptonCut) continue;
           if (fabs(analysisTree.muon_dxy[im]) >= dxyLeptonCut) continue;
           if (fabs(analysisTree.muon_dz[im]) >= dzLeptonCut) continue;
-          if (!muonMediumId && ApplyLeptonId) continue;
+          if (!muonMediumId) continue;
           leptons.push_back(im);
           }
       }
@@ -897,7 +897,7 @@ int main(int argc, char * argv[]){
     	  eff_data_trig_lt_l = SF_XTriggerLepLeg->get_EfficiencyData(leptonLV.Pt(), leptonLV.Eta());
     	  eff_mc_trig_lt_l = SF_XTriggerLepLeg->get_EfficiencyMC(leptonLV.Pt(), leptonLV.Eta());
     	  eff_data_trig_L = SF_SingleLepTrigger->get_EfficiencyData(leptonLV.Pt(), leptonLV.Eta());
-    	  eff_mc_trig_L = SF_SingleLepTrigger->get_EfficiencyData(leptonLV.Pt(), leptonLV.Eta());
+    	  eff_mc_trig_L = SF_SingleLepTrigger->get_EfficiencyMC(leptonLV.Pt(), leptonLV.Eta());
     
     	  otree->idisoweight_1 = SF_lepIdIso->get_ScaleFactor(leptonLV.Pt(), leptonLV.Eta());
     	  otree->idisoweight_antiiso_1 = SF_lepIdIso_antiiso->get_ScaleFactor(leptonLV.Pt(), leptonLV.Eta());
