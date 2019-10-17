@@ -1,8 +1,7 @@
-//----------------------Version 1.0-------------------------//
+//----------------------Version 2.0-------------------------//
 //Plotting Macro for ele -> Tau Fake Rates study
-//Author: Yiwen Wen
+//Author: Yiwen Wen & Andrea Cardini
 //DESY
-//V1.1 ZJ and ZTT template
 //-----------------------------------------------------------//
 #include "DesyTauAnalyses/NTupleMaker/test/HttStylesNew.cc"
 #include "TColor.h"
@@ -19,12 +18,13 @@ void ProduceDatacardInputs_ETauFR(
 				 int nBins = 12,
                                  float xmin = 60,
                                  float xmax = 120,
-                                 bool applyPU = true,
+				 TString Year="2018",
                                  bool passProbe = true,
 				 TString wpIso = "Tight",
                                  bool DeepTau = true
                                  ){
 	
+        bool applyPU = true;
 	TString tauIso = "tauby"+wpIso+"IsolationMVArun2v1DBoldDMwLT";  //Medium wpIso not in the Ntuple for MVA discriminator
  	TString againstMu = "tauagainstMuonLoose3";
 	TString DeepTauString ="MVA";
@@ -93,8 +93,11 @@ using namespace std;
 	  80.95, // (18) SingleTop t antitop
 	  136.02// (19) SingleTop t top
 	};
-	float lumi= 59970;
-	
+	float lumi;
+	if(Year=="2018") lumi = 59970;
+	else if(Year=="2017") lumi = 41860;
+	else if(Year=="2016") lumi = 36773;
+	else exit(EXIT_FAILURE);
 	//float lumi = 41860;
 	
 	TString suffix("");

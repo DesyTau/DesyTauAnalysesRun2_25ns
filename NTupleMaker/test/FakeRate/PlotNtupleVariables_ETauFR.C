@@ -1,9 +1,7 @@
-//----------------------Version 1.1-------------------------//
+//----------------------Version 2.0-------------------------//
 //Plot variables for E -> Tau Fake Rates study
-//Author: Yiwen Wen
+//Author: Yiwen Wen & Andrea Cardini
 //DESY
-//----------------------------------------------------------//
-//v1.1 features: ZJ and ZTT templates
 //----------------------------------------------------------//
 #include <iostream>
 #include <vector>
@@ -32,17 +30,18 @@ void PlotNtupleVariables_ETauFRwithDeepTau(
                                  float xmax = 250,
 				 TString wp = "Medium",
 				 TString wpIso = "Tight",
+				 TString Year="2018",
 				 bool DeepTau = true,
 				 TString MCweight="effweight*mcweight*",
 				 TString Cut="(iso_1<0.1&&mt_1<30)", 
                                  TString ytitle = "Events",
-                                 bool applyPU = true,
                                  bool passProbe = true,
                                  bool logY = false,
                                  bool legLeft = false)
 {  
   const int nSamples = 20;
 
+  bool applyPU = true;
   TString tauIso = "tauby"+wpIso+"IsolationMVArun2v1DBoldDMwLT";
   TString againstMu = "tauagainstMuonLoose3";
   TString DeepTauString ="";
@@ -107,9 +106,12 @@ if(DeepTau>0.5){
         80.95, // (16) SingleTop t antitop
         136.02// (17) SingleTop t top
     };
-    //float lumi= 36773;
-	float lumi= 59970;
-	//float lumi = 41860;
+	float lumi;
+	if(Year=="2018") lumi = 59970;
+	else if(Year=="2017") lumi = 41860;
+	else if(Year=="2016") lumi = 36773;
+	else exit(EXIT_FAILURE);
+
 	//Deal with bins and binning
 	float xMin = xmin;
 	float xMax = xmax;
@@ -530,16 +532,20 @@ if(DeepTau>0.5){
   	leg->Draw();
   	//plotchannel("e#mu");
     //	if (!applyPU) suffix = "_noPU";
+	TString title;
+	if (Year== "2016") DrawTitle(pads[0], "35.9 fb^{-1} (13 TeV, 2016)", 3);
+	if (Year== "2017") DrawTitle(pads[0], "41.9 fb^{-1} (13 TeV, 2017)", 3);
+	if (Year== "2018") DrawTitle(pads[0], "59.9 fb^{-1} (13 TeV, 2018)", 3);
+  	//TLatex * cms = new TLatex(0.20,0.94,"CMS 2018, L = 59.9 fb^{-1} at #sqrt{s} = 13 TeV");
 
-  	TLatex * cms = new TLatex(0.20,0.94,"CMS 2018, L = 59.9 fb^{-1} at #sqrt{s} = 13 TeV");
-
-  	cms->SetNDC();
-  	cms->SetTextSize(0.05);
-  	cms->Draw();
-    TLatex * workinprogress = new TLatex(x1Leg,0.55,"Work in progress");
-    workinprogress->SetNDC();
-    workinprogress->SetTextSize(0.05);
-    workinprogress->Draw();
+  	//cms->SetNDC();
+  	//cms->SetTextSize(0.05);
+  	//cms->Draw();
+	DrawTitle(pads[0], "#scale[1.2]{         #bf{CMS} Work in progress}", 1);
+	//TLatex * workinprogress = new TLatex(x1Leg,0.55,"Work in progress");
+	//workinprogress->SetNDC();
+	//workinprogress->SetTextSize(0.05);
+	//workinprogress->Draw();
     
     
   	if (logY) upper->SetLogy(true);

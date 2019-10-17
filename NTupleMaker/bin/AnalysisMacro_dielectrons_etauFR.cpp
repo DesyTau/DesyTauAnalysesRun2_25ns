@@ -29,8 +29,6 @@
 #include "DesyTauAnalyses/NTupleMaker/interface/functions.h"
 #include "HTT-utilities/LepEffInterface/interface/ScaleFactor.h"
 
-//A macro to perform e->tau fake rate measurement
-
 int main(int argc, char * argv[]) {
 
   // first argument - config file 
@@ -106,7 +104,10 @@ int main(int argc, char * argv[]) {
     //scale factor
     const string EleIdIsoFile = cfg.get<string>("EleIdIsoFile");
     const string EleTriggerFile = cfg.get<string>("EleTriggerFile");
-    
+ 
+    //zptweight file 
+    const string ZptweightFile = cfg.get<string>("ZptweightFile");
+   
     //Tag ele energy scale
     const float tageleScaleBarrel = cfg.get<float>("TagEleScaleBarrel");
     const float tageleScaleEndcap = cfg.get<float>("TagEleScaleEndcap");
@@ -187,6 +188,7 @@ int main(int argc, char * argv[]) {
     Float_t         effweight;
     Float_t         tauidweight;
 
+    Float_t         zptweight;
     
     Int_t           TPmatching_status;
     Int_t           gen_match_1;
@@ -268,6 +270,8 @@ int main(int argc, char * argv[]) {
     eleTree->Branch("isoweight_1", &isoweight_1, "isoweight_1/F");
     eleTree->Branch("effweight", &effweight, "effweight/F");
     eleTree->Branch("tauidweight", &tauidweight, "tauidweight/F");
+
+    eleTree->Branch("zptweight",&zptweight,"zptweight/F");
 
     eleTree->Branch("TPmatching_status",&TPmatching_status,"TPmatching_status/I");
     eleTree->Branch("gen_match_1",&gen_match_1,"gen_match_1/I");
@@ -359,6 +363,11 @@ int main(int argc, char * argv[]) {
     SF_eleIdIso->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(EleIdIsoFile));
     ScaleFactor * SF_eleTrig = new ScaleFactor();
     SF_eleTrig->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(EleTriggerFile));
+
+    // Zpt reweighting for LO DY samples 
+    TFile * f_zptweight = new TFile(TString(cmsswBase)+"/src/"+ZptweightFile,"read");
+    TH2D * h_zptweight = (TH2D*)f_zptweight->Get("zptmass_histo");
+
 
   int nFiles = 0;
   int nEvents = 0;
@@ -877,14 +886,15 @@ int main(int argc, char * argv[]) {
 
 
 			////////////////////////////////////////////////////////////
-			// MET Recoil Corrections
+			// MET Recoil Corrections & Zpt reweighting
 			////////////////////////////////////////////////////////////
 		
 			TLorentzVector genV( 0., 0., 0., 0.);
 			TLorentzVector genL( 0., 0., 0., 0.);
 			njets=analysisTree.pfjet_count;
 			UInt_t njetshad=njets;
- 		
+			zptweight = 1.;
+
 			if (!isData && applyRecoilCorrections && (isDY || isWJets ) ){
 			  genV = genTools::genV(analysisTree);
 			  genL = genTools::genL(analysisTree);
@@ -903,6 +913,27 @@ int main(int argc, char * argv[]) {
 						       );
 			  met=met_rcmr;
 			  metphi=metphi_rcmr;
+
+			  float bosonMass = genV.M();
+			  float bosonPt = genV.Pt();
+			  Float_t zptmassweight = 1;
+			  if (bosonMass>50.0) {
+			    float maxmass = h_zptweight->GetXaxis()->GetXmax();
+			    float maxpt = h_zptweight->GetYaxis()->GetXmax();
+			    float minmass = h_zptweight->GetXaxis()->GetXmin();
+			    float minpt = h_zptweight->GetYaxis()->GetXmin();
+			    float _bosonMass = bosonMass;
+			    float _bosonPt = bosonPt;
+			    if(bosonMass>maxmass) _bosonMass=maxmass;
+			    else if(bosonMass<minmass) _bosonMass=minmass;
+			    if(bosonPt>maxpt) _bosonPt = maxpt;
+			    else if(bosonPt<minpt) _bosonPt = minpt;
+			    zptmassweight = h_zptweight->GetBinContent(h_zptweight->GetXaxis()->FindBin(_bosonMass),
+								       h_zptweight->GetYaxis()->FindBin(_bosonPt));
+			  }
+			  zptweight =zptmassweight;
+
+
 			}
 			TLorentzVector metLV; metLV.SetXYZT(met*TMath::Cos(metphi),
 							    met*TMath::Sin(metphi),
@@ -910,6 +941,8 @@ int main(int argc, char * argv[]) {
 							    TMath::Sqrt( met*TMath::Sin(metphi)*met*TMath::Sin(metphi) +
 									 met*TMath::Cos(metphi)*met*TMath::Cos(metphi)));
 			
+
+
 			/*
                         float dPhiMETEle = dPhiFrom2P(analysisTree.electron_px[index1],analysisTree.electron_py[index1],analysisTree.pfmet_ex,analysisTree.pfmet_ey);
 
