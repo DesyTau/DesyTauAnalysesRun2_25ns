@@ -422,6 +422,7 @@ void  FillHistGenWeights( TTree *_inittree, TH1D* histWeightsH, bool isData){
 
    if (_inittree!=NULL) {
       Float_t genweight;
+      Float_t genweight_;
       if (!isData)
          _inittree->SetBranchAddress("genweight",&genweight);
       Long64_t numberOfEntriesInitTree = _inittree->GetEntries();
@@ -430,8 +431,11 @@ void  FillHistGenWeights( TTree *_inittree, TH1D* histWeightsH, bool isData){
          _inittree->GetEntry(iEntry);
          if (isData)
             histWeightsH->Fill(0.,1.);
-         else
-            histWeightsH->Fill(0.,genweight);
+         else{
+           if (genweight<0) genweight_ = -1;
+           else             genweight_ = 1;
+           histWeightsH->Fill(0.,genweight_);
+         }
       }
    }
 }

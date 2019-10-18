@@ -533,7 +533,7 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
 
   if (year== 2016) DrawTitle(pads[0], "35.9 fb^{-1} (13 TeV, 2016)", 3);
   if (year== 2017) DrawTitle(pads[0], "41.9 fb^{-1} (13 TeV, 2017)", 3);
-  if (year== 2018) DrawTitle(pads[0], "59.7 fb^{-1} (13 TeV, 2018)", 3);
+  if (year== 2018) DrawTitle(pads[0], "59.9 fb^{-1} (13 TeV, 2018)", 3);
   
   DrawTitle(pads[0], "#scale[1.2]{         #bf{CMS} Work in progress}", 1);
   FixBoxPadding(pads[0], legend, 0.05);

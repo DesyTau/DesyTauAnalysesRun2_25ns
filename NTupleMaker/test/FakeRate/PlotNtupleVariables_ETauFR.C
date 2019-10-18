@@ -1,9 +1,7 @@
-//----------------------Version 1.1-------------------------//
+//----------------------Version 2.0-------------------------//
 //Plot variables for E -> Tau Fake Rates study
-//Author: Yiwen Wen
+//Author: Yiwen Wen & Andrea Cardini
 //DESY
-//----------------------------------------------------------//
-//v1.1 features: ZJ and ZTT templates
 //----------------------------------------------------------//
 #include <iostream>
 #include <vector>
@@ -24,36 +22,50 @@
 #include "TColor.h"
 #include "TEfficiency.h"
 #include "TMath.h"
-void PlotNtupleVariables_ETauFR(
+void PlotNtupleVariables_ETauFRwithDeepTau(
                                  TString Variable= "m_vis",
                                  TString xtitle = "visible mass [GeV] ",
                                  int nbins = 30,
                                  float xmin = 0,
                                  float xmax = 250,
 				 TString wp = "Medium",
+				 TString wpIso = "Tight",
+				 TString Year="2018",
+				 bool DeepTau = true,
 				 TString MCweight="effweight*mcweight*",
-				 TString Cut="(iso_1<0.1&&mt_1<30)",
+				 TString Cut="(iso_1<0.1&&mt_1<30)", 
                                  TString ytitle = "Events",
-                                 bool applyPU = true,
                                  bool passProbe = true,
                                  bool logY = false,
                                  bool legLeft = false)
 {  
   const int nSamples = 20;
 
-  TString directory="./etau/wRecoilCorr/";
+  bool applyPU = true;
+  TString tauIso = "tauby"+wpIso+"IsolationMVArun2v1DBoldDMwLT";
+  TString againstMu = "tauagainstMuonLoose3";
+  TString DeepTauString ="";
+
+if(DeepTau>0.5){
+  DeepTauString ="DeepTau";
+  tauIso = "tauby"+wpIso+"DeepTau2017v2VSjet";
+  againstMu = "tauagainstMuLooseDeepTau";
+  }
+  
+
+  TString directory="./";
   TH1::SetDefaultSumw2();
   SetStyle();
     TString samples[nSamples] =
     {
         "EGamma_Run2018",//(0)data
-        "DYJetsToLL_M-50_TuneCP5_13TeV_madgraphMLM_pythia8",// (1)Drell-Yan Z->EE
-        "DYJetsToLL_M-50_TuneCP5_13TeV_madgraphMLM_pythia8", // (2)Drell-Yan ZJ
-        "DYJetsToLL_M-50_TuneCP5_13TeV_madgraphMLM_pythia8", // (3)Drell-Yan ZTT(tau -> lepton)
-        "DYJetsToLL_M-50_TuneCP5_13TeV_madgraphMLM_pythia8", // (4)Drell-Yan ZTT(hadronic tau)
-        "TTTo2L2Nu_TuneCP5_13TeV_powheg_pythia8",//(5)TTbar leptonic
-        "TTToSemiLeptonic_TuneCP5_13TeV_powheg_pythia8",//(6) semileptonic
-        "TTToHadronic_TuneCP5_13TeV_powheg_pythia8",//(7) hadronic
+        "DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8",// (1)Drell-Yan Z->EE
+        "DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8", // (2)Drell-Yan ZJ
+        "DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8", // (3)Drell-Yan ZTT(tau -> lepton)
+        "DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8", // (4)Drell-Yan ZTT(hadronic tau)
+        "TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8",//(5)TTbar leptonic
+        "TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8",//(6) semileptonic
+        "TTToHadronic_TuneCP5_13TeV-powheg-pythia8",//(7) hadronic
         "WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8",// (8)WJets
         "W1JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8",// (8)WJets
         "W2JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8",// (8)WJets
@@ -94,9 +106,12 @@ void PlotNtupleVariables_ETauFR(
         80.95, // (16) SingleTop t antitop
         136.02// (17) SingleTop t top
     };
-    //float lumi= 36773;
-	float lumi= 59970;
-	//float lumi = 41860;
+	float lumi;
+	if(Year=="2018") lumi = 59970;
+	else if(Year=="2017") lumi = 41860;
+	else if(Year=="2016") lumi = 36773;
+	else exit(EXIT_FAILURE);
+
 	//Deal with bins and binning
 	float xMin = xmin;
 	float xMax = xmax;
@@ -114,7 +129,18 @@ void PlotNtupleVariables_ETauFR(
 	TString cutsSS[nSamples];
 	
 	TString qcdweight ="1.06*";
-    
+    	
+	Cut+="*("+againstMu+">0.5&&"+tauIso+">0.5)";
+
+	if (DeepTau){
+		Cut="(DecayModeProbe!=5&&DecayModeProbe!=6)*"+Cut;
+			
+	}else{
+		Cut="(tau_decayModeFinding>0.5)*"+Cut;
+		
+	}	
+				
+
 	for (int i=0; i<nSamples; ++i)
 	{
 	  cuts[i] = MCweight+Cut+"*(os>0.5) ";
@@ -123,12 +149,21 @@ void PlotNtupleVariables_ETauFR(
 	TString ZEEcut    = MCweight+Cut+"* (gen_match_1 == 1 && gen_match_2 == 1) ";
 	TString ZJcut     = MCweight+Cut+"* (gen_match_2 == 6) ";
 	TString ZTT_elcut = MCweight+Cut+"* (gen_match_1 == 3 && (gen_match_2 == 3 || gen_match_2 == 4)) ";
-	TString ZTT_etcut = MCweight+Cut+"* (gen_match_1 == 3 && gen_match_2 == 5) * 0.9";
+	TString ZTT_etcut = MCweight+Cut+"* (gen_match_1 == 3 && gen_match_2 == 5)"; 
+	
+	//1= prompt ele at gen level 2=prompt mu 3= non prompt ele (from tau) 4= non promt mu (from tau) 5= tau at gen level 6= jet
+
+	if (DeepTau){
+		ZTT_etcut += "*0.83";
+	}else{
+		ZTT_etcut += "*0.9";
+	}
+
   	cuts[0] = Cut       +"*(os>0.5)";
 	cuts[1] = ZEEcut    +"*(os>0.5)";
 	cuts[2] = ZJcut     +"*(os>0.5)";
 	cuts[3] = ZTT_elcut +"*(os>0.5)";
-	cuts[4] = ZTT_etcut +"*(os>0.5)";
+	cuts[4] = ZTT_etcut +"* (os>0.5)";
 
     
 	cutsSS[0] = qcdweight+Cut       +"*(os<0.5)";
@@ -137,23 +172,23 @@ void PlotNtupleVariables_ETauFR(
 	cutsSS[3] = qcdweight+ZTT_elcut +"*(os<0.5)";
 	cutsSS[4] = qcdweight+ZTT_etcut +"*(os<0.5)";
 	
-	
+									//actual pass-fail selection
 	if(passProbe)
 	  {
 	    for (int i=0; i<nSamples; ++i)
 	      {
-		cuts[i] ="(tauagainstEle"+wp+">0.5&&taubyTightIsolationMVArun2v1DBoldDMwLT>0.5)*"+cuts[i];
-		cutsSS[i] ="(tauagainstEle"+wp+">0.5&&taubyTightIsolationMVArun2v1DBoldDMwLT>0.5)*"+cutsSS[i];
-	      }
+		cuts[i] ="(tauagainstEle"+wp+DeepTauString+">0.5)*"+cuts[i];
+		cutsSS[i] ="(tauagainstEle"+wp+DeepTauString+">0.5)*"+cutsSS[i];
+		}
 	    
 	  }
 	else
 	  {
 	    for (int i=0; i<nSamples; ++i)
 	      {
-		cuts[i] ="(tauagainstEleLoose<0.5&&taubyTightIsolationMVArun2v1DBoldDMwLT>0.5)*"+cuts[i];
-		cutsSS[i] ="(tauagainstEleLoose<0.5&&taubyTightIsolationMVArun2v1DBoldDMwLT>0.5)*"+cutsSS[i];
-	      }
+		cuts[i] ="(tauagainstEle"+wp+DeepTauString+"<0.5)*"+cuts[i];
+		cutsSS[i] ="(tauagainstEle"+wp+DeepTauString+"<0.5)*"+cutsSS[i];
+		}
 	  }
 	
 	if(applyPU)
@@ -166,7 +201,7 @@ void PlotNtupleVariables_ETauFR(
 	  }
 	
 	for (int i=0; i<nSamples; ++i){
-	  
+	  	cout << directory+samples[i]+".root" << endl;
 	        TFile * file = new TFile(directory+samples[i]+".root");
 		TH1D * histWeightsH = (TH1D*)file->Get("histWeightsH");
 		TTree * tree = (TTree*)file->Get("ETauFR");
@@ -497,16 +532,20 @@ void PlotNtupleVariables_ETauFR(
   	leg->Draw();
   	//plotchannel("e#mu");
     //	if (!applyPU) suffix = "_noPU";
+	TString title;
+	if (Year== "2016") DrawTitle(pads[0], "35.9 fb^{-1} (13 TeV, 2016)", 3);
+	if (Year== "2017") DrawTitle(pads[0], "41.9 fb^{-1} (13 TeV, 2017)", 3);
+	if (Year== "2018") DrawTitle(pads[0], "59.9 fb^{-1} (13 TeV, 2018)", 3);
+  	//TLatex * cms = new TLatex(0.20,0.94,"CMS 2018, L = 59.9 fb^{-1} at #sqrt{s} = 13 TeV");
 
-  	TLatex * cms = new TLatex(0.20,0.94,"CMS L = 59.9 fb^{-1} at #sqrt{s} = 13 TeV");
-
-  	cms->SetNDC();
-  	cms->SetTextSize(0.05);
-  	cms->Draw();
-    TLatex * workinprogress = new TLatex(x1Leg,0.55,"Work in progress");
-    workinprogress->SetNDC();
-    workinprogress->SetTextSize(0.05);
-    workinprogress->Draw();
+  	//cms->SetNDC();
+  	//cms->SetTextSize(0.05);
+  	//cms->Draw();
+	DrawTitle(pads[0], "#scale[1.2]{         #bf{CMS} Work in progress}", 1);
+	//TLatex * workinprogress = new TLatex(x1Leg,0.55,"Work in progress");
+	//workinprogress->SetNDC();
+	//workinprogress->SetTextSize(0.05);
+	//workinprogress->Draw();
     
     
   	if (logY) upper->SetLogy(true);
@@ -600,8 +639,8 @@ void PlotNtupleVariables_ETauFR(
   	canv1->Modified();
   	canv1->cd();
   	canv1->SetSelected(canv1);
-	canv1->Print("./Plots/wRecoilCorr/"+Variable+"_"+wp+".png");
-	canv1->Print("./Plots/wRecoilCorr/"+Variable+"_"+wp+".pdf","Portrait pdf");
+	canv1->Print("./Plots/"+Variable+"_"+wp+DeepTauString+"Iso"+wpIso+".png");
+	canv1->Print("./Plots/"+Variable+"_"+wp+DeepTauString+"Iso"+wpIso+".pdf","Portrait pdf");
 
 
 }

@@ -211,24 +211,33 @@ root -l -b -q 'ProduceDatacardInputs_ETauFR.C("m_vis_reso_scale_down","Gt1p558",
 root -l -b -q 'ProduceDatacardInputs_ETauFR.C("m_vis_reso_scale_down","Gt1p558","VTight",11,60,120,true,true)'
 root -l -b -q 'ProduceDatacardInputs_ETauFR.C("m_vis_reso_scale_down","Gt1p558","VTight",1,60,120,true,false)'
 
+
+hadd ETauFRAgainstEleVVLooseLt1p460.root ./shapes/ETauFRAgainstEleVVLooseLt1p460_*.root
 hadd ETauFRAgainstEleVLooseLt1p460.root ./shapes/ETauFRAgainstEleVLooseLt1p460_*.root
 hadd ETauFRAgainstEleLooseLt1p460.root ./shapes/ETauFRAgainstEleLooseLt1p460_*.root
 hadd ETauFRAgainstEleMediumLt1p460.root ./shapes/ETauFRAgainstEleMediumLt1p460_*.root
 hadd ETauFRAgainstEleTightLt1p460.root ./shapes/ETauFRAgainstEleTightLt1p460_*.root
 hadd ETauFRAgainstEleVTightLt1p460.root ./shapes/ETauFRAgainstEleVTightLt1p460_*.root
+hadd ETauFRAgainstEleVVTightLt1p460.root ./shapes/ETauFRAgainstEleVVTightLt1p460_*.root
+hadd ETauFRAgainstEleVVLooseGt1p558.root ./shapes/ETauFRAgainstEleVVLooseGt1p558_*.root
 hadd ETauFRAgainstEleVLooseGt1p558.root ./shapes/ETauFRAgainstEleVLooseGt1p558_*.root
 hadd ETauFRAgainstEleLooseGt1p558.root ./shapes/ETauFRAgainstEleLooseGt1p558_*.root
 hadd ETauFRAgainstEleMediumGt1p558.root ./shapes/ETauFRAgainstEleMediumGt1p558_*.root
 hadd ETauFRAgainstEleTightGt1p558.root ./shapes/ETauFRAgainstEleTightGt1p558_*.root
 hadd ETauFRAgainstEleVTightGt1p558.root ./shapes/ETauFRAgainstEleVTightGt1p558_*.root
+hadd ETauFRAgainstEleVVTightGt1p558.root ./shapes/ETauFRAgainstEleVVTightGt1p558_*.root
 
+mv ETauFRAgainstEleVVLooseLt1p460.root ./InputHisto_ToBeFitted/.
 mv ETauFRAgainstEleVLooseLt1p460.root ./InputHisto_ToBeFitted/.
 mv ETauFRAgainstEleLooseLt1p460.root ./InputHisto_ToBeFitted/.
 mv ETauFRAgainstEleMediumLt1p460.root ./InputHisto_ToBeFitted/.
 mv ETauFRAgainstEleTightLt1p460.root ./InputHisto_ToBeFitted/.
 mv ETauFRAgainstEleVTightLt1p460.root ./InputHisto_ToBeFitted/.
+mv ETauFRAgainstEleVVTightLt1p460.root ./InputHisto_ToBeFitted/.
+mv ETauFRAgainstEleVVLooseGt1p558.root ./InputHisto_ToBeFitted/.
 mv ETauFRAgainstEleVLooseGt1p558.root ./InputHisto_ToBeFitted/.
 mv ETauFRAgainstEleLooseGt1p558.root ./InputHisto_ToBeFitted/.
 mv ETauFRAgainstEleMediumGt1p558.root ./InputHisto_ToBeFitted/.
 mv ETauFRAgainstEleTightGt1p558.root ./InputHisto_ToBeFitted/.
 mv ETauFRAgainstEleVTightGt1p558.root ./InputHisto_ToBeFitted/.
+mv ETauFRAgainstEleVVTightGt1p558.root ./InputHisto_ToBeFitted/.
