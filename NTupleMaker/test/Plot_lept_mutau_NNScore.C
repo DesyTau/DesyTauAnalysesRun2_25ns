@@ -9,7 +9,7 @@ void   Plot_lept_mutau_NNScore(TString directory = "HtautauCP_mutau/Outputs/NTup
 			       TString outputDir = "./Plots/",
 			       int year=2017,
 			       bool FFmethod = true,  
-			       bool LargeScale = true,  
+			       bool LargeScale = false,  
 			       bool logY = false,
 			       bool showSignal = true,
 			       bool compareCP = false,
@@ -19,6 +19,27 @@ void   Plot_lept_mutau_NNScore(TString directory = "HtautauCP_mutau/Outputs/NTup
 			       )
 {
   
+  for(int categoryIndex=0;categoryIndex<2;categoryIndex++){
+    Plot_lept_mutau_NNNTuples("predicted_prob:acotautau_00",
+			      "#phi_{CP}",
+			      5,0.,2*TMath::Pi(),
+			      "xsec_lumi_weight*puweight*effweight*mcweight*",
+			      "(mt_1<50)*(tau_decay_mode_2==0)*",
+			      "Events",
+			      categoryIndex,
+			      directory,
+			      outputDir,
+			      year,
+			      FFmethod,  
+			      true,  
+			      true,
+			      showSignal,
+			      compareCP,
+			      scaleSignal,
+			      blindData,
+			      FORCE
+			      );
+  }
   for(int categoryIndex=0;categoryIndex<2;categoryIndex++){
     Plot_lept_mutau_NNNTuples("predicted_prob:acotautau_01",
 			      "#phi_{CP}",
@@ -31,7 +52,7 @@ void   Plot_lept_mutau_NNScore(TString directory = "HtautauCP_mutau/Outputs/NTup
 			      outputDir,
 			      year,
 			      FFmethod,  
-			      LargeScale,  
+			      true,  
 			      true,
 			      showSignal,
 			      compareCP,
@@ -42,9 +63,16 @@ void   Plot_lept_mutau_NNScore(TString directory = "HtautauCP_mutau/Outputs/NTup
   }
 
   bool _logY = false;
+  bool _largeScale = false;
   for(int categoryIndex=0;categoryIndex<8;categoryIndex++){
-    if(categoryIndex<2) _logY=true;
-    else _logY=logY;
+    if(categoryIndex<2){
+      _logY=true;
+      _largeScale=true;
+    }
+    else {
+      _logY=logY;
+      _largeScale=LargeScale;
+    }
     Plot_lept_mutau_NNNTuples("predicted_prob",
 			      "NN Score",
 			      10,0.,1.,
@@ -56,7 +84,7 @@ void   Plot_lept_mutau_NNScore(TString directory = "HtautauCP_mutau/Outputs/NTup
 			      outputDir,
 			      year,
 			      FFmethod,  
-			      LargeScale,  
+			      _largeScale,  
 			      _logY,
 			      showSignal,
 			      compareCP,
