@@ -6,6 +6,7 @@ dirST=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2017/mc_v3
 dirW=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2017/mc_v3
 dirVV=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2017/mc_v3
 dirCPsignals=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2017/mc_v3
+dirSUSY_old=/nfs/dust/cms/user/cardinia/gridjobs/NTuples/2017/MC/RunIIFall17
 
 ls $dirDY/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/*root > DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8
 ls $dirDY/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8_ext1/*root >> DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8
@@ -42,10 +43,14 @@ ls $dirVV/ZZ_TuneCP5_13TeV-pythia8/*root > ZZ_TuneCP5_13TeV-pythia8
 ls $dirCPsignals/GluGluHToTauTau_M125_13TeV_powheg_pythia8/*root > GluGluHToTauTau_M125_13TeV_powheg_pythia8
 ls $dirCPsignals/GluGluHToTauTau_M125_13TeV_powheg_pythia8_ext1/*root >> GluGluHToTauTau_M125_13TeV_powheg_pythia8
 ls $dirCPsignals/VBFHToTauTau_M125_13TeV_powheg_pythia8/*root > VBFHToTauTau_M125_13TeV_powheg_pythia8
-# ls $dirCPsignals/SUSYGluGluToHToTauTau_M-130_TuneCP5_13TeV-pythia8/*root > SUSYGluGluToHToTauTau_M-120_TuneCP5_13TeV-pythia8
-# ls $dirCPsignals/SUSYGluGluToHToTauTau_M-120_TuneCP5_13TeV-pythia8/*root >> SUSYGluGluToHToTauTau_M-120_TuneCP5_13TeV-pythia8
-# ls $dirCPsignals/SUSYGluGluToBBHToTauTau_M-130_TuneCP5_13TeV-pythia8/*root >> SUSYGluGluToHToTauTau_M-120_TuneCP5_13TeV-pythia8
-# ls $dirCPsignals/SUSYGluGluToBBHToTauTau_M-120_TuneCP5_13TeV-pythia8/*root >> SUSYGluGluToHToTauTau_M-120_TuneCP5_13TeV-pythia8
+ls $dirCPsignals/SUSYGluGluToHToTauTau_M-130_TuneCUETP8M1_13TeV-pythia8/*root > SUSYGluGluToHToTauTau_M-120_TuneCUETP8M1_13TeV-pythia8
+ls $dirCPsignals/SUSYGluGluToHToTauTau_M-120_TuneCUETP8M1_13TeV-pythia8/*root >> SUSYGluGluToHToTauTau_M-120_TuneCUETP8M1_13TeV-pythia8
+ls $dirCPsignals/SUSYGluGluToBBHToTauTau_M-130_TuneCUETP8M1_13TeV-pythia8/*root >> SUSYGluGluToHToTauTau_M-120_TuneCUETP8M1_13TeV-pythia8
+ls $dirCPsignals/SUSYGluGluToBBHToTauTau_M-120_TuneCUETP8M1_13TeV-pythia8/*root >> SUSYGluGluToHToTauTau_M-120_TuneCUETP8M1_13TeV-pythia8
+ls $dirSUSY_old/SUSYGluGluToHToTauTau_M-130_TuneCP5_13TeV-pythia8/*root > SUSYGluGluToHToTauTau_M-120_TuneCP5_13TeV-pythia8
+ls $dirSUSY_old/SUSYGluGluToHToTauTau_M-120_TuneCP5_13TeV-pythia8/*root >> SUSYGluGluToHToTauTau_M-120_TuneCP5_13TeV-pythia8
+ls $dirSUSY_old/SUSYGluGluToBBHToTauTau_M-130_TuneCP5_13TeV-pythia8/*root >> SUSYGluGluToHToTauTau_M-120_TuneCP5_13TeV-pythia8
+ls $dirSUSY_old/SUSYGluGluToBBHToTauTau_M-120_TuneCP5_13TeV-pythia8/*root >> SUSYGluGluToHToTauTau_M-120_TuneCP5_13TeV-pythia8
 
 ls $dirDataSingleMuon/SingleMuon_Run2017B-31Mar2018-v1/*root > SingleMuon_Run2017B
 ls $dirDataSingleMuon/SingleMuon_Run2017C-31Mar2018-v1/*root > SingleMuon_Run2017C

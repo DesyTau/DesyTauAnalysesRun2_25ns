@@ -628,11 +628,11 @@ int main(int argc, char * argv[]){
         if (fabs(analysisTree.tau_eta[it]) >= etaTauCut) continue;
         if (fabs(analysisTree.tau_leadchargedhadrcand_dz[it]) >= dzTauCut) continue;
         if (fabs(fabs(analysisTree.tau_charge[it]) - 1) > 0.001) continue;
-    
+
       	if (analysisTree.tau_byVVVLooseDeepTau2017v2p1VSjet[it] < 0.5) continue;
       	if (analysisTree.tau_byVVVLooseDeepTau2017v2p1VSe[it] < 0.5) continue;
       	if (analysisTree.tau_byVLooseDeepTau2017v2p1VSmu[it] < 0.5) continue;
-    
+  
         if (analysisTree.tau_decayModeFindingNewDMs[it] < 0.5) continue; //always true, cut applied in NTupleMaker
         if (analysisTree.tau_decayMode[it] == 5 || analysisTree.tau_decayMode[it] == 6) continue;
     

@@ -308,41 +308,39 @@ float abs_Iso_et (int Index, const AC1B * analysisTree, float dRiso){
 //returns the dilepton veto for mt channel
 bool dilepton_veto_mt(const Config *cfg,const  AC1B *analysisTree){
 
-  for (unsigned int im = 0; im<analysisTree->muon_count; ++im) {
-
-    if (analysisTree->muon_pt[im]<=cfg->get<float>("ptDiMuonVeto")) continue;
-    if (fabs(analysisTree->muon_eta[im])>=cfg->get<float>("etaDiMuonVeto")) continue;	
-		
-    if (fabs(analysisTree->muon_dxy[im])>=cfg->get<float>("dxyDiMuonVeto")) continue;
-    if (fabs(analysisTree->muon_dz[im])>=cfg->get<float>("dzDiMuonVeto")) continue;
-
-    float relIsoMu = (abs_Iso_mt(im, analysisTree, cfg->get<float>("dRiso")) / analysisTree->muon_pt[im]);
-    if(relIsoMu >= cfg->get<float>("isoDiMuonVeto")) continue;
-		
-    //bool passedVetoId = isICHEPmed(im, analysisTree);
-    //if (!passedVetoId && cfg->get<bool>("applyDiMuonVetoId")) continue;
-    if ( !(analysisTree->muon_isGlobal[im] && analysisTree->muon_isTracker[im] && analysisTree->muon_isPF[im]) ) continue;
+  for (unsigned int im = 0; im < analysisTree->muon_count; ++im) {
     
-    for (unsigned int je = im+1; je<analysisTree->muon_count; ++je) {
-      
-      if (analysisTree->muon_pt[je]<=cfg->get<float>("ptDiMuonVeto")) continue;
-      if (fabs(analysisTree->muon_eta[je])>=cfg->get<float>("etaDiMuonVeto")) continue;	
-		  
-      if (fabs(analysisTree->muon_dxy[je])>=cfg->get<float>("dxyDiMuonVeto")) continue;
-      if (fabs(analysisTree->muon_dz[je])>=cfg->get<float>("dzDiMuonVeto")) continue;
-		  
-      if (analysisTree->muon_charge[im] * analysisTree->muon_charge[je] > 0. && cfg->get<bool>("applyDiMuonOS")) continue;
+    float ptDiMuonVeto = cfg->get<float>("ptDiMuonVeto");
+    float etaDiMuonVeto = cfg->get<float>("etaDiMuonVeto");
+    float dxyDiMuonVeto = cfg->get<float>("dxyDiMuonVeto");
+    float dzDiMuonVeto = cfg->get<float>("dzDiMuonVeto");
+    float isoDiMuonVeto = cfg->get<float>("isoDiMuonVeto");
+    float dRiso = cfg->get<float>("dRiso");
+    float applyDiMuonOS = cfg->get<bool>("applyDiMuonOS");
+    float drDiMuonVeto = cfg->get<float>("drDiMuonVeto");
+    
+    if (analysisTree->muon_pt[im] <= ptDiMuonVeto) continue;
+    if (fabs(analysisTree->muon_eta[im]) >= etaDiMuonVeto) continue;	
+    if (fabs(analysisTree->muon_dxy[im]) >= dxyDiMuonVeto) continue;
+    if (fabs(analysisTree->muon_dz[im]) >= dzDiMuonVeto) continue;
 
-      float relIsoMu = 	(abs_Iso_mt(je, analysisTree, cfg->get<float>("dRiso")) / analysisTree->muon_pt[je]);
-      if(relIsoMu >= cfg->get<float>("isoDiMuonVeto")) continue;	
+    float relIsoMu = abs_Iso_mt(im, analysisTree, dRiso) / analysisTree->muon_pt[im];
+    if(relIsoMu >= isoDiMuonVeto) continue;
+		    if ( !(analysisTree->muon_isGlobal[im] && analysisTree->muon_isTracker[im] && analysisTree->muon_isPF[im]) ) continue;
+    
+    for (unsigned int je = im + 1; je < analysisTree->muon_count; ++je) {  
+      if (analysisTree->muon_pt[je] <= ptDiMuonVeto) continue;
+      if (fabs(analysisTree->muon_eta[je]) >= etaDiMuonVeto) continue;	
+      if (fabs(analysisTree->muon_dxy[je]) >= dxyDiMuonVeto) continue;
+      if (fabs(analysisTree->muon_dz[je]) >= dzDiMuonVeto) continue;
+      if (analysisTree->muon_charge[im] * analysisTree->muon_charge[je] > 0. && applyDiMuonOS) continue;
 
-      //passedVetoId = isICHEPmed(je, analysisTree);
-      //if (!passedVetoId && cfg->get<bool>("applyDiMuonVetoId")) continue;
+      float relIsoMu = abs_Iso_mt(je, analysisTree, dRiso) / analysisTree->muon_pt[je];
+      if(relIsoMu >= isoDiMuonVeto) continue;	
       if ( ! (analysisTree->muon_isGlobal[je] && analysisTree->muon_isTracker[je] && analysisTree->muon_isPF[je]) ) continue;
 		  
-      float dr = deltaR(analysisTree->muon_eta[im],analysisTree->muon_phi[im],analysisTree->muon_eta[je],analysisTree->muon_phi[je]);
-
-      if(dr<=cfg->get<float>("drDiMuonVeto")) continue;
+      float dR = deltaR(analysisTree->muon_eta[im], analysisTree->muon_phi[im], analysisTree->muon_eta[je], analysisTree->muon_phi[je]);
+      if(dR <= drDiMuonVeto) continue;
 
       return(1);
     }
@@ -399,37 +397,40 @@ bool dilepton_veto_et(const Config *cfg,const  AC1B *analysisTree){
 
 //returns the extra electron veto
 bool extra_electron_veto(int leptonIndex, TString ch, const Config *cfg, const AC1B *analysisTree){
+  for (unsigned int ie = 0; ie < analysisTree->electron_count; ++ie) {
+    
+    float ptVetoElectronCut = cfg->get<float>("ptVetoElectronCut");
+    float etaVetoElectronCut = cfg->get<float>("etaVetoElectronCut");
+    float dxyVetoElectronCut = cfg->get<float>("dxyVetoElectronCut");
+    float dzVetoElectronCut = cfg->get<float>("dzVetoElectronCut");
+    float applyVetoElectronId = cfg->get<bool>("applyVetoElectronId");
+    float dRisoExtraElecVeto = cfg->get<float>("dRisoExtraElecVeto");
+    float isoVetoElectronCut = cfg->get<float>("isoVetoElectronCut");
 
-  for (unsigned int ie = 0; ie<analysisTree->electron_count; ++ie) {
+    if (ch == "et" && int(ie) == leptonIndex) continue;
+    if (analysisTree->electron_pt[ie] <= ptVetoElectronCut) continue;
+    if (fabs(analysisTree->electron_eta[ie]) >= etaVetoElectronCut) continue;
+    if (fabs(analysisTree->electron_dxy[ie]) >= dxyVetoElectronCut) continue;
+    if (fabs(analysisTree->electron_dz[ie]) >= dzVetoElectronCut) continue;
 
-    if (ch=="et") {if (int(ie)==leptonIndex) continue;}
-
-    if (analysisTree->electron_pt[ie]<=cfg->get<float>("ptVetoElectronCut")) continue;
-    if (fabs(analysisTree->electron_eta[ie])>=cfg->get<float>("etaVetoElectronCut")) continue;
-    if (fabs(analysisTree->electron_dxy[ie])>=cfg->get<float>("dxyVetoElectronCut")) continue;
-    if (fabs(analysisTree->electron_dz[ie])>=cfg->get<float>("dzVetoElectronCut")) continue;
-
-    int era=cfg->get<int>("era");
+    int era = cfg->get<int>("era");
     bool electronMvaId;
 
-     if (era==2016) {
-         electronMvaId = analysisTree->electron_mva_wp90_general_Spring16_v1[ie]>0.5; 
-      }
-      else if (era ==2017){
-         electronMvaId = analysisTree->electron_mva_wp90_noIso_Fall17_v1[ie]>0.5;
-      }
-      else if (era == 2018){
-         electronMvaId = analysisTree->electron_mva_wp90_noIso_Fall17_v1[ie]>0.5;
-      }
+     if (era == 2016)
+       electronMvaId = analysisTree->electron_mva_wp90_general_Spring16_v1[ie] > 0.5; 
+      else if (era == 2017)
+       electronMvaId = analysisTree->electron_mva_wp90_noIso_Fall17_v1[ie] > 0.5;
+      else if (era == 2018)
+       electronMvaId = analysisTree->electron_mva_wp90_noIso_Fall17_v1[ie] > 0.5;
 
-     if (!electronMvaId && cfg->get<bool>("applyVetoElectronId")) continue;
+     if (!electronMvaId && applyVetoElectronId) continue;
 
     /* Merijn 2019 8 20: in the analysis note this is NOT mentioned for the mt channel, but it is mentioned in the twiki on legacy data. We keep it in */
-    if (!analysisTree->electron_pass_conversion[ie] && cfg->get<bool>("applyVetoElectronId")) continue;
-    if (analysisTree->electron_nmissinginnerhits[ie]>1 && cfg->get<bool>("applyVetoElectronId")) continue;
+    if (!analysisTree->electron_pass_conversion[ie] && applyVetoElectronId) continue;
+    if (analysisTree->electron_nmissinginnerhits[ie] > 1 && applyVetoElectronId) continue;
 
-    float relIsoEle = abs_Iso_et(ie, analysisTree, cfg->get<float>("dRisoExtraElecVeto")) / analysisTree->electron_pt[ie];
-    if (relIsoEle>=cfg->get<float>("isoVetoElectronCut")) continue;
+    float relIsoEle = abs_Iso_et(ie, analysisTree, dRisoExtraElecVeto) / analysisTree->electron_pt[ie];
+    if (relIsoEle >= isoVetoElectronCut) continue;
 
     return(1);		
   }
@@ -438,19 +439,24 @@ bool extra_electron_veto(int leptonIndex, TString ch, const Config *cfg, const A
 
 //returns the extra muon veto
 bool extra_muon_veto(int leptonIndex, TString ch, const Config *cfg, const AC1B *analysisTree, bool isData){
+  for (unsigned int im = 0; im < analysisTree->muon_count; ++im) {
+    float ptVetoMuonCut = cfg->get<float>("ptVetoMuonCut");
+    float etaVetoMuonCut = cfg->get<float>("etaVetoMuonCut");
+    float dxyVetoMuonCut = cfg->get<float>("dxyVetoMuonCut");
+    float dzVetoMuonCut = cfg->get<float>("dzVetoMuonCut");
+    float applyVetoMuonId = cfg->get<bool>("applyVetoMuonId");
+    float dRisoExtraMuonVeto = cfg->get<float>("dRisoExtraMuonVeto");
+    float isoVetoMuonCut = cfg->get<float>("isoVetoMuonCut");
+    
+    if (ch == "mt" && int(im) == leptonIndex) continue;
+    if (analysisTree->muon_pt[im] <= ptVetoMuonCut) continue;
+    if (fabs(analysisTree->muon_eta[im]) >= etaVetoMuonCut) continue;
+    if (fabs(analysisTree->muon_dxy[im]) >= dxyVetoMuonCut) continue;
+    if (fabs(analysisTree->muon_dz[im]) >= dzVetoMuonCut) continue;
 
-  for (unsigned int im = 0; im<analysisTree->muon_count; ++im) {
-
-    if (ch=="mt") {if (int(im)==leptonIndex) continue;}
-
-    if (analysisTree->muon_pt[im]<cfg->get<float>("ptVetoMuonCut")) continue;
-    if (fabs(analysisTree->muon_eta[im])>cfg->get<float>("etaVetoMuonCut")) continue;
-    if (fabs(analysisTree->muon_dxy[im])>cfg->get<float>("dxyVetoMuonCut")) continue;
-    if (fabs(analysisTree->muon_dz[im])>cfg->get<float>("dzVetoMuonCut")) continue;
-
-    if (cfg->get<bool>("applyVetoMuonId") && !(isIdentifiedMediumMuon(im,analysisTree,isData)) ) continue;
-    float relIsoMu = abs_Iso_mt(im, analysisTree, cfg->get<float>("dRisoExtraMuonVeto")) / analysisTree->muon_pt[im];
-    if (relIsoMu>cfg->get<float>("isoVetoMuonCut")) continue;
+    if (applyVetoMuonId && !(isIdentifiedMediumMuon(im, analysisTree, isData)) ) continue;
+    float relIsoMu = abs_Iso_mt(im, analysisTree, dRisoExtraMuonVeto) / analysisTree->muon_pt[im];
+    if (relIsoMu >= isoVetoMuonCut) continue;
 
     return(1);
   }
