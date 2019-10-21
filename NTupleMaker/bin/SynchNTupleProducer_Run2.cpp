@@ -923,7 +923,7 @@ int main(int argc, char * argv[]){
       jets::counting_jets(&analysisTree, otree, &cfg, &inputs_btag_scaling_medium);
       //MET
       //Merijn 2019 6 20: overloaded the function, it takes the era as arugment now, to take pfmetcorr for 2016 and 2017..
-      fillMET(ch, leptonIndex, tauIndex, &analysisTree, otree, era);
+      fillMET(&analysisTree, otree, era);
       
       TLorentzVector genV( 0., 0., 0., 0.);
       TLorentzVector genL( 0., 0., 0., 0.);
@@ -1009,10 +1009,13 @@ int main(int argc, char * argv[]){
   				     analysisTree.tau_mass[tauIndex]);
     
       // using PF MET
-      TLorentzVector metLV; 
+      TLorentzVector metLV, puppimetLV; 
       metLV.SetXYZT(otree->met*TMath::Cos(otree->metphi), otree->met*TMath::Sin(otree->metphi), 0,
                     TMath::Sqrt( otree->met*TMath::Sin(otree->metphi)*otree->met*TMath::Sin(otree->metphi) +
   			               otree->met*TMath::Cos(otree->metphi)*otree->met*TMath::Cos(otree->metphi)));
+      puppimetLV.SetXYZT(otree->puppimet*TMath::Cos(otree->puppimetphi), otree->puppimet*TMath::Sin(otree->puppimetphi), 0,
+                    TMath::Sqrt( otree->puppimet*TMath::Sin(otree->puppimetphi)*otree->puppimet*TMath::Sin(otree->puppimetphi) +
+  			               otree->puppimet*TMath::Cos(otree->puppimetphi)*otree->puppimet*TMath::Cos(otree->puppimetphi)));
     
     
       // shift the tau energy scale by decay mode and propagate to the met. 
@@ -1074,6 +1077,8 @@ int main(int argc, char * argv[]){
     
       otree->mt_1 = mT(leptonLV, metLV);
       otree->mt_2 = mT(tauLV, metLV);
+      otree->puppimt_1 = mT(leptonLV, puppimetLV);
+      otree->puppimt_2 = mT(tauLV, puppimetLV);
     
       // bisector of lepton and tau transverse momenta
     
@@ -1096,6 +1101,7 @@ int main(int argc, char * argv[]){
     
       otree->pzetavis  = vectorVisX*zetaX + vectorVisY*zetaY;
       otree->pzetamiss = otree->met*TMath::Cos(otree->metphi)*zetaX + otree->met*TMath::Sin(otree->metphi)*zetaY;
+      otree->puppipzetamiss = otree->puppimet*TMath::Cos(otree->puppimetphi)*zetaX + otree->puppimet*TMath::Sin(otree->puppimetphi)*zetaY;
       counter[14]++;
     
       // svfit variables

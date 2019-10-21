@@ -1222,7 +1222,7 @@ for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) {
       jets::counting_jets(&analysisTree, otree, &cfg, &inputs_btag_scaling_medium);
       //MET
 	//Merijn 2019 6 20: overloaded the function, it takes the era as arugment now, to take pfmetcorr for 2016 and 2017..
-      fillMET(ch, leptonIndex, tauIndex, &analysisTree, otree,cfg.get<int>("era"));
+      fillMET(&analysisTree, otree,cfg.get<int>("era"));
      
       TLorentzVector genV( 0., 0., 0., 0.);
       TLorentzVector genL( 0., 0., 0., 0.);

@@ -80,6 +80,7 @@ void Synch17Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("d0err_1", &d0err_1, &b_d0err_1);
    fChain->SetBranchAddress("dZerr_1", &dZerr_1, &b_dZerr_1);
    fChain->SetBranchAddress("mt_1", &mt_1, &b_mt_1);
+   fChain->SetBranchAddress("puppimt_1", &puppimt_1, &b_puppimt_1);
    fChain->SetBranchAddress("tau_decay_mode_1", &tau_decay_mode_1, &b_tau_decay_mode_1); 
    fChain->SetBranchAddress("pt_2", &pt_2, &b_pt_2);
    fChain->SetBranchAddress("phi_2", &phi_2, &b_phi_2);
@@ -100,6 +101,7 @@ void Synch17Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("d0err_2", &d0err_2, &b_d0err_2);
    fChain->SetBranchAddress("dZerr_2", &dZerr_2, &b_dZerr_2);
    fChain->SetBranchAddress("mt_2", &mt_2, &b_mt_2);
+   fChain->SetBranchAddress("puppimt_2", &puppimt_2, &b_puppimt_2);
    fChain->SetBranchAddress("tau_decay_mode_2", &tau_decay_mode_2, &b_tau_decay_mode_2); 
    
    fChain->SetBranchAddress("trigweight_1", &trigweight_1, &b_trigweight_1);
@@ -251,6 +253,17 @@ void Synch17Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("metcov11", &metcov11, &b_metcov11);
    fChain->SetBranchAddress("pzetavis", &pzetavis, &b_pzetavis);
    fChain->SetBranchAddress("pzetamiss", &pzetamiss, &b_pzetamiss);
+   
+   //PUPPI MET
+   fChain->SetBranchAddress("puppimet", &puppimet, &b_puppimet);
+   fChain->SetBranchAddress("puppimetphi", &puppimetphi, &b_puppimetphi);
+   fChain->SetBranchAddress("puppimet_rcmr", &puppimet_rcmr, &b_puppimet_rcmr);
+   fChain->SetBranchAddress("puppimetphi_rcmr", &puppimetphi_rcmr, &b_puppimetphi_rcmr);
+   fChain->SetBranchAddress("puppimetcov00", &puppimetcov00, &b_puppimetcov00);
+   fChain->SetBranchAddress("puppimetcov01", &puppimetcov01, &b_puppimetcov01);
+   fChain->SetBranchAddress("puppimetcov10", &puppimetcov10, &b_puppimetcov10);
+   fChain->SetBranchAddress("puppimetcov11", &puppimetcov11, &b_puppimetcov11);
+   fChain->SetBranchAddress("puppipzetamiss", &puppipzetamiss, &b_puppipzetamiss);
    
    //di tau system
    fChain->SetBranchAddress("pt_tt", &pt_tt, &b_pt_tt);
@@ -476,6 +489,7 @@ void Synch17Tree::WriteInit(TTree *tree) {
    fChain->Branch("d0err_1", &d0err_1, "d0err_1/F");
    fChain->Branch("dZerr_1", &dZerr_1, "dZerr_1/F");
    fChain->Branch("mt_1", &mt_1, "mt_1/F");
+   fChain->Branch("puppimt_1", &puppimt_1, "puppimt_1/F");
    fChain->Branch("tau_decay_mode_1", &tau_decay_mode_1, "tau_decay_mode_1/I"); 
    fChain->Branch("pt_2", &pt_2, "pt_2/F");
    fChain->Branch("phi_2", &phi_2, "phi_2/F");
@@ -496,6 +510,7 @@ void Synch17Tree::WriteInit(TTree *tree) {
    fChain->Branch("d0err_2", &d0err_2, "d0err_2/F");
    fChain->Branch("dZerr_2", &dZerr_2, "dZerr_2/F");
    fChain->Branch("mt_2", &mt_2, "mt_2/F");
+   fChain->Branch("puppimt_2", &puppimt_2, "puppimt_2/F");
    fChain->Branch("tau_decay_mode_2", &tau_decay_mode_2, "tau_decay_mode_2/I"); 
    
    fChain->Branch("againstElectronVLooseMVA6_1", &againstElectronVLooseMVA6_1, "againstElectronVLooseMVA6_1/F");
@@ -646,6 +661,17 @@ void Synch17Tree::WriteInit(TTree *tree) {
    fChain->Branch("metcov11", &metcov11, "metcov11/F");
    fChain->Branch("pzetavis", &pzetavis, "pzetavis/F");
    fChain->Branch("pzetamiss", &pzetamiss, "pzetamiss/F");
+
+   //PUPPI MET
+   fChain->Branch("puppimet", &puppimet, "puppimet/F");
+   fChain->Branch("puppimetphi", &puppimetphi, "puppimetphi/F");
+   fChain->Branch("puppimet_rcmr", &puppimet_rcmr, "puppimet_rcmr/F");
+   fChain->Branch("puppimetphi_rcmr", &puppimetphi_rcmr, "puppimetphi_rcmr/F");
+   fChain->Branch("puppimetcov00", &puppimetcov00, "puppimetcov00/F");
+   fChain->Branch("puppimetcov01", &puppimetcov01, "puppimetcov01/F");
+   fChain->Branch("puppimetcov10", &puppimetcov10, "puppimetcov10/F");
+   fChain->Branch("puppimetcov11", &puppimetcov11, "puppimetcov11/F");
+   fChain->Branch("puppipzetamiss", &puppipzetamiss, "puppipzetamiss/F");
    
    //di tau system
    fChain->Branch("pt_tt", &pt_tt, "pt_tt/F");

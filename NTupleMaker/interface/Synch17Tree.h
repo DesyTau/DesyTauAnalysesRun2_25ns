@@ -49,6 +49,7 @@ public :
   Float_t         d0err_1;
   Float_t         dZerr_1;
   Float_t         mt_1;
+  Float_t         puppimt_1;
   Int_t 	  tau_decay_mode_1;
   Float_t         pt_2;
   Float_t         phi_2;
@@ -67,6 +68,7 @@ public :
   Float_t         d0err_2;
   Float_t         dZerr_2;
   Float_t         mt_2;
+  Float_t         puppimt_2;
   Int_t 	  tau_decay_mode_2;
 
   //TO FIX
@@ -222,6 +224,17 @@ public :
   Float_t         pzetavis;
   Float_t         pzetamiss;
 
+  //PUPPI MET
+  Float_t         puppimet;
+  Float_t         puppimetphi;  
+  Float_t         puppimet_rcmr;
+  Float_t         puppimetphi_rcmr;  
+  Float_t         puppimetcov00;
+  Float_t         puppimetcov01;
+  Float_t         puppimetcov10;
+  Float_t         puppimetcov11;
+  Float_t         puppipzetamiss;
+
   //di tau system
   Float_t         pt_tt;
   Float_t         m_vis;
@@ -374,6 +387,7 @@ public :
   TBranch	 *b_d0err_1;
   TBranch	 *b_dZerr_1;
   TBranch	 *b_mt_1;
+  TBranch	 *b_puppimt_1;
   TBranch        *b_tau_decay_mode_1;
   TBranch	 *b_pt_2;
   TBranch	 *b_phi_2;
@@ -392,6 +406,7 @@ public :
   TBranch	 *b_d0err_2;
   TBranch	 *b_dZerr_2;
   TBranch	 *b_mt_2;
+  TBranch	 *b_puppimt_2;
   TBranch        *b_tau_decay_mode_2;
 
   //TO FIX
@@ -546,6 +561,17 @@ public :
   TBranch	 *b_metcov11;
   TBranch	 *b_pzetavis;
   TBranch	 *b_pzetamiss;
+
+  //PUPPI MET
+  TBranch	 *b_puppimet;
+  TBranch	 *b_puppimetphi;
+  TBranch	 *b_puppimet_rcmr;
+  TBranch	 *b_puppimetphi_rcmr;  
+  TBranch	 *b_puppimetcov00;
+  TBranch	 *b_puppimetcov01;
+  TBranch	 *b_puppimetcov10;
+  TBranch	 *b_puppimetcov11;
+  TBranch	 *b_puppipzetamiss;
 
   //di tau system
   TBranch	 *b_pt_tt;

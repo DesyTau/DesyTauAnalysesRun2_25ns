@@ -486,38 +486,32 @@ void fillMET(TString ch, int leptonIndex, int tauIndex, const AC1B * analysisTre
 }
 
 //Merijn 2019 6 20: added overloaded function, takes era as argument. Will do MET correct for 2016 2017, will need later to extend to 2018
-void fillMET(TString ch, int leptonIndex, int tauIndex, const AC1B * analysisTree, Synch17Tree *otree, int era){
+void fillMET(const AC1B * analysisTree, Synch17Tree *otree, int era){
 
    // pfmet variables
-  if(era==2018){
-  otree->met = TMath::Sqrt(analysisTree->pfmet_ex*analysisTree->pfmet_ex + analysisTree->pfmet_ey*analysisTree->pfmet_ey);
-  otree->metphi = TMath::ATan2(analysisTree->pfmet_ey,analysisTree->pfmet_ex);
-  otree->metcov00 = analysisTree->pfmet_sigxx;
-  otree->metcov01 = analysisTree->pfmet_sigxy;
-  otree->metcov10 = analysisTree->pfmet_sigyx;
-  otree->metcov11 = analysisTree->pfmet_sigyy;
-  float met_x = analysisTree->pfmet_ex;
-  float met_y = analysisTree->pfmet_ey;
+  if(era == 2018){
+    otree->met = TMath::Sqrt(analysisTree->pfmet_ex*analysisTree->pfmet_ex + analysisTree->pfmet_ey*analysisTree->pfmet_ey);
+    otree->metphi = TMath::ATan2(analysisTree->pfmet_ey,analysisTree->pfmet_ex);
+    otree->metcov00 = analysisTree->pfmet_sigxx;
+    otree->metcov01 = analysisTree->pfmet_sigxy;
+    otree->metcov10 = analysisTree->pfmet_sigyx;
+    otree->metcov11 = analysisTree->pfmet_sigyy;
+  }
+  else{
+    otree->met = TMath::Sqrt(analysisTree->pfmetcorr_ex*analysisTree->pfmetcorr_ex + analysisTree->pfmetcorr_ey*analysisTree->pfmetcorr_ey);
+    otree->metphi = TMath::ATan2(analysisTree->pfmetcorr_ey,analysisTree->pfmetcorr_ex);
+    otree->metcov00 = analysisTree->pfmetcorr_sigxx;
+    otree->metcov01 = analysisTree->pfmetcorr_sigxy;
+    otree->metcov10 = analysisTree->pfmetcorr_sigyx;
+    otree->metcov11 = analysisTree->pfmetcorr_sigyy;
+  }
 
-  float met_x2 = met_x * met_x;
-  float met_y2 = met_y * met_y;}
-else{
-//cout<<"use pfmetcorr, era = "<<era<<endl;
-  otree->met = TMath::Sqrt(analysisTree->pfmetcorr_ex*analysisTree->pfmetcorr_ex + analysisTree->pfmetcorr_ey*analysisTree->pfmetcorr_ey);
-  otree->metphi = TMath::ATan2(analysisTree->pfmetcorr_ey,analysisTree->pfmetcorr_ex);
-  otree->metcov00 = analysisTree->pfmetcorr_sigxx;
-  otree->metcov01 = analysisTree->pfmetcorr_sigxy;
-  otree->metcov10 = analysisTree->pfmetcorr_sigyx;
-  otree->metcov11 = analysisTree->pfmetcorr_sigyy;
-  float met_x = analysisTree->pfmetcorr_ex;
-  float met_y = analysisTree->pfmetcorr_ey;
-
-  float met_x2 = met_x * met_x;
-  float met_y2 = met_y * met_y;
-
-}
-
-
+  otree->puppimet = TMath::Sqrt(analysisTree->puppimet_ex*analysisTree->puppimet_ex + analysisTree->puppimet_ey*analysisTree->puppimet_ey);
+  otree->puppimetphi = TMath::ATan2(analysisTree->puppimet_ey,analysisTree->puppimet_ex);
+  otree->puppimetcov00 = analysisTree->puppimet_sigxx;
+  otree->puppimetcov01 = analysisTree->puppimet_sigxy;
+  otree->puppimetcov10 = analysisTree->puppimet_sigyx;
+  otree->puppimetcov11 = analysisTree->puppimet_sigyy;
 
 }
 
