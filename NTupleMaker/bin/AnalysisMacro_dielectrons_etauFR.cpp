@@ -49,7 +49,6 @@ int main(int argc, char * argv[]) {
 
     const bool isData = cfg.get<bool>("IsData");
     const bool applyGoodRunSelection = cfg.get<bool>("ApplyGoodRunSelection");
-    const bool slimNTuples = cfg.get<bool>("slimNTuples");
 
     const string jsonFile = cfg.get<string>("jsonFile");
 
@@ -60,6 +59,7 @@ int main(int argc, char * argv[]) {
     const bool applyPUreweighting_official = cfg.get<bool>("ApplyPUreweighting_official");
     const string dataPUFile = cfg.get<string>("DataPUFile");
     const string mcPUFile = cfg.get<string>("MCPUFile");
+    const string pileUpforMC = cfg.get<string>("pileUpforMC");
 
     // kinematic cuts on electrons
     const float ptEleTagCut  = cfg.get<float>("ptEleTagCut");
@@ -351,10 +351,13 @@ int main(int argc, char * argv[]) {
   PileUp * PUofficial = new PileUp();
 
   if (applyPUreweighting_official) {
+
     TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/"+TString(dataPUFile),"read");
     TFile * filePUdistribution_MC = new TFile (TString(cmsswBase)+"/src/"+TString(mcPUFile), "read");
     TH1D * PU_data = (TH1D *)filePUdistribution_data->Get("pileup");
-    TH1D * PU_mc = (TH1D *)filePUdistribution_MC->Get("pileup");
+    TString name_pileUpforMC= "pileup";
+    if(!isData&&pileUpforMC!="")name_pileUpforMC=pileUpforMC;
+    TH1D * PU_mc = (TH1D *)filePUdistribution_MC->Get(name_pileUpforMC);
     PUofficial->set_h_data(PU_data);
     PUofficial->set_h_MC(PU_mc);
   }
@@ -363,11 +366,9 @@ int main(int argc, char * argv[]) {
     SF_eleIdIso->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(EleIdIsoFile));
     ScaleFactor * SF_eleTrig = new ScaleFactor();
     SF_eleTrig->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(EleTriggerFile));
-
     // Zpt reweighting for LO DY samples 
     TFile * f_zptweight = new TFile(TString(cmsswBase)+"/src/"+ZptweightFile,"read");
     TH2D * h_zptweight = (TH2D*)f_zptweight->Get("zptmass_histo");
-
 
   int nFiles = 0;
   int nEvents = 0;
@@ -633,7 +634,7 @@ int main(int argc, char * argv[]) {
             if (fabs(analysisTree.tau_eta[it])>etaTauCut) continue;
             if (fabs(analysisTree.tau_leadchargedhadrcand_dz[it])>dzTauCut) continue;
             if (fabs(analysisTree.tau_charge[it])<0.5||fabs(analysisTree.tau_charge[it])>1.5) continue;
-            //if (analysisTree.tau_againstMuonLoose3[it] < 0.5) continue;
+            if (analysisTree.tau_againstMuonLoose3[it] < 0.5 && analysisTree.tau_byLooseDeepTau2017v2p1VSmu[it] < 0.5) continue;
             goodTaus.push_back(it);
         }
         
@@ -880,8 +881,8 @@ int main(int argc, char * argv[]) {
 
                         //using uncorrected MET for now in 2017
                         
-                        met = TMath::Sqrt(analysisTree.pfmet_ex*analysisTree.pfmet_ex + analysisTree.pfmet_ey*analysisTree.pfmet_ey);
-			metphi = analysisTree.pfmet_phi;
+                        met = TMath::Sqrt(analysisTree.pfmetcorr_ex*analysisTree.pfmetcorr_ex + analysisTree.pfmetcorr_ey*analysisTree.pfmetcorr_ey);
+			metphi = analysisTree.pfmetcorr_phi;
 
 
 
@@ -1064,7 +1065,6 @@ int main(int argc, char * argv[]) {
 			//                        taubyLooseIsolationMVArun2v1DBoldDMwLT = analysisTree.tau_byLooseIsolationMVArun2v1DBoldDMwLT[indexProbe];
                         taubyLooseIsolationMVArun2v1DBoldDMwLT = analysisTree.tau_byLooseIsolationMVArun2017v2DBoldDMwLT2017[indexProbe];
                         taubyTightIsolationMVArun2v1DBoldDMwLT = analysisTree.tau_byTightIsolationMVArun2017v2DBoldDMwLT2017[indexProbe];
-			if(slimNTuples&&taubyTightIsolationMVArun2v1DBoldDMwLT<0.5)continue;
 
 			tau_decayModeFinding = analysisTree.tau_decayModeFinding[indexProbe];
 
@@ -1098,6 +1098,7 @@ int main(int argc, char * argv[]) {
 			taubyMediumDeepTau2017v2p1VSjet = analysisTree.tau_byMediumDeepTau2017v2p1VSjet[indexProbe];                        
 			taubyTightDeepTau2017v2p1VSjet = analysisTree.tau_byTightDeepTau2017v2p1VSjet[indexProbe];
 			//if(slimNTuples&&taubyTightIsolationMVArun2v1DBoldDMwLT<0.5)continue;
+			if(taubyTightIsolationMVArun2v1DBoldDMwLT<0.5&&taubyMediumDeepTau2017v2p1VSjet<0.5)continue;
 
                        
                         

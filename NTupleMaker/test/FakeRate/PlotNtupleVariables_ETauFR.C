@@ -22,6 +22,10 @@
 #include "TColor.h"
 #include "TEfficiency.h"
 #include "TMath.h"
+
+#define NSAMPLES = 20
+#define NSAMPLES16 = 18
+
 void PlotNtupleVariables_ETauFRwithDeepTau(
                                  TString Variable= "m_vis",
                                  TString xtitle = "visible mass [GeV] ",
@@ -39,7 +43,7 @@ void PlotNtupleVariables_ETauFRwithDeepTau(
                                  bool logY = false,
                                  bool legLeft = false)
 {  
-  const int nSamples = 20;
+  const int nSamples = Year=="2016" ? NSAMPLES : NSAMPLES16;
 
   bool applyPU = true;
   TString tauIso = "tauby"+wpIso+"IsolationMVArun2v1DBoldDMwLT";
@@ -56,43 +60,111 @@ if(DeepTau>0.5){
   TString directory="./";
   TH1::SetDefaultSumw2();
   SetStyle();
-    TString samples[nSamples] =
+  vector<TString> samples;
+  if(Year!="2016") samples =
     {
-        "EGamma_Run2018",//(0)data
-        "DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8",// (1)Drell-Yan Z->EE
-        "DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8", // (2)Drell-Yan ZJ
-        "DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8", // (3)Drell-Yan ZTT(tau -> lepton)
-        "DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8", // (4)Drell-Yan ZTT(hadronic tau)
-        "TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8",//(5)TTbar leptonic
-        "TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8",//(6) semileptonic
-        "TTToHadronic_TuneCP5_13TeV-powheg-pythia8",//(7) hadronic
-        "WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8",// (8)WJets
-        "W1JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8",// (8)WJets
-        "W2JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8",// (8)WJets
-        "W3JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8",// (8)WJets
-        "W4JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8",// (8)WJets
-        "WW_TuneCP5_13TeV-pythia8",// (9)WW
-        "WZ_TuneCP5_13TeV-pythia8",// (10)WZ
-        "ZZ_TuneCP5_13TeV-pythia8",// (11)ZZ
-        "ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8", // (12) SingleTop tW tbar
-        "ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8", // (13) SingleTop tW t
-        "ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8",// (14) SingleTop t antitop
-        "ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8"// (15) SingleTop t top
+        "SingleEle_Run",//(0)data
+        "DYJetsToLL_M-50",// (1)Drell-Yan Z->EE
+        "DYJetsToLL_M-50", // (2)Drell-Yan ZJ
+        "DYJetsToLL_M-50", // (3)Drell-Yan ZTT(tau -> lepton)
+        "DYJetsToLL_M-50", // (4)Drell-Yan ZTT(hadronic tau)
+        "TTTo2L2Nu",//(5)TTbar leptonic
+        "TTToSemiLeptonic",//(6) semileptonic
+        "TTToHadronic",//(7) hadronic
+        "WJetsToLNu",// (8)WJets
+        "W1JetsToLNu",// (8)WJets
+        "W2JetsToLNu",// (8)WJets
+        "W3JetsToLNu",// (8)WJets
+        "W4JetsToLNu",// (8)WJets
+        "WW",// (9)WW
+        "WZ",// (10)WZ
+        "ZZ",// (11)ZZ
+        "ST_tW_antitop_5f", // (12) SingleTop tW tbar
+        "ST_tW_top_5f", // (13) SingleTop tW t
+        "ST_t-channel_antitop_4f",// (14) SingleTop t antitop
+        "ST_t-channel_top_4f"// (15) SingleTop t top
     };
+  else  samples =
+    {
+        "SingleEle_Run",//(0)data
+        "DYJetsToLL_M-50",// (1)Drell-Yan Z->EE
+        "DYJetsToLL_M-50", // (2)Drell-Yan ZJ
+        "DYJetsToLL_M-50", // (3)Drell-Yan ZTT(tau -> lepton)
+        "DYJetsToLL_M-50", // (4)Drell-Yan ZTT(hadronic tau)
+        "TT",//(5)TTbar leptonic
+        "WJetsToLNu",// (8)WJets
+        "W1JetsToLNu",// (8)WJets
+        "W2JetsToLNu",// (8)WJets
+        "W3JetsToLNu",// (8)WJets
+        "W4JetsToLNu",// (8)WJets
+        "WW",// (9)WW
+        "WZ",// (10)WZ
+        "ZZ",// (11)ZZ
+        "ST_tW_antitop_5f", // (12) SingleTop tW tbar
+        "ST_tW_top_5f", // (13) SingleTop tW t
+        "ST_t-channel_antitop_4f",// (14) SingleTop t antitop
+        "ST_t-channel_top_4f"// (15) SingleTop t top
+    };
+  else exit(EXIT_FAILURE);
+    samples[0]+=Year;
+
     double WJetsweight=0.8369;
 
     //double WJetsweight=1.;
     double DYJetsweight=1.;
 
-    double xsec[nSamples] = {
+    vector<double> xsec;
+    if(Year=="2016") xsec = {
+        1, // (0)data
+        DYJetsweight,// (1)Drell-Yan Z->EE
+        DYJetsweight,// (2)Drell-Yan ZJ
+        DYJetsweight,// (3)Drell-Yan ZTT(tau->lepton)
+        DYJetsweight,// (4)Drell-Yan ZTT(hadronic tau)
+        831.76, // (5)TTPowHeg leptonic
+        WJetsweight, // (6)WJetsToLNu_MG
+        WJetsweight, // (7)WJetsToLNu_MG
+        WJetsweight, // (8)WJetsToLNu_MG
+        WJetsweight, // (9)WJetsToLNu_MG
+        WJetsweight, // (10)WJetsToLNu_MG
+        75.88,  // WW (11)
+        27.6,   // WZ (12)
+        12.14,  // ZZ (13)
+        35.06,   // ST_tW_antitop_5f_inclusiveDecays (14)
+        35.06,   // ST_tW_top_5f_inclusiveDecays (15)
+        80.95, // (16) SingleTop t antitop
+        136.02// (17) SingleTop t top
+    };
+    else if(Year=="2017") xsec = {
         1, // (0)data
         DYJetsweight,// (1)Drell-Yan Z->EE
         DYJetsweight,// (2)Drell-Yan ZJ
         DYJetsweight,// (3)Drell-Yan ZTT(tau->lepton)
         DYJetsweight,// (4)Drell-Yan ZTT(hadronic tau)
         88.29, // (5)TTPowHeg leptonic
-        377.96, // (6)TTBar semileptonic
-        365.35, // (7)TTBar hadronic
+        365.35, // (6)TTBar semileptonic
+        377.96, // (7)TTBar hadronic
+        WJetsweight, // (6)WJetsToLNu_MG
+        WJetsweight, // (7)WJetsToLNu_MG
+        WJetsweight, // (8)WJetsToLNu_MG
+        WJetsweight, // (9)WJetsToLNu_MG
+        WJetsweight, // (10)WJetsToLNu_MG
+        75.88,  // WW (11)
+        27.6,   // WZ (12)
+        12.14,  // ZZ (13)
+        34.91,   // ST_tW_antitop_5f_inclusiveDecays (14)
+        34.91,   // ST_tW_top_5f_inclusiveDecays (15)
+        67.91, // (16) SingleTop t antitop
+        113.3// (17) SingleTop t top
+    };
+    else if(Year=="2018") xsec = {
+        1, // (0)data
+        DYJetsweight,// (1)Drell-Yan Z->EE
+        DYJetsweight,// (2)Drell-Yan ZJ
+        DYJetsweight,// (3)Drell-Yan ZTT(tau->lepton)
+        DYJetsweight,// (4)Drell-Yan ZTT(hadronic tau)
+        88.29, // (5)TTPowHeg leptonic
+        365.35, // (6)TTBar semileptonic
+        377.96, // (7)TTBar hadronic
         WJetsweight, // (6)WJetsToLNu_MG
         WJetsweight, // (7)WJetsToLNu_MG
         WJetsweight, // (8)WJetsToLNu_MG
@@ -101,25 +173,21 @@ if(DeepTau>0.5){
         63.21,  // WW (11)
         22.82,   // WZ (12)
         10.32,  // ZZ (13)
-        38.06,   // ST_tW_antitop_5f_inclusiveDecays (14)
-        38.09,   // ST_tW_top_5f_inclusiveDecays (15)
-        80.95, // (16) SingleTop t antitop
-        136.02// (17) SingleTop t top
+        10.32,  // ZZ (13)
+        34.91,   // ST_tW_antitop_5f_inclusiveDecays (14)
+        34.91,   // ST_tW_top_5f_inclusiveDecays (15)
+        67.91, // (16) SingleTop t antitop
+        113.3// (17) SingleTop t top
     };
+    else exit(EXIT_FAILURE);
+
+
 	float lumi;
 	if(Year=="2018") lumi = 59970;
 	else if(Year=="2017") lumi = 41860;
 	else if(Year=="2016") lumi = 36773;
 	else exit(EXIT_FAILURE);
 
-	//Deal with bins and binning
-	float xMin = xmin;
-	float xMax = xmax;
-	int nBins = nbins;
-	float bins[100];
-	float binWidth = (xMax-xMin)/float(nBins);
-        for (int iB=0; iB<=nBins; ++iB)
-        	bins[iB] = xMin + float(iB)*binWidth;
 
 	TH1D * hist[nSamples];
 	TH1D * histSS[nSamples];
@@ -215,9 +283,9 @@ if(DeepTau>0.5){
 		cout<< norm <<endl;
 		TString histName = samples[i] + "_"+Variable;
 		TString histNameSS = samples[i] + "_"+Variable+"_ss";
-		hist[i] = new TH1D(histName,"",nBins,xMin,xMax);
+		hist[i] = new TH1D(histName,"",nbins,xmin,xmax);
 		hist[i]->Sumw2();
-		histSS[i] = new TH1D(histNameSS,"",nBins,xMin,xMax);
+		histSS[i] = new TH1D(histNameSS,"",nbins,xmin,xmax);
 		histSS[i]->Sumw2();
 		tree->Draw(Variable+">>"+histName,cuts[i]);
 		tree->Draw(Variable+">>"+histNameSS,cutsSS[i]);
@@ -226,7 +294,7 @@ if(DeepTau>0.5){
 		    hist[i]   -> Scale(norm);
 		    histSS[i] -> Scale(norm);
 		  }
-		cout << samples[i] << " : Entries = " << hist[i]->GetEntries() << " : Integral = " << hist[i]->Integral(0,nBins+1) << endl;
+		cout << samples[i] << " : Entries = " << hist[i]->GetEntries() << " : Integral = " << hist[i]->Integral(0,nbins+1) << endl;
 		
 	}
 
@@ -269,14 +337,14 @@ if(DeepTau>0.5){
 	  TString histNameSSZTT_EL = filename + Variable + "_ztt_el_ss";
 	  TString histNameZTT_ET   = filename + Variable + "_ztt_et_os";
 	  TString histNameSSZTT_ET = filename + Variable + "_ztt_et_ss";
-	  histZEE[i]   = new TH1D(histNameZEE,"",nBins,xmin,xmax);
-	  histSSZEE[i] = new TH1D(histNameSSZEE,"",nBins,xmin,xmax);
-	  histZJ[i]   = new TH1D(histNameZJ,"",nBins,xmin,xmax);
-	  histSSZJ[i] = new TH1D(histNameSSZJ,"",nBins,xmin,xmax);
-	  histZTT_EL[i]   = new TH1D(histNameZTT_EL,"",nBins,xmin,xmax);
-	  histSSZTT_EL[i] = new TH1D(histNameSSZTT_EL,"",nBins,xmin,xmax);
-	  histZTT_ET[i]   = new TH1D(histNameZTT_ET,"",nBins,xmin,xmax);
-	  histSSZTT_ET[i] = new TH1D(histNameSSZTT_ET,"",nBins,xmin,xmax);
+	  histZEE[i]   = new TH1D(histNameZEE,"",nbins,xmin,xmax);
+	  histSSZEE[i] = new TH1D(histNameSSZEE,"",nbins,xmin,xmax);
+	  histZJ[i]   = new TH1D(histNameZJ,"",nbins,xmin,xmax);
+	  histSSZJ[i] = new TH1D(histNameSSZJ,"",nbins,xmin,xmax);
+	  histZTT_EL[i]   = new TH1D(histNameZTT_EL,"",nbins,xmin,xmax);
+	  histSSZTT_EL[i] = new TH1D(histNameSSZTT_EL,"",nbins,xmin,xmax);
+	  histZTT_ET[i]   = new TH1D(histNameZTT_ET,"",nbins,xmin,xmax);
+	  histSSZTT_ET[i] = new TH1D(histNameSSZTT_ET,"",nbins,xmin,xmax);
 	  
 
 	  tree -> Draw(Variable+">>"+histNameZEE,     cuts[1]);
@@ -332,7 +400,7 @@ if(DeepTau>0.5){
     }
     
     //Getting rid of negative bin in QCD
-    for (int iB=1; iB<=nBins; ++iB)
+    for (int iB=1; iB<=nbins; ++iB)
     {
         float ySS = histSS[0]->GetBinContent(iB);
         if (ySS<0)
@@ -387,7 +455,7 @@ if(DeepTau>0.5){
     float errW = 0.15;
     float errTT = 0.15;
     
-    for (int iB=1; iB<=nBins; ++iB)
+    for (int iB=1; iB<=nbins; ++iB)
     {
         float eQCD = errQCD*QCD->GetBinContent(iB);
         float eVV = errVV*VV->GetBinContent(iB);
@@ -416,7 +484,7 @@ if(DeepTau>0.5){
   	bkgdErr->SetMarkerStyle(21);
   	bkgdErr->SetMarkerSize(0);
 
-  	for (int iB=1; iB<=nBins; ++iB)
+  	for (int iB=1; iB<=nbins; ++iB)
     {  
         W->SetBinError(iB,0);
         QCD->SetBinError(iB,0);
@@ -498,7 +566,7 @@ if(DeepTau>0.5){
 	bkgdErr->Draw("e2same");
 	//Calculating chi2
 	float chi2 = 0;
-	for (int iB=1; iB<=nBins; ++iB) 
+	for (int iB=1; iB<=nbins; ++iB) 
 	{
 		float xData = data_obs->GetBinContent(iB);
 		float xMC = ZEE->GetBinContent(iB);
@@ -579,7 +647,7 @@ if(DeepTau>0.5){
   	ratioH->GetYaxis()->SetTickLength(0.04);
   	ratioH->GetYaxis()->SetLabelOffset(0.01);
 	
-	for (int iB=1; iB<=nBins; ++iB) 
+	for (int iB=1; iB<=nbins; ++iB) 
 	{
     		float x1 = data_obs->GetBinContent(iB);
     		float x2 = ZEE->GetBinContent(iB);
