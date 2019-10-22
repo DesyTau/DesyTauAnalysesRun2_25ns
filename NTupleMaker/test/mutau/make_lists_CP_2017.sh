@@ -36,10 +36,10 @@ ls $dirMC/GluGluHToTauTau_M125_13TeV_powheg_pythia8/*root > GluGluHToTauTau_M125
 ls $dirMC/GluGluHToTauTau_M125_13TeV_powheg_pythia8_ext1/*root >> GluGluHToTauTau_M125
 ls $dirMC/VBFHToTauTau_M125_13TeV_powheg_pythia8/*root > VBFHToTauTau_M125
 
-ls $dirMC/SUSYGluGluToHToTauTau_M-130_TuneCP5_13TeV-pythia8/*root > SUSYGluGluToHToTauTau
-ls $dirMC/SUSYGluGluToHToTauTau_M-120_TuneCP5_13TeV-pythia8/*root >> SUSYGluGluToHToTauTau
-ls $dirMC/SUSYGluGluToBBHToTauTau_M-130_TuneCP5_13TeV-pythia8/*root >> SUSYGluGluToHToTauTau
-ls $dirMC/SUSYGluGluToBBHToTauTau_M-120_TuneCP5_13TeV-pythia8/*root >> SUSYGluGluToHToTauTau
+ls $dirMC/SUSYGluGluToHToTauTau_M-130_TuneCUETP8M1_13TeV-pythia8/*root > SUSYGluGluToHToTauTau
+ls $dirMC/SUSYGluGluToHToTauTau_M-120_TuneCUETP8M1_13TeV-pythia8/*root >> SUSYGluGluToHToTauTau
+ls $dirMC/SUSYGluGluToBBHToTauTau_M-130_TuneCUETP8M1_13TeV-pythia8/*root >> SUSYGluGluToHToTauTau
+ls $dirMC/SUSYGluGluToBBHToTauTau_M-120_TuneCUETP8M1_13TeV-pythia8/*root >> SUSYGluGluToHToTauTau
 
 ls $dirDataSingleMuon/SingleMuon_Run2017B-31Mar2018-v1/*root > SingleMuon_Run2017B
 ls $dirDataSingleMuon/SingleMuon_Run2017C-31Mar2018-v1/*root > SingleMuon_Run2017C
