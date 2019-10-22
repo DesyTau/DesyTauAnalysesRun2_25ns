@@ -630,6 +630,7 @@ int main(int argc, char * argv[]) {
         for(unsigned int it=0;it<analysisTree.tau_count;++it)
         {
             //if (analysisTree.tau_decayModeFinding[it]<=0.5) continue;
+   	    if (analysisTree.tau_decayMode[it]==5 || analysisTree.tau_decayMode[it]==6) continue;
             if (analysisTree.tau_pt[it]<ptTauCut) continue;
             if (fabs(analysisTree.tau_eta[it])>etaTauCut) continue;
             if (fabs(analysisTree.tau_leadchargedhadrcand_dz[it])>dzTauCut) continue;
