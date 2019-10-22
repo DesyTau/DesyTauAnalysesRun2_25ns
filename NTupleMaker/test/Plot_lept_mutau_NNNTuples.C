@@ -69,7 +69,7 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
   }
   TString IsoCut=Cut+"(mva17_2>0.5)*";
   TString AntiIsoCut=Cut+"(mva17_2<0.5)*";
-  // directory="$CMSSW_BASE/src/"+directory;
+  directory="$CMSSW_BASE/src/"+directory;
   TH1::SetDefaultSumw2();
   SetStyle();
   const int nSamples = 10; //DY is used twice, for Zll and Ztt
@@ -189,14 +189,12 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
     hist[i]   = new TH1D(histName,"",nBins,xmin,xmax);
     histSS[i] = new TH1D(histNameSS,"",nBins,xmin,xmax);
     hist_AntiIso[i] = new TH1D(histNameaIso,"",nBins,xmin,xmax);
-		if (i != 9) {
-			cout << "Drawing ..." << endl;
-			tree->Draw(Variable+">>"+histName,cuts[i]);
-			cout << cuts[i] <<endl;
-			tree->Draw(Variable+">>"+histNameSS,cutsSS[i]);
-			tree->Draw(Variable+">>"+histNameaIso,cutsaIso[i]);
-			cout << sampleNames[i] << " : Entries = " << hist[i]->GetEntries() << " : Integral = " << hist[i]->Integral(0,nBins+1) << endl;
-		}
+    cout << "Drawing ..." << endl;
+    tree->Draw(Variable+">>"+histName,cuts[i]);
+    cout << cuts[i] <<endl;
+    tree->Draw(Variable+">>"+histNameSS,cutsSS[i]);
+    tree->Draw(Variable+">>"+histNameaIso,cutsaIso[i]);
+    cout << sampleNames[i] << " : Entries = " << hist[i]->GetEntries() << " : Integral = " << hist[i]->Integral(0,nBins+1) << endl;
   }
 
 
