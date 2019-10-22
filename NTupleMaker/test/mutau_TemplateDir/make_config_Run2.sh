@@ -1,32 +1,28 @@
 #!/bin/bash
 
 ### Important:
-### the script is to be run with "bash make_config_Run2.sh"
+### the script is to be run with "bash make_config_Run2.sh <year={16,17,18}> <data_type={data, MC}>"
 
 YEAR=$1
 DATA_TYPE=$2
 
 if [[ $YEAR -ne 16 && $YEAR -ne 17 && $YEAR -ne 18 ]]; then
+  echo
+  echo "To produce the scripts for a specific year and either data or MC this script is to be run with a command:"
+  echo
+  echo "  bash make_config_Run2.sh <year={16,17,18}> <data_type={data, MC}>"
+  echo
   echo "year is not 16, 17 or 18 - exiting"
   exit
 fi
 
-# pick the corresponding template for the year
+# pick the template for the corresponding year
 TEMPLATE_CFG_NAME="analysisMacroSynch_mt_${YEAR}"
 
 # define parameters which are different between MC and data configs
 KEY_LIST=(isData ApplyPUweight ApplyLepSF)
 VALUE_LIST_MC=(false true true)
 VALUE_LIST_DATA=(true false false)
-
-# these parameters are year dependant for MC, so leave them as they are in the config and set to 0 only if it is data config
-if [[ $DATA_TYPE == "data" ]]; then
-  KEY_LIST+=(TauEnergyScaleShift_OneProng TauEnergyScaleShift_OneProngOnePi0 TauEnergyScaleShift_ThreeProng)
-  VALUE_LIST_DATA+=(0.0 0.0 0.0)
-  
-  KEY_LIST+=(TauEnergyScaleShift_LepFake_OneProng TauEnergyScaleShift_LepFake_OneProngOnePi0 TauEnergyScaleShift_LepFake_ThreeProng)
-  VALUE_LIST_DATA+=(0.0 0.0 0.0)
-fi
 
 # redefine list of the parameters according to the input data type
 if [[ $DATA_TYPE == "data" ]]; then
@@ -37,9 +33,23 @@ else
     VALUE_LIST=("${VALUE_LIST_MC[@]}")
     NOT_DATA_TYPE="data"
   else
-    echo "data_type is neither data or MC - exiting"
+    echo
+    echo "To produce the scripts for a specific year and either data or MC this script is to be run with a command:"
+    echo
+    echo "  bash make_config_Run2.sh <year={16,17,18}> <data_type={data, MC}>"
+    echo
+    echo "data_type is neither data nor MC - exiting"
     exit
   fi
+fi
+
+# these parameters are year dependant for MC, so leave them as they are in the config and set to 0 only if it is data config
+if [[ $DATA_TYPE == "data" ]]; then
+  KEY_LIST+=(TauEnergyScaleShift_OneProng TauEnergyScaleShift_OneProngOnePi0 TauEnergyScaleShift_ThreeProng)
+  VALUE_LIST_DATA+=(0.0 0.0 0.0)
+  
+  KEY_LIST+=(TauEnergyScaleShift_LepFake_OneProng TauEnergyScaleShift_LepFake_OneProngOnePi0 TauEnergyScaleShift_LepFake_ThreeProng)
+  VALUE_LIST_DATA+=(0.0 0.0 0.0)
 fi
 
 # add the parameters to the config
@@ -54,46 +64,31 @@ sed -i "/${NOT_DATA_TYPE}: /d" ./${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf
 # remove just the strings "DATA_TYPE: " leaving the rest of the line intact 
 sed -i "s/${DATA_TYPE}: //" ./${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf
 
-cp analysisMacroSynch_lept_mt_MC17.conf analysisMacroSynch_lept_mt_backup.conf
+# lists with the MC samples' names
+MC_SAMPLES_LIST=(DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8 DY1JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8 DY2JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8)
+MC_SAMPLES_LIST+=(DY3JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8 DY4JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8)
+
+MC_SAMPLES_LIST+=(ST_t-channel_antitop_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8 ST_t-channel_top_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8)
+MC_SAMPLES_LIST+=(ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8 ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8)
+
+MC_SAMPLES_LIST+=(WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8 W1JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8 W2JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8)
+MC_SAMPLES_LIST+=(W3JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8 W4JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8)
+
+MC_SAMPLES_LIST+=(TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8 TTToHadronic_TuneCP5_PSweights_13TeV-powheg-pythia8 TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powheg-pythia8)
+MC_SAMPLES_LIST+=(WW_TuneCP5_13TeV-pythia8 WZ_TuneCP5_13TeV-pythia8 ZZ_TuneCP5_13TeV-pythia8)
+MC_SAMPLES_LIST+=(GluGluHToTauTau_M125_13TeV_powheg_pythia8 VBFHToTauTau_M125)
+MC_SAMPLES_LEN=${#MC_SAMPLES_LIST[@]}
+
+# Path in the root file to PU histograms for 16 and 18 data; 
+PU_STR=pileup
 
 if [[ $DATA_TYPE == "MC" ]]; then
-  sed 's/pileUpforMC =/pileUpforMC = DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8_pileup/' ${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf > analysisMacroSynch_lept_mt_DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8.conf
-  sed 's/pileUpforMC =/pileUpforMC = DY1JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8_pileup/' ${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf > analysisMacroSynch_lept_mt_DY1JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8.conf
-  sed 's/pileUpforMC =/pileUpforMC = DY2JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8_pileup/' ${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf > analysisMacroSynch_lept_mt_DY2JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8.conf
-  sed 's/pileUpforMC =/pileUpforMC = DY3JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8_pileup/' ${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf > analysisMacroSynch_lept_mt_DY3JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8.conf
-  sed 's/pileUpforMC =/pileUpforMC = DY4JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8_pileup/' ${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf > analysisMacroSynch_lept_mt_DY4JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8.conf
-
-  sed 's/pileUpforMC =/pileUpforMC = ST_t-channel_antitop_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8_pileup/' ${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf > analysisMacroSynch_lept_mt_ST_t-channel_antitop_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8.conf
-  sed 's/pileUpforMC =/pileUpforMC = ST_t-channel_top_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8_pileup/' ${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf > analysisMacroSynch_lept_mt_ST_t-channel_top_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8.conf
-  sed 's/pileUpforMC =/pileUpforMC = ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8_pileup/' ${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf > analysisMacroSynch_lept_mt_ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8.conf
-  sed 's/pileUpforMC =/pileUpforMC = ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8_pileup/' ${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf > analysisMacroSynch_lept_mt_ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8.conf
-
-  sed 's/pileUpforMC =/pileUpforMC = TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8_pileup/' ${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf > analysisMacroSynch_lept_mt_TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8.conf
-  sed 's/pileUpforMC =/pileUpforMC = TTToHadronic_TuneCP5_PSweights_13TeV-powheg-pythia8_pileup/' ${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf > analysisMacroSynch_lept_mt_TTToHadronic_TuneCP5_PSweights_13TeV-powheg-pythia8.conf
-  sed 's/pileUpforMC =/pileUpforMC = TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powheg-pythia8_pileup/' ${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf > analysisMacroSynch_lept_mt_TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powheg-pythia8.conf
-
-  sed 's/pileUpforMC =/pileUpforMC = W1JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_pileup/' ${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf > analysisMacroSynch_lept_mt_W1JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8.conf
-  sed 's/pileUpforMC =/pileUpforMC = W2JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_pileup/' ${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf > analysisMacroSynch_lept_mt_W2JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8.conf
-  sed 's/pileUpforMC =/pileUpforMC = W3JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_pileup/' ${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf > analysisMacroSynch_lept_mt_W3JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8.conf
-  sed 's/pileUpforMC =/pileUpforMC = W4JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_pileup/' ${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf > analysisMacroSynch_lept_mt_W4JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8.conf
-  sed 's/pileUpforMC =/pileUpforMC = WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_pileup/' ${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf > analysisMacroSynch_lept_mt_WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8.conf
-  sed 's/pileUpforMC =/pileUpforMC = MC_PU2017_pileup/' ${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf > analysisMacroSynch_lept_mt_DYJetsToLL_M-5to50_13TeV-12Apr2018.conf
-
-  sed 's/pileUpforMC =/pileUpforMC = WW_TuneCP5_13TeV-pythia8_pileup/' ${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf > analysisMacroSynch_lept_mt_WW_TuneCP5_13TeV-pythia8.conf
-  sed 's/pileUpforMC =/pileUpforMC = WZ_TuneCP5_13TeV-pythia8_pileup/' ${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf > analysisMacroSynch_lept_mt_WZ_TuneCP5_13TeV-pythia8.conf
-  sed 's/pileUpforMC =/pileUpforMC = ZZ_TuneCP5_13TeV-pythia8_pileup/' ${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf > analysisMacroSynch_lept_mt_ZZ_TuneCP5_13TeV-pythia8.conf
-
-  sed 's/pileUpforMC =/pileUpforMC = GluGluHToTauTau_M125_13TeV_powheg_pythia8_pileup/' ${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf > analysisMacroSynch_lept_mt_GluGluHToTauTau_M125_13TeV_powheg_pythia8.conf
+  for (( i = 0; i < $MC_SAMPLES_LEN; i++ )); do
+      if [[ $YEAR == 17 ]]; then
+        # for 17 it is sample dependent, pick it from the list
+        PU_STR=${MC_SAMPLES_LIST[i]}
+      fi
+      sed "s/pileUpforMC =/pileUpforMC = ${PU_STR}/" ${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf > analysisMacroSynch_lept_mt_${MC_SAMPLES_LIST[i]}.conf
+  done
   sed 's/pileUpforMC =/pileUpforMC = GluGluHToTauTau_M125_13TeV_powheg_pythia8_pileup/' ${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf > analysisMacroSynch_lept_mt_SUSYGluGluToHToTauTau_M-120_TuneCP5_13TeV-pythia8.conf
-
-  #Merijn: add a line for VBF:
-  sed 's/pileUpforMC =/pileUpforMC = VBFHToTauTau_M125_pileup/' ${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf > analysisMacroSynch_lept_mt_VBF125.conf
-
-
-  sed 's/pileUpforMC =/pileUpforMC = MC_PU2017_pileup/' ${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf > analysisMacroSynch_lept_mt_WGToLNuG.conf
-
-  sed 's/pileUpforMC =/pileUpforMC = EWKWMinus2Jets_WToLNu_M-50_TuneCP5_13TeV-madgraph-pythia8_pileup/' ${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf > analysisMacroSynch_lept_mt_EWKWMinus.conf
-  sed 's/pileUpforMC =/pileUpforMC = EWKWPlus2Jets_WToLNu_M-50_TuneCP5_13TeV-madgraph-pythia8_pileup/' ${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf > analysisMacroSynch_lept_mt_EWKWPlus.conf
-  sed 's/pileUpforMC =/pileUpforMC =  EWKZ2Jets_ZToLL_M-50_TuneCP5_13TeV-madgraph-pythia8_pileup/' ${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf > analysisMacroSynch_lept_mt_EWKZ2Jets_ZToLL.conf
-  sed 's/pileUpforMC =/pileUpforMC =  EWKZ2Jets_ZToNuNu_TuneCP5_13TeV-madgraph-pythia8_pileup/' ${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf > analysisMacroSynch_lept_mt_EWKZ2Jets_ZToNuNu.conf
 fi

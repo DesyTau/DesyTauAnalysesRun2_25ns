@@ -361,12 +361,7 @@ int main(int argc, char * argv[]){
     //std::cout << filePUdistribution_data << std::endl;
     //std::cout << filePUdistribution_MC << std::endl;
     
-    TH1D *PU_mc;
-    if (era == 2017) {
-      PU_mc = (TH1D *)filePUdistribution_MC->Get(TString(pileUpforMC));
-    } else {
-      PU_mc = (TH1D *)filePUdistribution_MC->Get(TString("pileup"));
-    }
+    TH1D *PU_mc = (TH1D *)filePUdistribution_MC->Get(TString(pileUpforMC);
     if (PU_mc == NULL) {
       std::cout << "Histogram " << pileUpforMC << " is not present in pileup file" << std::endl;
       exit(-1);
