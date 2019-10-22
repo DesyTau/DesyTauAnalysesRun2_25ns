@@ -26,24 +26,24 @@
 #define NSAMPLES = 20
 #define NSAMPLES16 = 18
 
-void PlotNtupleVariables_ETauFRwithDeepTau(
+void PlotNtupleVariables_ETauFR(
                                  TString Variable= "m_vis",
                                  TString xtitle = "visible mass [GeV] ",
                                  int nbins = 30,
                                  float xmin = 0,
                                  float xmax = 250,
-				 TString wp = "Medium",
-				 TString wpIso = "Tight",
-				 TString Year="2018",
-				 bool DeepTau = true,
 				 TString MCweight="effweight*mcweight*",
 				 TString Cut="(iso_1<0.1&&mt_1<30)", 
+				 TString wp = "Medium",
+				 TString Year="2016",
+				 bool DeepTau = true,
                                  TString ytitle = "Events",
                                  bool passProbe = true,
                                  bool logY = false,
                                  bool legLeft = false)
 {  
-  const int nSamples = Year=="2016" ? NSAMPLES : NSAMPLES16;
+  TString wpIso = "Tight";
+  const int nSamples = (Year=="2016" ? 18 : 20);
 
   bool applyPU = true;
   TString tauIso = "tauby"+wpIso+"IsolationMVArun2v1DBoldDMwLT";
@@ -52,7 +52,7 @@ void PlotNtupleVariables_ETauFRwithDeepTau(
 
 if(DeepTau>0.5){
   DeepTauString ="DeepTau";
-  tauIso = "tauby"+wpIso+"DeepTau2017v2VSjet";
+  tauIso = "tauby"+wpIso+"DeepTau2017v2p1VSjet";
   againstMu = "tauagainstMuLooseDeepTau";
   }
   
@@ -84,8 +84,7 @@ if(DeepTau>0.5){
         "ST_t-channel_antitop_4f",// (14) SingleTop t antitop
         "ST_t-channel_top_4f"// (15) SingleTop t top
     };
-  else  samples =
-    {
+  else  samples ={
         "SingleEle_Run",//(0)data
         "DYJetsToLL_M-50",// (1)Drell-Yan Z->EE
         "DYJetsToLL_M-50", // (2)Drell-Yan ZJ
@@ -105,7 +104,6 @@ if(DeepTau>0.5){
         "ST_t-channel_antitop_4f",// (14) SingleTop t antitop
         "ST_t-channel_top_4f"// (15) SingleTop t top
     };
-  else exit(EXIT_FAILURE);
     samples[0]+=Year;
 
     double WJetsweight=0.8369;
@@ -165,19 +163,19 @@ if(DeepTau>0.5){
         88.29, // (5)TTPowHeg leptonic
         365.35, // (6)TTBar semileptonic
         377.96, // (7)TTBar hadronic
-        WJetsweight, // (6)WJetsToLNu_MG
-        WJetsweight, // (7)WJetsToLNu_MG
         WJetsweight, // (8)WJetsToLNu_MG
         WJetsweight, // (9)WJetsToLNu_MG
         WJetsweight, // (10)WJetsToLNu_MG
-        63.21,  // WW (11)
-        22.82,   // WZ (12)
-        10.32,  // ZZ (13)
-        10.32,  // ZZ (13)
-        34.91,   // ST_tW_antitop_5f_inclusiveDecays (14)
-        34.91,   // ST_tW_top_5f_inclusiveDecays (15)
-        67.91, // (16) SingleTop t antitop
-        113.3// (17) SingleTop t top
+        WJetsweight, // (11)WJetsToLNu_MG
+        WJetsweight, // (12)WJetsToLNu_MG
+        63.21,  // WW (13)
+        22.82,   // WZ (14)
+        10.32,  // ZZ (15)
+        10.32,  // ZZ (16)
+        34.91,   // ST_tW_antitop_5f_inclusiveDecays (17)
+        34.91,   // ST_tW_top_5f_inclusiveDecays (18)
+        67.91, // (19) SingleTop t antitop
+        113.3// (20) SingleTop t top
     };
     else exit(EXIT_FAILURE);
 
@@ -601,15 +599,15 @@ if(DeepTau>0.5){
   	//plotchannel("e#mu");
     //	if (!applyPU) suffix = "_noPU";
 	TString title;
-	if (Year== "2016") DrawTitle(pads[0], "35.9 fb^{-1} (13 TeV, 2016)", 3);
-	if (Year== "2017") DrawTitle(pads[0], "41.9 fb^{-1} (13 TeV, 2017)", 3);
-	if (Year== "2018") DrawTitle(pads[0], "59.9 fb^{-1} (13 TeV, 2018)", 3);
+	if (Year== "2016") DrawTitle(upper, "35.9 fb^{-1} (13 TeV, 2016)", 3);
+	if (Year== "2017") DrawTitle(upper, "41.9 fb^{-1} (13 TeV, 2017)", 3);
+	if (Year== "2018") DrawTitle(upper, "59.9 fb^{-1} (13 TeV, 2018)", 3);
   	//TLatex * cms = new TLatex(0.20,0.94,"CMS 2018, L = 59.9 fb^{-1} at #sqrt{s} = 13 TeV");
 
   	//cms->SetNDC();
   	//cms->SetTextSize(0.05);
   	//cms->Draw();
-	DrawTitle(pads[0], "#scale[1.2]{         #bf{CMS} Work in progress}", 1);
+	DrawTitle(upper, "#scale[1.2]{         #bf{CMS} Work in progress}", 1);
 	//TLatex * workinprogress = new TLatex(x1Leg,0.55,"Work in progress");
 	//workinprogress->SetNDC();
 	//workinprogress->SetTextSize(0.05);
