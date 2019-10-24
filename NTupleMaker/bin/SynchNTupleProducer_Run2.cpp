@@ -206,21 +206,12 @@ int main(int argc, char * argv[]){
   const struct btag_scaling_inputs inputs_btag_scaling_medium = {reader_B, reader_C, reader_Light, tagEff_B, tagEff_C, tagEff_Light, rand};
 
   // MET Recoil Corrections
-  const bool ApplyRecoilCorrections = cfg.get<bool>("ApplyRecoilCorrections");
   const bool isDY = infiles.find("DY") == infiles.rfind("/")+1;
   const bool isWJets = (infiles.find("WJets") == infiles.rfind("/")+1) || (infiles.find("W1Jets") == infiles.rfind("/")+1) || (infiles.find("W2Jets") == infiles.rfind("/")+1) || (infiles.find("W3Jets") == infiles.rfind("/")+1) || (infiles.find("W4Jets") == infiles.rfind("/")+1) || (infiles.find("EWK") == infiles.rfind("/")+1);
   const bool isVBForGGHiggs = (infiles.find("VBFHTo")== infiles.rfind("/")+1) || (infiles.find("GluGluHTo")== infiles.rfind("/")+1);
   const bool isEWKZ =  infiles.find("EWKZ") == infiles.rfind("/")+1;
   const bool isMG = infiles.find("madgraph") != string::npos;
   const bool isMSSMsignal =  (infiles.find("SUSYGluGluToHToTauTau")== infiles.rfind("/")+1) || (infiles.find("SUSYGluGluToBBHToTauTau")== infiles.rfind("/")+1);
-  
-  RecoilCorrector *recoilPFMetCorrector = (RecoilCorrector*) malloc(sizeof(*recoilPFMetCorrector));
-  
-  if(!isData && ApplyRecoilCorrections && (isDY || isWJets || isVBForGGHiggs || isMSSMsignal) ){
-    TString RecoilFilePath = cfg.get<string>("RecoilFilePath");
-    std::cout << RecoilFilePath << std::endl;
-    recoilPFMetCorrector = new RecoilCorrector( RecoilFilePath);
-  }
   
   // Read in HLT filter
   vector<string> filterSingleLep;
@@ -978,11 +969,17 @@ int main(int argc, char * argv[]){
       ////////////////////////////////////////////////////////////
       
       otree->njetshad = otree->njets;
+      if (isWJets) otree->njetshad += 1;
+      const bool ApplyRecoilCorrections = cfg.get<bool>("ApplyRecoilCorrections") && !isData && (isDY || isWJets || isVBForGGHiggs || isMSSMsignal);
       
-      if (!isData && ApplyRecoilCorrections && (isDY || isWJets || isVBForGGHiggs || isMSSMsignal) ){
+      if(ApplyRecoilCorrections){
+        RecoilCorrector *recoilPFMetCorrector = (RecoilCorrector*) malloc(sizeof(*recoilPFMetCorrector));
+        TString RecoilFilePath = cfg.get<string>("RecoilFilePath");
+        std::cout << RecoilFilePath << std::endl;
+        recoilPFMetCorrector = new RecoilCorrector( RecoilFilePath);
+
       	genV = genTools::genV(analysisTree);
       	genL = genTools::genL(analysisTree);
-      	if(isWJets) otree->njetshad += 1;
 
         genTools::RecoilCorrections( *recoilPFMetCorrector, 1, // dummy parameter
           otree->met, otree->metphi,
