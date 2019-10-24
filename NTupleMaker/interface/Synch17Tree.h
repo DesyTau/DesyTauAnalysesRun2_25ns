@@ -320,6 +320,8 @@ public :
   Float_t VzConstitTau2;
   Float_t alphaminus;
 
+  //Vinay: ditau_vis_pT + MET
+  Float_t Prompt_pT;
 
   //////////////////////////////////////////////
   //            List of branches              //
@@ -623,6 +625,7 @@ public :
   TBranch        *b_VzConstitTau2;
   TBranch        *b_alphaminus;
 
+  TBranch       *b_Prompt_pT;
 
   Synch17Tree(TTree *tree=0);
   virtual ~Synch17Tree();
