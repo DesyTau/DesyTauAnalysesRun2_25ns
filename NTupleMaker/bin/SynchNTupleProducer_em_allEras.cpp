@@ -15,7 +15,8 @@ int main(int argc, char * argv[]) {
    const bool computeSVFitMass = cfg.get<bool>("ComputeSVFitMass");
    const bool computeFastMTTMass = cfg.get<bool>("ComputeFastMTTMass");
    const bool removeGammaStar = cfg.get<bool>("RemoveGammaStar");
-   
+   const bool usePuppiMet = cfg.get<bool>("UsePuppiMET");
+
    const bool isData = cfg.get<bool>("IsData");
    const bool isDY   = cfg.get<bool>("IsDY");
    const bool isW    = cfg.get<bool>("IsW");
@@ -125,9 +126,13 @@ int main(int argc, char * argv[]) {
    
    const string recoilFileName   = cfg.get<string>("RecoilFileName");
    TString RecoilFileName(recoilFileName);
+   const string recoilFileNamePuppi   = cfg.get<string>("RecoilFileNamePuppi");
+   TString RecoilFileNamePuppi(recoilFileNamePuppi);
    
    const string metSysFileName   = cfg.get<string>("MetSysFileName");
    TString MetSysFileName(metSysFileName);
+   const string metSysFileNamePuppi   = cfg.get<string>("MetSysFileNamePuppi");
+   TString MetSysFileNamePuppi(metSysFileNamePuppi);
    
    const string zMassPtWeightsFileName   = cfg.get<string>("ZMassPtWeightsFileName");
    TString ZMassPtWeightsFileName(zMassPtWeightsFileName);
@@ -150,7 +155,7 @@ int main(int argc, char * argv[]) {
    const bool apply_ggh_uncertainties = cfg.get<bool>("ApplygghUncertainties");
  
    const bool  isSampleForRecoilCorrection = (isW||isDY||isSignal)&&!isData;
-
+   
    
    // Open root files and setup trees  =================================================================================================================================
    std::string rootFileName(argv[2]);
@@ -315,6 +320,9 @@ int main(int argc, char * argv[]) {
    // initialize recoil corrections ====================================================================================================================================
    MEtSys metSys(MetSysFileName);
    RecoilCorrector recoilMetCorrector(RecoilFileName);
+   MEtSys metSysPuppi(MetSysFileNamePuppi);
+   RecoilCorrector recoilMetCorrectorPuppi(RecoilFileNamePuppi);
+
    // initialize calibration of impact parameters ======================================================================================================================
    //CalibrationOfImpactParameters calibrateIP;
    
@@ -383,6 +391,9 @@ int main(int argc, char * argv[]) {
    isSVFitUsed = computeSVFitMass;
    isFastMTTUsed = computeFastMTTMass;
 
+   // store whether PuppiMET is used ===========================================================================================================================
+   isPuppiMETUsed = usePuppiMet;
+   
    // setup MELA =======================================================================================================================================================
    const int erg_tev = 13;
    const float mPOLE = 125.6;
@@ -1010,10 +1021,15 @@ int main(int argc, char * argv[]) {
          TLorentzVector metLV;
          float met_x;
          float met_y;
-
-         met_x = analysisTree.pfmetcorr_ex;
-         met_y = analysisTree.pfmetcorr_ey;
-
+         
+         if (!usePuppiMet){
+            met_x = analysisTree.pfmetcorr_ex;
+            met_y = analysisTree.pfmetcorr_ey;
+         }
+         else{
+            met_x = analysisTree.puppimet_ex;
+            met_y = analysisTree.puppimet_ey;
+         }
          met = TMath::Sqrt(met_x*met_x + met_y*met_y);
          metLV.SetXYZT(met_x,met_y,0.,met);
 
@@ -1314,28 +1330,65 @@ int main(int argc, char * argv[]) {
          }
 
          // METs =======================================================================================================================================================
-         float met_x_recoilscaleUp = analysisTree.pfmetcorr_ex;
-         float met_x_recoilscaleDown = analysisTree.pfmetcorr_ex;
-         float met_y_recoilscaleUp = analysisTree.pfmetcorr_ey;
-         float met_y_recoilscaleDown = analysisTree.pfmetcorr_ey;
-         float met_x_recoilresoUp = analysisTree.pfmetcorr_ex;
-         float met_x_recoilresoDown = analysisTree.pfmetcorr_ex;
-         float met_y_recoilresoUp = analysisTree.pfmetcorr_ey;
-         float met_y_recoilresoDown = analysisTree.pfmetcorr_ey;
+         float met_x_recoilscaleUp;
+         float met_x_recoilscaleDown;
+         float met_y_recoilscaleUp;
+         float met_y_recoilscaleDown;
+         float met_x_recoilresoUp;
+         float met_x_recoilresoDown;
+         float met_y_recoilresoUp;
+         float met_y_recoilresoDown;
          
-         float met_unclMetUp_x    = analysisTree.pfmetcorr_ex_UnclusteredEnUp;
-         float met_unclMetUp_y    = analysisTree.pfmetcorr_ey_UnclusteredEnUp;
-         float met_unclMetDown_x  = analysisTree.pfmetcorr_ex_UnclusteredEnDown;
-         float met_unclMetDown_y  = analysisTree.pfmetcorr_ey_UnclusteredEnDown;
+         float met_unclMetUp_x;
+         float met_unclMetUp_y;
+         float met_unclMetDown_x;
+         float met_unclMetDown_y;
+        
+         if (!usePuppiMet){
+            met_x_recoilscaleUp = analysisTree.pfmetcorr_ex;
+            met_x_recoilscaleDown = analysisTree.pfmetcorr_ex;
+            met_y_recoilscaleUp = analysisTree.pfmetcorr_ey;
+            met_y_recoilscaleDown = analysisTree.pfmetcorr_ey;
+            met_x_recoilresoUp = analysisTree.pfmetcorr_ex;
+            met_x_recoilresoDown = analysisTree.pfmetcorr_ex;
+            met_y_recoilresoUp = analysisTree.pfmetcorr_ey;
+            met_y_recoilresoDown = analysisTree.pfmetcorr_ey;
          
+            met_unclMetUp_x    = analysisTree.pfmetcorr_ex_UnclusteredEnUp;
+            met_unclMetUp_y    = analysisTree.pfmetcorr_ey_UnclusteredEnUp;
+            met_unclMetDown_x  = analysisTree.pfmetcorr_ex_UnclusteredEnDown;
+            met_unclMetDown_y  = analysisTree.pfmetcorr_ey_UnclusteredEnDown;
+         }
+         else{
+            met_x_recoilscaleUp = analysisTree.puppimet_ex;
+            met_x_recoilscaleDown = analysisTree.puppimet_ex;
+            met_y_recoilscaleUp = analysisTree.puppimet_ey;
+            met_y_recoilscaleDown = analysisTree.puppimet_ey;
+            met_x_recoilresoUp = analysisTree.puppimet_ex;
+            met_x_recoilresoDown = analysisTree.puppimet_ex;
+            met_y_recoilresoUp = analysisTree.puppimet_ey;
+            met_y_recoilresoDown = analysisTree.puppimet_ey;
+         
+            met_unclMetUp_x    = analysisTree.puppimet_ex_UnclusteredEnUp;
+            met_unclMetUp_y    = analysisTree.puppimet_ey_UnclusteredEnUp;
+            met_unclMetDown_x  = analysisTree.puppimet_ex_UnclusteredEnDown;
+            met_unclMetDown_y  = analysisTree.puppimet_ey_UnclusteredEnDown;
+         }
          met = TMath::Sqrt(met_x*met_x + met_y*met_y);
          metphi = TMath::ATan2(met_y,met_x);
 
-         metcov00 = analysisTree.pfmetcorr_sigxx;
-         metcov01 = analysisTree.pfmetcorr_sigxy;
-         metcov10 = analysisTree.pfmetcorr_sigyx;
-         metcov11 = analysisTree.pfmetcorr_sigyy;
-
+         if (!usePuppiMet){
+            metcov00 = analysisTree.pfmetcorr_sigxx;
+            metcov01 = analysisTree.pfmetcorr_sigxy;
+            metcov10 = analysisTree.pfmetcorr_sigyx;
+            metcov11 = analysisTree.pfmetcorr_sigyy;
+         }
+         else{
+            metcov00 = analysisTree.puppimet_sigxx;
+            metcov01 = analysisTree.puppimet_sigxy;
+            metcov10 = analysisTree.puppimet_sigyx;
+            metcov11 = analysisTree.puppimet_sigyy;
+         }
          // recoil corrections =========================================================================================================================================
          int njetsforrecoil = njets;
          if (isW) njetsforrecoil = njets + 1;
@@ -1347,14 +1400,24 @@ int main(int argc, char * argv[]) {
          float pfmet_corr_y = met_y;
          if ((isW||isDY||isSignal)&&!isData) {
             if (applySimpleRecoilCorrections) {
-               recoilMetCorrector.CorrectByMeanResolution(met_x,met_y,bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,pfmet_corr_x,pfmet_corr_y);
-               metSys.ApplyMEtSys(pfmet_corr_x, pfmet_corr_y, bosonPx, bosonPy, lepPx, lepPy, njetsforrecoil, MEtSys::SysType::Response, MEtSys::SysShift::Up, met_x_recoilscaleUp, met_y_recoilscaleUp);
-               metSys.ApplyMEtSys(pfmet_corr_x, pfmet_corr_y, bosonPx, bosonPy, lepPx, lepPy, njetsforrecoil, MEtSys::SysType::Response, MEtSys::SysShift::Down, met_x_recoilscaleDown, met_y_recoilscaleDown);
-               metSys.ApplyMEtSys(pfmet_corr_x, pfmet_corr_y, bosonPx, bosonPy, lepPx, lepPy, njetsforrecoil, MEtSys::SysType::Resolution, MEtSys::SysShift::Up, met_x_recoilresoUp, met_y_recoilresoUp);
-               metSys.ApplyMEtSys(pfmet_corr_x, pfmet_corr_y, bosonPx, bosonPy, lepPx, lepPy, njetsforrecoil, MEtSys::SysType::Resolution, MEtSys::SysShift::Down, met_x_recoilresoDown, met_y_recoilresoDown);
+               if (!usePuppiMet){
+                  recoilMetCorrector.CorrectByMeanResolution(met_x,met_y,bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,pfmet_corr_x,pfmet_corr_y);
+                  metSys.ApplyMEtSys(pfmet_corr_x, pfmet_corr_y, bosonPx, bosonPy, lepPx, lepPy, njetsforrecoil, MEtSys::SysType::Response, MEtSys::SysShift::Up, met_x_recoilscaleUp, met_y_recoilscaleUp);
+                  metSys.ApplyMEtSys(pfmet_corr_x, pfmet_corr_y, bosonPx, bosonPy, lepPx, lepPy, njetsforrecoil, MEtSys::SysType::Response, MEtSys::SysShift::Down, met_x_recoilscaleDown, met_y_recoilscaleDown);
+                  metSys.ApplyMEtSys(pfmet_corr_x, pfmet_corr_y, bosonPx, bosonPy, lepPx, lepPy, njetsforrecoil, MEtSys::SysType::Resolution, MEtSys::SysShift::Up, met_x_recoilresoUp, met_y_recoilresoUp);
+                  metSys.ApplyMEtSys(pfmet_corr_x, pfmet_corr_y, bosonPx, bosonPy, lepPx, lepPy, njetsforrecoil, MEtSys::SysType::Resolution, MEtSys::SysShift::Down, met_x_recoilresoDown, met_y_recoilresoDown);
+               }
+               else{
+                  recoilMetCorrectorPuppi.CorrectByMeanResolution(met_x,met_y,bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,pfmet_corr_x,pfmet_corr_y);
+                  metSysPuppi.ApplyMEtSys(pfmet_corr_x, pfmet_corr_y, bosonPx, bosonPy, lepPx, lepPy, njetsforrecoil, MEtSys::SysType::Response, MEtSys::SysShift::Up, met_x_recoilscaleUp, met_y_recoilscaleUp);
+                  metSysPuppi.ApplyMEtSys(pfmet_corr_x, pfmet_corr_y, bosonPx, bosonPy, lepPx, lepPy, njetsforrecoil, MEtSys::SysType::Response, MEtSys::SysShift::Down, met_x_recoilscaleDown, met_y_recoilscaleDown);
+                  metSysPuppi.ApplyMEtSys(pfmet_corr_x, pfmet_corr_y, bosonPx, bosonPy, lepPx, lepPy, njetsforrecoil, MEtSys::SysType::Resolution, MEtSys::SysShift::Up, met_x_recoilresoUp, met_y_recoilresoUp);
+                  metSysPuppi.ApplyMEtSys(pfmet_corr_x, pfmet_corr_y, bosonPx, bosonPy, lepPx, lepPy, njetsforrecoil, MEtSys::SysType::Resolution, MEtSys::SysShift::Down, met_x_recoilresoDown, met_y_recoilresoDown);
+               }
             }
             else {
-               recoilMetCorrector.Correct(met_x,met_y,bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,pfmet_corr_x,pfmet_corr_y);
+               if (!usePuppiMet)recoilMetCorrector.Correct(met_x,met_y,bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,pfmet_corr_x,pfmet_corr_y);
+               else recoilMetCorrectorPuppi.Correct(met_x,met_y,bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,pfmet_corr_x,pfmet_corr_y);
             }
          }
          
@@ -1502,8 +1565,6 @@ int main(int argc, char * argv[]) {
             classic_svFit::MeasuredTauLepton svFitMu(classic_svFit::MeasuredTauLepton::kTauToMuDecay, pt_2, eta_2, phi_2, 105.658e-3); 
             
             if (checkSV){
-
-               std::cout<<"ClassicSVfit is used" <<std::endl;
                ClassicSVfit algo = SVFitMassComputation(svFitEle, svFitMu, met_x, met_y, covMET, inputFile_visPtResolution);
 
                if ( !algo.isValidSolution() )
