@@ -292,7 +292,7 @@ int main(int argc, char * argv[]) {
          metFlags.push_back("Flag_eeBadScFilter");
       metFlags.push_back("Flag_BadPFMuonFilter");
       //metFlags.push_back("Flag_BadChargedCandidateFilter");  // currently not recommended, under review
-      metFlags.push_back("ecalBadCalibReducedMINIAODFilter");
+      metFlags.push_back("ecalBadCalibReducedMINIAODFilter");//version we currently use is outdated, will be updated with next ntuple production campaign
    }
    else if (era == "2018"){
       metFlags.push_back("Flag_goodVertices");
@@ -311,11 +311,11 @@ int main(int argc, char * argv[]) {
       exit(-1);
    }
    std::vector<TString> badChargedCandidateFlag; badChargedCandidateFlag.clear();
-   badChargedCandidateFlag.push_back("Flag_BadChargedCandidateFilter");
+   badChargedCandidateFlag.push_back("Flag_BadChargedCandidateFilter");//do not apply? not applied for now, check!
    std::vector<TString> badPFMuonFlag; badPFMuonFlag.clear();
-   badPFMuonFlag.push_back("Flag_BadPFMuonFilter"); 
+   badPFMuonFlag.push_back("Flag_BadPFMuonFilter");//do not apply? not applied for now, check!
    std::vector<TString> badMuonFlag; badMuonFlag.clear();
-   badMuonFlag.push_back("Flag_badMuons"); 
+   badMuonFlag.push_back("Flag_badMuons");//do not apply? not applied for now, check! 
    
    // initialize recoil corrections ====================================================================================================================================
    MEtSys metSys(MetSysFileName);
@@ -782,10 +782,10 @@ int main(int argc, char * argv[]) {
          badChargedCandidateFilter_ = metFiltersPasses(analysisTree,badChargedCandidateFlag);
          badPFMuonFilter_ = metFiltersPasses(analysisTree,badPFMuonFlag);
          badMuonFilter_ = metFiltersPasses(analysisTree,badMuonFlag);
-         if (era=="2016") metFilters_ = metFilters_ && badMuonFilter_ && duplicateMuonFilter_ &&  badChargedCandidateFilter_ && badPFMuonFilter_;              
+         if (era=="2016") metFilters_ = metFilters_;// && badMuonFilter_ && duplicateMuonFilter_ &&  badChargedCandidateFilter_ && badPFMuonFilter_; not applied for now, check!              
          else metFilters_ = metFilters_;
-         if (era=="2016" && badMuonFilter_ < 0.5) continue;
-         if (era=="2016" && duplicateMuonFilter_ < 0.5) continue; 
+         //if (era=="2016" && badMuonFilter_ < 0.5) continue;
+         //if (era=="2016" && duplicateMuonFilter_ < 0.5) continue; 
          
 
          // triggered?  ================================================================================================================================================    
