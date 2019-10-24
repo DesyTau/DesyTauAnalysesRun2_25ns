@@ -482,9 +482,15 @@ Float_t GetZptMassWeight(Float_t bosonMass, Float_t bosonPt, TH2D * histZMassPtW
    if (bosonMass>50.0) {
       float bosonMassX = bosonMass;
       float bosonPtX = bosonPt;
-      if (bosonMassX>1000.) bosonMassX = 1000.;
-      if (bosonPtX<1.)      bosonPtX = 1.;
-      if (bosonPtX>1000.)   bosonPtX = 1000.;
+      if (bosonMassX>histZMassPtWeights->GetXaxis()->GetXmax()) {
+         bosonMassX = histZMassPtWeights->GetXaxis()->GetXmax();
+      }
+      double minpt;
+      if (histZMassPtWeights->GetYaxis()->GetXmin() > 1.) minpt = histZMassPtWeights->GetYaxis()->GetXmin();
+      else minpt =1.;
+      if (bosonPtX<minpt) bosonPtX = minpt;
+      if (bosonPtX>histZMassPtWeights->GetYaxis()->GetXmax()) bosonPtX = histZMassPtWeights->GetYaxis()->GetXmax();
+
       zptmassweight = histZMassPtWeights->GetBinContent(histZMassPtWeights->GetXaxis()->FindBin(bosonMassX),
                                                         histZMassPtWeights->GetYaxis()->FindBin(bosonPtX));
    }
