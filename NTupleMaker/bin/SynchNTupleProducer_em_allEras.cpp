@@ -318,10 +318,10 @@ int main(int argc, char * argv[]) {
    badMuonFlag.push_back("Flag_badMuons");//do not apply? not applied for now, check! 
    
    // initialize recoil corrections ====================================================================================================================================
-   MEtSys metSys(MetSysFileName);
-   RecoilCorrector recoilMetCorrector(RecoilFileName);
-   MEtSys metSysPuppi(MetSysFileNamePuppi);
-   RecoilCorrector recoilMetCorrectorPuppi(RecoilFileNamePuppi);
+   kit::MEtSys metSys(MetSysFileName);
+   kit::RecoilCorrector recoilMetCorrector(RecoilFileName);
+   kit::MEtSys metSysPuppi(MetSysFileNamePuppi);
+   kit::RecoilCorrector recoilMetCorrectorPuppi(RecoilFileNamePuppi);
 
    // initialize calibration of impact parameters ======================================================================================================================
    //CalibrationOfImpactParameters calibrateIP;
@@ -1402,17 +1402,17 @@ int main(int argc, char * argv[]) {
             if (applySimpleRecoilCorrections) {
                if (!usePuppiMet){
                   recoilMetCorrector.CorrectByMeanResolution(met_x,met_y,bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,pfmet_corr_x,pfmet_corr_y);
-                  metSys.ApplyMEtSys(pfmet_corr_x, pfmet_corr_y, bosonPx, bosonPy, lepPx, lepPy, njetsforrecoil, MEtSys::SysType::Response, MEtSys::SysShift::Up, met_x_recoilscaleUp, met_y_recoilscaleUp);
-                  metSys.ApplyMEtSys(pfmet_corr_x, pfmet_corr_y, bosonPx, bosonPy, lepPx, lepPy, njetsforrecoil, MEtSys::SysType::Response, MEtSys::SysShift::Down, met_x_recoilscaleDown, met_y_recoilscaleDown);
-                  metSys.ApplyMEtSys(pfmet_corr_x, pfmet_corr_y, bosonPx, bosonPy, lepPx, lepPy, njetsforrecoil, MEtSys::SysType::Resolution, MEtSys::SysShift::Up, met_x_recoilresoUp, met_y_recoilresoUp);
-                  metSys.ApplyMEtSys(pfmet_corr_x, pfmet_corr_y, bosonPx, bosonPy, lepPx, lepPy, njetsforrecoil, MEtSys::SysType::Resolution, MEtSys::SysShift::Down, met_x_recoilresoDown, met_y_recoilresoDown);
+                  metSys.ApplyMEtSys(pfmet_corr_x, pfmet_corr_y, bosonPx, bosonPy, lepPx, lepPy, njetsforrecoil, kit::MEtSys::SysType::Response, kit::MEtSys::SysShift::Up, met_x_recoilscaleUp, met_y_recoilscaleUp);
+                  metSys.ApplyMEtSys(pfmet_corr_x, pfmet_corr_y, bosonPx, bosonPy, lepPx, lepPy, njetsforrecoil, kit::MEtSys::SysType::Response, kit::MEtSys::SysShift::Down, met_x_recoilscaleDown, met_y_recoilscaleDown);
+                  metSys.ApplyMEtSys(pfmet_corr_x, pfmet_corr_y, bosonPx, bosonPy, lepPx, lepPy, njetsforrecoil, kit::MEtSys::SysType::Resolution, kit::MEtSys::SysShift::Up, met_x_recoilresoUp, met_y_recoilresoUp);
+                  metSys.ApplyMEtSys(pfmet_corr_x, pfmet_corr_y, bosonPx, bosonPy, lepPx, lepPy, njetsforrecoil, kit::MEtSys::SysType::Resolution, kit::MEtSys::SysShift::Down, met_x_recoilresoDown, met_y_recoilresoDown);
                }
                else{
                   recoilMetCorrectorPuppi.CorrectByMeanResolution(met_x,met_y,bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,pfmet_corr_x,pfmet_corr_y);
-                  metSysPuppi.ApplyMEtSys(pfmet_corr_x, pfmet_corr_y, bosonPx, bosonPy, lepPx, lepPy, njetsforrecoil, MEtSys::SysType::Response, MEtSys::SysShift::Up, met_x_recoilscaleUp, met_y_recoilscaleUp);
-                  metSysPuppi.ApplyMEtSys(pfmet_corr_x, pfmet_corr_y, bosonPx, bosonPy, lepPx, lepPy, njetsforrecoil, MEtSys::SysType::Response, MEtSys::SysShift::Down, met_x_recoilscaleDown, met_y_recoilscaleDown);
-                  metSysPuppi.ApplyMEtSys(pfmet_corr_x, pfmet_corr_y, bosonPx, bosonPy, lepPx, lepPy, njetsforrecoil, MEtSys::SysType::Resolution, MEtSys::SysShift::Up, met_x_recoilresoUp, met_y_recoilresoUp);
-                  metSysPuppi.ApplyMEtSys(pfmet_corr_x, pfmet_corr_y, bosonPx, bosonPy, lepPx, lepPy, njetsforrecoil, MEtSys::SysType::Resolution, MEtSys::SysShift::Down, met_x_recoilresoDown, met_y_recoilresoDown);
+                  metSysPuppi.ApplyMEtSys(pfmet_corr_x, pfmet_corr_y, bosonPx, bosonPy, lepPx, lepPy, njetsforrecoil, kit::MEtSys::SysType::Response, kit::MEtSys::SysShift::Up, met_x_recoilscaleUp, met_y_recoilscaleUp);
+                  metSysPuppi.ApplyMEtSys(pfmet_corr_x, pfmet_corr_y, bosonPx, bosonPy, lepPx, lepPy, njetsforrecoil, kit::MEtSys::SysType::Response, kit::MEtSys::SysShift::Down, met_x_recoilscaleDown, met_y_recoilscaleDown);
+                  metSysPuppi.ApplyMEtSys(pfmet_corr_x, pfmet_corr_y, bosonPx, bosonPy, lepPx, lepPy, njetsforrecoil, kit::MEtSys::SysType::Resolution, kit::MEtSys::SysShift::Up, met_x_recoilresoUp, met_y_recoilresoUp);
+                  metSysPuppi.ApplyMEtSys(pfmet_corr_x, pfmet_corr_y, bosonPx, bosonPy, lepPx, lepPy, njetsforrecoil, kit::MEtSys::SysType::Resolution, kit::MEtSys::SysShift::Down, met_x_recoilresoDown, met_y_recoilresoDown);
                }
             }
             else {
