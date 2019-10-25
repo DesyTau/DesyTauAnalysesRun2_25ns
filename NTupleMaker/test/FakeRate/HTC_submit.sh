@@ -5,7 +5,7 @@
 cat > $2.submit <<EOF
 +RequestRuntime=5000
 
-RequestMemory = 5000
+RequestMemory = 2000
 
 executable = $1
 

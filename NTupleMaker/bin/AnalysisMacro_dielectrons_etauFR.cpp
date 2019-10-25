@@ -29,8 +29,6 @@
 #include "DesyTauAnalyses/NTupleMaker/interface/functions.h"
 #include "HTT-utilities/LepEffInterface/interface/ScaleFactor.h"
 
-//A macro to perform e->tau fake rate measurement
-
 int main(int argc, char * argv[]) {
 
   // first argument - config file 
@@ -51,7 +49,6 @@ int main(int argc, char * argv[]) {
 
     const bool isData = cfg.get<bool>("IsData");
     const bool applyGoodRunSelection = cfg.get<bool>("ApplyGoodRunSelection");
-    const bool slimNTuples = cfg.get<bool>("slimNTuples");
 
     const string jsonFile = cfg.get<string>("jsonFile");
 
@@ -62,6 +59,7 @@ int main(int argc, char * argv[]) {
     const bool applyPUreweighting_official = cfg.get<bool>("ApplyPUreweighting_official");
     const string dataPUFile = cfg.get<string>("DataPUFile");
     const string mcPUFile = cfg.get<string>("MCPUFile");
+    const string pileUpforMC = cfg.get<string>("pileUpforMC");
 
     // kinematic cuts on electrons
     const float ptEleTagCut  = cfg.get<float>("ptEleTagCut");
@@ -106,7 +104,10 @@ int main(int argc, char * argv[]) {
     //scale factor
     const string EleIdIsoFile = cfg.get<string>("EleIdIsoFile");
     const string EleTriggerFile = cfg.get<string>("EleTriggerFile");
-    
+ 
+    //zptweight file 
+    const string ZptweightFile = cfg.get<string>("ZptweightFile");
+   
     //Tag ele energy scale
     const float tageleScaleBarrel = cfg.get<float>("TagEleScaleBarrel");
     const float tageleScaleEndcap = cfg.get<float>("TagEleScaleEndcap");
@@ -187,6 +188,7 @@ int main(int argc, char * argv[]) {
     Float_t         effweight;
     Float_t         tauidweight;
 
+    Float_t         zptweight;
     
     Int_t           TPmatching_status;
     Int_t           gen_match_1;
@@ -213,17 +215,36 @@ int main(int argc, char * argv[]) {
     Bool_t os;
     Float_t iso_1;
     
+    Bool_t tauagainstMuLooseDeepTau;
+    Bool_t tauagainstMuonLoose3;
+
     Bool_t tauagainstEleVLoose;
     Bool_t tauagainstEleLoose;
     Bool_t tauagainstEleMedium;
     Bool_t tauagainstEleTight;
     Bool_t tauagainstEleVTight;
     Float_t tauagainstEleRaw;
-
+	
     Bool_t taubyLooseCombinedIsolationDeltaBetaCorr3Hits;
     Bool_t taubyLooseIsolationMVArun2v1DBoldDMwLT;
     Bool_t taubyTightIsolationMVArun2v1DBoldDMwLT;
+    
+    Bool_t tauagainstEleVVVLooseDeepTau;
+    Bool_t tauagainstEleVVLooseDeepTau;
+    Bool_t tauagainstEleVLooseDeepTau;
+    Bool_t tauagainstEleLooseDeepTau;
+    Bool_t tauagainstEleMediumDeepTau;
+    Bool_t tauagainstEleTightDeepTau;
+    Bool_t tauagainstEleVTightDeepTau;
+    Bool_t tauagainstEleVVTightDeepTau;
+    Float_t tauagainstEleRawDeepTau;
+    
+    Bool_t taubyVLooseDeepTau2017v2p1VSjet;
+    Bool_t taubyLooseDeepTau2017v2p1VSjet;
+    Bool_t taubyMediumDeepTau2017v2p1VSjet;
+    Bool_t taubyTightDeepTau2017v2p1VSjet;
 
+    Bool_t tau_decayModeFinding;
     
     Float_t PtTag;
     Float_t EtaTag;
@@ -249,6 +270,8 @@ int main(int argc, char * argv[]) {
     eleTree->Branch("isoweight_1", &isoweight_1, "isoweight_1/F");
     eleTree->Branch("effweight", &effweight, "effweight/F");
     eleTree->Branch("tauidweight", &tauidweight, "tauidweight/F");
+
+    eleTree->Branch("zptweight",&zptweight,"zptweight/F");
 
     eleTree->Branch("TPmatching_status",&TPmatching_status,"TPmatching_status/I");
     eleTree->Branch("gen_match_1",&gen_match_1,"gen_match_1/I");
@@ -280,11 +303,31 @@ int main(int argc, char * argv[]) {
     eleTree->Branch("tauagainstEleVTight",&tauagainstEleVTight,"tauagainstEleVTight/O");
     eleTree->Branch("tauagainstEleRaw",&tauagainstEleRaw,"tauagainstEleRaw/F");
 
+    eleTree->Branch("tauagainstMuLooseDeepTau",&tauagainstMuLooseDeepTau,"tauagainstMuLooseDeepTau/O");
+    eleTree->Branch("tauagainstMuonLoose3",&tauagainstMuonLoose3,"tauagainstMuonLoose3/O");
     
+    
+    eleTree->Branch("tauagainstEleVVVLooseDeepTau",&tauagainstEleVVVLooseDeepTau,"tauagainstEleVVVLooseDeepTau/O");
+    eleTree->Branch("tauagainstEleVVLooseDeepTau",&tauagainstEleVVLooseDeepTau,"tauagainstEleVVLooseDeepTau/O");
+    eleTree->Branch("tauagainstEleVLooseDeepTau",&tauagainstEleVLooseDeepTau,"tauagainstEleVLooseDeepTau/O");
+    eleTree->Branch("tauagainstEleLooseDeepTau",&tauagainstEleLooseDeepTau,"tauagainstEleLooseDeepTau/O");
+    eleTree->Branch("tauagainstEleMediumDeepTau",&tauagainstEleMediumDeepTau,"tauagainstEleMediumDeepTau/O");
+    eleTree->Branch("tauagainstEleTightDeepTau",&tauagainstEleTightDeepTau,"tauagainstEleTightDeepTau/O");
+    eleTree->Branch("tauagainstEleVTightDeepTau",&tauagainstEleVTightDeepTau,"tauagainstEleVTightDeepTau/O");
+    eleTree->Branch("tauagainstEleVVTightDeepTau",&tauagainstEleVVTightDeepTau,"tauagainstEleVVTightDeepTau/O");
+    eleTree->Branch("tauagainstEleRawDeepTau",&tauagainstEleRawDeepTau,"tauagainstEleRawDeepTau/F");
+
+    eleTree->Branch("taubyVLooseDeepTau2017v2p1VSjet",&taubyVLooseDeepTau2017v2p1VSjet,"taubyVLooseDeepTau2017v2p1VSjet/O");
+    eleTree->Branch("taubyLooseDeepTau2017v2p1VSjet",&taubyLooseDeepTau2017v2p1VSjet,"taubyLooseDeepTau2017v2p1VSjet/O");
+    eleTree->Branch("taubyMediumDeepTau2017v2p1VSjet",&taubyMediumDeepTau2017v2p1VSjet,"taubyMediumDeepTau2017v2p1VSjet/O");
+    eleTree->Branch("taubyTightDeepTau2017v2p1VSjet",&taubyTightDeepTau2017v2p1VSjet,"taubyTightDeepTau2017v2p1VSjet/O");
+
 
     eleTree->Branch("taubyLooseCombinedIsolationDeltaBetaCorr3Hits",&taubyLooseCombinedIsolationDeltaBetaCorr3Hits,"taubyLooseCombinedIsolationDeltaBetaCorr3Hits/O");
     eleTree->Branch("taubyLooseIsolationMVArun2v1DBoldDMwLT",&taubyLooseIsolationMVArun2v1DBoldDMwLT,"taubyLooseIsolationMVArun2v1DBoldDMwLT/O");
     eleTree->Branch("taubyTightIsolationMVArun2v1DBoldDMwLT",&taubyTightIsolationMVArun2v1DBoldDMwLT,"taubyTightIsolationMVArun2v1DBoldDMwLT/O");
+
+    eleTree->Branch("tau_decayModeFinding",&tau_decayModeFinding,"tau_decayModeFinding/O");    
 
     eleTree->Branch("PtTag",&PtTag,"PtTag/F");
     eleTree->Branch("EtaTag",&EtaTag,"EtaTag/F");
@@ -308,10 +351,13 @@ int main(int argc, char * argv[]) {
   PileUp * PUofficial = new PileUp();
 
   if (applyPUreweighting_official) {
+
     TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/"+TString(dataPUFile),"read");
     TFile * filePUdistribution_MC = new TFile (TString(cmsswBase)+"/src/"+TString(mcPUFile), "read");
     TH1D * PU_data = (TH1D *)filePUdistribution_data->Get("pileup");
-    TH1D * PU_mc = (TH1D *)filePUdistribution_MC->Get("pileup");
+    TString name_pileUpforMC= "pileup";
+    if(!isData&&pileUpforMC!="")name_pileUpforMC=pileUpforMC;
+    TH1D * PU_mc = (TH1D *)filePUdistribution_MC->Get(name_pileUpforMC);
     PUofficial->set_h_data(PU_data);
     PUofficial->set_h_MC(PU_mc);
   }
@@ -320,6 +366,9 @@ int main(int argc, char * argv[]) {
     SF_eleIdIso->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(EleIdIsoFile));
     ScaleFactor * SF_eleTrig = new ScaleFactor();
     SF_eleTrig->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(EleTriggerFile));
+    // Zpt reweighting for LO DY samples 
+    TFile * f_zptweight = new TFile(TString(cmsswBase)+"/src/"+ZptweightFile,"read");
+    TH2D * h_zptweight = (TH2D*)f_zptweight->Get("zptmass_histo");
 
   int nFiles = 0;
   int nEvents = 0;
@@ -580,12 +629,13 @@ int main(int argc, char * argv[]) {
         vector<unsigned int> goodTaus; goodTaus.clear();
         for(unsigned int it=0;it<analysisTree.tau_count;++it)
         {
-            if (analysisTree.tau_decayModeFinding[it]<=0.5) continue;
+            //if (analysisTree.tau_decayModeFinding[it]<=0.5) continue;
+   	    if (analysisTree.tau_decayMode[it]==5 || analysisTree.tau_decayMode[it]==6) continue;
             if (analysisTree.tau_pt[it]<ptTauCut) continue;
             if (fabs(analysisTree.tau_eta[it])>etaTauCut) continue;
             if (fabs(analysisTree.tau_leadchargedhadrcand_dz[it])>dzTauCut) continue;
             if (fabs(analysisTree.tau_charge[it])<0.5||fabs(analysisTree.tau_charge[it])>1.5) continue;
-            if (analysisTree.tau_againstMuonLoose3[it] < 0.5) continue;
+            if (analysisTree.tau_againstMuonLoose3[it] < 0.5 && analysisTree.tau_byLooseDeepTau2017v2p1VSmu[it] < 0.5) continue;
             goodTaus.push_back(it);
         }
         
@@ -832,20 +882,21 @@ int main(int argc, char * argv[]) {
 
                         //using uncorrected MET for now in 2017
                         
-                        met = TMath::Sqrt(analysisTree.pfmet_ex*analysisTree.pfmet_ex + analysisTree.pfmet_ey*analysisTree.pfmet_ey);
-			metphi = analysisTree.pfmet_phi;
+                        met = TMath::Sqrt(analysisTree.pfmetcorr_ex*analysisTree.pfmetcorr_ex + analysisTree.pfmetcorr_ey*analysisTree.pfmetcorr_ey);
+			metphi = analysisTree.pfmetcorr_phi;
 
 
 
 			////////////////////////////////////////////////////////////
-			// MET Recoil Corrections
+			// MET Recoil Corrections & Zpt reweighting
 			////////////////////////////////////////////////////////////
 		
 			TLorentzVector genV( 0., 0., 0., 0.);
 			TLorentzVector genL( 0., 0., 0., 0.);
 			njets=analysisTree.pfjet_count;
 			UInt_t njetshad=njets;
- 		
+			zptweight = 1.;
+
 			if (!isData && applyRecoilCorrections && (isDY || isWJets ) ){
 			  genV = genTools::genV(analysisTree);
 			  genL = genTools::genL(analysisTree);
@@ -864,6 +915,27 @@ int main(int argc, char * argv[]) {
 						       );
 			  met=met_rcmr;
 			  metphi=metphi_rcmr;
+
+			  float bosonMass = genV.M();
+			  float bosonPt = genV.Pt();
+			  Float_t zptmassweight = 1;
+			  if (bosonMass>50.0) {
+			    float maxmass = h_zptweight->GetXaxis()->GetXmax();
+			    float maxpt = h_zptweight->GetYaxis()->GetXmax();
+			    float minmass = h_zptweight->GetXaxis()->GetXmin();
+			    float minpt = h_zptweight->GetYaxis()->GetXmin();
+			    float _bosonMass = bosonMass;
+			    float _bosonPt = bosonPt;
+			    if(bosonMass>maxmass) _bosonMass=maxmass;
+			    else if(bosonMass<minmass) _bosonMass=minmass;
+			    if(bosonPt>maxpt) _bosonPt = maxpt;
+			    else if(bosonPt<minpt) _bosonPt = minpt;
+			    zptmassweight = h_zptweight->GetBinContent(h_zptweight->GetXaxis()->FindBin(_bosonMass),
+								       h_zptweight->GetYaxis()->FindBin(_bosonPt));
+			  }
+			  zptweight =zptmassweight;
+
+
 			}
 			TLorentzVector metLV; metLV.SetXYZT(met*TMath::Cos(metphi),
 							    met*TMath::Sin(metphi),
@@ -871,6 +943,8 @@ int main(int argc, char * argv[]) {
 							    TMath::Sqrt( met*TMath::Sin(metphi)*met*TMath::Sin(metphi) +
 									 met*TMath::Cos(metphi)*met*TMath::Cos(metphi)));
 			
+
+
 			/*
                         float dPhiMETEle = dPhiFrom2P(analysisTree.electron_px[index1],analysisTree.electron_py[index1],analysisTree.pfmet_ex,analysisTree.pfmet_ey);
 
@@ -981,7 +1055,7 @@ int main(int argc, char * argv[]) {
                         //cout <<"m_vis_gen:"<< m_vis_gen<< endl;
                         
                         //cout <<"----------" << endl;
-                        
+                       
                         tauagainstEleVLoose = analysisTree.tau_againstElectronVLooseMVA6[indexProbe];
                         tauagainstEleLoose = analysisTree.tau_againstElectronLooseMVA6[indexProbe];
                         tauagainstEleMedium = analysisTree.tau_againstElectronMediumMVA6[indexProbe];
@@ -992,7 +1066,8 @@ int main(int argc, char * argv[]) {
 			//                        taubyLooseIsolationMVArun2v1DBoldDMwLT = analysisTree.tau_byLooseIsolationMVArun2v1DBoldDMwLT[indexProbe];
                         taubyLooseIsolationMVArun2v1DBoldDMwLT = analysisTree.tau_byLooseIsolationMVArun2017v2DBoldDMwLT2017[indexProbe];
                         taubyTightIsolationMVArun2v1DBoldDMwLT = analysisTree.tau_byTightIsolationMVArun2017v2DBoldDMwLT2017[indexProbe];
-			if(slimNTuples&&taubyTightIsolationMVArun2v1DBoldDMwLT<0.5)continue;
+
+			tau_decayModeFinding = analysisTree.tau_decayModeFinding[indexProbe];
 
                         PtTag = analysisTree.electron_pt[index1];
                         EtaTag = analysisTree.electron_eta[index1];
@@ -1000,7 +1075,35 @@ int main(int argc, char * argv[]) {
                         EtaProbe = analysisTree.tau_eta[indexProbe];
                         DecayModeProbe = analysisTree.tau_decayMode[indexProbe];
 
+
+
+			tauagainstMuLooseDeepTau = analysisTree.tau_byLooseDeepTau2017v2p1VSmu[indexProbe];
+			tauagainstMuonLoose3 = analysisTree.tau_againstMuonLoose3[indexProbe];
                         
+			
+			
+			tauagainstEleVVVLooseDeepTau = analysisTree.tau_byVVVLooseDeepTau2017v2p1VSe[indexProbe];
+			tauagainstEleVVLooseDeepTau = analysisTree.tau_byVVLooseDeepTau2017v2p1VSe[indexProbe];
+			tauagainstEleVLooseDeepTau = analysisTree.tau_byVLooseDeepTau2017v2p1VSe[indexProbe];
+                        tauagainstEleLooseDeepTau = analysisTree.tau_byLooseDeepTau2017v2p1VSe[indexProbe];
+                        tauagainstEleMediumDeepTau = analysisTree.tau_byMediumDeepTau2017v2p1VSe[indexProbe];
+                        tauagainstEleTightDeepTau = analysisTree.tau_byTightDeepTau2017v2p1VSe[indexProbe];
+                        tauagainstEleVTightDeepTau = analysisTree.tau_byVTightDeepTau2017v2p1VSe[indexProbe];
+			tauagainstEleVVTightDeepTau = analysisTree.tau_byVVTightDeepTau2017v2p1VSe[indexProbe];                        
+			tauagainstEleRawDeepTau = analysisTree.tau_byDeepTau2017v2p1VSeraw[indexProbe];
+                        taubyLooseCombinedIsolationDeltaBetaCorr3Hits = analysisTree.tau_byLooseCombinedIsolationDeltaBetaCorr3Hits[indexProbe];
+			//              taubyLooseIsolationMVArun2v1DBoldDMwLT = analysisTree.tau_byLooseIsolationMVArun2v1DBoldDMwLT[indexProbe];
+			                        
+			taubyVLooseDeepTau2017v2p1VSjet = analysisTree.tau_byVLooseDeepTau2017v2p1VSjet[indexProbe];
+			taubyLooseDeepTau2017v2p1VSjet = analysisTree.tau_byLooseDeepTau2017v2p1VSjet[indexProbe];
+			taubyMediumDeepTau2017v2p1VSjet = analysisTree.tau_byMediumDeepTau2017v2p1VSjet[indexProbe];                        
+			taubyTightDeepTau2017v2p1VSjet = analysisTree.tau_byTightDeepTau2017v2p1VSjet[indexProbe];
+			//if(slimNTuples&&taubyTightIsolationMVArun2v1DBoldDMwLT<0.5)continue;
+			if(taubyTightIsolationMVArun2v1DBoldDMwLT<0.5&&taubyMediumDeepTau2017v2p1VSjet<0.5)continue;
+
+                       
+                        
+
                         eleTree->Fill();
                         selEventsIsoEles++;
                     }

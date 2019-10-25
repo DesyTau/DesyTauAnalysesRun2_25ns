@@ -30,7 +30,7 @@ MuonEG:
 /MuonEG/Run2018D-PromptReco-v2/MINIAOD
 
 EGamma (replaces SingleElectron in 2018):
-/EGamma/Run2018A-17Sep2018-v1/MINIAOD
+/EGamma/Run2018A-17Sep2018-v2/MINIAOD
 /EGamma/Run2018B-17Sep2018-v1/MINIAOD
 /EGamma/Run2018C-17Sep2018-v1/MINIAOD
 /EGamma/Run2018D-22Jan2019-v2/MINIAOD

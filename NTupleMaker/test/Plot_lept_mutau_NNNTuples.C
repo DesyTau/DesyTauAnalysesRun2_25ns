@@ -323,19 +323,25 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
   // ***********************************
 
   TH1D * dummy = (TH1D*)ZTT->Clone("dummy");
+  float errFake = 0.15; // ad-hoc sys uncertainty of Fakes background
   float errQCD = 0.15; // ad-hoc sys uncertainty of QCD background
   float errVV  = 0.15; // ad-hoc sys uncertainty of VV background
   float errW   = 0.10; // ad-hoc sys uncertainty of W+Jets background
   float errTT  = 0.07; // ad-hoc sys uncertainty of TT background
+  float errDY  = 0.06; // ad-hoc sys uncertainty of DY background
 
   for (int iB=1; iB<=nBins; ++iB) {   // Add general systematic uncertainties to each bin as error
-    float eQCD   = errQCD*QCD->GetBinContent(iB);
+    float eQCD   = errFake*Fakes->GetBinContent(iB);
+    float eFake   = errQCD*QCD->GetBinContent(iB);
     float eVV    = errVV*VV->GetBinContent(iB);
     float eW     = errW*W->GetBinContent(iB);
     float eTT    = errTT*TT->GetBinContent(iB);
-    float err2   = eQCD*eQCD+eVV*eVV + eW*eW + eTT*eTT;     //TO DO: WAS IST MIT DEM FEHLER AUF DY?
+    float eDY    = errDY*ZTT->GetBinContent(iB);
+    float err2   ;
+    if(FFmethod)err2= eVV*eVV + eTT*eTT + eDY*eDY + eFake*eFake;     //TO DO: WAS IST MIT DEM FEHLER AUF DY?
+    else err2= eQCD*eQCD+eVV*eVV + eW*eW + eTT*eTT + eDY*eDY;     //TO DO: WAS IST MIT DEM FEHLER AUF DY?
     float errTot = TMath::Sqrt(err2);
-    cout << "eQCD: " << eQCD << "  eVV: " << eVV << "  eW: " << eW << "  eTT: " << eTT << "  eTotal: " << errTot << endl;
+    cout << "eQCD: " << eQCD << "  eVV: " << eVV << "  eW: " << eW << "  eTT: " << eTT << "  eDY: " << eDY << "  eTotal: " << errTot << endl;
     dummy -> SetBinError(iB,errTot);
     ggH   -> SetBinError(iB,0);
     CPoddH  -> SetBinError(iB,0);
@@ -468,7 +474,7 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
     float eMuon = errMuon * X;
     float eElectron = errElectron * X;
     float eBkg = dummy->GetBinError(iB);
-    float Err = TMath::Sqrt(eStat*eStat+eLumi*eLumi+eBkg*eBkg+eMuon*eMuon+eElectron*eElectron);
+    float Err = TMath::Sqrt(eStat*eStat+eLumi*eLumi+eBkg*eBkg+eMuon*eMuon);
     bkgdErr->SetBinError(iB,Err);
     cout << "eStat = " << eStat << " : eLumi = "<< eLumi <<" : eBkg = " << eBkg << endl;
   }
@@ -491,7 +497,7 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
 	  float errbkg = max(0.1,bkgdErr->GetBinError(iB)/bkgYield);
 	  float signalYield = ggH->GetBinContent(iB)/scaleSignal;
 	  float ye = signalYield / sqrt(bkgYield+pow(bkgYield*errbkg,2));
-	  if(ye>=0.2){
+	  if(ye>=0.3||(categoryIndex==0||categoryIndex==1)){
 	    histData->SetBinContent(iB,-1);
 	    histData->SetBinError(iB,0);
 	  }
@@ -527,7 +533,7 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
 
   if (year== 2016) DrawTitle(pads[0], "35.9 fb^{-1} (13 TeV, 2016)", 3);
   if (year== 2017) DrawTitle(pads[0], "41.9 fb^{-1} (13 TeV, 2017)", 3);
-  if (year== 2018) DrawTitle(pads[0], "59.7 fb^{-1} (13 TeV, 2018)", 3);
+  if (year== 2018) DrawTitle(pads[0], "59.9 fb^{-1} (13 TeV, 2018)", 3);
   
   DrawTitle(pads[0], "#scale[1.2]{         #bf{CMS} Work in progress}", 1);
   FixBoxPadding(pads[0], legend, 0.05);
