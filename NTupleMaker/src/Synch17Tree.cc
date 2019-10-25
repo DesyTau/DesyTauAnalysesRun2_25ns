@@ -208,6 +208,14 @@ void Synch17Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("byVVVLooseDeepTau2017v2p1VSe_2", &byVVVLooseDeepTau2017v2p1VSe_2, &b_byVVVLooseDeepTau2017v2p1VSe_2);
    fChain->SetBranchAddress("byVVVLooseDeepTau2017v2p1VSjet_2", &byVVVLooseDeepTau2017v2p1VSjet_2, &b_byVVVLooseDeepTau2017v2p1VSjet_2);
 
+   fChain->SetBranchAddress("MVADM2017v1_2", &MVADM2017v1_2, &b_MVADM2017v1_2);
+   fChain->SetBranchAddress("MVADM2017v1DM0raw_2", &MVADM2017v1DM0raw_2, &b_MVADM2017v1DM0raw_2);
+   fChain->SetBranchAddress("MVADM2017v1DM10raw_2", &MVADM2017v1DM10raw_2, &b_MVADM2017v1DM10raw_2);
+   fChain->SetBranchAddress("MVADM2017v1DM11raw_2", &MVADM2017v1DM11raw_2, &b_MVADM2017v1DM11raw_2);
+   fChain->SetBranchAddress("MVADM2017v1DM1raw_2", &MVADM2017v1DM1raw_2, &b_MVADM2017v1DM1raw_2);
+   fChain->SetBranchAddress("MVADM2017v1DM2raw_2", &MVADM2017v1DM2raw_2, &b_MVADM2017v1DM2raw_2);
+   fChain->SetBranchAddress("MVADM2017v1DMotherraw_2", &MVADM2017v1DMotherraw_2, &b_MVADM2017v1DMotherraw_2);
+
    fChain->SetBranchAddress("byCombinedIsolationDeltaBetaCorrRaw3Hits_2", &byCombinedIsolationDeltaBetaCorrRaw3Hits_2, &b_byCombinedIsolationDeltaBetaCorrRaw3Hits_2);
    fChain->SetBranchAddress("byIsolationMVA3newDMwoLTraw_2", &byIsolationMVA3newDMwoLTraw_2, &b_byIsolationMVA3newDMwoLTraw_2);
    fChain->SetBranchAddress("byIsolationMVA3oldDMwoLTraw_2", &byIsolationMVA3oldDMwoLTraw_2, &b_byIsolationMVA3oldDMwoLTraw_2);
@@ -548,6 +556,14 @@ void Synch17Tree::WriteInit(TTree *tree) {
    fChain->Branch("byVVTightDeepTau2017v2p1VSjet_2", &byVVTightDeepTau2017v2p1VSjet_2, "byVVTightDeepTau2017v2p1VSjet_2/F");
    fChain->Branch("byVVVLooseDeepTau2017v2p1VSe_2", &byVVVLooseDeepTau2017v2p1VSe_2, "byVVVLooseDeepTau2017v2p1VSe_2/F");
    fChain->Branch("byVVVLooseDeepTau2017v2p1VSjet_2", &byVVVLooseDeepTau2017v2p1VSjet_2, "byVVVLooseDeepTau2017v2p1VSjet_2/F");
+
+   fChain->Branch("MVADM2017v1_2", &MVADM2017v1_2, "MVADM2017v1_2/F");
+   fChain->Branch("MVADM2017v1DM0raw_2", &MVADM2017v1DM0raw_2, "MVADM2017v1DM0raw_2/F");
+   fChain->Branch("MVADM2017v1DM10raw_2", &MVADM2017v1DM10raw_2, "MVADM2017v1DM10raw_2/F");
+   fChain->Branch("MVADM2017v1DM11raw_2", &MVADM2017v1DM11raw_2, "MVADM2017v1DM11raw_2/F");
+   fChain->Branch("MVADM2017v1DM1raw_2", &MVADM2017v1DM1raw_2, "MVADM2017v1DM1raw_2/F");
+   fChain->Branch("MVADM2017v1DM2raw_2", &MVADM2017v1DM2raw_2, "MVADM2017v1DM2raw_2/F");
+   fChain->Branch("MVADM2017v1DMotherraw_2", &MVADM2017v1DMotherraw_2, "MVADM2017v1DMotherraw_2/F");
 
    fChain->Branch("byCombinedIsolationDeltaBetaCorrRaw3Hits_1", &byCombinedIsolationDeltaBetaCorrRaw3Hits_1, "byCombinedIsolationDeltaBetaCorrRaw3Hits_1/F");
    fChain->Branch("byIsolationMVA3newDMwoLTraw_1", &byIsolationMVA3newDMwoLTraw_1, "byIsolationMVA3newDMwoLTraw_1/F");

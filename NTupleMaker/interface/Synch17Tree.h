@@ -154,6 +154,14 @@ public :
   Float_t	   byVVVLooseDeepTau2017v2p1VSe_2;	
   Float_t	   byVVVLooseDeepTau2017v2p1VSjet_2;	
 
+  Float_t    MVADM2017v1_2;
+  Float_t    MVADM2017v1DM0raw_2;
+  Float_t    MVADM2017v1DM10raw_2;
+  Float_t    MVADM2017v1DM11raw_2;
+  Float_t    MVADM2017v1DM1raw_2;
+  Float_t    MVADM2017v1DM2raw_2;
+  Float_t    MVADM2017v1DMotherraw_2;
+
   // new 
   Float_t         idisoweight_2;
   Float_t         idisoweight_antiiso_2;
@@ -460,6 +468,14 @@ public :
   TBranch	   *b_byVVTightDeepTau2017v2p1VSjet_2;	
   TBranch	   *b_byVVVLooseDeepTau2017v2p1VSe_2;	
   TBranch	   *b_byVVVLooseDeepTau2017v2p1VSjet_2;	
+
+  TBranch    *b_MVADM2017v1_2;
+  TBranch    *b_MVADM2017v1DM0raw_2;
+  TBranch    *b_MVADM2017v1DM10raw_2;
+  TBranch    *b_MVADM2017v1DM11raw_2;
+  TBranch    *b_MVADM2017v1DM1raw_2;
+  TBranch    *b_MVADM2017v1DM2raw_2;
+  TBranch    *b_MVADM2017v1DMotherraw_2;
 
   ///////////////////////////////////////////////////////////NEW
   TBranch	 *b_efficiency_byVVLooseIsolationMVArun2017v2DBoldDMwLT2017_1;

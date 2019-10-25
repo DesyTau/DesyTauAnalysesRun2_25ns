@@ -352,7 +352,7 @@ int main(int argc, char * argv[]){
     //std::cout << filePUdistribution_data << std::endl;
     //std::cout << filePUdistribution_MC << std::endl;
     
-    TH1D *PU_mc = (TH1D *)filePUdistribution_MC->Get(TString(pileUpforMC);
+    TH1D *PU_mc = (TH1D *)filePUdistribution_MC->Get(TString(pileUpforMC));
     if (PU_mc == NULL) {
       std::cout << "Histogram " << pileUpforMC << " is not present in pileup file" << std::endl;
       exit(-1);
@@ -976,8 +976,8 @@ int main(int argc, char * argv[]){
         RecoilCorrector *recoilPFMetCorrector = (RecoilCorrector*) malloc(sizeof(*recoilPFMetCorrector));
         TString RecoilFilePath = cfg.get<string>("RecoilFilePath");
         std::cout << RecoilFilePath << std::endl;
-        recoilPFMetCorrector = new RecoilCorrector( RecoilFilePath);
-
+        recoilPFMetCorrector = new RecoilCorrector(RecoilFilePath);
+        
       	genV = genTools::genV(analysisTree);
       	genL = genTools::genL(analysisTree);
 
@@ -1636,7 +1636,15 @@ void FillTau(const AC1B *analysisTree, Synch17Tree *otree, int tauIndex){
   otree->byVVTightDeepTau2017v2p1VSjet_2  = analysisTree->tau_byVVTightDeepTau2017v2p1VSjet[tauIndex];
   otree->byVVVLooseDeepTau2017v2p1VSe_2   = analysisTree->tau_byVVVLooseDeepTau2017v2p1VSe[tauIndex];
   otree->byVVVLooseDeepTau2017v2p1VSjet_2 = analysisTree->tau_byVVVLooseDeepTau2017v2p1VSjet[tauIndex];
-  
+
+  otree->MVADM2017v1_2 = analysisTree->tau_MVADM2017v1[tauIndex];
+  otree->MVADM2017v1DM0raw_2 = analysisTree->tau_MVADM2017v1DM0raw[tauIndex];
+  otree->MVADM2017v1DM10raw_2 = analysisTree->tau_MVADM2017v1DM10raw[tauIndex];
+  otree->MVADM2017v1DM11raw_2 = analysisTree->tau_MVADM2017v1DM11raw[tauIndex];
+  otree->MVADM2017v1DM1raw_2 = analysisTree->tau_MVADM2017v1DM1raw[tauIndex];
+  otree->MVADM2017v1DM2raw_2 = analysisTree->tau_MVADM2017v1DM2raw[tauIndex];
+  otree->MVADM2017v1DMotherraw_2 = analysisTree->tau_MVADM2017v1DMotherraw[tauIndex];
+
   otree->byCombinedIsolationDeltaBetaCorrRaw3Hits_2 = analysisTree->tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[tauIndex];
   otree->byLooseCombinedIsolationDeltaBetaCorr3Hits_2 = analysisTree->tau_byLooseCombinedIsolationDeltaBetaCorr3Hits[tauIndex];
   otree->byMediumCombinedIsolationDeltaBetaCorr3Hits_2 = analysisTree->tau_byMediumCombinedIsolationDeltaBetaCorr3Hits[tauIndex];

@@ -86,7 +86,7 @@ if [[ $DATA_TYPE == "MC" ]]; then
   for (( i = 0; i < $MC_SAMPLES_LEN; i++ )); do
       if [[ $YEAR == 17 ]]; then
         # for 17 it is sample dependent, pick it from the list
-        PU_STR=${MC_SAMPLES_LIST[i]}
+        PU_STR=${MC_SAMPLES_LIST[i]}_pileup
       fi
       sed "s/pileUpforMC =/pileUpforMC = ${PU_STR}/" ${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf > analysisMacroSynch_lept_mt_${MC_SAMPLES_LIST[i]}.conf
   done
