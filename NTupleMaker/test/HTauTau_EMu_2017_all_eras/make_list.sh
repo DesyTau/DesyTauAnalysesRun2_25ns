@@ -1,32 +1,31 @@
 #!/bin/sh
-dirData=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/METRecipev2/MuonEG/
-dirDY=/nfs/dust/cms/user/tlenz/13TeV/2017/NTuples/MC/12Apr2018_PU2017_METrecipe_v2
-dirW=/nfs/dust/cms/user/tlenz/13TeV/2017/NTuples/MC/12Apr2018_PU2017_METrecipe_v2
-dirTT=/nfs/dust/cms/user/mameyer/SM_HiggsTauTau/ntuples/METRecipev2
-dirST=/nfs/dust/cms/user/mameyer/SM_HiggsTauTau/ntuples/METRecipev2
-dirVV=/nfs/dust/cms/user/mameyer/SM_HiggsTauTau/ntuples/METRecipev2
-#dirSignal=/nfs/dust/cms/user/tlenz/13TeV/2017/NTuples/MC/htt_signal_htxs_2017
-dirSignal=/nfs/dust/cms/user/tlenz/13TeV/2018/NTuples/MC/2017_signal_stxs1p1
-dirEm=/nfs/dust/cms/user/rasp/ntuples/Embedding_2017
-dirWGammaStar=/nfs/dust/cms/user/tlenz/13TeV/2017/NTuples/MC/htt_signal_htxs_2017/
-dirEWKZ=/nfs/dust/cms/user/tlenz/13TeV/2017/NTuples/MC/htt_signal_htxs_2017
+dirData=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2017/data/MuonEG
+dirDY=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2017/mc_v3
+dirW=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2017/mc_v3
+dirTT=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2017/mc_v3
+dirST=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2017/mc_v3
+dirVV=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2017/mc_v3
+dirSignal=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2017/mc_v3
+dirEm=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2017/data/Embedding_emu
+dirWGammaStar=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2017/mc_v3
+dirEWKZ=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2017/mc_v3
 
-ls $dirDY/DYJetsToLL_M-50_13TeV-12Apr2018/*root > DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8
-ls $dirDY/DYJetsToLL_M-50_13TeV-12Apr2018_ext1/*root >> DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8
-ls $dirDY/DY1JetsToLL_M-50_13TeV-12Apr2018_ext1/*root > DY1JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8
-ls $dirDY/DY2JetsToLL_M-50_13TeV-12Apr2018/*root > DY2JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8
-ls $dirDY/DY2JetsToLL_M-50_13TeV-12Apr2018_ext1/*root >> DY2JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8
-ls $dirDY/DY3JetsToLL_M-50_13TeV-12Apr2018/*root > DY3JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8
-ls $dirDY/DY3JetsToLL_M-50_13TeV-12Apr2018_ext1/*root >> DY3JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8
-ls $dirDY/DY4JetsToLL_M-50_13TeV-12Apr2018/*root > DY4JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8  
-ls $dirDY/DYJetsToLL_M-5to50_13TeV-12Apr2018/*root > DYJetsToLL_M-5to50_13TeV-12Apr2018
+ls $dirDY/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/*root > DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8
+ls $dirDY/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8_ext1/*root >> DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8
+ls $dirDY/DY1JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/*root > DY1JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8
+ls $dirDY/DY2JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/*root > DY2JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8
+ls $dirDY/DY2JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8_ext1/*root >> DY2JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8
+ls $dirDY/DY3JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/*root > DY3JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8
+ls $dirDY/DY3JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8_ext1/*root >> DY3JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8
+ls $dirDY/DY4JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/*root > DY4JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8  
+ls $dirDY/DYJetsToLL_M-10to50_TuneCP5_13TeV-madgraphMLM-pythia8/*root > DYJetsToLL_M-10to50_13TeV-12Apr2018
 
-ls $dirW/WJetsToLNu_TuneCP5_13TeV-12Apr2018/*root > WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8
-ls $dirW/WJetsToLNu_TuneCP5_13TeV-12Apr2018-ext1/*root >> WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8
-ls $dirW/W1JetsToLNu_TuneCP5_13TeV-12Apr2018/*root > W1JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8
-ls $dirW/W2JetsToLNu_TuneCP5_13TeV-12Apr2018/*root > W2JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8
-ls $dirW/W3JetsToLNu_TuneCP5_13TeV-12Apr2018/*root > W3JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8
-ls $dirW/W4JetsToLNu_TuneCP5_13TeV-12Apr2018/*root > W4JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8
+ls $dirW/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/*root > WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8
+ls $dirW/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_ext1/*root >> WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8
+ls $dirW/W1JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/*root > W1JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8
+ls $dirW/W2JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/*root > W2JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8
+ls $dirW/W3JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/*root > W3JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8
+ls $dirW/W4JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/*root > W4JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8
 
 ls $dirTT/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/*root > TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8
 ls $dirTT/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/*root > TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powheg-pythia8
@@ -34,7 +33,7 @@ ls $dirTT/TTToHadronic_TuneCP5_13TeV-powheg-pythia8/*root > TTToHadronic_TuneCP5
 
 ls $dirST/ST_t-channel_top_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8/*root > ST_t-channel_top_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8
 ls $dirST/ST_t-channel_antitop_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8/*root > ST_t-channel_antitop_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8
-ls $dirST/ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8/ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8/*root > ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8
+ls $dirST/ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8/*root > ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8
 ls $dirST/ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8/*root > ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8
 
 ls $dirVV/WW_TuneCP5_13TeV-pythia8/*root > WW_TuneCP5_13TeV-pythia8
@@ -50,18 +49,21 @@ ls $dirSignal/WminusHToTauTau_M125_13TeV_powheg_pythia8/*root > WminusHToTauTau_
 ls $dirSignal/WplusHToTauTau_M125_13TeV_powheg_pythia8/*root > WplusHToTauTau_M125_13TeV_powheg_pythia8
 ls $dirSignal/ZHToTauTau_M125_13TeV_powheg_pythia8/*root > ZHToTauTau_M125_13TeV_powheg_pythia8
 ls $dirSignal/ttHToTauTau_M125_TuneCP5_13TeV-powheg-pythia8/*root > ttHToTauTau_M125_TuneCP5_13TeV-powheg-pythia8
+ls $dirSignal/ggZH_HToTauTau_ZToLL_M125_13TeV_powheg_pythia8/*root > ggZH_HToTauTau_ZToLL_M125_13TeV_powheg_pythia8
+ls $dirSignal/ggZH_HToTauTau_ZToNuNu_M125_13TeV_powheg_pythia8/*root > ggZH_HToTauTau_ZToNuNu_M125_13TeV_powheg_pythia8
+ls $dirSignal/ggZH_HToTauTau_ZToQQ_M125_13TeV_powheg_pythia8/*root > ggZH_HToTauTau_ZToQQ_M125_13TeV_powheg_pythia8
 
-ls $dirData/MuonEG_Run2017B/*root > MuonEG_Run2017B
-ls $dirData/MuonEG_Run2017C/*root > MuonEG_Run2017CtoF
-ls $dirData/MuonEG_Run2017D/*root >> MuonEG_Run2017CtoF
-ls $dirData/MuonEG_Run2017E/*root >> MuonEG_Run2017CtoF
-ls $dirData/MuonEG_Run2017F/*root >> MuonEG_Run2017CtoF
+ls $dirData/MuonEG_Run2017B-31Mar2018-v1/*root > MuonEG_Run2017B
+ls $dirData/MuonEG_Run2017C-31Mar2018-v1/*root > MuonEG_Run2017CtoF
+ls $dirData/MuonEG_Run2017D-31Mar2018-v1/*root >> MuonEG_Run2017CtoF
+ls $dirData/MuonEG_Run2017E-31Mar2018-v1/*root >> MuonEG_Run2017CtoF
+ls $dirData/MuonEG_Run2017F-31Mar2018-v1/*root >> MuonEG_Run2017CtoF
 
-ls $dirEm/Embedding_Run2017B/*root > Embedding_Run2017
-ls $dirEm/Embedding_Run2017C/*root >> Embedding_Run2017
-ls $dirEm/Embedding_Run2017D/*root >> Embedding_Run2017
-ls $dirEm/Embedding_Run2017E/*root >> Embedding_Run2017
-ls $dirEm/Embedding_Run2017F/*root >> Embedding_Run2017
+ls $dirEm/EmbeddingRun2017B_ElMuFinalState/*root > Embedding_Run2017
+ls $dirEm/EmbeddingRun2017C_ElMuFinalState/*root >> Embedding_Run2017
+ls $dirEm/EmbeddingRun2017D_ElMuFinalState/*root >> Embedding_Run2017
+ls $dirEm/EmbeddingRun2017E_ElMuFinalState/*root >> Embedding_Run2017
+ls $dirEm/EmbeddingRun2017F_ElMuFinalState/*root >> Embedding_Run2017
 
 ls $dirWGammaStar/WGToLNuG_TuneCP5_13TeV-madgraphMLM-pythia8/*root > WGToLNuG_TuneCP5_13TeV-madgraphMLM-pythia8
 ls $dirEWKZ/EWKWMinus2Jets_WToLNu_M-50_TuneCP5_13TeV-madgraph-pythia8/*root > EWKWMinus2Jets_WToLNu_M-50_TuneCP5_13TeV-madgraph-pythia8

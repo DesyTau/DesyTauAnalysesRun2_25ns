@@ -596,6 +596,8 @@ bool passesFastMTTPreSel = false;
 bool isSVFitUsed = false;
 bool isFastMTTUsed = false;
 
+bool isPuppiMETUsed = false;
+
 // MELA outputs
 // 1. Matrix element variables for different hypotheses (VBF Higgs, ggH + 2 jets, Z + 2 jets)
 float ME_vbf, ME_ggh, ME_z2j_1, ME_z2j_2;
@@ -779,6 +781,7 @@ void SetupTree(){
    tree->Branch("extraelec_veto", &extraelec_veto, "extraelec_veto/O");
    tree->Branch("extramuon_veto", &extramuon_veto, "extramuon_veto/O");
    
+   tree->Branch("isPuppiMETUsed", &isPuppiMETUsed, "isPuppiMETUsed/O");
    tree->Branch("met", &met, "met/F");
    tree->Branch("metphi", &metphi, "metphi/F");
    tree->Branch("metcov00", &metcov00, "metcov00/F");
