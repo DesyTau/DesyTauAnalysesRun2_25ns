@@ -24,8 +24,16 @@ KEY_LIST=(isData ApplyPUweight ApplyLepSF)
 VALUE_LIST_MC=(false true true)
 VALUE_LIST_DATA=(true false false)
 
-# redefine list of the parameters according to the input data type
+# these parameters are year dependant for MC, so leave them as they are in the config and set to 0 only if it is data config
+# also redefine list of the parameters according to the input data type
+
 if [[ $DATA_TYPE == "data" ]]; then
+  KEY_LIST+=(TauEnergyScaleShift_OneProng TauEnergyScaleShift_OneProngOnePi0 TauEnergyScaleShift_ThreeProng)
+  VALUE_LIST_DATA+=(0.0 0.0 0.0)
+  
+  KEY_LIST+=(TauEnergyScaleShift_LepFake_OneProng TauEnergyScaleShift_LepFake_OneProngOnePi0 TauEnergyScaleShift_LepFake_ThreeProng)
+  VALUE_LIST_DATA+=(0.0 0.0 0.0)
+  
   VALUE_LIST=("${VALUE_LIST_DATA[@]}")
   NOT_DATA_TYPE="MC"
 else
@@ -41,15 +49,6 @@ else
     echo "data_type is neither data nor MC - exiting"
     exit
   fi
-fi
-
-# these parameters are year dependant for MC, so leave them as they are in the config and set to 0 only if it is data config
-if [[ $DATA_TYPE == "data" ]]; then
-  KEY_LIST+=(TauEnergyScaleShift_OneProng TauEnergyScaleShift_OneProngOnePi0 TauEnergyScaleShift_ThreeProng)
-  VALUE_LIST_DATA+=(0.0 0.0 0.0)
-  
-  KEY_LIST+=(TauEnergyScaleShift_LepFake_OneProng TauEnergyScaleShift_LepFake_OneProngOnePi0 TauEnergyScaleShift_LepFake_ThreeProng)
-  VALUE_LIST_DATA+=(0.0 0.0 0.0)
 fi
 
 # add the parameters to the config
