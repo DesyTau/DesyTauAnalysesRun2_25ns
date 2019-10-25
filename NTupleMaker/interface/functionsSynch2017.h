@@ -5,6 +5,7 @@
 #include "DesyTauAnalyses/NTupleMaker/interface/AC1B.h"
 #include "HTT-utilities/RecoilCorrections/interface/RecoilCorrector.h"
 #include "TauAnalysis/ClassicSVfit/interface/ClassicSVfit.h"
+#include "TauAnalysis/ClassicSVfit/interface/FastMTT.h"
 #include "TauAnalysis/ClassicSVfit/interface/svFitHistogramAdapter.h"
 #include "TauAnalysis/ClassicSVfit/interface/MeasuredTauLepton.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/Synch17Tree.h"
@@ -556,12 +557,10 @@ void svfit_variables(TString ch, const AC1B *analysisTree, Synch17Tree *otree, c
   int verbosity = 1;
   ClassicSVfit svFitAlgo(verbosity);
   double kappa = 4.; // use 3 for emu, 4 for etau and mutau, 5 for tautau channel
-  if(ch=="tt")kappa=5.;
 
   svFitAlgo.addLogM_fixed(true, kappa);
   svFitAlgo.integrate(measuredTauLeptons, measuredMETx, measuredMETy, covMET);
   bool isValidSolution = svFitAlgo.isValidSolution();
-  
   
   otree->m_sv   = static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(svFitAlgo.getHistogramAdapter())->getMass();
   otree->pt_sv  = static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(svFitAlgo.getHistogramAdapter())->getPt();
@@ -569,6 +568,22 @@ void svfit_variables(TString ch, const AC1B *analysisTree, Synch17Tree *otree, c
   otree->phi_sv = static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(svFitAlgo.getHistogramAdapter())->getPhi();      
   //otree->met_sv = static_cast<DiTauSystemHistogramAdapter*>(svFitAlgo.getHistogramAdapter())->getfittedMET().Rho();
   otree->mt_sv  = static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(svFitAlgo.getHistogramAdapter())->getTransverseMass();
+  
+  // FasMTT
+  LorentzVector tau1P4;
+  LorentzVector tau2P4;
+  FastMTT aFastMTTAlgo;
+  aFastMTTAlgo.run(measuredTauLeptons, measuredMETx, measuredMETy, covMET);
+  LorentzVector ttP4 = aFastMTTAlgo.getBestP4();
+  tau1P4 = aFastMTTAlgo.getTau1P4();
+  tau2P4 = aFastMTTAlgo.getTau2P4();
+
+  double dPhiTT = dPhiFrom2P( tau1P4.Px(), tau1P4.Py(), tau2P4.Px(), tau2P4.Py() );
+  otree->mt_fast = TMath::Sqrt(2*tau1P4.Pt()*tau2P4.Pt()*(1 - TMath::Cos(dPhiTT)));
+  otree->m_fast = ttP4.M();
+  otree->pt_fast = ttP4.Pt();
+  otree->eta_fast = ttP4.Eta();
+  otree->phi_fast = ttP4.Phi();
 }
 
 

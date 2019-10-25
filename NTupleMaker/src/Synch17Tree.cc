@@ -284,6 +284,12 @@ void Synch17Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("met_sv", &met_sv, &b_met_sv);
    fChain->SetBranchAddress("mt_sv", &mt_sv, &b_mt_sv);   
 
+   fChain->SetBranchAddress("m_fast", &m_fast, &b_m_fast);
+   fChain->SetBranchAddress("pt_fast", &pt_fast, &b_pt_fast);
+   fChain->SetBranchAddress("eta_fast", &eta_fast, &b_eta_fast);
+   fChain->SetBranchAddress("phi_fast", &phi_fast, &b_phi_fast);
+   fChain->SetBranchAddress("mt_fast", &mt_fast, &b_mt_fast);   
+
    //VBF
    fChain->SetBranchAddress("mjj", &mjj, &b_mjj);
    fChain->SetBranchAddress("jdeta", &jdeta, &b_jdeta);
@@ -699,6 +705,12 @@ void Synch17Tree::WriteInit(TTree *tree) {
    fChain->Branch("phi_sv", &phi_sv, "phi_sv/F");
    fChain->Branch("met_sv", &met_sv, "met_sv/F");
    fChain->Branch("mt_sv", &mt_sv, "mt_sv/F");   
+
+   fChain->Branch("m_fast", &m_fast, "m_fast/F");
+   fChain->Branch("pt_fast", &pt_fast, "pt_fast/F");
+   fChain->Branch("eta_fast", &eta_fast, "eta_fast/F");
+   fChain->Branch("phi_fast", &phi_fast, "phi_fast/F");
+   fChain->Branch("mt_fast", &mt_fast, "mt_fast/F");   
 
    //VBF
    fChain->Branch("mjj", &mjj, "mjj/F");

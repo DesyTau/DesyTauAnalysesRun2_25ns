@@ -253,6 +253,12 @@ public :
   Float_t         phi_sv;
   Float_t         met_sv;
   Float_t         mt_sv;
+  
+  Float_t         m_fast;
+  Float_t         pt_fast;
+  Float_t         eta_fast;
+  Float_t         phi_fast;
+  Float_t         mt_fast;
 
   //VBF
   Float_t         mjj;
@@ -599,6 +605,12 @@ public :
   TBranch	 *b_phi_sv;
   TBranch	 *b_met_sv;
   TBranch	 *b_mt_sv;
+
+  TBranch	 *b_m_fast;
+  TBranch	 *b_pt_fast;
+  TBranch	 *b_eta_fast;
+  TBranch	 *b_phi_fast;
+  TBranch	 *b_mt_fast;
 
   //VBF
   TBranch	 *b_mjj;
