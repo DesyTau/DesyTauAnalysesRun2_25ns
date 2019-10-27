@@ -56,20 +56,18 @@ float get_jetE(const AC1B *analysisTree, int jetIndex, TString JESname, TString 
 };
 
 
-//Merijn: made AC1B *analysisTree non-const, otherwise issues with calling functions from jets.h with analysisTree
-//2019 8 2 changed back again
-void counting_jets(const AC1B *analysisTree, Synch17Tree *otree, const Config *cfg, const btag_scaling_inputs *inputs_btag_scaling, TString JESname = "central", TString direction = "None",  JESUncertainties * jecUncertainties = 0){
+void counting_jets(const AC1B *analysisTree, Synch17Tree *otree, const Config *cfg, const btag_scaling_inputs *inputs_btag_scaling, 
+                   TString JESname = "central", TString direction = "None",  JESUncertainties * jecUncertainties = 0){
 
-  //Merijn 2019 6 7: define few things analogous to TM:
   float MaxBJetPt = 1000.;
   float MaxLJetPt = 1000.;
   float MinLJetPt = 20.;
-  float MinBJetPt = 20.; // !!!!!
+  float MinBJetPt = 20.;
 
   vector<unsigned int> jets; jets.clear();
   vector<unsigned int> jetspt20; jetspt20.clear();
   vector<unsigned int> bjets; bjets.clear();
-  vector<unsigned int> bjetsRaw; bjetsRaw.clear(); //Merijn 2019 6 7: add for reference
+  vector<unsigned int> bjetsRaw; bjetsRaw.clear();
  
   int indexLeadingJet = -1;
   float ptLeadingJet = -1;
@@ -85,53 +83,58 @@ void counting_jets(const AC1B *analysisTree, Synch17Tree *otree, const Config *c
 
   TH2F* histo_tageff_ = 0;
 
-  for (unsigned int jet = 0; jet < analysisTree->pfjet_count; ++jet) {
+  bool isData = cfg->get<bool>("isData");
+  bool ApplyBTagScaling = cfg->get<bool>("ApplyBTagScaling");
 
+  bool is2016 = false;
+  bool is2017 = false;
+  bool is2018 = false;
+  int era = cfg->get<int>("era");
+  if(era == 2016) is2016 = true;
+  else if(era == 2017) is2017 = true;
+  else if(era == 2018) is2018 = true;
+  else{cout<<"no era found in cfg file, exiting"<<endl; exit(0);}
+  
+  const float JetEtaCut = cfg->get<float>("JetEtaCut");
+  const float JetPtLowCut = cfg->get<float>("JetPtLowCut");
+  const float JetPtHighCut = cfg->get<float>("JetPtHighCut");
+  const float dRJetLeptonCut = cfg->get<float>("dRJetLeptonCut");
+  const float bJetEtaCut = cfg->get<float>("bJetEtaCut");
+  const string BTagDiscriminator1 = cfg->get<string>("BTagDiscriminator1");
+  const string BTagDiscriminator2 = cfg->get<string>("BTagDiscriminator2");
+  const float btagCut = cfg->get<float>("btagCut");
+  
+  for (unsigned int jet = 0; jet < analysisTree->pfjet_count; ++jet) {
+    
     float jetEta    = analysisTree->pfjet_eta[jet];
     float absJetEta = fabs(analysisTree->pfjet_eta[jet]);
-    if (absJetEta >= cfg->get<float>("JetEtaCut")) continue;
-
-    //merijn: add eras, exit if no era found
-    bool is2016 = false;
-    bool is2017 = false;
-    bool is2018 = false;
-    
-    //Merijn read in year, a.o. for prefiring issue
-    if(cfg->get<int>("era") == 2016) is2016 = true;
-    else if(cfg->get<int>("era") == 2017) is2017 = true;
-    else if(cfg->get<int>("era") == 2018) is2018 = true;
-    else{cout<<"no era found in cfg file, exiting"<<endl; exit(0);}
-    
-    //float jetPt = analysisTree->pfjet_pt[jet];
+    if (absJetEta >= JetEtaCut) continue;
+  
     float jetPt = get_jetPt(analysisTree, jet, JESname, direction, jecUncertainties);
-    if (jetPt <= cfg->get<float>("JetPtLowCut")) continue;
+    if (jetPt <= JetPtLowCut) continue;
 
     float dR1 = deltaR(analysisTree->pfjet_eta[jet], analysisTree->pfjet_phi[jet], otree->eta_1, otree->phi_1);
-    if (dR1 <= cfg->get<float>("dRJetLeptonCut")) continue;
+    if (dR1 <= dRJetLeptonCut) continue;
 
     float dR2 = deltaR(analysisTree->pfjet_eta[jet], analysisTree->pfjet_phi[jet], otree->eta_2, otree->phi_2);
-    if (dR2 <= cfg->get<float>("dRJetLeptonCut")) continue;
+    if (dR2 <= dRJetLeptonCut) continue;
 
-    //Merijn: skip prefiring region for 2017:
+    // skip prefiring region for 2017:
     if(is2017 && jetPt < 50 && absJetEta > 2.65 && absJetEta < 3.139) continue; 
 
     // see definition in Jets.h
-    bool isPFJetId = tightJetID((*analysisTree), int(jet), cfg->get<int>("era"));
+    bool isPFJetId = tightJetID((*analysisTree), int(jet), era);
     if (!isPFJetId) continue;
      
     jetspt20.push_back(jet);
 
-    if (absJetEta < cfg->get<float>("bJetEtaCut")) { // jet within b-tagging acceptance
+    if (absJetEta < bJetEtaCut) { // jet within b-tagging acceptance
       
-      const string bTagDiscriminator1 = cfg->get<string>("BTagDiscriminator1");
-      const string bTagDiscriminator2 = cfg->get<string>("BTagDiscriminator2");
-      const float btagCut = cfg->get<float>("btagCut");
-
-      TString BTagDiscriminator1(bTagDiscriminator1);
-      TString BTagDiscriminator2(bTagDiscriminator2);
+      TString BTagDiscriminator1(BTagDiscriminator1);
+      TString BTagDiscriminator2(BTagDiscriminator2);
       
-      unsigned int nBTagDiscriminant1 = 0;
-      unsigned int nBTagDiscriminant2 = 0;
+      unsigned int nBTagDiscriminant1 = -1;
+      unsigned int nBTagDiscriminant2 = -1;
       for (unsigned int iBTag = 0; iBTag < analysisTree->run_btagdiscriminators->size(); ++iBTag) {
       	TString discr(analysisTree->run_btagdiscriminators->at(iBTag));
       	if (discr == BTagDiscriminator1)
@@ -147,7 +150,7 @@ void counting_jets(const AC1B *analysisTree, Synch17Tree *otree, const Config *c
       	tagged = (analysisTree->pfjet_btag[jet][nBTagDiscriminant1] + analysisTree->pfjet_btag[jet][nBTagDiscriminant2]) > btagCut;
       bool taggedRaw = tagged;
     
-      if(!cfg->get<bool>("isData") && cfg->get<bool>("ApplyBTagScaling")) {
+      if(!isData && ApplyBTagScaling) {
       	int flavor = abs(analysisTree->pfjet_flavour[jet]);
       	double jet_scalefactor = 1;
       	double JetPtForBTag    = jetPt;
@@ -208,11 +211,13 @@ void counting_jets(const AC1B *analysisTree, Synch17Tree *otree, const Config *c
       	  }
       	}
       	if (jetPt > ptLeadingBJet) {
-      	  ptLeadingBJet = jetPt;
-      	  indexLeadingBJet = jet;
+          indexSubLeadingBJet = indexLeadingBJet;
+          ptSubLeadingBJet = ptLeadingBJet;
+          indexLeadingBJet = jet;
+          ptLeadingBJet = jetPt;
       	}
       }
-    } 
+    } // jet within b-tagging acceptance 
     
     if (indexLeadingJet >= 0) {
       if (jetPt < ptLeadingJet && jetPt > ptSubLeadingJet) {
@@ -222,72 +227,75 @@ void counting_jets(const AC1B *analysisTree, Synch17Tree *otree, const Config *c
     }
 
     if (jetPt > ptLeadingJet) {
+      indexSubLeadingJet = indexLeadingJet;
+      ptSubLeadingJet = ptLeadingJet;
       indexLeadingJet = jet;
       ptLeadingJet = jetPt;
     }
 
-    if (jetPt < cfg->get<float>("JetPtHighCut")) continue;
+    if (jetPt < JetPtHighCut) continue;
     jets.push_back(jet);
-  }
+  } // jets loop
 
   otree->njets = jets.size();
   otree->njetspt20 = jetspt20.size();
   otree->nbtag = bjets.size();
-  
-  otree->bpt_1   = -10; //Merijn 2019 7 31: put to -10 since it is used in the DNN don't want to confuse with strange value
-  otree->beta_1  = -9999;
-  otree->bphi_1  = -9999;
-  otree->bcsv_1  = -9999;
-  
+
+  // leading b-jet variables
   if (indexLeadingBJet >= 0) {
     otree->bpt_1   = get_jetPt(analysisTree, indexLeadingBJet, JESname, direction, jecUncertainties);
     otree->beta_1  = analysisTree->pfjet_eta[indexLeadingBJet];
     otree->bphi_1  = analysisTree->pfjet_phi[indexLeadingBJet];
-  
     otree->bcsv_1  = analysisTree->pfjet_btag[indexLeadingBJet][0];
   }
+  else {
+    otree->bpt_1   = -10;
+    otree->beta_1  = -9999;
+    otree->bphi_1  = -9999;
+    otree->bcsv_1  = -9999;
+  }
 
-  otree->bpt_2   = -10; //Merijn 2019 7 31: put to -10 since it is used in the DNN don't want to confuse with strange value
-  otree->beta_2  = -9999;
-  otree->bphi_2  = -9999;
-  otree->bcsv_2  = -9999;
-  
+  // subleading b-jet variables
   if (indexSubLeadingBJet >= 0) {
     otree->bpt_2   = get_jetPt(analysisTree, indexSubLeadingBJet, JESname, direction, jecUncertainties);
     otree->beta_2  = analysisTree->pfjet_eta[indexSubLeadingBJet];
     otree->bphi_2  = analysisTree->pfjet_phi[indexSubLeadingBJet];
     otree->bcsv_2  = analysisTree->pfjet_btag[indexSubLeadingBJet][0];
   }
-
-  otree->jpt_1 = -9999;
-  otree->jeta_1 = -9999;
-  otree->jphi_1 = -9999;
+  else {
+    otree->bpt_2   = -10;
+    otree->beta_2  = -9999;
+    otree->bphi_2  = -9999;
+    otree->bcsv_2  = -9999;
+  }
   
+  // leading jet variables
   if ( indexLeadingJet >= 0 && indexSubLeadingJet >= 0 && indexLeadingJet == indexSubLeadingJet )
     cout << "warning : indexLeadingJet ==indexSubLeadingJet = " << indexSubLeadingJet << endl;
-
   if (indexLeadingJet >= 0) {
     otree->jpt_1 = get_jetPt(analysisTree, indexLeadingJet, JESname, direction, jecUncertainties); //analysisTree->pfjet_pt[indexLeadingJet];
     otree->jeta_1 = analysisTree->pfjet_eta[indexLeadingJet];
     otree->jphi_1 = analysisTree->pfjet_phi[indexLeadingJet];
   }
-
-  otree->jpt_2 = -9999;
-  otree->jeta_2 = -9999;
-  otree->jphi_2 = -9999;
+  else {
+    otree->jpt_1 = -9999;
+    otree->jeta_1 = -9999;
+    otree->jphi_1 = -9999;
+  }
   
+  // subleading jet variables
   if (indexSubLeadingJet >= 0) {
     otree->jpt_2 = get_jetPt(analysisTree, indexSubLeadingJet, JESname, direction, jecUncertainties);
     otree->jeta_2 = analysisTree->pfjet_eta[indexSubLeadingJet];
     otree->jphi_2 = analysisTree->pfjet_phi[indexSubLeadingJet];
   }
+  else {
+    otree->jpt_2 = -9999;
+    otree->jeta_2 = -9999;
+    otree->jphi_2 = -9999;
+  }
 
-  otree->mjj =  -9999;
-  otree->jdeta =  -9999;
-  otree->dijetpt =  -9999;
-  otree->jdphi =  -9999;
-  otree->njetingap = -1;
-
+  // dijet variables
   if (indexLeadingJet >= 0 && indexSubLeadingJet >= 0) {
     otree->njetingap = 0;
     TLorentzVector jet1; 
@@ -315,8 +323,14 @@ void counting_jets(const AC1B *analysisTree, Synch17Tree *otree, const Config *c
         otree->njetingap++;
     }
   }
-}
-
-} //jets namespace 
+  else {
+    otree->mjj =  -9999;
+    otree->jdeta =  -9999;
+    otree->dijetpt =  -9999;
+    otree->jdphi =  -9999;
+    otree->njetingap = -1;
+  }
+ } // counting_jets
+} // jets namespace 
 
 #endif

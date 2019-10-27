@@ -48,6 +48,9 @@ public :
   Float_t         dZ_1;
   Float_t         d0err_1;
   Float_t         dZerr_1;
+  Float_t         IP_helix_x_1;
+  Float_t         IP_helix_y_1;
+  Float_t         IP_helix_z_1;
   Float_t         mt_1;
   Float_t         puppimt_1;
   Int_t 	  tau_decay_mode_1;
@@ -406,6 +409,9 @@ public :
   TBranch	 *b_dZ_1;
   TBranch	 *b_d0err_1;
   TBranch	 *b_dZerr_1;
+  TBranch	 *b_IP_helix_x_1;
+  TBranch	 *b_IP_helix_y_1;
+  TBranch	 *b_IP_helix_z_1;
   TBranch	 *b_mt_1;
   TBranch	 *b_puppimt_1;
   TBranch        *b_tau_decay_mode_1;

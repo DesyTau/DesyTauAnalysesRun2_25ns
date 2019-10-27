@@ -141,6 +141,10 @@ public :
    Int_t           muon_genmatch[100];   //[muon_count]
    Bool_t          muon_isDuplicate[100];   //[muon_count]
    Bool_t          muon_isBad[100];   //[muon_count]
+   Float_t         muon_helixparameters[100][5];
+   Float_t         muon_helixparameters_covar[100][5][5];
+   Float_t         muon_referencePoint[100][3];
+   Float_t         muon_Bfield[100];
    UInt_t          dimuon_count;
    UInt_t          dimuon_leading[100*99/2];   //[dimuon_count]
    UInt_t          dimuon_trailing[100*99/2];   //[dimuon_count]
@@ -920,6 +924,10 @@ public :
    TBranch        *b_muon_genmatch;   //!
    TBranch        *b_muon_isDuplicate;   //!
    TBranch        *b_muon_isBad;   //!
+   TBranch        *b_muon_helixparameters;
+   TBranch        *b_muon_helixparameters_covar;
+   TBranch        *b_muon_referencePoint;
+   TBranch        *b_muon_Bfield;
    TBranch        *b_dimuon_count;   //!
    TBranch        *b_dimuon_leading;   //!
    TBranch        *b_dimuon_trailing;   //!
@@ -1790,6 +1798,10 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("muon_genmatch", muon_genmatch, &b_muon_genmatch);
    fChain->SetBranchAddress("muon_isDuplicate", muon_isDuplicate, &b_muon_isDuplicate);
    fChain->SetBranchAddress("muon_isBad", muon_isBad, &b_muon_isBad);
+   fChain->SetBranchAddress("muon_helixparameters", muon_helixparameters, &b_muon_helixparameters);
+   fChain->SetBranchAddress("muon_helixparameters_covar", muon_helixparameters_covar, &b_muon_helixparameters_covar);
+   fChain->SetBranchAddress("muon_referencePoint", muon_referencePoint, &b_muon_referencePoint);
+   fChain->SetBranchAddress("muon_Bfield", muon_Bfield, &b_muon_Bfield);
    fChain->SetBranchAddress("dimuon_count", &dimuon_count, &b_dimuon_count);
    fChain->SetBranchAddress("dimuon_leading", dimuon_leading, &b_dimuon_leading);
    fChain->SetBranchAddress("dimuon_trailing", dimuon_trailing, &b_dimuon_trailing);

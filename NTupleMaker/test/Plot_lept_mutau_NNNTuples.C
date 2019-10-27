@@ -47,6 +47,7 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
   if(categoryIndex>=0){
     Cut+="(predicted_class=="+TString::Itoa(categoryIndex,10)+")*";
   }
+	
   TString VariableName=Variable;
   TString yVar,xVar;
   bool var2D=false;
