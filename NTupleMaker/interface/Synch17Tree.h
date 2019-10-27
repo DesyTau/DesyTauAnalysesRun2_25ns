@@ -360,6 +360,10 @@ public :
   Float_t RecoVertexY;
   Float_t RecoVertexZ;
 
+  Float_t PV_refitted_BS_x;
+  Float_t PV_refitted_BS_y;
+  Float_t PV_refitted_BS_z;
+
   Float_t GenVertexX;
   Float_t GenVertexY;
   Float_t GenVertexZ;
@@ -715,6 +719,10 @@ public :
   TBranch        *b_RecoVertexX;
   TBranch        *b_RecoVertexY;
   TBranch        *b_RecoVertexZ;  
+
+  TBranch        *b_PV_refitted_BS_x;
+  TBranch        *b_PV_refitted_BS_y;
+  TBranch        *b_PV_refitted_BS_z;  
 
 //gen vertex info is practical to have
   TBranch        *b_GenVertexX;

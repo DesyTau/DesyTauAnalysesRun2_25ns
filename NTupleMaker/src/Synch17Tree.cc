@@ -392,6 +392,10 @@ void Synch17Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("RecoVertexY", &RecoVertexY, &b_RecoVertexY);
    fChain->SetBranchAddress("RecoVertexZ", &RecoVertexZ, &b_RecoVertexZ);
 
+   fChain->SetBranchAddress("PV_refitted_BS_x", &PV_refitted_BS_x, &b_PV_refitted_BS_x);
+   fChain->SetBranchAddress("PV_refitted_BS_y", &PV_refitted_BS_y, &b_PV_refitted_BS_y);
+   fChain->SetBranchAddress("PV_refitted_BS_z", &PV_refitted_BS_z, &b_PV_refitted_BS_z);
+
   //gen vertex info useful to have
    fChain->SetBranchAddress("GenVertexX", &GenVertexX, &b_GenVertexX);
    fChain->SetBranchAddress("GenVertexY", &GenVertexY, &b_GenVertexY);
@@ -811,6 +815,10 @@ void Synch17Tree::WriteInit(TTree *tree) {
    fChain->Branch("RecoVertexX", &RecoVertexX, "RecoVertexX/F");
    fChain->Branch("RecoVertexY", &RecoVertexY, "RecoVertexY/F");
    fChain->Branch("RecoVertexZ", &RecoVertexZ, "RecoVertexZ/F"); 
+
+   fChain->Branch("PV_refitted_BS_x", &PV_refitted_BS_x, "PV_refitted_BS_x/F"); 
+   fChain->Branch("PV_refitted_BS_y", &PV_refitted_BS_y, "PV_refitted_BS_y/F"); 
+   fChain->Branch("PV_refitted_BS_z", &PV_refitted_BS_z, "PV_refitted_BS_z/F"); 
 
    fChain->Branch("GenVertexX", &GenVertexX, "GenVertexX/F");
    fChain->Branch("GenVertexY", &GenVertexY, "GenVertexY/F");

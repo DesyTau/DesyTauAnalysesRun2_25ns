@@ -1273,7 +1273,10 @@ void SaveRECOVertices(const AC1B *analysisTree, Synch17Tree *otree, const bool i
   otree->RecoVertexX = analysisTree->primvertex_x;
   otree->RecoVertexY = analysisTree->primvertex_y;
   otree->RecoVertexZ = analysisTree->primvertex_z;
-
+  
+  otree->PV_refitted_BS_x = analysisTree->refitvertexwithbs_x[0];
+  otree->PV_refitted_BS_y = analysisTree->refitvertexwithbs_y[0];
+  otree->PV_refitted_BS_z = analysisTree->refitvertexwithbs_z[0];
 
   if(!isData){
     for (unsigned int igen = 0; igen < analysisTree->genparticles_count; ++igen) {
