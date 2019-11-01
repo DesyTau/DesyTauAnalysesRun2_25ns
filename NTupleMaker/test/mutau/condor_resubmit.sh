@@ -13,7 +13,7 @@ do
     for file in $(ls ${samplename}*.sh)
     do
 	list=$(echo $file | sed 's/.sh//g')
-	checkRoot ${list}.root
+	checkRoot ${list}.root_0_mt_Sync.root
 	exit=$?
 	if [[ $exit -ne 0 ]]; then
 	    echo reason $exit
