@@ -213,6 +213,9 @@ int main(int argc, char * argv[]){
   const bool isMG = infiles.find("madgraph") != string::npos;
   const bool isMSSMsignal =  (infiles.find("SUSYGluGluToHToTauTau")== infiles.rfind("/")+1) || (infiles.find("SUSYGluGluToBBHToTauTau")== infiles.rfind("/")+1);
   
+  const bool ApplyRecoilCorrections = cfg.get<bool>("ApplyRecoilCorrections") && !isData && (isDY || isWJets || isVBForGGHiggs || isMSSMsignal);
+  RecoilCorrector recoilPFMetCorrector(cfg.get<string>("RecoilFilePath"));
+
   // Read in HLT filter
   vector<string> filterSingleLep;
   vector<string> filterXtriggerLepLeg;
@@ -968,20 +971,17 @@ int main(int argc, char * argv[]){
       // MET Recoil Corrections
       ////////////////////////////////////////////////////////////
       
+      otree->met_uncorr = otree->met;
+      otree->metphi_uncorr = otree->metphi;
+      
       otree->njetshad = otree->njets;
       if (isWJets) otree->njetshad += 1;
-      const bool ApplyRecoilCorrections = cfg.get<bool>("ApplyRecoilCorrections") && !isData && (isDY || isWJets || isVBForGGHiggs || isMSSMsignal);
-      
-      if(ApplyRecoilCorrections){
-        RecoilCorrector *recoilPFMetCorrector = (RecoilCorrector*) malloc(sizeof(*recoilPFMetCorrector));
-        TString RecoilFilePath = cfg.get<string>("RecoilFilePath");
-        std::cout << RecoilFilePath << std::endl;
-        recoilPFMetCorrector = new RecoilCorrector(RecoilFilePath);
-        
+
+      if(ApplyRecoilCorrections){        
       	genV = genTools::genV(analysisTree);
       	genL = genTools::genL(analysisTree);
 
-        genTools::RecoilCorrections( *recoilPFMetCorrector, 1, // dummy parameter
+        genTools::RecoilCorrections( recoilPFMetCorrector, 1, // dummy parameter
           otree->met, otree->metphi,
           genV.Px(), genV.Py(),
           genL.Px(), genL.Py(),
