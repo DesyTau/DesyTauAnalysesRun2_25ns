@@ -56,7 +56,6 @@ public :
    Int_t           primvertexwithbs_ntracks;
    Float_t         primvertexwithbs_cov[6];   
    
-
    //Declaration of refitted vertices
    UInt_t          refitvertex_count;
    //UInt_t          goodrefitvertex_count;
@@ -1583,7 +1582,7 @@ public :
    TBranch        *b_htxs_stage1p1cat;
    TBranch        *b_htxs_higgsPt;   //!
    TBranch        *b_htxs_njets30;   //!
-    
+   
    AC1B(TTree *tree=0, bool isData=false);
    virtual ~AC1B();
    virtual Int_t    Cut(Long64_t entry);
@@ -2453,7 +2452,6 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("htxs_higgsPt",&htxs_higgsPt , &b_htxs_higgsPt);
    fChain->SetBranchAddress("htxs_njets30", &htxs_njets30, &b_htxs_njets30);
    
-
    Notify();
 }
 

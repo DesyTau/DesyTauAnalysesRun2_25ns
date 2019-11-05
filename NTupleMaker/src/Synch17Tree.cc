@@ -406,7 +406,6 @@ void Synch17Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("VzConstitTau2", &VzConstitTau2, &b_VzConstitTau2);
    fChain->SetBranchAddress("alphaminus", &alphaminus, &b_alphaminus);
 
-   fChain->SetBranchAddress("Prompt_pT", &Prompt_pT, &b_Prompt_pT);
 
    lock=true;
 }
@@ -826,7 +825,7 @@ void Synch17Tree::WriteInit(TTree *tree) {
    fChain->Branch("VzConstitTau2", &VzConstitTau2, "VzConstitTau2/F");
    fChain->Branch("alphaminus", &alphaminus, "alphaminus/F");
 
-   fChain->Branch("Prompt_pT", &Prompt_pT, "Prompt_pT/F");
+   
 }
 
 void Synch17Tree::Fill(){
