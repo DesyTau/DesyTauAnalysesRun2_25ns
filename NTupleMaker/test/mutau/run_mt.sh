@@ -41,3 +41,4 @@
 ./condorsub_seq_leptau.sh SynchNTupleProducer_2017 analysisMacroSynch_lept_mt_ST_t-channel_top_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8.conf ST_t-channel_top_4f mt 20
 ./condorsub_seq_leptau.sh SynchNTupleProducer_2017 analysisMacroSynch_lept_mt_ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8.conf ST_tW_antitop_5f mt 20
 ./condorsub_seq_leptau.sh SynchNTupleProducer_2017 analysisMacroSynch_lept_mt_ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8.conf ST_tW_top_5f mt 20
+
