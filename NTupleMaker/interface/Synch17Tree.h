@@ -49,6 +49,7 @@ public :
   Float_t         d0err_1;
   Float_t         dZerr_1;
   Float_t         mt_1;
+  Float_t         puppimt_1;
   Int_t 	  tau_decay_mode_1;
   Float_t         pt_2;
   Float_t         phi_2;
@@ -67,6 +68,7 @@ public :
   Float_t         d0err_2;
   Float_t         dZerr_2;
   Float_t         mt_2;
+  Float_t         puppimt_2;
   Int_t 	  tau_decay_mode_2;
 
   //TO FIX
@@ -127,6 +129,39 @@ public :
   Float_t 	  byTightIsolationMVArun2017v2DBoldDMwLT2017_2;
   Float_t 	  byVTightIsolationMVArun2017v2DBoldDMwLT2017_2;
   Float_t 	  byVVTightIsolationMVArun2017v2DBoldDMwLT2017_2;
+    
+  Float_t	   byDeepTau2017v2p1VSeraw_2;	
+  Float_t	   byDeepTau2017v2p1VSjetraw_2;	
+  Float_t	   byDeepTau2017v2p1VSmuraw_2;	
+  Float_t	   byLooseDeepTau2017v2p1VSe_2;	
+  Float_t	   byLooseDeepTau2017v2p1VSjet_2;	
+  Float_t	   byLooseDeepTau2017v2p1VSmu_2;	
+  Float_t	   byMediumDeepTau2017v2p1VSe_2;	
+  Float_t	   byMediumDeepTau2017v2p1VSjet_2;	
+  Float_t	   byMediumDeepTau2017v2p1VSmu_2;	
+  Float_t	   byTightDeepTau2017v2p1VSe_2;	
+  Float_t	   byTightDeepTau2017v2p1VSjet_2;	
+  Float_t	   byTightDeepTau2017v2p1VSmu_2;	
+  Float_t	   byVLooseDeepTau2017v2p1VSe_2;	
+  Float_t	   byVLooseDeepTau2017v2p1VSjet_2;	
+  Float_t	   byVLooseDeepTau2017v2p1VSmu_2;	
+  Float_t	   byVTightDeepTau2017v2p1VSe_2;	
+  Float_t	   byVTightDeepTau2017v2p1VSjet_2;	
+  Float_t	   byVVLooseDeepTau2017v2p1VSe_2;	
+  Float_t	   byVVLooseDeepTau2017v2p1VSjet_2;	
+  Float_t	   byVVTightDeepTau2017v2p1VSe_2;	
+  Float_t	   byVVTightDeepTau2017v2p1VSjet_2;	
+  Float_t	   byVVVLooseDeepTau2017v2p1VSe_2;	
+  Float_t	   byVVVLooseDeepTau2017v2p1VSjet_2;	
+
+  Float_t    MVADM2017v1_2;
+  Float_t    MVADM2017v1DM0raw_2;
+  Float_t    MVADM2017v1DM10raw_2;
+  Float_t    MVADM2017v1DM11raw_2;
+  Float_t    MVADM2017v1DM1raw_2;
+  Float_t    MVADM2017v1DM2raw_2;
+  Float_t    MVADM2017v1DMotherraw_2;
+
   // new 
   Float_t         idisoweight_2;
   Float_t         idisoweight_antiiso_2;
@@ -188,6 +223,8 @@ public :
   //MET
   Float_t         met;
   Float_t         metphi;  
+  Float_t         met_uncorr;
+  Float_t         metphi_uncorr;  
   Float_t         met_rcmr;
   Float_t         metphi_rcmr;  
   Float_t         metcov00;
@@ -196,6 +233,17 @@ public :
   Float_t         metcov11;
   Float_t         pzetavis;
   Float_t         pzetamiss;
+
+  //PUPPI MET
+  Float_t         puppimet;
+  Float_t         puppimetphi;  
+  Float_t         puppimet_rcmr;
+  Float_t         puppimetphi_rcmr;  
+  Float_t         puppimetcov00;
+  Float_t         puppimetcov01;
+  Float_t         puppimetcov10;
+  Float_t         puppimetcov11;
+  Float_t         puppipzetamiss;
 
   //di tau system
   Float_t         pt_tt;
@@ -207,6 +255,12 @@ public :
   Float_t         phi_sv;
   Float_t         met_sv;
   Float_t         mt_sv;
+  
+  Float_t         m_fast;
+  Float_t         pt_fast;
+  Float_t         eta_fast;
+  Float_t         phi_fast;
+  Float_t         mt_fast;
 
   //VBF
   Float_t         mjj;
@@ -349,6 +403,7 @@ public :
   TBranch	 *b_d0err_1;
   TBranch	 *b_dZerr_1;
   TBranch	 *b_mt_1;
+  TBranch	 *b_puppimt_1;
   TBranch        *b_tau_decay_mode_1;
   TBranch	 *b_pt_2;
   TBranch	 *b_phi_2;
@@ -367,6 +422,7 @@ public :
   TBranch	 *b_d0err_2;
   TBranch	 *b_dZerr_2;
   TBranch	 *b_mt_2;
+  TBranch	 *b_puppimt_2;
   TBranch        *b_tau_decay_mode_2;
 
   //TO FIX
@@ -396,6 +452,38 @@ public :
   TBranch	 *b_byTightIsolationMVArun2017v2DBoldDMwLT2017_1;
   TBranch	 *b_byVTightIsolationMVArun2017v2DBoldDMwLT2017_1;
   TBranch	 *b_byVVTightIsolationMVArun2017v2DBoldDMwLT2017_1;
+
+  TBranch	   *b_byDeepTau2017v2p1VSeraw_2;	
+  TBranch	   *b_byDeepTau2017v2p1VSjetraw_2;	
+  TBranch	   *b_byDeepTau2017v2p1VSmuraw_2;	
+  TBranch	   *b_byLooseDeepTau2017v2p1VSe_2;	
+  TBranch	   *b_byLooseDeepTau2017v2p1VSjet_2;	
+  TBranch	   *b_byLooseDeepTau2017v2p1VSmu_2;	
+  TBranch	   *b_byMediumDeepTau2017v2p1VSe_2;	
+  TBranch	   *b_byMediumDeepTau2017v2p1VSjet_2;	
+  TBranch	   *b_byMediumDeepTau2017v2p1VSmu_2;	
+  TBranch	   *b_byTightDeepTau2017v2p1VSe_2;	
+  TBranch	   *b_byTightDeepTau2017v2p1VSjet_2;	
+  TBranch	   *b_byTightDeepTau2017v2p1VSmu_2;	
+  TBranch	   *b_byVLooseDeepTau2017v2p1VSe_2;	
+  TBranch	   *b_byVLooseDeepTau2017v2p1VSjet_2;	
+  TBranch	   *b_byVLooseDeepTau2017v2p1VSmu_2;	
+  TBranch	   *b_byVTightDeepTau2017v2p1VSe_2;	
+  TBranch	   *b_byVTightDeepTau2017v2p1VSjet_2;	
+  TBranch	   *b_byVVLooseDeepTau2017v2p1VSe_2;	
+  TBranch	   *b_byVVLooseDeepTau2017v2p1VSjet_2;	
+  TBranch	   *b_byVVTightDeepTau2017v2p1VSe_2;	
+  TBranch	   *b_byVVTightDeepTau2017v2p1VSjet_2;	
+  TBranch	   *b_byVVVLooseDeepTau2017v2p1VSe_2;	
+  TBranch	   *b_byVVVLooseDeepTau2017v2p1VSjet_2;	
+
+  TBranch    *b_MVADM2017v1_2;
+  TBranch    *b_MVADM2017v1DM0raw_2;
+  TBranch    *b_MVADM2017v1DM10raw_2;
+  TBranch    *b_MVADM2017v1DM11raw_2;
+  TBranch    *b_MVADM2017v1DM1raw_2;
+  TBranch    *b_MVADM2017v1DM2raw_2;
+  TBranch    *b_MVADM2017v1DMotherraw_2;
 
   ///////////////////////////////////////////////////////////NEW
   TBranch	 *b_efficiency_byVVLooseIsolationMVArun2017v2DBoldDMwLT2017_1;
@@ -489,6 +577,8 @@ public :
   //MET
   TBranch	 *b_met;
   TBranch	 *b_metphi;
+  TBranch	 *b_met_uncorr;
+  TBranch	 *b_metphi_uncorr;
   TBranch	 *b_met_rcmr;
   TBranch	 *b_metphi_rcmr;  
   TBranch	 *b_metcov00;
@@ -497,6 +587,17 @@ public :
   TBranch	 *b_metcov11;
   TBranch	 *b_pzetavis;
   TBranch	 *b_pzetamiss;
+
+  //PUPPI MET
+  TBranch	 *b_puppimet;
+  TBranch	 *b_puppimetphi;
+  TBranch	 *b_puppimet_rcmr;
+  TBranch	 *b_puppimetphi_rcmr;  
+  TBranch	 *b_puppimetcov00;
+  TBranch	 *b_puppimetcov01;
+  TBranch	 *b_puppimetcov10;
+  TBranch	 *b_puppimetcov11;
+  TBranch	 *b_puppipzetamiss;
 
   //di tau system
   TBranch	 *b_pt_tt;
@@ -508,6 +609,12 @@ public :
   TBranch	 *b_phi_sv;
   TBranch	 *b_met_sv;
   TBranch	 *b_mt_sv;
+
+  TBranch	 *b_m_fast;
+  TBranch	 *b_pt_fast;
+  TBranch	 *b_eta_fast;
+  TBranch	 *b_phi_fast;
+  TBranch	 *b_mt_fast;
 
   //VBF
   TBranch	 *b_mjj;

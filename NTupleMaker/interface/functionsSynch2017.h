@@ -5,6 +5,7 @@
 #include "DesyTauAnalyses/NTupleMaker/interface/AC1B.h"
 #include "HTT-utilities/RecoilCorrections/interface/RecoilCorrector.h"
 #include "TauAnalysis/ClassicSVfit/interface/ClassicSVfit.h"
+#include "TauAnalysis/ClassicSVfit/interface/FastMTT.h"
 #include "TauAnalysis/ClassicSVfit/interface/svFitHistogramAdapter.h"
 #include "TauAnalysis/ClassicSVfit/interface/MeasuredTauLepton.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/Synch17Tree.h"
@@ -211,10 +212,13 @@ float GenMatch(const AC1B * analysisTree, bool isData, TString particleType, int
 bool isIdentifiedMediumMuon(int Index, const AC1B * analysisTree, bool isData){
   bool isGoodMuon;
   if (isData){
-	if (analysisTree->event_run<=278808) isGoodMuon= isICHEPmed(Index, analysisTree);
-    else isGoodMuon=analysisTree->muon_isMedium[Index]; 
+  	if (analysisTree->event_run <= 278808) 
+      isGoodMuon = isICHEPmed(Index, analysisTree);
+    else 
+      isGoodMuon = analysisTree->muon_isMedium[Index]; 
 	}
-  else isGoodMuon=analysisTree->muon_isMedium[Index]; 
+  else 
+    isGoodMuon = analysisTree->muon_isMedium[Index]; 
   return isGoodMuon;
 }
 
@@ -305,41 +309,39 @@ float abs_Iso_et (int Index, const AC1B * analysisTree, float dRiso){
 //returns the dilepton veto for mt channel
 bool dilepton_veto_mt(const Config *cfg,const  AC1B *analysisTree){
 
-  for (unsigned int im = 0; im<analysisTree->muon_count; ++im) {
-
-    if (analysisTree->muon_pt[im]<=cfg->get<float>("ptDiMuonVeto")) continue;
-    if (fabs(analysisTree->muon_eta[im])>=cfg->get<float>("etaDiMuonVeto")) continue;	
-		
-    if (fabs(analysisTree->muon_dxy[im])>=cfg->get<float>("dxyDiMuonVeto")) continue;
-    if (fabs(analysisTree->muon_dz[im])>=cfg->get<float>("dzDiMuonVeto")) continue;
-
-    float relIsoMu = (abs_Iso_mt(im, analysisTree, cfg->get<float>("dRiso")) / analysisTree->muon_pt[im]);
-    if(relIsoMu >= cfg->get<float>("isoDiMuonVeto")) continue;
-		
-    //bool passedVetoId = isICHEPmed(im, analysisTree);
-    //if (!passedVetoId && cfg->get<bool>("applyDiMuonVetoId")) continue;
-    if ( !(analysisTree->muon_isGlobal[im] && analysisTree->muon_isTracker[im] && analysisTree->muon_isPF[im]) ) continue;
+  for (unsigned int im = 0; im < analysisTree->muon_count; ++im) {
     
-    for (unsigned int je = im+1; je<analysisTree->muon_count; ++je) {
-      
-      if (analysisTree->muon_pt[je]<=cfg->get<float>("ptDiMuonVeto")) continue;
-      if (fabs(analysisTree->muon_eta[je])>=cfg->get<float>("etaDiMuonVeto")) continue;	
-		  
-      if (fabs(analysisTree->muon_dxy[je])>=cfg->get<float>("dxyDiMuonVeto")) continue;
-      if (fabs(analysisTree->muon_dz[je])>=cfg->get<float>("dzDiMuonVeto")) continue;
-		  
-      if (analysisTree->muon_charge[im] * analysisTree->muon_charge[je] > 0. && cfg->get<bool>("applyDiMuonOS")) continue;
+    float ptDiMuonVeto = cfg->get<float>("ptDiMuonVeto");
+    float etaDiMuonVeto = cfg->get<float>("etaDiMuonVeto");
+    float dxyDiMuonVeto = cfg->get<float>("dxyDiMuonVeto");
+    float dzDiMuonVeto = cfg->get<float>("dzDiMuonVeto");
+    float isoDiMuonVeto = cfg->get<float>("isoDiMuonVeto");
+    float dRiso = cfg->get<float>("dRiso");
+    float applyDiMuonOS = cfg->get<bool>("applyDiMuonOS");
+    float drDiMuonVeto = cfg->get<float>("drDiMuonVeto");
+    
+    if (analysisTree->muon_pt[im] <= ptDiMuonVeto) continue;
+    if (fabs(analysisTree->muon_eta[im]) >= etaDiMuonVeto) continue;	
+    if (fabs(analysisTree->muon_dxy[im]) >= dxyDiMuonVeto) continue;
+    if (fabs(analysisTree->muon_dz[im]) >= dzDiMuonVeto) continue;
 
-      float relIsoMu = 	(abs_Iso_mt(je, analysisTree, cfg->get<float>("dRiso")) / analysisTree->muon_pt[je]);
-      if(relIsoMu >= cfg->get<float>("isoDiMuonVeto")) continue;	
+    float relIsoMu = abs_Iso_mt(im, analysisTree, dRiso) / analysisTree->muon_pt[im];
+    if(relIsoMu >= isoDiMuonVeto) continue;
+		    if ( !(analysisTree->muon_isGlobal[im] && analysisTree->muon_isTracker[im] && analysisTree->muon_isPF[im]) ) continue;
+    
+    for (unsigned int je = im + 1; je < analysisTree->muon_count; ++je) {  
+      if (analysisTree->muon_pt[je] <= ptDiMuonVeto) continue;
+      if (fabs(analysisTree->muon_eta[je]) >= etaDiMuonVeto) continue;	
+      if (fabs(analysisTree->muon_dxy[je]) >= dxyDiMuonVeto) continue;
+      if (fabs(analysisTree->muon_dz[je]) >= dzDiMuonVeto) continue;
+      if (analysisTree->muon_charge[im] * analysisTree->muon_charge[je] > 0. && applyDiMuonOS) continue;
 
-      //passedVetoId = isICHEPmed(je, analysisTree);
-      //if (!passedVetoId && cfg->get<bool>("applyDiMuonVetoId")) continue;
+      float relIsoMu = abs_Iso_mt(je, analysisTree, dRiso) / analysisTree->muon_pt[je];
+      if(relIsoMu >= isoDiMuonVeto) continue;	
       if ( ! (analysisTree->muon_isGlobal[je] && analysisTree->muon_isTracker[je] && analysisTree->muon_isPF[je]) ) continue;
 		  
-      float dr = deltaR(analysisTree->muon_eta[im],analysisTree->muon_phi[im],analysisTree->muon_eta[je],analysisTree->muon_phi[je]);
-
-      if(dr<=cfg->get<float>("drDiMuonVeto")) continue;
+      float dR = deltaR(analysisTree->muon_eta[im], analysisTree->muon_phi[im], analysisTree->muon_eta[je], analysisTree->muon_phi[je]);
+      if(dR <= drDiMuonVeto) continue;
 
       return(1);
     }
@@ -396,37 +398,40 @@ bool dilepton_veto_et(const Config *cfg,const  AC1B *analysisTree){
 
 //returns the extra electron veto
 bool extra_electron_veto(int leptonIndex, TString ch, const Config *cfg, const AC1B *analysisTree){
+  for (unsigned int ie = 0; ie < analysisTree->electron_count; ++ie) {
+    
+    float ptVetoElectronCut = cfg->get<float>("ptVetoElectronCut");
+    float etaVetoElectronCut = cfg->get<float>("etaVetoElectronCut");
+    float dxyVetoElectronCut = cfg->get<float>("dxyVetoElectronCut");
+    float dzVetoElectronCut = cfg->get<float>("dzVetoElectronCut");
+    float applyVetoElectronId = cfg->get<bool>("applyVetoElectronId");
+    float dRisoExtraElecVeto = cfg->get<float>("dRisoExtraElecVeto");
+    float isoVetoElectronCut = cfg->get<float>("isoVetoElectronCut");
 
-  for (unsigned int ie = 0; ie<analysisTree->electron_count; ++ie) {
+    if (ch == "et" && int(ie) == leptonIndex) continue;
+    if (analysisTree->electron_pt[ie] <= ptVetoElectronCut) continue;
+    if (fabs(analysisTree->electron_eta[ie]) >= etaVetoElectronCut) continue;
+    if (fabs(analysisTree->electron_dxy[ie]) >= dxyVetoElectronCut) continue;
+    if (fabs(analysisTree->electron_dz[ie]) >= dzVetoElectronCut) continue;
 
-    if (ch=="et") {if (int(ie)==leptonIndex) continue;}
-
-    if (analysisTree->electron_pt[ie]<=cfg->get<float>("ptVetoElectronCut")) continue;
-    if (fabs(analysisTree->electron_eta[ie])>=cfg->get<float>("etaVetoElectronCut")) continue;
-    if (fabs(analysisTree->electron_dxy[ie])>=cfg->get<float>("dxyVetoElectronCut")) continue;
-    if (fabs(analysisTree->electron_dz[ie])>=cfg->get<float>("dzVetoElectronCut")) continue;
-
-    int era=cfg->get<int>("era");
+    int era = cfg->get<int>("era");
     bool electronMvaId;
 
-     if (era==2016) {
-         electronMvaId = analysisTree->electron_mva_wp90_general_Spring16_v1[ie]>0.5; 
-      }
-      else if (era ==2017){
-         electronMvaId = analysisTree->electron_mva_wp90_noIso_Fall17_v1[ie]>0.5;
-      }
-      else if (era == 2018){
-         electronMvaId = analysisTree->electron_mva_wp90_noIso_Fall17_v1[ie]>0.5;
-      }
+     if (era == 2016)
+       electronMvaId = analysisTree->electron_mva_wp90_general_Spring16_v1[ie] > 0.5; 
+      else if (era == 2017)
+       electronMvaId = analysisTree->electron_mva_wp90_noIso_Fall17_v1[ie] > 0.5;
+      else if (era == 2018)
+       electronMvaId = analysisTree->electron_mva_wp90_noIso_Fall17_v1[ie] > 0.5;
 
-     if (!electronMvaId && cfg->get<bool>("applyVetoElectronId")) continue;
+     if (!electronMvaId && applyVetoElectronId) continue;
 
     /* Merijn 2019 8 20: in the analysis note this is NOT mentioned for the mt channel, but it is mentioned in the twiki on legacy data. We keep it in */
-    if (!analysisTree->electron_pass_conversion[ie] && cfg->get<bool>("applyVetoElectronId")) continue;
-    if (analysisTree->electron_nmissinginnerhits[ie]>1 && cfg->get<bool>("applyVetoElectronId")) continue;
+    if (!analysisTree->electron_pass_conversion[ie] && applyVetoElectronId) continue;
+    if (analysisTree->electron_nmissinginnerhits[ie] > 1 && applyVetoElectronId) continue;
 
-    float relIsoEle = abs_Iso_et(ie, analysisTree, cfg->get<float>("dRisoExtraElecVeto")) / analysisTree->electron_pt[ie];
-    if (relIsoEle>=cfg->get<float>("isoVetoElectronCut")) continue;
+    float relIsoEle = abs_Iso_et(ie, analysisTree, dRisoExtraElecVeto) / analysisTree->electron_pt[ie];
+    if (relIsoEle >= isoVetoElectronCut) continue;
 
     return(1);		
   }
@@ -435,19 +440,24 @@ bool extra_electron_veto(int leptonIndex, TString ch, const Config *cfg, const A
 
 //returns the extra muon veto
 bool extra_muon_veto(int leptonIndex, TString ch, const Config *cfg, const AC1B *analysisTree, bool isData){
+  for (unsigned int im = 0; im < analysisTree->muon_count; ++im) {
+    float ptVetoMuonCut = cfg->get<float>("ptVetoMuonCut");
+    float etaVetoMuonCut = cfg->get<float>("etaVetoMuonCut");
+    float dxyVetoMuonCut = cfg->get<float>("dxyVetoMuonCut");
+    float dzVetoMuonCut = cfg->get<float>("dzVetoMuonCut");
+    float applyVetoMuonId = cfg->get<bool>("applyVetoMuonId");
+    float dRisoExtraMuonVeto = cfg->get<float>("dRisoExtraMuonVeto");
+    float isoVetoMuonCut = cfg->get<float>("isoVetoMuonCut");
+    
+    if (ch == "mt" && int(im) == leptonIndex) continue;
+    if (analysisTree->muon_pt[im] <= ptVetoMuonCut) continue;
+    if (fabs(analysisTree->muon_eta[im]) >= etaVetoMuonCut) continue;
+    if (fabs(analysisTree->muon_dxy[im]) >= dxyVetoMuonCut) continue;
+    if (fabs(analysisTree->muon_dz[im]) >= dzVetoMuonCut) continue;
 
-  for (unsigned int im = 0; im<analysisTree->muon_count; ++im) {
-
-    if (ch=="mt") {if (int(im)==leptonIndex) continue;}
-
-    if (analysisTree->muon_pt[im]<cfg->get<float>("ptVetoMuonCut")) continue;
-    if (fabs(analysisTree->muon_eta[im])>cfg->get<float>("etaVetoMuonCut")) continue;
-    if (fabs(analysisTree->muon_dxy[im])>cfg->get<float>("dxyVetoMuonCut")) continue;
-    if (fabs(analysisTree->muon_dz[im])>cfg->get<float>("dzVetoMuonCut")) continue;
-
-    if (cfg->get<bool>("applyVetoMuonId") && !(isIdentifiedMediumMuon(im,analysisTree,isData)) ) continue;
-    float relIsoMu = abs_Iso_mt(im, analysisTree, cfg->get<float>("dRisoExtraMuonVeto")) / analysisTree->muon_pt[im];
-    if (relIsoMu>cfg->get<float>("isoVetoMuonCut")) continue;
+    if (applyVetoMuonId && !(isIdentifiedMediumMuon(im, analysisTree, isData)) ) continue;
+    float relIsoMu = abs_Iso_mt(im, analysisTree, dRisoExtraMuonVeto) / analysisTree->muon_pt[im];
+    if (relIsoMu >= isoVetoMuonCut) continue;
 
     return(1);
   }
@@ -477,38 +487,32 @@ void fillMET(TString ch, int leptonIndex, int tauIndex, const AC1B * analysisTre
 }
 
 //Merijn 2019 6 20: added overloaded function, takes era as argument. Will do MET correct for 2016 2017, will need later to extend to 2018
-void fillMET(TString ch, int leptonIndex, int tauIndex, const AC1B * analysisTree, Synch17Tree *otree, int era){
+void fillMET(const AC1B * analysisTree, Synch17Tree *otree, int era){
 
    // pfmet variables
-  if(era==2018){
-  otree->met = TMath::Sqrt(analysisTree->pfmet_ex*analysisTree->pfmet_ex + analysisTree->pfmet_ey*analysisTree->pfmet_ey);
-  otree->metphi = TMath::ATan2(analysisTree->pfmet_ey,analysisTree->pfmet_ex);
-  otree->metcov00 = analysisTree->pfmet_sigxx;
-  otree->metcov01 = analysisTree->pfmet_sigxy;
-  otree->metcov10 = analysisTree->pfmet_sigyx;
-  otree->metcov11 = analysisTree->pfmet_sigyy;
-  float met_x = analysisTree->pfmet_ex;
-  float met_y = analysisTree->pfmet_ey;
+  if(era == 2018){
+    otree->met = TMath::Sqrt(analysisTree->pfmet_ex*analysisTree->pfmet_ex + analysisTree->pfmet_ey*analysisTree->pfmet_ey);
+    otree->metphi = TMath::ATan2(analysisTree->pfmet_ey,analysisTree->pfmet_ex);
+    otree->metcov00 = analysisTree->pfmet_sigxx;
+    otree->metcov01 = analysisTree->pfmet_sigxy;
+    otree->metcov10 = analysisTree->pfmet_sigyx;
+    otree->metcov11 = analysisTree->pfmet_sigyy;
+  }
+  else{
+    otree->met = TMath::Sqrt(analysisTree->pfmetcorr_ex*analysisTree->pfmetcorr_ex + analysisTree->pfmetcorr_ey*analysisTree->pfmetcorr_ey);
+    otree->metphi = TMath::ATan2(analysisTree->pfmetcorr_ey,analysisTree->pfmetcorr_ex);
+    otree->metcov00 = analysisTree->pfmetcorr_sigxx;
+    otree->metcov01 = analysisTree->pfmetcorr_sigxy;
+    otree->metcov10 = analysisTree->pfmetcorr_sigyx;
+    otree->metcov11 = analysisTree->pfmetcorr_sigyy;
+  }
 
-  float met_x2 = met_x * met_x;
-  float met_y2 = met_y * met_y;}
-else{
-//cout<<"use pfmetcorr, era = "<<era<<endl;
-  otree->met = TMath::Sqrt(analysisTree->pfmetcorr_ex*analysisTree->pfmetcorr_ex + analysisTree->pfmetcorr_ey*analysisTree->pfmetcorr_ey);
-  otree->metphi = TMath::ATan2(analysisTree->pfmetcorr_ey,analysisTree->pfmetcorr_ex);
-  otree->metcov00 = analysisTree->pfmetcorr_sigxx;
-  otree->metcov01 = analysisTree->pfmetcorr_sigxy;
-  otree->metcov10 = analysisTree->pfmetcorr_sigyx;
-  otree->metcov11 = analysisTree->pfmetcorr_sigyy;
-  float met_x = analysisTree->pfmetcorr_ex;
-  float met_y = analysisTree->pfmetcorr_ey;
-
-  float met_x2 = met_x * met_x;
-  float met_y2 = met_y * met_y;
-
-}
-
-
+  otree->puppimet = TMath::Sqrt(analysisTree->puppimet_ex*analysisTree->puppimet_ex + analysisTree->puppimet_ey*analysisTree->puppimet_ey);
+  otree->puppimetphi = TMath::ATan2(analysisTree->puppimet_ey,analysisTree->puppimet_ex);
+  otree->puppimetcov00 = analysisTree->puppimet_sigxx;
+  otree->puppimetcov01 = analysisTree->puppimet_sigxy;
+  otree->puppimetcov10 = analysisTree->puppimet_sigyx;
+  otree->puppimetcov11 = analysisTree->puppimet_sigyy;
 
 }
 
@@ -553,12 +557,10 @@ void svfit_variables(TString ch, const AC1B *analysisTree, Synch17Tree *otree, c
   int verbosity = 1;
   ClassicSVfit svFitAlgo(verbosity);
   double kappa = 4.; // use 3 for emu, 4 for etau and mutau, 5 for tautau channel
-  if(ch=="tt")kappa=5.;
 
   svFitAlgo.addLogM_fixed(true, kappa);
   svFitAlgo.integrate(measuredTauLeptons, measuredMETx, measuredMETy, covMET);
   bool isValidSolution = svFitAlgo.isValidSolution();
-  
   
   otree->m_sv   = static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(svFitAlgo.getHistogramAdapter())->getMass();
   otree->pt_sv  = static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(svFitAlgo.getHistogramAdapter())->getPt();
@@ -566,6 +568,22 @@ void svfit_variables(TString ch, const AC1B *analysisTree, Synch17Tree *otree, c
   otree->phi_sv = static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(svFitAlgo.getHistogramAdapter())->getPhi();      
   //otree->met_sv = static_cast<DiTauSystemHistogramAdapter*>(svFitAlgo.getHistogramAdapter())->getfittedMET().Rho();
   otree->mt_sv  = static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(svFitAlgo.getHistogramAdapter())->getTransverseMass();
+  
+  // FasMTT
+  LorentzVector tau1P4;
+  LorentzVector tau2P4;
+  FastMTT aFastMTTAlgo;
+  aFastMTTAlgo.run(measuredTauLeptons, measuredMETx, measuredMETy, covMET);
+  LorentzVector ttP4 = aFastMTTAlgo.getBestP4();
+  tau1P4 = aFastMTTAlgo.getTau1P4();
+  tau2P4 = aFastMTTAlgo.getTau2P4();
+
+  double dPhiTT = dPhiFrom2P( tau1P4.Px(), tau1P4.Py(), tau2P4.Px(), tau2P4.Py() );
+  otree->mt_fast = TMath::Sqrt(2*tau1P4.Pt()*tau2P4.Pt()*(1 - TMath::Cos(dPhiTT)));
+  otree->m_fast = ttP4.M();
+  otree->pt_fast = ttP4.Pt();
+  otree->eta_fast = ttP4.Eta();
+  otree->phi_fast = ttP4.Phi();
 }
 
 
@@ -620,15 +638,15 @@ bool SafeRatio(double denominator){
 
 }
 
-bool passedAllMetFilters(const AC1B * analysisTree, std::vector<TString> met_filters, bool isData){
+bool passedAllMetFilters(const AC1B *analysisTree, std::vector<TString> met_filters){
   bool passed = true;
   unsigned int nfilters = met_filters.size();
-  for (std::map<string,int>::iterator it=analysisTree->flags->begin(); it!=analysisTree->flags->end(); ++it) {
+  for (std::map<string,int>::iterator it = analysisTree->flags->begin(); it != analysisTree->flags->end(); ++it) {
     TString filter_name(it->first);
-    for (unsigned int iFilter=0; iFilter<nfilters; ++iFilter){
-      if (filter_name.Contains(met_filters[iFilter])) {
-	  if (!isData && met_filters[iFilter].Contains("Flag_eeBadScFilter") ) continue; // this filter not applied in MC
-      if (it->second ==0){passed = false; break;}
+    for (unsigned int iFilter = 0; iFilter < nfilters; ++iFilter){
+      if (filter_name.Contains(met_filters[iFilter]) && it->second == 0) {
+        passed = false;
+        break;
       }
     }      
   }
