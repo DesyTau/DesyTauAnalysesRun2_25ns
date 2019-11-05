@@ -382,7 +382,7 @@ int main(int argc, char * argv[]) {
 	
       }
       //Skip events not passing the MET filters, if applied
-      if (ApplyMetFilters && !passedAllMetFilters(&analysisTree, met_filters_list, isData)) continue;
+      if (ApplyMetFilters && !passedAllMetFilters(&analysisTree, met_filters_list)) continue;
       counter[1]++;
       vector<int> nDiTauTrig(filterDiTau.size(),-1);
 
