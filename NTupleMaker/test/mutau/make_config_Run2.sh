@@ -78,16 +78,14 @@ MC_SAMPLES_LIST+=(WW_TuneCP5_13TeV-pythia8 WZ_TuneCP5_13TeV-pythia8 ZZ_TuneCP5_1
 MC_SAMPLES_LIST+=(GluGluHToTauTau_M125_13TeV_powheg_pythia8 VBFHToTauTau_M125)
 MC_SAMPLES_LEN=${#MC_SAMPLES_LIST[@]}
 
-# Path in the root file to PU histograms for 16 and 18 data; 
-PU_STR=pileup
-
 if [[ $DATA_TYPE == "MC" ]]; then
-  for (( i = 0; i < $MC_SAMPLES_LEN; i++ )); do
-      if [[ $YEAR == 17 ]]; then
-        # for 17 it is sample dependent, pick it from the list
+  if [[ $YEAR -eq 17 ]]; then # for 17 the path in the root file to PU histograms is sample-dependent, pick it from the list
+    for (( i = 0; i < $MC_SAMPLES_LEN; i++ )); do
         PU_STR=${MC_SAMPLES_LIST[i]}_pileup
-      fi
-      sed "s/pileUpforMC =/pileUpforMC = ${PU_STR}/" ${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf > analysisMacroSynch_lept_mt_${MC_SAMPLES_LIST[i]}.conf
-  done
-  sed 's/pileUpforMC =/pileUpforMC = GluGluHToTauTau_M125_13TeV_powheg_pythia8_pileup/' ${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf > analysisMacroSynch_lept_mt_SUSYGluGluToHToTauTau_M-120_TuneCP5_13TeV-pythia8.conf
+        sed "s/pileUpforMC =/pileUpforMC = ${PU_STR}/" ${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf > analysisMacroSynch_lept_mt_${MC_SAMPLES_LIST[i]}.conf
+    done
+    sed 's/pileUpforMC =/pileUpforMC = GluGluHToTauTau_M125_13TeV_powheg_pythia8_pileup/' ${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf > analysisMacroSynch_lept_mt_SUSYGluGluToHToTauTau_M-120_TuneCP5_13TeV-pythia8.conf
+  else # path in the root file to PU histograms for 16 and 18 data; 
+    sed -i "s/pileUpforMC =/pileUpforMC = pileup/" ${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf
+  fi
 fi

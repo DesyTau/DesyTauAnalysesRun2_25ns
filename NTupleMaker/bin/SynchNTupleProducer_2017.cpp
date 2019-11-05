@@ -1292,7 +1292,8 @@ for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) {
       }
       
       // PF MET
-      genTools::RecoilCorrections( *recoilPFMetCorrector, 1,
+      genTools::RecoilCorrections( *recoilPFMetCorrector, 
+           (!isData && applyRecoilCorrections && (isDY || isWJets || isVBForGGHiggs || isMSSMsignal)) * genTools::MeanResolution,
 				   otree->met, otree->metphi,
 				   genV.Px(), genV.Py(),
 				   genL.Px(), genL.Py(),

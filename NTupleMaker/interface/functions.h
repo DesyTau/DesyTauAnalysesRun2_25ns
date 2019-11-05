@@ -723,6 +723,8 @@ namespace genTools{
     return njetshad;
   } 
   
+  enum RecoilCorrectionsMethod{QuantileRemap=1, MeanResolution};
+  
   int RecoilCorrections( RecoilCorrector& corr, int method,
                   			 float met, float metphi,
                   			 float vx, float vy,
@@ -735,7 +737,10 @@ namespace genTools{
     float metcorrx = metx;
     float metcorry = mety;
 
-    corr.CorrectByMeanResolution(metx, mety, vx, vy, lx, ly, njets, metcorrx, metcorry);
+    if(method != 0) // <=> apply corrections
+      corr.CorrectByMeanResolution(metx, mety, vx, vy, lx, ly, njets, metcorrx, metcorry);
+    
+    // leave met as it is in the input if method == 0, otherwise overwrite with corrected values
     metcorr = TMath::Sqrt(metcorrx * metcorrx + metcorry * metcorry);
     metphicorr = TMath::ATan2(metcorry, metcorrx);
             

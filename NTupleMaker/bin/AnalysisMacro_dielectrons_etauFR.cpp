@@ -905,7 +905,8 @@ int main(int argc, char * argv[]) {
 			  float met_rcmr=met;
 			  float metphi_rcmr=metphi;
 			  // PF MET
-			  genTools::RecoilCorrections( *recoilPFMetCorrector, 1,
+			  genTools::RecoilCorrections( *recoilPFMetCorrector,
+                   (!isData && applyRecoilCorrections && (isDY || isWJets)) * genTools::MeanResolution,
 						       met, metphi,
 						       genV.Px(), genV.Py(),
 						       genL.Px(), genL.Py(),

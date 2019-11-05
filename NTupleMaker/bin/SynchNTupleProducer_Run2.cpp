@@ -981,7 +981,7 @@ int main(int argc, char * argv[]){
       	genV = genTools::genV(analysisTree);
       	genL = genTools::genL(analysisTree);
 
-        genTools::RecoilCorrections( recoilPFMetCorrector, 1, // dummy parameter
+        genTools::RecoilCorrections( recoilPFMetCorrector, ApplyRecoilCorrections, // pass the value != 0 to apply corrections
           otree->met, otree->metphi,
           genV.Px(), genV.Py(),
           genL.Px(), genL.Py(),
