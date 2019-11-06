@@ -87,7 +87,14 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
   for(unsigned int pindex=0;pindex<analysisTree->tau_constituents_count[tauIndex1];pindex++){
     if(abs(analysisTree->tau_constituents_pdgId[tauIndex1][pindex])==211){
       decay1haspion=true;
-      break;}}}
+      break;}}
+
+  //Vinay
+  for(unsigned int pindex=0;pindex<analysisTree->tau_constituents_count[tauIndex2];pindex++){
+    if(abs(analysisTree->tau_constituents_pdgId[tauIndex2][pindex])==211){
+      decay2haspion=true;
+      break;}}
+  }
   
   //make here a scan if the second decay is hadronic. Only for e-mu would not require this..
   if(channel=="mt"||channel=="et"){

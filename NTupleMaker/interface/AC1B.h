@@ -56,6 +56,7 @@ public :
    Int_t           primvertexwithbs_ntracks;
    Float_t         primvertexwithbs_cov[6];   
    
+
    //Declaration of refitted vertices
    UInt_t          refitvertex_count;
    //UInt_t          goodrefitvertex_count;
@@ -790,6 +791,15 @@ public :
    Float_t	   tau_byVVTightDeepTau2017v2p1VSjet[100];	//[tau_count]
    Float_t	   tau_byVVVLooseDeepTau2017v2p1VSe[100];	//[tau_count]
    Float_t	   tau_byVVVLooseDeepTau2017v2p1VSjet[100];	//[tau_count]
+   
+   Float_t     tau_MVADM2017v1[100];
+   Float_t     tau_MVADM2017v1DM0raw[100];
+   Float_t     tau_MVADM2017v1DM10raw[100];
+   Float_t     tau_MVADM2017v1DM11raw[100];
+   Float_t     tau_MVADM2017v1DM1raw[100];
+   Float_t     tau_MVADM2017v1DM2raw[100];
+   Float_t     tau_MVADM2017v1DMotherraw[100];
+   
    Int_t           htxs_stage0cat;
    Int_t           htxs_stage1cat;
    Int_t           htxs_stage1p1cat;
@@ -1560,12 +1570,21 @@ public :
    TBranch	  *b_tau_byVVTightDeepTau2017v2p1VSjet;	//!
    TBranch	  *b_tau_byVVVLooseDeepTau2017v2p1VSe;	//!
    TBranch	  *b_tau_byVVVLooseDeepTau2017v2p1VSjet;	//!
+   
+   TBranch    *b_tau_MVADM2017v1;
+   TBranch    *b_tau_MVADM2017v1DM0raw;
+   TBranch    *b_tau_MVADM2017v1DM10raw;
+   TBranch    *b_tau_MVADM2017v1DM11raw;
+   TBranch    *b_tau_MVADM2017v1DM1raw;
+   TBranch    *b_tau_MVADM2017v1DM2raw;
+   TBranch    *b_tau_MVADM2017v1DMotherraw;
+
    TBranch        *b_htxs_stage0cat;   //!
    TBranch        *b_htxs_stage1cat;   //!
    TBranch        *b_htxs_stage1p1cat;
    TBranch        *b_htxs_higgsPt;   //!
    TBranch        *b_htxs_njets30;   //!
-   
+    
    AC1B(TTree *tree=0, bool isData=false);
    virtual ~AC1B();
    virtual Int_t    Cut(Long64_t entry);
@@ -2420,12 +2439,22 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("tau_byVVTightDeepTau2017v2p1VSjet", tau_byVVTightDeepTau2017v2p1VSjet, &b_tau_byVVTightDeepTau2017v2p1VSjet);
    fChain->SetBranchAddress("tau_byVVVLooseDeepTau2017v2p1VSe", tau_byVVVLooseDeepTau2017v2p1VSe, &b_tau_byVVVLooseDeepTau2017v2p1VSe);
    fChain->SetBranchAddress("tau_byVVVLooseDeepTau2017v2p1VSjet", tau_byVVVLooseDeepTau2017v2p1VSjet, &b_tau_byVVVLooseDeepTau2017v2p1VSjet);
+
+   fChain->SetBranchAddress("tau_MVADM2017v1", tau_MVADM2017v1, &b_tau_MVADM2017v1);
+   fChain->SetBranchAddress("tau_MVADM2017v1DM0raw", tau_MVADM2017v1DM0raw, &b_tau_MVADM2017v1DM0raw);
+   fChain->SetBranchAddress("tau_MVADM2017v1DM10raw", tau_MVADM2017v1DM10raw, &b_tau_MVADM2017v1DM10raw);
+   fChain->SetBranchAddress("tau_MVADM2017v1DM11raw", tau_MVADM2017v1DM11raw, &b_tau_MVADM2017v1DM11raw);
+   fChain->SetBranchAddress("tau_MVADM2017v1DM1raw", tau_MVADM2017v1DM1raw, &b_tau_MVADM2017v1DM1raw);
+   fChain->SetBranchAddress("tau_MVADM2017v1DM2raw", tau_MVADM2017v1DM2raw, &b_tau_MVADM2017v1DM2raw);
+   fChain->SetBranchAddress("tau_MVADM2017v1DMotherraw", tau_MVADM2017v1DMotherraw, &b_tau_MVADM2017v1DMotherraw);
+
    fChain->SetBranchAddress("htxs_stage0cat",&htxs_stage0cat, &b_htxs_stage0cat);
    fChain->SetBranchAddress("htxs_stage1cat",&htxs_stage1cat , &b_htxs_stage1cat);
    fChain->SetBranchAddress("htxs_stage1p1cat",&htxs_stage1p1cat , &b_htxs_stage1p1cat);
    fChain->SetBranchAddress("htxs_higgsPt",&htxs_higgsPt , &b_htxs_higgsPt);
    fChain->SetBranchAddress("htxs_njets30", &htxs_njets30, &b_htxs_njets30);
    
+
    Notify();
 }
 

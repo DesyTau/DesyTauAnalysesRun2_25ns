@@ -30,7 +30,7 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
 			       TString Cut="(mt_1<50)*",
 			       TString ytitle = "Events",
 			       int categoryIndex=-1,
-			       TString directory = "HtautauCP_mutau/Inputs/NTuples_mt_2017/",
+			       TString directory = "HtautauCP_mutau/Inputs/forOleg/NTuples_mt_2017/",
 			       TString outputDir = "./Plots/",
 			       int year=2017,
 			       bool FFmethod = false,  
@@ -489,7 +489,7 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
   canv1   -> Update();
 
 
-  if (blindData)
+  if (blindData&&showSignal)
     {
       for (int iB=0; iB<=nBins; ++iB)
         {

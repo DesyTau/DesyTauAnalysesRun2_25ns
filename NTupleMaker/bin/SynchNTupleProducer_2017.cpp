@@ -289,7 +289,7 @@ int main(int argc, char * argv[]){
   const float etaTauCut      = cfg.get<float>("etaTauCut");
   const float dzTauCut       = cfg.get<float>("dzTauCut");
   const bool  applyTauId     = cfg.get<bool>("ApplyTauId");
-  const bool  applyMuonId     = cfg.get<bool>("ApplyMuonId");//merijn 2019 8 8: make sure that the flag in the config is used
+  const bool  applyMuonId    = cfg.get<bool>("ApplyMuonId");//merijn 2019 8 8: make sure that the flag in the config is used
 
   // tau energy scale corrections
   const float shift_tes_1prong = cfg.get<float>("TauEnergyScaleShift_OneProng");
@@ -336,7 +336,7 @@ int main(int argc, char * argv[]){
 
   //Merijn removed dimuon cut information since it is in the config file, best to have in one location only to avoid confusion
 
-  const float deltaRTrigMatch = cfg.get<float>("DRTrigMatch");
+  const float deltaRTrigMatch = cfg.get<float>("dRTrigMatch");
   const float dRiso = cfg.get<float>("dRiso");
   
   const float jetEtaCut = cfg.get<float>("JetEtaCut");
@@ -604,7 +604,7 @@ int main(int argc, char * argv[]){
     met_filters_list.push_back("ecalBadCalibReducedMINIAODFilter"); //WAS NOT IN LIST ABOVE
   
   
-  int counter[20];
+  int counter[20] = {0};
 
   ///////////////FILE LOOP///////////////
 
@@ -660,7 +660,7 @@ for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) {
 
 
       //Skip events not passing the MET filters, if applied
-      if (ApplyMetFilters && !passedAllMetFilters(&analysisTree, met_filters_list, isData)) continue;
+      if (ApplyMetFilters && !passedAllMetFilters(&analysisTree, met_filters_list)) continue;
       counter[1]++;
 
       // Check if all triggers are existent in each event and save index
@@ -1222,7 +1222,7 @@ for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) {
       jets::counting_jets(&analysisTree, otree, &cfg, &inputs_btag_scaling_medium);
       //MET
 	//Merijn 2019 6 20: overloaded the function, it takes the era as arugment now, to take pfmetcorr for 2016 and 2017..
-      fillMET(ch, leptonIndex, tauIndex, &analysisTree, otree,cfg.get<int>("era"));
+      fillMET(&analysisTree, otree,cfg.get<int>("era"));
      
       TLorentzVector genV( 0., 0., 0., 0.);
       TLorentzVector genL( 0., 0., 0., 0.);
@@ -1293,7 +1293,7 @@ for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) {
       
       // PF MET
       genTools::RecoilCorrections( *recoilPFMetCorrector, 
-				   (!isData && applyRecoilCorrections && (isDY || isWJets || isVBForGGHiggs || isMSSMsignal)) * genTools::MeanResolution,
+           (!isData && applyRecoilCorrections && (isDY || isWJets || isVBForGGHiggs || isMSSMsignal)) * genTools::MeanResolution,
 				   otree->met, otree->metphi,
 				   genV.Px(), genV.Py(),
 				   genL.Px(), genL.Py(),

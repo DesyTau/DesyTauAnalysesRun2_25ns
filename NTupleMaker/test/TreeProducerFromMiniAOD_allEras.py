@@ -140,7 +140,7 @@ baddetEcallist = cms.vuint32(
                               872421955,872421567,872437184,872421951,
                               872421694,872437056,872437057,872437313])
 
-if period == "2018" :
+if period == "2018" or period == "2017":
     process.ecalBadCalibReducedMINIAODFilter = cms.EDFilter(
         "EcalBadCalibFilter",
         EcalRecHitSource = cms.InputTag("reducedEgamma:reducedEERecHits"),
