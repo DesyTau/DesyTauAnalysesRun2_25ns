@@ -108,8 +108,8 @@ int main(int argc, char * argv[]){
   if(argc < 4){
     std::cout << "RUN ERROR: wrong number of arguments"<< std::endl;
     std::cout << "Please run the code in the following way:"<< std::endl;
-    std::cout << "SynchNtupleProducer_2017 NameOfTheConfigurationFile FileList Channel" << std::endl;
-    std::cout << "example: SynchNtupleProducer_2017 analysisMacroSynch_lept_mt_DATA_SingleMuon.conf DATA_SingleMuon mt" << std::endl;
+    std::cout << "SynchNTupleProducer_Run2 NameOfTheConfigurationFile FileList Channel" << std::endl;
+    std::cout << "example: SynchNTupleProducer_Run2 analysisMacroSynch_lept_mt_DATA_SingleMuon.conf DATA_SingleMuon mt" << std::endl;
     exit(-1);
   }
 
@@ -170,14 +170,15 @@ int main(int argc, char * argv[]){
   const string ZptweightFile = cfg.get<string>("ZptweightFile");
 
   //b-tag scale factors
-  const string BtagSfFile = cfg.get<string>("BtagSfFile");
-  TString pathToBtagScaleFactors = (TString) cmsswBase + "/src/" + BtagSfFile;
-  if( ApplyBTagScaling && gSystem->AccessPathName(pathToBtagScaleFactors) ){
-    cout<<pathToBtagScaleFactors<<" not found. Please check."<<endl;
+  const string BTagAlgorithm = cfg.get<string>("BTagAlgorithm");
+  const string BtagSfFile = cmsswBase + "/src/" + cfg.get<string>("BtagSfFile");
+  if( ApplyBTagScaling && gSystem->AccessPathName( (TString) BtagSfFile) ){
+    cout<<BtagSfFile<<" not found. Please check."<<endl;
     exit(-1);
-  }//cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/CSVv2_ichep.csv"
+  }
   
-  BTagCalibration calib("csvv2", (string) pathToBtagScaleFactors );
+  cout<<"using "<<BTagAlgorithm<<endl;
+  BTagCalibration calib(BTagAlgorithm, BtagSfFile);
   BTagCalibrationReader reader_B(BTagEntry::OP_MEDIUM, "central");
   BTagCalibrationReader reader_C(BTagEntry::OP_MEDIUM, "central");
   BTagCalibrationReader reader_Light(BTagEntry::OP_MEDIUM, "central");
@@ -186,9 +187,8 @@ int main(int argc, char * argv[]){
     reader_C.load(calib, BTagEntry::FLAV_C, "comb");
     reader_Light.load(calib, BTagEntry::FLAV_UDSG, "incl");
   }
-  
-  const string TaggingEfficienciesFile = cfg.get<string>("BtagMCeffFile");
-  TString pathToTaggingEfficiencies = (TString) cmsswBase + "/src/" + TaggingEfficienciesFile;
+    
+  TString pathToTaggingEfficiencies = (TString) cmsswBase + "/src/" + cfg.get<string>("BtagMCeffFile");
   if (ApplyBTagScaling && gSystem->AccessPathName(pathToTaggingEfficiencies)){
     cout<<pathToTaggingEfficiencies<<" not found. Please check."<<endl;
     exit(-1);
@@ -353,10 +353,7 @@ int main(int argc, char * argv[]){
   if(ApplyPUweight){
     TFile *filePUdistribution_data = new TFile(TString(cmsswBase) + "/src/" + TString(pileUpInDataFile), "read");
     TFile *filePUdistribution_MC = new TFile (TString(cmsswBase) + "/src/" + TString(pileUpInMCFile), "read");
-    TH1D *PU_data = (TH1D *)filePUdistribution_data->Get("pileup");
-    //std::cout << filePUdistribution_data << std::endl;
-    //std::cout << filePUdistribution_MC << std::endl;
-    
+    TH1D *PU_data = (TH1D *)filePUdistribution_data->Get("pileup");    
     TH1D *PU_mc = (TH1D *)filePUdistribution_MC->Get(TString(pileUpforMC));
     if (PU_mc == NULL) {
       std::cout << "Histogram " << pileUpforMC << " is not present in pileup file" << std::endl;

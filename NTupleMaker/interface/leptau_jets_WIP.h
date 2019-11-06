@@ -100,10 +100,39 @@ void counting_jets(const AC1B *analysisTree, Synch17Tree *otree, const Config *c
   const float JetPtHighCut = cfg->get<float>("JetPtHighCut");
   const float dRJetLeptonCut = cfg->get<float>("dRJetLeptonCut");
   const float bJetEtaCut = cfg->get<float>("bJetEtaCut");
-  const string BTagDiscriminator1 = cfg->get<string>("BTagDiscriminator1");
-  const string BTagDiscriminator2 = cfg->get<string>("BTagDiscriminator2");
   const float btagCut = cfg->get<float>("btagCut");
+  TString BTagDiscriminator1(cfg->get<string>("BTagDiscriminator1"));
+  TString BTagDiscriminator2(cfg->get<string>("BTagDiscriminator2"));
+  TString BTagDiscriminator3(cfg->get<string>("BTagDiscriminator3"));
+    
+  int nBTagDiscriminant1 = -1;
+  int nBTagDiscriminant2 = -1;
+  int nBTagDiscriminant3 = -1;
   
+  for (unsigned int iBTag = 0; iBTag < analysisTree->run_btagdiscriminators->size(); ++iBTag) {
+    TString discr(analysisTree->run_btagdiscriminators->at(iBTag));
+            
+    if (discr == BTagDiscriminator1)
+      nBTagDiscriminant1 = iBTag;
+    if (!is2016 && discr == BTagDiscriminator2)
+      nBTagDiscriminant2 = iBTag;
+    if (!is2016 && discr == BTagDiscriminator3)
+      nBTagDiscriminant3 = iBTag;
+  }
+    
+  if (nBTagDiscriminant1 == -1) {
+    cout << "couldn\'t find "<< BTagDiscriminator1 << " in run_btagdiscriminators, exiting" <<endl;
+    exit(-1);
+  }
+  if (nBTagDiscriminant2 == -1) {
+    cout << "couldn\'t find "<< BTagDiscriminator2 << " in run_btagdiscriminators, exiting" <<endl;
+    exit(-1);
+  }
+  if (nBTagDiscriminant3 == -1) {
+    cout << "couldn\'t find "<< BTagDiscriminator3 << " in run_btagdiscriminators, exiting" <<endl;
+    exit(-1);
+  }
+
   for (unsigned int jet = 0; jet < analysisTree->pfjet_count; ++jet) {
     
     float jetEta    = analysisTree->pfjet_eta[jet];
@@ -129,37 +158,26 @@ void counting_jets(const AC1B *analysisTree, Synch17Tree *otree, const Config *c
     jetspt20.push_back(jet);
 
     if (absJetEta < bJetEtaCut) { // jet within b-tagging acceptance
-      
-      TString BTagDiscriminator1(BTagDiscriminator1);
-      TString BTagDiscriminator2(BTagDiscriminator2);
-      
-      unsigned int nBTagDiscriminant1 = -1;
-      unsigned int nBTagDiscriminant2 = -1;
-      for (unsigned int iBTag = 0; iBTag < analysisTree->run_btagdiscriminators->size(); ++iBTag) {
-      	TString discr(analysisTree->run_btagdiscriminators->at(iBTag));
-      	if (discr == BTagDiscriminator1)
-      	  nBTagDiscriminant1 = iBTag;
-      	if (!is2016 && discr == BTagDiscriminator2)
-      	  nBTagDiscriminant2 = iBTag;
-      }
- 
+                
+      // check if meets working point cut <=> tagged      
       bool tagged = false;
       if (is2016)
       	tagged = analysisTree->pfjet_btag[jet][nBTagDiscriminant1] > btagCut; 
       else
-      	tagged = (analysisTree->pfjet_btag[jet][nBTagDiscriminant1] + analysisTree->pfjet_btag[jet][nBTagDiscriminant2]) > btagCut;
+      	// tagged = (analysisTree->pfjet_btag[jet][nBTagDiscriminant1] + analysisTree->pfjet_btag[jet][nBTagDiscriminant2]) > btagCut;
+      	tagged = (analysisTree->pfjet_btag[jet][nBTagDiscriminant1] + analysisTree->pfjet_btag[jet][nBTagDiscriminant2] + analysisTree->pfjet_btag[jet][nBTagDiscriminant3]) > btagCut;
       bool taggedRaw = tagged;
-    
+      
       if(!isData && ApplyBTagScaling) {
       	int flavor = abs(analysisTree->pfjet_flavour[jet]);
       	double jet_scalefactor = 1;
       	double JetPtForBTag    = jetPt;
       	double tageff          = 1;
 
-      	//Merijn 2019 6 7: implement adjustments for edges, from T/M
       	if (JetPtForBTag > MaxBJetPt) JetPtForBTag = MaxBJetPt - 0.1;
       	if (JetPtForBTag < MinBJetPt) JetPtForBTag = MinBJetPt + 0.1;
   	
+        // getting SFs and efficiencies
       	if (flavor == 5) {
       	  jet_scalefactor = inputs_btag_scaling->reader_B.eval_auto_bounds("central", BTagEntry::FLAV_B, jetEta, JetPtForBTag);
       	  histo_tageff_= inputs_btag_scaling->tagEff_B;
@@ -172,24 +190,15 @@ void counting_jets(const AC1B *analysisTree, Synch17Tree *otree, const Config *c
       	  jet_scalefactor = inputs_btag_scaling->reader_Light.eval_auto_bounds("central", BTagEntry::FLAV_UDSG, jetEta, JetPtForBTag);
       	  histo_tageff_= inputs_btag_scaling->tagEff_Light;
       	}
-
-	/*
-	if(JetPtForBTag > histo_tageff_->GetXaxis()->GetBinLowEdge(histo_tageff_->GetNbinsX()+1)){
-	  tageff = histo_tageff_->GetBinContent(histo_tageff_->GetNbinsX(),histo_tageff_->GetYaxis()->FindBin(absJetEta));
-	}
-	else{
-	  tageff = histo_tageff_->GetBinContent(histo_tageff_->GetXaxis()->FindBin(JetPtForBTag), histo_tageff_->GetYaxis()->FindBin(absJetEta));
-	  }*/
-
-	//Merijn 2019 6 7 replace by the code of T/M. Note: bounds adjusted upstream..
       	tageff = histo_tageff_->Interpolate(JetPtForBTag, absJetEta);
-	
-
       	if (tageff < 1e-5)      tageff = 1e-5;
       	if (tageff > 0.99999)   tageff = 0.99999;
+        
+        // random seed
       	inputs_btag_scaling->rand->SetSeed((int)((jetEta+5)*100000));
       	double rannum = inputs_btag_scaling->rand->Rndm();
 
+        // promote-demote method
       	if (jet_scalefactor < 1 && tagged)  { // downgrade - demote
       	  if (rannum < 1 - jet_scalefactor)  
             tagged = false;
@@ -204,7 +213,7 @@ void counting_jets(const AC1B *analysisTree, Synch17Tree *otree, const Config *c
       if (tagged) {
       	bjets.push_back(jet);
         
-      	if (indexLeadingBJet >= 0) {//Merijn: not sure if also done in macro t/m..
+      	if (indexLeadingBJet >= 0) {
       	  if (jetPt < ptLeadingBJet && jetPt > ptSubLeadingBJet) {
       	    indexSubLeadingBJet = jet;
       	    ptSubLeadingBJet = jetPt;
@@ -246,7 +255,7 @@ void counting_jets(const AC1B *analysisTree, Synch17Tree *otree, const Config *c
     otree->bpt_1   = get_jetPt(analysisTree, indexLeadingBJet, JESname, direction, jecUncertainties);
     otree->beta_1  = analysisTree->pfjet_eta[indexLeadingBJet];
     otree->bphi_1  = analysisTree->pfjet_phi[indexLeadingBJet];
-    otree->bcsv_1  = analysisTree->pfjet_btag[indexLeadingBJet][0];
+    otree->bcsv_1  = analysisTree->pfjet_btag[indexLeadingBJet][3]; // 3 - pfDeepFlavourJetTags:probb
   }
   else {
     otree->bpt_1   = -10;
@@ -260,7 +269,7 @@ void counting_jets(const AC1B *analysisTree, Synch17Tree *otree, const Config *c
     otree->bpt_2   = get_jetPt(analysisTree, indexSubLeadingBJet, JESname, direction, jecUncertainties);
     otree->beta_2  = analysisTree->pfjet_eta[indexSubLeadingBJet];
     otree->bphi_2  = analysisTree->pfjet_phi[indexSubLeadingBJet];
-    otree->bcsv_2  = analysisTree->pfjet_btag[indexSubLeadingBJet][0];
+    otree->bcsv_2  = analysisTree->pfjet_btag[indexSubLeadingBJet][3]; // 3 - pfDeepFlavourJetTags:probb
   }
   else {
     otree->bpt_2   = -10;
