@@ -270,6 +270,7 @@ public :
    Float_t         electron_mva_wp80_Iso_Fall17_v1[100];   //[electron_count]
    Float_t         electron_mva_Loose_Iso_Fall17_v1[100];   //[electron_count]
    Float_t         electron_mva_wp90_noIso_Fall17_v1[100];   //[electron_count]
+   Float_t         electron_mva_wp90_noIso_Fall17_v2[100];   //[electron_count]
    Float_t         electron_mva_wp80_noIso_Fall17_v1[100];   //[electron_count]
    Float_t         electron_mva_Loose_noIso_Fall17_v1[100];   //[electron_count]
    Bool_t          electron_cutId_veto_Fall17[100];   //[electron_count]
