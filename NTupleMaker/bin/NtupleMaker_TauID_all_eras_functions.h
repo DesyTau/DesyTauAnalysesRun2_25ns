@@ -382,16 +382,17 @@ int MatchingJet(AC1B &analysisTree, TLorentzVector lorentzVectorTau, bool &jetFo
    return indexMatchingJet;
 }
 
+// numbers for Fall17 v2 Id
 float getEffectiveArea(float eta) {
-    float effArea = 0.1566;
+    float effArea =  0.1440;
     float absEta = fabs(eta);
-    if (absEta<1.0) effArea = 0.1566;
-    else if (absEta < 1.4790) effArea = 0.1626;
-    else if (absEta < 2.0) effArea = 0.1073;
-    else if (absEta < 2.2) effArea = 0.0854;
-    else if (absEta < 2.3) effArea = 0.1051;
-    else if (absEta < 2.4) effArea = 0.1204;
-    else if (absEta < 5.0) effArea = 0.1524;
+    if (absEta<1.0) effArea = 0.1440;
+    else if (absEta < 1.4790) effArea = 0.1562;
+    else if (absEta < 2.0) effArea = 0.1032;
+    else if (absEta < 2.2) effArea = 0.0859;
+    else if (absEta < 2.3) effArea = 0.1116;
+    else if (absEta < 2.4) effArea = 0.1321;
+    else if (absEta < 5.0) effArea = 0.1654;
     return effArea;
 
   } 
@@ -544,29 +545,12 @@ void SelectMuonElePair(AC1B &analysisTree, vector<int> muons, vector<int> electr
          
          float absIsoEle; 
          float relIsoEle;
-         if (era=="2016"){
-            float neutralHadIsoEle = analysisTree.electron_neutralHadIso[eIndex];
-            float photonIsoEle = analysisTree.electron_photonIso[eIndex];
-            float chargedHadIsoEle = analysisTree.electron_chargedHadIso[eIndex];
-            float puIsoEle = analysisTree.electron_puIso[eIndex];
-            if (isElectronIsoR03) {
-               neutralHadIsoEle = analysisTree.electron_r03_sumNeutralHadronEt[eIndex];
-               photonIsoEle = analysisTree.electron_r03_sumPhotonEt[eIndex];
-               chargedHadIsoEle = analysisTree.electron_r03_sumChargedHadronPt[eIndex];
-               puIsoEle = analysisTree.electron_r03_sumPUPt[eIndex];
-            }
-            float neutralIsoEle = neutralHadIsoEle + photonIsoEle - 0.5*puIsoEle;
-            neutralIsoEle = TMath::Max(float(0),neutralIsoEle);
-            absIsoEle =  chargedHadIsoEle + neutralIsoEle;
-            relIsoEle = absIsoEle/analysisTree.electron_pt[eIndex];
-         }
-         else {
-            float rhoNeutral = analysisTree.rho;
-            float  eA = getEffectiveArea( fabs(analysisTree.electron_superclusterEta[eIndex]) );
-            absIsoEle = analysisTree.electron_r03_sumChargedHadronPt[eIndex] +
-               TMath::Max(0.0f,analysisTree.electron_r03_sumNeutralHadronEt[eIndex]+analysisTree.electron_r03_sumPhotonEt[eIndex]-eA*rhoNeutral);
-            relIsoEle = absIsoEle/analysisTree.electron_pt[eIndex];
-         }
+         float rhoNeutral = analysisTree.rho;
+         float  eA = getEffectiveArea( fabs(analysisTree.electron_superclusterEta[eIndex]) );
+         absIsoEle = analysisTree.electron_r03_sumChargedHadronPt[eIndex] +
+            TMath::Max(0.0f,analysisTree.electron_r03_sumNeutralHadronEt[eIndex]+analysisTree.electron_r03_sumPhotonEt[eIndex]-eA*rhoNeutral);
+         relIsoEle = absIsoEle/analysisTree.electron_pt[eIndex];
+            //}
          if (int(mIndex)!=muonIndex) {
             if (relIsoMu==isoMuMin) {
                if (analysisTree.muon_pt[mIndex]>analysisTree.muon_pt[muonIndex]) {
@@ -610,44 +594,18 @@ bool ElectronVeto(AC1B &analysisTree, int electronIndex, float ptVetoElectronCut
       if (fabs(analysisTree.electron_dxy[ie])>dxyVetoElectronCut) continue;
       if (fabs(analysisTree.electron_dz[ie])>dzVetoElectronCut) continue; 
       bool electronMvaId = true;
-      if (era=="2016") {
-         electronMvaId = analysisTree.electron_mva_wp90_general_Spring16_v1[ie]>0.5; 
-      }
-      else if (era == "2017"){
-         electronMvaId = analysisTree.electron_mva_wp90_noIso_Fall17_v1[ie]>0.5;
-      }
-      else if (era == "2018"){
-         electronMvaId = analysisTree.electron_mva_wp90_noIso_Fall17_v1[ie]>0.5;
-      }
+      electronMvaId = analysisTree.electron_mva_wp90_noIso_Fall17_v2[ie]>0.5;
       if (!electronMvaId&&applyVetoElectronId) continue;
       if (!analysisTree.electron_pass_conversion[ie]&&applyVetoElectronId) continue;
  
       if (analysisTree.electron_nmissinginnerhits[ie]>1&&applyVetoElectronId) continue;
       float relIsoEle;
       float absIsoEle;
-      if (era=="2016"){
-         float neutralHadIsoEle = analysisTree.electron_neutralHadIso[ie];
-         float photonIsoEle = analysisTree.electron_photonIso[ie];
-         float chargedHadIsoEle = analysisTree.electron_chargedHadIso[ie];
-         float puIsoEle = analysisTree.electron_puIso[ie];
-               if (isElectronIsoR03) {                                               
-                  neutralHadIsoEle = analysisTree.electron_r03_sumNeutralHadronEt[ie];
-                  photonIsoEle = analysisTree.electron_r03_sumPhotonEt[ie];
-                  chargedHadIsoEle = analysisTree.electron_r03_sumChargedHadronPt[ie];
-                  puIsoEle = analysisTree.electron_r03_sumPUPt[ie];
-               }
-               float neutralIsoEle = neutralHadIsoEle + photonIsoEle - 0.5*puIsoEle;
-               neutralIsoEle = TMath::Max(float(0),neutralIsoEle);
-               absIsoEle =  chargedHadIsoEle + neutralIsoEle;
-               relIsoEle = absIsoEle/analysisTree.electron_pt[ie];
-            }
-      else {
-         float rhoNeutral = analysisTree.rho;
-         float  eA = getEffectiveArea( fabs(analysisTree.electron_superclusterEta[ie]) );
-         absIsoEle = analysisTree.electron_r03_sumChargedHadronPt[ie] +
-            TMath::Max(0.0f,analysisTree.electron_r03_sumNeutralHadronEt[ie]+analysisTree.electron_r03_sumPhotonEt[ie]-eA*rhoNeutral);
-         relIsoEle = absIsoEle/analysisTree.electron_pt[ie];
-      }
+      float rhoNeutral = analysisTree.rho;
+      float  eA = getEffectiveArea( fabs(analysisTree.electron_superclusterEta[ie]) );
+      absIsoEle = analysisTree.electron_r03_sumChargedHadronPt[ie] +
+         TMath::Max(0.0f,analysisTree.electron_r03_sumNeutralHadronEt[ie]+analysisTree.electron_r03_sumPhotonEt[ie]-eA*rhoNeutral);
+      relIsoEle = absIsoEle/analysisTree.electron_pt[ie];
       if (relIsoEle>isoVetoElectronCut) continue;
  
       foundExtraElectron = true;
