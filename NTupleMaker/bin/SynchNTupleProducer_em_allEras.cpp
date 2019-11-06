@@ -878,11 +878,13 @@ int main(int argc, char * argv[]) {
 
             correctionWS_tracking->var("e_pt")->setVal(pt_1);
             correctionWS_tracking->var("e_eta")->setVal(eta_1);
-            idweight_1 = correctionWS_tracking->function("e_trk_ratio")->getVal();
-            
+            if (era=="2017") idweight_1 = correctionWS_tracking->function("e_trk_ratio")->getVal();
+            else idweight_1 =1.0;
+
             correctionWS_tracking->var("m_eta")->setVal(eta_2);
             correctionWS_tracking->var("m_pt")->setVal(pt_2);
-            idweight_2 = correctionWS_tracking->function("m_trk_ratio")->getVal();
+            if (era=="2016") idweight_2 = correctionWS_tracking->function("m_trk_ratio")->getVal();
+            else idweight_2 =1.0;
             
             isoweight_1 *= idweight_1;
             isoweight_2 *= idweight_2;
