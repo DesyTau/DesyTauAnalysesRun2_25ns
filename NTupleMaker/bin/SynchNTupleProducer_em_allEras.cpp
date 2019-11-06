@@ -739,9 +739,7 @@ int main(int argc, char * argv[]) {
             if (fabs(analysisTree.electron_dxy[ie])>dxyElectronCut) continue;
             if (fabs(analysisTree.electron_dz[ie])>dzElectronCut) continue;
             bool electronMvaId = true;
-            if      (era=="2016") electronMvaId = analysisTree.electron_mva_wp80_general_Spring16_v1[ie]>0.5; 
-            else if (era=="2017") electronMvaId = analysisTree.electron_mva_wp90_noIso_Fall17_v1[ie]>0.5;
-            else if (era=="2018") electronMvaId = analysisTree.electron_mva_wp90_noIso_Fall17_v1[ie]>0.5;
+            electronMvaId = analysisTree.electron_mva_wp90_noIso_Fall17_v2[ie]>0.5;
             if (!electronMvaId) continue;
             if (!analysisTree.electron_pass_conversion[ie]) continue;         
             if (analysisTree.electron_nmissinginnerhits[ie]>1) continue;      
@@ -864,8 +862,8 @@ int main(int argc, char * argv[]) {
                isoweight_2 = correctionWS_embedded->function("m_looseiso_ratio")->getVal() * correctionWS_embedded->function("m_id_ratio")->getVal();
             }
             else if (isEmbedded && era!="2016") {
-               isoweight_1 = correctionWS_embedded->function("e_id_embed_ratio")->getVal() * correctionWS_embedded->function("e_iso_binned_embed_ratio")->getVal();
-               isoweight_2 = correctionWS_embedded->function("m_looseiso_binned_embed_ratio")->getVal() * correctionWS_embedded->function("m_id_embed_ratio")->getVal();
+               isoweight_1 = correctionWS_embedded->function("e_id90_kit_data")->getVal()/correctionWS_embedded->function("e_id90_kit_embed")->getVal() * correctionWS_embedded->function("e_iso_kit_data")->getVal()/correctionWS_embedded->function("e_iso_kit_embed")->getVal();
+               isoweight_2 = correctionWS_embedded->function("m_id_kit_data")->getVal()/correctionWS_embedded->function("m_id_kit_embed")->getVal() * correctionWS_embedded->function("m_iso_kit_data")->getVal()/correctionWS_embedded->function("m_iso_kit_embed")->getVal();
             }
             else {
                if (era=="2016"){
@@ -873,14 +871,8 @@ int main(int argc, char * argv[]) {
                   isoweight_2 = (float)SF_muonIdIso->get_ScaleFactor(double(pt_2),double(eta_2));
                }
                else {
-                  correctionWS_tracking->var("e_pt")->setVal(pt_1);
-                  correctionWS_tracking->var("e_eta")->setVal(eta_1);
-                  correctionWS_tracking->var("e_iso")->setVal(iso_1);
-                  correctionWS_tracking->var("m_pt")->setVal(pt_2);
-                  correctionWS_tracking->var("m_eta")->setVal(eta_2);
-                  correctionWS_tracking->var("m_iso")->setVal(iso_2);
-                  isoweight_1 = correctionWS_tracking->function("e_idiso_binned_ratio")->getVal();
-                  isoweight_2 = correctionWS_tracking->function("m_idiso_binned_ratio")->getVal();
+                  isoweight_1 = correctionWS_embedded->function("e_id90_kit_data")->getVal()/correctionWS_embedded->function("e_id90_kit_mc")->getVal() * correctionWS_embedded->function("e_iso_kit_data")->getVal()/correctionWS_embedded->function("e_iso_kit_mc")->getVal();
+                  isoweight_2 = correctionWS_embedded->function("m_id_kit_data")->getVal()/correctionWS_embedded->function("m_id_kit_mc")->getVal() * correctionWS_embedded->function("m_iso_kit_data")->getVal()/correctionWS_embedded->function("m_iso_kit_mc")->getVal();
                } 
             }
 
