@@ -202,6 +202,12 @@ int main(int argc, char * argv[]) {
       JetCorrectionUncertainty *unc = new JetCorrectionUncertainty(*p);
       vsrc_Eta0To5[isrc] = unc;
    }
+   if (era=="2018"){
+      const char *name = "AbsoluteSample";
+      JetCorrectorParameters const *p = new JetCorrectorParameters(cmsswBase+"/src/"+jec_UncertaintySources, name);
+      JetCorrectionUncertainty *unc = new JetCorrectionUncertainty(*p);
+      vsrc_Eta0To5.push_back(unc);
+   }
    for (int isrc = 0; isrc < nsrc_Eta0To3; isrc++) {
       const char *name = srcnames_Eta0To3[isrc];
       JetCorrectorParameters const *p = new JetCorrectorParameters(cmsswBase+"/src/"+jec_UncertaintySources, name);
@@ -696,6 +702,7 @@ int main(int argc, char * argv[]) {
          npartons = analysisTree.genparticles_noutgoing;
          
          // apply good run selection  ==================================================================================================================================
+
          if (isData && applyGoodRunSelection){
             int n=analysisTree.event_run;
             int lum = analysisTree.event_luminosityblock;      
@@ -732,21 +739,23 @@ int main(int argc, char * argv[]) {
          SearchForBtagDiscriminant(analysisTree, BTagDiscriminator1, BTagDiscriminator2, BTagDiscriminator3, nBTagDiscriminant1, nBTagDiscriminant2, nBTagDiscriminant3, era);
          
          // electron selection =========================================================================================================================================
+
          vector<int> electrons; electrons.clear();
          for (unsigned int ie = 0; ie<analysisTree.electron_count; ++ie) {
-            if (analysisTree.electron_pt[ie]<ptElectronLowCut) continue;  
+            if (analysisTree.electron_pt[ie]<ptElectronLowCut) continue;
             if (fabs(analysisTree.electron_eta[ie])>etaElectronCut) continue;
             if (fabs(analysisTree.electron_dxy[ie])>dxyElectronCut) continue;
             if (fabs(analysisTree.electron_dz[ie])>dzElectronCut) continue;
             bool electronMvaId = true;
             electronMvaId = analysisTree.electron_mva_wp90_noIso_Fall17_v2[ie]>0.5;
             if (!electronMvaId) continue;
-            if (!analysisTree.electron_pass_conversion[ie]) continue;         
-            if (analysisTree.electron_nmissinginnerhits[ie]>1) continue;      
+            if (!analysisTree.electron_pass_conversion[ie]) continue;
+            if (analysisTree.electron_nmissinginnerhits[ie]>1) continue;
             electrons.push_back(ie);
          }
 
          // muon selection =============================================================================================================================================
+
          vector<int> muons; muons.clear();
          for (unsigned int im = 0; im<analysisTree.muon_count; ++im) {
             if (analysisTree.muon_pt[im]<ptMuonLowCut) continue;          
@@ -766,6 +775,7 @@ int main(int argc, char * argv[]) {
 
 
          // selecting muon and electron pair (OS or SS) ================================================================================================================
+
          int electronIndex = -1;
          int muonIndex = -1;
          float isoMuMin = 1e+10;
@@ -920,7 +930,7 @@ int main(int argc, char * argv[]) {
                   Mu23EffData  = correctionWS_embedded_trigger->function("m_trg23_binned_ic_data")->getVal();
                   Mu8EffData   = correctionWS_embedded_trigger->function("m_trg8_binned_ic_data")->getVal();
                }
-               if (era=="2018"){
+               else {
                   Ele23EffData = correctionWS_embedded_trigger->function("e_trg_binned_23_data")->getVal();
                   Ele12EffData = correctionWS_embedded_trigger->function("e_trg_binned_12_data")->getVal(); 
                   Mu23EffData  = correctionWS_embedded_trigger->function("m_trg_binned_23_data")->getVal();
