@@ -115,10 +115,14 @@ Float_t         qcdweight_0jet_rate_up;
 Float_t         qcdweight_0jet_rate_down;
 Float_t         qcdweight_1jet_rate_up;
 Float_t         qcdweight_1jet_rate_down;
+Float_t         qcdweight_2jet_rate_up;
+Float_t         qcdweight_2jet_rate_down;
 Float_t         qcdweight_0jet_shape_up;
 Float_t         qcdweight_0jet_shape_down;
 Float_t         qcdweight_1jet_shape_up;
 Float_t         qcdweight_1jet_shape_down;
+Float_t         qcdweight_2jet_shape_up;
+Float_t         qcdweight_2jet_shape_down;
 
 Float_t         qcdweight_iso_up;
 Float_t         qcdweight_iso_down;
@@ -689,10 +693,14 @@ void SetupTree(){
    tree->Branch("qcdweight_0jet_rate_down",&qcdweight_0jet_rate_down,"qcdweight_0jet_rate_down/F");
    tree->Branch("qcdweight_1jet_rate_up",&qcdweight_1jet_rate_up,"qcdweight_1jet_rate_up/F");
    tree->Branch("qcdweight_1jet_rate_down",&qcdweight_1jet_rate_down,"qcdweight_1jet_rate_down/F");
+   tree->Branch("qcdweight_2jet_rate_up",&qcdweight_2jet_rate_up,"qcdweight_2jet_rate_up/F");
+   tree->Branch("qcdweight_2jet_rate_down",&qcdweight_2jet_rate_down,"qcdweight_2jet_rate_down/F");
    tree->Branch("qcdweight_0jet_shape_up",&qcdweight_0jet_shape_up,"qcdweight_0jet_shape_up/F");
    tree->Branch("qcdweight_0jet_shape_down",&qcdweight_0jet_shape_down,"qcdweight_0jet_shape_down/F");  
    tree->Branch("qcdweight_1jet_shape_up",&qcdweight_1jet_shape_up,"qcdweight_1jet_shape_up/F");
    tree->Branch("qcdweight_1jet_shape_down",&qcdweight_1jet_shape_down,"qcdweight_1jet_shape_down/F");
+   tree->Branch("qcdweight_2jet_shape_up",&qcdweight_2jet_shape_up,"qcdweight_2jet_shape_up/F");
+   tree->Branch("qcdweight_2jet_shape_down",&qcdweight_2jet_shape_down,"qcdweight_2jet_shape_down/F");
    
    tree->Branch("qcdweight_iso_up",&qcdweight_iso_up,"qcdweight_iso_up/F");
    tree->Branch("qcdweight_iso_down",&qcdweight_iso_down,"qcdweight_iso_down/F");
@@ -971,11 +979,15 @@ void SetDefaultValues(){
    qcdweight_0jet_rate_down =  1;
    qcdweight_1jet_rate_up =  1;
    qcdweight_1jet_rate_down =  1;
+   qcdweight_2jet_rate_up =  1;
+   qcdweight_2jet_rate_down =  1;
    qcdweight_0jet_shape_up =  1;
    qcdweight_0jet_shape_down =  1;
    qcdweight_1jet_shape_up =  1;
    qcdweight_1jet_shape_down =  1;
-   
+   qcdweight_2jet_shape_up =  1;
+   qcdweight_2jet_shape_down =  1;
+
    qcdweight_iso_up =  1;
    qcdweight_iso_down =  1;
    zptmassweight = 1;
