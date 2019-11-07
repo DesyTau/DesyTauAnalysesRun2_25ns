@@ -1051,6 +1051,7 @@ public :
    TBranch        *b_electron_mva_wp80_Iso_Fall17_v1;   //!
    TBranch        *b_electron_mva_Loose_Iso_Fall17_v1;   //!
    TBranch        *b_electron_mva_wp90_noIso_Fall17_v1;   //!
+   TBranch        *b_electron_mva_wp90_noIso_Fall17_v2;   //!
    TBranch        *b_electron_mva_wp80_noIso_Fall17_v1;   //!
    TBranch        *b_electron_mva_Loose_noIso_Fall17_v1;   //!
    TBranch        *b_electron_cutId_veto_Fall17;   //!
@@ -1921,6 +1922,7 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("electron_mva_wp80_Iso_Fall17_v1", electron_mva_wp80_Iso_Fall17_v1, &b_electron_mva_wp80_Iso_Fall17_v1);
    fChain->SetBranchAddress("electron_mva_Loose_Iso_Fall17_v1", electron_mva_Loose_Iso_Fall17_v1, &b_electron_mva_Loose_Iso_Fall17_v1);
    fChain->SetBranchAddress("electron_mva_wp90_noIso_Fall17_v1", electron_mva_wp90_noIso_Fall17_v1, &b_electron_mva_wp90_noIso_Fall17_v1);
+   fChain->SetBranchAddress("electron_mva_wp90_noIso_Fall17_v2", electron_mva_wp90_noIso_Fall17_v2, &b_electron_mva_wp90_noIso_Fall17_v2);
    fChain->SetBranchAddress("electron_mva_wp80_noIso_Fall17_v1", electron_mva_wp80_noIso_Fall17_v1, &b_electron_mva_wp80_noIso_Fall17_v1);
    fChain->SetBranchAddress("electron_mva_Loose_noIso_Fall17_v1", electron_mva_Loose_noIso_Fall17_v1, &b_electron_mva_Loose_noIso_Fall17_v1);
    fChain->SetBranchAddress("electron_cutId_veto_Fall17", electron_cutId_veto_Fall17, &b_electron_cutId_veto_Fall17);
