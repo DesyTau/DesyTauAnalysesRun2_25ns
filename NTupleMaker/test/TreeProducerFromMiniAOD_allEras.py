@@ -58,7 +58,7 @@ import FWCore.PythonUtilities.LumiList as LumiList
 process.source = cms.Source("PoolSource",
   fileNames = cms.untracked.vstring(
         #"/store/data/Run2017B/Tau/MINIAOD/31Mar2018-v1/90000/FECFEF99-4F37-E811-8243-001E67792562.root"  # use for testing (2017)
-        "/store/mc/RunIIFall17MiniAODv2/TTToHadronic_TuneCP5_13TeV-powheg-pythia8/MINIAODSIM/PU2017_12Apr2018_new_pmx_94X_mc2017_realistic_v14-v2/120000/420D636B-4BBB-E811-B806-0025905C54C6.root"  # use for testing (2017)
+        #"/store/mc/RunIIFall17MiniAODv2/TTToHadronic_TuneCP5_13TeV-powheg-pythia8/MINIAODSIM/PU2017_12Apr2018_new_pmx_94X_mc2017_realistic_v14-v2/120000/420D636B-4BBB-E811-B806-0025905C54C6.root"  # use for testing (2017)
         #"/store/mc/RunIISummer16MiniAODv3/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/MINIAODSIM/PUMoriond17_94X_mcRun2_asymptotic_v3-v1/120000/FE7E7C9D-3CBF-E811-8BA6-44A84223FF3C.root" # use for testing (2016)
         #"/store/data/Run2016C/SingleMuon/MINIAOD/17Jul2018-v1/20000/FEC97F81-0097-E811-A7B9-90E2BACC5EEC.root" # use for testing (2016)
         #"/store/mc/RunIIAutumn18MiniAOD/W1JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v2/120000/403882A2-1EFE-9D44-9D5D-EC55DDBE4091.root" # use for testing (2018)
@@ -70,6 +70,7 @@ process.source = cms.Source("PoolSource",
 #	"root://cms-xrd-global.cern.ch///store/user/sbrommer/gc_storage/embedding_16_legacy_miniaod/ElMu_data_legacy_2016_CMSSW9414/TauEmbedding_ElMu_data_legacy_2016_CMSSW9414_Run2016B-v2/99/merged_miniaod_998.root" #emu embedded 16 test sample
 #	"root://cms-xrd-global.cern.ch///store/user/jbechtel/gc_storage/embedding_16_legacy_miniaod/MuTau_data_legacy_2016_CMSSW9414/TauEmbedding_MuTau_data_legacy_2016_CMSSW9414_Run2016B-v4/99/merged_miniaod_998.root" #mt embedded 16 test sample
 #	"root://cms-xrd-global.cern.ch///store/user/aakhmets/gc_storage/MuTau_data_2017_CMSSW944_gridka/TauEmbedding_MuTau_data_2017_CMSSW944_Run2017F/99/merged_9998.root"
+        "root://xrootd-cms.infn.it//store/results/hightt/adow/GluGluHToPseudoscalarTauTau_M125_13TeV_powheg_pythia8_2017-GEN_TEST07Jan19/USER/StoreResults_GluGluToHToTauTauNoSpin_M125_13TeV_pythia8_2017_MINIAOD-v1/50000/BA185D90-1ABC-E911-BF72-842B2B7680D5.root"
 	),
   skipEvents = cms.untracked.uint32(0),
   #lumisToProcess = LumiList.LumiList(filename = 'json/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt').getVLuminosityBlockRange()
@@ -646,7 +647,15 @@ process.triggerSelection = cms.EDFilter("HLTHighLevel",
                                         )
 # END Trigger filtering =================================================================================
 
+#try add tauspinner:
+process.icTauSpinnerProducer = cms.EDProducer("ICTauSpinnerProducer",
+  branch                  = cms.string("tauspinner"),
+  input                   = cms.InputTag("prunedGenParticles"),
+  theta                   = cms.string("0,0.25,0.5,-0.25,0.375")#Comment: if specify more angles, FIRST addapt NrAnglestoStore in ICTauSpinnerProducer and recompile, currently the branch expects max 5 weights!
+)
 
+#process.icTauSpinnerSequence = cms.Sequence()
+process.icTauSpinnerSequence = cms.Sequence(process.icTauSpinnerProducer)
 
 process.p = cms.Path(
   process.initroottree *
@@ -666,7 +675,8 @@ process.p = cms.Path(
   process.MiniAODRefitVertexBS * # PV with BS constraint
   process.htxsSequence * # HTXS
   process.prefiringweight * # prefiring-weights for 2016/2017
-  process.makeroottree
+  process.makeroottree *
+  process.icTauSpinnerSequence
 )
 
 if isData: filename_suffix = "DATA"
