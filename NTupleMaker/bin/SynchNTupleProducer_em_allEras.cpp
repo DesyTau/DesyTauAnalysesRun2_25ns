@@ -2,14 +2,14 @@
 #include "NtupleMaker_TauID_all_eras_functions.h"
 
 int main(int argc, char * argv[]) {
-   
+
     // first argument - config file
     // second argument - filelist
    bool sync = false;  
    
    // read config file =======================================================================================================================================================
    Config cfg(argv[1]);
-   
+
    const string era = cfg.get<string>("Era");
    
    const bool computeSVFitMass = cfg.get<bool>("ComputeSVFitMass");
@@ -170,7 +170,7 @@ int main(int argc, char * argv[]) {
    // output fileName with histograms ==================================================================================================================================
    TFile * file = new TFile(TStrName+TString(".root"),"recreate");
    file->cd("");
-   
+
    TH1D * inputEventsH = new TH1D("inputEventsH","",1,-0.5,0.5);
    TH1D * ZMM = new TH1D("ZMM","",1,-0.5,0.5);
    TH1D * ZEE = new TH1D("ZEE","",1,-0.5,0.5);
@@ -234,7 +234,7 @@ int main(int argc, char * argv[]) {
          vsrc_RelativeSample[isrc] = unc;
       }
    }
-   
+
    map< TString , vector<JetCorrectionUncertainty*> > jec_unc_map = {
       { "jecUncEta0To5"     , vsrc_Eta0To5 },
       { "jecUncEta0To3"     , vsrc_Eta0To3 },
@@ -253,7 +253,7 @@ int main(int argc, char * argv[]) {
    // Load CrystalBallEfficiency class =================================================================================================================================
    TString pathToCrystalLib = (TString) cmsswBase + "/src/HTT-utilities/CorrectionsWorkspace/CrystalBallEfficiency_cxx.so";
    LoadCrystalBallEfficiencyClass(pathToCrystalLib);
-   
+
    // PU reweighting  ==================================================================================================================================================
    PileUp * PUofficial = new PileUp();
    TFile * filePUdistribution_data = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/PileUpDistrib/"+PileUpDataFile,"read");
@@ -322,7 +322,7 @@ int main(int argc, char * argv[]) {
    badPFMuonFlag.push_back("Flag_BadPFMuonFilter");//do not apply? not applied for now, check!
    std::vector<TString> badMuonFlag; badMuonFlag.clear();
    badMuonFlag.push_back("Flag_badMuons");//do not apply? not applied for now, check! 
-   
+
    // initialize recoil corrections ====================================================================================================================================
    kit::MEtSys metSys(MetSysFileName);
    kit::RecoilCorrector recoilMetCorrector(RecoilFileName);
@@ -405,7 +405,6 @@ int main(int argc, char * argv[]) {
    const float mPOLE = 125.6;
    TVar::VerbosityLevel verbosity = TVar::SILENT;
    Mela mela(erg_tev, mPOLE, verbosity);
-
 
    // ==================================================================================================================================================================
    // open files =======================================================================================================================================================
@@ -794,7 +793,6 @@ int main(int argc, char * argv[]) {
          else metFilters_ = metFilters_;
          //if (era=="2016" && badMuonFilter_ < 0.5) continue;
          //if (era=="2016" && duplicateMuonFilter_ < 0.5) continue; 
-         
 
          // triggered?  ================================================================================================================================================    
          isMu23 = TriggerMatching(analysisTree, analysisTree.muon_eta[muonIndex], analysisTree.muon_phi[muonIndex], nHighPtLegMuon, deltaRTrigMatch) && analysisTree.muon_pt[muonIndex]>ptMuonHighCut;
@@ -856,10 +854,9 @@ int main(int argc, char * argv[]) {
          dZ_1 = analysisTree.electron_dz[electronIndex];
          iso_1 = isoEleMin;
          m_1 =  classic_svFit::electronMass;
-       
+
          // set iso, id and trigger weights   ==========================================================================================================================
          if (!isData || isEmbedded) {
-            
             correctionWS_embedded->var("e_pt")->setVal(pt_1);
             correctionWS_embedded->var("e_eta")->setVal(eta_1);
             correctionWS_embedded->var("e_iso")->setVal(iso_1);
@@ -902,7 +899,6 @@ int main(int argc, char * argv[]) {
             //		cout << "isoweight_1 = " << isoweight_1
             //		     << "isoweight_2 = " << isoweight_2 << endl;
             
-            
             correctionWS_embedded_trigger->var("e_pt")->setVal(pt_1);
             correctionWS_embedded_trigger->var("e_eta")->setVal(eta_1);
             correctionWS_embedded_trigger->var("m_pt")->setVal(pt_2);
@@ -939,7 +935,7 @@ int main(int argc, char * argv[]) {
             }
 
             float trigWeightData = Mu23EffData*Ele12EffData + Mu8EffData*Ele23EffData - Mu23EffData*Ele23EffData;
-            
+
             if (applyTriggerMatch && !isData) {
                if (era=="2016"){
                   if (!isEmbedded){
@@ -1020,7 +1016,6 @@ int main(int argc, char * argv[]) {
          dphi_tt = dPhiFrom2P(muonLV.Px(),muonLV.Py(),electronLV.Px(),electronLV.Py());   
          dr_tt = deltaR(muonLV.Eta(),muonLV.Phi(),electronLV.Eta(),electronLV.Phi());
          
-
          // counting jets ==============================================================================================================================================
          TLorentzVector metLV;
          float met_x;
@@ -1718,7 +1713,7 @@ int main(int argc, char * argv[]) {
             qcdweight_iso_up = correctionWS_qcd->function("em_qcd_extrap_up")->getVal();
             qcdweight_iso_down = correctionWS_qcd->function("em_qcd_extrap_down")->getVal();
          }  
-         else{
+         else if (era=="2017"){
             correctionWS_qcd->var("e_pt")->setVal(pt_1);
             correctionWS_qcd->var("m_pt")->setVal(pt_2);
             double_t em_qcd_extrap_uncert = correctionWS_qcd->function("em_qcd_extrap_uncert")->getVal();
@@ -1750,7 +1745,64 @@ int main(int argc, char * argv[]) {
             qcdweight_iso_up = em_qcd_extrap_uncert * em_qcd_extrap_uncert * em_qcd_osss_binned;
             qcdweight_iso_down = em_qcd_osss_binned;
          }
-         
+         else if (era=="2018"){
+            // correctionWS_qcd->var("e_pt")->setVal(pt_1);
+            // correctionWS_qcd->var("m_pt")->setVal(pt_2);
+            // double_t em_qcd_extrap_uncert = correctionWS_qcd->function("em_qcd_extrap_uncert")->getVal(); TO CHECK: ALREADY APPLIED?
+
+            correctionWS_qcd->var("e_pt")->setVal(pt_1);
+            correctionWS_qcd->var("m_pt")->setVal(pt_2);
+            correctionWS_qcd->var("njets")->setVal(njets);
+            correctionWS_qcd->var("dR")->setVal(dr_tt);
+            double_t em_qcd_osss_binned = correctionWS_qcd->function("em_qcd_osss_binned")->getVal();
+            double_t em_qcd_osss_binned_0jet_rate_up = correctionWS_qcd->function("em_qcd_osss_0jet_rateup")->getVal();
+            double_t em_qcd_osss_binned_0jet_rate_down = correctionWS_qcd->function("em_qcd_osss_0jet_ratedown")->getVal();
+            double_t em_qcd_osss_binned_1jet_rate_up = correctionWS_qcd->function("em_qcd_osss_1jet_rateup")->getVal();
+            double_t em_qcd_osss_binned_1jet_rate_down = correctionWS_qcd->function("em_qcd_osss_1jet_ratedown")->getVal();
+            double_t em_qcd_osss_binned_2jet_rate_up = correctionWS_qcd->function("em_qcd_osss_2jet_rateup")->getVal();
+            double_t em_qcd_osss_binned_2jet_rate_down = correctionWS_qcd->function("em_qcd_osss_2jet_ratedown")->getVal();
+            double_t em_qcd_osss_binned_0jet_shape_up = correctionWS_qcd->function("em_qcd_osss_0jet_shapeup")->getVal();
+            double_t em_qcd_osss_binned_0jet_shape_down = correctionWS_qcd->function("em_qcd_osss_0jet_shapedown")->getVal();
+            double_t em_qcd_osss_binned_1jet_shape_up = correctionWS_qcd->function("em_qcd_osss_1jet_shapeup")->getVal();
+            double_t em_qcd_osss_binned_1jet_shape_down = correctionWS_qcd->function("em_qcd_osss_1jet_shapedown")->getVal();
+            double_t em_qcd_osss_binned_2jet_shape_up = correctionWS_qcd->function("em_qcd_osss_2jet_shapeup")->getVal();
+            double_t em_qcd_osss_binned_2jet_shape_down = correctionWS_qcd->function("em_qcd_osss_2jet_shapedown")->getVal();
+            double_t em_qcd_extrap_up = correctionWS_qcd->function("em_qcd_extrap_up")->getVal();
+            double_t em_qcd_extrap_down = correctionWS_qcd->function("em_qcd_extrap_down")->getVal();
+
+            // qcdweight = em_qcd_extrap_uncert * em_qcd_osss_binned;
+            // qcdweight_0jet_rate_up = em_qcd_extrap_uncert * em_qcd_osss_binned_0jet_rate_up;
+            // qcdweight_0jet_rate_down = em_qcd_extrap_uncert * em_qcd_osss_binned_0jet_rate_down;   
+            // qcdweight_1jet_rate_up = em_qcd_extrap_uncert * em_qcd_osss_binned_1jet_rate_up;
+            // qcdweight_1jet_rate_down = em_qcd_extrap_uncert * em_qcd_osss_binned_1jet_rate_down;
+            // qcdweight_2jet_rate_up = em_qcd_extrap_uncert * em_qcd_osss_binned_2jet_rate_up;
+            // qcdweight_2jet_rate_down = em_qcd_extrap_uncert * em_qcd_osss_binned_2jet_rate_down;
+            // qcdweight_0jet_shape_up = em_qcd_extrap_uncert * em_qcd_osss_binned_0jet_shape_up;
+            // qcdweight_0jet_shape_down = em_qcd_extrap_uncert * em_qcd_osss_binned_0jet_shape_down;   
+            // qcdweight_1jet_shape_up = em_qcd_extrap_uncert * em_qcd_osss_binned_1jet_shape_up;
+            // qcdweight_1jet_shape_down = em_qcd_extrap_uncert * em_qcd_osss_binned_1jet_shape_down;
+            // qcdweight_2jet_shape_up = em_qcd_extrap_uncert * em_qcd_osss_binned_2jet_shape_up;
+            // qcdweight_2jet_shape_down = em_qcd_extrap_uncert * em_qcd_osss_binned_2jet_shape_down;
+           
+            // FIXME: HAS TO BE CHECKED IF CORRECLTY IMPLEMENTED
+            qcdweight =  em_qcd_osss_binned;
+            qcdweight_0jet_rate_up =  em_qcd_osss_binned_0jet_rate_up;
+            qcdweight_0jet_rate_down =  em_qcd_osss_binned_0jet_rate_down;   
+            qcdweight_1jet_rate_up =  em_qcd_osss_binned_1jet_rate_up;
+            qcdweight_1jet_rate_down =  em_qcd_osss_binned_1jet_rate_down;
+            qcdweight_2jet_rate_up =  em_qcd_osss_binned_2jet_rate_up;
+            qcdweight_2jet_rate_down =  em_qcd_osss_binned_2jet_rate_down;
+            qcdweight_0jet_shape_up =  em_qcd_osss_binned_0jet_shape_up;
+            qcdweight_0jet_shape_down =  em_qcd_osss_binned_0jet_shape_down;   
+            qcdweight_1jet_shape_up =  em_qcd_osss_binned_1jet_shape_up;
+            qcdweight_1jet_shape_down =  em_qcd_osss_binned_1jet_shape_down;
+            qcdweight_2jet_shape_up =  em_qcd_osss_binned_2jet_shape_up;
+            qcdweight_2jet_shape_down = em_qcd_osss_binned_2jet_shape_down;
+            
+            qcdweight_iso_up = em_qcd_extrap_up;
+            qcdweight_iso_down = em_qcd_extrap_down;
+         }
+
          if (!isData){
             if (era=="2016")
                {
