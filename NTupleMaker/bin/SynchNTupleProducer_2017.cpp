@@ -252,7 +252,8 @@ int main(int argc, char * argv[]){
     //    recoilMvaMetCorrector = new RecoilCorrector( RecoilFileName);
 
   }
-  
+ bool applyTauSpinnerWeights= cfg.get<bool>("applyTauSpinnerWeights");
+
   // Read in HLT filter
   vector<string> filterSingleLep;
   vector<string> filterXtriggerLepLeg;
@@ -336,7 +337,7 @@ int main(int argc, char * argv[]){
 
   //Merijn removed dimuon cut information since it is in the config file, best to have in one location only to avoid confusion
 
-  const float deltaRTrigMatch = cfg.get<float>("dRTrigMatch");
+  const float deltaRTrigMatch = cfg.get<float>("DRTrigMatch");
   const float dRiso = cfg.get<float>("dRiso");
   
   const float jetEtaCut = cfg.get<float>("JetEtaCut");
@@ -408,6 +409,10 @@ int main(int argc, char * argv[]){
 
   TString rootFileName(sample);
   std::string ntupleName("makeroottree/AC1B");
+
+  //Merijn add names for spinner trees
+  std::string TauSpinnerWeightTreeName("icTauSpinnerProducer/TauSpinnerWeightTree");
+  std::string TauSpinnerAngleTreeName("icTauSpinnerProducer/TauSpinnerAngleTree");
 
   // PU reweighting - initialization
   PileUp * PUofficial = new PileUp();
@@ -617,6 +622,14 @@ int main(int argc, char * argv[]){
         
     if (_tree==NULL) continue;
     
+    double * TSweight=new double();
+   TTree * _treeTauSpinnerWeights = NULL;
+
+   if(applyTauSpinnerWeights){ 
+	_treeTauSpinnerWeights = (TTree*)file_->Get(TString(TauSpinnerWeightTreeName));
+        _treeTauSpinnerWeights->SetBranchAddress("TauSpinnerWeights",TSweight);		
+	}  
+
     TH1D * histoInputEvents = NULL;
 
     histoInputEvents = (TH1D*)file_->Get("makeroottree/nEvents");
@@ -643,12 +656,40 @@ int main(int argc, char * argv[]){
     std::cout << "      number of entries in Tree = " << numberOfEntries << std::endl;
     ///////////////EVENT LOOP///////////////
 
-//for (Long64_t iEntry=0; iEntry<1000; iEntry++) {
-for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) {
+for (Long64_t iEntry=0; iEntry<1000; iEntry++) {
+//for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) {
   // cout<<"iEntry "<<iEntry<<endl;
       counter[0]++;
       analysisTree.GetEntry(iEntry);
       nEvents++;
+
+	if(applyTauSpinnerWeights){
+        _treeTauSpinnerWeights->GetEntry(iEntry);
+
+	for(int tsitindex=0;tsitindex<5;tsitindex++){
+		cout<<"TSweight[tsitindex] "<<TSweight[tsitindex] <<endl;
+	}
+
+	otree->TauSpinnerWeightsEven=TSweight[0];
+	gentree->TauSpinnerWeightsEven=TSweight[0];
+	gentreeForGoodRecoEvtsOnly->TauSpinnerWeightsEven=TSweight[0];
+
+	otree->TauSpinnerWeightsMaxMix=TSweight[1];
+	gentree->TauSpinnerWeightsMaxMix=TSweight[1];
+	gentreeForGoodRecoEvtsOnly->TauSpinnerWeightsMaxMix=TSweight[1];
+
+	otree->TauSpinnerWeightsOdd=TSweight[2];
+	gentree->TauSpinnerWeightsOdd=TSweight[2];
+	gentreeForGoodRecoEvtsOnly->TauSpinnerWeightsOdd=TSweight[2];
+
+	otree->TauSpinnerWeightsMinusMaxMix=TSweight[3];
+	gentree->TauSpinnerWeightsMinusMaxMix=TSweight[3];
+	gentreeForGoodRecoEvtsOnly->TauSpinnerWeightsMinusMaxMix=TSweight[3];
+
+	otree->TauSpinnerWeightsMix0p375=TSweight[4];
+	gentree->TauSpinnerWeightsMix0p375=TSweight[4];
+	gentreeForGoodRecoEvtsOnly->TauSpinnerWeightsMix0p375=TSweight[4];
+	}
 
       if (isData)
 	nWeightedEventsH->Fill(0., 1.);
@@ -657,6 +698,7 @@ for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) {
 	FillGenTree(&analysisTree,gentree,ch);
 	gentree->Fill();
       }
+
 
 
       //Skip events not passing the MET filters, if applied

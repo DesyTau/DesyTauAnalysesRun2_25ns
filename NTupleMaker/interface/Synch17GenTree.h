@@ -14,6 +14,10 @@
 #include <TChain.h>
 #include <TFile.h>
 
+//#define NrAnglestoStore   5  //Needed for the CP measurement. We´ll store for now 5 CP mixing scenarios: TauSpinnerWeightsEven, TauSpinnerWeightsOdd, TauSpinnerWeightsMaxMix, TauSpinnerWeightsMinusMaxMix, TauSpinnerWeightsMix0p375; If more needed update this number!
+#include <vector>
+#include <string>
+
 // Header file for the classes stored in the TTree if any.
 
 // Fixed size dimensions of array or collections stored in the TTree if any.
@@ -85,6 +89,8 @@ public :
   
   Float_t alphaminus;
 
+  double TauSpinnerWeightsEven, TauSpinnerWeightsOdd, TauSpinnerWeightsMaxMix, TauSpinnerWeightsMinusMaxMix, TauSpinnerWeightsMix0p375;
+
 
   //////////////////////////////////////////////
   //            List of branches              //
@@ -143,6 +149,12 @@ public :
   TBranch        *b_VyConstitTau2;
   TBranch        *b_VzConstitTau2;
   TBranch        *b_alphaminus;
+
+  TBranch        *b_TauSpinnerWeightsEven;
+  TBranch        *b_TauSpinnerWeightsOdd;
+  TBranch        *b_TauSpinnerWeightsMaxMix;
+  TBranch        *b_TauSpinnerWeightsMinusMaxMix;
+  TBranch        *b_TauSpinnerWeightsMix0p375;
 
   Synch17GenTree(TTree *tree=0);
   virtual ~Synch17GenTree();

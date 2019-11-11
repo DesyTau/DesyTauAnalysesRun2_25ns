@@ -14,6 +14,10 @@
 
 // Header file for the classes stored in the TTree if any.
 
+//#define NrAnglestoStore   5  //Needed for the CP measurement. We´ll store for now 5 CP mixing scenarios: TauSpinnerWeightsEven, TauSpinnerWeightsOdd, TauSpinnerWeightsMaxMix, TauSpinnerWeightsMinusMaxMix, TauSpinnerWeightsMix0p375; If more needed update this number!
+#include <vector>
+#include <string>
+
 // Fixed size dimensions of array or collections stored in the TTree if any.
 
 class Synch17Tree {
@@ -374,6 +378,8 @@ public :
   Float_t VzConstitTau2;
   Float_t alphaminus;
 
+  double TauSpinnerWeightsEven, TauSpinnerWeightsOdd, TauSpinnerWeightsMaxMix, TauSpinnerWeightsMinusMaxMix, TauSpinnerWeightsMix0p375;
+
   //Vinay: ditau_vis_pT + MET
   Float_t Prompt_pT;
 
@@ -731,6 +737,12 @@ public :
   TBranch        *b_VyConstitTau2;
   TBranch        *b_VzConstitTau2;
   TBranch        *b_alphaminus;
+
+  TBranch        *b_TauSpinnerWeightsEven;
+  TBranch        *b_TauSpinnerWeightsOdd;
+  TBranch        *b_TauSpinnerWeightsMaxMix;
+  TBranch        *b_TauSpinnerWeightsMinusMaxMix;
+  TBranch        *b_TauSpinnerWeightsMix0p375;
 
   TBranch       *b_Prompt_pT;
 
