@@ -259,9 +259,9 @@ void counting_jets(const AC1B *analysisTree, Synch17Tree *otree, const Config *c
   }
   else {
     otree->bpt_1   = -10;
-    otree->beta_1  = -9999;
-    otree->bphi_1  = -9999;
-    otree->bcsv_1  = -9999;
+    otree->beta_1  = -10;
+    otree->bphi_1  = -10;
+    otree->bcsv_1  = -10;
   }
 
   // subleading b-jet variables
@@ -273,9 +273,9 @@ void counting_jets(const AC1B *analysisTree, Synch17Tree *otree, const Config *c
   }
   else {
     otree->bpt_2   = -10;
-    otree->beta_2  = -9999;
-    otree->bphi_2  = -9999;
-    otree->bcsv_2  = -9999;
+    otree->beta_2  = -10;
+    otree->bphi_2  = -10;
+    otree->bcsv_2  = -10;
   }
   
   // leading jet variables
@@ -287,9 +287,9 @@ void counting_jets(const AC1B *analysisTree, Synch17Tree *otree, const Config *c
     otree->jphi_1 = analysisTree->pfjet_phi[indexLeadingJet];
   }
   else {
-    otree->jpt_1 = -9999;
-    otree->jeta_1 = -9999;
-    otree->jphi_1 = -9999;
+    otree->jpt_1 = -10;
+    otree->jeta_1 = -10;
+    otree->jphi_1 = -10;
   }
   
   // subleading jet variables
@@ -299,9 +299,9 @@ void counting_jets(const AC1B *analysisTree, Synch17Tree *otree, const Config *c
     otree->jphi_2 = analysisTree->pfjet_phi[indexSubLeadingJet];
   }
   else {
-    otree->jpt_2 = -9999;
-    otree->jeta_2 = -9999;
-    otree->jphi_2 = -9999;
+    otree->jpt_2 = -10;
+    otree->jeta_2 = -10;
+    otree->jphi_2 = -10;
   }
 
   // dijet variables
@@ -333,11 +333,11 @@ void counting_jets(const AC1B *analysisTree, Synch17Tree *otree, const Config *c
     }
   }
   else {
-    otree->mjj =  -9999;
-    otree->jdeta =  -9999;
-    otree->dijetpt =  -9999;
-    otree->jdphi =  -9999;
-    otree->njetingap = -1;
+    otree->mjj =  -10;
+    otree->jdeta =  -10;
+    otree->dijetpt =  -10;
+    otree->jdphi =  -10;
+    otree->njetingap = -10;
   }
  } // counting_jets
 } // jets namespace 
