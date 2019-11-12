@@ -76,12 +76,12 @@
 #define pionMass 		   0.1396
 
 
-void FillMuTau(const AC1B * analysisTree, Synch17Tree *otree, int leptonIndex, float dRiso);
-void FillETau(const AC1B * analysisTree, Synch17Tree *otree, int leptonIndex, float dRiso);
-void FillTau(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex);
 void initializeCPvar(Synch17Tree *otree);
-void SaveRECOVertices(const AC1B * analysisTree,Synch17Tree *otree, const bool isData);
 void initializeGenTree(Synch17GenTree *gentree);
+void FillMuTau(const AC1B * analysisTree, Synch17Tree *otree, int leptonIndex, int tauIndex, float dRiso);
+void FillETau(const AC1B * analysisTree, Synch17Tree *otree, int leptonIndex, float dRiso);
+void FillTau(const AC1B * analysisTree, Synch17Tree *otree, int leptonIndex, int tauIndex);
+void FillVertices(const AC1B * analysisTree,Synch17Tree *otree, const bool isData, int leptonIndex, int tauIndex);
 void FillGenTree(const AC1B * analysisTree, Synch17GenTree *gentree);
 
 /*Notifications Merijn
@@ -144,6 +144,7 @@ int main(int argc, char * argv[]){
   }
 
   const int era = cfg.get<int>("era");
+  const bool Synch = cfg.get<bool>("Synch"); 
   const bool ApplyPUweight    = cfg.get<bool>("ApplyPUweight"); 
   const bool ApplyLepSF       = cfg.get<bool>("ApplyLepSF"); 
   const bool ApplyTrigger     = cfg.get<bool>("ApplyTrigger"); 
@@ -567,7 +568,9 @@ int main(int argc, char * argv[]){
       }
       
       //Skip events not passing the MET filters, if applied
-      if (ApplyMetFilters && !passedAllMetFilters(&analysisTree, met_filters_list)) continue;
+      bool passed_all_met_filters = passedAllMetFilters(&analysisTree, met_filters_list);
+      if (ApplyMetFilters && !Synch && !passed_all_met_filters) continue;
+      otree->passedAllMetFilters = passed_all_met_filters;
       counter[1]++;
       
       // Check if all triggers are existent in each event and save index
@@ -859,7 +862,7 @@ int main(int argc, char * argv[]){
       // reset efficiency weights
     
       //all criterua passed, we fill vertices here;	
-      SaveRECOVertices(&analysisTree,otree, isData);
+      FillVertices(&analysisTree, otree, isData, leptonIndex, tauIndex);
     
       //Merijn: save here all gen information for the selected RECO events, gets stored for convenience in the taucheck tree ;-). Note that no selection on gen level is applied..     
       //Merijn 2019 4 3:note that a separate fill is not needed. We store in the otree now, which is Filled at the bottom! Filling here will make things out of synch..
@@ -867,7 +870,7 @@ int main(int argc, char * argv[]){
         FillGenTree(&analysisTree, gentreeForGoodRecoEvtsOnly);       
     
       if(ch == "mt") {
-      	FillMuTau(&analysisTree, otree, leptonIndex, dRiso);
+      	FillMuTau(&analysisTree, otree, leptonIndex, tauIndex, dRiso);
         leptonLV.SetXYZM(analysisTree.muon_px[leptonIndex], analysisTree.muon_py[leptonIndex], analysisTree.muon_pz[leptonIndex], muonMass);
     
       	// tracking efficiency weight	
@@ -914,7 +917,7 @@ int main(int argc, char * argv[]){
       }
       counter[10]++;
     
-      FillTau(&analysisTree, otree, tauIndex);
+      FillTau(&analysisTree, otree, leptonIndex, tauIndex);
     
       if (!isData && analysisTree.tau_genmatch[tauIndex] == 5) otree->idisoweight_2 = tau_id_sf; 
     
@@ -1122,7 +1125,6 @@ int main(int argc, char * argv[]){
       //calculate SV fit only for events passing baseline selection and mt cut
       // fill otree only for events passing baseline selection 
       // for synchronisation, take all events
-      const bool Synch = cfg.get<bool>("Synch"); 
       bool passedBaselineSel = false;
     
   	  // for SM analysis
@@ -1283,16 +1285,18 @@ int main(int argc, char * argv[]){
 
 ////FILLING FUNCTIONS//////
 
-void SaveRECOVertices(const AC1B *analysisTree, Synch17Tree *otree, const bool isData){
+void FillVertices(const AC1B *analysisTree, Synch17Tree *otree, const bool isData, int leptonIndex, int tauIndex){
 
   otree->RecoVertexX = analysisTree->primvertex_x;
   otree->RecoVertexY = analysisTree->primvertex_y;
   otree->RecoVertexZ = analysisTree->primvertex_z;
   
-  // note: picking the first one vertex in the collection
-  otree->PV_refitted_BS_x = analysisTree->refitvertexwithbs_x[0];
-  otree->PV_refitted_BS_y = analysisTree->refitvertexwithbs_y[0];
-  otree->PV_refitted_BS_z = analysisTree->refitvertexwithbs_z[0];
+  bool is_refitted_PV_with_BS = true;
+  TVector3 vertex_refitted_BS = get_refitted_PV_with_BS(analysisTree, leptonIndex, tauIndex, is_refitted_PV_with_BS);
+  otree->PV_refitted_BS_x = vertex_refitted_BS.X();
+  otree->PV_refitted_BS_y = vertex_refitted_BS.Y();
+  otree->PV_refitted_BS_z = vertex_refitted_BS.Z();
+  otree->is_refitted_PV_with_BS = is_refitted_PV_with_BS;
 
   if(!isData){
     for (unsigned int igen = 0; igen < analysisTree->genparticles_count; ++igen) {
@@ -1514,48 +1518,26 @@ void FillGenTree(const AC1B *analysisTree, Synch17GenTree *gentree){
 }
 
 //fill the otree with the muon variables in channel mutau
-void FillMuTau(const AC1B *analysisTree, Synch17Tree *otree, int leptonIndex, float dRiso){
+void FillMuTau(const AC1B *analysisTree, Synch17Tree *otree, int leptonIndex, int tauIndex, float dRiso){
 	otree->pt_1  = 	analysisTree->muon_pt[leptonIndex];
   otree->eta_1 = 	analysisTree->muon_eta[leptonIndex];
   otree->phi_1 = 	analysisTree->muon_phi[leptonIndex];
   otree->m_1   =  muonMass;
-  otree->q_1   = -1;
-  if (analysisTree->muon_charge[leptonIndex] > 0)
-    otree->q_1 =  1;
+  otree->q_1   =  analysisTree->muon_charge[leptonIndex];
   otree->gen_match_1 = analysisTree->muon_genmatch[leptonIndex];
-
   otree->iso_1 = abs_Iso_mt(leptonIndex, analysisTree, dRiso) / analysisTree->muon_pt[leptonIndex];
-
   otree->d0_1 = analysisTree->muon_dxy[leptonIndex];
   otree->dZ_1 = analysisTree->muon_dz[leptonIndex];
-  //otree->d0err_1 = analysisTree->muon_dxyerr[leptonIndex];
-  //otree->dZerr_1 = analysisTree->muon_dzerr[leptonIndex];
+  otree->tau_decay_mode_1 = -9999; 
   
-  
-  // helical approach for IP with BS constraned PV (1st in the collection)
-  double B = analysisTree->muon_Bfield[leptonIndex];
-  ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<float>> p4_1;  
-  TLorentzVector p4_1_aux; 
-  std::vector<float> h_param_1 = {};
-  p4_1_aux.SetXYZM(analysisTree->muon_px[leptonIndex], analysisTree->muon_py[leptonIndex], analysisTree->muon_pz[leptonIndex], muonMass);
-  p4_1.SetPxPyPzE(p4_1_aux.Px(),p4_1_aux.Py(),p4_1_aux.Pz(),p4_1_aux.E());
-  for(auto i :  analysisTree->muon_helixparameters[leptonIndex]) h_param_1.push_back(i);
-    
-  ROOT::Math::PositionVector3D<ROOT::Math::Cartesian3D<float>> pv(analysisTree->refitvertexwithbs_x[0], analysisTree->refitvertexwithbs_y[0], analysisTree->refitvertexwithbs_z[0]);
-  ROOT::Math::PositionVector3D<ROOT::Math::Cartesian3D<float>> ref_1;
-  ref_1.SetX(analysisTree->muon_referencePoint[leptonIndex][0]);
-  ref_1.SetY(analysisTree->muon_referencePoint[leptonIndex][1]);
-  ref_1.SetZ(analysisTree->muon_referencePoint[leptonIndex][2]);
-  
-  ImpactParameter IP;
-  TVector3 IP_helix_1 = IP.CalculatePCA(B, h_param_1, ref_1, pv, p4_1);        
+  // muon helical IP for refitted vertex with BS constraint
+  bool is_refitted_PV_with_BS = true;
+  TVector3 vertex_coord = get_refitted_PV_with_BS(analysisTree, leptonIndex, tauIndex, is_refitted_PV_with_BS);
+  TVector3 IP_helix_1 = calculate_IP_helix_mu(analysisTree, leptonIndex, vertex_coord);
   otree->IP_helix_x_1 = IP_helix_1.X();
   otree->IP_helix_y_1 = IP_helix_1.Y();
   otree->IP_helix_z_1 = IP_helix_1.Z();
   
-  otree->tau_decay_mode_1 = -9999; 
-  // otree->tau_decay_mode_1=analysisTree->tau_decayMode[leptonIndex]; can;'t do since its a lepton not a tau index
- 
   otree->byCombinedIsolationDeltaBetaCorrRaw3Hits_1 = -9999;
   otree->byLooseCombinedIsolationDeltaBetaCorr3Hits_1 = -9999;
   otree->byMediumCombinedIsolationDeltaBetaCorr3Hits_1 = -9999;
@@ -1575,7 +1557,6 @@ void FillMuTau(const AC1B *analysisTree, Synch17Tree *otree, int leptonIndex, fl
   otree->chargedIsoPtSum_1 = -9999;
   otree->neutralIsoPtSum_1 = -9999;
   otree->puCorrPtSum_1 = -9999;
-
 }
 
 //fill the otree with the electron variables in channel etau
@@ -1623,7 +1604,7 @@ void FillETau(const AC1B *analysisTree, Synch17Tree *otree, int leptonIndex, flo
 }
 
 //fill the otree with the tau variables 
-void FillTau(const AC1B *analysisTree, Synch17Tree *otree, int tauIndex){
+void FillTau(const AC1B *analysisTree, Synch17Tree *otree, int leptonIndex, int tauIndex){
   otree->pt_2 = analysisTree->tau_pt[tauIndex];
   otree->eta_2 = analysisTree->tau_eta[tauIndex];
   otree->phi_2 = analysisTree->tau_phi[tauIndex];
@@ -1652,6 +1633,14 @@ void FillTau(const AC1B *analysisTree, Synch17Tree *otree, int tauIndex){
   otree->tau_SV_covyy_2 = analysisTree->tau_SV_cov[tauIndex][3];
   otree->tau_SV_covzy_2 = analysisTree->tau_SV_cov[tauIndex][4];
   otree->tau_SV_covzz_2 = analysisTree->tau_SV_cov[tauIndex][5];
+  
+  // tau_h helical IP for refitted vertex with BS constraint
+  bool is_refitted_PV_with_BS = true;
+  TVector3 vertex_coord = get_refitted_PV_with_BS(analysisTree, leptonIndex, tauIndex, is_refitted_PV_with_BS);
+  TVector3 IP_helix_2 = calculate_IP_helix_tauh(analysisTree, tauIndex, vertex_coord);
+  otree->IP_helix_x_2 = IP_helix_2.X();
+  otree->IP_helix_y_2 = IP_helix_2.Y();
+  otree->IP_helix_z_2 = IP_helix_2.Z();
 
   otree->byDeepTau2017v2p1VSeraw_2        = analysisTree->tau_byDeepTau2017v2p1VSeraw[tauIndex];
   otree->byDeepTau2017v2p1VSjetraw_2      = analysisTree->tau_byDeepTau2017v2p1VSjetraw[tauIndex];

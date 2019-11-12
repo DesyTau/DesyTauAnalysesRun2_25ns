@@ -9,8 +9,10 @@
 #include "DesyTauAnalyses/NTupleMaker/interface/Synch17GenTree.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/functions.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/PileUp.h"
+#include "HiggsCPinTauDecays/ImpactParameter/interface/ImpactParameter.h"
 
-#define PI_MASS  0.13957 //All energies and momenta are expressed in GeV
+#define PI_MASS     0.13957 //All energies and momenta are expressed in GeV
+#define MUON_MASS   0.105658
 
 /*Updates Merijn 2018 11 13
 -added acott_Impr, which is improved version of acott. Note it takes the decay channel as input also. 
@@ -48,6 +50,9 @@ double acoCP(TLorentzVector Pi1, TLorentzVector Pi2,
 	     TLorentzVector ref1, TLorentzVector ref2,
 	     bool firstNegative, bool pi01, bool pi02, Synch17GenTree* gentree);
 
+TVector3 calculate_IP_helix_mu(const AC1B * analysisTree, int muIndex, TVector3 vertex_coord);
+TVector3 calculate_IP_helix_tauh(const AC1B * analysisTree, int tauIndex, TVector3 vertex_coord);
+TVector3 get_refitted_PV_with_BS(const AC1B * analysisTree, int leptonIndex, int tauIndex, int &is_refitted_PV_with_BS);
 
 //Merijn: updated function to do CP calculations
 //called with: acott_Impr(&analysisTree,otree,tauIndex,leptonIndex, ch);
@@ -303,29 +308,27 @@ TLorentzVector chargedPivec(const AC1B * analysisTree, int tauIndex){
 };
 
 int chargedPiIndex(const AC1B * analysisTree, int tauIndex){
-
+	// selects the highest energy Pi with the same sign of the tau
+	
   int ncomponents = analysisTree->tau_constituents_count[tauIndex];
-  int piIndex=-1;
-  float maxPt=-1;
+  int piIndex = -1;
+  float maxPt = -1;
   int sign = -1;
-  if(analysisTree->tau_charge[tauIndex]>0) sign = 1; 
-  for(int i=0;i<ncomponents;i++){ //selects the highest energy Pi with the same sign of the tau. 
-    //    cout<<"analysisTree->tau_constituents_pdgId[tauIndex][i] "<<analysisTree->tau_constituents_pdgId[tauIndex][i]<<endl;
-
-if((analysisTree->tau_constituents_pdgId[tauIndex][i]*sign)==211){
-//    if((analysisTree->tau_constituents_pdgId[tauIndex][i]*sign)==211||(analysisTree->tau_constituents_pdgId[tauIndex][i]*sign)==-13||(analysisTree->tau_constituents_pdgId[tauIndex][i]*sign)==-11){
-      TLorentzVector lvector; lvector.SetXYZT(analysisTree->tau_constituents_px[tauIndex][i],
-					      analysisTree->tau_constituents_py[tauIndex][i],
-					      analysisTree->tau_constituents_pz[tauIndex][i],
-					      analysisTree->tau_constituents_e[tauIndex][i]);
+  if(analysisTree->tau_charge[tauIndex] > 0) sign = 1; 
+  for(int i = 0; i < ncomponents; i++){ 
+		if((analysisTree->tau_constituents_pdgId[tauIndex][i]*sign) == 211){
+      TLorentzVector lvector; 
+			lvector.SetXYZT(analysisTree->tau_constituents_px[tauIndex][i],
+								      analysisTree->tau_constituents_py[tauIndex][i],
+								      analysisTree->tau_constituents_pz[tauIndex][i],
+								      analysisTree->tau_constituents_e[tauIndex][i]);
       double Pt = lvector.Pt();
-      if(Pt>maxPt){
-	piIndex=i;
-	maxPt = Pt;
+      if(Pt > maxPt){
+				piIndex = i;
+				maxPt = Pt;
       }
     }
   }
-  
   return piIndex;
 };
 
@@ -1201,4 +1204,76 @@ double acoCP(TLorentzVector Pi1, TLorentzVector Pi2,
   if (pi01&&pi02){ otree->acotautauPsi_11=sign;}
   
   return acop;
+}
+
+TVector3 calculate_IP_helix_mu(const AC1B * analysisTree, int muIndex, TVector3 vertex_coord){
+	// helical IP for tau decaying into muon
+
+	double B = analysisTree->muon_Bfield[muIndex];
+	ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<float>> p4_mu;  
+	TLorentzVector p4_mu_auxil; 
+	std::vector<float> h_param_mu = {};
+	ROOT::Math::PositionVector3D<ROOT::Math::Cartesian3D<float>> ref_mu;
+	
+	ref_mu.SetX(analysisTree->muon_referencePoint[muIndex][0]);
+	ref_mu.SetY(analysisTree->muon_referencePoint[muIndex][1]);
+	ref_mu.SetZ(analysisTree->muon_referencePoint[muIndex][2]);
+	p4_mu_auxil.SetXYZM(analysisTree->muon_px[muIndex], analysisTree->muon_py[muIndex], analysisTree->muon_pz[muIndex], MUON_MASS);
+	p4_mu.SetPxPyPzE(p4_mu_auxil.Px(),p4_mu_auxil.Py(),p4_mu_auxil.Pz(),p4_mu_auxil.E());
+	for(auto i:  analysisTree->muon_helixparameters[muIndex]) h_param_mu.push_back(i);	
+	ROOT::Math::PositionVector3D<ROOT::Math::Cartesian3D<float>> pv(vertex_coord.X(), vertex_coord.Y(), vertex_coord.Z());
+
+	ImpactParameter IP;
+	TVector3 IP_helix_mu = IP.CalculatePCA(B, h_param_mu, ref_mu, pv, p4_mu);        
+
+	return IP_helix_mu;
+}
+
+TVector3 calculate_IP_helix_tauh(const AC1B * analysisTree, int tauIndex, TVector3 vertex_coord){
+	// helical IP for tau_h
+	// NB: for calculation will take the 4-momentum of the leading charged hadron, same sign as tau
+
+	double B = analysisTree->tau_Bfield[tauIndex];
+	ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<float>> p4_tau;  
+	std::vector<float> h_param_tau = {};
+	ROOT::Math::PositionVector3D<ROOT::Math::Cartesian3D<float>> ref_tau;
+	
+	ref_tau.SetX(analysisTree->tau_referencePoint[tauIndex][0]);
+	ref_tau.SetY(analysisTree->tau_referencePoint[tauIndex][1]);
+	ref_tau.SetZ(analysisTree->tau_referencePoint[tauIndex][2]);
+	
+	int leading_pi_index = chargedPiIndex(analysisTree, tauIndex);
+	p4_tau.SetPxPyPzE(analysisTree->tau_constituents_px[tauIndex][leading_pi_index],
+										analysisTree->tau_constituents_py[tauIndex][leading_pi_index],
+										analysisTree->tau_constituents_pz[tauIndex][leading_pi_index],
+										analysisTree->tau_constituents_e[tauIndex][leading_pi_index]);
+	
+	for(auto i:  analysisTree->tau_helixparameters[tauIndex]) h_param_tau.push_back(i);	
+	ROOT::Math::PositionVector3D<ROOT::Math::Cartesian3D<float>> pv(vertex_coord.X(), vertex_coord.Y(), vertex_coord.Z());
+	
+	ImpactParameter IP;
+	TVector3 IP_helix_tau = IP.CalculatePCA(B, h_param_tau, ref_tau, pv, p4_tau);        
+	return IP_helix_tau;
+}
+
+
+TVector3 get_refitted_PV_with_BS(const AC1B * analysisTree, int leptonIndex, int tauIndex, bool &is_refitted_PV_with_BS){
+	float vtx_x = analysisTree->primvertexwithbs_x; // by default store non-refitted PV with BS constraint if refitted one is not found
+	float vtx_y = analysisTree->primvertexwithbs_y;
+	float vtx_z = analysisTree->primvertexwithbs_z;
+	is_refitted_PV_with_BS = false;
+
+	for(unsigned int i = 0; i < analysisTree->refitvertexwithbs_count; i++)
+	{
+    if( (leptonIndex == analysisTree->refitvertexwithbs_muIndex[i][0] || leptonIndex == analysisTree->refitvertexwithbs_muIndex[i][1]) &&
+        (tauIndex == analysisTree->refitvertexwithbs_tauIndex[i][0] || tauIndex == analysisTree->refitvertexwithbs_tauIndex[i][1]))
+    {
+      vtx_x = analysisTree->refitvertexwithbs_x[i];
+      vtx_y = analysisTree->refitvertexwithbs_y[i];
+      vtx_z = analysisTree->refitvertexwithbs_z[i];
+			is_refitted_PV_with_BS = true;
+    }
+	}
+	TVector3 vertex_coord(vtx_x, vtx_y, vtx_z);
+	return vertex_coord;
 }
