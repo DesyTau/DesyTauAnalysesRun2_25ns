@@ -58,6 +58,8 @@
 #include "DesyTauAnalyses/NTupleMaker/interface/functionsCP.h"
 #include "HTT-utilities/TauTriggerSFs2017/interface/TauTriggerSFs2017.h"
 
+#include "DesyTauAnalyses/NTupleMaker/interface/ImpactParameter.h"
+
 #define pi 	3.14159265358979312
 #define d2r 1.74532925199432955e-02
 #define r2d 57.2957795130823229
@@ -106,8 +108,8 @@ int main(int argc, char * argv[]){
   if(argc < 4){
     std::cout << "RUN ERROR: wrong number of arguments"<< std::endl;
     std::cout << "Please run the code in the following way:"<< std::endl;
-    std::cout << "SynchNtupleProducer_2017 NameOfTheConfigurationFile FileList Channel" << std::endl;
-    std::cout << "example: SynchNtupleProducer_2017 analysisMacroSynch_lept_mt_DATA_SingleMuon.conf DATA_SingleMuon mt" << std::endl;
+    std::cout << "SynchNTupleProducer_Run2 NameOfTheConfigurationFile FileList Channel" << std::endl;
+    std::cout << "example: SynchNTupleProducer_Run2 analysisMacroSynch_lept_mt_DATA_SingleMuon.conf DATA_SingleMuon mt" << std::endl;
     exit(-1);
   }
 
@@ -168,14 +170,15 @@ int main(int argc, char * argv[]){
   const string ZptweightFile = cfg.get<string>("ZptweightFile");
 
   //b-tag scale factors
-  const string BtagSfFile = cfg.get<string>("BtagSfFile");
-  TString pathToBtagScaleFactors = (TString) cmsswBase + "/src/" + BtagSfFile;
-  if( ApplyBTagScaling && gSystem->AccessPathName(pathToBtagScaleFactors) ){
-    cout<<pathToBtagScaleFactors<<" not found. Please check."<<endl;
+  const string BTagAlgorithm = cfg.get<string>("BTagAlgorithm");
+  const string BtagSfFile = cmsswBase + "/src/" + cfg.get<string>("BtagSfFile");
+  if( ApplyBTagScaling && gSystem->AccessPathName( (TString) BtagSfFile) ){
+    cout<<BtagSfFile<<" not found. Please check."<<endl;
     exit(-1);
-  }//cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/CSVv2_ichep.csv"
+  }
   
-  BTagCalibration calib("csvv2", (string) pathToBtagScaleFactors );
+  cout<<"using "<<BTagAlgorithm<<endl;
+  BTagCalibration calib(BTagAlgorithm, BtagSfFile);
   BTagCalibrationReader reader_B(BTagEntry::OP_MEDIUM, "central");
   BTagCalibrationReader reader_C(BTagEntry::OP_MEDIUM, "central");
   BTagCalibrationReader reader_Light(BTagEntry::OP_MEDIUM, "central");
@@ -184,9 +187,8 @@ int main(int argc, char * argv[]){
     reader_C.load(calib, BTagEntry::FLAV_C, "comb");
     reader_Light.load(calib, BTagEntry::FLAV_UDSG, "incl");
   }
-  
-  const string TaggingEfficienciesFile = cfg.get<string>("BtagMCeffFile");
-  TString pathToTaggingEfficiencies = (TString) cmsswBase + "/src/" + TaggingEfficienciesFile;
+    
+  TString pathToTaggingEfficiencies = (TString) cmsswBase + "/src/" + cfg.get<string>("BtagMCeffFile");
   if (ApplyBTagScaling && gSystem->AccessPathName(pathToTaggingEfficiencies)){
     cout<<pathToTaggingEfficiencies<<" not found. Please check."<<endl;
     exit(-1);
@@ -351,10 +353,7 @@ int main(int argc, char * argv[]){
   if(ApplyPUweight){
     TFile *filePUdistribution_data = new TFile(TString(cmsswBase) + "/src/" + TString(pileUpInDataFile), "read");
     TFile *filePUdistribution_MC = new TFile (TString(cmsswBase) + "/src/" + TString(pileUpInMCFile), "read");
-    TH1D *PU_data = (TH1D *)filePUdistribution_data->Get("pileup");
-    //std::cout << filePUdistribution_data << std::endl;
-    //std::cout << filePUdistribution_MC << std::endl;
-    
+    TH1D *PU_data = (TH1D *)filePUdistribution_data->Get("pileup");    
     TH1D *PU_mc = (TH1D *)filePUdistribution_MC->Get(TString(pileUpforMC));
     if (PU_mc == NULL) {
       std::cout << "Histogram " << pileUpforMC << " is not present in pileup file" << std::endl;
@@ -1273,7 +1272,11 @@ void SaveRECOVertices(const AC1B *analysisTree, Synch17Tree *otree, const bool i
   otree->RecoVertexX = analysisTree->primvertex_x;
   otree->RecoVertexY = analysisTree->primvertex_y;
   otree->RecoVertexZ = analysisTree->primvertex_z;
-
+  
+  // note: picking the first one vertex in the collection
+  otree->PV_refitted_BS_x = analysisTree->refitvertexwithbs_x[0];
+  otree->PV_refitted_BS_y = analysisTree->refitvertexwithbs_y[0];
+  otree->PV_refitted_BS_z = analysisTree->refitvertexwithbs_z[0];
 
   if(!isData){
     for (unsigned int igen = 0; igen < analysisTree->genparticles_count; ++igen) {
@@ -1496,13 +1499,13 @@ void FillGenTree(const AC1B *analysisTree, Synch17GenTree *gentree){
 
 //fill the otree with the muon variables in channel mutau
 void FillMuTau(const AC1B *analysisTree, Synch17Tree *otree, int leptonIndex, float dRiso){
-	otree->pt_1 = 	analysisTree->muon_pt[leptonIndex];
+	otree->pt_1  = 	analysisTree->muon_pt[leptonIndex];
   otree->eta_1 = 	analysisTree->muon_eta[leptonIndex];
   otree->phi_1 = 	analysisTree->muon_phi[leptonIndex];
-  otree->m_1 = 		muonMass;
-  otree->q_1 = -1;
-  if (analysisTree->muon_charge[leptonIndex]>0)
-    otree->q_1 = 1;
+  otree->m_1   =  muonMass;
+  otree->q_1   = -1;
+  if (analysisTree->muon_charge[leptonIndex] > 0)
+    otree->q_1 =  1;
   otree->gen_match_1 = analysisTree->muon_genmatch[leptonIndex];
 
   otree->iso_1 = abs_Iso_mt(leptonIndex, analysisTree, dRiso) / analysisTree->muon_pt[leptonIndex];
@@ -1512,7 +1515,28 @@ void FillMuTau(const AC1B *analysisTree, Synch17Tree *otree, int leptonIndex, fl
   //otree->d0err_1 = analysisTree->muon_dxyerr[leptonIndex];
   //otree->dZerr_1 = analysisTree->muon_dzerr[leptonIndex];
   
-
+  
+  // helical approach for IP with BS constraned PV (1st in the collection)
+  double B = analysisTree->muon_Bfield[leptonIndex];
+  ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<float>> p4_1;  
+  TLorentzVector p4_1_aux; 
+  std::vector<float> h_param_1 = {};
+  p4_1_aux.SetXYZM(analysisTree->muon_px[leptonIndex], analysisTree->muon_py[leptonIndex], analysisTree->muon_pz[leptonIndex], muonMass);
+  p4_1.SetPxPyPzE(p4_1_aux.Px(),p4_1_aux.Py(),p4_1_aux.Pz(),p4_1_aux.E());
+  for(auto i :  analysisTree->muon_helixparameters[leptonIndex]) h_param_1.push_back(i);
+    
+  ROOT::Math::PositionVector3D<ROOT::Math::Cartesian3D<float>> pv(analysisTree->refitvertexwithbs_x[0], analysisTree->refitvertexwithbs_y[0], analysisTree->refitvertexwithbs_z[0]);
+  ROOT::Math::PositionVector3D<ROOT::Math::Cartesian3D<float>> ref_1;
+  ref_1.SetX(analysisTree->muon_referencePoint[leptonIndex][0]);
+  ref_1.SetY(analysisTree->muon_referencePoint[leptonIndex][1]);
+  ref_1.SetZ(analysisTree->muon_referencePoint[leptonIndex][2]);
+  
+  ImpactParameter IP;
+  TVector3 IP_helix_1 = IP.CalculatePCA(B, h_param_1, ref_1, pv, p4_1);        
+  otree->IP_helix_x_1 = IP_helix_1.X();
+  otree->IP_helix_y_1 = IP_helix_1.Y();
+  otree->IP_helix_z_1 = IP_helix_1.Z();
+  
   otree->tau_decay_mode_1 = -9999; 
   // otree->tau_decay_mode_1=analysisTree->tau_decayMode[leptonIndex]; can;'t do since its a lepton not a tau index
  
