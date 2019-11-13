@@ -170,6 +170,8 @@ public :
   Float_t         idisoweight_antiiso_2;
   Float_t         trigweight_2;
   Float_t         trigweight_antiiso_2;
+  Float_t         tauvsjetweightMedium_2;
+
   /////////////////////////////////////////////////////////////// NEW NEW
   Float_t	 efficiency_byVVLooseIsolationMVArun2017v2DBoldDMwLT2017_1;
 //  Float_t	 efficiency_byLooseIsolationMVArun2017v2DBoldDMwLT2017_1;
@@ -564,6 +566,7 @@ public :
   TBranch	 *b_idisoweight_antiiso_2;
   TBranch	 *b_trigweight_2;
   TBranch	 *b_trigweight_antiiso_2;
+  TBranch	 *b_tauvsjetweightMedium_2;
 
   //Trig and weights
   TBranch	 *b_weight;

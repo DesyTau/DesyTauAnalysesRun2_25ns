@@ -60,6 +60,7 @@
 #include "DesyTauAnalyses/NTupleMaker/interface/LepTauFakeRate.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/functionsCP.h"
 #include "HTT-utilities/TauTriggerSFs2017/interface/TauTriggerSFs2017.h"
+#include "TauPOG/TauIDSFs/interface/TauIDSFTool.h"
 
 //#include "DesyTauAnalyses/NTupleMaker/interface/ImpactParameter.h"
 #include "HiggsCPinTauDecays/ImpactParameter/interface/ImpactParameter.h"
@@ -166,7 +167,13 @@ int main(int argc, char * argv[]){
 
   // tau trigger efficiency
   TauTriggerSFs2017 *tauTriggerSF = new TauTriggerSFs2017(cmsswBase + "/src/HTT-utilities/TauTriggerSFs2017/data/tauTriggerEfficiencies2017.root", "tight");
-  	
+  std::string year;
+  if(era==2016)year = "2016Legacy";
+  else if(era==2017)year = "2017ReReco";
+  else year = "2018ReReco";	
+  TauIDSFTool * tauIDSF_medium = new TauIDSFTool(year,"DeepTau2017v2p1VSjet","Medium",false);
+
+
   //svfit
   const string svFitPtResFile = TString(TString(cmsswBase) + "/src/" + TString(cfg.get<string>("svFitPtResFile"))).Data();
 
@@ -1046,7 +1053,9 @@ int main(int argc, char * argv[]){
       	  otree->m_2 = tauLV.M();
       	}
       }
-    
+      if(otree->gen_match_2==5&&!isData){
+  	  otree->tauvsjetweightMedium_2 = tauIDSF_medium->getSFvsPT(otree->pt_2);
+      }
       TLorentzVector dileptonLV = leptonLV + tauLV;
       otree->m_vis = dileptonLV.M();
       otree->pt_tt = (dileptonLV+metLV).Pt();   
