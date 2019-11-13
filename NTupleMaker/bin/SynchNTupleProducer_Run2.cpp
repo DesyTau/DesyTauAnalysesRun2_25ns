@@ -25,6 +25,9 @@
 #include "TRandom.h"
 #include "TSystem.h"
 
+#include "TVector3.h"
+#include "TMatrix.h"
+
 #include "RooRealVar.h"
 #include "RooWorkspace.h"
 
@@ -58,7 +61,8 @@
 #include "DesyTauAnalyses/NTupleMaker/interface/functionsCP.h"
 #include "HTT-utilities/TauTriggerSFs2017/interface/TauTriggerSFs2017.h"
 
-#include "DesyTauAnalyses/NTupleMaker/interface/ImpactParameter.h"
+//#include "DesyTauAnalyses/NTupleMaker/interface/ImpactParameter.h"
+#include "HiggsCPinTauDecays/ImpactParameter/interface/ImpactParameter.h"
 
 #define pi 	3.14159265358979312
 #define d2r 1.74532925199432955e-02
