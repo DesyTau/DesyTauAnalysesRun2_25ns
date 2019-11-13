@@ -59,8 +59,9 @@
 //#include "DesyTauAnalyses/NTupleMaker/interface/JESUncertainties.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/LepTauFakeRate.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/functionsCP.h"
-#include "HTT-utilities/TauTriggerSFs2017/interface/TauTriggerSFs2017.h"
+//#include "HTT-utilities/TauTriggerSFs2017/interface/TauTriggerSFs2017.h"
 #include "TauPOG/TauIDSFs/interface/TauIDSFTool.h"
+#include "TauAnalysisTools/TauTriggerSFs/interface/TauTriggerSFs2017.h"
 
 //#include "DesyTauAnalyses/NTupleMaker/interface/ImpactParameter.h"
 #include "HiggsCPinTauDecays/ImpactParameter/interface/ImpactParameter.h"
@@ -134,7 +135,7 @@ int main(int argc, char * argv[]){
   }
   
   if (ch == "mt") lep = "Muon"; 
-  if (ch == "et") lep = "Electron";
+  else if (ch == "et") lep = "Electron";
 
   lumi_json json;
   if (isData){ 
@@ -166,7 +167,11 @@ int main(int argc, char * argv[]){
   const string xTrigLepLegEffFile_antiiso   = cfg.get<string>("xTrigLepLegEffFile_antiiso");
 
   // tau trigger efficiency
-  TauTriggerSFs2017 *tauTriggerSF = new TauTriggerSFs2017(cmsswBase + "/src/HTT-utilities/TauTriggerSFs2017/data/tauTriggerEfficiencies2017.root", "tight");
+  std::string channel;
+  if (ch == "mt") channel = "mutau"; 
+  if (ch == "et") channel = "etau";
+
+  TauTriggerSFs2017 *tauTriggerSF = new TauTriggerSFs2017(cmsswBase + "/src/TauAnalysisTools/TauTriggerSFs/data/tauTriggerEfficiencies"+to_string(era)+".root",channel,to_string(era), "tight","MVAv2");
   std::string year;
   if(era==2016)year = "2016Legacy";
   else if(era==2017)year = "2017ReReco";
@@ -884,14 +889,8 @@ int main(int argc, char * argv[]){
       }
     
       if (!isData && ApplyLepSF) {
-    	  if (ch == "mt") {
-    	    eff_data_trig_lt_tau = tauTriggerSF->getMuTauEfficiencyData(analysisTree.tau_pt[tauIndex], analysisTree.tau_eta[tauIndex], analysisTree.tau_phi[tauIndex]);
-    	    eff_mc_trig_lt_tau = tauTriggerSF->getMuTauEfficiencyMC(analysisTree.tau_pt[tauIndex], analysisTree.tau_eta[tauIndex], analysisTree.tau_phi[tauIndex]);
-    	  }
-    	  else {
-    	    eff_data_trig_lt_tau = tauTriggerSF->getETauEfficiencyData(analysisTree.tau_pt[tauIndex], analysisTree.tau_eta[tauIndex], analysisTree.tau_phi[tauIndex]);
-    	    eff_mc_trig_lt_tau = tauTriggerSF->getETauEfficiencyMC(analysisTree.tau_pt[tauIndex], analysisTree.tau_eta[tauIndex], analysisTree.tau_phi[tauIndex]);
-    	  }
+	  eff_data_trig_lt_tau = tauTriggerSF->getTriggerEfficiencyData(analysisTree.tau_pt[tauIndex], analysisTree.tau_eta[tauIndex], analysisTree.tau_phi[tauIndex],analysisTree.tau_decayMode[tauIndex]);
+	  eff_mc_trig_lt_tau = tauTriggerSF->getTriggerEfficiencyMC(analysisTree.tau_pt[tauIndex], analysisTree.tau_eta[tauIndex], analysisTree.tau_phi[tauIndex],analysisTree.tau_decayMode[tauIndex]);
     
     	  eff_data_trig_lt_l = SF_XTriggerLepLeg->get_EfficiencyData(leptonLV.Pt(), leptonLV.Eta());
     	  eff_mc_trig_lt_l = SF_XTriggerLepLeg->get_EfficiencyMC(leptonLV.Pt(), leptonLV.Eta());

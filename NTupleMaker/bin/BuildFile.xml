@@ -541,6 +541,7 @@
  <use name="HTT-utilities/LepEffInterface"/>
  <use name="HTT-utilities/RecoilCorrections"/>
  <use name="TauPOG/TauIDSFs"/>
+ <use name="TauAnalysisTools/TauTriggerSFs"/>
 </bin>
 
 <bin name="AnalysisMacro_muonTrigger" file="AnalysisMacro_muonTrigger.cpp">
