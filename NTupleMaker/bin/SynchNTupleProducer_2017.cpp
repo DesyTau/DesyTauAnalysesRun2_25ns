@@ -67,6 +67,7 @@
 #define tauMass 		   1.77682
 #define pionMass 		   0.1396
 
+#define expectedtauspinnerweights 5
 
 void FillMuTau(const AC1B * analysisTree, Synch17Tree *otree, int leptonIndex, float dRiso);
 void FillETau(const AC1B * analysisTree, Synch17Tree *otree, int leptonIndex, float dRiso);
@@ -622,7 +623,8 @@ int main(int argc, char * argv[]){
         
     if (_tree==NULL) continue;
     
-    double * TSweight=new double();
+    double * TSweight=new double[expectedtauspinnerweights];
+
    TTree * _treeTauSpinnerWeights = NULL;
 
    if(applyTauSpinnerWeights){ 
@@ -656,8 +658,8 @@ int main(int argc, char * argv[]){
     std::cout << "      number of entries in Tree = " << numberOfEntries << std::endl;
     ///////////////EVENT LOOP///////////////
 
-for (Long64_t iEntry=0; iEntry<1000; iEntry++) {
-//for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) {
+//for (Long64_t iEntry=0; iEntry<1000; iEntry++) {
+for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) {
   // cout<<"iEntry "<<iEntry<<endl;
       counter[0]++;
       analysisTree.GetEntry(iEntry);
@@ -666,9 +668,10 @@ for (Long64_t iEntry=0; iEntry<1000; iEntry++) {
 	if(applyTauSpinnerWeights){
         _treeTauSpinnerWeights->GetEntry(iEntry);
 
+/*
 	for(int tsitindex=0;tsitindex<5;tsitindex++){
 		cout<<"TSweight[tsitindex] "<<TSweight[tsitindex] <<endl;
-	}
+	}*/
 
 	otree->TauSpinnerWeightsEven=TSweight[0];
 	gentree->TauSpinnerWeightsEven=TSweight[0];
@@ -690,6 +693,10 @@ for (Long64_t iEntry=0; iEntry<1000; iEntry++) {
 	gentree->TauSpinnerWeightsMix0p375=TSweight[4];
 	gentreeForGoodRecoEvtsOnly->TauSpinnerWeightsMix0p375=TSweight[4];
 	}
+	else{
+		for(int tsindex=0;tsindex<expectedtauspinnerweights;tsindex++){
+			TSweight[tsindex]=0;}
+	}	
 
       if (isData)
 	nWeightedEventsH->Fill(0., 1.);

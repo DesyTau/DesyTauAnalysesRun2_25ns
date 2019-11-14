@@ -33,6 +33,14 @@ sed 's/pileUpforMC =/pileUpforMC = GluGluHToTauTau_M125_13TeV_powheg_pythia8_pil
 sed 's/pileUpforMC =/pileUpforMC = GluGluHToTauTau_M125_13TeV_powheg_pythia8_pileup/' analysisMacroSynch_lept_mt_MC17.conf > analysisMacroSynch_lept_mt_SUSYGluGluToHToTauTau_M-120_TuneCP5_13TeV-pythia8.conf
 sed 's/pileUpforMC =/pileUpforMC = VBFHToTauTau_M125_pileup/' analysisMacroSynch_lept_mt_MC17.conf > analysisMacroSynch_lept_mt_VBF125.conf
 
+#Tauspinner samples
+sed 's/pileUpforMC =/pileUpforMC = GluGluHToTauTau_M125_13TeV_powheg_pythia8_pileup/' analysisMacroSynch_lept_mt_MC17.conf > analysisMacroSynch_lept_mt_GluGluHToTauTau_M125_13TeV_powheg_pythia8_TauSpinner.conf
+sed -i 's/applyTauSpinnerWeights=false/applyTauSpinnerWeights=true/g' analysisMacroSynch_lept_mt_GluGluHToTauTau_M125_13TeV_powheg_pythia8_TauSpinner.conf
+
+sed 's/pileUpforMC =/pileUpforMC = VBFHToTauTau_M125_pileup/' analysisMacroSynch_lept_mt_MC17.conf > analysisMacroSynch_lept_mt_VBF125_TauSpinner.conf
+sed -i 's/applyTauSpinnerWeights=false/applyTauSpinnerWeights=true/g' analysisMacroSynch_lept_mt_VBF125_TauSpinner.conf
+
+
 sed 's/pileUpforMC =/pileUpforMC = MC_PU2017_pileup/' analysisMacroSynch_lept_mt_MC17.conf > analysisMacroSynch_lept_mt_WGToLNuG.conf
 
 sed 's/pileUpforMC =/pileUpforMC = EWKWMinus2Jets_WToLNu_M-50_TuneCP5_13TeV-madgraph-pythia8_pileup/' analysisMacroSynch_lept_mt_MC17.conf > analysisMacroSynch_lept_mt_EWKWMinus.conf
