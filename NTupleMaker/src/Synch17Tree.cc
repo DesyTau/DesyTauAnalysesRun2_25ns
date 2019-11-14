@@ -79,6 +79,9 @@ void Synch17Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("dZ_1", &dZ_1, &b_dZ_1);
    fChain->SetBranchAddress("d0err_1", &d0err_1, &b_d0err_1);
    fChain->SetBranchAddress("dZerr_1", &dZerr_1, &b_dZerr_1);
+   fChain->SetBranchAddress("IP_helix_x_1", &IP_helix_x_1, &b_IP_helix_x_1);
+   fChain->SetBranchAddress("IP_helix_y_1", &IP_helix_y_1, &b_IP_helix_y_1);
+   fChain->SetBranchAddress("IP_helix_z_1", &IP_helix_z_1, &b_IP_helix_z_1);
    fChain->SetBranchAddress("mt_1", &mt_1, &b_mt_1);
    fChain->SetBranchAddress("puppimt_1", &puppimt_1, &b_puppimt_1);
    fChain->SetBranchAddress("tau_decay_mode_1", &tau_decay_mode_1, &b_tau_decay_mode_1); 
@@ -171,7 +174,8 @@ void Synch17Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("trigweight_antiiso_2", &trigweight_antiiso_2, &b_trigweight_antiiso_2);
    fChain->SetBranchAddress("idisoweight_2", &idisoweight_2, &b_idisoweight_2);
    fChain->SetBranchAddress("idisoweight_antiiso_2", &idisoweight_antiiso_2, &b_idisoweight_antiiso_2);
-
+   fChain->SetBranchAddress("tauvsjetweightMedium_2", &tauvsjetweightMedium_2, &b_tauvsjetweightMedium_2);
+   
    fChain->SetBranchAddress("againstElectronVLooseMVA6_2", &againstElectronVLooseMVA6_2, &b_againstElectronVLooseMVA6_2);
    fChain->SetBranchAddress("againstElectronVTightMVA6_2", &againstElectronVTightMVA6_2, &b_againstElectronVTightMVA6_2);
    fChain->SetBranchAddress("againstElectronTightMVA6_2", &againstElectronTightMVA6_2, &b_againstElectronTightMVA6_2);
@@ -392,6 +396,10 @@ void Synch17Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("RecoVertexY", &RecoVertexY, &b_RecoVertexY);
    fChain->SetBranchAddress("RecoVertexZ", &RecoVertexZ, &b_RecoVertexZ);
 
+   fChain->SetBranchAddress("PV_refitted_BS_x", &PV_refitted_BS_x, &b_PV_refitted_BS_x);
+   fChain->SetBranchAddress("PV_refitted_BS_y", &PV_refitted_BS_y, &b_PV_refitted_BS_y);
+   fChain->SetBranchAddress("PV_refitted_BS_z", &PV_refitted_BS_z, &b_PV_refitted_BS_z);
+
   //gen vertex info useful to have
    fChain->SetBranchAddress("GenVertexX", &GenVertexX, &b_GenVertexX);
    fChain->SetBranchAddress("GenVertexY", &GenVertexY, &b_GenVertexY);
@@ -505,6 +513,9 @@ void Synch17Tree::WriteInit(TTree *tree) {
    fChain->Branch("dZ_1", &dZ_1, "dZ_1/F");
    fChain->Branch("d0err_1", &d0err_1, "d0err_1/F");
    fChain->Branch("dZerr_1", &dZerr_1, "dZerr_1/F");
+   fChain->Branch("IP_helix_x_1", &IP_helix_x_1, "IP_helix_x_1/F");
+   fChain->Branch("IP_helix_y_1", &IP_helix_y_1, "IP_helix_y_1/F");
+   fChain->Branch("IP_helix_z_1", &IP_helix_z_1, "IP_helix_z_1/F");
    fChain->Branch("mt_1", &mt_1, "mt_1/F");
    fChain->Branch("puppimt_1", &puppimt_1, "puppimt_1/F");
    fChain->Branch("tau_decay_mode_1", &tau_decay_mode_1, "tau_decay_mode_1/I"); 
@@ -629,6 +640,7 @@ void Synch17Tree::WriteInit(TTree *tree) {
    fChain->Branch("trigweight_antiiso_2", &trigweight_antiiso_2, "trigweight_antiiso_2/F");
    fChain->Branch("idisoweight_2", &idisoweight_2, "idisoweight_2/F");
    fChain->Branch("idisoweight_antiiso_2", &idisoweight_antiiso_2, "idisoweight_antiiso_2/F");
+   fChain->Branch("tauvsjetweightMedium_2", &tauvsjetweightMedium_2, "tauvsjetweightMedium_2/F");
    fChain->Branch("againstElectronVLooseMVA6_2", &againstElectronVLooseMVA6_2, "againstElectronVLooseMVA6_2/F");
    fChain->Branch("againstElectronVTightMVA6_2", &againstElectronVTightMVA6_2, "againstElectronVTightMVA6_2/F");
    fChain->Branch("againstElectronTightMVA6_2", &againstElectronTightMVA6_2, "againstElectronTightMVA6_2/F");
@@ -812,6 +824,10 @@ void Synch17Tree::WriteInit(TTree *tree) {
    fChain->Branch("RecoVertexX", &RecoVertexX, "RecoVertexX/F");
    fChain->Branch("RecoVertexY", &RecoVertexY, "RecoVertexY/F");
    fChain->Branch("RecoVertexZ", &RecoVertexZ, "RecoVertexZ/F"); 
+
+   fChain->Branch("PV_refitted_BS_x", &PV_refitted_BS_x, "PV_refitted_BS_x/F"); 
+   fChain->Branch("PV_refitted_BS_y", &PV_refitted_BS_y, "PV_refitted_BS_y/F"); 
+   fChain->Branch("PV_refitted_BS_z", &PV_refitted_BS_z, "PV_refitted_BS_z/F"); 
 
    fChain->Branch("GenVertexX", &GenVertexX, "GenVertexX/F");
    fChain->Branch("GenVertexY", &GenVertexY, "GenVertexY/F");

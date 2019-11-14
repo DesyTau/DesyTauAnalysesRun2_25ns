@@ -534,11 +534,14 @@
  <use name="boost_program_options"/>
  <use name="DesyTauAnalyses/NTupleMaker"/>
  <use name="FWCore/ParameterSet"/>
+ <use name="HiggsCPinTauDecays/ImpactParameter"/>
  <use name="TauAnalysis/ClassicSVfit"/>
  <use name="CondFormats/BTauObjects"/>
  <use name="CondTools/BTau"/>
  <use name="HTT-utilities/LepEffInterface"/>
  <use name="HTT-utilities/RecoilCorrections"/>
+ <use name="TauPOG/TauIDSFs"/>
+ <use name="TauAnalysisTools/TauTriggerSFs"/>
 </bin>
 
 <bin name="AnalysisMacro_muonTrigger" file="AnalysisMacro_muonTrigger.cpp">

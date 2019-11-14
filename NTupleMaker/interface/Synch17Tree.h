@@ -48,6 +48,9 @@ public :
   Float_t         dZ_1;
   Float_t         d0err_1;
   Float_t         dZerr_1;
+  Float_t         IP_helix_x_1;
+  Float_t         IP_helix_y_1;
+  Float_t         IP_helix_z_1;
   Float_t         mt_1;
   Float_t         puppimt_1;
   Int_t 	  tau_decay_mode_1;
@@ -167,6 +170,8 @@ public :
   Float_t         idisoweight_antiiso_2;
   Float_t         trigweight_2;
   Float_t         trigweight_antiiso_2;
+  Float_t         tauvsjetweightMedium_2;
+
   /////////////////////////////////////////////////////////////// NEW NEW
   Float_t	 efficiency_byVVLooseIsolationMVArun2017v2DBoldDMwLT2017_1;
 //  Float_t	 efficiency_byLooseIsolationMVArun2017v2DBoldDMwLT2017_1;
@@ -360,6 +365,10 @@ public :
   Float_t RecoVertexY;
   Float_t RecoVertexZ;
 
+  Float_t PV_refitted_BS_x;
+  Float_t PV_refitted_BS_y;
+  Float_t PV_refitted_BS_z;
+
   Float_t GenVertexX;
   Float_t GenVertexY;
   Float_t GenVertexZ;
@@ -404,6 +413,9 @@ public :
   TBranch	 *b_dZ_1;
   TBranch	 *b_d0err_1;
   TBranch	 *b_dZerr_1;
+  TBranch	 *b_IP_helix_x_1;
+  TBranch	 *b_IP_helix_y_1;
+  TBranch	 *b_IP_helix_z_1;
   TBranch	 *b_mt_1;
   TBranch	 *b_puppimt_1;
   TBranch        *b_tau_decay_mode_1;
@@ -554,6 +566,7 @@ public :
   TBranch	 *b_idisoweight_antiiso_2;
   TBranch	 *b_trigweight_2;
   TBranch	 *b_trigweight_antiiso_2;
+  TBranch	 *b_tauvsjetweightMedium_2;
 
   //Trig and weights
   TBranch	 *b_weight;
@@ -717,6 +730,10 @@ public :
   TBranch        *b_RecoVertexX;
   TBranch        *b_RecoVertexY;
   TBranch        *b_RecoVertexZ;  
+
+  TBranch        *b_PV_refitted_BS_x;
+  TBranch        *b_PV_refitted_BS_y;
+  TBranch        *b_PV_refitted_BS_z;  
 
 //gen vertex info is practical to have
   TBranch        *b_GenVertexX;
