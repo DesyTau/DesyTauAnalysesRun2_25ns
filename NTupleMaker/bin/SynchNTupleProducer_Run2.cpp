@@ -889,9 +889,13 @@ int main(int argc, char * argv[]){
       }
     
       if (!isData && ApplyLepSF) {
-	  eff_data_trig_lt_tau = tauTriggerSF->getTriggerEfficiencyData(analysisTree.tau_pt[tauIndex], analysisTree.tau_eta[tauIndex], analysisTree.tau_phi[tauIndex],analysisTree.tau_decayMode[tauIndex]);
-	  eff_mc_trig_lt_tau = tauTriggerSF->getTriggerEfficiencyMC(analysisTree.tau_pt[tauIndex], analysisTree.tau_eta[tauIndex], analysisTree.tau_phi[tauIndex],analysisTree.tau_decayMode[tauIndex]);
-    
+ 	  if(analysisTree.tau_decayMode[tauIndex]==2||analysisTree.tau_decayMode[tauIndex]==11){
+	      eff_data_trig_lt_tau = 1;
+	      eff_mc_trig_lt_tau = 1;
+	  }else{
+	      eff_data_trig_lt_tau = tauTriggerSF->getTriggerEfficiencyData(analysisTree.tau_pt[tauIndex], analysisTree.tau_eta[tauIndex], analysisTree.tau_phi[tauIndex],analysisTree.tau_decayMode[tauIndex]);
+	      eff_mc_trig_lt_tau = tauTriggerSF->getTriggerEfficiencyMC(analysisTree.tau_pt[tauIndex], analysisTree.tau_eta[tauIndex], analysisTree.tau_phi[tauIndex],analysisTree.tau_decayMode[tauIndex]);
+	  }
     	  eff_data_trig_lt_l = SF_XTriggerLepLeg->get_EfficiencyData(leptonLV.Pt(), leptonLV.Eta());
     	  eff_mc_trig_lt_l = SF_XTriggerLepLeg->get_EfficiencyMC(leptonLV.Pt(), leptonLV.Eta());
     	  eff_data_trig_L = SF_SingleLepTrigger->get_EfficiencyData(leptonLV.Pt(), leptonLV.Eta());
