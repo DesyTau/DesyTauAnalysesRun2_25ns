@@ -31,6 +31,10 @@ public :
   Int_t           npv;
   Float_t         npu;
   Float_t         rho;
+  
+  // MET filters
+  Bool_t          passedAllMetFilters;
+  
   //Leptons
   Float_t         pt_1;
   Float_t         phi_1;
@@ -70,6 +74,9 @@ public :
   Float_t         dZ_2;
   Float_t         d0err_2;
   Float_t         dZerr_2;
+  Float_t         IP_helix_x_2;
+  Float_t         IP_helix_y_2;
+  Float_t         IP_helix_z_2;
   Float_t         mt_2;
   Float_t         puppimt_2;
   Int_t 	  tau_decay_mode_2;
@@ -368,7 +375,8 @@ public :
   Float_t PV_refitted_BS_x;
   Float_t PV_refitted_BS_y;
   Float_t PV_refitted_BS_z;
-
+  Bool_t  is_refitted_PV_with_BS;
+  
   Float_t GenVertexX;
   Float_t GenVertexY;
   Float_t GenVertexZ;
@@ -396,6 +404,10 @@ public :
   TBranch	 *b_npv;
   TBranch	 *b_npu;
   TBranch	 *b_rho;
+  
+  // MET filters
+  TBranch	 *b_passedAllMetFilters;
+  
   //Leptons
   TBranch	 *b_pt_1;
   TBranch	 *b_phi_1;
@@ -435,6 +447,9 @@ public :
   TBranch	 *b_dZ_2;
   TBranch	 *b_d0err_2;
   TBranch	 *b_dZerr_2;
+  TBranch	 *b_IP_helix_x_2;
+  TBranch	 *b_IP_helix_y_2;
+  TBranch	 *b_IP_helix_z_2;
   TBranch	 *b_mt_2;
   TBranch	 *b_puppimt_2;
   TBranch        *b_tau_decay_mode_2;
@@ -734,6 +749,7 @@ public :
   TBranch        *b_PV_refitted_BS_x;
   TBranch        *b_PV_refitted_BS_y;
   TBranch        *b_PV_refitted_BS_z;  
+  TBranch        *b_is_refitted_PV_with_BS;  
 
 //gen vertex info is practical to have
   TBranch        *b_GenVertexX;

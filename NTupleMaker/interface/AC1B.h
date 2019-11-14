@@ -352,6 +352,10 @@ public :
    Float_t         tau_constituents_vy[100][50];   //[tau_count]
    Float_t         tau_constituents_vz[100][50];   //[tau_count]
    Int_t           tau_constituents_pdgId[100][50];   //[tau_count]
+   Float_t         tau_helixparameters[100][5];
+   Float_t         tau_helixparameters_covar[100][5][5];
+   Float_t         tau_referencePoint[100][3];
+   Float_t         tau_Bfield[100];
    UInt_t          track_count;
    Float_t         track_px[1000];   //[track_count]
    Float_t         track_py[1000];   //[track_count]
@@ -1136,6 +1140,10 @@ public :
    TBranch        *b_tau_constituents_vy;   //!
    TBranch        *b_tau_constituents_vz;   //!
    TBranch        *b_tau_constituents_pdgId;   //!
+   TBranch        *b_tau_helixparameters;
+   TBranch        *b_tau_helixparameters_covar;
+   TBranch        *b_tau_referencePoint;
+   TBranch        *b_tau_Bfield;
    TBranch        *b_track_count;   //!
    TBranch        *b_track_px;   //!
    TBranch        *b_track_py;   //!
@@ -2011,6 +2019,10 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("tau_constituents_vy", tau_constituents_vy, &b_tau_constituents_vy);
    fChain->SetBranchAddress("tau_constituents_vz", tau_constituents_vz, &b_tau_constituents_vz);
    fChain->SetBranchAddress("tau_constituents_pdgId", tau_constituents_pdgId, &b_tau_constituents_pdgId);
+   fChain->SetBranchAddress("tau_helixparameters", tau_helixparameters, &b_tau_helixparameters);
+   fChain->SetBranchAddress("tau_helixparameters_covar", tau_helixparameters_covar, &b_tau_helixparameters_covar);
+   fChain->SetBranchAddress("tau_referencePoint", tau_referencePoint, &b_tau_referencePoint);
+   fChain->SetBranchAddress("tau_Bfield", tau_Bfield, &b_tau_Bfield);
    fChain->SetBranchAddress("track_count", &track_count, &b_track_count);
    fChain->SetBranchAddress("track_px", track_px, &b_track_px);
    fChain->SetBranchAddress("track_py", track_py, &b_track_py);
