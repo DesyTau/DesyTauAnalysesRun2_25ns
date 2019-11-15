@@ -791,10 +791,10 @@ int main(int argc, char * argv[]){
       otree->trg_singlemuon = false;
       otree->trg_singleelectron = false;
       otree->singleLepTrigger = false;
-      otree->ditauTrigger = false;
-      otree->xTrigger = false;
-      otree->xTriggerLep = false;
-      otree->xTriggerTau = false;
+      otree->trg_doubletau = false;
+      otree->trg_mutaucross = false;
+      otree->trg_mutaucross_mu = false;
+      otree->trg_mutaucross_tau = false;
     
       // setting weights to 1
       otree->trkeffweight = 1;
@@ -836,15 +836,15 @@ int main(int argc, char * argv[]){
         isXTrigLep = isXTrigLep && isXTrigLepLeg.at(i_trig);
       isXTrig = isXTrigTau && isXTrigLep;
     
+      otree->singleLepTrigger = isSingleLepTrig;
       if (ch == "mt")
        otree->trg_singlemuon = isSingleLepTrig;
       if (ch == "et")
        otree->trg_singleelectron = isSingleLepTrig;
     
-      otree->singleLepTrigger = isSingleLepTrig;
-      otree->xTriggerLep = isXTrigLep;
-      otree->xTriggerTau = isXTrigTau;
-      otree->xTrigger = isXTrig;
+      otree->trg_mutaucross_mu = isXTrigLep;
+      otree->trg_mutaucross_tau = isXTrigTau;
+      otree->trg_mutaucross = isXTrig;
     
     
       //filling variables
@@ -1293,9 +1293,9 @@ void FillVertices(const AC1B *analysisTree, Synch17Tree *otree, const bool isDat
   
   bool is_refitted_PV_with_BS = true;
   TVector3 vertex_refitted_BS = get_refitted_PV_with_BS(analysisTree, leptonIndex, tauIndex, is_refitted_PV_with_BS);
-  otree->PV_refitted_BS_x = vertex_refitted_BS.X();
-  otree->PV_refitted_BS_y = vertex_refitted_BS.Y();
-  otree->PV_refitted_BS_z = vertex_refitted_BS.Z();
+  otree->pvx = vertex_refitted_BS.X();
+  otree->pvy = vertex_refitted_BS.Y();
+  otree->pvz = vertex_refitted_BS.Z();
   otree->is_refitted_PV_with_BS = is_refitted_PV_with_BS;
 
   if(!isData){
@@ -1529,23 +1529,45 @@ void FillMuTau(const AC1B *analysisTree, Synch17Tree *otree, int leptonIndex, in
   otree->d0_1 = analysisTree->muon_dxy[leptonIndex];
   otree->dZ_1 = analysisTree->muon_dz[leptonIndex];
   otree->tau_decay_mode_1 = -9999; 
+  otree->dm_1 = 16;
+  otree->dmMVA_1 = 16;
+
+  TLorentzVector muon_P4;
+  muon_P4.SetXYZM(analysisTree->muon_px[leptonIndex], analysisTree->muon_py[leptonIndex], analysisTree->muon_pz[leptonIndex], muonMass);
+  otree->chpt_1 = muon_P4.Pt();
+  otree->cheta_1 = muon_P4.Eta();
+  otree->chphi_1 = muon_P4.Phi();
+  otree->chm_1 = muon_P4.M();
+  
+  otree->npt_1 = (muon_P4 - muon_P4).Pt();
+  otree->neta_1 = (muon_P4 - muon_P4).Eta();
+  otree->nphi_1 = (muon_P4 - muon_P4).Phi();
+  otree->nm_1 = (muon_P4 - muon_P4).M();
   
   // muon helical IP for refitted vertex with BS constraint
   bool is_refitted_PV_with_BS = true;
   TVector3 vertex_coord = get_refitted_PV_with_BS(analysisTree, leptonIndex, tauIndex, is_refitted_PV_with_BS);
   TVector3 IP_helix_1 = calculate_IP_helix_mu(analysisTree, leptonIndex, vertex_coord);
-  otree->IP_helix_x_1 = IP_helix_1.X();
-  otree->IP_helix_y_1 = IP_helix_1.Y();
-  otree->IP_helix_z_1 = IP_helix_1.Z();
+  otree->ipx_1 = IP_helix_1.X();
+  otree->ipy_1 = IP_helix_1.Y();
+  otree->ipz_1 = IP_helix_1.Z();
   
   otree->byCombinedIsolationDeltaBetaCorrRaw3Hits_1 = -9999;
   otree->byLooseCombinedIsolationDeltaBetaCorr3Hits_1 = -9999;
   otree->byMediumCombinedIsolationDeltaBetaCorr3Hits_1 = -9999;
   otree->byTightCombinedIsolationDeltaBetaCorr3Hits_1 = -9999;
+  
+  otree->deepTauVsEleRaw_1  = -9999;
+  otree->deepTauVsJetRaw_1  = -9999;
+  otree->deepTauVsMuRaw_1  = -9999;
+  
   otree->againstMuonLoose3_1 = -9999;
   otree->againstMuonTight3_1 = -9999;
-  otree->againstElectronVLooseMVA6_1 = -9999;
+  otree->againstElectronLooseMVA6_1 = -9999;
+  otree->againstElectronMediumMVA6_1 = -9999;
   otree->againstElectronTightMVA6_1 = -9999;
+  otree->againstElectronVLooseMVA6_1 = -9999;
+  otree->againstElectronVTightMVA6_1 = -9999;
 
   otree->byVLooseIsolationMVArun2017v2DBoldDMwLT2017_1 = -9999;
   otree->byLooseIsolationMVArun2017v2DBoldDMwLT2017_1 = -9999;
@@ -1553,7 +1575,8 @@ void FillMuTau(const AC1B *analysisTree, Synch17Tree *otree, int leptonIndex, in
   otree->byTightIsolationMVArun2017v2DBoldDMwLT2017_1 = -9999;
   otree->byVTightIsolationMVArun2017v2DBoldDMwLT2017_1 = -9999;
   otree->byVVTightIsolationMVArun2017v2DBoldDMwLT2017_1 = -9999;
-  otree-> byIsolationMVArun2017v2DBoldDMwLTraw2017_1 = -9999;
+  otree->byIsolationMVArun2017v2DBoldDMwLTraw2017_1 = -9999;
+  otree->byIsolationMVA3oldDMwLTraw_1 = -9999;
   otree->chargedIsoPtSum_1 = -9999;
   otree->neutralIsoPtSum_1 = -9999;
   otree->puCorrPtSum_1 = -9999;
@@ -1600,7 +1623,6 @@ void FillETau(const AC1B *analysisTree, Synch17Tree *otree, int leptonIndex, flo
   otree->neutralIsoPtSum_1 = -9999;
   otree->puCorrPtSum_1 = -9999;
   
-
 }
 
 //fill the otree with the tau variables 
@@ -1617,7 +1639,25 @@ void FillTau(const AC1B *analysisTree, Synch17Tree *otree, int leptonIndex, int 
   otree->iso_2 = analysisTree->tau_byCombinedIsolationDeltaBetaCorrRaw3Hits[tauIndex];
   otree->m_2 = analysisTree->tau_mass[tauIndex];
   otree->tau_decay_mode_2 = analysisTree->tau_decayMode[tauIndex];
+  otree->dm_2 = analysisTree->tau_decayMode[tauIndex];
+  otree->dmMVA_2 = analysisTree->tau_MVADM2017v1[tauIndex];
 
+  TLorentzVector constituents_P4 = charged_constituents_P4(analysisTree, tauIndex);
+  TLorentzVector tau_P4;
+  tau_P4.SetXYZM(analysisTree->tau_px[tauIndex],
+                 analysisTree->tau_py[tauIndex],
+                 analysisTree->tau_pz[tauIndex],
+                 analysisTree->tau_mass[tauIndex]);
+  otree->chpt_2 = constituents_P4.Pt();
+  otree->cheta_2 = constituents_P4.Eta();
+  otree->chphi_2 = constituents_P4.Phi();
+  otree->chm_2 = constituents_P4.M();
+  
+  otree->npt_2 = (tau_P4 - constituents_P4).Pt();
+  otree->neta_2 = (tau_P4 - constituents_P4).Eta();
+  otree->nphi_2 = (tau_P4 - constituents_P4).Phi();
+  otree->nm_2 = (tau_P4 - constituents_P4).M();
+  
   otree->tau_pca2D_x_2 = analysisTree->tau_pca2D_x[tauIndex];
   otree->tau_pca2D_y_2 = analysisTree->tau_pca2D_y[tauIndex];
   otree->tau_pca2D_z_2 = analysisTree->tau_pca2D_z[tauIndex];
@@ -1638,13 +1678,13 @@ void FillTau(const AC1B *analysisTree, Synch17Tree *otree, int leptonIndex, int 
   bool is_refitted_PV_with_BS = true;
   TVector3 vertex_coord = get_refitted_PV_with_BS(analysisTree, leptonIndex, tauIndex, is_refitted_PV_with_BS);
   TVector3 IP_helix_2 = calculate_IP_helix_tauh(analysisTree, tauIndex, vertex_coord);
-  otree->IP_helix_x_2 = IP_helix_2.X();
-  otree->IP_helix_y_2 = IP_helix_2.Y();
-  otree->IP_helix_z_2 = IP_helix_2.Z();
+  otree->ipx_2 = IP_helix_2.X();
+  otree->ipy_2 = IP_helix_2.Y();
+  otree->ipz_2 = IP_helix_2.Z();
 
-  otree->byDeepTau2017v2p1VSeraw_2        = analysisTree->tau_byDeepTau2017v2p1VSeraw[tauIndex];
-  otree->byDeepTau2017v2p1VSjetraw_2      = analysisTree->tau_byDeepTau2017v2p1VSjetraw[tauIndex];
-  otree->byDeepTau2017v2p1VSmuraw_2       = analysisTree->tau_byDeepTau2017v2p1VSmuraw[tauIndex];
+  otree->deepTauVsEleRaw_2                = analysisTree->tau_byDeepTau2017v2p1VSeraw[tauIndex];
+  otree->deepTauVsJetRaw_2                = analysisTree->tau_byDeepTau2017v2p1VSjetraw[tauIndex];
+  otree->deepTauVsMuRaw_2                 = analysisTree->tau_byDeepTau2017v2p1VSmuraw[tauIndex];
   otree->byLooseDeepTau2017v2p1VSe_2      = analysisTree->tau_byLooseDeepTau2017v2p1VSe[tauIndex];
   otree->byLooseDeepTau2017v2p1VSjet_2    = analysisTree->tau_byLooseDeepTau2017v2p1VSjet[tauIndex];
   otree->byLooseDeepTau2017v2p1VSmu_2     = analysisTree->tau_byLooseDeepTau2017v2p1VSmu[tauIndex];
@@ -1666,7 +1706,6 @@ void FillTau(const AC1B *analysisTree, Synch17Tree *otree, int leptonIndex, int 
   otree->byVVVLooseDeepTau2017v2p1VSe_2   = analysisTree->tau_byVVVLooseDeepTau2017v2p1VSe[tauIndex];
   otree->byVVVLooseDeepTau2017v2p1VSjet_2 = analysisTree->tau_byVVVLooseDeepTau2017v2p1VSjet[tauIndex];
 
-  otree->MVADM2017v1_2 = analysisTree->tau_MVADM2017v1[tauIndex];
   otree->MVADM2017v1DM0raw_2 = analysisTree->tau_MVADM2017v1DM0raw[tauIndex];
   otree->MVADM2017v1DM10raw_2 = analysisTree->tau_MVADM2017v1DM10raw[tauIndex];
   otree->MVADM2017v1DM11raw_2 = analysisTree->tau_MVADM2017v1DM11raw[tauIndex];
@@ -1680,8 +1719,11 @@ void FillTau(const AC1B *analysisTree, Synch17Tree *otree, int leptonIndex, int 
   otree->byTightCombinedIsolationDeltaBetaCorr3Hits_2 = analysisTree->tau_byTightCombinedIsolationDeltaBetaCorr3Hits[tauIndex];
   otree->againstMuonLoose3_2 = analysisTree->tau_againstMuonLoose3[tauIndex];
   otree->againstMuonTight3_2 = analysisTree->tau_againstMuonTight3[tauIndex];
-  otree->againstElectronVLooseMVA6_2 = analysisTree->tau_againstElectronVLooseMVA6[tauIndex];
+  otree->againstElectronLooseMVA6_2 = analysisTree->tau_againstElectronLooseMVA6[tauIndex];
+  otree->againstElectronMediumMVA6_2 = analysisTree->tau_againstElectronMediumMVA6[tauIndex];
   otree->againstElectronTightMVA6_2 = analysisTree->tau_againstElectronTightMVA6[tauIndex];
+  otree->againstElectronVLooseMVA6_2 = analysisTree->tau_againstElectronVLooseMVA6[tauIndex];
+  otree->againstElectronVTightMVA6_2 = analysisTree->tau_againstElectronVTightMVA6[tauIndex];
 
   otree->byVLooseIsolationMVArun2017v2DBoldDMwLT2017_2 = analysisTree->tau_byVLooseIsolationMVArun2017v2DBoldDMwLT2017[tauIndex];
   otree->byLooseIsolationMVArun2017v2DBoldDMwLT2017_2 = analysisTree->tau_byLooseIsolationMVArun2017v2DBoldDMwLT2017[tauIndex];
@@ -1689,7 +1731,8 @@ void FillTau(const AC1B *analysisTree, Synch17Tree *otree, int leptonIndex, int 
   otree->byTightIsolationMVArun2017v2DBoldDMwLT2017_2 = analysisTree->tau_byTightIsolationMVArun2017v2DBoldDMwLT2017[tauIndex];
   otree->byVTightIsolationMVArun2017v2DBoldDMwLT2017_2 = analysisTree->tau_byVTightIsolationMVArun2017v2DBoldDMwLT2017[tauIndex];
   otree->byVVTightIsolationMVArun2017v2DBoldDMwLT2017_2 = analysisTree->tau_byVVTightIsolationMVArun2017v2DBoldDMwLT2017[tauIndex];
-  otree-> byIsolationMVArun2017v2DBoldDMwLTraw2017_2 = analysisTree->tau_byIsolationMVArun2017v2DBoldDMwLTraw2017[tauIndex];
+  otree->byIsolationMVArun2017v2DBoldDMwLTraw2017_2 = analysisTree->tau_byIsolationMVArun2017v2DBoldDMwLTraw2017[tauIndex];
+  otree->byIsolationMVA3oldDMwLTraw_2 = analysisTree->tau_byIsolationMVArun2017v2DBoldDMwLTraw2017[tauIndex];
   otree->chargedIsoPtSum_2 = analysisTree->tau_chargedIsoPtSum[tauIndex];
   otree->neutralIsoPtSum_2 = analysisTree->tau_neutralIsoPtSum[tauIndex];
   otree->puCorrPtSum_2 = analysisTree->tau_puCorrPtSum[tauIndex];

@@ -26,6 +26,7 @@ void acott(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, int tau
 void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, int tauIndex2,TString ch);
 TLorentzVector chargedPivec(const AC1B * analysisTree, int tauIndex);
 TLorentzVector neutralPivec(const AC1B * analysisTree, int tauIndex);
+TLorentzVector charged_constituents_P4(const AC1B * analysisTree, int tauIndex);
 //TLorentzVector ipVec(const AC1B * analysisTree, int tauIndex, Synch17Tree *otree);
 TLorentzVector ipVec(const AC1B * analysisTree, int tauIndex); //merijn 2019 4 2: the otree argument is superfluous after all..
 int chargedPiIndex(const AC1B * analysisTree, int tauIndex);
@@ -1276,4 +1277,21 @@ TVector3 get_refitted_PV_with_BS(const AC1B * analysisTree, int leptonIndex, int
 	}
 	TVector3 vertex_coord(vtx_x, vtx_y, vtx_z);
 	return vertex_coord;
+}
+
+TLorentzVector charged_constituents_P4(const AC1B * analysisTree, int tauIndex){
+	int ncomponents = analysisTree->tau_constituents_count[tauIndex];
+	TLorentzVector sum_charged_P4; sum_charged_P4.SetXYZT(0.,0.,0.,0.);
+	TLorentzVector constituent_P4;   
+	
+	for(int i = 0; i < ncomponents; i++){
+		if(analysisTree->tau_constituents_charge[tauIndex][i] != 0 && analysisTree->tau_constituents_pdgId[tauIndex][i] > 0){
+			constituent_P4.SetPxPyPzE(analysisTree->tau_constituents_px[tauIndex][i],
+																analysisTree->tau_constituents_py[tauIndex][i],
+																analysisTree->tau_constituents_pz[tauIndex][i],
+																analysisTree->tau_constituents_e[tauIndex][i]);
+			sum_charged_P4 += constituent_P4;
+			}
+	}
+	return sum_charged_P4;
 }
