@@ -13,8 +13,8 @@
 #include <TFile.h>
 
 // Header file for the classes stored in the TTree if any.
+//We´ll store for now 5 CP mixing scenarios: "sm_htt125", "ps_htt125", "mm_htt125" "minusmm_htt125", "mix0p375_htt125". Names chose to stay somewhat consistent with choices IC in the CH branch
 
-//#define NrAnglestoStore   5  //Needed for the CP measurement. We´ll store for now 5 CP mixing scenarios: TauSpinnerWeightsEven, TauSpinnerWeightsOdd, TauSpinnerWeightsMaxMix, TauSpinnerWeightsMinusMaxMix, TauSpinnerWeightsMix0p375; If more needed update this number!
 #include <vector>
 #include <string>
 

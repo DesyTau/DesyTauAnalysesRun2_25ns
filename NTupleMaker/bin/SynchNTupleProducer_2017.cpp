@@ -1,4 +1,3 @@
-//Merijn
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -411,11 +410,11 @@ int main(int argc, char * argv[]){
 
   TString rootFileName(sample);
   std::string ntupleName("makeroottree/AC1B");
-  std::string ntupleNameinitroottree("initroottree/AC1B"); //for normalisation
+  std::string ntupleNameinitroottree("initroottree/AC1B"); //Since update of big tupler, need to fetch all genweights from here normalisation
 
-  //Merijn add names for spinner trees
+  //Fix the name for the tauspinner tree
   std::string TauSpinnerWeightTreeName("icTauSpinnerProducer/TauSpinnerWeightTree");
-  std::string TauSpinnerAngleTreeName("icTauSpinnerProducer/TauSpinnerAngleTree");
+//  std::string TauSpinnerAngleTreeNameTauSpinnerAngleTreeName("icTauSpinnerProducer/TauSpinnerAngleTree"); optional if like to read out the angle values, currently not used..
 
   // PU reweighting - initialization
   PileUp * PUofficial = new PileUp();
@@ -682,10 +681,6 @@ for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) {
 	if(applyTauSpinnerWeights){
         _treeTauSpinnerWeights->GetEntry(iEntry);
 
-/*
-	for(int tsitindex=0;tsitindex<5;tsitindex++){
-		cout<<"TSweight[tsitindex] "<<TSweight[tsitindex] <<endl;
-	}*/
 
 	otree->TauSpinnerWeightsEven=TSweight[0];
 	gentree->TauSpinnerWeightsEven=TSweight[0];

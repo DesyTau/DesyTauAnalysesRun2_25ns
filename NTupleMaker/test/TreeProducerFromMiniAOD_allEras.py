@@ -8,6 +8,7 @@ isRun2018D = False # needed for the correct Global Tag
 isHiggsSignal = False # Set to true if you run over higgs signal samples -> needed for STXS1p1 flags
 year = 2017
 period = '2017'
+RunTauSpinnerProducer=True #only do this if you want to calculate tauspinner weights for a sample with two taus and flat tau polarisation
 # ============================================================================================
 if isEmbedded : isData = True
 # ============================================================================================
@@ -70,7 +71,16 @@ process.source = cms.Source("PoolSource",
 #	"root://cms-xrd-global.cern.ch///store/user/sbrommer/gc_storage/embedding_16_legacy_miniaod/ElMu_data_legacy_2016_CMSSW9414/TauEmbedding_ElMu_data_legacy_2016_CMSSW9414_Run2016B-v2/99/merged_miniaod_998.root" #emu embedded 16 test sample
 #	"root://cms-xrd-global.cern.ch///store/user/jbechtel/gc_storage/embedding_16_legacy_miniaod/MuTau_data_legacy_2016_CMSSW9414/TauEmbedding_MuTau_data_legacy_2016_CMSSW9414_Run2016B-v4/99/merged_miniaod_998.root" #mt embedded 16 test sample
 #	"root://cms-xrd-global.cern.ch///store/user/aakhmets/gc_storage/MuTau_data_2017_CMSSW944_gridka/TauEmbedding_MuTau_data_2017_CMSSW944_Run2017F/99/merged_9998.root"
-        "root://xrootd-cms.infn.it//store/results/hightt/adow/GluGluHToPseudoscalarTauTau_M125_13TeV_powheg_pythia8_2017-GEN_TEST07Jan19/USER/StoreResults_GluGluToHToTauTauNoSpin_M125_13TeV_pythia8_2017_MINIAOD-v1/50000/BA185D90-1ABC-E911-BF72-842B2B7680D5.root"
+#testsample with flat tau polarisation
+#        "root://xrootd-cms.infn.it//store/results/hightt/adow/GluGluHToPseudoscalarTauTau_M125_13TeV_powheg_pythia8_2017-GEN_TEST07Jan19/USER/StoreResults_GluGluToHToTauTauNoSpin_M125_13TeV_pythia8_2017_MINIAOD-v1/50000/BA185D90-1ABC-E911-BF72-842B2B7680D5.root"
+#        "root://xrootd-cms.infn.it//store/results/hightt/adow/GluGluHToPseudoscalarTauTau_M125_13TeV_powheg_pythia8_2017-GEN_TEST07Jan19/USER/StoreResults_GluGluToHToTauTauNoSpin_M125_13TeV_pythia8_2017_MINIAOD-v1/50000/FC662831-23BC-E911-8C30-D4AE526A0B29.root"
+
+#        "root://cms-xrd-global.cern.ch//store/results/hightt/adow/GluGluHToPseudoscalarTauTau_M125_13TeV_powheg_pythia8_2017-GEN_TEST07Jan19/USER/StoreResults_GluGluToHToTauTauNoSpin_M125_13TeV_pythia8_2017_MINIAOD-v1/260000/F8664479-B5BA-E911-AFB8-1866DA87F44A.root"
+#	"root://cms-xrd-global.cern.ch//store/results/hightt/dwinterb/GluGluHToTauTau_M125_13TeV_powheg_pythia8_nospinner-filter-v2/USER/StoreResults_GluGluHToTauTau_M125_13TeV_powheg_pythia8_nospinner_filter_v2_miniA-v1/50000/FC974B86-CFBB-E911-A992-1866DA879ED8.root"
+	"root://cms-xrd-global.cern.ch//store/results/hightt/adow/VBFHToMaxmixTauTau_M125_13TeV_powheg_pythia8_2017-GEN_TEST07Jan19/USER/StoreResults_VBFHToTauTauNoSpin_M125_13TeV_pythia8_2017_MINIAOD-v1/270000/FA9EFA94-3ABB-E911-A5AF-0CC47A7EEE0E.root"
+
+	"root://cms-xrd-global.cern.ch//store/results/hightt/dwinterb/VBFHToTauTau_M125_13TeV_powheg_pythia8_nospinner-filter-v2/USER/StoreResults_VBFHToTauTau_M125_13TeV_powheg_pythia8_nospinner_filter_v2_miniAOD-v1/50000/FE9321BB-F9BA-E911-AD51-D4AE526A05F2.root"
+
 	),
   skipEvents = cms.untracked.uint32(0),
   #lumisToProcess = LumiList.LumiList(filename = 'json/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt').getVLuminosityBlockRange()
@@ -647,14 +657,12 @@ process.triggerSelection = cms.EDFilter("HLTHighLevel",
                                         )
 # END Trigger filtering =================================================================================
 
-#try add tauspinner:
+#define tauspinner producer. Here we define the mixing angles
 process.icTauSpinnerProducer = cms.EDProducer("ICTauSpinnerProducer",
   branch                  = cms.string("tauspinner"),
   input                   = cms.InputTag("prunedGenParticles"),
-  theta                   = cms.string("0,0.25,0.5,-0.25,0.375")#Comment: if specify more angles, FIRST addapt NrAnglestoStore in ICTauSpinnerProducer and recompile, currently the branch expects max 5 weights!
+  theta                   = cms.string("0,0.25,0.5,-0.25,0.375")#if specify more than 5 angles, FIRST addapt NrAnglestoStore in ICTauSpinnerProducer and recompile!
 )
-
-#process.icTauSpinnerSequence = cms.Sequence()
 process.icTauSpinnerSequence = cms.Sequence(process.icTauSpinnerProducer)
 
 process.p = cms.Path(
@@ -675,9 +683,12 @@ process.p = cms.Path(
   process.MiniAODRefitVertexBS * # PV with BS constraint
   process.htxsSequence * # HTXS
   process.prefiringweight * # prefiring-weights for 2016/2017
-  process.makeroottree *
-  process.icTauSpinnerSequence
+  process.makeroottree
 )
+
+if RunTauSpinnerProducer: process.p *=process.icTauSpinnerSequence
+
+#if RunTauSpinnerProducer: process.p=cms.Path(process.p*process.icTauSpinnerSequence)
 
 if isData: filename_suffix = "DATA"
 else:      filename_suffix = "MC"

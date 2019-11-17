@@ -1,5 +1,9 @@
-//#include "UserCode/ICHiggsTauTau/plugins/ICTauSpinnerProducer.hh"
-#include "DesyTauAnalyses/NTupleMaker/plugins/ICTauSpinnerProducer.hh" //Merijn: without path it also works.. check cmssw build perhaps once..
+
+/*Producer for tauspinner weights. Written by Merijn van de Klundert, based on original code from IC
+mvandekl@cern.ch
+*/
+
+#include "ICTauSpinnerProducer.hh"
 #include <memory>
 #include <string>
 #include <vector>
@@ -11,22 +15,12 @@
 #include "DataFormats/Common/interface/Handle.h"
 #include "DataFormats/Common/interface/View.h"
 
-/*
-#include "UserCode/ICHiggsTauTau/interface/StaticTree.hh"
-#include "UserCode/ICHiggsTauTau/interface/city.h"
-#include "UserCode/ICHiggsTauTau/plugins/Consumes.h"
-#include "UserCode/ICHiggsTauTau/plugins/PrintConfigTools.h"
-*/
-
-//#include "DesyTauAnalyses/NTupleMaker/plugins/NTupleMaker.h"
-
 ICTauSpinnerProducer::ICTauSpinnerProducer(const edm::ParameterSet& config)
     : input_(config.getParameter<edm::InputTag>("input")),
       branch_(config.getParameter<std::string>("branch")),
       theta_(config.getParameter<std::string>("theta")){
   consumes<edm::View<reco::GenParticle>>(input_);
 
-//  PrintHeaderWithProduces(config, input_, branch_);
   TauSpinnerSettingsPDF="NNPDF30_nlo_as_0118";
   Ipp=true;
   Ipol=0;
@@ -34,7 +28,6 @@ ICTauSpinnerProducer::ICTauSpinnerProducer(const edm::ParameterSet& config)
   nonSMN=0;
   CMSENE=13000.0;
   bosonPdgId_=25;
-//  info_ = new ic::EventInfo();
 }
 
 ICTauSpinnerProducer::~ICTauSpinnerProducer() {}
@@ -182,8 +175,6 @@ void ICTauSpinnerProducer::initialize(){
 
 void ICTauSpinnerProducer::produce(edm::Event& event,
                                   const edm::EventSetup& setup) {
-//cout<<"running ICTauSpinnerProducer"<<endl;
-
   edm::Handle<edm::View<reco::GenParticle> > parts_handle;
   event.getByLabel(input_, parts_handle);
   
@@ -206,19 +197,15 @@ void ICTauSpinnerProducer::produce(edm::Event& event,
   for(unsigned i=0; i<tau1_daughters.size(); ++i) simple_tau1_daughters.push_back(ConvertToSimplePart(tau1_daughters[i]));
   for(unsigned i=0; i<tau2_daughters.size(); ++i) simple_tau2_daughters.push_back(ConvertToSimplePart(tau2_daughters[i]));
  
- // WeightsPtr=new double[theta_vec_.size()];
-
   for(unsigned i=0; i<theta_vec_.size(); ++i){
     double theta_val_ = theta_vec_[i].second;
     std::string weight_name_ = theta_vec_[i].first;
     // Can make this more general by having boson pdgid as input or have option for set boson type
     TauSpinner::setHiggsParametersTR(-cos(2*M_PI*theta_val_),cos(2*M_PI*theta_val_),-sin(2*M_PI*theta_val_),-sin(2*M_PI*theta_val_));
     double weight_ = TauSpinner::calculateWeightFromParticlesH(simple_boson,simple_tau1,simple_tau2,simple_tau1_daughters,simple_tau2_daughters); 
-  //  info_->set_weight(weight_name_,weight_,false);
    
-// cout<<"weight_name "<<weight_name_ <<" weight "<<weight_ <<endl;
     WeightsPtr[i]=weight_;	
-  //  cout<<"WeightsPtr[i] "<<WeightsPtr[i]<<endl;
+
   }
 
 
@@ -226,20 +213,12 @@ void ICTauSpinnerProducer::produce(edm::Event& event,
 }
 
 void ICTauSpinnerProducer::beginJob() {
-//  ic::StaticTree::tree_->Branch(branch_.c_str(), &info_);
   theta_vec_ = SplitString(theta_);  
   initialize();
 
-//Merijn: try to connect to our output file
   edm::Service<TFileService> FS;
-  tree = FS->make<TTree>("TauSpinnerWeightTree","TauSpinnerWeightTree", 1); //works, but goes in icTauSpinner directory..
+  tree = FS->make<TTree>("TauSpinnerWeightTree","TauSpinnerWeightTree", 1);
   tree->SetMaxVirtualSize(300000000);
-
-//playground Merijn
-//  std::string ntupleName("makeroottree/AC1B"); this doesn work..
-//  tree = (TTree*)FS->Get(TString(ntupleName));
-//  NTupleMaker::treeKlundert->Branch("bosonPdgIdTauSpinner_", &bosonPdgId_, "bosonPdgId_/I"); could be way more elegant..
-//  nEvents = FS->make<TH1D>("nEvents", "nEvents", 2, -0.5, +1.5);
 
   NThetaAngles=theta_vec_.size();
   tree->Branch("NThetaAngles", &NThetaAngles, "NThetaAngles/i");
@@ -249,9 +228,8 @@ void ICTauSpinnerProducer::beginJob() {
 }
 
 void ICTauSpinnerProducer::endJob(){
-cout<<"start ICTauSpinnerProducer::endJob "<<endl;
   edm::Service<TFileService> FS;
-  //Merijn: use this function to ONCE store the angle names and values
+  //call this function only to ONCE store the angle names and values
   treeAngles=FS->make<TTree>("TauSpinnerAngleTree", "TauSpinnerAngleTree", 1);
   
   double * AnglePtr =new double[NThetaAngles];	
@@ -262,11 +240,10 @@ cout<<"start ICTauSpinnerProducer::endJob "<<endl;
     mystringso.push_back(theta_vec_[i].first);    
   }
 		
-  treeAngles->Branch("NThetaAngles", &NThetaAngles, "NThetaAngles/i"); //needed to set properly
+  treeAngles->Branch("NThetaAngles", &NThetaAngles, "NThetaAngles/i");
   treeAngles->Branch("TauSpinnerMixingAngles", AnglePtr, "AnglePtr[NThetaAngles]/D");	
   treeAngles->Branch("TauSpinnerMixingAnglesString",&mystringso);
-  treeAngles->Fill();  	
-  cout<<"end ICTauSpinnerProducer::endJob "<<endl;
+  treeAngles->Fill();
 }
 
 DEFINE_FWK_MODULE(ICTauSpinnerProducer);

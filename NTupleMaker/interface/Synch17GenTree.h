@@ -4,7 +4,7 @@
 // 
 // Based on Spring15Tree by Francesco Costanza
 
-//Merijn added some changes <merijn.van.de.klundert@desy.de>
+//Merijn added changes and tauspinner weights.. <merijn.van.de.klundert@desy.de>
 //////////////////////////////////////////////////////////
 
 #ifndef Synch17GenTree_h
@@ -14,12 +14,11 @@
 #include <TChain.h>
 #include <TFile.h>
 
-//#define NrAnglestoStore   5  //Needed for the CP measurement. We´ll store for now 5 CP mixing scenarios: TauSpinnerWeightsEven, TauSpinnerWeightsOdd, TauSpinnerWeightsMaxMix, TauSpinnerWeightsMinusMaxMix, TauSpinnerWeightsMix0p375; If more needed update this number!
+//We´ll store for now 5 CP mixing scenarios: "sm_htt125", "ps_htt125", "mm_htt125" "minusmm_htt125", "mix0p375_htt125". Names chose to stay somewhat consistent with choices IC in the CH branch
 #include <vector>
 #include <string>
 
 // Header file for the classes stored in the TTree if any.
-
 // Fixed size dimensions of array or collections stored in the TTree if any.
 
 class Synch17GenTree {

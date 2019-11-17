@@ -1,6 +1,10 @@
-//Merijn: I think that this is the right way to do it, not sure..
+
+/*Producer for tauspinner weights. Written by Merijn van de Klundert, based on original code from IC
+mvandekl@cern.ch
+*/
+
 #ifndef DesyTauAnalyses_ICHiggsTauTau_ICTauSpinnerProducer_h
-#define DesyTauAnalyses_ICHiggsTauTau_ICTauSpinnerProducer_h  //DesyTauAnalyses/NTupleMaker/plugins
+#define DesyTauAnalyses_ICHiggsTauTau_ICTauSpinnerProducer_h
 #include <memory>
 #include <vector>
 #include <string>
@@ -11,17 +15,13 @@
 #include "FWCore/Framework/interface/EventSetup.h"
 #include "FWCore/Utilities/interface/InputTag.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
-//#include "UserCode/ICHiggsTauTau/interface/EventInfo.hh"
 #include "TauSpinner/SimpleParticle.h"
 #include "TauSpinner/tau_reweight_lib.h"
 #include "DataFormats/HepMCCandidate/interface/GenStatusFlags.h"
-
-//Merijn add:
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 #include "TTree.h"
-//#include "DesyTauAnalyses/NTupleMaker/plugins/NTupleMaker.h" currently will generate an issue with multiple definitions 
-#define NrAnglestoStore   5
+#define NrAnglestoStore   5 //defines the number of CP reweighing angles we would like to store..
 
 enum pdgId {
   Gamma = 22,
@@ -38,9 +38,6 @@ enum pdgId {
   NuTau = 16
 };
 
-/**
- * @brief See documentation [here](\ref objs-candidate)
- */
 class ICTauSpinnerProducer : public edm::EDProducer {
  public:
   explicit ICTauSpinnerProducer(const edm::ParameterSet &);
@@ -60,7 +57,6 @@ class ICTauSpinnerProducer : public edm::EDProducer {
   TauSpinner::SimpleParticle ConvertToSimplePart(reco::GenParticle input_part);
   bool channelMatch(std::vector<reco::GenParticle> parts, std::vector<int> matches, bool signed_);
   std::vector<std::pair<std::string,double>> SplitString(std::string instring);
- // ic::EventInfo *info_;
   std::vector<std::pair<std::string,double>> theta_vec_;
 
   edm::InputTag input_;
@@ -75,14 +71,10 @@ class ICTauSpinnerProducer : public edm::EDProducer {
   int nonSMN;
   double CMSENE;
 
-
-  //Merijn add:
   TTree* tree;
   TTree* treeAngles;//this we'll fill only once!
-  TH1D*  nEvents;//for test purpose..
   int NThetaAngles;
-  double WeightsPtr[NrAnglestoStore];//in case we like to store 10 angles
-
+  double WeightsPtr[NrAnglestoStore];
 
 };
 
