@@ -164,8 +164,8 @@ void counting_jets(const AC1B *analysisTree, Synch17Tree *otree, const Config *c
       if (is2016)
       	tagged = analysisTree->pfjet_btag[jet][nBTagDiscriminant1] > btagCut; 
       else
-      	// tagged = (analysisTree->pfjet_btag[jet][nBTagDiscriminant1] + analysisTree->pfjet_btag[jet][nBTagDiscriminant2]) > btagCut;
-      	tagged = (analysisTree->pfjet_btag[jet][nBTagDiscriminant1] + analysisTree->pfjet_btag[jet][nBTagDiscriminant2] + analysisTree->pfjet_btag[jet][nBTagDiscriminant3]) > btagCut;
+      	tagged = (analysisTree->pfjet_btag[jet][nBTagDiscriminant1] + analysisTree->pfjet_btag[jet][nBTagDiscriminant2]) > btagCut;
+      	// tagged = (analysisTree->pfjet_btag[jet][nBTagDiscriminant1] + analysisTree->pfjet_btag[jet][nBTagDiscriminant2] + analysisTree->pfjet_btag[jet][nBTagDiscriminant3]) > btagCut;
       bool taggedRaw = tagged;
       
       if(!isData && ApplyBTagScaling) {
