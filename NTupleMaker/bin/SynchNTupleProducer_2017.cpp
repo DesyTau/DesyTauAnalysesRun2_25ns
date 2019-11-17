@@ -411,6 +411,7 @@ int main(int argc, char * argv[]){
 
   TString rootFileName(sample);
   std::string ntupleName("makeroottree/AC1B");
+  std::string ntupleNameinitroottree("initroottree/AC1B"); //for normalisation
 
   //Merijn add names for spinner trees
   std::string TauSpinnerWeightTreeName("icTauSpinnerProducer/TauSpinnerWeightTree");
@@ -491,6 +492,7 @@ int main(int argc, char * argv[]){
 
   TH1D * inputEventsH = new TH1D("inputEventsH","",1,-0.5,0.5);
   TH1D * nWeightedEventsH = new TH1D("nWeightedEvents", "", 1, -0.5,0.5);
+  TH1D * nWeightedEventsHMiniAOD = new TH1D("nWeightedEventsHMiniAOD", "nWeightedEventsHMiniAOD", 1, -0.5,0.5);
   
   TTree * tree = new TTree("TauCheck","TauCheck");
   // TTree * testtree = new TTree("TauChecktest","TauChecktest");
@@ -620,12 +622,23 @@ int main(int argc, char * argv[]){
     TFile * file_ = TFile::Open(fileList[iF].data());
     
     TTree * _tree = NULL;
-    _tree = (TTree*)file_->Get(TString(ntupleName));
-        
+    _tree = (TTree*)file_->Get(TString(ntupleName));        
     if (_tree==NULL) continue;
-    
-    double * TSweight=new double[expectedtauspinnerweights];
 
+   TTree * _treenorm = NULL;
+    _treenorm = (TTree*)file_->Get(TString(ntupleNameinitroottree));        
+    if (_treenorm==NULL) continue;
+    AC1B analysisTreenorm(_treenorm, isData);
+
+    Long64_t numberOfEntriesNorm = analysisTreenorm.GetEntries();
+    for (Long64_t iEntry=0; iEntry<numberOfEntriesNorm; iEntry++) {
+      analysisTreenorm.GetEntry(iEntry);
+      	nWeightedEventsHMiniAOD->Fill(0., analysisTreenorm.genweight);
+	}
+
+    
+
+    double * TSweight=new double[expectedtauspinnerweights];
    TTree * _treeTauSpinnerWeights = NULL;
 
    if(applyTauSpinnerWeights){ 
@@ -1656,6 +1669,11 @@ ConstitsPDG->Write();
     delete lepTauFakeThreeProngScaleSys;
   }
 
+cout<<"nWeightedEventsHMiniAOD->GetEntries() "<<nWeightedEventsHMiniAOD->GetEntries() <<endl;
+cout<<"nWeightedEventsHMiniAOD->GetSumOfWeights() "<<nWeightedEventsHMiniAOD->GetSumOfWeights() <<endl;
+
+cout<<"nWeightedEventsH->GetEntries() "<<nWeightedEventsH->GetEntries() <<endl;
+cout<<"nWeightedEventsH->GetSumOfWeights() "<<nWeightedEventsH->GetSumOfWeights() <<endl;
 
   file->Close();
   delete file;
