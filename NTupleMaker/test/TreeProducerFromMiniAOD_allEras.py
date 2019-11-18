@@ -192,9 +192,9 @@ tauIdEmbedder.runTauID()
 # Vertex Refitting ===============================================================================================
 
 #load vertex refitting excluding tau tracks
-process.load('VertexRefit.TauRefit.AdvancedRefitVertexProducer_cfi')
-process.load('VertexRefit.TauRefit.LeptonPreSelections_cfi')
-process.load('VertexRefit.TauRefit.MiniAODRefitVertexProducer_cfi')
+process.load('HiggsCPinTauDecays.TauRefit.AdvancedRefitVertexProducer_cfi')
+process.load('HiggsCPinTauDecays.TauRefit.LeptonPreSelections_cfi')
+process.load('HiggsCPinTauDecays.TauRefit.MiniAODRefitVertexProducer_cfi')
 # END Vertex Refitting ===========================================================================================
 
 # HTXS ========================================================================================================

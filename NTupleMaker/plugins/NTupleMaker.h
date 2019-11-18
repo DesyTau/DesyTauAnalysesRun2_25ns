@@ -78,7 +78,7 @@
 #include "JetMETCorrections/Objects/interface/JetCorrector.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
-#include "VertexRefit/TauRefit/interface/RefitVertex.h"
+#include "HiggsCPinTauDecays/TauRefit/interface/RefitVertex.h"
 #include "DataFormats/Candidate/interface/VertexCompositeCandidate.h"
 #include "DataFormats/Candidate/interface/VertexCompositeCandidateFwd.h"
 #include "DataFormats/RecoCandidate/interface/RecoChargedCandidate.h"

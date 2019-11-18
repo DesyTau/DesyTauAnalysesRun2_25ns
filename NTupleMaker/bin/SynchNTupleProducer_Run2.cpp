@@ -364,6 +364,7 @@ int main(int argc, char * argv[]){
 
   TString rootFileName(sample);
   std::string ntupleName("makeroottree/AC1B");
+  std::string initNtupleName("initroottree/AC1B");
 
   // PU reweighting - initialization
   PileUp *PUofficial = new PileUp();
@@ -548,21 +549,33 @@ int main(int argc, char * argv[]){
       for (unsigned int i = 0; i < jetEnergyScaleSys.size(); i++)
       	(jetEnergyScaleSys.at(i))->SetAC1B(&analysisTree);
     }
-
-    Long64_t numberOfEntries = analysisTree.GetEntries();
-    std::cout << "      number of entries in Tree = " << numberOfEntries << std::endl;
     
+    TTree * _inittree = NULL;
+      _inittree = (TTree*)file_->Get(TString(initNtupleName));
+      if (_inittree!=NULL) {
+          Float_t genweight;
+          if (!isData)
+              _inittree->SetBranchAddress("genweight",&genweight);
+          Long64_t numberOfEntriesInitTree = _inittree->GetEntries();
+          std::cout << "      number of entries in Init Tree = " << numberOfEntriesInitTree << std::endl;
+          for (Long64_t iEntry=0; iEntry<numberOfEntriesInitTree; iEntry++) {
+              _inittree->GetEntry(iEntry);
+              if (isData)
+                  nWeightedEventsH->Fill(0.,1.);
+              else
+                  nWeightedEventsH->Fill(0.,genweight);
+          }
+      }
+      
     ///////////////EVENT LOOP///////////////
+    Long64_t numberOfEntries = analysisTree.GetEntries();
 
     for (Long64_t iEntry = 0; iEntry < numberOfEntries; iEntry++) {
       counter[0]++;
       analysisTree.GetEntry(iEntry);
       nEvents++;
     
-      if (isData)
-        nWeightedEventsH->Fill(0., 1.);
-      else {
-      	nWeightedEventsH->Fill(0., analysisTree.genweight);
+      if (!isData){
       	FillGenTree(&analysisTree,gentree);
       	gentree->Fill();
       }
