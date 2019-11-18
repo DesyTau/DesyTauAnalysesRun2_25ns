@@ -8,7 +8,8 @@ isRun2018D = False # needed for the correct Global Tag
 isHiggsSignal = False # Set to true if you run over higgs signal samples -> needed for STXS1p1 flags
 year = 2017
 period = '2017'
-RunTauSpinnerProducer=False #only do this if you want to calculate tauspinner weights for a sample with two taus and flat tau polarisation
+RunTauSpinnerProducer=True #only do this if you want to calculate tauspinner weights for a sample with two taus and flat tau polarisation
+
 # ============================================================================================
 if isEmbedded : isData = True
 # ============================================================================================
