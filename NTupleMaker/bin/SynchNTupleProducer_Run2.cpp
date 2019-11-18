@@ -575,13 +575,9 @@ int main(int argc, char * argv[]){
       analysisTree.GetEntry(iEntry);
       nEvents++;
     
-      if (isData)
-        nWeightedEventsH->Fill(0., 1.);
-      else {
-      	nWeightedEventsH->Fill(0., analysisTree.genweight);
+      if (!isData)
       	FillGenTree(&analysisTree,gentree);
-      	gentree->Fill();
-      }
+      
       
       //Skip events not passing the MET filters, if applied
       bool passed_all_met_filters = passedAllMetFilters(&analysisTree, met_filters_list);
