@@ -49,3 +49,6 @@ ls $dirDataSingleMuon/SingleMuon_Run2017C-31Mar2018-v1/*root > SingleMuon_Run201
 ls $dirDataSingleMuon/SingleMuon_Run2017D-31Mar2018-v1/*root > SingleMuon_Run2017D
 ls $dirDataSingleMuon/SingleMuon_Run2017E-31Mar2018-v1/*root > SingleMuon_Run2017E
 ls $dirDataSingleMuon/SingleMuon_Run2017F-31Mar2018-v1/*root > SingleMuon_Run2017F
+
+ls /pnfs/desy.de/cms/tier2/store/user/mvandekl/2017/mc/GluGluToHToTauTauNoSpin_Unfiltered_Rev1/*.root > GluGluToHToTauTauNoSpinCorr_Unfiltered
+ls /pnfs/desy.de/cms/tier2/store/user/mvandekl/2017/mc/VBFHToTauTauNoSpin_Unfiltered_Rev1/*.root > VBFHToTauTauNoSpinCorr_Unfiltered

@@ -13,6 +13,10 @@
 #include <TFile.h>
 
 // Header file for the classes stored in the TTree if any.
+//We´ll store for now 5 CP mixing scenarios: "sm_htt125", "ps_htt125", "mm_htt125" "minusmm_htt125", "mix0p375_htt125". Names chose to stay somewhat consistent with choices IC in the CH branch
+
+#include <vector>
+#include <string>
 
 // Fixed size dimensions of array or collections stored in the TTree if any.
 
@@ -391,6 +395,8 @@ public :
   Float_t VzConstitTau2;
   Float_t alphaminus;
 
+  double TauSpinnerWeightsEven, TauSpinnerWeightsOdd, TauSpinnerWeightsMaxMix, TauSpinnerWeightsMinusMaxMix, TauSpinnerWeightsMix0p375;
+
   //Vinay: ditau_vis_pT + MET
   Float_t Prompt_pT;
 
@@ -764,6 +770,12 @@ public :
   TBranch        *b_VyConstitTau2;
   TBranch        *b_VzConstitTau2;
   TBranch        *b_alphaminus;
+
+  TBranch        *b_TauSpinnerWeightsEven;
+  TBranch        *b_TauSpinnerWeightsOdd;
+  TBranch        *b_TauSpinnerWeightsMaxMix;
+  TBranch        *b_TauSpinnerWeightsMinusMaxMix;
+  TBranch        *b_TauSpinnerWeightsMix0p375;
 
   TBranch       *b_Prompt_pT;
 
