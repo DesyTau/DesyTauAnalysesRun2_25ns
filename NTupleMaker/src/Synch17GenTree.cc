@@ -121,6 +121,12 @@ void Synch17GenTree::ReadInit(TTree *tree)
 
    fChain->SetBranchAddress("alphaminus", &alphaminus, &b_alphaminus);
    
+   fChain->SetBranchAddress("sm_htt125", &TauSpinnerWeightsEven, &b_TauSpinnerWeightsEven);
+   fChain->SetBranchAddress("ps_htt125", &TauSpinnerWeightsOdd, &b_TauSpinnerWeightsOdd);
+   fChain->SetBranchAddress("mm_htt125", &TauSpinnerWeightsMaxMix, &b_TauSpinnerWeightsMaxMix);
+   fChain->SetBranchAddress("minusmm_htt125", &TauSpinnerWeightsMinusMaxMix, &b_TauSpinnerWeightsMinusMaxMix);
+   fChain->SetBranchAddress("mix0p375_htt125", &TauSpinnerWeightsMix0p375, &b_TauSpinnerWeightsMix0p375);
+
    lock=true;
 }
 
@@ -251,6 +257,12 @@ void Synch17GenTree::WriteInit(TTree *tree) {
    fChain->Branch("gen_VzConstitTau2", &VzConstitTau2, "gen_VzConstitTau2/F");
 
    fChain->Branch("gen_alphaminus", &alphaminus, "gen_alphaminus/F");
+
+  fChain->Branch("gen_sm_htt125", &TauSpinnerWeightsEven, "gen_sm_htt125/D");
+  fChain->Branch("gen_ps_htt125", &TauSpinnerWeightsOdd, "gen_ps_htt125/D");
+  fChain->Branch("gen_mm_htt125", &TauSpinnerWeightsMaxMix, "gen_mm_htt125/D");
+  fChain->Branch("gen_minusmm_htt125", &TauSpinnerWeightsMinusMaxMix, "gen_minusmm_htt125/D");
+  fChain->Branch("gen_mix0p375_htt125", &TauSpinnerWeightsMix0p375, "gen_mix0p375_htt125/D");
 
 }
 

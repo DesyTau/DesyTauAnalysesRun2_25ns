@@ -13,6 +13,10 @@
 #include <TFile.h>
 
 // Header file for the classes stored in the TTree if any.
+//We´ll store for now 5 CP mixing scenarios: "sm_htt125", "ps_htt125", "mm_htt125" "minusmm_htt125", "mix0p375_htt125". Names chose to stay somewhat consistent with choices IC in the CH branch
+
+#include <vector>
+#include <string>
 
 // Fixed size dimensions of array or collections stored in the TTree if any.
 
@@ -31,6 +35,10 @@ public :
   Int_t           npv;
   Float_t         npu;
   Float_t         rho;
+  
+  // MET filters
+  Bool_t          passedAllMetFilters;
+  
   //Leptons
   Float_t         pt_1;
   Float_t         phi_1;
@@ -70,6 +78,9 @@ public :
   Float_t         dZ_2;
   Float_t         d0err_2;
   Float_t         dZerr_2;
+  Float_t         IP_helix_x_2;
+  Float_t         IP_helix_y_2;
+  Float_t         IP_helix_z_2;
   Float_t         mt_2;
   Float_t         puppimt_2;
   Int_t 	  tau_decay_mode_2;
@@ -368,7 +379,8 @@ public :
   Float_t PV_refitted_BS_x;
   Float_t PV_refitted_BS_y;
   Float_t PV_refitted_BS_z;
-
+  Bool_t  is_refitted_PV_with_BS;
+  
   Float_t GenVertexX;
   Float_t GenVertexY;
   Float_t GenVertexZ;
@@ -383,6 +395,8 @@ public :
   Float_t VzConstitTau2;
   Float_t alphaminus;
 
+  double TauSpinnerWeightsEven, TauSpinnerWeightsOdd, TauSpinnerWeightsMaxMix, TauSpinnerWeightsMinusMaxMix, TauSpinnerWeightsMix0p375;
+
   //Vinay: ditau_vis_pT + MET
   Float_t Prompt_pT;
 
@@ -396,6 +410,10 @@ public :
   TBranch	 *b_npv;
   TBranch	 *b_npu;
   TBranch	 *b_rho;
+  
+  // MET filters
+  TBranch	 *b_passedAllMetFilters;
+  
   //Leptons
   TBranch	 *b_pt_1;
   TBranch	 *b_phi_1;
@@ -435,6 +453,9 @@ public :
   TBranch	 *b_dZ_2;
   TBranch	 *b_d0err_2;
   TBranch	 *b_dZerr_2;
+  TBranch	 *b_IP_helix_x_2;
+  TBranch	 *b_IP_helix_y_2;
+  TBranch	 *b_IP_helix_z_2;
   TBranch	 *b_mt_2;
   TBranch	 *b_puppimt_2;
   TBranch        *b_tau_decay_mode_2;
@@ -734,6 +755,7 @@ public :
   TBranch        *b_PV_refitted_BS_x;
   TBranch        *b_PV_refitted_BS_y;
   TBranch        *b_PV_refitted_BS_z;  
+  TBranch        *b_is_refitted_PV_with_BS;  
 
 //gen vertex info is practical to have
   TBranch        *b_GenVertexX;
@@ -748,6 +770,12 @@ public :
   TBranch        *b_VyConstitTau2;
   TBranch        *b_VzConstitTau2;
   TBranch        *b_alphaminus;
+
+  TBranch        *b_TauSpinnerWeightsEven;
+  TBranch        *b_TauSpinnerWeightsOdd;
+  TBranch        *b_TauSpinnerWeightsMaxMix;
+  TBranch        *b_TauSpinnerWeightsMinusMaxMix;
+  TBranch        *b_TauSpinnerWeightsMix0p375;
 
   TBranch       *b_Prompt_pT;
 
