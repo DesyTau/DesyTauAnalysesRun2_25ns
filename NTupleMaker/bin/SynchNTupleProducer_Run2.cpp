@@ -246,21 +246,11 @@ int main(int argc, char * argv[]){
   std::cout << "Hey ya 1 " << std::endl;
 
   // Read in HLT filter
+
   vector<string> filterSingleLep;
   vector<string> filterXtriggerLepLeg;
   vector<string> filterXtriggerTauLeg;
   
-  filterSingleLep.push_back(cfg.get<string>("filterSingleLep1"));
-  filterSingleLep.push_back(cfg.get<string>("filterSingleLep2"));
-  filterXtriggerLepLeg.push_back(cfg.get<string>("filterXtriggerLepLeg1"));
-  filterXtriggerLepLeg.push_back(cfg.get<string>("filterXtriggerLepLeg2"));
-  filterXtriggerTauLeg.push_back(cfg.get<string>("filterXtriggerTauLeg1"));
-  filterXtriggerTauLeg.push_back(cfg.get<string>("filterXtriggerTauLeg2"));
-  
-  cout<<"Number of single lepton trigger legs = "<<filterSingleLep.size()<<endl;
-  cout<<"Number of X trigger legs (lep leg)   = "<<filterXtriggerLepLeg.size()<<endl;
-  cout<<"Number of X trigger legs (tau leg)   = "<<filterXtriggerTauLeg.size()<<endl;
-
   // tau cuts
   const float ptTauLowCut    = cfg.get<float>("ptTauLowCut");
   const float etaTauCut      = cfg.get<float>("etaTauCut");
@@ -426,8 +416,6 @@ int main(int argc, char * argv[]){
 
   // Zpt reweighting for LO DY samples 
   TFile *f_zptweight = new TFile(TString(cmsswBase) + "/src/" + ZptweightFile, "read");
-  //TFile * f_zptweight = new TFile(TString(cmsswBase)+"/src/"+"DesyTauAnalyses/NTupleMaker/data/zpt_weights_2016_BtoH.root","read");
-  //Merijn: the file will point now for 2017  instead to DesyTauAnalyses/NTupleMaker/data/zpt_weights_2017.root
   TH2D *h_zptweight = (TH2D*)f_zptweight->Get("zptmass_histo");
 
   // lepton to tau fake init
@@ -590,7 +578,39 @@ int main(int argc, char * argv[]){
                   nWeightedEventsH->Fill(0.,genweight);
           }
       }
-      delete _inittree;
+      
+      if (era != 2018) {
+      vector<string> filterSingleLep = cfg.get<vector<string>>("filterSingleLep");
+      vector<string> filterXtriggerLepLeg = cfg.get<vector<string>>("filterXtriggerLepLeg");
+      vector<string> filterXtriggerTauLeg = cfg.get<vector<string>>("filterXtriggerTauLeg");
+      }
+      else 
+      {
+        if(isData)
+        {
+          if (analysisTree.event_run < 315974) { // muon filter of the mutau triggers changed
+            filterXtriggerLepLeg = cfg.get<vector<string>>("filterXtriggerLepLeg_before_run315974");
+            filterXtriggerTauLeg = cfg.get<vector<string>>("filterXtriggerTauLeg_before_run315974");
+          }
+          else if (analysisTree.event_run < 317509) // HPS algorithm was introduced
+          {
+            filterXtriggerLepLeg = cfg.get<vector<string>>("filterXtriggerLepLeg_run315974_to_HPS");
+            filterXtriggerTauLeg = cfg.get<vector<string>>("filterXtriggerTauLeg_run315974_to_HPS");    
+          }
+          else{
+            filterXtriggerLepLeg = cfg.get<vector<string>>("filterXtriggerLepLeg_after_HPS");
+            filterXtriggerTauLeg = cfg.get<vector<string>>("filterXtriggerTauLeg_after_HPS");    
+          }
+        }
+        else{
+          filterXtriggerLepLeg = cfg.get<vector<string>>("filterXtriggerLepLeg_after_HPS");
+          filterXtriggerTauLeg = cfg.get<vector<string>>("filterXtriggerTauLeg_after_HPS");          
+        }
+    }
+        
+      cout<<"Number of single lepton trigger legs = "<<filterSingleLep.size()<<endl;
+      cout<<"Number of X trigger legs (lep leg)   = "<<filterXtriggerLepLeg.size()<<endl;
+      cout<<"Number of X trigger legs (tau leg)   = "<<filterXtriggerTauLeg.size()<<endl;
 
     ///////////////EVENT LOOP///////////////
     Long64_t numberOfEntries = analysisTree.GetEntries();

@@ -100,24 +100,28 @@ void counting_jets(const AC1B *analysisTree, Synch17Tree *otree, const Config *c
   const float dRJetLeptonCut = cfg->get<float>("dRJetLeptonCut");
   const float bJetEtaCut = cfg->get<float>("bJetEtaCut");
   const float btagCut = cfg->get<float>("btagCut");
-  const string BTagAlgorithm = cfg.get<string>("BTagAlgorithm");
+  const string BTagAlgorithm = cfg->get<string>("BTagAlgorithm");
 
+  TString BTagDiscriminator1;
+  TString BTagDiscriminator2;
+  TString BTagDiscriminator3;
+  
   try{
-    TString BTagDiscriminator1(cfg->get<string>("BTagDiscriminator1"));
+    BTagDiscriminator1 = (TString) cfg->get<string>("BTagDiscriminator1");
   } catch(...){
-    TString BTagDiscriminator1(cfg->get<string>("None"));
+    BTagDiscriminator1 = (TString) "None";
     std::cout << "no BTagDiscriminator1 found" << '\n';
   }
   try{
-    TString BTagDiscriminator2(cfg->get<string>("BTagDiscriminator2"));
+    BTagDiscriminator2 = (TString) cfg->get<string>("BTagDiscriminator2");
   } catch(...){
-    TString BTagDiscriminator2(cfg->get<string>("None"));
+    BTagDiscriminator2 = (TString) "None";
     std::cout << "no BTagDiscriminator2 found" << '\n';
   }
   try{
-    TString BTagDiscriminator3(cfg->get<string>("BTagDiscriminator3"));
+    BTagDiscriminator3 = (TString) cfg->get<string>("BTagDiscriminator3");
   } catch(...){
-    TString BTagDiscriminator3(cfg->get<string>("None"));
+    BTagDiscriminator3 = (TString) "None";
     std::cout << "no BTagDiscriminator3 found" << '\n';
   }
       
