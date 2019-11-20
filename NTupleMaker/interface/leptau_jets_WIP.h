@@ -105,11 +105,10 @@ void counting_jets(const AC1B *analysisTree, Synch17Tree *otree, const Config *c
   TString BTagDiscriminator1 = (TString) cfg->get<string>("BTagDiscriminator1");
   TString BTagDiscriminator2 = (TString) "None BTagDiscriminator2";
   TString BTagDiscriminator3 = (TString) "None BTagDiscriminator3";
-  
   if(BTagAlgorithm == "DeepCSV" || BTagAlgorithm == "DeepFlavour")
-    BTagDiscriminator2 = (TString) cfg->get<string>("BTagDiscriminator2");
+  BTagDiscriminator2 = (TString) cfg->get<string>("BTagDiscriminator2");
   if(BTagAlgorithm == "DeepFlavour")
-    BTagDiscriminator3 = (TString) cfg->get<string>("BTagDiscriminator3");
+  BTagDiscriminator3 = (TString) cfg->get<string>("BTagDiscriminator3");
       
   int nBTagDiscriminant1 = -1;
   int nBTagDiscriminant2 = -1;
@@ -125,7 +124,6 @@ void counting_jets(const AC1B *analysisTree, Synch17Tree *otree, const Config *c
       nBTagDiscriminant3 = iBTag;
   }
   
-  std::cout << "\nnumber of jets in event" << analysisTree->pfjet_count << '\n';
   for (unsigned int jet = 0; jet < analysisTree->pfjet_count; ++jet) {
     
     float jetEta    = analysisTree->pfjet_eta[jet];
@@ -141,16 +139,13 @@ void counting_jets(const AC1B *analysisTree, Synch17Tree *otree, const Config *c
     float dR2 = deltaR(analysisTree->pfjet_eta[jet], analysisTree->pfjet_phi[jet], otree->eta_2, otree->phi_2);
     if (dR2 <= dRJetLeptonCut) continue;
 
-    std::cout << "before prefiring" << '\n';
     // skip prefiring region for 2017:
     if(is2017 && jetPt < 50 && absJetEta > 2.65 && absJetEta < 3.139) continue; 
 
-    std::cout << "before tightJetID" << '\n';
     // see definition in Jets.h
     bool isPFJetId = tightJetID((*analysisTree), int(jet), era);
     if (!isPFJetId) continue;
      
-    std::cout << "before jetspt20.push_back(jet);" << '\n';
     jetspt20.push_back(jet);
 
     if (absJetEta < bJetEtaCut) { // jet within b-tagging acceptance
