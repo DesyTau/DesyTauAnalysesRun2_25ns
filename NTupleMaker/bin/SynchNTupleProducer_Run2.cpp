@@ -579,8 +579,8 @@ int main(int argc, char * argv[]){
           }
       }
       
-      if (era != 2018) {
       vector<string> filterSingleLep = cfg.get<vector<string>>("filterSingleLep");
+      if (era != 2018) {
       vector<string> filterXtriggerLepLeg = cfg.get<vector<string>>("filterXtriggerLepLeg");
       vector<string> filterXtriggerTauLeg = cfg.get<vector<string>>("filterXtriggerTauLeg");
       }
