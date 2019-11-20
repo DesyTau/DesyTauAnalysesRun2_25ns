@@ -1095,9 +1095,6 @@ int main(int argc, char * argv[]){
     
       //counting jet
       jets::counting_jets(&analysisTree, otree, &cfg, &inputs_btag_scaling_medium);
-      //MET
-      //Merijn 2019 6 20: overloaded the function, it takes the era as arugment now, to take pfmetcorr for 2016 and 2017..
-      fillMET(&analysisTree, otree, era);
       
       TLorentzVector genV( 0., 0., 0., 0.);
       TLorentzVector genL( 0., 0., 0., 0.);
@@ -1156,9 +1153,22 @@ int main(int argc, char * argv[]){
       // MET Recoil Corrections
       ////////////////////////////////////////////////////////////
       
+      otree->met = TMath::Sqrt(analysisTree.pfmetcorr_ex*analysisTree.pfmetcorr_ex + analysisTree.pfmetcorr_ey*analysisTree.pfmetcorr_ey);
+      otree->metphi = TMath::ATan2(analysisTree.pfmetcorr_ey,analysisTree.pfmetcorr_ex);
+      otree->metcov00 = analysisTree.pfmetcorr_sigxx;
+      otree->metcov01 = analysisTree.pfmetcorr_sigxy;
+      otree->metcov10 = analysisTree.pfmetcorr_sigyx;
+      otree->metcov11 = analysisTree.pfmetcorr_sigyy;
+
+      otree->puppimet = TMath::Sqrt(analysisTree.puppimet_ex*analysisTree.puppimet_ex + analysisTree.puppimet_ey*analysisTree.puppimet_ey);
+      otree->puppimetphi = TMath::ATan2(analysisTree.puppimet_ey,analysisTree.puppimet_ex);
+      otree->puppimetcov00 = analysisTree.puppimet_sigxx;
+      otree->puppimetcov01 = analysisTree.puppimet_sigxy;
+      otree->puppimetcov10 = analysisTree.puppimet_sigyx;
+      otree->puppimetcov11 = analysisTree.puppimet_sigyy;
+
       otree->met_uncorr = otree->met;
       otree->metphi_uncorr = otree->metphi;
-      
       otree->njetshad = otree->njets;
       if (isWJets) otree->njetshad += 1;
 
@@ -1320,7 +1330,7 @@ int main(int argc, char * argv[]){
     
       //if (!Synch && !passedBaselineSel) continue;
     
-      // if (ApplySVFit && otree->njetspt20 > 0) svfit_variables(ch, &analysisTree, otree, &cfg, inputFile_visPtResolution);
+      if (ApplySVFit && otree->njetspt20 > 0) svfit_variables(ch, &analysisTree, otree, &cfg, inputFile_visPtResolution);
     
     
       //addition Merijn: here we select the constituent of the tau with highest pT

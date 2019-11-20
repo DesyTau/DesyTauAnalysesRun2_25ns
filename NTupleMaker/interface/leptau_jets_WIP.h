@@ -252,7 +252,10 @@ void counting_jets(const AC1B *analysisTree, Synch17Tree *otree, const Config *c
     otree->bpt_1   = get_jetPt(analysisTree, indexLeadingBJet, JESname, direction, jecUncertainties);
     otree->beta_1  = analysisTree->pfjet_eta[indexLeadingBJet];
     otree->bphi_1  = analysisTree->pfjet_phi[indexLeadingBJet];
-    otree->bcsv_1  = analysisTree->pfjet_btag[indexLeadingBJet][1] + analysisTree->pfjet_btag[indexLeadingBJet][2];
+    if (BTagAlgorithm == "DeepCSV")
+      otree->bcsv_1  = analysisTree->pfjet_btag[indexLeadingBJet][nBTagDiscriminant1] + analysisTree->pfjet_btag[indexLeadingBJet][nBTagDiscriminant2];
+    else 
+      otree->bcsv_1  = -100;
   }
   else {
     otree->bpt_1   = -10;
@@ -266,7 +269,11 @@ void counting_jets(const AC1B *analysisTree, Synch17Tree *otree, const Config *c
     otree->bpt_2   = get_jetPt(analysisTree, indexSubLeadingBJet, JESname, direction, jecUncertainties);
     otree->beta_2  = analysisTree->pfjet_eta[indexSubLeadingBJet];
     otree->bphi_2  = analysisTree->pfjet_phi[indexSubLeadingBJet];
-    otree->bcsv_2  = analysisTree->pfjet_btag[indexSubLeadingBJet][1] + analysisTree->pfjet_btag[indexSubLeadingBJet][2]; // 3 - pfDeepFlavourJetTags:probb
+    if (BTagAlgorithm == "DeepCSV")
+      otree->bcsv_2  = analysisTree->pfjet_btag[indexSubLeadingBJet][nBTagDiscriminant1] + analysisTree->pfjet_btag[indexSubLeadingBJet][nBTagDiscriminant2];
+    else 
+      otree->bcsv_2  = -100;
+
   }
   else {
     otree->bpt_2   = -10;
