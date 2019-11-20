@@ -2,6 +2,7 @@
 dirDataSingleMuon=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2017/data/SingleMuon
 dirMC=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2017/mc_v3
 dirMC_v4=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2017/mc_v4
+dirTauSpinner=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2016/mc_v3/
 
 ls $dirMC/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/*root > DYJetsToLL_M-50
 ls $dirMC/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8_ext1/*root >> DYJetsToLL_M-50
@@ -49,6 +50,9 @@ ls $dirDataSingleMuon/SingleMuon_Run2017C-31Mar2018-v1/*root > SingleMuon_Run201
 ls $dirDataSingleMuon/SingleMuon_Run2017D-31Mar2018-v1/*root > SingleMuon_Run2017D
 ls $dirDataSingleMuon/SingleMuon_Run2017E-31Mar2018-v1/*root > SingleMuon_Run2017E
 ls $dirDataSingleMuon/SingleMuon_Run2017F-31Mar2018-v1/*root > SingleMuon_Run2017F
+
+ls $dirTauSpinner/GluGluToHToTauTauNoSpin_M125/*root > GluGluHToTauTauUncorrDecays_M125
+ls $dirTauSpinner/VBFHToTauTauNoSpin_M125/*root > GluGluHToTauTauUncorrDecays_M125
 
 ls /pnfs/desy.de/cms/tier2/store/user/mvandekl/2017/mc/GluGluToHToTauTauNoSpin_Unfiltered_Rev1/*.root > GluGluToHToTauTauNoSpinCorr_Unfiltered
 ls /pnfs/desy.de/cms/tier2/store/user/mvandekl/2017/mc/VBFHToTauTauNoSpin_Unfiltered_Rev1/*.root > VBFHToTauTauNoSpinCorr_Unfiltered

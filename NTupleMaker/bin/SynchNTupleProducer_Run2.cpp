@@ -232,7 +232,7 @@ int main(int argc, char * argv[]){
   const bool isEWKZ =  infiles.find("EWKZ") == infiles.rfind("/")+1;
   const bool isMG = infiles.find("madgraph") != string::npos;
   const bool isMSSMsignal =  (infiles.find("SUSYGluGluToHToTauTau")== infiles.rfind("/")+1) || (infiles.find("SUSYGluGluToBBHToTauTau")== infiles.rfind("/")+1);
-  const bool isTauSpinner = infiles.find("TauSpinner") != string::npos;
+  const bool isTauSpinner = infiles.find("Uncorr") != string::npos;
 
   bool applyTauSpinnerWeights = false;
   if(isTauSpinner) applyTauSpinnerWeights = true;
