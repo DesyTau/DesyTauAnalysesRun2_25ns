@@ -33,6 +33,7 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
 			       TString directory = "HtautauCP_mutau/Inputs/forOleg/NTuples_mt_2017/",
 			       TString outputDir = "./Plots/",
 			       int year=2017,
+			       bool DeepTau = false, 
 			       bool FFmethod = false,  
 			       bool LargeScale = false,  
 			       bool logY = false,
@@ -68,8 +69,12 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
     VariableName="Unrolled_"+xVar;
     var2D=true;
   }
-  TString IsoCut=Cut+"(mva17_2>0.5)*";
-  TString AntiIsoCut=Cut+"(mva17_2<0.5)*";
+  TString TauIso="mva17_2";
+  if(DeepTau)TauIso="byMediumDeepTau2017v2p1VSjet_2";
+  TString FFweight="ff_nom";
+  if(DeepTau)FFweight="ff_nom";
+  TString IsoCut=Cut+"("+TauIso+">0.5)*";
+  TString AntiIsoCut=Cut+"("+TauIso+"<0.5)*";
   // directory="$CMSSW_BASE/src/"+directory;
   TH1::SetDefaultSumw2();
   SetStyle();
@@ -134,7 +139,7 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
   for (int i=0; i<nSamples; ++i){
     cuts[i]   = IsoCut+Weight+"(os>0.5)";
     cutsSS[i] = IsoCut+Weight+qcdweight+"(os<0.5)";
-    cutsaIso[i] = AntiIsoCut+Weight+"(os>0.5)*ff_nom*((gen_match_2==5)*0.88+(gen_match_2==2||gen_match_2==4)*correction_againstMuonTight3_2+(gen_match_2==1||gen_match_2==3))";
+    cutsaIso[i] = AntiIsoCut+Weight+"(os>0.5)*"+FFweight+"*((gen_match_2==5)*0.88+(gen_match_2==2||gen_match_2==4)*correction_againstMuonTight3_2+(gen_match_2==1||gen_match_2==3))";
   }
 
   //specific selection weights for data, DY and top
@@ -157,7 +162,7 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
   cutsSS[8] += "*"+TString::Itoa(scaleSignal,10);
   cutsSS[9] += "*"+TString::Itoa(scaleSignal,10);
  
-  cutsaIso[0] = AntiIsoCut+"(os>0.5)*ff_nom";
+  cutsaIso[0] = AntiIsoCut+"(os>0.5)*"+FFweight;
   cutsaIso[1] += zptmassweight+isZTT;
   cutsaIso[2] += zptmassweight+isZLL;
   cutsaIso[3] += Wjets_weight; 
