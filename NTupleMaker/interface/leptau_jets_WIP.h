@@ -164,8 +164,8 @@ void counting_jets(const AC1B *analysisTree, Synch17Tree *otree, const Config *c
       if (is2016)
       	tagged = analysisTree->pfjet_btag[jet][nBTagDiscriminant1] > btagCut; 
       else
-      	// tagged = (analysisTree->pfjet_btag[jet][nBTagDiscriminant1] + analysisTree->pfjet_btag[jet][nBTagDiscriminant2]) > btagCut;
-      	tagged = (analysisTree->pfjet_btag[jet][nBTagDiscriminant1] + analysisTree->pfjet_btag[jet][nBTagDiscriminant2] + analysisTree->pfjet_btag[jet][nBTagDiscriminant3]) > btagCut;
+      	tagged = (analysisTree->pfjet_btag[jet][nBTagDiscriminant1] + analysisTree->pfjet_btag[jet][nBTagDiscriminant2]) > btagCut;
+      	// tagged = (analysisTree->pfjet_btag[jet][nBTagDiscriminant1] + analysisTree->pfjet_btag[jet][nBTagDiscriminant2] + analysisTree->pfjet_btag[jet][nBTagDiscriminant3]) > btagCut;
       bool taggedRaw = tagged;
       
       if(!isData && ApplyBTagScaling) {
@@ -255,7 +255,7 @@ void counting_jets(const AC1B *analysisTree, Synch17Tree *otree, const Config *c
     otree->bpt_1   = get_jetPt(analysisTree, indexLeadingBJet, JESname, direction, jecUncertainties);
     otree->beta_1  = analysisTree->pfjet_eta[indexLeadingBJet];
     otree->bphi_1  = analysisTree->pfjet_phi[indexLeadingBJet];
-    otree->bcsv_1  = analysisTree->pfjet_btag[indexLeadingBJet][3]; // 3 - pfDeepFlavourJetTags:probb
+    otree->bcsv_1  = analysisTree->pfjet_btag[indexLeadingBJet][1] + analysisTree->pfjet_btag[indexLeadingBJet][2];
   }
   else {
     otree->bpt_1   = -10;
@@ -269,7 +269,7 @@ void counting_jets(const AC1B *analysisTree, Synch17Tree *otree, const Config *c
     otree->bpt_2   = get_jetPt(analysisTree, indexSubLeadingBJet, JESname, direction, jecUncertainties);
     otree->beta_2  = analysisTree->pfjet_eta[indexSubLeadingBJet];
     otree->bphi_2  = analysisTree->pfjet_phi[indexSubLeadingBJet];
-    otree->bcsv_2  = analysisTree->pfjet_btag[indexSubLeadingBJet][3]; // 3 - pfDeepFlavourJetTags:probb
+    otree->bcsv_2  = analysisTree->pfjet_btag[indexSubLeadingBJet][1] + analysisTree->pfjet_btag[indexSubLeadingBJet][2]; // 3 - pfDeepFlavourJetTags:probb
   }
   else {
     otree->bpt_2   = -10;
@@ -282,14 +282,16 @@ void counting_jets(const AC1B *analysisTree, Synch17Tree *otree, const Config *c
   if ( indexLeadingJet >= 0 && indexSubLeadingJet >= 0 && indexLeadingJet == indexSubLeadingJet )
     cout << "warning : indexLeadingJet ==indexSubLeadingJet = " << indexSubLeadingJet << endl;
   if (indexLeadingJet >= 0) {
-    otree->jpt_1 = get_jetPt(analysisTree, indexLeadingJet, JESname, direction, jecUncertainties); //analysisTree->pfjet_pt[indexLeadingJet];
+    otree->jpt_1 = get_jetPt(analysisTree, indexLeadingJet, JESname, direction, jecUncertainties);
     otree->jeta_1 = analysisTree->pfjet_eta[indexLeadingJet];
     otree->jphi_1 = analysisTree->pfjet_phi[indexLeadingJet];
+    otree->jcsv_1 = analysisTree->pfjet_btag[indexLeadingJet][1] + analysisTree->pfjet_btag[indexLeadingJet][2];
   }
   else {
     otree->jpt_1 = -10;
     otree->jeta_1 = -10;
     otree->jphi_1 = -10;
+    otree->jcsv_1 = -10;
   }
   
   // subleading jet variables
@@ -297,11 +299,13 @@ void counting_jets(const AC1B *analysisTree, Synch17Tree *otree, const Config *c
     otree->jpt_2 = get_jetPt(analysisTree, indexSubLeadingJet, JESname, direction, jecUncertainties);
     otree->jeta_2 = analysisTree->pfjet_eta[indexSubLeadingJet];
     otree->jphi_2 = analysisTree->pfjet_phi[indexSubLeadingJet];
+    otree->jcsv_2 = analysisTree->pfjet_btag[indexSubLeadingJet][1] + analysisTree->pfjet_btag[indexSubLeadingJet][2];
   }
   else {
     otree->jpt_2 = -10;
     otree->jeta_2 = -10;
     otree->jphi_2 = -10;
+    otree->jcsv_2 = -10;
   }
 
   // dijet variables
@@ -314,7 +318,9 @@ void counting_jets(const AC1B *analysisTree, Synch17Tree *otree, const Config *c
   	jet2.SetPtEtaPhiE(otree->jpt_2, otree->jeta_2, otree->jphi_2, get_jetE(analysisTree, indexSubLeadingJet, JESname, direction, jecUncertainties));
 
     otree->mjj = (jet1 + jet2).M();
-    otree->dijetpt = (jet1 + jet2).Pt();//Merijn: added, needed for DNN inputs in mt
+    otree->dijetpt = (jet1 + jet2).Pt();
+    otree->dijeteta = (jet1 + jet2).Eta();
+    otree->dijetphi = (jet1 + jet2).Phi();
     otree->jdeta = abs(analysisTree->pfjet_eta[indexLeadingJet] - analysisTree->pfjet_eta[indexSubLeadingJet]);
     otree->jdphi = dPhiFrom2P(jet1.Px(), jet1.Py(), jet2.Px(),jet2.Py());
    

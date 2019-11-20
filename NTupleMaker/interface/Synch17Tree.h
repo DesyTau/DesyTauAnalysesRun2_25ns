@@ -56,12 +56,24 @@ public :
   Float_t         dZ_1;
   Float_t         d0err_1;
   Float_t         dZerr_1;
-  Float_t         IP_helix_x_1;
-  Float_t         IP_helix_y_1;
-  Float_t         IP_helix_z_1;
+  Float_t         ipx_1;
+  Float_t         ipy_1;
+  Float_t         ipz_1;
   Float_t         mt_1;
   Float_t         puppimt_1;
-  Int_t 	  tau_decay_mode_1;
+  Int_t 	        tau_decay_mode_1;
+  Float_t         dm_1;
+  Float_t         dmMVA_1;
+  Float_t 	      chpt_1;
+  Float_t 	      cheta_1;
+  Float_t 	      chphi_1;
+  Float_t 	      chm_1;
+  Float_t 	      npt_1;
+  Float_t 	      neta_1;
+  Float_t 	      nphi_1;
+  Float_t 	      nm_1;
+
+
   Float_t         pt_2;
   Float_t         phi_2;
   Float_t         eta_2;
@@ -78,12 +90,22 @@ public :
   Float_t         dZ_2;
   Float_t         d0err_2;
   Float_t         dZerr_2;
-  Float_t         IP_helix_x_2;
-  Float_t         IP_helix_y_2;
-  Float_t         IP_helix_z_2;
+  Float_t         ipx_2;
+  Float_t         ipy_2;
+  Float_t         ipz_2;
   Float_t         mt_2;
   Float_t         puppimt_2;
-  Int_t 	  tau_decay_mode_2;
+  Int_t 	        tau_decay_mode_2;
+  Float_t         dm_2;
+  Float_t         dmMVA_2;
+  Float_t 	      chpt_2;
+  Float_t 	      cheta_2;
+  Float_t 	      chphi_2;
+  Float_t 	      chm_2;
+  Float_t 	      npt_2;
+  Float_t 	      neta_2;
+  Float_t 	      nphi_2;
+  Float_t 	      nm_2;
 
   //TO FIX
   Float_t         againstElectronLooseMVA6_1;
@@ -144,9 +166,12 @@ public :
   Float_t 	  byVTightIsolationMVArun2017v2DBoldDMwLT2017_2;
   Float_t 	  byVVTightIsolationMVArun2017v2DBoldDMwLT2017_2;
     
-  Float_t	   byDeepTau2017v2p1VSeraw_2;	
-  Float_t	   byDeepTau2017v2p1VSjetraw_2;	
-  Float_t	   byDeepTau2017v2p1VSmuraw_2;	
+  Float_t	   deepTauVsEleRaw_1;	
+  Float_t	   deepTauVsJetRaw_1;	
+  Float_t	   deepTauVsMuRaw_1;	
+  Float_t	   deepTauVsEleRaw_2;	
+  Float_t	   deepTauVsJetRaw_2;	
+  Float_t	   deepTauVsMuRaw_2;	
   Float_t	   byLooseDeepTau2017v2p1VSe_2;	
   Float_t	   byLooseDeepTau2017v2p1VSjet_2;	
   Float_t	   byLooseDeepTau2017v2p1VSmu_2;	
@@ -168,7 +193,6 @@ public :
   Float_t	   byVVVLooseDeepTau2017v2p1VSe_2;	
   Float_t	   byVVVLooseDeepTau2017v2p1VSjet_2;	
 
-  Float_t    MVADM2017v1_2;
   Float_t    MVADM2017v1DM0raw_2;
   Float_t    MVADM2017v1DM10raw_2;
   Float_t    MVADM2017v1DM11raw_2;
@@ -224,18 +248,22 @@ public :
   Float_t         trigweight;
   
   Float_t         topptweight;
-  Double_t 	  zptweight;
+  Double_t 	      zptweight;
   Double_t        trkeffweight;
   Float_t         etaufakeweight;
   Float_t         mutaufakeweight;
-  Bool_t          xTrigger;
+  
   Bool_t          trg_singlemuon;
-  Bool_t	  trg_singleelectron;
+  Bool_t	        trg_singleelectron;
   Bool_t          singleLepTrigger;
+  Bool_t          trg_mutaucross;
+  Bool_t          trg_mutaucross_mu;
+  Bool_t          trg_mutaucross_tau;
+  Bool_t          trg_doubletau;
   Bool_t          ditauTrigger;
   Bool_t          xTriggerLep;
   Bool_t          xTriggerTau;
-
+  Bool_t          xTrigger;
   //MET
   Float_t         met;
   Float_t         metphi;  
@@ -282,7 +310,9 @@ public :
   Float_t         mjj;
   Float_t         jdeta;
   Float_t         jdphi;
-  Float_t         dijetpt; //Merijn added, needed for DNN inputs. THis name is consistent with 2016+2017 analysis
+  Float_t         dijetpt; 
+  Float_t         dijeteta; 
+  Float_t         dijetphi; 
   Int_t           njetingap;
   Int_t           njetingap20;
 
@@ -293,9 +323,11 @@ public :
   Float_t         jpt_1;
   Float_t         jeta_1;
   Float_t         jphi_1;
+  Float_t         jcsv_1;
   Float_t         jpt_2;
   Float_t         jeta_2;
   Float_t         jphi_2;
+  Float_t         jcsv_2;
   
   //b-jets
   Int_t           nbtag;
@@ -376,9 +408,9 @@ public :
   Float_t RecoVertexY;
   Float_t RecoVertexZ;
 
-  Float_t PV_refitted_BS_x;
-  Float_t PV_refitted_BS_y;
-  Float_t PV_refitted_BS_z;
+  Float_t pvx;
+  Float_t pvy;
+  Float_t pvz;
   Bool_t  is_refitted_PV_with_BS;
   
   Float_t GenVertexX;
@@ -435,18 +467,29 @@ public :
   TBranch	 *b_dZ_1;
   TBranch	 *b_d0err_1;
   TBranch	 *b_dZerr_1;
-  TBranch	 *b_IP_helix_x_1;
-  TBranch	 *b_IP_helix_y_1;
-  TBranch	 *b_IP_helix_z_1;
+  TBranch	 *b_ipx_1;
+  TBranch	 *b_ipy_1;
+  TBranch	 *b_ipz_1;
   TBranch	 *b_mt_1;
   TBranch	 *b_puppimt_1;
-  TBranch        *b_tau_decay_mode_1;
+  TBranch  *b_tau_decay_mode_1;
+  TBranch  *b_dm_1;
+  TBranch  *b_dmMVA_1;
+  TBranch  *b_chpt_1;
+  TBranch  *b_cheta_1;
+  TBranch  *b_chphi_1;
+  TBranch  *b_chm_1;
+  TBranch  *b_npt_1;
+  TBranch  *b_neta_1;
+  TBranch  *b_nphi_1;
+  TBranch  *b_nm_1;
+
   TBranch	 *b_pt_2;
   TBranch	 *b_phi_2;
   TBranch	 *b_eta_2;
-  TBranch        *b_chconst_2_pt;
-  TBranch        *b_chconst_2_eta;
-  TBranch        *b_chconst_2_phi; 
+  TBranch  *b_chconst_2_pt;
+  TBranch  *b_chconst_2_eta;
+  TBranch  *b_chconst_2_phi; 
   TBranch	 *b_m_2;
   TBranch	 *b_gen_match_2; 
   TBranch	 *b_q_2;
@@ -457,12 +500,22 @@ public :
   TBranch	 *b_dZ_2;
   TBranch	 *b_d0err_2;
   TBranch	 *b_dZerr_2;
-  TBranch	 *b_IP_helix_x_2;
-  TBranch	 *b_IP_helix_y_2;
-  TBranch	 *b_IP_helix_z_2;
+  TBranch	 *b_ipx_2;
+  TBranch	 *b_ipy_2;
+  TBranch	 *b_ipz_2;
   TBranch	 *b_mt_2;
   TBranch	 *b_puppimt_2;
-  TBranch        *b_tau_decay_mode_2;
+  TBranch  *b_tau_decay_mode_2;
+  TBranch  *b_dm_2;
+  TBranch  *b_dmMVA_2;
+  TBranch  *b_chpt_2;
+  TBranch  *b_cheta_2;
+  TBranch  *b_chphi_2;
+  TBranch  *b_chm_2;
+  TBranch  *b_npt_2;
+  TBranch  *b_neta_2;
+  TBranch  *b_nphi_2;
+  TBranch  *b_nm_2;
 
   //TO FIX
   TBranch	 *b_againstElectronLooseMVA6_1;
@@ -492,9 +545,12 @@ public :
   TBranch	 *b_byVTightIsolationMVArun2017v2DBoldDMwLT2017_1;
   TBranch	 *b_byVVTightIsolationMVArun2017v2DBoldDMwLT2017_1;
 
-  TBranch	   *b_byDeepTau2017v2p1VSeraw_2;	
-  TBranch	   *b_byDeepTau2017v2p1VSjetraw_2;	
-  TBranch	   *b_byDeepTau2017v2p1VSmuraw_2;	
+  TBranch	   *b_deepTauVsEleRaw_1;	
+  TBranch	   *b_deepTauVsJetRaw_1;	
+  TBranch	   *b_deepTauVsMuRaw_1;	
+  TBranch	   *b_deepTauVsEleRaw_2;	
+  TBranch	   *b_deepTauVsJetRaw_2;	
+  TBranch	   *b_deepTauVsMuRaw_2;	
   TBranch	   *b_byLooseDeepTau2017v2p1VSe_2;	
   TBranch	   *b_byLooseDeepTau2017v2p1VSjet_2;	
   TBranch	   *b_byLooseDeepTau2017v2p1VSmu_2;	
@@ -516,7 +572,6 @@ public :
   TBranch	   *b_byVVVLooseDeepTau2017v2p1VSe_2;	
   TBranch	   *b_byVVVLooseDeepTau2017v2p1VSjet_2;	
 
-  TBranch    *b_MVADM2017v1_2;
   TBranch    *b_MVADM2017v1DM0raw_2;
   TBranch    *b_MVADM2017v1DM10raw_2;
   TBranch    *b_MVADM2017v1DM11raw_2;
@@ -606,14 +661,17 @@ public :
   TBranch	 *b_etaufakeweight;
   TBranch	 *b_mutaufakeweight;
 
-  TBranch	 *b_xTrigger;
-  TBranch        *b_xTriggerLep;
-  TBranch        *b_xTriggerTau;
   TBranch	 *b_trg_singlemuon;
   TBranch	 *b_trg_singleelectron;
   TBranch	 *b_singleLepTrigger;
-  TBranch        *b_ditauTrigger;
-
+  TBranch	 *b_trg_mutaucross;
+  TBranch  *b_trg_mutaucross_mu;
+  TBranch  *b_trg_mutaucross_tau;
+  TBranch  *b_trg_doubletau;
+  TBranch  *b_ditauTrigger;
+  TBranch	 *b_xTrigger;
+  TBranch  *b_xTriggerLep;
+  TBranch  *b_xTriggerTau;
   //MET
   TBranch	 *b_met;
   TBranch	 *b_metphi;
@@ -660,6 +718,8 @@ public :
   TBranch	 *b_mjj;
   TBranch	 *b_jdeta;
   TBranch	 *b_dijetpt;
+  TBranch	 *b_dijeteta;
+  TBranch	 *b_dijetphi;
   TBranch	 *b_jdphi;
   TBranch	 *b_njetingap;
   TBranch	 *b_njetingap20;
@@ -671,9 +731,11 @@ public :
   TBranch	 *b_jpt_1;
   TBranch	 *b_jeta_1;
   TBranch	 *b_jphi_1;
+  TBranch	 *b_jcsv_1;
   TBranch	 *b_jpt_2;
   TBranch	 *b_jeta_2;
   TBranch	 *b_jphi_2;
+  TBranch	 *b_jcsv_2;
   
   //b-jets
   TBranch	 *b_nbtag;
@@ -756,9 +818,9 @@ public :
   TBranch        *b_RecoVertexY;
   TBranch        *b_RecoVertexZ;  
 
-  TBranch        *b_PV_refitted_BS_x;
-  TBranch        *b_PV_refitted_BS_y;
-  TBranch        *b_PV_refitted_BS_z;  
+  TBranch        *b_pvx;
+  TBranch        *b_pvy;
+  TBranch        *b_pvz;  
   TBranch        *b_is_refitted_PV_with_BS;  
 
 //gen vertex info is practical to have
