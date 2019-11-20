@@ -66,15 +66,16 @@
 //#include "DesyTauAnalyses/NTupleMaker/interface/ImpactParameter.h"
 #include "HiggsCPinTauDecays/ImpactParameter/interface/ImpactParameter.h"
 
-#define pi 	3.14159265358979312
-#define d2r 1.74532925199432955e-02
-#define r2d 57.2957795130823229
+#define pi   3.14159265358979312
+#define d2r  1.74532925199432955e-02
+#define r2d  57.2957795130823229
 
 #define electronMass 	 0.000511
-#define muonMass 		   0.105658
-#define tauMass 		   1.77682
-#define pionMass 		   0.1396
+#define muonMass 	 0.105658
+#define tauMass 	 1.77682
+#define pionMass 	 0.1396
 
+#define expectedtauspinnerweights 5
 
 void initializeCPvar(Synch17Tree *otree);
 void initializeGenTree(Synch17GenTree *gentree);
@@ -231,7 +232,11 @@ int main(int argc, char * argv[]){
   const bool isEWKZ =  infiles.find("EWKZ") == infiles.rfind("/")+1;
   const bool isMG = infiles.find("madgraph") != string::npos;
   const bool isMSSMsignal =  (infiles.find("SUSYGluGluToHToTauTau")== infiles.rfind("/")+1) || (infiles.find("SUSYGluGluToBBHToTauTau")== infiles.rfind("/")+1);
-  
+  const bool isTauSpinner = infiles.find("TauSpinner") != string::npos;
+
+  bool applyTauSpinnerWeights = false;
+  if(isTauSpinner) applyTauSpinnerWeights = true;
+
   const bool ApplyRecoilCorrections = cfg.get<bool>("ApplyRecoilCorrections") && !isData && (isDY || isWJets || isVBForGGHiggs || isMSSMsignal);
   RecoilCorrector recoilPFMetCorrector(cfg.get<string>("RecoilFilePath"));
 
@@ -365,6 +370,7 @@ int main(int argc, char * argv[]){
   TString rootFileName(sample);
   std::string ntupleName("makeroottree/AC1B");
   std::string initNtupleName("initroottree/AC1B");
+  std::string TauSpinnerWeightTreeName("icTauSpinnerProducer/TauSpinnerWeightTree");
 
   // PU reweighting - initialization
   PileUp *PUofficial = new PileUp();
@@ -550,6 +556,15 @@ int main(int argc, char * argv[]){
       	(jetEnergyScaleSys.at(i))->SetAC1B(&analysisTree);
     }
     
+    double * TSweight = new double[expectedtauspinnerweights];
+    TTree  * _treeTauSpinnerWeights = NULL;
+    
+    if(applyTauSpinnerWeights){ 
+      _treeTauSpinnerWeights = (TTree*)file_->Get(TString(TauSpinnerWeightTreeName));
+      _treeTauSpinnerWeights->SetBranchAddress("TauSpinnerWeights",TSweight);		
+    }  
+    
+
     TTree * _inittree = NULL;
       _inittree = (TTree*)file_->Get(TString(initNtupleName));
       if (_inittree!=NULL) {
@@ -580,6 +595,35 @@ int main(int argc, char * argv[]){
       	gentree->Fill();
       }
       
+      if(applyTauSpinnerWeights){
+        _treeTauSpinnerWeights->GetEntry(iEntry);
+	
+	otree->TauSpinnerWeightsEven = TSweight[0];
+	gentree->TauSpinnerWeightsEven = TSweight[0];
+	gentreeForGoodRecoEvtsOnly->TauSpinnerWeightsEven = TSweight[0];
+
+	otree->TauSpinnerWeightsMaxMix = TSweight[1];
+	gentree->TauSpinnerWeightsMaxMix = TSweight[1];
+	gentreeForGoodRecoEvtsOnly->TauSpinnerWeightsMaxMix = TSweight[1];
+
+	otree->TauSpinnerWeightsOdd = TSweight[2];
+	gentree->TauSpinnerWeightsOdd = TSweight[2];
+	gentreeForGoodRecoEvtsOnly->TauSpinnerWeightsOdd = TSweight[2];
+
+	otree->TauSpinnerWeightsMinusMaxMix = TSweight[3];
+	gentree->TauSpinnerWeightsMinusMaxMix = TSweight[3];
+	gentreeForGoodRecoEvtsOnly->TauSpinnerWeightsMinusMaxMix = TSweight[3];
+
+	otree->TauSpinnerWeightsMix0p375 = TSweight[4];
+	gentree->TauSpinnerWeightsMix0p375 = TSweight[4];
+	gentreeForGoodRecoEvtsOnly->TauSpinnerWeightsMix0p375 = TSweight[4];
+	}
+      else{
+	for(int tsindex=0;tsindex<expectedtauspinnerweights;tsindex++) TSweight[tsindex]=0;
+      }
+
+
+
       //Skip events not passing the MET filters, if applied
       bool passed_all_met_filters = passedAllMetFilters(&analysisTree, met_filters_list);
       if (ApplyMetFilters && !Synch && !passed_all_met_filters) continue;
