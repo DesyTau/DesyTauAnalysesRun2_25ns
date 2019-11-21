@@ -590,7 +590,8 @@ int main(int argc, char * argv[]){
                   nWeightedEventsH->Fill(0.,genweight);
           }
       }
-      
+      delete _inittree;
+
     ///////////////EVENT LOOP///////////////
     Long64_t numberOfEntries = analysisTree.GetEntries();
 
@@ -1350,7 +1351,8 @@ int main(int argc, char * argv[]){
       //Merijn 2019 1 10: perhaps this should be called before moving to next event..
       otree->Fill();
     } // event loop
-
+    
+    delete _treeTauSpinnerWeights;
     nFiles++;
     delete _tree;
     file_->Close();

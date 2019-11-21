@@ -699,6 +699,7 @@ void Synch17Tree::WriteInit(TTree *tree) {
   fChain->Branch("correction_againstMuonTight3_2", &correction_againstMuonTight3_2, "correction_againstMuonTight3_2/F");
 //////////////////////////////////////////////////////////////////////////////
 
+   fChain->Branch("embweight", &embweight, "embweight/F");
    fChain->Branch("trigweight_1", &trigweight_1, "trigweight_1/F");
    fChain->Branch("trigweight_antiiso_1", &trigweight_antiiso_1, "trigweight_antiiso_1/F");
    fChain->Branch("idisoweight_1", &idisoweight_1, "idisoweight_1/F");
