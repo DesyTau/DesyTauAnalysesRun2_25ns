@@ -264,6 +264,7 @@ void Synch17Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("mcweight", &mcweight, &b_mcweight);
    fChain->SetBranchAddress("puweight", &puweight, &b_puweight);
    fChain->SetBranchAddress("trigweight", &trigweight, &b_trigweight);
+   fChain->SetBranchAddress("embweight", &embweight, &b_embweight);
 
    fChain->SetBranchAddress("topptweight", &topptweight, &b_topptweight);
    fChain->SetBranchAddress("zptweight", &zptweight, &b_zptweight);
