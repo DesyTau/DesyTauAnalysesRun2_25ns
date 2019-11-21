@@ -688,8 +688,8 @@ int main(int argc, char * argv[]){
     
       initializeGenTree(gentree);
     
-       // weights
-      if(ApplyPUweight&&!isEmbedded) fill_weight(&analysisTree, otree, PUofficial, isData);
+       // weights //TO DO: check PU for embedded
+      if(ApplyPUweight) fill_weight(&analysisTree, otree, PUofficial, (isData&&!isEmbedded));
     
       otree->npv = analysisTree.primvertex_count;
       otree->npu = analysisTree.numtruepileupinteractions;// numpileupinteractions;
