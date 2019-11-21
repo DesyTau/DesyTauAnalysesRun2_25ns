@@ -437,11 +437,6 @@ int main(int argc, char * argv[]){
   
   TTree *tree = new TTree("TauCheck", "TauCheck");
   TTree *gtree = new TTree("GenTauCheck", "GenTauCheck");
-
-  //Merijn added a histogram to spot the pdg codes of the decaying hadronic tau
-  TH1F *ConstitsPDG = new TH1F("ConstitsPDG", "ConstitsPDG", 500, -250, 250);
-  int nonpionphotonctr = 0;
-
   Synch17Tree *otree = new Synch17Tree(tree);
   initializeCPvar(otree);
   
@@ -1150,7 +1145,7 @@ int main(int argc, char * argv[]){
       }
     
       ////////////////////////////////////////////////////////////
-      // MET Recoil Corrections
+      // MET and Recoil Corrections
       ////////////////////////////////////////////////////////////
       
       otree->met = TMath::Sqrt(analysisTree.pfmetcorr_ex*analysisTree.pfmetcorr_ex + analysisTree.pfmetcorr_ey*analysisTree.pfmetcorr_ey);
@@ -1294,72 +1289,16 @@ int main(int argc, char * argv[]){
       counter[14]++;
     
       // svfit variables
-      otree->m_sv   = -10;//Merijn updated for the DNN
+      otree->m_sv   = -10;
       otree->pt_sv  = -9999;
       otree->eta_sv = -9999;
       otree->phi_sv = -9999;
       otree->met_sv = -9999;
       otree->mt_sv = -9999;
-    
-      //calculate SV fit only for events passing baseline selection and mt cut
-      // fill otree only for events passing baseline selection 
-      // for synchronisation, take all events
-      bool passedBaselineSel = false;
-    
-  	  // for SM analysis
-      if (ch == "mt") 
-        passedBaselineSel = ( otree->iso_1<0.35 && otree->byLooseIsolationMVArun2017v2DBoldDMwLT2017_2>0.5 && 
-  		      otree->againstElectronVLooseMVA6_2>0.5 && otree->againstMuonTight3_2>0.5  &&
-  		      otree->dilepton_veto == 0 && otree->extraelec_veto == 0 && otree->extramuon_veto == 0);
-      if (ch == "et") 
-        passedBaselineSel = ( otree->iso_1<0.35 && otree->byLooseIsolationMVArun2017v2DBoldDMwLT2017_2>0.5 && 
-                            otree->againstMuonLoose3_2>0.5 && otree->againstElectronTightMVA6_2>0.5 && 
-                            otree->dilepton_veto == 0 && otree->extraelec_veto == 0 && otree->extramuon_veto == 0);
-    
-      if(otree->iso_1<0.35 && 
-    	 otree->againstMuonLoose3_2 > 0.5 && otree->againstElectronTightMVA6_2 > 0.5 && 
-    	 otree->dilepton_veto == 0 && otree->extraelec_veto == 0 && otree->extramuon_veto == 0) counter[15]++;
-      if(otree->iso_1 < 0.35 && otree->byLooseIsolationMVArun2017v2DBoldDMwLT2017_2 > 0.5 && 
-    	 otree->againstElectronTightMVA6_2 > 0.5 && 
-    	 otree->dilepton_veto == 0 && otree->extraelec_veto == 0 && otree->extramuon_veto == 0) counter[16]++;
-      if(otree->iso_1 < 0.35 && otree->byLooseIsolationMVArun2017v2DBoldDMwLT2017_2 > 0.5 && 
-    	 otree->againstMuonLoose3_2 > 0.5 && 
-    	 otree->dilepton_veto == 0 && otree->extraelec_veto == 0 && otree->extramuon_veto == 0) counter[17]++;
-      if(otree->iso_1 < 0.35 && otree->byLooseIsolationMVArun2017v2DBoldDMwLT2017_2 > 0.5 && 
-      	 otree->againstMuonLoose3_2 > 0.5 && otree->againstElectronTightMVA6_2 > 0.5 ) counter[18]++;
-    
-      //if (!Synch && !passedBaselineSel) continue;
-    
       if (ApplySVFit && otree->njetspt20 > 0) svfit_variables(ch, &analysisTree, otree, &cfg, inputFile_visPtResolution);
-    
-    
-      //addition Merijn: here we select the constituent of the tau with highest pT
-      int ncomponents = analysisTree.tau_constituents_count[tauIndex];
-      float maxPt = -1;
-      int sign = -1;
-      int pdgcode = -9999;
-      if(analysisTree.tau_charge[tauIndex] > 0) sign = 1; 
-    
-      for(int i = 0; i < ncomponents; i++){  
-        if((analysisTree.tau_constituents_pdgId[tauIndex][i]*sign) > 0){
-          TLorentzVector lvector; 
-          lvector.SetXYZT(analysisTree.tau_constituents_px[tauIndex][i],
-      				      analysisTree.tau_constituents_py[tauIndex][i],
-      				      analysisTree.tau_constituents_pz[tauIndex][i],
-      				      analysisTree.tau_constituents_e[tauIndex][i]);
-          double Pt = lvector.Pt();
-          if(Pt > maxPt){
-          	pdgcode = analysisTree.tau_constituents_pdgId[tauIndex][i];
-          	maxPt = Pt;
-          }
-        }
-      }
-    
-      otree->pdgcodetau2 = pdgcode; //Merijn tried here to assign to our tree. Not working yet so put in histogam..
-      ConstitsPDG->Fill(pdgcode);
-      if(abs(pdgcode) != 211 && abs(pdgcode) != 22) nonpionphotonctr++;
-    
-        // evaluate systematics for MC 
+        
+            
+      // evaluate systematics for MC 
       if(!isData && ApplySystShift){
       zPtWeightSys->Eval(); 
       topPtWeightSys->Eval();
@@ -1368,8 +1307,7 @@ int main(int argc, char * argv[]){
       if (ch == "mt") tauScaleSys->Eval(utils::MUTAU);
       else if (ch == "et") tauScaleSys->Eval(utils::ETAU);
       }
-      counter[19]++;
-    
+      counter[19]++;  
     
       //CP calculation. Updates Merijn: placed calculation at end, when all kinematic corrections are performed. Removed statement to only do calculation for tt. 
       //Created the acott_Impr function, which takes ch as input as well. See the funcrtion in functionsCP.h to see my updates to the function itself      
@@ -1397,11 +1335,8 @@ int main(int argc, char * argv[]){
   std::cout << "Total number of selected events = " << selEvents << std::endl;
   std::cout << std::endl;
   
-  cout<<"nonpionphotonctr ="<<nonpionphotonctr<<endl;
-
   file->cd("");
   file->Write();
-  ConstitsPDG->Write();
 
   // delete systematics objects
 
