@@ -266,9 +266,6 @@ int main(int argc, char * argv[]){
   const float shift_tes_lepfake_1p1p0  = cfg.get<float>("TauEnergyScaleShift_LepFake_OneProngOnePi0");
   const float shift_tes_lepfake_3prong = cfg.get<float>("TauEnergyScaleShift_LepFake_ThreeProng");
   
-  // for tau Id efficiency
-  const float tau_id_sf = cfg.get<float>("TauIdSF");
-  
   // pair selection
   const float dRleptonsCut = cfg.get<float>("dRleptonsCut");
 
@@ -410,7 +407,7 @@ int main(int argc, char * argv[]){
   TFile *f_workspace = new TFile(workspace_filename, "read");
   if (f_workspace->IsZombie()) {
     std::cout << " workspace file " << workspace_filename << " not found. Please check. " << std::endl;
-     exit(1);
+     exit(-1);
    }
   RooWorkspace *w = (RooWorkspace*)f_workspace->Get("w");
 
@@ -438,10 +435,7 @@ int main(int argc, char * argv[]){
   TTree *tree = new TTree("TauCheck", "TauCheck");
   TTree *gtree = new TTree("GenTauCheck", "GenTauCheck");
   Synch17Tree *otree = new Synch17Tree(tree);
-  initializeCPvar(otree);
-  
-  //Synch17GenTree *gentree = new Synch17GenTree(gtree);
-  
+  initializeCPvar(otree);  
   Synch17GenTree *gentree = new Synch17GenTree(gtree);
   Synch17GenTree *gentreeForGoodRecoEvtsOnly = new Synch17GenTree(tree);
     
@@ -467,7 +461,6 @@ int main(int argc, char * argv[]){
     std::cout << std::endl;
   }
   std::ofstream fileOutput("overlap.out");
-
 
   //svFit
   TH1::AddDirectory(false);  
@@ -1223,15 +1216,16 @@ int main(int argc, char * argv[]){
       	otree->metphi = metLV.Phi();
        }
     
-      if (!isData) {
-      	if(otree->gen_match_2 == 5 && tauLV.E() <= 400 && tauLV.E() >= 20){
-      	  if (otree->tau_decay_mode_2 == 0) tauLV *= (1-0.03);
-      	  else if (otree->tau_decay_mode_2 < 5) tauLV *= (1-0.02);
-      	  else if (otree->tau_decay_mode_2 == 10)tauLV *= (1-0.01);
-      	  otree->pt_2 = tauLV.Pt();
-      	  otree->m_2 = tauLV.M();
-      	}
-      }
+      // if (!isData) {
+      // 	if(otree->gen_match_2 == 5 && tauLV.E() <= 400 && tauLV.E() >= 20){
+      // 	  if (otree->tau_decay_mode_2 == 0) tauLV *= (1-0.03);
+      // 	  else if (otree->tau_decay_mode_2 < 5) tauLV *= (1-0.02);
+      // 	  else if (otree->tau_decay_mode_2 == 10)tauLV *= (1-0.01);
+      // 	  otree->pt_2 = tauLV.Pt();
+      // 	  otree->m_2 = tauLV.M();
+      // 	}
+      // }
+      
       if (otree->gen_match_2 == 5 && !isData)
     	  otree->tauvsjetweightMedium_2 = tauIDSF_medium->getSFvsPT(otree->pt_2);
       

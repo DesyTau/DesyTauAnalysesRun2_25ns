@@ -1,7 +1,6 @@
 #!/bin/bash
 
-### Important:
-### the script is to be run with "bash make_config_Run2.sh <year={16,17,18}> <data_type={data, MC}>"
+### the script is to be run with "./make_config_Run2.sh <year={16,17,18}> <data_type={data, MC}>"
 
 YEAR=$1
 DATA_TYPE=$2
