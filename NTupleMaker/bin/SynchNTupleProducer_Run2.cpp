@@ -84,6 +84,7 @@ void FillETau(const AC1B * analysisTree, Synch17Tree *otree, int leptonIndex, fl
 void FillTau(const AC1B * analysisTree, Synch17Tree *otree, int leptonIndex, int tauIndex);
 void FillVertices(const AC1B * analysisTree,Synch17Tree *otree, const bool isData, int leptonIndex, int tauIndex);
 void FillGenTree(const AC1B * analysisTree, Synch17GenTree *gentree);
+float getEmbeddedWeight(const AC1B * analysisTree, RooWorkspace* WS);
 
 /*Notifications Merijn
 -to my experience currently macro only works for mu-tau (unless udpated in the meantime)
@@ -205,6 +206,7 @@ int main(int argc, char * argv[]){
     reader_C.load(calib, BTagEntry::FLAV_C, "comb");
     reader_Light.load(calib, BTagEntry::FLAV_UDSG, "incl");
   }
+  std::cout << "What the hell" << std::endl;
     
   TString pathToTaggingEfficiencies = (TString) cmsswBase + "/src/" + cfg.get<string>("BtagMCeffFile");
   if (ApplyBTagScaling && gSystem->AccessPathName(pathToTaggingEfficiencies)){
@@ -236,9 +238,12 @@ int main(int argc, char * argv[]){
 
   bool applyTauSpinnerWeights = false;
   if(isTauSpinner) applyTauSpinnerWeights = true;
+  const bool isEmbedded = infiles.find("Embedded") != string::npos;
 
   const bool ApplyRecoilCorrections = cfg.get<bool>("ApplyRecoilCorrections") && !isData && (isDY || isWJets || isVBForGGHiggs || isMSSMsignal);
   RecoilCorrector recoilPFMetCorrector(cfg.get<string>("RecoilFilePath"));
+
+  std::cout << "Hey ya 1 " << std::endl;
 
   // Read in HLT filter
   vector<string> filterSingleLep;
@@ -320,7 +325,10 @@ int main(int argc, char * argv[]){
   // check overlap
   const bool checkOverlap = cfg.get<bool>("CheckOverlap");
   const bool debug = cfg.get<bool>("debug");
-  
+
+  // correction workspace
+  const string CorrectionWorkspaceFileName = cfg.get<string>("CorrectionWorkspaceFileName");
+
   // **** end of configuration analysis
 
   //file list creation
@@ -407,7 +415,8 @@ int main(int argc, char * argv[]){
 
   // Workspace containing tracking efficiency weights 
   //TString workspace_filename = TString(cmsswBase)+"/src/HTT-utilities/CorrectionsWorkspace/htt_scalefactors_v16_3.root";
-  TString workspace_filename = TString(cmsswBase) + "/src/DesyTauAnalyses/NTupleMaker/data/htt_scalefactors_v17_1.root";
+  TString workspace_filename = TString(cmsswBase) + "/src/DesyTauAnalyses/NTupleMaker/data/"+CorrectionWorkspaceFileName;
+  cout << workspace_filename << endl;
   TFile *f_workspace = new TFile(workspace_filename, "read");
   if (f_workspace->IsZombie()) {
     std::cout << " workspace file " << workspace_filename << " not found. Please check. " << std::endl;
@@ -679,11 +688,16 @@ int main(int argc, char * argv[]){
       initializeGenTree(gentree);
     
        // weights
-      if(ApplyPUweight) fill_weight(&analysisTree, otree, PUofficial, isData);
+      if(ApplyPUweight&&!isEmbedded) fill_weight(&analysisTree, otree, PUofficial, isData);
     
       otree->npv = analysisTree.primvertex_count;
       otree->npu = analysisTree.numtruepileupinteractions;// numpileupinteractions;
       otree->rho = analysisTree.rho;
+
+      // embedded weight
+      otree->embweight = 1;
+      if (isEmbedded)
+	otree->embweight = getEmbeddedWeight(&analysisTree, w);
     
       // tau selection
       vector<int> taus; taus.clear();
@@ -931,7 +945,7 @@ int main(int argc, char * argv[]){
         leptonLV.SetXYZM(analysisTree.muon_px[leptonIndex], analysisTree.muon_py[leptonIndex], analysisTree.muon_pz[leptonIndex], muonMass);
     
       	// tracking efficiency weight	
-        if (!isData && ApplyLepSF) {
+        if ((!isData||isEmbedded) && ApplyLepSF) {
            w->var("m_eta")->setVal(analysisTree.muon_eta[leptonIndex]); 
            otree->trkeffweight = (double)(w->function("m_trk_ratio")->getVal());
         }
@@ -941,13 +955,14 @@ int main(int argc, char * argv[]){
         leptonLV.SetXYZM(analysisTree.electron_px[leptonIndex], analysisTree.electron_py[leptonIndex], analysisTree.electron_pz[leptonIndex], electronMass);
     
         // tracking efficiency weight
-        if (!isData && ApplyLepSF) {
+        if ((!isData||isEmbedded) && ApplyLepSF) {
       	  w->var("e_eta")->setVal(analysisTree.electron_eta[leptonIndex]); 
       	  w->var("e_pt")->setVal(analysisTree.electron_pt[leptonIndex]); 	
       	  otree->trkeffweight = (double)( w->function("e_reco_ratio")->getVal());
          }
       }
     
+      /*
       if (!isData && ApplyLepSF) {
  	  if(analysisTree.tau_decayMode[tauIndex]==2||analysisTree.tau_decayMode[tauIndex]==11){
 	      eff_data_trig_lt_tau = 1;
@@ -972,12 +987,88 @@ int main(int argc, char * argv[]){
     	  if (eff_data_trig > 1e-4 && eff_mc_trig > 1e-4)
     	    otree->trigweight = eff_data_trig / eff_mc_trig;
       }
+      */ 
+      // moving to IC scale factors
+     
+      if (((isEmbedded||!isData)&&ApplyLepSF)) {
+	TString suffix = "mc";
+	TString suffixRatio = "ratio";
+	if (isEmbedded) {suffix = "embed"; suffixRatio = "embed_ratio";}
+	  w->var("t_pt")->setVal(analysisTree.tau_pt[tauIndex]);
+	  w->var("t_eta")->setVal(analysisTree.tau_eta[tauIndex]);
+	  w->var("t_phi")->setVal(analysisTree.tau_phi[tauIndex]);
+	  w->var("t_dm")->setVal(analysisTree.tau_decayMode[tauIndex]);
+	  if (ch=="mt") {
+	    w->var("m_pt")->setVal(leptonLV.Pt());
+	    w->var("m_eta")->setVal(leptonLV.Eta());
+	    eff_data_trig_lt_tau = w->function("t_trg_mediumDeepTau_mutau_data")->getVal();
+	    eff_mc_trig_lt_tau = w->function("t_trg_mediumDeepTau_mutau_"+suffix)->getVal();
+	    eff_data_trig_L = w->function("m_trg_ic_data")->getVal();
+	    eff_mc_trig_L = w->function("m_trg_ic_"+suffix)->getVal();
+	    if (era==2016) {
+	      eff_data_trig_lt_l = w->function("m_trg_19_ic_data")->getVal();
+	      eff_mc_trig_lt_l = w->function("m_trg_19_ic_"+suffix)->getVal();
+	    }
+	    else {
+	      eff_data_trig_lt_l = w->function("m_trg_20_ic_data")->getVal();
+              eff_mc_trig_lt_l = w->function("m_trg_20_ic_"+suffix)->getVal();
+	    }
+	    otree->idisoweight_1 = w->function("m_idiso_ic_"+suffixRatio)->getVal();
+	    otree->idisoweight_antiiso_1 = w->function("m_idiso_ic_"+suffixRatio)->getVal();
+	  }
+	  else if (ch=="et") {
+	    w->var("e_pt")->setVal(leptonLV.Pt());
+	    w->var("e_eta")->setVal(leptonLV.Eta());
+	    eff_data_trig_L = w->function("e_trg_ic_data")->getVal();
+	    eff_mc_trig_L = w->function("e_trg_ic_"+suffix)->getVal();
+	    if (era>2016) {
+	      eff_data_trig_lt_tau = w->function("t_trg_mediumDeepTau_etau_data")->getVal();
+	      eff_mc_trig_lt_tau = w->function("t_trg_mediumDeepTau_etau_"+suffix)->getVal();
+	      eff_data_trig_lt_l = w->function("e_trg_24_ic_data")->getVal();
+	      eff_mc_trig_lt_l = w->function("e_trg_24_ic_"+suffix)->getVal();
+	    }
+	    else {
+	      eff_data_trig_lt_tau = 0;
+	      eff_mc_trig_lt_tau = 0;
+	      eff_data_trig_lt_l = 0;
+	      eff_mc_trig_lt_l = 0;
+	    }
+	    otree->idisoweight_1 = w->function("e_idiso_ic_"+suffixRatio)->getVal();
+	    otree->idisoweight_antiiso_1 = w->function("e_idiso_ic_"+suffixRatio)->getVal();
+	  }
+                                                                                                                                                               
+    	  double eff_data_trig = eff_data_trig_L + (eff_data_trig_lt_l - eff_data_trig_L) * eff_data_trig_lt_tau;
+    	  double eff_mc_trig = eff_mc_trig_L + (eff_mc_trig_lt_l - eff_mc_trig_L) * eff_mc_trig_lt_tau;
+	  if (era==2016 && ch=="et") {
+	    eff_data_trig = eff_data_trig_L;
+	    eff_mc_trig = eff_mc_trig_L;
+	  }
+    	  if (eff_data_trig > 1e-4 && eff_mc_trig > 1e-4)
+    	    otree->trigweight = eff_data_trig / eff_mc_trig;
+      }
       counter[10]++;
     
       FillTau(&analysisTree, otree, leptonIndex, tauIndex);
     
-      if (!isData && analysisTree.tau_genmatch[tauIndex] == 5) otree->idisoweight_2 = tau_id_sf; 
+      if ((!isData || isEmbedded) && analysisTree.tau_genmatch[tauIndex] == 5) { 
+	w->var("t_pt")->setVal(analysisTree.tau_pt[tauIndex]);
+	if (!isEmbedded) {
+	  otree->idisoweight_2 = w->function("t_deeptauid_pt_medium")->getVal();	
+	}
+	else {
+	  //	  otree->idisoweight_2 = w->function("t_deeptauid_pt_medium")->getVal();	
+	  double t_dm = analysisTree.tau_decayMode[tauIndex];
+	  otree->idisoweight_2 = 0.99*((t_dm==0)*0.975 + (t_dm==1)*0.975*1.051 + (t_dm==2)*0.975*1.051 + (t_dm==10)*pow(0.975,3) + (t_dm==11)*pow(0.975,3)*1.051);
+	}
+      } // otree->idisoweight_2 = tau_id_sf; /// ???
     
+      cout << "======================" << endl;
+      cout << "Trigger weight = " << otree->trigweight << endl;
+      cout << "Trk eff weight = " << otree->trkeffweight << endl;
+      cout << "id/Iso 1       = " << otree->idisoweight_1 << endl;
+      cout << "id/Iso 2       = " << otree->idisoweight_2 << endl;
+      cout << "======================" << endl;
+
       otree->effweight = otree->idisoweight_1 * otree->trkeffweight * otree->idisoweight_2 * otree->trigweight;
       otree->weight = otree->effweight * otree->puweight * otree->mcweight; 
     
@@ -1377,6 +1468,45 @@ void FillVertices(const AC1B *analysisTree, Synch17Tree *otree, const bool isDat
     otree->GenVertexZ = -9999;
   }
 }
+
+float getEmbeddedWeight(const AC1B *analysisTree, RooWorkspace * wEm) {
+
+  std::vector<TLorentzVector> taus; taus.clear();
+  float emWeight = 1;
+  for (unsigned int igentau = 0; igentau < analysisTree->gentau_count; ++igentau) {
+    TLorentzVector tauLV; tauLV.SetXYZT(analysisTree->gentau_px[igentau], 
+					analysisTree->gentau_py[igentau],
+					analysisTree->gentau_pz[igentau],
+					analysisTree->gentau_e[igentau]);
+    if (analysisTree->gentau_isPrompt[igentau]&&analysisTree->gentau_isFirstCopy[igentau]) {
+      taus.push_back(tauLV);
+    }
+  }
+
+  if (taus.size()==2) {
+    double gt1_pt  = taus[0].Pt();
+    double gt1_eta = taus[0].Eta();
+    double gt2_pt  = taus[1].Pt();
+    double gt2_eta = taus[1].Eta();
+    wEm->var("gt_pt")->setVal(gt1_pt);
+    wEm->var("gt_eta")->setVal(gt1_eta);
+    double id1_embed = wEm->function("m_sel_id_ic_ratio")->getVal();
+    wEm->var("gt_pt")->setVal(gt2_pt);
+    wEm->var("gt_eta")->setVal(gt2_eta);
+    double id2_embed = wEm->function("m_sel_idEmb_ratio")->getVal();
+    wEm->var("gt1_pt")->setVal(gt1_pt);
+    wEm->var("gt2_pt")->setVal(gt2_pt);
+    wEm->var("gt1_eta")->setVal(gt1_eta);
+    wEm->var("gt2_eta")->setVal(gt2_eta);
+    double trg_emb = wEm->function("m_sel_trg_ratio")->getVal();
+    emWeight = id1_embed * id2_embed * trg_emb;
+  }
+
+  //  cout << "Embedding : " << emWeight << std::endl;
+  return emWeight;
+
+}
+
 
 void initializeGenTree(Synch17GenTree *gentree){
   gentree->Higgs_pt=-9999;

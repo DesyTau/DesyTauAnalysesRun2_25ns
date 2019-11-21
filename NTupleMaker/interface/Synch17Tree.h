@@ -246,7 +246,8 @@ public :
   Float_t         puweight;
   Float_t         effweight;
   Float_t         trigweight;
-  
+  Float_t         embweight;
+
   Float_t         topptweight;
   Double_t 	      zptweight;
   Double_t        trkeffweight;
@@ -654,7 +655,8 @@ public :
   TBranch	 *b_puweight;
   TBranch	 *b_effweight;
   TBranch        *b_trigweight;
-  
+  TBranch        *b_embweight;
+
   TBranch	 *b_topptweight;
   TBranch	 *b_zptweight;
   TBranch	 *b_trkeffweight;
