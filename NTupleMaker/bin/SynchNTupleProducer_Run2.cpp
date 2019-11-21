@@ -311,7 +311,6 @@ int main(int argc, char * argv[]){
 
   // check overlap
   const bool checkOverlap = cfg.get<bool>("CheckOverlap");
-  const bool debug = cfg.get<bool>("debug");
 
   // correction workspace
   const string CorrectionWorkspaceFileName = cfg.get<string>("CorrectionWorkspaceFileName");
@@ -400,10 +399,9 @@ int main(int argc, char * argv[]){
   }
   // For tau leg of cross-trigger a different implementation is used
 
-  // Workspace containing tracking efficiency weights 
-  //TString workspace_filename = TString(cmsswBase)+"/src/HTT-utilities/CorrectionsWorkspace/htt_scalefactors_v16_3.root";
-  TString workspace_filename = TString(cmsswBase) + "/src/DesyTauAnalyses/NTupleMaker/data/"+CorrectionWorkspaceFileName;
-  cout << workspace_filename << endl;
+  // Workspace containing corrections
+  TString workspace_filename = TString(cmsswBase) + "/src/DesyTauAnalyses/NTupleMaker/data/" + CorrectionWorkspaceFileName;
+  cout << "Taking correction workspace from " << workspace_filename << endl;
   TFile *f_workspace = new TFile(workspace_filename, "read");
   if (f_workspace->IsZombie()) {
     std::cout << " workspace file " << workspace_filename << " not found. Please check. " << std::endl;
@@ -551,54 +549,55 @@ int main(int argc, char * argv[]){
     
 
     TTree * _inittree = NULL;
-      _inittree = (TTree*)file_->Get(TString(initNtupleName));
-      if (_inittree!=NULL) {
-          Float_t genweight;
-          if (!isData)
-              _inittree->SetBranchAddress("genweight",&genweight);
-          Long64_t numberOfEntriesInitTree = _inittree->GetEntries();
-          std::cout << "      number of entries in Init Tree = " << numberOfEntriesInitTree << std::endl;
-          for (Long64_t iEntry=0; iEntry<numberOfEntriesInitTree; iEntry++) {
-              _inittree->GetEntry(iEntry);
-              if (isData)
-                  nWeightedEventsH->Fill(0.,1.);
-              else
-                  nWeightedEventsH->Fill(0.,genweight);
-          }
-      }
-      
-      vector<string> filterSingleLep = cfg.get<vector<string>>("filterSingleLep");
-      if (era != 2018) {
-      vector<string> filterXtriggerLepLeg = cfg.get<vector<string>>("filterXtriggerLepLeg");
-      vector<string> filterXtriggerTauLeg = cfg.get<vector<string>>("filterXtriggerTauLeg");
-      }
-      else 
+    _inittree = (TTree*)file_->Get(TString(initNtupleName));
+    if (_inittree!=NULL) {
+        Float_t genweight;
+        if (!isData)
+            _inittree->SetBranchAddress("genweight",&genweight);
+        Long64_t numberOfEntriesInitTree = _inittree->GetEntries();
+        std::cout << "      number of entries in Init Tree = " << numberOfEntriesInitTree << std::endl;
+        for (Long64_t iEntry=0; iEntry<numberOfEntriesInitTree; iEntry++) {
+            _inittree->GetEntry(iEntry);
+            if (isData)
+                nWeightedEventsH->Fill(0.,1.);
+            else
+                nWeightedEventsH->Fill(0.,genweight);
+        }
+    }
+    delete _inittree;
+
+    vector<string> filterSingleLep = cfg.get<vector<string>>("filterSingleLep");
+    if (era != 2018) {
+    vector<string> filterXtriggerLepLeg = cfg.get<vector<string>>("filterXtriggerLepLeg");
+    vector<string> filterXtriggerTauLeg = cfg.get<vector<string>>("filterXtriggerTauLeg");
+    }
+    else 
+    {
+      if(isData)
       {
-        if(isData)
+        if (analysisTree.event_run < 315974) { // muon filter of the mutau triggers changed
+          filterXtriggerLepLeg = cfg.get<vector<string>>("filterXtriggerLepLeg_before_run315974");
+          filterXtriggerTauLeg = cfg.get<vector<string>>("filterXtriggerTauLeg_before_run315974");
+        }
+        else if (analysisTree.event_run < 317509) // HPS algorithm was introduced
         {
-          if (analysisTree.event_run < 315974) { // muon filter of the mutau triggers changed
-            filterXtriggerLepLeg = cfg.get<vector<string>>("filterXtriggerLepLeg_before_run315974");
-            filterXtriggerTauLeg = cfg.get<vector<string>>("filterXtriggerTauLeg_before_run315974");
-          }
-          else if (analysisTree.event_run < 317509) // HPS algorithm was introduced
-          {
-            filterXtriggerLepLeg = cfg.get<vector<string>>("filterXtriggerLepLeg_run315974_to_HPS");
-            filterXtriggerTauLeg = cfg.get<vector<string>>("filterXtriggerTauLeg_run315974_to_HPS");    
-          }
-          else{
-            filterXtriggerLepLeg = cfg.get<vector<string>>("filterXtriggerLepLeg_after_HPS");
-            filterXtriggerTauLeg = cfg.get<vector<string>>("filterXtriggerTauLeg_after_HPS");    
-          }
+          filterXtriggerLepLeg = cfg.get<vector<string>>("filterXtriggerLepLeg_run315974_to_HPS");
+          filterXtriggerTauLeg = cfg.get<vector<string>>("filterXtriggerTauLeg_run315974_to_HPS");    
         }
         else{
           filterXtriggerLepLeg = cfg.get<vector<string>>("filterXtriggerLepLeg_after_HPS");
-          filterXtriggerTauLeg = cfg.get<vector<string>>("filterXtriggerTauLeg_after_HPS");          
+          filterXtriggerTauLeg = cfg.get<vector<string>>("filterXtriggerTauLeg_after_HPS");    
         }
+      }
+      else{
+        filterXtriggerLepLeg = cfg.get<vector<string>>("filterXtriggerLepLeg_after_HPS");
+        filterXtriggerTauLeg = cfg.get<vector<string>>("filterXtriggerTauLeg_after_HPS");          
+      }
     }
-        
-      cout<<"Number of single lepton trigger legs = "<<filterSingleLep.size()<<endl;
-      cout<<"Number of X trigger legs (lep leg)   = "<<filterXtriggerLepLeg.size()<<endl;
-      cout<<"Number of X trigger legs (tau leg)   = "<<filterXtriggerTauLeg.size()<<endl;
+      
+    cout<<"Number of single lepton trigger legs = "<<filterSingleLep.size()<<endl;
+    cout<<"Number of X trigger legs (lep leg)   = "<<filterXtriggerLepLeg.size()<<endl;
+    cout<<"Number of X trigger legs (tau leg)   = "<<filterXtriggerTauLeg.size()<<endl;
 
     ///////////////EVENT LOOP///////////////
     Long64_t numberOfEntries = analysisTree.GetEntries();
@@ -969,6 +968,8 @@ int main(int argc, char * argv[]){
       	  otree->trkeffweight = (double)( w->function("e_reco_ratio")->getVal());
          }
       }
+      
+      FillTau(&analysisTree, otree, leptonIndex, tauIndex);
     
       /*
       if (!isData && ApplyLepSF) {
@@ -998,77 +999,76 @@ int main(int argc, char * argv[]){
       */ 
       // moving to IC scale factors
      
-      if (((isEmbedded||!isData)&&ApplyLepSF)) {
-	TString suffix = "mc";
-	TString suffixRatio = "ratio";
-	if (isEmbedded) {suffix = "embed"; suffixRatio = "embed_ratio";}
-	  w->var("t_pt")->setVal(analysisTree.tau_pt[tauIndex]);
-	  w->var("t_eta")->setVal(analysisTree.tau_eta[tauIndex]);
-	  w->var("t_phi")->setVal(analysisTree.tau_phi[tauIndex]);
-	  w->var("t_dm")->setVal(analysisTree.tau_decayMode[tauIndex]);
-	  if (ch=="mt") {
-	    w->var("m_pt")->setVal(leptonLV.Pt());
-	    w->var("m_eta")->setVal(leptonLV.Eta());
-	    eff_data_trig_lt_tau = w->function("t_trg_mediumDeepTau_mutau_data")->getVal();
-	    eff_mc_trig_lt_tau = w->function("t_trg_mediumDeepTau_mutau_"+suffix)->getVal();
-	    eff_data_trig_L = w->function("m_trg_ic_data")->getVal();
-	    eff_mc_trig_L = w->function("m_trg_ic_"+suffix)->getVal();
-	    if (era==2016) {
-	      eff_data_trig_lt_l = w->function("m_trg_19_ic_data")->getVal();
-	      eff_mc_trig_lt_l = w->function("m_trg_19_ic_"+suffix)->getVal();
-	    }
-	    else {
-	      eff_data_trig_lt_l = w->function("m_trg_20_ic_data")->getVal();
-              eff_mc_trig_lt_l = w->function("m_trg_20_ic_"+suffix)->getVal();
-	    }
-	    otree->idisoweight_1 = w->function("m_idiso_ic_"+suffixRatio)->getVal();
-	    otree->idisoweight_antiiso_1 = w->function("m_idiso_ic_"+suffixRatio)->getVal();
-	  }
-	  else if (ch=="et") {
-	    w->var("e_pt")->setVal(leptonLV.Pt());
-	    w->var("e_eta")->setVal(leptonLV.Eta());
-	    eff_data_trig_L = w->function("e_trg_ic_data")->getVal();
-	    eff_mc_trig_L = w->function("e_trg_ic_"+suffix)->getVal();
-	    if (era>2016) {
-	      eff_data_trig_lt_tau = w->function("t_trg_mediumDeepTau_etau_data")->getVal();
-	      eff_mc_trig_lt_tau = w->function("t_trg_mediumDeepTau_etau_"+suffix)->getVal();
-	      eff_data_trig_lt_l = w->function("e_trg_24_ic_data")->getVal();
-	      eff_mc_trig_lt_l = w->function("e_trg_24_ic_"+suffix)->getVal();
-	    }
-	    else {
-	      eff_data_trig_lt_tau = 0;
-	      eff_mc_trig_lt_tau = 0;
-	      eff_data_trig_lt_l = 0;
-	      eff_mc_trig_lt_l = 0;
-	    }
-	    otree->idisoweight_1 = w->function("e_idiso_ic_"+suffixRatio)->getVal();
-	    otree->idisoweight_antiiso_1 = w->function("e_idiso_ic_"+suffixRatio)->getVal();
-	  }
-                                                                                                                                                               
+      if ((isEmbedded || !isData) && ApplyLepSF) {
+      	TString suffix = "mc";
+      	TString suffixRatio = "ratio";
+      	if (isEmbedded) {suffix = "embed"; suffixRatio = "embed_ratio";}
+        
+    	  w->var("t_pt")->setVal(analysisTree.tau_pt[tauIndex]);
+    	  w->var("t_eta")->setVal(analysisTree.tau_eta[tauIndex]);
+    	  w->var("t_phi")->setVal(analysisTree.tau_phi[tauIndex]);
+    	  w->var("t_dm")->setVal(analysisTree.tau_decayMode[tauIndex]);
+        
+    	  if (ch=="mt") {
+    	    w->var("m_pt")->setVal(leptonLV.Pt());
+    	    w->var("m_eta")->setVal(leptonLV.Eta());
+    	    eff_data_trig_lt_tau = w->function("t_trg_mediumDeepTau_mutau_data")->getVal();
+    	    eff_mc_trig_lt_tau = w->function("t_trg_mediumDeepTau_mutau_" + suffix)->getVal();
+    	    eff_data_trig_L = w->function("m_trg_ic_data")->getVal();
+    	    eff_mc_trig_L = w->function("m_trg_ic_" + suffix)->getVal();
+    	    if (era == 2016) {
+    	      eff_data_trig_lt_l = w->function("m_trg_19_ic_data")->getVal();
+    	      eff_mc_trig_lt_l = w->function("m_trg_19_ic_" + suffix)->getVal();
+    	    }
+    	    else {
+    	      eff_data_trig_lt_l = w->function("m_trg_20_ic_data")->getVal();
+            eff_mc_trig_lt_l = w->function("m_trg_20_ic_" + suffix)->getVal();
+    	    }
+    	    otree->idisoweight_1 = w->function("m_idiso_ic_" + suffixRatio)->getVal();
+    	    otree->idisoweight_antiiso_1 = w->function("m_idiso_ic_" + suffixRatio)->getVal();
+    	  }
+    	  else if (ch == "et") {
+    	    w->var("e_pt")->setVal(leptonLV.Pt());
+    	    w->var("e_eta")->setVal(leptonLV.Eta());
+    	    eff_data_trig_L = w->function("e_trg_ic_data")->getVal();
+    	    eff_mc_trig_L = w->function("e_trg_ic_" + suffix)->getVal();
+    	    if (era > 2016) {
+    	      eff_data_trig_lt_tau = w->function("t_trg_mediumDeepTau_etau_data")->getVal();
+    	      eff_mc_trig_lt_tau = w->function("t_trg_mediumDeepTau_etau_" + suffix)->getVal();
+    	      eff_data_trig_lt_l = w->function("e_trg_24_ic_data")->getVal();
+    	      eff_mc_trig_lt_l = w->function("e_trg_24_ic_" + suffix)->getVal();
+    	    }
+    	    else {
+    	      eff_data_trig_lt_tau = 0;
+    	      eff_mc_trig_lt_tau = 0;
+    	      eff_data_trig_lt_l = 0;
+    	      eff_mc_trig_lt_l = 0;
+    	    }
+    	    otree->idisoweight_1 = w->function("e_idiso_ic_" + suffixRatio)->getVal();
+    	    otree->idisoweight_antiiso_1 = w->function("e_idiso_ic_" + suffixRatio)->getVal();
+    	  }
+                                                                                                                                                                     
     	  double eff_data_trig = eff_data_trig_L + (eff_data_trig_lt_l - eff_data_trig_L) * eff_data_trig_lt_tau;
     	  double eff_mc_trig = eff_mc_trig_L + (eff_mc_trig_lt_l - eff_mc_trig_L) * eff_mc_trig_lt_tau;
-	  if (era==2016 && ch=="et") {
-	    eff_data_trig = eff_data_trig_L;
-	    eff_mc_trig = eff_mc_trig_L;
-	  }
+    	  if (era == 2016 && ch == "et") {
+    	    eff_data_trig = eff_data_trig_L;
+    	    eff_mc_trig = eff_mc_trig_L;
+    	  }
     	  if (eff_data_trig > 1e-4 && eff_mc_trig > 1e-4)
     	    otree->trigweight = eff_data_trig / eff_mc_trig;
       }
       counter[10]++;
     
-      FillTau(&analysisTree, otree, leptonIndex, tauIndex);
     
       if ((!isData || isEmbedded) && analysisTree.tau_genmatch[tauIndex] == 5) { 
-	w->var("t_pt")->setVal(analysisTree.tau_pt[tauIndex]);
-	if (!isEmbedded) {
-	  otree->idisoweight_2 = w->function("t_deeptauid_pt_medium")->getVal();	
-	}
-	else {
-	  //	  otree->idisoweight_2 = w->function("t_deeptauid_pt_medium")->getVal();	
-	  double t_dm = analysisTree.tau_decayMode[tauIndex];
-	  otree->idisoweight_2 = 0.99*((t_dm==0)*0.975 + (t_dm==1)*0.975*1.051 + (t_dm==2)*0.975*1.051 + (t_dm==10)*pow(0.975,3) + (t_dm==11)*pow(0.975,3)*1.051);
-	}
-      } // otree->idisoweight_2 = tau_id_sf; /// ???
+      	w->var("t_pt")->setVal(analysisTree.tau_pt[tauIndex]);
+      	if (!isEmbedded)
+      	  otree->idisoweight_2 = w->function("t_deeptauid_pt_medium")->getVal();	
+      	else {
+      	  double t_dm = analysisTree.tau_decayMode[tauIndex];
+      	  otree->idisoweight_2 = 0.99*((t_dm==0)*0.975 + (t_dm==1)*0.975*1.051 + (t_dm==2)*0.975*1.051 + (t_dm==10)*pow(0.975,3) + (t_dm==11)*pow(0.975,3)*1.051);
+      	}
+      }
     
       cout << "======================" << endl;
       cout << "Trigger weight = " << otree->trigweight << endl;
@@ -1228,7 +1228,8 @@ int main(int argc, char * argv[]){
       
       if (otree->gen_match_2 == 5 && !isData)
     	  otree->tauvsjetweightMedium_2 = tauIDSF_medium->getSFvsPT(otree->pt_2);
-      
+      else 
+        otree->tauvsjetweightMedium_2 = 1.;
       
       TLorentzVector dileptonLV = leptonLV + tauLV;
       otree->m_vis = dileptonLV.M();
