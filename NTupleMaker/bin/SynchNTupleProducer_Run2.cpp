@@ -174,13 +174,13 @@ int main(int argc, char * argv[]){
   if (ch == "mt") channel = "mutau"; 
   if (ch == "et") channel = "etau";
 
-  TauTriggerSFs2017 *tauTriggerSF = new TauTriggerSFs2017(cmsswBase + "/src/TauAnalysisTools/TauTriggerSFs/data/tauTriggerEfficiencies"+to_string(era)+".root",channel,to_string(era), "tight","MVAv2");
+  TauTriggerSFs2017 *tauTriggerSF = new TauTriggerSFs2017(cmsswBase + "/src/TauAnalysisTools/TauTriggerSFs/data/tauTriggerEfficiencies" + to_string(era) + ".root", channel, to_string(era), "tight", "MVAv2");
   std::string year;
-  if(era==2016)year = "2016Legacy";
-  else if(era==2017)year = "2017ReReco";
-  else year = "2018ReReco";	
-  TauIDSFTool * tauIDSF_medium = new TauIDSFTool(year,"DeepTau2017v2p1VSjet","Medium",false);
-
+  if (era == 2016) year = "2016Legacy";
+  else if (era == 2017) year = "2017ReReco";
+  else if (era == 2018) year = "2018ReReco";	
+  else {std::cout << "year is not 2016, 2017, 2018 - exiting" << '\n'; exit(-1);}
+  TauIDSFTool *tauIDSF_medium = new TauIDSFTool(year, "DeepTau2017v2p1VSjet", "Medium", false);
 
   //svfit
   const string svFitPtResFile = TString(TString(cmsswBase) + "/src/" + TString(cfg.get<string>("svFitPtResFile"))).Data();
@@ -623,31 +623,30 @@ int main(int argc, char * argv[]){
       if(applyTauSpinnerWeights){
         _treeTauSpinnerWeights->GetEntry(iEntry);
 	
-	otree->TauSpinnerWeightsEven = TSweight[0];
-	gentree->TauSpinnerWeightsEven = TSweight[0];
-	gentreeForGoodRecoEvtsOnly->TauSpinnerWeightsEven = TSweight[0];
+      	otree->TauSpinnerWeightsEven = TSweight[0];
+      	gentree->TauSpinnerWeightsEven = TSweight[0];
+      	gentreeForGoodRecoEvtsOnly->TauSpinnerWeightsEven = TSweight[0];
 
-	otree->TauSpinnerWeightsMaxMix = TSweight[1];
-	gentree->TauSpinnerWeightsMaxMix = TSweight[1];
-	gentreeForGoodRecoEvtsOnly->TauSpinnerWeightsMaxMix = TSweight[1];
+      	otree->TauSpinnerWeightsMaxMix = TSweight[1];
+      	gentree->TauSpinnerWeightsMaxMix = TSweight[1];
+      	gentreeForGoodRecoEvtsOnly->TauSpinnerWeightsMaxMix = TSweight[1];
 
-	otree->TauSpinnerWeightsOdd = TSweight[2];
-	gentree->TauSpinnerWeightsOdd = TSweight[2];
-	gentreeForGoodRecoEvtsOnly->TauSpinnerWeightsOdd = TSweight[2];
+      	otree->TauSpinnerWeightsOdd = TSweight[2];
+      	gentree->TauSpinnerWeightsOdd = TSweight[2];
+      	gentreeForGoodRecoEvtsOnly->TauSpinnerWeightsOdd = TSweight[2];
 
-	otree->TauSpinnerWeightsMinusMaxMix = TSweight[3];
-	gentree->TauSpinnerWeightsMinusMaxMix = TSweight[3];
-	gentreeForGoodRecoEvtsOnly->TauSpinnerWeightsMinusMaxMix = TSweight[3];
+      	otree->TauSpinnerWeightsMinusMaxMix = TSweight[3];
+      	gentree->TauSpinnerWeightsMinusMaxMix = TSweight[3];
+      	gentreeForGoodRecoEvtsOnly->TauSpinnerWeightsMinusMaxMix = TSweight[3];
 
-	otree->TauSpinnerWeightsMix0p375 = TSweight[4];
-	gentree->TauSpinnerWeightsMix0p375 = TSweight[4];
-	gentreeForGoodRecoEvtsOnly->TauSpinnerWeightsMix0p375 = TSweight[4];
-	}
+      	otree->TauSpinnerWeightsMix0p375 = TSweight[4];
+      	gentree->TauSpinnerWeightsMix0p375 = TSweight[4];
+      	gentreeForGoodRecoEvtsOnly->TauSpinnerWeightsMix0p375 = TSweight[4];
+      	}
       else{
-	for(int tsindex=0;tsindex<expectedtauspinnerweights;tsindex++) TSweight[tsindex]=0;
+      	for(int tsindex = 0; tsindex < expectedtauspinnerweights; tsindex++) 
+          TSweight[tsindex] = 0;
       }
-
-
 
       //Skip events not passing the MET filters, if applied
       bool passed_all_met_filters = passedAllMetFilters(&analysisTree, met_filters_list);
@@ -1233,9 +1232,10 @@ int main(int argc, char * argv[]){
       	  otree->m_2 = tauLV.M();
       	}
       }
-      if(otree->gen_match_2==5&&!isData){
-  	  otree->tauvsjetweightMedium_2 = tauIDSF_medium->getSFvsPT(otree->pt_2);
-      }
+      if (otree->gen_match_2 == 5 && !isData)
+    	  otree->tauvsjetweightMedium_2 = tauIDSF_medium->getSFvsPT(otree->pt_2);
+      
+      
       TLorentzVector dileptonLV = leptonLV + tauLV;
       otree->m_vis = dileptonLV.M();
       otree->pt_tt = (dileptonLV+metLV).Pt();   
