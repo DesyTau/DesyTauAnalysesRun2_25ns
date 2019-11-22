@@ -4,6 +4,7 @@
 
 YEAR=$1
 DATA_TYPE=$2
+OUTDIR=./20$YEAR
 
 if [[ $YEAR -ne 16 && $YEAR -ne 17 && $YEAR -ne 18 ]]; then
   echo
@@ -57,10 +58,10 @@ for (( i = 0; i < $KEY_LEN; i++ )); do
 done | sed -r -f- $TEMPLATE_CFG_NAME.conf > ${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf
 
 # remove all the lines which starts with "NOT_DATA_TYPE: " 
-sed -i "/${NOT_DATA_TYPE}: /d" ./${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf
+sed -i "/${NOT_DATA_TYPE}: /d" ${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf
 
 # remove just the strings "DATA_TYPE: " leaving the rest of the line intact 
-sed -i "s/${DATA_TYPE}: //" ./${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf
+sed -i "s/${DATA_TYPE}: //" ${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf
 
 # lists with the MC samples' names
 MC_SAMPLES_LIST=(DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8 DY1JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8 DY2JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8)
@@ -81,10 +82,12 @@ if [[ $DATA_TYPE == "MC" ]]; then
   if [[ $YEAR -eq 17 ]]; then # for 17 the path in the root file to PU histograms is sample-dependent, pick it from the list
     for (( i = 0; i < $MC_SAMPLES_LEN; i++ )); do
         PU_STR=${MC_SAMPLES_LIST[i]}_pileup
-        sed "s/pileUpforMC =/pileUpforMC = ${PU_STR}/" ${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf > analysisMacroSynch_lept_mt_${MC_SAMPLES_LIST[i]}.conf
+        sed "s/pileUpforMC =/pileUpforMC = ${PU_STR}/" ${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf > $OUTDIR/analysisMacroSynch_lept_mt_${MC_SAMPLES_LIST[i]}.conf
     done
-    sed 's/pileUpforMC =/pileUpforMC = GluGluHToTauTau_M125_13TeV_powheg_pythia8_pileup/' ${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf > analysisMacroSynch_lept_mt_SUSYGluGluToHToTauTau_M-120_TuneCP5_13TeV-pythia8.conf
+    sed 's/pileUpforMC =/pileUpforMC = GluGluHToTauTau_M125_13TeV_powheg_pythia8_pileup/' ${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf > $OUTDIR/analysisMacroSynch_lept_mt_SUSYGluGluToHToTauTau_M-120_TuneCP5_13TeV-pythia8.conf
   else # path in the root file to PU histograms for 16 and 18 data; 
-    sed -i "s/pileUpforMC =/pileUpforMC = pileup/" ${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf
+    sed "s/pileUpforMC =/pileUpforMC = pileup/" ${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf > $OUTDIR/${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf
   fi
+else
+  cp  ${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf $OUTDIR/${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf
 fi
