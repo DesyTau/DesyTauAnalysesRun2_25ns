@@ -952,10 +952,10 @@ int main(int argc, char * argv[]){
       otree->mcweight = 1;
       
       if (ApplyPUweight) 
-        otree->puweight = float(PUofficial->get_PUweight(double(analysisTree->numtruepileupinteractions)));
+        otree->puweight = float(PUofficial->get_PUweight(double(analysisTree.numtruepileupinteractions)));
       if(!isData || isEmbedded){
-        otree->mcweight = analysisTree->genweight;
-        otree->gen_noutgoing = analysisTree->genparticles_noutgoing;
+        otree->mcweight = analysisTree.genweight;
+        otree->gen_noutgoing = analysisTree.genparticles_noutgoing;
       }
 
 
