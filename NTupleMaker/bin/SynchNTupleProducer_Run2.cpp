@@ -668,7 +668,7 @@ int main(int argc, char * argv[]){
       initializeGenTree(gentree);
     
        // weights //TO DO: check PU for embedded
-      if(ApplyPUweight) fill_weight(&analysisTree, otree, PUofficial, (isData&&!isEmbedded));
+      // if(ApplyPUweight) fill_weight(&analysisTree, otree, PUofficial, (isData&&!isEmbedded));
     
       otree->npv = analysisTree.primvertex_count;
       otree->npu = analysisTree.numtruepileupinteractions;// numpileupinteractions;
@@ -950,6 +950,14 @@ int main(int argc, char * argv[]){
       otree->effweight = 1;
       otree->puweight = 1; 
       otree->mcweight = 1;
+      
+      if (ApplyPUweight) 
+        otree->puweight = float(PUofficial->get_PUweight(double(analysisTree->numtruepileupinteractions)));
+      if(!isData || isEmbedded){
+        otree->mcweight = analysisTree->genweight;
+        otree->gen_noutgoing = analysisTree->genparticles_noutgoing;
+      }
+
 
       if ((isEmbedded || !isData) && ApplyLepSF) {
       	TString suffix = "mc";
