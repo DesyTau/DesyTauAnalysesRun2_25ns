@@ -60,14 +60,17 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
     if(categoryIndex==1){
       nBins=nBins*5;
       xmax+=4*(xmax-xmin);
-      Variable=xVar+"*("+yVar+"<0.2)+(("+range+"+"+xVar+")*("+yVar+">=0.2&&"+yVar+"<0.4))+((2*"+range+"+"+xVar+")*("+yVar+">=0.4&&"+yVar+"<0.6))+((3*"+range+"+"+xVar+")*("+yVar+">=0.6&&"+yVar+"<0.8))+((4*"+range+"+"+xVar+")*("+yVar+">=0.8))";
+      Variable=xVar+"*("+yVar+"<0.3)+(("+range+"+"+xVar+")*("+yVar+">=0.3&&"+yVar+"<0.5))+((2*"+range+"+"+xVar+")*("+yVar+">=0.5&&"+yVar+"<0.65))+((3*"+range+"+"+xVar+")*("+yVar+">=0.65&&"+yVar+"<0.85))+((4*"+range+"+"+xVar+")*("+yVar+">=0.85))";
     }else{
       nBins=nBins*3;
       xmax+=2*(xmax-xmin);
-      Variable=xVar+"*("+yVar+"<0.2)+(("+range+"+"+xVar+")*("+yVar+">=0.2&&"+yVar+"<0.4))+((2*"+range+"+"+xVar+")*("+yVar+">=0.4&&"+yVar+"<0.6))+((3*"+range+"+"+xVar+")*("+yVar+">=0.6))";
+      Variable=xVar+"*("+yVar+"<0.3)+(("+range+"+"+xVar+")*("+yVar+">=0.3))";//&&"+yVar+"<0.4))+((2*"+range+"+"+xVar+")*("+yVar+">=0.4&&"+yVar+"<0.6))+((3*"+range+"+"+xVar+")*("+yVar+">=0.6))";
     }
     VariableName="Unrolled_"+xVar;
     var2D=true;
+  }else if(Variable.Contains("*")){
+    TObjArray *array = Variable.Tokenize("*");
+    VariableName=array->At(0)->GetName();
   }
   TString TauIso="mva17_2";
   if(DeepTau)TauIso="byMediumDeepTau2017v2p1VSjet_2";
@@ -78,7 +81,6 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
   // directory="$CMSSW_BASE/src/"+directory;
   TH1::SetDefaultSumw2();
   SetStyle();
-  const int nSamples = 10; //DY is used twice, for Zll and Ztt
 
   // Simple check to prevent accidental unblinding in SR, to unblind set FORCE to True
   if(!FORCE&&(categoryIndex==0||categoryIndex==1)){
@@ -103,7 +105,8 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
       "mt-NOMINAL_ntuple_VV",// (6) WW, WZ, ZZ
       "mt-NOMINAL_ntuple_ggH125", // (7) Scalar ggH
       "mt-NOMINAL_ntuple_qqH125", // (8) Scalar VBF H
-      "mt-NOMINAL_ntuple_CPoddH125" // (9) Pseudoscalar 
+      "mt-NOMINAL_ntuple_ggPSH125", // (9) Pseudoscalar ggH
+      "mt-NOMINAL_ntuple_qqPSH125" // (10) Pseudoscalar VBF
     };
   }else{
     sampleNames = {
@@ -116,9 +119,11 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
       "mt-NOMINAL_ntuple_VV",// (6) WW, WZ, ZZ
       "mt-NOMINAL_ntuple_ggH", // (7) Scalar ggH
       "mt-NOMINAL_ntuple_VBF", // (8) Scalar VBF H
-      "mt-NOMINAL_ntuple_CPodd" // (9) Pseudoscalar 
+      "mt-NOMINAL_ntuple_ggH", // (9) Pseudoscalar 
+      "mt-NOMINAL_ntuple_VBF" // (10) Scalar VBF H
     }; 
   }
+  const int nSamples = sampleNames.size(); //DY is used twice, for Zll and Ztt
   cout<<"this are the samples"<<endl;
   for (int i=0; i<nSamples; ++i) {
     cout << endl << sampleNames[i] << ":" << endl;}
@@ -148,28 +153,31 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
   cuts[2] += zptmassweight+isZLL;
   cuts[3] += Wjets_weight;
   cuts[4] += topweight; 
-  cuts[7] += "*"+TString::Itoa(scaleSignal,10);
-  cuts[8] += "*"+TString::Itoa(scaleSignal,10);
-  cuts[9] += "*"+TString::Itoa(scaleSignal,10);
-  if(FFmethod) for(int i=2; i<nSamples; ++i) cuts[i] += "*(gen_match_2!=6)";
+  cuts[7] += "*gen_sm_htt125*"+TString::Itoa(scaleSignal,10);
+  cuts[8] += "*gen_sm_htt125*"+TString::Itoa(scaleSignal,10);
+  cuts[9] += "*gen_ps_htt125*"+TString::Itoa(scaleSignal,10);
+  cuts[10]+= "*gen_ps_htt125*"+TString::Itoa(scaleSignal,10);
+  if(FFmethod) for(int i=2; i<7; ++i) cuts[i] += "*(gen_match_2!=6)";
    
   cutsSS[0] = IsoCut+qcdweight+"(os<0.5)";
   cutsSS[1] += zptmassweight+isZTT;
   cutsSS[2] += zptmassweight+isZLL;
   cutsSS[3] += Wjets_weight; 
   cutsSS[4] += topweight; 
-  cutsSS[7] += "*"+TString::Itoa(scaleSignal,10);
-  cutsSS[8] += "*"+TString::Itoa(scaleSignal,10);
-  cutsSS[9] += "*"+TString::Itoa(scaleSignal,10);
+  cutsSS[7] += "*gen_sm_htt125*"+TString::Itoa(scaleSignal,10);
+  cutsSS[8] += "*gen_sm_htt125*"+TString::Itoa(scaleSignal,10);
+  cutsSS[9] += "*gen_ps_htt125*"+TString::Itoa(scaleSignal,10);
+  cutsSS[10]+= "*gen_ps_htt125*"+TString::Itoa(scaleSignal,10);
  
   cutsaIso[0] = AntiIsoCut+"(os>0.5)*"+FFweight;
   cutsaIso[1] += zptmassweight+isZTT;
   cutsaIso[2] += zptmassweight+isZLL;
   cutsaIso[3] += Wjets_weight; 
   cutsaIso[4] += topweight; 
-  cutsaIso[7] += "*"+TString::Itoa(scaleSignal,10);
-  cutsaIso[8] += "*"+TString::Itoa(scaleSignal,10);
-  cutsaIso[9] += "*"+TString::Itoa(scaleSignal,10);
+  cutsaIso[7] += "*gen_sm_htt125*"+TString::Itoa(scaleSignal,10);
+  cutsaIso[8] += "*gen_sm_htt125*"+TString::Itoa(scaleSignal,10);
+  cutsaIso[9] += "*gen_ps_htt125*"+TString::Itoa(scaleSignal,10);
+  cutsaIso[10]+= "*gen_ps_htt125*"+TString::Itoa(scaleSignal,10);
  
   // *******************************
   // ***** Filling Histograms ******
@@ -196,14 +204,12 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
     histSS[i] = new TH1D(histNameSS,"",nBins,xmin,xmax);
     hist_AntiIso[i] = new TH1D(histNameaIso,"",nBins,xmin,xmax);
 		
-		if (i != 9) {
-			cout << "Drawing ..." << endl;
-			tree->Draw(Variable+">>"+histName,cuts[i]);
-			cout << cuts[i] <<endl;
-			tree->Draw(Variable+">>"+histNameSS,cutsSS[i]);
-			tree->Draw(Variable+">>"+histNameaIso,cutsaIso[i]);
-			cout << sampleNames[i] << " : Entries = " << hist[i]->GetEntries() << " : Integral = " << hist[i]->Integral(0,nBins+1) << endl;
-		}
+    cout << "Drawing ..." << endl;
+    tree->Draw(Variable+">>"+histName,cuts[i]);
+    cout << cuts[i] <<endl;
+    tree->Draw(Variable+">>"+histNameSS,cutsSS[i]);
+    tree->Draw(Variable+">>"+histNameaIso,cutsaIso[i]);
+    cout << sampleNames[i] << " : Entries = " << hist[i]->GetEntries() << " : Integral = " << hist[i]->Integral(0,nBins+1) << endl;
   }
 
 
@@ -455,9 +461,9 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
       legend->AddEntry(CPoddH,"CP-odd Higgs(125) #times "+TString::Itoa(scaleSignal,10),"f");
       CPoddH->Draw("hist same");
     }else{
-      legend->AddEntry(ggH,"ggH Higgs(125) #times 1","f");
+      legend->AddEntry(ggH,"ggH Higgs(125) #times "+TString::Itoa(scaleSignal,10),"f");
       ggH->Draw("hist same");
-      legend->AddEntry(qqH,"VBF Higgs(125) #times 1","f");
+      legend->AddEntry(qqH,"VBF Higgs(125) #times "+TString::Itoa(scaleSignal,10),"f");
       qqH->Draw("hist same");
     }
   }
@@ -506,7 +512,7 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
 	  float errbkg = max(0.1,bkgdErr->GetBinError(iB)/bkgYield);
 	  float signalYield = ggH->GetBinContent(iB)/scaleSignal;
 	  float ye = signalYield / sqrt(bkgYield+pow(bkgYield*errbkg,2));
-	  if(ye>=0.3||(categoryIndex==0||categoryIndex==1)){
+	  if(ye>=0.2||(categoryIndex==0||categoryIndex==1)){
 	    histData->SetBinContent(iB,-1);
 	    histData->SetBinError(iB,0);
 	  }

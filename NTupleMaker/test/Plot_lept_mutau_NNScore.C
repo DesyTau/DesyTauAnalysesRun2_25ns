@@ -5,7 +5,7 @@
 #include "DesyTauAnalyses/NTupleMaker/test/Plot_lept_mutau_NNNTuples.C"
 
 
-void   Plot_lept_mutau_NNScore(TString directory = "HtautauCP_mutau/Outputs/NTuples_mt_2017/predictions_2017/",
+void   Plot_lept_mutau_NNScore(TString directory = "/nfs/dust/cms/user/cardinia/HtoTauTau/HiggsCP/DNN/CMSSW_10_2_16/src/HiggsCP/Outputs/NTuples_mt_2017_v2/predictions_2017/",
 			       TString outputDir = "./Plots/",
 			       int year=2017,
 			       bool DeepTau = true, 
