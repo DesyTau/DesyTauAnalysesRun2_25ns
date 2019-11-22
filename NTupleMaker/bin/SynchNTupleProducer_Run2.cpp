@@ -160,15 +160,6 @@ int main(int argc, char * argv[]){
   const string pileUpInMCFile = cfg.get<string>("pileUpInMCFile");
   const string pileUpforMC = cfg.get<string>("pileUpforMC");
 
-  //lep eff
-  const string idIsoEffFile = cfg.get<string>("idIsoEffFile");
-  const string singleLepTrigEffFile = cfg.get<string>("singleLepTrigEffFile");
-  const string xTrigLepLegEffFile   = cfg.get<string>("xTrigLepLegEffFile");
-
-  const string idIsoEffFile_antiiso = cfg.get<string>("idIsoEffFile_antiiso");
-  const string singleLepTrigEffFile_antiiso = cfg.get<string>("singleLepTrigEffFile_antiiso");
-  const string xTrigLepLegEffFile_antiiso   = cfg.get<string>("xTrigLepLegEffFile_antiiso");
-
   // tau trigger efficiency
   std::string channel;
   if (ch == "mt") channel = "mutau"; 
@@ -381,25 +372,7 @@ int main(int argc, char * argv[]){
     PUofficial->set_h_MC(PU_mc);
   }  
 
-  // Lepton Scale Factors
-  ScaleFactor *SF_lepIdIso = new ScaleFactor();
-  ScaleFactor *SF_lepIdIso_antiiso = new ScaleFactor();
-  ScaleFactor *SF_SingleLepTrigger = new ScaleFactor();
-  ScaleFactor *SF_SingleLepTrigger_antiiso = new ScaleFactor();
-  ScaleFactor *SF_XTriggerLepLeg   = new ScaleFactor();
-  ScaleFactor *SF_XTriggerLepLeg_antiiso   = new ScaleFactor();
-
-  if(ApplyLepSF){
-    SF_lepIdIso->init_ScaleFactor(TString(cmsswBase) + "/src/" + TString(idIsoEffFile));
-    SF_lepIdIso_antiiso->init_ScaleFactor(TString(cmsswBase) + "/src/" + TString(idIsoEffFile_antiiso));
-    SF_SingleLepTrigger->init_ScaleFactor(TString(cmsswBase) + "/src/" + TString(singleLepTrigEffFile));
-    SF_SingleLepTrigger_antiiso->init_ScaleFactor(TString(cmsswBase) + "/src/" + TString(singleLepTrigEffFile_antiiso));
-    SF_XTriggerLepLeg->init_ScaleFactor(TString(cmsswBase) + "/src/" + TString(xTrigLepLegEffFile));
-    SF_XTriggerLepLeg_antiiso->init_ScaleFactor(TString(cmsswBase) + "/src/" + TString(xTrigLepLegEffFile_antiiso));
-  }
-  // For tau leg of cross-trigger a different implementation is used
-
-  // Workspace containing corrections
+  // Workspace with corrections
   TString workspace_filename = TString(cmsswBase) + "/src/DesyTauAnalyses/NTupleMaker/data/" + CorrectionWorkspaceFileName;
   cout << "Taking correction workspace from " << workspace_filename << endl;
   TFile *f_workspace = new TFile(workspace_filename, "read");
@@ -704,7 +677,7 @@ int main(int argc, char * argv[]){
       // embedded weight
       otree->embweight = 1;
       if (isEmbedded)
-	otree->embweight = getEmbeddedWeight(&analysisTree, w);
+      	otree->embweight = getEmbeddedWeight(&analysisTree, w);
     
       // tau selection
       vector<int> taus; taus.clear();
@@ -858,6 +831,11 @@ int main(int argc, char * argv[]){
       	lep_eta = analysisTree.electron_eta[leptonIndex]; 
       	lep_phi = analysisTree.electron_phi[leptonIndex];
       }
+
+
+      ////////////////////////////////////////////////////////////
+      // Trigger matching
+      ////////////////////////////////////////////////////////////
     
       bool isSingleLepTrig = false;
       vector<bool> isXTrigLepLeg(filterXtriggerLepLeg.size(), false);
@@ -873,16 +851,7 @@ int main(int argc, char * argv[]){
       otree->trg_mutaucross = false;
       otree->trg_mutaucross_mu = false;
       otree->trg_mutaucross_tau = false;
-    
-      // setting weights to 1
-      otree->trkeffweight = 1;
-      otree->trigweight_1 = 1;
-      otree->trigweight_2 = 1;
-      otree->effweight = 1;
-      otree->trigweight = 1;
-      otree->idisoweight_1 = 1;
-      otree->idisoweight_2 = 1;
-    
+        
       for (unsigned int iT = 0; iT < analysisTree.trigobject_count; ++iT) {
          float dRtrigLep = deltaR(lep_eta, lep_phi, analysisTree.trigobject_eta[iT], analysisTree.trigobject_phi[iT]);        
          float dRtrigTau = deltaR(analysisTree.tau_eta[tauIndex], analysisTree.tau_phi[tauIndex], analysisTree.trigobject_eta[iT], analysisTree.trigobject_phi[iT]);        
@@ -925,7 +894,10 @@ int main(int argc, char * argv[]){
       otree->trg_mutaucross = isXTrig;
     
     
-      //filling variables
+      ////////////////////////////////////////////////////////////
+      // Filling variables
+      ////////////////////////////////////////////////////////////
+
       TLorentzVector leptonLV;
     
       // used for trigger weights
@@ -950,55 +922,35 @@ int main(int argc, char * argv[]){
       if(ch == "mt") {
       	FillMuTau(&analysisTree, otree, leptonIndex, tauIndex, dRiso);
         leptonLV.SetXYZM(analysisTree.muon_px[leptonIndex], analysisTree.muon_py[leptonIndex], analysisTree.muon_pz[leptonIndex], muonMass);
-    
-      	// tracking efficiency weight	
-        if ((!isData||isEmbedded) && ApplyLepSF) {
-           w->var("m_eta")->setVal(analysisTree.muon_eta[leptonIndex]); 
-           otree->trkeffweight = (double)(w->function("m_trk_ratio")->getVal());
-        }
       } 
       else if(ch == "et"){
       	FillETau(&analysisTree, otree, leptonIndex, dRiso);
         leptonLV.SetXYZM(analysisTree.electron_px[leptonIndex], analysisTree.electron_py[leptonIndex], analysisTree.electron_pz[leptonIndex], electronMass);
-    
-        // tracking efficiency weight
-        if ((!isData||isEmbedded) && ApplyLepSF) {
-      	  w->var("e_eta")->setVal(analysisTree.electron_eta[leptonIndex]); 
-      	  w->var("e_pt")->setVal(analysisTree.electron_pt[leptonIndex]); 	
-      	  otree->trkeffweight = (double)( w->function("e_reco_ratio")->getVal());
-         }
       }
       
       FillTau(&analysisTree, otree, leptonIndex, tauIndex);
-    
-      /*
-      if (!isData && ApplyLepSF) {
- 	  if(analysisTree.tau_decayMode[tauIndex]==2||analysisTree.tau_decayMode[tauIndex]==11){
-	      eff_data_trig_lt_tau = 1;
-	      eff_mc_trig_lt_tau = 1;
-	  }else{
-	      eff_data_trig_lt_tau = tauTriggerSF->getTriggerEfficiencyData(analysisTree.tau_pt[tauIndex], analysisTree.tau_eta[tauIndex], analysisTree.tau_phi[tauIndex],analysisTree.tau_decayMode[tauIndex]);
-	      eff_mc_trig_lt_tau = tauTriggerSF->getTriggerEfficiencyMC(analysisTree.tau_pt[tauIndex], analysisTree.tau_eta[tauIndex], analysisTree.tau_phi[tauIndex],analysisTree.tau_decayMode[tauIndex]);
-	  }
-    	  eff_data_trig_lt_l = SF_XTriggerLepLeg->get_EfficiencyData(leptonLV.Pt(), leptonLV.Eta());
-    	  eff_mc_trig_lt_l = SF_XTriggerLepLeg->get_EfficiencyMC(leptonLV.Pt(), leptonLV.Eta());
-    	  eff_data_trig_L = SF_SingleLepTrigger->get_EfficiencyData(leptonLV.Pt(), leptonLV.Eta());
-    	  eff_mc_trig_L = SF_SingleLepTrigger->get_EfficiencyMC(leptonLV.Pt(), leptonLV.Eta());
-    
-    	  otree->idisoweight_1 = SF_lepIdIso->get_ScaleFactor(leptonLV.Pt(), leptonLV.Eta());
-    	  otree->idisoweight_antiiso_1 = SF_lepIdIso_antiiso->get_ScaleFactor(leptonLV.Pt(), leptonLV.Eta());
-    	  otree->trigweight_1 = SF_SingleLepTrigger->get_ScaleFactor(leptonLV.Pt(), leptonLV.Eta());
-    	  otree->trigweight_antiiso_1 = SF_SingleLepTrigger_antiiso->get_ScaleFactor(leptonLV.Pt(), leptonLV.Eta());
-    
-    	  double eff_data_trig = eff_data_trig_L + (eff_data_trig_lt_l - eff_data_trig_L) * eff_data_trig_lt_tau;
-    	  double eff_mc_trig = eff_mc_trig_L + (eff_mc_trig_lt_l - eff_mc_trig_L) * eff_mc_trig_lt_tau;
-    
-    	  if (eff_data_trig > 1e-4 && eff_mc_trig > 1e-4)
-    	    otree->trigweight = eff_data_trig / eff_mc_trig;
-      }
-      */ 
-      // moving to IC scale factors
-     
+
+      //counting jet
+      jets::counting_jets(&analysisTree, otree, &cfg, &inputs_btag_scaling_medium);
+      
+  
+      ////////////////////////////////////////////////////////////
+      // ID/Iso and Trigger Corrections
+      ////////////////////////////////////////////////////////////
+
+      // setting weights to 1
+      otree->trkeffweight = 1;
+      otree->trigweight_1 = 1;
+      otree->trigweight_2 = 1;
+      otree->idisoweight_1 = 1;
+      otree->idisoweight_antiiso_1 = 1;
+      otree->idisoweight_2 = 1;
+      otree->idisoweight_antiiso_2 = 1;
+      otree->trigweight = 1;
+      otree->effweight = 1;
+      otree->puweight = 1; 
+      otree->mcweight = 1;
+
       if ((isEmbedded || !isData) && ApplyLepSF) {
       	TString suffix = "mc";
       	TString suffixRatio = "ratio";
@@ -1009,7 +961,7 @@ int main(int argc, char * argv[]){
     	  w->var("t_phi")->setVal(analysisTree.tau_phi[tauIndex]);
     	  w->var("t_dm")->setVal(analysisTree.tau_decayMode[tauIndex]);
         
-    	  if (ch=="mt") {
+    	  if (ch == "mt") {
     	    w->var("m_pt")->setVal(leptonLV.Pt());
     	    w->var("m_eta")->setVal(leptonLV.Eta());
     	    eff_data_trig_lt_tau = w->function("t_trg_mediumDeepTau_mutau_data")->getVal();
@@ -1026,6 +978,7 @@ int main(int argc, char * argv[]){
     	    }
     	    otree->idisoweight_1 = w->function("m_idiso_ic_" + suffixRatio)->getVal();
     	    otree->idisoweight_antiiso_1 = w->function("m_idiso_ic_" + suffixRatio)->getVal();
+          otree->trkeffweight = w->function("m_trk_ratio")->getVal();
     	  }
     	  else if (ch == "et") {
     	    w->var("e_pt")->setVal(leptonLV.Pt());
@@ -1046,6 +999,7 @@ int main(int argc, char * argv[]){
     	    }
     	    otree->idisoweight_1 = w->function("e_idiso_ic_" + suffixRatio)->getVal();
     	    otree->idisoweight_antiiso_1 = w->function("e_idiso_ic_" + suffixRatio)->getVal();
+          otree->trkeffweight = w->function("e_trk_" + suffixRatio)->getVal();
     	  }
                                                                                                                                                                      
     	  double eff_data_trig = eff_data_trig_L + (eff_data_trig_lt_l - eff_data_trig_L) * eff_data_trig_lt_tau;
@@ -1070,23 +1024,23 @@ int main(int argc, char * argv[]){
       	}
       }
     
-      cout << "======================" << endl;
+      cout << "\n======================" << endl;
       cout << "Trigger weight = " << otree->trigweight << endl;
       cout << "Trk eff weight = " << otree->trkeffweight << endl;
       cout << "id/Iso 1       = " << otree->idisoweight_1 << endl;
       cout << "id/Iso 2       = " << otree->idisoweight_2 << endl;
-      cout << "======================" << endl;
+      cout << "======================\n" << endl;
 
       otree->effweight = otree->idisoweight_1 * otree->trkeffweight * otree->idisoweight_2 * otree->trigweight;
       otree->weight = otree->effweight * otree->puweight * otree->mcweight; 
-    
-      //counting jet
-      jets::counting_jets(&analysisTree, otree, &cfg, &inputs_btag_scaling_medium);
+      
+      ////////////////////////////////////////////////////////////
+      // Z pt weight
+      ////////////////////////////////////////////////////////////
       
       TLorentzVector genV( 0., 0., 0., 0.);
       TLorentzVector genL( 0., 0., 0., 0.);
-      
-      // Zpt weight
+
       otree->zptweight = 1.;
       if (!isData && ((isDY && isMG ) || isEWKZ)){
         genV = genTools::genV(analysisTree); // gen Z boson ?
@@ -1113,7 +1067,10 @@ int main(int argc, char * argv[]){
           otree->zptweight = zptmassweight;
       }
       
-      // topPt weight
+      ////////////////////////////////////////////////////////////
+      // Top pt weight
+      ////////////////////////////////////////////////////////////
+
       otree->topptweight = 1.;
       int a_topPtWeight = cfg.get<int>("a_topPtWeight");
       int b_topPtWeight = cfg.get<int>("b_topPtWeight");
@@ -1122,7 +1079,10 @@ int main(int argc, char * argv[]){
          otree->topptweight = genTools::topPtWeight(analysisTree, 1); // 1 is for Run1 - use this reweighting as recommended by HTT 17
       counter[11]++;
       
-      // lepton tau fakerates
+      ////////////////////////////////////////////////////////////
+      // Lep->tau fake weight
+      ////////////////////////////////////////////////////////////
+
       otree->mutaufakeweight = 1.;
       otree->etaufakeweight = 1.;
       if (!isData){
@@ -1192,7 +1152,10 @@ int main(int argc, char * argv[]){
   			               otree->puppimet*TMath::Cos(otree->puppimetphi)*otree->puppimet*TMath::Cos(otree->puppimetphi)));
     
     
-      // shift the tau energy scale by decay mode and propagate to the met. 
+      ////////////////////////////////////////////////////////////
+      // Tau ES shift + propagate to MET
+      ////////////////////////////////////////////////////////////
+      
       if (!isData) {
       	bool isOneProng = false;
       	float shift_tes = 0.0;
@@ -1226,6 +1189,10 @@ int main(int argc, char * argv[]){
       // 	}
       // }
       
+      ////////////////////////////////////////////////////////////
+      // Filling variables (with corrected MET and tau momentum)
+      ////////////////////////////////////////////////////////////
+
       if (otree->gen_match_2 == 5 && !isData)
     	  otree->tauvsjetweightMedium_2 = tauIDSF_medium->getSFvsPT(otree->pt_2);
       else 
@@ -1292,7 +1259,6 @@ int main(int argc, char * argv[]){
       otree->mt_sv = -9999;
       if (ApplySVFit && otree->njetspt20 > 0) svfit_variables(ch, &analysisTree, otree, &cfg, inputFile_visPtResolution);
         
-            
       // evaluate systematics for MC 
       if(!isData && ApplySystShift){
       zPtWeightSys->Eval(); 
@@ -1445,7 +1411,7 @@ float getEmbeddedWeight(const AC1B *analysisTree, RooWorkspace * wEm) {
     }
   }
 
-  if (taus.size()==2) {
+  if (taus.size() == 2) {
     double gt1_pt  = taus[0].Pt();
     double gt1_eta = taus[0].Eta();
     double gt2_pt  = taus[1].Pt();
