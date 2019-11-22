@@ -235,12 +235,6 @@ int main(int argc, char * argv[]){
   RecoilCorrector recoilPFMetCorrector(cfg.get<string>("RecoilFilePath"));
 
   std::cout << "Hey ya 1 " << std::endl;
-
-  // Read in HLT filter
-
-  vector<string> filterSingleLep;
-  vector<string> filterXtriggerLepLeg;
-  vector<string> filterXtriggerTauLeg;
   
   // tau cuts
   const float ptTauLowCut    = cfg.get<float>("ptTauLowCut");
@@ -539,10 +533,13 @@ int main(int argc, char * argv[]){
     }
     delete _inittree;
 
+    // Read in HLT filter
     vector<string> filterSingleLep = cfg.get<vector<string>>("filterSingleLep");
+    vector<string> filterXtriggerLepLeg;
+    vector<string> filterXtriggerTauLeg;
     if (era != 2018) {
-    vector<string> filterXtriggerLepLeg = cfg.get<vector<string>>("filterXtriggerLepLeg");
-    vector<string> filterXtriggerTauLeg = cfg.get<vector<string>>("filterXtriggerTauLeg");
+      filterXtriggerLepLeg = cfg.get<vector<string>>("filterXtriggerLepLeg");
+      filterXtriggerTauLeg = cfg.get<vector<string>>("filterXtriggerTauLeg");
     }
     else 
     {
