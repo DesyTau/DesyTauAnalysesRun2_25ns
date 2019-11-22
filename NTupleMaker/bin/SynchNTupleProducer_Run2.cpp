@@ -1455,7 +1455,7 @@ float getEmbeddedWeight(const AC1B *analysisTree, RooWorkspace * wEm) {
     double id1_embed = wEm->function("m_sel_id_ic_ratio")->getVal();
     wEm->var("gt_pt")->setVal(gt2_pt);
     wEm->var("gt_eta")->setVal(gt2_eta);
-    double id2_embed = wEm->function("m_sel_idEmb_ratio")->getVal();
+    double id2_embed = wEm->function("m_sel_id_ic_ratio")->getVal();
     wEm->var("gt1_pt")->setVal(gt1_pt);
     wEm->var("gt2_pt")->setVal(gt2_pt);
     wEm->var("gt1_eta")->setVal(gt1_eta);
