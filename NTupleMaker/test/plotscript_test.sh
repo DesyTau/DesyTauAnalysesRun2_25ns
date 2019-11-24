@@ -1,6 +1,6 @@
 # PATH_TO_TUPLES="/nfs/dust/cms/user/cardinia/HtoTauTau/HiggsCP/DNN/CMSSW_10_2_16/src/HiggsCP/Inputs/test/NTuples_mt_2017/"
-PATH_TO_TUPLES="/nfs/dust/cms/user/filatovo/HTT/CMSSW_10_2_16/src/HiggsCP/Inputs/v2_VBF_norm_commented/NTuples_mt_2017/"
-PATH_FOR_OUTPUT="./Plots/"
+PATH_TO_TUPLES="/nfs/dust/cms/user/filatovo/HTT/CMSSW_10_2_16/src/HiggsCP/Inputs/test/NTuples_mt_2018/"
+PATH_FOR_OUTPUT="./Plots_v3_2018/"
 
 WEIGHT="xsec_lumi_weight*puweight*effweight*mcweight*"
 USE_DEEPTAU="true"
