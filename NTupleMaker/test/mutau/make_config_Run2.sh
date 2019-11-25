@@ -6,6 +6,10 @@ YEAR=$1
 DATA_TYPE=$2
 OUTDIR=./20$YEAR
 
+if [ ! -d "$OUTDIR" ]; then
+  mkdir $OUTDIR
+fi
+
 if [[ $YEAR -ne 16 && $YEAR -ne 17 && $YEAR -ne 18 ]]; then
   echo
   echo "To produce the scripts for a specific year and either data or MC this script is to be run with a command:"

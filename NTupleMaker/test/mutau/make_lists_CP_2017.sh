@@ -5,6 +5,10 @@ dirMC_v4=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2017/mc_v4
 dirTauSpinner=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2016/mc_v3/
 OUTDIR=./2017
 
+if [ ! -d "$OUTDIR" ]; then
+  mkdir $OUTDIR
+fi
+
 ls $dirMC/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/*root > $OUTDIR/DYJetsToLL_M-50
 ls $dirMC/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8_ext1/*root >> $OUTDIR/DYJetsToLL_M-50
 ls $dirMC/DY1JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/*root > $OUTDIR/DY1JetsToLL_M-50
