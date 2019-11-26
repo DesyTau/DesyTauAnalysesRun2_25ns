@@ -1681,135 +1681,64 @@ int main(int argc, char * argv[]) {
             if (gen_match_1 == 2 && gen_match_2 ==2) isPromptZMM = true;
             }
          
+         // QCD estimation =======================================================================================================================================================
 
-         if (era=="2016"){
-            correctionWS_qcd->var("e_pt")->setVal(pt_1);
-            correctionWS_qcd->var("m_pt")->setVal(pt_2);
-            correctionWS_qcd->var("njets")->setVal(njets);
-            correctionWS_qcd->var("dR")->setVal(dr_tt);
-            double_t em_qcd_osss_binned = correctionWS_qcd->function("em_qcd_osss_binned")->getVal();
-            
-            double_t em_qcd_osss_binned_rate_up = correctionWS_qcd->function("em_qcd_osss_rateup_binned")->getVal();
-            double_t em_qcd_osss_binned_rate_down = correctionWS_qcd->function("em_qcd_osss_ratedown_binned")->getVal();
-            double_t em_qcd_osss_binned_shape_up = correctionWS_qcd->function("em_qcd_osss_shapeup_binned")->getVal();
-            double_t em_qcd_osss_binned_shape_down = correctionWS_qcd->function("em_qcd_osss_shapedown_binned")->getVal();
-               
-            qcdweight = em_qcd_osss_binned;
-            
-            if (njets==0) {
-               qcdweight_0jet_rate_up =  em_qcd_osss_binned_rate_up;
-               qcdweight_0jet_rate_down = em_qcd_osss_binned_rate_down;   
-               qcdweight_0jet_shape_up = em_qcd_osss_binned_shape_up;
-               qcdweight_0jet_shape_down =  em_qcd_osss_binned_shape_down;
-               qcdweight_1jet_rate_up =  em_qcd_osss_binned;
-               qcdweight_1jet_rate_down = em_qcd_osss_binned; 
-                  qcdweight_1jet_shape_up = em_qcd_osss_binned;
-                  qcdweight_1jet_shape_down = em_qcd_osss_binned;
-            }   
-            else {
-               qcdweight_0jet_rate_up =  em_qcd_osss_binned;
-               qcdweight_0jet_rate_down = em_qcd_osss_binned;
-               qcdweight_0jet_shape_up = em_qcd_osss_binned;
-               qcdweight_0jet_shape_down =  em_qcd_osss_binned;
-               qcdweight_1jet_rate_up =  em_qcd_osss_binned_rate_up;
-               qcdweight_1jet_rate_down =  em_qcd_osss_binned_rate_down;
-               qcdweight_1jet_shape_up = em_qcd_osss_binned_shape_up;
-               qcdweight_1jet_shape_down =  em_qcd_osss_binned_shape_down;
-            }
-            
-            qcdweight_iso_up = correctionWS_qcd->function("em_qcd_extrap_up")->getVal();
-            qcdweight_iso_down = correctionWS_qcd->function("em_qcd_extrap_down")->getVal();
-         }  
-         else if (era=="2017"){
-            correctionWS_qcd->var("e_pt")->setVal(pt_1);
-            correctionWS_qcd->var("m_pt")->setVal(pt_2);
-            double_t em_qcd_extrap_uncert = correctionWS_qcd->function("em_qcd_extrap_uncert")->getVal();
-            
-            correctionWS_qcd->var("e_pt")->setVal(pt_1);
-            correctionWS_qcd->var("m_pt")->setVal(pt_2);
-            correctionWS_qcd->var("njets")->setVal(njets);
-            correctionWS_qcd->var("dR")->setVal(dr_tt);
-            double_t em_qcd_osss_binned = correctionWS_qcd->function("em_qcd_osss_binned")->getVal();
-            double_t em_qcd_osss_binned_0jet_rate_up = correctionWS_qcd->function("em_qcd_osss_0jet_rateup")->getVal();
-            double_t em_qcd_osss_binned_0jet_rate_down = correctionWS_qcd->function("em_qcd_osss_0jet_ratedown")->getVal();
-            double_t em_qcd_osss_binned_1jet_rate_up = correctionWS_qcd->function("em_qcd_osss_1jet_rateup")->getVal();
-            double_t em_qcd_osss_binned_1jet_rate_down = correctionWS_qcd->function("em_qcd_osss_1jet_ratedown")->getVal();
-            double_t em_qcd_osss_binned_0jet_shape_up = correctionWS_qcd->function("em_qcd_osss_0jet_shapeup")->getVal();
-            double_t em_qcd_osss_binned_0jet_shape_down = correctionWS_qcd->function("em_qcd_osss_0jet_shapedown")->getVal();
-            double_t em_qcd_osss_binned_1jet_shape_up = correctionWS_qcd->function("em_qcd_osss_1jet_shapeup")->getVal();
-            double_t em_qcd_osss_binned_1jet_shape_down = correctionWS_qcd->function("em_qcd_osss_1jet_shapedown")->getVal();
-            
-            qcdweight = em_qcd_extrap_uncert * em_qcd_osss_binned;
-            qcdweight_0jet_rate_up = em_qcd_extrap_uncert * em_qcd_osss_binned_0jet_rate_up;
-            qcdweight_0jet_rate_down = em_qcd_extrap_uncert * em_qcd_osss_binned_0jet_rate_down;   
-            qcdweight_1jet_rate_up = em_qcd_extrap_uncert * em_qcd_osss_binned_1jet_rate_up;
-            qcdweight_1jet_rate_down = em_qcd_extrap_uncert * em_qcd_osss_binned_1jet_rate_down;
-            qcdweight_0jet_shape_up = em_qcd_extrap_uncert * em_qcd_osss_binned_0jet_shape_up;
-            qcdweight_0jet_shape_down = em_qcd_extrap_uncert * em_qcd_osss_binned_0jet_shape_down;   
-            qcdweight_1jet_shape_up = em_qcd_extrap_uncert * em_qcd_osss_binned_1jet_shape_up;
-            qcdweight_1jet_shape_down = em_qcd_extrap_uncert * em_qcd_osss_binned_1jet_shape_down;
-            
-            qcdweight_iso_up = em_qcd_extrap_uncert * em_qcd_extrap_uncert * em_qcd_osss_binned;
-            qcdweight_iso_down = em_qcd_osss_binned;
-         }
-         else if (era=="2018"){
-            // correctionWS_qcd->var("e_pt")->setVal(pt_1);
-            // correctionWS_qcd->var("m_pt")->setVal(pt_2);
-            // double_t em_qcd_extrap_uncert = correctionWS_qcd->function("em_qcd_extrap_uncert")->getVal(); TO CHECK: ALREADY APPLIED?
+         // correctionWS_qcd->var("e_pt")->setVal(pt_1);
+         // correctionWS_qcd->var("m_pt")->setVal(pt_2);
+         // double_t em_qcd_extrap_uncert = correctionWS_qcd->function("em_qcd_extrap_uncert")->getVal(); TO CHECK: ALREADY APPLIED?
 
-            correctionWS_qcd->var("e_pt")->setVal(pt_1);
-            correctionWS_qcd->var("m_pt")->setVal(pt_2);
-            correctionWS_qcd->var("njets")->setVal(njets);
-            correctionWS_qcd->var("dR")->setVal(dr_tt);
-            double_t em_qcd_osss_binned = correctionWS_qcd->function("em_qcd_osss_binned")->getVal();
-            double_t em_qcd_osss_binned_0jet_rate_up = correctionWS_qcd->function("em_qcd_osss_0jet_rateup")->getVal();
-            double_t em_qcd_osss_binned_0jet_rate_down = correctionWS_qcd->function("em_qcd_osss_0jet_ratedown")->getVal();
-            double_t em_qcd_osss_binned_1jet_rate_up = correctionWS_qcd->function("em_qcd_osss_1jet_rateup")->getVal();
-            double_t em_qcd_osss_binned_1jet_rate_down = correctionWS_qcd->function("em_qcd_osss_1jet_ratedown")->getVal();
-            double_t em_qcd_osss_binned_2jet_rate_up = correctionWS_qcd->function("em_qcd_osss_2jet_rateup")->getVal();
-            double_t em_qcd_osss_binned_2jet_rate_down = correctionWS_qcd->function("em_qcd_osss_2jet_ratedown")->getVal();
-            double_t em_qcd_osss_binned_0jet_shape_up = correctionWS_qcd->function("em_qcd_osss_0jet_shapeup")->getVal();
-            double_t em_qcd_osss_binned_0jet_shape_down = correctionWS_qcd->function("em_qcd_osss_0jet_shapedown")->getVal();
-            double_t em_qcd_osss_binned_1jet_shape_up = correctionWS_qcd->function("em_qcd_osss_1jet_shapeup")->getVal();
-            double_t em_qcd_osss_binned_1jet_shape_down = correctionWS_qcd->function("em_qcd_osss_1jet_shapedown")->getVal();
-            double_t em_qcd_osss_binned_2jet_shape_up = correctionWS_qcd->function("em_qcd_osss_2jet_shapeup")->getVal();
-            double_t em_qcd_osss_binned_2jet_shape_down = correctionWS_qcd->function("em_qcd_osss_2jet_shapedown")->getVal();
-            double_t em_qcd_extrap_up = correctionWS_qcd->function("em_qcd_extrap_up")->getVal();
-            double_t em_qcd_extrap_down = correctionWS_qcd->function("em_qcd_extrap_down")->getVal();
-
-            // qcdweight = em_qcd_extrap_uncert * em_qcd_osss_binned;
-            // qcdweight_0jet_rate_up = em_qcd_extrap_uncert * em_qcd_osss_binned_0jet_rate_up;
-            // qcdweight_0jet_rate_down = em_qcd_extrap_uncert * em_qcd_osss_binned_0jet_rate_down;   
-            // qcdweight_1jet_rate_up = em_qcd_extrap_uncert * em_qcd_osss_binned_1jet_rate_up;
-            // qcdweight_1jet_rate_down = em_qcd_extrap_uncert * em_qcd_osss_binned_1jet_rate_down;
-            // qcdweight_2jet_rate_up = em_qcd_extrap_uncert * em_qcd_osss_binned_2jet_rate_up;
-            // qcdweight_2jet_rate_down = em_qcd_extrap_uncert * em_qcd_osss_binned_2jet_rate_down;
-            // qcdweight_0jet_shape_up = em_qcd_extrap_uncert * em_qcd_osss_binned_0jet_shape_up;
-            // qcdweight_0jet_shape_down = em_qcd_extrap_uncert * em_qcd_osss_binned_0jet_shape_down;   
-            // qcdweight_1jet_shape_up = em_qcd_extrap_uncert * em_qcd_osss_binned_1jet_shape_up;
-            // qcdweight_1jet_shape_down = em_qcd_extrap_uncert * em_qcd_osss_binned_1jet_shape_down;
-            // qcdweight_2jet_shape_up = em_qcd_extrap_uncert * em_qcd_osss_binned_2jet_shape_up;
-            // qcdweight_2jet_shape_down = em_qcd_extrap_uncert * em_qcd_osss_binned_2jet_shape_down;
-           
-            // FIXME: HAS TO BE CHECKED IF CORRECLTY IMPLEMENTED
-            qcdweight =  em_qcd_osss_binned;
-            qcdweight_0jet_rate_up =  em_qcd_osss_binned_0jet_rate_up;
-            qcdweight_0jet_rate_down =  em_qcd_osss_binned_0jet_rate_down;   
-            qcdweight_1jet_rate_up =  em_qcd_osss_binned_1jet_rate_up;
-            qcdweight_1jet_rate_down =  em_qcd_osss_binned_1jet_rate_down;
-            qcdweight_2jet_rate_up =  em_qcd_osss_binned_2jet_rate_up;
-            qcdweight_2jet_rate_down =  em_qcd_osss_binned_2jet_rate_down;
-            qcdweight_0jet_shape_up =  em_qcd_osss_binned_0jet_shape_up;
-            qcdweight_0jet_shape_down =  em_qcd_osss_binned_0jet_shape_down;   
-            qcdweight_1jet_shape_up =  em_qcd_osss_binned_1jet_shape_up;
-            qcdweight_1jet_shape_down =  em_qcd_osss_binned_1jet_shape_down;
-            qcdweight_2jet_shape_up =  em_qcd_osss_binned_2jet_shape_up;
-            qcdweight_2jet_shape_down = em_qcd_osss_binned_2jet_shape_down;
-            
-            qcdweight_iso_up = em_qcd_extrap_up;
-            qcdweight_iso_down = em_qcd_extrap_down;
-         }
-
+         correctionWS_qcd->var("e_pt")->setVal(pt_1);
+         correctionWS_qcd->var("m_pt")->setVal(pt_2);
+         correctionWS_qcd->var("njets")->setVal(njets);
+         correctionWS_qcd->var("dR")->setVal(dr_tt);
+         double_t em_qcd_osss_binned = correctionWS_qcd->function("em_qcd_osss_binned")->getVal();
+         double_t em_qcd_osss_binned_0jet_rate_up = correctionWS_qcd->function("em_qcd_osss_0jet_rateup")->getVal();
+         double_t em_qcd_osss_binned_0jet_rate_down = correctionWS_qcd->function("em_qcd_osss_0jet_ratedown")->getVal();
+         double_t em_qcd_osss_binned_1jet_rate_up = correctionWS_qcd->function("em_qcd_osss_1jet_rateup")->getVal();
+         double_t em_qcd_osss_binned_1jet_rate_down = correctionWS_qcd->function("em_qcd_osss_1jet_ratedown")->getVal();
+         double_t em_qcd_osss_binned_2jet_rate_up = correctionWS_qcd->function("em_qcd_osss_2jet_rateup")->getVal();
+         double_t em_qcd_osss_binned_2jet_rate_down = correctionWS_qcd->function("em_qcd_osss_2jet_ratedown")->getVal();
+         double_t em_qcd_osss_binned_0jet_shape_up = correctionWS_qcd->function("em_qcd_osss_0jet_shapeup")->getVal();
+         double_t em_qcd_osss_binned_0jet_shape_down = correctionWS_qcd->function("em_qcd_osss_0jet_shapedown")->getVal();
+         double_t em_qcd_osss_binned_1jet_shape_up = correctionWS_qcd->function("em_qcd_osss_1jet_shapeup")->getVal();
+         double_t em_qcd_osss_binned_1jet_shape_down = correctionWS_qcd->function("em_qcd_osss_1jet_shapedown")->getVal();
+         double_t em_qcd_osss_binned_2jet_shape_up = correctionWS_qcd->function("em_qcd_osss_2jet_shapeup")->getVal();
+         double_t em_qcd_osss_binned_2jet_shape_down = correctionWS_qcd->function("em_qcd_osss_2jet_shapedown")->getVal();
+         double_t em_qcd_extrap_up = correctionWS_qcd->function("em_qcd_extrap_up")->getVal();
+         double_t em_qcd_extrap_down = correctionWS_qcd->function("em_qcd_extrap_down")->getVal();
+         
+         // qcdweight = em_qcd_extrap_uncert * em_qcd_osss_binned;
+         // qcdweight_0jet_rate_up = em_qcd_extrap_uncert * em_qcd_osss_binned_0jet_rate_up;
+         // qcdweight_0jet_rate_down = em_qcd_extrap_uncert * em_qcd_osss_binned_0jet_rate_down;   
+         // qcdweight_1jet_rate_up = em_qcd_extrap_uncert * em_qcd_osss_binned_1jet_rate_up;
+         // qcdweight_1jet_rate_down = em_qcd_extrap_uncert * em_qcd_osss_binned_1jet_rate_down;
+         // qcdweight_2jet_rate_up = em_qcd_extrap_uncert * em_qcd_osss_binned_2jet_rate_up;
+         // qcdweight_2jet_rate_down = em_qcd_extrap_uncert * em_qcd_osss_binned_2jet_rate_down;
+         // qcdweight_0jet_shape_up = em_qcd_extrap_uncert * em_qcd_osss_binned_0jet_shape_up;
+         // qcdweight_0jet_shape_down = em_qcd_extrap_uncert * em_qcd_osss_binned_0jet_shape_down;   
+         // qcdweight_1jet_shape_up = em_qcd_extrap_uncert * em_qcd_osss_binned_1jet_shape_up;
+         // qcdweight_1jet_shape_down = em_qcd_extrap_uncert * em_qcd_osss_binned_1jet_shape_down;
+         // qcdweight_2jet_shape_up = em_qcd_extrap_uncert * em_qcd_osss_binned_2jet_shape_up;
+         // qcdweight_2jet_shape_down = em_qcd_extrap_uncert * em_qcd_osss_binned_2jet_shape_down;
+         
+         // FIXME: HAS TO BE CHECKED IF CORRECLTY IMPLEMENTED
+         qcdweight =  em_qcd_osss_binned;
+         qcdweight_0jet_rate_up =  em_qcd_osss_binned_0jet_rate_up;
+         qcdweight_0jet_rate_down =  em_qcd_osss_binned_0jet_rate_down;   
+         qcdweight_1jet_rate_up =  em_qcd_osss_binned_1jet_rate_up;
+         qcdweight_1jet_rate_down =  em_qcd_osss_binned_1jet_rate_down;
+         qcdweight_2jet_rate_up =  em_qcd_osss_binned_2jet_rate_up;
+         qcdweight_2jet_rate_down =  em_qcd_osss_binned_2jet_rate_down;
+         qcdweight_0jet_shape_up =  em_qcd_osss_binned_0jet_shape_up;
+         qcdweight_0jet_shape_down =  em_qcd_osss_binned_0jet_shape_down;   
+         qcdweight_1jet_shape_up =  em_qcd_osss_binned_1jet_shape_up;
+         qcdweight_1jet_shape_down =  em_qcd_osss_binned_1jet_shape_down;
+         qcdweight_2jet_shape_up =  em_qcd_osss_binned_2jet_shape_up;
+         qcdweight_2jet_shape_down = em_qcd_osss_binned_2jet_shape_down;
+         
+         qcdweight_iso_up = em_qcd_extrap_up;
+         qcdweight_iso_down = em_qcd_extrap_down;
+         
          if (!isData){
             if (era=="2016")
                {
