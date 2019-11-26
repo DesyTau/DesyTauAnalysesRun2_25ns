@@ -186,38 +186,52 @@ bool tightJetiD_2018(AC1B &tree_ ,int jet){
 }
 
 
+// https://twiki.cern.ch/twiki/bin/viewauth/CMS/JetID
 bool tightJetID(const AC1B &tree_, int jet, int era){
 	bool tightJetID = false;
 	float energy = tree_.pfjet_e[jet];
 	float eta = tree_.pfjet_eta[jet];
-	float nhf = tree_.pfjet_neutralhadronicenergy[jet] / energy;
-	float nem = tree_.pfjet_neutralemenergy[jet] / energy;
-	float npr = tree_.pfjet_chargedmulti[jet] + tree_.pfjet_neutralmulti[jet];
-	float chm = tree_.pfjet_chargedmulti[jet] ;
-	float muf = tree_.pfjet_muonenergy[jet] / energy;
-	float chf = tree_.pfjet_chargedhadronicenergy[jet] / energy;
-	float elf = tree_.pfjet_chargedemenergy[jet] / energy;
-	float nm  = tree_.pfjet_neutralmulti[jet];
-	float nnpart = tree_.pfjet_neutralmulti[jet];
+	float NHF = tree_.pfjet_neutralhadronicenergy[jet] / energy;									 
+	float NEMF = tree_.pfjet_neutralemenergy[jet] / energy;  											 
+	float NumConst = tree_.pfjet_chargedmulti[jet] + tree_.pfjet_neutralmulti[jet];     
+	float CHM = tree_.pfjet_chargedmulti[jet];																		 											
+	float MUF = tree_.pfjet_muonenergy[jet] / energy;															 
+	float CHF = tree_.pfjet_chargedhadronicenergy[jet] / energy;									 
+	float CEMF = tree_.pfjet_chargedemenergy[jet] / energy;												 
+	float NumNeutralParticle  = tree_.pfjet_neutralmulti[jet]; 																		 													
 	
 	if (era == 2016){
 		if (fabs(eta) <= 2.7)
-			tightJetID = (nhf < 0.90 && nem < 0.90 && npr > 1) && ((abs(eta) <= 2.4 && chf > 0 && chm > 0 && elf < 0.99) || abs(eta) > 2.4);
+			tightJetID = (NHF < 0.90 && NEMF < 0.90 && NumConst > 1) && ((abs(eta) <= 2.4 && CHF > 0 && CHM > 0 && CEMF < 0.99) || abs(eta) > 2.4);
 		else if (fabs(eta) <= 3.0)
-			tightJetID = nhf < 0.98 && nem > 0.01 && nm > 2;
+			tightJetID = NHF < 0.98 && NEMF > 0.01 && NumNeutralParticle > 2;
 		else
-			tightJetID = nem < 0.90 && nm > 10;
+			tightJetID = NEMF < 0.90 && NumNeutralParticle > 10;
 	}
 	else if (era == 2017){
 		if (fabs(eta) <= 2.7)
-			tightJetID = (nhf < 0.90 && nem < 0.90 && npr > 1) && ((abs(eta) <= 2.4 && chf > 0 && chm > 0) || abs(eta) > 2.4);
+			tightJetID = (NHF < 0.90 && NEMF < 0.90 && NumConst > 1) && ((abs(eta) <= 2.4 && CHF > 0 && CHM > 0) || abs(eta) > 2.4);
 		else if (fabs(eta) <= 3.0)
-			tightJetID = nem < 0.99 && nem > 0.02 && nm > 2;
+			tightJetID = NEMF < 0.99 && NEMF > 0.02 && NumNeutralParticle > 2;
 		else
-			tightJetID = nem < 0.90 && nhf > 0.02 && nm > 10;
+			tightJetID = NEMF < 0.90 && NHF > 0.02 && NumNeutralParticle > 10;
+	}
+	else if (era == 2018){
+		if (fabs(eta) <= 2.6)
+			tightJetID = CEMF < 0.8 && CHM > 0 && CHF > 0 && NumConst > 1 && NEMF < 0.9 && MUF < 0.8 && NHF < 0.9;
+		else if (fabs(eta) <= 2.7)
+			tightJetID = CEMF < 0.8 && CHM > 0 && NEMF < 0.99 && MUF < 0.8 && NHF < 0.9;
+		else if (fabs(eta) <= 3.0)
+			tightJetID = NEMF > 0.02 && NEMF < 0.99 && NumNeutralParticle > 2;
+		else
+			tightJetID = NEMF < 0.90 && NHF > 0.2 && NumNeutralParticle > 10;
+	}
+	else
+	{
+		std::cout << "era is not 2016, 2017, 2018, exiting" << '\n';
+		exit(-1);
 	}
 	return tightJetID;
-
 }
 
 

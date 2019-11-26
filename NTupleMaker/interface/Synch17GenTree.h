@@ -88,8 +88,11 @@ public :
   
   Float_t alphaminus;
 
-  double TauSpinnerWeightsEven, TauSpinnerWeightsOdd, TauSpinnerWeightsMaxMix, TauSpinnerWeightsMinusMaxMix, TauSpinnerWeightsMix0p375;
-
+  Double_t TauSpinnerWeightsEven;
+  Double_t TauSpinnerWeightsOdd;
+  Double_t TauSpinnerWeightsMaxMix;
+  Double_t TauSpinnerWeightsMinusMaxMix;
+  Double_t TauSpinnerWeightsMix0p375;
 
   //////////////////////////////////////////////
   //            List of branches              //
