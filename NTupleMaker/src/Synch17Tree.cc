@@ -699,6 +699,7 @@ void Synch17Tree::WriteInit(TTree *tree) {
   fChain->Branch("correction_againstMuonTight3_2", &correction_againstMuonTight3_2, "correction_againstMuonTight3_2/F");
 //////////////////////////////////////////////////////////////////////////////
 
+   fChain->Branch("embweight", &embweight, "embweight/F");
    fChain->Branch("trigweight_1", &trigweight_1, "trigweight_1/F");
    fChain->Branch("trigweight_antiiso_1", &trigweight_antiiso_1, "trigweight_antiiso_1/F");
    fChain->Branch("idisoweight_1", &idisoweight_1, "idisoweight_1/F");
@@ -919,11 +920,11 @@ void Synch17Tree::WriteInit(TTree *tree) {
 
    fChain->Branch("Prompt_pT", &Prompt_pT, "Prompt_pT/F");
 
-  fChain->Branch("sm_htt125", &TauSpinnerWeightsEven, "sm_htt125/D");
-  fChain->Branch("ps_htt125", &TauSpinnerWeightsOdd, "ps_htt125/D");
-  fChain->Branch("mm_htt125", &TauSpinnerWeightsMaxMix, "mm_htt125/D");
-  fChain->Branch("minusmm_htt125", &TauSpinnerWeightsMinusMaxMix, "minusmm_htt125/D");
-  fChain->Branch("mix0p375_htt125", &TauSpinnerWeightsMix0p375, "mix0p375_htt125/D");
+  fChain->Branch("sm_htt125", &TauSpinnerWeightsEven, "TauSpinnerWeightsEven/F");
+  fChain->Branch("ps_htt125", &TauSpinnerWeightsOdd, "TauSpinnerWeightsOdd/F");
+  fChain->Branch("mm_htt125", &TauSpinnerWeightsMaxMix, "TauSpinnerWeightsMaxMix/F");
+  fChain->Branch("minusmm_htt125", &TauSpinnerWeightsMinusMaxMix, "TauSpinnerWeightsMinusMaxMix/F");
+  fChain->Branch("mix0p375_htt125", &TauSpinnerWeightsMix0p375, "TauSpinnerWeightsMix0p375/F");
 
 }
 
