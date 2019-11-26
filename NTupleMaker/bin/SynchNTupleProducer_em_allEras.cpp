@@ -457,7 +457,14 @@ int main(int argc, char * argv[]) {
             cout << "      processed " << nEvents << " events" << endl;
                           
          // set weights  ===============================================================================================================================================
-         mcweight = analysisTree.genweight;
+         if (isEmbedded) mcweight = analysisTree.genweight;
+         else {
+            if (analysisTree.genweight < 0){
+               mcweight = -1.;
+            }
+            else mcweight = 1.;
+         }
+         
          if (sync && mcweight<0) continue; // FIXME: needed for sync?
 
          weightScale1 = analysisTree.weightScale1;
