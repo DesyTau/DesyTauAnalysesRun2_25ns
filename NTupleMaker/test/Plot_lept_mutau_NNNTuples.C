@@ -45,7 +45,7 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
 			       )
 {
   using namespace std;
-  if(year==2018)compareCP=false;
+  if(year!=2017)compareCP=false;
   if(categoryIndex>=0){
     Cut+="(predicted_class=="+TString::Itoa(categoryIndex,10)+")*";
   }
@@ -207,7 +207,7 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
 
   // Draw main selection for all histograms in sampleNames
   for (int i=0; i<nSamples; ++i) {
-				
+    //if(!compareCP||i>=9)continue;		
     // Reading input file
     TFile * file = new TFile( directory + sampleNames[i] + ".root");
     TTree * tree = (TTree*)file->Get("TauCheck"); 
@@ -287,10 +287,16 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
   TH1D * VV         = (TH1D*)hist[5]         -> Clone("VV"); 
   TH1D * ggH        = (TH1D*)hist[7]         -> Clone("ggH");
   TH1D * qqH        = (TH1D*)hist[8]         -> Clone("qqH");
-  TH1D * CPoddH     = (TH1D*)hist[9]         -> Clone("CPoddH");
+  TH1D * CPoddH     = NULL;
+  TH1D * CPoddqqH   = NULL;
+  if(compareCP){
+    CPoddH     = (TH1D*)hist[9]         -> Clone("CPoddH");
+    CPoddqqH   = (TH1D*)hist[10]        -> Clone("CPoddqqH");
+  }
   TH1D * Fakes      = (TH1D*)hist_AntiIso[0] -> Clone("Fakes");
   
   for(int i=0;i<nSamples;i++){
+    //if(!compareCP&&i>=9)continue;
     cout << setw(nSamples) << sampleNames[i] << " : Entries = " << hist[i]->GetEntries() << " : Integral = " << hist[i]->Integral(0,nBins+1) << endl;
   }
 
@@ -376,7 +382,7 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
     cout << "eQCD: " << eQCD << "  eVV: " << eVV << "  eW: " << eW << "  eTT: " << eTT << "  eDY: " << eDY << "  eTotal: " << errTot << endl;
     dummy -> SetBinError(iB,errTot);
     ggH   -> SetBinError(iB,0);
-    CPoddH  -> SetBinError(iB,0);
+    if(compareCP)CPoddH  -> SetBinError(iB,0);
   }
   cout << endl;
 
@@ -422,9 +428,11 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
   pads[0] -> cd();
 
   // Setup legend
-  TLegend *legend = PositionedLegend(0.25, 0.30, 3, 0.03);
+  TLegend *legend;
+  if(categoryIndex==5)legend = PositionedLegend(0.35, 0.20, 2, 0.03);
+  else legend = PositionedLegend(0.35, 0.20, 3, 0.03);
   legend -> SetTextFont(42);
-
+  legend->SetNColumns(2);
   histData -> SetMarkerColor(1);
   histData -> SetLineColor(1);
   histData -> SetFillColor(1);
@@ -432,7 +440,7 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
   histData -> SetLineWidth(2);
   histData -> SetMarkerStyle(20);
   histData -> SetMarkerSize(1.1);
-
+  /*
   InitHist(QCD,TColor::GetColor("#FFCCFF"));
   InitHist(ZLL,TColor::GetColor("#DE5A6A"));
   InitHist(TT,TColor::GetColor("#9999CC"));
@@ -440,6 +448,14 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
   InitHist(ZTT,TColor::GetColor("#FFCC66"));
   InitHist(W,TColor::GetColor("#4496C8"));
   InitHist(Fakes,TColor::GetColor("#c6f74a"));
+  */
+  InitHist(QCD,TColor::GetColor("#FFCCFF"));
+  InitHist(ZLL,TColor::GetColor(100,192,232));
+  InitHist(TT,TColor::GetColor(155,152,204));
+  InitHist(VV,TColor::GetColor(222,90,106));
+  InitHist(ZTT,TColor::GetColor(248,206,104));
+  InitHist(W,TColor::GetColor("#4496C8"));
+  InitHist(Fakes,TColor::GetColor(192,232,100));
 
   legend -> AddEntry(histData, "Observed", "ple");
   legend -> AddEntry(ZTT,"Z#rightarrow #tau#tau","f");
@@ -451,7 +467,7 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
   
   legend -> AddEntry(W,"W+jets","f");
   }
-  legend -> AddEntry(VV,"single top + diboson","f");
+  legend -> AddEntry(VV,"EWK","f");
   
   // Add all bkg contributions to one stack plot
   THStack *stack = new THStack("Background","");
@@ -470,17 +486,27 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
 
   InitSignal(ggH ,2);
   InitSignal(qqH ,3);
-  InitSignal(CPoddH,4);
+  if(compareCP){
+    InitSignal(CPoddH,4); 
+    InitSignal(CPoddqqH,5); 
+  }
   if (showSignal){
     if(compareCP){
-      legend->AddEntry(ggH,"CP-even Higgs(125) #times "+TString::Itoa(scaleSignal,10),"f");
+      legend->AddEntry(ggH,"SM ggH H(125) #times "+TString::Itoa(scaleSignal,10),"f");
       ggH->Draw("hist same");
-      legend->AddEntry(CPoddH,"CP-odd Higgs(125) #times "+TString::Itoa(scaleSignal,10),"f");
+      legend->AddEntry(CPoddH,"PS ggH H(125) #times "+TString::Itoa(scaleSignal,10),"f");
       CPoddH->Draw("hist same");
+      if(nSamples==11){
+	legend->AddEntry(qqH,"SM qqH H(125) #times "+TString::Itoa(scaleSignal,10),"f");
+	qqH->Draw("hist same");
+	legend->AddEntry(CPoddqqH,"PS qqH H(125) #times "+TString::Itoa(scaleSignal,10),"f");
+	CPoddqqH->Draw("hist same");
+      
+      }
     }else{
-      legend->AddEntry(ggH,"ggH Higgs(125) #times "+TString::Itoa(scaleSignal,10),"f");
+      legend->AddEntry(ggH,"SM ggH H(125) #times "+TString::Itoa(scaleSignal,10),"f");
       ggH->Draw("hist same");
-      legend->AddEntry(qqH,"VBF Higgs(125) #times "+TString::Itoa(scaleSignal,10),"f");
+      legend->AddEntry(qqH,"SM qqH H(125) #times "+TString::Itoa(scaleSignal,10),"f");
       qqH->Draw("hist same");
     }
   }
@@ -558,6 +584,8 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
   ratioH->Draw("pe0same");
 
   pads[0]->cd();
+  if(categoryIndex==5) histData -> GetYaxis()->SetRangeUser(0.,10000.);
+
   histData->Draw("pesame");
 
   FixTopRange(pads[0], GetPadYMax(pads[0]), 0.115);
