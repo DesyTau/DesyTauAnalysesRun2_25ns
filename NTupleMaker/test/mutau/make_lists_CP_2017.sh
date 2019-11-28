@@ -2,7 +2,8 @@
 dirDataSingleMuon=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2017/data/SingleMuon
 dirMC=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2017/mc_v3
 dirMC_v4=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2017/mc_v4
-dirTauSpinner=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2016/mc_v3/
+dirTauSpinner=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2016/mc_v3/  # 2016 is OK - accidental typo
+dirEmbedded=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2017/data_v2/Embedding_mutau
 OUTDIR=./2017
 
 if [ ! -d "$OUTDIR" ]; then
@@ -42,16 +43,15 @@ ls $dirMC/WW_TuneCP5_13TeV-pythia8/*root > $OUTDIR/WW
 ls $dirMC/WZ_TuneCP5_13TeV-pythia8/*root > $OUTDIR/WZ
 ls $dirMC/ZZ_TuneCP5_13TeV-pythia8/*root > $OUTDIR/ZZ
 
-# ls $dirMC/GluGluHToTauTau_M125_13TeV_powheg_pythia8/*root > GluGluHToTauTau_M125
-# ls $dirMC/GluGluHToTauTau_M125_13TeV_powheg_pythia8_ext1/*root >> GluGluHToTauTau_M125
 ls $dirMC_v4/GluGluHToTauTau_M125_13TeV_powheg_pythia8_ext1/*root > $OUTDIR/GluGluHToTauTau_M125
 ls $dirMC_v4/GluGluHToTauTau_M125_13TeV_powheg_pythia8_new_pmx/*root >> $OUTDIR/GluGluHToTauTau_M125
 ls $dirMC_v4/VBFHToTauTau_M125_13TeV_powheg_pythia8/*root > $OUTDIR/VBFHToTauTau_M125
 
-ls $dirMC_v4/SUSYGluGluToHToTauTau_M-130_TuneCUETP8M1_13TeV-pythia8/*root > $OUTDIR/SUSYGluGluToHToTauTau
-ls $dirMC_v4/SUSYGluGluToHToTauTau_M-120_TuneCUETP8M1_13TeV-pythia8/*root >> $OUTDIR/SUSYGluGluToHToTauTau
-ls $dirMC_v4/SUSYGluGluToBBHToTauTau_M-130_TuneCUETP8M1_13TeV-pythia8/*root >> $OUTDIR/SUSYGluGluToHToTauTau
-ls $dirMC_v4/SUSYGluGluToBBHToTauTau_M-120_TuneCUETP8M1_13TeV-pythia8/*root >> $OUTDIR/SUSYGluGluToHToTauTau
+# # commented since now switching to TauSpinner weights
+# ls $dirMC_v4/SUSYGluGluToHToTauTau_M-130_TuneCUETP8M1_13TeV-pythia8/*root > $OUTDIR/SUSYGluGluToHToTauTau
+# ls $dirMC_v4/SUSYGluGluToHToTauTau_M-120_TuneCUETP8M1_13TeV-pythia8/*root >> $OUTDIR/SUSYGluGluToHToTauTau
+# ls $dirMC_v4/SUSYGluGluToBBHToTauTau_M-130_TuneCUETP8M1_13TeV-pythia8/*root >> $OUTDIR/SUSYGluGluToHToTauTau
+# ls $dirMC_v4/SUSYGluGluToBBHToTauTau_M-120_TuneCUETP8M1_13TeV-pythia8/*root >> $OUTDIR/SUSYGluGluToHToTauTau
 
 ls $dirDataSingleMuon/SingleMuon_Run2017B-31Mar2018-v1/*root > $OUTDIR/SingleMuon_Run2017B
 ls $dirDataSingleMuon/SingleMuon_Run2017C-31Mar2018-v1/*root > $OUTDIR/SingleMuon_Run2017C
@@ -62,6 +62,11 @@ ls $dirDataSingleMuon/SingleMuon_Run2017F-31Mar2018-v1/*root > $OUTDIR/SingleMuo
 ls $dirTauSpinner/GluGluToHToTauTauNoSpin_M125/*root > $OUTDIR/GluGluHToTauTauUncorrDecays_M125
 ls $dirTauSpinner/VBFHToTauTauNoSpin_M125/*root > $OUTDIR/VBFHToTauTauUncorrDecays_M125
 
-ls /pnfs/desy.de/cms/tier2/store/user/mvandekl/2017/mc/GluGluToHToTauTauNoSpin_Unfiltered_Rev1/*.root > $OUTDIR/GluGluToHToTauTauNoSpinCorr_Unfiltered
-ls /pnfs/desy.de/cms/tier2/store/user/mvandekl/2017/mc/VBFHToTauTauNoSpin_Unfiltered_Rev1/*.root > $OUTDIR/VBFHToTauTauNoSpinCorr_Unfiltered
+# ls /pnfs/desy.de/cms/tier2/store/user/mvandekl/2017/mc/GluGluToHToTauTauNoSpin_Unfiltered_Rev1/*.root > $OUTDIR/GluGluToHToTauTauNoSpinCorr_Unfiltered
+# ls /pnfs/desy.de/cms/tier2/store/user/mvandekl/2017/mc/VBFHToTauTauNoSpin_Unfiltered_Rev1/*.root > $OUTDIR/VBFHToTauTauNoSpinCorr_Unfiltered
 
+ls $dirEmbedded/EmbeddingRun2017B_MuTau/*root > $OUTDIR/EmbeddedMuTau_Run2017B
+ls $dirEmbedded/EmbeddingRun2017C_MuTau/*root > $OUTDIR/EmbeddedMuTau_Run2017C
+ls $dirEmbedded/EmbeddingRun2017D_MuTau/*root > $OUTDIR/EmbeddedMuTau_Run2017D
+ls $dirEmbedded/EmbeddingRun2017E_MuTau/*root > $OUTDIR/EmbeddedMuTau_Run2017E
+ls $dirEmbedded/EmbeddingRun2017F_MuTau/*root > $OUTDIR/EmbeddedMuTau_Run2017F

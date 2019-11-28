@@ -11,8 +11,9 @@
 #include "DesyTauAnalyses/NTupleMaker/interface/PileUp.h"
 #include "HiggsCPinTauDecays/ImpactParameter/interface/ImpactParameter.h"
 
-#define PI_MASS     0.13957 //All energies and momenta are expressed in GeV
-#define MUON_MASS   0.105658
+#define PI_MASS         0.13957 //All energies and momenta are expressed in GeV
+#define MUON_MASS       0.105658
+#define ELECTRON_MASS   0.000511
 
 /*Updates Merijn 2018 11 13
 -added acott_Impr, which is improved version of acott. Note it takes the decay channel as input also. 
@@ -84,8 +85,8 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
   otree->VyConstitTau2=-9999;
   otree->VzConstitTau2=-9999;
 
-  bool decay1haspion=false;
-  bool decay2haspion=false;
+  bool decay1haspion = false;
+  bool decay2haspion = false;
 
   //make here a scan if the first decay is hadronic. Only do for tt case, to avoid possible segfaults if tau not present
 
@@ -103,22 +104,25 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
   }
   
   //make here a scan if the second decay is hadronic. Only for e-mu would not require this..
-  if(channel=="mt"||channel=="et"){
-  for(unsigned int pindex=0;pindex<analysisTree->tau_constituents_count[tauIndex2];pindex++){
-    if(abs(analysisTree->tau_constituents_pdgId[tauIndex2][pindex])==211){
+  if(channel == "mt" || channel == "et"){
+  for(unsigned int pindex = 0; pindex < analysisTree->tau_constituents_count[tauIndex2]; pindex++){
+    if(abs(analysisTree->tau_constituents_pdgId[tauIndex2][pindex]) == 211){
     //if(abs(analysisTree->tau_constituents_pdgId[tauIndex2][pindex])==13){
-      decay2haspion=true;
-      break;}}}
-  
+      decay2haspion = true;
+      break;
+			}
+		}
+	}
   
 //Merijn: these definitions can be discussed and adjusted to include 3 prong decays, the allow for mode 10 as well
-  bool correctDecay1=false;
-  bool correctDecay2=false;
+  bool correctDecay1 = false;
+  bool correctDecay2 = false;
   //now fix for the tree cases. Note: currently we EXCLUDE 3 prong, since NOT implemented yet. 
 
-  if(channel=="mt"||channel=="et"){
-    correctDecay1=true;
-    correctDecay2 = analysisTree->tau_decayMode[tauIndex2]<10&&decay2haspion;}
+  if(channel == "mt" || channel == "et"){
+    correctDecay1 = true;
+    correctDecay2 = analysisTree->tau_decayMode[tauIndex2] < 10 && decay2haspion;
+	}
 
   if(channel=="tt"){//just require both to be hadronic
     correctDecay1 = analysisTree->tau_decayMode[tauIndex1]<10&&decay1haspion; 
@@ -135,9 +139,8 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
   TLorentzVector tau1Prong; //the mectric convention used elsehwere for reference. Its in form px, py, pz, E.
 
   //Merijn: tauindex1 may point to electron or muon. So use the switch and index to obtain correct kinematics, assuming electron and muon masses
-  if(channel=="mt"){    
-    double muenergy=TMath::Sqrt(TMath::Power(analysisTree->muon_px[tauIndex1],2)+TMath::Power(analysisTree->muon_py[tauIndex1],2)+TMath::Power(analysisTree->muon_pz[tauIndex1],2)+TMath::Power(0.105658,2));//reconstruct energy from 3 momenta + mass
-    tau1Prong.SetPxPyPzE(analysisTree->muon_px[tauIndex1],analysisTree->muon_py[tauIndex1],analysisTree->muon_pz[tauIndex1],muenergy);
+  if(channel == "mt"){    
+    tau1Prong.SetXYZM(analysisTree->muon_px[tauIndex1], analysisTree->muon_py[tauIndex1], analysisTree->muon_pz[tauIndex1], MUON_MASS);
     //save the dx, dy, dz for tau1:
     otree->VxConstitTau1=analysisTree->muon_vx[tauIndex1];
     otree->VyConstitTau1=analysisTree->muon_vy[tauIndex1];
@@ -150,8 +153,7 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
 
   
   if(channel=="et"){
-    double elecenergy=TMath::Sqrt(TMath::Power(analysisTree->electron_px[tauIndex1],2)+TMath::Power(analysisTree->electron_py[tauIndex1],2)+TMath::Power(analysisTree->electron_pz[tauIndex1],2)+TMath::Power(0.000511,2));
-    tau1Prong.SetPxPyPzE(analysisTree->electron_px[tauIndex1],analysisTree->electron_py[tauIndex1],analysisTree->electron_pz[tauIndex1],elecenergy);
+    tau1Prong.SetXYZM(analysisTree->electron_px[tauIndex1], analysisTree->electron_py[tauIndex1], analysisTree->electron_pz[tauIndex1], ELECTRON_MASS);
     //save the dx, dy, dz for tau1:
     otree->VxConstitTau1=analysisTree->electron_vx[tauIndex1];
     otree->VyConstitTau1=analysisTree->electron_vy[tauIndex1];
@@ -186,23 +188,23 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
   
 //merijn: we vetoed already if the second tau didn't contain a pion, so can safely calculate the momentum of 2nd prong from hadrons
   TLorentzVector tau2Prong;
-  tau2Prong=chargedPivec(analysisTree,tauIndex2);
-  int piIndexfortau2=chargedPiIndex(analysisTree,tauIndex2);
-  if(piIndexfortau2>-1){
+  tau2Prong = chargedPivec(analysisTree, tauIndex2);
+  int piIndexfortau2 = chargedPiIndex(analysisTree, tauIndex2);
+  if(piIndexfortau2 > -1){
     /*
     otree->VxConstitTau2=analysisTree->tau_constituents_vx[tauIndex2][piIndexfortau2];
     otree->VyConstitTau2=analysisTree->tau_constituents_vy[tauIndex2][piIndexfortau2];   
     otree->VzConstitTau2=analysisTree->tau_constituents_vz[tauIndex2][piIndexfortau2]; */
 
     //Merijn 2019 2 9: updated to new definition
-    otree->VxConstitTau2=analysisTree->tau_pca3D_x[tauIndex2];
-    otree->VyConstitTau2=analysisTree->tau_pca3D_y[tauIndex2];
-    otree->VzConstitTau2=analysisTree->tau_pca3D_z[tauIndex2];
+    otree->VxConstitTau2 = analysisTree->tau_pca3D_x[tauIndex2];
+    otree->VyConstitTau2 = analysisTree->tau_pca3D_y[tauIndex2];
+    otree->VzConstitTau2 = analysisTree->tau_pca3D_z[tauIndex2];
     
     //Merijn 2019 4 3: replace with the tau2Prong vector. Keep old code in case something broke:
-    otree->chconst_2_pt=tau2Prong.Pt();
-    otree->chconst_2_phi=tau2Prong.Phi();
-    otree->chconst_2_eta=tau2Prong.Eta();
+    otree->chconst_2_pt  = tau2Prong.Pt();
+    otree->chconst_2_phi = tau2Prong.Phi();
+    otree->chconst_2_eta = tau2Prong.Eta();
     
   }
     
@@ -293,18 +295,17 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
 
 
 TLorentzVector chargedPivec(const AC1B * analysisTree, int tauIndex){
-  int piIndex=-1;
-  piIndex=chargedPiIndex(analysisTree,tauIndex);
+  int piIndex = -1;
+  piIndex = chargedPiIndex(analysisTree, tauIndex);
   TLorentzVector chargedPi;
   chargedPi.SetXYZT(0,0,0,0);
 
-  if (piIndex>-1) {
+  if (piIndex > -1) {
     chargedPi.SetPxPyPzE(analysisTree->tau_constituents_px[tauIndex][piIndex],
 			 analysisTree->tau_constituents_py[tauIndex][piIndex],
 			 analysisTree->tau_constituents_pz[tauIndex][piIndex],
 			 analysisTree->tau_constituents_e[tauIndex][piIndex]);
   }  
-
   return chargedPi;
 };
 

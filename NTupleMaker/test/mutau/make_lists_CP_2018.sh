@@ -1,6 +1,7 @@
 #!/bin/sh
 dirDataSingleMuon=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2018/data/SingleMuon
 dirMC=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2018/mc
+dirEmbedded=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2018/data/Embedding_mutau
 OUTDIR=./2018
 
 if [ ! -d "$OUTDIR" ]; then
@@ -40,3 +41,8 @@ ls $dirDataSingleMuon/SingleMuon_Run2018A-17Sep2018-v2/*root > $OUTDIR/SingleMuo
 ls $dirDataSingleMuon/SingleMuon_Run2018B-17Sep2018-v1/*root > $OUTDIR/SingleMuon_Run2018B
 ls $dirDataSingleMuon/SingleMuon_Run2018C-17Sep2018-v1/*root > $OUTDIR/SingleMuon_Run2018C
 ls $dirDataSingleMuon/SingleMuon_Run2018D-22Jan2019-v2/*root > $OUTDIR/SingleMuon_Run2018D
+
+ls $dirEmbedded/EmbeddingRun2018A_MuTau/*root > $OUTDIR/EmbeddedMuTau_Run2018A
+ls $dirEmbedded/EmbeddingRun2018B_MuTau/*root > $OUTDIR/EmbeddedMuTau_Run2018B
+ls $dirEmbedded/EmbeddingRun2018C_MuTau/*root > $OUTDIR/EmbeddedMuTau_Run2018C
+ls $dirEmbedded/EmbeddingRun2018D_MuTau/*root > $OUTDIR/EmbeddedMuTau_Run2018D

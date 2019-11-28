@@ -24,9 +24,10 @@ fi
 TEMPLATE_CFG_NAME="analysisMacroSynch_mt_${YEAR}"
 
 # define parameters which are different between MC and data configs
-KEY_LIST=(isData ApplyPUweight ApplyLepSF)
-VALUE_LIST_MC=(false true true)
-VALUE_LIST_DATA=(true false false)
+KEY_LIST=(isData ApplyPUweight ApplyLepSF ApplyRecoilCorrections ApplyBTagScaling)
+VALUE_LIST_MC=(false true true true true)
+VALUE_LIST_DATA=(true false false true true)
+VALUE_LIST_EMBEDDED=(true false true false false)
 
 # these parameters are year dependant for MC, so leave them as they are in the config and set to 0 only if it is data config
 # also redefine list of the parameters according to the input data type
@@ -39,19 +40,30 @@ if [[ $DATA_TYPE == "data" ]]; then
   VALUE_LIST_DATA+=(0.0 0.0 0.0)
   
   VALUE_LIST=("${VALUE_LIST_DATA[@]}")
-  NOT_DATA_TYPE="MC"
+  NOT_DATA_TYPE=("MC" "embedded")
 else
   if [[ $DATA_TYPE == "MC" ]]; then
     VALUE_LIST=("${VALUE_LIST_MC[@]}")
-    NOT_DATA_TYPE="data"
-  else
-    echo
-    echo "To produce the scripts for a specific year and either data or MC this script is to be run with a command:"
-    echo
-    echo "  bash make_config_Run2.sh <year={16,17,18}> <data_type={data, MC}>"
-    echo
-    echo "data_type is neither data nor MC - exiting"
-    exit
+    NOT_DATA_TYPE=("data" "embedded")
+  else 
+    if [[ $DATA_TYPE == "embedded" ]]; then # will not apply TES for embedded 
+      KEY_LIST+=(TauEnergyScaleShift_OneProng TauEnergyScaleShift_OneProngOnePi0 TauEnergyScaleShift_ThreeProng)
+      VALUE_LIST_EMBEDDED+=(0.0 0.0 0.0)
+      
+      KEY_LIST+=(TauEnergyScaleShift_LepFake_OneProng TauEnergyScaleShift_LepFake_OneProngOnePi0 TauEnergyScaleShift_LepFake_ThreeProng)
+      VALUE_LIST_EMBEDDED+=(0.0 0.0 0.0)
+
+      VALUE_LIST=("${VALUE_LIST_EMBEDDED[@]}")
+      NOT_DATA_TYPE=("MC" "data")
+    else
+      echo
+      echo "To produce the scripts for a specific year and either data or MC this script is to be run with a command:"
+      echo
+      echo "  bash make_config_Run2.sh <year={16,17,18}> <data_type={data, MC}>"
+      echo
+      echo "data_type is neither data nor MC - exiting"
+      exit
+    fi  
   fi
 fi
 
@@ -62,7 +74,10 @@ for (( i = 0; i < $KEY_LEN; i++ )); do
 done | sed -r -f- $TEMPLATE_CFG_NAME.conf > ${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf
 
 # remove all the lines which starts with "NOT_DATA_TYPE: " 
-sed -i "/${NOT_DATA_TYPE}: /d" ${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf
+NOT_DATA_TYPE_LEN=${#NOT_DATA_TYPE[@]}
+for (( i = 0; i < NOT_DATA_TYPE_LEN; i++ )); do
+  sed -i "/${NOT_DATA_TYPE[i]}: /d" ${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf
+done
 
 # remove just the strings "DATA_TYPE: " leaving the rest of the line intact 
 sed -i "s/${DATA_TYPE}: //" ${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf
@@ -95,3 +110,4 @@ if [[ $DATA_TYPE == "MC" ]]; then
 else
   cp  ${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf $OUTDIR/${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf
 fi
+rm ${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf
