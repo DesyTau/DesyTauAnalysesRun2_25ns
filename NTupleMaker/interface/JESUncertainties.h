@@ -84,7 +84,7 @@ class JESUncertainties {
     "RelativeStatFSR",
     "RelativeStatHF",
     "RelativeBal",
-    "RelativeSample",
+    //    "RelativeSample",
     "SinglePionECAL",
     "SinglePionHCAL",
     "TimePtEta",
@@ -96,7 +96,8 @@ class JESUncertainties {
 						   "Eta0To3",
 						   "Eta3To5",
 						   "RelativeBal",
-						   "RelativeSample"};
+						   //						   "RelativeSample"
+  };
 
   int nsrc_Eta0To5 = 13;
   std::vector<std::string> srcnames_Eta0To5 = {"SinglePionECAL",
@@ -138,7 +139,7 @@ class JESUncertainties {
     {groupedUncertNames[1],srcnames_Eta0To3},
     {groupedUncertNames[2],srcnames_Eta3To5},
     {groupedUncertNames[3],srcnames_RelativeBal},
-    {groupedUncertNames[4],srcnames_RelativeSample}
+    //    {groupedUncertNames[4],srcnames_RelativeSample}
   };
 
 
