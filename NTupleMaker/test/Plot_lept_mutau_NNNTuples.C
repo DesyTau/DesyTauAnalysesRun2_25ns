@@ -26,7 +26,7 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
 			       int nBins  =   30,
 			       float xmin =    0,
 			       float xmax =  150,
-			       TString Weight = "xsec_lumi_weight*weight**",
+			       TString Weight = "xsec_lumi_weight*weight*",
 			       TString Cut="(mt_1<50)*",
 			       TString ytitle = "Events",
 			       int categoryIndex=-1,
@@ -106,8 +106,8 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
       "mt-NOMINAL_ntuple_VV",// (6) WW, WZ, ZZ
       "mt-NOMINAL_ntuple_ggH125", // (7) Scalar ggH
       "mt-NOMINAL_ntuple_qqH125", // (8) Scalar VBF H
-      "mt-NOMINAL_ntuple_ggPSH125", // (9) Pseudoscalar ggH
-      "mt-NOMINAL_ntuple_qqPSH125" // (10) Pseudoscalar VBF
+      "mt-NOMINAL_ntuple_ggH125", // (9) Pseudoscalar ggH
+      "mt-NOMINAL_ntuple_qqH125" // (10) Pseudoscalar VBF
     };
   }else{
     sampleNames = {
