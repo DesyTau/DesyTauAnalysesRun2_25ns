@@ -42,7 +42,7 @@ ls $dirMC/ZZ_TuneCP5_13TeV-pythia8/*root > $OUTDIR/ZZ
 # ls $dirMC/GluGluHToTauTau_M125_13TeV_powheg_pythia8_ext1/*root >> GluGluHToTauTau_M125
 ls $dirMC_v4/GluGluHToTauTau_M125_13TeV_powheg_pythia8_ext1/*root > $OUTDIR/GluGluHToTauTau_M125
 ls $dirMC_v4/GluGluHToTauTau_M125_13TeV_powheg_pythia8_new_pmx/*root >> $OUTDIR/GluGluHToTauTau_M125
-ls $dirMC/VBFHToTauTau_M125_13TeV_powheg_pythia8/*root > $OUTDIR/VBFHToTauTau_M125
+ls $dirMC_v4/VBFHToTauTau_M125_13TeV_powheg_pythia8/*root > $OUTDIR/VBFHToTauTau_M125
 
 ls $dirMC_v4/SUSYGluGluToHToTauTau_M-130_TuneCUETP8M1_13TeV-pythia8/*root > $OUTDIR/SUSYGluGluToHToTauTau
 ls $dirMC_v4/SUSYGluGluToHToTauTau_M-120_TuneCUETP8M1_13TeV-pythia8/*root >> $OUTDIR/SUSYGluGluToHToTauTau
@@ -56,7 +56,8 @@ ls $dirDataSingleMuon/SingleMuon_Run2017E-31Mar2018-v1/*root > $OUTDIR/SingleMuo
 ls $dirDataSingleMuon/SingleMuon_Run2017F-31Mar2018-v1/*root > $OUTDIR/SingleMuon_Run2017F
 
 ls $dirTauSpinner/GluGluToHToTauTauNoSpin_M125/*root > $OUTDIR/GluGluHToTauTauUncorrDecays_M125
-ls $dirTauSpinner/VBFHToTauTauNoSpin_M125/*root > $OUTDIR/GluGluHToTauTauUncorrDecays_M125
+ls $dirTauSpinner/VBFHToTauTauNoSpin_M125/*root > $OUTDIR/VBFHToTauTauUncorrDecays_M125
 
 ls /pnfs/desy.de/cms/tier2/store/user/mvandekl/2017/mc/GluGluToHToTauTauNoSpin_Unfiltered_Rev1/*.root > $OUTDIR/GluGluToHToTauTauNoSpinCorr_Unfiltered
 ls /pnfs/desy.de/cms/tier2/store/user/mvandekl/2017/mc/VBFHToTauTauNoSpin_Unfiltered_Rev1/*.root > $OUTDIR/VBFHToTauTauNoSpinCorr_Unfiltered
+

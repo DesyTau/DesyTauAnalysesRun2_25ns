@@ -31,9 +31,9 @@
 ./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_mt_18_MC.conf ZZ mt 10
 
 # TT
-./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_mt_18_MC.conf TTTo2L2Nu mt 10
-./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_mt_18_MC.conf TTToHadronic mt 10
-./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_mt_18_MC.conf TTToSemiLeptonic mt 10
+./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_mt_18_MC.conf TTTo2L2Nu mt 5
+./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_mt_18_MC.conf TTToHadronic mt 5
+./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_mt_18_MC.conf TTToSemiLeptonic mt 5
 
 # Single Top
 ./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_mt_18_MC.conf ST_t-channel_antitop_4f mt 10
