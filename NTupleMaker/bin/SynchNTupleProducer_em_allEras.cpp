@@ -455,9 +455,16 @@ int main(int argc, char * argv[]) {
             
          if (nEvents%10000==0)
             cout << "      processed " << nEvents << " events" << endl;
-                          
+
          // set weights  ===============================================================================================================================================
-         mcweight = analysisTree.genweight;
+         if (isEmbedded) mcweight = analysisTree.genweight;
+         else {
+            if (analysisTree.genweight < 0){
+               mcweight = -1.;
+            }
+            else mcweight = 1.;
+         }
+         
          if (sync && mcweight<0) continue; // FIXME: needed for sync?
 
          weightScale1 = analysisTree.weightScale1;
@@ -649,7 +656,7 @@ int main(int argc, char * argv[]) {
             
             nuPt = TMath::Sqrt(nuPx*nuPx+nuPy*nuPy);
             nuPhi = TMath::ATan2(nuPy,nuPx);
-            
+
             // set zptmassweight  ======================================================================================================================================             
             if (isDY) zptmassweight = GetZptMassWeight(bosonMass, bosonPt, histZMassPtWeights);
  
@@ -782,8 +789,8 @@ int main(int argc, char * argv[]) {
          SelectMuonElePair(analysisTree, muons, electrons, isMuonIsoR03, isElectronIsoR03, dRleptonsCut, ptMuonHighCut, ptElectronHighCut, electronIndex, muonIndex, isoMuMin, isoEleMin, era);
          if (electronIndex<0) continue;
          if (muonIndex<0) continue;
-         
 
+         
          // MET Filters ================================================================================================================================================             
          metFilters_ = metFiltersPasses(analysisTree,metFlags);
          badChargedCandidateFilter_ = metFiltersPasses(analysisTree,badChargedCandidateFlag);
@@ -895,7 +902,7 @@ int main(int argc, char * argv[]) {
             
             isoweight_1 *= idweight_1;
             isoweight_2 *= idweight_2;
-          
+
             //		cout << "isoweight_1 = " << isoweight_1
             //		     << "isoweight_2 = " << isoweight_2 << endl;
             
@@ -912,25 +919,25 @@ int main(int argc, char * argv[]) {
                Mu23EffData = (float)SF_muon23->get_EfficiencyData(double(pt_2),double(eta_2));
                Mu8EffData = (float)SF_muon8->get_EfficiencyData(double(pt_2),double(eta_2));
             }
-                else {
-                   Ele23EffData = correctionWS_embedded_trigger->function("e_trg_binned_23_data")->getVal();
-                   Ele12EffData = correctionWS_embedded_trigger->function("e_trg_binned_12_data")->getVal(); 
-                   Mu23EffData  = correctionWS_embedded_trigger->function("m_trg_binned_23_data")->getVal();
-                   Mu8EffData   = correctionWS_embedded_trigger->function("m_trg_binned_8_data")->getVal();
+            else {
+                   Ele23EffData = correctionWS_embedded_trigger->function("e_trg_23_binned_ic_data")->getVal();
+                   Ele12EffData = correctionWS_embedded_trigger->function("e_trg_12_binned_ic_data")->getVal(); 
+                   Mu23EffData  = correctionWS_embedded_trigger->function("m_trg_23_binned_ic_data")->getVal();
+                   Mu8EffData   = correctionWS_embedded_trigger->function("m_trg_8_binned_ic_data")->getVal();
                 }
             
             if (isEmbedded){
                if (era=="2016"){
-                  Ele23EffData = correctionWS_embedded_trigger->function("e_trg23_binned_ic_data")->getVal();
-                  Ele12EffData = correctionWS_embedded_trigger->function("e_trg12_binned_ic_data")->getVal(); 
-                  Mu23EffData  = correctionWS_embedded_trigger->function("m_trg23_binned_ic_data")->getVal();
-                  Mu8EffData   = correctionWS_embedded_trigger->function("m_trg8_binned_ic_data")->getVal();
+                  Ele23EffData = correctionWS_embedded_trigger->function("e_trg_23_binned_ic_data")->getVal();
+                  Ele12EffData = correctionWS_embedded_trigger->function("e_trg_12_binned_ic_data")->getVal(); 
+                  Mu23EffData  = correctionWS_embedded_trigger->function("m_trg_23_binned_ic_data")->getVal();
+                  Mu8EffData   = correctionWS_embedded_trigger->function("m_trg_8_binned_ic_data")->getVal();
                }
                else {
-                  Ele23EffData = correctionWS_embedded_trigger->function("e_trg_binned_23_data")->getVal();
-                  Ele12EffData = correctionWS_embedded_trigger->function("e_trg_binned_12_data")->getVal(); 
-                  Mu23EffData  = correctionWS_embedded_trigger->function("m_trg_binned_23_data")->getVal();
-                  Mu8EffData   = correctionWS_embedded_trigger->function("m_trg_binned_8_data")->getVal();
+                  Ele23EffData = correctionWS_embedded_trigger->function("e_trg_23_binned_ic_data")->getVal();
+                  Ele12EffData = correctionWS_embedded_trigger->function("e_trg_12_binned_ic_data")->getVal(); 
+                  Mu23EffData  = correctionWS_embedded_trigger->function("m_trg_23_binned_ic_data")->getVal();
+                  Mu8EffData   = correctionWS_embedded_trigger->function("m_trg_8_binned_ic_data")->getVal();
                }
             }
 
@@ -945,24 +952,24 @@ int main(int argc, char * argv[]) {
                      Mu8EffMC   = (float)SF_muon8->get_EfficiencyMC(double(pt_2),double(eta_2));
                   }
                   else {
-                     Ele23EffMC = correctionWS_embedded_trigger->function("e_trg23_binned_ic_embed")->getVal();
-                     Ele12EffMC = correctionWS_embedded_trigger->function("e_trg12_binned_ic_embed")->getVal(); 
-                     Mu23EffMC  = correctionWS_embedded_trigger->function("m_trg23_binned_ic_embed")->getVal();
-                     Mu8EffMC   = correctionWS_embedded_trigger->function("m_trg8_binned_ic_embed")->getVal();
+                     Ele23EffMC = correctionWS_embedded_trigger->function("e_trg_23_binned_ic_embed")->getVal();
+                     Ele12EffMC = correctionWS_embedded_trigger->function("e_trg_12_binned_ic_embed")->getVal(); 
+                     Mu23EffMC  = correctionWS_embedded_trigger->function("m_trg_23_binned_ic_embed")->getVal();
+                     Mu8EffMC   = correctionWS_embedded_trigger->function("m_trg_8_binned_ic_embed")->getVal();
                   }
                }
                else {
                   if (isEmbedded) {
-                     Ele23EffMC = correctionWS_embedded_trigger->function("e_trg_binned_23_embed")->getVal();
-                     Ele12EffMC = correctionWS_embedded_trigger->function("e_trg_binned_12_embed")->getVal(); 
-                     Mu23EffMC  = correctionWS_embedded_trigger->function("m_trg_binned_23_embed")->getVal();
-                     Mu8EffMC   = correctionWS_embedded_trigger->function("m_trg_binned_8_embed" )->getVal();
+                     Ele23EffMC = correctionWS_embedded_trigger->function("e_trg_23_binned_ic_embed")->getVal();
+                     Ele12EffMC = correctionWS_embedded_trigger->function("e_trg_12_binned_ic_embed")->getVal(); 
+                     Mu23EffMC  = correctionWS_embedded_trigger->function("m_trg_23_binned_ic_embed")->getVal();
+                     Mu8EffMC   = correctionWS_embedded_trigger->function("m_trg_8_binned_ic_embed" )->getVal();
                   }
                   else {
-                     Ele23EffMC = correctionWS_embedded_trigger->function("e_trg_binned_23_mc")->getVal();
-                     Ele12EffMC = correctionWS_embedded_trigger->function("e_trg_binned_12_mc")->getVal();
-                     Mu23EffMC  = correctionWS_embedded_trigger->function("m_trg_binned_23_mc")->getVal();
-                     Mu8EffMC   = correctionWS_embedded_trigger->function("m_trg_binned_8_mc" )->getVal();
+                     Ele23EffMC = correctionWS_embedded_trigger->function("e_trg_23_binned_ic_mc")->getVal();
+                     Ele12EffMC = correctionWS_embedded_trigger->function("e_trg_12_binned_ic_mc")->getVal();
+                     Mu23EffMC  = correctionWS_embedded_trigger->function("m_trg_23_binned_ic_mc")->getVal();
+                     Mu8EffMC   = correctionWS_embedded_trigger->function("m_trg_8_binned_ic_mc" )->getVal();
                   }
                   
                }
@@ -1015,7 +1022,7 @@ int main(int argc, char * argv[]) {
          pt_vis = dileptonLV.Pt();
          dphi_tt = dPhiFrom2P(muonLV.Px(),muonLV.Py(),electronLV.Px(),electronLV.Py());   
          dr_tt = deltaR(muonLV.Eta(),muonLV.Phi(),electronLV.Eta(),electronLV.Phi());
-         
+
          // counting jets ==============================================================================================================================================
          TLorentzVector metLV;
          float met_x;
@@ -1674,134 +1681,44 @@ int main(int argc, char * argv[]) {
             if (gen_match_1 == 2 && gen_match_2 ==2) isPromptZMM = true;
             }
          
+         // QCD estimation =======================================================================================================================================================
 
-         if (era=="2016"){
-            correctionWS_qcd->var("e_pt")->setVal(pt_1);
-            correctionWS_qcd->var("m_pt")->setVal(pt_2);
-            correctionWS_qcd->var("njets")->setVal(njets);
-            correctionWS_qcd->var("dR")->setVal(dr_tt);
-            double_t em_qcd_osss_binned = correctionWS_qcd->function("em_qcd_osss_binned")->getVal();
-            
-            double_t em_qcd_osss_binned_rate_up = correctionWS_qcd->function("em_qcd_osss_rateup_binned")->getVal();
-            double_t em_qcd_osss_binned_rate_down = correctionWS_qcd->function("em_qcd_osss_ratedown_binned")->getVal();
-            double_t em_qcd_osss_binned_shape_up = correctionWS_qcd->function("em_qcd_osss_shapeup_binned")->getVal();
-            double_t em_qcd_osss_binned_shape_down = correctionWS_qcd->function("em_qcd_osss_shapedown_binned")->getVal();
-               
-            qcdweight = em_qcd_osss_binned;
-            
-            if (njets==0) {
-               qcdweight_0jet_rate_up =  em_qcd_osss_binned_rate_up;
-               qcdweight_0jet_rate_down = em_qcd_osss_binned_rate_down;   
-               qcdweight_0jet_shape_up = em_qcd_osss_binned_shape_up;
-               qcdweight_0jet_shape_down =  em_qcd_osss_binned_shape_down;
-               qcdweight_1jet_rate_up =  em_qcd_osss_binned;
-               qcdweight_1jet_rate_down = em_qcd_osss_binned; 
-                  qcdweight_1jet_shape_up = em_qcd_osss_binned;
-                  qcdweight_1jet_shape_down = em_qcd_osss_binned;
-            }   
-            else {
-               qcdweight_0jet_rate_up =  em_qcd_osss_binned;
-               qcdweight_0jet_rate_down = em_qcd_osss_binned;
-               qcdweight_0jet_shape_up = em_qcd_osss_binned;
-               qcdweight_0jet_shape_down =  em_qcd_osss_binned;
-               qcdweight_1jet_rate_up =  em_qcd_osss_binned_rate_up;
-               qcdweight_1jet_rate_down =  em_qcd_osss_binned_rate_down;
-               qcdweight_1jet_shape_up = em_qcd_osss_binned_shape_up;
-               qcdweight_1jet_shape_down =  em_qcd_osss_binned_shape_down;
-            }
-            
-            qcdweight_iso_up = correctionWS_qcd->function("em_qcd_extrap_up")->getVal();
-            qcdweight_iso_down = correctionWS_qcd->function("em_qcd_extrap_down")->getVal();
-         }  
-         else if (era=="2017"){
-            correctionWS_qcd->var("e_pt")->setVal(pt_1);
-            correctionWS_qcd->var("m_pt")->setVal(pt_2);
-            double_t em_qcd_extrap_uncert = correctionWS_qcd->function("em_qcd_extrap_uncert")->getVal();
-            
-            correctionWS_qcd->var("e_pt")->setVal(pt_1);
-            correctionWS_qcd->var("m_pt")->setVal(pt_2);
-            correctionWS_qcd->var("njets")->setVal(njets);
-            correctionWS_qcd->var("dR")->setVal(dr_tt);
-            double_t em_qcd_osss_binned = correctionWS_qcd->function("em_qcd_osss_binned")->getVal();
-            double_t em_qcd_osss_binned_0jet_rate_up = correctionWS_qcd->function("em_qcd_osss_0jet_rateup")->getVal();
-            double_t em_qcd_osss_binned_0jet_rate_down = correctionWS_qcd->function("em_qcd_osss_0jet_ratedown")->getVal();
-            double_t em_qcd_osss_binned_1jet_rate_up = correctionWS_qcd->function("em_qcd_osss_1jet_rateup")->getVal();
-            double_t em_qcd_osss_binned_1jet_rate_down = correctionWS_qcd->function("em_qcd_osss_1jet_ratedown")->getVal();
-            double_t em_qcd_osss_binned_0jet_shape_up = correctionWS_qcd->function("em_qcd_osss_0jet_shapeup")->getVal();
-            double_t em_qcd_osss_binned_0jet_shape_down = correctionWS_qcd->function("em_qcd_osss_0jet_shapedown")->getVal();
-            double_t em_qcd_osss_binned_1jet_shape_up = correctionWS_qcd->function("em_qcd_osss_1jet_shapeup")->getVal();
-            double_t em_qcd_osss_binned_1jet_shape_down = correctionWS_qcd->function("em_qcd_osss_1jet_shapedown")->getVal();
-            
-            qcdweight = em_qcd_extrap_uncert * em_qcd_osss_binned;
-            qcdweight_0jet_rate_up = em_qcd_extrap_uncert * em_qcd_osss_binned_0jet_rate_up;
-            qcdweight_0jet_rate_down = em_qcd_extrap_uncert * em_qcd_osss_binned_0jet_rate_down;   
-            qcdweight_1jet_rate_up = em_qcd_extrap_uncert * em_qcd_osss_binned_1jet_rate_up;
-            qcdweight_1jet_rate_down = em_qcd_extrap_uncert * em_qcd_osss_binned_1jet_rate_down;
-            qcdweight_0jet_shape_up = em_qcd_extrap_uncert * em_qcd_osss_binned_0jet_shape_up;
-            qcdweight_0jet_shape_down = em_qcd_extrap_uncert * em_qcd_osss_binned_0jet_shape_down;   
-            qcdweight_1jet_shape_up = em_qcd_extrap_uncert * em_qcd_osss_binned_1jet_shape_up;
-            qcdweight_1jet_shape_down = em_qcd_extrap_uncert * em_qcd_osss_binned_1jet_shape_down;
-            
-            qcdweight_iso_up = em_qcd_extrap_uncert * em_qcd_extrap_uncert * em_qcd_osss_binned;
-            qcdweight_iso_down = em_qcd_osss_binned;
-         }
-         else if (era=="2018"){
-            // correctionWS_qcd->var("e_pt")->setVal(pt_1);
-            // correctionWS_qcd->var("m_pt")->setVal(pt_2);
-            // double_t em_qcd_extrap_uncert = correctionWS_qcd->function("em_qcd_extrap_uncert")->getVal(); TO CHECK: ALREADY APPLIED?
-
-            correctionWS_qcd->var("e_pt")->setVal(pt_1);
-            correctionWS_qcd->var("m_pt")->setVal(pt_2);
-            correctionWS_qcd->var("njets")->setVal(njets);
-            correctionWS_qcd->var("dR")->setVal(dr_tt);
-            double_t em_qcd_osss_binned = correctionWS_qcd->function("em_qcd_osss_binned")->getVal();
-            double_t em_qcd_osss_binned_0jet_rate_up = correctionWS_qcd->function("em_qcd_osss_0jet_rateup")->getVal();
-            double_t em_qcd_osss_binned_0jet_rate_down = correctionWS_qcd->function("em_qcd_osss_0jet_ratedown")->getVal();
-            double_t em_qcd_osss_binned_1jet_rate_up = correctionWS_qcd->function("em_qcd_osss_1jet_rateup")->getVal();
-            double_t em_qcd_osss_binned_1jet_rate_down = correctionWS_qcd->function("em_qcd_osss_1jet_ratedown")->getVal();
-            double_t em_qcd_osss_binned_2jet_rate_up = correctionWS_qcd->function("em_qcd_osss_2jet_rateup")->getVal();
-            double_t em_qcd_osss_binned_2jet_rate_down = correctionWS_qcd->function("em_qcd_osss_2jet_ratedown")->getVal();
-            double_t em_qcd_osss_binned_0jet_shape_up = correctionWS_qcd->function("em_qcd_osss_0jet_shapeup")->getVal();
-            double_t em_qcd_osss_binned_0jet_shape_down = correctionWS_qcd->function("em_qcd_osss_0jet_shapedown")->getVal();
-            double_t em_qcd_osss_binned_1jet_shape_up = correctionWS_qcd->function("em_qcd_osss_1jet_shapeup")->getVal();
-            double_t em_qcd_osss_binned_1jet_shape_down = correctionWS_qcd->function("em_qcd_osss_1jet_shapedown")->getVal();
-            double_t em_qcd_osss_binned_2jet_shape_up = correctionWS_qcd->function("em_qcd_osss_2jet_shapeup")->getVal();
-            double_t em_qcd_osss_binned_2jet_shape_down = correctionWS_qcd->function("em_qcd_osss_2jet_shapedown")->getVal();
-            double_t em_qcd_extrap_up = correctionWS_qcd->function("em_qcd_extrap_up")->getVal();
-            double_t em_qcd_extrap_down = correctionWS_qcd->function("em_qcd_extrap_down")->getVal();
-
-            // qcdweight = em_qcd_extrap_uncert * em_qcd_osss_binned;
-            // qcdweight_0jet_rate_up = em_qcd_extrap_uncert * em_qcd_osss_binned_0jet_rate_up;
-            // qcdweight_0jet_rate_down = em_qcd_extrap_uncert * em_qcd_osss_binned_0jet_rate_down;   
-            // qcdweight_1jet_rate_up = em_qcd_extrap_uncert * em_qcd_osss_binned_1jet_rate_up;
-            // qcdweight_1jet_rate_down = em_qcd_extrap_uncert * em_qcd_osss_binned_1jet_rate_down;
-            // qcdweight_2jet_rate_up = em_qcd_extrap_uncert * em_qcd_osss_binned_2jet_rate_up;
-            // qcdweight_2jet_rate_down = em_qcd_extrap_uncert * em_qcd_osss_binned_2jet_rate_down;
-            // qcdweight_0jet_shape_up = em_qcd_extrap_uncert * em_qcd_osss_binned_0jet_shape_up;
-            // qcdweight_0jet_shape_down = em_qcd_extrap_uncert * em_qcd_osss_binned_0jet_shape_down;   
-            // qcdweight_1jet_shape_up = em_qcd_extrap_uncert * em_qcd_osss_binned_1jet_shape_up;
-            // qcdweight_1jet_shape_down = em_qcd_extrap_uncert * em_qcd_osss_binned_1jet_shape_down;
-            // qcdweight_2jet_shape_up = em_qcd_extrap_uncert * em_qcd_osss_binned_2jet_shape_up;
-            // qcdweight_2jet_shape_down = em_qcd_extrap_uncert * em_qcd_osss_binned_2jet_shape_down;
-           
-            // FIXME: HAS TO BE CHECKED IF CORRECLTY IMPLEMENTED
-            qcdweight =  em_qcd_osss_binned;
-            qcdweight_0jet_rate_up =  em_qcd_osss_binned_0jet_rate_up;
-            qcdweight_0jet_rate_down =  em_qcd_osss_binned_0jet_rate_down;   
-            qcdweight_1jet_rate_up =  em_qcd_osss_binned_1jet_rate_up;
-            qcdweight_1jet_rate_down =  em_qcd_osss_binned_1jet_rate_down;
-            qcdweight_2jet_rate_up =  em_qcd_osss_binned_2jet_rate_up;
-            qcdweight_2jet_rate_down =  em_qcd_osss_binned_2jet_rate_down;
-            qcdweight_0jet_shape_up =  em_qcd_osss_binned_0jet_shape_up;
-            qcdweight_0jet_shape_down =  em_qcd_osss_binned_0jet_shape_down;   
-            qcdweight_1jet_shape_up =  em_qcd_osss_binned_1jet_shape_up;
-            qcdweight_1jet_shape_down =  em_qcd_osss_binned_1jet_shape_down;
-            qcdweight_2jet_shape_up =  em_qcd_osss_binned_2jet_shape_up;
-            qcdweight_2jet_shape_down = em_qcd_osss_binned_2jet_shape_down;
-            
-            qcdweight_iso_up = em_qcd_extrap_up;
-            qcdweight_iso_down = em_qcd_extrap_down;
-         }
+         correctionWS_qcd->var("e_pt")->setVal(pt_1);
+         correctionWS_qcd->var("m_pt")->setVal(pt_2);
+         correctionWS_qcd->var("njets")->setVal(njets);
+         correctionWS_qcd->var("dR")->setVal(dr_tt);
+         double_t em_qcd_osss_binned = correctionWS_qcd->function("em_qcd_osss")->getVal();
+         double_t em_qcd_osss_binned_0jet_rate_up = correctionWS_qcd->function("em_qcd_osss_stat_0jet_unc1_up")->getVal();
+         double_t em_qcd_osss_binned_0jet_rate_down = correctionWS_qcd->function("em_qcd_osss_stat_0jet_unc1_down")->getVal();
+         double_t em_qcd_osss_binned_1jet_rate_up = correctionWS_qcd->function("em_qcd_osss_stat_1jet_unc1_up")->getVal();
+         double_t em_qcd_osss_binned_1jet_rate_down = correctionWS_qcd->function("em_qcd_osss_stat_1jet_unc1_down")->getVal();
+         double_t em_qcd_osss_binned_2jet_rate_up = correctionWS_qcd->function("em_qcd_osss_stat_2jet_unc1_up")->getVal();
+         double_t em_qcd_osss_binned_2jet_rate_down = correctionWS_qcd->function("em_qcd_osss_stat_2jet_unc1_down")->getVal();
+         double_t em_qcd_osss_binned_0jet_shape_up = correctionWS_qcd->function("em_qcd_osss_stat_0jet_unc2_up")->getVal();
+         double_t em_qcd_osss_binned_0jet_shape_down = correctionWS_qcd->function("em_qcd_osss_stat_0jet_unc2_down")->getVal();
+         double_t em_qcd_osss_binned_1jet_shape_up = correctionWS_qcd->function("em_qcd_osss_stat_1jet_unc2_up")->getVal();
+         double_t em_qcd_osss_binned_1jet_shape_down = correctionWS_qcd->function("em_qcd_osss_stat_1jet_unc2_down")->getVal();
+         double_t em_qcd_osss_binned_2jet_shape_up = correctionWS_qcd->function("em_qcd_osss_stat_2jet_unc2_up")->getVal();
+         double_t em_qcd_osss_binned_2jet_shape_down = correctionWS_qcd->function("em_qcd_osss_stat_2jet_unc2_down")->getVal();
+         double_t em_qcd_extrap_up = correctionWS_qcd->function("em_qcd_osss_extrap_up")->getVal();
+         double_t em_qcd_extrap_down = correctionWS_qcd->function("em_qcd_osss_extrap_down")->getVal();
+        
+         qcdweight =  em_qcd_osss_binned;
+         qcdweight_0jet_rate_up =  em_qcd_osss_binned_0jet_rate_up;
+         qcdweight_0jet_rate_down =  em_qcd_osss_binned_0jet_rate_down;   
+         qcdweight_1jet_rate_up =  em_qcd_osss_binned_1jet_rate_up;
+         qcdweight_1jet_rate_down =  em_qcd_osss_binned_1jet_rate_down;
+         qcdweight_2jet_rate_up =  em_qcd_osss_binned_2jet_rate_up;
+         qcdweight_2jet_rate_down =  em_qcd_osss_binned_2jet_rate_down;
+         qcdweight_0jet_shape_up =  em_qcd_osss_binned_0jet_shape_up;
+         qcdweight_0jet_shape_down =  em_qcd_osss_binned_0jet_shape_down;   
+         qcdweight_1jet_shape_up =  em_qcd_osss_binned_1jet_shape_up;
+         qcdweight_1jet_shape_down =  em_qcd_osss_binned_1jet_shape_down;
+         qcdweight_2jet_shape_up =  em_qcd_osss_binned_2jet_shape_up;
+         qcdweight_2jet_shape_down = em_qcd_osss_binned_2jet_shape_down;
+         
+         qcdweight_iso_up = em_qcd_extrap_up;
+         qcdweight_iso_down = em_qcd_extrap_down;
 
          if (!isData){
             if (era=="2016")
