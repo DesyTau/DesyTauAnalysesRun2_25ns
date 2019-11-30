@@ -26,7 +26,7 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
 			       int nBins  =   30,
 			       float xmin =    0,
 			       float xmax =  150,
-			       TString Weight = "xsec_lumi_weight*puweight*effweight*mcweight*",
+			       TString Weight = "xsec_lumi_weight*weight*",
 			       TString Cut="(mt_1<50)*",
 			       TString ytitle = "Events",
 			       int categoryIndex=-1,
@@ -45,6 +45,7 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
 			       )
 {
   using namespace std;
+  if(year!=2017)compareCP=false;
   if(categoryIndex>=0){
     Cut+="(predicted_class=="+TString::Itoa(categoryIndex,10)+")*";
   }
@@ -60,14 +61,17 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
     if(categoryIndex==1){
       nBins=nBins*5;
       xmax+=4*(xmax-xmin);
-      Variable=xVar+"*("+yVar+"<0.2)+(("+range+"+"+xVar+")*("+yVar+">=0.2&&"+yVar+"<0.4))+((2*"+range+"+"+xVar+")*("+yVar+">=0.4&&"+yVar+"<0.6))+((3*"+range+"+"+xVar+")*("+yVar+">=0.6&&"+yVar+"<0.8))+((4*"+range+"+"+xVar+")*("+yVar+">=0.8))";
+      Variable=xVar+"*("+yVar+"<0.3)+(("+range+"+"+xVar+")*("+yVar+">=0.3&&"+yVar+"<0.5))+((2*"+range+"+"+xVar+")*("+yVar+">=0.5&&"+yVar+"<0.65))+((3*"+range+"+"+xVar+")*("+yVar+">=0.65&&"+yVar+"<0.85))+((4*"+range+"+"+xVar+")*("+yVar+">=0.85))";
     }else{
       nBins=nBins*3;
       xmax+=2*(xmax-xmin);
-      Variable=xVar+"*("+yVar+"<0.2)+(("+range+"+"+xVar+")*("+yVar+">=0.2&&"+yVar+"<0.4))+((2*"+range+"+"+xVar+")*("+yVar+">=0.4&&"+yVar+"<0.6))+((3*"+range+"+"+xVar+")*("+yVar+">=0.6))";
+      Variable=xVar+"*("+yVar+"<0.3)+(("+range+"+"+xVar+")*("+yVar+">=0.3&&"+yVar+"<0.5))+((2*"+range+"+"+xVar+")*("+yVar+">=0.5))";//&&"+yVar+"<0.6))+((3*"+range+"+"+xVar+")*("+yVar+">=0.6))";
     }
     VariableName="Unrolled_"+xVar;
     var2D=true;
+  }else if(Variable.Contains("*")){
+    TObjArray *array = Variable.Tokenize("*");
+    VariableName=array->At(0)->GetName();
   }
   TString TauIso="mva17_2";
   if(DeepTau)TauIso="byMediumDeepTau2017v2p1VSjet_2";
@@ -78,7 +82,6 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
   // directory="$CMSSW_BASE/src/"+directory;
   TH1::SetDefaultSumw2();
   SetStyle();
-  const int nSamples = 10; //DY is used twice, for Zll and Ztt
 
   // Simple check to prevent accidental unblinding in SR, to unblind set FORCE to True
   if(!FORCE&&(categoryIndex==0||categoryIndex==1)){
@@ -103,7 +106,8 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
       "mt-NOMINAL_ntuple_VV",// (6) WW, WZ, ZZ
       "mt-NOMINAL_ntuple_ggH125", // (7) Scalar ggH
       "mt-NOMINAL_ntuple_qqH125", // (8) Scalar VBF H
-      "mt-NOMINAL_ntuple_CPoddH125" // (9) Pseudoscalar 
+      "mt-NOMINAL_ntuple_ggH125", // (9) Pseudoscalar ggH
+      "mt-NOMINAL_ntuple_qqH125" // (10) Pseudoscalar VBF
     };
   }else{
     sampleNames = {
@@ -116,9 +120,11 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
       "mt-NOMINAL_ntuple_VV",// (6) WW, WZ, ZZ
       "mt-NOMINAL_ntuple_ggH", // (7) Scalar ggH
       "mt-NOMINAL_ntuple_VBF", // (8) Scalar VBF H
-      "mt-NOMINAL_ntuple_CPodd" // (9) Pseudoscalar 
+      "mt-NOMINAL_ntuple_ggH", // (9) Pseudoscalar 
+      "mt-NOMINAL_ntuple_VBF" // (10) Scalar VBF H
     }; 
   }
+  const int nSamples = sampleNames.size(); //DY is used twice, for Zll and Ztt
   cout<<"this are the samples"<<endl;
   for (int i=0; i<nSamples; ++i) {
     cout << endl << sampleNames[i] << ":" << endl;}
@@ -139,7 +145,7 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
   for (int i=0; i<nSamples; ++i){
     cuts[i]   = IsoCut+Weight+"(os>0.5)";
     cutsSS[i] = IsoCut+Weight+qcdweight+"(os<0.5)";
-    cutsaIso[i] = AntiIsoCut+Weight+"(os>0.5)*"+FFweight+"*((gen_match_2==5)*0.88+(gen_match_2==2||gen_match_2==4)*correction_againstMuonTight3_2+(gen_match_2==1||gen_match_2==3))";
+    cutsaIso[i] = AntiIsoCut+Weight+"(os>0.5)*"+FFweight+"*(gen_match_2!=6)";
   }
 
   //specific selection weights for data, DY and top
@@ -151,7 +157,14 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
   cuts[7] += "*"+TString::Itoa(scaleSignal,10);
   cuts[8] += "*"+TString::Itoa(scaleSignal,10);
   cuts[9] += "*"+TString::Itoa(scaleSignal,10);
-  if(FFmethod) for(int i=2; i<nSamples; ++i) cuts[i] += "*(gen_match_2!=6)";
+  cuts[10]+= "*"+TString::Itoa(scaleSignal,10);
+  if(compareCP){
+    cuts[7] +="*gen_sm_htt125";
+    cuts[8] +="*gen_sm_htt125";
+    cuts[9] +="*gen_ps_htt125";
+    cuts[10] +="*gen_ps_htt125";
+  }    
+  if(FFmethod) for(int i=2; i<7; ++i) cuts[i] += "*(gen_match_2!=6)";
    
   cutsSS[0] = IsoCut+qcdweight+"(os<0.5)";
   cutsSS[1] += zptmassweight+isZTT;
@@ -161,7 +174,13 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
   cutsSS[7] += "*"+TString::Itoa(scaleSignal,10);
   cutsSS[8] += "*"+TString::Itoa(scaleSignal,10);
   cutsSS[9] += "*"+TString::Itoa(scaleSignal,10);
- 
+  cutsSS[10]+= "*"+TString::Itoa(scaleSignal,10);
+ if(compareCP){
+    cutsSS[7] +="*gen_sm_htt125";
+    cutsSS[8] +="*gen_sm_htt125";
+    cutsSS[9] +="*gen_ps_htt125";
+    cutsSS[10] +="*gen_ps_htt125";
+  }  
   cutsaIso[0] = AntiIsoCut+"(os>0.5)*"+FFweight;
   cutsaIso[1] += zptmassweight+isZTT;
   cutsaIso[2] += zptmassweight+isZLL;
@@ -170,7 +189,13 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
   cutsaIso[7] += "*"+TString::Itoa(scaleSignal,10);
   cutsaIso[8] += "*"+TString::Itoa(scaleSignal,10);
   cutsaIso[9] += "*"+TString::Itoa(scaleSignal,10);
- 
+  cutsaIso[10]+= "*"+TString::Itoa(scaleSignal,10);
+  if(compareCP){
+    cutsaIso[7] +="*gen_sm_htt125";
+    cutsaIso[8] +="*gen_sm_htt125";
+    cutsaIso[9] +="*gen_ps_htt125";
+    cutsaIso[10] +="*gen_ps_htt125";
+  }  
   // *******************************
   // ***** Filling Histograms ******
   // *******************************
@@ -182,7 +207,7 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
 
   // Draw main selection for all histograms in sampleNames
   for (int i=0; i<nSamples; ++i) {
-				
+    //if(!compareCP||i>=9)continue;		
     // Reading input file
     TFile * file = new TFile( directory + sampleNames[i] + ".root");
     TTree * tree = (TTree*)file->Get("TauCheck"); 
@@ -196,14 +221,12 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
     histSS[i] = new TH1D(histNameSS,"",nBins,xmin,xmax);
     hist_AntiIso[i] = new TH1D(histNameaIso,"",nBins,xmin,xmax);
 		
-		if (i != 9) {
-			cout << "Drawing ..." << endl;
-			tree->Draw(Variable+">>"+histName,cuts[i]);
-			cout << cuts[i] <<endl;
-			tree->Draw(Variable+">>"+histNameSS,cutsSS[i]);
-			tree->Draw(Variable+">>"+histNameaIso,cutsaIso[i]);
-			cout << sampleNames[i] << " : Entries = " << hist[i]->GetEntries() << " : Integral = " << hist[i]->Integral(0,nBins+1) << endl;
-		}
+    cout << "Drawing ..." << endl;
+    tree->Draw(Variable+">>"+histName,cuts[i]);
+    cout << cuts[i] <<endl;
+    tree->Draw(Variable+">>"+histNameSS,cutsSS[i]);
+    tree->Draw(Variable+">>"+histNameaIso,cutsaIso[i]);
+    cout << sampleNames[i] << " : Entries = " << hist[i]->GetEntries() << " : Integral = " << hist[i]->Integral(0,nBins+1) << endl;
   }
 
 
@@ -264,10 +287,16 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
   TH1D * VV         = (TH1D*)hist[5]         -> Clone("VV"); 
   TH1D * ggH        = (TH1D*)hist[7]         -> Clone("ggH");
   TH1D * qqH        = (TH1D*)hist[8]         -> Clone("qqH");
-  TH1D * CPoddH     = (TH1D*)hist[9]         -> Clone("CPoddH");
+  TH1D * CPoddH     = NULL;
+  TH1D * CPoddqqH   = NULL;
+  if(compareCP){
+    CPoddH     = (TH1D*)hist[9]         -> Clone("CPoddH");
+    CPoddqqH   = (TH1D*)hist[10]        -> Clone("CPoddqqH");
+  }
   TH1D * Fakes      = (TH1D*)hist_AntiIso[0] -> Clone("Fakes");
   
   for(int i=0;i<nSamples;i++){
+    //if(!compareCP&&i>=9)continue;
     cout << setw(nSamples) << sampleNames[i] << " : Entries = " << hist[i]->GetEntries() << " : Integral = " << hist[i]->Integral(0,nBins+1) << endl;
   }
 
@@ -353,7 +382,7 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
     cout << "eQCD: " << eQCD << "  eVV: " << eVV << "  eW: " << eW << "  eTT: " << eTT << "  eDY: " << eDY << "  eTotal: " << errTot << endl;
     dummy -> SetBinError(iB,errTot);
     ggH   -> SetBinError(iB,0);
-    CPoddH  -> SetBinError(iB,0);
+    if(compareCP)CPoddH  -> SetBinError(iB,0);
   }
   cout << endl;
 
@@ -399,9 +428,11 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
   pads[0] -> cd();
 
   // Setup legend
-  TLegend *legend = PositionedLegend(0.25, 0.30, 3, 0.03);
+  TLegend *legend;
+  if(categoryIndex==5)legend = PositionedLegend(0.35, 0.20, 2, 0.03);
+  else legend = PositionedLegend(0.35, 0.20, 3, 0.03);
   legend -> SetTextFont(42);
-
+  legend->SetNColumns(2);
   histData -> SetMarkerColor(1);
   histData -> SetLineColor(1);
   histData -> SetFillColor(1);
@@ -409,7 +440,7 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
   histData -> SetLineWidth(2);
   histData -> SetMarkerStyle(20);
   histData -> SetMarkerSize(1.1);
-
+  /*
   InitHist(QCD,TColor::GetColor("#FFCCFF"));
   InitHist(ZLL,TColor::GetColor("#DE5A6A"));
   InitHist(TT,TColor::GetColor("#9999CC"));
@@ -417,6 +448,14 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
   InitHist(ZTT,TColor::GetColor("#FFCC66"));
   InitHist(W,TColor::GetColor("#4496C8"));
   InitHist(Fakes,TColor::GetColor("#c6f74a"));
+  */
+  InitHist(QCD,TColor::GetColor("#FFCCFF"));
+  InitHist(ZLL,TColor::GetColor(100,192,232));
+  InitHist(TT,TColor::GetColor(155,152,204));
+  InitHist(VV,TColor::GetColor(222,90,106));
+  InitHist(ZTT,TColor::GetColor(248,206,104));
+  InitHist(W,TColor::GetColor("#4496C8"));
+  InitHist(Fakes,TColor::GetColor(192,232,100));
 
   legend -> AddEntry(histData, "Observed", "ple");
   legend -> AddEntry(ZTT,"Z#rightarrow #tau#tau","f");
@@ -428,7 +467,7 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
   
   legend -> AddEntry(W,"W+jets","f");
   }
-  legend -> AddEntry(VV,"single top + diboson","f");
+  legend -> AddEntry(VV,"EWK","f");
   
   // Add all bkg contributions to one stack plot
   THStack *stack = new THStack("Background","");
@@ -447,17 +486,27 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
 
   InitSignal(ggH ,2);
   InitSignal(qqH ,3);
-  InitSignal(CPoddH,4);
+  if(compareCP){
+    InitSignal(CPoddH,4); 
+    InitSignal(CPoddqqH,5); 
+  }
   if (showSignal){
     if(compareCP){
-      legend->AddEntry(ggH,"CP-even Higgs(125) #times "+TString::Itoa(scaleSignal,10),"f");
+      legend->AddEntry(ggH,"SM ggH H(125) #times "+TString::Itoa(scaleSignal,10),"f");
       ggH->Draw("hist same");
-      legend->AddEntry(CPoddH,"CP-odd Higgs(125) #times "+TString::Itoa(scaleSignal,10),"f");
+      legend->AddEntry(CPoddH,"PS ggH H(125) #times "+TString::Itoa(scaleSignal,10),"f");
       CPoddH->Draw("hist same");
+      if(nSamples==11){
+	legend->AddEntry(qqH,"SM qqH H(125) #times "+TString::Itoa(scaleSignal,10),"f");
+	qqH->Draw("hist same");
+	legend->AddEntry(CPoddqqH,"PS qqH H(125) #times "+TString::Itoa(scaleSignal,10),"f");
+	CPoddqqH->Draw("hist same");
+      
+      }
     }else{
-      legend->AddEntry(ggH,"ggH Higgs(125) #times 1","f");
+      legend->AddEntry(ggH,"SM ggH H(125) #times "+TString::Itoa(scaleSignal,10),"f");
       ggH->Draw("hist same");
-      legend->AddEntry(qqH,"VBF Higgs(125) #times 1","f");
+      legend->AddEntry(qqH,"SM qqH H(125) #times "+TString::Itoa(scaleSignal,10),"f");
       qqH->Draw("hist same");
     }
   }
@@ -506,7 +555,7 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
 	  float errbkg = max(0.1,bkgdErr->GetBinError(iB)/bkgYield);
 	  float signalYield = ggH->GetBinContent(iB)/scaleSignal;
 	  float ye = signalYield / sqrt(bkgYield+pow(bkgYield*errbkg,2));
-	  if(ye>=0.3||(categoryIndex==0||categoryIndex==1)){
+	  if(ye>=0.2||(categoryIndex==0||categoryIndex==1)){
 	    histData->SetBinContent(iB,-1);
 	    histData->SetBinError(iB,0);
 	  }
@@ -535,14 +584,16 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
   ratioH->Draw("pe0same");
 
   pads[0]->cd();
+  if(categoryIndex==5) histData -> GetYaxis()->SetRangeUser(0.,10000.);
+
   histData->Draw("pesame");
 
   FixTopRange(pads[0], GetPadYMax(pads[0]), 0.115);
   //DrawCMSLogo(pads[0], "CMS", "Preliminary", 11, 0.045, 0.035, 1.2);
 
   if (year== 2016) DrawTitle(pads[0], "35.9 fb^{-1} (13 TeV, 2016)", 3);
-  if (year== 2017) DrawTitle(pads[0], "41.9 fb^{-1} (13 TeV, 2017)", 3);
-  if (year== 2018) DrawTitle(pads[0], "59.9 fb^{-1} (13 TeV, 2018)", 3);
+  else if (year== 2017) DrawTitle(pads[0], "41.9 fb^{-1} (13 TeV, 2017)", 3);
+  else if (year== 2018) DrawTitle(pads[0], "59.9 fb^{-1} (13 TeV, 2018)", 3);
   
   DrawTitle(pads[0], "#scale[1.2]{         #bf{CMS} Work in progress}", 1);
   FixBoxPadding(pads[0], legend, 0.05);
@@ -551,6 +602,6 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
   FixOverlay();
   canv1->Update();
   pads[0]->GetFrame()->Draw();
-  canv1 -> Print( outputDir + "MuTau_" + VariableName + (categoryIndex>=0 ? ((TString)"_Cat"+TString::Itoa(categoryIndex,10)+"_") : (TString)"_") +(FFmethod ? (TString)"fakes" : (TString)"MC") + ".pdf" );
-  canv1 -> Print( outputDir + "MuTau_" + VariableName + (categoryIndex>=0 ? ((TString)"_Cat"+TString::Itoa(categoryIndex,10)+"_") : (TString)"_") +(FFmethod ? (TString)"fakes" : (TString)"MC") + ".png" );
+  canv1 -> Print( outputDir + "MuTau"+TString::Itoa(year,10)+"_" + VariableName + (categoryIndex>=0 ? ((TString)"_Cat"+TString::Itoa(categoryIndex,10)+"_") : (TString)"_") +(FFmethod ? (TString)"fakes" : (TString)"MC") + ".pdf" );
+  canv1 -> Print( outputDir + "MuTau"+TString::Itoa(year,10)+"_" + VariableName + (categoryIndex>=0 ? ((TString)"_Cat"+TString::Itoa(categoryIndex,10)+"_") : (TString)"_") +(FFmethod ? (TString)"fakes" : (TString)"MC") + ".png" );
 }

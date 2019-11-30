@@ -13,7 +13,14 @@ JESUncertainties::JESUncertainties(std::string uncFileName) {
 
     JetCorrectionUncertainty * jecUnc(new JetCorrectionUncertainty(*JetCorParMap[name]));
     JetUncMap[name] = jecUnc;
+
+    JetUncMap[name]->setJetPt(50.);
+    JetUncMap[name]->setJetEta(1.6);
+      
   };
+  
+
+  std::cout << "++++++" << std::endl;
 
 }
 
@@ -23,16 +30,31 @@ JESUncertainties::~JESUncertainties() {
 
 std::vector<std::string> JESUncertainties::getUncertNames() {
 
-  return uncertNames;
+  return groupedUncertNames;
 
 }
 
 float JESUncertainties::getUncertainty(std::string name, float pt, float eta) {
 
-  JetUncMap[name]->setJetEta(eta);
-  JetUncMap[name]->setJetPt(pt);
-  float unc = JetUncMap[name]->getUncertainty(true);
-  return unc;
+  std::vector<std::string > uncerInGroup = MapUncert[name];
+  double unc = 0;
+  //  std::cout << name << std::endl;
+  for (unsigned int i=0; i<uncerInGroup.size(); ++i ) {
+    std::string nameUnc = uncerInGroup.at(i);
+    //    std::cout << "     " << nameUnc << " " << JetUncMap[nameUnc] << std::endl;
+    //    JetUncMap[nameUnc]->setJetEta(0.8);
+    //    JetUncMap[nameUnc]->setJetPt(50.);
+    double unc_src = 0;
+    if (JetUncMap[nameUnc]!=NULL) { 
+      JetUncMap[nameUnc]->setJetEta(eta);
+      JetUncMap[nameUnc]->setJetPt(pt);
+      unc_src = JetUncMap[nameUnc]->getUncertainty(true);
+      unc += unc_src*unc_src;
+    }
+  }
+  //  std::cout << "OK" << std::endl;
+
+  return TMath::Sqrt(unc);
 
 }
 
@@ -154,11 +176,10 @@ void JESUncertainties::runOnEvent(AC1B &analysisTree, float etalep1, float phile
       ptLeading = jetPt;
     }
 
-    for (auto const& name : uncertNames) {
-
-      JetUncMap[name]->setJetEta(jetEta);
-      JetUncMap[name]->setJetPt(jetPt);
-      float unc = JetUncMap[name]->getUncertainty(true);
+    for ( unsigned int iname=0; iname<groupedUncertNames.size(); ++iname) {
+      
+      std::string name = groupedUncertNames[iname];
+      float unc = getUncertainty(name,jetPt,jetEta);
 
       float jetPtUp = (1+unc)*jetPt;
       float jetPtDown = (1-unc)*jetPt;
@@ -196,22 +217,17 @@ void JESUncertainties::runOnEvent(AC1B &analysisTree, float etalep1, float phile
       mjj = (jet1+jet2).M();
       jdeta = fabs(jet1.Eta()-jet2.Eta());
     }
-  
-    for (auto const& name : uncertNames) {
 
+    for (unsigned int iname = 0; iname<groupedUncertNames.size(); ++iname) {
+
+      std::string name = groupedUncertNames.at(iname);
       float jetEta1 = analysisTree.pfjet_eta[indexLeading];
       float jetPt1 = analysisTree.pfjet_pt[indexLeading];
-      JetUncMap[name]->setJetEta(jetEta1);
-      JetUncMap[name]->setJetPt(jetPt1);
-      float unc1 = JetUncMap[name]->getUncertainty(true);
+      float unc1 = getUncertainty(name,jetPt1,jetEta1);
 
       float jetEta2 = analysisTree.pfjet_eta[indexTrailing];
       float jetPt2 = analysisTree.pfjet_pt[indexTrailing];
-      JetUncMap[name]->setJetEta(jetEta2);
-      JetUncMap[name]->setJetPt(jetPt2);
-      float unc2 = JetUncMap[name]->getUncertainty(true);
-
-
+      float unc2 = getUncertainty(name,jetPt2,jetEta2);
 
       TLorentzVector jet1Up = (1+unc1)*jet1;
       TLorentzVector jet1Down = (1-unc1)*jet1;
