@@ -53,7 +53,6 @@ int main(int argc, char * argv[]) {
    const float dzMuonCut      = cfg.get<float>("dzMuonCut");
    const float isoMuonLowCut  = cfg.get<float>("isoMuonLowCut");
    const float isoMuonHighCut = cfg.get<float>("isoMuonHighCut");
-   const bool applyICHEPMuonId     = cfg.get<bool>("ApplyICHEPMuonId");
    const string lowPtLegMuon  = cfg.get<string>("LowPtLegMuon");
    const string highPtLegMuon = cfg.get<string>("HighPtLegMuon");
    
@@ -146,10 +145,7 @@ int main(int argc, char * argv[]) {
    TString PileUpDataFile(pileUpDataFile);
    TString PileUpMCFile(pileUpMCFile);
    
-   const string correctionWSFile_tracking = cfg.get<string>("CorrectionWSFile_tracking");
-   const string correctionWSFile_qcd = cfg.get<string>("CorrectionWSFile_qcd");
-   const string correctionWSFile_embedded = cfg.get<string>("CorrectionWSFile_embedded");
-   const string correctionWSFile_embedded_trigger = cfg.get<string>("CorrectionWSFile_trigger");
+   const string correctionWSFile = cfg.get<string>("CorrectionWSFile");
 
    const bool apply_ggh_reweighting = cfg.get<bool>("ApplygghReweighting");
    const bool apply_ggh_uncertainties = cfg.get<bool>("ApplygghUncertainties");
@@ -377,21 +373,9 @@ int main(int argc, char * argv[]) {
    LoadZpTMassWeights(fileZMassPtWeights, ZMassPtWeightsFileName, histZMassPtWeights, ZMassPtWeightsHistName);
       
    // load correction workspaces =======================================================================================================================================
-   TString correctionsWorkspaceFileName = TString(cmsswBase)+"/src/"+correctionWSFile_tracking;
+   TString correctionsWorkspaceFileName = TString(cmsswBase)+"/src/"+correctionWSFile;
    TFile * correctionWorkSpaceFile = new TFile(correctionsWorkspaceFileName);
-   RooWorkspace *correctionWS_tracking = (RooWorkspace*)correctionWorkSpaceFile->Get("w");
-    
-   TString correctionsWorkspaceFileName_qcd = cmsswBase+"/src/"+correctionWSFile_qcd;
-   TFile * correctionWorkSpaceFile_qcd = new TFile(correctionsWorkspaceFileName_qcd);
-   RooWorkspace *correctionWS_qcd = (RooWorkspace*)correctionWorkSpaceFile_qcd->Get("w");
-   
-   TString correctionsWorkspaceFileName_embedded = TString(cmsswBase)+"/src/"+correctionWSFile_embedded;
-   TFile * correctionWorkSpaceFile_embedded  = new TFile(correctionsWorkspaceFileName_embedded);
-   RooWorkspace *correctionWS_embedded  = (RooWorkspace*)correctionWorkSpaceFile_embedded->Get("w");
-
-   TString correctionsWorkspaceFileName_embedded_trigger = TString(cmsswBase)+"/src/"+correctionWSFile_embedded_trigger;
-   TFile * correctionWorkSpaceFile_embedded_trigger  = new TFile(correctionsWorkspaceFileName_embedded_trigger);
-   RooWorkspace *correctionWS_embedded_trigger  = (RooWorkspace*)correctionWorkSpaceFile_embedded_trigger->Get("w");
+   RooWorkspace *correctionWS = (RooWorkspace*)correctionWorkSpaceFile->Get("w");
 
    // store whether FastMTT or SVFit is used ===========================================================================================================================
    isSVFitUsed = computeSVFitMass;
@@ -603,7 +587,7 @@ int main(int argc, char * argv[]) {
                   mtBoson_gen = mT(promptTausFirstCopy[0],promptTausFirstCopy[1]);
                   
                   // set embeddedWeight  ===============================================================================================================================
-                  embeddedWeight = GetEmbeddedWeight( promptTausFirstCopy, correctionWS_embedded);
+                  embeddedWeight = GetEmbeddedWeight( promptTausFirstCopy, correctionWS);
                }
                else if (promptMuons.size()==2) {
                   isZTT = false; isZMM = true; isZEE = false;
@@ -771,7 +755,6 @@ int main(int argc, char * argv[]) {
             if (analysisTree.muon_isBad[im]) badMuonFilter_ = false;                     
             if (analysisTree.muon_isDuplicate[im]) duplicateMuonFilter_ = false;                   
             bool muonId = analysisTree.muon_isMedium[im]; 
-            if (applyICHEPMuonId) muonId = analysisTree.muon_isICHEP[im];
             if (!muonId) continue;
             muons.push_back(im);
          }
@@ -830,7 +813,7 @@ int main(int argc, char * argv[]) {
          bool foundExtraElectron = false;
          bool foundExtraMuon = false;
          foundExtraElectron = ElectronVeto(analysisTree, electronIndex, ptVetoElectronCut, etaVetoElectronCut, dxyVetoElectronCut, dzVetoElectronCut, era, applyVetoElectronId, isElectronIsoR03, isoVetoElectronCut);
-         foundExtraMuon = MuonVeto(analysisTree, muonIndex, ptVetoMuonCut, etaVetoMuonCut, dxyVetoMuonCut, dzVetoMuonCut, applyICHEPMuonId, applyVetoMuonId, isMuonIsoR03, isoVetoMuonCut);
+         foundExtraMuon = MuonVeto(analysisTree, muonIndex, ptVetoMuonCut, etaVetoMuonCut, dxyVetoMuonCut, dzVetoMuonCut, applyVetoMuonId, isMuonIsoR03, isoVetoMuonCut);
          extraelec_veto = foundExtraElectron;
          extramuon_veto = foundExtraMuon;
 
@@ -864,40 +847,30 @@ int main(int argc, char * argv[]) {
 
          // set iso, id and trigger weights   ==========================================================================================================================
          if (!isData || isEmbedded) {
-            correctionWS_embedded->var("e_pt")->setVal(pt_1);
-            correctionWS_embedded->var("e_eta")->setVal(eta_1);
-            correctionWS_embedded->var("e_iso")->setVal(iso_1);
-            correctionWS_embedded->var("m_pt")->setVal(pt_2);
-            correctionWS_embedded->var("m_eta")->setVal(eta_2);
-            correctionWS_embedded->var("m_iso")->setVal(iso_2);
+            correctionWS->var("e_pt")->setVal(pt_1);
+            correctionWS->var("e_eta")->setVal(eta_1);
+            correctionWS->var("e_iso")->setVal(iso_1);
+            correctionWS->var("m_pt")->setVal(pt_2);
+            correctionWS->var("m_eta")->setVal(eta_2);
+            correctionWS->var("m_iso")->setVal(iso_2);
             // scale factors
-            if (isEmbedded && era=="2016") {
-               isoweight_1 = correctionWS_embedded->function("e_looseiso_ratio")->getVal() * correctionWS_embedded->function("e_id_ratio")->getVal();
-               isoweight_2 = correctionWS_embedded->function("m_looseiso_ratio")->getVal() * correctionWS_embedded->function("m_id_ratio")->getVal();
-            }
-            else if (isEmbedded && era!="2016") {
-               isoweight_1 = correctionWS_embedded->function("e_id90_kit_data")->getVal()/correctionWS_embedded->function("e_id90_kit_embed")->getVal() * correctionWS_embedded->function("e_iso_kit_data")->getVal()/correctionWS_embedded->function("e_iso_kit_embed")->getVal();
-               isoweight_2 = correctionWS_embedded->function("m_id_kit_data")->getVal()/correctionWS_embedded->function("m_id_kit_embed")->getVal() * correctionWS_embedded->function("m_iso_kit_data")->getVal()/correctionWS_embedded->function("m_iso_kit_embed")->getVal();
+            if (isEmbedded) {
+               isoweight_1 = correctionWS->function("e_id90_kit_data")->getVal()/correctionWS->function("e_id90_kit_embed")->getVal() * correctionWS->function("e_iso_kit_data")->getVal()/correctionWS->function("e_iso_kit_embed")->getVal();
+               isoweight_2 = correctionWS->function("m_id_kit_data")->getVal()/correctionWS->function("m_id_kit_embed")->getVal() * correctionWS->function("m_iso_kit_data")->getVal()/correctionWS->function("m_iso_kit_embed")->getVal();
             }
             else {
-               if (era=="2016"){
-                  isoweight_1 = (float)SF_electronIdIso->get_ScaleFactor(double(pt_1),double(eta_1));
-                  isoweight_2 = (float)SF_muonIdIso->get_ScaleFactor(double(pt_2),double(eta_2));
-               }
-               else {
-                  isoweight_1 = correctionWS_embedded->function("e_id90_kit_data")->getVal()/correctionWS_embedded->function("e_id90_kit_mc")->getVal() * correctionWS_embedded->function("e_iso_kit_data")->getVal()/correctionWS_embedded->function("e_iso_kit_mc")->getVal();
-                  isoweight_2 = correctionWS_embedded->function("m_id_kit_data")->getVal()/correctionWS_embedded->function("m_id_kit_mc")->getVal() * correctionWS_embedded->function("m_iso_kit_data")->getVal()/correctionWS_embedded->function("m_iso_kit_mc")->getVal();
-               } 
+               isoweight_1 = correctionWS->function("e_id90_kit_data")->getVal()/correctionWS->function("e_id90_kit_mc")->getVal() * correctionWS->function("e_iso_kit_data")->getVal()/correctionWS->function("e_iso_kit_mc")->getVal();
+               isoweight_2 = correctionWS->function("m_id_kit_data")->getVal()/correctionWS->function("m_id_kit_mc")->getVal() * correctionWS->function("m_iso_kit_data")->getVal()/correctionWS->function("m_iso_kit_mc")->getVal();
             }
 
-            correctionWS_tracking->var("e_pt")->setVal(pt_1);
-            correctionWS_tracking->var("e_eta")->setVal(eta_1);
-            if (era=="2017") idweight_1 = correctionWS_tracking->function("e_trk_ratio")->getVal();
+            correctionWS->var("e_pt")->setVal(pt_1);
+            correctionWS->var("e_eta")->setVal(eta_1);
+            if (era=="2017") idweight_1 = correctionWS->function("e_trk_ratio")->getVal();
             else idweight_1 =1.0;
 
-            correctionWS_tracking->var("m_eta")->setVal(eta_2);
-            correctionWS_tracking->var("m_pt")->setVal(pt_2);
-            if (era=="2016") idweight_2 = correctionWS_tracking->function("m_trk_ratio")->getVal();
+            correctionWS->var("m_eta")->setVal(eta_2);
+            correctionWS->var("m_pt")->setVal(pt_2);
+            if (era=="2016") idweight_2 = correctionWS->function("m_trk_ratio")->getVal();
             else idweight_2 =1.0;
             
             isoweight_1 *= idweight_1;
@@ -906,73 +879,41 @@ int main(int argc, char * argv[]) {
             //		cout << "isoweight_1 = " << isoweight_1
             //		     << "isoweight_2 = " << isoweight_2 << endl;
             
-            correctionWS_embedded_trigger->var("e_pt")->setVal(pt_1);
-            correctionWS_embedded_trigger->var("e_eta")->setVal(eta_1);
-            correctionWS_embedded_trigger->var("m_pt")->setVal(pt_2);
-            correctionWS_embedded_trigger->var("m_eta")->setVal(eta_2);
-            correctionWS_embedded_trigger->var("m_iso")->setVal(iso_2);
-            correctionWS_embedded_trigger->var("e_iso")->setVal(iso_1);
+            correctionWS->var("e_pt")->setVal(pt_1);
+            correctionWS->var("e_eta")->setVal(eta_1);
+            correctionWS->var("m_pt")->setVal(pt_2);
+            correctionWS->var("m_eta")->setVal(eta_2);
+            correctionWS->var("m_iso")->setVal(iso_2);
+            correctionWS->var("e_iso")->setVal(iso_1);
             
-            if (era=="2016"){
-               Ele23EffData = (float)SF_electron23->get_EfficiencyData(double(pt_1),double(eta_1));
-               Ele12EffData = (float)SF_electron12->get_EfficiencyData(double(pt_1),double(eta_1));
-               Mu23EffData = (float)SF_muon23->get_EfficiencyData(double(pt_2),double(eta_2));
-               Mu8EffData = (float)SF_muon8->get_EfficiencyData(double(pt_2),double(eta_2));
-            }
-            else {
-                   Ele23EffData = correctionWS_embedded_trigger->function("e_trg_23_binned_ic_data")->getVal();
-                   Ele12EffData = correctionWS_embedded_trigger->function("e_trg_12_binned_ic_data")->getVal(); 
-                   Mu23EffData  = correctionWS_embedded_trigger->function("m_trg_23_binned_ic_data")->getVal();
-                   Mu8EffData   = correctionWS_embedded_trigger->function("m_trg_8_binned_ic_data")->getVal();
-                }
+            Ele23EffData = correctionWS->function("e_trg_23_binned_ic_data")->getVal();
+            Ele12EffData = correctionWS->function("e_trg_12_binned_ic_data")->getVal(); 
+            Mu23EffData  = correctionWS->function("m_trg_23_binned_ic_data")->getVal();
+            Mu8EffData   = correctionWS->function("m_trg_8_binned_ic_data")->getVal();
             
             if (isEmbedded){
-               if (era=="2016"){
-                  Ele23EffData = correctionWS_embedded_trigger->function("e_trg_23_binned_ic_data")->getVal();
-                  Ele12EffData = correctionWS_embedded_trigger->function("e_trg_12_binned_ic_data")->getVal(); 
-                  Mu23EffData  = correctionWS_embedded_trigger->function("m_trg_23_binned_ic_data")->getVal();
-                  Mu8EffData   = correctionWS_embedded_trigger->function("m_trg_8_binned_ic_data")->getVal();
-               }
-               else {
-                  Ele23EffData = correctionWS_embedded_trigger->function("e_trg_23_binned_ic_data")->getVal();
-                  Ele12EffData = correctionWS_embedded_trigger->function("e_trg_12_binned_ic_data")->getVal(); 
-                  Mu23EffData  = correctionWS_embedded_trigger->function("m_trg_23_binned_ic_data")->getVal();
-                  Mu8EffData   = correctionWS_embedded_trigger->function("m_trg_8_binned_ic_data")->getVal();
-               }
+               Ele23EffData = correctionWS->function("e_trg_23_binned_ic_data")->getVal();
+               Ele12EffData = correctionWS->function("e_trg_12_binned_ic_data")->getVal(); 
+               Mu23EffData  = correctionWS->function("m_trg_23_binned_ic_data")->getVal();
+               Mu8EffData   = correctionWS->function("m_trg_8_binned_ic_data")->getVal();
             }
 
             float trigWeightData = Mu23EffData*Ele12EffData + Mu8EffData*Ele23EffData - Mu23EffData*Ele23EffData;
 
             if (applyTriggerMatch && !isData) {
-               if (era=="2016"){
-                  if (!isEmbedded){
-                     Ele23EffMC   = (float)SF_electron23->get_EfficiencyMC(double(pt_1),double(eta_1));
-                     Ele12EffMC   = (float)SF_electron12->get_EfficiencyMC(double(pt_1),double(eta_1));
-                     Mu23EffMC   = (float)SF_muon23->get_EfficiencyMC(double(pt_2),double(eta_2));
-                     Mu8EffMC   = (float)SF_muon8->get_EfficiencyMC(double(pt_2),double(eta_2));
-                  }
-                  else {
-                     Ele23EffMC = correctionWS_embedded_trigger->function("e_trg_23_binned_ic_embed")->getVal();
-                     Ele12EffMC = correctionWS_embedded_trigger->function("e_trg_12_binned_ic_embed")->getVal(); 
-                     Mu23EffMC  = correctionWS_embedded_trigger->function("m_trg_23_binned_ic_embed")->getVal();
-                     Mu8EffMC   = correctionWS_embedded_trigger->function("m_trg_8_binned_ic_embed")->getVal();
-                  }
+               if (isEmbedded) {
+                  Ele23EffMC = correctionWS->function("e_trg_23_binned_ic_embed")->getVal();
+                  Ele12EffMC = correctionWS->function("e_trg_12_binned_ic_embed")->getVal(); 
+                  Mu23EffMC  = correctionWS->function("m_trg_23_binned_ic_embed")->getVal();
+                  Mu8EffMC   = correctionWS->function("m_trg_8_binned_ic_embed" )->getVal();
                }
                else {
-                  if (isEmbedded) {
-                     Ele23EffMC = correctionWS_embedded_trigger->function("e_trg_23_binned_ic_embed")->getVal();
-                     Ele12EffMC = correctionWS_embedded_trigger->function("e_trg_12_binned_ic_embed")->getVal(); 
-                     Mu23EffMC  = correctionWS_embedded_trigger->function("m_trg_23_binned_ic_embed")->getVal();
-                     Mu8EffMC   = correctionWS_embedded_trigger->function("m_trg_8_binned_ic_embed" )->getVal();
-                  }
-                  else {
-                     Ele23EffMC = correctionWS_embedded_trigger->function("e_trg_23_binned_ic_mc")->getVal();
-                     Ele12EffMC = correctionWS_embedded_trigger->function("e_trg_12_binned_ic_mc")->getVal();
-                     Mu23EffMC  = correctionWS_embedded_trigger->function("m_trg_23_binned_ic_mc")->getVal();
-                     Mu8EffMC   = correctionWS_embedded_trigger->function("m_trg_8_binned_ic_mc" )->getVal();
-                  }
-                  
+                  Ele23EffMC = correctionWS->function("e_trg_23_binned_ic_mc")->getVal();
+                  Ele12EffMC = correctionWS->function("e_trg_12_binned_ic_mc")->getVal();
+                  Mu23EffMC  = correctionWS->function("m_trg_23_binned_ic_mc")->getVal();
+                  Mu8EffMC   = correctionWS->function("m_trg_8_binned_ic_mc" )->getVal();
                }
+               
                float trigWeightMC   = Mu23EffMC*Ele12EffMC     + Mu8EffMC*Ele23EffMC     - Mu23EffMC*Ele23EffMC;
                if (trigWeightMC>1e-6)
                   trigweight = trigWeightData / trigWeightMC;
@@ -1097,7 +1038,7 @@ int main(int argc, char * argv[]) {
             if (jetPt_tocheck<jetPtLowCut) continue;   
 
             bool isPFJetId =false;
-            if (era=="2016") isPFJetId= looseJetiD(analysisTree,int(jet));
+            if (era=="2016") isPFJetId= looseJetiD_2016(analysisTree,int(jet));
             else if (era=="2017") isPFJetId = tightJetiD_2017(analysisTree,int(jet));
             else if (era=="2018") isPFJetId = tightJetiD_2018(analysisTree,int(jet));
             if (!isPFJetId) continue;
@@ -1122,20 +1063,11 @@ int main(int argc, char * argv[]) {
                bool tagged_mistagDown = false;
                bool tagged_btagUp = false;
                bool tagged_btagDown = false;
-               if (era=="2016") {
-                  tagged = analysisTree.pfjet_btag[jet][nBTagDiscriminant1]>btagCut; // b-jet
-                  tagged_mistagUp = analysisTree.pfjet_btag[jet][nBTagDiscriminant1]>btagCut; // b-jet
-                  tagged_mistagDown = analysisTree.pfjet_btag[jet][nBTagDiscriminant1]>btagCut; // b-jet
-                  tagged_btagUp = analysisTree.pfjet_btag[jet][nBTagDiscriminant1]>btagCut; // b-jet
-                  tagged_btagDown = analysisTree.pfjet_btag[jet][nBTagDiscriminant1]>btagCut; // b-jet
-               }
-               else {
-                  tagged = analysisTree.pfjet_btag[jet][nBTagDiscriminant1] + analysisTree.pfjet_btag[jet][nBTagDiscriminant2] + analysisTree.pfjet_btag[jet][nBTagDiscriminant3]>btagCut;
-                  tagged_mistagUp = analysisTree.pfjet_btag[jet][nBTagDiscriminant1] + analysisTree.pfjet_btag[jet][nBTagDiscriminant2]  + analysisTree.pfjet_btag[jet][nBTagDiscriminant3] >btagCut;
-                  tagged_mistagDown = analysisTree.pfjet_btag[jet][nBTagDiscriminant1] + analysisTree.pfjet_btag[jet][nBTagDiscriminant2]  + analysisTree.pfjet_btag[jet][nBTagDiscriminant3] >btagCut;
-                  tagged_btagUp = analysisTree.pfjet_btag[jet][nBTagDiscriminant1] + analysisTree.pfjet_btag[jet][nBTagDiscriminant2]  + analysisTree.pfjet_btag[jet][nBTagDiscriminant3] >btagCut;
-                  tagged_btagDown = analysisTree.pfjet_btag[jet][nBTagDiscriminant1] + analysisTree.pfjet_btag[jet][nBTagDiscriminant2]  + analysisTree.pfjet_btag[jet][nBTagDiscriminant3] >btagCut;
-               }
+               tagged = analysisTree.pfjet_btag[jet][nBTagDiscriminant1] + analysisTree.pfjet_btag[jet][nBTagDiscriminant2] + analysisTree.pfjet_btag[jet][nBTagDiscriminant3]>btagCut;
+               tagged_mistagUp = analysisTree.pfjet_btag[jet][nBTagDiscriminant1] + analysisTree.pfjet_btag[jet][nBTagDiscriminant2]  + analysisTree.pfjet_btag[jet][nBTagDiscriminant3] >btagCut;
+               tagged_mistagDown = analysisTree.pfjet_btag[jet][nBTagDiscriminant1] + analysisTree.pfjet_btag[jet][nBTagDiscriminant2]  + analysisTree.pfjet_btag[jet][nBTagDiscriminant3] >btagCut;
+               tagged_btagUp = analysisTree.pfjet_btag[jet][nBTagDiscriminant1] + analysisTree.pfjet_btag[jet][nBTagDiscriminant2]  + analysisTree.pfjet_btag[jet][nBTagDiscriminant3] >btagCut;
+               tagged_btagDown = analysisTree.pfjet_btag[jet][nBTagDiscriminant1] + analysisTree.pfjet_btag[jet][nBTagDiscriminant2]  + analysisTree.pfjet_btag[jet][nBTagDiscriminant3] >btagCut;          
                bool taggedRaw = tagged;
 
                if (!isData) {
@@ -1683,25 +1615,25 @@ int main(int argc, char * argv[]) {
          
          // QCD estimation =======================================================================================================================================================
 
-         correctionWS_qcd->var("e_pt")->setVal(pt_1);
-         correctionWS_qcd->var("m_pt")->setVal(pt_2);
-         correctionWS_qcd->var("njets")->setVal(njets);
-         correctionWS_qcd->var("dR")->setVal(dr_tt);
-         double_t em_qcd_osss_binned = correctionWS_qcd->function("em_qcd_osss")->getVal();
-         double_t em_qcd_osss_binned_0jet_rate_up = correctionWS_qcd->function("em_qcd_osss_stat_0jet_unc1_up")->getVal();
-         double_t em_qcd_osss_binned_0jet_rate_down = correctionWS_qcd->function("em_qcd_osss_stat_0jet_unc1_down")->getVal();
-         double_t em_qcd_osss_binned_1jet_rate_up = correctionWS_qcd->function("em_qcd_osss_stat_1jet_unc1_up")->getVal();
-         double_t em_qcd_osss_binned_1jet_rate_down = correctionWS_qcd->function("em_qcd_osss_stat_1jet_unc1_down")->getVal();
-         double_t em_qcd_osss_binned_2jet_rate_up = correctionWS_qcd->function("em_qcd_osss_stat_2jet_unc1_up")->getVal();
-         double_t em_qcd_osss_binned_2jet_rate_down = correctionWS_qcd->function("em_qcd_osss_stat_2jet_unc1_down")->getVal();
-         double_t em_qcd_osss_binned_0jet_shape_up = correctionWS_qcd->function("em_qcd_osss_stat_0jet_unc2_up")->getVal();
-         double_t em_qcd_osss_binned_0jet_shape_down = correctionWS_qcd->function("em_qcd_osss_stat_0jet_unc2_down")->getVal();
-         double_t em_qcd_osss_binned_1jet_shape_up = correctionWS_qcd->function("em_qcd_osss_stat_1jet_unc2_up")->getVal();
-         double_t em_qcd_osss_binned_1jet_shape_down = correctionWS_qcd->function("em_qcd_osss_stat_1jet_unc2_down")->getVal();
-         double_t em_qcd_osss_binned_2jet_shape_up = correctionWS_qcd->function("em_qcd_osss_stat_2jet_unc2_up")->getVal();
-         double_t em_qcd_osss_binned_2jet_shape_down = correctionWS_qcd->function("em_qcd_osss_stat_2jet_unc2_down")->getVal();
-         double_t em_qcd_extrap_up = correctionWS_qcd->function("em_qcd_osss_extrap_up")->getVal();
-         double_t em_qcd_extrap_down = correctionWS_qcd->function("em_qcd_osss_extrap_down")->getVal();
+         correctionWS->var("e_pt")->setVal(pt_1);
+         correctionWS->var("m_pt")->setVal(pt_2);
+         correctionWS->var("njets")->setVal(njets);
+         correctionWS->var("dR")->setVal(dr_tt);
+         double_t em_qcd_osss_binned = correctionWS->function("em_qcd_osss")->getVal();
+         double_t em_qcd_osss_binned_0jet_rate_up = correctionWS->function("em_qcd_osss_stat_0jet_unc1_up")->getVal();
+         double_t em_qcd_osss_binned_0jet_rate_down = correctionWS->function("em_qcd_osss_stat_0jet_unc1_down")->getVal();
+         double_t em_qcd_osss_binned_1jet_rate_up = correctionWS->function("em_qcd_osss_stat_1jet_unc1_up")->getVal();
+         double_t em_qcd_osss_binned_1jet_rate_down = correctionWS->function("em_qcd_osss_stat_1jet_unc1_down")->getVal();
+         double_t em_qcd_osss_binned_2jet_rate_up = correctionWS->function("em_qcd_osss_stat_2jet_unc1_up")->getVal();
+         double_t em_qcd_osss_binned_2jet_rate_down = correctionWS->function("em_qcd_osss_stat_2jet_unc1_down")->getVal();
+         double_t em_qcd_osss_binned_0jet_shape_up = correctionWS->function("em_qcd_osss_stat_0jet_unc2_up")->getVal();
+         double_t em_qcd_osss_binned_0jet_shape_down = correctionWS->function("em_qcd_osss_stat_0jet_unc2_down")->getVal();
+         double_t em_qcd_osss_binned_1jet_shape_up = correctionWS->function("em_qcd_osss_stat_1jet_unc2_up")->getVal();
+         double_t em_qcd_osss_binned_1jet_shape_down = correctionWS->function("em_qcd_osss_stat_1jet_unc2_down")->getVal();
+         double_t em_qcd_osss_binned_2jet_shape_up = correctionWS->function("em_qcd_osss_stat_2jet_unc2_up")->getVal();
+         double_t em_qcd_osss_binned_2jet_shape_down = correctionWS->function("em_qcd_osss_stat_2jet_unc2_down")->getVal();
+         double_t em_qcd_extrap_up = correctionWS->function("em_qcd_osss_extrap_up")->getVal();
+         double_t em_qcd_extrap_down = correctionWS->function("em_qcd_osss_extrap_down")->getVal();
         
          qcdweight =  em_qcd_osss_binned;
          qcdweight_0jet_rate_up =  em_qcd_osss_binned_0jet_rate_up;
@@ -1720,72 +1652,73 @@ int main(int argc, char * argv[]) {
          qcdweight_iso_up = em_qcd_extrap_up;
          qcdweight_iso_down = em_qcd_extrap_down;
 
-         if (!isData){
-            if (era=="2016")
-               {
-                  double weightE = 1;
-                  double weightEUp = 1;
-                  double weightEDown = 1;
-                  if (gen_match_1==6) {
-                     double dRmin = 0.5;
-                     double ptJet = pt_1;
-                     for (unsigned int ijet=0; ijet<analysisTree.pfjet_count; ++ijet) {
-                        double etaJet = analysisTree.pfjet_eta[ijet];
-                        double phiJet = analysisTree.pfjet_phi[ijet];
-                        double dRjetE = deltaR(etaJet,phiJet,eta_1,phi_1);
-                        if (dRjetE<dRmin) {
-                           dRmin = dRjetE;
-                           ptJet = analysisTree.pfjet_pt[ijet];
-                        }
-                     }
-                     weightE     = a_jetEle + b_jetEle*ptJet;
-                     weightEUp   = a_jetEleUp + b_jetEleUp*ptJet;
-                     weightEDown = a_jetEleDown + b_jetEleDown*ptJet;
-                     fakeweight *= weightE;
-                  }
-                  else {
-                     weightE = isoweight_1;
-                     weightEUp = isoweight_1;
-                     weightEDown = isoweight_1;
-                  }
-                  double weightMu = 1;
-                  double weightMuUp = 1;
-                  double weightMuDown = 1;
-                  if (gen_match_2==6) {
-                     double dRmin = 0.5;
-                     double ptJet = pt_2;
-                     for (unsigned int ijet=0; ijet<analysisTree.pfjet_count; ++ijet) {
-                        double etaJet = analysisTree.pfjet_eta[ijet];
-                        double phiJet = analysisTree.pfjet_phi[ijet];
-                        double dRjetM = deltaR(etaJet,phiJet,eta_2,phi_2);
-                        if (dRjetM<dRmin) {
-                           dRmin = dRjetM;
-                           ptJet = analysisTree.pfjet_pt[ijet];
-                        }
-                     }
-                     weightMu     = a_jetMu     + b_jetMu*ptJet;
-                     weightMuUp   = a_jetMuUp   + b_jetMuUp*ptJet;
-                     weightMuDown = a_jetMuDown + b_jetMuDown*ptJet;
-                     fakeweight *= weightMu;
-                  }
-                  else {
-                     weightMu = isoweight_2;
-                     weightMuUp = isoweight_2;
-                     weightMuDown = isoweight_2;
-                  }
-                  float effweight0 = effweight;
-                  effweight = effweight0 * weightE * weightMu;
-                  effweight_jetMuUp   = effweight0 * weightE     * weightMuUp;
-                  effweight_jetMuDown = effweight0 * weightE     * weightMuDown; 
-                  effweight_jetEUp    = effweight0 * weightEUp   * weightMu;
-                  effweight_jetEDown  = effweight0 * weightEDown * weightMu; 
+         if (!isData) effweight = effweight*isoweight_1*isoweight_2;
+         // if (!isData){
+         //    if (era=="2016")
+         //       {
+         //          double weightE = 1;
+         //          double weightEUp = 1;
+         //          double weightEDown = 1;
+         //          if (gen_match_1==6) {
+         //             double dRmin = 0.5;
+         //             double ptJet = pt_1;
+         //             for (unsigned int ijet=0; ijet<analysisTree.pfjet_count; ++ijet) {
+         //                double etaJet = analysisTree.pfjet_eta[ijet];
+         //                double phiJet = analysisTree.pfjet_phi[ijet];
+         //                double dRjetE = deltaR(etaJet,phiJet,eta_1,phi_1);
+         //                if (dRjetE<dRmin) {
+         //                   dRmin = dRjetE;
+         //                   ptJet = analysisTree.pfjet_pt[ijet];
+         //                }
+         //             }
+         //             weightE     = a_jetEle + b_jetEle*ptJet;
+         //             weightEUp   = a_jetEleUp + b_jetEleUp*ptJet;
+         //             weightEDown = a_jetEleDown + b_jetEleDown*ptJet;
+         //             fakeweight *= weightE;
+         //          }
+         //          else {
+         //             weightE = isoweight_1;
+         //             weightEUp = isoweight_1;
+         //             weightEDown = isoweight_1;
+         //          }
+         //          double weightMu = 1;
+         //          double weightMuUp = 1;
+         //          double weightMuDown = 1;
+         //          if (gen_match_2==6) {
+         //             double dRmin = 0.5;
+         //             double ptJet = pt_2;
+         //             for (unsigned int ijet=0; ijet<analysisTree.pfjet_count; ++ijet) {
+         //                double etaJet = analysisTree.pfjet_eta[ijet];
+         //                double phiJet = analysisTree.pfjet_phi[ijet];
+         //                double dRjetM = deltaR(etaJet,phiJet,eta_2,phi_2);
+         //                if (dRjetM<dRmin) {
+         //                   dRmin = dRjetM;
+         //                   ptJet = analysisTree.pfjet_pt[ijet];
+         //                }
+         //             }
+         //             weightMu     = a_jetMu     + b_jetMu*ptJet;
+         //             weightMuUp   = a_jetMuUp   + b_jetMuUp*ptJet;
+         //             weightMuDown = a_jetMuDown + b_jetMuDown*ptJet;
+         //             fakeweight *= weightMu;
+         //          }
+         //          else {
+         //             weightMu = isoweight_2;
+         //             weightMuUp = isoweight_2;
+         //             weightMuDown = isoweight_2;
+         //          }
+         //          float effweight0 = effweight;
+         //          effweight = effweight0 * weightE * weightMu;
+         //          effweight_jetMuUp   = effweight0 * weightE     * weightMuUp;
+         //          effweight_jetMuDown = effweight0 * weightE     * weightMuDown; 
+         //          effweight_jetEUp    = effweight0 * weightEUp   * weightMu;
+         //          effweight_jetEDown  = effweight0 * weightEDown * weightMu; 
                   
-                  if (sync) weight = effweight * puweight * 0.979;
-               }
-            else {
-               effweight = effweight*isoweight_1*isoweight_2;
-            }
-         }
+         //          if (sync) weight = effweight * puweight * 0.979;
+         //       }
+         //    else {
+         //       effweight = effweight*isoweight_1*isoweight_2;
+         //    }
+         // }
 
          // First set the calibrated variables to the uncalibrated versions -> necessary for data
          d0_1_cal=d0_1;
