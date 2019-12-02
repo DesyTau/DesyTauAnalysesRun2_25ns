@@ -505,9 +505,9 @@ void SearchForBtagDiscriminant(AC1B &analysisTree, TString BTagDiscriminator1, T
       TString discr(analysisTree.run_btagdiscriminators->at(iBTag));
       if (discr == BTagDiscriminator1)
          nBTagDiscriminant1 = iBTag;
-      if (era!="2016" && discr == BTagDiscriminator2)
+      if (discr == BTagDiscriminator2)
          nBTagDiscriminant2 = iBTag;
-      if (era!="2016" && discr == BTagDiscriminator3)
+      if (discr == BTagDiscriminator3)
          nBTagDiscriminant3 = iBTag;
    }
 }
@@ -613,7 +613,7 @@ bool ElectronVeto(AC1B &analysisTree, int electronIndex, float ptVetoElectronCut
    return foundExtraElectron;
 }
 
-bool MuonVeto(AC1B &analysisTree, int muonIndex, float ptVetoMuonCut, float etaVetoMuonCut, float dxyVetoMuonCut, float dzVetoMuonCut, bool applyICHEPMuonId, bool applyVetoMuonId, bool isMuonIsoR03, float isoVetoMuonCut){
+bool MuonVeto(AC1B &analysisTree, int muonIndex, float ptVetoMuonCut, float etaVetoMuonCut, float dxyVetoMuonCut, float dzVetoMuonCut, bool applyVetoMuonId, bool isMuonIsoR03, float isoVetoMuonCut){
    
    bool foundExtraMuon = false;
    for (unsigned int im = 0; im<analysisTree.muon_count; ++im) {
@@ -623,7 +623,6 @@ bool MuonVeto(AC1B &analysisTree, int muonIndex, float ptVetoMuonCut, float etaV
       if (fabs(analysisTree.muon_dxy[im])>dxyVetoMuonCut) continue;
       if (fabs(analysisTree.muon_dz[im])>dzVetoMuonCut) continue;
       bool muonId = analysisTree.muon_isMedium[im];
-      if (applyICHEPMuonId) muonId = analysisTree.muon_isICHEP[im];
       if (!muonId&&applyVetoMuonId) continue;
       float neutralHadIsoMu = analysisTree.muon_neutralHadIso[im];
       float photonIsoMu = analysisTree.muon_photonIso[im];
