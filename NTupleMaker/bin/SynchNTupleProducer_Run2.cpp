@@ -56,6 +56,8 @@
 #include "DesyTauAnalyses/NTupleMaker/interface/ZPtWeightSys_WIP.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/TopPtWeightSys_WIP.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/JetEnergyScaleSys_WIP.h"
+#include "DesyTauAnalyses/NTupleMaker/interface/PuppiMETSys_WIP.h"
+#include "DesyTauAnalyses/NTupleMaker/interface/PFMETSys_WIP.h"
 //#include "DesyTauAnalyses/NTupleMaker/interface/JESUncertainties.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/LepTauFakeRate.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/functionsCP.h"
@@ -154,6 +156,7 @@ int main(int argc, char * argv[]){
   const bool ApplyBTagScaling = cfg.get<bool>("ApplyBTagScaling");
   const bool ApplySystShift   = cfg.get<bool>("ApplySystShift");
   const bool ApplyMetFilters  = cfg.get<bool>("ApplyMetFilters");
+  const bool usePuppiMET      = cfg.get<bool>("UsePuppiMET");
 
   //pileup distrib
   const string pileUpInDataFile = cfg.get<string>("pileUpInDataFile");
@@ -446,32 +449,51 @@ int main(int argc, char * argv[]){
   std::vector<JetEnergyScaleSys*> jetEnergyScaleSys;
   JESUncertainties * jecUncertainties = 0;
 
-  if(!isData && ApplySystShift){
+  std::vector<TString> metSysNames = {"UnclusteredEn","JetEn","JetRes"};
+  std::vector<PFMETSys*> metSys;
+  std::vector<PuppiMETSys*> puppiMetSys;
+
+  if((!isData||isEmbedded) && ApplySystShift){
     tauScaleSys = new TauScaleSys(otree);
     tauScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);
     tauScaleSys->SetUseSVFit(ApplySVFit);
-    zPtWeightSys = new ZPtWeightSys(otree);
-    topPtWeightSys = new TopPtWeightSys(otree);
 
-    if (cfg.get<bool>("splitJES")){
-      JESUncertainties *jecUncertainties = new JESUncertainties("DesyTauAnalyses/NTupleMaker/data/Summer16_UncertaintySources_AK4PFchs.txt");
-      std::vector<std::string> JESnames = jecUncertainties->getUncertNames();
-      for (unsigned int i = 0; i < JESnames.size(); i++) std::cout << "i: "<< i << ", JESnames.at(i) : " << JESnames.at(i) << std::endl;
-      for (unsigned int i = 0; i < JESnames.size(); i++){
-        JetEnergyScaleSys *aJESobject = new JetEnergyScaleSys(otree, TString(JESnames.at(i)));
-        aJESobject->SetConfig(&cfg);
-        aJESobject->SetBtagScaling(&inputs_btag_scaling_medium);
-        aJESobject->SetJESUncertainties(jecUncertainties);
-        jetEnergyScaleSys.push_back(aJESobject);
-      }	  
+    // systematics only for MC
+    if (!isEmbedded) {
+      zPtWeightSys = new ZPtWeightSys(otree);
+      topPtWeightSys = new TopPtWeightSys(otree);
+      for (unsigned int i = 0; i<metSysNames.size(); ++i) {
+	if (usePuppiMET)
+	  puppiMetSys.push_back(new PuppiMETSys(otree,metSysNames[i]));
+	else
+	  metSys.push_back(new PFMETSys(otree,metSysNames[i]));
+      }
+      if (cfg.get<bool>("splitJES")){
+	JESUncertainties *jecUncertainties;
+	if (era==2016) 
+	  jecUncertainties = new JESUncertainties("DesyTauAnalyses/NTupleMaker/data/Summer16_UncertaintySources_AK4PFchs.txt");
+	else if (era==2017)
+	  jecUncertainties = new JESUncertainties("DesyTauAnalyses/NTupleMaker/data/Fall17_17Nov2017_V32_MC_UncertaintySources_AK4PFchs.txt");
+	else 
+	  jecUncertainties = new JESUncertainties("DesyTauAnalyses/NTupleMaker/data/Autumn18_V19_MC_UncertaintySources_AK4PFchs.txt");
+	std::vector<std::string> JESnames = jecUncertainties->getUncertNames();
+	for (unsigned int i = 0; i < JESnames.size(); i++) std::cout << "i: "<< i << ", JESnames.at(i) : " << JESnames.at(i) << std::endl;
+	for (unsigned int i = 0; i < JESnames.size(); i++){
+	  JetEnergyScaleSys *aJESobject = new JetEnergyScaleSys(otree, TString(JESnames.at(i)));
+	  aJESobject->SetConfig(&cfg);
+	  aJESobject->SetBtagScaling(&inputs_btag_scaling_medium);
+	  aJESobject->SetJESUncertainties(jecUncertainties);
+	  jetEnergyScaleSys.push_back(aJESobject);
+	}	  
+      }
+      else { // use JEC uncertainty from analysis tree
+	JetEnergyScaleSys *singleJES = new JetEnergyScaleSys(otree, TString("JES"));
+	singleJES->SetConfig(&cfg);
+	singleJES->SetBtagScaling(&inputs_btag_scaling_medium);
+	singleJES->SetJESUncertainties(jecUncertainties);
+	jetEnergyScaleSys.push_back(singleJES);
+      }    
     }
-    else { // use JEC uncertainty from analysis tree
-      JetEnergyScaleSys *singleJES = new JetEnergyScaleSys(otree, TString("JES"));
-      singleJES->SetConfig(&cfg);
-      singleJES->SetBtagScaling(&inputs_btag_scaling_medium);
-      singleJES->SetJESUncertainties(jecUncertainties);
-      jetEnergyScaleSys.push_back(singleJES);
-    }    
   }
 
   // list of met filters from config
@@ -500,10 +522,14 @@ int main(int argc, char * argv[]){
       inputEventsH->Fill(0.);
 
     AC1B analysisTree(_tree, isData);
-    // set AC1B for JES systematicsf_
-    if (!isData && ApplySystShift && jetEnergyScaleSys.size() > 0){
+    // set AC1B for JES and MET systematics
+    if ( !isData && !isEmbedded && ApplySystShift) {
       for (unsigned int i = 0; i < jetEnergyScaleSys.size(); i++)
       	(jetEnergyScaleSys.at(i))->SetAC1B(&analysisTree);
+      for (unsigned int i = 0; i < metSys.size(); i++)
+	(metSys.at(i))->SetAC1B(&analysisTree);
+      for (unsigned int i = 0; i < puppiMetSys.size(); ++i)
+	(puppiMetSys.at(i))->SetAC1B(&analysisTree);
     }
     
     double * TSweight = new double[expectedtauspinnerweights];
@@ -1265,13 +1291,19 @@ int main(int argc, char * argv[]){
       if (ApplySVFit && otree->njetspt20 > 0) svfit_variables(ch, &analysisTree, otree, &cfg, inputFile_visPtResolution);
         
       // evaluate systematics for MC 
-      if(!isData && ApplySystShift){
-      zPtWeightSys->Eval(); 
-      topPtWeightSys->Eval();
-      for(unsigned int i = 0; i < jetEnergyScaleSys.size(); i++)
-        (jetEnergyScaleSys.at(i))->Eval(); 
-      if (ch == "mt") tauScaleSys->Eval(utils::MUTAU);
-      else if (ch == "et") tauScaleSys->Eval(utils::ETAU);
+      if( !isData && !isEmbedded && ApplySystShift){
+	zPtWeightSys->Eval(); 
+	topPtWeightSys->Eval();
+	for(unsigned int i = 0; i < jetEnergyScaleSys.size(); i++)
+	  (jetEnergyScaleSys.at(i))->Eval(); 
+	for(unsigned int i = 0; i < metSys.size(); ++i) 
+	  (metSys.at(i))->Eval();
+	for(unsigned int i = 0; i < puppiMetSys.size(); ++i)
+	  (puppiMetSys.at(i))->Eval();
+      }
+      if (ApplySystShift) {
+	if (ch == "mt") tauScaleSys->Eval(utils::MUTAU);
+	else if (ch == "et") tauScaleSys->Eval(utils::ETAU);
       }
       counter[19]++;  
     
@@ -1340,6 +1372,20 @@ int main(int argc, char * argv[]){
     for (unsigned int i = 0; i < jetEnergyScaleSys.size(); i++){
       (jetEnergyScaleSys.at(i))->Write();
       delete jetEnergyScaleSys.at(i);
+    }
+  }
+
+  if (metSys.size() > 0){
+    for (unsigned int i = 0; i < metSys.size(); i++ ) {
+      (metSys.at(i))->Write();
+      delete metSys.at(i);
+    }
+  }
+
+  if (puppiMetSys.size() > 0){
+    for (unsigned int i = 0; i < puppiMetSys.size(); i++ ) {
+      (puppiMetSys.at(i))->Write();
+      delete puppiMetSys.at(i);
     }
   }
 

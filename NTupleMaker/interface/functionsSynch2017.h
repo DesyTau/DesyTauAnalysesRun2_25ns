@@ -525,6 +525,13 @@ void fillMET(const AC1B * analysisTree, Synch17Tree *otree, int era){
 void svfit_variables(TString ch, const AC1B *analysisTree, Synch17Tree *otree, const Config *cfg, TFile * inputFile_visPtResolution){
   double measuredMETx =  otree->met * cos(otree->metphi);
   double measuredMETy =  otree->met * sin(otree->metphi);
+
+  bool isPuppiMET = cfg->get<bool>("UsePuppiMET");
+
+  if (isPuppiMET) {
+    measuredMETx = otree->puppimet * cos(otree->puppimetphi);
+    measuredMETy = otree->puppimet * sin(otree->puppimetphi);
+  }
   
   // define MET covariance
   TMatrixD covMET(2, 2);
@@ -534,6 +541,14 @@ void svfit_variables(TString ch, const AC1B *analysisTree, Synch17Tree *otree, c
   covMET[1][0] = otree->metcov10;
   covMET[0][1] = otree->metcov01;
   covMET[1][1] = otree->metcov11;
+
+  if (isPuppiMET) {
+    covMET[0][0] = otree->puppimetcov00;
+    covMET[1][0] = otree->puppimetcov10;
+    covMET[0][1] = otree->puppimetcov01;
+    covMET[1][1] = otree->puppimetcov11;
+  }
+
 
   std::vector<classic_svFit::MeasuredTauLepton> measuredTauLeptons;
   classic_svFit::MeasuredTauLepton::kDecayType type_ = classic_svFit::MeasuredTauLepton::kUndefinedDecayType;
