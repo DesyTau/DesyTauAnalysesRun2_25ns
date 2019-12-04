@@ -14,6 +14,7 @@ sed 's/SampleNameForPUHist =/SampleNameForPUHist = DY1JetsToLL_M-50_TuneCP5_13Te
 sed 's/SampleNameForPUHist =/SampleNameForPUHist = DY2JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8_/' analysisMacroSynch_em_DY.conf > analysisMacroSynch_em_DY2JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8.conf
 sed 's/SampleNameForPUHist =/SampleNameForPUHist = DY3JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8_/' analysisMacroSynch_em_DY.conf > analysisMacroSynch_em_DY3JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8.conf
 sed 's/SampleNameForPUHist =/SampleNameForPUHist = DY4JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8_/' analysisMacroSynch_em_DY.conf > analysisMacroSynch_em_DY4JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8.conf
+sed 's/SampleNameForPUHist =/SampleNameForPUHist = DYJetsToLL_M-10to50_13TeV-12Apr2018_/' analysisMacroSynch_em_DY.conf > analysisMacroSynch_em_DYJetsToLL_M-10to50_13TeV-12Apr2018.conf
 
 sed 's/SampleNameForPUHist =/SampleNameForPUHist = ST_t-channel_antitop_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8_/' analysisMacroSynch_em_MC.conf > analysisMacroSynch_em_ST_t-channel_antitop_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8.conf
 sed 's/SampleNameForPUHist =/SampleNameForPUHist = ST_t-channel_top_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8_/' analysisMacroSynch_em_MC.conf > analysisMacroSynch_em_ST_t-channel_top_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8.conf
