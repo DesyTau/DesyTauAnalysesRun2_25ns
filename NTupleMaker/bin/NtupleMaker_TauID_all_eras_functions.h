@@ -454,7 +454,7 @@ bool FillHistInputEvents(TFile *file_, TH1D*inputEventsH){
    return hasInputEvents;
 }
 
-Float_t GetEmbeddedWeight(std::vector<TLorentzVector> promptTausFirstCopy, RooWorkspace *correctionWS_embedded){
+Float_t GetEmbeddedWeight(std::vector<TLorentzVector> promptTausFirstCopy, RooWorkspace *correctionWS_embedded, TString era){
    
    Float_t embeddedWeight = 1.0;
    double gt1_pt  = promptTausFirstCopy[0].Pt();
@@ -463,15 +463,21 @@ Float_t GetEmbeddedWeight(std::vector<TLorentzVector> promptTausFirstCopy, RooWo
    double gt2_eta = promptTausFirstCopy[1].Eta();
    correctionWS_embedded->var("gt_pt")->setVal(gt1_pt);
    correctionWS_embedded->var("gt_eta")->setVal(gt1_eta);
-   double id1_embed = correctionWS_embedded->function("m_sel_idEmb_ratio")->getVal();
+   double id1_embed;
+   if (era=="2016") id1_embed = correctionWS_embedded->function("m_sel_idemb_kit_ratio")->getVal();
+   else id1_embed = correctionWS_embedded->function("m_sel_idEmb_ratio")->getVal();
    correctionWS_embedded->var("gt_pt")->setVal(gt2_pt);
    correctionWS_embedded->var("gt_eta")->setVal(gt2_eta);
-   double id2_embed = correctionWS_embedded->function("m_sel_idEmb_ratio")->getVal();
+   double id2_embed;
+   if (era=="2016") id2_embed = correctionWS_embedded->function("m_sel_idemb_kit_ratio")->getVal();
+   else id2_embed = correctionWS_embedded->function("m_sel_idEmb_ratio")->getVal();
    correctionWS_embedded->var("gt1_pt")->setVal(gt1_pt);
    correctionWS_embedded->var("gt1_eta")->setVal(gt1_eta);
    correctionWS_embedded->var("gt2_pt")->setVal(gt2_pt);
    correctionWS_embedded->var("gt2_eta")->setVal(gt2_eta);
-   double trg_embed = correctionWS_embedded->function("m_sel_trg_ratio")->getVal();
+   double trg_embed;
+   if (era=="2016") trg_embed = correctionWS_embedded->function("m_sel_trg_kit_ratio")->getVal();
+   else trg_embed = correctionWS_embedded->function("m_sel_trg_ratio")->getVal();
    embeddedWeight = id1_embed * id2_embed * trg_embed;
 
    return embeddedWeight;
