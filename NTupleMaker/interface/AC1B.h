@@ -2480,7 +2480,7 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("tau_MVADM2017v1DM2raw", tau_MVADM2017v1DM2raw, &b_tau_MVADM2017v1DM2raw);
    fChain->SetBranchAddress("tau_MVADM2017v1DMotherraw", tau_MVADM2017v1DMotherraw, &b_tau_MVADM2017v1DMotherraw);
    
-   fChain->SetBranchAddress("TauSpinAngles_count", TauSpinAngles_count, &b_TauSpinAngles_count);
+   fChain->SetBranchAddress("TauSpinAngles_count", &TauSpinAngles_count, &b_TauSpinAngles_count);
    fChain->SetBranchAddress("TauSpinnerWeight", TauSpinnerWeight, &b_TauSpinnerWeight);
 
    fChain->SetBranchAddress("htxs_stage0cat",&htxs_stage0cat, &b_htxs_stage0cat);
