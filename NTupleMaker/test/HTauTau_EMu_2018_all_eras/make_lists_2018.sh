@@ -1,17 +1,17 @@
 #!/bin/sh
 dirMuonEG=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2018/data/MuonEG/
 dirMC=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2018/mc/
-dirEmbedding=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2018/data/Embedding_emu/
+dirEmbedding=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2018/embedded/Embedding_emu
 
 ls $dirMuonEG/MuonEG_Run2018A-17Sep2018-v1/*root > MuonEG_Run2018A
 ls $dirMuonEG/MuonEG_Run2018B-17Sep2018-v1/*root > MuonEG_Run2018B
 ls $dirMuonEG/MuonEG_Run2018C-17Sep2018-v1/*root > MuonEG_Run2018C
 ls $dirMuonEG/MuonEG_Run2018D-PromptReco-v2/*root > MuonEG_Run2018D
 
-ls $dirEmbedding/EmbeddingRun2018A_ElMuFinalState/*root > EmbeddingRun2018A
-ls $dirEmbedding/EmbeddingRun2018B_ElMuFinalState/*root > EmbeddingRun2018B
-ls $dirEmbedding/EmbeddingRun2018C_ElMuFinalState/*root > EmbeddingRun2018C
-ls $dirEmbedding/EmbeddingRun2018D_ElMuFinalState/*root > EmbeddingRun2018D
+ls $dirEmbedding/EmbeddingRun2018A/*root > EmbeddingRun2018A
+ls $dirEmbedding/EmbeddingRun2018B/*root > EmbeddingRun2018B
+ls $dirEmbedding/EmbeddingRun2018C/*root > EmbeddingRun2018C
+ls $dirEmbedding/EmbeddingRun2018D/*root > EmbeddingRun2018D
 
 ls $dirMC/DYJetsToLL_M-10to50/*root > DYJetsToLL_M-10to50_TuneCP5_13TeV-madgraphMLM-pythia8
 ls $dirMC/DYJetsToLL_M-50/*root > DYJetsToLL_M-50_TuneCP5_13TeV_madgraphMLM_pythia8
