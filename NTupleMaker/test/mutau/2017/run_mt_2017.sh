@@ -8,20 +8,29 @@
 ./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_mt_17_data.conf SingleMuon_Run2017F mt 10
 
 # Signals
-./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_lept_mt_GluGluHToTauTau_M125_13TeV_powheg_pythia8.conf GluGluHToTauTau_M125 mt 10
-./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_lept_mt_VBFHToTauTau_M125.conf VBFHToTauTau_M125 mt 10
-./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_lept_mt_SUSYGluGluToHToTauTau_M-120_TuneCP5_13TeV-pythia8.conf SUSYGluGluToHToTauTau mt 10
+./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_lept_mt_GluGluHToTauTau_M125_13TeV_powheg_pythia8.conf GluGluHToTauTau_M125 mt 5
+./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_lept_mt_VBFHToTauTau_M125.conf VBFHToTauTau_M125 mt 5
+##  commented since now switching to TauSpinner weights
+# ./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_lept_mt_SUSYGluGluToHToTauTau_M-120_TuneCP5_13TeV-pythia8.conf SUSYGluGluToHToTauTau mt 5
 
-#tauspinner
-./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_lept_mt_GluGluHToTauTau_M125_13TeV_powheg_pythia8.conf GluGluHToTauTauUncorrDecays_M125 mt 15
-./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_lept_mt_VBFHToTauTau_M125.conf VBFHToTauTauUncorrDecays_M125 mt 15
+# Tau Spinner
+./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_lept_mt_GluGluHToTauTau_M125_13TeV_powheg_pythia8.conf GluGluHToTauTauUncorrDecays_M125 mt 5
+./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_lept_mt_VBFHToTauTau_M125.conf VBFHToTauTauUncorrDecays_M125 mt 5
 
 # DY
+# TODO: add low mass DY (need to switch to the other PU file)
 ./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_lept_mt_DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8.conf DYJetsToLL_M-50 mt 10
 ./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_lept_mt_DY1JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8.conf DY1JetsToLL_M-50 mt 10
 ./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_lept_mt_DY2JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8.conf DY2JetsToLL_M-50 mt 10
 ./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_lept_mt_DY3JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8.conf DY3JetsToLL_M-50 mt 10
 ./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_lept_mt_DY4JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8.conf DY4JetsToLL_M-50 mt 10
+
+# Embedded
+./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_mt_17_embedded.conf EmbeddedMuTau_Run2017B mt 10
+./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_mt_17_embedded.conf EmbeddedMuTau_Run2017C mt 10
+./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_mt_17_embedded.conf EmbeddedMuTau_Run2017D mt 10
+./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_mt_17_embedded.conf EmbeddedMuTau_Run2017E mt 10
+./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_mt_17_embedded.conf EmbeddedMuTau_Run2017F mt 10
 
 # W+jets
 ./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_lept_mt_WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8.conf WJetsToLNu mt 10

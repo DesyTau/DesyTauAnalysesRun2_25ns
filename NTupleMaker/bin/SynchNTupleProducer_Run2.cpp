@@ -232,7 +232,7 @@ int main(int argc, char * argv[]){
 
   bool applyTauSpinnerWeights = false;
   if(isTauSpinner) applyTauSpinnerWeights = true;
-  const bool isEmbedded = infiles.find("Embedded") != string::npos;
+  const bool isEmbedded = infiles.find("Embed") != string::npos;
 
   const bool ApplyRecoilCorrections = cfg.get<bool>("ApplyRecoilCorrections") && !isData && (isDY || isWJets || isVBForGGHiggs || isMSSMsignal);
   RecoilCorrector recoilPFMetCorrector(cfg.get<string>("RecoilFilePath"));
@@ -551,7 +551,7 @@ int main(int argc, char * argv[]){
         std::cout << "      number of entries in Init Tree = " << numberOfEntriesInitTree << std::endl;
         for (Long64_t iEntry=0; iEntry<numberOfEntriesInitTree; iEntry++) {
             _inittree->GetEntry(iEntry);
-            if (isData)
+            if (isData && !isEmbedded)
                 nWeightedEventsH->Fill(0.,1.);
             else
                 nWeightedEventsH->Fill(0.,genweight);
@@ -569,7 +569,7 @@ int main(int argc, char * argv[]){
     }
     else 
     {
-      if(isData)
+      if(isData && !isEmbedded)
       {
         if (analysisTree.event_run < 315974) { // muon filter of the mutau triggers changed
           filterXtriggerLepLeg = cfg.get<vector<string>>("filterXtriggerLepLeg_before_run315974");
@@ -685,13 +685,10 @@ int main(int argc, char * argv[]){
       nonOverlap++;
       counter[2]++;
     
-      if (isData && !isGoodLumi(otree->run, otree->lumi, json))
+      if (isData && !isEmbedded && !isGoodLumi(otree->run, otree->lumi, json))
       	continue;
     
       initializeGenTree(gentree);
-    
-       // weights //TO DO: check PU for embedded
-      // if(ApplyPUweight) fill_weight(&analysisTree, otree, PUofficial, (isData&&!isEmbedded));
     
       otree->npv = analysisTree.primvertex_count;
       otree->npu = analysisTree.numtruepileupinteractions;// numpileupinteractions;
@@ -982,7 +979,7 @@ int main(int argc, char * argv[]){
       }
 
 
-      if ((isEmbedded || !isData) && ApplyLepSF) {
+      if ((!isData || isEmbedded) && ApplyLepSF) {
       	TString suffix = "mc";
       	TString suffixRatio = "ratio";
       	if (isEmbedded) {suffix = "embed"; suffixRatio = "embed_ratio";}

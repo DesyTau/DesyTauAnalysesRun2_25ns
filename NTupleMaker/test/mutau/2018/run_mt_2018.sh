@@ -18,6 +18,12 @@
 ./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_mt_18_MC.conf DY4JetsToLL_M-50 mt 10
 ./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_mt_18_MC.conf DYJetsToLL_M-10to50 mt 10
 
+# Embedded
+./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_mt_18_embedded.conf EmbeddedMuTau_Run2018A mt 10
+./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_mt_18_embedded.conf EmbeddedMuTau_Run2018B mt 10
+./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_mt_18_embedded.conf EmbeddedMuTau_Run2018C mt 10
+./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_mt_18_embedded.conf EmbeddedMuTau_Run2018D mt 10
+
 # W+jets
 ./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_mt_18_MC.conf WJetsToLNu mt 10
 ./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_mt_18_MC.conf W1JetsToLNu mt 10
