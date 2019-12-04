@@ -535,7 +535,7 @@ int main(int argc, char * argv[]){
     double * TSweight = new double[expectedtauspinnerweights];
     TTree  * _treeTauSpinnerWeights = NULL;
     
-    if(applyTauSpinnerWeights){ 
+    if(applyTauSpinnerWeights&&era==2017){ 
       _treeTauSpinnerWeights = (TTree*)file_->Get(TString(TauSpinnerWeightTreeName));
       _treeTauSpinnerWeights->SetBranchAddress("TauSpinnerWeights",TSweight);		
     }  
@@ -607,33 +607,78 @@ int main(int argc, char * argv[]){
       	FillGenTree(&analysisTree,gentree);
       	gentree->Fill();
       }
-      
-      if(applyTauSpinnerWeights){
-        _treeTauSpinnerWeights->GetEntry(iEntry);
-	
-      	otree->TauSpinnerWeightsEven = TSweight[0];
-      	gentree->TauSpinnerWeightsEven = TSweight[0];
-      	gentreeForGoodRecoEvtsOnly->TauSpinnerWeightsEven = TSweight[0];
+
+      //TO DO: fix tauspinner weight implementation after deprecated method is not in use for 2017
+      if(!applyTauSpinnerWeights){
+      	for(int tsindex = 0; tsindex < expectedtauspinnerweights; tsindex++) 
+          TSweight[tsindex] = 1;
+
+	otree->TauSpinnerWeightsEven = TSweight[0];
+      	gentree->sm_htt125 = TSweight[0];
+      	gentreeForGoodRecoEvtsOnly->sm_htt125 = TSweight[0];
 
       	otree->TauSpinnerWeightsMaxMix = TSweight[1];
-      	gentree->TauSpinnerWeightsMaxMix = TSweight[1];
-      	gentreeForGoodRecoEvtsOnly->TauSpinnerWeightsMaxMix = TSweight[1];
+      	gentree->ps_htt125 = TSweight[1];
+      	gentreeForGoodRecoEvtsOnly->ps_htt125 = TSweight[1];
 
       	otree->TauSpinnerWeightsOdd = TSweight[2];
-      	gentree->TauSpinnerWeightsOdd = TSweight[2];
-      	gentreeForGoodRecoEvtsOnly->TauSpinnerWeightsOdd = TSweight[2];
+      	gentree->mm_htt125 = TSweight[2];
+      	gentreeForGoodRecoEvtsOnly->mm_htt125 = TSweight[2];
 
       	otree->TauSpinnerWeightsMinusMaxMix = TSweight[3];
-      	gentree->TauSpinnerWeightsMinusMaxMix = TSweight[3];
-      	gentreeForGoodRecoEvtsOnly->TauSpinnerWeightsMinusMaxMix = TSweight[3];
+      	gentree->minusmm_htt125 = TSweight[3];
+      	gentreeForGoodRecoEvtsOnly->minusmm_htt125 = TSweight[3];
 
       	otree->TauSpinnerWeightsMix0p375 = TSweight[4];
-      	gentree->TauSpinnerWeightsMix0p375 = TSweight[4];
-      	gentreeForGoodRecoEvtsOnly->TauSpinnerWeightsMix0p375 = TSweight[4];
-      	}
+      	gentree->mix0p375_htt125 = TSweight[4];
+      	gentreeForGoodRecoEvtsOnly->mix0p375_htt125 = TSweight[4];
+      
+      }
+      else if(era==2017){
+        _treeTauSpinnerWeights->GetEntry(iEntry);
+
+	otree->TauSpinnerWeightsEven = TSweight[0];
+      	gentree->sm_htt125 = TSweight[0];
+      	gentreeForGoodRecoEvtsOnly->sm_htt125 = TSweight[0];
+
+      	otree->TauSpinnerWeightsMaxMix = TSweight[1];
+      	gentree->ps_htt125 = TSweight[1];
+      	gentreeForGoodRecoEvtsOnly->ps_htt125 = TSweight[1];
+
+      	otree->TauSpinnerWeightsOdd = TSweight[2];
+      	gentree->mm_htt125 = TSweight[2];
+      	gentreeForGoodRecoEvtsOnly->mm_htt125 = TSweight[2];
+
+      	otree->TauSpinnerWeightsMinusMaxMix = TSweight[3];
+      	gentree->minusmm_htt125 = TSweight[3];
+      	gentreeForGoodRecoEvtsOnly->minusmm_htt125 = TSweight[3];
+
+      	otree->TauSpinnerWeightsMix0p375 = TSweight[4];
+      	gentree->mix0p375_htt125 = TSweight[4];
+      	gentreeForGoodRecoEvtsOnly->mix0p375_htt125 = TSweight[4];
+      }
       else{
-      	for(int tsindex = 0; tsindex < expectedtauspinnerweights; tsindex++) 
-          TSweight[tsindex] = 0;
+	otree->TauSpinnerWeightsEven = analysisTree.TauSpinnerWeight[0];
+      	gentree->sm_htt125 = analysisTree.TauSpinnerWeight[0];
+      	gentreeForGoodRecoEvtsOnly->sm_htt125 = analysisTree.TauSpinnerWeight[0];
+
+      	otree->TauSpinnerWeightsMaxMix = analysisTree.TauSpinnerWeight[1];
+      	gentree->ps_htt125 = analysisTree.TauSpinnerWeight[1];
+      	gentreeForGoodRecoEvtsOnly->ps_htt125 = analysisTree.TauSpinnerWeight[1];
+
+      	otree->TauSpinnerWeightsOdd = analysisTree.TauSpinnerWeight[2];
+      	gentree->mm_htt125 = analysisTree.TauSpinnerWeight[2];
+      	gentreeForGoodRecoEvtsOnly->mm_htt125 = analysisTree.TauSpinnerWeight[2];
+
+	if(analysisTree.TauSpinAngles_count>=5){
+	  otree->TauSpinnerWeightsMinusMaxMix = analysisTree.TauSpinnerWeight[3];
+	  gentree->minusmm_htt125 = analysisTree.TauSpinnerWeight[3];
+	  gentreeForGoodRecoEvtsOnly->minusmm_htt125 = analysisTree.TauSpinnerWeight[3];
+	  
+	  otree->TauSpinnerWeightsMix0p375 = analysisTree.TauSpinnerWeight[4];
+	  gentree->mix0p375_htt125 = analysisTree.TauSpinnerWeight[4];
+	  gentreeForGoodRecoEvtsOnly->mix0p375_htt125 = analysisTree.TauSpinnerWeight[4];
+	}
       }
 
       //Skip events not passing the MET filters, if applied

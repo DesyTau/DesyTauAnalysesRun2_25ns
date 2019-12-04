@@ -87,12 +87,12 @@ public :
   Float_t VzConstitTau2;
   
   Float_t alphaminus;
-
-  Double_t TauSpinnerWeightsEven;
-  Double_t TauSpinnerWeightsOdd;
-  Double_t TauSpinnerWeightsMaxMix;
-  Double_t TauSpinnerWeightsMinusMaxMix;
-  Double_t TauSpinnerWeightsMix0p375;
+  //tauspinner weights
+  Double_t sm_htt125;
+  Double_t ps_htt125;
+  Double_t mm_htt125;
+  Double_t minusmm_htt125;
+  Double_t mix0p375_htt125;
 
   //////////////////////////////////////////////
   //            List of branches              //
@@ -152,11 +152,11 @@ public :
   TBranch        *b_VzConstitTau2;
   TBranch        *b_alphaminus;
 
-  TBranch        *b_TauSpinnerWeightsEven;
-  TBranch        *b_TauSpinnerWeightsOdd;
-  TBranch        *b_TauSpinnerWeightsMaxMix;
-  TBranch        *b_TauSpinnerWeightsMinusMaxMix;
-  TBranch        *b_TauSpinnerWeightsMix0p375;
+  TBranch        *b_sm_htt125;
+  TBranch        *b_ps_htt125;
+  TBranch        *b_mm_htt125;
+  TBranch        *b_minusmm_htt125;
+  TBranch        *b_mix0p375_htt125;
 
   Synch17GenTree(TTree *tree=0);
   virtual ~Synch17GenTree();
