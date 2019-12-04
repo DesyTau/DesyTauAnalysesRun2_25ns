@@ -244,7 +244,7 @@ int main(int argc, char * argv[]) {
    // initialize good run selection ====================================================================================================================================
    std::vector<Period> periods;
    string fullPathToJsonFile = cmsswBase + "/src/DesyTauAnalyses/NTupleMaker/test/json/" + jsonFile;
-   if (isData) ReadJson(periods,fullPathToJsonFile);
+   if (isData || isEmbedded ) ReadJson(periods,fullPathToJsonFile);
    
    // Load CrystalBallEfficiency class =================================================================================================================================
    TString pathToCrystalLib = (TString) cmsswBase + "/src/HTT-utilities/CorrectionsWorkspace/CrystalBallEfficiency_cxx.so";
@@ -279,7 +279,7 @@ int main(int argc, char * argv[]) {
       metFlags.push_back("Flag_globalSuperTightHalo2016Filter");
       metFlags.push_back("Flag_EcalDeadCellTriggerPrimitiveFilter");
       metFlags.push_back("Flag_goodVertices");
-      if (isData)
+      if (isData || isEmbedded)
          metFlags.push_back("Flag_eeBadScFilter");
       metFlags.push_back("Flag_BadPFMuonFilter");
       // metFlags.push_back("Flag_BadChargedCandidateFilter");  // currently not recommended, under review
@@ -290,7 +290,7 @@ int main(int argc, char * argv[]) {
       metFlags.push_back("Flag_globalSuperTightHalo2016Filter");
       metFlags.push_back("Flag_EcalDeadCellTriggerPrimitiveFilter");
       metFlags.push_back("Flag_goodVertices");
-      if (isData)
+      if (isData || isEmbedded)
          metFlags.push_back("Flag_eeBadScFilter");
       metFlags.push_back("Flag_BadPFMuonFilter");
       //metFlags.push_back("Flag_BadChargedCandidateFilter");  // currently not recommended, under review
@@ -304,7 +304,7 @@ int main(int argc, char * argv[]) {
       metFlags.push_back("Flag_EcalDeadCellTriggerPrimitiveFilter");
       metFlags.push_back("Flag_BadPFMuonFilter");
       //metFlags.push_back("Flag_BadChargedCandidateFilter");  // currently not recommended, under review
-      if (isData)
+      if (isData || isEmbedded)
          metFlags.push_back("Flag_eeBadScFilter");
       metFlags.push_back("ecalBadCalibReducedMINIAODFilter");
    }
@@ -534,7 +534,7 @@ int main(int argc, char * argv[]) {
                      wDecayProductsLV += genLV;
                   }
                }
-               
+
                if (abs(analysisTree.genparticles_pdgid[igen])==13) {
                   isMuon = true;
                   if (analysisTree.genparticles_fromHardProcess[igen]&&analysisTree.genparticles_status[igen]==1) {
@@ -561,7 +561,7 @@ int main(int argc, char * argv[]) {
                      tauNeutrinosLV += genLV;
                   }
                }
-               
+
                bool isBoson = (fromHardProcessFinalState && (isMuon || isElectron || isNeutrino)) || isDirectHardProcessTauDecayProduct;
                bool isVisibleBoson = (fromHardProcessFinalState && (isMuon || isElectron)) || (isDirectHardProcessTauDecayProduct && !isNeutrino);
                
@@ -585,9 +585,8 @@ int main(int argc, char * argv[]) {
                   bosonMass = promptTausLV.M();
                   lepPx = promptVisTausLV.Px(); lepPy = promptVisTausLV.Py(); lepPz = promptVisTausLV.Pz();
                   mtBoson_gen = mT(promptTausFirstCopy[0],promptTausFirstCopy[1]);
-                  
                   // set embeddedWeight  ===============================================================================================================================
-                  embeddedWeight = GetEmbeddedWeight( promptTausFirstCopy, correctionWS);
+                  embeddedWeight = GetEmbeddedWeight( promptTausFirstCopy, correctionWS, era);
                }
                else if (promptMuons.size()==2) {
                   isZTT = false; isZMM = true; isZEE = false;
@@ -681,7 +680,6 @@ int main(int argc, char * argv[]) {
             }
                   
          }
-
          // store event variables  =====================================================================================================================================
          run = int(analysisTree.event_run);
          lumi = int(analysisTree.event_luminosityblock);
@@ -693,7 +691,7 @@ int main(int argc, char * argv[]) {
          
          // apply good run selection  ==================================================================================================================================
 
-         if (isData && applyGoodRunSelection){
+         if ((isData || isEmbedded) && applyGoodRunSelection){
             int n=analysisTree.event_run;
             int lum = analysisTree.event_luminosityblock;      
             if (!GoodRunSelection(n,lum,periods)) continue;
@@ -714,14 +712,18 @@ int main(int argc, char * argv[]) {
          isHighPtLegElectron = AccessTriggerInfo(analysisTree,HighPtLegElectron,nHighPtLegElectron);
          isLowPtLegMuon = AccessTriggerInfo(analysisTree,LowPtLegMuon,nLowPtLegMuon);
          isHighPtLegMuon = AccessTriggerInfo(analysisTree,HighPtLegMuon,nHighPtLegMuon);
+         if (applyDzFilterMatch){
          isMu23Ele12DzFilter = AccessTriggerInfo(analysisTree,Mu23Ele12DzFilter,nMu23Ele12DzFilter);
          isMu8Ele23DzFilter = AccessTriggerInfo(analysisTree,Mu8Ele23DzFilter,nMu8Ele23DzFilter);
-
-         if (!isLowPtLegElectron || !isHighPtLegElectron || !isLowPtLegMuon || !isHighPtLegMuon || !isMu23Ele12DzFilter || !isMu8Ele23DzFilter ) {
+         }
+         if (!isLowPtLegElectron || !isHighPtLegElectron || !isLowPtLegMuon || !isHighPtLegMuon ) {
             std::cout << "PFJet HLT filter not found" << std::endl;
             exit(-1);
          }
-         
+         if (applyDzFilterMatch && (!isMu23Ele12DzFilter || !isMu8Ele23DzFilter) ) {
+            std::cout << "PFJet HLT filter not found" << std::endl;
+            exit(-1);
+         }
          // searching for btagging discriminant ========================================================================================================================
          unsigned int nBTagDiscriminant1 = 0;
          unsigned int nBTagDiscriminant2 = 0;
@@ -773,7 +775,6 @@ int main(int argc, char * argv[]) {
          if (electronIndex<0) continue;
          if (muonIndex<0) continue;
 
-         
          // MET Filters ================================================================================================================================================             
          metFilters_ = metFiltersPasses(analysisTree,metFlags);
          badChargedCandidateFilter_ = metFiltersPasses(analysisTree,badChargedCandidateFlag);
@@ -787,19 +788,19 @@ int main(int argc, char * argv[]) {
          // triggered?  ================================================================================================================================================    
          isMu23 = TriggerMatching(analysisTree, analysisTree.muon_eta[muonIndex], analysisTree.muon_phi[muonIndex], nHighPtLegMuon, deltaRTrigMatch) && analysisTree.muon_pt[muonIndex]>ptMuonHighCut;
          isMu8 = TriggerMatching(analysisTree, analysisTree.muon_eta[muonIndex], analysisTree.muon_phi[muonIndex], nLowPtLegMuon, deltaRTrigMatch) && analysisTree.muon_pt[muonIndex]>ptMuonLowCut;
-         isMu23dz = TriggerMatching(analysisTree, analysisTree.muon_eta[muonIndex], analysisTree.muon_phi[muonIndex], nMu23Ele12DzFilter, deltaRTrigMatch);
-         isMu8dz = TriggerMatching(analysisTree, analysisTree.muon_eta[muonIndex], analysisTree.muon_phi[muonIndex], nMu8Ele23DzFilter, deltaRTrigMatch);
-         if (applyDzFilterMatch) {
+         if (applyDzFilterMatch){
+            isMu23dz = TriggerMatching(analysisTree, analysisTree.muon_eta[muonIndex], analysisTree.muon_phi[muonIndex], nMu23Ele12DzFilter, deltaRTrigMatch);
+            isMu8dz = TriggerMatching(analysisTree, analysisTree.muon_eta[muonIndex], analysisTree.muon_phi[muonIndex], nMu8Ele23DzFilter, deltaRTrigMatch);
             isMu23 = isMu23 && isMu23dz;
             isMu8 = isMu8 && isMu8dz;
          }
          isEle23 = TriggerMatching(analysisTree, analysisTree.electron_eta[electronIndex], analysisTree.electron_phi[electronIndex], nHighPtLegElectron, deltaRTrigMatch) && analysisTree.electron_pt[electronIndex]>ptElectronHighCut;
          isEle12 = TriggerMatching(analysisTree, analysisTree.electron_eta[electronIndex], analysisTree.electron_phi[electronIndex], nLowPtLegElectron, deltaRTrigMatch) && analysisTree.electron_pt[electronIndex]>ptElectronLowCut; 
+         if (applyDzFilterMatch) {
          isEle12dz = TriggerMatching(analysisTree, analysisTree.electron_eta[electronIndex], analysisTree.electron_phi[electronIndex], nMu23Ele12DzFilter, deltaRTrigMatch);
          isEle23dz = TriggerMatching(analysisTree, analysisTree.electron_eta[electronIndex], analysisTree.electron_phi[electronIndex], nMu8Ele23DzFilter, deltaRTrigMatch);
-         if (applyDzFilterMatch) {
-            isEle23 = isEle23 && isEle23dz;
-            isEle12 = isEle12 && isEle12dz;
+         isEle23 = isEle23 && isEle23dz;
+         isEle12 = isEle12 && isEle12dz;
          }		      
          trg_muonelectron = 
             (isMu23&&isEle12&&analysisTree.muon_pt[muonIndex]>ptMuonHighCut) ||
@@ -854,20 +855,30 @@ int main(int argc, char * argv[]) {
             correctionWS->var("m_eta")->setVal(eta_2);
             correctionWS->var("m_iso")->setVal(iso_2);
             // scale factors
-            if (isEmbedded) {
-               isoweight_1 = correctionWS->function("e_id90_kit_data")->getVal()/correctionWS->function("e_id90_kit_embed")->getVal() * correctionWS->function("e_iso_kit_data")->getVal()/correctionWS->function("e_iso_kit_embed")->getVal();
-               isoweight_2 = correctionWS->function("m_id_kit_data")->getVal()/correctionWS->function("m_id_kit_embed")->getVal() * correctionWS->function("m_iso_kit_data")->getVal()/correctionWS->function("m_iso_kit_embed")->getVal();
+            if (era=="2016"){
+               if (isEmbedded) {
+                  isoweight_1 = correctionWS->function("e_idiso_ratio_emb")->getVal();
+                  isoweight_2 = correctionWS->function("m_idiso_ratio_emb")->getVal();
+               }
+               else {
+                  isoweight_1 = correctionWS->function("e_idiso_ratio")->getVal();
+                  isoweight_2 = correctionWS->function("m_idiso_ratio")->getVal();
+               }
             }
-            else {
-               isoweight_1 = correctionWS->function("e_id90_kit_data")->getVal()/correctionWS->function("e_id90_kit_mc")->getVal() * correctionWS->function("e_iso_kit_data")->getVal()/correctionWS->function("e_iso_kit_mc")->getVal();
-               isoweight_2 = correctionWS->function("m_id_kit_data")->getVal()/correctionWS->function("m_id_kit_mc")->getVal() * correctionWS->function("m_iso_kit_data")->getVal()/correctionWS->function("m_iso_kit_mc")->getVal();
+            else{
+               if (isEmbedded) {
+                  isoweight_1 = correctionWS->function("e_id90iso_binned_embed_kit_ratio")->getVal();
+                  isoweight_2 = correctionWS->function("m_idiso_binned_embed_kit_ratio")->getVal();
+               }
+               else {
+                  isoweight_1 = correctionWS->function("e_id90iso_binned_kit_ratio")->getVal();
+                  isoweight_2 = correctionWS->function("m_idiso_binned_kit_data")->getVal();
+               }
             }
-
             correctionWS->var("e_pt")->setVal(pt_1);
             correctionWS->var("e_eta")->setVal(eta_1);
             if (era=="2017") idweight_1 = correctionWS->function("e_trk_ratio")->getVal();
             else idweight_1 =1.0;
-
             correctionWS->var("m_eta")->setVal(eta_2);
             correctionWS->var("m_pt")->setVal(pt_2);
             if (era=="2016") idweight_2 = correctionWS->function("m_trk_ratio")->getVal();
@@ -897,7 +908,6 @@ int main(int argc, char * argv[]) {
                Mu23EffData  = correctionWS->function("m_trg_23_binned_ic_data")->getVal();
                Mu8EffData   = correctionWS->function("m_trg_8_binned_ic_data")->getVal();
             }
-
             float trigWeightData = Mu23EffData*Ele12EffData + Mu8EffData*Ele23EffData - Mu23EffData*Ele23EffData;
 
             if (applyTriggerMatch && !isData) {
@@ -925,7 +935,6 @@ int main(int argc, char * argv[]) {
             
             effweight = trigweight;
          }
-
          // set properties of dilepton system ==========================================================================================================================
          TLorentzVector muonLV; muonLV.SetXYZM(analysisTree.muon_px[muonIndex],
                                                analysisTree.muon_py[muonIndex],
@@ -1044,7 +1053,7 @@ int main(int argc, char * argv[]) {
             if (!isPFJetId) continue;
 
             if (era=="2017" && jetPt < 50 && absJetEta > 2.65 && absJetEta < 3.139) continue;
-            
+
             bool cleanedJet = true;
             float dR1 = deltaR(analysisTree.pfjet_eta[jet],analysisTree.pfjet_phi[jet],
                                eta_1,phi_1);
@@ -1157,7 +1166,6 @@ int main(int argc, char * argv[]) {
                   if(tagged_btagUp)     bjets_btagUp.push_back(jet);
                   if(tagged_btagDown)   bjets_btagDown.push_back(jet);
             }
-
             if (jetLV_jecUnc.at("jecUncEta0To5Up").Pt()>jetPtHighCut) njets_jecUncEta0To5Up += 1;
             if (jetLV_jecUnc.at("jecUncEta0To5Down").Pt()>jetPtHighCut) njets_jecUncEta0To5Down += 1;
             if (jetLV_jecUnc.at("jecUncEta0To3Up").Pt()>jetPtHighCut) njets_jecUncEta0To3Up += 1;
@@ -1536,7 +1544,7 @@ int main(int argc, char * argv[]) {
          bool bgen_1 = false;
          unsigned int gen_2 = 0;
          bool bgen_2 = false;
-         
+
          if (!isData) {
             for (unsigned int igen=0; igen < analysisTree.genparticles_count; ++igen) {
                TLorentzVector genLV; genLV.SetXYZT(analysisTree.genparticles_px[igen],
