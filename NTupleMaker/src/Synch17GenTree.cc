@@ -121,11 +121,11 @@ void Synch17GenTree::ReadInit(TTree *tree)
 
    fChain->SetBranchAddress("alphaminus", &alphaminus, &b_alphaminus);
    
-   fChain->SetBranchAddress("sm_htt125", &TauSpinnerWeightsEven, &b_TauSpinnerWeightsEven);
-   fChain->SetBranchAddress("ps_htt125", &TauSpinnerWeightsOdd, &b_TauSpinnerWeightsOdd);
-   fChain->SetBranchAddress("mm_htt125", &TauSpinnerWeightsMaxMix, &b_TauSpinnerWeightsMaxMix);
-   fChain->SetBranchAddress("minusmm_htt125", &TauSpinnerWeightsMinusMaxMix, &b_TauSpinnerWeightsMinusMaxMix);
-   fChain->SetBranchAddress("mix0p375_htt125", &TauSpinnerWeightsMix0p375, &b_TauSpinnerWeightsMix0p375);
+   fChain->SetBranchAddress("sm_htt125", &sm_htt125, &b_sm_htt125);
+   fChain->SetBranchAddress("ps_htt125", &ps_htt125, &b_ps_htt125);
+   fChain->SetBranchAddress("mm_htt125", &mm_htt125, &b_mm_htt125);
+   fChain->SetBranchAddress("minusmm_htt125", &minusmm_htt125, &b_minusmm_htt125);
+   fChain->SetBranchAddress("mix0p375_htt125", &mix0p375_htt125, &b_mix0p375_htt125);
 
    lock=true;
 }
@@ -258,11 +258,11 @@ void Synch17GenTree::WriteInit(TTree *tree) {
 
    fChain->Branch("gen_alphaminus", &alphaminus, "gen_alphaminus/F");
 
-  fChain->Branch("gen_sm_htt125", &TauSpinnerWeightsEven, "TauSpinnerWeightsEven/D");
-  fChain->Branch("gen_ps_htt125", &TauSpinnerWeightsOdd, "TauSpinnerWeightsOdd/D");
-  fChain->Branch("gen_mm_htt125", &TauSpinnerWeightsMaxMix, "TauSpinnerWeightsMaxMix/D");
-  fChain->Branch("gen_minusmm_htt125", &TauSpinnerWeightsMinusMaxMix, "TauSpinnerWeightsMinusMaxMix/D");
-  fChain->Branch("gen_mix0p375_htt125", &TauSpinnerWeightsMix0p375, "TauSpinnerWeightsMix0p375/D");
+  fChain->Branch("gen_sm_htt125", &sm_htt125, "gen_sm_htt125/D");
+  fChain->Branch("gen_ps_htt125", &ps_htt125, "gen_ps_htt125/D");
+  fChain->Branch("gen_mm_htt125", &mm_htt125, "gen_mm_htt125/D");
+  fChain->Branch("gen_minusmm_htt125", &minusmm_htt125, "gen_minusmm_htt125/D");
+  fChain->Branch("gen_mix0p375_htt125", &mix0p375_htt125, "gen_mix0p375_htt125/D");
 
 }
 

@@ -800,14 +800,17 @@ public :
    Float_t	   tau_byVVVLooseDeepTau2017v2p1VSe[100];	//[tau_count]
    Float_t	   tau_byVVVLooseDeepTau2017v2p1VSjet[100];	//[tau_count]
    
-   Float_t     tau_MVADM2017v1[100];
-   Float_t     tau_MVADM2017v1DM0raw[100];
-   Float_t     tau_MVADM2017v1DM10raw[100];
-   Float_t     tau_MVADM2017v1DM11raw[100];
-   Float_t     tau_MVADM2017v1DM1raw[100];
-   Float_t     tau_MVADM2017v1DM2raw[100];
-   Float_t     tau_MVADM2017v1DMotherraw[100];
+   Float_t         tau_MVADM2017v1[100];
+   Float_t         tau_MVADM2017v1DM0raw[100];
+   Float_t         tau_MVADM2017v1DM10raw[100];
+   Float_t         tau_MVADM2017v1DM11raw[100];
+   Float_t         tau_MVADM2017v1DM1raw[100];
+   Float_t         tau_MVADM2017v1DM2raw[100];
+   Float_t         tau_MVADM2017v1DMotherraw[100];
    
+   UInt_t          TauSpinAngles_count;
+   Double_t        TauSpinnerWeight[20];//[TauSpinAngles_count]
+
    Int_t           htxs_stage0cat;
    Int_t           htxs_stage1cat;
    Int_t           htxs_stage1p1cat;
@@ -1588,13 +1591,16 @@ public :
    TBranch	  *b_tau_byVVVLooseDeepTau2017v2p1VSe;	//!
    TBranch	  *b_tau_byVVVLooseDeepTau2017v2p1VSjet;	//!
    
-   TBranch    *b_tau_MVADM2017v1;
-   TBranch    *b_tau_MVADM2017v1DM0raw;
-   TBranch    *b_tau_MVADM2017v1DM10raw;
-   TBranch    *b_tau_MVADM2017v1DM11raw;
-   TBranch    *b_tau_MVADM2017v1DM1raw;
-   TBranch    *b_tau_MVADM2017v1DM2raw;
-   TBranch    *b_tau_MVADM2017v1DMotherraw;
+   TBranch        *b_tau_MVADM2017v1;
+   TBranch        *b_tau_MVADM2017v1DM0raw;
+   TBranch        *b_tau_MVADM2017v1DM10raw;
+   TBranch        *b_tau_MVADM2017v1DM11raw;
+   TBranch        *b_tau_MVADM2017v1DM1raw;
+   TBranch        *b_tau_MVADM2017v1DM2raw;
+   TBranch        *b_tau_MVADM2017v1DMotherraw;
+
+   TBranch        *b_TauSpinAngles_count;
+   TBranch        *b_TauSpinnerWeight;
 
    TBranch        *b_htxs_stage0cat;   //!
    TBranch        *b_htxs_stage1cat;   //!
@@ -2473,6 +2479,9 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("tau_MVADM2017v1DM1raw", tau_MVADM2017v1DM1raw, &b_tau_MVADM2017v1DM1raw);
    fChain->SetBranchAddress("tau_MVADM2017v1DM2raw", tau_MVADM2017v1DM2raw, &b_tau_MVADM2017v1DM2raw);
    fChain->SetBranchAddress("tau_MVADM2017v1DMotherraw", tau_MVADM2017v1DMotherraw, &b_tau_MVADM2017v1DMotherraw);
+   
+   fChain->SetBranchAddress("TauSpinAngles_count", &TauSpinAngles_count, &b_TauSpinAngles_count);
+   fChain->SetBranchAddress("TauSpinnerWeight", TauSpinnerWeight, &b_TauSpinnerWeight);
 
    fChain->SetBranchAddress("htxs_stage0cat",&htxs_stage0cat, &b_htxs_stage0cat);
    fChain->SetBranchAddress("htxs_stage1cat",&htxs_stage1cat , &b_htxs_stage1cat);

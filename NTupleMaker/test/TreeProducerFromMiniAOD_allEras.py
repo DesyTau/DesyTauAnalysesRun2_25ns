@@ -59,8 +59,8 @@ import FWCore.PythonUtilities.LumiList as LumiList
 # https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideGoodLumiSectionsJSONFile#cmsRun
 process.source = cms.Source("PoolSource",
   fileNames = cms.untracked.vstring(
-        "/store/data/Run2017B/Tau/MINIAOD/31Mar2018-v1/90000/FECFEF99-4F37-E811-8243-001E67792562.root"  # use for testing (2017)
-        #"/store/mc/RunIIFall17MiniAODv2/TTToHadronic_TuneCP5_13TeV-powheg-pythia8/MINIAODSIM/PU2017_12Apr2018_new_pmx_94X_mc2017_realistic_v14-v2/120000/420D636B-4BBB-E811-B806-0025905C54C6.root"  # use for testing (2017)
+        #"/store/data/Run2017B/Tau/MINIAOD/31Mar2018-v1/90000/FECFEF99-4F37-E811-8243-001E67792562.root"  # use for testing (2017)
+        "/store/mc/RunIIFall17MiniAODv2/TTToHadronic_TuneCP5_13TeV-powheg-pythia8/MINIAODSIM/PU2017_12Apr2018_new_pmx_94X_mc2017_realistic_v14-v2/120000/420D636B-4BBB-E811-B806-0025905C54C6.root"  # use for testing (2017)
         #"/store/mc/RunIISummer16MiniAODv3/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/MINIAODSIM/PUMoriond17_94X_mcRun2_asymptotic_v3-v1/120000/FE7E7C9D-3CBF-E811-8BA6-44A84223FF3C.root" # use for testing (2016)
         #"/store/data/Run2016C/SingleMuon/MINIAOD/17Jul2018-v1/20000/FEC97F81-0097-E811-A7B9-90E2BACC5EEC.root" # use for testing (2016)
         #"/store/mc/RunIIAutumn18MiniAOD/W1JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v2/120000/403882A2-1EFE-9D44-9D5D-EC55DDBE4091.root" # use for testing (2018)
@@ -72,9 +72,7 @@ process.source = cms.Source("PoolSource",
 #	"root://cms-xrd-global.cern.ch///store/user/sbrommer/gc_storage/embedding_16_legacy_miniaod/ElMu_data_legacy_2016_CMSSW9414/TauEmbedding_ElMu_data_legacy_2016_CMSSW9414_Run2016B-v2/99/merged_miniaod_998.root" #emu embedded 16 test sample
 #	"root://cms-xrd-global.cern.ch///store/user/jbechtel/gc_storage/embedding_16_legacy_miniaod/MuTau_data_legacy_2016_CMSSW9414/TauEmbedding_MuTau_data_legacy_2016_CMSSW9414_Run2016B-v4/99/merged_miniaod_998.root" #mt embedded 16 test sample
 #	"root://cms-xrd-global.cern.ch///store/user/aakhmets/gc_storage/MuTau_data_2017_CMSSW944_gridka/TauEmbedding_MuTau_data_2017_CMSSW944_Run2017F/99/merged_9998.root"
-
-#testsample with flat tau polarisation
-	#"root://cms-xrd-global.cern.ch//store/mc/RunIIFall17MiniAODv2/VBFHToTauTauUncorrelatedDecay_Filtered_M125_TuneCP5_13TeV-powheg-pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/60000/F2FF8AFB-DF01-EA11-9882-5065F381C251.root"
+	#"root://cms-xrd-global.cern.ch//store/mc/RunIIFall17MiniAODv2/VBFHToTauTauUncorrelatedDecay_Filtered_M125_TuneCP5_13TeV-powheg-pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/60000/F2FF8AFB-DF01-EA11-9882-5065F381C251.root"#testsample with flat tau polarisation (tauspinner)
 	),
   skipEvents = cms.untracked.uint32(0),
   #lumisToProcess = LumiList.LumiList(filename = 'json/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt').getVLuminosityBlockRange()
@@ -522,6 +520,7 @@ RecPrimVertex = cms.untracked.bool(True),
 RecPrimVertexWithBS = cms.untracked.bool(True),
 RefittedVertex = cms.untracked.bool(False),
 RefittedVertexWithBS = cms.untracked.bool(True),
+ApplyTauSpinner = cms.untracked.bool(RunTauSpinnerProducer),
 RecBeamSpot = cms.untracked.bool(True),
 RecTrack = cms.untracked.bool(not isData or isSingleMuonData),
 RecPFMet = cms.untracked.bool(False),
@@ -632,7 +631,9 @@ RecJetBtagDiscriminators = cms.untracked.vstring(
 'pfDeepFlavourJetTags:probg'
 ),
 RecJetNum = cms.untracked.int32(0),
-SampleName = cms.untracked.string("Data")
+SampleName = cms.untracked.string("Data"),
+#TauSpinnerinput = cms.InputTag("prunedGenParticles"),
+TauSpinnerAngles = cms.string("0,0.25,0.5,-0.25,0.375")
 )
 # END NTuple Maker ======================================================================================
 
@@ -651,13 +652,14 @@ process.triggerSelection = cms.EDFilter("HLTHighLevel",
                                         )
 # END Trigger filtering =================================================================================
 
+#DEPRECATED old TauSpinner implementation, currently kept for possible cross checks
 #define tauspinner producer. Here we define the mixing angles
-process.icTauSpinnerProducer = cms.EDProducer("ICTauSpinnerProducer",
-  branch                  = cms.string("tauspinner"),
-  input                   = cms.InputTag("prunedGenParticles"),
-  theta                   = cms.string("0,0.25,0.5,-0.25,0.375")#if specify more than 5 angles, FIRST addapt NrAnglestoStore in ICTauSpinnerProducer and recompile!
-)
-process.icTauSpinnerSequence = cms.Sequence(process.icTauSpinnerProducer)
+#process.icTauSpinnerProducer = cms.EDProducer("GetTauSpinnerweights",
+#  branch                  = cms.string("tauspinner"),
+#  input                   = cms.InputTag("prunedGenParticles"),
+#  theta                   = cms.string("0,0.25,0.5,-0.25,0.375")#if specify more than 5 angles, FIRST addapt NrAnglestoStore in ICTauSpinnerProducer and recompile!
+#)
+#process.icTauSpinnerSequence = cms.Sequence(process.icTauSpinnerProducer)
 
 process.p = cms.Path(
   process.initroottree *
@@ -680,7 +682,7 @@ process.p = cms.Path(
   process.makeroottree
 )
 
-if RunTauSpinnerProducer: process.p *=process.icTauSpinnerSequence
+#if RunTauSpinnerProducer: process.p *=process.icTauSpinnerSequence
 
 if isData: filename_suffix = "DATA"
 else:      filename_suffix = "MC"

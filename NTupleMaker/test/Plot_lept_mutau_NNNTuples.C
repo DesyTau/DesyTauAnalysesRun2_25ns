@@ -30,15 +30,16 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
 			       TString Cut="(mt_1<50)*",
 			       TString ytitle = "Events",
 			       int categoryIndex=-1,
-			       TString directory = "HtautauCP_mutau/Inputs/forOleg/NTuples_mt_2017/",
+			       TString directory = "/nfs/dust/cms/user/cardinia/HtoTauTau/HiggsCP/DNN/CMSSW_10_2_16/src/HiggsCP/Inputs/test/NTuples_mt_2017/",
 			       TString outputDir = "./Plots/",
 			       int year=2017,
 			       bool DeepTau = false, 
-			       bool FFmethod = false,  
+			       bool FFmethod = false,
+			       bool useEmbedded = false,
 			       bool LargeScale = false,  
 			       bool logY = false,
 			       bool showSignal = true,
-			       bool compareCP = true,
+			       bool compareCP = false,
 			       int scaleSignal = 100.,
 			       bool blindData = true,
 			       bool FORCE = false
@@ -124,6 +125,7 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
       "mt-NOMINAL_ntuple_VBF" // (10) Scalar VBF H
     }; 
   }
+  if(useEmbedded)sampleNames[1]="mt-NOMINAL_ntuple_Embedded";
   const int nSamples = sampleNames.size(); //DY is used twice, for Zll and Ztt
   cout<<"this are the samples"<<endl;
   for (int i=0; i<nSamples; ++i) {
@@ -142,7 +144,7 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
   TString isZLL="*!(gen_match_2==5)";
 
   // Selection cuts applied to all samples
-  for (int i=0; i<nSamples; ++i){
+  for (int i=1; i<nSamples; ++i){
     cuts[i]   = IsoCut+Weight+"(os>0.5)";
     cutsSS[i] = IsoCut+Weight+qcdweight+"(os<0.5)";
     cutsaIso[i] = AntiIsoCut+Weight+"(os>0.5)*"+FFweight+"*(gen_match_2!=6)";
@@ -150,7 +152,8 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
 
   //specific selection weights for data, DY and top
   cuts[0] = IsoCut+"(os>0.5)"; //DATA
-  cuts[1] += zptmassweight+isZTT;
+  if(useEmbedded)cuts[1] = IsoCut+"(os>0.5)*embweight*effweight*mcweight"; //Embedded, i.e. data
+  else cuts[1] += zptmassweight+isZTT;
   cuts[2] += zptmassweight+isZLL;
   cuts[3] += Wjets_weight;
   cuts[4] += topweight; 
@@ -165,9 +168,12 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
     cuts[10] +="*gen_ps_htt125";
   }    
   if(FFmethod) for(int i=2; i<7; ++i) cuts[i] += "*(gen_match_2!=6)";
+  if(useEmbedded) for(int i=2; i<7; ++i) cuts[i] += "*!(gen_match_2==5 &&(gen_match_1==3||gen_match_1==4))";
+
    
   cutsSS[0] = IsoCut+qcdweight+"(os<0.5)";
-  cutsSS[1] += zptmassweight+isZTT;
+  if(useEmbedded)cutsSS[1] = IsoCut+qcdweight+"(os<0.5)*embweight*effweight*mcweight";
+  else cutsSS[1] += zptmassweight+isZTT;
   cutsSS[2] += zptmassweight+isZLL;
   cutsSS[3] += Wjets_weight; 
   cutsSS[4] += topweight; 
@@ -181,8 +187,11 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
     cutsSS[9] +="*gen_ps_htt125";
     cutsSS[10] +="*gen_ps_htt125";
   }  
+  if(useEmbedded) for(int i=2; i<7; ++i)cutsSS[i] += "*!(gen_match_2==5 &&(gen_match_1==3||gen_match_1==4))";
+
   cutsaIso[0] = AntiIsoCut+"(os>0.5)*"+FFweight;
-  cutsaIso[1] += zptmassweight+isZTT;
+  if(useEmbedded)cutsaIso[1] = AntiIsoCut+"(os>0.5)*embweight*effweight*mcweight*"+FFweight;
+  else cutsaIso[1] += zptmassweight+isZTT;
   cutsaIso[2] += zptmassweight+isZLL;
   cutsaIso[3] += Wjets_weight; 
   cutsaIso[4] += topweight; 
@@ -196,6 +205,7 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
     cutsaIso[9] +="*gen_ps_htt125";
     cutsaIso[10] +="*gen_ps_htt125";
   }  
+  if(useEmbedded) for(int i=2; i<7; ++i)cutsaIso[i] += "*!(gen_match_2==5 &&(gen_match_1==3||gen_match_1==4))";
   // *******************************
   // ***** Filling Histograms ******
   // *******************************
@@ -458,7 +468,8 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
   InitHist(Fakes,TColor::GetColor(192,232,100));
 
   legend -> AddEntry(histData, "Observed", "ple");
-  legend -> AddEntry(ZTT,"Z#rightarrow #tau#tau","f");
+  if(useEmbedded) legend -> AddEntry(ZTT,"Embedded","f");
+  else legend -> AddEntry(ZTT,"Z#rightarrow #tau#tau","f");
   legend -> AddEntry(TT,"t#bar{t}","f");
   legend -> AddEntry(ZLL,"Z#rightarrow #mu#mu/ee","f");
   if(FFmethod)legend -> AddEntry(Fakes,"j#rightarrow #tau_{h}","f");
