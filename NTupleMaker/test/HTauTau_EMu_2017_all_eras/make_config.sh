@@ -1,6 +1,7 @@
 #!/bin/bash
 
-sed 's/IsEmbedded = false/IsEmbedded = true/' analysisMacroSynch_em_MC.conf > analysisMacroSynch_em_Embedded.conf
+sed 's/IsEmbedded = false/IsEmbedded = true/' analysisMacroSynch_em_DATA.conf > analysisMacroSynch_em_Embedded.conf
+sed -i 's/IsData = true/IsData = false/g' analysisMacroSynch_em_Embedded.conf
 sed 's/IsW = false/IsW = true/' analysisMacroSynch_em_MC.conf > analysisMacroSynch_em_W.conf
 sed 's/IsDY = false/IsDY = true/' analysisMacroSynch_em_MC.conf > analysisMacroSynch_em_DY.conf
 sed 's/IsSignal = false/IsSignal = true/' analysisMacroSynch_em_MC.conf > analysisMacroSynch_em_Signal.conf
