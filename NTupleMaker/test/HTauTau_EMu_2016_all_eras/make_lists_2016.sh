@@ -1,7 +1,7 @@
 #!/bin/sh
 dirData=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2016/data/Run2016-17Jul2018/MuonEG
 dirMC=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2016/mc/
-dirEmbedded=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2016/data/Embedded_emu/
+dirEmbedded=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2016/embedded/Embedding_emu/
 dirMC_v2=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2016/mc_v2/
 dirMC_v3=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2016/mc_v3/
 
@@ -43,13 +43,13 @@ ls $dirMC/WZ_TuneCUETP8M1_13TeV-pythia8_ext1/*root >> WZ
 ls $dirMC/ZZ_TuneCUETP8M1_13TeV/*root > ZZ
 ls $dirMC/ZZ_TuneCUETP8M1_13TeV_ext1/*root >> ZZ
 
-ls $dirEmbedded/EmbeddingRun2016B_ElMuFinalState/*root > Embedding_Run2016
-ls $dirEmbedded/EmbeddingRun2016C_ElMuFinalState/*root >> Embedding_Run2016
-ls $dirEmbedded/EmbeddingRun2016D_ElMuFinalState/*root >> Embedding_Run2016
-ls $dirEmbedded/EmbeddingRun2016E_ElMuFinalState/*root >> Embedding_Run2016
-ls $dirEmbedded/EmbeddingRun2016F_ElMuFinalState/*root >> Embedding_Run2016
-ls $dirEmbedded/EmbeddingRun2016G_ElMuFinalState/*root >> Embedding_Run2016
-ls $dirEmbedded/EmbeddingRun2016H_ElMuFinalState/*root >> Embedding_Run2016
+ls $dirEmbedded/EmbeddingRun2016B_ElMuFinalState-v1/*root > Embedding_Run2016
+ls $dirEmbedded/EmbeddingRun2016C_ElMuFinalState-v1/*root >> Embedding_Run2016
+ls $dirEmbedded/EmbeddingRun2016D_ElMuFinalState-v1/*root >> Embedding_Run2016
+ls $dirEmbedded/EmbeddingRun2016E_ElMuFinalState-v1/*root >> Embedding_Run2016
+ls $dirEmbedded/EmbeddingRun2016F_ElMuFinalState-v1/*root >> Embedding_Run2016
+ls $dirEmbedded/EmbeddingRun2016G_ElMuFinalState-v1/*root >> Embedding_Run2016
+ls $dirEmbedded/EmbeddingRun2016H_ElMuFinalState-v1/*root >> Embedding_Run2016
 
 ls $dirMC/EWKWMinus2Jets_WToLNu_M-50_13TeV-madgraph-pythia8/*root > EWKWMinus2Jet
 ls $dirMC/EWKWMinus2Jets_WToLNu_M-50_13TeV-madgraph-pythia8_ext1/*root >> EWKWMinus2Jet
