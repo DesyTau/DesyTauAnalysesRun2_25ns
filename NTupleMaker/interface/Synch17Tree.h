@@ -357,10 +357,21 @@ public :
   Float_t         tau2DecayPlaneX;
   Float_t         tau2DecayPlaneY;
   Float_t         tau2DecayPlaneZ;
+
   Float_t         acotautau_00;
   Float_t         acotautau_10;
   Float_t         acotautau_01;
   Float_t         acotautau_11;
+
+  Float_t         acotautau_bs_00;
+  Float_t         acotautau_bs_10;
+  Float_t         acotautau_bs_01;
+  Float_t         acotautau_bs_11;
+
+  Float_t         acotautau_refitbs_00;
+  Float_t         acotautau_refitbs_10;
+  Float_t         acotautau_refitbs_01;
+  Float_t         acotautau_refitbs_11;
 
   //Merijn add acotau for psi:
   Float_t         acotautauPsi_00;
@@ -767,10 +778,21 @@ public :
   TBranch        *b_tau2DecayPlaneX;
   TBranch        *b_tau2DecayPlaneY;
   TBranch        *b_tau2DecayPlaneZ;
+
   TBranch        *b_acotautau_00;
   TBranch        *b_acotautau_10;
   TBranch        *b_acotautau_01;
   TBranch        *b_acotautau_11;
+
+  TBranch        *b_acotautau_bs_00;
+  TBranch        *b_acotautau_bs_10;
+  TBranch        *b_acotautau_bs_01;
+  TBranch        *b_acotautau_bs_11;
+
+  TBranch        *b_acotautau_refitbs_00;
+  TBranch        *b_acotautau_refitbs_10;
+  TBranch        *b_acotautau_refitbs_01;
+  TBranch        *b_acotautau_refitbs_11;
 
   TBranch        *b_acotautauPsi_00;
   TBranch        *b_acotautauPsi_10;

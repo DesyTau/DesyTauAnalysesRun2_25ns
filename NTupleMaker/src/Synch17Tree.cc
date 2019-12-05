@@ -375,10 +375,21 @@ void Synch17Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("tau2DecayPlaneX", &tau2DecayPlaneX, &b_tau2DecayPlaneX);
    fChain->SetBranchAddress("tau2DecayPlaneY", &tau2DecayPlaneY, &b_tau2DecayPlaneY);
    fChain->SetBranchAddress("tau2DecayPlaneZ", &tau2DecayPlaneZ, &b_tau2DecayPlaneZ);
+
    fChain->SetBranchAddress("acotautau_00", &acotautau_00, &b_acotautau_00);
    fChain->SetBranchAddress("acotautau_10", &acotautau_10, &b_acotautau_10);
    fChain->SetBranchAddress("acotautau_01", &acotautau_01, &b_acotautau_01);
    fChain->SetBranchAddress("acotautau_11", &acotautau_11, &b_acotautau_11);
+
+   fChain->SetBranchAddress("acotautau_bs_00", &acotautau_bs_00, &b_acotautau_bs_00);
+   fChain->SetBranchAddress("acotautau_bs_10", &acotautau_bs_10, &b_acotautau_bs_10);
+   fChain->SetBranchAddress("acotautau_bs_01", &acotautau_bs_01, &b_acotautau_bs_01);
+   fChain->SetBranchAddress("acotautau_bs_11", &acotautau_bs_11, &b_acotautau_bs_11);
+
+   fChain->SetBranchAddress("acotautau_refitbs_00", &acotautau_refitbs_00, &b_acotautau_refitbs_00);
+   fChain->SetBranchAddress("acotautau_refitbs_10", &acotautau_refitbs_10, &b_acotautau_refitbs_10);
+   fChain->SetBranchAddress("acotautau_refitbs_01", &acotautau_refitbs_01, &b_acotautau_refitbs_01);
+   fChain->SetBranchAddress("acotautau_refitbs_11", &acotautau_refitbs_11, &b_acotautau_refitbs_11);
 
    fChain->SetBranchAddress("acotautauPsi_00", &acotautauPsi_00, &b_acotautauPsi_00);
    fChain->SetBranchAddress("acotautauPsi_10", &acotautauPsi_10, &b_acotautauPsi_10);
@@ -849,10 +860,21 @@ void Synch17Tree::WriteInit(TTree *tree) {
    fChain->Branch("tau2DecayPlaneX", &tau2DecayPlaneX, "tau2DecayPlaneX/F");
    fChain->Branch("tau2DecayPlaneY", &tau2DecayPlaneY, "tau2DecayPlaneY/F");
    fChain->Branch("tau2DecayPlaneZ", &tau2DecayPlaneZ, "tau2DecayPlaneZ/F");
+
    fChain->Branch("acotautau_00", &acotautau_00, "acotautau_00/F");
    fChain->Branch("acotautau_10", &acotautau_10, "acotautau_10/F");
    fChain->Branch("acotautau_01", &acotautau_01, "acotautau_01/F");
    fChain->Branch("acotautau_11", &acotautau_11, "acotautau_11/F");
+
+   fChain->Branch("acotautau_bs_00", &acotautau_bs_00, "acotautau_bs_00/F");
+   fChain->Branch("acotautau_bs_10", &acotautau_bs_10, "acotautau_bs_10/F");
+   fChain->Branch("acotautau_bs_01", &acotautau_bs_01, "acotautau_bs_01/F");
+   fChain->Branch("acotautau_bs_11", &acotautau_bs_11, "acotautau_bs_11/F");
+
+   fChain->Branch("acotautau_refitbs_00", &acotautau_refitbs_00, "acotautau_refitbs_00/F");
+   fChain->Branch("acotautau_refitbs_10", &acotautau_refitbs_10, "acotautau_refitbs_10/F");
+   fChain->Branch("acotautau_refitbs_01", &acotautau_refitbs_01, "acotautau_refitbs_01/F");
+   fChain->Branch("acotautau_refitbs_11", &acotautau_refitbs_11, "acotautau_refitbs_11/F");
 
    fChain->Branch("acotautauPsi_00", &acotautauPsi_00, "acotautauPsi_00/F");
    fChain->Branch("acotautauPsi_10", &acotautauPsi_10, "acotautauPsi_10/F");

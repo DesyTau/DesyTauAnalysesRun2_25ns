@@ -14,6 +14,7 @@
 #define PI_MASS         0.13957 //All energies and momenta are expressed in GeV
 #define MUON_MASS       0.105658
 #define ELECTRON_MASS   0.000511
+#define RHO_MASS        0.775260
 
 /*Updates Merijn 2018 11 13
 -added acott_Impr, which is improved version of acott. Note it takes the decay channel as input also. 
@@ -28,6 +29,7 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
 TLorentzVector chargedPivec(const AC1B * analysisTree, int tauIndex);
 TLorentzVector neutralPivec(const AC1B * analysisTree, int tauIndex);
 TLorentzVector charged_constituents_P4(const AC1B * analysisTree, int tauIndex);
+std::vector<TLorentzVector> a1_rho_pi(const AC1B * analysisTree, int tauIndex);
 //TLorentzVector ipVec(const AC1B * analysisTree, int tauIndex, Synch17Tree *otree);
 TLorentzVector ipVec(const AC1B * analysisTree, int tauIndex); //merijn 2019 4 2: the otree argument is superfluous after all..
 int chargedPiIndex(const AC1B * analysisTree, int tauIndex);
@@ -42,7 +44,7 @@ TVector3 gen_ThreeProngSVertex(const AC1B * analysisTree, int tauIndex);
 int gen_chargedPiIndex(const AC1B * analysisTree, int tauIndex, int partId);
 vector<int> gen_ThreeProngIndices(const AC1B * analysisTree, int tauIndex);
 
-TLorentzVector ipVec_Lepton(const AC1B * analysisTree, int tauIndex, TString ch);
+TLorentzVector ipVec_Lepton(const AC1B * analysisTree, int leptonIndex, int tauIndex, int vertexType, TString ch);
 
 double acoCP(TLorentzVector Pi1, TLorentzVector Pi2, 
 	     TLorentzVector ref1, TLorentzVector ref2,
@@ -54,7 +56,7 @@ double acoCP(TLorentzVector Pi1, TLorentzVector Pi2,
 
 TVector3 calculate_IP_helix_mu(const AC1B * analysisTree, int muIndex, TVector3 vertex_coord);
 TVector3 calculate_IP_helix_tauh(const AC1B * analysisTree, int tauIndex, TVector3 vertex_coord);
-TVector3 get_refitted_PV_with_BS(const AC1B * analysisTree, int leptonIndex, int tauIndex, int &is_refitted_PV_with_BS);
+TVector3 get_refitted_PV_with_BS(const AC1B * analysisTree, int leptonIndex, int tauIndex, bool &is_refitted_PV_with_BS);
 
 //Merijn: updated function to do CP calculations
 //called with: acott_Impr(&analysisTree,otree,tauIndex,leptonIndex, ch);
@@ -70,6 +72,16 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
   otree->acotautau_10 = -9999;
   otree->acotautau_01 = -9999;
   otree->acotautau_11 = -9999;
+
+  otree->acotautau_bs_00 = -9999;
+  otree->acotautau_bs_10 = -9999;
+  otree->acotautau_bs_01 = -9999;
+  otree->acotautau_bs_11 = -9999;
+
+  otree->acotautau_refitbs_00 = -9999;
+  otree->acotautau_refitbs_10 = -9999;
+  otree->acotautau_refitbs_01 = -9999;
+  otree->acotautau_refitbs_11 = -9999;
 
   otree->acotautauPsi_00=-9999;
   otree->acotautauPsi_01=-9999;
@@ -105,24 +117,24 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
   
   //make here a scan if the second decay is hadronic. Only for e-mu would not require this..
   if(channel == "mt" || channel == "et"){
-  for(unsigned int pindex = 0; pindex < analysisTree->tau_constituents_count[tauIndex2]; pindex++){
-    if(abs(analysisTree->tau_constituents_pdgId[tauIndex2][pindex]) == 211){
-    //if(abs(analysisTree->tau_constituents_pdgId[tauIndex2][pindex])==13){
-      decay2haspion = true;
-      break;
-			}
-		}
-	}
+    for(unsigned int pindex = 0; pindex < analysisTree->tau_constituents_count[tauIndex2]; pindex++){
+      if(abs(analysisTree->tau_constituents_pdgId[tauIndex2][pindex]) == 211){
+	//if(abs(analysisTree->tau_constituents_pdgId[tauIndex2][pindex])==13){
+	decay2haspion = true;
+	break;
+      }
+    }
+  }
   
-//Merijn: these definitions can be discussed and adjusted to include 3 prong decays, the allow for mode 10 as well
+  //Merijn: these definitions can be discussed and adjusted to include 3 prong decays, the allow for mode 10 as well
   bool correctDecay1 = false;
   bool correctDecay2 = false;
   //now fix for the tree cases. Note: currently we EXCLUDE 3 prong, since NOT implemented yet. 
 
   if(channel == "mt" || channel == "et"){
     correctDecay1 = true;
-    correctDecay2 = analysisTree->tau_decayMode[tauIndex2] < 10 && decay2haspion;
-	}
+    correctDecay2 = analysisTree->tau_decayMode[tauIndex2] <= 10 && decay2haspion;
+  }
 
   if(channel=="tt"){//just require both to be hadronic
     correctDecay1 = analysisTree->tau_decayMode[tauIndex1]<10&&decay1haspion; 
@@ -130,7 +142,7 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
   
   bool correctDecay = correctDecay1 && correctDecay2;
 
-//properly inintialise to -9999 if decay not correct
+  //properly inintialise to -9999 if decay not correct
   if(!correctDecay){
     return;
   }
@@ -158,7 +170,7 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
     otree->VxConstitTau1=analysisTree->electron_vx[tauIndex1];
     otree->VyConstitTau1=analysisTree->electron_vy[tauIndex1];
     otree->VzConstitTau1=analysisTree->electron_vz[tauIndex1];
-
+    
     otree->chconst_1_pt=analysisTree->electron_pt[tauIndex1];
     otree->chconst_1_eta=analysisTree->electron_eta[tauIndex1];
     otree->chconst_1_phi=analysisTree->electron_phi[tauIndex1];
@@ -186,7 +198,7 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
     }
   }
   
-//merijn: we vetoed already if the second tau didn't contain a pion, so can safely calculate the momentum of 2nd prong from hadrons
+  //merijn: we vetoed already if the second tau didn't contain a pion, so can safely calculate the momentum of 2nd prong from hadrons
   TLorentzVector tau2Prong;
   tau2Prong = chargedPivec(analysisTree, tauIndex2);
   int piIndexfortau2 = chargedPiIndex(analysisTree, tauIndex2);
@@ -210,13 +222,19 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
     
   
   bool firstNegative = false;//Merijn 2019 1 10: instead I ask if the second is positive. WON'T WORK FOR E-MU CASE!
-//comment 2019 2 5: I need to re-evaluate why I implemented this. I think it is due to fact that initially lepton and muon index were innertwined
+  //comment 2019 2 5: I need to re-evaluate why I implemented this. I think it is due to fact that initially lepton and muon index were innertwined
   if (analysisTree->tau_charge[tauIndex2]>0.0)
     firstNegative = true;
 
   TLorentzVector tau1IP;
+  TLorentzVector tau1IP_bs;
+  TLorentzVector tau1IP_refitbs;
   //Merijn: for leptonic decay calculate in different way than for hadronic
-  if(channel=="et"||channel=="mt") tau1IP = ipVec_Lepton(analysisTree,tauIndex1,channel);
+  if(channel=="et"||channel=="mt") {
+    tau1IP = ipVec_Lepton(analysisTree,tauIndex1,tauIndex2,0,channel);
+    tau1IP_bs = ipVec_Lepton(analysisTree,tauIndex1,tauIndex2,1,channel);
+    tau1IP_refitbs = ipVec_Lepton(analysisTree,tauIndex1,tauIndex2,2,channel);
+  }
   else{tau1IP = ipVec(analysisTree,tauIndex1);}//tt: treat as tau index..
   TLorentzVector tau1Pi0;
   tau1Pi0.SetXYZT(0.,0.,0.,0.);
@@ -234,13 +252,38 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
 	  tau2Pi0 = neutralPivec(analysisTree,tauIndex2); }
  
   otree->acotautau_00=acoCP(tau1Prong,tau2Prong,tau1IP,tau2IP,firstNegative,false,false,otree);
+  otree->acotautau_bs_00=acoCP(tau1Prong,tau2Prong,tau1IP_bs,tau2IP,firstNegative,false,false,otree);
+  otree->acotautau_refitbs_00=acoCP(tau1Prong,tau2Prong,tau1IP_refitbs,tau2IP,firstNegative,false,false,otree);
   //I think it should work since everything assigned for 3 cases. Note: aco_00 will be filled with mu x 1-prong and mu x 1.1-prong
   
-  
+  //  std::cout << "MODE = " << analysisTree->tau_decayMode[tauIndex2] << std::endl;
+
   if(channel=="et"||channel=="mt"){//we only fill aco_01 for et and mt
     if (analysisTree->tau_decayMode[tauIndex2]==1){
       otree->acotautau_01=acoCP(tau1Prong,tau2Prong,tau1IP,tau2Pi0,firstNegative,false,true,otree);
+      otree->acotautau_bs_01=acoCP(tau1Prong,tau2Prong,tau1IP_bs,tau2Pi0,firstNegative,false,true,otree);
+      otree->acotautau_refitbs_01=acoCP(tau1Prong,tau2Prong,tau1IP_bs,tau2Pi0,firstNegative,false,true,otree);
     }    
+    if (analysisTree->tau_decayMode[tauIndex2]==10){
+      std::vector<TLorentzVector> partLV = a1_rho_pi(analysisTree,tauIndex2);
+      /*
+      std::cout << "a1->rho+pi ---> " << std::endl;
+      std::cout << "lead pi (px,py,pz,E) = " 
+		<< partLV.at(0).Px() 
+		<< "," << partLV.at(0).Py() 
+		<< "," << partLV.at(0).Pz()
+		<< "," << partLV.at(0).M() << std::endl;
+      std::cout << "rho (px,py,pz,E) = " 
+		<< partLV.at(1).Px() 
+		<< "," << partLV.at(1).Py() 
+		<< "," << partLV.at(1).Pz()
+		<< "," << partLV.at(1).M() << std::endl;
+      std::cout << std::endl;
+      */
+      otree->acotautau_01=acoCP(tau1Prong,partLV.at(0),tau1IP,partLV.at(1),firstNegative,false,true,otree);
+      otree->acotautau_bs_01=acoCP(tau1Prong,partLV.at(0),tau1IP_bs,partLV.at(1),firstNegative,false,true,otree);
+      otree->acotautau_refitbs_01=acoCP(tau1Prong,partLV.at(0),tau1IP_refitbs,partLV.at(1),firstNegative,false,true,otree);
+    }
   }
   //NOTE: Commented till DPG
   if(channel=="tt"){//merijn 2019 1 10: only for tt we can use the index to assess a tau, otherwise its a lepton!
@@ -439,18 +482,25 @@ TLorentzVector ipVec(const AC1B * analysisTree, int tauIndex) {
 
 
 //Merijn: added function to calculate the ipvec for leptons
-TLorentzVector ipVec_Lepton(const AC1B * analysisTree, int tauIndex, TString ch) {
+TLorentzVector ipVec_Lepton(const AC1B * analysisTree, int muonIndex, int tauIndex, int vertexType, TString ch) {
 //now the tauindex is for mu or electron!
 
   TLorentzVector vec;
   vec.SetXYZT(0.,0.,0.,0.);
 
+  TVector3 vertex(analysisTree->primvertex_x,
+		  analysisTree->primvertex_y,
+		  analysisTree->primvertex_z);
   
-
-TVector3 vertex(analysisTree->primvertex_x,
-		    analysisTree->primvertex_y,
-		    analysisTree->primvertex_z);
-  
+  if (vertexType==1) {
+    vertex.SetX(analysisTree->primvertexwithbs_x);
+    vertex.SetY(analysisTree->primvertexwithbs_y);
+    vertex.SetZ(analysisTree->primvertexwithbs_z);
+  }
+  else if (vertexType==2&&ch=="mt") {
+    bool refitted_PV_with_BS = false;
+    vertex = get_refitted_PV_with_BS(analysisTree, muonIndex, tauIndex, refitted_PV_with_BS);
+  }
 
   /*
   //Merijn: temporarily replace vertex with gen level info
@@ -1267,14 +1317,14 @@ TVector3 get_refitted_PV_with_BS(const AC1B * analysisTree, int leptonIndex, int
 
 	for(unsigned int i = 0; i < analysisTree->refitvertexwithbs_count; i++)
 	{
-    if( (leptonIndex == analysisTree->refitvertexwithbs_muIndex[i][0] || leptonIndex == analysisTree->refitvertexwithbs_muIndex[i][1]) &&
-        (tauIndex == analysisTree->refitvertexwithbs_tauIndex[i][0] || tauIndex == analysisTree->refitvertexwithbs_tauIndex[i][1]))
-    {
-      vtx_x = analysisTree->refitvertexwithbs_x[i];
-      vtx_y = analysisTree->refitvertexwithbs_y[i];
-      vtx_z = analysisTree->refitvertexwithbs_z[i];
-			is_refitted_PV_with_BS = true;
-    }
+	  if( (leptonIndex == analysisTree->refitvertexwithbs_muIndex[i][0] || leptonIndex == analysisTree->refitvertexwithbs_muIndex[i][1]) &&
+	      (tauIndex == analysisTree->refitvertexwithbs_tauIndex[i][0] || tauIndex == analysisTree->refitvertexwithbs_tauIndex[i][1]))
+	    {
+	      vtx_x = analysisTree->refitvertexwithbs_x[i];
+	      vtx_y = analysisTree->refitvertexwithbs_y[i];
+	      vtx_z = analysisTree->refitvertexwithbs_z[i];
+	      is_refitted_PV_with_BS = true;
+	    }
 	}
 	TVector3 vertex_coord(vtx_x, vtx_y, vtx_z);
 	return vertex_coord;
@@ -1288,11 +1338,87 @@ TLorentzVector charged_constituents_P4(const AC1B * analysisTree, int tauIndex){
 	for(int i = 0; i < ncomponents; i++){
 		if(analysisTree->tau_constituents_charge[tauIndex][i] != 0 && analysisTree->tau_constituents_pdgId[tauIndex][i] > 0){
 			constituent_P4.SetPxPyPzE(analysisTree->tau_constituents_px[tauIndex][i],
-																analysisTree->tau_constituents_py[tauIndex][i],
-																analysisTree->tau_constituents_pz[tauIndex][i],
-																analysisTree->tau_constituents_e[tauIndex][i]);
+						  analysisTree->tau_constituents_py[tauIndex][i],
+						  analysisTree->tau_constituents_pz[tauIndex][i],
+						  analysisTree->tau_constituents_e[tauIndex][i]);
 			sum_charged_P4 += constituent_P4;
-			}
+		}
 	}
 	return sum_charged_P4;
+}
+
+std::vector<TLorentzVector> a1_rho_pi(const AC1B * analysisTree, int tauIndex) {
+
+  int ncomponents = analysisTree->tau_constituents_count[tauIndex];
+  std::vector<TLorentzVector> partLV; partLV.clear();
+  TLorentzVector lv_rho; lv_rho.SetXYZT(0.,0.,0.,0.);
+
+  int index_pi_opposite = -1; 
+  TLorentzVector lv_pi_opposite; 
+  lv_pi_opposite.SetXYZT(0.,0.,0.,0.);
+
+  int index_pi_from_rho = -1;
+  TLorentzVector lv_pi_from_rho;
+  lv_pi_from_rho.SetXYZT(0.,0.,0.,0.);
+
+  int index_pi_lead = -1;
+  TLorentzVector lv_pi_lead;
+  lv_pi_lead.SetXYZT(0.,0.,0.,0.);
+
+  int tau_charge = -1; 
+  if (analysisTree->tau_charge[tauIndex]>0) tau_charge = 1;
+
+  for(int i = 0; i < ncomponents; i++){
+    std::cout << i << " " << analysisTree->tau_constituents_pdgId[tauIndex][i] << std::endl;
+    if(analysisTree->tau_constituents_charge[tauIndex][i] != 0 && abs(analysisTree->tau_constituents_pdgId[tauIndex][i])==211){
+      if (tau_charge*analysisTree->tau_constituents_charge[tauIndex][i]<0) { 
+	lv_pi_opposite.SetXYZT(analysisTree->tau_constituents_px[tauIndex][i],
+			       analysisTree->tau_constituents_py[tauIndex][i],
+			       analysisTree->tau_constituents_pz[tauIndex][i],
+			       analysisTree->tau_constituents_e[tauIndex][i]);
+	index_pi_opposite = i;
+	//	break;
+      }
+    }
+  }
+
+  double massdiff = 1e+10;
+  for (int i = 0; i < ncomponents; i++) {
+    if(analysisTree->tau_constituents_charge[tauIndex][i] != 0 && abs(analysisTree->tau_constituents_pdgId[tauIndex][i])==211){
+      if (tau_charge*analysisTree->tau_constituents_charge[tauIndex][i]>0) {
+        TLorentzVector lv; lv.SetXYZT(analysisTree->tau_constituents_px[tauIndex][i],
+				      analysisTree->tau_constituents_py[tauIndex][i],
+				      analysisTree->tau_constituents_pz[tauIndex][i],
+				      analysisTree->tau_constituents_e[tauIndex][i]);
+	double mass = (lv_pi_opposite+lv).M();
+	double diff = fabs(mass-RHO_MASS);
+	if (diff<massdiff) {
+	  index_pi_from_rho = i;
+	  lv_pi_from_rho = lv;
+	  massdiff = diff;
+	}	  
+      }
+    }
+  }
+
+  for (int i = 0; i < ncomponents; i++) {
+    if(analysisTree->tau_constituents_charge[tauIndex][i] != 0 && abs(analysisTree->tau_constituents_pdgId[tauIndex][i])==211){
+      if (tau_charge*analysisTree->tau_constituents_charge[tauIndex][i]>0) {
+	if (i!=index_pi_from_rho) {
+	  index_pi_lead = i;
+	  lv_pi_lead.SetXYZT(analysisTree->tau_constituents_px[tauIndex][i],
+			     analysisTree->tau_constituents_py[tauIndex][i],
+			     analysisTree->tau_constituents_pz[tauIndex][i],
+			     analysisTree->tau_constituents_e[tauIndex][i]);
+	}
+      }
+    }
+  }
+
+  lv_rho = lv_pi_opposite + lv_pi_from_rho;
+  partLV.push_back(lv_pi_lead);
+  partLV.push_back(lv_rho);
+
+  return partLV;
+
 }
