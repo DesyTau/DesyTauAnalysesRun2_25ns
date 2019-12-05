@@ -58,6 +58,15 @@ ls $dirSignal/ggZH_HToTauTau_ZToLL_M125_13TeV_powheg_pythia8/*root > ggZH_HToTau
 ls $dirSignal/ggZH_HToTauTau_ZToNuNu_M125_13TeV_powheg_pythia8/*root > ggZH_HToTauTau_ZToNuNu_M125_13TeV_powheg_pythia8
 ls $dirSignal/ggZH_HToTauTau_ZToQQ_M125_13TeV_powheg_pythia8/*root > ggZH_HToTauTau_ZToQQ_M125_13TeV_powheg_pythia8
 
+ls $dirggh/GluGluHToTauTau_HTXSFilter_STXS1p1_Bin110to113_M125/*root >  GluGluHToTauTau_HTXSFilter_STXS1p1_Bin110to113_M125
+ls $dirggh/GluGluHToTauTau_HTXSFilter_STXS1p1_Bin107to109_M125/*root >  GluGluHToTauTau_HTXSFilter_STXS1p1_Bin107to109_M125
+ls $dirggh/VBFHToTauTau_HTXSFilter_STXS1p1_Bin207to210_M125/*root >  VBFHToTauTau_HTXSFilter_STXS1p1_Bin207to210_M125
+ls $dirggh/GluGluHToTauTau_HTXSFilter_STXS1p1_Bin104to105_M125/*root >  GluGluHToTauTau_HTXSFilter_STXS1p1_Bin104to105_M125
+ls $dirggh/VBFHToTauTau_HTXSFilter_STXS1p1_Bin203to205_M125/*root >  VBFHToTauTau_HTXSFilter_STXS1p1_Bin203to205_M125
+ls $dirggh/VBFHToTauTau_HTXSFilter_STXS1p1_Bin206_M125/*root >  VBFHToTauTau_HTXSFilter_STXS1p1_Bin206_M125
+ls $dirggh/GluGluHToTauTau_HTXSFilter_STXS1p1_Bin106_M125/*root >  GluGluHToTauTau_HTXSFilter_STXS1p1_Bin106_M125
+ls $dirggh/GluGluHToTauTau_HTXSFilter_STXS1p1_Bin101_M125/*root >  GluGluHToTauTau_HTXSFilter_STXS1p1_Bin101_M125
+
 ls $dirData/MuonEG_Run2017B-31Mar2018-v1/*root > MuonEG_Run2017B
 ls $dirData/MuonEG_Run2017C-31Mar2018-v1/*root > MuonEG_Run2017CtoF
 ls $dirData/MuonEG_Run2017D-31Mar2018-v1/*root >> MuonEG_Run2017CtoF

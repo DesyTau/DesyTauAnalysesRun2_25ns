@@ -288,6 +288,22 @@ public :
    Bool_t          electron_cutId_tight_Fall17V2[100];   //[electron_count]
    Bool_t          electron_pass_conversion[100];   //[electron_count]
    Int_t           electron_genmatch[100];   //[electron_count]
+   Float_t         electron_px_energyscale_up[100]; //[electron_count]
+   Float_t         electron_px_energyscale_down[100]; //[electron_count]
+   Float_t         electron_py_energyscale_up[100]; //[electron_count]
+   Float_t         electron_py_energyscale_down[100]; //[electron_count]
+   Float_t         electron_pz_energyscale_up[100]; //[electron_count]
+   Float_t         electron_pz_energyscale_down[100]; //[electron_count]
+   Float_t         electron_pt_energyscale_up[100]; //[electron_count]
+   Float_t         electron_pt_energyscale_down[100]; //[electron_count]
+   Float_t         electron_px_energysigma_up[100]; //[electron_count]
+   Float_t         electron_px_energysigma_down[100]; //[electron_count]
+   Float_t         electron_py_energysigma_up[100]; //[electron_count]
+   Float_t         electron_py_energysigma_down[100]; //[electron_count]
+   Float_t         electron_pz_energysigma_up[100]; //[electron_count]
+   Float_t         electron_pz_energysigma_down[100]; //[electron_count]
+   Float_t         electron_pt_energysigma_up[100]; //[electron_count]
+   Float_t         electron_pt_energysigma_down[100]; //[electron_count]
    UInt_t          tau_count;
    Float_t         tau_e[100];   //[tau_count]
    Float_t         tau_px[100];   //[tau_count]
@@ -1078,7 +1094,23 @@ public :
    TBranch        *b_electron_cutId_medium_Fall17V2;   //!
    TBranch        *b_electron_cutId_tight_Fall17V2;   //!
    TBranch        *b_electron_pass_conversion;   //!
-   TBranch        *b_electron_genmatch;   //!
+   TBranch        *b_electron_genmatch;   //!;   //!
+   TBranch        *b_electron_px_energyscale_up;   //!
+   TBranch        *b_electron_px_energyscale_down;   //!
+   TBranch        *b_electron_py_energyscale_up;   //!
+   TBranch        *b_electron_py_energyscale_down;   //!
+   TBranch        *b_electron_pz_energyscale_up;   //!
+   TBranch        *b_electron_pz_energyscale_down;   //!
+   TBranch        *b_electron_pt_energyscale_up;   //!
+   TBranch        *b_electron_pt_energyscale_down;   //!
+   TBranch        *b_electron_px_energysigma_up;   //!
+   TBranch        *b_electron_px_energysigma_down;   //!
+   TBranch        *b_electron_py_energysigma_up;   //!
+   TBranch        *b_electron_py_energysigma_down;   //!
+   TBranch        *b_electron_pz_energysigma_up;   //!
+   TBranch        *b_electron_pz_energysigma_down;   //!
+   TBranch        *b_electron_pt_energysigma_up;   //!
+   TBranch        *b_electron_pt_energysigma_down;   //!
    TBranch        *b_tau_count;   //!
    TBranch        *b_tau_e;   //!
    TBranch        *b_tau_px;   //!
@@ -1961,6 +1993,22 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("electron_cutId_tight_Fall17V2", electron_cutId_tight_Fall17V2, &b_electron_cutId_tight_Fall17V2);
    fChain->SetBranchAddress("electron_pass_conversion", electron_pass_conversion, &b_electron_pass_conversion);
    fChain->SetBranchAddress("electron_genmatch", electron_genmatch, &b_electron_genmatch);
+   fChain->SetBranchAddress("electron_px_energyscale_up", electron_px_energyscale_up, &b_electron_px_energyscale_up);
+   fChain->SetBranchAddress("electron_px_energyscale_down", electron_px_energyscale_down, &b_electron_px_energyscale_down);
+   fChain->SetBranchAddress("electron_py_energyscale_up", electron_py_energyscale_up, &b_electron_py_energyscale_up);
+   fChain->SetBranchAddress("electron_py_energyscale_down", electron_py_energyscale_down, &b_electron_py_energyscale_down);
+   fChain->SetBranchAddress("electron_pz_energyscale_up", electron_pz_energyscale_up, &b_electron_pz_energyscale_up);
+   fChain->SetBranchAddress("electron_pz_energyscale_down", electron_pz_energyscale_down, &b_electron_pz_energyscale_down);
+   fChain->SetBranchAddress("electron_pt_energyscale_up", electron_pt_energyscale_up, &b_electron_pt_energyscale_up);
+   fChain->SetBranchAddress("electron_pt_energyscale_down", electron_pt_energyscale_down, &b_electron_pt_energyscale_down);
+   fChain->SetBranchAddress("electron_px_energysigma_up", electron_px_energysigma_up, &b_electron_px_energysigma_up);
+   fChain->SetBranchAddress("electron_px_energysigma_down", electron_px_energysigma_down, &b_electron_px_energysigma_down);
+   fChain->SetBranchAddress("electron_py_energysigma_up", electron_py_energysigma_up, &b_electron_py_energysigma_up);
+   fChain->SetBranchAddress("electron_py_energysigma_down", electron_py_energysigma_down, &b_electron_py_energysigma_down);
+   fChain->SetBranchAddress("electron_pz_energysigma_up", electron_pz_energysigma_up, &b_electron_pz_energysigma_up);
+   fChain->SetBranchAddress("electron_pz_energysigma_down", electron_pz_energysigma_down, &b_electron_pz_energysigma_down);
+   fChain->SetBranchAddress("electron_pt_energysigma_up", electron_pt_energysigma_up, &b_electron_pt_energysigma_up);
+   fChain->SetBranchAddress("electron_pt_energysigma_down", electron_pt_energysigma_down, &b_electron_pt_energysigma_down);
    fChain->SetBranchAddress("tau_count", &tau_count, &b_tau_count);
    fChain->SetBranchAddress("tau_e", tau_e, &b_tau_e);
    fChain->SetBranchAddress("tau_px", tau_px, &b_tau_px);

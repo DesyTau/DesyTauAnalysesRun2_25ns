@@ -66,3 +66,15 @@ echo "CONFIGFILE,FILELIST" > parameters.txt
 ../split_filelist.sh  analysisMacroSynch_em_Signal.conf WplusHToTauTau_M125_13TeV_powheg_pythia8 5
 ../split_filelist.sh  analysisMacroSynch_em_Signal.conf ZHToTauTau_M125_13TeV_powheg_pythia8 5
 ../split_filelist.sh  analysisMacroSynch_em_Signal.conf ttHToTauTau_M125_TuneCP5_13TeV-powheg-pythia8 5
+
+../split_filelist.sh  analysisMacroSynch_em_Signal_ggh.conf GluGluHToTauTau_HTXSFilter_STXS1p1_Bin104to105_M125 5
+../split_filelist.sh  analysisMacroSynch_em_Signal_ggh.conf GluGluHToTauTau_HTXSFilter_STXS1p1_Bin107to109_M125 5
+../split_filelist.sh  analysisMacroSynch_em_Signal_ggh.conf GluGluHToTauTau_HTXSFilter_STXS1p1_Bin106_M125 5 
+../split_filelist.sh  analysisMacroSynch_em_Signal_ggh.conf GluGluHToTauTau_HTXSFilter_STXS1p1_Bin110to113_M125 5
+../split_filelist.sh  analysisMacroSynch_em_Signal.conf VBFHToTauTau_HTXSFilter_STXS1p1_Bin203to205_M125 5
+../split_filelist.sh  analysisMacroSynch_em_Signal_ggh.conf GluGluHToTauTau_HTXSFilter_STXS1p1_Bin101_M125 5
+../split_filelist.sh  analysisMacroSynch_em_Signal.conf VBFHToTauTau_HTXSFilter_STXS1p1_Bin206_M125 5
+../split_filelist.sh  analysisMacroSynch_em_Signal.conf VBFHToTauTau_HTXSFilter_STXS1p1_Bin207to210_M125 5
+../split_filelist.sh  analysisMacroSynch_em_Signal.conf ggZH_HToTauTau_ZToQQ_M125_13TeV_powheg_pythia8 5
+../split_filelist.sh  analysisMacroSynch_em_Signal.conf ggZH_HToTauTau_ZToNuNu_M125_13TeV_powheg_pythia8 5
+../split_filelist.sh  analysisMacroSynch_em_Signal.conf ggZH_HToTauTau_ZToLL_M125_13TeV_powheg_pythia8 5

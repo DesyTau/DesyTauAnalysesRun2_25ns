@@ -62,3 +62,7 @@ echo "CONFIGFILE,FILELIST" > parameters.txt
 ../split_filelist.sh  analysisMacroSynch_em_DY.conf EWKZ2Jets  5
 
 ../split_filelist.sh  analysisMacroSynch_em_Embedded.conf Embedding_Run2016  1
+
+../split_filelist.sh  analysisMacroSynch_em_Signal_VBF.conf ggZH_HToTauTau_ZToQQ_M125_13TeV_powheg_pythia8 3
+../split_filelist.sh  analysisMacroSynch_em_Signal_VBF.conf ggZH_HToTauTau_ZToNuNu_M125_13TeV_powheg_pythia8 3
+../split_filelist.sh  analysisMacroSynch_em_Signal_VBF.conf ggZH_HToTauTau_ZToLL_M125_13TeV_powheg_pythia8 3

@@ -13,7 +13,7 @@ echo "CONFIGFILE,FILELIST" > parameters.txt
 ../split_filelist.sh analysisMacroSynch_em_DY3JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8.conf DY3JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8  5
 ../split_filelist.sh analysisMacroSynch_em_DY4JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8.conf DY4JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8  5
 ../split_filelist.sh analysisMacroSynch_em_DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8.conf DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8  5
-#../split_filelist.sh analysisMacroSynch_em_DYJetsToLL_M-10to50_13TeV-12Apr2018.conf DYJetsToLL_M-10to50_13TeV-12Apr2018  1
+../split_filelist.sh analysisMacroSynch_em_DYJetsToLL_M-10to50_13TeV-12Apr2018.conf DYJetsToLL_M-10to50_13TeV-12Apr2018  1
 
 ../split_filelist.sh analysisMacroSynch_em_ST_t-channel_antitop_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8.conf ST_t-channel_antitop_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8  5
 ../split_filelist.sh analysisMacroSynch_em_ST_t-channel_top_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8.conf  ST_t-channel_top_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8  5
@@ -51,3 +51,16 @@ echo "CONFIGFILE,FILELIST" > parameters.txt
 
 ../split_filelist.sh analysisMacroSynch_em_DATA_Run2017B.conf MuonEG_Run2017B 5
 ../split_filelist.sh analysisMacroSynch_em_DATA.conf MuonEG_Run2017CtoF 5
+
+../split_filelist.sh analysisMacroSynch_em_Signal_VBF.conf ggZH_HToTauTau_ZToLL_M125_13TeV_powheg_pythia8 5
+../split_filelist.sh analysisMacroSynch_em_Signal_VBF.conf ggZH_HToTauTau_ZToNuNu_M125_13TeV_powheg_pythia8 5
+../split_filelist.sh analysisMacroSynch_em_Signal_VBF.conf ggZH_HToTauTau_ZToQQ_M125_13TeV_powheg_pythia8 5
+
+../split_filelist.sh analysisMacroSynch_em_Signal_ggh.conf GluGluHToTauTau_HTXSFilter_STXS1p1_Bin110to113_M125 5
+../split_filelist.sh analysisMacroSynch_em_Signal_ggh.conf GluGluHToTauTau_HTXSFilter_STXS1p1_Bin107to109_M125 5
+../split_filelist.sh analysisMacroSynch_em_Signal_VBF.conf VBFHToTauTau_HTXSFilter_STXS1p1_Bin207to210_M125 5
+../split_filelist.sh analysisMacroSynch_em_Signal_ggh.conf GluGluHToTauTau_HTXSFilter_STXS1p1_Bin104to105_M125 5
+../split_filelist.sh analysisMacroSynch_em_Signal_VBF.conf VBFHToTauTau_HTXSFilter_STXS1p1_Bin203to205_M125 5
+../split_filelist.sh analysisMacroSynch_em_Signal_VBF.conf VBFHToTauTau_HTXSFilter_STXS1p1_Bin206_M125 5
+../split_filelist.sh analysisMacroSynch_em_Signal_ggh.conf GluGluHToTauTau_HTXSFilter_STXS1p1_Bin106_M125 5
+../split_filelist.sh analysisMacroSynch_em_Signal_ggh.conf GluGluHToTauTau_HTXSFilter_STXS1p1_Bin101_M125 5

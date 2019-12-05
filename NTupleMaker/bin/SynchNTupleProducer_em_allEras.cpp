@@ -832,8 +832,6 @@ int main(int argc, char * argv[]) {
          m_2 =  classic_svFit::muonMass;
 
          // filling electron variables    ==============================================================================================================================
-         float eleScale = eleScaleBarrel;
-         if (fabs(analysisTree.electron_eta[electronIndex])>1.479) eleScale = eleScaleEndcap;
          pt_1 = analysisTree.electron_pt[electronIndex];
          eta_1 = analysisTree.electron_eta[electronIndex];
          phi_1 = analysisTree.electron_phi[electronIndex];
@@ -956,14 +954,24 @@ int main(int argc, char * argv[]) {
                                                        analysisTree.electron_pz[electronIndex],
                                                        classic_svFit::electronMass);
          
-         TLorentzVector electronUpLV; electronUpLV.SetXYZM((1.0+eleScale)*analysisTree.electron_px[electronIndex],
-                                                           (1.0+eleScale)*analysisTree.electron_py[electronIndex],
-                                                           (1.0+eleScale)*analysisTree.electron_pz[electronIndex],
+         TLorentzVector electronUpLV; electronUpLV.SetXYZM(analysisTree.electron_px_energyscale_up[electronIndex],
+                                                           analysisTree.electron_py_energyscale_up[electronIndex],
+                                                           analysisTree.electron_pz_energyscale_up[electronIndex],
                                                            classic_svFit::electronMass);
          
-         TLorentzVector electronDownLV; electronDownLV.SetXYZM((1.0-eleScale)*analysisTree.electron_px[electronIndex],
-                                                               (1.0-eleScale)*analysisTree.electron_py[electronIndex],
-                                                               (1.0-eleScale)*analysisTree.electron_pz[electronIndex],
+         TLorentzVector electronDownLV; electronDownLV.SetXYZM(analysisTree.electron_px_energyscale_down[electronIndex],
+                                                               analysisTree.electron_py_energyscale_down[electronIndex],
+                                                               analysisTree.electron_pz_energyscale_down[electronIndex],
+                                                               classic_svFit::electronMass);
+
+         TLorentzVector electronResoUpLV; electronResoUpLV.SetXYZM(analysisTree.electron_px_energysigma_up[electronIndex],
+                                                           analysisTree.electron_py_energysigma_up[electronIndex],
+                                                           analysisTree.electron_pz_energysigma_up[electronIndex],
+                                                           classic_svFit::electronMass);
+         
+         TLorentzVector electronResoDownLV; electronResoDownLV.SetXYZM(analysisTree.electron_px_energysigma_down[electronIndex],
+                                                               analysisTree.electron_py_energysigma_down[electronIndex],
+                                                               analysisTree.electron_pz_energysigma_down[electronIndex],
                                                                classic_svFit::electronMass);
          
          TLorentzVector dileptonLV = muonLV + electronLV;
@@ -1420,19 +1428,28 @@ int main(int argc, char * argv[]) {
          float vectorVisY = muonLV.Py() + electronLV.Py();
          pzetavis = vectorVisX*zetaX + vectorVisY*zetaY;
          
-         double px_escaleUp = (1+eleScale) * pt_1 * TMath::Cos(phi_1);
-         double py_escaleUp = (1+eleScale) * pt_1 * TMath::Sin(phi_1);
-         
+         double px_escaleUp = analysisTree.electron_px_energyscale_up[electronIndex];
+         double py_escaleUp = analysisTree.electron_py_energyscale_up[electronIndex];
+         double px_eresoUp = analysisTree.electron_px_energysigma_up[electronIndex];
+         double py_eresoUp = analysisTree.electron_py_energysigma_up[electronIndex];
+
          double px_e = pt_1 * TMath::Cos(phi_1);
          double py_e = pt_1 * TMath::Sin(phi_1);
          
-         double px_escaleDown = (1-eleScale) * pt_1 * TMath::Cos(phi_1);
-         double py_escaleDown = (1-eleScale) * pt_1 * TMath::Sin(phi_1);
+         double px_escaleDown = analysisTree.electron_px_energyscale_down[electronIndex];
+         double py_escaleDown = analysisTree.electron_py_energyscale_down[electronIndex];
+         double px_eresoDown = analysisTree.electron_px_energysigma_down[electronIndex];
+         double py_eresoDown = analysisTree.electron_py_energysigma_down[electronIndex];
          
          double metx_escaleUp = met_x + px_e - px_escaleUp;
          double mety_escaleUp = met_y + py_e - py_escaleUp;
          double metx_escaleDown = met_x + px_e - px_escaleDown;
          double mety_escaleDown = met_y + py_e - py_escaleDown;
+
+         double metx_eresoUp = met_x + px_e - px_eresoUp;
+         double mety_eresoUp = met_y + py_e - py_eresoUp;
+         double metx_eresoDown = met_x + px_e - px_eresoDown;
+         double mety_eresoDown = met_y + py_e - py_eresoDown;
          
          // computation of DZeta variable
          // pfmet
@@ -1448,6 +1465,12 @@ int main(int argc, char * argv[]) {
          
          TLorentzVector metLV_escaleUp; metLV_escaleUp.SetXYZT(metx_escaleUp,mety_escaleUp,0.,met_escaleUp);
          TLorentzVector metLV_escaleDown; metLV_escaleDown.SetXYZT(metx_escaleDown,mety_escaleDown,0.,met_escaleDown);
+
+         float met_eresoUp = TMath::Sqrt(metx_eresoUp*metx_eresoUp+mety_eresoUp*mety_eresoUp);
+         float met_eresoDown = TMath::Sqrt(metx_eresoDown*metx_eresoDown+mety_eresoDown*mety_eresoDown);
+         
+         TLorentzVector metLV_eresoUp; metLV_eresoUp.SetXYZT(metx_eresoUp,mety_eresoUp,0.,met_eresoUp);
+         TLorentzVector metLV_eresoDown; metLV_eresoDown.SetXYZT(metx_eresoDown,mety_eresoDown,0.,met_eresoDown);
 
          mt_1 = mT(electronLV,metLV);
          mt_2 = mT(muonLV,metLV);
@@ -1786,6 +1809,10 @@ int main(int argc, char * argv[]) {
          uncertainty_map.at("escaleUp").electronLV = electronUpLV;
          uncertainty_map.at("escaleDown").metLV = metLV_escaleDown;
          uncertainty_map.at("escaleDown").electronLV = electronDownLV;
+         uncertainty_map.at("eresoUp").metLV = metLV_eresoUp;
+         uncertainty_map.at("eresoUp").electronLV = electronResoUpLV;
+         uncertainty_map.at("eresoDown").metLV = metLV_eresoDown;
+         uncertainty_map.at("eresoDown").electronLV = electronResoDownLV;
          //uncertainty_map.at("mscaleUp").muonLV = muonUpLV;
          //uncertainty_map.at("mscaleDown").muonLV = muonDownLV;
          uncertainty_map.at("recoilscaleUp").metLV = metLV_recoilscaleUp;
@@ -1828,7 +1855,7 @@ int main(int argc, char * argv[]) {
          
          for(auto &uncert : uncertainty_map){
             
-            bool is_data_or_embedded = isData || (isEmbedded && !uncert.first.Contains("escale"));
+            bool is_data_or_embedded = isData || (isEmbedded && !uncert.first.Contains("escale") && !uncert.first.Contains("ereso"));
             
             propagate_uncertainty( uncert.first,
                                    uncert.second.metLV, covMET, inputFile_visPtResolution,

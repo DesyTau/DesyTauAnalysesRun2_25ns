@@ -78,3 +78,7 @@ ls $dirMC_v2/WplusHToTauTau_M125_13TeV_powheg_pythia8/*root > WplusHToTauTau_M12
 ls $dirMC_v2/ZHToTauTau_M125_13TeV_powheg_pythia8/*root > ZHToTauTau_M125
 ls $dirMC_v2/ttHJetToTT_M125_13TeV_amcatnloFXFX_madspin_pythia8/*root > ttHJetToTT_M125
 ls $dirMC_v3/VBFHToTauTau_M125_13TeV_powheg_pythia8/*root > VBFHToTauTau_M125
+
+ls $dirMC_v3/ggZH_HToTauTau_ZToQQ_M125_13TeV_powheg_pythia8/*root > ggZH_HToTauTau_ZToQQ_M125_13TeV_powheg_pythia8
+ls $dirMC_v3/ggZH_HToTauTau_ZToNuNu_M125_13TeV_powheg_pythia8/*root >  ggZH_HToTauTau_ZToNuNu_M125_13TeV_powheg_pythia8
+ls $dirMC_v3/ggZH_HToTauTau_ZToLL_M125_13TeV_powheg_pythia8/*root > ggZH_HToTauTau_ZToLL_M125_13TeV_powheg_pythia8

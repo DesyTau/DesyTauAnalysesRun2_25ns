@@ -3,15 +3,16 @@ dirMuonEG=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2018/data/MuonEG/
 dirMC=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2018/mc/
 dirEmbedding=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2018/embedded/Embedding_emu
 
+
 ls $dirMuonEG/MuonEG_Run2018A-17Sep2018-v1/*root > MuonEG_Run2018A
 ls $dirMuonEG/MuonEG_Run2018B-17Sep2018-v1/*root > MuonEG_Run2018B
 ls $dirMuonEG/MuonEG_Run2018C-17Sep2018-v1/*root > MuonEG_Run2018C
 ls $dirMuonEG/MuonEG_Run2018D-PromptReco-v2/*root > MuonEG_Run2018D
 
-ls $dirEmbedding/EmbeddingRun2018A/*root > EmbeddingRun2018A
-ls $dirEmbedding/EmbeddingRun2018B/*root > EmbeddingRun2018B
-ls $dirEmbedding/EmbeddingRun2018C/*root > EmbeddingRun2018C
-ls $dirEmbedding/EmbeddingRun2018D/*root > EmbeddingRun2018D
+ls $dirEmbedding/EmbeddingRun2018A/ElMuFinalState-v1/EmbeddingRun2018A/*root > EmbeddingRun2018A
+ls $dirEmbedding/EmbeddingRun2018B/ElMuFinalState-v1/EmbeddingRun2018B/*root > EmbeddingRun2018B
+ls $dirEmbedding/EmbeddingRun2018C/ElMuFinalState-v1/EmbeddingRun2018C/*root > EmbeddingRun2018C
+ls $dirEmbedding/EmbeddingRun2018D/ElMuFinalState-v1/EmbeddingRun2018D/*root > EmbeddingRun2018D
 
 ls $dirMC/DYJetsToLL_M-10to50/*root > DYJetsToLL_M-10to50_TuneCP5_13TeV-madgraphMLM-pythia8
 ls $dirMC/DYJetsToLL_M-50/*root > DYJetsToLL_M-50_TuneCP5_13TeV_madgraphMLM_pythia8
@@ -55,4 +56,14 @@ ls $dirMC/WW_TuneCP5_13TeV-pythia8/*root > WW_TuneCP5_13TeV-pythia8
 ls $dirMC/WZ_TuneCP5_13TeV-pythia8/*root > WZ_TuneCP5_13TeV-pythia8
 ls $dirMC/ZZ_TuneCP5_13TeV-pythia8/*root > ZZ_TuneCP5_13TeV-pythia8
 
-
+ls $dirMC/GluGluHToTauTau_HTXSFilter_STXS1p1_Bin104to105_M125/*root > GluGluHToTauTau_HTXSFilter_STXS1p1_Bin104to105_M125
+ls $dirMC/GluGluHToTauTau_HTXSFilter_STXS1p1_Bin107to109_M125/*root > GluGluHToTauTau_HTXSFilter_STXS1p1_Bin107to109_M125
+ls $dirMC/GluGluHToTauTau_HTXSFilter_STXS1p1_Bin106_M125/*root > GluGluHToTauTau_HTXSFilter_STXS1p1_Bin106_M125
+ls $dirMC/GluGluHToTauTau_HTXSFilter_STXS1p1_Bin110to113_M125/*root > GluGluHToTauTau_HTXSFilter_STXS1p1_Bin110to113_M125
+ls $dirMC/VBFHToTauTau_HTXSFilter_STXS1p1_Bin203to205_M125/*root > VBFHToTauTau_HTXSFilter_STXS1p1_Bin203to205_M125
+ls $dirMC/GluGluHToTauTau_HTXSFilter_STXS1p1_Bin101_M125/*root > GluGluHToTauTau_HTXSFilter_STXS1p1_Bin101_M125
+ls $dirMC/VBFHToTauTau_HTXSFilter_STXS1p1_Bin206_M125/*root > VBFHToTauTau_HTXSFilter_STXS1p1_Bin206_M125
+ls $dirMC/VBFHToTauTau_HTXSFilter_STXS1p1_Bin207to210_M125/*root > VBFHToTauTau_HTXSFilter_STXS1p1_Bin207to210_M125
+ls $dirMC/ggZH_HToTauTau_ZToQQ_M125_13TeV_powheg_pythia8/*root > ggZH_HToTauTau_ZToQQ_M125_13TeV_powheg_pythia8
+ls $dirMC/ggZH_HToTauTau_ZToNuNu_M125_13TeV_powheg_pythia8/*root > ggZH_HToTauTau_ZToNuNu_M125_13TeV_powheg_pythia8
+ls $dirMC/ggZH_HToTauTau_ZToLL_M125_13TeV_powheg_pythia8/*root > ggZH_HToTauTau_ZToLL_M125_13TeV_powheg_pythia8
