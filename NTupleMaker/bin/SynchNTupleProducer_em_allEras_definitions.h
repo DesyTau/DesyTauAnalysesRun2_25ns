@@ -243,6 +243,10 @@ Int_t           njets_jecUncRelativeBalUp;
 Int_t           njets_jecUncRelativeBalDown;
 Int_t           njets_jecUncRelativeSampleUp;
 Int_t           njets_jecUncRelativeSampleDown;
+Int_t           njets_jecUncEC2Up;
+Int_t           njets_jecUncEC2Down;
+Int_t           njets_jecUncFlavorQCDUp;
+Int_t           njets_jecUncFlavorQCDDown;
 
 Int_t           njetspt20;
 
@@ -434,6 +438,10 @@ inputs jecUncRelativeBalUp;
 inputs jecUncRelativeBalDown;
 inputs jecUncRelativeSampleUp;
 inputs jecUncRelativeSampleDown;
+inputs jecUncEC2Up;
+inputs jecUncEC2Down;
+inputs jecUncFlavorQCDUp;
+inputs jecUncFlavorQCDDown;
 
 map<TString, inputs> uncertainty_map = { { "unclMetUp" , unclMetUp },
                                          { "unclMetDown" , unclMetDown },
@@ -456,31 +464,30 @@ map<TString, inputs> uncertainty_map = { { "unclMetUp" , unclMetUp },
                                          { "jecUncRelativeBalUp" , jecUncRelativeBalUp },
                                          { "jecUncRelativeBalDown" , jecUncRelativeBalDown },
                                          { "jecUncRelativeSampleUp" , jecUncRelativeSampleUp },
-                                         { "jecUncRelativeSampleDown" , jecUncRelativeSampleDown },                         
+                                         { "jecUncRelativeSampleDown" , jecUncRelativeSampleDown },
+                                         { "jecUncEC2Up" , jecUncEC2Up},
+                                         { "jecUncEC2Down" , jecUncEC2Down},
+                                         { "jecUncFlavorQCDUp" , jecUncFlavorQCDUp},
+                                         { "jecUncFlavorQCDDown" , jecUncFlavorQCDDown}
 };
 
-const int nsrc_Eta0To5 = 13;
+const int nsrc_Eta0To5 = 11;
 const char* srcnames_Eta0To5[nsrc_Eta0To5] = {"SinglePionECAL",
                                               "SinglePionHCAL",
-                                              "AbsoluteFlavMap",
                                               "AbsoluteMPFBias",
                                               "AbsoluteScale",
                                               "AbsoluteStat",
                                               "Fragmentation",
-                                              "FlavorQCD",
                                               "TimePtEta",
                                               "PileUpDataMC",
                                               "RelativeFSR",
                                               "RelativeStatFSR",
                                               "PileUpPtRef"};
-const int nsrc_Eta0To3 = 9;
+const int nsrc_Eta0To3 = 6;
 const char* srcnames_Eta0To3[nsrc_Eta0To3] = {"PileUpPtEC1",
-                                              "PileUpPtEC2",
                                               "PileUpPtBB",
                                               "RelativeJEREC1",
-                                              "RelativeJEREC2",
                                               "RelativePtEC1",
-                                              "RelativePtEC2",
                                               "RelativeStatEC",
                                               "RelativePtBB"};
 const int nsrc_Eta3To5 = 4;
@@ -494,11 +501,21 @@ const char* srcnames_RelativeBal[nsrc_RelativeBal] = {"RelativeBal"};
 const int nsrc_RelativeSample = 1;
 const char* srcnames_RelativeSample[nsrc_RelativeSample] = {"RelativeSample"};
 
+const int nsrc_EC2 = 3;
+const char*srcnames_EC2[nsrc_EC2] = {"PileUpPtEC2",
+                                     "RelativeJEREC2", 
+                                     "RelativePtEC2"};
+
+const int nsrc_FlavorQCD = 1;
+const char* srcnames_FlavorQCD[nsrc_FlavorQCD] = {"FlavorQCD"};
+
 std::vector<JetCorrectionUncertainty*> vsrc_Eta0To5(nsrc_Eta0To5);
 std::vector<JetCorrectionUncertainty*> vsrc_Eta0To3(nsrc_Eta0To3);
 std::vector<JetCorrectionUncertainty*> vsrc_Eta3To5(nsrc_Eta3To5);
 std::vector<JetCorrectionUncertainty*> vsrc_RelativeBal(nsrc_RelativeBal);
 std::vector<JetCorrectionUncertainty*> vsrc_RelativeSample(nsrc_RelativeSample);
+std::vector<JetCorrectionUncertainty*> vsrc_EC2(nsrc_EC2);
+std::vector<JetCorrectionUncertainty*> vsrc_FlavorQCD(nsrc_FlavorQCD);
 
 
 TTree *tree = new TTree("TauCheck","TauCheck");
@@ -854,7 +871,11 @@ void SetupTree(){
    tree->Branch("njets_jecUncRelativeBalDown", &njets_jecUncRelativeBalDown, "njets_jecUncRelativeBalDown/I");
    tree->Branch("njets_jecUncRelativeSampleUp", &njets_jecUncRelativeSampleUp, "njets_jecUncRelativeSampleUp/I");
    tree->Branch("njets_jecUncRelativeSampleDown", &njets_jecUncRelativeSampleDown, "njets_jecUncRelativeSampleDown/I");
-   
+   tree->Branch("njets_jecUncEC2Up", &njets_jecUncEC2Up, "njets_jecUncEC2Up/I");
+   tree->Branch("njets_jecUncEC2Down", &njets_jecUncEC2Down, "njets_jecUncEC2Down/I");
+   tree->Branch("njets_jecUncFlavorQCDUp", &njets_jecUncFlavorQCDUp, "njets_jecUncFlavorQCDUp/I");
+   tree->Branch("njets_jecUncFlavorQCDDown", &njets_jecUncFlavorQCDDown, "njets_jecUncFlavorQCDDown/I");
+
    tree->Branch("njetspt20", &njetspt20, "njetspt20/I");
    
    tree->Branch("jpt_1", &jpt_1, "jpt_1/F");
@@ -1133,7 +1154,11 @@ void SetDefaultValues(){
    njets_jecUncRelativeBalDown = 0;
    njets_jecUncRelativeSampleUp   = 0;
    njets_jecUncRelativeSampleDown = 0;
-   
+   njets_jecUncEC2Up   = 0;
+   njets_jecUncEC2Down = 0;
+   njets_jecUncFlavorQCDUp   = 0;
+   njets_jecUncFlavorQCDDown = 0;
+
    indexLeadingJet = -1;
    ptLeadingJet = -1;
    
