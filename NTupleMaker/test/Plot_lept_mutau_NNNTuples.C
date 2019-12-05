@@ -99,7 +99,7 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
   if(directory.Contains("Outputs")){
     sampleNames = {
       "mt-NOMINAL_ntuple_Data", // data (0)
-      "mt-NOMINAL_ntuple_DY",// (1)Drell-Yan Z->TT
+      "mt-NOMINAL_ntuple_DY",// (1)Drell-Yan Z->TT  or Embedded
       "mt-NOMINAL_ntuple_DY", // (2)Drell-Yan Z->LL
       "mt-NOMINAL_ntuple_W",// (3)WJets
       "mt-NOMINAL_ntuple_TT",//(4)TTbar leptonic, hadronic, + semileptonic
@@ -152,9 +152,14 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
 
   //specific selection weights for data, DY and top
   cuts[0] = IsoCut+"(os>0.5)"; //DATA
-  if(useEmbedded)cuts[1] = IsoCut+"(os>0.5)*embweight*effweight*mcweight"; //Embedded, i.e. data
-  else cuts[1] += zptmassweight+isZTT;
-  cuts[2] += zptmassweight+isZLL;
+  if(useEmbedded){
+    cuts[1] = IsoCut+"(os>0.5)*embweight*effweight*mcweight"; //Embedded, i.e. data
+    cuts[2] += zptmassweight;
+
+  }else{
+    cuts[1] += zptmassweight+isZTT;
+    cuts[2] += zptmassweight+isZLL;
+  }
   cuts[3] += Wjets_weight;
   cuts[4] += topweight; 
   cuts[7] += "*"+TString::Itoa(scaleSignal,10);
@@ -168,12 +173,17 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
     cuts[10] +="*gen_ps_htt125";
   }    
   if(FFmethod) for(int i=2; i<7; ++i) cuts[i] += "*(gen_match_2!=6)";
-  if(useEmbedded) for(int i=2; i<7; ++i) cuts[i] += "*!(gen_match_2==5 &&(gen_match_1==3||gen_match_1==4))";
+  if(useEmbedded) for(int i=2; i<7; ++i) cuts[i] += "*!(gen_match_2==5 &&gen_match_1==4)";
 
    
   cutsSS[0] = IsoCut+qcdweight+"(os<0.5)";
-  if(useEmbedded)cutsSS[1] = IsoCut+qcdweight+"(os<0.5)*embweight*effweight*mcweight";
-  else cutsSS[1] += zptmassweight+isZTT;
+  if(useEmbedded){
+    cutsSS[1] = IsoCut+qcdweight+"(os<0.5)*embweight*effweight*mcweight";
+    cutsSS[2] += zptmassweight;
+  }else{
+    cutsSS[1] += zptmassweight+isZTT;
+    cutsSS[2] += zptmassweight+isZLL;
+  }
   cutsSS[2] += zptmassweight+isZLL;
   cutsSS[3] += Wjets_weight; 
   cutsSS[4] += topweight; 
@@ -187,11 +197,16 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
     cutsSS[9] +="*gen_ps_htt125";
     cutsSS[10] +="*gen_ps_htt125";
   }  
-  if(useEmbedded) for(int i=2; i<7; ++i)cutsSS[i] += "*!(gen_match_2==5 &&(gen_match_1==3||gen_match_1==4))";
+  if(useEmbedded) for(int i=2; i<7; ++i)cutsSS[i] += "*!(gen_match_2==5 &&gen_match_1==4)";
 
   cutsaIso[0] = AntiIsoCut+"(os>0.5)*"+FFweight;
-  if(useEmbedded)cutsaIso[1] = AntiIsoCut+"(os>0.5)*embweight*effweight*mcweight*"+FFweight;
-  else cutsaIso[1] += zptmassweight+isZTT;
+  if(useEmbedded){
+    cutsaIso[1] = AntiIsoCut+"(os>0.5)*embweight*effweight*mcweight*"+FFweight;
+    cutsaIso[2] += zptmassweight;
+ }else{
+    cutsaIso[1] += zptmassweight+isZTT;
+    cutsaIso[2] += zptmassweight+isZLL;
+  }
   cutsaIso[2] += zptmassweight+isZLL;
   cutsaIso[3] += Wjets_weight; 
   cutsaIso[4] += topweight; 
@@ -205,7 +220,7 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
     cutsaIso[9] +="*gen_ps_htt125";
     cutsaIso[10] +="*gen_ps_htt125";
   }  
-  if(useEmbedded) for(int i=2; i<7; ++i)cutsaIso[i] += "*!(gen_match_2==5 &&(gen_match_1==3||gen_match_1==4))";
+  if(useEmbedded) for(int i=2; i<7; ++i)cutsaIso[i] += "*!(gen_match_2==5 && gen_match_1==4)";
   // *******************************
   // ***** Filling Histograms ******
   // *******************************
@@ -613,6 +628,6 @@ void Plot_lept_mutau_NNNTuples(TString Variable = "mt_1",
   FixOverlay();
   canv1->Update();
   pads[0]->GetFrame()->Draw();
-  canv1 -> Print( outputDir + "MuTau"+TString::Itoa(year,10)+"_" + VariableName + (categoryIndex>=0 ? ((TString)"_Cat"+TString::Itoa(categoryIndex,10)+"_") : (TString)"_") +(FFmethod ? (TString)"fakes" : (TString)"MC") + ".pdf" );
-  canv1 -> Print( outputDir + "MuTau"+TString::Itoa(year,10)+"_" + VariableName + (categoryIndex>=0 ? ((TString)"_Cat"+TString::Itoa(categoryIndex,10)+"_") : (TString)"_") +(FFmethod ? (TString)"fakes" : (TString)"MC") + ".png" );
+  canv1 -> Print( outputDir + "MuTau"+TString::Itoa(year,10)+"_" + VariableName + (categoryIndex>=0 ? ((TString)"_Cat"+TString::Itoa(categoryIndex,10)+"_") : (TString)"_") +(useEmbedded ? (TString)"Emb-" : (TString)"") + (FFmethod ? (TString)"fakes" : (TString)"MC") + ".pdf" );
+  canv1 -> Print( outputDir + "MuTau"+TString::Itoa(year,10)+"_" + VariableName + (categoryIndex>=0 ? ((TString)"_Cat"+TString::Itoa(categoryIndex,10)+"_") : (TString)"_") +(useEmbedded ? (TString)"Emb-" : (TString)"") + (FFmethod ? (TString)"fakes" : (TString)"MC") + ".png" );
 }
