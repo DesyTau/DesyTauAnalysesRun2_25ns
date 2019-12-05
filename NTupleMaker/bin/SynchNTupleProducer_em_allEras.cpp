@@ -198,12 +198,6 @@ int main(int argc, char * argv[]) {
       JetCorrectionUncertainty *unc = new JetCorrectionUncertainty(*p);
       vsrc_Eta0To5[isrc] = unc;
    }
-   if (era=="2018"){
-      const char *name = "AbsoluteSample";
-      JetCorrectorParameters const *p = new JetCorrectorParameters(cmsswBase+"/src/"+jec_UncertaintySources, name);
-      JetCorrectionUncertainty *unc = new JetCorrectionUncertainty(*p);
-      vsrc_Eta0To5.push_back(unc);
-   }
    for (int isrc = 0; isrc < nsrc_Eta0To3; isrc++) {
       const char *name = srcnames_Eta0To3[isrc];
       JetCorrectorParameters const *p = new JetCorrectorParameters(cmsswBase+"/src/"+jec_UncertaintySources, name);
@@ -222,20 +216,34 @@ int main(int argc, char * argv[]) {
       JetCorrectionUncertainty *unc = new JetCorrectionUncertainty(*p);
       vsrc_RelativeBal[isrc] = unc;
    }
-   if (era!="2016"){
-      for (int isrc = 0; isrc < nsrc_RelativeSample; isrc++) {
-         const char *name = srcnames_RelativeSample[isrc];
-         JetCorrectorParameters const *p = new JetCorrectorParameters(cmsswBase+"/src/"+jec_UncertaintySources, name);
-         JetCorrectionUncertainty *unc = new JetCorrectionUncertainty(*p);
-         vsrc_RelativeSample[isrc] = unc;
-      }
+   for (int isrc = 0; isrc < nsrc_RelativeSample; isrc++) {
+      const char *name = srcnames_RelativeSample[isrc];
+      JetCorrectorParameters const *p = new JetCorrectorParameters(cmsswBase+"/src/"+jec_UncertaintySources, name);
+      JetCorrectionUncertainty *unc = new JetCorrectionUncertainty(*p);
+      vsrc_RelativeSample[isrc] = unc;
+   }
+   for (int isrc = 0; isrc < nsrc_EC2; isrc++) {
+      const char *name = srcnames_EC2[isrc];
+      JetCorrectorParameters const *p = new JetCorrectorParameters(cmsswBase+"/src/"+jec_UncertaintySources, name);
+      JetCorrectionUncertainty *unc = new JetCorrectionUncertainty(*p);
+      vsrc_EC2[isrc] = unc;
+   }
+   for (int isrc = 0; isrc < nsrc_FlavorQCD; isrc++) {
+      const char *name = srcnames_FlavorQCD[isrc];
+      JetCorrectorParameters const *p = new JetCorrectorParameters(cmsswBase+"/src/"+jec_UncertaintySources, name);
+      JetCorrectionUncertainty *unc = new JetCorrectionUncertainty(*p);
+      vsrc_FlavorQCD[isrc] = unc;
    }
 
    map< TString , vector<JetCorrectionUncertainty*> > jec_unc_map = {
       { "jecUncEta0To5"     , vsrc_Eta0To5 },
       { "jecUncEta0To3"     , vsrc_Eta0To3 },
       { "jecUncEta3To5"     , vsrc_Eta3To5 },
-      { "jecUncRelativeBal" , vsrc_RelativeBal }};
+      { "jecUncRelativeBal" , vsrc_RelativeBal }, 
+      { "jecUncRelativeSample", vsrc_RelativeSample },
+      { "jecUncEC2"         , vsrc_EC2 }, 
+      { "jecUncFlavorQCD"   , vsrc_FlavorQCD }, 
+   };
    
    if (era!="2016"){
       jec_unc_map["jecUncRelativeSample"] = vsrc_RelativeSample;
@@ -1046,6 +1054,10 @@ int main(int argc, char * argv[]) {
                if(jetLV_jecUnc.at("jecUncEta3To5Up").Pt() > jetPtmax) jetPtmax = jetLV_jecUnc.at("jecUncEta3To5Up").Pt();
                if(jetLV_jecUnc.at("jecUncRelativeBalDown").Pt() > jetPtmax) jetPtmax = jetLV_jecUnc.at("jecUncRelativeBalDown").Pt();
                if(jetLV_jecUnc.at("jecUncRelativeBalUp").Pt() > jetPtmax) jetPtmax = jetLV_jecUnc.at("jecUncRelativeBalUp").Pt();
+               if(jetLV_jecUnc.at("jecUncEC2Down").Pt() > jetPtmax) jetPtmax = jetLV_jecUnc.at("jecUncEC2Down").Pt();
+               if(jetLV_jecUnc.at("jecUncEC2Up").Pt() > jetPtmax) jetPtmax = jetLV_jecUnc.at("jecUncEC2Up").Pt();
+               if(jetLV_jecUnc.at("jecUncFlavorQCDDown").Pt() > jetPtmax) jetPtmax = jetLV_jecUnc.at("jecUncFlavorQCDDown").Pt();
+               if(jetLV_jecUnc.at("jecUncFlavorQCDUp").Pt() > jetPtmax) jetPtmax = jetLV_jecUnc.at("jecUncFlavorQCDUp").Pt();
                if (era!="2016") {
                   if(jetLV_jecUnc.at("jecUncRelativeSampleDown").Pt() > jetPtmax) jetPtmax = jetLV_jecUnc.at("jecUncRelativeSampleDown").Pt();
                   if(jetLV_jecUnc.at("jecUncRelativeSampleUp").Pt() > jetPtmax) jetPtmax = jetLV_jecUnc.at("jecUncRelativeSampleUp").Pt();
@@ -1182,6 +1194,10 @@ int main(int argc, char * argv[]) {
             if (jetLV_jecUnc.at("jecUncEta3To5Down").Pt()>jetPtHighCut) njets_jecUncEta3To5Down += 1;
             if (jetLV_jecUnc.at("jecUncRelativeBalUp").Pt()>jetPtHighCut) njets_jecUncRelativeBalUp += 1;
             if (jetLV_jecUnc.at("jecUncRelativeBalDown").Pt()>jetPtHighCut) njets_jecUncRelativeBalDown += 1;
+            if (jetLV_jecUnc.at("jecUncEC2Up").Pt()>jetPtHighCut) njets_jecUncEC2Up += 1;
+            if (jetLV_jecUnc.at("jecUncEC2Down").Pt()>jetPtHighCut) njets_jecUncEC2Down += 1;
+            if (jetLV_jecUnc.at("jecUncFlavorQCDUp").Pt()>jetPtHighCut) njets_jecUncFlavorQCDUp += 1;
+            if (jetLV_jecUnc.at("jecUncFlavorQCDDown").Pt()>jetPtHighCut) njets_jecUncFlavorQCDDown += 1;
             if (era!="2016"){
                if (jetLV_jecUnc.at("jecUncRelativeSampleUp").Pt()>jetPtHighCut) njets_jecUncRelativeSampleUp += 1;
                if (jetLV_jecUnc.at("jecUncRelativeSampleDown").Pt()>jetPtHighCut) njets_jecUncRelativeSampleDown += 1;
@@ -1189,7 +1205,7 @@ int main(int argc, char * argv[]) {
             if (jetPt>jetPtHighCut)
                jets.push_back(jet); 
             
-            if (jetPt_tocheck<jetPtHighCut) continue;
+            //if (jetPt_tocheck<jetPtHighCut) continue; cut is done later to make sure that the uncertainties are treated correcly
 
             if (indexLeadingJet>=0) {
                if (jetPt<ptLeadingJet&&jetPt>ptSubLeadingJet) {
@@ -1844,6 +1860,18 @@ int main(int argc, char * argv[]) {
          if (!isSampleForRecoilCorrection && jet1.E() != 0) uncertainty_map.at("jecUncRelativeBalDown").metLV = metLV_jecUnc.at("jecUncRelativeBalDown");
          if(jet1.E() != 0) uncertainty_map.at("jecUncRelativeBalDown").jet1LV = jet1LV_jecUnc.at("jecUncRelativeBalDown");
          if(jet2.E() != 0) uncertainty_map.at("jecUncRelativeBalDown").jet2LV = jet2LV_jecUnc.at("jecUncRelativeBalDown");
+         if (!isSampleForRecoilCorrection && jet1.E() != 0) uncertainty_map.at("jecUncEC2Up").metLV = metLV_jecUnc.at("jecUncEC2Up");
+         if(jet1.E() != 0) uncertainty_map.at("jecUncEC2Up").jet1LV = jet1LV_jecUnc.at("jecUncEC2Up");
+         if(jet2.E() != 0) uncertainty_map.at("jecUncEC2Up").jet2LV = jet2LV_jecUnc.at("jecUncEC2Up");
+         if (!isSampleForRecoilCorrection && jet1.E() != 0) uncertainty_map.at("jecUncEC2Down").metLV = metLV_jecUnc.at("jecUncEC2Down");
+         if(jet1.E() != 0) uncertainty_map.at("jecUncEC2Down").jet1LV = jet1LV_jecUnc.at("jecUncEC2Down");
+         if(jet2.E() != 0) uncertainty_map.at("jecUncEC2Down").jet2LV = jet2LV_jecUnc.at("jecUncEC2Down");
+         if (!isSampleForRecoilCorrection && jet1.E() != 0) uncertainty_map.at("jecUncFlavorQCDUp").metLV = metLV_jecUnc.at("jecUncFlavorQCDUp");
+         if(jet1.E() != 0) uncertainty_map.at("jecUncFlavorQCDUp").jet1LV = jet1LV_jecUnc.at("jecUncFlavorQCDUp");
+         if(jet2.E() != 0) uncertainty_map.at("jecUncFlavorQCDUp").jet2LV = jet2LV_jecUnc.at("jecUncFlavorQCDUp");
+         if (!isSampleForRecoilCorrection && jet1.E() != 0) uncertainty_map.at("jecUncFlavorQCDDown").metLV = metLV_jecUnc.at("jecUncFlavorQCDDown");
+         if(jet1.E() != 0) uncertainty_map.at("jecUncFlavorQCDDown").jet1LV = jet1LV_jecUnc.at("jecUncFlavorQCDDown");
+         if(jet2.E() != 0) uncertainty_map.at("jecUncFlavorQCDDown").jet2LV = jet2LV_jecUnc.at("jecUncFlavorQCDDown");
          if (era!="2016"){
             if (!isSampleForRecoilCorrection && jet1.E() != 0) uncertainty_map.at("jecUncRelativeSampleUp").metLV = metLV_jecUnc.at("jecUncRelativeSampleUp");
             if(jet1.E() != 0) uncertainty_map.at("jecUncRelativeSampleUp").jet1LV = jet1LV_jecUnc.at("jecUncRelativeSampleUp");
