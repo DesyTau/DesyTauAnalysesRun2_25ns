@@ -56,6 +56,9 @@ public :
   Float_t         dZ_1;
   Float_t         d0err_1;
   Float_t         dZerr_1;
+  Float_t         ip0x_1;
+  Float_t         ip0y_1;
+  Float_t         ip0z_1;
   Float_t         ipx_1;
   Float_t         ipy_1;
   Float_t         ipz_1;
@@ -90,6 +93,9 @@ public :
   Float_t         dZ_2;
   Float_t         d0err_2;
   Float_t         dZerr_2;
+  Float_t         ip0x_2;
+  Float_t         ip0y_2;
+  Float_t         ip0z_2;
   Float_t         ipx_2;
   Float_t         ipy_2;
   Float_t         ipz_2;
@@ -372,6 +378,11 @@ public :
   Float_t         acotautau_refitbs_10;
   Float_t         acotautau_refitbs_01;
   Float_t         acotautau_refitbs_11;
+ 
+  Float_t         acotautau_helix_00;
+  Float_t         acotautau_helix_10;
+  Float_t         acotautau_helix_01;
+  Float_t         acotautau_helix_11;
 
   //Merijn add acotau for psi:
   Float_t         acotautauPsi_00;
@@ -479,6 +490,9 @@ public :
   TBranch	 *b_dZ_1;
   TBranch	 *b_d0err_1;
   TBranch	 *b_dZerr_1;
+  TBranch	 *b_ip0x_1;
+  TBranch	 *b_ip0y_1;
+  TBranch	 *b_ip0z_1;
   TBranch	 *b_ipx_1;
   TBranch	 *b_ipy_1;
   TBranch	 *b_ipz_1;
@@ -512,6 +526,9 @@ public :
   TBranch	 *b_dZ_2;
   TBranch	 *b_d0err_2;
   TBranch	 *b_dZerr_2;
+  TBranch	 *b_ip0x_2;
+  TBranch	 *b_ip0y_2;
+  TBranch	 *b_ip0z_2;
   TBranch	 *b_ipx_2;
   TBranch	 *b_ipy_2;
   TBranch	 *b_ipz_2;
@@ -793,6 +810,11 @@ public :
   TBranch        *b_acotautau_refitbs_10;
   TBranch        *b_acotautau_refitbs_01;
   TBranch        *b_acotautau_refitbs_11;
+
+  TBranch        *b_acotautau_helix_00;
+  TBranch        *b_acotautau_helix_10;
+  TBranch        *b_acotautau_helix_01;
+  TBranch        *b_acotautau_helix_11;
 
   TBranch        *b_acotautauPsi_00;
   TBranch        *b_acotautauPsi_10;

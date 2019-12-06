@@ -81,6 +81,9 @@ void Synch17Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("dZ_1", &dZ_1, &b_dZ_1);
    fChain->SetBranchAddress("d0err_1", &d0err_1, &b_d0err_1);
    fChain->SetBranchAddress("dZerr_1", &dZerr_1, &b_dZerr_1);
+   fChain->SetBranchAddress("ip0x_1", &ip0x_1, &b_ip0x_1);
+   fChain->SetBranchAddress("ip0y_1", &ip0y_1, &b_ip0y_1);
+   fChain->SetBranchAddress("ip0z_1", &ip0z_1, &b_ip0z_1);
    fChain->SetBranchAddress("ipx_1", &ipx_1, &b_ipx_1);
    fChain->SetBranchAddress("ipy_1", &ipy_1, &b_ipy_1);
    fChain->SetBranchAddress("ipz_1", &ipz_1, &b_ipz_1);
@@ -114,6 +117,9 @@ void Synch17Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("dZ_2", &dZ_2, &b_dZ_2);
    fChain->SetBranchAddress("d0err_2", &d0err_2, &b_d0err_2);
    fChain->SetBranchAddress("dZerr_2", &dZerr_2, &b_dZerr_2);
+   fChain->SetBranchAddress("ip0x_2", &ip0x_2, &b_ip0x_2);
+   fChain->SetBranchAddress("ip0y_2", &ip0y_2, &b_ip0y_2);
+   fChain->SetBranchAddress("ip0z_2", &ip0z_2, &b_ip0z_2);
    fChain->SetBranchAddress("ipx_2", &ipx_2, &b_ipx_2);
    fChain->SetBranchAddress("ipy_2", &ipy_2, &b_ipy_2);
    fChain->SetBranchAddress("ipz_2", &ipz_2, &b_ipz_2);
@@ -390,6 +396,11 @@ void Synch17Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("acotautau_refitbs_10", &acotautau_refitbs_10, &b_acotautau_refitbs_10);
    fChain->SetBranchAddress("acotautau_refitbs_01", &acotautau_refitbs_01, &b_acotautau_refitbs_01);
    fChain->SetBranchAddress("acotautau_refitbs_11", &acotautau_refitbs_11, &b_acotautau_refitbs_11);
+
+   fChain->SetBranchAddress("acotautau_helix_00", &acotautau_helix_00, &b_acotautau_helix_00);
+   fChain->SetBranchAddress("acotautau_helix_10", &acotautau_helix_10, &b_acotautau_helix_10);
+   fChain->SetBranchAddress("acotautau_helix_01", &acotautau_helix_01, &b_acotautau_helix_01);
+   fChain->SetBranchAddress("acotautau_helix_11", &acotautau_helix_11, &b_acotautau_helix_11);
 
    fChain->SetBranchAddress("acotautauPsi_00", &acotautauPsi_00, &b_acotautauPsi_00);
    fChain->SetBranchAddress("acotautauPsi_10", &acotautauPsi_10, &b_acotautauPsi_10);
@@ -875,6 +886,11 @@ void Synch17Tree::WriteInit(TTree *tree) {
    fChain->Branch("acotautau_refitbs_10", &acotautau_refitbs_10, "acotautau_refitbs_10/F");
    fChain->Branch("acotautau_refitbs_01", &acotautau_refitbs_01, "acotautau_refitbs_01/F");
    fChain->Branch("acotautau_refitbs_11", &acotautau_refitbs_11, "acotautau_refitbs_11/F");
+
+   fChain->Branch("acotautau_helix_00", &acotautau_helix_00, "acotautau_helix_00/F");
+   fChain->Branch("acotautau_helix_10", &acotautau_helix_10, "acotautau_helix_10/F");
+   fChain->Branch("acotautau_helix_01", &acotautau_helix_01, "acotautau_helix_01/F");
+   fChain->Branch("acotautau_helix_11", &acotautau_helix_11, "acotautau_helix_11/F");
 
    fChain->Branch("acotautauPsi_00", &acotautauPsi_00, "acotautauPsi_00/F");
    fChain->Branch("acotautauPsi_10", &acotautauPsi_10, "acotautauPsi_10/F");
