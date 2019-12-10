@@ -618,12 +618,12 @@ int main(int argc, char * argv[]){
       	gentreeForGoodRecoEvtsOnly->sm_htt125 = TSweight[0];
 
       	otree->TauSpinnerWeightsMaxMix = TSweight[1];
-      	gentree->ps_htt125 = TSweight[1];
-      	gentreeForGoodRecoEvtsOnly->ps_htt125 = TSweight[1];
+      	gentree->mm_htt125 = TSweight[1];
+      	gentreeForGoodRecoEvtsOnly->mm_htt125 = TSweight[1];
 
       	otree->TauSpinnerWeightsOdd = TSweight[2];
-      	gentree->mm_htt125 = TSweight[2];
-      	gentreeForGoodRecoEvtsOnly->mm_htt125 = TSweight[2];
+      	gentree->ps_htt125 = TSweight[2];
+      	gentreeForGoodRecoEvtsOnly->ps_htt125 = TSweight[2];
 
       	otree->TauSpinnerWeightsMinusMaxMix = TSweight[3];
       	gentree->minusmm_htt125 = TSweight[3];
@@ -642,12 +642,12 @@ int main(int argc, char * argv[]){
       	gentreeForGoodRecoEvtsOnly->sm_htt125 = TSweight[0];
 
       	otree->TauSpinnerWeightsMaxMix = TSweight[1];
-      	gentree->ps_htt125 = TSweight[1];
-      	gentreeForGoodRecoEvtsOnly->ps_htt125 = TSweight[1];
+      	gentree->mm_htt125 = TSweight[1];
+      	gentreeForGoodRecoEvtsOnly->mm_htt125 = TSweight[1];
 
       	otree->TauSpinnerWeightsOdd = TSweight[2];
-      	gentree->mm_htt125 = TSweight[2];
-      	gentreeForGoodRecoEvtsOnly->mm_htt125 = TSweight[2];
+      	gentree->ps_htt125 = TSweight[2];
+      	gentreeForGoodRecoEvtsOnly->ps_htt125 = TSweight[2];
 
       	otree->TauSpinnerWeightsMinusMaxMix = TSweight[3];
       	gentree->minusmm_htt125 = TSweight[3];
@@ -663,12 +663,12 @@ int main(int argc, char * argv[]){
       	gentreeForGoodRecoEvtsOnly->sm_htt125 = analysisTree.TauSpinnerWeight[0];
 
       	otree->TauSpinnerWeightsMaxMix = analysisTree.TauSpinnerWeight[1];
-      	gentree->ps_htt125 = analysisTree.TauSpinnerWeight[1];
-      	gentreeForGoodRecoEvtsOnly->ps_htt125 = analysisTree.TauSpinnerWeight[1];
+      	gentree->mm_htt125 = analysisTree.TauSpinnerWeight[1];
+      	gentreeForGoodRecoEvtsOnly->mm_htt125 = analysisTree.TauSpinnerWeight[1];
 
       	otree->TauSpinnerWeightsOdd = analysisTree.TauSpinnerWeight[2];
-      	gentree->mm_htt125 = analysisTree.TauSpinnerWeight[2];
-      	gentreeForGoodRecoEvtsOnly->mm_htt125 = analysisTree.TauSpinnerWeight[2];
+      	gentree->ps_htt125 = analysisTree.TauSpinnerWeight[2];
+      	gentreeForGoodRecoEvtsOnly->ps_htt125 = analysisTree.TauSpinnerWeight[2];
 
 	if(analysisTree.TauSpinAngles_count>=5){
 	  otree->TauSpinnerWeightsMinusMaxMix = analysisTree.TauSpinnerWeight[3];
