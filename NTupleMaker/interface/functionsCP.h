@@ -1285,7 +1285,8 @@ TLorentzVector calculate_IP_helix_mu(const AC1B * analysisTree, int muIndex, TVe
 	ROOT::Math::PositionVector3D<ROOT::Math::Cartesian3D<float>> pv(vertex_coord.X(), vertex_coord.Y(), vertex_coord.Z());
 
 	ImpactParameter IP;
-	TVector3 IP_helix_mu = IP.CalculatePCA(B, h_param_mu, ref_mu, pv, p4_mu);        
+	//TVector3 IP_helix_mu = IP.CalculatePCA(B, h_param_mu, ref_mu, pv, p4_mu);//kept for retrocompatibility        
+	TVector3 IP_helix_mu = IP.CalculatePCA(B, h_param_mu, ref_mu, pv);        
 	LVIP.SetVect(IP_helix_mu);
 	return LVIP;
 }
@@ -1314,7 +1315,8 @@ TLorentzVector calculate_IP_helix_tauh(const AC1B * analysisTree, int tauIndex, 
 	ROOT::Math::PositionVector3D<ROOT::Math::Cartesian3D<float>> pv(vertex_coord.X(), vertex_coord.Y(), vertex_coord.Z());
 	
 	ImpactParameter IP;
-	TVector3 IP_helix_tau = IP.CalculatePCA(B, h_param_tau, ref_tau, pv, p4_tau);              
+	//TVector3 IP_helix_tau = IP.CalculatePCA(B, h_param_tau, ref_tau, pv, p4_tau);     //kept for retrocompatibility           
+	TVector3 IP_helix_tau = IP.CalculatePCA(B, h_param_tau, ref_tau, pv);              
 	LVIP.SetVect(IP_helix_tau); 
 	return LVIP;
 }
