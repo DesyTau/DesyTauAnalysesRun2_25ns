@@ -456,7 +456,7 @@ int main(int argc, char * argv[]) {
             }
             else mcweight = 1.;
          }
-         
+
          if (sync && mcweight<0) continue; // FIXME: needed for sync?
 
          weightScale1 = analysisTree.weightScale1;
@@ -593,8 +593,10 @@ int main(int argc, char * argv[]) {
                   bosonMass = promptTausLV.M();
                   lepPx = promptVisTausLV.Px(); lepPy = promptVisTausLV.Py(); lepPz = promptVisTausLV.Pz();
                   mtBoson_gen = mT(promptTausFirstCopy[0],promptTausFirstCopy[1]);
+
                   // set embeddedWeight  ===============================================================================================================================
                   embeddedWeight = GetEmbeddedWeight( promptTausFirstCopy, correctionWS, era);
+
                }
                else if (promptMuons.size()==2) {
                   isZTT = false; isZMM = true; isZEE = false;
@@ -700,15 +702,17 @@ int main(int argc, char * argv[]) {
          // apply good run selection  ==================================================================================================================================
 
          if ((isData || isEmbedded) && applyGoodRunSelection){
+
             int n=analysisTree.event_run;
             int lum = analysisTree.event_luminosityblock;      
             if (!GoodRunSelection(n,lum,periods)) continue;
+
          }
 
          // pileup and top pt re-weighting weight ======================================================================================================================
          if (!isData && !isEmbedded) {
+
             puweight = float(PUofficial->get_PUweight(double(analysisTree.numtruepileupinteractions)));
-            
             if (topPt>0&&antitopPt>0) {
                topptweight = topPtWeight(topPt,antitopPt,true);
                topptweightRun2 = topPtWeight(topPt,antitopPt,false);
@@ -854,6 +858,7 @@ int main(int argc, char * argv[]) {
 
          // set iso, id and trigger weights   ==========================================================================================================================
          if (!isData || isEmbedded) {
+
             correctionWS->var("e_pt")->setVal(pt_1);
             correctionWS->var("e_eta")->setVal(eta_1);
             correctionWS->var("e_iso")->setVal(iso_1);
@@ -1882,9 +1887,9 @@ int main(int argc, char * argv[]) {
          }
          
          for(auto &uncert : uncertainty_map){
-            
-            bool is_data_or_embedded = isData || (isEmbedded && !uncert.first.Contains("escale") && !uncert.first.Contains("ereso"));
-            
+            //bool is_data_or_embedded = isData || (isEmbedded && !uncert.first.Contains("escale") && !uncert.first.Contains("ereso"));
+             bool is_data_or_embedded = isData || isEmbedded;
+
             propagate_uncertainty( uncert.first,
                                    uncert.second.metLV, covMET, inputFile_visPtResolution,
                                    uncert.second.muonLV,
@@ -1939,7 +1944,7 @@ int main(int argc, char * argv[]) {
             mela.setProcess(TVar::SelfDefine_spin0, TVar::JHUGen, TVar::JJQCD);
             mela.selfDHggcoupl[0][gHIGGS_GG_2][0] = 1;
             mela.computeProdP(ME_ggh, false);
-
+            
             // Hypothesis: Z + 2 jets
             // Compute the Hypothesis with flipped jets and sum them up for the discriminator.
             mela.setProcess(TVar::bkgZJets, TVar::MCFM, TVar::JJQCD);
