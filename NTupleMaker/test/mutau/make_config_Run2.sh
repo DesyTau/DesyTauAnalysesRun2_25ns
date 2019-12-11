@@ -1,6 +1,6 @@
 #!/bin/bash
 
-### the script is to be run with "./make_config_Run2.sh <year={16,17,18}> <data_type={data, MC}>"
+### the script is to be run with "./make_config_Run2.sh <year={16,17,18}> <data_type={data, MC, embedded}>"
 
 YEAR=$1
 DATA_TYPE=$2
@@ -14,7 +14,7 @@ if [[ $YEAR -ne 16 && $YEAR -ne 17 && $YEAR -ne 18 ]]; then
   echo
   echo "To produce the scripts for a specific year and either data or MC this script is to be run with a command:"
   echo
-  echo "  bash make_config_Run2.sh <year={16,17,18}> <data_type={data, MC}>"
+  echo "  bash make_config_Run2.sh <year={16,17,18}> <data_type={data, MC, embedded}>"
   echo
   echo "year is not 16, 17 or 18 - exiting"
   exit
@@ -59,7 +59,7 @@ else
       echo
       echo "To produce the scripts for a specific year and either data or MC this script is to be run with a command:"
       echo
-      echo "  bash make_config_Run2.sh <year={16,17,18}> <data_type={data, MC}>"
+      echo "  bash make_config_Run2.sh <year={16,17,18}> <data_type={data, MC, embedded}>"
       echo
       echo "data_type is neither data nor MC - exiting"
       exit
@@ -101,9 +101,9 @@ if [[ $DATA_TYPE == "MC" ]]; then
   if [[ $YEAR -eq 17 ]]; then # for 17 the path in the root file to PU histograms is sample-dependent, pick it from the list
     for (( i = 0; i < $MC_SAMPLES_LEN; i++ )); do
         PU_STR=${MC_SAMPLES_LIST[i]}_pileup
-        sed "s/pileUpforMC =/pileUpforMC = ${PU_STR}/" ${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf > $OUTDIR/analysisMacroSynch_lept_mt_${MC_SAMPLES_LIST[i]}.conf
+        sed "s/pileUpforMC =/pileUpforMC = ${PU_STR}/" ${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf > $OUTDIR/analysisMacroSynch_mt_${MC_SAMPLES_LIST[i]}.conf
     done
-    sed 's/pileUpforMC =/pileUpforMC = GluGluHToTauTau_M125_13TeV_powheg_pythia8_pileup/' ${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf > $OUTDIR/analysisMacroSynch_lept_mt_SUSYGluGluToHToTauTau_M-120_TuneCP5_13TeV-pythia8.conf
+    sed 's/pileUpforMC =/pileUpforMC = GluGluHToTauTau_M125_13TeV_powheg_pythia8_pileup/' ${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf > $OUTDIR/analysisMacroSynch_mt_SUSYGluGluToHToTauTau_M-120_TuneCP5_13TeV-pythia8.conf
   else # path in the root file to PU histograms for 16 and 18 data; 
     sed "s/pileUpforMC =/pileUpforMC = pileup/" ${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf > $OUTDIR/${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf
   fi

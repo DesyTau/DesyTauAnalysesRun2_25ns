@@ -618,12 +618,12 @@ int main(int argc, char * argv[]){
       	gentreeForGoodRecoEvtsOnly->sm_htt125 = TSweight[0];
 
       	otree->TauSpinnerWeightsMaxMix = TSweight[1];
-      	gentree->ps_htt125 = TSweight[1];
-      	gentreeForGoodRecoEvtsOnly->ps_htt125 = TSweight[1];
+      	gentree->mm_htt125 = TSweight[1];
+      	gentreeForGoodRecoEvtsOnly->mm_htt125 = TSweight[1];
 
       	otree->TauSpinnerWeightsOdd = TSweight[2];
-      	gentree->mm_htt125 = TSweight[2];
-      	gentreeForGoodRecoEvtsOnly->mm_htt125 = TSweight[2];
+      	gentree->ps_htt125 = TSweight[2];
+      	gentreeForGoodRecoEvtsOnly->ps_htt125 = TSweight[2];
 
       	otree->TauSpinnerWeightsMinusMaxMix = TSweight[3];
       	gentree->minusmm_htt125 = TSweight[3];
@@ -642,12 +642,12 @@ int main(int argc, char * argv[]){
       	gentreeForGoodRecoEvtsOnly->sm_htt125 = TSweight[0];
 
       	otree->TauSpinnerWeightsMaxMix = TSweight[1];
-      	gentree->ps_htt125 = TSweight[1];
-      	gentreeForGoodRecoEvtsOnly->ps_htt125 = TSweight[1];
+      	gentree->mm_htt125 = TSweight[1];
+      	gentreeForGoodRecoEvtsOnly->mm_htt125 = TSweight[1];
 
       	otree->TauSpinnerWeightsOdd = TSweight[2];
-      	gentree->mm_htt125 = TSweight[2];
-      	gentreeForGoodRecoEvtsOnly->mm_htt125 = TSweight[2];
+      	gentree->ps_htt125 = TSweight[2];
+      	gentreeForGoodRecoEvtsOnly->ps_htt125 = TSweight[2];
 
       	otree->TauSpinnerWeightsMinusMaxMix = TSweight[3];
       	gentree->minusmm_htt125 = TSweight[3];
@@ -663,12 +663,12 @@ int main(int argc, char * argv[]){
       	gentreeForGoodRecoEvtsOnly->sm_htt125 = analysisTree.TauSpinnerWeight[0];
 
       	otree->TauSpinnerWeightsMaxMix = analysisTree.TauSpinnerWeight[1];
-      	gentree->ps_htt125 = analysisTree.TauSpinnerWeight[1];
-      	gentreeForGoodRecoEvtsOnly->ps_htt125 = analysisTree.TauSpinnerWeight[1];
+      	gentree->mm_htt125 = analysisTree.TauSpinnerWeight[1];
+      	gentreeForGoodRecoEvtsOnly->mm_htt125 = analysisTree.TauSpinnerWeight[1];
 
       	otree->TauSpinnerWeightsOdd = analysisTree.TauSpinnerWeight[2];
-      	gentree->mm_htt125 = analysisTree.TauSpinnerWeight[2];
-      	gentreeForGoodRecoEvtsOnly->mm_htt125 = analysisTree.TauSpinnerWeight[2];
+      	gentree->ps_htt125 = analysisTree.TauSpinnerWeight[2];
+      	gentreeForGoodRecoEvtsOnly->ps_htt125 = analysisTree.TauSpinnerWeight[2];
 
 	if(analysisTree.TauSpinAngles_count>=5){
 	  otree->TauSpinnerWeightsMinusMaxMix = analysisTree.TauSpinnerWeight[3];
@@ -1751,15 +1751,7 @@ void FillMuTau(const AC1B *analysisTree, Synch17Tree *otree, int leptonIndex, in
   otree->neta_1 = (muon_P4 - muon_P4).Eta();
   otree->nphi_1 = (muon_P4 - muon_P4).Phi();
   otree->nm_1 = (muon_P4 - muon_P4).M();
-  
-  // muon helical IP for refitted vertex with BS constraint
-  bool is_refitted_PV_with_BS = true;
-  TVector3 vertex_coord = get_refitted_PV_with_BS(analysisTree, leptonIndex, tauIndex, is_refitted_PV_with_BS);
-  TVector3 IP_helix_1 = calculate_IP_helix_mu(analysisTree, leptonIndex, vertex_coord);
-  otree->ipx_1 = IP_helix_1.X();
-  otree->ipy_1 = IP_helix_1.Y();
-  otree->ipz_1 = IP_helix_1.Z();
-  
+    
   otree->byCombinedIsolationDeltaBetaCorrRaw3Hits_1 = -9999;
   otree->byLooseCombinedIsolationDeltaBetaCorr3Hits_1 = -9999;
   otree->byMediumCombinedIsolationDeltaBetaCorr3Hits_1 = -9999;
@@ -1881,14 +1873,6 @@ void FillTau(const AC1B *analysisTree, Synch17Tree *otree, int leptonIndex, int 
   otree->tau_SV_covyy_2 = analysisTree->tau_SV_cov[tauIndex][3];
   otree->tau_SV_covzy_2 = analysisTree->tau_SV_cov[tauIndex][4];
   otree->tau_SV_covzz_2 = analysisTree->tau_SV_cov[tauIndex][5];
-  
-  // tau_h helical IP for refitted vertex with BS constraint
-  bool is_refitted_PV_with_BS = true;
-  TVector3 vertex_coord = get_refitted_PV_with_BS(analysisTree, leptonIndex, tauIndex, is_refitted_PV_with_BS);
-  TVector3 IP_helix_2 = calculate_IP_helix_tauh(analysisTree, tauIndex, vertex_coord);
-  otree->ipx_2 = IP_helix_2.X();
-  otree->ipy_2 = IP_helix_2.Y();
-  otree->ipz_2 = IP_helix_2.Z();
 
   otree->deepTauVsEleRaw_2                = analysisTree->tau_byDeepTau2017v2p1VSeraw[tauIndex];
   otree->deepTauVsJetRaw_2                = analysisTree->tau_byDeepTau2017v2p1VSjetraw[tauIndex];

@@ -46,3 +46,6 @@ ls $dirEmbedded/EmbeddingRun2018A_MuTau/*root > $OUTDIR/EmbeddedMuTau_Run2018A
 ls $dirEmbedded/EmbeddingRun2018B_MuTau/*root > $OUTDIR/EmbeddedMuTau_Run2018B
 ls $dirEmbedded/EmbeddingRun2018C_MuTau/*root > $OUTDIR/EmbeddedMuTau_Run2018C
 ls $dirEmbedded/EmbeddingRun2018D_MuTau/*root > $OUTDIR/EmbeddedMuTau_Run2018D
+
+ls $dirMC/GluGluToHToTauUncorrelatedDecay_M125/*root > $OUTDIR/GluGluHToTauTauUncorrDecays_M125
+ls $dirMC/VBFHToTauTauUncorrelatedDecay_M125/*root > $OUTDIR/VBFHToTauTauUncorrDecays_M125
