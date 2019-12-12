@@ -528,24 +528,24 @@ TVector3 secvertex(0.,0.,0.);
 TVector3 momenta(0.,0.,0.);    
 
 if(ch=="et"){
-  secvertex.SetXYZ(analysisTree->electron_vx[tauIndex],
-		   analysisTree->electron_vy[tauIndex],
-		   analysisTree->electron_vz[tauIndex]);
+  secvertex.SetXYZ(analysisTree->electron_vx[muonIndex],
+		   analysisTree->electron_vy[muonIndex],
+		   analysisTree->electron_vz[muonIndex]);
   
   
-  momenta.SetXYZ(analysisTree->electron_px[tauIndex],
-		 analysisTree->electron_py[tauIndex],
-		 analysisTree->electron_pz[tauIndex]);}
+  momenta.SetXYZ(analysisTree->electron_px[muonIndex],
+		 analysisTree->electron_py[muonIndex],
+		 analysisTree->electron_pz[muonIndex]);}
  
  if(ch=="mt"){
-   secvertex.SetXYZ(analysisTree->muon_vx[tauIndex], //Merijn try somethin 2019 2 9
-		    analysisTree->muon_vy[tauIndex],
-		    analysisTree->muon_vz[tauIndex]);
+   secvertex.SetXYZ(analysisTree->muon_vx[muonIndex], //Merijn try somethin 2019 2 9
+		    analysisTree->muon_vy[muonIndex],
+		    analysisTree->muon_vz[muonIndex]);
    
    
-   momenta.SetXYZ(analysisTree->muon_px[tauIndex],
-		  analysisTree->muon_py[tauIndex],
-		  analysisTree->muon_pz[tauIndex]);
+   momenta.SetXYZ(analysisTree->muon_px[muonIndex],
+		  analysisTree->muon_py[muonIndex],
+		  analysisTree->muon_pz[muonIndex]);
    
  }
 
