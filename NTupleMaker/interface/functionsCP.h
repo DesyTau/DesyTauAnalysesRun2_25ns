@@ -43,6 +43,7 @@ TLorentzVector gen_ipVec(const AC1B * analysisTree, int tauIndex, TVector3 verte
 TVector3 gen_ThreeProngSVertex(const AC1B * analysisTree, int tauIndex);
 int gen_chargedPiIndex(const AC1B * analysisTree, int tauIndex, int partId);
 vector<int> gen_ThreeProngIndices(const AC1B * analysisTree, int tauIndex);
+vector<TLorentzVector> gen_a1_rho_pi(const AC1B * analysisTree, int tauIndex);
 
 TLorentzVector ipVec_Lepton(const AC1B * analysisTree, int leptonIndex, int tauIndex, int vertexType, TString ch);
 
@@ -718,12 +719,16 @@ void gen_acott(const AC1B * analysisTree, Synch17GenTree *gentree, int tauIndex1
   if (oneProngPi01&&oneProngPi02)
     gentree->acotautau_11=acoCP(tau1Prong,tau2Prong,tau1Pi0,tau2Pi0,firstNegative,true,true, gentree);
 
-  if(threeProng1)
-    gentree->acotautau_20=acoCP(tau1_3ProngVec,tau2Prong,tau1IP,tau2IP,firstNegative,false,false, gentree);
-
-  if(threeProng2)
-    gentree->acotautau_02=acoCP(tau1Prong,tau2_3ProngVec,tau1IP,tau2IP,firstNegative,false,false, gentree);
-
+  if(threeProng1) {
+    //    gentree->acotautau_20=acoCP(tau1_3ProngVec,tau2Prong,tau1IP,tau2IP,firstNegative,false,false, gentree);
+    vector<TLorentzVector> partLV = gen_a1_rho_pi(analysisTree,tauIndex1);
+    gentree->acotautau_20=acoCP(partLV.at(0),tau2Prong,partLV.at(1),tau2IP,firstNegative,true,false, gentree);
+  }
+  if(threeProng2) {
+    //    gentree->acotautau_02=acoCP(tau1Prong,tau2_3ProngVec,tau1IP,tau2IP,firstNegative,false,false, gentree);
+    vector<TLorentzVector> partLV = gen_a1_rho_pi(analysisTree,tauIndex2);
+    gentree->acotautau_02=acoCP(tau1Prong,partLV.at(0),tau1IP,partLV.at(1),firstNegative,false,true, gentree);
+  }
   if (oneProngPi01&&threeProng2)
     gentree->acotautau_12=acoCP(tau1Prong,tau2_3ProngVec,tau1Pi0,tau2IP,firstNegative,true,false, gentree);
 
@@ -1382,7 +1387,6 @@ std::vector<TLorentzVector> a1_rho_pi(const AC1B * analysisTree, int tauIndex) {
   if (analysisTree->tau_charge[tauIndex]>0) tau_charge = 1;
 
   for(int i = 0; i < ncomponents; i++){
-    std::cout << i << " " << analysisTree->tau_constituents_pdgId[tauIndex][i] << std::endl;
     if(analysisTree->tau_constituents_charge[tauIndex][i] != 0 && abs(analysisTree->tau_constituents_pdgId[tauIndex][i])==211){
       if (tau_charge*analysisTree->tau_constituents_charge[tauIndex][i]<0) { 
 	lv_pi_opposite.SetXYZT(analysisTree->tau_constituents_px[tauIndex][i],
@@ -1394,6 +1398,7 @@ std::vector<TLorentzVector> a1_rho_pi(const AC1B * analysisTree, int tauIndex) {
       }
     }
   }
+
 
   double massdiff = 1e+10;
   for (int i = 0; i < ncomponents; i++) {
@@ -1414,23 +1419,81 @@ std::vector<TLorentzVector> a1_rho_pi(const AC1B * analysisTree, int tauIndex) {
     }
   }
 
-  for (int i = 0; i < ncomponents; i++) {
-    if(analysisTree->tau_constituents_charge[tauIndex][i] != 0 && abs(analysisTree->tau_constituents_pdgId[tauIndex][i])==211){
-      if (tau_charge*analysisTree->tau_constituents_charge[tauIndex][i]>0) {
-	if (i!=index_pi_from_rho) {
-	  index_pi_lead = i;
-	  lv_pi_lead.SetXYZT(analysisTree->tau_constituents_px[tauIndex][i],
-			     analysisTree->tau_constituents_py[tauIndex][i],
-			     analysisTree->tau_constituents_pz[tauIndex][i],
-			     analysisTree->tau_constituents_e[tauIndex][i]);
-	}
+  partLV.push_back(lv_pi_from_rho);
+  partLV.push_back(lv_pi_opposite);
+
+  return partLV;
+
+}
+
+std::vector<TLorentzVector> gen_a1_rho_pi(const AC1B * analysisTree, int tauIndex) {
+
+  std::vector<int> ThreeProngIndices = gen_ThreeProngIndices(analysisTree,tauIndex);
+  int npart = ThreeProngIndices.size();
+  std::vector<TLorentzVector> partLV; partLV.clear();
+  TLorentzVector lv_rho; lv_rho.SetXYZT(0.,0.,0.,0.);
+
+  int index_pi_opposite = -1; 
+  TLorentzVector lv_pi_opposite; 
+  lv_pi_opposite.SetXYZT(0.,0.,0.,0.);
+
+  int index_pi_from_rho = -1;
+  TLorentzVector lv_pi_from_rho;
+  lv_pi_from_rho.SetXYZT(0.,0.,0.,0.);
+
+  int tau_charge = -1; 
+  if (analysisTree->gentau_charge[tauIndex]>0) tau_charge = 1;
+
+  //  std::cout << "tau decay = " << tau_charge << std::endl;
+  for(int i = 0; i < npart; i++){
+    int index = ThreeProngIndices.at(i);
+    std::cout << i << " : " << analysisTree->genparticles_pdgid[index] << std::endl;
+    if (fabs(analysisTree->genparticles_pdgid[index])==211) {
+      if (tau_charge*analysisTree->genparticles_pdgid[index]<0) { 
+	lv_pi_opposite.SetXYZT(analysisTree->genparticles_px[index],
+			       analysisTree->genparticles_py[index],
+			       analysisTree->genparticles_pz[index],
+			       analysisTree->genparticles_e[index]);
+	index_pi_opposite = index;
+	//	break;
       }
     }
   }
-
-  lv_rho = lv_pi_opposite + lv_pi_from_rho;
-  partLV.push_back(lv_pi_lead);
-  partLV.push_back(lv_rho);
+  
+  double massdiff = 1e+10;
+  for (int i = 0; i < npart; i++) {
+    int index = ThreeProngIndices.at(i);
+    if (fabs(analysisTree->genparticles_pdgid[index])==211) {
+      if (tau_charge*analysisTree->genparticles_pdgid[index]>0) { 
+	TLorentzVector lv; lv.SetXYZT(analysisTree->genparticles_px[index],
+				      analysisTree->genparticles_py[index],
+				      analysisTree->genparticles_pz[index],
+				      analysisTree->genparticles_e[index]);
+	double mass = (lv_pi_opposite+lv).M();
+	double diff = fabs(mass-RHO_MASS);
+	if (diff<massdiff) {
+	  index_pi_from_rho = index;
+	  lv_pi_from_rho = lv;
+	  massdiff = diff;
+	}	  
+      }
+    }
+  }
+  /*
+  std::cout << "pi1 (E,Px,Py,Pz,M)=("
+	    << lv_pi_from_rho.Px() << ","
+	    << lv_pi_from_rho.Py() << ","
+	    << lv_pi_from_rho.Pz() << ","
+	    << lv_pi_from_rho.M() << ")" << std::endl;
+  
+  std::cout << "pi2 (E,Px,Py,Pz,M)=("
+	    << lv_pi_opposite.Px() << ","
+	    << lv_pi_opposite.Py() << ","
+	    << lv_pi_opposite.Pz() << ","
+	    << lv_pi_opposite.M() << ")" << std::endl;
+  */
+  partLV.push_back(lv_pi_from_rho);
+  partLV.push_back(lv_pi_opposite);
 
   return partLV;
 
