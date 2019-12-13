@@ -8,7 +8,7 @@ dirST=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2017/mc_v4
 dirVV=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2017/mc_v3
 dirSignal=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2017/mc_v3
 dirggh=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2017/mc_v4
-dirEm=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2017/embedded/Embedding_emu
+dirEm=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2017/embedded/Embedding_emu_v2
 dirWGammaStar=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2017/mc_v3
 dirEWKZ=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2017/mc_v3
 

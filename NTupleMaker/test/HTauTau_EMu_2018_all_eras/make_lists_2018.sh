@@ -1,7 +1,7 @@
 #!/bin/sh
 dirMuonEG=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2018/data/MuonEG/
 dirMC=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2018/mc/
-dirEmbedding=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2018/embedded/Embedding_emu
+dirEmbedding=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2018/embedded/Embedding_emu_v2
 
 
 ls $dirMuonEG/MuonEG_Run2018A-17Sep2018-v1/*root > MuonEG_Run2018A

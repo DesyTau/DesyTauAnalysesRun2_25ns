@@ -1,7 +1,7 @@
 #!/bin/sh
 dirData=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2016/data/Run2016-17Jul2018/MuonEG
 dirMC=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2016/mc/
-dirEmbedded=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2016/embedded/Embedding_emu/
+dirEmbedded=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2016/embedded/Embedding_emu_v2/
 dirMC_v2=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2016/mc_v2/
 dirMC_v3=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2016/mc_v3/
 

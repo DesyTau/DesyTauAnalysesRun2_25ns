@@ -1887,9 +1887,8 @@ int main(int argc, char * argv[]) {
          }
          
          for(auto &uncert : uncertainty_map){
-            //bool is_data_or_embedded = isData || (isEmbedded && !uncert.first.Contains("escale") && !uncert.first.Contains("ereso"));
-             bool is_data_or_embedded = isData || isEmbedded;
-
+            bool is_data_or_embedded = isData || (isEmbedded && !uncert.first.Contains("escale") && !uncert.first.Contains("ereso"));
+            
             propagate_uncertainty( uncert.first,
                                    uncert.second.metLV, covMET, inputFile_visPtResolution,
                                    uncert.second.muonLV,
