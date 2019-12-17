@@ -1263,12 +1263,21 @@ int main(int argc, char * argv[]){
       	  else if (otree->tau_decay_mode_2 == 1)  shift_tes = shift_tes_lepfake_1p1p0; 
       	  else if (otree->tau_decay_mode_2 == 10) shift_tes = shift_tes_lepfake_3prong; 
       	}
-      	correctTauES(tauLV, metLV, shift_tes, isOneProng);	    
-      	otree->pt_2 = tauLV.Pt();
-      	otree->m_2 = tauLV.M();
-      	otree->met = metLV.Pt();
-      	otree->metphi = metLV.Phi();
-       }
+	if (usePuppiMET) {
+	  correctTauES(tauLV, puppimetLV, shift_tes, isOneProng);	    
+	  otree->pt_2 = tauLV.Pt();
+	  otree->m_2 = tauLV.M();
+	  otree->puppimet = puppimetLV.Pt();
+	  otree->puppimetphi = puppimetLV.Phi();
+	}
+	else {
+	  correctTauES(tauLV,metLV,shift_tes, isOneProng);
+	  otree->pt_2 = tauLV.Pt();
+          otree->m_2 = tauLV.M();
+	  otree->met = metLV.Pt();
+	  otree->metphi = metLV.Phi();
+	}
+      }
     
       // if (!isData) {
       // 	if(otree->gen_match_2 == 5 && tauLV.E() <= 400 && tauLV.E() >= 20){
@@ -1292,10 +1301,14 @@ int main(int argc, char * argv[]){
       TLorentzVector dileptonLV = leptonLV + tauLV;
       otree->m_vis = dileptonLV.M();
       otree->pt_tt = (dileptonLV+metLV).Pt();   
+      if (usePuppiMET)
+	otree->pt_tt = (dileptonLV+puppimetLV).Pt();
     
       // mt TOT
-      float mtTOT = 2*(otree->pt_1)*metLV.Pt()*(1-cos(DeltaPhi(leptonLV,metLV)));
-      mtTOT += 2*(otree->pt_2)*metLV.Pt()*(1-cos(DeltaPhi(tauLV,metLV))); 
+      TLorentzVector metxLV = metLV;
+      if (usePuppiMET) metxLV = puppimetLV;
+      float mtTOT = 2*(otree->pt_1)*metxLV.Pt()*(1-cos(DeltaPhi(leptonLV,metxLV)));
+      mtTOT += 2*(otree->pt_2)*metxLV.Pt()*(1-cos(DeltaPhi(tauLV,metxLV))); 
       mtTOT += 2*(otree->pt_1)*(otree->pt_2)*(1-cos(DeltaPhi(leptonLV,tauLV))); 
       otree->mt_tot = TMath::Sqrt(mtTOT);
     
