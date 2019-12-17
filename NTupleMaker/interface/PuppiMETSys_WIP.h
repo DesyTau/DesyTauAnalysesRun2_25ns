@@ -2,6 +2,10 @@
 #define PuppiMETSys_h
 
 #include "DesyTauAnalyses/NTupleMaker/interface/METSys_WIP.h"
+#include "HTT-utilities/RecoilCorrections_KIT/interface/MEtSys.h"
+#include "DesyTauAnalyses/NTupleMaker/interface/functions.h"
+
+using namespace kit;
 
 class PuppiMETSys : public METSys {
 
@@ -12,6 +16,9 @@ class PuppiMETSys : public METSys {
     label = "CMS_met_"+name+"_13TeV";
     this->Init(cenTree);
   };
+  void SetMEtSys(kit::MEtSys * sys) {
+    metSys = sys;
+  };
   virtual void Eval(utils::channel ch = utils::UNKNOWN) {
     this->Central();
     this->ScaleUp();
@@ -21,6 +28,8 @@ class PuppiMETSys : public METSys {
   virtual ~PuppiMETSys(){};
 
  protected:
+
+  kit::MEtSys * metSys;
 
   virtual void Central() {};
   virtual void ScaleDown() {
@@ -34,12 +43,42 @@ class PuppiMETSys : public METSys {
       obs.metx = analysisTree->puppimet_ex_JetResDown;
       obs.mety = analysisTree->puppimet_ey_JetResDown;
       uncertaintyFound = true;
-   }    
+    }    
     else if (label.Contains("JetEn")) {
       obs.metx = analysisTree->puppimet_ex_JetEnDown;
       obs.mety = analysisTree->puppimet_ey_JetEnDown;
       uncertaintyFound = true;
-   }    
+    }    
+    else if (label.Contains("boson")) {
+      int nj = 0;
+      int systype = 0;
+      if (label.Contains("1jet")) nj=1;
+      else if (label.Contains("2jet")) nj=2;
+      if (label.Contains("response"))
+	systype = MEtSys::SysType::Response;
+      else if (label.Contains("resolution"))
+	systype = MEtSys::SysType::Resolution;
+      if (cenTree->njets==nj) {
+	TLorentzVector genV = genTools::genV(*analysisTree);
+	TLorentzVector genL = genTools::genL(*analysisTree);
+	metSys->ApplyMEtSys(analysisTree->puppimet_ex,
+			    analysisTree->puppimet_ey,
+			    genV.Px(),
+			    genV.Py(),
+			    genL.Px(),
+			    genL.Py(),
+			    cenTree->njets,
+			    systype,
+			    MEtSys::SysShift::Down,
+			    obs.metx,
+			    obs.mety);
+      }
+      else {
+	obs.metx = analysisTree->puppimet_ex;
+	obs.mety = analysisTree->puppimet_ey;
+      }
+      uncertaintyFound = true;
+    }
     else {
       std::cout << "Systematic uncertainty " << label << std::endl;
       obs.met = cenTree->met;
@@ -56,7 +95,7 @@ class PuppiMETSys : public METSys {
     }
     FillPuppiMET("Down");
   };
-
+  
   virtual void ScaleUp() {
     bool uncertaintyFound = false;
     if (label.Contains("UnclusteredEn")) {
@@ -74,6 +113,36 @@ class PuppiMETSys : public METSys {
       obs.mety = analysisTree->puppimet_ey_JetEnUp;
       uncertaintyFound = true;
    }    
+    else if (label.Contains("boson")) {
+      int nj = 0;
+      int systype = 0;
+      if (label.Contains("1jet")) nj=1;
+      else if (label.Contains("2jet")) nj=2;
+      if (label.Contains("response"))
+	systype = MEtSys::SysType::Response;
+      else if (label.Contains("resolution"))
+	systype = MEtSys::SysType::Resolution;
+      if (cenTree->njets==nj) {
+	TLorentzVector genV = genTools::genV(*analysisTree);
+	TLorentzVector genL = genTools::genL(*analysisTree);
+	metSys->ApplyMEtSys(analysisTree->puppimet_ex,
+			    analysisTree->puppimet_ey,
+			    genV.Px(),
+			    genV.Py(),
+			    genL.Px(),
+			    genL.Py(),
+			    cenTree->njets,
+			    systype,
+			    MEtSys::SysShift::Up,
+			    obs.metx,
+			    obs.mety);
+      }
+      else {
+	obs.metx = analysisTree->puppimet_ex;
+	obs.mety = analysisTree->puppimet_ey;
+      }
+      uncertaintyFound = true;
+    }
     else {
       std::cout << "Systematic uncertainty " << label << std::endl;
       obs.met = cenTree->met;

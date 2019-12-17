@@ -41,7 +41,7 @@
 #include "DesyTauAnalyses/NTupleMaker/interface/leptau_jets_WIP.h"
 #include "HTT-utilities/LepEffInterface/interface/ScaleFactor.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/PileUp.h"
-#include "HTT-utilities/RecoilCorrections/interface/RecoilCorrector.h"
+#include "HTT-utilities/RecoilCorrections_KIT/interface/RecoilCorrector.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/functionsSynch2017.h"
 
 
@@ -67,6 +67,7 @@
 
 //#include "DesyTauAnalyses/NTupleMaker/interface/ImpactParameter.h"
 #include "HiggsCPinTauDecays/ImpactParameter/interface/ImpactParameter.h"
+#include "HTT-utilities/RecoilCorrections_KIT/interface/MEtSys.h"
 
 #define pi   3.14159265358979312
 #define d2r  1.74532925199432955e-02
@@ -234,10 +235,10 @@ int main(int argc, char * argv[]){
   if(isTauSpinner) applyTauSpinnerWeights = true;
   const bool isEmbedded = infiles.find("Embed") != string::npos;
 
-  const bool ApplyRecoilCorrections = cfg.get<bool>("ApplyRecoilCorrections") && !isData && (isDY || isWJets || isVBForGGHiggs || isMSSMsignal);
-  RecoilCorrector recoilPFMetCorrector(cfg.get<string>("RecoilFilePath"));
+  const bool ApplyRecoilCorrections = cfg.get<bool>("ApplyRecoilCorrections") && !isEmbedded && !isData && (isDY || isWJets || isVBForGGHiggs || isMSSMsignal);
+  kit::RecoilCorrector recoilCorrector(cfg.get<string>("RecoilFilePath"));
+  kit::MEtSys MetSys(cfg.get<string>("RecoilSysFilePath"));
 
-  std::cout << "Hey ya 1 " << std::endl;
   
   // tau cuts
   const float ptTauLowCut    = cfg.get<float>("ptTauLowCut");
@@ -449,7 +450,13 @@ int main(int argc, char * argv[]){
   std::vector<JetEnergyScaleSys*> jetEnergyScaleSys;
   JESUncertainties * jecUncertainties = 0;
 
-  std::vector<TString> metSysNames = {"UnclusteredEn","JetEn","JetRes"};
+  std::vector<TString> metSysNames = {"UnclusteredEn"};
+  std::vector<TString> recoilSysNames = {"boson_resolution_0jet",
+					 "boson_resolution_1jet",
+					 "boson_resolution_2jet",
+					 "boson_response_0jet",
+					 "boson_response_1jet",
+					 "boson_response_2jet"};
   std::vector<PFMETSys*> metSys;
   std::vector<PuppiMETSys*> puppiMetSys;
 
@@ -462,11 +469,22 @@ int main(int argc, char * argv[]){
     if (!isEmbedded) {
       zPtWeightSys = new ZPtWeightSys(otree);
       topPtWeightSys = new TopPtWeightSys(otree);
-      for (unsigned int i = 0; i<metSysNames.size(); ++i) {
-	if (usePuppiMET)
-	  puppiMetSys.push_back(new PuppiMETSys(otree,metSysNames[i]));
-	else
-	  metSys.push_back(new PFMETSys(otree,metSysNames[i]));
+      if (ApplyRecoilCorrections) {
+	if (usePuppiMET) {
+	  for (unsigned int i = 0; i < recoilSysNames.size(); ++i) {
+	    PuppiMETSys * puppiMetRecoilSys = new PuppiMETSys(otree,recoilSysNames[i]);
+	    puppiMetRecoilSys->SetMEtSys(&MetSys);
+	    puppiMetSys.push_back(puppiMetRecoilSys);
+	  }
+	}
+      }
+      else {
+	for (unsigned int i = 0; i<metSysNames.size(); ++i) {
+	  if (usePuppiMET)
+	    puppiMetSys.push_back(new PuppiMETSys(otree,metSysNames[i]));
+	  else
+	    metSys.push_back(new PFMETSys(otree,metSysNames[i]));
+	}
       }
       if (cfg.get<bool>("splitJES")){
 	JESUncertainties *jecUncertainties;
@@ -1097,12 +1115,12 @@ int main(int argc, char * argv[]){
       	}
       }
     
-      cout << "\n======================" << endl;
-      cout << "Trigger weight = " << otree->trigweight << endl;
-      cout << "Trk eff weight = " << otree->trkeffweight << endl;
-      cout << "id/Iso 1       = " << otree->idisoweight_1 << endl;
-      cout << "id/Iso 2       = " << otree->idisoweight_2 << endl;
-      cout << "======================\n" << endl;
+      //      cout << "\n======================" << endl;
+      //      cout << "Trigger weight = " << otree->trigweight << endl;
+      //      cout << "Trk eff weight = " << otree->trkeffweight << endl;
+      //      cout << "id/Iso 1       = " << otree->idisoweight_1 << endl;
+      //      cout << "id/Iso 2       = " << otree->idisoweight_2 << endl;
+      //      cout << "======================\n" << endl;
 
       otree->effweight = otree->idisoweight_1 * otree->trkeffweight * otree->idisoweight_2 * otree->trigweight;
       otree->weight = otree->effweight * otree->puweight * otree->mcweight; 
@@ -1187,8 +1205,8 @@ int main(int argc, char * argv[]){
       otree->puppimetcov10 = analysisTree.puppimet_sigyx;
       otree->puppimetcov11 = analysisTree.puppimet_sigyy;
 
-      otree->met_uncorr = otree->met;
-      otree->metphi_uncorr = otree->metphi;
+      otree->met_uncorr = otree->puppimet;
+      otree->metphi_uncorr = otree->puppimetphi;
       otree->njetshad = otree->njets;
       if (isWJets) otree->njetshad += 1;
 
@@ -1196,8 +1214,8 @@ int main(int argc, char * argv[]){
       	genV = genTools::genV(analysisTree);
       	genL = genTools::genL(analysisTree);
 
-        genTools::RecoilCorrections( recoilPFMetCorrector, ApplyRecoilCorrections, // pass the value != 0 to apply corrections
-          otree->met, otree->metphi,
+        genTools::KITRecoilCorrections( recoilCorrector, ApplyRecoilCorrections, // pass the value != 0 to apply corrections
+          otree->puppimet, otree->puppimetphi,
           genV.Px(), genV.Py(),
           genL.Px(), genL.Py(),
           otree->njetshad,
@@ -1205,8 +1223,8 @@ int main(int argc, char * argv[]){
         );
         
         // overwriting with recoil-corrected values 
-        otree->met = otree->met_rcmr;
-        otree->metphi = otree->metphi_rcmr;   
+        otree->puppimet = otree->met_rcmr;
+        otree->puppimetphi = otree->metphi_rcmr;   
       }
       
       //ditau sytem
@@ -1344,8 +1362,8 @@ int main(int argc, char * argv[]){
 	  (puppiMetSys.at(i))->Eval();
       }
       if (ApplySystShift) {
-	if (ch == "mt") tauScaleSys->Eval(utils::MUTAU);
-	else if (ch == "et") tauScaleSys->Eval(utils::ETAU);
+	//	if (ch == "mt") tauScaleSys->Eval(utils::MUTAU);
+	//	else if (ch == "et") tauScaleSys->Eval(utils::ETAU);
       }
       counter[19]++;  
     
@@ -1356,6 +1374,17 @@ int main(int argc, char * argv[]){
       acott_Impr(&analysisTree, otree, leptonIndex, tauIndex, ch);
       selEvents++;
     
+      otree->v_tracks = 0;
+      for(unsigned int i = 0; i < analysisTree.refitvertexwithbs_count; i++)
+        {
+          if( (leptonIndex == analysisTree.refitvertexwithbs_muIndex[i][0] || leptonIndex == analysisTree.refitvertexwithbs_muIndex[i][1]) &&
+              (tauIndex == analysisTree.refitvertexwithbs_tauIndex[i][0] || tauIndex == analysisTree.refitvertexwithbs_tauIndex[i][1]))
+            {
+              otree->v_tracks = analysisTree.refitvertexwithbs_ntracks[i];
+            }
+        }
+
+
       //Merijn 2019 1 10: perhaps this should be called before moving to next event..
       otree->Fill();
     } // event loop
