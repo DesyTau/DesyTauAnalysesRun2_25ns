@@ -59,7 +59,8 @@ echo "CONFIGFILE,FILELIST" > parameters.txt
 #EWK
 ../split_filelist.sh  analysisMacroSynch_em_W.conf EWKWMinus2Jet 5
 ../split_filelist.sh  analysisMacroSynch_em_W.conf EWKWPlus2Jets 5
-../split_filelist.sh  analysisMacroSynch_em_DY.conf EWKZ2Jets  5
+../split_filelist.sh  analysisMacroSynch_em_DY.conf EWKZ2Jets_ZToLL  5
+../split_filelist.sh  analysisMacroSynch_em_DY.conf EWKZ2Jets_ZToNuNu  5
 
 ../split_filelist.sh  analysisMacroSynch_em_Embedded.conf Embedding_Run2016  1
 

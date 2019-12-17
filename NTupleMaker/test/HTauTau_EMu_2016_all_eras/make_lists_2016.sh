@@ -57,12 +57,12 @@ ls $dirMC/EWKWMinus2Jets_WToLNu_M-50_13TeV-madgraph-pythia8_ext2/*root >> EWKWMi
 ls $dirMC/EWKWPlus2Jets_WToLNu_M-50_13TeV-madgraph-pythia8/*root > EWKWPlus2Jets
 ls $dirMC/EWKWPlus2Jets_WToLNu_M-50_13TeV-madgraph-pythia8_ext1/*root >> EWKWPlus2Jets
 ls $dirMC/EWKWPlus2Jets_WToLNu_M-50_13TeV-madgraph-pythia8_ext2/*root >> EWKWPlus2Jets
-ls $dirMC/EWKZ2Jets_ZToLL_M-50_13TeV-madgraph-pythia8//*root > EWKZ2Jets
-ls $dirMC/EWKZ2Jets_ZToLL_M-50_13TeV-madgraph-pythia8_ext1/*root >> EWKZ2Jets
-ls $dirMC/EWKZ2Jets_ZToLL_M-50_13TeV-madgraph-pythia8_ext2/*root >> EWKZ2Jets
-ls $dirMC/EWKZ2Jets_ZToNuNu_13TeV-madgraph-pythia8/*root >> EWKZ2Jets
-ls $dirMC/EWKZ2Jets_ZToNuNu_13TeV-madgraph-pythia8_ext1/*root >> EWKZ2Jets
-ls $dirMC/EWKZ2Jets_ZToNuNu_13TeV-madgraph-pythia8_ext2/*root >> EWKZ2Jets
+ls $dirMC/EWKZ2Jets_ZToLL_M-50_13TeV-madgraph-pythia8//*root > EWKZ2Jets_ZToLL
+ls $dirMC/EWKZ2Jets_ZToLL_M-50_13TeV-madgraph-pythia8_ext1/*root >> EWKZ2Jets_ZToLL
+ls $dirMC/EWKZ2Jets_ZToLL_M-50_13TeV-madgraph-pythia8_ext2/*root >> EWKZ2Jets_ZToLL
+ls $dirMC/EWKZ2Jets_ZToNuNu_13TeV-madgraph-pythia8/*root > EWKZ2Jets_ZToNuNu
+ls $dirMC/EWKZ2Jets_ZToNuNu_13TeV-madgraph-pythia8_ext1/*root >> EWKZ2Jets_ZToNuNu
+ls $dirMC/EWKZ2Jets_ZToNuNu_13TeV-madgraph-pythia8_ext2/*root >> EWKZ2Jets_ZToNuNu
 
 ls $dirMC/WGToLNuG_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_ext1/*root > WGToLNuG
 ls $dirMC/WGToLNuG_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_ext2/*root >> WGToLNuG
