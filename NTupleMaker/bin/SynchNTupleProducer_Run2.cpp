@@ -1392,7 +1392,7 @@ int main(int argc, char * argv[]){
       //one should note that in et or mt case,
       acott_Impr(&analysisTree, otree, leptonIndex, tauIndex, ch);
       selEvents++;
-    
+      /*
       otree->v_tracks = 0;
       for(unsigned int i = 0; i < analysisTree.refitvertexwithbs_count; i++)
         {
@@ -1402,7 +1402,7 @@ int main(int argc, char * argv[]){
               otree->v_tracks = analysisTree.refitvertexwithbs_ntracks[i];
             }
         }
-
+      */
 
       //Merijn 2019 1 10: perhaps this should be called before moving to next event..
       otree->Fill();
