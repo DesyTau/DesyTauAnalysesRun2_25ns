@@ -1356,12 +1356,18 @@ int main(int argc, char * argv[]){
     
       // svfit variables
       otree->m_sv   = -10;
-      otree->pt_sv  = -9999;
-      otree->eta_sv = -9999;
-      otree->phi_sv = -9999;
-      otree->met_sv = -9999;
-      otree->mt_sv = -9999;
-      if (ApplySVFit && otree->njetspt20 > 0) svfit_variables(ch, &analysisTree, otree, &cfg, inputFile_visPtResolution);
+      otree->pt_sv  = -10;
+      otree->eta_sv = -10;
+      otree->phi_sv = -10;
+      otree->met_sv = -10;
+      otree->mt_sv = -10;
+      bool isSRevent = true; //boolean used to compute SVFit variables only on SR events, it is set to true when running Synchronization to run SVFit on all events
+      if(!Synch){
+	isSRevent = (otree->njetspt20>0 && otree->dilepton_veto<0.5 &&  otree->extramuon_veto<0.5 && otree->extraelec_veto<0.5 && (otree->trg_singlemuon>0.5 || otree->trg_mutaucross>0.5) && otree->pt_1>20 && otree->pt_2>30 );
+	if(usePuppiMET) isSRevent = isSRevent && otree->puppimt_1<50;
+	else isSRevent = isSRevent && otree->mt_1<50;
+      }
+      if (ApplySVFit && isSRevent) svfit_variables(ch, &analysisTree, otree, &cfg, inputFile_visPtResolution);
         
       // evaluate systematics for MC 
       if( !isData && !isEmbedded && ApplySystShift){
