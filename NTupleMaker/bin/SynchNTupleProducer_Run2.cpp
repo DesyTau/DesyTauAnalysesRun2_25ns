@@ -230,6 +230,7 @@ int main(int argc, char * argv[]){
   const bool isMG = infiles.find("madgraph") != string::npos;
   const bool isMSSMsignal =  (infiles.find("SUSYGluGluToHToTauTau")== infiles.rfind("/")+1) || (infiles.find("SUSYGluGluToBBHToTauTau")== infiles.rfind("/")+1);
   const bool isTauSpinner = infiles.find("Uncorr") != string::npos;
+  const bool isTTbar = infiles.find("TT") != string::npos;
 
   bool applyTauSpinnerWeights = false;
   if(isTauSpinner) applyTauSpinnerWeights = true;
@@ -744,11 +745,11 @@ int main(int argc, char * argv[]){
       	}
       }
     
-      if (overlapEvent && checkOverlap) continue;
-      nonOverlap++;
-      counter[2]++;
+      //      if (overlapEvent && checkOverlap) continue;
+      //      nonOverlap++;
+      //      counter[2]++;
     
-      if (isData && !isEmbedded && !isGoodLumi(otree->run, otree->lumi, json))
+      if ((isData || isEmbedded) && !isGoodLumi(otree->run, otree->lumi, json))
       	continue;
     
       initializeGenTree(gentree);
@@ -1363,26 +1364,40 @@ int main(int argc, char * argv[]){
       otree->mt_sv = -10;
       bool isSRevent = true; //boolean used to compute SVFit variables only on SR events, it is set to true when running Synchronization to run SVFit on all events
       if(!Synch){
-	isSRevent = (otree->njetspt20>0 && otree->dilepton_veto<0.5 &&  otree->extramuon_veto<0.5 && otree->extraelec_veto<0.5 && (otree->trg_singlemuon>0.5 || otree->trg_mutaucross>0.5) && otree->pt_1>20 && otree->pt_2>30 );
-	if(usePuppiMET) isSRevent = isSRevent && otree->puppimt_1<50;
-	else isSRevent = isSRevent && otree->mt_1<50;
+	isSRevent = (otree->dilepton_veto<0.5 &&  otree->extramuon_veto<0.5 && otree->extraelec_veto<0.5 && (otree->trg_singlemuon>0.5 || otree->trg_mutaucross>0.5) && otree->pt_1>17 && otree->pt_2>25 && otree->byVVVLooseDeepTau2017v2p1VSjet_2>0.5);
+	if(usePuppiMET) isSRevent = isSRevent && otree->puppimt_1<60;
+	else isSRevent = isSRevent && otree->mt_1<60;
       }
+    /*
+    if (!isSRevent) { 
+      cout << "                                        " << endl;
+      cout << "========================================" << endl;
+      cout << "        Event is not selected           " << endl;
+      cout << "========================================" << endl;
+      cout << "                                        " << endl;
+    }
+    */
+      if (!isSRevent && ApplySystShift) continue;
       if (ApplySVFit && isSRevent) svfit_variables(ch, &analysisTree, otree, &cfg, inputFile_visPtResolution);
         
       // evaluate systematics for MC 
       if( !isData && !isEmbedded && ApplySystShift){
-	zPtWeightSys->Eval(); 
-	topPtWeightSys->Eval();
+	if (isDY) zPtWeightSys->Eval(); 
+	if (isTTbar) topPtWeightSys->Eval();
 	for(unsigned int i = 0; i < jetEnergyScaleSys.size(); i++)
 	  (jetEnergyScaleSys.at(i))->Eval(); 
-	for(unsigned int i = 0; i < metSys.size(); ++i) 
-	  (metSys.at(i))->Eval();
-	for(unsigned int i = 0; i < puppiMetSys.size(); ++i)
-	  (puppiMetSys.at(i))->Eval();
+	if (usePuppiMET) {
+	  for(unsigned int i = 0; i < puppiMetSys.size(); ++i)
+	    (puppiMetSys.at(i))->Eval();
+	}
+	else {
+	  for(unsigned int i = 0; i < metSys.size(); ++i) 
+	    (metSys.at(i))->Eval();
+	}
       }
-      if (ApplySystShift) {
-	//	if (ch == "mt") tauScaleSys->Eval(utils::MUTAU);
-	//	else if (ch == "et") tauScaleSys->Eval(utils::ETAU);
+      if (!isData && ApplySystShift) {
+	if (ch == "mt") tauScaleSys->Eval(utils::MUTAU);
+	else if (ch == "et") tauScaleSys->Eval(utils::ETAU);
       }
       counter[19]++;  
     
