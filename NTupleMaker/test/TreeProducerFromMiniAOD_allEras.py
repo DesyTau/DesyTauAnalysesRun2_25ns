@@ -284,6 +284,19 @@ HLTlist = cms.untracked.vstring(
 'HLT_DoubleTightChargedIsoPFTau35_Trk1_TightID_eta2p1_Reg_v',
 'HLT_DoubleMediumChargedIsoPFTau40_Trk1_TightID_eta2p1_Reg_v',
 'HLT_DoubleTightChargedIsoPFTau40_Trk1_eta2p1_Reg_v',
+'HLT_DoubleMediumChargedIsoPFTau40_Trk1_TightID_eta2p1_Reg_v', #2018                                                                           
+'HLT_DoubleTightChargedIsoPFTau40_Trk1_eta2p1_Reg_v', #2018                                                                                    
+'HLT_DoubleTightChargedIsoPFTau35_Trk1_TightID_eta2p1_Reg_v', #2018                                                                            
+'HLT_DoubleTightChargedIsoPFTauHPS40_Trk1_eta2p1_Reg_v', #2018                                                                                 
+'HLT_DoubleTightChargedIsoPFTau35_Trk1_TightID_eta2p1_Reg_v',  #2018 embed                                                                     
+'HLT_DoubleMediumChargedIsoPFTau40_Trk1_TightID_eta2p1_Reg_v', #2018 embed                                                                     
+'HLT_DoubleTightChargedIsoPFTau40_Trk1_eta2p1_Reg_v', #2018 embed                                                                              
+'HLT_DoubleMediumChargedIsoPFTauHPS35_Trk1_eta2p1_Reg_v', #2018 embed                                                                          
+'HLT_DoubleTightChargedIsoPFTau35_Trk1_TightID_eta2p1_Reg_v', #2017 embed                                                                      
+'HLT_DoubleMediumChargedIsoPFTau40_Trk1_TightID_eta2p1_Reg_v', #2017 embed                                                                     
+'HLT_DoubleTightChargedIsoPFTau40_Trk1_eta2p1_Reg_v', #2017 embed                                                                              
+'HLT_DoubleMediumIsoPFTau35_Trk1_eta2p1_Reg_v', #2016 embed                 
+
 # Single tau triggers
 'HLT_MediumChargedIsoPFTau180HighPtRelaxedIso_Trk50_eta2p1_v',
 'HLT_MediumChargedIsoPFTau180HighPtRelaxedIso_Trk50_eta2p1_1pr_v',
@@ -456,6 +469,18 @@ tau_hlt_filters = cms.untracked.vstring(
     'HLT_IsoMu20_eta2p1_LooseChargedIsoPFTauHPS27_eta2p1_TightID_CrossL1_v.*:hltHpsSelectedPFTau27LooseChargedIsolationTightOOSCPhotonsAgainstMuonL1HLTMatched',
     'HLT_Ele24_eta2p1_WPTight_Gsf_LooseChargedIsoPFTauHPS30_eta2p1_CrossL1_v.*:hltEle24erWPTightGsfTrackIsoFilterForTau',
     'HLT_Ele24_eta2p1_WPTight_Gsf_LooseChargedIsoPFTauHPS30_eta2p1_TightID_CrossL1_v.*:hltEle24erWPTightGsfTrackIsoFilterForTau',
+    'HLT_DoubleMediumChargedIsoPFTau40_Trk1_TightID_eta2p1_Reg_v.*:hltDoublePFTau40TrackPt1MediumChargedIsolationAndTightOOSCPhotonsDz02Reg',#2018                                                                                                                                         
+    'HLT_DoubleTightChargedIsoPFTau40_Trk1_eta2p1_Reg_v.*:hltDoublePFTau40TrackPt1TightChargedIsolationDz02Reg', #2018                    
+    'HLT_DoubleTightChargedIsoPFTau35_Trk1_TightID_eta2p1_Reg_v.*:hltDoublePFTau35TrackPt1TightChargedIsolationAndTightOOSCPhotonsDz02Reg',#2018                                                                                                                                           
+    'HLT_DoubleTightChargedIsoPFTauHPS40_Trk1_eta2p1_Reg_v.*:hltHpsDoublePFTau40TrackPt1TightChargedIsolationDz02Reg', #2018                   
+    'HLT_DoubleTightChargedIsoPFTau35_Trk1_TightID_eta2p1_Reg_v.*:hltDoubleL2IsoTau26eta2p2', #2018 embed                                      
+    'HLT_DoubleMediumChargedIsoPFTau40_Trk1_TightID_eta2p1_Reg_v.*:hltDoubleL2IsoTau26eta2p2', #2018 embed                                     
+    'HLT_DoubleTightChargedIsoPFTau40_Trk1_eta2p1_Reg_v.*:hltDoubleL2IsoTau26eta2p2', #2018 embed                                              
+    'HLT_DoubleMediumChargedIsoPFTauHPS35_Trk1_eta2p1_Reg_v.*:hltDoubleL2IsoTau26eta2p2', #2018 embed                                          
+    'HLT_DoubleTightChargedIsoPFTau35_Trk1_TightID_eta2p1_Reg_v.*:hltDoubleL2IsoTau26eta2p2', #2017 embed                                      
+    'HLT_DoubleMediumChargedIsoPFTau40_Trk1_TightID_eta2p1_Reg_v.*:hltDoubleL2IsoTau26eta2p2', #2017 embed                                     
+    'HLT_DoubleTightChargedIsoPFTau40_Trk1_eta2p1_Reg_v.*:hltDoubleL2IsoTau26eta2p2', #2017 embed                                              
+    'HLT_DoubleMediumIsoPFTau35_Trk1_eta2p1_Reg_v.*:hltDoublePFTau35Reg', #2016 embed           
     )
 if isEmbedded:
     tau_hlt_filters +=cms.untracked.vstring(
