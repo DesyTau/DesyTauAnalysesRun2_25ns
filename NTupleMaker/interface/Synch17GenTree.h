@@ -4,7 +4,7 @@
 // 
 // Based on Spring15Tree by Francesco Costanza
 
-//Merijn added some changes <merijn.van.de.klundert@desy.de>
+//Merijn added changes and tauspinner weights.. <merijn.van.de.klundert@desy.de>
 //////////////////////////////////////////////////////////
 
 #ifndef Synch17GenTree_h
@@ -14,8 +14,11 @@
 #include <TChain.h>
 #include <TFile.h>
 
-// Header file for the classes stored in the TTree if any.
+//We´ll store for now 5 CP mixing scenarios: "sm_htt125", "ps_htt125", "mm_htt125" "minusmm_htt125", "mix0p375_htt125". Names chose to stay somewhat consistent with choices IC in the CH branch
+#include <vector>
+#include <string>
 
+// Header file for the classes stored in the TTree if any.
 // Fixed size dimensions of array or collections stored in the TTree if any.
 
 class Synch17GenTree {
@@ -84,7 +87,12 @@ public :
   Float_t VzConstitTau2;
   
   Float_t alphaminus;
-
+  //tauspinner weights
+  Double_t sm_htt125;
+  Double_t ps_htt125;
+  Double_t mm_htt125;
+  Double_t minusmm_htt125;
+  Double_t mix0p375_htt125;
 
   //////////////////////////////////////////////
   //            List of branches              //
@@ -143,6 +151,12 @@ public :
   TBranch        *b_VyConstitTau2;
   TBranch        *b_VzConstitTau2;
   TBranch        *b_alphaminus;
+
+  TBranch        *b_sm_htt125;
+  TBranch        *b_ps_htt125;
+  TBranch        *b_mm_htt125;
+  TBranch        *b_minusmm_htt125;
+  TBranch        *b_mix0p375_htt125;
 
   Synch17GenTree(TTree *tree=0);
   virtual ~Synch17GenTree();

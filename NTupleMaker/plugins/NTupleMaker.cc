@@ -33,6 +33,9 @@
 #include "DesyTauAnalyses/CandidateTools/interface/candidateAuxFunctions.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/idAlgos.h"
 
+//#include "ICTauSpinnerProducer.hh"
+
+
 #include <TString.h>
 #include <Compression.h>
 
@@ -119,6 +122,7 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
   crecprimvertexwithbs(iConfig.getUntrackedParameter<bool>("RecPrimVertexWithBS", false)),
   crefittedvertex(iConfig.getUntrackedParameter<bool>("RefittedVertex", false)),
   crefittedvertexwithbs(iConfig.getUntrackedParameter<bool>("RefittedVertexWithBS", false)),
+  crecTauSpinner(iConfig.getUntrackedParameter<bool>("ApplyTauSpinner", false)),
   crecmuon(iConfig.getUntrackedParameter<bool>("RecMuon", false)),
   crecelectron(iConfig.getUntrackedParameter<bool>("RecElectron", false)),
   crectau(iConfig.getUntrackedParameter<bool>("RecTau", false)),
@@ -134,6 +138,9 @@ NTupleMaker::NTupleMaker(const edm::ParameterSet& iConfig) :
   // triggers
   cHLTriggerPaths(iConfig.getUntrackedParameter<vector<string> >("HLTriggerPaths")),
   cTriggerProcess(iConfig.getUntrackedParameter<string>("TriggerProcess", "HLT")),
+  //TauSpinner
+  cTauSpinAngles(iConfig.getParameter<std::string>("TauSpinnerAngles")),
+  //cTSinput(iConfig.getUntrackedParameter<edm::InputTag>("TauSpinnerinput")),
 
   //Flags
   cFlags(iConfig.getUntrackedParameter<vector<string> >("Flags")),
@@ -1110,6 +1117,24 @@ void NTupleMaker::beginJob(){
       tree->Branch("genjets_auxiliary_energy", genjets_auxiliary_energy, "genjets_auxiliary_energy[genjets_count]/F");
     }
   }
+  // TauSpinner branches and definitions
+  if (crecTauSpinner) {
+    std::string TauSpinnerSettingsPDF="NNPDF30_nlo_as_0118";
+    bool Ipp=true;
+    int Ipol=0;
+    int nonSM2=0;
+    int nonSMN=0;
+    double CMSENE=13000.0;
+    
+    Tauolapp::Tauola::initialize();
+    LHAPDF::initPDFSetByName(TauSpinnerSettingsPDF);
+    TauSpinner::initialize_spinner(Ipp, Ipol, nonSM2, nonSMN,  CMSENE);
+    
+    tree->Branch("TauSpinAngles_count", &TauSpinAngles_count, "TauSpinAngles_count/i");
+    tree->Branch("TauSpinnerWeight", TauSpinnerWeight, "TauSpinnerWeight[TauSpinAngles_count]/D");
+
+  }
+
   // SUSY Info
   if (csusyinfo) {
     tree->Branch("SusyMotherMass",&SusyMotherMass,"SusyMotherMass/F");
@@ -1281,6 +1306,7 @@ void NTupleMaker::beginJob(){
 //http://www.boost.org/doc/libs/1_55_0/libs/regex/doc/html/boost_regex/introduction_and_overview.html
 void AddTriggerList(const edm::Run& run,
 		    const HLTConfigProvider& hltConfig,
+                    const std::vector<std::string> run_hltnames,
                     const std::vector<std::pair<boost::regex, std::string> >& regexes,
                     std::vector<std::pair<std::string, std::string> >& foundTriggers,
                     std::string& triggerNames   )
@@ -1298,8 +1324,21 @@ void AddTriggerList(const edm::Run& run,
       boost::cmatch what;
 
       if(boost::regex_match(hltConfig.triggerName(i), regexes[j].first))
-	//if(boost::regex_match(HLTConfiguration.triggerName(i).c_str(), what, muonregexes[j].first) && muontriggers.size() < 32)
 	{
+	  // NEW: Continue if trigger was not specified in the HLTriggerPaths in the TreeProducer
+	  // cout << "regexes[j].first = " << regexes[j].first << endl;
+	  // cout<<"regexes[j].second = "<<regexes[j].second<<endl;
+	  bool trigger_found = false;
+	  for(auto const& s:run_hltnames){
+	    if( boost::regex_match(s, regexes[j].first) ){
+              trigger_found = true;
+	    }
+	  }
+	  if(!trigger_found){
+	    // cout<< "TRIGGER not found in HLTlist in TreeProducer: " << regexes[j].first << endl;
+	    continue;
+	  }
+
 	  // Check for filter
 	  if(regexes[j].second.size() != 0)
 	      {
@@ -1485,11 +1524,11 @@ void NTupleMaker::beginRun(const edm::Run& iRun, const edm::EventSetup& iSetup)
   string allphotonnames;
   string alljetnames;
 
-  AddTriggerList(iRun, HLTConfiguration, muonregexes,     muontriggers,     allmuonnames);
-  AddTriggerList(iRun, HLTConfiguration, electronregexes, electrontriggers, allelectronnames);
-  AddTriggerList(iRun, HLTConfiguration, tauregexes,      tautriggers,      alltaunames);
-  AddTriggerList(iRun, HLTConfiguration, photonregexes,   photontriggers,   allphotonnames);
-  AddTriggerList(iRun, HLTConfiguration, jetregexes,      jettriggers,      alljetnames);
+  AddTriggerList(iRun, HLTConfiguration, cHLTriggerPaths, muonregexes,     muontriggers,     allmuonnames);
+  AddTriggerList(iRun, HLTConfiguration, cHLTriggerPaths, electronregexes, electrontriggers, allelectronnames);
+  AddTriggerList(iRun, HLTConfiguration, cHLTriggerPaths, tauregexes,      tautriggers,      alltaunames);
+  AddTriggerList(iRun, HLTConfiguration, cHLTriggerPaths, photonregexes,   photontriggers,   allphotonnames);
+  AddTriggerList(iRun, HLTConfiguration, cHLTriggerPaths, jetregexes,      jettriggers,      alljetnames);
 
 
   run_hltnames.clear();
@@ -2217,10 +2256,6 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     */
   }
 
-
-
-
-
   //l1EGammas, l1EGammaLabel  = Handle("BXVector<l1t::EGamma>"), "caloStage2Digis:EGamma";
 
   if (crecpfjet)
@@ -2560,6 +2595,17 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	    }
 	}
     } // cgen
+
+  if(crecTauSpinner&&cgen&&!cdata){
+
+    for(int i=0;i<M_tauspinneranglesmaxcount;i++)TauSpinnerWeight[i]=1.;
+    if(doDebug)  cout<<"add TauSpinner weights"<< endl;
+    //ICTauSpinnerProducer * TauSpinner = new ICTauSpinnerProducer(iSetup.get<>);
+    //TauSpinner->produce(iEvent,iSetup);
+    TauSpinAngles_count= GetTauSpinnerweights(iEvent,iSetup);
+  }
+
+
   if (ctrigger)
     {
       if(doDebug)  cout<<"add trigger info"<< endl;
@@ -4959,3 +5005,116 @@ LorentzVector NTupleMaker::GetShiftedMomentum(const pat::Tau& tau, double shift)
 
   return ShiftedTau;
 }
+
+reco::GenParticle NTupleMaker::getLastCopy(reco::GenParticle part, edm::Handle<reco::GenParticleCollection> parts_handle) {
+  reco::GenParticle last_part;
+  reco::GenStatusFlags  flags = part.statusFlags();
+  bool isLastCopy = flags.isLastCopy();
+
+  if (!isLastCopy) {
+    int pdgid = part.pdgId();
+    for (unsigned i = 0; i < part.daughterRefVector().size(); ++i) {
+      int daughter_index = static_cast<int>(part.daughterRefVector().at(i).key());
+      reco::GenParticle daughter = parts_handle->at(daughter_index);
+      int daughter_pdgid = daughter.pdgId();
+      if (daughter_pdgid==pdgid) last_part = getLastCopy(daughter, parts_handle);
+    }
+  }
+  else last_part =  part;
+  return last_part;
+}
+
+void NTupleMaker::getTauDaughters(std::vector<reco::GenParticle> &tau_daughters, unsigned &type, reco::GenParticle tau, edm::Handle<reco::GenParticleCollection> parts_handle){
+  for (unsigned i = 0; i < tau.daughterRefVector().size(); ++i) {
+    int daughter_index = static_cast<int>(tau.daughterRefVector().at(i).key());
+    reco::GenParticle daughter = parts_handle->at(daughter_index);
+    int daughter_pdgid = fabs(daughter.pdgId());
+    if(daughter_pdgid == 22 || daughter_pdgid == 111 || daughter_pdgid == 211 || daughter_pdgid == 321 || daughter_pdgid == 130 || daughter_pdgid == 310 || daughter_pdgid == 11 || daughter_pdgid == 12 || daughter_pdgid == 13 || daughter_pdgid == 14 || daughter_pdgid == 16){
+      if(daughter_pdgid == 11) type = 1;
+      if(daughter_pdgid == 13) type = 2;
+      tau_daughters.push_back(daughter);
+    }
+    else getTauDaughters(tau_daughters, type, daughter, parts_handle);
+  }
+}
+
+TauSpinner::SimpleParticle NTupleMaker::ConvertToSimplePart(reco::GenParticle input_part){
+  return TauSpinner::SimpleParticle(input_part.px(), input_part.py(), input_part.pz(), input_part.energy(), input_part.pdgId());
+}
+
+unsigned int  NTupleMaker::GetTauSpinnerweights(const edm::Event& event, const edm::EventSetup& setup) {
+
+
+  //std::vector<std::pair<std::string,double>>theta_vec_ = ICTauSpinnerProducer::SplitString(cTauSpinAngles);
+  std::vector<std::pair<std::string,double>> theta_vec_;
+  std::stringstream ss(cTauSpinAngles);   
+  std::string splitstring;  
+  while(std::getline(ss, splitstring, ',')){
+    double val = std::stod(splitstring);
+    if(splitstring.find(".") != std::string::npos) splitstring.replace(splitstring.find("."),1,"p");
+    if(splitstring.find("-") != std::string::npos) splitstring.replace(splitstring.find("-"),1,"minus");
+    std::string weight_name = "wt_cp_"+splitstring;    
+    theta_vec_.push_back(std::make_pair(weight_name,val)); 
+  }
+
+  edm::Handle<reco::GenParticleCollection> parts_handle;
+  event.getByToken(GenParticleCollectionToken_, parts_handle);
+  
+  //reco::GenParticle boson = ICTauSpinnerProducer::getBoson(parts_handle);
+  reco::GenParticle boson;
+  bool foundBoson = false;
+  for (unsigned i = 0; i < parts_handle->size(); ++i) {
+    reco::GenParticle const& part = parts_handle->at(i);
+    bool isLastCopy = part.isLastCopy();
+    int part_pdgid = fabs(part.pdgId());
+    if (part_pdgid==25&&isLastCopy){
+        boson = part;
+        foundBoson = true;
+        break;
+    }
+  }
+  if(!foundBoson) {std::cout << "ICTauSpinnerProducer: Gen boson not found. Throwing exception." << std::endl; throw;}
+
+  //std::vector<reco::GenParticle> taus = ICTauSpinnerProducer::getTaus(boson,parts_handle);
+  std::vector<reco::GenParticle> taus;
+  unsigned nTaus=0;
+  for (unsigned i = 0; i < boson.daughterRefVector().size(); ++i) {
+    int daughter_index = static_cast<int>(boson.daughterRefVector().at(i).key());
+    reco::GenParticle daughter = parts_handle->at(daughter_index);
+    int daughter_pdgid = fabs(daughter.pdgId());
+    if (daughter_pdgid != 15) continue;
+    reco::GenParticle tau = NTupleMaker::getLastCopy(daughter, parts_handle);
+    taus.push_back(tau);
+    nTaus++;
+  }  
+
+  if(nTaus!=2) {std::cout << "ICTauSpinnerProducer: Found " << nTaus << " taus, expected 2. Throwing exception." << std::endl; throw;}
+
+  std::vector<reco::GenParticle> tau1_daughters;
+  std::vector<reco::GenParticle> tau2_daughters;
+  unsigned type1 = 0; 
+  unsigned type2 = 0;
+  NTupleMaker::getTauDaughters(tau1_daughters,type1,taus[0],parts_handle);  
+  NTupleMaker::getTauDaughters(tau2_daughters,type2,taus[1],parts_handle); 
+
+  TauSpinner::SimpleParticle simple_boson = NTupleMaker::ConvertToSimplePart(boson);
+  TauSpinner::SimpleParticle simple_tau1 = NTupleMaker::ConvertToSimplePart(taus[0]);
+  TauSpinner::SimpleParticle simple_tau2 = NTupleMaker::ConvertToSimplePart(taus[1]);
+  std::vector<TauSpinner::SimpleParticle> simple_tau1_daughters;
+  std::vector<TauSpinner::SimpleParticle> simple_tau2_daughters;
+  
+  for(unsigned i=0; i<tau1_daughters.size(); ++i) simple_tau1_daughters.push_back(NTupleMaker::ConvertToSimplePart(tau1_daughters[i]));
+  for(unsigned i=0; i<tau2_daughters.size(); ++i) simple_tau2_daughters.push_back(NTupleMaker::ConvertToSimplePart(tau2_daughters[i]));
+
+  for(unsigned i=0; i<theta_vec_.size(); ++i){
+    double theta_val_ = theta_vec_[i].second;
+    // Can make this more general by having boson pdgid as input or have option for set boson type
+    TauSpinner::setHiggsParametersTR(-cos(2*M_PI*theta_val_),cos(2*M_PI*theta_val_),-sin(2*M_PI*theta_val_),-sin(2*M_PI*theta_val_));
+    Double_t weight_ = TauSpinner::calculateWeightFromParticlesH(simple_boson,simple_tau1,simple_tau2,simple_tau1_daughters,simple_tau2_daughters); 
+   
+    TauSpinnerWeight[i]=weight_;	
+
+  }
+  return theta_vec_.size();
+}
+

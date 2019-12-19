@@ -8,7 +8,6 @@
 #include "CondFormats/BTauObjects/interface/BTagCalibration.h"
 #include "CondTools/BTau/interface/BTagCalibrationReader.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/JESUncertainties.h"
-//Merijn: add this header, it contains the definitions of tightjetid_2017 and loose_2016
 #include "DesyTauAnalyses/NTupleMaker/interface/Jets.h"
 
 struct btag_scaling_inputs{
@@ -23,32 +22,24 @@ struct btag_scaling_inputs{
 
 namespace jets{
 
-JESUncertainties * dummyJEC = 0;
-
 float get_jetPt(const AC1B *analysisTree, int jetIndex, TString JESname, TString direction, JESUncertainties * jecUncertainties){ // direction can be Up or Down
-
 	float jetPt = -9999;
 	float shift = 0.;
+  
 	// get the relative shift
-	if (JESname == "central")  { jetPt = analysisTree->pfjet_pt[jetIndex]; return jetPt;}
+	if (JESname == "central"){
+    jetPt = analysisTree->pfjet_pt[jetIndex];
+    return jetPt;
+  }
 	else if (JESname== "JES")  shift = analysisTree->pfjet_jecUncertainty[jetIndex];
 	else if (std::find(jecUncertainties->getUncertNames().begin(), jecUncertainties->getUncertNames().end(), JESname) != jecUncertainties->getUncertNames().end()) 
-		{
-         shift = jecUncertainties->getUncertainty(std::string(JESname), analysisTree->pfjet_pt[jetIndex],analysisTree->pfjet_eta[jetIndex]);
-		 // cout for debugging
-		 /*std::cout << "------------------------------------------------" << endl ;			    
-         std::cout << "in get jet pt -- " << " name: " << JESname ;			
- 	     std::cout << " pt of jet #" << jetIndex << " :: before correction = " <<  analysisTree->pfjet_pt[jetIndex] << std::endl ;
-		 std::cout << " shift  = " << shift << std::endl; */
-		}
-	// calculate shifted pt 
+      shift = jecUncertainties->getUncertainty(std::string(JESname), analysisTree->pfjet_pt[jetIndex],analysisTree->pfjet_eta[jetIndex]);
+	
+  // calculate shifted pt 
 	if (direction == "Up") jetPt = (analysisTree->pfjet_pt[jetIndex])*(1+shift);
 	else if (direction == "Down") jetPt = (analysisTree->pfjet_pt[jetIndex])*(1-shift);
-	//std::cout << " shifted by " << shift << " in direction" << direction << std::endl;
-    //std::cout << "------------------------------------------------" << endl ;			    
 	return jetPt;
 };
-
 
 float get_jetE(const AC1B *analysisTree, int jetIndex, TString JESname, TString direction, JESUncertainties * jecUncertainties){
 	float jetE = -9999;
@@ -65,22 +56,18 @@ float get_jetE(const AC1B *analysisTree, int jetIndex, TString JESname, TString 
 };
 
 
-//Merijn: made AC1B *analysisTree non-const, otherwise issues with calling functions from jets.h with analysisTree
-//2019 8 2 changed back again
-void counting_jets(const AC1B *analysisTree, Synch17Tree *otree, const Config *cfg, const btag_scaling_inputs *inputs_btag_scaling, TString JESname = "central", TString direction = "None",  JESUncertainties * jecUncertainties = dummyJEC){
+void counting_jets(const AC1B *analysisTree, Synch17Tree *otree, const Config *cfg, const btag_scaling_inputs *inputs_btag_scaling, 
+                   TString JESname = "central", TString direction = "None",  JESUncertainties * jecUncertainties = 0){
 
-  //Merijn 2019 6 7: define few things analogous to TM:
   float MaxBJetPt = 1000.;
   float MaxLJetPt = 1000.;
   float MinLJetPt = 20.;
-  float MinBJetPt = 20.; // !!!!!
-
-  //std::cout << "JESname: " << JESname << "| direction " << direction << std::endl;
+  float MinBJetPt = 20.;
 
   vector<unsigned int> jets; jets.clear();
   vector<unsigned int> jetspt20; jetspt20.clear();
   vector<unsigned int> bjets; bjets.clear();
-  vector<unsigned int> bjetsRaw; bjetsRaw.clear(); //Merijn 2019 6 7: add for reference
+  vector<unsigned int> bjetsRaw; bjetsRaw.clear();
  
   int indexLeadingJet = -1;
   float ptLeadingJet = -1;
@@ -96,292 +83,273 @@ void counting_jets(const AC1B *analysisTree, Synch17Tree *otree, const Config *c
 
   TH2F* histo_tageff_ = 0;
 
-  for (unsigned int jet=0; jet<analysisTree->pfjet_count; ++jet) {
+  bool isData = cfg->get<bool>("isData");
+  bool ApplyBTagScaling = cfg->get<bool>("ApplyBTagScaling");
 
+  bool is2017 = false;
+  int era = cfg->get<int>("era");
+  if(era == 2017) 
+    is2017 = true;
+  else if(era != 2016 && era != 2018) 
+    {cout<<"no proper era found in cfg file, exiting"<<endl; exit(-1);}
+
+  
+  const float JetEtaCut = cfg->get<float>("JetEtaCut");
+  const float JetPtLowCut = cfg->get<float>("JetPtLowCut");
+  const float JetPtHighCut = cfg->get<float>("JetPtHighCut");
+  const float dRJetLeptonCut = cfg->get<float>("dRJetLeptonCut");
+  const float bJetEtaCut = cfg->get<float>("bJetEtaCut");
+  const float btagCut = cfg->get<float>("btagCut");
+  const string BTagAlgorithm = cfg->get<string>("BTagAlgorithm");
+
+  TString BTagDiscriminator1 = (TString) cfg->get<string>("BTagDiscriminator1");
+  TString BTagDiscriminator2 = (TString) "None BTagDiscriminator2";
+  TString BTagDiscriminator3 = (TString) "None BTagDiscriminator3";
+  if(BTagAlgorithm == "DeepCSV" || BTagAlgorithm == "DeepFlavour")
+  BTagDiscriminator2 = (TString) cfg->get<string>("BTagDiscriminator2");
+  if(BTagAlgorithm == "DeepFlavour")
+  BTagDiscriminator3 = (TString) cfg->get<string>("BTagDiscriminator3");
+      
+  int nBTagDiscriminant1 = -1;
+  int nBTagDiscriminant2 = -1;
+  int nBTagDiscriminant3 = -1;
+  
+  for (unsigned int iBTag = 0; iBTag < analysisTree->run_btagdiscriminators->size(); ++iBTag) {
+    TString discr(analysisTree->run_btagdiscriminators->at(iBTag));          
+    if (discr == BTagDiscriminator1)
+      nBTagDiscriminant1 = iBTag;
+    if ((BTagAlgorithm == "DeepCSV" || BTagAlgorithm == "DeepFlavour") && discr == BTagDiscriminator2)
+      nBTagDiscriminant2 = iBTag;
+    if (BTagAlgorithm == "DeepFlavour" && discr == BTagDiscriminator3)
+      nBTagDiscriminant3 = iBTag;
+  }
+  
+  for (unsigned int jet = 0; jet < analysisTree->pfjet_count; ++jet) {
+    
     float jetEta    = analysisTree->pfjet_eta[jet];
     float absJetEta = fabs(analysisTree->pfjet_eta[jet]);
-    if (absJetEta>=cfg->get<float>("JetEtaCut")) continue;
-
-    //merijn: add eras, exit if no era found
-    bool is2016=false;
-    bool is2017=false;
-    bool is2018=false;
-    
-    //Merijn read in year, a.o. for prefiring issue
-    if(cfg->get<string>("era") == "2016") is2016=true;
-    else if(cfg->get<string>("era") == "2017") is2017=true;
-    else if(cfg->get<string>("era") == "2018") is2018=true;
-    else{cout<<"no era found in cfg file, exiting"<<endl; exit(0);}
-    
-    //float jetPt = analysisTree->pfjet_pt[jet];
+    if (absJetEta >= JetEtaCut) continue;
+  
     float jetPt = get_jetPt(analysisTree, jet, JESname, direction, jecUncertainties);
-    if (jetPt<=cfg->get<float>("JetPtLowCut")) continue;
+    if (jetPt <= JetPtLowCut) continue;
 
-    float dR1 = deltaR(analysisTree->pfjet_eta[jet],analysisTree->pfjet_phi[jet],otree->eta_1,otree->phi_1);
-    if (dR1<=cfg->get<float>("dRJetLeptonCut")) continue;
+    float dR1 = deltaR(analysisTree->pfjet_eta[jet], analysisTree->pfjet_phi[jet], otree->eta_1, otree->phi_1);
+    if (dR1 <= dRJetLeptonCut) continue;
 
-    float dR2 = deltaR(analysisTree->pfjet_eta[jet],analysisTree->pfjet_phi[jet],otree->eta_2,otree->phi_2);
-    if (dR2<=cfg->get<float>("dRJetLeptonCut")) continue;
+    float dR2 = deltaR(analysisTree->pfjet_eta[jet], analysisTree->pfjet_phi[jet], otree->eta_2, otree->phi_2);
+    if (dR2 <= dRJetLeptonCut) continue;
 
-    //Merijn: skip prefiring regoin 2017:
-    if(is2017&&jetPt < 50 && absJetEta > 2.65 && absJetEta < 3.139) continue; 
+    // skip prefiring region for 2017:
+    if(is2017 && jetPt < 50 && absJetEta > 2.65 && absJetEta < 3.139) continue; 
 
-    // jetId // ALSO PROPAGATED HERE?
-    /*
-    float energy = analysisTree->pfjet_e[jet];
-    energy *= analysisTree->pfjet_energycorr[jet];
-    float chf = analysisTree->pfjet_chargedhadronicenergy[jet]/energy;
-    float nhf = analysisTree->pfjet_neutralhadronicenergy[jet]/energy;
-    float phf = analysisTree->pfjet_neutralemenergy[jet]/energy;
-    float elf = analysisTree->pfjet_chargedemenergy[jet]/energy;
-    float muf = analysisTree->pfjet_muonenergy[jet]/energy;
-    float chm = analysisTree->pfjet_chargedmulti[jet];
-    float nm  = analysisTree->pfjet_neutralmulti[jet];
-    float npr = analysisTree->pfjet_chargedmulti[jet] + analysisTree->pfjet_neutralmulti[jet];
-    
-    bool isPFJetId = false;
-    if (absJetEta<=2.7)
-      isPFJetId = (nhf < 0.99 && phf < 0.99 && npr > 1) && (absJetEta>2.4 || (chf>0 && chm > 0 && elf < 0.99));
-    else if (absJetEta<=3.0)
-      isPFJetId = (phf < 0.9 && nm > 2);
-    else
-      isPFJetId = phf < 0.9 && nm > 10;
-    
-    if (!isPFJetId) continue;
-    */
-
-    //Merijn: update jetID requirements to definition in Jets.h:
-       
-    bool isPFJetId =false;
-    if (is2016) { isPFJetId= looseJetiD((*analysisTree),int(jet));}
-    else { isPFJetId = tightJetiD_2017((*analysisTree),int(jet));}
+    // see definition in Jets.h
+    bool isPFJetId = tightJetID((*analysisTree), int(jet), era);
     if (!isPFJetId) continue;
      
     jetspt20.push_back(jet);
 
-    if (absJetEta < cfg->get<float>("bJetEtaCut")) { // jet within b-tagging acceptance
-      
-      //  bool tagged = ( analysisTree->pfjet_btag[jet][0]>cfg->get<float>("btagCut") );
-      //Merijn 2019 6 7: updated to T/M definition
-      
-      const string bTagDiscriminator1 = cfg->get<string>("BTagDiscriminator1");
-      const string bTagDiscriminator2 = cfg->get<string>("BTagDiscriminator2");
-      const float btagCut = cfg->get<float>("btagCut");
-
-      TString BTagDiscriminator1(bTagDiscriminator1);
-      TString BTagDiscriminator2(bTagDiscriminator2);
-      
-      unsigned int nBTagDiscriminant1 = 0;
-      unsigned int nBTagDiscriminant2 = 0;
-      for (unsigned int iBTag=0; iBTag < analysisTree->run_btagdiscriminators->size(); ++iBTag) {
-	TString discr(analysisTree->run_btagdiscriminators->at(iBTag));
-	if (discr == BTagDiscriminator1)
-	  nBTagDiscriminant1 = iBTag;
-	if (!is2016 && discr == BTagDiscriminator2)
-	  nBTagDiscriminant2 = iBTag;}
- 
-      bool tagged=false;
-      if (is2016) {
-	tagged = analysisTree->pfjet_btag[jet][nBTagDiscriminant1]>btagCut; // b-jet
-	/* Merijn: for later reference..
-	tagged_mistagUp = analysisTree->pfjet_btag[jet][nBTagDiscriminant1]>btagCut; // b-jet
-	tagged_mistagDown = analysisTree->pfjet_btag[jet][nBTagDiscriminant1]>btagCut; // b-jet
-	tagged_btagUp = analysisTree->pfjet_btag[jet][nBTagDiscriminant1]>btagCut; // b-jet
-	tagged_btagDown = analysisTree->pfjet_btag[jet][nBTagDiscriminant1]>btagCut; // b-jet*/
-      }
-      else {
-	tagged = analysisTree->pfjet_btag[jet][nBTagDiscriminant1] + analysisTree->pfjet_btag[jet][nBTagDiscriminant2] >btagCut;
-	/*	tagged_mistagUp = analysisTree->pfjet_btag[jet][nBTagDiscriminant1] + analysisTree.pfjet_btag[jet][nBTagDiscriminant2] >btagCut;
-	tagged_mistagDown = analysisTree->pfjet_btag[jet][nBTagDiscriminant1] + analysisTree.pfjet_btag[jet][nBTagDiscriminant2] >btagCut;
-	tagged_btagUp = analysisTree->pfjet_btag[jet][nBTagDiscriminant1] + analysisTree.pfjet_btag[jet][nBTagDiscriminant2] >btagCut;
-	tagged_btagDown = analysisTree->pfjet_btag[jet][nBTagDiscriminant1] + analysisTree.pfjet_btag[jet][nBTagDiscriminant2] >btagCut;*/
-      }
+    if (absJetEta < bJetEtaCut) { // jet within b-tagging acceptance
+                
+      // check if meets working point cut <=> tagged      
+      bool tagged = false;
+      if (BTagAlgorithm == "pfCombinedInclusiveSecondaryVertexV2BJetTags")
+      	tagged = analysisTree->pfjet_btag[jet][nBTagDiscriminant1] > btagCut; 
+      else if (BTagAlgorithm == "DeepCSV")
+        tagged = (analysisTree->pfjet_btag[jet][nBTagDiscriminant1] + analysisTree->pfjet_btag[jet][nBTagDiscriminant2]) > btagCut;
+      else if (BTagAlgorithm == "DeepFlavour")
+        tagged = (analysisTree->pfjet_btag[jet][nBTagDiscriminant1] + analysisTree->pfjet_btag[jet][nBTagDiscriminant2] + analysisTree->pfjet_btag[jet][nBTagDiscriminant3]) > btagCut;
+      else
+        {
+          std::cout << "tagger in the cfg is neither pfCombinedInclusiveSecondaryVertexV2BJetTags, nor DeepFlavour, nor DeepCSV, exiting" << '\n';
+          exit(-1);
+        }
       bool taggedRaw = tagged;
       
-      if(!cfg->get<bool>("isData")  && cfg->get<bool>("ApplyBTagScaling")) {
+      if(!isData && ApplyBTagScaling) {
+      	int flavor = abs(analysisTree->pfjet_flavour[jet]);
+      	double jet_scalefactor = 1;
+      	double JetPtForBTag    = jetPt;
+      	double tageff          = 1;
 
-	int flavor = abs(analysisTree->pfjet_flavour[jet]);
-	double jet_scalefactor = 1;
-	double JetPtForBTag    = jetPt;
-	double tageff          = 1;
-	 // std::cout << "before inputs_btag_scaling" << std::endl;
+      	if (JetPtForBTag > MaxBJetPt) JetPtForBTag = MaxBJetPt - 0.1;
+      	if (JetPtForBTag < MinBJetPt) JetPtForBTag = MinBJetPt + 0.1;
+  	
+        // getting SFs and efficiencies
+      	if (flavor == 5) {
+      	  jet_scalefactor = inputs_btag_scaling->reader_B.eval_auto_bounds("central", BTagEntry::FLAV_B, jetEta, JetPtForBTag);
+      	  histo_tageff_= inputs_btag_scaling->tagEff_B;
+      	}
+      	else if (flavor == 4) {
+      	  jet_scalefactor = inputs_btag_scaling->reader_C.eval_auto_bounds("central", BTagEntry::FLAV_C, jetEta, JetPtForBTag);
+      	  histo_tageff_= inputs_btag_scaling->tagEff_C;
+      	}
+      	else {
+      	  jet_scalefactor = inputs_btag_scaling->reader_Light.eval_auto_bounds("central", BTagEntry::FLAV_UDSG, jetEta, JetPtForBTag);
+      	  histo_tageff_= inputs_btag_scaling->tagEff_Light;
+      	}
+      	tageff = histo_tageff_->Interpolate(JetPtForBTag, absJetEta);
+      	if (tageff < 1e-5)      tageff = 1e-5;
+      	if (tageff > 0.99999)   tageff = 0.99999;
+        
+        // random seed
+      	inputs_btag_scaling->rand->SetSeed((int)((jetEta+5)*100000));
+      	double rannum = inputs_btag_scaling->rand->Rndm();
 
-	//Merijn 2019 6 7: implement adjustments for edges, from T/M
-	if (JetPtForBTag>MaxBJetPt) JetPtForBTag = MaxBJetPt - 0.1;
-	if (JetPtForBTag<MinBJetPt) JetPtForBTag = MinBJetPt + 0.1;
-	
-	if (flavor==5) {
-	  jet_scalefactor = inputs_btag_scaling->reader_B.eval_auto_bounds("central",BTagEntry::FLAV_B, jetEta, JetPtForBTag);
-	  histo_tageff_=inputs_btag_scaling->tagEff_B;
-	}
-	else if (flavor==4) {
-	  jet_scalefactor = inputs_btag_scaling->reader_C.eval_auto_bounds("central",BTagEntry::FLAV_C, jetEta, JetPtForBTag);
-	  histo_tageff_=inputs_btag_scaling->tagEff_C;
-
-	}
-	else {
-	  jet_scalefactor = inputs_btag_scaling->reader_Light.eval_auto_bounds("central",BTagEntry::FLAV_UDSG, jetEta, JetPtForBTag);
-	  histo_tageff_=inputs_btag_scaling->tagEff_Light;
-	}
-
-	/*
-	if(JetPtForBTag > histo_tageff_->GetXaxis()->GetBinLowEdge(histo_tageff_->GetNbinsX()+1)){
-	  tageff = histo_tageff_->GetBinContent(histo_tageff_->GetNbinsX(),histo_tageff_->GetYaxis()->FindBin(absJetEta));
-	}
-	else{
-	  tageff = histo_tageff_->GetBinContent(histo_tageff_->GetXaxis()->FindBin(JetPtForBTag), histo_tageff_->GetYaxis()->FindBin(absJetEta));
-	  }*/
-
-	//Merijn 2019 6 7 replace by the code of T/M. Note: bounds adjusted upstream..
-	tageff =histo_tageff_->Interpolate(JetPtForBTag,absJetEta);
-	
-
-	if (tageff<1e-5)      tageff = 1e-5;
-	if (tageff>0.99999)   tageff = 0.99999;
-	inputs_btag_scaling->rand->SetSeed((int)((jetEta+5)*100000));
-	double rannum = inputs_btag_scaling->rand->Rndm();
-
-	if (jet_scalefactor<1 && tagged)  { // downgrade - demote
-	  if (rannum<1-jet_scalefactor)  tagged = false;
-	}
-	if (jet_scalefactor>1 && !tagged) { // upgrade - promote
-	  double fraction = (1.0-jet_scalefactor)/(1.0-1.0/tageff);
-	  if (rannum<fraction) tagged = true;
-	}
+        // promote-demote method
+      	if (jet_scalefactor < 1 && tagged)  { // downgrade - demote
+      	  if (rannum < 1 - jet_scalefactor)  
+            tagged = false;
+      	}
+      	if (jet_scalefactor > 1 && !tagged) { // upgrade - promote
+      	  double fraction = (1.0 - jet_scalefactor)/(1.0 - 1.0 / tageff);
+      	  if (rannum < fraction) tagged = true;
+      	}
       }
 
       if (taggedRaw) bjetsRaw.push_back(jet); 
       if (tagged) {
-	bjets.push_back(jet);
-
-	if (indexLeadingBJet>=0) {//Merijn: not sure if also done in macro t/m..
-	  if (jetPt<ptLeadingBJet && jetPt>ptSubLeadingBJet) {
-	    indexSubLeadingBJet = jet;
-	    ptSubLeadingBJet = jetPt;
-	  }
-	}
-	if (jetPt>ptLeadingBJet) {
-	  ptLeadingBJet = jetPt;
-	  indexLeadingBJet = jet;
-	}
+      	bjets.push_back(jet);
+        
+      	if (indexLeadingBJet >= 0) {
+      	  if (jetPt < ptLeadingBJet && jetPt > ptSubLeadingBJet) {
+      	    indexSubLeadingBJet = jet;
+      	    ptSubLeadingBJet = jetPt;
+      	  }
+      	}
+      	if (jetPt > ptLeadingBJet) {
+          indexSubLeadingBJet = indexLeadingBJet;
+          ptSubLeadingBJet = ptLeadingBJet;
+          indexLeadingBJet = jet;
+          ptLeadingBJet = jetPt;
+      	}
       }
-    } //if (absJetEta < cfg->get<float>("bJetEtaCut"))
-	  //std::cout << "after inputs_btag_scaling" << std::endl;
-    if (indexLeadingJet>=0) {
-      if (jetPt<ptLeadingJet && jetPt>ptSubLeadingJet) {
+    } // jet within b-tagging acceptance 
+    
+    if (indexLeadingJet >= 0) {
+      if (jetPt < ptLeadingJet && jetPt > ptSubLeadingJet) {
         indexSubLeadingJet = jet;
         ptSubLeadingJet = jetPt;
       }
     }
 
-    if (jetPt>ptLeadingJet) {
+    if (jetPt > ptLeadingJet) {
+      indexSubLeadingJet = indexLeadingJet;
+      ptSubLeadingJet = ptLeadingJet;
       indexLeadingJet = jet;
       ptLeadingJet = jetPt;
     }
 
-    if (jetPt<cfg->get<float>("JetPtHighCut")) continue;
+    if (jetPt < JetPtHighCut) continue;
     jets.push_back(jet);
-  }
+  } // jets loop
 
   otree->njets = jets.size();
   otree->njetspt20 = jetspt20.size();
   otree->nbtag = bjets.size();
-  
-  otree->bpt_1   = -10; //Merijn 2019 7 31: put to -10 since it is used in the DNN don't want to confuse with strange value
-  otree->beta_1  = -9999;
-  otree->bphi_1  = -9999;
-  otree->bcsv_1  = -9999;
-  
-  if (indexLeadingBJet>=0) {
+
+  // leading b-jet variables
+  if (indexLeadingBJet >= 0) {
     otree->bpt_1   = get_jetPt(analysisTree, indexLeadingBJet, JESname, direction, jecUncertainties);
     otree->beta_1  = analysisTree->pfjet_eta[indexLeadingBJet];
     otree->bphi_1  = analysisTree->pfjet_phi[indexLeadingBJet];
-  
-    otree->bcsv_1  = analysisTree->pfjet_btag[indexLeadingBJet][0];
+    if (BTagAlgorithm == "DeepCSV")
+      otree->bcsv_1  = analysisTree->pfjet_btag[indexLeadingBJet][nBTagDiscriminant1] + analysisTree->pfjet_btag[indexLeadingBJet][nBTagDiscriminant2];
+    else 
+      otree->bcsv_1  = -100;
+  }
+  else {
+    otree->bpt_1   = -10;
+    otree->beta_1  = -10;
+    otree->bphi_1  = -10;
+    otree->bcsv_1  = -10;
   }
 
-  otree->bpt_2   = -10; //Merijn 2019 7 31: put to -10 since it is used in the DNN don't want to confuse with strange value
-  otree->beta_2  = -9999;
-  otree->bphi_2  = -9999;
-  otree->bcsv_2  = -9999;
-  
-  if (indexSubLeadingBJet>=0) {
+  // subleading b-jet variables
+  if (indexSubLeadingBJet >= 0) {
     otree->bpt_2   = get_jetPt(analysisTree, indexSubLeadingBJet, JESname, direction, jecUncertainties);
     otree->beta_2  = analysisTree->pfjet_eta[indexSubLeadingBJet];
     otree->bphi_2  = analysisTree->pfjet_phi[indexSubLeadingBJet];
-    otree->bcsv_2  = analysisTree->pfjet_btag[indexSubLeadingBJet][0];
+    if (BTagAlgorithm == "DeepCSV")
+      otree->bcsv_2  = analysisTree->pfjet_btag[indexSubLeadingBJet][nBTagDiscriminant1] + analysisTree->pfjet_btag[indexSubLeadingBJet][nBTagDiscriminant2];
+    else 
+      otree->bcsv_2  = -100;
+
   }
-
-  otree->jpt_1 = -9999;
-  otree->jeta_1 = -9999;
-  otree->jphi_1 = -9999;
+  else {
+    otree->bpt_2   = -10;
+    otree->beta_2  = -10;
+    otree->bphi_2  = -10;
+    otree->bcsv_2  = -10;
+  }
   
-  if ( indexLeadingJet>=0 && indexSubLeadingJet>=0 && indexLeadingJet==indexSubLeadingJet )
-cout << "warning : indexLeadingJet ==indexSubLeadingJet = " << indexSubLeadingJet << endl;
-
-  if (indexLeadingJet>=0) {
-	//std::cout << "pt of jet #" << indexLeadingJet << " :: before correction = " <<  analysisTree->pfjet_pt[indexLeadingJet] ;
-	//std::cout << " Leading jet --------------------- " << std::endl;
-    otree->jpt_1 = get_jetPt(analysisTree, indexLeadingJet, JESname, direction, jecUncertainties); //analysisTree->pfjet_pt[indexLeadingJet];
-	//std::cout << " after correction = " << otree->jpt_1 << std::endl;
-	//std::cout << "  --------------------- EOF Leading jet " << std::endl;
+  // leading jet variables
+  if ( indexLeadingJet >= 0 && indexSubLeadingJet >= 0 && indexLeadingJet == indexSubLeadingJet )
+    cout << "warning : indexLeadingJet ==indexSubLeadingJet = " << indexSubLeadingJet << endl;
+  if (indexLeadingJet >= 0) {
+    otree->jpt_1 = get_jetPt(analysisTree, indexLeadingJet, JESname, direction, jecUncertainties);
     otree->jeta_1 = analysisTree->pfjet_eta[indexLeadingJet];
     otree->jphi_1 = analysisTree->pfjet_phi[indexLeadingJet];
+    otree->jcsv_1 = analysisTree->pfjet_btag[indexLeadingJet][1] + analysisTree->pfjet_btag[indexLeadingJet][2];
   }
-
-  otree->jpt_2 = -9999;
-  otree->jeta_2 = -9999;
-  otree->jphi_2 = -9999;
+  else {
+    otree->jpt_1 = -10;
+    otree->jeta_1 = -10;
+    otree->jphi_1 = -10;
+    otree->jcsv_1 = -10;
+  }
   
-  if (indexSubLeadingJet>=0) {
+  // subleading jet variables
+  if (indexSubLeadingJet >= 0) {
     otree->jpt_2 = get_jetPt(analysisTree, indexSubLeadingJet, JESname, direction, jecUncertainties);
     otree->jeta_2 = analysisTree->pfjet_eta[indexSubLeadingJet];
     otree->jphi_2 = analysisTree->pfjet_phi[indexSubLeadingJet];
+    otree->jcsv_2 = analysisTree->pfjet_btag[indexSubLeadingJet][1] + analysisTree->pfjet_btag[indexSubLeadingJet][2];
+  }
+  else {
+    otree->jpt_2 = -10;
+    otree->jeta_2 = -10;
+    otree->jphi_2 = -10;
+    otree->jcsv_2 = -10;
   }
 
-  otree->mjj =  -9999;
-  otree->jdeta =  -9999;
-  otree->dijetpt =  -9999;
-  otree->jdphi =  -9999;
-  otree->njetingap = -1;
-
-  if (indexLeadingJet>=0 && indexSubLeadingJet>=0) {
+  // dijet variables
+  if (indexLeadingJet >= 0 && indexSubLeadingJet >= 0) {
     otree->njetingap = 0;
     TLorentzVector jet1; 
     TLorentzVector jet2; 
 
-	jet1.SetPtEtaPhiE(otree->jpt_1, otree->jeta_1, otree->jphi_1, get_jetE(analysisTree, indexLeadingJet, JESname, direction, jecUncertainties));
-	jet2.SetPtEtaPhiE(otree->jpt_2, otree->jeta_2, otree->jphi_2, get_jetE(analysisTree, indexSubLeadingJet, JESname, direction, jecUncertainties));
+  	jet1.SetPtEtaPhiE(otree->jpt_1, otree->jeta_1, otree->jphi_1, get_jetE(analysisTree, indexLeadingJet, JESname, direction, jecUncertainties));
+  	jet2.SetPtEtaPhiE(otree->jpt_2, otree->jeta_2, otree->jphi_2, get_jetE(analysisTree, indexSubLeadingJet, JESname, direction, jecUncertainties));
 
-    otree->mjj = (jet1+jet2).M();
-    otree->dijetpt = (jet1+jet2).Pt();//Merijn: added, needed for DNN inputs in mt
-    otree->jdeta = abs(analysisTree->pfjet_eta[indexLeadingJet]-
-          analysisTree->pfjet_eta[indexSubLeadingJet]);
-    otree->jdphi = dPhiFrom2P(jet1.Px(),jet1.Py(),
-			      jet2.Px(),jet2.Py());
+    otree->mjj = (jet1 + jet2).M();
+    otree->dijetpt = (jet1 + jet2).Pt();
+    otree->dijeteta = (jet1 + jet2).Eta();
+    otree->dijetphi = (jet1 + jet2).Phi();
+    otree->jdeta = abs(analysisTree->pfjet_eta[indexLeadingJet] - analysisTree->pfjet_eta[indexSubLeadingJet]);
+    otree->jdphi = dPhiFrom2P(jet1.Px(), jet1.Py(), jet2.Px(),jet2.Py());
    
     float etamax = analysisTree->pfjet_eta[indexLeadingJet];
     float etamin = analysisTree->pfjet_eta[indexSubLeadingJet];
-    if (etamax<etamin) {
+    if (etamax < etamin) {
       float tmp = etamax;
       etamax = etamin;
       etamin = tmp;
     }
-    for (unsigned int jet=0; jet<jets.size(); ++jet) {
+    for (unsigned int jet = 0; jet < jets.size(); ++jet) {
       int index = jets.at(jet);
       float etaX = analysisTree->pfjet_eta[index];
-      if (index!=indexLeadingJet&&index!=indexSubLeadingJet&&etaX>etamin&&etaX<etamax) 
+      if ((index != indexLeadingJet) && (index != indexSubLeadingJet) && (etaX > etamin) && (etaX < etamax)) 
         otree->njetingap++;
     }
-
-
   }
-
-}
-
-
-
-
-} // end of leptau namespace 
+  else {
+    otree->mjj =  -10;
+    otree->jdeta =  -10;
+    otree->dijetpt =  -10;
+    otree->jdphi =  -10;
+    otree->njetingap = -10;
+  }
+ } // counting_jets
+} // jets namespace 
 
 #endif

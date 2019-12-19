@@ -1,0 +1,8 @@
+{
+"pt2": {"var":"pt_2", "nbins":20, "xmin":0, "xmax":100, "xtit":"Subleading muon p_{T} [GeV]", "ytit": "Events / 5 GeV"},
+"pt1": {"var":"pt_1", "nbins":40, "xmin":0, "xmax":200, "xtit":"Leading muon p_{T} [GeV]", "ytit": "Events / 5 GeV"},
+"met": {"var":"met", "nbins":30, "xmin":0, "xmax":150, "xtit":"PF MET w/o RC [GeV]", "ytit": "Events / 5 GeV"},
+"met_rcorr": {"var":"met_rcorr", "nbins":30, "xmin":0, "xmax":150, "xtit":"PF MET corrected [GeV]", "ytit": "Events / 5 GeV"},
+"m_ll": {"var":"m_ll", "nbins":50, "xmin":0, "xmax":500, "xtit":"Dimuon mass", "ytit": "Events / 10 GeV"},
+"njets30": {"var":"njets30", "nbins":10, "xmin":0, "xmax":10, "xtit":"Number of jets", "ytit": "Events / 1"}
+}

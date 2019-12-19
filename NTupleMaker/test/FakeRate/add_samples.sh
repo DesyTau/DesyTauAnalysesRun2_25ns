@@ -12,3 +12,6 @@ do
     mv $samplename ../$samplename
     cd ..
 done    
+
+root -l -b -q 'AddStitchWeights.C("WJetsToLNu")'
+root -l -b -q 'AddStitchWeights.C("DYJetsToLL_M-50")'

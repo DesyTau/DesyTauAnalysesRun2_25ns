@@ -56,6 +56,7 @@ public :
    Int_t           primvertexwithbs_ntracks;
    Float_t         primvertexwithbs_cov[6];   
    
+
    //Declaration of refitted vertices
    UInt_t          refitvertex_count;
    //UInt_t          goodrefitvertex_count;
@@ -141,6 +142,10 @@ public :
    Int_t           muon_genmatch[100];   //[muon_count]
    Bool_t          muon_isDuplicate[100];   //[muon_count]
    Bool_t          muon_isBad[100];   //[muon_count]
+   Float_t         muon_helixparameters[100][5];
+   Float_t         muon_helixparameters_covar[100][5][5];
+   Float_t         muon_referencePoint[100][3];
+   Float_t         muon_Bfield[100];
    UInt_t          dimuon_count;
    UInt_t          dimuon_leading[100*99/2];   //[dimuon_count]
    UInt_t          dimuon_trailing[100*99/2];   //[dimuon_count]
@@ -270,6 +275,7 @@ public :
    Float_t         electron_mva_wp80_Iso_Fall17_v1[100];   //[electron_count]
    Float_t         electron_mva_Loose_Iso_Fall17_v1[100];   //[electron_count]
    Float_t         electron_mva_wp90_noIso_Fall17_v1[100];   //[electron_count]
+   Float_t         electron_mva_wp90_noIso_Fall17_v2[100];   //[electron_count]
    Float_t         electron_mva_wp80_noIso_Fall17_v1[100];   //[electron_count]
    Float_t         electron_mva_Loose_noIso_Fall17_v1[100];   //[electron_count]
    Bool_t          electron_cutId_veto_Fall17[100];   //[electron_count]
@@ -282,6 +288,22 @@ public :
    Bool_t          electron_cutId_tight_Fall17V2[100];   //[electron_count]
    Bool_t          electron_pass_conversion[100];   //[electron_count]
    Int_t           electron_genmatch[100];   //[electron_count]
+   Float_t         electron_px_energyscale_up[100]; //[electron_count]
+   Float_t         electron_px_energyscale_down[100]; //[electron_count]
+   Float_t         electron_py_energyscale_up[100]; //[electron_count]
+   Float_t         electron_py_energyscale_down[100]; //[electron_count]
+   Float_t         electron_pz_energyscale_up[100]; //[electron_count]
+   Float_t         electron_pz_energyscale_down[100]; //[electron_count]
+   Float_t         electron_pt_energyscale_up[100]; //[electron_count]
+   Float_t         electron_pt_energyscale_down[100]; //[electron_count]
+   Float_t         electron_px_energysigma_up[100]; //[electron_count]
+   Float_t         electron_px_energysigma_down[100]; //[electron_count]
+   Float_t         electron_py_energysigma_up[100]; //[electron_count]
+   Float_t         electron_py_energysigma_down[100]; //[electron_count]
+   Float_t         electron_pz_energysigma_up[100]; //[electron_count]
+   Float_t         electron_pz_energysigma_down[100]; //[electron_count]
+   Float_t         electron_pt_energysigma_up[100]; //[electron_count]
+   Float_t         electron_pt_energysigma_down[100]; //[electron_count]
    UInt_t          tau_count;
    Float_t         tau_e[100];   //[tau_count]
    Float_t         tau_px[100];   //[tau_count]
@@ -346,6 +368,10 @@ public :
    Float_t         tau_constituents_vy[100][50];   //[tau_count]
    Float_t         tau_constituents_vz[100][50];   //[tau_count]
    Int_t           tau_constituents_pdgId[100][50];   //[tau_count]
+   Float_t         tau_helixparameters[100][5];
+   Float_t         tau_helixparameters_covar[100][5][5];
+   Float_t         tau_referencePoint[100][3];
+   Float_t         tau_Bfield[100];
    UInt_t          track_count;
    Float_t         track_px[1000];   //[track_count]
    Float_t         track_py[1000];   //[track_count]
@@ -766,29 +792,41 @@ public :
    Float_t         tau_byVVTightIsolationMVArun2017v2DBoldDMwLT2017[100];   //[tau_count]
    Float_t         tau_byVVTightIsolationMVArun2v1DBnewDMwLT2016[100];   //[tau_count]
    Float_t         tau_byVVTightIsolationMVArun2v1DBoldDMwLT2016[100];   //[tau_count]
-   Float_t	   tau_byDeepTau2017v2VSeraw[100];	//[tau_count]
-   Float_t	   tau_byDeepTau2017v2VSjetraw[100];	//[tau_count]
-   Float_t	   tau_byDeepTau2017v2VSmuraw[100];	//[tau_count]
-   Float_t	   tau_byLooseDeepTau2017v2VSe[100];	//[tau_count]
-   Float_t	   tau_byLooseDeepTau2017v2VSjet[100];	//[tau_count]
-   Float_t	   tau_byLooseDeepTau2017v2VSmu[100];	//[tau_count]
-   Float_t	   tau_byMediumDeepTau2017v2VSe[100];	//[tau_count]
-   Float_t	   tau_byMediumDeepTau2017v2VSjet[100];	//[tau_count]
-   Float_t	   tau_byMediumDeepTau2017v2VSmu[100];	//[tau_count]
-   Float_t	   tau_byTightDeepTau2017v2VSe[100];	//[tau_count]
-   Float_t	   tau_byTightDeepTau2017v2VSjet[100];	//[tau_count]
-   Float_t	   tau_byTightDeepTau2017v2VSmu[100];	//[tau_count]
-   Float_t	   tau_byVLooseDeepTau2017v2VSe[100];	//[tau_count]
-   Float_t	   tau_byVLooseDeepTau2017v2VSjet[100];	//[tau_count]
-   Float_t	   tau_byVLooseDeepTau2017v2VSmu[100];	//[tau_count]
-   Float_t	   tau_byVTightDeepTau2017v2VSe[100];	//[tau_count]
-   Float_t	   tau_byVTightDeepTau2017v2VSjet[100];	//[tau_count]
-   Float_t	   tau_byVVLooseDeepTau2017v2VSe[100];	//[tau_count]
-   Float_t	   tau_byVVLooseDeepTau2017v2VSjet[100];	//[tau_count]
-   Float_t	   tau_byVVTightDeepTau2017v2VSe[100];	//[tau_count]
-   Float_t	   tau_byVVTightDeepTau2017v2VSjet[100];	//[tau_count]
-   Float_t	   tau_byVVVLooseDeepTau2017v2VSe[100];	//[tau_count]
-   Float_t	   tau_byVVVLooseDeepTau2017v2VSjet[100];	//[tau_count]
+   Float_t	   tau_byDeepTau2017v2p1VSeraw[100];	//[tau_count]
+   Float_t	   tau_byDeepTau2017v2p1VSjetraw[100];	//[tau_count]
+   Float_t	   tau_byDeepTau2017v2p1VSmuraw[100];	//[tau_count]
+   Float_t	   tau_byLooseDeepTau2017v2p1VSe[100];	//[tau_count]
+   Float_t	   tau_byLooseDeepTau2017v2p1VSjet[100];	//[tau_count]
+   Float_t	   tau_byLooseDeepTau2017v2p1VSmu[100];	//[tau_count]
+   Float_t	   tau_byMediumDeepTau2017v2p1VSe[100];	//[tau_count]
+   Float_t	   tau_byMediumDeepTau2017v2p1VSjet[100];	//[tau_count]
+   Float_t	   tau_byMediumDeepTau2017v2p1VSmu[100];	//[tau_count]
+   Float_t	   tau_byTightDeepTau2017v2p1VSe[100];	//[tau_count]
+   Float_t	   tau_byTightDeepTau2017v2p1VSjet[100];	//[tau_count]
+   Float_t	   tau_byTightDeepTau2017v2p1VSmu[100];	//[tau_count]
+   Float_t	   tau_byVLooseDeepTau2017v2p1VSe[100];	//[tau_count]
+   Float_t	   tau_byVLooseDeepTau2017v2p1VSjet[100];	//[tau_count]
+   Float_t	   tau_byVLooseDeepTau2017v2p1VSmu[100];	//[tau_count]
+   Float_t	   tau_byVTightDeepTau2017v2p1VSe[100];	//[tau_count]
+   Float_t	   tau_byVTightDeepTau2017v2p1VSjet[100];	//[tau_count]
+   Float_t	   tau_byVVLooseDeepTau2017v2p1VSe[100];	//[tau_count]
+   Float_t	   tau_byVVLooseDeepTau2017v2p1VSjet[100];	//[tau_count]
+   Float_t	   tau_byVVTightDeepTau2017v2p1VSe[100];	//[tau_count]
+   Float_t	   tau_byVVTightDeepTau2017v2p1VSjet[100];	//[tau_count]
+   Float_t	   tau_byVVVLooseDeepTau2017v2p1VSe[100];	//[tau_count]
+   Float_t	   tau_byVVVLooseDeepTau2017v2p1VSjet[100];	//[tau_count]
+   
+   Float_t         tau_MVADM2017v1[100];
+   Float_t         tau_MVADM2017v1DM0raw[100];
+   Float_t         tau_MVADM2017v1DM10raw[100];
+   Float_t         tau_MVADM2017v1DM11raw[100];
+   Float_t         tau_MVADM2017v1DM1raw[100];
+   Float_t         tau_MVADM2017v1DM2raw[100];
+   Float_t         tau_MVADM2017v1DMotherraw[100];
+   
+   UInt_t          TauSpinAngles_count;
+   Double_t        TauSpinnerWeight[20];//[TauSpinAngles_count]
+
    Int_t           htxs_stage0cat;
    Int_t           htxs_stage1cat;
    Int_t           htxs_stage1p1cat;
@@ -911,6 +949,10 @@ public :
    TBranch        *b_muon_genmatch;   //!
    TBranch        *b_muon_isDuplicate;   //!
    TBranch        *b_muon_isBad;   //!
+   TBranch        *b_muon_helixparameters;
+   TBranch        *b_muon_helixparameters_covar;
+   TBranch        *b_muon_referencePoint;
+   TBranch        *b_muon_Bfield;
    TBranch        *b_dimuon_count;   //!
    TBranch        *b_dimuon_leading;   //!
    TBranch        *b_dimuon_trailing;   //!
@@ -1040,6 +1082,7 @@ public :
    TBranch        *b_electron_mva_wp80_Iso_Fall17_v1;   //!
    TBranch        *b_electron_mva_Loose_Iso_Fall17_v1;   //!
    TBranch        *b_electron_mva_wp90_noIso_Fall17_v1;   //!
+   TBranch        *b_electron_mva_wp90_noIso_Fall17_v2;   //!
    TBranch        *b_electron_mva_wp80_noIso_Fall17_v1;   //!
    TBranch        *b_electron_mva_Loose_noIso_Fall17_v1;   //!
    TBranch        *b_electron_cutId_veto_Fall17;   //!
@@ -1051,7 +1094,23 @@ public :
    TBranch        *b_electron_cutId_medium_Fall17V2;   //!
    TBranch        *b_electron_cutId_tight_Fall17V2;   //!
    TBranch        *b_electron_pass_conversion;   //!
-   TBranch        *b_electron_genmatch;   //!
+   TBranch        *b_electron_genmatch;   //!;   //!
+   TBranch        *b_electron_px_energyscale_up;   //!
+   TBranch        *b_electron_px_energyscale_down;   //!
+   TBranch        *b_electron_py_energyscale_up;   //!
+   TBranch        *b_electron_py_energyscale_down;   //!
+   TBranch        *b_electron_pz_energyscale_up;   //!
+   TBranch        *b_electron_pz_energyscale_down;   //!
+   TBranch        *b_electron_pt_energyscale_up;   //!
+   TBranch        *b_electron_pt_energyscale_down;   //!
+   TBranch        *b_electron_px_energysigma_up;   //!
+   TBranch        *b_electron_px_energysigma_down;   //!
+   TBranch        *b_electron_py_energysigma_up;   //!
+   TBranch        *b_electron_py_energysigma_down;   //!
+   TBranch        *b_electron_pz_energysigma_up;   //!
+   TBranch        *b_electron_pz_energysigma_down;   //!
+   TBranch        *b_electron_pt_energysigma_up;   //!
+   TBranch        *b_electron_pt_energysigma_down;   //!
    TBranch        *b_tau_count;   //!
    TBranch        *b_tau_e;   //!
    TBranch        *b_tau_px;   //!
@@ -1116,6 +1175,10 @@ public :
    TBranch        *b_tau_constituents_vy;   //!
    TBranch        *b_tau_constituents_vz;   //!
    TBranch        *b_tau_constituents_pdgId;   //!
+   TBranch        *b_tau_helixparameters;
+   TBranch        *b_tau_helixparameters_covar;
+   TBranch        *b_tau_referencePoint;
+   TBranch        *b_tau_Bfield;
    TBranch        *b_track_count;   //!
    TBranch        *b_track_px;   //!
    TBranch        *b_track_py;   //!
@@ -1536,35 +1599,47 @@ public :
    TBranch        *b_tau_byVVTightIsolationMVArun2017v2DBoldDMwLT2017;   //!
    TBranch        *b_tau_byVVTightIsolationMVArun2v1DBnewDMwLT2016;   //!
    TBranch        *b_tau_byVVTightIsolationMVArun2v1DBoldDMwLT2016;   //!
-   TBranch	  *b_tau_byDeepTau2017v2VSeraw;	//!
-   TBranch	  *b_tau_byDeepTau2017v2VSjetraw;	//!
-   TBranch	  *b_tau_byDeepTau2017v2VSmuraw;	//!
-   TBranch	  *b_tau_byLooseDeepTau2017v2VSe;	//!
-   TBranch	  *b_tau_byLooseDeepTau2017v2VSjet;	//!
-   TBranch	  *b_tau_byLooseDeepTau2017v2VSmu;	//!
-   TBranch	  *b_tau_byMediumDeepTau2017v2VSe;	//!
-   TBranch	  *b_tau_byMediumDeepTau2017v2VSjet;	//!
-   TBranch	  *b_tau_byMediumDeepTau2017v2VSmu;	//!
-   TBranch	  *b_tau_byTightDeepTau2017v2VSe;	//!
-   TBranch	  *b_tau_byTightDeepTau2017v2VSjet;	//!
-   TBranch	  *b_tau_byTightDeepTau2017v2VSmu;	//!
-   TBranch	  *b_tau_byVLooseDeepTau2017v2VSe;	//!
-   TBranch	  *b_tau_byVLooseDeepTau2017v2VSjet;	//!
-   TBranch	  *b_tau_byVLooseDeepTau2017v2VSmu;	//!
-   TBranch	  *b_tau_byVTightDeepTau2017v2VSe;	//!
-   TBranch	  *b_tau_byVTightDeepTau2017v2VSjet;	//!
-   TBranch	  *b_tau_byVVLooseDeepTau2017v2VSe;	//!
-   TBranch	  *b_tau_byVVLooseDeepTau2017v2VSjet;	//!
-   TBranch	  *b_tau_byVVTightDeepTau2017v2VSe;	//!
-   TBranch	  *b_tau_byVVTightDeepTau2017v2VSjet;	//!
-   TBranch	  *b_tau_byVVVLooseDeepTau2017v2VSe;	//!
-   TBranch	  *b_tau_byVVVLooseDeepTau2017v2VSjet;	//!
+   TBranch	  *b_tau_byDeepTau2017v2p1VSeraw;	//!
+   TBranch	  *b_tau_byDeepTau2017v2p1VSjetraw;	//!
+   TBranch	  *b_tau_byDeepTau2017v2p1VSmuraw;	//!
+   TBranch	  *b_tau_byLooseDeepTau2017v2p1VSe;	//!
+   TBranch	  *b_tau_byLooseDeepTau2017v2p1VSjet;	//!
+   TBranch	  *b_tau_byLooseDeepTau2017v2p1VSmu;	//!
+   TBranch	  *b_tau_byMediumDeepTau2017v2p1VSe;	//!
+   TBranch	  *b_tau_byMediumDeepTau2017v2p1VSjet;	//!
+   TBranch	  *b_tau_byMediumDeepTau2017v2p1VSmu;	//!
+   TBranch	  *b_tau_byTightDeepTau2017v2p1VSe;	//!
+   TBranch	  *b_tau_byTightDeepTau2017v2p1VSjet;	//!
+   TBranch	  *b_tau_byTightDeepTau2017v2p1VSmu;	//!
+   TBranch	  *b_tau_byVLooseDeepTau2017v2p1VSe;	//!
+   TBranch	  *b_tau_byVLooseDeepTau2017v2p1VSjet;	//!
+   TBranch	  *b_tau_byVLooseDeepTau2017v2p1VSmu;	//!
+   TBranch	  *b_tau_byVTightDeepTau2017v2p1VSe;	//!
+   TBranch	  *b_tau_byVTightDeepTau2017v2p1VSjet;	//!
+   TBranch	  *b_tau_byVVLooseDeepTau2017v2p1VSe;	//!
+   TBranch	  *b_tau_byVVLooseDeepTau2017v2p1VSjet;	//!
+   TBranch	  *b_tau_byVVTightDeepTau2017v2p1VSe;	//!
+   TBranch	  *b_tau_byVVTightDeepTau2017v2p1VSjet;	//!
+   TBranch	  *b_tau_byVVVLooseDeepTau2017v2p1VSe;	//!
+   TBranch	  *b_tau_byVVVLooseDeepTau2017v2p1VSjet;	//!
+   
+   TBranch        *b_tau_MVADM2017v1;
+   TBranch        *b_tau_MVADM2017v1DM0raw;
+   TBranch        *b_tau_MVADM2017v1DM10raw;
+   TBranch        *b_tau_MVADM2017v1DM11raw;
+   TBranch        *b_tau_MVADM2017v1DM1raw;
+   TBranch        *b_tau_MVADM2017v1DM2raw;
+   TBranch        *b_tau_MVADM2017v1DMotherraw;
+
+   TBranch        *b_TauSpinAngles_count;
+   TBranch        *b_TauSpinnerWeight;
+
    TBranch        *b_htxs_stage0cat;   //!
    TBranch        *b_htxs_stage1cat;   //!
    TBranch        *b_htxs_stage1p1cat;
    TBranch        *b_htxs_higgsPt;   //!
    TBranch        *b_htxs_njets30;   //!
-   
+    
    AC1B(TTree *tree=0, bool isData=false);
    virtual ~AC1B();
    virtual Int_t    Cut(Long64_t entry);
@@ -1772,6 +1847,10 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("muon_genmatch", muon_genmatch, &b_muon_genmatch);
    fChain->SetBranchAddress("muon_isDuplicate", muon_isDuplicate, &b_muon_isDuplicate);
    fChain->SetBranchAddress("muon_isBad", muon_isBad, &b_muon_isBad);
+   fChain->SetBranchAddress("muon_helixparameters", muon_helixparameters, &b_muon_helixparameters);
+   fChain->SetBranchAddress("muon_helixparameters_covar", muon_helixparameters_covar, &b_muon_helixparameters_covar);
+   fChain->SetBranchAddress("muon_referencePoint", muon_referencePoint, &b_muon_referencePoint);
+   fChain->SetBranchAddress("muon_Bfield", muon_Bfield, &b_muon_Bfield);
    fChain->SetBranchAddress("dimuon_count", &dimuon_count, &b_dimuon_count);
    fChain->SetBranchAddress("dimuon_leading", dimuon_leading, &b_dimuon_leading);
    fChain->SetBranchAddress("dimuon_trailing", dimuon_trailing, &b_dimuon_trailing);
@@ -1901,6 +1980,7 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("electron_mva_wp80_Iso_Fall17_v1", electron_mva_wp80_Iso_Fall17_v1, &b_electron_mva_wp80_Iso_Fall17_v1);
    fChain->SetBranchAddress("electron_mva_Loose_Iso_Fall17_v1", electron_mva_Loose_Iso_Fall17_v1, &b_electron_mva_Loose_Iso_Fall17_v1);
    fChain->SetBranchAddress("electron_mva_wp90_noIso_Fall17_v1", electron_mva_wp90_noIso_Fall17_v1, &b_electron_mva_wp90_noIso_Fall17_v1);
+   fChain->SetBranchAddress("electron_mva_wp90_noIso_Fall17_v2", electron_mva_wp90_noIso_Fall17_v2, &b_electron_mva_wp90_noIso_Fall17_v2);
    fChain->SetBranchAddress("electron_mva_wp80_noIso_Fall17_v1", electron_mva_wp80_noIso_Fall17_v1, &b_electron_mva_wp80_noIso_Fall17_v1);
    fChain->SetBranchAddress("electron_mva_Loose_noIso_Fall17_v1", electron_mva_Loose_noIso_Fall17_v1, &b_electron_mva_Loose_noIso_Fall17_v1);
    fChain->SetBranchAddress("electron_cutId_veto_Fall17", electron_cutId_veto_Fall17, &b_electron_cutId_veto_Fall17);
@@ -1913,6 +1993,22 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("electron_cutId_tight_Fall17V2", electron_cutId_tight_Fall17V2, &b_electron_cutId_tight_Fall17V2);
    fChain->SetBranchAddress("electron_pass_conversion", electron_pass_conversion, &b_electron_pass_conversion);
    fChain->SetBranchAddress("electron_genmatch", electron_genmatch, &b_electron_genmatch);
+   fChain->SetBranchAddress("electron_px_energyscale_up", electron_px_energyscale_up, &b_electron_px_energyscale_up);
+   fChain->SetBranchAddress("electron_px_energyscale_down", electron_px_energyscale_down, &b_electron_px_energyscale_down);
+   fChain->SetBranchAddress("electron_py_energyscale_up", electron_py_energyscale_up, &b_electron_py_energyscale_up);
+   fChain->SetBranchAddress("electron_py_energyscale_down", electron_py_energyscale_down, &b_electron_py_energyscale_down);
+   fChain->SetBranchAddress("electron_pz_energyscale_up", electron_pz_energyscale_up, &b_electron_pz_energyscale_up);
+   fChain->SetBranchAddress("electron_pz_energyscale_down", electron_pz_energyscale_down, &b_electron_pz_energyscale_down);
+   fChain->SetBranchAddress("electron_pt_energyscale_up", electron_pt_energyscale_up, &b_electron_pt_energyscale_up);
+   fChain->SetBranchAddress("electron_pt_energyscale_down", electron_pt_energyscale_down, &b_electron_pt_energyscale_down);
+   fChain->SetBranchAddress("electron_px_energysigma_up", electron_px_energysigma_up, &b_electron_px_energysigma_up);
+   fChain->SetBranchAddress("electron_px_energysigma_down", electron_px_energysigma_down, &b_electron_px_energysigma_down);
+   fChain->SetBranchAddress("electron_py_energysigma_up", electron_py_energysigma_up, &b_electron_py_energysigma_up);
+   fChain->SetBranchAddress("electron_py_energysigma_down", electron_py_energysigma_down, &b_electron_py_energysigma_down);
+   fChain->SetBranchAddress("electron_pz_energysigma_up", electron_pz_energysigma_up, &b_electron_pz_energysigma_up);
+   fChain->SetBranchAddress("electron_pz_energysigma_down", electron_pz_energysigma_down, &b_electron_pz_energysigma_down);
+   fChain->SetBranchAddress("electron_pt_energysigma_up", electron_pt_energysigma_up, &b_electron_pt_energysigma_up);
+   fChain->SetBranchAddress("electron_pt_energysigma_down", electron_pt_energysigma_down, &b_electron_pt_energysigma_down);
    fChain->SetBranchAddress("tau_count", &tau_count, &b_tau_count);
    fChain->SetBranchAddress("tau_e", tau_e, &b_tau_e);
    fChain->SetBranchAddress("tau_px", tau_px, &b_tau_px);
@@ -1977,6 +2073,10 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("tau_constituents_vy", tau_constituents_vy, &b_tau_constituents_vy);
    fChain->SetBranchAddress("tau_constituents_vz", tau_constituents_vz, &b_tau_constituents_vz);
    fChain->SetBranchAddress("tau_constituents_pdgId", tau_constituents_pdgId, &b_tau_constituents_pdgId);
+   fChain->SetBranchAddress("tau_helixparameters", tau_helixparameters, &b_tau_helixparameters);
+   fChain->SetBranchAddress("tau_helixparameters_covar", tau_helixparameters_covar, &b_tau_helixparameters_covar);
+   fChain->SetBranchAddress("tau_referencePoint", tau_referencePoint, &b_tau_referencePoint);
+   fChain->SetBranchAddress("tau_Bfield", tau_Bfield, &b_tau_Bfield);
    fChain->SetBranchAddress("track_count", &track_count, &b_track_count);
    fChain->SetBranchAddress("track_px", track_px, &b_track_px);
    fChain->SetBranchAddress("track_py", track_py, &b_track_py);
@@ -2396,35 +2496,48 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("tau_byVVTightIsolationMVArun2017v2DBoldDMdR0p3wLT2017", tau_byVVTightIsolationMVArun2017v2DBoldDMdR0p3wLT2017, &b_tau_byVVTightIsolationMVArun2017v2DBoldDMdR0p3wLT2017);
    fChain->SetBranchAddress("tau_byVVTightIsolationMVArun2017v2DBoldDMwLT2017", tau_byVVTightIsolationMVArun2017v2DBoldDMwLT2017, &b_tau_byVVTightIsolationMVArun2017v2DBoldDMwLT2017);
    fChain->SetBranchAddress("tau_byVVTightIsolationMVArun2v1DBnewDMwLT2016", tau_byVVTightIsolationMVArun2v1DBnewDMwLT2016, &b_tau_byVVTightIsolationMVArun2v1DBnewDMwLT2016);
-   fChain->SetBranchAddress("tau_byDeepTau2017v2VSeraw", tau_byDeepTau2017v2VSeraw, &b_tau_byDeepTau2017v2VSeraw);	
-   fChain->SetBranchAddress("tau_byDeepTau2017v2VSjetraw", tau_byDeepTau2017v2VSjetraw, &b_tau_byDeepTau2017v2VSjetraw);	
-   fChain->SetBranchAddress("tau_byDeepTau2017v2VSmuraw", tau_byDeepTau2017v2VSmuraw, &b_tau_byDeepTau2017v2VSmuraw);	
-   fChain->SetBranchAddress("tau_byLooseDeepTau2017v2VSe", tau_byLooseDeepTau2017v2VSe, &b_tau_byLooseDeepTau2017v2VSe);	
-   fChain->SetBranchAddress("tau_byLooseDeepTau2017v2VSjet", tau_byLooseDeepTau2017v2VSjet, &b_tau_byLooseDeepTau2017v2VSjet);	
-   fChain->SetBranchAddress("tau_byLooseDeepTau2017v2VSmu", tau_byLooseDeepTau2017v2VSmu, &b_tau_byLooseDeepTau2017v2VSmu);	
-   fChain->SetBranchAddress("tau_byMediumDeepTau2017v2VSe", tau_byMediumDeepTau2017v2VSe, &b_tau_byMediumDeepTau2017v2VSe);	
-   fChain->SetBranchAddress("tau_byMediumDeepTau2017v2VSjet", tau_byMediumDeepTau2017v2VSjet, &b_tau_byMediumDeepTau2017v2VSjet);	
-   fChain->SetBranchAddress("tau_byMediumDeepTau2017v2VSmu", tau_byMediumDeepTau2017v2VSmu, &b_tau_byMediumDeepTau2017v2VSmu);	
-   fChain->SetBranchAddress("tau_byTightDeepTau2017v2VSe", tau_byTightDeepTau2017v2VSe, &b_tau_byTightDeepTau2017v2VSe);	
-   fChain->SetBranchAddress("tau_byTightDeepTau2017v2VSjet", tau_byTightDeepTau2017v2VSjet, &b_tau_byTightDeepTau2017v2VSjet);	
-   fChain->SetBranchAddress("tau_byTightDeepTau2017v2VSmu", tau_byTightDeepTau2017v2VSmu, &b_tau_byTightDeepTau2017v2VSmu);	
-   fChain->SetBranchAddress("tau_byVLooseDeepTau2017v2VSe", tau_byVLooseDeepTau2017v2VSe, &b_tau_byVLooseDeepTau2017v2VSe);	
-   fChain->SetBranchAddress("tau_byVLooseDeepTau2017v2VSjet", tau_byVLooseDeepTau2017v2VSjet, &b_tau_byVLooseDeepTau2017v2VSjet);	
-   fChain->SetBranchAddress("tau_byVLooseDeepTau2017v2VSmu", tau_byVLooseDeepTau2017v2VSmu, &b_tau_byVLooseDeepTau2017v2VSmu);	
-   fChain->SetBranchAddress("tau_byVTightDeepTau2017v2VSe", tau_byVTightDeepTau2017v2VSe, &b_tau_byVTightDeepTau2017v2VSe);	
-   fChain->SetBranchAddress("tau_byVTightDeepTau2017v2VSjet", tau_byVTightDeepTau2017v2VSjet, &b_tau_byVTightDeepTau2017v2VSjet);	
-   fChain->SetBranchAddress("tau_byVVLooseDeepTau2017v2VSe", tau_byVVLooseDeepTau2017v2VSe, &b_tau_byVVLooseDeepTau2017v2VSe);	
-   fChain->SetBranchAddress("tau_byVVLooseDeepTau2017v2VSjet", tau_byVVLooseDeepTau2017v2VSjet, &b_tau_byVVLooseDeepTau2017v2VSjet);	
-   fChain->SetBranchAddress("tau_byVVTightDeepTau2017v2VSe", tau_byVVTightDeepTau2017v2VSe, &b_tau_byVVTightDeepTau2017v2VSe);	
-   fChain->SetBranchAddress("tau_byVVTightDeepTau2017v2VSjet", tau_byVVTightDeepTau2017v2VSjet, &b_tau_byVVTightDeepTau2017v2VSjet);	
-   fChain->SetBranchAddress("tau_byVVVLooseDeepTau2017v2VSe", tau_byVVVLooseDeepTau2017v2VSe, &b_tau_byVVVLooseDeepTau2017v2VSe);	
-   fChain->SetBranchAddress("tau_byVVVLooseDeepTau2017v2VSjet", tau_byVVVLooseDeepTau2017v2VSjet, &b_tau_byVVVLooseDeepTau2017v2VSjet);	
+   fChain->SetBranchAddress("tau_byDeepTau2017v2p1VSeraw", tau_byDeepTau2017v2p1VSeraw, &b_tau_byDeepTau2017v2p1VSeraw);
+   fChain->SetBranchAddress("tau_byDeepTau2017v2p1VSjetraw", tau_byDeepTau2017v2p1VSjetraw, &b_tau_byDeepTau2017v2p1VSjetraw);
+   fChain->SetBranchAddress("tau_byDeepTau2017v2p1VSmuraw", tau_byDeepTau2017v2p1VSmuraw, &b_tau_byDeepTau2017v2p1VSmuraw);
+   fChain->SetBranchAddress("tau_byLooseDeepTau2017v2p1VSe", tau_byLooseDeepTau2017v2p1VSe, &b_tau_byLooseDeepTau2017v2p1VSe);
+   fChain->SetBranchAddress("tau_byLooseDeepTau2017v2p1VSjet", tau_byLooseDeepTau2017v2p1VSjet, &b_tau_byLooseDeepTau2017v2p1VSjet);
+   fChain->SetBranchAddress("tau_byLooseDeepTau2017v2p1VSmu", tau_byLooseDeepTau2017v2p1VSmu, &b_tau_byLooseDeepTau2017v2p1VSmu);
+   fChain->SetBranchAddress("tau_byMediumDeepTau2017v2p1VSe", tau_byMediumDeepTau2017v2p1VSe, &b_tau_byMediumDeepTau2017v2p1VSe);
+   fChain->SetBranchAddress("tau_byMediumDeepTau2017v2p1VSjet", tau_byMediumDeepTau2017v2p1VSjet, &b_tau_byMediumDeepTau2017v2p1VSjet);
+   fChain->SetBranchAddress("tau_byMediumDeepTau2017v2p1VSmu", tau_byMediumDeepTau2017v2p1VSmu, &b_tau_byMediumDeepTau2017v2p1VSmu);
+   fChain->SetBranchAddress("tau_byTightDeepTau2017v2p1VSe", tau_byTightDeepTau2017v2p1VSe, &b_tau_byTightDeepTau2017v2p1VSe);
+   fChain->SetBranchAddress("tau_byTightDeepTau2017v2p1VSjet", tau_byTightDeepTau2017v2p1VSjet, &b_tau_byTightDeepTau2017v2p1VSjet);
+   fChain->SetBranchAddress("tau_byTightDeepTau2017v2p1VSmu", tau_byTightDeepTau2017v2p1VSmu, &b_tau_byTightDeepTau2017v2p1VSmu);
+   fChain->SetBranchAddress("tau_byVLooseDeepTau2017v2p1VSe", tau_byVLooseDeepTau2017v2p1VSe, &b_tau_byVLooseDeepTau2017v2p1VSe);
+   fChain->SetBranchAddress("tau_byVLooseDeepTau2017v2p1VSjet", tau_byVLooseDeepTau2017v2p1VSjet, &b_tau_byVLooseDeepTau2017v2p1VSjet);
+   fChain->SetBranchAddress("tau_byVLooseDeepTau2017v2p1VSmu", tau_byVLooseDeepTau2017v2p1VSmu, &b_tau_byVLooseDeepTau2017v2p1VSmu);
+   fChain->SetBranchAddress("tau_byVTightDeepTau2017v2p1VSe", tau_byVTightDeepTau2017v2p1VSe, &b_tau_byVTightDeepTau2017v2p1VSe);
+   fChain->SetBranchAddress("tau_byVTightDeepTau2017v2p1VSjet", tau_byVTightDeepTau2017v2p1VSjet, &b_tau_byVTightDeepTau2017v2p1VSjet);
+   fChain->SetBranchAddress("tau_byVVLooseDeepTau2017v2p1VSe", tau_byVVLooseDeepTau2017v2p1VSe, &b_tau_byVVLooseDeepTau2017v2p1VSe);
+   fChain->SetBranchAddress("tau_byVVLooseDeepTau2017v2p1VSjet", tau_byVVLooseDeepTau2017v2p1VSjet, &b_tau_byVVLooseDeepTau2017v2p1VSjet);
+   fChain->SetBranchAddress("tau_byVVTightDeepTau2017v2p1VSe", tau_byVVTightDeepTau2017v2p1VSe, &b_tau_byVVTightDeepTau2017v2p1VSe);
+   fChain->SetBranchAddress("tau_byVVTightDeepTau2017v2p1VSjet", tau_byVVTightDeepTau2017v2p1VSjet, &b_tau_byVVTightDeepTau2017v2p1VSjet);
+   fChain->SetBranchAddress("tau_byVVVLooseDeepTau2017v2p1VSe", tau_byVVVLooseDeepTau2017v2p1VSe, &b_tau_byVVVLooseDeepTau2017v2p1VSe);
+   fChain->SetBranchAddress("tau_byVVVLooseDeepTau2017v2p1VSjet", tau_byVVVLooseDeepTau2017v2p1VSjet, &b_tau_byVVVLooseDeepTau2017v2p1VSjet);
+
+   fChain->SetBranchAddress("tau_MVADM2017v1", tau_MVADM2017v1, &b_tau_MVADM2017v1);
+   fChain->SetBranchAddress("tau_MVADM2017v1DM0raw", tau_MVADM2017v1DM0raw, &b_tau_MVADM2017v1DM0raw);
+   fChain->SetBranchAddress("tau_MVADM2017v1DM10raw", tau_MVADM2017v1DM10raw, &b_tau_MVADM2017v1DM10raw);
+   fChain->SetBranchAddress("tau_MVADM2017v1DM11raw", tau_MVADM2017v1DM11raw, &b_tau_MVADM2017v1DM11raw);
+   fChain->SetBranchAddress("tau_MVADM2017v1DM1raw", tau_MVADM2017v1DM1raw, &b_tau_MVADM2017v1DM1raw);
+   fChain->SetBranchAddress("tau_MVADM2017v1DM2raw", tau_MVADM2017v1DM2raw, &b_tau_MVADM2017v1DM2raw);
+   fChain->SetBranchAddress("tau_MVADM2017v1DMotherraw", tau_MVADM2017v1DMotherraw, &b_tau_MVADM2017v1DMotherraw);
+   
+   fChain->SetBranchAddress("TauSpinAngles_count", &TauSpinAngles_count, &b_TauSpinAngles_count);
+   fChain->SetBranchAddress("TauSpinnerWeight", TauSpinnerWeight, &b_TauSpinnerWeight);
+
    fChain->SetBranchAddress("htxs_stage0cat",&htxs_stage0cat, &b_htxs_stage0cat);
    fChain->SetBranchAddress("htxs_stage1cat",&htxs_stage1cat , &b_htxs_stage1cat);
    fChain->SetBranchAddress("htxs_stage1p1cat",&htxs_stage1p1cat , &b_htxs_stage1p1cat);
    fChain->SetBranchAddress("htxs_higgsPt",&htxs_higgsPt , &b_htxs_higgsPt);
    fChain->SetBranchAddress("htxs_njets30", &htxs_njets30, &b_htxs_njets30);
    
+
    Notify();
 }
 

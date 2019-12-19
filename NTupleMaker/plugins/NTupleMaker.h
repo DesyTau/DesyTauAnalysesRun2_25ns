@@ -78,7 +78,7 @@
 #include "JetMETCorrections/Objects/interface/JetCorrector.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
-#include "VertexRefit/TauRefit/interface/RefitVertex.h"
+#include "HiggsCPinTauDecays/TauRefit/interface/RefitVertex.h"
 #include "DataFormats/Candidate/interface/VertexCompositeCandidate.h"
 #include "DataFormats/Candidate/interface/VertexCompositeCandidateFwd.h"
 #include "DataFormats/RecoCandidate/interface/RecoChargedCandidate.h"
@@ -155,6 +155,10 @@
 
 #include "SimDataFormats/HTXS/interface/HiggsTemplateCrossSections.h"
 
+//needed for tauspinner
+#include "TauSpinner/SimpleParticle.h"
+#include "TauSpinner/tau_reweight_lib.h"
+
 using namespace std;
 using namespace reco;
 
@@ -175,6 +179,7 @@ using namespace reco;
 #define M_trigobjectmaxcount 1000
 #define M_hltfiltersmax 200
 #define M_refitvtxmaxcount 1000
+#define M_tauspinneranglesmaxcount 10
 typedef ROOT::Math::PositionVector3D<ROOT::Math::Cartesian3D<double>,ROOT::Math::DefaultCoordinateSystemTag> Point3D;
 typedef ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> > LorentzVector;
 typedef ROOT::Math::SMatrix<double, 2, 2, ROOT::Math::MatRepSym<double, 2> > CovMatrix2D;
@@ -292,6 +297,10 @@ class NTupleMaker : public edm::EDAnalyzer{
   unsigned int AddPFJets(const edm::Event& iEvent, const edm::EventSetup& iSetup);
   unsigned int AddPFPuppiJets(const edm::Event& iEvent, const edm::EventSetup& iSetup);
   unsigned int AddTriggerObjects(const edm::Event& iEvent, edm::EDGetTokenT<pat::TriggerObjectStandAloneCollection> TriggerObjectCollectionToken, const edm::TriggerResults & trigRes);
+  unsigned int GetTauSpinnerweights(const edm::Event&, const edm::EventSetup&);
+  reco::GenParticle getLastCopy(reco::GenParticle part, edm::Handle<reco::GenParticleCollection> parts_handle);
+  void getTauDaughters(std::vector<reco::GenParticle> &tau_daughters, unsigned &type, reco::GenParticle tau, edm::Handle<reco::GenParticleCollection> parts_handle);
+  TauSpinner::SimpleParticle ConvertToSimplePart(reco::GenParticle input_part);
   bool foundCompatibleInnerHits(const reco::HitPattern& hitPatA, const reco::HitPattern& hitPatB);
   bool AddSusyInfo(const edm::Event& iEvent);
   bool AddFlags(const edm::Event& iEvent, const char* module, const char* label, const char* process);
@@ -340,6 +349,7 @@ class NTupleMaker : public edm::EDAnalyzer{
   bool crecprimvertexwithbs;
   bool crefittedvertex;
   bool crefittedvertexwithbs;
+  bool crecTauSpinner;
   bool crecmuon;
   bool crecelectron;
   bool crectau;
@@ -356,8 +366,9 @@ class NTupleMaker : public edm::EDAnalyzer{
 
   vector<string> cHLTriggerPaths;
   string cTriggerProcess;
-  string cMyTriggerProcess;
+  string cTauSpinAngles;
 
+  string cMyTriggerProcess;
   vector<string> cFlags;
   vector<string> cFlagsProcesses;
   edm::EDGetTokenT<bool> BadChCandFilterToken_;
@@ -1387,7 +1398,8 @@ class NTupleMaker : public edm::EDAnalyzer{
   Float_t prefiringweightup;
   Float_t prefiringweightdown;
   //std::vector< double > embeddingWeights_; //for RhEmb
-  //float TauSpinnerWeight_;
+  Double_t TauSpinnerWeight[M_tauspinneranglesmaxcount];
+  UInt_t TauSpinAngles_count;
   JetCorrectionUncertainty *jecUnc;
 
 };

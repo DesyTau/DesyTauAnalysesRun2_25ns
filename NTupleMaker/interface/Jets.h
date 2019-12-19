@@ -185,6 +185,56 @@ bool tightJetiD_2018(AC1B &tree_ ,int jet){
 
 }
 
+
+// https://twiki.cern.ch/twiki/bin/viewauth/CMS/JetID
+bool tightJetID(const AC1B &tree_, int jet, int era){
+	bool tightJetID = false;
+	float energy = tree_.pfjet_e[jet];
+	float eta = tree_.pfjet_eta[jet];
+	float NHF = tree_.pfjet_neutralhadronicenergy[jet] / energy;									 
+	float NEMF = tree_.pfjet_neutralemenergy[jet] / energy;  											 
+	float NumConst = tree_.pfjet_chargedmulti[jet] + tree_.pfjet_neutralmulti[jet];     
+	float CHM = tree_.pfjet_chargedmulti[jet];																		 											
+	float MUF = tree_.pfjet_muonenergy[jet] / energy;															 
+	float CHF = tree_.pfjet_chargedhadronicenergy[jet] / energy;									 
+	float CEMF = tree_.pfjet_chargedemenergy[jet] / energy;												 
+	float NumNeutralParticle  = tree_.pfjet_neutralmulti[jet]; 																		 													
+	
+	if (era == 2016){
+		if (fabs(eta) <= 2.7)
+			tightJetID = (NHF < 0.90 && NEMF < 0.90 && NumConst > 1) && ((abs(eta) <= 2.4 && CHF > 0 && CHM > 0 && CEMF < 0.99) || abs(eta) > 2.4);
+		else if (fabs(eta) <= 3.0)
+			tightJetID = NHF < 0.98 && NEMF > 0.01 && NumNeutralParticle > 2;
+		else
+			tightJetID = NEMF < 0.90 && NumNeutralParticle > 10;
+	}
+	else if (era == 2017){
+		if (fabs(eta) <= 2.7)
+			tightJetID = (NHF < 0.90 && NEMF < 0.90 && NumConst > 1) && ((abs(eta) <= 2.4 && CHF > 0 && CHM > 0) || abs(eta) > 2.4);
+		else if (fabs(eta) <= 3.0)
+			tightJetID = NEMF < 0.99 && NEMF > 0.02 && NumNeutralParticle > 2;
+		else
+			tightJetID = NEMF < 0.90 && NHF > 0.02 && NumNeutralParticle > 10;
+	}
+	else if (era == 2018){
+		if (fabs(eta) <= 2.6)
+			tightJetID = CEMF < 0.8 && CHM > 0 && CHF > 0 && NumConst > 1 && NEMF < 0.9 && MUF < 0.8 && NHF < 0.9;
+		else if (fabs(eta) <= 2.7)
+			tightJetID = CEMF < 0.8 && CHM > 0 && NEMF < 0.99 && MUF < 0.8 && NHF < 0.9;
+		else if (fabs(eta) <= 3.0)
+			tightJetID = NEMF > 0.02 && NEMF < 0.99 && NumNeutralParticle > 2;
+		else
+			tightJetID = NEMF < 0.90 && NHF > 0.2 && NumNeutralParticle > 10;
+	}
+	else
+	{
+		std::cout << "era is not 2016, 2017, 2018, exiting" << '\n';
+		exit(-1);
+	}
+	return tightJetID;
+}
+
+
 bool looseJetiD(AC1B &tree_, int jet){  // updated recipe for 74x,76x,80x
 
         bool looseJetID = false;

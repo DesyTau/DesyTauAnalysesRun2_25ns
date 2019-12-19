@@ -45,6 +45,7 @@ isFlagged = {}
 table = {}
 #fpf_b = fit_b.floatParsFinal()
 fpf_s = fit_s.floatParsFinal()
+
 pulls = []
 for i in range(fpf_s.getSize()):
     nuis_s = fpf_s.at(i)
@@ -54,6 +55,7 @@ for i in range(fpf_s.getSize()):
     row = []
     flag = False;
     mean_p, sigma_p = 0,0
+    print name, ": ", nuis_s.getVal(), "+-", nuis_s.getError()
     if nuis_p == None:
         if not options.abs: continue
         row += [ "[%.2f, %.2f]" % (nuis_s.getMin(), nuis_s.getMax()) ]

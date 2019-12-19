@@ -1,9 +1,11 @@
 #!/bin/bash
 
-sed 's/IsEmbedded = false/IsEmbedded = true/' analysisMacroSynch_em_MC.conf > analysisMacroSynch_em_Embedded.conf
+sed 's/IsEmbedded = false/IsEmbedded = true/' analysisMacroSynch_em_DATA.conf > analysisMacroSynch_em_Embedded.conf
+sed -i 's/IsData = true/IsData = false/g' analysisMacroSynch_em_Embedded.conf
 sed 's/IsW = false/IsW = true/' analysisMacroSynch_em_MC.conf > analysisMacroSynch_em_W.conf
 sed 's/IsDY = false/IsDY = true/' analysisMacroSynch_em_MC.conf > analysisMacroSynch_em_DY.conf
 sed 's/IsSignal = false/IsSignal = true/' analysisMacroSynch_em_MC.conf > analysisMacroSynch_em_Signal.conf
+sed 's/SampleNameForPUHist =/SampleNameForPUHist = MC_PU2017_/' analysisMacroSynch_em_Signal.conf > analysisMacroSynch_em_Signal_VBF.conf
 
 #
 
@@ -12,6 +14,7 @@ sed 's/SampleNameForPUHist =/SampleNameForPUHist = DY1JetsToLL_M-50_TuneCP5_13Te
 sed 's/SampleNameForPUHist =/SampleNameForPUHist = DY2JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8_/' analysisMacroSynch_em_DY.conf > analysisMacroSynch_em_DY2JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8.conf
 sed 's/SampleNameForPUHist =/SampleNameForPUHist = DY3JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8_/' analysisMacroSynch_em_DY.conf > analysisMacroSynch_em_DY3JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8.conf
 sed 's/SampleNameForPUHist =/SampleNameForPUHist = DY4JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8_/' analysisMacroSynch_em_DY.conf > analysisMacroSynch_em_DY4JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8.conf
+sed 's/SampleNameForPUHist =/SampleNameForPUHist = DYJetsToLL_M-10to50_13TeV-12Apr2018_/' analysisMacroSynch_em_DY.conf > analysisMacroSynch_em_DYJetsToLL_M-10to50_13TeV-12Apr2018.conf
 
 sed 's/SampleNameForPUHist =/SampleNameForPUHist = ST_t-channel_antitop_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8_/' analysisMacroSynch_em_MC.conf > analysisMacroSynch_em_ST_t-channel_antitop_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8.conf
 sed 's/SampleNameForPUHist =/SampleNameForPUHist = ST_t-channel_top_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8_/' analysisMacroSynch_em_MC.conf > analysisMacroSynch_em_ST_t-channel_top_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8.conf
@@ -36,6 +39,7 @@ sed 's/SampleNameForPUHist =/SampleNameForPUHist = ZZ_TuneCP5_13TeV-pythia8_/' a
 sed 's/SampleNameForPUHist =/SampleNameForPUHist = GluGluHToTauTau_M125_13TeV_powheg_pythia8_/' analysisMacroSynch_em_Signal.conf > analysisMacroSynch_em_Signal_GGH_Htautau_M125.conf
 sed -i 's/ApplygghReweighting = false/ApplygghReweighting = true/g' analysisMacroSynch_em_Signal_GGH_Htautau_M125.conf 
 sed -i 's/ApplygghUncertainties = false/ApplygghUncertainties = true/g' analysisMacroSynch_em_Signal_GGH_Htautau_M125.conf 
+sed 's/SampleNameForPUHist = GluGluHToTauTau_M125_13TeV_powheg_pythia8_/SampleNameForPUHist = MC_PU2017_/' analysisMacroSynch_em_Signal_GGH_Htautau_M125.conf > analysisMacroSynch_em_Signal_ggh.conf
 sed 's/SampleNameForPUHist =/SampleNameForPUHist = VBFHToTauTau_M125_/' analysisMacroSynch_em_Signal.conf > analysisMacroSynch_em_Signal_VBF_Htautau_M125.conf
 
 sed 's/SampleNameForPUHist =/SampleNameForPUHist = GluGluHToWWTo2L2Nu_/' analysisMacroSynch_em_Signal.conf > analysisMacroSynch_em_Signal_GGH_HWW_M125.conf

@@ -103,7 +103,8 @@ void PlotShapes(
 
         float eW;
         //if(!passProbe && eta=="0p8to1p2") eW = 0;
-        eW = errW*(W->GetBinContent(iB));
+        if(W!=NULL){eW = errW*(W->GetBinContent(iB));}
+
         float eTT = errTT*(TT->GetBinContent(iB));
         float err2 = eQCD*eQCD + eVV*eVV + eW*eW + eTT*eTT+eDYEE*eDYEE+eDYZJ*eDYZJ+eDYZTT_et*eDYZTT_et;
         float errTot = TMath::Sqrt(err2);
@@ -111,18 +112,19 @@ void PlotShapes(
     }
     float numberZEE = ZEE->GetSumOfWeights();
     
-    W->Add(W,QCD);
+    if(W!=NULL){W->Add(W,QCD);}
     TT->Add(TT,W);
-	VV->Add(VV,TT);
-	ZTT_et->Add(ZTT_et,VV);
-    if(wp !="VTight" && eta!="Gt1p558")
+    VV->Add(VV,TT);
+    ZTT_et->Add(ZTT_et,VV);
+    if(ZTT_el!=NULL)
     {
         ZTT_el->Add(ZTT_el,ZTT_et);
         ZJ->Add(ZJ,ZTT_el);
     }
     else
         ZJ->Add(ZJ,ZTT_et);
-	ZEE->Add(ZEE,ZJ);
+    
+    ZEE->Add(ZEE,ZJ);	
     
     float totData = data_obs->GetSumOfWeights();
     float totMC = ZEE->GetSumOfWeights();
@@ -135,7 +137,7 @@ void PlotShapes(
     
   	for (int iB=1; iB<=nBins; ++iB)
     {  
-        W->SetBinError(iB,0);
+        if(W!=NULL) W->SetBinError(iB,0);
         if(QCD)QCD->SetBinError(iB,0);
         VV->SetBinError(iB,0);
         TT->SetBinError(iB,0);
@@ -176,7 +178,7 @@ void PlotShapes(
 	InitHist(TT,TColor::GetColor("#9999CC"));
 	InitHist(VV,TColor::GetColor("#6F2D35"));
 	InitHist(ZJ,TColor::GetColor("#FFCC66"));
-	InitHist(W,TColor::GetColor("#4496C8"));
+	if(W!=NULL) {InitHist(W,TColor::GetColor("#4496C8"));}
 	data_obs->GetXaxis()->SetTitle(xtitle);
  	data_obs->GetYaxis()->SetTitle(ytitle);
 	data_obs->GetYaxis()->SetTitleOffset(1.5);
@@ -221,7 +223,7 @@ void PlotShapes(
   	ZJ->Draw("sameh");
   	VV->Draw("sameh");
   	TT->Draw("sameh");
-	W->Draw("sameh");
+	if(W!=NULL) {W->Draw("sameh");}
 	if(QCD)QCD->Draw("sameh");
   	data_obs->Draw("e1same");
 	bkgdErr->Draw("e2same");
@@ -295,7 +297,7 @@ void PlotShapes(
  	ratioH->SetMarkerStyle(20);
   	ratioH->SetMarkerSize(1.5);
   	ratioH->SetLineColor(1);
-  	ratioH->GetYaxis()->SetRangeUser(0.3,1.8);
+  	ratioH->GetYaxis()->SetRangeUser(0.65,1.35);
  	ratioH->GetYaxis()->SetNdivisions(505);
   	ratioH->GetXaxis()->SetLabelFont(42);
   	ratioH->GetXaxis()->SetLabelOffset(0.04);
@@ -372,8 +374,8 @@ void PlotShapes(
   	canv1->Modified();
   	canv1->cd();
   	canv1->SetSelected(canv1);
-	canv1->Print("./Plots/ETauFR"+suffixPassOrFail+eta+wp+suffix+".png");
-	canv1->Print("./Plots/ETauFR"+suffixPassOrFail+eta+wp+suffix+".pdf","Portrait pdf");
+	canv1->Print("./Pre-PostFitPlots/ETauFR"+suffixPassOrFail+eta+wp+suffix+".png");
+	canv1->Print("./Pre-PostFitPlots/ETauFR"+suffixPassOrFail+eta+wp+suffix+".pdf","Portrait pdf");
 	canv1->Print("macrosOfPlots/ETauFR"+suffixPassOrFail+eta+wp+suffix+".C","cxx");
 	canv1->Print("rootFilesOfPlots/ETauFR"+suffixPassOrFail+eta+wp+suffix+".root","root");
 

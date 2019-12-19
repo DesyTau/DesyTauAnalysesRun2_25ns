@@ -382,16 +382,17 @@ int MatchingJet(AC1B &analysisTree, TLorentzVector lorentzVectorTau, bool &jetFo
    return indexMatchingJet;
 }
 
+// numbers for Fall17 v2 Id
 float getEffectiveArea(float eta) {
-    float effArea = 0.1566;
+    float effArea =  0.1440;
     float absEta = fabs(eta);
-    if (absEta<1.0) effArea = 0.1566;
-    else if (absEta < 1.4790) effArea = 0.1626;
-    else if (absEta < 2.0) effArea = 0.1073;
-    else if (absEta < 2.2) effArea = 0.0854;
-    else if (absEta < 2.3) effArea = 0.1051;
-    else if (absEta < 2.4) effArea = 0.1204;
-    else if (absEta < 5.0) effArea = 0.1524;
+    if (absEta<1.0) effArea = 0.1440;
+    else if (absEta < 1.4790) effArea = 0.1562;
+    else if (absEta < 2.0) effArea = 0.1032;
+    else if (absEta < 2.2) effArea = 0.0859;
+    else if (absEta < 2.3) effArea = 0.1116;
+    else if (absEta < 2.4) effArea = 0.1321;
+    else if (absEta < 5.0) effArea = 0.1654;
     return effArea;
 
   } 
@@ -422,6 +423,7 @@ void  FillHistGenWeights( TTree *_inittree, TH1D* histWeightsH, bool isData){
 
    if (_inittree!=NULL) {
       Float_t genweight;
+      Float_t genweight_;
       if (!isData)
          _inittree->SetBranchAddress("genweight",&genweight);
       Long64_t numberOfEntriesInitTree = _inittree->GetEntries();
@@ -430,8 +432,11 @@ void  FillHistGenWeights( TTree *_inittree, TH1D* histWeightsH, bool isData){
          _inittree->GetEntry(iEntry);
          if (isData)
             histWeightsH->Fill(0.,1.);
-         else
-            histWeightsH->Fill(0.,genweight);
+         else{
+           if (genweight<0) genweight_ = -1;
+           else             genweight_ = 1;
+           histWeightsH->Fill(0.,genweight_);
+         }
       }
    }
 }
@@ -449,7 +454,7 @@ bool FillHistInputEvents(TFile *file_, TH1D*inputEventsH){
    return hasInputEvents;
 }
 
-Float_t GetEmbeddedWeight(std::vector<TLorentzVector> promptTausFirstCopy, RooWorkspace *correctionWS_embedded){
+Float_t GetEmbeddedWeight(std::vector<TLorentzVector> promptTausFirstCopy, RooWorkspace *correctionWS_embedded, TString era){
    
    Float_t embeddedWeight = 1.0;
    double gt1_pt  = promptTausFirstCopy[0].Pt();
@@ -458,15 +463,21 @@ Float_t GetEmbeddedWeight(std::vector<TLorentzVector> promptTausFirstCopy, RooWo
    double gt2_eta = promptTausFirstCopy[1].Eta();
    correctionWS_embedded->var("gt_pt")->setVal(gt1_pt);
    correctionWS_embedded->var("gt_eta")->setVal(gt1_eta);
-   double id1_embed = correctionWS_embedded->function("m_sel_idEmb_ratio")->getVal();
+   double id1_embed;
+   if (era=="2016") id1_embed = correctionWS_embedded->function("m_sel_idemb_kit_ratio")->getVal();
+   else id1_embed = correctionWS_embedded->function("m_sel_idEmb_ratio")->getVal();
    correctionWS_embedded->var("gt_pt")->setVal(gt2_pt);
    correctionWS_embedded->var("gt_eta")->setVal(gt2_eta);
-   double id2_embed = correctionWS_embedded->function("m_sel_idEmb_ratio")->getVal();
+   double id2_embed;
+   if (era=="2016") id2_embed = correctionWS_embedded->function("m_sel_idemb_kit_ratio")->getVal();
+   else id2_embed = correctionWS_embedded->function("m_sel_idEmb_ratio")->getVal();
    correctionWS_embedded->var("gt1_pt")->setVal(gt1_pt);
    correctionWS_embedded->var("gt1_eta")->setVal(gt1_eta);
    correctionWS_embedded->var("gt2_pt")->setVal(gt2_pt);
    correctionWS_embedded->var("gt2_eta")->setVal(gt2_eta);
-   double trg_embed = correctionWS_embedded->function("m_sel_trg_ratio")->getVal();
+   double trg_embed;
+   if (era=="2016") trg_embed = correctionWS_embedded->function("m_sel_trg_kit_ratio")->getVal();
+   else trg_embed = correctionWS_embedded->function("m_sel_trg_ratio")->getVal();
    embeddedWeight = id1_embed * id2_embed * trg_embed;
 
    return embeddedWeight;
@@ -478,9 +489,15 @@ Float_t GetZptMassWeight(Float_t bosonMass, Float_t bosonPt, TH2D * histZMassPtW
    if (bosonMass>50.0) {
       float bosonMassX = bosonMass;
       float bosonPtX = bosonPt;
-      if (bosonMassX>1000.) bosonMassX = 1000.;
-      if (bosonPtX<1.)      bosonPtX = 1.;
-      if (bosonPtX>1000.)   bosonPtX = 1000.;
+      if (bosonMassX>histZMassPtWeights->GetXaxis()->GetXmax()) {
+         bosonMassX = histZMassPtWeights->GetXaxis()->GetXmax() - 0.00001;
+      }
+      double minpt;
+      if (histZMassPtWeights->GetYaxis()->GetXmin() > 1.) minpt = histZMassPtWeights->GetYaxis()->GetXmin();
+      else minpt =1.;
+      if (bosonPtX<minpt) bosonPtX = minpt+0.00001;
+      if (bosonPtX>histZMassPtWeights->GetYaxis()->GetXmax()) bosonPtX = histZMassPtWeights->GetYaxis()->GetXmax()- 0.00001;
+
       zptmassweight = histZMassPtWeights->GetBinContent(histZMassPtWeights->GetXaxis()->FindBin(bosonMassX),
                                                         histZMassPtWeights->GetYaxis()->FindBin(bosonPtX));
    }
@@ -488,14 +505,16 @@ Float_t GetZptMassWeight(Float_t bosonMass, Float_t bosonPt, TH2D * histZMassPtW
 }
 
 
-void SearchForBtagDiscriminant(AC1B &analysisTree, TString BTagDiscriminator1, TString BTagDiscriminator2, unsigned int &nBTagDiscriminant1, unsigned int &nBTagDiscriminant2, TString era){
+void SearchForBtagDiscriminant(AC1B &analysisTree, TString BTagDiscriminator1, TString BTagDiscriminator2, TString BTagDiscriminator3, unsigned int &nBTagDiscriminant1, unsigned int &nBTagDiscriminant2, unsigned int &nBTagDiscriminant3, TString era){
 
    for (unsigned int iBTag=0; iBTag < analysisTree.run_btagdiscriminators->size(); ++iBTag) {
       TString discr(analysisTree.run_btagdiscriminators->at(iBTag));
       if (discr == BTagDiscriminator1)
          nBTagDiscriminant1 = iBTag;
-      if (era!="2016" && discr == BTagDiscriminator2)
+      if (discr == BTagDiscriminator2)
          nBTagDiscriminant2 = iBTag;
+      if (discr == BTagDiscriminator3)
+         nBTagDiscriminant3 = iBTag;
    }
 }
 
@@ -532,29 +551,12 @@ void SelectMuonElePair(AC1B &analysisTree, vector<int> muons, vector<int> electr
          
          float absIsoEle; 
          float relIsoEle;
-         if (era=="2016"){
-            float neutralHadIsoEle = analysisTree.electron_neutralHadIso[eIndex];
-            float photonIsoEle = analysisTree.electron_photonIso[eIndex];
-            float chargedHadIsoEle = analysisTree.electron_chargedHadIso[eIndex];
-            float puIsoEle = analysisTree.electron_puIso[eIndex];
-            if (isElectronIsoR03) {
-               neutralHadIsoEle = analysisTree.electron_r03_sumNeutralHadronEt[eIndex];
-               photonIsoEle = analysisTree.electron_r03_sumPhotonEt[eIndex];
-               chargedHadIsoEle = analysisTree.electron_r03_sumChargedHadronPt[eIndex];
-               puIsoEle = analysisTree.electron_r03_sumPUPt[eIndex];
-            }
-            float neutralIsoEle = neutralHadIsoEle + photonIsoEle - 0.5*puIsoEle;
-            neutralIsoEle = TMath::Max(float(0),neutralIsoEle);
-            absIsoEle =  chargedHadIsoEle + neutralIsoEle;
-            relIsoEle = absIsoEle/analysisTree.electron_pt[eIndex];
-         }
-         else {
-            float rhoNeutral = analysisTree.rho;
-            float  eA = getEffectiveArea( fabs(analysisTree.electron_superclusterEta[eIndex]) );
-            absIsoEle = analysisTree.electron_r03_sumChargedHadronPt[eIndex] +
-               TMath::Max(0.0f,analysisTree.electron_r03_sumNeutralHadronEt[eIndex]+analysisTree.electron_r03_sumPhotonEt[eIndex]-eA*rhoNeutral);
-            relIsoEle = absIsoEle/analysisTree.electron_pt[eIndex];
-         }
+         float rhoNeutral = analysisTree.rho;
+         float  eA = getEffectiveArea( fabs(analysisTree.electron_superclusterEta[eIndex]) );
+         absIsoEle = analysisTree.electron_r03_sumChargedHadronPt[eIndex] +
+            TMath::Max(0.0f,analysisTree.electron_r03_sumNeutralHadronEt[eIndex]+analysisTree.electron_r03_sumPhotonEt[eIndex]-eA*rhoNeutral);
+         relIsoEle = absIsoEle/analysisTree.electron_pt[eIndex];
+            //}
          if (int(mIndex)!=muonIndex) {
             if (relIsoMu==isoMuMin) {
                if (analysisTree.muon_pt[mIndex]>analysisTree.muon_pt[muonIndex]) {
@@ -598,44 +600,18 @@ bool ElectronVeto(AC1B &analysisTree, int electronIndex, float ptVetoElectronCut
       if (fabs(analysisTree.electron_dxy[ie])>dxyVetoElectronCut) continue;
       if (fabs(analysisTree.electron_dz[ie])>dzVetoElectronCut) continue; 
       bool electronMvaId = true;
-      if (era=="2016") {
-         electronMvaId = analysisTree.electron_mva_wp90_general_Spring16_v1[ie]>0.5; 
-      }
-      else if (era == "2017"){
-         electronMvaId = analysisTree.electron_mva_wp90_noIso_Fall17_v1[ie]>0.5;
-      }
-      else if (era == "2018"){
-         electronMvaId = analysisTree.electron_mva_wp90_noIso_Fall17_v1[ie]>0.5;
-      }
+      electronMvaId = analysisTree.electron_mva_wp90_noIso_Fall17_v2[ie]>0.5;
       if (!electronMvaId&&applyVetoElectronId) continue;
       if (!analysisTree.electron_pass_conversion[ie]&&applyVetoElectronId) continue;
  
       if (analysisTree.electron_nmissinginnerhits[ie]>1&&applyVetoElectronId) continue;
       float relIsoEle;
       float absIsoEle;
-      if (era=="2016"){
-         float neutralHadIsoEle = analysisTree.electron_neutralHadIso[ie];
-         float photonIsoEle = analysisTree.electron_photonIso[ie];
-         float chargedHadIsoEle = analysisTree.electron_chargedHadIso[ie];
-         float puIsoEle = analysisTree.electron_puIso[ie];
-               if (isElectronIsoR03) {                                               
-                  neutralHadIsoEle = analysisTree.electron_r03_sumNeutralHadronEt[ie];
-                  photonIsoEle = analysisTree.electron_r03_sumPhotonEt[ie];
-                  chargedHadIsoEle = analysisTree.electron_r03_sumChargedHadronPt[ie];
-                  puIsoEle = analysisTree.electron_r03_sumPUPt[ie];
-               }
-               float neutralIsoEle = neutralHadIsoEle + photonIsoEle - 0.5*puIsoEle;
-               neutralIsoEle = TMath::Max(float(0),neutralIsoEle);
-               absIsoEle =  chargedHadIsoEle + neutralIsoEle;
-               relIsoEle = absIsoEle/analysisTree.electron_pt[ie];
-            }
-      else {
-         float rhoNeutral = analysisTree.rho;
-         float  eA = getEffectiveArea( fabs(analysisTree.electron_superclusterEta[ie]) );
-         absIsoEle = analysisTree.electron_r03_sumChargedHadronPt[ie] +
-            TMath::Max(0.0f,analysisTree.electron_r03_sumNeutralHadronEt[ie]+analysisTree.electron_r03_sumPhotonEt[ie]-eA*rhoNeutral);
-         relIsoEle = absIsoEle/analysisTree.electron_pt[ie];
-      }
+      float rhoNeutral = analysisTree.rho;
+      float  eA = getEffectiveArea( fabs(analysisTree.electron_superclusterEta[ie]) );
+      absIsoEle = analysisTree.electron_r03_sumChargedHadronPt[ie] +
+         TMath::Max(0.0f,analysisTree.electron_r03_sumNeutralHadronEt[ie]+analysisTree.electron_r03_sumPhotonEt[ie]-eA*rhoNeutral);
+      relIsoEle = absIsoEle/analysisTree.electron_pt[ie];
       if (relIsoEle>isoVetoElectronCut) continue;
  
       foundExtraElectron = true;
@@ -643,7 +619,7 @@ bool ElectronVeto(AC1B &analysisTree, int electronIndex, float ptVetoElectronCut
    return foundExtraElectron;
 }
 
-bool MuonVeto(AC1B &analysisTree, int muonIndex, float ptVetoMuonCut, float etaVetoMuonCut, float dxyVetoMuonCut, float dzVetoMuonCut, bool applyICHEPMuonId, bool applyVetoMuonId, bool isMuonIsoR03, float isoVetoMuonCut){
+bool MuonVeto(AC1B &analysisTree, int muonIndex, float ptVetoMuonCut, float etaVetoMuonCut, float dxyVetoMuonCut, float dzVetoMuonCut, bool applyVetoMuonId, bool isMuonIsoR03, float isoVetoMuonCut){
    
    bool foundExtraMuon = false;
    for (unsigned int im = 0; im<analysisTree.muon_count; ++im) {
@@ -653,7 +629,6 @@ bool MuonVeto(AC1B &analysisTree, int muonIndex, float ptVetoMuonCut, float etaV
       if (fabs(analysisTree.muon_dxy[im])>dxyVetoMuonCut) continue;
       if (fabs(analysisTree.muon_dz[im])>dzVetoMuonCut) continue;
       bool muonId = analysisTree.muon_isMedium[im];
-      if (applyICHEPMuonId) muonId = analysisTree.muon_isICHEP[im];
       if (!muonId&&applyVetoMuonId) continue;
       float neutralHadIsoMu = analysisTree.muon_neutralHadIso[im];
       float photonIsoMu = analysisTree.muon_photonIso[im];

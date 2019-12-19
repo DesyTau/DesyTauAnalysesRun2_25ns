@@ -121,6 +121,12 @@ void Synch17GenTree::ReadInit(TTree *tree)
 
    fChain->SetBranchAddress("alphaminus", &alphaminus, &b_alphaminus);
    
+   fChain->SetBranchAddress("sm_htt125", &sm_htt125, &b_sm_htt125);
+   fChain->SetBranchAddress("ps_htt125", &ps_htt125, &b_ps_htt125);
+   fChain->SetBranchAddress("mm_htt125", &mm_htt125, &b_mm_htt125);
+   fChain->SetBranchAddress("minusmm_htt125", &minusmm_htt125, &b_minusmm_htt125);
+   fChain->SetBranchAddress("mix0p375_htt125", &mix0p375_htt125, &b_mix0p375_htt125);
+
    lock=true;
 }
 
@@ -252,6 +258,12 @@ void Synch17GenTree::WriteInit(TTree *tree) {
 
    fChain->Branch("gen_alphaminus", &alphaminus, "gen_alphaminus/F");
 
+  fChain->Branch("gen_sm_htt125", &sm_htt125, "gen_sm_htt125/D");
+  fChain->Branch("gen_ps_htt125", &ps_htt125, "gen_ps_htt125/D");
+  fChain->Branch("gen_mm_htt125", &mm_htt125, "gen_mm_htt125/D");
+  fChain->Branch("gen_minusmm_htt125", &minusmm_htt125, "gen_minusmm_htt125/D");
+  fChain->Branch("gen_mix0p375_htt125", &mix0p375_htt125, "gen_mix0p375_htt125/D");
+
 }
 
 void Synch17GenTree::Fill(){
@@ -260,4 +272,3 @@ void Synch17GenTree::Fill(){
 
   fChain->Fill();
 }
-
