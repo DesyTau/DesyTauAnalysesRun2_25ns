@@ -1447,7 +1447,7 @@ std::vector<TLorentzVector> gen_a1_rho_pi(const AC1B * analysisTree, int tauInde
   //  std::cout << "tau decay = " << tau_charge << std::endl;
   for(int i = 0; i < npart; i++){
     int index = ThreeProngIndices.at(i);
-    std::cout << i << " : " << analysisTree->genparticles_pdgid[index] << std::endl;
+    //    std::cout << i << " : " << analysisTree->genparticles_pdgid[index] << std::endl;
     if (fabs(analysisTree->genparticles_pdgid[index])==211) {
       if (tau_charge*analysisTree->genparticles_pdgid[index]<0) { 
 	lv_pi_opposite.SetXYZT(analysisTree->genparticles_px[index],

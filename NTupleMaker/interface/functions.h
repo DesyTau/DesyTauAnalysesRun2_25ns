@@ -5,6 +5,7 @@
 #include "DesyTauAnalyses/NTupleMaker/interface/Config.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/AC1B.h"
 #include "HTT-utilities/RecoilCorrections/interface/RecoilCorrector.h"
+#include "HTT-utilities/RecoilCorrections_KIT/interface/RecoilCorrector.h"
 #include "TauAnalysis/SVfitStandalone/interface/SVfitStandaloneAlgorithm.h"
 
 const double MuMass = 0.105658367;
@@ -726,11 +727,11 @@ namespace genTools{
   enum RecoilCorrectionsMethod{QuantileRemap=1, MeanResolution};
   
   int RecoilCorrections( RecoilCorrector& corr, int method,
-                  			 float met, float metphi,
-                  			 float vx, float vy,
-                  			 float lx, float ly,
-                  			 int njets,
-                  			 float& metcorr, float& metphicorr ){
+			 float met, float metphi,
+			 float vx, float vy,
+			 float lx, float ly,
+			 int njets,
+			 float& metcorr, float& metphicorr ){
          
     float metx = met*TMath::Cos(metphi);
     float mety = met*TMath::Sin(metphi);
@@ -739,6 +740,27 @@ namespace genTools{
 
     if(method != 0) // <=> apply corrections
       corr.CorrectByMeanResolution(metx, mety, vx, vy, lx, ly, njets, metcorrx, metcorry);
+    
+    // leave met as it is in the input if method == 0, otherwise overwrite with corrected values
+    metcorr = TMath::Sqrt(metcorrx * metcorrx + metcorry * metcorry);
+    metphicorr = TMath::ATan2(metcorry, metcorrx);
+            
+    return method;
+  }
+  int KITRecoilCorrections( kit::RecoilCorrector& corr, int method,
+			    float met, float metphi,
+			    float vx, float vy,
+			    float lx, float ly,
+			    int njets,
+			    float& metcorr, float& metphicorr ){
+         
+    float metx = met*TMath::Cos(metphi);
+    float mety = met*TMath::Sin(metphi);
+    float metcorrx = metx;
+    float metcorry = mety;
+
+    if(method != 0) // <=> apply corrections
+      corr.CorrectWithHist(metx, mety, vx, vy, lx, ly, njets, metcorrx, metcorry);
     
     // leave met as it is in the input if method == 0, otherwise overwrite with corrected values
     metcorr = TMath::Sqrt(metcorrx * metcorrx + metcorry * metcorry);

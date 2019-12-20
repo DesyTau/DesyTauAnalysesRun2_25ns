@@ -597,3 +597,15 @@
  <use name="DesyTauAnalyses/NTupleMaker"/>
  <use name="HTT-utilities/LepEffInterface"/>
 </bin>
+
+<bin name="SynchNtupleProducer_AZh" file="SynchNtupleProducer_AZh.cpp">
+ <use name="PhysicsTools/Utilities"/>
+ <use name="rootgraphics"/>
+ <use name="root"/>
+ <use name="rootmath"/>
+ <use name="roottmva"/>
+ <use name="boost" />
+ <use name="boost_program_options"/>
+ <use name="DesyTauAnalyses/NTupleMaker"/>
+ <use name="HTT-utilities/LepEffInterface"/>
+</bin>

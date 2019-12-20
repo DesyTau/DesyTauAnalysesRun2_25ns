@@ -41,7 +41,7 @@
 #include "DesyTauAnalyses/NTupleMaker/interface/leptau_jets_WIP.h"
 #include "HTT-utilities/LepEffInterface/interface/ScaleFactor.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/PileUp.h"
-#include "HTT-utilities/RecoilCorrections/interface/RecoilCorrector.h"
+#include "HTT-utilities/RecoilCorrections_KIT/interface/RecoilCorrector.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/functionsSynch2017.h"
 
 
@@ -67,6 +67,7 @@
 
 //#include "DesyTauAnalyses/NTupleMaker/interface/ImpactParameter.h"
 #include "HiggsCPinTauDecays/ImpactParameter/interface/ImpactParameter.h"
+#include "HTT-utilities/RecoilCorrections_KIT/interface/MEtSys.h"
 
 #define pi   3.14159265358979312
 #define d2r  1.74532925199432955e-02
@@ -229,15 +230,16 @@ int main(int argc, char * argv[]){
   const bool isMG = infiles.find("madgraph") != string::npos;
   const bool isMSSMsignal =  (infiles.find("SUSYGluGluToHToTauTau")== infiles.rfind("/")+1) || (infiles.find("SUSYGluGluToBBHToTauTau")== infiles.rfind("/")+1);
   const bool isTauSpinner = infiles.find("Uncorr") != string::npos;
+  const bool isTTbar = infiles.find("TT") != string::npos;
 
   bool applyTauSpinnerWeights = false;
   if(isTauSpinner) applyTauSpinnerWeights = true;
   const bool isEmbedded = infiles.find("Embed") != string::npos;
 
-  const bool ApplyRecoilCorrections = cfg.get<bool>("ApplyRecoilCorrections") && !isData && (isDY || isWJets || isVBForGGHiggs || isMSSMsignal);
-  RecoilCorrector recoilPFMetCorrector(cfg.get<string>("RecoilFilePath"));
+  const bool ApplyRecoilCorrections = cfg.get<bool>("ApplyRecoilCorrections") && !isEmbedded && !isData && (isDY || isWJets || isVBForGGHiggs || isMSSMsignal);
+  kit::RecoilCorrector recoilCorrector(cfg.get<string>("RecoilFilePath"));
+  kit::MEtSys MetSys(cfg.get<string>("RecoilSysFilePath"));
 
-  std::cout << "Hey ya 1 " << std::endl;
   
   // tau cuts
   const float ptTauLowCut    = cfg.get<float>("ptTauLowCut");
@@ -449,7 +451,13 @@ int main(int argc, char * argv[]){
   std::vector<JetEnergyScaleSys*> jetEnergyScaleSys;
   JESUncertainties * jecUncertainties = 0;
 
-  std::vector<TString> metSysNames = {"UnclusteredEn","JetEn","JetRes"};
+  std::vector<TString> metSysNames = {"UnclusteredEn"};
+  std::vector<TString> recoilSysNames = {"boson_resolution_0jet",
+					 "boson_resolution_1jet",
+					 "boson_resolution_2jet",
+					 "boson_response_0jet",
+					 "boson_response_1jet",
+					 "boson_response_2jet"};
   std::vector<PFMETSys*> metSys;
   std::vector<PuppiMETSys*> puppiMetSys;
 
@@ -462,11 +470,22 @@ int main(int argc, char * argv[]){
     if (!isEmbedded) {
       zPtWeightSys = new ZPtWeightSys(otree);
       topPtWeightSys = new TopPtWeightSys(otree);
-      for (unsigned int i = 0; i<metSysNames.size(); ++i) {
-	if (usePuppiMET)
-	  puppiMetSys.push_back(new PuppiMETSys(otree,metSysNames[i]));
-	else
-	  metSys.push_back(new PFMETSys(otree,metSysNames[i]));
+      if (ApplyRecoilCorrections) {
+	if (usePuppiMET) {
+	  for (unsigned int i = 0; i < recoilSysNames.size(); ++i) {
+	    PuppiMETSys * puppiMetRecoilSys = new PuppiMETSys(otree,recoilSysNames[i]);
+	    puppiMetRecoilSys->SetMEtSys(&MetSys);
+	    puppiMetSys.push_back(puppiMetRecoilSys);
+	  }
+	}
+      }
+      else {
+	for (unsigned int i = 0; i<metSysNames.size(); ++i) {
+	  if (usePuppiMET)
+	    puppiMetSys.push_back(new PuppiMETSys(otree,metSysNames[i]));
+	  else
+	    metSys.push_back(new PFMETSys(otree,metSysNames[i]));
+	}
       }
       if (cfg.get<bool>("splitJES")){
 	JESUncertainties *jecUncertainties;
@@ -726,11 +745,11 @@ int main(int argc, char * argv[]){
       	}
       }
     
-      if (overlapEvent && checkOverlap) continue;
-      nonOverlap++;
-      counter[2]++;
+      //      if (overlapEvent && checkOverlap) continue;
+      //      nonOverlap++;
+      //      counter[2]++;
     
-      if (isData && !isEmbedded && !isGoodLumi(otree->run, otree->lumi, json))
+      if ((isData || isEmbedded) && !isGoodLumi(otree->run, otree->lumi, json))
       	continue;
     
       initializeGenTree(gentree);
@@ -1097,12 +1116,12 @@ int main(int argc, char * argv[]){
       	}
       }
     
-      cout << "\n======================" << endl;
-      cout << "Trigger weight = " << otree->trigweight << endl;
-      cout << "Trk eff weight = " << otree->trkeffweight << endl;
-      cout << "id/Iso 1       = " << otree->idisoweight_1 << endl;
-      cout << "id/Iso 2       = " << otree->idisoweight_2 << endl;
-      cout << "======================\n" << endl;
+      //      cout << "\n======================" << endl;
+      //      cout << "Trigger weight = " << otree->trigweight << endl;
+      //      cout << "Trk eff weight = " << otree->trkeffweight << endl;
+      //      cout << "id/Iso 1       = " << otree->idisoweight_1 << endl;
+      //      cout << "id/Iso 2       = " << otree->idisoweight_2 << endl;
+      //      cout << "======================\n" << endl;
 
       otree->effweight = otree->idisoweight_1 * otree->trkeffweight * otree->idisoweight_2 * otree->trigweight;
       otree->weight = otree->effweight * otree->puweight * otree->mcweight; 
@@ -1187,8 +1206,8 @@ int main(int argc, char * argv[]){
       otree->puppimetcov10 = analysisTree.puppimet_sigyx;
       otree->puppimetcov11 = analysisTree.puppimet_sigyy;
 
-      otree->met_uncorr = otree->met;
-      otree->metphi_uncorr = otree->metphi;
+      otree->met_uncorr = otree->puppimet;
+      otree->metphi_uncorr = otree->puppimetphi;
       otree->njetshad = otree->njets;
       if (isWJets) otree->njetshad += 1;
 
@@ -1196,8 +1215,8 @@ int main(int argc, char * argv[]){
       	genV = genTools::genV(analysisTree);
       	genL = genTools::genL(analysisTree);
 
-        genTools::RecoilCorrections( recoilPFMetCorrector, ApplyRecoilCorrections, // pass the value != 0 to apply corrections
-          otree->met, otree->metphi,
+        genTools::KITRecoilCorrections( recoilCorrector, ApplyRecoilCorrections, // pass the value != 0 to apply corrections
+          otree->puppimet, otree->puppimetphi,
           genV.Px(), genV.Py(),
           genL.Px(), genL.Py(),
           otree->njetshad,
@@ -1205,8 +1224,8 @@ int main(int argc, char * argv[]){
         );
         
         // overwriting with recoil-corrected values 
-        otree->met = otree->met_rcmr;
-        otree->metphi = otree->metphi_rcmr;   
+        otree->puppimet = otree->met_rcmr;
+        otree->puppimetphi = otree->metphi_rcmr;   
       }
       
       //ditau sytem
@@ -1245,12 +1264,21 @@ int main(int argc, char * argv[]){
       	  else if (otree->tau_decay_mode_2 == 1)  shift_tes = shift_tes_lepfake_1p1p0; 
       	  else if (otree->tau_decay_mode_2 == 10) shift_tes = shift_tes_lepfake_3prong; 
       	}
-      	correctTauES(tauLV, metLV, shift_tes, isOneProng);	    
-      	otree->pt_2 = tauLV.Pt();
-      	otree->m_2 = tauLV.M();
-      	otree->met = metLV.Pt();
-      	otree->metphi = metLV.Phi();
-       }
+	if (usePuppiMET) {
+	  correctTauES(tauLV, puppimetLV, shift_tes, isOneProng);	    
+	  otree->pt_2 = tauLV.Pt();
+	  otree->m_2 = tauLV.M();
+	  otree->puppimet = puppimetLV.Pt();
+	  otree->puppimetphi = puppimetLV.Phi();
+	}
+	else {
+	  correctTauES(tauLV,metLV,shift_tes, isOneProng);
+	  otree->pt_2 = tauLV.Pt();
+          otree->m_2 = tauLV.M();
+	  otree->met = metLV.Pt();
+	  otree->metphi = metLV.Phi();
+	}
+      }
     
       // if (!isData) {
       // 	if(otree->gen_match_2 == 5 && tauLV.E() <= 400 && tauLV.E() >= 20){
@@ -1274,10 +1302,14 @@ int main(int argc, char * argv[]){
       TLorentzVector dileptonLV = leptonLV + tauLV;
       otree->m_vis = dileptonLV.M();
       otree->pt_tt = (dileptonLV+metLV).Pt();   
+      if (usePuppiMET)
+	otree->pt_tt = (dileptonLV+puppimetLV).Pt();
     
       // mt TOT
-      float mtTOT = 2*(otree->pt_1)*metLV.Pt()*(1-cos(DeltaPhi(leptonLV,metLV)));
-      mtTOT += 2*(otree->pt_2)*metLV.Pt()*(1-cos(DeltaPhi(tauLV,metLV))); 
+      TLorentzVector metxLV = metLV;
+      if (usePuppiMET) metxLV = puppimetLV;
+      float mtTOT = 2*(otree->pt_1)*metxLV.Pt()*(1-cos(DeltaPhi(leptonLV,metxLV)));
+      mtTOT += 2*(otree->pt_2)*metxLV.Pt()*(1-cos(DeltaPhi(tauLV,metxLV))); 
       mtTOT += 2*(otree->pt_1)*(otree->pt_2)*(1-cos(DeltaPhi(leptonLV,tauLV))); 
       otree->mt_tot = TMath::Sqrt(mtTOT);
     
@@ -1325,25 +1357,45 @@ int main(int argc, char * argv[]){
     
       // svfit variables
       otree->m_sv   = -10;
-      otree->pt_sv  = -9999;
-      otree->eta_sv = -9999;
-      otree->phi_sv = -9999;
-      otree->met_sv = -9999;
-      otree->mt_sv = -9999;
-      if (ApplySVFit && otree->njetspt20 > 0) svfit_variables(ch, &analysisTree, otree, &cfg, inputFile_visPtResolution);
+      otree->pt_sv  = -10;
+      otree->eta_sv = -10;
+      otree->phi_sv = -10;
+      otree->met_sv = -10;
+      otree->mt_sv = -10;
+      bool isSRevent = true; //boolean used to compute SVFit variables only on SR events, it is set to true when running Synchronization to run SVFit on all events
+      if(!Synch){
+	isSRevent = (otree->dilepton_veto<0.5 &&  otree->extramuon_veto<0.5 && otree->extraelec_veto<0.5 && (otree->trg_singlemuon>0.5 || otree->trg_mutaucross>0.5) && otree->pt_1>17 && otree->pt_2>25 && otree->byVVVLooseDeepTau2017v2p1VSjet_2>0.5);
+	if(usePuppiMET) isSRevent = isSRevent && otree->puppimt_1<60;
+	else isSRevent = isSRevent && otree->mt_1<60;
+      }
+    /*
+    if (!isSRevent) { 
+      cout << "                                        " << endl;
+      cout << "========================================" << endl;
+      cout << "        Event is not selected           " << endl;
+      cout << "========================================" << endl;
+      cout << "                                        " << endl;
+    }
+    */
+      if (!isSRevent && ApplySystShift) continue;
+      if (ApplySVFit && isSRevent) svfit_variables(ch, &analysisTree, otree, &cfg, inputFile_visPtResolution);
         
       // evaluate systematics for MC 
       if( !isData && !isEmbedded && ApplySystShift){
-	zPtWeightSys->Eval(); 
-	topPtWeightSys->Eval();
+	if (isDY) zPtWeightSys->Eval(); 
+	if (isTTbar) topPtWeightSys->Eval();
 	for(unsigned int i = 0; i < jetEnergyScaleSys.size(); i++)
 	  (jetEnergyScaleSys.at(i))->Eval(); 
-	for(unsigned int i = 0; i < metSys.size(); ++i) 
-	  (metSys.at(i))->Eval();
-	for(unsigned int i = 0; i < puppiMetSys.size(); ++i)
-	  (puppiMetSys.at(i))->Eval();
+	if (usePuppiMET) {
+	  for(unsigned int i = 0; i < puppiMetSys.size(); ++i)
+	    (puppiMetSys.at(i))->Eval();
+	}
+	else {
+	  for(unsigned int i = 0; i < metSys.size(); ++i) 
+	    (metSys.at(i))->Eval();
+	}
       }
-      if (ApplySystShift) {
+      if (!isData && ApplySystShift) {
 	if (ch == "mt") tauScaleSys->Eval(utils::MUTAU);
 	else if (ch == "et") tauScaleSys->Eval(utils::ETAU);
       }
@@ -1355,7 +1407,18 @@ int main(int argc, char * argv[]){
       //one should note that in et or mt case,
       acott_Impr(&analysisTree, otree, leptonIndex, tauIndex, ch);
       selEvents++;
-    
+      /*
+      otree->v_tracks = 0;
+      for(unsigned int i = 0; i < analysisTree.refitvertexwithbs_count; i++)
+        {
+          if( (leptonIndex == analysisTree.refitvertexwithbs_muIndex[i][0] || leptonIndex == analysisTree.refitvertexwithbs_muIndex[i][1]) &&
+              (tauIndex == analysisTree.refitvertexwithbs_tauIndex[i][0] || tauIndex == analysisTree.refitvertexwithbs_tauIndex[i][1]))
+            {
+              otree->v_tracks = analysisTree.refitvertexwithbs_ntracks[i];
+            }
+        }
+      */
+
       //Merijn 2019 1 10: perhaps this should be called before moving to next event..
       otree->Fill();
     } // event loop
