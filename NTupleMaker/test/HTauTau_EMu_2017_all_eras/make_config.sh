@@ -5,7 +5,6 @@ sed -i 's/IsData = true/IsData = false/g' analysisMacroSynch_em_Embedded.conf
 sed 's/IsW = false/IsW = true/' analysisMacroSynch_em_MC.conf > analysisMacroSynch_em_W.conf
 sed 's/IsDY = false/IsDY = true/' analysisMacroSynch_em_MC.conf > analysisMacroSynch_em_DY.conf
 sed 's/IsSignal = false/IsSignal = true/' analysisMacroSynch_em_MC.conf > analysisMacroSynch_em_Signal.conf
-sed 's/SampleNameForPUHist =/SampleNameForPUHist = MC_PU2017_/' analysisMacroSynch_em_Signal.conf > analysisMacroSynch_em_Signal_VBF.conf
 
 #
 
@@ -41,11 +40,13 @@ sed -i 's/ApplygghReweighting = false/ApplygghReweighting = true/g' analysisMacr
 sed -i 's/ApplygghUncertainties = false/ApplygghUncertainties = true/g' analysisMacroSynch_em_Signal_GGH_Htautau_M125.conf 
 sed 's/SampleNameForPUHist = GluGluHToTauTau_M125_13TeV_powheg_pythia8_/SampleNameForPUHist = MC_PU2017_/' analysisMacroSynch_em_Signal_GGH_Htautau_M125.conf > analysisMacroSynch_em_Signal_ggh.conf
 sed 's/SampleNameForPUHist =/SampleNameForPUHist = VBFHToTauTau_M125_/' analysisMacroSynch_em_Signal.conf > analysisMacroSynch_em_Signal_VBF_Htautau_M125.conf
+sed -i 's/ApplyVBFUncertainties = false/ApplyVBFUncertainties = true/g' analysisMacroSynch_em_Signal_VBF_Htautau_M125.conf
 
 sed 's/SampleNameForPUHist =/SampleNameForPUHist = GluGluHToWWTo2L2Nu_/' analysisMacroSynch_em_Signal.conf > analysisMacroSynch_em_Signal_GGH_HWW_M125.conf
 sed -i 's/ApplygghReweighting = false/ApplygghReweighting = true/g' analysisMacroSynch_em_Signal_GGH_HWW_M125.conf
 sed -i 's/ApplygghUncertainties = false/ApplygghUncertainties = true/g' analysisMacroSynch_em_Signal_GGH_HWW_M125.conf  
 sed 's/SampleNameForPUHist =/SampleNameForPUHist = MC_PU2017_/' analysisMacroSynch_em_Signal.conf > analysisMacroSynch_em_Signal_VBF_HWW_M125.conf
+sed -i 's/ApplyVBFUncertainties = false/ApplyVBFUncertainties = true/g' analysisMacroSynch_em_Signal_VBF_HWW_M125.conf
 
 sed 's/SampleNameForPUHist =/SampleNameForPUHist = MC_PU2017_/' analysisMacroSynch_em_Signal.conf > analysisMacroSynch_em_Signal_ZH.conf
 

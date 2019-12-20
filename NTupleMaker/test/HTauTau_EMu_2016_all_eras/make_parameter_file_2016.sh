@@ -44,12 +44,12 @@ echo "CONFIGFILE,FILELIST" > parameters.txt
 #Signal
 ../split_filelist.sh  analysisMacroSynch_em_Signal_ggh.conf  GluGluHToTauTau_M125  4
 ../split_filelist.sh analysisMacroSynch_em_Signal_VBF.conf VBFHToTauTau_M125 4
-../split_filelist.sh  analysisMacroSynch_em_Signal_VBF.conf  WminusHToTauTau_M125 1
-../split_filelist.sh  analysisMacroSynch_em_Signal_VBF.conf  WplusHToTauTau_M125 1
-../split_filelist.sh  analysisMacroSynch_em_Signal_VBF.conf  ZHToTauTau_M125 1
+../split_filelist.sh  analysisMacroSynch_em_Signal.conf  WminusHToTauTau_M125 1
+../split_filelist.sh  analysisMacroSynch_em_Signal.conf  WplusHToTauTau_M125 1
+../split_filelist.sh  analysisMacroSynch_em_Signal.conf  ZHToTauTau_M125 1
 ../split_filelist.sh  analysisMacroSynch_em_Signal_ggh.conf  GluGluHToWWTo2L2Nu_M125 1
 ../split_filelist.sh  analysisMacroSynch_em_Signal_VBF.conf  VBFHToWWTo2L2Nu_M125 1
-../split_filelist.sh  analysisMacroSynch_em_Signal_VBF.conf  ttHJetToTT_M125 1
+../split_filelist.sh  analysisMacroSynch_em_Signal.conf  ttHJetToTT_M125 1
 
 #WG and WGstar 
 ../split_filelist.sh  analysisMacroSynch_em_WG.conf  WGToLNuG   4
@@ -64,6 +64,6 @@ echo "CONFIGFILE,FILELIST" > parameters.txt
 
 ../split_filelist.sh  analysisMacroSynch_em_Embedded.conf Embedding_Run2016  1
 
-../split_filelist.sh  analysisMacroSynch_em_Signal_VBF.conf ggZH_HToTauTau_ZToQQ_M125_13TeV_powheg_pythia8 3
-../split_filelist.sh  analysisMacroSynch_em_Signal_VBF.conf ggZH_HToTauTau_ZToNuNu_M125_13TeV_powheg_pythia8 3
-../split_filelist.sh  analysisMacroSynch_em_Signal_VBF.conf ggZH_HToTauTau_ZToLL_M125_13TeV_powheg_pythia8 3
+../split_filelist.sh  analysisMacroSynch_em_Signal.conf ggZH_HToTauTau_ZToQQ_M125_13TeV_powheg_pythia8 3
+../split_filelist.sh  analysisMacroSynch_em_Signal.conf ggZH_HToTauTau_ZToNuNu_M125_13TeV_powheg_pythia8 3
+../split_filelist.sh  analysisMacroSynch_em_Signal.conf ggZH_HToTauTau_ZToLL_M125_13TeV_powheg_pythia8 3

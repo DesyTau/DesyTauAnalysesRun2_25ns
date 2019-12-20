@@ -39,6 +39,7 @@
 #include "CondTools/BTau/interface/BTagCalibrationReader.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/helper_functions_em.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/ggF_qcd_uncertainty_2017.h"
+#include "DesyTauAnalyses/NTupleMaker/interface/qq2Hqq_uncert_scheme.cpp"
 
 #include "TCut.h"
 
@@ -364,6 +365,17 @@ Float_t THU_ggH_PT60;
 Float_t THU_ggH_PT120;
 Float_t THU_ggH_qmtop;
 
+Float_t THU_qqH_TOT;
+Float_t THU_qqH_PTH200;
+Float_t THU_qqH_Mjj60;
+Float_t THU_qqH_Mjj120;
+Float_t THU_qqH_Mjj350;
+Float_t THU_qqH_Mjj700;
+Float_t THU_qqH_Mjj1000;
+Float_t THU_qqH_Mjj1500;
+Float_t THU_qqH_25;
+Float_t THU_qqH_JET01;
+
 float MaxBJetPt = 1000.;
 float MaxLJetPt = 1000.;
 float MinLJetPt = 20.;
@@ -675,6 +687,17 @@ void SetupTree(){
    tree->Branch("THU_ggH_PT60" , &THU_ggH_PT60, "THU_ggH_PT60/F");
    tree->Branch("THU_ggH_PT120", &THU_ggH_PT120, "THU_ggH_PT120/F");
    tree->Branch("THU_ggH_qmtop", &THU_ggH_qmtop, "THU_ggH_qmtop/F");
+ 
+   tree->Branch("THU_qqH_TOT", &THU_qqH_TOT, "THU_qqH_TOT/F");
+   tree->Branch("THU_qqH_PTH200", &THU_qqH_PTH200, "THU_qqH_PTH200/F");
+   tree->Branch("THU_qqH_Mjj60", &THU_qqH_Mjj60, "THU_qqH_Mjj60/F");
+   tree->Branch("THU_qqH_Mjj120", &THU_qqH_Mjj120, "THU_qqH_Mjj120/F");
+   tree->Branch("THU_qqH_Mjj350", &THU_qqH_Mjj350, "THU_qqH_Mjj350/F");
+   tree->Branch("THU_qqH_Mjj700", &THU_qqH_Mjj700, "THU_qqH_Mjj700/F");
+   tree->Branch("THU_qqH_Mjj1000" , &THU_qqH_Mjj1000, "THU_qqH_Mjj1000/F");
+   tree->Branch("THU_qqH_Mjj1500", &THU_qqH_Mjj1500, "THU_qqH_Mjj1500/F");
+   tree->Branch("THU_qqH_25", &THU_qqH_25, "THU_qqH_25/F");
+   tree->Branch("THU_qqH_JET01", &THU_qqH_JET01, "THU_qqH_JET01/F");
    
    tree->Branch("higgspt_HTXS",&higgspt_HTXS,"higgspt_HTXS/F");
    tree->Branch("njets_HTXS",&njets_HTXS,"njets_HTXS/I");
@@ -993,6 +1016,18 @@ void SetDefaultValues(){
    THU_ggH_PT60 = 1.0;
    THU_ggH_PT120 = 1.0;
    THU_ggH_qmtop = 1.0;
+   
+   THU_qqH_TOT = 1.0;
+   THU_qqH_PTH200 = 1.0;
+   THU_qqH_Mjj60 = 1.0;
+   THU_qqH_Mjj120 = 1.0;
+   THU_qqH_Mjj350 = 1.0;
+   THU_qqH_Mjj700 = 1.0;
+   THU_qqH_Mjj1000 = 1.0;
+   THU_qqH_Mjj1500 = 1.0;
+   THU_qqH_25 = 1.0;
+   THU_qqH_JET01 = 1.0;
+
    qcdweight = 1;
    qcdweightup = 1;
    qcdweightdown = 1;

@@ -149,6 +149,7 @@ int main(int argc, char * argv[]) {
 
    const bool apply_ggh_reweighting = cfg.get<bool>("ApplygghReweighting");
    const bool apply_ggh_uncertainties = cfg.get<bool>("ApplygghUncertainties");
+   const bool apply_vbf_uncertainties = cfg.get<bool>("ApplyVBFUncertainties");
  
    const bool  isSampleForRecoilCorrection = (isW||isDY||isSignal)&&!isData;
    
@@ -660,11 +661,11 @@ int main(int argc, char * argv[]) {
             isZLL = isZMM || isZEE;
          } // end of if !isData
 
-         // ggh reweighting  ===========================================================================================================================================
+         // ggh reweighting   && ggH and VBF uncertainties================================================================================================================
          if (isSignal){
             njets_HTXS = analysisTree.htxs_njets30;
-	    higgspt_HTXS = analysisTree.htxs_higgsPt;
-	    htxs_stage0cat = analysisTree.htxs_stage0cat;
+            higgspt_HTXS = analysisTree.htxs_higgsPt;
+            htxs_stage0cat = analysisTree.htxs_stage0cat;
             htxs_stage1cat = analysisTree.htxs_stage1p1cat;
             htxs_stage1p1cat = analysisTree.htxs_stage1p1cat;
 
@@ -687,6 +688,19 @@ int main(int argc, char * argv[]) {
                THU_ggH_PT60 = ggF_unc[6];
                THU_ggH_PT120 = ggF_unc[7];
                THU_ggH_qmtop = ggF_unc[8];
+            }
+            
+            if (apply_vbf_uncertainties){
+               THU_qqH_TOT = vbf_uncert_stage_1_1(0, htxs_stage1p1cat, 1.0);
+               THU_qqH_PTH200 = vbf_uncert_stage_1_1(1, htxs_stage1p1cat, 1.0);
+               THU_qqH_Mjj60 = vbf_uncert_stage_1_1(2, htxs_stage1p1cat, 1.0);
+               THU_qqH_Mjj120 = vbf_uncert_stage_1_1(3, htxs_stage1p1cat, 1.0);
+               THU_qqH_Mjj350 = vbf_uncert_stage_1_1(4, htxs_stage1p1cat, 1.0);
+               THU_qqH_Mjj700 = vbf_uncert_stage_1_1(5, htxs_stage1p1cat, 1.0);
+               THU_qqH_Mjj1000 =vbf_uncert_stage_1_1(6, htxs_stage1p1cat, 1.0);
+               THU_qqH_Mjj1500 = vbf_uncert_stage_1_1(7, htxs_stage1p1cat, 1.0);
+               THU_qqH_25 = vbf_uncert_stage_1_1(8, htxs_stage1p1cat, 1.0);
+               THU_qqH_JET01 = vbf_uncert_stage_1_1(9, htxs_stage1p1cat, 1.0);
             }
                   
          }
