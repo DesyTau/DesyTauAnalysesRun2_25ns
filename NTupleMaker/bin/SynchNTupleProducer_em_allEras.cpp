@@ -217,11 +217,11 @@ int main(int argc, char * argv[]) {
       JetCorrectionUncertainty *unc = new JetCorrectionUncertainty(*p);
       vsrc_RelativeBal[isrc] = unc;
    }
-   for (int isrc = 0; isrc < nsrc_RelativeSample; isrc++) {
-      const char *name = srcnames_RelativeSample[isrc];
+   for (int isrc = 0; isrc < nsrc_RelativeSampleYear; isrc++) {
+      const char *name = srcnames_RelativeSampleYear[isrc];
       JetCorrectorParameters const *p = new JetCorrectorParameters(cmsswBase+"/src/"+jec_UncertaintySources, name);
       JetCorrectionUncertainty *unc = new JetCorrectionUncertainty(*p);
-      vsrc_RelativeSample[isrc] = unc;
+      vsrc_RelativeSampleYear[isrc] = unc;
    }
    for (int isrc = 0; isrc < nsrc_EC2; isrc++) {
       const char *name = srcnames_EC2[isrc];
@@ -235,21 +235,45 @@ int main(int argc, char * argv[]) {
       JetCorrectionUncertainty *unc = new JetCorrectionUncertainty(*p);
       vsrc_FlavorQCD[isrc] = unc;
    }
+   for (int isrc = 0; isrc < nsrc_AbsoluteYear; isrc++) {
+      const char *name = srcnames_AbsoluteYear[isrc];
+      JetCorrectorParameters const *p = new JetCorrectorParameters(cmsswBase+"/src/"+jec_UncertaintySources, name);
+      JetCorrectionUncertainty *unc = new JetCorrectionUncertainty(*p);
+      vsrc_AbsoluteYear[isrc] = unc;
+   }
+   for (int isrc = 0; isrc < nsrc_HFYear; isrc++) {
+      const char *name = srcnames_HFYear[isrc];
+      JetCorrectorParameters const *p = new JetCorrectorParameters(cmsswBase+"/src/"+jec_UncertaintySources, name);
+      JetCorrectionUncertainty *unc = new JetCorrectionUncertainty(*p);
+      vsrc_HFYear[isrc] = unc;
+   }
+   for (int isrc = 0; isrc < nsrc_EC2Year; isrc++) {
+      const char *name = srcnames_EC2Year[isrc];
+      JetCorrectorParameters const *p = new JetCorrectorParameters(cmsswBase+"/src/"+jec_UncertaintySources, name);
+      JetCorrectionUncertainty *unc = new JetCorrectionUncertainty(*p);
+      vsrc_EC2Year[isrc] = unc;
+   }
+   for (int isrc = 0; isrc < nsrc_BBEC1Year; isrc++) {
+      const char *name = srcnames_BBEC1Year[isrc];
+      JetCorrectorParameters const *p = new JetCorrectorParameters(cmsswBase+"/src/"+jec_UncertaintySources, name);
+      JetCorrectionUncertainty *unc = new JetCorrectionUncertainty(*p);
+      vsrc_BBEC1Year[isrc] = unc;
+   }
 
    map< TString , vector<JetCorrectionUncertainty*> > jec_unc_map = {
       { "jecUncEta0To5"     , vsrc_Eta0To5 },
       { "jecUncEta0To3"     , vsrc_Eta0To3 },
       { "jecUncEta3To5"     , vsrc_Eta3To5 },
       { "jecUncRelativeBal" , vsrc_RelativeBal }, 
-      { "jecUncRelativeSample", vsrc_RelativeSample },
+      { "jecUncRelativeSampleYear", vsrc_RelativeSampleYear },
       { "jecUncEC2"         , vsrc_EC2 }, 
       { "jecUncFlavorQCD"   , vsrc_FlavorQCD }, 
+      { "jecUncAbsoluteYear"   , vsrc_AbsoluteYear }, 
+      { "jecUncHFYear"   , vsrc_HFYear }, 
+      { "jecUncEC2Year"   , vsrc_EC2Year }, 
+      { "jecUncBBEC1Year"   , vsrc_BBEC1Year }, 
    };
-   
-   if (era!="2016"){
-      jec_unc_map["jecUncRelativeSample"] = vsrc_RelativeSample;
-   }
-   
+      
    // initialize good run selection ====================================================================================================================================
    std::vector<Period> periods;
    string fullPathToJsonFile = cmsswBase + "/src/DesyTauAnalyses/NTupleMaker/test/json/" + jsonFile;
@@ -1077,10 +1101,16 @@ int main(int argc, char * argv[]) {
                if(jetLV_jecUnc.at("jecUncEC2Up").Pt() > jetPtmax) jetPtmax = jetLV_jecUnc.at("jecUncEC2Up").Pt();
                if(jetLV_jecUnc.at("jecUncFlavorQCDDown").Pt() > jetPtmax) jetPtmax = jetLV_jecUnc.at("jecUncFlavorQCDDown").Pt();
                if(jetLV_jecUnc.at("jecUncFlavorQCDUp").Pt() > jetPtmax) jetPtmax = jetLV_jecUnc.at("jecUncFlavorQCDUp").Pt();
-               if (era!="2016") {
-                  if(jetLV_jecUnc.at("jecUncRelativeSampleDown").Pt() > jetPtmax) jetPtmax = jetLV_jecUnc.at("jecUncRelativeSampleDown").Pt();
-                  if(jetLV_jecUnc.at("jecUncRelativeSampleUp").Pt() > jetPtmax) jetPtmax = jetLV_jecUnc.at("jecUncRelativeSampleUp").Pt();
-               }
+               if(jetLV_jecUnc.at("jecUncAbsoluteYearDown").Pt() > jetPtmax) jetPtmax = jetLV_jecUnc.at("jecUncAbsoluteYearDown").Pt();
+               if(jetLV_jecUnc.at("jecUncAbsoluteYearUp").Pt() > jetPtmax) jetPtmax = jetLV_jecUnc.at("jecUncAbsoluteYearUp").Pt();
+               if(jetLV_jecUnc.at("jecUncHFYearDown").Pt() > jetPtmax) jetPtmax = jetLV_jecUnc.at("jecUncHFYearDown").Pt();
+               if(jetLV_jecUnc.at("jecUncHFYearUp").Pt() > jetPtmax) jetPtmax = jetLV_jecUnc.at("jecUncHFYearUp").Pt();
+               if(jetLV_jecUnc.at("jecUncEC2YearDown").Pt() > jetPtmax) jetPtmax = jetLV_jecUnc.at("jecUncEC2YearDown").Pt();
+               if(jetLV_jecUnc.at("jecUncEC2YearUp").Pt() > jetPtmax) jetPtmax = jetLV_jecUnc.at("jecUncEC2YearUp").Pt();
+               if(jetLV_jecUnc.at("jecUncBBEC1YearDown").Pt() > jetPtmax) jetPtmax = jetLV_jecUnc.at("jecUncBBEC1YearDown").Pt();
+               if(jetLV_jecUnc.at("jecUncBBEC1YearUp").Pt() > jetPtmax) jetPtmax = jetLV_jecUnc.at("jecUncBBEC1YearUp").Pt();
+               if(jetLV_jecUnc.at("jecUncRelativeSampleYearDown").Pt() > jetPtmax) jetPtmax = jetLV_jecUnc.at("jecUncRelativeSampleYearDown").Pt();
+               if(jetLV_jecUnc.at("jecUncRelativeSampleYearUp").Pt() > jetPtmax) jetPtmax = jetLV_jecUnc.at("jecUncRelativeSampleYearUp").Pt();
                jetPt_tocheck = jetPtmax;
             }
             if (jetPt_tocheck<jetPtLowCut) continue;   
@@ -1217,10 +1247,16 @@ int main(int argc, char * argv[]) {
             if (jetLV_jecUnc.at("jecUncEC2Down").Pt()>jetPtHighCut) njets_jecUncEC2Down += 1;
             if (jetLV_jecUnc.at("jecUncFlavorQCDUp").Pt()>jetPtHighCut) njets_jecUncFlavorQCDUp += 1;
             if (jetLV_jecUnc.at("jecUncFlavorQCDDown").Pt()>jetPtHighCut) njets_jecUncFlavorQCDDown += 1;
-            if (era!="2016"){
-               if (jetLV_jecUnc.at("jecUncRelativeSampleUp").Pt()>jetPtHighCut) njets_jecUncRelativeSampleUp += 1;
-               if (jetLV_jecUnc.at("jecUncRelativeSampleDown").Pt()>jetPtHighCut) njets_jecUncRelativeSampleDown += 1;
-            }
+            if (jetLV_jecUnc.at("jecUncRelativeSampleYearUp").Pt()>jetPtHighCut) njets_jecUncRelativeSampleYearUp += 1;
+            if (jetLV_jecUnc.at("jecUncRelativeSampleYearDown").Pt()>jetPtHighCut) njets_jecUncRelativeSampleYearDown += 1;
+            if (jetLV_jecUnc.at("jecUncEC2YearUp").Pt()>jetPtHighCut) njets_jecUncEC2YearUp += 1;
+            if (jetLV_jecUnc.at("jecUncEC2YearDown").Pt()>jetPtHighCut) njets_jecUncEC2YearDown += 1;
+            if (jetLV_jecUnc.at("jecUncHFYearUp").Pt()>jetPtHighCut) njets_jecUncHFYearUp += 1;
+            if (jetLV_jecUnc.at("jecUncHFYearDown").Pt()>jetPtHighCut) njets_jecUncHFYearDown += 1;
+            if (jetLV_jecUnc.at("jecUncAbsoluteYearUp").Pt()>jetPtHighCut) njets_jecUncAbsoluteYearUp += 1;
+            if (jetLV_jecUnc.at("jecUncAbsoluteYearDown").Pt()>jetPtHighCut) njets_jecUncAbsoluteYearDown += 1;
+            if (jetLV_jecUnc.at("jecUncBBEC1YearUp").Pt()>jetPtHighCut) njets_jecUncBBEC1YearUp += 1;
+            if (jetLV_jecUnc.at("jecUncBBEC1YearDown").Pt()>jetPtHighCut) njets_jecUncBBEC1YearDown += 1;
             if (jetPt>jetPtHighCut)
                jets.push_back(jet); 
             
@@ -1891,14 +1927,36 @@ int main(int argc, char * argv[]) {
          if (!isSampleForRecoilCorrection && jet1.E() != 0) uncertainty_map.at("jecUncFlavorQCDDown").metLV = metLV_jecUnc.at("jecUncFlavorQCDDown");
          if(jet1.E() != 0) uncertainty_map.at("jecUncFlavorQCDDown").jet1LV = jet1LV_jecUnc.at("jecUncFlavorQCDDown");
          if(jet2.E() != 0) uncertainty_map.at("jecUncFlavorQCDDown").jet2LV = jet2LV_jecUnc.at("jecUncFlavorQCDDown");
-         if (era!="2016"){
-            if (!isSampleForRecoilCorrection && jet1.E() != 0) uncertainty_map.at("jecUncRelativeSampleUp").metLV = metLV_jecUnc.at("jecUncRelativeSampleUp");
-            if(jet1.E() != 0) uncertainty_map.at("jecUncRelativeSampleUp").jet1LV = jet1LV_jecUnc.at("jecUncRelativeSampleUp");
-            if(jet2.E() != 0) uncertainty_map.at("jecUncRelativeSampleUp").jet2LV = jet2LV_jecUnc.at("jecUncRelativeSampleUp");
-            if (!isSampleForRecoilCorrection && jet1.E() != 0) uncertainty_map.at("jecUncRelativeSampleDown").metLV = metLV_jecUnc.at("jecUncRelativeSampleDown");
-            if(jet1.E() != 0) uncertainty_map.at("jecUncRelativeSampleDown").jet1LV = jet1LV_jecUnc.at("jecUncRelativeSampleDown");
-            if(jet2.E() != 0) uncertainty_map.at("jecUncRelativeSampleDown").jet2LV = jet2LV_jecUnc.at("jecUncRelativeSampleDown");
-         }
+         if (!isSampleForRecoilCorrection && jet1.E() != 0) uncertainty_map.at("jecUncEC2YearUp").metLV = metLV_jecUnc.at("jecUncEC2YearUp");
+         if(jet1.E() != 0) uncertainty_map.at("jecUncEC2YearUp").jet1LV = jet1LV_jecUnc.at("jecUncEC2YearUp");
+         if(jet2.E() != 0) uncertainty_map.at("jecUncEC2YearUp").jet2LV = jet2LV_jecUnc.at("jecUncEC2YearUp");
+         if (!isSampleForRecoilCorrection && jet1.E() != 0) uncertainty_map.at("jecUncEC2YearDown").metLV = metLV_jecUnc.at("jecUncEC2YearDown");
+         if(jet1.E() != 0) uncertainty_map.at("jecUncEC2YearDown").jet1LV = jet1LV_jecUnc.at("jecUncEC2YearDown");
+         if(jet2.E() != 0) uncertainty_map.at("jecUncEC2YearDown").jet2LV = jet2LV_jecUnc.at("jecUncEC2YearDown");
+         if (!isSampleForRecoilCorrection && jet1.E() != 0) uncertainty_map.at("jecUncHFYearUp").metLV = metLV_jecUnc.at("jecUncHFYearUp");
+         if(jet1.E() != 0) uncertainty_map.at("jecUncHFYearUp").jet1LV = jet1LV_jecUnc.at("jecUncHFYearUp");
+         if(jet2.E() != 0) uncertainty_map.at("jecUncHFYearUp").jet2LV = jet2LV_jecUnc.at("jecUncHFYearUp");
+         if (!isSampleForRecoilCorrection && jet1.E() != 0) uncertainty_map.at("jecUncHFYearDown").metLV = metLV_jecUnc.at("jecUncHFYearDown");
+         if(jet1.E() != 0) uncertainty_map.at("jecUncHFYearDown").jet1LV = jet1LV_jecUnc.at("jecUncHFYearDown");
+         if(jet2.E() != 0) uncertainty_map.at("jecUncHFYearDown").jet2LV = jet2LV_jecUnc.at("jecUncHFYearDown");
+         if (!isSampleForRecoilCorrection && jet1.E() != 0) uncertainty_map.at("jecUncAbsoluteYearUp").metLV = metLV_jecUnc.at("jecUncAbsoluteYearUp");
+         if(jet1.E() != 0) uncertainty_map.at("jecUncAbsoluteYearUp").jet1LV = jet1LV_jecUnc.at("jecUncAbsoluteYearUp");
+         if(jet2.E() != 0) uncertainty_map.at("jecUncAbsoluteYearUp").jet2LV = jet2LV_jecUnc.at("jecUncAbsoluteYearUp");
+         if (!isSampleForRecoilCorrection && jet1.E() != 0) uncertainty_map.at("jecUncAbsoluteYearDown").metLV = metLV_jecUnc.at("jecUncAbsoluteYearDown");
+         if(jet1.E() != 0) uncertainty_map.at("jecUncAbsoluteYearDown").jet1LV = jet1LV_jecUnc.at("jecUncAbsoluteYearDown");
+         if(jet2.E() != 0) uncertainty_map.at("jecUncAbsoluteYearDown").jet2LV = jet2LV_jecUnc.at("jecUncAbsoluteYearDown");
+         if (!isSampleForRecoilCorrection && jet1.E() != 0) uncertainty_map.at("jecUncBBEC1YearUp").metLV = metLV_jecUnc.at("jecUncBBEC1YearUp");
+         if(jet1.E() != 0) uncertainty_map.at("jecUncBBEC1YearUp").jet1LV = jet1LV_jecUnc.at("jecUncBBEC1YearUp");
+         if(jet2.E() != 0) uncertainty_map.at("jecUncBBEC1YearUp").jet2LV = jet2LV_jecUnc.at("jecUncBBEC1YearUp");
+         if (!isSampleForRecoilCorrection && jet1.E() != 0) uncertainty_map.at("jecUncBBEC1YearDown").metLV = metLV_jecUnc.at("jecUncBBEC1YearDown");
+         if(jet1.E() != 0) uncertainty_map.at("jecUncBBEC1YearDown").jet1LV = jet1LV_jecUnc.at("jecUncBBEC1YearDown");
+         if(jet2.E() != 0) uncertainty_map.at("jecUncBBEC1YearDown").jet2LV = jet2LV_jecUnc.at("jecUncBBEC1YearDown");
+         if (!isSampleForRecoilCorrection && jet1.E() != 0) uncertainty_map.at("jecUncRelativeSampleYearUp").metLV = metLV_jecUnc.at("jecUncRelativeSampleYearUp");
+         if(jet1.E() != 0) uncertainty_map.at("jecUncRelativeSampleYearUp").jet1LV = jet1LV_jecUnc.at("jecUncRelativeSampleYearUp");
+         if(jet2.E() != 0) uncertainty_map.at("jecUncRelativeSampleYearUp").jet2LV = jet2LV_jecUnc.at("jecUncRelativeSampleYearUp");
+         if (!isSampleForRecoilCorrection && jet1.E() != 0) uncertainty_map.at("jecUncRelativeSampleYearDown").metLV = metLV_jecUnc.at("jecUncRelativeSampleYearDown");
+         if(jet1.E() != 0) uncertainty_map.at("jecUncRelativeSampleYearDown").jet1LV = jet1LV_jecUnc.at("jecUncRelativeSampleYearDown");
+         if(jet2.E() != 0) uncertainty_map.at("jecUncRelativeSampleYearDown").jet2LV = jet2LV_jecUnc.at("jecUncRelativeSampleYearDown");
          
          for(auto &uncert : uncertainty_map){
             bool is_data_or_embedded = isData || (isEmbedded && !uncert.first.Contains("escale") && !uncert.first.Contains("ereso"));

@@ -242,12 +242,20 @@ Int_t           njets_jecUncEta3To5Up;
 Int_t           njets_jecUncEta3To5Down;
 Int_t           njets_jecUncRelativeBalUp;
 Int_t           njets_jecUncRelativeBalDown;
-Int_t           njets_jecUncRelativeSampleUp;
-Int_t           njets_jecUncRelativeSampleDown;
+Int_t           njets_jecUncRelativeSampleYearUp;
+Int_t           njets_jecUncRelativeSampleYearDown;
 Int_t           njets_jecUncEC2Up;
 Int_t           njets_jecUncEC2Down;
 Int_t           njets_jecUncFlavorQCDUp;
 Int_t           njets_jecUncFlavorQCDDown;
+Int_t           njets_jecUncEC2YearUp;
+Int_t           njets_jecUncEC2YearDown;
+Int_t           njets_jecUncHFYearUp;
+Int_t           njets_jecUncHFYearDown;
+Int_t           njets_jecUncAbsoluteYearUp;
+Int_t           njets_jecUncAbsoluteYearDown;
+Int_t           njets_jecUncBBEC1YearUp;
+Int_t           njets_jecUncBBEC1YearDown;
 
 Int_t           njetspt20;
 
@@ -448,12 +456,20 @@ inputs jecUncEta3To5Up;
 inputs jecUncEta3To5Down;
 inputs jecUncRelativeBalUp;
 inputs jecUncRelativeBalDown;
-inputs jecUncRelativeSampleUp;
-inputs jecUncRelativeSampleDown;
+inputs jecUncRelativeSampleYearUp;
+inputs jecUncRelativeSampleYearDown;
 inputs jecUncEC2Up;
 inputs jecUncEC2Down;
 inputs jecUncFlavorQCDUp;
 inputs jecUncFlavorQCDDown;
+inputs jecUncAbsoluteYearUp;
+inputs jecUncAbsoluteYearDown;
+inputs jecUncBBEC1YearUp;
+inputs jecUncBBEC1YearDown;
+inputs jecUncEC2YearUp;
+inputs jecUncEC2YearDown;
+inputs jecUncHFYearUp;
+inputs jecUncHFYearDown;
 
 map<TString, inputs> uncertainty_map = { { "unclMetUp" , unclMetUp },
                                          { "unclMetDown" , unclMetDown },
@@ -475,48 +491,67 @@ map<TString, inputs> uncertainty_map = { { "unclMetUp" , unclMetUp },
                                          { "jecUncEta3To5Down" , jecUncEta3To5Down },
                                          { "jecUncRelativeBalUp" , jecUncRelativeBalUp },
                                          { "jecUncRelativeBalDown" , jecUncRelativeBalDown },
-                                         { "jecUncRelativeSampleUp" , jecUncRelativeSampleUp },
-                                         { "jecUncRelativeSampleDown" , jecUncRelativeSampleDown },
+                                         { "jecUncRelativeSampleYearUp" , jecUncRelativeSampleYearUp },
+                                         { "jecUncRelativeSampleYearDown" , jecUncRelativeSampleYearDown },
                                          { "jecUncEC2Up" , jecUncEC2Up},
                                          { "jecUncEC2Down" , jecUncEC2Down},
                                          { "jecUncFlavorQCDUp" , jecUncFlavorQCDUp},
-                                         { "jecUncFlavorQCDDown" , jecUncFlavorQCDDown}
+                                         { "jecUncFlavorQCDDown" , jecUncFlavorQCDDown},
+                                         { "jecUncAbsoluteYearUp" , jecUncAbsoluteYearUp},
+                                         { "jecUncAbsoluteYearDown" , jecUncAbsoluteYearDown},
+                                         { "jecUncBBEC1YearUp" , jecUncBBEC1YearUp},
+                                         { "jecUncBBEC1YearDown" , jecUncBBEC1YearDown},
+                                         { "jecUncEC2YearUp" , jecUncEC2YearUp},
+                                         { "jecUncEC2YearDown" , jecUncEC2YearDown},
+                                         { "jecUncHFYearUp" , jecUncHFYearUp},
+                                         { "jecUncHFYearDown" , jecUncHFYearDown}                                         
 };
 
-const int nsrc_Eta0To5 = 11;
+const int nsrc_Eta0To5 = 8; // == Absolute according to https://docs.google.com/spreadsheets/d/1Feuj1n0MdotcPq19Mht7SUIgvkXkA4hiB0BxEuBShLw/edit#gid=1345121349
 const char* srcnames_Eta0To5[nsrc_Eta0To5] = {"SinglePionECAL",
                                               "SinglePionHCAL",
                                               "AbsoluteMPFBias",
                                               "AbsoluteScale",
-                                              "AbsoluteStat",
                                               "Fragmentation",
-                                              "TimePtEta",
                                               "PileUpDataMC",
                                               "RelativeFSR",
-                                              "RelativeStatFSR",
                                               "PileUpPtRef"};
-const int nsrc_Eta0To3 = 6;
+const int nsrc_AbsoluteYear = 3;
+const char* srcnames_AbsoluteYear[nsrc_AbsoluteYear] = {"AbsoluteStat",
+                                                        "RelativeStatFSR", 
+                                                        "TimePtEta"};
+
+
+const int nsrc_Eta0To3 = 3; // == BBEC1 according to https://docs.google.com/spreadsheets/d/1Feuj1n0MdotcPq19Mht7SUIgvkXkA4hiB0BxEuBShLw/edit#gid=1345121349
 const char* srcnames_Eta0To3[nsrc_Eta0To3] = {"PileUpPtEC1",
                                               "PileUpPtBB",
-                                              "RelativeJEREC1",
-                                              "RelativePtEC1",
-                                              "RelativeStatEC",
                                               "RelativePtBB"};
-const int nsrc_Eta3To5 = 4;
-const char* srcnames_Eta3To5[nsrc_Eta3To5] = {"RelativeStatHF",
-                                              "RelativePtHF",
+const int nsrc_BBEC1Year= 3;
+const char* srcnames_BBEC1Year[nsrc_BBEC1Year] = {"RelativeJEREC1",
+                                                  "RelativePtEC1",
+                                                  "RelativeStatEC"};
+
+const int nsrc_Eta3To5 = 3;// == HF according to https://docs.google.com/spreadsheets/d/1Feuj1n0MdotcPq19Mht7SUIgvkXkA4hiB0BxEuBShLw/edit#gid=1345121349
+const char* srcnames_Eta3To5[nsrc_Eta3To5] = {"RelativePtHF",
                                               "PileUpPtHF",
                                               "RelativeJERHF"};
+
+const int nsrc_HFYear = 1;
+const char* srcnames_HFYear[nsrc_HFYear] = {"RelativeStatHF"};
+
 const int nsrc_RelativeBal = 1;
 const char* srcnames_RelativeBal[nsrc_RelativeBal] = {"RelativeBal"};
 
-const int nsrc_RelativeSample = 1;
-const char* srcnames_RelativeSample[nsrc_RelativeSample] = {"RelativeSample"};
+const int nsrc_RelativeSampleYear = 1;
+const char* srcnames_RelativeSampleYear[nsrc_RelativeSampleYear] = {"RelativeSample"};
 
-const int nsrc_EC2 = 3;
-const char*srcnames_EC2[nsrc_EC2] = {"PileUpPtEC2",
-                                     "RelativeJEREC2", 
-                                     "RelativePtEC2"};
+const int nsrc_EC2 = 1;
+const char*srcnames_EC2[nsrc_EC2] = {"PileUpPtEC2"};
+
+
+const int nsrc_EC2Year = 2;
+const char*srcnames_EC2Year[nsrc_EC2Year] = {"RelativeJEREC2", 
+                                             "RelativePtEC2"};
 
 const int nsrc_FlavorQCD = 1;
 const char* srcnames_FlavorQCD[nsrc_FlavorQCD] = {"FlavorQCD"};
@@ -525,9 +560,14 @@ std::vector<JetCorrectionUncertainty*> vsrc_Eta0To5(nsrc_Eta0To5);
 std::vector<JetCorrectionUncertainty*> vsrc_Eta0To3(nsrc_Eta0To3);
 std::vector<JetCorrectionUncertainty*> vsrc_Eta3To5(nsrc_Eta3To5);
 std::vector<JetCorrectionUncertainty*> vsrc_RelativeBal(nsrc_RelativeBal);
-std::vector<JetCorrectionUncertainty*> vsrc_RelativeSample(nsrc_RelativeSample);
+std::vector<JetCorrectionUncertainty*> vsrc_RelativeSampleYear(nsrc_RelativeSampleYear);
 std::vector<JetCorrectionUncertainty*> vsrc_EC2(nsrc_EC2);
 std::vector<JetCorrectionUncertainty*> vsrc_FlavorQCD(nsrc_FlavorQCD);
+std::vector<JetCorrectionUncertainty*> vsrc_HFYear(nsrc_HFYear);
+std::vector<JetCorrectionUncertainty*> vsrc_EC2Year(nsrc_EC2Year);
+std::vector<JetCorrectionUncertainty*> vsrc_BBEC1Year(nsrc_BBEC1Year);
+std::vector<JetCorrectionUncertainty*> vsrc_AbsoluteYear(nsrc_AbsoluteYear);
+
 
 
 TTree *tree = new TTree("TauCheck","TauCheck");
@@ -892,12 +932,21 @@ void SetupTree(){
    tree->Branch("njets_jecUncEta3To5Down", &njets_jecUncEta3To5Down, "njets_jecUncEta3To5Down/I");
    tree->Branch("njets_jecUncRelativeBalUp", &njets_jecUncRelativeBalUp, "njets_jecUncRelativeBalUp/I");
    tree->Branch("njets_jecUncRelativeBalDown", &njets_jecUncRelativeBalDown, "njets_jecUncRelativeBalDown/I");
-   tree->Branch("njets_jecUncRelativeSampleUp", &njets_jecUncRelativeSampleUp, "njets_jecUncRelativeSampleUp/I");
-   tree->Branch("njets_jecUncRelativeSampleDown", &njets_jecUncRelativeSampleDown, "njets_jecUncRelativeSampleDown/I");
+   tree->Branch("njets_jecUncRelativeSampleYearUp", &njets_jecUncRelativeSampleYearUp, "njets_jecUncRelativeSampleYearUp/I");
+   tree->Branch("njets_jecUncRelativeSampleYearDown", &njets_jecUncRelativeSampleYearDown, "njets_jecUncRelativeSampleYearDown/I");
    tree->Branch("njets_jecUncEC2Up", &njets_jecUncEC2Up, "njets_jecUncEC2Up/I");
    tree->Branch("njets_jecUncEC2Down", &njets_jecUncEC2Down, "njets_jecUncEC2Down/I");
    tree->Branch("njets_jecUncFlavorQCDUp", &njets_jecUncFlavorQCDUp, "njets_jecUncFlavorQCDUp/I");
    tree->Branch("njets_jecUncFlavorQCDDown", &njets_jecUncFlavorQCDDown, "njets_jecUncFlavorQCDDown/I");
+   tree->Branch("njets_jecUncEC2YearUp", &njets_jecUncEC2YearUp, "njets_jecUncEC2YearUp/I");
+   tree->Branch("njets_jecUncEC2YearDown", &njets_jecUncEC2YearDown, "njets_jecUncEC2YearDown/I");
+   tree->Branch("njets_jecUncHFYearUp", &njets_jecUncHFYearUp, "njets_jecUncHFYearUp/I");
+   tree->Branch("njets_jecUncHFYearDown", &njets_jecUncHFYearDown, "njets_jecUncHFYearDown/I");
+   tree->Branch("njets_jecUncAbsoluteYearUp", &njets_jecUncAbsoluteYearUp, "njets_jecUncAbsoluteYearUp/I");
+   tree->Branch("njets_jecUncAbsoluteYearDown", &njets_jecUncAbsoluteYearDown, "njets_jecUncAbsoluteYearDown/I");
+   tree->Branch("njets_jecUncBBEC1YearUp", &njets_jecUncBBEC1YearUp, "njets_jecUncBBEC1YearUp/I");
+   tree->Branch("njets_jecUncBBEC1YearDown", &njets_jecUncBBEC1YearDown, "njets_jecUncBBEC1YearDown/I");
+
 
    tree->Branch("njetspt20", &njetspt20, "njetspt20/I");
    
@@ -1187,12 +1236,20 @@ void SetDefaultValues(){
    njets_jecUncEta3To5Down = 0;
    njets_jecUncRelativeBalUp   = 0;
    njets_jecUncRelativeBalDown = 0;
-   njets_jecUncRelativeSampleUp   = 0;
-   njets_jecUncRelativeSampleDown = 0;
+   njets_jecUncRelativeSampleYearUp   = 0;
+   njets_jecUncRelativeSampleYearDown = 0;
    njets_jecUncEC2Up   = 0;
    njets_jecUncEC2Down = 0;
    njets_jecUncFlavorQCDUp   = 0;
    njets_jecUncFlavorQCDDown = 0;
+   njets_jecUncEC2YearUp   = 0;
+   njets_jecUncEC2YearDown = 0;
+   njets_jecUncHFYearUp   = 0;
+   njets_jecUncHFYearDown = 0;
+   njets_jecUncAbsoluteYearUp   = 0;
+   njets_jecUncAbsoluteYearDown = 0;
+   njets_jecUncBBEC1YearUp   = 0;
+   njets_jecUncBBEC1YearDown = 0;
 
    indexLeadingJet = -1;
    ptLeadingJet = -1;
