@@ -43,7 +43,10 @@ echo "CONFIGFILE,FILELIST" > parameters.txt
 
 #Signal
 ../split_filelist.sh  analysisMacroSynch_em_Signal_ggh.conf  GluGluHToTauTau_M125  4
+../split_filelist.sh  analysisMacroSynch_em_Signal_ggh.conf  GluGluHToTauTau_M125_ext1 40 
 ../split_filelist.sh analysisMacroSynch_em_Signal_VBF.conf VBFHToTauTau_M125 4
+../split_filelist.sh analysisMacroSynch_em_Signal_VBF.conf VBFHToTauTau_M125_ext1 40
+
 ../split_filelist.sh  analysisMacroSynch_em_Signal.conf  WminusHToTauTau_M125 1
 ../split_filelist.sh  analysisMacroSynch_em_Signal.conf  WplusHToTauTau_M125 1
 ../split_filelist.sh  analysisMacroSynch_em_Signal.conf  ZHToTauTau_M125 1
