@@ -6,6 +6,13 @@ sed 's/IsW = false/IsW = true/' analysisMacroSynch_em_MC.conf > analysisMacroSyn
 sed 's/IsDY = false/IsDY = true/' analysisMacroSynch_em_MC.conf > analysisMacroSynch_em_DY.conf
 sed 's/IsSignal = false/IsSignal = true/' analysisMacroSynch_em_MC.conf > analysisMacroSynch_em_Signal.conf
 
+cp analysisMacroSynch_em_Signal.conf analysisMacroSynch_em_Signal_VBF.conf
+cp analysisMacroSynch_em_Signal.conf analysisMacroSynch_em_Signal_ggZH.conf
+sed -i 's/SampleNameForPUHist =/SampleNameForPUHist = MC_PU2017_/' analysisMacroSynch_em_Signal_VBF.conf
+sed -i 's/ApplyVBFUncertainties = false/ApplyVBFUncertainties = true/g' analysisMacroSynch_em_Signal_VBF.conf
+sed -i 's/SampleNameForPUHist =/SampleNameForPUHist = MC_PU2017_/' analysisMacroSynch_em_Signal_ggZH.conf
+
+
 #
 
 sed 's/SampleNameForPUHist =/SampleNameForPUHist = DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8_/' analysisMacroSynch_em_DY.conf > analysisMacroSynch_em_DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8.conf
