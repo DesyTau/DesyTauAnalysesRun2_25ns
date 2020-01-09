@@ -31,6 +31,7 @@
 #include "HTT-utilities/LepEffInterface/interface/ScaleFactor.h"
 #include "HTT-utilities/RecoilCorrections/interface/RecoilCorrector.h"
 #include "HTT-utilities/RecoilCorrections/interface/MEtSys.h"
+#include "HiggsCPinTauDecays/IpCorrection/interface/IpCorrection.h"
 
 #include "CondFormats/BTauObjects/interface/BTagCalibration.h"
 #include "CondTools/BTau/interface/BTagCalibrationReader.h"
@@ -54,6 +55,52 @@ float topPtWeight(float pt1,
   return TMath::Sqrt(w1*w2);
 
 }
+
+TVector3 get_refitted_PV_with_BS(const AC1B * analysisTree, int leptonIndex1, int leptonIndex2, bool &is_refitted_PV_with_BS){
+	float vtx_x = analysisTree->primvertexwithbs_x; // by default store non-refitted PV with BS constraint if refitted one is not found
+	float vtx_y = analysisTree->primvertexwithbs_y;
+	float vtx_z = analysisTree->primvertexwithbs_z;
+	is_refitted_PV_with_BS = false;
+
+	for(unsigned int i = 0; i < analysisTree->refitvertexwithbs_count; i++)
+	{
+	  if( (leptonIndex1 == analysisTree->refitvertexwithbs_muIndex[i][0] || leptonIndex1 == analysisTree->refitvertexwithbs_muIndex[i][1]) &&
+	      (leptonIndex2 == analysisTree->refitvertexwithbs_muIndex[i][0] || leptonIndex2 == analysisTree->refitvertexwithbs_muIndex[i][1]))
+	    {
+	      vtx_x = analysisTree->refitvertexwithbs_x[i];
+	      vtx_y = analysisTree->refitvertexwithbs_y[i];
+
+	      vtx_z = analysisTree->refitvertexwithbs_z[i];
+	      is_refitted_PV_with_BS = true;
+	    }
+	}
+	TVector3 vertex_coord(vtx_x, vtx_y, vtx_z);
+	return vertex_coord;
+}
+
+TVector3 ipVec_Lepton(const AC1B * analysisTree, int muonIndex, TVector3 vertex) {
+
+  TVector3 secvertex(0.,0.,0.);
+  TVector3 momenta(0.,0.,0.);    
+
+  secvertex.SetXYZ(analysisTree->muon_vx[muonIndex], 
+		   analysisTree->muon_vy[muonIndex],
+		   analysisTree->muon_vz[muonIndex]);
+  
+   
+  momenta.SetXYZ(analysisTree->muon_px[muonIndex],
+		 analysisTree->muon_py[muonIndex],
+		 analysisTree->muon_pz[muonIndex]);
+   
+  TVector3 r(0.,0.,0.);
+  r=secvertex-vertex;
+  
+  double projection=r*momenta/momenta.Mag2();
+  TVector3 IP;    
+  IP=r-momenta*projection;
+  
+  return IP;
+};
 
 /*
 
@@ -199,6 +246,10 @@ int main(int argc, char * argv[]) {
   TString ZMassPtWeightsFileName(zMassPtWeightsFileName);
   const string zMassPtWeightsHistName   = cfg.get<string>("ZMassPtWeightsHistName");
   TString ZMassPtWeightsHistName(zMassPtWeightsHistName);
+
+  const bool applyIpCorrection = cfg.get<bool>("ApplyIpCorrection"); 
+  const string ipCorrFileName  = cfg.get<string>("IpCorrectionFileName");
+  TString IpCorrFileName(ipCorrFileName);
 
   const string jsonFile = cfg.get<string>("jsonFile");
   const int applyJES = cfg.get<int>("applyJES");
@@ -348,6 +399,26 @@ int main(int argc, char * argv[]) {
   TH1D * MuSF_IdIso_Mu1H = new TH1D("MuIdIsoSF_Mu1H", "MuIdIsoSF_Mu1", 100, 0.5,1.5);
   TH1D * MuSF_IdIso_Mu2H = new TH1D("MuIdIsoSF_Mu2H", "MuIdIsoSF_Mu2", 100, 0.5,1.5);
 
+  TH1D * ipxH = new TH1D("ipxH","ipxH",100,-0.01,0.01);
+  TH1D * ipyH = new TH1D("ipyH","ipyH",100,-0.01,0.01);
+  TH1D * ipzH = new TH1D("ipzH","ipzH",100,-0.01,0.01);
+
+  TH1D * ipdxH = new TH1D("ipdxH","ipdxH",100,-0.02,0.02);
+  TH1D * ipdyH = new TH1D("ipdyH","ipdyH",100,-0.02,0.02);
+  TH1D * ipdzH = new TH1D("ipdzH","ipdzH",100,-0.02,0.02);
+
+  TH1D * nxyipH = new TH1D("nxyipH","nxyipH",200,0.0,0.1);
+  TH1D * dphiipH = new TH1D("dphiipH","dphiipH",200,-1,1);
+  TH1D * detaipH = new TH1D("detaipH","detaipH",200,-1,1);
+
+  TH1D * nxyip_BSH = new TH1D("nxyip_BSH","nxyipH",200,0.0,0.1);
+  TH1D * dphiip_BSH = new TH1D("dphiip_BSH","dphiipH",200,-1,1);
+  TH1D * detaip_BSH = new TH1D("detaip_BSH","detaipH",200,-1,1);
+
+  TH1D * ipxEtaH[4];
+  TH1D * ipyEtaH[4];
+  TH1D * ipzEtaH[4];
+  
   // tag and probe 
   int nPtBins = 7;
   float ptBins[8] = {10., 20., 30., 40., 50., 60., 100., 1000.};
@@ -367,6 +438,12 @@ int main(int argc, char * argv[]) {
 			"Eta0p9to1p2",
 			"Eta1p2to2p1",
 			"EtaGt2p1"};
+
+  for (int iEta=0; iEta<4; ++iEta) {
+    ipxEtaH[iEta] = new TH1D("ipx"+EtaBins[iEta],"",200,-0.02,0.02);
+    ipyEtaH[iEta] = new TH1D("ipy"+EtaBins[iEta],"",200,-0.02,0.02);
+    ipzEtaH[iEta] = new TH1D("ipz"+EtaBins[iEta],"",200,-0.02,0.02);
+  }
 
   TString JetBins[3] = {"Jet0","Jet1","JetGe2"};
 
@@ -613,6 +690,9 @@ int main(int argc, char * argv[]) {
   TFile * workspaceFile = new TFile(TString(cmsswBase)+"/src/"+CorrectionWorkspaceFile);
   RooWorkspace *correctionWS = (RooWorkspace*)workspaceFile->Get("w");
 
+  // IP correction
+  IpCorrection * ipCorrection = new IpCorrection(TString(cmsswBase)+"/src/"+IpCorrFileName);
+
   // Z mass pt weights
   TFile * fileZMassPtWeights = new TFile(TString(cmsswBase)+"/src/"+ZMassPtWeightsFileName); 
   if (fileZMassPtWeights->IsZombie()) {
@@ -693,7 +773,27 @@ int main(int argc, char * argv[]) {
 
     std::cout << "file " << iF+1 << " out of " << nTotalFiles << " filename : " << filen << std::endl;
     TFile * file_ = TFile::Open(TString(filen));
-    
+
+    TTree * _inittree = NULL; 
+    _inittree = (TTree*)file_->Get(TString(initNtupleName));
+    if (_inittree != NULL) {
+      Float_t genweight;
+      if (!isData)
+	_inittree->SetBranchAddress("genweight",&genweight);
+      Long64_t numberOfEntriesInitTree = _inittree->GetEntries();
+      std::cout << "      number of entries in Init Tree = " << numberOfEntriesInitTree << std::endl;
+      for (Long64_t iEntry=0; iEntry<numberOfEntriesInitTree; iEntry++) {
+	_inittree->GetEntry(iEntry);
+	if (isData)
+	  histWeightsH->Fill(0.,1.);
+	else {
+	  Float_t GenWeight = 1;
+	  if (genweight<0) GenWeight = -1;
+	  histWeightsH->Fill(0.,GenWeight);
+	}
+      }
+    }
+
     TTree * _tree = NULL;
     _tree = (TTree*)file_->Get(TString(ntupleName));
     if (_tree==NULL) continue;
@@ -715,11 +815,13 @@ int main(int argc, char * argv[]) {
 
       //------------------------------------------------
 
-      if (!isData) 
-	weight *=analysisTree.genweight;
-
-      histWeightsH->Fill(float(0),weight);
-
+      if (!isData) { 
+	float genweight = 1;
+	if (analysisTree.genweight<0)
+	  genweight = -1;
+	weight *= genweight;
+      }
+      
       TLorentzVector genZ; genZ.SetXYZT(0,0,0,0); 
       TLorentzVector genV; genV.SetXYZT(0,0,0,0);
       TLorentzVector genL; genL.SetXYZT(0,0,0,0);
@@ -1435,16 +1537,28 @@ int main(int argc, char * argv[]) {
 
 	//	std::cout << "Jet processed" << std::endl;
 
+	bool isRefittedVtx = false;
+	TVector3 vertex = get_refitted_PV_with_BS(&analysisTree,indx1,indx2,isRefittedVtx);
+	TVector3 ip1    = ipVec_Lepton(&analysisTree,indx1,vertex);
+	TVector3 ip2    = ipVec_Lepton(&analysisTree,indx2,vertex);
+	double ptMu1 = (double)analysisTree.muon_pt[indx1];
+	double ptMu2 = (double)analysisTree.muon_pt[indx2];
+	double etaMu1 = (double)analysisTree.muon_eta[indx1];
+	double etaMu2 = (double)analysisTree.muon_eta[indx2];
+
 	if (!isData && applyLeptonSF) {
 
 	  //leptonSFweight = SF_yourScaleFactor->get_ScaleFactor(pt, eta)	
-	  double ptMu1 = (double)analysisTree.muon_pt[indx1];
-	  double ptMu2 = (double)analysisTree.muon_pt[indx2];
-	  double etaMu1 = (double)analysisTree.muon_eta[indx1];
-	  double etaMu2 = (double)analysisTree.muon_eta[indx2];
 	  double IdIsoSF_mu1 = SF_muonIdIso->get_ScaleFactor(ptMu1, etaMu1);
 	  double IdIsoSF_mu2 = SF_muonIdIso->get_ScaleFactor(ptMu2, etaMu2);
 
+
+	  /*
+	  std::cout << "isRefittedVtx = " << isRefittedVtx << std::endl;
+	  std::cout << "IP1 (x,y,z) = (" << ip1.X() << "," << ip1.Y() << "," << ip1.Z() << ")" << std::endl; 
+	  std::cout << "IP2 (x,y,z) = (" << ip2.X() << "," << ip2.Y() << "," << ip2.Z() << ")" << std::endl; 
+	  std::cout << std::endl;
+	  */
 	  correctionWS->var("m_eta")->setVal(etaMu1);
 	  correctionWS->var("m_pt")->setVal(ptMu1);
 	  double trackSF_mu1 = correctionWS->function("m_trk_ratio")->getVal();
@@ -1648,6 +1762,99 @@ int main(int argc, char * argv[]) {
 	  computeRecoil(puppimet_ex,puppimet_ey,unitX,unitY,perpUnitX,perpUnitY,dimuonPt,recoilPuppiParal,recoilPuppiPerp,responsePuppiHad);
 
 	  if (massSel>70&&massSel<110) { // Z Region
+
+	    int etaBin1 = binNumber(TMath::Min(float(fabs(etaMu1)),float(2.4)),nEtaBins,etaBins);
+	    int etaBin2 = binNumber(TMath::Min(float(fabs(etaMu2)),float(2.4)),nEtaBins,etaBins);
+	    
+	    //	    cout << "eta(Mu1) = " << etaMu1 << " : " << etaBin1 << std::endl;
+	    //	    cout << "eta(Mu2) = " << etaMu2 << " : " << etaBin2 << std::endl;
+
+	    double ipx1 = ip1.X();
+	    double ipx2 = ip2.X();
+
+	    double ipy1 = ip1.Y();
+	    double ipy2 = ip2.Y();
+
+	    double ipz1 = ip1.Z();
+	    double ipz2 = ip2.Z();
+	    
+	    if (applyIpCorrection) {
+
+	      ipx1 = ipCorrection->correctIp(IpCorrection::Coordinate::Ipx,ip1.X(),mu1.Eta());
+	      ipy1 = ipCorrection->correctIp(IpCorrection::Coordinate::Ipy,ip1.Y(),mu1.Eta());
+	      ipz1 = ipCorrection->correctIp(IpCorrection::Coordinate::Ipz,ip1.Z(),mu1.Eta());
+
+	      ipx2 = ipCorrection->correctIp(IpCorrection::Coordinate::Ipx,ip2.X(),mu2.Eta());
+	      ipy2 = ipCorrection->correctIp(IpCorrection::Coordinate::Ipy,ip2.Y(),mu2.Eta());
+	      ipz2 = ipCorrection->correctIp(IpCorrection::Coordinate::Ipz,ip2.Z(),mu2.Eta());
+
+	      /*
+	      std::cout << "IPx (1) = " << ipx1 << " : " << ip1.X() << std::endl;
+	      std::cout << "IPy (1) = " << ipy1 << " : " << ip1.Y() << std::endl;
+	      std::cout << "IPz (1) = " << ipz1 << " : " << ip1.Z() << std::endl;
+
+	      std::cout << "IPx (2) = " << ipx2 << " : " << ip2.X() << std::endl;
+	      std::cout << "IPy (2) = " << ipy2 << " : " << ip2.Y() << std::endl;
+	      std::cout << "IPz (2) = " << ipz2 << " : " << ip2.Z() << std::endl;
+	      */
+	    }
+
+	    ipxH->Fill(ipx1,weight);
+	    ipxH->Fill(ipx2,weight);
+
+	    ipyH->Fill(ipy1,weight);
+	    ipyH->Fill(ipy2,weight);
+
+	    ipzH->Fill(ipz1,weight);
+	    ipzH->Fill(ipz2,weight);
+
+	    TLorentzVector n1; n1.SetXYZM(ipx1,ipy1,ipz1,0);
+	    TLorentzVector n2; n2.SetXYZM(ipx2,ipy2,ipz2,0);
+
+	    nxyipH->Fill(n1.Pt(),weight);
+	    nxyipH->Fill(n2.Pt(),weight);
+	    if (isRefittedVtx) {
+	      nxyip_BSH->Fill(n1.Pt(),weight);
+	      nxyip_BSH->Fill(n2.Pt(),weight);
+	    }
+
+	    double cosdphi1 = (mu1.Px()*n1.Px()+mu1.Py()*n1.Py())/(mu1.Pt()*n1.Pt());
+	    double dphi1 = TMath::ACos(cosdphi1);
+	    double sign = mu1.Px()*n1.Py()-mu1.Py()*n1.Px();
+	    if (sign<0) 
+	      dphi1 = -dphi1;
+	    dphiipH->Fill(dphi1,weight);
+	    double deta1 = n1.Eta()-mu1.Eta();
+	    detaipH->Fill(deta1,weight);
+
+	    double cosdphi2 = (mu2.Px()*n2.Px()+mu2.Py()*n2.Py())/(mu2.Pt()*n2.Pt());
+	    double dphi2 = TMath::ACos(cosdphi2);
+	    sign = mu2.Px()*n2.Py()-mu2.Py()*n2.Px();
+	    if (sign<0) 
+	      dphi2 = -dphi2;
+	    dphiipH->Fill(dphi2,weight);
+	    double deta2 = n2.Eta()-mu2.Eta();
+	    detaipH->Fill(deta2,weight);
+
+	    if (isRefittedVtx) {	      
+	      dphiip_BSH->Fill(dphi1,weight);
+	      detaip_BSH->Fill(deta1,weight);
+	      dphiip_BSH->Fill(dphi2,weight);
+	      detaip_BSH->Fill(deta2,weight);
+	    }
+
+	    ipxEtaH[etaBin1]->Fill(ipx1,weight);
+	    ipxEtaH[etaBin2]->Fill(ipx2,weight);
+
+	    ipyEtaH[etaBin1]->Fill(ipy1,weight);
+	    ipyEtaH[etaBin2]->Fill(ipy2,weight);
+
+	    ipzEtaH[etaBin1]->Fill(ipz1,weight);
+	    ipzEtaH[etaBin2]->Fill(ipz2,weight);
+
+	    ipdxH->Fill(ipx1-ipx2,weight);
+	    ipdyH->Fill(ipy1-ipy2,weight);
+	    ipdzH->Fill(ipz1-ipz2,weight);
 
 	    metZSelH->Fill(pfmet,weight);
 	    puppimetZSelH->Fill(puppimet,weight);

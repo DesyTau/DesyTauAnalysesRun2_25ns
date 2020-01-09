@@ -123,15 +123,24 @@ void counting_jets(const AC1B *analysisTree, Synch17Tree *otree, const Config *c
     if (BTagAlgorithm == "DeepFlavour" && discr == BTagDiscriminator3)
       nBTagDiscriminant3 = iBTag;
   }
+
+  TLorentzVector uncorrectedJets; uncorrectedJets.SetXYZT(0,0,0,0);
+  TLorentzVector correctedJets; correctedJets.SetXYZT(0,0,0,0);
   
   for (unsigned int jet = 0; jet < analysisTree->pfjet_count; ++jet) {
     
     float jetEta    = analysisTree->pfjet_eta[jet];
     float absJetEta = fabs(analysisTree->pfjet_eta[jet]);
     if (absJetEta >= JetEtaCut) continue;
+
+    TLorentzVector uncorrectedJet; uncorrectedJet.SetXYZT(analysisTree->pfjet_px[jet],
+							  analysisTree->pfjet_py[jet],
+							  analysisTree->pfjet_pz[jet],
+							  analysisTree->pfjet_e[jet]);
+    TLorentzVector correctedJet = uncorrectedJet;
   
     float jetPt = get_jetPt(analysisTree, jet, JESname, direction, jecUncertainties);
-    if (jetPt <= JetPtLowCut) continue;
+    correctedJet *= jetPt/uncorrectedJet.Pt();
 
     float dR1 = deltaR(analysisTree->pfjet_eta[jet], analysisTree->pfjet_phi[jet], otree->eta_1, otree->phi_1);
     if (dR1 <= dRJetLeptonCut) continue;
@@ -139,8 +148,16 @@ void counting_jets(const AC1B *analysisTree, Synch17Tree *otree, const Config *c
     float dR2 = deltaR(analysisTree->pfjet_eta[jet], analysisTree->pfjet_phi[jet], otree->eta_2, otree->phi_2);
     if (dR2 <= dRJetLeptonCut) continue;
 
+    if (correctedJet.Pt()>10 && !(is2017 && correctedJet.Pt() < 50 && absJetEta > 2.65 && absJetEta < 3.139))
+      correctedJets += correctedJet;
+
+    if (uncorrectedJet.Pt()>10 && !(is2017 && uncorrectedJet.Pt() < 50 && absJetEta > 2.65 && absJetEta < 3.139))
+      uncorrectedJets += uncorrectedJet;        
+
     // skip prefiring region for 2017:
     if(is2017 && jetPt < 50 && absJetEta > 2.65 && absJetEta < 3.139) continue; 
+
+    if (jetPt <= JetPtLowCut) continue;
 
     // see definition in Jets.h
     bool isPFJetId = tightJetID((*analysisTree), int(jet), era);
@@ -246,6 +263,41 @@ void counting_jets(const AC1B *analysisTree, Synch17Tree *otree, const Config *c
   otree->njets = jets.size();
   otree->njetspt20 = jetspt20.size();
   otree->nbtag = bjets.size();
+
+  if (!cfg->get<bool>("ApplyRecoilCorrections")) {
+
+    float metx = otree->met * cos(otree->metphi);
+    float mety = otree->met * sin(otree->metphi);
+    float metx_puppi = otree->puppimet * cos(otree->puppimetphi);
+    float mety_puppi = otree->puppimet * sin(otree->puppimetphi);
+    
+    metx = metx + uncorrectedJets.Px() - correctedJets.Px();
+    mety = mety + uncorrectedJets.Py() - correctedJets.Py();
+    metx_puppi = metx_puppi + uncorrectedJets.Px() - correctedJets.Px();
+    mety_puppi = mety_puppi + uncorrectedJets.Py() - correctedJets.Py();
+
+    otree->met = sqrt(metx*metx+mety*mety);
+    otree->metphi = atan2(mety,metx);
+    otree->puppimet = sqrt(metx_puppi*metx_puppi+mety_puppi*mety_puppi);
+    otree->puppimetphi = atan2(mety_puppi,metx_puppi);
+    TLorentzVector metLV; metLV.SetXYZT(metx,mety,0.,otree->met);
+    TLorentzVector puppimetLV; puppimetLV.SetXYZT(metx_puppi,mety_puppi,0.,otree->puppimet);
+    TLorentzVector leptonLV; leptonLV.SetPtEtaPhiM(otree->pt_1,otree->eta_1,otree->phi_1,otree->m_1);
+    TLorentzVector tauLV; tauLV.SetPtEtaPhiM(otree->pt_2,otree->eta_2,otree->phi_2,otree->m_2);
+    TLorentzVector dileptonLV = leptonLV + tauLV;
+    TLorentzVector metxLV = metLV;
+    if (cfg->get<bool>("UsePuppiMET")) metxLV = puppimetLV;
+
+    float mtTOT = 2*(otree->pt_1)*metxLV.Pt()*(1-cos(DeltaPhi(leptonLV,metxLV)));
+    mtTOT += 2*(otree->pt_2)*metxLV.Pt()*(1-cos(DeltaPhi(tauLV,metxLV)));
+    mtTOT += 2*(otree->pt_1)*(otree->pt_2)*(1-cos(DeltaPhi(leptonLV,tauLV)));
+    otree->mt_tot = TMath::Sqrt(mtTOT);
+    otree->pt_tt = (dileptonLV+metxLV).Pt();
+    otree->mt_1 = mT(leptonLV, metLV);
+    otree->mt_2 = mT(tauLV, metLV);
+    otree->puppimt_1 = mT(leptonLV, puppimetLV);
+    otree->puppimt_2 = mT(tauLV, puppimetLV);
+  }
 
   // leading b-jet variables
   if (indexLeadingBJet >= 0) {

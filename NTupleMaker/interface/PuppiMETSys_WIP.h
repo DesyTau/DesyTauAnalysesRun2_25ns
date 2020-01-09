@@ -50,39 +50,30 @@ class PuppiMETSys : public METSys {
       uncertaintyFound = true;
     }    
     else if (label.Contains("boson")) {
-      int nj = 0;
       int systype = 0;
-      if (label.Contains("1jet")) nj=1;
-      else if (label.Contains("2jet")) nj=2;
       if (label.Contains("response"))
 	systype = MEtSys::SysType::Response;
       else if (label.Contains("resolution"))
 	systype = MEtSys::SysType::Resolution;
-      if (cenTree->njets==nj) {
-	TLorentzVector genV = genTools::genV(*analysisTree);
-	TLorentzVector genL = genTools::genL(*analysisTree);
-	metSys->ApplyMEtSys(analysisTree->puppimet_ex,
-			    analysisTree->puppimet_ey,
-			    genV.Px(),
-			    genV.Py(),
-			    genL.Px(),
-			    genL.Py(),
-			    cenTree->njets,
-			    systype,
-			    MEtSys::SysShift::Down,
-			    obs.metx,
-			    obs.mety);
-      }
-      else {
-	obs.metx = analysisTree->puppimet_ex;
-	obs.mety = analysisTree->puppimet_ey;
-      }
+      TLorentzVector genV = genTools::genV(*analysisTree);
+      TLorentzVector genL = genTools::genL(*analysisTree);
+      metSys->ApplyMEtSys(analysisTree->puppimet_ex,
+			  analysisTree->puppimet_ey,
+			  genV.Px(),
+			  genV.Py(),
+			  genL.Px(),
+			  genL.Py(),
+			  cenTree->njets,
+			  systype,
+			  MEtSys::SysShift::Down,
+			  obs.metx,
+			  obs.mety);
       uncertaintyFound = true;
     }
     else {
       std::cout << "Systematic uncertainty " << label << std::endl;
-      obs.met = cenTree->met;
-      obs.metphi = cenTree->metphi;
+      obs.met = cenTree->puppimet;
+      obs.metphi = cenTree->puppimetphi;
     }
     if (uncertaintyFound) {
       obs.metphi = atan2(obs.mety,obs.metx);
@@ -114,33 +105,24 @@ class PuppiMETSys : public METSys {
       uncertaintyFound = true;
    }    
     else if (label.Contains("boson")) {
-      int nj = 0;
       int systype = 0;
-      if (label.Contains("1jet")) nj=1;
-      else if (label.Contains("2jet")) nj=2;
       if (label.Contains("response"))
 	systype = MEtSys::SysType::Response;
       else if (label.Contains("resolution"))
 	systype = MEtSys::SysType::Resolution;
-      if (cenTree->njets==nj) {
-	TLorentzVector genV = genTools::genV(*analysisTree);
-	TLorentzVector genL = genTools::genL(*analysisTree);
-	metSys->ApplyMEtSys(analysisTree->puppimet_ex,
-			    analysisTree->puppimet_ey,
-			    genV.Px(),
-			    genV.Py(),
-			    genL.Px(),
-			    genL.Py(),
-			    cenTree->njets,
-			    systype,
-			    MEtSys::SysShift::Up,
-			    obs.metx,
-			    obs.mety);
-      }
-      else {
-	obs.metx = analysisTree->puppimet_ex;
-	obs.mety = analysisTree->puppimet_ey;
-      }
+      TLorentzVector genV = genTools::genV(*analysisTree);
+      TLorentzVector genL = genTools::genL(*analysisTree);
+      metSys->ApplyMEtSys(analysisTree->puppimet_ex,
+			  analysisTree->puppimet_ey,
+			  genV.Px(),
+			  genV.Py(),
+			  genL.Px(),
+			  genL.Py(),
+			  cenTree->njets,
+			  systype,
+			  MEtSys::SysShift::Up,
+			  obs.metx,
+			  obs.mety);
       uncertaintyFound = true;
     }
     else {
