@@ -10,7 +10,9 @@ echo "CONFIGFILE,FILELIST" > parameters.txt
 
 ../split_filelist.sh analysisMacroSynch_em_DY1JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8.conf DY1JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8 5
 ../split_filelist.sh analysisMacroSynch_em_DY2JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8.conf DY2JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8  5
+../split_filelist.sh analysisMacroSynch_em_DY2JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8_ext.conf DY2JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8_ext  5
 ../split_filelist.sh analysisMacroSynch_em_DY3JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8.conf DY3JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8  5
+../split_filelist.sh analysisMacroSynch_em_DY3JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8_ext.conf DY3JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8_ext  5
 ../split_filelist.sh analysisMacroSynch_em_DY4JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8.conf DY4JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8  5
 ../split_filelist.sh analysisMacroSynch_em_DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8.conf DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8  5
 ../split_filelist.sh analysisMacroSynch_em_DYJetsToLL_M-10to50_13TeV-12Apr2018.conf DYJetsToLL_M-10to50_13TeV-12Apr2018  1
@@ -23,6 +25,9 @@ echo "CONFIGFILE,FILELIST" > parameters.txt
 ../split_filelist.sh analysisMacroSynch_em_TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8.conf TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8  1
 ../split_filelist.sh analysisMacroSynch_em_TTToHadronic_TuneCP5_PSweights_13TeV-powheg-pythia8.conf TTToHadronic_TuneCP5_PSweights_13TeV-powheg-pythia8 1
 ../split_filelist.sh analysisMacroSynch_em_TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powheg-pythia8.conf TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powheg-pythia8 1
+../split_filelist.sh analysisMacroSynch_em_TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8.conf TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8  1
+../split_filelist.sh analysisMacroSynch_em_TTToHadronic_TuneCP5_13TeV-powheg-pythia8.conf TTToHadronic_TuneCP5_13TeV-powheg-pythia8 1
+../split_filelist.sh analysisMacroSynch_em_TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8.conf TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8 1
 
 ../split_filelist.sh analysisMacroSynch_em_W1JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8.conf W1JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8  5
 ../split_filelist.sh analysisMacroSynch_em_W2JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8.conf W2JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8  5
