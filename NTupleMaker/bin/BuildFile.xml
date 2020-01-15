@@ -240,6 +240,7 @@
  <use name="boost_program_options"/>
  <use name="DesyTauAnalyses/NTupleMaker"/>
  <use name="HTT-utilities/LepEffInterface"/>
+ <use name="HiggsCPinTauDecays/IpCorrection"/>
 </bin>
 
 

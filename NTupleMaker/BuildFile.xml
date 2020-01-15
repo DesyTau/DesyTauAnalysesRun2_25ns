@@ -12,6 +12,7 @@
 <use   name="TauAnalysis/SVfitStandalone"/> 
 <use   name="CondFormats/BTauObjects"/>
 <use   name="CondTools/BTau"/>
+<use   name="HiggsCPinTauDecays/IpCorrection"/>
 <export>
   <lib   name="1"/>
 </export>

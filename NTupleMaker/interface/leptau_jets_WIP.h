@@ -131,6 +131,11 @@ void counting_jets(const AC1B *analysisTree, Synch17Tree *otree, const Config *c
     
     float jetEta    = analysisTree->pfjet_eta[jet];
     float absJetEta = fabs(analysisTree->pfjet_eta[jet]);
+    float rawPt = analysisTree->pfjet_pt[jet]*analysisTree->pfjet_energycorr[jet];
+
+    //    std::cout << analysisTree->pfjet_pt[jet] << "   " 
+    //	      << analysisTree->pfjet_energycorr[jet] << std::endl;
+
     if (absJetEta >= JetEtaCut) continue;
 
     TLorentzVector uncorrectedJet; uncorrectedJet.SetXYZT(analysisTree->pfjet_px[jet],
@@ -148,14 +153,14 @@ void counting_jets(const AC1B *analysisTree, Synch17Tree *otree, const Config *c
     float dR2 = deltaR(analysisTree->pfjet_eta[jet], analysisTree->pfjet_phi[jet], otree->eta_2, otree->phi_2);
     if (dR2 <= dRJetLeptonCut) continue;
 
-    if (correctedJet.Pt()>10 && !(is2017 && correctedJet.Pt() < 50 && absJetEta > 2.65 && absJetEta < 3.139))
+    if (correctedJet.Pt()>10 && !(is2017 && rawPt < 50 && absJetEta > 2.65 && absJetEta < 3.139))
       correctedJets += correctedJet;
 
-    if (uncorrectedJet.Pt()>10 && !(is2017 && uncorrectedJet.Pt() < 50 && absJetEta > 2.65 && absJetEta < 3.139))
+    if (uncorrectedJet.Pt()>10 && !(is2017 && rawPt < 50 && absJetEta > 2.65 && absJetEta < 3.139))
       uncorrectedJets += uncorrectedJet;        
 
     // skip prefiring region for 2017:
-    if(is2017 && jetPt < 50 && absJetEta > 2.65 && absJetEta < 3.139) continue; 
+    if(is2017 && rawPt < 50 && absJetEta > 2.65 && absJetEta < 3.139) continue; 
 
     if (jetPt <= JetPtLowCut) continue;
 

@@ -6,6 +6,14 @@ JESUncertainties::JESUncertainties(std::string uncFileName) {
   std::string cmsswBase( getenv ("CMSSW_BASE") );
   uncertFile = cmsswBase + "/src/" + uncFileName;
 
+  TString UncertFile(uncertFile);
+  if (UncertFile.Contains("Regrouped_Autumn18"))
+    uncertNames = uncertNames_2018;
+  else if (UncertFile.Contains("Regrouped_Fall17"))
+    uncertNames = uncertNames_2017;
+  else 
+    uncertNames = uncertNames_2016;
+
   for (auto const& name : uncertNames) {
 
     JetCorrectorParameters const * JetCorPar = new JetCorrectorParameters(uncertFile, name);
@@ -30,31 +38,21 @@ JESUncertainties::~JESUncertainties() {
 
 std::vector<std::string> JESUncertainties::getUncertNames() {
 
-  return groupedUncertNames;
+  return uncertNames;
 
 }
 
 float JESUncertainties::getUncertainty(std::string name, float pt, float eta) {
 
-  std::vector<std::string > uncerInGroup = MapUncert[name];
   double unc = 0;
-  //  std::cout << name << std::endl;
-  for (unsigned int i=0; i<uncerInGroup.size(); ++i ) {
-    std::string nameUnc = uncerInGroup.at(i);
-    //    std::cout << "     " << nameUnc << " " << JetUncMap[nameUnc] << std::endl;
-    //    JetUncMap[nameUnc]->setJetEta(0.8);
-    //    JetUncMap[nameUnc]->setJetPt(50.);
-    double unc_src = 0;
-    if (JetUncMap[nameUnc]!=NULL) { 
-      JetUncMap[nameUnc]->setJetEta(eta);
-      JetUncMap[nameUnc]->setJetPt(pt);
-      unc_src = JetUncMap[nameUnc]->getUncertainty(true);
-      unc += unc_src*unc_src;
-    }
+  if (JetUncMap[name]!=NULL) { 
+    JetUncMap[name]->setJetEta(eta);
+    JetUncMap[name]->setJetPt(pt);
+    unc = JetUncMap[name]->getUncertainty(true);
   }
   //  std::cout << "OK" << std::endl;
 
-  return TMath::Sqrt(unc);
+  return unc;
 
 }
 
@@ -176,9 +174,8 @@ void JESUncertainties::runOnEvent(AC1B &analysisTree, float etalep1, float phile
       ptLeading = jetPt;
     }
 
-    for ( unsigned int iname=0; iname<groupedUncertNames.size(); ++iname) {
+    for (auto const& name : uncertNames) {
       
-      std::string name = groupedUncertNames[iname];
       float unc = getUncertainty(name,jetPt,jetEta);
 
       float jetPtUp = (1+unc)*jetPt;
@@ -218,9 +215,8 @@ void JESUncertainties::runOnEvent(AC1B &analysisTree, float etalep1, float phile
       jdeta = fabs(jet1.Eta()-jet2.Eta());
     }
 
-    for (unsigned int iname = 0; iname<groupedUncertNames.size(); ++iname) {
+    for (auto const& name : uncertNames) {
 
-      std::string name = groupedUncertNames.at(iname);
       float jetEta1 = analysisTree.pfjet_eta[indexLeading];
       float jetPt1 = analysisTree.pfjet_pt[indexLeading];
       float unc1 = getUncertainty(name,jetPt1,jetEta1);

@@ -47,12 +47,12 @@ else
     NOT_DATA_TYPE=("data" "embedded")
   else 
     if [[ $DATA_TYPE == "embedded" ]]; then # will not apply TES for embedded 
-      KEY_LIST+=(TauEnergyScaleShift_OneProng TauEnergyScaleShift_OneProngOnePi0 TauEnergyScaleShift_ThreeProng)
-      VALUE_LIST_EMBEDDED+=(0.0 0.0 0.0)
-      
-      KEY_LIST+=(TauEnergyScaleShift_LepFake_OneProng TauEnergyScaleShift_LepFake_OneProngOnePi0 TauEnergyScaleShift_LepFake_ThreeProng)
-      VALUE_LIST_EMBEDDED+=(0.0 0.0 0.0)
-
+#      KEY_LIST+=(TauEnergyScaleShift_OneProng TauEnergyScaleShift_OneProngOnePi0 TauEnergyScaleShift_ThreeProng)
+#      VALUE_LIST_EMBEDDED+=(0.0 0.0 0.0)
+#      
+#      KEY_LIST+=(TauEnergyScaleShift_LepFake_OneProng TauEnergyScaleShift_LepFake_OneProngOnePi0 TauEnergyScaleShift_LepFake_ThreeProng)
+#      VALUE_LIST_EMBEDDED+=(0.0 0.0 0.0)
+#
       VALUE_LIST=("${VALUE_LIST_EMBEDDED[@]}")
       NOT_DATA_TYPE=("MC" "data")
     else

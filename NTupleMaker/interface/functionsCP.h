@@ -10,6 +10,7 @@
 #include "DesyTauAnalyses/NTupleMaker/interface/functions.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/PileUp.h"
 #include "HiggsCPinTauDecays/ImpactParameter/interface/ImpactParameter.h"
+#include "HiggsCPinTauDecays/IpCorrection/interface/IpCorrection.h"
 
 #define PI_MASS         0.13957 //All energies and momenta are expressed in GeV
 #define MUON_MASS       0.105658
@@ -64,6 +65,105 @@ TVector3 get_refitted_PV_with_BS(const AC1B * analysisTree, int leptonIndex, int
 //Update call instead with: acott_Impr(&analysisTree,otree,leptonIndex, tauIndex, ch). Throughout code we'll switch between mt, et and tt case!
 //in later case, the lepton index must be treated as a tau instead of leptonic index
 //currently we'll ignore e-mu
+
+void calibrateIP(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, int tauIndex2, TString channel, IpCorrection * ip) {
+
+  int nPart = analysisTree->genparticles_count;
+  TVector3 vertex;
+  int partPDG = 0;
+  for (int igen=0; igen<nPart; ++igen) {
+    if (analysisTree->genparticles_pdgid[igen]==23||analysisTree->genparticles_pdgid[igen]==24||
+	analysisTree->genparticles_pdgid[igen]==25||analysisTree->genparticles_pdgid[igen]==35||
+	analysisTree->genparticles_pdgid[igen]==36||analysisTree->genparticles_pdgid[igen]==6||
+	analysisTree->genparticles_pdgid[igen]==-6) {
+      //      cout << "pdg = " << analysisTree->genparticles_pdgid[igen] << std::endl;
+      vertex.SetX(analysisTree->genparticles_vx[igen]);
+      vertex.SetY(analysisTree->genparticles_vy[igen]);
+      vertex.SetZ(analysisTree->genparticles_vz[igen]);
+    }
+  }
+  //  std::cout << "Vertex gen X = " << vertex.X()
+  //	    << "  Y = " << vertex.Y()
+  //	    << "  Z = " << vertex.Z() << std::endl;
+  if (otree->gen_match_1==2||otree->gen_match_1==4||otree->gen_match_1==5) {
+    if (otree->gen_match_1==2||otree->gen_match_1==4) partPDG = 13;
+    else partPDG = 211;
+    int indexMu = -1;
+    float dR = 0.4;
+    for (int igen=0; igen<nPart; ++igen) {
+      if (TMath::Abs(analysisTree->genparticles_pdgid[igen])==partPDG) {
+	if (analysisTree->genparticles_status[igen]==1) {
+	  TLorentzVector genPart; genPart.SetXYZT(analysisTree->genparticles_px[igen],
+						  analysisTree->genparticles_py[igen],
+						  analysisTree->genparticles_pz[igen],
+						  analysisTree->genparticles_e[igen]);
+	  float dRx = deltaR(otree->eta_1,otree->phi_1,
+			     genPart.Eta(),genPart.Phi());
+	  if (dRx<dR) {
+	    indexMu = igen;
+	    dR = dRx;
+	  }
+	}
+      }
+    }
+    if (indexMu>=0) {
+      TLorentzVector ipGen = gen_ipVec(analysisTree,tauIndex1,indexMu,vertex);
+
+      //      float dipx = otree->ipx_1 - ipGen.X();
+      float ipx = ip->correctIp(IpCorrection::Coordinate::Ipx,ipx,ipGen.X(),otree->eta_1);
+      otree->ipx_1 = ipx;
+
+      //      float dipy = otree->ipy_1 - ipGen.Y();
+      float ipy = ip->correctIp(IpCorrection::Coordinate::Ipy,ipy,ipGen.Y(),otree->eta_1);
+      otree->ipy_1 = ipy;
+
+      //      float dipz = otree->ipz_1 - ipGen.Z();
+      float ipz = ip->correctIp(IpCorrection::Coordinate::Ipz,ipz,ipGen.Z(),otree->eta_1);
+      otree->ipz_1 = ipz;
+
+    }
+  }
+  //  std::cout << "gen_match_2 = " << otree->gen_match_2 << std::endl;
+  if (otree->gen_match_2==2||otree->gen_match_2==4||otree->gen_match_2==5) {
+    if (otree->gen_match_2==2||otree->gen_match_2==4) partPDG = 13;
+    else partPDG = 211;
+    int indexMu = -1;
+    float dR = 0.4;
+    for (int igen=0; igen<nPart; ++igen) {
+      if (TMath::Abs(analysisTree->genparticles_pdgid[igen])==partPDG) {
+	if (analysisTree->genparticles_status[igen]==1) {
+	  TLorentzVector genPart; genPart.SetXYZT(analysisTree->genparticles_px[igen],
+						  analysisTree->genparticles_py[igen],
+						  analysisTree->genparticles_pz[igen],
+						  analysisTree->genparticles_e[igen]);
+	  float dRx = deltaR(otree->eta_2,otree->phi_2,
+			     genPart.Eta(),genPart.Phi());
+	  if (dRx<dR) {
+	    indexMu = igen;
+	    dR = dRx;
+	  }
+	}
+      }
+    }
+    //    std::cout << "index pi = " << indexMu << std::endl;
+    if (indexMu>=0) {
+      TLorentzVector ipGen = gen_ipVec(analysisTree,tauIndex2,indexMu,vertex);
+
+      //      float dipx = otree->ipx_2 - ipGen.X();
+      float ipx = float(ip->correctIp(IpCorrection::Coordinate::Ipx,ipx,ipGen.X(),otree->eta_2));
+      otree->ipx_2 = ipx;
+
+      //      float dipy = otree->ipy_2 - ipGen.Y();
+      float ipy = float(ip->correctIp(IpCorrection::Coordinate::Ipy,ipy,ipGen.Y(),otree->eta_2));
+      otree->ipy_2 = ipy;
+      
+      //      float dipz = otree->ipz_2 - ipGen.Z();
+      float ipz = float(ip->correctIp(IpCorrection::Coordinate::Ipz,ipz,ipGen.Z(),otree->eta_2));
+      otree->ipz_2 = ipz;
+
+    }
+  }
+}
 
 void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, int tauIndex2, TString channel){
   // cout<<"Start acott_Impr"<<endl;
@@ -229,6 +329,8 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
   bool is_refitted_PV_with_BS = true;
   TVector3 vertex_coord = get_refitted_PV_with_BS(analysisTree, tauIndex1, tauIndex2, is_refitted_PV_with_BS);
 
+  otree->isrefitBS = is_refitted_PV_with_BS;
+
   TLorentzVector tau1IP;
   TLorentzVector tau1IP_bs;
   TLorentzVector tau1IP_refitbs;
@@ -241,12 +343,12 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
     tau1IP_bs = ipVec_Lepton(analysisTree,tauIndex1,tauIndex2,1,channel);
     tau1IP_refitbs = ipVec_Lepton(analysisTree,tauIndex1,tauIndex2,2,channel);
     tau1IP_helix = calculate_IP_helix_mu(analysisTree, tauIndex1, vertex_coord);
-    otree->ip0x_1 = tau1IP.X();
-    otree->ip0y_1 = tau1IP.Y();
-    otree->ip0z_1 = tau1IP.Z();
-    otree->ipx_1 = tau1IP_helix.X();
-    otree->ipy_1 = tau1IP_helix.Y();
-    otree->ipz_1 = tau1IP_helix.Z();
+    otree->ipx_1 = tau1IP_refitbs.X();
+    otree->ipy_1 = tau1IP_refitbs.Y();
+    otree->ipz_1 = tau1IP_refitbs.Z();
+    otree->ip0x_1 = tau1IP_helix.X();
+    otree->ip0y_1 = tau1IP_helix.Y();
+    otree->ip0z_1 = tau1IP_helix.Z();
   }
   else{tau1IP = ipVec(analysisTree,tauIndex1,tauIndex2,0);}//tt: currently unused only computed for reconstructed PV
   TLorentzVector tau1Pi0;
@@ -261,12 +363,17 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
   tau2IP_bs = ipVec(analysisTree,tauIndex1,tauIndex2,1);
   tau2IP_refitbs = ipVec(analysisTree,tauIndex1,tauIndex2,2);
   tau2IP_helix = calculate_IP_helix_tauh(analysisTree, tauIndex2, vertex_coord);
-  otree->ip0x_2 = tau2IP.X();
-  otree->ip0y_2 = tau2IP.Y();
-  otree->ip0z_2 = tau2IP.Z();
-  otree->ipx_2 = tau2IP_helix.X();
-  otree->ipy_2 = tau2IP_helix.Y();
-  otree->ipz_2 = tau2IP_helix.Z();
+  otree->ipx_2 = tau2IP_refitbs.X();
+  otree->ipy_2 = tau2IP_refitbs.Y();
+  otree->ipz_2 = tau2IP_refitbs.Z();
+  otree->ip0x_2 = tau2IP_helix.X();
+  otree->ip0y_2 = tau2IP_helix.Y();
+  otree->ip0z_2 = tau2IP_helix.Z();
+  /*
+  cout << "X (linear:helix) = " << otree->ipx_2 << ":" << otree->ip0x_2 << endl;
+  cout << "Y (linear:helix) = " << otree->ipy_2 << ":" << otree->ip0y_2 << endl;
+  cout << "Z (linear:helix) = " << otree->ipz_2 << ":" << otree->ip0z_2 << endl;
+  */
   TLorentzVector tau2Pi0;
   tau2Pi0.SetXYZT(0.,0.,0.,0.); 
   

@@ -56,92 +56,52 @@ class JESUncertainties {
 
   std::map<std::string, JetCorrectorParameters const *> JetCorParMap;
   std::map<std::string, JetCorrectionUncertainty* > JetUncMap;
+  std::vector< std::string > uncertNames;
 
-  // unc names
-  std::vector< std::string > uncertNames = {
-    "AbsoluteFlavMap",
-    "AbsoluteMPFBias",
-    "AbsoluteScale",
-    "AbsoluteStat",
+  // unc names 2016
+  std::vector< std::string > uncertNames_2016 = {
     "FlavorQCD",
-    "Fragmentation",
-    "PileUpDataMC",
-    "PileUpEnvelope",
-    "PileUpPtBB",
-    "PileUpPtEC1",
-    "PileUpPtEC2",
-    "PileUpPtHF",
-    "PileUpPtRef",
-    "RelativeFSR",
-    "RelativeJEREC1",
-    "RelativeJEREC2",
-    "RelativeJERHF",
-    "RelativePtBB",
-    "RelativePtEC1",
-    "RelativePtEC2",
-    "RelativePtHF",
-    "RelativeStatEC",
-    "RelativeStatFSR",
-    "RelativeStatHF",
     "RelativeBal",
-    //    "RelativeSample",
-    "SinglePionECAL",
-    "SinglePionHCAL",
-    "TimePtEta",
-    "Total",
-  }; // end uncertNames
+    "HF",
+    "BBEC1",
+    "EC2",
+    "Absolute",
+    "BBEC1_2016",
+    "EC2_2016",
+    "Absolute_2016",
+    "HF_2016",
+    "RelativeSample_2016",
+  }; // end of 2016 uncertNames
 
-  // groupped uncertainties
-  std::vector< std::string > groupedUncertNames = {"Eta0To5",
-						   "Eta0To3",
-						   "Eta3To5",
-						   "RelativeBal",
-						   //						   "RelativeSample"
-  };
+  // unc names 2017
+  std::vector< std::string > uncertNames_2017 = {
+    "FlavorQCD",
+    "RelativeBal",
+    "HF",
+    "BBEC1",
+    "EC2",
+    "Absolute",
+    "BBEC1_2017",
+    "RelativeSample_2017",
+    "EC2_2017",
+    "HF_2017",
+    "Absolute_2017"
+  }; // end of 2017 uncertNames
 
-  int nsrc_Eta0To5 = 13;
-  std::vector<std::string> srcnames_Eta0To5 = {"SinglePionECAL",
-					       "SinglePionHCAL",
-					       "AbsoluteFlavMap",
-					       "AbsoluteMPFBias",
-					       "AbsoluteScale",
-					       "AbsoluteStat",
-					       "Fragmentation",
-					       "FlavorQCD",
-					       "TimePtEta",
-					       "PileUpDataMC",
-					       "RelativeFSR",
-					       "RelativeStatFSR",
-					       "PileUpPtRef"};
- int nsrc_Eta0To3 = 9;
-  std::vector<std::string> srcnames_Eta0To3 = {"PileUpPtEC1",
-					       "PileUpPtEC2",
-					       "PileUpPtBB",
-					       "RelativeJEREC1",
-					       "RelativeJEREC2",
-					       "RelativePtEC1",
-					       "RelativePtEC2",
-					       "RelativeStatEC",
-					       "RelativePtBB"};
-  int nsrc_Eta3To5 = 4;
-  std::vector<std::string> srcnames_Eta3To5 = {"RelativeStatHF",
-					       "RelativePtHF",
-					       "PileUpPtHF",
-					       "RelativeJERHF"};
-  int nsrc_RelativeBal = 1;
-  std::vector<std::string> srcnames_RelativeBal = {"RelativeBal"};
-  
-  int nsrc_RelativeSample = 1;
-  std::vector<std::string> srcnames_RelativeSample = {"RelativeSample"};
-
-  std::map<std::string, std::vector<std::string> > MapUncert = {
-    {groupedUncertNames[0],srcnames_Eta0To5},
-    {groupedUncertNames[1],srcnames_Eta0To3},
-    {groupedUncertNames[2],srcnames_Eta3To5},
-    {groupedUncertNames[3],srcnames_RelativeBal},
-    //    {groupedUncertNames[4],srcnames_RelativeSample}
-  };
-
+  // unc names 2018
+  std::vector< std::string > uncertNames_2018 = {
+    "FlavorQCD",
+    "RelativeBal",
+    "HF",
+    "BBEC1",
+    "EC2",
+    "Absolute",
+    "Absolute_2018",
+    "HF_2018",
+    "EC2_2018",
+    "RelativeSample_2018",
+    "BBEC1_2018"
+  }; // end of 2018 uncertNames
 
 
 };

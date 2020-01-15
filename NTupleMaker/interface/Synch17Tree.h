@@ -62,9 +62,22 @@ public :
   Float_t         ipx_1;
   Float_t         ipy_1;
   Float_t         ipz_1;
+  Float_t         ipx_uncorr_1;
+  Float_t         ipy_uncorr_1;
+  Float_t         ipz_uncorr_1;
+  Float_t         ipxy_1;
+  Float_t         ipn_1;
+  Float_t         drip_1;
+  Float_t         detaip_1;
+  Float_t         dphiip_1;
+  Float_t         ipxy_uncorr_1;
+  Float_t         ipn_uncorr_1;
+  Float_t         drip_uncorr_1;
+  Float_t         detaip_uncorr_1;
+  Float_t         dphiip_uncorr_1;
   Float_t         mt_1;
   Float_t         puppimt_1;
-  Int_t 	        tau_decay_mode_1;
+  Int_t 	  tau_decay_mode_1;
   Float_t         dm_1;
   Float_t         dmMVA_1;
   Float_t 	      chpt_1;
@@ -99,9 +112,22 @@ public :
   Float_t         ipx_2;
   Float_t         ipy_2;
   Float_t         ipz_2;
+  Float_t         ipx_uncorr_2;
+  Float_t         ipy_uncorr_2;
+  Float_t         ipz_uncorr_2;
+  Float_t         ipxy_2;
+  Float_t         ipn_2;
+  Float_t         drip_2;
+  Float_t         detaip_2;
+  Float_t         dphiip_2;
+  Float_t         ipxy_uncorr_2;
+  Float_t         ipn_uncorr_2;
+  Float_t         drip_uncorr_2;
+  Float_t         detaip_uncorr_2;
+  Float_t         dphiip_uncorr_2;
   Float_t         mt_2;
   Float_t         puppimt_2;
-  Int_t 	        tau_decay_mode_2;
+  Int_t 	  tau_decay_mode_2;
   Float_t         dm_2;
   Float_t         dmMVA_2;
   Float_t 	      chpt_2;
@@ -435,6 +461,7 @@ public :
   Float_t pvy;
   Float_t pvz;
   Bool_t  is_refitted_PV_with_BS;
+  Int_t   v_tracks;
   
   Float_t GenVertexX;
   Float_t GenVertexY;
@@ -458,6 +485,8 @@ public :
 
   //Vinay: ditau_vis_pT + MET
   Float_t Prompt_pT;
+
+  Bool_t isrefitBS;
 
   //////////////////////////////////////////////
   //            List of branches              //
@@ -496,6 +525,19 @@ public :
   TBranch	 *b_ipx_1;
   TBranch	 *b_ipy_1;
   TBranch	 *b_ipz_1;
+  TBranch	 *b_ipx_uncorr_1;
+  TBranch	 *b_ipy_uncorr_1;
+  TBranch	 *b_ipz_uncorr_1;
+  TBranch	 *b_ipxy_1;
+  TBranch	 *b_ipn_1;
+  TBranch	 *b_drip_1;
+  TBranch	 *b_detaip_1;
+  TBranch	 *b_dphiip_1;
+  TBranch	 *b_ipxy_uncorr_1;
+  TBranch	 *b_ipn_uncorr_1;
+  TBranch	 *b_drip_uncorr_1;
+  TBranch	 *b_detaip_uncorr_1;
+  TBranch	 *b_dphiip_uncorr_1;
   TBranch	 *b_mt_1;
   TBranch	 *b_puppimt_1;
   TBranch  *b_tau_decay_mode_1;
@@ -532,6 +574,19 @@ public :
   TBranch	 *b_ipx_2;
   TBranch	 *b_ipy_2;
   TBranch	 *b_ipz_2;
+  TBranch	 *b_ipx_uncorr_2;
+  TBranch	 *b_ipy_uncorr_2;
+  TBranch	 *b_ipz_uncorr_2;
+  TBranch	 *b_ipxy_2;
+  TBranch	 *b_ipn_2;
+  TBranch	 *b_drip_2;
+  TBranch	 *b_detaip_2;
+  TBranch	 *b_dphiip_2;
+  TBranch	 *b_ipxy_uncorr_2;
+  TBranch	 *b_ipn_uncorr_2;
+  TBranch	 *b_drip_uncorr_2;
+  TBranch	 *b_detaip_uncorr_2;
+  TBranch	 *b_dphiip_uncorr_2;
   TBranch	 *b_mt_2;
   TBranch	 *b_puppimt_2;
   TBranch  *b_tau_decay_mode_2;
@@ -868,6 +923,7 @@ public :
   TBranch        *b_pvy;
   TBranch        *b_pvz;  
   TBranch        *b_is_refitted_PV_with_BS;  
+  TBranch        *b_v_tracks;
 
 //gen vertex info is practical to have
   TBranch        *b_GenVertexX;
@@ -890,6 +946,8 @@ public :
   TBranch        *b_TauSpinnerWeightsMix0p375;
 
   TBranch       *b_Prompt_pT;
+
+  TBranch       *b_isrefitBS;
 
   Synch17Tree(TTree *tree=0);
   virtual ~Synch17Tree();
