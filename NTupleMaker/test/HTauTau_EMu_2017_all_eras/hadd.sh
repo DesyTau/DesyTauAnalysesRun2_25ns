@@ -15,4 +15,9 @@ do
 done
 
 hadd -f MuonEG.root MuonEG_Run2017CtoF.root MuonEG_Run2017B.root
+hadd -f  DY2JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8.root  DY2JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8.root  DY2JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8_ext.root
+hadd -f  DY3JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8.root  DY3JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8.root  DY3JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8_ext.root
 
+hadd -f TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8.root TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8.root TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8.root
+hadd -f TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powheg-pythia8.root TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powheg-pythia8.root TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8.root 
+hadd -f TTToHadronic_TuneCP5_PSweights_13TeV-powheg-pythia8.root TTToHadronic_TuneCP5_PSweights_13TeV-powheg-pythia8.root TTToHadronic_TuneCP5_13TeV-powheg-pythia8.root
