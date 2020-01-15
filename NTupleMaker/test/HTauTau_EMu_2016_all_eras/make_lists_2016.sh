@@ -4,6 +4,7 @@ dirMC=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2016/mc/
 dirEmbedded=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2016/embedded/Embedding_emu_v2/
 dirMC_v2=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2016/mc_v2/
 dirMC_v3=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2016/mc_v3/
+dirMC_v4=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2016/mc_v4/
 
 ls $dirData/MuonEG_Run2016B-17Jul2018_ver2-v1/*root > MuonEG_Run2016B
 ls $dirData/MuonEG_Run2016C-17Jul2018-v1/*root > MuonEG_Run2016C
@@ -71,13 +72,15 @@ ls $dirMC/WGstarToLNuEE_012Jets_13TeV-madgraph/*root > WGstarToLNuEE
 ls $dirMC/WGstarToLNuMuMu_012Jets_13TeV-madgraph/*root > WGstarToLNuMuMu
 
 ls $dirMC_v2/GluGluHToTauTau_M125_13TeV_powheg_pythia8-v3/*root > GluGluHToTauTau_M125
+find $dirMC_v4/GluGluHToTauTau_M125_13TeV_powheg_pythia8_ext1/ -type f -name "*.root" >GluGluHToTauTau_M125_ext1
 ls $dirMC_v2/GluGluHToWWTo2L2Nu_M125_13TeV_powheg_JHUgen_pythia8/*root > GluGluHToWWTo2L2Nu_M125
 ls $dirMC_v2/VBFHToWWTo2L2Nu_M125_13TeV_powheg_JHUgen_pythia8/*root > VBFHToWWTo2L2Nu_M125
 ls $dirMC_v2/WminusHToTauTau_M125_13TeV_powheg_pythia8/*root > WminusHToTauTau_M125
 ls $dirMC_v2/WplusHToTauTau_M125_13TeV_powheg_pythia8/*root > WplusHToTauTau_M125
 ls $dirMC_v2/ZHToTauTau_M125_13TeV_powheg_pythia8/*root > ZHToTauTau_M125
 ls $dirMC_v2/ttHJetToTT_M125_13TeV_amcatnloFXFX_madspin_pythia8/*root > ttHJetToTT_M125
-ls $dirMC_v3/VBFHToTauTau_M125_13TeV_powheg_pythia8/*root > VBFHToTauTau_M125
+ls $dirMC_v4/VBFHToTauTau_M125_13TeV_powheg_pythia8/*root > VBFHToTauTau_M125
+find $dirMC_v4/VBFHToTauTau_M125_13TeV_powheg_pythia8_ext1/ -type f -name "*.root" >VBFHToTauTau_M125_ext1
 
 ls $dirMC_v3/ggZH_HToTauTau_ZToQQ_M125_13TeV_powheg_pythia8/*root > ggZH_HToTauTau_ZToQQ_M125_13TeV_powheg_pythia8
 ls $dirMC_v3/ggZH_HToTauTau_ZToNuNu_M125_13TeV_powheg_pythia8/*root >  ggZH_HToTauTau_ZToNuNu_M125_13TeV_powheg_pythia8
