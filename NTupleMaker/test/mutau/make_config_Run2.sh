@@ -26,7 +26,7 @@ TEMPLATE_CFG_NAME="analysisMacroSynch_mt_${YEAR}"
 # define parameters which are different between MC and data configs
 KEY_LIST=(isData ApplyPUweight ApplyLepSF ApplyRecoilCorrections ApplyBTagScaling)
 VALUE_LIST_MC=(false true true true true)
-VALUE_LIST_DATA=(true false false true true)
+VALUE_LIST_DATA=(true false false false false)
 VALUE_LIST_EMBEDDED=(true false true false false)
 
 # these parameters are year dependant for MC, so leave them as they are in the config and set to 0 only if it is data config
