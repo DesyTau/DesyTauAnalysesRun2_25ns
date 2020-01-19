@@ -1064,8 +1064,8 @@ void Synch17Tree::WriteInit(TTree *tree) {
    fChain->Branch("alpha_IP_uncorr_1", &alpha_IP_uncorr_1, "alpha_IP_uncorr_1/F");
    fChain->Branch("alpha_IP_uncorr_2", &alpha_IP_uncorr_2, "alpha_IP_uncorr_2/F");
 
-   fChain->Branch("alpha_plane_1", &alpha_IP_1, "alpha_plane_1/F");
-   fChain->Branch("alpha_plane_2", &alpha_IP_2, "alpha_plane_2/F");
+   fChain->Branch("alpha_plane_1", &alpha_plane_1, "alpha_plane_1/F");
+   fChain->Branch("alpha_plane_2", &alpha_plane_2, "alpha_plane_2/F");
 
    fChain->Branch("Prompt_pT", &Prompt_pT, "Prompt_pT/F");
    //   fChain->Branch("isrefitBS", &isrefitBS, "isrefitBS/O");
