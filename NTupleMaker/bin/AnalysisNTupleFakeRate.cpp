@@ -171,6 +171,7 @@ int main(int argc, char * argv[]) {
   std::ifstream fileList(argv[2]);
   std::ifstream fileList0(argv[2]);
   std::string ntupleName("makeroottree/AC1B");
+  std::string initNtupleName("initroottree/AC1B");
   std::string eventHistoName("eventCount/EventCount");
   std::string eventHistoNameData("makeroottree/nEvents");
   std::string weightsHistoName("eventCount/EventWeights");
@@ -712,6 +713,25 @@ int main(int argc, char * argv[]) {
       exit(-1);
     }
 
+    TTree * _inittree = (TTree*)file_->Get(TString(initNtupleName));
+    if (_inittree!=NULL) {
+      Float_t genweight;
+      if (!isData)
+	_inittree->SetBranchAddress("genweight",&genweight);
+      Long64_t numberOfEntriesInitTree = _inittree->GetEntries();
+      std::cout << "      number of entries in Init Tree = " << numberOfEntriesInitTree << std::endl;
+      for (Long64_t iEntry=0; iEntry<numberOfEntriesInitTree; iEntry++) {
+	_inittree->GetEntry(iEntry);
+	if (isData)
+	  histWeightsH->Fill(0.,1.);
+	else {
+	  Float_t GenWeight = 1;
+	  if (genweight<0) GenWeight = -1;
+	  histWeightsH->Fill(0.,GenWeight);
+	}
+      }
+    }
+
     // accessing tree
     TTree * tree_ = (TTree*)file_->Get(TString(ntupleName));
     if (tree_==NULL) { 
@@ -931,7 +951,6 @@ int main(int argc, char * argv[]) {
 	  genWeight_ = 1;
 	weight_ *= genWeight_;
       }
-      histWeightsH->Fill(double(0.),double(genWeight_));
 
       // **********************************
       // *** Analysis of generator info ***

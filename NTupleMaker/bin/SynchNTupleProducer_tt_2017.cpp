@@ -40,7 +40,7 @@
 #include "DesyTauAnalyses/NTupleMaker/interface/PileUp.h"
 #include "HTT-utilities/RecoilCorrections/interface/RecoilCorrector.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/functionsSynch2017.h"
-
+#include "HiggsCPinTauDecays/IpCorrection/interface/IpCorrection.h"
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
@@ -143,9 +143,12 @@ int main(int argc, char * argv[]) {
   const bool ApplyTrigger     = cfg.get<bool>("ApplyTrigger"); 
   const bool ApplySVFit       = cfg.get<bool>("ApplySVFit");
   const bool ApplyBTagScaling = cfg.get<bool>("ApplyBTagScaling");
-  const bool ApplySystShift   = cfg.get<bool>("ApplySystShift");
   const bool ApplyMetFilters = cfg.get<bool>("ApplyMetFilters");
-  
+
+  const bool ApplyIpCorrection = cfg.get<bool>("ApplyIpCorrection");
+  const string ipCorrFileName = cfg.get<string>("IpCorrFileName");
+  TString IpCorrFileName(ipCorrFileName);
+
   //pileup distrib
   const string pileUpInDataFile = cfg.get<string>("pileUpInDataFile");
   const string pileUpInMCFile = cfg.get<string>("pileUpInMCFile");
@@ -246,6 +249,9 @@ int main(int argc, char * argv[]) {
   // create input files list
   int ifile = 0;
   int jfile = -1;
+
+  // IP corrections
+  IpCorrection *ip = new IpCorrection(TString(cmsswBase) + "/src/" + IpCorrFileName);
 
   std::vector<std::string> fileList; 
   int NumberOfFiles = 0;
@@ -605,7 +611,9 @@ int main(int argc, char * argv[]) {
       otree->m_vis = diTauLV.M();
       otree->pt_tt = diTauLV.Pt();
       
-      acott_Impr(&analysisTree,otree,tauIndex_1,tauIndex_2,"tt"); 
+      IpCorrection * ipCorrector = NULL;
+      if (ApplyIpCorrection) ipCorrector = ip;
+      acott_Impr(&analysisTree,otree,tauIndex_1,tauIndex_2,"tt",ipCorrector); 
       //const AC1B * analysisTree;      
   
       //tau1 

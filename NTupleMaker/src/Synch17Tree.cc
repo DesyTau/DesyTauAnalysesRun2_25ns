@@ -90,16 +90,16 @@ void Synch17Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("ipx_uncorr_1", &ipx_uncorr_1, &b_ipx_uncorr_1);
    fChain->SetBranchAddress("ipy_uncorr_1", &ipy_uncorr_1, &b_ipy_uncorr_1);
    fChain->SetBranchAddress("ipz_uncorr_1", &ipz_uncorr_1, &b_ipz_uncorr_1);
-    //   fChain->SetBranchAddress("ipxy_1", &ipxy_1, &b_ipxy_1);
+   // fChain->SetBranchAddress("ipxy_1", &ipxy_1, &b_ipxy_1);
    //   fChain->SetBranchAddress("ipn_1", &ipn_1, &b_ipn_1);
    //   fChain->SetBranchAddress("drip_1", &drip_1, &b_drip_1);
-   //  fChain->SetBranchAddress("detaip_1", &detaip_1, &b_detaip_1);
-   //   fChain->SetBranchAddress("dphiip_1", &dphiip_1, &b_dphiip_1);
+   fChain->SetBranchAddress("detaip_1", &detaip_1, &b_detaip_1);
+   fChain->SetBranchAddress("dphiip_1", &dphiip_1, &b_dphiip_1);
    //  fChain->SetBranchAddress("ipxy_uncorr_1", &ipxy_uncorr_1, &b_ipxy_uncorr_1);
    //   fChain->SetBranchAddress("ipn_uncorr_1", &ipn_uncorr_1, &b_ipn_uncorr_1);
    //   fChain->SetBranchAddress("drip_uncorr_1", &drip_uncorr_1, &b_drip_uncorr_1);
-   //   fChain->SetBranchAddress("detaip_uncorr_1", &detaip_uncorr_1, &b_detaip_uncorr_1);
-   //   fChain->SetBranchAddress("dphiip_uncorr_1", &dphiip_uncorr_1, &b_dphiip_uncorr_1);
+   fChain->SetBranchAddress("detaip_uncorr_1", &detaip_uncorr_1, &b_detaip_uncorr_1);
+   fChain->SetBranchAddress("dphiip_uncorr_1", &dphiip_uncorr_1, &b_dphiip_uncorr_1);
    fChain->SetBranchAddress("mt_1", &mt_1, &b_mt_1);
    fChain->SetBranchAddress("puppimt_1", &puppimt_1, &b_puppimt_1);
    fChain->SetBranchAddress("tau_decay_mode_1", &tau_decay_mode_1, &b_tau_decay_mode_1); 
@@ -145,13 +145,13 @@ void Synch17Tree::ReadInit(TTree *tree)
    //   fChain->SetBranchAddress("ipxy_2", &ipxy_2, &b_ipxy_2);
    //   fChain->SetBranchAddress("ipn_2", &ipn_2, &b_ipn_2);
    //   fChain->SetBranchAddress("drip_2", &drip_2, &b_drip_2);
-   //   fChain->SetBranchAddress("detaip_2", &detaip_2, &b_detaip_2);
-   //   fChain->SetBranchAddress("dphiip_2", &dphiip_2, &b_dphiip_2);
+   fChain->SetBranchAddress("detaip_2", &detaip_2, &b_detaip_2);
+   fChain->SetBranchAddress("dphiip_2", &dphiip_2, &b_dphiip_2);
    //   fChain->SetBranchAddress("ipxy_uncorr_2", &ipxy_uncorr_2, &b_ipxy_uncorr_2);
    //   fChain->SetBranchAddress("ipn_uncorr_2", &ipn_uncorr_2, &b_ipn_uncorr_2);
    //   fChain->SetBranchAddress("drip_uncorr_2", &drip_uncorr_2, &b_drip_uncorr_2);
-   //   fChain->SetBranchAddress("detaip_uncorr_2", &detaip_uncorr_2, &b_detaip_uncorr_2);
-   //   fChain->SetBranchAddress("dphiip_uncorr_2", &dphiip_uncorr_2, &b_dphiip_uncorr_2);
+   fChain->SetBranchAddress("detaip_uncorr_2", &detaip_uncorr_2, &b_detaip_uncorr_2);
+   fChain->SetBranchAddress("dphiip_uncorr_2", &dphiip_uncorr_2, &b_dphiip_uncorr_2);
    fChain->SetBranchAddress("mt_2", &mt_2, &b_mt_2);
    fChain->SetBranchAddress("puppimt_2", &puppimt_2, &b_puppimt_2);
    fChain->SetBranchAddress("tau_decay_mode_2", &tau_decay_mode_2, &b_tau_decay_mode_2); 
@@ -425,11 +425,22 @@ void Synch17Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("acotautau_refitbs_10", &acotautau_refitbs_10, &b_acotautau_refitbs_10);
    fChain->SetBranchAddress("acotautau_refitbs_01", &acotautau_refitbs_01, &b_acotautau_refitbs_01);
    fChain->SetBranchAddress("acotautau_refitbs_11", &acotautau_refitbs_11, &b_acotautau_refitbs_11);
+   fChain->SetBranchAddress("acotautau_refitbs_02", &acotautau_refitbs_02, &b_acotautau_refitbs_02);
 
    fChain->SetBranchAddress("acotautau_helix_00", &acotautau_helix_00, &b_acotautau_helix_00);
    fChain->SetBranchAddress("acotautau_helix_10", &acotautau_helix_10, &b_acotautau_helix_10);
    fChain->SetBranchAddress("acotautau_helix_01", &acotautau_helix_01, &b_acotautau_helix_01);
    fChain->SetBranchAddress("acotautau_helix_11", &acotautau_helix_11, &b_acotautau_helix_11);
+
+   fChain->SetBranchAddress("acotautau_refitbs_uncorr_00", &acotautau_refitbs_uncorr_00, &b_acotautau_refitbs_uncorr_00);
+   fChain->SetBranchAddress("acotautau_refitbs_uncorr_10", &acotautau_refitbs_uncorr_10, &b_acotautau_refitbs_uncorr_10);
+   fChain->SetBranchAddress("acotautau_refitbs_uncorr_01", &acotautau_refitbs_uncorr_01, &b_acotautau_refitbs_uncorr_01);
+   fChain->SetBranchAddress("acotautau_refitbs_uncorr_11", &acotautau_refitbs_uncorr_11, &b_acotautau_refitbs_uncorr_11);
+
+   fChain->SetBranchAddress("acotautau_helix_uncorr_00", &acotautau_helix_uncorr_00, &b_acotautau_helix_uncorr_00);
+   fChain->SetBranchAddress("acotautau_helix_uncorr_10", &acotautau_helix_uncorr_10, &b_acotautau_helix_uncorr_10);
+   fChain->SetBranchAddress("acotautau_helix_uncorr_01", &acotautau_helix_uncorr_01, &b_acotautau_helix_uncorr_01);
+   fChain->SetBranchAddress("acotautau_helix_uncorr_11", &acotautau_helix_uncorr_11, &b_acotautau_helix_uncorr_11);
 
    //   fChain->SetBranchAddress("acotautauPsi_00", &acotautauPsi_00, &b_acotautauPsi_00);
    //   fChain->SetBranchAddress("acotautauPsi_10", &acotautauPsi_10, &b_acotautauPsi_10);
@@ -502,7 +513,18 @@ void Synch17Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("VxConstitTau2", &VxConstitTau2, &b_VxConstitTau2);
    fChain->SetBranchAddress("VyConstitTau2", &VyConstitTau2, &b_VyConstitTau2);
    fChain->SetBranchAddress("VzConstitTau2", &VzConstitTau2, &b_VzConstitTau2);
+
    fChain->SetBranchAddress("alphaminus", &alphaminus, &b_alphaminus);
+   fChain->SetBranchAddress("alphaminus_uncorr", &alphaminus_uncorr, &b_alphaminus_uncorr);
+
+   fChain->SetBranchAddress("alpha_IP_1", &alpha_IP_1, &b_alpha_IP_1);
+   fChain->SetBranchAddress("alpha_IP_2", &alpha_IP_2, &b_alpha_IP_2);
+
+   fChain->SetBranchAddress("alpha_IP_uncorr_1", &alpha_IP_uncorr_1, &b_alpha_IP_uncorr_1);
+   fChain->SetBranchAddress("alpha_IP_uncorr_2", &alpha_IP_uncorr_2, &b_alpha_IP_uncorr_2);
+
+   fChain->SetBranchAddress("alpha_plane_1", &alpha_plane_1, &b_alpha_plane_1);
+   fChain->SetBranchAddress("alpha_plane_2", &alpha_plane_2, &b_alpha_plane_2);
 
    fChain->SetBranchAddress("Prompt_pT", &Prompt_pT, &b_Prompt_pT);
    //   fChain->SetBranchAddress("isrefitBS", &isrefitBS, &b_isrefitBS);
@@ -622,13 +644,13 @@ void Synch17Tree::WriteInit(TTree *tree) {
    //   fChain->Branch("ipxy_1", &ipxy_1, "ipxy_1/F");
    //  fChain->Branch("ipn_1", &ipn_1, "ipn_1/F");
    //  fChain->Branch("drip_1", &drip_1, "drip_1/F");
-   //   fChain->Branch("detaip_1", &detaip_1, "detaip_1/F");
-   //   fChain->Branch("dphiip_1", &dphiip_1, "dphiip_1/F");
+   fChain->Branch("detaip_1", &detaip_1, "detaip_1/F");
+   fChain->Branch("dphiip_1", &dphiip_1, "dphiip_1/F");
    //   fChain->Branch("ipxy_uncorr_1", &ipxy_uncorr_1, "ipxy_uncorr_1/F");
    //  fChain->Branch("ipn_uncorr_1", &ipn_uncorr_1, "ipn_uncorr_1/F");
    //   fChain->Branch("drip_uncorr_1", &drip_uncorr_1, "drip_uncorr_1/F");
-   //   fChain->Branch("detaip_uncorr_1", &detaip_uncorr_1, "detaip_uncorr_1/F");
-   //   fChain->Branch("dphiip_uncorr_1", &dphiip_uncorr_1, "dphiip_uncorr_1/F");
+   fChain->Branch("detaip_uncorr_1", &detaip_uncorr_1, "detaip_uncorr_1/F");
+   fChain->Branch("dphiip_uncorr_1", &dphiip_uncorr_1, "dphiip_uncorr_1/F");
    fChain->Branch("mt_1", &mt_1, "mt_1/F");
    fChain->Branch("puppimt_1", &puppimt_1, "puppimt_1/F");
    fChain->Branch("tau_decay_mode_1", &tau_decay_mode_1, "tau_decay_mode_1/I"); 
@@ -671,13 +693,13 @@ void Synch17Tree::WriteInit(TTree *tree) {
    //   fChain->Branch("ipxy_2", &ipxy_2, "ipxy_2/F");
    //   fChain->Branch("ipn_2", &ipn_2, "ipn_2/F");
    //   fChain->Branch("drip_2", &drip_2, "drip_2/F");
-   //  fChain->Branch("detaip_2", &detaip_2, "detaip_2/F");
-   //   fChain->Branch("dphiip_2", &dphiip_2, "dphiip_2/F");
+   fChain->Branch("detaip_2", &detaip_2, "detaip_2/F");
+   fChain->Branch("dphiip_2", &dphiip_2, "dphiip_2/F");
    //   fChain->Branch("ipxy_uncorr_2", &ipxy_uncorr_2, "ipxy_uncorr_2/F");
    //   fChain->Branch("ipn_uncorr_2", &ipn_uncorr_2, "ipn_uncorr_2/F");
    //   fChain->Branch("drip_uncorr_2", &drip_uncorr_2, "drip_uncorr_2/F");
-   //   fChain->Branch("detaip_uncorr_2", &detaip_uncorr_2, "detaip_uncorr_2/F");
-   //   fChain->Branch("dphiip_uncorr_2", &dphiip_uncorr_2, "dphiip_uncorr_2/F");
+   fChain->Branch("detaip_uncorr_2", &detaip_uncorr_2, "detaip_uncorr_2/F");
+   fChain->Branch("dphiip_uncorr_2", &dphiip_uncorr_2, "dphiip_uncorr_2/F");
    fChain->Branch("mt_2", &mt_2, "mt_2/F");
    fChain->Branch("puppimt_2", &puppimt_2, "puppimt_2/F");
    fChain->Branch("tau_decay_mode_2", &tau_decay_mode_2, "tau_decay_mode_2/I"); 
@@ -952,11 +974,22 @@ void Synch17Tree::WriteInit(TTree *tree) {
    fChain->Branch("acotautau_refitbs_10", &acotautau_refitbs_10, "acotautau_refitbs_10/F");
    fChain->Branch("acotautau_refitbs_01", &acotautau_refitbs_01, "acotautau_refitbs_01/F");
    fChain->Branch("acotautau_refitbs_11", &acotautau_refitbs_11, "acotautau_refitbs_11/F");
+   fChain->Branch("acotautau_refitbs_02", &acotautau_refitbs_02, "acotautau_refitbs_02/F");
 
    fChain->Branch("acotautau_helix_00", &acotautau_helix_00, "acotautau_helix_00/F");
    fChain->Branch("acotautau_helix_10", &acotautau_helix_10, "acotautau_helix_10/F");
    fChain->Branch("acotautau_helix_01", &acotautau_helix_01, "acotautau_helix_01/F");
    fChain->Branch("acotautau_helix_11", &acotautau_helix_11, "acotautau_helix_11/F");
+
+   fChain->Branch("acotautau_refitbs_uncorr_00", &acotautau_refitbs_uncorr_00, "acotautau_refitbs_uncorr_00/F");
+   fChain->Branch("acotautau_refitbs_uncorr_10", &acotautau_refitbs_uncorr_10, "acotautau_refitbs_uncorr_10/F");
+   fChain->Branch("acotautau_refitbs_uncorr_01", &acotautau_refitbs_uncorr_01, "acotautau_refitbs_uncorr_01/F");
+   fChain->Branch("acotautau_refitbs_uncorr_11", &acotautau_refitbs_uncorr_11, "acotautau_refitbs_uncorr_11/F");
+
+   fChain->Branch("acotautau_helix_uncorr_00", &acotautau_helix_uncorr_00, "acotautau_helix_uncorr_00/F");
+   fChain->Branch("acotautau_helix_uncorr_10", &acotautau_helix_uncorr_10, "acotautau_helix_uncorr_10/F");
+   fChain->Branch("acotautau_helix_uncorr_01", &acotautau_helix_uncorr_01, "acotautau_helix_uncorr_01/F");
+   fChain->Branch("acotautau_helix_uncorr_11", &acotautau_helix_uncorr_11, "acotautau_helix_uncorr_11/F");
    /*
    fChain->Branch("acotautauPsi_00", &acotautauPsi_00, "acotautauPsi_00/F");
    fChain->Branch("acotautauPsi_10", &acotautauPsi_10, "acotautauPsi_10/F");
@@ -1021,7 +1054,18 @@ void Synch17Tree::WriteInit(TTree *tree) {
    fChain->Branch("VxConstitTau2", &VxConstitTau2, "VxConstitTau2/F");
    fChain->Branch("VyConstitTau2", &VyConstitTau2, "VyConstitTau2/F");
    fChain->Branch("VzConstitTau2", &VzConstitTau2, "VzConstitTau2/F");
+
    fChain->Branch("alphaminus", &alphaminus, "alphaminus/F");
+   fChain->Branch("alphaminus_uncorr", &alphaminus_uncorr, "alphaminus_uncorr/F");
+
+   fChain->Branch("alpha_IP_1", &alpha_IP_1, "alpha_IP_1/F");
+   fChain->Branch("alpha_IP_2", &alpha_IP_2, "alpha_IP_2/F");
+
+   fChain->Branch("alpha_IP_uncorr_1", &alpha_IP_uncorr_1, "alpha_IP_uncorr_1/F");
+   fChain->Branch("alpha_IP_uncorr_2", &alpha_IP_uncorr_2, "alpha_IP_uncorr_2/F");
+
+   fChain->Branch("alpha_plane_1", &alpha_IP_1, "alpha_plane_1/F");
+   fChain->Branch("alpha_plane_2", &alpha_IP_2, "alpha_plane_2/F");
 
    fChain->Branch("Prompt_pT", &Prompt_pT, "Prompt_pT/F");
    //   fChain->Branch("isrefitBS", &isrefitBS, "isrefitBS/O");

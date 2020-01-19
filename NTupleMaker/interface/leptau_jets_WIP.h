@@ -269,7 +269,7 @@ void counting_jets(const AC1B *analysisTree, Synch17Tree *otree, const Config *c
   otree->njetspt20 = jetspt20.size();
   otree->nbtag = bjets.size();
 
-  if (!cfg->get<bool>("ApplyRecoilCorrections")) {
+  if (!otree->apply_recoil) {
 
     float metx = otree->met * cos(otree->metphi);
     float mety = otree->met * sin(otree->metphi);

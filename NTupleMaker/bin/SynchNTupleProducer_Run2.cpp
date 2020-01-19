@@ -634,6 +634,7 @@ int main(int argc, char * argv[]){
         filterXtriggerTauLeg = cfg.get<vector<string>>("filterXtriggerTauLeg_after_HPS");          
       }
     }
+    //    cout << "Run number = " << analysisTree.event_run << endl;
       
     cout<<"Number of single lepton trigger legs = "<<filterSingleLep.size()<<endl;
     cout<<"Number of X trigger legs (lep leg)   = "<<filterXtriggerLepLeg.size()<<endl;
@@ -755,7 +756,7 @@ int main(int argc, char * argv[]){
       	  }
       	}
       }
-    
+
       if (nEvents % 10000 == 0) 
       	cout << "      processed " << nEvents << " events" << endl; 
     
@@ -836,12 +837,11 @@ int main(int argc, char * argv[]){
           if (fabs(analysisTree.muon_dz[im]) >= dzLeptonCut) continue;
           if (!muonMediumId) continue;
           leptons.push_back(im);
-          }
+	}
       }
-      counter[4]++;
+      counter[4]++;    
     
-    
-    	if (leptons.size() == 0) continue;
+      if (leptons.size() == 0) continue;
       if (taus.size() == 0) continue;
       counter[5]++;
     
@@ -962,30 +962,55 @@ int main(int argc, char * argv[]){
       otree->trg_mutaucross_tau = false;
         
       for (unsigned int iT = 0; iT < analysisTree.trigobject_count; ++iT) {
-         float dRtrigLep = deltaR(lep_eta, lep_phi, analysisTree.trigobject_eta[iT], analysisTree.trigobject_phi[iT]);        
-         float dRtrigTau = deltaR(analysisTree.tau_eta[tauIndex], analysisTree.tau_phi[tauIndex], analysisTree.trigobject_eta[iT], analysisTree.trigobject_phi[iT]);        
+	
+	/*
+	for(unsigned int i_trig = 0; i_trig < filterXtriggerLepLeg.size(); i_trig++)
+	  {
+	    if (nXTrigLepLeg.at(i_trig) == -1) continue;
+	    if (analysisTree.trigobject_filters[iT][nXTrigLepLeg.at(i_trig)]) 
+	      cout << filterXtriggerLepLeg.at(i_trig) << " : " << analysisTree.trigobject_pt[iT] << endl;
+	    
+	  }       
+	for(unsigned int i_trig = 0; i_trig < filterXtriggerTauLeg.size(); i_trig++)
+	  {
+	    if (nXTrigTauLeg.at(i_trig) == -1) continue;
+	    if (analysisTree.trigobject_filters[iT][nXTrigTauLeg.at(i_trig)])
+	      cout << filterXtriggerTauLeg.at(i_trig) << " : " << analysisTree.trigobject_pt[iT] << endl;
+	  }
+	*/
+	float dRtrigLep = deltaR(lep_eta, lep_phi, analysisTree.trigobject_eta[iT], analysisTree.trigobject_phi[iT]);        
+	float dRtrigTau = deltaR(analysisTree.tau_eta[tauIndex], analysisTree.tau_phi[tauIndex], analysisTree.trigobject_eta[iT], analysisTree.trigobject_phi[iT]);        
     
-         if (dRtrigLep < dRTrigMatch){
-           for(unsigned int i_trig = 0; i_trig < filterSingleLep.size(); i_trig++)
-           {
+
+	if (dRtrigLep < dRTrigMatch){
+	  for(unsigned int i_trig = 0; i_trig < filterSingleLep.size(); i_trig++)
+	    {
               if (nSingleLepTrig.at(i_trig) == -1) continue;
               if (analysisTree.trigobject_filters[iT][nSingleLepTrig.at(i_trig)]) isSingleLepTrig = true;
             }
-           for(unsigned int i_trig = 0; i_trig < filterXtriggerLepLeg.size(); i_trig++)
-           {
+	  for(unsigned int i_trig = 0; i_trig < filterXtriggerLepLeg.size(); i_trig++)
+	    {
               if (nXTrigLepLeg.at(i_trig) == -1) continue;
               if (analysisTree.trigobject_filters[iT][nXTrigLepLeg.at(i_trig)]) isXTrigLepLeg.at(i_trig) = true;
             } 
-          }
-         if (dRtrigTau < dRTrigMatch){ 
-            for(unsigned int i_trig = 0; i_trig < filterXtriggerTauLeg.size(); i_trig++)
+	}
+	if (dRtrigTau < dRTrigMatch){ 
+	  for(unsigned int i_trig = 0; i_trig < filterXtriggerTauLeg.size(); i_trig++)
             {
-               if (nXTrigTauLeg.at(i_trig) == -1) continue;
-               if (analysisTree.trigobject_filters[iT][nXTrigTauLeg.at(i_trig)]) isXTrigTauLeg.at(i_trig) = true;
+	      if (nXTrigTauLeg.at(i_trig) == -1) continue;
+	      if (analysisTree.trigobject_filters[iT][nXTrigTauLeg.at(i_trig)]) isXTrigTauLeg.at(i_trig) = true;
             }  
-         }	  
+	}	  
       }
-    
+      /*
+      for (unsigned int i=0; i<nXTrigTauLeg.size(); ++i) {
+	cout << "Tau leg : " << filterXtriggerTauLeg.at(i) << " : " << nXTrigTauLeg.at(i) << endl;
+      }
+      for (unsigned int i=0; i<nXTrigLepLeg.size(); ++i) {
+	cout << "Lepton leg : " << filterXtriggerLepLeg.at(i) << " : " << nXTrigLepLeg.at(i) << endl;
+      }
+      */
+
       for(unsigned int i_trig = 0; i_trig < filterXtriggerTauLeg.size(); i_trig++)
         isXTrigTau = isXTrigTau && isXTrigTauLeg.at(i_trig);
       for(unsigned int i_trig = 0; i_trig < filterXtriggerLepLeg.size(); i_trig++)
@@ -998,6 +1023,16 @@ int main(int argc, char * argv[]){
       if (ch == "et")
        otree->trg_singleelectron = isSingleLepTrig;
     
+      /*
+      cout << "xtrig_lep = " << isXTrigLep << "  xtrig_tau = " << isXTrigTau << endl;
+      cout << "lep pt = " << lep_pt << "  eta = " << lep_eta << endl;
+      cout << "tau pt = " 
+	   << analysisTree.tau_pt[tauIndex] << "  eta = " 
+	   << analysisTree.tau_eta[tauIndex] << endl;
+      
+      cout << endl;
+      */
+
       otree->trg_mutaucross_mu = isXTrigLep;
       otree->trg_mutaucross_tau = isXTrigTau;
       otree->trg_mutaucross = isXTrig;
@@ -1091,11 +1126,11 @@ int main(int argc, char * argv[]){
     	    }
     	    else {
     	      eff_data_trig_lt_l = w->function("m_trg_20_ic_data")->getVal();
-            eff_mc_trig_lt_l = w->function("m_trg_20_ic_" + suffix)->getVal();
+	      eff_mc_trig_lt_l = w->function("m_trg_20_ic_" + suffix)->getVal();
     	    }
     	    otree->idisoweight_1 = w->function("m_idiso_ic_" + suffixRatio)->getVal();
     	    otree->idisoweight_antiiso_1 = w->function("m_idiso_ic_" + suffixRatio)->getVal();
-          otree->trkeffweight = w->function("m_trk_ratio")->getVal();
+	    otree->trkeffweight = w->function("m_trk_ratio")->getVal();
     	  }
     	  else if (ch == "et") {
     	    w->var("e_pt")->setVal(leptonLV.Pt());
@@ -1116,7 +1151,7 @@ int main(int argc, char * argv[]){
     	    }
     	    otree->idisoweight_1 = w->function("e_idiso_ic_" + suffixRatio)->getVal();
     	    otree->idisoweight_antiiso_1 = w->function("e_idiso_ic_" + suffixRatio)->getVal();
-          otree->trkeffweight = w->function("e_trk_" + suffixRatio)->getVal();
+	    otree->trkeffweight = w->function("e_trk_" + suffixRatio)->getVal();
     	  }
                                                                                                                                                                      
     	  double eff_data_trig = eff_data_trig_L + (eff_data_trig_lt_l - eff_data_trig_L) * eff_data_trig_lt_tau;
@@ -1389,7 +1424,7 @@ int main(int argc, char * argv[]){
       otree->mt_sv = -10;
       bool isSRevent = true; //boolean used to compute SVFit variables only on SR events, it is set to true when running Synchronization to run SVFit on all events
       if(!Synch){
-	isSRevent = (otree->dilepton_veto<0.5 &&  otree->extramuon_veto<0.5 && otree->extraelec_veto<0.5 && (otree->trg_singlemuon>0.5 || otree->trg_mutaucross>0.5) && otree->pt_1>17 && otree->pt_2>25 && otree->byVVVLooseDeepTau2017v2p1VSjet_2>0.5);
+	isSRevent = (otree->dilepton_veto<0.5 &&  otree->extramuon_veto<0.5 && otree->extraelec_veto<0.5 && (otree->trg_singlemuon>0.5 || otree->trg_mutaucross>0.5) && otree->pt_1>19 && otree->pt_2>19 && otree->byVVVLooseDeepTau2017v2p1VSjet_2>0.5);
 	if(usePuppiMET) isSRevent = isSRevent && otree->puppimt_1<60;
 	else isSRevent = isSRevent && otree->mt_1<60;
       }
@@ -1402,6 +1437,7 @@ int main(int argc, char * argv[]){
       cout << "                                        " << endl;
     }
     */
+      otree->apply_recoil = ApplyRecoilCorrections;
       if (!isSRevent && ApplySystShift) continue;
       if (ApplySVFit && isSRevent) svfit_variables(ch, &analysisTree, otree, &cfg, inputFile_visPtResolution);
         
@@ -1438,40 +1474,33 @@ int main(int argc, char * argv[]){
       //Created the acott_Impr function, which takes ch as input as well. See the funcrtion in functionsCP.h to see my updates to the function itself      
       //Merijn 2019 1 10 debug: a major source of problems was that indices were innertwined from the beginning...
       //one should note that in et or mt case,
-      acott_Impr(&analysisTree, otree, leptonIndex, tauIndex, ch);
+      IpCorrection * ipCorrector = NULL;
+      if (ApplyIpCorrection && (!isData)) ipCorrector = ip; 
+      acott_Impr(&analysisTree, otree, leptonIndex, tauIndex, ch,ipCorrector);
 
-      otree->ipx_uncorr_1 = otree->ipx_1;
-      otree->ipy_uncorr_1 = otree->ipy_1;
-      otree->ipz_uncorr_1 = otree->ipz_1;
-      TLorentzVector ip1; ip1.SetXYZM(otree->ipx_1,otree->ipy_1,otree->ipz_1,0.);
+      TLorentzVector ip1; ip1.SetXYZM(otree->ipx_uncorr_1,otree->ipy_uncorr_1,otree->ipz_uncorr_1,0.);
       otree->ipxy_uncorr_1 = ip1.Pt();
       otree->ipn_uncorr_1 = ip1.P();
       otree->drip_uncorr_1 = deltaR(otree->eta_1,otree->phi_1,ip1.Eta(),ip1.Phi());
       otree->detaip_uncorr_1 = ip1.Eta() - otree->eta_1; 
-      TVector3 vectIP = TVector3(otree->ipx_1,otree->ipy_1,0.);
+      TVector3 vectIP = TVector3(otree->ipx_uncorr_1,otree->ipy_uncorr_1,0.);
       TVector3 vectP  = TVector3(leptonLV.Px(),leptonLV.Py(),0.);
       otree->dphiip_uncorr_1 = TMath::ACos(vectIP*vectP/(vectIP.Mag()*vectP.Mag()));
       //      cout << "dphi = " << otree->dphiip_uncorr_1 << std::endl;
       //      cout << "refit = " << otree->isrefitBS << std::endl;
 
-      otree->ipx_uncorr_2 = otree->ipx_2;
-      otree->ipy_uncorr_2 = otree->ipy_2;
-      otree->ipz_uncorr_2 = otree->ipz_2;
-      TLorentzVector ip2; ip2.SetXYZM(otree->ipx_2,otree->ipy_2,otree->ipz_2,0.);
+      TLorentzVector ip2; ip2.SetXYZM(otree->ipx_uncorr_2,otree->ipy_uncorr_2,otree->ipz_uncorr_2,0.);
       otree->ipxy_uncorr_2 = ip2.Pt();
       otree->ipn_uncorr_2 = ip2.P();
       otree->drip_uncorr_2 = deltaR(otree->eta_2,otree->phi_2,ip2.Eta(),ip2.Phi());
       otree->detaip_uncorr_2 = ip2.Eta() - otree->eta_2;
-      vectIP.SetX(otree->ipx_2);
-      vectIP.SetY(otree->ipy_2);
+      vectIP.SetX(otree->ipx_uncorr_2);
+      vectIP.SetY(otree->ipy_uncorr_2);
       vectIP.SetZ(0.);
       vectP.SetX(tauLV.Px());
       vectP.SetY(tauLV.Py());
       vectP.SetZ(0.);
       otree->dphiip_uncorr_2 = TMath::ACos(vectIP*vectP/(vectIP.Mag()*vectP.Mag()));
-
-      if (ApplyIpCorrection && (!isData || isEmbedded))
-	calibrateIP(&analysisTree,otree,leptonIndex,tauIndex,ch,ip);
 
       ip1.SetXYZM(otree->ipx_1,otree->ipy_1,otree->ipz_1,0.);
       otree->ipxy_1 = ip1.Pt();
@@ -1499,9 +1528,8 @@ int main(int argc, char * argv[]){
       vectP.SetZ(0.);
       otree->dphiip_2 = TMath::ACos(vectIP*vectP/(vectIP.Mag()*vectP.Mag()));
 
-
       selEvents++;
-      /*
+      
       otree->v_tracks = 0;
       for(unsigned int i = 0; i < analysisTree.refitvertexwithbs_count; i++)
         {
@@ -1511,7 +1539,7 @@ int main(int argc, char * argv[]){
               otree->v_tracks = analysisTree.refitvertexwithbs_ntracks[i];
             }
         }
-      */
+      
 
       //Merijn 2019 1 10: perhaps this should be called before moving to next event..
       otree->Fill();

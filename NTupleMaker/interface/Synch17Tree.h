@@ -281,13 +281,13 @@ public :
   Float_t         embweight;
 
   Float_t         topptweight;
-  Double_t 	      zptweight;
+  Double_t 	  zptweight;
   Double_t        trkeffweight;
   Float_t         etaufakeweight;
   Float_t         mutaufakeweight;
   
   Bool_t          trg_singlemuon;
-  Bool_t	        trg_singleelectron;
+  Bool_t	  trg_singleelectron;
   Bool_t          singleLepTrigger;
   Bool_t          trg_mutaucross;
   Bool_t          trg_mutaucross_mu;
@@ -404,11 +404,22 @@ public :
   Float_t         acotautau_refitbs_10;
   Float_t         acotautau_refitbs_01;
   Float_t         acotautau_refitbs_11;
- 
+  Float_t         acotautau_refitbs_02;
+
   Float_t         acotautau_helix_00;
   Float_t         acotautau_helix_10;
   Float_t         acotautau_helix_01;
   Float_t         acotautau_helix_11;
+
+  Float_t         acotautau_refitbs_uncorr_00;
+  Float_t         acotautau_refitbs_uncorr_10;
+  Float_t         acotautau_refitbs_uncorr_01;
+  Float_t         acotautau_refitbs_uncorr_11;
+ 
+  Float_t         acotautau_helix_uncorr_00;
+  Float_t         acotautau_helix_uncorr_10;
+  Float_t         acotautau_helix_uncorr_01;
+  Float_t         acotautau_helix_uncorr_11;
 
   //Merijn add acotau for psi:
   Float_t         acotautauPsi_00;
@@ -452,6 +463,14 @@ public :
   Float_t         tau_SV_covzy_2;
   Float_t         tau_SV_covzz_2;
 
+  Float_t alpha_IP_1;
+  Float_t alpha_IP_uncorr_1;
+  Float_t alpha_plane_1;
+
+  Float_t alpha_IP_2;
+  Float_t alpha_IP_uncorr_2;
+  Float_t alpha_plane_2;
+
   //reco vertices
   Float_t RecoVertexX;
   Float_t RecoVertexY;
@@ -476,6 +495,7 @@ public :
   Float_t VyConstitTau2;
   Float_t VzConstitTau2;
   Float_t alphaminus;
+  Float_t alphaminus_uncorr;
 
   Double_t TauSpinnerWeightsEven;
   Double_t TauSpinnerWeightsOdd;
@@ -487,6 +507,8 @@ public :
   Float_t Prompt_pT;
 
   Bool_t isrefitBS;
+
+  Bool_t apply_recoil;
 
   //////////////////////////////////////////////
   //            List of branches              //
@@ -865,11 +887,22 @@ public :
   TBranch        *b_acotautau_refitbs_10;
   TBranch        *b_acotautau_refitbs_01;
   TBranch        *b_acotautau_refitbs_11;
+  TBranch        *b_acotautau_refitbs_02;
 
   TBranch        *b_acotautau_helix_00;
   TBranch        *b_acotautau_helix_10;
   TBranch        *b_acotautau_helix_01;
   TBranch        *b_acotautau_helix_11;
+
+  TBranch        *b_acotautau_refitbs_uncorr_00;
+  TBranch        *b_acotautau_refitbs_uncorr_10;
+  TBranch        *b_acotautau_refitbs_uncorr_01;
+  TBranch        *b_acotautau_refitbs_uncorr_11;
+
+  TBranch        *b_acotautau_helix_uncorr_00;
+  TBranch        *b_acotautau_helix_uncorr_10;
+  TBranch        *b_acotautau_helix_uncorr_01;
+  TBranch        *b_acotautau_helix_uncorr_11;
 
   TBranch        *b_acotautauPsi_00;
   TBranch        *b_acotautauPsi_10;
@@ -938,6 +971,15 @@ public :
   TBranch        *b_VyConstitTau2;
   TBranch        *b_VzConstitTau2;
   TBranch        *b_alphaminus;
+  TBranch        *b_alphaminus_uncorr;
+
+  TBranch        *b_alpha_IP_1;
+  TBranch        *b_alpha_IP_uncorr_1;
+  TBranch        *b_alpha_plane_1;
+
+  TBranch        *b_alpha_IP_2;
+  TBranch        *b_alpha_IP_uncorr_2;
+  TBranch        *b_alpha_plane_2;
 
   TBranch        *b_TauSpinnerWeightsEven;
   TBranch        *b_TauSpinnerWeightsOdd;

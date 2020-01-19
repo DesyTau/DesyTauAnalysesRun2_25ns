@@ -57,8 +57,10 @@ class PuppiMETSys : public METSys {
 	systype = MEtSys::SysType::Resolution;
       TLorentzVector genV = genTools::genV(*analysisTree);
       TLorentzVector genL = genTools::genL(*analysisTree);
-      metSys->ApplyMEtSys(analysisTree->puppimet_ex,
-			  analysisTree->puppimet_ey,
+      float puppimet_ex = cenTree->puppimet*TMath::Cos(cenTree->puppimetphi);
+      float puppimet_ey = cenTree->puppimet*TMath::Sin(cenTree->puppimetphi);
+      metSys->ApplyMEtSys(puppimet_ex,
+			  puppimet_ey,
 			  genV.Px(),
 			  genV.Py(),
 			  genL.Px(),
@@ -79,10 +81,10 @@ class PuppiMETSys : public METSys {
       obs.metphi = atan2(obs.mety,obs.metx);
       obs.met = sqrt(obs.metx*obs.metx+obs.mety*obs.mety);
       //      std::cout << label << " (met,metphi) : central = (" 
-      //		<< cenTree->met << ","
-      //		<< cenTree->metphi << ")" 
-      //		<< " down = (" << obs.met << ","
-      //                << obs.metphi << ")" << std::endl;
+      //      		<< cenTree->puppimet << ","
+      //      		<< cenTree->puppimetphi << ")" 
+      //      		<< " down = (" << obs.met << ","
+      //		<< obs.metphi << ")" << std::endl;
     }
     FillPuppiMET("Down");
   };
@@ -112,8 +114,10 @@ class PuppiMETSys : public METSys {
 	systype = MEtSys::SysType::Resolution;
       TLorentzVector genV = genTools::genV(*analysisTree);
       TLorentzVector genL = genTools::genL(*analysisTree);
-      metSys->ApplyMEtSys(analysisTree->puppimet_ex,
-			  analysisTree->puppimet_ey,
+      float puppimet_ex = cenTree->puppimet*TMath::Cos(cenTree->puppimetphi);
+      float puppimet_ey = cenTree->puppimet*TMath::Sin(cenTree->puppimetphi);
+      metSys->ApplyMEtSys(puppimet_ex,
+			  puppimet_ey,
 			  genV.Px(),
 			  genV.Py(),
 			  genL.Px(),
@@ -136,10 +140,10 @@ class PuppiMETSys : public METSys {
       obs.metphi = atan2(obs.mety,obs.metx);
       obs.met = sqrt(obs.metx*obs.metx+obs.mety*obs.mety);
       //      std::cout << label << " (met,metphi) : central = (" 
-      //		<< cenTree->met << ","
-      //		<< cenTree->metphi << ")" 
-      //		<< " up = (" << obs.met << ","
-      //                << obs.metphi << ")" << std::endl;
+      //      		<< cenTree->puppimet << ","
+      //      		<< cenTree->puppimetphi << ")" 
+      //      		<< " up = (" << obs.met << ","
+      //		<< obs.metphi << ")" << std::endl;
     }
     FillPuppiMET("Up");
   };
