@@ -90,6 +90,7 @@ void calibrateIP(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, i
   int partPDG = 0;
   for (int igen=0; igen<nPart; ++igen) {
     if (analysisTree->genparticles_pdgid[igen]==23||analysisTree->genparticles_pdgid[igen]==24||
+	analysisTree->genparticles_pdgid[igen]==-24||
 	analysisTree->genparticles_pdgid[igen]==25||analysisTree->genparticles_pdgid[igen]==35||
 	analysisTree->genparticles_pdgid[igen]==36||analysisTree->genparticles_pdgid[igen]==6||
 	analysisTree->genparticles_pdgid[igen]==-6) {
@@ -582,7 +583,7 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
   otree->alpha_IP_uncorr_1=TMath::ACos(angle);
 
   // alpha_IP_2
-  IPVEC=tau2IP;
+  IPVEC=tau2IP_refitbs;
   IPVEC_UNCORR=tau2IP_refitbs_uncorr;
   PVEC=tau2Prong;
   angle = CalculateCosPsi(PVEC,IPVEC);
