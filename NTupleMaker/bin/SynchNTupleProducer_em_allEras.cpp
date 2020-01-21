@@ -921,7 +921,7 @@ int main(int argc, char * argv[]) {
                }
                else {
                   isoweight_1 = correctionWS->function("e_id90iso_binned_kit_ratio")->getVal();
-                  isoweight_2 = correctionWS->function("m_idiso_binned_kit_data")->getVal();
+                  isoweight_2 = correctionWS->function("m_idiso_binned_kit_ratio")->getVal();
                }
             }
             correctionWS->var("e_pt")->setVal(pt_1);
