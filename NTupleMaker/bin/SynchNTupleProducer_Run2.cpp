@@ -1924,6 +1924,11 @@ void FillMuTau(const AC1B *analysisTree, Synch17Tree *otree, int leptonIndex, in
   otree->tau_decay_mode_1 = -9999; 
   otree->dm_1 = 16;
   otree->dmMVA_1 = 16;
+  
+  std::vector<float> PV_with_BS_cov_components = {};
+  for(auto i:  analysisTree->primvertexwithbs_cov) PV_with_BS_cov_components.push_back(i);	
+  TVector3 PV_with_BS (analysisTree->primvertexwithbs_x, analysisTree->primvertexwithbs_y, analysisTree->primvertexwithbs_z );
+  otree->IP_signif_PV_with_BS_1 = IP_significance_helix_mu(analysisTree, leptonIndex, PV_with_BS, PV_with_BS_cov_components);
 
   TLorentzVector muon_P4;
   muon_P4.SetXYZM(analysisTree->muon_px[leptonIndex], analysisTree->muon_py[leptonIndex], analysisTree->muon_pz[leptonIndex], muonMass);
@@ -2026,6 +2031,11 @@ void FillTau(const AC1B *analysisTree, Synch17Tree *otree, int leptonIndex, int 
   otree->tau_decay_mode_2 = analysisTree->tau_decayMode[tauIndex];
   otree->dm_2 = analysisTree->tau_decayMode[tauIndex];
   otree->dmMVA_2 = analysisTree->tau_MVADM2017v1[tauIndex];
+
+  std::vector<float> PV_with_BS_cov_components = {};
+  for(auto i:  analysisTree->primvertexwithbs_cov) PV_with_BS_cov_components.push_back(i);	
+  TVector3 PV_with_BS (analysisTree->primvertexwithbs_x, analysisTree->primvertexwithbs_y, analysisTree->primvertexwithbs_z );
+  otree->IP_signif_PV_with_BS_2 = IP_significance_helix_tauh(analysisTree, tauIndex, PV_with_BS, PV_with_BS_cov_components);
 
   TLorentzVector constituents_P4 = charged_constituents_P4(analysisTree, tauIndex);
   TLorentzVector tau_P4;
