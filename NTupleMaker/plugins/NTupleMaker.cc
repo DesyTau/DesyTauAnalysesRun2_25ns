@@ -404,7 +404,7 @@ void NTupleMaker::beginJob(){
     tree->Branch("refitvertex_chi2", refitvertex_chi2, "refitvertex_chi2[refitvertex_count]/F");
     tree->Branch("refitvertex_ndof", refitvertex_ndof, "refitvertex_ndof[refitvertex_count]/F");
     tree->Branch("refitvertex_ntracks", refitvertex_ntracks, "refitvertex_ntracks[refitvertex_count]/I");
-    //tree->Branch("refitvertex_cov", refitvertex_cov, "refitvertex_cov[refitvertex_count][6]/F");
+    tree->Branch("refitvertex_cov", refitvertex_cov, "refitvertex_cov[refitvertex_count][6]/F");
     tree->Branch("refitvertex_eleIndex", refitvertex_eleIndex, "refitvertex_eleIndex[refitvertex_count][2]/I");
     tree->Branch("refitvertex_muIndex", refitvertex_muIndex, "refitvertex_muIndex[refitvertex_count][2]/I");
     tree->Branch("refitvertex_tauIndex", refitvertex_tauIndex, "refitvertex_tauIndex[refitvertex_count][2]/I");
@@ -418,7 +418,7 @@ void NTupleMaker::beginJob(){
     tree->Branch("refitvertexwithbs_chi2", refitvertexwithbs_chi2, "refitvertexwithbs_chi2[refitvertexwithbs_count]/F");
     tree->Branch("refitvertexwithbs_ndof", refitvertexwithbs_ndof, "refitvertexwithbs_ndof[refitvertexwithbs_count]/F");
     tree->Branch("refitvertexwithbs_ntracks", refitvertexwithbs_ntracks, "refitvertexwithbs_ntracks[refitvertexwithbs_count]/I");
-    //tree->Branch("refitvertexwithbs_cov", refitvertexwithbs_cov, "refitvertexwithbs_cov[refitvertexwithbs_count][6]/F");
+    tree->Branch("refitvertexwithbs_cov", refitvertexwithbs_cov, "refitvertexwithbs_cov[refitvertexwithbs_count][6]/F");
     tree->Branch("refitvertexwithbs_eleIndex", refitvertexwithbs_eleIndex, "refitvertexwithbs_eleIndex[refitvertexwithbs_count][2]/I");
     tree->Branch("refitvertexwithbs_muIndex", refitvertexwithbs_muIndex, "refitvertexwithbs_muIndex[refitvertexwithbs_count][2]/I");
     tree->Branch("refitvertexwithbs_tauIndex", refitvertexwithbs_tauIndex, "refitvertexwithbs_tauIndex[refitvertexwithbs_count][2]/I");

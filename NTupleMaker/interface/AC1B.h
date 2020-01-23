@@ -67,7 +67,7 @@ public :
    Float_t         refitvertex_ndof[100];
    Float_t         refitvertex_ptq[100];
    Int_t           refitvertex_ntracks[100];
-   //Float_t         refitvertex_cov[100][6];
+   Float_t         refitvertex_cov[100][6];
    Int_t   refitvertex_eleIndex[1000][2];
    Int_t   refitvertex_muIndex[1000][2];
    Int_t   refitvertex_tauIndex[1000][2];
@@ -80,7 +80,7 @@ public :
    Float_t         refitvertexwithbs_ndof[100];
    Float_t         refitvertexwithbs_ptq[100];
    Int_t           refitvertexwithbs_ntracks[100];
-   //Float_t         refitvertexwithbs_cov[100][6];
+   Float_t         refitvertexwithbs_cov[100][6];
    Int_t   refitvertexwithbs_eleIndex[1000][2];
    Int_t   refitvertexwithbs_muIndex[1000][2];
    Int_t   refitvertexwithbs_tauIndex[1000][2];
