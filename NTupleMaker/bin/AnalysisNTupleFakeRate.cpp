@@ -282,6 +282,7 @@ int main(int argc, char * argv[]) {
   Float_t jettauPhi_;
 
   Bool_t  jettauDM_;
+  Bool_t  jettauNewDM_;
 
   Bool_t  jettauLooseIso_;
   Bool_t  jettauMediumIso_;
@@ -473,6 +474,7 @@ int main(int argc, char * argv[]) {
   ntuple_->Branch("jettauPhi",&jettauPhi_,"jettauPhi/F");
 
   ntuple_->Branch("jettauDM",&jettauDM_,"jettauDM/O");
+  ntuple_->Branch("jettauNewDM",&jettauNewDM_,"jettauNewDM/O");
 
   ntuple_->Branch("jettauLooseIso", &jettauLooseIso_, "jettauLooseIso/O");
   ntuple_->Branch("jettauMediumIso",&jettauMediumIso_,"jettauMediumIso/O");
@@ -832,6 +834,7 @@ int main(int argc, char * argv[]) {
       jettauPhi_ = 0;
 
       jettauDM_ = false;
+      jettauNewDM_ = false;
       jettauLooseIso_ = false;
       jettauMediumIso_ = false;
       jettauTightIso_ = false;
@@ -1675,6 +1678,7 @@ int main(int argc, char * argv[]) {
 	  jettauPhi_ = analysisTree.tau_phi[taujetIndex];
 	  
 	  jettauDM_ = analysisTree.tau_decayModeFinding[taujetIndex] > 0.5;
+	  jettauNewDM_ = analysisTree.tau_decayModeFindingNewDMs[taujetIndex] > 0.5;
 	  jettauLooseIso_ = analysisTree.tau_byLooseCombinedIsolationDeltaBetaCorr3Hits[taujetIndex] > 0.5;
 	  jettauMediumIso_ = analysisTree.tau_byMediumCombinedIsolationDeltaBetaCorr3Hits[taujetIndex] > 0.5;
 	  jettauTightIso_ = analysisTree.tau_byTightCombinedIsolationDeltaBetaCorr3Hits[taujetIndex] > 0.5;
