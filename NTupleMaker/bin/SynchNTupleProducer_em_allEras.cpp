@@ -5,7 +5,7 @@ int main(int argc, char * argv[]) {
 
     // first argument - config file
     // second argument - filelist
-   bool sync = false;  
+   bool sync = false; 
    
    // read config file =======================================================================================================================================================
    Config cfg(argv[1]);
@@ -96,6 +96,9 @@ int main(int argc, char * argv[]) {
    const bool applyJetPuId = cfg.get<bool>("ApplyJetPuId");
    
    const string jec_UncertaintySources = cfg.get<string>("JEC_UncertaintySources");
+   const string jer_resolution = cfg.get<string>("JER_Resolution");
+   const string jer_scalefactor = cfg.get<string>("JER_ScaleFactor");
+   
    
    TString LowPtLegElectron(lowPtLegElectron);
    TString HighPtLegElectron(highPtLegElectron);
@@ -273,7 +276,15 @@ int main(int argc, char * argv[]) {
       { "jecUncEC2Year"   , vsrc_EC2Year }, 
       { "jecUncBBEC1Year"   , vsrc_BBEC1Year }, 
    };
-      
+   
+   // JER corrections and uncertainties (NEW) ==========================================================================================================================
+
+   m_resolution_from_file.reset(new JME::JetResolution(cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/JER/"+jer_resolution));
+   m_scale_factor_from_file.reset(new JME::JetResolutionScaleFactor(cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/JER/"+jer_scalefactor));
+
+   resolution = *m_resolution_from_file;
+   resolution_sf = *m_scale_factor_from_file;
+
    // initialize good run selection ====================================================================================================================================
    std::vector<Period> periods;
    string fullPathToJsonFile = cmsswBase + "/src/DesyTauAnalyses/NTupleMaker/test/json/" + jsonFile;
@@ -1050,16 +1061,39 @@ int main(int argc, char * argv[]) {
 
         for (unsigned int jet=0; jet<analysisTree.pfjet_count; ++jet) {
             
+           double jet_resolution = resolution.getResolution({{JME::Binning::JetPt, analysisTree.pfjet_pt[jet]}, {JME::Binning::JetEta, analysisTree.pfjet_eta[jet]}, {JME::Binning::Rho, rho}});
+           double jer_sf = resolution_sf.getScaleFactor({{JME::Binning::JetPt, analysisTree.pfjet_pt[jet]}, {JME::Binning::JetEta, analysisTree.pfjet_eta[jet]}}, Variation::NOMINAL);
+           double jer_sf_up = resolution_sf.getScaleFactor({{JME::Binning::JetPt, analysisTree.pfjet_pt[jet]}, {JME::Binning::JetEta, analysisTree.pfjet_eta[jet]}}, Variation::UP);
+           double jer_sf_down = resolution_sf.getScaleFactor({{JME::Binning::JetPt, analysisTree.pfjet_pt[jet]}, {JME::Binning::JetEta, analysisTree.pfjet_eta[jet]}}, Variation::DOWN);
+
+           randm.SetSeed(static_cast<int>((analysisTree.pfjet_eta[jet] + 5) * 1000) * 1000 + static_cast<int>((analysisTree.pfjet_phi[jet] + 4) * 1000) + 10000);
+           if (!isData && !isEmbedded){
+              shift = randm.Gaus(0, jet_resolution) * std::sqrt(std::max(jer_sf * jer_sf - 1, 0.0));
+              shift_up = randm.Gaus(0, jet_resolution) * std::sqrt(std::max(jer_sf_up * jer_sf_up - 1, 0.0));
+              shift_down = randm.Gaus(0, jet_resolution) * std::sqrt(std::max(jer_sf_down * jer_sf_down - 1, 0.0));
+              if (shift < -1.0) shift = -1.0;
+              if (shift_up < -1.0) shift_up = -1.0;
+              if (shift_down < -1.0) shift_down = -1.0;
+           }
+           jetLV.SetPxPyPzE(analysisTree.pfjet_px[jet] * (1.0 + shift),
+                            analysisTree.pfjet_py[jet] * (1.0 + shift),
+                            analysisTree.pfjet_pz[jet] * (1.0 + shift),
+                            analysisTree.pfjet_e[jet] * (1.0 + shift) );
+           jetLVJERUp.SetPxPyPzE(analysisTree.pfjet_px[jet] * (1.0 + shift_up),
+                            analysisTree.pfjet_py[jet] * (1.0 + shift_up),
+                            analysisTree.pfjet_pz[jet] * (1.0 + shift_up),
+                            analysisTree.pfjet_e[jet] * (1.0 + shift_up) );
+           jetLVJERDown.SetPxPyPzE(analysisTree.pfjet_px[jet] * (1.0 + shift_down),
+                            analysisTree.pfjet_py[jet] * (1.0 + shift_down),
+                            analysisTree.pfjet_pz[jet] * (1.0 + shift_down),
+                            analysisTree.pfjet_e[jet] * (1.0 + shift_down) );
+           
+           
             double absJetEta = fabs(analysisTree.pfjet_eta[jet]);
             double jetEta = analysisTree.pfjet_eta[jet];
             if (absJetEta>jetEtaCut) continue;
             
-            float jetPt = analysisTree.pfjet_pt[jet];
-            
-            jetLV.SetPxPyPzE(analysisTree.pfjet_px[jet],
-                             analysisTree.pfjet_py[jet],
-                             analysisTree.pfjet_pz[jet],
-                             analysisTree.pfjet_e[jet]);
+            float jetPt = analysisTree.pfjet_pt[jet] * (1.0 + shift);
             
             map<TString,TLorentzVector> jetLV_jecUnc;
             
@@ -1111,6 +1145,8 @@ int main(int argc, char * argv[]) {
                if(jetLV_jecUnc.at("jecUncBBEC1YearUp").Pt() > jetPtmax) jetPtmax = jetLV_jecUnc.at("jecUncBBEC1YearUp").Pt();
                if(jetLV_jecUnc.at("jecUncRelativeSampleYearDown").Pt() > jetPtmax) jetPtmax = jetLV_jecUnc.at("jecUncRelativeSampleYearDown").Pt();
                if(jetLV_jecUnc.at("jecUncRelativeSampleYearUp").Pt() > jetPtmax) jetPtmax = jetLV_jecUnc.at("jecUncRelativeSampleYearUp").Pt();
+               if (jetLVJERUp.Pt() > jetPtmax) jetPtmax = jetLVJERUp.Pt();
+               if (jetLVJERDown.Pt() > jetPtmax) jetPtmax = jetLVJERDown.Pt();
                jetPt_tocheck = jetPtmax;
             }
             if (jetPt_tocheck<jetPtLowCut) continue;   
@@ -1257,6 +1293,8 @@ int main(int argc, char * argv[]) {
             if (jetLV_jecUnc.at("jecUncAbsoluteYearDown").Pt()>jetPtHighCut) njets_jecUncAbsoluteYearDown += 1;
             if (jetLV_jecUnc.at("jecUncBBEC1YearUp").Pt()>jetPtHighCut) njets_jecUncBBEC1YearUp += 1;
             if (jetLV_jecUnc.at("jecUncBBEC1YearDown").Pt()>jetPtHighCut) njets_jecUncBBEC1YearDown += 1;
+            if (jetLVJERUp.Pt() > jetPtHighCut) njets_jerUp += 1;
+            if (jetLVJERDown.Pt() > jetPtHighCut) njets_jerDown += 1;
             if (jetPt>jetPtHighCut)
                jets.push_back(jet); 
             
@@ -1287,7 +1325,7 @@ int main(int argc, char * argv[]) {
          nbtag_noSF = bjetsRaw.size();
          
          if (indexLeadingBJet>=0) {
-            bpt = analysisTree.pfjet_pt[indexLeadingBJet];
+            bpt = analysisTree.pfjet_pt[indexLeadingBJet]* (1.0 + shift);
             beta_1 = analysisTree.pfjet_eta[indexLeadingBJet];
             bphi = analysisTree.pfjet_phi[indexLeadingBJet];
          }
@@ -1296,14 +1334,23 @@ int main(int argc, char * argv[]) {
             cout << "warning : indexLeadingJet ==indexSubLeadingJet = " << indexSubLeadingJet << endl;
         
          if (indexLeadingJet>=0) {
-            jpt_1 = analysisTree.pfjet_pt[indexLeadingJet];
+            jpt_1 = analysisTree.pfjet_pt[indexLeadingJet] * (1.0 + shift);
             jeta_1 = analysisTree.pfjet_eta[indexLeadingJet];
             jphi_1 = analysisTree.pfjet_phi[indexLeadingJet];
             jptraw_1 = analysisTree.pfjet_pt[indexLeadingJet]*analysisTree.pfjet_energycorr[indexLeadingJet];
-            jet1.SetPxPyPzE(analysisTree.pfjet_px[indexLeadingJet],
-                            analysisTree.pfjet_py[indexLeadingJet],
-                            analysisTree.pfjet_pz[indexLeadingJet],
-                            analysisTree.pfjet_e[indexLeadingJet]);
+            jet1.SetPxPyPzE(analysisTree.pfjet_px[indexLeadingJet] * (1.0 + shift),
+                            analysisTree.pfjet_py[indexLeadingJet] * (1.0 + shift),
+                            analysisTree.pfjet_pz[indexLeadingJet] * (1.0 + shift),
+                            analysisTree.pfjet_e[indexLeadingJet] * (1.0 + shift));
+
+            jet1LV_jerUp.SetPxPyPzE(analysisTree.pfjet_px[indexLeadingJet] * (1.0 + shift_up),
+                            analysisTree.pfjet_py[indexLeadingJet] * (1.0 + shift_up),
+                            analysisTree.pfjet_pz[indexLeadingJet] * (1.0 + shift_up),
+                            analysisTree.pfjet_e[indexLeadingJet] * (1.0 + shift_up));
+            jet1LV_jerDown.SetPxPyPzE(analysisTree.pfjet_px[indexLeadingJet] * (1.0 + shift_down),
+                            analysisTree.pfjet_py[indexLeadingJet] * (1.0 + shift_down),
+                            analysisTree.pfjet_pz[indexLeadingJet] * (1.0 + shift_down),
+                            analysisTree.pfjet_e[indexLeadingJet] * (1.0 + shift_down));
 
             for (auto uncer_split : jec_unc_map) {
                float sum_unc   = 0;
@@ -1321,15 +1368,23 @@ int main(int argc, char * argv[]) {
          }
 
          if (indexSubLeadingJet>=0) {
-            jpt_2 = analysisTree.pfjet_pt[indexSubLeadingJet];
+            jpt_2 = analysisTree.pfjet_pt[indexSubLeadingJet]  * (1.0 + shift);
             jeta_2 = analysisTree.pfjet_eta[indexSubLeadingJet];
             jphi_2 = analysisTree.pfjet_phi[indexSubLeadingJet];
             jptraw_2 = analysisTree.pfjet_pt[indexSubLeadingJet]*analysisTree.pfjet_energycorr[indexSubLeadingJet];
 
-            jet2.SetPxPyPzE(analysisTree.pfjet_px[indexSubLeadingJet],
-                            analysisTree.pfjet_py[indexSubLeadingJet],
-                            analysisTree.pfjet_pz[indexSubLeadingJet],
-                            analysisTree.pfjet_e[indexSubLeadingJet]);
+            jet2.SetPxPyPzE(analysisTree.pfjet_px[indexSubLeadingJet] * (1.0 + shift),
+                            analysisTree.pfjet_py[indexSubLeadingJet] * (1.0 + shift),
+                            analysisTree.pfjet_pz[indexSubLeadingJet] * (1.0 + shift),
+                            analysisTree.pfjet_e[indexSubLeadingJet] * (1.0 + shift));
+            jet2LV_jerUp.SetPxPyPzE(analysisTree.pfjet_px[indexSubLeadingJet] * (1.0 + shift_up),
+                            analysisTree.pfjet_py[indexSubLeadingJet] * (1.0 + shift_up),
+                            analysisTree.pfjet_pz[indexSubLeadingJet] * (1.0 + shift_up),
+                            analysisTree.pfjet_e[indexSubLeadingJet] * (1.0 + shift_up));
+            jet2LV_jerDown.SetPxPyPzE(analysisTree.pfjet_px[indexSubLeadingJet] * (1.0 + shift_down),
+                            analysisTree.pfjet_py[indexSubLeadingJet] * (1.0 + shift_down),
+                            analysisTree.pfjet_pz[indexSubLeadingJet] * (1.0 + shift_down),
+                            analysisTree.pfjet_e[indexSubLeadingJet] * (1.0 + shift_down));
             
             for (auto uncer_split : jec_unc_map) {
                float sum_unc   = 0;
@@ -1368,7 +1423,11 @@ int main(int argc, char * argv[]) {
          float met_unclMetUp_y;
          float met_unclMetDown_x;
          float met_unclMetDown_y;
-        
+         float met_JERDown_x;
+         float met_JERDown_y;
+         float met_JERUp_x;
+         float met_JERUp_y;
+
          if (!usePuppiMet){
             met_x_recoilscaleUp = analysisTree.pfmetcorr_ex;
             met_x_recoilscaleDown = analysisTree.pfmetcorr_ex;
@@ -1383,6 +1442,10 @@ int main(int argc, char * argv[]) {
             met_unclMetUp_y    = analysisTree.pfmetcorr_ey_UnclusteredEnUp;
             met_unclMetDown_x  = analysisTree.pfmetcorr_ex_UnclusteredEnDown;
             met_unclMetDown_y  = analysisTree.pfmetcorr_ey_UnclusteredEnDown;
+            met_JERUp_x    = analysisTree.pfmetcorr_ex_JetResUp;
+            met_JERUp_y    = analysisTree.pfmetcorr_ey_JetResUp;
+            met_JERDown_x  = analysisTree.pfmetcorr_ex_JetResDown;
+            met_JERDown_y  = analysisTree.pfmetcorr_ey_JetResDown;
          }
          else{
             met_x_recoilscaleUp = analysisTree.puppimet_ex;
@@ -1398,6 +1461,11 @@ int main(int argc, char * argv[]) {
             met_unclMetUp_y    = analysisTree.puppimet_ey_UnclusteredEnUp;
             met_unclMetDown_x  = analysisTree.puppimet_ex_UnclusteredEnDown;
             met_unclMetDown_y  = analysisTree.puppimet_ey_UnclusteredEnDown;
+
+            met_JERUp_x    = analysisTree.puppimet_ex_JetResUp;
+            met_JERUp_y    = analysisTree.puppimet_ey_JetResUp;
+            met_JERDown_x  = analysisTree.puppimet_ex_JetResDown;
+            met_JERDown_y  = analysisTree.puppimet_ey_JetResDown;
          }
          met = TMath::Sqrt(met_x*met_x + met_y*met_y);
          metphi = TMath::ATan2(met_y,met_x);
@@ -1465,6 +1533,9 @@ int main(int argc, char * argv[]) {
          metphi_unclMetUp = TMath::ATan2(met_unclMetUp_y,met_unclMetUp_x);
          met_unclMetDown = TMath::Sqrt(met_unclMetDown_x*met_unclMetDown_x+met_unclMetDown_y*met_unclMetDown_y);
          metphi_unclMetDown = TMath::ATan2(met_unclMetDown_y,met_unclMetDown_x);
+
+         met_JERUp = TMath::Sqrt(met_JERUp_x*met_JERUp_x+met_JERUp_y*met_JERUp_y);
+         met_JERDown = TMath::Sqrt(met_JERDown_x*met_JERDown_x+met_JERDown_y*met_JERDown_y);
          
          if(isSampleForRecoilCorrection){
             met_unclMetUp_x   = met_x;
@@ -1551,6 +1622,9 @@ int main(int argc, char * argv[]) {
          
          TLorentzVector metLV_unclMetUp; metLV_unclMetUp.SetXYZT(met_unclMetUp_x,met_unclMetUp_y,0.,met_unclMetUp);
          TLorentzVector metLV_unclMetDown; metLV_unclMetDown.SetXYZT(met_unclMetDown_x,met_unclMetDown_y,0.,met_unclMetDown);
+
+         TLorentzVector metLV_JERUp; metLV_JERUp.SetXYZT(met_JERUp_x,met_JERUp_y,0.,met_JERUp);
+         TLorentzVector metLV_JERDown; metLV_JERDown.SetXYZT(met_JERDown_x,met_JERDown_y,0.,met_JERDown);
          // computing total transverse mass
          mTtot = totalTransverseMass        ( muonLV ,     electronLV , metLV);
          mTemu   = mT(electronLV,muonLV);
@@ -1890,6 +1964,12 @@ int main(int argc, char * argv[]) {
          uncertainty_map.at("recoilscaleDown").metLV = metLV_recoilscaleDown;
          uncertainty_map.at("recoilresoUp").metLV = metLV_recoilresoUp;
          uncertainty_map.at("recoilresoDown").metLV = metLV_recoilresoDown;
+         uncertainty_map.at("jerUp").metLV = metLV_JERUp;
+         uncertainty_map.at("jerDown").metLV = metLV_JERDown;
+         uncertainty_map.at("jerUp").jet1LV = jet1LV_jerUp;
+         uncertainty_map.at("jerDown").jet1LV = jet1LV_jerDown;
+         uncertainty_map.at("jerUp").jet2LV = jet2LV_jerUp;
+         uncertainty_map.at("jerDown").jet2LV = jet2LV_jerDown;
   
          if (!isSampleForRecoilCorrection && jet1.E() != 0) uncertainty_map.at("jecUncEta0To5Up").metLV = metLV_jecUnc.at("jecUncEta0To5Up");
          if(jet1.E() != 0) uncertainty_map.at("jecUncEta0To5Up").jet1LV = jet1LV_jecUnc.at("jecUncEta0To5Up");
