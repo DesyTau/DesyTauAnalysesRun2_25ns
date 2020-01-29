@@ -445,7 +445,10 @@ vector<TString> unc_vars= {"met",  // 0
                            "eta_sv", // 25
                            "phi_sv", // 26
                            "mt_sv", // 27
-                           "mTemu"}; // 28
+                           "mTemu",// 28
+                           "ME_q2v1",//29
+                           "ME_q2v2"//30
+                            };
 
 
 struct inputs {
@@ -455,6 +458,8 @@ struct inputs {
    TLorentzVector metLV;
    TLorentzVector jet1LV;
    TLorentzVector jet2LV;
+   Int_t q1;
+   Int_t q2;
 };
 
 inputs unclMetUp;

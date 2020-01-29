@@ -3,6 +3,8 @@
 #include "TauAnalysis/ClassicSVfit/interface/svFitHistogramAdapter.h"
 #include "TauAnalysis/ClassicSVfit/interface/MeasuredTauLepton.h"
 #include "TauAnalysis/ClassicSVfit/interface/FastMTT.h"
+#include "ZZMatrixElement/MELA/interface/Mela.h"
+#include "ZZMatrixElement/MELA/interface/TUtil.hh"
 
 void computeDzeta(float metX,  float metY, float zetaX, float zetaY, float pzetavis,
                   float & pzetamiss,
@@ -121,7 +123,10 @@ void propagate_uncertainty(TString uncertainty_name,
 			   float uncertainty_container[],
 			   bool isData,
             bool svfit_on,
-            bool fastmtt_on               
+            bool fastmtt_on, 
+            Int_t q_1,
+            Int_t q_2, 
+            Mela mela               
 			   )
 {
 
@@ -214,5 +219,50 @@ void propagate_uncertainty(TString uncertainty_name,
   
   // mTemu // 28
   uncertainty_container[28] = mT(electronLV,muonLV);
+
+  if(jet1LV.E()!=0 && jet2LV.E()!=0){
+     
+     TLorentzVector tau1, tau2;
+     tau1.SetPtEtaPhiM(electronLV.Pt(), electronLV.Eta(), electronLV.Phi(), classic_svFit::electronMass);
+     tau2.SetPtEtaPhiM(muonLV.Pt(),muonLV.Eta(), muonLV.Phi(), classic_svFit::muonMass);
+
+     // FIXME: TODO: Why do we not use the jet mass here? (comment from KIT)
+     TLorentzVector jet1, jet2;
+     jet1.SetPtEtaPhiM(jet1LV.Pt(), jet1LV.Eta(), jet1LV.Phi(), 0);
+     jet2.SetPtEtaPhiM(jet2LV.Pt(), jet2LV.Eta(), jet2LV.Phi(), 0);
+  
+            // Run MELA  TO DO
+     SimpleParticleCollection_t daughters;
+     if (q_1 * q_2 < 0){
+     daughters.push_back(SimpleParticle_t(15 * q_1, tau1));
+     daughters.push_back(SimpleParticle_t(15 * q_2, tau2));
+     }
+     else { //Sanitize charge for application on same-sign events
+        daughters.push_back(SimpleParticle_t(15 * q_1, tau1)); 
+        daughters.push_back(SimpleParticle_t(-15 * q_1, tau2));
+     }
+     SimpleParticleCollection_t associated;
+     associated.push_back(SimpleParticle_t(0, jet1));
+     associated.push_back(SimpleParticle_t(0, jet2));
+     
+     SimpleParticleCollection_t associated2;
+     associated2.push_back(SimpleParticle_t(0, jet2));
+     associated2.push_back(SimpleParticle_t(0, jet1));
+     
+     mela.resetInputEvent();
+     mela.setCandidateDecayMode(TVar::CandidateDecay_ff); //decay into fermions
+     mela.setInputEvent(&daughters, &associated, (SimpleParticleCollection_t *)0, false); //set the decay products and the associated jets
+     
+     float ME_q2v1 = -10;
+     float ME_q2v2 = -10;
+     float ME_costheta1=-10, ME_costheta2=-10, ME_phi=-10, ME_costhetastar=-10, ME_phi1=-10;
+
+     // Hypothesis: SM VBF Higgs
+     mela.setProcess(TVar::HSMHiggs, TVar::JHUGen, TVar::JJVBF);
+     mela.computeVBFAngles(ME_q2v1, ME_q2v2, ME_costheta1, ME_costheta2, ME_phi, ME_costhetastar, ME_phi1);
+     
+     uncertainty_container[29] = ME_q2v1;
+     uncertainty_container[30] = ME_q2v2;
+  }
 }
 

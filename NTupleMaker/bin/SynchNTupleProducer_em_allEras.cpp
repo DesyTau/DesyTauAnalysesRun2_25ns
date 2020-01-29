@@ -444,7 +444,7 @@ int main(int argc, char * argv[]) {
    int nEvents = 0;
    int selEvents = 0;
    int nFiles = 0;
-   
+
    for (int iF=0; iF<nTotalFiles; ++iF) {
       
       std::string filen;
@@ -468,6 +468,7 @@ int main(int argc, char * argv[]) {
       std::cout << "      number of entries in Tree = " << numberOfEntries << std::endl;
       
       // event loop ====================================================================================================================================================
+ 
       for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) {
 
          analysisTree.GetEntry(iEntry);
@@ -1939,6 +1940,93 @@ int main(int argc, char * argv[]) {
          //         }
          //      }       
          
+         //set MELA variables
+         if (njets>1){
+
+            TLorentzVector tau1, tau2;
+            tau1.SetPtEtaPhiM(pt_1, eta_1, phi_1, m_1);
+            tau2.SetPtEtaPhiM(pt_2, eta_2, phi_2, m_2);
+
+            // FIXME: TODO: Why do we not use the jet mass here? (comment from KIT)
+            TLorentzVector jet1, jet2;
+            jet1.SetPtEtaPhiM(jpt_1, jeta_1, jphi_1, 0);
+            jet2.SetPtEtaPhiM(jpt_2, jeta_2, jphi_2, 0);
+
+            // Run MELA
+            SimpleParticleCollection_t daughters;
+            if (q_1 * q_2 < 0){
+               daughters.push_back(SimpleParticle_t(15 * q_1, tau1));
+               daughters.push_back(SimpleParticle_t(15 * q_2, tau2));
+            }
+            else { //Sanitize charge for application on same-sign events
+               daughters.push_back(SimpleParticle_t(15 * q_1, tau1)); 
+               daughters.push_back(SimpleParticle_t(-15 * q_1, tau2));
+            }
+            SimpleParticleCollection_t associated;
+            associated.push_back(SimpleParticle_t(0, jet1));
+            associated.push_back(SimpleParticle_t(0, jet2));
+
+            SimpleParticleCollection_t associated2;
+            associated2.push_back(SimpleParticle_t(0, jet2));
+            associated2.push_back(SimpleParticle_t(0, jet1));
+
+            mela.resetInputEvent();
+            mela.setCandidateDecayMode(TVar::CandidateDecay_ff); //decay into fermions
+            mela.setInputEvent(&daughters, &associated, (SimpleParticleCollection_t *)0, false); //set the decay products and the associated jets
+
+            // Hypothesis: SM VBF Higgs
+            mela.setProcess(TVar::HSMHiggs, TVar::JHUGen, TVar::JJVBF);
+            mela.computeProdP(ME_vbf, false);
+            mela.computeVBFAngles(ME_q2v1, ME_q2v2, ME_costheta1, ME_costheta2, ME_phi, ME_costhetastar, ME_phi1);
+
+            // Hypothesis ggH + 2 jets
+            mela.setProcess(TVar::SelfDefine_spin0, TVar::JHUGen, TVar::JJQCD);
+            mela.selfDHggcoupl[0][gHIGGS_GG_2][0] = 1;
+            mela.computeProdP(ME_ggh, false);
+            
+            // Hypothesis: Z + 2 jets
+            // Compute the Hypothesis with flipped jets and sum them up for the discriminator.
+            mela.setProcess(TVar::bkgZJets, TVar::MCFM, TVar::JJQCD);
+            mela.computeProdP(ME_z2j_1, false);
+
+            mela.resetInputEvent();
+            mela.setInputEvent(&daughters, &associated2, (SimpleParticleCollection_t *)0, false);
+            mela.computeProdP(ME_z2j_2, false);
+
+            // Compute discriminator for VBF vs Z
+            if ((ME_vbf + ME_z2j_1 + ME_z2j_2) != 0.0)
+               {
+                  ME_vbf_vs_Z = ME_vbf / (ME_vbf + ME_z2j_1 + ME_z2j_2);
+               }
+            else
+               {
+                  std::cout << "WARNING: ME_vbf_vs_Z = X / 0. Setting it to default " << -10 << std::endl;
+                  ME_vbf_vs_Z = -10;
+               }
+
+            // Compute discriminator for ggH vs Z
+            if ((ME_ggh + ME_z2j_1 + ME_z2j_2) != 0.0)
+               {
+                  ME_ggh_vs_Z = ME_ggh / (ME_ggh + ME_z2j_1 + ME_z2j_2);
+               }
+            else
+               {
+                  std::cout << "WARNING: ME_ggh_vs_Z = X / 0. Setting it to default " << -10 << std::endl;
+                  ME_ggh_vs_Z = -10;
+               }
+
+            // Compute discriminator for VBF vs ggH
+            if ((ME_vbf + ME_ggh) != 0.0)
+               {
+                  ME_vbf_vs_ggh = ME_vbf / (ME_vbf + ME_ggh);
+               }
+            else
+               {
+                  std::cout << "WARNING: ME_vbf_vs_ggh = X / 0. Setting it to default " << -10 << std::endl;
+                  ME_vbf_vs_ggh = -10;
+               }
+         }
+
          // Add for all relevant variables the met uncertainty
          for(auto &uncert : uncertainty_map){
             uncert.second.electronLV = electronLV;
@@ -1946,6 +2034,8 @@ int main(int argc, char * argv[]) {
             uncert.second.metLV      = metLV;
             uncert.second.jet1LV     = jet1;
             uncert.second.jet2LV     = jet2;
+            uncert.second.q1         = q_1;
+            uncert.second.q2         = q_2;
          }
          
          uncertainty_map.at("unclMetUp").metLV = metLV_unclMetUp;
@@ -2048,95 +2138,11 @@ int main(int argc, char * argv[]) {
                                    uncert.second.jet1LV,
                                    uncert.second.jet2LV,
                                    uncert.second.container,
-                                   is_data_or_embedded, checkSV, checkFastMTT);
+                                   is_data_or_embedded, checkSV, checkFastMTT,
+                                   uncert.second.q1,
+                                   uncert.second.q2, 
+                                   mela);
             
-         }
-
-         //set MELA variables
-         if (njets>1){
-
-            TLorentzVector tau1, tau2;
-            tau1.SetPtEtaPhiM(pt_1, eta_1, phi_1, m_1);
-            tau2.SetPtEtaPhiM(pt_2, eta_2, phi_2, m_2);
-
-            // FIXME: TODO: Why do we not use the jet mass here? (comment from KIT)
-            TLorentzVector jet1, jet2;
-            jet1.SetPtEtaPhiM(jpt_1, jeta_1, jphi_1, 0);
-            jet2.SetPtEtaPhiM(jpt_2, jeta_2, jphi_2, 0);
-
-            // Run MELA
-            SimpleParticleCollection_t daughters;
-            if (q_1 * q_2 < 0){
-               daughters.push_back(SimpleParticle_t(15 * q_1, tau1));
-               daughters.push_back(SimpleParticle_t(15 * q_2, tau2));
-            }
-            else { //Sanitize charge for application on same-sign events
-               daughters.push_back(SimpleParticle_t(15 * q_1, tau1)); 
-               daughters.push_back(SimpleParticle_t(-15 * q_1, tau2));
-            }
-            SimpleParticleCollection_t associated;
-            associated.push_back(SimpleParticle_t(0, jet1));
-            associated.push_back(SimpleParticle_t(0, jet2));
-
-            SimpleParticleCollection_t associated2;
-            associated2.push_back(SimpleParticle_t(0, jet2));
-            associated2.push_back(SimpleParticle_t(0, jet1));
-
-            mela.resetInputEvent();
-            mela.setCandidateDecayMode(TVar::CandidateDecay_ff); //decay into fermions
-            mela.setInputEvent(&daughters, &associated, (SimpleParticleCollection_t *)0, false); //set the decay products and the associated jets
-
-            // Hypothesis: SM VBF Higgs
-            mela.setProcess(TVar::HSMHiggs, TVar::JHUGen, TVar::JJVBF);
-            mela.computeProdP(ME_vbf, false);
-            mela.computeVBFAngles(ME_q2v1, ME_q2v2, ME_costheta1, ME_costheta2, ME_phi, ME_costhetastar, ME_phi1);
-
-            // Hypothesis ggH + 2 jets
-            mela.setProcess(TVar::SelfDefine_spin0, TVar::JHUGen, TVar::JJQCD);
-            mela.selfDHggcoupl[0][gHIGGS_GG_2][0] = 1;
-            mela.computeProdP(ME_ggh, false);
-            
-            // Hypothesis: Z + 2 jets
-            // Compute the Hypothesis with flipped jets and sum them up for the discriminator.
-            mela.setProcess(TVar::bkgZJets, TVar::MCFM, TVar::JJQCD);
-            mela.computeProdP(ME_z2j_1, false);
-
-            mela.resetInputEvent();
-            mela.setInputEvent(&daughters, &associated2, (SimpleParticleCollection_t *)0, false);
-            mela.computeProdP(ME_z2j_2, false);
-
-            // Compute discriminator for VBF vs Z
-            if ((ME_vbf + ME_z2j_1 + ME_z2j_2) != 0.0)
-               {
-                  ME_vbf_vs_Z = ME_vbf / (ME_vbf + ME_z2j_1 + ME_z2j_2);
-               }
-            else
-               {
-                  std::cout << "WARNING: ME_vbf_vs_Z = X / 0. Setting it to default " << -10 << std::endl;
-                  ME_vbf_vs_Z = -10;
-               }
-
-            // Compute discriminator for ggH vs Z
-            if ((ME_ggh + ME_z2j_1 + ME_z2j_2) != 0.0)
-               {
-                  ME_ggh_vs_Z = ME_ggh / (ME_ggh + ME_z2j_1 + ME_z2j_2);
-               }
-            else
-               {
-                  std::cout << "WARNING: ME_ggh_vs_Z = X / 0. Setting it to default " << -10 << std::endl;
-                  ME_ggh_vs_Z = -10;
-               }
-
-            // Compute discriminator for VBF vs ggH
-            if ((ME_vbf + ME_ggh) != 0.0)
-               {
-                  ME_vbf_vs_ggh = ME_vbf / (ME_vbf + ME_ggh);
-               }
-            else
-               {
-                  std::cout << "WARNING: ME_vbf_vs_ggh = X / 0. Setting it to default " << -10 << std::endl;
-                  ME_vbf_vs_ggh = -10;
-               }
          }
 
          tree->Fill();
