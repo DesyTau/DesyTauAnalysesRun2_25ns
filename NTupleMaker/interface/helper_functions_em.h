@@ -126,8 +126,9 @@ void propagate_uncertainty(TString uncertainty_name,
             bool fastmtt_on, 
             Int_t q_1,
             Int_t q_2, 
-            Mela mela               
-			   )
+            Mela mela ,              
+			   bool calculateMELA
+            )
 {
 
   TLorentzVector dileptonLV = muonLV + electronLV;
@@ -220,7 +221,7 @@ void propagate_uncertainty(TString uncertainty_name,
   // mTemu // 28
   uncertainty_container[28] = mT(electronLV,muonLV);
 
-  if(jet1LV.E()!=0 && jet2LV.E()!=0){
+  if(jet1LV.E()!=0 && jet2LV.E()!=0 && calculateMELA){
      
      TLorentzVector tau1, tau2;
      tau1.SetPtEtaPhiM(electronLV.Pt(), electronLV.Eta(), electronLV.Phi(), classic_svFit::electronMass);

@@ -1941,7 +1941,10 @@ int main(int argc, char * argv[]) {
          //      }       
          
          //set MELA variables
-         if (njets>1){
+         bool calculateMELA = false;
+         calculateMELA = iso_1<0.15 && iso_2<0.2 && trg_muonelectron > 0.5 && extraelec_veto<0.5 && extramuon_veto<0.5 && (nbtag==0||nbtag_mistagUp==0||nbtag_mistagDown==0||nbtag_btagUp==0||nbtag_btagDown==0);
+         
+         if (njets>1 && calculateMELA){
 
             TLorentzVector tau1, tau2;
             tau1.SetPtEtaPhiM(pt_1, eta_1, phi_1, m_1);
@@ -2141,7 +2144,7 @@ int main(int argc, char * argv[]) {
                                    is_data_or_embedded, checkSV, checkFastMTT,
                                    uncert.second.q1,
                                    uncert.second.q2, 
-                                   mela);
+                                   mela, calculateMELA);
             
          }
 
