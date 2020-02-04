@@ -53,7 +53,23 @@
 #include "ZZMatrixElement/MELA/interface/Mela.h"
 #include "ZZMatrixElement/MELA/interface/TUtil.hh"
 
+#include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
+#include "JetMETCorrections/Modules/interface/JetResolution.h"
+
 using namespace std;
+
+
+std::unique_ptr<JME::JetResolution> m_resolution_from_file;
+std::unique_ptr<JME::JetResolutionScaleFactor> m_scale_factor_from_file;
+
+JME::JetResolution resolution;
+JME::JetResolutionScaleFactor resolution_sf;
+
+TRandom3 randm = TRandom3(0);
+
+double shift = 0;
+double shift_up = 0;
+double shift_down = 0;
 
 const float a_jetMu = 0.902;
 const float b_jetMu = 0.0025;
@@ -215,6 +231,9 @@ Float_t         metphi_unclMetUp;
 Float_t         met_unclMetDown;
 Float_t         metphi_unclMetDown;
 
+Float_t         met_JERDown;
+Float_t         met_JERUp;
+
 Float_t         genmet;
 Float_t         genmetphi;
 
@@ -256,6 +275,8 @@ Int_t           njets_jecUncAbsoluteYearUp;
 Int_t           njets_jecUncAbsoluteYearDown;
 Int_t           njets_jecUncBBEC1YearUp;
 Int_t           njets_jecUncBBEC1YearDown;
+Int_t           njets_jerDown;
+Int_t           njets_jerUp;
 
 Int_t           njetspt20;
 
@@ -424,7 +445,10 @@ vector<TString> unc_vars= {"met",  // 0
                            "eta_sv", // 25
                            "phi_sv", // 26
                            "mt_sv", // 27
-                           "mTemu"}; // 28
+                           "mTemu",// 28
+                           "ME_q2v1",//29
+                           "ME_q2v2"//30
+                            };
 
 
 struct inputs {
@@ -434,6 +458,8 @@ struct inputs {
    TLorentzVector metLV;
    TLorentzVector jet1LV;
    TLorentzVector jet2LV;
+   Int_t q1;
+   Int_t q2;
 };
 
 inputs unclMetUp;
@@ -470,6 +496,8 @@ inputs jecUncEC2YearUp;
 inputs jecUncEC2YearDown;
 inputs jecUncHFYearUp;
 inputs jecUncHFYearDown;
+inputs jerUp;
+inputs jerDown;
 
 map<TString, inputs> uncertainty_map = { { "unclMetUp" , unclMetUp },
                                          { "unclMetDown" , unclMetDown },
@@ -504,7 +532,9 @@ map<TString, inputs> uncertainty_map = { { "unclMetUp" , unclMetUp },
                                          { "jecUncEC2YearUp" , jecUncEC2YearUp},
                                          { "jecUncEC2YearDown" , jecUncEC2YearDown},
                                          { "jecUncHFYearUp" , jecUncHFYearUp},
-                                         { "jecUncHFYearDown" , jecUncHFYearDown}                                         
+                                         { "jecUncHFYearDown" , jecUncHFYearDown},
+                                         { "jerUp", jerUp},
+                                         { "jerDown", jerDown}
 };
 
 const int nsrc_Eta0To5 = 8; // == Absolute according to https://docs.google.com/spreadsheets/d/1Feuj1n0MdotcPq19Mht7SUIgvkXkA4hiB0BxEuBShLw/edit#gid=1345121349
@@ -650,8 +680,14 @@ vector<unsigned int> bjets_nocleaned;
 vector<unsigned int> bjetsRaw;
 
 TLorentzVector jetLV;
+TLorentzVector jetLVJERDown;
+TLorentzVector jetLVJERUp;
 TLorentzVector jet1;
 TLorentzVector jet2;
+TLorentzVector jet1LV_jerUp;
+TLorentzVector jet1LV_jerDown;
+TLorentzVector jet2LV_jerUp;
+TLorentzVector jet2LV_jerDown;
 map<TString,TLorentzVector> jet1LV_jecUnc;
 map<TString,TLorentzVector> jet2LV_jecUnc;
 map<TString,TLorentzVector> metLV_jecUnc;
@@ -891,6 +927,9 @@ void SetupTree(){
     
    tree->Branch("met_unclMetUp", &met_unclMetUp, "met_unclMetUp/F");
    tree->Branch("metphi_unclMetUp", &metphi_unclMetUp, "metphi_unclMetUp/F");
+
+   tree->Branch("met_JERUp", &met_JERUp, "met_JERUp/F");
+   tree->Branch("met_JERDown", &met_JERDown, "met_JERDown/F");
    
    tree->Branch("met_unclMetDown", &met_unclMetDown, "met_unclMetDown/F");
    tree->Branch("metphi_unclMetDown", &metphi_unclMetDown, "metphi_unclMetDown/F");
@@ -946,7 +985,8 @@ void SetupTree(){
    tree->Branch("njets_jecUncAbsoluteYearDown", &njets_jecUncAbsoluteYearDown, "njets_jecUncAbsoluteYearDown/I");
    tree->Branch("njets_jecUncBBEC1YearUp", &njets_jecUncBBEC1YearUp, "njets_jecUncBBEC1YearUp/I");
    tree->Branch("njets_jecUncBBEC1YearDown", &njets_jecUncBBEC1YearDown, "njets_jecUncBBEC1YearDown/I");
-
+   tree->Branch("njets_jerUp", &njets_jerUp, "njets_jerUp/I");
+   tree->Branch("njets_jerDown", &njets_jerDown, "njets_jerDown/I");
 
    tree->Branch("njetspt20", &njetspt20, "njetspt20/I");
    
@@ -1250,6 +1290,8 @@ void SetDefaultValues(){
    njets_jecUncAbsoluteYearDown = 0;
    njets_jecUncBBEC1YearUp   = 0;
    njets_jecUncBBEC1YearDown = 0;
+   njets_jerUp = 0;
+   njets_jerDown = 0;
 
    indexLeadingJet = -1;
    ptLeadingJet = -1;
