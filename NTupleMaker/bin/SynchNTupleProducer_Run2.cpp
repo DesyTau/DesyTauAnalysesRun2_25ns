@@ -68,6 +68,9 @@
 //#include "DesyTauAnalyses/NTupleMaker/interface/ImpactParameter.h"
 #include "HiggsCPinTauDecays/ImpactParameter/interface/ImpactParameter.h"
 #include "HTT-utilities/RecoilCorrections_KIT/interface/MEtSys.h"
+#include "HTTutilities/Jet2TauFakes/interface/FakeFactor.h"
+#include "RooFunctor.h"
+
 
 #define pi   3.14159265358979312
 #define d2r  1.74532925199432955e-02
@@ -206,7 +209,6 @@ int main(int argc, char * argv[]){
     reader_C.load(calib, BTagEntry::FLAV_C, "comb");
     reader_Light.load(calib, BTagEntry::FLAV_UDSG, "incl");
   }
-  std::cout << "What the hell" << std::endl;
     
   TString pathToTaggingEfficiencies = (TString) cmsswBase + "/src/" + cfg.get<string>("BtagMCeffFile");
   if (ApplyBTagScaling && gSystem->AccessPathName(pathToTaggingEfficiencies)){
@@ -226,6 +228,22 @@ int main(int argc, char * argv[]){
   }
   TRandom3 *rand = new TRandom3();
   const struct btag_scaling_inputs inputs_btag_scaling_medium = {reader_B, reader_C, reader_Light, tagEff_B, tagEff_C, tagEff_Light, rand};
+
+  TFile * ff_file = TFile::Open(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/fakefactors_ws_"+TString(year)+".root");
+  if (ff_file->IsZombie()) {
+    cout << "File " << TString(cmsswBase) << "/src/DesyTauAnalyses/NTupleMaker/data/fakefactors_ws_" << TString(year) << ".root not found" << endl;
+    cout << "Quitting... " << endl;
+    exit(-1);
+  }
+
+  FakeFactor* ff = (FakeFactor*)ff_file->Get("ff_comb");
+  std::shared_ptr<RooWorkspace> ff_ws_;
+  std::map<std::string, std::shared_ptr<RooFunctor>> fns_;
+  ff_ws_ = std::shared_ptr<RooWorkspace>((RooWorkspace*)gDirectory->Get("w"));
+  fns_["ff_mt_medium_dmbins"] = std::shared_ptr<RooFunctor>(ff_ws_->function("ff_mt_medium_dmbins")->functor(ff_ws_->argSet("pt,dm,njets,m_pt,os,met,mt,m_iso,pass_single,mvis")));
+  fns_["ff_mt_medium_mvadmbins"] = std::shared_ptr<RooFunctor>(ff_ws_->function("ff_mt_medium_mvadmbins")->functor(ff_ws_->argSet("pt,mvadm,njets,m_pt,os,met,mt,m_iso,pass_single,mvis")));
+
+
 
   // MET Recoil Corrections
   const bool isDY = infiles.find("DY") == infiles.rfind("/")+1;
@@ -1194,7 +1212,7 @@ int main(int argc, char * argv[]){
       TLorentzVector genL( 0., 0., 0., 0.);
 
       otree->zptweight = 1.;
-      if (!isData && ((isDY && isMG ) || isEWKZ)){
+      if (!isData && isDY){
         genV = genTools::genV(analysisTree); // gen Z boson ?
       	float bosonMass = genV.M();
       	float bosonPt = genV.Pt();
@@ -1325,11 +1343,40 @@ int main(int argc, char * argv[]){
       	  else if (otree->tau_decay_mode_2 == 10) shift_tes = shift_tes_lepfake_3prong; 
       	}
 	if (usePuppiMET) {
-	  correctTauES(tauLV, puppimetLV, shift_tes, isOneProng);	    
+	  TLorentzVector tauLV_unclES_UP = tauLV;
+	  TLorentzVector tauLV_unclES_DOWN = tauLV;
+	  float puppiMET_Up = TMath::Sqrt(analysisTree.puppimet_ex_UnclusteredEnUp*analysisTree.puppimet_ex_UnclusteredEnUp+
+					  analysisTree.puppimet_ey_UnclusteredEnUp*analysisTree.puppimet_ey_UnclusteredEnUp);
+	  float puppiMET_Down = TMath::Sqrt(analysisTree.puppimet_ex_UnclusteredEnDown*analysisTree.puppimet_ex_UnclusteredEnDown+
+					    analysisTree.puppimet_ey_UnclusteredEnDown*analysisTree.puppimet_ey_UnclusteredEnDown);
+	  TLorentzVector puppiUncl_UP; puppiUncl_UP.SetXYZT(analysisTree.puppimet_ex_UnclusteredEnUp,
+							    analysisTree.puppimet_ey_UnclusteredEnUp,
+							    0,
+							    puppiMET_Up); 
+	  TLorentzVector puppiUncl_DOWN; puppiUncl_DOWN.SetXYZT(analysisTree.puppimet_ex_UnclusteredEnDown,
+								analysisTree.puppimet_ey_UnclusteredEnDown,
+								0,
+								puppiMET_Down); 
+	  //	  std::cout << "Central : " << puppimetLV.Pt()
+	  //		    << "    Up : " << puppiUncl_UP.Pt()
+	  //		    << "    Down : " << puppiUncl_DOWN.Pt() << std::endl;
+	  correctTauES(tauLV, puppimetLV, shift_tes, isOneProng);
+	  correctTauES(tauLV_unclES_UP,puppiUncl_UP,shift_tes, isOneProng);
+	  correctTauES(tauLV_unclES_DOWN,puppiUncl_DOWN,shift_tes, isOneProng);
 	  otree->pt_2 = tauLV.Pt();
 	  otree->m_2 = tauLV.M();
 	  otree->puppimet = puppimetLV.Pt();
 	  otree->puppimetphi = puppimetLV.Phi();
+	  otree->puppimet_ex_UnclusteredEnUp = puppiUncl_UP.Px();
+	  otree->puppimet_ey_UnclusteredEnUp = puppiUncl_UP.Py();
+	  otree->puppimet_ex_UnclusteredEnDown = puppiUncl_DOWN.Px();
+	  otree->puppimet_ey_UnclusteredEnDown = puppiUncl_DOWN.Py();
+	  //
+	  //	  std::cout << "Corrected -> " << std::endl;
+	  //	  std::cout << "Central : " << puppimetLV.Pt()
+	  //                    << "    Up : " << puppiUncl_UP.Pt()
+	  //                    << "    Down : " << puppiUncl_DOWN.Pt() << std::endl;
+	  //
 	}
 	else {
 	  correctTauES(tauLV,metLV,shift_tes, isOneProng);
@@ -1428,15 +1475,52 @@ int main(int argc, char * argv[]){
 	if(usePuppiMET) isSRevent = isSRevent && otree->puppimt_1<60;
 	else isSRevent = isSRevent && otree->mt_1<60;
       }
-    /*
-    if (!isSRevent) { 
-      cout << "                                        " << endl;
-      cout << "========================================" << endl;
-      cout << "        Event is not selected           " << endl;
-      cout << "========================================" << endl;
-      cout << "                                        " << endl;
-    }
-    */
+      /*
+	if (!isSRevent) { 
+	cout << "                                        " << endl;
+	cout << "========================================" << endl;
+	cout << "        Event is not selected           " << endl;
+	cout << "========================================" << endl;
+	cout << "                                        " << endl;
+	}
+      */
+      if (!isSRevent) continue;
+
+      if (otree->byMediumDeepTau2017v2p1VSjet_2<0.5){
+		
+	auto args = std::vector<double>{otree->pt_2,
+					static_cast<double>(otree->tau_decay_mode_2),
+					static_cast<double>(otree->njets),
+					otree->pt_1,
+					static_cast<double>(otree->os),
+					otree->puppimet,
+					otree->puppimt_1,
+					otree->iso_1,
+					static_cast<double>(otree->trg_singlemuon),
+					otree->m_vis};
+	otree->ff_nom = fns_["ff_mt_medium_dmbins"]->eval(args.data());
+	
+	auto args_mva = std::vector<double>{otree->pt_2,
+					    otree->dmMVA_2,
+					    static_cast<double>(otree->njets),
+					    otree->pt_1,
+					    static_cast<double>(otree->os),
+					    otree->puppimet,
+					    otree->puppimt_1,
+					    otree->iso_1,
+					    static_cast<double>(otree->trg_singlemuon),
+					    otree->m_vis};
+	otree->ff_mva = fns_["ff_mt_medium_mvadmbins"]->eval(args_mva.data());
+	
+	//		cout << "ff_nom : " << ff_nom << "   ff_mva : " << ff_mva << endl;
+	
+      }else { 
+	otree->ff_nom = 1.;
+	otree->ff_mva = 1.;
+      }
+      otree->ff_nom_sys = 0.15;
+      otree->ff_mva_sys = 0.15;
+
       otree->apply_recoil = ApplyRecoilCorrections;
       if (!isSRevent && ApplySystShift) continue;
       if (ApplySVFit && isSRevent) svfit_variables(ch, &analysisTree, otree, &cfg, inputFile_visPtResolution);
@@ -1445,8 +1529,15 @@ int main(int argc, char * argv[]){
       if( !isData && !isEmbedded && ApplySystShift){
 	if (isDY) zPtWeightSys->Eval(); 
 	if (isTTbar) topPtWeightSys->Eval();
-	for(unsigned int i = 0; i < jetEnergyScaleSys.size(); i++)
+	for(unsigned int i = 0; i < jetEnergyScaleSys.size(); i++) {
+	  //	  cout << endl;
+	  //	  cout << "+++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
+	  //	  cout << endl;	  
 	  (jetEnergyScaleSys.at(i))->Eval(); 
+	  //	  cout << endl;
+	  //	  cout << "++++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl; 
+	  //	  cout << endl;
+	}
 	if (usePuppiMET) {
 	  for(unsigned int i = 0; i < puppiMetSys.size(); ++i)
 	    (puppiMetSys.at(i))->Eval();
@@ -1468,6 +1559,7 @@ int main(int argc, char * argv[]){
 	  tauThreeProngScaleSys->Eval(utils::ETAU);
 	}
       }
+      
       counter[19]++;  
 
       //CP calculation. Updates Merijn: placed calculation at end, when all kinematic corrections are performed. Removed statement to only do calculation for tt. 
@@ -1540,6 +1632,7 @@ int main(int argc, char * argv[]){
             }
         }
       
+      //      cout << "Once again puppimet central : " << otree->puppimet << endl;
 
       //Merijn 2019 1 10: perhaps this should be called before moving to next event..
       otree->Fill();
@@ -1630,6 +1723,7 @@ int main(int argc, char * argv[]){
     lepTauFakeThreeProngScaleSys->Write();
     delete lepTauFakeThreeProngScaleSys;
   }
+
 
   file->Close();
   delete file;

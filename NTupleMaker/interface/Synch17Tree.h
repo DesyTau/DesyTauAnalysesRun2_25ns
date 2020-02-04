@@ -288,6 +288,11 @@ public :
   Float_t         etaufakeweight;
   Float_t         mutaufakeweight;
   
+  Float_t         ff_nom;
+  Float_t         ff_mva;
+  Float_t         ff_nom_sys;
+  Float_t         ff_mva_sys;
+
   Bool_t          trg_singlemuon;
   Bool_t	  trg_singleelectron;
   Bool_t          singleLepTrigger;
@@ -323,6 +328,24 @@ public :
   Float_t         puppimetcov10;
   Float_t         puppimetcov11;
   Float_t         puppipzetamiss;
+
+  Float_t         puppimet_ex_UnclusteredEnUp;
+  Float_t         puppimet_ex_UnclusteredEnDown;
+
+  Float_t         puppimet_ey_UnclusteredEnUp;
+  Float_t         puppimet_ey_UnclusteredEnDown;
+
+  Float_t         puppimet_ex_JetEnUp;
+  Float_t         puppimet_ex_JetEnDown;
+
+  Float_t         puppimet_ey_JetEnUp;
+  Float_t         puppimet_ey_JetEnDown;
+
+  Float_t         puppimet_ex_JetResUp;
+  Float_t         puppimet_ex_JetResDown;
+
+  Float_t         puppimet_ey_JetResUp;
+  Float_t         puppimet_ey_JetResDown;
 
   //di tau system
   Float_t         pt_tt;
@@ -771,6 +794,11 @@ public :
   TBranch	 *b_trkeffweight;
   TBranch	 *b_etaufakeweight;
   TBranch	 *b_mutaufakeweight;
+
+  TBranch        *b_ff_nom;
+  TBranch        *b_ff_mva;
+  TBranch        *b_ff_nom_sys;
+  TBranch        *b_ff_mva_sys;
 
   TBranch	 *b_trg_singlemuon;
   TBranch	 *b_trg_singleelectron;

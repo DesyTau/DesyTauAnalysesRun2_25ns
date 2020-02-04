@@ -525,6 +525,7 @@
  <use name="CondTools/BTau"/>
  <use name="HTT-utilities/LepEffInterface"/>
  <use name="HTT-utilities/RecoilCorrections"/>
+ <use name="HTTutilities/Jet2TauFakes"/>
  <use name="TauPOG/TauIDSFs"/>
  <use name="TauAnalysisTools/TauTriggerSFs"/>
 </bin>

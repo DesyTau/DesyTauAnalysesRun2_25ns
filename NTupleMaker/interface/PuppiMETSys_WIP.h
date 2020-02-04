@@ -31,22 +31,27 @@ class PuppiMETSys : public METSys {
 
   kit::MEtSys * metSys;
 
-  virtual void Central() {};
+  virtual void Central() {
+    //    if (label.Contains("UnclusteredEn")) {
+    //      cout << "CENTRAL : " << cenTree->puppimet << endl;
+    //    }
+
+  };
   virtual void ScaleDown() {
     bool uncertaintyFound = false;
     if (label.Contains("UnclusteredEn")) {
-      obs.metx = analysisTree->puppimet_ex_UnclusteredEnDown;
-      obs.mety = analysisTree->puppimet_ey_UnclusteredEnDown;
+      obs.metx = cenTree->puppimet_ex_UnclusteredEnDown;
+      obs.mety = cenTree->puppimet_ey_UnclusteredEnDown;
       uncertaintyFound = true;
     }
     else if (label.Contains("JetRes")) {
-      obs.metx = analysisTree->puppimet_ex_JetResDown;
-      obs.mety = analysisTree->puppimet_ey_JetResDown;
+      obs.metx = cenTree->puppimet_ex_JetResDown;
+      obs.mety = cenTree->puppimet_ey_JetResDown;
       uncertaintyFound = true;
     }    
     else if (label.Contains("JetEn")) {
-      obs.metx = analysisTree->puppimet_ex_JetEnDown;
-      obs.mety = analysisTree->puppimet_ey_JetEnDown;
+      obs.metx = cenTree->puppimet_ex_JetEnDown;
+      obs.mety = cenTree->puppimet_ey_JetEnDown;
       uncertaintyFound = true;
     }    
     else if (label.Contains("boson")) {
@@ -85,6 +90,9 @@ class PuppiMETSys : public METSys {
       //      		<< cenTree->puppimetphi << ")" 
       //      		<< " down = (" << obs.met << ","
       //		<< obs.metphi << ")" << std::endl;
+      //      if (label.Contains("UnclusteredEn")) {
+      //	cout << "DOWN = " << obs.met << std::endl;
+      //      }
     }
     FillPuppiMET("Down");
   };
@@ -92,18 +100,18 @@ class PuppiMETSys : public METSys {
   virtual void ScaleUp() {
     bool uncertaintyFound = false;
     if (label.Contains("UnclusteredEn")) {
-      obs.metx = analysisTree->puppimet_ex_UnclusteredEnUp;
-      obs.mety = analysisTree->puppimet_ey_UnclusteredEnUp;
+      obs.metx = cenTree->puppimet_ex_UnclusteredEnUp;
+      obs.mety = cenTree->puppimet_ey_UnclusteredEnUp;
       uncertaintyFound = true;
     }
     else if (label.Contains("JetRes")) {
-      obs.metx = analysisTree->puppimet_ex_JetResUp;
-      obs.mety = analysisTree->puppimet_ey_JetResUp;
+      obs.metx = cenTree->puppimet_ex_JetResUp;
+      obs.mety = cenTree->puppimet_ey_JetResUp;
       uncertaintyFound = true;
    }    
     else if (label.Contains("JetEn")) {
-      obs.metx = analysisTree->puppimet_ex_JetEnUp;
-      obs.mety = analysisTree->puppimet_ey_JetEnUp;
+      obs.metx = cenTree->puppimet_ex_JetEnUp;
+      obs.mety = cenTree->puppimet_ey_JetEnUp;
       uncertaintyFound = true;
    }    
     else if (label.Contains("boson")) {
@@ -137,13 +145,14 @@ class PuppiMETSys : public METSys {
     if (uncertaintyFound) {
       obs.metphi = atan2(obs.mety,obs.metx);
       obs.met = sqrt(obs.metx*obs.metx+obs.mety*obs.mety);
-      obs.metphi = atan2(obs.mety,obs.metx);
-      obs.met = sqrt(obs.metx*obs.metx+obs.mety*obs.mety);
       //      std::cout << label << " (met,metphi) : central = (" 
       //      		<< cenTree->puppimet << ","
       //      		<< cenTree->puppimetphi << ")" 
       //      		<< " up = (" << obs.met << ","
       //		<< obs.metphi << ")" << std::endl;
+      //      if (label.Contains("UnclusteredEn")) {
+      //	cout << "Up = " << obs.met << std::endl;
+      //      }
     }
     FillPuppiMET("Up");
   };

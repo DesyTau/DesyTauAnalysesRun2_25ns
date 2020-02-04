@@ -302,13 +302,17 @@ void Synch17Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("puweight", &puweight, &b_puweight);
    fChain->SetBranchAddress("trigweight", &trigweight, &b_trigweight);
    fChain->SetBranchAddress("embweight", &embweight, &b_embweight);
-
    fChain->SetBranchAddress("topptweight", &topptweight, &b_topptweight);
    fChain->SetBranchAddress("zptweight", &zptweight, &b_zptweight);
    fChain->SetBranchAddress("trkeffweight", &trkeffweight, &b_trkeffweight);
    fChain->SetBranchAddress("effweight", &effweight, &b_effweight); 
    fChain->SetBranchAddress("etaufakeweight", &etaufakeweight, &b_etaufakeweight);
    fChain->SetBranchAddress("mutaufakeweight", &mutaufakeweight, &b_mutaufakeweight);
+
+   fChain->SetBranchAddress("ff_nom",&ff_nom,&b_ff_nom);
+   fChain->SetBranchAddress("ff_mva",&ff_mva,&b_ff_mva);
+   fChain->SetBranchAddress("ff_nom_sys",&ff_nom_sys,&b_ff_nom_sys);
+   fChain->SetBranchAddress("ff_mva_sys",&ff_mva_sys,&b_ff_mva_sys);
 
    fChain->SetBranchAddress("trg_singlemuon",  &trg_singlemuon, &b_trg_singlemuon);
    fChain->SetBranchAddress("trg_singleelectron",  &trg_singleelectron, &b_trg_singleelectron);
@@ -618,16 +622,16 @@ void Synch17Tree::WriteInit(TTree *tree) {
   
   fChain->Branch("passedAllMetFilters", &passedAllMetFilters, "passedAllMetFilters/O");
 
-   fChain->Branch("pt_1", &pt_1, "pt_1/F");
-   fChain->Branch("phi_1", &phi_1, "phi_1/F");
-   fChain->Branch("eta_1", &eta_1, "eta_1/F");
-   fChain->Branch("chconst_1_pt", &chconst_1_pt, "chconst_1_pt/F");
-   fChain->Branch("chconst_1_eta", &chconst_1_eta, "chconst_1_eta/F");
-   fChain->Branch("chconst_1_phi", &chconst_1_phi, "chconst_1_phi/F");
-   fChain->Branch("m_1", &m_1, "m_1/F");
-   fChain->Branch("gen_match_1", &gen_match_1, "gen_match_1/I");
-   fChain->Branch("q_1", &q_1, "q_1/I");
-   fChain->Branch("iso_1", &iso_1, "iso_1/F");
+  fChain->Branch("pt_1", &pt_1, "pt_1/F");
+  fChain->Branch("phi_1", &phi_1, "phi_1/F");
+  fChain->Branch("eta_1", &eta_1, "eta_1/F");
+  fChain->Branch("chconst_1_pt", &chconst_1_pt, "chconst_1_pt/F");
+  fChain->Branch("chconst_1_eta", &chconst_1_eta, "chconst_1_eta/F");
+  fChain->Branch("chconst_1_phi", &chconst_1_phi, "chconst_1_phi/F");
+  fChain->Branch("m_1", &m_1, "m_1/F");
+  fChain->Branch("gen_match_1", &gen_match_1, "gen_match_1/I");
+  fChain->Branch("q_1", &q_1, "q_1/I");
+  fChain->Branch("iso_1", &iso_1, "iso_1/F");
    //   fChain->Branch("mva_1", &mva_1, "mva_1/F");
    //   fChain->Branch("mva17_1", &mva17_1, "mva17_1/F");
    fChain->Branch("d0_1", &d0_1, "d0_1/F");
@@ -823,7 +827,7 @@ void Synch17Tree::WriteInit(TTree *tree) {
    fChain->Branch("idisoweight_antiiso_2", &idisoweight_antiiso_2, "idisoweight_antiiso_2/F");
    fChain->Branch("tauvsjetweightMedium_2", &tauvsjetweightMedium_2, "tauvsjetweightMedium_2/F");
    /*
-   fChain->Branch("againstElectronVLooseMVA6_2", &againstElectronVLooseMVA6_2, "againstElectronVLooseMVA6_2/F");
+fChain->Branch("againstElectronVLooseMVA6_2", &againstElectronVLooseMVA6_2, "againstElectronVLooseMVA6_2/F");
    fChain->Branch("againstElectronVTightMVA6_2", &againstElectronVTightMVA6_2, "againstElectronVTightMVA6_2/F");
    fChain->Branch("againstElectronTightMVA6_2", &againstElectronTightMVA6_2, "againstElectronTightMVA6_2/F");
    fChain->Branch("againstElectronMediumMVA6_2", &againstElectronMediumMVA6_2, "againstElectronMediumMVA6_2/F");
@@ -860,6 +864,11 @@ void Synch17Tree::WriteInit(TTree *tree) {
    fChain->Branch("effweight", &effweight, "effweight/F"); 
    fChain->Branch("etaufakeweight", &etaufakeweight, "etaufakeweight/F");
    fChain->Branch("mutaufakeweight", &mutaufakeweight, "mutaufakeweight/F");
+
+   fChain->Branch("ff_nom",&ff_nom,"ff_nom/F");
+   fChain->Branch("ff_mva",&ff_mva,"ff_mva/F");
+   fChain->Branch("ff_nom_sys",&ff_nom_sys,"ff_nom_sys/F");
+   fChain->Branch("ff_mva_sys",&ff_mva_sys,"ff_mva_sys/F");
 
    fChain->Branch("trg_singlemuon",  &trg_singlemuon, "trg_singlemuon/O");
    fChain->Branch("trg_singleelectron",  &trg_singleelectron, "trg_singleelectron/O");
