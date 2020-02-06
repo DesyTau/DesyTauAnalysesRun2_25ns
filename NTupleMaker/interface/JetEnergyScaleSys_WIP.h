@@ -83,19 +83,49 @@ protected:
   };
 
   virtual void ScaleUp(){
-	jets::counting_jets(analysisTree, cenTree, cfg, inputs_btag_scaling, uncertainty_name, "Up", jecUncertainties);
+    met_cen = cenTree->met;
+    metphi_cen = cenTree->metphi;
+    puppimet_cen = cenTree->puppimet;
+    puppimetphi_cen = cenTree->puppimetphi;
+    mt_tot_cen = cenTree->mt_tot;
+    pt_tt_cen = cenTree->pt_tt;
+    mt_1_cen = cenTree->mt_1;
+    mt_2_cen = cenTree->mt_2;
+    puppimt_1_cen = cenTree->puppimt_1;
+    puppimt_2_cen = cenTree->puppimt_2;    
+    jets::counting_jets(analysisTree, cenTree, cfg, inputs_btag_scaling, uncertainty_name, "Up", jecUncertainties);
     this->Fill("Up");
   };
   
-  virtual void ScaleDown(){
-	jets::counting_jets(analysisTree, cenTree, cfg, inputs_btag_scaling, uncertainty_name, "Down", jecUncertainties);
+  virtual void ScaleDown(){    
+    met_cen = cenTree->met;
+    metphi_cen = cenTree->metphi;
+    puppimet_cen = cenTree->puppimet;
+    puppimetphi_cen = cenTree->puppimetphi;
+    mt_tot_cen = cenTree->mt_tot;
+    pt_tt_cen = cenTree->pt_tt;
+    mt_1_cen = cenTree->mt_1;
+    mt_2_cen = cenTree->mt_2;
+    puppimt_1_cen = cenTree->puppimt_1;
+    puppimt_2_cen = cenTree->puppimt_2;
+    jets::counting_jets(analysisTree, cenTree, cfg, inputs_btag_scaling, uncertainty_name, "Down", jecUncertainties);
     this->Fill("Down");
   };
   
 
   virtual void Fill(const char* shift){
     outTree[shift]->Fill();
-	jets::counting_jets(analysisTree, cenTree, cfg, inputs_btag_scaling, "central");
+    cenTree->met = met_cen;
+    cenTree->metphi = metphi_cen;
+    cenTree->puppimet = puppimet_cen;
+    cenTree->puppimetphi = puppimetphi_cen;
+    cenTree->mt_1 = mt_1_cen;
+    cenTree->mt_2 = mt_2_cen;
+    cenTree->puppimt_1 = puppimt_1_cen;
+    cenTree->puppimt_2 = puppimt_2_cen;
+    cenTree->mt_tot = mt_tot_cen;
+    cenTree->pt_tt = pt_tt_cen;
+    jets::counting_jets(analysisTree, cenTree, cfg, inputs_btag_scaling, "central");
   }
 
   //const AC1B * analysisTree;
@@ -105,6 +135,17 @@ protected:
   std::map< std::string, TTree* >  outTree;
   TString uncertainty_name;
   JESUncertainties * jecUncertainties;
+
+  float met_cen; 
+  float metphi_cen; 
+  float puppimet_cen; 
+  float puppimetphi_cen; 
+  float mt_tot_cen; 
+  float pt_tt_cen; 
+  float mt_1_cen; 
+  float mt_2_cen; 
+  float puppimt_1_cen; 
+  float puppimt_2_cen; 
   
 };
 

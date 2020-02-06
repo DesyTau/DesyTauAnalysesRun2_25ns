@@ -275,11 +275,20 @@ void counting_jets(const AC1B *analysisTree, Synch17Tree *otree, const Config *c
     float mety = otree->met * sin(otree->metphi);
     float metx_puppi = otree->puppimet * cos(otree->puppimetphi);
     float mety_puppi = otree->puppimet * sin(otree->puppimetphi);
-    
+
+    //    std::cout << JESname << " : " << direction << std::endl;
+    //    std::cout << "  PuppiMetX = " << metx_puppi << "  PuppiMetY = " << mety_puppi << std::endl; 
+    //    std::cout << "  UncorJetX = " << uncorrectedJets.Px() << " UncorJetY = " << uncorrectedJets.Py() << endl;
+    //    std::cout << "  CorJetX   = " << uncorrectedJets.Px() << " CorJetY   = " << uncorrectedJets.Py() << endl;
+
     metx = metx + uncorrectedJets.Px() - correctedJets.Px();
     mety = mety + uncorrectedJets.Py() - correctedJets.Py();
     metx_puppi = metx_puppi + uncorrectedJets.Px() - correctedJets.Px();
     mety_puppi = mety_puppi + uncorrectedJets.Py() - correctedJets.Py();
+
+    //    std::cout << " corrected -> " << std::endl;
+    //    std::cout << " PuppiMetX =" << metx_puppi << "  PuppiMetY = " << mety_puppi << std::endl;
+
 
     otree->met = sqrt(metx*metx+mety*mety);
     otree->metphi = atan2(mety,metx);

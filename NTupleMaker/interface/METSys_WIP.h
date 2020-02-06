@@ -149,6 +149,7 @@ class METSys : public Systematics {
     cenTree->pt_tt = obs.pt_tt;
     cenTree->mt_tot = obs.mt_tot;
 
+
     if (useSVFit) {
       cenTree->m_sv = obs.m_sv;
       cenTree->pt_sv = obs.pt_sv;
@@ -160,7 +161,8 @@ class METSys : public Systematics {
 
     // Filling
     outTree[shift]->Fill();
-    // restore central values                                                                                                                                                                
+    // restore central values
+
     cenTree->puppimt_1 = puppimt_1_cen;
     cenTree->puppimt_2 = puppimt_2_cen;
     cenTree->puppimet = puppimet_cen;

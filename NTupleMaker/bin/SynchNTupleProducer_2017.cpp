@@ -1228,7 +1228,7 @@ for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) {
 	  otree->idisoweight_1 = SF_lepIdIso->get_ScaleFactor(leptonLV.Pt(),
 							      leptonLV.Eta());
 
-	  otree->idisoweight_antiiso_1 = SF_lepIdIso_antiiso->get_ScaleFactor(leptonLV.Pt(),
+	  otree->idisoweight_antiiso_1 = SF_lepIdIso_antiiso->gets_ScaleFactor(leptonLV.Pt(),
 									      leptonLV.Eta());
 	  
 	  otree->trigweight_1 = SF_SingleLepTrigger->get_ScaleFactor(leptonLV.Pt(),
