@@ -1094,8 +1094,8 @@ int main(int argc, char * argv[]) {
             double jetEta = analysisTree.pfjet_eta[jet];
             if (absJetEta>jetEtaCut) continue;
             
+           
             float jetPt = analysisTree.pfjet_pt[jet] * (1.0 + shift);
-            
             map<TString,TLorentzVector> jetLV_jecUnc;
             
             // Include variations for jec uncertainties
@@ -1119,7 +1119,6 @@ int main(int argc, char * argv[]) {
                   metLV_jecUnc[uncer_split.first + "Down"] += jetLV* unc_total;
                }
             }
-
             float jetPt_tocheck = jetPt;
             if (sync) jetPt_tocheck = jetPt;
             else{
@@ -1150,7 +1149,8 @@ int main(int argc, char * argv[]) {
                if (jetLVJERDown.Pt() > jetPtmax) jetPtmax = jetLVJERDown.Pt();
                jetPt_tocheck = jetPtmax;
             }
-            if (jetPt_tocheck<jetPtLowCut) continue;   
+            if (sync) {if (jetPt<jetPtLowCut) continue; } 
+            else if (jetPt_tocheck<jetPtLowCut) continue;   
 
             bool isPFJetId =false;
             if (era=="2016") isPFJetId= looseJetiD_2016(analysisTree,int(jet));
@@ -1170,7 +1170,6 @@ int main(int argc, char * argv[]) {
             if (!cleanedJet) continue;
 
             if (jetPt>jetPtLowCut) jetspt20.push_back(jet);
-            
             if (absJetEta<bJetEtaCut) { // jet within b-tagging acceptance
 
                bool tagged = false;
@@ -1264,6 +1263,7 @@ int main(int argc, char * argv[]) {
                      if (jetPt>ptLeadingBJet) {
                         ptLeadingBJet = jetPt;
                         indexLeadingBJet = jet;
+                        shift_bjet = shift;
                      }
                }
                
@@ -1296,15 +1296,19 @@ int main(int argc, char * argv[]) {
             if (jetLV_jecUnc.at("jecUncBBEC1YearDown").Pt()>jetPtHighCut) njets_jecUncBBEC1YearDown += 1;
             if (jetLVJERUp.Pt() > jetPtHighCut) njets_jerUp += 1;
             if (jetLVJERDown.Pt() > jetPtHighCut) njets_jerDown += 1;
-            if (jetPt>jetPtHighCut)
-               jets.push_back(jet); 
+
+            if (jetPt>jetPtHighCut) jets.push_back(jet);
             
             //if (jetPt_tocheck<jetPtHighCut) continue; cut is done later to make sure that the uncertainties are treated correcly
+            if (sync) if (jetPt <jetPtHighCut) continue;  
 
             if (indexLeadingJet>=0) {
                if (jetPt<ptLeadingJet&&jetPt>ptSubLeadingJet) {
                   indexSubLeadingJet = jet;
                   ptSubLeadingJet = jetPt;
+                  shift_jet2 =  shift;
+                  shift_jet2_up = shift_up;
+                  shift_jet2_down = shift_down;
                }
             }
             if (jetPt>ptLeadingJet) {
@@ -1312,6 +1316,12 @@ int main(int argc, char * argv[]) {
                ptSubLeadingJet = ptLeadingJet;
                indexLeadingJet = jet;
                ptLeadingJet = jetPt;
+               shift_jet2 =  shift_jet1;
+               shift_jet2_up = shift_jet1_up;
+               shift_jet2_down = shift_jet1_down;
+               shift_jet1 =  shift;
+               shift_jet1_up = shift_up;
+               shift_jet1_down = shift_down;
             }
          }
          njets = jets.size();
@@ -1326,7 +1336,7 @@ int main(int argc, char * argv[]) {
          nbtag_noSF = bjetsRaw.size();
          
          if (indexLeadingBJet>=0) {
-            bpt = analysisTree.pfjet_pt[indexLeadingBJet]* (1.0 + shift);
+            bpt = analysisTree.pfjet_pt[indexLeadingBJet]* (1.0 + shift_bjet);
             beta_1 = analysisTree.pfjet_eta[indexLeadingBJet];
             bphi = analysisTree.pfjet_phi[indexLeadingBJet];
          }
@@ -1335,23 +1345,23 @@ int main(int argc, char * argv[]) {
             cout << "warning : indexLeadingJet ==indexSubLeadingJet = " << indexSubLeadingJet << endl;
         
          if (indexLeadingJet>=0) {
-            jpt_1 = analysisTree.pfjet_pt[indexLeadingJet] * (1.0 + shift);
+            jpt_1 = analysisTree.pfjet_pt[indexLeadingJet] * (1.0 + shift_jet1);
             jeta_1 = analysisTree.pfjet_eta[indexLeadingJet];
             jphi_1 = analysisTree.pfjet_phi[indexLeadingJet];
             jptraw_1 = analysisTree.pfjet_pt[indexLeadingJet]*analysisTree.pfjet_energycorr[indexLeadingJet];
-            jet1.SetPxPyPzE(analysisTree.pfjet_px[indexLeadingJet] * (1.0 + shift),
-                            analysisTree.pfjet_py[indexLeadingJet] * (1.0 + shift),
-                            analysisTree.pfjet_pz[indexLeadingJet] * (1.0 + shift),
-                            analysisTree.pfjet_e[indexLeadingJet] * (1.0 + shift));
+            jet1.SetPxPyPzE(analysisTree.pfjet_px[indexLeadingJet] * (1.0 + shift_jet1),
+                            analysisTree.pfjet_py[indexLeadingJet] * (1.0 + shift_jet1),
+                            analysisTree.pfjet_pz[indexLeadingJet] * (1.0 + shift_jet1),
+                            analysisTree.pfjet_e[indexLeadingJet] * (1.0 + shift_jet1));
 
-            jet1LV_jerUp.SetPxPyPzE(analysisTree.pfjet_px[indexLeadingJet] * (1.0 + shift_up),
-                            analysisTree.pfjet_py[indexLeadingJet] * (1.0 + shift_up),
-                            analysisTree.pfjet_pz[indexLeadingJet] * (1.0 + shift_up),
-                            analysisTree.pfjet_e[indexLeadingJet] * (1.0 + shift_up));
-            jet1LV_jerDown.SetPxPyPzE(analysisTree.pfjet_px[indexLeadingJet] * (1.0 + shift_down),
-                            analysisTree.pfjet_py[indexLeadingJet] * (1.0 + shift_down),
-                            analysisTree.pfjet_pz[indexLeadingJet] * (1.0 + shift_down),
-                            analysisTree.pfjet_e[indexLeadingJet] * (1.0 + shift_down));
+            jet1LV_jerUp.SetPxPyPzE(analysisTree.pfjet_px[indexLeadingJet] * (1.0 + shift_jet1_up),
+                            analysisTree.pfjet_py[indexLeadingJet] * (1.0 + shift_jet1_up),
+                            analysisTree.pfjet_pz[indexLeadingJet] * (1.0 + shift_jet1_up),
+                            analysisTree.pfjet_e[indexLeadingJet] * (1.0 + shift_jet1_up));
+            jet1LV_jerDown.SetPxPyPzE(analysisTree.pfjet_px[indexLeadingJet] * (1.0 + shift_jet1_down),
+                            analysisTree.pfjet_py[indexLeadingJet] * (1.0 + shift_jet1_down),
+                            analysisTree.pfjet_pz[indexLeadingJet] * (1.0 + shift_jet1_down),
+                            analysisTree.pfjet_e[indexLeadingJet] * (1.0 + shift_jet1_down));
 
             for (auto uncer_split : jec_unc_map) {
                float sum_unc   = 0;
@@ -1369,23 +1379,23 @@ int main(int argc, char * argv[]) {
          }
 
          if (indexSubLeadingJet>=0) {
-            jpt_2 = analysisTree.pfjet_pt[indexSubLeadingJet]  * (1.0 + shift);
+            jpt_2 = analysisTree.pfjet_pt[indexSubLeadingJet]  * (1.0 + shift_jet2);
             jeta_2 = analysisTree.pfjet_eta[indexSubLeadingJet];
             jphi_2 = analysisTree.pfjet_phi[indexSubLeadingJet];
             jptraw_2 = analysisTree.pfjet_pt[indexSubLeadingJet]*analysisTree.pfjet_energycorr[indexSubLeadingJet];
 
-            jet2.SetPxPyPzE(analysisTree.pfjet_px[indexSubLeadingJet] * (1.0 + shift),
-                            analysisTree.pfjet_py[indexSubLeadingJet] * (1.0 + shift),
-                            analysisTree.pfjet_pz[indexSubLeadingJet] * (1.0 + shift),
-                            analysisTree.pfjet_e[indexSubLeadingJet] * (1.0 + shift));
-            jet2LV_jerUp.SetPxPyPzE(analysisTree.pfjet_px[indexSubLeadingJet] * (1.0 + shift_up),
-                            analysisTree.pfjet_py[indexSubLeadingJet] * (1.0 + shift_up),
-                            analysisTree.pfjet_pz[indexSubLeadingJet] * (1.0 + shift_up),
-                            analysisTree.pfjet_e[indexSubLeadingJet] * (1.0 + shift_up));
-            jet2LV_jerDown.SetPxPyPzE(analysisTree.pfjet_px[indexSubLeadingJet] * (1.0 + shift_down),
-                            analysisTree.pfjet_py[indexSubLeadingJet] * (1.0 + shift_down),
-                            analysisTree.pfjet_pz[indexSubLeadingJet] * (1.0 + shift_down),
-                            analysisTree.pfjet_e[indexSubLeadingJet] * (1.0 + shift_down));
+            jet2.SetPxPyPzE(analysisTree.pfjet_px[indexSubLeadingJet] * (1.0 + shift_jet2),
+                            analysisTree.pfjet_py[indexSubLeadingJet] * (1.0 + shift_jet2),
+                            analysisTree.pfjet_pz[indexSubLeadingJet] * (1.0 + shift_jet2),
+                            analysisTree.pfjet_e[indexSubLeadingJet] * (1.0 + shift_jet2));
+            jet2LV_jerUp.SetPxPyPzE(analysisTree.pfjet_px[indexSubLeadingJet] * (1.0 + shift_jet2_up),
+                            analysisTree.pfjet_py[indexSubLeadingJet] * (1.0 + shift_jet2_up),
+                            analysisTree.pfjet_pz[indexSubLeadingJet] * (1.0 + shift_jet2_up),
+                            analysisTree.pfjet_e[indexSubLeadingJet] * (1.0 + shift_jet2_up));
+            jet2LV_jerDown.SetPxPyPzE(analysisTree.pfjet_px[indexSubLeadingJet] * (1.0 + shift_jet2_down),
+                            analysisTree.pfjet_py[indexSubLeadingJet] * (1.0 + shift_jet2_down),
+                            analysisTree.pfjet_pz[indexSubLeadingJet] * (1.0 + shift_jet2_down),
+                            analysisTree.pfjet_e[indexSubLeadingJet] * (1.0 + shift_jet2_down));
             
             for (auto uncer_split : jec_unc_map) {
                float sum_unc   = 0;
@@ -2143,8 +2153,7 @@ int main(int argc, char * argv[]) {
                                    uncert.second.container,
                                    is_data_or_embedded, checkSV, checkFastMTT,
                                    uncert.second.q1,
-                                   uncert.second.q2, 
-                                   mela, calculateMELA);
+                                   uncert.second.q2);
             
          }
 

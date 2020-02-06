@@ -71,6 +71,14 @@ double shift = 0;
 double shift_up = 0;
 double shift_down = 0;
 
+double shift_bjet = 0;
+double shift_jet1 = 0;
+double shift_jet1_up = 0;
+double shift_jet1_down = 0;
+double shift_jet2 = 0;
+double shift_jet2_up = 0;
+double shift_jet2_down = 0;
+
 const float a_jetMu = 0.902;
 const float b_jetMu = 0.0025;
 
@@ -445,9 +453,9 @@ vector<TString> unc_vars= {"met",  // 0
                            "eta_sv", // 25
                            "phi_sv", // 26
                            "mt_sv", // 27
-                           "mTemu",// 28
-                           "ME_q2v1",//29
-                           "ME_q2v2"//30
+                           "mTemu"// 28
+                           //"ME_q2v1",//29
+                           //"ME_q2v2"//30
                             };
 
 
