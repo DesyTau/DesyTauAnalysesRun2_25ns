@@ -13,7 +13,7 @@ class PuppiMETSys : public METSys {
   PuppiMETSys(){};
   PuppiMETSys(Synch17Tree* c, TString name) {
     cenTree = c;
-    label = "CMS_met_"+name+"_13TeV";
+    label = name;
     this->Init(cenTree);
   };
   void SetMEtSys(kit::MEtSys * sys) {
@@ -39,7 +39,7 @@ class PuppiMETSys : public METSys {
   };
   virtual void ScaleDown() {
     bool uncertaintyFound = false;
-    if (label.Contains("UnclusteredEn")) {
+    if (label.Contains("unclustered")) {
       obs.metx = cenTree->puppimet_ex_UnclusteredEnDown;
       obs.mety = cenTree->puppimet_ey_UnclusteredEnDown;
       uncertaintyFound = true;
@@ -54,11 +54,11 @@ class PuppiMETSys : public METSys {
       obs.mety = cenTree->puppimet_ey_JetEnDown;
       uncertaintyFound = true;
     }    
-    else if (label.Contains("boson")) {
+    else if (label.Contains("CMS_htt_boson")) {
       int systype = 0;
-      if (label.Contains("response"))
+      if (label.Contains("boson_scale"))
 	systype = MEtSys::SysType::Response;
-      else if (label.Contains("resolution"))
+      else if (label.Contains("boson_reso"))
 	systype = MEtSys::SysType::Resolution;
       TLorentzVector genV = genTools::genV(*analysisTree);
       TLorentzVector genL = genTools::genL(*analysisTree);
@@ -99,7 +99,7 @@ class PuppiMETSys : public METSys {
   
   virtual void ScaleUp() {
     bool uncertaintyFound = false;
-    if (label.Contains("UnclusteredEn")) {
+    if (label.Contains("unclustered")) {
       obs.metx = cenTree->puppimet_ex_UnclusteredEnUp;
       obs.mety = cenTree->puppimet_ey_UnclusteredEnUp;
       uncertaintyFound = true;
@@ -114,11 +114,11 @@ class PuppiMETSys : public METSys {
       obs.mety = cenTree->puppimet_ey_JetEnUp;
       uncertaintyFound = true;
    }    
-    else if (label.Contains("boson")) {
+    else if (label.Contains("CMS_htt_boson")) {
       int systype = 0;
-      if (label.Contains("response"))
+      if (label.Contains("boson_scale"))
 	systype = MEtSys::SysType::Response;
-      else if (label.Contains("resolution"))
+      else if (label.Contains("boson_reso"))
 	systype = MEtSys::SysType::Resolution;
       TLorentzVector genV = genTools::genV(*analysisTree);
       TLorentzVector genL = genTools::genL(*analysisTree);

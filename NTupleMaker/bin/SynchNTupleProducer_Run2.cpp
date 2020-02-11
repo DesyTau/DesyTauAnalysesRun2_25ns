@@ -69,6 +69,7 @@
 #include "HiggsCPinTauDecays/ImpactParameter/interface/ImpactParameter.h"
 #include "HTT-utilities/RecoilCorrections_KIT/interface/MEtSys.h"
 #include "HTTutilities/Jet2TauFakes/interface/FakeFactor.h"
+#include "JetMETCorrections/Modules/interface/JetResolution.h"
 #include "RooFunctor.h"
 
 
@@ -163,6 +164,10 @@ int main(int argc, char * argv[]){
   const bool usePuppiMET      = cfg.get<bool>("UsePuppiMET");
   const bool ApplyIpCorrection = cfg.get<bool>("ApplyIpCorrection");
 
+  // JER
+  //  const string jer_resolution = cfg.get<string>("JER_Resolution");
+  //  const string jer_scalefactor = cfg.get<string>("JER_ScaleFactor");
+
   //pileup distrib
   const string pileUpInDataFile = cfg.get<string>("pileUpInDataFile");
   const string pileUpInMCFile = cfg.get<string>("pileUpInMCFile");
@@ -199,6 +204,25 @@ int main(int argc, char * argv[]){
     exit(-1);
   }
   
+  // JER
+  std::unique_ptr<JME::JetResolution> m_resolution_from_file;
+  std::unique_ptr<JME::JetResolutionScaleFactor> m_scale_factor_from_file;
+  if (era==2016) {
+    m_resolution_from_file.reset(new JME::JetResolution(cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/JER/Summer16_25nsV1_MC_PtResolution_AK4PFchs.txt"));
+    m_scale_factor_from_file.reset(new JME::JetResolutionScaleFactor(cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/JER/Summer16_25nsV1_MC_SF_AK4PFchs.txt"));
+  }
+  else if (era==2017) {
+    m_resolution_from_file.reset(new JME::JetResolution(cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/JER/Fall17_V3_MC_PtResolution_AK4PFchs.txt"));
+    m_scale_factor_from_file.reset(new JME::JetResolutionScaleFactor(cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/JER/Fall17_V3_MC_SF_AK4PFchs.txt"));
+  }
+  else {
+    m_resolution_from_file.reset(new JME::JetResolution(cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/JER/Autumn18_V7b_MC_PtResolution_AK4PFchs.txt"));
+    m_scale_factor_from_file.reset(new JME::JetResolutionScaleFactor(cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/JER/Autumn18_V7b_MC_SF_AK8PFchs.txt"));    
+  }
+
+  JME::JetResolution resolution = *m_resolution_from_file;
+  JME::JetResolutionScaleFactor resolution_sf = *m_scale_factor_from_file;
+
   cout<<"using "<<BTagAlgorithm<<endl;
   BTagCalibration calib(BTagAlgorithm, BtagSfFile);
   BTagCalibrationReader reader_B(BTagEntry::OP_MEDIUM, "central");
@@ -464,11 +488,14 @@ int main(int argc, char * argv[]){
   TH1::AddDirectory(false);  
   TFile *inputFile_visPtResolution = new TFile(svFitPtResFile.data());
 
+  std::cout << "inputFile_visPtResolution : " << std::endl;
+
   //Systematics init
   TauScaleSys *tauScaleSys = 0;
   TauOneProngScaleSys *tauOneProngScaleSys = 0;
   TauOneProngOnePi0ScaleSys *tauOneProngOnePi0ScaleSys = 0;
   TauThreeProngScaleSys *tauThreeProngScaleSys = 0;
+  MuonScaleSys *muonScaleSys = 0;
 
   LepTauFakeOneProngScaleSys *lepTauFakeOneProngScaleSys = 0;
   LepTauFakeOneProngOnePi0ScaleSys *lepTauFakeOneProngOnePi0ScaleSys = 0;
@@ -479,9 +506,9 @@ int main(int argc, char * argv[]){
   std::vector<JetEnergyScaleSys*> jetEnergyScaleSys;
   JESUncertainties * jecUncertainties = 0;
 
-  std::vector<TString> metSysNames = {"UnclusteredEn"};
-  std::vector<TString> recoilSysNames = {"boson_resolution",
-					 "boson_response"};
+  std::vector<TString> metSysNames = {"CMS_scale_met_unclustered_13TeV"};
+  std::vector<TString> recoilSysNames = {"CMS_htt_boson_reso_met_13TeV",
+					 "CMS_htt_boson_scale_met_13TeV"};
 
   std::vector<PFMETSys*> metSys;
   std::vector<PuppiMETSys*> puppiMetSys;
@@ -490,6 +517,11 @@ int main(int argc, char * argv[]){
     //    tauScaleSys = new TauScaleSys(otree);
     //    tauScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);
     //    tauScaleSys->SetUseSVFit(ApplySVFit);
+
+    muonScaleSys = new MuonScaleSys(otree);
+    muonScaleSys->SetUseSVFit(ApplySVFit);
+    muonScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);
+    muonScaleSys->SetUsePuppiMET(usePuppiMET);
 
     tauOneProngScaleSys = new TauOneProngScaleSys(otree);
     tauOneProngScaleSys->SetScale(shift_tes_1prong,shift_tes_1prong_e);
@@ -511,8 +543,6 @@ int main(int argc, char * argv[]){
 
     // systematics only for MC
     if (!isEmbedded) {
-      if (isDY) zPtWeightSys = new ZPtWeightSys(otree);
-      if (isTTbar) topPtWeightSys = new TopPtWeightSys(otree);
       if (ApplyRecoilCorrections) {
 	if (usePuppiMET) {
 	  for (unsigned int i = 0; i < recoilSysNames.size(); ++i) {
@@ -554,7 +584,12 @@ int main(int argc, char * argv[]){
 	singleJES->SetBtagScaling(&inputs_btag_scaling_medium);
 	singleJES->SetJESUncertainties(jecUncertainties);
 	jetEnergyScaleSys.push_back(singleJES);
-      }    
+      }
+      JetEnergyScaleSys * JERsys = new JetEnergyScaleSys(otree, TString("JER"));
+      JERsys->SetConfig(&cfg);
+      JERsys->SetBtagScaling(&inputs_btag_scaling_medium);
+      JERsys->SetJESUncertainties(jecUncertainties);
+      jetEnergyScaleSys.push_back(JERsys);
     }
   }
 
@@ -743,6 +778,8 @@ int main(int argc, char * argv[]){
 	  gentreeForGoodRecoEvtsOnly->mix0p375_htt125 = analysisTree.TauSpinnerWeight[4];
 	}
       }
+
+      //      std::cout << "OK!!!!!!!!" << std::endl;
 
       //Skip events not passing the MET filters, if applied
       bool passed_all_met_filters = passedAllMetFilters(&analysisTree, met_filters_list);
@@ -1092,9 +1129,16 @@ int main(int argc, char * argv[]){
       
       FillTau(&analysisTree, otree, leptonIndex, tauIndex);
 
+      // initialize JER (including data and embedded) 
+      jets::initializeJER(&analysisTree);
+
+      if (!isData && !isEmbedded) { // JER smearing
+	jets::associateRecoAndGenJets(&analysisTree, resolution);
+	jets::smear_jets(&analysisTree,resolution,resolution_sf,true);
+      }
+
       //counting jet
       jets::counting_jets(&analysisTree, otree, &cfg, &inputs_btag_scaling_medium);
-      
   
       ////////////////////////////////////////////////////////////
       // ID/Iso and Trigger Corrections
@@ -1486,6 +1530,7 @@ int main(int argc, char * argv[]){
       */
       if (!isSRevent) continue;
 
+      /*
       if (otree->byMediumDeepTau2017v2p1VSjet_2<0.5){
 		
 	auto args = std::vector<double>{otree->pt_2,
@@ -1520,15 +1565,13 @@ int main(int argc, char * argv[]){
       }
       otree->ff_nom_sys = 0.15;
       otree->ff_mva_sys = 0.15;
-
+      */
       otree->apply_recoil = ApplyRecoilCorrections;
       if (!isSRevent && ApplySystShift) continue;
       if (ApplySVFit && isSRevent) svfit_variables(ch, &analysisTree, otree, &cfg, inputFile_visPtResolution);
         
       // evaluate systematics for MC 
       if( !isData && !isEmbedded && ApplySystShift){
-	if (isDY) zPtWeightSys->Eval(); 
-	if (isTTbar) topPtWeightSys->Eval();
 	for(unsigned int i = 0; i < jetEnergyScaleSys.size(); i++) {
 	  //	  cout << endl;
 	  //	  cout << "+++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
@@ -1549,6 +1592,7 @@ int main(int argc, char * argv[]){
       }
       if ((!isData||isEmbedded) && ApplySystShift) {
 	if (ch == "mt") { 
+	  muonScaleSys->Eval(utils::MUTAU);
 	  tauOneProngScaleSys->Eval(utils::MUTAU);
 	  tauOneProngOnePi0ScaleSys->Eval(utils::MUTAU);
 	  tauThreeProngScaleSys->Eval(utils::MUTAU);
@@ -1562,13 +1606,67 @@ int main(int argc, char * argv[]){
       
       counter[19]++;  
 
-      //CP calculation. Updates Merijn: placed calculation at end, when all kinematic corrections are performed. Removed statement to only do calculation for tt. 
-      //Created the acott_Impr function, which takes ch as input as well. See the funcrtion in functionsCP.h to see my updates to the function itself      
-      //Merijn 2019 1 10 debug: a major source of problems was that indices were innertwined from the beginning...
-      //one should note that in et or mt case,
+      // IPSignificance calibration ->
+
+      otree->v_tracks = 0;
+      std::vector<float> PV_covariance; PV_covariance.clear();
+      // by default store non-refitted PV with BS constraint if refitted one is not found
+      float vtx_x = analysisTree.primvertexwithbs_x; 
+      float vtx_y = analysisTree.primvertexwithbs_y;
+      float vtx_z = analysisTree.primvertexwithbs_z;
+      for (int j = 0; j<6 ; ++j)
+	PV_covariance.push_back(analysisTree.primvertexwithbs_cov[j]);
+
+
+      for(unsigned int i = 0; i < analysisTree.refitvertexwithbs_count; i++)
+        {
+          if( (leptonIndex == analysisTree.refitvertexwithbs_muIndex[i][0] || leptonIndex == analysisTree.refitvertexwithbs_muIndex[i][1]) &&
+              (tauIndex == analysisTree.refitvertexwithbs_tauIndex[i][0] || tauIndex == analysisTree.refitvertexwithbs_tauIndex[i][1]))
+            {
+              otree->v_tracks = analysisTree.refitvertexwithbs_ntracks[i];
+	      vtx_x = analysisTree.refitvertexwithbs_x[i];
+	      vtx_y = analysisTree.refitvertexwithbs_y[i];
+	      vtx_z = analysisTree.refitvertexwithbs_z[i];
+	      for (int j=0; j<6; ++j) 
+		PV_covariance[j] = analysisTree.refitvertexwithbs_cov[i][j];
+            }
+        }
+
       IpCorrection * ipCorrector = NULL;
-      if (ApplyIpCorrection && (!isData)) ipCorrector = ip; 
+      ImpactParameter IP;
+      if (ApplyIpCorrection && (!isData || isEmbedded)) ipCorrector = ip; 
+      //      std::cout << " ipCorrector : " << ipCorrector << std::endl; 
       acott_Impr(&analysisTree, otree, leptonIndex, tauIndex, ch,ipCorrector);
+
+      TVector3 vertex(vtx_x,vtx_y,vtx_z);
+      ROOT::Math::SMatrix<float,3,3, ROOT::Math::MatRepStd< float, 3, 3 >> ipCov1;
+      TVector3 IP1;
+      double ipsig1 = IP_significance_helix_mu(&analysisTree,leptonIndex,vertex,PV_covariance,ipCov1,IP1);
+
+      ROOT::Math::SMatrix<float,3,3, ROOT::Math::MatRepStd< float, 3, 3 >> ipCov2;
+      TVector3 IP2;
+      double ipsig2 = IP_significance_helix_tauh(&analysisTree,tauIndex,vertex,PV_covariance,ipCov2,IP2);
+
+      /*
+      cout << "ipsig1 = " << ipsig1 << " ipsig2 = " << ipsig2 << endl;
+
+     
+      cout << "IP1  : x = " << IP1.x() 
+	   << "  y = " << IP1.y() 
+	   << "  z = " << IP1.z() << std::endl;
+      cout << "       x = " << otree->ipx_uncorr_1 
+	   << "  y = " << otree->ipy_uncorr_1 
+	   << "  z = " << otree->ipz_uncorr_1 << std::endl;
+
+      cout << "IP2  : x = " << IP2.x() 
+	   << "  y = " << IP2.y() 
+	   << "  z = " << IP2.z() << std::endl;
+      cout << "       x = " << otree->ipx_uncorr_2 
+	   << "  y = " << otree->ipy_uncorr_2 
+	   << "  z = " << otree->ipz_uncorr_2 << std::endl;
+      */     
+
+      // Uncorrected values
 
       TLorentzVector ip1; ip1.SetXYZM(otree->ipx_uncorr_1,otree->ipy_uncorr_1,otree->ipz_uncorr_1,0.);
       otree->ipxy_uncorr_1 = ip1.Pt();
@@ -1580,6 +1678,9 @@ int main(int argc, char * argv[]){
       otree->dphiip_uncorr_1 = TMath::ACos(vectIP*vectP/(vectIP.Mag()*vectP.Mag()));
       //      cout << "dphi = " << otree->dphiip_uncorr_1 << std::endl;
       //      cout << "refit = " << otree->isrefitBS << std::endl;
+
+      TVector3 Ip1(otree->ipx_uncorr_1,otree->ipy_uncorr_1,otree->ipz_uncorr_1);
+      otree->IP_signif_RefitV_with_BS_uncorr_1 = IP.CalculateIPSignificanceHelical(Ip1, ipCov1);
 
       TLorentzVector ip2; ip2.SetXYZM(otree->ipx_uncorr_2,otree->ipy_uncorr_2,otree->ipz_uncorr_2,0.);
       otree->ipxy_uncorr_2 = ip2.Pt();
@@ -1593,6 +1694,10 @@ int main(int argc, char * argv[]){
       vectP.SetY(tauLV.Py());
       vectP.SetZ(0.);
       otree->dphiip_uncorr_2 = TMath::ACos(vectIP*vectP/(vectIP.Mag()*vectP.Mag()));
+      TVector3 Ip2(otree->ipx_uncorr_2,otree->ipy_uncorr_2,otree->ipz_uncorr_2);
+      otree->IP_signif_RefitV_with_BS_uncorr_2 = IP.CalculateIPSignificanceHelical(Ip2, ipCov2);
+
+      // Corrected values 
 
       ip1.SetXYZM(otree->ipx_1,otree->ipy_1,otree->ipz_1,0.);
       otree->ipxy_1 = ip1.Pt();
@@ -1606,6 +1711,11 @@ int main(int argc, char * argv[]){
       vectP.SetY(leptonLV.Py());
       vectP.SetZ(0.);
       otree->dphiip_1 = TMath::ACos(vectIP*vectP/(vectIP.Mag()*vectP.Mag()));
+      Ip1.SetXYZ(otree->ipx_1,otree->ipy_1,otree->ipz_1);
+      ROOT::Math::SMatrix<float,3,3, ROOT::Math::MatRepStd< float, 3, 3 >> ipCov1_corr = ipCov1;
+      if (ipCorrector!=NULL)
+	ipCov1_corr = ipCorrector->correctIpCov(ipCov1,otree->eta_1);      
+      otree->IP_signif_RefitV_with_BS_1 = IP.CalculateIPSignificanceHelical(Ip1, ipCov1_corr);
 
       ip2.SetXYZM(otree->ipx_2,otree->ipy_2,otree->ipz_2,0.);
       otree->ipxy_2 = ip2.Pt();
@@ -1619,18 +1729,24 @@ int main(int argc, char * argv[]){
       vectP.SetY(tauLV.Py());
       vectP.SetZ(0.);
       otree->dphiip_2 = TMath::ACos(vectIP*vectP/(vectIP.Mag()*vectP.Mag()));
+      Ip2.SetXYZ(otree->ipx_2,otree->ipy_2,otree->ipz_2);
+      ROOT::Math::SMatrix<float,3,3, ROOT::Math::MatRepStd< float, 3, 3 >> ipCov2_corr = ipCov2;
+      if (ipCorrector!=NULL)
+	ipCov2_corr = ipCorrector->correctIpCov(ipCov2,otree->eta_2);      
+      otree->IP_signif_RefitV_with_BS_2 = IP.CalculateIPSignificanceHelical(Ip2, ipCov2_corr);      
 
+      /*
+      std::cout << "IPSig(1) = " << otree->IP_signif_RefitV_with_BS_uncorr_1
+		<< "  :  " << otree->IP_signif_RefitV_with_BS_1 
+		<< "  -> " << otree->IP_signif_PV_with_BS_1 << std::endl;
+
+      std::cout << "IPSig(2) = " << otree->IP_signif_RefitV_with_BS_uncorr_2
+		<< "  :  " << otree->IP_signif_RefitV_with_BS_2 
+		<< "  -> " << otree->IP_signif_PV_with_BS_2 << std::endl;
+      std::cout << std::endl;
+      */
       selEvents++;
       
-      otree->v_tracks = 0;
-      for(unsigned int i = 0; i < analysisTree.refitvertexwithbs_count; i++)
-        {
-          if( (leptonIndex == analysisTree.refitvertexwithbs_muIndex[i][0] || leptonIndex == analysisTree.refitvertexwithbs_muIndex[i][1]) &&
-              (tauIndex == analysisTree.refitvertexwithbs_tauIndex[i][0] || tauIndex == analysisTree.refitvertexwithbs_tauIndex[i][1]))
-            {
-              otree->v_tracks = analysisTree.refitvertexwithbs_ntracks[i];
-            }
-        }
       
       //      cout << "Once again puppimet central : " << otree->puppimet << endl;
 
@@ -1663,6 +1779,11 @@ int main(int argc, char * argv[]){
     delete tauScaleSys;
   }
 
+  if (muonScaleSys != 0) {
+    muonScaleSys->Write();
+    delete muonScaleSys;
+  }
+
   if(tauOneProngScaleSys != 0){
     tauOneProngScaleSys->Write();
     delete tauOneProngScaleSys;
@@ -1676,16 +1797,6 @@ int main(int argc, char * argv[]){
   if(tauThreeProngScaleSys != 0){
     tauThreeProngScaleSys->Write();
     delete tauThreeProngScaleSys;
-  }
-
-  if(zPtWeightSys != 0){
-    zPtWeightSys->Write();
-    delete zPtWeightSys;
-  }
-
-  if(topPtWeightSys != 0){
-    topPtWeightSys->Write();
-    delete topPtWeightSys;
   }
 
   if(jetEnergyScaleSys.size() > 0){
@@ -2022,7 +2133,9 @@ void FillMuTau(const AC1B *analysisTree, Synch17Tree *otree, int leptonIndex, in
   std::vector<float> PV_with_BS_cov_components = {};
   for(auto i:  analysisTree->primvertexwithbs_cov) PV_with_BS_cov_components.push_back(i);	
   TVector3 PV_with_BS (analysisTree->primvertexwithbs_x, analysisTree->primvertexwithbs_y, analysisTree->primvertexwithbs_z );
-  otree->IP_signif_PV_with_BS_1 = IP_significance_helix_mu(analysisTree, leptonIndex, PV_with_BS, PV_with_BS_cov_components);
+  TVector3 ip; 
+  ROOT::Math::SMatrix<float,3,3, ROOT::Math::MatRepStd< float, 3, 3 >> ipCovariance;
+  otree->IP_signif_PV_with_BS_1 = IP_significance_helix_mu(analysisTree, leptonIndex, PV_with_BS, PV_with_BS_cov_components,ipCovariance,ip);
 
   TLorentzVector muon_P4;
   muon_P4.SetXYZM(analysisTree->muon_px[leptonIndex], analysisTree->muon_py[leptonIndex], analysisTree->muon_pz[leptonIndex], muonMass);
@@ -2129,7 +2242,9 @@ void FillTau(const AC1B *analysisTree, Synch17Tree *otree, int leptonIndex, int 
   std::vector<float> PV_with_BS_cov_components = {};
   for(auto i:  analysisTree->primvertexwithbs_cov) PV_with_BS_cov_components.push_back(i);	
   TVector3 PV_with_BS (analysisTree->primvertexwithbs_x, analysisTree->primvertexwithbs_y, analysisTree->primvertexwithbs_z );
-  otree->IP_signif_PV_with_BS_2 = IP_significance_helix_tauh(analysisTree, tauIndex, PV_with_BS, PV_with_BS_cov_components);
+  ROOT::Math::SMatrix<float,3,3, ROOT::Math::MatRepStd< float, 3, 3 >> ipCovariance;
+  TVector3 ip;
+  otree->IP_signif_PV_with_BS_2 = IP_significance_helix_tauh(analysisTree, tauIndex, PV_with_BS, PV_with_BS_cov_components, ipCovariance, ip);
 
   TLorentzVector constituents_P4 = charged_constituents_P4(analysisTree, tauIndex);
   TLorentzVector tau_P4;

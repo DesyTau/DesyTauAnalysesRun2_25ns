@@ -59,9 +59,9 @@ double acoCP(TLorentzVector Pi1, TLorentzVector Pi2,
 	     bool firstNegative, bool pi01, bool pi02, Synch17GenTree* gentree);
 
 TLorentzVector IP_helix_mu(const AC1B * analysisTree, int muIndex, TVector3 PV_coord);
-double IP_significance_helix_mu(const AC1B * analysisTree, int muIndex, TVector3 PV_coord, const std::vector<float> &PV_cov_components);
+double IP_significance_helix_mu(const AC1B * analysisTree, int muIndex, TVector3 PV_coord, const std::vector<float> &PV_cov_components,ROOT::Math::SMatrix<float,3,3, ROOT::Math::MatRepStd< float, 3, 3 >> & ipCovariance, TVector3 & ip);
 TLorentzVector IP_helix_tauh(const AC1B * analysisTree, int tauIndex, TVector3 PV_coord);
-double IP_significance_helix_tauh(const AC1B * analysisTree, int tauIndex, TVector3 PV_coord, const std::vector<float> &PV_cov_components);
+double IP_significance_helix_tauh(const AC1B * analysisTree, int tauIndex, TVector3 PV_coord, const std::vector<float> &PV_cov_components,ROOT::Math::SMatrix<float,3,3, ROOT::Math::MatRepStd< float, 3, 3 >> & ipCovariance, TVector3 & ip);
 TVector3 get_refitted_PV_with_BS(const AC1B * analysisTree, int leptonIndex, int tauIndex, bool &is_refitted_PV_with_BS);
 
 //Merijn: updated function to do CP calculations
@@ -105,8 +105,9 @@ void calibrateIP(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, i
     }
   }
   //  std::cout << "Vertex gen X = " << vertex.X()
-  //	    << "  Y = " << vertex.Y()
-  //	    << "  Z = " << vertex.Z() << std::endl;
+  //  	    << "  Y = " << vertex.Y()
+  //  	    << "  Z = " << vertex.Z() << std::endl;
+  //  std::cout << "gen_match_1 = " << otree->gen_match_1 << std::endl;
   if (otree->gen_match_1==2||otree->gen_match_1==4||otree->gen_match_1==5) {
     if (otree->gen_match_1==2||otree->gen_match_1==4) partPDG = 13;
     else partPDG = 211;
@@ -128,8 +129,12 @@ void calibrateIP(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, i
 	}
       }
     }
+    //    std::cout << "Index mu : " << indexMu << std::endl;
     if (indexMu>=0) {
       TLorentzVector ipGen = gen_ipVec(analysisTree,tauIndex1,indexMu,vertex);
+      //      std::cout << "muon genIP   x = " << ipGen.Px() 
+      //		<< "   y = " << ipGen.Py() 
+      //		<< "   z = " << ipGen.Pz() << std::endl;
 
       //      float dipx = otree->ipx_1 - ipGen.X();
       float ipx = ip->correctIp(IpCorrection::Coordinate::Ipx,otree->ipx_1,ipGen.X(),otree->eta_1);
@@ -176,6 +181,9 @@ void calibrateIP(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, i
     //    std::cout << "index pi = " << indexMu << std::endl;
     if (indexMu>=0) {
       TLorentzVector ipGen = gen_ipVec(analysisTree,tauIndex2,indexMu,vertex);
+      //      std::cout << "pi genIP   x = " << ipGen.Px() 
+      //		<< "   y = " << ipGen.Py() 
+      //		<< "   z = " << ipGen.Pz() << std::endl;
 
       //      float dipx = otree->ipx_2 - ipGen.X();
       float ipx = float(ip->correctIp(IpCorrection::Coordinate::Ipx,otree->ipx_2,ipGen.X(),otree->eta_2));
@@ -232,6 +240,30 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
   otree->acotautau_helix_uncorr_10 = -9999;
   otree->acotautau_helix_uncorr_01 = -9999;
   otree->acotautau_helix_uncorr_11 = -9999;
+
+  otree->ipx_1 = -9999;
+  otree->ipy_1 = -9999;
+  otree->ipz_1 = -9999;
+
+  otree->ipx_2 = -9999;
+  otree->ipy_2 = -9999;
+  otree->ipz_2 = -9999;
+
+  otree->ip0x_1 = -9999;
+  otree->ip0y_1 = -9999;
+  otree->ip0z_1 = -9999;
+
+  otree->ip0x_2 = -9999;
+  otree->ip0y_2 = -9999;
+  otree->ip0z_2 = -9999;
+
+  otree->ipx_uncorr_1 = -9999;
+  otree->ipy_uncorr_1 = -9999;
+  otree->ipz_uncorr_1 = -9999;
+
+  otree->ipx_uncorr_2 = -9999;
+  otree->ipy_uncorr_2 = -9999;
+  otree->ipz_uncorr_2 = -9999;
 
   otree->acotautauPsi_00=-9999;
   otree->acotautauPsi_01=-9999;
@@ -378,7 +410,14 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
     firstNegative = true;
   bool is_refitted_PV_with_BS = true;
   TVector3 PV_coord = get_refitted_PV_with_BS(analysisTree, tauIndex1, tauIndex2, is_refitted_PV_with_BS);
-
+  /*
+  if (is_refitted_PV_with_BS) {
+    cout << "refitted vertex found" << endl;
+  }
+  else {
+    cout << "refitted vertex NOT FOUND" << endl;
+  }
+  */
   otree->isrefitBS = is_refitted_PV_with_BS;
 
   TLorentzVector tau1IP;
@@ -1577,7 +1616,7 @@ TLorentzVector IP_helix_tauh(const AC1B * analysisTree, int tauIndex, TVector3 P
 	return LVIP;
 }
 
-double IP_significance_helix_mu(const AC1B * analysisTree, int muIndex, TVector3 PV_coord, const std::vector<float> &PV_cov_components)
+double IP_significance_helix_mu(const AC1B * analysisTree, int muIndex, TVector3 PV_coord, const std::vector<float> &PV_cov_components, ROOT::Math::SMatrix<float,3,3, ROOT::Math::MatRepStd< float, 3, 3 >> & ipCovariance, TVector3 & ip)
 {	
 	ImpactParameter IP;
 	std::pair <TVector3, ROOT::Math::SMatrix<float,3,3, ROOT::Math::MatRepStd< float, 3, 3 >>> ipAndCov;
@@ -1617,14 +1656,14 @@ double IP_significance_helix_mu(const AC1B * analysisTree, int muIndex, TVector3
 		PV_covariance // (SMatrixSym3D)		
 	);
 	
-	TVector3 ip = ipAndCov.first;
-	ROOT::Math::SMatrix<float,3,3, ROOT::Math::MatRepStd< float, 3, 3 >> ipCovariance = ipAndCov.second;
+	ip = ipAndCov.first;
+	ipCovariance = ipAndCov.second;
 	double ipSignificance = IP.CalculateIPSignificanceHelical(ip, ipCovariance);	
 	
 	return ipSignificance;
 }
 
-double IP_significance_helix_tauh(const AC1B * analysisTree, int tauIndex, TVector3 PV_coord, const std::vector<float> &PV_cov_components)
+double IP_significance_helix_tauh(const AC1B * analysisTree, int tauIndex, TVector3 PV_coord, const std::vector<float> &PV_cov_components, ROOT::Math::SMatrix<float,3,3, ROOT::Math::MatRepStd< float, 3, 3 >> & ipCovariance, TVector3 & ip)
 {	
 	ImpactParameter IP;
 	std::pair <TVector3, ROOT::Math::SMatrix<float,3,3, ROOT::Math::MatRepStd< float, 3, 3 >>> ipAndCov;
@@ -1664,8 +1703,8 @@ double IP_significance_helix_tauh(const AC1B * analysisTree, int tauIndex, TVect
 		PV_covariance // (SMatrixSym3D)		
 	);
 	
-	TVector3 ip = ipAndCov.first;
-	ROOT::Math::SMatrix<float,3,3, ROOT::Math::MatRepStd< float, 3, 3 >> ipCovariance = ipAndCov.second;
+	ip = ipAndCov.first;
+	ipCovariance = ipAndCov.second;
 	double ipSignificance = IP.CalculateIPSignificanceHelical(ip, ipCovariance);	
 	
 	return ipSignificance;

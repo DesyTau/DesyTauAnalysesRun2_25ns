@@ -204,12 +204,12 @@ protected:
        
     cenTree->m_vis = dileptonLV.M();
 
-    cenTree->m_sv = -10;//Merijn adjust for DNN
-    cenTree->pt_sv = -9999;
-    cenTree->eta_sv = -9999;
-    cenTree->phi_sv = -9999;
-    cenTree->met_sv = -9999;
-    cenTree->mt_sv = -9999;
+    cenTree->m_sv = m_sv_cen;
+    cenTree->pt_sv = pt_sv_cen;
+    cenTree->eta_sv = eta_sv_cen;
+    cenTree->phi_sv = phi_sv_cen;
+    cenTree->met_sv = met_sv_cen;
+    cenTree->mt_sv = mt_sv_cen;
 
     float mtTOT =2*lep1_scaled.Pt()*metLV.Pt()*(1-cos(cenTree->phi_1 - metLV.Phi()));
     mtTOT += 2*lep2_scaled.Pt()*metLV.Pt()*(1-cos(cenTree->phi_2 - metLV.Phi())); 
@@ -218,7 +218,7 @@ protected:
 
     // add flag for svfit
     if (useSVFit) {
-      if(ch != UNKNOWN && cenTree->njetspt20>0){
+      if(ch != UNKNOWN){
 	std::shared_ptr<SVfitStandaloneAlgorithm> algo = calc::svFit(lep1_scaled, cenTree->tau_decay_mode_1, 
 								     lep2_scaled, cenTree->tau_decay_mode_2, 
 								     metLV, covMET, 
@@ -300,7 +300,7 @@ public:
   
   MuonScaleSys(Synch17Tree* c){
     cenTree = c;
-    label = "CMS_scale_m_13TeV";
+    label = "CMS_scale_mu_13TeV";
     
     this->Init(cenTree);
   };
@@ -312,11 +312,21 @@ protected:
     const int pt_bins = 1;
     double pt_edges[pt_bins + 1] = {0., 14001.};
 
-    const int eta_bins = 1;
-    double eta_edges[eta_bins + 1] = {0., 2.5};
+    const int eta_bins = 3;
+    double eta_edges[eta_bins + 1] = {0., 1.2, 2.1,  2.4};
 
     sf_up = new TH2D(label+"_sf_up", label+"_sf_up", pt_bins, pt_edges, eta_bins, eta_edges);
     sf_down = new TH2D(label+"_sf_down", label+"_sf_down", pt_bins, pt_edges, eta_bins, eta_edges);
+
+    sf_up->SetBinContent(sf_up->FindBin(100.,0.9),0.004);
+    sf_down->SetBinContent(sf_down->FindBin(100.,0.9),0.004);
+
+    sf_up->SetBinContent(sf_up->FindBin(100.,1.5),0.009);
+    sf_down->SetBinContent(sf_down->FindBin(100.,1.5),0.009);
+
+    sf_up->SetBinContent(sf_up->FindBin(100.,2.2),0.017);
+    sf_down->SetBinContent(sf_down->FindBin(100.,2.2),0.017);
+
   };  
 
   virtual void ScaleUp(utils::channel ch){
@@ -675,7 +685,7 @@ public:
   
   TauOneProngScaleSys(Synch17Tree* c){
     cenTree = c;
-    label = "CMS_shape_t_1prong_13TeV";
+    label = "CMS_scale_t_1prong_13TeV";
     
     this->Init(cenTree);
   };
@@ -785,7 +795,7 @@ public:
   
   TauOneProngOnePi0ScaleSys(Synch17Tree* c){
     cenTree = c;
-    label = "CMS_shape_t_1prong1pi0_13TeV";
+    label = "CMS_scale_t_1prong1pizero_13TeV";
     
     this->Init(cenTree);
   };
@@ -896,7 +906,7 @@ public:
   
   TauThreeProngScaleSys(Synch17Tree* c){
     cenTree = c;
-    label = "CMS_shape_t_3prong_13TeV";
+    label = "CMS_scale_t_3prong_13TeV";
     
     this->Init(cenTree);
   };

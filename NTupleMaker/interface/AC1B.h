@@ -182,6 +182,10 @@ public :
    Bool_t          pfjet_pu_jet_fullId_medium[200];   //[pfjet_count]
    Bool_t          pfjet_pu_jet_fullId_tight[200];   //[pfjet_count]
    Float_t         pfjet_pu_jet_fullDisc_mva[200];   //[pfjet_count]
+   Int_t           pfjet_genJet[200]; // [pfjet_count]
+   Float_t         pfjet_JER_Central[200]; // [pfjet_count]
+   Float_t         pfjet_JER_Up[200];  // [pfjet_count]
+   Float_t         pfjet_JER_Down[200]; // [pfjet_count]
    UInt_t          electron_count;
    Float_t         electron_px[100];   //[electron_count]
    Float_t         electron_py[100];   //[electron_count]

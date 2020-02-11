@@ -241,6 +241,7 @@
  <use name="DesyTauAnalyses/NTupleMaker"/>
  <use name="HTT-utilities/LepEffInterface"/>
  <use name="HiggsCPinTauDecays/IpCorrection"/>
+ <use name="HiggsCPinTauDecays/ImpactParameter"/>
 </bin>
 
 

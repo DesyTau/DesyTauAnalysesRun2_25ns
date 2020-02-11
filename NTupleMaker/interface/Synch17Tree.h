@@ -66,7 +66,9 @@ public :
   Float_t         ipy_uncorr_1;
   Float_t         ipz_uncorr_1;
   Float_t         ipxy_1;
-  Double_t         IP_signif_PV_with_BS_1;
+  Double_t        IP_signif_PV_with_BS_1;
+  Double_t        IP_signif_RefitV_with_BS_1;
+  Double_t        IP_signif_RefitV_with_BS_uncorr_1;
   Float_t         ipn_1;
   Float_t         drip_1;
   Float_t         detaip_1;
@@ -118,6 +120,8 @@ public :
   Float_t         ipz_uncorr_2;
   Float_t         ipxy_2;
   Double_t        IP_signif_PV_with_BS_2;
+  Double_t        IP_signif_RefitV_with_BS_2;
+  Double_t        IP_signif_RefitV_with_BS_uncorr_2;
   Float_t         ipn_2;
   Float_t         drip_2;
   Float_t         detaip_2;
@@ -577,6 +581,8 @@ public :
   TBranch	 *b_ipz_uncorr_1;
   TBranch	 *b_ipxy_1;
   TBranch	 *b_IP_signif_PV_with_BS_1;
+  TBranch	 *b_IP_signif_RefitV_with_BS_1;
+  TBranch	 *b_IP_signif_RefitV_with_BS_uncorr_1;
   TBranch	 *b_ipn_1;
   TBranch	 *b_drip_1;
   TBranch	 *b_detaip_1;
@@ -627,6 +633,8 @@ public :
   TBranch	 *b_ipz_uncorr_2;
   TBranch	 *b_ipxy_2;
   TBranch	 *b_IP_signif_PV_with_BS_2;
+  TBranch	 *b_IP_signif_RefitV_with_BS_2;
+  TBranch	 *b_IP_signif_RefitV_with_BS_uncorr_2;
   TBranch	 *b_ipn_2;
   TBranch	 *b_drip_2;
   TBranch	 *b_detaip_2;

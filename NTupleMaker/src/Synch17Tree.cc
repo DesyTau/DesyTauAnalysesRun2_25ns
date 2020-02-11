@@ -91,6 +91,8 @@ void Synch17Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("ipy_uncorr_1", &ipy_uncorr_1, &b_ipy_uncorr_1);
    fChain->SetBranchAddress("ipz_uncorr_1", &ipz_uncorr_1, &b_ipz_uncorr_1);
    fChain->SetBranchAddress("IP_signif_PV_with_BS_1", &IP_signif_PV_with_BS_1, &b_IP_signif_PV_with_BS_1);
+   fChain->SetBranchAddress("IP_signif_RefitV_with_BS_1", &IP_signif_RefitV_with_BS_1, &b_IP_signif_RefitV_with_BS_1);
+   fChain->SetBranchAddress("IP_signif_RefitV_with_BS_uncorr_1", &IP_signif_RefitV_with_BS_uncorr_1, &b_IP_signif_RefitV_with_BS_uncorr_1);
    // fChain->SetBranchAddress("ipxy_1", &ipxy_1, &b_ipxy_1);
    //   fChain->SetBranchAddress("ipn_1", &ipn_1, &b_ipn_1);
    //   fChain->SetBranchAddress("drip_1", &drip_1, &b_drip_1);
@@ -144,6 +146,8 @@ void Synch17Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("ipy_uncorr_2", &ipy_uncorr_2, &b_ipy_uncorr_2);
    fChain->SetBranchAddress("ipz_uncorr_2", &ipz_uncorr_2, &b_ipz_uncorr_2);
    fChain->SetBranchAddress("IP_signif_PV_with_BS_2", &IP_signif_PV_with_BS_2, &b_IP_signif_PV_with_BS_2);
+   fChain->SetBranchAddress("IP_signif_RefitV_with_BS_2", &IP_signif_RefitV_with_BS_2, &b_IP_signif_RefitV_with_BS_2);
+   fChain->SetBranchAddress("IP_signif_RefitV_with_BS_uncorr_2", &IP_signif_RefitV_with_BS_uncorr_2, &b_IP_signif_RefitV_with_BS_uncorr_2);
    //   fChain->SetBranchAddress("ipxy_2", &ipxy_2, &b_ipxy_2);
    //   fChain->SetBranchAddress("ipn_2", &ipn_2, &b_ipn_2);
    //   fChain->SetBranchAddress("drip_2", &drip_2, &b_drip_2);
@@ -648,6 +652,8 @@ void Synch17Tree::WriteInit(TTree *tree) {
    fChain->Branch("ipy_uncorr_1", &ipy_uncorr_1, "ipy_uncorr_1/F");
    fChain->Branch("ipz_uncorr_1", &ipz_uncorr_1, "ipz_uncorr_1/F");
    fChain->Branch("IP_signif_PV_with_BS_1", &IP_signif_PV_with_BS_1, "IP_signif_PV_with_BS_1/D");
+   fChain->Branch("IP_signif_RefitV_with_BS_1", &IP_signif_RefitV_with_BS_1, "IP_signif_RefitV_with_BS_1/D");
+   fChain->Branch("IP_signif_RefitV_with_BS_uncorr_1", &IP_signif_RefitV_with_BS_uncorr_1, "IP_signif_RefitV_with_BS_uncorr_1/D");
    //   fChain->Branch("ipxy_1", &ipxy_1, "ipxy_1/F");
    //  fChain->Branch("ipn_1", &ipn_1, "ipn_1/F");
    //  fChain->Branch("drip_1", &drip_1, "drip_1/F");
@@ -698,6 +704,8 @@ void Synch17Tree::WriteInit(TTree *tree) {
    fChain->Branch("ipy_uncorr_2", &ipy_uncorr_2, "ipy_uncorr_2/F");
    fChain->Branch("ipz_uncorr_2", &ipz_uncorr_2, "ipz_uncorr_2/F");
    fChain->Branch("IP_signif_PV_with_BS_2", &IP_signif_PV_with_BS_2, "IP_signif_PV_with_BS_2/D");
+   fChain->Branch("IP_signif_RefitV_with_BS_2", &IP_signif_RefitV_with_BS_2, "IP_signif_RefitV_with_BS_2/D");
+   fChain->Branch("IP_signif_RefitV_with_BS_uncorr_2", &IP_signif_RefitV_with_BS_uncorr_2, "IP_signif_RefitV_with_BS_uncorr_2/D");
    //   fChain->Branch("ipxy_2", &ipxy_2, "ipxy_2/F");
    //   fChain->Branch("ipn_2", &ipn_2, "ipn_2/F");
    //   fChain->Branch("drip_2", &drip_2, "drip_2/F");
