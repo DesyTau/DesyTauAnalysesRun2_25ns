@@ -158,6 +158,7 @@ int main(int argc, char * argv[]){
   const bool ApplyLepSF       = cfg.get<bool>("ApplyLepSF"); 
   const bool ApplyTrigger     = cfg.get<bool>("ApplyTrigger"); 
   const bool ApplySVFit       = cfg.get<bool>("ApplySVFit");
+  const bool ApplyFastMTT     = cfg.get<bool>("ApplyFastMTT");
   const bool ApplyBTagScaling = cfg.get<bool>("ApplyBTagScaling");
   const bool ApplySystShift   = cfg.get<bool>("ApplySystShift");
   const bool ApplyMetFilters  = cfg.get<bool>("ApplyMetFilters");
@@ -1130,6 +1131,7 @@ int main(int argc, char * argv[]){
       FillTau(&analysisTree, otree, leptonIndex, tauIndex);
 
       // initialize JER (including data and embedded) 
+      otree->apply_recoil = ApplyRecoilCorrections;
       jets::initializeJER(&analysisTree);
 
       if (!isData && !isEmbedded) { // JER smearing
@@ -1506,13 +1508,6 @@ int main(int argc, char * argv[]){
       otree->puppipzetamiss = otree->puppimet*TMath::Cos(otree->puppimetphi)*zetaX + otree->puppimet*TMath::Sin(otree->puppimetphi)*zetaY;
       counter[14]++;
     
-      // svfit variables
-      otree->m_sv   = -10;
-      otree->pt_sv  = -10;
-      otree->eta_sv = -10;
-      otree->phi_sv = -10;
-      otree->met_sv = -10;
-      otree->mt_sv = -10;
       bool isSRevent = true; //boolean used to compute SVFit variables only on SR events, it is set to true when running Synchronization to run SVFit on all events
       if(!Synch){
 	isSRevent = (otree->dilepton_veto<0.5 &&  otree->extramuon_veto<0.5 && otree->extraelec_veto<0.5 && (otree->trg_singlemuon>0.5 || otree->trg_mutaucross>0.5) && otree->pt_1>19 && otree->pt_2>19 && otree->byVVVLooseDeepTau2017v2p1VSjet_2>0.5);
@@ -1527,87 +1522,60 @@ int main(int argc, char * argv[]){
 	cout << "========================================" << endl;
 	cout << "                                        " << endl;
 	}
-      */
-      if (!isSRevent) continue;
-
-      /*
-      if (otree->byMediumDeepTau2017v2p1VSjet_2<0.5){
-		
+	if (otree->byMediumDeepTau2017v2p1VSjet_2<0.5){
+	
 	auto args = std::vector<double>{otree->pt_2,
-					static_cast<double>(otree->tau_decay_mode_2),
-					static_cast<double>(otree->njets),
-					otree->pt_1,
-					static_cast<double>(otree->os),
-					otree->puppimet,
-					otree->puppimt_1,
-					otree->iso_1,
-					static_cast<double>(otree->trg_singlemuon),
-					otree->m_vis};
+	static_cast<double>(otree->tau_decay_mode_2),
+	static_cast<double>(otree->njets),
+	otree->pt_1,
+	static_cast<double>(otree->os),
+	otree->puppimet,
+	otree->puppimt_1,
+	otree->iso_1,
+	static_cast<double>(otree->trg_singlemuon),
+	otree->m_vis};
 	otree->ff_nom = fns_["ff_mt_medium_dmbins"]->eval(args.data());
 	
 	auto args_mva = std::vector<double>{otree->pt_2,
-					    otree->dmMVA_2,
-					    static_cast<double>(otree->njets),
-					    otree->pt_1,
-					    static_cast<double>(otree->os),
-					    otree->puppimet,
-					    otree->puppimt_1,
-					    otree->iso_1,
-					    static_cast<double>(otree->trg_singlemuon),
-					    otree->m_vis};
+	otree->dmMVA_2,
+	static_cast<double>(otree->njets),
+	otree->pt_1,
+	static_cast<double>(otree->os),
+	otree->puppimet,
+	otree->puppimt_1,
+	otree->iso_1,
+	static_cast<double>(otree->trg_singlemuon),
+	otree->m_vis};
 	otree->ff_mva = fns_["ff_mt_medium_mvadmbins"]->eval(args_mva.data());
 	
 	//		cout << "ff_nom : " << ff_nom << "   ff_mva : " << ff_mva << endl;
 	
-      }else { 
+	}else { 
 	otree->ff_nom = 1.;
 	otree->ff_mva = 1.;
-      }
-      otree->ff_nom_sys = 0.15;
-      otree->ff_mva_sys = 0.15;
+	}
+	otree->ff_nom_sys = 0.15;
+	otree->ff_mva_sys = 0.15;
       */
-      otree->apply_recoil = ApplyRecoilCorrections;
+
+      // initialize svfit and fastMTT variables
+      otree->m_sv   = -10;
+      otree->pt_sv  = -10;
+      otree->eta_sv = -10;
+      otree->phi_sv = -10;
+      otree->met_sv = -10;
+      otree->mt_sv = -10;
+      otree->m_fast = -10;
+      otree->mt_fast = -10;
+      otree->pt_fast = -10;
+      otree->phi_fast = -10;
+      otree->eta_fast = -10;
       if (!isSRevent && ApplySystShift) continue;
-      if (ApplySVFit && isSRevent) svfit_variables(ch, &analysisTree, otree, &cfg, inputFile_visPtResolution);
-        
-      // evaluate systematics for MC 
-      if( !isData && !isEmbedded && ApplySystShift){
-	for(unsigned int i = 0; i < jetEnergyScaleSys.size(); i++) {
-	  //	  cout << endl;
-	  //	  cout << "+++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
-	  //	  cout << endl;	  
-	  (jetEnergyScaleSys.at(i))->Eval(); 
-	  //	  cout << endl;
-	  //	  cout << "++++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl; 
-	  //	  cout << endl;
-	}
-	if (usePuppiMET) {
-	  for(unsigned int i = 0; i < puppiMetSys.size(); ++i)
-	    (puppiMetSys.at(i))->Eval();
-	}
-	else {
-	  for(unsigned int i = 0; i < metSys.size(); ++i) 
-	    (metSys.at(i))->Eval();
-	}
-      }
-      if ((!isData||isEmbedded) && ApplySystShift) {
-	if (ch == "mt") { 
-	  muonScaleSys->Eval(utils::MUTAU);
-	  tauOneProngScaleSys->Eval(utils::MUTAU);
-	  tauOneProngOnePi0ScaleSys->Eval(utils::MUTAU);
-	  tauThreeProngScaleSys->Eval(utils::MUTAU);
-	}
-	else if (ch == "et") { 
-	  tauOneProngScaleSys->Eval(utils::ETAU);
-	  tauOneProngOnePi0ScaleSys->Eval(utils::ETAU);
-	  tauThreeProngScaleSys->Eval(utils::ETAU);
-	}
-      }
-      
-      counter[19]++;  
+      if ( (ApplySVFit||ApplyFastMTT) && isSRevent ) svfit_variables(ch, &analysisTree, otree, &cfg, inputFile_visPtResolution);
 
-      // IPSignificance calibration ->
-
+      // ***********************************
+      // ** IPSignificance calibration ->
+      // ***********************************
       otree->v_tracks = 0;
       std::vector<float> PV_covariance; PV_covariance.clear();
       // by default store non-refitted PV with BS constraint if refitted one is not found
@@ -1745,11 +1713,47 @@ int main(int argc, char * argv[]){
 		<< "  -> " << otree->IP_signif_PV_with_BS_2 << std::endl;
       std::cout << std::endl;
       */
+        
+      // evaluate systematics for MC 
+      if( !isData && !isEmbedded && ApplySystShift){
+	for(unsigned int i = 0; i < jetEnergyScaleSys.size(); i++) {
+	  //	  cout << endl;
+	  //	  cout << "+++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
+	  //	  cout << endl;	  
+	  (jetEnergyScaleSys.at(i))->Eval(); 
+	  //	  cout << endl;
+	  //	  cout << "++++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl; 
+	  //	  cout << endl;
+	}
+	if (usePuppiMET) {
+	  for(unsigned int i = 0; i < puppiMetSys.size(); ++i)
+	    (puppiMetSys.at(i))->Eval();
+	}
+	else {
+	  for(unsigned int i = 0; i < metSys.size(); ++i) 
+	    (metSys.at(i))->Eval();
+	}
+      }
+      if ((!isData||isEmbedded) && ApplySystShift) {
+	if (ch == "mt") { 
+	  muonScaleSys->Eval(utils::MUTAU);
+	  tauOneProngScaleSys->Eval(utils::MUTAU);
+	  tauOneProngOnePi0ScaleSys->Eval(utils::MUTAU);
+	  tauThreeProngScaleSys->Eval(utils::MUTAU);
+	}
+	else if (ch == "et") { 
+	  tauOneProngScaleSys->Eval(utils::ETAU);
+	  tauOneProngOnePi0ScaleSys->Eval(utils::ETAU);
+	  tauThreeProngScaleSys->Eval(utils::ETAU);
+	}
+      }
+      
+      counter[19]++;  
+
       selEvents++;
       
       
       //      cout << "Once again puppimet central : " << otree->puppimet << endl;
-
       //Merijn 2019 1 10: perhaps this should be called before moving to next event..
       otree->Fill();
     } // event loop
@@ -1761,8 +1765,10 @@ int main(int argc, char * argv[]){
     delete file_;
   } // file loop
    
-  std::cout << "COUNTERS" << std::endl;
-  for(int iC = 0; iC < 20; iC++) std::cout << "Counter " << iC << ":    " << counter[iC] << std::endl;
+  //
+  //  std::cout << "COUNTERS" << std::endl;
+  //  for(int iC = 0; iC < 20; iC++) std::cout << "Counter " << iC << ":    " << counter[iC] << std::endl;
+  //
   std::cout << std::endl;
   std::cout << "Total number of input events    = " << int(inputEventsH->GetEntries()) << std::endl;
   std::cout << "Total number of events in Tree  = " << nEvents << std::endl;
@@ -1917,7 +1923,6 @@ float getEmbeddedWeight(const AC1B *analysisTree, RooWorkspace * wEm) {
   return emWeight;
 
 }
-
 
 void initializeGenTree(Synch17GenTree *gentree){
   gentree->Higgs_pt=-9999;
@@ -2238,6 +2243,7 @@ void FillTau(const AC1B *analysisTree, Synch17Tree *otree, int leptonIndex, int 
   otree->tau_decay_mode_2 = analysisTree->tau_decayMode[tauIndex];
   otree->dm_2 = analysisTree->tau_decayMode[tauIndex];
   otree->dmMVA_2 = analysisTree->tau_MVADM2017v1[tauIndex];
+  otree->DM = analysisTree->tau_decayModeFinding[tauIndex];
 
   std::vector<float> PV_with_BS_cov_components = {};
   for(auto i:  analysisTree->primvertexwithbs_cov) PV_with_BS_cov_components.push_back(i);	

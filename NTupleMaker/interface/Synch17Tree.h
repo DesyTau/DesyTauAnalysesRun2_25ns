@@ -100,6 +100,7 @@ public :
   Float_t         chconst_2_eta;
   Float_t         chconst_2_phi;     
   Float_t         m_2;
+  Float_t         DM;
   Int_t           gen_match_2; 
   Int_t           q_2;
   Float_t         iso_2;
