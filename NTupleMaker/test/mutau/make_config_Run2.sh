@@ -50,6 +50,12 @@ else
     NOT_DATA_TYPE=("data" "embedded")
   else 
     if [[ $DATA_TYPE == "embedded" ]]; then 
+      KEY_LIST+=(TauEnergyScaleShift_OneProng TauEnergyScaleShift_OneProngOnePi0 TauEnergyScaleShift_ThreeProng)
+      VALUE_LIST_EMBEDDED+=(0.0 0.0 0.0)
+      
+      KEY_LIST+=(TauEnergyScaleShift_OneProng_Error TauEnergyScaleShift_OneProngOnePi0_Error TauEnergyScaleShift_ThreeProng_Error)
+      VALUE_LIST_EMBEDDED+=(0.015 0.015 0.015) 
+      
       VALUE_LIST=("${VALUE_LIST_EMBEDDED[@]}")
       NOT_DATA_TYPE=("MC" "data")
     else
