@@ -76,6 +76,10 @@ class PuppiMETSys : public METSys {
 			  obs.metx,
 			  obs.mety);
       uncertaintyFound = true;
+      
+      //      if(label.Contains("boson_scale"))
+      //	cout << "MET central = " << cenTree->puppimet << "   down = " << TMath::Sqrt(obs.metx*obs.metx+obs.mety*obs.mety) << std::endl;
+
     }
     else {
       std::cout << "Systematic uncertainty " << label << std::endl;
@@ -135,6 +139,8 @@ class PuppiMETSys : public METSys {
 			  MEtSys::SysShift::Up,
 			  obs.metx,
 			  obs.mety);
+      //      if (label.Contains("boson_scale"))
+      //	cout << "MET central = " << cenTree->puppimet << "   up = " << TMath::Sqrt(obs.metx*obs.metx+obs.mety*obs.mety) << std::endl;
       uncertaintyFound = true;
     }
     else {
