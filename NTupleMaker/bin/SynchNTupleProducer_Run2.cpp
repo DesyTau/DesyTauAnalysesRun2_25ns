@@ -521,6 +521,7 @@ int main(int argc, char * argv[]){
 
     muonScaleSys = new MuonScaleSys(otree);
     muonScaleSys->SetUseSVFit(ApplySVFit);
+    muonScaleSys->SetUseFastMTT(ApplyFastMTT);
     muonScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);
     muonScaleSys->SetUsePuppiMET(usePuppiMET);
 
@@ -528,18 +529,21 @@ int main(int argc, char * argv[]){
     tauOneProngScaleSys->SetScale(shift_tes_1prong,shift_tes_1prong_e);
     tauOneProngScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);
     tauOneProngScaleSys->SetUseSVFit(ApplySVFit);
+    tauOneProngScaleSys->SetUseFastMTT(ApplyFastMTT);
     tauOneProngScaleSys->SetUsePuppiMET(usePuppiMET);
 
     tauOneProngOnePi0ScaleSys = new TauOneProngOnePi0ScaleSys(otree);
     tauOneProngOnePi0ScaleSys->SetScale(shift_tes_1p1p0,shift_tes_1p1p0_e);
     tauOneProngOnePi0ScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);
     tauOneProngOnePi0ScaleSys->SetUseSVFit(ApplySVFit);
+    tauOneProngOnePi0ScaleSys->SetUseFastMTT(ApplyFastMTT);
     tauOneProngOnePi0ScaleSys->SetUsePuppiMET(usePuppiMET);
 
     tauThreeProngScaleSys = new TauThreeProngScaleSys(otree);
     tauThreeProngScaleSys->SetScale(shift_tes_3prong,shift_tes_3prong_e);
     tauThreeProngScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);
     tauThreeProngScaleSys->SetUseSVFit(ApplySVFit);
+    tauThreeProngScaleSys->SetUseFastMTT(ApplyFastMTT);
     tauThreeProngScaleSys->SetUsePuppiMET(usePuppiMET);
 
     // systematics only for MC
@@ -633,10 +637,10 @@ int main(int argc, char * argv[]){
     double * TSweight = new double[expectedtauspinnerweights];
     TTree  * _treeTauSpinnerWeights = NULL;
     
-    if(applyTauSpinnerWeights&&era==2017){ 
-      _treeTauSpinnerWeights = (TTree*)file_->Get(TString(TauSpinnerWeightTreeName));
-      _treeTauSpinnerWeights->SetBranchAddress("TauSpinnerWeights",TSweight);		
-    }  
+    //    if(applyTauSpinnerWeights&&era==2017){ 
+    //      _treeTauSpinnerWeights = (TTree*)file_->Get(TString(TauSpinnerWeightTreeName));
+    //      _treeTauSpinnerWeights->SetBranchAddress("TauSpinnerWeights",TSweight);		
+    //    }  
     
 
     TTree * _inittree = NULL;
@@ -732,29 +736,6 @@ int main(int argc, char * argv[]){
       	gentree->mix0p375_htt125 = TSweight[4];
       	gentreeForGoodRecoEvtsOnly->mix0p375_htt125 = TSweight[4];
       
-      }
-      else if(era==2017){
-        _treeTauSpinnerWeights->GetEntry(iEntry);
-
-	otree->TauSpinnerWeightsEven = TSweight[0];
-      	gentree->sm_htt125 = TSweight[0];
-      	gentreeForGoodRecoEvtsOnly->sm_htt125 = TSweight[0];
-
-      	otree->TauSpinnerWeightsMaxMix = TSweight[1];
-      	gentree->mm_htt125 = TSweight[1];
-      	gentreeForGoodRecoEvtsOnly->mm_htt125 = TSweight[1];
-
-      	otree->TauSpinnerWeightsOdd = TSweight[2];
-      	gentree->ps_htt125 = TSweight[2];
-      	gentreeForGoodRecoEvtsOnly->ps_htt125 = TSweight[2];
-
-      	otree->TauSpinnerWeightsMinusMaxMix = TSweight[3];
-      	gentree->minusmm_htt125 = TSweight[3];
-      	gentreeForGoodRecoEvtsOnly->minusmm_htt125 = TSweight[3];
-
-      	otree->TauSpinnerWeightsMix0p375 = TSweight[4];
-      	gentree->mix0p375_htt125 = TSweight[4];
-      	gentreeForGoodRecoEvtsOnly->mix0p375_htt125 = TSweight[4];
       }
       else{
 	otree->TauSpinnerWeightsEven = analysisTree.TauSpinnerWeight[0];

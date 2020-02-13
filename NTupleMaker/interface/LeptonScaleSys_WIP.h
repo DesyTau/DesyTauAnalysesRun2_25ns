@@ -231,8 +231,9 @@ protected:
     mtTOT += 2*lep1_scaled.Pt()*lep2_scaled.Pt()*(1-cos(cenTree->phi_1-cenTree->phi_2)); 
     cenTree->mt_tot = TMath::Sqrt(mtTOT);
     
+
     // add flag for svfit
-    if(ch != UNKNOWN){
+    if(ch != UNKNOWN && (useSVFit || useFastMTT)){
 
       std::vector<classic_svFit::MeasuredTauLepton> measuredTauLeptons;
       classic_svFit::MeasuredTauLepton::kDecayType type_ = classic_svFit::MeasuredTauLepton::kUndefinedDecayType;
@@ -241,6 +242,7 @@ protected:
       if (ch == ETAU)   type_ = classic_svFit::MeasuredTauLepton::kTauToElecDecay;
       if (ch == TAUTAU) type_ = classic_svFit::MeasuredTauLepton::kTauToHadDecay;
       // define lepton four vectors                                                                                                             
+
       measuredTauLeptons.push_back(classic_svFit::MeasuredTauLepton(type_,
 								    lep1_scaled.Pt(),
 								    lep1_scaled.Eta(),
@@ -272,6 +274,7 @@ protected:
       
       }
       if (useFastMTT) {
+
 	// FasMTT
 	LorentzVector tau1P4;
 	LorentzVector tau2P4;
