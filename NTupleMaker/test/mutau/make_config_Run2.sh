@@ -82,16 +82,9 @@ sed -i "s/${DATA_TYPE}: //" ${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf
 # lists with the MC samples' names
 MC_SAMPLES_LIST=(DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8 DY1JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8 DY2JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8)
 MC_SAMPLES_LIST+=(DY3JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8 DY4JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8)
-
-MC_SAMPLES_LIST+=(ST_t-channel_antitop_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8 ST_t-channel_top_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8)
-MC_SAMPLES_LIST+=(ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8 ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8)
-
-MC_SAMPLES_LIST+=(WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8 W1JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8 W2JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8)
 MC_SAMPLES_LIST+=(W3JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8 W4JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8)
-
 MC_SAMPLES_LIST+=(TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8 TTToHadronic_TuneCP5_PSweights_13TeV-powheg-pythia8 TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powheg-pythia8)
 MC_SAMPLES_LIST+=(WW_TuneCP5_13TeV-pythia8 WZ_TuneCP5_13TeV-pythia8 ZZ_TuneCP5_13TeV-pythia8)
-MC_SAMPLES_LIST+=(GluGluHToTauTau_M125_13TeV_powheg_pythia8 VBFHToTauTau_M125)
 MC_SAMPLES_LEN=${#MC_SAMPLES_LIST[@]}
 
 if [[ $DATA_TYPE == "MC" ]]; then
@@ -100,10 +93,8 @@ if [[ $DATA_TYPE == "MC" ]]; then
         PU_STR=${MC_SAMPLES_LIST[i]}_pileup
         sed "s/pileUpforMC =/pileUpforMC = ${PU_STR}/" ${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf > $OUTDIR/analysisMacroSynch_mt_${MC_SAMPLES_LIST[i]}.conf
     done
-    sed 's/pileUpforMC =/pileUpforMC = GluGluHToTauTau_M125_13TeV_powheg_pythia8_pileup/' ${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf > $OUTDIR/analysisMacroSynch_mt_SUSYGluGluToHToTauTau_M-120_TuneCP5_13TeV-pythia8.conf
-  else # path in the root file to PU histograms for 16 and 18 data; 
-    sed "s/pileUpforMC =/pileUpforMC = pileup/" ${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf > $OUTDIR/${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf
-  fi
+  fi # path in the root file to PU histograms for 16 and 18 data; 
+  sed "s/pileUpforMC =/pileUpforMC = pileup/" ${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf > $OUTDIR/${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf
 else
   cp  ${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf $OUTDIR/${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf
 fi
