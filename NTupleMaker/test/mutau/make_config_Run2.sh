@@ -54,7 +54,7 @@ else
       VALUE_LIST_EMBEDDED+=(0.0 0.0 0.0)
 
       KEY_LIST+=(TauEnergyScaleShift_LepFake_OneProng TauEnergyScaleShift_LepFake_OneProngOnePi0 TauEnergyScaleShift_LepFake_ThreeProng)
-      VALUE_LIST_DATA+=(0.0 0.0 0.0)
+      VALUE_LIST_EMBEDDED+=(0.0 0.0 0.0)
      
       KEY_LIST+=(TauEnergyScaleShift_OneProng_Error TauEnergyScaleShift_OneProngOnePi0_Error TauEnergyScaleShift_ThreeProng_Error)
       VALUE_LIST_EMBEDDED+=(0.015 0.015 0.015) 
