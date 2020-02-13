@@ -59,6 +59,48 @@ float topPtWeight(float pt1,
 
 }
 
+float getEmbeddedWeight(const AC1B *analysisTree, RooWorkspace * wEm) {
+
+  std::vector<TLorentzVector> taus; taus.clear();
+  float emWeight = 1;
+  for (unsigned int igen = 0; igen < analysisTree->genparticles_count; ++igen) {
+    if (TMath::Abs(analysisTree->genparticles_pdgid[igen])==13&&analysisTree->genparticles_isPrompt[igen]&&analysisTree->genparticles_status[igen]==1) {
+    TLorentzVector tauLV; tauLV.SetXYZT(analysisTree->genparticles_px[igen], 
+					analysisTree->genparticles_py[igen],
+					analysisTree->genparticles_pz[igen],
+					analysisTree->genparticles_e[igen]);
+      taus.push_back(tauLV);
+      //      cout << analysisTree->genparticles_pdgid[igen] << endl;
+    }
+  }
+
+  //  cout << "Taus : " << taus.size() << std::endl;
+  //  cout << endl;
+
+  if (taus.size() == 2) {
+    double gt1_pt  = taus[0].Pt();
+    double gt1_eta = taus[0].Eta();
+    double gt2_pt  = taus[1].Pt();
+    double gt2_eta = taus[1].Eta();
+    wEm->var("gt_pt")->setVal(gt1_pt);
+    wEm->var("gt_eta")->setVal(gt1_eta);
+    double id1_embed = wEm->function("m_sel_id_ic_ratio")->getVal();
+    wEm->var("gt_pt")->setVal(gt2_pt);
+    wEm->var("gt_eta")->setVal(gt2_eta);
+    double id2_embed = wEm->function("m_sel_id_ic_ratio")->getVal();
+    wEm->var("gt1_pt")->setVal(gt1_pt);
+    wEm->var("gt2_pt")->setVal(gt2_pt);
+    wEm->var("gt1_eta")->setVal(gt1_eta);
+    wEm->var("gt2_eta")->setVal(gt2_eta);
+    double trg_emb = wEm->function("m_sel_trg_ratio")->getVal();
+    emWeight = id1_embed * id2_embed * trg_emb;
+  }
+
+  //  cout << "Embedding : " << emWeight << std::endl;
+  return emWeight;
+
+}
+
 TVector3 get_refitted_PV_with_BS(const AC1B * analysisTree, int leptonIndex1, int leptonIndex2, bool &is_refitted_PV_with_BS, std::vector<float> & PV_covariance){
 
 	float vtx_x = analysisTree->primvertexwithbs_x; // by default store non-refitted PV with BS constraint if refitted one is not found
@@ -237,6 +279,7 @@ int main(int argc, char * argv[]) {
   Config cfg(argv[1]);
 
   const bool isData = cfg.get<bool>("IsData");
+  const bool isEmbedded = cfg.get<bool>("IsEmbedded");
   const bool applyGoodRunSelection = cfg.get<bool>("ApplyGoodRunSelection");
 
   // pile up reweighting
@@ -539,9 +582,9 @@ int main(int argc, char * argv[]) {
     ipxSigEtaH[iEta] = new TH1D("ipxSig"+EtaBins[iEta],"",200,-10,10);
     ipySigEtaH[iEta] = new TH1D("ipySig"+EtaBins[iEta],"",200,-10,10);
     ipzSigEtaH[iEta] = new TH1D("ipzSig"+EtaBins[iEta],"",200,-10,10);
-    ipxErrEtaH[iEta] = new TH1D("ipxErr"+EtaBins[iEta],"",200,0,0.04);
-    ipyErrEtaH[iEta] = new TH1D("ipyErr"+EtaBins[iEta],"",200,0,0.04);
-    ipzErrEtaH[iEta] = new TH1D("ipzErr"+EtaBins[iEta],"",200,0,0.04);
+    ipxErrEtaH[iEta] = new TH1D("ipxErr"+EtaBins[iEta],"",1000,0,0.1);
+    ipyErrEtaH[iEta] = new TH1D("ipyErr"+EtaBins[iEta],"",1000,0,0.1);
+    ipzErrEtaH[iEta] = new TH1D("ipzErr"+EtaBins[iEta],"",1000,0,0.1);
   }
 
   TString JetBins[3] = {"Jet0","Jet1","JetGe2"};
@@ -914,7 +957,7 @@ int main(int argc, char * argv[]) {
 
       //------------------------------------------------
 
-      if (!isData) { 
+      if (!isData || isEmbedded) { 
 	float genweight = 1;
 	if (analysisTree.genweight<0)
 	  genweight = -1;
@@ -1665,7 +1708,7 @@ int main(int argc, char * argv[]) {
 	cout << endl;
 	*/	
 
-	if (!isData && applyLeptonSF) {
+	if ((!isData || isEmbedded) && applyLeptonSF) {
 
 	  //leptonSFweight = SF_yourScaleFactor->get_ScaleFactor(pt, eta)	
 	  double IdIsoSF_mu1 = SF_muonIdIso->get_ScaleFactor(ptMu1, etaMu1);
@@ -1681,15 +1724,26 @@ int main(int argc, char * argv[]) {
 	  correctionWS->var("m_eta")->setVal(etaMu1);
 	  correctionWS->var("m_pt")->setVal(ptMu1);
 	  double trackSF_mu1 = correctionWS->function("m_trk_ratio")->getVal();
-	  if (applyKITCorrection)
-	    IdIsoSF_mu1 = correctionWS->function("m_id_ratio")->getVal()*correctionWS->function("m_iso_ratio")->getVal();
-
+	  if (applyKITCorrection) {
+	    if (isEmbedded)
+	      IdIsoSF_mu1 = correctionWS->function("m_idiso_ic_embed_ratio")->getVal();
+	    else
+	      IdIsoSF_mu1 = correctionWS->function("m_idiso_ic_ratio")->getVal();
+	  }
 
 	  correctionWS->var("m_eta")->setVal(etaMu2);
           correctionWS->var("m_pt")->setVal(ptMu2);
 	  double trackSF_mu2 = correctionWS->function("m_trk_ratio")->getVal();
-	  if (applyKITCorrection)
-	    IdIsoSF_mu2 = correctionWS->function("m_id_ratio")->getVal()*correctionWS->function("m_iso_ratio")->getVal();
+	  if (applyKITCorrection) {
+	    if (isEmbedded)
+	      IdIsoSF_mu2 = correctionWS->function("m_idiso_ic_embed_ratio")->getVal();
+	    else
+	      IdIsoSF_mu2 = correctionWS->function("m_idiso_ic_ratio")->getVal();
+	  }
+
+	  //	  cout << " Mu1 : IdIso = " << IdIsoSF_mu1 << "  " << SF_muonIdIso->get_ScaleFactor(ptMu1, etaMu1) << endl;
+	  //	  cout << " Mu2 : IdIso = " << IdIsoSF_mu2 << "  " << SF_muonIdIso->get_ScaleFactor(ptMu2, etaMu2) << endl;
+	  
 
 	  MuSF_IdIso_Mu1H->Fill(IdIsoSF_mu1);
 	  MuSF_IdIso_Mu2H->Fill(IdIsoSF_mu2);
@@ -1726,6 +1780,8 @@ int main(int argc, char * argv[]) {
 	    weight = weight*weightTrig;
 	  }
 	}
+	if (isEmbedded)
+	  weight = weight*getEmbeddedWeight(&analysisTree,correctionWS);
 
 	float visiblePx = dimuon.Px();
 	float visiblePy = dimuon.Py();
@@ -1810,9 +1866,9 @@ int main(int argc, char * argv[]) {
 	  float dimuonPt  = dimuon.Pt();
 	  float dimuonPhi = dimuon.Phi();
 	  float sumMuonPt = (mu1.Pt()+mu2.Pt());
-	  float ptRatio = 0.0;
-	  if (sumMuonPt != 0)
-	    ptRatio = (dimuonPt/sumMuonPt);
+	  //	  float ptRatio = 0.0;
+	  //	  if (sumMuonPt != 0)
+	  //	    ptRatio = (dimuonPt/sumMuonPt);
 
 	  dimuonMassPtH->Fill(massSel,dimuonPt,weight);
 	  dimuonPtSelH->Fill(dimuon.Pt(),weight);
