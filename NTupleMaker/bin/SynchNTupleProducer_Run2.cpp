@@ -271,12 +271,12 @@ int main(int argc, char * argv[]){
 
 
   // MET Recoil Corrections
-  const bool isDY = infiles.find("DY") == infiles.rfind("/")+1;
-  const bool isWJets = (infiles.find("WJets") == infiles.rfind("/")+1) || (infiles.find("W1Jets") == infiles.rfind("/")+1) || (infiles.find("W2Jets") == infiles.rfind("/")+1) || (infiles.find("W3Jets") == infiles.rfind("/")+1) || (infiles.find("W4Jets") == infiles.rfind("/")+1) || (infiles.find("EWK") == infiles.rfind("/")+1);
-  const bool isVBForGGHiggs = (infiles.find("VBFHTo")== infiles.rfind("/")+1) || (infiles.find("GluGluHTo")== infiles.rfind("/")+1);
-  const bool isEWKZ =  infiles.find("EWKZ") == infiles.rfind("/")+1;
+  const bool isDY = infiles.find("DY") != string::npos;
+  const bool isWJets = (infiles.find("WJets") != string::npos) || (infiles.find("W1Jets") != string::npos) || (infiles.find("W2Jets") != string::npos) || (infiles.find("W3Jets") != string::npos) || (infiles.find("W4Jets") != string::npos) || (infiles.find("EWK") != string::npos);
+  const bool isVBForGGHiggs = (infiles.find("VBFHTo")!= string::npos) || (infiles.find("GluGluHTo")!= string::npos);
+  const bool isEWKZ =  infiles.find("EWKZ") != string::npos;
   const bool isMG = infiles.find("madgraph") != string::npos;
-  const bool isMSSMsignal =  (infiles.find("SUSYGluGluToHToTauTau")== infiles.rfind("/")+1) || (infiles.find("SUSYGluGluToBBHToTauTau")== infiles.rfind("/")+1);
+  const bool isMSSMsignal =  (infiles.find("SUSYGluGluToHToTauTau")!= string::npos) || (infiles.find("SUSYGluGluToBBHToTauTau")!= string::npos);
   const bool isTauSpinner = infiles.find("Uncorr") != string::npos;
   const bool isTTbar = infiles.find("TT") != string::npos;
 
