@@ -601,7 +601,7 @@
  <use name="HTT-utilities/LepEffInterface"/>
 </bin>
 
-<bin name="SynchNtupleProducer_AZh" file="SynchNtupleProducer_AZh.cpp">
+<bin name="SynchNtupleProducer_AZh_ee" file="SynchNtupleProducer_AZh_ee.cpp">
  <use name="PhysicsTools/Utilities"/>
  <use name="rootgraphics"/>
  <use name="root"/>
