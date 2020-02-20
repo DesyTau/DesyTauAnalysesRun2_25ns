@@ -706,10 +706,6 @@ int main(int argc, char * argv[]){
       analysisTree.GetEntry(iEntry);
       nEvents++;
     
-      if (!isData){
-      	FillGenTree(&analysisTree,gentree);
-      	gentree->Fill();
-      }
 
       //TO DO: fix tauspinner weight implementation after deprecated method is not in use for 2017
       if(!applyTauSpinnerWeights){
@@ -759,6 +755,11 @@ int main(int argc, char * argv[]){
 	  gentree->mix0p375_htt125 = analysisTree.TauSpinnerWeight[4];
 	  gentreeForGoodRecoEvtsOnly->mix0p375_htt125 = analysisTree.TauSpinnerWeight[4];
 	}
+      }
+
+      if (!isData){
+      	FillGenTree(&analysisTree,gentree);
+      	gentree->Fill();
       }
 
       //      std::cout << "OK!!!!!!!!" << std::endl;
@@ -1596,7 +1597,7 @@ int main(int argc, char * argv[]){
       TVector3 IP2;
       double ipsig2 = IP_significance_helix_tauh(&analysisTree,tauIndex,vertex,PV_covariance,ipCov2,IP2);
 
-      /*
+      /*      
       cout << "ipsig1 = " << ipsig1 << " ipsig2 = " << ipsig2 << endl;
 
      
@@ -1613,7 +1614,7 @@ int main(int argc, char * argv[]){
       cout << "       x = " << otree->ipx_uncorr_2 
 	   << "  y = " << otree->ipy_uncorr_2 
 	   << "  z = " << otree->ipz_uncorr_2 << std::endl;
-      */     
+      */   
 
       // Uncorrected values
 
@@ -1631,6 +1632,13 @@ int main(int argc, char * argv[]){
       TVector3 Ip1(otree->ipx_uncorr_1,otree->ipy_uncorr_1,otree->ipz_uncorr_1);
       otree->IP_signif_RefitV_with_BS_uncorr_1 = IP.CalculateIPSignificanceHelical(Ip1, ipCov1);
 
+      otree->ip_covxx_1 = ipCov1(0,0);
+      otree->ip_covxy_1 = ipCov1(0,1);
+      otree->ip_covxz_1 = ipCov1(0,2);
+      otree->ip_covyy_1 = ipCov1(1,1);
+      otree->ip_covyz_1 = ipCov1(1,2);
+      otree->ip_covzz_1 = ipCov1(2,2);
+
       TLorentzVector ip2; ip2.SetXYZM(otree->ipx_uncorr_2,otree->ipy_uncorr_2,otree->ipz_uncorr_2,0.);
       otree->ipxy_uncorr_2 = ip2.Pt();
       otree->ipn_uncorr_2 = ip2.P();
@@ -1645,6 +1653,13 @@ int main(int argc, char * argv[]){
       otree->dphiip_uncorr_2 = TMath::ACos(vectIP*vectP/(vectIP.Mag()*vectP.Mag()));
       TVector3 Ip2(otree->ipx_uncorr_2,otree->ipy_uncorr_2,otree->ipz_uncorr_2);
       otree->IP_signif_RefitV_with_BS_uncorr_2 = IP.CalculateIPSignificanceHelical(Ip2, ipCov2);
+
+      otree->ip_covxx_2 = ipCov2(0,0);
+      otree->ip_covxy_2 = ipCov2(0,1);
+      otree->ip_covxz_2 = ipCov2(0,2);
+      otree->ip_covyy_2 = ipCov2(1,1);
+      otree->ip_covyz_2 = ipCov2(1,2);
+      otree->ip_covzz_2 = ipCov2(2,2);
 
       // Corrected values 
 
@@ -1881,6 +1896,8 @@ float getEmbeddedWeight(const AC1B *analysisTree, RooWorkspace * wEm) {
     }
   }
 
+  //  std::cout << "n taus = " << taus.size() << "  :  wEm = " << wEm << std::endl;
+
   if (taus.size() == 2) {
     double gt1_pt  = taus[0].Pt();
     double gt1_eta = taus[0].Eta();
@@ -1896,7 +1913,7 @@ float getEmbeddedWeight(const AC1B *analysisTree, RooWorkspace * wEm) {
     wEm->var("gt2_pt")->setVal(gt2_pt);
     wEm->var("gt1_eta")->setVal(gt1_eta);
     wEm->var("gt2_eta")->setVal(gt2_eta);
-    double trg_emb = wEm->function("m_sel_trg_ratio")->getVal();
+    double trg_emb = wEm->function("m_sel_trg_ic_ratio")->getVal();
     emWeight = id1_embed * id2_embed * trg_emb;
   }
 
