@@ -275,6 +275,7 @@ public :
    Float_t         electron_mva_wp80_general_Spring16_v1[100];   //[electron_count]
    Float_t         electron_mva_value_Iso_Fall17_v1[100];   //[electron_count]
    Float_t         electron_mva_value_noIso_Fall17_v1[100];   //[electron_count]
+   Float_t         electron_mva_value_noIso_Fall17_v2[100];   //[electron_count]
    Float_t         electron_mva_wp90_Iso_Fall17_v1[100];   //[electron_count]
    Float_t         electron_mva_wp80_Iso_Fall17_v1[100];   //[electron_count]
    Float_t         electron_mva_Loose_Iso_Fall17_v1[100];   //[electron_count]
@@ -1082,6 +1083,7 @@ public :
    TBranch        *b_electron_mva_wp80_general_Spring16_v1;   //!
    TBranch        *b_electron_mva_value_Iso_Fall17_v1;   //!
    TBranch        *b_electron_mva_value_noIso_Fall17_v1;   //!
+   TBranch        *b_electron_mva_value_noIso_Fall17_v2;   //!
    TBranch        *b_electron_mva_wp90_Iso_Fall17_v1;   //!
    TBranch        *b_electron_mva_wp80_Iso_Fall17_v1;   //!
    TBranch        *b_electron_mva_Loose_Iso_Fall17_v1;   //!
@@ -1980,6 +1982,7 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("electron_mva_wp80_general_Spring16_v1", electron_mva_wp80_general_Spring16_v1, &b_electron_mva_wp80_general_Spring16_v1);
    fChain->SetBranchAddress("electron_mva_value_Iso_Fall17_v1", electron_mva_value_Iso_Fall17_v1, &b_electron_mva_value_Iso_Fall17_v1);
    fChain->SetBranchAddress("electron_mva_value_noIso_Fall17_v1", electron_mva_value_noIso_Fall17_v1, &b_electron_mva_value_noIso_Fall17_v1);
+   fChain->SetBranchAddress("electron_mva_value_noIso_Fall17_v2", electron_mva_value_noIso_Fall17_v2, &b_electron_mva_value_noIso_Fall17_v2);
    fChain->SetBranchAddress("electron_mva_wp90_Iso_Fall17_v1", electron_mva_wp90_Iso_Fall17_v1, &b_electron_mva_wp90_Iso_Fall17_v1);
    fChain->SetBranchAddress("electron_mva_wp80_Iso_Fall17_v1", electron_mva_wp80_Iso_Fall17_v1, &b_electron_mva_wp80_Iso_Fall17_v1);
    fChain->SetBranchAddress("electron_mva_Loose_Iso_Fall17_v1", electron_mva_Loose_Iso_Fall17_v1, &b_electron_mva_Loose_Iso_Fall17_v1);

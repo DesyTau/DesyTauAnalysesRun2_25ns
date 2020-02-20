@@ -102,8 +102,10 @@ if [[ $DATA_TYPE == "MC" ]]; then
         PU_STR=${MC_SAMPLES_LIST[i]}_pileup
         sed "s/pileUpforMC =/pileUpforMC = ${PU_STR}/" ${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf > $OUTDIR/analysisMacroSynch_mt_${MC_SAMPLES_LIST[i]}.conf
     done
+    sed "s/pileUpforMC =/pileUpforMC = MC_PU2017_pileup/" ${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf > $OUTDIR/${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf
+  else
+    sed "s/pileUpforMC =/pileUpforMC = pileup/" ${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf > $OUTDIR/${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf
   fi # path in the root file to PU histograms for 16 and 18 data; 
-  sed "s/pileUpforMC =/pileUpforMC = pileup/" ${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf > $OUTDIR/${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf
 else
   cp  ${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf $OUTDIR/${TEMPLATE_CFG_NAME}_${DATA_TYPE}.conf
 fi
