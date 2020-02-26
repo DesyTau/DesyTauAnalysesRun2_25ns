@@ -87,6 +87,17 @@ void Synch17Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("ipx_1", &ipx_1, &b_ipx_1);
    fChain->SetBranchAddress("ipy_1", &ipy_1, &b_ipy_1);
    fChain->SetBranchAddress("ipz_1", &ipz_1, &b_ipz_1);
+   fChain->SetBranchAddress("gen_ipx_1", &gen_ipx_1, &b_gen_ipx_1);
+   fChain->SetBranchAddress("gen_ipy_1", &gen_ipy_1, &b_gen_ipy_1);
+   fChain->SetBranchAddress("gen_ipz_1", &gen_ipz_1, &b_gen_ipz_1);
+
+   fChain->SetBranchAddress("ip_covxx_1", &ip_covxx_1, &b_ip_covxx_1);
+   fChain->SetBranchAddress("ip_covxy_1", &ip_covxy_1, &b_ip_covxy_1);
+   fChain->SetBranchAddress("ip_covxz_1", &ip_covxz_1, &b_ip_covxz_1);
+   fChain->SetBranchAddress("ip_covyy_1", &ip_covyy_1, &b_ip_covyy_1);
+   fChain->SetBranchAddress("ip_covyz_1", &ip_covyz_1, &b_ip_covyz_1);
+   fChain->SetBranchAddress("ip_covzz_1", &ip_covzz_1, &b_ip_covzz_1);
+
    fChain->SetBranchAddress("ipx_uncorr_1", &ipx_uncorr_1, &b_ipx_uncorr_1);
    fChain->SetBranchAddress("ipy_uncorr_1", &ipy_uncorr_1, &b_ipy_uncorr_1);
    fChain->SetBranchAddress("ipz_uncorr_1", &ipz_uncorr_1, &b_ipz_uncorr_1);
@@ -142,6 +153,17 @@ void Synch17Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("ipx_2", &ipx_2, &b_ipx_2);
    fChain->SetBranchAddress("ipy_2", &ipy_2, &b_ipy_2);
    fChain->SetBranchAddress("ipz_2", &ipz_2, &b_ipz_2);
+   fChain->SetBranchAddress("gen_ipx_2", &gen_ipx_2, &b_gen_ipx_2);
+   fChain->SetBranchAddress("gen_ipy_2", &gen_ipy_2, &b_gen_ipy_2);
+   fChain->SetBranchAddress("gen_ipz_2", &gen_ipz_2, &b_gen_ipz_2);
+
+   fChain->SetBranchAddress("ip_covxx_2", &ip_covxx_2, &b_ip_covxx_2);
+   fChain->SetBranchAddress("ip_covxy_2", &ip_covxy_2, &b_ip_covxy_2);
+   fChain->SetBranchAddress("ip_covxz_2", &ip_covxz_2, &b_ip_covxz_2);
+   fChain->SetBranchAddress("ip_covyy_2", &ip_covyy_2, &b_ip_covyy_2);
+   fChain->SetBranchAddress("ip_covyz_2", &ip_covyz_2, &b_ip_covyz_2);
+   fChain->SetBranchAddress("ip_covzz_2", &ip_covzz_2, &b_ip_covzz_2);
+
    fChain->SetBranchAddress("ipx_uncorr_2", &ipx_uncorr_2, &b_ipx_uncorr_2);
    fChain->SetBranchAddress("ipy_uncorr_2", &ipy_uncorr_2, &b_ipy_uncorr_2);
    fChain->SetBranchAddress("ipz_uncorr_2", &ipz_uncorr_2, &b_ipz_uncorr_2);
@@ -648,6 +670,17 @@ void Synch17Tree::WriteInit(TTree *tree) {
    fChain->Branch("ipx_1", &ipx_1, "ipx_1/F");
    fChain->Branch("ipy_1", &ipy_1, "ipy_1/F");
    fChain->Branch("ipz_1", &ipz_1, "ipz_1/F");
+   fChain->Branch("gen_ipx_1", &gen_ipx_1, "gen_ipx_1/F");
+   fChain->Branch("gen_ipy_1", &gen_ipy_1, "gen_ipy_1/F");
+   fChain->Branch("gen_ipz_1", &gen_ipz_1, "gen_ipz_1/F");
+
+   fChain->Branch("ip_covxx_1", &ip_covxx_1, "ip_covxx_1/F");
+   fChain->Branch("ip_covxy_1", &ip_covxy_1, "ip_covxy_1/F");
+   fChain->Branch("ip_covxz_1", &ip_covxz_1, "ip_covxz_1/F");
+   fChain->Branch("ip_covyy_1", &ip_covyy_1, "ip_covyy_1/F");
+   fChain->Branch("ip_covyz_1", &ip_covyz_1, "ip_covyz_1/F");
+   fChain->Branch("ip_covzz_1", &ip_covzz_1, "ip_covzz_1/F");
+
    fChain->Branch("ipx_uncorr_1", &ipx_uncorr_1, "ipx_uncorr_1/F");
    fChain->Branch("ipy_uncorr_1", &ipy_uncorr_1, "ipy_uncorr_1/F");
    fChain->Branch("ipz_uncorr_1", &ipz_uncorr_1, "ipz_uncorr_1/F");
@@ -700,6 +733,17 @@ void Synch17Tree::WriteInit(TTree *tree) {
    fChain->Branch("ipx_2", &ipx_2, "ipx_2/F");
    fChain->Branch("ipy_2", &ipy_2, "ipy_2/F");
    fChain->Branch("ipz_2", &ipz_2, "ipz_2/F");
+   fChain->Branch("gen_ipx_2", &gen_ipx_2, "gen_ipx_2/F");
+   fChain->Branch("gen_ipy_2", &gen_ipy_2, "gen_ipy_2/F");
+   fChain->Branch("gen_ipz_2", &gen_ipz_2, "gen_ipz_2/F");
+
+   fChain->Branch("ip_covxx_2", &ip_covxx_2, "ip_covxx_2/F");
+   fChain->Branch("ip_covxy_2", &ip_covxy_2, "ip_covxy_2/F");
+   fChain->Branch("ip_covxz_2", &ip_covxz_2, "ip_covxz_2/F");
+   fChain->Branch("ip_covyy_2", &ip_covyy_2, "ip_covyy_2/F");
+   fChain->Branch("ip_covyz_2", &ip_covyz_2, "ip_covyz_2/F");
+   fChain->Branch("ip_covzz_2", &ip_covzz_2, "ip_covzz_2/F");
+
    fChain->Branch("ipx_uncorr_2", &ipx_uncorr_2, "ipx_uncorr_2/F");
    fChain->Branch("ipy_uncorr_2", &ipy_uncorr_2, "ipy_uncorr_2/F");
    fChain->Branch("ipz_uncorr_2", &ipz_uncorr_2, "ipz_uncorr_2/F");

@@ -65,6 +65,17 @@ public :
   Float_t         ipx_uncorr_1;
   Float_t         ipy_uncorr_1;
   Float_t         ipz_uncorr_1;
+  Float_t         gen_ipx_1;
+  Float_t         gen_ipy_1;
+  Float_t         gen_ipz_1;
+
+  Float_t         ip_covxx_1;
+  Float_t         ip_covxy_1;
+  Float_t         ip_covxz_1;
+  Float_t         ip_covyy_1;  
+  Float_t         ip_covyz_1;
+  Float_t         ip_covzz_1;
+
   Float_t         ipxy_1;
   Double_t        IP_signif_PV_with_BS_1;
   Double_t        IP_signif_RefitV_with_BS_1;
@@ -119,6 +130,17 @@ public :
   Float_t         ipx_uncorr_2;
   Float_t         ipy_uncorr_2;
   Float_t         ipz_uncorr_2;
+  Float_t         gen_ipx_2;
+  Float_t         gen_ipy_2;
+  Float_t         gen_ipz_2;
+
+  Float_t         ip_covxx_2;
+  Float_t         ip_covxy_2;
+  Float_t         ip_covxz_2;
+  Float_t         ip_covyy_2;  
+  Float_t         ip_covyz_2;
+  Float_t         ip_covzz_2;
+
   Float_t         ipxy_2;
   Double_t        IP_signif_PV_with_BS_2;
   Double_t        IP_signif_RefitV_with_BS_2;
@@ -580,6 +602,18 @@ public :
   TBranch	 *b_ipx_uncorr_1;
   TBranch	 *b_ipy_uncorr_1;
   TBranch	 *b_ipz_uncorr_1;
+
+  TBranch	 *b_gen_ipx_1;
+  TBranch	 *b_gen_ipy_1;
+  TBranch	 *b_gen_ipz_1;
+
+  TBranch        *b_ip_covxx_1;
+  TBranch        *b_ip_covxy_1;
+  TBranch        *b_ip_covxz_1;
+  TBranch        *b_ip_covyy_1;  
+  TBranch        *b_ip_covyz_1;
+  TBranch        *b_ip_covzz_1;
+
   TBranch	 *b_ipxy_1;
   TBranch	 *b_IP_signif_PV_with_BS_1;
   TBranch	 *b_IP_signif_RefitV_with_BS_1;
@@ -629,6 +663,18 @@ public :
   TBranch	 *b_ipx_2;
   TBranch	 *b_ipy_2;
   TBranch	 *b_ipz_2;
+
+  TBranch	 *b_gen_ipx_2;
+  TBranch	 *b_gen_ipy_2;
+  TBranch	 *b_gen_ipz_2;
+
+  TBranch        *b_ip_covxx_2;
+  TBranch        *b_ip_covxy_2;
+  TBranch        *b_ip_covxz_2;
+  TBranch        *b_ip_covyy_2;  
+  TBranch        *b_ip_covyz_2;
+  TBranch        *b_ip_covzz_2;
+
   TBranch	 *b_ipx_uncorr_2;
   TBranch	 *b_ipy_uncorr_2;
   TBranch	 *b_ipz_uncorr_2;

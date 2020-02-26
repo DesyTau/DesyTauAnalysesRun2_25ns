@@ -136,6 +136,10 @@ void calibrateIP(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, i
       //		<< "   y = " << ipGen.Py() 
       //		<< "   z = " << ipGen.Pz() << std::endl;
 
+      otree->gen_ipx_1 = ipGen.Px();
+      otree->gen_ipy_1 = ipGen.Py();
+      otree->gen_ipz_1 = ipGen.Pz();
+
       //      float dipx = otree->ipx_1 - ipGen.X();
       float ipx = ip->correctIp(IpCorrection::Coordinate::Ipx,otree->ipx_1,ipGen.X(),otree->eta_1);
       otree->ipx_1 = ipx;
@@ -184,6 +188,10 @@ void calibrateIP(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, i
       //      std::cout << "pi genIP   x = " << ipGen.Px() 
       //		<< "   y = " << ipGen.Py() 
       //		<< "   z = " << ipGen.Pz() << std::endl;
+
+      otree->gen_ipx_2 = ipGen.Px();
+      otree->gen_ipy_2 = ipGen.Py();
+      otree->gen_ipz_2 = ipGen.Pz();
 
       //      float dipx = otree->ipx_2 - ipGen.X();
       float ipx = float(ip->correctIp(IpCorrection::Coordinate::Ipx,otree->ipx_2,ipGen.X(),otree->eta_2));
