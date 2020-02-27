@@ -546,6 +546,22 @@ int main(int argc, char * argv[]){
     tauThreeProngScaleSys->SetUseFastMTT(ApplyFastMTT);
     tauThreeProngScaleSys->SetUsePuppiMET(usePuppiMET);
 
+    if (isDY) {
+
+      lepTauFakeOneProngScaleSys = new LepTauFakeOneProngScaleSys(otree);
+      lepTauFakeOneProngScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);
+      lepTauFakeOneProngScaleSys->SetUseSVFit(ApplySVFit);
+      lepTauFakeOneProngScaleSys->SetUseFastMTT(ApplyFastMTT);
+      lepTauFakeOneProngScaleSys->SetUsePuppiMET(usePuppiMET);
+
+      lepTauFakeOneProngOnePi0ScaleSys = new LepTauFakeOneProngOnePi0ScaleSys(otree);
+      lepTauFakeOneProngOnePi0ScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);
+      lepTauFakeOneProngOnePi0ScaleSys->SetUseSVFit(ApplySVFit);
+      lepTauFakeOneProngOnePi0ScaleSys->SetUseFastMTT(ApplyFastMTT);
+      lepTauFakeOneProngOnePi0ScaleSys->SetUsePuppiMET(usePuppiMET);
+
+    }
+
     // systematics only for MC
     if (!isEmbedded) {
       if (ApplyRecoilCorrections) {
@@ -1782,11 +1798,19 @@ int main(int argc, char * argv[]){
 	  tauOneProngScaleSys->Eval(utils::MUTAU);
 	  tauOneProngOnePi0ScaleSys->Eval(utils::MUTAU);
 	  tauThreeProngScaleSys->Eval(utils::MUTAU);
+	  if (isDY) {
+	    lepTauFakeOneProngScaleSys->Eval(utils::MUTAU);
+	    lepTauFakeOneProngOnePi0ScaleSys->Eval(utils::MUTAU);
+	  }
 	}
 	else if (ch == "et") { 
 	  tauOneProngScaleSys->Eval(utils::ETAU);
 	  tauOneProngOnePi0ScaleSys->Eval(utils::ETAU);
 	  tauThreeProngScaleSys->Eval(utils::ETAU);
+	  if (isDY) {
+	    lepTauFakeOneProngScaleSys->Eval(utils::ETAU);
+	    lepTauFakeOneProngOnePi0ScaleSys->Eval(utils::ETAU);	    
+	  }
 	}
       }
       
@@ -1846,6 +1870,17 @@ int main(int argc, char * argv[]){
     tauThreeProngScaleSys->Write();
     delete tauThreeProngScaleSys;
   }
+
+  if(lepTauFakeOneProngScaleSys != 0){
+    lepTauFakeOneProngScaleSys->Write();
+    delete lepTauFakeOneProngScaleSys;
+  }
+
+  if(lepTauFakeOneProngOnePi0ScaleSys != 0){
+    lepTauFakeOneProngOnePi0ScaleSys->Write();
+    delete lepTauFakeOneProngOnePi0ScaleSys;
+  }
+
 
   if(jetEnergyScaleSys.size() > 0){
     for (unsigned int i = 0; i < jetEnergyScaleSys.size(); i++){

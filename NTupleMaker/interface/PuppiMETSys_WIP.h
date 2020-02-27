@@ -104,8 +104,12 @@ class PuppiMETSys : public METSys {
   virtual void ScaleUp() {
     bool uncertaintyFound = false;
     if (label.Contains("unclustered")) {
-      obs.metx = cenTree->puppimet_ex_UnclusteredEnUp;
-      obs.mety = cenTree->puppimet_ey_UnclusteredEnUp;
+      //      obs.metx = cenTree->puppimet_ex_UnclusteredEnUp;
+      //      obs.mety = cenTree->puppimet_ey_UnclusteredEnUp;
+      float metx_central = cenTree->puppimet*TMath::Cos(cenTree->puppimetphi);
+      float mety_central = cenTree->puppimet*TMath::Sin(cenTree->puppimetphi);
+      obs.metx = 2.0*metx_central - cenTree->puppimet_ex_UnclusteredEnDown;
+      obs.mety = 2.0*mety_central - cenTree->puppimet_ey_UnclusteredEnDown;
       uncertaintyFound = true;
     }
     else if (label.Contains("JetRes")) {
