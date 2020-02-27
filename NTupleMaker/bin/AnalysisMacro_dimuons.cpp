@@ -73,7 +73,7 @@ float getEmbeddedWeight(const AC1B *analysisTree, RooWorkspace * wEm) {
       //      cout << analysisTree->genparticles_pdgid[igen] << endl;
     }
   }
-
+  
   //  cout << "Taus : " << taus.size() << std::endl;
   //  cout << endl;
 
@@ -92,8 +92,11 @@ float getEmbeddedWeight(const AC1B *analysisTree, RooWorkspace * wEm) {
     wEm->var("gt2_pt")->setVal(gt2_pt);
     wEm->var("gt1_eta")->setVal(gt1_eta);
     wEm->var("gt2_eta")->setVal(gt2_eta);
-    double trg_emb = wEm->function("m_sel_trg_ratio")->getVal();
-    emWeight = id1_embed * id2_embed * trg_emb;
+    //    double trg_emb = wEm->function("m_sel_trg_ic_ratio")->getVal();
+    double trg_emb_ic = wEm->function("m_sel_trg_ic_ratio")->getVal();
+    emWeight = id1_embed * id2_embed * trg_emb_ic;
+    //    double emWeight_ic = id1_embed * id2_embed * trg_emb_ic;
+    //    cout << "KIT : " << emWeight << "  IC : " << emWeight_ic << std::endl;
   }
 
   //  cout << "Embedding : " << emWeight << std::endl;
@@ -959,11 +962,26 @@ int main(int argc, char * argv[]) {
 
       if (!isData || isEmbedded) { 
 	float genweight = 1;
+	//	std::cout << "gen weight = " << analysisTree.genweight << std::endl;
 	if (analysisTree.genweight<0)
 	  genweight = -1;
 	weight *= genweight;
+	//	std::cout << "weight = " << weight << std::endl;
       }
-      
+      if ( isEmbedded && TStrName.Contains("2016") ) {
+	unsigned int run = analysisTree.event_run;
+	float embedded_stitching_weight = 
+	  ((run >= 272007) && (run < 275657))*(1.0/0.891)
+	  +((run >= 275657) && (run < 276315))*(1.0/0.910)
+	  +((run >= 276315) && (run < 276831))*(1.0/0.953)
+	  +((run >= 276831) && (run < 277772))*(1.0/0.947)
+	  +((run >= 277772) && (run < 278820))*(1.0/0.942)
+	  +((run >= 278820) && (run < 280919))*(1.0/0.906)
+	  +((run >= 280919) && (run < 284045))*(1.0/0.950);
+	//	std::cout << "stitching weight = " << embedded_stitching_weight << std::endl;
+	weight *= embedded_stitching_weight;
+      }
+
       TLorentzVector genZ; genZ.SetXYZT(0,0,0,0); 
       TLorentzVector genV; genV.SetXYZT(0,0,0,0);
       TLorentzVector genL; genL.SetXYZT(0,0,0,0);
@@ -1714,31 +1732,37 @@ int main(int argc, char * argv[]) {
 	  double IdIsoSF_mu1 = SF_muonIdIso->get_ScaleFactor(ptMu1, etaMu1);
 	  double IdIsoSF_mu2 = SF_muonIdIso->get_ScaleFactor(ptMu2, etaMu2);
 
-
+	  //	  std::cout << " weight (2) = " << weight << std::endl;
 	  /*
 	  std::cout << "isRefittedVtx = " << isRefittedVtx << std::endl;
 	  std::cout << "IP1 (x,y,z) = (" << ip1.X() << "," << ip1.Y() << "," << ip1.Z() << ")" << std::endl; 
 	  std::cout << "IP2 (x,y,z) = (" << ip2.X() << "," << ip2.Y() << "," << ip2.Z() << ")" << std::endl; 
 	  std::cout << std::endl;
 	  */
+
+	  //	  std::cout<< "IdIsoSF1 (DESY) = " << IdIsoSF_mu1 <<std::endl;
+	  //	  std::cout<< "IdIsoSF2 (DESY) = " << IdIsoSF_mu2 <<std::endl;
+
 	  correctionWS->var("m_eta")->setVal(etaMu1);
 	  correctionWS->var("m_pt")->setVal(ptMu1);
 	  double trackSF_mu1 = correctionWS->function("m_trk_ratio")->getVal();
 	  if (applyKITCorrection) {
-	    if (isEmbedded)
+	    if (isEmbedded) 
 	      IdIsoSF_mu1 = correctionWS->function("m_idiso_ic_embed_ratio")->getVal();
-	    else
+	    else 
 	      IdIsoSF_mu1 = correctionWS->function("m_idiso_ic_ratio")->getVal();
+	    //	    std::cout << "IdIsoSF1 (IC) = " << IdIsoSF_mu1 << std::endl;
 	  }
 
 	  correctionWS->var("m_eta")->setVal(etaMu2);
           correctionWS->var("m_pt")->setVal(ptMu2);
 	  double trackSF_mu2 = correctionWS->function("m_trk_ratio")->getVal();
 	  if (applyKITCorrection) {
-	    if (isEmbedded)
+	    if (isEmbedded) 
 	      IdIsoSF_mu2 = correctionWS->function("m_idiso_ic_embed_ratio")->getVal();
 	    else
 	      IdIsoSF_mu2 = correctionWS->function("m_idiso_ic_ratio")->getVal();
+	    //	    std::cout<< "IdIsoSF2 (IC) = " << IdIsoSF_mu2 <<std::endl;
 	  }
 
 	  //	  cout << " Mu1 : IdIso = " << IdIsoSF_mu1 << "  " << SF_muonIdIso->get_ScaleFactor(ptMu1, etaMu1) << endl;
