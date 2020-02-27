@@ -335,6 +335,23 @@ void Synch17Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("etaufakeweight", &etaufakeweight, &b_etaufakeweight);
    fChain->SetBranchAddress("mutaufakeweight", &mutaufakeweight, &b_mutaufakeweight);
 
+
+   fChain->SetBranchAddress("weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVUp", &weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVUp, &b_weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVUp);
+   fChain->SetBranchAddress("weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVUp", &weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVUp, &b_weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVUp);
+   fChain->SetBranchAddress("weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVUp", &weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVUp, &b_weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVUp);
+   fChain->SetBranchAddress("weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVUp", &weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVUp, &b_weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVUp);
+   fChain->SetBranchAddress("weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVUp", &weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVUp, &b_weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVUp);
+   fChain->SetBranchAddress("weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVDown", &weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVDown, &b_weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVDown);
+   fChain->SetBranchAddress("weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVDown", &weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVDown, &b_weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVDown);
+   fChain->SetBranchAddress("weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVDown", &weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVDown, &b_weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVDown);
+   fChain->SetBranchAddress("weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVDown", &weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVDown, &b_weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVDown);
+   fChain->SetBranchAddress("weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVDown", &weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVDown, &b_weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVDown);
+
+   fChain->SetBranchAddress("weight_CMS_scale_gg_13TeVUp", &weight_CMS_scale_gg_13TeVUp, &b_weight_CMS_scale_gg_13TeVUp);
+   fChain->SetBranchAddress("weight_CMS_scale_gg_13TeVDown", &weight_CMS_scale_gg_13TeVDown, &b_weight_CMS_scale_gg_13TeVDown);
+
+
+
    fChain->SetBranchAddress("ff_nom",&ff_nom,&b_ff_nom);
    fChain->SetBranchAddress("ff_mva",&ff_mva,&b_ff_mva);
    fChain->SetBranchAddress("ff_nom_sys",&ff_nom_sys,&b_ff_nom_sys);
@@ -878,6 +895,24 @@ void Synch17Tree::WriteInit(TTree *tree) {
    fChain->Branch("idisoweight_2", &idisoweight_2, "idisoweight_2/F");
    fChain->Branch("idisoweight_antiiso_2", &idisoweight_antiiso_2, "idisoweight_antiiso_2/F");
    fChain->Branch("tauvsjetweightMedium_2", &tauvsjetweightMedium_2, "tauvsjetweightMedium_2/F");
+
+
+   fChain->Branch("weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVUp", &weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVUp, "weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVUp/F");
+   fChain->Branch("weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVUp", &weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVUp, "weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVUp/F");
+   fChain->Branch("weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVUp", &weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVUp, "weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVUp/F");
+   fChain->Branch("weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVUp", &weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVUp, "weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVUp/F");
+   fChain->Branch("weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVUp", &weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVUp, "weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVUp/F");
+   fChain->Branch("weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVDown", &weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVDown, "weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVDown/F");
+   fChain->Branch("weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVDown", &weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVDown, "weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVDown/F");
+   fChain->Branch("weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVDown", &weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVDown, "weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVDown/F");
+   fChain->Branch("weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVDown", &weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVDown, "weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVDown/F");
+   fChain->Branch("weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVDown", &weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVDown, "weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVDown/F");
+
+   fChain->Branch("weight_CMS_scale_gg_13TeVUp", &weight_CMS_scale_gg_13TeVUp, "weight_CMS_scale_gg_13TeVUp/F");
+   fChain->Branch("weight_CMS_scale_gg_13TeVDown", &weight_CMS_scale_gg_13TeVDown, "weight_CMS_scale_gg_13TeVDown/F");
+
+
+
    /*
 fChain->Branch("againstElectronVLooseMVA6_2", &againstElectronVLooseMVA6_2, "againstElectronVLooseMVA6_2/F");
    fChain->Branch("againstElectronVTightMVA6_2", &againstElectronVTightMVA6_2, "againstElectronVTightMVA6_2/F");

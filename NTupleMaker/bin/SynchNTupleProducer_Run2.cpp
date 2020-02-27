@@ -1091,6 +1091,10 @@ int main(int argc, char * argv[]){
       double eff_mc_trig_L        = 1;
       double sf_trig_ditau_tau1   = 1;
       double sf_trig_ditau_tau2   = 1;
+      double eff_data_trig_lt_tauUp   = 1;
+      double eff_mc_trig_lt_tauUp     = 1;
+      double eff_data_trig_lt_tauDown = 1;
+      double eff_mc_trig_lt_tauDown   = 1;
       // reset efficiency weights
     
       //all criterua passed, we fill vertices here;	
@@ -1140,7 +1144,17 @@ int main(int argc, char * argv[]){
       otree->effweight = 1;
       otree->puweight = 1; 
       otree->mcweight = 1;
-      
+      otree->weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVUp = 1;
+      otree->weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVUp = 1;
+      otree->weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVUp = 1;
+      otree->weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVUp = 1;
+      otree->weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVUp = 1;
+      otree->weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVDown = 1;
+      otree->weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVDown = 1;
+      otree->weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVDown = 1;
+      otree->weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVDown = 1;
+      otree->weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVDown = 1;
+
       if (ApplyPUweight) 
         otree->puweight = float(PUofficial->get_PUweight(double(analysisTree.numtruepileupinteractions)));
       if(!isData || isEmbedded){
@@ -1153,17 +1167,21 @@ int main(int argc, char * argv[]){
       	TString suffix = "mc";
       	TString suffixRatio = "ratio";
       	if (isEmbedded) {suffix = "embed"; suffixRatio = "embed_ratio";}
-        
+	TString mvadm = TString::Itoa(analysisTree.tau_MVADM2017v1[tauIndex],10);
     	  w->var("t_pt")->setVal(analysisTree.tau_pt[tauIndex]);
     	  w->var("t_eta")->setVal(analysisTree.tau_eta[tauIndex]);
     	  w->var("t_phi")->setVal(analysisTree.tau_phi[tauIndex]);
-    	  w->var("t_dm")->setVal(analysisTree.tau_decayMode[tauIndex]);
-        
+    	  //w->var("t_dm")->setVal(analysisTree.tau_decayMode[tauIndex]);
+    	  w->var("t_mvadm")->setVal(analysisTree.tau_MVADM2017v1[tauIndex]);
     	  if (ch == "mt") {
     	    w->var("m_pt")->setVal(leptonLV.Pt());
     	    w->var("m_eta")->setVal(leptonLV.Eta());
     	    eff_data_trig_lt_tau = w->function("t_trg_mediumDeepTau_mutau_data")->getVal();
     	    eff_mc_trig_lt_tau = w->function("t_trg_mediumDeepTau_mutau_" + suffix)->getVal();
+    	    eff_data_trig_lt_tauUp = w->function("t_trg_ic_deeptau_medium_mvadm_mutau_data_mvadm"+mvadm+"_up")->getVal();
+    	    eff_mc_trig_lt_tauUp = w->function("t_trg_ic_deeptau_medium_mvadm_mutau_" + suffix + "_mvadm"+mvadm+"_up")->getVal();
+    	    eff_data_trig_lt_tauDown = w->function("t_trg_ic_deeptau_medium_mvadm_mutau_data_mvadm"+mvadm+"_down")->getVal();
+    	    eff_mc_trig_lt_tauDown = w->function("t_trg_ic_deeptau_medium_mvadm_mutau_" + suffix + "_mvadm"+mvadm+"_down")->getVal();
     	    eff_data_trig_L = w->function("m_trg_ic_data")->getVal();
     	    eff_mc_trig_L = w->function("m_trg_ic_" + suffix)->getVal();
     	    if (era == 2016) {
@@ -1201,13 +1219,37 @@ int main(int argc, char * argv[]){
     	  }
                                                                                                                                                                      
     	  double eff_data_trig = eff_data_trig_L + (eff_data_trig_lt_l - eff_data_trig_L) * eff_data_trig_lt_tau;
-    	  double eff_mc_trig = eff_mc_trig_L + (eff_mc_trig_lt_l - eff_mc_trig_L) * eff_mc_trig_lt_tau;
+    	  double eff_mc_trig = eff_mc_trig_L + (eff_mc_trig_lt_l - eff_mc_trig_L) * eff_mc_trig_lt_tau;                                                            
+    	  double eff_data_trigUp = eff_data_trig_L + (eff_data_trig_lt_l - eff_data_trig_L) * eff_data_trig_lt_tauUp;
+    	  double eff_mc_trigUp = eff_mc_trig_L + (eff_mc_trig_lt_l - eff_mc_trig_L) * eff_mc_trig_lt_tauUp;                                                   
+    	  double eff_data_trigDown = eff_data_trig_L + (eff_data_trig_lt_l - eff_data_trig_L) * eff_data_trig_lt_tauDown;
+    	  double eff_mc_trigDown = eff_mc_trig_L + (eff_mc_trig_lt_l - eff_mc_trig_L) * eff_mc_trig_lt_tauDown;
     	  if (era == 2016 && ch == "et") {
     	    eff_data_trig = eff_data_trig_L;
     	    eff_mc_trig = eff_mc_trig_L;
     	  }
-    	  if (eff_data_trig > 1e-4 && eff_mc_trig > 1e-4)
+    	  if (eff_data_trig > 1e-4 && eff_mc_trig > 1e-4){
     	    otree->trigweight = eff_data_trig / eff_mc_trig;
+	    double trigweightUp = (eff_data_trigUp / eff_mc_trigUp) / (eff_data_trig / eff_mc_trig);
+	    double trigweightDown = (eff_data_trigDown / eff_mc_trigDown) / (eff_data_trig / eff_mc_trig);
+
+	    if(mvadm=="0"){
+	      otree->weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVUp = trigweightUp;
+	      otree->weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVDown = trigweightDown;
+	    }else if(mvadm=="1"){
+	      otree->weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVUp = trigweightUp;
+	      otree->weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVDown = trigweightDown;
+	    }else if(mvadm=="2"){
+	      otree->weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVUp = trigweightUp;
+	      otree->weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVDown = trigweightDown;
+	    }else if(mvadm=="10"){
+	      otree->weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVUp = trigweightUp;
+	      otree->weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVDown = trigweightDown;
+	    }else if(mvadm=="11"){
+	      otree->weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVUp = trigweightUp;
+	      otree->weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVDown = trigweightDown;
+	    }
+	  }
       }
       counter[10]++;
     
@@ -1232,6 +1274,10 @@ int main(int argc, char * argv[]){
       otree->effweight = otree->idisoweight_1 * otree->trkeffweight * otree->idisoweight_2 * otree->trigweight;
       otree->weight = otree->effweight * otree->puweight * otree->mcweight; 
       
+      otree->weight_CMS_scale_gg_13TeVUp   = analysisTree.weightScale4;
+      otree->weight_CMS_scale_gg_13TeVDown = analysisTree.weightScale8;
+
+
       ////////////////////////////////////////////////////////////
       // Z pt weight
       ////////////////////////////////////////////////////////////

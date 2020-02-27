@@ -309,6 +309,20 @@ public :
   Float_t         trigweight;
   Float_t         embweight;
 
+  Float_t weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVUp;
+  Float_t weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVUp;
+  Float_t weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVUp;
+  Float_t weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVUp;
+  Float_t weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVUp;
+  Float_t weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVDown;
+  Float_t weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVDown;
+  Float_t weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVDown;
+  Float_t weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVDown;
+  Float_t weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVDown;
+
+  Float_t weight_CMS_scale_gg_13TeVUp;
+  Float_t weight_CMS_scale_gg_13TeVDown;
+
   Float_t         topptweight;
   Double_t 	  zptweight;
   Double_t        trkeffweight;
@@ -331,6 +345,7 @@ public :
   Bool_t          xTriggerLep;
   Bool_t          xTriggerTau;
   Bool_t          xTrigger;
+
   //MET
   Float_t         met;
   Float_t         metphi;  
@@ -843,6 +858,20 @@ public :
   TBranch	 *b_effweight;
   TBranch        *b_trigweight;
   TBranch        *b_embweight;
+
+  TBranch        *b_weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVUp;
+  TBranch        *b_weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVUp;
+  TBranch        *b_weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVUp;
+  TBranch        *b_weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVUp;
+  TBranch        *b_weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVUp;
+  TBranch        *b_weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVDown;
+  TBranch        *b_weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVDown;
+  TBranch        *b_weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVDown;
+  TBranch        *b_weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVDown;
+  TBranch        *b_weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVDown;
+
+  TBranch        *b_weight_CMS_scale_gg_13TeVUp;
+  TBranch        *b_weight_CMS_scale_gg_13TeVDown;
 
   TBranch	 *b_topptweight;
   TBranch	 *b_zptweight;
