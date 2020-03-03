@@ -347,6 +347,30 @@ void Synch17Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVDown", &weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVDown, &b_weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVDown);
    fChain->SetBranchAddress("weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVDown", &weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVDown, &b_weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVDown);
 
+
+  fChain->SetBranchAddress("weight_CMS_eff_t_pTlow_MVADM0_13TeVUp", &weight_CMS_eff_t_pTlow_MVADM0_13TeVUp, &b_weight_CMS_eff_t_pTlow_MVADM0_13TeVUp); 
+  fChain->SetBranchAddress("weight_CMS_eff_t_pTlow_MVADM1_13TeVUp", &weight_CMS_eff_t_pTlow_MVADM1_13TeVUp, &b_weight_CMS_eff_t_pTlow_MVADM1_13TeVUp); 
+  fChain->SetBranchAddress("weight_CMS_eff_t_pTlow_MVADM2_13TeVUp", &weight_CMS_eff_t_pTlow_MVADM2_13TeVUp, &b_weight_CMS_eff_t_pTlow_MVADM2_13TeVUp); 
+  fChain->SetBranchAddress("weight_CMS_eff_t_pTlow_MVADM10_13TeVUp", &weight_CMS_eff_t_pTlow_MVADM10_13TeVUp, &b_weight_CMS_eff_t_pTlow_MVADM10_13TeVUp);
+  fChain->SetBranchAddress("weight_CMS_eff_t_pTlow_MVADM11_13TeVUp", &weight_CMS_eff_t_pTlow_MVADM11_13TeVUp, &b_weight_CMS_eff_t_pTlow_MVADM11_13TeVUp);
+  fChain->SetBranchAddress("weight_CMS_eff_t_pThigh_MVADM0_13TeVUp", &weight_CMS_eff_t_pThigh_MVADM0_13TeVUp, &b_weight_CMS_eff_t_pThigh_MVADM0_13TeVUp);
+  fChain->SetBranchAddress("weight_CMS_eff_t_pThigh_MVADM1_13TeVUp", &weight_CMS_eff_t_pThigh_MVADM1_13TeVUp, &b_weight_CMS_eff_t_pThigh_MVADM1_13TeVUp);
+  fChain->SetBranchAddress("weight_CMS_eff_t_pThigh_MVADM2_13TeVUp", &weight_CMS_eff_t_pThigh_MVADM2_13TeVUp, &b_weight_CMS_eff_t_pThigh_MVADM2_13TeVUp);
+  fChain->SetBranchAddress("weight_CMS_eff_t_pThigh_MVADM10_13TeVUp", &weight_CMS_eff_t_pThigh_MVADM10_13TeVUp, &b_weight_CMS_eff_t_pThigh_MVADM10_13TeVUp); 
+  fChain->SetBranchAddress("weight_CMS_eff_t_pThigh_MVADM11_13TeVUp", &weight_CMS_eff_t_pThigh_MVADM11_13TeVUp, &b_weight_CMS_eff_t_pThigh_MVADM11_13TeVUp); 
+  fChain->SetBranchAddress("weight_CMS_eff_t_pTlow_MVADM0_13TeVDown", &weight_CMS_eff_t_pTlow_MVADM0_13TeVDown, &b_weight_CMS_eff_t_pTlow_MVADM0_13TeVDown); 
+  fChain->SetBranchAddress("weight_CMS_eff_t_pTlow_MVADM1_13TeVDown", &weight_CMS_eff_t_pTlow_MVADM1_13TeVDown, &b_weight_CMS_eff_t_pTlow_MVADM1_13TeVDown); 
+  fChain->SetBranchAddress("weight_CMS_eff_t_pTlow_MVADM2_13TeVDown", &weight_CMS_eff_t_pTlow_MVADM2_13TeVDown, &b_weight_CMS_eff_t_pTlow_MVADM2_13TeVDown); 
+  fChain->SetBranchAddress("weight_CMS_eff_t_pTlow_MVADM10_13TeVDown", &weight_CMS_eff_t_pTlow_MVADM10_13TeVDown, &b_weight_CMS_eff_t_pTlow_MVADM10_13TeVDown); 
+  fChain->SetBranchAddress("weight_CMS_eff_t_pTlow_MVADM11_13TeVDown", &weight_CMS_eff_t_pTlow_MVADM11_13TeVDown, &b_weight_CMS_eff_t_pTlow_MVADM11_13TeVDown); 
+  fChain->SetBranchAddress("weight_CMS_eff_t_pThigh_MVADM0_13TeVDown", &weight_CMS_eff_t_pThigh_MVADM0_13TeVDown, &b_weight_CMS_eff_t_pThigh_MVADM0_13TeVDown); 
+  fChain->SetBranchAddress("weight_CMS_eff_t_pThigh_MVADM1_13TeVDown", &weight_CMS_eff_t_pThigh_MVADM1_13TeVDown, &b_weight_CMS_eff_t_pThigh_MVADM1_13TeVDown); 
+  fChain->SetBranchAddress("weight_CMS_eff_t_pThigh_MVADM2_13TeVDown", &weight_CMS_eff_t_pThigh_MVADM2_13TeVDown, &b_weight_CMS_eff_t_pThigh_MVADM2_13TeVDown); 
+  fChain->SetBranchAddress("weight_CMS_eff_t_pThigh_MVADM10_13TeVDown", &weight_CMS_eff_t_pThigh_MVADM10_13TeVDown, &b_weight_CMS_eff_t_pThigh_MVADM10_13TeVDown);
+  fChain->SetBranchAddress("weight_CMS_eff_t_pThigh_MVADM11_13TeVDown", &weight_CMS_eff_t_pThigh_MVADM11_13TeVDown, &b_weight_CMS_eff_t_pThigh_MVADM11_13TeVDown);
+
+
+
    fChain->SetBranchAddress("weight_CMS_scale_gg_13TeVUp", &weight_CMS_scale_gg_13TeVUp, &b_weight_CMS_scale_gg_13TeVUp);
    fChain->SetBranchAddress("weight_CMS_scale_gg_13TeVDown", &weight_CMS_scale_gg_13TeVDown, &b_weight_CMS_scale_gg_13TeVDown);
 
@@ -907,6 +931,30 @@ void Synch17Tree::WriteInit(TTree *tree) {
    fChain->Branch("weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVDown", &weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVDown, "weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVDown/F");
    fChain->Branch("weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVDown", &weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVDown, "weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVDown/F");
    fChain->Branch("weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVDown", &weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVDown, "weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVDown/F");
+
+
+  fChain->Branch("weight_CMS_eff_t_pTlow_MVADM0_13TeVUp", &weight_CMS_eff_t_pTlow_MVADM0_13TeVUp, "weight_CMS_eff_t_pTlow_MVADM0_13TeVUp/F"); 
+  fChain->Branch("weight_CMS_eff_t_pTlow_MVADM1_13TeVUp", &weight_CMS_eff_t_pTlow_MVADM1_13TeVUp, "weight_CMS_eff_t_pTlow_MVADM1_13TeVUp/F"); 
+  fChain->Branch("weight_CMS_eff_t_pTlow_MVADM2_13TeVUp", &weight_CMS_eff_t_pTlow_MVADM2_13TeVUp, "weight_CMS_eff_t_pTlow_MVADM2_13TeVUp/F"); 
+  fChain->Branch("weight_CMS_eff_t_pTlow_MVADM10_13TeVUp", &weight_CMS_eff_t_pTlow_MVADM10_13TeVUp, "weight_CMS_eff_t_pTlow_MVADM10_13TeVUp/F");
+  fChain->Branch("weight_CMS_eff_t_pTlow_MVADM11_13TeVUp", &weight_CMS_eff_t_pTlow_MVADM11_13TeVUp, "weight_CMS_eff_t_pTlow_MVADM11_13TeVUp/F");
+  fChain->Branch("weight_CMS_eff_t_pThigh_MVADM0_13TeVUp", &weight_CMS_eff_t_pThigh_MVADM0_13TeVUp, "weight_CMS_eff_t_pThigh_MVADM0_13TeVUp/F");
+  fChain->Branch("weight_CMS_eff_t_pThigh_MVADM1_13TeVUp", &weight_CMS_eff_t_pThigh_MVADM1_13TeVUp, "weight_CMS_eff_t_pThigh_MVADM1_13TeVUp/F");
+  fChain->Branch("weight_CMS_eff_t_pThigh_MVADM2_13TeVUp", &weight_CMS_eff_t_pThigh_MVADM2_13TeVUp, "weight_CMS_eff_t_pThigh_MVADM2_13TeVUp/F");
+  fChain->Branch("weight_CMS_eff_t_pThigh_MVADM10_13TeVUp", &weight_CMS_eff_t_pThigh_MVADM10_13TeVUp, "weight_CMS_eff_t_pThigh_MVADM10_13TeVUp/F"); 
+  fChain->Branch("weight_CMS_eff_t_pThigh_MVADM11_13TeVUp", &weight_CMS_eff_t_pThigh_MVADM11_13TeVUp, "weight_CMS_eff_t_pThigh_MVADM11_13TeVUp/F"); 
+  fChain->Branch("weight_CMS_eff_t_pTlow_MVADM0_13TeVDown", &weight_CMS_eff_t_pTlow_MVADM0_13TeVDown, "weight_CMS_eff_t_pTlow_MVADM0_13TeVDown/F"); 
+  fChain->Branch("weight_CMS_eff_t_pTlow_MVADM1_13TeVDown", &weight_CMS_eff_t_pTlow_MVADM1_13TeVDown, "weight_CMS_eff_t_pTlow_MVADM1_13TeVDown/F"); 
+  fChain->Branch("weight_CMS_eff_t_pTlow_MVADM2_13TeVDown", &weight_CMS_eff_t_pTlow_MVADM2_13TeVDown, "weight_CMS_eff_t_pTlow_MVADM2_13TeVDown/F"); 
+  fChain->Branch("weight_CMS_eff_t_pTlow_MVADM10_13TeVDown", &weight_CMS_eff_t_pTlow_MVADM10_13TeVDown, "weight_CMS_eff_t_pTlow_MVADM10_13TeVDown/F"); 
+  fChain->Branch("weight_CMS_eff_t_pTlow_MVADM11_13TeVDown", &weight_CMS_eff_t_pTlow_MVADM11_13TeVDown, "weight_CMS_eff_t_pTlow_MVADM11_13TeVDown/F"); 
+  fChain->Branch("weight_CMS_eff_t_pThigh_MVADM0_13TeVDown", &weight_CMS_eff_t_pThigh_MVADM0_13TeVDown, "weight_CMS_eff_t_pThigh_MVADM0_13TeVDown/F"); 
+  fChain->Branch("weight_CMS_eff_t_pThigh_MVADM1_13TeVDown", &weight_CMS_eff_t_pThigh_MVADM1_13TeVDown, "weight_CMS_eff_t_pThigh_MVADM1_13TeVDown/F"); 
+  fChain->Branch("weight_CMS_eff_t_pThigh_MVADM2_13TeVDown", &weight_CMS_eff_t_pThigh_MVADM2_13TeVDown, "weight_CMS_eff_t_pThigh_MVADM2_13TeVDown/F"); 
+  fChain->Branch("weight_CMS_eff_t_pThigh_MVADM10_13TeVDown", &weight_CMS_eff_t_pThigh_MVADM10_13TeVDown, "weight_CMS_eff_t_pThigh_MVADM10_13TeVDown/F");
+  fChain->Branch("weight_CMS_eff_t_pThigh_MVADM11_13TeVDown", &weight_CMS_eff_t_pThigh_MVADM11_13TeVDown, "weight_CMS_eff_t_pThigh_MVADM11_13TeVDown/F");
+
+
 
    fChain->Branch("weight_CMS_scale_gg_13TeVUp", &weight_CMS_scale_gg_13TeVUp, "weight_CMS_scale_gg_13TeVUp/F");
    fChain->Branch("weight_CMS_scale_gg_13TeVDown", &weight_CMS_scale_gg_13TeVDown, "weight_CMS_scale_gg_13TeVDown/F");

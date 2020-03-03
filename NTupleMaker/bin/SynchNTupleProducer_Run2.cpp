@@ -425,7 +425,7 @@ int main(int argc, char * argv[]){
   }  
 
   // Workspace with corrections
-  TString workspace_filename = TString(cmsswBase) + "/src/DesyTauAnalyses/NTupleMaker/data/" + CorrectionWorkspaceFileName;
+  TString workspace_filename = TString(cmsswBase) + "/src/LegacyCorrectionsWorkspace/output/" + CorrectionWorkspaceFileName;
   cout << "Taking correction workspace from " << workspace_filename << endl;
   TFile *f_workspace = new TFile(workspace_filename, "read");
   if (f_workspace->IsZombie()) {
@@ -790,7 +790,6 @@ int main(int argc, char * argv[]){
       vector<int> nSingleLepTrig(filterSingleLep.size(), -1);
       vector<int> nXTrigLepLeg(filterXtriggerLepLeg.size(), -1);
       vector<int> nXTrigTauLeg(filterXtriggerTauLeg.size(), -1);
-      
       if(ApplyTrigger){
       	vector<bool> checkFilterSingleLep(filterSingleLep.size(), false); 
       	vector<bool> checkFilterXTrigLepLeg(filterXtriggerLepLeg.size(), false); 
@@ -854,9 +853,9 @@ int main(int argc, char * argv[]){
       	if (analysisTree.tau_byVVVLooseDeepTau2017v2p1VSjet[it] < 0.5) continue;
       	if (analysisTree.tau_byVVVLooseDeepTau2017v2p1VSe[it] < 0.5) continue;
       	if (analysisTree.tau_byVLooseDeepTau2017v2p1VSmu[it] < 0.5) continue;
-  
         if (analysisTree.tau_decayModeFindingNewDMs[it] < 0.5) continue; //always true, cut applied in NTupleMaker
         if (analysisTree.tau_decayMode[it] == 5 || analysisTree.tau_decayMode[it] == 6) continue;
+        if (analysisTree.tau_MVADM2017v1[it] < 0) continue; //prevents storing events with unidentified mva DM for the tau (-1)
     
         taus.push_back(it);
       }
@@ -1170,7 +1169,27 @@ int main(int argc, char * argv[]){
       otree->weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVDown = 1;
       otree->weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVDown = 1;
       otree->weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVDown = 1;
-
+      otree->weight_CMS_eff_t_pTlow_MVADM0_13TeVUp = 1; 
+      otree->weight_CMS_eff_t_pTlow_MVADM1_13TeVUp = 1; 
+      otree->weight_CMS_eff_t_pTlow_MVADM2_13TeVUp = 1; 
+      otree->weight_CMS_eff_t_pTlow_MVADM10_13TeVUp = 1;
+      otree->weight_CMS_eff_t_pTlow_MVADM11_13TeVUp = 1;
+      otree->weight_CMS_eff_t_pThigh_MVADM0_13TeVUp = 1;
+      otree->weight_CMS_eff_t_pThigh_MVADM1_13TeVUp = 1;
+      otree->weight_CMS_eff_t_pThigh_MVADM2_13TeVUp = 1;
+      otree->weight_CMS_eff_t_pThigh_MVADM10_13TeVUp = 1; 
+      otree->weight_CMS_eff_t_pThigh_MVADM11_13TeVUp = 1; 
+      otree->weight_CMS_eff_t_pTlow_MVADM0_13TeVDown = 1; 
+      otree->weight_CMS_eff_t_pTlow_MVADM1_13TeVDown = 1; 
+      otree->weight_CMS_eff_t_pTlow_MVADM2_13TeVDown = 1; 
+      otree->weight_CMS_eff_t_pTlow_MVADM10_13TeVDown = 1; 
+      otree->weight_CMS_eff_t_pTlow_MVADM11_13TeVDown = 1; 
+      otree->weight_CMS_eff_t_pThigh_MVADM0_13TeVDown = 1; 
+      otree->weight_CMS_eff_t_pThigh_MVADM1_13TeVDown = 1; 
+      otree->weight_CMS_eff_t_pThigh_MVADM2_13TeVDown = 1; 
+      otree->weight_CMS_eff_t_pThigh_MVADM10_13TeVDown = 1;
+      otree->weight_CMS_eff_t_pThigh_MVADM11_13TeVDown = 1;
+	
       if (ApplyPUweight) 
         otree->puweight = float(PUofficial->get_PUweight(double(analysisTree.numtruepileupinteractions)));
       if(!isData || isEmbedded){
@@ -1178,6 +1197,7 @@ int main(int argc, char * argv[]){
         otree->gen_noutgoing = analysisTree.genparticles_noutgoing;
       }
 
+      //cout <<"Trig SF" <<endl;
 
       if ((!isData || isEmbedded) && ApplyLepSF) {
       	TString suffix = "mc";
@@ -1269,15 +1289,67 @@ int main(int argc, char * argv[]){
       }
       counter[10]++;
     
-    
+      //cout <<"TauID SF" <<endl;
+
       if ((!isData || isEmbedded) && analysisTree.tau_genmatch[tauIndex] == 5) { 
+      	TString suffix = "";
+      	if (isEmbedded) suffix = "_embed";
+
+	TString mvadm = TString::Itoa(analysisTree.tau_MVADM2017v1[tauIndex],10);
+	double t_pt = analysisTree.tau_pt[tauIndex];
+
       	w->var("t_pt")->setVal(analysisTree.tau_pt[tauIndex]);
-      	if (!isEmbedded)
-      	  otree->idisoweight_2 = w->function("t_deeptauid_pt_medium")->getVal();	
-      	else {
-      	  double t_dm = analysisTree.tau_decayMode[tauIndex];
-      	  otree->idisoweight_2 = 0.99*((t_dm==0)*0.975 + (t_dm==1)*0.975*1.051 + (t_dm==2)*0.975*1.051 + (t_dm==10)*pow(0.975,3) + (t_dm==11)*pow(0.975,3)*1.051);
-      	}
+      	w->var("t_mvadm")->setVal(analysisTree.tau_MVADM2017v1[tauIndex]);
+	double nominalID = w->function("t_deeptauid_mvadm"+suffix+"_medium")->getVal();
+	otree->idisoweight_2 = nominalID;
+	//cout <<nominalID <<endl;
+	double tauIDlowpTUp = w->function("t_deeptauid_mvadm"+suffix+"_medium_lowpt_mvadm"+mvadm+"_up")->getVal() / nominalID;
+	double tauIDhighpTUp = w->function("t_deeptauid_mvadm"+suffix+"_medium_highpt_mvadm"+mvadm+"_up")->getVal() / nominalID;
+	double tauIDlowpTDown = w->function("t_deeptauid_mvadm"+suffix+"_medium_lowpt_mvadm"+mvadm+"_down")->getVal() / nominalID;
+	double tauIDhighpTDown = w->function("t_deeptauid_mvadm"+suffix+"_medium_highpt_mvadm"+mvadm+"_down")->getVal() / nominalID;
+
+	if(mvadm=="0"){
+	  if(t_pt<40){
+	    otree->weight_CMS_eff_t_pTlow_MVADM0_13TeVUp = tauIDlowpTUp;
+	    otree->weight_CMS_eff_t_pTlow_MVADM0_13TeVDown = tauIDlowpTDown;
+	  }else{
+	    otree->weight_CMS_eff_t_pThigh_MVADM0_13TeVUp = tauIDhighpTUp;
+	    otree->weight_CMS_eff_t_pThigh_MVADM0_13TeVDown = tauIDhighpTDown;
+	  }
+	}else if(mvadm=="1"){
+	  if(t_pt<40){
+	    otree->weight_CMS_eff_t_pTlow_MVADM1_13TeVUp = tauIDlowpTUp;
+	    otree->weight_CMS_eff_t_pTlow_MVADM1_13TeVDown = tauIDlowpTDown;
+	  }else{
+	    otree->weight_CMS_eff_t_pThigh_MVADM1_13TeVUp = tauIDhighpTUp;
+	    otree->weight_CMS_eff_t_pThigh_MVADM1_13TeVDown = tauIDhighpTDown;
+	  }
+	}else if(mvadm=="2"){
+	  if(t_pt<40){
+	    otree->weight_CMS_eff_t_pTlow_MVADM2_13TeVUp = tauIDlowpTUp;
+	    otree->weight_CMS_eff_t_pTlow_MVADM2_13TeVDown = tauIDlowpTDown;
+	  }else{
+	    otree->weight_CMS_eff_t_pThigh_MVADM2_13TeVUp = tauIDhighpTUp;
+	    otree->weight_CMS_eff_t_pThigh_MVADM2_13TeVDown = tauIDhighpTDown;
+	  }
+	}else if(mvadm=="10"){
+	  if(t_pt<40){
+	    otree->weight_CMS_eff_t_pTlow_MVADM10_13TeVUp = tauIDlowpTUp;
+	    otree->weight_CMS_eff_t_pTlow_MVADM10_13TeVDown = tauIDlowpTDown;
+	  }else{
+	    otree->weight_CMS_eff_t_pThigh_MVADM10_13TeVUp = tauIDhighpTUp;
+	    otree->weight_CMS_eff_t_pThigh_MVADM10_13TeVDown = tauIDhighpTDown;
+	  }
+	}else if(mvadm=="11"){
+	  if(t_pt<40){
+	    otree->weight_CMS_eff_t_pTlow_MVADM11_13TeVUp = tauIDlowpTUp;
+	    otree->weight_CMS_eff_t_pTlow_MVADM11_13TeVDown = tauIDlowpTDown;
+	  }else{
+	    otree->weight_CMS_eff_t_pThigh_MVADM11_13TeVUp = tauIDhighpTUp;
+	    otree->weight_CMS_eff_t_pThigh_MVADM11_13TeVDown = tauIDhighpTDown;
+	  }
+	}
+								 
       }
     
       //      cout << "\n======================" << endl;
