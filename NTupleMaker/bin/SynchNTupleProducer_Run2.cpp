@@ -425,7 +425,7 @@ int main(int argc, char * argv[]){
   }  
 
   // Workspace with corrections
-  TString workspace_filename = TString(cmsswBase) + "/src/LegacyCorrectionsWorkspace/output/" + CorrectionWorkspaceFileName;
+  TString workspace_filename = TString(cmsswBase) + "/src/" + CorrectionWorkspaceFileName;
   cout << "Taking correction workspace from " << workspace_filename << endl;
   TFile *f_workspace = new TFile(workspace_filename, "read");
   if (f_workspace->IsZombie()) {
