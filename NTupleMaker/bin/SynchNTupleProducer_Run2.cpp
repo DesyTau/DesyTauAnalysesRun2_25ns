@@ -1952,6 +1952,10 @@ int main(int argc, char * argv[]){
     delete lepTauFakeOneProngOnePi0ScaleSys;
   }
 
+  if(lepTauFakeThreeProngScaleSys != 0){
+    lepTauFakeThreeProngScaleSys->Write();
+    delete lepTauFakeThreeProngScaleSys;
+  }
 
   if(jetEnergyScaleSys.size() > 0){
     for (unsigned int i = 0; i < jetEnergyScaleSys.size(); i++){
