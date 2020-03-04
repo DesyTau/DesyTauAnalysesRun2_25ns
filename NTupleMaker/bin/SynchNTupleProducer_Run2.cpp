@@ -1915,7 +1915,6 @@ int main(int argc, char * argv[]){
   
   file->cd("");
   file->Write();
-
   // delete systematics objects
 
   if(tauScaleSys != 0){
@@ -1974,22 +1973,6 @@ int main(int argc, char * argv[]){
       delete puppiMetSys.at(i);
     }
   }
-
-  if(lepTauFakeOneProngScaleSys != 0){
-    lepTauFakeOneProngScaleSys->Write();
-    delete lepTauFakeOneProngScaleSys;
-  }
-
-  if(lepTauFakeOneProngOnePi0ScaleSys != 0){
-    lepTauFakeOneProngOnePi0ScaleSys->Write();
-    delete lepTauFakeOneProngOnePi0ScaleSys;
-  }
-
-  if(lepTauFakeThreeProngScaleSys != 0){
-    lepTauFakeThreeProngScaleSys->Write();
-    delete lepTauFakeThreeProngScaleSys;
-  }
-
 
   file->Close();
   delete file;
