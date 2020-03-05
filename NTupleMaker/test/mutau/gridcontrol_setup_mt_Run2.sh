@@ -17,7 +17,9 @@ cd ..
 
 ###################################################################################################
 #
+# Change make_parameter_file.sh in the ./20$YEAR directory before running this script
 # After running this script setup the gridcontrol config file (./2017/gc_synch17.conf for example)
 # Change project area, and storage area (se path)
+# Then run grid-control
 #
 ###################################################################################################

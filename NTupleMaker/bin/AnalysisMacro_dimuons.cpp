@@ -32,6 +32,7 @@
 #include "HTT-utilities/RecoilCorrections/interface/RecoilCorrector.h"
 #include "HTT-utilities/RecoilCorrections/interface/MEtSys.h"
 #include "HiggsCPinTauDecays/IpCorrection/interface/IpCorrection.h"
+#include "HiggsCPinTauDecays/ImpactParameter/interface/ImpactParameter.h"
 
 #include "CondFormats/BTauObjects/interface/BTagCalibration.h"
 #include "CondTools/BTau/interface/BTagCalibrationReader.h"
@@ -39,6 +40,8 @@
 #include "RooWorkspace.h"
 #include "RooAbsReal.h"
 #include "RooRealVar.h"
+
+typedef ROOT::Math::SMatrix<float,5,5, ROOT::Math::MatRepSym<float,5>> SMatrixSym5F;
 
 float topPtWeight(float pt1,
 		  float pt2) {
@@ -56,10 +59,59 @@ float topPtWeight(float pt1,
 
 }
 
-TVector3 get_refitted_PV_with_BS(const AC1B * analysisTree, int leptonIndex1, int leptonIndex2, bool &is_refitted_PV_with_BS){
+float getEmbeddedWeight(const AC1B *analysisTree, RooWorkspace * wEm) {
+
+  std::vector<TLorentzVector> taus; taus.clear();
+  float emWeight = 1;
+  for (unsigned int igen = 0; igen < analysisTree->genparticles_count; ++igen) {
+    if (TMath::Abs(analysisTree->genparticles_pdgid[igen])==13&&analysisTree->genparticles_isPrompt[igen]&&analysisTree->genparticles_status[igen]==1) {
+    TLorentzVector tauLV; tauLV.SetXYZT(analysisTree->genparticles_px[igen], 
+					analysisTree->genparticles_py[igen],
+					analysisTree->genparticles_pz[igen],
+					analysisTree->genparticles_e[igen]);
+      taus.push_back(tauLV);
+      //      cout << analysisTree->genparticles_pdgid[igen] << endl;
+    }
+  }
+  
+  //  cout << "Taus : " << taus.size() << std::endl;
+  //  cout << endl;
+
+  if (taus.size() == 2) {
+    double gt1_pt  = taus[0].Pt();
+    double gt1_eta = taus[0].Eta();
+    double gt2_pt  = taus[1].Pt();
+    double gt2_eta = taus[1].Eta();
+    wEm->var("gt_pt")->setVal(gt1_pt);
+    wEm->var("gt_eta")->setVal(gt1_eta);
+    double id1_embed = wEm->function("m_sel_id_ic_ratio")->getVal();
+    wEm->var("gt_pt")->setVal(gt2_pt);
+    wEm->var("gt_eta")->setVal(gt2_eta);
+    double id2_embed = wEm->function("m_sel_id_ic_ratio")->getVal();
+    wEm->var("gt1_pt")->setVal(gt1_pt);
+    wEm->var("gt2_pt")->setVal(gt2_pt);
+    wEm->var("gt1_eta")->setVal(gt1_eta);
+    wEm->var("gt2_eta")->setVal(gt2_eta);
+    //    double trg_emb = wEm->function("m_sel_trg_ic_ratio")->getVal();
+    double trg_emb_ic = wEm->function("m_sel_trg_ic_ratio")->getVal();
+    emWeight = id1_embed * id2_embed * trg_emb_ic;
+    //    double emWeight_ic = id1_embed * id2_embed * trg_emb_ic;
+    //    cout << "KIT : " << emWeight << "  IC : " << emWeight_ic << std::endl;
+  }
+
+  //  cout << "Embedding : " << emWeight << std::endl;
+  return emWeight;
+
+}
+
+TVector3 get_refitted_PV_with_BS(const AC1B * analysisTree, int leptonIndex1, int leptonIndex2, bool &is_refitted_PV_with_BS, std::vector<float> & PV_covariance){
+
 	float vtx_x = analysisTree->primvertexwithbs_x; // by default store non-refitted PV with BS constraint if refitted one is not found
 	float vtx_y = analysisTree->primvertexwithbs_y;
 	float vtx_z = analysisTree->primvertexwithbs_z;
+	for (int j = 0; j<6 ; ++j)
+	  PV_covariance.push_back(analysisTree->primvertexwithbs_cov[j]);
+
 	is_refitted_PV_with_BS = false;
 
 	for(unsigned int i = 0; i < analysisTree->refitvertexwithbs_count; i++)
@@ -71,12 +123,69 @@ TVector3 get_refitted_PV_with_BS(const AC1B * analysisTree, int leptonIndex1, in
 	      vtx_y = analysisTree->refitvertexwithbs_y[i];
 
 	      vtx_z = analysisTree->refitvertexwithbs_z[i];
+	      for (int j = 0; j<6 ; ++j)
+		PV_covariance[j] = analysisTree->refitvertexwithbs_cov[i][j];
+
 	      is_refitted_PV_with_BS = true;
 	    }
 	}
 	TVector3 vertex_coord(vtx_x, vtx_y, vtx_z);
 	return vertex_coord;
-}
+};
+
+TVector3 ipHelical(const AC1B * analysisTree, 
+		   int muIndex, 
+		   TVector3 PV_coord,
+		   std::vector<float> PV_cov,
+		   ROOT::Math::SMatrix<float,3,3, ROOT::Math::MatRepStd< float, 3, 3 >> &IPCovariance
+		   ) {
+
+  ImpactParameter IP;
+
+  std::pair <TVector3, ROOT::Math::SMatrix<float,3,3, ROOT::Math::MatRepStd< float, 3, 3 >>> ipAndCov;
+  std::vector<float> h_param_mu = {};
+  RMPoint ref_mu;
+  SMatrixSym3D PV_covariance;
+  SMatrixSym5F helix_params_covariance;
+	
+  int k = 0;
+  double B = analysisTree->muon_Bfield[muIndex];	
+  ref_mu.SetX(analysisTree->muon_referencePoint[muIndex][0]);
+  ref_mu.SetY(analysisTree->muon_referencePoint[muIndex][1]);
+  ref_mu.SetZ(analysisTree->muon_referencePoint[muIndex][2]);
+  RMPoint PV(PV_coord.X(), PV_coord.Y(), PV_coord.Z());
+  for(auto i:  analysisTree->muon_helixparameters[muIndex]) h_param_mu.push_back(i);	
+  
+  // !! check that in NTupleMaker the logic of filling PV_cov_components is the same 
+  // for more on how to fill SMatrices see: https://root.cern/doc/master/SMatrixDoc.html 
+  for (size_t i = 0; i < 5; i++)
+    for (size_t j = i; j < 5; j++) // should be symmetrically completed automatically
+      helix_params_covariance[i][j] = analysisTree->muon_helixparameters_covar[muIndex][i][j];
+  for (size_t i = 0; i < 3; i++)
+    {
+      for (size_t j = i; j < 3; j++) // should be symmetrically completed automatically
+	{
+	  PV_covariance[i][j] = PV_cov[k];
+          PV_covariance[j][i] = PV_cov[k];
+	  k++;
+	}
+    }
+  
+  ipAndCov = IP.CalculateIPandCovariance(
+					 B, // (double)
+					 h_param_mu, // (std::vector<float>)
+					 ref_mu, // (RMPoint)
+					 PV, // (RMPoint)	
+					 helix_params_covariance, // (ROOT::Math::SMatrix<float,5,5, ROOT::Math::MatRepSym<float,5>>)
+					 PV_covariance // (SMatrixSym3D)		
+					 );
+  
+  TVector3 ip = ipAndCov.first;
+  IPCovariance = ipAndCov.second;
+  
+  return ip;
+
+};
 
 TVector3 ipVec_Lepton(const AC1B * analysisTree, int muonIndex, TVector3 vertex) {
 
@@ -173,6 +282,7 @@ int main(int argc, char * argv[]) {
   Config cfg(argv[1]);
 
   const bool isData = cfg.get<bool>("IsData");
+  const bool isEmbedded = cfg.get<bool>("IsEmbedded");
   const bool applyGoodRunSelection = cfg.get<bool>("ApplyGoodRunSelection");
 
   // pile up reweighting
@@ -248,6 +358,7 @@ int main(int argc, char * argv[]) {
   TString ZMassPtWeightsHistName(zMassPtWeightsHistName);
 
   const bool applyIpCorrection = cfg.get<bool>("ApplyIpCorrection"); 
+  const bool applyIpSigCorrection = cfg.get<bool>("ApplyIpSigCorrection"); 
   const string ipCorrFileName  = cfg.get<string>("IpCorrectionFileName");
   TString IpCorrFileName(ipCorrFileName);
 
@@ -403,6 +514,26 @@ int main(int argc, char * argv[]) {
   TH1D * ipyH = new TH1D("ipyH","ipyH",100,-0.01,0.01);
   TH1D * ipzH = new TH1D("ipzH","ipzH",100,-0.01,0.01);
 
+  TH1D * ipxSigH = new TH1D("ipxSigH","ipxSigH",400,-10,10);
+  TH1D * ipySigH = new TH1D("ipySigH","ipySigH",400,-10,10);
+  TH1D * ipzSigH = new TH1D("ipzSigH","ipzSigH",400,-10,10);
+
+  TH1D * ipSigH = new TH1D("ipSigH","",500,0.,10);
+
+  TH1D * ipxSigUncorrH = new TH1D("ipxSigUncorrH","ipxSigH",400,-10,10);
+  TH1D * ipySigUncorrH = new TH1D("ipySigUncorrH","ipySigH",400,-10,10);
+  TH1D * ipzSigUncorrH = new TH1D("ipzSigUncorrH","ipzSigH",400,-10,10);
+
+  TH1D * ipzRegionH = new TH1D("ipzRegionH","",100,-0.05,0.05);
+  TH1D * ipzUncorrRegionH = new TH1D("ipzUncorrRegionH","",100,-0.05,0.05);
+  TH1D * dipzRegionH = new TH1D("dipzRegionH","",100,-0.05,0.05);
+
+  TH1D * ipzSigRegionH = new TH1D("ipzSigRegionH","",400,-10,10);
+  TH1D * ipzSigUncorrRegionH = new TH1D("ipzSigUncorrRegionH","",400,-10,10);
+  TH1D * dipzSigRegionH = new TH1D("dipzSigRegionH","",400,-10,10);
+
+
+
   TH1D * ipdxH = new TH1D("ipdxH","ipdxH",100,-0.02,0.02);
   TH1D * ipdyH = new TH1D("ipdyH","ipdyH",100,-0.02,0.02);
   TH1D * ipdzH = new TH1D("ipdzH","ipdzH",100,-0.02,0.02);
@@ -418,6 +549,14 @@ int main(int argc, char * argv[]) {
   TH1D * ipxEtaH[4];
   TH1D * ipyEtaH[4];
   TH1D * ipzEtaH[4];
+
+  TH1D * ipxSigEtaH[4];
+  TH1D * ipySigEtaH[4];
+  TH1D * ipzSigEtaH[4];
+  
+  TH1D * ipxErrEtaH[4];
+  TH1D * ipyErrEtaH[4];
+  TH1D * ipzErrEtaH[4];
   
   // tag and probe 
   int nPtBins = 7;
@@ -443,6 +582,12 @@ int main(int argc, char * argv[]) {
     ipxEtaH[iEta] = new TH1D("ipx"+EtaBins[iEta],"",200,-0.02,0.02);
     ipyEtaH[iEta] = new TH1D("ipy"+EtaBins[iEta],"",200,-0.02,0.02);
     ipzEtaH[iEta] = new TH1D("ipz"+EtaBins[iEta],"",200,-0.02,0.02);
+    ipxSigEtaH[iEta] = new TH1D("ipxSig"+EtaBins[iEta],"",200,-10,10);
+    ipySigEtaH[iEta] = new TH1D("ipySig"+EtaBins[iEta],"",200,-10,10);
+    ipzSigEtaH[iEta] = new TH1D("ipzSig"+EtaBins[iEta],"",200,-10,10);
+    ipxErrEtaH[iEta] = new TH1D("ipxErr"+EtaBins[iEta],"",1000,0,0.1);
+    ipyErrEtaH[iEta] = new TH1D("ipyErr"+EtaBins[iEta],"",1000,0,0.1);
+    ipzErrEtaH[iEta] = new TH1D("ipzErr"+EtaBins[iEta],"",1000,0,0.1);
   }
 
   TString JetBins[3] = {"Jet0","Jet1","JetGe2"};
@@ -815,13 +960,28 @@ int main(int argc, char * argv[]) {
 
       //------------------------------------------------
 
-      if (!isData) { 
+      if (!isData || isEmbedded) { 
 	float genweight = 1;
+	//	std::cout << "gen weight = " << analysisTree.genweight << std::endl;
 	if (analysisTree.genweight<0)
 	  genweight = -1;
 	weight *= genweight;
+	//	std::cout << "weight = " << weight << std::endl;
       }
-      
+      if ( isEmbedded && TStrName.Contains("2016") ) {
+	unsigned int run = analysisTree.event_run;
+	float embedded_stitching_weight = 
+	  ((run >= 272007) && (run < 275657))*(1.0/0.891)
+	  +((run >= 275657) && (run < 276315))*(1.0/0.910)
+	  +((run >= 276315) && (run < 276831))*(1.0/0.953)
+	  +((run >= 276831) && (run < 277772))*(1.0/0.947)
+	  +((run >= 277772) && (run < 278820))*(1.0/0.942)
+	  +((run >= 278820) && (run < 280919))*(1.0/0.906)
+	  +((run >= 280919) && (run < 284045))*(1.0/0.950);
+	//	std::cout << "stitching weight = " << embedded_stitching_weight << std::endl;
+	weight *= embedded_stitching_weight;
+      }
+
       TLorentzVector genZ; genZ.SetXYZT(0,0,0,0); 
       TLorentzVector genV; genV.SetXYZT(0,0,0,0);
       TLorentzVector genL; genL.SetXYZT(0,0,0,0);
@@ -1538,39 +1698,76 @@ int main(int argc, char * argv[]) {
 	//	std::cout << "Jet processed" << std::endl;
 
 	bool isRefittedVtx = false;
-	TVector3 vertex = get_refitted_PV_with_BS(&analysisTree,indx1,indx2,isRefittedVtx);
+	std::vector<float> PV_cov; PV_cov.clear();
+	TVector3 vertex = get_refitted_PV_with_BS(&analysisTree,indx1,indx2,isRefittedVtx,PV_cov);
 	TVector3 ip1    = ipVec_Lepton(&analysisTree,indx1,vertex);
 	TVector3 ip2    = ipVec_Lepton(&analysisTree,indx2,vertex);
 	double ptMu1 = (double)analysisTree.muon_pt[indx1];
 	double ptMu2 = (double)analysisTree.muon_pt[indx2];
 	double etaMu1 = (double)analysisTree.muon_eta[indx1];
 	double etaMu2 = (double)analysisTree.muon_eta[indx2];
+	ROOT::Math::SMatrix<float,3,3, ROOT::Math::MatRepStd< float, 3, 3 >> ipCov1;
+	TVector3 ip1_0 = ipHelical(&analysisTree,indx1,vertex,PV_cov,ipCov1);
+	ROOT::Math::SMatrix<float,3,3, ROOT::Math::MatRepStd< float, 3, 3 >> ipCov2;
+	TVector3 ip2_0 = ipHelical(&analysisTree,indx2,vertex,PV_cov,ipCov2);
 
-	if (!isData && applyLeptonSF) {
+	/*
+	cout << "ip(1)  : X = " << ip1.X() << "  Y = " << ip1.Y() << "  Z = " << ip1.Z() << endl; 
+	cout << "ip0(1) : X = " << ip1_0.X() << "  Y = " << ip1_0.Y() << "  Z = " << ip1_0.Z() << endl; 
+	cout << "ip(2)  : X = " << ip2.X() << "  Y = " << ip2.Y() << "  Z = " << ip2.Z() << endl; 
+	cout << "ip0(2) : X = " << ip2_0.X() << "  Y = " << ip2_0.Y() << "  Z = " << ip2_0.Z() << endl; 
+	cout << "IP Covariance (1) : [0,0] = " << TMath::Sqrt(ipCov1[0][0])
+	     << " [1,1] = " << TMath::Sqrt(ipCov1[1][1])
+	     << " [2,2] = " << TMath::Sqrt(ipCov1[2][2]) << endl;
+	cout << "IP Covariance (2) : [0,0] = " << TMath::Sqrt(ipCov2[0][0])
+	     << " [1,1] = " << TMath::Sqrt(ipCov2[1][1])
+	     << " [2,2] = " << TMath::Sqrt(ipCov2[2][2]) << endl;
+
+	cout << endl;
+	*/	
+
+	if ((!isData || isEmbedded) && applyLeptonSF) {
 
 	  //leptonSFweight = SF_yourScaleFactor->get_ScaleFactor(pt, eta)	
 	  double IdIsoSF_mu1 = SF_muonIdIso->get_ScaleFactor(ptMu1, etaMu1);
 	  double IdIsoSF_mu2 = SF_muonIdIso->get_ScaleFactor(ptMu2, etaMu2);
 
-
+	  //	  std::cout << " weight (2) = " << weight << std::endl;
 	  /*
 	  std::cout << "isRefittedVtx = " << isRefittedVtx << std::endl;
 	  std::cout << "IP1 (x,y,z) = (" << ip1.X() << "," << ip1.Y() << "," << ip1.Z() << ")" << std::endl; 
 	  std::cout << "IP2 (x,y,z) = (" << ip2.X() << "," << ip2.Y() << "," << ip2.Z() << ")" << std::endl; 
 	  std::cout << std::endl;
 	  */
+
+	  //	  std::cout<< "IdIsoSF1 (DESY) = " << IdIsoSF_mu1 <<std::endl;
+	  //	  std::cout<< "IdIsoSF2 (DESY) = " << IdIsoSF_mu2 <<std::endl;
+
 	  correctionWS->var("m_eta")->setVal(etaMu1);
 	  correctionWS->var("m_pt")->setVal(ptMu1);
 	  double trackSF_mu1 = correctionWS->function("m_trk_ratio")->getVal();
-	  if (applyKITCorrection)
-	    IdIsoSF_mu1 = correctionWS->function("m_id_ratio")->getVal()*correctionWS->function("m_iso_ratio")->getVal();
-
+	  if (applyKITCorrection) {
+	    if (isEmbedded) 
+	      IdIsoSF_mu1 = correctionWS->function("m_idiso_ic_embed_ratio")->getVal();
+	    else 
+	      IdIsoSF_mu1 = correctionWS->function("m_idiso_ic_ratio")->getVal();
+	    //	    std::cout << "IdIsoSF1 (IC) = " << IdIsoSF_mu1 << std::endl;
+	  }
 
 	  correctionWS->var("m_eta")->setVal(etaMu2);
           correctionWS->var("m_pt")->setVal(ptMu2);
 	  double trackSF_mu2 = correctionWS->function("m_trk_ratio")->getVal();
-	  if (applyKITCorrection)
-	    IdIsoSF_mu2 = correctionWS->function("m_id_ratio")->getVal()*correctionWS->function("m_iso_ratio")->getVal();
+	  if (applyKITCorrection) {
+	    if (isEmbedded) 
+	      IdIsoSF_mu2 = correctionWS->function("m_idiso_ic_embed_ratio")->getVal();
+	    else
+	      IdIsoSF_mu2 = correctionWS->function("m_idiso_ic_ratio")->getVal();
+	    //	    std::cout<< "IdIsoSF2 (IC) = " << IdIsoSF_mu2 <<std::endl;
+	  }
+
+	  //	  cout << " Mu1 : IdIso = " << IdIsoSF_mu1 << "  " << SF_muonIdIso->get_ScaleFactor(ptMu1, etaMu1) << endl;
+	  //	  cout << " Mu2 : IdIso = " << IdIsoSF_mu2 << "  " << SF_muonIdIso->get_ScaleFactor(ptMu2, etaMu2) << endl;
+	  
 
 	  MuSF_IdIso_Mu1H->Fill(IdIsoSF_mu1);
 	  MuSF_IdIso_Mu2H->Fill(IdIsoSF_mu2);
@@ -1607,6 +1804,8 @@ int main(int argc, char * argv[]) {
 	    weight = weight*weightTrig;
 	  }
 	}
+	if (isEmbedded)
+	  weight = weight*getEmbeddedWeight(&analysisTree,correctionWS);
 
 	float visiblePx = dimuon.Px();
 	float visiblePy = dimuon.Py();
@@ -1691,9 +1890,9 @@ int main(int argc, char * argv[]) {
 	  float dimuonPt  = dimuon.Pt();
 	  float dimuonPhi = dimuon.Phi();
 	  float sumMuonPt = (mu1.Pt()+mu2.Pt());
-	  float ptRatio = 0.0;
-	  if (sumMuonPt != 0)
-	    ptRatio = (dimuonPt/sumMuonPt);
+	  //	  float ptRatio = 0.0;
+	  //	  if (sumMuonPt != 0)
+	  //	    ptRatio = (dimuonPt/sumMuonPt);
 
 	  dimuonMassPtH->Fill(massSel,dimuonPt,weight);
 	  dimuonPtSelH->Fill(dimuon.Pt(),weight);
@@ -1799,6 +1998,27 @@ int main(int argc, char * argv[]) {
 	      */
 	    }
 
+	    
+	    if (applyIpSigCorrection) {
+	      ROOT::Math::SMatrix<float,3,3, ROOT::Math::MatRepStd< float, 3, 3 >> ipCovCorr 
+		= ipCorrection->correctIpCov(ipCov1,mu1.Eta());
+	      ipCov1 = ipCovCorr;
+	      ipCovCorr
+                = ipCorrection->correctIpCov(ipCov2,mu2.Eta());
+	      ipCov2 = ipCovCorr;
+	    }
+
+	    ImpactParameter IP;
+
+	    TVector3 ipCorr1; ipCorr1.SetX(ipx1); ipCorr1.SetY(ipy1); ipCorr1.SetZ(ipz1);
+	    double ipSig1 = IP.CalculateIPSignificanceHelical(ipCorr1,ipCov1);
+
+	    TVector3 ipCorr2; ipCorr2.SetX(ipx2); ipCorr2.SetY(ipy2); ipCorr2.SetZ(ipz2);
+	    double ipSig2 = IP.CalculateIPSignificanceHelical(ipCorr2,ipCov2);
+
+	    ipSigH->Fill(ipSig1,weight);
+	    ipSigH->Fill(ipSig2,weight);
+
 	    ipxH->Fill(ipx1,weight);
 	    ipxH->Fill(ipx2,weight);
 
@@ -1808,8 +2028,108 @@ int main(int argc, char * argv[]) {
 	    ipzH->Fill(ipz1,weight);
 	    ipzH->Fill(ipz2,weight);
 
+
+	    double ipxSig1 = ipx1/TMath::Sqrt(ipCov1(0,0));
+	    double ipySig1 = ipy1/TMath::Sqrt(ipCov1(1,1));
+	    double ipzSig1 = ipz1/TMath::Sqrt(ipCov1(2,2));
+
+	    double ipxSigUncorr1 = ip1.X()/TMath::Sqrt(ipCov1(0,0));
+	    double ipySigUncorr1 = ip1.Y()/TMath::Sqrt(ipCov1(1,1));
+	    double ipzSigUncorr1 = ip1.Z()/TMath::Sqrt(ipCov1(2,2));
+
+	    double ipxSig2 = ipx2/TMath::Sqrt(ipCov2(0,0));
+	    double ipySig2 = ipy2/TMath::Sqrt(ipCov2(1,1));
+	    double ipzSig2 = ipz2/TMath::Sqrt(ipCov2(2,2));
+
+	    double ipxSigUncorr2 = ip2.X()/TMath::Sqrt(ipCov2(0,0));
+	    double ipySigUncorr2 = ip2.Y()/TMath::Sqrt(ipCov2(1,1));
+	    double ipzSigUncorr2 = ip2.Z()/TMath::Sqrt(ipCov2(2,2));
+
+	    /*
+	      if (ipz1>0.02) {
+	      cout << endl;
+	      cout << "1 : (helical) ipx = " << ip1_0.X()
+		   << "   ipy = " << ip1_0.Y() 
+		   << "   ipz = " << ip1_0.Z() << std::endl;
+	      cout << "1 : (tangent) ipx = " << ip1.X() 
+		   << "   ipy = " << ip1.Y()
+		   << "   ipz = " << ip1.Z() << std::endl;
+	      cout << "1 : (correct) ipx = " << ipx1 
+		   << "   ipy = " << ipy1
+		   << "   ipz = " << ipz1 << std::endl;
+	      cout << "1 : covxx = " << TMath::Sqrt(ipCov1(0,0))
+		   << "    covyy = " << TMath::Sqrt(ipCov1(1,1))
+		   << "    covzz = " << TMath::Sqrt(ipCov1(2,2)) << std::endl;
+	      cout << "1 : ipxSig = " << ipxSig1
+		   << "    ipySig = " << ipySig1
+		   << "    ipzSig = " << ipzSig1 
+		   << "    ipzSig(Old) = " << ipzSigOld1 << std::endl;
+	      cout << endl;
+	    }
+
+	    if (ipz2>0.02) {
+	      cout << endl;
+	      cout << "2 : (helical) ipx = " << ip2_0.X()
+		   << "   ipy = " << ip2_0.Y() 
+		   << "   ipz = " << ip2_0.Z() << std::endl;
+	      cout << "2 : (tangent) ipx = " << ip2.X() 
+		   << "   ipy = " << ip2.Y()
+		   << "   ipz = " << ip2.Z() << std::endl;
+	      cout << "2 : (correct) ipx = " << ipx2 
+		   << "   ipy = " << ipy2
+		   << "   ipz = " << ipz2 << std::endl;
+	      cout << "2 : covxx = " << TMath::Sqrt(ipCov2(0,0))
+		   << "    covyy = " << TMath::Sqrt(ipCov2(1,1))
+		   << "    covzz = " << TMath::Sqrt(ipCov2(2,2)) << std::endl;
+	      cout << "2 : ipxSig = " << ipxSig2
+		   << "    ipySig = " << ipySig2
+		   << "    ipzSig = " << ipzSig2 
+		   << "    ipzSig(Old) = " << ipzSigOld2 << std::endl;
+	      cout << endl;
+	    }
+	    */
+
+	    ipxSigH->Fill(ipxSig1,weight);
+	    ipxSigH->Fill(ipxSig2,weight);
+
+	    ipySigH->Fill(ipySig1,weight);
+	    ipySigH->Fill(ipySig2,weight);
+
+	    ipzSigH->Fill(ipzSig1,weight);
+	    ipzSigH->Fill(ipzSig2,weight);
+
+	    ipxSigUncorrH->Fill(ipxSigUncorr1,weight);
+	    ipxSigUncorrH->Fill(ipxSigUncorr2,weight);
+
+	    ipySigUncorrH->Fill(ipySigUncorr1,weight);
+	    ipySigUncorrH->Fill(ipySigUncorr2,weight);
+
+	    ipzSigUncorrH->Fill(ipzSigUncorr1,weight);
+	    ipzSigUncorrH->Fill(ipzSigUncorr2,weight);
+
+	    if (ipzSigUncorr1>2) {
+	      ipzUncorrRegionH->Fill(ip1.Z(),weight);
+	      ipzRegionH->Fill(ipz1,weight);
+	      dipzRegionH->Fill(ipz1-ip1.Z(),weight);
+	      ipzSigRegionH->Fill(ipzSig1,weight);
+	      ipzSigUncorrRegionH->Fill(ipzSigUncorr1,weight);
+	      dipzSigRegionH->Fill(ipzSig1-ipzSigUncorr1,weight);
+	    }
+
+	    if (ipzSigUncorr2>2) {
+	      ipzUncorrRegionH->Fill(ip2.Z(),weight);
+	      ipzRegionH->Fill(ipz2,weight);
+	      dipzRegionH->Fill(ipz2-ip2.Z(),weight);
+	      ipzSigRegionH->Fill(ipzSig2,weight);
+	      ipzSigUncorrRegionH->Fill(ipzSigUncorr2,weight);
+	      dipzSigRegionH->Fill(ipzSig2-ipzSigUncorr2,weight);
+	    }
+
 	    TLorentzVector n1; n1.SetXYZM(ipx1,ipy1,ipz1,0);
 	    TLorentzVector n2; n2.SetXYZM(ipx2,ipy2,ipz2,0);
+
+	    
+
 
 	    nxyipH->Fill(n1.Pt(),weight);
 	    nxyipH->Fill(n2.Pt(),weight);
@@ -1851,6 +2171,24 @@ int main(int argc, char * argv[]) {
 
 	    ipzEtaH[etaBin1]->Fill(ipz1,weight);
 	    ipzEtaH[etaBin2]->Fill(ipz2,weight);
+
+	    ipxSigEtaH[etaBin1]->Fill(ipxSig1,weight);
+	    ipxSigEtaH[etaBin2]->Fill(ipxSig2,weight);
+
+	    ipySigEtaH[etaBin1]->Fill(ipySig1,weight);
+	    ipySigEtaH[etaBin2]->Fill(ipySig2,weight);
+
+	    ipzSigEtaH[etaBin1]->Fill(ipzSig1,weight);
+	    ipzSigEtaH[etaBin2]->Fill(ipzSig2,weight);
+
+	    ipxErrEtaH[etaBin1]->Fill(TMath::Sqrt(ipCov1(0,0)),weight);
+	    ipxErrEtaH[etaBin2]->Fill(TMath::Sqrt(ipCov2(0,0)),weight);
+
+	    ipyErrEtaH[etaBin1]->Fill(TMath::Sqrt(ipCov1(1,1)),weight);
+	    ipyErrEtaH[etaBin2]->Fill(TMath::Sqrt(ipCov2(1,1)),weight);
+
+	    ipzErrEtaH[etaBin1]->Fill(TMath::Sqrt(ipCov1(2,2)),weight);
+	    ipzErrEtaH[etaBin2]->Fill(TMath::Sqrt(ipCov2(2,2)),weight);
 
 	    ipdxH->Fill(ipx1-ipx2,weight);
 	    ipdyH->Fill(ipy1-ipy2,weight);

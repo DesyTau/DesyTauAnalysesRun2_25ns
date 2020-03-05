@@ -21,7 +21,9 @@ public:
   LeptonScaleSys(Synch17Tree* c){
     cenTree = c;
     label = "lScale";
-    
+    usePuppiMET = true;
+    useSVFit = false;
+    useFastMTT = false;
     this->Init(cenTree);
   };
 
@@ -53,6 +55,10 @@ public:
 
   void SetUseSVFit(bool isSV){
     useSVFit = isSV;	
+  }
+
+  void SetUseFastMTT(bool isFastMTT){
+    useFastMTT = isFastMTT;	
   }
 
   void SetUsePuppiMET(bool isPuppiMET) {
@@ -131,8 +137,15 @@ protected:
     float phi_sv_cen = cenTree->phi_sv;
     float met_sv_cen = cenTree->met_sv;
     float mt_sv_cen = cenTree->mt_sv;
+    
+    float mt_fast_cen = cenTree->mt_fast; 
+    float m_fast_cen = cenTree->m_fast;
+    float pt_fast_cen = cenTree->pt_fast;
+    float eta_fast_cen = cenTree->eta_fast;
+    float phi_fast_cen = cenTree->phi_fast; 
 
     float mt_tot_cen = cenTree->mt_tot;
+
 
     // calc shifted values
     cenTree->pt_1 = lep1_scaled.Pt();
@@ -158,7 +171,7 @@ protected:
     pfmetLV.SetPx(pfmetLV.Px()- (lep1_scaled.Px()-lep1.Px()));
     pfmetLV.SetPy(pfmetLV.Py()- (lep1_scaled.Py()-lep1.Py()));
     
-    // propagate the tau pt shift to the puppiMET
+    // propagate the lepton pt shift to the puppiMET
     puppimetLV.SetPx(puppimetLV.Px()- (lep2_scaled.Px()-lep2.Px()));
     puppimetLV.SetPy(puppimetLV.Py()- (lep2_scaled.Py()-lep2.Py()));
 
@@ -184,6 +197,15 @@ protected:
     covMET[1][0] = cenTree->metcov10;
     covMET[0][1] = cenTree->metcov01;
     covMET[1][1] = cenTree->metcov11;
+
+    double measuredMETx =  cenTree->met * cos(cenTree->metphi);
+    double measuredMETy =  cenTree->met * sin(cenTree->metphi);
+
+    if (usePuppiMET) {
+      measuredMETx = cenTree->puppimet * cos(cenTree->puppimetphi);
+      measuredMETy = cenTree->puppimet * sin(cenTree->puppimetphi);
+    }
+
     if (usePuppiMET) {
       covMET[0][0] = cenTree->puppimetcov00;
       covMET[1][0] = cenTree->puppimetcov10;
@@ -196,42 +218,78 @@ protected:
     TLorentzVector metLV = pfmetLV;
     if (usePuppiMET) 
       metLV = puppimetLV;
-
+    
     cenTree->pt_tt = (lep1_scaled+lep2_scaled+metLV).Pt();
-
+    
     cenTree->pzetavis = calc::pzetavis(lep1_scaled, lep2_scaled);
     cenTree->pzetamiss = calc::pzetamiss( lep1_scaled, lep2_scaled, pfmetLV);
-       
+    
     cenTree->m_vis = dileptonLV.M();
-
-    cenTree->m_sv = -10;//Merijn adjust for DNN
-    cenTree->pt_sv = -9999;
-    cenTree->eta_sv = -9999;
-    cenTree->phi_sv = -9999;
-    cenTree->met_sv = -9999;
-    cenTree->mt_sv = -9999;
-
+    
     float mtTOT =2*lep1_scaled.Pt()*metLV.Pt()*(1-cos(cenTree->phi_1 - metLV.Phi()));
     mtTOT += 2*lep2_scaled.Pt()*metLV.Pt()*(1-cos(cenTree->phi_2 - metLV.Phi())); 
     mtTOT += 2*lep1_scaled.Pt()*lep2_scaled.Pt()*(1-cos(cenTree->phi_1-cenTree->phi_2)); 
     cenTree->mt_tot = TMath::Sqrt(mtTOT);
+    
 
     // add flag for svfit
-    if (useSVFit) {
-      if(ch != UNKNOWN && cenTree->njetspt20>0){
-	std::shared_ptr<SVfitStandaloneAlgorithm> algo = calc::svFit(lep1_scaled, cenTree->tau_decay_mode_1, 
-								     lep2_scaled, cenTree->tau_decay_mode_2, 
-								     metLV, covMET, 
-								     ch, 
-								     svFit_visPtResolution); 
-	if (algo != 0){
-	  cenTree->m_sv = algo->mass();
-	  cenTree->pt_sv = algo->pt();
-	  cenTree->eta_sv = algo->eta();
-	  cenTree->phi_sv = algo->phi();      
-	  cenTree->met_sv = algo->fittedMET().Rho();
-	  cenTree->mt_sv = algo->transverseMass();
-	}
+    if(ch != UNKNOWN && (useSVFit || useFastMTT)){
+
+      std::vector<classic_svFit::MeasuredTauLepton> measuredTauLeptons;
+      classic_svFit::MeasuredTauLepton::kDecayType type_ = classic_svFit::MeasuredTauLepton::kUndefinedDecayType;
+
+      if (ch == MUTAU)  type_ = classic_svFit::MeasuredTauLepton::kTauToMuDecay;
+      if (ch == ETAU)   type_ = classic_svFit::MeasuredTauLepton::kTauToElecDecay;
+      if (ch == TAUTAU) type_ = classic_svFit::MeasuredTauLepton::kTauToHadDecay;
+      // define lepton four vectors                                                                                                             
+
+      measuredTauLeptons.push_back(classic_svFit::MeasuredTauLepton(type_,
+								    lep1_scaled.Pt(),
+								    lep1_scaled.Eta(),
+								    lep1_scaled.Phi(),
+								    lep1_scaled.M()));
+      measuredTauLeptons.push_back(classic_svFit::MeasuredTauLepton(classic_svFit::MeasuredTauLepton::kTauToHadDecay,
+								    lep2_scaled.Pt(),
+								    lep2_scaled.Eta(),
+								    lep2_scaled.Phi(),
+								    lep2_scaled.M(),
+								    cenTree->tau_decay_mode_2));
+      if (useSVFit) {
+	
+				       
+	int verbosity = 1;
+	ClassicSVfit svFitAlgo(verbosity);
+	double kappa = 4.; // use 3 for emu, 4 for etau and mutau, 5 for tautau channel
+	
+	svFitAlgo.addLogM_fixed(true, kappa);
+	svFitAlgo.integrate(measuredTauLeptons, measuredMETx, measuredMETy, covMET);
+	bool isValidSolution = svFitAlgo.isValidSolution();
+	
+	cenTree->m_sv   = static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(svFitAlgo.getHistogramAdapter())->getMass();
+	cenTree->pt_sv  = static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(svFitAlgo.getHistogramAdapter())->getPt();
+	cenTree->eta_sv = static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(svFitAlgo.getHistogramAdapter())->getEta();
+	cenTree->phi_sv = static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(svFitAlgo.getHistogramAdapter())->getPhi();      
+	//otree->met_sv = static_cast<DiTauSystemHistogramAdapter*>(svFitAlgo.getHistogramAdapter())->getfittedMET().Rho();
+	cenTree->mt_sv  = static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(svFitAlgo.getHistogramAdapter())->getTransverseMass();
+      
+      }
+      if (useFastMTT) {
+
+	// FasMTT
+	LorentzVector tau1P4;
+	LorentzVector tau2P4;
+	FastMTT aFastMTTAlgo;
+	aFastMTTAlgo.run(measuredTauLeptons, measuredMETx, measuredMETy, covMET);
+	LorentzVector ttP4 = aFastMTTAlgo.getBestP4();
+	tau1P4 = aFastMTTAlgo.getTau1P4();
+	tau2P4 = aFastMTTAlgo.getTau2P4();
+    
+	double dPhiTT = dPhiFrom2P( tau1P4.Px(), tau1P4.Py(), tau2P4.Px(), tau2P4.Py() );
+	cenTree->mt_fast = TMath::Sqrt(2*tau1P4.Pt()*tau2P4.Pt()*(1 - TMath::Cos(dPhiTT)));
+	cenTree->m_fast = ttP4.M();
+	cenTree->pt_fast = ttP4.Pt();
+	cenTree->eta_fast = ttP4.Eta();
+	cenTree->phi_fast = ttP4.Phi();
       }
     }
 
@@ -273,6 +331,12 @@ protected:
     cenTree->met_sv = met_sv_cen;
     cenTree->mt_sv = mt_sv_cen;    
 	
+    cenTree->mt_fast = mt_fast_cen; 
+    cenTree->m_fast = m_fast_cen;
+    cenTree->pt_fast = pt_fast_cen;
+    cenTree->eta_fast = eta_fast_cen;
+    cenTree->phi_fast = phi_fast_cen;
+
     cenTree->mt_tot = mt_tot_cen;
 
   }
@@ -288,6 +352,7 @@ protected:
   TFile* svFit_visPtResolution;
   bool useSVFit;
   bool usePuppiMET;
+  bool useFastMTT;
   float central;
   float error;
   std::map< std::string, TTree* >  outTree;
@@ -300,7 +365,7 @@ public:
   
   MuonScaleSys(Synch17Tree* c){
     cenTree = c;
-    label = "CMS_scale_m_13TeV";
+    label = "CMS_scale_mu_13TeV";
     
     this->Init(cenTree);
   };
@@ -312,11 +377,21 @@ protected:
     const int pt_bins = 1;
     double pt_edges[pt_bins + 1] = {0., 14001.};
 
-    const int eta_bins = 1;
-    double eta_edges[eta_bins + 1] = {0., 2.5};
+    const int eta_bins = 3;
+    double eta_edges[eta_bins + 1] = {0., 1.2, 2.1,  2.4};
 
     sf_up = new TH2D(label+"_sf_up", label+"_sf_up", pt_bins, pt_edges, eta_bins, eta_edges);
     sf_down = new TH2D(label+"_sf_down", label+"_sf_down", pt_bins, pt_edges, eta_bins, eta_edges);
+
+    sf_up->SetBinContent(sf_up->FindBin(100.,0.9),0.004);
+    sf_down->SetBinContent(sf_down->FindBin(100.,0.9),0.004);
+
+    sf_up->SetBinContent(sf_up->FindBin(100.,1.5),0.009);
+    sf_down->SetBinContent(sf_down->FindBin(100.,1.5),0.009);
+
+    sf_up->SetBinContent(sf_up->FindBin(100.,2.2),0.017);
+    sf_down->SetBinContent(sf_down->FindBin(100.,2.2),0.017);
+
   };  
 
   virtual void ScaleUp(utils::channel ch){
@@ -675,7 +750,7 @@ public:
   
   TauOneProngScaleSys(Synch17Tree* c){
     cenTree = c;
-    label = "CMS_shape_t_1prong_13TeV";
+    label = "CMS_scale_t_1prong_13TeV";
     
     this->Init(cenTree);
   };
@@ -785,7 +860,7 @@ public:
   
   TauOneProngOnePi0ScaleSys(Synch17Tree* c){
     cenTree = c;
-    label = "CMS_shape_t_1prong1pi0_13TeV";
+    label = "CMS_scale_t_1prong1pizero_13TeV";
     
     this->Init(cenTree);
   };
@@ -896,7 +971,7 @@ public:
   
   TauThreeProngScaleSys(Synch17Tree* c){
     cenTree = c;
-    label = "CMS_shape_t_3prong_13TeV";
+    label = "CMS_scale_t_3prong_13TeV";
     
     this->Init(cenTree);
   };

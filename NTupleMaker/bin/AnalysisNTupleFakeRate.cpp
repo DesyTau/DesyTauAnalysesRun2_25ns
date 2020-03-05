@@ -938,7 +938,7 @@ int main(int argc, char * argv[]) {
 
 
       if (debug) {
-	std::cout << "Run = " << analysisTree.event_nr << "    Event = " << analysisTree.event_run << std::endl; 
+	std::cout << "Run = " << analysisTree.event_run << "    Event = " << analysisTree.event_nr << std::endl; 
 	std::cout << "Number of gen particles = " << analysisTree.genparticles_count << std::endl;
 	std::cout << "Number of taus          = " << analysisTree.tau_count << std::endl;
 	std::cout << "Number of jets          = " << analysisTree.pfjet_count << std::endl;

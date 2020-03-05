@@ -1,7 +1,6 @@
 #!/bin/sh
-dirDataSingleMuon=/pnfs/desy.de/cms/tier2/store/user/acardini/ntuples/2018/data
-dirTauSpinner=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2018/mc
-dirMC=/pnfs/desy.de/cms/tier2/store/user/acardini/ntuples/2018/mc
+dirDataSingleMuon=/pnfs/desy.de/cms/tier2/store/user/acardini/ntuples/2018/data_v2/SingleMuon
+dirMC=/pnfs/desy.de/cms/tier2/store/user/acardini/ntuples/2018/mc_v2
 dirEmbedded=/pnfs/desy.de/cms/tier2/store/user/acardini/ntuples/2018/embedded/Embedding_mutau
 OUTDIR=./2018
 
@@ -35,18 +34,15 @@ ls $dirMC/WW_TuneCP5_13TeV-pythia8/*root > $OUTDIR/WW
 ls $dirMC/WZ_TuneCP5_13TeV-pythia8/*root > $OUTDIR/WZ
 ls $dirMC/ZZ_TuneCP5_13TeV-pythia8/*root > $OUTDIR/ZZ
 
-ls $dirTauSpinner/GluGluHToTauTau_M125_13TeV_powheg_pythia8/*root > $OUTDIR/GluGluHToTauTau_M125
-ls $dirTauSpinner/VBFHToTauTau_M125_13TeV_powheg_pythia8/*root > $OUTDIR/VBFHToTauTau_M125
-
-ls $dirDataSingleMuon/SingleMuon_Run2018A_17Sep2018_v2/*root > $OUTDIR/SingleMuon_Run2018A
-ls $dirDataSingleMuon/SingleMuon_Run2018B_17Sep2018_v1/*root > $OUTDIR/SingleMuon_Run2018B
-ls $dirDataSingleMuon/SingleMuon_Run2018C_17Sep2018_v1/*root > $OUTDIR/SingleMuon_Run2018C
-ls $dirDataSingleMuon/SingleMuon_Run2018D_22Jan2019_v2/*root > $OUTDIR/SingleMuon_Run2018D
+ls $dirDataSingleMuon/SingleMuon_Run2018A/*root > $OUTDIR/SingleMuon_Run2018A
+ls $dirDataSingleMuon/SingleMuon_Run2018B/*root > $OUTDIR/SingleMuon_Run2018B
+ls $dirDataSingleMuon/SingleMuon_Run2018C/*root > $OUTDIR/SingleMuon_Run2018C
+ls $dirDataSingleMuon/SingleMuon_Run2018D/*root > $OUTDIR/SingleMuon_Run2018D
 
 ls $dirEmbedded/EmbeddingRun2018A_MuTau/*root > $OUTDIR/EmbeddedMuTau_Run2018A
 ls $dirEmbedded/EmbeddingRun2018B_MuTau/*root > $OUTDIR/EmbeddedMuTau_Run2018B
 ls $dirEmbedded/EmbeddingRun2018C_MuTau/*root > $OUTDIR/EmbeddedMuTau_Run2018C
 ls $dirEmbedded/EmbeddingRun2018D_MuTau/*root > $OUTDIR/EmbeddedMuTau_Run2018D
 
-ls $dirTauSpinner/GluGluToHToTauUncorrelatedDecay_M125/*root > $OUTDIR/GluGluHToTauTauUncorrDecays_M125
-ls $dirTauSpinner/VBFHToTauTauUncorrelatedDecay_M125/*root > $OUTDIR/VBFHToTauTauUncorrDecays_M125
+ls $dirMC/GluGluToHToTauUncorrelatedDecay_M125/*root > $OUTDIR/GluGluHToTauTauUncorrDecays_M125
+ls $dirMC/VBFHToTauTauUncorrelatedDecay_M125/*root > $OUTDIR/VBFHToTauTauUncorrDecays_M125

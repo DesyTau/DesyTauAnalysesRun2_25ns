@@ -65,8 +65,21 @@ public :
   Float_t         ipx_uncorr_1;
   Float_t         ipy_uncorr_1;
   Float_t         ipz_uncorr_1;
+  Float_t         gen_ipx_1;
+  Float_t         gen_ipy_1;
+  Float_t         gen_ipz_1;
+
+  Float_t         ip_covxx_1;
+  Float_t         ip_covxy_1;
+  Float_t         ip_covxz_1;
+  Float_t         ip_covyy_1;  
+  Float_t         ip_covyz_1;
+  Float_t         ip_covzz_1;
+
   Float_t         ipxy_1;
-  Double_t         IP_signif_PV_with_BS_1;
+  Double_t        IP_signif_PV_with_BS_1;
+  Double_t        IP_signif_RefitV_with_BS_1;
+  Double_t        IP_signif_RefitV_with_BS_uncorr_1;
   Float_t         ipn_1;
   Float_t         drip_1;
   Float_t         detaip_1;
@@ -98,6 +111,7 @@ public :
   Float_t         chconst_2_eta;
   Float_t         chconst_2_phi;     
   Float_t         m_2;
+  Float_t         DM;
   Int_t           gen_match_2; 
   Int_t           q_2;
   Float_t         iso_2;
@@ -116,8 +130,21 @@ public :
   Float_t         ipx_uncorr_2;
   Float_t         ipy_uncorr_2;
   Float_t         ipz_uncorr_2;
+  Float_t         gen_ipx_2;
+  Float_t         gen_ipy_2;
+  Float_t         gen_ipz_2;
+
+  Float_t         ip_covxx_2;
+  Float_t         ip_covxy_2;
+  Float_t         ip_covxz_2;
+  Float_t         ip_covyy_2;  
+  Float_t         ip_covyz_2;
+  Float_t         ip_covzz_2;
+
   Float_t         ipxy_2;
   Double_t        IP_signif_PV_with_BS_2;
+  Double_t        IP_signif_RefitV_with_BS_2;
+  Double_t        IP_signif_RefitV_with_BS_uncorr_2;
   Float_t         ipn_2;
   Float_t         drip_2;
   Float_t         detaip_2;
@@ -282,6 +309,41 @@ public :
   Float_t         trigweight;
   Float_t         embweight;
 
+  Float_t weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVUp;
+  Float_t weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVUp;
+  Float_t weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVUp;
+  Float_t weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVUp;
+  Float_t weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVUp;
+  Float_t weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVDown;
+  Float_t weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVDown;
+  Float_t weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVDown;
+  Float_t weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVDown;
+  Float_t weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVDown;
+
+  Float_t weight_CMS_eff_t_pTlow_MVADM0_13TeVUp; 
+  Float_t weight_CMS_eff_t_pTlow_MVADM1_13TeVUp; 
+  Float_t weight_CMS_eff_t_pTlow_MVADM2_13TeVUp; 
+  Float_t weight_CMS_eff_t_pTlow_MVADM10_13TeVUp;
+  Float_t weight_CMS_eff_t_pTlow_MVADM11_13TeVUp;
+  Float_t weight_CMS_eff_t_pThigh_MVADM0_13TeVUp;
+  Float_t weight_CMS_eff_t_pThigh_MVADM1_13TeVUp;
+  Float_t weight_CMS_eff_t_pThigh_MVADM2_13TeVUp;
+  Float_t weight_CMS_eff_t_pThigh_MVADM10_13TeVUp; 
+  Float_t weight_CMS_eff_t_pThigh_MVADM11_13TeVUp; 
+  Float_t weight_CMS_eff_t_pTlow_MVADM0_13TeVDown; 
+  Float_t weight_CMS_eff_t_pTlow_MVADM1_13TeVDown; 
+  Float_t weight_CMS_eff_t_pTlow_MVADM2_13TeVDown; 
+  Float_t weight_CMS_eff_t_pTlow_MVADM10_13TeVDown; 
+  Float_t weight_CMS_eff_t_pTlow_MVADM11_13TeVDown; 
+  Float_t weight_CMS_eff_t_pThigh_MVADM0_13TeVDown; 
+  Float_t weight_CMS_eff_t_pThigh_MVADM1_13TeVDown; 
+  Float_t weight_CMS_eff_t_pThigh_MVADM2_13TeVDown; 
+  Float_t weight_CMS_eff_t_pThigh_MVADM10_13TeVDown;
+  Float_t weight_CMS_eff_t_pThigh_MVADM11_13TeVDown;
+
+  Float_t weight_CMS_scale_gg_13TeVUp;
+  Float_t weight_CMS_scale_gg_13TeVDown;
+
   Float_t         topptweight;
   Double_t 	  zptweight;
   Double_t        trkeffweight;
@@ -304,6 +366,7 @@ public :
   Bool_t          xTriggerLep;
   Bool_t          xTriggerTau;
   Bool_t          xTrigger;
+
   //MET
   Float_t         met;
   Float_t         metphi;  
@@ -575,8 +638,22 @@ public :
   TBranch	 *b_ipx_uncorr_1;
   TBranch	 *b_ipy_uncorr_1;
   TBranch	 *b_ipz_uncorr_1;
+
+  TBranch	 *b_gen_ipx_1;
+  TBranch	 *b_gen_ipy_1;
+  TBranch	 *b_gen_ipz_1;
+
+  TBranch        *b_ip_covxx_1;
+  TBranch        *b_ip_covxy_1;
+  TBranch        *b_ip_covxz_1;
+  TBranch        *b_ip_covyy_1;  
+  TBranch        *b_ip_covyz_1;
+  TBranch        *b_ip_covzz_1;
+
   TBranch	 *b_ipxy_1;
   TBranch	 *b_IP_signif_PV_with_BS_1;
+  TBranch	 *b_IP_signif_RefitV_with_BS_1;
+  TBranch	 *b_IP_signif_RefitV_with_BS_uncorr_1;
   TBranch	 *b_ipn_1;
   TBranch	 *b_drip_1;
   TBranch	 *b_detaip_1;
@@ -622,11 +699,25 @@ public :
   TBranch	 *b_ipx_2;
   TBranch	 *b_ipy_2;
   TBranch	 *b_ipz_2;
+
+  TBranch	 *b_gen_ipx_2;
+  TBranch	 *b_gen_ipy_2;
+  TBranch	 *b_gen_ipz_2;
+
+  TBranch        *b_ip_covxx_2;
+  TBranch        *b_ip_covxy_2;
+  TBranch        *b_ip_covxz_2;
+  TBranch        *b_ip_covyy_2;  
+  TBranch        *b_ip_covyz_2;
+  TBranch        *b_ip_covzz_2;
+
   TBranch	 *b_ipx_uncorr_2;
   TBranch	 *b_ipy_uncorr_2;
   TBranch	 *b_ipz_uncorr_2;
   TBranch	 *b_ipxy_2;
   TBranch	 *b_IP_signif_PV_with_BS_2;
+  TBranch	 *b_IP_signif_RefitV_with_BS_2;
+  TBranch	 *b_IP_signif_RefitV_with_BS_uncorr_2;
   TBranch	 *b_ipn_2;
   TBranch	 *b_drip_2;
   TBranch	 *b_detaip_2;
@@ -788,6 +879,41 @@ public :
   TBranch	 *b_effweight;
   TBranch        *b_trigweight;
   TBranch        *b_embweight;
+
+  TBranch        *b_weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVUp;
+  TBranch        *b_weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVUp;
+  TBranch        *b_weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVUp;
+  TBranch        *b_weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVUp;
+  TBranch        *b_weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVUp;
+  TBranch        *b_weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVDown;
+  TBranch        *b_weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVDown;
+  TBranch        *b_weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVDown;
+  TBranch        *b_weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVDown;
+  TBranch        *b_weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVDown;
+
+  TBranch        *b_weight_CMS_eff_t_pTlow_MVADM0_13TeVUp; 
+  TBranch        *b_weight_CMS_eff_t_pTlow_MVADM1_13TeVUp; 
+  TBranch        *b_weight_CMS_eff_t_pTlow_MVADM2_13TeVUp; 
+  TBranch        *b_weight_CMS_eff_t_pTlow_MVADM10_13TeVUp;
+  TBranch        *b_weight_CMS_eff_t_pTlow_MVADM11_13TeVUp;
+  TBranch        *b_weight_CMS_eff_t_pThigh_MVADM0_13TeVUp;
+  TBranch        *b_weight_CMS_eff_t_pThigh_MVADM1_13TeVUp;
+  TBranch        *b_weight_CMS_eff_t_pThigh_MVADM2_13TeVUp;
+  TBranch        *b_weight_CMS_eff_t_pThigh_MVADM10_13TeVUp; 
+  TBranch        *b_weight_CMS_eff_t_pThigh_MVADM11_13TeVUp; 
+  TBranch        *b_weight_CMS_eff_t_pTlow_MVADM0_13TeVDown; 
+  TBranch        *b_weight_CMS_eff_t_pTlow_MVADM1_13TeVDown; 
+  TBranch        *b_weight_CMS_eff_t_pTlow_MVADM2_13TeVDown; 
+  TBranch        *b_weight_CMS_eff_t_pTlow_MVADM10_13TeVDown; 
+  TBranch        *b_weight_CMS_eff_t_pTlow_MVADM11_13TeVDown; 
+  TBranch        *b_weight_CMS_eff_t_pThigh_MVADM0_13TeVDown; 
+  TBranch        *b_weight_CMS_eff_t_pThigh_MVADM1_13TeVDown; 
+  TBranch        *b_weight_CMS_eff_t_pThigh_MVADM2_13TeVDown; 
+  TBranch        *b_weight_CMS_eff_t_pThigh_MVADM10_13TeVDown;
+  TBranch        *b_weight_CMS_eff_t_pThigh_MVADM11_13TeVDown;
+  
+  TBranch        *b_weight_CMS_scale_gg_13TeVUp;
+  TBranch        *b_weight_CMS_scale_gg_13TeVDown;
 
   TBranch	 *b_topptweight;
   TBranch	 *b_zptweight;

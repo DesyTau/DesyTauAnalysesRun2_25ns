@@ -21,7 +21,7 @@ public:
   JetEnergyScaleSys(Synch17Tree* c, TString name){
     cenTree = c;
     label = "CMS_scale_j_13TeV";    
-	this->SetUncertaintyName(name);
+    this->SetUncertaintyName(name);
     this->Init(cenTree);
   };
   
@@ -55,7 +55,9 @@ void SetBtagScaling(const btag_scaling_inputs * _InputsBtagScaling){
 
 void SetUncertaintyName(TString name){
 	uncertainty_name = name;
-	label = "CMS_scale_j_"+uncertainty_name+"13TeV";
+	label = "CMS_scale_j_"+uncertainty_name+"_13TeV";
+	if (uncertainty_name == "JER")
+	  label = "CMS_res_j_13TeV";
 }
 
 void SetJESUncertainties(JESUncertainties * jec){

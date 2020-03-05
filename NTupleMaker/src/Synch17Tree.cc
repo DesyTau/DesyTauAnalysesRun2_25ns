@@ -87,10 +87,23 @@ void Synch17Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("ipx_1", &ipx_1, &b_ipx_1);
    fChain->SetBranchAddress("ipy_1", &ipy_1, &b_ipy_1);
    fChain->SetBranchAddress("ipz_1", &ipz_1, &b_ipz_1);
+   fChain->SetBranchAddress("gen_ipx_1", &gen_ipx_1, &b_gen_ipx_1);
+   fChain->SetBranchAddress("gen_ipy_1", &gen_ipy_1, &b_gen_ipy_1);
+   fChain->SetBranchAddress("gen_ipz_1", &gen_ipz_1, &b_gen_ipz_1);
+
+   fChain->SetBranchAddress("ip_covxx_1", &ip_covxx_1, &b_ip_covxx_1);
+   fChain->SetBranchAddress("ip_covxy_1", &ip_covxy_1, &b_ip_covxy_1);
+   fChain->SetBranchAddress("ip_covxz_1", &ip_covxz_1, &b_ip_covxz_1);
+   fChain->SetBranchAddress("ip_covyy_1", &ip_covyy_1, &b_ip_covyy_1);
+   fChain->SetBranchAddress("ip_covyz_1", &ip_covyz_1, &b_ip_covyz_1);
+   fChain->SetBranchAddress("ip_covzz_1", &ip_covzz_1, &b_ip_covzz_1);
+
    fChain->SetBranchAddress("ipx_uncorr_1", &ipx_uncorr_1, &b_ipx_uncorr_1);
    fChain->SetBranchAddress("ipy_uncorr_1", &ipy_uncorr_1, &b_ipy_uncorr_1);
    fChain->SetBranchAddress("ipz_uncorr_1", &ipz_uncorr_1, &b_ipz_uncorr_1);
    fChain->SetBranchAddress("IP_signif_PV_with_BS_1", &IP_signif_PV_with_BS_1, &b_IP_signif_PV_with_BS_1);
+   fChain->SetBranchAddress("IP_signif_RefitV_with_BS_1", &IP_signif_RefitV_with_BS_1, &b_IP_signif_RefitV_with_BS_1);
+   fChain->SetBranchAddress("IP_signif_RefitV_with_BS_uncorr_1", &IP_signif_RefitV_with_BS_uncorr_1, &b_IP_signif_RefitV_with_BS_uncorr_1);
    // fChain->SetBranchAddress("ipxy_1", &ipxy_1, &b_ipxy_1);
    //   fChain->SetBranchAddress("ipn_1", &ipn_1, &b_ipn_1);
    //   fChain->SetBranchAddress("drip_1", &drip_1, &b_drip_1);
@@ -140,10 +153,23 @@ void Synch17Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("ipx_2", &ipx_2, &b_ipx_2);
    fChain->SetBranchAddress("ipy_2", &ipy_2, &b_ipy_2);
    fChain->SetBranchAddress("ipz_2", &ipz_2, &b_ipz_2);
+   fChain->SetBranchAddress("gen_ipx_2", &gen_ipx_2, &b_gen_ipx_2);
+   fChain->SetBranchAddress("gen_ipy_2", &gen_ipy_2, &b_gen_ipy_2);
+   fChain->SetBranchAddress("gen_ipz_2", &gen_ipz_2, &b_gen_ipz_2);
+
+   fChain->SetBranchAddress("ip_covxx_2", &ip_covxx_2, &b_ip_covxx_2);
+   fChain->SetBranchAddress("ip_covxy_2", &ip_covxy_2, &b_ip_covxy_2);
+   fChain->SetBranchAddress("ip_covxz_2", &ip_covxz_2, &b_ip_covxz_2);
+   fChain->SetBranchAddress("ip_covyy_2", &ip_covyy_2, &b_ip_covyy_2);
+   fChain->SetBranchAddress("ip_covyz_2", &ip_covyz_2, &b_ip_covyz_2);
+   fChain->SetBranchAddress("ip_covzz_2", &ip_covzz_2, &b_ip_covzz_2);
+
    fChain->SetBranchAddress("ipx_uncorr_2", &ipx_uncorr_2, &b_ipx_uncorr_2);
    fChain->SetBranchAddress("ipy_uncorr_2", &ipy_uncorr_2, &b_ipy_uncorr_2);
    fChain->SetBranchAddress("ipz_uncorr_2", &ipz_uncorr_2, &b_ipz_uncorr_2);
    fChain->SetBranchAddress("IP_signif_PV_with_BS_2", &IP_signif_PV_with_BS_2, &b_IP_signif_PV_with_BS_2);
+   fChain->SetBranchAddress("IP_signif_RefitV_with_BS_2", &IP_signif_RefitV_with_BS_2, &b_IP_signif_RefitV_with_BS_2);
+   fChain->SetBranchAddress("IP_signif_RefitV_with_BS_uncorr_2", &IP_signif_RefitV_with_BS_uncorr_2, &b_IP_signif_RefitV_with_BS_uncorr_2);
    //   fChain->SetBranchAddress("ipxy_2", &ipxy_2, &b_ipxy_2);
    //   fChain->SetBranchAddress("ipn_2", &ipn_2, &b_ipn_2);
    //   fChain->SetBranchAddress("drip_2", &drip_2, &b_drip_2);
@@ -308,6 +334,47 @@ void Synch17Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("effweight", &effweight, &b_effweight); 
    fChain->SetBranchAddress("etaufakeweight", &etaufakeweight, &b_etaufakeweight);
    fChain->SetBranchAddress("mutaufakeweight", &mutaufakeweight, &b_mutaufakeweight);
+
+
+   fChain->SetBranchAddress("weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVUp", &weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVUp, &b_weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVUp);
+   fChain->SetBranchAddress("weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVUp", &weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVUp, &b_weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVUp);
+   fChain->SetBranchAddress("weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVUp", &weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVUp, &b_weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVUp);
+   fChain->SetBranchAddress("weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVUp", &weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVUp, &b_weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVUp);
+   fChain->SetBranchAddress("weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVUp", &weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVUp, &b_weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVUp);
+   fChain->SetBranchAddress("weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVDown", &weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVDown, &b_weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVDown);
+   fChain->SetBranchAddress("weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVDown", &weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVDown, &b_weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVDown);
+   fChain->SetBranchAddress("weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVDown", &weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVDown, &b_weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVDown);
+   fChain->SetBranchAddress("weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVDown", &weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVDown, &b_weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVDown);
+   fChain->SetBranchAddress("weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVDown", &weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVDown, &b_weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVDown);
+
+
+  fChain->SetBranchAddress("weight_CMS_eff_t_pTlow_MVADM0_13TeVUp", &weight_CMS_eff_t_pTlow_MVADM0_13TeVUp, &b_weight_CMS_eff_t_pTlow_MVADM0_13TeVUp); 
+  fChain->SetBranchAddress("weight_CMS_eff_t_pTlow_MVADM1_13TeVUp", &weight_CMS_eff_t_pTlow_MVADM1_13TeVUp, &b_weight_CMS_eff_t_pTlow_MVADM1_13TeVUp); 
+  fChain->SetBranchAddress("weight_CMS_eff_t_pTlow_MVADM2_13TeVUp", &weight_CMS_eff_t_pTlow_MVADM2_13TeVUp, &b_weight_CMS_eff_t_pTlow_MVADM2_13TeVUp); 
+  fChain->SetBranchAddress("weight_CMS_eff_t_pTlow_MVADM10_13TeVUp", &weight_CMS_eff_t_pTlow_MVADM10_13TeVUp, &b_weight_CMS_eff_t_pTlow_MVADM10_13TeVUp);
+  fChain->SetBranchAddress("weight_CMS_eff_t_pTlow_MVADM11_13TeVUp", &weight_CMS_eff_t_pTlow_MVADM11_13TeVUp, &b_weight_CMS_eff_t_pTlow_MVADM11_13TeVUp);
+  fChain->SetBranchAddress("weight_CMS_eff_t_pThigh_MVADM0_13TeVUp", &weight_CMS_eff_t_pThigh_MVADM0_13TeVUp, &b_weight_CMS_eff_t_pThigh_MVADM0_13TeVUp);
+  fChain->SetBranchAddress("weight_CMS_eff_t_pThigh_MVADM1_13TeVUp", &weight_CMS_eff_t_pThigh_MVADM1_13TeVUp, &b_weight_CMS_eff_t_pThigh_MVADM1_13TeVUp);
+  fChain->SetBranchAddress("weight_CMS_eff_t_pThigh_MVADM2_13TeVUp", &weight_CMS_eff_t_pThigh_MVADM2_13TeVUp, &b_weight_CMS_eff_t_pThigh_MVADM2_13TeVUp);
+  fChain->SetBranchAddress("weight_CMS_eff_t_pThigh_MVADM10_13TeVUp", &weight_CMS_eff_t_pThigh_MVADM10_13TeVUp, &b_weight_CMS_eff_t_pThigh_MVADM10_13TeVUp); 
+  fChain->SetBranchAddress("weight_CMS_eff_t_pThigh_MVADM11_13TeVUp", &weight_CMS_eff_t_pThigh_MVADM11_13TeVUp, &b_weight_CMS_eff_t_pThigh_MVADM11_13TeVUp); 
+  fChain->SetBranchAddress("weight_CMS_eff_t_pTlow_MVADM0_13TeVDown", &weight_CMS_eff_t_pTlow_MVADM0_13TeVDown, &b_weight_CMS_eff_t_pTlow_MVADM0_13TeVDown); 
+  fChain->SetBranchAddress("weight_CMS_eff_t_pTlow_MVADM1_13TeVDown", &weight_CMS_eff_t_pTlow_MVADM1_13TeVDown, &b_weight_CMS_eff_t_pTlow_MVADM1_13TeVDown); 
+  fChain->SetBranchAddress("weight_CMS_eff_t_pTlow_MVADM2_13TeVDown", &weight_CMS_eff_t_pTlow_MVADM2_13TeVDown, &b_weight_CMS_eff_t_pTlow_MVADM2_13TeVDown); 
+  fChain->SetBranchAddress("weight_CMS_eff_t_pTlow_MVADM10_13TeVDown", &weight_CMS_eff_t_pTlow_MVADM10_13TeVDown, &b_weight_CMS_eff_t_pTlow_MVADM10_13TeVDown); 
+  fChain->SetBranchAddress("weight_CMS_eff_t_pTlow_MVADM11_13TeVDown", &weight_CMS_eff_t_pTlow_MVADM11_13TeVDown, &b_weight_CMS_eff_t_pTlow_MVADM11_13TeVDown); 
+  fChain->SetBranchAddress("weight_CMS_eff_t_pThigh_MVADM0_13TeVDown", &weight_CMS_eff_t_pThigh_MVADM0_13TeVDown, &b_weight_CMS_eff_t_pThigh_MVADM0_13TeVDown); 
+  fChain->SetBranchAddress("weight_CMS_eff_t_pThigh_MVADM1_13TeVDown", &weight_CMS_eff_t_pThigh_MVADM1_13TeVDown, &b_weight_CMS_eff_t_pThigh_MVADM1_13TeVDown); 
+  fChain->SetBranchAddress("weight_CMS_eff_t_pThigh_MVADM2_13TeVDown", &weight_CMS_eff_t_pThigh_MVADM2_13TeVDown, &b_weight_CMS_eff_t_pThigh_MVADM2_13TeVDown); 
+  fChain->SetBranchAddress("weight_CMS_eff_t_pThigh_MVADM10_13TeVDown", &weight_CMS_eff_t_pThigh_MVADM10_13TeVDown, &b_weight_CMS_eff_t_pThigh_MVADM10_13TeVDown);
+  fChain->SetBranchAddress("weight_CMS_eff_t_pThigh_MVADM11_13TeVDown", &weight_CMS_eff_t_pThigh_MVADM11_13TeVDown, &b_weight_CMS_eff_t_pThigh_MVADM11_13TeVDown);
+
+
+
+   fChain->SetBranchAddress("weight_CMS_scale_gg_13TeVUp", &weight_CMS_scale_gg_13TeVUp, &b_weight_CMS_scale_gg_13TeVUp);
+   fChain->SetBranchAddress("weight_CMS_scale_gg_13TeVDown", &weight_CMS_scale_gg_13TeVDown, &b_weight_CMS_scale_gg_13TeVDown);
+
+
 
    fChain->SetBranchAddress("ff_nom",&ff_nom,&b_ff_nom);
    fChain->SetBranchAddress("ff_mva",&ff_mva,&b_ff_mva);
@@ -644,10 +711,23 @@ void Synch17Tree::WriteInit(TTree *tree) {
    fChain->Branch("ipx_1", &ipx_1, "ipx_1/F");
    fChain->Branch("ipy_1", &ipy_1, "ipy_1/F");
    fChain->Branch("ipz_1", &ipz_1, "ipz_1/F");
+   fChain->Branch("gen_ipx_1", &gen_ipx_1, "gen_ipx_1/F");
+   fChain->Branch("gen_ipy_1", &gen_ipy_1, "gen_ipy_1/F");
+   fChain->Branch("gen_ipz_1", &gen_ipz_1, "gen_ipz_1/F");
+
+   fChain->Branch("ip_covxx_1", &ip_covxx_1, "ip_covxx_1/F");
+   fChain->Branch("ip_covxy_1", &ip_covxy_1, "ip_covxy_1/F");
+   fChain->Branch("ip_covxz_1", &ip_covxz_1, "ip_covxz_1/F");
+   fChain->Branch("ip_covyy_1", &ip_covyy_1, "ip_covyy_1/F");
+   fChain->Branch("ip_covyz_1", &ip_covyz_1, "ip_covyz_1/F");
+   fChain->Branch("ip_covzz_1", &ip_covzz_1, "ip_covzz_1/F");
+
    fChain->Branch("ipx_uncorr_1", &ipx_uncorr_1, "ipx_uncorr_1/F");
    fChain->Branch("ipy_uncorr_1", &ipy_uncorr_1, "ipy_uncorr_1/F");
    fChain->Branch("ipz_uncorr_1", &ipz_uncorr_1, "ipz_uncorr_1/F");
    fChain->Branch("IP_signif_PV_with_BS_1", &IP_signif_PV_with_BS_1, "IP_signif_PV_with_BS_1/D");
+   fChain->Branch("IP_signif_RefitV_with_BS_1", &IP_signif_RefitV_with_BS_1, "IP_signif_RefitV_with_BS_1/D");
+   fChain->Branch("IP_signif_RefitV_with_BS_uncorr_1", &IP_signif_RefitV_with_BS_uncorr_1, "IP_signif_RefitV_with_BS_uncorr_1/D");
    //   fChain->Branch("ipxy_1", &ipxy_1, "ipxy_1/F");
    //  fChain->Branch("ipn_1", &ipn_1, "ipn_1/F");
    //  fChain->Branch("drip_1", &drip_1, "drip_1/F");
@@ -694,10 +774,23 @@ void Synch17Tree::WriteInit(TTree *tree) {
    fChain->Branch("ipx_2", &ipx_2, "ipx_2/F");
    fChain->Branch("ipy_2", &ipy_2, "ipy_2/F");
    fChain->Branch("ipz_2", &ipz_2, "ipz_2/F");
+   fChain->Branch("gen_ipx_2", &gen_ipx_2, "gen_ipx_2/F");
+   fChain->Branch("gen_ipy_2", &gen_ipy_2, "gen_ipy_2/F");
+   fChain->Branch("gen_ipz_2", &gen_ipz_2, "gen_ipz_2/F");
+
+   fChain->Branch("ip_covxx_2", &ip_covxx_2, "ip_covxx_2/F");
+   fChain->Branch("ip_covxy_2", &ip_covxy_2, "ip_covxy_2/F");
+   fChain->Branch("ip_covxz_2", &ip_covxz_2, "ip_covxz_2/F");
+   fChain->Branch("ip_covyy_2", &ip_covyy_2, "ip_covyy_2/F");
+   fChain->Branch("ip_covyz_2", &ip_covyz_2, "ip_covyz_2/F");
+   fChain->Branch("ip_covzz_2", &ip_covzz_2, "ip_covzz_2/F");
+
    fChain->Branch("ipx_uncorr_2", &ipx_uncorr_2, "ipx_uncorr_2/F");
    fChain->Branch("ipy_uncorr_2", &ipy_uncorr_2, "ipy_uncorr_2/F");
    fChain->Branch("ipz_uncorr_2", &ipz_uncorr_2, "ipz_uncorr_2/F");
    fChain->Branch("IP_signif_PV_with_BS_2", &IP_signif_PV_with_BS_2, "IP_signif_PV_with_BS_2/D");
+   fChain->Branch("IP_signif_RefitV_with_BS_2", &IP_signif_RefitV_with_BS_2, "IP_signif_RefitV_with_BS_2/D");
+   fChain->Branch("IP_signif_RefitV_with_BS_uncorr_2", &IP_signif_RefitV_with_BS_uncorr_2, "IP_signif_RefitV_with_BS_uncorr_2/D");
    //   fChain->Branch("ipxy_2", &ipxy_2, "ipxy_2/F");
    //   fChain->Branch("ipn_2", &ipn_2, "ipn_2/F");
    //   fChain->Branch("drip_2", &drip_2, "drip_2/F");
@@ -826,6 +919,48 @@ void Synch17Tree::WriteInit(TTree *tree) {
    fChain->Branch("idisoweight_2", &idisoweight_2, "idisoweight_2/F");
    fChain->Branch("idisoweight_antiiso_2", &idisoweight_antiiso_2, "idisoweight_antiiso_2/F");
    fChain->Branch("tauvsjetweightMedium_2", &tauvsjetweightMedium_2, "tauvsjetweightMedium_2/F");
+
+
+   fChain->Branch("weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVUp", &weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVUp, "weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVUp/F");
+   fChain->Branch("weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVUp", &weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVUp, "weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVUp/F");
+   fChain->Branch("weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVUp", &weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVUp, "weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVUp/F");
+   fChain->Branch("weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVUp", &weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVUp, "weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVUp/F");
+   fChain->Branch("weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVUp", &weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVUp, "weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVUp/F");
+   fChain->Branch("weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVDown", &weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVDown, "weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVDown/F");
+   fChain->Branch("weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVDown", &weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVDown, "weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVDown/F");
+   fChain->Branch("weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVDown", &weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVDown, "weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVDown/F");
+   fChain->Branch("weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVDown", &weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVDown, "weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVDown/F");
+   fChain->Branch("weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVDown", &weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVDown, "weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVDown/F");
+
+
+  fChain->Branch("weight_CMS_eff_t_pTlow_MVADM0_13TeVUp", &weight_CMS_eff_t_pTlow_MVADM0_13TeVUp, "weight_CMS_eff_t_pTlow_MVADM0_13TeVUp/F"); 
+  fChain->Branch("weight_CMS_eff_t_pTlow_MVADM1_13TeVUp", &weight_CMS_eff_t_pTlow_MVADM1_13TeVUp, "weight_CMS_eff_t_pTlow_MVADM1_13TeVUp/F"); 
+  fChain->Branch("weight_CMS_eff_t_pTlow_MVADM2_13TeVUp", &weight_CMS_eff_t_pTlow_MVADM2_13TeVUp, "weight_CMS_eff_t_pTlow_MVADM2_13TeVUp/F"); 
+  fChain->Branch("weight_CMS_eff_t_pTlow_MVADM10_13TeVUp", &weight_CMS_eff_t_pTlow_MVADM10_13TeVUp, "weight_CMS_eff_t_pTlow_MVADM10_13TeVUp/F");
+  fChain->Branch("weight_CMS_eff_t_pTlow_MVADM11_13TeVUp", &weight_CMS_eff_t_pTlow_MVADM11_13TeVUp, "weight_CMS_eff_t_pTlow_MVADM11_13TeVUp/F");
+  fChain->Branch("weight_CMS_eff_t_pThigh_MVADM0_13TeVUp", &weight_CMS_eff_t_pThigh_MVADM0_13TeVUp, "weight_CMS_eff_t_pThigh_MVADM0_13TeVUp/F");
+  fChain->Branch("weight_CMS_eff_t_pThigh_MVADM1_13TeVUp", &weight_CMS_eff_t_pThigh_MVADM1_13TeVUp, "weight_CMS_eff_t_pThigh_MVADM1_13TeVUp/F");
+  fChain->Branch("weight_CMS_eff_t_pThigh_MVADM2_13TeVUp", &weight_CMS_eff_t_pThigh_MVADM2_13TeVUp, "weight_CMS_eff_t_pThigh_MVADM2_13TeVUp/F");
+  fChain->Branch("weight_CMS_eff_t_pThigh_MVADM10_13TeVUp", &weight_CMS_eff_t_pThigh_MVADM10_13TeVUp, "weight_CMS_eff_t_pThigh_MVADM10_13TeVUp/F"); 
+  fChain->Branch("weight_CMS_eff_t_pThigh_MVADM11_13TeVUp", &weight_CMS_eff_t_pThigh_MVADM11_13TeVUp, "weight_CMS_eff_t_pThigh_MVADM11_13TeVUp/F"); 
+  fChain->Branch("weight_CMS_eff_t_pTlow_MVADM0_13TeVDown", &weight_CMS_eff_t_pTlow_MVADM0_13TeVDown, "weight_CMS_eff_t_pTlow_MVADM0_13TeVDown/F"); 
+  fChain->Branch("weight_CMS_eff_t_pTlow_MVADM1_13TeVDown", &weight_CMS_eff_t_pTlow_MVADM1_13TeVDown, "weight_CMS_eff_t_pTlow_MVADM1_13TeVDown/F"); 
+  fChain->Branch("weight_CMS_eff_t_pTlow_MVADM2_13TeVDown", &weight_CMS_eff_t_pTlow_MVADM2_13TeVDown, "weight_CMS_eff_t_pTlow_MVADM2_13TeVDown/F"); 
+  fChain->Branch("weight_CMS_eff_t_pTlow_MVADM10_13TeVDown", &weight_CMS_eff_t_pTlow_MVADM10_13TeVDown, "weight_CMS_eff_t_pTlow_MVADM10_13TeVDown/F"); 
+  fChain->Branch("weight_CMS_eff_t_pTlow_MVADM11_13TeVDown", &weight_CMS_eff_t_pTlow_MVADM11_13TeVDown, "weight_CMS_eff_t_pTlow_MVADM11_13TeVDown/F"); 
+  fChain->Branch("weight_CMS_eff_t_pThigh_MVADM0_13TeVDown", &weight_CMS_eff_t_pThigh_MVADM0_13TeVDown, "weight_CMS_eff_t_pThigh_MVADM0_13TeVDown/F"); 
+  fChain->Branch("weight_CMS_eff_t_pThigh_MVADM1_13TeVDown", &weight_CMS_eff_t_pThigh_MVADM1_13TeVDown, "weight_CMS_eff_t_pThigh_MVADM1_13TeVDown/F"); 
+  fChain->Branch("weight_CMS_eff_t_pThigh_MVADM2_13TeVDown", &weight_CMS_eff_t_pThigh_MVADM2_13TeVDown, "weight_CMS_eff_t_pThigh_MVADM2_13TeVDown/F"); 
+  fChain->Branch("weight_CMS_eff_t_pThigh_MVADM10_13TeVDown", &weight_CMS_eff_t_pThigh_MVADM10_13TeVDown, "weight_CMS_eff_t_pThigh_MVADM10_13TeVDown/F");
+  fChain->Branch("weight_CMS_eff_t_pThigh_MVADM11_13TeVDown", &weight_CMS_eff_t_pThigh_MVADM11_13TeVDown, "weight_CMS_eff_t_pThigh_MVADM11_13TeVDown/F");
+
+
+
+   fChain->Branch("weight_CMS_scale_gg_13TeVUp", &weight_CMS_scale_gg_13TeVUp, "weight_CMS_scale_gg_13TeVUp/F");
+   fChain->Branch("weight_CMS_scale_gg_13TeVDown", &weight_CMS_scale_gg_13TeVDown, "weight_CMS_scale_gg_13TeVDown/F");
+
+
+
    /*
 fChain->Branch("againstElectronVLooseMVA6_2", &againstElectronVLooseMVA6_2, "againstElectronVLooseMVA6_2/F");
    fChain->Branch("againstElectronVTightMVA6_2", &againstElectronVTightMVA6_2, "againstElectronVTightMVA6_2/F");
