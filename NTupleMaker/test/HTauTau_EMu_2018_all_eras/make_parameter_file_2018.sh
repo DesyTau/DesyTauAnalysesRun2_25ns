@@ -42,10 +42,10 @@ echo "CONFIGFILE,FILELIST" > parameters.txt
 
 
 #Embedded
-#../split_filelist.sh   analysisMacroSynch_em_Embedded.conf EmbeddingRun2018A 1
-#../split_filelist.sh   analysisMacroSynch_em_Embedded.conf EmbeddingRun2018B 1
-#../split_filelist.sh   analysisMacroSynch_em_Embedded.conf EmbeddingRun2018C 1
-#../split_filelist.sh   analysisMacroSynch_em_Embedded.conf EmbeddingRun2018D 1
+../split_filelist.sh   analysisMacroSynch_em_Embedded.conf EmbeddingRun2018A 1
+../split_filelist.sh   analysisMacroSynch_em_Embedded.conf EmbeddingRun2018B 1
+../split_filelist.sh   analysisMacroSynch_em_Embedded.conf EmbeddingRun2018C 1
+../split_filelist.sh   analysisMacroSynch_em_Embedded.conf EmbeddingRun2018D 1
 
 
 #EWKZ
