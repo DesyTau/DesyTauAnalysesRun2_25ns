@@ -421,6 +421,40 @@ int main(int argc, char * argv[]) {
    TFile * correctionWorkSpaceFile = new TFile(correctionsWorkspaceFileName);
    RooWorkspace *correctionWS = (RooWorkspace*)correctionWorkSpaceFile->Get("w");
 
+   // load QCD 
+   TFile *fQCD = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/QCDweights_2016.root", "READ");
+   if (era=="2017") fQCD = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/QCDweights_2017.root", "READ");
+   else if (era=="2018") fQCD = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/QCDweights_2018.root", "READ");
+
+   TGraph *OS_SS_njetgt1 = (TGraph*)fQCD->Get("OS_SS_transfer_factors_njetgt1");
+   TGraph *OS_SS_njet1 = (TGraph*)fQCD->Get("OS_SS_transfer_factors_njet1");
+   TGraph *OS_SS_njet0 = (TGraph*)fQCD->Get("OS_SS_transfer_factors_njet0");
+  
+   TGraph *OS_SS_njet0_Par0_UP = (TGraph*)fQCD->Get("OS_SS_transfer_factors_Par0_njet0_UP");
+   TGraph *OS_SS_njet0_Par0_DOWN = (TGraph*)fQCD->Get("OS_SS_transfer_factors_Par0_njet0_DOWN");
+   TGraph *OS_SS_njet0_Par1_UP = (TGraph*)fQCD->Get("OS_SS_transfer_factors_Par1_njet0_UP");
+   TGraph *OS_SS_njet0_Par1_DOWN = (TGraph*)fQCD->Get("OS_SS_transfer_factors_Par1_njet0_DOWN");  
+   TGraph *OS_SS_njet0_Par2_UP = (TGraph*)fQCD->Get("OS_SS_transfer_factors_Par2_njet0_UP");
+   TGraph *OS_SS_njet0_Par2_DOWN = (TGraph*)fQCD->Get("OS_SS_transfer_factors_Par2_njet0_DOWN");  
+   
+   TGraph *OS_SS_njet1_Par0_UP = (TGraph*)fQCD->Get("OS_SS_transfer_factors_Par0_njet1_UP");
+   TGraph *OS_SS_njet1_Par0_DOWN = (TGraph*)fQCD->Get("OS_SS_transfer_factors_Par0_njet1_DOWN");
+   TGraph *OS_SS_njet1_Par1_UP = (TGraph*)fQCD->Get("OS_SS_transfer_factors_Par1_njet1_UP");
+   TGraph *OS_SS_njet1_Par1_DOWN = (TGraph*)fQCD->Get("OS_SS_transfer_factors_Par1_njet1_DOWN");  
+   TGraph *OS_SS_njet1_Par2_UP = (TGraph*)fQCD->Get("OS_SS_transfer_factors_Par2_njet1_UP");
+   TGraph *OS_SS_njet1_Par2_DOWN = (TGraph*)fQCD->Get("OS_SS_transfer_factors_Par2_njet1_DOWN");  
+   
+   TGraph *OS_SS_njetgt1_Par0_UP = (TGraph*)fQCD->Get("OS_SS_transfer_factors_Par0_njetgt1_UP");
+   TGraph *OS_SS_njetgt1_Par0_DOWN = (TGraph*)fQCD->Get("OS_SS_transfer_factors_Par0_njetgt1_DOWN");
+   TGraph *OS_SS_njetgt1_Par1_UP = (TGraph*)fQCD->Get("OS_SS_transfer_factors_Par1_njetgt1_UP");
+   TGraph *OS_SS_njetgt1_Par1_DOWN = (TGraph*)fQCD->Get("OS_SS_transfer_factors_Par1_njetgt1_DOWN");  
+   TGraph *OS_SS_njetgt1_Par2_UP = (TGraph*)fQCD->Get("OS_SS_transfer_factors_Par2_njetgt1_UP");
+   TGraph *OS_SS_njetgt1_Par2_DOWN = (TGraph*)fQCD->Get("OS_SS_transfer_factors_Par2_njetgt1_DOWN");  
+   
+   TH2F *hNonClosureCorrection = (TH2F*)fQCD->Get("NonClosureCorrection");
+   TH2F *hIsolationCorrection = (TH2F*)fQCD->Get("IsolationCorrection");
+   
+   
    // store whether FastMTT or SVFit is used ===========================================================================================================================
    isSVFitUsed = computeSVFitMass;
    isFastMTTUsed = computeFastMTTMass;
@@ -1028,7 +1062,7 @@ int main(int argc, char * argv[]) {
                                                        analysisTree.electron_pz[electronIndex],
                                                        classic_svFit::electronMass);
          double sf_ele = 1.0;   
-         if (isEmbedded) sf_ele= SFEleScaleEmbedded(analysisTree, era, electronIndex )
+         if (isEmbedded) sf_ele= SFEleScaleEmbedded(analysisTree, era, electronIndex );
          if (isEmbedded) electronLV = electronLV *sf_ele;
          
          TLorentzVector electronUpLV; electronUpLV.SetXYZM(analysisTree.electron_px_energyscale_up[electronIndex],
@@ -1817,42 +1851,75 @@ int main(int argc, char * argv[]) {
          
          // QCD estimation =======================================================================================================================================================
 
-         correctionWS->var("e_pt")->setVal(pt_1);
-         correctionWS->var("m_pt")->setVal(pt_2);
-         correctionWS->var("njets")->setVal(njets);
-         correctionWS->var("dR")->setVal(dr_tt);
-         double_t em_qcd_osss_binned = correctionWS->function("em_qcd_osss")->getVal();
-         double_t em_qcd_osss_binned_0jet_rate_up = correctionWS->function("em_qcd_osss_stat_0jet_unc1_up")->getVal();
-         double_t em_qcd_osss_binned_0jet_rate_down = correctionWS->function("em_qcd_osss_stat_0jet_unc1_down")->getVal();
-         double_t em_qcd_osss_binned_1jet_rate_up = correctionWS->function("em_qcd_osss_stat_1jet_unc1_up")->getVal();
-         double_t em_qcd_osss_binned_1jet_rate_down = correctionWS->function("em_qcd_osss_stat_1jet_unc1_down")->getVal();
-         double_t em_qcd_osss_binned_2jet_rate_up = correctionWS->function("em_qcd_osss_stat_2jet_unc1_up")->getVal();
-         double_t em_qcd_osss_binned_2jet_rate_down = correctionWS->function("em_qcd_osss_stat_2jet_unc1_down")->getVal();
-         double_t em_qcd_osss_binned_0jet_shape_up = correctionWS->function("em_qcd_osss_stat_0jet_unc2_up")->getVal();
-         double_t em_qcd_osss_binned_0jet_shape_down = correctionWS->function("em_qcd_osss_stat_0jet_unc2_down")->getVal();
-         double_t em_qcd_osss_binned_1jet_shape_up = correctionWS->function("em_qcd_osss_stat_1jet_unc2_up")->getVal();
-         double_t em_qcd_osss_binned_1jet_shape_down = correctionWS->function("em_qcd_osss_stat_1jet_unc2_down")->getVal();
-         double_t em_qcd_osss_binned_2jet_shape_up = correctionWS->function("em_qcd_osss_stat_2jet_unc2_up")->getVal();
-         double_t em_qcd_osss_binned_2jet_shape_down = correctionWS->function("em_qcd_osss_stat_2jet_unc2_down")->getVal();
-         double_t em_qcd_extrap_up = correctionWS->function("em_qcd_osss_extrap_up")->getVal();
-         double_t em_qcd_extrap_down = correctionWS->function("em_qcd_osss_extrap_down")->getVal();
+         // correctionWS->var("e_pt")->setVal(pt_1);
+         // correctionWS->var("m_pt")->setVal(pt_2);
+         // correctionWS->var("njets")->setVal(njets);
+         // correctionWS->var("dR")->setVal(dr_tt);
+         // double_t em_qcd_osss_binned = correctionWS->function("em_qcd_osss")->getVal();
+         // double_t em_qcd_osss_binned_0jet_rate_up = correctionWS->function("em_qcd_osss_stat_0jet_unc1_up")->getVal();
+         // double_t em_qcd_osss_binned_0jet_rate_down = correctionWS->function("em_qcd_osss_stat_0jet_unc1_down")->getVal();
+         // double_t em_qcd_osss_binned_1jet_rate_up = correctionWS->function("em_qcd_osss_stat_1jet_unc1_up")->getVal();
+         // double_t em_qcd_osss_binned_1jet_rate_down = correctionWS->function("em_qcd_osss_stat_1jet_unc1_down")->getVal();
+         // double_t em_qcd_osss_binned_2jet_rate_up = correctionWS->function("em_qcd_osss_stat_2jet_unc1_up")->getVal();
+         // double_t em_qcd_osss_binned_2jet_rate_down = correctionWS->function("em_qcd_osss_stat_2jet_unc1_down")->getVal();
+         // double_t em_qcd_osss_binned_0jet_shape_up = correctionWS->function("em_qcd_osss_stat_0jet_unc2_up")->getVal();
+         // double_t em_qcd_osss_binned_0jet_shape_down = correctionWS->function("em_qcd_osss_stat_0jet_unc2_down")->getVal();
+         // double_t em_qcd_osss_binned_1jet_shape_up = correctionWS->function("em_qcd_osss_stat_1jet_unc2_up")->getVal();
+         // double_t em_qcd_osss_binned_1jet_shape_down = correctionWS->function("em_qcd_osss_stat_1jet_unc2_down")->getVal();
+         // double_t em_qcd_osss_binned_2jet_shape_up = correctionWS->function("em_qcd_osss_stat_2jet_unc2_up")->getVal();
+         // double_t em_qcd_osss_binned_2jet_shape_down = correctionWS->function("em_qcd_osss_stat_2jet_unc2_down")->getVal();
+         // double_t em_qcd_extrap_up = correctionWS->function("em_qcd_osss_extrap_up")->getVal();
+         // double_t em_qcd_extrap_down = correctionWS->function("em_qcd_osss_extrap_down")->getVal();
         
-         qcdweight =  em_qcd_osss_binned;
-         qcdweight_0jet_rate_up =  em_qcd_osss_binned_0jet_rate_up;
-         qcdweight_0jet_rate_down =  em_qcd_osss_binned_0jet_rate_down;   
-         qcdweight_1jet_rate_up =  em_qcd_osss_binned_1jet_rate_up;
-         qcdweight_1jet_rate_down =  em_qcd_osss_binned_1jet_rate_down;
-         qcdweight_2jet_rate_up =  em_qcd_osss_binned_2jet_rate_up;
-         qcdweight_2jet_rate_down =  em_qcd_osss_binned_2jet_rate_down;
-         qcdweight_0jet_shape_up =  em_qcd_osss_binned_0jet_shape_up;
-         qcdweight_0jet_shape_down =  em_qcd_osss_binned_0jet_shape_down;   
-         qcdweight_1jet_shape_up =  em_qcd_osss_binned_1jet_shape_up;
-         qcdweight_1jet_shape_down =  em_qcd_osss_binned_1jet_shape_down;
-         qcdweight_2jet_shape_up =  em_qcd_osss_binned_2jet_shape_up;
-         qcdweight_2jet_shape_down = em_qcd_osss_binned_2jet_shape_down;
+         // qcdweight =  em_qcd_osss_binned;
+         // qcdweight_0jet_rate_up =  em_qcd_osss_binned_0jet_rate_up;
+         // qcdweight_0jet_rate_down =  em_qcd_osss_binned_0jet_rate_down;   
+         // qcdweight_1jet_rate_up =  em_qcd_osss_binned_1jet_rate_up;
+         // qcdweight_1jet_rate_down =  em_qcd_osss_binned_1jet_rate_down;
+         // qcdweight_2jet_rate_up =  em_qcd_osss_binned_2jet_rate_up;
+         // qcdweight_2jet_rate_down =  em_qcd_osss_binned_2jet_rate_down;
+         // qcdweight_0jet_shape_up =  em_qcd_osss_binned_0jet_shape_up;
+         // qcdweight_0jet_shape_down =  em_qcd_osss_binned_0jet_shape_down;   
+         // qcdweight_1jet_shape_up =  em_qcd_osss_binned_1jet_shape_up;
+         // qcdweight_1jet_shape_down =  em_qcd_osss_binned_1jet_shape_down;
+         // qcdweight_2jet_shape_up =  em_qcd_osss_binned_2jet_shape_up;
+         // qcdweight_2jet_shape_down = em_qcd_osss_binned_2jet_shape_down;
          
-         qcdweight_iso_up = em_qcd_extrap_up;
-         qcdweight_iso_down = em_qcd_extrap_down;
+         //qcdweight_iso_up = em_qcd_extrap_up;
+         //qcdweight_iso_down = em_qcd_extrap_down;
+
+          if(njets==0){
+            qcdweight_deltaR =OS_SS_njet0->Eval(dr_tt);
+            qcdweight_deltaR_Par0_up =  OS_SS_njet0_Par0_UP->Eval(dr_tt);
+            qcdweight_deltaR_Par0_down =  OS_SS_njet0_Par0_DOWN->Eval(dr_tt);
+            qcdweight_deltaR_Par1_up =  OS_SS_njet0_Par1_UP->Eval(dr_tt);
+            qcdweight_deltaR_Par1_down =  OS_SS_njet0_Par1_DOWN->Eval(dr_tt);
+            qcdweight_deltaR_Par2_up =  OS_SS_njet0_Par2_UP->Eval(dr_tt);
+            qcdweight_deltaR_Par2_down =  OS_SS_njet0_Par2_DOWN->Eval(dr_tt);
+          }
+          else if(njets ==1) {
+            qcdweight_deltaR = OS_SS_njet1->Eval(dr_tt);
+            qcdweight_deltaR_Par0_up =  OS_SS_njet1_Par0_UP->Eval(dr_tt);
+            qcdweight_deltaR_Par0_down =  OS_SS_njet1_Par0_DOWN->Eval(dr_tt);
+            qcdweight_deltaR_Par1_up =  OS_SS_njet1_Par1_UP->Eval(dr_tt);
+            qcdweight_deltaR_Par1_down =  OS_SS_njet1_Par1_DOWN->Eval(dr_tt);
+            qcdweight_deltaR_Par2_up =  OS_SS_njet1_Par2_UP->Eval(dr_tt);
+            qcdweight_deltaR_Par2_down =  OS_SS_njet1_Par2_DOWN->Eval(dr_tt);
+          }
+          else {
+            qcdweight_deltaR = OS_SS_njetgt1->Eval(dr_tt);
+            qcdweight_deltaR_Par0_up =  OS_SS_njetgt1_Par0_UP->Eval(dr_tt);
+            qcdweight_deltaR_Par0_down =  OS_SS_njetgt1_Par0_DOWN->Eval(dr_tt);
+            qcdweight_deltaR_Par1_up =  OS_SS_njetgt1_Par1_UP->Eval(dr_tt);
+            qcdweight_deltaR_Par1_down =  OS_SS_njetgt1_Par1_DOWN->Eval(dr_tt);
+            qcdweight_deltaR_Par2_up =  OS_SS_njetgt1_Par2_UP->Eval(dr_tt);
+            qcdweight_deltaR_Par2_down =  OS_SS_njetgt1_Par2_DOWN->Eval(dr_tt);
+            
+          }
+        qcdweight_nonclosure = hNonClosureCorrection->GetBinContent(hNonClosureCorrection->GetXaxis()->FindBin(pt_2),hNonClosureCorrection->GetYaxis()->FindBin(pt_1));
+        qcdweight_isolationcorrection = hIsolationCorrection->GetBinContent(hIsolationCorrection->GetXaxis()->FindBin(pt_2),hIsolationCorrection->GetYaxis()->FindBin(pt_1));
+        
+        qcdweight=qcdweight_deltaR*qcdweight_nonclosure*qcdweight_isolationcorrection;
 
          if (!isData) effweight = effweight*isoweight_1*isoweight_2;
          // if (!isData){

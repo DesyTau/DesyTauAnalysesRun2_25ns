@@ -152,6 +152,16 @@ Float_t         qcdweight_2jet_shape_down;
 Float_t         qcdweight_iso_up;
 Float_t         qcdweight_iso_down;
 
+Float_t         qcdweight_deltaR;
+Float_t         qcdweight_deltaR_Par0_up;
+Float_t         qcdweight_deltaR_Par0_down;
+Float_t         qcdweight_deltaR_Par1_up;
+Float_t         qcdweight_deltaR_Par1_down;
+Float_t         qcdweight_deltaR_Par2_up;
+Float_t         qcdweight_deltaR_Par2_down;
+
+Float_t         qcdweight_nonclosure;
+Float_t         qcdweight_isolationcorrection;
 
 Float_t         zptmassweight;
 Float_t         zptmassweight_esup;
@@ -833,6 +843,17 @@ void SetupTree(){
    tree->Branch("qcdweight_iso_up",&qcdweight_iso_up,"qcdweight_iso_up/F");
    tree->Branch("qcdweight_iso_down",&qcdweight_iso_down,"qcdweight_iso_down/F");
    
+  tree->Branch("qcdweight_deltaR",&qcdweight_deltaR,"qcdweight_deltaR/F");
+  tree->Branch("qcdweight_deltaR_Par0_up",&qcdweight_deltaR_Par0_up, "qcdweight_deltaR_Par0_up/F");
+  tree->Branch("qcdweight_deltaR_Par0_down",&qcdweight_deltaR_Par0_down, "qcdweight_deltaR_Par0_down/F");
+  tree->Branch("qcdweight_deltaR_Par1_up",&qcdweight_deltaR_Par1_up, "qcdweight_deltaR_Par1_up/F");
+  tree->Branch("qcdweight_deltaR_Par1_down",&qcdweight_deltaR_Par1_down, "qcdweight_deltaR_Par1_down/F");
+  tree->Branch("qcdweight_deltaR_Par2_up",&qcdweight_deltaR_Par2_up, "qcdweight_deltaR_Par2_up/F");
+  tree->Branch("qcdweight_deltaR_Par2_down",&qcdweight_deltaR_Par2_down, "qcdweight_deltaR_Par2_down/F");
+
+  tree->Branch("qcdweight_nonclosure",&qcdweight_nonclosure, "qcdweight_nonclosure/F");
+  tree->Branch("qcdweight_isolationcorrection",&qcdweight_isolationcorrection, "qcdweight_isolationcorrection/F");
+   
    tree->Branch("zptmassweight",&zptmassweight,"zptmassweight/F");
    
    tree->Branch("zptmassweight_esup",&zptmassweight_esup,"zptmassweight_esup/F");
@@ -1147,6 +1168,18 @@ void SetDefaultValues(){
 
    qcdweight_iso_up =  1;
    qcdweight_iso_down =  1;
+   
+   qcdweight_deltaR =  1;
+   qcdweight_deltaR_Par0_up =  1;
+   qcdweight_deltaR_Par0_down =  1;
+   qcdweight_deltaR_Par1_up =  1;
+   qcdweight_deltaR_Par1_down =  1;
+   qcdweight_deltaR_Par2_up =  1;
+   qcdweight_deltaR_Par2_down =  1;
+
+   qcdweight_nonclosure =  1;
+   qcdweight_isolationcorrection =  1;
+   
    zptmassweight = 1;
    zptmassweight_esup = 1;
    zptmassweight_esdown = 1;

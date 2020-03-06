@@ -51,6 +51,7 @@ double CorrectEleScaleEmbedded(AC1B &analysisTree, TString era, int ie )
 }
 
 double SFEleScaleEmbedded(AC1B &analysisTree, TString era, int electronIndex ){
+  double sf_ele=1.0;
   if (era=="2016"){
      if (fabs(analysisTree.electron_eta[electronIndex]) < 1.479 ) sf_ele= (1-0.00243);
      else sf_ele = (1-0.007);
@@ -579,7 +580,7 @@ void SelectMuonElePair(AC1B &analysisTree, vector<int> muons, vector<int> electr
          if (dR<dRleptonsCut) continue;
          
          double ele_sf = 1.0;
-         if (isEmbedded) ele_sf= SFEleScaleEmbedded(analysisTree, era, electronIndex )
+         if (isEmbedded) ele_sf= SFEleScaleEmbedded(analysisTree, era, electronIndex );
 
          bool trigMatch =
             (analysisTree.muon_pt[mIndex]>ptMuonHighCut) ||
@@ -633,7 +634,7 @@ bool ElectronVeto(AC1B &analysisTree, int electronIndex, float ptVetoElectronCut
    for (unsigned int ie = 0; ie<analysisTree.electron_count; ++ie) {
       if (int(ie)==electronIndex) continue;
       double ele_sf = 1.0;
-      if (isEmbedded) ele_sf= SFEleScaleEmbedded(analysisTree, era, electronIndex )
+      if (isEmbedded) ele_sf= SFEleScaleEmbedded(analysisTree, era, electronIndex );
   
       if (analysisTree.electron_pt[ie] * ele_sf <ptVetoElectronCut) continue;
       if (fabs(analysisTree.electron_eta[ie])>etaVetoElectronCut) continue;
