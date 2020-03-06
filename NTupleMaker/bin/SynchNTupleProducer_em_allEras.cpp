@@ -795,19 +795,10 @@ int main(int argc, char * argv[]) {
 
          vector<int> electrons; electrons.clear();
          for (unsigned int ie = 0; ie<analysisTree.electron_count; ++ie) {
+	   
             float elept =analysisTree.electron_pt[ie];
-            if (era=="2016" && isEmbedded){
-               if (fabs(analysisTree.electron_eta[ie]) < 1.479 ) elept = analysisTree.electron_pt[ie] * (1-0.00243);
-               else elept = analysisTree.electron_pt[ie] * (1-0.007);
-            }
-            if (era=="2017" && isEmbedded){
-               if (fabs(analysisTree.electron_eta[ie]) < 1.479 ) elept = analysisTree.electron_pt[ie] * (1-0.00067);
-               else elept = analysisTree.electron_pt[ie] * (1-0.01133);
-            }
-            if (era=="2018" && isEmbedded){
-               if (fabs(analysisTree.electron_eta[ie]) < 1.479 ) elept = analysisTree.electron_pt[ie] * (1-0.00328);
-               else elept = analysisTree.electron_pt[ie] * (1-0.00557);
-            }
+	    if (isEmbedded) elept = CorrectEleScaleEmbedded(analysisTree, era, ie);
+
             if (elept<ptElectronLowCut) continue;
             if (fabs(analysisTree.electron_eta[ie])>etaElectronCut) continue;
             if (fabs(analysisTree.electron_dxy[ie])>dxyElectronCut) continue;
@@ -860,19 +851,9 @@ int main(int argc, char * argv[]) {
          //if (era=="2016" && duplicateMuonFilter_ < 0.5) continue; 
 
          // triggered?  ================================================================================================================================================
-         float elept =analysisTree.electron_pt[electronIndex];
-            if (era=="2016" && isEmbedded){
-               if (fabs(analysisTree.electron_eta[electronIndex]) < 1.479 ) elept = analysisTree.electron_pt[electronIndex] * (1-0.00243);
-               else elept = analysisTree.electron_pt[electronIndex] * (1-0.007);
-            }
-            if (era=="2017" && isEmbedded){
-               if (fabs(analysisTree.electron_eta[electronIndex]) < 1.479 ) elept = analysisTree.electron_pt[electronIndex] * (1-0.00067);
-               else elept = analysisTree.electron_pt[electronIndex] * (1-0.01133);
-            }
-            if (era=="2018" && isEmbedded){
-               if (fabs(analysisTree.electron_eta[electronIndex]) < 1.479 ) elept = analysisTree.electron_pt[electronIndex] * (1-0.00328);
-               else elept = analysisTree.electron_pt[electronIndex] * (1-0.00557);
-            }
+	 float elept =analysisTree.electron_pt[electronIndex];
+	 if (isEmbedded) elept = CorrectEleScaleEmbedded(analysisTree, era, electronIndex);
+    
          isMu23 = TriggerMatching(analysisTree, analysisTree.muon_eta[muonIndex], analysisTree.muon_phi[muonIndex], nHighPtLegMuon, deltaRTrigMatch) && analysisTree.muon_pt[muonIndex]>ptMuonHighCut;
          isMu8 = TriggerMatching(analysisTree, analysisTree.muon_eta[muonIndex], analysisTree.muon_phi[muonIndex], nLowPtLegMuon, deltaRTrigMatch) && analysisTree.muon_pt[muonIndex]>ptMuonLowCut;
          if (applyDzFilterMatch){
@@ -920,19 +901,9 @@ int main(int argc, char * argv[]) {
 
          // filling electron variables    ==============================================================================================================================
          elept =analysisTree.electron_pt[electronIndex];
-         if (era=="2016" && isEmbedded){
-            if (fabs(analysisTree.electron_eta[electronIndex]) < 1.479 ) elept = analysisTree.electron_pt[electronIndex] * (1-0.00243);
-            else elept = analysisTree.electron_pt[electronIndex] * (1-0.007);
-         }
-         if (era=="2017" && isEmbedded){
-            if (fabs(analysisTree.electron_eta[electronIndex]) < 1.479 ) elept = analysisTree.electron_pt[electronIndex] * (1-0.00067);
-            else elept = analysisTree.electron_pt[electronIndex] * (1-0.01133);
-         }
-         if (era=="2018" && isEmbedded){
-            if (fabs(analysisTree.electron_eta[electronIndex]) < 1.479 ) elept = analysisTree.electron_pt[electronIndex] * (1-0.00328);
-            else elept = analysisTree.electron_pt[electronIndex] * (1-0.00557);
-         }
-         pt_1 = elept;
+	 if (isEmbedded) elept = CorrectEleScaleEmbedded(analysisTree, era, electronIndex);
+         
+	 pt_1 = elept;
          eta_1 = analysisTree.electron_eta[electronIndex];
          phi_1 = analysisTree.electron_phi[electronIndex];
          q_1 = -1;
@@ -1057,18 +1028,7 @@ int main(int argc, char * argv[]) {
                                                        analysisTree.electron_pz[electronIndex],
                                                        classic_svFit::electronMass);
          double sf_ele = 1.0;   
-         if (era=="2016" && isEmbedded){
-            if (fabs(analysisTree.electron_eta[electronIndex]) < 1.479 ) sf_ele= (1-0.00243);
-            else sf_ele = (1-0.007);
-         }
-         if (era=="2017" && isEmbedded){
-            if (fabs(analysisTree.electron_eta[electronIndex]) < 1.479 ) sf_ele =  (1-0.00067);
-            else sf_ele =  (1-0.01133);
-         }
-         if (era=="2018" && isEmbedded){
-            if (fabs(analysisTree.electron_eta[electronIndex]) < 1.479 ) sf_ele = (1-0.00328);
-            else sf_ele =  (1-0.00557);
-         }
+         if (isEmbedded) sf_ele= SFEleScaleEmbedded(analysisTree, era, electronIndex )
          if (isEmbedded) electronLV = electronLV *sf_ele;
          
          TLorentzVector electronUpLV; electronUpLV.SetXYZM(analysisTree.electron_px_energyscale_up[electronIndex],

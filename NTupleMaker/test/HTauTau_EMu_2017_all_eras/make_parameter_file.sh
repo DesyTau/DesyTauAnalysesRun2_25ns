@@ -39,7 +39,7 @@ echo "CONFIGFILE,FILELIST" > parameters.txt
 ../split_filelist.sh analysisMacroSynch_em_WZ_TuneCP5_13TeV-pythia8.conf WZ_TuneCP5_13TeV-pythia8  1
 ../split_filelist.sh analysisMacroSynch_em_ZZ_TuneCP5_13TeV-pythia8.conf ZZ_TuneCP5_13TeV-pythia8  1
 
-#../split_filelist.sh analysisMacroSynch_em_Embedded.conf Embedding_Run2017 1
+../split_filelist.sh analysisMacroSynch_em_Embedded.conf Embedding_Run2017 1
 
 ../split_filelist.sh analysisMacroSynch_em_Signal_WMinusH.conf WminusHToTauTau_M125_13TeV_powheg_pythia8 1
 ../split_filelist.sh analysisMacroSynch_em_Signal_WPlusH.conf WplusHToTauTau_M125_13TeV_powheg_pythia8 1
