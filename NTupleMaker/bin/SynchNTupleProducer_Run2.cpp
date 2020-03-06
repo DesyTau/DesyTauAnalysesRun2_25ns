@@ -677,6 +677,7 @@ int main(int argc, char * argv[]){
     }
     delete _inittree;
 
+
     // Read in HLT filter
     vector<string> filterSingleLep = cfg.get<vector<string>>("filterSingleLep");
     vector<string> filterXtriggerLepLeg;
@@ -685,30 +686,6 @@ int main(int argc, char * argv[]){
       filterXtriggerLepLeg = cfg.get<vector<string>>("filterXtriggerLepLeg");
       filterXtriggerTauLeg = cfg.get<vector<string>>("filterXtriggerTauLeg");
     }
-    else 
-    {
-      if(isData && !isEmbedded)
-      {
-        if (analysisTree.event_run < 315974) { // muon filter of the mutau triggers changed
-          filterXtriggerLepLeg = cfg.get<vector<string>>("filterXtriggerLepLeg_before_run315974");
-          filterXtriggerTauLeg = cfg.get<vector<string>>("filterXtriggerTauLeg_before_run315974");
-        }
-        else if (analysisTree.event_run < 317509) // HPS algorithm was introduced
-        {
-          filterXtriggerLepLeg = cfg.get<vector<string>>("filterXtriggerLepLeg_run315974_to_HPS");
-          filterXtriggerTauLeg = cfg.get<vector<string>>("filterXtriggerTauLeg_run315974_to_HPS");    
-        }
-        else{
-          filterXtriggerLepLeg = cfg.get<vector<string>>("filterXtriggerLepLeg_after_HPS");
-          filterXtriggerTauLeg = cfg.get<vector<string>>("filterXtriggerTauLeg_after_HPS");    
-        }
-      }
-      else{
-        filterXtriggerLepLeg = cfg.get<vector<string>>("filterXtriggerLepLeg_after_HPS");
-        filterXtriggerTauLeg = cfg.get<vector<string>>("filterXtriggerTauLeg_after_HPS");          
-      }
-    }
-    //    cout << "Run number = " << analysisTree.event_run << endl;
       
     cout<<"Number of single lepton trigger legs = "<<filterSingleLep.size()<<endl;
     cout<<"Number of X trigger legs (lep leg)   = "<<filterXtriggerLepLeg.size()<<endl;
@@ -721,6 +698,30 @@ int main(int argc, char * argv[]){
       counter[0]++;
       analysisTree.GetEntry(iEntry);
       nEvents++;
+
+      if (era==2018) {
+	if(isData && !isEmbedded)
+	  {
+	    if (analysisTree.event_run < 315974) { // muon filter of the mutau triggers changed
+	      filterXtriggerLepLeg = cfg.get<vector<string>>("filterXtriggerLepLeg_before_run315974");
+	      filterXtriggerTauLeg = cfg.get<vector<string>>("filterXtriggerTauLeg_before_run315974");
+	    }
+	    else if (analysisTree.event_run < 317509) // HPS algorithm was introduced
+	      {
+		filterXtriggerLepLeg = cfg.get<vector<string>>("filterXtriggerLepLeg_run315974_to_HPS");
+		filterXtriggerTauLeg = cfg.get<vector<string>>("filterXtriggerTauLeg_run315974_to_HPS");    
+	      }
+	    else{
+	      filterXtriggerLepLeg = cfg.get<vector<string>>("filterXtriggerLepLeg_after_HPS");
+	      filterXtriggerTauLeg = cfg.get<vector<string>>("filterXtriggerTauLeg_after_HPS");    
+	    }
+	  }
+	else{
+	  filterXtriggerLepLeg = cfg.get<vector<string>>("filterXtriggerLepLeg_after_HPS");
+	  filterXtriggerTauLeg = cfg.get<vector<string>>("filterXtriggerTauLeg_after_HPS");          
+	}
+      }
+      //      cout << "Run number = " << analysisTree.event_run << endl;
     
 
       //TO DO: fix tauspinner weight implementation after deprecated method is not in use for 2017
