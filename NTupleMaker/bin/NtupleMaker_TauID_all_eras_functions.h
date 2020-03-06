@@ -32,6 +32,40 @@
 #include "RooAbsReal.h"
 #include "RooRealVar.h"
 
+double CorrectEleScaleEmbedded(AC1B &analysisTree, TString era, int ie )
+{
+  float elept =analysisTree.electron_pt[ie];
+  if (era=="2016"){
+    if (fabs(analysisTree.electron_eta[ie]) < 1.479 ) elept = analysisTree.electron_pt[ie] * (1-0.00243);
+    else elept = analysisTree.electron_pt[ie] * (1-0.007);
+  }
+  if (era=="2017"){
+    if (fabs(analysisTree.electron_eta[ie]) < 1.479 ) elept = analysisTree.electron_pt[ie] * (1-0.00067);
+    else elept = analysisTree.electron_pt[ie] * (1-0.01133);
+  }
+  if (era=="2018"){
+    if (fabs(analysisTree.electron_eta[ie]) < 1.479 ) elept = analysisTree.electron_pt[ie] * (1-0.00328);
+    else elept = analysisTree.electron_pt[ie] * (1-0.00557);
+  }
+  return elept;
+}
+
+double SFEleScaleEmbedded(AC1B &analysisTree, TString era, int electronIndex ){
+  if (era=="2016"){
+     if (fabs(analysisTree.electron_eta[electronIndex]) < 1.479 ) sf_ele= (1-0.00243);
+     else sf_ele = (1-0.007);
+  }
+  if (era=="2017"){
+     if (fabs(analysisTree.electron_eta[electronIndex]) < 1.479 ) sf_ele =  (1-0.00067);
+     else sf_ele =  (1-0.01133);
+  }
+  if (era=="2018"){
+     if (fabs(analysisTree.electron_eta[electronIndex]) < 1.479 ) sf_ele = (1-0.00328);
+     else sf_ele =  (1-0.00557);
+  }
+  return sf_ele;
+}
+
 bool metFiltersPasses(AC1B &tree_, std::vector<TString> metFlags, bool isData) {
 
   bool passed = true;
@@ -518,7 +552,7 @@ void SearchForBtagDiscriminant(AC1B &analysisTree, TString BTagDiscriminator1, T
    }
 }
 
-void SelectMuonElePair(AC1B &analysisTree, vector<int> muons, vector<int> electrons, bool isMuonIsoR03, bool isElectronIsoR03, float dRleptonsCut, float ptMuonHighCut, float ptElectronHighCut, int &electronIndex, int &muonIndex, float &isoMuMin, float &isoEleMin, TString era){
+void SelectMuonElePair(AC1B &analysisTree, vector<int> muons, vector<int> electrons, bool isMuonIsoR03, bool isElectronIsoR03, float dRleptonsCut, float ptMuonHighCut, float ptElectronHighCut, int &electronIndex, int &muonIndex, float &isoMuMin, float &isoEleMin, TString era, bool isEmbedded){
          
    for (unsigned int im=0; im<muons.size(); ++im) {
       unsigned int mIndex  = muons.at(im);
@@ -544,9 +578,12 @@ void SelectMuonElePair(AC1B &analysisTree, vector<int> muons, vector<int> electr
          
          if (dR<dRleptonsCut) continue;
          
+         double ele_sf = 1.0;
+         if (isEmbedded) ele_sf= SFEleScaleEmbedded(analysisTree, era, electronIndex )
+
          bool trigMatch =
             (analysisTree.muon_pt[mIndex]>ptMuonHighCut) ||
-            (analysisTree.electron_pt[eIndex]>ptElectronHighCut);
+            (analysisTree.electron_pt[eIndex] * ele_sf >ptElectronHighCut);
          if (!trigMatch) continue;
          
          float absIsoEle; 
@@ -555,7 +592,7 @@ void SelectMuonElePair(AC1B &analysisTree, vector<int> muons, vector<int> electr
          float  eA = getEffectiveArea( fabs(analysisTree.electron_superclusterEta[eIndex]) );
          absIsoEle = analysisTree.electron_r03_sumChargedHadronPt[eIndex] +
             TMath::Max(0.0f,analysisTree.electron_r03_sumNeutralHadronEt[eIndex]+analysisTree.electron_r03_sumPhotonEt[eIndex]-eA*rhoNeutral);
-         relIsoEle = absIsoEle/analysisTree.electron_pt[eIndex];
+         relIsoEle = absIsoEle/(analysisTree.electron_pt[eIndex] *ele_sf);
             //}
          if (int(mIndex)!=muonIndex) {
             if (relIsoMu==isoMuMin) {
@@ -590,12 +627,15 @@ void SelectMuonElePair(AC1B &analysisTree, vector<int> muons, vector<int> electr
 }
 
 
-bool ElectronVeto(AC1B &analysisTree, int electronIndex, float ptVetoElectronCut, float etaVetoElectronCut, float dxyVetoElectronCut, float dzVetoElectronCut, TString era, bool applyVetoElectronId, bool isElectronIsoR03, float isoVetoElectronCut){
+bool ElectronVeto(AC1B &analysisTree, int electronIndex, float ptVetoElectronCut, float etaVetoElectronCut, float dxyVetoElectronCut, float dzVetoElectronCut, TString era, bool applyVetoElectronId, bool isElectronIsoR03, float isoVetoElectronCut, bool isEmbedded){
  
    bool foundExtraElectron = false;
    for (unsigned int ie = 0; ie<analysisTree.electron_count; ++ie) {
       if (int(ie)==electronIndex) continue;
-      if (analysisTree.electron_pt[ie]<ptVetoElectronCut) continue;
+      double ele_sf = 1.0;
+      if (isEmbedded) ele_sf= SFEleScaleEmbedded(analysisTree, era, electronIndex )
+  
+      if (analysisTree.electron_pt[ie] * ele_sf <ptVetoElectronCut) continue;
       if (fabs(analysisTree.electron_eta[ie])>etaVetoElectronCut) continue;
       if (fabs(analysisTree.electron_dxy[ie])>dxyVetoElectronCut) continue;
       if (fabs(analysisTree.electron_dz[ie])>dzVetoElectronCut) continue; 
@@ -650,3 +690,4 @@ bool MuonVeto(AC1B &analysisTree, int muonIndex, float ptVetoMuonCut, float etaV
    
    return foundExtraMuon;
 }
+

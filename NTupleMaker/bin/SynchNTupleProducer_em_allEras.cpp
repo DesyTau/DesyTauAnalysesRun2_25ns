@@ -495,7 +495,6 @@ int main(int argc, char * argv[]) {
          }
 
          if (sync && mcweight<0) continue; // FIXME: needed for sync?
-
          weightScale1 = analysisTree.weightScale1;
          weightScale2 = analysisTree.weightScale2;
          weightScale3 = analysisTree.weightScale3;
@@ -689,7 +688,7 @@ int main(int argc, char * argv[]) {
 
             // set zptmassweight  ======================================================================================================================================             
             if (isDY) zptmassweight = GetZptMassWeight(bosonMass, bosonPt, histZMassPtWeights);
- 
+
             ALL->Fill(0.0);
             if (isZMM) ZMM->Fill(0.);
             if (isZEE) ZEE->Fill(0.);
@@ -748,7 +747,7 @@ int main(int argc, char * argv[]) {
          npu = analysisTree.numtruepileupinteractions;
          rho = analysisTree.rho;
          npartons = analysisTree.genparticles_noutgoing;
-         
+
          // apply good run selection  ==================================================================================================================================
 
          if ((isData || isEmbedded) && applyGoodRunSelection){
@@ -796,7 +795,11 @@ int main(int argc, char * argv[]) {
 
          vector<int> electrons; electrons.clear();
          for (unsigned int ie = 0; ie<analysisTree.electron_count; ++ie) {
-            if (analysisTree.electron_pt[ie]<ptElectronLowCut) continue;
+	   
+            float elept =analysisTree.electron_pt[ie];
+	    if (isEmbedded) elept = CorrectEleScaleEmbedded(analysisTree, era, ie);
+
+            if (elept<ptElectronLowCut) continue;
             if (fabs(analysisTree.electron_eta[ie])>etaElectronCut) continue;
             if (fabs(analysisTree.electron_dxy[ie])>dxyElectronCut) continue;
             if (fabs(analysisTree.electron_dz[ie])>dzElectronCut) continue;
@@ -833,7 +836,7 @@ int main(int argc, char * argv[]) {
          int muonIndex = -1;
          float isoMuMin = 1e+10;
          float isoEleMin = 1e+10;
-         SelectMuonElePair(analysisTree, muons, electrons, isMuonIsoR03, isElectronIsoR03, dRleptonsCut, ptMuonHighCut, ptElectronHighCut, electronIndex, muonIndex, isoMuMin, isoEleMin, era);
+         SelectMuonElePair(analysisTree, muons, electrons, isMuonIsoR03, isElectronIsoR03, dRleptonsCut, ptMuonHighCut, ptElectronHighCut, electronIndex, muonIndex, isoMuMin, isoEleMin, era, isEmbedded);
          if (electronIndex<0) continue;
          if (muonIndex<0) continue;
 
@@ -847,7 +850,10 @@ int main(int argc, char * argv[]) {
          //if (era=="2016" && badMuonFilter_ < 0.5) continue;
          //if (era=="2016" && duplicateMuonFilter_ < 0.5) continue; 
 
-         // triggered?  ================================================================================================================================================    
+         // triggered?  ================================================================================================================================================
+	 float elept =analysisTree.electron_pt[electronIndex];
+	 if (isEmbedded) elept = CorrectEleScaleEmbedded(analysisTree, era, electronIndex);
+    
          isMu23 = TriggerMatching(analysisTree, analysisTree.muon_eta[muonIndex], analysisTree.muon_phi[muonIndex], nHighPtLegMuon, deltaRTrigMatch) && analysisTree.muon_pt[muonIndex]>ptMuonHighCut;
          isMu8 = TriggerMatching(analysisTree, analysisTree.muon_eta[muonIndex], analysisTree.muon_phi[muonIndex], nLowPtLegMuon, deltaRTrigMatch) && analysisTree.muon_pt[muonIndex]>ptMuonLowCut;
          if (applyDzFilterMatch){
@@ -856,8 +862,8 @@ int main(int argc, char * argv[]) {
             isMu23 = isMu23 && isMu23dz;
             isMu8 = isMu8 && isMu8dz;
          }
-         isEle23 = TriggerMatching(analysisTree, analysisTree.electron_eta[electronIndex], analysisTree.electron_phi[electronIndex], nHighPtLegElectron, deltaRTrigMatch) && analysisTree.electron_pt[electronIndex]>ptElectronHighCut;
-         isEle12 = TriggerMatching(analysisTree, analysisTree.electron_eta[electronIndex], analysisTree.electron_phi[electronIndex], nLowPtLegElectron, deltaRTrigMatch) && analysisTree.electron_pt[electronIndex]>ptElectronLowCut; 
+         isEle23 = TriggerMatching(analysisTree, analysisTree.electron_eta[electronIndex], analysisTree.electron_phi[electronIndex], nHighPtLegElectron, deltaRTrigMatch) && elept>ptElectronHighCut;
+         isEle12 = TriggerMatching(analysisTree, analysisTree.electron_eta[electronIndex], analysisTree.electron_phi[electronIndex], nLowPtLegElectron, deltaRTrigMatch) && elept>ptElectronLowCut; 
          if (applyDzFilterMatch) {
          isEle12dz = TriggerMatching(analysisTree, analysisTree.electron_eta[electronIndex], analysisTree.electron_phi[electronIndex], nMu23Ele12DzFilter, deltaRTrigMatch);
          isEle23dz = TriggerMatching(analysisTree, analysisTree.electron_eta[electronIndex], analysisTree.electron_phi[electronIndex], nMu8Ele23DzFilter, deltaRTrigMatch);
@@ -866,7 +872,7 @@ int main(int argc, char * argv[]) {
          }		      
          trg_muonelectron = 
             (isMu23&&isEle12&&analysisTree.muon_pt[muonIndex]>ptMuonHighCut) ||
-            (isMu8&&isEle23&&analysisTree.electron_pt[electronIndex]>ptElectronHighCut);
+            (isMu8&&isEle23&&elept>ptElectronHighCut);
          if (!sync && applyTriggerMatch&&trg_muonelectron<0.5) continue;
 
          // check charge of electron & muon pair =======================================================================================================================
@@ -875,7 +881,7 @@ int main(int argc, char * argv[]) {
          // looking for extra leptons  =================================================================================================================================
          bool foundExtraElectron = false;
          bool foundExtraMuon = false;
-         foundExtraElectron = ElectronVeto(analysisTree, electronIndex, ptVetoElectronCut, etaVetoElectronCut, dxyVetoElectronCut, dzVetoElectronCut, era, applyVetoElectronId, isElectronIsoR03, isoVetoElectronCut);
+         foundExtraElectron = ElectronVeto(analysisTree, electronIndex, ptVetoElectronCut, etaVetoElectronCut, dxyVetoElectronCut, dzVetoElectronCut, era, applyVetoElectronId, isElectronIsoR03, isoVetoElectronCut, isEmbedded);
          foundExtraMuon = MuonVeto(analysisTree, muonIndex, ptVetoMuonCut, etaVetoMuonCut, dxyVetoMuonCut, dzVetoMuonCut, applyVetoMuonId, isMuonIsoR03, isoVetoMuonCut);
          extraelec_veto = foundExtraElectron;
          extramuon_veto = foundExtraMuon;
@@ -894,7 +900,10 @@ int main(int argc, char * argv[]) {
          m_2 =  classic_svFit::muonMass;
 
          // filling electron variables    ==============================================================================================================================
-         pt_1 = analysisTree.electron_pt[electronIndex];
+         elept =analysisTree.electron_pt[electronIndex];
+	 if (isEmbedded) elept = CorrectEleScaleEmbedded(analysisTree, era, electronIndex);
+         
+	 pt_1 = elept;
          eta_1 = analysisTree.electron_eta[electronIndex];
          phi_1 = analysisTree.electron_phi[electronIndex];
          q_1 = -1;
@@ -919,32 +928,34 @@ int main(int argc, char * argv[]) {
             if (era=="2016"){
                if (isEmbedded) {
                   isoweight_1 = correctionWS->function("e_idiso_ratio_emb")->getVal();
-                  isoweight_2 = correctionWS->function("m_idiso_ratio_emb")->getVal();
+                  isoweight_2 = correctionWS->function("m_idlooseiso_binned_ic_embed_ratio")->getVal();
                }
                else {
                   isoweight_1 = correctionWS->function("e_idiso_ratio")->getVal();
-                  isoweight_2 = correctionWS->function("m_idiso_ratio")->getVal();
+                  isoweight_2 = correctionWS->function("m_idlooseiso_binned_ic_ratio")->getVal();
                }
             }
             else{
                if (isEmbedded) {
-                  isoweight_1 = correctionWS->function("e_id90iso_binned_embed_kit_ratio")->getVal();
-                  isoweight_2 = correctionWS->function("m_idiso_binned_embed_kit_ratio")->getVal();
+                  isoweight_1 = correctionWS->function("e_id90_embed_kit_ratio")->getVal() * correctionWS->function("e_iso_binned_embed_kit_ratio")->getVal();
+                  isoweight_2 = correctionWS->function("m_looseiso_binned_ic_embed_ratio")->getVal()*correctionWS->function("m_id_embed_kit_ratio")->getVal();
                }
                else {
-                  isoweight_1 = correctionWS->function("e_id90iso_binned_kit_ratio")->getVal();
-                  isoweight_2 = correctionWS->function("m_idiso_binned_kit_ratio")->getVal();
+                  isoweight_1 = correctionWS->function("e_id90_kit_ratio")->getVal() * correctionWS->function("e_iso_binned_kit_ratio")->getVal();
+                  isoweight_2 = correctionWS->function("m_looseiso_binned_ic_ratio")->getVal()*correctionWS->function("m_id_kit_ratio")->getVal();
                }
             }
+            idweight_1 =1.0;
+            idweight_2 =1.0;
+            if (!isEmbedded){
             correctionWS->var("e_pt")->setVal(pt_1);
             correctionWS->var("e_eta")->setVal(eta_1);
-            if (era=="2017") idweight_1 = correctionWS->function("e_trk_ratio")->getVal();
-            else idweight_1 =1.0;
+            if (era =="2018") idweight_1 = correctionWS->function("e_trk_ratio")->getVal();
             correctionWS->var("m_eta")->setVal(eta_2);
             correctionWS->var("m_pt")->setVal(pt_2);
-            if (era=="2016") idweight_2 = correctionWS->function("m_trk_ratio")->getVal();
-            else idweight_2 =1.0;
-            
+            if (era=="2016" || era=="2018") idweight_2 = correctionWS->function("m_trk_ratio")->getVal();
+            }
+            if (era == "2017") idweight_1 = correctionWS->function("e_trk_ratio")->getVal();
             isoweight_1 *= idweight_1;
             isoweight_2 *= idweight_2;
 
@@ -1016,27 +1027,30 @@ int main(int argc, char * argv[]) {
                                                        analysisTree.electron_py[electronIndex],
                                                        analysisTree.electron_pz[electronIndex],
                                                        classic_svFit::electronMass);
+         double sf_ele = 1.0;   
+         if (isEmbedded) sf_ele= SFEleScaleEmbedded(analysisTree, era, electronIndex )
+         if (isEmbedded) electronLV = electronLV *sf_ele;
          
          TLorentzVector electronUpLV; electronUpLV.SetXYZM(analysisTree.electron_px_energyscale_up[electronIndex],
                                                            analysisTree.electron_py_energyscale_up[electronIndex],
                                                            analysisTree.electron_pz_energyscale_up[electronIndex],
                                                            classic_svFit::electronMass);
-         
+         if (isEmbedded) electronUpLV = electronUpLV *sf_ele;
          TLorentzVector electronDownLV; electronDownLV.SetXYZM(analysisTree.electron_px_energyscale_down[electronIndex],
                                                                analysisTree.electron_py_energyscale_down[electronIndex],
                                                                analysisTree.electron_pz_energyscale_down[electronIndex],
                                                                classic_svFit::electronMass);
-
+         if (isEmbedded) electronDownLV = electronDownLV *sf_ele;
          TLorentzVector electronResoUpLV; electronResoUpLV.SetXYZM(analysisTree.electron_px_energysigma_up[electronIndex],
                                                            analysisTree.electron_py_energysigma_up[electronIndex],
                                                            analysisTree.electron_pz_energysigma_up[electronIndex],
                                                            classic_svFit::electronMass);
-         
+         if (isEmbedded) electronResoUpLV = electronResoUpLV *sf_ele;
          TLorentzVector electronResoDownLV; electronResoDownLV.SetXYZM(analysisTree.electron_px_energysigma_down[electronIndex],
                                                                analysisTree.electron_py_energysigma_down[electronIndex],
                                                                analysisTree.electron_pz_energysigma_down[electronIndex],
                                                                classic_svFit::electronMass);
-         
+         if (isEmbedded) electronResoDownLV = electronResoDownLV *sf_ele;
          TLorentzVector dileptonLV = muonLV + electronLV;
             
          m_vis = dileptonLV.M();
@@ -1158,7 +1172,8 @@ int main(int argc, char * argv[]) {
             else if (era=="2018") isPFJetId = tightJetiD_2018(analysisTree,int(jet));
             if (!isPFJetId) continue;
 
-            if (era=="2017" && jetPt < 50 && absJetEta > 2.65 && absJetEta < 3.139) continue;
+            float jetptraw = analysisTree.pfjet_pt[jet]*analysisTree.pfjet_energycorr[jet];
+            if (era=="2017" && jetptraw < 50 && absJetEta > 2.65 && absJetEta < 3.139) continue;
 
             bool cleanedJet = true;
             float dR1 = deltaR(analysisTree.pfjet_eta[jet],analysisTree.pfjet_phi[jet],
@@ -1581,18 +1596,18 @@ int main(int argc, char * argv[]) {
          float vectorVisY = muonLV.Py() + electronLV.Py();
          pzetavis = vectorVisX*zetaX + vectorVisY*zetaY;
          
-         double px_escaleUp = analysisTree.electron_px_energyscale_up[electronIndex];
-         double py_escaleUp = analysisTree.electron_py_energyscale_up[electronIndex];
-         double px_eresoUp = analysisTree.electron_px_energysigma_up[electronIndex];
-         double py_eresoUp = analysisTree.electron_py_energysigma_up[electronIndex];
+         double px_escaleUp = analysisTree.electron_px_energyscale_up[electronIndex]*sf_ele;
+         double py_escaleUp = analysisTree.electron_py_energyscale_up[electronIndex]*sf_ele;
+         double px_eresoUp = analysisTree.electron_px_energysigma_up[electronIndex]*sf_ele;
+         double py_eresoUp = analysisTree.electron_py_energysigma_up[electronIndex]*sf_ele;
 
          double px_e = pt_1 * TMath::Cos(phi_1);
          double py_e = pt_1 * TMath::Sin(phi_1);
          
-         double px_escaleDown = analysisTree.electron_px_energyscale_down[electronIndex];
-         double py_escaleDown = analysisTree.electron_py_energyscale_down[electronIndex];
-         double px_eresoDown = analysisTree.electron_px_energysigma_down[electronIndex];
-         double py_eresoDown = analysisTree.electron_py_energysigma_down[electronIndex];
+         double px_escaleDown = analysisTree.electron_px_energyscale_down[electronIndex]*sf_ele;
+         double py_escaleDown = analysisTree.electron_py_energyscale_down[electronIndex]*sf_ele;
+         double px_eresoDown = analysisTree.electron_px_energysigma_down[electronIndex]*sf_ele;
+         double py_eresoDown = analysisTree.electron_py_energysigma_down[electronIndex]*sf_ele;
          
          double metx_escaleUp = met_x + px_e - px_escaleUp;
          double mety_escaleUp = met_y + py_e - py_escaleUp;
