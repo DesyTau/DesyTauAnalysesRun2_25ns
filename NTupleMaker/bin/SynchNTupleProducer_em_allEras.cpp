@@ -1064,7 +1064,20 @@ int main(int argc, char * argv[]) {
          double sf_ele = 1.0;   
          if (isEmbedded) sf_ele= SFEleScaleEmbedded(analysisTree, era, electronIndex );
          if (isEmbedded) electronLV = electronLV *sf_ele;
-         
+
+         TLorentzVector electronEmbeddedUpLV = electronLV;
+         TLorentzVector electronEmbeddedDownLV= electronLV;
+
+         if (isEmbedded) {
+            if (fabs(analysisTree.electron_eta[electronIndex]) < 1.479 )  {
+               electronEmbeddedUpLV = electronEmbeddedUpLV * (1.0 + 0.005);
+               electronEmbeddedDownLV = electronEmbeddedDownLV * (1.0 - 0.005);
+            }
+            else  {
+               electronEmbeddedUpLV = electronEmbeddedUpLV * (1.0 + 0.0125);
+               electronEmbeddedDownLV = electronEmbeddedDownLV * (1.0 - 0.0125);
+            }
+          }
          TLorentzVector electronUpLV; electronUpLV.SetXYZM(analysisTree.electron_px_energyscale_up[electronIndex],
                                                            analysisTree.electron_py_energyscale_up[electronIndex],
                                                            analysisTree.electron_pz_energyscale_up[electronIndex],
@@ -1635,6 +1648,11 @@ int main(int argc, char * argv[]) {
          double px_eresoUp = analysisTree.electron_px_energysigma_up[electronIndex]*sf_ele;
          double py_eresoUp = analysisTree.electron_py_energysigma_up[electronIndex]*sf_ele;
 
+         double px_embeddedescaleUp  = electronEmbeddedUpLV.Px();
+         double py_embeddedescaleUp  = electronEmbeddedUpLV.Py();
+         double px_embeddedescaleDown  = electronEmbeddedDownLV.Px();
+         double py_embeddedescaleDown  = electronEmbeddedDownLV.Py();
+
          double px_e = pt_1 * TMath::Cos(phi_1);
          double py_e = pt_1 * TMath::Sin(phi_1);
          
@@ -1647,6 +1665,11 @@ int main(int argc, char * argv[]) {
          double mety_escaleUp = met_y + py_e - py_escaleUp;
          double metx_escaleDown = met_x + px_e - px_escaleDown;
          double mety_escaleDown = met_y + py_e - py_escaleDown;
+
+         double metx_embescaleUp = met_x + px_e - px_embeddedescaleUp;
+         double mety_embescaleUp = met_y + py_e - py_embeddedescaleUp;
+         double metx_embescaleDown = met_x + px_e - px_embeddedescaleDown;
+         double mety_embescaleDown = met_y + py_e - py_embeddedescaleDown;
 
          double metx_eresoUp = met_x + px_e - px_eresoUp;
          double mety_eresoUp = met_y + py_e - py_eresoUp;
@@ -1667,6 +1690,12 @@ int main(int argc, char * argv[]) {
          
          TLorentzVector metLV_escaleUp; metLV_escaleUp.SetXYZT(metx_escaleUp,mety_escaleUp,0.,met_escaleUp);
          TLorentzVector metLV_escaleDown; metLV_escaleDown.SetXYZT(metx_escaleDown,mety_escaleDown,0.,met_escaleDown);
+
+         float met_embescaleUp = TMath::Sqrt(metx_embescaleUp*metx_embescaleUp+mety_embescaleUp*mety_embescaleUp);
+         float met_embescaleDown = TMath::Sqrt(metx_embescaleDown*metx_embescaleDown+mety_embescaleDown*mety_embescaleDown);
+         
+         TLorentzVector metLV_embescaleUp; metLV_embescaleUp.SetXYZT(metx_embescaleUp,mety_embescaleUp,0.,met_embescaleUp);
+         TLorentzVector metLV_embescaleDown; metLV_embescaleDown.SetXYZT(metx_embescaleDown,mety_embescaleDown,0.,met_embescaleDown);
 
          float met_eresoUp = TMath::Sqrt(metx_eresoUp*metx_eresoUp+mety_eresoUp*mety_eresoUp);
          float met_eresoDown = TMath::Sqrt(metx_eresoDown*metx_eresoDown+mety_eresoDown*mety_eresoDown);
@@ -2139,6 +2168,10 @@ int main(int argc, char * argv[]) {
          uncertainty_map.at("escaleUp").electronLV = electronUpLV;
          uncertainty_map.at("escaleDown").metLV = metLV_escaleDown;
          uncertainty_map.at("escaleDown").electronLV = electronDownLV;
+         uncertainty_map.at("embescaleUp").metLV = metLV_embescaleUp;
+         uncertainty_map.at("embescaleUp").electronLV = electronEmbeddedUpLV;
+         uncertainty_map.at("embescaleDown").metLV = metLV_embescaleDown;
+         uncertainty_map.at("embescaleDown").electronLV = electronEmbeddedDownLV;
          uncertainty_map.at("eresoUp").metLV = metLV_eresoUp;
          uncertainty_map.at("eresoUp").electronLV = electronResoUpLV;
          uncertainty_map.at("eresoDown").metLV = metLV_eresoDown;
@@ -2224,7 +2257,7 @@ int main(int argc, char * argv[]) {
          if(jet2.E() != 0) uncertainty_map.at("jecUncRelativeSampleYearDown").jet2LV = jet2LV_jecUnc.at("jecUncRelativeSampleYearDown");
          
          for(auto &uncert : uncertainty_map){
-            bool is_data_or_embedded = isData || (isEmbedded && !uncert.first.Contains("escale") && !uncert.first.Contains("ereso"));
+            bool is_data_or_embedded = isData || (isEmbedded && !uncert.first.Contains("escale") && !uncert.first.Contains("ereso")  && !uncert.first.Contains("embescale"));
             
             propagate_uncertainty( uncert.first,
                                    uncert.second.metLV, covMET, inputFile_visPtResolution,

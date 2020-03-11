@@ -484,6 +484,8 @@ inputs unclMetUp;
 inputs unclMetDown;
 inputs escaleUp;
 inputs escaleDown;
+inputs embescaleUp;
+inputs embescaleDown;
 inputs eresoUp;
 inputs eresoDown;
 //inputs mscaleUp;
@@ -521,6 +523,8 @@ map<TString, inputs> uncertainty_map = { { "unclMetUp" , unclMetUp },
                                          { "unclMetDown" , unclMetDown },
                                          { "escaleUp" , escaleUp },
                                          { "escaleDown" , escaleDown },
+                                         { "embescaleUp" , embescaleUp },
+                                         { "embescaleDown" , embescaleDown },
                                          { "eresoUp" , eresoUp },
                                          { "eresoDown" , eresoDown },
                                          //{ "mscaleUp" , mscaleUp },
