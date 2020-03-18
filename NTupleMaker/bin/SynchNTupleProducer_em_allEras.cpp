@@ -150,6 +150,8 @@ int main(int argc, char * argv[]) {
    
    const string correctionWSFile = cfg.get<string>("CorrectionWSFile");
 
+   const string qcdFileName = cfg.get<string>("QCDFileName");
+
    const bool apply_ggh_reweighting = cfg.get<bool>("ApplygghReweighting");
    const bool apply_ggh_uncertainties = cfg.get<bool>("ApplygghUncertainties");
    const bool apply_vbf_uncertainties = cfg.get<bool>("ApplyVBFUncertainties");
@@ -421,10 +423,8 @@ int main(int argc, char * argv[]) {
    TFile * correctionWorkSpaceFile = new TFile(correctionsWorkspaceFileName);
    RooWorkspace *correctionWS = (RooWorkspace*)correctionWorkSpaceFile->Get("w");
 
-   // load QCD 
-   TFile *fQCD = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/QCDweights_2016.root", "READ");
-   if (era=="2017") fQCD = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/QCDweights_2017.root", "READ");
-   else if (era=="2018") fQCD = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/QCDweights_2018.root", "READ");
+   // load QCD =======================================================================================================================================
+   TFile *fQCD = new TFile(TString(cmsswBase)+"/src/"+qcdFileName);
 
    TGraph *OS_SS_njetgt1 = (TGraph*)fQCD->Get("OS_SS_transfer_factors_njetgt1");
    TGraph *OS_SS_njet1 = (TGraph*)fQCD->Get("OS_SS_transfer_factors_njet1");
