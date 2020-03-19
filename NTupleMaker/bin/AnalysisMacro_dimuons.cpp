@@ -123,9 +123,10 @@ TVector3 get_refitted_PV_with_BS(const AC1B * analysisTree, int leptonIndex1, in
 	      vtx_y = analysisTree->refitvertexwithbs_y[i];
 
 	      vtx_z = analysisTree->refitvertexwithbs_z[i];
-	      for (int j = 0; j<6 ; ++j)
+	      for (int j = 0; j<6 ; ++j) {
 		PV_covariance[j] = analysisTree->refitvertexwithbs_cov[i][j];
-
+		//		std::cout << j << " : " << analysisTree->refitvertexwithbs_cov[i][j] << std::endl;
+	      }
 	      is_refitted_PV_with_BS = true;
 	    }
 	}
@@ -967,19 +968,6 @@ int main(int argc, char * argv[]) {
 	  genweight = -1;
 	weight *= genweight;
 	//	std::cout << "weight = " << weight << std::endl;
-      }
-      if ( isEmbedded && TStrName.Contains("2016") ) {
-	unsigned int run = analysisTree.event_run;
-	float embedded_stitching_weight = 
-	  ((run >= 272007) && (run < 275657))*(1.0/0.891)
-	  +((run >= 275657) && (run < 276315))*(1.0/0.910)
-	  +((run >= 276315) && (run < 276831))*(1.0/0.953)
-	  +((run >= 276831) && (run < 277772))*(1.0/0.947)
-	  +((run >= 277772) && (run < 278820))*(1.0/0.942)
-	  +((run >= 278820) && (run < 280919))*(1.0/0.906)
-	  +((run >= 280919) && (run < 284045))*(1.0/0.950);
-	//	std::cout << "stitching weight = " << embedded_stitching_weight << std::endl;
-	weight *= embedded_stitching_weight;
       }
 
       TLorentzVector genZ; genZ.SetXYZT(0,0,0,0); 
