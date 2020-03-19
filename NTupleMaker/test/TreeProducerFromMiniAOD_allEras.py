@@ -111,6 +111,7 @@ from PhysicsTools.PatUtils.tools.runMETCorrectionsAndUncertainties import runMet
 # If you only want to re-correct and get the proper uncertainties
 runMetCorAndUncFromMiniAOD(process,
                            isData=isData,
+                           isEmbeddedSample=isEmbedded,
                            fixEE2017 = bool(period=='2017'),
                            fixEE2017Params = {'userawPt': True, 'ptThreshold':50.0, 'minEtaThreshold':2.65, 'maxEtaThreshold': 3.139} ,
                            postfix = "ModifiedMET"
@@ -123,6 +124,7 @@ makePuppiesFromMiniAOD( process, True );
 # If you only want to re-correct and get the proper uncertainties
 runMetCorAndUncFromMiniAOD(process,
                            isData=isData,
+                           isEmbeddedSample=isEmbedded,
                            metType="Puppi",
                            postfix="Puppi",
                            jetFlavor="AK4PFPuppi",
