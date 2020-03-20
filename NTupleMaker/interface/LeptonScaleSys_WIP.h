@@ -1117,7 +1117,7 @@ protected:
     float absEta1 = fabs(lep1.Eta());
     float pt2 = lep2.Pt();
     float absEta2 = fabs(lep2.Eta());
-    if (cenTree->gen_match_2==5 && cenTree->tau_decay_mode_2 ==10){
+    if (cenTree->gen_match_2==5 && cenTree->tau_decay_mode_2 ==11){
       if (ch == ETAU)
         lep2_scaled.SetXYZM(lep2.Px() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))),
 			    lep2.Py() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))),
@@ -1154,7 +1154,7 @@ protected:
     float absEta1 = fabs(lep1.Eta());
     float pt2 = lep2.Pt();
     float absEta2 = fabs(lep2.Eta());
-    if (cenTree->gen_match_2==5 && cenTree->tau_decay_mode_2==10){
+    if (cenTree->gen_match_2==5 && cenTree->tau_decay_mode_2==11){
       if (ch == ETAU)
         lep2_scaled.SetXYZM(lep2.Px() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt2, absEta2))),
 			  lep2.Py() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt2, absEta2))),
@@ -1562,7 +1562,7 @@ protected:
     float absEta1 = fabs(lep1.Eta());
     float pt2 = lep2.Pt();
     float absEta2 = fabs(lep2.Eta());
-    if (cenTree->gen_match_2<5 && cenTree->tau_decay_mode_2==10){
+    if (cenTree->gen_match_2<5 && cenTree->tau_decay_mode_2==11){
       if (ch == ETAU )
         lep2_scaled.SetXYZM(lep2.Px() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))),
 			  lep2.Py() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))),
@@ -1585,7 +1585,7 @@ protected:
     float absEta1 = fabs(lep1.Eta());
     float pt2 = lep2.Pt();
     float absEta2 = fabs(lep2.Eta());
-    if (cenTree->gen_match_2<5 && cenTree->tau_decay_mode_2==10){
+    if (cenTree->gen_match_2<5 && cenTree->tau_decay_mode_2==11){
       if (ch == ETAU )
         lep2_scaled.SetXYZM(lep2.Px() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt2, absEta2))),
 			  lep2.Py() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt2, absEta2))),
