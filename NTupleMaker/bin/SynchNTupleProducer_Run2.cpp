@@ -295,18 +295,21 @@ int main(int argc, char * argv[]){
   const float dzTauCut       = cfg.get<float>("dzTauCut");
 
   // tau energy scale corrections
-  const float shift_tes_1prong = cfg.get<float>("TauEnergyScaleShift_OneProng");
-  const float shift_tes_1p1p0  = cfg.get<float>("TauEnergyScaleShift_OneProngOnePi0");
-  const float shift_tes_3prong = cfg.get<float>("TauEnergyScaleShift_ThreeProng");
+  const float shift_tes_1prong     = cfg.get<float>("TauEnergyScaleShift_OneProng");
+  const float shift_tes_1p1p0      = cfg.get<float>("TauEnergyScaleShift_OneProngOnePi0");
+  const float shift_tes_3prong     = cfg.get<float>("TauEnergyScaleShift_ThreeProng");
+  const float shift_tes_3prong1pi0 = cfg.get<float>("TauEnergyScaleShift_ThreeProng");
 
   const float shift_tes_1prong_e = cfg.get<float>("TauEnergyScaleShift_OneProng_Error");
   const float shift_tes_1p1p0_e  = cfg.get<float>("TauEnergyScaleShift_OneProngOnePi0_Error");
   const float shift_tes_3prong_e = cfg.get<float>("TauEnergyScaleShift_ThreeProng_Error");
+  const float shift_tes_3prong1p0_e = cfg.get<float>("TauEnergyScaleShift_ThreeProngOnePi0_Error");
   
   // for lep->tau fakes
   const float shift_tes_lepfake_1prong = cfg.get<float>("TauEnergyScaleShift_LepFake_OneProng");
   const float shift_tes_lepfake_1p1p0  = cfg.get<float>("TauEnergyScaleShift_LepFake_OneProngOnePi0");
   const float shift_tes_lepfake_3prong = cfg.get<float>("TauEnergyScaleShift_LepFake_ThreeProng");
+  const float shift_tes_lepfake_3prong1p0 = cfg.get<float>("TauEnergyScaleShift_LepFake_ThreeProngOnePi0");
   
 
   // pair selection
@@ -496,11 +499,13 @@ int main(int argc, char * argv[]){
   TauOneProngScaleSys *tauOneProngScaleSys = 0;
   TauOneProngOnePi0ScaleSys *tauOneProngOnePi0ScaleSys = 0;
   TauThreeProngScaleSys *tauThreeProngScaleSys = 0;
+  TauThreeProngOnePi0ScaleSys *tauThreeProngOnePi0ScaleSys = 0;
   MuonScaleSys *muonScaleSys = 0;
 
   LepTauFakeOneProngScaleSys *lepTauFakeOneProngScaleSys = 0;
   LepTauFakeOneProngOnePi0ScaleSys *lepTauFakeOneProngOnePi0ScaleSys = 0;
   LepTauFakeThreeProngScaleSys  *lepTauFakeThreeProngScaleSys = 0;
+  LepTauFakeThreeProngOnePi0ScaleSys  *lepTauFakeThreeProngOnePi0ScaleSys = 0;
 
   ZPtWeightSys* zPtWeightSys = 0;
   TopPtWeightSys* topPtWeightSys = 0;
@@ -545,6 +550,13 @@ int main(int argc, char * argv[]){
     tauThreeProngScaleSys->SetUseSVFit(ApplySVFit);
     tauThreeProngScaleSys->SetUseFastMTT(ApplyFastMTT);
     tauThreeProngScaleSys->SetUsePuppiMET(usePuppiMET);
+
+    tauThreeProngOnePi0ScaleSys = new TauThreeProngOnePi0ScaleSys(otree);
+    tauThreeProngOnePi0ScaleSys->SetScale(shift_tes_3prong,shift_tes_3prong_e);
+    tauThreeProngOnePi0ScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);
+    tauThreeProngOnePi0ScaleSys->SetUseSVFit(ApplySVFit);
+    tauThreeProngOnePi0ScaleSys->SetUseFastMTT(ApplyFastMTT);
+    tauThreeProngOnePi0ScaleSys->SetUsePuppiMET(usePuppiMET);
 
     if (isDY) {
 
@@ -1871,6 +1883,7 @@ int main(int argc, char * argv[]){
 	  tauOneProngScaleSys->Eval(utils::MUTAU);
 	  tauOneProngOnePi0ScaleSys->Eval(utils::MUTAU);
 	  tauThreeProngScaleSys->Eval(utils::MUTAU);
+	  tauThreeProngOnePi0ScaleSys->Eval(utils::MUTAU);
 	  if (isDY) {
 	    lepTauFakeOneProngScaleSys->Eval(utils::MUTAU);
 	    lepTauFakeOneProngOnePi0ScaleSys->Eval(utils::MUTAU);
@@ -1880,6 +1893,7 @@ int main(int argc, char * argv[]){
 	  tauOneProngScaleSys->Eval(utils::ETAU);
 	  tauOneProngOnePi0ScaleSys->Eval(utils::ETAU);
 	  tauThreeProngScaleSys->Eval(utils::ETAU);
+	  tauThreeProngOnePi0ScaleSys->Eval(utils::ETAU);
 	  if (isDY) {
 	    lepTauFakeOneProngScaleSys->Eval(utils::ETAU);
 	    lepTauFakeOneProngOnePi0ScaleSys->Eval(utils::ETAU);	    
@@ -1941,6 +1955,11 @@ int main(int argc, char * argv[]){
   if(tauThreeProngScaleSys != 0){
     tauThreeProngScaleSys->Write();
     delete tauThreeProngScaleSys;
+  }
+
+  if(tauThreeProngOnePi0ScaleSys != 0){
+    tauThreeProngOnePi0ScaleSys->Write();
+    delete tauThreeProngOnePi0ScaleSys;
   }
 
   if(lepTauFakeOneProngScaleSys != 0){

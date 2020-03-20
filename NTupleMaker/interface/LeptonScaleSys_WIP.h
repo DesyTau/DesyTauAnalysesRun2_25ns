@@ -1074,6 +1074,116 @@ protected:
   };
 };
 
+// split by decay mode. Three prong shape, for tau_decay_mode_2 ==11
+class TauThreeProngOnePi0ScaleSys : public LeptonScaleSys { 
+public:
+  TauThreeProngOnePi0ScaleSys(){};
+  
+  TauThreeProngOnePi0ScaleSys(Synch17Tree* c){
+    cenTree = c;
+    label = "CMS_scale_t_3prong1pizero_13TeV";
+    
+    this->Init(cenTree);
+  };
+  
+  virtual ~TauThreeProngOnePi0ScaleSys(){};
+
+protected:
+  virtual void InitSF(){
+    const int pt_bins = 1;
+    double pt_edges[pt_bins + 1] = {0., 14001.};
+    double pt_central[pt_bins] = {};
+    for(int ibin = 0; ibin < pt_bins; ibin++)
+      pt_central[ibin] = (pt_edges[ibin+1] + pt_edges[ibin])/2.; 
+
+    const int eta_bins = 1;
+    double eta_edges[eta_bins + 1] = {0., 2.5};
+    double eta_central[eta_bins] = {};
+    for(int ibin = 0; ibin < eta_bins; ibin++)
+      eta_central[ibin] = (eta_edges[ibin+1] + eta_edges[ibin])/2.; 
+
+    sf_up = new TH2D(label+"_sf_up", label+"_sf_up", pt_bins, pt_edges, eta_bins, eta_edges);
+    sf_down = new TH2D(label+"_sf_down", label+"_sf_down", pt_bins, pt_edges, eta_bins, eta_edges);
+
+    sf_up->SetBinContent( sf_up->FindBin( pt_central[0], eta_central[0] ), error);
+    sf_down->SetBinContent( sf_down->FindBin( pt_central[0], eta_central[0] ), error);
+  };
+
+  virtual void ScaleUp(utils::channel ch){
+    lep1_scaled = lep1;
+    lep2_scaled = lep2;
+
+    float pt1 = lep1.Pt();
+    float absEta1 = fabs(lep1.Eta());
+    float pt2 = lep2.Pt();
+    float absEta2 = fabs(lep2.Eta());
+    if (cenTree->gen_match_2==5 && cenTree->tau_decay_mode_2 ==10){
+      if (ch == ETAU)
+        lep2_scaled.SetXYZM(lep2.Px() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))),
+			    lep2.Py() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))),
+			    lep2.Pz() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))),
+			    lep2.M()  * (1. + sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))));
+      else if (ch == MUTAU) {
+	//	cout << "decay mode : " << cenTree->tau_decay_mode_2 << endl;
+	//	cout << "scale factor up : " << 1. + sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2)) << endl;
+        lep2_scaled.SetXYZM(lep2.Px() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))),
+			  lep2.Py() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))),
+			  lep2.Pz() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))),
+			  lep2.M()  * (1. + sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))));
+      }
+      else if (ch == TAUTAU){
+        lep1_scaled.SetXYZM(lep1.Px() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt1, absEta1))),
+			  lep1.Py() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt1, absEta1))),
+			  lep1.Pz() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt1, absEta1))),
+			  lep1.M()  * (1. + sf_up->GetBinContent( sf_up->FindBin(pt1, absEta1))));
+      
+        lep2_scaled.SetXYZM(lep2.Px() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))),
+			  lep2.Py() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))),
+			  lep2.Pz() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))),
+			  lep2.M()  * (1. + sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))));
+      }
+    }
+    this->Fill(ch, "Up");
+  };
+  
+  virtual void ScaleDown(utils::channel ch){
+    lep1_scaled = lep1;
+    lep2_scaled = lep2;
+
+    float pt1 = lep1.Pt();
+    float absEta1 = fabs(lep1.Eta());
+    float pt2 = lep2.Pt();
+    float absEta2 = fabs(lep2.Eta());
+    if (cenTree->gen_match_2==5 && cenTree->tau_decay_mode_2==10){
+      if (ch == ETAU)
+        lep2_scaled.SetXYZM(lep2.Px() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt2, absEta2))),
+			  lep2.Py() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt2, absEta2))),
+			  lep2.Pz() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt2, absEta2))),
+			  lep2.M()  * (1. - sf_down->GetBinContent( sf_down->FindBin(pt2, absEta2))));
+      else if (ch == MUTAU) {
+	//	cout << "decay mode : " << cenTree->tau_decay_mode_2 << endl;
+	//        cout << "scale factor down : " << 1. + sf_down->GetBinContent( sf_down->FindBin(pt2, absEta2)) << endl;
+	lep2_scaled.SetXYZM(lep2.Px() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt2, absEta2))),
+			    lep2.Py() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt2, absEta2))),
+			    lep2.Pz() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt2, absEta2))),
+			    lep2.M()  * (1. - sf_down->GetBinContent( sf_down->FindBin(pt2, absEta2))));
+      }
+      else if (ch == TAUTAU){
+        lep1_scaled.SetXYZM(lep1.Px() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt1, absEta1))),
+			  lep1.Py() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt1, absEta1))),
+			  lep1.Pz() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt1, absEta1))),
+			  lep1.M()  * (1. - sf_down->GetBinContent( sf_down->FindBin(pt1, absEta1))));
+			  
+        lep2_scaled.SetXYZM(lep2.Px() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt2, absEta2))),
+			  lep2.Py() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt2, absEta2))),
+			  lep2.Pz() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt2, absEta2))),
+			  lep2.M()  * (1. - sf_down->GetBinContent( sf_down->FindBin(pt2, absEta2))));
+      }
+    }
+    this->Fill(ch, "Down");
+  };
+};
+
 // shift tau pt and propagate to MEt and svfit - for all fake taus. 
 class LepTauFakeScaleSys : public LeptonScaleSys { 
 public:
@@ -1338,6 +1448,90 @@ public:
   };
   
   virtual ~LepTauFakeThreeProngScaleSys(){};
+
+protected:
+  virtual void InitSF(){
+    const int pt_bins = 1;
+    double pt_edges[pt_bins + 1] = {0., 14001.};
+    double pt_central[pt_bins] = {};
+    for(int ibin = 0; ibin < pt_bins; ibin++)
+      pt_central[ibin] = (pt_edges[ibin+1] + pt_edges[ibin])/2.; 
+
+    const int eta_bins = 1;
+    double eta_edges[eta_bins + 1] = {0., 2.5};
+    double eta_central[eta_bins] = {};
+    for(int ibin = 0; ibin < eta_bins; ibin++)
+      eta_central[ibin] = (eta_edges[ibin+1] + eta_edges[ibin])/2.; 
+
+    sf_up = new TH2D(label+"_sf_up", label+"_sf_up", pt_bins, pt_edges, eta_bins, eta_edges);
+    sf_down = new TH2D(label+"_sf_down", label+"_sf_down", pt_bins, pt_edges, eta_bins, eta_edges);
+
+    sf_up->SetBinContent( sf_up->FindBin( pt_central[0], eta_central[0] ), 0.03);
+    sf_down->SetBinContent( sf_down->FindBin( pt_central[0], eta_central[0] ), 0.03);
+  };
+
+  virtual void ScaleUp(utils::channel ch){
+    lep1_scaled = lep1;
+    lep2_scaled = lep2;
+
+    float pt1 = lep1.Pt();
+    float absEta1 = fabs(lep1.Eta());
+    float pt2 = lep2.Pt();
+    float absEta2 = fabs(lep2.Eta());
+    if (cenTree->gen_match_2<5 && cenTree->tau_decay_mode_2==10){
+      if (ch == ETAU )
+        lep2_scaled.SetXYZM(lep2.Px() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))),
+			  lep2.Py() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))),
+			  lep2.Pz() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))),
+			  lep2.M()  * (1. + sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))));
+      else if (ch == MUTAU )
+        lep2_scaled.SetXYZM(lep2.Px() * (1. + 0.5*sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))),
+			  lep2.Py() * (1. + 0.5*sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))),
+			  lep2.Pz() * (1. + 0.5*sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))),
+			  lep2.M()  * (1. + 0.5*sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))));
+    }
+    this->Fill(ch, "Up");
+  };
+  
+  virtual void ScaleDown(utils::channel ch){
+    lep1_scaled = lep1;
+    lep2_scaled = lep2;
+
+    float pt1 = lep1.Pt();
+    float absEta1 = fabs(lep1.Eta());
+    float pt2 = lep2.Pt();
+    float absEta2 = fabs(lep2.Eta());
+    if (cenTree->gen_match_2<5 && cenTree->tau_decay_mode_2==10){
+      if (ch == ETAU )
+        lep2_scaled.SetXYZM(lep2.Px() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt2, absEta2))),
+			  lep2.Py() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt2, absEta2))),
+			  lep2.Pz() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt2, absEta2))),
+			  lep2.M()  * (1. - sf_down->GetBinContent( sf_down->FindBin(pt2, absEta2))));
+      else if (ch == MUTAU )
+        lep2_scaled.SetXYZM(lep2.Px() * (1. - 0.5*sf_down->GetBinContent( sf_down->FindBin(pt2, absEta2))),
+			  lep2.Py() * (1. - 0.5*sf_down->GetBinContent( sf_down->FindBin(pt2, absEta2))),
+			  lep2.Pz() * (1. - 0.5*sf_down->GetBinContent( sf_down->FindBin(pt2, absEta2))),
+			  lep2.M()  * (1. - 0.5*sf_down->GetBinContent( sf_down->FindBin(pt2, absEta2))));
+    }
+    this->Fill(ch, "Down");
+  };
+};
+
+
+// shift tau pt and propagate to MEt and svfit - for 3prong fake taus. Shift all lep->tau fakes. 
+// for mu-tau, 1.5% shift. For e-tau, 3% shift.
+class LepTauFakeThreeProngOnePi0ScaleSys : public LeptonScaleSys { 
+public:
+  LepTauFakeThreeProngOnePi0ScaleSys(){};
+  
+  LepTauFakeThreeProngOnePi0ScaleSys(Synch17Tree* c){
+    cenTree = c;
+    label = "CMS_htt_ZLShape_3prong1pizero_13TeV";
+    
+    this->Init(cenTree);
+  };
+  
+  virtual ~LepTauFakeThreeProngOnePi0ScaleSys(){};
 
 protected:
   virtual void InitSF(){
