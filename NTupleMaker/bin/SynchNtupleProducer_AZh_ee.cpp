@@ -165,7 +165,8 @@ int main(int argc, char * argv[]) {
     TH1D * histWeightsH = new TH1D("histWeightsH","",1,-0.5,0.5);
 
     Float_t         puweight;
-    
+    Float_t         mcweight;
+
     //Event ID variable
     ULong64_t run;
     UInt_t lumi;
@@ -224,10 +225,32 @@ int main(int argc, char * argv[]) {
     Float_t iso_3;
     Int_t gen_match_3;
     Float_t IdRawMva_3;
+    Bool_t VSjetVVTight_3;
+    Bool_t VSjetVTight_3;
+    Bool_t VSjetTight_3;
+    Bool_t VSjetMedium_3;
+    Bool_t VSjetLoose_3;
+    Bool_t VSjetVLoose_3;
+    Bool_t VSjetVVLoose_3;
+    Bool_t VSjetVVVLoose_3;
+    Bool_t VSeVVTight_3;
+    Bool_t VSeVTight_3;
+    Bool_t VSeTight_3;
+    Bool_t VSeMedium_3;
+    Bool_t VSeLoose_3;
+    Bool_t VSeVLoose_3;
+    Bool_t VSeVVLoose_3;
+    Bool_t VSeVVVLoose_3;
+    Bool_t VSmuTight_3;
+    Bool_t VSmuMedium_3;
+    Bool_t VSmuLoose_3;
+    Bool_t VSmuVLoose_3;
     Float_t pfmt_3;
     Float_t muonSF_3;
     Float_t electronSF_3;
     Float_t tauSF_3;
+
+
     
     //Leg 4 (Based off of Higgs legs: ET -> T, MT -> T, EM -> M, TT -> subleading pt tau)
     Float_t pt_4;
@@ -236,10 +259,31 @@ int main(int argc, char * argv[]) {
     Float_t iso_4;
     Int_t gen_match_4;
     Float_t IdRawMva_4;
+    Bool_t VSjetVVTight_4;
+    Bool_t VSjetVTight_4;
+    Bool_t VSjetTight_4;
+    Bool_t VSjetMedium_4;
+    Bool_t VSjetLoose_4;
+    Bool_t VSjetVLoose_4;
+    Bool_t VSjetVVLoose_4;
+    Bool_t VSjetVVVLoose_4;
+    Bool_t VSeVVTight_4;
+    Bool_t VSeVTight_4;
+    Bool_t VSeTight_4;
+    Bool_t VSeMedium_4;
+    Bool_t VSeLoose_4;
+    Bool_t VSeVLoose_4;
+    Bool_t VSeVVLoose_4;
+    Bool_t VSeVVVLoose_4;
+    Bool_t VSmuTight_4;
+    Bool_t VSmuMedium_4;
+    Bool_t VSmuLoose_4;
+    Bool_t VSmuVLoose_4;
     Float_t pfmt_4;
     Float_t muonSF_4;
     Float_t electronSF_4;
     Float_t tauSF_4;
+    
     Float_t met;
     Float_t metphi;
     Float_t metcov00;
@@ -275,6 +319,7 @@ int main(int argc, char * argv[]) {
     SynTree->Branch("npv",&npv,"npv/I");
     SynTree->Branch("npu",&npu,"npu/I");
     SynTree->Branch("rho",&rho,"rho/F");
+    SynTree->Branch("mcweight",&mcweight,"mcweight/F");
     SynTree->Branch("puweight", &puweight, "puweight/F");
     SynTree->Branch("nbtag",&nbtag,"nbtag/I");
     SynTree->Branch("njets",&njets,"njets/I");
@@ -320,6 +365,26 @@ int main(int argc, char * argv[]) {
     SynTree->Branch("iso_3",&iso_3,"iso_3/F");
     SynTree->Branch("gen_match_3",&gen_match_3,"gen_match_3/I");
     SynTree->Branch("IdRawMva_3",&IdRawMva_3,"IdRawMva_3/F");
+    SynTree->Branch("VSjetVVTight_3",&VSjetVVTight_3,"VSjetVVTight_3/O");
+    SynTree->Branch("VSjetVTight_3",&VSjetVTight_3,"VSjetVTight_3/O");
+    SynTree->Branch("VSjetTight_3",&VSjetTight_3,"VSjetTight_3/O");
+    SynTree->Branch("VSjetMedium_3",&VSjetMedium_3,"VSjetMedium_3/O");
+    SynTree->Branch("VSjetLoose_3",&VSjetLoose_3,"VSjetLoose_3/O");
+    SynTree->Branch("VSjetVLoose_3",&VSjetVLoose_3,"VSjetVLoose_3/O");
+    SynTree->Branch("VSjetVVLoose_3",&VSjetVVLoose_3,"VSjetVVLoose_3/O");
+    SynTree->Branch("VSjetVVVLoose_3",&VSjetVVVLoose_3,"VSjetVVVLoose_3/O");
+    SynTree->Branch("VSeVVTight_3",&VSeVVTight_3,"VSeVVTight_3/O");
+    SynTree->Branch("VSeVTight_3",&VSeVTight_3,"VSeVTight_3/O");
+    SynTree->Branch("VSeTight_3",&VSeTight_3,"VSeTight_3/O");
+    SynTree->Branch("VSeMedium_3",&VSeMedium_3,"VSeMedium_3/O");
+    SynTree->Branch("VSeLoose_3",&VSeLoose_3,"VSeLoose_3/O");
+    SynTree->Branch("VSeVLoose_3",&VSeVLoose_3,"VSeVLoose_3/O");
+    SynTree->Branch("VSeVVLoose_3",&VSeVVLoose_3,"VSeVVLoose_3/O");
+    SynTree->Branch("VSeVVVLoose_3",&VSeVVVLoose_3,"VSeVVVLoose_3/O");
+    SynTree->Branch("VSmuTight_3",&VSmuTight_3,"VSmuTight_3/O");
+    SynTree->Branch("VSmuMedium_3",&VSmuMedium_3,"VSmuMedium_3/O");
+    SynTree->Branch("VSmuLoose_3",&VSmuLoose_3,"VSmuLoose_3/O");
+    SynTree->Branch("VSmuVLoose_3",&VSmuVLoose_3,"VSmuVLoose_3/O");
     SynTree->Branch("pfmt_3",&pfmt_3,"pfmt_3/F");
     SynTree->Branch("muonSF_3",&muonSF_3,"muonSF_3/F");
     SynTree->Branch("electronSF_3",&electronSF_3,"electronSF_3/F");
@@ -331,6 +396,28 @@ int main(int argc, char * argv[]) {
     SynTree->Branch("iso_4",&iso_4,"iso_4/F");
     SynTree->Branch("gen_match_4",&gen_match_4,"gen_match_4/I");
     SynTree->Branch("IdRawMva_4",&IdRawMva_4,"IdRawMva_4/F");
+    SynTree->Branch("gen_match_4",&gen_match_4,"gen_match_4/I");
+    SynTree->Branch("IdRawMva_4",&IdRawMva_4,"IdRawMva_4/F");
+    SynTree->Branch("VSjetVVTight_4",&VSjetVVTight_4,"VSjetVVTight_4/O");
+    SynTree->Branch("VSjetVTight_4",&VSjetVTight_4,"VSjetVTight_4/O");
+    SynTree->Branch("VSjetTight_4",&VSjetTight_4,"VSjetTight_4/O");
+    SynTree->Branch("VSjetMedium_4",&VSjetMedium_4,"VSjetMedium_4/O");
+    SynTree->Branch("VSjetLoose_4",&VSjetLoose_4,"VSjetLoose_4/O");
+    SynTree->Branch("VSjetVLoose_4",&VSjetVLoose_4,"VSjetVLoose_4/O");
+    SynTree->Branch("VSjetVVLoose_4",&VSjetVVLoose_4,"VSjetVVLoose_4/O");
+    SynTree->Branch("VSjetVVVLoose_4",&VSjetVVVLoose_4,"VSjetVVVLoose_4/O");
+    SynTree->Branch("VSeVVTight_4",&VSeVVTight_4,"VSeVVTight_4/O");
+    SynTree->Branch("VSeVTight_4",&VSeVTight_4,"VSeVTight_4/O");
+    SynTree->Branch("VSeTight_4",&VSeTight_4,"VSeTight_4/O");
+    SynTree->Branch("VSeMedium_4",&VSeMedium_4,"VSeMedium_4/O");
+    SynTree->Branch("VSeLoose_4",&VSeLoose_4,"VSeLoose_4/O");
+    SynTree->Branch("VSeVLoose_4",&VSeVLoose_4,"VSeVLoose_4/O");
+    SynTree->Branch("VSeVVLoose_4",&VSeVVLoose_4,"VSeVVLoose_4/O");
+    SynTree->Branch("VSeVVVLoose_4",&VSeVVVLoose_4,"VSeVVVLoose_4/O");
+    SynTree->Branch("VSmuTight_4",&VSmuTight_4,"VSmuTight_4/O");
+    SynTree->Branch("VSmuMedium_4",&VSmuMedium_4,"VSmuMedium_4/O");
+    SynTree->Branch("VSmuLoose_4",&VSmuLoose_4,"VSmuLoose_4/O");
+    SynTree->Branch("VSmuVLoose_4",&VSmuVLoose_4,"VSmuVLoose_4/O");
     SynTree->Branch("pfmt_4",&pfmt_4,"pfmt_4/F");
     SynTree->Branch("muonSF_4",&muonSF_4,"muonSF_4/F");
     SynTree->Branch("electronSF_4",&electronSF_4,"electronSF_4/F");
@@ -393,7 +480,7 @@ int main(int argc, char * argv[]) {
     
   int nFiles = 0;
   int nEvents = 0;
-  int selEventsIsoMuons = 0;
+  int selEvents = 0;
 
   int nTotalFiles = 0;
   std::string dummy;
@@ -456,7 +543,11 @@ int main(int argc, char * argv[]) {
           cout << "      processed " << nEvents << " events" << endl;
 
         float weight = 1;
+        puweight = 1;
+        mcweight = 1;
         
+        mcweight = analysisTree.genweight;
+
         // Pileup variable
         npv = analysisTree.primvertex_count;
         npu = analysisTree.numtruepileupinteractions;
@@ -645,33 +736,30 @@ int main(int argc, char * argv[]) {
         if(idEles.size() < 2) continue;
         if(HiggsFinalState == "EE")
         {
-            if(idEles.size() != 4) continue;
-            if(idMuons.size() != 0) continue;
+            if(idEles.size() < 4) continue;
         }
         if(HiggsFinalState == "EM")
         {
-            if(idEles.size() != 3) continue;
-            if(idMuons.size() != 1) continue;
+            if(idEles.size() < 3) continue;
+            if(idMuons.size() < 1) continue;
         }
         if(HiggsFinalState == "ET")
         {
-            if(idEles.size() != 3) continue;
-            if(idMuons.size() != 0) continue;
+            if(idEles.size() < 3) continue;
         }
         if(HiggsFinalState == "MT")
         {
-            if(idEles.size() != 2) continue;
-            if(idMuons.size() != 1) continue;
+            if(idEles.size() < 2) continue;
+            if(idMuons.size() < 1) continue;
         }
         if(HiggsFinalState == "MM")
         {
-            if(idEles.size() != 2) continue;
-            if(idMuons.size() != 2) continue;
+            if(idEles.size() < 2) continue;
+            if(idMuons.size() < 2) continue;
         }
         if(HiggsFinalState == "TT")
         {
-            if(idEles.size() != 2) continue;
-            if(idMuons.size() != 0) continue;
+            if(idEles.size() < 2) continue;
         }
         //std::cout << "id electrons:" << idEles.size() << std::endl;
         //std::cout << "id muons:" << idMuons.size() << std::endl;
@@ -810,7 +898,7 @@ int main(int argc, char * argv[]) {
         {
             if(goodEles.size() != 2) continue;
             if(goodMuons.size() != 0) continue;
-            if(goodTaus.size() <= 2) continue;
+            if(goodTaus.size() < 2) continue;
         }
         
         //std::cout << "good electrons:" << goodEles.size() << std::endl;
@@ -895,7 +983,7 @@ int main(int argc, char * argv[]) {
                 for(unsigned int it=0;it<goodTaus.size();++it)
                 {
                     int indexTemp2 = goodTaus[it];
-                    if (analysisTree.tau_byTightDeepTau2017v2p1VSmu[indexTemp2]<0.5) continue;
+                    if (analysisTree.tau_byTightDeepTau2017v2p1VSe[indexTemp2]<0.5) continue;
                     //(no needed for Synchronization)
                     //if (analysisTree.tau_byMediumDeepTau2017v2p1VSjet[indexTemp2]<0.5) continue;
                     if (analysisTree.electron_pt[indexTemp1]+analysisTree.tau_pt[indexTemp2]>Higgs_LT)
@@ -1026,12 +1114,33 @@ int main(int argc, char * argv[]) {
             absIso_3 += neutralIso_3;
             iso_3 = absIso_3/analysisTree.electron_pt[indexLeg3];
             Leg3.SetXYZM(analysisTree.electron_px[indexLeg3],analysisTree.electron_py[indexLeg3],analysisTree.electron_pz[indexLeg3],electronMass);
-
             pt_4 = analysisTree.tau_pt[indexLeg4];
             phi_4 = analysisTree.tau_phi[indexLeg4];
             eta_4 = analysisTree.tau_eta[indexLeg4];
             iso_4 = analysisTree.tau_byDeepTau2017v2p1VSjetraw[indexLeg4];
             Leg4.SetXYZM(analysisTree.tau_px[indexLeg4],analysisTree.tau_py[indexLeg4],analysisTree.tau_pz[indexLeg4],analysisTree.tau_mass[indexLeg4]);
+            
+            VSjetVVTight_4 = analysisTree.tau_byVVTightDeepTau2017v2p1VSjet[indexLeg4];
+            VSjetVTight_4 = analysisTree.tau_byVTightDeepTau2017v2p1VSjet[indexLeg4];
+            VSjetTight_4 = analysisTree.tau_byTightDeepTau2017v2p1VSjet[indexLeg4];
+            VSjetMedium_4 = analysisTree.tau_byMediumDeepTau2017v2p1VSjet[indexLeg4];
+            VSjetLoose_4 = analysisTree.tau_byLooseDeepTau2017v2p1VSjet[indexLeg4];
+            VSjetVLoose_4 = analysisTree.tau_byVLooseDeepTau2017v2p1VSjet[indexLeg4];
+            VSjetVVLoose_4 = analysisTree.tau_byVVLooseDeepTau2017v2p1VSjet[indexLeg4];
+            VSjetVVVLoose_4 = analysisTree.tau_byVVVLooseDeepTau2017v2p1VSjet[indexLeg4];
+            VSeVVTight_4 = analysisTree.tau_byVVTightDeepTau2017v2p1VSe[indexLeg4];
+            VSeVTight_4 = analysisTree.tau_byVTightDeepTau2017v2p1VSe[indexLeg4];
+            VSeTight_4 = analysisTree.tau_byTightDeepTau2017v2p1VSe[indexLeg4];
+            VSeMedium_4 = analysisTree.tau_byMediumDeepTau2017v2p1VSe[indexLeg4];
+            VSeLoose_4 = analysisTree.tau_byLooseDeepTau2017v2p1VSe[indexLeg4];
+            VSeVLoose_4 = analysisTree.tau_byVLooseDeepTau2017v2p1VSe[indexLeg4];
+            VSeVVLoose_4 = analysisTree.tau_byVVLooseDeepTau2017v2p1VSe[indexLeg4];
+            VSeVVVLoose_4 = analysisTree.tau_byVVVLooseDeepTau2017v2p1VSe[indexLeg4];
+            VSmuTight_4 = analysisTree.tau_byTightDeepTau2017v2p1VSmu[indexLeg4];
+            VSmuMedium_4 = analysisTree.tau_byMediumDeepTau2017v2p1VSmu[indexLeg4];
+            VSmuLoose_4 = analysisTree.tau_byLooseDeepTau2017v2p1VSmu[indexLeg4];
+            VSmuVLoose_4 = analysisTree.tau_byVLooseDeepTau2017v2p1VSmu[indexLeg4];
+            
             H_SS = false;
             if (analysisTree.electron_charge[indexLeg3]*analysisTree.tau_charge[indexLeg4]>0)
                 H_SS = true;
@@ -1054,7 +1163,28 @@ int main(int argc, char * argv[]) {
             eta_4 = analysisTree.tau_eta[indexLeg4];
             iso_4 = analysisTree.tau_byDeepTau2017v2p1VSjetraw[indexLeg4];
             Leg4.SetXYZM(analysisTree.tau_px[indexLeg4],analysisTree.tau_py[indexLeg4],analysisTree.tau_pz[indexLeg4],analysisTree.tau_mass[indexLeg4]);
-
+            
+            VSjetVVTight_4 = analysisTree.tau_byVVTightDeepTau2017v2p1VSjet[indexLeg4];
+            VSjetVTight_4 = analysisTree.tau_byVTightDeepTau2017v2p1VSjet[indexLeg4];
+            VSjetTight_4 = analysisTree.tau_byTightDeepTau2017v2p1VSjet[indexLeg4];
+            VSjetMedium_4 = analysisTree.tau_byMediumDeepTau2017v2p1VSjet[indexLeg4];
+            VSjetLoose_4 = analysisTree.tau_byLooseDeepTau2017v2p1VSjet[indexLeg4];
+            VSjetVLoose_4 = analysisTree.tau_byVLooseDeepTau2017v2p1VSjet[indexLeg4];
+            VSjetVVLoose_4 = analysisTree.tau_byVVLooseDeepTau2017v2p1VSjet[indexLeg4];
+            VSjetVVVLoose_4 = analysisTree.tau_byVVVLooseDeepTau2017v2p1VSjet[indexLeg4];
+            VSeVVTight_4 = analysisTree.tau_byVVTightDeepTau2017v2p1VSe[indexLeg4];
+            VSeVTight_4 = analysisTree.tau_byVTightDeepTau2017v2p1VSe[indexLeg4];
+            VSeTight_4 = analysisTree.tau_byTightDeepTau2017v2p1VSe[indexLeg4];
+            VSeMedium_4 = analysisTree.tau_byMediumDeepTau2017v2p1VSe[indexLeg4];
+            VSeLoose_4 = analysisTree.tau_byLooseDeepTau2017v2p1VSe[indexLeg4];
+            VSeVLoose_4 = analysisTree.tau_byVLooseDeepTau2017v2p1VSe[indexLeg4];
+            VSeVVLoose_4 = analysisTree.tau_byVVLooseDeepTau2017v2p1VSe[indexLeg4];
+            VSeVVVLoose_4 = analysisTree.tau_byVVVLooseDeepTau2017v2p1VSe[indexLeg4];
+            VSmuTight_4 = analysisTree.tau_byTightDeepTau2017v2p1VSmu[indexLeg4];
+            VSmuMedium_4 = analysisTree.tau_byMediumDeepTau2017v2p1VSmu[indexLeg4];
+            VSmuLoose_4 = analysisTree.tau_byLooseDeepTau2017v2p1VSmu[indexLeg4];
+            VSmuVLoose_4 = analysisTree.tau_byVLooseDeepTau2017v2p1VSmu[indexLeg4];
+            
             H_SS = false;
             if (analysisTree.muon_charge[indexLeg3]*analysisTree.tau_charge[indexLeg4]>0)
                 H_SS = true;
@@ -1067,13 +1197,55 @@ int main(int argc, char * argv[]) {
             eta_3 = analysisTree.tau_eta[indexLeg3];
             iso_3 = analysisTree.tau_byDeepTau2017v2p1VSjetraw[indexLeg3];
             Leg3.SetXYZM(analysisTree.tau_px[indexLeg3],analysisTree.tau_py[indexLeg3],analysisTree.tau_pz[indexLeg3],analysisTree.tau_mass[indexLeg3]);
-
+            
+            VSjetVVTight_3 = analysisTree.tau_byVVTightDeepTau2017v2p1VSjet[indexLeg3];
+            VSjetVTight_3 = analysisTree.tau_byVTightDeepTau2017v2p1VSjet[indexLeg3];
+            VSjetTight_3 = analysisTree.tau_byTightDeepTau2017v2p1VSjet[indexLeg3];
+            VSjetMedium_3 = analysisTree.tau_byMediumDeepTau2017v2p1VSjet[indexLeg3];
+            VSjetLoose_3 = analysisTree.tau_byLooseDeepTau2017v2p1VSjet[indexLeg3];
+            VSjetVLoose_3 = analysisTree.tau_byVLooseDeepTau2017v2p1VSjet[indexLeg3];
+            VSjetVVLoose_3 = analysisTree.tau_byVVLooseDeepTau2017v2p1VSjet[indexLeg3];
+            VSjetVVVLoose_3 = analysisTree.tau_byVVVLooseDeepTau2017v2p1VSjet[indexLeg3];
+            VSeVVTight_3 = analysisTree.tau_byVVTightDeepTau2017v2p1VSe[indexLeg3];
+            VSeVTight_3 = analysisTree.tau_byVTightDeepTau2017v2p1VSe[indexLeg3];
+            VSeTight_3 = analysisTree.tau_byTightDeepTau2017v2p1VSe[indexLeg3];
+            VSeMedium_3 = analysisTree.tau_byMediumDeepTau2017v2p1VSe[indexLeg3];
+            VSeLoose_3 = analysisTree.tau_byLooseDeepTau2017v2p1VSe[indexLeg3];
+            VSeVLoose_3 = analysisTree.tau_byVLooseDeepTau2017v2p1VSe[indexLeg3];
+            VSeVVLoose_3 = analysisTree.tau_byVVLooseDeepTau2017v2p1VSe[indexLeg3];
+            VSeVVVLoose_3 = analysisTree.tau_byVVVLooseDeepTau2017v2p1VSe[indexLeg3];
+            VSmuTight_3 = analysisTree.tau_byTightDeepTau2017v2p1VSmu[indexLeg3];
+            VSmuMedium_3 = analysisTree.tau_byMediumDeepTau2017v2p1VSmu[indexLeg3];
+            VSmuLoose_3 = analysisTree.tau_byLooseDeepTau2017v2p1VSmu[indexLeg3];
+            VSmuVLoose_3 = analysisTree.tau_byVLooseDeepTau2017v2p1VSmu[indexLeg3];
+            
             pt_4 = analysisTree.tau_pt[indexLeg4];
             phi_4 = analysisTree.tau_phi[indexLeg4];
             eta_4 = analysisTree.tau_eta[indexLeg4];
             iso_4 = analysisTree.tau_byDeepTau2017v2p1VSjetraw[indexLeg4];
             Leg4.SetXYZM(analysisTree.tau_px[indexLeg4],analysisTree.tau_py[indexLeg4],analysisTree.tau_pz[indexLeg4],analysisTree.tau_mass[indexLeg4]);
-
+            
+            VSjetVVTight_4 = analysisTree.tau_byVVTightDeepTau2017v2p1VSjet[indexLeg4];
+            VSjetVTight_4 = analysisTree.tau_byVTightDeepTau2017v2p1VSjet[indexLeg4];
+            VSjetTight_4 = analysisTree.tau_byTightDeepTau2017v2p1VSjet[indexLeg4];
+            VSjetMedium_4 = analysisTree.tau_byMediumDeepTau2017v2p1VSjet[indexLeg4];
+            VSjetLoose_4 = analysisTree.tau_byLooseDeepTau2017v2p1VSjet[indexLeg4];
+            VSjetVLoose_4 = analysisTree.tau_byVLooseDeepTau2017v2p1VSjet[indexLeg4];
+            VSjetVVLoose_4 = analysisTree.tau_byVVLooseDeepTau2017v2p1VSjet[indexLeg4];
+            VSjetVVVLoose_4 = analysisTree.tau_byVVVLooseDeepTau2017v2p1VSjet[indexLeg4];
+            VSeVVTight_4 = analysisTree.tau_byVVTightDeepTau2017v2p1VSe[indexLeg4];
+            VSeVTight_4 = analysisTree.tau_byVTightDeepTau2017v2p1VSe[indexLeg4];
+            VSeTight_4 = analysisTree.tau_byTightDeepTau2017v2p1VSe[indexLeg4];
+            VSeMedium_4 = analysisTree.tau_byMediumDeepTau2017v2p1VSe[indexLeg4];
+            VSeLoose_4 = analysisTree.tau_byLooseDeepTau2017v2p1VSe[indexLeg4];
+            VSeVLoose_4 = analysisTree.tau_byVLooseDeepTau2017v2p1VSe[indexLeg4];
+            VSeVVLoose_4 = analysisTree.tau_byVVLooseDeepTau2017v2p1VSe[indexLeg4];
+            VSeVVVLoose_4 = analysisTree.tau_byVVVLooseDeepTau2017v2p1VSe[indexLeg4];
+            VSmuTight_4 = analysisTree.tau_byTightDeepTau2017v2p1VSmu[indexLeg4];
+            VSmuMedium_4 = analysisTree.tau_byMediumDeepTau2017v2p1VSmu[indexLeg4];
+            VSmuLoose_4 = analysisTree.tau_byLooseDeepTau2017v2p1VSmu[indexLeg4];
+            VSmuVLoose_4 = analysisTree.tau_byVLooseDeepTau2017v2p1VSmu[indexLeg4];
+            
             H_SS = false;
             if (analysisTree.tau_charge[indexLeg3]*analysisTree.tau_charge[indexLeg4]>0)
                 H_SS = true;
@@ -1361,7 +1533,7 @@ int main(int argc, char * argv[]) {
         }
         
         SynTree->Fill();
-        selEventsIsoMuons++;
+        selEvents++;
     } // end of file processing (loop over events in one file)
     nFiles++;
     delete _tree;
@@ -1372,7 +1544,7 @@ int main(int argc, char * argv[]) {
   int allEvents = int(inputEventsH->GetEntries());
   std::cout << "Total number of input events                     = " << allEvents << std::endl;
   std::cout << "Total number of events in Tree                   = " << nEvents << std::endl;
-  std::cout << "Total number of selected events (iso muon pairs) = " << selEventsIsoMuons << std::endl;
+  std::cout << "Total number of selected events                  = " << selEvents << std::endl;
   std::cout << std::endl;
   std::cout << "RunMin = " << RunMin << std::endl;
   std::cout << "RunMax = " << RunMax << std::endl;
