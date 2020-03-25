@@ -1417,11 +1417,14 @@ int main(int argc, char * argv[]){
       ////////////////////////////////////////////////////////////
 
       otree->topptweight = 1.;
-      int a_topPtWeight = cfg.get<int>("a_topPtWeight");
-      int b_topPtWeight = cfg.get<int>("b_topPtWeight");
-      if(!isData)
-         // otree->topptweight = genTools::return_topPtWeight(analysisTree, a_topPtWeight, b_topPtWeight);
-         otree->topptweight = genTools::topPtWeight(analysisTree, 1); // 1 is for Run1 - use this reweighting as recommended by HTT 17
+      if(!isData || isEmbedded){
+        float a_topPtWeight = cfg.get<float>("a_topPtWeight");
+        float b_topPtWeight = cfg.get<float>("b_topPtWeight");
+        float c_topPtWeight = cfg.get<float>("c_topPtWeight");
+        float max_pt_topPtWeight = cfg.get<float>("max_pt_topPtWeight");
+        otree->topptweight = genTools::topPtWeight_Run2(analysisTree, a_topPtWeight, b_topPtWeight, c_topPtWeight, max_pt_topPtWeight);
+        // otree->topptweight = genTools::topPtWeight(analysisTree, 1); // 1 is for Run1 - use this reweighting as recommended by HTT 17
+      }
       counter[11]++;
       
       ////////////////////////////////////////////////////////////

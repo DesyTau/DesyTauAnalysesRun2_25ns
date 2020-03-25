@@ -485,28 +485,31 @@ namespace genTools{
   };
   
   // these are functionally the same as above, logic rewritten
-  float calculate_topPtWeight(float pt1, float pt2, float a, float b) {
-    if (pt1 > 400) pt1 = 400; // approximation works only up to 400 GeV
-    if (pt2 > 400) pt2 = 400;
-    float w1 = TMath::Exp(a + b*pt1);
-    float w2 = TMath::Exp(a + b*pt2);
-    
-    return TMath::Sqrt(w1*w2);  
+  float calculate_topPtWeight(float pt, float a, float b, float c, float max_pt) {
+    if (pt > max_pt) pt = max_pt; // approximation works only up to 400 GeV
+    float w = TMath::Exp(a + b*pt + c*pt*pt);
+    return w;  
   }
 
-  float return_topPtWeight(const AC1B &analysisTree, float a, float b){
+  float topPtWeight_Run2(const AC1B &analysisTree, float a, float b, float c, float max_pt){
     float topPt = -1;
     float antitopPt = -1;
+    float w_pos = 1;
+    float w_neg = 1;
     
     for (unsigned int igen=0; igen < analysisTree.genparticles_count; ++igen) { 
-      if (analysisTree.genparticles_pdgid[igen] == 6)
+      if (analysisTree.genparticles_pdgid[igen] == 6){
         topPt = TMath::Sqrt(analysisTree.genparticles_px[igen] * analysisTree.genparticles_px[igen] + analysisTree.genparticles_py[igen] * analysisTree.genparticles_py[igen]);
-      if (analysisTree.genparticles_pdgid[igen] == -6)
+        w_pos = calculate_topPtWeight(topPt, a, b, c, max_pt);
+      }
+      if (analysisTree.genparticles_pdgid[igen] == -6){
         antitopPt = TMath::Sqrt(analysisTree.genparticles_px[igen] * analysisTree.genparticles_px[igen] + analysisTree.genparticles_py[igen] * analysisTree.genparticles_py[igen]);
+        w_neg = calculate_topPtWeight(antitopPt, a, b, c, max_pt);
+      }
     }
     
     if(topPt > 0. && antitopPt > 0.)
-      return calculate_topPtWeight(topPt, antitopPt, a, b);
+      return TMath::Sqrt(w_pos*w_neg);
     else 
       return 1.;
   };
