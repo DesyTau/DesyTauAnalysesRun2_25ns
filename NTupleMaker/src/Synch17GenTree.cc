@@ -127,6 +127,11 @@ void Synch17GenTree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("minusmm_htt125", &minusmm_htt125, &b_minusmm_htt125);
    fChain->SetBranchAddress("mix0p375_htt125", &mix0p375_htt125, &b_mix0p375_htt125);
 
+   fChain->SetBranchAddress("y1_LF", &y1_LF, &b_y1_LF);
+   fChain->SetBranchAddress("y2_LF", &y2_LF, &b_y2_LF);
+   fChain->SetBranchAddress("y1_ZMF", &y1_ZMF, &b_y1_ZMF);
+   fChain->SetBranchAddress("y2_ZMF", &y1_ZMF, &b_y1_ZMF);
+
    lock=true;
 }
 
@@ -263,6 +268,11 @@ void Synch17GenTree::WriteInit(TTree *tree) {
   fChain->Branch("gen_mm_htt125", &mm_htt125, "gen_mm_htt125/D");
   fChain->Branch("gen_minusmm_htt125", &minusmm_htt125, "gen_minusmm_htt125/D");
   fChain->Branch("gen_mix0p375_htt125", &mix0p375_htt125, "gen_mix0p375_htt125/D");
+
+   fChain->Branch("gen_y1_LF", &y1_LF, "gen_y1_LF/D");
+   fChain->Branch("gen_y2_LF", &y2_LF, "gen_y2_LF/D");
+   fChain->Branch("gen_y1_ZMF", &y1_ZMF, "gen_y1_ZMF/D");
+   fChain->Branch("gen_y2_ZMF", &y2_ZMF, "gen_y2_ZMF/D");
 
 }
 

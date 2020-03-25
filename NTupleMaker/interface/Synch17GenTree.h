@@ -94,6 +94,11 @@ public :
   Double_t minusmm_htt125;
   Double_t mix0p375_htt125;
 
+  //polarisation related obervables
+  double y1_LF;
+  double y2_LF;
+  double y1_ZMF;
+  double y2_ZMF;
   //////////////////////////////////////////////
   //            List of branches              //
   //////////////////////////////////////////////
@@ -156,8 +161,12 @@ public :
   TBranch        *b_ps_htt125;
   TBranch        *b_mm_htt125;
   TBranch        *b_minusmm_htt125;
-  TBranch        *b_mix0p375_htt125;
-
+  TBranch        *b_y1_LF;
+  TBranch        *b_y2_LF;
+  TBranch        *b_y1_ZMF;
+  TBranch        *b_y2_ZMF;
+  
+TBranch        *b_mix0p375_htt125;
   Synch17GenTree(TTree *tree=0);
   virtual ~Synch17GenTree();
 

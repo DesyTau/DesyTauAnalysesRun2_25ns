@@ -608,6 +608,11 @@ void Synch17Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("minusmm_htt125", &TauSpinnerWeightsMinusMaxMix, &b_TauSpinnerWeightsMinusMaxMix);
    fChain->SetBranchAddress("mix0p375_htt125", &TauSpinnerWeightsMix0p375, &b_TauSpinnerWeightsMix0p375);
 
+   fChain->SetBranchAddress("y1_LF", &y1_LF, &b_y1_LF);
+   fChain->SetBranchAddress("y2_LF", &y2_LF, &b_y2_LF);
+   fChain->SetBranchAddress("y1_ZMF", &y1_ZMF, &b_y1_ZMF);
+   fChain->SetBranchAddress("y2_ZMF", &y1_ZMF, &b_y1_ZMF);
+
    lock=true;
 }
 
@@ -1218,11 +1223,16 @@ fChain->Branch("againstElectronVLooseMVA6_2", &againstElectronVLooseMVA6_2, "aga
    fChain->Branch("Prompt_pT", &Prompt_pT, "Prompt_pT/F");
    //   fChain->Branch("isrefitBS", &isrefitBS, "isrefitBS/O");
 
-  fChain->Branch("sm_htt125", &TauSpinnerWeightsEven, "TauSpinnerWeightsEven/D");
-  fChain->Branch("ps_htt125", &TauSpinnerWeightsOdd, "TauSpinnerWeightsOdd/D");
-  fChain->Branch("mm_htt125", &TauSpinnerWeightsMaxMix, "TauSpinnerWeightsMaxMix/D");
-  fChain->Branch("minusmm_htt125", &TauSpinnerWeightsMinusMaxMix, "TauSpinnerWeightsMinusMaxMix/D");
-  fChain->Branch("mix0p375_htt125", &TauSpinnerWeightsMix0p375, "TauSpinnerWeightsMix0p375/D");
+   fChain->Branch("sm_htt125", &TauSpinnerWeightsEven, "TauSpinnerWeightsEven/D");
+   fChain->Branch("ps_htt125", &TauSpinnerWeightsOdd, "TauSpinnerWeightsOdd/D");
+   fChain->Branch("mm_htt125", &TauSpinnerWeightsMaxMix, "TauSpinnerWeightsMaxMix/D");
+   fChain->Branch("minusmm_htt125", &TauSpinnerWeightsMinusMaxMix, "TauSpinnerWeightsMinusMaxMix/D");
+   fChain->Branch("mix0p375_htt125", &TauSpinnerWeightsMix0p375, "TauSpinnerWeightsMix0p375/D");
+
+   fChain->Branch("y1_LF", &y1_LF, "y1_LF/D");
+   fChain->Branch("y2_LF", &y2_LF, "y2_LF/D");
+   fChain->Branch("y1_ZMF", &y1_ZMF, "y1_ZMF/D");
+   fChain->Branch("y2_ZMF", &y2_ZMF, "y2_ZMF/D");
 
 }
 

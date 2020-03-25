@@ -591,6 +591,12 @@ public :
   Double_t TauSpinnerWeightsMinusMaxMix;
   Double_t TauSpinnerWeightsMix0p375;
 
+  //polarisation related obervables
+  double y1_LF;
+  double y2_LF;
+  double y1_ZMF;
+  double y2_ZMF;
+
   //Vinay: ditau_vis_pT + MET
   Float_t Prompt_pT;
 
@@ -1148,6 +1154,10 @@ public :
   TBranch       *b_Prompt_pT;
 
   TBranch       *b_isrefitBS;
+ TBranch        *b_y1_LF;
+  TBranch        *b_y2_LF;
+  TBranch        *b_y1_ZMF;
+  TBranch        *b_y2_ZMF;
 
   Synch17Tree(TTree *tree=0);
   virtual ~Synch17Tree();

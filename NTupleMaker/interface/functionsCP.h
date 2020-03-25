@@ -287,6 +287,11 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
   otree->VyConstitTau2=-9999;
   otree->VzConstitTau2=-9999;
 
+  otree->y1_LF =-10;
+  otree->y2_LF =-10;
+  otree->y1_ZMF =-10;
+  otree->y2_ZMF =-10;
+
   bool decay1haspion = false;
   bool decay2haspion = false;
 
@@ -892,6 +897,11 @@ void gen_acott(const AC1B * analysisTree, Synch17GenTree *gentree, int tauIndex1
   gentree->VyConstitTau2=-9999;
   gentree->VzConstitTau2=-9999;
 
+  gentree->y1_LF =-10;
+  gentree->y2_LF =-10;
+  gentree->y1_ZMF =-10;
+  gentree->y2_ZMF =-10;
+
   gentree->decaymode_1 = analysisTree->gentau_decayMode[tauIndex1];
   gentree->decaymode_2 = analysisTree->gentau_decayMode[tauIndex2];
 
@@ -1424,6 +1434,8 @@ double acoCP(TLorentzVector Pi1, TLorentzVector Pi2,
   if (pi02)
     y2 = Pi2.E() - ref2.E();
 
+  otree->y1_LF=(Pi1.E() - ref1.E())/(Pi1.E() + ref1.E());
+  otree->y2_LF=(Pi2.E() - ref2.E())/(Pi2.E() + ref2.E());
 
   double y = y1*y2; 
   //double y = -1; 
@@ -1434,6 +1446,9 @@ double acoCP(TLorentzVector Pi1, TLorentzVector Pi2,
   Pi2.Boost(boost);
   ref1.Boost(boost);
   ref2.Boost(boost);
+
+  otree->y1_ZMF=(Pi1.E() - ref1.E())/(Pi1.E() + ref1.E());
+  otree->y2_ZMF=(Pi2.E() - ref2.E())/(Pi2.E() + ref2.E());
 
   //  std::cout << "First negative = " << firstNegative << "  pi01 = " << pi01 << "   pi02 = " << pi02 << std::endl;
   //  std::cout << "Px(1) = " << Pi1.Px() << "  Py(1) = " << Pi1.Py() << "  Pz(1) = " << Pi1.Pz() << std::endl;
@@ -1509,6 +1524,9 @@ double acoCP(TLorentzVector Pi1, TLorentzVector Pi2,
   if (pi02)
     y2 = Pi2.E() - ref2.E();
 
+  otree->y1_LF=(Pi1.E() - ref1.E())/(Pi1.E() + ref1.E());
+  otree->y2_LF=(Pi2.E() - ref2.E())/(Pi2.E() + ref2.E());
+
 
   double y = y1*y2; 
 
@@ -1518,6 +1536,9 @@ double acoCP(TLorentzVector Pi1, TLorentzVector Pi2,
   Pi2.Boost(boost);
   ref1.Boost(boost);
   ref2.Boost(boost);
+
+  otree->y1_ZMF=(Pi1.E() - ref1.E())/(Pi1.E() + ref1.E());
+  otree->y2_ZMF=(Pi2.E() - ref2.E())/(Pi2.E() + ref2.E());
   
   // get 3-vectors
   TVector3 vecPi1 = Pi1.Vect();
