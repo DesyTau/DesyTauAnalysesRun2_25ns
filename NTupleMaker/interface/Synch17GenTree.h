@@ -99,6 +99,8 @@ public :
   double y2_LF;
   double y1_ZMF;
   double y2_ZMF;
+  double y1_TMF;
+  double y2_TMF;
   //////////////////////////////////////////////
   //            List of branches              //
   //////////////////////////////////////////////
@@ -165,6 +167,8 @@ public :
   TBranch        *b_y2_LF;
   TBranch        *b_y1_ZMF;
   TBranch        *b_y2_ZMF;
+  TBranch        *b_y1_TMF;
+  TBranch        *b_y2_TMF;
   
 TBranch        *b_mix0p375_htt125;
   Synch17GenTree(TTree *tree=0);

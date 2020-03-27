@@ -3,6 +3,7 @@
 // Author: Andrea Cardini <andrea.cardini@desy.de>
 // 
 // Based on Spring15Tree by Francesco Costanza
+//Merijn added changes and tauspinner weights.. <merijn.van.de.klundert@desy.de>
 //////////////////////////////////////////////////////////
 
 #ifndef Synch17Tree_h
@@ -94,8 +95,8 @@ public :
   Int_t 	  tau_decay_mode_1;
   Float_t         dm_1;
   Float_t         dmMVA_1;
-  Float_t 	      chpt_1;
-  Float_t 	      cheta_1;
+  Float_t 	  chpt_1;
+  Float_t 	  cheta_1;
   Float_t 	      chphi_1;
   Float_t 	      chm_1;
   Float_t 	      npt_1;
@@ -596,6 +597,8 @@ public :
   double y2_LF;
   double y1_ZMF;
   double y2_ZMF;
+  double y1_TMF;
+  double y2_TMF;
 
   //Vinay: ditau_vis_pT + MET
   Float_t Prompt_pT;
@@ -1154,10 +1157,12 @@ public :
   TBranch       *b_Prompt_pT;
 
   TBranch       *b_isrefitBS;
- TBranch        *b_y1_LF;
+  TBranch        *b_y1_LF;
   TBranch        *b_y2_LF;
   TBranch        *b_y1_ZMF;
   TBranch        *b_y2_ZMF;
+  TBranch        *b_y1_TMF;
+  TBranch        *b_y2_TMF;
 
   Synch17Tree(TTree *tree=0);
   virtual ~Synch17Tree();

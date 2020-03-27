@@ -130,7 +130,9 @@ void Synch17GenTree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("y1_LF", &y1_LF, &b_y1_LF);
    fChain->SetBranchAddress("y2_LF", &y2_LF, &b_y2_LF);
    fChain->SetBranchAddress("y1_ZMF", &y1_ZMF, &b_y1_ZMF);
-   fChain->SetBranchAddress("y2_ZMF", &y1_ZMF, &b_y1_ZMF);
+   fChain->SetBranchAddress("y2_ZMF", &y2_ZMF, &b_y2_ZMF);
+  fChain->SetBranchAddress("y1_TMF", &y1_TMF, &b_y1_TMF);
+   fChain->SetBranchAddress("y2_TMF", &y2_TMF, &b_y2_TMF);
 
    lock=true;
 }
@@ -273,6 +275,8 @@ void Synch17GenTree::WriteInit(TTree *tree) {
    fChain->Branch("gen_y2_LF", &y2_LF, "gen_y2_LF/D");
    fChain->Branch("gen_y1_ZMF", &y1_ZMF, "gen_y1_ZMF/D");
    fChain->Branch("gen_y2_ZMF", &y2_ZMF, "gen_y2_ZMF/D");
+   fChain->Branch("gen_y1_TMF", &y1_TMF, "gen_y1_TMF/D");
+   fChain->Branch("gen_y2_TMF", &y2_TMF, "gen_y2_TMF/D");
 
 }
 

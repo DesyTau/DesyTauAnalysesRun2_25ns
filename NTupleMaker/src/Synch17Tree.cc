@@ -611,7 +611,9 @@ void Synch17Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("y1_LF", &y1_LF, &b_y1_LF);
    fChain->SetBranchAddress("y2_LF", &y2_LF, &b_y2_LF);
    fChain->SetBranchAddress("y1_ZMF", &y1_ZMF, &b_y1_ZMF);
-   fChain->SetBranchAddress("y2_ZMF", &y1_ZMF, &b_y1_ZMF);
+   fChain->SetBranchAddress("y2_ZMF", &y2_ZMF, &b_y2_ZMF);
+   fChain->SetBranchAddress("y1_TMF", &y1_TMF, &b_y1_TMF);
+   fChain->SetBranchAddress("y2_TMF", &y2_TMF, &b_y2_TMF);
 
    lock=true;
 }
@@ -959,12 +961,8 @@ void Synch17Tree::WriteInit(TTree *tree) {
   fChain->Branch("weight_CMS_eff_t_pThigh_MVADM10_13TeVDown", &weight_CMS_eff_t_pThigh_MVADM10_13TeVDown, "weight_CMS_eff_t_pThigh_MVADM10_13TeVDown/F");
   fChain->Branch("weight_CMS_eff_t_pThigh_MVADM11_13TeVDown", &weight_CMS_eff_t_pThigh_MVADM11_13TeVDown, "weight_CMS_eff_t_pThigh_MVADM11_13TeVDown/F");
 
-
-
    fChain->Branch("weight_CMS_scale_gg_13TeVUp", &weight_CMS_scale_gg_13TeVUp, "weight_CMS_scale_gg_13TeVUp/F");
    fChain->Branch("weight_CMS_scale_gg_13TeVDown", &weight_CMS_scale_gg_13TeVDown, "weight_CMS_scale_gg_13TeVDown/F");
-
-
 
    /*
 fChain->Branch("againstElectronVLooseMVA6_2", &againstElectronVLooseMVA6_2, "againstElectronVLooseMVA6_2/F");
@@ -993,6 +991,7 @@ fChain->Branch("againstElectronVLooseMVA6_2", &againstElectronVLooseMVA6_2, "aga
    fChain->Branch("byVTightIsolationMVArun2017v2DBoldDMwLT2017_2", &byVTightIsolationMVArun2017v2DBoldDMwLT2017_2, "byVTightIsolationMVArun2017v2DBoldDMwLT2017_2/F");
    fChain->Branch("byVVTightIsolationMVArun2017v2DBoldDMwLT2017_2", &byVVTightIsolationMVArun2017v2DBoldDMwLT2017_2, "byVVTightIsolationMVArun2017v2DBoldDMwLT2017_2/F");
    */
+
    fChain->Branch("weight", &weight, "weight/F");
    fChain->Branch("mcweight", &mcweight, "mcweight/F");
    fChain->Branch("puweight", &puweight, "puweight/F");
@@ -1233,7 +1232,8 @@ fChain->Branch("againstElectronVLooseMVA6_2", &againstElectronVLooseMVA6_2, "aga
    fChain->Branch("y2_LF", &y2_LF, "y2_LF/D");
    fChain->Branch("y1_ZMF", &y1_ZMF, "y1_ZMF/D");
    fChain->Branch("y2_ZMF", &y2_ZMF, "y2_ZMF/D");
-
+   fChain->Branch("y1_TMF", &y1_TMF, "y1_TMF/D");
+   fChain->Branch("y2_TMF", &y2_TMF, "y2_TMF/D");
 }
 
 void Synch17Tree::Fill(){

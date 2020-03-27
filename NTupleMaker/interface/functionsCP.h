@@ -291,6 +291,8 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
   otree->y2_LF =-10;
   otree->y1_ZMF =-10;
   otree->y2_ZMF =-10;
+  otree->y1_TMF =-10;
+  otree->y2_TMF =-10;
 
   bool decay1haspion = false;
   bool decay2haspion = false;
@@ -901,6 +903,8 @@ void gen_acott(const AC1B * analysisTree, Synch17GenTree *gentree, int tauIndex1
   gentree->y2_LF =-10;
   gentree->y1_ZMF =-10;
   gentree->y2_ZMF =-10;
+  gentree->y1_TMF =-10;
+  gentree->y2_TMF =-10;
 
   gentree->decaymode_1 = analysisTree->gentau_decayMode[tauIndex1];
   gentree->decaymode_2 = analysisTree->gentau_decayMode[tauIndex2];
@@ -1440,6 +1444,12 @@ double acoCP(TLorentzVector Pi1, TLorentzVector Pi2,
   double y = y1*y2; 
   //double y = -1; 
 
+  //save copies before boost in charged zmf:
+  TLorentzVector Pi1Lab=Pi1;
+  TLorentzVector Pi2Lab=Pi2;
+  TLorentzVector ref1Lab=ref1;
+  TLorentzVector ref2Lab=ref2;
+
   TLorentzVector Prongsum = Pi1 + Pi2;
   TVector3 boost = -Prongsum.BoostVector();
   Pi1.Boost(boost);
@@ -1449,6 +1459,53 @@ double acoCP(TLorentzVector Pi1, TLorentzVector Pi2,
 
   otree->y1_ZMF=(Pi1.E() - ref1.E())/(Pi1.E() + ref1.E());
   otree->y2_ZMF=(Pi2.E() - ref2.E())/(Pi2.E() + ref2.E());
+
+  // 
+// if (pi01&&pi02){
+
+  TLorentzVector Rho1, Rho2, Rho1Boost, Rho2Boost;
+  Rho1=Pi1+ref1;	
+  Rho2=Pi2+ref2;
+
+  TLorentzVector ProngsumRho = Rho1 + Rho2;
+  TVector3 boostrho = -ProngsumRho.BoostVector();
+  Rho1.Boost(boostrho);
+  Rho2.Boost(boostrho);
+
+  TVector3 vecRho1 = Rho1.Vect();
+  TVector3 vecRho2 = Rho2.Vect();
+  double vecRho1Mag=vecRho1.Mag();
+  double vecRho2Mag=vecRho2.Mag();  
+  double CRho1, CRho2;
+  double mH=125.18;
+  double mtau=1.776;
+
+if(vecRho1Mag!=0&&vecRho2Mag!=0){
+  CRho1=TMath::Sqrt( (TMath::Power(0.5*mH,2)-TMath::Power(mtau,2))/TMath::Power(vecRho1Mag,2) );
+  CRho2=TMath::Sqrt( (TMath::Power(0.5*mH,2)-TMath::Power(mtau,2))/TMath::Power(vecRho2Mag,2) );
+  vecRho1*=CRho1;
+  vecRho2*=CRho2;
+  //define new 4 vectors
+ // TLorentzVector P1(vecRho1[0],vecRho1[1],vecRho1[2],(0.5*mH)); 
+  TLorentzVector P1(vecRho1,(0.5*mH));
+  TLorentzVector P2(vecRho2,(0.5*mH));
+
+  //  cout<<" cros check P1.Mag() "<<P1.Mag() <<endl; 
+  //  cout<<" cros check P2.Mag() "<<P2.Mag() <<endl;
+  TVector3 boostvec1=-P1.BoostVector();
+  TVector3 boostvec2=-P2.BoostVector();
+
+  Pi1Lab.Boost(boostvec1);
+  ref1Lab.Boost(boostvec1);
+  Pi2Lab.Boost(boostvec2);
+  ref2Lab.Boost(boostvec2);
+
+  otree->y1_TMF=(Pi1Lab.E() - ref1Lab.E())/(Pi1Lab.E() + ref1Lab.E());
+  otree->y2_TMF=(Pi2Lab.E() - ref2Lab.E())/(Pi2Lab.E() + ref2Lab.E());
+
+}
+//  cout<<"y2_T1F "<<y2_T1F<<endl;
+//  cout<<"y2_ZMF "<<otree->y2_ZMF<<endl;
 
   //  std::cout << "First negative = " << firstNegative << "  pi01 = " << pi01 << "   pi02 = " << pi02 << std::endl;
   //  std::cout << "Px(1) = " << Pi1.Px() << "  Py(1) = " << Pi1.Py() << "  Pz(1) = " << Pi1.Pz() << std::endl;
@@ -1527,8 +1584,13 @@ double acoCP(TLorentzVector Pi1, TLorentzVector Pi2,
   otree->y1_LF=(Pi1.E() - ref1.E())/(Pi1.E() + ref1.E());
   otree->y2_LF=(Pi2.E() - ref2.E())/(Pi2.E() + ref2.E());
 
-
   double y = y1*y2; 
+
+  //save copies before boost:
+  TLorentzVector Pi1Lab=Pi1;
+  TLorentzVector Pi2Lab=Pi2;
+  TLorentzVector ref1Lab=ref1;
+  TLorentzVector ref2Lab=ref2;
 
   TLorentzVector Prongsum = Pi1 + Pi2;
   TVector3 boost = -Prongsum.BoostVector();
@@ -1540,6 +1602,46 @@ double acoCP(TLorentzVector Pi1, TLorentzVector Pi2,
   otree->y1_ZMF=(Pi1.E() - ref1.E())/(Pi1.E() + ref1.E());
   otree->y2_ZMF=(Pi2.E() - ref2.E())/(Pi2.E() + ref2.E());
   
+  TLorentzVector Rho1, Rho2, Rho1Boost, Rho2Boost;
+  Rho1=Pi1+ref1;	
+  Rho2=Pi2+ref2;
+
+  TLorentzVector ProngsumRho = Rho1 + Rho2;
+  TVector3 boostrho = -ProngsumRho.BoostVector();
+  Rho1.Boost(boostrho);
+  Rho2.Boost(boostrho);
+
+  TVector3 vecRho1 = Rho1.Vect();
+  TVector3 vecRho2 = Rho2.Vect();
+  double vecRho1Mag=vecRho1.Mag();
+  double vecRho2Mag=vecRho2.Mag();  
+
+if(vecRho1Mag!=0&&vecRho2Mag!=0){
+  double CRho1, CRho2;
+  double mH=125.18;
+  double mtau=1.776;
+  CRho1=TMath::Sqrt( (TMath::Power(0.5*mH,2)-TMath::Power(mtau,2))/TMath::Power(vecRho1Mag,2) );
+  CRho2=TMath::Sqrt( (TMath::Power(0.5*mH,2)-TMath::Power(mtau,2))/TMath::Power(vecRho2Mag,2) );
+  vecRho1*=CRho1;
+  vecRho2*=CRho2;
+  //define new 4 vectors
+  TLorentzVector P1(vecRho1,(0.5*mH));
+  TLorentzVector P2(vecRho2,(0.5*mH));
+
+//  cout<<" cros check P1.Mag() "<<P1.Mag() <<endl;
+//  cout<<" cros check P2.Mag() "<<P2.Mag() <<endl;
+  TVector3 boostvec1=-P1.BoostVector();
+  TVector3 boostvec2=-P2.BoostVector();
+
+  Pi1Lab.Boost(boostvec1);
+  ref1Lab.Boost(boostvec1);
+  Pi2Lab.Boost(boostvec2);
+  ref2Lab.Boost(boostvec2);
+
+  otree->y1_TMF=(Pi1Lab.E() - ref1Lab.E())/(Pi1Lab.E() + ref1Lab.E());
+  otree->y2_TMF=(Pi2Lab.E() - ref2Lab.E())/(Pi2Lab.E() + ref2Lab.E());
+} 
+
   // get 3-vectors
   TVector3 vecPi1 = Pi1.Vect();
   TVector3 vecPi2 = Pi2.Vect();
