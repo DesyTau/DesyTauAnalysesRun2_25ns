@@ -41,7 +41,6 @@
 #include "HTT-utilities/RecoilCorrections/interface/RecoilCorrector.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/functionsSynch2017.h"
 #include "HiggsCPinTauDecays/IpCorrection/interface/IpCorrection.h"
-
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/foreach.hpp>
@@ -53,6 +52,7 @@
 #include "DesyTauAnalyses/NTupleMaker/interface/ZPtWeightSys_WIP.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/TopPtWeightSys_WIP.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/JetEnergyScaleSys_WIP.h"
+#include "DesyTauAnalyses/NTupleMaker/interface/BtagSys_WIP.h"
 //#include "DesyTauAnalyses/NTupleMaker/interface/JESUncertainties.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/LepTauFakeRate.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/functionsCP.h"

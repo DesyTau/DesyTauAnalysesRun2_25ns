@@ -103,7 +103,7 @@ namespace jets{
     float shift = 0.;
   
     // get the relative shift
-    if (JESname == "central"){
+    if (JESname == "central" || JESname == "Btag" ){
       jetPt = analysisTree->pfjet_pt[jetIndex];
       return jetPt;
     }
@@ -128,7 +128,7 @@ namespace jets{
     float jetE = -9999;
     float shift = 0.;
     // get the relative shift
-    if (JESname == "central")  { jetE = analysisTree->pfjet_e[jetIndex]; return jetE;}
+    if (JESname == "central" || JESname == "Btag" )  { jetE = analysisTree->pfjet_e[jetIndex]; return jetE;}
     else if (JESname== "JES")   shift = analysisTree->pfjet_jecUncertainty[jetIndex];
     else if (JESname=="JER") { 
       double central_shift = analysisTree->pfjet_JER_Central[jetIndex];
@@ -357,6 +357,12 @@ namespace jets{
 	 // getting SFs and efficiencies
 	 if (flavor == 5) {
 	   jet_scalefactor = inputs_btag_scaling->reader_B.eval_auto_bounds("central", BTagEntry::FLAV_B, jetEta, JetPtForBTag);
+	   if (JESname=="Btag") {
+	     if (direction=="Down")
+	       jet_scalefactor = inputs_btag_scaling->reader_B.eval_auto_bounds("down", BTagEntry::FLAV_B, jetEta, JetPtForBTag);
+	     else if (direction=="Up")
+	       jet_scalefactor = inputs_btag_scaling->reader_B.eval_auto_bounds("up", BTagEntry::FLAV_B, jetEta, JetPtForBTag);
+	   }
 	   histo_tageff_= inputs_btag_scaling->tagEff_B;
 	 }
 	 else if (flavor == 4) {

@@ -58,6 +58,7 @@
 #include "DesyTauAnalyses/NTupleMaker/interface/JetEnergyScaleSys_WIP.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/PuppiMETSys_WIP.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/PFMETSys_WIP.h"
+#include "DesyTauAnalyses/NTupleMaker/interface/BtagSys_WIP.h"
 //#include "DesyTauAnalyses/NTupleMaker/interface/JESUncertainties.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/LepTauFakeRate.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/functionsCP.h"
@@ -226,7 +227,7 @@ int main(int argc, char * argv[]){
 
   cout<<"using "<<BTagAlgorithm<<endl;
   BTagCalibration calib(BTagAlgorithm, BtagSfFile);
-  BTagCalibrationReader reader_B(BTagEntry::OP_MEDIUM, "central");
+  BTagCalibrationReader reader_B(BTagEntry::OP_MEDIUM, "central",{"up","down"});
   BTagCalibrationReader reader_C(BTagEntry::OP_MEDIUM, "central");
   BTagCalibrationReader reader_Light(BTagEntry::OP_MEDIUM, "central");
   if(ApplyBTagScaling){
@@ -495,6 +496,7 @@ int main(int argc, char * argv[]){
   std::cout << "inputFile_visPtResolution : " << std::endl;
 
   //Systematics init
+  
   TauScaleSys *tauScaleSys = 0;
   TauOneProngScaleSys *tauOneProngScaleSys = 0;
   TauOneProngOnePi0ScaleSys *tauOneProngOnePi0ScaleSys = 0;
@@ -509,6 +511,7 @@ int main(int argc, char * argv[]){
 
   ZPtWeightSys* zPtWeightSys = 0;
   TopPtWeightSys* topPtWeightSys = 0;
+  BtagSys * btagSys = 0;
   std::vector<JetEnergyScaleSys*> jetEnergyScaleSys;
   JESUncertainties * jecUncertainties = 0;
 
@@ -576,6 +579,11 @@ int main(int argc, char * argv[]){
 
     // systematics only for MC
     if (!isEmbedded) {
+      if (!isDY && !isWJets && !isVBForGGHiggs) {
+	btagSys = new BtagSys(otree,TString("Btag"));
+	btagSys->SetConfig(&cfg);
+	btagSys->SetBtagScaling(&inputs_btag_scaling_medium);
+      }
       if (ApplyRecoilCorrections) {
 	if (usePuppiMET) {
 	  for (unsigned int i = 0; i < recoilSysNames.size(); ++i) {
@@ -652,8 +660,10 @@ int main(int argc, char * argv[]){
       inputEventsH->Fill(0.);
 
     AC1B analysisTree(_tree, isData);
-    // set AC1B for JES and MET systematics
+    // set AC1B for JES Btag and MET systematics
     if ( !isData && !isEmbedded && ApplySystShift) {
+      if (!isDY && !isWJets && !isVBForGGHiggs)
+	btagSys->SetAC1B(&analysisTree);
       for (unsigned int i = 0; i < jetEnergyScaleSys.size(); i++)
       	(jetEnergyScaleSys.at(i))->SetAC1B(&analysisTree);
       for (unsigned int i = 0; i < metSys.size(); i++)
@@ -1862,6 +1872,9 @@ int main(int argc, char * argv[]){
         
       // evaluate systematics for MC 
       if( !isData && !isEmbedded && ApplySystShift){
+	if (!isDY && !isWJets && !isVBForGGHiggs) {
+	  btagSys->Eval();
+	}
 	for(unsigned int i = 0; i < jetEnergyScaleSys.size(); i++) {
 	  //	  cout << endl;
 	  //	  cout << "+++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
@@ -1978,6 +1991,11 @@ int main(int argc, char * argv[]){
   if(lepTauFakeThreeProngScaleSys != 0){
     lepTauFakeThreeProngScaleSys->Write();
     delete lepTauFakeThreeProngScaleSys;
+  }
+
+  if (btagSys != 0) {
+    btagSys->Write();
+    delete btagSys;
   }
 
   if(jetEnergyScaleSys.size() > 0){
