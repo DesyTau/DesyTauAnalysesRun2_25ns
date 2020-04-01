@@ -389,6 +389,9 @@ void Synch17Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("trg_mutaucross",  &trg_mutaucross, &b_trg_mutaucross);
    fChain->SetBranchAddress("trg_mutaucross_mu",  &trg_mutaucross_mu, &b_trg_mutaucross_mu);
    fChain->SetBranchAddress("trg_mutaucross_tau",  &trg_mutaucross_tau, &b_trg_mutaucross_tau);
+   fChain->SetBranchAddress("trg_etaucross",  &trg_etaucross, &b_trg_etaucross);
+   fChain->SetBranchAddress("trg_etaucross_e",  &trg_etaucross_e, &b_trg_etaucross_e);
+   fChain->SetBranchAddress("trg_etaucross_tau",  &trg_etaucross_tau, &b_trg_etaucross_tau);
    fChain->SetBranchAddress("trg_doubletau", &trg_doubletau, &b_trg_doubletau);
    fChain->SetBranchAddress("ditauTrigger", &ditauTrigger, &b_ditauTrigger);
    fChain->SetBranchAddress("xTrigger",  &xTrigger, &b_xTrigger);
@@ -1023,6 +1026,9 @@ fChain->Branch("againstElectronVLooseMVA6_2", &againstElectronVLooseMVA6_2, "aga
    fChain->Branch("trg_mutaucross",  &trg_mutaucross, "trg_mutaucross/O");
    fChain->Branch("trg_mutaucross_mu",  &trg_mutaucross_mu, "trg_mutaucross_mu/O");
    fChain->Branch("trg_mutaucross_tau",  &trg_mutaucross_tau, "trg_mutaucross_tau/O");
+   fChain->Branch("trg_etaucross",  &trg_etaucross, "trg_etaucross/O");
+   fChain->Branch("trg_etaucross_e",  &trg_etaucross_e, "trg_etaucross_e/O");
+   fChain->Branch("trg_etaucross_tau",  &trg_etaucross_tau, "trg_etaucross_tau/O");
    fChain->Branch("trg_doubletau", &trg_doubletau,"trg_doubletau/O");
    fChain->Branch("ditauTrigger", &ditauTrigger,"ditauTrigger/O");
    fChain->Branch("xTrigger",  &xTrigger, "xTrigger/O");

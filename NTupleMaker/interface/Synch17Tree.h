@@ -364,6 +364,9 @@ public :
   Bool_t          trg_mutaucross;
   Bool_t          trg_mutaucross_mu;
   Bool_t          trg_mutaucross_tau;
+  Bool_t          trg_etaucross;
+  Bool_t          trg_etaucross_e;
+  Bool_t          trg_etaucross_tau;
   Bool_t          trg_doubletau;
   Bool_t          ditauTrigger;
   Bool_t          xTriggerLep;
@@ -949,6 +952,9 @@ public :
   TBranch	 *b_trg_mutaucross;
   TBranch  *b_trg_mutaucross_mu;
   TBranch  *b_trg_mutaucross_tau;
+  TBranch	 *b_trg_etaucross;
+  TBranch  *b_trg_etaucross_e;
+  TBranch  *b_trg_etaucross_tau;
   TBranch  *b_trg_doubletau;
   TBranch  *b_ditauTrigger;
   TBranch	 *b_xTrigger;

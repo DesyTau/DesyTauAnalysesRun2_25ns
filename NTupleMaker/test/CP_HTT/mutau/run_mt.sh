@@ -1,0 +1,57 @@
+#!/bin/bash
+
+# Data
+./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_mt_17_data.conf SingleMuon_Run2017B mt 15
+./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_mt_17_data.conf SingleMuon_Run2017C mt 15
+./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_mt_17_data.conf SingleMuon_Run2017D mt 15
+./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_mt_17_data.conf SingleMuon_Run2017E mt 15
+./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_mt_17_data.conf SingleMuon_Run2017F mt 15
+
+# Embedded
+./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_mt_17_embed.conf EmbeddedRun2017B mt 15
+./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_mt_17_embed.conf EmbeddedRun2017C mt 15
+./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_mt_17_embed.conf EmbeddedRun2017D mt 15
+./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_mt_17_embed.conf EmbeddedRun2017E mt 15
+./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_mt_17_embed.conf EmbeddedRun2017F mt 15
+
+# Signals
+./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_lept_mt_GluGluHToTauTau_M125_13TeV_powheg_pythia8.conf GluGluHToTauTau_M125 mt 15
+./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_lept_mt_VBFHToTauTau_M125.conf VBFHToTauTau_M125 mt 15
+./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_lept_mt_SUSYGluGluToHToTauTau_M-120_TuneCP5_13TeV-pythia8.conf SUSYGluGluToHToTauTau mt 15
+
+#tauspinner
+./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_lept_mt_GluGluHToTauTau_M125_13TeV_powheg_pythia8.conf GluGluHToTauTauUncorrDecays_M125 mt 15
+./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_lept_mt_VBFHToTauTau_M125.conf VBFHToTauTauUncorrDecays_M125 mt 15
+
+# DY
+./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_lept_mt_DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8.conf DYJetsToLL_M-50 mt 15
+./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_lept_mt_DY1JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8.conf DY1JetsToLL_M-50 mt 15
+./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_lept_mt_DY2JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8.conf DY2JetsToLL_M-50 mt 15
+./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_lept_mt_DY3JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8.conf DY3JetsToLL_M-50 mt 15
+./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_lept_mt_DY4JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8.conf DY4JetsToLL_M-50 mt 15
+./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_lept_mt_DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8.conf DYJetsToLL_M-10to50 mt 15
+
+
+# W+jets
+./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_lept_mt_WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8.conf WJetsToLNu mt 15
+./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_lept_mt_W1JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8.conf W1JetsToLNu mt 15
+./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_lept_mt_W2JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8.conf W2JetsToLNu mt 15
+./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_lept_mt_W3JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8.conf W3JetsToLNu mt 15
+./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_lept_mt_W4JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8.conf W4JetsToLNu mt 15
+
+# VV
+./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_lept_mt_WW_TuneCP5_13TeV-pythia8.conf WW mt 15
+./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_lept_mt_WZ_TuneCP5_13TeV-pythia8.conf WZ mt 15
+./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_lept_mt_ZZ_TuneCP5_13TeV-pythia8.conf ZZ mt 15
+
+# TT
+./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_lept_mt_TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8.conf TTTo2L2Nu mt 15
+./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_lept_mt_TTToHadronic_TuneCP5_PSweights_13TeV-powheg-pythia8.conf TTToHadronic mt 15
+./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_lept_mt_TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powheg-pythia8.conf TTToSemiLeptonic mt 15
+
+# Single Top
+./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_lept_mt_ST_t-channel_antitop_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8.conf ST_t-channel_antitop_4f mt 15
+./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_lept_mt_ST_t-channel_top_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8.conf ST_t-channel_top_4f mt 15
+./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_lept_mt_ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8.conf ST_tW_antitop_5f mt 15
+./condorsub_seq_leptau.sh SynchNTupleProducer_Run2 analysisMacroSynch_lept_mt_ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8.conf ST_tW_top_5f mt 15
+
