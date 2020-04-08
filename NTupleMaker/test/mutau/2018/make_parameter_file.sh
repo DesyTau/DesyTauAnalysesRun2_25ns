@@ -21,11 +21,11 @@ echo "CONFIGFILE,FILELIST" > parameters.txt
 
 # DY
 # TODO: add low mass DY (need to switch to the other PU file)
-./split_filelist.sh analysisMacroSynch_mt_18_MC.conf DYJetsToLL_M-50 10
-./split_filelist.sh analysisMacroSynch_mt_18_MC.conf DY1JetsToLL_M-50 10
-./split_filelist.sh analysisMacroSynch_mt_18_MC.conf DY2JetsToLL_M-50 10
-./split_filelist.sh analysisMacroSynch_mt_18_MC.conf DY3JetsToLL_M-50 10
-./split_filelist.sh analysisMacroSynch_mt_18_MC.conf DY4JetsToLL_M-50 10
+./split_filelist.sh analysisMacroSynch_mt_18_MC.conf DYJetsToLL_M-50 5
+./split_filelist.sh analysisMacroSynch_mt_18_MC.conf DY1JetsToLL_M-50 5
+./split_filelist.sh analysisMacroSynch_mt_18_MC.conf DY2JetsToLL_M-50 5
+./split_filelist.sh analysisMacroSynch_mt_18_MC.conf DY3JetsToLL_M-50 5
+./split_filelist.sh analysisMacroSynch_mt_18_MC.conf DY4JetsToLL_M-50 5
 
 # Embedded
 ./split_filelist.sh analysisMacroSynch_mt_18_embedded.conf EmbeddedMuTau_Run2018A 3
