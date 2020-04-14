@@ -305,7 +305,7 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
       decay1haspion=true;
       break;}}
 
-  //Vinay
+ 
   for(unsigned int pindex=0;pindex<analysisTree->tau_constituents_count[tauIndex2];pindex++){
     if(abs(analysisTree->tau_constituents_pdgId[tauIndex2][pindex])==211){
       decay2haspion=true;
@@ -378,40 +378,28 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
     tau1Prong=chargedPivec(analysisTree,tauIndex1);//Merijn: changed to index1. Only works if call for tt!
     int piIndex_=chargedPiIndex(analysisTree,tauIndex1);
     if(piIndex_>-1){
-      
-      /*
-      otree->VxConstitTau1=analysisTree->tau_constituents_vx[tauIndex1][piIndex_];
-      otree->VyConstitTau1=analysisTree->tau_constituents_vy[tauIndex1][piIndex_];   
-      otree->VzConstitTau1=analysisTree->tau_constituents_vz[tauIndex1][piIndex_];*/
-
-      //Merijn 2019 2 9: updated to new definition
+ 
+ 
       otree->VxConstitTau1=analysisTree->tau_pca3D_x[tauIndex1];
       otree->VyConstitTau1=analysisTree->tau_pca3D_y[tauIndex1];
       otree->VzConstitTau1=analysisTree->tau_pca3D_z[tauIndex1];
 
-      //Merijn 2019 4 2: comment out and replace with vector from above:    
       otree->chconst_1_pt=tau1Prong.Pt();
       otree->chconst_1_phi=tau1Prong.Phi();
       otree->chconst_1_eta=tau1Prong.Eta();
     }
   }
   
-  //merijn: we vetoed already if the second tau didn't contain a pion, so can safely calculate the momentum of 2nd prong from hadrons
+
   TLorentzVector tau2Prong;
   tau2Prong = chargedPivec(analysisTree, tauIndex2);
   int piIndexfortau2 = chargedPiIndex(analysisTree, tauIndex2);
   if(piIndexfortau2 > -1){
-    /*
-    otree->VxConstitTau2=analysisTree->tau_constituents_vx[tauIndex2][piIndexfortau2];
-    otree->VyConstitTau2=analysisTree->tau_constituents_vy[tauIndex2][piIndexfortau2];   
-    otree->VzConstitTau2=analysisTree->tau_constituents_vz[tauIndex2][piIndexfortau2]; */
-
-    //Merijn 2019 2 9: updated to new definition
     otree->VxConstitTau2 = analysisTree->tau_pca3D_x[tauIndex2];
     otree->VyConstitTau2 = analysisTree->tau_pca3D_y[tauIndex2];
     otree->VzConstitTau2 = analysisTree->tau_pca3D_z[tauIndex2];
     
-    //Merijn 2019 4 3: replace with the tau2Prong vector. Keep old code in case something broke:
+
     otree->chconst_2_pt  = tau2Prong.Pt();
     otree->chconst_2_phi = tau2Prong.Phi();
     otree->chconst_2_eta = tau2Prong.Eta();
@@ -425,14 +413,7 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
     firstNegative = true;
   bool is_refitted_PV_with_BS = true;
   TVector3 PV_coord = get_refitted_PV_with_BS(analysisTree, tauIndex1, tauIndex2, is_refitted_PV_with_BS);
-  /*
-  if (is_refitted_PV_with_BS) {
-    cout << "refitted vertex found" << endl;
-  }
-  else {
-    cout << "refitted vertex NOT FOUND" << endl;
-  }
-  */
+
   otree->isrefitBS = is_refitted_PV_with_BS;
 
   TLorentzVector tau1IP;
@@ -449,9 +430,9 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
     tau1IP_helix = IP_helix_mu(analysisTree, tauIndex1, PV_coord);
   }
   else{
-    tau1IP = ipVec(analysisTree,tauIndex1,tauIndex2,0);
-    tau1IP_bs = ipVec(analysisTree,tauIndex1,tauIndex2,1);
-    tau1IP_refitbs = ipVec(analysisTree,tauIndex1,tauIndex2,2);
+    tau1IP = ipVec(analysisTree,tauIndex2,tauIndex1,0);
+    tau1IP_bs = ipVec(analysisTree,tauIndex2,tauIndex1,1);
+    tau1IP_refitbs = ipVec(analysisTree,tauIndex2,tauIndex1,2);
     tau1IP_helix = IP_helix_tauh(analysisTree,tauIndex1,PV_coord);
   }//tt: currently unused only computed for reconstructed PV
   TLorentzVector tau1Pi0;
@@ -511,11 +492,7 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
   tau2IP_refitbs.SetY(otree->ipy_2);
   tau2IP_refitbs.SetZ(otree->ipz_2);
 
-  /*
-  cout << "X (linear:helix) = " << otree->ipx_2 << ":" << otree->ip0x_2 << endl;
-  cout << "Y (linear:helix) = " << otree->ipy_2 << ":" << otree->ip0y_2 << endl;
-  cout << "Z (linear:helix) = " << otree->ipz_2 << ":" << otree->ip0z_2 << endl;
-  */
+
   TLorentzVector tau2Pi0;
   tau2Pi0.SetXYZT(0.,0.,0.,0.); 
   
@@ -552,21 +529,6 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
     }    
     if (analysisTree->tau_decayMode[tauIndex2]==10){
       partLV = a1_rho_pi(analysisTree,tauIndex2);
-      /*
-      std::cout << "a1->rho+pi ---> " << std::endl;
-      std::cout << "lead pi (px,py,pz,E) = " 
-		<< partLV.at(0).Px() 
-		<< "," << partLV.at(0).Py() 
-		<< "," << partLV.at(0).Pz()
-		<< "," << partLV.at(0).M() << std::endl;
-      std::cout << "rho (px,py,pz,E) = " 
-		<< partLV.at(1).Px() 
-		<< "," << partLV.at(1).Py() 
-		<< "," << partLV.at(1).Pz()
-		<< "," << partLV.at(1).M() << std::endl;
-      std::cout << std::endl;
-      */
-      
 
       TLorentzVector tauP; tauP.SetXYZT(analysisTree->tau_SV_x[tauIndex2]-PV_coord.X(),
 					analysisTree->tau_SV_y[tauIndex2]-PV_coord.Y(),
@@ -589,7 +551,7 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
   }
   //NOTE: Commented till DPG
   if(channel=="tt"){//merijn 2019 1 10: only for tt we can use the index to assess a tau, otherwise its a lepton!
-    cout<<"accident"<<endl;
+    ///cout<<"accident"<<endl;
     if (analysisTree->tau_decayMode[tauIndex1]==1&&analysisTree->tau_decayMode[tauIndex2]==0) {
       otree->acotautau_10=acoCP(tau1Prong,tau2Prong,tau1Pi0,tau2IP,firstNegative,true,false,otree);
     }    
@@ -713,8 +675,9 @@ TLorentzVector neutralPivec(const AC1B * analysisTree, int tauIndex){
   int ncomponents = analysisTree->tau_constituents_count[tauIndex];
   int piIndex=-1;
   TLorentzVector neutralPi; neutralPi.SetXYZT(0.,0.,0.,0.);
-  
-  
+  TLorentzVector neutralPi_tmp; neutralPi_tmp.SetXYZT(0.,0.,0.,0.);
+
+  float maxPT=-100;int leadingIndex;
   for(int i=0;i<ncomponents;i++){
     if(analysisTree->tau_constituents_pdgId[tauIndex][i]==22||abs(analysisTree->tau_constituents_pdgId[tauIndex][i])==11){
 
@@ -724,10 +687,21 @@ TLorentzVector neutralPivec(const AC1B * analysisTree, int tauIndex){
 			     analysisTree->tau_constituents_py[tauIndex][i],
 			     analysisTree->tau_constituents_pz[tauIndex][i],
 			     analysisTree->tau_constituents_e[tauIndex][i]);
-      neutralPi+=neutralpart;
+      if(neutralpart.Pt() >= maxPT && analysisTree->tau_constituents_pdgId[tauIndex][i]==22){
+	maxPT = neutralpart.Pt();
+	leadingIndex = i;
       }
+      neutralPi+=neutralpart;
+    }
   }
 
+  neutralPi_tmp.SetPxPyPzE(analysisTree->tau_constituents_px[tauIndex][leadingIndex],
+			   analysisTree->tau_constituents_py[tauIndex][leadingIndex],
+			   analysisTree->tau_constituents_pz[tauIndex][leadingIndex],
+			   analysisTree->tau_constituents_e[tauIndex][leadingIndex]);
+    
+  
+  neutralPi.SetPtEtaPhiE(neutralPi.Pt(),neutralPi_tmp.Eta(),neutralPi_tmp.Phi(),neutralPi.E());
   return neutralPi;
 };
 

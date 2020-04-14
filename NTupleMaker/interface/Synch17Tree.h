@@ -3,7 +3,6 @@
 // Author: Andrea Cardini <andrea.cardini@desy.de>
 // 
 // Based on Spring15Tree by Francesco Costanza
-//Merijn added changes and tauspinner weights.. <merijn.van.de.klundert@desy.de>
 //////////////////////////////////////////////////////////
 
 #ifndef Synch17Tree_h
@@ -95,8 +94,8 @@ public :
   Int_t 	  tau_decay_mode_1;
   Float_t         dm_1;
   Float_t         dmMVA_1;
-  Float_t 	  chpt_1;
-  Float_t 	  cheta_1;
+  Float_t 	      chpt_1;
+  Float_t 	      cheta_1;
   Float_t 	      chphi_1;
   Float_t 	      chm_1;
   Float_t 	      npt_1;
@@ -112,7 +111,6 @@ public :
   Float_t         chconst_2_eta;
   Float_t         chconst_2_phi;     
   Float_t         m_2;
-  Float_t         DM;
   Int_t           gen_match_2; 
   Int_t           q_2;
   Float_t         iso_2;
@@ -200,6 +198,7 @@ public :
   Float_t         idisoweight_antiiso_1;
   Float_t         trigweight_1;
   Float_t         trigweight_antiiso_1;
+  Float_t         tauvsjetweightMedium_1;
 
   Float_t         againstElectronLooseMVA6_2;
   Float_t         againstElectronMediumMVA6_2;
@@ -262,6 +261,35 @@ public :
   Float_t    MVADM2017v1DM2raw_2;
   Float_t    MVADM2017v1DMotherraw_2;
 
+  //For tt
+  Float_t	   byLooseDeepTau2017v2p1VSe_1;	
+  Float_t	   byLooseDeepTau2017v2p1VSjet_1;	
+  Float_t	   byLooseDeepTau2017v2p1VSmu_1;	
+  Float_t	   byMediumDeepTau2017v2p1VSe_1;	
+  Float_t	   byMediumDeepTau2017v2p1VSjet_1;	
+  Float_t	   byMediumDeepTau2017v2p1VSmu_1;	
+  Float_t	   byTightDeepTau2017v2p1VSe_1;	
+  Float_t	   byTightDeepTau2017v2p1VSjet_1;	
+  Float_t	   byTightDeepTau2017v2p1VSmu_1;	
+  Float_t	   byVLooseDeepTau2017v2p1VSe_1;	
+  Float_t	   byVLooseDeepTau2017v2p1VSjet_1;	
+  Float_t	   byVLooseDeepTau2017v2p1VSmu_1;	
+  Float_t	   byVTightDeepTau2017v2p1VSe_1;	
+  Float_t	   byVTightDeepTau2017v2p1VSjet_1;	
+  Float_t	   byVVLooseDeepTau2017v2p1VSe_1;	
+  Float_t	   byVVLooseDeepTau2017v2p1VSjet_1;	
+  Float_t	   byVVTightDeepTau2017v2p1VSe_1;	
+  Float_t	   byVVTightDeepTau2017v2p1VSjet_1;	
+  Float_t	   byVVVLooseDeepTau2017v2p1VSe_1;	
+  Float_t	   byVVVLooseDeepTau2017v2p1VSjet_1;	
+
+  Float_t    MVADM2017v1DM0raw_1;
+  Float_t    MVADM2017v1DM10raw_1;
+  Float_t    MVADM2017v1DM11raw_1;
+  Float_t    MVADM2017v1DM1raw_1;
+  Float_t    MVADM2017v1DM2raw_1;
+  Float_t    MVADM2017v1DMotherraw_1;
+
   // new 
   Float_t         idisoweight_2;
   Float_t         idisoweight_antiiso_2;
@@ -310,52 +338,12 @@ public :
   Float_t         trigweight;
   Float_t         embweight;
 
-  Float_t weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVUp;
-  Float_t weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVUp;
-  Float_t weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVUp;
-  Float_t weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVUp;
-  Float_t weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVUp;
-  Float_t weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVDown;
-  Float_t weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVDown;
-  Float_t weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVDown;
-  Float_t weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVDown;
-  Float_t weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVDown;
-
-  Float_t weight_CMS_eff_t_pTlow_MVADM0_13TeVUp; 
-  Float_t weight_CMS_eff_t_pTlow_MVADM1_13TeVUp; 
-  Float_t weight_CMS_eff_t_pTlow_MVADM2_13TeVUp; 
-  Float_t weight_CMS_eff_t_pTlow_MVADM10_13TeVUp;
-  Float_t weight_CMS_eff_t_pTlow_MVADM11_13TeVUp;
-  Float_t weight_CMS_eff_t_pThigh_MVADM0_13TeVUp;
-  Float_t weight_CMS_eff_t_pThigh_MVADM1_13TeVUp;
-  Float_t weight_CMS_eff_t_pThigh_MVADM2_13TeVUp;
-  Float_t weight_CMS_eff_t_pThigh_MVADM10_13TeVUp; 
-  Float_t weight_CMS_eff_t_pThigh_MVADM11_13TeVUp; 
-  Float_t weight_CMS_eff_t_pTlow_MVADM0_13TeVDown; 
-  Float_t weight_CMS_eff_t_pTlow_MVADM1_13TeVDown; 
-  Float_t weight_CMS_eff_t_pTlow_MVADM2_13TeVDown; 
-  Float_t weight_CMS_eff_t_pTlow_MVADM10_13TeVDown; 
-  Float_t weight_CMS_eff_t_pTlow_MVADM11_13TeVDown; 
-  Float_t weight_CMS_eff_t_pThigh_MVADM0_13TeVDown; 
-  Float_t weight_CMS_eff_t_pThigh_MVADM1_13TeVDown; 
-  Float_t weight_CMS_eff_t_pThigh_MVADM2_13TeVDown; 
-  Float_t weight_CMS_eff_t_pThigh_MVADM10_13TeVDown;
-  Float_t weight_CMS_eff_t_pThigh_MVADM11_13TeVDown;
-
-  Float_t weight_CMS_scale_gg_13TeVUp;
-  Float_t weight_CMS_scale_gg_13TeVDown;
-
   Float_t         topptweight;
   Double_t 	  zptweight;
   Double_t        trkeffweight;
   Float_t         etaufakeweight;
   Float_t         mutaufakeweight;
   
-  Float_t         ff_nom;
-  Float_t         ff_mva;
-  Float_t         ff_nom_sys;
-  Float_t         ff_mva_sys;
-
   Bool_t          trg_singlemuon;
   Bool_t	  trg_singleelectron;
   Bool_t          singleLepTrigger;
@@ -367,7 +355,6 @@ public :
   Bool_t          xTriggerLep;
   Bool_t          xTriggerTau;
   Bool_t          xTrigger;
-
   //MET
   Float_t         met;
   Float_t         metphi;  
@@ -392,7 +379,6 @@ public :
   Float_t         puppimetcov10;
   Float_t         puppimetcov11;
   Float_t         puppipzetamiss;
-
   Float_t         puppimet_ex_UnclusteredEnUp;
   Float_t         puppimet_ex_UnclusteredEnDown;
 
@@ -410,7 +396,6 @@ public :
 
   Float_t         puppimet_ey_JetResUp;
   Float_t         puppimet_ey_JetResDown;
-
   //di tau system
   Float_t         pt_tt;
   Float_t         m_vis;
@@ -591,7 +576,7 @@ public :
   Double_t TauSpinnerWeightsMaxMix;
   Double_t TauSpinnerWeightsMinusMaxMix;
   Double_t TauSpinnerWeightsMix0p375;
-
+  
   //polarisation related obervables
   double y1_LF;
   double y2_LF;
@@ -599,8 +584,8 @@ public :
   double y2_ZMF;
   double y1_TMF;
   double y2_TMF;
-
-  //Vinay: ditau_vis_pT + MET
+  
+  //ditau_vis_pT + MET
   Float_t Prompt_pT;
 
   Bool_t isrefitBS;
@@ -647,7 +632,6 @@ public :
   TBranch	 *b_ipx_uncorr_1;
   TBranch	 *b_ipy_uncorr_1;
   TBranch	 *b_ipz_uncorr_1;
-
   TBranch	 *b_gen_ipx_1;
   TBranch	 *b_gen_ipy_1;
   TBranch	 *b_gen_ipz_1;
@@ -708,7 +692,9 @@ public :
   TBranch	 *b_ipx_2;
   TBranch	 *b_ipy_2;
   TBranch	 *b_ipz_2;
-
+  TBranch	 *b_ipx_uncorr_2;
+  TBranch	 *b_ipy_uncorr_2;
+  TBranch	 *b_ipz_uncorr_2;
   TBranch	 *b_gen_ipx_2;
   TBranch	 *b_gen_ipy_2;
   TBranch	 *b_gen_ipz_2;
@@ -720,9 +706,6 @@ public :
   TBranch        *b_ip_covyz_2;
   TBranch        *b_ip_covzz_2;
 
-  TBranch	 *b_ipx_uncorr_2;
-  TBranch	 *b_ipy_uncorr_2;
-  TBranch	 *b_ipz_uncorr_2;
   TBranch	 *b_ipxy_2;
   TBranch	 *b_IP_signif_PV_with_BS_2;
   TBranch	 *b_IP_signif_RefitV_with_BS_2;
@@ -812,6 +795,34 @@ public :
   TBranch    *b_MVADM2017v1DM2raw_2;
   TBranch    *b_MVADM2017v1DMotherraw_2;
 
+  TBranch	   *b_byLooseDeepTau2017v2p1VSe_1;	
+  TBranch	   *b_byLooseDeepTau2017v2p1VSjet_1;	
+  TBranch	   *b_byLooseDeepTau2017v2p1VSmu_1;	
+  TBranch	   *b_byMediumDeepTau2017v2p1VSe_1;	
+  TBranch	   *b_byMediumDeepTau2017v2p1VSjet_1;	
+  TBranch	   *b_byMediumDeepTau2017v2p1VSmu_1;	
+  TBranch	   *b_byTightDeepTau2017v2p1VSe_1;	
+  TBranch	   *b_byTightDeepTau2017v2p1VSjet_1;	
+  TBranch	   *b_byTightDeepTau2017v2p1VSmu_1;	
+  TBranch	   *b_byVLooseDeepTau2017v2p1VSe_1;	
+  TBranch	   *b_byVLooseDeepTau2017v2p1VSjet_1;	
+  TBranch	   *b_byVLooseDeepTau2017v2p1VSmu_1;	
+  TBranch	   *b_byVTightDeepTau2017v2p1VSe_1;	
+  TBranch	   *b_byVTightDeepTau2017v2p1VSjet_1;	
+  TBranch	   *b_byVVLooseDeepTau2017v2p1VSe_1;	
+  TBranch	   *b_byVVLooseDeepTau2017v2p1VSjet_1;	
+  TBranch	   *b_byVVTightDeepTau2017v2p1VSe_1;	
+  TBranch	   *b_byVVTightDeepTau2017v2p1VSjet_1;	
+  TBranch	   *b_byVVVLooseDeepTau2017v2p1VSe_1;	
+  TBranch	   *b_byVVVLooseDeepTau2017v2p1VSjet_1;	
+
+  TBranch    *b_MVADM2017v1DM0raw_1;
+  TBranch    *b_MVADM2017v1DM10raw_1;
+  TBranch    *b_MVADM2017v1DM11raw_1;
+  TBranch    *b_MVADM2017v1DM1raw_1;
+  TBranch    *b_MVADM2017v1DM2raw_1;
+  TBranch    *b_MVADM2017v1DMotherraw_1;
+
   ///////////////////////////////////////////////////////////NEW
   TBranch	 *b_efficiency_byVVLooseIsolationMVArun2017v2DBoldDMwLT2017_1;
 //  TBranch	 *b_efficiency_byLooseIsolationMVArun2017v2DBoldDMwLT2017_1;
@@ -849,6 +860,7 @@ public :
   TBranch	 *b_idisoweight_antiiso_1;
   TBranch	 *b_trigweight_1;
   TBranch	 *b_trigweight_antiiso_1;
+  TBranch        *b_tauvsjetweightMedium_1;
   TBranch	 *b_againstElectronLooseMVA6_2;
   TBranch	 *b_againstElectronMediumMVA6_2;
   TBranch	 *b_againstElectronTightMVA6_2;
@@ -889,51 +901,11 @@ public :
   TBranch        *b_trigweight;
   TBranch        *b_embweight;
 
-  TBranch        *b_weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVUp;
-  TBranch        *b_weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVUp;
-  TBranch        *b_weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVUp;
-  TBranch        *b_weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVUp;
-  TBranch        *b_weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVUp;
-  TBranch        *b_weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVDown;
-  TBranch        *b_weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVDown;
-  TBranch        *b_weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVDown;
-  TBranch        *b_weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVDown;
-  TBranch        *b_weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVDown;
-
-  TBranch        *b_weight_CMS_eff_t_pTlow_MVADM0_13TeVUp; 
-  TBranch        *b_weight_CMS_eff_t_pTlow_MVADM1_13TeVUp; 
-  TBranch        *b_weight_CMS_eff_t_pTlow_MVADM2_13TeVUp; 
-  TBranch        *b_weight_CMS_eff_t_pTlow_MVADM10_13TeVUp;
-  TBranch        *b_weight_CMS_eff_t_pTlow_MVADM11_13TeVUp;
-  TBranch        *b_weight_CMS_eff_t_pThigh_MVADM0_13TeVUp;
-  TBranch        *b_weight_CMS_eff_t_pThigh_MVADM1_13TeVUp;
-  TBranch        *b_weight_CMS_eff_t_pThigh_MVADM2_13TeVUp;
-  TBranch        *b_weight_CMS_eff_t_pThigh_MVADM10_13TeVUp; 
-  TBranch        *b_weight_CMS_eff_t_pThigh_MVADM11_13TeVUp; 
-  TBranch        *b_weight_CMS_eff_t_pTlow_MVADM0_13TeVDown; 
-  TBranch        *b_weight_CMS_eff_t_pTlow_MVADM1_13TeVDown; 
-  TBranch        *b_weight_CMS_eff_t_pTlow_MVADM2_13TeVDown; 
-  TBranch        *b_weight_CMS_eff_t_pTlow_MVADM10_13TeVDown; 
-  TBranch        *b_weight_CMS_eff_t_pTlow_MVADM11_13TeVDown; 
-  TBranch        *b_weight_CMS_eff_t_pThigh_MVADM0_13TeVDown; 
-  TBranch        *b_weight_CMS_eff_t_pThigh_MVADM1_13TeVDown; 
-  TBranch        *b_weight_CMS_eff_t_pThigh_MVADM2_13TeVDown; 
-  TBranch        *b_weight_CMS_eff_t_pThigh_MVADM10_13TeVDown;
-  TBranch        *b_weight_CMS_eff_t_pThigh_MVADM11_13TeVDown;
-  
-  TBranch        *b_weight_CMS_scale_gg_13TeVUp;
-  TBranch        *b_weight_CMS_scale_gg_13TeVDown;
-
   TBranch	 *b_topptweight;
   TBranch	 *b_zptweight;
   TBranch	 *b_trkeffweight;
   TBranch	 *b_etaufakeweight;
   TBranch	 *b_mutaufakeweight;
-
-  TBranch        *b_ff_nom;
-  TBranch        *b_ff_mva;
-  TBranch        *b_ff_nom_sys;
-  TBranch        *b_ff_mva_sys;
 
   TBranch	 *b_trg_singlemuon;
   TBranch	 *b_trg_singleelectron;
@@ -1155,14 +1127,13 @@ public :
   TBranch        *b_TauSpinnerWeightsMix0p375;
 
   TBranch       *b_Prompt_pT;
-
-  TBranch       *b_isrefitBS;
   TBranch        *b_y1_LF;
   TBranch        *b_y2_LF;
   TBranch        *b_y1_ZMF;
   TBranch        *b_y2_ZMF;
   TBranch        *b_y1_TMF;
   TBranch        *b_y2_TMF;
+  TBranch       *b_isrefitBS;
 
   Synch17Tree(TTree *tree=0);
   virtual ~Synch17Tree();
