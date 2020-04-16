@@ -333,6 +333,8 @@ int main(int argc, char * argv[]) {
   Bool_t jettaubyVTightDeepTau2017v2p1VSjet_;
   Bool_t jettaubyVVTightDeepTau2017v2p1VSjet_;
 
+  Float_t jettaubyDeepTau2017v2p1VSjetraw_;
+
   Float_t jettauLeadingTrackPt_;
   Float_t jettauLeadingTrackEta_;
   Float_t jettauLeadingTrackPhi_;
@@ -561,7 +563,12 @@ int main(int argc, char * argv[]) {
   ntuple_->Branch("jettaubyMediumDeepTau2017v2p1VSmu",
 		  &jettaubyMediumDeepTau2017v2p1VSmu_,
 		  "jettaubyMediumDeepTau2017v2p1VSmu/O");
-  ntuple_->Branch("jettaubyTightDeepTau2017v2p1VSmu",
+
+  ntuple_->Branch("jettaubyDeepTau2017v2p1VSjetraw",
+		  &jettaubyDeepTau2017v2p1VSjetraw_,
+		  "jettaubyDeepTau2017v2p1VSjetraw/F");
+
+  ntuple_->Branch("",
 		  &jettaubyTightDeepTau2017v2p1VSmu_,
 		  "jettaubyTightDeepTau2017v2p1VSmu/O");
 
@@ -876,6 +883,8 @@ int main(int argc, char * argv[]) {
       jettaubyTightDeepTau2017v2p1VSjet_ = false;
       jettaubyVTightDeepTau2017v2p1VSjet_ = false;
       jettaubyVVTightDeepTau2017v2p1VSjet_ = false;
+
+      jettaubyDeepTau2017v2p1VSjetraw_ = -1;
 
       jettauLeadingTrackPt_  = 0;
       jettauLeadingTrackEta_ = 0;
@@ -1701,6 +1710,8 @@ int main(int argc, char * argv[]) {
 	  jettauAntiElectronVLooseMVA6_ = analysisTree.tau_againstElectronVLooseMVA6[taujetIndex] > 0.5;
 	  jettauAntiElectronLooseMVA6_ = analysisTree.tau_againstElectronLooseMVA6[taujetIndex] > 0.5;
 	 
+	  jettaubyDeepTau2017v2p1VSjetraw_ = analysisTree.tau_byDeepTau2017v2p1VSjetraw[taujetIndex];
+
 	  jettaubyVVVLooseDeepTau2017v2p1VSjet_ = analysisTree.tau_byVVVLooseDeepTau2017v2p1VSjet[taujetIndex] > 0.5;
 	  jettaubyVVLooseDeepTau2017v2p1VSjet_ = analysisTree.tau_byVVLooseDeepTau2017v2p1VSjet[taujetIndex] > 0.5;
 	  jettaubyVLooseDeepTau2017v2p1VSjet_ = analysisTree.tau_byVLooseDeepTau2017v2p1VSjet[taujetIndex] > 0.5;
@@ -1723,6 +1734,7 @@ int main(int argc, char * argv[]) {
 	  jettaubyLooseDeepTau2017v2p1VSmu_ = analysisTree.tau_byLooseDeepTau2017v2p1VSmu[taujetIndex] > 0.5;
 	  jettaubyMediumDeepTau2017v2p1VSmu_ = analysisTree.tau_byMediumDeepTau2017v2p1VSmu[taujetIndex] > 0.5;
 	  jettaubyTightDeepTau2017v2p1VSmu_ = analysisTree.tau_byTightDeepTau2017v2p1VSmu[taujetIndex] > 0.5;
+	  
 
 	  jettauDecay_ = analysisTree.tau_decayMode[taujetIndex];
 	  jettauGenDecay_ = analysisTree.tau_genDecayMode[taujetIndex];

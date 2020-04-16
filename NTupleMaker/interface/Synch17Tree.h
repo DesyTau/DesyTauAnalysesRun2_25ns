@@ -85,6 +85,7 @@ public :
   Float_t         drip_1;
   Float_t         detaip_1;
   Float_t         dphiip_1;
+  Float_t         ip_sig_1;
   Float_t         ipxy_uncorr_1;
   Float_t         ipn_uncorr_1;
   Float_t         drip_uncorr_1;
@@ -147,6 +148,7 @@ public :
   Double_t        IP_signif_RefitV_with_BS_2;
   Double_t        IP_signif_RefitV_with_BS_uncorr_2;
   Float_t         ipn_2;
+  Float_t         ip_sig_2;
   Float_t         drip_2;
   Float_t         detaip_2;
   Float_t         dphiip_2;
@@ -592,6 +594,10 @@ public :
   Double_t TauSpinnerWeightsMinusMaxMix;
   Double_t TauSpinnerWeightsMix0p375;
 
+  Double_t tauspinnerH;
+  Double_t tauspinnerA;
+  Double_t tauspinnerMaxMix;
+
   //polarisation related obervables
   double y1_LF;
   double y2_LF;
@@ -664,6 +670,7 @@ public :
   TBranch	 *b_IP_signif_RefitV_with_BS_1;
   TBranch	 *b_IP_signif_RefitV_with_BS_uncorr_1;
   TBranch	 *b_ipn_1;
+  TBranch	 *b_ip_sig_1;
   TBranch	 *b_drip_1;
   TBranch	 *b_detaip_1;
   TBranch	 *b_dphiip_1;
@@ -728,6 +735,7 @@ public :
   TBranch	 *b_IP_signif_RefitV_with_BS_2;
   TBranch	 *b_IP_signif_RefitV_with_BS_uncorr_2;
   TBranch	 *b_ipn_2;
+  TBranch        *b_ip_sig_2;
   TBranch	 *b_drip_2;
   TBranch	 *b_detaip_2;
   TBranch	 *b_dphiip_2;
@@ -1153,6 +1161,10 @@ public :
   TBranch        *b_TauSpinnerWeightsMaxMix;
   TBranch        *b_TauSpinnerWeightsMinusMaxMix;
   TBranch        *b_TauSpinnerWeightsMix0p375;
+
+  TBranch        *b_tauspinnerH;
+  TBranch        *b_tauspinnerA;
+  TBranch        *b_tauspinnerMaxMix;
 
   TBranch       *b_Prompt_pT;
 

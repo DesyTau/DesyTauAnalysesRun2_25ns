@@ -106,6 +106,7 @@ void Synch17Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("IP_signif_RefitV_with_BS_uncorr_1", &IP_signif_RefitV_with_BS_uncorr_1, &b_IP_signif_RefitV_with_BS_uncorr_1);
    // fChain->SetBranchAddress("ipxy_1", &ipxy_1, &b_ipxy_1);
    //   fChain->SetBranchAddress("ipn_1", &ipn_1, &b_ipn_1);
+   fChain->SetBranchAddress("ip_sig_1", &ip_sig_1, &b_ip_sig_1);
    //   fChain->SetBranchAddress("drip_1", &drip_1, &b_drip_1);
    fChain->SetBranchAddress("detaip_1", &detaip_1, &b_detaip_1);
    fChain->SetBranchAddress("dphiip_1", &dphiip_1, &b_dphiip_1);
@@ -172,6 +173,7 @@ void Synch17Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("IP_signif_RefitV_with_BS_uncorr_2", &IP_signif_RefitV_with_BS_uncorr_2, &b_IP_signif_RefitV_with_BS_uncorr_2);
    //   fChain->SetBranchAddress("ipxy_2", &ipxy_2, &b_ipxy_2);
    //   fChain->SetBranchAddress("ipn_2", &ipn_2, &b_ipn_2);
+   fChain->SetBranchAddress("ip_sig_2", &ip_sig_2, &b_ip_sig_2);
    //   fChain->SetBranchAddress("drip_2", &drip_2, &b_drip_2);
    fChain->SetBranchAddress("detaip_2", &detaip_2, &b_detaip_2);
    fChain->SetBranchAddress("dphiip_2", &dphiip_2, &b_dphiip_2);
@@ -608,6 +610,10 @@ void Synch17Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("minusmm_htt125", &TauSpinnerWeightsMinusMaxMix, &b_TauSpinnerWeightsMinusMaxMix);
    fChain->SetBranchAddress("mix0p375_htt125", &TauSpinnerWeightsMix0p375, &b_TauSpinnerWeightsMix0p375);
 
+   fChain->SetBranchAddress("tauspinnerH",&tauspinnerH,&b_tauspinnerH);
+   fChain->SetBranchAddress("tauspinnerA",&tauspinnerA,&b_tauspinnerA);
+   fChain->SetBranchAddress("tauspinnerMaxMix",&tauspinnerMaxMix,&b_tauspinnerMaxMix);
+
    fChain->SetBranchAddress("y1_LF", &y1_LF, &b_y1_LF);
    fChain->SetBranchAddress("y2_LF", &y2_LF, &b_y2_LF);
    fChain->SetBranchAddress("y1_ZMF", &y1_ZMF, &b_y1_ZMF);
@@ -737,6 +743,7 @@ void Synch17Tree::WriteInit(TTree *tree) {
    fChain->Branch("IP_signif_RefitV_with_BS_uncorr_1", &IP_signif_RefitV_with_BS_uncorr_1, "IP_signif_RefitV_with_BS_uncorr_1/D");
    //   fChain->Branch("ipxy_1", &ipxy_1, "ipxy_1/F");
    //  fChain->Branch("ipn_1", &ipn_1, "ipn_1/F");
+   fChain->Branch("ip_sig_1", &ip_sig_1, "ip_sig_1/F");
    //  fChain->Branch("drip_1", &drip_1, "drip_1/F");
    fChain->Branch("detaip_1", &detaip_1, "detaip_1/F");
    fChain->Branch("dphiip_1", &dphiip_1, "dphiip_1/F");
@@ -800,6 +807,7 @@ void Synch17Tree::WriteInit(TTree *tree) {
    fChain->Branch("IP_signif_RefitV_with_BS_uncorr_2", &IP_signif_RefitV_with_BS_uncorr_2, "IP_signif_RefitV_with_BS_uncorr_2/D");
    //   fChain->Branch("ipxy_2", &ipxy_2, "ipxy_2/F");
    //   fChain->Branch("ipn_2", &ipn_2, "ipn_2/F");
+   fChain->Branch("ip_sig_2", &ip_sig_2, "ip_sig_2/F");
    //   fChain->Branch("drip_2", &drip_2, "drip_2/F");
    fChain->Branch("detaip_2", &detaip_2, "detaip_2/F");
    fChain->Branch("dphiip_2", &dphiip_2, "dphiip_2/F");
@@ -1227,6 +1235,10 @@ fChain->Branch("againstElectronVLooseMVA6_2", &againstElectronVLooseMVA6_2, "aga
    fChain->Branch("mm_htt125", &TauSpinnerWeightsMaxMix, "TauSpinnerWeightsMaxMix/D");
    fChain->Branch("minusmm_htt125", &TauSpinnerWeightsMinusMaxMix, "TauSpinnerWeightsMinusMaxMix/D");
    fChain->Branch("mix0p375_htt125", &TauSpinnerWeightsMix0p375, "TauSpinnerWeightsMix0p375/D");
+
+   fChain->Branch("tauspinnerH",&tauspinnerH,"tauspinnerH/D");
+   fChain->Branch("tauspinnerA",&tauspinnerA,"tauspinnerA/D");
+   fChain->Branch("tauspinnerMaxMix",&tauspinnerMaxMix,"tauspinnerMaxMix/D");
 
    fChain->Branch("y1_LF", &y1_LF, "y1_LF/D");
    fChain->Branch("y2_LF", &y2_LF, "y2_LF/D");
