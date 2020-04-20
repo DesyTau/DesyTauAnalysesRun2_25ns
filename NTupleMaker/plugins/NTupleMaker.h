@@ -162,6 +162,7 @@
 using namespace std;
 using namespace reco;
 
+#define M_Nweights 20 //number of GenEventInfo weights to be stored
 #define M_trackmaxcount 1000
 #define M_superclustermaxcount 1000
 #define M_superclustermembermaxcount 1000
@@ -1268,6 +1269,7 @@ class NTupleMaker : public edm::EDAnalyzer{
   Float_t genid2;
   Float_t genx2;
   Float_t genScale;
+  Float_t gen_pythiaweights[M_Nweights];
 
   Float_t weightScale[9];
   Float_t weightPDFmax;
