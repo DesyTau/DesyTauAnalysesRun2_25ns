@@ -878,7 +878,7 @@ int main(int argc, char * argv[]){
       	if (analysisTree.tau_byVLooseDeepTau2017v2p1VSmu[it] < 0.5) continue;
         if (analysisTree.tau_decayModeFindingNewDMs[it] < 0.5) continue; //always true, cut applied in NTupleMaker
         if (analysisTree.tau_decayMode[it] == 5 || analysisTree.tau_decayMode[it] == 6) continue;
-        if (analysisTree.tau_MVADM2017v1[it] < 0) continue; //prevents storing events with unidentified mva DM for the tau (-1)
+	//	if (analysisTree.tau_MVADM2017v1[it] < 0) continue; //prevents storing events with unidentified mva DM for the tau (-1)
     
         taus.push_back(it);
       }
@@ -942,10 +942,9 @@ int main(int argc, char * argv[]){
           unsigned int lIndex = leptons.at(il);
     
           float lep_pt     = -9999.;
-          float lep_pt_max = -9999.;
           float lep_eta    = -9999.;
           float lep_phi    = -9999.;
-          float relIsoLep  = -9999.;
+	  float relIsoLep  = -9999.;
     
           if (ch == "mt")  relIsoLep = (abs_Iso_mt(lIndex, &analysisTree, dRiso) / analysisTree.muon_pt[lIndex] );
           if (ch == "et")  relIsoLep = (abs_Iso_et(lIndex, &analysisTree, dRiso) / analysisTree.electron_pt[lIndex] );
@@ -972,19 +971,19 @@ int main(int argc, char * argv[]){
            changePair = true;
           else if (fabs(relIsoLep - isoLepMin) < 1.e-5)
            {
-                 if (lep_pt > lep_pt_max)
-                  changePair = true;
-                 else if (fabs(lep_pt - lep_pt_max) < 1.e-5) 
-                 {
-        	              if (sortIsoTau > isoTauMax)
-                          changePair = true;
-        	              else if ((sortIsoTau - isoTauMax) < 1.e-5)
-                        {
-        	                    if (analysisTree.tau_pt[tIndex] > tau_pt_max)
-                                changePair = true;
-        	              }
-                 }
-            }
+	     if (lep_pt > lep_pt_max)
+	       changePair = true;
+	     else if (fabs(lep_pt - lep_pt_max) < 1.e-5) 
+	       {
+		 if (sortIsoTau > isoTauMax)
+		   changePair = true;
+		 else if (fabs(sortIsoTau - isoTauMax) < 1.e-5)
+		   {
+		     if (analysisTree.tau_pt[tIndex] > tau_pt_max)
+		       changePair = true;
+		   }
+	       }
+	   }
           counter[8]++;
     
           if (changePair) {
@@ -998,6 +997,8 @@ int main(int argc, char * argv[]){
         } // lepton loop
       } // tau loop
     
+      //      std::cout << "OK1" << std::endl;
+
       if (leptonIndex < 0) continue;
       if (tauIndex < 0) continue;
       counter[9]++;
@@ -1227,88 +1228,95 @@ int main(int argc, char * argv[]){
       	TString suffixRatio = "ratio";
       	if (isEmbedded) {suffix = "embed"; suffixRatio = "embed_ratio";}
 	TString mvadm = TString::Itoa(analysisTree.tau_MVADM2017v1[tauIndex],10);
-    	  w->var("t_pt")->setVal(analysisTree.tau_pt[tauIndex]);
-    	  w->var("t_eta")->setVal(analysisTree.tau_eta[tauIndex]);
-    	  w->var("t_phi")->setVal(analysisTree.tau_phi[tauIndex]);
-    	  //w->var("t_dm")->setVal(analysisTree.tau_decayMode[tauIndex]);
-    	  w->var("t_mvadm")->setVal(analysisTree.tau_MVADM2017v1[tauIndex]);
-    	  if (ch == "mt") {
-    	    w->var("m_pt")->setVal(leptonLV.Pt());
-    	    w->var("m_eta")->setVal(leptonLV.Eta());
-    	    eff_data_trig_lt_tau = w->function("t_trg_mediumDeepTau_mutau_data")->getVal();
-    	    eff_mc_trig_lt_tau = w->function("t_trg_mediumDeepTau_mutau_" + suffix)->getVal();
-    	    eff_data_trig_lt_tauUp = w->function("t_trg_ic_deeptau_medium_mvadm_mutau_data_mvadm"+mvadm+"_up")->getVal();
-    	    eff_mc_trig_lt_tauUp = w->function("t_trg_ic_deeptau_medium_mvadm_mutau_" + suffix + "_mvadm"+mvadm+"_up")->getVal();
-    	    eff_data_trig_lt_tauDown = w->function("t_trg_ic_deeptau_medium_mvadm_mutau_data_mvadm"+mvadm+"_down")->getVal();
-    	    eff_mc_trig_lt_tauDown = w->function("t_trg_ic_deeptau_medium_mvadm_mutau_" + suffix + "_mvadm"+mvadm+"_down")->getVal();
-    	    eff_data_trig_L = w->function("m_trg_ic_data")->getVal();
-    	    eff_mc_trig_L = w->function("m_trg_ic_" + suffix)->getVal();
-    	    if (era == 2016) {
-    	      eff_data_trig_lt_l = w->function("m_trg_19_ic_data")->getVal();
-    	      eff_mc_trig_lt_l = w->function("m_trg_19_ic_" + suffix)->getVal();
-    	    }
-    	    else {
-    	      eff_data_trig_lt_l = w->function("m_trg_20_ic_data")->getVal();
-	      eff_mc_trig_lt_l = w->function("m_trg_20_ic_" + suffix)->getVal();
-    	    }
-    	    otree->idisoweight_1 = w->function("m_idiso_ic_" + suffixRatio)->getVal();
-    	    otree->idisoweight_antiiso_1 = w->function("m_idiso_ic_" + suffixRatio)->getVal();
-	    otree->trkeffweight = w->function("m_trk_ratio")->getVal();
-    	  }
-    	  else if (ch == "et") {
-    	    w->var("e_pt")->setVal(leptonLV.Pt());
-    	    w->var("e_eta")->setVal(leptonLV.Eta());
-    	    eff_data_trig_L = w->function("e_trg_ic_data")->getVal();
-    	    eff_mc_trig_L = w->function("e_trg_ic_" + suffix)->getVal();
-    	    if (era > 2016) {
-    	      eff_data_trig_lt_tau = w->function("t_trg_mediumDeepTau_etau_data")->getVal();
-    	      eff_mc_trig_lt_tau = w->function("t_trg_mediumDeepTau_etau_" + suffix)->getVal();
-    	      eff_data_trig_lt_l = w->function("e_trg_24_ic_data")->getVal();
-    	      eff_mc_trig_lt_l = w->function("e_trg_24_ic_" + suffix)->getVal();
-    	    }
-    	    else {
-    	      eff_data_trig_lt_tau = 0;
-    	      eff_mc_trig_lt_tau = 0;
-    	      eff_data_trig_lt_l = 0;
-    	      eff_mc_trig_lt_l = 0;
-    	    }
-    	    otree->idisoweight_1 = w->function("e_idiso_ic_" + suffixRatio)->getVal();
-    	    otree->idisoweight_antiiso_1 = w->function("e_idiso_ic_" + suffixRatio)->getVal();
-	    otree->trkeffweight = w->function("e_trk_" + suffixRatio)->getVal();
-    	  }
-                                                                                                                                                                     
-    	  double eff_data_trig = eff_data_trig_L + (eff_data_trig_lt_l - eff_data_trig_L) * eff_data_trig_lt_tau;
-    	  double eff_mc_trig = eff_mc_trig_L + (eff_mc_trig_lt_l - eff_mc_trig_L) * eff_mc_trig_lt_tau;                                                            
-    	  double eff_data_trigUp = eff_data_trig_L + (eff_data_trig_lt_l - eff_data_trig_L) * eff_data_trig_lt_tauUp;
-    	  double eff_mc_trigUp = eff_mc_trig_L + (eff_mc_trig_lt_l - eff_mc_trig_L) * eff_mc_trig_lt_tauUp;                                                   
-    	  double eff_data_trigDown = eff_data_trig_L + (eff_data_trig_lt_l - eff_data_trig_L) * eff_data_trig_lt_tauDown;
-    	  double eff_mc_trigDown = eff_mc_trig_L + (eff_mc_trig_lt_l - eff_mc_trig_L) * eff_mc_trig_lt_tauDown;
-    	  if (era == 2016 && ch == "et") {
-    	    eff_data_trig = eff_data_trig_L;
-    	    eff_mc_trig = eff_mc_trig_L;
-    	  }
-    	  if (eff_data_trig > 1e-4 && eff_mc_trig > 1e-4){
-    	    otree->trigweight = eff_data_trig / eff_mc_trig;
-	    double trigweightUp = (eff_data_trigUp / eff_mc_trigUp) / (eff_data_trig / eff_mc_trig);
-	    double trigweightDown = (eff_data_trigDown / eff_mc_trigDown) / (eff_data_trig / eff_mc_trig);
-
-	    if(mvadm=="0"){
-	      otree->weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVUp = trigweightUp;
-	      otree->weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVDown = trigweightDown;
-	    }else if(mvadm=="1"){
-	      otree->weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVUp = trigweightUp;
-	      otree->weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVDown = trigweightDown;
-	    }else if(mvadm=="2"){
-	      otree->weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVUp = trigweightUp;
-	      otree->weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVDown = trigweightDown;
-	    }else if(mvadm=="10"){
-	      otree->weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVUp = trigweightUp;
-	      otree->weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVDown = trigweightDown;
-	    }else if(mvadm=="11"){
-	      otree->weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVUp = trigweightUp;
-	      otree->weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVDown = trigweightDown;
-	    }
+	if (analysisTree.tau_MVADM2017v1[tauIndex]<0.0)
+	  mvadm = TString::Itoa(analysisTree.tau_decayMode[tauIndex],10);;
+	w->var("t_pt")->setVal(analysisTree.tau_pt[tauIndex]);
+	w->var("t_eta")->setVal(analysisTree.tau_eta[tauIndex]);
+	w->var("t_phi")->setVal(analysisTree.tau_phi[tauIndex]);
+	//w->var("t_dm")->setVal(analysisTree.tau_decayMode[tauIndex]);
+	
+	if (analysisTree.tau_MVADM2017v1[tauIndex]<0.)
+	  w->var("t_mvadm")->setVal(analysisTree.tau_decayMode[tauIndex]);
+	else
+	  w->var("t_mvadm")->setVal(analysisTree.tau_MVADM2017v1[tauIndex]);
+	
+	if (ch == "mt") {
+	  w->var("m_pt")->setVal(leptonLV.Pt());
+	  w->var("m_eta")->setVal(leptonLV.Eta());
+	  eff_data_trig_lt_tau = w->function("t_trg_mediumDeepTau_mutau_data")->getVal();
+	  eff_mc_trig_lt_tau = w->function("t_trg_mediumDeepTau_mutau_" + suffix)->getVal();
+	  eff_data_trig_lt_tauUp = w->function("t_trg_ic_deeptau_medium_mvadm_mutau_data_mvadm"+mvadm+"_up")->getVal();
+	  eff_mc_trig_lt_tauUp = w->function("t_trg_ic_deeptau_medium_mvadm_mutau_" + suffix + "_mvadm"+mvadm+"_up")->getVal();
+	  eff_data_trig_lt_tauDown = w->function("t_trg_ic_deeptau_medium_mvadm_mutau_data_mvadm"+mvadm+"_down")->getVal();
+	  eff_mc_trig_lt_tauDown = w->function("t_trg_ic_deeptau_medium_mvadm_mutau_" + suffix + "_mvadm"+mvadm+"_down")->getVal();
+	  eff_data_trig_L = w->function("m_trg_ic_data")->getVal();
+	  eff_mc_trig_L = w->function("m_trg_ic_" + suffix)->getVal();
+	  if (era == 2016) {
+	    eff_data_trig_lt_l = w->function("m_trg_19_ic_data")->getVal();
+	    eff_mc_trig_lt_l = w->function("m_trg_19_ic_" + suffix)->getVal();
 	  }
+	  else {
+	    eff_data_trig_lt_l = w->function("m_trg_20_ic_data")->getVal();
+	    eff_mc_trig_lt_l = w->function("m_trg_20_ic_" + suffix)->getVal();
+	  }
+	  otree->idisoweight_1 = w->function("m_idiso_ic_" + suffixRatio)->getVal();
+	  otree->idisoweight_antiiso_1 = w->function("m_idiso_ic_" + suffixRatio)->getVal();
+	  otree->trkeffweight = w->function("m_trk_ratio")->getVal();
+	}
+	else if (ch == "et") {
+	  w->var("e_pt")->setVal(leptonLV.Pt());
+	  w->var("e_eta")->setVal(leptonLV.Eta());
+	  eff_data_trig_L = w->function("e_trg_ic_data")->getVal();
+	  eff_mc_trig_L = w->function("e_trg_ic_" + suffix)->getVal();
+	  if (era > 2016) {
+	    eff_data_trig_lt_tau = w->function("t_trg_mediumDeepTau_etau_data")->getVal();
+	    eff_mc_trig_lt_tau = w->function("t_trg_mediumDeepTau_etau_" + suffix)->getVal();
+	    eff_data_trig_lt_l = w->function("e_trg_24_ic_data")->getVal();
+	    eff_mc_trig_lt_l = w->function("e_trg_24_ic_" + suffix)->getVal();
+	  }
+	  else {
+	    eff_data_trig_lt_tau = 0;
+	    eff_mc_trig_lt_tau = 0;
+	    eff_data_trig_lt_l = 0;
+	    eff_mc_trig_lt_l = 0;
+	  }
+	  otree->idisoweight_1 = w->function("e_idiso_ic_" + suffixRatio)->getVal();
+	  otree->idisoweight_antiiso_1 = w->function("e_idiso_ic_" + suffixRatio)->getVal();
+	  otree->trkeffweight = w->function("e_trk_" + suffixRatio)->getVal();
+	}
+                                                                                                                                                                     
+	double eff_data_trig = eff_data_trig_L + (eff_data_trig_lt_l - eff_data_trig_L) * eff_data_trig_lt_tau;
+	double eff_mc_trig = eff_mc_trig_L + (eff_mc_trig_lt_l - eff_mc_trig_L) * eff_mc_trig_lt_tau;                                                            
+	double eff_data_trigUp = eff_data_trig_L + (eff_data_trig_lt_l - eff_data_trig_L) * eff_data_trig_lt_tauUp;
+	double eff_mc_trigUp = eff_mc_trig_L + (eff_mc_trig_lt_l - eff_mc_trig_L) * eff_mc_trig_lt_tauUp;                                                   
+	double eff_data_trigDown = eff_data_trig_L + (eff_data_trig_lt_l - eff_data_trig_L) * eff_data_trig_lt_tauDown;
+	double eff_mc_trigDown = eff_mc_trig_L + (eff_mc_trig_lt_l - eff_mc_trig_L) * eff_mc_trig_lt_tauDown;
+	if (era == 2016 && ch == "et") {
+	  eff_data_trig = eff_data_trig_L;
+	  eff_mc_trig = eff_mc_trig_L;
+	}
+	if (eff_data_trig > 1e-4 && eff_mc_trig > 1e-4){
+	  otree->trigweight = eff_data_trig / eff_mc_trig;
+	  double trigweightUp = (eff_data_trigUp / eff_mc_trigUp) / (eff_data_trig / eff_mc_trig);
+	  double trigweightDown = (eff_data_trigDown / eff_mc_trigDown) / (eff_data_trig / eff_mc_trig);
+	  
+	  if(mvadm=="0"){
+	    otree->weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVUp = trigweightUp;
+	    otree->weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVDown = trigweightDown;
+	  }else if(mvadm=="1"){
+	    otree->weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVUp = trigweightUp;
+	    otree->weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVDown = trigweightDown;
+	  }else if(mvadm=="2"){
+	    otree->weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVUp = trigweightUp;
+	    otree->weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVDown = trigweightDown;
+	  }else if(mvadm=="10"){
+	    otree->weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVUp = trigweightUp;
+	    otree->weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVDown = trigweightDown;
+	  }else if(mvadm=="11"){
+	    otree->weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVUp = trigweightUp;
+	    otree->weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVDown = trigweightDown;
+	  }
+	}
       }
       counter[10]++;
     
@@ -1317,12 +1325,17 @@ int main(int argc, char * argv[]){
       if ((!isData || isEmbedded) && analysisTree.tau_genmatch[tauIndex] == 5) { 
       	TString suffix = "";
       	if (isEmbedded) suffix = "_embed";
-
+	
 	TString mvadm = TString::Itoa(analysisTree.tau_MVADM2017v1[tauIndex],10);
+	if (analysisTree.tau_MVADM2017v1[tauIndex]<0.0)
+	  mvadm = TString::Itoa(analysisTree.tau_decayMode[tauIndex],10);;
 	double t_pt = analysisTree.tau_pt[tauIndex];
-
+	
       	w->var("t_pt")->setVal(analysisTree.tau_pt[tauIndex]);
-      	w->var("t_mvadm")->setVal(analysisTree.tau_MVADM2017v1[tauIndex]);
+	if (analysisTree.tau_MVADM2017v1[tauIndex]<0.0) 
+	  w->var("t_mvadm")->setVal(analysisTree.tau_decayMode[tauIndex]);
+	else
+	  w->var("t_mvadm")->setVal(analysisTree.tau_MVADM2017v1[tauIndex]);
 	double nominalID = w->function("t_deeptauid_mvadm"+suffix+"_medium")->getVal();
 	otree->idisoweight_2 = nominalID;
 	//cout <<nominalID <<endl;
@@ -1330,7 +1343,7 @@ int main(int argc, char * argv[]){
 	double tauIDhighpTUp = w->function("t_deeptauid_mvadm"+suffix+"_medium_highpt_mvadm"+mvadm+"_up")->getVal() / nominalID;
 	double tauIDlowpTDown = w->function("t_deeptauid_mvadm"+suffix+"_medium_lowpt_mvadm"+mvadm+"_down")->getVal() / nominalID;
 	double tauIDhighpTDown = w->function("t_deeptauid_mvadm"+suffix+"_medium_highpt_mvadm"+mvadm+"_down")->getVal() / nominalID;
-
+	
 	if(mvadm=="0"){
 	  if(t_pt<40){
 	    otree->weight_CMS_eff_t_pTlow_MVADM0_13TeVUp = tauIDlowpTUp;
@@ -1745,9 +1758,13 @@ int main(int argc, char * argv[]){
       IpCorrection * ipCorrector = NULL;
       ImpactParameter IP;
       if (ApplyIpCorrection && (!isData || isEmbedded)) ipCorrector = ip; 
-      //      std::cout << " ipCorrector : " << ipCorrector << std::endl; 
+      //      std::cout << "before..." << std::endl;
       acott_Impr(&analysisTree, otree, leptonIndex, tauIndex, ch,ipCorrector);
+      //      std::cout << "after..." << std::endl;
 
+      otree->acotautau_00 = otree->acotautau_refitbs_00;
+      otree->acotautau_01 = otree->acotautau_refitbs_01;
+      
       TVector3 vertex(vtx_x,vtx_y,vtx_z);
       ROOT::Math::SMatrix<float,3,3, ROOT::Math::MatRepStd< float, 3, 3 >> ipCov1;
       TVector3 IP1;
@@ -1859,6 +1876,16 @@ int main(int argc, char * argv[]){
 	ipCov2_corr = ipCorrector->correctIpCov(ipCov2,otree->eta_2);      
       otree->IP_signif_RefitV_with_BS_2 = IP.CalculateIPSignificanceHelical(Ip2, ipCov2_corr);      
 
+      otree->tauspinnerH = 0.;
+      otree->tauspinnerA = 0.;
+      otree->tauspinnerMaxMix = 0.;
+      if (!std::isnan(otree->TauSpinnerWeightsEven)) 
+	otree->tauspinnerH = otree->TauSpinnerWeightsEven;
+      if (!std::isnan(otree->TauSpinnerWeightsOdd)) 
+	otree->tauspinnerA = otree->TauSpinnerWeightsOdd;
+      if (!std::isnan(otree->TauSpinnerWeightsMaxMix)) 
+	otree->tauspinnerMaxMix = otree->TauSpinnerWeightsMaxMix;
+
       /*
       std::cout << "IPSig(1) = " << otree->IP_signif_RefitV_with_BS_uncorr_1
 		<< "  :  " << otree->IP_signif_RefitV_with_BS_1 
@@ -1869,6 +1896,9 @@ int main(int argc, char * argv[]){
 		<< "  -> " << otree->IP_signif_PV_with_BS_2 << std::endl;
       std::cout << std::endl;
       */
+
+      otree->ip_sig_1 = otree->IP_signif_RefitV_with_BS_1;
+      otree->ip_sig_2 = otree->IP_signif_RefitV_with_BS_2;
         
       // evaluate systematics for MC 
       if( !isData && !isEmbedded && ApplySystShift){

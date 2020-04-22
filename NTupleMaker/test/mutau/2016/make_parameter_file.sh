@@ -4,14 +4,17 @@ echo "CONFIGFILE,FILELIST" > parameters.txt
 
 ## Test for 2016
 #data
-./split_filelist.sh analysisMacroSynch_mt_16_data.conf SingleMuon_Run2016A 4
 ./split_filelist.sh analysisMacroSynch_mt_16_data.conf SingleMuon_Run2016B 4
 ./split_filelist.sh analysisMacroSynch_mt_16_data.conf SingleMuon_Run2016C 4
 ./split_filelist.sh analysisMacroSynch_mt_16_data.conf SingleMuon_Run2016D 4
+./split_filelist.sh analysisMacroSynch_mt_16_data.conf SingleMuon_Run2016E 4
+./split_filelist.sh analysisMacroSynch_mt_16_data.conf SingleMuon_Run2016F 4
+./split_filelist.sh analysisMacroSynch_mt_16_data.conf SingleMuon_Run2016G 4
+./split_filelist.sh analysisMacroSynch_mt_16_data.conf SingleMuon_Run2016H 4
 
 # Signals
-./split_filelist.sh analysisMacroSynch_mt_16_MC.conf GluGluHToTauTau_M125 4
-./split_filelist.sh analysisMacroSynch_mt_16_MC.conf VBFHToTauTau_M125 4
+#./split_filelist.sh analysisMacroSynch_mt_16_MC.conf GluGluHToTauTau_M125 4
+#./split_filelist.sh analysisMacroSynch_mt_16_MC.conf VBFHToTauTau_M125 4
 ##  commented since now switching to TauSpinner weights
 # ./split_filelist.sh analysisMacroSynch_mt_SUSYGluGluToHToTauTau_M-120_TuneCP5_13TeV-pythia8.conf SUSYGluGluToHToTauTau 4
 
@@ -28,10 +31,13 @@ echo "CONFIGFILE,FILELIST" > parameters.txt
 ./split_filelist.sh analysisMacroSynch_mt_16_MC.conf DY4JetsToLL_M-50 10
 
 # Embedded
-./split_filelist.sh analysisMacroSynch_mt_16_embedded.conf EmbeddedMuTau_Run2016A 3
 ./split_filelist.sh analysisMacroSynch_mt_16_embedded.conf EmbeddedMuTau_Run2016B 3
 ./split_filelist.sh analysisMacroSynch_mt_16_embedded.conf EmbeddedMuTau_Run2016C 3
 ./split_filelist.sh analysisMacroSynch_mt_16_embedded.conf EmbeddedMuTau_Run2016D 3
+./split_filelist.sh analysisMacroSynch_mt_16_embedded.conf EmbeddedMuTau_Run2016E 3
+./split_filelist.sh analysisMacroSynch_mt_16_embedded.conf EmbeddedMuTau_Run2016F 3
+./split_filelist.sh analysisMacroSynch_mt_16_embedded.conf EmbeddedMuTau_Run2016G 3
+./split_filelist.sh analysisMacroSynch_mt_16_embedded.conf EmbeddedMuTau_Run2016H 3
 
 # W+jets
 ./split_filelist.sh analysisMacroSynch_mt_16_MC.conf WJetsToLNu 10
@@ -46,9 +52,7 @@ echo "CONFIGFILE,FILELIST" > parameters.txt
 ./split_filelist.sh analysisMacroSynch_mt_16_MC.conf ZZ 10
 
 # TT
-./split_filelist.sh analysisMacroSynch_mt_16_MC.conf TTTo2L2Nu 3
-./split_filelist.sh analysisMacroSynch_mt_16_MC.conf TTToHadronic 3
-./split_filelist.sh analysisMacroSynch_mt_16_MC.conf TTToSemiLeptonic 3
+./split_filelist.sh analysisMacroSynch_mt_16_MC.conf TT 3
 
 # Single Top
 ./split_filelist.sh analysisMacroSynch_mt_16_MC.conf ST_t-channel_antitop_4f 10

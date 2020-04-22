@@ -13,6 +13,7 @@
 #include "HiggsCPinTauDecays/IpCorrection/interface/IpCorrection.h"
 
 #define PI_MASS         0.13957 //All energies and momenta are expressed in GeV
+#define PI0_MASS        0.13498
 #define MUON_MASS       0.105658
 #define ELECTRON_MASS   0.000511
 #define RHO_MASS        0.775260
@@ -313,16 +314,16 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
   }
   
   //make here a scan if the second decay is hadronic. Only for e-mu would not require this..
+  /*
   if(channel == "mt" || channel == "et"){
     for(unsigned int pindex = 0; pindex < analysisTree->tau_constituents_count[tauIndex2]; pindex++){
       if(abs(analysisTree->tau_constituents_pdgId[tauIndex2][pindex]) == 211){
-	//if(abs(analysisTree->tau_constituents_pdgId[tauIndex2][pindex])==13){
 	decay2haspion = true;
 	break;
       }
     }
   }
-  
+  */
   //Merijn: these definitions can be discussed and adjusted to include 3 prong decays, the allow for mode 10 as well
   bool correctDecay1 = false;
   bool correctDecay2 = false;
@@ -330,8 +331,9 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
 
   if(channel == "mt" || channel == "et"){
     correctDecay1 = true;
-    //    correctDecay2 = true;
-    correctDecay2 = analysisTree->tau_decayMode[tauIndex2] <= 10 && decay2haspion;
+    int piIndex2 = chargedPiIndex(analysisTree, tauIndex2);
+    correctDecay2 = piIndex2>-1;
+    //    correctDecay2 = analysisTree->tau_decayMode[tauIndex2] <= 10 && decay2haspion;
   }
 
   if(channel=="tt"){//just require both to be hadronic
@@ -521,18 +523,19 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
   
   if(channel=="tt"){ if(analysisTree->tau_decayMode[tauIndex1]>=1&&analysisTree->tau_decayMode[tauIndex1]<=3) tau1Pi0 = neutralPivec(analysisTree,tauIndex1);}
   
-  if(analysisTree->tau_decayMode[tauIndex2]>=1&&analysisTree->tau_decayMode[tauIndex2]<=3){ 
-	  tau2Pi0 = neutralPivec(analysisTree,tauIndex2); }
+  if((analysisTree->tau_decayMode[tauIndex2]>=1&&analysisTree->tau_decayMode[tauIndex2])<=3||
+     (analysisTree->tau_MVADM2017v1[tauIndex2]>=0.5&&analysisTree->tau_MVADM2017v1[tauIndex2]<=3.5)){ 
+    tau2Pi0 = neutralPivec(analysisTree,tauIndex2); }
  
   otree->acotautau_00=acoCP(tau1Prong,tau2Prong,tau1IP,tau2IP,firstNegative,false,false,otree);
   otree->acotautau_bs_00=acoCP(tau1Prong,tau2Prong,tau1IP_bs,tau2IP_bs,firstNegative,false,false,otree);
   otree->acotautau_refitbs_00=acoCP(tau1Prong,tau2Prong,tau1IP_refitbs,tau2IP_refitbs,firstNegative,false,false,otree);
   otree->acotautau_helix_00=acoCP(tau1Prong,tau2Prong,tau1IP_helix,tau2IP_helix,firstNegative,false,false,otree);
-
+  
   otree->acotautau_refitbs_uncorr_00=acoCP(tau1Prong,tau2Prong,tau1IP_refitbs_uncorr,tau2IP_refitbs_uncorr,firstNegative,false,false,otree);
   otree->acotautau_helix_uncorr_00=acoCP(tau1Prong,tau2Prong,tau1IP_helix_uncorr,tau2IP_helix_uncorr,firstNegative,false,false,otree);
   //I think it should work since everything assigned for 3 cases. Note: aco_00 will be filled with mu x 1-prong and mu x 1.1-prong
-
+  
   //  std::cout << "MODE = " << analysisTree->tau_decayMode[tauIndex2] << std::endl;
   if (otree->acotautau_refitbs_00<-100) {
     cout << otree->acotautau_refitbs_00 << " : " << otree->acotautau_refitbs_uncorr_00 << std::endl;
@@ -540,7 +543,8 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
 
   std::vector<TLorentzVector> partLV; partLV.clear();
   if(channel=="et"||channel=="mt"){//we only fill aco_01 for et and mt
-    if (analysisTree->tau_decayMode[tauIndex2]==1){
+    if ((analysisTree->tau_decayMode[tauIndex2]>=1&&analysisTree->tau_decayMode[tauIndex2]<=3)||
+	(analysisTree->tau_MVADM2017v1[tauIndex2]>=0.5&&analysisTree->tau_MVADM2017v1[tauIndex2]<=3.5)){
       otree->acotautau_01=acoCP(tau1Prong,tau2Prong,tau1IP,tau2Pi0,firstNegative,false,true,otree);
       otree->acotautau_bs_01=acoCP(tau1Prong,tau2Prong,tau1IP_bs,tau2Pi0,firstNegative,false,true,otree);
       otree->acotautau_refitbs_01=acoCP(tau1Prong,tau2Prong,tau1IP_refitbs,tau2Pi0,firstNegative,false,true,otree);
@@ -550,7 +554,8 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
       otree->acotautau_helix_uncorr_01=acoCP(tau1Prong,tau2Prong,tau1IP_helix_uncorr,tau2Pi0,firstNegative,false,true,otree);
 
     }    
-    if (analysisTree->tau_decayMode[tauIndex2]==10){
+    if (analysisTree->tau_decayMode[tauIndex2]==10||analysisTree->tau_decayMode[tauIndex2]==11||
+	(analysisTree->tau_MVADM2017v1[tauIndex2]>=9.5&&analysisTree->tau_MVADM2017v1[tauIndex2]<=11.5)){
       partLV = a1_rho_pi(analysisTree,tauIndex2);
       /*
       std::cout << "a1->rho+pi ---> " << std::endl;
@@ -692,17 +697,20 @@ int chargedPiIndex(const AC1B * analysisTree, int tauIndex){
   float maxPt = -1;
   int sign = -1;
   if(analysisTree->tau_charge[tauIndex] > 0) sign = 1; 
+  bool piFound = false;
   for(int i = 0; i < ncomponents; i++){ 
-		if((analysisTree->tau_constituents_pdgId[tauIndex][i]*sign) == 211){
+    if((analysisTree->tau_constituents_pdgId[tauIndex][i]*sign) == 211 || 
+       (analysisTree->tau_constituents_pdgId[tauIndex][i]*sign) == -13 || 
+       (analysisTree->tau_constituents_pdgId[tauIndex][i]*sign) == -11){
       TLorentzVector lvector; 
-			lvector.SetXYZT(analysisTree->tau_constituents_px[tauIndex][i],
-								      analysisTree->tau_constituents_py[tauIndex][i],
-								      analysisTree->tau_constituents_pz[tauIndex][i],
-								      analysisTree->tau_constituents_e[tauIndex][i]);
+      lvector.SetXYZT(analysisTree->tau_constituents_px[tauIndex][i],
+		      analysisTree->tau_constituents_py[tauIndex][i],
+		      analysisTree->tau_constituents_pz[tauIndex][i],
+		      analysisTree->tau_constituents_e[tauIndex][i]);
       double Pt = lvector.Pt();
       if(Pt > maxPt){
-				piIndex = i;
-				maxPt = Pt;
+	piIndex = i;
+	maxPt = Pt;
       }
     }
   }
@@ -712,23 +720,43 @@ int chargedPiIndex(const AC1B * analysisTree, int tauIndex){
 TLorentzVector neutralPivec(const AC1B * analysisTree, int tauIndex){
   int ncomponents = analysisTree->tau_constituents_count[tauIndex];
   int piIndex=-1;
-  TLorentzVector neutralPi; neutralPi.SetXYZT(0.,0.,0.,0.);
   
-  
+  double etot = 0.;
+  double emax = 0.;
+  TLorentzVector neutralpart; neutralpart.SetXYZT(0.,0.,0.,0.);     //momentum of the leading particle
   for(int i=0;i<ncomponents;i++){
     if(analysisTree->tau_constituents_pdgId[tauIndex][i]==22||abs(analysisTree->tau_constituents_pdgId[tauIndex][i])==11){
 
-      TLorentzVector neutralpart;      //momenta for photons, electrons and positrons
-
-      neutralpart.SetPxPyPzE(analysisTree->tau_constituents_px[tauIndex][i],
-			     analysisTree->tau_constituents_py[tauIndex][i],
-			     analysisTree->tau_constituents_pz[tauIndex][i],
-			     analysisTree->tau_constituents_e[tauIndex][i]);
-      neutralPi+=neutralpart;
+      etot += analysisTree->tau_constituents_e[tauIndex][i];
+      if (analysisTree->tau_constituents_e[tauIndex][i]>emax) {
+	neutralpart.SetPxPyPzE(analysisTree->tau_constituents_px[tauIndex][i],
+			       analysisTree->tau_constituents_py[tauIndex][i],
+			       analysisTree->tau_constituents_pz[tauIndex][i],
+			       analysisTree->tau_constituents_e[tauIndex][i]);
+	emax = analysisTree->tau_constituents_e[tauIndex][i];
       }
+    }
+  }
+  
+  if (etot>PI0_MASS) {
+    double mom = neutralpart.P();
+    double momtot = TMath::Sqrt(etot*etot-PI0_MASS*PI0_MASS);
+    double scale = momtot/mom;
+    double px = scale*neutralpart.Px();
+    double py = scale*neutralpart.Py();
+    double pz = scale*neutralpart.Pz();
+    neutralpart.SetPxPyPzE(px,py,pz,etot);
+  }
+  else {
+    double mom = neutralpart.P();
+    double scale = etot/mom;
+    double px = scale*neutralpart.Px();
+    double py = scale*neutralpart.Py();
+    double pz = scale*neutralpart.Pz();
+    neutralpart.SetPxPyPzE(px,py,pz,etot);    
   }
 
-  return neutralPi;
+  return neutralpart;
 };
 
 TLorentzVector ipVec(const AC1B * analysisTree, int muonIndex, int tauIndex, int vertexType) {

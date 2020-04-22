@@ -996,7 +996,8 @@ void NTupleMaker::beginJob(){
       tree->Branch("genid2", &genid2, "genid2/F");
       tree->Branch("genx2", &genx2, "genx2/F");
       tree->Branch("genScale", &genScale, "genScale/F");
-
+      tree->Branch("gen_pythiaweights", &gen_pythiaweights, "gen_pythiaweights[20]/F");
+      
       for (int iScale=0; iScale<9; ++iScale) {
 	char number[4];
 	sprintf(number,"%1i",iScale);
@@ -2569,6 +2570,14 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	  genid2 = HEPMC->pdf()->id.first;
 	  genx2 = HEPMC->pdf()->x.second;
 	  genScale = HEPMC->qScale();
+	  
+	  //ISR and FSR weights for CP analysis
+	  vector<double> pythiaWeights = HEPMC->weights();
+	  for( size_t iW=0; iW < std::min( (size_t)pythiaWeights.size(), (size_t)M_Nweights ); iW++ )
+	    gen_pythiaweights[iW] = pythiaWeights[iW];
+	  // cout << pythiaWeights[iW] << " ";
+	  // cout << endl;
+	    
 	}
 
       edm::Handle<vector<PileupSummaryInfo> > PUInfo;
@@ -4512,12 +4521,14 @@ unsigned int NTupleMaker::AddPFJets(const edm::Event& iEvent, const edm::EventSe
 	  pfjet_pu_jet_fullId_loose[pfjet_count]  = false;
 	  pfjet_pu_jet_fullId_medium[pfjet_count] = false;
 	  pfjet_pu_jet_fullId_tight[pfjet_count]  = false;
-	  /*
-	  pfjet_pu_jet_fullDisc_mva[pfjet_count]  = (*pfjets)[i].userFloat("pileupJetIdUpdated:fullDiscriminant");
-	  pfjet_pu_jet_fullId_loose[pfjet_count]  = ( (*pfjets)[i].userInt("pileupJetIdUpdated:fullId") & (1<<2) );
-	  pfjet_pu_jet_fullId_medium[pfjet_count] = ( (*pfjets)[i].userInt("pileupJetIdUpdated:fullId") & (1<<1) );
-	  pfjet_pu_jet_fullId_tight[pfjet_count]  = ( (*pfjets)[i].userInt("pileupJetIdUpdated:fullId") & (1<<0) );
-	  */
+	  
+	  if(pfjet_pt[pfjet_count]>=20){
+	    pfjet_pu_jet_fullDisc_mva[pfjet_count]  = (*pfjets)[i].userFloat("pileupJetId:fullDiscriminant");
+	    pfjet_pu_jet_fullId_loose[pfjet_count]  = ( (*pfjets)[i].userInt("pileupJetId:fullId") & (1<<2) || pfjet_pt[pfjet_count]>50 );
+	    pfjet_pu_jet_fullId_medium[pfjet_count] = ( (*pfjets)[i].userInt("pileupJetId:fullId") & (1<<1) || pfjet_pt[pfjet_count]>50 );
+	    pfjet_pu_jet_fullId_tight[pfjet_count]  = ( (*pfjets)[i].userInt("pileupJetId:fullId") & (1<<0) || pfjet_pt[pfjet_count]>50 );
+	  }
+	  
 
 	  for(unsigned n = 0 ; n < cBtagDiscriminators.size() ; n++)
 	    {
