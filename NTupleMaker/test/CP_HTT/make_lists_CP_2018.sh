@@ -3,12 +3,12 @@
 CHANNEL=$1
 
 dirMC=/pnfs/desy.de/cms/tier2/store/user/acardini/ntuples/2018/mc_v2
-if [[ CHANNEL == "mt" ]]; then
+if [[ $CHANNEL == "mt" ]]; then
   dirData=/pnfs/desy.de/cms/tier2/store/user/acardini/ntuples/2018/data_v2/SingleMuon
   dirEmbedded=/pnfs/desy.de/cms/tier2/store/user/acardini/ntuples/2018/embedded/Embedding_mutau
   OUTDIR=./mutau/2018
 else
-  if [[ CHANNEL == "et" ]]; then
+  if [[ $CHANNEL == "et" ]]; then
     dirData=/pnfs/desy.de/cms/tier2/store/user/acardini/ntuples/2018/data_v2/SingleMuon
     dirEmbedded=/pnfs/desy.de/cms/tier2/store/user/acardini/ntuples/2018/embedded/Embedding_mutau
     OUTDIR=./etau/2018
@@ -56,14 +56,14 @@ ls $dirMC/ZZ_TuneCP5_13TeV-pythia8/*root > $OUTDIR/ZZ
 ls $dirMC/GluGluToHToTauUncorrelatedDecay_M125/*root > $OUTDIR/GluGluHToTauTauUncorrDecays_M125
 ls $dirMC/VBFHToTauTauUncorrelatedDecay_M125/*root > $OUTDIR/VBFHToTauTauUncorrDecays_M125
 
-if [[ CHANNEL == "mt" ]]; then
+if [[ $CHANNEL == "mt" ]]; then
   ls $dirData/SingleMuon_Run2018A/*root > $OUTDIR/SingleMuon_Run2018A
   ls $dirData/SingleMuon_Run2018B/*root > $OUTDIR/SingleMuon_Run2018B
   ls $dirData/SingleMuon_Run2018C/*root > $OUTDIR/SingleMuon_Run2018C
   ls $dirData/SingleMuon_Run2018D/*root > $OUTDIR/SingleMuon_Run2018D
 fi
 
-if [[ CHANNEL == "mt" ]]; then
+if [[ $CHANNEL == "mt" ]]; then
   ls $dirEmbedded/EmbeddingRun2018A_MuTau/*root > $OUTDIR/EmbeddedMuTau_Run2018A
   ls $dirEmbedded/EmbeddingRun2018B_MuTau/*root > $OUTDIR/EmbeddedMuTau_Run2018B
   ls $dirEmbedded/EmbeddingRun2018C_MuTau/*root > $OUTDIR/EmbeddedMuTau_Run2018C
