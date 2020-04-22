@@ -1,8 +1,27 @@
 #!/bin/sh
-dirDataSingleMuon=/nfs/dust/cms/user/rasp/ntuples/2017/data/SingleMuon
+
+CHANNEL=$1
+
 dirMC=/pnfs/desy.de/cms/tier2/store/user/acardini/ntuples/2017/mc
-dirEmbedded=/pnfs/desy.de/cms/tier2/store/user/acardini/ntuples/2017/embedded/Embedding_mutau
-OUTDIR=./2017
+if [[ CHANNEL == "mt" ]]; then
+  dirData=/nfs/dust/cms/user/rasp/ntuples/2017/data/SingleMuon
+  dirEmbedded=/pnfs/desy.de/cms/tier2/store/user/acardini/ntuples/2017/embedded/Embedding_mutau
+  OUTDIR=./mutau/2017
+else
+  if [[ CHANNEL == "et" ]]; then
+    dirData=/nfs/dust/cms/user/rasp/ntuples/2017/data/SingleMuon
+    dirEmbedded=/pnfs/desy.de/cms/tier2/store/user/acardini/ntuples/2017/embedded/Embedding_mutau
+    OUTDIR=./etau/2017
+  else 
+    echo
+    echo "To produce file lists for a specific channel this script is to be run with a command:"
+    echo
+    echo "  ./make_lists_CP_2017.sh <channel={mt,et}>"
+    echo
+    echo "channel is not mt or et - exiting"
+    exit
+  fi
+fi
 
 if [ ! -d "$OUTDIR" ]; then
   mkdir $OUTDIR
@@ -41,21 +60,21 @@ ls $dirMC/WW_TuneCP5_13TeV-pythia8/*root > $OUTDIR/WW
 ls $dirMC/WZ_TuneCP5_13TeV-pythia8/*root > $OUTDIR/WZ
 ls $dirMC/ZZ_TuneCP5_13TeV-pythia8/*root > $OUTDIR/ZZ
 
-
-ls $dirDataSingleMuon/SingleMuon_Run2017B/*root > $OUTDIR/SingleMuon_Run2017B
-ls $dirDataSingleMuon/SingleMuon_Run2017C/*root > $OUTDIR/SingleMuon_Run2017C
-ls $dirDataSingleMuon/SingleMuon_Run2017D/*root > $OUTDIR/SingleMuon_Run2017D
-ls $dirDataSingleMuon/SingleMuon_Run2017E/*root > $OUTDIR/SingleMuon_Run2017E
-ls $dirDataSingleMuon/SingleMuon_Run2017F/*root > $OUTDIR/SingleMuon_Run2017F
-
 ls $dirMC/GluGluHToTauTauUncorrelatedDecay_Filtered_M125/*root > $OUTDIR/GluGluHToTauTauUncorrDecays_M125
 ls $dirMC/VBFHToTauTauUncorrelatedDecay_Filtered_M125/*root > $OUTDIR/VBFHToTauTauUncorrDecays_M125
 
-# ls /pnfs/desy.de/cms/tier2/store/user/mvandekl/2017/mc/GluGluToHToTauTauNoSpin_Unfiltered_Rev1/*.root > $OUTDIR/GluGluToHToTauTauNoSpinCorr_Unfiltered
-# ls /pnfs/desy.de/cms/tier2/store/user/mvandekl/2017/mc/VBFHToTauTauNoSpin_Unfiltered_Rev1/*.root > $OUTDIR/VBFHToTauTauNoSpinCorr_Unfiltered
+if [[ CHANNEL == "mt" ]]; then
+  ls $dirData/SingleMuon_Run2017B/*root > $OUTDIR/SingleMuon_Run2017B
+  ls $dirData/SingleMuon_Run2017C/*root > $OUTDIR/SingleMuon_Run2017C
+  ls $dirData/SingleMuon_Run2017D/*root > $OUTDIR/SingleMuon_Run2017D
+  ls $dirData/SingleMuon_Run2017E/*root > $OUTDIR/SingleMuon_Run2017E
+  ls $dirData/SingleMuon_Run2017F/*root > $OUTDIR/SingleMuon_Run2017F
+fi
 
-ls $dirEmbedded/EmbeddingRun2017B_MuTau/*root > $OUTDIR/EmbeddedMuTau_Run2017B
-ls $dirEmbedded/EmbeddingRun2017C_MuTau/*root > $OUTDIR/EmbeddedMuTau_Run2017C
-ls $dirEmbedded/EmbeddingRun2017D_MuTau/*root > $OUTDIR/EmbeddedMuTau_Run2017D
-ls $dirEmbedded/EmbeddingRun2017E_MuTau/*root > $OUTDIR/EmbeddedMuTau_Run2017E
-ls $dirEmbedded/EmbeddingRun2017F_MuTau/*root > $OUTDIR/EmbeddedMuTau_Run2017F
+if [[ CHANNEL == "mt" ]]; then
+  ls $dirEmbedded/EmbeddingRun2017B_MuTau/*root > $OUTDIR/EmbeddedMuTau_Run2017B
+  ls $dirEmbedded/EmbeddingRun2017C_MuTau/*root > $OUTDIR/EmbeddedMuTau_Run2017C
+  ls $dirEmbedded/EmbeddingRun2017D_MuTau/*root > $OUTDIR/EmbeddedMuTau_Run2017D
+  ls $dirEmbedded/EmbeddingRun2017E_MuTau/*root > $OUTDIR/EmbeddedMuTau_Run2017E
+  ls $dirEmbedded/EmbeddingRun2017F_MuTau/*root > $OUTDIR/EmbeddedMuTau_Run2017F
+fi
