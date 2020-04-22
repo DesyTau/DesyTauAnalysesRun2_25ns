@@ -116,14 +116,15 @@ bool isGoodLumi(int run, int lumi, const lumi_json& json){
 }
 
 float getEffectiveArea(float eta) {
-    float effArea = 0.1440;
-    if (eta<=0) eta=fabs(eta);
-    if (eta > 1.0 && eta < 1.4790) effArea = 0.1562;
-    else if (eta < 2.0)    effArea = 0.1032;
-    else if (eta < 2.2)    effArea = 0.0859;
-    else if (eta < 2.3)    effArea = 0.1116;
-    else if (eta < 2.4)    effArea = 0.1321;
-    else if (eta < 2.5)    effArea = 0.1654;
+    float effArea =  0.1440;
+    float absEta = fabs(eta);
+    if (absEta<1.0) effArea = 0.1440;
+    else if (absEta < 1.4790) effArea = 0.1562;
+    else if (absEta < 2.0) effArea = 0.1032;
+    else if (absEta < 2.2) effArea = 0.0859;
+    else if (absEta < 2.3) effArea = 0.1116;
+    else if (absEta < 2.4) effArea = 0.1321;
+    else if (absEta < 5.0) effArea = 0.1654;
     return effArea;
 
   } 
@@ -254,10 +255,6 @@ float abs_Iso_mt (int Index, const AC1B * analysisTree, float dRiso){
 
 float abs_Iso_et (int Index, const AC1B * analysisTree, float dRiso){
 
-  float neutralHadIso = -9999.;
-  float photonIso     = -9999.;
-  float chargedHadIso = -9999.;
-  float puIso         = -9999.;
   float absIso        = -9999.;
   float isoCone       = 0.3;
   float neutralIso    = -9999.;
@@ -269,13 +266,10 @@ float abs_Iso_et (int Index, const AC1B * analysisTree, float dRiso){
     analysisTree->rho*TMath::Pi()*isoCone*isoCone;
   neutralIso = TMath::Max(float(0),neutralIso);
   return(absIso + neutralIso);
-
   */
  
   float  eA = getEffectiveArea( fabs(analysisTree->electron_superclusterEta[Index]) );
- 
   absIso = analysisTree->electron_r03_sumChargedHadronPt[Index];
-
   neutralIso = analysisTree->electron_r03_sumNeutralHadronEt[Index] +
     analysisTree->electron_r03_sumPhotonEt[Index] -
     eA*analysisTree->rho;
@@ -316,8 +310,7 @@ bool dilepton_veto_mt(const Config *cfg,const  AC1B *analysisTree){
     float dxyDiMuonVeto = cfg->get<float>("dxyDiMuonVeto");
     float dzDiMuonVeto = cfg->get<float>("dzDiMuonVeto");
     float isoDiMuonVeto = cfg->get<float>("isoDiMuonVeto");
-    float dRiso = cfg->get<float>("dRiso");
-    float applyDiMuonOS = cfg->get<bool>("applyDiMuonOS");
+    float dRiso = cfg->get<float>("dRisoDiMuonVeto");
     float drDiMuonVeto = cfg->get<float>("drDiMuonVeto");
     
     if (analysisTree->muon_pt[im] <= ptDiMuonVeto) continue;
@@ -334,7 +327,7 @@ bool dilepton_veto_mt(const Config *cfg,const  AC1B *analysisTree){
       if (fabs(analysisTree->muon_eta[je]) >= etaDiMuonVeto) continue;	
       if (fabs(analysisTree->muon_dxy[je]) >= dxyDiMuonVeto) continue;
       if (fabs(analysisTree->muon_dz[je]) >= dzDiMuonVeto) continue;
-      if (analysisTree->muon_charge[im] * analysisTree->muon_charge[je] > 0. && applyDiMuonOS) continue;
+      if (analysisTree->muon_charge[im] * analysisTree->muon_charge[je] > 0.) continue;
 
       float relIsoMu = abs_Iso_mt(je, analysisTree, dRiso) / analysisTree->muon_pt[je];
       if(relIsoMu >= isoDiMuonVeto) continue;	
@@ -360,12 +353,12 @@ bool dilepton_veto_et(const Config *cfg,const  AC1B *analysisTree){
     if (fabs(analysisTree->electron_dxy[ie])>=cfg->get<float>("dxyDiElectronVeto")) continue;
     if (fabs(analysisTree->electron_dz[ie])>=cfg->get<float>("dzDiElectronVeto")) continue;
 
-    float absIsoEle =   abs_Iso_et(ie, analysisTree, cfg->get<float>("dRiso"));
+    float absIsoEle =   abs_Iso_et(ie, analysisTree, cfg->get<float>("dRisoDiElectronVeto"));
     float relIsoEle =   absIsoEle / analysisTree->electron_pt[ie] ;
     if(relIsoEle >= cfg->get<float>("isoDiElectronVeto")) continue;
     
-    bool passedVetoId =  passedSummer16VetoId(analysisTree, ie); //analysisTree->electron_cutId_veto_Summer16[ie];
-    if (!passedVetoId && cfg->get<bool>("applyDiElectronVetoId")) continue;
+    bool passedVetoId =  analysisTree->electron_cutId_veto_Fall17V2[ie];
+    if (!passedVetoId) continue;
 		
     for (unsigned int je = ie+1; je<analysisTree->electron_count; ++je) {
 
@@ -378,10 +371,10 @@ bool dilepton_veto_et(const Config *cfg,const  AC1B *analysisTree){
       float relIsoEle =  absIsoEle / analysisTree->electron_pt[je];
       if(relIsoEle >= cfg->get<float>("isoDiElectronVeto")) continue;	
 
-      passedVetoId =  analysisTree->electron_cutId_veto_Summer16[je];
-      if (!passedVetoId && cfg->get<bool>("applyDiElectronVetoId")) continue;
+      passedVetoId =  analysisTree->electron_cutId_veto_Fall17V2[je];
+      if (!passedVetoId) continue;
 
-      if (analysisTree->electron_charge[ie] * analysisTree->electron_charge[je] > 0. && cfg->get<bool>("applyDiElectronOS")) continue;
+      if (analysisTree->electron_charge[ie] * analysisTree->electron_charge[je] > 0.) continue;
 		  
       float dr = deltaR(analysisTree->electron_eta[ie],analysisTree->electron_phi[ie],
                         analysisTree->electron_eta[je],analysisTree->electron_phi[je]);
@@ -414,19 +407,8 @@ bool extra_electron_veto(int leptonIndex, TString ch, const Config *cfg, const A
     if (fabs(analysisTree->electron_dxy[ie]) >= dxyVetoElectronCut) continue;
     if (fabs(analysisTree->electron_dz[ie]) >= dzVetoElectronCut) continue;
 
-    int era = cfg->get<int>("era");
-    bool electronMvaId;
-
-     if (era == 2016)
-       electronMvaId = analysisTree->electron_mva_wp90_general_Spring16_v1[ie] > 0.5; 
-      else if (era == 2017)
-       electronMvaId = analysisTree->electron_mva_wp90_noIso_Fall17_v1[ie] > 0.5;
-      else if (era == 2018)
-       electronMvaId = analysisTree->electron_mva_wp90_noIso_Fall17_v1[ie] > 0.5;
-
-     if (!electronMvaId && applyVetoElectronId) continue;
-
-    /* Merijn 2019 8 20: in the analysis note this is NOT mentioned for the mt channel, but it is mentioned in the twiki on legacy data. We keep it in */
+    bool electronMvaId = analysisTree->electron_mva_wp90_noIso_Fall17_v2[ie] > 0.5;
+    if (!electronMvaId && applyVetoElectronId) continue;
     if (!analysisTree->electron_pass_conversion[ie] && applyVetoElectronId) continue;
     if (analysisTree->electron_nmissinginnerhits[ie] > 1 && applyVetoElectronId) continue;
 
