@@ -1173,8 +1173,8 @@ int main(int argc, char * argv[]) {
                jetLV_jecUnc[uncer_split.first + "Up"]   = jetLV * ( 1 + unc_total);
                jetLV_jecUnc[uncer_split.first + "Down"] = jetLV * ( 1 - unc_total);
                // Propagate jec uncertainties to met
-               if( metLV_jecUnc.find(uncer_split.first+"Up") == metLV_jecUnc.end()) metLV_jecUnc[uncer_split.first+"Up"] = metLV;
-               if( metLV_jecUnc.find(uncer_split.first+"Down") == metLV_jecUnc.end()) metLV_jecUnc[uncer_split.first+"Down"] = metLV;
+               metLV_jecUnc[uncer_split.first+"Up"] = metLV;
+               metLV_jecUnc[uncer_split.first+"Down"] = metLV;
                if (!isSampleForRecoilCorrection) {
                   metLV_jecUnc[uncer_split.first + "Up"]   -= jetLV* unc_total;
                   metLV_jecUnc[uncer_split.first + "Down"] += jetLV* unc_total;
