@@ -752,6 +752,10 @@ class NTupleMaker : public edm::EDAnalyzer{
 
   // pat electrons
   UInt_t electron_count;
+  Float_t electron_helixparameters[M_electronmaxcount][5];
+  Float_t electron_helixparameters_covar[M_electronmaxcount][5][5];
+  Float_t electron_referencePoint[M_electronmaxcount][3];
+  Float_t electron_Bfield[M_electronmaxcount];
   Float_t electron_px[M_electronmaxcount];
   Float_t electron_py[M_electronmaxcount];
   Float_t electron_pz[M_electronmaxcount];
