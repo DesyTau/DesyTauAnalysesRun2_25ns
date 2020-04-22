@@ -426,9 +426,9 @@ int main(int argc, char * argv[]) {
    // load QCD =======================================================================================================================================
    TFile *fQCD = new TFile(TString(cmsswBase)+"/src/"+qcdFileName);
 
-   TGraph *OS_SS_njetgt1 = (TGraph*)fQCD->Get("OS_SS_transfer_factors_njetgt1");
-   TGraph *OS_SS_njet1 = (TGraph*)fQCD->Get("OS_SS_transfer_factors_njet1");
-   TGraph *OS_SS_njet0 = (TGraph*)fQCD->Get("OS_SS_transfer_factors_njet0");
+   TF1 *OS_SS_njetgt1 = (TF1*)fQCD->Get("OS_SS_transfer_factors_njetgt1");
+   TF1 *OS_SS_njet1 = (TF1*)fQCD->Get("OS_SS_transfer_factors_njet1");
+   TF1 *OS_SS_njet0 = (TF1*)fQCD->Get("OS_SS_transfer_factors_njet0");
   
    TGraph *OS_SS_njet0_Par0_UP = (TGraph*)fQCD->Get("OS_SS_transfer_factors_Par0_njet0_UP");
    TGraph *OS_SS_njet0_Par0_DOWN = (TGraph*)fQCD->Get("OS_SS_transfer_factors_Par0_njet0_DOWN");
@@ -1173,8 +1173,8 @@ int main(int argc, char * argv[]) {
                jetLV_jecUnc[uncer_split.first + "Up"]   = jetLV * ( 1 + unc_total);
                jetLV_jecUnc[uncer_split.first + "Down"] = jetLV * ( 1 - unc_total);
                // Propagate jec uncertainties to met
-               if( metLV_jecUnc.find(uncer_split.first+"Up") == metLV_jecUnc.end()) metLV_jecUnc[uncer_split.first+"Up"] = metLV;
-               if( metLV_jecUnc.find(uncer_split.first+"Down") == metLV_jecUnc.end()) metLV_jecUnc[uncer_split.first+"Down"] = metLV;
+               metLV_jecUnc[uncer_split.first+"Up"] = metLV;
+               metLV_jecUnc[uncer_split.first+"Down"] = metLV;
                if (!isSampleForRecoilCorrection) {
                   metLV_jecUnc[uncer_split.first + "Up"]   -= jetLV* unc_total;
                   metLV_jecUnc[uncer_split.first + "Down"] += jetLV* unc_total;
