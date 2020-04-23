@@ -74,7 +74,7 @@ process.source = cms.Source("PoolSource",
 	#"root://cms-xrd-global.cern.ch///store/user/sbrommer/gc_storage/embedding_16_legacy_miniaod/ElMu_data_legacy_2016_CMSSW9414/TauEmbedding_ElMu_data_legacy_2016_CMSSW9414_Run2016B-v2/99/merged_miniaod_998.root" #emu embedded 16 test sample
 	#"root://cms-xrd-global.cern.ch///store/user/jbechtel/gc_storage/embedding_16_legacy_miniaod/MuTau_data_legacy_2016_CMSSW9414/TauEmbedding_MuTau_data_legacy_2016_CMSSW9414_Run2016B-v4/99/merged_miniaod_998.root" #mt embedded 16 test sample
 	#"root://cms-xrd-global.cern.ch///store/user/jbechtel/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018A/1/merged_100.root" #mt embedded 18 test sample
-#	"root://cms-xrd-global.cern.ch///store/user/aakhmets/gc_storage/MuTau_data_2017_CMSSW944_gridka/TauEmbedding_MuTau_data_2017_CMSSW944_Run2017F/99/merged_9998.root"
+	#"root://cms-xrd-global.cern.ch///store/user/aakhmets/gc_storage/MuTau_data_2017_CMSSW944_gridka/TauEmbedding_MuTau_data_2017_CMSSW944_Run2017F/99/merged_9998.root"
 	#"root://cms-xrd-global.cern.ch//store/mc/RunIIFall17MiniAODv2/VBFHToTauTauUncorrelatedDecay_Filtered_M125_TuneCP5_13TeV-powheg-pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/60000/F2FF8AFB-DF01-EA11-9882-5065F381C251.root"#testsample with flat tau polarisation (tauspinner, 2017)
 	),
   skipEvents = cms.untracked.uint32(0),
@@ -284,6 +284,7 @@ HLTlist = cms.untracked.vstring(
 'HLT_Ele35_WPTight_Gsf_v',
 'HLT_Ele25_eta2p1_WPTight_Gsf_v',
 'HLT_Ele27_eta2p1_WPTight_Gsf_v',
+'HLT_Ele27_WPTight_Gsf_v',
 # Electron-Tau triggers
 'HLT_Ele24_eta2p1_WPTight_Gsf_LooseChargedIsoPFTau30_eta2p1_CrossL1_v',
 # Dilepton triggers
@@ -350,6 +351,8 @@ HLTlist_2016 = cms.untracked.vstring(
 HLTlist_2017 = cms.untracked.vstring(
     #SingleElectron
     'HLT_Ele32_WPTight_Gsf_v',
+    'HLT_Ele35_WPTight_Gsf_v',
+    'HLT_Ele32_WPTight_Gsf_L1DoubleEG_v',
     'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass8_v',
     'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8_v',
     )
@@ -463,9 +466,11 @@ if period is '2018' and isEmbedded:
 
 electron_hlt_filters = cms.untracked.vstring(
     'HLT_Ele27_eta2p1_WPTight_Gsf_v.*:hltEle27erWPTightGsfTrackIsoFilter',
+    'HLT_Ele27_WPTight_Gsf_v.*:hltEle27WPTightGsfTrackIsoFilter',
     'HLT_Ele32_WPTight_Gsf_v.*:hltEle32WPTightGsfTrackIsoFilter',
     'HLT_Ele32_WPTight_Gsf_DoubleL1EG_v.*:hltEle32L1DoubleEGWPTightGsfTrackIsoFilter',
     'HLT_Ele32_WPTight_Gsf_DoubleL1EG_v.*:hltEGL1SingleEGOrFilter',
+    'HLT_Ele32_WPTight_Gsf_L1DoubleEG_v.*:hltEle32L1DoubleEGWPTightGsfTrackIsoFilter',
     'HLT_Ele35_WPTight_Gsf_v.*:hltEle35noerWPTightGsfTrackIsoFilter',
     'HLT_Ele25_eta2p1_WPTight_Gsf_v.*:hltEle25erWPTightGsfTrackIsoFilter',
     'HLT_Ele24_eta2p1_WPTight_Gsf_LooseChargedIsoPFTau30_eta2p1_CrossL1_v.*:hltEle24erWPTightGsfTrackIsoFilterForTau',
@@ -504,6 +509,11 @@ if period is '2016' :
         'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v.*:hltL1sMu20EG10IorMu23EG10',
         'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v.*:hltL1sMu5EG20IorMu5IsoEG18IorMu5IsoEG20IorMu5EG23',
     )
+if period is '2017':
+    electron_hlt_filters +=cms.untracked.vstring(
+        'HLT_Ele35_WPTight_Gsf_v.*:hltEGL1SingleEGOrFilter',
+    )
+
 
 tau_hlt_filters = cms.untracked.vstring(
     'HLT_IsoMu19_eta2p1_LooseIsoPFTau20_SingleL1_v.*:hltPFTau20TrackLooseIsoAgainstMuon',
@@ -513,7 +523,7 @@ tau_hlt_filters = cms.untracked.vstring(
     'HLT_IsoMu20_eta2p1_LooseChargedIsoPFTau27_eta2p1_CrossL1_v.*:hltOverlapFilterIsoMu20LooseChargedIsoPFTau27L1Seeded',
     'HLT_IsoMu24_eta2p1_LooseChargedIsoPFTau20_SingleL1_v.*:hltPFTau20TrackLooseChargedIsoAgainstMuon',
     'HLT_IsoMu24_eta2p1_LooseChargedIsoPFTau20_SingleL1_v.*:hltOverlapFilterIsoMu24LooseChargedIsoPFTau20',
-    'HLT_Ele24_eta2p1_WPTight_Gsf_LooseChargedIsoPFTau30_eta2p1_CrossL1_v.*:hltPFTau30TrackLooseChargedIso',
+    'HLT_Ele24_eta2p1_WPTight_Gsf_LooseChargedIsoPFTau30_eta2p1_CrossL1_v.*:hltPFTau30TrackLooseChargedIso,hltSelectedPFTau30LooseChargedIsolationL1HLTMatched',
     'HLT_DoubleMediumIsoPFTau35_Trk1_eta2p1_Reg_v.*:hltDoublePFTau35TrackPt1MediumIsolationDz02Reg',
     'HLT_DoubleMediumCombinedIsoPFTau35_Trk1_eta2p1_Reg_v.*:hltDoublePFTau35TrackPt1MediumCombinedIsolationDz02Reg',
     'HLT_DoubleTightChargedIsoPFTau35_Trk1_TightID_eta2p1_Reg_v.*:hltDoublePFTau35TrackPt1TightChargedIsolationAndTightOOSCPhotonsDz02Reg',
@@ -557,6 +567,10 @@ if isEmbedded and period is '2016':
 	'HLT_IsoMu19_eta2p1_LooseIsoPFTau20_v.*:hltL1sMu18erTau20er',
     )
 if isData and period is '2018':
+    tau_hlt_filters +=cms.untracked.vstring(
+        'HLT_IsoMu20_eta2p1_LooseChargedIsoPFTau27_eta2p1_CrossL1_v.*:hltSelectedPFTau27LooseChargedIsolationAgainstMuonL1HLTMatched',
+    )
+if period is '2017':
     tau_hlt_filters +=cms.untracked.vstring(
         'HLT_IsoMu20_eta2p1_LooseChargedIsoPFTau27_eta2p1_CrossL1_v.*:hltSelectedPFTau27LooseChargedIsolationAgainstMuonL1HLTMatched',
     )
