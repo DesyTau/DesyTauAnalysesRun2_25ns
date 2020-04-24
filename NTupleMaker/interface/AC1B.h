@@ -309,6 +309,10 @@ public :
    Float_t         electron_pz_energysigma_down[100]; //[electron_count]
    Float_t         electron_pt_energysigma_up[100]; //[electron_count]
    Float_t         electron_pt_energysigma_down[100]; //[electron_count]
+   Float_t         electron_helixparameters[100][5];
+   Float_t         electron_helixparameters_covar[100][5][5];
+   Float_t         electron_referencePoint[100][3];
+   Float_t         electron_Bfield[100];
    UInt_t          tau_count;
    Float_t         tau_e[100];   //[tau_count]
    Float_t         tau_px[100];   //[tau_count]
@@ -1118,6 +1122,10 @@ public :
    TBranch        *b_electron_pz_energysigma_down;   //!
    TBranch        *b_electron_pt_energysigma_up;   //!
    TBranch        *b_electron_pt_energysigma_down;   //!
+   TBranch        *b_electron_helixparameters;
+   TBranch        *b_electron_helixparameters_covar;
+   TBranch        *b_electron_referencePoint;
+   TBranch        *b_electron_Bfield;
    TBranch        *b_tau_count;   //!
    TBranch        *b_tau_e;   //!
    TBranch        *b_tau_px;   //!
@@ -1896,6 +1904,10 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("pfjet_pu_jet_fullId_tight", pfjet_pu_jet_fullId_tight, &b_pfjet_pu_jet_fullId_tight);
    fChain->SetBranchAddress("pfjet_pu_jet_fullDisc_mva", pfjet_pu_jet_fullDisc_mva, &b_pfjet_pu_jet_fullDisc_mva);
    fChain->SetBranchAddress("electron_count", &electron_count, &b_electron_count);
+   fChain->SetBranchAddress("electron_helixparameters", electron_helixparameters, &b_electron_helixparameters);
+   fChain->SetBranchAddress("electron_helixparameters_covar", electron_helixparameters_covar, &b_electron_helixparameters_covar);
+   fChain->SetBranchAddress("electron_referencePoint", electron_referencePoint, &b_electron_referencePoint);
+   fChain->SetBranchAddress("electron_Bfield", electron_Bfield, &b_electron_Bfield);
    fChain->SetBranchAddress("electron_px", electron_px, &b_electron_px);
    fChain->SetBranchAddress("electron_py", electron_py, &b_electron_py);
    fChain->SetBranchAddress("electron_pz", electron_pz, &b_electron_pz);

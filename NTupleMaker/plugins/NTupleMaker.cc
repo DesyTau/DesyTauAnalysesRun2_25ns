@@ -568,6 +568,10 @@ void NTupleMaker::beginJob(){
   // electrons
   if (crecelectron) {
     tree->Branch("electron_count", &electron_count, "electron_count/i");
+    tree->Branch("electron_helixparameters", electron_helixparameters, "electron_helixparameters[electron_count][5]/F");
+    tree->Branch("electron_helixparameters_covar", electron_helixparameters_covar,"electron_helixparameters_covar[electron_count][5][5]/F");
+    tree->Branch("electron_referencePoint", electron_referencePoint,"electron_referencePoint[electron_count][3]/F");
+    tree->Branch("electron_Bfield", electron_Bfield, "electron_Bfield[electron_count]/F");
     tree->Branch("electron_px", electron_px, "electron_px[electron_count]/F");
     tree->Branch("electron_py", electron_py, "electron_py[electron_count]/F");
     tree->Branch("electron_pz", electron_pz, "electron_pz[electron_count]/F");
@@ -3359,7 +3363,7 @@ unsigned int NTupleMaker::AddMuons(const edm::Event& iEvent, const edm::EventSet
 	muon_referencePoint[muon_count][1]=-999;
 	muon_referencePoint[muon_count][2]=-999;	  
 	muon_Bfield[muon_count]=-999;
-}
+	}
 
 	muon_px[muon_count] = (*Muons)[i].px();
 	muon_py[muon_count] = (*Muons)[i].py();
@@ -4778,6 +4782,50 @@ unsigned int NTupleMaker::AddElectrons(const edm::Event& iEvent, const edm::Even
 	  electron_dzerr[electron_count]        = gsfTr_e->dzError();
 
 	  //	  std::cout << "   dxy = " << electron_dxy[electron_count] << "   dz = " << electron_dz[electron_count] << std::endl;
+
+
+
+	  //code below is to store the track param vec + covariances, a references pt on track, and B field in ref pt. For CP measurement
+	  
+	  reco::GsfTrackRef leadTrk = el->gsfTrack();
+	  if (leadTrk.isNonnull()) {
+	    TrackBase::ParameterVector ParamVecEle=leadTrk->parameters();
+	    TrackBase::CovarianceMatrix CVMTrack=leadTrk->covariance();
+	    
+	    for(int index=0; index<ParamVecEle.kSize;index++){
+	      electron_helixparameters[electron_count][index]=ParamVecEle[index];
+	      for(int index2=0; index2<ParamVecEle.kSize;index2++){
+		electron_helixparameters_covar[electron_count][index][index2]=CVMTrack[index][index2];
+	      }
+	    }
+
+	    TrackBase::Point RFptEle=leadTrk->referencePoint();
+	    
+	    electron_referencePoint[electron_count][0]=RFptEle.X();
+	    electron_referencePoint[electron_count][1]=RFptEle.Y();
+	    electron_referencePoint[electron_count][2]=RFptEle.Z();
+	    
+	    double	magneticField = (TTrackBuilder.product() ? TTrackBuilder.product()->field()->inInverseGeV(GlobalPoint(RFptEle.X(), RFptEle.Y(), RFptEle.Z())).z() : 0.0);
+	    electron_Bfield[electron_count]=magneticField;
+	  }
+	  else{
+	    for(int index=0; index<5;index++){
+	      electron_helixparameters[electron_count][index]=-999;
+	      for(int index2=0; index2<5;index2++){
+		electron_helixparameters_covar[electron_count][index][index2]=-999;
+	      }
+	    }
+
+	    electron_referencePoint[electron_count][0]=-999;
+	    electron_referencePoint[electron_count][1]=-999;
+	    electron_referencePoint[electron_count][2]=-999;	  
+	    electron_Bfield[electron_count]=-999;
+	  }
+	
+
+
+
+
 
 	  // Electron Ids
      electron_cutId_veto_Summer16[electron_count] = el ->electronID("cutBasedElectronID-Summer16-80X-V1-veto");
