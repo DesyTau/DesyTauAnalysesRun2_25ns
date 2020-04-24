@@ -798,6 +798,7 @@ int main(int argc, char * argv[]) {
             if (topPt>0&&antitopPt>0) {
                topptweight = topPtWeight(topPt,antitopPt,true);
                topptweightRun2 = topPtWeight(topPt,antitopPt,false);
+               topptweightRun2ttH = genTools::topPtWeight_Run2(analysisTree, 0.088, -0.00087, 9.2e-07, 472.0);
             }
          }
 
