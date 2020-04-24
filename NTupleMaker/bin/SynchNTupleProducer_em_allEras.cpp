@@ -783,7 +783,6 @@ int main(int argc, char * argv[]) {
          npartons = analysisTree.genparticles_noutgoing;
 
          // apply good run selection  ==================================================================================================================================
-
          if ((isData || isEmbedded) && applyGoodRunSelection){
 
             int n=analysisTree.event_run;
@@ -1561,20 +1560,19 @@ int main(int argc, char * argv[]) {
          
          met_uncorr = met;
          metphi_uncorr = metphi;
-         
          float pfmet_corr_x = met_x;
          float pfmet_corr_y = met_y;
          if ((isW||isDY||isSignal)&&!isData) {
             if (applySimpleRecoilCorrections) {
                if (!usePuppiMet){
-                  recoilMetCorrector.CorrectByMeanResolution(met_x,met_y,bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,pfmet_corr_x,pfmet_corr_y);
+                  recoilMetCorrector.CorrectWithHist(met_x,met_y,bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,pfmet_corr_x,pfmet_corr_y);
                   metSys.ApplyMEtSys(pfmet_corr_x, pfmet_corr_y, bosonPx, bosonPy, lepPx, lepPy, njetsforrecoil, kit::MEtSys::SysType::Response, kit::MEtSys::SysShift::Up, met_x_recoilscaleUp, met_y_recoilscaleUp);
                   metSys.ApplyMEtSys(pfmet_corr_x, pfmet_corr_y, bosonPx, bosonPy, lepPx, lepPy, njetsforrecoil, kit::MEtSys::SysType::Response, kit::MEtSys::SysShift::Down, met_x_recoilscaleDown, met_y_recoilscaleDown);
                   metSys.ApplyMEtSys(pfmet_corr_x, pfmet_corr_y, bosonPx, bosonPy, lepPx, lepPy, njetsforrecoil, kit::MEtSys::SysType::Resolution, kit::MEtSys::SysShift::Up, met_x_recoilresoUp, met_y_recoilresoUp);
                   metSys.ApplyMEtSys(pfmet_corr_x, pfmet_corr_y, bosonPx, bosonPy, lepPx, lepPy, njetsforrecoil, kit::MEtSys::SysType::Resolution, kit::MEtSys::SysShift::Down, met_x_recoilresoDown, met_y_recoilresoDown);
                }
                else{
-                  recoilMetCorrectorPuppi.CorrectByMeanResolution(met_x,met_y,bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,pfmet_corr_x,pfmet_corr_y);
+                  recoilMetCorrectorPuppi.CorrectWithHist(met_x,met_y,bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,pfmet_corr_x,pfmet_corr_y);
                   metSysPuppi.ApplyMEtSys(pfmet_corr_x, pfmet_corr_y, bosonPx, bosonPy, lepPx, lepPy, njetsforrecoil, kit::MEtSys::SysType::Response, kit::MEtSys::SysShift::Up, met_x_recoilscaleUp, met_y_recoilscaleUp);
                   metSysPuppi.ApplyMEtSys(pfmet_corr_x, pfmet_corr_y, bosonPx, bosonPy, lepPx, lepPy, njetsforrecoil, kit::MEtSys::SysType::Response, kit::MEtSys::SysShift::Down, met_x_recoilscaleDown, met_y_recoilscaleDown);
                   metSysPuppi.ApplyMEtSys(pfmet_corr_x, pfmet_corr_y, bosonPx, bosonPy, lepPx, lepPy, njetsforrecoil, kit::MEtSys::SysType::Resolution, kit::MEtSys::SysShift::Up, met_x_recoilresoUp, met_y_recoilresoUp);
@@ -1586,7 +1584,7 @@ int main(int argc, char * argv[]) {
                else recoilMetCorrectorPuppi.Correct(met_x,met_y,bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,pfmet_corr_x,pfmet_corr_y);
             }
          }
-         
+
          met_x = pfmet_corr_x;
          met_y = pfmet_corr_y;
          met = TMath::Sqrt(met_x*met_x+met_y*met_y);
@@ -1721,9 +1719,8 @@ int main(int argc, char * argv[]) {
                                  metLV.Px(),metLV.Py());
          dphi_emet  = dPhiFrom2P(electronLV.Px(),electronLV.Py(),
                                  metLV.Px(),metLV.Py());
-         
-         
-         
+
+
          mTdileptonMET = mT(dileptonLV,metLV);
          
          pt_ttjj = -10;
