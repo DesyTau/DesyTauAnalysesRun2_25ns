@@ -988,6 +988,7 @@ void NTupleMaker::beginJob(){
   if(crecstxs){
     tree->Branch("htxs_stage0cat",&htxs_stage0cat,"htxs_stage0cat/I");
     tree->Branch("htxs_stage1p1cat",&htxs_stage1p1cat,"htxs_stage1p1cat/I");
+    tree->Branch("htxs_stage1p1finecat",&htxs_stage1p1finecat,"htxs_stage1p1finecat/I");
     tree->Branch("htxs_higgsPt",&htxs_higgsPt,"htxs_higgsPt/F");
     tree->Branch("htxs_njets30",&htxs_njets30,"htxs_njets30/I");
   }
@@ -2651,6 +2652,7 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       iEvent.getByToken(htxsToken_, htxs);
       htxs_stage0cat = htxs->stage0_cat;
       htxs_stage1p1cat = htxs->stage1_1_cat_pTjet30GeV;
+      htxs_stage1p1finecat = htxs->stage1_1_fine_cat_pTjet30GeV;
       htxs_higgsPt = htxs->higgs.Pt();
       htxs_njets30 = htxs->jets30.size();
     }
