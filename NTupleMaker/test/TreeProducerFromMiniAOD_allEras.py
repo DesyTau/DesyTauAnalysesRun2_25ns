@@ -246,20 +246,15 @@ else:
 # END Pre-firing weights ======================================================================================
 
 # Pileup Jet ID ==========================================================================================
-# https://twiki.cern.ch/twiki/bin/view/CMS/PileupJetID#9X_2017_and_10X_2018_recipes
-from RecoJets.JetProducers.PileupJetID_cfi import _chsalgos_102x, _chsalgos_94x, _chsalgos_80x
+# https://twiki.cern.ch/twiki/bin/view/CMS/PileupJetID#9X_2017_and_10X_2018_recipes - for now the recommendation is to use 80x for all years, might need to be adjusted in the future
+from RecoJets.JetProducers.PileupJetID_cfi import _chsalgos_80x
 process.load('RecoJets.JetProducers.PileupJetID_cfi')
 process.pileupJetId.jets = cms.InputTag('slimmedJets')
 process.pileupJetId.inputIsCorrected = False
 process.pileupJetId.jec = cms.string('AK4PFchs')
 process.pileupJetId.applyJec = True
 process.pileupJetId.vertexes = cms.InputTag('offlineSlimmedPrimaryVertices')
-if period == '2018' :
-    process.pileupJetId.algos = cms.VPSet(_chsalgos_102x)
-elif period == '2017' :
-    process.pileupJetId.algos = cms.VPSet(_chsalgos_94x)
-else :
-    process.pileupJetId.algos = cms.VPSet(_chsalgos_80x)
+process.pileupJetId.algos = cms.VPSet(_chsalgos_80x)
 
 # END Pileup Jet ID ======================================================================================
 
