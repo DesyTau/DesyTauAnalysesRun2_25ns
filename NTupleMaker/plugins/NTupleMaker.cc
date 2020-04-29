@@ -532,9 +532,9 @@ void NTupleMaker::beginJob(){
     tree->Branch("pfjet_flavour", pfjet_flavour, "pfjet_flavour[pfjet_count]/I");
     tree->Branch("pfjet_btag", pfjet_btag,"pfjet_btag[pfjet_count][10]/F");
     tree->Branch("pfjet_jecUncertainty",pfjet_jecUncertainty,"pfjet_jecUncertainty[pfjet_count]/F");
-    tree->Branch("pfjet_pu_jet_fullId_loose", pfjet_pu_jet_fullId_loose, "pfjet_pu_jet_fullId_loose[pfjet_count]/O");
-    tree->Branch("pfjet_pu_jet_fullId_medium", pfjet_pu_jet_fullId_medium, "pfjet_pu_jet_fullId_medium[pfjet_count]/O");
-    tree->Branch("pfjet_pu_jet_fullId_tight", pfjet_pu_jet_fullId_tight, "pfjet_pu_jet_fullId_tight[pfjet_count]/O");
+    //tree->Branch("pfjet_pu_jet_fullId_loose", pfjet_pu_jet_fullId_loose, "pfjet_pu_jet_fullId_loose[pfjet_count]/O");
+    //tree->Branch("pfjet_pu_jet_fullId_medium", pfjet_pu_jet_fullId_medium, "pfjet_pu_jet_fullId_medium[pfjet_count]/O");
+    //tree->Branch("pfjet_pu_jet_fullId_tight", pfjet_pu_jet_fullId_tight, "pfjet_pu_jet_fullId_tight[pfjet_count]/O");
     tree->Branch("pfjet_pu_jet_fullDisc_mva", pfjet_pu_jet_fullDisc_mva, "pfjet_pu_jet_fullDisc_mva[pfjet_count]/F");
   }
 
@@ -4524,15 +4524,15 @@ unsigned int NTupleMaker::AddPFJets(const edm::Event& iEvent, const edm::EventSe
 
 	  //pileup jet id
 
-	  pfjet_pu_jet_fullId_loose[pfjet_count]  = false;
-	  pfjet_pu_jet_fullId_medium[pfjet_count] = false;
-	  pfjet_pu_jet_fullId_tight[pfjet_count]  = false;
-	  
-	  if(pfjet_pt[pfjet_count]>=20){
+	  //pfjet_pu_jet_fullId_loose[pfjet_count]  = false;
+	  //pfjet_pu_jet_fullId_medium[pfjet_count] = false;
+	  //pfjet_pu_jet_fullId_tight[pfjet_count]  = false;
+	  pfjet_pu_jet_fullDisc_mva[pfjet_count] = 1.;
+	  if(pfjet_pt[pfjet_count]<50){
 	    pfjet_pu_jet_fullDisc_mva[pfjet_count]  = (*pfjets)[i].userFloat("pileupJetId:fullDiscriminant");
-	    pfjet_pu_jet_fullId_loose[pfjet_count]  = ( (*pfjets)[i].userInt("pileupJetId:fullId") & (1<<2) || pfjet_pt[pfjet_count]>50 );
-	    pfjet_pu_jet_fullId_medium[pfjet_count] = ( (*pfjets)[i].userInt("pileupJetId:fullId") & (1<<1) || pfjet_pt[pfjet_count]>50 );
-	    pfjet_pu_jet_fullId_tight[pfjet_count]  = ( (*pfjets)[i].userInt("pileupJetId:fullId") & (1<<0) || pfjet_pt[pfjet_count]>50 );
+	    //pfjet_pu_jet_fullId_loose[pfjet_count]  = ( (*pfjets)[i].userInt("pileupJetId:fullId") & (1<<2) || pfjet_pt[pfjet_count]>50 );
+	    //pfjet_pu_jet_fullId_medium[pfjet_count] = ( (*pfjets)[i].userInt("pileupJetId:fullId") & (1<<1) || pfjet_pt[pfjet_count]>50 );
+	    //pfjet_pu_jet_fullId_tight[pfjet_count]  = ( (*pfjets)[i].userInt("pileupJetId:fullId") & (1<<0) || pfjet_pt[pfjet_count]>50 );
 	  }
 	  
 
