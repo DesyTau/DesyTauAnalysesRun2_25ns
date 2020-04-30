@@ -885,7 +885,7 @@ public :
    TBranch        *b_refitvertex_ndof;   //!
    TBranch        *b_refitvertex_pdf;   //!
    TBranch        *b_refitvertex_ntracks;   //!
-   //TBranch        *b_refitvertex_cov;   //!
+   TBranch        *b_refitvertex_cov;   //!
    TBranch        *b_refitvertex_eleIndex;
    TBranch        *b_refitvertex_muIndex;
    TBranch        *b_refitvertex_tauIndex;
@@ -1788,7 +1788,7 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("refitvertex_ndof", refitvertex_ndof, &b_refitvertex_ndof);
    fChain->SetBranchAddress("refitvertex_ptq", refitvertex_ptq, &b_refitvertex_pdf);
    fChain->SetBranchAddress("refitvertex_ntracks",refitvertex_ntracks, &b_refitvertex_ntracks);
-   //fChain->SetBranchAddress("refitvertex_cov",refitvertex_cov, &b_refitvertex_cov);
+   fChain->SetBranchAddress("refitvertex_cov",refitvertex_cov, &b_refitvertex_cov);
    fChain->SetBranchAddress("refitvertex_eleIndex", refitvertex_eleIndex, &b_refitvertex_eleIndex);
    fChain->SetBranchAddress("refitvertex_muIndex", refitvertex_muIndex, &b_refitvertex_muIndex);
    fChain->SetBranchAddress("refitvertex_tauIndex", refitvertex_tauIndex, &b_refitvertex_tauIndex);

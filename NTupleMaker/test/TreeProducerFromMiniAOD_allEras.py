@@ -606,7 +606,7 @@ SusyInfo = cms.untracked.bool(not isData),
 Trigger = cms.untracked.bool(True),
 RecPrimVertex = cms.untracked.bool(True),
 RecPrimVertexWithBS = cms.untracked.bool(True),
-RefittedVertex = cms.untracked.bool(False),
+RefittedVertex = cms.untracked.bool(True),
 RefittedVertexWithBS = cms.untracked.bool(True),
 ApplyTauSpinner = cms.untracked.bool(RunTauSpinnerProducer),
 RecBeamSpot = cms.untracked.bool(True),
@@ -762,7 +762,7 @@ process.p = cms.Path(
   process.egammaPostRecoSeq *               # electron energy corrections and Ids
   process.rerunMvaIsolationSequence *  # Tau IDs
   getattr(process,updatedTauName) *  # Tau IDs
-  #process.AdvancedRefitVertexNoBSBSSequence * # Vertex refit w/o BS
+  process.AdvancedRefitVertexNoBSBSSequence * # Vertex refit w/o BS
   process.AdvancedRefitVertexBSSequence * # Vertex refit w/ BS
   process.MiniAODRefitVertexBS * # PV with BS constraint
   process.htxsSequence * # HTXS
