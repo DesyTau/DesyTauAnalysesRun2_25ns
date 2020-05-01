@@ -856,6 +856,7 @@ int main(int argc, char * argv[]){
       	otree->embweight = getEmbeddedWeight(&analysisTree, w);
     
       // tau selection
+      vector<int> taus_all; taus_all.clear();
       vector<int> taus; taus.clear();
       for (unsigned int it = 0; it < analysisTree.tau_count; ++it) { 
         if (analysisTree.tau_pt[it] <= ptTauLowCut) continue;
@@ -869,8 +870,8 @@ int main(int argc, char * argv[]){
   
         if (analysisTree.tau_decayModeFindingNewDMs[it] < 0.5) continue; //always true, cut applied in NTupleMaker
         if (analysisTree.tau_decayMode[it] == 5 || analysisTree.tau_decayMode[it] == 6) continue;
-	//if (analysisTree.tau_MVADM2017v1[it] < 0) continue;
-        taus.push_back(it);
+	if (analysisTree.tau_MVADM2017v1[it] < -1) continue;
+        taus_all.push_back(it);
       }
       counter[3]++;
       
@@ -906,8 +907,11 @@ int main(int argc, char * argv[]){
 	}
       }
       if(ch == "tt"){
-	for (unsigned int it = 0; it < taus.size(); ++it){
-	  leptons.push_back(it);
+	for (unsigned int it1 = 0; it1 < taus_all.size(); ++it1){
+	  for (unsigned int it2 = it1+1; it2 < taus_all.size(); ++it2){
+	    taus.push_back(it1);
+	    leptons.push_back(it2);
+	  }
 	}
       }
       counter[4]++;
@@ -935,7 +939,7 @@ int main(int argc, char * argv[]){
 	
     	//////////////LOOP on Leptons or second Tau/////////////
 	
-        for (unsigned int il = it+1; il < leptons.size(); ++il) {
+        for (unsigned int il =0; il < leptons.size(); ++il) {
 	  
 	  //if(ch == "tt")il = it+1;
 	  unsigned int lIndex = leptons.at(il);
@@ -972,7 +976,7 @@ int main(int argc, char * argv[]){
           if (dR < dRleptonsCut) continue;
     
           // change pair
-	  if(ch=="mt" || ch == "et"){
+	  if(ch=="mt" || ch == "et" || ch=="tt"){
 	    bool changePair =  false;
 	    if (relIsoLep < isoLepMin)
 	      changePair = true;
@@ -997,50 +1001,48 @@ int main(int argc, char * argv[]){
 	      isoLepMin = relIsoLep;
 	      lep_pt_max = lep_pt;
 	      tau_pt_max = analysisTree.tau_pt[tIndex];
-	      leptonIndex = lIndex;
+	      leptonIndex = tIndex;
 	      isoTauMax = sortIsoTau;
-	      tauIndex = tIndex;
+	      tauIndex = lIndex;
 	    }
 	  }
-	  if(ch=="tt"){
-	    DiTauInfo sortDiTauInfo;
-	    sortDiTauInfo.index1_ = tIndex;
-	    sortDiTauInfo.index2_ = lIndex;
-	    sortDiTauInfo.sumPt_ = analysisTree.tau_pt[tIndex] + analysisTree.tau_pt[lIndex];
-	    sortDiTauInfo.sumIso_ = relIsoLep + sortIsoTau;
+	  //  if(ch=="tt"){
+	  //   DiTauInfo sortDiTauInfo;
+	  //   sortDiTauInfo.index1_ = tIndex;
+	  //   sortDiTauInfo.index2_ = lIndex;
+	  //   sortDiTauInfo.sumPt_ = analysisTree.tau_pt[tIndex] + analysisTree.tau_pt[lIndex];
+	  //   sortDiTauInfo.sumIso_ = relIsoLep + sortIsoTau;
 
-	    sortDiTauInfos.push_back(sortDiTauInfo);
-	  }
-          
-	  
+	  //   sortDiTauInfos.push_back(sortDiTauInfo);
+	  // }	  
         } // lepton loop
       } // tau loop
 
       //Only Leading and SubLeading tau pair is selcted
-      if(ch == "tt"){
-	std::sort(sortDiTauInfos.begin(), sortDiTauInfos.end(), SortDiTauPairs());
-	int diTauCounter = -1;
-	for(std::vector<DiTauInfo>::iterator iter = sortDiTauInfos.begin(); iter != sortDiTauInfos.end() ; iter++){
-	  if(diTauCounter >= 0) continue;
+      // if(ch == "tt"){
+      // 	std::sort(sortDiTauInfos.begin(), sortDiTauInfos.end(), SortDiTauPairs());
+      // 	int diTauCounter = -1;
+      // 	for(std::vector<DiTauInfo>::iterator iter = sortDiTauInfos.begin(); iter != sortDiTauInfos.end() ; iter++){
+      // 	  if(diTauCounter >= 0) continue;
 
-	  uint tIndex1 = iter->index1_;
-	  uint tIndex2 = iter->index2_;
-	  LV temp_Leg1_(analysisTree.tau_px[tIndex1], analysisTree.tau_py[tIndex1], analysisTree.tau_pz[tIndex1], analysisTree.tau_e[tIndex1]);
-	  LV temp_Leg2_(analysisTree.tau_px[tIndex2], analysisTree.tau_py[tIndex2], analysisTree.tau_pz[tIndex2], analysisTree.tau_e[tIndex2]);
-	  LV Leg1P4_, Leg2P4_;
-	  if(temp_Leg1_.pt() > temp_Leg2_.pt()){
-	    Leg1P4_ = temp_Leg1_;tIndex1 = iter->index1_;
-	    Leg2P4_ = temp_Leg2_;tIndex2 = iter->index2_;
-	  }
-	  else {
-	    Leg1P4_ = temp_Leg2_; tIndex1 = iter->index2_;
-	    Leg2P4_ = temp_Leg1_; tIndex2 = iter->index1_;
-	  }
-	  ++diTauCounter;
-	  tauIndex =tIndex2;
-	  leptonIndex =tIndex1;
-	}
-      }
+      // 	  uint tIndex1 = iter->index1_;
+      // 	  uint tIndex2 = iter->index2_;
+      // 	  LV temp_Leg1_(analysisTree.tau_px[tIndex1], analysisTree.tau_py[tIndex1], analysisTree.tau_pz[tIndex1], analysisTree.tau_e[tIndex1]);
+      // 	  LV temp_Leg2_(analysisTree.tau_px[tIndex2], analysisTree.tau_py[tIndex2], analysisTree.tau_pz[tIndex2], analysisTree.tau_e[tIndex2]);
+      // 	  LV Leg1P4_, Leg2P4_;
+      // 	  if(temp_Leg1_.pt() > temp_Leg2_.pt()){
+      // 	    Leg1P4_ = temp_Leg1_;tIndex1 = iter->index1_;
+      // 	    Leg2P4_ = temp_Leg2_;tIndex2 = iter->index2_;
+      // 	  }
+      // 	  else {
+      // 	    Leg1P4_ = temp_Leg2_; tIndex1 = iter->index2_;
+      // 	    Leg2P4_ = temp_Leg1_; tIndex2 = iter->index1_;
+      // 	  }
+      // 	  ++diTauCounter;
+      // 	  tauIndex =tIndex2;
+      // 	  leptonIndex =tIndex1;
+      // 	}
+      // }
       if (leptonIndex < 0) continue;
       if (tauIndex < 0) continue;
       counter[9]++;
@@ -1496,59 +1498,59 @@ int main(int argc, char * argv[]){
 	  else if (otree->tau_decay_mode_1 == 1)  shift_tes_1 = shift_tes_lepfake_1p1p0; 
 	  else if (otree->tau_decay_mode_1 == 10) shift_tes_1 = shift_tes_lepfake_3prong;
 	}
-	if (usePuppiMET) {
-	  TLorentzVector tauLV1_unclES_UP = tauLV_1;
-	  TLorentzVector tauLV1_unclES_DOWN = tauLV_1;
-	  TLorentzVector tauLV_unclES_UP = tauLV;
-	  TLorentzVector tauLV_unclES_DOWN = tauLV;
-	  float puppiMET_Up = TMath::Sqrt(analysisTree.puppimet_ex_UnclusteredEnUp*analysisTree.puppimet_ex_UnclusteredEnUp+
-					  analysisTree.puppimet_ey_UnclusteredEnUp*analysisTree.puppimet_ey_UnclusteredEnUp);
-	  float puppiMET_Down = TMath::Sqrt(analysisTree.puppimet_ex_UnclusteredEnDown*analysisTree.puppimet_ex_UnclusteredEnDown+
-					    analysisTree.puppimet_ey_UnclusteredEnDown*analysisTree.puppimet_ey_UnclusteredEnDown);
-	  TLorentzVector puppiUncl_UP; puppiUncl_UP.SetXYZT(analysisTree.puppimet_ex_UnclusteredEnUp,
-							    analysisTree.puppimet_ey_UnclusteredEnUp,
-							    0,
-							    puppiMET_Up); 
-	  TLorentzVector puppiUncl_DOWN; puppiUncl_DOWN.SetXYZT(analysisTree.puppimet_ex_UnclusteredEnDown,
-								analysisTree.puppimet_ey_UnclusteredEnDown,
-								0,
-								puppiMET_Down); 
-	  //  std::cout << "Central : " << puppimetLV.Pt()
-	  //    << "    Up : " << puppiUncl_UP.Pt()
-	  //    << "    Down : " << puppiUncl_DOWN.Pt() << std::endl;
-	  correctTauES(tauLV_1, puppimetLV, shift_tes_1, isOneProng_1);
-	  correctTauES(tauLV1_unclES_UP,puppiUncl_UP,shift_tes_1, isOneProng_1);
-	  correctTauES(tauLV1_unclES_DOWN,puppiUncl_DOWN,shift_tes_1, isOneProng_1);
-	  correctTauES(tauLV, puppimetLV, shift_tes_2, isOneProng_2);
-	  correctTauES(tauLV_unclES_UP,puppiUncl_UP,shift_tes_2, isOneProng_2);
-	  correctTauES(tauLV_unclES_DOWN,puppiUncl_DOWN,shift_tes_2, isOneProng_2);
-	  otree->pt_2 = tauLV.Pt();
-	  otree->m_2 = tauLV.M();
-	  otree->pt_1 = tauLV_1.Pt();
-	  otree->m_1 = tauLV_1.M();
-	  otree->puppimet = puppimetLV.Pt();
-	  otree->puppimetphi = puppimetLV.Phi();
-	  otree->puppimet_ex_UnclusteredEnUp = puppiUncl_UP.Px();
-	  otree->puppimet_ey_UnclusteredEnUp = puppiUncl_UP.Py();
-	  otree->puppimet_ex_UnclusteredEnDown = puppiUncl_DOWN.Px();
-	  otree->puppimet_ey_UnclusteredEnDown = puppiUncl_DOWN.Py();
-	  //
-	  //  std::cout << "Corrected -> " << std::endl;
-	  //  std::cout << "Central : " << puppimetLV.Pt()
-	  //                    << "    Up : " << puppiUncl_UP.Pt()
-	  //                    << "    Down : " << puppiUncl_DOWN.Pt() << std::endl;
-	  //
-	}
-	else {
-	  correctTauES(tauLV_1,metLV,shift_tes_1, isOneProng_1);
-	  correctTauES(tauLV,metLV,shift_tes_2, isOneProng_2);
-	  otree->pt_1 = tauLV_1.Pt();
-          otree->m_1 = tauLV_1.M();
-	  otree->pt_2 = tauLV.Pt();
-          otree->m_2 = tauLV.M();
-	  otree->met = metLV.Pt();
-	  otree->metphi = metLV.Phi();
-	}
+	// if (usePuppiMET) {
+	//   TLorentzVector tauLV1_unclES_UP = tauLV_1;
+	//   TLorentzVector tauLV1_unclES_DOWN = tauLV_1;
+	//   TLorentzVector tauLV_unclES_UP = tauLV;
+	//   TLorentzVector tauLV_unclES_DOWN = tauLV;
+	//   float puppiMET_Up = TMath::Sqrt(analysisTree.puppimet_ex_UnclusteredEnUp*analysisTree.puppimet_ex_UnclusteredEnUp+
+	// 				  analysisTree.puppimet_ey_UnclusteredEnUp*analysisTree.puppimet_ey_UnclusteredEnUp);
+	//   float puppiMET_Down = TMath::Sqrt(analysisTree.puppimet_ex_UnclusteredEnDown*analysisTree.puppimet_ex_UnclusteredEnDown+
+	// 				    analysisTree.puppimet_ey_UnclusteredEnDown*analysisTree.puppimet_ey_UnclusteredEnDown);
+	//   TLorentzVector puppiUncl_UP; puppiUncl_UP.SetXYZT(analysisTree.puppimet_ex_UnclusteredEnUp,
+	// 						    analysisTree.puppimet_ey_UnclusteredEnUp,
+	// 						    0,
+	// 						    puppiMET_Up); 
+	//   TLorentzVector puppiUncl_DOWN; puppiUncl_DOWN.SetXYZT(analysisTree.puppimet_ex_UnclusteredEnDown,
+	// 							analysisTree.puppimet_ey_UnclusteredEnDown,
+	// 							0,
+	// 							puppiMET_Down); 
+	//   //  std::cout << "Central : " << puppimetLV.Pt()
+	//   //    << "    Up : " << puppiUncl_UP.Pt()
+	//   //    << "    Down : " << puppiUncl_DOWN.Pt() << std::endl;
+	//   correctTauES(tauLV_1, puppimetLV, shift_tes_1, isOneProng_1);
+	//   correctTauES(tauLV1_unclES_UP,puppiUncl_UP,shift_tes_1, isOneProng_1);
+	//   correctTauES(tauLV1_unclES_DOWN,puppiUncl_DOWN,shift_tes_1, isOneProng_1);
+	//   correctTauES(tauLV, puppimetLV, shift_tes_2, isOneProng_2);
+	//   correctTauES(tauLV_unclES_UP,puppiUncl_UP,shift_tes_2, isOneProng_2);
+	//   correctTauES(tauLV_unclES_DOWN,puppiUncl_DOWN,shift_tes_2, isOneProng_2);
+	//   otree->pt_2 = tauLV.Pt();
+	//   otree->m_2 = tauLV.M();
+	//   otree->pt_1 = tauLV_1.Pt();
+	//   otree->m_1 = tauLV_1.M();
+	//   otree->puppimet = puppimetLV.Pt();
+	//   otree->puppimetphi = puppimetLV.Phi();
+	//   otree->puppimet_ex_UnclusteredEnUp = puppiUncl_UP.Px();
+	//   otree->puppimet_ey_UnclusteredEnUp = puppiUncl_UP.Py();
+	//   otree->puppimet_ex_UnclusteredEnDown = puppiUncl_DOWN.Px();
+	//   otree->puppimet_ey_UnclusteredEnDown = puppiUncl_DOWN.Py();
+	//   //
+	//   //  std::cout << "Corrected -> " << std::endl;
+	//   //  std::cout << "Central : " << puppimetLV.Pt()
+	//   //                    << "    Up : " << puppiUncl_UP.Pt()
+	//   //                    << "    Down : " << puppiUncl_DOWN.Pt() << std::endl;
+	//   //
+	// }
+	// else {
+	//   correctTauES(tauLV_1,metLV,shift_tes_1, isOneProng_1);
+	//   correctTauES(tauLV,metLV,shift_tes_2, isOneProng_2);
+	//   otree->pt_1 = tauLV_1.Pt();
+        //   otree->m_1 = tauLV_1.M();
+	//   otree->pt_2 = tauLV.Pt();
+        //   otree->m_2 = tauLV.M();
+	//   otree->met = metLV.Pt();
+	//   otree->metphi = metLV.Phi();
+	// }
       }
       ////////////////////////////////////////////////////////////
       // Filling variables (with corrected MET and tau momentum)
@@ -1630,7 +1632,9 @@ int main(int argc, char * argv[]){
       otree->pt_fast = -10;
       otree->phi_fast = -10;
       otree->eta_fast = -10;
-      if (ApplySVFit)svfit_variables(ch, &analysisTree, otree, &cfg, inputFile_visPtResolution);
+  
+      if (ApplySVFit && otree->trg_doubletau > 0.5 && otree->extraelec_veto < 0.5 && otree->extramuon_veto < 0.5&&otree->puppimt_1<60)
+	svfit_variables(ch, &analysisTree, otree, &cfg, inputFile_visPtResolution);
   /*
     if (!isSRevent) { 
       cout << "                                        " << endl;

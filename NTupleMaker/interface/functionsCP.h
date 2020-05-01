@@ -677,21 +677,23 @@ TLorentzVector neutralPivec(const AC1B * analysisTree, int tauIndex){
   TLorentzVector neutralPi; neutralPi.SetXYZT(0.,0.,0.,0.);
   TLorentzVector neutralPi_tmp; neutralPi_tmp.SetXYZT(0.,0.,0.,0.);
 
-  float maxPT=-100;int leadingIndex;
+  float maxPT=-100;int leadingIndex;float sumPT =0,sumE=0;
   for(int i=0;i<ncomponents;i++){
     if(analysisTree->tau_constituents_pdgId[tauIndex][i]==22||abs(analysisTree->tau_constituents_pdgId[tauIndex][i])==11){
 
       TLorentzVector neutralpart;      //momenta for photons, electrons and positrons
-
+      
       neutralpart.SetPxPyPzE(analysisTree->tau_constituents_px[tauIndex][i],
 			     analysisTree->tau_constituents_py[tauIndex][i],
 			     analysisTree->tau_constituents_pz[tauIndex][i],
 			     analysisTree->tau_constituents_e[tauIndex][i]);
-      if(neutralpart.Pt() >= maxPT && analysisTree->tau_constituents_pdgId[tauIndex][i]==22){
+      if(neutralpart.Pt() >= maxPT){
 	maxPT = neutralpart.Pt();
 	leadingIndex = i;
       }
       neutralPi+=neutralpart;
+      sumPT = sumPT + neutralpart.Pt();
+      sumE = sumE + neutralpart.E();
     }
   }
 
@@ -701,7 +703,7 @@ TLorentzVector neutralPivec(const AC1B * analysisTree, int tauIndex){
 			   analysisTree->tau_constituents_e[tauIndex][leadingIndex]);
     
   
-  neutralPi.SetPtEtaPhiE(neutralPi.Pt(),neutralPi_tmp.Eta(),neutralPi_tmp.Phi(),neutralPi.E());
+  neutralPi.SetPtEtaPhiE(sumPT,neutralPi_tmp.Eta(),neutralPi_tmp.Phi(),sumE);
   return neutralPi;
 };
 
