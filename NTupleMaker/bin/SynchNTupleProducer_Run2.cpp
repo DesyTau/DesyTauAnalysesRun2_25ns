@@ -1571,10 +1571,10 @@ int main(int argc, char * argv[]){
 
       TString wpVsEle = "VVLoose";
       TString wpVsMu = "Tight";
-      if(ch == "et"){
+      if(ch == "mt"){
 	wpVsEle = "VVLoose";
 	wpVsMu = "Tight";
-      }else if(ch == "mt") {
+      }else if(ch == "et") {
 	wpVsEle = "Tight";
 	wpVsMu = "VLoose";
       }
