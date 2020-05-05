@@ -1387,14 +1387,15 @@ int main(int argc, char * argv[]){
 
 	//corrections for genuine taus
 	if( analysisTree.tau_genmatch[tauIndex] == 5 ){
-	  
-	  double nominalID = w->function("t_deeptauid_mvadm"+suffix+"_medium")->getVal();
+	  TString forEtau="";
+	  if(ch == "et") forEtau = "_tightvsele";
+	  double nominalID= w->function("t_deeptauid_mvadm"+suffix+"_medium"+forEtau)->getVal();
 	  otree->idisoweight_2 = nominalID;
 	  //cout <<nominalID <<endl;
-	  double tauIDlowpTUp = w->function("t_deeptauid_mvadm"+suffix+"_medium_lowpt_mvadm"+mvadm+"_up")->getVal() / nominalID;
-	  double tauIDhighpTUp = w->function("t_deeptauid_mvadm"+suffix+"_medium_highpt_mvadm"+mvadm+"_up")->getVal() / nominalID;
-	  double tauIDlowpTDown = w->function("t_deeptauid_mvadm"+suffix+"_medium_lowpt_mvadm"+mvadm+"_down")->getVal() / nominalID;
-	  double tauIDhighpTDown = w->function("t_deeptauid_mvadm"+suffix+"_medium_highpt_mvadm"+mvadm+"_down")->getVal() / nominalID;
+	  double tauIDlowpTUp = w->function("t_deeptauid_mvadm"+suffix+"_medium"+forEtau+"_lowpt_mvadm"+mvadm+"_up")->getVal() / nominalID;
+	  double tauIDhighpTUp = w->function("t_deeptauid_mvadm"+suffix+"_medium"+forEtau+"_highpt_mvadm"+mvadm+"_up")->getVal() / nominalID;
+	  double tauIDlowpTDown = w->function("t_deeptauid_mvadm"+suffix+"_medium"+forEtau+"_lowpt_mvadm"+mvadm+"_down")->getVal() / nominalID;
+	  double tauIDhighpTDown = w->function("t_deeptauid_mvadm"+suffix+"_medium"+forEtau+"_highpt_mvadm"+mvadm+"_down")->getVal() / nominalID;
 	  
 	  if(mvadm=="0"){
 	    if(t_pt<40){
@@ -1467,7 +1468,7 @@ int main(int argc, char * argv[]){
 	  }
 	}else if( analysisTree.tau_genmatch[tauIndex] == 1 || analysisTree.tau_genmatch[tauIndex] == 3 ){
 	  //corrections for e->tau fakes
-	  
+	  //Currently not present
 	}
 	  
       }
