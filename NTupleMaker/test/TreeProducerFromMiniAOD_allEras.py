@@ -245,24 +245,6 @@ else:
         SkipWarnings = False)
 # END Pre-firing weights ======================================================================================
 
-# Pileup Jet ID ==========================================================================================
-# https://twiki.cern.ch/twiki/bin/view/CMS/PileupJetID#9X_2017_and_10X_2018_recipes
-from RecoJets.JetProducers.PileupJetID_cfi import _chsalgos_102x, _chsalgos_94x, _chsalgos_80x
-process.load('RecoJets.JetProducers.PileupJetID_cfi')
-process.pileupJetId.jets = cms.InputTag('slimmedJets')
-process.pileupJetId.inputIsCorrected = False
-process.pileupJetId.jec = cms.string('AK4PFchs')
-process.pileupJetId.applyJec = True
-process.pileupJetId.vertexes = cms.InputTag('offlineSlimmedPrimaryVertices')
-if period == '2018' :
-    process.pileupJetId.algos = cms.VPSet(_chsalgos_102x)
-elif period == '2017' :
-    process.pileupJetId.algos = cms.VPSet(_chsalgos_94x)
-else :
-    process.pileupJetId.algos = cms.VPSet(_chsalgos_80x)
-
-# END Pileup Jet ID ======================================================================================
-
 # Trigger list ================================================================================================
 # !!!!! WARNING : in 2018 all tau trigger names changed in the middle of the year -> please add also other names -> more information can be found here: https://twiki.cern.ch/twiki/bin/viewauth/CMS/TauTrigger#Trigger_table_for_2018 !!!!
 HLTlist = cms.untracked.vstring(
@@ -624,7 +606,7 @@ SusyInfo = cms.untracked.bool(not isData),
 Trigger = cms.untracked.bool(True),
 RecPrimVertex = cms.untracked.bool(True),
 RecPrimVertexWithBS = cms.untracked.bool(True),
-RefittedVertex = cms.untracked.bool(False),
+RefittedVertex = cms.untracked.bool(True),
 RefittedVertexWithBS = cms.untracked.bool(True),
 ApplyTauSpinner = cms.untracked.bool(RunTauSpinnerProducer),
 RecBeamSpot = cms.untracked.bool(True),
@@ -780,7 +762,7 @@ process.p = cms.Path(
   process.egammaPostRecoSeq *               # electron energy corrections and Ids
   process.rerunMvaIsolationSequence *  # Tau IDs
   getattr(process,updatedTauName) *  # Tau IDs
-  #process.AdvancedRefitVertexNoBSBSSequence * # Vertex refit w/o BS
+  process.AdvancedRefitVertexNoBSBSSequence * # Vertex refit w/o BS
   process.AdvancedRefitVertexBSSequence * # Vertex refit w/ BS
   process.MiniAODRefitVertexBS * # PV with BS constraint
   process.htxsSequence * # HTXS

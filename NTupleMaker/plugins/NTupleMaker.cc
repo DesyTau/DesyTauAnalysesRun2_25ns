@@ -532,9 +532,9 @@ void NTupleMaker::beginJob(){
     tree->Branch("pfjet_flavour", pfjet_flavour, "pfjet_flavour[pfjet_count]/I");
     tree->Branch("pfjet_btag", pfjet_btag,"pfjet_btag[pfjet_count][10]/F");
     tree->Branch("pfjet_jecUncertainty",pfjet_jecUncertainty,"pfjet_jecUncertainty[pfjet_count]/F");
-    tree->Branch("pfjet_pu_jet_fullId_loose", pfjet_pu_jet_fullId_loose, "pfjet_pu_jet_fullId_loose[pfjet_count]/O");
-    tree->Branch("pfjet_pu_jet_fullId_medium", pfjet_pu_jet_fullId_medium, "pfjet_pu_jet_fullId_medium[pfjet_count]/O");
-    tree->Branch("pfjet_pu_jet_fullId_tight", pfjet_pu_jet_fullId_tight, "pfjet_pu_jet_fullId_tight[pfjet_count]/O");
+    //tree->Branch("pfjet_pu_jet_fullId_loose", pfjet_pu_jet_fullId_loose, "pfjet_pu_jet_fullId_loose[pfjet_count]/O");
+    //tree->Branch("pfjet_pu_jet_fullId_medium", pfjet_pu_jet_fullId_medium, "pfjet_pu_jet_fullId_medium[pfjet_count]/O");
+    //tree->Branch("pfjet_pu_jet_fullId_tight", pfjet_pu_jet_fullId_tight, "pfjet_pu_jet_fullId_tight[pfjet_count]/O");
     tree->Branch("pfjet_pu_jet_fullDisc_mva", pfjet_pu_jet_fullDisc_mva, "pfjet_pu_jet_fullDisc_mva[pfjet_count]/F");
   }
 
@@ -1984,9 +1984,9 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	    edm::Ptr<reco::Candidate> leptonCand = (*RFVertex)[i].userCand(leptonName);
             if(std::abs(leptonCand->pdgId())==11 ){
               for(size_t ie = 0; ie < electron_count; ie++){
-                if(TMath::Abs(leptonCand->pt() - electron_pt[ie]) < 0.01 &&
-                   TMath::Abs(leptonCand->eta() - electron_eta[ie]) < 0.001 &&
-                   TMath::Abs(leptonCand->phi() - electron_phi[ie]) < 0.001){
+                if(//TMath::Abs(leptonCand->pt() - electron_pt[ie]) < 0.01 && //Electron ES is corrected, therefore pt matching cannot be done for electrons
+                   TMath::Abs(leptonCand->eta() - electron_eta[ie]) < 0.005 &&
+                   TMath::Abs(leptonCand->phi() - electron_phi[ie]) < 0.005){
                   nEle++;
                   if(nEle == 1)ele1 = ie;
                   else if(nEle == 2) ele2 = ie;
@@ -1995,9 +1995,9 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
             }
             else if(std::abs(leptonCand->pdgId())==13 ){
               for(size_t im = 0; im < muon_count; im++){
-                if(TMath::Abs(leptonCand->pt() - muon_pt[im]) < 0.01 &&
-                   TMath::Abs(leptonCand->eta() - muon_eta[im]) < 0.001 &&
-                   TMath::Abs(leptonCand->phi() - muon_phi[im]) < 0.001){
+                if(TMath::Abs(leptonCand->pt() - muon_pt[im]) < 0.05 &&
+                   TMath::Abs(leptonCand->eta() - muon_eta[im]) < 0.005 &&
+                   TMath::Abs(leptonCand->phi() - muon_phi[im]) < 0.005){
                   nMu++;
                   if(nMu == 1)muon1 = im;
                   else if(nMu == 2) muon2 = im;
@@ -2006,9 +2006,9 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
             }
             else { //for tau
               for(size_t it = 0; it < tau_count; it++){
-                if(TMath::Abs(leptonCand->pt() - tau_pt[it]) < 0.01 &&
-                   TMath::Abs(leptonCand->eta() - tau_eta[it]) < 0.001 &&
-                   TMath::Abs(leptonCand->phi() - tau_phi[it]) < 0.001){
+                if(TMath::Abs(leptonCand->pt() - tau_pt[it]) < 0.05 &&
+                   TMath::Abs(leptonCand->eta() - tau_eta[it]) < 0.005 &&
+                   TMath::Abs(leptonCand->phi() - tau_phi[it]) < 0.005){
                   nTau++;
                   if(nTau == 1)tau1 = it;
                   else if(nTau == 2) tau2 = it;
@@ -2059,9 +2059,9 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	    edm::Ptr<reco::Candidate> leptonCand = (*RFVertexwithbs)[i].userCand(leptonName);
             if(std::abs(leptonCand->pdgId())==11 ){
               for(size_t ie = 0; ie < electron_count; ie++){
-                if(TMath::Abs(leptonCand->pt() - electron_pt[ie]) < 0.01 &&
-                   TMath::Abs(leptonCand->eta() - electron_eta[ie]) < 0.001 &&
-                   TMath::Abs(leptonCand->phi() - electron_phi[ie]) < 0.001){
+                if(//TMath::Abs(leptonCand->pt() - electron_pt[ie]) < 0.05 &&
+                   TMath::Abs(leptonCand->eta() - electron_eta[ie]) < 0.005 &&
+                   TMath::Abs(leptonCand->phi() - electron_phi[ie]) < 0.005){
                   nEle++;
                   if(nEle == 1)ele1 = ie;
                   else if(nEle == 2) ele2 = ie;
@@ -2070,9 +2070,9 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
             }
             else if(std::abs(leptonCand->pdgId())==13 ){
               for(size_t im = 0; im < muon_count; im++){
-                if(TMath::Abs(leptonCand->pt() - muon_pt[im]) < 0.01 &&
-                   TMath::Abs(leptonCand->eta() - muon_eta[im]) < 0.001 &&
-                   TMath::Abs(leptonCand->phi() - muon_phi[im]) < 0.001){
+                if(TMath::Abs(leptonCand->pt() - muon_pt[im]) < 0.05 &&
+                   TMath::Abs(leptonCand->eta() - muon_eta[im]) < 0.005 &&
+                   TMath::Abs(leptonCand->phi() - muon_phi[im]) < 0.005){
                   nMu++;
                   if(nMu == 1)muon1 = im;
                   else if(nMu == 2) muon2 = im;
@@ -2081,9 +2081,9 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
             }
             else { //for tau
               for(size_t it = 0; it < tau_count; it++){
-                if(TMath::Abs(leptonCand->pt() - tau_pt[it]) < 0.01 &&
-                   TMath::Abs(leptonCand->eta() - tau_eta[it]) < 0.001 &&
-                   TMath::Abs(leptonCand->phi() - tau_phi[it]) < 0.001){
+                if(TMath::Abs(leptonCand->pt() - tau_pt[it]) < 0.05 &&
+                   TMath::Abs(leptonCand->eta() - tau_eta[it]) < 0.005 &&
+                   TMath::Abs(leptonCand->phi() - tau_phi[it]) < 0.005){
                   nTau++;
                   if(nTau == 1)tau1 = it;
                   else if(nTau == 2) tau2 = it;
@@ -4524,15 +4524,15 @@ unsigned int NTupleMaker::AddPFJets(const edm::Event& iEvent, const edm::EventSe
 
 	  //pileup jet id
 
-	  pfjet_pu_jet_fullId_loose[pfjet_count]  = false;
-	  pfjet_pu_jet_fullId_medium[pfjet_count] = false;
-	  pfjet_pu_jet_fullId_tight[pfjet_count]  = false;
-	  
-	  if(pfjet_pt[pfjet_count]>=20){
+	  //pfjet_pu_jet_fullId_loose[pfjet_count]  = false;
+	  //pfjet_pu_jet_fullId_medium[pfjet_count] = false;
+	  //pfjet_pu_jet_fullId_tight[pfjet_count]  = false;
+	  pfjet_pu_jet_fullDisc_mva[pfjet_count] = 1.;
+	  if(pfjet_pt[pfjet_count]<50){
 	    pfjet_pu_jet_fullDisc_mva[pfjet_count]  = (*pfjets)[i].userFloat("pileupJetId:fullDiscriminant");
-	    pfjet_pu_jet_fullId_loose[pfjet_count]  = ( (*pfjets)[i].userInt("pileupJetId:fullId") & (1<<2) || pfjet_pt[pfjet_count]>50 );
-	    pfjet_pu_jet_fullId_medium[pfjet_count] = ( (*pfjets)[i].userInt("pileupJetId:fullId") & (1<<1) || pfjet_pt[pfjet_count]>50 );
-	    pfjet_pu_jet_fullId_tight[pfjet_count]  = ( (*pfjets)[i].userInt("pileupJetId:fullId") & (1<<0) || pfjet_pt[pfjet_count]>50 );
+	    //pfjet_pu_jet_fullId_loose[pfjet_count]  = ( (*pfjets)[i].userInt("pileupJetId:fullId") & (1<<2) || pfjet_pt[pfjet_count]>50 );
+	    //pfjet_pu_jet_fullId_medium[pfjet_count] = ( (*pfjets)[i].userInt("pileupJetId:fullId") & (1<<1) || pfjet_pt[pfjet_count]>50 );
+	    //pfjet_pu_jet_fullId_tight[pfjet_count]  = ( (*pfjets)[i].userInt("pileupJetId:fullId") & (1<<0) || pfjet_pt[pfjet_count]>50 );
 	  }
 	  
 

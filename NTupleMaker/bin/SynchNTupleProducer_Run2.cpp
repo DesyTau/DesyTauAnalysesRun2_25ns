@@ -568,12 +568,16 @@ int main(int argc, char * argv[]){
       lepTauFakeOneProngScaleSys->SetUseSVFit(ApplySVFit);
       lepTauFakeOneProngScaleSys->SetUseFastMTT(ApplyFastMTT);
       lepTauFakeOneProngScaleSys->SetUsePuppiMET(usePuppiMET);
+      if(ch=="mt")lepTauFakeOneProngScaleSys->SetLabel("CMS_htt_ZLShape_mt_13TeV");
+      else if(ch=="et")lepTauFakeOneProngScaleSys->SetLabel("CMS_htt_ZLShape_et_13TeV");
 
       lepTauFakeOneProngOnePi0ScaleSys = new LepTauFakeOneProngOnePi0ScaleSys(otree);
       lepTauFakeOneProngOnePi0ScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);
       lepTauFakeOneProngOnePi0ScaleSys->SetUseSVFit(ApplySVFit);
       lepTauFakeOneProngOnePi0ScaleSys->SetUseFastMTT(ApplyFastMTT);
       lepTauFakeOneProngOnePi0ScaleSys->SetUsePuppiMET(usePuppiMET);
+      if(ch=="mt")lepTauFakeOneProngOnePi0ScaleSys->SetLabel("CMS_htt_ZLShape_mt_13TeV");
+      else if(ch=="et")lepTauFakeOneProngOnePi0ScaleSys->SetLabel("CMS_htt_ZLShape_et_13TeV");
 
     }
 
@@ -1240,6 +1244,17 @@ int main(int argc, char * argv[]){
       otree->weight_CMS_eff_t_pThigh_MVADM2_13TeVDown = 1; 
       otree->weight_CMS_eff_t_pThigh_MVADM10_13TeVDown = 1;
       otree->weight_CMS_eff_t_pThigh_MVADM11_13TeVDown = 1;
+      otree->weight_mufake_corr = 1; 
+      otree->weight_CMS_mufake_mt_MVADM0_13TeVUp = 1; 
+      otree->weight_CMS_mufake_mt_MVADM1_13TeVUp = 1; 
+      otree->weight_CMS_mufake_mt_MVADM2_13TeVUp = 1; 
+      otree->weight_CMS_mufake_mt_MVADM10_13TeVUp = 1;
+      otree->weight_CMS_mufake_mt_MVADM11_13TeVUp = 1;
+      otree->weight_CMS_mufake_mt_MVADM0_13TeVDown = 1; 
+      otree->weight_CMS_mufake_mt_MVADM1_13TeVDown = 1; 
+      otree->weight_CMS_mufake_mt_MVADM2_13TeVDown = 1; 
+      otree->weight_CMS_mufake_mt_MVADM10_13TeVDown = 1;
+      otree->weight_CMS_mufake_mt_MVADM11_13TeVDown = 1;
 	
       if (ApplyPUweight) 
         otree->puweight = float(PUofficial->get_PUweight(double(analysisTree.numtruepileupinteractions)));
@@ -1354,7 +1369,7 @@ int main(int argc, char * argv[]){
     
       //cout <<"TauID SF" <<endl;
 
-      if ((!isData || isEmbedded) && analysisTree.tau_genmatch[tauIndex] == 5) { 
+      if ((!isData || isEmbedded) && analysisTree.tau_genmatch[tauIndex] <= 5) { 
       	TString suffix = "";
       	if (isEmbedded) suffix = "_embed";
 	
@@ -1368,56 +1383,94 @@ int main(int argc, char * argv[]){
 	  w->var("t_mvadm")->setVal(analysisTree.tau_decayMode[tauIndex]);
 	else
 	  w->var("t_mvadm")->setVal(analysisTree.tau_MVADM2017v1[tauIndex]);
-	double nominalID = w->function("t_deeptauid_mvadm"+suffix+"_medium")->getVal();
-	otree->idisoweight_2 = nominalID;
-	//cout <<nominalID <<endl;
-	double tauIDlowpTUp = w->function("t_deeptauid_mvadm"+suffix+"_medium_lowpt_mvadm"+mvadm+"_up")->getVal() / nominalID;
-	double tauIDhighpTUp = w->function("t_deeptauid_mvadm"+suffix+"_medium_highpt_mvadm"+mvadm+"_up")->getVal() / nominalID;
-	double tauIDlowpTDown = w->function("t_deeptauid_mvadm"+suffix+"_medium_lowpt_mvadm"+mvadm+"_down")->getVal() / nominalID;
-	double tauIDhighpTDown = w->function("t_deeptauid_mvadm"+suffix+"_medium_highpt_mvadm"+mvadm+"_down")->getVal() / nominalID;
-	
-	if(mvadm=="0"){
-	  if(t_pt<40){
-	    otree->weight_CMS_eff_t_pTlow_MVADM0_13TeVUp = tauIDlowpTUp;
-	    otree->weight_CMS_eff_t_pTlow_MVADM0_13TeVDown = tauIDlowpTDown;
-	  }else{
-	    otree->weight_CMS_eff_t_pThigh_MVADM0_13TeVUp = tauIDhighpTUp;
-	    otree->weight_CMS_eff_t_pThigh_MVADM0_13TeVDown = tauIDhighpTDown;
+
+
+	//corrections for genuine taus
+	if( analysisTree.tau_genmatch[tauIndex] == 5 ){
+	  TString forEtau="";
+	  if(ch == "et") forEtau = "_tightvsele";
+	  double nominalID= w->function("t_deeptauid_mvadm"+suffix+"_medium"+forEtau)->getVal();
+	  otree->idisoweight_2 = nominalID;
+	  //cout <<nominalID <<endl;
+	  double tauIDlowpTUp = w->function("t_deeptauid_mvadm"+suffix+"_medium"+forEtau+"_lowpt_mvadm"+mvadm+"_up")->getVal() / nominalID;
+	  double tauIDhighpTUp = w->function("t_deeptauid_mvadm"+suffix+"_medium"+forEtau+"_highpt_mvadm"+mvadm+"_up")->getVal() / nominalID;
+	  double tauIDlowpTDown = w->function("t_deeptauid_mvadm"+suffix+"_medium"+forEtau+"_lowpt_mvadm"+mvadm+"_down")->getVal() / nominalID;
+	  double tauIDhighpTDown = w->function("t_deeptauid_mvadm"+suffix+"_medium"+forEtau+"_highpt_mvadm"+mvadm+"_down")->getVal() / nominalID;
+	  
+	  if(mvadm=="0"){
+	    if(t_pt<40){
+	      otree->weight_CMS_eff_t_pTlow_MVADM0_13TeVUp = tauIDlowpTUp;
+	      otree->weight_CMS_eff_t_pTlow_MVADM0_13TeVDown = tauIDlowpTDown;
+	    }else{
+	      otree->weight_CMS_eff_t_pThigh_MVADM0_13TeVUp = tauIDhighpTUp;
+	      otree->weight_CMS_eff_t_pThigh_MVADM0_13TeVDown = tauIDhighpTDown;
+	    }
+	  }else if(mvadm=="1"){
+	    if(t_pt<40){
+	      otree->weight_CMS_eff_t_pTlow_MVADM1_13TeVUp = tauIDlowpTUp;
+	      otree->weight_CMS_eff_t_pTlow_MVADM1_13TeVDown = tauIDlowpTDown;
+	    }else{
+	      otree->weight_CMS_eff_t_pThigh_MVADM1_13TeVUp = tauIDhighpTUp;
+	      otree->weight_CMS_eff_t_pThigh_MVADM1_13TeVDown = tauIDhighpTDown;
+	    }
+	  }else if(mvadm=="2"){
+	    if(t_pt<40){
+	      otree->weight_CMS_eff_t_pTlow_MVADM2_13TeVUp = tauIDlowpTUp;
+	      otree->weight_CMS_eff_t_pTlow_MVADM2_13TeVDown = tauIDlowpTDown;
+	    }else{
+	      otree->weight_CMS_eff_t_pThigh_MVADM2_13TeVUp = tauIDhighpTUp;
+	      otree->weight_CMS_eff_t_pThigh_MVADM2_13TeVDown = tauIDhighpTDown;
+	    }
+	  }else if(mvadm=="10"){
+	    if(t_pt<40){
+	      otree->weight_CMS_eff_t_pTlow_MVADM10_13TeVUp = tauIDlowpTUp;
+	      otree->weight_CMS_eff_t_pTlow_MVADM10_13TeVDown = tauIDlowpTDown;
+	    }else{
+	      otree->weight_CMS_eff_t_pThigh_MVADM10_13TeVUp = tauIDhighpTUp;
+	      otree->weight_CMS_eff_t_pThigh_MVADM10_13TeVDown = tauIDhighpTDown;
+	    }
+	  }else if(mvadm=="11"){
+	    if(t_pt<40){
+	      otree->weight_CMS_eff_t_pTlow_MVADM11_13TeVUp = tauIDlowpTUp;
+	      otree->weight_CMS_eff_t_pTlow_MVADM11_13TeVDown = tauIDlowpTDown;
+	    }else{
+	      otree->weight_CMS_eff_t_pThigh_MVADM11_13TeVUp = tauIDhighpTUp;
+	      otree->weight_CMS_eff_t_pThigh_MVADM11_13TeVDown = tauIDhighpTDown;
+	    }
 	  }
-	}else if(mvadm=="1"){
-	  if(t_pt<40){
-	    otree->weight_CMS_eff_t_pTlow_MVADM1_13TeVUp = tauIDlowpTUp;
-	    otree->weight_CMS_eff_t_pTlow_MVADM1_13TeVDown = tauIDlowpTDown;
-	  }else{
-	    otree->weight_CMS_eff_t_pThigh_MVADM1_13TeVUp = tauIDhighpTUp;
-	    otree->weight_CMS_eff_t_pThigh_MVADM1_13TeVDown = tauIDhighpTDown;
+	}else if( analysisTree.tau_genmatch[tauIndex] == 2 || analysisTree.tau_genmatch[tauIndex] == 4 ){
+	  //corrections for mu->tau fakes
+
+	  double FRcorr = w->function("t_mufake_mt_mvadm_mvadm"+mvadm)->getVal();
+	  double FRcorrUp = w->function("t_mufake_mt_mvadm_mvadm"+mvadm+"_up")->getVal() / FRcorr;
+	  double FRcorrDown = w->function("t_mufake_mt_mvadm_mvadm"+mvadm+"_down")->getVal() / FRcorr;
+
+	  if(mvadm=="0"){
+	    otree->weight_mufake_corr = FRcorr;
+	    otree->weight_CMS_mufake_mt_MVADM0_13TeVUp = FRcorrUp;
+	    otree->weight_CMS_mufake_mt_MVADM0_13TeVDown = FRcorrDown;
+	  }else if(mvadm=="1"){
+	    otree->weight_mufake_corr = FRcorr;
+	    otree->weight_CMS_mufake_mt_MVADM1_13TeVUp = FRcorrUp;
+	    otree->weight_CMS_mufake_mt_MVADM1_13TeVDown = FRcorrDown;
+	  }else if(mvadm=="2"){
+	    otree->weight_mufake_corr = FRcorr;
+	    otree->weight_CMS_mufake_mt_MVADM2_13TeVUp = FRcorrUp;
+	    otree->weight_CMS_mufake_mt_MVADM2_13TeVDown = FRcorrDown;
+	  }else if(mvadm=="10"){
+	    otree->weight_mufake_corr = FRcorr;
+	    otree->weight_CMS_mufake_mt_MVADM10_13TeVUp = FRcorrUp;
+	    otree->weight_CMS_mufake_mt_MVADM10_13TeVDown = FRcorrDown;
+	  }else if(mvadm=="11"){
+	    otree->weight_mufake_corr = FRcorr;
+	    otree->weight_CMS_mufake_mt_MVADM11_13TeVUp = FRcorrUp;
+	    otree->weight_CMS_mufake_mt_MVADM11_13TeVDown = FRcorrDown;
 	  }
-	}else if(mvadm=="2"){
-	  if(t_pt<40){
-	    otree->weight_CMS_eff_t_pTlow_MVADM2_13TeVUp = tauIDlowpTUp;
-	    otree->weight_CMS_eff_t_pTlow_MVADM2_13TeVDown = tauIDlowpTDown;
-	  }else{
-	    otree->weight_CMS_eff_t_pThigh_MVADM2_13TeVUp = tauIDhighpTUp;
-	    otree->weight_CMS_eff_t_pThigh_MVADM2_13TeVDown = tauIDhighpTDown;
-	  }
-	}else if(mvadm=="10"){
-	  if(t_pt<40){
-	    otree->weight_CMS_eff_t_pTlow_MVADM10_13TeVUp = tauIDlowpTUp;
-	    otree->weight_CMS_eff_t_pTlow_MVADM10_13TeVDown = tauIDlowpTDown;
-	  }else{
-	    otree->weight_CMS_eff_t_pThigh_MVADM10_13TeVUp = tauIDhighpTUp;
-	    otree->weight_CMS_eff_t_pThigh_MVADM10_13TeVDown = tauIDhighpTDown;
-	  }
-	}else if(mvadm=="11"){
-	  if(t_pt<40){
-	    otree->weight_CMS_eff_t_pTlow_MVADM11_13TeVUp = tauIDlowpTUp;
-	    otree->weight_CMS_eff_t_pTlow_MVADM11_13TeVDown = tauIDlowpTDown;
-	  }else{
-	    otree->weight_CMS_eff_t_pThigh_MVADM11_13TeVUp = tauIDhighpTUp;
-	    otree->weight_CMS_eff_t_pThigh_MVADM11_13TeVDown = tauIDhighpTDown;
-	  }
+	}else if( analysisTree.tau_genmatch[tauIndex] == 1 || analysisTree.tau_genmatch[tauIndex] == 3 ){
+	  //corrections for e->tau fakes
+	  //Currently not present
 	}
-								 
+	  
       }
     
       //      cout << "\n======================" << endl;
@@ -1430,8 +1483,23 @@ int main(int argc, char * argv[]){
       otree->effweight = otree->idisoweight_1 * otree->trkeffweight * otree->idisoweight_2 * otree->trigweight;
       otree->weight = otree->effweight * otree->puweight * otree->mcweight; 
       
+      
+      //Theory uncertainties for CP analysis
+      
       otree->weight_CMS_scale_gg_13TeVUp   = analysisTree.weightScale4;
       otree->weight_CMS_scale_gg_13TeVDown = analysisTree.weightScale8;
+
+      otree->weight_CMS_PS_ISR_ggH_13TeVUp   = 1.;
+      otree->weight_CMS_PS_ISR_ggH_13TeVDown = 1.;
+      otree->weight_CMS_PS_FSR_ggH_13TeVUp   = 1.;
+      otree->weight_CMS_PS_FSR_ggH_13TeVDown = 1.;
+
+      if(isVBForGGHiggs){
+	otree->weight_CMS_PS_ISR_ggH_13TeVUp   = analysisTree.gen_pythiaweights[6];
+	otree->weight_CMS_PS_ISR_ggH_13TeVDown = analysisTree.gen_pythiaweights[8];
+	otree->weight_CMS_PS_FSR_ggH_13TeVUp   = analysisTree.gen_pythiaweights[7];
+	otree->weight_CMS_PS_FSR_ggH_13TeVDown = analysisTree.gen_pythiaweights[9];
+      }
 
 
       ////////////////////////////////////////////////////////////
@@ -1481,14 +1549,16 @@ int main(int argc, char * argv[]){
         // otree->topptweight = genTools::topPtWeight(analysisTree, 1); // 1 is for Run1 - use this reweighting as recommended by HTT 17
       }
       counter[11]++;
-      
+
       ////////////////////////////////////////////////////////////
       // Lep->tau fake weight
       ////////////////////////////////////////////////////////////
 
       otree->mutaufakeweight = 1.;
       otree->etaufakeweight = 1.;
+      /* //DEPREACTED
       if (!isData){
+      
       	if (ch == "et") {
       	  otree->etaufakeweight = leptauFR->get_fakerate("electron", "Tight", otree->eta_2, otree->gen_match_2);
       	  otree->mutaufakeweight = leptauFR->get_fakerate("muon", "Loose", otree->eta_2, otree->gen_match_2);
@@ -1497,8 +1567,28 @@ int main(int argc, char * argv[]){
       	  otree->etaufakeweight = leptauFR->get_fakerate("electron", "VLoose", otree->eta_2, otree->gen_match_2);
       	  otree->mutaufakeweight = leptauFR->get_fakerate("muon", "Tight", otree->eta_2, otree->gen_match_2);
       	}
+	}*/
+
+      TString wpVsEle = "VVLoose";
+      TString wpVsMu = "Tight";
+      if(ch == "mt"){
+	wpVsEle = "VVLoose";
+	wpVsMu = "Tight";
+      }else if(ch == "et") {
+	wpVsEle = "Tight";
+	wpVsMu = "VLoose";
       }
-    
+      if(!isData){
+	if(otree->gen_match_2==2||otree->gen_match_2==4){
+	  TFile muTauFRfile(TString(cmsswBase)+"/src/TauPOG/TauIDSFs/data/TauID_SF_eta_DeepTau2017v2p1VSmu_"+year+".root"); 
+	  TH1F *SFhist = (TH1F*) muTauFRfile.Get(wpVsMu);
+	  otree->mutaufakeweight = SFhist->GetBinContent(SFhist->GetXaxis()->FindBin(otree->eta_2));
+	}else if(otree->gen_match_2==1||otree->gen_match_2==3){
+	  TFile eTauFRfile(TString(cmsswBase)+"/src/TauPOG/TauIDSFs/data/TauID_SF_eta_DeepTau2017v2p1VSe_"+year+".root"); 
+	  TH1F *SFhist = (TH1F*) eTauFRfile.Get(wpVsEle);
+	  otree->etaufakeweight = SFhist->GetBinContent(SFhist->GetXaxis()->FindBin(otree->eta_2));
+	}
+      }
       ////////////////////////////////////////////////////////////
       // MET and Recoil Corrections
       ////////////////////////////////////////////////////////////
