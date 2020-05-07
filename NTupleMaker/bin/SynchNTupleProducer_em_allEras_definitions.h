@@ -705,6 +705,8 @@ vector<unsigned int> bjetsRaw;
 TLorentzVector jetLV;
 TLorentzVector jetLVJERDown;
 TLorentzVector jetLVJERUp;
+TLorentzVector metLV_JERDown;
+TLorentzVector metLV_JERUp;
 TLorentzVector jet1;
 TLorentzVector jet2;
 TLorentzVector jet1LV_jerUp;

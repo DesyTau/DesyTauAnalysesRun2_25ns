@@ -782,6 +782,7 @@ int main(int argc, char * argv[]) {
          rho = analysisTree.rho;
          npartons = analysisTree.genparticles_noutgoing;
 
+
          // apply good run selection  ==================================================================================================================================
          if ((isData || isEmbedded) && applyGoodRunSelection){
 
@@ -1180,6 +1181,16 @@ int main(int argc, char * argv[]) {
                   metLV_jecUnc[uncer_split.first + "Down"] += jetLV* unc_total;
                }
             }
+            
+            //propagate jer uncertainties to met
+            metLV_JERUp = metLV;
+            metLV_JERDown = metLV;
+            if (!isSampleForRecoilCorrection) {
+              metLV_JERUp -= jetLV*shift_up;
+              metLV_JERDown -= jetLV*shift_down;
+            }
+            
+            
             float jetPt_tocheck = jetPt;
             if (sync) jetPt_tocheck = jetPt;
             else{
@@ -1496,10 +1507,6 @@ int main(int argc, char * argv[]) {
          float met_unclMetUp_y;
          float met_unclMetDown_x;
          float met_unclMetDown_y;
-         float met_JERDown_x;
-         float met_JERDown_y;
-         float met_JERUp_x;
-         float met_JERUp_y;
 
          if (!usePuppiMet){
             met_x_recoilscaleUp = analysisTree.pfmetcorr_ex;
@@ -1515,10 +1522,6 @@ int main(int argc, char * argv[]) {
             met_unclMetUp_y    = analysisTree.pfmetcorr_ey_UnclusteredEnUp;
             met_unclMetDown_x  = analysisTree.pfmetcorr_ex_UnclusteredEnDown;
             met_unclMetDown_y  = analysisTree.pfmetcorr_ey_UnclusteredEnDown;
-            met_JERUp_x    = analysisTree.pfmetcorr_ex_JetResUp;
-            met_JERUp_y    = analysisTree.pfmetcorr_ey_JetResUp;
-            met_JERDown_x  = analysisTree.pfmetcorr_ex_JetResDown;
-            met_JERDown_y  = analysisTree.pfmetcorr_ey_JetResDown;
          }
          else{
             met_x_recoilscaleUp = analysisTree.puppimet_ex;
@@ -1534,11 +1537,6 @@ int main(int argc, char * argv[]) {
             met_unclMetUp_y    = analysisTree.puppimet_ey_UnclusteredEnUp;
             met_unclMetDown_x  = analysisTree.puppimet_ex_UnclusteredEnDown;
             met_unclMetDown_y  = analysisTree.puppimet_ey_UnclusteredEnDown;
-
-            met_JERUp_x    = analysisTree.puppimet_ex_JetResUp;
-            met_JERUp_y    = analysisTree.puppimet_ey_JetResUp;
-            met_JERDown_x  = analysisTree.puppimet_ex_JetResDown;
-            met_JERDown_y  = analysisTree.puppimet_ey_JetResDown;
          }
          met = TMath::Sqrt(met_x*met_x + met_y*met_y);
          metphi = TMath::ATan2(met_y,met_x);
@@ -1605,9 +1603,6 @@ int main(int argc, char * argv[]) {
          metphi_unclMetUp = TMath::ATan2(met_unclMetUp_y,met_unclMetUp_x);
          met_unclMetDown = TMath::Sqrt(met_unclMetDown_x*met_unclMetDown_x+met_unclMetDown_y*met_unclMetDown_y);
          metphi_unclMetDown = TMath::ATan2(met_unclMetDown_y,met_unclMetDown_x);
-
-         met_JERUp = TMath::Sqrt(met_JERUp_x*met_JERUp_x+met_JERUp_y*met_JERUp_y);
-         met_JERDown = TMath::Sqrt(met_JERDown_x*met_JERDown_x+met_JERDown_y*met_JERDown_y);
          
          if(isSampleForRecoilCorrection){
             met_unclMetUp_x   = met_x;
@@ -1711,8 +1706,6 @@ int main(int argc, char * argv[]) {
          TLorentzVector metLV_unclMetUp; metLV_unclMetUp.SetXYZT(met_unclMetUp_x,met_unclMetUp_y,0.,met_unclMetUp);
          TLorentzVector metLV_unclMetDown; metLV_unclMetDown.SetXYZT(met_unclMetDown_x,met_unclMetDown_y,0.,met_unclMetDown);
 
-         TLorentzVector metLV_JERUp; metLV_JERUp.SetXYZT(met_JERUp_x,met_JERUp_y,0.,met_JERUp);
-         TLorentzVector metLV_JERDown; metLV_JERDown.SetXYZT(met_JERDown_x,met_JERDown_y,0.,met_JERDown);
          // computing total transverse mass
          mTtot = totalTransverseMass        ( muonLV ,     electronLV , metLV);
          mTemu   = mT(electronLV,muonLV);
@@ -1723,6 +1716,7 @@ int main(int argc, char * argv[]) {
 
 
          mTdileptonMET = mT(dileptonLV,metLV);
+
          
          pt_ttjj = -10;
          if (indexLeadingJet>=0 && indexSubLeadingJet>=0) {
@@ -2256,7 +2250,7 @@ int main(int argc, char * argv[]) {
          
          for(auto &uncert : uncertainty_map){
             bool is_data_or_embedded = isData || (isEmbedded && !uncert.first.Contains("escale") && !uncert.first.Contains("ereso")  && !uncert.first.Contains("embescale"));
-            
+          
             propagate_uncertainty( uncert.first,
                                    uncert.second.metLV, covMET, inputFile_visPtResolution,
                                    uncert.second.muonLV,
