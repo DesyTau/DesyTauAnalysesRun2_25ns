@@ -36,9 +36,15 @@ echo "CONFIGFILE,FILELIST" > parameters.txt
 ../split_filelist.sh   analysisMacroSynch_em_MC.conf  TTToHadronic_TuneCP5_13TeV_powheg_pythia8 5
 
 #Diboson 
-../split_filelist.sh   analysisMacroSynch_em_MC.conf WW_TuneCP5_13TeV-pythia8 1
-../split_filelist.sh   analysisMacroSynch_em_MC.conf WZ_TuneCP5_13TeV-pythia8 1
-../split_filelist.sh   analysisMacroSynch_em_MC.conf ZZ_TuneCP5_13TeV-pythia8 5
+#../split_filelist.sh   analysisMacroSynch_em_MC.conf WW_TuneCP5_13TeV-pythia8 1
+#../split_filelist.sh   analysisMacroSynch_em_MC.conf WZ_TuneCP5_13TeV-pythia8 1
+#../split_filelist.sh   analysisMacroSynch_em_MC.conf ZZ_TuneCP5_13TeV-pythia8 5
+
+../split_filelist.sh   analysisMacroSynch_em_MC.conf WZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8 1
+../split_filelist.sh   analysisMacroSynch_em_MC.conf VVTo2L2Nu_13TeV_amcatnloFXFX_madspin_pythia8 1
+../split_filelist.sh   analysisMacroSynch_em_MC.conf WZTo3LNu_TuneCP5_13TeV-amcatnloFXFX-pythia8 1
+../split_filelist.sh   analysisMacroSynch_em_MC.conf ZZTo4L_TuneCP5_13TeV_powheg_pythia8 1
+../split_filelist.sh   analysisMacroSynch_em_MC.conf ZZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8 1
 
 
 #Embedded
@@ -78,3 +84,8 @@ echo "CONFIGFILE,FILELIST" > parameters.txt
 ../split_filelist.sh  analysisMacroSynch_em_Signal.conf ggZH_HToTauTau_ZToQQ_M125_13TeV_powheg_pythia8 1
 ../split_filelist.sh  analysisMacroSynch_em_Signal.conf ggZH_HToTauTau_ZToNuNu_M125_13TeV_powheg_pythia8 1
 ../split_filelist.sh  analysisMacroSynch_em_Signal.conf ggZH_HToTauTau_ZToLL_M125_13TeV_powheg_pythia8 1
+
+../split_filelist.sh  analysisMacroSynch_em_Signal_ggH.conf GluGluZH_HToWW_M125_13TeV_powheg_pythia8_TuneCP5_PSweights 1
+../split_filelist.sh  analysisMacroSynch_em_Signal.conf HWminusJ_HToWW_M125_13TeV_powheg_jhugen724_pythia8_TuneCP5 1
+../split_filelist.sh  analysisMacroSynch_em_Signal.conf HWplusJ_HToWW_M125_13TeV_powheg_jhugen724_pythia8_TuneCP5 1
+../split_filelist.sh  analysisMacroSynch_em_Signal.conf HZJ_HToWW_M125_13TeV_powheg_jhugen714_pythia8_TuneCP5 1
