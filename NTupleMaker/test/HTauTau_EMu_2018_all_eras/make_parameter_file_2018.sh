@@ -85,7 +85,7 @@ echo "CONFIGFILE,FILELIST" > parameters.txt
 ../split_filelist.sh  analysisMacroSynch_em_Signal.conf ggZH_HToTauTau_ZToNuNu_M125_13TeV_powheg_pythia8 1
 ../split_filelist.sh  analysisMacroSynch_em_Signal.conf ggZH_HToTauTau_ZToLL_M125_13TeV_powheg_pythia8 1
 
-../split_filelist.sh  analysisMacroSynch_em_Signal_ggH.conf GluGluZH_HToWW_M125_13TeV_powheg_pythia8_TuneCP5_PSweights 1
+../split_filelist.sh  analysisMacroSynch_em_Signal_ggh.conf GluGluZH_HToWW_M125_13TeV_powheg_pythia8_TuneCP5_PSweights 1
 ../split_filelist.sh  analysisMacroSynch_em_Signal.conf HWminusJ_HToWW_M125_13TeV_powheg_jhugen724_pythia8_TuneCP5 1
 ../split_filelist.sh  analysisMacroSynch_em_Signal.conf HWplusJ_HToWW_M125_13TeV_powheg_jhugen724_pythia8_TuneCP5 1
 ../split_filelist.sh  analysisMacroSynch_em_Signal.conf HZJ_HToWW_M125_13TeV_powheg_jhugen714_pythia8_TuneCP5 1
