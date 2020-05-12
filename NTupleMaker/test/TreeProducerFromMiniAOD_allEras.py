@@ -287,6 +287,7 @@ HLTlist = cms.untracked.vstring(
 'HLT_DoubleTightChargedIsoPFTau35_Trk1_TightID_eta2p1_Reg_v',
 'HLT_DoubleMediumChargedIsoPFTau40_Trk1_TightID_eta2p1_Reg_v',
 'HLT_DoubleTightChargedIsoPFTau40_Trk1_eta2p1_Reg_v',
+'HLT_DoubleMediumChargedIsoPFTauHPS35_Trk1_TightID_eta2p1_Reg_v'#2018
 'HLT_DoubleMediumChargedIsoPFTau40_Trk1_TightID_eta2p1_Reg_v', #2018                                                                           
 'HLT_DoubleTightChargedIsoPFTau40_Trk1_eta2p1_Reg_v', #2018                                                                                    
 'HLT_DoubleTightChargedIsoPFTau35_Trk1_TightID_eta2p1_Reg_v', #2018                                                                            
@@ -511,6 +512,7 @@ tau_hlt_filters = cms.untracked.vstring(
     'HLT_IsoMu20_eta2p1_LooseChargedIsoPFTauHPS27_eta2p1_TightID_CrossL1_v.*:hltHpsSelectedPFTau27LooseChargedIsolationTightOOSCPhotonsAgainstMuonL1HLTMatched',
     'HLT_Ele24_eta2p1_WPTight_Gsf_LooseChargedIsoPFTauHPS30_eta2p1_CrossL1_v.*:hltEle24erWPTightGsfTrackIsoFilterForTau',
     'HLT_Ele24_eta2p1_WPTight_Gsf_LooseChargedIsoPFTauHPS30_eta2p1_TightID_CrossL1_v.*:hltEle24erWPTightGsfTrackIsoFilterForTau',
+    'HLT_DoubleMediumChargedIsoPFTauHPS35_Trk1_TightID_eta2p1_Reg_v.*: hltHpsDoublePFTau35TrackPt1MediumChargedIsolationAndTightOOSCPhotonsDz02Reg',#2018
     'HLT_DoubleMediumChargedIsoPFTau40_Trk1_TightID_eta2p1_Reg_v.*:hltDoublePFTau40TrackPt1MediumChargedIsolationAndTightOOSCPhotonsDz02Reg',#2018                                                                                                                                         
     'HLT_DoubleTightChargedIsoPFTau40_Trk1_eta2p1_Reg_v.*:hltDoublePFTau40TrackPt1TightChargedIsolationDz02Reg', #2018                    
     'HLT_DoubleTightChargedIsoPFTau35_Trk1_TightID_eta2p1_Reg_v.*:hltDoublePFTau35TrackPt1TightChargedIsolationAndTightOOSCPhotonsDz02Reg',#2018                                                                                                                                           
