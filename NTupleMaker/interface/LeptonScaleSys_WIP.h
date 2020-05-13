@@ -48,7 +48,11 @@ public:
     for (std::map<std::string,TTree*>::iterator it=outTree.begin(); it!=outTree.end(); ++it)
       it->second->Write();
   };
-  
+
+  void SetLabel(TString l){
+    label = l;
+  };
+
   void SetSvFitVisPtResolution(TFile* f){
     svFit_visPtResolution = f;
   };

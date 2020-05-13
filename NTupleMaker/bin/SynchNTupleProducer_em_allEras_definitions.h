@@ -127,6 +127,7 @@ Float_t         embeddedWeight;
 Float_t         signalWeight;
 Float_t         topptweight;
 Float_t         topptweightRun2;
+Float_t         topptweightRun2ttH;
 
 Float_t         qcdweight;
 Float_t         qcdweightup;
@@ -704,6 +705,8 @@ vector<unsigned int> bjetsRaw;
 TLorentzVector jetLV;
 TLorentzVector jetLVJERDown;
 TLorentzVector jetLVJERUp;
+TLorentzVector metLV_JERDown;
+TLorentzVector metLV_JERUp;
 TLorentzVector jet1;
 TLorentzVector jet2;
 TLorentzVector jet1LV_jerUp;
@@ -822,6 +825,7 @@ void SetupTree(){
    tree->Branch("signalWeight", &signalWeight, "signalWeight/F");
    tree->Branch("topptweight", &topptweight, "topptweight/F");
    tree->Branch("topptweightRun2", &topptweightRun2, "topptweightRun2/F");
+   tree->Branch("topptweightRun2ttH", &topptweightRun2ttH, "topptweightRun2ttH/F");
    
    tree->Branch("qcdweight", &qcdweight, "qcdweight/F");
    tree->Branch("qcdweightup", &qcdweightup, "qcdweightup/F");
@@ -1128,6 +1132,7 @@ void SetDefaultValues(){
    signalWeight = 1;
    topptweight = 1;
    topptweightRun2 = 1;
+   topptweightRun2ttH = 1;
    
    THU_ggH_Mu = 1.0;
    THU_ggH_Res = 1.0;

@@ -344,8 +344,25 @@ public :
   Float_t weight_CMS_eff_t_pThigh_MVADM10_13TeVDown;
   Float_t weight_CMS_eff_t_pThigh_MVADM11_13TeVDown;
 
+
+  Float_t weight_mufake_corr; 
+  Float_t weight_CMS_mufake_mt_MVADM0_13TeVUp; 
+  Float_t weight_CMS_mufake_mt_MVADM1_13TeVUp; 
+  Float_t weight_CMS_mufake_mt_MVADM2_13TeVUp; 
+  Float_t weight_CMS_mufake_mt_MVADM10_13TeVUp;
+  Float_t weight_CMS_mufake_mt_MVADM11_13TeVUp;
+  Float_t weight_CMS_mufake_mt_MVADM0_13TeVDown; 
+  Float_t weight_CMS_mufake_mt_MVADM1_13TeVDown; 
+  Float_t weight_CMS_mufake_mt_MVADM2_13TeVDown; 
+  Float_t weight_CMS_mufake_mt_MVADM10_13TeVDown;
+  Float_t weight_CMS_mufake_mt_MVADM11_13TeVDown;
+
   Float_t weight_CMS_scale_gg_13TeVUp;
   Float_t weight_CMS_scale_gg_13TeVDown;
+  Float_t weight_CMS_PS_ISR_ggH_13TeVUp;
+  Float_t weight_CMS_PS_ISR_ggH_13TeVDown;
+  Float_t weight_CMS_PS_FSR_ggH_13TeVUp;
+  Float_t weight_CMS_PS_FSR_ggH_13TeVDown;
 
   Float_t         topptweight;
   Double_t 	  zptweight;
@@ -364,6 +381,9 @@ public :
   Bool_t          trg_mutaucross;
   Bool_t          trg_mutaucross_mu;
   Bool_t          trg_mutaucross_tau;
+  Bool_t          trg_etaucross;
+  Bool_t          trg_etaucross_e;
+  Bool_t          trg_etaucross_tau;
   Bool_t          trg_doubletau;
   Bool_t          ditauTrigger;
   Bool_t          xTriggerLep;
@@ -931,6 +951,22 @@ public :
   
   TBranch        *b_weight_CMS_scale_gg_13TeVUp;
   TBranch        *b_weight_CMS_scale_gg_13TeVDown;
+  TBranch        *b_weight_CMS_PS_ISR_ggH_13TeVUp;
+  TBranch        *b_weight_CMS_PS_ISR_ggH_13TeVDown;
+  TBranch        *b_weight_CMS_PS_FSR_ggH_13TeVUp;
+  TBranch        *b_weight_CMS_PS_FSR_ggH_13TeVDown;
+
+  TBranch        *b_weight_mufake_corr; 
+  TBranch        *b_weight_CMS_mufake_mt_MVADM0_13TeVUp; 
+  TBranch        *b_weight_CMS_mufake_mt_MVADM1_13TeVUp; 
+  TBranch        *b_weight_CMS_mufake_mt_MVADM2_13TeVUp; 
+  TBranch        *b_weight_CMS_mufake_mt_MVADM10_13TeVUp;
+  TBranch        *b_weight_CMS_mufake_mt_MVADM11_13TeVUp;
+  TBranch        *b_weight_CMS_mufake_mt_MVADM0_13TeVDown; 
+  TBranch        *b_weight_CMS_mufake_mt_MVADM1_13TeVDown; 
+  TBranch        *b_weight_CMS_mufake_mt_MVADM2_13TeVDown; 
+  TBranch        *b_weight_CMS_mufake_mt_MVADM10_13TeVDown;
+  TBranch        *b_weight_CMS_mufake_mt_MVADM11_13TeVDown;
 
   TBranch	 *b_topptweight;
   TBranch	 *b_zptweight;
@@ -949,6 +985,9 @@ public :
   TBranch	 *b_trg_mutaucross;
   TBranch  *b_trg_mutaucross_mu;
   TBranch  *b_trg_mutaucross_tau;
+  TBranch	 *b_trg_etaucross;
+  TBranch  *b_trg_etaucross_e;
+  TBranch  *b_trg_etaucross_tau;
   TBranch  *b_trg_doubletau;
   TBranch  *b_ditauTrigger;
   TBranch	 *b_xTrigger;

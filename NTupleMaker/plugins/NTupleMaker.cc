@@ -532,9 +532,9 @@ void NTupleMaker::beginJob(){
     tree->Branch("pfjet_flavour", pfjet_flavour, "pfjet_flavour[pfjet_count]/I");
     tree->Branch("pfjet_btag", pfjet_btag,"pfjet_btag[pfjet_count][10]/F");
     tree->Branch("pfjet_jecUncertainty",pfjet_jecUncertainty,"pfjet_jecUncertainty[pfjet_count]/F");
-    tree->Branch("pfjet_pu_jet_fullId_loose", pfjet_pu_jet_fullId_loose, "pfjet_pu_jet_fullId_loose[pfjet_count]/O");
-    tree->Branch("pfjet_pu_jet_fullId_medium", pfjet_pu_jet_fullId_medium, "pfjet_pu_jet_fullId_medium[pfjet_count]/O");
-    tree->Branch("pfjet_pu_jet_fullId_tight", pfjet_pu_jet_fullId_tight, "pfjet_pu_jet_fullId_tight[pfjet_count]/O");
+    //tree->Branch("pfjet_pu_jet_fullId_loose", pfjet_pu_jet_fullId_loose, "pfjet_pu_jet_fullId_loose[pfjet_count]/O");
+    //tree->Branch("pfjet_pu_jet_fullId_medium", pfjet_pu_jet_fullId_medium, "pfjet_pu_jet_fullId_medium[pfjet_count]/O");
+    //tree->Branch("pfjet_pu_jet_fullId_tight", pfjet_pu_jet_fullId_tight, "pfjet_pu_jet_fullId_tight[pfjet_count]/O");
     tree->Branch("pfjet_pu_jet_fullDisc_mva", pfjet_pu_jet_fullDisc_mva, "pfjet_pu_jet_fullDisc_mva[pfjet_count]/F");
   }
 
@@ -568,6 +568,10 @@ void NTupleMaker::beginJob(){
   // electrons
   if (crecelectron) {
     tree->Branch("electron_count", &electron_count, "electron_count/i");
+    tree->Branch("electron_helixparameters", electron_helixparameters, "electron_helixparameters[electron_count][5]/F");
+    tree->Branch("electron_helixparameters_covar", electron_helixparameters_covar,"electron_helixparameters_covar[electron_count][5][5]/F");
+    tree->Branch("electron_referencePoint", electron_referencePoint,"electron_referencePoint[electron_count][3]/F");
+    tree->Branch("electron_Bfield", electron_Bfield, "electron_Bfield[electron_count]/F");
     tree->Branch("electron_px", electron_px, "electron_px[electron_count]/F");
     tree->Branch("electron_py", electron_py, "electron_py[electron_count]/F");
     tree->Branch("electron_pz", electron_pz, "electron_pz[electron_count]/F");
@@ -984,6 +988,7 @@ void NTupleMaker::beginJob(){
   if(crecstxs){
     tree->Branch("htxs_stage0cat",&htxs_stage0cat,"htxs_stage0cat/I");
     tree->Branch("htxs_stage1p1cat",&htxs_stage1p1cat,"htxs_stage1p1cat/I");
+    tree->Branch("htxs_stage1p1finecat",&htxs_stage1p1finecat,"htxs_stage1p1finecat/I");
     tree->Branch("htxs_higgsPt",&htxs_higgsPt,"htxs_higgsPt/F");
     tree->Branch("htxs_njets30",&htxs_njets30,"htxs_njets30/I");
   }
@@ -1979,9 +1984,9 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	    edm::Ptr<reco::Candidate> leptonCand = (*RFVertex)[i].userCand(leptonName);
             if(std::abs(leptonCand->pdgId())==11 ){
               for(size_t ie = 0; ie < electron_count; ie++){
-                if(TMath::Abs(leptonCand->pt() - electron_pt[ie]) < 0.01 &&
-                   TMath::Abs(leptonCand->eta() - electron_eta[ie]) < 0.001 &&
-                   TMath::Abs(leptonCand->phi() - electron_phi[ie]) < 0.001){
+                if(//TMath::Abs(leptonCand->pt() - electron_pt[ie]) < 0.01 && //Electron ES is corrected, therefore pt matching cannot be done for electrons
+                   TMath::Abs(leptonCand->eta() - electron_eta[ie]) < 0.005 &&
+                   TMath::Abs(leptonCand->phi() - electron_phi[ie]) < 0.005){
                   nEle++;
                   if(nEle == 1)ele1 = ie;
                   else if(nEle == 2) ele2 = ie;
@@ -1990,9 +1995,9 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
             }
             else if(std::abs(leptonCand->pdgId())==13 ){
               for(size_t im = 0; im < muon_count; im++){
-                if(TMath::Abs(leptonCand->pt() - muon_pt[im]) < 0.01 &&
-                   TMath::Abs(leptonCand->eta() - muon_eta[im]) < 0.001 &&
-                   TMath::Abs(leptonCand->phi() - muon_phi[im]) < 0.001){
+                if(TMath::Abs(leptonCand->pt() - muon_pt[im]) < 0.05 &&
+                   TMath::Abs(leptonCand->eta() - muon_eta[im]) < 0.005 &&
+                   TMath::Abs(leptonCand->phi() - muon_phi[im]) < 0.005){
                   nMu++;
                   if(nMu == 1)muon1 = im;
                   else if(nMu == 2) muon2 = im;
@@ -2001,9 +2006,9 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
             }
             else { //for tau
               for(size_t it = 0; it < tau_count; it++){
-                if(TMath::Abs(leptonCand->pt() - tau_pt[it]) < 0.01 &&
-                   TMath::Abs(leptonCand->eta() - tau_eta[it]) < 0.001 &&
-                   TMath::Abs(leptonCand->phi() - tau_phi[it]) < 0.001){
+                if(TMath::Abs(leptonCand->pt() - tau_pt[it]) < 0.05 &&
+                   TMath::Abs(leptonCand->eta() - tau_eta[it]) < 0.005 &&
+                   TMath::Abs(leptonCand->phi() - tau_phi[it]) < 0.005){
                   nTau++;
                   if(nTau == 1)tau1 = it;
                   else if(nTau == 2) tau2 = it;
@@ -2054,9 +2059,9 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	    edm::Ptr<reco::Candidate> leptonCand = (*RFVertexwithbs)[i].userCand(leptonName);
             if(std::abs(leptonCand->pdgId())==11 ){
               for(size_t ie = 0; ie < electron_count; ie++){
-                if(TMath::Abs(leptonCand->pt() - electron_pt[ie]) < 0.01 &&
-                   TMath::Abs(leptonCand->eta() - electron_eta[ie]) < 0.001 &&
-                   TMath::Abs(leptonCand->phi() - electron_phi[ie]) < 0.001){
+                if(//TMath::Abs(leptonCand->pt() - electron_pt[ie]) < 0.05 &&
+                   TMath::Abs(leptonCand->eta() - electron_eta[ie]) < 0.005 &&
+                   TMath::Abs(leptonCand->phi() - electron_phi[ie]) < 0.005){
                   nEle++;
                   if(nEle == 1)ele1 = ie;
                   else if(nEle == 2) ele2 = ie;
@@ -2065,9 +2070,9 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
             }
             else if(std::abs(leptonCand->pdgId())==13 ){
               for(size_t im = 0; im < muon_count; im++){
-                if(TMath::Abs(leptonCand->pt() - muon_pt[im]) < 0.01 &&
-                   TMath::Abs(leptonCand->eta() - muon_eta[im]) < 0.001 &&
-                   TMath::Abs(leptonCand->phi() - muon_phi[im]) < 0.001){
+                if(TMath::Abs(leptonCand->pt() - muon_pt[im]) < 0.05 &&
+                   TMath::Abs(leptonCand->eta() - muon_eta[im]) < 0.005 &&
+                   TMath::Abs(leptonCand->phi() - muon_phi[im]) < 0.005){
                   nMu++;
                   if(nMu == 1)muon1 = im;
                   else if(nMu == 2) muon2 = im;
@@ -2076,9 +2081,9 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
             }
             else { //for tau
               for(size_t it = 0; it < tau_count; it++){
-                if(TMath::Abs(leptonCand->pt() - tau_pt[it]) < 0.01 &&
-                   TMath::Abs(leptonCand->eta() - tau_eta[it]) < 0.001 &&
-                   TMath::Abs(leptonCand->phi() - tau_phi[it]) < 0.001){
+                if(TMath::Abs(leptonCand->pt() - tau_pt[it]) < 0.05 &&
+                   TMath::Abs(leptonCand->eta() - tau_eta[it]) < 0.005 &&
+                   TMath::Abs(leptonCand->phi() - tau_phi[it]) < 0.005){
                   nTau++;
                   if(nTau == 1)tau1 = it;
                   else if(nTau == 2) tau2 = it;
@@ -2647,6 +2652,7 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       iEvent.getByToken(htxsToken_, htxs);
       htxs_stage0cat = htxs->stage0_cat;
       htxs_stage1p1cat = htxs->stage1_1_cat_pTjet30GeV;
+      htxs_stage1p1finecat = htxs->stage1_1_fine_cat_pTjet30GeV;
       htxs_higgsPt = htxs->higgs.Pt();
       htxs_njets30 = htxs->jets30.size();
     }
@@ -3359,7 +3365,7 @@ unsigned int NTupleMaker::AddMuons(const edm::Event& iEvent, const edm::EventSet
 	muon_referencePoint[muon_count][1]=-999;
 	muon_referencePoint[muon_count][2]=-999;	  
 	muon_Bfield[muon_count]=-999;
-}
+	}
 
 	muon_px[muon_count] = (*Muons)[i].px();
 	muon_py[muon_count] = (*Muons)[i].py();
@@ -4518,15 +4524,15 @@ unsigned int NTupleMaker::AddPFJets(const edm::Event& iEvent, const edm::EventSe
 
 	  //pileup jet id
 
-	  pfjet_pu_jet_fullId_loose[pfjet_count]  = false;
-	  pfjet_pu_jet_fullId_medium[pfjet_count] = false;
-	  pfjet_pu_jet_fullId_tight[pfjet_count]  = false;
-	  
-	  if(pfjet_pt[pfjet_count]>=20){
+	  //pfjet_pu_jet_fullId_loose[pfjet_count]  = false;
+	  //pfjet_pu_jet_fullId_medium[pfjet_count] = false;
+	  //pfjet_pu_jet_fullId_tight[pfjet_count]  = false;
+	  pfjet_pu_jet_fullDisc_mva[pfjet_count] = 1.;
+	  if(pfjet_pt[pfjet_count]<50){
 	    pfjet_pu_jet_fullDisc_mva[pfjet_count]  = (*pfjets)[i].userFloat("pileupJetId:fullDiscriminant");
-	    pfjet_pu_jet_fullId_loose[pfjet_count]  = ( (*pfjets)[i].userInt("pileupJetId:fullId") & (1<<2) || pfjet_pt[pfjet_count]>50 );
-	    pfjet_pu_jet_fullId_medium[pfjet_count] = ( (*pfjets)[i].userInt("pileupJetId:fullId") & (1<<1) || pfjet_pt[pfjet_count]>50 );
-	    pfjet_pu_jet_fullId_tight[pfjet_count]  = ( (*pfjets)[i].userInt("pileupJetId:fullId") & (1<<0) || pfjet_pt[pfjet_count]>50 );
+	    //pfjet_pu_jet_fullId_loose[pfjet_count]  = ( (*pfjets)[i].userInt("pileupJetId:fullId") & (1<<2) || pfjet_pt[pfjet_count]>50 );
+	    //pfjet_pu_jet_fullId_medium[pfjet_count] = ( (*pfjets)[i].userInt("pileupJetId:fullId") & (1<<1) || pfjet_pt[pfjet_count]>50 );
+	    //pfjet_pu_jet_fullId_tight[pfjet_count]  = ( (*pfjets)[i].userInt("pileupJetId:fullId") & (1<<0) || pfjet_pt[pfjet_count]>50 );
 	  }
 	  
 
@@ -4778,6 +4784,50 @@ unsigned int NTupleMaker::AddElectrons(const edm::Event& iEvent, const edm::Even
 	  electron_dzerr[electron_count]        = gsfTr_e->dzError();
 
 	  //	  std::cout << "   dxy = " << electron_dxy[electron_count] << "   dz = " << electron_dz[electron_count] << std::endl;
+
+
+
+	  //code below is to store the track param vec + covariances, a references pt on track, and B field in ref pt. For CP measurement
+	  
+	  reco::GsfTrackRef leadTrk = el->gsfTrack();
+	  if (leadTrk.isNonnull()) {
+	    TrackBase::ParameterVector ParamVecEle=leadTrk->parameters();
+	    TrackBase::CovarianceMatrix CVMTrack=leadTrk->covariance();
+	    
+	    for(int index=0; index<ParamVecEle.kSize;index++){
+	      electron_helixparameters[electron_count][index]=ParamVecEle[index];
+	      for(int index2=0; index2<ParamVecEle.kSize;index2++){
+		electron_helixparameters_covar[electron_count][index][index2]=CVMTrack[index][index2];
+	      }
+	    }
+
+	    TrackBase::Point RFptEle=leadTrk->referencePoint();
+	    
+	    electron_referencePoint[electron_count][0]=RFptEle.X();
+	    electron_referencePoint[electron_count][1]=RFptEle.Y();
+	    electron_referencePoint[electron_count][2]=RFptEle.Z();
+	    
+	    double	magneticField = (TTrackBuilder.product() ? TTrackBuilder.product()->field()->inInverseGeV(GlobalPoint(RFptEle.X(), RFptEle.Y(), RFptEle.Z())).z() : 0.0);
+	    electron_Bfield[electron_count]=magneticField;
+	  }
+	  else{
+	    for(int index=0; index<5;index++){
+	      electron_helixparameters[electron_count][index]=-999;
+	      for(int index2=0; index2<5;index2++){
+		electron_helixparameters_covar[electron_count][index][index2]=-999;
+	      }
+	    }
+
+	    electron_referencePoint[electron_count][0]=-999;
+	    electron_referencePoint[electron_count][1]=-999;
+	    electron_referencePoint[electron_count][2]=-999;	  
+	    electron_Bfield[electron_count]=-999;
+	  }
+	
+
+
+
+
 
 	  // Electron Ids
      electron_cutId_veto_Summer16[electron_count] = el ->electronID("cutBasedElectronID-Summer16-80X-V1-veto");

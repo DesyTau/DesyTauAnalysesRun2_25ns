@@ -333,6 +333,55 @@ double JERSF(double eta, double weight){
 
 }	
 
+bool jetPUID(AC1B &tree_, int jet, TString wp="Tight"){
+  // from https://twiki.cern.ch/twiki/bin/viewauth/CMS/PileupJetID#Working_points
+  //4 Eta Categories 0-2.5 2.5-2.75 2.75-3.0 3.0-5.0
+  //Tight Id
+  size_t etaIndex=0;
+  vector<float> Pt010 = { 0.69, -0.35, -0.26, -0.21};
+  vector<float> Pt1020 = { 0.69, -0.35, -0.26, -0.21};
+  vector<float> Pt2030 = { 0.69, -0.35, -0.26, -0.21};
+  vector<float> Pt3050 = { 0.86, -0.10, -0.05, -0.01};
+  if(wp=="Medium"){
+    //Medium Id
+    Pt010 = { 0.18, -0.55, -0.42, -0.36};
+    Pt1020 = { 0.18, -0.55, -0.42, -0.36};
+    Pt2030 = { 0.18, -0.55, -0.42, -0.36};
+    Pt3050 = { 0.61, -0.35, -0.23, -0.17};
+  }else if(wp=="Loose"){
+    //Loose Id
+    Pt010 = {-0.97, -0.68, -0.53, -0.47};
+    Pt1020 = {-0.97, -0.68, -0.53, -0.47};
+    Pt2030 = {-0.97, -0.68, -0.53, -0.47};
+    Pt3050 = {-0.89, -0.52, -0.38, -0.30};
+  }
+
+
+  float pt = tree_.pfjet_pt[jet];
+  float eta = tree_.pfjet_eta[jet];
+  float mva =  tree_.pfjet_pu_jet_fullDisc_mva[jet];
+
+  if(fabs(eta) < 2.5) etaIndex=0;
+  else if(fabs(eta) < 2.75) etaIndex=1;
+  else if(fabs(eta) < 3.0)  etaIndex=2;
+  else if(fabs(eta) < 5.0)  etaIndex=3;
+
+  float cut = -1.;
+
+  if(pt<10) cut = Pt010[etaIndex];
+  else if(pt<20) cut = Pt1020[etaIndex];
+  else if(pt<30) cut = Pt2030[etaIndex];
+  else if(pt<50) cut = Pt3050[etaIndex];
+
+
+  bool passedPUID = (bool) mva > cut;
+  if (pt >= 50) passedPUID = true;
+  if (eta >=5.0)passedPUID = false;
+
+  return passedPUID;
+
+}
+
 
 
 

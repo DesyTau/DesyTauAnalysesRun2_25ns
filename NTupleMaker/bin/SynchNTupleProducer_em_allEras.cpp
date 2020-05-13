@@ -426,9 +426,9 @@ int main(int argc, char * argv[]) {
    // load QCD =======================================================================================================================================
    TFile *fQCD = new TFile(TString(cmsswBase)+"/src/"+qcdFileName);
 
-   TGraph *OS_SS_njetgt1 = (TGraph*)fQCD->Get("OS_SS_transfer_factors_njetgt1");
-   TGraph *OS_SS_njet1 = (TGraph*)fQCD->Get("OS_SS_transfer_factors_njet1");
-   TGraph *OS_SS_njet0 = (TGraph*)fQCD->Get("OS_SS_transfer_factors_njet0");
+   TF1 *OS_SS_njetgt1 = (TF1*)fQCD->Get("OS_SS_transfer_factors_njetgt1");
+   TF1 *OS_SS_njet1 = (TF1*)fQCD->Get("OS_SS_transfer_factors_njet1");
+   TF1 *OS_SS_njet0 = (TF1*)fQCD->Get("OS_SS_transfer_factors_njet0");
   
    TGraph *OS_SS_njet0_Par0_UP = (TGraph*)fQCD->Get("OS_SS_transfer_factors_Par0_njet0_UP");
    TGraph *OS_SS_njet0_Par0_DOWN = (TGraph*)fQCD->Get("OS_SS_transfer_factors_Par0_njet0_DOWN");
@@ -782,8 +782,8 @@ int main(int argc, char * argv[]) {
          rho = analysisTree.rho;
          npartons = analysisTree.genparticles_noutgoing;
 
-         // apply good run selection  ==================================================================================================================================
 
+         // apply good run selection  ==================================================================================================================================
          if ((isData || isEmbedded) && applyGoodRunSelection){
 
             int n=analysisTree.event_run;
@@ -799,6 +799,7 @@ int main(int argc, char * argv[]) {
             if (topPt>0&&antitopPt>0) {
                topptweight = topPtWeight(topPt,antitopPt,true);
                topptweightRun2 = topPtWeight(topPt,antitopPt,false);
+               topptweightRun2ttH = genTools::topPtWeight_Run2(analysisTree, 0.088, -0.00087, 9.2e-07, 472.0);
             }
          }
 
@@ -1173,13 +1174,23 @@ int main(int argc, char * argv[]) {
                jetLV_jecUnc[uncer_split.first + "Up"]   = jetLV * ( 1 + unc_total);
                jetLV_jecUnc[uncer_split.first + "Down"] = jetLV * ( 1 - unc_total);
                // Propagate jec uncertainties to met
-               if( metLV_jecUnc.find(uncer_split.first+"Up") == metLV_jecUnc.end()) metLV_jecUnc[uncer_split.first+"Up"] = metLV;
-               if( metLV_jecUnc.find(uncer_split.first+"Down") == metLV_jecUnc.end()) metLV_jecUnc[uncer_split.first+"Down"] = metLV;
+               metLV_jecUnc[uncer_split.first+"Up"] = metLV;
+               metLV_jecUnc[uncer_split.first+"Down"] = metLV;
                if (!isSampleForRecoilCorrection) {
                   metLV_jecUnc[uncer_split.first + "Up"]   -= jetLV* unc_total;
                   metLV_jecUnc[uncer_split.first + "Down"] += jetLV* unc_total;
                }
             }
+            
+            //propagate jer uncertainties to met
+            metLV_JERUp = metLV;
+            metLV_JERDown = metLV;
+            if (!isSampleForRecoilCorrection) {
+              metLV_JERUp -= jetLV*shift_up;
+              metLV_JERDown -= jetLV*shift_down;
+            }
+            
+            
             float jetPt_tocheck = jetPt;
             if (sync) jetPt_tocheck = jetPt;
             else{
@@ -1496,10 +1507,6 @@ int main(int argc, char * argv[]) {
          float met_unclMetUp_y;
          float met_unclMetDown_x;
          float met_unclMetDown_y;
-         float met_JERDown_x;
-         float met_JERDown_y;
-         float met_JERUp_x;
-         float met_JERUp_y;
 
          if (!usePuppiMet){
             met_x_recoilscaleUp = analysisTree.pfmetcorr_ex;
@@ -1515,10 +1522,6 @@ int main(int argc, char * argv[]) {
             met_unclMetUp_y    = analysisTree.pfmetcorr_ey_UnclusteredEnUp;
             met_unclMetDown_x  = analysisTree.pfmetcorr_ex_UnclusteredEnDown;
             met_unclMetDown_y  = analysisTree.pfmetcorr_ey_UnclusteredEnDown;
-            met_JERUp_x    = analysisTree.pfmetcorr_ex_JetResUp;
-            met_JERUp_y    = analysisTree.pfmetcorr_ey_JetResUp;
-            met_JERDown_x  = analysisTree.pfmetcorr_ex_JetResDown;
-            met_JERDown_y  = analysisTree.pfmetcorr_ey_JetResDown;
          }
          else{
             met_x_recoilscaleUp = analysisTree.puppimet_ex;
@@ -1534,11 +1537,6 @@ int main(int argc, char * argv[]) {
             met_unclMetUp_y    = analysisTree.puppimet_ey_UnclusteredEnUp;
             met_unclMetDown_x  = analysisTree.puppimet_ex_UnclusteredEnDown;
             met_unclMetDown_y  = analysisTree.puppimet_ey_UnclusteredEnDown;
-
-            met_JERUp_x    = analysisTree.puppimet_ex_JetResUp;
-            met_JERUp_y    = analysisTree.puppimet_ey_JetResUp;
-            met_JERDown_x  = analysisTree.puppimet_ex_JetResDown;
-            met_JERDown_y  = analysisTree.puppimet_ey_JetResDown;
          }
          met = TMath::Sqrt(met_x*met_x + met_y*met_y);
          metphi = TMath::ATan2(met_y,met_x);
@@ -1561,20 +1559,19 @@ int main(int argc, char * argv[]) {
          
          met_uncorr = met;
          metphi_uncorr = metphi;
-         
          float pfmet_corr_x = met_x;
          float pfmet_corr_y = met_y;
          if ((isW||isDY||isSignal)&&!isData) {
             if (applySimpleRecoilCorrections) {
                if (!usePuppiMet){
-                  recoilMetCorrector.CorrectByMeanResolution(met_x,met_y,bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,pfmet_corr_x,pfmet_corr_y);
+                  recoilMetCorrector.CorrectWithHist(met_x,met_y,bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,pfmet_corr_x,pfmet_corr_y);
                   metSys.ApplyMEtSys(pfmet_corr_x, pfmet_corr_y, bosonPx, bosonPy, lepPx, lepPy, njetsforrecoil, kit::MEtSys::SysType::Response, kit::MEtSys::SysShift::Up, met_x_recoilscaleUp, met_y_recoilscaleUp);
                   metSys.ApplyMEtSys(pfmet_corr_x, pfmet_corr_y, bosonPx, bosonPy, lepPx, lepPy, njetsforrecoil, kit::MEtSys::SysType::Response, kit::MEtSys::SysShift::Down, met_x_recoilscaleDown, met_y_recoilscaleDown);
                   metSys.ApplyMEtSys(pfmet_corr_x, pfmet_corr_y, bosonPx, bosonPy, lepPx, lepPy, njetsforrecoil, kit::MEtSys::SysType::Resolution, kit::MEtSys::SysShift::Up, met_x_recoilresoUp, met_y_recoilresoUp);
                   metSys.ApplyMEtSys(pfmet_corr_x, pfmet_corr_y, bosonPx, bosonPy, lepPx, lepPy, njetsforrecoil, kit::MEtSys::SysType::Resolution, kit::MEtSys::SysShift::Down, met_x_recoilresoDown, met_y_recoilresoDown);
                }
                else{
-                  recoilMetCorrectorPuppi.CorrectByMeanResolution(met_x,met_y,bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,pfmet_corr_x,pfmet_corr_y);
+                  recoilMetCorrectorPuppi.CorrectWithHist(met_x,met_y,bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,pfmet_corr_x,pfmet_corr_y);
                   metSysPuppi.ApplyMEtSys(pfmet_corr_x, pfmet_corr_y, bosonPx, bosonPy, lepPx, lepPy, njetsforrecoil, kit::MEtSys::SysType::Response, kit::MEtSys::SysShift::Up, met_x_recoilscaleUp, met_y_recoilscaleUp);
                   metSysPuppi.ApplyMEtSys(pfmet_corr_x, pfmet_corr_y, bosonPx, bosonPy, lepPx, lepPy, njetsforrecoil, kit::MEtSys::SysType::Response, kit::MEtSys::SysShift::Down, met_x_recoilscaleDown, met_y_recoilscaleDown);
                   metSysPuppi.ApplyMEtSys(pfmet_corr_x, pfmet_corr_y, bosonPx, bosonPy, lepPx, lepPy, njetsforrecoil, kit::MEtSys::SysType::Resolution, kit::MEtSys::SysShift::Up, met_x_recoilresoUp, met_y_recoilresoUp);
@@ -1586,7 +1583,7 @@ int main(int argc, char * argv[]) {
                else recoilMetCorrectorPuppi.Correct(met_x,met_y,bosonPx,bosonPy,lepPx,lepPy,njetsforrecoil,pfmet_corr_x,pfmet_corr_y);
             }
          }
-         
+
          met_x = pfmet_corr_x;
          met_y = pfmet_corr_y;
          met = TMath::Sqrt(met_x*met_x+met_y*met_y);
@@ -1606,9 +1603,6 @@ int main(int argc, char * argv[]) {
          metphi_unclMetUp = TMath::ATan2(met_unclMetUp_y,met_unclMetUp_x);
          met_unclMetDown = TMath::Sqrt(met_unclMetDown_x*met_unclMetDown_x+met_unclMetDown_y*met_unclMetDown_y);
          metphi_unclMetDown = TMath::ATan2(met_unclMetDown_y,met_unclMetDown_x);
-
-         met_JERUp = TMath::Sqrt(met_JERUp_x*met_JERUp_x+met_JERUp_y*met_JERUp_y);
-         met_JERDown = TMath::Sqrt(met_JERDown_x*met_JERDown_x+met_JERDown_y*met_JERDown_y);
          
          if(isSampleForRecoilCorrection){
             met_unclMetUp_x   = met_x;
@@ -1712,8 +1706,6 @@ int main(int argc, char * argv[]) {
          TLorentzVector metLV_unclMetUp; metLV_unclMetUp.SetXYZT(met_unclMetUp_x,met_unclMetUp_y,0.,met_unclMetUp);
          TLorentzVector metLV_unclMetDown; metLV_unclMetDown.SetXYZT(met_unclMetDown_x,met_unclMetDown_y,0.,met_unclMetDown);
 
-         TLorentzVector metLV_JERUp; metLV_JERUp.SetXYZT(met_JERUp_x,met_JERUp_y,0.,met_JERUp);
-         TLorentzVector metLV_JERDown; metLV_JERDown.SetXYZT(met_JERDown_x,met_JERDown_y,0.,met_JERDown);
          // computing total transverse mass
          mTtot = totalTransverseMass        ( muonLV ,     electronLV , metLV);
          mTemu   = mT(electronLV,muonLV);
@@ -1721,10 +1713,10 @@ int main(int argc, char * argv[]) {
                                  metLV.Px(),metLV.Py());
          dphi_emet  = dPhiFrom2P(electronLV.Px(),electronLV.Py(),
                                  metLV.Px(),metLV.Py());
-         
-         
-         
+
+
          mTdileptonMET = mT(dileptonLV,metLV);
+
          
          pt_ttjj = -10;
          if (indexLeadingJet>=0 && indexSubLeadingJet>=0) {
@@ -2258,7 +2250,7 @@ int main(int argc, char * argv[]) {
          
          for(auto &uncert : uncertainty_map){
             bool is_data_or_embedded = isData || (isEmbedded && !uncert.first.Contains("escale") && !uncert.first.Contains("ereso")  && !uncert.first.Contains("embescale"));
-            
+          
             propagate_uncertainty( uncert.first,
                                    uncert.second.metLV, covMET, inputFile_visPtResolution,
                                    uncert.second.muonLV,

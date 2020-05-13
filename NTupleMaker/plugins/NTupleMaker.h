@@ -752,6 +752,10 @@ class NTupleMaker : public edm::EDAnalyzer{
 
   // pat electrons
   UInt_t electron_count;
+  Float_t electron_helixparameters[M_electronmaxcount][5];
+  Float_t electron_helixparameters_covar[M_electronmaxcount][5][5];
+  Float_t electron_referencePoint[M_electronmaxcount][3];
+  Float_t electron_Bfield[M_electronmaxcount];
   Float_t electron_px[M_electronmaxcount];
   Float_t electron_py[M_electronmaxcount];
   Float_t electron_pz[M_electronmaxcount];
@@ -1260,6 +1264,7 @@ class NTupleMaker : public edm::EDAnalyzer{
   //Generator Information
   Int_t htxs_stage0cat;
   Int_t htxs_stage1p1cat;
+  Int_t htxs_stage1p1finecat;
   Float_t htxs_higgsPt;
   Int_t htxs_njets30;
 

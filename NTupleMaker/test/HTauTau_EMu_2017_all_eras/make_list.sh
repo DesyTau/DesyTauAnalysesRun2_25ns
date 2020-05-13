@@ -11,6 +11,7 @@ dirggh=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2017/mc_v4
 dirEm=/pnfs/desy.de/cms/tier2/store/user/acardini/ntuples/2017/embedded/EmbeddedEmu
 dirWGammaStar=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2017/mc_v3
 dirEWKZ=/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2017/mc_v3
+dirApril2020=/pnfs/desy.de/cms/tier2/store/user/ywen/ntuples_Apr2020/2017/mc/
 
 ls $dirDY/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/*root > DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8
 ls $dirDY/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8_ext1/*root >> DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8
@@ -45,27 +46,38 @@ ls $dirVV/WW_TuneCP5_13TeV-pythia8/*root > WW_TuneCP5_13TeV-pythia8
 ls $dirVV/WZ_TuneCP5_13TeV-pythia8/*root > WZ_TuneCP5_13TeV-pythia8
 ls $dirVV/ZZ_TuneCP5_13TeV-pythia8/*root > ZZ_TuneCP5_13TeV-pythia8
 
-ls $dirggh/GluGluHToTauTau_M125_13TeV_powheg_pythia8_new_pmx/*root > GluGluHToTauTau_M125_13TeV_powheg_pythia8
-ls $dirggh/GluGluHToTauTau_M125_13TeV_powheg_pythia8_ext1/*root >> GluGluHToTauTau_M125_13TeV_powheg_pythia8
-ls $dirSignal/VBFHToTauTau_M125_13TeV_powheg_pythia8/*root > VBFHToTauTau_M125_13TeV_powheg_pythia8
-ls $dirSignal/GluGluHToWWTo2L2Nu_M125_13TeV_powheg2_JHUGenV714_pythia8/*root > GluGluHToWWTo2L2Nu
-ls $dirSignal/VBFHToWWTo2L2Nu_M125_13TeV_powheg2_JHUGenV714_pythia8/*root > VBFHToWWTo2L2Nu_M125_13TeV_powheg2_JHUGenV714_pythia8
-ls $dirSignal/WminusHToTauTau_M125_13TeV_powheg_pythia8/*root > WminusHToTauTau_M125_13TeV_powheg_pythia8
-ls $dirSignal/WplusHToTauTau_M125_13TeV_powheg_pythia8/*root > WplusHToTauTau_M125_13TeV_powheg_pythia8
-ls $dirSignal/ZHToTauTau_M125_13TeV_powheg_pythia8/*root > ZHToTauTau_M125_13TeV_powheg_pythia8
-ls $dirSignal/ttHToTauTau_M125_TuneCP5_13TeV-powheg-pythia8/*root > ttHToTauTau_M125_TuneCP5_13TeV-powheg-pythia8
-ls $dirSignal/ggZH_HToTauTau_ZToLL_M125_13TeV_powheg_pythia8/*root > ggZH_HToTauTau_ZToLL_M125_13TeV_powheg_pythia8
-ls $dirSignal/ggZH_HToTauTau_ZToNuNu_M125_13TeV_powheg_pythia8/*root > ggZH_HToTauTau_ZToNuNu_M125_13TeV_powheg_pythia8
-ls $dirSignal/ggZH_HToTauTau_ZToQQ_M125_13TeV_powheg_pythia8/*root > ggZH_HToTauTau_ZToQQ_M125_13TeV_powheg_pythia8
+ls $dirApril2020/WZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8/*root >  WZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8
+ls $dirApril2020/WZTo3LNu_TuneCP5_13TeV-amcatnloFXFX-pythia8/*root >  WZTo3LNu_TuneCP5_13TeV-amcatnloFXFX-pythia8
+ls $dirApril2020/ZZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8/*root >  ZZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8
+ls $dirApril2020/ZZTo4L_TuneCP5_13TeV-amcatnloFXFX-pythia8/*root >  ZZTo4L_TuneCP5_13TeV-amcatnloFXFX-pythia8
+ls $dirApril2020/VVTo2L2Nu_13TeV_amcatnloFXFX_madspin_pythia8/*root >  VVTo2L2Nu_13TeV_amcatnloFXFX_madspin_pythia8
 
-ls $dirggh/GluGluHToTauTau_HTXSFilter_STXS1p1_Bin110to113_M125/*root >  GluGluHToTauTau_HTXSFilter_STXS1p1_Bin110to113_M125
-ls $dirggh/GluGluHToTauTau_HTXSFilter_STXS1p1_Bin107to109_M125/*root >  GluGluHToTauTau_HTXSFilter_STXS1p1_Bin107to109_M125
-ls $dirggh/VBFHToTauTau_HTXSFilter_STXS1p1_Bin207to210_M125/*root >  VBFHToTauTau_HTXSFilter_STXS1p1_Bin207to210_M125
-ls $dirggh/GluGluHToTauTau_HTXSFilter_STXS1p1_Bin104to105_M125/*root >  GluGluHToTauTau_HTXSFilter_STXS1p1_Bin104to105_M125
-ls $dirggh/VBFHToTauTau_HTXSFilter_STXS1p1_Bin203to205_M125/*root >  VBFHToTauTau_HTXSFilter_STXS1p1_Bin203to205_M125
-ls $dirggh/VBFHToTauTau_HTXSFilter_STXS1p1_Bin206_M125/*root >  VBFHToTauTau_HTXSFilter_STXS1p1_Bin206_M125
-ls $dirggh/GluGluHToTauTau_HTXSFilter_STXS1p1_Bin106_M125/*root >  GluGluHToTauTau_HTXSFilter_STXS1p1_Bin106_M125
-ls $dirggh/GluGluHToTauTau_HTXSFilter_STXS1p1_Bin101_M125/*root >  GluGluHToTauTau_HTXSFilter_STXS1p1_Bin101_M125
+ls $dirApril2020/GluGluHToTauTau_M125_13TeV_powheg_pythia8/*root > GluGluHToTauTau_M125_13TeV_powheg_pythia8
+ls $dirApril2020/GluGluHToTauTau_M125_13TeV_powheg_pythia8_ext1/*root >> GluGluHToTauTau_M125_13TeV_powheg_pythia8
+ls $dirApril2020/VBFHToTauTau_M125_13TeV_powheg_pythia8/*root > VBFHToTauTau_M125_13TeV_powheg_pythia8
+ls $dirApril2020/GluGluHToWWTo2L2Nu_M125_13TeV_powheg2_JHUGenV714_pythia8/*root > GluGluHToWWTo2L2Nu
+ls $dirApril2020/VBFHToWWTo2L2Nu_M125_13TeV_powheg2_JHUGenV714_pythia8/*root > VBFHToWWTo2L2Nu_M125_13TeV_powheg2_JHUGenV714_pythia8
+ls $dirApril2020/WminusHToTauTau_M125_13TeV_powheg_pythia8/*root > WminusHToTauTau_M125_13TeV_powheg_pythia8
+ls $dirApril2020/WplusHToTauTau_M125_13TeV_powheg_pythia8/*root > WplusHToTauTau_M125_13TeV_powheg_pythia8
+ls $dirApril2020/ZHToTauTau_M125_13TeV_powheg_pythia8/*root > ZHToTauTau_M125_13TeV_powheg_pythia8
+ls $dirApril2020/ttHToTauTau_M125_TuneCP5_13TeV-powheg-pythia8/*root > ttHToTauTau_M125_TuneCP5_13TeV-powheg-pythia8
+ls $dirApril2020/ggZH_HToTauTau_ZToLL_M125_13TeV_powheg_pythia8/*root > ggZH_HToTauTau_ZToLL_M125_13TeV_powheg_pythia8
+ls $dirApril2020/ggZH_HToTauTau_ZToNuNu_M125_13TeV_powheg_pythia8/*root > ggZH_HToTauTau_ZToNuNu_M125_13TeV_powheg_pythia8
+ls $dirApril2020/ggZH_HToTauTau_ZToQQ_M125_13TeV_powheg_pythia8/*root > ggZH_HToTauTau_ZToQQ_M125_13TeV_powheg_pythia8
+
+ls $dirApril2020/GluGluHToTauTau_HTXSFilter_STXS1p1_Bin110to113_M125_TuneCP5_13TeV-powheg-pythia8/*root >  GluGluHToTauTau_HTXSFilter_STXS1p1_Bin110to113_M125
+ls $dirApril2020/GluGluHToTauTau_HTXSFilter_STXS1p1_Bin107to109_M125_TuneCP5_13TeV-powheg-pythia8/*root >  GluGluHToTauTau_HTXSFilter_STXS1p1_Bin107to109_M125
+ls $dirApril2020/VBFHToTauTau_HTXSFilter_STXS1p1_Bin207to210_M125_TuneCP5_13TeV-powheg-pythia8/*root >  VBFHToTauTau_HTXSFilter_STXS1p1_Bin207to210_M125
+ls $dirApril2020/GluGluHToTauTau_HTXSFilter_STXS1p1_Bin104to105_M125_TuneCP5_13TeV-powheg-pythia8/*root >  GluGluHToTauTau_HTXSFilter_STXS1p1_Bin104to105_M125
+ls $dirApril2020/VBFHToTauTau_HTXSFilter_STXS1p1_Bin203to205_M125_TuneCP5_13TeV-powheg-pythia8/*root >  VBFHToTauTau_HTXSFilter_STXS1p1_Bin203to205_M125
+ls $dirApril2020/VBFHToTauTau_HTXSFilter_STXS1p1_Bin206_M125_TuneCP5_13TeV-powheg-pythia8/*root >  VBFHToTauTau_HTXSFilter_STXS1p1_Bin206_M125
+ls $dirApril2020/GluGluHToTauTau_HTXSFilter_STXS1p1_Bin106_M125_TuneCP5_13TeV-powheg-pythia8/*root >  GluGluHToTauTau_HTXSFilter_STXS1p1_Bin106_M125
+ls $dirApril2020/GluGluHToTauTau_HTXSFilter_STXS1p1_Bin101_M125_TuneCP5_13TeV-powheg-pythia8/*root >  GluGluHToTauTau_HTXSFilter_STXS1p1_Bin101_M125
+ls $dirApril2020/GluGluZH_HToWW_M125_13TeV_powheg_pythia8_TuneCP5/*root > GluGluZH_HToWW_M125_13TeV_powheg_pythia8_TuneCP5
+ls $dirApril2020/HWminusJ_HToWW_M125_13TeV_powheg_pythia8_TuneCP5/*root > HWminusJ_HToWW_M125_13TeV_powheg_pythia8_TuneCP5
+ls $dirApril2020/HWplusJ_HToWW_M125_13TeV_powheg_pythia8_TuneCP5/*root > HWplusJ_HToWW_M125_13TeV_powheg_pythia8_TuneCP5
+ls $dirApril2020/HZJ_HToWW_M125_13TeV_powheg_jhugen714_pythia8_TuneCP5/*root > HZJ_HToWW_M125_13TeV_powheg_jhugen714_pythia8_TuneCP5
+
 
 ls $dirData/MuonEG_Run2017B-31Mar2018-v1/*root > MuonEG_Run2017B
 ls $dirData/MuonEG_Run2017C-31Mar2018-v1/*root > MuonEG_Run2017CtoF

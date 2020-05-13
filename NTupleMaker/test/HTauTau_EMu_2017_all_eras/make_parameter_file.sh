@@ -8,6 +8,12 @@ echo "CONFIGFILE,FILELIST" > parameters.txt
 ../split_filelist.sh analysisMacroSynch_em_Signal_GGH_HWW_M125.conf GluGluHToWWTo2L2Nu 1
 ../split_filelist.sh analysisMacroSynch_em_Signal_VBF_HWW_M125.conf VBFHToWWTo2L2Nu_M125_13TeV_powheg2_JHUGenV714_pythia8 1
 
+../split_filelist.sh analysisMacroSynch_em_Signal_ggZH.conf GluGluZH_HToWW_M125_13TeV_powheg_pythia8_TuneCP5 1
+../split_filelist.sh analysisMacroSynch_em_Signal_ttH.conf HWminusJ_HToWW_M125_13TeV_powheg_pythia8_TuneCP5 1 
+../split_filelist.sh analysisMacroSynch_em_Signal_ttH.conf HWminusJ_HToWW_M125_13TeV_powheg_pythia8_TuneCP5 1
+../split_filelist.sh analysisMacroSynch_em_Signal_ttH.conf HWplusJ_HToWW_M125_13TeV_powheg_pythia8_TuneCP5 1
+../split_filelist.sh analysisMacroSynch_em_Signal_ttH.conf HZJ_HToWW_M125_13TeV_powheg_jhugen714_pythia8_TuneCP5 1
+
 ../split_filelist.sh analysisMacroSynch_em_DY1JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8.conf DY1JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8 10
 ../split_filelist.sh analysisMacroSynch_em_DY2JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8.conf DY2JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8  10
 ../split_filelist.sh analysisMacroSynch_em_DY2JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8_ext.conf DY2JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8_ext  10
@@ -38,6 +44,12 @@ echo "CONFIGFILE,FILELIST" > parameters.txt
 ../split_filelist.sh analysisMacroSynch_em_WW_TuneCP5_13TeV-pythia8.conf WW_TuneCP5_13TeV-pythia8  1
 ../split_filelist.sh analysisMacroSynch_em_WZ_TuneCP5_13TeV-pythia8.conf WZ_TuneCP5_13TeV-pythia8  1
 ../split_filelist.sh analysisMacroSynch_em_ZZ_TuneCP5_13TeV-pythia8.conf ZZ_TuneCP5_13TeV-pythia8  1
+
+../split_filelist.sh analysisMacroSynch_em_Diboson.conf WZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8 1
+../split_filelist.sh analysisMacroSynch_em_Diboson.conf WZTo3LNu_TuneCP5_13TeV-amcatnloFXFX-pythia8 1
+../split_filelist.sh analysisMacroSynch_em_Diboson.conf ZZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8 1
+../split_filelist.sh analysisMacroSynch_em_Diboson.conf ZZTo4L_TuneCP5_13TeV-amcatnloFXFX-pythia8 1
+../split_filelist.sh analysisMacroSynch_em_Diboson.conf VVTo2L2Nu_13TeV_amcatnloFXFX_madspin_pythia8 1
 
 ../split_filelist.sh analysisMacroSynch_em_Embedded.conf Embedding_Run2017 1
 
