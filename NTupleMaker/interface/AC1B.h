@@ -840,6 +840,7 @@ public :
    Int_t           htxs_stage0cat;
    Int_t           htxs_stage1cat;
    Int_t           htxs_stage1p1cat;
+   Int_t           htxs_stage1p1finecat;
    Float_t         htxs_higgsPt;
    Int_t           htxs_njets30;
 
@@ -1653,6 +1654,7 @@ public :
    TBranch        *b_htxs_stage0cat;   //!
    TBranch        *b_htxs_stage1cat;   //!
    TBranch        *b_htxs_stage1p1cat;
+   TBranch        *b_htxs_stage1p1finecat;
    TBranch        *b_htxs_higgsPt;   //!
    TBranch        *b_htxs_njets30;   //!
     
@@ -2556,6 +2558,7 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("htxs_stage0cat",&htxs_stage0cat, &b_htxs_stage0cat);
    fChain->SetBranchAddress("htxs_stage1cat",&htxs_stage1cat , &b_htxs_stage1cat);
    fChain->SetBranchAddress("htxs_stage1p1cat",&htxs_stage1p1cat , &b_htxs_stage1p1cat);
+   fChain->SetBranchAddress("htxs_stage1p1finecat",&htxs_stage1p1finecat , &b_htxs_stage1p1finecat);
    fChain->SetBranchAddress("htxs_higgsPt",&htxs_higgsPt , &b_htxs_higgsPt);
    fChain->SetBranchAddress("htxs_njets30", &htxs_njets30, &b_htxs_njets30);
    

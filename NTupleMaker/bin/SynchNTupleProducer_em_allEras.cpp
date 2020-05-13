@@ -737,6 +737,7 @@ int main(int argc, char * argv[]) {
             htxs_stage0cat = analysisTree.htxs_stage0cat;
             htxs_stage1cat = analysisTree.htxs_stage1p1cat;
             htxs_stage1p1cat = analysisTree.htxs_stage1p1cat;
+            htxs_stage1p1finecat = analysisTree.htxs_stage1p1finecat;
 
             if (apply_ggh_reweighting)
                {
@@ -760,16 +761,16 @@ int main(int argc, char * argv[]) {
             }
             
             if (apply_vbf_uncertainties){
-               THU_qqH_TOT = vbf_uncert_stage_1_1(0, htxs_stage1p1cat, 1.0);
-               THU_qqH_PTH200 = vbf_uncert_stage_1_1(1, htxs_stage1p1cat, 1.0);
-               THU_qqH_Mjj60 = vbf_uncert_stage_1_1(2, htxs_stage1p1cat, 1.0);
-               THU_qqH_Mjj120 = vbf_uncert_stage_1_1(3, htxs_stage1p1cat, 1.0);
-               THU_qqH_Mjj350 = vbf_uncert_stage_1_1(4, htxs_stage1p1cat, 1.0);
-               THU_qqH_Mjj700 = vbf_uncert_stage_1_1(5, htxs_stage1p1cat, 1.0);
-               THU_qqH_Mjj1000 =vbf_uncert_stage_1_1(6, htxs_stage1p1cat, 1.0);
-               THU_qqH_Mjj1500 = vbf_uncert_stage_1_1(7, htxs_stage1p1cat, 1.0);
-               THU_qqH_25 = vbf_uncert_stage_1_1(8, htxs_stage1p1cat, 1.0);
-               THU_qqH_JET01 = vbf_uncert_stage_1_1(9, htxs_stage1p1cat, 1.0);
+               THU_qqH_TOT = vbf_uncert_stage_1_1(0, htxs_stage1p1finecat, 1.0);
+               THU_qqH_PTH200 = vbf_uncert_stage_1_1(1, htxs_stage1p1finecat, 1.0);
+               THU_qqH_Mjj60 = vbf_uncert_stage_1_1(2, htxs_stage1p1finecat, 1.0);
+               THU_qqH_Mjj120 = vbf_uncert_stage_1_1(3, htxs_stage1p1finecat, 1.0);
+               THU_qqH_Mjj350 = vbf_uncert_stage_1_1(4, htxs_stage1p1finecat, 1.0);
+               THU_qqH_Mjj700 = vbf_uncert_stage_1_1(5, htxs_stage1p1finecat, 1.0);
+               THU_qqH_Mjj1000 =vbf_uncert_stage_1_1(6, htxs_stage1p1finecat, 1.0);
+               THU_qqH_Mjj1500 = vbf_uncert_stage_1_1(7, htxs_stage1p1finecat, 1.0);
+               THU_qqH_25 = vbf_uncert_stage_1_1(8, htxs_stage1p1finecat, 1.0);
+               THU_qqH_JET01 = vbf_uncert_stage_1_1(9, htxs_stage1p1finecat, 1.0);
             }
                   
          }
