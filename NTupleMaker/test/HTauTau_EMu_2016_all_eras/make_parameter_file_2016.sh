@@ -33,19 +33,28 @@ echo "CONFIGFILE,FILELIST" > parameters.txt
 ../split_filelist.sh  analysisMacroSynch_em_mc.conf  ST_tW_antitop   4
 
 #TTbar
-../split_filelist.sh  analysisMacroSynch_em_mc.conf  TTbar   4
+#../split_filelist.sh  analysisMacroSynch_em_mc.conf  TTbar   4
+../split_filelist.sh  analysisMacroSynch_em_mc.conf  TTTo2L2Nu 4
+../split_filelist.sh  analysisMacroSynch_em_mc.conf  TTToHadronic 4
+../split_filelist.sh  analysisMacroSynch_em_mc.conf  TTToSemiLeptonic 4
 
 #Diboson 
-../split_filelist.sh  analysisMacroSynch_em_mc.conf  ZZ  1
-../split_filelist.sh  analysisMacroSynch_em_mc.conf  WW  1
-../split_filelist.sh  analysisMacroSynch_em_mc.conf  WZ   1
-
+#../split_filelist.sh  analysisMacroSynch_em_mc.conf  ZZ  1
+#../split_filelist.sh  analysisMacroSynch_em_mc.conf  WW  1
+#../split_filelist.sh  analysisMacroSynch_em_mc.conf  WZ   1
+../split_filelist.sh  analysisMacroSynch_em_mc.conf  VVTo2L2Nu
+../split_filelist.sh  analysisMacroSynch_em_mc.conf  WZTo2L2Q
+../split_filelist.sh  analysisMacroSynch_em_mc.conf  WZTo3LNu
+../split_filelist.sh  analysisMacroSynch_em_mc.conf  ZZTo2L2Q
+../split_filelist.sh  analysisMacroSynch_em_mc.conf  ZZTo4L
 
 #Signal
 ../split_filelist.sh  analysisMacroSynch_em_Signal_ggh.conf  GluGluHToTauTau_M125  4
-../split_filelist.sh  analysisMacroSynch_em_Signal_ggh.conf  GluGluHToTauTau_M125_ext1 40 
+../split_filelist.sh  analysisMacroSynch_em_Signal_ggh.conf  GluGluHToTauTau_M125_ext1 40
+../split_filelist.sh  analysisMacroSynch_em_Signal_ggh.conf  GluGluHToTauTau_M125_ext2 40
 ../split_filelist.sh analysisMacroSynch_em_Signal_VBF.conf VBFHToTauTau_M125 4
 ../split_filelist.sh analysisMacroSynch_em_Signal_VBF.conf VBFHToTauTau_M125_ext1 40
+../split_filelist.sh analysisMacroSynch_em_Signal_VBF.conf VBFHToTauTau_M125_ext2 40
 
 ../split_filelist.sh  analysisMacroSynch_em_Signal.conf  WminusHToTauTau_M125 1
 ../split_filelist.sh  analysisMacroSynch_em_Signal.conf  WplusHToTauTau_M125 1
@@ -53,6 +62,10 @@ echo "CONFIGFILE,FILELIST" > parameters.txt
 ../split_filelist.sh  analysisMacroSynch_em_Signal_ggh.conf  GluGluHToWWTo2L2Nu_M125 1
 ../split_filelist.sh  analysisMacroSynch_em_Signal_VBF.conf  VBFHToWWTo2L2Nu_M125 1
 ../split_filelist.sh  analysisMacroSynch_em_Signal.conf  ttHJetToTT_M125 1
+../split_filelist.sh  analysisMacroSynch_em_Signal.conf  GluGluZH_HToWW_M125_13TeV_powheg_pythia8 1
+../split_filelist.sh  analysisMacroSynch_em_Signal.conf  HWminusJ_HToWW_M125_13TeV_powheg_pythia8 1
+../split_filelist.sh  analysisMacroSynch_em_Signal.conf  HWplusJ_HToWW_M125_13TeV_powheg_pythia8 1
+../split_filelist.sh  analysisMacroSynch_em_Signal.conf  HZJ_HToWW_M125_13TeV_powheg_pythia8 1
 
 #WG and WGstar 
 ../split_filelist.sh  analysisMacroSynch_em_WG.conf  WGToLNuG   4
