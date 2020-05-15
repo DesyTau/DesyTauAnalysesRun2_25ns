@@ -42,11 +42,11 @@ echo "CONFIGFILE,FILELIST" > parameters.txt
 #../split_filelist.sh  analysisMacroSynch_em_mc.conf  ZZ  1
 #../split_filelist.sh  analysisMacroSynch_em_mc.conf  WW  1
 #../split_filelist.sh  analysisMacroSynch_em_mc.conf  WZ   1
-../split_filelist.sh  analysisMacroSynch_em_mc.conf  VVTo2L2Nu
-../split_filelist.sh  analysisMacroSynch_em_mc.conf  WZTo2L2Q
-../split_filelist.sh  analysisMacroSynch_em_mc.conf  WZTo3LNu
-../split_filelist.sh  analysisMacroSynch_em_mc.conf  ZZTo2L2Q
-../split_filelist.sh  analysisMacroSynch_em_mc.conf  ZZTo4L
+../split_filelist.sh  analysisMacroSynch_em_mc.conf  VVTo2L2Nu 1
+../split_filelist.sh  analysisMacroSynch_em_mc.conf  WZTo2L2Q 1
+../split_filelist.sh  analysisMacroSynch_em_mc.conf  WZTo3LNu 1
+../split_filelist.sh  analysisMacroSynch_em_mc.conf  ZZTo2L2Q 1
+../split_filelist.sh  analysisMacroSynch_em_mc.conf  ZZTo4L 1
 
 #Signal
 ../split_filelist.sh  analysisMacroSynch_em_Signal_ggh.conf  GluGluHToTauTau_M125  4
