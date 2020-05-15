@@ -10,7 +10,6 @@ echo "CONFIGFILE,FILELIST" > parameters.txt
 
 ../split_filelist.sh analysisMacroSynch_em_Signal_ggZH.conf GluGluZH_HToWW_M125_13TeV_powheg_pythia8_TuneCP5 1
 ../split_filelist.sh analysisMacroSynch_em_Signal_ttH.conf HWminusJ_HToWW_M125_13TeV_powheg_pythia8_TuneCP5 1 
-../split_filelist.sh analysisMacroSynch_em_Signal_ttH.conf HWminusJ_HToWW_M125_13TeV_powheg_pythia8_TuneCP5 1
 ../split_filelist.sh analysisMacroSynch_em_Signal_ttH.conf HWplusJ_HToWW_M125_13TeV_powheg_pythia8_TuneCP5 1
 ../split_filelist.sh analysisMacroSynch_em_Signal_ttH.conf HZJ_HToWW_M125_13TeV_powheg_jhugen714_pythia8_TuneCP5 1
 
