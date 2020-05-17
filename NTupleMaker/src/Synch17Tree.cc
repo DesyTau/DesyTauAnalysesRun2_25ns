@@ -84,12 +84,24 @@ void Synch17Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("ip0x_1", &ip0x_1, &b_ip0x_1);
    fChain->SetBranchAddress("ip0y_1", &ip0y_1, &b_ip0y_1);
    fChain->SetBranchAddress("ip0z_1", &ip0z_1, &b_ip0z_1);
+
    fChain->SetBranchAddress("ipx_1", &ipx_1, &b_ipx_1);
    fChain->SetBranchAddress("ipy_1", &ipy_1, &b_ipy_1);
    fChain->SetBranchAddress("ipz_1", &ipz_1, &b_ipz_1);
+   fChain->SetBranchAddress("ipphi_1", &ipphi_1, &b_ipphi_1);
+   fChain->SetBranchAddress("ipeta_1", &ipeta_1, &b_ipeta_1);
+
+   fChain->SetBranchAddress("ipx_bs_1", &ipx_bs_1, &b_ipx_bs_1);
+   fChain->SetBranchAddress("ipy_bs_1", &ipy_bs_1, &b_ipy_bs_1);
+   fChain->SetBranchAddress("ipz_bs_1", &ipz_bs_1, &b_ipz_bs_1);
+   fChain->SetBranchAddress("ipphi_bs_1", &ipphi_bs_1, &b_ipphi_bs_1);
+   fChain->SetBranchAddress("ipeta_bs_1", &ipeta_bs_1, &b_ipeta_bs_1);
+
    fChain->SetBranchAddress("gen_ipx_1", &gen_ipx_1, &b_gen_ipx_1);
    fChain->SetBranchAddress("gen_ipy_1", &gen_ipy_1, &b_gen_ipy_1);
    fChain->SetBranchAddress("gen_ipz_1", &gen_ipz_1, &b_gen_ipz_1);
+   fChain->SetBranchAddress("gen_ipphi_1", &gen_ipphi_1, &b_gen_ipphi_1);
+   fChain->SetBranchAddress("gen_ipeta_1", &gen_ipeta_1, &b_gen_ipeta_1);
 
    fChain->SetBranchAddress("ip_covxx_1", &ip_covxx_1, &b_ip_covxx_1);
    fChain->SetBranchAddress("ip_covxy_1", &ip_covxy_1, &b_ip_covxy_1);
@@ -151,12 +163,24 @@ void Synch17Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("ip0x_2", &ip0x_2, &b_ip0x_2);
    fChain->SetBranchAddress("ip0y_2", &ip0y_2, &b_ip0y_2);
    fChain->SetBranchAddress("ip0z_2", &ip0z_2, &b_ip0z_2);
+
    fChain->SetBranchAddress("ipx_2", &ipx_2, &b_ipx_2);
    fChain->SetBranchAddress("ipy_2", &ipy_2, &b_ipy_2);
    fChain->SetBranchAddress("ipz_2", &ipz_2, &b_ipz_2);
+   fChain->SetBranchAddress("ipphi_2", &ipphi_2, &b_ipphi_2);
+   fChain->SetBranchAddress("ipeta_2", &ipeta_2, &b_ipeta_2);
+
+   fChain->SetBranchAddress("ipx_bs_2", &ipx_bs_2, &b_ipx_bs_2);
+   fChain->SetBranchAddress("ipy_bs_2", &ipy_bs_2, &b_ipy_bs_2);
+   fChain->SetBranchAddress("ipz_bs_2", &ipz_bs_2, &b_ipz_bs_2);
+   fChain->SetBranchAddress("ipphi_bs_2", &ipphi_bs_2, &b_ipphi_bs_2);
+   fChain->SetBranchAddress("ipeta_bs_2", &ipeta_bs_2, &b_ipeta_bs_2);
+
    fChain->SetBranchAddress("gen_ipx_2", &gen_ipx_2, &b_gen_ipx_2);
    fChain->SetBranchAddress("gen_ipy_2", &gen_ipy_2, &b_gen_ipy_2);
    fChain->SetBranchAddress("gen_ipz_2", &gen_ipz_2, &b_gen_ipz_2);
+   fChain->SetBranchAddress("gen_ipphi_2", &gen_ipphi_2, &b_gen_ipphi_2);
+   fChain->SetBranchAddress("gen_ipeta_2", &gen_ipeta_2, &b_gen_ipeta_2);
 
    fChain->SetBranchAddress("ip_covxx_2", &ip_covxx_2, &b_ip_covxx_2);
    fChain->SetBranchAddress("ip_covxy_2", &ip_covxy_2, &b_ip_covxy_2);
@@ -371,7 +395,6 @@ void Synch17Tree::ReadInit(TTree *tree)
   fChain->SetBranchAddress("weight_CMS_eff_t_pThigh_MVADM10_13TeVDown", &weight_CMS_eff_t_pThigh_MVADM10_13TeVDown, &b_weight_CMS_eff_t_pThigh_MVADM10_13TeVDown);
   fChain->SetBranchAddress("weight_CMS_eff_t_pThigh_MVADM11_13TeVDown", &weight_CMS_eff_t_pThigh_MVADM11_13TeVDown, &b_weight_CMS_eff_t_pThigh_MVADM11_13TeVDown);
 
-
   fChain->SetBranchAddress("weight_mufake_corr", &weight_mufake_corr, &b_weight_mufake_corr);
   fChain->SetBranchAddress("weight_CMS_mufake_mt_MVADM0_13TeVUp", &weight_CMS_mufake_mt_MVADM0_13TeVUp, &b_weight_CMS_mufake_mt_MVADM0_13TeVUp);
   fChain->SetBranchAddress("weight_CMS_mufake_mt_MVADM1_13TeVUp", &weight_CMS_mufake_mt_MVADM1_13TeVUp, &b_weight_CMS_mufake_mt_MVADM1_13TeVUp);
@@ -384,15 +407,13 @@ void Synch17Tree::ReadInit(TTree *tree)
   fChain->SetBranchAddress("weight_CMS_mufake_mt_MVADM10_13TeVDown", &weight_CMS_mufake_mt_MVADM10_13TeVDown, &b_weight_CMS_mufake_mt_MVADM10_13TeVDown);
   fChain->SetBranchAddress("weight_CMS_mufake_mt_MVADM11_13TeVDown", &weight_CMS_mufake_mt_MVADM11_13TeVDown, &b_weight_CMS_mufake_mt_MVADM11_13TeVDown);
 
-
-   fChain->SetBranchAddress("weight_CMS_scale_gg_13TeVUp", &weight_CMS_scale_gg_13TeVUp, &b_weight_CMS_scale_gg_13TeVUp);
-   fChain->SetBranchAddress("weight_CMS_scale_gg_13TeVDown", &weight_CMS_scale_gg_13TeVDown, &b_weight_CMS_scale_gg_13TeVDown);
-   fChain->SetBranchAddress("weight_CMS_PS_ISR_ggH_13TeVUp", &weight_CMS_PS_ISR_ggH_13TeVUp, &b_weight_CMS_PS_ISR_ggH_13TeVUp);
-   fChain->SetBranchAddress("weight_CMS_PS_ISR_ggH_13TeVDown", &weight_CMS_PS_ISR_ggH_13TeVDown, &b_weight_CMS_PS_ISR_ggH_13TeVDown);
-   fChain->SetBranchAddress("weight_CMS_PS_FSR_ggH_13TeVUp", &weight_CMS_PS_FSR_ggH_13TeVUp, &b_weight_CMS_PS_FSR_ggH_13TeVUp);
-   fChain->SetBranchAddress("weight_CMS_PS_FSR_ggH_13TeVDown", &weight_CMS_PS_FSR_ggH_13TeVDown, &b_weight_CMS_PS_FSR_ggH_13TeVDown);
-
-
+  fChain->SetBranchAddress("weight_CMS_scale_gg_13TeVUp", &weight_CMS_scale_gg_13TeVUp, &b_weight_CMS_scale_gg_13TeVUp);
+  fChain->SetBranchAddress("weight_CMS_scale_gg_13TeVDown", &weight_CMS_scale_gg_13TeVDown, &b_weight_CMS_scale_gg_13TeVDown);
+  fChain->SetBranchAddress("weight_CMS_scale_gg_13TeVDown", &weight_CMS_scale_gg_13TeVDown, &b_weight_CMS_scale_gg_13TeVDown);
+  fChain->SetBranchAddress("weight_CMS_PS_ISR_ggH_13TeVUp", &weight_CMS_PS_ISR_ggH_13TeVUp, &b_weight_CMS_PS_ISR_ggH_13TeVUp);
+  fChain->SetBranchAddress("weight_CMS_PS_ISR_ggH_13TeVDown", &weight_CMS_PS_ISR_ggH_13TeVDown, &b_weight_CMS_PS_ISR_ggH_13TeVDown);
+  fChain->SetBranchAddress("weight_CMS_PS_FSR_ggH_13TeVUp", &weight_CMS_PS_FSR_ggH_13TeVUp, &b_weight_CMS_PS_FSR_ggH_13TeVUp);
+  fChain->SetBranchAddress("weight_CMS_PS_FSR_ggH_13TeVDown", &weight_CMS_PS_FSR_ggH_13TeVDown, &b_weight_CMS_PS_FSR_ggH_13TeVDown);
 
 
    fChain->SetBranchAddress("ff_nom",&ff_nom,&b_ff_nom);
@@ -403,12 +424,15 @@ void Synch17Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("trg_singlemuon",  &trg_singlemuon, &b_trg_singlemuon);
    fChain->SetBranchAddress("trg_singleelectron",  &trg_singleelectron, &b_trg_singleelectron);
    fChain->SetBranchAddress("singleLepTrigger",  &singleLepTrigger, &b_singleLepTrigger);
+
    fChain->SetBranchAddress("trg_mutaucross",  &trg_mutaucross, &b_trg_mutaucross);
    fChain->SetBranchAddress("trg_mutaucross_mu",  &trg_mutaucross_mu, &b_trg_mutaucross_mu);
    fChain->SetBranchAddress("trg_mutaucross_tau",  &trg_mutaucross_tau, &b_trg_mutaucross_tau);
+
    fChain->SetBranchAddress("trg_etaucross",  &trg_etaucross, &b_trg_etaucross);
    fChain->SetBranchAddress("trg_etaucross_e",  &trg_etaucross_e, &b_trg_etaucross_e);
    fChain->SetBranchAddress("trg_etaucross_tau",  &trg_etaucross_tau, &b_trg_etaucross_tau);
+
    fChain->SetBranchAddress("trg_doubletau", &trg_doubletau, &b_trg_doubletau);
    fChain->SetBranchAddress("ditauTrigger", &ditauTrigger, &b_ditauTrigger);
    fChain->SetBranchAddress("xTrigger",  &xTrigger, &b_xTrigger);
@@ -596,6 +620,11 @@ void Synch17Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("v_tracks",&v_tracks,&b_v_tracks);
    fChain->SetBranchAddress("is_refitted_PV_with_BS", &is_refitted_PV_with_BS, &b_is_refitted_PV_with_BS);
 
+   fChain->SetBranchAddress("pvx_bs", &pvx_bs, &b_pvx_bs);
+   fChain->SetBranchAddress("pvy_bs", &pvy_bs, &b_pvy_bs);
+   fChain->SetBranchAddress("pvz_bs", &pvz_bs, &b_pvz_bs);
+
+
   //gen vertex info useful to have
    fChain->SetBranchAddress("GenVertexX", &GenVertexX, &b_GenVertexX);
    fChain->SetBranchAddress("GenVertexY", &GenVertexY, &b_GenVertexY);
@@ -741,12 +770,24 @@ void Synch17Tree::WriteInit(TTree *tree) {
    fChain->Branch("ip0x_1", &ip0x_1, "ip0x_1/F");
    fChain->Branch("ip0y_1", &ip0y_1, "ip0y_1/F");
    fChain->Branch("ip0z_1", &ip0z_1, "ip0z_1/F");
+
    fChain->Branch("ipx_1", &ipx_1, "ipx_1/F");
    fChain->Branch("ipy_1", &ipy_1, "ipy_1/F");
    fChain->Branch("ipz_1", &ipz_1, "ipz_1/F");
+   fChain->Branch("ipphi_1", &ipphi_1, "ipphi_1/F");
+   fChain->Branch("ipeta_1", &ipeta_1, "ipeta_1/F");
+
+   fChain->Branch("ipx_bs_1", &ipx_bs_1, "ipx_bs_1/F");
+   fChain->Branch("ipy_bs_1", &ipy_bs_1, "ipy_bs_1/F");
+   fChain->Branch("ipz_bs_1", &ipz_bs_1, "ipz_bs_1/F");
+   fChain->Branch("ipphi_bs_1", &ipphi_bs_1, "ipphi_bs_1/F");
+   fChain->Branch("ipeta_bs_1", &ipeta_bs_1, "ipeta_bs_1/F");
+
    fChain->Branch("gen_ipx_1", &gen_ipx_1, "gen_ipx_1/F");
    fChain->Branch("gen_ipy_1", &gen_ipy_1, "gen_ipy_1/F");
    fChain->Branch("gen_ipz_1", &gen_ipz_1, "gen_ipz_1/F");
+   fChain->Branch("gen_ipphi_1", &gen_ipphi_1, "gen_ipphi_1/F");
+   fChain->Branch("gen_ipeta_1", &gen_ipeta_1, "gen_ipeta_1/F");
 
    fChain->Branch("ip_covxx_1", &ip_covxx_1, "ip_covxx_1/F");
    fChain->Branch("ip_covxy_1", &ip_covxy_1, "ip_covxy_1/F");
@@ -805,12 +846,24 @@ void Synch17Tree::WriteInit(TTree *tree) {
    fChain->Branch("ip0x_2", &ip0x_2, "ip0x_2/F");
    fChain->Branch("ip0y_2", &ip0y_2, "ip0y_2/F");
    fChain->Branch("ip0z_2", &ip0z_2, "ip0z_2/F");
+
    fChain->Branch("ipx_2", &ipx_2, "ipx_2/F");
    fChain->Branch("ipy_2", &ipy_2, "ipy_2/F");
    fChain->Branch("ipz_2", &ipz_2, "ipz_2/F");
+   fChain->Branch("ipphi_2", &ipphi_2, "ipphi_2/F");
+   fChain->Branch("ipeta_2", &ipeta_2, "ipeta_2/F");
+
+   fChain->Branch("ipx_bs_2", &ipx_bs_2, "ipx_bs_2/F");
+   fChain->Branch("ipy_bs_2", &ipy_bs_2, "ipy_bs_2/F");
+   fChain->Branch("ipz_bs_2", &ipz_bs_2, "ipz_bs_2/F");
+   fChain->Branch("ipphi_bs_2", &ipphi_bs_2, "ipphi_bs_2/F");
+   fChain->Branch("ipeta_bs_2", &ipeta_bs_2, "ipeta_bs_2/F");
+
    fChain->Branch("gen_ipx_2", &gen_ipx_2, "gen_ipx_2/F");
    fChain->Branch("gen_ipy_2", &gen_ipy_2, "gen_ipy_2/F");
    fChain->Branch("gen_ipz_2", &gen_ipz_2, "gen_ipz_2/F");
+   fChain->Branch("gen_ipphi_2", &gen_ipphi_2, "gen_ipphi_2/F");
+   fChain->Branch("gen_ipeta_2", &gen_ipeta_2, "gen_ipeta_2/F");
 
    fChain->Branch("ip_covxx_2", &ip_covxx_2, "ip_covxx_2/F");
    fChain->Branch("ip_covxy_2", &ip_covxy_2, "ip_covxy_2/F");
@@ -989,7 +1042,6 @@ void Synch17Tree::WriteInit(TTree *tree) {
   fChain->Branch("weight_CMS_eff_t_pThigh_MVADM10_13TeVDown", &weight_CMS_eff_t_pThigh_MVADM10_13TeVDown, "weight_CMS_eff_t_pThigh_MVADM10_13TeVDown/F");
   fChain->Branch("weight_CMS_eff_t_pThigh_MVADM11_13TeVDown", &weight_CMS_eff_t_pThigh_MVADM11_13TeVDown, "weight_CMS_eff_t_pThigh_MVADM11_13TeVDown/F");
 
-
   fChain->Branch("weight_mufake_corr", &weight_mufake_corr, "weight_mufake_corr/F");
   fChain->Branch("weight_CMS_mufake_mt_MVADM0_13TeVUp", &weight_CMS_mufake_mt_MVADM0_13TeVUp, "weight_CMS_mufake_mt_MVADM0_13TeVUp/F");
   fChain->Branch("weight_CMS_mufake_mt_MVADM1_13TeVUp", &weight_CMS_mufake_mt_MVADM1_13TeVUp, "weight_CMS_mufake_mt_MVADM1_13TeVUp/F");
@@ -1001,7 +1053,6 @@ void Synch17Tree::WriteInit(TTree *tree) {
   fChain->Branch("weight_CMS_mufake_mt_MVADM2_13TeVDown", &weight_CMS_mufake_mt_MVADM2_13TeVDown, "weight_CMS_mufake_mt_MVADM2_13TeVDown/F");
   fChain->Branch("weight_CMS_mufake_mt_MVADM10_13TeVDown", &weight_CMS_mufake_mt_MVADM10_13TeVDown, "weight_CMS_mufake_mt_MVADM10_13TeVDown/F");
   fChain->Branch("weight_CMS_mufake_mt_MVADM11_13TeVDown", &weight_CMS_mufake_mt_MVADM11_13TeVDown, "weight_CMS_mufake_mt_MVADM11_13TeVDown/F");
-
 
    fChain->Branch("weight_CMS_scale_gg_13TeVUp", &weight_CMS_scale_gg_13TeVUp, "weight_CMS_scale_gg_13TeVUp/F");
    fChain->Branch("weight_CMS_scale_gg_13TeVDown", &weight_CMS_scale_gg_13TeVDown, "weight_CMS_scale_gg_13TeVDown/F");
@@ -1058,12 +1109,16 @@ fChain->Branch("againstElectronVLooseMVA6_2", &againstElectronVLooseMVA6_2, "aga
    fChain->Branch("trg_singlemuon",  &trg_singlemuon, "trg_singlemuon/O");
    fChain->Branch("trg_singleelectron",  &trg_singleelectron, "trg_singleelectron/O");
    fChain->Branch("singleLepTrigger",  &singleLepTrigger, "singleLepTrigger/O");
+
    fChain->Branch("trg_mutaucross",  &trg_mutaucross, "trg_mutaucross/O");
    fChain->Branch("trg_mutaucross_mu",  &trg_mutaucross_mu, "trg_mutaucross_mu/O");
    fChain->Branch("trg_mutaucross_tau",  &trg_mutaucross_tau, "trg_mutaucross_tau/O");
+
+
    fChain->Branch("trg_etaucross",  &trg_etaucross, "trg_etaucross/O");
    fChain->Branch("trg_etaucross_e",  &trg_etaucross_e, "trg_etaucross_e/O");
    fChain->Branch("trg_etaucross_tau",  &trg_etaucross_tau, "trg_etaucross_tau/O");
+
    fChain->Branch("trg_doubletau", &trg_doubletau,"trg_doubletau/O");
    fChain->Branch("ditauTrigger", &ditauTrigger,"ditauTrigger/O");
    fChain->Branch("xTrigger",  &xTrigger, "xTrigger/O");
@@ -1243,6 +1298,11 @@ fChain->Branch("againstElectronVLooseMVA6_2", &againstElectronVLooseMVA6_2, "aga
    fChain->Branch("pvz", &pvz, "pvz/F");
    fChain->Branch("v_tracks",&v_tracks,"v_tracks/I");
    fChain->Branch("is_refitted_PV_with_BS", &is_refitted_PV_with_BS, "is_refitted_PV_with_BS/O"); 
+
+   fChain->Branch("pvx_bs", &pvx_bs, "pvx_bs/F"); 
+   fChain->Branch("pvy_bs", &pvy_bs, "pvy_bs/F"); 
+   fChain->Branch("pvz_bs", &pvz_bs, "pvz_bs/F");
+
 
    fChain->Branch("GenVertexX", &GenVertexX, "GenVertexX/F");
    fChain->Branch("GenVertexY", &GenVertexY, "GenVertexY/F");
