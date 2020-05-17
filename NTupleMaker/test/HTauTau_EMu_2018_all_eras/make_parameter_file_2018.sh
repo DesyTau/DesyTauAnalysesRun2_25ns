@@ -43,7 +43,7 @@ echo "CONFIGFILE,FILELIST" > parameters.txt
 ../split_filelist.sh   analysisMacroSynch_em_MC.conf WZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8 1
 ../split_filelist.sh   analysisMacroSynch_em_MC.conf VVTo2L2Nu_13TeV_amcatnloFXFX_madspin_pythia8 1
 ../split_filelist.sh   analysisMacroSynch_em_MC.conf WZTo3LNu_TuneCP5_13TeV-amcatnloFXFX-pythia8 1
-../split_filelist.sh   analysisMacroSynch_em_MC.conf ZZTo4L_TuneCP5_13TeV_powheg_pythia8 1
+../split_filelist.sh   analysisMacroSynch_em_MC.conf ZZTo4L_TuneCP5_13TeV-amcatnloFXFX-pythia8 1
 ../split_filelist.sh   analysisMacroSynch_em_MC.conf ZZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8 1
 
 

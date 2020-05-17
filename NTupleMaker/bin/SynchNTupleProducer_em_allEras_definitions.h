@@ -402,6 +402,7 @@ Int_t njets_HTXS;
 Int_t htxs_stage0cat;
 Int_t htxs_stage1cat;
 Int_t htxs_stage1p1cat;
+Int_t htxs_stage1p1finecat;
 
 Float_t THU_ggH_Mu;
 Float_t THU_ggH_Res;
@@ -805,6 +806,7 @@ void SetupTree(){
    tree->Branch("htxs_stage0cat",&htxs_stage0cat,"htxs_stage0cat/I");
    tree->Branch("htxs_stage1cat",&htxs_stage1cat,"htxs_stage1cat/I");
    tree->Branch("htxs_stage1p1cat",&htxs_stage1p1cat,"htxs_stage1p1cat/I");
+    tree->Branch("htxs_stage1p1finecat",&htxs_stage1p1finecat,"htxs_stage1p1finecat/I");
    
    tree->Branch("mcweight", &mcweight, "mcweight/F");
    tree->Branch("puweight", &puweight, "puweight/F");
@@ -1227,6 +1229,7 @@ void SetDefaultValues(){
    htxs_stage0cat = -1.;
    htxs_stage1cat = -1.;
    htxs_stage1p1cat = -1.;
+   htxs_stage1p1finecat = -1.;
    
    metFilters_ = true;
    badChargedCandidateFilter_ = true;

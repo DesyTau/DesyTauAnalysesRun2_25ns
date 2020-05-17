@@ -52,14 +52,14 @@ ls $dirApril2020/ttHToTauTau_M125_TuneCP5_13TeV-powheg-pythia8/*root > ttHToTauT
 
 ls $dirMC/WGToLNuG_TuneCP5_13TeV-madgraphMLM-pythia8/*root > WGToLNuG_TuneCP5_13TeV-madgraphMLM-pythia8
 
-ls $dirMC/WW_TuneCP5_13TeV-pythia8/*root > WW_TuneCP5_13TeV-pythia8
-ls $dirMC/WZ_TuneCP5_13TeV-pythia8/*root > WZ_TuneCP5_13TeV-pythia8
-ls $dirMC/ZZ_TuneCP5_13TeV-pythia8/*root > ZZ_TuneCP5_13TeV-pythia8
+#ls $dirMC/WW_TuneCP5_13TeV-pythia8/*root > WW_TuneCP5_13TeV-pythia8
+#ls $dirMC/WZ_TuneCP5_13TeV-pythia8/*root > WZ_TuneCP5_13TeV-pythia8
+#ls $dirMC/ZZ_TuneCP5_13TeV-pythia8/*root > ZZ_TuneCP5_13TeV-pythia8
 
 ls $dirApril2020/WZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8/*root > WZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8
 ls $dirApril2020/VVTo2L2Nu_13TeV_amcatnloFXFX_madspin_pythia8/*root > VVTo2L2Nu_13TeV_amcatnloFXFX_madspin_pythia8
 ls $dirApril2020/WZTo3LNu_TuneCP5_13TeV-amcatnloFXFX-pythia8/*root > WZTo3LNu_TuneCP5_13TeV-amcatnloFXFX-pythia8
-ls $dirApril2020/ZZTo4L_TuneCP5_13TeV_powheg_pythia8/*root > ZZTo4L_TuneCP5_13TeV_powheg_pythia8
+ls $dirApril2020/ZZTo4L_TuneCP5_13TeV-amcatnloFXFX-pythia8/*root >  ZZTo4L_TuneCP5_13TeV-amcatnloFXFX-pythia8
 ls $dirApril2020/ZZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8/*root > ZZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8
 
 ls $dirApril2020/HWminusJ_HToWW_M125_13TeV_powheg_jhugen724_pythia8_TuneCP5/*root > HWminusJ_HToWW_M125_13TeV_powheg_jhugen724_pythia8_TuneCP5
