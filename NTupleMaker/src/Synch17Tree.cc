@@ -360,6 +360,9 @@ void Synch17Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("effweight", &effweight, &b_effweight); 
    fChain->SetBranchAddress("etaufakeweight", &etaufakeweight, &b_etaufakeweight);
    fChain->SetBranchAddress("mutaufakeweight", &mutaufakeweight, &b_mutaufakeweight);
+   fChain->SetBranchAddress("prefiringweight", &prefiringweight, &b_prefiringweight);
+   fChain->SetBranchAddress("prefiringweightUp", &prefiringweightUp, &b_prefiringweightUp);
+   fChain->SetBranchAddress("prefiringweightDown", &prefiringweightDown, &b_prefiringweightDown);
 
 
    fChain->SetBranchAddress("weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVUp", &weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVUp, &b_weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVUp);
@@ -1093,6 +1096,9 @@ fChain->Branch("againstElectronVLooseMVA6_2", &againstElectronVLooseMVA6_2, "aga
    fChain->Branch("mcweight", &mcweight, "mcweight/F");
    fChain->Branch("puweight", &puweight, "puweight/F");
    fChain->Branch("trigweight", &trigweight, "trigweight/F");
+   fChain->Branch("prefiringweight", &prefiringweight, "prefiringweight/F");
+   fChain->Branch("prefiringweightUp", &prefiringweightUp, "prefiringweightUp/F");
+   fChain->Branch("prefiringweightDown", &prefiringweightDown, "prefiringweightDown/F");
 
    fChain->Branch("topptweight", &topptweight, "topptweight/F");
    fChain->Branch("zptweight", &zptweight, "zptweight/D");

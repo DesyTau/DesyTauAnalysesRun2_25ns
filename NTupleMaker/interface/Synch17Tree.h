@@ -329,6 +329,9 @@ public :
   Float_t         effweight;
   Float_t         trigweight;
   Float_t         embweight;
+  Float_t         prefiringweight;
+  Float_t         prefiringweightUp;
+  Float_t         prefiringweightDown;
 
   Float_t weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVUp;
   Float_t weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVUp;
@@ -956,6 +959,9 @@ public :
   TBranch	 *b_effweight;
   TBranch        *b_trigweight;
   TBranch        *b_embweight;
+  TBranch	 *b_prefiringweight;
+  TBranch	 *b_prefiringweightUp;
+  TBranch	 *b_prefiringweightDown;
 
   TBranch        *b_weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVUp;
   TBranch        *b_weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVUp;

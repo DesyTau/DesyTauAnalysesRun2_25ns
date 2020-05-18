@@ -1504,6 +1504,12 @@ int main(int argc, char * argv[]){
 	otree->weight_CMS_PS_FSR_ggH_13TeVDown = analysisTree.gen_pythiaweights[9];
       }
 
+      //Prefiring weights for CP analysis
+      otree->prefiringweight     = analysisTree.prefiringweight;
+      otree->prefiringweightUp   = analysisTree.prefiringweightup;
+      otree->prefiringweightDown = analysisTree.prefiringweightdown;
+
+
 
       ////////////////////////////////////////////////////////////
       // Z pt weight
