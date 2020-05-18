@@ -333,7 +333,7 @@ double JERSF(double eta, double weight){
 
 }	
 
-bool jetPUID(AC1B &tree_, int jet, TString wp="Tight"){
+bool jetPUID(const AC1B &tree_, int jet, TString wp="Tight"){
   // from https://twiki.cern.ch/twiki/bin/viewauth/CMS/PileupJetID#Working_points
   //4 Eta Categories 0-2.5 2.5-2.75 2.75-3.0 3.0-5.0
   //Tight Id
@@ -374,7 +374,7 @@ bool jetPUID(AC1B &tree_, int jet, TString wp="Tight"){
   else if(pt<50) cut = Pt3050[etaIndex];
 
 
-  bool passedPUID = (bool) mva > cut;
+  bool passedPUID = (bool) (mva > cut);
   if (pt >= 50) passedPUID = true;
   if (eta >=5.0)passedPUID = false;
 
