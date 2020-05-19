@@ -20,13 +20,6 @@
 
 typedef ROOT::Math::SMatrix<float,5,5, ROOT::Math::MatRepSym<float,5>> SMatrixSym5F;
 
-/*Updates Merijn 2018 11 13
--added acott_Impr, which is improved version of acott. Note it takes the decay channel as input also. 
-If the channel is e-t or mu-t, it will calculate the lepton vx etc. 
--added ipVec_Lepton. it uses the reco vx, vy ,and vz to calculate the leptonic tau impact vector.
--looking into potential issue with acoCPCOUT
-*/
-
 void acott(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, int tauIndex2);
 
 void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, int tauIndex2,TString ch);
@@ -295,7 +288,6 @@ void calibrateIP(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, i
 void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, int tauIndex2, TString channel, IpCorrection *ip, IpCorrection *ipBS){
   // cout<<"Start acott_Impr"<<endl;
  
-  //Merijn 2019 1 10: there may be situations where we pass correctdecay, but ultimately the acotau does NOT get calculated. For these situations, currently acotau seems not initialised.
   otree->acotautau_00 = -9999;
   otree->acotautau_10 = -9999;
   otree->acotautau_01 = -9999;
@@ -416,10 +408,8 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
     }
   }
   */
-  //Merijn: these definitions can be discussed and adjusted to include 3 prong decays, the allow for mode 10 as well
   bool correctDecay1 = false;
   bool correctDecay2 = false;
-  //now fix for the tree cases. Note: currently we EXCLUDE 3 prong, since NOT implemented yet. 
 
   if(channel == "mt" || channel == "et"){
     correctDecay1 = true;
@@ -478,19 +468,16 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
       otree->VyConstitTau1=analysisTree->tau_constituents_vy[tauIndex1][piIndex_];   
       otree->VzConstitTau1=analysisTree->tau_constituents_vz[tauIndex1][piIndex_];*/
 
-      //Merijn 2019 2 9: updated to new definition
       otree->VxConstitTau1=analysisTree->tau_pca3D_x[tauIndex1];
       otree->VyConstitTau1=analysisTree->tau_pca3D_y[tauIndex1];
       otree->VzConstitTau1=analysisTree->tau_pca3D_z[tauIndex1];
 
-      //Merijn 2019 4 2: comment out and replace with vector from above:    
       otree->chconst_1_pt=tau1Prong.Pt();
       otree->chconst_1_phi=tau1Prong.Phi();
       otree->chconst_1_eta=tau1Prong.Eta();
     }
   }
   
-  //merijn: we vetoed already if the second tau didn't contain a pion, so can safely calculate the momentum of 2nd prong from hadrons
   TLorentzVector tau2Prong;
   tau2Prong = chargedPivec(analysisTree, tauIndex2);
   int piIndexfortau2 = chargedPiIndex(analysisTree, tauIndex2);
@@ -500,12 +487,10 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
     otree->VyConstitTau2=analysisTree->tau_constituents_vy[tauIndex2][piIndexfortau2];   
     otree->VzConstitTau2=analysisTree->tau_constituents_vz[tauIndex2][piIndexfortau2]; */
 
-    //Merijn 2019 2 9: updated to new definition
     otree->VxConstitTau2 = analysisTree->tau_pca3D_x[tauIndex2];
     otree->VyConstitTau2 = analysisTree->tau_pca3D_y[tauIndex2];
     otree->VzConstitTau2 = analysisTree->tau_pca3D_z[tauIndex2];
     
-    //Merijn 2019 4 3: replace with the tau2Prong vector. Keep old code in case something broke:
     otree->chconst_2_pt  = tau2Prong.Pt();
     otree->chconst_2_phi = tau2Prong.Phi();
     otree->chconst_2_eta = tau2Prong.Eta();
@@ -661,7 +646,6 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
   
   otree->acotautau_refitbs_uncorr_00=acoCP(tau1Prong,tau2Prong,tau1IP_refitbs_uncorr,tau2IP_refitbs_uncorr,firstNegative,false,false,otree);
   otree->acotautau_helix_uncorr_00=acoCP(tau1Prong,tau2Prong,tau1IP_helix_uncorr,tau2IP_helix_uncorr,firstNegative,false,false,otree);
-  //I think it should work since everything assigned for 3 cases. Note: aco_00 will be filled with mu x 1-prong and mu x 1.1-prong
   
   //  std::cout << "MODE = " << analysisTree->tau_decayMode[tauIndex2] << std::endl;
   if (otree->acotautau_refitbs_00<-100) {
@@ -1092,7 +1076,7 @@ TLorentzVector ipVec_Lepton(const AC1B * analysisTree, int muonIndex, int tauInd
 		   analysisTree->electron_pz[muonIndex]);}
  
   if(ch=="mt"){
-    secvertex.SetXYZ(analysisTree->muon_vx[muonIndex], //Merijn try somethin 2019 2 9
+    secvertex.SetXYZ(analysisTree->muon_vx[muonIndex],
 		     analysisTree->muon_vy[muonIndex],
 		     analysisTree->muon_vz[muonIndex]);
     
@@ -1200,7 +1184,6 @@ void gen_acott(const AC1B * analysisTree, Synch17GenTree *gentree, int tauIndex1
   gentree->chconst_1_phi=lvector1.Phi();
   gentree->chconst_1_eta=lvector1.Eta();*/
 
-  //Merijn 2019 4 2: replace with vector already defined..
   gentree->chconst_1_pt=tau1Prong.Pt();
   gentree->chconst_1_phi=tau1Prong.Phi();
   gentree->chconst_1_eta=tau1Prong.Eta();
@@ -1221,7 +1204,6 @@ void gen_acott(const AC1B * analysisTree, Synch17GenTree *gentree, int tauIndex1
   gentree->chconst_2_phi=lvector2.Phi();
   */
   
-  //Merijn 2019 4 2: replace with vector already defined..
   gentree->chconst_2_pt=tau2Prong.Pt();
   gentree->chconst_2_eta=tau2Prong.Eta();
   gentree->chconst_2_phi=tau2Prong.Phi();
@@ -1272,13 +1254,10 @@ void gen_acott(const AC1B * analysisTree, Synch17GenTree *gentree, int tauIndex1
   if (oneProngPi01)
     gentree->acotautau_10=acoCP(tau1Prong,tau2Prong,tau1Pi0,tau2IP,firstNegative,true,false, gentree);
 
-  //Merijn: I think we need the other configuration also..
     if (oneProngPi02)
     gentree->acotautau_01=acoCP(tau1Prong,tau2Prong,tau1IP,tau2Pi0,firstNegative,false,true, gentree);
   
 
-  //Merijn 2019 2 9: presume that this is code supposed to keep by Andrea..
-  //Merijn 2019 2 9: the gentree arugment was kept. I remove it now..
   if (oneProngPi01&&oneProngPi02)
     gentree->acotautau_11=acoCP(tau1Prong,tau2Prong,tau1Pi0,tau2Pi0,firstNegative,true,true, gentree);
 
@@ -1567,9 +1546,7 @@ TLorentzVector gen_ThreeProngVec(const AC1B * analysisTree, int tauIndex){
   TLorentzVector ThreeProngVec;
   ThreeProngVec.SetXYZT(0.,0.,0.,0.);
   
-  if(npart!=3){
-    //Meirjn 2010 2 9: Andrea and Merijn commented out a warning message here..
-    
+  if(npart!=3){    
     return ThreeProngVec;
   }
   
@@ -1635,7 +1612,6 @@ Float_t gen_A1Polarization(const AC1B * analysisTree, int tauIndex){
 			 analysisTree->genparticles_pz[piIndex],
 			 analysisTree->genparticles_e[piIndex]);
 
-    //Merijn 2019 2 9: commented originally this out due to compilation issue.
     Vec[i]=LVec[i].Vect();
     LVecSum+=LVec[i];
     i++;
@@ -1656,7 +1632,6 @@ Float_t gen_A1Polarization(const AC1B * analysisTree, int tauIndex){
   for(int j=0;j<3;j++)Lambda-=2*pow(Bfunction(LVec[j],LVecSum),2);
   if(Lambda<0.) problem=true;
 
-  //Merijn 2019 2 9: comment out cout, since annoying when run over larger samples..
   /*
   if(problem){
     cout << "PROBLEM" <<endl;
@@ -1963,13 +1938,13 @@ TLorentzVector IP_helix_lep(const AC1B * analysisTree, int lepIndex, TString cha
     for(auto i:  analysisTree->muon_helixparameters[lepIndex]) h_param_lep.push_back(i);    
         
   } else if (channel == "et"){
-    B = analysisTree->muon_Bfield[lepIndex];
-    ref_lep.SetX(analysisTree->muon_referencePoint[lepIndex][0]);
-    ref_lep.SetY(analysisTree->muon_referencePoint[lepIndex][1]);
-    ref_lep.SetZ(analysisTree->muon_referencePoint[lepIndex][2]);
+    B = analysisTree->electron_Bfield[lepIndex];
+    ref_lep.SetX(analysisTree->electron_referencePoint[lepIndex][0]);
+    ref_lep.SetY(analysisTree->electron_referencePoint[lepIndex][1]);
+    ref_lep.SetZ(analysisTree->electron_referencePoint[lepIndex][2]);
     p4_lep_auxil.SetXYZM(analysisTree->electron_px[lepIndex], analysisTree->electron_py[lepIndex], analysisTree->electron_pz[lepIndex], ELECTRON_MASS);
     p4_lep.SetPxPyPzE(p4_lep_auxil.Px(),p4_lep_auxil.Py(),p4_lep_auxil.Pz(),p4_lep_auxil.E());
-    for(auto i:  analysisTree->muon_helixparameters[lepIndex]) h_param_lep.push_back(i);    
+    for(auto i:  analysisTree->electron_helixparameters[lepIndex]) h_param_lep.push_back(i);    
   }
     
   ImpactParameter IP;
@@ -2046,8 +2021,8 @@ double IP_significance_helix_lep(const AC1B * analysisTree, int lepIndex, TStrin
       {
 	if (channel == "mt")
 	  helix_params_covariance[i][j] = analysisTree->muon_helixparameters_covar[lepIndex][i][j];
-	// else if(channel == "et")
-	//     helix_params_covariance[i][j] = analysisTree->electron_helixparameters_covar[lepIndex][i][j];
+	else if(channel == "et")
+	  helix_params_covariance[i][j] = analysisTree->electron_helixparameters_covar[lepIndex][i][j];
       }
   for (size_t i = 0; i < 3; i++)
     {
