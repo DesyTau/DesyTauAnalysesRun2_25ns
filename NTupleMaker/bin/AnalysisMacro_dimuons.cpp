@@ -626,6 +626,14 @@ int main(int argc, char * argv[]) {
     ipz_errzIP[i] = new TH1D("ipz_errzIP_"+ipErrZ[i],"",200,-0.02,0.02);
   }
 
+  TH1D * xDVertH = new TH1D("xDVertH","",200,-0.02,0.02);
+  TH1D * yDVertH = new TH1D("yDVertH","",200,-0.02,0.02);
+  TH1D * zDVertH = new TH1D("zDVertH","",200,-0.02,0.02);
+
+  TH1D * xDVert_rfbsH = new TH1D("xDVert_rfbsH","",200,-0.02,0.02);
+  TH1D * yDVert_rfbsH = new TH1D("yDVert_rfbsH","",200,-0.02,0.02);
+  TH1D * zDVert_rfbsH = new TH1D("zDVert_rfbsH","",200,-0.02,0.02);
+
   for (int i=0; i<6; ++i) {
 
     dxVert_errxVert[i] = new TH1D("dxVert_errxVert"+VertErrXYnames[i],"",100,-0.01,0.01);
@@ -2072,8 +2080,8 @@ int main(int argc, char * argv[]) {
 	    bool isRefittedVtx = false;
 	    std::vector<float> PV_cov; PV_cov.clear();
 	    std::vector<float> PV_cov_rfbs; PV_cov_rfbs.clear();
-	    bool rf_bs = true;
-	    TVector3 vertex = get_refitted_PV_with_BS(&analysisTree,indx1,indx2,isRefittedVtx,PV_cov,rf_bs);
+	    bool rfbs = false;
+	    TVector3 vertex = get_refitted_PV_with_BS(&analysisTree,indx1,indx2,isRefittedVtx,PV_cov,rfbs);
 	    TVector3 ip1    = ipVec_Lepton(&analysisTree,indx1,vertex);
 	    TVector3 ip2    = ipVec_Lepton(&analysisTree,indx2,vertex);
 	    ROOT::Math::SMatrix<float,3,3, ROOT::Math::MatRepStd< float, 3, 3 >> ipCov1;
@@ -2082,31 +2090,42 @@ int main(int argc, char * argv[]) {
 	    TVector3 ip2_0 = ipHelical(&analysisTree,indx2,vertex,PV_cov,ipCov2);
 
 	    bool isRefittedVtx_rfbs = false;
-	    bool rfbs = false;
+	    rfbs = true;
 	    TVector3 vertex_rfbs = get_refitted_PV_with_BS(&analysisTree,indx1,indx2,isRefittedVtx_rfbs,PV_cov_rfbs,rfbs);
 	    TVector3 ip1_rfbs    = ipVec_Lepton(&analysisTree,indx1,vertex_rfbs);
 	    TVector3 ip2_rfbs    = ipVec_Lepton(&analysisTree,indx2,vertex_rfbs);
 	    ROOT::Math::SMatrix<float,3,3, ROOT::Math::MatRepStd< float, 3, 3 >> ipCov1_rfbs;
-	    TVector3 ip1_0_rfbs = ipHelical(&analysisTree,indx1,vertex,PV_cov_rfbs,ipCov1_rfbs);
+	    TVector3 ip1_0_rfbs = ipHelical(&analysisTree,indx1,vertex_rfbs,PV_cov_rfbs,ipCov1_rfbs);
 	    ROOT::Math::SMatrix<float,3,3, ROOT::Math::MatRepStd< float, 3, 3 >> ipCov2_rfbs;
-	    TVector3 ip2_0_rfbs = ipHelical(&analysisTree,indx2,vertex,PV_cov_rfbs,ipCov2_rfbs);
+	    TVector3 ip2_0_rfbs = ipHelical(&analysisTree,indx2,vertex_rfbs,PV_cov_rfbs,ipCov2_rfbs);
 
 	    /*
-	    cout << "ip(1)  : X = " << ip1.X() << "  Y = " << ip1.Y() << "  Z = " << ip1.Z() << endl; 
-	    cout << "ip0(1) : X = " << ip1_0.X() << "  Y = " << ip1_0.Y() << "  Z = " << ip1_0.Z() << endl; 
-	    cout << "ip(2)  : X = " << ip2.X() << "  Y = " << ip2.Y() << "  Z = " << ip2.Z() << endl; 
-	    cout << "ip0(2) : X = " << ip2_0.X() << "  Y = " << ip2_0.Y() << "  Z = " << ip2_0.Z() << endl; 
-	    cout << "IP Covariance (1) : [0,0] = " << TMath::Sqrt(ipCov1[0][0])
+	    cout << "ip(1)     : X = " << ip1.X() << "  Y = " << ip1.Y() << "  Z = " << ip1.Z() << endl; 
+	    cout << "ip0(1)    : X = " << ip1_0.X() << "  Y = " << ip1_0.Y() << "  Z = " << ip1_0.Z() << endl; 
+	    cout << "ip_rf(1)  : X = " << ip1_rfbs.X() << "  Y = " << ip1_rfbs.Y() << "  Z = " << ip1_rfbs.Z() << endl; 
+	    cout << "ip0_rf(1) : X = " << ip1_0_rfbs.X() << "  Y = " << ip1_0_rfbs.Y() << "  Z = " << ip1_0_rfbs.Z() << endl; 
+
+	    cout << "ip(2)     : X = " << ip2.X() << "  Y = " << ip2.Y() << "  Z = " << ip2.Z() << endl; 
+	    cout << "ip0(2)    : X = " << ip2_0.X() << "  Y = " << ip2_0.Y() << "  Z = " << ip2_0.Z() << endl; 
+	    cout << "ip_rf(2)  : X = " << ip2_rfbs.X() << "  Y = " << ip2_rfbs.Y() << "  Z = " << ip2_rfbs.Z() << endl; 
+	    cout << "ip0_rf(2) : X = " << ip2_0_rfbs.X() << "  Y = " << ip2_0_rfbs.Y() << "  Z = " << ip2_0_rfbs.Z() << endl; 
+
+	    cout << "IP Covariance    (1) : [0,0] = " << TMath::Sqrt(ipCov1[0][0])
 		 << " [1,1] = " << TMath::Sqrt(ipCov1[1][1])
 		 << " [2,2] = " << TMath::Sqrt(ipCov1[2][2]) << endl;
-	    cout << "IP Covariance (2) : [0,0] = " << TMath::Sqrt(ipCov2[0][0])
+	    cout << "IP Covariance bs (1) : [0,0] = " << TMath::Sqrt(ipCov1_rfbs[0][0])
+		 << " [1,1] = " << TMath::Sqrt(ipCov1_rfbs[1][1])
+		 << " [2,2] = " << TMath::Sqrt(ipCov1_rfbs[2][2]) << endl;
+	    cout << "IP Covariance    (2) : [0,0] = " << TMath::Sqrt(ipCov2[0][0])
 		 << " [1,1] = " << TMath::Sqrt(ipCov2[1][1])
 		 << " [2,2] = " << TMath::Sqrt(ipCov2[2][2]) << endl;
+	    cout << "IP Covariance bs (2) : [0,0] = " << TMath::Sqrt(ipCov2_rfbs[0][0])
+		 << " [1,1] = " << TMath::Sqrt(ipCov2_rfbs[1][1])
+		 << " [2,2] = " << TMath::Sqrt(ipCov2_rfbs[2][2]) << endl;
 
-
-	    std::cout << "array PV_cov      : " << PV_cov.size() << std::endl;
-	    std::cout << "array PV_cov_rfbs : " << PV_cov_rfbs.size() << std::endl;
+	    std::cout << std::endl;
 	    */
+
 	    int etaBin1 = binNumber(TMath::Min(float(fabs(etaMu1)),float(2.4)),nEtaBins,etaBins);
 	    int etaBin2 = binNumber(TMath::Min(float(fabs(etaMu2)),float(2.4)),nEtaBins,etaBins);
 	    
@@ -2180,6 +2199,14 @@ int main(int argc, char * argv[]) {
 	    float xDVert_rfbs = vertex_rfbs.X() - genVertex.X();
 	    float yDVert_rfbs = vertex_rfbs.Y() - genVertex.Y();
 	    float zDVert_rfbs = vertex_rfbs.Z() - genVertex.Z();
+
+	    xDVertH->Fill(xDVert,weight);
+	    yDVertH->Fill(yDVert,weight);
+	    zDVertH->Fill(zDVert,weight);
+
+	    xDVert_rfbsH->Fill(xDVert_rfbs,weight);
+	    yDVert_rfbsH->Fill(yDVert_rfbs,weight);
+	    zDVert_rfbsH->Fill(zDVert_rfbs,weight);
 
 	    errxVert_rfbsH->Fill(covxxPV_rfbs,weight);
 	    erryVert_rfbsH->Fill(covyyPV_rfbs,weight);
@@ -2261,12 +2288,12 @@ int main(int argc, char * argv[]) {
 	      ipgen.SetY(0.);
 	      ipgen.SetZ(0.);
 	      ROOT::Math::SMatrix<float,3,3, ROOT::Math::MatRepStd< float, 3, 3 >> ipCovCorr 
-	      //		= ipCorrection->correctIpCov(ipCov1,mu1.Eta());
-		= ipCorrection->correctIpCov(ipCov1,ip1,ipgen,mu1.Eta());
+		= ipCorrection->correctIpCov(ipCov1,mu1.Eta());
+	      //		= ipCorrection->correctIpCov(ipCov1,ip1,ipgen,mu1.Eta());
 	      ipCov1 = ipCovCorr;
 	      ipCovCorr
-		//                = ipCorrection->correctIpCov(ipCov2,mu2.Eta());
-		= ipCorrection->correctIpCov(ipCov2,ip2,ipgen,mu2.Eta());
+		= ipCorrection->correctIpCov(ipCov2,mu2.Eta());
+	      //		= ipCorrection->correctIpCov(ipCov2,ip2,ipgen,mu2.Eta());
 	      ipCov2 = ipCovCorr;
 	    }
 

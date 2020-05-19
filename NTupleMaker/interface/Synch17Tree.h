@@ -63,12 +63,21 @@ public :
   Float_t         ipx_1;
   Float_t         ipy_1;
   Float_t         ipz_1;
+  Float_t         ipphi_1;
+  Float_t         ipeta_1;
+  Float_t         ipx_bs_1;
+  Float_t         ipy_bs_1;
+  Float_t         ipz_bs_1;
+  Float_t         ipphi_bs_1;
+  Float_t         ipeta_bs_1;
   Float_t         ipx_uncorr_1;
   Float_t         ipy_uncorr_1;
   Float_t         ipz_uncorr_1;
   Float_t         gen_ipx_1;
   Float_t         gen_ipy_1;
   Float_t         gen_ipz_1;
+  Float_t         gen_ipphi_1;
+  Float_t         gen_ipeta_1;
 
   Float_t         ip_covxx_1;
   Float_t         ip_covxy_1;
@@ -129,12 +138,21 @@ public :
   Float_t         ipx_2;
   Float_t         ipy_2;
   Float_t         ipz_2;
+  Float_t         ipphi_2;
+  Float_t         ipeta_2;
+  Float_t         ipx_bs_2;
+  Float_t         ipy_bs_2;
+  Float_t         ipz_bs_2;
+  Float_t         ipphi_bs_2;
+  Float_t         ipeta_bs_2;
   Float_t         ipx_uncorr_2;
   Float_t         ipy_uncorr_2;
   Float_t         ipz_uncorr_2;
   Float_t         gen_ipx_2;
   Float_t         gen_ipy_2;
   Float_t         gen_ipz_2;
+  Float_t         gen_ipphi_2;
+  Float_t         gen_ipeta_2;
 
   Float_t         ip_covxx_2;
   Float_t         ip_covxy_2;
@@ -311,6 +329,9 @@ public :
   Float_t         effweight;
   Float_t         trigweight;
   Float_t         embweight;
+  Float_t         prefiringweight;
+  Float_t         prefiringweightUp;
+  Float_t         prefiringweightDown;
 
   Float_t weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVUp;
   Float_t weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVUp;
@@ -343,7 +364,6 @@ public :
   Float_t weight_CMS_eff_t_pThigh_MVADM2_13TeVDown; 
   Float_t weight_CMS_eff_t_pThigh_MVADM10_13TeVDown;
   Float_t weight_CMS_eff_t_pThigh_MVADM11_13TeVDown;
-
 
   Float_t weight_mufake_corr; 
   Float_t weight_CMS_mufake_mt_MVADM0_13TeVUp; 
@@ -590,6 +610,11 @@ public :
   Float_t pvx;
   Float_t pvy;
   Float_t pvz;
+
+  Float_t pvx_bs;
+  Float_t pvy_bs;
+  Float_t pvz_bs;
+
   Bool_t  is_refitted_PV_with_BS;
   Int_t   v_tracks;
   
@@ -670,6 +695,13 @@ public :
   TBranch	 *b_ipx_1;
   TBranch	 *b_ipy_1;
   TBranch	 *b_ipz_1;
+  TBranch	 *b_ipphi_1;
+  TBranch	 *b_ipeta_1;
+  TBranch	 *b_ipx_bs_1;
+  TBranch	 *b_ipy_bs_1;
+  TBranch	 *b_ipz_bs_1;
+  TBranch	 *b_ipphi_bs_1;
+  TBranch	 *b_ipeta_bs_1;
   TBranch	 *b_ipx_uncorr_1;
   TBranch	 *b_ipy_uncorr_1;
   TBranch	 *b_ipz_uncorr_1;
@@ -677,6 +709,8 @@ public :
   TBranch	 *b_gen_ipx_1;
   TBranch	 *b_gen_ipy_1;
   TBranch	 *b_gen_ipz_1;
+  TBranch	 *b_gen_ipphi_1;
+  TBranch	 *b_gen_ipeta_1;
 
   TBranch        *b_ip_covxx_1;
   TBranch        *b_ip_covxy_1;
@@ -735,10 +769,19 @@ public :
   TBranch	 *b_ipx_2;
   TBranch	 *b_ipy_2;
   TBranch	 *b_ipz_2;
+  TBranch	 *b_ipphi_2;
+  TBranch	 *b_ipeta_2;
+  TBranch	 *b_ipx_bs_2;
+  TBranch	 *b_ipy_bs_2;
+  TBranch	 *b_ipz_bs_2;
+  TBranch	 *b_ipphi_bs_2;
+  TBranch	 *b_ipeta_bs_2;
 
   TBranch	 *b_gen_ipx_2;
   TBranch	 *b_gen_ipy_2;
   TBranch	 *b_gen_ipz_2;
+  TBranch	 *b_gen_ipphi_2;
+  TBranch	 *b_gen_ipeta_2;
 
   TBranch        *b_ip_covxx_2;
   TBranch        *b_ip_covxy_2;
@@ -916,6 +959,9 @@ public :
   TBranch	 *b_effweight;
   TBranch        *b_trigweight;
   TBranch        *b_embweight;
+  TBranch	 *b_prefiringweight;
+  TBranch	 *b_prefiringweightUp;
+  TBranch	 *b_prefiringweightDown;
 
   TBranch        *b_weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVUp;
   TBranch        *b_weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVUp;
@@ -968,6 +1014,7 @@ public :
   TBranch        *b_weight_CMS_mufake_mt_MVADM10_13TeVDown;
   TBranch        *b_weight_CMS_mufake_mt_MVADM11_13TeVDown;
 
+
   TBranch	 *b_topptweight;
   TBranch	 *b_zptweight;
   TBranch	 *b_trkeffweight;
@@ -983,16 +1030,16 @@ public :
   TBranch	 *b_trg_singleelectron;
   TBranch	 *b_singleLepTrigger;
   TBranch	 *b_trg_mutaucross;
-  TBranch  *b_trg_mutaucross_mu;
-  TBranch  *b_trg_mutaucross_tau;
+  TBranch        *b_trg_mutaucross_mu;
+  TBranch        *b_trg_mutaucross_tau;
   TBranch	 *b_trg_etaucross;
-  TBranch  *b_trg_etaucross_e;
-  TBranch  *b_trg_etaucross_tau;
-  TBranch  *b_trg_doubletau;
-  TBranch  *b_ditauTrigger;
+  TBranch        *b_trg_etaucross_e;
+  TBranch        *b_trg_etaucross_tau;
+  TBranch        *b_trg_doubletau;
+  TBranch        *b_ditauTrigger;
   TBranch	 *b_xTrigger;
-  TBranch  *b_xTriggerLep;
-  TBranch  *b_xTriggerTau;
+  TBranch        *b_xTriggerLep;
+  TBranch        *b_xTriggerTau;
   //MET
   TBranch	 *b_met;
   TBranch	 *b_metphi;
@@ -1171,6 +1218,12 @@ public :
   TBranch        *b_pvz;  
   TBranch        *b_is_refitted_PV_with_BS;  
   TBranch        *b_v_tracks;
+
+  TBranch        *b_pvx_bs;
+  TBranch        *b_pvy_bs;
+  TBranch        *b_pvz_bs;  
+
+
 
 //gen vertex info is practical to have
   TBranch        *b_GenVertexX;

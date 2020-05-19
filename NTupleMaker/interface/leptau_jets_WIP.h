@@ -250,7 +250,8 @@ namespace jets{
    else if(era != 2016 && era != 2018) 
      {cout<<"no proper era found in cfg file, exiting"<<endl; exit(-1);}
    
-  
+   const bool applyJetPUID = cfg->get<bool>("ApplyJetPUID");
+   
    const float JetEtaCut = cfg->get<float>("JetEtaCut");
    const float JetPtLowCut = cfg->get<float>("JetPtLowCut");
    const float JetPtHighCut = cfg->get<float>("JetPtHighCut");
@@ -325,6 +326,8 @@ namespace jets{
      // see definition in Jets.h
      bool isPFJetId = tightJetID((*analysisTree), int(jet), era);
      if (!isPFJetId) continue;
+     bool passedPUID = jetPUID((*analysisTree), int(jet),"Tight");
+     if(applyJetPUID&&!passedPUID) continue;
      
      jetspt20.push_back(jet);
      

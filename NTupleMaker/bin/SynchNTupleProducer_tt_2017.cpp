@@ -613,7 +613,7 @@ int main(int argc, char * argv[]) {
       
       IpCorrection * ipCorrector = NULL;
       if (ApplyIpCorrection) ipCorrector = ip;
-      acott_Impr(&analysisTree,otree,tauIndex_1,tauIndex_2,"tt",ipCorrector); 
+      acott_Impr(&analysisTree,otree,tauIndex_1,tauIndex_2,"tt",ipCorrector,ipCorrector); 
       //const AC1B * analysisTree;      
   
       //tau1 
