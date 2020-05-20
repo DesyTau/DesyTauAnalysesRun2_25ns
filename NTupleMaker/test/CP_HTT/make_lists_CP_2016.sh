@@ -66,11 +66,11 @@ ls $dirMC/WZ_TuneCUETP8M1_13TeV-pythia8_ext1/*root >> $OUTDIR/WZ
 ls $dirMC/ZZ_TuneCUETP8M1_13TeV-pythia8/*root > $OUTDIR/ZZ
 ls $dirMC/ZZ_TuneCUETP8M1_13TeV-pythia8_ext1/*root >> $OUTDIR/ZZ
 
-ls $dirMC/GluGluHToTauTauUncorrelatedDecay_M125/*root > $OUTDIR/GluGluHToTauTauUncorrelatedDecay_M125
-ls $dirMC/VBFHToTauTauUncorrelatedDecay_M125/*root > $OUTDIR/VBFHToTauTauUncorrelatedDecay_M125
-ls $dirMC/WminusHToTauTauUncorrelatedDecay_M125/*root > $OUTDIR/WminusHToTauTauUncorrelatedDecay_M125
-ls $dirMC/WplusHToTauTauUncorrelatedDecay_M125/*root > $OUTDIR/WplusHToTauTauUncorrelatedDecay_M125
-ls $dirMC/ZHToTauTauUncorrelatedDecay_M125/*root > $OUTDIR/ZHToTauTauUncorrelatedDecay_M125
+ls $dirMC/GluGluHToTauTauUncorrelatedDecay_M125/*root > $OUTDIR/GluGluHToTauTauUncorrDecays_M125
+ls $dirMC/VBFHToTauTauUncorrelatedDecay_M125/*root > $OUTDIR/VBFHToTauTauUncorrDecays_M125
+ls $dirMC/WminusHToTauTauUncorrelatedDecay_M125/*root > $OUTDIR/WminusHToTauTauUncorrDecays_M125
+ls $dirMC/WplusHToTauTauUncorrelatedDecay_M125/*root > $OUTDIR/WplusHToTauTauUncorrDecays_M125
+ls $dirMC/ZHToTauTauUncorrelatedDecay_M125/*root > $OUTDIR/ZHToTauTauUncorrDecays_M125
 
 if [[ $CHANNEL == "mt" ]]; then
   ls $dirData/SingleMuon/SingleMuon_Run2016B_ver2/*root > $OUTDIR/SingleMuon_Run2016B

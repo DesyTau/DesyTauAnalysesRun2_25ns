@@ -2,7 +2,6 @@
 
 echo "CONFIGFILE,FILELIST" > parameters.txt
 
-## Test for 2016
 #data
 ./split_filelist.sh analysisMacroSynch_mt_16_data.conf SingleElectron_Run2016B 10
 ./split_filelist.sh analysisMacroSynch_mt_16_data.conf SingleElectron_Run2016C 10
@@ -12,18 +11,15 @@ echo "CONFIGFILE,FILELIST" > parameters.txt
 ./split_filelist.sh analysisMacroSynch_mt_16_data.conf SingleElectron_Run2016G 10
 ./split_filelist.sh analysisMacroSynch_mt_16_data.conf SingleElectron_Run2016H 10
 
-# Signals
-#./split_filelist.sh analysisMacroSynch_mt_16_MC.conf GluGluHToTauTau_M125 10
-#./split_filelist.sh analysisMacroSynch_mt_16_MC.conf VBFHToTauTau_M125 10
-##  commented since now switching to TauSpinner weights
-# ./split_filelist.sh analysisMacroSynch_mt_SUSYGluGluToHToTauTau_M-120_TuneCP5_13TeV-pythia8.conf SUSYGluGluToHToTauTau 10
-
 # Tau Spinner
 ./split_filelist.sh analysisMacroSynch_mt_16_MC.conf GluGluHToTauTauUncorrDecays_M125 10
 ./split_filelist.sh analysisMacroSynch_mt_16_MC.conf VBFHToTauTauUncorrDecays_M125 10
+# ./split_filelist.sh analysisMacroSynch_mt_16_MC.conf WminusHToTauTauUncorrDecays_M125 10
+# ./split_filelist.sh analysisMacroSynch_mt_16_MC.conf WplusHToTauTauUncorrDecays_M125 10
+# ./split_filelist.sh analysisMacroSynch_mt_16_MC.conf ZHToTauTauUncorrDecays_M125 10
 
 # DY
-# TODO: add low mass DY (need to switch to the other PU file)
+./split_filelist.sh analysisMacroSynch_mt_16_MC.conf DYJetsToLL_M-10to50 10
 ./split_filelist.sh analysisMacroSynch_mt_16_MC.conf DYJetsToLL_M-50 10
 ./split_filelist.sh analysisMacroSynch_mt_16_MC.conf DY1JetsToLL_M-50 10
 ./split_filelist.sh analysisMacroSynch_mt_16_MC.conf DY2JetsToLL_M-50 10
