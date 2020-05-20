@@ -2,9 +2,9 @@
 
 CHANNEL=$1
 
-dirMC=/pnfs/desy.de/cms/tier2/store/user/ywen/ntuples_Apr2020/2017/mc/
+dirMC=/pnfs/desy.de/cms/tier2/store/user/ywen/ntuples_Apr2020/2017/mc
 dirData=/pnfs/desy.de/cms/tier2/store/user/ywen/ntuples_Apr2020/2017/data
-dirEmbedded=/pnfs/desy.de/cms/tier2/store/user/ywen/ntuples_Apr2020/2017/embedded/
+dirEmbedded=/pnfs/desy.de/cms/tier2/store/user/ywen/ntuples_Apr2020/2017/embedded
 
 if [[ -z "$CMSSW_BASE" ]]; then
   echo "Nah, set up your CMSSW first!"
@@ -45,7 +45,7 @@ ls $dirMC/DY4JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/*root > $OUTDIR/DY4
 ls $dirMC/DYJetsToLL_M-10to50_TuneCP5_13TeV-madgraphMLM-pythia8/*root > $OUTDIR/DYJetsToLL_M-10to50
 
 ls $dirMC/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/*root > $OUTDIR/WJetsToLNu
-ls $dirMC/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_ex1/*root >> $OUTDIR/WJetsToLNu
+ls $dirMC/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_ext1/*root >> $OUTDIR/WJetsToLNu
 ls $dirMC/W1JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/*root > $OUTDIR/W1JetsToLNu
 ls $dirMC/W2JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/*root > $OUTDIR/W2JetsToLNu
 ls $dirMC/W3JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/*root > $OUTDIR/W3JetsToLNu

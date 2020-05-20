@@ -2,9 +2,9 @@
 
 CHANNEL=$1
 
-dirMC=/pnfs/desy.de/cms/tier2/store/user/ywen/ntuples_Apr2020/2016/mc/
-dirData=/pnfs/desy.de/cms/tier2/store/user/ywen/ntuples_Apr2020/2016/data/
-dirEmbedded=/pnfs/desy.de/cms/tier2/store/user/ywen/ntuples_Apr2020/2016/embedded/
+dirMC=/pnfs/desy.de/cms/tier2/store/user/ywen/ntuples_Apr2020/2016/mc
+dirData=/pnfs/desy.de/cms/tier2/store/user/ywen/ntuples_Apr2020/2016/data
+dirEmbedded=/pnfs/desy.de/cms/tier2/store/user/ywen/ntuples_Apr2020/2016/embedded
 
 if [[ -z "$CMSSW_BASE" ]]; then
   echo "Nah, set up your CMSSW first!"
