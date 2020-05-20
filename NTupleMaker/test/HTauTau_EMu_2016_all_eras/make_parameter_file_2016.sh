@@ -34,7 +34,7 @@ echo "CONFIGFILE,FILELIST" > parameters.txt
 
 #TTbar
 #../split_filelist.sh  analysisMacroSynch_em_mc.conf  TTbar   4
-../split_filelist.sh  analysisMacroSynch_em_mc.conf  TTTo2L2Nu 4
+../split_filelist.sh  analysisMacroSynch_em_mc.conf  TTTo2L2Nu 1
 ../split_filelist.sh  analysisMacroSynch_em_mc.conf  TTToHadronic 4
 ../split_filelist.sh  analysisMacroSynch_em_mc.conf  TTToSemiLeptonic 4
 
@@ -51,7 +51,7 @@ echo "CONFIGFILE,FILELIST" > parameters.txt
 #Signal
 ../split_filelist.sh  analysisMacroSynch_em_Signal_ggh.conf  GluGluHToTauTau_M125  4
 ../split_filelist.sh  analysisMacroSynch_em_Signal_ggh.conf  GluGluHToTauTau_M125_ext1 40
-../split_filelist.sh  analysisMacroSynch_em_Signal_ggh.conf  GluGluHToTauTau_M125_ext2 40
+../split_filelist.sh  analysisMacroSynch_em_Signal_ggh.conf  GluGluHToTauTau_M125_ext2 20
 ../split_filelist.sh analysisMacroSynch_em_Signal_VBF.conf VBFHToTauTau_M125 4
 ../split_filelist.sh analysisMacroSynch_em_Signal_VBF.conf VBFHToTauTau_M125_ext1 40
 ../split_filelist.sh analysisMacroSynch_em_Signal_VBF.conf VBFHToTauTau_M125_ext2 40
@@ -70,7 +70,7 @@ echo "CONFIGFILE,FILELIST" > parameters.txt
 #WG and WGstar 
 ../split_filelist.sh  analysisMacroSynch_em_WG.conf  WGToLNuG   4
 ../split_filelist.sh  analysisMacroSynch_em_W.conf  WGstarToLNuEE   4
-../split_filelist.sh  analysisMacroSynch_em_W.conf   WGstarToLNuMuMu  4
+../split_filelist.sh  analysisMacroSynch_em_W.conf   WGstarToLNuMuMu  1
 
 #EWK
 ../split_filelist.sh  analysisMacroSynch_em_W.conf EWKWMinus2Jet 5

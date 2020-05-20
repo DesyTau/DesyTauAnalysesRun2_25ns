@@ -1444,7 +1444,7 @@ int main(int argc, char * argv[]){
 	}else if( analysisTree.tau_genmatch[tauIndex] == 2 || analysisTree.tau_genmatch[tauIndex] == 4 ){
 	  //corrections for mu->tau fakes
 
-	  double FRcorr = w->function("t_mufake_mt_mvadm_mvadm"+mvadm)->getVal();
+	  double FRcorr = w->function("t_mufake_mt_mvadm")->getVal();
 	  double FRcorrUp = w->function("t_mufake_mt_mvadm_mvadm"+mvadm+"_up")->getVal() / FRcorr;
 	  double FRcorrDown = w->function("t_mufake_mt_mvadm_mvadm"+mvadm+"_down")->getVal() / FRcorr;
 
