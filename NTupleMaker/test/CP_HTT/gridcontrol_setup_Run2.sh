@@ -1,6 +1,7 @@
 #!/bin/bash
 
 ### the script is to be run with "./gridcontrol_setup_mt_Run2.sh <year={16,17,18}> <channel={mt,et}>"
+source /cvmfs/grid.desy.de/etc/profile.d/grid-ui-env.sh
 
 YEAR=$1
 CHANNEL=$2
