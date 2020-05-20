@@ -2,4 +2,4 @@
 
 echo @CONFIGFILE@
 
-SynchNTupleProducer_Run2 @CONFIGFILE@ @FILELIST@ mt
+SynchNTupleProducer_Run2 @CONFIGFILE@ @FILELIST@ et
