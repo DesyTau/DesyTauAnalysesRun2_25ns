@@ -1043,9 +1043,10 @@ int main(int argc, char * argv[]){
       // Trigger matching
       ////////////////////////////////////////////////////////////
     
-      bool isSingleLepTrig = false;
+      vector<bool> isSingleLepLeg(filterSingleLep.size(), false);
       vector<bool> isXTrigLepLeg(filterXtriggerLepLeg.size(), false);
       vector<bool> isXTrigTauLeg(filterXtriggerTauLeg.size(), false);
+      bool isSingleLepTrig = false;
       bool isXTrig         = false;
       bool isXTrigLep      = true;
       bool isXTrigTau      = true;
@@ -1086,7 +1087,7 @@ int main(int argc, char * argv[]){
 	  for(unsigned int i_trig = 0; i_trig < filterSingleLep.size(); i_trig++)
 	    {
               if (nSingleLepTrig.at(i_trig) == -1) continue;
-              if (analysisTree.trigobject_filters[iT][nSingleLepTrig.at(i_trig)]) isSingleLepTrig = true;
+              if (analysisTree.trigobject_filters[iT][nSingleLepTrig.at(i_trig)]) isSingleLepLeg.at(i_trig) = true;
             }
 	  for(unsigned int i_trig = 0; i_trig < filterXtriggerLepLeg.size(); i_trig++)
 	    {
@@ -1111,6 +1112,21 @@ int main(int argc, char * argv[]){
       }
       */
 
+      if (era == 2017 && ch == "et") {
+        int id_SingleEGO = -1;
+        int id_Single32 = -1;    
+        for(unsigned int i_trig = 0; i_trig < filterSingleLep.size(); i_trig++){
+          if(filterSingleLep.at(i_trig) == "hltEGL1SingleEGOrFilter")
+            id_SingleEGO = i_trig;
+          if(filterSingleLep.at(i_trig) == "hltEle32L1DoubleEGWPTightGsfTrackIsoFilter")
+            id_Single32 = i_trig;
+        }
+        isSingleLepLeg[id_SingleEGO] = isSingleLepLeg[id_SingleEGO] && isSingleLepLeg[id_Single32];
+        isSingleLepLeg[id_Single32] = isSingleLepLeg[id_SingleEGO] && isSingleLepLeg[id_Single32];
+      }
+       
+      for(unsigned int i_trig = 0; i_trig < filterSingleLep.size(); i_trig++)
+        isSingleLepTrig = isSingleLepTrig || isSingleLepLeg.at(i_trig);
       for(unsigned int i_trig = 0; i_trig < filterXtriggerTauLeg.size(); i_trig++)
         isXTrigTau = isXTrigTau && isXTrigTauLeg.at(i_trig);
       for(unsigned int i_trig = 0; i_trig < filterXtriggerLepLeg.size(); i_trig++)
