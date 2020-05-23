@@ -3,24 +3,48 @@
 #include <vector>
 void TestTree_etau(int numberOfEvents = 10) {
 
-  std::vector<TString> list_of_filters = {
+  std::vector<TString> list_of_filters_2017 = {
     "hltEle27WPTightGsfTrackIsoFilter",
     "hltEle32L1DoubleEGWPTightGsfTrackIsoFilter",
     "hltEGL1SingleEGOrFilter",
+    "hltEle32WPTightGsfTrackIsoFilter",
     "hltEle24erWPTightGsfTrackIsoFilterForTau",
     "hltSelectedPFTau30LooseChargedIsolationL1HLTMatched",
     "hltOverlapFilterIsoEle24WPTightGsfLooseIsoPFTau30",
     "hltL1sBigORLooseIsoEGXXerIsoTauYYerdRMin0p3"
   };
 
+  std::vector<TString> list_of_filters_2018 = {
+    "hltEle32WPTightGsfTrackIsoFilter",
+    "hltEle35noerWPTightGsfTrackIsoFilter",
+    "hltEle24erWPTightGsfTrackIsoFilterForTau",
+    "hltSelectedPFTau30LooseChargedIsolationL1HLTMatched",
+    "hltHpsSelectedPFTau30LooseChargedIsolationL1HLTMatched",
+    "hltL1sBigORLooseIsoEGXXerIsoTauYYerdRMin0p3",
+    "hltOverlapFilterIsoEle24WPTightGsfLooseIsoPFTau30",
+    "hltHpsOverlapFilterIsoEle24WPTightGsfLooseIsoPFTau30"
+  };
+
+  std::vector<TString> list_of_filters = list_of_filters_2018;
+
   // Data
+  // 2017
   //  TFile * file = new TFile("/pnfs/desy.de/cms/tier2/store/user/ywen/ntuples_Apr2020/2017/data/SingleElectron_Run2017F-31Mar2018-v1/SingleElectron_Run2017F-31Mar2018-v1_1680.root");
+  // 2018
+  // TFile * file = new TFile("/pnfs/desy.de/cms/tier2/store/user/ywen/ntuples_Apr2020/2018/data/EGamma/EGamma_Run2018B/EGamma_Run2018B_195.root");
+  //  TFile * file = new TFile("/pnfs/desy.de/cms/tier2/store/user/ywen/ntuples_Apr2020/2018/data/EGamma/EGamma_Run2018D/EGamma_Run2018D_6843.root");
 
   // MC
+  // 2017
   //  TFile * file = new TFile("/pnfs/desy.de/cms/tier2/store/user/ywen/ntuples_Apr2020/2017/mc/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8_4119.root");
+  // 2018
+  // TFile * file = new TFile("/pnfs/desy.de/cms/tier2/store/user/ywen/ntuples_Apr2020/2018/mc/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8_4353.root");
 
-  // Embedding
-  TFile * file = new TFile("/pnfs/desy.de/cms/tier2/store/user/ywen/ntuples_Apr2020/2017/embedded/Embedding_eltau/EmbeddingRun2017F_ElTau/EmbeddingRun2017F_ElTau_2306.root");
+  // ******* Embedding *********
+  // 2017
+  //  TFile * file = new TFile("/pnfs/desy.de/cms/tier2/store/user/ywen/ntuples_Apr2020/2017/embedded/Embedding_eltau/EmbeddingRun2017F_ElTau/EmbeddingRun2017F_ElTau_2306.root");
+  // 2018
+  TFile * file = new TFile("/pnfs/desy.de/cms/tier2/store/user/ywen/ntuples_Apr2020/2018/embedded/Embedding_eltau/EmbeddingRun2018C_ElTau/EmbeddingRun2018C_ElTau_1009.root");
 
   TTree * tree = (TTree*)file->Get("makeroottree/AC1B");
 
