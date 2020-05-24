@@ -1288,8 +1288,8 @@ int main(int argc, char * argv[]){
 	if (ch == "mt") {
 	  w->var("m_pt")->setVal(leptonLV.Pt());
 	  w->var("m_eta")->setVal(leptonLV.Eta());
-    eff_data_trig_lt_tau = w->function("t_trg_ic_deeptau_medium_mvadm_mutau_data")->getVal();
-    eff_mc_trig_lt_tau = w->function("t_trg_ic_deeptau_medium_mvadm_mutau_" + suffix)->getVal();
+	  eff_data_trig_lt_tau = w->function("t_trg_ic_deeptau_medium_mvadm_mutau_data")->getVal();
+	  eff_mc_trig_lt_tau = w->function("t_trg_ic_deeptau_medium_mvadm_mutau_" + suffix)->getVal();
 	  eff_data_trig_lt_tauUp = w->function("t_trg_ic_deeptau_medium_mvadm_mutau_data_mvadm"+mvadm+"_up")->getVal();
 	  eff_mc_trig_lt_tauUp = w->function("t_trg_ic_deeptau_medium_mvadm_mutau_" + suffix + "_mvadm"+mvadm+"_up")->getVal();
 	  eff_data_trig_lt_tauDown = w->function("t_trg_ic_deeptau_medium_mvadm_mutau_data_mvadm"+mvadm+"_down")->getVal();
@@ -1314,30 +1314,45 @@ int main(int argc, char * argv[]){
 	  eff_data_trig_L = w->function("e_trg_ic_data")->getVal();
 	  eff_mc_trig_L = w->function("e_trg_ic_" + suffix)->getVal();
 	  if (era > 2016) {
-      eff_data_trig_lt_tau = w->function("t_trg_ic_deeptau_medium_mvadm_etau_data")->getVal();
-      eff_mc_trig_lt_tau = w->function("t_trg_ic_deeptau_medium_mvadm_etau_" + suffix)->getVal();
-      eff_data_trig_lt_l = w->function("e_trg_24_ic_data")->getVal();
+	    eff_data_trig_lt_tau = w->function("t_trg_ic_deeptau_medium_mvadm_etau_data")->getVal();
+	    eff_mc_trig_lt_tau = w->function("t_trg_ic_deeptau_medium_mvadm_etau_" + suffix)->getVal();
+	    eff_data_trig_lt_l = w->function("e_trg_24_ic_data")->getVal();
 	    eff_mc_trig_lt_l = w->function("e_trg_24_ic_" + suffix)->getVal();
-      eff_data_trig_lt_tauUp = w->function("t_trg_ic_deeptau_medium_mvadm_etau_data_mvadm"+mvadm+"_up")->getVal();
-      eff_mc_trig_lt_tauUp = w->function("t_trg_ic_deeptau_medium_mvadm_etau_" + suffix + "_mvadm"+mvadm+"_up")->getVal();
-      eff_data_trig_lt_tauDown = w->function("t_trg_ic_deeptau_medium_mvadm_etau_data_mvadm"+mvadm+"_down")->getVal();
-      eff_mc_trig_lt_tauDown = w->function("t_trg_ic_deeptau_medium_mvadm_etau_" + suffix + "_mvadm"+mvadm+"_down")->getVal();
+	    eff_data_trig_lt_tauUp = w->function("t_trg_ic_deeptau_medium_mvadm_etau_data_mvadm"+mvadm+"_up")->getVal();
+	    eff_mc_trig_lt_tauUp = w->function("t_trg_ic_deeptau_medium_mvadm_etau_" + suffix + "_mvadm"+mvadm+"_up")->getVal();
+	    eff_data_trig_lt_tauDown = w->function("t_trg_ic_deeptau_medium_mvadm_etau_data_mvadm"+mvadm+"_down")->getVal();
+	    eff_mc_trig_lt_tauDown = w->function("t_trg_ic_deeptau_medium_mvadm_etau_" + suffix + "_mvadm"+mvadm+"_down")->getVal();
 	  }
 	  else {
 	    eff_data_trig_lt_tau = 0;
 	    eff_mc_trig_lt_tau = 0;
 	    eff_data_trig_lt_l = 0;
 	    eff_mc_trig_lt_l = 0;
-      eff_data_trig_lt_tauUp = 0;
-      eff_mc_trig_lt_tauUp = 0;
-      eff_data_trig_lt_tauDown = 0;
-      eff_mc_trig_lt_tauDown = 0;
+	    eff_data_trig_lt_tauUp = 0;
+	    eff_mc_trig_lt_tauUp = 0;
+	    eff_data_trig_lt_tauDown = 0;
+	    eff_mc_trig_lt_tauDown = 0;
 	  }
 	  otree->idisoweight_1 = w->function("e_idiso_ic_" + suffixRatio)->getVal();
 	  otree->idisoweight_antiiso_1 = w->function("e_idiso_ic_" + suffixRatio)->getVal();
 	  otree->trkeffweight = w->function("e_trk_" + suffixRatio)->getVal();
 	}
-                                                                                                                                                                     
+	otree->trigweight_1 = 1;
+	otree->trigweight_2 = 1;
+
+	if (eff_mc_trig_L>0.1)
+	  otree->trigweight_1 = eff_data_trig_L/eff_mc_trig_L;
+	if (eff_mc_trig_lt_l>0.1&&eff_mc_trig_lt_tau>0.1) 
+	  otree->trigweight_2 = (eff_data_trig_lt_l*eff_data_trig_lt_tau)/(eff_mc_trig_lt_l*eff_mc_trig_lt_tau);
+	
+	//	if (leptonLV.Pt()>28.) {
+	//	  std::cout << "electron pt = " << leptonLV.Pt() << "   eta = " << leptonLV.Eta() << std::endl;
+	//	  std::cout << "eff(trig_L,Data) = " << eff_data_trig_L 
+	//		    << "    eff(trig_L,MC) = " << eff_mc_trig_L << std::endl;
+	//	  std::cout << "SF(trig_L) = " << otree->trigweight_1 << std::endl;
+	//	  std::cout << std::endl;
+	//	}
+
 	double eff_data_trig = eff_data_trig_L + (eff_data_trig_lt_l - eff_data_trig_L) * eff_data_trig_lt_tau;
 	double eff_mc_trig = eff_mc_trig_L + (eff_mc_trig_lt_l - eff_mc_trig_L) * eff_mc_trig_lt_tau;                                                            
 	double eff_data_trigUp = eff_data_trig_L + (eff_data_trig_lt_l - eff_data_trig_L) * eff_data_trig_lt_tauUp;
@@ -1345,29 +1360,32 @@ int main(int argc, char * argv[]){
 	double eff_data_trigDown = eff_data_trig_L + (eff_data_trig_lt_l - eff_data_trig_L) * eff_data_trig_lt_tauDown;
 	double eff_mc_trigDown = eff_mc_trig_L + (eff_mc_trig_lt_l - eff_mc_trig_L) * eff_mc_trig_lt_tauDown;
 
+	
+
 	if (eff_data_trig > 1e-4 && eff_mc_trig > 1e-4){
 	  otree->trigweight = eff_data_trig / eff_mc_trig;
-    double trigweightUp = (eff_data_trigUp / eff_mc_trigUp) / (eff_data_trig / eff_mc_trig);
-    double trigweightDown = (eff_data_trigDown / eff_mc_trigDown) / (eff_data_trig / eff_mc_trig);                
-    if (ch == "mt"){
-      if(mvadm=="0"){
-        otree->weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVUp = trigweightUp;
-        otree->weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVDown = trigweightDown;
-      }else if(mvadm=="1"){
-        otree->weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVUp = trigweightUp;
-        otree->weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVDown = trigweightDown;
-      }else if(mvadm=="2"){
-        otree->weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVUp = trigweightUp;
-        otree->weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVDown = trigweightDown;
-      }else if(mvadm=="10"){
-        otree->weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVUp = trigweightUp;
-        otree->weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVDown = trigweightDown;
-      }else if(mvadm=="11"){
-        otree->weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVUp = trigweightUp;
-        otree->weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVDown = trigweightDown;
+	  double trigweightUp = (eff_data_trigUp / eff_mc_trigUp) / (eff_data_trig / eff_mc_trig);
+	  double trigweightDown = (eff_data_trigDown / eff_mc_trigDown) / (eff_data_trig / eff_mc_trig);                
+	  if (ch == "mt"){
+	    if(mvadm=="0"){
+	      otree->weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVUp = trigweightUp;
+	      otree->weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVDown = trigweightDown;
+	    }else if(mvadm=="1"){
+	      otree->weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVUp = trigweightUp;
+	      otree->weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVDown = trigweightDown;
+	    }else if(mvadm=="2"){
+	      otree->weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVUp = trigweightUp;
+	      otree->weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVDown = trigweightDown;
+	    }else if(mvadm=="10"){
+	      otree->weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVUp = trigweightUp;
+	      otree->weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVDown = trigweightDown;
+	    }else if(mvadm=="11"){
+	      otree->weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVUp = trigweightUp;
+	      otree->weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVDown = trigweightDown;
+	    }
+	  }
+	}      
       }
-    }
-  }      }
       counter[10]++;
     
       //cout <<"TauID SF" <<endl;
