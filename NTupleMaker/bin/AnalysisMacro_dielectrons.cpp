@@ -36,6 +36,183 @@
 #include "RooRealVar.h"
 
 #include "DesyTauAnalyses/NTupleMaker/interface/functionsSynch2017.h"
+#include "HiggsCPinTauDecays/IpCorrection/interface/IpCorrection.h"
+#include "HiggsCPinTauDecays/ImpactParameter/interface/ImpactParameter.h"
+
+typedef ROOT::Math::SMatrix<float,5,5, ROOT::Math::MatRepSym<float,5>> SMatrixSym5F;
+
+float getEmbeddedWeight(const AC1B *analysisTree, RooWorkspace * wEm) {
+
+  std::vector<TLorentzVector> taus; taus.clear();
+  float emWeight = 1;
+  for (unsigned int igen = 0; igen < analysisTree->genparticles_count; ++igen) {
+    if (TMath::Abs(analysisTree->genparticles_pdgid[igen])==13&&analysisTree->genparticles_isPrompt[igen]&&analysisTree->genparticles_status[igen]==1) {
+    TLorentzVector tauLV; tauLV.SetXYZT(analysisTree->genparticles_px[igen], 
+					analysisTree->genparticles_py[igen],
+					analysisTree->genparticles_pz[igen],
+					analysisTree->genparticles_e[igen]);
+      taus.push_back(tauLV);
+      //      cout << analysisTree->genparticles_pdgid[igen] << endl;
+    }
+  }
+  
+  //  cout << "Taus : " << taus.size() << std::endl;
+  //  cout << endl;
+
+  if (taus.size() == 2) {
+    double gt1_pt  = taus[0].Pt();
+    double gt1_eta = taus[0].Eta();
+    double gt2_pt  = taus[1].Pt();
+    double gt2_eta = taus[1].Eta();
+    wEm->var("gt_pt")->setVal(gt1_pt);
+    wEm->var("gt_eta")->setVal(gt1_eta);
+    double id1_embed = wEm->function("m_sel_id_ic_ratio")->getVal();
+    wEm->var("gt_pt")->setVal(gt2_pt);
+    wEm->var("gt_eta")->setVal(gt2_eta);
+    double id2_embed = wEm->function("m_sel_id_ic_ratio")->getVal();
+    wEm->var("gt1_pt")->setVal(gt1_pt);
+    wEm->var("gt2_pt")->setVal(gt2_pt);
+    wEm->var("gt1_eta")->setVal(gt1_eta);
+    wEm->var("gt2_eta")->setVal(gt2_eta);
+    //    double trg_emb = wEm->function("m_sel_trg_ic_ratio")->getVal();
+    double trg_emb_ic = wEm->function("m_sel_trg_ic_ratio")->getVal();
+    emWeight = id1_embed * id2_embed * trg_emb_ic;
+    //    double emWeight_ic = id1_embed * id2_embed * trg_emb_ic;
+    //    cout << "KIT : " << emWeight << "  IC : " << emWeight_ic << std::endl;
+  }
+
+  //  cout << "Embedding : " << emWeight << std::endl;
+  return emWeight;
+
+}
+
+TVector3 get_refitted_PV_with_BS(const AC1B * analysisTree, int leptonIndex1, int leptonIndex2, bool &is_refitted_PV_with_BS, std::vector<float> & PV_covariance, bool RefitV_BS){
+
+  // by default store non-refitted PV with BS constraint if refitted one is not found	
+        float vtx_x = analysisTree->primvertexwithbs_x; 
+	float vtx_y = analysisTree->primvertexwithbs_y;
+	float vtx_z = analysisTree->primvertexwithbs_z;
+	for (int j = 0; j<6 ; ++j)
+	  PV_covariance.push_back(analysisTree->primvertexwithbs_cov[j]);
+
+	is_refitted_PV_with_BS = false;
+
+	if (RefitV_BS) {
+	  for(unsigned int i = 0; i < analysisTree->refitvertexwithbs_count; i++)
+	    {
+	      if( (leptonIndex1 == analysisTree->refitvertexwithbs_eleIndex[i][0] || leptonIndex1 == analysisTree->refitvertexwithbs_eleIndex[i][1]) &&
+		  (leptonIndex2 == analysisTree->refitvertexwithbs_eleIndex[i][0] || leptonIndex2 == analysisTree->refitvertexwithbs_eleIndex[i][1]))
+		{
+		  vtx_x = analysisTree->refitvertexwithbs_x[i];
+		  vtx_y = analysisTree->refitvertexwithbs_y[i];		  
+		  vtx_z = analysisTree->refitvertexwithbs_z[i];
+		  for (int j = 0; j<6 ; ++j) {
+		    PV_covariance[j] = analysisTree->refitvertexwithbs_cov[i][j];
+		//		std::cout << j << " : " << analysisTree->refitvertexwithbs_cov[i][j] << std::endl;
+		  }
+		  is_refitted_PV_with_BS = true;
+		}
+	    }
+	  /*
+	    if (!is_refitted_PV_with_BS) {
+	    std::cout << "Failure refit " << std::endl;
+	    std::cout << "pT(mu1) = " << analysisTree->muon_pt[leptonIndex1] << std::endl;
+	    std::cout << "pT(mu2) = " << analysisTree->muon_pt[leptonIndex2] << std::endl;
+	    std::cout << std::endl;
+	    }
+	
+	    else {
+	    std::cout << "OK refit " << std::endl;
+	    std::cout << "pT(mu1) = " << analysisTree->muon_pt[leptonIndex1] << std::endl;
+	    std::cout << "pT(mu2) = " << analysisTree->muon_pt[leptonIndex2] << std::endl;
+	    std::cout << std::endl;
+	    }
+	  */
+	}
+	TVector3 vertex_coord(vtx_x, vtx_y, vtx_z);
+	//	for (int j=0; j<6; ++j) 
+	//	  std::cout << j << " : " << PV_covariance[j] << std::endl;
+	return vertex_coord;
+
+};
+
+TVector3 ipHelical(const AC1B * analysisTree, 
+		   int eleIndex, 
+		   TVector3 PV_coord,
+		   std::vector<float> PV_cov,
+		   ROOT::Math::SMatrix<float,3,3, ROOT::Math::MatRepStd< float, 3, 3 >> 
+		   &IPCovariance
+		   ) {
+
+  ImpactParameter IP;
+
+  std::pair <TVector3, ROOT::Math::SMatrix<float,3,3, ROOT::Math::MatRepStd< float, 3, 3 >>> ipAndCov;
+  std::vector<float> h_param_ele = {};
+  RMPoint ref_ele;
+  SMatrixSym3D PV_covariance;
+  SMatrixSym5F helix_params_covariance;
+	
+  int k = 0;
+  double B = analysisTree->electron_Bfield[eleIndex];	
+  ref_ele.SetX(analysisTree->electron_referencePoint[eleIndex][0]);
+  ref_ele.SetY(analysisTree->electron_referencePoint[eleIndex][1]);
+  ref_ele.SetZ(analysisTree->electron_referencePoint[eleIndex][2]);
+  RMPoint PV(PV_coord.X(), PV_coord.Y(), PV_coord.Z());
+  for(auto i:  analysisTree->electron_helixparameters[eleIndex]) h_param_ele.push_back(i);	
+  
+  // !! check that in NTupleMaker the logic of filling PV_cov_components is the same 
+  // for more on how to fill SMatrices see: https://root.cern/doc/master/SMatrixDoc.html 
+  for (size_t i = 0; i < 5; i++)
+    for (size_t j = i; j < 5; j++) // should be symmetrically completed automatically
+      helix_params_covariance[i][j] = analysisTree->electron_helixparameters_covar[eleIndex][i][j];
+  for (size_t i = 0; i < 3; i++)
+    {
+      for (size_t j = i; j < 3; j++) // should be symmetrically completed automatically
+	{
+	  PV_covariance[i][j] = PV_cov[k];
+          PV_covariance[j][i] = PV_cov[k];
+	  k++;
+	}
+    }
+  
+  ipAndCov = IP.CalculateIPandCovariance(
+					 B, // (double)
+					 h_param_ele, // (std::vector<float>)
+					 ref_ele, // (RMPoint)
+					 PV, // (RMPoint)	
+					 helix_params_covariance, // (ROOT::Math::SMatrix<float,5,5, ROOT::Math::MatRepSym<float,5>>)
+					 PV_covariance // (SMatrixSym3D)		
+					 );
+  
+  TVector3 ip = ipAndCov.first;
+  IPCovariance = ipAndCov.second;
+  
+  return ip;
+
+};
+
+TVector3 ipVec_Lepton(const AC1B * analysisTree, int electronIndex, TVector3 vertex) {
+
+  TVector3 secvertex(0.,0.,0.);
+  TVector3 momenta(0.,0.,0.);    
+
+  secvertex.SetXYZ(analysisTree->electron_vx[electronIndex], 
+		   analysisTree->electron_vy[electronIndex],
+		   analysisTree->electron_vz[electronIndex]);
+   
+  momenta.SetXYZ(analysisTree->electron_px[electronIndex],
+		 analysisTree->electron_py[electronIndex],
+		 analysisTree->electron_pz[electronIndex]);
+   
+  TVector3 r(0.,0.,0.);
+  r=secvertex-vertex;
+  
+  double projection=r*momenta/momenta.Mag2();
+  TVector3 IP;    
+  IP=r-momenta*projection;
+  
+  return IP;
+};
 
 float topPtWeight(float pt1,
 		  float pt2) {
@@ -79,6 +256,8 @@ void computeRecoil(float metx, float mety,
   recoilPerp = metx*perpUnitX + mety*perpUnitY;
   responseHad = 1 + recoilParal/dimuonPt;
 }
+
+
 
 int main(int argc, char * argv[]) {
 
@@ -475,6 +654,58 @@ int main(int argc, char * argv[]) {
     }
   }
 
+  TH1D * ipxH = new TH1D("ipxH","ipxH",200,-0.02,0.02);
+  TH1D * ipyH = new TH1D("ipyH","ipyH",200,-0.02,0.02);
+  TH1D * ipzH = new TH1D("ipzH","ipzH",200,-0.02,0.02);
+
+  TH1D * ipxSigH = new TH1D("ipxSigH","ipxSigH",400,-10,10);
+  TH1D * ipySigH = new TH1D("ipySigH","ipySigH",400,-10,10);
+  TH1D * ipzSigH = new TH1D("ipzSigH","ipzSigH",400,-10,10);
+
+  TH1D * ipSigH = new TH1D("ipSigH","",500,0.,10);
+
+  TH1D * errxVertH = new TH1D("errxVertH","",200,0,0.002);
+  TH1D * erryVertH = new TH1D("erryVertH","",200,0,0.002);
+  TH1D * errzVertH = new TH1D("errzVertH","",500,0,0.1);
+
+  TH1D * isRefitV_BSH = new TH1D("isRefitV_BSH","",2,-0.5,1.5); 
+
+  TH1D * xDVertH = new TH1D("xDVertH","",200,-0.02,0.02);
+  TH1D * yDVertH = new TH1D("yDVertH","",200,-0.02,0.02);
+  TH1D * zDVertH = new TH1D("zDVertH","",200,-0.02,0.02);
+
+  TH1D * ipdxH = new TH1D("ipdxH","ipdxH",100,-0.02,0.02);
+  TH1D * ipdyH = new TH1D("ipdyH","ipdyH",100,-0.02,0.02);
+  TH1D * ipdzH = new TH1D("ipdzH","ipdzH",100,-0.02,0.02);
+
+  TH1D * nxyipH = new TH1D("nxyipH","nxyipH",200,0.0,0.1);
+  TH1D * dphiipH = new TH1D("dphiipH","dphiipH",200,-1,1);
+  TH1D * detaipH = new TH1D("detaipH","detaipH",200,-1,1);
+
+  TH1D * ipxEtaH[5];
+  TH1D * ipyEtaH[5];
+  TH1D * ipzEtaH[5];
+
+  TH1D * ipxSigEtaH[5];
+  TH1D * ipySigEtaH[5];
+  TH1D * ipzSigEtaH[5];
+  
+  TH1D * ipxErrEtaH[5];
+  TH1D * ipyErrEtaH[5];
+  TH1D * ipzErrEtaH[5];
+  
+  for (int iEta=0; iEta<5; ++iEta) {
+    ipxEtaH[iEta] = new TH1D("ipx"+EtaBins[iEta],"",200,-0.02,0.02);
+    ipyEtaH[iEta] = new TH1D("ipy"+EtaBins[iEta],"",200,-0.02,0.02);
+    ipzEtaH[iEta] = new TH1D("ipz"+EtaBins[iEta],"",200,-0.02,0.02);
+    ipxSigEtaH[iEta] = new TH1D("ipxSig"+EtaBins[iEta],"",200,-10,10);
+    ipySigEtaH[iEta] = new TH1D("ipySig"+EtaBins[iEta],"",200,-10,10);
+    ipzSigEtaH[iEta] = new TH1D("ipzSig"+EtaBins[iEta],"",200,-10,10);
+    ipxErrEtaH[iEta] = new TH1D("ipxErr"+EtaBins[iEta],"",1000,0,0.1);
+    ipyErrEtaH[iEta] = new TH1D("ipyErr"+EtaBins[iEta],"",1000,0,0.1);
+    ipzErrEtaH[iEta] = new TH1D("ipzErr"+EtaBins[iEta],"",1000,0,0.1);
+  }
+
   TH1D * PUweightsOfficialH = new TH1D("PUweightsOfficialH","PU weights w/ official reweighting",1000, 0, 10);
 
   // PILE UP REWEIGHTING - OPTIONS
@@ -613,6 +844,11 @@ int main(int argc, char * argv[]) {
       std::vector<unsigned int> genElectrons; genElectrons.clear();
       std::vector<unsigned int> genTaus; genTaus.clear();
       std::vector<unsigned int> genVisTaus; genVisTaus.clear();
+
+      float genVertexX = 0;
+      float genVertexY = 0;
+      float genVertexZ = 0;
+
       if (!isData) {
 
 	for (unsigned int igentau=0; igentau < analysisTree.gentau_count; ++igentau) {
@@ -641,6 +877,19 @@ int main(int argc, char * argv[]) {
 						  analysisTree.genparticles_py[igen],
 						  analysisTree.genparticles_pz[igen],
 						  analysisTree.genparticles_e[igen]);
+	  if (analysisTree.genparticles_pdgid[igen]==23||
+	      analysisTree.genparticles_pdgid[igen]==24||
+	      analysisTree.genparticles_pdgid[igen]==-24||
+	      analysisTree.genparticles_pdgid[igen]==25||
+	      analysisTree.genparticles_pdgid[igen]==35||
+	      analysisTree.genparticles_pdgid[igen]==36||
+	      analysisTree.genparticles_pdgid[igen]==6||
+	      analysisTree.genparticles_pdgid[igen]==-6) {
+	    genVertexX = analysisTree.genparticles_vx[igen];
+	    genVertexY = analysisTree.genparticles_vy[igen];
+	    genVertexZ = analysisTree.genparticles_vy[igen];
+	  }
+
 	  if (analysisTree.genparticles_pdgid[igen]==23) {
 	    if (analysisTree.genparticles_fromHardProcess[igen])
 	      genZ.SetXYZT(analysisTree.genparticles_px[igen],
