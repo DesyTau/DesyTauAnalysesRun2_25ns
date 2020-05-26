@@ -143,6 +143,9 @@ void acott_Impr_tt(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1,
     tau2Prong=partLV.at(0);
     tau2Pi0 = partLV.at(1);
   }
+  ////////////////////////////////////////////////
+  //Begin on pion pT studies on A1 variables
+  ////////////////////////////////////////////////
   TLorentzVector pion1LV;
   TLorentzVector RhoPion1LV;
   TLorentzVector A1Pion1LV;TLorentzVector A2Pion1LV;
@@ -196,6 +199,8 @@ if(analysisTree->tau_decayMode[tauIndex1]==2 && analysisTree->tau_decayMode[tauI
      otree->acotautau_helix_DPDP_A1A1 = AcoCP(A1Pion1LV,A1Pion2LV,tau1Pi0,tau2Pi0,firstNegative,true,true,otree);
    }
  }
+///////////////////////////////////////////
+ 
  otree->acotautau_00 = AcoCP(tau1Prong,tau2Prong,tau1IP,tau2IP,firstNegative,false,false,otree);
  otree->acotautau_01 = AcoCP(tau1Prong,tau2Prong,tau1IP,tau2Pi0,firstNegative,false,true,otree);
  otree->acotautau_10 = AcoCP(tau1Prong,tau2Prong,tau1Pi0,tau2IP,firstNegative,true,false,otree);
@@ -293,20 +298,7 @@ TLorentzVector ChargedPivec(const AC1B * analysisTree, int tauIndex){
   }  
   return chargedPi;
 };
-TLorentzVector ChargedPivec(const AC1B * analysisTree, int tauIndex, bool pionPT){
-  int piIndex = -1;
-  piIndex = ChargedPiIndex(analysisTree, tauIndex);
-  TLorentzVector chargedPi;
-  chargedPi.SetXYZT(0,0,0,0);
 
-  if (piIndex > -1) {
-    chargedPi.SetPxPyPzE(analysisTree->tau_constituents_px[tauIndex][piIndex],
-			 analysisTree->tau_constituents_py[tauIndex][piIndex],
-			 analysisTree->tau_constituents_pz[tauIndex][piIndex],
-			 analysisTree->tau_constituents_e[tauIndex][piIndex]);
-  }  
-  return chargedPi;
-};
 int ChargedPiIndex(const AC1B * analysisTree, int tauIndex){
   // selects the highest energy Pi with the same sign of the tau
   
