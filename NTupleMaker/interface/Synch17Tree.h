@@ -65,6 +65,11 @@ public :
   Float_t         ipx_uncorr_1;
   Float_t         ipy_uncorr_1;
   Float_t         ipz_uncorr_1;
+
+  Float_t         ipnx_uncorr_1;
+  Float_t         ipny_uncorr_1;
+  Float_t         ipnz_uncorr_1;
+  
   Float_t         gen_ipx_1;
   Float_t         gen_ipy_1;
   Float_t         gen_ipz_1;
@@ -75,7 +80,7 @@ public :
   Float_t         ip_covyy_1;  
   Float_t         ip_covyz_1;
   Float_t         ip_covzz_1;
-
+  Float_t         ip_sig_1;
   Float_t         ipxy_1;
   Double_t        IP_signif_PV_with_BS_1;
   Double_t        IP_signif_RefitV_with_BS_1;
@@ -129,6 +134,10 @@ public :
   Float_t         ipx_uncorr_2;
   Float_t         ipy_uncorr_2;
   Float_t         ipz_uncorr_2;
+  Float_t         ipnx_uncorr_2;
+  Float_t         ipny_uncorr_2;
+  Float_t         ipnz_uncorr_2;
+  
   Float_t         gen_ipx_2;
   Float_t         gen_ipy_2;
   Float_t         gen_ipz_2;
@@ -139,7 +148,7 @@ public :
   Float_t         ip_covyy_2;  
   Float_t         ip_covyz_2;
   Float_t         ip_covzz_2;
-
+  Float_t         ip_sig_2;
   Float_t         ipxy_2;
   Double_t        IP_signif_PV_with_BS_2;
   Double_t        IP_signif_RefitV_with_BS_2;
@@ -495,6 +504,21 @@ public :
   Float_t         acotautau_helix_uncorr_01;
   Float_t         acotautau_helix_uncorr_11;
 
+  Float_t         acotautau_helix_IPIP_pi40_pionA1;
+  Float_t         acotautau_helix_DPIP_pi40_rhoA1;
+  Float_t         acotautau_helix_IPDP_pi40_A1A1;
+  Float_t         acotautau_helix_IPDP_pionA1;
+  Float_t         acotautau_helix_DPDP_rhoA1;
+  Float_t         acotautau_helix_DPDP_A1A1;
+  Float_t         acotautau_helix_IPIP_pi40_A1A1;
+  Float_t         acotautau_helix_IPIP_pi40_rhoA1;
+
+  Float_t         acotautau_helix_IPIP_pi40_pionRho;
+  Float_t         acotautau_helix_IPDP_pionRho;
+  Float_t         acotautau_helix_IPIP_pi40_RhoRho;
+  Float_t         acotautau_helix_IPDP_pi40_RhoRho;
+  Float_t         acotautau_helix_DPDP_pionRho;
+
   //Merijn add acotau for psi:
   Float_t         acotautauPsi_00;
   Float_t         acotautauPsi_10;
@@ -553,6 +577,9 @@ public :
   Float_t pvx;
   Float_t pvy;
   Float_t pvz;
+  Float_t pvx_bs;
+  Float_t pvy_bs;
+  Float_t pvz_bs;
   Bool_t  is_refitted_PV_with_BS;
   Int_t   v_tracks;
   
@@ -632,6 +659,10 @@ public :
   TBranch	 *b_ipx_uncorr_1;
   TBranch	 *b_ipy_uncorr_1;
   TBranch	 *b_ipz_uncorr_1;
+
+  TBranch	 *b_ipnx_uncorr_1;
+  TBranch	 *b_ipny_uncorr_1;
+  TBranch	 *b_ipnz_uncorr_1;
   TBranch	 *b_gen_ipx_1;
   TBranch	 *b_gen_ipy_1;
   TBranch	 *b_gen_ipz_1;
@@ -642,6 +673,7 @@ public :
   TBranch        *b_ip_covyy_1;  
   TBranch        *b_ip_covyz_1;
   TBranch        *b_ip_covzz_1;
+  TBranch        *b_ip_sig_1;
 
   TBranch	 *b_ipxy_1;
   TBranch	 *b_IP_signif_PV_with_BS_1;
@@ -695,6 +727,10 @@ public :
   TBranch	 *b_ipx_uncorr_2;
   TBranch	 *b_ipy_uncorr_2;
   TBranch	 *b_ipz_uncorr_2;
+  TBranch	 *b_ipnx_uncorr_2;
+  TBranch	 *b_ipny_uncorr_2;
+  TBranch	 *b_ipnz_uncorr_2;
+
   TBranch	 *b_gen_ipx_2;
   TBranch	 *b_gen_ipy_2;
   TBranch	 *b_gen_ipz_2;
@@ -705,6 +741,7 @@ public :
   TBranch        *b_ip_covyy_2;  
   TBranch        *b_ip_covyz_2;
   TBranch        *b_ip_covzz_2;
+  TBranch        *b_ip_sig_2;
 
   TBranch	 *b_ipxy_2;
   TBranch	 *b_IP_signif_PV_with_BS_2;
@@ -1033,6 +1070,22 @@ public :
   TBranch        *b_acotautau_helix_01;
   TBranch        *b_acotautau_helix_11;
 
+  TBranch        *b_acotautau_helix_IPIP_pi40_pionA1;
+  TBranch        *b_acotautau_helix_IPDP_pionA1;
+  TBranch        *b_acotautau_helix_DPIP_pi40_rhoA1;
+  TBranch        *b_acotautau_helix_DPDP_rhoA1;
+  TBranch        *b_acotautau_helix_IPIP_pi40_A1A1;
+  TBranch        *b_acotautau_helix_PDP_pi40_A1A1;
+  TBranch        *b_acotautau_helix_DPDP_A1A1;
+  TBranch        *b_acotautau_helix_IPDP_pi40_A1A1;
+  TBranch        *b_acotautau_helix_IPIP_pi40_rhoA1;
+  TBranch        *b_acotautau_helix_IPIP_pi40_pionRho;
+  TBranch        *b_acotautau_helix_IPDP_pionRho;
+  TBranch        *b_acotautau_helix_IPIP_pi40_RhoRho;
+  TBranch        *b_acotautau_helix_IPDP_pi40_RhoRho;
+  TBranch        *b_acotautau_helix_DPDP_pionRho;
+
+
   TBranch        *b_acotautau_refitbs_uncorr_00;
   TBranch        *b_acotautau_refitbs_uncorr_10;
   TBranch        *b_acotautau_refitbs_uncorr_01;
@@ -1094,6 +1147,10 @@ public :
   TBranch        *b_pvx;
   TBranch        *b_pvy;
   TBranch        *b_pvz;  
+  TBranch        *b_pvx_bs;
+  TBranch        *b_pvy_bs;
+  TBranch        *b_pvz_bs;  
+
   TBranch        *b_is_refitted_PV_with_BS;  
   TBranch        *b_v_tracks;
 

@@ -97,10 +97,15 @@ void Synch17Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("ip_covyy_1", &ip_covyy_1, &b_ip_covyy_1);
    fChain->SetBranchAddress("ip_covyz_1", &ip_covyz_1, &b_ip_covyz_1);
    fChain->SetBranchAddress("ip_covzz_1", &ip_covzz_1, &b_ip_covzz_1);
+   fChain->SetBranchAddress("ip_sig_1", &ip_sig_1, &b_ip_sig_1);
 
    fChain->SetBranchAddress("ipx_uncorr_1", &ipx_uncorr_1, &b_ipx_uncorr_1);
    fChain->SetBranchAddress("ipy_uncorr_1", &ipy_uncorr_1, &b_ipy_uncorr_1);
    fChain->SetBranchAddress("ipz_uncorr_1", &ipz_uncorr_1, &b_ipz_uncorr_1);
+   fChain->SetBranchAddress("ipnx_uncorr_1", &ipnx_uncorr_1, &b_ipnx_uncorr_1);
+   fChain->SetBranchAddress("ipny_uncorr_1", &ipny_uncorr_1, &b_ipny_uncorr_1);
+   fChain->SetBranchAddress("ipnz_uncorr_1", &ipnz_uncorr_1, &b_ipnz_uncorr_1);
+   
    fChain->SetBranchAddress("IP_signif_PV_with_BS_1", &IP_signif_PV_with_BS_1, &b_IP_signif_PV_with_BS_1);
    fChain->SetBranchAddress("IP_signif_RefitV_with_BS_1", &IP_signif_RefitV_with_BS_1, &b_IP_signif_RefitV_with_BS_1);
    fChain->SetBranchAddress("IP_signif_RefitV_with_BS_uncorr_1", &IP_signif_RefitV_with_BS_uncorr_1, &b_IP_signif_RefitV_with_BS_uncorr_1);
@@ -163,10 +168,15 @@ void Synch17Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("ip_covyy_2", &ip_covyy_2, &b_ip_covyy_2);
    fChain->SetBranchAddress("ip_covyz_2", &ip_covyz_2, &b_ip_covyz_2);
    fChain->SetBranchAddress("ip_covzz_2", &ip_covzz_2, &b_ip_covzz_2);
+   fChain->SetBranchAddress("ip_sig_2", &ip_sig_2, &b_ip_sig_2);
 
    fChain->SetBranchAddress("ipx_uncorr_2", &ipx_uncorr_2, &b_ipx_uncorr_2);
    fChain->SetBranchAddress("ipy_uncorr_2", &ipy_uncorr_2, &b_ipy_uncorr_2);
    fChain->SetBranchAddress("ipz_uncorr_2", &ipz_uncorr_2, &b_ipz_uncorr_2);
+   fChain->SetBranchAddress("ipnx_uncorr_2", &ipnx_uncorr_2, &b_ipnx_uncorr_2);
+   fChain->SetBranchAddress("ipny_uncorr_2", &ipny_uncorr_2, &b_ipny_uncorr_2);
+   fChain->SetBranchAddress("ipnz_uncorr_2", &ipnz_uncorr_2, &b_ipnz_uncorr_2);
+   
    fChain->SetBranchAddress("IP_signif_PV_with_BS_2", &IP_signif_PV_with_BS_2, &b_IP_signif_PV_with_BS_2);
    fChain->SetBranchAddress("IP_signif_RefitV_with_BS_2", &IP_signif_RefitV_with_BS_2, &b_IP_signif_RefitV_with_BS_2);
    fChain->SetBranchAddress("IP_signif_RefitV_with_BS_uncorr_2", &IP_signif_RefitV_with_BS_uncorr_2, &b_IP_signif_RefitV_with_BS_uncorr_2);
@@ -488,6 +498,22 @@ void Synch17Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("acotautau_helix_01", &acotautau_helix_01, &b_acotautau_helix_01);
    fChain->SetBranchAddress("acotautau_helix_11", &acotautau_helix_11, &b_acotautau_helix_11);
 
+   fChain->SetBranchAddress("acotautau_helix_IPIP_pi40_pionA1", &acotautau_helix_IPIP_pi40_pionA1, &b_acotautau_helix_IPIP_pi40_pionA1);
+   fChain->SetBranchAddress("acotautau_helix_IPDP_pionA1", &acotautau_helix_IPDP_pionA1, &b_acotautau_helix_IPDP_pionA1);
+   fChain->SetBranchAddress("acotautau_helix_DPIP_pi40_rhoA1", &acotautau_helix_DPIP_pi40_rhoA1, &b_acotautau_helix_DPIP_pi40_rhoA1);
+   fChain->SetBranchAddress("acotautau_helix_DPDP_rhoA1", &acotautau_helix_DPDP_rhoA1, &b_acotautau_helix_DPDP_rhoA1);
+   fChain->SetBranchAddress("acotautau_helix_IPIP_pi40_A1A1", &acotautau_helix_IPIP_pi40_A1A1, &b_acotautau_helix_IPIP_pi40_A1A1);
+   fChain->SetBranchAddress("acotautau_helix_IPDP_pi40_A1A1", &acotautau_helix_IPDP_pi40_A1A1, &b_acotautau_helix_IPDP_pi40_A1A1);
+   fChain->SetBranchAddress("acotautau_helix_DPDP_A1A1", &acotautau_helix_DPDP_A1A1, &b_acotautau_helix_DPDP_A1A1);
+   fChain->SetBranchAddress("acotautau_helix_IPIP_pi40_rhoA1", &acotautau_helix_IPIP_pi40_rhoA1, &b_acotautau_helix_IPIP_pi40_rhoA1);
+
+   fChain->SetBranchAddress("acotautau_helix_IPIP_pi40_pionRho", &acotautau_helix_IPIP_pi40_pionRho, &b_acotautau_helix_IPIP_pi40_pionRho);
+   fChain->SetBranchAddress("acotautau_helix_IPDP_pionRho", &acotautau_helix_IPDP_pionRho, &b_acotautau_helix_IPDP_pionRho);
+   fChain->SetBranchAddress("acotautau_helix_IPIP_pi40_RhoRho", &acotautau_helix_IPIP_pi40_RhoRho, &b_acotautau_helix_IPIP_pi40_RhoRho);
+   fChain->SetBranchAddress("acotautau_helix_IPDP_pi40_RhoRho", &acotautau_helix_IPDP_pi40_RhoRho, &b_acotautau_helix_IPDP_pi40_RhoRho);
+   fChain->SetBranchAddress("acotautau_helix_DPDP_pionRho", &acotautau_helix_DPDP_pionRho, &b_acotautau_helix_DPDP_pionRho);
+
+
    fChain->SetBranchAddress("acotautau_refitbs_uncorr_00", &acotautau_refitbs_uncorr_00, &b_acotautau_refitbs_uncorr_00);
    fChain->SetBranchAddress("acotautau_refitbs_uncorr_10", &acotautau_refitbs_uncorr_10, &b_acotautau_refitbs_uncorr_10);
    fChain->SetBranchAddress("acotautau_refitbs_uncorr_01", &acotautau_refitbs_uncorr_01, &b_acotautau_refitbs_uncorr_01);
@@ -554,6 +580,10 @@ void Synch17Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("pvx", &pvx, &b_pvx);
    fChain->SetBranchAddress("pvy", &pvy, &b_pvy);
    fChain->SetBranchAddress("pvz", &pvz, &b_pvz);
+   fChain->SetBranchAddress("pvx_bs", &pvx_bs, &b_pvx_bs);
+   fChain->SetBranchAddress("pvy_bs", &pvy_bs, &b_pvy_bs);
+   fChain->SetBranchAddress("pvz_bs", &pvz_bs, &b_pvz_bs);
+   
    fChain->SetBranchAddress("v_tracks",&v_tracks,&b_v_tracks);
    fChain->SetBranchAddress("is_refitted_PV_with_BS", &is_refitted_PV_with_BS, &b_is_refitted_PV_with_BS);
 
@@ -713,6 +743,10 @@ void Synch17Tree::WriteInit(TTree *tree) {
    fChain->Branch("ipx_uncorr_1", &ipx_uncorr_1, "ipx_uncorr_1/F");
    fChain->Branch("ipy_uncorr_1", &ipy_uncorr_1, "ipy_uncorr_1/F");
    fChain->Branch("ipz_uncorr_1", &ipz_uncorr_1, "ipz_uncorr_1/F");
+   fChain->Branch("ipnx_uncorr_1", &ipnx_uncorr_1, "ipnx_uncorr_1/F");
+   fChain->Branch("ipny_uncorr_1", &ipny_uncorr_1, "ipny_uncorr_1/F");
+   fChain->Branch("ipnz_uncorr_1", &ipnz_uncorr_1, "ipnz_uncorr_1/F");
+   
    fChain->Branch("IP_signif_PV_with_BS_1", &IP_signif_PV_with_BS_1, "IP_signif_PV_with_BS_1/D");
    fChain->Branch("IP_signif_RefitV_with_BS_1", &IP_signif_RefitV_with_BS_1, "IP_signif_RefitV_with_BS_1/D");
    fChain->Branch("IP_signif_RefitV_with_BS_uncorr_1", &IP_signif_RefitV_with_BS_uncorr_1, "IP_signif_RefitV_with_BS_uncorr_1/D");
@@ -776,6 +810,9 @@ void Synch17Tree::WriteInit(TTree *tree) {
    fChain->Branch("ipx_uncorr_2", &ipx_uncorr_2, "ipx_uncorr_2/F");
    fChain->Branch("ipy_uncorr_2", &ipy_uncorr_2, "ipy_uncorr_2/F");
    fChain->Branch("ipz_uncorr_2", &ipz_uncorr_2, "ipz_uncorr_2/F");
+   fChain->Branch("ipnx_uncorr_2", &ipnx_uncorr_2, "ipnx_uncorr_2/F");
+   fChain->Branch("ipny_uncorr_2", &ipny_uncorr_2, "ipny_uncorr_2/F");
+   fChain->Branch("ipnz_uncorr_2", &ipnz_uncorr_2, "ipnz_uncorr_2/F");
    fChain->Branch("IP_signif_PV_with_BS_2", &IP_signif_PV_with_BS_2, "IP_signif_PV_with_BS_2/D");
    fChain->Branch("IP_signif_RefitV_with_BS_2", &IP_signif_RefitV_with_BS_2, "IP_signif_RefitV_with_BS_2/D");
    fChain->Branch("IP_signif_RefitV_with_BS_uncorr_2", &IP_signif_RefitV_with_BS_uncorr_2, "IP_signif_RefitV_with_BS_uncorr_2/D");
@@ -1099,6 +1136,21 @@ void Synch17Tree::WriteInit(TTree *tree) {
    fChain->Branch("acotautau_helix_01", &acotautau_helix_01, "acotautau_helix_01/F");
    fChain->Branch("acotautau_helix_11", &acotautau_helix_11, "acotautau_helix_11/F");
 
+   fChain->Branch("acotautau_helix_IPIP_pi40_pionA1", &acotautau_helix_IPIP_pi40_pionA1, "acotautau_helix_IPIP_pi40_pionA1/F");
+   fChain->Branch("acotautau_helix_IPDP_pionA1", &acotautau_helix_IPDP_pionA1, "acotautau_helix_IPDP_pionA1/F");
+   fChain->Branch("acotautau_helix_DPIP_pi40_rhoA1", &acotautau_helix_DPIP_pi40_rhoA1, "acotautau_helix_DPIP_pi40_rhoA1/F");
+   fChain->Branch("acotautau_helix_DPDP_rhoA1", &acotautau_helix_DPDP_rhoA1, "acotautau_helix_DPDP_rhoA1/F");
+   fChain->Branch("acotautau_helix_IPIP_pi40_A1A1", &acotautau_helix_IPIP_pi40_A1A1, "acotautau_helix_IPIP_pi40_A1A1/F");
+   fChain->Branch("acotautau_helix_IPDP_pi40_A1A1", &acotautau_helix_IPDP_pi40_A1A1, "acotautau_helix_IPDP_pi40_A1A1/F");
+   fChain->Branch("acotautau_helix_DPDP_A1A1", &acotautau_helix_DPDP_A1A1, "acotautau_helix_DPDP_A1A1/F");
+   fChain->Branch("acotautau_helix_IPIP_pi40_rhoA1", &acotautau_helix_IPIP_pi40_rhoA1, "acotautau_helix_IPIP_pi40_rhoA1/F");
+  
+   fChain->Branch("acotautau_helix_IPIP_pi40_pionRho", &acotautau_helix_IPIP_pi40_pionRho, "acotautau_helix_IPIP_pi40_pionRho/F");
+   fChain->Branch("acotautau_helix_IPDP_pionRho", &acotautau_helix_IPDP_pionRho, "acotautau_helix_IPDP_pionRho/F");
+   fChain->Branch("acotautau_helix_IPIP_pi40_RhoRho", &acotautau_helix_IPIP_pi40_RhoRho, "acotautau_helix_IPIP_pi40_RhoRho/F");
+   fChain->Branch("acotautau_helix_IPDP_pi40_RhoRho", &acotautau_helix_IPDP_pi40_RhoRho, "acotautau_helix_IPDP_pi40_RhoRho/F");
+   fChain->Branch("acotautau_helix_DPDP_pionRho", &acotautau_helix_DPDP_pionRho, "acotautau_helix_DPDP_pionRho/F");
+
    fChain->Branch("acotautau_refitbs_uncorr_00", &acotautau_refitbs_uncorr_00, "acotautau_refitbs_uncorr_00/F");
    fChain->Branch("acotautau_refitbs_uncorr_10", &acotautau_refitbs_uncorr_10, "acotautau_refitbs_uncorr_10/F");
    fChain->Branch("acotautau_refitbs_uncorr_01", &acotautau_refitbs_uncorr_01, "acotautau_refitbs_uncorr_01/F");
@@ -1158,6 +1210,10 @@ void Synch17Tree::WriteInit(TTree *tree) {
    fChain->Branch("pvx", &pvx, "pvx/F"); 
    fChain->Branch("pvy", &pvy, "pvy/F"); 
    fChain->Branch("pvz", &pvz, "pvz/F");
+   fChain->Branch("pvx_bs", &pvx_bs, "pvx_bs/F"); 
+   fChain->Branch("pvy_bs", &pvy_bs, "pvy_bs/F"); 
+   fChain->Branch("pvz_bs", &pvz_bs, "pvz_bs/F");
+
    fChain->Branch("v_tracks",&v_tracks,"v_tracks/I");
    fChain->Branch("is_refitted_PV_with_BS", &is_refitted_PV_with_BS, "is_refitted_PV_with_BS/O"); 
 
