@@ -270,6 +270,7 @@ int main(int argc, char * argv[]) {
   Config cfg(argv[1]);
 
   const bool isData = cfg.get<bool>("IsData");
+  const bool isEmbedded = cfg.get<bool>("IsEmbedded");
   const bool applyGoodRunSelection = cfg.get<bool>("ApplyGoodRunSelection");
 
   // pile up reweighting
@@ -315,10 +316,14 @@ int main(int argc, char * argv[]) {
   //trigger
   const bool applyTrigger = cfg.get<bool>("ApplyTrigger");
   const string electronHLTName = cfg.get<string>("ElectronHLTName");
-  const string electronHLTFilterName = cfg.get<string>("ElectronHLTFilterName");
+  const string electronHLTFilterName  = cfg.get<string>("ElectronHLTFilterName");
+  const string electronHLTFilterName1 = cfg.get<string>("ElectronHLTFilterName1");
+  const string electronL1FilterName = cfg.get<string>("ElectronL1FilterName");
 
   TString ElectronHLTName(electronHLTName);
   TString ElectronHLTFilterName(electronHLTFilterName);
+  TString ElectronHLTFilterName1(electronHLTFilterName1);
+  TString ElectronL1FilterName(electronL1FilterName); 
 
   // vertex cuts
   const float ndofVertexCut  = cfg.get<float>("NdofVertexCut");   
@@ -727,15 +732,15 @@ int main(int argc, char * argv[]) {
   RecoilCorrector recoilPFMetCorrector(RecoilFileName);
 
   // Lepton Scale Factors 
-  ScaleFactor * SF_electronIdIso;
-  ScaleFactor * SF_electronTrig;
-  if (applyLeptonSF) {
-    SF_electronIdIso = new ScaleFactor();
-    SF_electronIdIso->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(ElectronIdIsoFile));
-    SF_electronTrig = new ScaleFactor();
-    SF_electronTrig->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(ElectronTrigFile));
+  //  ScaleFactor * SF_electronIdIso;
+  //  ScaleFactor * SF_electronTrig;
+  //  if (applyLeptonSF) {
+    //    SF_electronIdIso = new ScaleFactor();
+    //    SF_electronIdIso->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(ElectronIdIsoFile));
+    //    SF_electronTrig = new ScaleFactor();
+    //    SF_electronTrig->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(ElectronTrigFile));
     
-  }
+  //  }
   // tracking efficiency SF                                                                                                                                                
   TFile * workspaceFile = new TFile(TString(cmsswBase)+"/src/"+CorrectionWorkspaceFile);
   RooWorkspace *correctionWS = (RooWorkspace*)workspaceFile->Get("w");
@@ -827,8 +832,12 @@ int main(int argc, char * argv[]) {
       
       float weight = 1;
 
-      if (!isData) {
-	weight *= analysisTree.genweight;
+      if (!isData||isEmbedded) {
+	  weight *= analysisTree.genweight;
+	  if (isEmbedded) {	  
+	    if (analysisTree.genweight>1e+3)
+	      weight = 0;
+	  }
 	nvertH->Fill(analysisTree.primvertex_count,weight);
       }
       histWeightsSkimmedH->Fill(float(0),weight);
@@ -1080,9 +1089,13 @@ int main(int argc, char * argv[]) {
 
       unsigned int nElectronFilter = 0;
       bool isElectronFilter = false;
+
+      unsigned int nElectronFilter1 = 0;
+      bool isElectronFilter1 = false;
+
+      unsigned int nElectronL1Filter = 0;
+      bool isElectronL1Filter = false;
       
-      unsigned int nSingleEleFilter = 0;
-      bool isSingleEleFilter = false;
 
       unsigned int nfilters = analysisTree.run_hltfilters->size();
       for (unsigned int i=0; i<nfilters; ++i) {
@@ -1091,12 +1104,26 @@ int main(int argc, char * argv[]) {
 	  nElectronFilter = i;
 	  isElectronFilter = true;
 	}
+	if (HLTFilter==ElectronHLTFilterName1) {
+	  nElectronFilter1 = i;
+	  isElectronFilter1 = true;
+	}
+	if (HLTFilter==ElectronL1FilterName) {
+	  nElectronL1Filter = i;
+	  isElectronL1Filter = true;
+	}
       }
 
       if (applyTrigger) {
 	if (!isElectronFilter) {
 	  cout << "Filter " << ElectronHLTFilterName << " not found" << endl;
 	  exit(-1);
+	}
+	if (!isElectronFilter1) {
+	  cout << "warning : Filter " << ElectronHLTFilterName1 << " not found" << endl;
+	}
+	if (!isElectronL1Filter) {
+	  cout << "warning : L1 Filter " << ElectronHLTFilterName << " not found" << endl;
 	}
       }
 
@@ -1144,15 +1171,28 @@ int main(int argc, char * argv[]) {
 	if (fabs(analysisTree.electron_dxy[im])>dxyElectronProbeCut) continue;
 	if (fabs(analysisTree.electron_dz[im])>dzElectronProbeCut) continue;
 
-	bool electronTriggerMatch = false;
+	bool electronFilter = false;
+	bool electronFilter1 = false;
+	bool electronL1Filter = false;
+
 
 	for (unsigned int iT=0; iT<analysisTree.trigobject_count; ++iT) {
 	  float dRtrig = deltaR(analysisTree.electron_eta[im],analysisTree.electron_phi[im],
 				analysisTree.trigobject_eta[iT],analysisTree.trigobject_phi[iT]);
 	  if (dRtrig>DRTrigMatch) continue;
 	  if (analysisTree.trigobject_filters[iT][nElectronFilter])
-	    electronTriggerMatch = true;
+	    electronFilter = true;
+	  if (isElectronFilter1) {
+	    if (analysisTree.trigobject_filters[iT][nElectronFilter1])
+	      electronFilter1 = true;	    
+	  }
+	  if (isElectronL1Filter) {
+	    if (analysisTree.trigobject_filters[iT][nElectronL1Filter])
+	      electronL1Filter = true;	    
+	  }
 	}
+	if (!isElectronL1Filter) electronL1Filter = true;
+	bool electronTriggerMatch = (electronFilter||electronFilter1) && electronL1Filter;
 
 	if (!applyTrigger) 
 	  electronTriggerMatch = true;
@@ -1188,13 +1228,13 @@ int main(int argc, char * argv[]) {
 	if (fabs(analysisTree.electron_dz[im])>dzElectronCut)  isPassed = false;
 	bool electronId = true;
 	if (electronIdType==1)
-	  electronId = analysisTree.electron_mva_wp80_Iso_Fall17_v1[im]>0.5;
+	  electronId = analysisTree.electron_mva_wp90_noIso_Fall17_v2[im]>0.5;
 	else if (electronIdType==2)
-	  electronId = analysisTree.electron_mva_wp90_Iso_Fall17_v1[im]>0.5;
+	  electronId = analysisTree.electron_mva_wp90_noIso_Fall17_v2[im]>0.5;
 	else if (electronIdType==3)
-	  electronId = analysisTree.electron_mva_wp80_general_Spring16_v1[im]>0.5;
+	  electronId = analysisTree.electron_mva_wp90_Iso_Fall17_v1[im]>0.5;
 	else if (electronIdType==4)
-	  electronId = analysisTree.electron_mva_wp90_general_Spring16_v1[im]>0.5;
+	  electronId = analysisTree.electron_mva_wp80_Iso_Fall17_v1[im]>0.5;
 	if (!analysisTree.electron_pass_conversion[im]) electronId = false;
 	if (analysisTree.electron_nmissinginnerhits[im]>1) electronId = false;
 	bool isPassedId = isPassed && electronId;
@@ -1387,20 +1427,42 @@ int main(int argc, char * argv[]) {
 	    double ptEle2 = (double)analysisTree.electron_pt[iE2];
 	    double etaEle1 = (double)analysisTree.electron_eta[iE1];
 	    double etaEle2 = (double)analysisTree.electron_eta[iE2];
-	    double IdIsoSF_ele1 = SF_electronIdIso->get_ScaleFactor(ptEle1, etaEle1);
-	    double IdIsoSF_ele2 = SF_electronIdIso->get_ScaleFactor(ptEle2, etaEle2);
+	    //	    double IdIsoSF_ele1 = SF_electronIdIso->get_ScaleFactor(ptEle1, etaEle1);
+	    //	    double IdIsoSF_ele2 = SF_electronIdIso->get_ScaleFactor(ptEle2, etaEle2);
 	
-	    EleSF_IdIso_Ele1H->Fill(IdIsoSF_ele1);
-	    EleSF_IdIso_Ele2H->Fill(IdIsoSF_ele2);
-	    
+	    TString suffix = "mc";
+	    TString suffixRatio = "ratio";
+	    if (isEmbedded) {
+	      suffix = "embed"; 
+	      suffixRatio = "embed_ratio";
+	    }
+
 	    correctionWS->var("e_pt")->setVal(ptEle1);
 	    correctionWS->var("e_eta")->setVal(etaEle1);
-	    double trkSF1 = correctionWS->function("e_reco_ratio")->getVal();
+	    double IdIsoSF_ele1 = correctionWS->function("e_idiso_ic_" + suffixRatio)->getVal();
+	    double trkSF1 = correctionWS->function("e_trk_" + suffixRatio)->getVal();
+	    double effDataTrig1 = correctionWS->function("e_trg_ic_data")->getVal();
+	    double effMcTrig1 = correctionWS->function("e_trg_ic_" + suffix)->getVal();
+	    double sfTrig1 = effDataTrig1/effMcTrig1;
+	    if (sfTrig1>5.0) {
+	      effDataTrig1 = 0.0;
+	      effMcTrig1 = 1.0;
+	    }
 
 	    correctionWS->var("e_pt")->setVal(ptEle2);
 	    correctionWS->var("e_eta")->setVal(etaEle2);
-	    double trkSF2 = correctionWS->function("e_reco_ratio")->getVal();
-	    
+	    double IdIsoSF_ele2 = correctionWS->function("e_idiso_ic_" + suffixRatio)->getVal();
+	    double trkSF2 = correctionWS->function("e_trk_" + suffixRatio)->getVal();
+	    double effDataTrig2 = correctionWS->function("e_trg_ic_data")->getVal();
+	    double effMcTrig2 = correctionWS->function("e_trg_ic_" + suffix)->getVal();
+	    double sfTrig2 = effDataTrig2/effMcTrig2;
+	    if (sfTrig2>5.0) {
+	      effDataTrig2 = 0.0;
+	      effMcTrig2 = 1.0;
+	    }
+
+	    EleSF_IdIso_Ele1H->Fill(IdIsoSF_ele1);
+	    EleSF_IdIso_Ele2H->Fill(IdIsoSF_ele2);
 
 	    //	    if (ptEle1<20||ptEle2<20) {
 	    //	      std::cout << "ele 1 ->  pt = " << ptEle1 << "   eta = " << etaEle1 << std::endl;
@@ -1415,14 +1477,12 @@ int main(int argc, char * argv[]) {
 	    //	    }
 	    weight = weight*IdIsoSF_ele1*IdIsoSF_ele2*trkSF1*trkSF2;
 
-	    double effDataTrig1 = SF_electronTrig->get_EfficiencyData(ptEle1, etaEle1);  
-	    double effDataTrig2 = SF_electronTrig->get_EfficiencyData(ptEle2, etaEle2);  
+	    //	    double effDataTrig1 = SF_electronTrig->get_EfficiencyData(ptEle1, etaEle1);  
+	    //	    double effDataTrig2 = SF_electronTrig->get_EfficiencyData(ptEle2, etaEle2);  
 	    double effTrigData = 1 - (1-effDataTrig1)*(1-effDataTrig2);
 
 	    if (applyTrigger) {
 
-	      double effMcTrig1 = SF_electronTrig->get_EfficiencyMC(ptEle1, etaEle1);  
-	      double effMcTrig2 = SF_electronTrig->get_EfficiencyMC(ptEle2, etaEle2);  
 	      double effMcTrig = 1 - (1-effMcTrig1)*(1-effMcTrig2);
 	    
 	      if (effTrigData>0&&effMcTrig>0) {
@@ -1436,8 +1496,9 @@ int main(int argc, char * argv[]) {
 	    else {
 	      weight = weight*effTrigData;
 	    }
-	    
 	  }
+	  if (isEmbedded)
+	    weight = weight*getEmbeddedWeight(&analysisTree,correctionWS);
 	   
 	  //	  std::cout << "Ok1" << std::endl;
 
@@ -1620,6 +1681,10 @@ int main(int argc, char * argv[]) {
 	    }
 
 	    if (mass>70&&mass<110) {
+
+	      
+
+
 	      metZSelH->Fill(pfmet,weight);
 	      puppimetZSelH->Fill(puppimet,weight);
 	      
