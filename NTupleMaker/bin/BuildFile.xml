@@ -257,7 +257,8 @@
  <use name="DesyTauAnalyses/NTupleMaker"/>
  <use name="HTT-utilities/LepEffInterface"/>
  <use name="TauAnalysis/ClassicSVfit"/>
-
+ <use name="HiggsCPinTauDecays/IpCorrection"/>
+ <use name="HiggsCPinTauDecays/ImpactParameter"/>
 </bin>
 
 <bin name="AnalysisMacro_EMu" file="AnalysisMacro_EMu.cpp">
