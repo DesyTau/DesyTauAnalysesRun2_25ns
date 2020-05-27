@@ -46,7 +46,7 @@ float getEmbeddedWeight(const AC1B *analysisTree, RooWorkspace * wEm) {
   std::vector<TLorentzVector> taus; taus.clear();
   float emWeight = 1;
   for (unsigned int igen = 0; igen < analysisTree->genparticles_count; ++igen) {
-    if (TMath::Abs(analysisTree->genparticles_pdgid[igen])==13&&analysisTree->genparticles_isPrompt[igen]&&analysisTree->genparticles_status[igen]==1) {
+    if (TMath::Abs(analysisTree->genparticles_pdgid[igen])==11&&analysisTree->genparticles_isPrompt[igen]&&analysisTree->genparticles_status[igen]==1) {
     TLorentzVector tauLV; tauLV.SetXYZT(analysisTree->genparticles_px[igen], 
 					analysisTree->genparticles_py[igen],
 					analysisTree->genparticles_pz[igen],
@@ -74,11 +74,9 @@ float getEmbeddedWeight(const AC1B *analysisTree, RooWorkspace * wEm) {
     wEm->var("gt2_pt")->setVal(gt2_pt);
     wEm->var("gt1_eta")->setVal(gt1_eta);
     wEm->var("gt2_eta")->setVal(gt2_eta);
-    //    double trg_emb = wEm->function("m_sel_trg_ic_ratio")->getVal();
     double trg_emb_ic = wEm->function("m_sel_trg_ic_ratio")->getVal();
     emWeight = id1_embed * id2_embed * trg_emb_ic;
-    //    double emWeight_ic = id1_embed * id2_embed * trg_emb_ic;
-    //    cout << "KIT : " << emWeight << "  IC : " << emWeight_ic << std::endl;
+    //    cout << "emb : " << emWeight << "  IC : " << emWeight << std::endl;
   }
 
   //  cout << "Embedding : " << emWeight << std::endl;
@@ -559,8 +557,8 @@ int main(int argc, char * argv[]) {
   int nPtBins = 6;
   float ptBins[7] = {10,20,30,40,50,100,1000};
 
-  int nEtaBins = 5;
-  float etaBins[6] = {0, 1.0, 1.479, 1.653, 2.1, 2.5}; 
+  int nEtaBins = 4;
+  float etaBins[5] = {0, 1.0, 1.479, 1.653, 2.1}; 
 
   TString PtBins[6] = {"Pt10to20",
 		       "Pt20to30",		       
@@ -569,11 +567,10 @@ int main(int argc, char * argv[]) {
 		       "Pt50to100",
 		       "PtGt100"};
 
-  TString EtaBins[5] = {"EtaLt1p0",
+  TString EtaBins[4] = {"EtaLt1p0",
 			"Eta1p0to1p48",
 			"Eta1p48to1p65",
-			"Eta1p65to2p1",
-			"EtaGt2p1"};
+			"Eta1p65to2p1"};
 
   TString JetBins[3] = {"Jet0","Jet1","JetGe2"};
 
@@ -630,17 +627,17 @@ int main(int argc, char * argv[]) {
   TH1D * ZMassPass = new TH1D("ZMassPass","",80,50,130);
   TH1D * ZMassFail = new TH1D("ZMassFail","",80,50,130);
 
-  TH1F * ZMassJetEtaPtPass[3][5][8];
-  TH1F * ZMassJetEtaPtFail[3][5][8];
+  TH1F * ZMassJetEtaPtPass[3][4][8];
+  TH1F * ZMassJetEtaPtFail[3][4][8];
 
-  TH1F * ZMassEtaPtPass[5][8];
-  TH1F * ZMassEtaPtFail[5][8];
+  TH1F * ZMassEtaPtPass[4][8];
+  TH1F * ZMassEtaPtFail[4][8];
 
-  TH1F * ZMassIso1EtaPtPass[4][5][8];
-  TH1F * ZMassIso1EtaPtFail[4][5][8];
+  TH1F * ZMassIso1EtaPtPass[4][4][8];
+  TH1F * ZMassIso1EtaPtFail[4][4][8];
 
-  TH1F * ZMassIso2EtaPtPass[4][5][8];
-  TH1F * ZMassIso2EtaPtFail[4][5][8];
+  TH1F * ZMassIso2EtaPtPass[4][4][8];
+  TH1F * ZMassIso2EtaPtFail[4][4][8];
 
   for (int iEta=0; iEta<nEtaBins; ++iEta) {
     for (int iPt=0; iPt<nPtBins; ++iPt) {
@@ -701,7 +698,7 @@ int main(int argc, char * argv[]) {
   TH1D * ipyErrEtaH[5];
   TH1D * ipzErrEtaH[5];
   
-  for (int iEta=0; iEta<5; ++iEta) {
+  for (int iEta=0; iEta<nEtaBins; ++iEta) {
     ipxEtaH[iEta] = new TH1D("ipx"+EtaBins[iEta],"",200,-0.02,0.02);
     ipyEtaH[iEta] = new TH1D("ipy"+EtaBins[iEta],"",200,-0.02,0.02);
     ipzEtaH[iEta] = new TH1D("ipz"+EtaBins[iEta],"",200,-0.02,0.02);
@@ -823,6 +820,8 @@ int main(int argc, char * argv[]) {
   
     // EVENT LOOP //
     
+    bool newFile = true;
+
     for (Long64_t iEntry=0; iEntry<numberOfEntries; iEntry++) { 
 
       analysisTree.GetEntry(iEntry);
@@ -860,7 +859,7 @@ int main(int argc, char * argv[]) {
       float genVertexY = 0;
       float genVertexZ = 0;
 
-      if (!isData) {
+      if (!isData||isEmbedded) {
 
 	for (unsigned int igentau=0; igentau < analysisTree.gentau_count; ++igentau) {
 	  TLorentzVector tauLV; tauLV.SetXYZT(analysisTree.gentau_px[igentau],
@@ -979,7 +978,7 @@ int main(int argc, char * argv[]) {
 	ptZH->Fill(genZPt,weight);
 	massPtZH->Fill(genZMass,genZPt,weight);
 
-	if (applyZMassPtReweighting) {
+	if (applyZMassPtReweighting&&TStrName.Contains("DYJets")) {
 	  if (genZMass>1000) genZMass=999;
 	  if (genZPt>1000) genZPt=999;
 	  if (genZMass>50.0&&genZPt>0.0) {
@@ -989,7 +988,7 @@ int main(int argc, char * argv[]) {
 	    else 
 	      dyWeight *= histZMassPtWeights->GetBinContent(histZMassPtWeights->FindBin(genZMass,genZPt));
 	    
-	    //	    std::cout << "Z mass = " << genZMass << "   Z Pt = " << genZPt << "   weight = " << dyWeight << std::endl;
+	    std::cout << "Z mass = " << genZMass << "   Z Pt = " << genZPt << "   weight = " << dyWeight << std::endl;
 	    weight *= dyWeight;
 	  }
 	  
@@ -1057,6 +1056,8 @@ int main(int argc, char * argv[]) {
 	if (!lumi) continue;
 	
       }
+
+      //      std::cout << "Run-lumi selection : " << std::endl;
       
       if (analysisTree.event_run<RunMin)
 	RunMin = analysisTree.event_run;
@@ -1121,12 +1122,13 @@ int main(int argc, char * argv[]) {
 	  cout << "Filter " << ElectronHLTFilterName << " not found" << endl;
 	  exit(-1);
 	}
-	if (!isElectronFilter1) {
+	if (!isElectronFilter1&&newFile) {
 	  cout << "warning : Filter " << ElectronHLTFilterName1 << " not found" << endl;
 	}
-	if (!isElectronL1Filter) {
-	  cout << "warning : L1 Filter " << ElectronHLTFilterName << " not found" << endl;
+	if (!isElectronL1Filter&&newFile) {
+	  cout << "warning : L1 Filter " << ElectronL1FilterName << " not found" << endl;
 	}
+	newFile = false;
       }
 
       //      std::cout << "HLT Filters " << std::endl; 
@@ -1254,9 +1256,12 @@ int main(int argc, char * argv[]) {
 	}
       }
       // end of electron selection
-
-      //      std::cout << "Electron selection -> " << std::endl;
-
+      /*
+      std::cout << "Electron selection -> " << std::endl;
+      std::cout << "isoIdElectrons : " << isoIdElectrons.size() << std::endl;
+      std::cout << "isoIdElectronsIso : " << isoIdElectronsIso.size() << std::endl;
+      std::cout << "isoIdElectronsIsTriggerMatched : " << isoIdElectronsIsTriggerMatched.size() << std::endl;
+      */
       bool isElectronsPair = false;
       bool firstTrigger = true;
       if (isoIdElectrons.size()>0) {
@@ -1446,7 +1451,7 @@ int main(int argc, char * argv[]) {
 	    double effDataTrig1 = correctionWS->function("e_trg_ic_data")->getVal();
 	    double effMcTrig1 = correctionWS->function("e_trg_ic_" + suffix)->getVal();
 	    double sfTrig1 = effDataTrig1/effMcTrig1;
-	    if (sfTrig1>5.0) {
+	    if (sfTrig1>5.0||std::isnan(sfTrig1)) {
 	      effDataTrig1 = 0.0;
 	      effMcTrig1 = 1.0;
 	    }
@@ -1458,7 +1463,7 @@ int main(int argc, char * argv[]) {
 	    double effDataTrig2 = correctionWS->function("e_trg_ic_data")->getVal();
 	    double effMcTrig2 = correctionWS->function("e_trg_ic_" + suffix)->getVal();
 	    double sfTrig2 = effDataTrig2/effMcTrig2;
-	    if (sfTrig2>5.0) {
+	    if (sfTrig2>5.0||std::isnan(sfTrig2)) {
 	      effDataTrig2 = 0.0;
 	      effMcTrig2 = 1.0;
 	    }
@@ -1467,17 +1472,19 @@ int main(int argc, char * argv[]) {
 	    EleSF_IdIso_Ele2H->Fill(IdIsoSF_ele2);
 
 	    //	    if (ptEle1<20||ptEle2<20) {
-	    //	      std::cout << "ele 1 ->  pt = " << ptEle1 << "   eta = " << etaEle1 << std::endl;
+	    //	    std::cout << "ele 1 ->  pt = " << ptEle1 << "   eta = " << etaEle1 << std::endl;
 	    //	      std::cout << "eff data ele 1 = " << SF_electronIdIso->get_EfficiencyData(ptEle1, etaEle1)<< " |  eff mc ele 1 = " << SF_electronIdIso->get_EfficiencyMC(ptEle1, etaEle1)<<std::endl;
-	    //	      std::cout << "ele 2 ->  pt = " << ptEle2 << "   eta = " << etaEle2 << std::endl;
+	    //	    std::cout << "ele 2 ->  pt = " << ptEle2 << "   eta = " << etaEle2 << std::endl;
 	    //	      std::cout << "eff data ele 2 = " << SF_electronIdIso->get_EfficiencyData(ptEle2, etaEle2)<< " |  eff mc ele 2 = " << SF_electronIdIso->get_EfficiencyMC(ptEle2, etaEle2)<<std::endl;
-	    //	      std::cout << "SF ele1 = " << IdIsoSF_ele1 << std::endl;
-	    //	      std::cout << "SF ele2 = " << IdIsoSF_ele2 << std::endl;
+	    //	    std::cout << "SF ele1 = " << IdIsoSF_ele1 << std::endl;
+	    //	    std::cout << "SF ele2 = " << IdIsoSF_ele2 << std::endl;
 	    //	      
 	    //	      std::cout << " mass = " << mass << std::endl;
 	    //	      std::cout << std::endl;
 	    //	    }
 	    weight = weight*IdIsoSF_ele1*IdIsoSF_ele2*trkSF1*trkSF2;
+
+	    //	    std::cout << "Weight after di-e trk/Id/Iso = " << weight << std::endl;
 
 	    //	    double effDataTrig1 = SF_electronTrig->get_EfficiencyData(ptEle1, etaEle1);  
 	    //	    double effDataTrig2 = SF_electronTrig->get_EfficiencyData(ptEle2, etaEle2);  
@@ -1491,7 +1498,7 @@ int main(int argc, char * argv[]) {
 		double weightTrig = effTrigData/effMcTrig;
 		// std::cout << "ele 1 ->  pt = " << ptEle1 << "   eta = " << etaEle1 << std::endl;
 		// std::cout << "ele 2 ->  pt = " << ptEle2 << "   eta = " << etaEle2 << std::endl;
-		// std::cout << "WeightTrig = " << weightTrig << std::endl;
+		//		std::cout << "WeightTrig = " << weightTrig << std::endl;
 		weight = weight*weightTrig;
 	      }
 	    }
@@ -1499,11 +1506,18 @@ int main(int argc, char * argv[]) {
 	      weight = weight*effTrigData;
 	    }
 	  }
-	  if (isEmbedded)
-	    weight = weight*getEmbeddedWeight(&analysisTree,correctionWS);
-	   
-	  //	  std::cout << "Ok1" << std::endl;
+	  
+	  //	  std::cout << "Weight after tigger = " << weight << std::endl;
 
+	  if (isEmbedded) 
+	    weight = weight*getEmbeddedWeight(&analysisTree,correctionWS);
+
+	  //	  std::cout << "Weight after embedding = " << weight << std::endl;
+
+	  if (weight>1e+4) {
+	    std::cout << "warning : huge weight... " << weight << std::endl;
+	    weight = 0.0;
+	  }
 	  // selecting good jets --->
 	  
 	  // HT variables
@@ -1697,6 +1711,22 @@ int main(int argc, char * argv[]) {
 	      ROOT::Math::SMatrix<float,3,3, ROOT::Math::MatRepStd< float, 3, 3 >> ipCov2;
 	      TVector3 ip2_0 = ipHelical(&analysisTree,indx2,vertex,PV_cov,ipCov2);
 
+	      /*
+	      cout << "ip(1)     : X = " << ip1.X() << "  Y = " << ip1.Y() << "  Z = " << ip1.Z() << endl; 
+	      cout << "ip0(1)    : X = " << ip1_0.X() << "  Y = " << ip1_0.Y() << "  Z = " << ip1_0.Z() << endl; 
+
+	      cout << "ip(2)     : X = " << ip2.X() << "  Y = " << ip2.Y() << "  Z = " << ip2.Z() << endl; 
+	      cout << "ip0(2)    : X = " << ip2_0.X() << "  Y = " << ip2_0.Y() << "  Z = " << ip2_0.Z() << endl; 
+
+	      cout << "IP Covariance    (1) : [0,0] = " << TMath::Sqrt(ipCov1[0][0])
+		   << " [1,1] = " << TMath::Sqrt(ipCov1[1][1])
+		   << " [2,2] = " << TMath::Sqrt(ipCov1[2][2]) << endl;
+	      cout << "IP Covariance    (2) : [0,0] = " << TMath::Sqrt(ipCov2[0][0])
+		   << " [1,1] = " << TMath::Sqrt(ipCov2[1][1])
+		   << " [2,2] = " << TMath::Sqrt(ipCov2[2][2]) << endl;
+	      
+	      std::cout << std::endl;
+	      */
 	      double ptEle1 = (double)analysisTree.electron_pt[iE1];
 	      double ptEle2 = (double)analysisTree.electron_pt[iE2];
 	      double etaEle1 = (double)analysisTree.electron_eta[iE1];
@@ -1717,6 +1747,19 @@ int main(int argc, char * argv[]) {
 	    
 	      if (PV_cov[5]<0.) 
 		std::cout << "PV cov(2,2) = " << PV_cov[5] << std::endl;
+
+	      /*
+	      std::cout << "generator vertex  : X = "
+			<< genVertexX 
+			<< "  Y = " << genVertexY
+			<< "  Z = " << genVertexZ << std::endl;
+	      std::cout << "reco vertex       : X = "
+			<< vertex.X() 
+			<< "  Y = " << vertex.Y()
+			<< "  Z = " << vertex.Z() << std::endl;
+	      std::cout << "++++++++++++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
+	      std::cout << std::endl;
+	      */
 	    
 	      float xDVert = vertex.X() - genVertexX;
 	      float yDVert = vertex.Y() - genVertexY;
