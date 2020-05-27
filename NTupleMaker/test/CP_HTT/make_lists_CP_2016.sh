@@ -46,6 +46,20 @@ ls $dirMC/TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powheg-pythia8/*root > $OUTDI
 ls $dirMC/TTToHadronic_TuneCP5_PSweights_13TeV-powheg-pythia8/*root > $OUTDIR/TTToHadronic
 ls $dirMC/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/*root > $OUTDIR/TT
 
+ls $dirMC/EWKWPlus2Jets_WToLNu_M-50_13TeV-madgraph-pythia8/*root > $OUTDIR/EWKWPlus2Jets_WToLNu_M-50
+ls $dirMC/EWKWPlus2Jets_WToLNu_M-50_13TeV-madgraph-pythia8_ext1/*root >> $OUTDIR/EWKWPlus2Jets_WToLNu_M-50
+ls $dirMC/EWKWPlus2Jets_WToLNu_M-50_13TeV-madgraph-pythia8_ext2/*root >> $OUTDIR/EWKWPlus2Jets_WToLNu_M-50
+ls $dirMC/EWKWMinus2Jets_WToLNu_M-50_13TeV-madgraph-pythia8/*root > $OUTDIR/EWKWMinus2Jets_WToLNu_M-50
+ls $dirMC/EWKWMinus2Jets_WToLNu_M-50_13TeV-madgraph-pythia8_ext1/*root >> $OUTDIR/EWKWMinus2Jets_WToLNu_M-50
+ls $dirMC/EWKWMinus2Jets_WToLNu_M-50_13TeV-madgraph-pythia8_ext2/*root >> $OUTDIR/EWKWMinus2Jets_WToLNu_M-50
+
+ls $dirMC/EWKZ2Jets_ZToLL_M-50_13TeV-madgraph-pythia8/*root > $OUTDIR/EWKZ2Jets_ZToLL_M-50
+ls $dirMC/EWKZ2Jets_ZToLL_M-50_13TeV-madgraph-pythia8_ext1/*root >> $OUTDIR/EWKZ2Jets_ZToLL_M-50
+ls $dirMC/EWKZ2Jets_ZToLL_M-50_13TeV-madgraph-pythia8_ext2/*root >> $OUTDIR/EWKZ2Jets_ZToLL_M-50
+ls $dirMC/EWKZ2Jets_ZToNuNu_13TeV-madgraph-pythia8/*root > $OUTDIR/EWKZ2Jets_ZToNuNu
+ls $dirMC/EWKZ2Jets_ZToNuNu_13TeV-madgraph-pythia8_ext1/*root >> $OUTDIR/EWKZ2Jets_ZToNuNu
+ls $dirMC/EWKZ2Jets_ZToNuNu_13TeV-madgraph-pythia8_ext2/*root >> $OUTDIR/EWKZ2Jets_ZToNuNu
+
 ls $dirMC/WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/*root > $OUTDIR/WJetsToLNu
 ls $dirMC/WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_ext2/*root >> $OUTDIR/WJetsToLNu
 ls $dirMC/W1JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/*root > $OUTDIR/W1JetsToLNu
@@ -65,6 +79,19 @@ ls $dirMC/WZ_TuneCUETP8M1_13TeV-pythia8/*root > $OUTDIR/WZ
 ls $dirMC/WZ_TuneCUETP8M1_13TeV-pythia8_ext1/*root >> $OUTDIR/WZ
 ls $dirMC/ZZ_TuneCUETP8M1_13TeV-pythia8/*root > $OUTDIR/ZZ
 ls $dirMC/ZZ_TuneCUETP8M1_13TeV-pythia8_ext1/*root >> $OUTDIR/ZZ
+
+ls $dirMC/VVTo2L2Nu_13TeV_amcatnloFXFX_madspin_pythia8/*root > $OUTDIR/VVTo2L2Nu
+ls $dirMC/WZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8/*root > $OUTDIR/WZTo2L2Q
+ls $dirMC/WZTo3LNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/*root > $OUTDIR/WZTo3LNu
+ls $dirMC/ZZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8/*root > $OUTDIR/ZZTo2L2Q
+ls $dirMC/ZZTo4L_13TeV_powheg_pythia8/*root > $OUTDIR/ZZTo4L
+
+ls $dirMC/GluGluHToWWTo2L2Nu_M125_13TeV_powheg_JHUgen_pythia8/*root > $OUTDIR/GluGluHToWWTo2L2Nu_M125
+ls $dirMC/VBFHToWWTo2L2Nu_M125_13TeV_powheg_JHUgen_pythia8/*root > $OUTDIR/VBFHToWWTo2L2Nu_M125
+ls $dirMC/GluGluZH_HToWW_M125_13TeV_powheg_pythia8/*root > $OUTDIR/GluGluZH_HToWW_M125
+ls $dirMC/HWminusJ_HToWW_M125_13TeV_powheg_pythia8/*root > $OUTDIR/HWminusJ_HToWW_M125
+ls $dirMC/HWplusJ_HToWW_M125_13TeV_powheg_pythia8/*root > $OUTDIR/HWplusJ_HToWW_M125
+ls $dirMC/HZJ_HToWW_M125_13TeV_powheg_pythia8/*root > $OUTDIR/HZJ_HToWW_M125
 
 ls $dirMC/GluGluHToTauTauUncorrelatedDecay_M125/*root > $OUTDIR/GluGluHToTauTauUncorrDecays_M125
 ls $dirMC/VBFHToTauTauUncorrelatedDecay_M125/*root > $OUTDIR/VBFHToTauTauUncorrDecays_M125
