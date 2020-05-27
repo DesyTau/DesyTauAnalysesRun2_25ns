@@ -46,6 +46,11 @@ ls $dirMC/W2JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/*root > $OUTDIR/W2JetsTo
 ls $dirMC/W3JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/*root > $OUTDIR/W3JetsToLNu
 ls $dirMC/W4JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/*root > $OUTDIR/W4JetsToLNu
 
+ls $dirMC/EWKWPlus2Jets_WToLNu_M-50_TuneCP5_13TeV-madgraph-pythia8/*root > $OUTDIR/EWKWPlus2Jets_WToLNu_M-50
+ls $dirMC/EWKWMinus2Jets_WToLNu_M-50_TuneCP5_13TeV-madgraph-pythia8/*root > $OUTDIR/EWKWMinus2Jets_WToLNu_M-50
+ls $dirMC/EWKZ2Jets_ZToLL_M-50_TuneCP5_PSweights_13TeV-madgraph-pythia8/*root > $OUTDIR/EWKZ2Jets_ZToLL_M-50
+ls $dirMC/EWKZ2Jets_ZToNuNu_TuneCP5_PSweights_13TeV-madgraph-pythia8/*root > $OUTDIR/EWKZ2Jets_ZToNuNu
+
 ls $dirMC/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/*root > $OUTDIR/TTTo2L2Nu
 ls $dirMC/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/*root > $OUTDIR/TTToSemiLeptonic
 ls $dirMC/TTToHadronic_TuneCP5_13TeV-powheg-pythia8/*root > $OUTDIR/TTToHadronic
@@ -58,6 +63,22 @@ ls $dirMC/ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8/*root > $OUT
 ls $dirMC/WW_TuneCP5_13TeV-pythia8/*root > $OUTDIR/WW
 ls $dirMC/WZ_TuneCP5_13TeV-pythia8/*root > $OUTDIR/WZ
 ls $dirMC/ZZ_TuneCP5_13TeV-pythia8/*root > $OUTDIR/ZZ
+
+ls $dirMC/VVTo2L2Nu_13TeV_amcatnloFXFX_madspin_pythia8/*root > $OUTDIR/VVTo2L2Nu
+ls $dirMC/WWToLNuQQ_NNPDF31_TuneCP5_13TeV-powheg-pythia8/*root > $OUTDIR/WToLNuQQ_NNPDF31_TuneCP5_13TeV-powheg-pythia8
+ls $dirMC/WWTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8/*root > $OUTDIR/WWTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8
+ls $dirMC/WZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8/*root > $OUTDIR/WZTo2L2Q
+ls $dirMC/WZTo3LNu_TuneCP5_13TeV-amcatnloFXFX-pythia8/*root > $OUTDIR/WZTo3LNu
+ls $dirMC/ZZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8/*root > $OUTDIR/ZZTo2L2Q
+ls $dirMC/ZZTo4L_TuneCP5_13TeV_powheg_pythia8/*root > $OUTDIR/ZZTo4L_TuneCP5_13TeV_powheg_pythia8
+ls $dirMC/ZZTo4L_TuneCP5_13TeV-amcatnloFXFX-pythia8/*root > $OUTDIR/ZZTo4L_TuneCP5_13TeV-amcatnloFXFX-pythia8
+
+ls $dirMC/GluGluHToWWTo2L2Nu_M125_13TeV_powheg2_JHUGenV714_pythia8/*root > $OUTDIR/GluGluHToWWTo2L2Nu_M125
+ls $dirMC/VBFHToWWTo2L2Nu_M125_13TeV_powheg2_JHUGenV714_pythia8/*root > $OUTDIR/VBFHToWWTo2L2Nu_M125
+ls $dirMC/GluGluZH_HToWW_M125_13TeV_powheg_pythia8_TuneCP5_PSweights/*root > $OUTDIR/GluGluZH_HToWW_M125
+ls $dirMC/HWminusJ_HToWW_M125_13TeV_powheg_jhugen724_pythia8_TuneCP5/*root > $OUTDIR/HWminusJ_HToWW_M125
+ls $dirMC/HWplusJ_HToWW_M125_13TeV_powheg_jhugen724_pythia8_TuneCP5/*root > $OUTDIR/HWplusJ_HToWW_M125
+ls $dirMC/HZJ_HToWW_M125_13TeV_powheg_jhugen714_pythia8_TuneCP5/*root > $OUTDIR/HZJ_HToWW_M125
 
 ls $dirMC/GluGluToHToTauUncorrelatedDecay_M125/*root > $OUTDIR/GluGluHToTauTauUncorrDecays_M125
 ls $dirMC/VBFHToTauTauUncorrelatedDecay_M125/*root > $OUTDIR/VBFHToTauTauUncorrDecays_M125
