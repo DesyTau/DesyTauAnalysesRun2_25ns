@@ -22,8 +22,9 @@ fi
 
 ./make_lists_CP_20$YEAR.sh $CHANNEL
 
+cp ./make_parameter_file_20${YEAR}.sh $OUTDIR
 cd $OUTDIR
-./make_parameter_file.sh
+./make_parameter_file_20${YEAR}.sh $CHANNEL
 cd -
 
 ###################################################################################################
