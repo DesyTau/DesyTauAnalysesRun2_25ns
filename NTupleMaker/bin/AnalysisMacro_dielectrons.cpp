@@ -988,7 +988,7 @@ int main(int argc, char * argv[]) {
 	    else 
 	      dyWeight *= histZMassPtWeights->GetBinContent(histZMassPtWeights->FindBin(genZMass,genZPt));
 	    
-	    std::cout << "Z mass = " << genZMass << "   Z Pt = " << genZPt << "   weight = " << dyWeight << std::endl;
+	    //	    std::cout << "Z mass = " << genZMass << "   Z Pt = " << genZPt << "   weight = " << dyWeight << std::endl;
 	    weight *= dyWeight;
 	  }
 	  
