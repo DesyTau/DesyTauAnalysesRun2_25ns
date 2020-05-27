@@ -11,9 +11,9 @@ echo "CONFIGFILE,FILELIST" > parameters.txt
 # Tau Spinner
 ./split_filelist.sh analysisMacroSynch_et_18_MC.conf GluGluHToTauTauUncorrDecays_M125 4
 ./split_filelist.sh analysisMacroSynch_et_18_MC.conf VBFHToTauTauUncorrDecays_M125 4
-# ./split_filelist.sh analysisMacroSynch_et_18_MC.conf WminusHToTauTauUncorrDecays_M125 4
-# ./split_filelist.sh analysisMacroSynch_et_18_MC.conf WplusHToTauTauUncorrDecays_M125 4
-# ./split_filelist.sh analysisMacroSynch_et_18_MC.conf ZHToTauTauUncorrDecays_M125 4
+./split_filelist.sh analysisMacroSynch_et_18_MC.conf WminusHToTauTauUncorrDecays_M125 4
+./split_filelist.sh analysisMacroSynch_et_18_MC.conf WplusHToTauTauUncorrDecays_M125 4
+./split_filelist.sh analysisMacroSynch_et_18_MC.conf ZHToTauTauUncorrDecays_M125 4
 
 # DY
 ./split_filelist.sh analysisMacroSynch_et_18_MC.conf DYJetsToLL_M-10to50 10
@@ -36,10 +36,34 @@ echo "CONFIGFILE,FILELIST" > parameters.txt
 ./split_filelist.sh analysisMacroSynch_et_18_MC.conf W3JetsToLNu 20
 ./split_filelist.sh analysisMacroSynch_et_18_MC.conf W4JetsToLNu 20
 
+# EWK
+./split_filelist.sh analysisMacroSynch_et_18_MC.conf EWKWPlus2Jets_WToLNu_M-50 10
+./split_filelist.sh analysisMacroSynch_et_18_MC.conf EWKWMinus2Jets_WToLNu_M-50 10
+./split_filelist.sh analysisMacroSynch_et_18_MC.conf EWKZ2Jets_ZToLL_M-50 10
+./split_filelist.sh analysisMacroSynch_et_18_MC.conf EWKZ2Jets_ZToNuNu 10
+
 # VV
 ./split_filelist.sh analysisMacroSynch_et_18_MC.conf WW 20
 ./split_filelist.sh analysisMacroSynch_et_18_MC.conf WZ 20
 ./split_filelist.sh analysisMacroSynch_et_18_MC.conf ZZ 20
+
+# Exclusive VV
+./split_filelist.sh analysisMacroSynch_et_18_MC.conf VVTo2L2Nu 10
+./split_filelist.sh analysisMacroSynch_et_18_MC.conf WToLNuQQ_NNPDF31_TuneCP5_13TeV-powheg-pythia8 10
+./split_filelist.sh analysisMacroSynch_et_18_MC.conf WWTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8 10
+./split_filelist.sh analysisMacroSynch_et_18_MC.conf WZTo2L2Q 10
+./split_filelist.sh analysisMacroSynch_et_18_MC.conf WZTo3LNu 10
+./split_filelist.sh analysisMacroSynch_et_18_MC.conf ZZTo2L2Q 10
+./split_filelist.sh analysisMacroSynch_et_18_MC.conf ZZTo4L_TuneCP5_13TeV_powheg_pythia8 10
+./split_filelist.sh analysisMacroSynch_et_18_MC.conf ZZTo4L_TuneCP5_13TeV-amcatnloFXFX-pythia8 10
+
+# H->WW
+./split_filelist.sh analysisMacroSynch_et_18_MC.conf GluGluHToWWTo2L2Nu_M125 10
+./split_filelist.sh analysisMacroSynch_et_18_MC.conf VBFHToWWTo2L2Nu_M125 10
+./split_filelist.sh analysisMacroSynch_et_18_MC.conf GluGluZH_HToWW_M125 10
+./split_filelist.sh analysisMacroSynch_et_18_MC.conf HWminusJ_HToWW_M125 10
+./split_filelist.sh analysisMacroSynch_et_18_MC.conf HWplusJ_HToWW_M125 10
+./split_filelist.sh analysisMacroSynch_et_18_MC.conf HZJ_HToWW_M125 10
 
 # TT
 ./split_filelist.sh analysisMacroSynch_et_18_MC.conf TTTo2L2Nu 10
