@@ -326,7 +326,7 @@ namespace jets{
      // see definition in Jets.h
      bool isPFJetId = tightJetID((*analysisTree), int(jet), era);
      if (!isPFJetId) continue;
-     bool passedPUID = jetPUID((*analysisTree), int(jet),"Tight");
+     bool passedPUID = jetPUID((*analysisTree), int(jet),"Loose");
      if(applyJetPUID&&!passedPUID) continue;
      
      jetspt20.push_back(jet);
