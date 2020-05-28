@@ -99,9 +99,9 @@ fi
 ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_MC.conf TT 10
 
 # Exclusive TT (CP5 samples)
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_MC.conf TTTo2L2Nu 3
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_MC.conf TTToSemiLeptonic 3
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_MC.conf TTToHadronic 3
+./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_MC_TT_CP5.conf TTTo2L2Nu 3
+./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_MC_TT_CP5.conf TTToSemiLeptonic 3
+./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_MC_TT_CP5.conf TTToHadronic 3
 
 # Single Top
 ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_MC.conf ST_t-channel_antitop_4f 20
