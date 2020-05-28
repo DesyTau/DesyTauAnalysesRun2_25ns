@@ -142,3 +142,45 @@ else
   cp  ${TEMPLATE_CFG_NAME}_tmp.conf $OUTDIR/${TEMPLATE_CFG_NAME}.conf
 fi
 rm ${TEMPLATE_CFG_NAME}_tmp.conf
+
+
+# changing B-tag SF and efficiency files for 2016 CP5 samples (at the moment TT only)
+if [[ $YEAR -eq 16 && $DATA_TYPE == "MC" ]]; then
+  SF_COUNTS=$(grep -c "BtagSfFile" $OUTDIR/${TEMPLATE_CFG_NAME}.conf)
+  EFF_COUNTS=$(grep -c "BtagMCeffFile" $OUTDIR/${TEMPLATE_CFG_NAME}.conf)
+  if [[ $SF_COUNTS -ne 1 ]]; then
+    echo
+    echo 
+    echo "hmm🤔"
+    echo "there are ${SF_COUNTS} entries of BtagSfFile in $OUTDIR/${TEMPLATE_CFG_NAME}.conf, while only one is expected" 
+    echo "this is needed for 2016 b-tag SF file replacement in CP5 samples"
+    echo "exiting"
+    echo 
+    echo 
+    exit
+  else 
+    if [[ $EFF_COUNTS -ne 1 ]]; then
+      echo
+      echo 
+      echo "hmm🤔"
+      echo "there are ${EFF_COUNTS} entries of BtagMCeffFile in $OUTDIR/${TEMPLATE_CFG_NAME}.conf, while only one is expected" 
+      echo "this is needed for 2016 b-tag eff file replacement in CP5 samples"
+      echo "exiting"
+      echo 
+      echo 
+      exit
+    fi
+  fi
+  
+  # now needed only for TT samples
+  # make sure to make corresponding adjustments in cfg names in make_parameter_file_{YEAR}.sh
+  SAMPLE_POSTFIX="TT_CP5"
+  
+  cp $OUTDIR/${TEMPLATE_CFG_NAME}.conf $OUTDIR/${TEMPLATE_CFG_NAME}_${SAMPLE_POSTFIX}.conf
+  # finding lines which start from e.g. "BtagSfFile" and replacing these lines with a specified path
+  sed -i 's/^BtagSfFile.*$/BtagSfFile = DesyTauAnalyses\/NTupleMaker\/data\/DeepCSV_2016LegacySF_V1_TuneCP5.csv/g' $OUTDIR/${TEMPLATE_CFG_NAME}_${SAMPLE_POSTFIX}.conf
+  
+  # tagging_efficiencies_deepCSV_2016_CP5.root is taken from Danny: 
+  # /afs/cern.ch/work/d/dwinterb/public/btag_efficiencies_cp5/
+  sed -i 's/^BtagMCeffFile.*$/BtagMCeffFile = DesyTauAnalyses\/NTupleMaker\/data\/tagging_efficiencies_deepCSV_2016_CP5.root/g' $OUTDIR/${TEMPLATE_CFG_NAME}_${SAMPLE_POSTFIX}.conf
+fi
