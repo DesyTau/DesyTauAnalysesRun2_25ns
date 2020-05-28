@@ -529,6 +529,7 @@ int main(int argc, char * argv[]){
   TauThreeProngScaleSys *tauThreeProngScaleSys = 0;
   TauThreeProngOnePi0ScaleSys *tauThreeProngOnePi0ScaleSys = 0;
   MuonScaleSys *muonScaleSys = 0;
+  ElectronScaleSys *electronScaleSys = 0;
 
   LepTauFakeOneProngScaleSys *lepTauFakeOneProngScaleSys = 0;
   LepTauFakeOneProngOnePi0ScaleSys *lepTauFakeOneProngOnePi0ScaleSys = 0;
@@ -558,6 +559,12 @@ int main(int argc, char * argv[]){
     muonScaleSys->SetUseFastMTT(ApplyFastMTT);
     muonScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);
     muonScaleSys->SetUsePuppiMET(usePuppiMET);
+    
+    electronScaleSys = new ElectronScaleSys(otree);
+    electronScaleSys->SetUseSVFit(ApplySVFit);
+    electronScaleSys->SetUseFastMTT(ApplyFastMTT);
+    electronScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);
+    electronScaleSys->SetUsePuppiMET(usePuppiMET);
 
     tauOneProngScaleSys = new TauOneProngScaleSys(otree);
     tauOneProngScaleSys->SetScale(shift_tes_1prong,shift_tes_1prong_e);
@@ -2226,7 +2233,11 @@ int main(int argc, char * argv[]){
 	    lepTauFakeOneProngOnePi0ScaleSys->Eval(utils::MUTAU);
 	  }
 	}
-	else if (ch == "et") { 
+	else if (ch == "et") {
+    electronScaleSys->SetElectronIndex(leptonIndex);
+    electronScaleSys->SetAC1B(&analysisTree);
+    electronScaleSys->Eval(utils::ETAU);
+    
 	  tauOneProngScaleSys->Eval(utils::ETAU);
 	  tauOneProngOnePi0ScaleSys->Eval(utils::ETAU);
 	  tauThreeProngScaleSys->Eval(utils::ETAU);
@@ -2277,6 +2288,11 @@ int main(int argc, char * argv[]){
   if (muonScaleSys != 0) {
     muonScaleSys->Write("",TObject::kOverwrite);
     delete muonScaleSys;
+  }
+  
+  if (electronScaleSys != 0) {
+    electronScaleSys->Write();
+    delete electronScaleSys;
   }
 
   if(tauOneProngScaleSys != 0){
