@@ -69,13 +69,13 @@ fi
 
 # Exclusive VV
 ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf VVTo2L2Nu 10
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf WToLNuQQ_NNPDF31_TuneCP5_13TeV-powheg-pythia8 10
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf WWTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8 10
+#./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf WToLNuQQ_NNPDF31_TuneCP5_13TeV-powheg-pythia8 10
+./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf WWTo1L1Nu2Q 10
 ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf WZTo2L2Q 10
 ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf WZTo3LNu 10
 ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf ZZTo2L2Q 10
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf ZZTo4L_TuneCP5_13TeV_powheg_pythia8 10
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf ZZTo4L_TuneCP5_13TeV-amcatnloFXFX-pythia8 10
+#./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf ZZTo4L_TuneCP5_13TeV_powheg_pythia8 10
+./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf ZZTo4L 10
 
 # H->WW
 ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf GluGluHToWWTo2L2Nu_M125 10

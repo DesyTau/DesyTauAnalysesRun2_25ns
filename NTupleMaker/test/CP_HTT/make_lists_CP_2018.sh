@@ -6,26 +6,16 @@ dirMC=/pnfs/desy.de/cms/tier2/store/user/ywen/ntuples_Apr2020/2018/mc
 dirData=/pnfs/desy.de/cms/tier2/store/user/ywen/ntuples_Apr2020/2018/data
 dirEmbedded=/pnfs/desy.de/cms/tier2/store/user/ywen/ntuples_Apr2020/2018/embedded
 
-if [[ -z "$CMSSW_BASE" ]]; then
-  echo "Nah, set up your CMSSW first!"
-  exit
-fi
-
 if [[ $CHANNEL == "mt" ]]; then
-  OUTDIR=$CMSSW_BASE/src/DesyTauAnalyses/NTupleMaker/test/CP_HTT/mutau/2018
-else
-  if [[ $CHANNEL == "et" ]]; then
-    OUTDIR=$CMSSW_BASE/src/DesyTauAnalyses/NTupleMaker/test/CP_HTT/etau/2018
-  else 
-    echo
-    echo "To produce file lists for a specific channel this script is to be run with a command:"
-    echo
-    echo "  ./make_lists_CP_2018.sh <channel={mt,et}>"
-    echo
-    echo "channel is not mt or et - exiting"
-    exit
-  fi
-fi
+    OUTDIR=./mutau/2018
+else   
+    if [[ $CHANNEL == "et" ]]; then
+	OUTDIR=./etau/2018
+    else
+	echo "ERROR: please run the script with ./make_lists_CP_2018.sh <channel={mt,et}>"
+	exit
+    fi
+fi 
 
 if [ ! -d "$OUTDIR" ]; then
   echo "Path does not exist: ${OUTDIR}"
@@ -65,13 +55,13 @@ ls $dirMC/WZ_TuneCP5_13TeV-pythia8/*root > $OUTDIR/WZ
 ls $dirMC/ZZ_TuneCP5_13TeV-pythia8/*root > $OUTDIR/ZZ
 
 ls $dirMC/VVTo2L2Nu_13TeV_amcatnloFXFX_madspin_pythia8/*root > $OUTDIR/VVTo2L2Nu
-ls $dirMC/WWToLNuQQ_NNPDF31_TuneCP5_13TeV-powheg-pythia8/*root > $OUTDIR/WToLNuQQ_NNPDF31_TuneCP5_13TeV-powheg-pythia8
-ls $dirMC/WWTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8/*root > $OUTDIR/WWTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8
+#ls $dirMC/WWToLNuQQ_NNPDF31_TuneCP5_13TeV-powheg-pythia8/*root > $OUTDIR/WToLNuQQ_NNPDF31_TuneCP5_13TeV-powheg-pythia8
+ls $dirMC/WWTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8/*root > $OUTDIR/WWTo1L1Nu2Q
 ls $dirMC/WZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8/*root > $OUTDIR/WZTo2L2Q
 ls $dirMC/WZTo3LNu_TuneCP5_13TeV-amcatnloFXFX-pythia8/*root > $OUTDIR/WZTo3LNu
 ls $dirMC/ZZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8/*root > $OUTDIR/ZZTo2L2Q
-ls $dirMC/ZZTo4L_TuneCP5_13TeV_powheg_pythia8/*root > $OUTDIR/ZZTo4L_TuneCP5_13TeV_powheg_pythia8
-ls $dirMC/ZZTo4L_TuneCP5_13TeV-amcatnloFXFX-pythia8/*root > $OUTDIR/ZZTo4L_TuneCP5_13TeV-amcatnloFXFX-pythia8
+#ls $dirMC/ZZTo4L_TuneCP5_13TeV_powheg_pythia8/*root > $OUTDIR/ZZTo4L_TuneCP5_13TeV_powheg_pythia8
+ls $dirMC/ZZTo4L_TuneCP5_13TeV-amcatnloFXFX-pythia8/*root > $OUTDIR/ZZTo4L
 
 ls $dirMC/GluGluHToWWTo2L2Nu_M125_13TeV_powheg2_JHUGenV714_pythia8/*root > $OUTDIR/GluGluHToWWTo2L2Nu_M125
 ls $dirMC/VBFHToWWTo2L2Nu_M125_13TeV_powheg2_JHUGenV714_pythia8/*root > $OUTDIR/VBFHToWWTo2L2Nu_M125

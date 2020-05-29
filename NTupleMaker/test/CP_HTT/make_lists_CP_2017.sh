@@ -6,26 +6,16 @@ dirMC=/pnfs/desy.de/cms/tier2/store/user/ywen/ntuples_Apr2020/2017/mc
 dirData=/pnfs/desy.de/cms/tier2/store/user/ywen/ntuples_Apr2020/2017/data
 dirEmbedded=/pnfs/desy.de/cms/tier2/store/user/ywen/ntuples_Apr2020/2017/embedded
 
-if [[ -z "$CMSSW_BASE" ]]; then
-  echo "Nah, set up your CMSSW first!"
-  exit
-fi
-
 if [[ $CHANNEL == "mt" ]]; then
-  OUTDIR=$CMSSW_BASE/src/DesyTauAnalyses/NTupleMaker/test/CP_HTT/mutau/2017
-else
-  if [[ $CHANNEL == "et" ]]; then
-    OUTDIR=$CMSSW_BASE/src/DesyTauAnalyses/NTupleMaker/test/CP_HTT/etau/2017
-  else 
-    echo
-    echo "To produce file lists for a specific channel this script is to be run with a command:"
-    echo
-    echo "  ./make_lists_CP_2017.sh <channel={mt,et}>"
-    echo
-    echo "channel is not mt or et - exiting"
-    exit
-  fi
-fi
+    OUTDIR=./mutau/2017
+else   
+    if [[ $CHANNEL == "et" ]]; then
+	OUTDIR=./etau/2017
+    else
+	echo "ERROR: please run the script with ./make_lists_CP_2017.sh <channel={mt,et}>"
+	exit
+    fi
+fi 
 
 if [ ! -d "$OUTDIR" ]; then
   echo "Path does not exist: ${OUTDIR}"
