@@ -157,11 +157,12 @@ void acott_Impr_tt(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1,
  otree->acotautau_00 = AcoCP(tau1Prong,tau2Prong,tau1IP,tau2IP,firstNegative,false,false,otree);
  otree->acotautau_01 = AcoCP(tau1Prong,tau2Prong,tau1IP,tau2Pi0,firstNegative,false,true,otree);
  otree->acotautau_10 = AcoCP(tau1Prong,tau2Prong,tau1Pi0,tau2IP,firstNegative,true,false,otree);
+ otree->acotautau_11 = AcoCP(tau1Prong,tau2Prong,tau1Pi0,tau2Pi0,firstNegative,true,true,otree);
 
  otree->acotautau_helix_00 = AcoCP(tau1Prong,tau2Prong,tau1IP_helix,tau2IP_helix,firstNegative,false,false,otree);
  otree->acotautau_helix_01 = AcoCP(tau1Prong,tau2Prong,tau1IP_helix,tau2Pi0,firstNegative,false,true,otree);
  otree->acotautau_helix_10 = AcoCP(tau1Prong,tau2Prong,tau1Pi0,tau2IP_helix,firstNegative,true,false,otree);
-
+ otree->acotautau_helix_11 = AcoCP(tau1Prong,tau2Prong,tau1Pi0,tau2Pi0,firstNegative,true,true,otree);
   ////////////////////////////////////////////////
   //Begin on pion pT studies on A1 variables
   ////////////////////////////////////////////////
@@ -170,17 +171,17 @@ void acott_Impr_tt(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1,
   TLorentzVector RhoPion2LV;
   TLorentzVector A1Pion1LV;
   TLorentzVector A1Pion2LV;
-  pion1LV.SetXYZT(0.,0.,0.,0.); 
-  RhoPion1LV.SetXYZT(0.,0.,0.,0.); 
-  RhoPion2LV.SetXYZT(0.,0.,0.,0.); 
-  A1Pion1LV.SetXYZT(0.,0.,0.,0.); 
-  A1Pion2LV.SetXYZT(0.,0.,0.,0.); 
+  pion1LV.SetXYZT(0.,0.,0.,0.);
+  RhoPion1LV.SetXYZT(0.,0.,0.,0.);
+  RhoPion2LV.SetXYZT(0.,0.,0.,0.);
+  A1Pion1LV.SetXYZT(0.,0.,0.,0.);
+  A1Pion2LV.SetXYZT(0.,0.,0.,0.);
   ROOT::Math::SMatrix<float,3,3, ROOT::Math::MatRepStd< float, 3, 3 >> ipCov2;
   TVector3 IP2;
   double ip_sig_tau1 = IP_significance_helix_Tauh(analysisTree,tauIndex1,PV_coord,PV_covariance,ipCov2,IP2);
   double ip_sig_tau2 = IP_significance_helix_Tauh(analysisTree,tauIndex2,PV_coord,PV_covariance,ipCov2,IP2);
-  if(analysisTree->tau_decayMode[tauIndex1]==0 && analysisTree->tau_decayMode[tauIndex2]==2){
-
+  if(otree->dmMVA_1==0 && otree->dmMVA_2==2){
+    cout<<otree->dmMVA_1<<"  "<<otree->dmMVA_2<<endl;
     pion1LV   = ChargedPivec(analysisTree,tauIndex1);
     A1Pion1LV = ChargedPivec(analysisTree,tauIndex2);
     double IPIP_pionA1 = AcoCP(pion1LV,A1Pion1LV,tau1IP_helix,tau2Pi0,firstNegative,false,true,otree);
@@ -190,8 +191,11 @@ void acott_Impr_tt(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1,
     else{
       otree->acotautau_helix_IPDP_pionA1 = IPIP_pionA1;
     }
+    
+    cout<<"CP_pionA1  "<<otree->acotautau_helix_IPIP_pi40_pionA1<<endl;
   }
- if(analysisTree->tau_decayMode[tauIndex1]==2 && analysisTree->tau_decayMode[tauIndex2]==0){
+  
+ if(otree->dmMVA_1==2 && otree->dmMVA_2==0){
     pion1LV   = ChargedPivec(analysisTree,tauIndex2);
     A1Pion1LV = ChargedPivec(analysisTree,tauIndex1);
     double IPIP_pionA1 = AcoCP(pion1LV,A1Pion1LV,tau2Pi0,tau1IP_helix,firstNegative,true,false,otree);
@@ -200,8 +204,9 @@ void acott_Impr_tt(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1,
     else{
       otree->acotautau_helix_IPDP_pionA1 = IPIP_pionA1;
     }
- }    
- if(analysisTree->tau_decayMode[tauIndex1]==1 && analysisTree->tau_decayMode[tauIndex2]==2){
+    cout<<"CP_A1pion  "<<otree->acotautau_helix_IPIP_pi40_pionA1<<endl;
+ }
+ if(otree->dmMVA_1==1 && otree->dmMVA_2==2){
    RhoPion1LV   = ChargedPivec(analysisTree,tauIndex1);
    A1Pion1LV    = ChargedPivec(analysisTree,tauIndex2);
    double IPIP_rhoA1 = AcoCP(RhoPion1LV,A1Pion1LV,tau1Pi0,tau2Pi0,firstNegative,true,true,otree);
@@ -210,8 +215,9 @@ void acott_Impr_tt(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1,
    else{
      otree->acotautau_helix_DPDP_rhoA1 = IPIP_rhoA1;
    }
+   cout<<"CP_rhoA1  "<<otree->acotautau_helix_DPIP_pi40_rhoA1<<endl;
  }
- if(analysisTree->tau_decayMode[tauIndex1]==2 && analysisTree->tau_decayMode[tauIndex2]==1){
+ if(otree->dmMVA_1==2 && otree->dmMVA_2==1){
    RhoPion1LV   = ChargedPivec(analysisTree,tauIndex2);
    A1Pion1LV    = ChargedPivec(analysisTree,tauIndex1);
    double IPIP_rhoA1 = AcoCP(RhoPion1LV,A1Pion1LV,tau1Pi0,tau2Pi0,firstNegative,true,true,otree);
@@ -220,8 +226,9 @@ void acott_Impr_tt(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1,
    else{
      otree->acotautau_helix_DPDP_rhoA1 = IPIP_rhoA1;
    }
+   
  }
-if(analysisTree->tau_decayMode[tauIndex1]==2 && analysisTree->tau_decayMode[tauIndex2]==2){
+if(otree->dmMVA_1==2 && otree->dmMVA_2==2){
    A1Pion1LV   = ChargedPivec(analysisTree,tauIndex1);
    A1Pion2LV    = ChargedPivec(analysisTree,tauIndex2);
    double  IPIP_A1A1 = AcoCP(A1Pion1LV,A1Pion2LV,tau1Pi0,tau2Pi0,firstNegative,true,true,otree);
@@ -234,6 +241,7 @@ if(analysisTree->tau_decayMode[tauIndex1]==2 && analysisTree->tau_decayMode[tauI
    else{
      otree->acotautau_helix_DPDP_A1A1 = IPIP_A1A1;
    }
+   cout<<"CP_A1A1  "<<otree->acotautau_helix_IPIP_pi40_A1A1<<endl;
  }
 if(analysisTree->tau_decayMode[tauIndex1]==0 && analysisTree->tau_decayMode[tauIndex2]==1){
   pion1LV = ChargedPivec(analysisTree,tauIndex1);
@@ -541,7 +549,10 @@ std::vector<float> Get_refitted_PVBS_cov(const AC1B * analysisTree, int firstInd
   float vtx_z = analysisTree->primvertex_z;
   is_refitted_PV_with_BS = false;
   std::vector<int> first_indices(2, -787);
-
+  for (int j = 0; j<6 ; ++j) {
+    PV_covariance.push_back(analysisTree->primvertex_cov[j]);
+    
+  }
   for(unsigned int i = 0; i < analysisTree->refitvertexwithbs_count; i++)
     {    
       if (ch == "mt")

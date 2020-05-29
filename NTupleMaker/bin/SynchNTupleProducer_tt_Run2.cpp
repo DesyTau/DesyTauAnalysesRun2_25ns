@@ -215,12 +215,12 @@ int main(int argc, char * argv[]){
     cout << "Quitting... " << endl;
     exit(-1);
   }
-  FakeFactor* ff = (FakeFactor*)ff_file->Get("ff_comb");
-  std::shared_ptr<RooWorkspace> ff_ws_;
-  std::map<std::string, std::shared_ptr<RooFunctor>> fns_;
-  ff_ws_ = std::shared_ptr<RooWorkspace>((RooWorkspace*)gDirectory->Get("w"));
-  fns_["ff_tt_medium_dmbins"] = std::shared_ptr<RooFunctor>(ff_ws_->function("ff_tt_medium_dmbins")->functor(ff_ws_->argSet("pt,dm,njets,pt_2,os,met_var_qcd")));
-  fns_["ff_tt_medium_mvadmbins"] = std::shared_ptr<RooFunctor>(ff_ws_->function("ff_tt_medium_mvadmbins")->functor(ff_ws_->argSet("pt,mvadm,njets,pt_2,os,met_var_qcd")));
+  // FakeFactor* ff = (FakeFactor*)ff_file->Get("ff_comb");
+  // std::shared_ptr<RooWorkspace> ff_ws_;
+  // std::map<std::string, std::shared_ptr<RooFunctor>> fns_;
+  // ff_ws_ = std::shared_ptr<RooWorkspace>((RooWorkspace*)gDirectory->Get("w"));
+  // fns_["ff_tt_medium_dmbins"] = std::shared_ptr<RooFunctor>(ff_ws_->function("ff_tt_medium_dmbins")->functor(ff_ws_->argSet("pt,dm,njets,pt_2,os,met_var_qcd")));
+  // fns_["ff_tt_medium_mvadmbins"] = std::shared_ptr<RooFunctor>(ff_ws_->function("ff_tt_medium_mvadmbins")->functor(ff_ws_->argSet("pt,mvadm,njets,pt_2,os,met_var_qcd")));
 
   // MET Recoil Corrections
   const bool isDY = infiles.find("DY") != string::npos;
@@ -521,12 +521,52 @@ int main(int argc, char * argv[]){
       otree->passedAllMetFilters = passed_all_metFilters;
       counter[1]++;
       if(applyTauSpinnerWeights){
+	for(int tsindex = 0; tsindex < expectedtauspinnerweights; tsindex++) 
+          TSweight[tsindex] = 1;
+
+	otree->TauSpinnerWeightsEven = TSweight[0];
+	gentree->sm_htt125 = TSweight[0];
+	gentreeForGoodRecoEvtsOnly->sm_htt125 = TSweight[0];
+
+	otree->TauSpinnerWeightsMaxMix = TSweight[1];
+	gentree->mm_htt125 = TSweight[1];
+	gentreeForGoodRecoEvtsOnly->mm_htt125 = TSweight[1];
+
+	otree->TauSpinnerWeightsOdd = TSweight[2];
+	gentree->ps_htt125 = TSweight[2];
+	gentreeForGoodRecoEvtsOnly->ps_htt125 = TSweight[2];
+
+	otree->TauSpinnerWeightsMinusMaxMix = TSweight[3];
+	gentree->minusmm_htt125 = TSweight[3];
+	gentreeForGoodRecoEvtsOnly->minusmm_htt125 = TSweight[3];
+
+	otree->TauSpinnerWeightsMix0p375 = TSweight[4];
+	gentree->mix0p375_htt125 = TSweight[4];
+	gentreeForGoodRecoEvtsOnly->mix0p375_htt125 = TSweight[4];
+      
+      }
+      else{
 	otree->TauSpinnerWeightsEven = analysisTree.TauSpinnerWeight[0];
-	
+	gentree->sm_htt125 = analysisTree.TauSpinnerWeight[0];
+	gentreeForGoodRecoEvtsOnly->sm_htt125 = analysisTree.TauSpinnerWeight[0];
+
 	otree->TauSpinnerWeightsMaxMix = analysisTree.TauSpinnerWeight[1];
-	
+	gentree->mm_htt125 = analysisTree.TauSpinnerWeight[1];
+	gentreeForGoodRecoEvtsOnly->mm_htt125 = analysisTree.TauSpinnerWeight[1];
+
 	otree->TauSpinnerWeightsOdd = analysisTree.TauSpinnerWeight[2];
-	
+	gentree->ps_htt125 = analysisTree.TauSpinnerWeight[2];
+	gentreeForGoodRecoEvtsOnly->ps_htt125 = analysisTree.TauSpinnerWeight[2];
+
+	if(analysisTree.TauSpinAngles_count>=5){
+	  otree->TauSpinnerWeightsMinusMaxMix = analysisTree.TauSpinnerWeight[3];
+	  gentree->minusmm_htt125 = analysisTree.TauSpinnerWeight[3];
+	  gentreeForGoodRecoEvtsOnly->minusmm_htt125 = analysisTree.TauSpinnerWeight[3];
+	    
+	  otree->TauSpinnerWeightsMix0p375 = analysisTree.TauSpinnerWeight[4];
+	  gentree->mix0p375_htt125 = analysisTree.TauSpinnerWeight[4];
+	  gentreeForGoodRecoEvtsOnly->mix0p375_htt125 = analysisTree.TauSpinnerWeight[4];
+	}
       }
       //cout<<"Tauspinor weight  "<<otree->TauSpinnerWeightsEven<<endl;
       vector<int> nDiTauTrig(filterDiTau.size(),-1);      
@@ -594,7 +634,7 @@ int main(int argc, char * argv[]){
 	//check<<endl<<"ok4.11"<<endl;
         taus.push_back(it);
       }
-      counter[3]++;
+      counter[2]++;
       //loop over pair of taus
       int tauIndex_1 = -1;
       int tauIndex_2 = -1;
@@ -612,6 +652,7 @@ int main(int argc, char * argv[]){
           float isoTau2 = analysisTree.tau_byDeepTau2017v2p1VSjetraw[tIndex2]; //by AN
 	  float tau_pt1 = analysisTree.tau_pt[tIndex1];
 	  float tau_pt2 = analysisTree.tau_pt[tIndex2];
+	  counter[3]++;
 	  //change pair
 	  bool changepair=false;
 	  if(isoTau1 < isoTauMin)
@@ -644,6 +685,7 @@ int main(int argc, char * argv[]){
       if(tauIndex_2<0)continue;
       //check<<endl<<"ok5"<<endl;
       counter[5]++;
+
       //////////////////////////////////////
       //Trigger Matching
       /////////////////////////////////////
@@ -724,32 +766,36 @@ int main(int argc, char * argv[]){
 
       if (ApplyPUweight) 
         otree->puweight = float(PUofficial->get_PUweight(double(analysisTree.numtruepileupinteractions)));
-      if(analysisTree.tau_genmatch[tauIndex_1] == 5){
+      if(!isData || isEmbedded){
+        otree->mcweight = analysisTree.genweight;
+        otree->gen_noutgoing = analysisTree.genparticles_noutgoing;
+      
+	if(analysisTree.tau_genmatch[tauIndex_1] == 5){
+	  w->var("t_dm")->setVal(analysisTree.tau_decayMode[tauIndex_1]);
+	  otree->idisoweight_1 = w->function("t_deeptauid_dm_medium")->getVal();
+	}
+	if(analysisTree.tau_genmatch[tauIndex_2] == 5){
+	  w->var("t_dm")->setVal(analysisTree.tau_decayMode[tauIndex_2]);
+	  otree->idisoweight_2 = w->function("t_deeptauid_dm_medium")->getVal();
+	}
+	TString suffix = "mc";
+	TString suffixRatio = "ratio";
+
+	w->var("t_pt")->setVal(analysisTree.tau_pt[tauIndex_1]);
+	w->var("t_eta")->setVal(analysisTree.tau_eta[tauIndex_1]);
+	w->var("t_phi")->setVal(analysisTree.tau_phi[tauIndex_1]);
 	w->var("t_dm")->setVal(analysisTree.tau_decayMode[tauIndex_1]);
-	otree->idisoweight_1 = w->function("t_deeptauid_dm_medium")->getVal();
-      }
-      if(analysisTree.tau_genmatch[tauIndex_2] == 5){
+	otree->trigweight_1 = w->function("t_trg_mediumDeepTau_ditau_"+suffixRatio)->getVal();
+	w->var("t_pt")->setVal(analysisTree.tau_pt[tauIndex_2]);
+	w->var("t_eta")->setVal(analysisTree.tau_eta[tauIndex_2]);
+	w->var("t_phi")->setVal(analysisTree.tau_phi[tauIndex_2]);
 	w->var("t_dm")->setVal(analysisTree.tau_decayMode[tauIndex_2]);
-	otree->idisoweight_2 = w->function("t_deeptauid_dm_medium")->getVal();
+	otree->trigweight_2 = w->function("t_trg_mediumDeepTau_ditau_"+suffixRatio)->getVal();
+
+     
+	otree->effweight = otree->idisoweight_1 * otree->idisoweight_2 * otree->trigweight_1 * otree->trigweight_2;
+	otree->weight = otree->effweight * otree->puweight * otree->mcweight; 
       }
-      TString suffix = "mc";
-      TString suffixRatio = "ratio";
-
-      w->var("t_pt")->setVal(analysisTree.tau_pt[tauIndex_1]);
-      w->var("t_eta")->setVal(analysisTree.tau_eta[tauIndex_1]);
-      w->var("t_phi")->setVal(analysisTree.tau_phi[tauIndex_1]);
-      w->var("t_dm")->setVal(analysisTree.tau_decayMode[tauIndex_1]);
-      otree->trigweight_1 = w->function("t_trg_mediumDeepTau_ditau_"+suffixRatio)->getVal();
-      w->var("t_pt")->setVal(analysisTree.tau_pt[tauIndex_2]);
-      w->var("t_eta")->setVal(analysisTree.tau_eta[tauIndex_2]);
-      w->var("t_phi")->setVal(analysisTree.tau_phi[tauIndex_2]);
-      w->var("t_dm")->setVal(analysisTree.tau_decayMode[tauIndex_2]);
-      otree->trigweight_2 = w->function("t_trg_mediumDeepTau_ditau_"+suffixRatio)->getVal();
-
-      otree->mcweight = analysisTree.genweight;
-      otree->effweight = otree->idisoweight_1 * otree->idisoweight_2 * otree->trigweight_1 * otree->trigweight_2;
-      otree->weight = otree->effweight * otree->puweight * otree->mcweight; 
-
       //Theory uncertainties for CP analysis
       
       // otree->weight_CMS_scale_gg_13TeVUp   = analysisTree.weightScale4;
@@ -820,8 +866,13 @@ int main(int argc, char * argv[]){
       puppimetLV.SetXYZT(otree->puppimet*TMath::Cos(otree->puppimetphi), otree->puppimet*TMath::Sin(otree->puppimetphi), 0,
 			 TMath::Sqrt( otree->puppimet*TMath::Sin(otree->puppimetphi)*otree->puppimet*TMath::Sin(otree->puppimetphi) +
 				      otree->puppimet*TMath::Cos(otree->puppimetphi)*otree->puppimet*TMath::Cos(otree->puppimetphi)));
-    
       counter[9]++;
+
+
+      //extra lepton veto
+      otree->extraelec_veto = extra_electron_veto(tauIndex_1,"tt", &cfg, &analysisTree);
+      otree->extramuon_veto = extra_muon_veto(tauIndex_1, "tt", &cfg, &analysisTree, isData);
+    
       /////////////////////////////////////////
       //Di-Tau System
       ////////////////////////////////////////
@@ -838,6 +889,13 @@ int main(int argc, char * argv[]){
       otree->m_vis = dileptonLV.M();
       otree->Prompt_pT = dileptonLV.Pt();
       otree->pt_tt = (dileptonLV+metLV).Pt();   
+      
+      
+      TVector3 tau1_vec = tauLV1.Vect();
+      TVector3 met_vec = puppimetLV.Vect();
+      double deltaPhi = tau1_vec.Dot(met_vec)/(tau1_vec.Mag()*met_vec.Mag());
+      otree->met_var_qcd = otree->puppimet*TMath::Cos(deltaPhi)/tauLV1.Pt();
+    
       if (usePuppiMET)
 	otree->pt_tt = (dileptonLV+puppimetLV).Pt();
       
