@@ -1163,8 +1163,11 @@ int main(int argc, char * argv[]){
 	otree->trg_etaucross_tau = isXTrigTau;
 	otree->trg_etaucross = isXTrig;        
 	if (triggerEmbed2017) {
-	  if (lep_pt<ptTriggerEmbed2017&&fabs(lep_eta)>etaTriggerEmbed2017) 
+	  if (lep_pt<ptTriggerEmbed2017&&fabs(lep_eta)>etaTriggerEmbed2017) {
 	    otree->trg_singleelectron = true;
+	    otree->trg_etaucross_e = true;
+	    otree->trg_etaucross = otree->trg_etaucross_tau;
+	  }
 	}
 	otree->singleLepTrigger = otree->trg_singleelectron;
       } 
@@ -1354,8 +1357,10 @@ int main(int argc, char * argv[]){
 	    eff_data_trig_lt_tauDown = w->function("t_trg_ic_deeptau_medium_mvadm_etau_data_mvadm"+mvadm+"_down")->getVal();
 	    eff_mc_trig_lt_tauDown = w->function("t_trg_ic_deeptau_medium_mvadm_etau_" + suffix + "_mvadm"+mvadm+"_down")->getVal();
 	    if (triggerEmbed2017) {
-	      if (leptonLV.Pt()<ptTriggerEmbed2017&&fabs(leptonLV.Eta())>etaTriggerEmbed2017) 
+	      if (leptonLV.Pt()<ptTriggerEmbed2017&&fabs(leptonLV.Eta())>etaTriggerEmbed2017) {
 		eff_mc_trig_L = 1.0;
+		eff_mc_trig_lt_l = 1.0;
+	      }
 	    }
 	  }
 	  else {
@@ -1386,7 +1391,8 @@ int main(int argc, char * argv[]){
 	  otree->trigweight_2 = eff_data_trig_lt_l*eff_data_trig_lt_tau;
 
 	/*
-	if (leptonLV.Pt()>28.&&leptonLV.Eta()>1.6) {
+	if (leptonLV.Pt()>26.&&leptonLV.Pt()<30.&&fabs(leptonLV.Eta())>1.65
+	    &&otree->trg_etaucross_e) {
 	  
 	  std::cout << "run : " << otree->run << "    event : " << otree->evt << std::endl;
 	  std::cout << "trg_singleelectron : " << otree->trg_singleelectron << std::endl;
