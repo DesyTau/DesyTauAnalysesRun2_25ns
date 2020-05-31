@@ -365,6 +365,13 @@ int main(int argc, char * argv[]){
   // correction workspace
   const string CorrectionWorkspaceFileName = cfg.get<string>("CorrectionWorkspaceFileName");
 
+  bool triggerEmbed2017 = false;
+  float ptTriggerEmbed2017 = 40;
+  float etaTriggerEmbed2017 = 1.479;
+
+  if (era==2017&&isEmbedded)
+    triggerEmbed2017 = true;
+
   // **** end of configuration analysis
 
   //file list creation
@@ -885,9 +892,12 @@ int main(int argc, char * argv[]){
 
       // embedded weight
       otree->embweight = 1;
-      if (isEmbedded)
+      if (isEmbedded) {
       	otree->embweight = getEmbeddedWeight(&analysisTree, w);
-    
+	if (otree->embweight>10.0)
+	  cout << "warning : embedding weight = " << otree->embweight << endl;
+      }
+
       // tau selection
       vector<int> taus; taus.clear();
       for (unsigned int it = 0; it < analysisTree.tau_count; ++it) { 
@@ -1144,15 +1154,20 @@ int main(int argc, char * argv[]){
         otree->trg_mutaucross_mu = isXTrigLep;
         otree->trg_mutaucross_tau = isXTrigTau;
         otree->trg_mutaucross = isXTrig;        
+	otree->singleLepTrigger = otree->trg_singlemuon;
       }
       if (ch == "et")
       {  
-       otree->trg_singleelectron = isSingleLepTrig;
-       otree->trg_etaucross_e = isXTrigLep;
-       otree->trg_etaucross_tau = isXTrigTau;
-       otree->trg_etaucross = isXTrig;        
+	otree->trg_singleelectron = isSingleLepTrig;
+	otree->trg_etaucross_e = isXTrigLep;
+	otree->trg_etaucross_tau = isXTrigTau;
+	otree->trg_etaucross = isXTrig;        
+	if (triggerEmbed2017) {
+	  if (lep_pt<ptTriggerEmbed2017&&fabs(lep_eta)>etaTriggerEmbed2017) 
+	    otree->trg_singleelectron = true;
+	}
+	otree->singleLepTrigger = otree->trg_singleelectron;
       } 
-    
       /*
       cout << "xtrig_lep = " << isXTrigLep << "  xtrig_tau = " << isXTrigTau << endl;
       cout << "lep pt = " << lep_pt << "  eta = " << lep_eta << endl;
@@ -1280,9 +1295,9 @@ int main(int argc, char * argv[]){
       if(!isData || isEmbedded){
         otree->mcweight = analysisTree.genweight;
         otree->gen_noutgoing = analysisTree.genparticles_noutgoing;
+	if (isEmbedded&&otree->mcweight>1.0)
+	  otree->mcweight = 0.0;
       }
-
-      //cout <<"Trig SF" <<endl;
 
       if ((!isData || isEmbedded) && ApplyLepSF) {
       	TString suffix = "mc";
@@ -1338,6 +1353,10 @@ int main(int argc, char * argv[]){
 	    eff_mc_trig_lt_tauUp = w->function("t_trg_ic_deeptau_medium_mvadm_etau_" + suffix + "_mvadm"+mvadm+"_up")->getVal();
 	    eff_data_trig_lt_tauDown = w->function("t_trg_ic_deeptau_medium_mvadm_etau_data_mvadm"+mvadm+"_down")->getVal();
 	    eff_mc_trig_lt_tauDown = w->function("t_trg_ic_deeptau_medium_mvadm_etau_" + suffix + "_mvadm"+mvadm+"_down")->getVal();
+	    if (triggerEmbed2017) {
+	      if (leptonLV.Pt()<ptTriggerEmbed2017&&fabs(leptonLV.Eta())>etaTriggerEmbed2017) 
+		eff_mc_trig_L = 1.0;
+	    }
 	  }
 	  else {
 	    eff_data_trig_lt_tau = 0;
@@ -1356,18 +1375,39 @@ int main(int argc, char * argv[]){
 	otree->trigweight_1 = 1;
 	otree->trigweight_2 = 1;
 
-	if (eff_mc_trig_L>0.1)
-	  otree->trigweight_1 = eff_data_trig_L/eff_mc_trig_L;
-	if (eff_mc_trig_lt_l>0.1&&eff_mc_trig_lt_tau>0.1) 
-	  otree->trigweight_2 = (eff_data_trig_lt_l*eff_data_trig_lt_tau)/(eff_mc_trig_lt_l*eff_mc_trig_lt_tau);
+	//	if (eff_mc_trig_L>0.1)
+	otree->trigweight_1 = eff_data_trig_L/eff_mc_trig_L;
+	//	if (eff_mc_trig_lt_l>0.1&&eff_mc_trig_lt_tau>0.1) 
+	otree->trigweight_2 = (eff_data_trig_lt_l*eff_data_trig_lt_tau)/(eff_mc_trig_lt_l*eff_mc_trig_lt_tau);
 	
-	//	if (leptonLV.Pt()>28.) {
-	//	  std::cout << "electron pt = " << leptonLV.Pt() << "   eta = " << leptonLV.Eta() << std::endl;
-	//	  std::cout << "eff(trig_L,Data) = " << eff_data_trig_L 
-	//		    << "    eff(trig_L,MC) = " << eff_mc_trig_L << std::endl;
-	//	  std::cout << "SF(trig_L) = " << otree->trigweight_1 << std::endl;
-	//	  std::cout << std::endl;
-	//	}
+	if (std::isnan(otree->trigweight_1))
+	  otree->trigweight_1 = eff_data_trig_L;
+	if (std::isnan(otree->trigweight_2))
+	  otree->trigweight_2 = eff_data_trig_lt_l*eff_data_trig_lt_tau;
+
+	/*
+	if (leptonLV.Pt()>28.&&leptonLV.Eta()>1.6) {
+	  
+	  std::cout << "run : " << otree->run << "    event : " << otree->evt << std::endl;
+	  std::cout << "trg_singleelectron : " << otree->trg_singleelectron << std::endl;
+	  std::cout << "trg_etaucross_e    : " << otree->trg_etaucross_e << endl;
+	  std::cout << "trg_etaucross_tau  : " << otree->trg_etaucross_tau << endl;
+	  std::cout << "electron pt = " << leptonLV.Pt() << "   eta = " << leptonLV.Eta() << std::endl;
+	  std::cout << "eff(trig_L,Data) = " << eff_data_trig_L 
+		    << "    eff(trig_L,MC) = " << eff_mc_trig_L << std::endl;
+	  std::cout << "eff(Data)/Eff(MC) = " << otree->trigweight_1 << std::endl;
+	  std::cout << "eff(trig_l,Data) = " << eff_data_trig_lt_l 
+		    << "    eff(trig_l,MC) = " << eff_mc_trig_lt_l << std::endl;
+
+	  std::cout << "eff(trig_t,Data) = " << eff_data_trig_lt_tau 
+		    << "    eff(trig_t,MC) = " << eff_mc_trig_lt_tau << std::endl;
+	  if (isEmbedded)
+	    std::cout << "SF(trig_L) = " << w->function("e_trg_ic_embed_ratio")->getVal();
+	  else
+	    std::cout << "SF(trig_L) = " << w->function("e_trg_ic_ratio")->getVal();
+	  std::cout << std::endl;
+	}
+	*/
 
 	double eff_data_trig = eff_data_trig_L + (eff_data_trig_lt_l - eff_data_trig_L) * eff_data_trig_lt_tau;
 	double eff_mc_trig = eff_mc_trig_L + (eff_mc_trig_lt_l - eff_mc_trig_L) * eff_mc_trig_lt_tau;                                                            
@@ -1970,7 +2010,7 @@ int main(int argc, char * argv[]){
       TVector3 IP2_bs;
       double ipsig2_bs = IP_significance_helix_tauh(&analysisTree,tauIndex,vertex_bs,PVBS_covariance,ipCov2_bs,IP2_bs);
 
-      /*      
+      /*
       cout << "ipsig1 = " << ipsig1 << " ipsig2 = " << ipsig2 << endl;
       cout << "IP1  : x = " << IP1.x() 
 	   << "  y = " << IP1.y() 
@@ -1985,7 +2025,7 @@ int main(int argc, char * argv[]){
       cout << "       x = " << otree->ipx_uncorr_2 
 	   << "  y = " << otree->ipy_uncorr_2 
 	   << "  z = " << otree->ipz_uncorr_2 << std::endl;
-      */   
+      */
       // Uncorrected values
 
       TLorentzVector ip1; ip1.SetXYZM(otree->ipx_uncorr_1,otree->ipy_uncorr_1,otree->ipz_uncorr_1,0.);
@@ -2361,7 +2401,6 @@ float getEmbeddedWeight(const AC1B *analysisTree, RooWorkspace * wEm) {
     emWeight = id1_embed * id2_embed * trg_emb;
   }
 
-  //  cout << "Embedding : " << emWeight << std::endl;
   return emWeight;
 
 }
