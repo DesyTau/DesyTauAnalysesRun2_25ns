@@ -36,9 +36,9 @@ public:
     this->ScaleDown();
   };
 
-  virtual void Write(){
+  virtual void Write(const char *name="", Int_t option=0){
     for (std::map<std::string,TTree*>::iterator it=outTree.begin(); it!=outTree.end(); ++it)
-      it->second->Write();
+      it->second->Write(name,option);
   };
 
 void SetAC1B(const AC1B * tree){ 

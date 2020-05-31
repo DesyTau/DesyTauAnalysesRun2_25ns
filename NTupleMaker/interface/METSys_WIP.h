@@ -30,9 +30,9 @@ class METSys : public Systematics {
   };
 
 
-  virtual void Write(){
+  virtual void Write(const char *name="", Int_t option=0){
     for (std::map<std::string,TTree*>::iterator it=outTree.begin(); it!=outTree.end(); ++it)
-      it->second->Write();
+      it->second->Write(name,option);
   };
   
   void SetSvFitVisPtResolution(TFile* f){

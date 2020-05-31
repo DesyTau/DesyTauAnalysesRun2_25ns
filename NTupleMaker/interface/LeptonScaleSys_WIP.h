@@ -44,9 +44,9 @@ public:
     this->ScaleDown(ch);
   };
 
-  virtual void Write(){
+  virtual void Write(const char *name="", Int_t option=0){
     for (std::map<std::string,TTree*>::iterator it=outTree.begin(); it!=outTree.end(); ++it)
-      it->second->Write();
+      it->second->Write(name,option);
   };
 
   void SetLabel(TString l){

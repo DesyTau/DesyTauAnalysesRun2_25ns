@@ -2254,72 +2254,72 @@ int main(int argc, char * argv[]){
   // delete systematics objects
 
   if(tauScaleSys != 0){
-    tauScaleSys->Write();
+    tauScaleSys->Write("",TObject::kOverwrite);
     delete tauScaleSys;
   }
 
   if (muonScaleSys != 0) {
-    muonScaleSys->Write();
+    muonScaleSys->Write("",TObject::kOverwrite);
     delete muonScaleSys;
   }
 
   if(tauOneProngScaleSys != 0){
-    tauOneProngScaleSys->Write();
+    tauOneProngScaleSys->Write("",TObject::kOverwrite);
     delete tauOneProngScaleSys;
   }
 
   if(tauOneProngOnePi0ScaleSys != 0){
-    tauOneProngOnePi0ScaleSys->Write();
+    tauOneProngOnePi0ScaleSys->Write("",TObject::kOverwrite);
     delete tauOneProngOnePi0ScaleSys;
   }
 
   if(tauThreeProngScaleSys != 0){
-    tauThreeProngScaleSys->Write();
+    tauThreeProngScaleSys->Write("",TObject::kOverwrite);
     delete tauThreeProngScaleSys;
   }
 
   if(tauThreeProngOnePi0ScaleSys != 0){
-    tauThreeProngOnePi0ScaleSys->Write();
+    tauThreeProngOnePi0ScaleSys->Write("",TObject::kOverwrite);
     delete tauThreeProngOnePi0ScaleSys;
   }
 
   if(lepTauFakeOneProngScaleSys != 0){
-    lepTauFakeOneProngScaleSys->Write();
+    lepTauFakeOneProngScaleSys->Write("",TObject::kOverwrite);
     delete lepTauFakeOneProngScaleSys;
   }
 
   if(lepTauFakeOneProngOnePi0ScaleSys != 0){
-    lepTauFakeOneProngOnePi0ScaleSys->Write();
+    lepTauFakeOneProngOnePi0ScaleSys->Write("",TObject::kOverwrite);
     delete lepTauFakeOneProngOnePi0ScaleSys;
   }
 
   if(lepTauFakeThreeProngScaleSys != 0){
-    lepTauFakeThreeProngScaleSys->Write();
+    lepTauFakeThreeProngScaleSys->Write("",TObject::kOverwrite);
     delete lepTauFakeThreeProngScaleSys;
   }
 
   if (btagSys != 0) {
-    btagSys->Write();
+    btagSys->Write("",TObject::kOverwrite);
     delete btagSys;
   }
 
   if(jetEnergyScaleSys.size() > 0){
     for (unsigned int i = 0; i < jetEnergyScaleSys.size(); i++){
-      (jetEnergyScaleSys.at(i))->Write();
+      (jetEnergyScaleSys.at(i))->Write("",TObject::kOverwrite);
       delete jetEnergyScaleSys.at(i);
     }
   }
 
   if (metSys.size() > 0){
     for (unsigned int i = 0; i < metSys.size(); i++ ) {
-      (metSys.at(i))->Write();
+      (metSys.at(i))->Write("",TObject::kOverwrite);
       delete metSys.at(i);
     }
   }
 
   if (puppiMetSys.size() > 0){
     for (unsigned int i = 0; i < puppiMetSys.size(); i++ ) {
-      (puppiMetSys.at(i))->Write();
+      (puppiMetSys.at(i))->Write("",TObject::kOverwrite);
       delete puppiMetSys.at(i);
     }
   }

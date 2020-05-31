@@ -19,7 +19,7 @@ public:
   virtual ~Systematics(){};
   
   virtual void Eval(utils::channel ch = utils::UNKNOWN) = 0;
-  virtual void Write() = 0;
+  virtual void Write(const char *name="", Int_t option=0) = 0;
 protected:
   virtual void Init(Synch17Tree*) = 0;
   
