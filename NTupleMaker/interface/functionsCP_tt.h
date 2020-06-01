@@ -201,9 +201,10 @@ void acott_Impr_tt(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1,
     A1Pion1LV = ChargedPivec(analysisTree,tauIndex2);
     double IPDP_pionA1 = AcoCP(pion1LV,A1Pion1LV,tau1IP_helix,tau2Pi0,firstNegative,false,true,otree);
     if(A1Pion1LV.Pt() > 35){
-      if(ip_sig_tau2>1.5)
+      if(ip_sig_tau1>1.5 && ip_sig_tau2>1.5)
 	otree->acotautau_helix_IPIP_pi40_pionA1 = AcoCP(pion1LV,A1Pion1LV,tau1IP_helix,tau2IP_helix,firstNegative,false,false,otree);
-      otree->acotautau_helix_IPIP_pi40_pvBS_pionA1 = AcoCP(pion1LV,A1Pion1LV,tau1IP_helix,tau2IP_sv,firstNegative,false,false,otree);
+      if(ip_sig_tau1>1.5)
+	otree->acotautau_helix_IPIP_pi40_pvBS_pionA1 = AcoCP(pion1LV,A1Pion1LV,tau1IP_helix,tau2IP_sv,firstNegative,false,false,otree);
     }
     else{
       otree->acotautau_helix_IPDP_pionA1 = IPDP_pionA1;
@@ -215,9 +216,10 @@ void acott_Impr_tt(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1,
     A1Pion1LV = ChargedPivec(analysisTree,tauIndex1);
     double IPDP_pionA1 = AcoCP(pion1LV,A1Pion1LV,tau1Pi0,tau2IP_helix,firstNegative,true,false,otree);
     if(A1Pion1LV.Pt() > 35){
-      if(ip_sig_tau1 > 1.5)
+      if(ip_sig_tau1 > 1.5 && ip_sig_tau2>1.5)
 	otree->acotautau_helix_IPIP_pi40_pionA1 = AcoCP(pion1LV,A1Pion1LV,tau1IP_helix,tau2IP_helix,firstNegative,false,false,otree);
-      otree->acotautau_helix_IPIP_pi40_pvBS_pionA1 = AcoCP(pion1LV,A1Pion1LV,tau1IP_sv,tau2IP_helix,firstNegative,false,false,otree);
+      if(ip_sig_tau2>1.5)
+	otree->acotautau_helix_IPIP_pi40_pvBS_pionA1 = AcoCP(pion1LV,A1Pion1LV,tau1IP_sv,tau2IP_helix,firstNegative,false,false,otree);
     }
     else{
       otree->acotautau_helix_IPDP_pionA1 = IPDP_pionA1;
