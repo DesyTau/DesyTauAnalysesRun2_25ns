@@ -165,6 +165,7 @@ int main(int argc, char * argv[]){
   const bool ApplyMetFilters  = cfg.get<bool>("ApplyMetFilters");
   const bool usePuppiMET      = cfg.get<bool>("UsePuppiMET");
   const bool ApplyIpCorrection = cfg.get<bool>("ApplyIpCorrection");
+  const bool ApplyBTagCP5Correction = cfg.get<bool>("ApplyBTagCP5Correction");
 
   // JER
   //  const string jer_resolution = cfg.get<string>("JER_Resolution");
@@ -245,18 +246,33 @@ int main(int argc, char * argv[]){
     exit(-1);
   }
   
+  TString pathToTaggingEfficiencies_nonCP5 = (TString) cmsswBase + "/src/" + cfg.get<string>("BtagMCeffFile_nonCP5");
+  if (ApplyBTagScaling && ApplyBTagCP5Correction && gSystem->AccessPathName(pathToTaggingEfficiencies_nonCP5)){
+    cout<<pathToTaggingEfficiencies_nonCP5<<" not found. Please check."<<endl;
+    exit(-1);
+  }
+  
   TFile *fileTagging  = new TFile(pathToTaggingEfficiencies);
+  TFile *fileTagging_nonCP5  = new TFile(pathToTaggingEfficiencies_nonCP5);
   TH2F  *tagEff_B     = 0;
   TH2F  *tagEff_C     = 0;
   TH2F  *tagEff_Light = 0;
-  
+  TH2F  *tagEff_B_nonCP5     = 0;
+  TH2F  *tagEff_C_nonCP5     = 0;
+  TH2F  *tagEff_Light_nonCP5 = 0;
+  TRandom3 *rand = new TRandom3();
+
   if(ApplyBTagScaling){
     tagEff_B     = (TH2F*)fileTagging->Get("btag_eff_b");
     tagEff_C     = (TH2F*)fileTagging->Get("btag_eff_c");
     tagEff_Light = (TH2F*)fileTagging->Get("btag_eff_oth");
-  }
-  TRandom3 *rand = new TRandom3();
-  const struct btag_scaling_inputs inputs_btag_scaling_medium = {reader_B, reader_C, reader_Light, tagEff_B, tagEff_C, tagEff_Light, rand};
+    if (ApplyBTagCP5Correction) {
+      tagEff_B_nonCP5     = (TH2F*)fileTagging_nonCP5->Get("btag_eff_b");
+      tagEff_C_nonCP5     = (TH2F*)fileTagging_nonCP5->Get("btag_eff_c");
+      tagEff_Light_nonCP5 = (TH2F*)fileTagging_nonCP5->Get("btag_eff_oth");
+    }
+  }  
+  const struct btag_scaling_inputs inputs_btag_scaling_medium = {reader_B, reader_C, reader_Light, tagEff_B, tagEff_C, tagEff_Light, tagEff_B_nonCP5, tagEff_C_nonCP5, tagEff_Light_nonCP5, rand};
 
   TFile * ff_file = TFile::Open(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/fakefactors_ws_"+TString(year)+".root");
   if (ff_file->IsZombie()) {

@@ -18,6 +18,9 @@ struct btag_scaling_inputs{
   TH2F *tagEff_B;
   TH2F *tagEff_C;
   TH2F *tagEff_Light;
+  TH2F *tagEff_B_nonCP5;
+  TH2F *tagEff_C_nonCP5;
+  TH2F *tagEff_Light_nonCP5;
   TRandom3 *rand;
 };
 
@@ -239,9 +242,11 @@ namespace jets{
    float ptSubLeadingBJet = -1;
    
    TH2F* histo_tageff_ = 0;
-   
+   TH2F* histo_tageff_nonCP5_ = 0;
+
    bool isData = cfg->get<bool>("isData");
    bool ApplyBTagScaling = cfg->get<bool>("ApplyBTagScaling");
+   bool ApplyBTagCP5Correction = cfg->get<bool>("ApplyBTagCP5Correction");
    
    bool is2017 = false;
    int era = cfg->get<int>("era");
@@ -353,7 +358,8 @@ namespace jets{
 	 double jet_scalefactor = 1;
 	 double JetPtForBTag    = jetPt;
 	 double tageff          = 1;
-	 
+   double tageff_nonCP5   = 1;
+
 	 if (JetPtForBTag > MaxBJetPt) JetPtForBTag = MaxBJetPt - 0.1;
 	 if (JetPtForBTag < MinBJetPt) JetPtForBTag = MinBJetPt + 0.1;
 	 
@@ -384,6 +390,21 @@ namespace jets{
 	 inputs_btag_scaling->rand->SetSeed((int)((jetEta+5)*100000));
 	 double rannum = inputs_btag_scaling->rand->Rndm();
 	 
+   // correction for CP5 samples: can't use non-CP5 derived SFs, so take the old ones and correct them with non-CP5/CP5 eff ratio
+   if (ApplyBTagScaling && ApplyBTagCP5Correction) {     
+     if (flavor == 5) {
+       histo_tageff_nonCP5_ = inputs_btag_scaling->tagEff_B_nonCP5;
+     } else if (flavor == 4) {
+       histo_tageff_nonCP5_ = inputs_btag_scaling->tagEff_C_nonCP5;
+     } else {
+       histo_tageff_nonCP5_ = inputs_btag_scaling->tagEff_Light_nonCP5;
+     }
+     tageff_nonCP5 = histo_tageff_nonCP5_->Interpolate(JetPtForBTag, absJetEta);
+     if (tageff_nonCP5 < 1e-5)      tageff_nonCP5 = 1e-5;
+     if (tageff_nonCP5 > 0.99999)   tageff_nonCP5 = 0.99999;
+     jet_scalefactor *= tageff_nonCP5 / tageff; // tageff is assumed to be a CP5 derived efficiency
+   }
+   
 	 // promote-demote method
 	 if (jet_scalefactor < 1 && tagged)  { // downgrade - demote
 	   if (rannum < 1 - jet_scalefactor)  
