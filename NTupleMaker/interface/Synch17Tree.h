@@ -1,3 +1,4 @@
+
 /////////////////////////////////////////////////////////////
 // Read and Write Synch Ntuple for CP measurement in h->tau tau
 // Author: Andrea Cardini <andrea.cardini@desy.de>
@@ -377,7 +378,7 @@ public :
   Float_t         metcov11;
   Float_t         pzetavis;
   Float_t         pzetamiss;
-
+  Double_t        met_var_qcd;
   //PUPPI MET
   Float_t         puppimet;
   Float_t         puppimetphi;  
@@ -505,13 +506,21 @@ public :
   Float_t         acotautau_helix_uncorr_11;
 
   Float_t         acotautau_helix_IPIP_pi40_pionA1;
-  Float_t         acotautau_helix_DPIP_pi40_rhoA1;
-  Float_t         acotautau_helix_IPDP_pi40_A1A1;
+  Float_t         acotautau_helix_IPIP_pi40_pvBS_pionA1;
   Float_t         acotautau_helix_IPDP_pionA1;
+
+  Float_t         acotautau_helix_DPIP_pi40_rhoA1;
+  Float_t         acotautau_helix_DPIP_pi40_pvBS_rhoA1;
   Float_t         acotautau_helix_DPDP_rhoA1;
-  Float_t         acotautau_helix_DPDP_A1A1;
+
+  Float_t         acotautau_helix_IPDP_pi40_A1A1;
+  Float_t         acotautau_helix_DPIP_pi40_A1A1;
   Float_t         acotautau_helix_IPIP_pi40_A1A1;
-  Float_t         acotautau_helix_IPIP_pi40_rhoA1;
+  Float_t         acotautau_helix_DPDP_A1A1;
+
+  Float_t         acotautau_helix_IPDP_pi40_pvBS_A1A1;
+  Float_t         acotautau_helix_DPIP_pi40_pvBS_A1A1;
+  Float_t         acotautau_helix_IPIP_pi40_pvBS_A1A1;
 
   Float_t         acotautau_helix_IPIP_pi40_pionRho;
   Float_t         acotautau_helix_IPDP_pionRho;
@@ -968,7 +977,7 @@ public :
   TBranch	 *b_metcov11;
   TBranch	 *b_pzetavis;
   TBranch	 *b_pzetamiss;
-
+  TBranch        *b_met_var_qcd;
   //PUPPI MET
   TBranch	 *b_puppimet;
   TBranch	 *b_puppimetphi;
@@ -1071,14 +1080,23 @@ public :
   TBranch        *b_acotautau_helix_11;
 
   TBranch        *b_acotautau_helix_IPIP_pi40_pionA1;
+  TBranch        *b_acotautau_helix_IPIP_pi40_pvBS_pionA1;
   TBranch        *b_acotautau_helix_IPDP_pionA1;
+
   TBranch        *b_acotautau_helix_DPIP_pi40_rhoA1;
+  TBranch        *b_acotautau_helix_DPIP_pi40_pvBS_rhoA1;
   TBranch        *b_acotautau_helix_DPDP_rhoA1;
+
   TBranch        *b_acotautau_helix_IPIP_pi40_A1A1;
-  TBranch        *b_acotautau_helix_PDP_pi40_A1A1;
-  TBranch        *b_acotautau_helix_DPDP_A1A1;
   TBranch        *b_acotautau_helix_IPDP_pi40_A1A1;
-  TBranch        *b_acotautau_helix_IPIP_pi40_rhoA1;
+  TBranch        *b_acotautau_helix_DPIP_pi40_A1A1;
+  TBranch        *b_acotautau_helix_DPDP_A1A1;
+
+  TBranch        *b_acotautau_helix_IPIP_pi40_pvBS_A1A1;
+  TBranch        *b_acotautau_helix_IPDP_pi40_pvBS_A1A1;
+  TBranch        *b_acotautau_helix_DPIP_pi40_pvBS_A1A1;
+  
+
   TBranch        *b_acotautau_helix_IPIP_pi40_pionRho;
   TBranch        *b_acotautau_helix_IPDP_pionRho;
   TBranch        *b_acotautau_helix_IPIP_pi40_RhoRho;

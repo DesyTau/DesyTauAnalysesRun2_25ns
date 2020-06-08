@@ -199,7 +199,7 @@ void acott_Impr_tt(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1,
 
     pion1LV   = ChargedPivec(analysisTree,tauIndex1);
     A1Pion1LV = ChargedPivec(analysisTree,tauIndex2);
-    double IPDP_pionA1 = AcoCP(pion1LV,A1Pion1LV,tau1IP_helix,tau2Pi0,firstNegative,false,true,otree);
+    double IPDP_pionA1 =  otree->acotautau_01;//AcoCP(pion1LV,A1Pion1LV,tau1IP_helix,tau2Pi0,firstNegative,false,true,otree);
     if(A1Pion1LV.Pt() > 35){
       if(ip_sig_tau1>1.5 && ip_sig_tau2>1.5)
 	otree->acotautau_helix_IPIP_pi40_pionA1 = AcoCP(pion1LV,A1Pion1LV,tau1IP_helix,tau2IP_helix,firstNegative,false,false,otree);
@@ -214,15 +214,15 @@ void acott_Impr_tt(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1,
  if(otree->dmMVA_1==2 && otree->dmMVA_2==0){
     pion1LV   = ChargedPivec(analysisTree,tauIndex2);
     A1Pion1LV = ChargedPivec(analysisTree,tauIndex1);
-    double IPDP_pionA1 = AcoCP(pion1LV,A1Pion1LV,tau1Pi0,tau2IP_helix,firstNegative,true,false,otree);
+    double DPIP_pionA1 =  otree->acotautau_10;//AcoCP(pion1LV,A1Pion1LV,tau1Pi0,tau2IP_helix,firstNegative,true,false,otree);
     if(A1Pion1LV.Pt() > 35){
       if(ip_sig_tau1 > 1.5 && ip_sig_tau2>1.5)
-	otree->acotautau_helix_IPIP_pi40_pionA1 = AcoCP(pion1LV,A1Pion1LV,tau1IP_helix,tau2IP_helix,firstNegative,false,false,otree);
+ 	otree->acotautau_helix_IPIP_pi40_pionA1 = AcoCP(A1Pion1LV,pion1LV,tau1IP_helix,tau2IP_helix,firstNegative,false,false,otree);
       if(ip_sig_tau2>1.5)
-	otree->acotautau_helix_IPIP_pi40_pvBS_pionA1 = AcoCP(pion1LV,A1Pion1LV,tau1IP_sv,tau2IP_helix,firstNegative,false,false,otree);
+ 	otree->acotautau_helix_IPIP_pi40_pvBS_pionA1 = AcoCP(A1Pion1LV,pion1LV,tau1IP_sv,tau2IP_helix,firstNegative,false,false,otree);
     }
     else{
-      otree->acotautau_helix_IPDP_pionA1 = IPDP_pionA1;
+      otree->acotautau_helix_IPDP_pionA1 = DPIP_pionA1;
     }
  }
  if(otree->dmMVA_1==1 && otree->dmMVA_2==2){
@@ -245,8 +245,8 @@ void acott_Impr_tt(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1,
    double DPDP_rhoA1 = AcoCP(RhoPion1LV,A1Pion1LV,tau1Pi0,tau2Pi0,firstNegative,true,true,otree);
    if(A1Pion1LV.Pt() > 35){
      if(ip_sig_tau1>1.5)
-       otree->acotautau_helix_DPIP_pi40_rhoA1 = AcoCP(RhoPion1LV,A1Pion1LV,tau1IP_helix,tau2Pi0,firstNegative,false,true,otree);
-     otree->acotautau_helix_DPIP_pi40_pvBS_rhoA1 = AcoCP(RhoPion1LV,A1Pion1LV,tau1IP_sv,tau2Pi0,firstNegative,false,true,otree);
+       otree->acotautau_helix_DPIP_pi40_rhoA1 = AcoCP(A1Pion1LV,RhoPion1LV,tau1IP_helix,tau2Pi0,firstNegative,false,true,otree);
+     otree->acotautau_helix_DPIP_pi40_pvBS_rhoA1 = AcoCP(A1Pion1LV,RhoPion1LV,tau1IP_sv,tau2Pi0,firstNegative,false,true,otree);
    }
    else{
      otree->acotautau_helix_DPDP_rhoA1 = DPDP_rhoA1;

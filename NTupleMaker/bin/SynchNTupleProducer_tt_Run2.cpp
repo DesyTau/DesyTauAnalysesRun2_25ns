@@ -119,7 +119,7 @@ int main(int argc, char * argv[]){
     read_json(TString(TString(cmsswBase) + "/src/" + TString(json_name)).Data(), json);
   }
   const int era = cfg.get<int>("era");
-  const bool Synch = cfg.get<bool>("Synch"); 
+  //  const bool Synch = cfg.get<bool>("Synch"); 
   const bool ApplyPUweight    = cfg.get<bool>("ApplyPUweight"); 
   const bool ApplyLepSF       = cfg.get<bool>("ApplyLepSF"); 
   const bool ApplyTrigger     = cfg.get<bool>("ApplyTrigger"); 
@@ -245,6 +245,8 @@ int main(int argc, char * argv[]){
   const float ptTauCut = cfg.get<float>("ptTauLowCut");
   const float etaTauCut = cfg.get<float>("etaTauCut");
   const float dzTauCut = cfg.get<float>("dzTauCut");
+
+  //const bool Synch = cfg.get<bool>("Synch");
   
   // tau energy scale corrections
   const float shift_tes_1prong = cfg.get<float>("TauEnergyScaleShift_OneProng");
@@ -508,8 +510,25 @@ int main(int argc, char * argv[]){
     double * TSweight = new double[expectedtauspinnerweights];
     TTree  * _treeTauSpinnerWeights = NULL;
 
-    vector<string> filterDiTau = cfg.get<vector<string>>("filterDiTaus");
+
+    vector<string> filterDiTau;// = cfg.get<vector<string>>("filterDiTaus");                                                                                                    
+    if(era==2018){
+      if(isData && !isEmbedded){
+        if(analysisTree.event_run >= 317509)
+          filterDiTau = cfg.get<vector<string>>("filterDiTauswithHPS");
+        else
+          filterDiTau = cfg.get<vector<string>>("filterDiTausNoHPS");
+      }
+      else{
+	filterDiTau = cfg.get<vector<string>>("filterDiTaus");
+      }
+    }
+    else{
+      filterDiTau = cfg.get<vector<string>>("filterDiTaus");
+    }
     cout<<"Number of Ditau trigger legs = "<<filterDiTau.size()<<endl;
+
+
     Long64_t numberOfEntries = analysisTree.GetEntries();
     
     for(Long64_t iEntry = 0; iEntry < numberOfEntries; iEntry++){
@@ -568,7 +587,7 @@ int main(int argc, char * argv[]){
 	  gentreeForGoodRecoEvtsOnly->mix0p375_htt125 = analysisTree.TauSpinnerWeight[4];
 	}
       }
-      //cout<<"Tauspinor weight  "<<otree->TauSpinnerWeightsEven<<endl;
+      //      cout<<"Tauspinor weight  "<<otree->TauSpinnerWeightsEven<<endl;
       vector<int> nDiTauTrig(filterDiTau.size(),-1);      
       if(ApplyTrigger){
 	vector<bool> checkFilterDiTauTrig(filterDiTau.size(), false);
@@ -766,36 +785,69 @@ int main(int argc, char * argv[]){
 
       if (ApplyPUweight) 
         otree->puweight = float(PUofficial->get_PUweight(double(analysisTree.numtruepileupinteractions)));
-      if(!isData || isEmbedded){
-        otree->mcweight = analysisTree.genweight;
-        otree->gen_noutgoing = analysisTree.genparticles_noutgoing;
+
       
+      if(!isData || isEmbedded){
+      
+	otree->mcweight = analysisTree.genweight;
+        otree->gen_noutgoing = analysisTree.genparticles_noutgoing;
+	if (isEmbedded&&otree->mcweight>1.0)
+	  otree->mcweight = 0.0;
+	
+	TString suffix = "";
+	TString suffixRatio = "ratio";
+	if (isEmbedded) {suffix = "_embed"; suffixRatio = "embed_ratio";}
+	
 	if(analysisTree.tau_genmatch[tauIndex_1] == 5){
-	  w->var("t_dm")->setVal(analysisTree.tau_decayMode[tauIndex_1]);
-	  otree->idisoweight_1 = w->function("t_deeptauid_dm_medium")->getVal();
+	  //w->var("t_dm")->setVal(analysisTree.tau_decayMode[tauIndex_1]);
+	  if (analysisTree.tau_MVADM2017v1[tauIndex_1]<0.)
+	    w->var("t_mvadm")->setVal(analysisTree.tau_decayMode[tauIndex_1]);
+	  else
+	    w->var("t_mvadm")->setVal(analysisTree.tau_MVADM2017v1[tauIndex_1]);
+	
+	  otree->idisoweight_1 = w->function("t_deeptauid_mvadm"+suffix+"_medium")->getVal();
 	}
 	if(analysisTree.tau_genmatch[tauIndex_2] == 5){
-	  w->var("t_dm")->setVal(analysisTree.tau_decayMode[tauIndex_2]);
-	  otree->idisoweight_2 = w->function("t_deeptauid_dm_medium")->getVal();
+	  //w->var("t_dm")->setVal(analysisTree.tau_decayMode[tauIndex_2]);
+	  if (analysisTree.tau_MVADM2017v1[tauIndex_2]<0.)
+	    w->var("t_mvadm")->setVal(analysisTree.tau_decayMode[tauIndex_2]);
+	  else
+	    w->var("t_mvadm")->setVal(analysisTree.tau_MVADM2017v1[tauIndex_2]);
+	  otree->idisoweight_2 = w->function("t_deeptauid_mvadm"+suffix+"_medium")->getVal();
 	}
-	TString suffix = "mc";
-	TString suffixRatio = "ratio";
 
+      
+	///Tau triger SF
+	TString tau1mvadm = TString::Itoa(analysisTree.tau_MVADM2017v1[tauIndex_1],10);
+	TString tau2mvadm = TString::Itoa(analysisTree.tau_MVADM2017v1[tauIndex_2],10);
+	if (analysisTree.tau_MVADM2017v1[tauIndex_1]<0.0)
+	  tau1mvadm = TString::Itoa(analysisTree.tau_decayMode[tauIndex_1],10);
+	if (analysisTree.tau_MVADM2017v1[tauIndex_2]<0.0)
+	  tau2mvadm = TString::Itoa(analysisTree.tau_decayMode[tauIndex_2],10);
 	w->var("t_pt")->setVal(analysisTree.tau_pt[tauIndex_1]);
 	w->var("t_eta")->setVal(analysisTree.tau_eta[tauIndex_1]);
 	w->var("t_phi")->setVal(analysisTree.tau_phi[tauIndex_1]);
-	w->var("t_dm")->setVal(analysisTree.tau_decayMode[tauIndex_1]);
-	otree->trigweight_1 = w->function("t_trg_mediumDeepTau_ditau_"+suffixRatio)->getVal();
+	//w->var("t_dm")->setVal(analysisTree.tau_decayMode[tauIndex_1]);
+	if (analysisTree.tau_MVADM2017v1[tauIndex_1]<0.)
+	  w->var("t_mvadm")->setVal(analysisTree.tau_decayMode[tauIndex_1]);
+	else
+	  w->var("t_mvadm")->setVal(analysisTree.tau_MVADM2017v1[tauIndex_1]);
+	otree->trigweight_1 = w->function("t_trg_ic_deeptau_medium_ditau_mvadm"+tau1mvadm+"_"+suffixRatio)->getVal();
 	w->var("t_pt")->setVal(analysisTree.tau_pt[tauIndex_2]);
 	w->var("t_eta")->setVal(analysisTree.tau_eta[tauIndex_2]);
 	w->var("t_phi")->setVal(analysisTree.tau_phi[tauIndex_2]);
-	w->var("t_dm")->setVal(analysisTree.tau_decayMode[tauIndex_2]);
-	otree->trigweight_2 = w->function("t_trg_mediumDeepTau_ditau_"+suffixRatio)->getVal();
+	//w->var("t_dm")->setVal(analysisTree.tau_decayMode[tauIndex_2]);
+	if (analysisTree.tau_MVADM2017v1[tauIndex_2]<0.)
+	  w->var("t_mvadm")->setVal(analysisTree.tau_decayMode[tauIndex_2]);
+	else
+	  w->var("t_mvadm")->setVal(analysisTree.tau_MVADM2017v1[tauIndex_2]);
+	otree->trigweight_2 = w->function("t_trg_ic_deeptau_medium_ditau_mvadm"+tau2mvadm+"_"+suffixRatio)->getVal();
 
      
+      }
 	otree->effweight = otree->idisoweight_1 * otree->idisoweight_2 * otree->trigweight_1 * otree->trigweight_2;
 	otree->weight = otree->effweight * otree->puweight * otree->mcweight; 
-      }
+
       //Theory uncertainties for CP analysis
       
       // otree->weight_CMS_scale_gg_13TeVUp   = analysisTree.weightScale4;
@@ -911,141 +963,18 @@ int main(int argc, char * argv[]){
       otree->pt_fast = -10;
       otree->phi_fast = -10;
       otree->eta_fast = -10;
-      if(ApplySVFit||ApplyFastMTT)
+      
+      bool Synch = false;
+      if(ApplySVFit||ApplyFastMTT){
 	svfit_variables(ch, &analysisTree, otree, &cfg, inputFile_visPtResolution);
+      }
       counter[10]++;
       // ***********************************
       // ** IPSignificance calibration ->
       // ***********************************
 
       acott_Impr_tt(&analysisTree, otree, tauIndex_1, tauIndex_2);
-      bool Synch = false;
-      if(Synch){
-	otree->v_tracks = 0;
-	// std::vector<float> PV_covariance; PV_covariance.clear();
-	// // by default store non-refitted PV with BS constraint if refitted one is not found
-	// float vtx_x = analysisTree.primvertexwithbs_x; 
-	// float vtx_y = analysisTree.primvertexwithbs_y;
-	// float vtx_z = analysisTree.primvertexwithbs_z;
-	// for (int j = 0; j<6 ; ++j)
-	//   PV_covariance.push_back(analysisTree.primvertexwithbs_cov[j]);
-
-	// for(unsigned int i = 0; i < analysisTree.refitvertexwithbs_count; i++)
-	//   {
-	//     if( (tauIndex_1 == analysisTree.refitvertexwithbs_tauIndex[i][0] || tauIndex_1 == analysisTree.refitvertexwithbs_tauIndex[i][1]) &&
-	// 	(tauIndex_2 == analysisTree.refitvertexwithbs_tauIndex[i][0] || tauIndex_2 == analysisTree.refitvertexwithbs_tauIndex[i][1]))
-	//       {
-	// 	otree->v_tracks = analysisTree.refitvertexwithbs_ntracks[i];
-	// 	vtx_x = analysisTree.refitvertexwithbs_x[i];
-	// 	vtx_y = analysisTree.refitvertexwithbs_y[i];
-	// 	vtx_z = analysisTree.refitvertexwithbs_z[i];
-	// 	for (int j=0; j<6; ++j) 
-	// 	  PV_covariance[j] = analysisTree.refitvertexwithbs_cov[i][j];
-	//       }
-	//   }
-	// IpCorrection * ipCorrector = NULL;
-	// ImpactParameter IP;
-	// if (ApplyIpCorrection&&(!isData))ipCorrector = ip; 
-	// acott_Impr(&analysisTree, otree, tauIndex_1, tauIndex_2, ch,ipCorrector);
-	// otree->acotautau_00 = otree->acotautau_refitbs_00;
-	// otree->acotautau_01 = otree->acotautau_refitbs_01;
-      
-	// TVector3 vertex(vtx_x,vtx_y,vtx_z);
-	// ROOT::Math::SMatrix<float,3,3, ROOT::Math::MatRepStd< float, 3, 3 >> ipCov1;
-	// TVector3 IP1;
-	// double ipsig1 = IP_significance_helix_tauh(&analysisTree,tauIndex_1, vertex,PV_covariance,ipCov1,IP1);
-
-	// ROOT::Math::SMatrix<float,3,3, ROOT::Math::MatRepStd< float, 3, 3 >> ipCov2;
-	// TVector3 IP2;
-	// double ipsig2 = IP_significance_helix_tauh(&analysisTree,tauIndex_2,vertex,PV_covariance,ipCov2,IP2);
-
-	// // Uncorrected values
-
-	// TLorentzVector ip1; ip1.SetXYZM(otree->ipx_uncorr_1,otree->ipy_uncorr_1,otree->ipz_uncorr_1,0.);
-	// otree->ipxy_uncorr_1 = ip1.Pt();
-	// otree->ipn_uncorr_1 = ip1.P();
-	// otree->drip_uncorr_1 = deltaR(otree->eta_1,otree->phi_1,ip1.Eta(),ip1.Phi());
-	// otree->detaip_uncorr_1 = ip1.Eta() - otree->eta_1; 
-	// TVector3 vectIP = TVector3(otree->ipx_uncorr_1,otree->ipy_uncorr_1,0.);
-	// TVector3 vectP  = TVector3(tauLV1.Px(),tauLV1.Py(),0.);
-	// otree->dphiip_uncorr_1 = TMath::ACos(vectIP*vectP/(vectIP.Mag()*vectP.Mag()));
-	// //      cout << "dphi = " << otree->dphiip_uncorr_1 << std::endl;
-	// //      cout << "refit = " << otree->isrefitBS << std::endl;
-
-	// TVector3 Ip1(otree->ipx_uncorr_1,otree->ipy_uncorr_1,otree->ipz_uncorr_1);
-	// otree->IP_signif_RefitV_with_BS_uncorr_1 = IP.CalculateIPSignificanceHelical(Ip1, ipCov1);
-
-	// otree->ip_covxx_1 = ipCov1(0,0);
-	// otree->ip_covxy_1 = ipCov1(0,1);
-	// otree->ip_covxz_1 = ipCov1(0,2);
-	// otree->ip_covyy_1 = ipCov1(1,1);
-	// otree->ip_covyz_1 = ipCov1(1,2);
-	// otree->ip_covzz_1 = ipCov1(2,2);
-
-	// TLorentzVector ip2; ip2.SetXYZM(otree->ipx_uncorr_2,otree->ipy_uncorr_2,otree->ipz_uncorr_2,0.);
-	// otree->ipxy_uncorr_2 = ip2.Pt();
-	// otree->ipn_uncorr_2 = ip2.P();
-	// otree->drip_uncorr_2 = deltaR(otree->eta_2,otree->phi_2,ip2.Eta(),ip2.Phi());
-	// otree->detaip_uncorr_2 = ip2.Eta() - otree->eta_2;
-	// vectIP.SetX(otree->ipx_uncorr_2);
-	// vectIP.SetY(otree->ipy_uncorr_2);
-	// vectIP.SetZ(0.);
-	// vectP.SetX(tauLV2.Px());
-	// vectP.SetY(tauLV2.Py());
-	// vectP.SetZ(0.);
-	// otree->dphiip_uncorr_2 = TMath::ACos(vectIP*vectP/(vectIP.Mag()*vectP.Mag()));
-	// TVector3 Ip2(otree->ipx_uncorr_2,otree->ipy_uncorr_2,otree->ipz_uncorr_2);
-	// otree->IP_signif_RefitV_with_BS_uncorr_2 = IP.CalculateIPSignificanceHelical(Ip2, ipCov2);
-
-	// otree->ip_covxx_2 = ipCov2(0,0);
-	// otree->ip_covxy_2 = ipCov2(0,1);
-	// otree->ip_covxz_2 = ipCov2(0,2);
-	// otree->ip_covyy_2 = ipCov2(1,1);
-	// otree->ip_covyz_2 = ipCov2(1,2);
-	// otree->ip_covzz_2 = ipCov2(2,2);
-
-      
-	// // Corrected values 
-
-	// ip1.SetXYZM(otree->ipx_1,otree->ipy_1,otree->ipz_1,0.);
-	// otree->ipxy_1 = ip1.Pt();
-	// otree->ipn_1 = ip1.P();
-	// otree->drip_1 = deltaR(otree->eta_1,otree->phi_1,ip1.Eta(),ip1.Phi());
-	// otree->detaip_1 = ip1.Eta() - otree->eta_1; 
-	// vectIP.SetX(otree->ipx_1);
-	// vectIP.SetY(otree->ipy_1);
-	// vectIP.SetZ(0.);
-	// vectP.SetX(tauLV1.Px());
-	// vectP.SetY(tauLV1.Py());
-	// vectP.SetZ(0.);
-	// otree->dphiip_1 = TMath::ACos(vectIP*vectP/(vectIP.Mag()*vectP.Mag()));
-	// Ip1.SetXYZ(otree->ipx_1,otree->ipy_1,otree->ipz_1);
-	// ROOT::Math::SMatrix<float,3,3, ROOT::Math::MatRepStd< float, 3, 3 >> ipCov1_corr = ipCov1;
-	// if (ipCorrector!=NULL)
-	//   ipCov1_corr = ipCorrector->correctIpCov(ipCov1,otree->eta_1);      
-	// otree->IP_signif_RefitV_with_BS_1 = IP.CalculateIPSignificanceHelical(Ip1, ipCov1_corr);
-
-	// ip2.SetXYZM(otree->ipx_2,otree->ipy_2,otree->ipz_2,0.);
-	// otree->ipxy_2 = ip2.Pt();
-	// otree->ipn_2 = ip2.P();
-	// otree->drip_2 = deltaR(otree->eta_2,otree->phi_2,ip2.Eta(),ip2.Phi());
-	// otree->detaip_2 = ip2.Eta() - otree->eta_2; 
-	// vectIP.SetX(otree->ipx_2);
-	// vectIP.SetY(otree->ipy_2);
-	// vectIP.SetZ(0.);
-	// vectP.SetX(tauLV2.Px());
-	// vectP.SetY(tauLV2.Py());
-	// vectP.SetZ(0.);
-	// otree->dphiip_2 = TMath::ACos(vectIP*vectP/(vectIP.Mag()*vectP.Mag()));
-	// Ip2.SetXYZ(otree->ipx_2,otree->ipy_2,otree->ipz_2);
-	// ROOT::Math::SMatrix<float,3,3, ROOT::Math::MatRepStd< float, 3, 3 >> ipCov2_corr = ipCov2;
-	// if (ipCorrector!=NULL)
-	//   ipCov2_corr = ipCorrector->correctIpCov(ipCov2,otree->eta_2);      
-	// otree->IP_signif_RefitV_with_BS_2 = IP.CalculateIPSignificanceHelical(Ip2, ipCov2_corr);      
-
-	// otree->ip_sig_1 = otree->IP_signif_RefitV_with_BS_1;
-	// otree->ip_sig_2 = otree->IP_signif_RefitV_with_BS_2;
-      }
+      //bool Synch = false;
       //check<<endl<<"ok22"<<endl;
       counter[11]++;
       otree->Fill();

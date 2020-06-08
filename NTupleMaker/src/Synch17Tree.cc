@@ -399,7 +399,7 @@ void Synch17Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("metcov11", &metcov11, &b_metcov11);
    //   fChain->SetBranchAddress("pzetavis", &pzetavis, &b_pzetavis);
    //   fChain->SetBranchAddress("pzetamiss", &pzetamiss, &b_pzetamiss);
-   
+   fChain->SetBranchAddress("met_var_qcd", &met_var_qcd, &b_met_var_qcd);
    //PUPPI MET
    fChain->SetBranchAddress("puppimet", &puppimet, &b_puppimet);
    fChain->SetBranchAddress("puppimetphi", &puppimetphi, &b_puppimetphi);
@@ -499,13 +499,20 @@ void Synch17Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("acotautau_helix_11", &acotautau_helix_11, &b_acotautau_helix_11);
 
    fChain->SetBranchAddress("acotautau_helix_IPIP_pi40_pionA1", &acotautau_helix_IPIP_pi40_pionA1, &b_acotautau_helix_IPIP_pi40_pionA1);
+   fChain->SetBranchAddress("acotautau_helix_IPIP_pi40_pvBS_pionA1", &acotautau_helix_IPIP_pi40_pvBS_pionA1, &b_acotautau_helix_IPIP_pi40_pvBS_pionA1);
    fChain->SetBranchAddress("acotautau_helix_IPDP_pionA1", &acotautau_helix_IPDP_pionA1, &b_acotautau_helix_IPDP_pionA1);
    fChain->SetBranchAddress("acotautau_helix_DPIP_pi40_rhoA1", &acotautau_helix_DPIP_pi40_rhoA1, &b_acotautau_helix_DPIP_pi40_rhoA1);
+   fChain->SetBranchAddress("acotautau_helix_DPIP_pi40_pvBS_rhoA1", &acotautau_helix_DPIP_pi40_pvBS_rhoA1, &b_acotautau_helix_DPIP_pi40_pvBS_rhoA1);
    fChain->SetBranchAddress("acotautau_helix_DPDP_rhoA1", &acotautau_helix_DPDP_rhoA1, &b_acotautau_helix_DPDP_rhoA1);
    fChain->SetBranchAddress("acotautau_helix_IPIP_pi40_A1A1", &acotautau_helix_IPIP_pi40_A1A1, &b_acotautau_helix_IPIP_pi40_A1A1);
    fChain->SetBranchAddress("acotautau_helix_IPDP_pi40_A1A1", &acotautau_helix_IPDP_pi40_A1A1, &b_acotautau_helix_IPDP_pi40_A1A1);
+   fChain->SetBranchAddress("acotautau_helix_DPIP_pi40_A1A1", &acotautau_helix_DPIP_pi40_A1A1, &b_acotautau_helix_DPIP_pi40_A1A1);
    fChain->SetBranchAddress("acotautau_helix_DPDP_A1A1", &acotautau_helix_DPDP_A1A1, &b_acotautau_helix_DPDP_A1A1);
-   fChain->SetBranchAddress("acotautau_helix_IPIP_pi40_rhoA1", &acotautau_helix_IPIP_pi40_rhoA1, &b_acotautau_helix_IPIP_pi40_rhoA1);
+
+
+   fChain->SetBranchAddress("acotautau_helix_IPIP_pi40_pvBS_A1A1", &acotautau_helix_IPIP_pi40_pvBS_A1A1, &b_acotautau_helix_IPIP_pi40_pvBS_A1A1);
+   fChain->SetBranchAddress("acotautau_helix_IPDP_pi40_pvBS_A1A1", &acotautau_helix_IPDP_pi40_pvBS_A1A1, &b_acotautau_helix_IPDP_pi40_pvBS_A1A1);
+   fChain->SetBranchAddress("acotautau_helix_DPIP_pi40_pvBS_A1A1", &acotautau_helix_DPIP_pi40_pvBS_A1A1, &b_acotautau_helix_DPIP_pi40_pvBS_A1A1);
 
    fChain->SetBranchAddress("acotautau_helix_IPIP_pi40_pionRho", &acotautau_helix_IPIP_pi40_pionRho, &b_acotautau_helix_IPIP_pi40_pionRho);
    fChain->SetBranchAddress("acotautau_helix_IPDP_pionRho", &acotautau_helix_IPDP_pionRho, &b_acotautau_helix_IPDP_pionRho);
@@ -1034,6 +1041,7 @@ void Synch17Tree::WriteInit(TTree *tree) {
    fChain->Branch("metcov01", &metcov01, "metcov01/F");
    fChain->Branch("metcov10", &metcov10, "metcov10/F");
    fChain->Branch("metcov11", &metcov11, "metcov11/F");
+   fChain->Branch("met_var_qcd", &met_var_qcd, "met_var_qcd/D");
    //   fChain->Branch("pzetavis", &pzetavis, "pzetavis/F");
    //   fChain->Branch("pzetamiss", &pzetamiss, "pzetamiss/F");
 
@@ -1137,13 +1145,22 @@ void Synch17Tree::WriteInit(TTree *tree) {
    fChain->Branch("acotautau_helix_11", &acotautau_helix_11, "acotautau_helix_11/F");
 
    fChain->Branch("acotautau_helix_IPIP_pi40_pionA1", &acotautau_helix_IPIP_pi40_pionA1, "acotautau_helix_IPIP_pi40_pionA1/F");
+   fChain->Branch("acotautau_helix_IPIP_pi40_pvBS_pionA1", &acotautau_helix_IPIP_pi40_pvBS_pionA1, "acotautau_helix_IPIP_pi40_pvBS_pionA1/F");
    fChain->Branch("acotautau_helix_IPDP_pionA1", &acotautau_helix_IPDP_pionA1, "acotautau_helix_IPDP_pionA1/F");
+
    fChain->Branch("acotautau_helix_DPIP_pi40_rhoA1", &acotautau_helix_DPIP_pi40_rhoA1, "acotautau_helix_DPIP_pi40_rhoA1/F");
+   fChain->Branch("acotautau_helix_DPIP_pi40_pvBS_rhoA1", &acotautau_helix_DPIP_pi40_pvBS_rhoA1, "acotautau_helix_DPIP_pi40_pvBS_rhoA1/F");
+
    fChain->Branch("acotautau_helix_DPDP_rhoA1", &acotautau_helix_DPDP_rhoA1, "acotautau_helix_DPDP_rhoA1/F");
    fChain->Branch("acotautau_helix_IPIP_pi40_A1A1", &acotautau_helix_IPIP_pi40_A1A1, "acotautau_helix_IPIP_pi40_A1A1/F");
    fChain->Branch("acotautau_helix_IPDP_pi40_A1A1", &acotautau_helix_IPDP_pi40_A1A1, "acotautau_helix_IPDP_pi40_A1A1/F");
    fChain->Branch("acotautau_helix_DPDP_A1A1", &acotautau_helix_DPDP_A1A1, "acotautau_helix_DPDP_A1A1/F");
-   fChain->Branch("acotautau_helix_IPIP_pi40_rhoA1", &acotautau_helix_IPIP_pi40_rhoA1, "acotautau_helix_IPIP_pi40_rhoA1/F");
+   fChain->Branch("acotautau_helix_DPIP_pi40_A1A1", &acotautau_helix_DPIP_pi40_A1A1, "acotautau_helix_DPIP_pi40_A1A1/F");
+
+   fChain->Branch("acotautau_helix_IPIP_pi40_pvBS_A1A1", &acotautau_helix_IPIP_pi40_pvBS_A1A1, "acotautau_helix_IPIP_pi40_pvBS_A1A1/F");
+   fChain->Branch("acotautau_helix_IPDP_pi40_pvBS_A1A1", &acotautau_helix_IPDP_pi40_pvBS_A1A1, "acotautau_helix_IPDP_pi40_pvBS_A1A1/F");
+   fChain->Branch("acotautau_helix_DPDP_A1A1", &acotautau_helix_DPDP_A1A1, "acotautau_helix_DPDP_A1A1/F");
+   fChain->Branch("acotautau_helix_DPIP_pi40_pvBS_A1A1", &acotautau_helix_DPIP_pi40_pvBS_A1A1, "acotautau_helix_DPIP_pi40_pvBS_A1A1/F");
   
    fChain->Branch("acotautau_helix_IPIP_pi40_pionRho", &acotautau_helix_IPIP_pi40_pionRho, "acotautau_helix_IPIP_pi40_pionRho/F");
    fChain->Branch("acotautau_helix_IPDP_pionRho", &acotautau_helix_IPDP_pionRho, "acotautau_helix_IPDP_pionRho/F");
