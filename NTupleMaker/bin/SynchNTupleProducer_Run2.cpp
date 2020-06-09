@@ -290,7 +290,7 @@ int main(int argc, char * argv[]){
 
 
   // MET Recoil Corrections
-  const bool isDY = infiles.find("DY") != string::npos;
+  const bool isDY = (infiles.find("DY") != string::npos) || (infiles.find("EWKZ") != string::npos);//Corrections that should be applied on EWKZ are the same needed for DY
   const bool isWJets = (infiles.find("WJets") != string::npos) || (infiles.find("W1Jets") != string::npos) || (infiles.find("W2Jets") != string::npos) || (infiles.find("W3Jets") != string::npos) || (infiles.find("W4Jets") != string::npos) || (infiles.find("EWK") != string::npos);
   const bool isVBForGGHiggs = (infiles.find("VBFHTo")!= string::npos) || (infiles.find("GluGluHTo")!= string::npos);
   const bool isEWKZ =  infiles.find("EWKZ") != string::npos;
@@ -600,16 +600,12 @@ int main(int argc, char * argv[]){
       lepTauFakeOneProngScaleSys->SetUseSVFit(ApplySVFit);
       lepTauFakeOneProngScaleSys->SetUseFastMTT(ApplyFastMTT);
       lepTauFakeOneProngScaleSys->SetUsePuppiMET(usePuppiMET);
-      if(ch=="mt")lepTauFakeOneProngScaleSys->SetLabel("CMS_htt_ZLShape_mt_13TeV");
-      else if(ch=="et")lepTauFakeOneProngScaleSys->SetLabel("CMS_htt_ZLShape_et_13TeV");
 
       lepTauFakeOneProngOnePi0ScaleSys = new LepTauFakeOneProngOnePi0ScaleSys(otree);
       lepTauFakeOneProngOnePi0ScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);
       lepTauFakeOneProngOnePi0ScaleSys->SetUseSVFit(ApplySVFit);
       lepTauFakeOneProngOnePi0ScaleSys->SetUseFastMTT(ApplyFastMTT);
       lepTauFakeOneProngOnePi0ScaleSys->SetUsePuppiMET(usePuppiMET);
-      if(ch=="mt")lepTauFakeOneProngOnePi0ScaleSys->SetLabel("CMS_htt_ZLShape_mt_13TeV");
-      else if(ch=="et")lepTauFakeOneProngOnePi0ScaleSys->SetLabel("CMS_htt_ZLShape_et_13TeV");
 
     }
 
