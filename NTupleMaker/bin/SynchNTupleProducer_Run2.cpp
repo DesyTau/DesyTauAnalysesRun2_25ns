@@ -245,15 +245,8 @@ int main(int argc, char * argv[]){
     cout<<pathToTaggingEfficiencies<<" not found. Please check."<<endl;
     exit(-1);
   }
-  
-  TString pathToTaggingEfficiencies_nonCP5 = (TString) cmsswBase + "/src/" + cfg.get<string>("BtagMCeffFile_nonCP5");
-  if (ApplyBTagScaling && ApplyBTagCP5Correction && gSystem->AccessPathName(pathToTaggingEfficiencies_nonCP5)){
-    cout<<pathToTaggingEfficiencies_nonCP5<<" not found. Please check."<<endl;
-    exit(-1);
-  }
-  
+    
   TFile *fileTagging  = new TFile(pathToTaggingEfficiencies);
-  TFile *fileTagging_nonCP5  = new TFile(pathToTaggingEfficiencies_nonCP5);
   TH2F  *tagEff_B     = 0;
   TH2F  *tagEff_C     = 0;
   TH2F  *tagEff_Light = 0;
@@ -267,6 +260,12 @@ int main(int argc, char * argv[]){
     tagEff_C     = (TH2F*)fileTagging->Get("btag_eff_c");
     tagEff_Light = (TH2F*)fileTagging->Get("btag_eff_oth");
     if (ApplyBTagCP5Correction) {
+      TString pathToTaggingEfficiencies_nonCP5 = (TString) cmsswBase + "/src/" + cfg.get<string>("BtagMCeffFile_nonCP5");
+      if (gSystem->AccessPathName(pathToTaggingEfficiencies_nonCP5)) {
+        cout<<pathToTaggingEfficiencies_nonCP5<<" not found. Please check."<<endl;
+        exit(-1);
+      } 
+      TFile *fileTagging_nonCP5  = new TFile(pathToTaggingEfficiencies_nonCP5);
       tagEff_B_nonCP5     = (TH2F*)fileTagging_nonCP5->Get("btag_eff_b");
       tagEff_C_nonCP5     = (TH2F*)fileTagging_nonCP5->Get("btag_eff_c");
       tagEff_Light_nonCP5 = (TH2F*)fileTagging_nonCP5->Get("btag_eff_oth");
@@ -529,6 +528,7 @@ int main(int argc, char * argv[]){
   TauThreeProngScaleSys *tauThreeProngScaleSys = 0;
   TauThreeProngOnePi0ScaleSys *tauThreeProngOnePi0ScaleSys = 0;
   MuonScaleSys *muonScaleSys = 0;
+  ElectronScaleSys *electronScaleSys = 0;
 
   LepTauFakeOneProngScaleSys *lepTauFakeOneProngScaleSys = 0;
   LepTauFakeOneProngOnePi0ScaleSys *lepTauFakeOneProngOnePi0ScaleSys = 0;
@@ -558,6 +558,12 @@ int main(int argc, char * argv[]){
     muonScaleSys->SetUseFastMTT(ApplyFastMTT);
     muonScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);
     muonScaleSys->SetUsePuppiMET(usePuppiMET);
+    
+    electronScaleSys = new ElectronScaleSys(otree);
+    electronScaleSys->SetUseSVFit(ApplySVFit);
+    electronScaleSys->SetUseFastMTT(ApplyFastMTT);
+    electronScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);
+    electronScaleSys->SetUsePuppiMET(usePuppiMET);
 
     tauOneProngScaleSys = new TauOneProngScaleSys(otree);
     tauOneProngScaleSys->SetScale(shift_tes_1prong,shift_tes_1prong_e);
@@ -2226,7 +2232,11 @@ int main(int argc, char * argv[]){
 	    lepTauFakeOneProngOnePi0ScaleSys->Eval(utils::MUTAU);
 	  }
 	}
-	else if (ch == "et") { 
+	else if (ch == "et") {
+    electronScaleSys->SetElectronIndex(leptonIndex);
+    electronScaleSys->SetAC1B(&analysisTree);
+    electronScaleSys->Eval(utils::ETAU);
+    
 	  tauOneProngScaleSys->Eval(utils::ETAU);
 	  tauOneProngOnePi0ScaleSys->Eval(utils::ETAU);
 	  tauThreeProngScaleSys->Eval(utils::ETAU);
@@ -2277,6 +2287,11 @@ int main(int argc, char * argv[]){
   if (muonScaleSys != 0) {
     muonScaleSys->Write("",TObject::kOverwrite);
     delete muonScaleSys;
+  }
+  
+  if (electronScaleSys != 0) {
+    electronScaleSys->Write("",TObject::kOverwrite);
+    delete electronScaleSys;
   }
 
   if(tauOneProngScaleSys != 0){
