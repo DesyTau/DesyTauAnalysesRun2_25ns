@@ -2290,7 +2290,7 @@ int main(int argc, char * argv[]){
   }
   
   if (electronScaleSys != 0) {
-    electronScaleSys->Write();
+    electronScaleSys->Write("",TObject::kOverwrite);
     delete electronScaleSys;
   }
 
