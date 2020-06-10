@@ -635,7 +635,7 @@ RecHTXS = cms.untracked.bool(isHiggsSignal),
 # collections
 MuonCollectionTag = cms.InputTag("slimmedMuons"),
 ElectronCollectionTag = cms.InputTag("slimmedElectrons"),
-applyElectronESShift = cms.untracked.bool(not isData or isEmbedded),
+applyElectronESShift = cms.untracked.bool(not isData),
 TauCollectionTag = cms.InputTag("NewTauIDsEmbedded"),
 L1MuonCollectionTag = cms.InputTag("gmtStage2Digis:Muon"),
 L1EGammaCollectionTag = cms.InputTag("caloStage2Digis:EGamma"),
