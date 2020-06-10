@@ -292,7 +292,7 @@ int main(int argc, char * argv[]){
   // MET Recoil Corrections
   const bool isDY = (infiles.find("DY") != string::npos) || (infiles.find("EWKZ") != string::npos);//Corrections that should be applied on EWKZ are the same needed for DY
   const bool isWJets = (infiles.find("WJets") != string::npos) || (infiles.find("W1Jets") != string::npos) || (infiles.find("W2Jets") != string::npos) || (infiles.find("W3Jets") != string::npos) || (infiles.find("W4Jets") != string::npos) || (infiles.find("EWK") != string::npos);
-  const bool isVBForGGHiggs = (infiles.find("VBFHTo")!= string::npos) || (infiles.find("GluGluHTo")!= string::npos);
+  const bool isHiggs = (infiles.find("VBFHTo")!= string::npos) || (infiles.find("VHTo")!= string::npos) || (infiles.find("GluGluHTo")!= string::npos);
   const bool isEWKZ =  infiles.find("EWKZ") != string::npos;
   const bool isMG = infiles.find("madgraph") != string::npos;
   const bool isMSSMsignal =  (infiles.find("SUSYGluGluToHToTauTau")!= string::npos) || (infiles.find("SUSYGluGluToBBHToTauTau")!= string::npos);
@@ -303,7 +303,7 @@ int main(int argc, char * argv[]){
   if(isTauSpinner) applyTauSpinnerWeights = true;
   const bool isEmbedded = infiles.find("Embed") != string::npos;
 
-  const bool ApplyRecoilCorrections = cfg.get<bool>("ApplyRecoilCorrections") && !isEmbedded && !isData && (isDY || isWJets || isVBForGGHiggs || isMSSMsignal);
+  const bool ApplyRecoilCorrections = cfg.get<bool>("ApplyRecoilCorrections") && !isEmbedded && !isData && (isDY || isWJets || isHiggs || isMSSMsignal);
   kit::RecoilCorrector recoilCorrector(cfg.get<string>("RecoilFilePath"));
   kit::MEtSys MetSys(cfg.get<string>("RecoilSysFilePath"));
 
@@ -611,7 +611,7 @@ int main(int argc, char * argv[]){
 
     // systematics only for MC
     if (!isEmbedded) {
-      if (!isDY && !isWJets && !isVBForGGHiggs) {
+      if (!isDY && !isWJets && !isHiggs) {
 	btagSys = new BtagSys(otree,TString("Btag"));
 	btagSys->SetConfig(&cfg);
 	btagSys->SetBtagScaling(&inputs_btag_scaling_medium);
@@ -694,7 +694,7 @@ int main(int argc, char * argv[]){
     AC1B analysisTree(_tree, isData);
     // set AC1B for JES Btag and MET systematics
     if ( !isData && !isEmbedded && ApplySystShift) {
-      if (!isDY && !isWJets && !isVBForGGHiggs)
+      if (!isDY && !isWJets && !isHiggs)
 	btagSys->SetAC1B(&analysisTree);
       for (unsigned int i = 0; i < jetEnergyScaleSys.size(); i++)
       	(jetEnergyScaleSys.at(i))->SetAC1B(&analysisTree);
@@ -1595,7 +1595,7 @@ int main(int argc, char * argv[]){
       otree->weight_CMS_PS_FSR_ggH_13TeVUp   = 1.;
       otree->weight_CMS_PS_FSR_ggH_13TeVDown = 1.;
 
-      if(isVBForGGHiggs){
+      if(isHiggs){
 	otree->weight_CMS_PS_ISR_ggH_13TeVUp   = analysisTree.gen_pythiaweights[6];
 	otree->weight_CMS_PS_ISR_ggH_13TeVDown = analysisTree.gen_pythiaweights[8];
 	otree->weight_CMS_PS_FSR_ggH_13TeVUp   = analysisTree.gen_pythiaweights[7];
@@ -2195,7 +2195,7 @@ int main(int argc, char * argv[]){
         
       // evaluate systematics for MC 
       if( !isData && !isEmbedded && ApplySystShift){
-	if (!isDY && !isWJets && !isVBForGGHiggs) {
+	if (!isDY && !isWJets && !isHiggs) {
 	  btagSys->Eval();
 	}
 	for(unsigned int i = 0; i < jetEnergyScaleSys.size(); i++) {
