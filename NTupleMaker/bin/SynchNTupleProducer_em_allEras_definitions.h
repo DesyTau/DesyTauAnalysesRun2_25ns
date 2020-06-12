@@ -1346,6 +1346,13 @@ void SetDefaultValues(){
    njets_jerUp = 0;
    njets_jerDown = 0;
 
+   jet1.SetXYZT(0,0,0,0);
+   jet2.SetXYZT(0,0,0,0);
+   jet1LV_jerUp.SetXYZT(0,0,0,0);
+   jet1LV_jerDown.SetXYZT(0,0,0,0);
+   jet2LV_jerUp.SetXYZT(0,0,0,0);
+   jet2LV_jerDown.SetXYZT(0,0,0,0);
+   
    indexLeadingJet = -1;
    ptLeadingJet = -1;
    
