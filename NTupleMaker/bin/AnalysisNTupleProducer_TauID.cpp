@@ -754,7 +754,7 @@ int main(int argc, char * argv[]) {
     TFile * filePUOfficial_data = new TFile(TString(cmsswBase)+"/src/"+PUDataFile,"read");
     TFile * filePUOfficial_MC = new TFile (TString(cmsswBase)+"/src/"+PUMCFile, "read");
     TH1D * PUOfficial_data = (TH1D *)filePUOfficial_data->Get("pileup");
-    TString NamePUHistMC = samplenameForPUHist + "_pileup";
+    TString NamePUHistMC = samplenameForPUHist;
     TH1D * PUOfficial_mc = (TH1D *)filePUOfficial_MC->Get(NamePUHistMC);
     if( !PUOfficial_mc) {
       cout<<endl<<"MC pileup histogram "<<NamePUHistMC<<" does not exist in root file "<<PUMCFile<<". Exiting."<<endl<<endl;
@@ -1398,43 +1398,46 @@ int main(int argc, char * argv[]) {
 	  isSinglePFTau180Trk50oneprongFilter = true;
 	}
       }
-      //      if (isData) {
-      if (!isSingleMuonHLTFilter) {
-	std::cout << "HLT filter " << SingleMuonHLTFilterName << " not found" << std::endl;
-	exit(-1);
+      if (isData) {
+	if (!isSingleMuonHLTFilter) {
+	  std::cout << "HLT filter " << SingleMuonHLTFilterName << " not found" << std::endl;
+	  exit(-1);
+	}
+     
+	if (!isPFJet60HLTFilter) {
+	  std::cout << "HLT filter " << PFJet60HLTFilterName << " not found" << std::endl;
+	  exit(-1);
+	}
+	if (!isPFJet80HLTFilter) {
+	  std::cout << "HLT filter " << PFJet80HLTFilterName << " not found" << std::endl;
+	  exit(-1);
+	}
+	if (!isPFJet140HLTFilter) {
+	  std::cout << "HLT filter " << PFJet140HLTFilterName << " not found" << std::endl;
+	  exit(-1);
+	}
+	if (!isPFJet200HLTFilter) {
+	  std::cout << "HLT filter " << PFJet200HLTFilterName << " not found" << std::endl;
+	  exit(-1);
+	}
+	if (!isPFJet260HLTFilter) {
+	  std::cout << "HLT filter " << PFJet260HLTFilterName << " not found" << std::endl;
+	  exit(-1);
+	}
+	if (!isPFJet320HLTFilter) {
+	  std::cout << "HLT filter " << PFJet320HLTFilterName << " not found" << std::endl;
+	  exit(-1);
+	}
+	if (!isPFJet400HLTFilter) {
+	  std::cout << "HLT filter " << PFJet400HLTFilterName << " not found" << std::endl;
+	  exit(-1);
+	}
+	if (!isPFJet450HLTFilter) {
+	  std::cout << "HLT filter " << PFJet450HLTFilterName << " not found" << std::endl;
+	  exit(-1);
+	}
       }
-      if (!isPFJet60HLTFilter) {
-	std::cout << "HLT filter " << PFJet60HLTFilterName << " not found" << std::endl;
-	exit(-1);
-      }
-      if (!isPFJet80HLTFilter) {
-	std::cout << "HLT filter " << PFJet80HLTFilterName << " not found" << std::endl;
-	exit(-1);
-      }
-      if (!isPFJet140HLTFilter) {
-	std::cout << "HLT filter " << PFJet140HLTFilterName << " not found" << std::endl;
-	exit(-1);
-      }
-      if (!isPFJet200HLTFilter) {
-	std::cout << "HLT filter " << PFJet200HLTFilterName << " not found" << std::endl;
-	exit(-1);
-      }
-      if (!isPFJet260HLTFilter) {
-	std::cout << "HLT filter " << PFJet260HLTFilterName << " not found" << std::endl;
-	exit(-1);
-      }
-      if (!isPFJet320HLTFilter) {
-	std::cout << "HLT filter " << PFJet320HLTFilterName << " not found" << std::endl;
-	exit(-1);
-      }
-      if (!isPFJet400HLTFilter) {
-	std::cout << "HLT filter " << PFJet400HLTFilterName << " not found" << std::endl;
-	exit(-1);
-      }
-      if (!isPFJet450HLTFilter) {
-	std::cout << "HLT filter " << PFJet450HLTFilterName << " not found" << std::endl;
-	exit(-1);
-      }
+
       // ************************************
       // **** end accessing trigger info ****
       // ************************************
@@ -1554,7 +1557,8 @@ int main(int argc, char * argv[]) {
 	    float dRtrig = deltaR(analysisTree.muon_eta[imuon],analysisTree.muon_phi[imuon],
 				  analysisTree.trigobject_eta[iT],analysisTree.trigobject_phi[iT]);
 	    if (dRtrig>0.5) continue;
-	    if (analysisTree.trigobject_filters[iT][nSingleMuonHLTFilter]) trigMatch = true;
+	    if (analysisTree.trigobject_filters[iT][nSingleMuonHLTFilter]&&isSingleMuonHLTFilter) 
+	      trigMatch = true;
 
 	  }
 	  if (trigMatch&&analysisTree.muon_pt[imuon]>ptTriggerMu) {
@@ -1942,7 +1946,8 @@ int main(int argc, char * argv[]) {
 
 	if( (tauDecayMode == "1prong0pizeros"     && analysisTree.tau_decayMode[itau]==0) ||
 	    (tauDecayMode == "1prongUpTo4pizeros" && analysisTree.tau_decayMode[itau]>=1 && analysisTree.tau_decayMode[itau]<=4) ||
-	    (tauDecayMode == "3prong0pizeros"     && analysisTree.tau_decayMode[itau]==10) ){
+	    (tauDecayMode == "3prong0pizeros"     && analysisTree.tau_decayMode[itau]==10) || 
+	    (tauDecayMode == "inclusive"          && (analysisTree.tau_decayMode[itau]<=4 || analysisTree.tau_decayMode[itau]==10)) ){
 
 	  analysisTree.tau_px[itau]   *= tauMomScale;
 	  analysisTree.tau_py[itau]   *= tauMomScale;
