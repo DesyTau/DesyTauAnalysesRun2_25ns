@@ -42,11 +42,11 @@ int main(int argc, char * argv[]) {
    const string pfJet400HLTFilterName = cfg.get<string>("PFJet400HLTFilterName"); 
    const string pfJet450HLTFilterName = cfg.get<string>("PFJet450HLTFilterName"); 
    
-   // const string singlePFTau180Trk50Name = cfg.get<string>("SinglePFTau180Trk50Name");
-   // const string singlePFTau180Trk50oneprongName = cfg.get<string>("SinglePFTau180Trk50oneprongName");
-   
-   // TString SinglePFTau180Trk50Name(singlePFTau180Trk50Name);
-   // TString SinglePFTau180Trk50oneprongName(singlePFTau180Trk50oneprongName);
+   const string singlePFTau180Trk50Name = cfg.get<string>("SinglePFTau180Trk50Name");
+   const string singlePFTau180Trk50oneprongName = cfg.get<string>("SinglePFTau180Trk50oneprongName");
+
+   TString SinglePFTau180Trk50Name(singlePFTau180Trk50Name);
+   TString SinglePFTau180Trk50oneprongName(singlePFTau180Trk50oneprongName);
    
    TString MetHLTName(metHTLName);
    TString SingleMuonHLTName(singleMuonHLTName);
@@ -537,9 +537,14 @@ int main(int argc, char * argv[]) {
             exit(-1);
           }
         }
-        //AccessTriggerInfo(analysisTree,SinglePFTau180Trk50Name,nSinglePFTau180Trk50Filter,isSinglePFTau180Trk50Filter);
-        //AccessTriggerInfo(analysisTree,SinglePFTau180Trk50oneprongName,nSinglePFTau180Trk50oneprongFilter,isSinglePFTau180Trk50oneprongFilter);
-        
+        isSinglePFTau180Trk50Filter = AccessTriggerInfo(analysisTree,SinglePFTau180Trk50Name,nSinglePFTau180Trk50Filter);
+        isSinglePFTau180Trk50oneprongFilter = AccessTriggerInfo(analysisTree,SinglePFTau180Trk50oneprongName,nSinglePFTau180Trk50oneprongFilter);
+        if (isData){
+          if (!isSinglePFTau180Trk50Filter || !isSinglePFTau180Trk50oneprongFilter){
+              std::cout << "Single Tau HLT filter not found" << std::endl;
+        	    exit(-1);
+          }
+        }
         
         // ***************************************************
         // accessing PF MET and changing momentum scale of met
@@ -1123,21 +1128,20 @@ int main(int argc, char * argv[]) {
            taubyVVVLooseDeepTau2017v2p1VSe_ = analysisTree.tau_byVVVLooseDeepTau2017v2p1VSe[indexTau] > 0.5;
            taubyVVVLooseDeepTau2017v2p1VSjet_ = analysisTree.tau_byVVVLooseDeepTau2017v2p1VSjet[indexTau] > 0.5;
 
-           // bool isSingleTau = false;
-           // bool isSingleTauOneProng = false;
-           // for (unsigned int iT=0; iT<analysisTree.trigobject_count;++iT) {
-           //   double dR = deltaR(lorentzVectorTau.Eta(),lorentzVectorTau.Phi(),
-           // 		     analysisTree.trigobject_eta[iT],analysisTree.trigobject_phi[iT]);
-           //   if (dR>0.5) continue;
-           //   if (isSinglePFTau180Trk50Filter) {
-           //     if (analysisTree.trigobject_filters[iT][nSinglePFTau180Trk50Filter]) isSingleTau = true;
-           //   }
-           //   if (isSinglePFTau180Trk50oneprongFilter) {
-           //     if (analysisTree.trigobject_filters[iT][nSinglePFTau180Trk50oneprongFilter]) isSingleTauOneProng = true;
-           //   }
-           // }
-           // tauSinglePFTau180Trk50_ = isSingleTau;
-           // tauSinglePFTau180Trk50oneprong_ = isSingleTauOneProng;
+           bool isSingleTau = false;
+	         bool isSingleTauOneProng = false;
+	         for (unsigned int iT=0; iT<analysisTree.trigobject_count;++iT) {
+	             double dR = deltaR(lorentzVectorTau.Eta(),lorentzVectorTau.Phi(), analysisTree.trigobject_eta[iT],analysisTree.trigobject_phi[iT]);
+	             if (dR>0.5) continue;
+	             if (isSinglePFTau180Trk50Filter) {
+	                if (analysisTree.trigobject_filters[iT][nSinglePFTau180Trk50Filter]) isSingleTau = true;
+	               }
+	             if (isSinglePFTau180Trk50oneprongFilter) {
+	                if (analysisTree.trigobject_filters[iT][nSinglePFTau180Trk50oneprongFilter]) isSingleTauOneProng = true;
+	               }
+	              }
+	         tauSinglePFTau180Trk50_ = isSingleTau;
+	         tauSinglePFTau180Trk50oneprong_ = isSingleTauOneProng;
            
            // finding matching jet
            bool jetFound = false;

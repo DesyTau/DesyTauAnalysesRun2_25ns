@@ -351,12 +351,6 @@ bool isSinglePFTau180Trk50Filter = false;
 unsigned int nSinglePFTau180Trk50oneprongFilter = 0;
 bool isSinglePFTau180Trk50oneprongFilter = false;
 
-// unsigned int nSinglePFTau180Trk50Filter = 0;
-// bool isSinglePFTau180Trk50Filter = false;
-
-// unsigned int nSinglePFTau180Trk50oneprongFilter = 0;
-// bool isSinglePFTau180Trk50oneprongFilter = false;
-
 TTree * ntuple_ = new TTree("NTuple","NTuple");
 TTree * trigNTuple_ = new TTree("TriggerNTuple","TriggerNTuple");
 
@@ -887,12 +881,6 @@ void SetDefaultValues(){
    
    nSinglePFTau180Trk50oneprongFilter = 0;
    isSinglePFTau180Trk50oneprongFilter = false;
-   
-   // nSinglePFTau180Trk50Filter = 0;
-   // isSinglePFTau180Trk50Filter = false;
-
-   // nSinglePFTau180Trk50oneprongFilter = 0;
-   // isSinglePFTau180Trk50oneprongFilter = false;
 
 
 }
