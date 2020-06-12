@@ -183,6 +183,9 @@ int main(int argc, char * argv[]) {
   TH2F  *tagEff_B     = 0;
   TH2F  *tagEff_C     = 0;
   TH2F  *tagEff_Light = 0;
+  TH2F  *tagEff_B_nonCP5     = 0;
+  TH2F  *tagEff_C_nonCP5     = 0;
+  TH2F  *tagEff_Light_nonCP5 = 0;
   
   if( ApplyBTagScaling ){
     tagEff_B     = (TH2F*)fileTagging->Get("btag_eff_b");
@@ -190,7 +193,7 @@ int main(int argc, char * argv[]) {
     tagEff_Light = (TH2F*)fileTagging->Get("btag_eff_oth");
   }
   TRandom3 *rand = new TRandom3();
-  const struct btag_scaling_inputs inputs_btag_scaling_medium = { reader_B, reader_C, reader_Light, tagEff_B, tagEff_C, tagEff_Light, rand };
+  const struct btag_scaling_inputs inputs_btag_scaling_medium = { reader_B, reader_C, reader_Light, tagEff_B, tagEff_C, tagEff_Light, tagEff_B_nonCP5, tagEff_C_nonCP5, tagEff_Light_nonCP5, rand };
 
   const bool applyRecoilCorrections = cfg.get<bool>("ApplyRecoilCorrections");
   

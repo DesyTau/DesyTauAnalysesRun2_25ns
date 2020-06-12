@@ -165,6 +165,7 @@ int main(int argc, char * argv[]){
   const bool ApplyMetFilters  = cfg.get<bool>("ApplyMetFilters");
   const bool usePuppiMET      = cfg.get<bool>("UsePuppiMET");
   const bool ApplyIpCorrection = cfg.get<bool>("ApplyIpCorrection");
+  const bool ApplyBTagCP5Correction = cfg.get<bool>("ApplyBTagCP5Correction");
 
   // JER
   //  const string jer_resolution = cfg.get<string>("JER_Resolution");
@@ -244,19 +245,33 @@ int main(int argc, char * argv[]){
     cout<<pathToTaggingEfficiencies<<" not found. Please check."<<endl;
     exit(-1);
   }
-  
+    
   TFile *fileTagging  = new TFile(pathToTaggingEfficiencies);
   TH2F  *tagEff_B     = 0;
   TH2F  *tagEff_C     = 0;
   TH2F  *tagEff_Light = 0;
-  
+  TH2F  *tagEff_B_nonCP5     = 0;
+  TH2F  *tagEff_C_nonCP5     = 0;
+  TH2F  *tagEff_Light_nonCP5 = 0;
+  TRandom3 *rand = new TRandom3();
+
   if(ApplyBTagScaling){
     tagEff_B     = (TH2F*)fileTagging->Get("btag_eff_b");
     tagEff_C     = (TH2F*)fileTagging->Get("btag_eff_c");
     tagEff_Light = (TH2F*)fileTagging->Get("btag_eff_oth");
-  }
-  TRandom3 *rand = new TRandom3();
-  const struct btag_scaling_inputs inputs_btag_scaling_medium = {reader_B, reader_C, reader_Light, tagEff_B, tagEff_C, tagEff_Light, rand};
+    if (ApplyBTagCP5Correction) {
+      TString pathToTaggingEfficiencies_nonCP5 = (TString) cmsswBase + "/src/" + cfg.get<string>("BtagMCeffFile_nonCP5");
+      if (gSystem->AccessPathName(pathToTaggingEfficiencies_nonCP5)) {
+        cout<<pathToTaggingEfficiencies_nonCP5<<" not found. Please check."<<endl;
+        exit(-1);
+      } 
+      TFile *fileTagging_nonCP5  = new TFile(pathToTaggingEfficiencies_nonCP5);
+      tagEff_B_nonCP5     = (TH2F*)fileTagging_nonCP5->Get("btag_eff_b");
+      tagEff_C_nonCP5     = (TH2F*)fileTagging_nonCP5->Get("btag_eff_c");
+      tagEff_Light_nonCP5 = (TH2F*)fileTagging_nonCP5->Get("btag_eff_oth");
+    }
+  }  
+  const struct btag_scaling_inputs inputs_btag_scaling_medium = {reader_B, reader_C, reader_Light, tagEff_B, tagEff_C, tagEff_Light, tagEff_B_nonCP5, tagEff_C_nonCP5, tagEff_Light_nonCP5, rand};
 
   TFile * ff_file = TFile::Open(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/fakefactors_ws_"+TString(year)+".root");
   if (ff_file->IsZombie()) {
@@ -275,9 +290,9 @@ int main(int argc, char * argv[]){
 
 
   // MET Recoil Corrections
-  const bool isDY = infiles.find("DY") != string::npos;
+  const bool isDY = (infiles.find("DY") != string::npos) || (infiles.find("EWKZ") != string::npos);//Corrections that should be applied on EWKZ are the same needed for DY
   const bool isWJets = (infiles.find("WJets") != string::npos) || (infiles.find("W1Jets") != string::npos) || (infiles.find("W2Jets") != string::npos) || (infiles.find("W3Jets") != string::npos) || (infiles.find("W4Jets") != string::npos) || (infiles.find("EWK") != string::npos);
-  const bool isVBForGGHiggs = (infiles.find("VBFHTo")!= string::npos) || (infiles.find("GluGluHTo")!= string::npos);
+  const bool isHiggs = (infiles.find("VBFHTo")!= string::npos) || (infiles.find("WminusHTo")!= string::npos) || (infiles.find("WplusHTo")!= string::npos) || (infiles.find("ZHTo")!= string::npos) || (infiles.find("GluGluHTo")!= string::npos);
   const bool isEWKZ =  infiles.find("EWKZ") != string::npos;
   const bool isMG = infiles.find("madgraph") != string::npos;
   const bool isMSSMsignal =  (infiles.find("SUSYGluGluToHToTauTau")!= string::npos) || (infiles.find("SUSYGluGluToBBHToTauTau")!= string::npos);
@@ -288,7 +303,7 @@ int main(int argc, char * argv[]){
   if(isTauSpinner) applyTauSpinnerWeights = true;
   const bool isEmbedded = infiles.find("Embed") != string::npos;
 
-  const bool ApplyRecoilCorrections = cfg.get<bool>("ApplyRecoilCorrections") && !isEmbedded && !isData && (isDY || isWJets || isVBForGGHiggs || isMSSMsignal);
+  const bool ApplyRecoilCorrections = cfg.get<bool>("ApplyRecoilCorrections") && !isEmbedded && !isData && (isDY || isWJets || isHiggs || isMSSMsignal);
   kit::RecoilCorrector recoilCorrector(cfg.get<string>("RecoilFilePath"));
   kit::MEtSys MetSys(cfg.get<string>("RecoilSysFilePath"));
 
@@ -513,6 +528,7 @@ int main(int argc, char * argv[]){
   TauThreeProngScaleSys *tauThreeProngScaleSys = 0;
   TauThreeProngOnePi0ScaleSys *tauThreeProngOnePi0ScaleSys = 0;
   MuonScaleSys *muonScaleSys = 0;
+  ElectronScaleSys *electronScaleSys = 0;
 
   LepTauFakeOneProngScaleSys *lepTauFakeOneProngScaleSys = 0;
   LepTauFakeOneProngOnePi0ScaleSys *lepTauFakeOneProngOnePi0ScaleSys = 0;
@@ -542,6 +558,12 @@ int main(int argc, char * argv[]){
     muonScaleSys->SetUseFastMTT(ApplyFastMTT);
     muonScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);
     muonScaleSys->SetUsePuppiMET(usePuppiMET);
+    
+    electronScaleSys = new ElectronScaleSys(otree);
+    electronScaleSys->SetUseSVFit(ApplySVFit);
+    electronScaleSys->SetUseFastMTT(ApplyFastMTT);
+    electronScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);
+    electronScaleSys->SetUsePuppiMET(usePuppiMET);
 
     tauOneProngScaleSys = new TauOneProngScaleSys(otree);
     tauOneProngScaleSys->SetScale(shift_tes_1prong,shift_tes_1prong_e);
@@ -578,22 +600,18 @@ int main(int argc, char * argv[]){
       lepTauFakeOneProngScaleSys->SetUseSVFit(ApplySVFit);
       lepTauFakeOneProngScaleSys->SetUseFastMTT(ApplyFastMTT);
       lepTauFakeOneProngScaleSys->SetUsePuppiMET(usePuppiMET);
-      if(ch=="mt")lepTauFakeOneProngScaleSys->SetLabel("CMS_htt_ZLShape_mt_13TeV");
-      else if(ch=="et")lepTauFakeOneProngScaleSys->SetLabel("CMS_htt_ZLShape_et_13TeV");
 
       lepTauFakeOneProngOnePi0ScaleSys = new LepTauFakeOneProngOnePi0ScaleSys(otree);
       lepTauFakeOneProngOnePi0ScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);
       lepTauFakeOneProngOnePi0ScaleSys->SetUseSVFit(ApplySVFit);
       lepTauFakeOneProngOnePi0ScaleSys->SetUseFastMTT(ApplyFastMTT);
       lepTauFakeOneProngOnePi0ScaleSys->SetUsePuppiMET(usePuppiMET);
-      if(ch=="mt")lepTauFakeOneProngOnePi0ScaleSys->SetLabel("CMS_htt_ZLShape_mt_13TeV");
-      else if(ch=="et")lepTauFakeOneProngOnePi0ScaleSys->SetLabel("CMS_htt_ZLShape_et_13TeV");
 
     }
 
     // systematics only for MC
     if (!isEmbedded) {
-      if (!isDY && !isWJets && !isVBForGGHiggs) {
+      if (!isDY && !isWJets && !isHiggs) {
 	btagSys = new BtagSys(otree,TString("Btag"));
 	btagSys->SetConfig(&cfg);
 	btagSys->SetBtagScaling(&inputs_btag_scaling_medium);
@@ -676,7 +694,7 @@ int main(int argc, char * argv[]){
     AC1B analysisTree(_tree, isData);
     // set AC1B for JES Btag and MET systematics
     if ( !isData && !isEmbedded && ApplySystShift) {
-      if (!isDY && !isWJets && !isVBForGGHiggs)
+      if (!isDY && !isWJets && !isHiggs)
 	btagSys->SetAC1B(&analysisTree);
       for (unsigned int i = 0; i < jetEnergyScaleSys.size(); i++)
       	(jetEnergyScaleSys.at(i))->SetAC1B(&analysisTree);
@@ -1577,7 +1595,7 @@ int main(int argc, char * argv[]){
       otree->weight_CMS_PS_FSR_ggH_13TeVUp   = 1.;
       otree->weight_CMS_PS_FSR_ggH_13TeVDown = 1.;
 
-      if(isVBForGGHiggs){
+      if(isHiggs){
 	otree->weight_CMS_PS_ISR_ggH_13TeVUp   = analysisTree.gen_pythiaweights[6];
 	otree->weight_CMS_PS_ISR_ggH_13TeVDown = analysisTree.gen_pythiaweights[8];
 	otree->weight_CMS_PS_FSR_ggH_13TeVUp   = analysisTree.gen_pythiaweights[7];
@@ -2177,7 +2195,7 @@ int main(int argc, char * argv[]){
         
       // evaluate systematics for MC 
       if( !isData && !isEmbedded && ApplySystShift){
-	if (!isDY && !isWJets && !isVBForGGHiggs) {
+	if (!isDY && !isWJets && !isHiggs) {
 	  btagSys->Eval();
 	}
 	for(unsigned int i = 0; i < jetEnergyScaleSys.size(); i++) {
@@ -2210,7 +2228,11 @@ int main(int argc, char * argv[]){
 	    lepTauFakeOneProngOnePi0ScaleSys->Eval(utils::MUTAU);
 	  }
 	}
-	else if (ch == "et") { 
+	else if (ch == "et") {
+    electronScaleSys->SetElectronIndex(leptonIndex);
+    electronScaleSys->SetAC1B(&analysisTree);
+    electronScaleSys->Eval(utils::ETAU);
+    
 	  tauOneProngScaleSys->Eval(utils::ETAU);
 	  tauOneProngOnePi0ScaleSys->Eval(utils::ETAU);
 	  tauThreeProngScaleSys->Eval(utils::ETAU);
@@ -2261,6 +2283,11 @@ int main(int argc, char * argv[]){
   if (muonScaleSys != 0) {
     muonScaleSys->Write("",TObject::kOverwrite);
     delete muonScaleSys;
+  }
+  
+  if (electronScaleSys != 0) {
+    electronScaleSys->Write("",TObject::kOverwrite);
+    delete electronScaleSys;
   }
 
   if(tauOneProngScaleSys != 0){

@@ -10,6 +10,7 @@
 
 #include <DesyTauAnalyses/NTupleMaker/interface/functions.h>
 #include <DesyTauAnalyses/NTupleMaker/interface/Systematics.h>
+#include "DesyTauAnalyses/NTupleMaker/interface/AC1B.h"
 
 using namespace utils;
 
@@ -472,12 +473,20 @@ public:
 
   ElectronScaleSys(Synch17Tree* c){
     cenTree = c;
-    label = "eScale";
+    label = "CMS_scale_e_13TeV";
     
     this->Init(cenTree);
   };
   
   virtual ~ElectronScaleSys(){};
+
+  void SetAC1B(const AC1B * tree){
+    analysisTree = tree;
+  };
+  
+  void SetElectronIndex(int index){
+    electronIndex = index;
+  };
 
 protected:
   virtual void InitSF(){
@@ -486,16 +495,16 @@ protected:
     double pt_central[pt_bins] = {};
     for(int ibin = 0; ibin < pt_bins; ibin++)
       pt_central[ibin] = (pt_edges[ibin+1] + pt_edges[ibin])/2.; 
-
+  
     const int eta_bins = 2;
     double eta_edges[eta_bins + 1] = {0., 1.479, 2.5};
     double eta_central[eta_bins] = {};
     for(int ibin = 0; ibin < eta_bins; ibin++)
       eta_central[ibin] = (eta_edges[ibin+1] + eta_edges[ibin])/2.; 
-
+  
     sf_up = new TH2D(label+"_sf_up", label+"_sf_up", pt_bins, pt_edges, eta_bins, eta_edges);
     sf_down = new TH2D(label+"_sf_down", label+"_sf_down", pt_bins, pt_edges, eta_bins, eta_edges);
-
+  
     sf_up->SetBinContent( sf_up->FindBin( pt_central[0], eta_central[0] ), 0.01);
     sf_up->SetBinContent( sf_up->FindBin( pt_central[0], eta_central[1] ), 0.025);   
     sf_down->SetBinContent( sf_down->FindBin( pt_central[0], eta_central[0] ), 0.01);
@@ -505,32 +514,45 @@ protected:
   virtual void ScaleUp(utils::channel ch){
     lep1_scaled = lep1;
     lep2_scaled = lep2;
-
-    float pt1 = lep1.Pt();
-    float absEta1 = fabs(lep1.Eta());
-    float pt2 = lep2.Pt();
-    float absEta2 = fabs(lep2.Eta());
     
+    // reading scaled momentum values from BigNTuple tree 
+    // only single electron options implemented
     if (ch == EMU)
-      lep1_scaled.SetXYZM(lep1.Px() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt1, absEta1))),
-			  lep1.Py() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt1, absEta1))),
-			  lep1.Pz() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt1, absEta1))),
+      lep1_scaled.SetXYZM(analysisTree->electron_px_energyscale_up[electronIndex],
+			  analysisTree->electron_py_energyscale_up[electronIndex],
+			  analysisTree->electron_pz_energyscale_up[electronIndex],
 			  lep1.M());
     else if (ch == ETAU)
-      lep1_scaled.SetXYZM(lep1.Px() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt1, absEta1))),
-			  lep1.Py() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt1, absEta1))),
-			  lep1.Pz() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt1, absEta1))),
-			  lep1.M());
-    else if (ch == EE){
-      lep1_scaled.SetXYZM(lep1.Px() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt1, absEta1))),
-			  lep1.Py() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt1, absEta1))),
-			  lep1.Pz() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt1, absEta1))),
-			  lep1.M());
-      lep2_scaled.SetXYZM(lep2.Px() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))),
-			  lep2.Py() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))),
-			  lep2.Pz() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))),
-			  lep2.M());
-    }
+      lep1_scaled.SetXYZM(analysisTree->electron_px_energyscale_up[electronIndex],
+        analysisTree->electron_py_energyscale_up[electronIndex],
+        analysisTree->electron_pz_energyscale_up[electronIndex],
+        lep1.M());
+    // 
+    // float pt1 = lep1.Pt();
+    // float absEta1 = fabs(lep1.Eta());
+    // float pt2 = lep2.Pt();
+    // float absEta2 = fabs(lep2.Eta());
+
+    // if (ch == EMU)
+    //   lep1_scaled.SetXYZM(lep1.Px() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt1, absEta1))),
+		// 	  lep1.Py() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt1, absEta1))),
+		// 	  lep1.Pz() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt1, absEta1))),
+		// 	  lep1.M());
+    // else if (ch == ETAU)
+    //   lep1_scaled.SetXYZM(lep1.Px() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt1, absEta1))),
+		// 	  lep1.Py() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt1, absEta1))),
+		// 	  lep1.Pz() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt1, absEta1))),
+		// 	  lep1.M());
+    // else if (ch == EE){
+    //   lep1_scaled.SetXYZM(lep1.Px() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt1, absEta1))),
+		// 	  lep1.Py() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt1, absEta1))),
+		// 	  lep1.Pz() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt1, absEta1))),
+		// 	  lep1.M());
+    //   lep2_scaled.SetXYZM(lep2.Px() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))),
+		// 	  lep2.Py() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))),
+		// 	  lep2.Pz() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))),
+		// 	  lep2.M());
+    // }
 
     this->Fill(ch, "Up");
   };
@@ -539,34 +561,50 @@ protected:
     lep1_scaled = lep1;
     lep2_scaled = lep2;
 
-    float pt1 = lep1.Pt();
-    float absEta1 = fabs(lep1.Eta());
-    float pt2 = lep2.Pt();
-    float absEta2 = fabs(lep2.Eta());
-    
+    // reading scaled momentum values from BigNTuple tree 
+    // only single electron options implemented
     if (ch == EMU)
-      lep1_scaled.SetXYZM(lep1.Px() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt1, absEta1))),
-			  lep1.Py() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt1, absEta1))),
-			  lep1.Pz() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt1, absEta1))),
+      lep1_scaled.SetXYZM(analysisTree->electron_px_energyscale_down[electronIndex],
+			  analysisTree->electron_py_energyscale_down[electronIndex],
+			  analysisTree->electron_pz_energyscale_down[electronIndex],
 			  lep1.M());
-    else if (ch == MUTAU)
-      lep1_scaled.SetXYZM(lep1.Px() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt1, absEta1))),
-			  lep1.Py() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt1, absEta1))),
-			  lep1.Pz() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt1, absEta1))),
-			  lep1.M());
-    else if (ch == MUMU){
-      lep1_scaled.SetXYZM(lep1.Px() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt1, absEta1))),
-			  lep1.Py() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt1, absEta1))),
-			  lep1.Pz() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt1, absEta1))),
-			  lep1.M());
-      lep2_scaled.SetXYZM(lep2.Px() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt2, absEta2))),
-			  lep2.Py() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt2, absEta2))),
-			  lep2.Pz() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt2, absEta2))),
-			  lep2.M());
-    }
+    else if (ch == ETAU)
+      lep1_scaled.SetXYZM(analysisTree->electron_px_energyscale_down[electronIndex],
+        analysisTree->electron_py_energyscale_down[electronIndex],
+        analysisTree->electron_pz_energyscale_down[electronIndex],
+        lep1.M());
+
+    // float pt1 = lep1.Pt();
+    // float absEta1 = fabs(lep1.Eta());
+    // float pt2 = lep2.Pt();
+    // float absEta2 = fabs(lep2.Eta());
+    // 
+    // if (ch == EMU)
+    //   lep1_scaled.SetXYZM(lep1.Px() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt1, absEta1))),
+		// 	  lep1.Py() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt1, absEta1))),
+		// 	  lep1.Pz() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt1, absEta1))),
+		// 	  lep1.M());
+    // else if (ch == MUTAU)
+    //   lep1_scaled.SetXYZM(lep1.Px() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt1, absEta1))),
+		// 	  lep1.Py() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt1, absEta1))),
+		// 	  lep1.Pz() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt1, absEta1))),
+		// 	  lep1.M());
+    // else if (ch == MUMU){
+    //   lep1_scaled.SetXYZM(lep1.Px() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt1, absEta1))),
+		// 	  lep1.Py() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt1, absEta1))),
+		// 	  lep1.Pz() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt1, absEta1))),
+		// 	  lep1.M());
+    //   lep2_scaled.SetXYZM(lep2.Px() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt2, absEta2))),
+		// 	  lep2.Py() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt2, absEta2))),
+		// 	  lep2.Pz() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt2, absEta2))),
+		// 	  lep2.M());
+    // }
     
     this->Fill(ch, "Down");
   };
+  
+  const AC1B * analysisTree;
+  int electronIndex;
 };
 
 class ElectronEBScaleSys : public ElectronScaleSys {
