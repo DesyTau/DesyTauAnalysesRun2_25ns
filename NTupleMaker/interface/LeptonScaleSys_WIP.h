@@ -73,7 +73,7 @@ public:
   void SetScale(float Central, float Error) {
     central = Central;
     error = Error;
-    // this->Init(cenTree);
+    this->Init(cenTree);
   }  
 
 protected:
