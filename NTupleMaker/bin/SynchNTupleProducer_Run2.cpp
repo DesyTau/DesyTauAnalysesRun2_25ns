@@ -1689,11 +1689,11 @@ int main(int argc, char * argv[]){
 	if(otree->gen_match_2==2||otree->gen_match_2==4){
 	  TFile muTauFRfile(TString(cmsswBase)+"/src/TauPOG/TauIDSFs/data/TauID_SF_eta_DeepTau2017v2p1VSmu_"+year+".root"); 
 	  TH1F *SFhist = (TH1F*) muTauFRfile.Get(wpVsMu);
-	  otree->mutaufakeweight = SFhist->GetBinContent(SFhist->GetXaxis()->FindBin(otree->eta_2));
+	  otree->mutaufakeweight = SFhist->GetBinContent(SFhist->GetXaxis()->FindBin(abs(otree->eta_2)));
 	}else if(otree->gen_match_2==1||otree->gen_match_2==3){
 	  TFile eTauFRfile(TString(cmsswBase)+"/src/TauPOG/TauIDSFs/data/TauID_SF_eta_DeepTau2017v2p1VSe_"+year+".root"); 
 	  TH1F *SFhist = (TH1F*) eTauFRfile.Get(wpVsEle);
-	  otree->etaufakeweight = SFhist->GetBinContent(SFhist->GetXaxis()->FindBin(otree->eta_2));
+	  otree->etaufakeweight = SFhist->GetBinContent(SFhist->GetXaxis()->FindBin(abs(otree->eta_2)));
 	}
       }
       ////////////////////////////////////////////////////////////
