@@ -83,7 +83,7 @@ double CalculateCosPsi(TLorentzVector momentum, TLorentzVector ipvec){
 
 }
 
-void calibrateIP(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, int tauIndex2, TString channel, IpCorrection * ip, IpCorrection * ipBS) {
+void calibrateIP(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, int tauIndex2, TString channel, std::map<TString,IpCorrection*> ipCorrectors) {
 
   int nPart = analysisTree->genparticles_count;
   TVector3 vertex;
@@ -161,7 +161,9 @@ void calibrateIP(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, i
 	    << otree->gen_ipz_1 << std::endl;
   */
 
-  if (ip!=NULL) {
+  if (ipCorrectors["ipTau1"]!=NULL) {
+    
+    IpCorrection * ip = ipCorrectors["ipTau1"];
     float ipx = ip->correctIp(IpCorrection::Coordinate::Ipx,otree->ipx_1,ipGen.X(),otree->eta_1);
     otree->ipx_1 = ipx;
     ipx = ip->correctIp(IpCorrection::Coordinate::Ipx,otree->ip0x_1,ipGen.X(),otree->eta_1);
@@ -180,7 +182,8 @@ void calibrateIP(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, i
   
   // PV + BS
   // -------
-  if (ipBS!=NULL) {
+  if (ipCorrectors["ipTau1BS"]!=NULL) {
+    IpCorrection * ipBS = ipCorrectors["ipTau1BS"];
     float ipx = ipBS->correctIp(IpCorrection::Coordinate::Ipx,otree->ipx_bs_1,ipGen.X(),otree->eta_1);
     otree->ipx_bs_1 = ipx;
   
@@ -254,7 +257,8 @@ void calibrateIP(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, i
   otree->gen_ipphi_2 = ipGen.Phi();
   otree->gen_ipeta_2 = ipGen.Eta();
 
-  if (ip!=NULL) {
+  if (ipCorrectors["ipTau2"]!=NULL) {
+    IpCorrection *ip = ipCorrectors["ipTau2"];
     float ipx = float(ip->correctIp(IpCorrection::Coordinate::Ipx,otree->ipx_2,ipGen.X(),otree->eta_2));
     otree->ipx_2 = ipx;
     ipx = float(ip->correctIp(IpCorrection::Coordinate::Ipx,otree->ip0x_2,ipGen.X(),otree->eta_2));
@@ -272,7 +276,9 @@ void calibrateIP(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, i
   }
   // PV + BS
   // -------
-  if (ipBS!=NULL) {
+ 
+  if (ipCorrectors["ipTau2BS"]!=NULL) {
+    IpCorrection * ipBS = ipCorrectors["ipTau2BS"];
     float ipx = ipBS->correctIp(IpCorrection::Coordinate::Ipx,otree->ipx_bs_2,ipGen.X(),otree->eta_2);
     otree->ipx_bs_2 = ipx;
   
@@ -281,11 +287,12 @@ void calibrateIP(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, i
   
     float ipz = ipBS->correctIp(IpCorrection::Coordinate::Ipz,otree->ipz_bs_2,ipGen.Z(),otree->eta_2);
     otree->ipz_bs_2 = ipz;
-  }
 
+  }
+  
 }
 
-void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, int tauIndex2, TString channel, IpCorrection *ip, IpCorrection *ipBS){
+void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, int tauIndex2, TString channel, std::map<TString,IpCorrection*> ipCorrectors){
   // cout<<"Start acott_Impr"<<endl;
  
   otree->acotautau_00 = -9999;
@@ -357,6 +364,14 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
   otree->ipx_uncorr_2 = -9999;
   otree->ipy_uncorr_2 = -9999;
   otree->ipz_uncorr_2 = -9999;
+
+  otree->ipx_bs_uncorr_1 = -9999;
+  otree->ipy_bs_uncorr_1 = -9999;
+  otree->ipz_bs_uncorr_1 = -9999;
+
+  otree->ipx_bs_uncorr_2 = -9999;
+  otree->ipy_bs_uncorr_2 = -9999;
+  otree->ipz_bs_uncorr_2 = -9999;
 
   otree->acotautauPsi_00=-9999;
   otree->acotautauPsi_01=-9999;
@@ -569,6 +584,10 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
   otree->ipy_uncorr_1 = tau1IP_refitbs.Y();
   otree->ipz_uncorr_1 = tau1IP_refitbs.Z();
 
+  otree->ipx_bs_uncorr_1 = tau1IP_bs.X();
+  otree->ipy_bs_uncorr_1 = tau1IP_bs.Y();
+  otree->ipz_bs_uncorr_1 = tau1IP_bs.Z();
+
   TLorentzVector tau2IP_refitbs_uncorr = tau2IP_refitbs;
   TLorentzVector tau2IP_helix_uncorr = tau2IP_helix;
   otree->ipx_2 = tau2IP_refitbs.X();
@@ -591,7 +610,11 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
   otree->ipy_uncorr_2 = tau2IP_refitbs.Y();
   otree->ipz_uncorr_2 = tau2IP_refitbs.Z();
 
-  calibrateIP(analysisTree,otree,tauIndex1,tauIndex2,channel,ip,ipBS);  
+  otree->ipx_bs_uncorr_2 = tau2IP_bs.X();
+  otree->ipy_bs_uncorr_2 = tau2IP_bs.Y();
+  otree->ipz_bs_uncorr_2 = tau2IP_bs.Z();
+
+  calibrateIP(analysisTree,otree,tauIndex1,tauIndex2,channel,ipCorrectors);  
 
   tau1IP_helix.SetX(otree->ip0x_1);
   tau1IP_helix.SetY(otree->ip0y_1);
@@ -635,7 +658,7 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
   
   if(channel=="tt"){ if(analysisTree->tau_decayMode[tauIndex1]>=1&&analysisTree->tau_decayMode[tauIndex1]<=3) tau1Pi0 = neutralPivec(analysisTree,tauIndex1);}
   
-  if((analysisTree->tau_decayMode[tauIndex2]>=1&&analysisTree->tau_decayMode[tauIndex2])<=3||
+  if((analysisTree->tau_decayMode[tauIndex2]>=1&&analysisTree->tau_decayMode[tauIndex2]<=3)||
      (analysisTree->tau_MVADM2017v1[tauIndex2]>=0.5&&analysisTree->tau_MVADM2017v1[tauIndex2]<=3.5)){ 
     tau2Pi0 = neutralPivec(analysisTree,tauIndex2); }
  
@@ -1254,7 +1277,7 @@ void gen_acott(const AC1B * analysisTree, Synch17GenTree *gentree, int tauIndex1
   if (oneProngPi01)
     gentree->acotautau_10=acoCP(tau1Prong,tau2Prong,tau1Pi0,tau2IP,firstNegative,true,false, gentree);
 
-    if (oneProngPi02)
+  if (oneProngPi02)
     gentree->acotautau_01=acoCP(tau1Prong,tau2Prong,tau1IP,tau2Pi0,firstNegative,false,true, gentree);
   
 

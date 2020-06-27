@@ -148,6 +148,8 @@ int main(int argc, char * argv[]) {
   const bool ApplyIpCorrection = cfg.get<bool>("ApplyIpCorrection");
   const string ipCorrFileName = cfg.get<string>("IpCorrFileName");
   TString IpCorrFileName(ipCorrFileName);
+  const string ipCorrFileNameBS = cfg.get<string>("IpCorrFileNamePVBS");
+  TString IpCorrFileNameBS(ipCorrFileNameBS);
 
   //pileup distrib
   const string pileUpInDataFile = cfg.get<string>("pileUpInDataFile");
@@ -255,6 +257,14 @@ int main(int argc, char * argv[]) {
 
   // IP corrections
   IpCorrection *ip = new IpCorrection(TString(cmsswBase) + "/src/" + IpCorrFileName);
+  IpCorrection *ipBS = new IpCorrection(TString(cmsswBase) + "/src/" + IpCorrFileNameBS);
+
+  std::map<TString,IpCorrection*> ipCorrectors = {
+    {"ipTau1",ip},
+    {"ipTau1BS",ipBS},
+    {"ipTau2",ip},
+    {"ipTau2BS",ipBS}
+  };
 
   std::vector<std::string> fileList; 
   int NumberOfFiles = 0;
@@ -614,9 +624,15 @@ int main(int argc, char * argv[]) {
       otree->m_vis = diTauLV.M();
       otree->pt_tt = diTauLV.Pt();
       
-      IpCorrection * ipCorrector = NULL;
-      if (ApplyIpCorrection) ipCorrector = ip;
-      acott_Impr(&analysisTree,otree,tauIndex_1,tauIndex_2,"tt",ipCorrector,ipCorrector); 
+      std::map<TString,IpCorrection*> ipCorrectorsNULL = {
+	{"ipTau1",NULL},
+	{"ipTau1BS",NULL},
+	{"ipTau2",NULL},
+	{"ipTau2BS",NULL}
+      };
+      std::map<TString,IpCorrection*> ipCorrectorsPass = ipCorrectorsNULL;
+      if (ApplyIpCorrection) {ipCorrectorsPass = ipCorrectors;}
+      acott_Impr(&analysisTree,otree,tauIndex_1,tauIndex_2,"tt",ipCorrectorsPass); 
       //const AC1B * analysisTree;      
   
       //tau1 

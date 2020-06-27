@@ -73,6 +73,9 @@ public :
   Float_t         ipx_uncorr_1;
   Float_t         ipy_uncorr_1;
   Float_t         ipz_uncorr_1;
+  Float_t         ipx_bs_uncorr_1;
+  Float_t         ipy_bs_uncorr_1;
+  Float_t         ipz_bs_uncorr_1;
   Float_t         gen_ipx_1;
   Float_t         gen_ipy_1;
   Float_t         gen_ipz_1;
@@ -88,6 +91,7 @@ public :
 
   Float_t         ipxy_1;
   Double_t        IP_signif_PV_with_BS_1;
+  Double_t        IP_signif_PV_with_BS_uncorr_1;
   Double_t        IP_signif_RefitV_with_BS_1;
   Double_t        IP_signif_RefitV_with_BS_uncorr_1;
   Float_t         ipn_1;
@@ -148,6 +152,9 @@ public :
   Float_t         ipx_uncorr_2;
   Float_t         ipy_uncorr_2;
   Float_t         ipz_uncorr_2;
+  Float_t         ipx_bs_uncorr_2;
+  Float_t         ipy_bs_uncorr_2;
+  Float_t         ipz_bs_uncorr_2;
   Float_t         gen_ipx_2;
   Float_t         gen_ipy_2;
   Float_t         gen_ipz_2;
@@ -163,6 +170,7 @@ public :
 
   Float_t         ipxy_2;
   Double_t        IP_signif_PV_with_BS_2;
+  Double_t        IP_signif_PV_with_BS_uncorr_2;
   Double_t        IP_signif_RefitV_with_BS_2;
   Double_t        IP_signif_RefitV_with_BS_uncorr_2;
   Float_t         ipn_2;
@@ -705,6 +713,9 @@ public :
   TBranch	 *b_ipx_uncorr_1;
   TBranch	 *b_ipy_uncorr_1;
   TBranch	 *b_ipz_uncorr_1;
+  TBranch	 *b_ipx_bs_uncorr_1;
+  TBranch	 *b_ipy_bs_uncorr_1;
+  TBranch	 *b_ipz_bs_uncorr_1;
 
   TBranch	 *b_gen_ipx_1;
   TBranch	 *b_gen_ipy_1;
@@ -721,6 +732,7 @@ public :
 
   TBranch	 *b_ipxy_1;
   TBranch	 *b_IP_signif_PV_with_BS_1;
+  TBranch	 *b_IP_signif_PV_with_BS_uncorr_1;
   TBranch	 *b_IP_signif_RefitV_with_BS_1;
   TBranch	 *b_IP_signif_RefitV_with_BS_uncorr_1;
   TBranch	 *b_ipn_1;
@@ -793,8 +805,14 @@ public :
   TBranch	 *b_ipx_uncorr_2;
   TBranch	 *b_ipy_uncorr_2;
   TBranch	 *b_ipz_uncorr_2;
+
+  TBranch	 *b_ipx_bs_uncorr_2;
+  TBranch	 *b_ipy_bs_uncorr_2;
+  TBranch	 *b_ipz_bs_uncorr_2;
+
   TBranch	 *b_ipxy_2;
   TBranch	 *b_IP_signif_PV_with_BS_2;
+  TBranch	 *b_IP_signif_PV_with_BS_uncorr_2;
   TBranch	 *b_IP_signif_RefitV_with_BS_2;
   TBranch	 *b_IP_signif_RefitV_with_BS_uncorr_2;
   TBranch	 *b_ipn_2;

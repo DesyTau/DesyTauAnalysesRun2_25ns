@@ -175,10 +175,17 @@ int main(int argc, char * argv[]){
   const string pileUpInDataFile = cfg.get<string>("pileUpInDataFile");
   const string pileUpInMCFile = cfg.get<string>("pileUpInMCFile");
   const string pileUpforMC = cfg.get<string>("pileUpforMC");
-  const string ipCorrFileName = cfg.get<string>("IpCorrFileName");
-  const string ipCorrFileNameBS = cfg.get<string>("IpCorrFileNamePVBS");
-  TString IpCorrFileName(ipCorrFileName);
-  TString IpCorrFileNameBS(ipCorrFileNameBS);
+
+  const string ipCorrFileNameLepton   = cfg.get<string>("IpCorrFileNameLepton");
+  const string ipCorrFileNameLeptonBS = cfg.get<string>("IpCorrFileNameLeptonPVBS");
+  const string ipCorrFileNamePion     = cfg.get<string>("IpCorrFileNamePion");
+  const string ipCorrFileNamePionBS   = cfg.get<string>("IpCorrFileNamePionPVBS");
+
+  TString IpCorrFileNameLepton(ipCorrFileNameLepton);
+  TString IpCorrFileNameLeptonBS(ipCorrFileNameLeptonBS);
+  TString IpCorrFileNamePion(ipCorrFileNamePion);
+  TString IpCorrFileNamePionBS(ipCorrFileNamePionBS);
+
 
   // tau trigger efficiency
   std::string channel;
@@ -193,8 +200,18 @@ int main(int argc, char * argv[]){
   else {std::cout << "year is not 2016, 2017, 2018 - exiting" << '\n'; exit(-1);}
   TauIDSFTool *tauIDSF_medium = new TauIDSFTool(year, "DeepTau2017v2p1VSjet", "Medium", false);
 
-  IpCorrection *ip = new IpCorrection(TString(cmsswBase) + "/src/" + IpCorrFileName);
-  IpCorrection *ipBS = new IpCorrection(TString(cmsswBase) + "/src/" + IpCorrFileNameBS);  
+  IpCorrection *ipLepton   = new IpCorrection(TString(cmsswBase) + "/src/" + IpCorrFileNameLepton);
+  IpCorrection *ipLeptonBS = new IpCorrection(TString(cmsswBase) + "/src/" + IpCorrFileNameLeptonBS);  
+  IpCorrection *ipPion     = new IpCorrection(TString(cmsswBase) + "/src/" + IpCorrFileNamePion);
+  IpCorrection *ipPionBS   = new IpCorrection(TString(cmsswBase) + "/src/" + IpCorrFileNamePionBS);  
+
+  std::map<TString,IpCorrection*> ipCorrectors = {
+    {"ipTau1"   ,ipLepton},
+    {"ipTau1BS" ,ipLeptonBS},
+    {"ipTau2"     ,ipPion},
+    {"ipTau2BS"   ,ipPionBS}
+  };
+  
 
   //svfit
   const string svFitPtResFile = TString(TString(cmsswBase) + "/src/" + TString(cfg.get<string>("svFitPtResFile"))).Data();
@@ -2000,12 +2017,18 @@ int main(int argc, char * argv[]){
             }
         }
 
-      IpCorrection * ipCorrector = NULL;
-      IpCorrection * ipCorrectorBS = NULL;
+      std::map<TString,IpCorrection*> ipCorrectorsNULL = {
+	{"ipTau1",NULL},
+	{"ipTau1BS",NULL},
+	{"ipTau2",NULL},
+	{"ipTau2BS",NULL}
+      };
+
       ImpactParameter IP;
-      if (ApplyIpCorrection && (!isData || isEmbedded)) { ipCorrector = ip; ipCorrectorBS = ipBS;}
+      std::map<TString,IpCorrection*> ipCorrectorsPass = ipCorrectorsNULL;
+      if (ApplyIpCorrection && (!isData || isEmbedded)) ipCorrectorsPass = ipCorrectors;
       //      std::cout << "before..." << std::endl;
-      acott_Impr(&analysisTree, otree, leptonIndex, tauIndex, ch, ipCorrector, ipCorrectorBS);
+      acott_Impr(&analysisTree, otree, leptonIndex, tauIndex, ch, ipCorrectorsPass);
       //      std::cout << "after..." << std::endl;
 
       otree->acotautau_00 = otree->acotautau_refitbs_00;
@@ -2065,6 +2088,8 @@ int main(int argc, char * argv[]){
 
       TVector3 Ip1(otree->ipx_uncorr_1,otree->ipy_uncorr_1,otree->ipz_uncorr_1);
       otree->IP_signif_RefitV_with_BS_uncorr_1 = IP.CalculateIPSignificanceHelical(Ip1, ipCov1);
+      Ip1.SetXYZ(otree->ipx_bs_uncorr_1,otree->ipy_bs_uncorr_1,otree->ipz_bs_uncorr_1);
+      otree->IP_signif_PV_with_BS_uncorr_1 = IP.CalculateIPSignificanceHelical(Ip1, ipCov1_bs);
 
       otree->ip_covxx_1 = ipCov1(0,0);
       otree->ip_covxy_1 = ipCov1(0,1);
@@ -2087,6 +2112,8 @@ int main(int argc, char * argv[]){
       otree->dphiip_uncorr_2 = TMath::ACos(vectIP*vectP/(vectIP.Mag()*vectP.Mag()));
       TVector3 Ip2(otree->ipx_uncorr_2,otree->ipy_uncorr_2,otree->ipz_uncorr_2);
       otree->IP_signif_RefitV_with_BS_uncorr_2 = IP.CalculateIPSignificanceHelical(Ip2, ipCov2);
+      Ip2.SetXYZ(otree->ipx_bs_uncorr_2,otree->ipy_bs_uncorr_2,otree->ipz_bs_uncorr_2);
+      otree->IP_signif_PV_with_BS_uncorr_2 = IP.CalculateIPSignificanceHelical(Ip2, ipCov2_bs);
 
       otree->ip_covxx_2 = ipCov2(0,0);
       otree->ip_covxy_2 = ipCov2(0,1);
@@ -2117,8 +2144,8 @@ int main(int argc, char * argv[]){
       else {
 	ipCov1_corr =ipCov1;
 	Ip1.SetXYZ(otree->ipx_1,otree->ipy_1,otree->ipz_1);
-	if (ipCorrector!=NULL)
-	  ipCov1_corr = ipCorrector->correctIpCov(ipCov1,otree->eta_1);      
+	if (ipCorrectorsPass["ipTau1"]!=NULL)
+	  ipCov1_corr = ipCorrectorsPass["ipTau1"]->correctIpCov(ipCov1,otree->eta_1);      
 	otree->IP_signif_RefitV_with_BS_1 = IP.CalculateIPSignificanceHelical(Ip1, ipCov1_corr);
       }
 
@@ -2128,8 +2155,8 @@ int main(int argc, char * argv[]){
       else {
 	Ip1.SetXYZ(otree->ipx_bs_1,otree->ipy_bs_1,otree->ipz_bs_1);
 	ipCov1_corr = ipCov1_bs;
-	if (ipCorrectorBS!=NULL)
-	  ipCov1_corr = ipCorrectorBS->correctIpCov(ipCov1_bs,otree->eta_1);      
+	if (ipCorrectorsPass["ipTaus1BS"]!=NULL)
+	  ipCov1_corr = ipCorrectorsPass["ipTau1BS"]->correctIpCov(ipCov1_bs,otree->eta_1);      
 	otree->IP_signif_PV_with_BS_1 = IP.CalculateIPSignificanceHelical(Ip1, ipCov1_corr);
       }
 
@@ -2153,8 +2180,8 @@ int main(int argc, char * argv[]){
       else {
 	Ip2.SetXYZ(otree->ipx_2,otree->ipy_2,otree->ipz_2);
 	ipCov2_corr = ipCov2;
-	if (ipCorrector!=NULL)
-	  ipCov2_corr = ipCorrector->correctIpCov(ipCov2,otree->eta_2);      
+	if (ipCorrectorsPass["ipTau2"]!=NULL)
+	  ipCov2_corr = ipCorrectorsPass["ipTau2"]->correctIpCov(ipCov2,otree->eta_2);      
 	otree->IP_signif_RefitV_with_BS_2 = IP.CalculateIPSignificanceHelical(Ip2, ipCov2_corr);      
       }
 
@@ -2164,8 +2191,8 @@ int main(int argc, char * argv[]){
       else {
 	Ip2.SetXYZ(otree->ipx_bs_2,otree->ipy_bs_2,otree->ipz_bs_2);
 	ipCov2_corr = ipCov2_bs;
-	if (ipCorrectorBS!=NULL)
-	  ipCov2_corr = ipCorrectorBS->correctIpCov(ipCov2_bs,otree->eta_2);      
+	if (ipCorrectorsPass["ipTau2BS"]!=NULL)
+	  ipCov2_corr = ipCorrectors["ipTau2BS"]->correctIpCov(ipCov2_bs,otree->eta_2);      
 	otree->IP_signif_PV_with_BS_2 = IP.CalculateIPSignificanceHelical(Ip2, ipCov2_corr);      
       }
 
