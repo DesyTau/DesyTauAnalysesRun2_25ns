@@ -116,11 +116,11 @@ if [[ $CHANNEL == "et" ]]; then
   ls $dirData/SingleElectron_Run2016G-17Jul2018-v1/*root > $OUTDIR/SingleElectron_Run2016G
   ls $dirData/SingleElectron_Run2016H-17Jul2018-v1/*root > $OUTDIR/SingleElectron_Run2016H
 
-  ls $dirEmbedded/Embedding_eltau/EmbeddingRun2016B_ElTau/*root > $OUTDIR/EmbeddedElTau_Run2016B
-  ls $dirEmbedded/Embedding_eltau/EmbeddingRun2016C_ElTau/*root > $OUTDIR/EmbeddedElTau_Run2016C
-  ls $dirEmbedded/Embedding_eltau/EmbeddingRun2016D_ElTau/*root > $OUTDIR/EmbeddedElTau_Run2016D
-  ls $dirEmbedded/Embedding_eltau/EmbeddingRun2016E_ElTau/*root > $OUTDIR/EmbeddedElTau_Run2016E
-  ls $dirEmbedded/Embedding_eltau/EmbeddingRun2016F_ElTau/*root > $OUTDIR/EmbeddedElTau_Run2016F
-  ls $dirEmbedded/Embedding_eltau/EmbeddingRun2016G_ElTau/*root > $OUTDIR/EmbeddedElTau_Run2016G
-  ls $dirEmbedded/Embedding_eltau/EmbeddingRun2016H_ElTau/*root > $OUTDIR/EmbeddedElTau_Run2016H
+  ls $dirEmbedded/Embedding_eltau_v2/EmbeddingRun2016B_ElTau/*root > $OUTDIR/EmbeddedElTau_Run2016B
+  ls $dirEmbedded/Embedding_eltau_v2/EmbeddingRun2016C_ElTau/*root > $OUTDIR/EmbeddedElTau_Run2016C
+  ls $dirEmbedded/Embedding_eltau_v2/EmbeddingRun2016D_ElTau/*root > $OUTDIR/EmbeddedElTau_Run2016D
+  ls $dirEmbedded/Embedding_eltau_v2/EmbeddingRun2016E_ElTau/*root > $OUTDIR/EmbeddedElTau_Run2016E
+  ls $dirEmbedded/Embedding_eltau_v2/EmbeddingRun2016F_ElTau/*root > $OUTDIR/EmbeddedElTau_Run2016F
+  ls $dirEmbedded/Embedding_eltau_v2/EmbeddingRun2016G_ElTau/*root > $OUTDIR/EmbeddedElTau_Run2016G
+  ls $dirEmbedded/Embedding_eltau_v2/EmbeddingRun2016H_ElTau/*root > $OUTDIR/EmbeddedElTau_Run2016H
 fi
