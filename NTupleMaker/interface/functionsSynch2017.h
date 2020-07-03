@@ -44,6 +44,7 @@ bool isICHEPmed(int Index, const AC1B * analysisTree);
 bool isIdentifiedMediumMuon(int Index, const AC1B * analysisTree, bool isData);
 float getEffectiveArea(float eta);
 int ZDecay(const AC1B * analysisTree);
+float EmbedElectronES_SF(const AC1B * analysisTree, int era, int electronIndex );
 
 ///////////////////////////////////////////////
 //////////////FUNCTION DEFINITION//////////////
@@ -344,31 +345,32 @@ bool dilepton_veto_mt(const Config *cfg,const  AC1B *analysisTree){
 
 
 //returns the dilepton veto fot et channel
-bool dilepton_veto_et(const Config *cfg,const  AC1B *analysisTree){
-
+bool dilepton_veto_et(const Config *cfg,const  AC1B *analysisTree, int era, bool isEmbedded){
+  float sf_eleES_i = 1.0;   
+  float sf_eleES_j = 1.0;   
   for (unsigned int ie = 0; ie<analysisTree->electron_count; ++ie) {
-
-    if (analysisTree->electron_pt[ie]<=cfg->get<float>("ptDiElectronVeto")) continue;
+    if (isEmbedded) sf_eleES_i = EmbedElectronES_SF(analysisTree, era, ie);
+    if (sf_eleES_i*analysisTree->electron_pt[ie]<=cfg->get<float>("ptDiElectronVeto")) continue;
     if (fabs(analysisTree->electron_eta[ie])>=cfg->get<float>("etaDiElectronVeto")) continue;	
     if (fabs(analysisTree->electron_dxy[ie])>=cfg->get<float>("dxyDiElectronVeto")) continue;
     if (fabs(analysisTree->electron_dz[ie])>=cfg->get<float>("dzDiElectronVeto")) continue;
 
     float absIsoEle =   abs_Iso_et(ie, analysisTree, cfg->get<float>("dRisoDiElectronVeto"));
-    float relIsoEle =   absIsoEle / analysisTree->electron_pt[ie] ;
+    float relIsoEle =   absIsoEle / (sf_eleES_i*analysisTree->electron_pt[ie]) ;
     if(relIsoEle >= cfg->get<float>("isoDiElectronVeto")) continue;
     
     bool passedVetoId =  analysisTree->electron_cutId_veto_Fall17V2[ie];
     if (!passedVetoId) continue;
 		
     for (unsigned int je = ie+1; je<analysisTree->electron_count; ++je) {
-
-      if (analysisTree->electron_pt[je]<=cfg->get<float>("ptDiElectronVeto")) continue;
+      if (isEmbedded) sf_eleES_j = EmbedElectronES_SF(analysisTree, era, je);
+      if (sf_eleES_j*analysisTree->electron_pt[je]<=cfg->get<float>("ptDiElectronVeto")) continue;
       if (fabs(analysisTree->electron_eta[je])>=cfg->get<float>("etaDiElectronVeto")) continue;	
       if (fabs(analysisTree->electron_dxy[je])>=cfg->get<float>("dxyDiElectronVeto")) continue;
       if (fabs(analysisTree->electron_dz[je])>=cfg->get<float>("dzDiElectronVeto")) continue;
 		  
       float absIsoEle =  abs_Iso_et(je, analysisTree, cfg->get<float>("dRiso"));
-      float relIsoEle =  absIsoEle / analysisTree->electron_pt[je];
+      float relIsoEle =  absIsoEle / (sf_eleES_j*analysisTree->electron_pt[je]);
       if(relIsoEle >= cfg->get<float>("isoDiElectronVeto")) continue;	
 
       passedVetoId =  analysisTree->electron_cutId_veto_Fall17V2[je];
@@ -390,9 +392,10 @@ bool dilepton_veto_et(const Config *cfg,const  AC1B *analysisTree){
 //////EXTRA LEPTON VETO FUNCTIONS
 
 //returns the extra electron veto
-bool extra_electron_veto(int leptonIndex, TString ch, const Config *cfg, const AC1B *analysisTree){
+bool extra_electron_veto(int leptonIndex, TString ch, const Config *cfg, const AC1B *analysisTree, int era, bool isEmbedded){
   for (unsigned int ie = 0; ie < analysisTree->electron_count; ++ie) {
-    
+    float sf_eleES = 1.0;
+    if (isEmbedded && ch == "et") sf_eleES = EmbedElectronES_SF(analysisTree, era, ie);
     float ptVetoElectronCut = cfg->get<float>("ptVetoElectronCut");
     float etaVetoElectronCut = cfg->get<float>("etaVetoElectronCut");
     float dxyVetoElectronCut = cfg->get<float>("dxyVetoElectronCut");
@@ -402,7 +405,7 @@ bool extra_electron_veto(int leptonIndex, TString ch, const Config *cfg, const A
     float isoVetoElectronCut = cfg->get<float>("isoVetoElectronCut");
 
     if (ch == "et" && int(ie) == leptonIndex) continue;
-    if (analysisTree->electron_pt[ie] <= ptVetoElectronCut) continue;
+    if (sf_eleES*analysisTree->electron_pt[ie] <= ptVetoElectronCut) continue;
     if (fabs(analysisTree->electron_eta[ie]) >= etaVetoElectronCut) continue;
     if (fabs(analysisTree->electron_dxy[ie]) >= dxyVetoElectronCut) continue;
     if (fabs(analysisTree->electron_dz[ie]) >= dzVetoElectronCut) continue;
@@ -412,7 +415,7 @@ bool extra_electron_veto(int leptonIndex, TString ch, const Config *cfg, const A
     if (!analysisTree->electron_pass_conversion[ie] && applyVetoElectronId) continue;
     if (analysisTree->electron_nmissinginnerhits[ie] > 1 && applyVetoElectronId) continue;
 
-    float relIsoEle = abs_Iso_et(ie, analysisTree, dRisoExtraElecVeto) / analysisTree->electron_pt[ie];
+    float relIsoEle = abs_Iso_et(ie, analysisTree, dRisoExtraElecVeto) / (sf_eleES*analysisTree->electron_pt[ie]);
     if (relIsoEle >= isoVetoElectronCut) continue;
 
     return(1);		
@@ -591,6 +594,22 @@ void svfit_variables(TString ch, const AC1B *analysisTree, Synch17Tree *otree, c
   }
 }
 
+float EmbedElectronES_SF(const AC1B * analysisTree, int era, int electronIndex ){
+  float sf_ele=1.0;
+  if (era == 2016){
+     if (fabs(analysisTree->electron_eta[electronIndex]) < 1.479 ) sf_ele= (1-0.00243);
+     else sf_ele = (1-0.007);
+  }
+  if (era == 2017){
+     if (fabs(analysisTree->electron_eta[electronIndex]) < 1.479 ) sf_ele =  (1-0.00067);
+     else sf_ele =  (1-0.01133);
+  }
+  if (era == 2018){
+     if (fabs(analysisTree->electron_eta[electronIndex]) < 1.479 ) sf_ele = (1-0.00328);
+     else sf_ele =  (1-0.00557);
+  }
+  return sf_ele;
+}
 
 /// shift tau energy scale and propagate it to the met. 
 void correctTauES(TLorentzVector& Tau, TLorentzVector& Met, float relative_shift, bool tau_is_one_prong){
