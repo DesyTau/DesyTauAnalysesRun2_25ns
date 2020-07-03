@@ -44,7 +44,7 @@ bool isICHEPmed(int Index, const AC1B * analysisTree);
 bool isIdentifiedMediumMuon(int Index, const AC1B * analysisTree, bool isData);
 float getEffectiveArea(float eta);
 int ZDecay(const AC1B * analysisTree);
-float EmbedElectronES_SF(const AC1B * analysisTree, TString era, int electronIndex );
+float EmbedElectronES_SF(const AC1B * analysisTree, int era, int electronIndex );
 
 ///////////////////////////////////////////////
 //////////////FUNCTION DEFINITION//////////////
@@ -594,17 +594,17 @@ void svfit_variables(TString ch, const AC1B *analysisTree, Synch17Tree *otree, c
   }
 }
 
-float EmbedElectronES_SF(const AC1B * analysisTree, TString era, int electronIndex ){
+float EmbedElectronES_SF(const AC1B * analysisTree, int era, int electronIndex ){
   float sf_ele=1.0;
-  if (era=="2016"){
+  if (era == 2016){
      if (fabs(analysisTree->electron_eta[electronIndex]) < 1.479 ) sf_ele= (1-0.00243);
      else sf_ele = (1-0.007);
   }
-  if (era=="2017"){
+  if (era == 2017){
      if (fabs(analysisTree->electron_eta[electronIndex]) < 1.479 ) sf_ele =  (1-0.00067);
      else sf_ele =  (1-0.01133);
   }
-  if (era=="2018"){
+  if (era == 2018){
      if (fabs(analysisTree->electron_eta[electronIndex]) < 1.479 ) sf_ele = (1-0.00328);
      else sf_ele =  (1-0.00557);
   }
