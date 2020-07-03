@@ -2317,6 +2317,7 @@ int main(int argc, char * argv[]){
 	}
 	else if (ch == "et") {
     electronScaleSys->SetElectronIndex(leptonIndex);
+    electronScaleSys->SetIsEmbedded(isEmbedded);
     electronScaleSys->SetAC1B(&analysisTree);
     electronScaleSys->Eval(utils::ETAU);
     

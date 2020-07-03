@@ -487,6 +487,10 @@ public:
   void SetElectronIndex(int index){
     electronIndex = index;
   };
+  
+  void SetIsEmbedded(bool isEmbeddedFlag){
+    isEmbedded = isEmbeddedFlag;
+  };
 
 protected:
   virtual void InitSF(){
@@ -505,28 +509,48 @@ protected:
     sf_up = new TH2D(label+"_sf_up", label+"_sf_up", pt_bins, pt_edges, eta_bins, eta_edges);
     sf_down = new TH2D(label+"_sf_down", label+"_sf_down", pt_bins, pt_edges, eta_bins, eta_edges);
   
-    sf_up->SetBinContent( sf_up->FindBin( pt_central[0], eta_central[0] ), 0.01);
-    sf_up->SetBinContent( sf_up->FindBin( pt_central[0], eta_central[1] ), 0.025);   
-    sf_down->SetBinContent( sf_down->FindBin( pt_central[0], eta_central[0] ), 0.01);
-    sf_down->SetBinContent( sf_down->FindBin( pt_central[0], eta_central[1] ), 0.025);
+    // this is used only for Embedded samples: ±0.50% (barrel) and  ±1.25%(endcap) for all the years (https://twiki.cern.ch/twiki/bin/viewauth/CMS/TauTauEmbeddingSamples2016Legacy#Lepton_energy_scale_corrections)
+    // otherwise read the up/down variations from BigNTuple tree
+    sf_up->SetBinContent( sf_up->FindBin( pt_central[0], eta_central[0] ), 0.005);
+    sf_up->SetBinContent( sf_up->FindBin( pt_central[0], eta_central[1] ), 0.0125);   
+    sf_down->SetBinContent( sf_down->FindBin( pt_central[0], eta_central[0] ), 0.005);
+    sf_down->SetBinContent( sf_down->FindBin( pt_central[0], eta_central[1] ), 0.0125);
   };
   
   virtual void ScaleUp(utils::channel ch){
     lep1_scaled = lep1;
     lep2_scaled = lep2;
     
-    // reading scaled momentum values from BigNTuple tree 
-    // only single electron options implemented
-    if (ch == EMU)
-      lep1_scaled.SetXYZM(analysisTree->electron_px_energyscale_up[electronIndex],
-			  analysisTree->electron_py_energyscale_up[electronIndex],
-			  analysisTree->electron_pz_energyscale_up[electronIndex],
-			  lep1.M());
-    else if (ch == ETAU)
+    if (isEmbedded) {
+      
+      float pt1 = lep1.Pt();
+      float absEta1 = fabs(lep1.Eta());
+      float pt2 = lep2.Pt();
+      float absEta2 = fabs(lep2.Eta());
+
+      if (ch == EMU)
+        lep1_scaled.SetXYZM(lep1.Px() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt1, absEta1))),
+      	  lep1.Py() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt1, absEta1))),
+      	  lep1.Pz() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt1, absEta1))),
+      	  lep1.M());
+      else if (ch == ETAU)
+        lep1_scaled.SetXYZM(lep1.Px() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt1, absEta1))),
+      	  lep1.Py() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt1, absEta1))),
+      	  lep1.Pz() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt1, absEta1))),
+      	  lep1.M());
+
+    } else {
+      if (ch == EMU)
       lep1_scaled.SetXYZM(analysisTree->electron_px_energyscale_up[electronIndex],
         analysisTree->electron_py_energyscale_up[electronIndex],
         analysisTree->electron_pz_energyscale_up[electronIndex],
         lep1.M());
+      else if (ch == ETAU)
+        lep1_scaled.SetXYZM(analysisTree->electron_px_energyscale_up[electronIndex],
+          analysisTree->electron_py_energyscale_up[electronIndex],
+          analysisTree->electron_pz_energyscale_up[electronIndex],
+          lep1.M());
+    }
     // 
     // float pt1 = lep1.Pt();
     // float absEta1 = fabs(lep1.Eta());
@@ -561,18 +585,36 @@ protected:
     lep1_scaled = lep1;
     lep2_scaled = lep2;
 
-    // reading scaled momentum values from BigNTuple tree 
-    // only single electron options implemented
-    if (ch == EMU)
-      lep1_scaled.SetXYZM(analysisTree->electron_px_energyscale_down[electronIndex],
-			  analysisTree->electron_py_energyscale_down[electronIndex],
-			  analysisTree->electron_pz_energyscale_down[electronIndex],
-			  lep1.M());
-    else if (ch == ETAU)
+    if (isEmbedded) {
+      // for Embedded read variations from SF hist
+      float pt1 = lep1.Pt();
+      float absEta1 = fabs(lep1.Eta());
+      float pt2 = lep2.Pt();
+      float absEta2 = fabs(lep2.Eta());
+      
+      if (ch == EMU)
+        lep1_scaled.SetXYZM(lep1.Px() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt1, absEta1))),
+  			  lep1.Py() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt1, absEta1))),
+  			  lep1.Pz() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt1, absEta1))),
+  			  lep1.M());
+      else if (ch == ETAU)
+        lep1_scaled.SetXYZM(lep1.Px() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt1, absEta1))),
+  			  lep1.Py() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt1, absEta1))),
+  			  lep1.Pz() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt1, absEta1))),
+  			  lep1.M());
+    } else {
+      // otherwie reading scaled momentum values from BigNTuple tree 
+      if (ch == EMU)
       lep1_scaled.SetXYZM(analysisTree->electron_px_energyscale_down[electronIndex],
         analysisTree->electron_py_energyscale_down[electronIndex],
         analysisTree->electron_pz_energyscale_down[electronIndex],
         lep1.M());
+      else if (ch == ETAU)
+        lep1_scaled.SetXYZM(analysisTree->electron_px_energyscale_down[electronIndex],
+          analysisTree->electron_py_energyscale_down[electronIndex],
+          analysisTree->electron_pz_energyscale_down[electronIndex],
+          lep1.M());
+    }
 
     // float pt1 = lep1.Pt();
     // float absEta1 = fabs(lep1.Eta());
@@ -605,6 +647,7 @@ protected:
   
   const AC1B * analysisTree;
   int electronIndex;
+  bool isEmbedded;
 };
 
 class ElectronEBScaleSys : public ElectronScaleSys {
