@@ -88,7 +88,7 @@
 void initializeCPvar(Synch17Tree *otree);
 void initializeGenTree(Synch17GenTree *gentree);
 void FillMuTau(const AC1B * analysisTree, Synch17Tree *otree, int leptonIndex, int tauIndex, float dRiso);
-void FillETau(const AC1B * analysisTree, Synch17Tree *otree, int leptonIndex, float dRiso);
+void FillETau(const AC1B * analysisTree, Synch17Tree *otree, int leptonIndex, float dRiso, int era, bool isEmbedded);
 void FillTau(const AC1B * analysisTree, Synch17Tree *otree, int leptonIndex, int tauIndex);
 void FillVertices(const AC1B * analysisTree,Synch17Tree *otree, const bool isData, int leptonIndex, int tauIndex, TString channel);
 void FillGenTree(const AC1B * analysisTree, Synch17GenTree *gentree);
@@ -952,13 +952,17 @@ int main(int argc, char * argv[]){
       }
       counter[3]++;
     
+      // as of 30 June 2020 electron ES in Embedded samples isn't corrected in BigNTuples, so it needs to be applied downstream
+      float sf_eleES = 1.0;   
+
       //lepton selection
       vector<int> leptons; leptons.clear();
       if(ch == "et"){
         for (unsigned int ie = 0; ie<analysisTree.electron_count; ++ie) {
           bool electronMvaId = analysisTree.electron_mva_wp90_noIso_Fall17_v2[ie];
-    
-          if (analysisTree.electron_pt[ie] <= ptLeptonLowCut) continue;
+          
+          if (isEmbedded) sf_eleES = EmbedElectronES_SF(&analysisTree, era, ie);          
+          if (sf_eleES*analysisTree.electron_pt[ie] <= ptLeptonLowCut) continue;
           if (fabs(analysisTree.electron_eta[ie]) >= etaLeptonCut) continue;
           if (fabs(analysisTree.electron_dxy[ie]) >= dxyLeptonCut) continue;
       	  if (fabs(analysisTree.electron_dz[ie]) >= dzLeptonCut) continue;
@@ -1010,17 +1014,19 @@ int main(int argc, char * argv[]){
           float lep_eta    = -9999.;
           float lep_phi    = -9999.;
 	  float relIsoLep  = -9999.;
-    
-          if (ch == "mt")  relIsoLep = (abs_Iso_mt(lIndex, &analysisTree, dRiso) / analysisTree.muon_pt[lIndex] );
-          if (ch == "et")  relIsoLep = (abs_Iso_et(lIndex, &analysisTree, dRiso) / analysisTree.electron_pt[lIndex] );
+             
     
           if(ch == "mt"){
+            relIsoLep = (abs_Iso_mt(lIndex, &analysisTree, dRiso) / analysisTree.muon_pt[lIndex] );
             lep_pt  = analysisTree.muon_pt[lIndex]; 
             lep_eta = analysisTree.muon_eta[lIndex]; 
             lep_phi = analysisTree.muon_phi[lIndex];
           }
-          if(ch == "et"){         
-            lep_pt  = analysisTree.electron_pt[lIndex];
+          if(ch == "et"){    
+            sf_eleES = 1.;
+            if (isEmbedded) sf_eleES = EmbedElectronES_SF(&analysisTree, era, lIndex);  
+            relIsoLep = (abs_Iso_et(lIndex, &analysisTree, dRiso) / (sf_eleES*analysisTree.electron_pt[lIndex]) );     
+            lep_pt  = sf_eleES*analysisTree.electron_pt[lIndex];
             lep_eta = analysisTree.electron_eta[lIndex]; 
             lep_phi = analysisTree.electron_phi[lIndex];
           }
@@ -1071,14 +1077,17 @@ int main(int argc, char * argv[]){
       float lep_pt  = -9999.;
       float lep_eta = -9999.;
       float lep_phi = -9999.;
-    
+      
+
       if (ch == "mt") {
       	lep_pt =      analysisTree.muon_pt[leptonIndex]; 
       	lep_eta =     analysisTree.muon_eta[leptonIndex]; 
       	lep_phi =     analysisTree.muon_phi[leptonIndex];
       }
-      if(ch == "et") {         
-      	lep_pt  = analysisTree.electron_pt[leptonIndex];
+      if(ch == "et") {    
+        sf_eleES = 1.;
+        if (isEmbedded) sf_eleES = EmbedElectronES_SF(&analysisTree, era, leptonIndex);  
+      	lep_pt  = sf_eleES*analysisTree.electron_pt[leptonIndex];
       	lep_eta = analysisTree.electron_eta[leptonIndex]; 
       	lep_phi = analysisTree.electron_phi[leptonIndex];
       }
@@ -1252,8 +1261,9 @@ int main(int argc, char * argv[]){
         leptonLV.SetXYZM(analysisTree.muon_px[leptonIndex], analysisTree.muon_py[leptonIndex], analysisTree.muon_pz[leptonIndex], muonMass);
       } 
       else if(ch == "et"){
-      	FillETau(&analysisTree, otree, leptonIndex, dRiso);
+      	FillETau(&analysisTree, otree, leptonIndex, dRiso, era, isEmbedded);
         leptonLV.SetXYZM(analysisTree.electron_px[leptonIndex], analysisTree.electron_py[leptonIndex], analysisTree.electron_pz[leptonIndex], electronMass);
+        if(isEmbedded) leptonLV *= sf_eleES;
       }
       
       FillTau(&analysisTree, otree, leptonIndex, tauIndex);
@@ -1872,10 +1882,10 @@ int main(int argc, char * argv[]){
     
       // dilepton veto
       if(ch=="mt") otree->dilepton_veto = dilepton_veto_mt(&cfg, &analysisTree);
-      if(ch=="et") otree->dilepton_veto = dilepton_veto_et(&cfg, &analysisTree);
+      if(ch=="et") otree->dilepton_veto = dilepton_veto_et(&cfg, &analysisTree, era, isEmbedded);
     
   	  //extra lepton veto
-      otree->extraelec_veto = extra_electron_veto(leptonIndex, ch, &cfg, &analysisTree);
+      otree->extraelec_veto = extra_electron_veto(leptonIndex, ch, &cfg, &analysisTree, era, isEmbedded);
       otree->extramuon_veto = extra_muon_veto(leptonIndex, ch, &cfg, &analysisTree, isData);
     
       counter[13]++;
@@ -2028,7 +2038,7 @@ int main(int argc, char * argv[]){
       std::map<TString,IpCorrection*> ipCorrectorsPass = ipCorrectorsNULL;
       if (ApplyIpCorrection && (!isData || isEmbedded)) ipCorrectorsPass = ipCorrectors;
       //      std::cout << "before..." << std::endl;
-      acott_Impr(&analysisTree, otree, leptonIndex, tauIndex, ch, ipCorrectorsPass);
+      acott_Impr(&analysisTree, otree, leptonIndex, tauIndex, ch, era, isEmbedded, ipCorrectorsPass);
       //      std::cout << "after..." << std::endl;
 
       otree->acotautau_00 = otree->acotautau_refitbs_00;
@@ -2727,8 +2737,12 @@ void FillMuTau(const AC1B *analysisTree, Synch17Tree *otree, int leptonIndex, in
 }
 
 //fill the otree with the electron variables in channel etau
-void FillETau(const AC1B *analysisTree, Synch17Tree *otree, int leptonIndex, float dRiso){
-	otree->pt_1 = 	analysisTree->electron_pt[leptonIndex];
+void FillETau(const AC1B *analysisTree, Synch17Tree *otree, int leptonIndex, float dRiso, int era, bool isEmbedded){
+  
+  float sf_eleES = 1.;
+  if (isEmbedded) sf_eleES = EmbedElectronES_SF(analysisTree, era, leptonIndex);  
+
+	otree->pt_1 = 	sf_eleES*analysisTree->electron_pt[leptonIndex];
   otree->eta_1 = 	analysisTree->electron_eta[leptonIndex];
   otree->phi_1 = 	analysisTree->electron_phi[leptonIndex];
   otree->m_1 = 		electronMass;
@@ -2737,7 +2751,7 @@ void FillETau(const AC1B *analysisTree, Synch17Tree *otree, int leptonIndex, flo
     otree->q_1 = 1;
   otree->gen_match_1 = analysisTree->electron_genmatch[leptonIndex];
 
-  otree->iso_1 =  abs_Iso_et(leptonIndex, analysisTree, dRiso) /analysisTree->electron_pt[leptonIndex];
+  otree->iso_1 =  abs_Iso_et(leptonIndex, analysisTree, dRiso) / (sf_eleES*analysisTree->electron_pt[leptonIndex]);
 
   otree->d0_1 = analysisTree->electron_dxy[leptonIndex];
   otree->dZ_1 = analysisTree->electron_dz[leptonIndex];

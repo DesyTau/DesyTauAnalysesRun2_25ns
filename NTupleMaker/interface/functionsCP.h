@@ -22,13 +22,13 @@ typedef ROOT::Math::SMatrix<float,5,5, ROOT::Math::MatRepSym<float,5>> SMatrixSy
 
 void acott(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, int tauIndex2);
 
-void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, int tauIndex2,TString ch);
+void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, int tauIndex2,TString ch, int era, bool isEmbedded, std::map<TString,IpCorrection*> ipCorrectors);
 TLorentzVector chargedPivec(const AC1B * analysisTree, int tauIndex);
 TLorentzVector neutralPivec(const AC1B * analysisTree, int tauIndex);
 TLorentzVector charged_constituents_P4(const AC1B * analysisTree, int tauIndex);
 std::vector<TLorentzVector> a1_rho_pi(const AC1B * analysisTree, int tauIndex);
 //TLorentzVector ipVec(const AC1B * analysisTree, int tauIndex, Synch17Tree *otree);
-TLorentzVector ipVec(const AC1B * analysisTree, int muonIndex, int tauIndex, TString ch, int vertexType); //iP vec of hadronic tau, muonIndex (eleIndex) required to get refitted PV with BS
+TLorentzVector ipVec(const AC1B * analysisTree, int lepIndex, int tauIndex, TString ch, int vertexType); //iP vec of hadronic tau, lepIndex required to get refitted PV with BS
 int chargedPiIndex(const AC1B * analysisTree, int tauIndex);
 
 void gen_acott(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, int tauIndex2);
@@ -42,7 +42,7 @@ int gen_chargedPiIndex(const AC1B * analysisTree, int tauIndex, int partId);
 vector<int> gen_ThreeProngIndices(const AC1B * analysisTree, int tauIndex);
 vector<TLorentzVector> gen_a1_rho_pi(const AC1B * analysisTree, int tauIndex);
 
-TLorentzVector ipVec_Lepton(const AC1B * analysisTree, int leptonIndex, int tauIndex, int vertexType, TString ch);
+TLorentzVector ipVec_Lepton(const AC1B * analysisTree, int leptonIndex, int tauIndex, int vertexType, TString ch, int era, bool isEmbedded);
 
 double acoCP(TLorentzVector Pi1, TLorentzVector Pi2, 
 	     TLorentzVector ref1, TLorentzVector ref2,
@@ -52,7 +52,7 @@ double acoCP(TLorentzVector Pi1, TLorentzVector Pi2,
 	     TLorentzVector ref1, TLorentzVector ref2,
 	     bool firstNegative, bool pi01, bool pi02, Synch17GenTree* gentree);
 
-TLorentzVector IP_helix_lep(const AC1B * analysisTree, int lepIndex, TString channel, TVector3 PV_coord);
+TLorentzVector IP_helix_lep(const AC1B * analysisTree, int lepIndex, TVector3 PV_coord, TString channel, int era, bool isEmbedded);
 double IP_significance_helix_lep(const AC1B * analysisTree, int lepIndex, TString channel, TVector3 PV_coord, const std::vector<float> &PV_cov_components,ROOT::Math::SMatrix<float,3,3, ROOT::Math::MatRepStd< float, 3, 3 >> & ipCovariance, TVector3 & ip);
 
 TLorentzVector IP_helix_tauh(const AC1B * analysisTree, int tauIndex, TVector3 PV_coord);
@@ -292,7 +292,7 @@ void calibrateIP(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, i
   
 }
 
-void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, int tauIndex2, TString channel, std::map<TString,IpCorrection*> ipCorrectors){
+void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, int tauIndex2, TString channel, int era, bool isEmbedded, std::map<TString,IpCorrection*> ipCorrectors){
   // cout<<"Start acott_Impr"<<endl;
  
   otree->acotautau_00 = -9999;
@@ -537,10 +537,10 @@ void acott_Impr(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, in
 
   // IP for leptons
   if(channel=="et"||channel=="mt") {
-    tau1IP = ipVec_Lepton(analysisTree,tauIndex1,tauIndex2,0,channel);
-    tau1IP_bs = ipVec_Lepton(analysisTree,tauIndex1,tauIndex2,1,channel);
-    tau1IP_refitbs = ipVec_Lepton(analysisTree,tauIndex1,tauIndex2,2,channel);
-    tau1IP_helix = IP_helix_lep(analysisTree, tauIndex1, channel, PV_coord);
+    tau1IP = ipVec_Lepton(analysisTree,tauIndex1,tauIndex2,0,channel, era, isEmbedded);
+    tau1IP_bs = ipVec_Lepton(analysisTree,tauIndex1,tauIndex2,1,channel, era, isEmbedded);
+    tau1IP_refitbs = ipVec_Lepton(analysisTree,tauIndex1,tauIndex2,2,channel, era, isEmbedded);
+    tau1IP_helix = IP_helix_lep(analysisTree, tauIndex1, PV_coord, channel, era, isEmbedded);
   }
   else{
     tau1IP = ipVec(analysisTree,tauIndex1,tauIndex2,channel,0);
@@ -986,7 +986,7 @@ TLorentzVector neutralPivec(const AC1B * analysisTree, int tauIndex){
   return neutralpart;
 };
 
-TLorentzVector ipVec(const AC1B * analysisTree, int muonIndex, int tauIndex, TString channel, int vertexType) {
+TLorentzVector ipVec(const AC1B * analysisTree, int lepIndex, int tauIndex, TString channel, int vertexType) {
 
   int ncomponents = analysisTree->tau_constituents_count[tauIndex];
   TLorentzVector vec;
@@ -1007,8 +1007,8 @@ TLorentzVector ipVec(const AC1B * analysisTree, int muonIndex, int tauIndex, TSt
       vertex.SetZ(analysisTree->primvertexwithbs_z);
     }
     else if (vertexType==2) {
-      bool refitted_PV_with_BS = false;
-      vertex = get_refitted_PV_with_BS(analysisTree, muonIndex, tauIndex, channel, refitted_PV_with_BS);
+      bool is_refitted_PV_with_BS = false;
+      vertex = get_refitted_PV_with_BS(analysisTree, lepIndex, tauIndex, channel, is_refitted_PV_with_BS);
     }
        
     //Merijn: temporarily add gen vertex instead.. please leave this code for future reference
@@ -1051,7 +1051,7 @@ TLorentzVector ipVec(const AC1B * analysisTree, int muonIndex, int tauIndex, TSt
 
 
 //Merijn: added function to calculate the ipvec for leptons
-TLorentzVector ipVec_Lepton(const AC1B * analysisTree, int muonIndex, int tauIndex, int vertexType, TString ch) {
+TLorentzVector ipVec_Lepton(const AC1B * analysisTree, int leptonIndex, int tauIndex, int vertexType, TString ch, int era, bool isEmbedded) {
   //now the tauindex is for mu or electron!
 
   TLorentzVector vec;
@@ -1067,8 +1067,8 @@ TLorentzVector ipVec_Lepton(const AC1B * analysisTree, int muonIndex, int tauInd
     vertex.SetZ(analysisTree->primvertexwithbs_z);
   }
   else if (vertexType==2) {
-    bool refitted_PV_with_BS = false;
-    vertex = get_refitted_PV_with_BS(analysisTree, muonIndex, tauIndex, ch, refitted_PV_with_BS);
+    bool is_refitted_PV_with_BS = false;
+    vertex = get_refitted_PV_with_BS(analysisTree, leptonIndex, tauIndex, ch, is_refitted_PV_with_BS);
   }
   
   /*
@@ -1087,26 +1087,30 @@ TLorentzVector ipVec_Lepton(const AC1B * analysisTree, int muonIndex, int tauInd
     
   TVector3 secvertex(0.,0.,0.);
   TVector3 momenta(0.,0.,0.);    
+	
+	float sf_eleES = 1.0;   
+  if (isEmbedded && ch == "et") sf_eleES = EmbedElectronES_SF(analysisTree, era, leptonIndex);
 
   if(ch=="et"){
-    secvertex.SetXYZ(analysisTree->electron_vx[muonIndex],
-		     analysisTree->electron_vy[muonIndex],
-		     analysisTree->electron_vz[muonIndex]);
+    secvertex.SetXYZ(analysisTree->electron_vx[leptonIndex],
+		     analysisTree->electron_vy[leptonIndex],
+		     analysisTree->electron_vz[leptonIndex]);
   
   
-    momenta.SetXYZ(analysisTree->electron_px[muonIndex],
-		   analysisTree->electron_py[muonIndex],
-		   analysisTree->electron_pz[muonIndex]);}
+    momenta.SetXYZ(analysisTree->electron_px[leptonIndex],
+		   analysisTree->electron_py[leptonIndex],
+		   analysisTree->electron_pz[leptonIndex]);}
+	  if (isEmbedded) momenta *= sf_eleES;
  
   if(ch=="mt"){
-    secvertex.SetXYZ(analysisTree->muon_vx[muonIndex],
-		     analysisTree->muon_vy[muonIndex],
-		     analysisTree->muon_vz[muonIndex]);
+    secvertex.SetXYZ(analysisTree->muon_vx[leptonIndex],
+		     analysisTree->muon_vy[leptonIndex],
+		     analysisTree->muon_vz[leptonIndex]);
     
     
-    momenta.SetXYZ(analysisTree->muon_px[muonIndex],
-		   analysisTree->muon_py[muonIndex],
-		   analysisTree->muon_pz[muonIndex]);
+    momenta.SetXYZ(analysisTree->muon_px[leptonIndex],
+		   analysisTree->muon_py[leptonIndex],
+		   analysisTree->muon_pz[leptonIndex]);
    
   }
 
@@ -1941,7 +1945,7 @@ if(vecRho1Mag!=0&&vecRho2Mag!=0){
   return acop;
 }
 
-TLorentzVector IP_helix_lep(const AC1B * analysisTree, int lepIndex, TString channel, TVector3 PV_coord){
+TLorentzVector IP_helix_lep(const AC1B * analysisTree, int lepIndex, TVector3 PV_coord, TString channel, int era, bool isEmbedded){
   // helical IP for tau decaying into 
   TLorentzVector LVIP={0.,0.,0.,0.};
   ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<float>> p4_lep;  
@@ -1950,6 +1954,9 @@ TLorentzVector IP_helix_lep(const AC1B * analysisTree, int lepIndex, TString cha
   std::vector<float> h_param_lep = {};
   ROOT::Math::PositionVector3D<ROOT::Math::Cartesian3D<float>> ref_lep;
   ROOT::Math::PositionVector3D<ROOT::Math::Cartesian3D<float>> PV(PV_coord.X(), PV_coord.Y(), PV_coord.Z());
+	
+	float sf_eleES = 1.0;   
+  if (isEmbedded && channel == "et") sf_eleES = EmbedElectronES_SF(analysisTree, era, lepIndex);
 
   if (channel == "mt") {
     B = analysisTree->muon_Bfield[lepIndex];
@@ -1966,6 +1973,7 @@ TLorentzVector IP_helix_lep(const AC1B * analysisTree, int lepIndex, TString cha
     ref_lep.SetY(analysisTree->electron_referencePoint[lepIndex][1]);
     ref_lep.SetZ(analysisTree->electron_referencePoint[lepIndex][2]);
     p4_lep_auxil.SetXYZM(analysisTree->electron_px[lepIndex], analysisTree->electron_py[lepIndex], analysisTree->electron_pz[lepIndex], ELECTRON_MASS);
+		p4_lep_auxil *= sf_eleES;
     p4_lep.SetPxPyPzE(p4_lep_auxil.Px(),p4_lep_auxil.Py(),p4_lep_auxil.Pz(),p4_lep_auxil.E());
     for(auto i:  analysisTree->electron_helixparameters[lepIndex]) h_param_lep.push_back(i);    
   }

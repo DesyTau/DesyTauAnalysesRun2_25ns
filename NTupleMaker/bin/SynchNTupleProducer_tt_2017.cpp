@@ -536,7 +536,7 @@ int main(int argc, char * argv[]) {
       if(!isDiTauTrig) continue;
       //extra letpn veto
      
-      otree->extraelec_veto = extra_electron_veto(tauIndex, "tt", &cfg, &analysisTree);
+      otree->extraelec_veto = extra_electron_veto(tauIndex, "tt", &cfg, &analysisTree, 0, false); //will not apply ES here, since there is no access to Embedded or era information in this macro
       otree->extramuon_veto = extra_muon_veto(tauIndex, "tt", &cfg, &analysisTree, isData);
       
       //TriggerSF                                                                                                                                  
@@ -632,7 +632,7 @@ int main(int argc, char * argv[]) {
       };
       std::map<TString,IpCorrection*> ipCorrectorsPass = ipCorrectorsNULL;
       if (ApplyIpCorrection) {ipCorrectorsPass = ipCorrectors;}
-      acott_Impr(&analysisTree,otree,tauIndex_1,tauIndex_2,"tt",ipCorrectorsPass); 
+      acott_Impr(&analysisTree,otree,tauIndex_1,tauIndex_2,"tt", 0, false, ipCorrectorsPass); // era and isEmbedded are needed to be passed to acott_Impr() to apply electron ES. But it is needed only for et channel, so setting them randomly here
       //const AC1B * analysisTree;      
   
       //tau1 
