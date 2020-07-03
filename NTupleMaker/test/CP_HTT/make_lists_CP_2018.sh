@@ -94,8 +94,8 @@ if [[ $CHANNEL == "et" ]]; then
   ls $dirData/EGamma/EGamma_Run2018C/*root > $OUTDIR/EGamma_Run2018C
   ls $dirData/EGamma/EGamma_Run2018D/*root > $OUTDIR/EGamma_Run2018D
   
-  ls $dirEmbedded/Embedding_eltau/EmbeddingRun2018A_ElTau/*root > $OUTDIR/EmbeddedElTau_Run2018A
-  ls $dirEmbedded/Embedding_eltau/EmbeddingRun2018B_ElTau/*root > $OUTDIR/EmbeddedElTau_Run2018B
-  ls $dirEmbedded/Embedding_eltau/EmbeddingRun2018C_ElTau/*root > $OUTDIR/EmbeddedElTau_Run2018C
-  ls $dirEmbedded/Embedding_eltau/EmbeddingRun2018D_ElTau/*root > $OUTDIR/EmbeddedElTau_Run2018D
+  ls $dirEmbedded/Embedding_eltau_v2/EmbeddingRun2018A_ElTau/*root > $OUTDIR/EmbeddedElTau_Run2018A
+  ls $dirEmbedded/Embedding_eltau_v2/EmbeddingRun2018B_ElTau/*root > $OUTDIR/EmbeddedElTau_Run2018B
+  ls $dirEmbedded/Embedding_eltau_v2/EmbeddingRun2018C_ElTau/*root > $OUTDIR/EmbeddedElTau_Run2018C
+  ls $dirEmbedded/Embedding_eltau_v2/EmbeddingRun2018D_ElTau/*root > $OUTDIR/EmbeddedElTau_Run2018D
 fi
