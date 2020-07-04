@@ -371,6 +371,10 @@ int main(int argc, char * argv[]){
   const float shift_tes_lepfake_3prong = cfg.get<float>("TauEnergyScaleShift_LepFake_ThreeProng");
   const float shift_tes_lepfake_3prong1p0 = cfg.get<float>("TauEnergyScaleShift_LepFake_ThreeProngOnePi0");
   
+  const string leptauFake_wpVsEle = cfg.get<string>("LeptauFake_wpVsEle");
+  const string leptauFake_wpVsMu = cfg.get<string>("LeptauFake_wpVsMu");
+  TString LeptauFake_wpVsEle(leptauFake_wpVsEle);
+  TString LeptauFake_wpVsMu(leptauFake_wpVsMu);
 
   // pair selection
   const float dRleptonsCut = cfg.get<float>("dRleptonsCut");
@@ -1749,23 +1753,14 @@ int main(int argc, char * argv[]){
       	}
 	}*/
 
-      TString wpVsEle = "VVLoose";
-      TString wpVsMu = "Tight";
-      if(ch == "mt"){
-	wpVsEle = "VVLoose";
-	wpVsMu = "Tight";
-      }else if(ch == "et") {
-	wpVsEle = "Tight";
-	wpVsMu = "VLoose";
-      }
       if(!isData){
 	if(otree->gen_match_2==2||otree->gen_match_2==4){
 	  TFile muTauFRfile(TString(cmsswBase)+"/src/TauPOG/TauIDSFs/data/TauID_SF_eta_DeepTau2017v2p1VSmu_"+year+".root"); 
-	  TH1F *SFhist = (TH1F*) muTauFRfile.Get(wpVsMu);
+	  TH1F *SFhist = (TH1F*) muTauFRfile.Get(LeptauFake_wpVsMu);
 	  otree->mutaufakeweight = SFhist->GetBinContent(SFhist->GetXaxis()->FindBin(abs(otree->eta_2)));
 	}else if(otree->gen_match_2==1||otree->gen_match_2==3){
 	  TFile eTauFRfile(TString(cmsswBase)+"/src/TauPOG/TauIDSFs/data/TauID_SF_eta_DeepTau2017v2p1VSe_"+year+".root"); 
-	  TH1F *SFhist = (TH1F*) eTauFRfile.Get(wpVsEle);
+	  TH1F *SFhist = (TH1F*) eTauFRfile.Get(LeptauFake_wpVsEle);
 	  otree->etaufakeweight = SFhist->GetBinContent(SFhist->GetXaxis()->FindBin(abs(otree->eta_2)));
 	}
       }
