@@ -578,8 +578,6 @@ int main(int argc, char * argv[]){
 
   LepTauFakeOneProngScaleSys *lepTauFakeOneProngScaleSys = 0;
   LepTauFakeOneProngOnePi0ScaleSys *lepTauFakeOneProngOnePi0ScaleSys = 0;
-  LepTauFakeThreeProngScaleSys  *lepTauFakeThreeProngScaleSys = 0;
-  LepTauFakeThreeProngOnePi0ScaleSys  *lepTauFakeThreeProngOnePi0ScaleSys = 0;
 
   ZPtWeightSys* zPtWeightSys = 0;
   TopPtWeightSys* topPtWeightSys = 0;
@@ -2401,11 +2399,6 @@ int main(int argc, char * argv[]){
   if(lepTauFakeOneProngOnePi0ScaleSys != 0){
     lepTauFakeOneProngOnePi0ScaleSys->Write("",TObject::kOverwrite);
     delete lepTauFakeOneProngOnePi0ScaleSys;
-  }
-
-  if(lepTauFakeThreeProngScaleSys != 0){
-    lepTauFakeThreeProngScaleSys->Write("",TObject::kOverwrite);
-    delete lepTauFakeThreeProngScaleSys;
   }
 
   if (btagSys != 0) {
