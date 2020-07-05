@@ -93,6 +93,30 @@ void FillTau(const AC1B * analysisTree, Synch17Tree *otree, int leptonIndex, int
 void FillVertices(const AC1B * analysisTree,Synch17Tree *otree, const bool isData, int leptonIndex, int tauIndex, TString channel);
 void FillGenTree(const AC1B * analysisTree, Synch17GenTree *gentree);
 float getEmbeddedWeight(const AC1B * analysisTree, RooWorkspace* WS);
+float shift_tauES(const AC1B * analysisTree, 
+		  unsigned int itau,
+		  float shift_tes_1prong,
+		  float shift_tes_1p1p0,
+		  float shift_tes_3prong,
+		  float shift_tes_lepfake_1prong,
+		  float shift_tes_lepfake_1p1p0,
+		  float shift_tes_lepfake_3prong
+		  ) {
+  float shift_tes = 0.0;
+  int gen_match = analysisTree->tau_genmatch[itau];
+  int decay_mode = analysisTree->tau_decayMode[itau];
+  if (gen_match >= 5){
+    if (decay_mode == 0) shift_tes = shift_tes_1prong; 
+    else if (decay_mode >= 1 && decay_mode <= 3) shift_tes = shift_tes_1p1p0; 
+    else if (decay_mode >= 10) shift_tes = shift_tes_3prong;
+  }
+  else if (gen_match < 5) {
+    if (decay_mode == 0)      {shift_tes = shift_tes_lepfake_1prong;}
+    else if (decay_mode >= 1 && decay_mode <= 3)  shift_tes = shift_tes_lepfake_1p1p0; 
+    else if (decay_mode >= 10) shift_tes = shift_tes_lepfake_3prong; 
+  }
+  return shift_tes;
+}
 
 /*Notifications Merijn
 -to my experience currently macro only works for mu-tau (unless udpated in the meantime)
@@ -382,6 +406,7 @@ int main(int argc, char * argv[]){
 
   const float dRTrigMatch = cfg.get<float>("dRTrigMatch");
   const float dRiso = cfg.get<float>("dRiso");
+  const float lepIsoCut = cfg.get<float>("LeptonIsoCut");
   
   const float jetEtaCut = cfg.get<float>("JetEtaCut");
   const float jetPtLowCut = cfg.get<float>("JetPtLowCut");
@@ -935,8 +960,18 @@ int main(int argc, char * argv[]){
 
       // tau selection
       vector<int> taus; taus.clear();
-      for (unsigned int it = 0; it < analysisTree.tau_count; ++it) { 
-        if (analysisTree.tau_pt[it] <= ptTauLowCut) continue;
+      for (unsigned int it = 0; it < analysisTree.tau_count; ++it) {
+	float shift_tes  = shift_tauES(&analysisTree,it,
+				       shift_tes_1prong,
+				       shift_tes_1p1p0,
+				       shift_tes_3prong,
+				       shift_tes_lepfake_1prong,
+				       shift_tes_lepfake_1p1p0,
+				       shift_tes_lepfake_1p1p0);
+ 
+	float ptTau = (1.+shift_tes)*analysisTree.tau_pt[it];
+
+        if (ptTau <= ptTauLowCut) continue;
         if (fabs(analysisTree.tau_eta[it]) >= etaTauCut) continue;
         if (fabs(analysisTree.tau_leadchargedhadrcand_dz[it]) >= dzTauCut) continue;
         if (fabs(fabs(analysisTree.tau_charge[it]) - 1) > 0.001) continue;
@@ -966,7 +1001,9 @@ int main(int argc, char * argv[]){
           if (fabs(analysisTree.electron_eta[ie]) >= etaLeptonCut) continue;
           if (fabs(analysisTree.electron_dxy[ie]) >= dxyLeptonCut) continue;
       	  if (fabs(analysisTree.electron_dz[ie]) >= dzLeptonCut) continue;
-          if (!electronMvaId) continue;
+	  float relIsoLep = (abs_Iso_et(ie, &analysisTree, dRiso) / (sf_eleES*analysisTree.electron_pt[ie]) );
+	  if (relIsoLep>lepIsoCut) continue;
+	  if (!electronMvaId) continue;
       	  if (!analysisTree.electron_pass_conversion[ie]) continue;
       	  if (analysisTree.electron_nmissinginnerhits[ie] > 1) continue;
           leptons.push_back(ie);
@@ -1004,6 +1041,15 @@ int main(int argc, char * argv[]){
       for (unsigned int it = 0; it < taus.size(); ++it) {
         counter[6]++;
       	unsigned int tIndex = taus.at(it);
+	float shift_tes  = shift_tauES(&analysisTree,tIndex,
+				       shift_tes_1prong,
+				       shift_tes_1p1p0,
+				       shift_tes_3prong,
+				       shift_tes_lepfake_1prong,
+				       shift_tes_lepfake_1p1p0,
+				       shift_tes_lepfake_1p1p0);
+ 
+	float ptTau = (1.+shift_tes)*analysisTree.tau_pt[tIndex];
     
     	//////////////LOOP on Leptons or second Tau/////////////
     
@@ -1050,7 +1096,7 @@ int main(int argc, char * argv[]){
 		   changePair = true;
 		 else if (fabs(sortIsoTau - isoTauMax) < 1.e-5)
 		   {
-		     if (analysisTree.tau_pt[tIndex] > tau_pt_max)
+		     if (ptTau > tau_pt_max)
 		       changePair = true;
 		   }
 	       }
@@ -1844,6 +1890,10 @@ int main(int argc, char * argv[]){
 	}
       }
     
+      // rejecting events with pT(lep),pT(tau)<cut
+      if (otree->pt_2<ptTauLowCut) continue;
+      if (otree->pt_1<ptLeptonLowCut) continue;
+
       // if (!isData) {
       // 	if(otree->gen_match_2 == 5 && tauLV.E() <= 400 && tauLV.E() >= 20){
       // 	  if (otree->tau_decay_mode_2 == 0) tauLV *= (1-0.03);
@@ -2742,7 +2792,8 @@ void FillETau(const AC1B *analysisTree, Synch17Tree *otree, int leptonIndex, flo
   float sf_eleES = 1.;
   if (isEmbedded) sf_eleES = EmbedElectronES_SF(analysisTree, era, leptonIndex);  
 
-	otree->pt_1 = 	sf_eleES*analysisTree->electron_pt[leptonIndex];
+  otree->pt_1  = 	sf_eleES*analysisTree->electron_pt[leptonIndex];
+  otree->pt_uncorr_1 =  analysisTree->electron_pt[leptonIndex];
   otree->eta_1 = 	analysisTree->electron_eta[leptonIndex];
   otree->phi_1 = 	analysisTree->electron_phi[leptonIndex];
   otree->m_1 = 		electronMass;
@@ -2786,6 +2837,7 @@ void FillETau(const AC1B *analysisTree, Synch17Tree *otree, int leptonIndex, flo
 //fill the otree with the tau variables 
 void FillTau(const AC1B *analysisTree, Synch17Tree *otree, int leptonIndex, int tauIndex){
   otree->pt_2 = analysisTree->tau_pt[tauIndex];
+  otree->pt_uncorr_2 = analysisTree->tau_pt[tauIndex];
   otree->eta_2 = analysisTree->tau_eta[tauIndex];
   otree->phi_2 = analysisTree->tau_phi[tauIndex];
   otree->q_2 = analysisTree->tau_charge[tauIndex];

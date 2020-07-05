@@ -64,6 +64,7 @@ void Synch17Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("passedAllMetFilters", &passedAllMetFilters, &b_passedAllMetFilters);
 
    fChain->SetBranchAddress("pt_1", &pt_1, &b_pt_1);
+   fChain->SetBranchAddress("pt_uncorr_1", &pt_uncorr_1, &b_pt_uncorr_1);
    fChain->SetBranchAddress("phi_1", &phi_1, &b_phi_1);
    fChain->SetBranchAddress("eta_1", &eta_1, &b_eta_1);
 
@@ -148,6 +149,7 @@ void Synch17Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("nm_1", &nm_1, &b_nm_1);
 
    fChain->SetBranchAddress("pt_2", &pt_2, &b_pt_2);
+   fChain->SetBranchAddress("pt_uncorr_2", &pt_uncorr_2, &b_pt_uncorr_2);
    fChain->SetBranchAddress("phi_2", &phi_2, &b_phi_2);
    fChain->SetBranchAddress("eta_2", &eta_2, &b_eta_2);
    fChain->SetBranchAddress("chconst_2_pt", &chconst_2_pt, &b_chconst_2_pt);
@@ -767,6 +769,7 @@ void Synch17Tree::WriteInit(TTree *tree) {
   fChain->Branch("passedAllMetFilters", &passedAllMetFilters, "passedAllMetFilters/O");
 
   fChain->Branch("pt_1", &pt_1, "pt_1/F");
+  fChain->Branch("pt_uncorr_1", &pt_uncorr_1, "pt_uncorr_1/F");
   fChain->Branch("phi_1", &phi_1, "phi_1/F");
   fChain->Branch("eta_1", &eta_1, "eta_1/F");
   fChain->Branch("chconst_1_pt", &chconst_1_pt, "chconst_1_pt/F");
@@ -849,6 +852,7 @@ void Synch17Tree::WriteInit(TTree *tree) {
    fChain->Branch("nm_1", &nm_1, "nm_1/F");
    
    fChain->Branch("pt_2", &pt_2, "pt_2/F");
+   fChain->Branch("pt_uncorr_2", &pt_uncorr_2, "pt_uncorr_2/F");
    fChain->Branch("phi_2", &phi_2, "phi_2/F");
    fChain->Branch("eta_2", &eta_2, "eta_2/F");
    fChain->Branch("chconst_2_pt", &chconst_2_pt, "chconst_2_pt/F");

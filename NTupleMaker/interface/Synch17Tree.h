@@ -42,6 +42,7 @@ public :
   
   //Leptons
   Float_t         pt_1;
+  Float_t         pt_uncorr_1;
   Float_t         phi_1;
   Float_t         eta_1;
   Float_t         chconst_1_pt;
@@ -120,6 +121,7 @@ public :
 
 
   Float_t         pt_2;
+  Float_t         pt_uncorr_2;
   Float_t         phi_2;
   Float_t         eta_2;
   Float_t         chconst_2_pt;
@@ -680,8 +682,9 @@ public :
   // MET filters
   TBranch	 *b_passedAllMetFilters;
   
-  //Leptons
+  //Leptons  
   TBranch	 *b_pt_1;
+  TBranch	 *b_pt_uncorr_1;
   TBranch	 *b_phi_1;
   TBranch	 *b_eta_1;
   TBranch        *b_chconst_1_pt;
@@ -760,6 +763,7 @@ public :
   TBranch  *b_nm_1;
 
   TBranch	 *b_pt_2;
+  TBranch	 *b_pt_uncorr_2;
   TBranch	 *b_phi_2;
   TBranch	 *b_eta_2;
   TBranch  *b_chconst_2_pt;
