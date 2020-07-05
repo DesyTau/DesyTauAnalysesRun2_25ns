@@ -369,7 +369,6 @@ int main(int argc, char * argv[]){
   const float shift_tes_lepfake_1prong = cfg.get<float>("TauEnergyScaleShift_LepFake_OneProng");
   const float shift_tes_lepfake_1p1p0  = cfg.get<float>("TauEnergyScaleShift_LepFake_OneProngOnePi0");
   const float shift_tes_lepfake_3prong = cfg.get<float>("TauEnergyScaleShift_LepFake_ThreeProng");
-  const float shift_tes_lepfake_3prong1p0 = cfg.get<float>("TauEnergyScaleShift_LepFake_ThreeProngOnePi0");
   
   const string leptauFake_wpVsEle = cfg.get<string>("LeptauFake_wpVsEle");
   const string leptauFake_wpVsMu = cfg.get<string>("LeptauFake_wpVsMu");
