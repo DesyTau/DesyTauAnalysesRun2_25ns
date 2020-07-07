@@ -93,30 +93,11 @@ void FillTau(const AC1B * analysisTree, Synch17Tree *otree, int leptonIndex, int
 void FillVertices(const AC1B * analysisTree,Synch17Tree *otree, const bool isData, int leptonIndex, int tauIndex, TString channel);
 void FillGenTree(const AC1B * analysisTree, Synch17GenTree *gentree);
 float getEmbeddedWeight(const AC1B * analysisTree, RooWorkspace* WS);
-float shift_tauES(const AC1B * analysisTree, 
-		  unsigned int itau,
-		  float shift_tes_1prong,
-		  float shift_tes_1p1p0,
-		  float shift_tes_3prong,
-		  float shift_tes_lepfake_1prong,
-		  float shift_tes_lepfake_1p1p0,
-		  float shift_tes_lepfake_3prong
-		  ) {
-  float shift_tes = 0.0;
-  int gen_match = analysisTree->tau_genmatch[itau];
-  int decay_mode = analysisTree->tau_decayMode[itau];
-  if (gen_match >= 5){
-    if (decay_mode == 0) shift_tes = shift_tes_1prong; 
-    else if (decay_mode >= 1 && decay_mode <= 3) shift_tes = shift_tes_1p1p0; 
-    else if (decay_mode >= 10) shift_tes = shift_tes_3prong;
-  }
-  else if (gen_match < 5) {
-    if (decay_mode == 0)      {shift_tes = shift_tes_lepfake_1prong;}
-    else if (decay_mode >= 1 && decay_mode <= 3)  shift_tes = shift_tes_lepfake_1p1p0; 
-    else if (decay_mode >= 10) shift_tes = shift_tes_lepfake_3prong; 
-  }
-  return shift_tes;
-}
+float shift_tauES(const AC1B * analysisTree, unsigned int itau, 
+									float shift_tes_1prong, float shift_tes_1p1p0, float shift_tes_3prong,
+								  float shift_tes_lepfake_1prong_barrel, float shift_tes_lepfake_1p1p0_barrel,
+								  float shift_tes_lepfake_1prong_endcap, float shift_tes_lepfake_1p1p0_endcap
+								); 
 
 /*Notifications Merijn
 -to my experience currently macro only works for mu-tau (unless udpated in the meantime)
@@ -217,12 +198,12 @@ int main(int argc, char * argv[]){
   if (ch == "et") channel = "etau";
 
   TauTriggerSFs2017 *tauTriggerSF = new TauTriggerSFs2017(cmsswBase + "/src/TauAnalysisTools/TauTriggerSFs/data/tauTriggerEfficiencies" + to_string(era) + ".root", channel, to_string(era), "tight", "MVAv2");
-  std::string year;
-  if (era == 2016) year = "2016Legacy";
-  else if (era == 2017) year = "2017ReReco";
-  else if (era == 2018) year = "2018ReReco";	
+  std::string year_label;
+  if (era == 2016) year_label = "2016Legacy";
+  else if (era == 2017) year_label = "2017ReReco";
+  else if (era == 2018) year_label = "2018ReReco";	
   else {std::cout << "year is not 2016, 2017, 2018 - exiting" << '\n'; exit(-1);}
-  TauIDSFTool *tauIDSF_medium = new TauIDSFTool(year, "DeepTau2017v2p1VSjet", "Medium", false);
+  TauIDSFTool *tauIDSF_medium = new TauIDSFTool(year_label, "DeepTau2017v2p1VSjet", "Medium", false);
 
   IpCorrection *ipLepton   = new IpCorrection(TString(cmsswBase) + "/src/" + IpCorrFileNameLepton);
   IpCorrection *ipLeptonBS = new IpCorrection(TString(cmsswBase) + "/src/" + IpCorrFileNameLeptonBS);  
@@ -314,9 +295,9 @@ int main(int argc, char * argv[]){
   }  
   const struct btag_scaling_inputs inputs_btag_scaling_medium = {reader_B, reader_C, reader_Light, tagEff_B, tagEff_C, tagEff_Light, tagEff_B_nonCP5, tagEff_C_nonCP5, tagEff_Light_nonCP5, rand};
 
-  TFile * ff_file = TFile::Open(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/fakefactors_ws_"+TString(year)+".root");
+  TFile * ff_file = TFile::Open(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/fakefactors_ws_"+TString(year_label)+".root");
   if (ff_file->IsZombie()) {
-    cout << "File " << TString(cmsswBase) << "/src/DesyTauAnalyses/NTupleMaker/data/fakefactors_ws_" << TString(year) << ".root not found" << endl;
+    cout << "File " << TString(cmsswBase) << "/src/DesyTauAnalyses/NTupleMaker/data/fakefactors_ws_" << TString(year_label) << ".root not found" << endl;
     cout << "Quitting... " << endl;
     exit(-1);
   }
@@ -365,11 +346,28 @@ int main(int argc, char * argv[]){
   const float shift_tes_3prong_e = cfg.get<float>("TauEnergyScaleShift_ThreeProng_Error");
   const float shift_tes_3prong1p0_e = cfg.get<float>("TauEnergyScaleShift_ThreeProngOnePi0_Error");
   
-  // for lep->tau fakes
-  const float shift_tes_lepfake_1prong = cfg.get<float>("TauEnergyScaleShift_LepFake_OneProng");
-  const float shift_tes_lepfake_1p1p0  = cfg.get<float>("TauEnergyScaleShift_LepFake_OneProngOnePi0");
-  const float shift_tes_lepfake_3prong = cfg.get<float>("TauEnergyScaleShift_LepFake_ThreeProng");
-  
+
+	// lep->tau FES correction and uncertainties
+	// apply non-zero only for DY MC in et channel, HPS decay modes 0 and 1
+	TFile TauFES_file(TString(cmsswBase)+"/src/TauPOG/TauIDSFs/data/TauFES_eta-dm_DeepTau2017v2p1VSe_"+year_label+".root"); 
+	TGraphAsymmErrors* FES_graph = (TGraphAsymmErrors*) TauFES_file.Get("fes");
+	
+	const float shift_tes_lepfake_1prong_barrel((ch == "et" && isDY) ? FES_graph->GetY()[0] - 1.0 : 0.0 );
+	const float shift_tes_lepfake_1p1p0_barrel ((ch == "et" && isDY) ? FES_graph->GetY()[1] - 1.0 : 0.0 );
+	const float shift_tes_lepfake_1prong_endcap((ch == "et" && isDY) ? FES_graph->GetY()[2] - 1.0 : 0.0 );
+	const float shift_tes_lepfake_1p1p0_endcap ((ch == "et" && isDY) ? FES_graph->GetY()[3] - 1.0 : 0.0 );
+	
+	const float shift_tes_lepfake_1prong_barrel_up((ch == "et" && isDY) ? FES_graph->GetErrorYhigh(0) : 0.0 );
+	const float shift_tes_lepfake_1p1p0_barrel_up ((ch == "et" && isDY) ? FES_graph->GetErrorYhigh(1) : 0.0 );
+	const float shift_tes_lepfake_1prong_endcap_up((ch == "et" && isDY) ? FES_graph->GetErrorYhigh(2) : 0.0 );
+	const float shift_tes_lepfake_1p1p0_endcap_up ((ch == "et" && isDY) ? FES_graph->GetErrorYhigh(3) : 0.0 );
+	
+	const float shift_tes_lepfake_1prong_barrel_down((ch == "et" && isDY) ? FES_graph->GetErrorYlow(0) : 0.0 );
+	const float shift_tes_lepfake_1p1p0_barrel_down ((ch == "et" && isDY) ? FES_graph->GetErrorYlow(1) : 0.0 );
+	const float shift_tes_lepfake_1prong_endcap_down((ch == "et" && isDY) ? FES_graph->GetErrorYlow(2) : 0.0 );
+	const float shift_tes_lepfake_1p1p0_endcap_down ((ch == "et" && isDY) ? FES_graph->GetErrorYlow(3) : 0.0 );
+
+	// lep->tau FR, DeepTau WPs
   const string leptauFake_wpVsEle = cfg.get<string>("LeptauFake_wpVsEle");
   const string leptauFake_wpVsMu = cfg.get<string>("LeptauFake_wpVsMu");
   TString LeptauFake_wpVsEle(leptauFake_wpVsEle);
@@ -966,9 +964,10 @@ int main(int argc, char * argv[]){
 				       shift_tes_1prong,
 				       shift_tes_1p1p0,
 				       shift_tes_3prong,
-				       shift_tes_lepfake_1prong,
-				       shift_tes_lepfake_1p1p0,
-				       shift_tes_lepfake_1p1p0);
+				       shift_tes_lepfake_1prong_barrel,
+				       shift_tes_lepfake_1p1p0_barrel,
+				       shift_tes_lepfake_1prong_endcap,
+				       shift_tes_lepfake_1p1p0_endcap);
  
 	float ptTau = (1.+shift_tes)*analysisTree.tau_pt[it];
 
@@ -1046,9 +1045,10 @@ int main(int argc, char * argv[]){
 				       shift_tes_1prong,
 				       shift_tes_1p1p0,
 				       shift_tes_3prong,
-				       shift_tes_lepfake_1prong,
-				       shift_tes_lepfake_1p1p0,
-				       shift_tes_lepfake_1p1p0);
+				       shift_tes_lepfake_1prong_barrel,
+				       shift_tes_lepfake_1p1p0_barrel,
+				       shift_tes_lepfake_1prong_endcap,
+				       shift_tes_lepfake_1p1p0_endcap);
  
 	float ptTau = (1.+shift_tes)*analysisTree.tau_pt[tIndex];
     
@@ -1752,11 +1752,11 @@ int main(int argc, char * argv[]){
 
       if(!isData){
 	if(otree->gen_match_2==2||otree->gen_match_2==4){
-	  TFile muTauFRfile(TString(cmsswBase)+"/src/TauPOG/TauIDSFs/data/TauID_SF_eta_DeepTau2017v2p1VSmu_"+year+".root"); 
+	  TFile muTauFRfile(TString(cmsswBase)+"/src/TauPOG/TauIDSFs/data/TauID_SF_eta_DeepTau2017v2p1VSmu_"+year_label+".root"); 
 	  TH1F *SFhist = (TH1F*) muTauFRfile.Get(LeptauFake_wpVsMu);
 	  otree->mutaufakeweight = SFhist->GetBinContent(SFhist->GetXaxis()->FindBin(abs(otree->eta_2)));
 	}else if(otree->gen_match_2==1||otree->gen_match_2==3){
-	  TFile eTauFRfile(TString(cmsswBase)+"/src/TauPOG/TauIDSFs/data/TauID_SF_eta_DeepTau2017v2p1VSe_"+year+".root"); 
+	  TFile eTauFRfile(TString(cmsswBase)+"/src/TauPOG/TauIDSFs/data/TauID_SF_eta_DeepTau2017v2p1VSe_"+year_label+".root"); 
 	  TH1F *SFhist = (TH1F*) eTauFRfile.Get(LeptauFake_wpVsEle);
 	  otree->etaufakeweight = SFhist->GetBinContent(SFhist->GetXaxis()->FindBin(abs(otree->eta_2)));
 	}
@@ -1832,11 +1832,23 @@ int main(int argc, char * argv[]){
       	  else if (otree->tau_decay_mode_2 == 1) shift_tes = shift_tes_1p1p0; 
       	  else if (otree->tau_decay_mode_2 == 10) shift_tes = shift_tes_3prong;
          }
-      	else if (otree->gen_match_2 < 5) {
-      	  if (otree->tau_decay_mode_2 == 0)      {shift_tes = shift_tes_lepfake_1prong; isOneProng = true;}
-      	  else if (otree->tau_decay_mode_2 == 1)  shift_tes = shift_tes_lepfake_1p1p0; 
-      	  else if (otree->tau_decay_mode_2 == 10) shift_tes = shift_tes_lepfake_3prong; 
+				// do only mu->tau FES for mt channel (but effectively it is 0, see template cfg files) and e->tau FES for et channel
+      	else if ((ch == "mt" && (otree->gen_match_2 == 2 || otree->gen_match_2 == 4)) || (ch == "et" && (otree->gen_match_2 == 1 || otree->gen_match_2 == 3))) {
+      	  if (otree->tau_decay_mode_2 == 0){
+						if (fabs(otree->eta_2) < 1.5)
+							shift_tes = shift_tes_lepfake_1prong_barrel; 
+						else
+							shift_tes = shift_tes_lepfake_1prong_endcap; 
+						isOneProng = true;
+					}
+      	  else if (otree->tau_decay_mode_2 == 1){
+						if (fabs(otree->eta_2) < 1.5)
+							shift_tes = shift_tes_lepfake_1p1p0_barrel; 
+						else
+							shift_tes = shift_tes_lepfake_1p1p0_endcap; 
+					}  
       	}
+				
 	if (usePuppiMET) {
 	  TLorentzVector tauLV_unclES_UP = tauLV;
 	  TLorentzVector tauLV_unclES_DOWN = tauLV;
@@ -2511,6 +2523,41 @@ float getEmbeddedWeight(const AC1B *analysisTree, RooWorkspace * wEm) {
 
   return emWeight;
 
+}
+
+float shift_tauES(const AC1B * analysisTree, 
+		  unsigned int itau,
+		  float shift_tes_1prong,
+		  float shift_tes_1p1p0,
+		  float shift_tes_3prong,
+		  float shift_tes_lepfake_1prong_barrel,
+		  float shift_tes_lepfake_1p1p0_barrel,
+		  float shift_tes_lepfake_1prong_endcap,
+		  float shift_tes_lepfake_1p1p0_endcap
+		  ) {
+  float shift_tes = 0.0;
+  int gen_match = analysisTree->tau_genmatch[itau];
+  int decay_mode = analysisTree->tau_decayMode[itau];
+  if (gen_match >= 5){
+    if (decay_mode == 0) shift_tes = shift_tes_1prong; 
+    else if (decay_mode >= 1 && decay_mode <= 3) shift_tes = shift_tes_1p1p0; 
+    else if (decay_mode >= 10) shift_tes = shift_tes_3prong;
+  }
+  else {
+    if (decay_mode == 0){
+			if (fabs(analysisTree->tau_eta[itau]) < 1.5) // barrel definition taken from https://github.com/cms-tau-pog/TauIDSFs/blob/b4963b627df0ba85bce4aeaeacf401bc35686246/python/TauIDSFTool.py#L231
+					shift_tes = shift_tes_lepfake_1prong_barrel; 
+				else
+					shift_tes = shift_tes_lepfake_1prong_endcap; 
+				} 	 
+			else if (decay_mode >= 1 && decay_mode <= 3){
+			if (fabs(analysisTree->tau_eta[itau]) < 1.5)
+				shift_tes = shift_tes_lepfake_1p1p0_barrel; 
+			else
+				shift_tes = shift_tes_lepfake_1p1p0_endcap; 
+	  } 
+  }
+  return shift_tes;
 }
 
 void initializeGenTree(Synch17GenTree *gentree){
