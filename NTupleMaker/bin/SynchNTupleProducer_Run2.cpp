@@ -348,24 +348,26 @@ int main(int argc, char * argv[]){
   
 
 	// lep->tau FES correction and uncertainties
-	// apply non-zero only for DY MC in et channel, HPS decay modes 0 and 1
 	TFile TauFES_file(TString(cmsswBase)+"/src/TauPOG/TauIDSFs/data/TauFES_eta-dm_DeepTau2017v2p1VSe_"+year_label+".root"); 
 	TGraphAsymmErrors* FES_graph = (TGraphAsymmErrors*) TauFES_file.Get("fes");
 	
+	// apply non-zero only for DY MC in et channel, HPS decay modes 0 and 1	
 	const float shift_tes_lepfake_1prong_barrel((ch == "et" && isDY) ? FES_graph->GetY()[0] - 1.0 : 0.0 );
 	const float shift_tes_lepfake_1p1p0_barrel ((ch == "et" && isDY) ? FES_graph->GetY()[1] - 1.0 : 0.0 );
 	const float shift_tes_lepfake_1prong_endcap((ch == "et" && isDY) ? FES_graph->GetY()[2] - 1.0 : 0.0 );
 	const float shift_tes_lepfake_1p1p0_endcap ((ch == "et" && isDY) ? FES_graph->GetY()[3] - 1.0 : 0.0 );
 	
-	const float shift_tes_lepfake_1prong_barrel_up((ch == "et" && isDY) ? FES_graph->GetErrorYhigh(0) : 0.0 );
-	const float shift_tes_lepfake_1p1p0_barrel_up ((ch == "et" && isDY) ? FES_graph->GetErrorYhigh(1) : 0.0 );
-	const float shift_tes_lepfake_1prong_endcap_up((ch == "et" && isDY) ? FES_graph->GetErrorYhigh(2) : 0.0 );
-	const float shift_tes_lepfake_1p1p0_endcap_up ((ch == "et" && isDY) ? FES_graph->GetErrorYhigh(3) : 0.0 );
+	// for et take up/down values from file, for mt set to 1% (https://twiki.cern.ch/twiki/bin/viewauth/CMS/TauIDRecommendationForRun2#Corrections_to_be_applied_to_AN2)
+	// with the definition as below it can be accidently applied to data/embedded, so make sure to not do this!
+	const float shift_tes_lepfake_1prong_barrel_up((ch == "et") ? FES_graph->GetErrorYhigh(0) : 0.01 );
+	const float shift_tes_lepfake_1p1p0_barrel_up ((ch == "et") ? FES_graph->GetErrorYhigh(1) : 0.01 );
+	const float shift_tes_lepfake_1prong_endcap_up((ch == "et") ? FES_graph->GetErrorYhigh(2) : 0.01 );
+	const float shift_tes_lepfake_1p1p0_endcap_up ((ch == "et") ? FES_graph->GetErrorYhigh(3) : 0.01 );
 	
-	const float shift_tes_lepfake_1prong_barrel_down((ch == "et" && isDY) ? FES_graph->GetErrorYlow(0) : 0.0 );
-	const float shift_tes_lepfake_1p1p0_barrel_down ((ch == "et" && isDY) ? FES_graph->GetErrorYlow(1) : 0.0 );
-	const float shift_tes_lepfake_1prong_endcap_down((ch == "et" && isDY) ? FES_graph->GetErrorYlow(2) : 0.0 );
-	const float shift_tes_lepfake_1p1p0_endcap_down ((ch == "et" && isDY) ? FES_graph->GetErrorYlow(3) : 0.0 );
+	const float shift_tes_lepfake_1prong_barrel_down((ch == "et") ? FES_graph->GetErrorYlow(0) : 0.01 );
+	const float shift_tes_lepfake_1p1p0_barrel_down ((ch == "et") ? FES_graph->GetErrorYlow(1) : 0.01 );
+	const float shift_tes_lepfake_1prong_endcap_down((ch == "et") ? FES_graph->GetErrorYlow(2) : 0.01 );
+	const float shift_tes_lepfake_1p1p0_endcap_down ((ch == "et") ? FES_graph->GetErrorYlow(3) : 0.01 );
 
 	// lep->tau FR, DeepTau WPs
   const string leptauFake_wpVsEle = cfg.get<string>("LeptauFake_wpVsEle");
@@ -641,12 +643,22 @@ int main(int argc, char * argv[]){
       lepTauFakeOneProngScaleSys->SetUseSVFit(ApplySVFit);
       lepTauFakeOneProngScaleSys->SetUseFastMTT(ApplyFastMTT);
       lepTauFakeOneProngScaleSys->SetUsePuppiMET(usePuppiMET);
+			lepTauFakeOneProngScaleSys->SetBarrelEdge(1.5);
+			lepTauFakeOneProngScaleSys->SetScaleBarrelUp(shift_tes_lepfake_1prong_barrel, shift_tes_lepfake_1prong_barrel_up);
+			lepTauFakeOneProngScaleSys->SetScaleBarrelDown(shift_tes_lepfake_1prong_barrel, shift_tes_lepfake_1prong_barrel_down);
+			lepTauFakeOneProngScaleSys->SetScaleEndcapUp(shift_tes_lepfake_1prong_endcap, shift_tes_lepfake_1prong_endcap_up);
+			lepTauFakeOneProngScaleSys->SetScaleEndcapDown(shift_tes_lepfake_1prong_endcap, shift_tes_lepfake_1prong_endcap_down);
 
       lepTauFakeOneProngOnePi0ScaleSys = new LepTauFakeOneProngOnePi0ScaleSys(otree);
       lepTauFakeOneProngOnePi0ScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);
       lepTauFakeOneProngOnePi0ScaleSys->SetUseSVFit(ApplySVFit);
       lepTauFakeOneProngOnePi0ScaleSys->SetUseFastMTT(ApplyFastMTT);
       lepTauFakeOneProngOnePi0ScaleSys->SetUsePuppiMET(usePuppiMET);
+			lepTauFakeOneProngOnePi0ScaleSys->SetBarrelEdge(1.5);
+			lepTauFakeOneProngOnePi0ScaleSys->SetScaleBarrelUp(shift_tes_lepfake_1p1p0_barrel, shift_tes_lepfake_1p1p0_barrel_up);
+			lepTauFakeOneProngOnePi0ScaleSys->SetScaleBarrelDown(shift_tes_lepfake_1p1p0_barrel, shift_tes_lepfake_1p1p0_barrel_down);
+			lepTauFakeOneProngOnePi0ScaleSys->SetScaleEndcapUp(shift_tes_lepfake_1p1p0_endcap, shift_tes_lepfake_1p1p0_endcap_up);
+			lepTauFakeOneProngOnePi0ScaleSys->SetScaleEndcapDown(shift_tes_lepfake_1p1p0_endcap, shift_tes_lepfake_1p1p0_endcap_down);
 
     }
 
@@ -1832,7 +1844,7 @@ int main(int argc, char * argv[]){
       	  else if (otree->tau_decay_mode_2 == 1) shift_tes = shift_tes_1p1p0; 
       	  else if (otree->tau_decay_mode_2 == 10) shift_tes = shift_tes_3prong;
          }
-				// do only mu->tau FES for mt channel (but effectively it is 0, see template cfg files) and e->tau FES for et channel
+				// do only mu->tau FES for mt channel (but effectively it is 0, see its definition above) and e->tau FES for et channel
       	else if ((ch == "mt" && (otree->gen_match_2 == 2 || otree->gen_match_2 == 4)) || (ch == "et" && (otree->gen_match_2 == 1 || otree->gen_match_2 == 3))) {
       	  if (otree->tau_decay_mode_2 == 0){
 						if (fabs(otree->eta_2) < 1.5)
@@ -2307,7 +2319,9 @@ int main(int argc, char * argv[]){
 	    (metSys.at(i))->Eval();
 	}
       }
+			
       if ((!isData||isEmbedded) && ApplySystShift) {
+
 	if (ch == "mt") { 
 	  muonScaleSys->Eval(utils::MUTAU);
 	  tauOneProngScaleSys->Eval(utils::MUTAU);

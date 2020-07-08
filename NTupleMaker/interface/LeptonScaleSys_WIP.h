@@ -25,6 +25,11 @@ public:
     usePuppiMET = true;
     useSVFit = false;
     useFastMTT = false;
+    errorBarrelUp = 0.0;
+    errorBarrelDown = 0.0;
+    errorEndcapUp = 0.0;
+    errorEndcapDown = 0.0;
+    barrelEdge = 1.5;
     this->Init(cenTree);
   };
 
@@ -73,6 +78,30 @@ public:
   void SetScale(float Central, float Error) {
     central = Central;
     error = Error;
+    this->Init(cenTree);
+  }  
+  
+  void SetBarrelEdge(float BarrelEdge) {
+    barrelEdge = BarrelEdge;
+  }  
+  
+  void SetScaleBarrelUp(float Central, float ErrorBarrelUp) {
+    errorBarrelUp = ErrorBarrelUp;
+    this->Init(cenTree);
+  }  
+  
+  void SetScaleBarrelDown(float Central, float ErrorBarrelDown) {
+    errorBarrelDown = ErrorBarrelDown;
+    this->Init(cenTree);
+  }  
+  
+  void SetScaleEndcapUp(float Central, float ErrorEndcapUp) {
+    errorEndcapUp = ErrorEndcapUp;
+    this->Init(cenTree);
+  }  
+  
+  void SetScaleEndcapDown(float Central, float ErrorEndcapDown) {
+    errorEndcapDown = ErrorEndcapDown;
     this->Init(cenTree);
   }  
 
@@ -360,6 +389,11 @@ protected:
   bool useFastMTT;
   float central;
   float error;
+  float errorBarrelUp;
+  float errorBarrelDown;
+  float errorEndcapUp;
+  float errorEndcapDown;
+  float barrelEdge;
   std::map< std::string, TTree* >  outTree;
   //std::map< std::string, SpringTree* >  outTree;
 };
@@ -1351,8 +1385,9 @@ protected:
   };
 };
 
-// shift tau pt and propagate to MEt and svfit - for 1prong fake taus. Shift all lep->tau fakes. 
-// for mu-tau, 1.5% shift. For e-tau, 3% shift.
+// shift tau pt and propagate to MEt and svfit - for 1prong fake taus
+//!!! it is assumed that the choice of mt or et channels is done and the corresponding values are passed *outside* of the class
+//!!! the same applies also for barrel/endcap choice
 class LepTauFakeOneProngScaleSys : public LeptonScaleSys { 
 public:
   LepTauFakeOneProngScaleSys(){};
@@ -1374,8 +1409,8 @@ protected:
     for(int ibin = 0; ibin < pt_bins; ibin++)
       pt_central[ibin] = (pt_edges[ibin+1] + pt_edges[ibin])/2.; 
 
-    const int eta_bins = 1;
-    double eta_edges[eta_bins + 1] = {0., 2.5};
+    const int eta_bins = 2;
+    double eta_edges[eta_bins + 1] = {0., barrelEdge, 2.5};
     double eta_central[eta_bins] = {};
     for(int ibin = 0; ibin < eta_bins; ibin++)
       eta_central[ibin] = (eta_edges[ibin+1] + eta_edges[ibin])/2.; 
@@ -1383,8 +1418,10 @@ protected:
     sf_up = new TH2D(label+"_sf_up", label+"_sf_up", pt_bins, pt_edges, eta_bins, eta_edges);
     sf_down = new TH2D(label+"_sf_down", label+"_sf_down", pt_bins, pt_edges, eta_bins, eta_edges);
 
-    sf_up->SetBinContent( sf_up->FindBin( pt_central[0], eta_central[0] ), 0.03);
-    sf_down->SetBinContent( sf_down->FindBin( pt_central[0], eta_central[0] ), 0.03);
+    sf_up->SetBinContent( sf_up->FindBin( pt_central[0], eta_central[0] ), errorBarrelUp);
+    sf_down->SetBinContent( sf_down->FindBin( pt_central[0], eta_central[0] ), errorBarrelDown);
+    sf_up->SetBinContent( sf_up->FindBin( pt_central[0], eta_central[1] ), errorEndcapUp);
+    sf_down->SetBinContent( sf_down->FindBin( pt_central[0], eta_central[1] ), errorEndcapDown);
   };
 
   virtual void ScaleUp(utils::channel ch){
@@ -1395,18 +1432,11 @@ protected:
     float absEta1 = fabs(lep1.Eta());
     float pt2 = lep2.Pt();
     float absEta2 = fabs(lep2.Eta());
-    if (cenTree->gen_match_2<5 && cenTree->tau_decay_mode_2==0){
-      if (ch == ETAU)
-        lep2_scaled.SetXYZM(lep2.Px() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))),
-			  lep2.Py() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))),
-			  lep2.Pz() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))),
-			  lep2.M()  );
-      else if (ch == MUTAU)
-        lep2_scaled.SetXYZM(lep2.Px() * (1. + 0.5*sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))),
-			  lep2.Py() * (1. + 0.5*sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))),
-			  lep2.Pz() * (1. + 0.5*sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))),
-			  lep2.M() );
-    }
+    if (cenTree->tau_decay_mode_2==0)
+      lep2_scaled.SetXYZM(lep2.Px() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))),
+                    		  lep2.Py() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))),
+                    		  lep2.Pz() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))),
+                    		  lep2.M()  );
     this->Fill(ch, "Up");
   };
   
@@ -1418,25 +1448,19 @@ protected:
     float absEta1 = fabs(lep1.Eta());
     float pt2 = lep2.Pt();
     float absEta2 = fabs(lep2.Eta());
-    if (cenTree->gen_match_2<5 && cenTree->tau_decay_mode_2==0){
-      if (ch == ETAU)
-        lep2_scaled.SetXYZM(lep2.Px() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt2, absEta2))),
-			  lep2.Py() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt2, absEta2))),
-			  lep2.Pz() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt2, absEta2))),
-			  lep2.M() );
-      else if (ch == MUTAU)
-        lep2_scaled.SetXYZM(lep2.Px() * (1. - 0.5*sf_down->GetBinContent( sf_down->FindBin(pt2, absEta2))),
-			  lep2.Py() * (1. - 0.5*sf_down->GetBinContent( sf_down->FindBin(pt2, absEta2))),
-			  lep2.Pz() * (1. - 0.5*sf_down->GetBinContent( sf_down->FindBin(pt2, absEta2))),
-			  lep2.M() );
-    }
+    if (cenTree->tau_decay_mode_2==0)
+      lep2_scaled.SetXYZM(lep2.Px() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt2, absEta2))),
+                  			  lep2.Py() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt2, absEta2))),
+                  			  lep2.Pz() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt2, absEta2))),
+                  			  lep2.M() );
     this->Fill(ch, "Down");
   };
 };
 
 
-// shift tau pt and propagate to MEt and svfit - for 1prong1pizero fake taus. Shift all lep->tau fakes. 
-// for mu-tau, 1.5% shift. For e-tau, 3% shift.
+// shift tau pt and propagate to MEt and svfit - for 1prong1pi0 fake taus
+//!!! it is assumed that the choice of mt or et channels is done and the corresponding values are passed *outside* of the class
+//!!! the same applies also for barrel/endcap choice
 class LepTauFakeOneProngOnePi0ScaleSys : public LeptonScaleSys { 
 public:
   LepTauFakeOneProngOnePi0ScaleSys(){};
@@ -1458,8 +1482,8 @@ protected:
     for(int ibin = 0; ibin < pt_bins; ibin++)
       pt_central[ibin] = (pt_edges[ibin+1] + pt_edges[ibin])/2.; 
 
-    const int eta_bins = 1;
-    double eta_edges[eta_bins + 1] = {0., 2.5};
+    const int eta_bins = 2;
+    double eta_edges[eta_bins + 1] = {0., barrelEdge, 2.5};
     double eta_central[eta_bins] = {};
     for(int ibin = 0; ibin < eta_bins; ibin++)
       eta_central[ibin] = (eta_edges[ibin+1] + eta_edges[ibin])/2.; 
@@ -1467,8 +1491,10 @@ protected:
     sf_up = new TH2D(label+"_sf_up", label+"_sf_up", pt_bins, pt_edges, eta_bins, eta_edges);
     sf_down = new TH2D(label+"_sf_down", label+"_sf_down", pt_bins, pt_edges, eta_bins, eta_edges);
 
-    sf_up->SetBinContent( sf_up->FindBin( pt_central[0], eta_central[0] ), 0.03);
-    sf_down->SetBinContent( sf_down->FindBin( pt_central[0], eta_central[0] ), 0.03);
+    sf_up->SetBinContent( sf_up->FindBin( pt_central[0], eta_central[0] ), errorBarrelUp);
+    sf_down->SetBinContent( sf_down->FindBin( pt_central[0], eta_central[0] ), errorBarrelDown);
+    sf_up->SetBinContent( sf_up->FindBin( pt_central[0], eta_central[1] ), errorEndcapUp);
+    sf_down->SetBinContent( sf_down->FindBin( pt_central[0], eta_central[1] ), errorEndcapDown);
   };
 
   virtual void ScaleUp(utils::channel ch){
@@ -1479,18 +1505,11 @@ protected:
     float absEta1 = fabs(lep1.Eta());
     float pt2 = lep2.Pt();
     float absEta2 = fabs(lep2.Eta());
-    if (cenTree->gen_match_2<5 && cenTree->tau_decay_mode_2==1){
-      if (ch == ETAU )
-        lep2_scaled.SetXYZM(lep2.Px() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))),
-			  lep2.Py() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))),
-			  lep2.Pz() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))),
-			  lep2.M()  * (1. + sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))));
-      else if (ch == MUTAU )
-        lep2_scaled.SetXYZM(lep2.Px() * (1. + 0.5*sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))),
-			  lep2.Py() * (1. + 0.5*sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))),
-			  lep2.Pz() * (1. + 0.5*sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))),
-			  lep2.M()  * (1. + 0.5*sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))));
-    }
+    if (cenTree->tau_decay_mode_2==1)
+      lep2_scaled.SetXYZM(lep2.Px() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))),
+                  			  lep2.Py() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))),
+                  			  lep2.Pz() * (1. + sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))),
+                  			  lep2.M()  * (1. + sf_up->GetBinContent( sf_up->FindBin(pt2, absEta2))));
     this->Fill(ch, "Up");
   };
   
@@ -1502,18 +1521,11 @@ protected:
     float absEta1 = fabs(lep1.Eta());
     float pt2 = lep2.Pt();
     float absEta2 = fabs(lep2.Eta());
-    if (cenTree->gen_match_2<5 && cenTree->tau_decay_mode_2==1){
-      if (ch == ETAU )
-        lep2_scaled.SetXYZM(lep2.Px() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt2, absEta2))),
-			  lep2.Py() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt2, absEta2))),
-			  lep2.Pz() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt2, absEta2))),
-			  lep2.M()  * (1. - sf_down->GetBinContent( sf_down->FindBin(pt2, absEta2))));
-      else if (ch == MUTAU )
-        lep2_scaled.SetXYZM(lep2.Px() * (1. - 0.5*sf_down->GetBinContent( sf_down->FindBin(pt2, absEta2))),
-			  lep2.Py() * (1. - 0.5*sf_down->GetBinContent( sf_down->FindBin(pt2, absEta2))),
-			  lep2.Pz() * (1. - 0.5*sf_down->GetBinContent( sf_down->FindBin(pt2, absEta2))),
-			  lep2.M()  * (1. - 0.5*sf_down->GetBinContent( sf_down->FindBin(pt2, absEta2))));
-    }
+    if (cenTree->tau_decay_mode_2==1)
+      lep2_scaled.SetXYZM(lep2.Px() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt2, absEta2))),
+                  			  lep2.Py() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt2, absEta2))),
+                  			  lep2.Pz() * (1. - sf_down->GetBinContent( sf_down->FindBin(pt2, absEta2))),
+                  			  lep2.M()  * (1. - sf_down->GetBinContent( sf_down->FindBin(pt2, absEta2))));
     this->Fill(ch, "Down");
   };
 };
