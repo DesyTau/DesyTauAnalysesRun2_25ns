@@ -1268,8 +1268,9 @@ int main(int argc, char * argv[]){
 	if (triggerEmbed2017) {
 	  if (lep_pt<ptTriggerEmbed2017&&fabs(lep_eta)>etaTriggerEmbed2017) {
 	    otree->trg_singleelectron = true;
-	    otree->trg_etaucross_e = true;
-	    otree->trg_etaucross = otree->trg_etaucross_tau;
+			otree->trg_etaucross = true;
+	    // otree->trg_etaucross_e = true;
+	    // otree->trg_etaucross = otree->trg_etaucross_tau;
 	  }
 	}
 	otree->singleLepTrigger = otree->trg_singleelectron;
@@ -1464,6 +1465,7 @@ int main(int argc, char * argv[]){
 	      if (leptonLV.Pt()<ptTriggerEmbed2017&&fabs(leptonLV.Eta())>etaTriggerEmbed2017) {
 		eff_mc_trig_L = 1.0;
 		eff_mc_trig_lt_l = 1.0;
+		eff_mc_trig_lt_tau = 1.0;
 	      }
 	    }
 	  }
