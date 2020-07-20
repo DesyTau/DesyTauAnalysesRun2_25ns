@@ -1356,6 +1356,7 @@ int main(int argc, char * argv[]){
       otree->effweight = 1;
       otree->puweight = 1; 
       otree->mcweight = 1;
+			
       otree->weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVUp = 1;
       otree->weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVUp = 1;
       otree->weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVUp = 1;
@@ -1366,6 +1367,17 @@ int main(int argc, char * argv[]){
       otree->weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVDown = 1;
       otree->weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVDown = 1;
       otree->weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVDown = 1;
+      otree->weight_CMS_eff_Xtrigger_et_MVADM0_13TeVUp = 1;
+      otree->weight_CMS_eff_Xtrigger_et_MVADM1_13TeVUp = 1;
+      otree->weight_CMS_eff_Xtrigger_et_MVADM2_13TeVUp = 1;
+      otree->weight_CMS_eff_Xtrigger_et_MVADM10_13TeVUp = 1;
+      otree->weight_CMS_eff_Xtrigger_et_MVADM11_13TeVUp = 1;
+      otree->weight_CMS_eff_Xtrigger_et_MVADM0_13TeVDown = 1;
+      otree->weight_CMS_eff_Xtrigger_et_MVADM1_13TeVDown = 1;
+      otree->weight_CMS_eff_Xtrigger_et_MVADM2_13TeVDown = 1;
+      otree->weight_CMS_eff_Xtrigger_et_MVADM10_13TeVDown = 1;
+      otree->weight_CMS_eff_Xtrigger_et_MVADM11_13TeVDown = 1;
+			
       otree->weight_CMS_eff_t_pTlow_MVADM0_13TeVUp = 1; 
       otree->weight_CMS_eff_t_pTlow_MVADM1_13TeVUp = 1; 
       otree->weight_CMS_eff_t_pTlow_MVADM2_13TeVUp = 1; 
@@ -1386,6 +1398,7 @@ int main(int argc, char * argv[]){
       otree->weight_CMS_eff_t_pThigh_MVADM2_13TeVDown = 1; 
       otree->weight_CMS_eff_t_pThigh_MVADM10_13TeVDown = 1;
       otree->weight_CMS_eff_t_pThigh_MVADM11_13TeVDown = 1;
+			
       otree->weight_mufake_corr = 1; 
       otree->weight_CMS_mufake_mt_MVADM0_13TeVUp = 1; 
       otree->weight_CMS_mufake_mt_MVADM1_13TeVUp = 1; 
@@ -1466,6 +1479,8 @@ int main(int argc, char * argv[]){
 		eff_mc_trig_L = 1.0;
 		eff_mc_trig_lt_l = 1.0;
 		eff_mc_trig_lt_tau = 1.0;
+		eff_mc_trig_lt_tauUp = 1.0;
+		eff_mc_trig_lt_tauDown = 1.0;
 	      }
 	    }
 	  }
@@ -1552,6 +1567,24 @@ int main(int argc, char * argv[]){
 	      otree->weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVDown = trigweightDown;
 	    }
 	  }
+		else if (ch == "et"){
+			if(mvadm=="0"){
+				otree->weight_CMS_eff_Xtrigger_et_MVADM0_13TeVUp = trigweightUp;
+				otree->weight_CMS_eff_Xtrigger_et_MVADM0_13TeVDown = trigweightDown;
+			}else if(mvadm=="1"){
+				otree->weight_CMS_eff_Xtrigger_et_MVADM1_13TeVUp = trigweightUp;
+				otree->weight_CMS_eff_Xtrigger_et_MVADM1_13TeVDown = trigweightDown;
+			}else if(mvadm=="2"){
+				otree->weight_CMS_eff_Xtrigger_et_MVADM2_13TeVUp = trigweightUp;
+				otree->weight_CMS_eff_Xtrigger_et_MVADM2_13TeVDown = trigweightDown;
+			}else if(mvadm=="10"){
+				otree->weight_CMS_eff_Xtrigger_et_MVADM10_13TeVUp = trigweightUp;
+				otree->weight_CMS_eff_Xtrigger_et_MVADM10_13TeVDown = trigweightDown;
+			}else if(mvadm=="11"){
+				otree->weight_CMS_eff_Xtrigger_et_MVADM11_13TeVUp = trigweightUp;
+				otree->weight_CMS_eff_Xtrigger_et_MVADM11_13TeVDown = trigweightDown;
+			}			
+		}
 	}      
       }
       counter[10]++;
