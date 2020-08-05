@@ -353,6 +353,16 @@ public :
   Float_t weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVDown;
   Float_t weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVDown;
   Float_t weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVDown;
+  Float_t weight_CMS_eff_Xtrigger_et_MVADM0_13TeVUp;
+  Float_t weight_CMS_eff_Xtrigger_et_MVADM1_13TeVUp;
+  Float_t weight_CMS_eff_Xtrigger_et_MVADM2_13TeVUp;
+  Float_t weight_CMS_eff_Xtrigger_et_MVADM10_13TeVUp;
+  Float_t weight_CMS_eff_Xtrigger_et_MVADM11_13TeVUp;
+  Float_t weight_CMS_eff_Xtrigger_et_MVADM0_13TeVDown;
+  Float_t weight_CMS_eff_Xtrigger_et_MVADM1_13TeVDown;
+  Float_t weight_CMS_eff_Xtrigger_et_MVADM2_13TeVDown;
+  Float_t weight_CMS_eff_Xtrigger_et_MVADM10_13TeVDown;
+  Float_t weight_CMS_eff_Xtrigger_et_MVADM11_13TeVDown;
 
   Float_t weight_CMS_eff_t_pTlow_MVADM0_13TeVUp; 
   Float_t weight_CMS_eff_t_pTlow_MVADM1_13TeVUp; 
@@ -995,6 +1005,16 @@ public :
   TBranch        *b_weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVDown;
   TBranch        *b_weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVDown;
   TBranch        *b_weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVDown;
+  TBranch        *b_weight_CMS_eff_Xtrigger_et_MVADM0_13TeVUp;
+  TBranch        *b_weight_CMS_eff_Xtrigger_et_MVADM1_13TeVUp;
+  TBranch        *b_weight_CMS_eff_Xtrigger_et_MVADM2_13TeVUp;
+  TBranch        *b_weight_CMS_eff_Xtrigger_et_MVADM10_13TeVUp;
+  TBranch        *b_weight_CMS_eff_Xtrigger_et_MVADM11_13TeVUp;
+  TBranch        *b_weight_CMS_eff_Xtrigger_et_MVADM0_13TeVDown;
+  TBranch        *b_weight_CMS_eff_Xtrigger_et_MVADM1_13TeVDown;
+  TBranch        *b_weight_CMS_eff_Xtrigger_et_MVADM2_13TeVDown;
+  TBranch        *b_weight_CMS_eff_Xtrigger_et_MVADM10_13TeVDown;
+  TBranch        *b_weight_CMS_eff_Xtrigger_et_MVADM11_13TeVDown;
 
   TBranch        *b_weight_CMS_eff_t_pTlow_MVADM0_13TeVUp; 
   TBranch        *b_weight_CMS_eff_t_pTlow_MVADM1_13TeVUp; 

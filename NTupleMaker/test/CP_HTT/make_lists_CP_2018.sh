@@ -89,10 +89,10 @@ if [[ $CHANNEL == "mt" ]]; then
 fi
 
 if [[ $CHANNEL == "et" ]]; then
-  ls $dirData/EGamma/EGamma_Run2018A/*root > $OUTDIR/EGamma_Run2018A
-  ls $dirData/EGamma/EGamma_Run2018B/*root > $OUTDIR/EGamma_Run2018B
-  ls $dirData/EGamma/EGamma_Run2018C/*root > $OUTDIR/EGamma_Run2018C
-  ls $dirData/EGamma/EGamma_Run2018D/*root > $OUTDIR/EGamma_Run2018D
+  ls $dirData/EGamma_v3/EGamma_Run2018A/*root > $OUTDIR/EGamma_Run2018A
+  ls $dirData/EGamma_v3/EGamma_Run2018B/*root > $OUTDIR/EGamma_Run2018B
+  ls $dirData/EGamma_v3/EGamma_Run2018C/*root > $OUTDIR/EGamma_Run2018C
+  ls $dirData/EGamma_v3/EGamma_Run2018D/*root > $OUTDIR/EGamma_Run2018D
   
   ls $dirEmbedded/Embedding_eltau_v2/EmbeddingRun2018A_ElTau/*root > $OUTDIR/EmbeddedElTau_Run2018A
   ls $dirEmbedded/Embedding_eltau_v2/EmbeddingRun2018B_ElTau/*root > $OUTDIR/EmbeddedElTau_Run2018B
