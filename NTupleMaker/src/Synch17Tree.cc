@@ -298,6 +298,8 @@ void Synch17Tree::ReadInit(TTree *tree)
 //  fChain->SetBranchAddress("correction_againstMuonTight3_2", &correction_againstMuonTight3_2, &b_correction_againstMuonTight3_2);
 //////////////////////////////////////////////////////////////////////////////////////////
    fChain->SetBranchAddress("trigweight_2", &trigweight_2, &b_trigweight_2);
+   fChain->SetBranchAddress("trigweight_l_lt", &trigweight_l_lt, &b_trigweight_l_lt);
+   fChain->SetBranchAddress("trigweight_t_lt", &trigweight_t_lt, &b_trigweight_t_lt);
    fChain->SetBranchAddress("trigweight_antiiso_2", &trigweight_antiiso_2, &b_trigweight_antiiso_2);
    fChain->SetBranchAddress("idisoweight_2", &idisoweight_2, &b_idisoweight_2);
    fChain->SetBranchAddress("idisoweight_antiiso_2", &idisoweight_antiiso_2, &b_idisoweight_antiiso_2);
@@ -364,14 +366,20 @@ void Synch17Tree::ReadInit(TTree *tree)
    //   fChain->SetBranchAddress("byVVTightIsolationMVArun2017v2DBoldDMwLT2017_2", &byVVTightIsolationMVArun2017v2DBoldDMwLT2017_2, &b_byVVTightIsolationMVArun2017v2DBoldDMwLT2017_2);
 
    fChain->SetBranchAddress("weight", &weight, &b_weight);
+   fChain->SetBranchAddress("weightSingle", &weightSingle, &b_weightSingle);
+   fChain->SetBranchAddress("weightExcl", &weightExcl, &b_weightExcl);
    fChain->SetBranchAddress("mcweight", &mcweight, &b_mcweight);
    fChain->SetBranchAddress("puweight", &puweight, &b_puweight);
    fChain->SetBranchAddress("trigweight", &trigweight, &b_trigweight);
+   fChain->SetBranchAddress("trigweightSingle", &trigweightSingle, &b_trigweightSingle);
+   fChain->SetBranchAddress("trigweightExcl", &trigweightExcl, &b_trigweightExcl);
    fChain->SetBranchAddress("embweight", &embweight, &b_embweight);
    fChain->SetBranchAddress("topptweight", &topptweight, &b_topptweight);
    fChain->SetBranchAddress("zptweight", &zptweight, &b_zptweight);
    fChain->SetBranchAddress("trkeffweight", &trkeffweight, &b_trkeffweight);
    fChain->SetBranchAddress("effweight", &effweight, &b_effweight); 
+   fChain->SetBranchAddress("effweightSingle", &effweightSingle, &b_effweightSingle); 
+   fChain->SetBranchAddress("effweightExcl", &effweightExcl, &b_effweightExcl); 
    fChain->SetBranchAddress("etaufakeweight", &etaufakeweight, &b_etaufakeweight);
    fChain->SetBranchAddress("mutaufakeweight", &mutaufakeweight, &b_mutaufakeweight);
    fChain->SetBranchAddress("prefiringweight", &prefiringweight, &b_prefiringweight);
@@ -1044,6 +1052,8 @@ void Synch17Tree::WriteInit(TTree *tree) {
    fChain->Branch("idisoweight_1", &idisoweight_1, "idisoweight_1/F");
    fChain->Branch("idisoweight_antiiso_1", &idisoweight_antiiso_1, "idisoweight_antiiso_1/F");
    fChain->Branch("trigweight_2", &trigweight_2, "trigweight_2/F");
+   fChain->Branch("trigweight_l_lt", &trigweight_l_lt, "trigweight_l_lt/F");
+   fChain->Branch("trigweight_t_lt", &trigweight_t_lt, "trigweight_t_lt/F");
    fChain->Branch("trigweight_antiiso_2", &trigweight_antiiso_2, "trigweight_antiiso_2/F");
    fChain->Branch("idisoweight_2", &idisoweight_2, "idisoweight_2/F");
    fChain->Branch("idisoweight_antiiso_2", &idisoweight_antiiso_2, "idisoweight_antiiso_2/F");
@@ -1141,6 +1151,8 @@ fChain->Branch("againstElectronVLooseMVA6_2", &againstElectronVLooseMVA6_2, "aga
    */
 
    fChain->Branch("weight", &weight, "weight/F");
+   fChain->Branch("weightSingle", &weightSingle, "weightSingle/F");
+   fChain->Branch("weightExcl", &weightExcl, "weightExcl/F");
    fChain->Branch("mcweight", &mcweight, "mcweight/F");
    fChain->Branch("puweight", &puweight, "puweight/F");
    fChain->Branch("trigweight", &trigweight, "trigweight/F");
@@ -1152,6 +1164,8 @@ fChain->Branch("againstElectronVLooseMVA6_2", &againstElectronVLooseMVA6_2, "aga
    fChain->Branch("zptweight", &zptweight, "zptweight/D");
    fChain->Branch("trkeffweight", &trkeffweight, "trkeffweight/D");
    fChain->Branch("effweight", &effweight, "effweight/F"); 
+   fChain->Branch("effweightSingle", &effweightSingle, "effweightSingle/F"); 
+   fChain->Branch("effweightExcl"  , &effweightExcl,   "effweightExcl/F"); 
    fChain->Branch("etaufakeweight", &etaufakeweight, "etaufakeweight/F");
    fChain->Branch("mutaufakeweight", &mutaufakeweight, "mutaufakeweight/F");
 

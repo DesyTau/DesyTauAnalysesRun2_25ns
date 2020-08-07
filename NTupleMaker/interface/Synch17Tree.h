@@ -296,6 +296,8 @@ public :
   Float_t         idisoweight_2;
   Float_t         idisoweight_antiiso_2;
   Float_t         trigweight_2;
+  Float_t         trigweight_l_lt;
+  Float_t         trigweight_t_lt;
   Float_t         trigweight_antiiso_2;
   Float_t         tauvsjetweightMedium_2;
 
@@ -334,10 +336,16 @@ public :
   ////////////////////////////////////////////////////////////
   //Trig and weights
   Float_t         weight;
+  Float_t         weightSingle;
+  Float_t         weightExcl;
   Float_t         mcweight;
   Float_t         puweight;
   Float_t         effweight;
+  Float_t         effweightSingle;
+  Float_t         effweightExcl;
   Float_t         trigweight;
+  Float_t         trigweightSingle;
+  Float_t         trigweightExcl;
   Float_t         embweight;
   Float_t         prefiringweight;
   Float_t         prefiringweightUp;
@@ -981,15 +989,23 @@ public :
   TBranch	 *b_idisoweight_2;
   TBranch	 *b_idisoweight_antiiso_2;
   TBranch	 *b_trigweight_2;
+  TBranch	 *b_trigweight_l_lt;
+  TBranch	 *b_trigweight_t_lt;
   TBranch	 *b_trigweight_antiiso_2;
   TBranch	 *b_tauvsjetweightMedium_2;
 
   //Trig and weights
   TBranch	 *b_weight;
+  TBranch	 *b_weightSingle;
+  TBranch	 *b_weightExcl;
   TBranch	 *b_mcweight;
   TBranch	 *b_puweight;
   TBranch	 *b_effweight;
+  TBranch	 *b_effweightSingle;
+  TBranch	 *b_effweightExcl;
   TBranch        *b_trigweight;
+  TBranch        *b_trigweightSingle;
+  TBranch        *b_trigweightExcl;
   TBranch        *b_embweight;
   TBranch	 *b_prefiringweight;
   TBranch	 *b_prefiringweightUp;
