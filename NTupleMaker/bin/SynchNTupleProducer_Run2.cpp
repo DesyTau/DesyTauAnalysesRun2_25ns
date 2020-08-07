@@ -1592,17 +1592,21 @@ int main(int argc, char * argv[]){
 	if (eff_data_trig > 1e-4 && eff_mc_trig > 1e-4 && era>2016){
 	  otree->trigweight = eff_data_trig / eff_mc_trig;
 
-	  bool pass_single_offline = (otree->pt_1>ptSingleE); // pt_thresh = 28 for 2017 or 33 for 2018
-	  bool pass_cross_offline  = (otree->pt_2>ptTauLeg && fabs(otree->eta_1-otree->eta_2)>0.2);
-
-	  if (!pass_cross_offline) 
-	    otree->trigweight = eff_sf_trig_L;
-	  else if(!pass_single_offline)
-	    otree->trigweight = eff_sf_trig_lt_l * eff_sf_trig_lt_tau;
-
-
+	  bool pass_single_offline = otree->pt_1>ptSingleE;//pt_thresh = 28 for 2017 or 33 for 2018
+	  bool pass_cross_offline  = otree->pt_2>ptTauLeg;//ptTauLeg = 35 tau offline threshold
 	  double trigweightUp = (eff_data_trigUp / eff_mc_trigUp) / (eff_data_trig / eff_mc_trig);
 	  double trigweightDown = (eff_data_trigDown / eff_mc_trigDown) / (eff_data_trig / eff_mc_trig);                
+
+	  if (!pass_cross_offline) {
+	    otree->trigweight = eff_sf_trig_L;
+	    trigweightUp = 1;
+	    trigweightDown = 1;
+	  }
+	  else if(!pass_single_offline) {
+	    otree->trigweight = eff_sf_trig_lt_l * eff_sf_trig_lt_tau;
+	    trigweightUp = 
+	  }
+
 	  if (ch == "mt"){
 	    if(mvadm=="0"){
 	      otree->weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVUp = trigweightUp;
@@ -1757,7 +1761,11 @@ int main(int argc, char * argv[]){
       //      cout << "======================\n" << endl;
 
       otree->effweight = otree->idisoweight_1 * otree->trkeffweight * otree->idisoweight_2 * otree->trigweight;
+      otree->effweightSingle = otree->idisoweight_1 * otree->trkeffweight * otree->idisoweight_2 * otree->trigweightSingle;
+      otree->effweightExcl = otree->idisoweight_1 * otree->trkeffweight * otree->idisoweight_2 * otree->trigweightExcl;
       otree->weight = otree->effweight * otree->puweight * otree->mcweight; 
+      otree->weightSingle = otree->effweightSingle * otree->puweight * otree->mcweight; 
+      otree->weightExcl   = otree->effweightExcl * otree->puweight * otree->mcweight; 
       
       
       //Theory uncertainties for CP analysis
