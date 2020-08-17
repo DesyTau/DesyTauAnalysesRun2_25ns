@@ -94,9 +94,14 @@ void FillVertices(const AC1B * analysisTree,Synch17Tree *otree, const bool isDat
 void FillGenTree(const AC1B * analysisTree, Synch17GenTree *gentree);
 float getEmbeddedWeight(const AC1B * analysisTree, RooWorkspace* WS);
 float shift_tauES(const AC1B * analysisTree, unsigned int itau, 
-		  float shift_tes_1prong, float shift_tes_1p1p0, float shift_tes_3prong,
-		  float shift_tes_lepfake_1prong_barrel, float shift_tes_lepfake_1p1p0_barrel,
-		  float shift_tes_lepfake_1prong_endcap, float shift_tes_lepfake_1p1p0_endcap
+		  float shift_tes_1prong, 
+		  float shift_tes_1p1p0, 
+		  float shift_tes_3prong,
+		  float shift_tes_3prong1p0,
+		  float shift_tes_lepfake_1prong_barrel, 
+		  float shift_tes_lepfake_1p1p0_barrel,
+		  float shift_tes_lepfake_1prong_endcap, 
+		  float shift_tes_lepfake_1p1p0_endcap
 		  ); 
 
 /*Notifications Merijn
@@ -339,7 +344,7 @@ int main(int argc, char * argv[]){
   const float shift_tes_1prong     = cfg.get<float>("TauEnergyScaleShift_OneProng");
   const float shift_tes_1p1p0      = cfg.get<float>("TauEnergyScaleShift_OneProngOnePi0");
   const float shift_tes_3prong     = cfg.get<float>("TauEnergyScaleShift_ThreeProng");
-  const float shift_tes_3prong1pi0 = cfg.get<float>("TauEnergyScaleShift_ThreeProng");
+  const float shift_tes_3prong1p0 = cfg.get<float>("TauEnergyScaleShift_ThreeProngOnePi0");
 
   const float shift_tes_1prong_e = cfg.get<float>("TauEnergyScaleShift_OneProng_Error");
   const float shift_tes_1p1p0_e  = cfg.get<float>("TauEnergyScaleShift_OneProngOnePi0_Error");
@@ -637,7 +642,7 @@ int main(int argc, char * argv[]){
     tauThreeProngScaleSys->SetUsePuppiMET(usePuppiMET);
 
     tauThreeProngOnePi0ScaleSys = new TauThreeProngOnePi0ScaleSys(otree);
-    tauThreeProngOnePi0ScaleSys->SetScale(shift_tes_3prong,shift_tes_3prong_e);
+    tauThreeProngOnePi0ScaleSys->SetScale(shift_tes_3prong1p0,shift_tes_3prong1p0_e);
     tauThreeProngOnePi0ScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);
     tauThreeProngOnePi0ScaleSys->SetUseSVFit(ApplySVFit);
     tauThreeProngOnePi0ScaleSys->SetUseFastMTT(ApplyFastMTT);
@@ -983,6 +988,7 @@ int main(int argc, char * argv[]){
 				       shift_tes_1prong,
 				       shift_tes_1p1p0,
 				       shift_tes_3prong,
+				       shift_tes_3prong1p0,
 				       shift_tes_lepfake_1prong_barrel,
 				       shift_tes_lepfake_1p1p0_barrel,
 				       shift_tes_lepfake_1prong_endcap,
@@ -1064,6 +1070,7 @@ int main(int argc, char * argv[]){
 				       shift_tes_1prong,
 				       shift_tes_1p1p0,
 				       shift_tes_3prong,
+				       shift_tes_3prong1p0,
 				       shift_tes_lepfake_1prong_barrel,
 				       shift_tes_lepfake_1p1p0_barrel,
 				       shift_tes_lepfake_1prong_endcap,
@@ -1438,6 +1445,38 @@ int main(int argc, char * argv[]){
 	  otree->mcweight = 0.0;
       }
 
+      float TauES = 1.0;
+      float shift_tes = 0.0;
+      if (otree->gen_match_2 >= 5){
+	if (otree->tau_decay_mode_2 == 0){
+	  shift_tes = shift_tes_1prong; 
+	}
+	else if (otree->tau_decay_mode_2 >= 1 && otree->tau_decay_mode_2 <= 3)
+	  shift_tes = shift_tes_1p1p0; 
+	else if (otree->tau_decay_mode_2 == 10) 
+	  shift_tes = shift_tes_3prong;
+	else if (otree->tau_decay_mode_2 >= 11) shift_tes = shift_tes_3prong1p0;
+      }
+      // do only mu->tau FES for mt channel (but effectively it is 0, see its definition above) and e->tau FES for et channel
+      else if ((ch == "mt" && (otree->gen_match_2 == 2 || otree->gen_match_2 == 4)) || (ch == "et" && (otree->gen_match_2 == 1 || otree->gen_match_2 == 3))) {
+	if (otree->tau_decay_mode_2 == 0){
+	  if (fabs(otree->eta_2) < 1.5)
+	    shift_tes = shift_tes_lepfake_1prong_barrel; 
+	  else
+	    shift_tes = shift_tes_lepfake_1prong_endcap; 
+	}
+	else if (otree->tau_decay_mode_2 == 1){
+	  if (fabs(otree->eta_2) < 1.5)
+	    shift_tes = shift_tes_lepfake_1p1p0_barrel; 
+	  else
+	    shift_tes = shift_tes_lepfake_1p1p0_endcap; 
+	}  
+      }
+
+      TauES = 1.0 + shift_tes;
+
+      //      std::cout << "TauES = " << TauES << std::endl;
+       
       if ((!isData || isEmbedded) && ApplyLepSF) {
       	TString suffix = "mc";
       	TString suffixRatio = "ratio";
@@ -1445,7 +1484,7 @@ int main(int argc, char * argv[]){
 	TString mvadm = TString::Itoa(analysisTree.tau_MVADM2017v1[tauIndex],10);
 	if (analysisTree.tau_MVADM2017v1[tauIndex]<0.0)
 	  mvadm = TString::Itoa(analysisTree.tau_decayMode[tauIndex],10);;
-	w->var("t_pt")->setVal(analysisTree.tau_pt[tauIndex]);
+	w->var("t_pt")->setVal(TauES*analysisTree.tau_pt[tauIndex]);
 	w->var("t_eta")->setVal(analysisTree.tau_eta[tauIndex]);
 	w->var("t_phi")->setVal(analysisTree.tau_phi[tauIndex]);
 	//w->var("t_dm")->setVal(analysisTree.tau_decayMode[tauIndex]);
@@ -1604,7 +1643,7 @@ int main(int argc, char * argv[]){
 	  }
 	  else if(!pass_single_offline) {
 	    otree->trigweight = eff_sf_trig_lt_l * eff_sf_trig_lt_tau;
-	    trigweightUp = 
+	    //	    trigweightUp = 
 	  }
 
 	  if (ch == "mt"){
@@ -1940,7 +1979,7 @@ int main(int argc, char * argv[]){
           }
       	  else if (otree->tau_decay_mode_2 >= 1 && otree->tau_decay_mode_2 <= 3) shift_tes = shift_tes_1p1p0; 
       	  else if (otree->tau_decay_mode_2 == 10) shift_tes = shift_tes_3prong;
-	  else if (otree->tau_decay_mode_2 >= 11) shift_tes = shift_tes_3prong1pi0;
+	  else if (otree->tau_decay_mode_2 >= 11) shift_tes = shift_tes_3prong1p0;
          }
 				// do only mu->tau FES for mt channel (but effectively it is 0, see its definition above) and e->tau FES for et channel
       	else if ((ch == "mt" && (otree->gen_match_2 == 2 || otree->gen_match_2 == 4)) || (ch == "et" && (otree->gen_match_2 == 1 || otree->gen_match_2 == 3))) {
@@ -2642,6 +2681,7 @@ float shift_tauES(const AC1B * analysisTree,
 		  float shift_tes_1prong,
 		  float shift_tes_1p1p0,
 		  float shift_tes_3prong,
+		  float shift_tes_3prong1p0,
 		  float shift_tes_lepfake_1prong_barrel,
 		  float shift_tes_lepfake_1p1p0_barrel,
 		  float shift_tes_lepfake_1prong_endcap,
@@ -2653,7 +2693,8 @@ float shift_tauES(const AC1B * analysisTree,
   if (gen_match >= 5){
     if (decay_mode == 0) shift_tes = shift_tes_1prong; 
     else if (decay_mode >= 1 && decay_mode <= 3) shift_tes = shift_tes_1p1p0; 
-    else if (decay_mode >= 10) shift_tes = shift_tes_3prong;
+    else if (decay_mode == 10) shift_tes = shift_tes_3prong;
+    else if (decay_mode == 12) shift_tes = shift_tes_3prong1p0;
   }
   else {
     if (decay_mode == 0){
