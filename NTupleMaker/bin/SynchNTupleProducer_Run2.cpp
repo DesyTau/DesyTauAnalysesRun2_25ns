@@ -1632,7 +1632,7 @@ int main(int argc, char * argv[]){
 	  otree->trigweight = eff_data_trig / eff_mc_trig;
 
 	  bool pass_single_offline = otree->pt_1>ptSingleE;//pt_thresh = 28 for 2017 or 33 for 2018
-	  bool pass_cross_offline  = otree->pt_2>ptTauLeg;//ptTauLeg = 35 tau offline threshold
+	  bool pass_cross_offline  = TauES*otree->pt_2>ptTauLeg;//ptTauLeg = 35 tau offline threshold
 	  double trigweightUp = (eff_data_trigUp / eff_mc_trigUp) / (eff_data_trig / eff_mc_trig);
 	  double trigweightDown = (eff_data_trigDown / eff_mc_trigDown) / (eff_data_trig / eff_mc_trig);                
 
@@ -1695,9 +1695,9 @@ int main(int argc, char * argv[]){
 	TString mvadm = TString::Itoa(analysisTree.tau_MVADM2017v1[tauIndex],10);
 	if (analysisTree.tau_MVADM2017v1[tauIndex]<0.0)
 	  mvadm = TString::Itoa(analysisTree.tau_decayMode[tauIndex],10);;
-	double t_pt = analysisTree.tau_pt[tauIndex];
+	double t_pt = TauES*analysisTree.tau_pt[tauIndex];
 	
-      	w->var("t_pt")->setVal(analysisTree.tau_pt[tauIndex]);
+      	w->var("t_pt")->setVal(TauES*analysisTree.tau_pt[tauIndex]);
 	if (analysisTree.tau_MVADM2017v1[tauIndex]<0.0) 
 	  w->var("t_mvadm")->setVal(analysisTree.tau_decayMode[tauIndex]);
 	else
