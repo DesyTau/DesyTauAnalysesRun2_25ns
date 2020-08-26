@@ -625,6 +625,14 @@ public :
   Float_t         tau_SV_covzy_2;
   Float_t         tau_SV_covzz_2;
 
+  //SV-PV
+  Float_t         SVminusRefitV_x;
+  Float_t         SVminusRefitV_y;
+  Float_t         SVminusRefitV_z;
+  Float_t         SVminusPV_x;
+  Float_t         SVminusPV_y;
+  Float_t         SVminusPV_z;
+
   Float_t alpha_IP_1;
   Float_t alpha_IP_uncorr_1;
   Float_t alpha_plane_1;
@@ -1268,6 +1276,14 @@ public :
   TBranch        *b_tau_SV_covyy_2;
   TBranch        *b_tau_SV_covzy_2;
   TBranch        *b_tau_SV_covzz_2;
+
+  //SV-PV
+  TBranch        *b_SVminusRefitV_x;
+  TBranch        *b_SVminusRefitV_y;
+  TBranch        *b_SVminusRefitV_z;
+  TBranch        *b_SVminusPV_x;
+  TBranch        *b_SVminusPV_y;
+  TBranch        *b_SVminusPV_z;
 
   //reco vertices
   //RECO vertex info is practical to have

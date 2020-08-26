@@ -2643,6 +2643,26 @@ void FillVertices(const AC1B *analysisTree, Synch17Tree *otree, const bool isDat
   otree->pvy_bs = analysisTree->primvertexwithbs_y;
   otree->pvz_bs = analysisTree->primvertexwithbs_z;
 
+  otree->tau_SV_x_2 = analysisTree->tau_SV_x[tauIndex];
+  otree->tau_SV_y_2 = analysisTree->tau_SV_y[tauIndex];
+  otree->tau_SV_z_2 = analysisTree->tau_SV_z[tauIndex];
+
+  otree->tau_SV_covxx_2 = analysisTree->tau_SV_cov[tauIndex][0];
+  otree->tau_SV_covyx_2 = analysisTree->tau_SV_cov[tauIndex][1];
+  otree->tau_SV_covzx_2 = analysisTree->tau_SV_cov[tauIndex][2];
+  otree->tau_SV_covyy_2 = analysisTree->tau_SV_cov[tauIndex][3];
+  otree->tau_SV_covzy_2 = analysisTree->tau_SV_cov[tauIndex][4];
+  otree->tau_SV_covzz_2 = analysisTree->tau_SV_cov[tauIndex][5];
+
+  otree->SVminusRefitV_x=otree->tau_SV_x_2-vertex_refitted_BS.X();
+  otree->SVminusRefitV_y=otree->tau_SV_y_2-vertex_refitted_BS.Y();
+  otree->SVminusRefitV_z=otree->tau_SV_z_2-vertex_refitted_BS.Z();
+
+  otree->SVminusPV_x=otree->tau_SV_x_2-otree->RecoVertexX;
+  otree->SVminusPV_y=otree->tau_SV_y_2-otree->RecoVertexY;
+  otree->SVminusPV_z=otree->tau_SV_z_2-otree->RecoVertexZ;
+
+
   if(!isData){
     for (unsigned int igen = 0; igen < analysisTree->genparticles_count; ++igen) {
 
@@ -3101,15 +3121,6 @@ void FillTau(const AC1B *analysisTree, Synch17Tree *otree, int leptonIndex, int 
   otree->tau_pca3D_x_2 = analysisTree->tau_pca3D_x[tauIndex];
   otree->tau_pca3D_y_2 = analysisTree->tau_pca3D_y[tauIndex];
   otree->tau_pca3D_z_2 = analysisTree->tau_pca3D_z[tauIndex];
-  otree->tau_SV_x_2 = analysisTree->tau_SV_x[tauIndex];
-  otree->tau_SV_y_2 = analysisTree->tau_SV_y[tauIndex];
-  otree->tau_SV_z_2 = analysisTree->tau_SV_z[tauIndex];
-  otree->tau_SV_covxx_2 = analysisTree->tau_SV_cov[tauIndex][0];
-  otree->tau_SV_covyx_2 = analysisTree->tau_SV_cov[tauIndex][1];
-  otree->tau_SV_covzx_2 = analysisTree->tau_SV_cov[tauIndex][2];
-  otree->tau_SV_covyy_2 = analysisTree->tau_SV_cov[tauIndex][3];
-  otree->tau_SV_covzy_2 = analysisTree->tau_SV_cov[tauIndex][4];
-  otree->tau_SV_covzz_2 = analysisTree->tau_SV_cov[tauIndex][5];
 
   otree->deepTauVsEleRaw_2                = analysisTree->tau_byDeepTau2017v2p1VSeraw[tauIndex];
   otree->deepTauVsJetRaw_2                = analysisTree->tau_byDeepTau2017v2p1VSjetraw[tauIndex];
