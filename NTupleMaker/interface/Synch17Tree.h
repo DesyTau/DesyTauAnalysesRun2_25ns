@@ -298,6 +298,9 @@ public :
   Float_t         trigweight_2;
   Float_t         trigweight_l_lt;
   Float_t         trigweight_t_lt;
+  Float_t         trigweight_2_Up;
+  Float_t         trigweight_2_Down;
+
   Float_t         trigweight_antiiso_2;
   Float_t         tauvsjetweightMedium_2;
 
@@ -989,6 +992,8 @@ public :
   TBranch	 *b_idisoweight_2;
   TBranch	 *b_idisoweight_antiiso_2;
   TBranch	 *b_trigweight_2;
+  TBranch	 *b_trigweight_2_Up;
+  TBranch	 *b_trigweight_2_Down;
   TBranch	 *b_trigweight_l_lt;
   TBranch	 *b_trigweight_t_lt;
   TBranch	 *b_trigweight_antiiso_2;
