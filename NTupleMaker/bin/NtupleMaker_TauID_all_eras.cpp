@@ -116,6 +116,9 @@ int main(int argc, char * argv[]) {
    const float metNoMu_Trig              = cfg.get<float>("metNoMu_Trig");
    
    // momentum scales
+   const bool applyTEScorrection = cfg.get<bool>("ApplyTESCorrection"); // apply TES correction to tau leptons for the trigger efficiency measurement
+   const string tesCorrectionsFile = cfg.get<string>("TESCorrections");
+   const string uncShiftTES = cfg.get<string>("UncShiftTES");
    const float tauMomScale = cfg.get<float>("TauMomScale");
    const string tauDecayMode  = cfg.get<string>("TauDecayMode");
    const float muonMomScale = cfg.get<float>("MuonMomScale");
@@ -192,6 +195,10 @@ int main(int argc, char * argv[]) {
   map<int,TGraphAsymmErrors*>  map_trigEffMC;
   TFile * trigEffFile = new TFile(TString(cmsswBase)+"/src/"+trigEffFileName,"read");
   iniTriggerEfficiencies(trigEffFile,map_trigEffData,map_trigEffMC);
+  
+  // ------------------- initialize TES corrections -----------------------
+  TFile *TESFile = new TFile(TString(cmsswBase)+"/src/"+tesCorrectionsFile,"read");
+  TH1F *TEShist = (TH1F*)TESFile->Get("tes"); 
   
   // ------------------- set MET filters ---------------------------------
   std::vector<TString> metFlags; metFlags.clear();
@@ -973,17 +980,39 @@ int main(int argc, char * argv[]) {
         
         for (unsigned int itau=0; itau<analysisTree.tau_count; ++itau) { // loop over taus
            
-           if( (tauDecayMode == "1prong0pizeros"     && analysisTree.tau_decayMode[itau]==0) ||
-               (tauDecayMode == "1prongUpTo4pizeros" && analysisTree.tau_decayMode[itau]>=1 && analysisTree.tau_decayMode[itau]<=4) ||
-               (tauDecayMode == "3prong0pizeros"     && (analysisTree.tau_decayMode[itau]==10 || analysisTree.tau_decayMode[itau]==11 || analysisTree.tau_decayMode[itau]==7 ) ) || tauDecayMode == "inclusive" ){
+           if (!applyTEScorrection){
+             if( (tauDecayMode == "1prong0pizeros"     && analysisTree.tau_decayMode[itau]==0) ||
+                (tauDecayMode == "1prongUpTo4pizeros" && analysisTree.tau_decayMode[itau]>=1 && analysisTree.tau_decayMode[itau]<=4) ||
+                (tauDecayMode == "3prong0pizeros"     && (analysisTree.tau_decayMode[itau]==10 || analysisTree.tau_decayMode[itau]==11 || analysisTree.tau_decayMode[itau]==7 ) ) || tauDecayMode == "inclusive" ){
               
-              analysisTree.tau_px[itau]   *= tauMomScale;
-              analysisTree.tau_py[itau]   *= tauMomScale;
-              analysisTree.tau_pz[itau]   *= tauMomScale;
-              analysisTree.tau_pt[itau]   *= tauMomScale;
-              analysisTree.tau_e[itau]    *= tauMomScale;
-              analysisTree.tau_mass[itau] *= tauMomScale;
-           }
+                  analysisTree.tau_px[itau]   *= tauMomScale;
+                  analysisTree.tau_py[itau]   *= tauMomScale;
+                  analysisTree.tau_pz[itau]   *= tauMomScale;
+                  analysisTree.tau_pt[itau]   *= tauMomScale;
+                  analysisTree.tau_e[itau]    *= tauMomScale;
+                  analysisTree.tau_mass[itau] *= tauMomScale;
+                }
+            }
+            else
+            {         
+              if (!isData){
+                double tes_corr  = TEShist->GetBinContent(TEShist->GetXaxis()->FindBin(analysisTree.tau_decayMode[itau]));
+                if (uncShiftTES != "None"){
+                  if( (tauDecayMode == "1prong0pizeros"     && analysisTree.tau_decayMode[itau]==0) ||
+                    (tauDecayMode == "1prongUpTo4pizeros" && analysisTree.tau_decayMode[itau]>=1 && analysisTree.tau_decayMode[itau]<=4) ||
+                    (tauDecayMode == "3prong0pizeros"     && (analysisTree.tau_decayMode[itau]==10 || analysisTree.tau_decayMode[itau]==11 || analysisTree.tau_decayMode[itau]==7 ) ) || tauDecayMode == "inclusive" ){
+                      if (uncShiftTES == "Up") tes_corr +=  TEShist->GetBinError(TEShist->GetXaxis()->FindBin(analysisTree.tau_decayMode[itau])) * 3;
+                      if (uncShiftTES == "Down") tes_corr -=  TEShist->GetBinError(TEShist->GetXaxis()->FindBin(analysisTree.tau_decayMode[itau])) * 3;
+                    }
+                  }
+                  analysisTree.tau_px[itau]   *= tes_corr;
+                  analysisTree.tau_py[itau]   *= tes_corr;
+                  analysisTree.tau_pz[itau]   *= tes_corr;
+                  analysisTree.tau_pt[itau]   *= tes_corr;
+                  analysisTree.tau_e[itau]    *= tes_corr;
+                  analysisTree.tau_mass[itau] *= tes_corr;
+                }
+           }  
            if (!LooseTauSelection(analysisTree,itau)) continue;
            // finding matching mu and e-->
            int matchedMuIndex = MatchingMuon(analysisTree, itau, muonIndexes);
