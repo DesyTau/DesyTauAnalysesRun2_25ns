@@ -298,6 +298,8 @@ void Synch17Tree::ReadInit(TTree *tree)
 //  fChain->SetBranchAddress("correction_againstMuonTight3_2", &correction_againstMuonTight3_2, &b_correction_againstMuonTight3_2);
 //////////////////////////////////////////////////////////////////////////////////////////
    fChain->SetBranchAddress("trigweight_2", &trigweight_2, &b_trigweight_2);
+   fChain->SetBranchAddress("trigweight_2_Up", &trigweight_2_Up, &b_trigweight_2_Up);
+   fChain->SetBranchAddress("trigweight_2_Down", &trigweight_2_Down, &b_trigweight_2_Down);
    fChain->SetBranchAddress("trigweight_l_lt", &trigweight_l_lt, &b_trigweight_l_lt);
    fChain->SetBranchAddress("trigweight_t_lt", &trigweight_t_lt, &b_trigweight_t_lt);
    fChain->SetBranchAddress("trigweight_antiiso_2", &trigweight_antiiso_2, &b_trigweight_antiiso_2);
@@ -633,15 +635,23 @@ void Synch17Tree::ReadInit(TTree *tree)
    //   fChain->SetBranchAddress("tau_SV_covzy_1", &tau_SV_covzy_1, &b_tau_SV_covzy_1);
    //   fChain->SetBranchAddress("tau_SV_covzz_1", &tau_SV_covzz_1, &b_tau_SV_covzz_1);
 
-   //   fChain->SetBranchAddress("tau_SV_x_2", &tau_SV_x_2, &b_tau_SV_x_2);
-   //   fChain->SetBranchAddress("tau_SV_y_2", &tau_SV_y_2, &b_tau_SV_y_2);
-   //   fChain->SetBranchAddress("tau_SV_z_2", &tau_SV_z_2, &b_tau_SV_z_2);
-   //   fChain->SetBranchAddress("tau_SV_covxx_2", &tau_SV_covxx_2, &b_tau_SV_covxx_2);
-   //   fChain->SetBranchAddress("tau_SV_covyx_2", &tau_SV_covyx_2, &b_tau_SV_covyx_2);
-   //   fChain->SetBranchAddress("tau_SV_covzx_2", &tau_SV_covzx_2, &b_tau_SV_covzx_2);
-   //   fChain->SetBranchAddress("tau_SV_covyy_2", &tau_SV_covyy_2, &b_tau_SV_covyy_2);
-   //   fChain->SetBranchAddress("tau_SV_covzy_2", &tau_SV_covzy_2, &b_tau_SV_covzy_2);
-   //   fChain->SetBranchAddress("tau_SV_covzz_2", &tau_SV_covzz_2, &b_tau_SV_covzz_2);
+   fChain->SetBranchAddress("tau_SV_x_2", &tau_SV_x_2, &b_tau_SV_x_2);
+   fChain->SetBranchAddress("tau_SV_y_2", &tau_SV_y_2, &b_tau_SV_y_2);
+   fChain->SetBranchAddress("tau_SV_z_2", &tau_SV_z_2, &b_tau_SV_z_2);
+   fChain->SetBranchAddress("tau_SV_covxx_2", &tau_SV_covxx_2, &b_tau_SV_covxx_2);
+   fChain->SetBranchAddress("tau_SV_covyx_2", &tau_SV_covyx_2, &b_tau_SV_covyx_2);
+   fChain->SetBranchAddress("tau_SV_covzx_2", &tau_SV_covzx_2, &b_tau_SV_covzx_2);
+   fChain->SetBranchAddress("tau_SV_covyy_2", &tau_SV_covyy_2, &b_tau_SV_covyy_2);
+   fChain->SetBranchAddress("tau_SV_covzy_2", &tau_SV_covzy_2, &b_tau_SV_covzy_2);
+   fChain->SetBranchAddress("tau_SV_covzz_2", &tau_SV_covzz_2, &b_tau_SV_covzz_2);
+
+   //SV-PV
+   fChain->SetBranchAddress("SVminusRefitV_x", &SVminusRefitV_x, &b_SVminusRefitV_x);
+   fChain->SetBranchAddress("SVminusRefitV_y", &SVminusRefitV_y, &b_SVminusRefitV_y);
+   fChain->SetBranchAddress("SVminusRefitV_z", &SVminusRefitV_z, &b_SVminusRefitV_z);
+   fChain->SetBranchAddress("SVminusPV_x", &SVminusPV_x, &b_SVminusPV_x);
+   fChain->SetBranchAddress("SVminusPV_y", &SVminusPV_y, &b_SVminusPV_y);
+   fChain->SetBranchAddress("SVminusPV_z", &SVminusPV_z, &b_SVminusPV_z);
 
 
   //RECO vertex info useful to have
@@ -1052,6 +1062,8 @@ void Synch17Tree::WriteInit(TTree *tree) {
    fChain->Branch("idisoweight_1", &idisoweight_1, "idisoweight_1/F");
    fChain->Branch("idisoweight_antiiso_1", &idisoweight_antiiso_1, "idisoweight_antiiso_1/F");
    fChain->Branch("trigweight_2", &trigweight_2, "trigweight_2/F");
+   fChain->Branch("trigweight_2_Up", &trigweight_2_Up, "trigweight_2_Up/F");
+   fChain->Branch("trigweight_2_Down", &trigweight_2_Down, "trigweight_2_Down/F");
    fChain->Branch("trigweight_l_lt", &trigweight_l_lt, "trigweight_l_lt/F");
    fChain->Branch("trigweight_t_lt", &trigweight_t_lt, "trigweight_t_lt/F");
    fChain->Branch("trigweight_antiiso_2", &trigweight_antiiso_2, "trigweight_antiiso_2/F");
@@ -1153,9 +1165,14 @@ fChain->Branch("againstElectronVLooseMVA6_2", &againstElectronVLooseMVA6_2, "aga
    fChain->Branch("weight", &weight, "weight/F");
    fChain->Branch("weightSingle", &weightSingle, "weightSingle/F");
    fChain->Branch("weightExcl", &weightExcl, "weightExcl/F");
+
    fChain->Branch("mcweight", &mcweight, "mcweight/F");
    fChain->Branch("puweight", &puweight, "puweight/F");
+
    fChain->Branch("trigweight", &trigweight, "trigweight/F");
+   fChain->Branch("trigweightSingle", &trigweightSingle, "trigweightSingle/F");
+   fChain->Branch("trigweightExcl", &trigweightExcl, "trigweightExcl/F");
+
    fChain->Branch("prefiringweight", &prefiringweight, "prefiringweight/F");
    fChain->Branch("prefiringweightUp", &prefiringweightUp, "prefiringweightUp/F");
    fChain->Branch("prefiringweightDown", &prefiringweightDown, "prefiringweightDown/F");
@@ -1163,11 +1180,12 @@ fChain->Branch("againstElectronVLooseMVA6_2", &againstElectronVLooseMVA6_2, "aga
    fChain->Branch("topptweight", &topptweight, "topptweight/F");
    fChain->Branch("zptweight", &zptweight, "zptweight/D");
    fChain->Branch("trkeffweight", &trkeffweight, "trkeffweight/D");
+   fChain->Branch("etaufakeweight", &etaufakeweight, "etaufakeweight/F");
+   fChain->Branch("mutaufakeweight", &mutaufakeweight, "mutaufakeweight/F");
+
    fChain->Branch("effweight", &effweight, "effweight/F"); 
    fChain->Branch("effweightSingle", &effweightSingle, "effweightSingle/F"); 
    fChain->Branch("effweightExcl"  , &effweightExcl,   "effweightExcl/F"); 
-   fChain->Branch("etaufakeweight", &etaufakeweight, "etaufakeweight/F");
-   fChain->Branch("mutaufakeweight", &mutaufakeweight, "mutaufakeweight/F");
 
    fChain->Branch("ff_nom",&ff_nom,"ff_nom/F");
    fChain->Branch("ff_mva",&ff_mva,"ff_mva/F");
@@ -1336,7 +1354,7 @@ fChain->Branch("againstElectronVLooseMVA6_2", &againstElectronVLooseMVA6_2, "aga
    fChain->Branch("tau_pca3D_x_2", &tau_pca3D_x_2, "tau_pca3D_x_2/F");
    fChain->Branch("tau_pca3D_y_2", &tau_pca3D_y_2, "tau_pca3D_y_2/F");
    fChain->Branch("tau_pca3D_z_2", &tau_pca3D_z_2, "tau_pca3D_z_2/F");
-
+   
    fChain->Branch("tau_SV_x_1", &tau_SV_x_1, "tau_SV_x_1/F");
    fChain->Branch("tau_SV_y_1", &tau_SV_y_1, "tau_SV_y_1/F");
    fChain->Branch("tau_SV_z_1", &tau_SV_z_1, "tau_SV_z_1/F");
@@ -1346,7 +1364,7 @@ fChain->Branch("againstElectronVLooseMVA6_2", &againstElectronVLooseMVA6_2, "aga
    fChain->Branch("tau_SV_covyy_1", &tau_SV_covyy_1, "tau_SV_covyy_1/F");
    fChain->Branch("tau_SV_covzy_1", &tau_SV_covzy_1, "tau_SV_covzy_1/F");
    fChain->Branch("tau_SV_covzz_1", &tau_SV_covzz_1, "tau_SV_covzz_1/F");
-
+   */
    fChain->Branch("tau_SV_x_2", &tau_SV_x_2, "tau_SV_x_2/F");
    fChain->Branch("tau_SV_y_2", &tau_SV_y_2, "tau_SV_y_2/F");
    fChain->Branch("tau_SV_z_2", &tau_SV_z_2, "tau_SV_z_2/F");
@@ -1356,7 +1374,16 @@ fChain->Branch("againstElectronVLooseMVA6_2", &againstElectronVLooseMVA6_2, "aga
    fChain->Branch("tau_SV_covyy_2", &tau_SV_covyy_2, "tau_SV_covyy_2/F");
    fChain->Branch("tau_SV_covzy_2", &tau_SV_covzy_2, "tau_SV_covzy_2/F");
    fChain->Branch("tau_SV_covzz_2", &tau_SV_covzz_2, "tau_SV_covzz_2/F");
-   */
+   
+
+   //SV-PV
+   fChain->Branch("SVminusRefitV_x", &SVminusRefitV_x, "SVminusRefitV_x/F");
+   fChain->Branch("SVminusRefitV_y", &SVminusRefitV_y, "SVminusRefitV_y/F");
+   fChain->Branch("SVminusRefitV_z", &SVminusRefitV_z, "SVminusRefitV_z/F");
+   fChain->Branch("SVminusPV_x", &SVminusPV_x, "SVminusPV_x/F");
+   fChain->Branch("SVminusPV_y", &SVminusPV_y, "SVminusPV_y/F");
+   fChain->Branch("SVminusPV_z", &SVminusPV_z, "SVminusPV_z/F");
+
    fChain->Branch("RecoVertexX", &RecoVertexX, "RecoVertexX/F");
    fChain->Branch("RecoVertexY", &RecoVertexY, "RecoVertexY/F");
    fChain->Branch("RecoVertexZ", &RecoVertexZ, "RecoVertexZ/F"); 

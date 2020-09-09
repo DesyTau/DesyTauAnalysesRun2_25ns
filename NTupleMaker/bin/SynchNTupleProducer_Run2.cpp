@@ -1457,7 +1457,8 @@ int main(int argc, char * argv[]){
 	  shift_tes = shift_tes_3prong;
 	else if (otree->tau_decay_mode_2 >= 11) shift_tes = shift_tes_3prong1p0;
       }
-      // do only mu->tau FES for mt channel (but effectively it is 0, see its definition above) and e->tau FES for et channel
+      // do only mu->tau FES for mt channel (but effectively it is 0, see its definition above) 
+      // and e->tau FES for et channel
       else if ((ch == "mt" && (otree->gen_match_2 == 2 || otree->gen_match_2 == 4)) || (ch == "et" && (otree->gen_match_2 == 1 || otree->gen_match_2 == 3))) {
 	if (otree->tau_decay_mode_2 == 0){
 	  if (fabs(otree->eta_2) < 1.5)
@@ -1542,16 +1543,30 @@ int main(int argc, char * argv[]){
 	    eff_mc_trig_lt_tauUp = w->function("t_trg_ic_deeptau_medium_mvadm_etau_" + suffix + "_mvadm"+mvadm+"_up")->getVal();
 	    eff_data_trig_lt_tauDown = w->function("t_trg_ic_deeptau_medium_mvadm_etau_data_mvadm"+mvadm+"_down")->getVal();
 	    eff_mc_trig_lt_tauDown = w->function("t_trg_ic_deeptau_medium_mvadm_etau_" + suffix + "_mvadm"+mvadm+"_down")->getVal();
+	    if (isEmbedded) {
+	      eff_data_trig_lt_tauUp = w->function("t_trg_ic_deeptau_medium_mvadm_etau_embed_data_mvadm"+mvadm+"_up")->getVal();
+	      eff_data_trig_lt_tauDown = w->function("t_trg_ic_deeptau_medium_mvadm_etau_embed_data_mvadm"+mvadm+"_down")->getVal();
+	    }
+
+	    /*
+	    std::cout << "Data(etau_tau) = " << eff_data_trig_lt_tau 
+		      << "  up = " << eff_data_trig_lt_tauUp
+		      << "  down = " << eff_data_trig_lt_tauDown << std::endl;
+	    std::cout << "MC(etau_tau) = " << eff_mc_trig_lt_tau 
+		      << "  up = " << eff_mc_trig_lt_tauUp
+		      << "  down = " << eff_mc_trig_lt_tauDown << std::endl;
+	    */
+
 	    if (triggerEmbed2017) {
 	      if (leptonLV.Pt()<ptTriggerEmbed2017&&fabs(leptonLV.Eta())>etaTriggerEmbed2017) {
 		eff_mc_trig_L = 1.0;
 		eff_mc_trig_lt_l = 1.0;
 		eff_mc_trig_lt_tau = 1.0;
+		eff_mc_trig_lt_tauUp = 1.0;
+		eff_mc_trig_lt_tauDown = 1.0;
 		eff_sf_trig_L = eff_data_trig_L;
 		eff_sf_trig_lt_l = eff_data_trig_lt_l;
 		eff_sf_trig_lt_tau = eff_data_trig_lt_tau;		
-		eff_mc_trig_lt_tauUp = 1.0;
-		eff_mc_trig_lt_tauDown = 1.0;
 	      }
 	    }
 	  }
@@ -1569,49 +1584,36 @@ int main(int argc, char * argv[]){
 	  otree->idisoweight_antiiso_1 = w->function("e_idiso_ic_" + suffixRatio)->getVal();
 	  otree->trkeffweight = w->function("e_trk_" + suffixRatio)->getVal();
 	}
-	otree->trigweight_1 = 1;
-	otree->trigweight_2 = 1;
-
-	//	if (eff_mc_trig_L>0.1)
 	otree->trigweight_1 = eff_data_trig_L/eff_mc_trig_L;
-	//	std::cout << "SingleE sf = " << eff_sf_trig_L << "   eff(data)/eff(mc) = " << eff_data_trig_L/eff_mc_trig_L << std::endl; 
-	//	if (eff_mc_trig_lt_l>0.1&&eff_mc_trig_lt_tau>0.1) 
-	otree->trigweight_2 = (eff_data_trig_lt_l*eff_data_trig_lt_tau)/(eff_mc_trig_lt_l*eff_mc_trig_lt_tau);
-	otree->trigweight_l_lt = eff_sf_trig_lt_l;
-	otree->trigweight_t_lt = eff_sf_trig_lt_tau;
-	//	std::cout << "l_ltau  sf = " << eff_sf_trig_lt_l << "   eff(data)/eff(mc) = " << eff_data_trig_lt_l/eff_mc_trig_lt_l << std::endl; 
-	//	std::cout << "t_ltau  sf = " << eff_sf_trig_lt_tau << "   eff(data)/eff(mc) = " << eff_data_trig_lt_tau/eff_mc_trig_lt_tau << std::endl; 
-	
+	otree->trigweight_2 = 1.0;
+	otree->trigweight_2_Up = 1.0;
+	otree->trigweight_2_Down = 1.0;
+
+	if (era>=2017) {
+	  otree->trigweight_2 = (eff_data_trig_lt_l*eff_data_trig_lt_tau)/(eff_mc_trig_lt_l*eff_mc_trig_lt_tau);
+	  otree->trigweight_2_Up   = (eff_data_trig_lt_tauUp/eff_mc_trig_lt_tauUp)    /(eff_data_trig_lt_tau/eff_mc_trig_lt_tau);
+	  otree->trigweight_2_Down = (eff_data_trig_lt_tauDown/eff_mc_trig_lt_tauDown)/(eff_data_trig_lt_tau/eff_mc_trig_lt_tau);
+	  otree->trigweight_l_lt = eff_sf_trig_lt_l;
+	  otree->trigweight_t_lt = eff_sf_trig_lt_tau;
+	}
+
+	if (std::isnan(otree->trigweight_2)||std::isnan(otree->trigweight_2_Up)||std::isnan(otree->trigweight_2_Down)) {
+	  otree->trigweight_2 = 1.0;
+	  otree->trigweight_2_Up = 1.0;
+	  otree->trigweight_2_Down = 1.0;
+	}
+	if (otree->trigweight_2<0.0||otree->trigweight_2_Up<0.0||otree->trigweight_2_Down<0.0) {
+	  otree->trigweight_2 = 1.0;
+          otree->trigweight_2_Up = 1.0;
+          otree->trigweight_2_Down = 1.0;
+	}
 
 	if (std::isnan(otree->trigweight_1))
-	  otree->trigweight_1 = eff_data_trig_L;
-	if (std::isnan(otree->trigweight_2))
-	  otree->trigweight_2 = eff_data_trig_lt_l*eff_data_trig_lt_tau;
+	  otree->trigweight_1 = 1.0;
 
-	/*
-	if (leptonLV.Pt()>26.&&leptonLV.Pt()<30.&&fabs(leptonLV.Eta())>1.65
-	    &&otree->trg_etaucross_e) {
-	  
-	  std::cout << "run : " << otree->run << "    event : " << otree->evt << std::endl;
-	  std::cout << "trg_singleelectron : " << otree->trg_singleelectron << std::endl;
-	  std::cout << "trg_etaucross_e    : " << otree->trg_etaucross_e << endl;
-	  std::cout << "trg_etaucross_tau  : " << otree->trg_etaucross_tau << endl;
-	  std::cout << "electron pt = " << leptonLV.Pt() << "   eta = " << leptonLV.Eta() << std::endl;
-	  std::cout << "eff(trig_L,Data) = " << eff_data_trig_L 
-		    << "    eff(trig_L,MC) = " << eff_mc_trig_L << std::endl;
-	  std::cout << "eff(Data)/Eff(MC) = " << otree->trigweight_1 << std::endl;
-	  std::cout << "eff(trig_l,Data) = " << eff_data_trig_lt_l 
-		    << "    eff(trig_l,MC) = " << eff_mc_trig_lt_l << std::endl;
-
-	  std::cout << "eff(trig_t,Data) = " << eff_data_trig_lt_tau 
-		    << "    eff(trig_t,MC) = " << eff_mc_trig_lt_tau << std::endl;
-	  if (isEmbedded)
-	    std::cout << "SF(trig_L) = " << w->function("e_trg_ic_embed_ratio")->getVal();
-	  else
-	    std::cout << "SF(trig_L) = " << w->function("e_trg_ic_ratio")->getVal();
-	  std::cout << std::endl;
+	if (otree->trigweight_1<0.0) {
+	  otree->trigweight_1 = 0.0;
 	}
-	*/
 
 	double eff_data_trig = eff_data_trig_L + (eff_data_trig_lt_l - eff_data_trig_L) * eff_data_trig_lt_tau;
 	double eff_mc_trig = eff_mc_trig_L + (eff_mc_trig_lt_l - eff_mc_trig_L) * eff_mc_trig_lt_tau;                                                            
@@ -1628,14 +1630,19 @@ int main(int argc, char * argv[]){
 	  otree->trigweightExcl = eff_sf_trig_lt_l * eff_sf_trig_lt_tau;
 	otree->trigweight_l_lt = eff_sf_trig_lt_l;
 	otree->trigweight_t_lt = eff_sf_trig_lt_tau;
+	
+	float trigweightUp = 1;
+	float trigweightDown = 1;
+
+	bool pass_single_offline = true;
+	bool pass_cross_offline  = true;
 	if (eff_data_trig > 1e-4 && eff_mc_trig > 1e-4 && era>2016){
 	  otree->trigweight = eff_data_trig / eff_mc_trig;
 
-	  bool pass_single_offline = otree->pt_1>ptSingleE;//pt_thresh = 28 for 2017 or 33 for 2018
-	  bool pass_cross_offline  = TauES*otree->pt_2>ptTauLeg;//ptTauLeg = 35 tau offline threshold
-	  double trigweightUp = (eff_data_trigUp / eff_mc_trigUp) / (eff_data_trig / eff_mc_trig);
-	  double trigweightDown = (eff_data_trigDown / eff_mc_trigDown) / (eff_data_trig / eff_mc_trig);                
-
+	  pass_single_offline = otree->pt_1>ptSingleE;     //pt_thresh = 28 for 2017 or 33 for 2018
+	  pass_cross_offline  = TauES*otree->pt_2>ptTauLeg;//ptTauLeg = 35 tau offline threshold
+	  trigweightUp = (eff_data_trigUp / eff_mc_trigUp) / (eff_data_trig / eff_mc_trig);
+	  trigweightDown = (eff_data_trigDown / eff_mc_trigDown) / (eff_data_trig / eff_mc_trig);                
 	  if (!pass_cross_offline) {
 	    otree->trigweight = eff_sf_trig_L;
 	    trigweightUp = 1;
@@ -1643,8 +1650,10 @@ int main(int argc, char * argv[]){
 	  }
 	  else if(!pass_single_offline) {
 	    otree->trigweight = eff_sf_trig_lt_l * eff_sf_trig_lt_tau;
-	    //	    trigweightUp = 
+	    trigweightUp = (eff_data_trig_lt_tauUp/eff_mc_trig_lt_tauUp) / (eff_data_trig_lt_tau/eff_mc_trig_lt_tau);
+	    trigweightDown = (eff_data_trig_lt_tauDown/eff_mc_trig_lt_tauDown) / (eff_data_trig_lt_tau/eff_mc_trig_lt_tau);
 	  }
+
 
 	  if (ch == "mt"){
 	    if(mvadm=="0"){
@@ -1682,7 +1691,27 @@ int main(int argc, char * argv[]){
 	      otree->weight_CMS_eff_Xtrigger_et_MVADM11_13TeVDown = trigweightDown;
 	    }			
 	  }
-	}      
+	}
+
+	/*
+	if (!pass_single_offline&&pass_cross_offline) 
+	  std::cout << " **************** etau_tau trigger ******************* " << std::endl;
+
+	std::cout << "pt_1 = " << otree->pt_1 << "   eta_1 = " << otree->eta_1
+		  << "   pt_2 = " << otree->pt_2 << "   eta_2 = " << otree->eta_2 << std::endl;
+	std::cout << "pass_single_offline = " << pass_single_offline 
+		  << "   pass_cross_offline = " << pass_cross_offline << std::endl;
+	std::cout << "trigweight_1 = " << otree->trigweight_1 << std::endl;
+	std::cout << "trigweight_2 = " << otree->trigweight_2
+		  << "   Up = " << otree->trigweight_2_Up
+		  << "   Down = " << otree->trigweight_2_Down << std::endl;
+	
+	std::cout << "trigweght = " << otree->trigweight 
+		  << "   Up = " << trigweightUp 
+		  << "   Down = " << trigweightDown << std::endl;
+	std::cout << std::endl;
+	*/
+
       }
       counter[10]++;
     
@@ -2614,6 +2643,26 @@ void FillVertices(const AC1B *analysisTree, Synch17Tree *otree, const bool isDat
   otree->pvy_bs = analysisTree->primvertexwithbs_y;
   otree->pvz_bs = analysisTree->primvertexwithbs_z;
 
+  otree->tau_SV_x_2 = analysisTree->tau_SV_x[tauIndex];
+  otree->tau_SV_y_2 = analysisTree->tau_SV_y[tauIndex];
+  otree->tau_SV_z_2 = analysisTree->tau_SV_z[tauIndex];
+
+  otree->tau_SV_covxx_2 = analysisTree->tau_SV_cov[tauIndex][0];
+  otree->tau_SV_covyx_2 = analysisTree->tau_SV_cov[tauIndex][1];
+  otree->tau_SV_covzx_2 = analysisTree->tau_SV_cov[tauIndex][2];
+  otree->tau_SV_covyy_2 = analysisTree->tau_SV_cov[tauIndex][3];
+  otree->tau_SV_covzy_2 = analysisTree->tau_SV_cov[tauIndex][4];
+  otree->tau_SV_covzz_2 = analysisTree->tau_SV_cov[tauIndex][5];
+
+  otree->SVminusRefitV_x=otree->tau_SV_x_2-vertex_refitted_BS.X();
+  otree->SVminusRefitV_y=otree->tau_SV_y_2-vertex_refitted_BS.Y();
+  otree->SVminusRefitV_z=otree->tau_SV_z_2-vertex_refitted_BS.Z();
+
+  otree->SVminusPV_x=otree->tau_SV_x_2-otree->RecoVertexX;
+  otree->SVminusPV_y=otree->tau_SV_y_2-otree->RecoVertexY;
+  otree->SVminusPV_z=otree->tau_SV_z_2-otree->RecoVertexZ;
+
+
   if(!isData){
     for (unsigned int igen = 0; igen < analysisTree->genparticles_count; ++igen) {
 
@@ -3072,15 +3121,6 @@ void FillTau(const AC1B *analysisTree, Synch17Tree *otree, int leptonIndex, int 
   otree->tau_pca3D_x_2 = analysisTree->tau_pca3D_x[tauIndex];
   otree->tau_pca3D_y_2 = analysisTree->tau_pca3D_y[tauIndex];
   otree->tau_pca3D_z_2 = analysisTree->tau_pca3D_z[tauIndex];
-  otree->tau_SV_x_2 = analysisTree->tau_SV_x[tauIndex];
-  otree->tau_SV_y_2 = analysisTree->tau_SV_y[tauIndex];
-  otree->tau_SV_z_2 = analysisTree->tau_SV_z[tauIndex];
-  otree->tau_SV_covxx_2 = analysisTree->tau_SV_cov[tauIndex][0];
-  otree->tau_SV_covyx_2 = analysisTree->tau_SV_cov[tauIndex][1];
-  otree->tau_SV_covzx_2 = analysisTree->tau_SV_cov[tauIndex][2];
-  otree->tau_SV_covyy_2 = analysisTree->tau_SV_cov[tauIndex][3];
-  otree->tau_SV_covzy_2 = analysisTree->tau_SV_cov[tauIndex][4];
-  otree->tau_SV_covzz_2 = analysisTree->tau_SV_cov[tauIndex][5];
 
   otree->deepTauVsEleRaw_2                = analysisTree->tau_byDeepTau2017v2p1VSeraw[tauIndex];
   otree->deepTauVsJetRaw_2                = analysisTree->tau_byDeepTau2017v2p1VSjetraw[tauIndex];

@@ -298,6 +298,9 @@ public :
   Float_t         trigweight_2;
   Float_t         trigweight_l_lt;
   Float_t         trigweight_t_lt;
+  Float_t         trigweight_2_Up;
+  Float_t         trigweight_2_Down;
+
   Float_t         trigweight_antiiso_2;
   Float_t         tauvsjetweightMedium_2;
 
@@ -621,6 +624,14 @@ public :
   Float_t         tau_SV_covyy_2;
   Float_t         tau_SV_covzy_2;
   Float_t         tau_SV_covzz_2;
+
+  //SV-PV
+  Float_t         SVminusRefitV_x;
+  Float_t         SVminusRefitV_y;
+  Float_t         SVminusRefitV_z;
+  Float_t         SVminusPV_x;
+  Float_t         SVminusPV_y;
+  Float_t         SVminusPV_z;
 
   Float_t alpha_IP_1;
   Float_t alpha_IP_uncorr_1;
@@ -989,6 +1000,8 @@ public :
   TBranch	 *b_idisoweight_2;
   TBranch	 *b_idisoweight_antiiso_2;
   TBranch	 *b_trigweight_2;
+  TBranch	 *b_trigweight_2_Up;
+  TBranch	 *b_trigweight_2_Down;
   TBranch	 *b_trigweight_l_lt;
   TBranch	 *b_trigweight_t_lt;
   TBranch	 *b_trigweight_antiiso_2;
@@ -1263,6 +1276,14 @@ public :
   TBranch        *b_tau_SV_covyy_2;
   TBranch        *b_tau_SV_covzy_2;
   TBranch        *b_tau_SV_covzz_2;
+
+  //SV-PV
+  TBranch        *b_SVminusRefitV_x;
+  TBranch        *b_SVminusRefitV_y;
+  TBranch        *b_SVminusRefitV_z;
+  TBranch        *b_SVminusPV_x;
+  TBranch        *b_SVminusPV_y;
+  TBranch        *b_SVminusPV_z;
 
   //reco vertices
   //RECO vertex info is practical to have
