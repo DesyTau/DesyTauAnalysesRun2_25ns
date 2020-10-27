@@ -454,6 +454,7 @@ public :
   Float_t         metcov11;
   Float_t         pzetavis;
   Float_t         pzetamiss;
+  Float_t         pzeta;
 
   //PUPPI MET
   Float_t         puppimet;
@@ -465,6 +466,8 @@ public :
   Float_t         puppimetcov10;
   Float_t         puppimetcov11;
   Float_t         puppipzetamiss;
+  Float_t         puppipzetavis;
+  Float_t         puppipzeta;
 
   Float_t         puppimet_ex_UnclusteredEnUp;
   Float_t         puppimet_ex_UnclusteredEnDown;
@@ -1124,6 +1127,7 @@ public :
   TBranch	 *b_metcov11;
   TBranch	 *b_pzetavis;
   TBranch	 *b_pzetamiss;
+  TBranch        *b_pzeta;
 
   //PUPPI MET
   TBranch	 *b_puppimet;
@@ -1135,7 +1139,8 @@ public :
   TBranch	 *b_puppimetcov10;
   TBranch	 *b_puppimetcov11;
   TBranch	 *b_puppipzetamiss;
-
+  TBranch        *b_puppipzetavis;
+  
   //di tau system
   TBranch	 *b_pt_tt;
   TBranch	 *b_m_vis;
@@ -1347,13 +1352,13 @@ public :
   TBranch        *b_y1_TMF;
   TBranch        *b_y2_TMF;
 
-  Synch17Tree(TTree *tree=0);
+  Synch17Tree(TTree *tree=0, bool emu = false);
   virtual ~Synch17Tree();
 
-  virtual void Init(TTree *tree);
+  virtual void Init(TTree *tree, bool emu);
   
   //Read methods
-  virtual void     ReadInit(TTree *tree);
+  virtual void     ReadInit(TTree *tree, bool emu);
   virtual void     ReadReset();
   virtual Long64_t GetEntries();
   virtual Long64_t LoadTree(Long64_t entry);
@@ -1363,7 +1368,7 @@ public :
   virtual Int_t    Cut(Long64_t entry);
 
   //Write methods
-  virtual void WriteInit(TTree *tree);
+  virtual void WriteInit(TTree *tree, bool emu);
   virtual void Fill();
 
 protected:

@@ -10,22 +10,22 @@
 #include "DesyTauAnalyses/NTupleMaker/interface/Synch17Tree.h"
 
 // Initialization
-Synch17Tree::Synch17Tree(TTree *tree) : fChain(0) {
+Synch17Tree::Synch17Tree(TTree *tree, bool emu) : fChain(0) {
   lock = false;
   ientry = -2;
   
   if (!tree) return;
   
-  Init(tree);
+  Init(tree, emu);
 }
 
-void Synch17Tree::Init(TTree *tree){
+void Synch17Tree::Init(TTree *tree, bool emu){
   if(!tree) return;
 	      
   if(tree->GetEntries())
-    ReadInit(tree);
+    ReadInit(tree, emu);
   else
-    WriteInit(tree);
+    WriteInit(tree, emu);
 }
 
 // Destructors
@@ -35,7 +35,7 @@ Synch17Tree::~Synch17Tree(){
 }
 
 // Read methods
-void Synch17Tree::ReadInit(TTree *tree)
+void Synch17Tree::ReadInit(TTree *tree, bool em)
 {
    // The Init() function is called when the selector needs to initialize
    // a new tree or chain. Typically here the branch addresses and branch
@@ -319,40 +319,41 @@ void Synch17Tree::ReadInit(TTree *tree)
    //   fChain->SetBranchAddress("decayModeFindingOldDMs_2", &decayModeFindingOldDMs_2, &b_decayModeFindingOldDMs_2);
    //   fChain->SetBranchAddress("puCorrPtSum_2", &puCorrPtSum_2, &b_puCorrPtSum_2);
    
-   fChain->SetBranchAddress("deepTauVsEleRaw_1", &deepTauVsEleRaw_1, &b_deepTauVsEleRaw_1);
-   fChain->SetBranchAddress("deepTauVsJetRaw_1", &deepTauVsJetRaw_1, &b_deepTauVsJetRaw_1);
-   fChain->SetBranchAddress("deepTauVsMuRaw_1", &deepTauVsMuRaw_1, &b_deepTauVsMuRaw_1);
-   fChain->SetBranchAddress("deepTauVsEleRaw_2", &deepTauVsEleRaw_2, &b_deepTauVsEleRaw_2);
-   fChain->SetBranchAddress("deepTauVsJetRaw_2", &deepTauVsJetRaw_2, &b_deepTauVsJetRaw_2);
-   fChain->SetBranchAddress("deepTauVsMuRaw_2", &deepTauVsMuRaw_2, &b_deepTauVsMuRaw_2);
-   fChain->SetBranchAddress("byLooseDeepTau2017v2p1VSe_2", &byLooseDeepTau2017v2p1VSe_2, &b_byLooseDeepTau2017v2p1VSe_2);
-   fChain->SetBranchAddress("byLooseDeepTau2017v2p1VSjet_2", &byLooseDeepTau2017v2p1VSjet_2, &b_byLooseDeepTau2017v2p1VSjet_2);
-   fChain->SetBranchAddress("byLooseDeepTau2017v2p1VSmu_2", &byLooseDeepTau2017v2p1VSmu_2, &b_byLooseDeepTau2017v2p1VSmu_2);
-   fChain->SetBranchAddress("byMediumDeepTau2017v2p1VSe_2", &byMediumDeepTau2017v2p1VSe_2, &b_byMediumDeepTau2017v2p1VSe_2);
-   fChain->SetBranchAddress("byMediumDeepTau2017v2p1VSjet_2", &byMediumDeepTau2017v2p1VSjet_2, &b_byMediumDeepTau2017v2p1VSjet_2);
-   fChain->SetBranchAddress("byMediumDeepTau2017v2p1VSmu_2", &byMediumDeepTau2017v2p1VSmu_2, &b_byMediumDeepTau2017v2p1VSmu_2);
-   fChain->SetBranchAddress("byTightDeepTau2017v2p1VSe_2", &byTightDeepTau2017v2p1VSe_2, &b_byTightDeepTau2017v2p1VSe_2);
-   fChain->SetBranchAddress("byTightDeepTau2017v2p1VSjet_2", &byTightDeepTau2017v2p1VSjet_2, &b_byTightDeepTau2017v2p1VSjet_2);
-   fChain->SetBranchAddress("byTightDeepTau2017v2p1VSmu_2", &byTightDeepTau2017v2p1VSmu_2, &b_byTightDeepTau2017v2p1VSmu_2);
-   fChain->SetBranchAddress("byVLooseDeepTau2017v2p1VSe_2", &byVLooseDeepTau2017v2p1VSe_2, &b_byVLooseDeepTau2017v2p1VSe_2);
-   fChain->SetBranchAddress("byVLooseDeepTau2017v2p1VSjet_2", &byVLooseDeepTau2017v2p1VSjet_2, &b_byVLooseDeepTau2017v2p1VSjet_2);
-   fChain->SetBranchAddress("byVLooseDeepTau2017v2p1VSmu_2", &byVLooseDeepTau2017v2p1VSmu_2, &b_byVLooseDeepTau2017v2p1VSmu_2);
-   fChain->SetBranchAddress("byVTightDeepTau2017v2p1VSe_2", &byVTightDeepTau2017v2p1VSe_2, &b_byVTightDeepTau2017v2p1VSe_2);
-   fChain->SetBranchAddress("byVTightDeepTau2017v2p1VSjet_2", &byVTightDeepTau2017v2p1VSjet_2, &b_byVTightDeepTau2017v2p1VSjet_2);
-   fChain->SetBranchAddress("byVVLooseDeepTau2017v2p1VSe_2", &byVVLooseDeepTau2017v2p1VSe_2, &b_byVVLooseDeepTau2017v2p1VSe_2);
-   fChain->SetBranchAddress("byVVLooseDeepTau2017v2p1VSjet_2", &byVVLooseDeepTau2017v2p1VSjet_2, &b_byVVLooseDeepTau2017v2p1VSjet_2);
-   fChain->SetBranchAddress("byVVTightDeepTau2017v2p1VSe_2", &byVVTightDeepTau2017v2p1VSe_2, &b_byVVTightDeepTau2017v2p1VSe_2);
-   fChain->SetBranchAddress("byVVTightDeepTau2017v2p1VSjet_2", &byVVTightDeepTau2017v2p1VSjet_2, &b_byVVTightDeepTau2017v2p1VSjet_2);
-   fChain->SetBranchAddress("byVVVLooseDeepTau2017v2p1VSe_2", &byVVVLooseDeepTau2017v2p1VSe_2, &b_byVVVLooseDeepTau2017v2p1VSe_2);
-   fChain->SetBranchAddress("byVVVLooseDeepTau2017v2p1VSjet_2", &byVVVLooseDeepTau2017v2p1VSjet_2, &b_byVVVLooseDeepTau2017v2p1VSjet_2);
+   if (!em) {
+     fChain->SetBranchAddress("deepTauVsEleRaw_1", &deepTauVsEleRaw_1, &b_deepTauVsEleRaw_1);
+     fChain->SetBranchAddress("deepTauVsJetRaw_1", &deepTauVsJetRaw_1, &b_deepTauVsJetRaw_1);
+     fChain->SetBranchAddress("deepTauVsMuRaw_1", &deepTauVsMuRaw_1, &b_deepTauVsMuRaw_1);
+     fChain->SetBranchAddress("deepTauVsEleRaw_2", &deepTauVsEleRaw_2, &b_deepTauVsEleRaw_2);
+     fChain->SetBranchAddress("deepTauVsJetRaw_2", &deepTauVsJetRaw_2, &b_deepTauVsJetRaw_2);
+     fChain->SetBranchAddress("deepTauVsMuRaw_2", &deepTauVsMuRaw_2, &b_deepTauVsMuRaw_2);
+     fChain->SetBranchAddress("byLooseDeepTau2017v2p1VSe_2", &byLooseDeepTau2017v2p1VSe_2, &b_byLooseDeepTau2017v2p1VSe_2);
+     fChain->SetBranchAddress("byLooseDeepTau2017v2p1VSjet_2", &byLooseDeepTau2017v2p1VSjet_2, &b_byLooseDeepTau2017v2p1VSjet_2);
+     fChain->SetBranchAddress("byLooseDeepTau2017v2p1VSmu_2", &byLooseDeepTau2017v2p1VSmu_2, &b_byLooseDeepTau2017v2p1VSmu_2);
+     fChain->SetBranchAddress("byMediumDeepTau2017v2p1VSe_2", &byMediumDeepTau2017v2p1VSe_2, &b_byMediumDeepTau2017v2p1VSe_2);
+     fChain->SetBranchAddress("byMediumDeepTau2017v2p1VSjet_2", &byMediumDeepTau2017v2p1VSjet_2, &b_byMediumDeepTau2017v2p1VSjet_2);
+     fChain->SetBranchAddress("byMediumDeepTau2017v2p1VSmu_2", &byMediumDeepTau2017v2p1VSmu_2, &b_byMediumDeepTau2017v2p1VSmu_2);
+     fChain->SetBranchAddress("byTightDeepTau2017v2p1VSe_2", &byTightDeepTau2017v2p1VSe_2, &b_byTightDeepTau2017v2p1VSe_2);
+     fChain->SetBranchAddress("byTightDeepTau2017v2p1VSjet_2", &byTightDeepTau2017v2p1VSjet_2, &b_byTightDeepTau2017v2p1VSjet_2);
+     fChain->SetBranchAddress("byTightDeepTau2017v2p1VSmu_2", &byTightDeepTau2017v2p1VSmu_2, &b_byTightDeepTau2017v2p1VSmu_2);
+     fChain->SetBranchAddress("byVLooseDeepTau2017v2p1VSe_2", &byVLooseDeepTau2017v2p1VSe_2, &b_byVLooseDeepTau2017v2p1VSe_2);
+     fChain->SetBranchAddress("byVLooseDeepTau2017v2p1VSjet_2", &byVLooseDeepTau2017v2p1VSjet_2, &b_byVLooseDeepTau2017v2p1VSjet_2);
+     fChain->SetBranchAddress("byVLooseDeepTau2017v2p1VSmu_2", &byVLooseDeepTau2017v2p1VSmu_2, &b_byVLooseDeepTau2017v2p1VSmu_2);
+     fChain->SetBranchAddress("byVTightDeepTau2017v2p1VSe_2", &byVTightDeepTau2017v2p1VSe_2, &b_byVTightDeepTau2017v2p1VSe_2);
+     fChain->SetBranchAddress("byVTightDeepTau2017v2p1VSjet_2", &byVTightDeepTau2017v2p1VSjet_2, &b_byVTightDeepTau2017v2p1VSjet_2);
+     fChain->SetBranchAddress("byVVLooseDeepTau2017v2p1VSe_2", &byVVLooseDeepTau2017v2p1VSe_2, &b_byVVLooseDeepTau2017v2p1VSe_2);
+     fChain->SetBranchAddress("byVVLooseDeepTau2017v2p1VSjet_2", &byVVLooseDeepTau2017v2p1VSjet_2, &b_byVVLooseDeepTau2017v2p1VSjet_2);
+     fChain->SetBranchAddress("byVVTightDeepTau2017v2p1VSe_2", &byVVTightDeepTau2017v2p1VSe_2, &b_byVVTightDeepTau2017v2p1VSe_2);
+     fChain->SetBranchAddress("byVVTightDeepTau2017v2p1VSjet_2", &byVVTightDeepTau2017v2p1VSjet_2, &b_byVVTightDeepTau2017v2p1VSjet_2);
+     fChain->SetBranchAddress("byVVVLooseDeepTau2017v2p1VSe_2", &byVVVLooseDeepTau2017v2p1VSe_2, &b_byVVVLooseDeepTau2017v2p1VSe_2);
+     fChain->SetBranchAddress("byVVVLooseDeepTau2017v2p1VSjet_2", &byVVVLooseDeepTau2017v2p1VSjet_2, &b_byVVVLooseDeepTau2017v2p1VSjet_2);
 
-   fChain->SetBranchAddress("MVADM2017v1DM0raw_2", &MVADM2017v1DM0raw_2, &b_MVADM2017v1DM0raw_2);
-   fChain->SetBranchAddress("MVADM2017v1DM10raw_2", &MVADM2017v1DM10raw_2, &b_MVADM2017v1DM10raw_2);
-   fChain->SetBranchAddress("MVADM2017v1DM11raw_2", &MVADM2017v1DM11raw_2, &b_MVADM2017v1DM11raw_2);
-   fChain->SetBranchAddress("MVADM2017v1DM1raw_2", &MVADM2017v1DM1raw_2, &b_MVADM2017v1DM1raw_2);
-   fChain->SetBranchAddress("MVADM2017v1DM2raw_2", &MVADM2017v1DM2raw_2, &b_MVADM2017v1DM2raw_2);
-   fChain->SetBranchAddress("MVADM2017v1DMotherraw_2", &MVADM2017v1DMotherraw_2, &b_MVADM2017v1DMotherraw_2);
-
+     fChain->SetBranchAddress("MVADM2017v1DM0raw_2", &MVADM2017v1DM0raw_2, &b_MVADM2017v1DM0raw_2);
+     fChain->SetBranchAddress("MVADM2017v1DM10raw_2", &MVADM2017v1DM10raw_2, &b_MVADM2017v1DM10raw_2);
+     fChain->SetBranchAddress("MVADM2017v1DM11raw_2", &MVADM2017v1DM11raw_2, &b_MVADM2017v1DM11raw_2);
+     fChain->SetBranchAddress("MVADM2017v1DM1raw_2", &MVADM2017v1DM1raw_2, &b_MVADM2017v1DM1raw_2);
+     fChain->SetBranchAddress("MVADM2017v1DM2raw_2", &MVADM2017v1DM2raw_2, &b_MVADM2017v1DM2raw_2);
+     fChain->SetBranchAddress("MVADM2017v1DMotherraw_2", &MVADM2017v1DMotherraw_2, &b_MVADM2017v1DMotherraw_2);
+   }
    //   fChain->SetBranchAddress("byCombinedIsolationDeltaBetaCorrRaw3Hits_2", &byCombinedIsolationDeltaBetaCorrRaw3Hits_2, &b_byCombinedIsolationDeltaBetaCorrRaw3Hits_2);
    //   fChain->SetBranchAddress("byIsolationMVA3newDMwoLTraw_2", &byIsolationMVA3newDMwoLTraw_2, &b_byIsolationMVA3newDMwoLTraw_2);
    //   fChain->SetBranchAddress("byIsolationMVA3oldDMwoLTraw_2", &byIsolationMVA3oldDMwoLTraw_2, &b_byIsolationMVA3oldDMwoLTraw_2);
@@ -388,75 +389,77 @@ void Synch17Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("prefiringweightUp", &prefiringweightUp, &b_prefiringweightUp);
    fChain->SetBranchAddress("prefiringweightDown", &prefiringweightDown, &b_prefiringweightDown);
 
-
-   fChain->SetBranchAddress("weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVUp", &weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVUp, &b_weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVUp);
-   fChain->SetBranchAddress("weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVUp", &weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVUp, &b_weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVUp);
-   fChain->SetBranchAddress("weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVUp", &weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVUp, &b_weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVUp);
-   fChain->SetBranchAddress("weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVUp", &weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVUp, &b_weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVUp);
-   fChain->SetBranchAddress("weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVUp", &weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVUp, &b_weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVUp);
-   fChain->SetBranchAddress("weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVDown", &weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVDown, &b_weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVDown);
-   fChain->SetBranchAddress("weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVDown", &weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVDown, &b_weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVDown);
-   fChain->SetBranchAddress("weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVDown", &weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVDown, &b_weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVDown);
-   fChain->SetBranchAddress("weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVDown", &weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVDown, &b_weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVDown);
-   fChain->SetBranchAddress("weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVDown", &weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVDown, &b_weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVDown);
-   fChain->SetBranchAddress("weight_CMS_eff_Xtrigger_et_MVADM0_13TeVUp", &weight_CMS_eff_Xtrigger_et_MVADM0_13TeVUp, &b_weight_CMS_eff_Xtrigger_et_MVADM0_13TeVUp);
-   fChain->SetBranchAddress("weight_CMS_eff_Xtrigger_et_MVADM1_13TeVUp", &weight_CMS_eff_Xtrigger_et_MVADM1_13TeVUp, &b_weight_CMS_eff_Xtrigger_et_MVADM1_13TeVUp);
-   fChain->SetBranchAddress("weight_CMS_eff_Xtrigger_et_MVADM2_13TeVUp", &weight_CMS_eff_Xtrigger_et_MVADM2_13TeVUp, &b_weight_CMS_eff_Xtrigger_et_MVADM2_13TeVUp);
-   fChain->SetBranchAddress("weight_CMS_eff_Xtrigger_et_MVADM10_13TeVUp", &weight_CMS_eff_Xtrigger_et_MVADM10_13TeVUp, &b_weight_CMS_eff_Xtrigger_et_MVADM10_13TeVUp);
-   fChain->SetBranchAddress("weight_CMS_eff_Xtrigger_et_MVADM11_13TeVUp", &weight_CMS_eff_Xtrigger_et_MVADM11_13TeVUp, &b_weight_CMS_eff_Xtrigger_et_MVADM11_13TeVUp);
-   fChain->SetBranchAddress("weight_CMS_eff_Xtrigger_et_MVADM0_13TeVDown", &weight_CMS_eff_Xtrigger_et_MVADM0_13TeVDown, &b_weight_CMS_eff_Xtrigger_et_MVADM0_13TeVDown);
-   fChain->SetBranchAddress("weight_CMS_eff_Xtrigger_et_MVADM1_13TeVDown", &weight_CMS_eff_Xtrigger_et_MVADM1_13TeVDown, &b_weight_CMS_eff_Xtrigger_et_MVADM1_13TeVDown);
-   fChain->SetBranchAddress("weight_CMS_eff_Xtrigger_et_MVADM2_13TeVDown", &weight_CMS_eff_Xtrigger_et_MVADM2_13TeVDown, &b_weight_CMS_eff_Xtrigger_et_MVADM2_13TeVDown);
-   fChain->SetBranchAddress("weight_CMS_eff_Xtrigger_et_MVADM10_13TeVDown", &weight_CMS_eff_Xtrigger_et_MVADM10_13TeVDown, &b_weight_CMS_eff_Xtrigger_et_MVADM10_13TeVDown);
-   fChain->SetBranchAddress("weight_CMS_eff_Xtrigger_et_MVADM11_13TeVDown", &weight_CMS_eff_Xtrigger_et_MVADM11_13TeVDown, &b_weight_CMS_eff_Xtrigger_et_MVADM11_13TeVDown);
-
-
-  fChain->SetBranchAddress("weight_CMS_eff_t_pTlow_MVADM0_13TeVUp", &weight_CMS_eff_t_pTlow_MVADM0_13TeVUp, &b_weight_CMS_eff_t_pTlow_MVADM0_13TeVUp); 
-  fChain->SetBranchAddress("weight_CMS_eff_t_pTlow_MVADM1_13TeVUp", &weight_CMS_eff_t_pTlow_MVADM1_13TeVUp, &b_weight_CMS_eff_t_pTlow_MVADM1_13TeVUp); 
-  fChain->SetBranchAddress("weight_CMS_eff_t_pTlow_MVADM2_13TeVUp", &weight_CMS_eff_t_pTlow_MVADM2_13TeVUp, &b_weight_CMS_eff_t_pTlow_MVADM2_13TeVUp); 
-  fChain->SetBranchAddress("weight_CMS_eff_t_pTlow_MVADM10_13TeVUp", &weight_CMS_eff_t_pTlow_MVADM10_13TeVUp, &b_weight_CMS_eff_t_pTlow_MVADM10_13TeVUp);
-  fChain->SetBranchAddress("weight_CMS_eff_t_pTlow_MVADM11_13TeVUp", &weight_CMS_eff_t_pTlow_MVADM11_13TeVUp, &b_weight_CMS_eff_t_pTlow_MVADM11_13TeVUp);
-  fChain->SetBranchAddress("weight_CMS_eff_t_pThigh_MVADM0_13TeVUp", &weight_CMS_eff_t_pThigh_MVADM0_13TeVUp, &b_weight_CMS_eff_t_pThigh_MVADM0_13TeVUp);
-  fChain->SetBranchAddress("weight_CMS_eff_t_pThigh_MVADM1_13TeVUp", &weight_CMS_eff_t_pThigh_MVADM1_13TeVUp, &b_weight_CMS_eff_t_pThigh_MVADM1_13TeVUp);
-  fChain->SetBranchAddress("weight_CMS_eff_t_pThigh_MVADM2_13TeVUp", &weight_CMS_eff_t_pThigh_MVADM2_13TeVUp, &b_weight_CMS_eff_t_pThigh_MVADM2_13TeVUp);
-  fChain->SetBranchAddress("weight_CMS_eff_t_pThigh_MVADM10_13TeVUp", &weight_CMS_eff_t_pThigh_MVADM10_13TeVUp, &b_weight_CMS_eff_t_pThigh_MVADM10_13TeVUp); 
-  fChain->SetBranchAddress("weight_CMS_eff_t_pThigh_MVADM11_13TeVUp", &weight_CMS_eff_t_pThigh_MVADM11_13TeVUp, &b_weight_CMS_eff_t_pThigh_MVADM11_13TeVUp); 
-  fChain->SetBranchAddress("weight_CMS_eff_t_pTlow_MVADM0_13TeVDown", &weight_CMS_eff_t_pTlow_MVADM0_13TeVDown, &b_weight_CMS_eff_t_pTlow_MVADM0_13TeVDown); 
-  fChain->SetBranchAddress("weight_CMS_eff_t_pTlow_MVADM1_13TeVDown", &weight_CMS_eff_t_pTlow_MVADM1_13TeVDown, &b_weight_CMS_eff_t_pTlow_MVADM1_13TeVDown); 
-  fChain->SetBranchAddress("weight_CMS_eff_t_pTlow_MVADM2_13TeVDown", &weight_CMS_eff_t_pTlow_MVADM2_13TeVDown, &b_weight_CMS_eff_t_pTlow_MVADM2_13TeVDown); 
-  fChain->SetBranchAddress("weight_CMS_eff_t_pTlow_MVADM10_13TeVDown", &weight_CMS_eff_t_pTlow_MVADM10_13TeVDown, &b_weight_CMS_eff_t_pTlow_MVADM10_13TeVDown); 
-  fChain->SetBranchAddress("weight_CMS_eff_t_pTlow_MVADM11_13TeVDown", &weight_CMS_eff_t_pTlow_MVADM11_13TeVDown, &b_weight_CMS_eff_t_pTlow_MVADM11_13TeVDown); 
-  fChain->SetBranchAddress("weight_CMS_eff_t_pThigh_MVADM0_13TeVDown", &weight_CMS_eff_t_pThigh_MVADM0_13TeVDown, &b_weight_CMS_eff_t_pThigh_MVADM0_13TeVDown); 
-  fChain->SetBranchAddress("weight_CMS_eff_t_pThigh_MVADM1_13TeVDown", &weight_CMS_eff_t_pThigh_MVADM1_13TeVDown, &b_weight_CMS_eff_t_pThigh_MVADM1_13TeVDown); 
-  fChain->SetBranchAddress("weight_CMS_eff_t_pThigh_MVADM2_13TeVDown", &weight_CMS_eff_t_pThigh_MVADM2_13TeVDown, &b_weight_CMS_eff_t_pThigh_MVADM2_13TeVDown); 
-  fChain->SetBranchAddress("weight_CMS_eff_t_pThigh_MVADM10_13TeVDown", &weight_CMS_eff_t_pThigh_MVADM10_13TeVDown, &b_weight_CMS_eff_t_pThigh_MVADM10_13TeVDown);
-  fChain->SetBranchAddress("weight_CMS_eff_t_pThigh_MVADM11_13TeVDown", &weight_CMS_eff_t_pThigh_MVADM11_13TeVDown, &b_weight_CMS_eff_t_pThigh_MVADM11_13TeVDown);
-
-  fChain->SetBranchAddress("weight_mufake_corr", &weight_mufake_corr, &b_weight_mufake_corr);
-  fChain->SetBranchAddress("weight_CMS_mufake_mt_MVADM0_13TeVUp", &weight_CMS_mufake_mt_MVADM0_13TeVUp, &b_weight_CMS_mufake_mt_MVADM0_13TeVUp);
-  fChain->SetBranchAddress("weight_CMS_mufake_mt_MVADM1_13TeVUp", &weight_CMS_mufake_mt_MVADM1_13TeVUp, &b_weight_CMS_mufake_mt_MVADM1_13TeVUp);
-  fChain->SetBranchAddress("weight_CMS_mufake_mt_MVADM2_13TeVUp", &weight_CMS_mufake_mt_MVADM2_13TeVUp, &b_weight_CMS_mufake_mt_MVADM2_13TeVUp);
-  fChain->SetBranchAddress("weight_CMS_mufake_mt_MVADM10_13TeVUp", &weight_CMS_mufake_mt_MVADM10_13TeVUp, &b_weight_CMS_mufake_mt_MVADM10_13TeVUp);
-  fChain->SetBranchAddress("weight_CMS_mufake_mt_MVADM11_13TeVUp", &weight_CMS_mufake_mt_MVADM11_13TeVUp, &b_weight_CMS_mufake_mt_MVADM11_13TeVUp);
-  fChain->SetBranchAddress("weight_CMS_mufake_mt_MVADM0_13TeVDown", &weight_CMS_mufake_mt_MVADM0_13TeVDown, &b_weight_CMS_mufake_mt_MVADM0_13TeVDown);
-  fChain->SetBranchAddress("weight_CMS_mufake_mt_MVADM1_13TeVDown", &weight_CMS_mufake_mt_MVADM1_13TeVDown, &b_weight_CMS_mufake_mt_MVADM1_13TeVDown);
-  fChain->SetBranchAddress("weight_CMS_mufake_mt_MVADM2_13TeVDown", &weight_CMS_mufake_mt_MVADM2_13TeVDown, &b_weight_CMS_mufake_mt_MVADM2_13TeVDown);
-  fChain->SetBranchAddress("weight_CMS_mufake_mt_MVADM10_13TeVDown", &weight_CMS_mufake_mt_MVADM10_13TeVDown, &b_weight_CMS_mufake_mt_MVADM10_13TeVDown);
-  fChain->SetBranchAddress("weight_CMS_mufake_mt_MVADM11_13TeVDown", &weight_CMS_mufake_mt_MVADM11_13TeVDown, &b_weight_CMS_mufake_mt_MVADM11_13TeVDown);
-
-  fChain->SetBranchAddress("weight_CMS_scale_gg_13TeVUp", &weight_CMS_scale_gg_13TeVUp, &b_weight_CMS_scale_gg_13TeVUp);
-  fChain->SetBranchAddress("weight_CMS_scale_gg_13TeVDown", &weight_CMS_scale_gg_13TeVDown, &b_weight_CMS_scale_gg_13TeVDown);
-  fChain->SetBranchAddress("weight_CMS_scale_gg_13TeVDown", &weight_CMS_scale_gg_13TeVDown, &b_weight_CMS_scale_gg_13TeVDown);
-  fChain->SetBranchAddress("weight_CMS_PS_ISR_ggH_13TeVUp", &weight_CMS_PS_ISR_ggH_13TeVUp, &b_weight_CMS_PS_ISR_ggH_13TeVUp);
-  fChain->SetBranchAddress("weight_CMS_PS_ISR_ggH_13TeVDown", &weight_CMS_PS_ISR_ggH_13TeVDown, &b_weight_CMS_PS_ISR_ggH_13TeVDown);
-  fChain->SetBranchAddress("weight_CMS_PS_FSR_ggH_13TeVUp", &weight_CMS_PS_FSR_ggH_13TeVUp, &b_weight_CMS_PS_FSR_ggH_13TeVUp);
-  fChain->SetBranchAddress("weight_CMS_PS_FSR_ggH_13TeVDown", &weight_CMS_PS_FSR_ggH_13TeVDown, &b_weight_CMS_PS_FSR_ggH_13TeVDown);
+   if (!em) {
+     fChain->SetBranchAddress("weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVUp", &weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVUp, &b_weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVUp);
+     fChain->SetBranchAddress("weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVUp", &weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVUp, &b_weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVUp);
+     fChain->SetBranchAddress("weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVUp", &weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVUp, &b_weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVUp);
+     fChain->SetBranchAddress("weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVUp", &weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVUp, &b_weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVUp);
+     fChain->SetBranchAddress("weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVUp", &weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVUp, &b_weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVUp);
+     fChain->SetBranchAddress("weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVDown", &weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVDown, &b_weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVDown);
+     fChain->SetBranchAddress("weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVDown", &weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVDown, &b_weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVDown);
+     fChain->SetBranchAddress("weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVDown", &weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVDown, &b_weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVDown);
+     fChain->SetBranchAddress("weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVDown", &weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVDown, &b_weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVDown);
+     fChain->SetBranchAddress("weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVDown", &weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVDown, &b_weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVDown);
+     fChain->SetBranchAddress("weight_CMS_eff_Xtrigger_et_MVADM0_13TeVUp", &weight_CMS_eff_Xtrigger_et_MVADM0_13TeVUp, &b_weight_CMS_eff_Xtrigger_et_MVADM0_13TeVUp);
+     fChain->SetBranchAddress("weight_CMS_eff_Xtrigger_et_MVADM1_13TeVUp", &weight_CMS_eff_Xtrigger_et_MVADM1_13TeVUp, &b_weight_CMS_eff_Xtrigger_et_MVADM1_13TeVUp);
+     fChain->SetBranchAddress("weight_CMS_eff_Xtrigger_et_MVADM2_13TeVUp", &weight_CMS_eff_Xtrigger_et_MVADM2_13TeVUp, &b_weight_CMS_eff_Xtrigger_et_MVADM2_13TeVUp);
+     fChain->SetBranchAddress("weight_CMS_eff_Xtrigger_et_MVADM10_13TeVUp", &weight_CMS_eff_Xtrigger_et_MVADM10_13TeVUp, &b_weight_CMS_eff_Xtrigger_et_MVADM10_13TeVUp);
+     fChain->SetBranchAddress("weight_CMS_eff_Xtrigger_et_MVADM11_13TeVUp", &weight_CMS_eff_Xtrigger_et_MVADM11_13TeVUp, &b_weight_CMS_eff_Xtrigger_et_MVADM11_13TeVUp);
+     fChain->SetBranchAddress("weight_CMS_eff_Xtrigger_et_MVADM0_13TeVDown", &weight_CMS_eff_Xtrigger_et_MVADM0_13TeVDown, &b_weight_CMS_eff_Xtrigger_et_MVADM0_13TeVDown);
+     fChain->SetBranchAddress("weight_CMS_eff_Xtrigger_et_MVADM1_13TeVDown", &weight_CMS_eff_Xtrigger_et_MVADM1_13TeVDown, &b_weight_CMS_eff_Xtrigger_et_MVADM1_13TeVDown);
+     fChain->SetBranchAddress("weight_CMS_eff_Xtrigger_et_MVADM2_13TeVDown", &weight_CMS_eff_Xtrigger_et_MVADM2_13TeVDown, &b_weight_CMS_eff_Xtrigger_et_MVADM2_13TeVDown);
+     fChain->SetBranchAddress("weight_CMS_eff_Xtrigger_et_MVADM10_13TeVDown", &weight_CMS_eff_Xtrigger_et_MVADM10_13TeVDown, &b_weight_CMS_eff_Xtrigger_et_MVADM10_13TeVDown);
+     fChain->SetBranchAddress("weight_CMS_eff_Xtrigger_et_MVADM11_13TeVDown", &weight_CMS_eff_Xtrigger_et_MVADM11_13TeVDown, &b_weight_CMS_eff_Xtrigger_et_MVADM11_13TeVDown);
 
 
-   fChain->SetBranchAddress("ff_nom",&ff_nom,&b_ff_nom);
-   fChain->SetBranchAddress("ff_mva",&ff_mva,&b_ff_mva);
-   fChain->SetBranchAddress("ff_nom_sys",&ff_nom_sys,&b_ff_nom_sys);
-   fChain->SetBranchAddress("ff_mva_sys",&ff_mva_sys,&b_ff_mva_sys);
+     fChain->SetBranchAddress("weight_CMS_eff_t_pTlow_MVADM0_13TeVUp", &weight_CMS_eff_t_pTlow_MVADM0_13TeVUp, &b_weight_CMS_eff_t_pTlow_MVADM0_13TeVUp); 
+     fChain->SetBranchAddress("weight_CMS_eff_t_pTlow_MVADM1_13TeVUp", &weight_CMS_eff_t_pTlow_MVADM1_13TeVUp, &b_weight_CMS_eff_t_pTlow_MVADM1_13TeVUp); 
+     fChain->SetBranchAddress("weight_CMS_eff_t_pTlow_MVADM2_13TeVUp", &weight_CMS_eff_t_pTlow_MVADM2_13TeVUp, &b_weight_CMS_eff_t_pTlow_MVADM2_13TeVUp); 
+     fChain->SetBranchAddress("weight_CMS_eff_t_pTlow_MVADM10_13TeVUp", &weight_CMS_eff_t_pTlow_MVADM10_13TeVUp, &b_weight_CMS_eff_t_pTlow_MVADM10_13TeVUp);
+     fChain->SetBranchAddress("weight_CMS_eff_t_pTlow_MVADM11_13TeVUp", &weight_CMS_eff_t_pTlow_MVADM11_13TeVUp, &b_weight_CMS_eff_t_pTlow_MVADM11_13TeVUp);
+     fChain->SetBranchAddress("weight_CMS_eff_t_pThigh_MVADM0_13TeVUp", &weight_CMS_eff_t_pThigh_MVADM0_13TeVUp, &b_weight_CMS_eff_t_pThigh_MVADM0_13TeVUp);
+     fChain->SetBranchAddress("weight_CMS_eff_t_pThigh_MVADM1_13TeVUp", &weight_CMS_eff_t_pThigh_MVADM1_13TeVUp, &b_weight_CMS_eff_t_pThigh_MVADM1_13TeVUp);
+     fChain->SetBranchAddress("weight_CMS_eff_t_pThigh_MVADM2_13TeVUp", &weight_CMS_eff_t_pThigh_MVADM2_13TeVUp, &b_weight_CMS_eff_t_pThigh_MVADM2_13TeVUp);
+     fChain->SetBranchAddress("weight_CMS_eff_t_pThigh_MVADM10_13TeVUp", &weight_CMS_eff_t_pThigh_MVADM10_13TeVUp, &b_weight_CMS_eff_t_pThigh_MVADM10_13TeVUp); 
+     fChain->SetBranchAddress("weight_CMS_eff_t_pThigh_MVADM11_13TeVUp", &weight_CMS_eff_t_pThigh_MVADM11_13TeVUp, &b_weight_CMS_eff_t_pThigh_MVADM11_13TeVUp); 
+     fChain->SetBranchAddress("weight_CMS_eff_t_pTlow_MVADM0_13TeVDown", &weight_CMS_eff_t_pTlow_MVADM0_13TeVDown, &b_weight_CMS_eff_t_pTlow_MVADM0_13TeVDown); 
+     fChain->SetBranchAddress("weight_CMS_eff_t_pTlow_MVADM1_13TeVDown", &weight_CMS_eff_t_pTlow_MVADM1_13TeVDown, &b_weight_CMS_eff_t_pTlow_MVADM1_13TeVDown); 
+     fChain->SetBranchAddress("weight_CMS_eff_t_pTlow_MVADM2_13TeVDown", &weight_CMS_eff_t_pTlow_MVADM2_13TeVDown, &b_weight_CMS_eff_t_pTlow_MVADM2_13TeVDown); 
+     fChain->SetBranchAddress("weight_CMS_eff_t_pTlow_MVADM10_13TeVDown", &weight_CMS_eff_t_pTlow_MVADM10_13TeVDown, &b_weight_CMS_eff_t_pTlow_MVADM10_13TeVDown); 
+     fChain->SetBranchAddress("weight_CMS_eff_t_pTlow_MVADM11_13TeVDown", &weight_CMS_eff_t_pTlow_MVADM11_13TeVDown, &b_weight_CMS_eff_t_pTlow_MVADM11_13TeVDown); 
+     fChain->SetBranchAddress("weight_CMS_eff_t_pThigh_MVADM0_13TeVDown", &weight_CMS_eff_t_pThigh_MVADM0_13TeVDown, &b_weight_CMS_eff_t_pThigh_MVADM0_13TeVDown); 
+     fChain->SetBranchAddress("weight_CMS_eff_t_pThigh_MVADM1_13TeVDown", &weight_CMS_eff_t_pThigh_MVADM1_13TeVDown, &b_weight_CMS_eff_t_pThigh_MVADM1_13TeVDown); 
+     fChain->SetBranchAddress("weight_CMS_eff_t_pThigh_MVADM2_13TeVDown", &weight_CMS_eff_t_pThigh_MVADM2_13TeVDown, &b_weight_CMS_eff_t_pThigh_MVADM2_13TeVDown); 
+     fChain->SetBranchAddress("weight_CMS_eff_t_pThigh_MVADM10_13TeVDown", &weight_CMS_eff_t_pThigh_MVADM10_13TeVDown, &b_weight_CMS_eff_t_pThigh_MVADM10_13TeVDown);
+     fChain->SetBranchAddress("weight_CMS_eff_t_pThigh_MVADM11_13TeVDown", &weight_CMS_eff_t_pThigh_MVADM11_13TeVDown, &b_weight_CMS_eff_t_pThigh_MVADM11_13TeVDown);
+     
+     fChain->SetBranchAddress("weight_mufake_corr", &weight_mufake_corr, &b_weight_mufake_corr);
+     fChain->SetBranchAddress("weight_CMS_mufake_mt_MVADM0_13TeVUp", &weight_CMS_mufake_mt_MVADM0_13TeVUp, &b_weight_CMS_mufake_mt_MVADM0_13TeVUp);
+     fChain->SetBranchAddress("weight_CMS_mufake_mt_MVADM1_13TeVUp", &weight_CMS_mufake_mt_MVADM1_13TeVUp, &b_weight_CMS_mufake_mt_MVADM1_13TeVUp);
+     fChain->SetBranchAddress("weight_CMS_mufake_mt_MVADM2_13TeVUp", &weight_CMS_mufake_mt_MVADM2_13TeVUp, &b_weight_CMS_mufake_mt_MVADM2_13TeVUp);
+     fChain->SetBranchAddress("weight_CMS_mufake_mt_MVADM10_13TeVUp", &weight_CMS_mufake_mt_MVADM10_13TeVUp, &b_weight_CMS_mufake_mt_MVADM10_13TeVUp);
+     fChain->SetBranchAddress("weight_CMS_mufake_mt_MVADM11_13TeVUp", &weight_CMS_mufake_mt_MVADM11_13TeVUp, &b_weight_CMS_mufake_mt_MVADM11_13TeVUp);
+     fChain->SetBranchAddress("weight_CMS_mufake_mt_MVADM0_13TeVDown", &weight_CMS_mufake_mt_MVADM0_13TeVDown, &b_weight_CMS_mufake_mt_MVADM0_13TeVDown);
+     fChain->SetBranchAddress("weight_CMS_mufake_mt_MVADM1_13TeVDown", &weight_CMS_mufake_mt_MVADM1_13TeVDown, &b_weight_CMS_mufake_mt_MVADM1_13TeVDown);
+     fChain->SetBranchAddress("weight_CMS_mufake_mt_MVADM2_13TeVDown", &weight_CMS_mufake_mt_MVADM2_13TeVDown, &b_weight_CMS_mufake_mt_MVADM2_13TeVDown);
+     fChain->SetBranchAddress("weight_CMS_mufake_mt_MVADM10_13TeVDown", &weight_CMS_mufake_mt_MVADM10_13TeVDown, &b_weight_CMS_mufake_mt_MVADM10_13TeVDown);
+     fChain->SetBranchAddress("weight_CMS_mufake_mt_MVADM11_13TeVDown", &weight_CMS_mufake_mt_MVADM11_13TeVDown, &b_weight_CMS_mufake_mt_MVADM11_13TeVDown);
+   }
+
+   fChain->SetBranchAddress("weight_CMS_scale_gg_13TeVUp", &weight_CMS_scale_gg_13TeVUp, &b_weight_CMS_scale_gg_13TeVUp);
+   fChain->SetBranchAddress("weight_CMS_scale_gg_13TeVDown", &weight_CMS_scale_gg_13TeVDown, &b_weight_CMS_scale_gg_13TeVDown);
+   fChain->SetBranchAddress("weight_CMS_scale_gg_13TeVDown", &weight_CMS_scale_gg_13TeVDown, &b_weight_CMS_scale_gg_13TeVDown);
+   fChain->SetBranchAddress("weight_CMS_PS_ISR_ggH_13TeVUp", &weight_CMS_PS_ISR_ggH_13TeVUp, &b_weight_CMS_PS_ISR_ggH_13TeVUp);
+   fChain->SetBranchAddress("weight_CMS_PS_ISR_ggH_13TeVDown", &weight_CMS_PS_ISR_ggH_13TeVDown, &b_weight_CMS_PS_ISR_ggH_13TeVDown);
+   fChain->SetBranchAddress("weight_CMS_PS_FSR_ggH_13TeVUp", &weight_CMS_PS_FSR_ggH_13TeVUp, &b_weight_CMS_PS_FSR_ggH_13TeVUp);
+   fChain->SetBranchAddress("weight_CMS_PS_FSR_ggH_13TeVDown", &weight_CMS_PS_FSR_ggH_13TeVDown, &b_weight_CMS_PS_FSR_ggH_13TeVDown);
+     
+   if (!em) {
+     fChain->SetBranchAddress("ff_nom",&ff_nom,&b_ff_nom);
+     fChain->SetBranchAddress("ff_mva",&ff_mva,&b_ff_mva);
+     fChain->SetBranchAddress("ff_nom_sys",&ff_nom_sys,&b_ff_nom_sys);
+     fChain->SetBranchAddress("ff_mva_sys",&ff_mva_sys,&b_ff_mva_sys);
+   }
 
    fChain->SetBranchAddress("trg_singlemuon",  &trg_singlemuon, &b_trg_singlemuon);
    fChain->SetBranchAddress("trg_singleelectron",  &trg_singleelectron, &b_trg_singleelectron);
@@ -559,44 +562,45 @@ void Synch17Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("extraelec_veto", &extraelec_veto, &b_extraelec_veto);
    fChain->SetBranchAddress("extramuon_veto", &extramuon_veto, &b_extramuon_veto);
 
+   if (!em) {
    //CP measurement   
-   fChain->SetBranchAddress("tau1DecayPlaneX", &tau1DecayPlaneX, &b_tau1DecayPlaneX);
-   fChain->SetBranchAddress("tau1DecayPlaneY", &tau1DecayPlaneY, &b_tau1DecayPlaneY);
-   fChain->SetBranchAddress("tau1DecayPlaneZ", &tau1DecayPlaneZ, &b_tau1DecayPlaneZ);
-   fChain->SetBranchAddress("tau2DecayPlaneX", &tau2DecayPlaneX, &b_tau2DecayPlaneX);
-   fChain->SetBranchAddress("tau2DecayPlaneY", &tau2DecayPlaneY, &b_tau2DecayPlaneY);
-   fChain->SetBranchAddress("tau2DecayPlaneZ", &tau2DecayPlaneZ, &b_tau2DecayPlaneZ);
+     fChain->SetBranchAddress("tau1DecayPlaneX", &tau1DecayPlaneX, &b_tau1DecayPlaneX);
+     fChain->SetBranchAddress("tau1DecayPlaneY", &tau1DecayPlaneY, &b_tau1DecayPlaneY);
+     fChain->SetBranchAddress("tau1DecayPlaneZ", &tau1DecayPlaneZ, &b_tau1DecayPlaneZ);
+     fChain->SetBranchAddress("tau2DecayPlaneX", &tau2DecayPlaneX, &b_tau2DecayPlaneX);
+     fChain->SetBranchAddress("tau2DecayPlaneY", &tau2DecayPlaneY, &b_tau2DecayPlaneY);
+     fChain->SetBranchAddress("tau2DecayPlaneZ", &tau2DecayPlaneZ, &b_tau2DecayPlaneZ);
+     
+     fChain->SetBranchAddress("acotautau_00", &acotautau_00, &b_acotautau_00);
+     fChain->SetBranchAddress("acotautau_10", &acotautau_10, &b_acotautau_10);
+     fChain->SetBranchAddress("acotautau_01", &acotautau_01, &b_acotautau_01);
+     fChain->SetBranchAddress("acotautau_11", &acotautau_11, &b_acotautau_11);
 
-   fChain->SetBranchAddress("acotautau_00", &acotautau_00, &b_acotautau_00);
-   fChain->SetBranchAddress("acotautau_10", &acotautau_10, &b_acotautau_10);
-   fChain->SetBranchAddress("acotautau_01", &acotautau_01, &b_acotautau_01);
-   fChain->SetBranchAddress("acotautau_11", &acotautau_11, &b_acotautau_11);
-
-   fChain->SetBranchAddress("acotautau_bs_00", &acotautau_bs_00, &b_acotautau_bs_00);
-   fChain->SetBranchAddress("acotautau_bs_10", &acotautau_bs_10, &b_acotautau_bs_10);
-   fChain->SetBranchAddress("acotautau_bs_01", &acotautau_bs_01, &b_acotautau_bs_01);
-   fChain->SetBranchAddress("acotautau_bs_11", &acotautau_bs_11, &b_acotautau_bs_11);
-
-   fChain->SetBranchAddress("acotautau_refitbs_00", &acotautau_refitbs_00, &b_acotautau_refitbs_00);
-   fChain->SetBranchAddress("acotautau_refitbs_10", &acotautau_refitbs_10, &b_acotautau_refitbs_10);
-   fChain->SetBranchAddress("acotautau_refitbs_01", &acotautau_refitbs_01, &b_acotautau_refitbs_01);
-   fChain->SetBranchAddress("acotautau_refitbs_11", &acotautau_refitbs_11, &b_acotautau_refitbs_11);
-   fChain->SetBranchAddress("acotautau_refitbs_02", &acotautau_refitbs_02, &b_acotautau_refitbs_02);
-
-   fChain->SetBranchAddress("acotautau_helix_00", &acotautau_helix_00, &b_acotautau_helix_00);
-   fChain->SetBranchAddress("acotautau_helix_10", &acotautau_helix_10, &b_acotautau_helix_10);
-   fChain->SetBranchAddress("acotautau_helix_01", &acotautau_helix_01, &b_acotautau_helix_01);
-   fChain->SetBranchAddress("acotautau_helix_11", &acotautau_helix_11, &b_acotautau_helix_11);
-
-   fChain->SetBranchAddress("acotautau_refitbs_uncorr_00", &acotautau_refitbs_uncorr_00, &b_acotautau_refitbs_uncorr_00);
-   fChain->SetBranchAddress("acotautau_refitbs_uncorr_10", &acotautau_refitbs_uncorr_10, &b_acotautau_refitbs_uncorr_10);
-   fChain->SetBranchAddress("acotautau_refitbs_uncorr_01", &acotautau_refitbs_uncorr_01, &b_acotautau_refitbs_uncorr_01);
-   fChain->SetBranchAddress("acotautau_refitbs_uncorr_11", &acotautau_refitbs_uncorr_11, &b_acotautau_refitbs_uncorr_11);
-
-   fChain->SetBranchAddress("acotautau_helix_uncorr_00", &acotautau_helix_uncorr_00, &b_acotautau_helix_uncorr_00);
-   fChain->SetBranchAddress("acotautau_helix_uncorr_10", &acotautau_helix_uncorr_10, &b_acotautau_helix_uncorr_10);
-   fChain->SetBranchAddress("acotautau_helix_uncorr_01", &acotautau_helix_uncorr_01, &b_acotautau_helix_uncorr_01);
-   fChain->SetBranchAddress("acotautau_helix_uncorr_11", &acotautau_helix_uncorr_11, &b_acotautau_helix_uncorr_11);
+     fChain->SetBranchAddress("acotautau_bs_00", &acotautau_bs_00, &b_acotautau_bs_00);
+     fChain->SetBranchAddress("acotautau_bs_10", &acotautau_bs_10, &b_acotautau_bs_10);
+     fChain->SetBranchAddress("acotautau_bs_01", &acotautau_bs_01, &b_acotautau_bs_01);
+     fChain->SetBranchAddress("acotautau_bs_11", &acotautau_bs_11, &b_acotautau_bs_11);
+     
+     fChain->SetBranchAddress("acotautau_refitbs_00", &acotautau_refitbs_00, &b_acotautau_refitbs_00);
+     fChain->SetBranchAddress("acotautau_refitbs_10", &acotautau_refitbs_10, &b_acotautau_refitbs_10);
+     fChain->SetBranchAddress("acotautau_refitbs_01", &acotautau_refitbs_01, &b_acotautau_refitbs_01);
+     fChain->SetBranchAddress("acotautau_refitbs_11", &acotautau_refitbs_11, &b_acotautau_refitbs_11);
+     fChain->SetBranchAddress("acotautau_refitbs_02", &acotautau_refitbs_02, &b_acotautau_refitbs_02);
+     
+     fChain->SetBranchAddress("acotautau_helix_00", &acotautau_helix_00, &b_acotautau_helix_00);
+     fChain->SetBranchAddress("acotautau_helix_10", &acotautau_helix_10, &b_acotautau_helix_10);
+     fChain->SetBranchAddress("acotautau_helix_01", &acotautau_helix_01, &b_acotautau_helix_01);
+     fChain->SetBranchAddress("acotautau_helix_11", &acotautau_helix_11, &b_acotautau_helix_11);
+     
+     fChain->SetBranchAddress("acotautau_refitbs_uncorr_00", &acotautau_refitbs_uncorr_00, &b_acotautau_refitbs_uncorr_00);
+     fChain->SetBranchAddress("acotautau_refitbs_uncorr_10", &acotautau_refitbs_uncorr_10, &b_acotautau_refitbs_uncorr_10);
+     fChain->SetBranchAddress("acotautau_refitbs_uncorr_01", &acotautau_refitbs_uncorr_01, &b_acotautau_refitbs_uncorr_01);
+     fChain->SetBranchAddress("acotautau_refitbs_uncorr_11", &acotautau_refitbs_uncorr_11, &b_acotautau_refitbs_uncorr_11);
+     
+     fChain->SetBranchAddress("acotautau_helix_uncorr_00", &acotautau_helix_uncorr_00, &b_acotautau_helix_uncorr_00);
+     fChain->SetBranchAddress("acotautau_helix_uncorr_10", &acotautau_helix_uncorr_10, &b_acotautau_helix_uncorr_10);
+     fChain->SetBranchAddress("acotautau_helix_uncorr_01", &acotautau_helix_uncorr_01, &b_acotautau_helix_uncorr_01);
+     fChain->SetBranchAddress("acotautau_helix_uncorr_11", &acotautau_helix_uncorr_11, &b_acotautau_helix_uncorr_11);
 
    //   fChain->SetBranchAddress("acotautauPsi_00", &acotautauPsi_00, &b_acotautauPsi_00);
    //   fChain->SetBranchAddress("acotautauPsi_10", &acotautauPsi_10, &b_acotautauPsi_10);
@@ -604,8 +608,8 @@ void Synch17Tree::ReadInit(TTree *tree)
    //   fChain->SetBranchAddress("acotautauPsi_11", &acotautauPsi_11, &b_acotautauPsi_11);
 
 
-   fChain->SetBranchAddress("pdgcodetau2", &pdgcodetau2, &b_pdgcodetau2);
-
+     fChain->SetBranchAddress("pdgcodetau2", &pdgcodetau2, &b_pdgcodetau2);
+   }
   //Points of closest approach
 
    /*
@@ -635,26 +639,27 @@ void Synch17Tree::ReadInit(TTree *tree)
    //   fChain->SetBranchAddress("tau_SV_covzy_1", &tau_SV_covzy_1, &b_tau_SV_covzy_1);
    //   fChain->SetBranchAddress("tau_SV_covzz_1", &tau_SV_covzz_1, &b_tau_SV_covzz_1);
 
-   fChain->SetBranchAddress("tau_SV_x_2", &tau_SV_x_2, &b_tau_SV_x_2);
-   fChain->SetBranchAddress("tau_SV_y_2", &tau_SV_y_2, &b_tau_SV_y_2);
-   fChain->SetBranchAddress("tau_SV_z_2", &tau_SV_z_2, &b_tau_SV_z_2);
-   fChain->SetBranchAddress("tau_SV_covxx_2", &tau_SV_covxx_2, &b_tau_SV_covxx_2);
-   fChain->SetBranchAddress("tau_SV_covyx_2", &tau_SV_covyx_2, &b_tau_SV_covyx_2);
-   fChain->SetBranchAddress("tau_SV_covzx_2", &tau_SV_covzx_2, &b_tau_SV_covzx_2);
-   fChain->SetBranchAddress("tau_SV_covyy_2", &tau_SV_covyy_2, &b_tau_SV_covyy_2);
-   fChain->SetBranchAddress("tau_SV_covzy_2", &tau_SV_covzy_2, &b_tau_SV_covzy_2);
-   fChain->SetBranchAddress("tau_SV_covzz_2", &tau_SV_covzz_2, &b_tau_SV_covzz_2);
+   if (!em) {
+     fChain->SetBranchAddress("tau_SV_x_2", &tau_SV_x_2, &b_tau_SV_x_2);
+     fChain->SetBranchAddress("tau_SV_y_2", &tau_SV_y_2, &b_tau_SV_y_2);
+     fChain->SetBranchAddress("tau_SV_z_2", &tau_SV_z_2, &b_tau_SV_z_2);
+     fChain->SetBranchAddress("tau_SV_covxx_2", &tau_SV_covxx_2, &b_tau_SV_covxx_2);
+     fChain->SetBranchAddress("tau_SV_covyx_2", &tau_SV_covyx_2, &b_tau_SV_covyx_2);
+     fChain->SetBranchAddress("tau_SV_covzx_2", &tau_SV_covzx_2, &b_tau_SV_covzx_2);
+     fChain->SetBranchAddress("tau_SV_covyy_2", &tau_SV_covyy_2, &b_tau_SV_covyy_2);
+     fChain->SetBranchAddress("tau_SV_covzy_2", &tau_SV_covzy_2, &b_tau_SV_covzy_2);
+     fChain->SetBranchAddress("tau_SV_covzz_2", &tau_SV_covzz_2, &b_tau_SV_covzz_2);
+     
+     //SV-PV
+     fChain->SetBranchAddress("SVminusRefitV_x", &SVminusRefitV_x, &b_SVminusRefitV_x);
+     fChain->SetBranchAddress("SVminusRefitV_y", &SVminusRefitV_y, &b_SVminusRefitV_y);
+     fChain->SetBranchAddress("SVminusRefitV_z", &SVminusRefitV_z, &b_SVminusRefitV_z);
+     fChain->SetBranchAddress("SVminusPV_x", &SVminusPV_x, &b_SVminusPV_x);
+     fChain->SetBranchAddress("SVminusPV_y", &SVminusPV_y, &b_SVminusPV_y);
+     fChain->SetBranchAddress("SVminusPV_z", &SVminusPV_z, &b_SVminusPV_z);
+   }
 
-   //SV-PV
-   fChain->SetBranchAddress("SVminusRefitV_x", &SVminusRefitV_x, &b_SVminusRefitV_x);
-   fChain->SetBranchAddress("SVminusRefitV_y", &SVminusRefitV_y, &b_SVminusRefitV_y);
-   fChain->SetBranchAddress("SVminusRefitV_z", &SVminusRefitV_z, &b_SVminusRefitV_z);
-   fChain->SetBranchAddress("SVminusPV_x", &SVminusPV_x, &b_SVminusPV_x);
-   fChain->SetBranchAddress("SVminusPV_y", &SVminusPV_y, &b_SVminusPV_y);
-   fChain->SetBranchAddress("SVminusPV_z", &SVminusPV_z, &b_SVminusPV_z);
-
-
-  //RECO vertex info useful to have
+   //RECO vertex info useful to have
    fChain->SetBranchAddress("RecoVertexX", &RecoVertexX, &b_RecoVertexX);
    fChain->SetBranchAddress("RecoVertexY", &RecoVertexY, &b_RecoVertexY);
    fChain->SetBranchAddress("RecoVertexZ", &RecoVertexZ, &b_RecoVertexZ);
@@ -670,51 +675,53 @@ void Synch17Tree::ReadInit(TTree *tree)
    fChain->SetBranchAddress("pvz_bs", &pvz_bs, &b_pvz_bs);
 
 
-  //gen vertex info useful to have
+   //gen vertex info useful to have
    fChain->SetBranchAddress("GenVertexX", &GenVertexX, &b_GenVertexX);
    fChain->SetBranchAddress("GenVertexY", &GenVertexY, &b_GenVertexY);
    fChain->SetBranchAddress("GenVertexZ", &GenVertexZ, &b_GenVertexZ);
    
-   fChain->SetBranchAddress("VxConstitTau1", &VxConstitTau1, &b_VxConstitTau1);
-   fChain->SetBranchAddress("VyConstitTau1", &VyConstitTau1, &b_VyConstitTau1);
-   fChain->SetBranchAddress("VzConstitTau1", &VzConstitTau1, &b_VzConstitTau1);
 
-   fChain->SetBranchAddress("VxConstitTau2", &VxConstitTau2, &b_VxConstitTau2);
-   fChain->SetBranchAddress("VyConstitTau2", &VyConstitTau2, &b_VyConstitTau2);
-   fChain->SetBranchAddress("VzConstitTau2", &VzConstitTau2, &b_VzConstitTau2);
+   if (!em) {
+     fChain->SetBranchAddress("VxConstitTau1", &VxConstitTau1, &b_VxConstitTau1);
+     fChain->SetBranchAddress("VyConstitTau1", &VyConstitTau1, &b_VyConstitTau1);
+     fChain->SetBranchAddress("VzConstitTau1", &VzConstitTau1, &b_VzConstitTau1);
 
-   fChain->SetBranchAddress("alphaminus", &alphaminus, &b_alphaminus);
-   fChain->SetBranchAddress("alphaminus_uncorr", &alphaminus_uncorr, &b_alphaminus_uncorr);
+     fChain->SetBranchAddress("VxConstitTau2", &VxConstitTau2, &b_VxConstitTau2);
+     fChain->SetBranchAddress("VyConstitTau2", &VyConstitTau2, &b_VyConstitTau2);
+     fChain->SetBranchAddress("VzConstitTau2", &VzConstitTau2, &b_VzConstitTau2);
+     
+     fChain->SetBranchAddress("alphaminus", &alphaminus, &b_alphaminus);
+     fChain->SetBranchAddress("alphaminus_uncorr", &alphaminus_uncorr, &b_alphaminus_uncorr);
+     
+     fChain->SetBranchAddress("alpha_IP_1", &alpha_IP_1, &b_alpha_IP_1);
+     fChain->SetBranchAddress("alpha_IP_2", &alpha_IP_2, &b_alpha_IP_2);
 
-   fChain->SetBranchAddress("alpha_IP_1", &alpha_IP_1, &b_alpha_IP_1);
-   fChain->SetBranchAddress("alpha_IP_2", &alpha_IP_2, &b_alpha_IP_2);
-
-   fChain->SetBranchAddress("alpha_IP_uncorr_1", &alpha_IP_uncorr_1, &b_alpha_IP_uncorr_1);
-   fChain->SetBranchAddress("alpha_IP_uncorr_2", &alpha_IP_uncorr_2, &b_alpha_IP_uncorr_2);
-
-   fChain->SetBranchAddress("alpha_plane_1", &alpha_plane_1, &b_alpha_plane_1);
-   fChain->SetBranchAddress("alpha_plane_2", &alpha_plane_2, &b_alpha_plane_2);
-
-   fChain->SetBranchAddress("Prompt_pT", &Prompt_pT, &b_Prompt_pT);
+     fChain->SetBranchAddress("alpha_IP_uncorr_1", &alpha_IP_uncorr_1, &b_alpha_IP_uncorr_1);
+     fChain->SetBranchAddress("alpha_IP_uncorr_2", &alpha_IP_uncorr_2, &b_alpha_IP_uncorr_2);
+     
+     fChain->SetBranchAddress("alpha_plane_1", &alpha_plane_1, &b_alpha_plane_1);
+     fChain->SetBranchAddress("alpha_plane_2", &alpha_plane_2, &b_alpha_plane_2);
+     
+     fChain->SetBranchAddress("Prompt_pT", &Prompt_pT, &b_Prompt_pT);
    //   fChain->SetBranchAddress("isrefitBS", &isrefitBS, &b_isrefitBS);
 
-   fChain->SetBranchAddress("sm_htt125", &TauSpinnerWeightsEven, &b_TauSpinnerWeightsEven);
-   fChain->SetBranchAddress("ps_htt125", &TauSpinnerWeightsOdd, &b_TauSpinnerWeightsOdd);
-   fChain->SetBranchAddress("mm_htt125", &TauSpinnerWeightsMaxMix, &b_TauSpinnerWeightsMaxMix);
-   fChain->SetBranchAddress("minusmm_htt125", &TauSpinnerWeightsMinusMaxMix, &b_TauSpinnerWeightsMinusMaxMix);
-   fChain->SetBranchAddress("mix0p375_htt125", &TauSpinnerWeightsMix0p375, &b_TauSpinnerWeightsMix0p375);
+     fChain->SetBranchAddress("sm_htt125", &TauSpinnerWeightsEven, &b_TauSpinnerWeightsEven);
+     fChain->SetBranchAddress("ps_htt125", &TauSpinnerWeightsOdd, &b_TauSpinnerWeightsOdd);
+     fChain->SetBranchAddress("mm_htt125", &TauSpinnerWeightsMaxMix, &b_TauSpinnerWeightsMaxMix);
+     fChain->SetBranchAddress("minusmm_htt125", &TauSpinnerWeightsMinusMaxMix, &b_TauSpinnerWeightsMinusMaxMix);
+     fChain->SetBranchAddress("mix0p375_htt125", &TauSpinnerWeightsMix0p375, &b_TauSpinnerWeightsMix0p375);
 
-   fChain->SetBranchAddress("tauspinnerH",&tauspinnerH,&b_tauspinnerH);
-   fChain->SetBranchAddress("tauspinnerA",&tauspinnerA,&b_tauspinnerA);
-   fChain->SetBranchAddress("tauspinnerMaxMix",&tauspinnerMaxMix,&b_tauspinnerMaxMix);
-
-   fChain->SetBranchAddress("y1_LF", &y1_LF, &b_y1_LF);
-   fChain->SetBranchAddress("y2_LF", &y2_LF, &b_y2_LF);
-   fChain->SetBranchAddress("y1_ZMF", &y1_ZMF, &b_y1_ZMF);
-   fChain->SetBranchAddress("y2_ZMF", &y2_ZMF, &b_y2_ZMF);
-   fChain->SetBranchAddress("y1_TMF", &y1_TMF, &b_y1_TMF);
-   fChain->SetBranchAddress("y2_TMF", &y2_TMF, &b_y2_TMF);
-
+     fChain->SetBranchAddress("tauspinnerH",&tauspinnerH,&b_tauspinnerH);
+     fChain->SetBranchAddress("tauspinnerA",&tauspinnerA,&b_tauspinnerA);
+     fChain->SetBranchAddress("tauspinnerMaxMix",&tauspinnerMaxMix,&b_tauspinnerMaxMix);
+     
+     fChain->SetBranchAddress("y1_LF", &y1_LF, &b_y1_LF);
+     fChain->SetBranchAddress("y2_LF", &y2_LF, &b_y2_LF);
+     fChain->SetBranchAddress("y1_ZMF", &y1_ZMF, &b_y1_ZMF);
+     fChain->SetBranchAddress("y2_ZMF", &y2_ZMF, &b_y2_ZMF);
+     fChain->SetBranchAddress("y1_TMF", &y1_TMF, &b_y1_TMF);
+     fChain->SetBranchAddress("y2_TMF", &y2_TMF, &b_y2_TMF);
+   }
    lock=true;
 }
 
@@ -781,7 +788,7 @@ Int_t Synch17Tree::Cut(Long64_t entry){
 
 
 //Write Methods
-void Synch17Tree::WriteInit(TTree *tree) {
+void Synch17Tree::WriteInit(TTree *tree, bool em) {
   if (!tree) return;
    
   fChain = tree;
@@ -975,39 +982,41 @@ void Synch17Tree::WriteInit(TTree *tree) {
    fChain->Branch("decayModeFindingOldDMs_1", &decayModeFindingOldDMs_1, "decayModeFindingOldDMs_1/F");
    fChain->Branch("puCorrPtSum_1", &puCorrPtSum_1, "puCorrPtSum_1/F");
    */
-   fChain->Branch("deepTauVsEleRaw_1", &deepTauVsEleRaw_1, "deepTauVsEleRaw_1/F");
-   fChain->Branch("deepTauVsJetRaw_1", &deepTauVsJetRaw_1, "deepTauVsJetRaw_1/F");
-   fChain->Branch("deepTauVsMuRaw_1", &deepTauVsMuRaw_1, "deepTauVsMuRaw_1/F");
-   fChain->Branch("deepTauVsEleRaw_2", &deepTauVsEleRaw_2, "deepTauVsEleRaw_2/F");
-   fChain->Branch("deepTauVsJetRaw_2", &deepTauVsJetRaw_2, "deepTauVsJetRaw_2/F");
-   fChain->Branch("deepTauVsMuRaw_2", &deepTauVsMuRaw_2, "deepTauVsMuRaw_2/F");
-   fChain->Branch("byLooseDeepTau2017v2p1VSe_2", &byLooseDeepTau2017v2p1VSe_2, "byLooseDeepTau2017v2p1VSe_2/F");
-   fChain->Branch("byLooseDeepTau2017v2p1VSjet_2", &byLooseDeepTau2017v2p1VSjet_2, "byLooseDeepTau2017v2p1VSjet_2/F");
-   fChain->Branch("byLooseDeepTau2017v2p1VSmu_2", &byLooseDeepTau2017v2p1VSmu_2, "byLooseDeepTau2017v2p1VSmu_2/F");
-   fChain->Branch("byMediumDeepTau2017v2p1VSe_2", &byMediumDeepTau2017v2p1VSe_2, "byMediumDeepTau2017v2p1VSe_2/F");
-   fChain->Branch("byMediumDeepTau2017v2p1VSjet_2", &byMediumDeepTau2017v2p1VSjet_2, "byMediumDeepTau2017v2p1VSjet_2/F");
-   fChain->Branch("byMediumDeepTau2017v2p1VSmu_2", &byMediumDeepTau2017v2p1VSmu_2, "byMediumDeepTau2017v2p1VSmu_2/F");
-   fChain->Branch("byTightDeepTau2017v2p1VSe_2", &byTightDeepTau2017v2p1VSe_2, "byTightDeepTau2017v2p1VSe_2/F");
-   fChain->Branch("byTightDeepTau2017v2p1VSjet_2", &byTightDeepTau2017v2p1VSjet_2, "byTightDeepTau2017v2p1VSjet_2/F");
-   fChain->Branch("byTightDeepTau2017v2p1VSmu_2", &byTightDeepTau2017v2p1VSmu_2, "byTightDeepTau2017v2p1VSmu_2/F");
-   fChain->Branch("byVLooseDeepTau2017v2p1VSe_2", &byVLooseDeepTau2017v2p1VSe_2, "byVLooseDeepTau2017v2p1VSe_2/F");
-   fChain->Branch("byVLooseDeepTau2017v2p1VSjet_2", &byVLooseDeepTau2017v2p1VSjet_2, "byVLooseDeepTau2017v2p1VSjet_2/F");
-   fChain->Branch("byVLooseDeepTau2017v2p1VSmu_2", &byVLooseDeepTau2017v2p1VSmu_2, "byVLooseDeepTau2017v2p1VSmu_2/F");
-   fChain->Branch("byVTightDeepTau2017v2p1VSe_2", &byVTightDeepTau2017v2p1VSe_2, "byVTightDeepTau2017v2p1VSe_2/F");
-   fChain->Branch("byVTightDeepTau2017v2p1VSjet_2", &byVTightDeepTau2017v2p1VSjet_2, "byVTightDeepTau2017v2p1VSjet_2/F");
-   fChain->Branch("byVVLooseDeepTau2017v2p1VSe_2", &byVVLooseDeepTau2017v2p1VSe_2, "byVVLooseDeepTau2017v2p1VSe_2/F");
-   fChain->Branch("byVVLooseDeepTau2017v2p1VSjet_2", &byVVLooseDeepTau2017v2p1VSjet_2, "byVVLooseDeepTau2017v2p1VSjet_2/F");
-   fChain->Branch("byVVTightDeepTau2017v2p1VSe_2", &byVVTightDeepTau2017v2p1VSe_2, "byVVTightDeepTau2017v2p1VSe_2/F");
-   fChain->Branch("byVVTightDeepTau2017v2p1VSjet_2", &byVVTightDeepTau2017v2p1VSjet_2, "byVVTightDeepTau2017v2p1VSjet_2/F");
-   fChain->Branch("byVVVLooseDeepTau2017v2p1VSe_2", &byVVVLooseDeepTau2017v2p1VSe_2, "byVVVLooseDeepTau2017v2p1VSe_2/F");
-   fChain->Branch("byVVVLooseDeepTau2017v2p1VSjet_2", &byVVVLooseDeepTau2017v2p1VSjet_2, "byVVVLooseDeepTau2017v2p1VSjet_2/F");
+   if (!em) {
+     fChain->Branch("deepTauVsEleRaw_1", &deepTauVsEleRaw_1, "deepTauVsEleRaw_1/F");
+     fChain->Branch("deepTauVsJetRaw_1", &deepTauVsJetRaw_1, "deepTauVsJetRaw_1/F");
+     fChain->Branch("deepTauVsMuRaw_1", &deepTauVsMuRaw_1, "deepTauVsMuRaw_1/F");
+     fChain->Branch("deepTauVsEleRaw_2", &deepTauVsEleRaw_2, "deepTauVsEleRaw_2/F");
+     fChain->Branch("deepTauVsJetRaw_2", &deepTauVsJetRaw_2, "deepTauVsJetRaw_2/F");
+     fChain->Branch("deepTauVsMuRaw_2", &deepTauVsMuRaw_2, "deepTauVsMuRaw_2/F");
+     fChain->Branch("byLooseDeepTau2017v2p1VSe_2", &byLooseDeepTau2017v2p1VSe_2, "byLooseDeepTau2017v2p1VSe_2/F");
+     fChain->Branch("byLooseDeepTau2017v2p1VSjet_2", &byLooseDeepTau2017v2p1VSjet_2, "byLooseDeepTau2017v2p1VSjet_2/F");
+     fChain->Branch("byLooseDeepTau2017v2p1VSmu_2", &byLooseDeepTau2017v2p1VSmu_2, "byLooseDeepTau2017v2p1VSmu_2/F");
+     fChain->Branch("byMediumDeepTau2017v2p1VSe_2", &byMediumDeepTau2017v2p1VSe_2, "byMediumDeepTau2017v2p1VSe_2/F");
+     fChain->Branch("byMediumDeepTau2017v2p1VSjet_2", &byMediumDeepTau2017v2p1VSjet_2, "byMediumDeepTau2017v2p1VSjet_2/F");
+     fChain->Branch("byMediumDeepTau2017v2p1VSmu_2", &byMediumDeepTau2017v2p1VSmu_2, "byMediumDeepTau2017v2p1VSmu_2/F");
+     fChain->Branch("byTightDeepTau2017v2p1VSe_2", &byTightDeepTau2017v2p1VSe_2, "byTightDeepTau2017v2p1VSe_2/F");
+     fChain->Branch("byTightDeepTau2017v2p1VSjet_2", &byTightDeepTau2017v2p1VSjet_2, "byTightDeepTau2017v2p1VSjet_2/F");
+     fChain->Branch("byTightDeepTau2017v2p1VSmu_2", &byTightDeepTau2017v2p1VSmu_2, "byTightDeepTau2017v2p1VSmu_2/F");
+     fChain->Branch("byVLooseDeepTau2017v2p1VSe_2", &byVLooseDeepTau2017v2p1VSe_2, "byVLooseDeepTau2017v2p1VSe_2/F");
+     fChain->Branch("byVLooseDeepTau2017v2p1VSjet_2", &byVLooseDeepTau2017v2p1VSjet_2, "byVLooseDeepTau2017v2p1VSjet_2/F");
+     fChain->Branch("byVLooseDeepTau2017v2p1VSmu_2", &byVLooseDeepTau2017v2p1VSmu_2, "byVLooseDeepTau2017v2p1VSmu_2/F");
+     fChain->Branch("byVTightDeepTau2017v2p1VSe_2", &byVTightDeepTau2017v2p1VSe_2, "byVTightDeepTau2017v2p1VSe_2/F");
+     fChain->Branch("byVTightDeepTau2017v2p1VSjet_2", &byVTightDeepTau2017v2p1VSjet_2, "byVTightDeepTau2017v2p1VSjet_2/F");
+     fChain->Branch("byVVLooseDeepTau2017v2p1VSe_2", &byVVLooseDeepTau2017v2p1VSe_2, "byVVLooseDeepTau2017v2p1VSe_2/F");
+     fChain->Branch("byVVLooseDeepTau2017v2p1VSjet_2", &byVVLooseDeepTau2017v2p1VSjet_2, "byVVLooseDeepTau2017v2p1VSjet_2/F");
+     fChain->Branch("byVVTightDeepTau2017v2p1VSe_2", &byVVTightDeepTau2017v2p1VSe_2, "byVVTightDeepTau2017v2p1VSe_2/F");
+     fChain->Branch("byVVTightDeepTau2017v2p1VSjet_2", &byVVTightDeepTau2017v2p1VSjet_2, "byVVTightDeepTau2017v2p1VSjet_2/F");
+     fChain->Branch("byVVVLooseDeepTau2017v2p1VSe_2", &byVVVLooseDeepTau2017v2p1VSe_2, "byVVVLooseDeepTau2017v2p1VSe_2/F");
+     fChain->Branch("byVVVLooseDeepTau2017v2p1VSjet_2", &byVVVLooseDeepTau2017v2p1VSjet_2, "byVVVLooseDeepTau2017v2p1VSjet_2/F");
 
-   fChain->Branch("MVADM2017v1DM0raw_2", &MVADM2017v1DM0raw_2, "MVADM2017v1DM0raw_2/F");
-   fChain->Branch("MVADM2017v1DM10raw_2", &MVADM2017v1DM10raw_2, "MVADM2017v1DM10raw_2/F");
-   fChain->Branch("MVADM2017v1DM11raw_2", &MVADM2017v1DM11raw_2, "MVADM2017v1DM11raw_2/F");
-   fChain->Branch("MVADM2017v1DM1raw_2", &MVADM2017v1DM1raw_2, "MVADM2017v1DM1raw_2/F");
-   fChain->Branch("MVADM2017v1DM2raw_2", &MVADM2017v1DM2raw_2, "MVADM2017v1DM2raw_2/F");
-   fChain->Branch("MVADM2017v1DMotherraw_2", &MVADM2017v1DMotherraw_2, "MVADM2017v1DMotherraw_2/F");
+     fChain->Branch("MVADM2017v1DM0raw_2", &MVADM2017v1DM0raw_2, "MVADM2017v1DM0raw_2/F");
+     fChain->Branch("MVADM2017v1DM10raw_2", &MVADM2017v1DM10raw_2, "MVADM2017v1DM10raw_2/F");
+     fChain->Branch("MVADM2017v1DM11raw_2", &MVADM2017v1DM11raw_2, "MVADM2017v1DM11raw_2/F");
+     fChain->Branch("MVADM2017v1DM1raw_2", &MVADM2017v1DM1raw_2, "MVADM2017v1DM1raw_2/F");
+     fChain->Branch("MVADM2017v1DM2raw_2", &MVADM2017v1DM2raw_2, "MVADM2017v1DM2raw_2/F");
+     fChain->Branch("MVADM2017v1DMotherraw_2", &MVADM2017v1DMotherraw_2, "MVADM2017v1DMotherraw_2/F");
+   }
    /*
    fChain->Branch("byCombinedIsolationDeltaBetaCorrRaw3Hits_1", &byCombinedIsolationDeltaBetaCorrRaw3Hits_1, "byCombinedIsolationDeltaBetaCorrRaw3Hits_1/F");
    fChain->Branch("byIsolationMVA3newDMwoLTraw_1", &byIsolationMVA3newDMwoLTraw_1, "byIsolationMVA3newDMwoLTraw_1/F");
@@ -1071,61 +1080,62 @@ void Synch17Tree::WriteInit(TTree *tree) {
    fChain->Branch("idisoweight_antiiso_2", &idisoweight_antiiso_2, "idisoweight_antiiso_2/F");
    fChain->Branch("tauvsjetweightMedium_2", &tauvsjetweightMedium_2, "tauvsjetweightMedium_2/F");
 
+   if (!em) {
+     fChain->Branch("weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVUp", &weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVUp, "weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVUp/F");
+     fChain->Branch("weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVUp", &weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVUp, "weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVUp/F");
+     fChain->Branch("weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVUp", &weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVUp, "weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVUp/F");
+     fChain->Branch("weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVUp", &weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVUp, "weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVUp/F");
+     fChain->Branch("weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVUp", &weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVUp, "weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVUp/F");
+     fChain->Branch("weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVDown", &weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVDown, "weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVDown/F");
+     fChain->Branch("weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVDown", &weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVDown, "weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVDown/F");
+     fChain->Branch("weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVDown", &weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVDown, "weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVDown/F");
+     fChain->Branch("weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVDown", &weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVDown, "weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVDown/F");
+     fChain->Branch("weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVDown", &weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVDown, "weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVDown/F");
+     fChain->Branch("weight_CMS_eff_Xtrigger_et_MVADM0_13TeVUp", &weight_CMS_eff_Xtrigger_et_MVADM0_13TeVUp, "weight_CMS_eff_Xtrigger_et_MVADM0_13TeVUp/F");
+     fChain->Branch("weight_CMS_eff_Xtrigger_et_MVADM1_13TeVUp", &weight_CMS_eff_Xtrigger_et_MVADM1_13TeVUp, "weight_CMS_eff_Xtrigger_et_MVADM1_13TeVUp/F");
+     fChain->Branch("weight_CMS_eff_Xtrigger_et_MVADM2_13TeVUp", &weight_CMS_eff_Xtrigger_et_MVADM2_13TeVUp, "weight_CMS_eff_Xtrigger_et_MVADM2_13TeVUp/F");
+     fChain->Branch("weight_CMS_eff_Xtrigger_et_MVADM10_13TeVUp", &weight_CMS_eff_Xtrigger_et_MVADM10_13TeVUp, "weight_CMS_eff_Xtrigger_et_MVADM10_13TeVUp/F");
+     fChain->Branch("weight_CMS_eff_Xtrigger_et_MVADM11_13TeVUp", &weight_CMS_eff_Xtrigger_et_MVADM11_13TeVUp, "weight_CMS_eff_Xtrigger_et_MVADM11_13TeVUp/F");
+     fChain->Branch("weight_CMS_eff_Xtrigger_et_MVADM0_13TeVDown", &weight_CMS_eff_Xtrigger_et_MVADM0_13TeVDown, "weight_CMS_eff_Xtrigger_et_MVADM0_13TeVDown/F");
+     fChain->Branch("weight_CMS_eff_Xtrigger_et_MVADM1_13TeVDown", &weight_CMS_eff_Xtrigger_et_MVADM1_13TeVDown, "weight_CMS_eff_Xtrigger_et_MVADM1_13TeVDown/F");
+     fChain->Branch("weight_CMS_eff_Xtrigger_et_MVADM2_13TeVDown", &weight_CMS_eff_Xtrigger_et_MVADM2_13TeVDown, "weight_CMS_eff_Xtrigger_et_MVADM2_13TeVDown/F");
+     fChain->Branch("weight_CMS_eff_Xtrigger_et_MVADM10_13TeVDown", &weight_CMS_eff_Xtrigger_et_MVADM10_13TeVDown, "weight_CMS_eff_Xtrigger_et_MVADM10_13TeVDown/F");
+     fChain->Branch("weight_CMS_eff_Xtrigger_et_MVADM11_13TeVDown", &weight_CMS_eff_Xtrigger_et_MVADM11_13TeVDown, "weight_CMS_eff_Xtrigger_et_MVADM11_13TeVDown/F");
 
-   fChain->Branch("weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVUp", &weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVUp, "weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVUp/F");
-   fChain->Branch("weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVUp", &weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVUp, "weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVUp/F");
-   fChain->Branch("weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVUp", &weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVUp, "weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVUp/F");
-   fChain->Branch("weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVUp", &weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVUp, "weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVUp/F");
-   fChain->Branch("weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVUp", &weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVUp, "weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVUp/F");
-   fChain->Branch("weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVDown", &weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVDown, "weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVDown/F");
-   fChain->Branch("weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVDown", &weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVDown, "weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVDown/F");
-   fChain->Branch("weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVDown", &weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVDown, "weight_CMS_eff_Xtrigger_mt_MVADM2_13TeVDown/F");
-   fChain->Branch("weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVDown", &weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVDown, "weight_CMS_eff_Xtrigger_mt_MVADM10_13TeVDown/F");
-   fChain->Branch("weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVDown", &weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVDown, "weight_CMS_eff_Xtrigger_mt_MVADM11_13TeVDown/F");
-   fChain->Branch("weight_CMS_eff_Xtrigger_et_MVADM0_13TeVUp", &weight_CMS_eff_Xtrigger_et_MVADM0_13TeVUp, "weight_CMS_eff_Xtrigger_et_MVADM0_13TeVUp/F");
-   fChain->Branch("weight_CMS_eff_Xtrigger_et_MVADM1_13TeVUp", &weight_CMS_eff_Xtrigger_et_MVADM1_13TeVUp, "weight_CMS_eff_Xtrigger_et_MVADM1_13TeVUp/F");
-   fChain->Branch("weight_CMS_eff_Xtrigger_et_MVADM2_13TeVUp", &weight_CMS_eff_Xtrigger_et_MVADM2_13TeVUp, "weight_CMS_eff_Xtrigger_et_MVADM2_13TeVUp/F");
-   fChain->Branch("weight_CMS_eff_Xtrigger_et_MVADM10_13TeVUp", &weight_CMS_eff_Xtrigger_et_MVADM10_13TeVUp, "weight_CMS_eff_Xtrigger_et_MVADM10_13TeVUp/F");
-   fChain->Branch("weight_CMS_eff_Xtrigger_et_MVADM11_13TeVUp", &weight_CMS_eff_Xtrigger_et_MVADM11_13TeVUp, "weight_CMS_eff_Xtrigger_et_MVADM11_13TeVUp/F");
-   fChain->Branch("weight_CMS_eff_Xtrigger_et_MVADM0_13TeVDown", &weight_CMS_eff_Xtrigger_et_MVADM0_13TeVDown, "weight_CMS_eff_Xtrigger_et_MVADM0_13TeVDown/F");
-   fChain->Branch("weight_CMS_eff_Xtrigger_et_MVADM1_13TeVDown", &weight_CMS_eff_Xtrigger_et_MVADM1_13TeVDown, "weight_CMS_eff_Xtrigger_et_MVADM1_13TeVDown/F");
-   fChain->Branch("weight_CMS_eff_Xtrigger_et_MVADM2_13TeVDown", &weight_CMS_eff_Xtrigger_et_MVADM2_13TeVDown, "weight_CMS_eff_Xtrigger_et_MVADM2_13TeVDown/F");
-   fChain->Branch("weight_CMS_eff_Xtrigger_et_MVADM10_13TeVDown", &weight_CMS_eff_Xtrigger_et_MVADM10_13TeVDown, "weight_CMS_eff_Xtrigger_et_MVADM10_13TeVDown/F");
-   fChain->Branch("weight_CMS_eff_Xtrigger_et_MVADM11_13TeVDown", &weight_CMS_eff_Xtrigger_et_MVADM11_13TeVDown, "weight_CMS_eff_Xtrigger_et_MVADM11_13TeVDown/F");
 
+     fChain->Branch("weight_CMS_eff_t_pTlow_MVADM0_13TeVUp", &weight_CMS_eff_t_pTlow_MVADM0_13TeVUp, "weight_CMS_eff_t_pTlow_MVADM0_13TeVUp/F"); 
+     fChain->Branch("weight_CMS_eff_t_pTlow_MVADM1_13TeVUp", &weight_CMS_eff_t_pTlow_MVADM1_13TeVUp, "weight_CMS_eff_t_pTlow_MVADM1_13TeVUp/F"); 
+     fChain->Branch("weight_CMS_eff_t_pTlow_MVADM2_13TeVUp", &weight_CMS_eff_t_pTlow_MVADM2_13TeVUp, "weight_CMS_eff_t_pTlow_MVADM2_13TeVUp/F"); 
+     fChain->Branch("weight_CMS_eff_t_pTlow_MVADM10_13TeVUp", &weight_CMS_eff_t_pTlow_MVADM10_13TeVUp, "weight_CMS_eff_t_pTlow_MVADM10_13TeVUp/F");
+     fChain->Branch("weight_CMS_eff_t_pTlow_MVADM11_13TeVUp", &weight_CMS_eff_t_pTlow_MVADM11_13TeVUp, "weight_CMS_eff_t_pTlow_MVADM11_13TeVUp/F");
+     fChain->Branch("weight_CMS_eff_t_pThigh_MVADM0_13TeVUp", &weight_CMS_eff_t_pThigh_MVADM0_13TeVUp, "weight_CMS_eff_t_pThigh_MVADM0_13TeVUp/F");
+     fChain->Branch("weight_CMS_eff_t_pThigh_MVADM1_13TeVUp", &weight_CMS_eff_t_pThigh_MVADM1_13TeVUp, "weight_CMS_eff_t_pThigh_MVADM1_13TeVUp/F");
+     fChain->Branch("weight_CMS_eff_t_pThigh_MVADM2_13TeVUp", &weight_CMS_eff_t_pThigh_MVADM2_13TeVUp, "weight_CMS_eff_t_pThigh_MVADM2_13TeVUp/F");
+     fChain->Branch("weight_CMS_eff_t_pThigh_MVADM10_13TeVUp", &weight_CMS_eff_t_pThigh_MVADM10_13TeVUp, "weight_CMS_eff_t_pThigh_MVADM10_13TeVUp/F"); 
+     fChain->Branch("weight_CMS_eff_t_pThigh_MVADM11_13TeVUp", &weight_CMS_eff_t_pThigh_MVADM11_13TeVUp, "weight_CMS_eff_t_pThigh_MVADM11_13TeVUp/F"); 
+     fChain->Branch("weight_CMS_eff_t_pTlow_MVADM0_13TeVDown", &weight_CMS_eff_t_pTlow_MVADM0_13TeVDown, "weight_CMS_eff_t_pTlow_MVADM0_13TeVDown/F"); 
+     fChain->Branch("weight_CMS_eff_t_pTlow_MVADM1_13TeVDown", &weight_CMS_eff_t_pTlow_MVADM1_13TeVDown, "weight_CMS_eff_t_pTlow_MVADM1_13TeVDown/F"); 
+     fChain->Branch("weight_CMS_eff_t_pTlow_MVADM2_13TeVDown", &weight_CMS_eff_t_pTlow_MVADM2_13TeVDown, "weight_CMS_eff_t_pTlow_MVADM2_13TeVDown/F"); 
+     fChain->Branch("weight_CMS_eff_t_pTlow_MVADM10_13TeVDown", &weight_CMS_eff_t_pTlow_MVADM10_13TeVDown, "weight_CMS_eff_t_pTlow_MVADM10_13TeVDown/F"); 
+     fChain->Branch("weight_CMS_eff_t_pTlow_MVADM11_13TeVDown", &weight_CMS_eff_t_pTlow_MVADM11_13TeVDown, "weight_CMS_eff_t_pTlow_MVADM11_13TeVDown/F"); 
+     fChain->Branch("weight_CMS_eff_t_pThigh_MVADM0_13TeVDown", &weight_CMS_eff_t_pThigh_MVADM0_13TeVDown, "weight_CMS_eff_t_pThigh_MVADM0_13TeVDown/F"); 
+     fChain->Branch("weight_CMS_eff_t_pThigh_MVADM1_13TeVDown", &weight_CMS_eff_t_pThigh_MVADM1_13TeVDown, "weight_CMS_eff_t_pThigh_MVADM1_13TeVDown/F"); 
+     fChain->Branch("weight_CMS_eff_t_pThigh_MVADM2_13TeVDown", &weight_CMS_eff_t_pThigh_MVADM2_13TeVDown, "weight_CMS_eff_t_pThigh_MVADM2_13TeVDown/F"); 
+     fChain->Branch("weight_CMS_eff_t_pThigh_MVADM10_13TeVDown", &weight_CMS_eff_t_pThigh_MVADM10_13TeVDown, "weight_CMS_eff_t_pThigh_MVADM10_13TeVDown/F");
+     fChain->Branch("weight_CMS_eff_t_pThigh_MVADM11_13TeVDown", &weight_CMS_eff_t_pThigh_MVADM11_13TeVDown, "weight_CMS_eff_t_pThigh_MVADM11_13TeVDown/F");
 
-  fChain->Branch("weight_CMS_eff_t_pTlow_MVADM0_13TeVUp", &weight_CMS_eff_t_pTlow_MVADM0_13TeVUp, "weight_CMS_eff_t_pTlow_MVADM0_13TeVUp/F"); 
-  fChain->Branch("weight_CMS_eff_t_pTlow_MVADM1_13TeVUp", &weight_CMS_eff_t_pTlow_MVADM1_13TeVUp, "weight_CMS_eff_t_pTlow_MVADM1_13TeVUp/F"); 
-  fChain->Branch("weight_CMS_eff_t_pTlow_MVADM2_13TeVUp", &weight_CMS_eff_t_pTlow_MVADM2_13TeVUp, "weight_CMS_eff_t_pTlow_MVADM2_13TeVUp/F"); 
-  fChain->Branch("weight_CMS_eff_t_pTlow_MVADM10_13TeVUp", &weight_CMS_eff_t_pTlow_MVADM10_13TeVUp, "weight_CMS_eff_t_pTlow_MVADM10_13TeVUp/F");
-  fChain->Branch("weight_CMS_eff_t_pTlow_MVADM11_13TeVUp", &weight_CMS_eff_t_pTlow_MVADM11_13TeVUp, "weight_CMS_eff_t_pTlow_MVADM11_13TeVUp/F");
-  fChain->Branch("weight_CMS_eff_t_pThigh_MVADM0_13TeVUp", &weight_CMS_eff_t_pThigh_MVADM0_13TeVUp, "weight_CMS_eff_t_pThigh_MVADM0_13TeVUp/F");
-  fChain->Branch("weight_CMS_eff_t_pThigh_MVADM1_13TeVUp", &weight_CMS_eff_t_pThigh_MVADM1_13TeVUp, "weight_CMS_eff_t_pThigh_MVADM1_13TeVUp/F");
-  fChain->Branch("weight_CMS_eff_t_pThigh_MVADM2_13TeVUp", &weight_CMS_eff_t_pThigh_MVADM2_13TeVUp, "weight_CMS_eff_t_pThigh_MVADM2_13TeVUp/F");
-  fChain->Branch("weight_CMS_eff_t_pThigh_MVADM10_13TeVUp", &weight_CMS_eff_t_pThigh_MVADM10_13TeVUp, "weight_CMS_eff_t_pThigh_MVADM10_13TeVUp/F"); 
-  fChain->Branch("weight_CMS_eff_t_pThigh_MVADM11_13TeVUp", &weight_CMS_eff_t_pThigh_MVADM11_13TeVUp, "weight_CMS_eff_t_pThigh_MVADM11_13TeVUp/F"); 
-  fChain->Branch("weight_CMS_eff_t_pTlow_MVADM0_13TeVDown", &weight_CMS_eff_t_pTlow_MVADM0_13TeVDown, "weight_CMS_eff_t_pTlow_MVADM0_13TeVDown/F"); 
-  fChain->Branch("weight_CMS_eff_t_pTlow_MVADM1_13TeVDown", &weight_CMS_eff_t_pTlow_MVADM1_13TeVDown, "weight_CMS_eff_t_pTlow_MVADM1_13TeVDown/F"); 
-  fChain->Branch("weight_CMS_eff_t_pTlow_MVADM2_13TeVDown", &weight_CMS_eff_t_pTlow_MVADM2_13TeVDown, "weight_CMS_eff_t_pTlow_MVADM2_13TeVDown/F"); 
-  fChain->Branch("weight_CMS_eff_t_pTlow_MVADM10_13TeVDown", &weight_CMS_eff_t_pTlow_MVADM10_13TeVDown, "weight_CMS_eff_t_pTlow_MVADM10_13TeVDown/F"); 
-  fChain->Branch("weight_CMS_eff_t_pTlow_MVADM11_13TeVDown", &weight_CMS_eff_t_pTlow_MVADM11_13TeVDown, "weight_CMS_eff_t_pTlow_MVADM11_13TeVDown/F"); 
-  fChain->Branch("weight_CMS_eff_t_pThigh_MVADM0_13TeVDown", &weight_CMS_eff_t_pThigh_MVADM0_13TeVDown, "weight_CMS_eff_t_pThigh_MVADM0_13TeVDown/F"); 
-  fChain->Branch("weight_CMS_eff_t_pThigh_MVADM1_13TeVDown", &weight_CMS_eff_t_pThigh_MVADM1_13TeVDown, "weight_CMS_eff_t_pThigh_MVADM1_13TeVDown/F"); 
-  fChain->Branch("weight_CMS_eff_t_pThigh_MVADM2_13TeVDown", &weight_CMS_eff_t_pThigh_MVADM2_13TeVDown, "weight_CMS_eff_t_pThigh_MVADM2_13TeVDown/F"); 
-  fChain->Branch("weight_CMS_eff_t_pThigh_MVADM10_13TeVDown", &weight_CMS_eff_t_pThigh_MVADM10_13TeVDown, "weight_CMS_eff_t_pThigh_MVADM10_13TeVDown/F");
-  fChain->Branch("weight_CMS_eff_t_pThigh_MVADM11_13TeVDown", &weight_CMS_eff_t_pThigh_MVADM11_13TeVDown, "weight_CMS_eff_t_pThigh_MVADM11_13TeVDown/F");
-
-  fChain->Branch("weight_mufake_corr", &weight_mufake_corr, "weight_mufake_corr/F");
-  fChain->Branch("weight_CMS_mufake_mt_MVADM0_13TeVUp", &weight_CMS_mufake_mt_MVADM0_13TeVUp, "weight_CMS_mufake_mt_MVADM0_13TeVUp/F");
-  fChain->Branch("weight_CMS_mufake_mt_MVADM1_13TeVUp", &weight_CMS_mufake_mt_MVADM1_13TeVUp, "weight_CMS_mufake_mt_MVADM1_13TeVUp/F");
-  fChain->Branch("weight_CMS_mufake_mt_MVADM2_13TeVUp", &weight_CMS_mufake_mt_MVADM2_13TeVUp, "weight_CMS_mufake_mt_MVADM2_13TeVUp/F");
-  fChain->Branch("weight_CMS_mufake_mt_MVADM10_13TeVUp", &weight_CMS_mufake_mt_MVADM10_13TeVUp, "weight_CMS_mufake_mt_MVADM10_13TeVUp/F");
-  fChain->Branch("weight_CMS_mufake_mt_MVADM11_13TeVUp", &weight_CMS_mufake_mt_MVADM11_13TeVUp, "weight_CMS_mufake_mt_MVADM11_13TeVUp/F");
-  fChain->Branch("weight_CMS_mufake_mt_MVADM0_13TeVDown", &weight_CMS_mufake_mt_MVADM0_13TeVDown, "weight_CMS_mufake_mt_MVADM0_13TeVDown/F");
-  fChain->Branch("weight_CMS_mufake_mt_MVADM1_13TeVDown", &weight_CMS_mufake_mt_MVADM1_13TeVDown, "weight_CMS_mufake_mt_MVADM1_13TeVDown/F");
-  fChain->Branch("weight_CMS_mufake_mt_MVADM2_13TeVDown", &weight_CMS_mufake_mt_MVADM2_13TeVDown, "weight_CMS_mufake_mt_MVADM2_13TeVDown/F");
-  fChain->Branch("weight_CMS_mufake_mt_MVADM10_13TeVDown", &weight_CMS_mufake_mt_MVADM10_13TeVDown, "weight_CMS_mufake_mt_MVADM10_13TeVDown/F");
-  fChain->Branch("weight_CMS_mufake_mt_MVADM11_13TeVDown", &weight_CMS_mufake_mt_MVADM11_13TeVDown, "weight_CMS_mufake_mt_MVADM11_13TeVDown/F");
+     fChain->Branch("weight_mufake_corr", &weight_mufake_corr, "weight_mufake_corr/F");
+     fChain->Branch("weight_CMS_mufake_mt_MVADM0_13TeVUp", &weight_CMS_mufake_mt_MVADM0_13TeVUp, "weight_CMS_mufake_mt_MVADM0_13TeVUp/F");
+     fChain->Branch("weight_CMS_mufake_mt_MVADM1_13TeVUp", &weight_CMS_mufake_mt_MVADM1_13TeVUp, "weight_CMS_mufake_mt_MVADM1_13TeVUp/F");
+     fChain->Branch("weight_CMS_mufake_mt_MVADM2_13TeVUp", &weight_CMS_mufake_mt_MVADM2_13TeVUp, "weight_CMS_mufake_mt_MVADM2_13TeVUp/F");
+     fChain->Branch("weight_CMS_mufake_mt_MVADM10_13TeVUp", &weight_CMS_mufake_mt_MVADM10_13TeVUp, "weight_CMS_mufake_mt_MVADM10_13TeVUp/F");
+     fChain->Branch("weight_CMS_mufake_mt_MVADM11_13TeVUp", &weight_CMS_mufake_mt_MVADM11_13TeVUp, "weight_CMS_mufake_mt_MVADM11_13TeVUp/F");
+     fChain->Branch("weight_CMS_mufake_mt_MVADM0_13TeVDown", &weight_CMS_mufake_mt_MVADM0_13TeVDown, "weight_CMS_mufake_mt_MVADM0_13TeVDown/F");
+     fChain->Branch("weight_CMS_mufake_mt_MVADM1_13TeVDown", &weight_CMS_mufake_mt_MVADM1_13TeVDown, "weight_CMS_mufake_mt_MVADM1_13TeVDown/F");
+     fChain->Branch("weight_CMS_mufake_mt_MVADM2_13TeVDown", &weight_CMS_mufake_mt_MVADM2_13TeVDown, "weight_CMS_mufake_mt_MVADM2_13TeVDown/F");
+     fChain->Branch("weight_CMS_mufake_mt_MVADM10_13TeVDown", &weight_CMS_mufake_mt_MVADM10_13TeVDown, "weight_CMS_mufake_mt_MVADM10_13TeVDown/F");
+     fChain->Branch("weight_CMS_mufake_mt_MVADM11_13TeVDown", &weight_CMS_mufake_mt_MVADM11_13TeVDown, "weight_CMS_mufake_mt_MVADM11_13TeVDown/F");
+   }
 
    fChain->Branch("weight_CMS_scale_gg_13TeVUp", &weight_CMS_scale_gg_13TeVUp, "weight_CMS_scale_gg_13TeVUp/F");
    fChain->Branch("weight_CMS_scale_gg_13TeVDown", &weight_CMS_scale_gg_13TeVDown, "weight_CMS_scale_gg_13TeVDown/F");
@@ -1187,10 +1197,12 @@ fChain->Branch("againstElectronVLooseMVA6_2", &againstElectronVLooseMVA6_2, "aga
    fChain->Branch("effweightSingle", &effweightSingle, "effweightSingle/F"); 
    fChain->Branch("effweightExcl"  , &effweightExcl,   "effweightExcl/F"); 
 
-   fChain->Branch("ff_nom",&ff_nom,"ff_nom/F");
-   fChain->Branch("ff_mva",&ff_mva,"ff_mva/F");
-   fChain->Branch("ff_nom_sys",&ff_nom_sys,"ff_nom_sys/F");
-   fChain->Branch("ff_mva_sys",&ff_mva_sys,"ff_mva_sys/F");
+   if (!em) {
+     fChain->Branch("ff_nom",&ff_nom,"ff_nom/F");
+     fChain->Branch("ff_mva",&ff_mva,"ff_mva/F");
+     fChain->Branch("ff_nom_sys",&ff_nom_sys,"ff_nom_sys/F");
+     fChain->Branch("ff_mva_sys",&ff_mva_sys,"ff_mva_sys/F");
+   }
 
    fChain->Branch("trg_singlemuon",  &trg_singlemuon, "trg_singlemuon/O");
    fChain->Branch("trg_singleelectron",  &trg_singleelectron, "trg_singleelectron/O");
@@ -1294,52 +1306,52 @@ fChain->Branch("againstElectronVLooseMVA6_2", &againstElectronVLooseMVA6_2, "aga
    fChain->Branch("extramuon_veto", &extramuon_veto, "extramuon_veto/I");
 
    //CP measurement
+   if (!em) {
+     fChain->Branch("tau1DecayPlaneX", &tau1DecayPlaneX, "tau1DecayPlaneX/F");
+     fChain->Branch("tau1DecayPlaneY", &tau1DecayPlaneY, "tau1DecayPlaneY/F");
+     fChain->Branch("tau1DecayPlaneZ", &tau1DecayPlaneZ, "tau1DecayPlaneZ/F");
+     fChain->Branch("tau2DecayPlaneX", &tau2DecayPlaneX, "tau2DecayPlaneX/F");
+     fChain->Branch("tau2DecayPlaneY", &tau2DecayPlaneY, "tau2DecayPlaneY/F");
+     fChain->Branch("tau2DecayPlaneZ", &tau2DecayPlaneZ, "tau2DecayPlaneZ/F");
+     
+     fChain->Branch("acotautau_00", &acotautau_00, "acotautau_00/F");
+     fChain->Branch("acotautau_10", &acotautau_10, "acotautau_10/F");
+     fChain->Branch("acotautau_01", &acotautau_01, "acotautau_01/F");
+     fChain->Branch("acotautau_11", &acotautau_11, "acotautau_11/F");
+     
+     fChain->Branch("acotautau_bs_00", &acotautau_bs_00, "acotautau_bs_00/F");
+     fChain->Branch("acotautau_bs_10", &acotautau_bs_10, "acotautau_bs_10/F");
+     fChain->Branch("acotautau_bs_01", &acotautau_bs_01, "acotautau_bs_01/F");
+     fChain->Branch("acotautau_bs_11", &acotautau_bs_11, "acotautau_bs_11/F");
+     
+     fChain->Branch("acotautau_refitbs_00", &acotautau_refitbs_00, "acotautau_refitbs_00/F");
+     fChain->Branch("acotautau_refitbs_10", &acotautau_refitbs_10, "acotautau_refitbs_10/F");
+     fChain->Branch("acotautau_refitbs_01", &acotautau_refitbs_01, "acotautau_refitbs_01/F");
+     fChain->Branch("acotautau_refitbs_11", &acotautau_refitbs_11, "acotautau_refitbs_11/F");
+     fChain->Branch("acotautau_refitbs_02", &acotautau_refitbs_02, "acotautau_refitbs_02/F");
 
-   fChain->Branch("tau1DecayPlaneX", &tau1DecayPlaneX, "tau1DecayPlaneX/F");
-   fChain->Branch("tau1DecayPlaneY", &tau1DecayPlaneY, "tau1DecayPlaneY/F");
-   fChain->Branch("tau1DecayPlaneZ", &tau1DecayPlaneZ, "tau1DecayPlaneZ/F");
-   fChain->Branch("tau2DecayPlaneX", &tau2DecayPlaneX, "tau2DecayPlaneX/F");
-   fChain->Branch("tau2DecayPlaneY", &tau2DecayPlaneY, "tau2DecayPlaneY/F");
-   fChain->Branch("tau2DecayPlaneZ", &tau2DecayPlaneZ, "tau2DecayPlaneZ/F");
+     fChain->Branch("acotautau_helix_00", &acotautau_helix_00, "acotautau_helix_00/F");
+     fChain->Branch("acotautau_helix_10", &acotautau_helix_10, "acotautau_helix_10/F");
+     fChain->Branch("acotautau_helix_01", &acotautau_helix_01, "acotautau_helix_01/F");
+     fChain->Branch("acotautau_helix_11", &acotautau_helix_11, "acotautau_helix_11/F");
+     
+     fChain->Branch("acotautau_refitbs_uncorr_00", &acotautau_refitbs_uncorr_00, "acotautau_refitbs_uncorr_00/F");
+     fChain->Branch("acotautau_refitbs_uncorr_10", &acotautau_refitbs_uncorr_10, "acotautau_refitbs_uncorr_10/F");
+     fChain->Branch("acotautau_refitbs_uncorr_01", &acotautau_refitbs_uncorr_01, "acotautau_refitbs_uncorr_01/F");
+     fChain->Branch("acotautau_refitbs_uncorr_11", &acotautau_refitbs_uncorr_11, "acotautau_refitbs_uncorr_11/F");
 
-   fChain->Branch("acotautau_00", &acotautau_00, "acotautau_00/F");
-   fChain->Branch("acotautau_10", &acotautau_10, "acotautau_10/F");
-   fChain->Branch("acotautau_01", &acotautau_01, "acotautau_01/F");
-   fChain->Branch("acotautau_11", &acotautau_11, "acotautau_11/F");
-
-   fChain->Branch("acotautau_bs_00", &acotautau_bs_00, "acotautau_bs_00/F");
-   fChain->Branch("acotautau_bs_10", &acotautau_bs_10, "acotautau_bs_10/F");
-   fChain->Branch("acotautau_bs_01", &acotautau_bs_01, "acotautau_bs_01/F");
-   fChain->Branch("acotautau_bs_11", &acotautau_bs_11, "acotautau_bs_11/F");
-
-   fChain->Branch("acotautau_refitbs_00", &acotautau_refitbs_00, "acotautau_refitbs_00/F");
-   fChain->Branch("acotautau_refitbs_10", &acotautau_refitbs_10, "acotautau_refitbs_10/F");
-   fChain->Branch("acotautau_refitbs_01", &acotautau_refitbs_01, "acotautau_refitbs_01/F");
-   fChain->Branch("acotautau_refitbs_11", &acotautau_refitbs_11, "acotautau_refitbs_11/F");
-   fChain->Branch("acotautau_refitbs_02", &acotautau_refitbs_02, "acotautau_refitbs_02/F");
-
-   fChain->Branch("acotautau_helix_00", &acotautau_helix_00, "acotautau_helix_00/F");
-   fChain->Branch("acotautau_helix_10", &acotautau_helix_10, "acotautau_helix_10/F");
-   fChain->Branch("acotautau_helix_01", &acotautau_helix_01, "acotautau_helix_01/F");
-   fChain->Branch("acotautau_helix_11", &acotautau_helix_11, "acotautau_helix_11/F");
-
-   fChain->Branch("acotautau_refitbs_uncorr_00", &acotautau_refitbs_uncorr_00, "acotautau_refitbs_uncorr_00/F");
-   fChain->Branch("acotautau_refitbs_uncorr_10", &acotautau_refitbs_uncorr_10, "acotautau_refitbs_uncorr_10/F");
-   fChain->Branch("acotautau_refitbs_uncorr_01", &acotautau_refitbs_uncorr_01, "acotautau_refitbs_uncorr_01/F");
-   fChain->Branch("acotautau_refitbs_uncorr_11", &acotautau_refitbs_uncorr_11, "acotautau_refitbs_uncorr_11/F");
-
-   fChain->Branch("acotautau_helix_uncorr_00", &acotautau_helix_uncorr_00, "acotautau_helix_uncorr_00/F");
-   fChain->Branch("acotautau_helix_uncorr_10", &acotautau_helix_uncorr_10, "acotautau_helix_uncorr_10/F");
-   fChain->Branch("acotautau_helix_uncorr_01", &acotautau_helix_uncorr_01, "acotautau_helix_uncorr_01/F");
-   fChain->Branch("acotautau_helix_uncorr_11", &acotautau_helix_uncorr_11, "acotautau_helix_uncorr_11/F");
+     fChain->Branch("acotautau_helix_uncorr_00", &acotautau_helix_uncorr_00, "acotautau_helix_uncorr_00/F");
+     fChain->Branch("acotautau_helix_uncorr_10", &acotautau_helix_uncorr_10, "acotautau_helix_uncorr_10/F");
+     fChain->Branch("acotautau_helix_uncorr_01", &acotautau_helix_uncorr_01, "acotautau_helix_uncorr_01/F");
+     fChain->Branch("acotautau_helix_uncorr_11", &acotautau_helix_uncorr_11, "acotautau_helix_uncorr_11/F");
    /*
-   fChain->Branch("acotautauPsi_00", &acotautauPsi_00, "acotautauPsi_00/F");
-   fChain->Branch("acotautauPsi_10", &acotautauPsi_10, "acotautauPsi_10/F");
-   fChain->Branch("acotautauPsi_01", &acotautauPsi_01, "acotautauPsi_01/F");
-   fChain->Branch("acotautauPsi_11", &acotautauPsi_11, "acotautauPsi_11/F");
+     fChain->Branch("acotautauPsi_00", &acotautauPsi_00, "acotautauPsi_00/F");
+     fChain->Branch("acotautauPsi_10", &acotautauPsi_10, "acotautauPsi_10/F");
+     fChain->Branch("acotautauPsi_01", &acotautauPsi_01, "acotautauPsi_01/F");
+     fChain->Branch("acotautauPsi_11", &acotautauPsi_11, "acotautauPsi_11/F");
    */
-   fChain->Branch("pdgcodetau2", &pdgcodetau2, "pdgcodetau2/F");
-
+     fChain->Branch("pdgcodetau2", &pdgcodetau2, "pdgcodetau2/F");
+   }
   //Points of closest approach
    /*
    fChain->Branch("tau_pca2D_x_1", &tau_pca2D_x_1, "tau_pca2D_x_1/F");
@@ -1365,25 +1377,26 @@ fChain->Branch("againstElectronVLooseMVA6_2", &againstElectronVLooseMVA6_2, "aga
    fChain->Branch("tau_SV_covzy_1", &tau_SV_covzy_1, "tau_SV_covzy_1/F");
    fChain->Branch("tau_SV_covzz_1", &tau_SV_covzz_1, "tau_SV_covzz_1/F");
    */
-   fChain->Branch("tau_SV_x_2", &tau_SV_x_2, "tau_SV_x_2/F");
-   fChain->Branch("tau_SV_y_2", &tau_SV_y_2, "tau_SV_y_2/F");
-   fChain->Branch("tau_SV_z_2", &tau_SV_z_2, "tau_SV_z_2/F");
-   fChain->Branch("tau_SV_covxx_2", &tau_SV_covxx_2, "tau_SV_covxx_2/F");
-   fChain->Branch("tau_SV_covyx_2", &tau_SV_covyx_2, "tau_SV_covyx_2/F");
-   fChain->Branch("tau_SV_covzx_2", &tau_SV_covzx_2, "tau_SV_covzx_2/F");
-   fChain->Branch("tau_SV_covyy_2", &tau_SV_covyy_2, "tau_SV_covyy_2/F");
-   fChain->Branch("tau_SV_covzy_2", &tau_SV_covzy_2, "tau_SV_covzy_2/F");
-   fChain->Branch("tau_SV_covzz_2", &tau_SV_covzz_2, "tau_SV_covzz_2/F");
-   
+   if (!em) {
+     fChain->Branch("tau_SV_x_2", &tau_SV_x_2, "tau_SV_x_2/F");
+     fChain->Branch("tau_SV_y_2", &tau_SV_y_2, "tau_SV_y_2/F");
+     fChain->Branch("tau_SV_z_2", &tau_SV_z_2, "tau_SV_z_2/F");
+     fChain->Branch("tau_SV_covxx_2", &tau_SV_covxx_2, "tau_SV_covxx_2/F");
+     fChain->Branch("tau_SV_covyx_2", &tau_SV_covyx_2, "tau_SV_covyx_2/F");
+     fChain->Branch("tau_SV_covzx_2", &tau_SV_covzx_2, "tau_SV_covzx_2/F");
+     fChain->Branch("tau_SV_covyy_2", &tau_SV_covyy_2, "tau_SV_covyy_2/F");
+     fChain->Branch("tau_SV_covzy_2", &tau_SV_covzy_2, "tau_SV_covzy_2/F");
+     fChain->Branch("tau_SV_covzz_2", &tau_SV_covzz_2, "tau_SV_covzz_2/F");
+     
 
-   //SV-PV
-   fChain->Branch("SVminusRefitV_x", &SVminusRefitV_x, "SVminusRefitV_x/F");
-   fChain->Branch("SVminusRefitV_y", &SVminusRefitV_y, "SVminusRefitV_y/F");
-   fChain->Branch("SVminusRefitV_z", &SVminusRefitV_z, "SVminusRefitV_z/F");
-   fChain->Branch("SVminusPV_x", &SVminusPV_x, "SVminusPV_x/F");
-   fChain->Branch("SVminusPV_y", &SVminusPV_y, "SVminusPV_y/F");
-   fChain->Branch("SVminusPV_z", &SVminusPV_z, "SVminusPV_z/F");
-
+     //SV-PV
+     fChain->Branch("SVminusRefitV_x", &SVminusRefitV_x, "SVminusRefitV_x/F");
+     fChain->Branch("SVminusRefitV_y", &SVminusRefitV_y, "SVminusRefitV_y/F");
+     fChain->Branch("SVminusRefitV_z", &SVminusRefitV_z, "SVminusRefitV_z/F");
+     fChain->Branch("SVminusPV_x", &SVminusPV_x, "SVminusPV_x/F");
+     fChain->Branch("SVminusPV_y", &SVminusPV_y, "SVminusPV_y/F");
+     fChain->Branch("SVminusPV_z", &SVminusPV_z, "SVminusPV_z/F");
+   }
    fChain->Branch("RecoVertexX", &RecoVertexX, "RecoVertexX/F");
    fChain->Branch("RecoVertexY", &RecoVertexY, "RecoVertexY/F");
    fChain->Branch("RecoVertexZ", &RecoVertexZ, "RecoVertexZ/F"); 
@@ -1403,45 +1416,47 @@ fChain->Branch("againstElectronVLooseMVA6_2", &againstElectronVLooseMVA6_2, "aga
    fChain->Branch("GenVertexY", &GenVertexY, "GenVertexY/F");
    fChain->Branch("GenVertexZ", &GenVertexZ, "GenVertexZ/F");
 
-   fChain->Branch("VxConstitTau1", &VxConstitTau1, "VxConstitTau1/F");
-   fChain->Branch("VyConstitTau1", &VyConstitTau1, "VyConstitTau1/F");
-   fChain->Branch("VzConstitTau1", &VzConstitTau1, "VzConstitTau1/F");
+   if (!em) {
+     fChain->Branch("VxConstitTau1", &VxConstitTau1, "VxConstitTau1/F");
+     fChain->Branch("VyConstitTau1", &VyConstitTau1, "VyConstitTau1/F");
+     fChain->Branch("VzConstitTau1", &VzConstitTau1, "VzConstitTau1/F");
 
-   fChain->Branch("VxConstitTau2", &VxConstitTau2, "VxConstitTau2/F");
-   fChain->Branch("VyConstitTau2", &VyConstitTau2, "VyConstitTau2/F");
-   fChain->Branch("VzConstitTau2", &VzConstitTau2, "VzConstitTau2/F");
+     fChain->Branch("VxConstitTau2", &VxConstitTau2, "VxConstitTau2/F");
+     fChain->Branch("VyConstitTau2", &VyConstitTau2, "VyConstitTau2/F");
+     fChain->Branch("VzConstitTau2", &VzConstitTau2, "VzConstitTau2/F");
 
-   fChain->Branch("alphaminus", &alphaminus, "alphaminus/F");
-   fChain->Branch("alphaminus_uncorr", &alphaminus_uncorr, "alphaminus_uncorr/F");
+     fChain->Branch("alphaminus", &alphaminus, "alphaminus/F");
+     fChain->Branch("alphaminus_uncorr", &alphaminus_uncorr, "alphaminus_uncorr/F");
 
-   fChain->Branch("alpha_IP_1", &alpha_IP_1, "alpha_IP_1/F");
-   fChain->Branch("alpha_IP_2", &alpha_IP_2, "alpha_IP_2/F");
+     fChain->Branch("alpha_IP_1", &alpha_IP_1, "alpha_IP_1/F");
+     fChain->Branch("alpha_IP_2", &alpha_IP_2, "alpha_IP_2/F");
 
-   fChain->Branch("alpha_IP_uncorr_1", &alpha_IP_uncorr_1, "alpha_IP_uncorr_1/F");
-   fChain->Branch("alpha_IP_uncorr_2", &alpha_IP_uncorr_2, "alpha_IP_uncorr_2/F");
+     fChain->Branch("alpha_IP_uncorr_1", &alpha_IP_uncorr_1, "alpha_IP_uncorr_1/F");
+     fChain->Branch("alpha_IP_uncorr_2", &alpha_IP_uncorr_2, "alpha_IP_uncorr_2/F");
 
-   fChain->Branch("alpha_plane_1", &alpha_plane_1, "alpha_plane_1/F");
-   fChain->Branch("alpha_plane_2", &alpha_plane_2, "alpha_plane_2/F");
-
-   fChain->Branch("Prompt_pT", &Prompt_pT, "Prompt_pT/F");
+     fChain->Branch("alpha_plane_1", &alpha_plane_1, "alpha_plane_1/F");
+     fChain->Branch("alpha_plane_2", &alpha_plane_2, "alpha_plane_2/F");
+     
+     fChain->Branch("Prompt_pT", &Prompt_pT, "Prompt_pT/F");
    //   fChain->Branch("isrefitBS", &isrefitBS, "isrefitBS/O");
+     
+     fChain->Branch("sm_htt125", &TauSpinnerWeightsEven, "TauSpinnerWeightsEven/D");
+     fChain->Branch("ps_htt125", &TauSpinnerWeightsOdd, "TauSpinnerWeightsOdd/D");
+     fChain->Branch("mm_htt125", &TauSpinnerWeightsMaxMix, "TauSpinnerWeightsMaxMix/D");
+     fChain->Branch("minusmm_htt125", &TauSpinnerWeightsMinusMaxMix, "TauSpinnerWeightsMinusMaxMix/D");
+     fChain->Branch("mix0p375_htt125", &TauSpinnerWeightsMix0p375, "TauSpinnerWeightsMix0p375/D");
 
-   fChain->Branch("sm_htt125", &TauSpinnerWeightsEven, "TauSpinnerWeightsEven/D");
-   fChain->Branch("ps_htt125", &TauSpinnerWeightsOdd, "TauSpinnerWeightsOdd/D");
-   fChain->Branch("mm_htt125", &TauSpinnerWeightsMaxMix, "TauSpinnerWeightsMaxMix/D");
-   fChain->Branch("minusmm_htt125", &TauSpinnerWeightsMinusMaxMix, "TauSpinnerWeightsMinusMaxMix/D");
-   fChain->Branch("mix0p375_htt125", &TauSpinnerWeightsMix0p375, "TauSpinnerWeightsMix0p375/D");
+     fChain->Branch("tauspinnerH",&tauspinnerH,"tauspinnerH/D");
+     fChain->Branch("tauspinnerA",&tauspinnerA,"tauspinnerA/D");
+     fChain->Branch("tauspinnerMaxMix",&tauspinnerMaxMix,"tauspinnerMaxMix/D");
 
-   fChain->Branch("tauspinnerH",&tauspinnerH,"tauspinnerH/D");
-   fChain->Branch("tauspinnerA",&tauspinnerA,"tauspinnerA/D");
-   fChain->Branch("tauspinnerMaxMix",&tauspinnerMaxMix,"tauspinnerMaxMix/D");
-
-   fChain->Branch("y1_LF", &y1_LF, "y1_LF/D");
-   fChain->Branch("y2_LF", &y2_LF, "y2_LF/D");
-   fChain->Branch("y1_ZMF", &y1_ZMF, "y1_ZMF/D");
-   fChain->Branch("y2_ZMF", &y2_ZMF, "y2_ZMF/D");
-   fChain->Branch("y1_TMF", &y1_TMF, "y1_TMF/D");
-   fChain->Branch("y2_TMF", &y2_TMF, "y2_TMF/D");
+     fChain->Branch("y1_LF", &y1_LF, "y1_LF/D");
+     fChain->Branch("y2_LF", &y2_LF, "y2_LF/D");
+     fChain->Branch("y1_ZMF", &y1_ZMF, "y1_ZMF/D");
+     fChain->Branch("y2_ZMF", &y2_ZMF, "y2_ZMF/D");
+     fChain->Branch("y1_TMF", &y1_TMF, "y1_TMF/D");
+     fChain->Branch("y2_TMF", &y2_TMF, "y2_TMF/D");
+   }
 }
 
 void Synch17Tree::Fill(){

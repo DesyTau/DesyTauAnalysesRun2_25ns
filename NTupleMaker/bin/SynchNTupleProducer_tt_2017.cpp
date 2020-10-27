@@ -339,7 +339,7 @@ int main(int argc, char * argv[]) {
   
   TTree * tree = new TTree("TauCheck","TauCheck");
 
-  Synch17Tree *otree = new Synch17Tree(tree);
+  Synch17Tree *otree = new Synch17Tree(tree,false);
   //initializeCPvar(otree);
   int nTotalFiles = 0;
 

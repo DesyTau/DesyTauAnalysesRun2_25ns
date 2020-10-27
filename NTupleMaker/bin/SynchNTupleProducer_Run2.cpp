@@ -543,7 +543,7 @@ int main(int argc, char * argv[]){
   
   TTree *tree = new TTree("TauCheck", "TauCheck");
   TTree *gtree = new TTree("GenTauCheck", "GenTauCheck");
-  Synch17Tree *otree = new Synch17Tree(tree);
+  Synch17Tree *otree = new Synch17Tree(tree,false);
   initializeCPvar(otree);  
   Synch17GenTree *gentree = new Synch17GenTree(gtree);
   Synch17GenTree *gentreeForGoodRecoEvtsOnly = new Synch17GenTree(tree);
