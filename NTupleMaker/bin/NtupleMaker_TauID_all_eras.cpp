@@ -547,7 +547,7 @@ int main(int argc, char * argv[]) {
         isSinglePFTau180Trk50Filter = AccessTriggerInfo(analysisTree,SinglePFTau180Trk50Name,nSinglePFTau180Trk50Filter);
         isSinglePFTau180Trk50oneprongFilter = AccessTriggerInfo(analysisTree,SinglePFTau180Trk50oneprongName,nSinglePFTau180Trk50oneprongFilter);
         if (isData){
-          if (!isSinglePFTau180Trk50Filter || !isSinglePFTau180Trk50oneprongFilter){
+          if (!isSinglePFTau180Trk50Filter && !isSinglePFTau180Trk50oneprongFilter){
               std::cout << "Single Tau HLT filter not found" << std::endl;
         	    exit(-1);
           }
