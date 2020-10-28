@@ -501,7 +501,7 @@ int main(int argc, char * argv[]){
   TH1F* ConstitsPDG=new TH1F("ConstitsPDG","ConstitsPDG",500,-250,250);
   int nonpionphotonctr=0;
 
-  Synch17Tree *otree = new Synch17Tree(tree);
+  Synch17Tree *otree = new Synch17Tree(tree,false);
   initializeCPvar(otree);
   
   //Synch17GenTree *gentree = new Synch17GenTree(gtree);
