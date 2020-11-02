@@ -2044,6 +2044,7 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   //add refitted vertex with tracks removed from pair of leptons along with bs constraint
   if (crefittedvertexwithbs)
     {
+      refitvertexwithbs_count = 0;
       edm::Handle<RefitVertexCollection> RFVertexwithbs;
       iEvent.getByToken(RefittedwithBSPVToken_, RFVertexwithbs);
       if(RFVertexwithbs.isValid()) {
@@ -2092,7 +2093,6 @@ void NTupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
             }
           } //end of lepton pair
           if((nEle + nMu + nTau) < 2) continue;  //should have a pair of selected leptons
-
           refitvertexwithbs_eleIndex[refitvertexwithbs_count][0] = ele1;
           refitvertexwithbs_eleIndex[refitvertexwithbs_count][1] = ele2;
           refitvertexwithbs_muIndex[refitvertexwithbs_count][0] = muon1;
