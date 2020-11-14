@@ -69,7 +69,6 @@ bool isWTauNu = false;
 bool isWMuNu  = false;
 bool isDiJet = false;
 
-
 UInt_t run_;
 UInt_t lumi_;
 UInt_t event_;
@@ -78,6 +77,8 @@ Float_t puWeight_;
 Float_t genWeight_;
 Float_t trigWeight_;
 Float_t weight_;
+Float_t oddWeight_;
+Float_t evenWeight_;
 
 Bool_t trigger_;
 Bool_t isWTrig_;
@@ -145,16 +146,57 @@ Float_t tauMass_;
 Int_t   tauQ_;
 Float_t tauPz_;
 
+Float_t tau1Pt_;
+Float_t tau1Eta_;
+Float_t tau1Phi_;
+Float_t tau1Mass_;
+Int_t   tau1Q_;
+Float_t tau1Pz_;
+
 Float_t genTauWPt_;
 Float_t genTauWEta_;
 Float_t genTauWPhi_;
 Float_t genTauWE_;
+
+Float_t genTauPt_;
+Float_t genTauEta_;
+Float_t genTauPhi_;
+Float_t genTauVisPt_;
+Float_t genTauVisEta_;
+Float_t genTauVisPhi_;
+Float_t genTauVisMass_;
+Int_t genTauDecay_;
+Bool_t genTauFoundReco_;
+
+Float_t genTauLeadingTrackPt_;
+Float_t genTauLeadingTrackEta_;
+Float_t genTauLeadingTrackPhi_;
+
+Float_t genTau1Pt_;
+Float_t genTau1Eta_;
+Float_t genTau1Phi_;
+Float_t genTau1VisPt_;
+Float_t genTau1VisEta_;
+Float_t genTau1VisPhi_;
+Float_t genTau1VisMass_;
+Int_t genTau1Decay_;
+Bool_t genTau1FoundReco_;
+
+Float_t genTau1LeadingTrackPt_;
+Float_t genTau1LeadingTrackEta_;
+Float_t genTau1LeadingTrackPhi_;
 
 Float_t tauJetPt_;
 Float_t tauJetEta_;
 Float_t tauJetPhi_;
 Bool_t  tauJetTightId_;
 Int_t tauJetFlavor_;
+
+Float_t tau1JetPt_;
+Float_t tau1JetEta_;
+Float_t tau1JetPhi_;
+Bool_t  tau1JetTightId_;
+Int_t tau1JetFlavor_;
 
 Float_t recoilDPhi_;
 
@@ -164,16 +206,28 @@ Float_t recoilJetDPhi_;
 Int_t   tauDecay_;
 Int_t   tauGenDecay_;
 Int_t   tauGenMatchDecay_;
+
+Int_t   tau1Decay_;
+Int_t   tau1GenDecay_;
+Int_t   tau1GenMatchDecay_;
+
+
 UInt_t  tauNtrk05_;
 UInt_t  tauNtrk08_;
 UInt_t  tauNtrk1_;
 
 UInt_t  tauGenMatch_;
+UInt_t  tau1GenMatch_;
 
 Bool_t  tauDM_;
 Bool_t  tauNewDM_;
 
+Bool_t  tau1DM_;
+Bool_t  tau1NewDM_;
+
 Float_t tauIso_;
+Float_t tau1Iso_;
+
 Bool_t  tauLooseIso_;
 Bool_t  tauMediumIso_;
 Bool_t  tauTightIso_;
@@ -227,7 +281,63 @@ Bool_t taubyVVVLooseDeepTau2017v2p1VSe_;
 Bool_t taubyVVVLooseDeepTau2017v2p1VSjet_;
 
 Bool_t tauSinglePFTau180Trk50_;
+Bool_t tauSinglePFTau180Trk50_2_;
 Bool_t tauSinglePFTau180Trk50oneprong_;
+Bool_t tauSinglePFTau180Trk50oneprong_2_;
+
+Bool_t tauMatchedL1Tau80_;
+Bool_t tauMatchedL1Tau140_;
+
+Bool_t tauDoubleTauTrigger1_;
+Bool_t tauDoubleTauTrigger2_;
+Bool_t tauDoubleTauTrigger3_;
+Bool_t tauDoubleTauTrigger4_;
+
+Bool_t tauMuTauTrigger1_;
+Bool_t tauMuTauTrigger2_;
+Bool_t tauMuTauTrigger3_;
+Bool_t tauMuTauTrigger4_;
+
+
+Bool_t tau1byDeepTau2017v2p1VSeraw_;
+Bool_t tau1byDeepTau2017v2p1VSjetraw_;
+Bool_t tau1byDeepTau2017v2p1VSmuraw_;
+Bool_t tau1byLooseDeepTau2017v2p1VSe_;
+Bool_t tau1byLooseDeepTau2017v2p1VSjet_;
+Bool_t tau1byLooseDeepTau2017v2p1VSmu_;
+Bool_t tau1byMediumDeepTau2017v2p1VSe_;
+Bool_t tau1byMediumDeepTau2017v2p1VSjet_;
+Bool_t tau1byMediumDeepTau2017v2p1VSmu_;
+Bool_t tau1byTightDeepTau2017v2p1VSe_;
+Bool_t tau1byTightDeepTau2017v2p1VSjet_;
+Bool_t tau1byTightDeepTau2017v2p1VSmu_;
+Bool_t tau1byVLooseDeepTau2017v2p1VSe_;
+Bool_t tau1byVLooseDeepTau2017v2p1VSjet_;
+Bool_t tau1byVLooseDeepTau2017v2p1VSmu_;
+Bool_t tau1byVTightDeepTau2017v2p1VSe_;
+Bool_t tau1byVTightDeepTau2017v2p1VSjet_;
+Bool_t tau1byVVLooseDeepTau2017v2p1VSe_;
+Bool_t tau1byVVLooseDeepTau2017v2p1VSjet_;
+Bool_t tau1byVVTightDeepTau2017v2p1VSe_;
+Bool_t tau1byVVTightDeepTau2017v2p1VSjet_;
+Bool_t tau1byVVVLooseDeepTau2017v2p1VSe_;
+Bool_t tau1byVVVLooseDeepTau2017v2p1VSjet_;
+
+
+Bool_t tau1SingleMuon_;
+
+Bool_t tau1SinglePFTau180Trk50_;
+Bool_t tau1SinglePFTau180Trk50_2_;
+Bool_t tau1SinglePFTau180Trk50oneprong_;
+Bool_t tau1SinglePFTau180Trk50oneprong_2_;
+
+Bool_t tau1MatchedL1Tau80_;
+Bool_t tau1MatchedL1Tau140_;
+
+Bool_t tau1DoubleTauTrigger1_;
+Bool_t tau1DoubleTauTrigger2_;
+Bool_t tau1DoubleTauTrigger3_;
+Bool_t tau1DoubleTauTrigger4_;
 
 Float_t tauLeadingTrackPt_;
 Float_t tauLeadingTrackEta_;
@@ -235,9 +345,18 @@ Float_t tauLeadingTrackPhi_;
 Float_t tauLeadingTrackDz_;
 Float_t tauLeadingTrackDxy_;
 
+Float_t tau1LeadingTrackPt_;
+Float_t tau1LeadingTrackEta_;
+Float_t tau1LeadingTrackPhi_;
+Float_t tau1LeadingTrackDz_;
+Float_t tau1LeadingTrackDxy_;
+
 UInt_t nMuon_;
 UInt_t nSelMuon_;
 UInt_t nElec_;
+UInt_t nSelElec_;
+
+Float_t deltaR_;
 
 UInt_t nJetsCentral20_;
 UInt_t nJetsCentral30_;
@@ -348,12 +467,257 @@ bool isPFJet450HLTFilter = false;
 unsigned int nSinglePFTau180Trk50Filter = 0;
 bool isSinglePFTau180Trk50Filter = false;
 
+unsigned int nSinglePFTau180Trk50Filter2 = 0;
+bool isSinglePFTau180Trk50Filter2 = false;
+
 unsigned int nSinglePFTau180Trk50oneprongFilter = 0;
 bool isSinglePFTau180Trk50oneprongFilter = false;
+
+unsigned int nSinglePFTau180Trk50oneprongFilter2 = 0;
+bool isSinglePFTau180Trk50oneprongFilter2 = false;
+
+unsigned int nDoubleTauFilter1 = 0;
+bool isDoubleTauFilter1 = false;
+
+unsigned int nDoubleTauFilter2 = 0;
+bool isDoubleTauFilter2 = false;
+
+unsigned int nDoubleTauFilter3 = 0;
+bool isDoubleTauFilter3 = false;
+
+unsigned int nDoubleTauFilter4 = 0;
+bool isDoubleTauFilter4 = false;
+
+unsigned int nMuTauFilter1 = 0;
+bool isMuTauFilter1 = false;
+
+unsigned int nMuTauFilter2 = 0;
+bool isMuTauFilter2 = false;
+
+unsigned int nMuTauFilter3 = 0;
+bool isMuTauFilter3 = false;
+
+unsigned int nMuTauFilter4 = 0;
+bool isMuTauFilter4 = false;
+
+UInt_t ngentaus;
+Float_t gentau_pt[2];
+Float_t gentau_eta[2];
+Float_t gentau_phi[2];
+Int_t gentau_decay[2];
+UInt_t gentau_index[2];
+
+Float_t embWeight_;
+UInt_t vtx_trk;
+Float_t vtx_ex;
+Float_t vtx_ey;
+Float_t vtx_ez;
 
 TTree * ntuple_ = new TTree("NTuple","NTuple");
 TTree * trigNTuple_ = new TTree("TriggerNTuple","TriggerNTuple");
 
+void SetupTauTree() {
+
+   ntuple_->Branch("puWeight",  &puWeight_,  "puWeight/F");
+   ntuple_->Branch("genWeight", &genWeight_, "genWeight/F");
+   ntuple_->Branch("trigWeight",&trigWeight_,"trigWeight/F");
+   ntuple_->Branch("weight",    &weight_,    "weight/F");
+   ntuple_->Branch("embWeight", &embWeight_,  "embWeight/F");
+   ntuple_->Branch("evenWeight", &evenWeight_,  "evenWeight/F");
+   ntuple_->Branch("oddWeight", &oddWeight_,  "oddWeight/F");
+
+   ntuple_->Branch("ngentaus",&ngentaus,"ngentaus/i");
+   ntuple_->Branch("gentau_pt",gentau_pt,"gentau_pt[ngentaus]/F");
+   ntuple_->Branch("gentau_eta",gentau_eta,"gentau_eta[ngentaus]/F");
+   ntuple_->Branch("gentau_phi",gentau_phi,"gentau_phi[ngentaus]/F");
+
+   // Second tau (hadronic) (or tau from the W)
+
+   ntuple_->Branch("genTauPt",  &genTauPt_,  "genTauPt/F");
+   ntuple_->Branch("genTauEta", &genTauEta_, "genTauEta/F");
+   ntuple_->Branch("genTauPhi", &genTauPhi_, "genTauPhi/F");
+
+
+   ntuple_->Branch("genTauVisPt",  &genTauVisPt_,  "genTauVisPt/F");
+   ntuple_->Branch("genTauVisEta", &genTauVisEta_, "genTauVisEta/F");
+   ntuple_->Branch("genTauVisPhi", &genTauVisPhi_, "genTauVisPhi/F");
+   ntuple_->Branch("genTauVisMass",&genTauVisMass_,"genTauVisMass/F");
+   ntuple_->Branch("genTauDecay",&genTauDecay_,"genTauDecay/I");
+   ntuple_->Branch("genTauFoundReco",&genTauFoundReco_,"genTauFoundReco/O");
+
+   ntuple_->Branch("genTauLeadingTrackPt",&genTauLeadingTrackPt_,"genTauLeadingTrackPt/F");
+   ntuple_->Branch("genTauLeadingTrackEta",&genTauLeadingTrackEta_,"genTauLeadingTrackEta/F");
+   ntuple_->Branch("genTauLeadingTrackPhi",&genTauLeadingTrackPhi_,"genTauLeadingTrackPhi/F");
+
+   ntuple_->Branch("tauPt",  &tauPt_,  "tauPt/F");
+   ntuple_->Branch("tauPz",  &tauPz_,  "tauPz/F");
+   ntuple_->Branch("tauEta", &tauEta_, "tauEta/F");
+   ntuple_->Branch("tauPhi", &tauPhi_, "tauPhi/F");
+   ntuple_->Branch("tauMass",&tauMass_,"tauMass/F");
+   ntuple_->Branch("tauQ",   &tauQ_,   "tauQ/I");
+   ntuple_->Branch("tauDM",&tauDM_,"tauDM/O");
+   ntuple_->Branch("tauNewDM",&tauNewDM_,"tauNewDM/O");
+   ntuple_->Branch("tauDecay",   &tauDecay_,   "tauDecay/I");
+
+   ntuple_->Branch("tauLeadingTrackPt",&tauLeadingTrackPt_,"tauLeadingTrackPt/F");
+   ntuple_->Branch("tauLeadingTrackEta",&tauLeadingTrackEta_,"tauLeadingTrackEta/F");
+   ntuple_->Branch("tauLeadingTrackPhi",&tauLeadingTrackPhi_,"tauLeadingTrackPhi/F");
+   ntuple_->Branch("tauLeadingTrackDxy",&tauLeadingTrackDxy_,"tauLeadingTrackDxy/F");
+   ntuple_->Branch("tauLeadingTrackDz",&tauLeadingTrackDz_,"tauLeadingTrackDz/F");
+
+   ntuple_->Branch("tauJetPt",&tauJetPt_,"tauJetPt/F");
+   ntuple_->Branch("tauJetEta",&tauJetEta_,"tauJetEta/F");
+   ntuple_->Branch("tauJetPhi",&tauJetPhi_,"tauJetPhi/F");
+   ntuple_->Branch("tauJetTightId",&tauJetTightId_,"tauJetTightId/F");
+   ntuple_->Branch("tauJetFlavor",&tauJetFlavor_,"tauJetFlavor/F");
+   
+   ntuple_->Branch("taubyDeepTau2017v2p1VSeraw",&taubyDeepTau2017v2p1VSeraw_,"taubyDeepTau2017v2p1VSeraw/O");
+   ntuple_->Branch("taubyDeepTau2017v2p1VSjetraw",&taubyDeepTau2017v2p1VSjetraw_,"taubyDeepTau2017v2p1VSjetraw/O");
+   ntuple_->Branch("taubyDeepTau2017v2p1VSmuraw",&taubyDeepTau2017v2p1VSmuraw_,"taubyDeepTau2017v2p1VSmuraw/O");
+   ntuple_->Branch("taubyLooseDeepTau2017v2p1VSe",&taubyLooseDeepTau2017v2p1VSe_,"taubyLooseDeepTau2017v2p1VSe/O");
+   ntuple_->Branch("taubyLooseDeepTau2017v2p1VSjet",&taubyLooseDeepTau2017v2p1VSjet_,"taubyLooseDeepTau2017v2p1VSjet/O");
+   ntuple_->Branch("taubyLooseDeepTau2017v2p1VSmu",&taubyLooseDeepTau2017v2p1VSmu_,"taubyLooseDeepTau2017v2p1VSmu/O");
+   ntuple_->Branch("taubyMediumDeepTau2017v2p1VSe",&taubyMediumDeepTau2017v2p1VSe_,"taubyMediumDeepTau2017v2p1VSe/O");
+   ntuple_->Branch("taubyMediumDeepTau2017v2p1VSjet",&taubyMediumDeepTau2017v2p1VSjet_,"taubyMediumDeepTau2017v2p1VSjet/O");
+   ntuple_->Branch("taubyMediumDeepTau2017v2p1VSmu",&taubyMediumDeepTau2017v2p1VSmu_,"taubyMediumDeepTau2017v2p1VSmu/O");
+   ntuple_->Branch("taubyTightDeepTau2017v2p1VSe",&taubyTightDeepTau2017v2p1VSe_,"taubyTightDeepTau2017v2p1VSe/O");
+   ntuple_->Branch("taubyTightDeepTau2017v2p1VSjet",&taubyTightDeepTau2017v2p1VSjet_,"taubyTightDeepTau2017v2p1VSjet/O");
+   ntuple_->Branch("taubyTightDeepTau2017v2p1VSmu",&taubyTightDeepTau2017v2p1VSmu_,"taubyTightDeepTau2017v2p1VSmu/O");
+   ntuple_->Branch("taubyVLooseDeepTau2017v2p1VSe",&taubyVLooseDeepTau2017v2p1VSe_,"taubyVLooseDeepTau2017v2p1VSe/O");
+   ntuple_->Branch("taubyVLooseDeepTau2017v2p1VSjet",&taubyVLooseDeepTau2017v2p1VSjet_,"taubyVLooseDeepTau2017v2p1VSjet/O");
+   ntuple_->Branch("taubyVLooseDeepTau2017v2p1VSmu",&taubyVLooseDeepTau2017v2p1VSmu_,"taubyVLooseDeepTau2017v2p1VSmu/O");
+   ntuple_->Branch("taubyVTightDeepTau2017v2p1VSe",&taubyVTightDeepTau2017v2p1VSe_,"taubyVTightDeepTau2017v2p1VSe/O");
+   ntuple_->Branch("taubyVTightDeepTau2017v2p1VSjet",&taubyVTightDeepTau2017v2p1VSjet_,"taubyVTightDeepTau2017v2p1VSjet/O");
+   ntuple_->Branch("taubyVVLooseDeepTau2017v2p1VSe",&taubyVVLooseDeepTau2017v2p1VSe_,"taubyVVLooseDeepTau2017v2p1VSe/O");
+   ntuple_->Branch("taubyVVLooseDeepTau2017v2p1VSjet",&taubyVVLooseDeepTau2017v2p1VSjet_,"taubyVVLooseDeepTau2017v2p1VSjet/O");
+   ntuple_->Branch("taubyVVTightDeepTau2017v2p1VSe",&taubyVVTightDeepTau2017v2p1VSe_,"taubyVVTightDeepTau2017v2p1VSe/O");
+   ntuple_->Branch("taubyVVTightDeepTau2017v2p1VSjet",&taubyVVTightDeepTau2017v2p1VSjet_,"taubyVVTightDeepTau2017v2p1VSjet/O");
+   ntuple_->Branch("taubyVVVLooseDeepTau2017v2p1VSe",&taubyVVVLooseDeepTau2017v2p1VSe_,"taubyVVVLooseDeepTau2017v2p1VSe/O");
+   ntuple_->Branch("taubyVVVLooseDeepTau2017v2p1VSjet",&taubyVVVLooseDeepTau2017v2p1VSjet_,"taubyVVVLooseDeepTau2017v2p1VSjet/O");
+
+   ntuple_->Branch("tauSinglePFTau180Trk50",&tauSinglePFTau180Trk50_,"tauSinglePFTau180Trk50/O");
+   ntuple_->Branch("tauSinglePFTau180Trk50_2",&tauSinglePFTau180Trk50_2_,"tauSinglePFTau180Trk50_2/O");
+   ntuple_->Branch("tauSinglePFTau180Trk50oneprong",&tauSinglePFTau180Trk50oneprong_,"tauSinglePFTau180Trk50oneprong/O");
+   ntuple_->Branch("tauSinglePFTau180Trk50oneprong_2",&tauSinglePFTau180Trk50oneprong_2_,"tauSinglePFTau180Trk50oneprong_2/O");
+   
+   ntuple_->Branch("tauDoubleTauTrigger1",&tauDoubleTauTrigger1_,"tauDoubleTauTrigger1/O");
+   ntuple_->Branch("tauDoubleTauTrigger2",&tauDoubleTauTrigger2_,"tauDoubleTauTrigger2/O");
+   ntuple_->Branch("tauDoubleTauTrigger3",&tauDoubleTauTrigger3_,"tauDoubleTauTrigger3/O");
+   ntuple_->Branch("tauDoubleTauTrigger4",&tauDoubleTauTrigger4_,"tauDoubleTauTrigger4/O");
+   ntuple_->Branch("tauMatchedL1Tau80",&tauMatchedL1Tau80_,"tauMatchedL1Tau80/O");
+   ntuple_->Branch("tauMatchedL1Tau140",&tauMatchedL1Tau140_,"tauMatchedL1Tau140/O");
+
+
+   ntuple_->Branch("tauMuTauTrigger1",&tauMuTauTrigger1_,"tauMuTauTrigger1/O");
+   ntuple_->Branch("tauMuTauTrigger2",&tauMuTauTrigger2_,"tauMuTauTrigger2/O");
+   ntuple_->Branch("tauMuTauTrigger3",&tauMuTauTrigger3_,"tauMuTauTrigger3/O");
+   ntuple_->Branch("tauMuTauTrigger4",&tauMuTauTrigger4_,"tauMuTauTrigger4/O");
+
+   // first tau (could be also muon or electron)
+
+   ntuple_->Branch("genTau1Pt",  &genTau1Pt_,  "genTau1Pt/F");
+   ntuple_->Branch("genTau1Eta", &genTau1Eta_, "genTau1Eta/F");
+   ntuple_->Branch("genTau1Phi", &genTau1Phi_, "genTau1Phi/F");
+
+   ntuple_->Branch("genTau1VisPt",  &genTau1VisPt_,  "genTau1VisPt/F");
+   ntuple_->Branch("genTau1VisEta", &genTau1VisEta_, "genTau1VisEta/F");
+   ntuple_->Branch("genTau1VisPhi", &genTau1VisPhi_, "genTau1VisPhi/F");
+   ntuple_->Branch("genTau1VisMass",&genTau1VisMass_,"genTau1VisMass/F");
+   ntuple_->Branch("genTau1Decay",&genTau1Decay_,"genTau1Decay/I");
+   ntuple_->Branch("genTau1FoundReco",&genTau1FoundReco_,"genTau1FoundReco/O");
+
+   ntuple_->Branch("genTau1LeadingTrackPt",&genTau1LeadingTrackPt_,"genTau1LeadingTrackPt/F");
+   ntuple_->Branch("genTau1LeadingTrackEta",&genTau1LeadingTrackEta_,"genTau1LeadingTrackEta/F");
+   ntuple_->Branch("genTau1LeadingTrackPhi",&genTau1LeadingTrackPhi_,"genTau1LeadingTrackPhi/F");
+
+   ntuple_->Branch("tau1Pt",  &tau1Pt_,  "tau1Pt/F");
+   ntuple_->Branch("tau1Pz",  &tau1Pz_,  "tau1Pz/F");
+   ntuple_->Branch("tau1Eta", &tau1Eta_, "tau1Eta/F");
+   ntuple_->Branch("tau1Phi", &tau1Phi_, "tau1Phi/F");
+   ntuple_->Branch("tau1Mass",&tau1Mass_,"tau1Mass/F");
+   ntuple_->Branch("tau1Q",   &tau1Q_,   "tau1Q/I");
+   ntuple_->Branch("tau1DM",&tau1DM_,"tau1DM/O");
+   ntuple_->Branch("tau1NewDM",&tau1NewDM_,"tau1NewDM/O");
+   ntuple_->Branch("tau1Decay",   &tau1Decay_,   "tau1Decay/I");
+   ntuple_->Branch("tau1Iso", &tau1Iso_,"tau1Iso/F");
+
+   ntuple_->Branch("tau1LeadingTrackPt",&tau1LeadingTrackPt_,"tau1LeadingTrackPt/F");
+   ntuple_->Branch("tau1LeadingTrackEta",&tau1LeadingTrackEta_,"tau1LeadingTrackEta/F");
+   ntuple_->Branch("tau1LeadingTrackPhi",&tau1LeadingTrackPhi_,"tau1LeadingTrackPhi/F");
+   ntuple_->Branch("tau1LeadingTrackDxy",&tau1LeadingTrackDxy_,"tau1LeadingTrackDxy/F");
+   ntuple_->Branch("tau1LeadingTrackDz",&tau1LeadingTrackDz_,"tau1LeadingTrackDz/F");
+   
+   ntuple_->Branch("tau1JetPt",&tau1JetPt_,"tau1JetPt/F");
+   ntuple_->Branch("tau1JetEta",&tau1JetEta_,"tau1JetEta/F");
+   ntuple_->Branch("tau1JetPhi",&tau1JetPhi_,"tau1JetPhi/F");
+   ntuple_->Branch("tau1JetTightId",&tau1JetTightId_,"tau1JetTightId/F");
+   ntuple_->Branch("tau1JetFlavor",&tau1JetFlavor_,"tau1JetFlavor/F");
+
+   ntuple_->Branch("tau1byDeepTau2017v2p1VSeraw",&tau1byDeepTau2017v2p1VSeraw_,"tau1byDeepTau2017v2p1VSeraw/O");
+   ntuple_->Branch("tau1byDeepTau2017v2p1VSjetraw",&tau1byDeepTau2017v2p1VSjetraw_,"tau1byDeepTau2017v2p1VSjetraw/O");
+   ntuple_->Branch("tau1byDeepTau2017v2p1VSmuraw",&tau1byDeepTau2017v2p1VSmuraw_,"tau1byDeepTau2017v2p1VSmuraw/O");
+   ntuple_->Branch("tau1byLooseDeepTau2017v2p1VSe",&tau1byLooseDeepTau2017v2p1VSe_,"tau1byLooseDeepTau2017v2p1VSe/O");
+   ntuple_->Branch("tau1byLooseDeepTau2017v2p1VSjet",&tau1byLooseDeepTau2017v2p1VSjet_,"tau1byLooseDeepTau2017v2p1VSjet/O");
+   ntuple_->Branch("tau1byLooseDeepTau2017v2p1VSmu",&tau1byLooseDeepTau2017v2p1VSmu_,"tau1byLooseDeepTau2017v2p1VSmu/O");
+   ntuple_->Branch("tau1byMediumDeepTau2017v2p1VSe",&tau1byMediumDeepTau2017v2p1VSe_,"tau1byMediumDeepTau2017v2p1VSe/O");
+   ntuple_->Branch("tau1byMediumDeepTau2017v2p1VSjet",&tau1byMediumDeepTau2017v2p1VSjet_,"tau1byMediumDeepTau2017v2p1VSjet/O");
+   ntuple_->Branch("tau1byMediumDeepTau2017v2p1VSmu",&tau1byMediumDeepTau2017v2p1VSmu_,"tau1byMediumDeepTau2017v2p1VSmu/O");
+   ntuple_->Branch("tau1byTightDeepTau2017v2p1VSe",&tau1byTightDeepTau2017v2p1VSe_,"tau1byTightDeepTau2017v2p1VSe/O");
+   ntuple_->Branch("tau1byTightDeepTau2017v2p1VSjet",&tau1byTightDeepTau2017v2p1VSjet_,"tau1byTightDeepTau2017v2p1VSjet/O");
+   ntuple_->Branch("tau1byTightDeepTau2017v2p1VSmu",&tau1byTightDeepTau2017v2p1VSmu_,"tau1byTightDeepTau2017v2p1VSmu/O");
+   ntuple_->Branch("tau1byVLooseDeepTau2017v2p1VSe",&tau1byVLooseDeepTau2017v2p1VSe_,"tau1byVLooseDeepTau2017v2p1VSe/O");
+   ntuple_->Branch("tau1byVLooseDeepTau2017v2p1VSjet",&tau1byVLooseDeepTau2017v2p1VSjet_,"tau1byVLooseDeepTau2017v2p1VSjet/O");
+   ntuple_->Branch("tau1byVLooseDeepTau2017v2p1VSmu",&tau1byVLooseDeepTau2017v2p1VSmu_,"tau1byVLooseDeepTau2017v2p1VSmu/O");
+   ntuple_->Branch("tau1byVTightDeepTau2017v2p1VSe",&tau1byVTightDeepTau2017v2p1VSe_,"tau1byVTightDeepTau2017v2p1VSe/O");
+   ntuple_->Branch("tau1byVTightDeepTau2017v2p1VSjet",&tau1byVTightDeepTau2017v2p1VSjet_,"tau1byVTightDeepTau2017v2p1VSjet/O");
+   ntuple_->Branch("tau1byVVLooseDeepTau2017v2p1VSe",&tau1byVVLooseDeepTau2017v2p1VSe_,"tau1byVVLooseDeepTau2017v2p1VSe/O");
+   ntuple_->Branch("tau1byVVLooseDeepTau2017v2p1VSjet",&tau1byVVLooseDeepTau2017v2p1VSjet_,"tau1byVVLooseDeepTau2017v2p1VSjet/O");
+   ntuple_->Branch("tau1byVVTightDeepTau2017v2p1VSe",&tau1byVVTightDeepTau2017v2p1VSe_,"tau1byVVTightDeepTau2017v2p1VSe/O");
+   ntuple_->Branch("tau1byVVTightDeepTau2017v2p1VSjet",&tau1byVVTightDeepTau2017v2p1VSjet_,"tau1byVVTightDeepTau2017v2p1VSjet/O");
+   ntuple_->Branch("tau1byVVVLooseDeepTau2017v2p1VSe",&tau1byVVVLooseDeepTau2017v2p1VSe_,"tau1byVVVLooseDeepTau2017v2p1VSe/O");
+   ntuple_->Branch("tau1byVVVLooseDeepTau2017v2p1VSjet",&tau1byVVVLooseDeepTau2017v2p1VSjet_,"tau1byVVVLooseDeepTau2017v2p1VSjet/O");
+
+   ntuple_->Branch("tau1SingleMuon",&tau1SingleMuon_,"tau1SingleMuon/O");   
+   ntuple_->Branch("tau1SinglePFTau180Trk50",&tau1SinglePFTau180Trk50_,"tau1SinglePFTau180Trk50/O");
+   ntuple_->Branch("tau1SinglePFTau180Trk50_2",&tau1SinglePFTau180Trk50_2_,"tau1SinglePFTau180Trk50_2/O");
+   ntuple_->Branch("tau1SinglePFTau180Trk50oneprong",&tau1SinglePFTau180Trk50oneprong_,"tau1SinglePFTau180Trk50oneprong/O");
+   ntuple_->Branch("tau1SinglePFTau180Trk50oneprong_2",&tau1SinglePFTau180Trk50oneprong_2_,"tau1SinglePFTau180Trk50oneprong_2/O");
+   ntuple_->Branch("tau1MatchedL1Tau80",&tau1MatchedL1Tau80_,"tau1MatchedL1Tau80/O");
+   ntuple_->Branch("tau1MatchedL1Tau140",&tau1MatchedL1Tau140_,"tau1MatchedL1Tau140/O");
+
+   ntuple_->Branch("tau1DoubleTauTrigger1",&tau1DoubleTauTrigger1_,"tau1DoubleTauTrigger1/O");
+   ntuple_->Branch("tau1DoubleTauTrigger2",&tau1DoubleTauTrigger2_,"tau1DoubleTauTrigger2/O");
+   ntuple_->Branch("tau1DoubleTauTrigger3",&tau1DoubleTauTrigger3_,"tau1DoubleTauTrigger3/O");
+   ntuple_->Branch("tau1DoubleTauTrigger4",&tau1DoubleTauTrigger4_,"tau1DoubleTauTrigger4/O");
+
+   ntuple_->Branch("deltaR",&deltaR_,"deltaR/F");
+
+   ntuple_->Branch("trigger",&trigger_,"trigger/O");
+   ntuple_->Branch("met",&met_,"met/F");
+   
+   ntuple_->Branch("nMuon",&nMuon_,"nMuon/i");
+   ntuple_->Branch("nElec",&nElec_,"nElec/i");
+
+   ntuple_->Branch("nSelMuon",&nSelMuon_,"nSelMuon/i");
+   ntuple_->Branch("nSelElec",&nSelElec_,"nSelElec/i");
+   
+   ntuple_->Branch("nJetsCentral20",&nJetsCentral20_,"nJetsCentral20/i");
+   ntuple_->Branch("nJetsCentral30",&nJetsCentral30_,"nJetsCentral30/i");
+   
+   ntuple_->Branch("nJetsForward20",&nJetsForward20_,"nJetsForward20/i");
+   ntuple_->Branch("nJetsForward30",&nJetsForward30_,"nJetsForward30/i");
+
+   ntuple_->Branch("recoilDPhi",&recoilDPhi_,"recoilDPhi/F");
+   ntuple_->Branch("mhtNoMu",&mhtNoMu_,"mhtNoMu/F");
+   ntuple_->Branch("mht",&mht_,"mht/F");
+   ntuple_->Branch("metNoMu",&metNoMu_,"metNoMu/F");
+   ntuple_->Branch("vtx_trk",&vtx_trk,"vtx_trk/i");
+   ntuple_->Branch("vtx_ex",&vtx_ex,"vtx_ex/F");
+   ntuple_->Branch("vtx_ey",&vtx_ey,"vtx_ey/F");
+   ntuple_->Branch("vtx_ez",&vtx_ez,"vtx_ez/F");
+   
+
+}
 
 void SetupTrees()
 {
@@ -625,7 +989,9 @@ void SetDefaultValues(){
    genWeight_ = 1;
    trigWeight_ = 1;
    puWeight_ = 1;
-   
+   oddWeight_ = 1;
+   evenWeight_ = 1;
+
    trig_ = false;
    metFilters_ = true;
 
@@ -646,6 +1012,11 @@ void SetDefaultValues(){
    lepWPhi_ = 0;
    lepWE_   = 0;
 
+   vtx_trk = 0;
+   vtx_ex = 0;
+   vtx_ey = 0;
+   vtx_ez = 0;
+
    met_ =  -1;
    metphi_ =  0;
    mttau_ = 0;
@@ -663,6 +1034,35 @@ void SetDefaultValues(){
    muon2Eta_ = 0;
    muon2Phi_ = 0;
    muon2Q_ = 0;
+
+   genTauPt_ = -9999;
+   genTauEta_ = -9999;
+   genTauPhi_ = - 9999;
+   genTauVisPt_ = -9999;
+   genTauVisEta_ = -9999;
+   genTauVisPhi_ = -9999;
+   genTauVisMass_ = -9999;
+   genTauDecay_ = -9999;
+   genTauFoundReco_ = false;
+
+   genTauLeadingTrackPt_ = -999;
+   genTauLeadingTrackEta_ = -999;
+   genTauLeadingTrackPhi_ = -999;
+
+   genTau1Pt_ = -9999;
+   genTau1Eta_ = -9999;
+   genTau1Phi_ = - 9999;
+   genTau1VisPt_ = -9999;
+   genTau1VisEta_ = -9999;
+   genTau1VisPhi_ = -9999;
+   genTau1VisMass_ = -9999;
+   genTau1Decay_ = -9999;
+   genTau1FoundReco_ = false;
+
+   genTau1LeadingTrackPt_ = -999;
+   genTau1LeadingTrackEta_ = -999;
+   genTau1LeadingTrackPhi_ = -999;
+
    
    tauPt_ = 0;
    tauPz_ = 0;
@@ -671,11 +1071,24 @@ void SetDefaultValues(){
    tauMass_ = 0;
    tauQ_ = 0;
 
+   tau1Pt_ = 0;
+   tau1Pz_ = 0;
+   tau1Eta_ = 0;
+   tau1Phi_ = 0;
+   tau1Mass_ = 0;
+   tau1Q_ = 0;
+
    tauJetPt_ = 0;
    tauJetEta_ = 0;
    tauJetPhi_ = 0;
    tauJetTightId_ = false;
    tauJetFlavor_ = 0;
+   
+   tau1JetPt_ = 0;
+   tau1JetEta_ = 0;
+   tau1JetPhi_ = 0;
+   tau1JetTightId_ = false;
+   tau1JetFlavor_ = 0;
    
    recoilDPhi_ = 0;
    
@@ -689,23 +1102,35 @@ void SetDefaultValues(){
    
    tauDecay_ = -1;
    tauGenDecay_ = -1;
-   tauGenMatchDecay_ = -1;
    tauGenMatch_ = 6;
+
+   tau1Decay_ = -1;
 
    tauNtrk1_  = 0;
    tauNtrk05_ = 0;
    tauNtrk08_ = 0;
    
-   tauLeadingTrackPt_  = 0;
-   tauLeadingTrackEta_ = 0;
-   tauLeadingTrackPhi_ = 0;
+   tauLeadingTrackPt_  = -999;
+   tauLeadingTrackEta_ = -999;
+   tauLeadingTrackPhi_ = -999;
    tauLeadingTrackDz_  = -999;
    tauLeadingTrackDxy_ = -999;
    
+   tau1LeadingTrackPt_  = -999;
+   tau1LeadingTrackEta_ = -999;
+   tau1LeadingTrackPhi_ = -999;
+   tau1LeadingTrackDz_  = -999;
+   tau1LeadingTrackDxy_ = -999;
+
    tauDM_ = false;
    tauNewDM_ = false;
 
+   tau1DM_ = false;
+   tau1NewDM_ = false;
+
    tauIso_ = 0;
+   tau1Iso_ = 0;
+
    tauLooseIso_ = false;
    tauMediumIso_ = false;
    tauTightIso_ = false;
@@ -758,13 +1183,68 @@ void SetDefaultValues(){
    taubyVVVLooseDeepTau2017v2p1VSe_= false;
    taubyVVVLooseDeepTau2017v2p1VSjet_= false;
    
-
    tauSinglePFTau180Trk50_ = false;
+   tauSinglePFTau180Trk50_2_ = false;
    tauSinglePFTau180Trk50oneprong_ = false;
+   tauSinglePFTau180Trk50oneprong_2_ = false;
+
+   tauMatchedL1Tau80_ = false;
+   tauMatchedL1Tau140_ = false;
+
+   tauDoubleTauTrigger1_ = false;
+   tauDoubleTauTrigger2_ = false;
+   tauDoubleTauTrigger3_ = false;
+   tauDoubleTauTrigger4_ = false;
+
+   tauMuTauTrigger1_ = false;
+   tauMuTauTrigger2_ = false;
+   tauMuTauTrigger3_ = false;
+   tauMuTauTrigger4_ = false;
+
+
+   tau1byDeepTau2017v2p1VSeraw_= false;
+   tau1byDeepTau2017v2p1VSjetraw_= false;
+   tau1byDeepTau2017v2p1VSmuraw_= false;
+   tau1byLooseDeepTau2017v2p1VSe_= false;
+   tau1byLooseDeepTau2017v2p1VSjet_= false;
+   tau1byLooseDeepTau2017v2p1VSmu_= false;
+   tau1byMediumDeepTau2017v2p1VSe_= false;
+   tau1byMediumDeepTau2017v2p1VSjet_= false;
+   tau1byMediumDeepTau2017v2p1VSmu_= false;
+   tau1byTightDeepTau2017v2p1VSe_= false;
+   tau1byTightDeepTau2017v2p1VSjet_= false;
+   tau1byTightDeepTau2017v2p1VSmu_= false;
+   tau1byVLooseDeepTau2017v2p1VSe_= false;
+   tau1byVLooseDeepTau2017v2p1VSjet_= false;
+   tau1byVLooseDeepTau2017v2p1VSmu_= false;
+   tau1byVTightDeepTau2017v2p1VSe_= false;
+   tau1byVTightDeepTau2017v2p1VSjet_= false;
+   tau1byVVLooseDeepTau2017v2p1VSe_= false;
+   tau1byVVLooseDeepTau2017v2p1VSjet_= false;
+   tau1byVVTightDeepTau2017v2p1VSe_= false;
+   tau1byVVTightDeepTau2017v2p1VSjet_= false;
+   tau1byVVVLooseDeepTau2017v2p1VSe_= false;
+   tau1byVVVLooseDeepTau2017v2p1VSjet_= false;
+   
+   tau1SingleMuon_ = false;
+
+   tau1SinglePFTau180Trk50_ = false;
+   tau1SinglePFTau180Trk50_2_ = false;
+   tau1SinglePFTau180Trk50oneprong_ = false;
+   tau1SinglePFTau180Trk50oneprong_2_ = false;
+
+   tau1MatchedL1Tau80_ = false;
+   tau1MatchedL1Tau140_ = false;
+
+   tau1DoubleTauTrigger1_ = false;
+   tau1DoubleTauTrigger2_ = false;
+   tau1DoubleTauTrigger3_ = false;
+   tau1DoubleTauTrigger4_ = false;
 
    nMuon_ = 0;
    nSelMuon_ = 0;
    nElec_ = 0;
+   nSelElec_ = 0;
    
    nJetsCentral20_ = 0;
    nJetsCentral30_ = 0;
@@ -845,6 +1325,8 @@ void SetDefaultValues(){
    nMuonTrig_ = 0;
    nSelMuonTrig_ = 0;
 
+   deltaR_ = 9999;
+
    npartons_ = 9999;
    npartonsNLO_ = 9999;
    lheWPt_ = -1;
@@ -879,8 +1361,38 @@ void SetDefaultValues(){
    nSinglePFTau180Trk50Filter = 0;
    isSinglePFTau180Trk50Filter = false;
    
+   nSinglePFTau180Trk50Filter2 = 0;
+   isSinglePFTau180Trk50Filter2 = false;
+   
    nSinglePFTau180Trk50oneprongFilter = 0;
    isSinglePFTau180Trk50oneprongFilter = false;
+
+   nSinglePFTau180Trk50oneprongFilter2 = 0;
+   isSinglePFTau180Trk50oneprongFilter2 = false;
+
+   nDoubleTauFilter1 = 0;
+   isDoubleTauFilter1 = false;
+
+   nDoubleTauFilter2 = 0;
+   isDoubleTauFilter2 = false;
+
+   nDoubleTauFilter3 = 0;
+   isDoubleTauFilter3 = false;
+
+   nDoubleTauFilter4 = 0;
+   isDoubleTauFilter4 = false;
+
+   nMuTauFilter1 = 0;
+   isMuTauFilter1 = false;
+
+   nMuTauFilter2 = 0;
+   isMuTauFilter2 = false;
+
+   nMuTauFilter3 = 0;
+   isMuTauFilter3 = false;
+
+   nMuTauFilter4 = 0;
+   isMuTauFilter4 = false;
 
 
 }
