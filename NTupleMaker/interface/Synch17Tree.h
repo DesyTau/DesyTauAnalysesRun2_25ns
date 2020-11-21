@@ -227,6 +227,7 @@ public :
   Float_t 	  byVTightIsolationMVArun2017v2DBoldDMwLT2017_1;
   Float_t 	  byVVTightIsolationMVArun2017v2DBoldDMwLT2017_1;
   Float_t         idisoweight_1;
+  Float_t         trkeffweight_1;
   Float_t         idisoweight_antiiso_1;
   Float_t         trigweight_1;
   Float_t         trigweight_antiiso_1;
@@ -295,6 +296,7 @@ public :
   // new 
   Float_t         idisoweight_2;
   Float_t         idisoweight_antiiso_2;
+  Float_t         trkeffweight_2;
   Float_t         trigweight_2;
   Float_t         trigweight_l_lt;
   Float_t         trigweight_t_lt;
@@ -440,6 +442,12 @@ public :
   Bool_t          xTriggerLep;
   Bool_t          xTriggerTau;
   Bool_t          xTrigger;
+  Bool_t          trg_muhigh;
+  Bool_t          trg_mulow;
+  Bool_t          trg_ehigh;
+  Bool_t          trg_elow;
+  Bool_t          trg_muhigh_elow;
+  Bool_t          trg_ehigh_mulow;
 
   //MET
   Float_t         met;
@@ -466,7 +474,6 @@ public :
   Float_t         puppimetcov10;
   Float_t         puppimetcov11;
   Float_t         puppipzetamiss;
-  Float_t         puppipzetavis;
   Float_t         puppipzeta;
 
   Float_t         puppimet_ex_UnclusteredEnUp;
@@ -491,6 +498,7 @@ public :
   Float_t         pt_tt;
   Float_t         m_vis;
   Float_t         mt_tot;
+
   Float_t         m_sv;
   Float_t         pt_sv;
   Float_t         eta_sv;
@@ -498,6 +506,9 @@ public :
   Float_t         met_sv;
   Float_t         mt_sv;
   
+  Float_t         pt_tt_puppi;
+  Float_t         mt_tot_puppi;
+
   Float_t         m_fast;
   Float_t         pt_fast;
   Float_t         eta_fast;

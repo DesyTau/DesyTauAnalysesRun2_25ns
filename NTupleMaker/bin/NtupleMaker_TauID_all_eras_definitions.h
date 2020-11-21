@@ -323,8 +323,8 @@ Bool_t tau1byVVTightDeepTau2017v2p1VSjet_;
 Bool_t tau1byVVVLooseDeepTau2017v2p1VSe_;
 Bool_t tau1byVVVLooseDeepTau2017v2p1VSjet_;
 
-
 Bool_t tau1SingleMuon_;
+Bool_t tau1SingleElectron_;
 
 Bool_t tau1SinglePFTau180Trk50_;
 Bool_t tau1SinglePFTau180Trk50_2_;
@@ -439,6 +439,9 @@ bool isSingleMuonHLTFilter = false;
 unsigned int nSingleMuonHLTFilter1 = 0;
 bool isSingleMuonHLTFilter1 = false;
 bool isSingleMuonHLTFilter2 = false;
+
+unsigned int nSingleElectronHLTFilter = 0;
+bool isSingleElectronHLTFilter = false;
 
 unsigned int nPFJet60HLTFilter = 0;
 bool isPFJet60HLTFilter = false;
@@ -678,6 +681,7 @@ void SetupTauTree() {
    ntuple_->Branch("tau1byVVVLooseDeepTau2017v2p1VSjet",&tau1byVVVLooseDeepTau2017v2p1VSjet_,"tau1byVVVLooseDeepTau2017v2p1VSjet/O");
 
    ntuple_->Branch("tau1SingleMuon",&tau1SingleMuon_,"tau1SingleMuon/O");   
+   ntuple_->Branch("tau1SingleElectron",&tau1SingleElectron_,"tau1SingleElectron/O");   
    ntuple_->Branch("tau1SinglePFTau180Trk50",&tau1SinglePFTau180Trk50_,"tau1SinglePFTau180Trk50/O");
    ntuple_->Branch("tau1SinglePFTau180Trk50_2",&tau1SinglePFTau180Trk50_2_,"tau1SinglePFTau180Trk50_2/O");
    ntuple_->Branch("tau1SinglePFTau180Trk50oneprong",&tau1SinglePFTau180Trk50oneprong_,"tau1SinglePFTau180Trk50oneprong/O");
@@ -693,6 +697,7 @@ void SetupTauTree() {
    ntuple_->Branch("deltaR",&deltaR_,"deltaR/F");
 
    ntuple_->Branch("trigger",&trigger_,"trigger/O");
+   ntuple_->Branch("metFilters",&metFilters_,"metFilters/O");
    ntuple_->Branch("met",&met_,"met/F");
    
    ntuple_->Branch("nMuon",&nMuon_,"nMuon/i");
@@ -1227,6 +1232,7 @@ void SetDefaultValues(){
    tau1byVVVLooseDeepTau2017v2p1VSjet_= false;
    
    tau1SingleMuon_ = false;
+   tau1SingleElectron_ = false;
 
    tau1SinglePFTau180Trk50_ = false;
    tau1SinglePFTau180Trk50_2_ = false;

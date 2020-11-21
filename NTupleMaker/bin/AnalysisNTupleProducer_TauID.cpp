@@ -106,8 +106,10 @@ int main(int argc, char * argv[]) {
    const bool applyGoodRunSelection = cfg.get<bool>("ApplyGoodRunSelection");
    const string jsonFile = cfg.get<string>("jsonFile");
    
-   const string singleMuonHLTFilter = cfg.get<string>("SingleMuonHLTFilter");
+   const string singleMuonHLTFilter  = cfg.get<string>("SingleMuonHLTFilter");
    const string singleMuonHLTFilter1 = cfg.get<string>("SingleMuonHLTFilter1");
+
+   const string singleElectronHLTFilter = cfg.get<string>("SingleElectronHLTFilter");
 
    const string singlePFTau180Trk50Name = cfg.get<string>("SinglePFTau180Trk50Name");
    const string singlePFTau180Trk50Name2 = cfg.get<string>("SinglePFTau180Trk50Name2");
@@ -129,6 +131,7 @@ int main(int argc, char * argv[]) {
 
    TString SingleMuonHLTFilter(singleMuonHLTFilter);
    TString SingleMuonHLTFilter1(singleMuonHLTFilter1);
+   TString SingleElectronHLTFilter(singleElectronHLTFilter);
    TString SinglePFTau180Trk50Name(singlePFTau180Trk50Name);
    TString SinglePFTau180Trk50Name2(singlePFTau180Trk50Name2);
    TString SinglePFTau180Trk50oneprongName(singlePFTau180Trk50oneprongName);
@@ -225,6 +228,47 @@ int main(int argc, char * argv[]) {
    TFile * trigEffFile = new TFile(TString(cmsswBase)+"/src/"+trigEffFileName,"read");
    iniTriggerEfficiencies(trigEffFile,map_trigEffData,map_trigEffMC);
   
+  // ------------------- set MET filters ---------------------------------
+   std::vector<TString> metFlags; metFlags.clear();
+   if (era == "2017"){                                      //FIXME: Recommendations changed, has to be updated
+     metFlags.push_back("Flag_HBHENoiseFilter");
+     metFlags.push_back("Flag_HBHENoiseIsoFilter");
+     metFlags.push_back("Flag_globalTightHalo2016Filter");
+     metFlags.push_back("Flag_EcalDeadCellTriggerPrimitiveFilter");
+     metFlags.push_back("Flag_goodVertices"); 
+     if (isData)
+       metFlags.push_back("Flag_eeBadScFilter");
+     //metFlags.push_back("Flag_muonBadTrackFilter");
+     //metFlags.push_back("Flag_chargedHadronTrackResolutionFilter");
+     metFlags.push_back("Flag_BadChargedCandidateFilter");
+     metFlags.push_back("Flag_BadPFMuonFilter");
+     metFlags.push_back("Flag_ecalBadCalibFilter");
+   }
+   else if (era == "2018"){
+     metFlags.push_back("Flag_goodVertices");
+     metFlags.push_back("Flag_globalSuperTightHalo2016Filter");
+     metFlags.push_back("Flag_HBHENoiseFilter");
+     metFlags.push_back("Flag_HBHENoiseIsoFilter");
+     metFlags.push_back("Flag_EcalDeadCellTriggerPrimitiveFilter");
+     metFlags.push_back("Flag_BadPFMuonFilter");
+     metFlags.push_back("Flag_BadChargedCandidateFilter");
+     if (isData)
+       metFlags.push_back("Flag_eeBadScFilter");
+     metFlags.push_back("ecalBadCalibReducedMINIAODFilter");
+   }
+   else if (era == "2016"){
+     metFlags.push_back("Flag_goodVertices");
+     if(isData) metFlags.push_back("Flag_globalSuperTightHalo2016Filter");
+     metFlags.push_back("Flag_HBHENoiseFilter");
+     metFlags.push_back("Flag_HBHENoiseIsoFilter");
+     metFlags.push_back("Flag_EcalDeadCellTriggerPrimitiveFilter");
+     metFlags.push_back("Flag_BadPFMuonFilter");
+   }
+   else {
+     std::cout << "MET filters not defined for era "<<era<<std::endl;
+     exit(-1);
+   }
+
    // --------------------------------------------------------------------------
    // ------------------- open files --------------------------------------------
    // --------------------------------------------------------------------------
@@ -384,6 +428,7 @@ int main(int argc, char * argv[]) {
         // *********************************        
 	isSingleMuonHLTFilter = AccessTriggerInfo(analysisTree,SingleMuonHLTFilter,nSingleMuonHLTFilter);
 	isSingleMuonHLTFilter1 = AccessTriggerInfo(analysisTree,SingleMuonHLTFilter1,nSingleMuonHLTFilter1);
+	isSingleElectronHLTFilter = AccessTriggerInfo(analysisTree,SingleElectronHLTFilter,nSingleElectronHLTFilter);
 
         isSinglePFTau180Trk50Filter = AccessTriggerInfo(analysisTree,SinglePFTau180Trk50Name,nSinglePFTau180Trk50Filter);
         isSinglePFTau180Trk50Filter2 = AccessTriggerInfo(analysisTree,SinglePFTau180Trk50Name2,nSinglePFTau180Trk50Filter2);
@@ -433,6 +478,10 @@ int main(int argc, char * argv[]) {
 	  }
 	}
 	trigger_ = isMetHLT;
+
+        // setting met filters
+        metFilters_ = metFiltersPasses(analysisTree,metFlags,isData);
+
 	  
         // *****************************
         // accessing PF MET ************
@@ -875,6 +924,18 @@ int main(int argc, char * argv[]) {
 		tau1Mass_ = electronMass;
 		tau1Q_ = int(analysisTree.electron_charge[index]);
 		tau1Iso_ = isolation;
+
+		tau1SingleElectron_ = false;
+		for (unsigned int iT=0; iT<analysisTree.trigobject_count;++iT) {
+		  double dR = deltaR(analysisTree.trigobject_eta[iT],analysisTree.trigobject_phi[iT], 
+				     tau1Eta_,tau1Phi_);
+		  if (dR>0.5) continue;
+		  if (isSingleElectronHLTFilter) {
+		    if (analysisTree.trigobject_filters[iT][nSingleElectronHLTFilter]) tau1SingleElectron_ = true;
+		  }
+
+		}
+
 	      }
 	    }
 
