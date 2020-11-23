@@ -211,11 +211,11 @@ int main(int argc, char * argv[]){
     exit(-1);
   }
 
-  if(argc < 4){
+  if(argc < 3){
     std::cout << "RUN ERROR: wrong number of arguments"<< std::endl;
     std::cout << "Please run the code in the following way:"<< std::endl;
-    std::cout << "SynchNTupleProducer_Run2 NameOfTheConfigurationFile FileList Channel" << std::endl;
-    std::cout << "example: SynchNTupleProducer_Run2 analysisMacroSynch_lept_mt_DATA_SingleMuon.conf DATA_SingleMuon mt" << std::endl;
+    std::cout << "SynchNTupleProducer_em_Run2 NameOfTheConfigurationFile FileList" << std::endl;
+    std::cout << "example: SynchNTupleProducer_Run2 analysisMacroSynch_em_2018.conf DATA_SingleMuon" << std::endl;
     exit(-1);
   }
 
@@ -234,9 +234,9 @@ int main(int argc, char * argv[]){
   }
 
   const int era = cfg.get<int>("era");
+  const bool Synch            = cfg.get<bool>("Synch");
   const bool ApplyPUweight    = cfg.get<bool>("ApplyPUweight"); 
   const bool ApplyLepSF       = cfg.get<bool>("ApplyLepSF"); 
-  const bool ApplyTrigger     = cfg.get<bool>("ApplyTrigger"); 
   const bool ApplySVFit       = cfg.get<bool>("ApplySVFit");
   const bool ApplyFastMTT     = cfg.get<bool>("ApplyFastMTT");
   const bool ApplyBTagScaling = cfg.get<bool>("ApplyBTagScaling");
@@ -271,10 +271,10 @@ int main(int argc, char * argv[]){
   else if (era == 2018) year_label = "2018ReReco";	
   else {std::cout << "year is not 2016, 2017, 2018 - exiting" << '\n'; exit(-1);}
 
-  IpCorrection *ipMuon   = new IpCorrection(TString(cmsswBase) + "/src/" + IpCorrFileNameMuon);
-  IpCorrection *ipMuonBS = new IpCorrection(TString(cmsswBase) + "/src/" + IpCorrFileNameMuonBS);  
-  IpCorrection *ipElec   = new IpCorrection(TString(cmsswBase) + "/src/" + IpCorrFileNameElec);
-  IpCorrection *ipElecBS = new IpCorrection(TString(cmsswBase) + "/src/" + IpCorrFileNameElecBS);  
+  IpCorrection *CorrectorIpMuon   = new IpCorrection(TString(cmsswBase) + "/src/" + IpCorrFileNameMuon);
+  IpCorrection *CorrectorIpMuonBS = new IpCorrection(TString(cmsswBase) + "/src/" + IpCorrFileNameMuonBS);  
+  IpCorrection *CorrectorIpElec   = new IpCorrection(TString(cmsswBase) + "/src/" + IpCorrFileNameElec);
+  IpCorrection *CorrectorIpElecBS = new IpCorrection(TString(cmsswBase) + "/src/" + IpCorrFileNameElecBS);  
 
   //svfit
   const string svFitPtResFile = TString(TString(cmsswBase) + "/src/" + TString(cfg.get<string>("svFitPtResFile"))).Data();
@@ -353,6 +353,8 @@ int main(int argc, char * argv[]){
   }  
   const struct btag_scaling_inputs inputs_btag_scaling_medium = {reader_B, reader_C, reader_Light, tagEff_B, tagEff_C, tagEff_Light, tagEff_B_nonCP5, tagEff_C_nonCP5, tagEff_Light_nonCP5, rand};
 
+  std::cout << "btagging loaded" << std::endl;
+
   // MET Recoil Corrections
   const bool isDY = (infiles.find("DY") != string::npos) || (infiles.find("EWKZ") != string::npos);//Corrections that should be applied on EWKZ are the same needed for DY
   const bool isWJets = (infiles.find("WJets") != string::npos) || (infiles.find("W1Jets") != string::npos) || (infiles.find("W2Jets") != string::npos) || (infiles.find("W3Jets") != string::npos) || (infiles.find("W4Jets") != string::npos) || (infiles.find("EWK") != string::npos);
@@ -369,16 +371,17 @@ int main(int argc, char * argv[]){
   kit::RecoilCorrector recoilCorrector(cfg.get<string>("RecoilFilePath"));
   kit::MEtSys MetSys(cfg.get<string>("RecoilSysFilePath"));
 
+  std::cout << "recoil corrections" << std::endl;
+
   // kinematic cuts on electrons
-  const float ptElectronLowCut   = cfg.get<float>("ptElectronLowCut");
-  const float ptElectronHighCut  = cfg.get<float>("ptElectronHighCut");
-  const float etaElectronCut     = cfg.get<float>("etaElectronCut");
-  const float dxyElectronCut     = cfg.get<float>("dxyElectronCut");
-  const float dzElectronCut      = cfg.get<float>("dzElectronCut");
-  const float isoElectronLowCut  = cfg.get<float>("isoElectronLowCut");
-  const float isoElectronHighCut = cfg.get<float>("isoElectronHighCut");
-  const string lowPtLegElectron  = cfg.get<string>("LowPtLegElectron");
-  const string highPtLegElectron = cfg.get<string>("HighPtLegElectron");
+  const float ptElectronLowCut    = cfg.get<float>("ptElectronLowCut");
+  const float ptElectronHighCut   = cfg.get<float>("ptElectronHighCut");
+  const float ptElectronSingleCut = cfg.get<float>("ptElectronSingleCut");
+  const float etaElectronCut      = cfg.get<float>("etaElectronCut");
+  const float dxyElectronCut      = cfg.get<float>("dxyElectronCut");
+  const float dzElectronCut       = cfg.get<float>("dzElectronCut");
+  const string lowPtLegElectron   = cfg.get<string>("LowPtLegElectron");
+  const string highPtLegElectron  = cfg.get<string>("HighPtLegElectron");
   const vector<string> singleLegElectron = cfg.get<vector<string> >("SingleLegElectron");
   
   // veto electrons
@@ -387,18 +390,16 @@ int main(int argc, char * argv[]){
   const float dxyVetoElectronCut  = cfg.get<float>("dxyVetoElectronCut");
   const float dzVetoElectronCut   = cfg.get<float>("dzVetoElectronCut");
   const float isoVetoElectronCut  = cfg.get<float>("isoVetoElectronCut");
-  const bool applyVetoElectronId  = cfg.get<bool>("ApplyVetoElectronId");
   
   // kinematic cuts on muons
-  const float ptMuonLowCut   = cfg.get<float>("ptMuonLowCut");
-  const float ptMuonHighCut  = cfg.get<float>("ptMuonHighCut");
-  const float etaMuonCut     = cfg.get<float>("etaMuonCut");
-  const float dxyMuonCut     = cfg.get<float>("dxyMuonCut");
-  const float dzMuonCut      = cfg.get<float>("dzMuonCut");
-  const float isoMuonLowCut  = cfg.get<float>("isoMuonLowCut");
-  const float isoMuonHighCut = cfg.get<float>("isoMuonHighCut");
-  const string lowPtLegMuon  = cfg.get<string>("LowPtLegMuon");
-  const string highPtLegMuon = cfg.get<string>("HighPtLegMuon");
+  const float ptMuonLowCut    = cfg.get<float>("ptMuonLowCut");
+  const float ptMuonHighCut   = cfg.get<float>("ptMuonHighCut");
+  const float ptMuonSingleCut = cfg.get<float>("ptMuonSingleCut");
+  const float etaMuonCut      = cfg.get<float>("etaMuonCut");
+  const float dxyMuonCut      = cfg.get<float>("dxyMuonCut");
+  const float dzMuonCut       = cfg.get<float>("dzMuonCut");
+  const string lowPtLegMuon   = cfg.get<string>("LowPtLegMuon");
+  const string highPtLegMuon  = cfg.get<string>("HighPtLegMuon");
   const vector<string> singleLegMuon = cfg.get<vector<string> >("SingleLegMuon");
    
   // veto muons
@@ -407,19 +408,14 @@ int main(int argc, char * argv[]){
   const float dxyVetoMuonCut   = cfg.get<float>("dxyVetoMuonCut");
   const float dzVetoMuonCut   = cfg.get<float>("dzVetoMuonCut");
   const float isoVetoMuonCut   = cfg.get<float>("isoVetoMuonCut");
-  const bool applyVetoMuonId     = cfg.get<bool>("ApplyVetoMuonId");
   
-  // vertex cuts
-  const float ndofVertexCut  = cfg.get<float>("NdofVertexCut");
-  const float zVertexCut     = cfg.get<float>("ZVertexCut");
-  const float dVertexCut     = cfg.get<float>("DVertexCut");
-   
-  // topological cuts
+  // dR trigger, leptons
+  const float dRTrigMatch = cfg.get<float>("dRTrigMatch");
   const float dRleptonsCut   = cfg.get<float>("dRleptonsCut");
   const bool isMuonIsoR03 = cfg.get<bool>("IsMuonIsoR03");
   const bool isElectronIsoR03 = cfg.get<bool>("IsElectronIsoR03");
-  const bool applyTriggerMatch = cfg.get<bool>("ApplyTriggerMatch");
-  const float deltaRTrigMatch = cfg.get<float>("DRTrigMatch");
+
+  // dz filter
   const bool applyDzFilterMatch = cfg.get<bool>("ApplyDzFilterMatch");
   const string mu23ele12DzFilter = cfg.get<string>("Mu23Ele12DzFilter");
   const string mu8ele23DzFilter = cfg.get<string>("Mu8Ele23DzFilter");
@@ -430,9 +426,9 @@ int main(int argc, char * argv[]){
   if (isElectronIsoR03) dRIsoElectron = 0.3;
 
   TString LowPtLegMuon(lowPtLegMuon);
-  TString LowPtLegElectron(lowPtLegMuon);
+  TString LowPtLegElectron(lowPtLegElectron);
   TString HighPtLegMuon(highPtLegMuon);
-  TString HighPtLegElectron(HighPtLegElectron);
+  TString HighPtLegElectron(highPtLegElectron);
   vector<TString> SingleLegMuon;
   vector<TString> SingleLegElectron;
   for (unsigned int i=0; i<singleLegMuon.size(); ++i) 
@@ -442,8 +438,6 @@ int main(int argc, char * argv[]){
   TString Mu23Ele12DzFilter(mu23ele12DzFilter);
   TString Mu8Ele23DzFilter(mu8ele23DzFilter);
 
-  const float dRTrigMatch = cfg.get<float>("dRTrigMatch");
-  const bool vetoSingleMuon = cfg.get<bool>("VetoSingleMuon");
   const float jetEtaCut = cfg.get<float>("JetEtaCut");
   const float jetPtLowCut = cfg.get<float>("JetPtLowCut");
   const float jetPtHighCut = cfg.get<float>("JetPtHighCut");
@@ -462,23 +456,18 @@ int main(int argc, char * argv[]){
   if (era==2017&&isEmbedded)
     triggerEmbed2017 = true;
 
-  float ptSingleE = 26;
-  float ptTauLeg = 35;
-  if (era==2017)
-    ptSingleE = 28;
-  if (era==2018)
-    ptSingleE = 33;
-
   // **** end of configuration analysis
+
+  std::cout << "end of configuration " << std::endl;
 
   //file list creation
   int ifile = 0;
   int jfile = -1;
 
+  if (argc > 3)
+    ifile = atoi(argv[3]);
   if (argc > 4)
-    ifile = atoi(argv[4]);
-  if (argc > 5)
-    jfile = atoi(argv[5]);
+    jfile = atoi(argv[4]);
   
   // create input files list
   std::vector<std::string> fileList;  
@@ -511,6 +500,8 @@ int main(int argc, char * argv[]){
   
   if(NumberOfFiles < jfile) jfile = NumberOfFiles;
 
+  std::cout << "Number of files" << jfile << std::endl;
+
   for (int iF = ifile; iF < jfile; ++iF) {
     std::cout<<fileList[iF]<<std::endl;
   }
@@ -534,6 +525,8 @@ int main(int argc, char * argv[]){
     PUofficial->set_h_MC(PU_mc);
   }  
 
+  std::cout << "PU loaded" << std::endl;
+
   // Workspace with corrections
   TString workspace_filename = TString(cmsswBase) + "/src/" + CorrectionWorkspaceFileName;
   cout << "Taking correction workspace from " << workspace_filename << endl;
@@ -548,6 +541,7 @@ int main(int argc, char * argv[]){
   TFile *f_zptweight = new TFile(TString(cmsswBase) + "/src/" + ZptweightFile, "read");
   TH2D *h_zptweight = (TH2D*)f_zptweight->Get("zptmass_histo");
 
+  std::cout << "ZPt weights" << std::endl;
 
   // load QCD =========================
   const string qcdFileName = cfg.get<string>("QCDFileName");
@@ -704,7 +698,6 @@ int main(int argc, char * argv[]){
   for (unsigned int i = 1; i < (unsigned int) cfg.get<int>("num_met_filters") + 1; i++) {
     met_filters_list.push_back(cfg.get<string>("met_filter_" + std::to_string(i)));
   }
-  int counter[20] = {0};
 
   ///////////////FILE LOOP///////////////
 
@@ -712,9 +705,11 @@ int main(int argc, char * argv[]){
     std::cout << "file " << iF + 1 << " out of " << fileList.size() << " filename : " << fileList[iF] << std::endl;
     
     TFile *file_ = TFile::Open(fileList[iF].data());
-    TTree *_tree = NULL;
-    _tree = (TTree*)file_->Get(TString(ntupleName));  
-    if (_tree == NULL) continue;
+    TTree *_tree = (TTree*)file_->Get(TString(ntupleName));  
+    if (_tree == NULL) {
+      std::cout << "TTree " << ntupleName << " is absent" << std::endl;
+      continue;
+    }
     
     TH1D *histoInputEvents = NULL;
     histoInputEvents = (TH1D*)file_->Get("makeroottree/nEvents");
@@ -724,21 +719,7 @@ int main(int argc, char * argv[]){
     for (int iE = 0; iE < NE; ++iE)
       inputEventsH->Fill(0.);
 
-    AC1B analysisTree(_tree, isData);
-    // set AC1B for JES Btag and MET systematics
-    if ( !isData && !isEmbedded && ApplySystShift) {
-      if (!isDY && !isWJets && !isHiggs)
-	btagSys->SetAC1B(&analysisTree);
-      for (unsigned int i = 0; i < jetEnergyScaleSys.size(); i++)
-      	(jetEnergyScaleSys.at(i))->SetAC1B(&analysisTree);
-      for (unsigned int i = 0; i < metSys.size(); i++)
-	(metSys.at(i))->SetAC1B(&analysisTree);
-      for (unsigned int i = 0; i < puppiMetSys.size(); ++i)
-	(puppiMetSys.at(i))->SetAC1B(&analysisTree);
-    }
-    
-    TTree * _inittree = NULL;
-    _inittree = (TTree*)file_->Get(TString(initNtupleName));
+    TTree * _inittree = (TTree*)file_->Get(TString(initNtupleName));
     if (_inittree!=NULL) {
       Float_t genweight;
       if (!isData)
@@ -753,17 +734,30 @@ int main(int argc, char * argv[]){
 	  nWeightedEventsH->Fill(0.,genweight);
       }
     }
-    delete _inittree;
+
+    //    AC1B analysisTree(_tree, isData);
+    AC1B analysisTree(_tree);
+    // set AC1B for JES Btag and MET systematics
+    if ( !isData && !isEmbedded && ApplySystShift) {
+      if (!isDY && !isWJets && !isHiggs)
+	btagSys->SetAC1B(&analysisTree);
+      for (unsigned int i = 0; i < jetEnergyScaleSys.size(); i++)
+      	(jetEnergyScaleSys.at(i))->SetAC1B(&analysisTree);
+      for (unsigned int i = 0; i < metSys.size(); i++)
+	(metSys.at(i))->SetAC1B(&analysisTree);
+      for (unsigned int i = 0; i < puppiMetSys.size(); ++i)
+	(puppiMetSys.at(i))->SetAC1B(&analysisTree);
+    }
     
     ///////////////EVENT LOOP///////////////
     Long64_t numberOfEntries = analysisTree.GetEntries();
+    std::cout << "      number of entries in Tree = " << numberOfEntries << std::endl;    
 
     for (Long64_t iEntry = 0; iEntry < numberOfEntries; iEntry++) {
 
       if (nEvents % 10000 == 0) 
       	cout << "      processed " << nEvents << " events" << endl; 
 
-      counter[0]++;
       analysisTree.GetEntry(iEntry);
       nEvents++;
 
@@ -774,12 +768,10 @@ int main(int argc, char * argv[]){
       	gentree->Fill();
       }
 
-      //      std::cout << "OK!!!!!!!!" << std::endl;
       //Skip events not passing the MET filters, if applied
       bool passed_all_met_filters = passedAllMetFilters(&analysisTree, met_filters_list);
       if (ApplyMetFilters && !Synch && !passed_all_met_filters) continue;
       otree->passedAllMetFilters = passed_all_met_filters;
-      counter[1]++;
       
       // accessing trigger info ====
       vector<bool> isSingleLegMuon; isSingleLegMuon.clear();
@@ -849,8 +841,6 @@ int main(int argc, char * argv[]){
 	  otree->mcweight = 0.0;
       }
 
-      counter[3]++;
-    
       // selecting electrons      
       float sf_eleES = 1.0;   
       vector<int> electrons; electrons.clear();
@@ -878,11 +868,12 @@ int main(int argc, char * argv[]){
 	if (!muonMediumId) continue;
 	muons.push_back(im);
       }
-      counter[4]++;    
     
+      //      std::cout << "muons = " << muons.size() << std::endl;
+      //      std::cout << "electrons = " << electrons.size() << std::endl;
+
       if (muons.size() == 0) continue;
       if (electrons.size() == 0) continue;
-      counter[5]++;
     
       int electronIndex = -1;
       int muonIndex = -1;
@@ -893,11 +884,19 @@ int main(int argc, char * argv[]){
       selectMuonElePair(&analysisTree, muons, electrons, isMuonIsoR03, isElectronIsoR03, dRleptonsCut, ptMuonHighCut, ptElectronHighCut, electronIndex, muonIndex, isoMuMin, isoEleMin, era, isEmbedded);
       if (electronIndex<0) continue;
       if (muonIndex<0) continue;
-      counter[9]++;
       
       // Filling ntuple with the electron and muon information
       FillElMu(&analysisTree,otree,electronIndex,dRIsoElectron,muonIndex,dRIsoMuon,era,isEmbedded);
+
+      //      std::cout << "fill emu " << std::endl;
+      //      std::cout << "e : pt = " << otree->pt_1 << "  eta = " << otree->eta_1 << "  phi = " << otree->phi_1 << std::endl;
+      //      std::cout << "m : pt = " << otree->pt_2 << "  eta = " << otree->eta_2 << "  phi = " << otree->phi_2 << std::endl;
+
+      //all criterua passed, we fill vertices here;	
+      FillVertices(&analysisTree, otree, isData);
       
+      //      std::cout << "fill vertices" << std::endl;
+
       /////////////////////////////
       // Trigger matching
       /////////////////////////////
@@ -905,8 +904,10 @@ int main(int argc, char * argv[]){
       vector<bool> isSingleElectronMatch(isSingleLegElectron.size(), false);
       bool isHighPtMuonMatch = triggerMatching(&analysisTree,otree->eta_2,otree->phi_2,isHighPtLegMuon,nHighPtLegMuon,dRTrigMatch);
       bool isLowPtMuonMatch  = triggerMatching(&analysisTree,otree->eta_2,otree->phi_2,isLowPtLegMuon,nLowPtLegMuon,dRTrigMatch);
+
       bool isHighPtElectronMatch = triggerMatching(&analysisTree,otree->eta_1,otree->phi_1,isHighPtLegElectron,nHighPtLegElectron,dRTrigMatch);;
       bool isLowPtElectronMatch  = triggerMatching(&analysisTree,otree->eta_1,otree->phi_1,isLowPtLegElectron,nLowPtLegElectron,dRTrigMatch);
+
       for ( unsigned int i=0; i<isSingleLegMuon.size(); ++i) {
 	isSingleMuonMatch.at(i) = triggerMatching(&analysisTree,otree->eta_2,otree->phi_2,isSingleLegMuon.at(i),nSingleLegMuon.at(i),dRTrigMatch);
       }
@@ -969,21 +970,26 @@ int main(int argc, char * argv[]){
       }    
       otree->singleLepTrigger = otree->trg_singleelectron || otree->trg_singlemuon;
     
-      //all criterua passed, we fill vertices here;	
-      FillVertices(&analysisTree, otree, isData);
+      //      std::cout << "after trigger" << std::endl;
 
       // initialize JER (including data and embedded) 
       otree->apply_recoil = ApplyRecoilCorrections;
       jets::initializeJER(&analysisTree);
+
+      //      std::cout << "initialising JER" << std::endl;
 
       if (!isData && !isEmbedded) { // JER smearing
 	jets::associateRecoAndGenJets(&analysisTree, resolution);
 	jets::smear_jets(&analysisTree,resolution,resolution_sf,true);
       }
 
+      //      std::cout << "smeared jets" << std::endl;
+
       //counting jet
       jets::counting_jets(&analysisTree, otree, &cfg, &inputs_btag_scaling_medium);
   
+      //      std::cout << "counted jets" << std::endl;
+
       ////////////////////////////////////////////////////////////
       // ID/Iso and Trigger Corrections
       ////////////////////////////////////////////////////////////
@@ -1030,6 +1036,8 @@ int main(int argc, char * argv[]){
       float eff_data_trig_elow = 1;
       float eff_mc_trig_elow = 1;
        
+      //      std::cout << "before weights " << std::endl;
+
       if ((!isData || isEmbedded) && ApplyLepSF) {
       	TString suffix = "mc";
       	TString suffixRatio = "ratio";
@@ -1062,9 +1070,9 @@ int main(int argc, char * argv[]){
 	sf_trig_e = w->function("e_trg_ic_" + suffixRatio)->getVal();
 
 	eff_data_trig_ehigh = w->function("e_trg_23_binned_ic_data")->getVal();
-	eff_data_trig_elow = w->function("e_trg_8_binned_ic_data")->getVal();
+	eff_data_trig_elow = w->function("e_trg_12_binned_ic_data")->getVal();
 	eff_mc_trig_ehigh = w->function("e_trg_23_binned_ic_"+suffix)->getVal();
-	eff_mc_trig_elow = w->function("e_trg_8_binned_ic_"+suffix)->getVal();
+	eff_mc_trig_elow = w->function("e_trg_12_binned_ic_"+suffix)->getVal();
 
 	if (triggerEmbed2017) {
 	  if (otree->pt_1<ptTriggerEmbed2017&&fabs(otree->eta_1)>etaTriggerEmbed2017) {
@@ -1080,12 +1088,19 @@ int main(int argc, char * argv[]){
 	otree->trigweight_1 = sf_trig_e;
 	otree->trigweight_2 = sf_trig_m;
 	
-	float eff_single_data = 1.0 - (1-eff_data_trig_e)*(eff_data_trig_m);
-	float eff_single_mc = 1.0 - (1-eff_mc_trig_e)*(1-eff_mc_trig_m);
+	float eff_single_data = 1.0 - (1.0-eff_data_trig_e)*(1.0-eff_data_trig_m);
+	float eff_single_mc   = 1.0 - (1.0-eff_mc_trig_e)  *(1.0-eff_mc_trig_m);
 	if (eff_single_mc>1e-3) 
 	  otree->trigweightSingle = eff_single_data/eff_single_mc;
 	else
 	  otree->trigweightSingle = 1.0;
+
+	if (otree->pt_1<ptElectronSingleCut)
+	  otree->trigweightSingle = sf_trig_m;
+	if (otree->pt_2<ptMuonSingleCut)
+	  otree->trigweightSingle = sf_trig_e;
+	if (otree->pt_1<ptElectronSingleCut&&otree->pt_2<ptMuonSingleCut)
+	  otree->trigweightSingle = 0;
 
 	float eff_emu_data = 
 	  eff_data_trig_mhigh*eff_data_trig_elow + 
@@ -1095,16 +1110,23 @@ int main(int argc, char * argv[]){
 	  eff_mc_trig_mhigh*eff_mc_trig_elow + 
 	  eff_mc_trig_mlow*eff_mc_trig_ehigh -
 	  eff_mc_trig_mhigh*eff_mc_trig_ehigh;
+
 	if (eff_emu_mc>1e-3)
 	  otree->trigweightExcl = eff_emu_data/eff_emu_mc;
 	else
 	  otree->trigweightExcl = 1.0;
 
 	otree->trigweightSingle = otree->trigweight;
+	if (otree->pt_1<ptElectronHighCut)
+	  otree->trigweightExcl = eff_mc_trig_mhigh*eff_mc_trig_elow;
+	if (otree->pt_2<ptMuonHighCut)
+	  otree->trigweightExcl = eff_mc_trig_ehigh*eff_mc_trig_mlow;
+	if (otree->pt_1<ptElectronHighCut&&otree->pt_2<ptMuonHighCut)
+	  otree->trigweightExcl = 0;
 
 	/*
 	if (!pass_single_offline&&pass_cross_offline) 
-	  std::cout << " **************** etau_tau trigger ******************* " << std::endl;
+	std::cout << " **************** etau_tau trigger ******************* " << std::endl;
 
 	std::cout << "pt_1 = " << otree->pt_1 << "   eta_1 = " << otree->eta_1
 		  << "   pt_2 = " << otree->pt_2 << "   eta_2 = " << otree->eta_2 << std::endl;
@@ -1121,6 +1143,7 @@ int main(int argc, char * argv[]){
 	std::cout << std::endl;
 	*/
 
+	otree->trigweight = otree->trigweightSingle;
 	float eff_emu_weight = otree->idisoweight_1 * otree->trkeffweight_1 * otree->idisoweight_2 * otree->trkeffweight_2;
 	if (isEmbedded) eff_emu_weight *= otree->embweight;
 	otree->effweight = eff_emu_weight * otree->trigweight;
@@ -1129,8 +1152,8 @@ int main(int argc, char * argv[]){
 	otree->weight = otree->effweight * otree->puweight * otree->mcweight; 
 	otree->weightSingle = otree->effweightSingle * otree->puweight * otree->mcweight; 
 	otree->weightExcl   = otree->effweightExcl * otree->puweight * otree->mcweight; 
+
       }
-      counter[10]++;
       
       //Theory uncertainties for CP analysis      
       otree->weight_CMS_scale_gg_13TeVUp   = analysisTree.weightScale4;
@@ -1153,6 +1176,41 @@ int main(int argc, char * argv[]){
       otree->prefiringweightUp   = analysisTree.prefiringweightup;
       otree->prefiringweightDown = analysisTree.prefiringweightdown;
 
+      // ************************
+      // QCD background weights *
+      // ************************
+      if(otree->njets==0){
+	otree->qcdweight_deltaR =OS_SS_njet0->Eval(otree->dr_tt);
+	otree->qcdweight_deltaR_Par0_up =  OS_SS_njet0_Par0_UP->Eval(otree->dr_tt);
+	otree->qcdweight_deltaR_Par0_down =  OS_SS_njet0_Par0_DOWN->Eval(otree->dr_tt);
+	otree->qcdweight_deltaR_Par1_up =  OS_SS_njet0_Par1_UP->Eval(otree->dr_tt);
+	otree->qcdweight_deltaR_Par1_down =  OS_SS_njet0_Par1_DOWN->Eval(otree->dr_tt);
+	otree->qcdweight_deltaR_Par2_up =  OS_SS_njet0_Par2_UP->Eval(otree->dr_tt);
+	otree->qcdweight_deltaR_Par2_down =  OS_SS_njet0_Par2_DOWN->Eval(otree->dr_tt);
+      }
+      else if(otree->njets ==1) {
+	otree->qcdweight_deltaR = OS_SS_njet1->Eval(otree->dr_tt);
+	otree->qcdweight_deltaR_Par0_up =  OS_SS_njet1_Par0_UP->Eval(otree->dr_tt);
+	otree->qcdweight_deltaR_Par0_down =  OS_SS_njet1_Par0_DOWN->Eval(otree->dr_tt);
+	otree->qcdweight_deltaR_Par1_up =  OS_SS_njet1_Par1_UP->Eval(otree->dr_tt);
+	otree->qcdweight_deltaR_Par1_down =  OS_SS_njet1_Par1_DOWN->Eval(otree->dr_tt);
+	otree->qcdweight_deltaR_Par2_up =  OS_SS_njet1_Par2_UP->Eval(otree->dr_tt);
+	otree->qcdweight_deltaR_Par2_down =  OS_SS_njet1_Par2_DOWN->Eval(otree->dr_tt);
+      }
+      else {
+	otree->qcdweight_deltaR = OS_SS_njetgt1->Eval(otree->dr_tt);
+	otree->qcdweight_deltaR_Par0_up =  OS_SS_njetgt1_Par0_UP->Eval(otree->dr_tt);
+	otree->qcdweight_deltaR_Par0_down =  OS_SS_njetgt1_Par0_DOWN->Eval(otree->dr_tt);
+	otree->qcdweight_deltaR_Par1_up =  OS_SS_njetgt1_Par1_UP->Eval(otree->dr_tt);
+	otree->qcdweight_deltaR_Par1_down =  OS_SS_njetgt1_Par1_DOWN->Eval(otree->dr_tt);
+	otree->qcdweight_deltaR_Par2_up =  OS_SS_njetgt1_Par2_UP->Eval(otree->dr_tt);
+	otree->qcdweight_deltaR_Par2_down =  OS_SS_njetgt1_Par2_DOWN->Eval(otree->dr_tt);
+        
+      }
+      otree->qcdweight_nonclosure = hNonClosureCorrection->GetBinContent(hNonClosureCorrection->GetXaxis()->FindBin(otree->pt_2),hNonClosureCorrection->GetYaxis()->FindBin(otree->pt_1));
+      otree->qcdweight_isolationcorrection = hIsolationCorrection->GetBinContent(hIsolationCorrection->GetXaxis()->FindBin(otree->pt_2),hIsolationCorrection->GetYaxis()->FindBin(otree->pt_1));
+        
+      otree->qcdweight=otree->qcdweight_deltaR*otree->qcdweight_nonclosure*otree->qcdweight_isolationcorrection;
 
       ////////////////////////////////////////////////////////////
       // Z pt weight
@@ -1200,7 +1258,6 @@ int main(int argc, char * argv[]){
         otree->topptweight = genTools::topPtWeight_Run2(analysisTree, a_topPtWeight, b_topPtWeight, c_topPtWeight, max_pt_topPtWeight);
         // otree->topptweight = genTools::topPtWeight(analysisTree, 1); // 1 is for Run1 - use this reweighting as recommended by HTT 17
       }
-      counter[11]++;
 
       ////////////////////////////////////////////////////////////
       // MET and Recoil Corrections !  
@@ -1264,7 +1321,7 @@ int main(int argc, char * argv[]){
       // }
       
       ////////////////////////////////////////////////////////////
-      // Filling variables (with corrected MET electron pt)
+      // Filling variables (with corrected MET and electron pt)
       ////////////////////////////////////////////////////////////
 
       TLorentzVector muonLV; muonLV.SetPtEtaPhiM(otree->pt_2,
@@ -1272,10 +1329,10 @@ int main(int argc, char * argv[]){
 						 otree->phi_2,
 						 muonMass);
 
-      TLorentzVector electronLV; muonLV.SetPtEtaPhiM(otree->pt_1,
-						     otree->eta_1,
-						     otree->phi_1,
-						     electronMass);
+      TLorentzVector electronLV; electronLV.SetPtEtaPhiM(otree->pt_1,
+							 otree->eta_1,
+							 otree->phi_1,
+							 electronMass);
 
       TLorentzVector metLV; metLV.SetXYZT(otree->met*TMath::Cos(otree->metphi),
 					  otree->met*TMath::Sin(otree->metphi),
@@ -1301,7 +1358,7 @@ int main(int argc, char * argv[]){
       mtTOT = 2*(otree->pt_1)*puppimetLV.Pt()*(1-cos(DeltaPhi(electronLV,puppimetLV)));
       mtTOT += 2*(otree->pt_2)*puppimetLV.Pt()*(1-cos(DeltaPhi(muonLV,puppimetLV))); 
       mtTOT += 2*(otree->pt_1)*(otree->pt_2)*(1-cos(DeltaPhi(electronLV,muonLV))); 
-      otree->mt_tot = TMath::Sqrt(mtTOT);
+      otree->mt_tot_puppi = TMath::Sqrt(mtTOT);
     
       // opposite charge
       otree->os = (otree->q_1 * otree->q_2) < 0.;
@@ -1315,8 +1372,6 @@ int main(int argc, char * argv[]){
       TString chMu("mt");
       otree->extraelec_veto = extra_electron_veto(electronIndex, chE, &cfg, &analysisTree, era, isEmbedded);
       otree->extramuon_veto = extra_muon_veto(muonIndex, chMu, &cfg, &analysisTree, isData);
-    
-      counter[13]++;
     
       otree->mt_1 = mT(electronLV, metLV);
       otree->mt_2 = mT(muonLV, metLV);
@@ -1348,7 +1403,6 @@ int main(int argc, char * argv[]){
       otree->pzeta = otree->pzetamiss - 0.85*otree->pzetavis;
       otree->puppipzeta = otree->puppipzetamiss - 0.85*otree->pzetavis;
 
-      counter[14]++;
     
       bool isSRevent = true; //boolean used to compute SVFit variables only on SR events, it is set to true when running Synchronization to run SVFit on all events
       //      if(!Synch){
@@ -1358,6 +1412,7 @@ int main(int argc, char * argv[]){
       //	if(ch == "mt") isSRevent = isSRevent && (otree->trg_singlemuon>0.5 || otree->trg_mutaucross>0.5);
       //	if(ch == "et") isSRevent = isSRevent && (otree->trg_singleelectron>0.5 || otree->trg_etaucross>0.5);
       //      }
+
       /*
 	if (!isSRevent) { 
 	cout << "                                        " << endl;
@@ -1366,40 +1421,6 @@ int main(int argc, char * argv[]){
 	cout << "========================================" << endl;
 	cout << "                                        " << endl;
 	}
-	if (otree->byMediumDeepTau2017v2p1VSjet_2<0.5){
-	
-	auto args = std::vector<double>{otree->pt_2,
-	static_cast<double>(otree->tau_decay_mode_2),
-	static_cast<double>(otree->njets),
-	otree->pt_1,
-	static_cast<double>(otree->os),
-	otree->puppimet,
-	otree->puppimt_1,
-	otree->iso_1,
-	static_cast<double>(otree->trg_singlemuon),
-	otree->m_vis};
-	otree->ff_nom = fns_["ff_mt_medium_dmbins"]->eval(args.data());
-	
-	auto args_mva = std::vector<double>{otree->pt_2,
-	otree->dmMVA_2,
-	static_cast<double>(otree->njets),
-	otree->pt_1,
-	static_cast<double>(otree->os),
-	otree->puppimet,
-	otree->puppimt_1,
-	otree->iso_1,
-	static_cast<double>(otree->trg_singlemuon),
-	otree->m_vis};
-	otree->ff_mva = fns_["ff_mt_medium_mvadmbins"]->eval(args_mva.data());
-	
-	//		cout << "ff_nom : " << ff_nom << "   ff_mva : " << ff_mva << endl;
-	
-	}else { 
-	otree->ff_nom = 1.;
-	otree->ff_mva = 1.;
-	}
-	otree->ff_nom_sys = 0.15;
-	otree->ff_mva_sys = 0.15;
       */
 
       // initialize svfit and fastMTT variables
@@ -1414,8 +1435,7 @@ int main(int argc, char * argv[]){
       otree->pt_fast = -10;
       otree->phi_fast = -10;
       otree->eta_fast = -10;
-      //      if (!isSRevent && ApplySystShift) continue;
-      //      if ( (ApplySVFit||ApplyFastMTT) && isSRevent ) svfit_variables(ch, &analysisTree, otree, &cfg, inputFile_visPtResolution);
+
 
       // ***********************************
       // ** IPSignificance calibration ->
@@ -1455,47 +1475,133 @@ int main(int argc, char * argv[]){
             }
         }
 
-      /*
-      std::map<TString,IpCorrection*> ipCorrectorsNULL = {
-	{"ipTau1",NULL},
-	{"ipTau1BS",NULL},
-	{"ipTau2",NULL},
-	{"ipTau2BS",NULL}
-      };
+      otree->pvx = vtx_x;
+      otree->pvy = vtx_y;
+      otree->pvz = vtx_z;
+      TVector3 vertex_bs(vtx_bs_x,vtx_bs_y,vtx_bs_z);
+      TVector3 vertex(vtx_x,vtx_y,vtx_z);
+      
+      TLorentzVector muonIP = ipVec_Lepton_emu(&analysisTree,muonIndex,false,vertex,era,isEmbedded);
+      TLorentzVector muonIP_pvbs = ipVec_Lepton_emu(&analysisTree,muonIndex,false,vertex_bs,era,isEmbedded);
 
+      TLorentzVector electronIP = ipVec_Lepton_emu(&analysisTree,electronIndex,true,vertex,era,isEmbedded);
+      TLorentzVector electronIP_pvbs = ipVec_Lepton_emu(&analysisTree,electronIndex,true,vertex_bs,era,isEmbedded);
+      
+      otree->ipx_uncorr_1 = electronIP.X();
+      otree->ipy_uncorr_1 = electronIP.Y();
+      otree->ipz_uncorr_1 = electronIP.Z();
+
+      otree->ipx_bs_uncorr_1 = electronIP_pvbs.X();
+      otree->ipy_bs_uncorr_1 = electronIP_pvbs.Y();
+      otree->ipz_bs_uncorr_1 = electronIP_pvbs.Z();
+
+      otree->ipx_uncorr_2 = muonIP.X();
+      otree->ipy_uncorr_2 = muonIP.Y();
+      otree->ipz_uncorr_2 = muonIP.Z();
+
+      otree->ipx_bs_uncorr_2 = muonIP_pvbs.X();
+      otree->ipy_bs_uncorr_2 = muonIP_pvbs.Y();
+      otree->ipz_bs_uncorr_2 = muonIP_pvbs.Z();
+
+      otree->gen_ipx_1 = -9999;
+      otree->gen_ipy_1 = -9999;
+      otree->gen_ipz_1 = -9999;
+
+      otree->gen_ipx_2 = -9999;
+      otree->gen_ipy_2 = -9999;
+      otree->gen_ipz_2 = -9999;
+
+      otree->ipx_1 = otree->ipx_uncorr_1;
+      otree->ipy_1 = otree->ipy_uncorr_1;
+      otree->ipz_1 = otree->ipz_uncorr_1;
+      
+      otree->ipx_bs_1 = otree->ipx_bs_uncorr_1;
+      otree->ipy_bs_1 = otree->ipy_bs_uncorr_1;
+      otree->ipz_bs_1 = otree->ipz_bs_uncorr_1;
+      
+      otree->ipx_2 = otree->ipx_uncorr_2;
+      otree->ipy_2 = otree->ipy_uncorr_2;
+      otree->ipz_2 = otree->ipz_uncorr_2;
+      
+      otree->ipx_bs_2 = otree->ipx_bs_uncorr_2;
+      otree->ipy_bs_2 = otree->ipy_bs_uncorr_2;
+      otree->ipz_bs_2 = otree->ipz_bs_uncorr_2;
+
+      if (!isData || isEmbedded) {
+
+	TVector3 genVertex(otree->GenVertexX,
+			   otree->GenVertexY,
+			   otree->GenVertexZ);
+
+	TVector3 ipGenMuon = genParticleIP(&analysisTree,genVertex,otree->gen_match_2,otree->eta_2,otree->phi_2);
+	TVector3 ipGenElec = genParticleIP(&analysisTree,genVertex,otree->gen_match_1,otree->eta_1,otree->phi_1);
+      
+	otree->gen_ipx_1 = ipGenElec.X();
+	otree->gen_ipy_1 = ipGenElec.Y();
+	otree->gen_ipz_1 = ipGenElec.Z();
+
+	otree->gen_ipx_2 = ipGenMuon.X();
+	otree->gen_ipy_2 = ipGenMuon.Y();
+	otree->gen_ipz_2 = ipGenMuon.Z();
+	
+	if (ApplyIpCorrection) {
+
+	  TVector3 ipMuon_uncorr = muonIP.Vect();
+	  TVector3 ipMuon_uncorr_pvbs = muonIP_pvbs.Vect(); 
+	  TVector3 ipElec_uncorr = electronIP.Vect();
+	  TVector3 ipElec_uncorr_pvbs = electronIP_pvbs.Vect(); 
+	
+	  TVector3 ipMuon      = CorrectorIpMuon->correctIp(ipMuon_uncorr,ipGenMuon,otree->eta_2);
+	  TVector3 ipMuon_pvbs = CorrectorIpMuonBS->correctIp(ipMuon_uncorr_pvbs,ipGenMuon,otree->eta_2);
+
+	  TVector3 ipElec      = CorrectorIpElec->correctIp(ipElec_uncorr,ipGenElec,otree->eta_1);
+	  TVector3 ipElec_pvbs = CorrectorIpElecBS->correctIp(ipElec_uncorr_pvbs,ipGenElec,otree->eta_1);
+
+	  otree->ipx_1 = ipElec.X();
+	  otree->ipy_1 = ipElec.Y();
+	  otree->ipz_1 = ipElec.Z();
+
+	  otree->ipx_bs_1 = ipElec_pvbs.X();
+	  otree->ipy_bs_1 = ipElec_pvbs.Y();
+	  otree->ipz_bs_1 = ipElec_pvbs.Z();
+	  
+	  otree->ipx_2 = ipMuon.X();
+	  otree->ipy_2 = ipMuon.Y();
+	  otree->ipz_2 = ipMuon.Z();
+	  
+	  otree->ipx_bs_2 = ipMuon_pvbs.X();
+	  otree->ipy_bs_2 = ipMuon_pvbs.Y();
+	  otree->ipz_bs_2 = ipMuon_pvbs.Z();
+	}
+      }
+      
       ImpactParameter IP;
-      std::map<TString,IpCorrection*> ipCorrectorsPass = ipCorrectorsNULL;
-      if (ApplyIpCorrection && (!isData || isEmbedded)) ipCorrectorsPass = ipCorrectors;
-      //      std::cout << "before..." << std::endl;
-      //      acott_Impr(&analysisTree, otree, leptonIndex, tauIndex, ch, era, isEmbedded, ipCorrectorsPass);
-      //      std::cout << "after..." << std::endl;
-
-      //      otree->acotautau_00 = otree->acotautau_refitbs_00;
-      //      otree->acotautau_01 = otree->acotautau_refitbs_01;
       
       // *****
       // RefitV + BS
       // *****
-      TVector3 vertex(vtx_x,vtx_y,vtx_z);
+
       ROOT::Math::SMatrix<float,3,3, ROOT::Math::MatRepStd< float, 3, 3 >> ipCov1;
       TVector3 IP1;
-      double ipsig1 = IP_significance_helix_lep(&analysisTree,leptonIndex, ch, vertex,PV_covariance,ipCov1,IP1);
+      IP_significance_helix_lep(&analysisTree,electronIndex, "et", vertex,PV_covariance,ipCov1,IP1);
 
       ROOT::Math::SMatrix<float,3,3, ROOT::Math::MatRepStd< float, 3, 3 >> ipCov2;
       TVector3 IP2;
-      double ipsig2 = IP_significance_helix_tauh(&analysisTree,tauIndex,vertex,PV_covariance,ipCov2,IP2);
+      IP_significance_helix_lep(&analysisTree, muonIndex, "mt", vertex,PV_covariance,ipCov2,IP2);
+
       // ******
       // PV+BS
       // ******
-      TVector3 vertex_bs(vtx_bs_x,vtx_bs_y,vtx_bs_z);
+
       ROOT::Math::SMatrix<float,3,3, ROOT::Math::MatRepStd< float, 3, 3 >> ipCov1_bs;
       TVector3 IP1_bs;
-      double ipsig1_bs = IP_significance_helix_lep(&analysisTree,leptonIndex,ch,vertex_bs,PVBS_covariance,ipCov1_bs,IP1_bs);
+      IP_significance_helix_lep(&analysisTree,electronIndex,"et",vertex_bs,PVBS_covariance,ipCov1_bs,IP1_bs);
 
       ROOT::Math::SMatrix<float,3,3, ROOT::Math::MatRepStd< float, 3, 3 >> ipCov2_bs;
       TVector3 IP2_bs;
-      double ipsig2_bs = IP_significance_helix_tauh(&analysisTree,tauIndex,vertex_bs,PVBS_covariance,ipCov2_bs,IP2_bs);
+      IP_significance_helix_lep(&analysisTree,muonIndex,"mt",vertex_bs,PVBS_covariance,ipCov2_bs,IP2_bs);
 
+      /*
       cout << "ipsig1 = " << ipsig1 << " ipsig2 = " << ipsig2 << endl;
       cout << "IP1  : x = " << IP1.x() 
 	   << "  y = " << IP1.y() 
@@ -1510,22 +1616,15 @@ int main(int argc, char * argv[]){
       cout << "       x = " << otree->ipx_uncorr_2 
 	   << "  y = " << otree->ipy_uncorr_2 
 	   << "  z = " << otree->ipz_uncorr_2 << std::endl;
-
-      TLorentzVector ip1; ip1.SetXYZM(otree->ipx_uncorr_1,otree->ipy_uncorr_1,otree->ipz_uncorr_1,0.);
-      otree->ipxy_uncorr_1 = ip1.Pt();
-      otree->ipn_uncorr_1 = ip1.P();
-      otree->drip_uncorr_1 = deltaR(otree->eta_1,otree->phi_1,ip1.Eta(),ip1.Phi());
-      otree->detaip_uncorr_1 = ip1.Eta() - otree->eta_1; 
-      TVector3 vectIP = TVector3(otree->ipx_uncorr_1,otree->ipy_uncorr_1,0.);
-      TVector3 vectP  = TVector3(electronLV.Px(),electronLV.Py(),0.);
-      otree->dphiip_uncorr_1 = TMath::ACos(vectIP*vectP/(vectIP.Mag()*vectP.Mag()));
-      //      cout << "dphi = " << otree->dphiip_uncorr_1 << std::endl;
-      //      cout << "refit = " << otree->isrefitBS << std::endl;
+      */
 
       TVector3 Ip1(otree->ipx_uncorr_1,otree->ipy_uncorr_1,otree->ipz_uncorr_1);
       otree->IP_signif_RefitV_with_BS_uncorr_1 = IP.CalculateIPSignificanceHelical(Ip1, ipCov1);
+      otree->IP_signif_RefitV_with_BS_1 = otree->IP_signif_RefitV_with_BS_uncorr_1;
+
       Ip1.SetXYZ(otree->ipx_bs_uncorr_1,otree->ipy_bs_uncorr_1,otree->ipz_bs_uncorr_1);
       otree->IP_signif_PV_with_BS_uncorr_1 = IP.CalculateIPSignificanceHelical(Ip1, ipCov1_bs);
+      otree->IP_signif_PV_with_BS_1 = otree->IP_signif_PV_with_BS_uncorr_1;
 
       otree->ip_covxx_1 = ipCov1(0,0);
       otree->ip_covxy_1 = ipCov1(0,1);
@@ -1534,22 +1633,13 @@ int main(int argc, char * argv[]){
       otree->ip_covyz_1 = ipCov1(1,2);
       otree->ip_covzz_1 = ipCov1(2,2);
 
-      TLorentzVector ip2; ip2.SetXYZM(otree->ipx_uncorr_2,otree->ipy_uncorr_2,otree->ipz_uncorr_2,0.);
-      otree->ipxy_uncorr_2 = ip2.Pt();
-      otree->ipn_uncorr_2 = ip2.P();
-      otree->drip_uncorr_2 = deltaR(otree->eta_2,otree->phi_2,ip2.Eta(),ip2.Phi());
-      otree->detaip_uncorr_2 = ip2.Eta() - otree->eta_2;
-      vectIP.SetX(otree->ipx_uncorr_2);
-      vectIP.SetY(otree->ipy_uncorr_2);
-      vectIP.SetZ(0.);
-      vectP.SetX(muonLV.Px());
-      vectP.SetY(muonLV.Py());
-      vectP.SetZ(0.);
-      otree->dphiip_uncorr_2 = TMath::ACos(vectIP*vectP/(vectIP.Mag()*vectP.Mag()));
       TVector3 Ip2(otree->ipx_uncorr_2,otree->ipy_uncorr_2,otree->ipz_uncorr_2);
       otree->IP_signif_RefitV_with_BS_uncorr_2 = IP.CalculateIPSignificanceHelical(Ip2, ipCov2);
+      otree->IP_signif_RefitV_with_BS_2 = otree->IP_signif_RefitV_with_BS_uncorr_2;
+
       Ip2.SetXYZ(otree->ipx_bs_uncorr_2,otree->ipy_bs_uncorr_2,otree->ipz_bs_uncorr_2);
       otree->IP_signif_PV_with_BS_uncorr_2 = IP.CalculateIPSignificanceHelical(Ip2, ipCov2_bs);
+      otree->IP_signif_PV_with_BS_2 = otree->IP_signif_PV_with_BS_uncorr_2;
 
       otree->ip_covxx_2 = ipCov2(0,0);
       otree->ip_covxy_2 = ipCov2(0,1);
@@ -1558,90 +1648,36 @@ int main(int argc, char * argv[]){
       otree->ip_covyz_2 = ipCov2(1,2);
       otree->ip_covzz_2 = ipCov2(2,2);
 
+      // ***********************
       // Corrected values 
+      // ***********************
 
-      ip1.SetXYZM(otree->ipx_1,otree->ipy_1,otree->ipz_1,0.);
-      otree->ipxy_1 = ip1.Pt();
-      otree->ipn_1 = ip1.P();
-      otree->drip_1 = deltaR(otree->eta_1,otree->phi_1,ip1.Eta(),ip1.Phi());
-      otree->detaip_1 = ip1.Eta() - otree->eta_1; 
-      vectIP.SetX(otree->ipx_1);
-      vectIP.SetY(otree->ipy_1);
-      vectIP.SetZ(0.);
-      vectP.SetX(electronLV.Px());
-      vectP.SetY(electronLV.Py());
-      vectP.SetZ(0.);
-      otree->dphiip_1 = TMath::ACos(vectIP*vectP/(vectIP.Mag()*vectP.Mag()));
+      if ((!isData || isEmbedded) && ApplyIpCorrection) {
+	ROOT::Math::SMatrix<float,3,3, ROOT::Math::MatRepStd< float, 3, 3 >> ipCov1_corr;
+	ROOT::Math::SMatrix<float,3,3, ROOT::Math::MatRepStd< float, 3, 3 >> ipCov2_corr;
 
-      ROOT::Math::SMatrix<float,3,3, ROOT::Math::MatRepStd< float, 3, 3 >> ipCov1_corr;
-      if (otree->ipx_1<-9998)  {
-	otree->IP_signif_RefitV_with_BS_1 = -9999;
-      }
-      else {
 	ipCov1_corr =ipCov1;
 	Ip1.SetXYZ(otree->ipx_1,otree->ipy_1,otree->ipz_1);
-	if (ipCorrectorsPass["ipTau1"]!=NULL)
-	  ipCov1_corr = ipCorrectorsPass["ipTau1"]->correctIpCov(ipCov1,otree->eta_1);      
+	ipCov1_corr = CorrectorIpElec->correctIpCov(ipCov1,otree->eta_1);      
 	otree->IP_signif_RefitV_with_BS_1 = IP.CalculateIPSignificanceHelical(Ip1, ipCov1_corr);
-      }
 
-      if (otree->ipx_bs_1<-9998) {
-	otree->IP_signif_PV_with_BS_1 = -9999;
-      }
-      else {
 	Ip1.SetXYZ(otree->ipx_bs_1,otree->ipy_bs_1,otree->ipz_bs_1);
 	ipCov1_corr = ipCov1_bs;
-	if (ipCorrectorsPass["ipTaus1BS"]!=NULL)
-	  ipCov1_corr = ipCorrectorsPass["ipTau1BS"]->correctIpCov(ipCov1_bs,otree->eta_1);      
+	ipCov1_corr = CorrectorIpElecBS->correctIpCov(ipCov1_bs,otree->eta_1);      
 	otree->IP_signif_PV_with_BS_1 = IP.CalculateIPSignificanceHelical(Ip1, ipCov1_corr);
-      }
 
-      ip2.SetXYZM(otree->ipx_2,otree->ipy_2,otree->ipz_2,0.);
-      otree->ipxy_2 = ip2.Pt();
-      otree->ipn_2 = ip2.P();
-      otree->drip_2 = deltaR(otree->eta_2,otree->phi_2,ip2.Eta(),ip2.Phi());
-      otree->detaip_2 = ip2.Eta() - otree->eta_2; 
-      vectIP.SetX(otree->ipx_2);
-      vectIP.SetY(otree->ipy_2);
-      vectIP.SetZ(0.);
-      vectP.SetX(muonLV.Px());
-      vectP.SetY(muonLV.Py());
-      vectP.SetZ(0.);
-      otree->dphiip_2 = TMath::ACos(vectIP*vectP/(vectIP.Mag()*vectP.Mag()));
-
-      ROOT::Math::SMatrix<float,3,3, ROOT::Math::MatRepStd< float, 3, 3 >> ipCov2_corr;
-      if (otree->ipx_2<-9998) {
-	otree->IP_signif_RefitV_with_BS_2 = -9999;
-      }
-      else {
 	Ip2.SetXYZ(otree->ipx_2,otree->ipy_2,otree->ipz_2);
 	ipCov2_corr = ipCov2;
-	if (ipCorrectorsPass["ipTau2"]!=NULL)
-	  ipCov2_corr = ipCorrectorsPass["ipTau2"]->correctIpCov(ipCov2,otree->eta_2);      
+	ipCov2_corr = CorrectorIpMuon->correctIpCov(ipCov2,otree->eta_2);      
 	otree->IP_signif_RefitV_with_BS_2 = IP.CalculateIPSignificanceHelical(Ip2, ipCov2_corr);      
-      }
 
-      if (otree->ipx_bs_2<-9998) {
-	otree->IP_signif_PV_with_BS_2 = -9999;
-      }
-      else {
 	Ip2.SetXYZ(otree->ipx_bs_2,otree->ipy_bs_2,otree->ipz_bs_2);
 	ipCov2_corr = ipCov2_bs;
-	if (ipCorrectorsPass["ipTau2BS"]!=NULL)
-	  ipCov2_corr = ipCorrectors["ipTau2BS"]->correctIpCov(ipCov2_bs,otree->eta_2);      
+	ipCov2_corr = CorrectorIpMuonBS->correctIpCov(ipCov2_bs,otree->eta_2);      
 	otree->IP_signif_PV_with_BS_2 = IP.CalculateIPSignificanceHelical(Ip2, ipCov2_corr);      
       }
 
-      otree->tauspinnerH = 0.;
-      otree->tauspinnerA = 0.;
-      otree->tauspinnerMaxMix = 0.;
-      if (!std::isnan(otree->TauSpinnerWeightsEven)) 
-	otree->tauspinnerH = otree->TauSpinnerWeightsEven;
-      if (!std::isnan(otree->TauSpinnerWeightsOdd)) 
-	otree->tauspinnerA = otree->TauSpinnerWeightsOdd;
-      if (!std::isnan(otree->TauSpinnerWeightsMaxMix)) 
-	otree->tauspinnerMaxMix = otree->TauSpinnerWeightsMaxMix;
-
+      /*
       std::cout << "IPSig(1) = " << otree->IP_signif_RefitV_with_BS_uncorr_1
 		<< "  :  " << otree->IP_signif_RefitV_with_BS_1 
 		<< "  -> " << otree->IP_signif_PV_with_BS_1 << std::endl;
@@ -1652,8 +1688,8 @@ int main(int argc, char * argv[]){
       std::cout << std::endl;
       */
 
-      //      otree->ip_sig_1 = otree->IP_signif_RefitV_with_BS_1;
-      //      otree->ip_sig_2 = otree->IP_signif_RefitV_with_BS_2;
+      otree->ip_sig_1 = otree->IP_signif_RefitV_with_BS_1;
+      otree->ip_sig_2 = otree->IP_signif_RefitV_with_BS_2;
         
       // evaluate systematics for MC 
       if( !isData && !isEmbedded && ApplySystShift){
@@ -1688,14 +1724,10 @@ int main(int argc, char * argv[]){
 	electronScaleSys->Eval(utils::EMU);
     
       }
-      
-      counter[19]++;  
 
       selEvents++;
       
-      
       //      cout << "Once again puppimet central : " << otree->puppimet << endl;
-      //Merijn 2019 1 10: perhaps this should be called before moving to next event..
       otree->Fill();
     } // event loop
     
@@ -1705,10 +1737,7 @@ int main(int argc, char * argv[]){
     delete file_;
   } // file loop
    
-  //
-  //  std::cout << "COUNTERS" << std::endl;
-  //  for(int iC = 0; iC < 20; iC++) std::cout << "Counter " << iC << ":    " << counter[iC] << std::endl;
-  //
+
   std::cout << std::endl;
   std::cout << "Total number of input events    = " << int(inputEventsH->GetEntries()) << std::endl;
   std::cout << "Total number of events in Tree  = " << nEvents << std::endl;
@@ -1779,9 +1808,14 @@ void FillVertices(const AC1B *analysisTree, Synch17Tree *otree, const bool isDat
   //here fill the generator vertices to have the gen information present in tree PER GOOD RECO EVENT
   //Note: we may want to add constraint that the W and Z are prompt. If we remove these, may get in trouble with a DY or W MC sample..
 
-      if ((analysisTree->genparticles_pdgid[igen] == 23 || analysisTree->genparticles_pdgid[igen] == 24 ||
-  	       analysisTree->genparticles_pdgid[igen] == 25 || analysisTree->genparticles_pdgid[igen] == 35 || analysisTree->genparticles_pdgid[igen] == 36) && 
-           analysisTree->genparticles_isLastCopy[igen] == 1 && analysisTree->genparticles_isPrompt[igen] == 1) {
+      if ( analysisTree->genparticles_pdgid[igen] == 23 || 
+	   analysisTree->genparticles_pdgid[igen] == 24 ||
+	   analysisTree->genparticles_pdgid[igen] == -24 ||
+	   analysisTree->genparticles_pdgid[igen] == 25 || 
+	   analysisTree->genparticles_pdgid[igen] == 35 || 
+	   analysisTree->genparticles_pdgid[igen] == 36 ||
+	   analysisTree->genparticles_pdgid[igen] == 6 ||
+	   analysisTree->genparticles_pdgid[igen] == -6 ) {
         otree->GenVertexX = analysisTree->genparticles_vx[igen];
         otree->GenVertexY = analysisTree->genparticles_vy[igen];
         otree->GenVertexZ = analysisTree->genparticles_vz[igen];
@@ -1790,9 +1824,9 @@ void FillVertices(const AC1B *analysisTree, Synch17Tree *otree, const bool isDat
     }
   }
   else {//if it is data, fill with something recognisable nonsensible
-    otree->GenVertexX = -9999;
-    otree->GenVertexY = -9999;
-    otree->GenVertexZ = -9999;
+    otree->GenVertexX = 0;
+    otree->GenVertexY = 0;
+    otree->GenVertexZ = 0;
   }
 }
 
@@ -1986,5 +2020,7 @@ void FillElMu(const AC1B *analysisTree, Synch17Tree *otree, int electronIndex, f
   otree->q_2 = -1;
   if (analysisTree->muon_charge[muonIndex]>0)
     otree->q_2 = 1;
+
+  otree->dr_tt = deltaR(otree->eta_1,otree->phi_1,otree->eta_2,otree->phi_2);
 
 }

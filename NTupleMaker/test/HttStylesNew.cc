@@ -21,7 +21,7 @@ void InitSignal(TH1* hist);
 void SetLegendStyle(TLegend* leg);
 /// add CMSPreliminary logo, lumi and channel
 void CMSPrelim(const char* dataset, double lowX=0.4, double lowY=0.74);
-void plotchannel(const char* channel, double lowX=0.4, double lowY=0.74);
+void plotchannel(TString channel);
 
 
 
@@ -51,9 +51,9 @@ void SetStyle()
   HttStyle->SetPadColor       (0);
   HttStyle->SetPadBorderSize  (10);
   HttStyle->SetPadBorderMode  (0);
-  HttStyle->SetPadBottomMargin(0.13);
+  HttStyle->SetPadBottomMargin(0.15);
   HttStyle->SetPadTopMargin   (0.08);
-  HttStyle->SetPadLeftMargin  (0.15);
+  HttStyle->SetPadLeftMargin  (0.18);
   HttStyle->SetPadRightMargin (0.05);
   HttStyle->SetPadGridX       (0);
   HttStyle->SetPadGridY       (0);
@@ -151,33 +151,29 @@ void InitSubPad(TPad* pad, int i)
   TPad *tmpPad = (TPad*) pad->GetPad(i);
   tmpPad->SetLeftMargin  (0.18);
   tmpPad->SetTopMargin   (0.05);
-  tmpPad->SetRightMargin (0.07);
+  tmpPad->SetRightMargin (0.05);
   tmpPad->SetBottomMargin(0.15);
   return;
 }
 
-void InitSignal(TH1 *hist, int color)
+void InitSignal(TH1 *hist)
 {
-    hist->SetFillStyle(1001);
-    gStyle->SetLineStyleString(11,"20 10");
-    hist->SetLineStyle(11);
-    hist->SetFillColor(0);
-    hist->SetLineColor(color);
-    hist->SetLineWidth(3);
-    return;
+  hist->SetFillStyle(0.);
+  hist->SetLineStyle(11);
+  hist->SetLineWidth(2.);
+  hist->SetLineColor(kBlue+3);
 }
 
-void InitHist(TH1 *hist, int color)
+void InitHist(TH1 *hist, const char *xtit, const char *ytit, int color, int style)
 {
-  /*
   hist->SetXTitle(xtit);
   hist->SetYTitle(ytit);
   hist->SetLineColor(kBlack);
-  hist->SetLineWidth(    3.);
+  hist->SetLineWidth(    2.);
   hist->SetFillColor(color );
   hist->SetFillStyle(style );
   hist->SetTitleSize  (0.055,"Y");
-  hist->SetTitleOffset(1.600,"Y");
+  hist->SetTitleOffset(1.200,"Y");
   hist->SetLabelOffset(0.014,"Y");
   hist->SetLabelSize  (0.040,"Y");
   hist->SetLabelFont  (42   ,"Y");
@@ -191,17 +187,7 @@ void InitHist(TH1 *hist, int color)
   hist->SetMarkerSize (0.6);
   hist->GetYaxis()->SetTitleFont(42);
   hist->GetXaxis()->SetTitleFont(42);
-  hist->SetTitle("");  */
-    hist->SetFillColor(color);
-    hist->SetFillStyle(1001);
-    hist->SetLineColor(1);
-    hist->SetLineStyle(1);
-    hist->SetLineWidth(2);
-    hist->SetMarkerColor(1);
-    hist->SetMarkerStyle(21);
-    hist->SetMarkerSize(0.0);
-    hist->SetStats(false);
-    
+  hist->SetTitle("");  
   return;
 }
 
@@ -209,7 +195,7 @@ void InitData(TH1* hist)
 {
   hist->SetMarkerStyle(20.);
   hist->SetMarkerSize (1.3);
-  hist->SetLineWidth  ( 3.);
+  hist->SetLineWidth  ( 2.);
 }
 
 void SetLegendStyle(TLegend* leg) 
@@ -242,16 +228,12 @@ void CMSPrelim(const char* dataset, double lowX, double lowY)
   lumi->Draw();
 
 }
-void plotchannel(const char * channel, double lowX, double lowY) {
+void plotchannel(TString channel) {
 
-  TPaveText* chan     = new TPaveText(lowX, lowY+0.061, lowX+0.12, lowY+0.161, "NDC");
-  chan->SetBorderSize(   0 );
-  chan->SetFillStyle(    0 );
-  chan->SetTextAlign(   12 );
-  chan->SetTextSize ( 0.07 );
-  chan->SetTextColor(    1 );
-  chan->SetTextFont (   62 );
-  chan->AddText(channel);
-  chan->Draw();
+   TLatex * tex = new TLatex(0.2,0.94,channel);
+   tex->SetNDC();
+   tex->SetTextSize(0.06);
+   tex->SetLineWidth(2);
+   tex->Draw();
 
 }

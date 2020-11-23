@@ -86,6 +86,51 @@ double CalculateCosPsi(TLorentzVector momentum, TLorentzVector ipvec){
 
 }
 
+TVector3 genParticleIP(const AC1B * analysisTree, TVector3 vertex, int gen_match, float eta, float phi) {
+
+  int index = -1;
+  int partPDG = 0;
+  int partPDG1 = 0;
+  int nPart = analysisTree->genparticles_count;
+  if (gen_match<=6) {
+    if (gen_match==2||gen_match==4) {partPDG = 13; partPDG1 = 13;}
+    else if (gen_match==1||gen_match==3) {partPDG = 11; partPDG1 = 11;}
+    else {partPDG = 211; partPDG1 = 321;}
+    float dR = 0.4;
+    for (int igen=0; igen<nPart; ++igen) {
+      if (TMath::Abs(analysisTree->genparticles_pdgid[igen])==partPDG ||
+	  TMath::Abs(analysisTree->genparticles_pdgid[igen])==partPDG1) {
+	if (analysisTree->genparticles_status[igen]==1) {
+	  TLorentzVector genPart; genPart.SetXYZT(analysisTree->genparticles_px[igen],
+						  analysisTree->genparticles_py[igen],
+						  analysisTree->genparticles_pz[igen],
+						  analysisTree->genparticles_e[igen]);
+	  float dRx = deltaR(eta,phi,
+			     genPart.Eta(),genPart.Phi());
+	  if (dRx<dR) {
+	    index = igen;
+	    dR = dRx;
+	  }
+	}
+      }
+    }
+  }
+  TLorentzVector ipGen;
+  int tauIndex = 0;
+  if (index>=0) {
+    ipGen = gen_ipVec(analysisTree,tauIndex,index,vertex);
+    ipGen.SetPx(ipGen.Px()+1e-8);
+    ipGen.SetPy(ipGen.Py()+1e-8);
+    ipGen.SetPz(ipGen.Pz()+1e-8);
+  }
+  else
+    ipGen.SetXYZT(1e-8,1e-8,1e-8,4e-8);
+
+  TVector3 ipgen3 = ipGen.Vect();
+  return ipgen3;
+    
+}
+
 void calibrateIP(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, int tauIndex2, TString channel, std::map<TString,IpCorrection*> ipCorrectors) {
 
   int nPart = analysisTree->genparticles_count;

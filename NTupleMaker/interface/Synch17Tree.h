@@ -112,12 +112,12 @@ public :
   Float_t         dmMVA_1;
   Float_t 	  chpt_1;
   Float_t 	  cheta_1;
-  Float_t 	      chphi_1;
-  Float_t 	      chm_1;
-  Float_t 	      npt_1;
-  Float_t 	      neta_1;
-  Float_t 	      nphi_1;
-  Float_t 	      nm_1;
+  Float_t 	  chphi_1;
+  Float_t 	  chm_1;
+  Float_t 	  npt_1;
+  Float_t 	  neta_1;
+  Float_t 	  nphi_1;
+  Float_t 	  nm_1;
 
 
   Float_t         pt_2;
@@ -190,14 +190,14 @@ public :
   Int_t 	  tau_decay_mode_2;
   Float_t         dm_2;
   Float_t         dmMVA_2;
-  Float_t 	      chpt_2;
-  Float_t 	      cheta_2;
-  Float_t 	      chphi_2;
-  Float_t 	      chm_2;
-  Float_t 	      npt_2;
-  Float_t 	      neta_2;
-  Float_t 	      nphi_2;
-  Float_t 	      nm_2;
+  Float_t 	  chpt_2;
+  Float_t 	  cheta_2;
+  Float_t 	  chphi_2;
+  Float_t 	  chm_2;
+  Float_t 	  npt_2;
+  Float_t 	  neta_2;
+  Float_t 	  nphi_2;
+  Float_t 	  nm_2;
 
   //TO FIX
   Float_t         againstElectronLooseMVA6_1;
@@ -229,6 +229,7 @@ public :
   Float_t         idisoweight_1;
   Float_t         trkeffweight_1;
   Float_t         idisoweight_antiiso_1;
+  Float_t         idisoweight_loose_1;
   Float_t         trigweight_1;
   Float_t         trigweight_antiiso_1;
 
@@ -296,6 +297,7 @@ public :
   // new 
   Float_t         idisoweight_2;
   Float_t         idisoweight_antiiso_2;
+  Float_t         idisoweight_loose_2;
   Float_t         trkeffweight_2;
   Float_t         trigweight_2;
   Float_t         trigweight_l_lt;
@@ -417,6 +419,18 @@ public :
   Float_t weight_CMS_PS_FSR_ggH_13TeVUp;
   Float_t weight_CMS_PS_FSR_ggH_13TeVDown;
 
+  Float_t qcdweight_deltaR;
+  Float_t qcdweight_deltaR_Par0_up;
+  Float_t qcdweight_deltaR_Par0_down;
+  Float_t qcdweight_deltaR_Par1_up;
+  Float_t qcdweight_deltaR_Par1_down;
+  Float_t qcdweight_deltaR_Par2_up;
+  Float_t qcdweight_deltaR_Par2_down;
+  Float_t qcdweight_nonclosure;
+  Float_t qcdweight_isolationcorrection;
+  Float_t qcdweight;
+
+
   Float_t         topptweight;
   Double_t 	  zptweight;
   Double_t        trkeffweight;
@@ -498,6 +512,7 @@ public :
   Float_t         pt_tt;
   Float_t         m_vis;
   Float_t         mt_tot;
+  Float_t         dr_tt;
 
   Float_t         m_sv;
   Float_t         pt_sv;
@@ -985,6 +1000,7 @@ public :
   TBranch	 *b_idisoweight_antiiso_1;
   TBranch	 *b_trigweight_1;
   TBranch	 *b_trigweight_antiiso_1;
+  TBranch        *b_trkeffweight_1;
   TBranch	 *b_againstElectronLooseMVA6_2;
   TBranch	 *b_againstElectronMediumMVA6_2;
   TBranch	 *b_againstElectronTightMVA6_2;
@@ -1013,6 +1029,7 @@ public :
   TBranch	 *b_byVVTightIsolationMVArun2017v2DBoldDMwLT2017_2;
   TBranch	 *b_idisoweight_2;
   TBranch	 *b_idisoweight_antiiso_2;
+  TBranch        *b_trkeffweight_2;
   TBranch	 *b_trigweight_2;
   TBranch	 *b_trigweight_2_Up;
   TBranch	 *b_trigweight_2_Down;
@@ -1099,6 +1116,16 @@ public :
   TBranch        *b_weight_CMS_mufake_mt_MVADM10_13TeVDown;
   TBranch        *b_weight_CMS_mufake_mt_MVADM11_13TeVDown;
 
+  TBranch        *b_qcdweight_deltaR;
+  TBranch        *b_qcdweight_deltaR_Par0_up;
+  TBranch        *b_qcdweight_deltaR_Par0_down;
+  TBranch        *b_qcdweight_deltaR_Par1_up;
+  TBranch        *b_qcdweight_deltaR_Par1_down;
+  TBranch        *b_qcdweight_deltaR_Par2_up;
+  TBranch        *b_qcdweight_deltaR_Par2_down;
+  TBranch        *b_qcdweight_nonclosure;
+  TBranch        *b_qcdweight_isolationcorrection;
+  TBranch        *b_qcdweight;
 
   TBranch	 *b_topptweight;
   TBranch	 *b_zptweight;
@@ -1125,6 +1152,13 @@ public :
   TBranch	 *b_xTrigger;
   TBranch        *b_xTriggerLep;
   TBranch        *b_xTriggerTau;
+  TBranch        *b_trg_muhigh;
+  TBranch        *b_trg_mulow;
+  TBranch        *b_trg_ehigh;
+  TBranch        *b_trg_elow;
+  TBranch        *b_trg_muhigh_elow;
+  TBranch        *b_trg_ehigh_mulow;
+
   //MET
   TBranch	 *b_met;
   TBranch	 *b_metphi;
@@ -1150,12 +1184,14 @@ public :
   TBranch	 *b_puppimetcov10;
   TBranch	 *b_puppimetcov11;
   TBranch	 *b_puppipzetamiss;
-  TBranch        *b_puppipzetavis;
+  TBranch        *b_puppipzeta;
   
   //di tau system
   TBranch	 *b_pt_tt;
   TBranch	 *b_m_vis;
   TBranch	 *b_mt_tot;
+  TBranch        *b_dr_tt;
+
   TBranch	 *b_m_sv;
   TBranch	 *b_pt_sv;
   TBranch	 *b_eta_sv;
@@ -1168,6 +1204,9 @@ public :
   TBranch	 *b_eta_fast;
   TBranch	 *b_phi_fast;
   TBranch	 *b_mt_fast;
+
+  TBranch	 *b_pt_tt_puppi;
+  TBranch	 *b_mt_tot_puppi;
 
   //VBF
   TBranch	 *b_mjj;
