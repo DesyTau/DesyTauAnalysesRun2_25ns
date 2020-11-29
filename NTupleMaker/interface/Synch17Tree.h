@@ -430,7 +430,6 @@ public :
   Float_t qcdweight_isolationcorrection;
   Float_t qcdweight;
 
-
   Float_t         topptweight;
   Double_t 	  zptweight;
   Double_t        trkeffweight;

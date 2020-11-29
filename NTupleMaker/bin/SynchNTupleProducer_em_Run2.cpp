@@ -234,7 +234,7 @@ int main(int argc, char * argv[]){
   }
 
   const int era = cfg.get<int>("era");
-  const bool Synch            = cfg.get<bool>("Synch");
+  const bool synch            = cfg.get<bool>("Synch");
   const bool ApplyPUweight    = cfg.get<bool>("ApplyPUweight"); 
   const bool ApplyLepSF       = cfg.get<bool>("ApplyLepSF"); 
   const bool ApplySVFit       = cfg.get<bool>("ApplySVFit");
@@ -448,6 +448,7 @@ int main(int argc, char * argv[]){
 
   // correction workspace
   const string CorrectionWorkspaceFileName = cfg.get<string>("CorrectionWorkspaceFileName");
+  const string CorrectionWorkspaceFileNameKIT = cfg.get<string>("CorrectionWorkspaceFileNameKIT");
 
   bool triggerEmbed2017 = false;
   float ptTriggerEmbed2017 = 40;
@@ -529,13 +530,21 @@ int main(int argc, char * argv[]){
 
   // Workspace with corrections
   TString workspace_filename = TString(cmsswBase) + "/src/" + CorrectionWorkspaceFileName;
+  TString workspace_filename_kit = TString(cmsswBase) + "/src/" + CorrectionWorkspaceFileNameKIT;
   cout << "Taking correction workspace from " << workspace_filename << endl;
   TFile *f_workspace = new TFile(workspace_filename, "read");
+  TFile *f_workspace_kit = new TFile(workspace_filename_kit, "read");
   if (f_workspace->IsZombie()) {
     std::cout << " workspace file " << workspace_filename << " not found. Please check. " << std::endl;
      exit(-1);
    }
+  if (f_workspace_kit->IsZombie()) {
+    std::cout << " workspace file " << workspace_filename_kit << " not found. Please check. " << std::endl;
+     exit(-1);
+   }
+
   RooWorkspace *w = (RooWorkspace*)f_workspace->Get("w");
+  RooWorkspace *correctionWS = (RooWorkspace*)f_workspace_kit->Get("w");
 
   // Zpt reweighting for LO DY samples 
   TFile *f_zptweight = new TFile(TString(cmsswBase) + "/src/" + ZptweightFile, "read");
@@ -770,7 +779,7 @@ int main(int argc, char * argv[]){
 
       //Skip events not passing the MET filters, if applied
       bool passed_all_met_filters = passedAllMetFilters(&analysisTree, met_filters_list);
-      if (ApplyMetFilters && !Synch && !passed_all_met_filters) continue;
+      if (ApplyMetFilters && !synch && !passed_all_met_filters) continue;
       otree->passedAllMetFilters = passed_all_met_filters;
       
       // accessing trigger info ====
@@ -1043,6 +1052,24 @@ int main(int argc, char * argv[]){
       	TString suffixRatio = "ratio";
       	if (isEmbedded) {suffix = "embed"; suffixRatio = "embed_ratio";}
 
+	correctionWS->var("e_pt")->setVal(otree->pt_1);
+	correctionWS->var("e_eta")->setVal(otree->eta_1);
+	correctionWS->var("e_iso")->setVal(otree->iso_1);
+	correctionWS->var("m_pt")->setVal(otree->pt_2);
+	correctionWS->var("m_eta")->setVal(otree->eta_2);
+	correctionWS->var("m_iso")->setVal(otree->iso_2);
+
+	/*
+	float eff_data_trig_mhigh_kit = correctionWS->function("m_trg_23_binned_ic_data")->getVal();
+	float eff_data_trig_mlow_kit = correctionWS->function("m_trg_8_binned_ic_data")->getVal();
+	float eff_mc_trig_mhigh_kit = correctionWS->function("m_trg_23_binned_ic_"+suffix)->getVal();
+	float eff_mc_trig_mlow_kit = correctionWS->function("m_trg_8_binned_ic_"+suffix)->getVal();
+
+	float eff_data_trig_ehigh_kit = correctionWS->function("e_trg_23_binned_ic_data")->getVal();
+	float eff_data_trig_elow_kit = correctionWS->function("e_trg_12_binned_ic_data")->getVal();
+	float eff_mc_trig_ehigh_kit = correctionWS->function("e_trg_23_binned_ic_"+suffix)->getVal();
+	float eff_mc_trig_elow_kit = correctionWS->function("e_trg_12_binned_ic_"+suffix)->getVal();
+	*/
 	// muon weights
 	w->var("m_pt")->setVal(otree->pt_2);
 	w->var("m_eta")->setVal(otree->eta_2);
@@ -1057,6 +1084,7 @@ int main(int argc, char * argv[]){
 	eff_mc_trig_mhigh = w->function("m_trg_23_binned_ic_"+suffix)->getVal();
 	eff_mc_trig_mlow = w->function("m_trg_8_binned_ic_"+suffix)->getVal();
 
+;
 	otree->idisoweight_2 = w->function("m_idiso_ic_" + suffixRatio)->getVal();
 	otree->idisoweight_antiiso_2 = w->function("m_idiso_ic_" + suffixRatio)->getVal();
 	otree->trkeffweight_2 = w->function("m_trk_ratio")->getVal(); //  may be wrong
@@ -1073,7 +1101,17 @@ int main(int argc, char * argv[]){
 	eff_data_trig_elow = w->function("e_trg_12_binned_ic_data")->getVal();
 	eff_mc_trig_ehigh = w->function("e_trg_23_binned_ic_"+suffix)->getVal();
 	eff_mc_trig_elow = w->function("e_trg_12_binned_ic_"+suffix)->getVal();
+	/*
+	std::cout << "eff_data_trig_ehigh : " << eff_data_trig_ehigh << "  " << eff_data_trig_ehigh_kit << std::endl;
+	std::cout << "eff_mc_trig_ehigh   :  " << eff_mc_trig_ehigh << "  " << eff_mc_trig_ehigh_kit << std::endl;
+	std::cout << "eff_data_trig_elow : " << eff_data_trig_elow << "  " << eff_data_trig_elow_kit << std::endl;
+	std::cout << "eff_mc_trig_elow   :  " << eff_mc_trig_elow << "  " << eff_mc_trig_elow_kit << std::endl;
 
+	std::cout << "eff_data_trig_mhigh : " << eff_data_trig_mhigh << "  " << eff_data_trig_mhigh_kit << std::endl;
+	std::cout << "eff_mc_trig_mhigh   :  " << eff_mc_trig_mhigh << "  " << eff_mc_trig_mhigh_kit << std::endl;
+	std::cout << "eff_data_trig_mlow : " << eff_data_trig_mlow << "  " << eff_data_trig_mlow_kit << std::endl;
+	std::cout << "eff_mc_trig_mlow   :  " << eff_mc_trig_mlow << "  " << eff_mc_trig_mlow_kit << std::endl;
+	*/
 	if (triggerEmbed2017) {
 	  if (otree->pt_1<ptTriggerEmbed2017&&fabs(otree->eta_1)>etaTriggerEmbed2017) {
 	    eff_mc_trig_e = 1.0;
@@ -1085,23 +1123,67 @@ int main(int argc, char * argv[]){
 	otree->idisoweight_antiiso_1 = w->function("e_idiso_ic_" + suffixRatio)->getVal();
 	otree->trkeffweight_1 = w->function("e_trk_" + suffixRatio)->getVal();
 
+	float isoweight_1_kit = 1.0;
+	float isoweight_2_kit = 1.0;
+	float trkeffweight_1_kit = 1.0;
+	float trkeffweight_2_kit = 1.0;
+
+	// scale factors (from KIT)
+	if (era==2016){
+	  if (isEmbedded) {
+	    isoweight_1_kit = correctionWS->function("e_idiso_ratio_emb")->getVal();
+	    isoweight_2_kit = correctionWS->function("m_idlooseiso_binned_ic_embed_ratio")->getVal();
+	  }
+	  else {
+	    isoweight_1_kit = correctionWS->function("e_idiso_ratio")->getVal();
+	    isoweight_2_kit = correctionWS->function("m_idlooseiso_binned_ic_ratio")->getVal();
+	  }
+	}
+	else{
+	  if (isEmbedded) {
+	    isoweight_1_kit = correctionWS->function("e_id90_embed_kit_ratio")->getVal() * correctionWS->function("e_iso_binned_embed_kit_ratio")->getVal();
+	    isoweight_2_kit = correctionWS->function("m_looseiso_binned_ic_embed_ratio")->getVal()*correctionWS->function("m_id_embed_kit_ratio")->getVal();
+	  }
+	  else {
+	    isoweight_1_kit = correctionWS->function("e_id90_kit_ratio")->getVal() * correctionWS->function("e_iso_binned_kit_ratio")->getVal();
+	    isoweight_2_kit = correctionWS->function("m_looseiso_binned_ic_ratio")->getVal()*correctionWS->function("m_id_kit_ratio")->getVal();
+	  }
+	}
+	if (!isEmbedded){
+	  correctionWS->var("e_pt")->setVal(otree->pt_1);
+	  correctionWS->var("e_eta")->setVal(otree->eta_1);
+	  if (era == 2018) trkeffweight_1_kit = correctionWS->function("e_trk_ratio")->getVal();
+	  correctionWS->var("m_eta")->setVal(otree->eta_2);
+	  correctionWS->var("m_pt")->setVal(otree->pt_2);
+	  if (era==2016 || era==2018) 
+	    trkeffweight_2_kit = correctionWS->function("m_trk_ratio")->getVal();
+	}
+	if (era == 2017) trkeffweight_1_kit = correctionWS->function("e_trk_ratio")->getVal();
+	//	isoweight_1_kit *= trkeffweight_1_kit;
+	//	isoweight_2_kit *= trkeffweight_2_kit;
+	// KIT SF
+	otree->idisoweight_1 = isoweight_1_kit;
+	otree->idisoweight_2 = isoweight_2_kit;
+	otree->trkeffweight_1 = trkeffweight_1_kit;
+	otree->trkeffweight_2 = trkeffweight_2_kit;
+
 	otree->trigweight_1 = sf_trig_e;
 	otree->trigweight_2 = sf_trig_m;
 	
 	float eff_single_data = 1.0 - (1.0-eff_data_trig_e)*(1.0-eff_data_trig_m);
 	float eff_single_mc   = 1.0 - (1.0-eff_mc_trig_e)  *(1.0-eff_mc_trig_m);
-	if (eff_single_mc>1e-3) 
-	  otree->trigweightSingle = eff_single_data/eff_single_mc;
+	if (eff_single_mc<1e-3||eff_single_data<1e-3) 
+	  otree->trigweightSingle = 0.0;
 	else
-	  otree->trigweightSingle = 1.0;
+	  otree->trigweightSingle = eff_single_data/eff_single_mc;
 
 	if (otree->pt_1<ptElectronSingleCut)
 	  otree->trigweightSingle = sf_trig_m;
 	if (otree->pt_2<ptMuonSingleCut)
 	  otree->trigweightSingle = sf_trig_e;
-	if (otree->pt_1<ptElectronSingleCut&&otree->pt_2<ptMuonSingleCut)
+	if (otree->pt_1<ptElectronSingleCut&&otree->pt_2<ptMuonSingleCut) {
 	  otree->trigweightSingle = 0;
-
+	}
 	float eff_emu_data = 
 	  eff_data_trig_mhigh*eff_data_trig_elow + 
 	  eff_data_trig_mlow*eff_data_trig_ehigh -
@@ -1111,48 +1193,65 @@ int main(int argc, char * argv[]){
 	  eff_mc_trig_mlow*eff_mc_trig_ehigh -
 	  eff_mc_trig_mhigh*eff_mc_trig_ehigh;
 
-	if (eff_emu_mc>1e-3)
-	  otree->trigweightExcl = eff_emu_data/eff_emu_mc;
+	if (eff_emu_mc<1e-3||eff_emu_data<1e-3)
+	  otree->trigweight = 0.0;
 	else
-	  otree->trigweightExcl = 1.0;
+	  otree->trigweight = eff_emu_data/eff_emu_mc;
 
-	otree->trigweightSingle = otree->trigweight;
+	float sf_trig_mhigh = 0;
+	float sf_trig_mlow = 0;
+	float sf_trig_ehigh = 0;
+	float sf_trig_elow = 0;
+
+	if (eff_data_trig_mhigh>1e-3&&eff_mc_trig_mhigh>1e-3)
+	  sf_trig_mhigh = eff_data_trig_mhigh/eff_mc_trig_mhigh;
+	if (eff_data_trig_mlow>1e-3&&eff_mc_trig_mlow>1e-3)
+	  sf_trig_mlow = eff_data_trig_mlow/eff_mc_trig_mlow;
+
+	if (eff_data_trig_ehigh>1e-3&&eff_mc_trig_ehigh>1e-3)
+	  sf_trig_ehigh = eff_data_trig_ehigh/eff_mc_trig_ehigh;
+	if (eff_data_trig_elow>1e-3&&eff_mc_trig_elow>1e-3)
+	  sf_trig_elow = eff_data_trig_elow/eff_mc_trig_elow;
+
 	if (otree->pt_1<ptElectronHighCut)
-	  otree->trigweightExcl = eff_mc_trig_mhigh*eff_mc_trig_elow;
+	  otree->trigweight = sf_trig_mhigh*sf_trig_elow;
 	if (otree->pt_2<ptMuonHighCut)
-	  otree->trigweightExcl = eff_mc_trig_ehigh*eff_mc_trig_mlow;
-	if (otree->pt_1<ptElectronHighCut&&otree->pt_2<ptMuonHighCut)
-	  otree->trigweightExcl = 0;
+	  otree->trigweight = sf_trig_ehigh*sf_trig_mlow;
+	if (otree->pt_1<ptElectronHighCut&&otree->pt_2<ptMuonHighCut) {
+	  otree->trigweight = 0;
+	}
 
 	/*
-	if (!pass_single_offline&&pass_cross_offline) 
-	std::cout << " **************** etau_tau trigger ******************* " << std::endl;
+	std::cout << "pt_1 : " << otree->pt_1 << "  eta_1 = " << otree->eta_1 << "  iso_1 = " << otree->iso_1 << std::endl; 
+	std::cout << "idiso_1 = " << otree->idisoweight_1 
+		  << "  idiso_kit_1 = " << isoweight_1_kit << std::endl;
+	std::cout << "trkeff_1 = " << otree->trkeffweight_1 
+		  << "  trkeff_kit_1 = " << trkeffweight_1_kit << std::endl;
 
-	std::cout << "pt_1 = " << otree->pt_1 << "   eta_1 = " << otree->eta_1
-		  << "   pt_2 = " << otree->pt_2 << "   eta_2 = " << otree->eta_2 << std::endl;
-	std::cout << "pass_single_offline = " << pass_single_offline 
-		  << "   pass_cross_offline = " << pass_cross_offline << std::endl;
-	std::cout << "trigweight_1 = " << otree->trigweight_1 << std::endl;
-	std::cout << "trigweight_2 = " << otree->trigweight_2
-		  << "   Up = " << otree->trigweight_2_Up
-		  << "   Down = " << otree->trigweight_2_Down << std::endl;
+	std::cout << "pt_2 : " << otree->pt_2 << "  eta_2 = " << otree->eta_2 << "  iso_2 = " << otree->iso_2 << std::endl; 
+	std::cout << "idiso_2 = " << otree->idisoweight_2 
+		  << "  idiso_kit_2 = " << isoweight_2_kit << std::endl;
+	std::cout << "trkeff_2 = " << otree->trkeffweight_2 
+		  << "  trkeff_kit_2 = " << trkeffweight_2_kit << std::endl;	
 	
-	std::cout << "trigweght = " << otree->trigweight 
-		  << "   Up = " << trigweightUp 
-		  << "   Down = " << trigweightDown << std::endl;
+	std::cout << "eff_mc_trig_e   = " << eff_mc_trig_e << std::endl;
+	std::cout << "eff_mc_trig_m   = " << eff_mc_trig_m << std::endl;
+	std::cout << "eff_data_trig_e = " << eff_data_trig_e << std::endl;
+	std::cout << "eff_data_trig_m = " << eff_data_trig_m << std::endl;
+	std::cout << "eff_single_data = " << eff_single_data << std::endl;
+	std::cout << "eff_single_mc   = " << eff_single_mc << std::endl;
+	std::cout << "trigweight = " << otree->trigweightSingle << std::endl;
+	std::cout << "trigweight(e+mu) = " << otree->trigweightExcl << std::endl;
+
 	std::cout << std::endl;
 	*/
-
-	otree->trigweight = otree->trigweightSingle;
 	float eff_emu_weight = otree->idisoweight_1 * otree->trkeffweight_1 * otree->idisoweight_2 * otree->trkeffweight_2;
-	if (isEmbedded) eff_emu_weight *= otree->embweight;
 	otree->effweight = eff_emu_weight * otree->trigweight;
 	otree->effweightSingle = eff_emu_weight * otree->trigweightSingle;
-	otree->effweightExcl = eff_emu_weight * otree->trigweightExcl;
 	otree->weight = otree->effweight * otree->puweight * otree->mcweight; 
 	otree->weightSingle = otree->effweightSingle * otree->puweight * otree->mcweight; 
-	otree->weightExcl   = otree->effweightExcl * otree->puweight * otree->mcweight; 
-
+	otree->weight *= otree->embweight;
+	otree->weightSingle *= otree->embweight;
       }
       
       //Theory uncertainties for CP analysis      
