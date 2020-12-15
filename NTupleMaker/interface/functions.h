@@ -16,7 +16,6 @@ const double pionMass = 0.1396;
 using namespace std;
 
 
-
 double mctcorr(const double v1[4],const double v2[4]
                          ,const double vds[4],const double ptm[2]
                          ,const double ecm=14000.0,const double mxlo=0.0);
@@ -782,6 +781,14 @@ namespace calc{
     return sqrt(2*lpt*met*(1.-TMath::Cos(lphi-metphi)));
   }
 
+  float mTtot(const TLorentzVector& v1, const TLorentzVector& v2, const TLorentzVector& v3) {
+    float mT12 = mT(v1,v2);
+    float mT13 = mT(v1,v3);
+    float mT23 = mT(v2,v3);
+    float result = TMath::Sqrt(mT12*mT12+mT13*mT13+mT23*mT23);
+    return result;
+  }
+
   float pzetavis( float zx, float zy, float visx, float visy){
     return zx*visx+zy*visy;
   }
@@ -807,6 +814,7 @@ namespace calc{
     return zx*met*TMath::Cos(metphi)+zy*met*TMath::Sin(metphi);
   }
 
+
   float pzetamiss(const TLorentzVector& v1, const TLorentzVector& v2, const TLorentzVector& met){
     float v1ux = v1.Px()/v1.Pt();
     float v1uy = v1.Py()/v1.Pt();
@@ -822,6 +830,13 @@ namespace calc{
     zy = zy/modz;
     
     return pzetamiss( zx, zy, met.Pt(), met.Phi()); 
+  }
+
+  float pzeta(const TLorentzVector& v1, const TLorentzVector& v2, const TLorentzVector& met) {
+    float pzvis = pzetavis(v1,v2);
+    float pzmis = pzetamiss(v1,v2,met);
+    float pz = pzmis - 0.85*pzvis;
+    return pz;
   }
 
   std::shared_ptr<SVfitStandaloneAlgorithm> svFit(const TLorentzVector& v1, int dm_1,

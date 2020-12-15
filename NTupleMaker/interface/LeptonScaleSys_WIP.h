@@ -162,7 +162,9 @@ protected:
     float pt_tt_cen = cenTree->pt_tt;
     float pzetavis_cen = cenTree->pzetavis;
     float pzetamiss_cen = cenTree->pzetamiss;
-    
+    float pzeta_cen = cenTree->pzeta;
+    float mt_tot_cen = cenTree->mt_tot;
+
     float m_vis_cen = cenTree->m_vis;
 
     float m_sv_cen = cenTree->m_sv;
@@ -177,9 +179,6 @@ protected:
     float pt_fast_cen = cenTree->pt_fast;
     float eta_fast_cen = cenTree->eta_fast;
     float phi_fast_cen = cenTree->phi_fast; 
-
-    float mt_tot_cen = cenTree->mt_tot;
-
 
     // calc shifted values
     cenTree->pt_1 = lep1_scaled.Pt();
@@ -216,15 +215,15 @@ protected:
     cenTree->met = pfmetLV.Pt();
     cenTree->metphi = pfmetLV.Phi();
 
-    cenTree->mt_1 = sqrt(2*lep1_scaled.Pt()*pfmetLV.Pt()*(1.-cos(lep1_scaled.Phi()-pfmetLV.Phi())));
-    cenTree->mt_2 = sqrt(2*lep2_scaled.Pt()*pfmetLV.Pt()*(1.-cos(lep2_scaled.Phi()-pfmetLV.Phi())));
+    cenTree->mt_1 = mT(lep1_scaled,pfmetLV);
+    cenTree->mt_2 = mT(lep2_scaled,pfmetLV);
 
     // changing puppi MET
     cenTree->puppimet = puppimetLV.Pt();
     cenTree->puppimetphi = puppimetLV.Phi();
 
-    cenTree->puppimt_1 = sqrt(2*lep1_scaled.Pt()*puppimetLV.Pt()*(1.-cos(lep1_scaled.Phi()-puppimetLV.Phi())));
-    cenTree->puppimt_2 = sqrt(2*lep2_scaled.Pt()*puppimetLV.Pt()*(1.-cos(lep2_scaled.Phi()-puppimetLV.Phi())));
+    cenTree->puppimt_1 = mT(lep1_scaled,puppimetLV);
+    cenTree->puppimt_2 = mT(lep2_scaled,puppimetLV);
     
     TMatrixD covMET(2, 2);
     covMET[0][0] = cenTree->metcov00;
@@ -249,22 +248,18 @@ protected:
 
     TLorentzVector dileptonLV = lep1_scaled + lep2_scaled;
 
-    TLorentzVector metLV = pfmetLV;
+    TLorentzVector metxLV = pfmetLV;
     if (usePuppiMET) 
-      metLV = puppimetLV;
+      metxLV = puppimetLV;
     
-    cenTree->pt_tt = (lep1_scaled+lep2_scaled+metLV).Pt();
+    cenTree->pt_tt = (lep1_scaled+lep2_scaled+metxLV).Pt();
     
     cenTree->pzetavis = calc::pzetavis(lep1_scaled, lep2_scaled);
-    cenTree->pzetamiss = calc::pzetamiss( lep1_scaled, lep2_scaled, pfmetLV);
+    cenTree->pzetamiss = calc::pzetamiss( lep1_scaled, lep2_scaled, metxLV);
+    cenTree->pzeta = calc::pzeta(lep1_scaled, lep2_scaled, metxLV);
     
     cenTree->m_vis = dileptonLV.M();
-    
-    float mtTOT =2*lep1_scaled.Pt()*metLV.Pt()*(1-cos(cenTree->phi_1 - metLV.Phi()));
-    mtTOT += 2*lep2_scaled.Pt()*metLV.Pt()*(1-cos(cenTree->phi_2 - metLV.Phi())); 
-    mtTOT += 2*lep1_scaled.Pt()*lep2_scaled.Pt()*(1-cos(cenTree->phi_1-cenTree->phi_2)); 
-    cenTree->mt_tot = TMath::Sqrt(mtTOT);
-    
+    cenTree->mt_tot = calc::mTtot(lep1_scaled,lep2_scaled,metxLV);    
 
     // add flag for svfit
     if(ch != UNKNOWN && (useSVFit || useFastMTT)){
@@ -275,6 +270,7 @@ protected:
       if (ch == MUTAU)  type_ = classic_svFit::MeasuredTauLepton::kTauToMuDecay;
       if (ch == ETAU)   type_ = classic_svFit::MeasuredTauLepton::kTauToElecDecay;
       if (ch == TAUTAU) type_ = classic_svFit::MeasuredTauLepton::kTauToHadDecay;
+      if (ch == EMU)    type_ = classic_svFit::MeasuredTauLepton::kTauToElecDecay;
       // define lepton four vectors                                                                                                             
 
       measuredTauLeptons.push_back(classic_svFit::MeasuredTauLepton(type_,
@@ -282,14 +278,23 @@ protected:
 								    lep1_scaled.Eta(),
 								    lep1_scaled.Phi(),
 								    lep1_scaled.M()));
-      measuredTauLeptons.push_back(classic_svFit::MeasuredTauLepton(classic_svFit::MeasuredTauLepton::kTauToHadDecay,
-								    lep2_scaled.Pt(),
-								    lep2_scaled.Eta(),
-								    lep2_scaled.Phi(),
-								    lep2_scaled.M(),
-								    cenTree->tau_decay_mode_2));
-      if (useSVFit) {
+      if (ch == EMU) {
+	measuredTauLeptons.push_back(classic_svFit::MeasuredTauLepton(classic_svFit::MeasuredTauLepton::kTauToMuDecay,
+								      lep2_scaled.Pt(),
+								      lep2_scaled.Eta(),
+								      lep2_scaled.Phi(),
+								      lep2_scaled.M())); 
 	
+      }
+      else {
+	measuredTauLeptons.push_back(classic_svFit::MeasuredTauLepton(classic_svFit::MeasuredTauLepton::kTauToHadDecay,
+								      lep2_scaled.Pt(),
+								      lep2_scaled.Eta(),
+								      lep2_scaled.Phi(),
+								      lep2_scaled.M(), 
+  								      cenTree->tau_decay_mode_2));
+      }
+      if (useSVFit) {	  
 				       
 	int verbosity = 1;
 	ClassicSVfit svFitAlgo(verbosity);

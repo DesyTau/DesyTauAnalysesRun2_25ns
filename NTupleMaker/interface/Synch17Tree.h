@@ -486,8 +486,6 @@ public :
   Float_t         puppimetcov01;
   Float_t         puppimetcov10;
   Float_t         puppimetcov11;
-  Float_t         puppipzetamiss;
-  Float_t         puppipzeta;
 
   Float_t         puppimet_ex_UnclusteredEnUp;
   Float_t         puppimet_ex_UnclusteredEnDown;
@@ -520,9 +518,6 @@ public :
   Float_t         met_sv;
   Float_t         mt_sv;
   
-  Float_t         pt_tt_puppi;
-  Float_t         mt_tot_puppi;
-
   Float_t         m_fast;
   Float_t         pt_fast;
   Float_t         eta_fast;
@@ -1182,8 +1177,6 @@ public :
   TBranch	 *b_puppimetcov01;
   TBranch	 *b_puppimetcov10;
   TBranch	 *b_puppimetcov11;
-  TBranch	 *b_puppipzetamiss;
-  TBranch        *b_puppipzeta;
   
   //di tau system
   TBranch	 *b_pt_tt;

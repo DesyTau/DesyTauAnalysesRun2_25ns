@@ -672,11 +672,11 @@ int main(int argc, char * argv[]){
       if (cfg.get<bool>("splitJES")){
 	JESUncertainties *jecUncertainties;
 	if (era==2016) 
-	  jecUncertainties = new JESUncertainties("DesyTauAnalyses/NTupleMaker/data/Regrouped_Summer16_07Aug2017_V11_MC_UncertaintySources_AK4PFchs.txt");
+	  jecUncertainties = new JESUncertainties("DesyTauAnalyses/NTupleMaker/data/RegroupedV2_Summer16_07Aug2017_V11_MC_UncertaintySources_AK4PFchs.txt");
 	else if (era==2017)
-	  jecUncertainties = new JESUncertainties("DesyTauAnalyses/NTupleMaker/data/Regrouped_Fall17_17Nov2017_V32_MC_UncertaintySources_AK4PFchs.txt");
+	  jecUncertainties = new JESUncertainties("DesyTauAnalyses/NTupleMaker/data/RegroupedV2_Fall17_17Nov2017_V32_MC_UncertaintySources_AK4PFchs.txt");
 	else 
-	  jecUncertainties = new JESUncertainties("DesyTauAnalyses/NTupleMaker/data/Regrouped_Autumn18_V19_MC_UncertaintySources_AK4PFchs.txt");
+	  jecUncertainties = new JESUncertainties("DesyTauAnalyses/NTupleMaker/data/RegroupedV2_Autumn18_V19_MC_UncertaintySources_AK4PFchs.txt");
 	std::vector<std::string> JESnames = jecUncertainties->getUncertNames();
 	for (unsigned int i = 0; i < JESnames.size(); i++) std::cout << "i: "<< i << ", JESnames.at(i) : " << JESnames.at(i) << std::endl;
 	for (unsigned int i = 0; i < JESnames.size(); i++){
@@ -1377,6 +1377,14 @@ int main(int argc, char * argv[]){
       otree->puppimetcov10 = analysisTree.puppimet_sigyx;
       otree->puppimetcov11 = analysisTree.puppimet_sigyy;
 
+      otree->puppimet_ex_UnclusteredEnUp = analysisTree.puppimet_ex_UnclusteredEnUp;
+      otree->puppimet_ex_UnclusteredEnDown = analysisTree.puppimet_ex_UnclusteredEnDown;
+
+      otree->puppimet_ey_UnclusteredEnUp = analysisTree.puppimet_ex_UnclusteredEnUp;
+      otree->puppimet_ey_UnclusteredEnDown = analysisTree.puppimet_ex_UnclusteredEnDown;
+
+      
+
       otree->met_uncorr = otree->puppimet;
       otree->metphi_uncorr = otree->puppimetphi;
       otree->njetshad = otree->njets;
@@ -1435,29 +1443,16 @@ int main(int argc, char * argv[]){
 
       TLorentzVector metLV; metLV.SetXYZT(otree->met*TMath::Cos(otree->metphi),
 					  otree->met*TMath::Sin(otree->metphi),
-					  otree->met,
+					  0.0,
 					  otree->met);
 
       TLorentzVector puppimetLV; puppimetLV.SetXYZT(otree->puppimet*TMath::Cos(otree->puppimetphi),
 						    otree->puppimet*TMath::Sin(otree->puppimetphi),
-						    otree->puppimet,
+						    0.0,
 						    otree->puppimet);
 
       TLorentzVector dileptonLV = muonLV + electronLV;
       otree->m_vis = dileptonLV.M();
-      otree->pt_tt = (dileptonLV+metLV).Pt();   
-      otree->pt_tt_puppi = (dileptonLV+puppimetLV).Pt();
-    
-      // mt TOT
-      float mtTOT = 2*(otree->pt_1)*metLV.Pt()*(1-cos(DeltaPhi(electronLV,metLV)));
-      mtTOT += 2*(otree->pt_2)*metLV.Pt()*(1-cos(DeltaPhi(muonLV,metLV))); 
-      mtTOT += 2*(otree->pt_1)*(otree->pt_2)*(1-cos(DeltaPhi(electronLV,muonLV))); 
-      otree->mt_tot = TMath::Sqrt(mtTOT);
-
-      mtTOT = 2*(otree->pt_1)*puppimetLV.Pt()*(1-cos(DeltaPhi(electronLV,puppimetLV)));
-      mtTOT += 2*(otree->pt_2)*puppimetLV.Pt()*(1-cos(DeltaPhi(muonLV,puppimetLV))); 
-      mtTOT += 2*(otree->pt_1)*(otree->pt_2)*(1-cos(DeltaPhi(electronLV,muonLV))); 
-      otree->mt_tot_puppi = TMath::Sqrt(mtTOT);
     
       // opposite charge
       otree->os = (otree->q_1 * otree->q_2) < 0.;
@@ -1479,30 +1474,18 @@ int main(int argc, char * argv[]){
     
       // bisector of lepton and tau transverse momenta
     
-      float electronUnitX = electronLV.Px() / electronLV.Pt();
-      float electronUnitY = electronLV.Py() / electronLV.Pt();
-    
-      float muonUnitX = muonLV.Px() / muonLV.Pt();
-      float muonUnitY = muonLV.Py() / muonLV.Pt();
-    
-      float zetaX = electronUnitX + muonUnitX;
-      float zetaY = electronUnitY + muonUnitY;
-    
-      float normZeta = TMath::Sqrt(zetaX*zetaX+zetaY*zetaY);
-    
-      zetaX = zetaX / normZeta;
-      zetaY = zetaY / normZeta;
-    
-      float vectorVisX = electronLV.Px() + muonLV.Px();
-      float vectorVisY = electronLV.Py() + muonLV.Py();
-    
-      otree->pzetavis  = vectorVisX*zetaX + vectorVisY*zetaY;
-      otree->pzetamiss = otree->met*TMath::Cos(otree->metphi)*zetaX + otree->met*TMath::Sin(otree->metphi)*zetaY;
-      otree->puppipzetamiss = otree->puppimet*TMath::Cos(otree->puppimetphi)*zetaX + otree->puppimet*TMath::Sin(otree->puppimetphi)*zetaY;
-      otree->pzeta = otree->pzetamiss - 0.85*otree->pzetavis;
-      otree->puppipzeta = otree->puppipzetamiss - 0.85*otree->pzetavis;
+      otree->pzetavis  = calc::pzetavis(electronLV,muonLV);
 
-    
+      TLorentzVector metxLV = metLV;
+      if (usePuppiMET) 
+	metxLV = puppimetLV;
+
+      otree->pt_tt = (dileptonLV+metxLV).Pt();   
+      otree->mt_tot = calc::mTtot(electronLV,muonLV,metxLV);
+      otree->pzetamiss = calc::pzetamiss(electronLV,muonLV,metxLV);
+      otree->pzeta = calc::pzeta(electronLV,muonLV,metxLV);
+      
+
       bool isSRevent = true; //boolean used to compute SVFit variables only on SR events, it is set to true when running Synchronization to run SVFit on all events
       //      if(!Synch){
       //	isSRevent = (otree->dilepton_veto<0.5 &&  otree->extramuon_veto<0.5 && otree->extraelec_veto<0.5 && otree->pt_1>19 && otree->pt_2>19 && otree->byVVVLooseDeepTau2017v2p1VSjet_2>0.5);
@@ -1535,261 +1518,11 @@ int main(int argc, char * argv[]){
       otree->phi_fast = -10;
       otree->eta_fast = -10;
 
+      // +++++++++++++++++++++++++++++++++++++++++++++++++
+      // ++++++++ Systematic uncertainties +++++++++++++++
+      // +++++++++++++++++++++++++++++++++++++++++++++++++
 
-      // ***********************************
-      // ** IPSignificance calibration ->
-      // ***********************************
-      otree->v_tracks = 0;
-      std::vector<float> PV_covariance; PV_covariance.clear();
-      std::vector<float> PVBS_covariance; PVBS_covariance.clear();
-      // by default store non-refitted PV with BS constraint if refitted one is not found
 
-      float vtx_x = analysisTree.primvertexwithbs_x; 
-      float vtx_y = analysisTree.primvertexwithbs_y;
-      float vtx_z = analysisTree.primvertexwithbs_z;
-
-      float vtx_bs_x = analysisTree.primvertexwithbs_x; 
-      float vtx_bs_y = analysisTree.primvertexwithbs_y;
-      float vtx_bs_z = analysisTree.primvertexwithbs_z;
-
-      for (int j = 0; j<6 ; ++j) {
-	PV_covariance.push_back(analysisTree.primvertexwithbs_cov[j]);
-	PVBS_covariance.push_back(analysisTree.primvertexwithbs_cov[j]);
-      }
-
-      for(unsigned int i = 0; i < analysisTree.refitvertexwithbs_count; i++)
-        {
-	  bool muon_match = muonIndex == analysisTree.refitvertexwithbs_muIndex[i][0] || muonIndex == analysisTree.refitvertexwithbs_muIndex[i][1];
-	  bool electron_match = electronIndex == analysisTree.refitvertexwithbs_eleIndex[i][0] || electronIndex == analysisTree.refitvertexwithbs_eleIndex[i][1];
-	  bool lep_match = muon_match && electron_match;
-
-          if( lep_match )
-            {
-              otree->v_tracks = analysisTree.refitvertexwithbs_ntracks[i];
-	      vtx_x = analysisTree.refitvertexwithbs_x[i];
-	      vtx_y = analysisTree.refitvertexwithbs_y[i];
-	      vtx_z = analysisTree.refitvertexwithbs_z[i];
-	      for (int j=0; j<6; ++j) 
-		PV_covariance[j] = analysisTree.refitvertexwithbs_cov[i][j];
-            }
-        }
-
-      otree->pvx = vtx_x;
-      otree->pvy = vtx_y;
-      otree->pvz = vtx_z;
-      TVector3 vertex_bs(vtx_bs_x,vtx_bs_y,vtx_bs_z);
-      TVector3 vertex(vtx_x,vtx_y,vtx_z);
-      
-      TLorentzVector muonIP = ipVec_Lepton_emu(&analysisTree,muonIndex,false,vertex,era,isEmbedded);
-      TLorentzVector muonIP_pvbs = ipVec_Lepton_emu(&analysisTree,muonIndex,false,vertex_bs,era,isEmbedded);
-
-      TLorentzVector electronIP = ipVec_Lepton_emu(&analysisTree,electronIndex,true,vertex,era,isEmbedded);
-      TLorentzVector electronIP_pvbs = ipVec_Lepton_emu(&analysisTree,electronIndex,true,vertex_bs,era,isEmbedded);
-      
-      otree->ipx_uncorr_1 = electronIP.X();
-      otree->ipy_uncorr_1 = electronIP.Y();
-      otree->ipz_uncorr_1 = electronIP.Z();
-
-      otree->ipx_bs_uncorr_1 = electronIP_pvbs.X();
-      otree->ipy_bs_uncorr_1 = electronIP_pvbs.Y();
-      otree->ipz_bs_uncorr_1 = electronIP_pvbs.Z();
-
-      otree->ipx_uncorr_2 = muonIP.X();
-      otree->ipy_uncorr_2 = muonIP.Y();
-      otree->ipz_uncorr_2 = muonIP.Z();
-
-      otree->ipx_bs_uncorr_2 = muonIP_pvbs.X();
-      otree->ipy_bs_uncorr_2 = muonIP_pvbs.Y();
-      otree->ipz_bs_uncorr_2 = muonIP_pvbs.Z();
-
-      otree->gen_ipx_1 = -9999;
-      otree->gen_ipy_1 = -9999;
-      otree->gen_ipz_1 = -9999;
-
-      otree->gen_ipx_2 = -9999;
-      otree->gen_ipy_2 = -9999;
-      otree->gen_ipz_2 = -9999;
-
-      otree->ipx_1 = otree->ipx_uncorr_1;
-      otree->ipy_1 = otree->ipy_uncorr_1;
-      otree->ipz_1 = otree->ipz_uncorr_1;
-      
-      otree->ipx_bs_1 = otree->ipx_bs_uncorr_1;
-      otree->ipy_bs_1 = otree->ipy_bs_uncorr_1;
-      otree->ipz_bs_1 = otree->ipz_bs_uncorr_1;
-      
-      otree->ipx_2 = otree->ipx_uncorr_2;
-      otree->ipy_2 = otree->ipy_uncorr_2;
-      otree->ipz_2 = otree->ipz_uncorr_2;
-      
-      otree->ipx_bs_2 = otree->ipx_bs_uncorr_2;
-      otree->ipy_bs_2 = otree->ipy_bs_uncorr_2;
-      otree->ipz_bs_2 = otree->ipz_bs_uncorr_2;
-
-      if (!isData || isEmbedded) {
-
-	TVector3 genVertex(otree->GenVertexX,
-			   otree->GenVertexY,
-			   otree->GenVertexZ);
-
-	TVector3 ipGenMuon = genParticleIP(&analysisTree,genVertex,otree->gen_match_2,otree->eta_2,otree->phi_2);
-	TVector3 ipGenElec = genParticleIP(&analysisTree,genVertex,otree->gen_match_1,otree->eta_1,otree->phi_1);
-      
-	otree->gen_ipx_1 = ipGenElec.X();
-	otree->gen_ipy_1 = ipGenElec.Y();
-	otree->gen_ipz_1 = ipGenElec.Z();
-
-	otree->gen_ipx_2 = ipGenMuon.X();
-	otree->gen_ipy_2 = ipGenMuon.Y();
-	otree->gen_ipz_2 = ipGenMuon.Z();
-	
-	if (ApplyIpCorrection) {
-
-	  TVector3 ipMuon_uncorr = muonIP.Vect();
-	  TVector3 ipMuon_uncorr_pvbs = muonIP_pvbs.Vect(); 
-	  TVector3 ipElec_uncorr = electronIP.Vect();
-	  TVector3 ipElec_uncorr_pvbs = electronIP_pvbs.Vect(); 
-	
-	  TVector3 ipMuon      = CorrectorIpMuon->correctIp(ipMuon_uncorr,ipGenMuon,otree->eta_2);
-	  TVector3 ipMuon_pvbs = CorrectorIpMuonBS->correctIp(ipMuon_uncorr_pvbs,ipGenMuon,otree->eta_2);
-
-	  TVector3 ipElec      = CorrectorIpElec->correctIp(ipElec_uncorr,ipGenElec,otree->eta_1);
-	  TVector3 ipElec_pvbs = CorrectorIpElecBS->correctIp(ipElec_uncorr_pvbs,ipGenElec,otree->eta_1);
-
-	  otree->ipx_1 = ipElec.X();
-	  otree->ipy_1 = ipElec.Y();
-	  otree->ipz_1 = ipElec.Z();
-
-	  otree->ipx_bs_1 = ipElec_pvbs.X();
-	  otree->ipy_bs_1 = ipElec_pvbs.Y();
-	  otree->ipz_bs_1 = ipElec_pvbs.Z();
-	  
-	  otree->ipx_2 = ipMuon.X();
-	  otree->ipy_2 = ipMuon.Y();
-	  otree->ipz_2 = ipMuon.Z();
-	  
-	  otree->ipx_bs_2 = ipMuon_pvbs.X();
-	  otree->ipy_bs_2 = ipMuon_pvbs.Y();
-	  otree->ipz_bs_2 = ipMuon_pvbs.Z();
-	}
-      }
-      
-      ImpactParameter IP;
-      
-      // *****
-      // RefitV + BS
-      // *****
-
-      ROOT::Math::SMatrix<float,3,3, ROOT::Math::MatRepStd< float, 3, 3 >> ipCov1;
-      TVector3 IP1;
-      IP_significance_helix_lep(&analysisTree,electronIndex, "et", vertex,PV_covariance,ipCov1,IP1);
-
-      ROOT::Math::SMatrix<float,3,3, ROOT::Math::MatRepStd< float, 3, 3 >> ipCov2;
-      TVector3 IP2;
-      IP_significance_helix_lep(&analysisTree, muonIndex, "mt", vertex,PV_covariance,ipCov2,IP2);
-
-      // ******
-      // PV+BS
-      // ******
-
-      ROOT::Math::SMatrix<float,3,3, ROOT::Math::MatRepStd< float, 3, 3 >> ipCov1_bs;
-      TVector3 IP1_bs;
-      IP_significance_helix_lep(&analysisTree,electronIndex,"et",vertex_bs,PVBS_covariance,ipCov1_bs,IP1_bs);
-
-      ROOT::Math::SMatrix<float,3,3, ROOT::Math::MatRepStd< float, 3, 3 >> ipCov2_bs;
-      TVector3 IP2_bs;
-      IP_significance_helix_lep(&analysisTree,muonIndex,"mt",vertex_bs,PVBS_covariance,ipCov2_bs,IP2_bs);
-
-      /*
-      cout << "ipsig1 = " << ipsig1 << " ipsig2 = " << ipsig2 << endl;
-      cout << "IP1  : x = " << IP1.x() 
-	   << "  y = " << IP1.y() 
-	   << "  z = " << IP1.z() << std::endl;
-      cout << "       x = " << otree->ipx_uncorr_1 
-	   << "  y = " << otree->ipy_uncorr_1 
-	   << "  z = " << otree->ipz_uncorr_1 << std::endl;
-
-      cout << "IP2  : x = " << IP2.x() 
-	   << "  y = " << IP2.y() 
-	   << "  z = " << IP2.z() << std::endl;
-      cout << "       x = " << otree->ipx_uncorr_2 
-	   << "  y = " << otree->ipy_uncorr_2 
-	   << "  z = " << otree->ipz_uncorr_2 << std::endl;
-      */
-
-      TVector3 Ip1(otree->ipx_uncorr_1,otree->ipy_uncorr_1,otree->ipz_uncorr_1);
-      otree->IP_signif_RefitV_with_BS_uncorr_1 = IP.CalculateIPSignificanceHelical(Ip1, ipCov1);
-      otree->IP_signif_RefitV_with_BS_1 = otree->IP_signif_RefitV_with_BS_uncorr_1;
-
-      Ip1.SetXYZ(otree->ipx_bs_uncorr_1,otree->ipy_bs_uncorr_1,otree->ipz_bs_uncorr_1);
-      otree->IP_signif_PV_with_BS_uncorr_1 = IP.CalculateIPSignificanceHelical(Ip1, ipCov1_bs);
-      otree->IP_signif_PV_with_BS_1 = otree->IP_signif_PV_with_BS_uncorr_1;
-
-      otree->ip_covxx_1 = ipCov1(0,0);
-      otree->ip_covxy_1 = ipCov1(0,1);
-      otree->ip_covxz_1 = ipCov1(0,2);
-      otree->ip_covyy_1 = ipCov1(1,1);
-      otree->ip_covyz_1 = ipCov1(1,2);
-      otree->ip_covzz_1 = ipCov1(2,2);
-
-      TVector3 Ip2(otree->ipx_uncorr_2,otree->ipy_uncorr_2,otree->ipz_uncorr_2);
-      otree->IP_signif_RefitV_with_BS_uncorr_2 = IP.CalculateIPSignificanceHelical(Ip2, ipCov2);
-      otree->IP_signif_RefitV_with_BS_2 = otree->IP_signif_RefitV_with_BS_uncorr_2;
-
-      Ip2.SetXYZ(otree->ipx_bs_uncorr_2,otree->ipy_bs_uncorr_2,otree->ipz_bs_uncorr_2);
-      otree->IP_signif_PV_with_BS_uncorr_2 = IP.CalculateIPSignificanceHelical(Ip2, ipCov2_bs);
-      otree->IP_signif_PV_with_BS_2 = otree->IP_signif_PV_with_BS_uncorr_2;
-
-      otree->ip_covxx_2 = ipCov2(0,0);
-      otree->ip_covxy_2 = ipCov2(0,1);
-      otree->ip_covxz_2 = ipCov2(0,2);
-      otree->ip_covyy_2 = ipCov2(1,1);
-      otree->ip_covyz_2 = ipCov2(1,2);
-      otree->ip_covzz_2 = ipCov2(2,2);
-
-      // ***********************
-      // Corrected values 
-      // ***********************
-
-      if ((!isData || isEmbedded) && ApplyIpCorrection) {
-	ROOT::Math::SMatrix<float,3,3, ROOT::Math::MatRepStd< float, 3, 3 >> ipCov1_corr;
-	ROOT::Math::SMatrix<float,3,3, ROOT::Math::MatRepStd< float, 3, 3 >> ipCov2_corr;
-
-	ipCov1_corr =ipCov1;
-	Ip1.SetXYZ(otree->ipx_1,otree->ipy_1,otree->ipz_1);
-	ipCov1_corr = CorrectorIpElec->correctIpCov(ipCov1,otree->eta_1);      
-	otree->IP_signif_RefitV_with_BS_1 = IP.CalculateIPSignificanceHelical(Ip1, ipCov1_corr);
-
-	Ip1.SetXYZ(otree->ipx_bs_1,otree->ipy_bs_1,otree->ipz_bs_1);
-	ipCov1_corr = ipCov1_bs;
-	ipCov1_corr = CorrectorIpElecBS->correctIpCov(ipCov1_bs,otree->eta_1);      
-	otree->IP_signif_PV_with_BS_1 = IP.CalculateIPSignificanceHelical(Ip1, ipCov1_corr);
-
-	Ip2.SetXYZ(otree->ipx_2,otree->ipy_2,otree->ipz_2);
-	ipCov2_corr = ipCov2;
-	ipCov2_corr = CorrectorIpMuon->correctIpCov(ipCov2,otree->eta_2);      
-	otree->IP_signif_RefitV_with_BS_2 = IP.CalculateIPSignificanceHelical(Ip2, ipCov2_corr);      
-
-	Ip2.SetXYZ(otree->ipx_bs_2,otree->ipy_bs_2,otree->ipz_bs_2);
-	ipCov2_corr = ipCov2_bs;
-	ipCov2_corr = CorrectorIpMuonBS->correctIpCov(ipCov2_bs,otree->eta_2);      
-	otree->IP_signif_PV_with_BS_2 = IP.CalculateIPSignificanceHelical(Ip2, ipCov2_corr);      
-      }
-
-      /*
-      std::cout << "IPSig(1) = " << otree->IP_signif_RefitV_with_BS_uncorr_1
-		<< "  :  " << otree->IP_signif_RefitV_with_BS_1 
-		<< "  -> " << otree->IP_signif_PV_with_BS_1 << std::endl;
-
-      std::cout << "IPSig(2) = " << otree->IP_signif_RefitV_with_BS_uncorr_2
-		<< "  :  " << otree->IP_signif_RefitV_with_BS_2 
-		<< "  -> " << otree->IP_signif_PV_with_BS_2 << std::endl;
-      std::cout << std::endl;
-      */
-
-      otree->ip_sig_1 = otree->IP_signif_RefitV_with_BS_1;
-      otree->ip_sig_2 = otree->IP_signif_RefitV_with_BS_2;
-        
       // evaluate systematics for MC 
       if( !isData && !isEmbedded && ApplySystShift){
 	if (!isDY && !isWJets && !isHiggs) {
