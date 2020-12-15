@@ -554,24 +554,19 @@ void Synch17Tree::ReadInit(TTree *tree, bool em)
      fChain->SetBranchAddress("puppimetcov10", &puppimetcov10, &b_puppimetcov10);
      fChain->SetBranchAddress("puppimetcov11", &puppimetcov11, &b_puppimetcov11);
    }
-   fChain->SetBranchAddress("puppipzetamiss", &puppipzetamiss, &b_puppipzetamiss);
-   fChain->SetBranchAddress("puppipzeta", &puppipzeta, &b_puppipzeta);
 
    //di tau system
    fChain->SetBranchAddress("pt_tt", &pt_tt, &b_pt_tt);
    fChain->SetBranchAddress("dr_tt", &dr_tt, &b_dr_tt);
    fChain->SetBranchAddress("m_vis", &m_vis, &b_m_vis);
    fChain->SetBranchAddress("mt_tot", &mt_tot, &b_mt_tot);
-   if (!em) {
-     fChain->SetBranchAddress("m_sv", &m_sv, &b_m_sv);
-     fChain->SetBranchAddress("pt_sv", &pt_sv, &b_pt_sv);
-     fChain->SetBranchAddress("eta_sv", &eta_sv, &b_eta_sv);
-     fChain->SetBranchAddress("phi_sv", &phi_sv, &b_phi_sv);
-     fChain->SetBranchAddress("met_sv", &met_sv, &b_met_sv);
-     fChain->SetBranchAddress("mt_sv", &mt_sv, &b_mt_sv);   
-   }
-   fChain->SetBranchAddress("pt_tt_puppi", &pt_tt, &b_pt_tt_puppi);
-   fChain->SetBranchAddress("mt_tot_puppi", &mt_tot, &b_mt_tot_puppi);
+
+   fChain->SetBranchAddress("m_sv", &m_sv, &b_m_sv);
+   fChain->SetBranchAddress("pt_sv", &pt_sv, &b_pt_sv);
+   fChain->SetBranchAddress("eta_sv", &eta_sv, &b_eta_sv);
+   fChain->SetBranchAddress("phi_sv", &phi_sv, &b_phi_sv);
+   fChain->SetBranchAddress("met_sv", &met_sv, &b_met_sv);
+   fChain->SetBranchAddress("mt_sv", &mt_sv, &b_mt_sv);   
 
    if (!em) {
      fChain->SetBranchAddress("m_fast", &m_fast, &b_m_fast);
@@ -1337,8 +1332,8 @@ fChain->Branch("againstElectronVLooseMVA6_2", &againstElectronVLooseMVA6_2, "aga
      fChain->Branch("metcov10", &metcov10, "metcov10/F");
      fChain->Branch("metcov11", &metcov11, "metcov11/F");
    }
-   //   fChain->Branch("pzetavis", &pzetavis, "pzetavis/F");
-   //   fChain->Branch("pzetamiss", &pzetamiss, "pzetamiss/F");
+   fChain->Branch("pzetavis", &pzetavis, "pzetavis/F");
+   fChain->Branch("pzetamiss", &pzetamiss, "pzetamiss/F");
    fChain->Branch("pzeta", &pzeta, "pzeta/F");
 
    //PUPPI MET
@@ -1353,26 +1348,18 @@ fChain->Branch("againstElectronVLooseMVA6_2", &againstElectronVLooseMVA6_2, "aga
      fChain->Branch("puppimetcov11", &puppimetcov11, "puppimetcov11/F");
    }
 
-   //   fChain->Branch("puppipzetamiss", &puppipzetamiss, "puppipzetamiss/F");
-   fChain->Branch("puppipzeta", &puppipzeta, "puppipzeta/F");
-   
    //di tau system
    fChain->Branch("pt_tt", &pt_tt, "pt_tt/F");
    fChain->Branch("dr_tt", &dr_tt, "dr_tt/F");
    fChain->Branch("m_vis", &m_vis, "m_vis/F");
    fChain->Branch("mt_tot", &mt_tot, "mt_tot/F");
 
-   if (!em) {
-     fChain->Branch("m_sv", &m_sv, "m_sv/F");
-     fChain->Branch("pt_sv", &pt_sv, "pt_sv/F");
-     fChain->Branch("eta_sv", &eta_sv, "eta_sv/F");
-     fChain->Branch("phi_sv", &phi_sv, "phi_sv/F");
-     fChain->Branch("met_sv", &met_sv, "met_sv/F");
-     fChain->Branch("mt_sv", &mt_sv, "mt_sv/F");   
-   }
-
-   fChain->Branch("pt_tt_puppi", &pt_tt_puppi, "pt_tt_puppi/F");
-   fChain->Branch("mt_tot_puppi", &mt_tot_puppi, "mt_tot_puppi/F");
+   fChain->Branch("m_sv", &m_sv, "m_sv/F");
+   fChain->Branch("pt_sv", &pt_sv, "pt_sv/F");
+   fChain->Branch("eta_sv", &eta_sv, "eta_sv/F");
+   fChain->Branch("phi_sv", &phi_sv, "phi_sv/F");
+   fChain->Branch("met_sv", &met_sv, "met_sv/F");
+   fChain->Branch("mt_sv", &mt_sv, "mt_sv/F");   
 
    if (!em) {
      fChain->Branch("m_fast", &m_fast, "m_fast/F");
