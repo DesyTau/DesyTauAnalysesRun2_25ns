@@ -91,6 +91,8 @@ protected:
     puppimetphi_cen = cenTree->puppimetphi;
     mt_tot_cen = cenTree->mt_tot;
     pt_tt_cen = cenTree->pt_tt;
+    pzeta_cen = cenTree->pzeta;
+    pzetamiss_cen = cenTree->pzetamiss;
     mt_1_cen = cenTree->mt_1;
     mt_2_cen = cenTree->mt_2;
     puppimt_1_cen = cenTree->puppimt_1;
@@ -106,14 +108,15 @@ protected:
     puppimetphi_cen = cenTree->puppimetphi;
     mt_tot_cen = cenTree->mt_tot;
     pt_tt_cen = cenTree->pt_tt;
+    pzeta_cen = cenTree->pzeta;
+    pzetamiss_cen = cenTree->pzetamiss;
     mt_1_cen = cenTree->mt_1;
     mt_2_cen = cenTree->mt_2;
     puppimt_1_cen = cenTree->puppimt_1;
     puppimt_2_cen = cenTree->puppimt_2;
     jets::counting_jets(analysisTree, cenTree, cfg, inputs_btag_scaling, uncertainty_name, "Down", jecUncertainties);
     this->Fill("Down");
-  };
-  
+  };  
 
   virtual void Fill(const char* shift){
     outTree[shift]->Fill();
@@ -127,6 +130,8 @@ protected:
     cenTree->puppimt_2 = puppimt_2_cen;
     cenTree->mt_tot = mt_tot_cen;
     cenTree->pt_tt = pt_tt_cen;
+    cenTree->pzeta = pzeta_cen;
+    cenTree->pzetamiss = pzetamiss_cen;
     jets::counting_jets(analysisTree, cenTree, cfg, inputs_btag_scaling, "central");
   }
 
@@ -148,7 +153,9 @@ protected:
   float mt_2_cen; 
   float puppimt_1_cen; 
   float puppimt_2_cen; 
-  
+  float pzeta_cen;
+  float pzetamiss_cen;
+
 };
 
 #undef addvar

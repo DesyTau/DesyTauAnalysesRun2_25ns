@@ -63,7 +63,10 @@ class METSys : public Systematics {
     float eta_sv;
     float phi_sv;
     float met_sv;
-    float mt_sv;      
+    float mt_sv;
+    float pzetamiss;
+    float pzeta;
+    
   } obs;
 
 
@@ -85,7 +88,7 @@ class METSys : public Systematics {
   bool useSVFit;
   const AC1B * analysisTree;
 
-  virtual void PropagateUncertainty(bool isPuppi) {
+  virtual void PropagateUncertainty() {
     obs.metx = obs.met*cos(obs.metphi);
     obs.mety = obs.met*sin(obs.metphi);
     TLorentzVector metLV; metLV.SetXYZT(obs.metx,obs.mety,0,obs.met);
@@ -100,15 +103,13 @@ class METSys : public Systematics {
 					  cenTree->pt_2 * sinh(cenTree->eta_2),
 					  cenTree->m_2);
 
-
-    obs.mt_1 = sqrt(2*lep1LV.Pt()*metLV.Pt()*(1.0-cos(lep1LV.Phi()-metLV.Phi())));
-    obs.mt_2 = sqrt(2*lep2LV.Pt()*metLV.Pt()*(1.0-cos(lep2LV.Phi()-metLV.Phi())));
+    obs.mt_1 = mT(lep1LV,metLV);
+    obs.mt_2 = mT(lep2LV,metLV);
     obs.pt_tt = (lep1LV+lep2LV+metLV).Pt();
+    obs.mt_tot  = calc::mTtot(lep1LV,lep2LV,metLV);
 
-    float mtTOT = 2*lep1LV.Pt()*metLV.Pt()*(1-cos(lep1LV.Phi()-metLV.Phi()));
-    mtTOT      += 2*lep2LV.Pt()*metLV.Pt()*(1-cos(lep2LV.Phi()-metLV.Phi())); 
-    mtTOT      += 2*lep1LV.Pt()*lep2LV.Pt()*(1-cos(lep1LV.Phi()-lep2LV.Phi())); 
-    obs.mt_tot  = TMath::Sqrt(mtTOT);
+    obs.pzetamiss = calc::pzetamiss(lep1LV,lep2LV,metLV);
+    obs.pzeta = calc::pzeta(lep1LV,lep2LV,metLV);
     
     // initialize
     obs.m_sv = cenTree->m_sv;
@@ -133,6 +134,8 @@ class METSys : public Systematics {
     float puppimetphi_cen = cenTree->puppimetphi;
     float pt_tt_cen = cenTree->pt_tt;
     float mt_tot_cen = cenTree->mt_tot;
+    float pzeta_cen = cenTree->pzeta;
+    float pzetamiss_cen = cenTree->pzetamiss;
     float m_sv_cen = cenTree->m_sv;
     float pt_sv_cen = cenTree->pt_sv;
     float eta_sv_cen = cenTree->eta_sv;
@@ -140,7 +143,7 @@ class METSys : public Systematics {
     float met_sv_cen = cenTree->met_sv;
     float mt_sv_cen  = cenTree->mt_sv;
 
-    PropagateUncertainty(true);
+    PropagateUncertainty();
 
     cenTree->puppimt_1 = obs.mt_1;
     cenTree->puppimt_2 = obs.mt_2;
@@ -148,7 +151,8 @@ class METSys : public Systematics {
     cenTree->puppimetphi = obs.metphi;
     cenTree->pt_tt = obs.pt_tt;
     cenTree->mt_tot = obs.mt_tot;
-
+    cenTree->pzeta = obs.pzeta;
+    cenTree->pzetamiss = obs.pzetamiss;
 
     if (useSVFit) {
       cenTree->m_sv = obs.m_sv;
@@ -169,6 +173,8 @@ class METSys : public Systematics {
     cenTree->puppimetphi = puppimetphi_cen;
     cenTree->pt_tt = pt_tt_cen;
     cenTree->mt_tot = mt_tot_cen;
+    cenTree->pzeta = pzeta_cen;
+    cenTree->pzetamiss = pzetamiss_cen;
     cenTree->m_sv = m_sv_cen;
     cenTree->pt_sv = pt_sv_cen;
     cenTree->eta_sv = eta_sv_cen;
@@ -198,8 +204,10 @@ class METSys : public Systematics {
     float phi_sv_cen = cenTree->phi_sv;
     float met_sv_cen = cenTree->met_sv;
     float mt_sv_cen  = cenTree->mt_sv;
+    float pzeta_cen = cenTree->pzeta;
+    float pzetamiss_cen = cenTree->pzetamiss;
     
-    PropagateUncertainty(false);
+    PropagateUncertainty();
 
     cenTree->mt_1 = obs.mt_1;
     cenTree->mt_2 = obs.mt_2;
@@ -207,8 +215,10 @@ class METSys : public Systematics {
     cenTree->metphi = obs.metphi;
     cenTree->pt_tt = obs.pt_tt;
     cenTree->mt_tot = obs.mt_tot;
-  
-  if (useSVFit) {
+    cenTree->pzeta = obs.pzeta;
+    cenTree->pzetamiss = obs.pzetamiss;
+
+    if (useSVFit) {
       cenTree->m_sv = obs.m_sv;
       cenTree->pt_sv = obs.pt_sv;
       cenTree->eta_sv = obs.eta_sv;
@@ -232,6 +242,8 @@ class METSys : public Systematics {
     cenTree->phi_sv = phi_sv_cen;
     cenTree->met_sv = met_sv_cen;
     cenTree->mt_sv  = mt_sv_cen;
+    cenTree->pzeta = pzeta_cen;
+    cenTree->pzetamiss = pzetamiss_cen;
 
   };
 

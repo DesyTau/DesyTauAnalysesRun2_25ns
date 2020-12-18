@@ -7,8 +7,8 @@ isSingleMuonData = False # needed to record track collection for NMSSM ananlysis
 isEmbedded = False # set to true if you run over Z->TauTau embedded samples
 isRun2018D = False # needed for the correct Global Tag
 isHiggsSignal = False # Set to true if you run over higgs signal samples -> needed for STXS1p1 flags
-year = 2016
-period = '2016'
+year = 2018
+period = '2018'
 RunTauSpinnerProducer = False #only do this if you want to calculate tauspinner weights for a sample with two taus and flat tau polarisation
 
 # ============================================================================================
@@ -62,16 +62,15 @@ process.source = cms.Source("PoolSource",
   fileNames = cms.untracked.vstring(
 #        "/store/data/Run2017B/Tau/MINIAOD/31Mar2018-v1/90000/FECFEF99-4F37-E811-8243-001E67792562.root"  # use for testing (2017)
 #        "/store/mc/RunIIFall17MiniAODv2/TTToHadronic_TuneCP5_13TeV-powheg-pythia8/MINIAODSIM/PU2017_12Apr2018_new_pmx_94X_mc2017_realistic_v14-v2/120000/420D636B-4BBB-E811-B806-0025905C54C6.root"  # use for testing (2017)
-        "/store/mc/RunIISummer16MiniAODv3/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/MINIAODSIM/PUMoriond17_94X_mcRun2_asymptotic_v3-v1/120000/FE7E7C9D-3CBF-E811-8BA6-44A84223FF3C.root" # use for testing (2016)
+        #"/store/mc/RunIISummer16MiniAODv3/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/MINIAODSIM/PUMoriond17_94X_mcRun2_asymptotic_v3-v1/120000/FE7E7C9D-3CBF-E811-8BA6-44A84223FF3C.root" # use for testing (2016)
         #"/store/data/Run2016C/SingleMuon/MINIAOD/17Jul2018-v1/20000/FEC97F81-0097-E811-A7B9-90E2BACC5EEC.root" # use for testing (2016)
         #"/store/mc/RunIIAutumn18MiniAOD/W1JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v2/120000/403882A2-1EFE-9D44-9D5D-EC55DDBE4091.root" # use for testing (2018)
 #        "/store/mc/RunIIAutumn18MiniAOD/SUSYGluGluToHToTauTau_M-900_TuneCP5_13TeV-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v2/00000/AF34DA46-3E14-F94F-BFE3-820EC6A90FC9.root" # 2018
         #"root://cms-xrd-global.cern.ch///store/user/jbechtel/gc_storage/TauTau_data_2018ABC_CMSSW1020/TauEmbedding_TauTau_data_2018ABC_CMSSW1020_Run2018C/1/merged_0.root" (embedded 2017)
 #        "root://cms-xrd-global.cern.ch///store/user/sbrommer/gc_storage/ElTau_data_2017_CMSSW944/TauEmbedding_ElTau_data_2017_CMSSW944_Run2017B/1/merged_1100.root"
-      #"root://cms-xrd-global.cern.ch///store/user/aakhmets/gc_storage/MuTau_data_2017_CMSSW944_gridka/TauEmbedding_MuTau_data_2017_CMSSW944_Run2017D/1/merged_100.root"
+        #"root://cms-xrd-global.cern.ch///store/user/aakhmets/gc_storage/MuTau_data_2017_CMSSW944_gridka/TauEmbedding_MuTau_data_2017_CMSSW944_Run2017D/1/merged_100.root"
         #"root://cms-xrd-global.cern.ch///store/user/sbrommer/gc_storage/ElTau_data_2017_CMSSW944/TauEmbedding_ElTau_data_2017_CMSSW944_Run2017E/1/merged_10300.root"
-        #"/store/mc/RunIIFall17MiniAODv2/SUSYGluGluToHToTauTau_M-1200_TuneCP5_13TeV-pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/90000/408FF742-D941-E811-AEBD-484D7E8DF085.root",
-      #"/store/data/Run2018A/DoubleMuon/MINIAOD/17Sep2018-v2/00000/02F59D88-91F7-D14D-8FD4-6530DBC467FC.root"
+        "/store/mc/RunIIFall17MiniAODv2/SUSYGluGluToHToTauTau_M-1200_TuneCP5_13TeV-pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/90000/408FF742-D941-E811-AEBD-484D7E8DF085.root",
         #"/store/data/Run2018A/MET/MINIAOD/17Sep2018-v1/120000/7D0437D3-D24D-4C44-B015-6A2938D4D707.root" # use for testing (2018)
         #"/store/data/Run2018B/DoubleMuon/MINIAOD/26Sep2018-v1/110000/EEE985E6-A85C-9C4C-8747-5211105A0603.root" # for testing (2018)
         #"/store/data/Run2018D/JetHT/MINIAOD/PromptReco-v2/000/320/853/00000/2C20B666-3A9A-E811-9D32-FA163EAC4172.root"  # From Run2018D with a lot of events not passing the json file
@@ -94,48 +93,12 @@ process.source = cms.Source("PoolSource",
 
 from PhysicsTools.PatAlgos.tools.jetTools import updateJetCollection
 updateJetCollection(
-    process,
-    jetSource = cms.InputTag('slimmedJets'),
-    pvSource = cms.InputTag('offlineSlimmedPrimaryVertices'),
-    svSource = cms.InputTag('slimmedSecondaryVertices'),
-    labelName = 'UpdatedJEC',
-    jetCorrections = ('AK4PFchs', cms.vstring(['L1FastJet', 'L2Relative', 'L3Absolute', 'L2L3Residual']), 'None'),  # Update: Safe to always add 'L2L3Residual' as MC contains dummy L2L3Residual corrections (always set to 1)
-    btagDiscriminators = [
-#        'pfCombinedInclusiveSecondaryVertexV2BJetTags',
-#        'pfDeepCSVJetTags:probb',
-#        'pfDeepCSVJetTags:probbb',
-        'pfDeepFlavourJetTags:probb',
-        'pfDeepFlavourJetTags:probbb',
-        'pfDeepFlavourJetTags:problepb',
-        'pfDeepFlavourJetTags:probc',
-        'pfDeepFlavourJetTags:probuds',
-        'pfDeepFlavourJetTags:probg'
-    ]
-
+  process,
+  jetSource = cms.InputTag('slimmedJets'),
+  labelName = 'UpdatedJEC',
+  jetCorrections = ('AK4PFchs', cms.vstring(['L1FastJet', 'L2Relative', 'L3Absolute', 'L2L3Residual']), 'None')  # Update: Safe to always add 'L2L3Residual' as MC contains dummy L2L3Residual corrections (always set to 1)
 )
-
-# b-tagging
-# ---------
-process.load("RecoJets.JetAssociationProducers.ak4JTA_cff")
-from RecoJets.JetAssociationProducers.ak4JTA_cff import ak4JetTracksAssociatorAtVertex
-process.load("RecoBTag.Configuration.RecoBTag_cff")
-import RecoBTag.Configuration.RecoBTag_cff as btag
-
-process.pfImpactParameterTagInfos.primaryVertex = cms.InputTag("offlineSlimmedPrimaryVertices")
-process.pfImpactParameterTagInfos.candidates = cms.InputTag("packedPFCandidates")
-
-#process.jecSequence = cms.Sequence(process.patJetCorrFactorsUpdatedJEC * process.updatedPatJetsUpdatedJEC)
-process.jecSequence = cms.Sequence( 
-    process.patJetCorrFactorsUpdatedJEC+
-    process.updatedPatJetsUpdatedJEC + 
-    process.pfImpactParameterTagInfosUpdatedJEC+
-    process.pfInclusiveSecondaryVertexFinderTagInfosUpdatedJEC+
-    process.pfDeepCSVTagInfosUpdatedJEC+
-    process.pfDeepFlavourTagInfosUpdatedJEC+
-    process.pfDeepFlavourJetTagsUpdatedJEC+
-    process.patJetCorrFactorsTransientCorrectedUpdatedJEC+
-    process.updatedPatJetsTransientCorrectedUpdatedJEC)
-
+process.jecSequence = cms.Sequence(process.patJetCorrFactorsUpdatedJEC * process.updatedPatJetsUpdatedJEC)
 
 updateJetCollection(
   process,
@@ -288,7 +251,6 @@ else:
         PrefiringRateSystematicUncty = cms.double(0.2),
         SkipWarnings = False)
 # END Pre-firing weights ======================================================================================
-#process.updatedPatJetsUpdatedJEC.addBTagInfo = cms.bool(True)
 
 # Trigger list ================================================================================================
 # !!!!! WARNING : in 2018 all tau trigger names changed in the middle of the year -> please add also other names -> more information can be found here: https://twiki.cern.ch/twiki/bin/viewauth/CMS/TauTrigger#Trigger_table_for_2018 !!!!
@@ -575,8 +537,6 @@ tau_hlt_filters = cms.untracked.vstring(
     'HLT_DoubleTightChargedIsoPFTau40_Trk1_eta2p1_Reg_v.*:hltDoublePFTau40TrackPt1TightChargedIsolationDz02Reg',
     'HLT_VLooseIsoPFTau120_Trk50_eta2p1_v.*:hltPFTau120TrackPt50LooseAbsOrRelVLooseIso',
     'HLT_VLooseIsoPFTau140_Trk50_eta2p1_v.*:hltPFTau140TrackPt50LooseAbsOrRelVLooseIso',
-    'HLT_VLooseIsoPFTau120_Trk50_eta2p1_v.*:hltSingleL2Tau80eta2p2',
-    'HLT_VLooseIsoPFTau140_Trk50_eta2p1_v.*:hltSingleL2Tau80eta2p2',
     'HLT_MediumChargedIsoPFTau180HighPtRelaxedIso_Trk50_eta2p1_v.*:hltPFTau180TrackPt50LooseAbsOrRelMediumHighPtRelaxedIsoIso',
     'HLT_MediumChargedIsoPFTau180HighPtRelaxedIso_Trk50_eta2p1_v.*:hltSelectedPFTau180MediumChargedIsolationL1HLTMatched',
     'HLT_MediumChargedIsoPFTau180HighPtRelaxedIso_Trk50_eta2p1_v.*:hltSingleL2Tau80eta2p2',
@@ -711,7 +671,7 @@ L1EGammaCollectionTag = cms.InputTag("caloStage2Digis:EGamma"),
 L1TauCollectionTag = cms.InputTag("caloStage2Digis:Tau"),
 L1JetCollectionTag = cms.InputTag("caloStage2Digis:Jet"),
 #JetCollectionTag = cms.InputTag("slimmedJets"),
-JetCollectionTag = cms.InputTag("updatedPatJetsTransientCorrectedUpdatedJEC::TreeProducer"),
+JetCollectionTag = cms.InputTag("updatedPatJetsUpdatedJEC::TreeProducer"),
 PuppiJetCollectionTag = cms.InputTag("updatedPatJetsUpdatedJECPuppi::TreeProducer"),
 MetCollectionTag = cms.InputTag("slimmedMETs::@skipCurrentProcess"),
 MetCorrCollectionTag = cms.InputTag("slimmedMETsModifiedMET::TreeProducer"),
@@ -786,9 +746,9 @@ RecJetEtaMax = cms.untracked.double(5.2),
 RecJetHLTriggerMatching = jet_hlt_filters,
 #from https://twiki.cern.ch/twiki/bin/view/CMS/DeepJet
 RecJetBtagDiscriminators = cms.untracked.vstring(
-#'pfCombinedInclusiveSecondaryVertexV2BJetTags',
-#'pfDeepCSVJetTags:probb',
-#'pfDeepCSVJetTags:probbb',
+'pfCombinedInclusiveSecondaryVertexV2BJetTags',
+'pfDeepCSVJetTags:probb',
+'pfDeepCSVJetTags:probbb',
 'pfDeepFlavourJetTags:probb',
 'pfDeepFlavourJetTags:probbb',
 'pfDeepFlavourJetTags:problepb',
@@ -828,24 +788,24 @@ process.triggerSelection = cms.EDFilter("HLTHighLevel",
 #process.icTauSpinnerSequence = cms.Sequence(process.icTauSpinnerProducer)
 
 process.p = cms.Path(
-    process.initroottree *
-    process.triggerSelection * # trigger filtering
-    process.jecSequencepuppi *  # New JECs
-    process.egmPhotonIDSequence * # Puppi MET
-    process.puppiMETSequence *  # Puppi MET
-    process.fullPatMetSequencePuppi *  # Re-correcting Puppi MET
-    process.jecSequence * # New JECs
-    process.fullPatMetSequenceModifiedMET *  # Re-correcting PFMET
-    process.ecalBadCalibReducedMINIAODFilter *  # MET filter 2018
-    process.egammaPostRecoSeq *               # electron energy corrections and Ids
-    process.rerunMvaIsolationSequence *  # Tau IDs
-    getattr(process,updatedTauName) *  # Tau IDs
-    process.AdvancedRefitVertexNoBSBSSequence * # Vertex refit w/o BS
-    process.AdvancedRefitVertexBSSequence * # Vertex refit w/ BS
-    process.MiniAODRefitVertexBS * # PV with BS constraint
-    process.htxsSequence * # HTXS
-    process.prefiringweight * # prefiring-weights for 2016/2017
-    process.makeroottree
+  process.initroottree *
+  process.triggerSelection * # trigger filtering
+  process.jecSequence *  # New JECs
+  process.jecSequencepuppi *  # New JECs
+  process.egmPhotonIDSequence * # Puppi MET
+  process.puppiMETSequence *  # Puppi MET
+  process.fullPatMetSequencePuppi *  # Re-correcting Puppi MET
+  process.fullPatMetSequenceModifiedMET *  # Re-correcting PFMET
+  process.ecalBadCalibReducedMINIAODFilter *  # MET filter 2018
+  process.egammaPostRecoSeq *               # electron energy corrections and Ids
+  process.rerunMvaIsolationSequence *  # Tau IDs
+  getattr(process,updatedTauName) *  # Tau IDs
+  process.AdvancedRefitVertexNoBSBSSequence * # Vertex refit w/o BS
+  process.AdvancedRefitVertexBSSequence * # Vertex refit w/ BS
+  process.MiniAODRefitVertexBS * # PV with BS constraint
+  process.htxsSequence * # HTXS
+  process.prefiringweight * # prefiring-weights for 2016/2017
+  process.makeroottree
 )
 
 #if RunTauSpinnerProducer: process.p *=process.icTauSpinnerSequence

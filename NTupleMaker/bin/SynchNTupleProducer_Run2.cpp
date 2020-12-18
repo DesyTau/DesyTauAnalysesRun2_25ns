@@ -196,7 +196,6 @@ int main(int argc, char * argv[]){
   TString IpCorrFileNamePion(ipCorrFileNamePion);
   TString IpCorrFileNamePionBS(ipCorrFileNamePionBS);
 
-
   // tau trigger efficiency
   std::string channel;
   if (ch == "mt") channel = "mutau"; 
@@ -2148,7 +2147,7 @@ int main(int argc, char * argv[]){
     
       otree->pzetavis  = vectorVisX*zetaX + vectorVisY*zetaY;
       otree->pzetamiss = otree->met*TMath::Cos(otree->metphi)*zetaX + otree->met*TMath::Sin(otree->metphi)*zetaY;
-      otree->puppipzetamiss = otree->puppimet*TMath::Cos(otree->puppimetphi)*zetaX + otree->puppimet*TMath::Sin(otree->puppimetphi)*zetaY;
+
       counter[14]++;
     
       bool isSRevent = true; //boolean used to compute SVFit variables only on SR events, it is set to true when running Synchronization to run SVFit on all events

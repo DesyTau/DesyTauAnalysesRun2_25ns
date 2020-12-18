@@ -1251,6 +1251,12 @@ int main(int argc, char * argv[]) {
                bool tagged_mistagDown = false;
                bool tagged_btagUp = false;
                bool tagged_btagDown = false;
+
+	       std::cout << "D1 = " << analysisTree.pfjet_btag[jet][nBTagDiscriminant1] << std::endl;
+	       std::cout << "D2 = " << analysisTree.pfjet_btag[jet][nBTagDiscriminant2] << std::endl;
+	       std::cout << "D3 = " << analysisTree.pfjet_btag[jet][nBTagDiscriminant3] << std::endl;
+
+
                tagged = analysisTree.pfjet_btag[jet][nBTagDiscriminant1] + analysisTree.pfjet_btag[jet][nBTagDiscriminant2] + analysisTree.pfjet_btag[jet][nBTagDiscriminant3]>btagCut;
                tagged_mistagUp = analysisTree.pfjet_btag[jet][nBTagDiscriminant1] + analysisTree.pfjet_btag[jet][nBTagDiscriminant2]  + analysisTree.pfjet_btag[jet][nBTagDiscriminant3] >btagCut;
                tagged_mistagDown = analysisTree.pfjet_btag[jet][nBTagDiscriminant1] + analysisTree.pfjet_btag[jet][nBTagDiscriminant2]  + analysisTree.pfjet_btag[jet][nBTagDiscriminant3] >btagCut;
@@ -1943,7 +1949,7 @@ int main(int argc, char * argv[]) {
         
         qcdweight=qcdweight_deltaR*qcdweight_nonclosure*qcdweight_isolationcorrection;
 
-         if (!isData) effweight = effweight*isoweight_1*isoweight_2;
+	if (!isData) effweight = effweight*isoweight_1*isoweight_2;
          // if (!isData){
          //    if (era=="2016")
          //       {

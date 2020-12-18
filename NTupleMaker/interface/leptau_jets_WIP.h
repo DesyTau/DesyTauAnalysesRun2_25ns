@@ -106,7 +106,7 @@ namespace jets{
     float shift = 0.;
   
     // get the relative shift
-    if (JESname == "central" || JESname == "Btag" ){
+    if (JESname == "central" || JESname == "Btag" || JESname == "Mistag"){
       jetPt = analysisTree->pfjet_pt[jetIndex];
       return jetPt;
     }
@@ -131,7 +131,7 @@ namespace jets{
     float jetE = -9999;
     float shift = 0.;
     // get the relative shift
-    if (JESname == "central" || JESname == "Btag" )  { jetE = analysisTree->pfjet_e[jetIndex]; return jetE;}
+    if (JESname == "central" || JESname == "Btag" || JESname == "Mistag")  { jetE = analysisTree->pfjet_e[jetIndex]; return jetE;}
     else if (JESname== "JES")   shift = analysisTree->pfjet_jecUncertainty[jetIndex];
     else if (JESname=="JER") { 
       double central_shift = analysisTree->pfjet_JER_Central[jetIndex];
@@ -286,6 +286,8 @@ namespace jets{
      if (BTagAlgorithm == "DeepFlavour" && discr == BTagDiscriminator3)
        nBTagDiscriminant3 = iBTag;
    }
+
+   //   std::cout << nBTagDiscriminant1 << ":" << nBTagDiscriminant2 << ":" << nBTagDiscriminant3 << std::endl;
    
    TLorentzVector uncorrectedJets; uncorrectedJets.SetXYZT(0,0,0,0);
    TLorentzVector correctedJets; correctedJets.SetXYZT(0,0,0,0);
@@ -338,6 +340,10 @@ namespace jets{
      
      if (absJetEta < bJetEtaCut) { // jet within b-tagging acceptance
        
+       //       std::cout << "Discriminant1 : " << analysisTree->pfjet_btag[jet][nBTagDiscriminant1] << std::endl;
+       //       std::cout << "Discriminant2 : " << analysisTree->pfjet_btag[jet][nBTagDiscriminant2] << std::endl;
+       //       std::cout << "Discriminant3 : " << analysisTree->pfjet_btag[jet][nBTagDiscriminant3] << std::endl;
+
        // check if meets working point cut <=> tagged      
        bool tagged = false;
        if (BTagAlgorithm == "pfCombinedInclusiveSecondaryVertexV2BJetTags")
@@ -376,10 +382,22 @@ namespace jets{
 	 }
 	 else if (flavor == 4) {
 	   jet_scalefactor = inputs_btag_scaling->reader_C.eval_auto_bounds("central", BTagEntry::FLAV_C, jetEta, JetPtForBTag);
+	   if (JESname=="Mistag") {
+	     if (direction=="Down") 
+	       jet_scalefactor = inputs_btag_scaling->reader_C.eval_auto_bounds("down", BTagEntry::FLAV_C, jetEta, JetPtForBTag);
+	     else if (direction=="Up")
+	       jet_scalefactor = inputs_btag_scaling->reader_C.eval_auto_bounds("up", BTagEntry::FLAV_C, jetEta, JetPtForBTag);
+	   }
 	   histo_tageff_= inputs_btag_scaling->tagEff_C;
 	 }
 	 else {
 	   jet_scalefactor = inputs_btag_scaling->reader_Light.eval_auto_bounds("central", BTagEntry::FLAV_UDSG, jetEta, JetPtForBTag);
+	   if (JESname=="Mistag") {
+	     if (direction=="Down")
+	       jet_scalefactor = inputs_btag_scaling->reader_Light.eval_auto_bounds("down", BTagEntry::FLAV_UDSG, jetEta, JetPtForBTag);
+	     else if (direction=="Up")
+	       jet_scalefactor = inputs_btag_scaling->reader_Light.eval_auto_bounds("up", BTagEntry::FLAV_UDSG, jetEta, JetPtForBTag);
+	   }
 	   histo_tageff_= inputs_btag_scaling->tagEff_Light;
 	 }
 	 tageff = histo_tageff_->Interpolate(JetPtForBTag, absJetEta);
@@ -390,20 +408,20 @@ namespace jets{
 	 inputs_btag_scaling->rand->SetSeed((int)((jetEta+5)*100000));
 	 double rannum = inputs_btag_scaling->rand->Rndm();
 	 
-   // correction for CP5 samples: can't use non-CP5 derived SFs, so take the old ones and correct them with non-CP5/CP5 eff ratio
-   if (ApplyBTagScaling && ApplyBTagCP5Correction) {     
-     if (flavor == 5) {
-       histo_tageff_nonCP5_ = inputs_btag_scaling->tagEff_B_nonCP5;
-     } else if (flavor == 4) {
-       histo_tageff_nonCP5_ = inputs_btag_scaling->tagEff_C_nonCP5;
-     } else {
-       histo_tageff_nonCP5_ = inputs_btag_scaling->tagEff_Light_nonCP5;
-     }
-     tageff_nonCP5 = histo_tageff_nonCP5_->Interpolate(JetPtForBTag, absJetEta);
-     if (tageff_nonCP5 < 1e-5)      tageff_nonCP5 = 1e-5;
-     if (tageff_nonCP5 > 0.99999)   tageff_nonCP5 = 0.99999;
-     jet_scalefactor *= tageff_nonCP5 / tageff; // tageff is assumed to be a CP5 derived efficiency
-   }
+	 // correction for CP5 samples: can't use non-CP5 derived SFs, so take the old ones and correct them with non-CP5/CP5 eff ratio
+	 if (ApplyBTagScaling && ApplyBTagCP5Correction) {     
+	   if (flavor == 5) {
+	     histo_tageff_nonCP5_ = inputs_btag_scaling->tagEff_B_nonCP5;
+	   } else if (flavor == 4) {
+	     histo_tageff_nonCP5_ = inputs_btag_scaling->tagEff_C_nonCP5;
+	   } else {
+	     histo_tageff_nonCP5_ = inputs_btag_scaling->tagEff_Light_nonCP5;
+	   }
+	   tageff_nonCP5 = histo_tageff_nonCP5_->Interpolate(JetPtForBTag, absJetEta);
+	   if (tageff_nonCP5 < 1e-5)      tageff_nonCP5 = 1e-5;
+	   if (tageff_nonCP5 > 0.99999)   tageff_nonCP5 = 0.99999;
+	   jet_scalefactor *= tageff_nonCP5 / tageff; // tageff is assumed to be a CP5 derived efficiency
+	 }
    
 	 // promote-demote method
 	 if (jet_scalefactor < 1 && tagged)  { // downgrade - demote
@@ -479,28 +497,28 @@ namespace jets{
      //    std::cout << " corrected -> " << std::endl;
      //    std::cout << " PuppiMetX =" << metx_puppi << "  PuppiMetY = " << mety_puppi << std::endl;
      
-
      otree->met = sqrt(metx*metx+mety*mety);
      otree->metphi = atan2(mety,metx);
      otree->puppimet = sqrt(metx_puppi*metx_puppi+mety_puppi*mety_puppi);
      otree->puppimetphi = atan2(mety_puppi,metx_puppi);
      TLorentzVector metLV; metLV.SetXYZT(metx,mety,0.,otree->met);
      TLorentzVector puppimetLV; puppimetLV.SetXYZT(metx_puppi,mety_puppi,0.,otree->puppimet);
-     TLorentzVector leptonLV; leptonLV.SetPtEtaPhiM(otree->pt_1,otree->eta_1,otree->phi_1,otree->m_1);
-     TLorentzVector tauLV; tauLV.SetPtEtaPhiM(otree->pt_2,otree->eta_2,otree->phi_2,otree->m_2);
-     TLorentzVector dileptonLV = leptonLV + tauLV;
+     TLorentzVector lep1LV; lep1LV.SetPtEtaPhiM(otree->pt_1,otree->eta_1,otree->phi_1,otree->m_1);
+     TLorentzVector lep2LV; lep2LV.SetPtEtaPhiM(otree->pt_2,otree->eta_2,otree->phi_2,otree->m_2);
+     TLorentzVector dileptonLV = lep1LV + lep2LV;
      TLorentzVector metxLV = metLV;
      if (cfg->get<bool>("UsePuppiMET")) metxLV = puppimetLV;
      
-     float mtTOT = 2*(otree->pt_1)*metxLV.Pt()*(1-cos(DeltaPhi(leptonLV,metxLV)));
-     mtTOT += 2*(otree->pt_2)*metxLV.Pt()*(1-cos(DeltaPhi(tauLV,metxLV)));
-     mtTOT += 2*(otree->pt_1)*(otree->pt_2)*(1-cos(DeltaPhi(leptonLV,tauLV)));
-     otree->mt_tot = TMath::Sqrt(mtTOT);
+     otree->mt_tot = calc::mTtot(lep1LV,lep2LV,metxLV);;
      otree->pt_tt = (dileptonLV+metxLV).Pt();
-     otree->mt_1 = mT(leptonLV, metLV);
-     otree->mt_2 = mT(tauLV, metLV);
-     otree->puppimt_1 = mT(leptonLV, puppimetLV);
-     otree->puppimt_2 = mT(tauLV, puppimetLV);
+     
+     otree->pzetamiss = calc::pzetamiss(lep1LV,lep2LV,metxLV);
+     otree->pzeta = calc::pzeta(lep1LV,lep2LV,metxLV);
+     
+     otree->mt_1 = mT(lep1LV, metLV);
+     otree->mt_2 = mT(lep2LV, metLV);
+     otree->puppimt_1 = mT(lep1LV, puppimetLV);
+     otree->puppimt_2 = mT(lep2LV, puppimetLV);
    }
 
    // leading b-jet variables

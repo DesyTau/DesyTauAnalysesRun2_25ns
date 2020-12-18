@@ -11,6 +11,7 @@
 #include "DesyTauAnalyses/NTupleMaker/interface/PileUp.h"
 #include "HiggsCPinTauDecays/ImpactParameter/interface/ImpactParameter.h"
 #include "HiggsCPinTauDecays/IpCorrection/interface/IpCorrection.h"
+//#include "DesyTauAnalyses/NTupleMaker/interface/functionsSynch2017.h"
 
 #define PI_MASS         0.13957 //All energies and momenta are expressed in GeV
 #define PI0_MASS        0.13498
@@ -43,6 +44,8 @@ vector<int> gen_ThreeProngIndices(const AC1B * analysisTree, int tauIndex);
 vector<TLorentzVector> gen_a1_rho_pi(const AC1B * analysisTree, int tauIndex);
 
 TLorentzVector ipVec_Lepton(const AC1B * analysisTree, int leptonIndex, int tauIndex, int vertexType, TString ch, int era, bool isEmbedded);
+
+TLorentzVector ipVec_Lepton_emu(const AC1B * analysisTree, int leptonIndex, bool electron, TVector3 vtx, int era, bool isEmbedded);
 
 double acoCP(TLorentzVector Pi1, TLorentzVector Pi2, 
 	     TLorentzVector ref1, TLorentzVector ref2,
@@ -81,6 +84,51 @@ double CalculateCosPsi(TLorentzVector momentum, TLorentzVector ipvec){
 
   return cospsi;
 
+}
+
+TVector3 genParticleIP(const AC1B * analysisTree, TVector3 vertex, int gen_match, float eta, float phi) {
+
+  int index = -1;
+  int partPDG = 0;
+  int partPDG1 = 0;
+  int nPart = analysisTree->genparticles_count;
+  if (gen_match<=6) {
+    if (gen_match==2||gen_match==4) {partPDG = 13; partPDG1 = 13;}
+    else if (gen_match==1||gen_match==3) {partPDG = 11; partPDG1 = 11;}
+    else {partPDG = 211; partPDG1 = 321;}
+    float dR = 0.4;
+    for (int igen=0; igen<nPart; ++igen) {
+      if (TMath::Abs(analysisTree->genparticles_pdgid[igen])==partPDG ||
+	  TMath::Abs(analysisTree->genparticles_pdgid[igen])==partPDG1) {
+	if (analysisTree->genparticles_status[igen]==1) {
+	  TLorentzVector genPart; genPart.SetXYZT(analysisTree->genparticles_px[igen],
+						  analysisTree->genparticles_py[igen],
+						  analysisTree->genparticles_pz[igen],
+						  analysisTree->genparticles_e[igen]);
+	  float dRx = deltaR(eta,phi,
+			     genPart.Eta(),genPart.Phi());
+	  if (dRx<dR) {
+	    index = igen;
+	    dR = dRx;
+	  }
+	}
+      }
+    }
+  }
+  TLorentzVector ipGen;
+  int tauIndex = 0;
+  if (index>=0) {
+    ipGen = gen_ipVec(analysisTree,tauIndex,index,vertex);
+    ipGen.SetPx(ipGen.Px()+1e-8);
+    ipGen.SetPy(ipGen.Py()+1e-8);
+    ipGen.SetPz(ipGen.Pz()+1e-8);
+  }
+  else
+    ipGen.SetXYZT(1e-8,1e-8,1e-8,4e-8);
+
+  TVector3 ipgen3 = ipGen.Vect();
+  return ipgen3;
+    
 }
 
 void calibrateIP(const AC1B * analysisTree, Synch17Tree *otree, int tauIndex1, int tauIndex2, TString channel, std::map<TString,IpCorrection*> ipCorrectors) {
@@ -1103,6 +1151,68 @@ TLorentzVector ipVec_Lepton(const AC1B * analysisTree, int leptonIndex, int tauI
 	  if (isEmbedded) momenta *= sf_eleES;
  
   if(ch=="mt"){
+    secvertex.SetXYZ(analysisTree->muon_vx[leptonIndex],
+		     analysisTree->muon_vy[leptonIndex],
+		     analysisTree->muon_vz[leptonIndex]);
+    
+    
+    momenta.SetXYZ(analysisTree->muon_px[leptonIndex],
+		   analysisTree->muon_py[leptonIndex],
+		   analysisTree->muon_pz[leptonIndex]);
+   
+  }
+
+
+  TVector3 r(0.,0.,0.);
+  r=secvertex-vertex;
+    
+  double projection=r*momenta/momenta.Mag2();
+  TVector3 IP;    
+  IP=r-momenta*projection;
+  vec.SetVect(IP);   
+  vec.SetT(0.);
+
+  return vec;
+};
+
+TLorentzVector ipVec_Lepton_emu(const AC1B * analysisTree, int leptonIndex, bool electron, TVector3 vertex, int era, bool isEmbedded) {
+  //now the tauindex is for mu or electron!
+
+  TLorentzVector vec;
+  vec.SetXYZT(0.,0.,0.,0.);
+  
+  /*
+  //Merijn: temporarily replace vertex with gen level info
+  TVector3 vertex;
+  for (unsigned int igen=0; igen<analysisTree->genparticles_count; ++igen) {
+    if (analysisTree->genparticles_pdgid[igen]==23||analysisTree->genparticles_pdgid[igen]==24||
+	analysisTree->genparticles_pdgid[igen]==25||analysisTree->genparticles_pdgid[igen]==35||analysisTree->genparticles_pdgid[igen]==36) {
+      vertex.SetX(analysisTree->genparticles_vx[igen]);
+      vertex.SetY(analysisTree->genparticles_vy[igen]);
+      vertex.SetZ(analysisTree->genparticles_vz[igen]);
+      break;
+    }
+  }
+*/  
+    
+  TVector3 secvertex(0.,0.,0.);
+  TVector3 momenta(0.,0.,0.);    
+	
+  float sf_eleES = 1.0;   
+  if (isEmbedded && electron) sf_eleES = EmbedElectronES_SF(analysisTree, era, leptonIndex);
+
+  if(electron){
+    secvertex.SetXYZ(analysisTree->electron_vx[leptonIndex],
+		     analysisTree->electron_vy[leptonIndex],
+		     analysisTree->electron_vz[leptonIndex]);
+  
+  
+    momenta.SetXYZ(analysisTree->electron_px[leptonIndex],
+		   analysisTree->electron_py[leptonIndex],
+		   analysisTree->electron_pz[leptonIndex]);
+  if (isEmbedded) momenta *= sf_eleES;
+  }
+  else {
     secvertex.SetXYZ(analysisTree->muon_vx[leptonIndex],
 		     analysisTree->muon_vy[leptonIndex],
 		     analysisTree->muon_vz[leptonIndex]);
