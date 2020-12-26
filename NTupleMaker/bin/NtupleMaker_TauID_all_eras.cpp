@@ -549,7 +549,7 @@ int main(int argc, char * argv[]) {
         if (isData){
           if (!isSinglePFTau180Trk50Filter && !isSinglePFTau180Trk50oneprongFilter){
               std::cout << "Single Tau HLT filter not found" << std::endl;
-        	    exit(-1);
+              // trigger not present in full Run2016, set to false where trigger is not present
           }
         }
         
