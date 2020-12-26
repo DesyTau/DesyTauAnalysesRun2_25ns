@@ -7,9 +7,9 @@ JESUncertainties::JESUncertainties(std::string uncFileName) {
   uncertFile = cmsswBase + "/src/" + uncFileName;
 
   TString UncertFile(uncertFile);
-  if (UncertFile.Contains("Regrouped_Autumn18"))
+  if (UncertFile.Contains("Regrouped_Autumn18")||UncertFile.Contains("RegroupedV2_Autumn18"))
     uncertNames = uncertNames_2018;
-  else if (UncertFile.Contains("Regrouped_Fall17"))
+  else if (UncertFile.Contains("Regrouped_Fall17")||UncertFile.Contains("RegroupedV2_Fall17"))
     uncertNames = uncertNames_2017;
   else 
     uncertNames = uncertNames_2016;

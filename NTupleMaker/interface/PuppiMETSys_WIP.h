@@ -32,9 +32,9 @@ class PuppiMETSys : public METSys {
   kit::MEtSys * metSys;
 
   virtual void Central() {
-    //    if (label.Contains("UnclusteredEn")) {
-    //      cout << "CENTRAL : " << cenTree->puppimet << endl;
-    //    }
+    if (label.Contains("UnclusteredEn")) {
+      //      cout << "CENTRAL : " << cenTree->puppimet << " : " << cenTree->puppimetphi << endl;
+    }
 
   };
   virtual void ScaleDown() {
@@ -89,14 +89,14 @@ class PuppiMETSys : public METSys {
     if (uncertaintyFound) {
       obs.metphi = atan2(obs.mety,obs.metx);
       obs.met = sqrt(obs.metx*obs.metx+obs.mety*obs.mety);
-      //      std::cout << label << " (met,metphi) : central = (" 
-      //      		<< cenTree->puppimet << ","
-      //      		<< cenTree->puppimetphi << ")" 
-      //      		<< " down = (" << obs.met << ","
-      //		<< obs.metphi << ")" << std::endl;
-      //      if (label.Contains("UnclusteredEn")) {
-      //	cout << "DOWN = " << obs.met << std::endl;
-      //      }
+      /*
+      std::cout << "PuppiSysDown : (" << obs.metx << "," << obs.mety << ")" << std::endl;
+      std::cout << label << " (met,metphi) : central = (" 
+      		<< cenTree->puppimet << ","
+      		<< cenTree->puppimetphi << ")" 
+      		<< " down = (" << obs.met << ","
+      		<< obs.metphi << ")" << std::endl;
+      */
     }
     FillPuppiMET("Down");
   };
@@ -155,14 +155,14 @@ class PuppiMETSys : public METSys {
     if (uncertaintyFound) {
       obs.metphi = atan2(obs.mety,obs.metx);
       obs.met = sqrt(obs.metx*obs.metx+obs.mety*obs.mety);
-      //      std::cout << label << " (met,metphi) : central = (" 
-      //      		<< cenTree->puppimet << ","
-      //      		<< cenTree->puppimetphi << ")" 
-      //      		<< " up = (" << obs.met << ","
-      //		<< obs.metphi << ")" << std::endl;
-      //      if (label.Contains("UnclusteredEn")) {
-      //	cout << "Up = " << obs.met << std::endl;
-      //      }
+      /*
+      std::cout << "PuppiSysUp : (" << obs.metx << "," << obs.mety << ")" << std::endl;
+      std::cout << label << " (met,metphi) : central = (" 
+      		<< cenTree->puppimet << ","
+      		<< cenTree->puppimetphi << ")" 
+      		<< " up = (" << obs.met << ","
+      		<< obs.metphi << ")" << std::endl;
+      */
     }
     FillPuppiMET("Up");
   };

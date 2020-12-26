@@ -325,6 +325,8 @@ HLTlist = cms.untracked.vstring(
 'HLT_DoubleEle24_22_eta2p1_WPLoose_Gsf_v',
 'HLT_DoubleIsoMu24_eta2p1_v',
 'HLT_Mu17_Mu8_SameSign_DZ_v',
+'HLT_Mu18_Mu9_v',
+'HLT_Mu18_Mu9_DZ_v',
 'HLT_Mu18_Mu9_SameSign_v',
 'HLT_Mu18_Mu9_SameSign_DZ_v',
 'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v',

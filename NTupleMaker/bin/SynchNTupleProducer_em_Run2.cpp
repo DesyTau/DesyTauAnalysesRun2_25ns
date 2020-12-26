@@ -69,7 +69,6 @@
 #include "JetMETCorrections/Modules/interface/JetResolution.h"
 #include "RooFunctor.h"
 
-
 #define pi   3.14159265358979312
 #define d2r  1.74532925199432955e-02
 #define r2d  57.2957795130823229
@@ -243,7 +242,6 @@ int main(int argc, char * argv[]){
   const bool ApplySystShift   = cfg.get<bool>("ApplySystShift");
   const bool ApplyMetFilters  = cfg.get<bool>("ApplyMetFilters");
   const bool usePuppiMET      = cfg.get<bool>("UsePuppiMET");
-  const bool ApplyIpCorrection = cfg.get<bool>("ApplyIpCorrection");
   const bool ApplyBTagCP5Correction = cfg.get<bool>("ApplyBTagCP5Correction");
 
   // JER
@@ -255,26 +253,11 @@ int main(int argc, char * argv[]){
   const string pileUpInMCFile = cfg.get<string>("pileUpInMCFile");
   const string pileUpforMC = cfg.get<string>("pileUpforMC");
 
-  const string ipCorrFileNameMuon   = cfg.get<string>("IpCorrFileNameMuon");
-  const string ipCorrFileNameMuonBS = cfg.get<string>("IpCorrFileNameMuonBS");
-  const string ipCorrFileNameElec     = cfg.get<string>("IpCorrFileNameElec");
-  const string ipCorrFileNameElecBS   = cfg.get<string>("IpCorrFileNameElecBS");
-
-  TString IpCorrFileNameMuon(ipCorrFileNameMuon);
-  TString IpCorrFileNameMuonBS(ipCorrFileNameMuonBS);
-  TString IpCorrFileNameElec(ipCorrFileNameElec);
-  TString IpCorrFileNameElecBS(ipCorrFileNameElecBS);
-
   std::string year_label;
   if (era == 2016) year_label = "2016Legacy";
   else if (era == 2017) year_label = "2017ReReco";
   else if (era == 2018) year_label = "2018ReReco";	
   else {std::cout << "year is not 2016, 2017, 2018 - exiting" << '\n'; exit(-1);}
-
-  IpCorrection *CorrectorIpMuon   = new IpCorrection(TString(cmsswBase) + "/src/" + IpCorrFileNameMuon);
-  IpCorrection *CorrectorIpMuonBS = new IpCorrection(TString(cmsswBase) + "/src/" + IpCorrFileNameMuonBS);  
-  IpCorrection *CorrectorIpElec   = new IpCorrection(TString(cmsswBase) + "/src/" + IpCorrFileNameElec);
-  IpCorrection *CorrectorIpElecBS = new IpCorrection(TString(cmsswBase) + "/src/" + IpCorrFileNameElecBS);  
 
   //svfit
   const string svFitPtResFile = TString(TString(cmsswBase) + "/src/" + TString(cfg.get<string>("svFitPtResFile"))).Data();
@@ -310,11 +293,15 @@ int main(int argc, char * argv[]){
   JME::JetResolutionScaleFactor resolution_sf = *m_scale_factor_from_file;
 
   cout<<"using "<<BTagAlgorithm<<endl;
-  BTagCalibration calib(BTagAlgorithm, BtagSfFile);
-  BTagCalibrationReader reader_B(BTagEntry::OP_MEDIUM, "central",{"up","down"});
-  BTagCalibrationReader reader_C(BTagEntry::OP_MEDIUM, "central");
-  BTagCalibrationReader reader_Light(BTagEntry::OP_MEDIUM, "central");
+  BTagCalibration calib;
+  BTagCalibrationReader reader_B;
+  BTagCalibrationReader reader_C;
+  BTagCalibrationReader reader_Light;
   if(ApplyBTagScaling){
+    calib = BTagCalibration(BTagAlgorithm, BtagSfFile);
+    reader_B = BTagCalibrationReader(BTagEntry::OP_MEDIUM, "central",{"up","down"});
+    reader_C = BTagCalibrationReader(BTagEntry::OP_MEDIUM, "central",{"up","down"});
+    reader_Light = BTagCalibrationReader(BTagEntry::OP_MEDIUM, "central",{"up","down"});
     reader_B.load(calib, BTagEntry::FLAV_B, "comb");
     reader_C.load(calib, BTagEntry::FLAV_C, "comb");
     reader_Light.load(calib, BTagEntry::FLAV_UDSG, "incl");
@@ -362,7 +349,7 @@ int main(int argc, char * argv[]){
   const bool isEWKZ =  infiles.find("EWKZ") != string::npos;
   const bool isMG = infiles.find("madgraph") != string::npos;
   const bool isMSSMsignal =  (infiles.find("SUSYGluGluToHToTauTau")!= string::npos) || (infiles.find("SUSYGluGluToBBHToTauTau")!= string::npos);
-  const bool isTTbar = infiles.find("TT") != string::npos;
+  const bool isTTbar = (infiles.find("TT_INCL") != string::npos) || (infiles.find("TTTo") != string::npos);
 
   const bool isEmbedded = infiles.find("Embed") != string::npos;
 
@@ -453,6 +440,12 @@ int main(int argc, char * argv[]){
   bool triggerEmbed2017 = false;
   float ptTriggerEmbed2017 = 40;
   float etaTriggerEmbed2017 = 1.479;
+  float dzFilterEff_data = 0.95;
+  float dzFilterEff_mc = 0.95;
+  if (era==2016) {
+    dzFilterEff_data = 0.98;
+    dzFilterEff_mc = 1.0;
+  }
 
   if (era==2017&&isEmbedded)
     triggerEmbed2017 = true;
@@ -598,9 +591,9 @@ int main(int argc, char * argv[]){
   TH1D *nWeightedEventsH = new TH1D("nWeightedEvents", "", 1, -0.5, 0.5);
   
   TTree *tree = new TTree("TauCheck", "TauCheck");
-  TTree *gtree = new TTree("GenTauCheck", "GenTauCheck");
+  //  TTree *gtree = new TTree("GenTauCheck", "GenTauCheck");
   Synch17Tree *otree = new Synch17Tree(tree,true);
-  Synch17GenTree *gentree = new Synch17GenTree(gtree);
+  //  Synch17GenTree *gentree = new Synch17GenTree(gtree);
     
   int nTotalFiles = 0;
   int nEvents = 0;
@@ -621,6 +614,7 @@ int main(int argc, char * argv[]){
   ZPtWeightSys* zPtWeightSys = 0;
   TopPtWeightSys* topPtWeightSys = 0;
   BtagSys * btagSys = 0;
+  BtagSys * mistagSys = 0;
   std::vector<JetEnergyScaleSys*> jetEnergyScaleSys;
   JESUncertainties * jecUncertainties = 0;
 
@@ -647,11 +641,12 @@ int main(int argc, char * argv[]){
 
     // systematics only for MC
     if (!isEmbedded) {
-      if (!isDY && !isWJets && !isHiggs) {
-	btagSys = new BtagSys(otree,TString("Btag"));
-	btagSys->SetConfig(&cfg);
-	btagSys->SetBtagScaling(&inputs_btag_scaling_medium);
-      }
+      btagSys = new BtagSys(otree,TString("Btag"));
+      btagSys->SetConfig(&cfg);
+      btagSys->SetBtagScaling(&inputs_btag_scaling_medium);
+      mistagSys = new BtagSys(otree,TString("Mistag"));
+      mistagSys->SetConfig(&cfg);
+      mistagSys->SetBtagScaling(&inputs_btag_scaling_medium);
       if (ApplyRecoilCorrections) {
 	if (usePuppiMET) {
 	  for (unsigned int i = 0; i < recoilSysNames.size(); ++i) {
@@ -748,8 +743,8 @@ int main(int argc, char * argv[]){
     AC1B analysisTree(_tree);
     // set AC1B for JES Btag and MET systematics
     if ( !isData && !isEmbedded && ApplySystShift) {
-      if (!isDY && !isWJets && !isHiggs)
 	btagSys->SetAC1B(&analysisTree);
+	mistagSys->SetAC1B(&analysisTree);
       for (unsigned int i = 0; i < jetEnergyScaleSys.size(); i++)
       	(jetEnergyScaleSys.at(i))->SetAC1B(&analysisTree);
       for (unsigned int i = 0; i < metSys.size(); i++)
@@ -771,11 +766,11 @@ int main(int argc, char * argv[]){
       nEvents++;
 
       // filling generator tree
-      if (!isData){
-	initializeGenTree(gentree);
-      	FillGenTree(&analysisTree,gentree);
-      	gentree->Fill();
-      }
+      //      if (!isData){
+      //	initializeGenTree(gentree);
+      //      	FillGenTree(&analysisTree,gentree);
+      //      	gentree->Fill();
+      //      }
 
       //Skip events not passing the MET filters, if applied
       bool passed_all_met_filters = passedAllMetFilters(&analysisTree, met_filters_list);
@@ -830,25 +825,6 @@ int main(int argc, char * argv[]){
       otree->npu = analysisTree.numtruepileupinteractions;// numpileupinteractions;
       otree->rho = analysisTree.rho;
 
-      // embedded weight
-      otree->embweight = 1;
-      if (isEmbedded) {
-      	otree->embweight = getEmbeddedWeight(&analysisTree, w);
-	if (otree->embweight>10.0)
-	  cout << "warning : embedding weight = " << otree->embweight << endl;
-      }
-
-      // PU weight
-      if (ApplyPUweight) 
-        otree->puweight = float(PUofficial->get_PUweight(double(analysisTree.numtruepileupinteractions)));
-
-      // generator weight
-      if(!isData || isEmbedded){
-        otree->mcweight = analysisTree.genweight;
-        otree->gen_noutgoing = analysisTree.genparticles_noutgoing;
-	if (isEmbedded&&otree->mcweight>1.0)
-	  otree->mcweight = 0.0;
-      }
 
       // selecting electrons      
       float sf_eleES = 1.0;   
@@ -902,7 +878,7 @@ int main(int argc, char * argv[]){
       //      std::cout << "m : pt = " << otree->pt_2 << "  eta = " << otree->eta_2 << "  phi = " << otree->phi_2 << std::endl;
 
       //all criterua passed, we fill vertices here;	
-      FillVertices(&analysisTree, otree, isData);
+      //      FillVertices(&analysisTree, otree, isData);
       
       //      std::cout << "fill vertices" << std::endl;
 
@@ -979,6 +955,20 @@ int main(int argc, char * argv[]){
       }    
       otree->singleLepTrigger = otree->trg_singleelectron || otree->trg_singlemuon;
     
+      bool trigger_fired = otree->trg_singleelectron || otree->trg_singlemuon || otree->trg_ehigh_mulow || otree->trg_muhigh_elow;
+
+      //extra lepton veto
+      TString chE("et");
+      TString chMu("mt");
+      otree->extraelec_veto = extra_electron_veto(electronIndex, chE, &cfg, &analysisTree, era, isEmbedded);
+      otree->extramuon_veto = extra_muon_veto(muonIndex, chMu, &cfg, &analysisTree, isData);
+
+
+      bool isSRevent = otree->iso_1<0.15&&otree->iso_2<0.4&&otree->extramuon_veto<0.5&&otree->extraelec_veto<0.5&&trigger_fired;
+
+      // when producing synch tuples for final datacards reduces the size of tuples.
+      if (ApplySystShift&&!isSRevent) continue;
+
       //      std::cout << "after trigger" << std::endl;
 
       // initialize JER (including data and embedded) 
@@ -1015,15 +1005,15 @@ int main(int argc, char * argv[]){
 
       otree->trigweight = 1;
       otree->trigweightSingle = 1;
-      otree->trigweightExcl = 1;
+      otree->trigweightEMu = 1;
 
       otree->effweight = 1;
       otree->effweightSingle = 1;
-      otree->effweightExcl = 1;
+      otree->effweightEMu = 1;
 
       otree->weight = 1;
       otree->weightSingle = 1;
-      otree->weightExcl = 1;
+      otree->weightEMu = 1;
 
       otree->trigweight_l_lt = 1;
       otree->trigweight_t_lt = 1;
@@ -1079,12 +1069,11 @@ int main(int argc, char * argv[]){
 	eff_mc_trig_m = w->function("m_trg_ic_" + suffix)->getVal();
 	sf_trig_m = w->function("m_trg_ic_" + suffixRatio)->getVal();
 
-	eff_data_trig_mhigh = w->function("m_trg_23_binned_ic_data")->getVal();
-	eff_data_trig_mlow = w->function("m_trg_8_binned_ic_data")->getVal();
-	eff_mc_trig_mhigh = w->function("m_trg_23_binned_ic_"+suffix)->getVal();
-	eff_mc_trig_mlow = w->function("m_trg_8_binned_ic_"+suffix)->getVal();
+	eff_data_trig_mhigh = w->function("m_trg_23_ic_data")->getVal();
+	eff_data_trig_mlow = w->function("m_trg_8_ic_data")->getVal();
+	eff_mc_trig_mhigh = w->function("m_trg_23_ic_"+suffix)->getVal();
+	eff_mc_trig_mlow = w->function("m_trg_8_ic_"+suffix)->getVal();
 
-;
 	otree->idisoweight_2 = w->function("m_idiso_ic_" + suffixRatio)->getVal();
 	otree->idisoweight_antiiso_2 = w->function("m_idiso_ic_" + suffixRatio)->getVal();
 	otree->trkeffweight_2 = w->function("m_trk_ratio")->getVal(); //  may be wrong
@@ -1097,21 +1086,19 @@ int main(int argc, char * argv[]){
 	eff_mc_trig_e = w->function("e_trg_ic_" + suffix)->getVal();
 	sf_trig_e = w->function("e_trg_ic_" + suffixRatio)->getVal();
 
-	eff_data_trig_ehigh = w->function("e_trg_23_binned_ic_data")->getVal();
-	eff_data_trig_elow = w->function("e_trg_12_binned_ic_data")->getVal();
-	eff_mc_trig_ehigh = w->function("e_trg_23_binned_ic_"+suffix)->getVal();
-	eff_mc_trig_elow = w->function("e_trg_12_binned_ic_"+suffix)->getVal();
-	/*
-	std::cout << "eff_data_trig_ehigh : " << eff_data_trig_ehigh << "  " << eff_data_trig_ehigh_kit << std::endl;
-	std::cout << "eff_mc_trig_ehigh   :  " << eff_mc_trig_ehigh << "  " << eff_mc_trig_ehigh_kit << std::endl;
-	std::cout << "eff_data_trig_elow : " << eff_data_trig_elow << "  " << eff_data_trig_elow_kit << std::endl;
-	std::cout << "eff_mc_trig_elow   :  " << eff_mc_trig_elow << "  " << eff_mc_trig_elow_kit << std::endl;
+	eff_data_trig_ehigh = w->function("e_trg_23_ic_data")->getVal();
+	eff_data_trig_elow = w->function("e_trg_12_ic_data")->getVal();
+	eff_mc_trig_ehigh = w->function("e_trg_23_ic_"+suffix)->getVal();
+	eff_mc_trig_elow = w->function("e_trg_12_ic_"+suffix)->getVal();
 
+	/*
 	std::cout << "eff_data_trig_mhigh : " << eff_data_trig_mhigh << "  " << eff_data_trig_mhigh_kit << std::endl;
 	std::cout << "eff_mc_trig_mhigh   :  " << eff_mc_trig_mhigh << "  " << eff_mc_trig_mhigh_kit << std::endl;
 	std::cout << "eff_data_trig_mlow : " << eff_data_trig_mlow << "  " << eff_data_trig_mlow_kit << std::endl;
 	std::cout << "eff_mc_trig_mlow   :  " << eff_mc_trig_mlow << "  " << eff_mc_trig_mlow_kit << std::endl;
+	std::cout << std::endl;
 	*/
+
 	if (triggerEmbed2017) {
 	  if (otree->pt_1<ptTriggerEmbed2017&&fabs(otree->eta_1)>etaTriggerEmbed2017) {
 	    eff_mc_trig_e = 1.0;
@@ -1123,6 +1110,7 @@ int main(int argc, char * argv[]){
 	otree->idisoweight_antiiso_1 = w->function("e_idiso_ic_" + suffixRatio)->getVal();
 	otree->trkeffweight_1 = w->function("e_trk_" + suffixRatio)->getVal();
 
+	/*
 	float isoweight_1_kit = 1.0;
 	float isoweight_2_kit = 1.0;
 	float trkeffweight_1_kit = 1.0;
@@ -1162,28 +1150,58 @@ int main(int argc, char * argv[]){
 	//	isoweight_1_kit *= trkeffweight_1_kit;
 	//	isoweight_2_kit *= trkeffweight_2_kit;
 	// KIT SF
+
+	if (otree->pt_1>50.&&otree->iso_1>0.25) {
+	  std::cout << "pt_1 = " << otree->pt_1 << std::endl;
+	  std::cout << "  idiso_ic = " << otree->idisoweight_1 
+		    << "  trk_ic = " << otree->trkeffweight_1 << std::endl;
+	  std::cout << "  idiso_kit = " << isoweight_1_kit 
+		    << "  trk_kit = " << trkeffweight_1_kit << std::endl;
+	}
+	if (otree->pt_2<50.&&otree->iso_2>0.25) {
+	  std::cout << "pt_2 = " << otree->pt_2 << std::endl;
+	  std::cout << "  idiso_ic = " << otree->idisoweight_2 
+		    << "  trk_ic = " << otree->trkeffweight_2 << std::endl;
+	  std::cout << "  idiso_kit = " << isoweight_2_kit 
+		    << "  trk_kit = " << trkeffweight_2_kit << std::endl;
+	}
+       
+
 	otree->idisoweight_1 = isoweight_1_kit;
 	otree->idisoweight_2 = isoweight_2_kit;
 	otree->trkeffweight_1 = trkeffweight_1_kit;
 	otree->trkeffweight_2 = trkeffweight_2_kit;
-
+	*/
 	otree->trigweight_1 = sf_trig_e;
 	otree->trigweight_2 = sf_trig_m;
 	
+	//  singleLep trigger
+	if (otree->pt_1<ptElectronSingleCut) {
+	  eff_data_trig_e = 0.0;
+	  eff_mc_trig_e = 0.0;
+	}
+	if (otree->pt_2<ptMuonSingleCut) {
+	  eff_data_trig_m = 0.0;
+	  eff_mc_trig_m = 0.0;
+	}
 	float eff_single_data = 1.0 - (1.0-eff_data_trig_e)*(1.0-eff_data_trig_m);
 	float eff_single_mc   = 1.0 - (1.0-eff_mc_trig_e)  *(1.0-eff_mc_trig_m);
+
 	if (eff_single_mc<1e-3||eff_single_data<1e-3) 
 	  otree->trigweightSingle = 0.0;
 	else
 	  otree->trigweightSingle = eff_single_data/eff_single_mc;
 
-	if (otree->pt_1<ptElectronSingleCut)
-	  otree->trigweightSingle = sf_trig_m;
-	if (otree->pt_2<ptMuonSingleCut)
-	  otree->trigweightSingle = sf_trig_e;
-	if (otree->pt_1<ptElectronSingleCut&&otree->pt_2<ptMuonSingleCut) {
-	  otree->trigweightSingle = 0;
+	// e-mu trigger
+	if (otree->pt_1<ptElectronHighCut) {
+	  eff_data_trig_ehigh = 0;
+	  eff_mc_trig_ehigh = 0;
 	}
+	if (otree->pt_2<ptMuonHighCut) {
+	  eff_data_trig_mhigh = 0;
+          eff_mc_trig_mhigh = 0;
+	}
+
 	float eff_emu_data = 
 	  eff_data_trig_mhigh*eff_data_trig_elow + 
 	  eff_data_trig_mlow*eff_data_trig_ehigh -
@@ -1191,35 +1209,69 @@ int main(int argc, char * argv[]){
 	float eff_emu_mc = 
 	  eff_mc_trig_mhigh*eff_mc_trig_elow + 
 	  eff_mc_trig_mlow*eff_mc_trig_ehigh -
-	  eff_mc_trig_mhigh*eff_mc_trig_ehigh;
+	  eff_mc_trig_mhigh*eff_mc_trig_ehigh;	
 
 	if (eff_emu_mc<1e-3||eff_emu_data<1e-3)
+	  otree->trigweightEMu = 0.0;
+	else
+	  otree->trigweightEMu = eff_emu_data/eff_emu_mc;
+
+	/*
+	if (otree->pt_1<ptElectronHighCut||otree->pt_2<ptElectronLowCut) {
+
+	  std::cout << "event = " << otree->evt << std::endl;
+	  std::cout << "pt_1 = " << otree->pt_1 << "  pt_2 = " << otree->pt_2 << std::endl;
+	  std::cout << "trigweightEMu  =  " << otree->trigweightEMu << std::endl;
+	  std::cout << "trigweight(Old) = " << www << std::endl;
+	  std::cout << "eff_emu_data = " << eff_emu_data << std::endl;
+	  std::cout << "eff_emu_mc = " << eff_emu_mc << std::endl;
+
+	  float sf_trig_mhigh = 0;
+	  float sf_trig_mlow = 0;
+	  float sf_trig_ehigh = 0;
+	  float sf_trig_elow = 0;
+
+	  if (eff_data_trig_mhigh>1e-3&&eff_mc_trig_mhigh>1e-3)
+	    sf_trig_mhigh = eff_data_trig_mhigh/eff_mc_trig_mhigh;
+	  if (eff_data_trig_mlow>1e-3&&eff_mc_trig_mlow>1e-3)
+	    sf_trig_mlow = eff_data_trig_mlow/eff_mc_trig_mlow;
+
+	  if (eff_data_trig_ehigh>1e-3&&eff_mc_trig_ehigh>1e-3)
+	    sf_trig_ehigh = eff_data_trig_ehigh/eff_mc_trig_ehigh;
+	  if (eff_data_trig_elow>1e-3&&eff_mc_trig_elow>1e-3)
+	    sf_trig_elow = eff_data_trig_elow/eff_mc_trig_elow;
+	  
+	  std::cout << "SF(mu-high)*SF(e-low) = " << sf_trig_mhigh*sf_trig_elow << std::endl;
+	  std::cout << "SF(e-high)*SF(mu-low) = " << sf_trig_ehigh*sf_trig_mlow << std::endl;
+	  std::cout << std::endl;
+
+	}
+	*/
+	// dz filter
+
+	otree->trigweightEMu *= dzFilterEff_data/dzFilterEff_mc;
+
+	float eff_comb_data = 
+	  eff_data_trig_e + 
+	  eff_data_trig_m + 
+	  eff_emu_data*dzFilterEff_data - 
+	  eff_data_trig_e*eff_data_trig_m - 
+	  eff_data_trig_e*eff_data_trig_mlow*dzFilterEff_data -
+	  eff_data_trig_m*eff_data_trig_elow*dzFilterEff_data +
+	  eff_data_trig_e*eff_data_trig_m*dzFilterEff_data;
+	float eff_comb_mc =
+	  eff_mc_trig_e +
+          eff_mc_trig_m +
+          eff_emu_mc*dzFilterEff_mc -
+          eff_mc_trig_e*eff_mc_trig_m -
+          eff_mc_trig_e*eff_mc_trig_mlow*dzFilterEff_mc -
+          eff_mc_trig_m*eff_mc_trig_elow*dzFilterEff_mc +
+          eff_mc_trig_e*eff_mc_trig_m*dzFilterEff_mc;
+
+	if (eff_comb_mc<1e-3||eff_comb_data<1e-4)
 	  otree->trigweight = 0.0;
 	else
-	  otree->trigweight = eff_emu_data/eff_emu_mc;
-
-	float sf_trig_mhigh = 0;
-	float sf_trig_mlow = 0;
-	float sf_trig_ehigh = 0;
-	float sf_trig_elow = 0;
-
-	if (eff_data_trig_mhigh>1e-3&&eff_mc_trig_mhigh>1e-3)
-	  sf_trig_mhigh = eff_data_trig_mhigh/eff_mc_trig_mhigh;
-	if (eff_data_trig_mlow>1e-3&&eff_mc_trig_mlow>1e-3)
-	  sf_trig_mlow = eff_data_trig_mlow/eff_mc_trig_mlow;
-
-	if (eff_data_trig_ehigh>1e-3&&eff_mc_trig_ehigh>1e-3)
-	  sf_trig_ehigh = eff_data_trig_ehigh/eff_mc_trig_ehigh;
-	if (eff_data_trig_elow>1e-3&&eff_mc_trig_elow>1e-3)
-	  sf_trig_elow = eff_data_trig_elow/eff_mc_trig_elow;
-
-	if (otree->pt_1<ptElectronHighCut)
-	  otree->trigweight = sf_trig_mhigh*sf_trig_elow;
-	if (otree->pt_2<ptMuonHighCut)
-	  otree->trigweight = sf_trig_ehigh*sf_trig_mlow;
-	if (otree->pt_1<ptElectronHighCut&&otree->pt_2<ptMuonHighCut) {
-	  otree->trigweight = 0;
-	}
+	  otree->trigweight = eff_comb_data/eff_comb_mc;
 
 	/*
 	std::cout << "pt_1 : " << otree->pt_1 << "  eta_1 = " << otree->eta_1 << "  iso_1 = " << otree->iso_1 << std::endl; 
@@ -1248,10 +1300,42 @@ int main(int argc, char * argv[]){
 	float eff_emu_weight = otree->idisoweight_1 * otree->trkeffweight_1 * otree->idisoweight_2 * otree->trkeffweight_2;
 	otree->effweight = eff_emu_weight * otree->trigweight;
 	otree->effweightSingle = eff_emu_weight * otree->trigweightSingle;
-	otree->weight = otree->effweight * otree->puweight * otree->mcweight; 
-	otree->weightSingle = otree->effweightSingle * otree->puweight * otree->mcweight; 
+	otree->effweightEMu = eff_emu_weight * otree->trigweightEMu;
+	otree->weight = otree->effweight;
+	otree->weightSingle = otree->effweightSingle;
+	otree->weightEMu = otree->effweightEMu;
+      }
+
+      // embedded weight
+      otree->embweight = 1.0;
+      if (isEmbedded) {
+      	otree->embweight = getEmbeddedWeight(&analysisTree, w);
+	if (otree->embweight>10.0)
+	  cout << "warning : embedding weight = " << otree->embweight << endl;
 	otree->weight *= otree->embweight;
 	otree->weightSingle *= otree->embweight;
+	otree->weightEMu *= otree->embweight;
+      }
+
+      // PU weight
+      otree->puweight = 1.0;
+      if (ApplyPUweight) {
+        otree->puweight = float(PUofficial->get_PUweight(double(analysisTree.numtruepileupinteractions)));
+	otree->weight *= otree->puweight;
+	otree->weightSingle *= otree->puweight;
+	otree->weightEMu *= otree->puweight;
+      }
+
+      // generator weight
+      otree->mcweight = 1.0;
+      if(!isData || isEmbedded){
+        otree->mcweight = analysisTree.genweight;
+        otree->gen_noutgoing = analysisTree.genparticles_noutgoing;
+	if (isEmbedded&&otree->mcweight>1.0)
+	  otree->mcweight = 0.0;
+	otree->weight *= otree->mcweight;
+	otree->weightSingle *= otree->mcweight;
+	otree->weightEMu *= otree->mcweight;	
       }
       
       //Theory uncertainties for CP analysis      
@@ -1274,7 +1358,13 @@ int main(int argc, char * argv[]){
       otree->prefiringweight     = analysisTree.prefiringweight;
       otree->prefiringweightUp   = analysisTree.prefiringweightup;
       otree->prefiringweightDown = analysisTree.prefiringweightdown;
-
+      if (!isData && !isEmbedded) {
+	if (era<2018) {
+	  otree->weight *= otree->prefiringweight;
+	  otree->weightSingle *= otree->prefiringweight;
+	  otree->weightEMu *= otree->prefiringweight;
+	}
+      }
       // ************************
       // QCD background weights *
       // ************************
@@ -1306,8 +1396,14 @@ int main(int argc, char * argv[]){
 	otree->qcdweight_deltaR_Par2_down =  OS_SS_njetgt1_Par2_DOWN->Eval(otree->dr_tt);
         
       }
-      otree->qcdweight_nonclosure = hNonClosureCorrection->GetBinContent(hNonClosureCorrection->GetXaxis()->FindBin(otree->pt_2),hNonClosureCorrection->GetYaxis()->FindBin(otree->pt_1));
-      otree->qcdweight_isolationcorrection = hIsolationCorrection->GetBinContent(hIsolationCorrection->GetXaxis()->FindBin(otree->pt_2),hIsolationCorrection->GetYaxis()->FindBin(otree->pt_1));
+
+      float pt1 = otree->pt_1;
+      float pt2 = otree->pt_2;
+      if (pt1>149.) pt1 = 149.0;
+      if (pt2>149.) pt2 = 149.0;
+
+      otree->qcdweight_nonclosure = hNonClosureCorrection->GetBinContent(hNonClosureCorrection->GetXaxis()->FindBin(pt2),hNonClosureCorrection->GetYaxis()->FindBin(pt1));
+      otree->qcdweight_isolationcorrection = hIsolationCorrection->GetBinContent(hIsolationCorrection->GetXaxis()->FindBin(pt2),hIsolationCorrection->GetYaxis()->FindBin(pt1));
         
       otree->qcdweight=otree->qcdweight_deltaR*otree->qcdweight_nonclosure*otree->qcdweight_isolationcorrection;
 
@@ -1342,6 +1438,9 @@ int main(int argc, char * argv[]){
           zptmassweight = h_zptweight->GetBinContent(h_zptweight->GetXaxis()->FindBin(bosonMassX), h_zptweight->GetYaxis()->FindBin(bosonPtX));
           }	
           otree->zptweight = zptmassweight;
+	  otree->weight *= zptmassweight;
+	  otree->weightSingle *= zptmassweight;
+	  otree->weightEMu *= zptmassweight;
       }
       
       ////////////////////////////////////////////////////////////
@@ -1349,14 +1448,27 @@ int main(int argc, char * argv[]){
       ////////////////////////////////////////////////////////////
 
       otree->topptweight = 1.;
-      if(!isData || isEmbedded){
+      if(!isData && isTTbar){
         float a_topPtWeight = cfg.get<float>("a_topPtWeight");
         float b_topPtWeight = cfg.get<float>("b_topPtWeight");
         float c_topPtWeight = cfg.get<float>("c_topPtWeight");
         float max_pt_topPtWeight = cfg.get<float>("max_pt_topPtWeight");
         otree->topptweight = genTools::topPtWeight_Run2(analysisTree, a_topPtWeight, b_topPtWeight, c_topPtWeight, max_pt_topPtWeight);
         // otree->topptweight = genTools::topPtWeight(analysisTree, 1); // 1 is for Run1 - use this reweighting as recommended by HTT 17
+	otree->weight *= otree->topptweight;
+	otree->weightSingle *= otree->topptweight;
+	otree->weightEMu *= otree->topptweight;
       }
+
+      // ************************
+      // Data has weight 1.0
+      // ************************
+      if (!isEmbedded && isData) {
+	otree->weight = 1.0;
+	otree->weightSingle = 1.0;
+	otree->weightEMu = 1.0;
+      }
+
 
       ////////////////////////////////////////////////////////////
       // MET and Recoil Corrections !  
@@ -1380,10 +1492,37 @@ int main(int argc, char * argv[]){
       otree->puppimet_ex_UnclusteredEnUp = analysisTree.puppimet_ex_UnclusteredEnUp;
       otree->puppimet_ex_UnclusteredEnDown = analysisTree.puppimet_ex_UnclusteredEnDown;
 
-      otree->puppimet_ey_UnclusteredEnUp = analysisTree.puppimet_ex_UnclusteredEnUp;
-      otree->puppimet_ey_UnclusteredEnDown = analysisTree.puppimet_ex_UnclusteredEnDown;
+      otree->puppimet_ey_UnclusteredEnUp = analysisTree.puppimet_ey_UnclusteredEnUp;
+      otree->puppimet_ey_UnclusteredEnDown = analysisTree.puppimet_ey_UnclusteredEnDown;
 
-      
+      float puppimetUp = sqrt(analysisTree.puppimet_ex_UnclusteredEnUp*analysisTree.puppimet_ex_UnclusteredEnUp+
+			      analysisTree.puppimet_ey_UnclusteredEnUp*analysisTree.puppimet_ey_UnclusteredEnUp);
+      float puppimetphiUp = atan2(analysisTree.puppimet_ey_UnclusteredEnUp,
+				  analysisTree.puppimet_ex_UnclusteredEnUp); 
+
+      float puppimetDown = sqrt(analysisTree.puppimet_ex_UnclusteredEnDown*analysisTree.puppimet_ex_UnclusteredEnDown+
+			      analysisTree.puppimet_ey_UnclusteredEnDown*analysisTree.puppimet_ey_UnclusteredEnDown);
+      float puppimetphiDown = atan2(analysisTree.puppimet_ey_UnclusteredEnDown,
+				  analysisTree.puppimet_ex_UnclusteredEnDown); 
+
+      /*     
+      std::cout << std::endl;
+      std::cout << " Central : (" << analysisTree.puppimet_ex 
+		<< "," << analysisTree.puppimet_ey << ")" << std::endl;
+
+      std::cout << "Up : (" << otree->puppimet_ex_UnclusteredEnUp 
+		<< "," << otree->puppimet_ey_UnclusteredEnUp << ")" << std::endl;
+
+      std::cout << "Down : (" << otree->puppimet_ex_UnclusteredEnDown 
+		<< "," << otree->puppimet_ey_UnclusteredEnDown << ")" << std::endl;
+
+      std::cout << "PuppiMET central :  " << otree->puppimet 
+      		<< "    " << analysisTree.puppimet_phi << std::endl;
+      std::cout << "PuppiMET up      :  " << puppimetUp 
+      		<< "    " << puppimetphiUp << std::endl;
+      std::cout << "PuppiMET down    :  " << puppimetDown
+      		<< "    " << puppimetphiDown << std::endl;
+      */
 
       otree->met_uncorr = otree->puppimet;
       otree->metphi_uncorr = otree->puppimetphi;
@@ -1416,16 +1555,6 @@ int main(int argc, char * argv[]){
 	otree->met = otree->met_rcmr;
 	otree->metphi = otree->metphi_rcmr;
       }
-      
-      // if (!isData) {
-      // 	if(otree->gen_match_2 == 5 && tauLV.E() <= 400 && tauLV.E() >= 20){
-      // 	  if (otree->tau_decay_mode_2 == 0) tauLV *= (1-0.03);
-      // 	  else if (otree->tau_decay_mode_2 < 5) tauLV *= (1-0.02);
-      // 	  else if (otree->tau_decay_mode_2 == 10)tauLV *= (1-0.01);
-      // 	  otree->pt_2 = tauLV.Pt();
-      // 	  otree->m_2 = tauLV.M();
-      // 	}
-      // }
       
       ////////////////////////////////////////////////////////////
       // Filling variables (with corrected MET and electron pt)
@@ -1461,11 +1590,6 @@ int main(int argc, char * argv[]){
       //      if(ch=="mt") otree->dilepton_veto = dilepton_veto_mt(&cfg, &analysisTree);
       //      if(ch=="et") otree->dilepton_veto = dilepton_veto_et(&cfg, &analysisTree, era, isEmbedded);
     
-      //extra lepton veto
-      TString chE("et");
-      TString chMu("mt");
-      otree->extraelec_veto = extra_electron_veto(electronIndex, chE, &cfg, &analysisTree, era, isEmbedded);
-      otree->extramuon_veto = extra_muon_veto(muonIndex, chMu, &cfg, &analysisTree, isData);
     
       otree->mt_1 = mT(electronLV, metLV);
       otree->mt_2 = mT(muonLV, metLV);
@@ -1485,25 +1609,7 @@ int main(int argc, char * argv[]){
       otree->pzetamiss = calc::pzetamiss(electronLV,muonLV,metxLV);
       otree->pzeta = calc::pzeta(electronLV,muonLV,metxLV);
       
-
-      bool isSRevent = true; //boolean used to compute SVFit variables only on SR events, it is set to true when running Synchronization to run SVFit on all events
-      //      if(!Synch){
-      //	isSRevent = (otree->dilepton_veto<0.5 &&  otree->extramuon_veto<0.5 && otree->extraelec_veto<0.5 && otree->pt_1>19 && otree->pt_2>19 && otree->byVVVLooseDeepTau2017v2p1VSjet_2>0.5);
-      //	if(usePuppiMET) isSRevent = isSRevent && otree->puppimt_1<60;
-      //	else isSRevent = isSRevent && otree->mt_1<60;
-      //	if(ch == "mt") isSRevent = isSRevent && (otree->trg_singlemuon>0.5 || otree->trg_mutaucross>0.5);
-      //	if(ch == "et") isSRevent = isSRevent && (otree->trg_singleelectron>0.5 || otree->trg_etaucross>0.5);
-      //      }
-
-      /*
-	if (!isSRevent) { 
-	cout << "                                        " << endl;
-	cout << "========================================" << endl;
-	cout << "        Event is not selected           " << endl;
-	cout << "========================================" << endl;
-	cout << "                                        " << endl;
-	}
-      */
+      //boolean used to compute SVFit variables only on SR events, it is set to true when running Synchronization to run SVFit on all events
 
       // initialize svfit and fastMTT variables
       otree->m_sv   = -10;
@@ -1517,17 +1623,16 @@ int main(int argc, char * argv[]){
       otree->pt_fast = -10;
       otree->phi_fast = -10;
       otree->eta_fast = -10;
+      if ( (ApplySVFit||ApplyFastMTT) && isSRevent) svfit_variables("em", &analysisTree, otree, &cfg, inputFile_visPtResolution);
 
       // +++++++++++++++++++++++++++++++++++++++++++++++++
       // ++++++++ Systematic uncertainties +++++++++++++++
       // +++++++++++++++++++++++++++++++++++++++++++++++++
-
-
+      
       // evaluate systematics for MC 
       if( !isData && !isEmbedded && ApplySystShift){
-	if (!isDY && !isWJets && !isHiggs) {
 	  btagSys->Eval();
-	}
+	  mistagSys->Eval();
 	for(unsigned int i = 0; i < jetEnergyScaleSys.size(); i++) {
 	  //	  cout << endl;
 	  //	  cout << "+++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
@@ -1594,6 +1699,11 @@ int main(int argc, char * argv[]){
   if (btagSys != 0) {
     btagSys->Write("",TObject::kOverwrite);
     delete btagSys;
+  }
+
+  if (mistagSys != 0) {
+    mistagSys->Write("",TObject::kOverwrite);
+    delete mistagSys;
   }
 
   if(jetEnergyScaleSys.size() > 0){

@@ -544,19 +544,29 @@ void svfit_variables(TString ch, const AC1B *analysisTree, Synch17Tree *otree, c
     if (ch == "mt") type_ = classic_svFit::MeasuredTauLepton::kTauToMuDecay;
     if (ch == "et") type_ = classic_svFit::MeasuredTauLepton::kTauToElecDecay;
     if (ch == "tt") type_ = classic_svFit::MeasuredTauLepton::kTauToHadDecay;
+    if (ch == "em") type_ = classic_svFit::MeasuredTauLepton::kTauToElecDecay;
     // define lepton four vectors
     measuredTauLeptons.push_back(classic_svFit::MeasuredTauLepton(type_,
 								  otree->pt_1,
 								  otree->eta_1,
 								  otree->phi_1,
-								  otree->m_1)); 
-    measuredTauLeptons.push_back(classic_svFit::MeasuredTauLepton(classic_svFit::MeasuredTauLepton::kTauToHadDecay,
-								  otree->pt_2,
-								  otree->eta_2,
-								  otree->phi_2,
-								  otree->m_2,
-						 otree->tau_decay_mode_2));
-    
+								  otree->m_1));
+    if (ch == "em") {
+      measuredTauLeptons.push_back(classic_svFit::MeasuredTauLepton(classic_svFit::MeasuredTauLepton::kTauToMuDecay,
+								    otree->pt_2,
+								    otree->eta_2,
+								    otree->phi_2,
+								    otree->m_2));
+      
+    }
+    else {
+      measuredTauLeptons.push_back(classic_svFit::MeasuredTauLepton(classic_svFit::MeasuredTauLepton::kTauToHadDecay,
+								    otree->pt_2,
+								    otree->eta_2,
+								    otree->phi_2,
+								    otree->m_2,
+								    otree->tau_decay_mode_2));
+    }
     if (cfg->get<bool>("ApplySVFit")) {
       int verbosity = 1;
       ClassicSVfit svFitAlgo(verbosity);

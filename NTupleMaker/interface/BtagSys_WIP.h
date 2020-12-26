@@ -21,7 +21,7 @@ public:
   BtagSys(Synch17Tree* c, TString name){
     cenTree = c;
     label = "CMS_eff_b_13TeV";    
-    if (name="Mistag")
+    if (name=="Mistag")
       label = "CMS_mistag_b_13TeV";
     this->SetUncertaintyName(name);
     this->Init(cenTree);

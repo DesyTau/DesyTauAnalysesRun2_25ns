@@ -69,6 +69,7 @@ int main(int argc, char * argv[]) {
 
   const string hltDoubleMu           = cfg.get<string>("HLTDoubleMu");
   const string hltDoubleMuDZ         = cfg.get<string>("HLTDoubleMuDZ");
+  const string hltDoubleMuSameSign   = cfg.get<string>("HLTDoubleMuSameSign");
   const string hltDoubleMuSameSignDZ = cfg.get<string>("HLTDoubleMuSameSignDZ");
 
   const string hltIsoSingleMu   = cfg.get<string>("HLTIsoSingleMu");  
@@ -106,6 +107,7 @@ int main(int argc, char * argv[]) {
   // convesrsion from string to TString
   TString HLTDoubleMu(hltDoubleMu);
   TString HLTDoubleMuDZ(hltDoubleMuDZ);
+  TString HLTDoubleMuSameSign(hltDoubleMuSameSign);
   TString HLTDoubleMuSameSignDZ(hltDoubleMuSameSignDZ);
 
   TString HLTIsoSingleMu(hltIsoSingleMu);
@@ -169,6 +171,7 @@ int main(int argc, char * argv[]) {
 
   int presHLTDoubleMu = 0;
   int presHLTDoubleMuDZ = 0;
+  int presHLTDoubleMuSameSign = 0;
   int presHLTDoubleMuSameSignDZ = 0;
   int presHLTIsoSingleMu = 0;
   int presHLTIsoMu18 = 0;
@@ -179,6 +182,7 @@ int main(int argc, char * argv[]) {
 
   bool isHLTDoubleMu = 0;
   bool isHLTDoubleMuDZ = 0;
+  bool isHLTDoubleMuSameSign = 0;
   bool isHLTDoubleMuSameSignDZ = 0;
   bool isHLTIsoSingleMu = 0;
   bool isHLTIsoMu18 = 0;
@@ -227,6 +231,7 @@ int main(int argc, char * argv[]) {
   // prescales
   TH1F * prescaleHLTDoubleMuH = new TH1F("prescaleHLTDoubleMuH","",21,-0.5,20.5);
   TH1F * prescaleHLTDoubleMuDZH = new TH1F("prescaleHLTDoubleMuDZH","",21,-0.5,20.5);
+  TH1F * prescaleHLTDoubleMuSameSignH = new TH1F("prescaleHLTDoubleMuSameSignH","",21,-0.5,20.5);
   TH1F * prescaleHLTDoubleMuSameSignDZH = new TH1F("prescaleHLTDoubleMuSameSignDZH","",21,-0.5,20.5);
   TH1F * prescaleHLTIsoSingleMuH = new TH1F("prescaleHLTIsoSingleMuH","",21,-0.5,20.5);
   TH1F * prescaleHLTIsoMu18H = new TH1F("prescaleHLTIsoMu18H","",101,-0.5,100.5);
@@ -574,6 +579,7 @@ int main(int argc, char * argv[]) {
       // triggers
       isHLTDoubleMu = false;
       isHLTDoubleMuDZ = false;
+      isHLTDoubleMuSameSign = false;
       isHLTDoubleMuSameSignDZ = false;
       isHLTIsoSingleMu = false;
       isHLTIsoMu18 = false;
@@ -598,6 +604,11 @@ int main(int argc, char * argv[]) {
 	  //	  std::cout << trigName << " : " << it->second << std::endl;
 	  if (it->second==1)
             isHLTDoubleMuSameSignDZ = true;
+	}
+	if (trigName.Contains(HLTDoubleMuSameSign)) {
+	  //	  std::cout << trigName << " : " << it->second << std::endl;
+	  if (it->second==1)
+            isHLTDoubleMuSameSign = true;
 	}
 	if (trigName.Contains(HLTIsoSingleMu)) {
 	  if (it->second==1)
@@ -629,6 +640,7 @@ int main(int argc, char * argv[]) {
 
       presHLTDoubleMu = 0;
       presHLTDoubleMuDZ = 0;
+      presHLTDoubleMuSameSign = 0;
       presHLTDoubleMuSameSignDZ = 0;
       presHLTIsoSingleMu = 0;
       presHLTIsoMu18 = 0;
@@ -645,6 +657,10 @@ int main(int argc, char * argv[]) {
 	if (trigName.Contains(HLTDoubleMuDZ)) {
 	  //	  std::cout << trigName << " : " << it->second << std::endl;
 	  presHLTDoubleMuDZ = it->second;
+	}
+	if (trigName.Contains(HLTDoubleMuSameSign)) {
+	  //	  std::cout << trigName << " : " << it->second << std::endl;
+	  presHLTDoubleMuSameSign = it->second;
 	}
 	if (trigName.Contains(HLTDoubleMuSameSignDZ)) {
 	  //	  std::cout << trigName << " : " << it->second << std::endl;
@@ -783,6 +799,7 @@ int main(int argc, char * argv[]) {
 
       prescaleHLTDoubleMuH->Fill(float(presHLTDoubleMu),weight);
       prescaleHLTDoubleMuDZH->Fill(float(presHLTDoubleMuDZ),weight);
+      prescaleHLTDoubleMuSameSignH->Fill(float(presHLTDoubleMuSameSign),weight);
       prescaleHLTDoubleMuSameSignDZH->Fill(float(presHLTDoubleMuSameSignDZ),weight);
       prescaleHLTIsoSingleMuH->Fill(float(presHLTIsoSingleMu),weight);
       prescaleHLTIsoMu18H->Fill(float(presHLTIsoMu18),weight);
