@@ -1109,8 +1109,7 @@ int main(int argc, char * argv[]){
 	otree->idisoweight_1 = w->function("e_idiso_ic_" + suffixRatio)->getVal();
 	otree->idisoweight_antiiso_1 = w->function("e_idiso_ic_" + suffixRatio)->getVal();
 	otree->trkeffweight_1 = w->function("e_trk_" + suffixRatio)->getVal();
-
-	/*
+	
 	float isoweight_1_kit = 1.0;
 	float isoweight_2_kit = 1.0;
 	float trkeffweight_1_kit = 1.0;
@@ -1151,6 +1150,7 @@ int main(int argc, char * argv[]){
 	//	isoweight_2_kit *= trkeffweight_2_kit;
 	// KIT SF
 
+	/*
 	if (otree->pt_1>50.&&otree->iso_1>0.25) {
 	  std::cout << "pt_1 = " << otree->pt_1 << std::endl;
 	  std::cout << "  idiso_ic = " << otree->idisoweight_1 
@@ -1165,13 +1165,13 @@ int main(int argc, char * argv[]){
 	  std::cout << "  idiso_kit = " << isoweight_2_kit 
 		    << "  trk_kit = " << trkeffweight_2_kit << std::endl;
 	}
-       
+	*/
 
 	otree->idisoweight_1 = isoweight_1_kit;
 	otree->idisoweight_2 = isoweight_2_kit;
 	otree->trkeffweight_1 = trkeffweight_1_kit;
 	otree->trkeffweight_2 = trkeffweight_2_kit;
-	*/
+	
 	otree->trigweight_1 = sf_trig_e;
 	otree->trigweight_2 = sf_trig_m;
 	

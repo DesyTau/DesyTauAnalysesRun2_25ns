@@ -224,7 +224,7 @@ void Plot(TFile * file,
   upper->Update();
   canv1->cd();
 
-  ratioUp->GetYaxis()->SetRangeUser(0.9,1.1);
+  ratioUp->GetYaxis()->SetRangeUser(0.85,1.15);
   ratioUp->GetYaxis()->SetNdivisions(505);
   ratioUp->GetXaxis()->SetLabelFont(42);
   ratioUp->GetXaxis()->SetLabelOffset(0.04);

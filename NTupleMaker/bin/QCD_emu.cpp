@@ -26,6 +26,8 @@ bool is2016;
 bool is2017;
 bool is2018;
 
+bool applySF;
+
 float ptTriggerEmbed2017 = 40;
 float etaTriggerEmbed2017 = 1.479;
 
@@ -60,6 +62,7 @@ float xmaxPZeta = 150;
 int triggerOption;
 TString input_dir;
 TString output_dir;
+
 
 SampleAttributes SetSampleAttributes(TString name, 
 				     TString histname,
@@ -332,11 +335,13 @@ void RunOnTree(TTree * tree,
   bool isTTbar = name=="TT";
   bool isDY = name=="DYJetsLL";
 
+  int count = 0;
+
+
   for (Long64_t ie = 0; ie<nentries; ++ie) {
     tree17->GetEntry(ie);
-
-    if (ie!=0 && ie%100000==0) 
-      std::cout << "      processed " << ie << "   events" << std::endl;
+    if (ie!=0&&ie%100000==0)
+      std::cout << "    processed " << ie << " events" << std::endl;
 
     /*
     std::cout << "pt_1 = " << pt_1 << std::endl;
@@ -361,12 +366,29 @@ void RunOnTree(TTree * tree,
     bool isSingleMu = (tree17->pt_2 > pt_SingleMu && tree17->trg_singlemuon>0.5);
     bool isSingleLep = isSingleE || isSingleMu;
     bool isEMu = (tree17->pt_1>24.&&tree17->trg_ehigh_mulow) || (tree17->pt_2>24.&&tree17->trg_muhigh_elow);
-    if (triggerOption==0&&!isEMu) continue;
-    if (triggerOption==1&&!isSingleLep) continue;
-    if (triggerOption==2&&!(isEMu||isSingleLep)) continue;
+    if (!isData) {
+      if (triggerOption==0&&!isEMu) continue;
+      if (triggerOption==1&&!isSingleLep) continue;
+      if (triggerOption==2&&!(isEMu||isSingleLep)) continue;
+    }
+    else {
+      bool trigger = true;
+      if (sampleName.Contains("EGamma")||sampleName.Contains("SingleElectron")) {
+	trigger = isSingleE && !isSingleMu;
+	if (!trigger) continue;
+      }
+      if (sampleName.Contains("SingleMuon")) {
+	trigger = isSingleMu;
+	if (!trigger) continue;
+      }
+      if (sampleName.Contains("MuonEG"))  {
+	trigger = isEMu;
+	if (triggerOption==2)
+	  trigger = isEMu && !isSingleE && !isSingleMu;
+	if (!trigger) continue;
+      }
 
-    if (sampleName.Contains("EGamma")||sampleName.Contains("SingleElectron")) 
-      if (isSingleMu) continue;
+    }
     if (sampleName.Contains("WJetsToLNu_0")||sampleName.Contains("DYJetsToLL_M-50_0"))
       if (tree17->gen_noutgoing!=0) continue;
     if (sampleName.Contains("WJetsToLNu_1")||sampleName.Contains("DYJetsToLL_M-50_1"))
@@ -377,8 +399,6 @@ void RunOnTree(TTree * tree,
       if (tree17->gen_noutgoing!=3) continue;
     if (sampleName.Contains("WJetsToLNu_4")||sampleName.Contains("DYJetsToLL_M-50_4"))
       if (tree17->gen_noutgoing!=4) continue;
-    if (sampleName.Contains("MuonEG")) 
-      if (triggerOption==2&&(isSingleMu||isSingleE)) continue;
 
     //    std::cout << "selectDiTau = " << selectDiTau << std::endl;
     bool isDiTau = tree17->gen_match_1==3&&tree17->gen_match_2==4;
@@ -390,11 +410,21 @@ void RunOnTree(TTree * tree,
 
     // weight to fill histo
     
-    float effweight = 1.0;
-    float weight = 1.0;
+    float effweight = tree17->effweight;    
+    float weight = 1.0;    
+    if (triggerOption==0)
+      effweight = tree17->effweightEMu;
+    if (triggerOption==1)
+      effweight = tree17->effweightSingle;
     
-    /*
-    if (!isData) {
+    float effweightEMu = 1.0;//tree17->effweightEMu;
+    float effweightSingle = 1.0;//tree17->effweightSingle;
+    float effweightComb = 1.0;//tree17->effweight;
+    float trigweightSingle = 1.0;//tree17->trigweightSingle;
+    float trigweightEMu = 1.0;//tree17->trigweightEMu;
+    float trigweight_comb = 1.0;//tree17->trigweight;
+
+    if (!isData&&applySF) {
       TString suffix = "mc";
       TString suffixRatio = "ratio";
       if (isEmbedded) {suffix = "embed"; suffixRatio = "embed_ratio";}
@@ -451,7 +481,7 @@ void RunOnTree(TTree * tree,
 	eff_mc_trig_e = 0;
       }
 
-      if (tree17->pt_1<pt_SingleMu) {
+      if (tree17->pt_2<pt_SingleMu) {
 	eff_data_trig_m = 0;
 	eff_mc_trig_m = 0;
       }
@@ -459,7 +489,6 @@ void RunOnTree(TTree * tree,
       float eff_single_data = eff_data_trig_e + eff_data_trig_m - eff_data_trig_e*eff_data_trig_m;
       float eff_single_mc   = eff_mc_trig_e + eff_mc_trig_m - eff_mc_trig_e*eff_mc_trig_m;
 
-      float trigweightSingle = 0.0;
 
       if (eff_single_mc<1e-3||eff_single_data<1e-3) 
 	trigweightSingle = 0.0;
@@ -476,7 +505,6 @@ void RunOnTree(TTree * tree,
 			eff_mc_trig_mlow*eff_mc_trig_ehigh -
 			eff_mc_trig_mhigh*eff_mc_trig_ehigh;	
       
-      float trigweightEMu = 1.0;
       if (eff_emu_mc<1e-3||eff_emu_data<1e-3)
 	trigweightEMu = 0.0;
       else
@@ -499,19 +527,40 @@ void RunOnTree(TTree * tree,
 		     eff_mc_trig_m*eff_mc_trig_elow*dzFilterEff_mc +
 		     eff_mc_trig_e*eff_mc_trig_m*dzFilterEff_mc;
 
-      float trigweight_comb = 1.0;
       if (eff_comb_mc<1e-3||eff_comb_data<1e-4)
 	trigweight_comb = 0.0;
       else
 	trigweight_comb = eff_comb_data/eff_comb_mc;
       
-      effweight = idisoweight_1 * trkeffweight_1 * idisoweight_2 * trkeffweight_2;
+      float idiso_eff = idisoweight_1 * trkeffweight_1 * idisoweight_2 * trkeffweight_2;
+      effweightEMu = idiso_eff * trigweightEMu;
+      effweightSingle = idiso_eff * trigweightSingle;
+      effweightComb = idiso_eff * trigweight_comb;
       if (triggerOption==0)
-	effweight *= trigweightEMu;
+	effweight = effweightEMu;
       else if (triggerOption==1)
-	effweight *= trigweightSingle;
+	effweight = effweightSingle;
       else
-	effweight *= trigweight_comb;
+	effweight = trigweight_comb;
+    }
+
+    /*
+    if (tree17->iso_1<0.15&&tree17->iso_2<0.2&&(tree17->pt_1>100.0||tree17->pt_2>100.0)) {
+
+      std::cout << "pt1 = " << tree17->pt_1 << "    pt2 = " << tree17->pt_2 << std::endl;
+
+      std::cout << "Effweight (e-mu)      : KIT = " << tree17->effweightEMu << "   IC = " << effweightEMu << std::endl;
+
+      std::cout << "Effweight (singleLep) : KIT = " << tree17->effweightSingle << "   IC = " << effweightSingle << std::endl;
+
+      std::cout << "Effweight (comb)      : KIT = " << tree17->effweight << "   IC = " << effweightComb << std::endl;
+      // ******
+      // ******
+      std::cout << "Trgweight (e-mu)      : KIT = " << tree17->trigweightEMu << "   IC = " << trigweightEMu << std::endl;
+
+      std::cout << "Trgweight (singleLep) : KIT = " << tree17->trigweightSingle << "   IC = " << trigweightSingle << std::endl;
+
+      std::cout << "Trgweight (comb)      : KIT = " << tree17->trigweight << "   IC = " << trigweight_comb << std::endl;
 
     }
     */
@@ -621,33 +670,25 @@ void RunOnTree(TTree * tree,
 
     if (tree17->iso_1<0.15&&tree17->iso_2<0.2&&tree17->pzeta>-35.0) { 
       th1["mvis_sel_signal_"+iSign]->Fill(tree17->m_vis,weight);
-      th1["mvis_sel_signal_"+iSign]->Fill(tree17->m_vis,weight);
-      th1["pt1_sel_signal_"+iSign]->Fill(tree17->pt_1,weight);
-      th1["pt1_sel_signal_"+iSign]->Fill(tree17->pt_1,weight);
-      th1["pt2_sel_signal_"+iSign]->Fill(tree17->pt_2,weight);
-      th1["pt2_sel_signal_"+iSign]->Fill(tree17->pt_2,weight);
-      th1["mTtot_sel_signal_"+iSign]->Fill(tree17->mt_tot,weight);
-      th1["mTtot_sel_signal_"+iSign]->Fill(tree17->mt_tot,weight);
+      th1["pt1_sel_signal_"+iSign]->Fill(tree17->m_vis,weight);
+      th1["pt2_sel_signal_"+iSign]->Fill(tree17->m_vis,weight);
+      th1["mTtot_sel_signal_"+iSign]->Fill(tree17->m_vis,weight);
+      if (tree17->os>0.5) count += 1;
     }
 
     if (tree17->iso_1<0.15&&tree17->iso_2<0.2&&tree17->pzeta<=-35.0) { 
       th1["mvis_sel_ttbar_"+iSign]->Fill(tree17->m_vis,weight);
-      th1["mvis_sel_ttbar_"+iSign]->Fill(tree17->m_vis,weight);
-      th1["pt1_sel_ttbar_"+iSign]->Fill(tree17->pt_1,weight);
-      th1["pt1_sel_ttbar_"+iSign]->Fill(tree17->pt_1,weight);
-      th1["pt2_sel_ttbar_"+iSign]->Fill(tree17->pt_2,weight);
-      th1["pt2_sel_ttbar_"+iSign]->Fill(tree17->pt_2,weight);
-      th1["mTtot_sel_ttbar_"+iSign]->Fill(tree17->mt_tot,weight);
-      th1["mTtot_sel_ttbar_"+iSign]->Fill(tree17->mt_tot,weight);
+      th1["pt1_sel_ttbar_"+iSign]->Fill(tree17->m_vis,weight);
+      th1["pt2_sel_ttbar_"+iSign]->Fill(tree17->m_vis,weight);
+      th1["mTtot_sel_ttbar_"+iSign]->Fill(tree17->m_vis,weight);
     }
 
     if (tree17->iso_1<0.15&&tree17->iso_2<0.2) {
       th1["pzeta_sel_"+iSign]->Fill(tree17->pzeta,weight);
-      th1["pzeta_sel_"+iSign]->Fill(tree17->pzeta,weight);
     }
 
   }
-
+  //  std::cout << "   " << sampleName << "  :  " << count << std::endl;
   delete tree17;
 
 } 
@@ -668,12 +709,11 @@ void ProcessSample(SampleAttributes sample,
 
   for (auto mapIter : sampleMap) {
     TString sampleName = mapIter.first; 
-    std::cout << "     " << sampleName; 
     TFile * file = mapIter.second;
     TTree * tree = (TTree*)file->Get(BaseTreeName);
-    std::cout << "     events in tree : " << tree->GetEntries() << std::endl;
     float norm = normMap[sampleName];
     int selectDiTau = sample.selectDiTau;
+    std::cout << "       " << sampleName << "      events in tree : " << tree->GetEntries() << std::endl;
     //    std::cout << "selectDiTau = " << selectDiTau << std::endl;
     //    std::cout << "norm = " << norm << std::endl;
     RunOnTree(tree,name,sampleName,th1,th2,selectDiTau,norm);
@@ -697,15 +737,16 @@ void ProcessSample(SampleAttributes sample,
 int main(int argc, char * argv[]) {
   
   // argument - config file
-  if (argc!=3) {
-    std::cout << "usage of the scripts : QCD_emu [era=2016,2017,2018] [trigger Option = SingleLep, EMu, Comb]" << std::endl;
+  if (argc!=5) {
+    std::cout << "usage of the scripts : QCD_emu [era=2016,2017,2018] [trigger Option = SingleLep, EMu, Comb] [Sample = Data, Embedded, MC, TT, All] [SF = SFnew, SFold]" << std::endl;
     exit(-1);
   }
 
   // **** input parameters
   TString era(argv[1]);
   TString Trigger(argv[2]);
-
+  TString Sample(argv[3]);
+  TString SF(argv[4]);
 
   if (era!="2016"&&era!="2017"&&era!="2018") {
     std::cout << "Unknown era : " << era << std::endl;
@@ -713,7 +754,16 @@ int main(int argc, char * argv[]) {
   }
   if (Trigger!="SingleLep"&&Trigger!="EMu"&&Trigger!="Comb") {
     std::cout << "Unknown trigger option : " << Trigger << std::endl;
+    exit(-1);
   }
+  if (Sample!="Data"&&Sample!="Embedded"&&Sample!="MC"&&Sample!="All"&&Sample!="TT") {
+    std::cout << "Unknown sample option : " << Sample << std::endl;
+  }
+
+  if (SF=="SFold") 
+    applySF = false;
+  if (SF=="SFnew")
+    applySF = true;
 
   if (era=="2018") {
     lumi = 59740;
@@ -753,7 +803,6 @@ int main(int argc, char * argv[]) {
     dzFilterEff_data = 0.95;
   }
 
-  TString OutputFileName = Trigger + "_" + era + ".root";
   
   string cmsswBase = (getenv("CMSSW_BASE"));
 
@@ -796,7 +845,7 @@ int main(int argc, char * argv[]) {
 
   std::vector<TString> DataSamples; DataSamples.clear();
 				      
-  if (triggerOption==0) {
+  if (triggerOption==1) {
 
     for (unsigned int i=0; i<SingleElectron.size(); ++i)
       DataSamples.push_back(SingleElectron.at(i));
@@ -805,7 +854,7 @@ int main(int argc, char * argv[]) {
       DataSamples.push_back(SingleMuon.at(i));
 
   }
-  if (triggerOption==1) {
+  if (triggerOption==0) {
     DataSamples = MuonEG;
   }
   if (triggerOption==2) {
@@ -832,15 +881,30 @@ int main(int argc, char * argv[]) {
   SampleAttributes VVAttr = SetSampleAttributes("VV","VV",EWKSamples,-1);
   SampleAttributes TTAttr = SetSampleAttributes("TT","TT",TTSamples,-1);
 
+  TString OutputFileName = Sample + "_" + Trigger + "_" + SF + "_" + era + ".root";
   TFile * outputFile = new TFile(OutputFileName,"recreate");
   outputFile->cd("");
   
-  //  ProcessSample(DataAttr,outputFile);
-  ProcessSample(EmbedAttr,outputFile);
-  //  ProcessSample(ZllAttr,outputFile);
-  //  ProcessSample(WJetsAttr,outputFile);
-  //  ProcessSample(VVAttr,outputFile);
-  //  ProcessSample(TTAttr,outputFile);
+  if (Sample=="Data")
+    ProcessSample(DataAttr,outputFile);
+  if (Sample=="Embedded")
+    ProcessSample(EmbedAttr,outputFile);
+  if (Sample=="MC") {
+    ProcessSample(ZllAttr,outputFile);
+    ProcessSample(WJetsAttr,outputFile);
+    ProcessSample(VVAttr,outputFile);
+  }
+  if (Sample=="TT") 
+    ProcessSample(TTAttr,outputFile);
+  if (Sample=="All") {
+    ProcessSample(DataAttr,outputFile);
+    ProcessSample(EmbedAttr,outputFile);
+    ProcessSample(ZllAttr,outputFile);
+    ProcessSample(WJetsAttr,outputFile);
+    ProcessSample(VVAttr,outputFile);
+    ProcessSample(TTAttr,outputFile);
+  }
+
 
   outputFile->Close();
   delete outputFile;

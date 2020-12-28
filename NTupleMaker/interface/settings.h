@@ -8,20 +8,17 @@
 using namespace std;
 
 map<TString, double> xsecs = {
-  {"WJetsToLNu"  , 52760*1.166}, // NNLO (1)
-  {"W1JetsToLNu" , 1.166*8104.}, // NNLO (2)
-  {"W2JetsToLNu" , 1.166*2796.}, // NNLO (3)
-  {"W3JetsToLNu" , 1.166*993.5}, // NNLO (4)
-  {"W4JetsToLNu" , 1.166*544.4}, // NNLO (5)
-  {"ZZ" , 12.19},  // LO (17) -> could be improved
-  {"WW" , 118.7},  // NNLO QCD (18)
-  {"WZ" , 27.68},  // LO (19) -> could be improved
+  {"WJetsToLNu"  , 61526.7}, // NNLO (1)
+  {"W1JetsToLNu" , 9370.5}, // NNLO (2)
+  {"W2JetsToLNu" , 3170.9}, // NNLO (3)
+  {"W3JetsToLNu" , 1132.5}, // NNLO (4)
+  {"W4JetsToLNu" , 631.5 }, // NNLO (5)
   {"DYJetsToLL_M-50"       , 6077.22},  // NNLO (20)
-  {"DY1JetsToLL_M-50"      , 878.7*1.079}, // NNLO (20a)
-  {"DY2JetsToLL_M-50"      , 304.4*1.079}, // NNLO (20b)
-  {"DY3JetsToLL_M-50"      , 111.5*1.079}, // NNLO (20c)
-  {"DY4JetsToLL_M-50"      , 44.03*1.079}, // NNLO (20d)
-  {"TT"               , 831.76}, // NNLO (21 inclusive)
+  {"DY1JetsToLL_M-50"      , 977.1}, // NNLO (20a)
+  {"DY2JetsToLL_M-50"      , 347.3}, // NNLO (20b)
+  {"DY3JetsToLL_M-50"      , 126.1}, // NNLO (20c)
+  {"DY4JetsToLL_M-50"      , 71.67}, // NNLO (20d)
+  {"TT_INCL"          , 831.76}, // NNLO (21 inclusive)
   {"TTTo2L2Nu"        , 88.29},  // NNLO (21)
   {"TTToHadronic"     , 377.96}, // NNLO (22)
   {"TTToSemiLeptonic" , 365.35}, // NNLO (23)
@@ -29,15 +26,15 @@ map<TString, double> xsecs = {
   {"ST_t-channel_antitop_4f" , 80.95}, // ? (25) -> could be improved
   {"ST_tW_top_5f"            , 35.85}, // ? (26) -> could be improved
   {"ST_tW_antitop_5f"        , 35.85}, // ? (27) -> could be improved
-  {"VVTo2L2Nu"               , 11.95 },
+  {"VVTo2L2Nu"               , 13.84},
   {"WWToLNuQQ"               , 49.997 },
-  {"WZTo2L2Q"                , 5.595 },
+  {"WZTo2L2Q"                , 5.52 },
   {"WZTo1L1Nu2Q"             , 10.71 },
   {"WZTo1L3Nu"               , 3.05 },
   {"WZJToLLLNu"               , 4.708 },
   {"WZTo3LNu"                 , 4.43 },
-  {"ZZTo4L"                   , 1.212 },
-  {"ZZTo2L2Q"                 , 3.22 },  
+  {"ZZTo4L"                   , 1.26 },
+  {"ZZTo2L2Q"                 , 3.38 },
 };
 
 std::vector<TString> SingleMuon_2018 = {
@@ -232,7 +229,7 @@ std::vector<TString> TT_EXCL = {
 };
 
 std::vector<TString> TT_INCL = {
-  "TT"
+  "TT_INCL"
 };
 
 TString baseNameBBH = "SUSYGluGluToBBHToTauTau_M-";
