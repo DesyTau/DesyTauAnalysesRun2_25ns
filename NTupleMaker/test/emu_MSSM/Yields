@@ -1,0 +1,41 @@
+EMu or SingleLep --->
+EGamma_Run2018A : 124642
+EGamma_Run2018B : 65292
+EGamma_Run2018C : 64060
+EGamma_Run2018D : 303646
+SingleMuon_Run2018A : 183697
+SingleMuon_Run2018B : 94546
+SingleMuon_Run2018C : 92263
+SingleMuon_Run2018D : 422316
+MuonEG_Run2018A : 227635
+MuonEG_Run2018B : 116116
+MuonEG_Run2018C : 113710
+MuonEG_Run2018D : 515816
+
+EMu trigger ---> 
+EGamma_Run2018A = 114529 
+EGamma_Run2018B = 60418 
+EGamma_Run2018C = 58973 
+EGamma_Run2018D = 281809 
+SingleMuon_Run2018A = 165603 
+SingleMuon_Run2018B = 86478 
+SingleMuon_Run2018C = 84050 
+SingleMuon_Run2018D = 386444 
+MuonEG_Run2018A = 217529 
+MuonEG_Run2018B = 111547 
+MuonEG_Run2018C = 108898 
+MuonEG_Run2018D = 495514 
+
+SingleLep --->
+EGamma_Run2018A = 121447 : 14768.3
+EGamma_Run2018B = 63624 : 7642.9
+EGamma_Run2018C = 62338 : 7884.4
+EGamma_Run2018D = 289755 : 34371.2
+SingleMuon_Run2018A = 174768 : 21817.8
+SingleMuon_Run2018B = 89756 : 11497.7
+SingleMuon_Run2018C = 87766 : 11688.6
+SingleMuon_Run2018D = 401165 : 51037
+MuonEG_Run2018A = 182651 : 24389.2
+MuonEG_Run2018B = 93901 : 12636.2
+MuonEG_Run2018C = 91795 : 13073.2
+MuonEG_Run2018D = 418594 : 56345.4
