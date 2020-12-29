@@ -38,7 +38,6 @@
 
 using namespace std;
 
-
 const float PionMass = 0.13957;
 
 int main(int argc, char * argv[]) {
@@ -97,6 +96,7 @@ int main(int argc, char * argv[]) {
   // trigger matching
   const float DRTrigMatch          = cfg.get<float>("DRTrigMatch"); 
   const float effDzSS              = cfg.get<float>("effDzSS");
+  const float trkIsoSF             = cfg.get<float>("TrackIsolationSF");
   const unsigned int numberOfMuons = cfg.get<unsigned int>("NumberOfMuons");
 
   TString DiMuonTriggerName(dimuonTriggerName);
@@ -112,12 +112,14 @@ int main(int argc, char * argv[]) {
   TString PileUpDataFile(pileUpDataFile);
   TString PileUpMCFile(pileUpMCFile);
 
-  const string Muon17TriggerFile = cfg.get<string>("Muon17TriggerEff");
-  const string Muon8TriggerFile  = cfg.get<string>("Muon8TriggerEff");
+  const string Muon17TriggerFile = cfg.get<string>("MuonHighPtTriggerEff");
+  const string Muon8TriggerFile  = cfg.get<string>("MuonLowPtTriggerEff");
+  const string CorrectionWSFileName = cfg.get<string>("CorrectionWorkspaceFileName");
 
   // Higgs pt reweighting
   const string higgsPtFileName = cfg.get<string>("HiggsPtFileName");
   TString HiggsPtFileName(higgsPtFileName);
+  const bool isVH = cfg.get<bool>("IsVH");
 
   //////////////////////////////////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////////////////////
@@ -197,8 +199,8 @@ int main(int argc, char * argv[]) {
 
   float metx;
   float mety;
-  float met;
-  float metphi;
+  //  float met;
+  //  float metphi;
   
   // Trigger
   unsigned int trigobject_count;
@@ -248,9 +250,9 @@ int main(int argc, char * argv[]) {
   
   
 
-  std::string rootFileName(argv[2]);
-  
+  std::string rootFileName(argv[2]);  
   std::string chainName("makeroottree/AC1B");
+  std::string initNtupleName("initroottree/AC1B");
   TString TStrName(rootFileName);
   std::cout <<TStrName <<std::endl;
   if (TStrName.Contains("Signal")) {
@@ -296,13 +298,10 @@ int main(int argc, char * argv[]) {
   TH1D * nGoodMuonsH = new TH1D("nGoodMuonsH","",11,-0.5,10.5);
   TH1D * puWeightH = new TH1D("puWeightH","",250,0,5);
   TH1D * triggerWeightH = new TH1D("triggerWeightH","",100,0,2);
+  TH1D * MuTrkWeightH = new TH1D("MuTrkWeightH","",80,0.8,1.2);
+  TH1D * HiggsPtWeightH = new TH1D("HiggsPtWeightH","",250,0,5);
   
   TH1D * histWeightsH = new TH1D("histWeightsH","",1,0.,2.);
-  TH1D * histWeightsSingleMuH = new TH1D("histWeightsSingleMuH","",1,0.,2.);
-  TH1D * histWeightsTripleMuH = new TH1D("histWeightsTripleMuH","",1,0.,2.);
-  TH1D * histWeightsDoubleMuSSH = new TH1D("histWeightsDoubleMuSSH","",1,0.,2.);
-  TH1D * histWeightsAllTriggersH = new TH1D("histWeightsAllTriggersH","",1,0.,2.);
-  
   
   //////// Kinematics Muons ////////////////////
   TH1D * ptLeadingMuH = new TH1D("ptLeadingMuH","",400,0,400);
@@ -536,11 +535,48 @@ int main(int argc, char * argv[]) {
   PUofficial->set_h_data(PU_data);
   PUofficial->set_h_MC(PU_mc);
 
-  // Higgs reweighting 
-  TFile * higgsPtFile = new TFile(TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/"+HiggsPtFileName);
-  TH1D * higgsPtH = (TH1D*)higgsPtFile->Get("kfactor");
+  // Higgs reweighting
+  TString fullpath_HiggsPtFile = TString(cmsswBase)+"/src/DesyTauAnalyses/NTupleMaker/data/"+HiggsPtFileName;
+  TFile * higgsPtFile = NULL;
+  TH1D * higgsPtH = NULL;
+  TH1D * higgsPt_WPlusH = NULL;
+  TH1D * higgsPt_WMinusH = NULL;
+  TH1D * higgsPt_ZH = NULL;
+  if (applyHiggsPtWeight) { 
+    std::cout << "ApplyHiggsPtWeight = " << applyHiggsPtWeight << std::endl;
+    higgsPtFile = new TFile(fullpath_HiggsPtFile);
+    if (higgsPtFile->IsZombie()) {
+      std::cout << fullpath_HiggsPtFile << "  not found" << std::endl;
+      exit(-1);
+    }
+    if (isVH) {
+      std::cout << "IsVH = " << isVH << std::endl;
+      higgsPt_WPlusH = (TH1D*)higgsPtFile->Get("kfactor_WplusH");
+      higgsPt_WMinusH = (TH1D*)higgsPtFile->Get("kfactor_WminusH");
+      higgsPt_ZH = (TH1D*)higgsPtFile->Get("kfactor_ZH");
+      if (higgsPt_WPlusH==NULL) {
+	std::cout << "histogram kfactor_WplusH is not found in file " << fullpath_HiggsPtFile << std::endl;
+	exit(-1);
+      }
+      if (higgsPt_WMinusH==NULL) {
+	std::cout << "histogram kfactor_WminusH is not found in file " << fullpath_HiggsPtFile << std::endl;
+	exit(-1);
+      }
+      if (higgsPt_ZH==NULL) {
+	std::cout << "histogram kfactor_ZH is not found in file " << fullpath_HiggsPtFile << std::endl;
+	exit(-1);
+      }
+    }
+    else {
+      higgsPtH = (TH1D*)higgsPtFile->Get("kfactor");
+      if (higgsPtH==NULL) {
+	std::cout << "histogram kfactor is not found in file " << fullpath_HiggsPtFile << std::endl;
+	exit(-1);	
+      }
+    }
+  }
   //  std::cout << "Higgs Pt histogram : " << higgsPtH << std::endl;
-  
+
   // Trigger efficiencies
   ScaleFactor * SF_muon17 = new ScaleFactor();
   SF_muon17->init_ScaleFactor(TString(cmsswBase)+"/src/"+TString(Muon17TriggerFile));
@@ -556,9 +592,15 @@ int main(int argc, char * argv[]) {
   }
 
   // Correction workspace
-  TString correctionsWorkspaceFileName = TString(cmsswBase)+"/src/HTT-utilities/CorrectionsWorkspace/htt_scalefactors_v16_5.root";
+  TString correctionsWorkspaceFileName = TString(cmsswBase)+"/src/"+TString(CorrectionWSFileName);
   TFile * correctionWorkSpaceFile = new TFile(correctionsWorkspaceFileName);
+  if (correctionWorkSpaceFile->IsZombie()) {
+    std::cout << correctionsWorkspaceFileName << " does not exist " << std::endl;
+  }
   RooWorkspace *correctionWS = (RooWorkspace*)correctionWorkSpaceFile->Get("w");
+  if (correctionWS==NULL) {
+    std::cout << "correction workspace not found " << std::endl;
+  }
 
   //////////////////////////////////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////////////////////
@@ -577,6 +619,23 @@ int main(int argc, char * argv[]) {
    
    TFile * file_ = TFile::Open(TString(filen));
    if (file_==NULL) continue;
+
+   // sum of weights (needed for normalization)
+   TTree * _inittree = (TTree*)file_->Get(TString(initNtupleName));
+   if (_inittree!=NULL) {
+     Float_t Genweight;
+     if (!isData)
+       _inittree->SetBranchAddress("genweight",&Genweight);
+     Long64_t numberOfEntriesInitTree = _inittree->GetEntries();
+     std::cout << "Number of entries in Init Tree = " << numberOfEntriesInitTree << std::endl;
+     for (Long64_t iEntry=0; iEntry<numberOfEntriesInitTree; iEntry++) {
+       _inittree->GetEntry(iEntry);
+       if (isData)
+	 histWeightsH->Fill(0.,1.);
+       else
+	 histWeightsH->Fill(0.,Genweight);
+     }
+   }
 
    TTree * tree_ = (TTree*)file_->Get(TString(chainName));
    
@@ -616,10 +675,8 @@ int main(int argc, char * argv[]) {
    tree_->SetBranchAddress("muon_isICHEP", muon_isICHEP);
 
    // MET
-   tree_->SetBranchAddress("pfmet_ex", &metx);
-   tree_->SetBranchAddress("pfmet_ey", &mety);
-   tree_->SetBranchAddress("pfmet_pt", &met);
-   tree_->SetBranchAddress("pfmet_phi",&metphi);
+   tree_->SetBranchAddress("pfmetcorr_ex", &metx);
+   tree_->SetBranchAddress("pfmetcorr_ey", &mety);
  
 
    // Tracks
@@ -655,7 +712,6 @@ int main(int argc, char * argv[]) {
    tree_->SetBranchAddress("hltriggerresults",&hltriggerresults);
    tree_->SetBranchAddress("hltriggerprescales",&hltriggerprescales);
 
-   tree_->SetBranchAddress("numtruepileupinteractions",&numtruepileupinteractions);
 
    if (!isData) {
      tree_->SetBranchAddress("genweight",&genweight);
@@ -669,6 +725,7 @@ int main(int argc, char * argv[]) {
      tree_->SetBranchAddress("genparticles_info", genparticles_info);
      tree_->SetBranchAddress("genparticles_fromHardProcess", genparticles_fromHardProcess);
      tree_->SetBranchAddress("genparticles_status", genparticles_status);
+     tree_->SetBranchAddress("numtruepileupinteractions",&numtruepileupinteractions);
    }   
 
    // jets
@@ -682,9 +739,9 @@ int main(int argc, char * argv[]) {
    tree_->SetBranchAddress("pfjet_phi", pfjet_phi);
    tree_->SetBranchAddress("pfjet_flavour", pfjet_flavour);
    tree_->SetBranchAddress("pfjet_btag", pfjet_btag);
-   tree_->SetBranchAddress("pfjet_pu_jet_fullId_loose", pfjet_pu_jet_fullId_loose);
-   tree_->SetBranchAddress("pfjet_pu_jet_fullId_medium", pfjet_pu_jet_fullId_medium);
-   tree_->SetBranchAddress("pfjet_pu_jet_fullId_tight", pfjet_pu_jet_fullId_tight);
+   //   tree_->SetBranchAddress("pfjet_pu_jet_fullId_loose", pfjet_pu_jet_fullId_loose);
+   //   tree_->SetBranchAddress("pfjet_pu_jet_fullId_medium", pfjet_pu_jet_fullId_medium);
+   //   tree_->SetBranchAddress("pfjet_pu_jet_fullId_tight", pfjet_pu_jet_fullId_tight);
    
    // genjets
    if (!isData) {
@@ -708,12 +765,11 @@ int main(int argc, char * argv[]) {
   
    int numberOfCandidates = tree_->GetEntries();
 
-   std::cout << "number of events = " << numberOfCandidates << std::endl;
+   std::cout << "number of events in Main Tree = " << numberOfCandidates << std::endl;
    
    TRandom3 rand;
 
    for (int iCand=0; iCand<numberOfCandidates; iCand++) {  /////// Starting Event Loop ........ ////////
-     
      tree_->GetEntry(iCand);
 
      events++;
@@ -724,7 +780,6 @@ int main(int argc, char * argv[]) {
        weight *= genweight;
      }
 
-   
      // ********************
      //   gen-level study
      // ********************
@@ -962,8 +1017,20 @@ int main(int argc, char * argv[]) {
        {
 	   double HiggsPtForWeighting = higgsPt;
 	   if (higgsPt>500) HiggsPtForWeighting = 499;
-	   double higgsPtWeight = higgsPtH->GetBinContent(higgsPtH->FindBin(HiggsPtForWeighting));
+	   double higgsPtWeight = 1;
+	   if (isVH) {
+	     if (isWplus)
+	       higgsPtWeight = higgsPt_WPlusH->GetBinContent(higgsPt_WPlusH->FindBin(HiggsPtForWeighting));
+	     if (isWminus)
+	       higgsPtWeight = higgsPt_WMinusH->GetBinContent(higgsPt_WMinusH->FindBin(HiggsPtForWeighting));
+	     if (isZ)
+	       higgsPtWeight = higgsPt_ZH->GetBinContent(higgsPt_ZH->FindBin(HiggsPtForWeighting));
+	   }
+	   else {
+	     higgsPtWeight = higgsPtH->GetBinContent(higgsPtH->FindBin(HiggsPtForWeighting));
+	   }
 	   weight *= higgsPtWeight;
+	   HiggsPtWeightH->Fill(higgsPtWeight);
        }
        
      }
@@ -978,7 +1045,6 @@ int main(int argc, char * argv[]) {
        higgsSMTree->Fill();
      }
      
-     histWeightsH->Fill(1.0,weight);
      counter_InputEventsH->Fill(1.0,weight);
 
 
@@ -1099,12 +1165,14 @@ int main(int argc, char * argv[]) {
 		 
          bool muonID = muon_isMedium[i]; // MC 
          
+	 
          if (isData) 
          {
 	         if (event_run >= 278820 && muon_isMedium[i]) muonID = true; // Run2016G-H
-	         if (event_run < 278820  && muon_isICHEP[i]) muonID = true; // Run2016B-F
+	         if (event_run < 278820 && muon_isICHEP[i]) muonID = true; // Run2016B-F
+		   
          }
-         
+
          if (!muonID) continue;
          if(fabs(muon_dxy[i])>dxyMuonCut) continue;
          if(fabs(muon_dz[i])>dzMuonCut) continue;
@@ -1221,7 +1289,7 @@ int main(int argc, char * argv[]) {
 	               {
 	                   isTriggerMatched = isTriggerMatched && mu1MatchSS && mu2MatchSS;
 	                   
-	                   if (event_run<=274442||event_run>=280919) isTriggerMatched = isTriggerMatched && mu1MatchDz && mu2MatchDz; // when dZ filter is present
+	                   if (event_run<=274442||(event_run>=280919&&event_run<=284044)) isTriggerMatched = isTriggerMatched && mu1MatchDz && mu2MatchDz; // when dZ filter is present
 	               }
 	           }
 	           else 
@@ -1254,15 +1322,15 @@ int main(int argc, char * argv[]) {
 
      if (iLeading<0) continue;
      if (iTrailing<0) continue;
-     
-     
 
-     // ***********************
-     //   Trigger efficiency 
-     // ***********************
+     // *************************************************
+     //   Trigger efficiency and muon tracking efficiencies
+     // *************************************************
      
      double triggerWeight = 1;
-     
+     double effTrkLeading = 1;
+     double effTrkTrailing = 1;
+
      if (!isData)
      {   
          double ptLeading = muon_pt[iLeading];
@@ -1295,32 +1363,35 @@ int main(int argc, char * argv[]) {
 	     
          triggerWeight *= effDzSS;
 
+	 correctionWS->var("m_pt")->setVal(ptLeading);
+	 correctionWS->var("m_eta")->setVal(etaLeading);
+	 effTrkLeading = correctionWS->function("m_trk_ratio")->getVal();
+	 correctionWS->var("m_pt")->setVal(ptTrailing);
+	 correctionWS->var("m_eta")->setVal(etaTrailing);
+	 effTrkTrailing = correctionWS->function("m_trk_ratio")->getVal();
+
      }
      
      triggerWeightH->Fill(triggerWeight,1.0);
-     weight *= triggerWeight;
-     
-
+     weight = weight*triggerWeight*effTrkLeading*effTrkTrailing;
+     MuTrkWeightH->Fill(effTrkLeading*effTrkTrailing,1.0);
 
      // *****************************
      // Histos after dimuon selection
      // *****************************
      
      TLorentzVector LeadingMuon4; LeadingMuon4.SetXYZM(muon_px[iLeading],
-						                               muon_py[iLeading],
-						                               muon_pz[iLeading],
-						                               MuMass);
+						       muon_py[iLeading],
+						       muon_pz[iLeading],
+						       MuMass);
      
      TLorentzVector TrailingMuon4; TrailingMuon4.SetXYZM(muon_px[iTrailing],
-							                             muon_py[iTrailing],
-							                             muon_pz[iTrailing],
-							                             MuMass);
-     
+							 muon_py[iTrailing],
+							 muon_pz[iTrailing],
+							 MuMass);
      TLorentzVector diMuon4 = LeadingMuon4 + TrailingMuon4;
      
      TLorentzVector Met4; Met4.SetXYZM(metx,mety,0,0);
-
-
      
      float dimuonMass = diMuon4.M();
      float dimuonDR  = deltaR(LeadingMuon4.Eta(),LeadingMuon4.Phi(),TrailingMuon4.Eta(),TrailingMuon4.Phi());
@@ -1335,8 +1406,6 @@ int main(int argc, char * argv[]) {
      etaLeadingMuH->Fill(muon_eta[iLeading],weight);
      etaTrailingMuH->Fill(muon_eta[iTrailing],weight);
      counter_MuonKinematicsH->Fill(1.0,weight);                  
-
- 
  
      /////////////////////////////////////////////////////////////////////////
      //////// ****** Selecting a Track around each muon ********* ////////////
@@ -1355,9 +1424,9 @@ int main(int argc, char * argv[]) {
           int index = tracks.at(iTrk);
 
           TLorentzVector trk4; trk4.SetXYZM(track_px[index],
-					                        track_py[index],
-			  		                        track_pz[index],
-					                        track_mass[index]);
+					    track_py[index],
+					    track_pz[index],
+					    track_mass[index]);
 
           TLorentzVector leadingMuDiff = LeadingMuon4 - trk4;
           TLorentzVector trailingMuDiff = TrailingMuon4 - trk4;
@@ -1373,10 +1442,10 @@ int main(int argc, char * argv[]) {
 	      bool chargeSelection = qTrkLeadingMu<0;
 
 	      if (drTrkMu<dRMuonsCut && chargeSelection &&  ptSum>maxPtSumMuLTrk)
-          {
+		{
 	          iTrkLeading=index;
-              maxPtSumMuLTrk=ptSum;
-	      }
+		  maxPtSumMuLTrk=ptSum;
+		}
 
 
      }
@@ -1384,9 +1453,9 @@ int main(int argc, char * argv[]) {
      if (iTrkLeading<0) continue;
 
      TLorentzVector TrkLeadingMuon4; TrkLeadingMuon4.SetXYZM(track_px[iTrkLeading],
-						                                     track_py[iTrkLeading],
-						                                     track_pz[iTrkLeading],
-						                                     track_mass[iTrkLeading]);
+							     track_py[iTrkLeading],
+							     track_pz[iTrkLeading],
+							     track_mass[iTrkLeading]);
 
      ///////// Track around trailing Muon //////////
      float maxPtSumMuTTrk = ptSumCut;
@@ -1401,9 +1470,9 @@ int main(int argc, char * argv[]) {
           int index = tracks.at(iTrk);
 
           TLorentzVector trk4; trk4.SetXYZM(track_px[index],
-					                        track_py[index],
-					                        track_pz[index],
-					                        track_mass[index]);
+					    track_py[index],
+					    track_pz[index],
+					    track_mass[index]);
 
           TLorentzVector leadingMuDiff = LeadingMuon4 - trk4;
           TLorentzVector trailingMuDiff = TrailingMuon4 - trk4;
@@ -1420,10 +1489,10 @@ int main(int argc, char * argv[]) {
 	      bool chargeSelection = qTrkTrailingMu<0;
 
 	      if (drTrkMu<dRMuonsCut && chargeSelection && ptSum>maxPtSumMuTTrk)
-          {
+		{
 	          iTrkTrailing=index;
-              maxPtSumMuTTrk=ptSum;
-	      }
+		  maxPtSumMuTTrk=ptSum;
+		}
 
 
      }
@@ -1632,8 +1701,8 @@ int main(int argc, char * argv[]) {
      Eventweight = weight;
      
      
-	 ////**** Filling Tress *****/////
-	 if(controlNoSR) tree_NoSR->Fill();
+     ////**** Filling Tress *****/////
+     if(controlNoSR) tree_NoSR->Fill();
 	 
 	        
      if(controlSemiIso) tree_SemiIso->Fill();
@@ -1663,11 +1732,13 @@ int main(int argc, char * argv[]) {
        if (!isData)
        {
        /////////////////////// ** Reweighting TrackIso ** /////////////////////////
+	 // Will use flat SF and uncertainty
+	 /*
        double scaleFIsoL = -1.45573e-03*TrkLeadingMuon4.Pt()+9.37871e-01;
        double scaleFIsoT = -1.45573e-03*TrkTrailingMuon4.Pt()+9.37871e-01;
        
        /////////////////////// ** Uncertainty Studies ** /////////////////////////
-	   // Track Iso uncertainty studies
+       // Track Iso uncertainty studies
        double derivativeL[2];
        derivativeL[0]=1;derivativeL[1]=TrkLeadingMuon4.Pt();
        double derivativeT[2];
@@ -1700,13 +1771,15 @@ int main(int argc, char * argv[]) {
        double weightUp = weight*scaleFIsoLUp*scaleFIsoTUp;
        double weightDown = weight*scaleFIsoLDown*scaleFIsoTDown;
        
-       
-       weight *= scaleFIsoL*scaleFIsoT;
+	 */       
+       weight *= trkIsoSF*trkIsoSF;
        
        ////**** Setting the values of the variables *****/////
        Eventweight = weight;
-       Eventweight_TrkIso_Up=weightUp;
-       Eventweight_TrkIso_Down=weightDown;
+       //       Eventweight_TrkIso_Up=weightUp;
+       //       Eventweight_TrkIso_Down=weightDown;
+       Eventweight_TrkIso_Up=weight;
+       Eventweight_TrkIso_Down=weight;
        
        }
 
