@@ -47,7 +47,7 @@ WZ_13TeV-pythia8
 ZZ_13TeV-pythia8
 ST_t-channel_top
 ST_t-channel_antitop
-ST_tW_top_5f
+ST_tW_top
 ST_tW_antitop
 TTTo2L2Nu
 TTToHadronic
@@ -71,9 +71,7 @@ QCD_Pt-800to1000_MuEnrichedPt5
 QCD_Pt-1000toInf_MuEnrichedPt5
 )
 
-j=0
-i=0  
-
+i=0
 while [ $i -lt ${#samples[@]} ] 
 do
     echo "Creating file list for sample" ${samples[$i]} 
@@ -84,6 +82,7 @@ do
     i=`expr $i + 1` 
 done
 
+j=0
 while [ $j -lt ${#names_QCD[@]} ] 
 do
     echo "Creating file list for sample" ${names_QCD[$j]} 

@@ -70,6 +70,9 @@ int main(int argc, char * argv[]) {
   const float dRMuonsCut     = cfg.get<float>("dRMuonsCut");
   const bool sameSign        = cfg.get<bool>("SameSignMuons");
 
+  const bool applyOSdimuonVeto = cfg.get<bool>("ApplyOppositeSignDimuonVeto");
+  const float maxPtSumOSdimuons   = cfg.get<float>("MaxPtOppositeSignDimuon");
+
   // track selection
   const float ptSumCut        = cfg.get<float>("ptSumCut");
   const float dRIso           = cfg.get<float>("dRIso");
@@ -123,7 +126,6 @@ int main(int argc, char * argv[]) {
 
   //////////////////////////////////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////////////////////
-  
 
   std::ifstream fileList(argv[2]);
 
@@ -1163,8 +1165,7 @@ int main(int argc, char * argv[]) {
      for(UInt_t i=0;i<muon_count;i++)
      {
 		 
-         bool muonID = muon_isMedium[i]; // MC 
-         
+         bool muonID = muon_isMedium[i]; // MC          
 	 
          if (isData) 
          {
@@ -1192,6 +1193,31 @@ int main(int argc, char * argv[]) {
      
      counter_MuonSizeGTE2H->Fill(1.,weight);
 
+     bool vetoOSdimuons = false;
+     if (applyOSdimuonVeto) {
+       for (unsigned int im=0; im<muons.size()-1; ++im) {
+	 for (unsigned int jm=im+1; jm<muons.size(); ++jm) {
+	   unsigned int index1 = muons[im];
+	   unsigned int index2 = muons[jm];
+	   float charge = muon_charge[index1] *  muon_charge[index2];
+	   if (charge>0.0) continue;
+	   TLorentzVector muon1; muon1.SetXYZM(muon_px[index1],
+					       muon_py[index1],
+					       muon_pz[index1],
+					       MuMass); 
+	   TLorentzVector muon2; muon2.SetXYZM(muon_px[index2],
+					       muon_py[index2],
+					       muon_pz[index2],
+					       MuMass); 
+	   TLorentzVector dimuons_os = muon1+muon2;
+	   float ptSum = dimuons_os.Pt();
+	   if (ptSum>maxPtSumOSdimuons) vetoOSdimuons = true;
+
+	 }
+       }
+     }
+
+     if (vetoOSdimuons) continue;
      
      // **********************
      // selecting good tracks
@@ -1210,10 +1236,6 @@ int main(int argc, char * argv[]) {
           tracks.push_back(iTrk);
 
       } // end loop over good tracks
-      
-      
-     
-
 
      // *************************
      // selection of dimuon pair
