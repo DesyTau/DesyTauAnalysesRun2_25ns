@@ -1,0 +1,23 @@
+/////////////////////////////// Some Instructions of how to run the MVA based analysis (H->aa->4tau) ////////////////////////////////////////////
+
+
+/////////////////////**** Main Analysis ******/////////////////////////////////////////////
+- The main code (analysis_macro.cpp) was made to run within the standard DesyTauAnalysesRun2 package. It contains the selection, corrections, etc (currently implemented for 2016 dataset) necessary for the analysis.
+- The root files that it produces mainly contain ROOT Trees and some histograms. The tree branches are basically a set of interesting variables that have certain discriminating power between signal and background. For each control region and signal region, a tree is saved with the information of all the variables that could be used for the BDT training (classification) in the analysis.      
+
+
+/////////////////////**** BDT Training ******/////////////////////////////////////////////
+- The root TMVA class is used for building the BDT. The training is performed for each mass point (Bkgd model (data-driven) vs Signal model (signal samples)) and for this purpose one needs to use the macro "trainBDT.py" located in "2016/MVA/DM/Macros/BDT_Training". With this macro one is able to: 
+1-) choose the variables that are going to be used for classification
+2-) select the signal and background samples with their corresponding event-weights
+3-) configure the BDT
+
+There is a script called "TrainAll.sh" that copies the necessary root files for each mass point and runs the "trainBDT.py" macro.
+
+* To have considerably good statistics in the Signal class new ggH samples were produced with GEN-level DoubleMuonTrigger-like requirements. The GENSIM samples can be found in: "/pnfs/desy.de/cms/tier2/store/user/dperezad/MC_Production/2016/H2aa_4tau_SCDoMuFilter". There are also MINIAODs and NTuples produced for 2016, but I am afraid that for the remaining years the corresponding RECO-stages have to be produced on top of the GENSIM.
+
+
+/////////////////////**** BDT Classification ******/////////////////////////////////////////////
+- After the training, the "weight files" are produced and one uses them to classify our data. For that there is a dedicated macro ("CreateInputs.C") in "2016/MVA/DM/Macros/BDTClassification", which has a couple of instructions at the beginning of the code; it basically uses the weights files to classify the signal, background and observed data samples. With the help of this macro one also produce the datacards and their corresponding input files. One could only run the last "void func" in the macro and it will produce everything. The Classification process creates root files called "SUSY*_BDTOutput_M-*.root" and "DoubleMuon*_BDTOutput_M-*.root" with the BDT output histograms. The datacard creation process uses these files as inputs.
+
+
