@@ -4,13 +4,17 @@
 #include "TString.h"
 #include "TH1.h"
 #include "TH2.h"
+#include "TMath.h"
 #include <iostream>
 #include "RooRealVar.h"
 #include "RooWorkspace.h"
 #include "RooFunctor.h"
 #include "DesyTauAnalyses/NTupleMaker/interface/Synch17Tree.h"
 
+bool debug;
+
 RooWorkspace * w;
+RooWorkspace * w_IC;
 
 struct SampleAttributes {
   TString name;
@@ -26,7 +30,7 @@ bool is2016;
 bool is2017;
 bool is2018;
 
-bool applySF;
+bool applyKitSF;
 
 float ptTriggerEmbed2017 = 40;
 float etaTriggerEmbed2017 = 1.479;
@@ -51,9 +55,9 @@ float binsMTtot[14] = {20,40,60,80,100,125,150,200,250,300,500,700,1000,4000};
 int nBinsPt_2D = 4;
 float binsPt_2D[5] = {15,25,40,70,200};
 
-int nBinsMvis = 60;
+int nBinsMvis = 40;
 float xminMvis = 0;
-float xmaxMvis = 300;
+float xmaxMvis = 200;
 
 int nBinsPZeta = 30;
 float xminPZeta = -150;
@@ -63,11 +67,11 @@ int triggerOption;
 TString input_dir;
 TString output_dir;
 
-
 SampleAttributes SetSampleAttributes(TString name, 
 				     TString histname,
 				     std::vector<TString> sampleNames,
-				     int selectDiTau) {
+				     int selectDiTau
+				     ) {
   SampleAttributes sampleAttr;
   sampleAttr.name = name;
   sampleAttr.histname = histname;
@@ -169,6 +173,8 @@ SampleAttributes SetSampleAttributes(TString name,
 
 std::vector<TString> th1_basename = {
 
+  // determination region
+
   "deltaR_0jet_OS",
   "deltaR_0jet_SS",
 
@@ -189,44 +195,112 @@ std::vector<TString> th1_basename = {
   "pt1_inclusive_OS",
   "pt1_btag_OS",
   "pt1_nobtag_OS",
+  "pt1_btag_highmsv_OS",
+  "pt1_nobtag_highmsv_OS",
 
   "pt1_inclusive_SS",
   "pt1_btag_SS",
   "pt1_nobtag_SS",
+  "pt1_btag_highmsv_SS",
+  "pt1_nobtag_highmsv_SS",
+
+  "pt1_inclusive_SS_Up",
+  "pt1_btag_SS_Up",
+  "pt1_nobtag_SS_Up",
 
   "pt2_inclusive_OS",
   "pt2_btag_OS",
   "pt2_nobtag_OS",
+  "pt2_btag_highmsv_OS",
+  "pt2_nobtag_highmsv_OS",
 
   "pt2_inclusive_SS",
   "pt2_btag_SS",
   "pt2_nobtag_SS",
+  "pt2_btag_highmsv_SS",
+  "pt2_nobtag_highmsv_SS",
+
+  "pt2_inclusive_SS_Up",
+  "pt2_btag_SS_Up",
+  "pt2_nobtag_SS_Up",
 
   "deltaR_inclusive_isoMu_antiisoE_OS",
   "pt1_inclusive_isoMu_antiisoE_OS",
   "pt2_inclusive_isoMu_antiisoE_OS",
+  "mTtot_inclusive_isoMu_antiisoE_OS",
+
+  "pt1_btag_isoMu_antiisoE_OS",
+  "pt2_btag_isoMu_antiisoE_OS",
+  "mTtot_btag_isoMu_antiisoE_OS",
+
+  "pt1_nobtag_isoMu_antiisoE_OS",
+  "pt2_nobtag_isoMu_antiisoE_OS"
+  "mTtot_nobtag_isoMu_antiisoE_OS",
+
+  "pt1_btag_isoMu_antiisoE_SS",
+  "pt2_btag_isoMu_antiisoE_SS",
+  "mTtot_btag_isoMu_antiisoE_SS",
+
+  "pt1_nobtag_isoMu_antiisoE_SS",
+  "pt2_nobtag_isoMu_antiisoE_SS"
+  "mTtot_nobtag_isoMu_antiisoE_SS",
 
   "deltaR_inclusive_isoMu_antiisoE_SS",
   "pt1_inclusive_isoMu_antiisoE_SS",
   "pt2_inclusive_isoMu_antiisoE_SS",
+  "mTtot_inclusive_isoMu_antiisoE_SS",
 
   "deltaR_inclusive_antiisoMu_antiisoE_OS",
   "pt1_inclusive_antiisoMu_antiisoE_OS",
   "pt2_inclusive_antiisoMu_antiisoE_OS",
+  "mTtot_inclusive_antiisoMu_antiisoE_OS",
 
   "deltaR_inclusive_antiisoMu_antiisoE_SS",
   "pt1_inclusive_antiisoMu_antiisoE_SS",
   "pt2_inclusive_antiisoMu_antiisoE_SS",
+  "mTtot_inclusive_antiisoMu_antiisoE_SS",
+
+  "pt1_btag_antiisoMu_antiisoE_OS",
+  "pt2_btag_antiisoMu_antiisoE_OS",
+  "mTtot_btag_antiisoMu_antiisoE_OS",
+
+  "pt1_nobtag_antiisoMu_antiisoE_OS",
+  "pt2_nobtag_antiisoMu_antiisoE_OS"
+  "mTtot_nobtag_antiisoMu_antiisoE_OS",
+
+  "pt1_btag_antiisoMu_antiisoE_SS",
+  "pt2_btag_antiisoMu_antiisoE_SS",
+  "mTtot_btag_antiisoMu_antiisoE_SS",
+
+  "pt1_nobtag_antiisoMu_antiisoE_SS",
+  "pt2_nobtag_antiisoMu_antiisoE_SS"
+  "mTtot_nobtag_antiisoMu_antiisoE_SS",
+
 
   "mTtot_inclusive_OS",
   "mTtot_btag_OS",
   "mTtot_nobtag_OS",
+  "mTtot_btag_highmsv_OS",
+  "mTtot_nobtag_highmsv_OS",
+
   "mTtot_ttbar_OS",
+  "pt1_ttbar_OS",
+  "pt2_ttbar_OS",
 
   "mTtot_inclusive_SS",
   "mTtot_btag_SS",
   "mTtot_nobtag_SS",
+  "mTtot_btag_highmsv_SS",
+  "mTtot_nobtag_highmsv_SS",
+
   "mTtot_ttbar_SS",
+  "pt1_ttbar_SS",
+  "pt2_ttbar_SS",
+
+  "mTtot_inclusive_SS_Up",
+  "mTtot_btag_SS_Up",
+  "mTtot_nobtag_SS_Up",
+  "mTtot_ttbar_SS_Up",
 
   "mTtot_inclusive_looseisoMu_SS",
   "mTtot_btag_looseisoMu_SS",
@@ -241,11 +315,35 @@ std::vector<TString> th1_basename = {
   "mvis_sel_signal_SS",
   "mvis_sel_signal_OS",
 
+  "mvis_sel_signal_btag_SS",
+  "mvis_sel_signal_btag_OS",
+
+  "mvis_sel_signal_nobtag_SS",
+  "mvis_sel_signal_nobtag_OS",
+
+  "mvis_sel_signal_btag_highmsv_SS",
+  "mvis_sel_signal_btag_highmsv_OS",
+
+  "mvis_sel_signal_nobtag_highmsv_SS",
+  "mvis_sel_signal_nobtag_highmsv_OS",
+
   "mvis_sel_ttbar_SS",
   "mvis_sel_ttbar_OS",
 
   "mTtot_sel_signal_SS",
   "mTtot_sel_signal_OS",
+
+  "mTtot_sel_signal_btag_SS",
+  "mTtot_sel_signal_btag_OS",
+
+  "mTtot_sel_signal_nobtag_SS",
+  "mTtot_sel_signal_nobtag_OS",
+
+  "mTtot_sel_signal_btag_highmsv_SS",
+  "mTtot_sel_signal_btag_highmsv_OS",
+
+  "mTtot_sel_signal_nobtag_highmsv_SS",
+  "mTtot_sel_signal_nobtag_highmsv_OS",
 
   "mTtot_sel_ttbar_SS",
   "mTtot_sel_ttbar_OS",
@@ -253,17 +351,51 @@ std::vector<TString> th1_basename = {
   "pt1_sel_signal_SS",
   "pt1_sel_signal_OS",
 
+  "pt1_sel_signal_btag_SS",
+  "pt1_sel_signal_btag_OS",
+
+  "pt1_sel_signal_nobtag_SS",
+  "pt1_sel_signal_nobtag_OS",
+
+  "pt1_sel_signal_btag_highmsv_SS",
+  "pt1_sel_signal_btag_highmsv_OS",
+
+  "pt1_sel_signal_nobtag_highmsv_SS",
+  "pt1_sel_signal_nobtag_highmsv_OS",
+
   "pt1_sel_ttbar_SS",
   "pt1_sel_ttbar_OS",
 
   "pt2_sel_signal_SS",
   "pt2_sel_signal_OS",
 
+  "pt2_sel_signal_btag_SS",
+  "pt2_sel_signal_btag_OS",
+
+  "pt2_sel_signal_nobtag_SS",
+  "pt2_sel_signal_nobtag_OS",
+
+  "pt2_sel_signal_btag_highmsv_SS",
+  "pt2_sel_signal_btag_highmsv_OS",
+
+  "pt2_sel_signal_nobtag_highmsv_SS",
+  "pt2_sel_signal_nobtag_highmsv_OS",
+
   "pt2_sel_ttbar_SS",
   "pt2_sel_ttbar_OS",
 
   "pzeta_sel_SS",
-  "pzeta_sel_OS"
+  "pzeta_sel_OS",
+
+  "weight_idiso",
+  "weight_trigger_emu",
+  "weight_eff_emu",
+
+  "weight_trigger_singleLep",
+  "weight_eff_singleLep",
+
+  "weight_trigger_comb",
+  "weight_eff_comb",
 
 };
 
@@ -271,11 +403,13 @@ std::vector<TString> th2_basename = {
   "pt1_pt2_inclusive_OS",
   "pt1_pt2_btag_OS",
   "pt1_pt2_nobtag_OS",
+  "pt1_pt2_ttbar_OS",
 
   "pt1_pt2_inclusive_SS",
   "pt1_pt2_btag_SS",
   "pt1_pt2_nobtag_SS",
-   
+  "pt1_pt2_ttbar_SS",
+
   "pt1_pt2_inclusive_isoMu_antiisoE_OS",
   "pt1_pt2_inclusive_isoMu_antiisoE_SS",
  
@@ -298,6 +432,8 @@ void CreateMaps(std::map<TString,TH1D*> & th1,
       hist = new TH1D(name+"_"+sampleName,"",nBinsMvis,xminMvis,xmaxMvis);
     else if (name.Contains("pzeta"))
       hist = new TH1D(name+"_"+sampleName,"",nBinsPZeta,xminPZeta,xmaxPZeta);
+    else if (name.Contains("weight"))
+      hist = new TH1D(name+"_"+sampleName,"",200,0.,2.);
     else
       hist = new TH1D(name+"_"+sampleName,"",nBinsPt,binsPt);
     hist->Sumw2();
@@ -320,6 +456,16 @@ void RunOnTree(TTree * tree,
 	       float norm) {
 
   Synch17Tree * tree17 =  new Synch17Tree(tree, true);
+  //  float qcdweight_deltaR;
+  //  float qcdweight_deltaR_Par0_up;
+  //  float qcdweight_deltaR_Par1_up;
+  //  float qcdweight_deltaR_Par2_up;
+  //  float qcdweight_isolationcorrection;
+  //  tree->SetBranchAddress("qcdweight_deltaR",&qcdweight_deltaR);
+  //  tree->SetBranchAddress("qcdweight_deltaR_Par0_up",&qcdweight_deltaR_Par0_up);
+  //  tree->SetBranchAddress("qcdweight_deltaR_Par1_up",&qcdweight_deltaR_Par1_up);
+  //  tree->SetBranchAddress("qcdweight_deltaR_Par2_up",&qcdweight_deltaR_Par2_up);
+  //  tree->SetBranchAddress("qcdweight_isolationcorrection",&qcdweight_isolationcorrection);
   Long64_t nentries = tree17->GetEntries();
   /*
   std::cout << "Number of events in tree = " << nentries << std::endl;
@@ -334,9 +480,6 @@ void RunOnTree(TTree * tree,
   bool isEmbedded = name=="Embedded";
   bool isTTbar = name=="TT";
   bool isDY = name=="DYJetsLL";
-
-  int count = 0;
-
 
   for (Long64_t ie = 0; ie<nentries; ++ie) {
     tree17->GetEntry(ie);
@@ -410,28 +553,43 @@ void RunOnTree(TTree * tree,
 
     // weight to fill histo
     
-    float effweight = tree17->effweight;    
-    float weight = 1.0;    
+    float weight = 1.0;  
+    float weightUp = 1.0;
+    float effweight = tree17->effweight;
     if (triggerOption==0)
       effweight = tree17->effweightEMu;
     if (triggerOption==1)
       effweight = tree17->effweightSingle;
     
-    float effweightEMu = 1.0;//tree17->effweightEMu;
-    float effweightSingle = 1.0;//tree17->effweightSingle;
-    float effweightComb = 1.0;//tree17->effweight;
-    float trigweightSingle = 1.0;//tree17->trigweightSingle;
-    float trigweightEMu = 1.0;//tree17->trigweightEMu;
-    float trigweight_comb = 1.0;//tree17->trigweight;
+    float effweightEMu = 1.0;
+    float effweightSingle = 1.0;
+    float effweightComb = 1.0;
+    float trigweightSingle = 1.0;
+    float trigweightEMu = 1.0;
+    float trigweightComb = 1.0;
 
-    if (!isData&&applySF) {
+    float idiso_eff = 1.0;
+
+    float idisoweight_1 = 1;
+    float trkeffweight_1 = 1;
+    float idisoweight_2 = 1;
+    float trkeffweight_2 = 1;
+
+    if (!isData) {
       TString suffix = "mc";
       TString suffixRatio = "ratio";
-      if (isEmbedded) {suffix = "embed"; suffixRatio = "embed_ratio";}
+
+      if (isEmbedded) {
+	suffix = "embed"; 
+	suffixRatio = "embed_ratio";
+      }
 
       w->var("m_pt")->setVal(tree17->pt_2);
       w->var("m_eta")->setVal(tree17->eta_2);
       w->var("m_iso")->setVal(tree17->iso_2);
+      w_IC->var("m_pt")->setVal(tree17->pt_2);
+      w_IC->var("m_eta")->setVal(tree17->eta_2);
+      w_IC->var("m_iso")->setVal(tree17->iso_2);
 
       float eff_data_trig_m = w->function("m_trg_ic_data")->getVal();
       float eff_mc_trig_m = w->function("m_trg_ic_" + suffix)->getVal();
@@ -441,13 +599,13 @@ void RunOnTree(TTree * tree,
       float eff_mc_trig_mhigh = w->function("m_trg_23_ic_"+suffix)->getVal();
       float eff_mc_trig_mlow = w->function("m_trg_8_ic_"+suffix)->getVal();
 
-      float idisoweight_2 = w->function("m_idiso_ic_" + suffixRatio)->getVal();
-      float trkeffweight_2 = w->function("m_trk_ratio")->getVal(); //  may be wrong
-
       // electron weights
       w->var("e_pt")->setVal(tree17->pt_1);
       w->var("e_eta")->setVal(tree17->eta_1);
       w->var("e_iso")->setVal(tree17->iso_1);
+      w_IC->var("e_pt")->setVal(tree17->pt_1);
+      w_IC->var("e_eta")->setVal(tree17->eta_1);
+      w_IC->var("e_iso")->setVal(tree17->iso_1);
       
       float eff_data_trig_e = w->function("e_trg_ic_data")->getVal();
       float eff_mc_trig_e = w->function("e_trg_ic_" + suffix)->getVal();
@@ -457,8 +615,50 @@ void RunOnTree(TTree * tree,
       float eff_mc_trig_ehigh = w->function("e_trg_23_ic_"+suffix)->getVal();
       float eff_mc_trig_elow = w->function("e_trg_12_ic_"+suffix)->getVal();
 
-      float idisoweight_1 = w->function("e_idiso_ic_" + suffixRatio)->getVal();
-      float trkeffweight_1 = w->function("e_trk_" + suffixRatio)->getVal();
+      float isoweight_1_kit = 1.0;
+      float isoweight_2_kit = 1.0;
+      float trkeffweight_1_kit = 1.0;
+      float trkeffweight_2_kit = 1.0;
+
+      if (applyKitSF) { // apply KIT SF
+	if (is2016){
+	  if (isEmbedded) {
+	    isoweight_1_kit = w->function("e_idiso_ratio_emb")->getVal();
+	    isoweight_2_kit = w->function("m_idlooseiso_binned_ic_embed_ratio")->getVal();
+	  }
+	  else {
+	    isoweight_1_kit = w->function("e_idiso_ratio")->getVal();
+	    isoweight_2_kit = w->function("m_idlooseiso_binned_ic_ratio")->getVal();
+	  }	  
+	}
+	else{
+	  if (isEmbedded) {
+	    isoweight_1_kit = w->function("e_id90_embed_kit_ratio")->getVal() * w->function("e_iso_embed_kit_ratio")->getVal();
+	    isoweight_2_kit = w->function("m_looseiso_ic_embed_ratio")->getVal()*w->function("m_id_embed_kit_ratio")->getVal();
+	  }
+	  else {
+	    isoweight_1_kit = w->function("e_id90_kit_ratio")->getVal() * w->function("e_iso_kit_ratio")->getVal();
+	    isoweight_2_kit = w->function("m_looseiso_ic_ratio")->getVal()*w->function("m_id_kit_ratio")->getVal();
+	  }
+	}
+	if (!isEmbedded){
+	  if (is2018) trkeffweight_1_kit = w->function("e_trk_ratio")->getVal();
+	  if (is2016 || is2018) 
+	    trkeffweight_2_kit = w->function("m_trk_ratio")->getVal();
+	}
+	if (is2017) trkeffweight_1_kit = w->function("e_trk_ratio")->getVal();
+	idisoweight_1 = isoweight_1_kit;
+	idisoweight_2 = isoweight_2_kit;
+	trkeffweight_1 = trkeffweight_1_kit;
+	trkeffweight_2 = trkeffweight_2_kit;
+      }
+      else { // apply IC SFs
+	idisoweight_1 = w_IC->function("e_idiso_ic_" + suffixRatio)->getVal();
+	trkeffweight_1 = w_IC->function("e_trk_" + suffixRatio)->getVal();
+	idisoweight_2 = w_IC->function("m_idiso_ic_" + suffixRatio)->getVal();
+	trkeffweight_2 = w_IC->function("m_trk_ratio")->getVal(); //  may be wrong
+      }
+
 
       if (is2017&&isEmbedded) {
 	if (tree17->pt_1<ptTriggerEmbed2017&&fabs(tree17->eta_1)>etaTriggerEmbed2017) {
@@ -510,6 +710,8 @@ void RunOnTree(TTree * tree,
       else
 	trigweightEMu = eff_emu_data/eff_emu_mc;
       
+      trigweightEMu *= dzFilterEff_data/dzFilterEff_mc;
+
       float eff_comb_data = 
 		     eff_data_trig_e + 
 		     eff_data_trig_m + 
@@ -528,62 +730,148 @@ void RunOnTree(TTree * tree,
 		     eff_mc_trig_e*eff_mc_trig_m*dzFilterEff_mc;
 
       if (eff_comb_mc<1e-3||eff_comb_data<1e-4)
-	trigweight_comb = 0.0;
+	trigweightComb = 0.0;
       else
-	trigweight_comb = eff_comb_data/eff_comb_mc;
+	trigweightComb = eff_comb_data/eff_comb_mc;
       
-      float idiso_eff = idisoweight_1 * trkeffweight_1 * idisoweight_2 * trkeffweight_2;
+      idiso_eff = idisoweight_1 * trkeffweight_1 * idisoweight_2 * trkeffweight_2;
       effweightEMu = idiso_eff * trigweightEMu;
       effweightSingle = idiso_eff * trigweightSingle;
-      effweightComb = idiso_eff * trigweight_comb;
+      effweightComb = idiso_eff * trigweightComb;
       if (triggerOption==0)
 	effweight = effweightEMu;
       else if (triggerOption==1)
 	effweight = effweightSingle;
       else
-	effweight = trigweight_comb;
+	effweight = effweightComb;
     }
 
-    /*
-    if (tree17->iso_1<0.15&&tree17->iso_2<0.2&&(tree17->pt_1>100.0||tree17->pt_2>100.0)) {
+    float weightEMu = 1;
+    float weightSingle = 1;
 
-      std::cout << "pt1 = " << tree17->pt_1 << "    pt2 = " << tree17->pt_2 << std::endl;
-
-      std::cout << "Effweight (e-mu)      : KIT = " << tree17->effweightEMu << "   IC = " << effweightEMu << std::endl;
-
-      std::cout << "Effweight (singleLep) : KIT = " << tree17->effweightSingle << "   IC = " << effweightSingle << std::endl;
-
-      std::cout << "Effweight (comb)      : KIT = " << tree17->effweight << "   IC = " << effweightComb << std::endl;
-      // ******
-      // ******
-      std::cout << "Trgweight (e-mu)      : KIT = " << tree17->trigweightEMu << "   IC = " << trigweightEMu << std::endl;
-
-      std::cout << "Trgweight (singleLep) : KIT = " << tree17->trigweightSingle << "   IC = " << trigweightSingle << std::endl;
-
-      std::cout << "Trgweight (comb)      : KIT = " << tree17->trigweight << "   IC = " << trigweight_comb << std::endl;
-
-    }
-    */
     if (isEmbedded) {
       weight = tree17->mcweight*tree17->embweight*effweight;
+      weightEMu = tree17->mcweight*tree17->embweight*effweightEMu;
+      weightSingle = tree17->mcweight*tree17->embweight*effweightSingle;
     }
     else if (isData) {
       weight = 1;
     }
     else {
-      weight = tree17->mcweight*tree17->puweight*effweight;
-      if (is2016||is2017)
+      weight = tree17->mcweight*tree17->puweight*effweight; 
+      weightEMu = tree17->mcweight*tree17->puweight*effweightEMu;
+      weightSingle = tree17->mcweight*tree17->puweight*effweightSingle;
+      if (is2016||is2017) { 
 	weight *= tree17->prefiringweight;
+	weightEMu *= tree17->prefiringweight;
+	weightSingle *= tree17->prefiringweight;
+      }
     }
-    if (isTTbar) 
+    if (isTTbar) {
       weight *= tree17->topptweight;
-    if (isDY)
+      weightEMu *= tree17->topptweight;
+      weightSingle *= tree17->topptweight;
+    }
+    if (isDY) {
       weight *= tree17->zptweight;
+      weightEMu *= tree17->zptweight;
+      weightSingle *= tree17->zptweight;
+    }
 
-    if (tree17->os<0.5)
+    if (tree17->os<0.5) { 
       weight *= tree17->qcdweight;
+      weightUp = weight;
+      
+      double weight_0_Par0_Up = tree17->qcdweight_deltaR_0jet_Par0_up - 1.;
+      double weight_0_Par1_Up = tree17->qcdweight_deltaR_0jet_Par1_up - 1.;
+      double weight_0_Par2_Up = tree17->qcdweight_deltaR_0jet_Par2_up - 1.;
+
+      double weight_1_Par0_Up = tree17->qcdweight_deltaR_1jet_Par0_up - 1.;
+      double weight_1_Par1_Up = tree17->qcdweight_deltaR_1jet_Par1_up - 1.;
+      double weight_1_Par2_Up = tree17->qcdweight_deltaR_1jet_Par2_up - 1.;
+
+      double weight_2_Par0_Up = tree17->qcdweight_deltaR_2jet_Par0_up - 1.;
+      double weight_2_Par1_Up = tree17->qcdweight_deltaR_2jet_Par1_up - 1.;
+      double weight_2_Par2_Up = tree17->qcdweight_deltaR_2jet_Par2_up - 1.;
+
+      double weight_IsoCorr = tree17->qcdweight_isolationcorrection - 1.;
+
+      double tot = TMath::Sqrt(
+			       weight_0_Par0_Up*weight_0_Par0_Up+
+			       weight_0_Par1_Up*weight_0_Par1_Up+
+			       weight_0_Par2_Up*weight_0_Par2_Up+
+			       weight_1_Par0_Up*weight_1_Par0_Up+
+			       weight_1_Par1_Up*weight_1_Par1_Up+
+			       weight_1_Par2_Up*weight_1_Par2_Up+
+			       weight_2_Par0_Up*weight_2_Par0_Up+
+			       weight_2_Par1_Up*weight_2_Par1_Up+
+			       weight_2_Par2_Up*weight_2_Par2_Up+
+			       weight_IsoCorr*weight_IsoCorr);
+
+      weightUp = weight*(1+tot);
+      //      std::cout << "weightUp/weight = " << weightUp/weight << std::endl;
+
+    }
+
+
+    if (tree17->iso_1<0.15&&tree17->iso_2<0.2) {
+      th1["weight_idiso"]->Fill(idiso_eff);
+      th1["weight_trigger_emu"]->Fill(trigweightEMu);
+      th1["weight_eff_emu"]->Fill(effweightEMu);
+      th1["weight_trigger_singleLep"]->Fill(trigweightSingle);
+      th1["weight_eff_singleLep"]->Fill(effweightSingle);
+      th1["weight_trigger_comb"]->Fill(trigweightComb);
+      th1["weight_eff_comb"]->Fill(effweightComb);
+    }
+    
+    if (debug) {
+      if (tree17->iso_1>0.2)
+	std::cout << "iso_1 = " << tree17->iso_1 << std::endl;
+      if (tree17->iso_2>0.15)
+	std::cout << "iso_2 = " << tree17->iso_2 << std::endl;
+
+      /*
+      //      if (tree17->iso_1<0.15&&tree17->iso_2<0.2&&(tree17->pt_1>100||tree17->pt_2>100)) {
+      if (tree17->iso_1<0.15&&tree17->iso_2<0.2) {
+
+	std::cout << "pt1 = " << tree17->pt_1 << "    pt2 = " << tree17->pt_2 << std::endl;
+
+	std::cout << "idisoweight_1         : Ntuple = " << tree17->idisoweight_1 << "   SF = " << idisoweight_1 << std::endl;
+	std::cout << "idisoweight_2         : Ntuple = " << tree17->idisoweight_2 << "   SF = " << idisoweight_2 << std::endl;
+
+
+	std::cout << "idiso eff weight = " << idiso_eff << std::endl;
+	std::cout << "------" << std::endl;
+
+	std::cout << "weight (e-mu)         : Ntuple = " << tree17->weightEMu << "   SF = " << weightEMu << std::endl;
+
+	std::cout << "weight (singleLep)    : Ntuple = " << tree17->weightSingle << "   SF = " << weightSingle << std::endl;
+
+	std::cout << "weight (comb)         : Ntuple = " << tree17->weight << "   SF = " << weight << std::endl;
+	// *******
+	std::cout << "-----" << std::endl;
+	// *******
+	std::cout << "Effweight (e-mu)      : Ntuple = " << tree17->effweightEMu << "   SF = " << effweightEMu << std::endl;
+
+	std::cout << "Effweight (singleLep) : Ntuple = " << tree17->effweightSingle << "   SF = " << effweightSingle << std::endl;
+
+	std::cout << "Effweight (comb)      : Ntuple = " << tree17->effweight << "   SF = " << effweightComb << std::endl;
+	// ******
+	std::cout << "-----" << std::endl;
+	// ******
+	std::cout << "Trgweight (e-mu)      : Ntuple = " << tree17->trigweightEMu << "   SF = " << trigweightEMu << std::endl;
+
+	std::cout << "Trgweight (singleLep) : Ntuple = " << tree17->trigweightSingle << "   SF = " << trigweightSingle << std::endl;
+
+	std::cout << "Trgweight (comb)      : Ntuple = " << tree17->trigweight << "   SF = " << trigweightComb << std::endl;
+
+	std::cout << std::endl;
+      }
+      */
+    }
 
     weight *= norm;
+    weightUp *= norm;
 
     TString iSign = "SS";
     if (tree17->os>0.5)
@@ -618,11 +906,34 @@ void RunOnTree(TTree * tree,
       th2["pt1_pt2_inclusive_"+iSign]->Fill(tree17->pt_1,tree17->pt_2,weight);
       th2["pt1_pt2_"+ibtag+"_"+iSign]->Fill(tree17->pt_1,tree17->pt_2,weight);
 
+      if (tree17->os<0.5) {
+	th1["mTtot_"+ibtag+"_SS_Up"]->Fill(tree17->mt_tot,weightUp);
+	th1["mTtot_inclusive_SS_Up"]->Fill(tree17->mt_tot,weightUp);
+
+	th1["pt2_"+ibtag+"_SS_Up"]->Fill(tree17->pt_2,weightUp);
+	th1["pt2_inclusive_SS_Up"]->Fill(tree17->pt_2,weightUp);
+
+	th1["pt1_"+ibtag+"_SS_Up"]->Fill(tree17->pt_1,weightUp);
+	th1["pt1_inclusive_SS_Up"]->Fill(tree17->pt_1,weightUp);
+      }
+
+      if (tree17->m_sv>250.0) {
+
+      	th1["pt1_"+ibtag+"_highmsv_"+iSign]->Fill(tree17->pt_1,weight);
+      	th1["pt2_"+ibtag+"_highmsv_"+iSign]->Fill(tree17->pt_2,weight);
+      	th1["mTtot_"+ibtag+"_highmsv_"+iSign]->Fill(tree17->mt_tot,weight);
+
+      }
+
     }
 
     // ttbar region
     if (tree17->iso_1<0.15&&tree17->iso_2>0.2&&tree17->pzeta<=-35.0) {
+
       th1["mTtot_ttbar_"+iSign]->Fill(tree17->mt_tot,weight);
+      th1["pt1_ttbar_"+iSign]->Fill(tree17->pt_1,weight);
+      th1["pt2_ttbar_"+iSign]->Fill(tree17->pt_2,weight);
+
     }
 
     //    std::cout << "m_vis = " << m_vis << std::endl;
@@ -630,24 +941,40 @@ void RunOnTree(TTree * tree,
     //    std::cout << "mTtot = " << mt_tot << std::endl;
 
     // isolated muon, antiisolated electron
+    
     if (tree17->iso_2<0.2&&tree17->iso_1>0.15&&tree17->pzeta>-35.0) {
+
+      if (debug) 
+	std::cout << "iso_1 = " << tree17->iso_1 << "   iso_2 = " << tree17->iso_2 << std::endl;
 
       th1["deltaR_inclusive_isoMu_antiisoE_"+iSign]->Fill(tree17->dr_tt,weight);     
       th1["pt1_inclusive_isoMu_antiisoE_"+iSign]->Fill(tree17->pt_1,weight);
       th1["pt2_inclusive_isoMu_antiisoE_"+iSign]->Fill(tree17->pt_2,weight);
       th2["pt1_pt2_inclusive_isoMu_antiisoE_"+iSign]->Fill(tree17->pt_1,tree17->pt_2,weight);
+      th1["mTtot_inclusive_isoMu_antiisoE_"+iSign]->Fill(tree17->mt_tot,weight);
+      th1["mTtot_"+ibtag+"_isoMu_antiisoE_"+iSign]->Fill(tree17->mt_tot,weight);
+      th1["pt1_"+ibtag+"_isoMu_antiisoE_"+iSign]->Fill(tree17->pt_1,weight);
+      th1["pt2_"+ibtag+"_isoMu_antiisoE_"+iSign]->Fill(tree17->pt_2,weight);
 
     }
-
+    
     // antiisolated muon, antiisolated electron
     if (tree17->iso_2>0.2&&tree17->iso_1>0.15&&tree17->pzeta>-35.0) {
+
+      if (debug) 
+	std::cout << "iso_1 = " << tree17->iso_1 << "   iso_2 = " << tree17->iso_2 << std::endl;
 
       th1["deltaR_inclusive_antiisoMu_antiisoE_"+iSign]->Fill(tree17->dr_tt,weight);
       th1["pt1_inclusive_antiisoMu_antiisoE_"+iSign]->Fill(tree17->pt_1,weight);
       th1["pt2_inclusive_antiisoMu_antiisoE_"+iSign]->Fill(tree17->pt_2,weight);
       th2["pt1_pt2_inclusive_antiisoMu_antiisoE_"+iSign]->Fill(tree17->pt_1,tree17->pt_2,weight);
+      th1["mTtot_inclusive_antiisoMu_antiisoE_"+iSign]->Fill(tree17->mt_tot,weight);
+      th1["mTtot_"+ibtag+"_antiisoMu_antiisoE_"+iSign]->Fill(tree17->mt_tot,weight);
+      th1["pt1_"+ibtag+"_antiisoMu_antiisoE_"+iSign]->Fill(tree17->pt_1,weight);
+      th1["pt2_"+ibtag+"_antiisoMu_antiisoE_"+iSign]->Fill(tree17->pt_2,weight);
 
     }
+
     // shapes comparison 
     if (tree17->os<0.5) {
       // direct muon iso
@@ -667,13 +994,24 @@ void RunOnTree(TTree * tree,
 	th1["mTtot_ttbar_looseisoMu_SS"]->Fill(tree17->mt_tot,weight);
       }      
     }
-
+    
     if (tree17->iso_1<0.15&&tree17->iso_2<0.2&&tree17->pzeta>-35.0) { 
       th1["mvis_sel_signal_"+iSign]->Fill(tree17->m_vis,weight);
       th1["pt1_sel_signal_"+iSign]->Fill(tree17->m_vis,weight);
       th1["pt2_sel_signal_"+iSign]->Fill(tree17->m_vis,weight);
       th1["mTtot_sel_signal_"+iSign]->Fill(tree17->m_vis,weight);
-      if (tree17->os>0.5) count += 1;
+      
+      th1["mvis_sel_signal_"+ibtag+"_"+iSign]->Fill(tree17->m_vis,weight);
+      th1["pt1_sel_signal_"+ibtag+"_"+iSign]->Fill(tree17->m_vis,weight);
+      th1["pt2_sel_signal_"+ibtag+"_"+iSign]->Fill(tree17->m_vis,weight);
+      th1["mTtot_sel_signal_"+ibtag+"_"+iSign]->Fill(tree17->m_vis,weight);
+      
+      if (tree17->m_sv>250.) {
+	th1["mvis_sel_signal_"+ibtag+"_highmsv_"+iSign]->Fill(tree17->m_vis,weight);
+	th1["pt1_sel_signal_"+ibtag+"_highmsv_"+iSign]->Fill(tree17->m_vis,weight);
+	th1["pt2_sel_signal_"+ibtag+"_highmsv_"+iSign]->Fill(tree17->m_vis,weight);
+	th1["mTtot_sel_signal_"+ibtag+"_highmsv_"+iSign]->Fill(tree17->m_vis,weight);
+      }
     }
 
     if (tree17->iso_1<0.15&&tree17->iso_2<0.2&&tree17->pzeta<=-35.0) { 
@@ -688,7 +1026,6 @@ void RunOnTree(TTree * tree,
     }
 
   }
-  //  std::cout << "   " << sampleName << "  :  " << count << std::endl;
   delete tree17;
 
 } 
@@ -735,10 +1072,11 @@ void ProcessSample(SampleAttributes sample,
 
 
 int main(int argc, char * argv[]) {
+
   
   // argument - config file
-  if (argc!=5) {
-    std::cout << "usage of the scripts : QCD_emu [era=2016,2017,2018] [trigger Option = SingleLep, EMu, Comb] [Sample = Data, Embedded, MC, TT, All] [SF = SFnew, SFold]" << std::endl;
+  if (argc!=6) {
+    std::cout << "usage of the scripts : QCD_emu [era=2016,2017,2018] [trigger Option = SingleLep, EMu, Comb] [Sample = Data, Embedded, MC, TT, All] [SF = KIT, IC] [debug=0,1]" << std::endl;
     exit(-1);
   }
 
@@ -747,6 +1085,7 @@ int main(int argc, char * argv[]) {
   TString Trigger(argv[2]);
   TString Sample(argv[3]);
   TString SF(argv[4]);
+  TString Debug(argv[5]);
 
   if (era!="2016"&&era!="2017"&&era!="2018") {
     std::cout << "Unknown era : " << era << std::endl;
@@ -758,27 +1097,44 @@ int main(int argc, char * argv[]) {
   }
   if (Sample!="Data"&&Sample!="Embedded"&&Sample!="MC"&&Sample!="All"&&Sample!="TT") {
     std::cout << "Unknown sample option : " << Sample << std::endl;
+    exit(-1);
   }
+  if (SF!="KIT"&&SF!="IC") {
+    std::cout << "Unknown correction option : " << SF << std::endl;
+    exit(-1);
+  }
+  if (Debug!="0"&&Debug!="1") {
+    std::cout << "Unknown debug option : " << Debug << std::endl;
+    exit(-1);
+  }
+  if (Debug=="0") 
+    debug = false;
+  else
+    debug = true;
 
-  if (SF=="SFold") 
-    applySF = false;
-  if (SF=="SFnew")
-    applySF = true;
+  input_dir = "/nfs/dust/cms/user/rasp/Run/emu_MSSM/Jan1/"+era;
+  output_dir = "/nfs/dust/cms/user/rasp/Run/emu_MSSM/QCDModel/RooT_Jan1/";
+  if (debug)
+    output_dir = "/nfs/dust/cms/user/rasp/Run/emu_MSSM/QCDModel/test/";
 
-  if (era=="2018") {
-    lumi = 59740;
-    pt_SingleE = 33.0;
-    pt_SingleMu = 25.0;
+  applyKitSF = false;
+  if (SF=="KIT")
+    applyKitSF = true;
+
+  if (era=="2016") {
+    lumi = 35866;
+    pt_SingleE = 26.0;
+    pt_SingleMu = 23.0;
   }
   if (era=="2017") {
     lumi = 41900;
     pt_SingleE = 28.0;
     pt_SingleMu = 25.0;
   }
-  if (era=="2016") {
-    lumi = 35866;
-    pt_SingleE = 26.0;
-    pt_SingleMu = 23.0;
+  if (era=="2018") {
+    lumi = 59740;
+    pt_SingleE = 33.0;
+    pt_SingleMu = 25.0;
   }
 
   if (Trigger=="SingleLep")
@@ -791,28 +1147,32 @@ int main(int argc, char * argv[]) {
   is2017 = false;
   is2018 = false;
   is2016 = false;
-  dzFilterEff_mc = 0.98;
-  dzFilterEff_data = 1.0;
+  if (era=="2016") {
+    is2016 = true;
+    dzFilterEff_data = 0.98;
+    dzFilterEff_mc = 1.0;
+  }
   if (era=="2017") {
     is2017 = true;
     dzFilterEff_mc = 0.95;
     dzFilterEff_data = 0.95;
   }
   if (era=="2018") {
+    is2018 = true;
     dzFilterEff_mc = 0.95;
     dzFilterEff_data = 0.95;
   }
-
   
   string cmsswBase = (getenv("CMSSW_BASE"));
 
-  TString workspace_filename = TString(cmsswBase) + "/src/DesyTauAnalyses/NTupleMaker/data/CorrectionWS_IC/htt_scalefactors_legacy_"+era+".root";
-
+  TString workspace_filename = TString(cmsswBase) + "/src/DesyTauAnalyses/NTupleMaker/data/htt_scalefactors_legacy_"+era+".root";
+  TString workspace_filename_IC = TString(cmsswBase) + "/src/DesyTauAnalyses/NTupleMaker/data/CorrectionWS_IC/htt_scalefactors_legacy_"+era+".root";
+    
   TFile * f_workspace = new TFile(workspace_filename);
+  TFile * f_workspace_IC = new TFile(workspace_filename_IC);
   w = (RooWorkspace*)f_workspace->Get("w");
+  w_IC = (RooWorkspace*)f_workspace_IC->Get("w");
 
-  input_dir = "/nfs/dust/cms/user/rasp/grid-jobs/emu_MSSM_Dec20/"+era;
-  output_dir = "./";
 
   std::cout << "Base directory : " << input_dir << std::endl;
 
@@ -840,7 +1200,6 @@ int main(int argc, char * argv[]) {
     SingleMuon = SingleMuon_2016;
     MuonEG = MuonEG_2016;
     EmbedSamples = EmbeddedElMu_2016;
-    TTSamples = TT_INCL;
   }
 
   std::vector<TString> DataSamples; DataSamples.clear();
@@ -867,7 +1226,6 @@ int main(int argc, char * argv[]) {
 
     for (unsigned int i=0; i<MuonEG.size(); ++i)
       DataSamples.push_back(MuonEG.at(i));
-
   }
 
   std::cout << "Data samples : " << std::endl;
@@ -881,7 +1239,7 @@ int main(int argc, char * argv[]) {
   SampleAttributes VVAttr = SetSampleAttributes("VV","VV",EWKSamples,-1);
   SampleAttributes TTAttr = SetSampleAttributes("TT","TT",TTSamples,-1);
 
-  TString OutputFileName = Sample + "_" + Trigger + "_" + SF + "_" + era + ".root";
+  TString OutputFileName = output_dir+"/QCD_Model_"+Sample + "_" + Trigger + "_" + era + "_"+SF+".root";
   TFile * outputFile = new TFile(OutputFileName,"recreate");
   outputFile->cd("");
   

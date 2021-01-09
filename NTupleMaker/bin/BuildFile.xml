@@ -13,6 +13,12 @@
   <use name="rootmath"/>
 </bin>
 
+<bin name="PlotDatacards_EMu" file="PlotDatacards_EMu.cpp">
+  <use name="root"/>
+  <use name="rootgraphics"/>
+  <use name="rootmath"/>
+</bin>
+
 <bin name="PlotTrigger" file="PlotTrigger.cpp">
   <use name="root"/>
   <use name="rootgraphics"/>
@@ -20,6 +26,20 @@
 </bin>
 
 <bin name="QCD_emu" file="QCD_emu.cpp">
+  <use name="root"/>
+  <use name="rootgraphics"/>
+  <use name="rootmath"/>
+  <use name="DesyTauAnalyses/NTupleMaker"/>
+</bin>
+
+<bin name="CreateCards_emu" file="CreateCards_emu.cpp">
+  <use name="root"/>
+  <use name="rootgraphics"/>
+  <use name="rootmath"/>
+  <use name="DesyTauAnalyses/NTupleMaker"/>
+</bin>
+
+<bin name="CreateModel_emu" file="CreateModel_emu.cpp">
   <use name="root"/>
   <use name="rootgraphics"/>
   <use name="rootmath"/>

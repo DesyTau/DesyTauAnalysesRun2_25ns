@@ -47,10 +47,16 @@ void Plot(TFile * file,
 
 int main(int argc, char ** argv) {
 
+  if (argc!=3) {
+    std::cout << "Usage : PlotSys [era=2016,2017,2018]  [Sample=TTTo2L2Nu, GluGluHToTauTau_M125, ...]" 
+	      << std::endl;  
+    exit(-1);
+
+  }
+
   TString era(argv[1]);
   TString fileName(argv[2]);
 
-  TString dirName = "/nfs/dust/cms/user/rasp/grid-jobs/synch-emu/"+era;
 
   TString cutsTrig = "((trg_singleelectron>0.5&&pt_1>33.0)||(trg_singlemuon>0.5&&pt_2>25.0))";
   if (era == "2017")
@@ -59,10 +65,12 @@ int main(int argc, char ** argv) {
     cutsTrig = "((trg_singleelectron>0.5&&pt_1>26.0)||(trg_singlemuon>0.5&&pt_2>25.0))";
       
   TString cuts = cutsTrig + "&&iso_1<0.15&&iso_2<0.20&&extraelec_veto<0.5&&extramuon_veto<0.5&&dr_tt>0.3&&pt_1>15.&&pt_2>15.";
-
+  std::ifstream ifs ("variables.txt", std::ifstream::in);
+  TString baseDirName;
+  ifs >> baseDirName;
+  TString dirName = baseDirName + "/" + era;
   TFile * file = new TFile(dirName+"/"+fileName+".root");
   std::vector<HistAttr> attrs;
-  std::ifstream ifs ("variables.txt", std::ifstream::in);
   TString varName;
   TString sysName;
   int nBins;
@@ -107,29 +115,42 @@ void Plot(TFile * file,
   TTree * treeUp = (TTree*)file->Get("TauCheck_"+sysName+"Up");
   TTree * treeDown = (TTree*)file->Get("TauCheck_"+sysName+"Down");
 
-  if (sysName=="CMS_tShape") {
+  TString weightUp("");
+  TString weightDown("");
+  if (sysName=="CMS_htt_ttbarShape") {
     treeUp = treeNominal;
     treeDown = treeNominal;
+    weightUp = "topptweight*";
+    weightDown = "(1/topptweight)*";
+  }
+  if (sysName=="CMS_htt_dyShape") {
+    treeUp = treeNominal;
+    treeDown = treeNominal;
+    weightUp = "zptweight*";
+    weightDown = "(1/zptweight)*";
+  }
+
+  if (sysName=="CMS_Prefiring") {
+    treeUp = treeNominal;
+    treeDown = treeNominal;
+    weightUp = "(prefiringweightUp/prefiringweight)*";
+    weightDown = "(prefiringweightDown/prefiringweight)*";
   }
 
   if (treeUp==NULL) {
     std::cout << "Sytematics " << sysName << " is absent" << std::endl;
+    return;
   }
-
+  std::cout << "Running with systematics " << sysName << "  on variable " << varName << std::endl;
   TH1D * histNominal = new TH1D("histNominal","",nBins,xmin,xmax);
   TH1D * histUp = new TH1D("histUp","",nBins, xmin,xmax);
   TH1D * histDown = new TH1D("histDown","",nBins, xmin,xmax);
 
   TCanvas * dummy = new TCanvas("dummy","",600,600);
   treeNominal->Draw(varName+">>histNominal","weight*("+cuts+")");
-  if (sysName=="CMS_tShape") {
-    treeUp->Draw(varName+">>histUp","weight*topptweight*("+cuts+")");
-    treeDown->Draw(varName+">>histDown","(weight/topptweight)*("+cuts+")");
-  }
-  else {
-    treeUp->Draw(varName+">>histUp","weight*("+cuts+")");
-    treeDown->Draw(varName+">>histDown","weight*("+cuts+")");
-  }
+  treeUp->Draw(varName+">>histUp","weight*"+weightUp+"("+cuts+")");
+  treeDown->Draw(varName+">>histDown","weight*"+weightDown+"("+cuts+")");
+
   float yMax = histUp->GetMaximum();
   if (histNominal->GetMaximum()>yMax)
     yMax = histNominal->GetMaximum();
@@ -137,7 +158,7 @@ void Plot(TFile * file,
     yMax = histDown->GetMaximum();
   delete dummy;
 
-  histUp->GetYaxis()->SetRangeUser(0.01,1.1*yMax);
+  histUp->GetYaxis()->SetRangeUser(0.01,1.4*yMax);
   histNominal->SetLineColor(1);
   histUp->SetLineColor(2);
   histDown->SetLineColor(4);
@@ -210,10 +231,10 @@ void Plot(TFile * file,
   histUp->Draw("h");
   histNominal->Draw("pesame");
   histDown->Draw("hsame");
-  TLegend * leg = new TLegend(0.55,0.65,0.92,0.9);
+  TLegend * leg = new TLegend(0.25,0.72,0.92,0.9);
   leg->SetHeader(sysName);
   leg->SetFillColor(0);
-  leg->SetTextSize(0.04);
+  leg->SetTextSize(0.036);
   leg->AddEntry(histNominal,"Central","l");
   leg->AddEntry(histUp,"Up","l");
   leg->AddEntry(histDown,"Down","l");
@@ -277,11 +298,11 @@ void Plot(TFile * file,
   canv1->cd();
 
   if (pageType<0)
-    canv1->Print("figuresSys/Systematics_"+sampleName+"_"+era+".pdf(","pdf");
+    canv1->Print("Systematics_"+sampleName+"_"+era+".pdf(","pdf");
   else if (pageType>0) 
-    canv1->Print("figuresSys/Systematics_"+sampleName+"_"+era+".pdf)","pdf");
+    canv1->Print("Systematics_"+sampleName+"_"+era+".pdf)","pdf");
   else
-    canv1->Print("figuresSys/Systematics_"+sampleName+"_"+era+".pdf","pdf");
+    canv1->Print("Systematics_"+sampleName+"_"+era+".pdf","pdf");
 
   delete histNominal;
   delete histUp;

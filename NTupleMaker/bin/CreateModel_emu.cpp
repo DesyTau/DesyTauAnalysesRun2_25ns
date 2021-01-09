@@ -10,87 +10,136 @@
 #include <sstream>
 #include "DesyTauAnalyses/NTupleMaker/interface/Config.h"
 
+std::vector<TString> sysToLnNames_Common = {
+  "CMS_scale_met_unclustered",
+  "CMS_scale_j_FlavorQCD",
+  "CMS_scale_j_RelativeBal",
+  "CMS_scale_j_HF",
+  "CMS_scale_j_BBEC1",
+  "CMS_scale_j_EC2",
+  "CMS_scale_j_Absolute",
+};
+
+std::vector<TString> sysToLnNames_Era = {
+  "CMS_htt_boson_res_met",
+  "CMS_htt_boson_scale_met",
+  "CMS_htt_eff_b",
+  "CMS_htt_mistag_b",
+  "CMS_scale_j_Absolute",
+  "CMS_scale_j_HF",
+  "CMS_scale_j_EC2",
+  "CMS_scale_j_RelativeSample",
+  "CMS_scale_j_BBEC1",
+  "CMS_res_j",
+};
+
+std::vector<TString> higgsMass = {
+  "200",
+  "400",
+  "600",
+  "800",
+  "1200",
+  "1400",
+  "1600",
+  "1800",
+  "2000",
+  "2600",
+  "3200"
+};
+
+TString ExtractSys(TFile * file, 
+		   TString cat, 
+		   TString process, 
+		   TString sysName) {
+  
+  TString output(" - ");
+  TH1D * histNominal = (TH1D*)file->Get(cat+"/"+process);
+  TH1D * histUp = (TH1D*)file->Get(cat+"/"+process+"_"+sysName+"Up");
+  if (histUp!=NULL&&histNominal!=NULL) {
+    double xNominal = histNominal->GetSumOfWeights();
+    double xUp = histUp->GetSumOfWeights();
+    double err = xUp/xNominal;
+    if (err<0.999||err>1.001) {
+      char number[10];
+      sprintf(number,"%5.3f",err);
+      output = " " + TString(number) + " ";
+    }
+  }
+
+  return output;
+
+}
+
 int main(int argc, char * argv[]) {
 
-  TString dir = "/nfs/dust/cms/user/rasp/Run/emu_MSSM";
+  if (argc!=2) {
+    std::cout << "Usage : CreateModel_emu [trigger=0,1,2]" << std::endl;
+    exit(-1);
+  }
+  TString trigger(argv[1]);
 
-  TString folder(argv[1]);
-  TString era(argv[2]);
-  TString inclusive(argv[3]);
+  TString dir = "/nfs/dust/cms/user/rasp/Run/emu_MSSM/Jan1/datacards_"+trigger;
+  TString dir_cards = "/nfs/dust/cms/user/rasp/Run/emu_MSSM/Jan1/cards_"+trigger;
 
-  std::vector<TString> categories; 
-  if (inclusive=="inclusive") {
-    categories.push_back("ttbar");
-    categories.push_back("inclusive_btag");
-    categories.push_back("inclusive_nobtag");
-  }
-  else {
-    categories.push_back("ttbar");
-    categories.push_back("low_pzeta_btag");
-    categories.push_back("low_pzeta_nobtag");
-    categories.push_back("medium_pzeta_btag");
-    categories.push_back("medium_pzeta_nobtag");
-    categories.push_back("high_pzeta_btag");
-    categories.push_back("high_pzeta_nobtag");
-  }
+  std::vector<TString> categories = { 
+    "em_ttbar_control",
+    "em_ttbar_btag",
+    "em_ttbar_nobtag",
+    "em_btag_lowdzeta",
+    "em_btag_mediumdzeta",
+    "em_btag_highdzeta",
+    "em_nobtag_lowdzeta",
+    "em_nobtag_mediumdzeta",
+    "em_nobtag_highdzeta"
+  };
 
-  std::vector<TString> eras;
-  if (era=="all") {
-    eras.push_back("2016");
-    eras.push_back("2017");
-    eras.push_back("2018");
-  }
-  else {
-    eras.push_back(era);
-  }
+  std::vector<TString> eras = {
+    "2016",
+    "2017",
+    "2018"
+  };
+
   std::vector<TString> signals = {
     "ggH",
     "bbH"
   };
-  std::vector<TString> bkgs = {
-    "EmbedZTT",
-    "TT",
-    "ZLL",
-    "VV",
-    "W"
-  };
 
   for (auto Era : eras) {
+    TString fileName = dir + "/" + Era + "/htt_em_mssm.root";
+    TFile * file = new TFile(fileName);
+    if (file->IsZombie()) {
+      std::cout << fileName << "  cannot be opened" << std::endl;
+      exit(-1);
+    }
     for (auto cat : categories) {
-      TString fileName = dir + "/" + folder + "/" + cat + "_" + Era + ".root";
-      TFile * file = new TFile(fileName);
-      if (file->IsZombie()) {
-	std::cout << fileName << "  cannot be opened" << std::endl;
-	exit(-1);
-      }
 
-      TH1D * data = (TH1D*)file->Get("data_obs");
+      TH1D * data = (TH1D*)file->Get(cat+"/data_obs");
+      TH1D * EMB = (TH1D*)file->Get(cat+"/EMB");
+      TH1D * TTL = (TH1D*)file->Get(cat+"/TTL");
+      TH1D * VVL = (TH1D*)file->Get(cat+"/VVL");
+      TH1D * QCD = (TH1D*)file->Get(cat+"/QCD");
+      TH1D * W   = (TH1D*)file->Get(cat+"/W");
+      TH1D * ZLL = (TH1D*)file->Get(cat+"/ZLL");
+
+      std::map<TString,TString> TTL_sys;
+      std::map<TString,TString> VVL_sys;
+      std::map<TString,TString> W_sys;
+      std::map<TString,TString> ZLL_sys;
+
       double data_yield = data->GetSumOfWeights();
-
-      TH1D * EmbedZTT = (TH1D*)file->Get("EmbedZTT");
-      double embed_yield = EmbedZTT->GetSumOfWeights();
-
-      TH1D * TT = (TH1D*)file->Get("TT");
-      double tt_yield = TT->GetSumOfWeights();
-
-      TH1D * ZLL = (TH1D*)file->Get("ZLL");
+      double tt_yield = TTL->GetSumOfWeights();
       double zll_yield = ZLL->GetSumOfWeights();
-
-      TH1D * W = (TH1D*)file->Get("W");
       double w_yield = W->GetSumOfWeights();
-
-      TH1D * VV = (TH1D*)file->Get("VV");
-      double vv_yield = VV->GetSumOfWeights();
-
-      TH1D * QCD = (TH1D*)file->Get("QCD");
+      double vv_yield = VVL->GetSumOfWeights();
       double qcd_yield = QCD->GetSumOfWeights();
+      double embed_yield = EMB->GetSumOfWeights();
 
       TString channel = cat + "_" + Era;
 
       double totBkgd = embed_yield + tt_yield + zll_yield + w_yield + vv_yield + qcd_yield;
 
       std::cout << "making cards for channel " << channel << std::endl;
-      std::cout << "EmbedZTT  : " << embed_yield << std::endl;
+      std::cout << "EMB       : " << embed_yield << std::endl;
       std::cout << "TT        : " << tt_yield << std::endl;
       std::cout << "ZLL       : " << zll_yield << std::endl;
       std::cout << "W         : " << w_yield << std::endl;
@@ -99,17 +148,47 @@ int main(int argc, char * argv[]) {
       std::cout << "Total Bkg : " << totBkgd << std::endl;
       std::cout << "Data      : " << data_yield << std::endl;
       std::cout << "Data/Bkg  : " << data_yield/totBkgd << std::endl;
-      std::cout << "signif    : " << (data_yield-totBkgd)/TMath::Sqrt(data_yield) << std::endl;
       std::cout << std::endl;
 
-      for (auto mass : masses ) {
+      for (auto sysName : sysToLnNames_Common) {
+	TTL_sys[sysName] = ExtractSys(file, cat, "TTL", sysName);
+	VVL_sys[sysName] = ExtractSys(file, cat, "VVL", sysName);
+	W_sys[sysName]   = ExtractSys(file, cat, "W", sysName);
+	ZLL_sys[sysName] = ExtractSys(file, cat, "ZLL", sysName); 
+      }
+
+      for (auto sysNameEra : sysToLnNames_Era) {
+	TString sysName = sysNameEra + "_" + Era;
+	TTL_sys[sysName] = ExtractSys(file, cat, "TTL", sysName);
+	VVL_sys[sysName] = ExtractSys(file, cat, "VVL", sysName);
+	W_sys[sysName]   = ExtractSys(file, cat, "W", sysName);
+	ZLL_sys[sysName] = ExtractSys(file, cat, "ZLL", sysName); 
+      }
+
+      for (auto mass : higgsMass ) {
 	for (auto sig : signals) {
 
 	  TString sig_name = sig+mass;
-	  TString BaseName = dir + "/" + folder + "/" + cat + "_" + Era + "_" + sig_name;
+	  TString BaseName = dir_cards + "/" + Era + "/" + cat + "_" + sig_name;
 
-	  TH1D * SIG = (TH1D*)file->Get(sig_name);
+	  TH1D * SIG = (TH1D*)file->Get(cat+"/"+sig_name);
+	  if (SIG==NULL) {
+	    std::cout << "Signal " << sig_name << " is absent" << std::endl;
+	    exit(-1);
+	  }
+
 	  double sig_yield = SIG->GetSumOfWeights();
+
+	  std::map<TString,TString> SIG_sys;
+
+	  for (auto sysName : sysToLnNames_Common) {
+	    SIG_sys[sysName] = ExtractSys(file, cat, sig_name, sysName);
+	  }
+	  
+	  for (auto sysNameEra : sysToLnNames_Era) {
+	    TString sysName = sysNameEra + "_" + Era;
+	    SIG_sys[sysName] = ExtractSys(file, cat, sig_name, sysName);
+	  }
 
 	  ostringstream str;
 	  str << BaseName << ".txt";
@@ -123,13 +202,13 @@ int main(int argc, char * argv[]) {
 	  textFile << "-----------------" << std::endl;
 	  textFile << "observation " << data_yield << std::endl;
 	  textFile << "-----------------" << std::endl;
-	  textFile << "shapes * * " << fileName << "  $PROCESS   $PROCESS_$SYSTEMATIC " << std::endl;
+	  textFile << "shapes * * " << fileName << "  " << cat << "/$PROCESS " << cat << "/$PROCESS_$SYSTEMATIC " << std::endl;
 	  textFile << "-----------------" << std::endl;
 	  textFile << "bin        "; 
 	  for (unsigned int i=0; i<7; ++i)
 	    textFile << "  " << channel;
 	  textFile << std::endl;
-	  textFile << "process      " << sig_name << "  EmbedZTT  TT  QCD  W  VV  ZLL" << std::endl;
+	  textFile << "process      " << sig_name << "  EMB  TTL  QCD  W  VVL  ZLL" << std::endl;
 	  textFile << "process                  0    1      2      3      4      5      6" << std::endl;
 	  textFile << "rate     " 
 		   << sig_yield <<  "  "
@@ -140,19 +219,55 @@ int main(int argc, char * argv[]) {
 		   << vv_yield << "  " 
 		   << zll_yield << std::endl;
 	  textFile << "-----------------------------" << std::endl;
-	  textFile << "CMS_eff_m                   lnN   1.03   1.03   1.03      -   1.03   1.03   1.03" << std::endl;
-	  textFile << "CMS_eff_e                   lnN   1.04   1.04   1.04      -   1.04   1.04   1.04" << std::endl;
-	  textFile << "CMS_ztt_ttjNorm             lnN      -      -   1.07      -      -      -      -" << std::endl;
-	  textFile << "CMS_ztt_wNorm               lnN      -      -      -      -   1.15      -      -" << std::endl;
-	  textFile << "CMS_ztt_vvNorm              lnN      -      -      -      -      -   1.20      -" << std::endl;
-	  textFile << "CMS_ztt_em_zllNorm          lnN      -      -      -      -      -      -   1.20" << std::endl;
-	  textFile << "CMS_ztt_em_qcdNorm          lnN      -      -      -   1.15      -      -      -" << std::endl;
-	  textFile << "lumi_13TeV_" << Era  << "                 lnN   1.03    1.03   1.03      -   1.03   1.03      -" << std::endl;
-	  textFile << "CMS_ztt_boson_scale_met     lnN   1.04    1.02      -      -   1.02      -      -" << std::endl;
-	  textFile << "CMS_ztt_boson_reso_met      lnN   1.04    1.02      -      -   1.02      -      -" << std::endl;
-	  //	  textFile << "* autoMCStats 10 "<< std::endl;
-	  textFile.close();
+	  textFile << "CMS_eff_m                        lnN   1.02     -   1.02      -   1.02   1.02   1.02" << std::endl;
+	  textFile << "CMS_eff_e                        lnN   1.02     -   1.02      -   1.02   1.02   1.02" << std::endl;
+	  textFile << "CMS_trigger_" << Era << "     lnN   1.02     -   1.02      -   1.02   1.02   1.02" << std::endl;
+	  textFile << "CMS_trigger_emb" << Era << "  lnN      -   1.02     -      -      -      -      -" << std::endl;
+	  textFile << "CMS_eff_m_emb                    lnN      -   1.02      -      -     -     -   -" << std::endl;
+	  textFile << "CMS_eff_e_emb                    lnN      -   1.02      -      -     -     -   -" << std::endl;
 
+	  textFile << "CMS_htt_tjXsec                   lnN      -      -   1.06      -      -      -      -" << std::endl;
+	  textFile << "CMS_htt_wjXsec                   lnN      -      -      -      -   1.06      -      -" << std::endl;
+	  textFile << "CMS_htt_vvXsec                   lnN      -      -      -      -      -   1.06      -" << std::endl;
+	  textFile << "CMS_htt_zjXsec                   lnN      -      -      -      -      -      -   1.02" << std::endl;
+	  textFile << "lumi_" << Era  << "           lnN   1.015    1.015   1.015      -   1.015   1.015   1.015" << std::endl;
+
+	  textFile << "lumi                             lnN   1.015    1.015   1.015      -   1.015   1.015   1.015" << std::endl;
+	  textFile << "CMS_scale_e                    shape   1.00       -    1.00     -   1.00    1.00     -" << std::endl;
+	  //	  textFile << "CMS_scale_m                    shape   1.00    1.00    1.00     -   1.00    1.00   1.00" << std::endl;
+	  textFile << "CMS_scale_e_emb                shape      -    1.00       -     -      -       -      -" << std::endl;
+	  textFile << "CMS_htt_ttbarShape             shape      -       -     1.00    -      -       -      -" << std::endl;
+	  if (Era=="2016")
+	    textFile << "CMS_htt_dyShape_2016           shape      -       -        -    -      -       -   0.10" << std::endl;
+	  else
+	    textFile << "CMS_htt_dyShape                shape      -       -        -    -      -       -   0.10" << std::endl;
+
+	  for (auto sysName : sysToLnNames_Common) {
+	    textFile << sysName << "   lnN  "
+		     << SIG_sys[sysName] 
+		     << " - " 
+		     << TTL_sys[sysName] 
+		     << " - "
+		     << W_sys[sysName]
+		     << VVL_sys[sysName]
+		     << ZLL_sys[sysName] << std::endl;
+	  }
+
+	  for (auto sysNameEra : sysToLnNames_Era) {
+	    TString sysName = sysNameEra + "_" + Era;
+	    textFile << sysName << "   lnN  "
+		     << SIG_sys[sysName] 
+		     << " - " 
+		     << TTL_sys[sysName] 
+		     << " - "
+		     << W_sys[sysName]
+		     << VVL_sys[sysName]
+		     << ZLL_sys[sysName] << std::endl;
+	  }
+	  
+
+	  textFile << "* autoMCStats 10 "<< std::endl;
+	  textFile.close();
 
 	}
       }

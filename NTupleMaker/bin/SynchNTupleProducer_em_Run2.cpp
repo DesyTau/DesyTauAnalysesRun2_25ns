@@ -345,11 +345,14 @@ int main(int argc, char * argv[]){
   // MET Recoil Corrections
   const bool isDY = (infiles.find("DY") != string::npos) || (infiles.find("EWKZ") != string::npos);//Corrections that should be applied on EWKZ are the same needed for DY
   const bool isWJets = (infiles.find("WJets") != string::npos) || (infiles.find("W1Jets") != string::npos) || (infiles.find("W2Jets") != string::npos) || (infiles.find("W3Jets") != string::npos) || (infiles.find("W4Jets") != string::npos) || (infiles.find("EWK") != string::npos);
-  const bool isHiggs = (infiles.find("VBFHTo")!= string::npos) || (infiles.find("WminusHTo")!= string::npos) || (infiles.find("WplusHTo")!= string::npos) || (infiles.find("ZHTo")!= string::npos) || (infiles.find("GluGluHTo")!= string::npos);
+  const bool isHToTauTau = infiles.find("HToTauTau") != string::npos;
+  const bool isHToWW = infiles.find("HToWW") != string::npos;
   const bool isEWKZ =  infiles.find("EWKZ") != string::npos;
   const bool isMG = infiles.find("madgraph") != string::npos;
   const bool isMSSMsignal =  (infiles.find("SUSYGluGluToHToTauTau")!= string::npos) || (infiles.find("SUSYGluGluToBBHToTauTau")!= string::npos);
   const bool isTTbar = (infiles.find("TT_INCL") != string::npos) || (infiles.find("TTTo") != string::npos);
+
+  bool isHiggs = isHToTauTau || isHToWW; 
 
   const bool isEmbedded = infiles.find("Embed") != string::npos;
 
@@ -628,14 +631,14 @@ int main(int argc, char * argv[]){
   if((!isData||isEmbedded) && ApplySystShift){
 
     muonScaleSys = new MuonScaleSys(otree);
-    muonScaleSys->SetUseSVFit(ApplySVFit);
-    muonScaleSys->SetUseFastMTT(ApplyFastMTT);
+    muonScaleSys->SetUseSVFit(false);
+    muonScaleSys->SetUseFastMTT(false);
     muonScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);
     muonScaleSys->SetUsePuppiMET(usePuppiMET);
     
     electronScaleSys = new ElectronScaleSys(otree);
-    electronScaleSys->SetUseSVFit(ApplySVFit);
-    electronScaleSys->SetUseFastMTT(ApplyFastMTT);
+    electronScaleSys->SetUseSVFit(false);
+    electronScaleSys->SetUseFastMTT(false);
     electronScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);
     electronScaleSys->SetUsePuppiMET(usePuppiMET);
 
@@ -709,6 +712,10 @@ int main(int argc, char * argv[]){
     std::cout << "file " << iF + 1 << " out of " << fileList.size() << " filename : " << fileList[iF] << std::endl;
     
     TFile *file_ = TFile::Open(fileList[iF].data());
+    if (file_->IsZombie()) {
+      cout << "cannot open file " << fileList[iF].data() << std::endl;
+      continue;
+    }
     TTree *_tree = (TTree*)file_->Get(TString(ntupleName));  
     if (_tree == NULL) {
       std::cout << "TTree " << ntupleName << " is absent" << std::endl;
@@ -824,7 +831,6 @@ int main(int argc, char * argv[]){
       otree->npv = analysisTree.primvertex_count;
       otree->npu = analysisTree.numtruepileupinteractions;// numpileupinteractions;
       otree->rho = analysisTree.rho;
-
 
       // selecting electrons      
       float sf_eleES = 1.0;   
@@ -1128,12 +1134,12 @@ int main(int argc, char * argv[]){
 	}
 	else{
 	  if (isEmbedded) {
-	    isoweight_1_kit = correctionWS->function("e_id90_embed_kit_ratio")->getVal() * correctionWS->function("e_iso_binned_embed_kit_ratio")->getVal();
-	    isoweight_2_kit = correctionWS->function("m_looseiso_binned_ic_embed_ratio")->getVal()*correctionWS->function("m_id_embed_kit_ratio")->getVal();
+	    isoweight_1_kit = correctionWS->function("e_id90_embed_kit_ratio")->getVal() * correctionWS->function("e_iso_embed_kit_ratio")->getVal();
+	    isoweight_2_kit = correctionWS->function("m_looseiso_ic_embed_ratio")->getVal()*correctionWS->function("m_id_embed_kit_ratio")->getVal();
 	  }
 	  else {
-	    isoweight_1_kit = correctionWS->function("e_id90_kit_ratio")->getVal() * correctionWS->function("e_iso_binned_kit_ratio")->getVal();
-	    isoweight_2_kit = correctionWS->function("m_looseiso_binned_ic_ratio")->getVal()*correctionWS->function("m_id_kit_ratio")->getVal();
+	    isoweight_1_kit = correctionWS->function("e_id90_kit_ratio")->getVal() * correctionWS->function("e_iso_kit_ratio")->getVal();
+	    isoweight_2_kit = correctionWS->function("m_looseiso_ic_ratio")->getVal()*correctionWS->function("m_id_kit_ratio")->getVal();
 	  }
 	}
 	if (!isEmbedded){
@@ -1149,7 +1155,6 @@ int main(int argc, char * argv[]){
 	//	isoweight_1_kit *= trkeffweight_1_kit;
 	//	isoweight_2_kit *= trkeffweight_2_kit;
 	// KIT SF
-
 	/*
 	if (otree->pt_1>50.&&otree->iso_1>0.25) {
 	  std::cout << "pt_1 = " << otree->pt_1 << std::endl;
@@ -1347,7 +1352,7 @@ int main(int argc, char * argv[]){
       otree->weight_CMS_PS_FSR_ggH_13TeVUp   = 1.;
       otree->weight_CMS_PS_FSR_ggH_13TeVDown = 1.;
 
-      if(isHiggs){
+      if(isHiggs || isMSSMsignal){
 	otree->weight_CMS_PS_ISR_ggH_13TeVUp   = analysisTree.gen_pythiaweights[6];
 	otree->weight_CMS_PS_ISR_ggH_13TeVDown = analysisTree.gen_pythiaweights[8];
 	otree->weight_CMS_PS_FSR_ggH_13TeVUp   = analysisTree.gen_pythiaweights[7];
@@ -1368,33 +1373,83 @@ int main(int argc, char * argv[]){
       // ************************
       // QCD background weights *
       // ************************
+      otree->qcdweight_deltaR = 1.0;
+
+      otree->qcdweight_deltaR_0jet_Par0_up = 1.0;
+      otree->qcdweight_deltaR_0jet_Par0_down = 1.0;
+      otree->qcdweight_deltaR_0jet_Par1_up = 1.0;
+      otree->qcdweight_deltaR_0jet_Par1_down = 1.0;
+      otree->qcdweight_deltaR_0jet_Par2_up = 1.0;
+      otree->qcdweight_deltaR_0jet_Par2_down = 1.0;
+
+      otree->qcdweight_deltaR_1jet_Par0_up = 1.0;
+      otree->qcdweight_deltaR_1jet_Par0_down = 1.0;
+      otree->qcdweight_deltaR_1jet_Par1_up = 1.0;
+      otree->qcdweight_deltaR_1jet_Par1_down = 1.0;
+      otree->qcdweight_deltaR_1jet_Par2_up = 1.0;
+      otree->qcdweight_deltaR_1jet_Par2_down = 1.0;
+
+      otree->qcdweight_deltaR_2jet_Par0_up = 1.0;
+      otree->qcdweight_deltaR_2jet_Par0_down = 1.0;
+      otree->qcdweight_deltaR_2jet_Par1_up = 1.0;
+      otree->qcdweight_deltaR_2jet_Par1_down = 1.0;
+      otree->qcdweight_deltaR_2jet_Par2_up = 1.0;
+      otree->qcdweight_deltaR_2jet_Par2_down = 1.0;
+
+      
+
       if(otree->njets==0){
 	otree->qcdweight_deltaR =OS_SS_njet0->Eval(otree->dr_tt);
-	otree->qcdweight_deltaR_Par0_up =  OS_SS_njet0_Par0_UP->Eval(otree->dr_tt);
-	otree->qcdweight_deltaR_Par0_down =  OS_SS_njet0_Par0_DOWN->Eval(otree->dr_tt);
-	otree->qcdweight_deltaR_Par1_up =  OS_SS_njet0_Par1_UP->Eval(otree->dr_tt);
-	otree->qcdweight_deltaR_Par1_down =  OS_SS_njet0_Par1_DOWN->Eval(otree->dr_tt);
-	otree->qcdweight_deltaR_Par2_up =  OS_SS_njet0_Par2_UP->Eval(otree->dr_tt);
-	otree->qcdweight_deltaR_Par2_down =  OS_SS_njet0_Par2_DOWN->Eval(otree->dr_tt);
+	otree->qcdweight_deltaR_0jet_Par0_up =  OS_SS_njet0_Par0_UP->Eval(otree->dr_tt)/otree->qcdweight_deltaR;
+	otree->qcdweight_deltaR_0jet_Par0_down =  OS_SS_njet0_Par0_DOWN->Eval(otree->dr_tt)/otree->qcdweight_deltaR;
+	otree->qcdweight_deltaR_0jet_Par1_up =  OS_SS_njet0_Par1_UP->Eval(otree->dr_tt)/otree->qcdweight_deltaR;
+	otree->qcdweight_deltaR_0jet_Par1_down =  OS_SS_njet0_Par1_DOWN->Eval(otree->dr_tt)/otree->qcdweight_deltaR;
+	otree->qcdweight_deltaR_0jet_Par2_up =  OS_SS_njet0_Par2_UP->Eval(otree->dr_tt)/otree->qcdweight_deltaR;
+	otree->qcdweight_deltaR_0jet_Par2_down =  OS_SS_njet0_Par2_DOWN->Eval(otree->dr_tt)/otree->qcdweight_deltaR;
+	/*
+	std::cout << "qcdweight_deltaR_0jet_Par0_up   = " << otree->qcdweight_deltaR_0jet_Par0_up << std::endl;
+	std::cout << "qcdweight_deltaR_0jet_Par0_down = " << otree->qcdweight_deltaR_0jet_Par0_down << std::endl;
+	std::cout << "qcdweight_deltaR_0jet_Par1_up   = " << otree->qcdweight_deltaR_0jet_Par1_up << std::endl;
+	std::cout << "qcdweight_deltaR_0jet_Par1_down = " << otree->qcdweight_deltaR_0jet_Par1_down << std::endl;
+	std::cout << "qcdweight_deltaR_0jet_Par2_up   = " << otree->qcdweight_deltaR_0jet_Par2_up << std::endl;
+	std::cout << "qcdweight_deltaR_0jet_Par2_down = " << otree->qcdweight_deltaR_0jet_Par2_down << std::endl;
+	*/
+
       }
       else if(otree->njets ==1) {
 	otree->qcdweight_deltaR = OS_SS_njet1->Eval(otree->dr_tt);
-	otree->qcdweight_deltaR_Par0_up =  OS_SS_njet1_Par0_UP->Eval(otree->dr_tt);
-	otree->qcdweight_deltaR_Par0_down =  OS_SS_njet1_Par0_DOWN->Eval(otree->dr_tt);
-	otree->qcdweight_deltaR_Par1_up =  OS_SS_njet1_Par1_UP->Eval(otree->dr_tt);
-	otree->qcdweight_deltaR_Par1_down =  OS_SS_njet1_Par1_DOWN->Eval(otree->dr_tt);
-	otree->qcdweight_deltaR_Par2_up =  OS_SS_njet1_Par2_UP->Eval(otree->dr_tt);
-	otree->qcdweight_deltaR_Par2_down =  OS_SS_njet1_Par2_DOWN->Eval(otree->dr_tt);
+	otree->qcdweight_deltaR_1jet_Par0_up =  OS_SS_njet1_Par0_UP->Eval(otree->dr_tt)/otree->qcdweight_deltaR;
+	otree->qcdweight_deltaR_1jet_Par0_down =  OS_SS_njet1_Par0_DOWN->Eval(otree->dr_tt)/otree->qcdweight_deltaR;
+	otree->qcdweight_deltaR_1jet_Par1_up =  OS_SS_njet1_Par1_UP->Eval(otree->dr_tt)/otree->qcdweight_deltaR;
+	otree->qcdweight_deltaR_1jet_Par1_down =  OS_SS_njet1_Par1_DOWN->Eval(otree->dr_tt)/otree->qcdweight_deltaR;
+	otree->qcdweight_deltaR_1jet_Par2_up =  OS_SS_njet1_Par2_UP->Eval(otree->dr_tt)/otree->qcdweight_deltaR;
+	otree->qcdweight_deltaR_1jet_Par2_down =  OS_SS_njet1_Par2_DOWN->Eval(otree->dr_tt)/otree->qcdweight_deltaR;
+	/*
+	std::cout << "qcdweight_deltaR_1jet_Par0_up   = " << otree->qcdweight_deltaR_1jet_Par0_up << std::endl;
+	std::cout << "qcdweight_deltaR_1jet_Par0_down = " << otree->qcdweight_deltaR_1jet_Par0_down << std::endl;
+	std::cout << "qcdweight_deltaR_1jet_Par1_up   = " << otree->qcdweight_deltaR_1jet_Par1_up << std::endl;
+	std::cout << "qcdweight_deltaR_1jet_Par1_down = " << otree->qcdweight_deltaR_1jet_Par1_down << std::endl;
+	std::cout << "qcdweight_deltaR_1jet_Par2_up   = " << otree->qcdweight_deltaR_1jet_Par2_up << std::endl;
+	std::cout << "qcdweight_deltaR_1jet_Par2_down = " << otree->qcdweight_deltaR_1jet_Par2_down << std::endl;
+	*/
       }
       else {
+
 	otree->qcdweight_deltaR = OS_SS_njetgt1->Eval(otree->dr_tt);
-	otree->qcdweight_deltaR_Par0_up =  OS_SS_njetgt1_Par0_UP->Eval(otree->dr_tt);
-	otree->qcdweight_deltaR_Par0_down =  OS_SS_njetgt1_Par0_DOWN->Eval(otree->dr_tt);
-	otree->qcdweight_deltaR_Par1_up =  OS_SS_njetgt1_Par1_UP->Eval(otree->dr_tt);
-	otree->qcdweight_deltaR_Par1_down =  OS_SS_njetgt1_Par1_DOWN->Eval(otree->dr_tt);
-	otree->qcdweight_deltaR_Par2_up =  OS_SS_njetgt1_Par2_UP->Eval(otree->dr_tt);
-	otree->qcdweight_deltaR_Par2_down =  OS_SS_njetgt1_Par2_DOWN->Eval(otree->dr_tt);
-        
+	otree->qcdweight_deltaR_2jet_Par0_up =  OS_SS_njetgt1_Par0_UP->Eval(otree->dr_tt)/otree->qcdweight_deltaR;
+	otree->qcdweight_deltaR_2jet_Par0_down =  OS_SS_njetgt1_Par0_DOWN->Eval(otree->dr_tt)/otree->qcdweight_deltaR;
+	otree->qcdweight_deltaR_2jet_Par1_up =  OS_SS_njetgt1_Par1_UP->Eval(otree->dr_tt)/otree->qcdweight_deltaR;
+	otree->qcdweight_deltaR_2jet_Par1_down =  OS_SS_njetgt1_Par1_DOWN->Eval(otree->dr_tt)/otree->qcdweight_deltaR;
+	otree->qcdweight_deltaR_2jet_Par2_up =  OS_SS_njetgt1_Par2_UP->Eval(otree->dr_tt)/otree->qcdweight_deltaR;
+	otree->qcdweight_deltaR_2jet_Par2_down =  OS_SS_njetgt1_Par2_DOWN->Eval(otree->dr_tt)/otree->qcdweight_deltaR;
+        /*
+	std::cout << "qcdweight_deltaR_2jet_Par0_up   = " << otree->qcdweight_deltaR_2jet_Par0_up << std::endl;
+	std::cout << "qcdweight_deltaR_2jet_Par0_down = " << otree->qcdweight_deltaR_2jet_Par0_down << std::endl;
+	std::cout << "qcdweight_deltaR_2jet_Par1_up   = " << otree->qcdweight_deltaR_2jet_Par1_up << std::endl;
+	std::cout << "qcdweight_deltaR_2jet_Par1_down = " << otree->qcdweight_deltaR_2jet_Par1_down << std::endl;
+	std::cout << "qcdweight_deltaR_2jet_Par2_up   = " << otree->qcdweight_deltaR_2jet_Par2_up << std::endl;
+	std::cout << "qcdweight_deltaR_2jet_Par2_down = " << otree->qcdweight_deltaR_2jet_Par2_down << std::endl;
+	*/
       }
 
       float pt1 = otree->pt_1;

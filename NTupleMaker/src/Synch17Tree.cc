@@ -460,12 +460,30 @@ void Synch17Tree::ReadInit(TTree *tree, bool em)
 
    if (em) {
      fChain->SetBranchAddress("qcdweight_deltaR", &qcdweight_deltaR, &b_qcdweight_deltaR);
-     fChain->SetBranchAddress("qcdweight_deltaR_Par0_up", &qcdweight_deltaR_Par0_up, &b_qcdweight_deltaR_Par0_up);
-     fChain->SetBranchAddress("qcdweight_deltaR_Par0_down", &qcdweight_deltaR_Par0_down, &b_qcdweight_deltaR_Par0_down);
-     fChain->SetBranchAddress("qcdweight_deltaR_Par1_up", &qcdweight_deltaR_Par1_up, &b_qcdweight_deltaR_Par1_up);
-     fChain->SetBranchAddress("qcdweight_deltaR_Par1_down", &qcdweight_deltaR_Par1_down, &b_qcdweight_deltaR_Par1_down);
-     fChain->SetBranchAddress("qcdweight_deltaR_Par2_up", &qcdweight_deltaR_Par2_up, &b_qcdweight_deltaR_Par2_up);
-     fChain->SetBranchAddress("qcdweight_deltaR_Par2_down", &qcdweight_deltaR_Par2_down, &b_qcdweight_deltaR_Par2_down);
+
+     fChain->SetBranchAddress("qcdweight_deltaR_0jet_Par0_up", &qcdweight_deltaR_0jet_Par0_up, &b_qcdweight_deltaR_0jet_Par0_up);
+     fChain->SetBranchAddress("qcdweight_deltaR_0jet_Par0_down", &qcdweight_deltaR_0jet_Par0_down, &b_qcdweight_deltaR_0jet_Par0_down);
+     fChain->SetBranchAddress("qcdweight_deltaR_0jet_Par1_up", &qcdweight_deltaR_0jet_Par1_up, &b_qcdweight_deltaR_0jet_Par1_up);
+     fChain->SetBranchAddress("qcdweight_deltaR_0jet_Par1_down", &qcdweight_deltaR_0jet_Par1_down, &b_qcdweight_deltaR_0jet_Par1_down);
+     fChain->SetBranchAddress("qcdweight_deltaR_0jet_Par2_up", &qcdweight_deltaR_0jet_Par2_up, &b_qcdweight_deltaR_0jet_Par2_up);
+     fChain->SetBranchAddress("qcdweight_deltaR_0jet_Par2_down", &qcdweight_deltaR_0jet_Par2_down, &b_qcdweight_deltaR_0jet_Par2_down);
+
+     fChain->SetBranchAddress("qcdweight_deltaR_1jet_Par0_up", &qcdweight_deltaR_1jet_Par0_up, &b_qcdweight_deltaR_1jet_Par0_up);
+     fChain->SetBranchAddress("qcdweight_deltaR_1jet_Par0_down", &qcdweight_deltaR_1jet_Par0_down, &b_qcdweight_deltaR_1jet_Par0_down);
+     fChain->SetBranchAddress("qcdweight_deltaR_1jet_Par1_up", &qcdweight_deltaR_1jet_Par1_up, &b_qcdweight_deltaR_1jet_Par1_up);
+     fChain->SetBranchAddress("qcdweight_deltaR_1jet_Par1_down", &qcdweight_deltaR_1jet_Par1_down, &b_qcdweight_deltaR_1jet_Par1_down);
+     fChain->SetBranchAddress("qcdweight_deltaR_1jet_Par2_up", &qcdweight_deltaR_1jet_Par2_up, &b_qcdweight_deltaR_1jet_Par2_up);
+     fChain->SetBranchAddress("qcdweight_deltaR_1jet_Par2_down", &qcdweight_deltaR_1jet_Par2_down, &b_qcdweight_deltaR_1jet_Par2_down);
+
+     fChain->SetBranchAddress("qcdweight_deltaR_2jet_Par0_up", &qcdweight_deltaR_2jet_Par0_up, &b_qcdweight_deltaR_2jet_Par0_up);
+     fChain->SetBranchAddress("qcdweight_deltaR_2jet_Par0_down", &qcdweight_deltaR_2jet_Par0_down, &b_qcdweight_deltaR_2jet_Par0_down);
+     fChain->SetBranchAddress("qcdweight_deltaR_2jet_Par1_up", &qcdweight_deltaR_2jet_Par1_up, &b_qcdweight_deltaR_2jet_Par1_up);
+     fChain->SetBranchAddress("qcdweight_deltaR_2jet_Par1_down", &qcdweight_deltaR_2jet_Par1_down, &b_qcdweight_deltaR_2jet_Par1_down);
+     fChain->SetBranchAddress("qcdweight_deltaR_2jet_Par2_up", &qcdweight_deltaR_2jet_Par2_up, &b_qcdweight_deltaR_2jet_Par2_up);
+     fChain->SetBranchAddress("qcdweight_deltaR_2jet_Par2_down", &qcdweight_deltaR_2jet_Par2_down, &b_qcdweight_deltaR_2jet_Par2_down);
+
+
+
      fChain->SetBranchAddress("qcdweight_nonclosure", &qcdweight_nonclosure, &b_qcdweight_nonclosure);
      fChain->SetBranchAddress("qcdweight_isolationcorrection", &qcdweight_isolationcorrection, &b_qcdweight_isolationcorrection);
      fChain->SetBranchAddress("qcdweight", &qcdweight, &b_qcdweight);
@@ -1194,12 +1212,28 @@ void Synch17Tree::WriteInit(TTree *tree, bool em) {
 
    if (em) {
      fChain->Branch("qcdweight_deltaR",&qcdweight_deltaR,"qcdweight_deltaR/F");
-     fChain->Branch("qcdweight_deltaR_Par0_up",&qcdweight_deltaR_Par0_up,"qcdweight_deltaR_Par0_up/F");
-     fChain->Branch("qcdweight_deltaR_Par0_down",&qcdweight_deltaR_Par0_down,"qcdweight_deltaR_Par0_down/F");
-     fChain->Branch("qcdweight_deltaR_Par1_up",&qcdweight_deltaR_Par1_up,"qcdweight_deltaR_Par1_up/F");
-     fChain->Branch("qcdweight_deltaR_Par1_down",&qcdweight_deltaR_Par1_down,"qcdweight_deltaR_Par1_down/F");
-     fChain->Branch("qcdweight_deltaR_Par2_up",&qcdweight_deltaR_Par2_up,"qcdweight_deltaR_Par2_up/F");
-     fChain->Branch("qcdweight_deltaR_Par2_down",&qcdweight_deltaR_Par2_down,"qcdweight_deltaR_Par2_down/F");
+
+     fChain->Branch("qcdweight_deltaR_0jet_Par0_up",&qcdweight_deltaR_0jet_Par0_up,"qcdweight_deltaR_0jet_Par0_up/F");
+     fChain->Branch("qcdweight_deltaR_0jet_Par0_down",&qcdweight_deltaR_0jet_Par0_down,"qcdweight_deltaR_0jet_Par0_down/F");
+     fChain->Branch("qcdweight_deltaR_0jet_Par1_up",&qcdweight_deltaR_0jet_Par1_up,"qcdweight_deltaR_0jet_Par1_up/F");
+     fChain->Branch("qcdweight_deltaR_0jet_Par1_down",&qcdweight_deltaR_0jet_Par1_down,"qcdweight_deltaR_0jet_Par1_down/F");
+     fChain->Branch("qcdweight_deltaR_0jet_Par2_up",&qcdweight_deltaR_0jet_Par2_up,"qcdweight_deltaR_0jet_Par2_up/F");
+     fChain->Branch("qcdweight_deltaR_0jet_Par2_down",&qcdweight_deltaR_0jet_Par2_down,"qcdweight_deltaR_0jet_Par2_down/F");
+
+     fChain->Branch("qcdweight_deltaR_1jet_Par0_up",&qcdweight_deltaR_1jet_Par0_up,"qcdweight_deltaR_1jet_Par0_up/F");
+     fChain->Branch("qcdweight_deltaR_1jet_Par0_down",&qcdweight_deltaR_1jet_Par0_down,"qcdweight_deltaR_1jet_Par0_down/F");
+     fChain->Branch("qcdweight_deltaR_1jet_Par1_up",&qcdweight_deltaR_1jet_Par1_up,"qcdweight_deltaR_1jet_Par1_up/F");
+     fChain->Branch("qcdweight_deltaR_1jet_Par1_down",&qcdweight_deltaR_1jet_Par1_down,"qcdweight_deltaR_1jet_Par1_down/F");
+     fChain->Branch("qcdweight_deltaR_1jet_Par2_up",&qcdweight_deltaR_1jet_Par2_up,"qcdweight_deltaR_1jet_Par2_up/F");
+     fChain->Branch("qcdweight_deltaR_1jet_Par2_down",&qcdweight_deltaR_1jet_Par2_down,"qcdweight_deltaR_1jet_Par2_down/F");
+
+     fChain->Branch("qcdweight_deltaR_2jet_Par0_up",&qcdweight_deltaR_2jet_Par0_up,"qcdweight_deltaR_2jet_Par0_up/F");
+     fChain->Branch("qcdweight_deltaR_2jet_Par0_down",&qcdweight_deltaR_2jet_Par0_down,"qcdweight_deltaR_2jet_Par0_down/F");
+     fChain->Branch("qcdweight_deltaR_2jet_Par1_up",&qcdweight_deltaR_2jet_Par1_up,"qcdweight_deltaR_2jet_Par1_up/F");
+     fChain->Branch("qcdweight_deltaR_2jet_Par1_down",&qcdweight_deltaR_2jet_Par1_down,"qcdweight_deltaR_2jet_Par1_down/F");
+     fChain->Branch("qcdweight_deltaR_2jet_Par2_up",&qcdweight_deltaR_2jet_Par2_up,"qcdweight_deltaR_2jet_Par2_up/F");
+     fChain->Branch("qcdweight_deltaR_2jet_Par2_down",&qcdweight_deltaR_2jet_Par2_down,"qcdweight_deltaR_2jet_Par2_down/F");
+
      fChain->Branch("qcdweight_nonclosure",&qcdweight_nonclosure,"qcdweight_nonclosure/F");
      fChain->Branch("qcdweight_isolationcorrection",&qcdweight_isolationcorrection,"qcdweight_isolationcorrection/F");
      fChain->Branch("qcdweight",&qcdweight,"qcdweight/F");
