@@ -8,37 +8,44 @@
 using namespace std;
 
 map<TString, double> xsecs = {
-  {"WJetsToLNu"  , 52760*1.166}, // NNLO (1)
-  {"W1JetsToLNu" , 1.166*8104.}, // NNLO (2)
-  {"W2JetsToLNu" , 1.166*2796.}, // NNLO (3)
-  {"W3JetsToLNu" , 1.166*993.5}, // NNLO (4)
-  {"W4JetsToLNu" , 1.166*544.4}, // NNLO (5)
-  {"ZZ" , 12.19},  // LO (17) -> could be improved
-  {"WW" , 118.7},  // NNLO QCD (18)
-  {"WZ" , 27.68},  // LO (19) -> could be improved
+  {"WJetsToLNu"  , 61526.7}, // NNLO (1)
+  {"W1JetsToLNu" , 9370.5}, // NNLO (2)
+  {"W2JetsToLNu" , 3170.9}, // NNLO (3)
+  {"W3JetsToLNu" , 1132.5}, // NNLO (4)
+  {"W4JetsToLNu" , 631.5 }, // NNLO (5)
   {"DYJetsToLL_M-50"       , 6077.22},  // NNLO (20)
-  {"DY1JetsToLL_M-50"      , 878.7*1.079}, // NNLO (20a)
-  {"DY2JetsToLL_M-50"      , 304.4*1.079}, // NNLO (20b)
-  {"DY3JetsToLL_M-50"      , 111.5*1.079}, // NNLO (20c)
-  {"DY4JetsToLL_M-50"      , 44.03*1.079}, // NNLO (20d)
-  {"TT"               , 831.76}, // NNLO (21 inclusive)
+  {"DY1JetsToLL_M-50"      , 977.1}, // NNLO (20a)
+  {"DY2JetsToLL_M-50"      , 347.3}, // NNLO (20b)
+  {"DY3JetsToLL_M-50"      , 126.1}, // NNLO (20c)
+  {"DY4JetsToLL_M-50"      , 71.67}, // NNLO (20d)
   {"TTTo2L2Nu"        , 88.29},  // NNLO (21)
   {"TTToHadronic"     , 377.96}, // NNLO (22)
   {"TTToSemiLeptonic" , 365.35}, // NNLO (23)
-  {"ST_t-channel_top_4f"     , 136.02}, // ? (24) -> could be improved
-  {"ST_t-channel_antitop_4f" , 80.95}, // ? (25) -> could be improved
-  {"ST_tW_top_5f"            , 35.85}, // ? (26) -> could be improved
-  {"ST_tW_antitop_5f"        , 35.85}, // ? (27) -> could be improved
-  {"VVTo2L2Nu"               , 11.95 },
-  {"WWToLNuQQ"               , 49.997 },
-  {"WZTo2L2Q"                , 5.595 },
-  {"WZTo1L1Nu2Q"             , 10.71 },
-  {"WZTo1L3Nu"               , 3.05 },
-  {"WZJToLLLNu"               , 4.708 },
-  {"WZTo3LNu"                 , 4.43 },
-  {"ZZTo4L"                   , 1.212 },
-  {"ZZTo2L2Q"                 , 3.22 },  
+  {"ST_t-channel_top_4f"      , 136.02}, // ? (24) -> could be improved
+  {"ST_t-channel_antitop_4f"  , 80.95}, // ? (25) -> could be improved
+  {"ST_tW_top_5f"             , 35.85}, // ? (26) -> could be improved
+  {"ST_tW_antitop_5f"         , 35.85}, // ? (27) -> could be improved
+  {"VVTo2L2Nu"                , 13.84},
+  {"WWToLNuQQ"                , 49.997},
+  {"WZTo2L2Q"                 , 5.52},
+  {"WZTo1L1Nu2Q"              , 10.71},
+  {"WZTo1L3Nu"                , 3.05},
+  {"WZJToLLLNu"               , 4.708},
+  {"WZTo3LNu"                 , 4.43},
+  {"ZZTo4L"                   , 1.26},
+  {"ZZTo2L2Q"                 , 3.38},
+  {"GluGluHToTauTau_M125"     , 3.00},
+  {"VBFHToTauTau_M125"        , 0.237},
+  {"WplusHToTauTau_M125"      , 0.0527},
+  {"WminusHToTauTau_M125"     , 0.0334},
+  {"ZHToTauTau_M125_13TeV"    , 0.0477},
+  {"GluGluHToWWTo2L2Nu_M125"  , 1.09},
+  {"VBFHToWWTo2L2Nu_M125"     , 0.0850},
+  {"HWminusJ_HToWW_M125"      , 0.114},
+  {"HWplusJ_HToWW_M125"       , 0.18},
+  {"ZHJ_HToWW_M125"           , 0.163}
 };
+
 
 std::vector<TString> SingleMuon_2018 = {
   "SingleMuon_Run2018A",
@@ -150,8 +157,8 @@ std::vector<TString> WJets = {
   "W2JetsToLNu",
   "W3JetsToLNu",
   "W4JetsToLNu"
-}; 
-
+};
+ 
 std::vector<TString> DYJets = {
   "DYJetsToLL_M-50",
   "DY1JetsToLL_M-50",
@@ -179,19 +186,19 @@ std::vector<TString> TT_EXCL = {
 };
 
 std::vector<TString> TT_INCL = {
-  "TT"
+  "TT_INCL"
 };
 
-int nBinsNoBTag = 31;
-float binsNoBTag[32] = 
-  {0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,225,250,275,300,325,350,400,500,700,900,4000};
-
-int nBinsBTag = 17;
-float binsBTag[18] =
-  {0,20,40,60,80,100,120,140,160,180,200,250,300,350,400,500,700,4000};
+TString baseNameBBH = "SUSYGluGluToBBHToTauTau_M-";
+TString baseNameGGH = "SUSYGluGluToHToTauTau_M-"; 
 
 std::vector<TString> masses = {
+  "80",
+  "90",
+  "100",
+  "120",
   "140",
+  "160",
   "180",
   "200",
   "250",
@@ -213,28 +220,78 @@ std::vector<TString> masses = {
   "3200"
 };
 
-std::map<TString,double> Masses = {
-  {"140",140},
-  {"180",180},
-  {"200",200},
-  {"250",250},
-  {"350",350},
-  {"400",400},
-  {"450",450},
-  {"600",600},
-  {"700",700},
-  {"800",800},
-  {"900",900},
-  {"1200",1200},
-  {"1400",1400},
-  {"1600",1600},
-  {"1800",1800},
-  {"2000",2000},
-  {"2300",2300},
-  {"2600",2600},
-  {"2900",2900},
-  {"3200",3200}
+const TString BaseTreeName = "TauCheck"; 
+vector<TString> SystematicsNames = {"",  
+				    "CMS_scale_met_unclustered_13TeVUp",
+				    "CMS_scale_met_unclustered_13TeVDown",
+				    "CMS_scale_met_boson_resolution_13TeVUp",
+				    "CMS_scale_met_boson_resolution_13TeVDown",
+				    "CMS_scale_met_boson_response_13TeVUp",
+				    "CMS_scale_met_boson_response_13TeVDown",
+				    "CMS_htt_boson_reso_met_13TeVUp",
+				    "CMS_htt_boson_reso_met_13TeVDown",
+				    "CMS_htt_boson_scale_met_13TeVUp",
+				    "CMS_htt_boson_scale_met_13TeVDown",
+				    "CMS_eff_b_13TeVUp",
+				    "CMS_eff_b_13TeVDown",
+				    "CMS_eff_mistag_13TeVUp",
+				    "CMS_eff_mistag_13TeVDown",
+				    "CMS_scale_j_FlavorQCD_13TeVUp",
+				    "CMS_scale_j_FlavorQCD_13TeVDown",
+				    "CMS_scale_j_RelativeBal_13TeVUp",
+				    "CMS_scale_j_RelativeBal_13TeVDown",
+				    "CMS_scale_j_HF_13TeVUp",
+				    "CMS_scale_j_HF_13TeVDown",
+				    "CMS_scale_j_BBEC1_13TeVUp",
+				    "CMS_scale_j_BBEC1_13TeVDown",
+				    "CMS_scale_j_EC2_13TeVUp",
+				    "CMS_scale_j_EC2_13TeVDown",
+				    "CMS_scale_j_Absolute_13TeVUp",
+				    "CMS_scale_j_Absolute_13TeVDown",
+				    "CMS_scale_j_Absolute_2016_13TeVUp",
+				    "CMS_scale_j_Absolute_2016_13TeVDown",
+				    "CMS_scale_j_HF_2016_13TeVUp",
+				    "CMS_scale_j_HF_2016_13TeVDown",
+				    "CMS_scale_j_EC2_2016_13TeVUp",
+				    "CMS_scale_j_EC2_2016_13TeVDown",
+				    "CMS_scale_j_RelativeSample_2016_13TeVUp",
+				    "CMS_scale_j_RelativeSample_2016_13TeVDown",
+				    "CMS_scale_j_BBEC1_2016_13TeVUp",
+				    "CMS_scale_j_BBEC1_2016_13TeVDown",
+				    "CMS_scale_j_Absolute_2017_13TeVUp",
+				    "CMS_scale_j_Absolute_2017_13TeVDown",
+				    "CMS_scale_j_HF_2017_13TeVUp",
+				    "CMS_scale_j_HF_2017_13TeVDown",
+				    "CMS_scale_j_EC2_2017_13TeVUp",
+				    "CMS_scale_j_EC2_2017_13TeVDown",
+				    "CMS_scale_j_RelativeSample_2017_13TeVUp",
+				    "CMS_scale_j_RelativeSample_2017_13TeVDown",
+				    "CMS_scale_j_BBEC1_2017_13TeVUp",
+				    "CMS_scale_j_BBEC1_2017_13TeVDown",
+				    "CMS_scale_j_Absolute_2018_13TeVUp",
+				    "CMS_scale_j_Absolute_2018_13TeVDown",
+				    "CMS_scale_j_HF_2018_13TeVUp",
+				    "CMS_scale_j_HF_2018_13TeVDown",
+				    "CMS_scale_j_EC2_2018_13TeVUp",
+				    "CMS_scale_j_EC2_2018_13TeVDown",
+				    "CMS_scale_j_RelativeSample_2018_13TeVUp",
+				    "CMS_scale_j_RelativeSample_2018_13TeVDown",
+				    "CMS_scale_j_BBEC1_2018_13TeVUp",
+				    "CMS_scale_j_BBEC1_2018_13TeVDown",
+				    "CMS_scale_mu_13TeVUp",
+				    "CMS_scale_mu_13TeVDown",
+				    "CMS_scale_e_13TeVUp",
+				    "CMS_scale_e_13TeVDown",
+				    "CMS_res_j_13TeVUp",
+				    "CMS_res_j_13TeVDown"
 };
 
+int nBinsNoBTag = 31;
+float binsNoBTag[32] = 
+  {20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,225,250,275,300,325,350,400,500,700,900,4000};
+
+int nBinsBTag = 17;
+float binsBTag[18] =
+  {20,40,60,80,100,120,140,160,180,200,250,300,350,400,500,700,4000};
 
 #endif

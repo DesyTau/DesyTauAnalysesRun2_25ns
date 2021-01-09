@@ -4,49 +4,42 @@ CHANNEL=em
 echo "CONFIGFILE,FILELIST" > parameters.txt
 
 # data
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_data.conf SingleMuon_Run2018A 10
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_data.conf SingleMuon_Run2018B 10
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_data.conf SingleMuon_Run2018C 10
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_data.conf SingleMuon_Run2018D 10
+./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_data.conf SingleMuon_Run2018A 150
+./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_data.conf SingleMuon_Run2018B 150
+./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_data.conf SingleMuon_Run2018C 150
+./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_data.conf SingleMuon_Run2018D 150
 
 # data
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_data.conf EGamma_Run2018A 10
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_data.conf EGamma_Run2018B 10
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_data.conf EGamma_Run2018C 10
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_data.conf EGamma_Run2018D 10
+./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_data.conf EGamma_Run2018A 150
+./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_data.conf EGamma_Run2018B 150
+./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_data.conf EGamma_Run2018C 150
+./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_data.conf EGamma_Run2018D 150
 
 # data
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_data.conf MuonEG_Run2018A 10
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_data.conf MuonEG_Run2018B 10
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_data.conf MuonEG_Run2018C 10
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_data.conf MuonEG_Run2018D 10
+./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_data.conf MuonEG_Run2018A 150
+./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_data.conf MuonEG_Run2018B 150
+./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_data.conf MuonEG_Run2018C 150
+./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_data.conf MuonEG_Run2018D 150
 
 # Embedded
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_embedded.conf EmbeddedElMu_Run2018A 10
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_embedded.conf EmbeddedElMu_Run2018B 10
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_embedded.conf EmbeddedElMu_Run2018C 10
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_embedded.conf EmbeddedElMu_Run2018D 10
+./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_embedded.conf EmbeddedElMu_Run2018A 4
+./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_embedded.conf EmbeddedElMu_Run2018B 4
+./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_embedded.conf EmbeddedElMu_Run2018C 4
+./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_embedded.conf EmbeddedElMu_Run2018D 4
     
 # DY
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf DYJetsToLL_M-10to50 10
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf DYJetsToLL_M-50 10
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf DY1JetsToLL_M-50 10
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf DY2JetsToLL_M-50 10
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf DY3JetsToLL_M-50 10
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf DY4JetsToLL_M-50 10
+./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf DYJetsToLL_M-50 20
+./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf DY1JetsToLL_M-50 20
+./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf DY2JetsToLL_M-50 20
+./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf DY3JetsToLL_M-50 20
+./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf DY4JetsToLL_M-50 20
 
 # W+jets
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf WJetsToLNu 10
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf W1JetsToLNu 10
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf W2JetsToLNu 10
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf W3JetsToLNu 10
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf W4JetsToLNu 10
-
-# EWK
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf EWKWPlus2Jets_WToLNu_M-50 10
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf EWKWMinus2Jets_WToLNu_M-50 10
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf EWKZ2Jets_ZToLL_M-50 10
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf EWKZ2Jets_ZToNuNu 10
+./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf WJetsToLNu 20
+./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf W1JetsToLNu 20
+./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf W2JetsToLNu 20
+./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf W3JetsToLNu 20
+./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf W4JetsToLNu 20
 
 # Exclusive VV
 ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf VVTo2L2Nu 10
@@ -66,6 +59,20 @@ echo "CONFIGFILE,FILELIST" > parameters.txt
 ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf ST_t-channel_top_4f 10
 ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf ST_tW_antitop_5f 10
 ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf ST_tW_top_5f 10
+
+# H->WW
+./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf GluGluHToWWTo2L2Nu_M125 10
+./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf VBFHToWWTo2L2Nu_M125 10
+./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf HWminusJ_HToWW_M125 10
+./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf HWplusJ_HToWW_M125 10
+./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf ZHJ_HToWW_M125 10
+
+# H->tautau
+./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf GluGluHToTauTau_M125 10
+./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf VBFHToTauTau_M125 10
+./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf WplusHToTauTau_M125 10
+./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf WminusHToTauTau_M125 10
+./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf ZHToTauTau_M125_13TeV 10
 
 # SUSY_ggH
 for j in $(less list_SUSY_ggH_2018);

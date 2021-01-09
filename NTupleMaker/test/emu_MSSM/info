@@ -1,0 +1,1809 @@
+processing era 2016 with trigger option : 2
+     processing category em_inclusive
+Top : 112222
+EWK : 23443.4
+W   : 3776.5
+QCD : 24070.7
+ZLL : 2882.55
+ZTT : 129083
+
+Model : 295517
+Data  : 291452
+ratio = 0.986245
+
+
+Chi2 = 733884
+
+
+Signal yields for 1 pb... 
+mass = 110 :   bbH = 166.553  ggH = 167.13
+mass = 120 :   bbH = 210.986  ggH = 203.943
+mass = 130 :   bbH = 250.809  ggH = 247.953
+mass = 140 :   bbH = 302.617  ggH = 276.682
+mass = 160 :   bbH = 367.622  ggH = 340.698
+mass = 180 :   bbH = 420.153  ggH = 398.83
+mass = 200 :   bbH = 465.658  ggH = 465.008
+mass = 250 :   bbH = 624.6  ggH = 567.766
+mass = 300 :   bbH ------   ggH = 661.641
+mass = 350 :   bbH = 760.213  ggH = 746.653
+mass = 400 :   bbH = 803.628  ggH = 808.256
+mass = 450 :   bbH = 871.513  ggH = 881.808
+mass = 500 :   bbH = 948.539  ggH = 940.362
+mass = 600 :   bbH = 988.373  ggH = 1010.53
+mass = 700 :   bbH = 1047.73  ggH = 1037.98
+mass = 800 :   bbH = 1165.95  ggH = 1104.76
+mass = 900 :   bbH = 1135.47  ggH = 1172.35
+mass = 1000 :   bbH = 1121.16  ggH = 1144.75
+mass = 1200 :   bbH = 1206.95  ggH = 1188.24
+mass = 1400 :   bbH = 1227.35  ggH = 1231.28
+mass = 1600 :   bbH = 1230.53  ggH = 1247.62
+mass = 1800 :   bbH = 1228.46  ggH = 1284.14
+mass = 2000 :   bbH = 1269.27  ggH = 1247.39
+mass = 2300 :   bbH = 1208.03  ggH = 1264.55
+mass = 2600 :   bbH = 1316.65  ggH = 1268.64
+mass = 2900 :   bbH = 1256.35  ggH = 1339.61
+mass = 3200 :   bbH = 1234.37  ggH = 1308.18
+     processing category em_btag
+Top : 95133.1
+EWK : 7166.97
+W   : 224.44
+QCD : 909.924
+ZLL : 100.996
+ZTT : 4603.67
+
+Model : 108391
+Data  : 101702
+ratio = 0.938291
+
+
+Chi2 = 721.319
+
+
+Signal yields for 1 pb... 
+mass = 110 :   bbH = 44.9088  ggH = 5.86508
+mass = 120 :   bbH = 61.3224  ggH = 6.33842
+mass = 130 :   bbH = 73.4309  ggH = 8.86882
+mass = 140 :   bbH = 86.9515  ggH = 10.3481
+mass = 160 :   bbH = 112.882  ggH = 12.3543
+mass = 180 :   bbH = 124.298  ggH = 16.0673
+mass = 200 :   bbH = 144.033  ggH = 17.011
+mass = 250 :   bbH = 233.515  ggH = 24.3682
+mass = 300 :   bbH ------   ggH = 28.1958
+mass = 350 :   bbH = 299.955  ggH = 35.2306
+mass = 400 :   bbH = 342.189  ggH = 41.7009
+mass = 450 :   bbH = 390.837  ggH = 47.07
+mass = 500 :   bbH = 420.637  ggH = 51.4886
+mass = 600 :   bbH = 457.728  ggH = 53.8883
+mass = 700 :   bbH = 557.648  ggH = 69.1132
+mass = 800 :   bbH = 562.15  ggH = 68.4806
+mass = 900 :   bbH = 567.187  ggH = 80.1124
+mass = 1000 :   bbH = 524.216  ggH = 79.6654
+mass = 1200 :   bbH = 589.805  ggH = 89.6551
+mass = 1400 :   bbH = 645.696  ggH = 99.2934
+mass = 1600 :   bbH = 630.079  ggH = 89.9819
+mass = 1800 :   bbH = 613.336  ggH = 103.082
+mass = 2000 :   bbH = 665.661  ggH = 101.462
+mass = 2300 :   bbH = 583.493  ggH = 102.313
+mass = 2600 :   bbH = 691.795  ggH = 114.913
+mass = 2900 :   bbH = 700.104  ggH = 122.094
+mass = 3200 :   bbH = 688.113  ggH = 116.786
+     processing category em_nobtag
+Top : 17089.1
+EWK : 16276.5
+W   : 3552.05
+QCD : 23160.8
+ZLL : 2781.56
+ZTT : 124480
+
+Model : 187359
+Data  : 189750
+ratio = 1.01276
+
+
+Chi2 = 2.33333e+06
+
+
+Signal yields for 1 pb... 
+mass = 110 :   bbH = 121.95  ggH = 161.265
+mass = 120 :   bbH = 149.664  ggH = 197.604
+mass = 130 :   bbH = 177.379  ggH = 239.084
+mass = 140 :   bbH = 215.665  ggH = 266.334
+mass = 160 :   bbH = 254.741  ggH = 328.344
+mass = 180 :   bbH = 295.855  ggH = 382.762
+mass = 200 :   bbH = 321.625  ggH = 447.997
+mass = 250 :   bbH = 391.326  ggH = 543.398
+mass = 300 :   bbH ------   ggH = 633.445
+mass = 350 :   bbH = 460.309  ggH = 711.423
+mass = 400 :   bbH = 462.001  ggH = 766.555
+mass = 450 :   bbH = 479.695  ggH = 834.738
+mass = 500 :   bbH = 528.956  ggH = 888.874
+mass = 600 :   bbH = 530.954  ggH = 956.639
+mass = 700 :   bbH = 490.165  ggH = 968.868
+mass = 800 :   bbH = 603.715  ggH = 1036.28
+mass = 900 :   bbH = 570.832  ggH = 1092.24
+mass = 1000 :   bbH = 599.506  ggH = 1065.08
+mass = 1200 :   bbH = 616.753  ggH = 1098.58
+mass = 1400 :   bbH = 583.553  ggH = 1131.99
+mass = 1600 :   bbH = 600.79  ggH = 1157.64
+mass = 1800 :   bbH = 618.41  ggH = 1181.06
+mass = 2000 :   bbH = 603.314  ggH = 1145.93
+mass = 2300 :   bbH = 626.728  ggH = 1162.23
+mass = 2600 :   bbH = 628.127  ggH = 1153.72
+mass = 2900 :   bbH = 558.049  ggH = 1217.52
+mass = 3200 :   bbH = 547.665  ggH = 1191.4
+     processing category em_nobtag_highmsv
+Top : 7267.15
+EWK : 5198.49
+W   : 513.41
+QCD : 1542.94
+ZLL : 87.6334
+ZTT : 2412.23
+
+Model : 17053.7
+Data  : 17256
+ratio = 1.01186
+
+
+Chi2 = 10879.4
+
+
+Signal yields for 1 pb... 
+mass = 110 :   bbH = 3.02075  ggH = 0.525729
+mass = 120 :   bbH = 2.57924  ggH = 2.40122
+mass = 130 :   bbH = 4.22146  ggH = 2.89719
+mass = 140 :   bbH = 6.20029  ggH = 4.69351
+mass = 160 :   bbH = 12.6917  ggH = 9.73598
+mass = 180 :   bbH = 17.3767  ggH = 16.6719
+mass = 200 :   bbH = 35.5605  ggH = 33.9761
+mass = 250 :   bbH = 103.659  ggH = 151.956
+mass = 300 :   bbH ------   ggH = 332.961
+mass = 350 :   bbH = 279.486  ggH = 481.96
+mass = 400 :   bbH = 320.758  ggH = 585.726
+mass = 450 :   bbH = 403.612  ggH = 711.491
+mass = 500 :   bbH = 469.064  ggH = 784.35
+mass = 600 :   bbH = 500.536  ggH = 875.606
+mass = 700 :   bbH = 467.717  ggH = 924.81
+mass = 800 :   bbH = 583.242  ggH = 998.388
+mass = 900 :   bbH = 549.722  ggH = 1074.24
+mass = 1000 :   bbH = 586.328  ggH = 1048.91
+mass = 1200 :   bbH = 615.831  ggH = 1083.35
+mass = 1400 :   bbH = 580.181  ggH = 1119.54
+mass = 1600 :   bbH = 599.33  ggH = 1146.91
+mass = 1800 :   bbH = 616.671  ggH = 1175.42
+mass = 2000 :   bbH = 601.246  ggH = 1143.12
+mass = 2300 :   bbH = 621.666  ggH = 1160.41
+mass = 2600 :   bbH = 626.032  ggH = 1151.18
+mass = 2900 :   bbH = 557.034  ggH = 1216.78
+mass = 3200 :   bbH = 548.006  ggH = 1189.45
+     processing category em_ttbar_control
+Top : 238143
+EWK : 52215.1
+W   : 6267.98
+QCD : 6737.39
+ZLL : 780.999
+ZTT : 7296.49
+
+Model : 311441
+Data  : 300377
+ratio = 0.964474
+
+
+Chi2 = 2253.25
+
+
+Signal yields for 1 pb... 
+mass = 110 :   bbH = 12.1685  ggH = 12.3069
+mass = 120 :   bbH = 14.0168  ggH = 15.3163
+mass = 130 :   bbH = 13.9327  ggH = 17.9046
+mass = 140 :   bbH = 18.3644  ggH = 19.0573
+mass = 160 :   bbH = 20.0183  ggH = 22.7349
+mass = 180 :   bbH = 24.5602  ggH = 24.4252
+mass = 200 :   bbH = 32.8664  ggH = 26.035
+mass = 250 :   bbH = 40.5605  ggH = 29.9564
+mass = 300 :   bbH ------   ggH = 38.9191
+mass = 350 :   bbH = 55.7793  ggH = 46.3975
+mass = 400 :   bbH = 63.0713  ggH = 50.4995
+mass = 450 :   bbH = 61.8626  ggH = 48.3771
+mass = 500 :   bbH = 68.2328  ggH = 51.5467
+mass = 600 :   bbH = 60.4139  ggH = 61.6909
+mass = 700 :   bbH = 63.2176  ggH = 55.0471
+mass = 800 :   bbH = 84.4924  ggH = 62.7537
+mass = 900 :   bbH = 53.6648  ggH = 72.381
+mass = 1000 :   bbH = 74.2944  ggH = 73.1021
+mass = 1200 :   bbH = 111.781  ggH = 73.2198
+mass = 1400 :   bbH = 101.787  ggH = 68.7507
+mass = 1600 :   bbH = 99.9654  ggH = 86.5489
+mass = 1800 :   bbH = 113.014  ggH = 87.5703
+mass = 2000 :   bbH = 118.789  ggH = 88.3411
+mass = 2300 :   bbH = 125.771  ggH = 85.7795
+mass = 2600 :   bbH = 127.216  ggH = 94.7866
+mass = 2900 :   bbH = 106.018  ggH = 96.5613
+mass = 3200 :   bbH = 144.988  ggH = 89.1708
+     processing category em_nobtag_highdzeta
+Top : 4447.42
+EWK : 2300.28
+W   : 239.525
+QCD : 652.009
+ZLL : 66.595
+ZTT : 5142.53
+
+Model : 12859.8
+Data  : 13037
+ratio = 1.01378
+
+
+Chi2 = 25592.1
+
+
+Signal yields for 1 pb... 
+mass = 110 :   bbH = 6.38599  ggH = 19.9686
+mass = 120 :   bbH = 6.54822  ggH = 26.3655
+mass = 130 :   bbH = 9.10287  ggH = 31.0801
+mass = 140 :   bbH = 8.43536  ggH = 34.0753
+mass = 160 :   bbH = 18.3746  ggH = 48.4202
+mass = 180 :   bbH = 14.5636  ggH = 57.0608
+mass = 200 :   bbH = 35.2431  ggH = 67.8347
+mass = 250 :   bbH = 36.5235  ggH = 94.0876
+mass = 300 :   bbH ------   ggH = 122.322
+mass = 350 :   bbH = 63.6458  ggH = 161.881
+mass = 400 :   bbH = 80.6996  ggH = 174.567
+mass = 450 :   bbH = 83.5546  ggH = 201.893
+mass = 500 :   bbH = 98.9017  ggH = 237.702
+mass = 600 :   bbH = 127.62  ggH = 270.082
+mass = 700 :   bbH = 137.908  ggH = 283.218
+mass = 800 :   bbH = 177.639  ggH = 316.973
+mass = 900 :   bbH = 118.509  ggH = 342.191
+mass = 1000 :   bbH = 148.528  ggH = 358.001
+mass = 1200 :   bbH = 194.255  ggH = 383.026
+mass = 1400 :   bbH = 201.974  ggH = 443.205
+mass = 1600 :   bbH = 211.722  ggH = 445.891
+mass = 1800 :   bbH = 205.024  ggH = 475.326
+mass = 2000 :   bbH = 234.365  ggH = 475.985
+mass = 2300 :   bbH = 230.969  ggH = 500.836
+mass = 2600 :   bbH = 239.356  ggH = 511.321
+mass = 2900 :   bbH = 215.568  ggH = 547.195
+mass = 3200 :   bbH = 224.472  ggH = 514.634
+     processing category em_nobtag_mediumdzeta
+Top : 6453.98
+EWK : 6034.01
+W   : 1347.52
+QCD : 11929.1
+ZLL : 1564.15
+ZTT : 82461.5
+
+Model : 109791
+Data  : 111940
+ratio = 1.01958
+
+
+Chi2 = 2.76846e+06
+
+
+Signal yields for 1 pb... 
+mass = 110 :   bbH = 77.9325  ggH = 94.6587
+mass = 120 :   bbH = 94.7203  ggH = 118.999
+mass = 130 :   bbH = 117.869  ggH = 143.319
+mass = 140 :   bbH = 144.364  ggH = 164.192
+mass = 160 :   bbH = 166.841  ggH = 198.475
+mass = 180 :   bbH = 196.461  ggH = 231.863
+mass = 200 :   bbH = 210.676  ggH = 280.233
+mass = 250 :   bbH = 258.051  ggH = 335.686
+mass = 300 :   bbH ------   ggH = 384.481
+mass = 350 :   bbH = 279.966  ggH = 408.084
+mass = 400 :   bbH = 282.519  ggH = 445.499
+mass = 450 :   bbH = 289.358  ggH = 469.123
+mass = 500 :   bbH = 340.973  ggH = 499.619
+mass = 600 :   bbH = 289.226  ggH = 525.321
+mass = 700 :   bbH = 254.269  ggH = 522.099
+mass = 800 :   bbH = 339.326  ggH = 545.408
+mass = 900 :   bbH = 329.503  ggH = 560.789
+mass = 1000 :   bbH = 345.391  ggH = 542.974
+mass = 1200 :   bbH = 308.076  ggH = 545.71
+mass = 1400 :   bbH = 281.72  ggH = 520.08
+mass = 1600 :   bbH = 302.867  ggH = 542.561
+mass = 1800 :   bbH = 323.324  ggH = 545.057
+mass = 2000 :   bbH = 290.374  ggH = 538.256
+mass = 2300 :   bbH = 279.339  ggH = 497.762
+mass = 2600 :   bbH = 309.579  ggH = 482.655
+mass = 2900 :   bbH = 271.734  ggH = 503.811
+mass = 3200 :   bbH = 229.536  ggH = 519.158
+     processing category em_nobtag_lowdzeta
+Top : 6187.71
+EWK : 7942.18
+W   : 1965.01
+QCD : 10579.7
+ZLL : 1150.82
+ZTT : 36875.6
+
+Model : 64773.4
+Data  : 64773
+ratio = 0.999994
+
+
+Chi2 = 392050
+
+
+Signal yields for 1 pb... 
+mass = 110 :   bbH = 37.6619  ggH = 46.6378
+mass = 120 :   bbH = 49.0902  ggH = 52.2399
+mass = 130 :   bbH = 50.7003  ggH = 64.6854
+mass = 140 :   bbH = 63.7031  ggH = 68.0665
+mass = 160 :   bbH = 69.7234  ggH = 81.4485
+mass = 180 :   bbH = 85.0553  ggH = 93.8388
+mass = 200 :   bbH = 77.2189  ggH = 99.9293
+mass = 250 :   bbH = 97.43  ggH = 113.624
+mass = 300 :   bbH ------   ggH = 126.642
+mass = 350 :   bbH = 118.709  ggH = 141.458
+mass = 400 :   bbH = 108.423  ggH = 146.489
+mass = 450 :   bbH = 112.913  ggH = 163.723
+mass = 500 :   bbH = 96.7512  ggH = 151.553
+mass = 600 :   bbH = 116.18  ggH = 161.236
+mass = 700 :   bbH = 107.424  ggH = 163.552
+mass = 800 :   bbH = 94.2344  ggH = 173.901
+mass = 900 :   bbH = 129.152  ggH = 189.26
+mass = 1000 :   bbH = 108.084  ggH = 164.107
+mass = 1200 :   bbH = 123.145  ggH = 169.847
+mass = 1400 :   bbH = 102.211  ggH = 168.704
+mass = 1600 :   bbH = 90.596  ggH = 169.184
+mass = 1800 :   bbH = 94.3783  ggH = 160.675
+mass = 2000 :   bbH = 82.7253  ggH = 131.688
+mass = 2300 :   bbH = 123.676  ggH = 163.636
+mass = 2600 :   bbH = 86.6388  ggH = 159.748
+mass = 2900 :   bbH = 75.2761  ggH = 166.515
+mass = 3200 :   bbH = 95.3724  ggH = 157.604
+     processing category em_nobtag_highmsv_highdzeta
+Top : 3212.17
+EWK : 1663.94
+W   : 124.538
+QCD : 270.423
+ZLL : 16.7053
+ZTT : 1016.57
+
+Model : 6322.04
+Data  : 6472
+ratio = 1.02372
+
+
+Chi2 = 2788.69
+
+
+Signal yields for 1 pb... 
+mass = 110 :   bbH = 1.82294  ggH = 0.158145
+mass = 120 :   bbH = 1.79046  ggH = 1.37818
+mass = 130 :   bbH = 3.40375  ggH = 2.03726
+mass = 140 :   bbH = 3.38993  ggH = 3.06311
+mass = 160 :   bbH = 7.77517  ggH = 4.65316
+mass = 180 :   bbH = 7.23083  ggH = 7.05939
+mass = 200 :   bbH = 17.1769  ggH = 14.2055
+mass = 250 :   bbH = 24.3125  ggH = 51.1861
+mass = 300 :   bbH ------   ggH = 100.907
+mass = 350 :   bbH = 54.1895  ggH = 147.025
+mass = 400 :   bbH = 78.083  ggH = 165.366
+mass = 450 :   bbH = 75.5655  ggH = 196.181
+mass = 500 :   bbH = 92.5131  ggH = 232.709
+mass = 600 :   bbH = 119.43  ggH = 264.317
+mass = 700 :   bbH = 133.873  ggH = 279.339
+mass = 800 :   bbH = 172.461  ggH = 313.137
+mass = 900 :   bbH = 116.298  ggH = 342.191
+mass = 1000 :   bbH = 146.699  ggH = 357.11
+mass = 1200 :   bbH = 194.425  ggH = 381.633
+mass = 1400 :   bbH = 199.627  ggH = 440.471
+mass = 1600 :   bbH = 212.216  ggH = 444.004
+mass = 1800 :   bbH = 205.617  ggH = 474.464
+mass = 2000 :   bbH = 234.571  ggH = 475.378
+mass = 2300 :   bbH = 229.33  ggH = 500.209
+mass = 2600 :   bbH = 237.927  ggH = 510.654
+mass = 2900 :   bbH = 214.749  ggH = 547.195
+mass = 3200 :   bbH = 223.727  ggH = 514.288
+     processing category em_nobtag_highmsv_mediumdzeta
+Top : 2538.43
+EWK : 2065.67
+W   : 238.878
+QCD : 1004.56
+ZLL : 51.3158
+ZTT : 1297.9
+
+Model : 7197.07
+Data  : 7157
+ratio = 0.994433
+
+
+Chi2 = 10335.2
+
+
+Signal yields for 1 pb... 
+mass = 110 :   bbH = 1.40527  ggH = 0.287514
+mass = 120 :   bbH = 1.02123  ggH = 1.02303
+mass = 130 :   bbH = 0.897648  ggH = 0.859931
+mass = 140 :   bbH = 3.26941  ggH = 1.6304
+mass = 160 :   bbH = 5.17794  ggH = 5.08282
+mass = 180 :   bbH = 10.105  ggH = 9.45135
+mass = 200 :   bbH = 18.7064  ggH = 19.2545
+mass = 250 :   bbH = 67.8616  ggH = 88.3519
+mass = 300 :   bbH ------   ggH = 184.155
+mass = 350 :   bbH = 160.635  ggH = 257.07
+mass = 400 :   bbH = 177.685  ggH = 317.969
+mass = 450 :   bbH = 240.081  ggH = 379.975
+mass = 500 :   bbH = 289.692  ggH = 424.645
+mass = 600 :   bbH = 275.697  ggH = 463.515
+mass = 700 :   bbH = 235.498  ggH = 490.445
+mass = 800 :   bbH = 324.525  ggH = 519.223
+mass = 900 :   bbH = 316.682  ggH = 545.83
+mass = 1000 :   bbH = 337.678  ggH = 529.578
+mass = 1200 :   bbH = 304.116  ggH = 535.091
+mass = 1400 :   bbH = 281.18  ggH = 511.919
+mass = 1600 :   bbH = 300.808  ggH = 534.45
+mass = 1800 :   bbH = 320.467  ggH = 541.758
+mass = 2000 :   bbH = 289.266  ggH = 536.057
+mass = 2300 :   bbH = 277.109  ggH = 496.564
+mass = 2600 :   bbH = 308.286  ggH = 480.781
+mass = 2900 :   bbH = 270.914  ggH = 503.07
+mass = 3200 :   bbH = 229.781  ggH = 517.562
+     processing category em_nobtag_highmsv_lowdzeta
+Top : 1516.54
+EWK : 1468.88
+W   : 149.993
+QCD : 267.945
+ZLL : 19.6123
+ZTT : 97.7611
+
+Model : 3646.18
+Data  : 3627
+ratio = 0.994739
+
+
+Chi2 = 549.949
+
+
+Signal yields for 1 pb... 
+mass = 110 :   bbH = 0.0657351  ggH = 0.0800703
+mass = 120 :   bbH = 0.0630068  ggH = 0
+mass = 130 :   bbH = 0.0809933  ggH = 0
+mass = 140 :   bbH = 0.0718325  ggH = 0
+mass = 160 :   bbH = 0.0465419  ggH = 0
+mass = 180 :   bbH = 0.257644  ggH = 0.161164
+mass = 200 :   bbH = 1.16254  ggH = 0.516057
+mass = 250 :   bbH = 12.7522  ggH = 12.4185
+mass = 300 :   bbH ------   ggH = 47.8985
+mass = 350 :   bbH = 67.1679  ggH = 77.8638
+mass = 400 :   bbH = 75.6651  ggH = 102.391
+mass = 450 :   bbH = 91.6119  ggH = 135.335
+mass = 500 :   bbH = 93.9592  ggH = 126.996
+mass = 600 :   bbH = 109.725  ggH = 147.774
+mass = 700 :   bbH = 103.187  ggH = 155.025
+mass = 800 :   bbH = 90.4397  ggH = 166.028
+mass = 900 :   bbH = 123.108  ggH = 186.22
+mass = 1000 :   bbH = 104.111  ggH = 162.224
+mass = 1200 :   bbH = 123.025  ggH = 166.627
+mass = 1400 :   bbH = 100.876  ggH = 167.145
+mass = 1600 :   bbH = 89.7272  ggH = 168.454
+mass = 1800 :   bbH = 93.968  ggH = 159.202
+mass = 2000 :   bbH = 82.2577  ggH = 131.688
+mass = 2300 :   bbH = 121.848  ggH = 163.636
+mass = 2600 :   bbH = 86.4642  ggH = 159.748
+mass = 2900 :   bbH = 74.8292  ggH = 166.515
+mass = 3200 :   bbH = 94.9378  ggH = 157.604
+     processing category em_btag_highdzeta
+Top : 26208.4
+EWK : 1896.63
+W   : 27.8112
+QCD : -105.764
+ZLL : 7.96363
+ZTT : 753.835
+
+Model : 28930.2
+Data  : 27405
+ratio = 0.947279
+
+
+Chi2 = 114.281
+
+
+Signal yields for 1 pb... 
+mass = 110 :   bbH = 4.96462  ggH = 2.36241
+mass = 120 :   bbH = 3.33674  ggH = 1.28531
+mass = 130 :   bbH = 9.83529  ggH = 3.07241
+mass = 140 :   bbH = 9.79539  ggH = 3.07549
+mass = 160 :   bbH = 12.9723  ggH = 3.6425
+mass = 180 :   bbH = 15.3096  ggH = 4.58157
+mass = 200 :   bbH = 25.4286  ggH = 4.40076
+mass = 250 :   bbH = 48.5017  ggH = 9.70836
+mass = 300 :   bbH ------   ggH = 9.83317
+mass = 350 :   bbH = 61.5396  ggH = 13.7204
+mass = 400 :   bbH = 82.2527  ggH = 18.1472
+mass = 450 :   bbH = 98.3179  ggH = 16.0486
+mass = 500 :   bbH = 120.873  ggH = 21.3732
+mass = 600 :   bbH = 138.726  ggH = 23.2544
+mass = 700 :   bbH = 201.241  ggH = 37.443
+mass = 800 :   bbH = 215.266  ggH = 34.7726
+mass = 900 :   bbH = 233.787  ggH = 50.7369
+mass = 1000 :   bbH = 227.033  ggH = 41.5657
+mass = 1200 :   bbH = 270.778  ggH = 43.1518
+mass = 1400 :   bbH = 274.222  ggH = 51.4935
+mass = 1600 :   bbH = 302.613  ggH = 51.1539
+mass = 1800 :   bbH = 297.338  ggH = 54.8707
+mass = 2000 :   bbH = 378.594  ggH = 57.4298
+mass = 2300 :   bbH = 288.821  ggH = 55.8805
+mass = 2600 :   bbH = 444.341  ggH = 69.6127
+mass = 2900 :   bbH = 406.18  ggH = 78.0386
+mass = 3200 :   bbH = 375.149  ggH = 67.6814
+     processing category em_btag_mediumdzeta
+Top : 35567
+EWK : 2705.92
+W   : 82.5135
+QCD : 545.006
+ZLL : 52.2816
+ZTT : 2444.43
+
+Model : 41455.8
+Data  : 38954
+ratio = 0.939651
+
+
+Chi2 = 570.68
+
+
+Signal yields for 1 pb... 
+mass = 110 :   bbH = 27.587  ggH = 2.21487
+mass = 120 :   bbH = 35.7807  ggH = 3.01841
+mass = 130 :   bbH = 44.4966  ggH = 3.59803
+mass = 140 :   bbH = 51.4031  ggH = 4.59079
+mass = 160 :   bbH = 72.0294  ggH = 6.62712
+mass = 180 :   bbH = 75.2709  ggH = 8.18779
+mass = 200 :   bbH = 83.3974  ggH = 8.66801
+mass = 250 :   bbH = 124.315  ggH = 11.8063
+mass = 300 :   bbH ------   ggH = 13.474
+mass = 350 :   bbH = 187.675  ggH = 15.8256
+mass = 400 :   bbH = 192.329  ggH = 18.0544
+mass = 450 :   bbH = 204.723  ggH = 24.0388
+mass = 500 :   bbH = 242.099  ggH = 22.485
+mass = 600 :   bbH = 236.81  ggH = 21.6232
+mass = 700 :   bbH = 279.947  ggH = 21.875
+mass = 800 :   bbH = 255.378  ggH = 25.7448
+mass = 900 :   bbH = 262.615  ggH = 27.6726
+mass = 1000 :   bbH = 218.152  ggH = 28.3876
+mass = 1200 :   bbH = 240.788  ggH = 34.1621
+mass = 1400 :   bbH = 260.83  ggH = 32.7186
+mass = 1600 :   bbH = 238.103  ggH = 30.6749
+mass = 1800 :   bbH = 243.679  ggH = 34.8163
+mass = 2000 :   bbH = 207.044  ggH = 30.9152
+mass = 2300 :   bbH = 242.299  ggH = 32.9938
+mass = 2600 :   bbH = 184.901  ggH = 36.7199
+mass = 2900 :   bbH = 200.151  ggH = 31.5808
+mass = 3200 :   bbH = 230.652  ggH = 34.2834
+     processing category em_btag_lowdzeta
+Top : 33357.7
+EWK : 2564.42
+W   : 114.116
+QCD : 470.51
+ZLL : 40.7504
+ZTT : 1405.4
+
+Model : 38093.5
+Data  : 35343
+ratio = 0.927797
+
+
+Chi2 = 191.854
+
+
+Signal yields for 1 pb... 
+mass = 110 :   bbH = 12.3572  ggH = 1.2878
+mass = 120 :   bbH = 22.3791  ggH = 2.0347
+mass = 130 :   bbH = 19.1795  ggH = 2.19838
+mass = 140 :   bbH = 26.0213  ggH = 2.68181
+mass = 160 :   bbH = 28.0028  ggH = 2.08472
+mass = 180 :   bbH = 33.8203  ggH = 3.2979
+mass = 200 :   bbH = 35.3526  ggH = 3.94223
+mass = 250 :   bbH = 60.7349  ggH = 2.85345
+mass = 300 :   bbH ------   ggH = 4.88863
+mass = 350 :   bbH = 51.0011  ggH = 5.68469
+mass = 400 :   bbH = 70.6548  ggH = 5.49929
+mass = 450 :   bbH = 88.8902  ggH = 6.98259
+mass = 500 :   bbH = 58.0125  ggH = 7.63033
+mass = 600 :   bbH = 85.0758  ggH = 9.01067
+mass = 700 :   bbH = 77.9605  ggH = 9.79521
+mass = 800 :   bbH = 93.2171  ggH = 7.96316
+mass = 900 :   bbH = 71.8897  ggH = 1.70289
+mass = 1000 :   bbH = 80.8227  ggH = 9.71211
+mass = 1200 :   bbH = 79.3284  ggH = 12.3412
+mass = 1400 :   bbH = 112.538  ggH = 15.0813
+mass = 1600 :   bbH = 92.0501  ggH = 8.15315
+mass = 1800 :   bbH = 77.7447  ggH = 13.3954
+mass = 2000 :   bbH = 82.2897  ggH = 13.1169
+mass = 2300 :   bbH = 60.8459  ggH = 13.4386
+mass = 2600 :   bbH = 67.0346  ggH = 8.58016
+mass = 2900 :   bbH = 95.9222  ggH = 12.4743
+mass = 3200 :   bbH = 83.8203  ggH = 14.8216
+processing era 2017 with trigger option : 2
+     processing category em_inclusive
+Top : 133012
+EWK : 28703.8
+W   : 7004.76
+QCD : 48821.5
+ZLL : 4565.87
+ZTT : 156683
+
+Model : 378798
+Data  : 364232
+ratio = 0.961546
+
+
+Chi2 = 919820
+
+
+Signal yields for 1 pb... 
+mass = 110 :   bbH = 203.597  ggH ------ 
+mass = 120 :   bbH = 241.054  ggH ------ 
+mass = 130 :   bbH = 280.659  ggH ------ 
+mass = 140 :   bbH = 341.875  ggH ------ 
+mass = 160 :   bbH = 450.215  ggH ------ 
+mass = 180 :   bbH = 492.45  ggH ------ 
+mass = 200 :   bbH = 545.117  ggH ------ 
+mass = 250 :   bbH = 769.135  ggH ------ 
+mass = 300 :   bbH = 884.142  ggH ------ 
+mass = 350 :   bbH = 950.349  ggH ------ 
+mass = 400 :   bbH = 1048.83  ggH ------ 
+mass = 450 :   bbH = 1086.07  ggH ------ 
+mass = 500 :   bbH = 1149.47  ggH ------ 
+mass = 600 :   bbH = 1182.61  ggH ------ 
+mass = 700 :   bbH = 1350.05  ggH ------ 
+mass = 800 :   bbH = 1292.58  ggH ------ 
+mass = 900 :   bbH = 1377.95  ggH ------ 
+mass = 1000 :   bbH = 1459.35  ggH ------ 
+mass = 1200 :   bbH = 1468.55  ggH ------ 
+mass = 1400 :   bbH = 1409.63  ggH ------ 
+mass = 1600 :   bbH = 1510.84  ggH ------ 
+mass = 1800 :   bbH = 1531.41  ggH ------ 
+mass = 2000 :   bbH = 1558.64  ggH ------ 
+mass = 2300 :   bbH = 1558.99  ggH ------ 
+mass = 2600 :   bbH = 1516.55  ggH ------ 
+mass = 2900 :   bbH = 1546.85  ggH ------ 
+mass = 3200 :   bbH = 1631.4  ggH ------ 
+     processing category em_btag
+Top : 114482
+EWK : 9230.55
+W   : 464.412
+QCD : 4380.21
+ZLL : 223.056
+ZTT : 7132.06
+
+Model : 135917
+Data  : 131380
+ratio = 0.966617
+
+
+Chi2 = 1992.3
+
+
+Signal yields for 1 pb... 
+mass = 110 :   bbH = 43.9563  ggH ------ 
+mass = 120 :   bbH = 55.6049  ggH ------ 
+mass = 130 :   bbH = 71.4598  ggH ------ 
+mass = 140 :   bbH = 97.8597  ggH ------ 
+mass = 160 :   bbH = 124.017  ggH ------ 
+mass = 180 :   bbH = 138.788  ggH ------ 
+mass = 200 :   bbH = 152.133  ggH ------ 
+mass = 250 :   bbH = 233.79  ggH ------ 
+mass = 300 :   bbH = 327.954  ggH ------ 
+mass = 350 :   bbH = 308.985  ggH ------ 
+mass = 400 :   bbH = 374.604  ggH ------ 
+mass = 450 :   bbH = 429.308  ggH ------ 
+mass = 500 :   bbH = 463.438  ggH ------ 
+mass = 600 :   bbH = 477.803  ggH ------ 
+mass = 700 :   bbH = 547.663  ggH ------ 
+mass = 800 :   bbH = 586.41  ggH ------ 
+mass = 900 :   bbH = 552.142  ggH ------ 
+mass = 1000 :   bbH = 660.517  ggH ------ 
+mass = 1200 :   bbH = 657.65  ggH ------ 
+mass = 1400 :   bbH = 644.436  ggH ------ 
+mass = 1600 :   bbH = 693.711  ggH ------ 
+mass = 1800 :   bbH = 702.766  ggH ------ 
+mass = 2000 :   bbH = 710.02  ggH ------ 
+mass = 2300 :   bbH = 745.807  ggH ------ 
+mass = 2600 :   bbH = 759.772  ggH ------ 
+mass = 2900 :   bbH = 768.506  ggH ------ 
+mass = 3200 :   bbH = 791.549  ggH ------ 
+     processing category em_nobtag
+Top : 18529.4
+EWK : 19473.2
+W   : 6540.35
+QCD : 44441.3
+ZLL : 4342.82
+ZTT : 149551
+
+Model : 242900
+Data  : 232852
+ratio = 0.958633
+
+
+Chi2 = 2.79876e+06
+
+
+Signal yields for 1 pb... 
+mass = 110 :   bbH = 159.796  ggH ------ 
+mass = 120 :   bbH = 185.505  ggH ------ 
+mass = 130 :   bbH = 209.222  ggH ------ 
+mass = 140 :   bbH = 244.065  ggH ------ 
+mass = 160 :   bbH = 326.198  ggH ------ 
+mass = 180 :   bbH = 353.687  ggH ------ 
+mass = 200 :   bbH = 392.984  ggH ------ 
+mass = 250 :   bbH = 535.604  ggH ------ 
+mass = 300 :   bbH = 556.213  ggH ------ 
+mass = 350 :   bbH = 641.659  ggH ------ 
+mass = 400 :   bbH = 674.348  ggH ------ 
+mass = 450 :   bbH = 656.805  ggH ------ 
+mass = 500 :   bbH = 687.322  ggH ------ 
+mass = 600 :   bbH = 704.736  ggH ------ 
+mass = 700 :   bbH = 804.011  ggH ------ 
+mass = 800 :   bbH = 707.139  ggH ------ 
+mass = 900 :   bbH = 826.238  ggH ------ 
+mass = 1000 :   bbH = 799.553  ggH ------ 
+mass = 1200 :   bbH = 811.093  ggH ------ 
+mass = 1400 :   bbH = 766.657  ggH ------ 
+mass = 1600 :   bbH = 819.389  ggH ------ 
+mass = 1800 :   bbH = 829.688  ggH ------ 
+mass = 2000 :   bbH = 849.684  ggH ------ 
+mass = 2300 :   bbH = 814.773  ggH ------ 
+mass = 2600 :   bbH = 758.426  ggH ------ 
+mass = 2900 :   bbH = 778.212  ggH ------ 
+mass = 3200 :   bbH = 840.734  ggH ------ 
+     processing category em_nobtag_highmsv
+Top : 7656.68
+EWK : 5959.53
+W   : 1119.69
+QCD : 2669.78
+ZLL : 143.129
+ZTT : 2506.09
+
+Model : 20079.6
+Data  : 19066
+ratio = 0.949521
+
+
+Chi2 = 10877.4
+
+
+Signal yields for 1 pb... 
+mass = 110 :   bbH = 0.941965  ggH ------ 
+mass = 120 :   bbH = 1.22298  ggH ------ 
+mass = 130 :   bbH = 2.77732  ggH ------ 
+mass = 140 :   bbH = 4.34945  ggH ------ 
+mass = 160 :   bbH = 9.32872  ggH ------ 
+mass = 180 :   bbH = 16.4632  ggH ------ 
+mass = 200 :   bbH = 29.3657  ggH ------ 
+mass = 250 :   bbH = 112.291  ggH ------ 
+mass = 300 :   bbH = 224.337  ggH ------ 
+mass = 350 :   bbH = 334.248  ggH ------ 
+mass = 400 :   bbH = 447.648  ggH ------ 
+mass = 450 :   bbH = 456.21  ggH ------ 
+mass = 500 :   bbH = 542.134  ggH ------ 
+mass = 600 :   bbH = 602.087  ggH ------ 
+mass = 700 :   bbH = 717.418  ggH ------ 
+mass = 800 :   bbH = 649.715  ggH ------ 
+mass = 900 :   bbH = 789.836  ggH ------ 
+mass = 1000 :   bbH = 768.627  ggH ------ 
+mass = 1200 :   bbH = 794.755  ggH ------ 
+mass = 1400 :   bbH = 751.301  ggH ------ 
+mass = 1600 :   bbH = 805.605  ggH ------ 
+mass = 1800 :   bbH = 820.13  ggH ------ 
+mass = 2000 :   bbH = 844.884  ggH ------ 
+mass = 2300 :   bbH = 810.709  ggH ------ 
+mass = 2600 :   bbH = 756.037  ggH ------ 
+mass = 2900 :   bbH = 778.482  ggH ------ 
+mass = 3200 :   bbH = 836.461  ggH ------ 
+     processing category em_ttbar_control
+Top : 289602
+EWK : 64473.7
+W   : 11127.4
+QCD : 13782.3
+ZLL : 1105.91
+ZTT : 11221
+
+Model : 391331
+Data  : 378033
+ratio = 0.966019
+
+
+Chi2 = 4443
+
+
+Signal yields for 1 pb... 
+mass = 110 :   bbH = 14.4746  ggH ------ 
+mass = 120 :   bbH = 19.276  ggH ------ 
+mass = 130 :   bbH = 21.0994  ggH ------ 
+mass = 140 :   bbH = 22.3328  ggH ------ 
+mass = 160 :   bbH = 24.6831  ggH ------ 
+mass = 180 :   bbH = 26.5869  ggH ------ 
+mass = 200 :   bbH = 35.3735  ggH ------ 
+mass = 250 :   bbH = 45.2494  ggH ------ 
+mass = 300 :   bbH = 59.4707  ggH ------ 
+mass = 350 :   bbH = 63.1309  ggH ------ 
+mass = 400 :   bbH = 65.5075  ggH ------ 
+mass = 450 :   bbH = 73.1752  ggH ------ 
+mass = 500 :   bbH = 82.1155  ggH ------ 
+mass = 600 :   bbH = 95.6813  ggH ------ 
+mass = 700 :   bbH = 97.8311  ggH ------ 
+mass = 800 :   bbH = 109.828  ggH ------ 
+mass = 900 :   bbH = 115.689  ggH ------ 
+mass = 1000 :   bbH = 130.157  ggH ------ 
+mass = 1200 :   bbH = 134.041  ggH ------ 
+mass = 1400 :   bbH = 151.639  ggH ------ 
+mass = 1600 :   bbH = 130.625  ggH ------ 
+mass = 1800 :   bbH = 112.303  ggH ------ 
+mass = 2000 :   bbH = 149.223  ggH ------ 
+mass = 2300 :   bbH = 134.945  ggH ------ 
+mass = 2600 :   bbH = 155.403  ggH ------ 
+mass = 2900 :   bbH = 143.496  ggH ------ 
+mass = 3200 :   bbH = 159.892  ggH ------ 
+     processing category em_nobtag_highdzeta
+Top : 4798.19
+EWK : 2560.88
+W   : 458.765
+QCD : 1256.08
+ZLL : 143.428
+ZTT : 7193.1
+
+Model : 16418.1
+Data  : 15888
+ratio = 0.96771
+
+
+Chi2 = 37550
+
+
+Signal yields for 1 pb... 
+mass = 110 :   bbH = 3.80072  ggH ------ 
+mass = 120 :   bbH = 6.25464  ggH ------ 
+mass = 130 :   bbH = 7.57563  ggH ------ 
+mass = 140 :   bbH = 8.9788  ggH ------ 
+mass = 160 :   bbH = 12.7333  ggH ------ 
+mass = 180 :   bbH = 17.1777  ggH ------ 
+mass = 200 :   bbH = 18.8903  ggH ------ 
+mass = 250 :   bbH = 33.8652  ggH ------ 
+mass = 300 :   bbH = 38.9711  ggH ------ 
+mass = 350 :   bbH = 45.3605  ggH ------ 
+mass = 400 :   bbH = 51.8979  ggH ------ 
+mass = 450 :   bbH = 66.9672  ggH ------ 
+mass = 500 :   bbH = 70.5716  ggH ------ 
+mass = 600 :   bbH = 69.8855  ggH ------ 
+mass = 700 :   bbH = 89.6144  ggH ------ 
+mass = 800 :   bbH = 97.9933  ggH ------ 
+mass = 900 :   bbH = 116.456  ggH ------ 
+mass = 1000 :   bbH = 127.387  ggH ------ 
+mass = 1200 :   bbH = 120.715  ggH ------ 
+mass = 1400 :   bbH = 139.24  ggH ------ 
+mass = 1600 :   bbH = 155.262  ggH ------ 
+mass = 1800 :   bbH = 182.997  ggH ------ 
+mass = 2000 :   bbH = 197.91  ggH ------ 
+mass = 2300 :   bbH = 188.617  ggH ------ 
+mass = 2600 :   bbH = 204.784  ggH ------ 
+mass = 2900 :   bbH = 221.756  ggH ------ 
+mass = 3200 :   bbH = 230.034  ggH ------ 
+     processing category em_nobtag_mediumdzeta
+Top : 6956.52
+EWK : 7229.55
+W   : 2295.2
+QCD : 23110.8
+ZLL : 2469.17
+ZTT : 96841.9
+
+Model : 138916
+Data  : 133533
+ratio = 0.961251
+
+
+Chi2 = 3.33407e+06
+
+
+Signal yields for 1 pb... 
+mass = 110 :   bbH = 102.716  ggH ------ 
+mass = 120 :   bbH = 121.21  ggH ------ 
+mass = 130 :   bbH = 134.378  ggH ------ 
+mass = 140 :   bbH = 148.854  ggH ------ 
+mass = 160 :   bbH = 210.023  ggH ------ 
+mass = 180 :   bbH = 227.696  ggH ------ 
+mass = 200 :   bbH = 258.789  ggH ------ 
+mass = 250 :   bbH = 358.759  ggH ------ 
+mass = 300 :   bbH = 359.583  ggH ------ 
+mass = 350 :   bbH = 428.687  ggH ------ 
+mass = 400 :   bbH = 453.237  ggH ------ 
+mass = 450 :   bbH = 421.584  ggH ------ 
+mass = 500 :   bbH = 439.404  ggH ------ 
+mass = 600 :   bbH = 433.483  ggH ------ 
+mass = 700 :   bbH = 519.045  ggH ------ 
+mass = 800 :   bbH = 447.322  ggH ------ 
+mass = 900 :   bbH = 541.526  ggH ------ 
+mass = 1000 :   bbH = 492.615  ggH ------ 
+mass = 1200 :   bbH = 486.344  ggH ------ 
+mass = 1400 :   bbH = 469.685  ggH ------ 
+mass = 1600 :   bbH = 482.987  ggH ------ 
+mass = 1800 :   bbH = 475.029  ggH ------ 
+mass = 2000 :   bbH = 478.258  ggH ------ 
+mass = 2300 :   bbH = 445.639  ggH ------ 
+mass = 2600 :   bbH = 410.161  ggH ------ 
+mass = 2900 :   bbH = 423.163  ggH ------ 
+mass = 3200 :   bbH = 443.658  ggH ------ 
+     processing category em_nobtag_lowdzeta
+Top : 6774.7
+EWK : 9682.78
+W   : 3786.38
+QCD : 20074.2
+ZLL : 1730.22
+ZTT : 45516.4
+
+Model : 87598.1
+Data  : 83431
+ratio = 0.952429
+
+
+Chi2 = 511009
+
+
+Signal yields for 1 pb... 
+mass = 110 :   bbH = 53.3635  ggH ------ 
+mass = 120 :   bbH = 58.4509  ggH ------ 
+mass = 130 :   bbH = 67.6776  ggH ------ 
+mass = 140 :   bbH = 86.455  ggH ------ 
+mass = 160 :   bbH = 103.907  ggH ------ 
+mass = 180 :   bbH = 108.991  ggH ------ 
+mass = 200 :   bbH = 115.636  ggH ------ 
+mass = 250 :   bbH = 143.095  ggH ------ 
+mass = 300 :   bbH = 159.172  ggH ------ 
+mass = 350 :   bbH = 168.216  ggH ------ 
+mass = 400 :   bbH = 171.149  ggH ------ 
+mass = 450 :   bbH = 169.046  ggH ------ 
+mass = 500 :   bbH = 178.56  ggH ------ 
+mass = 600 :   bbH = 203.625  ggH ------ 
+mass = 700 :   bbH = 197.047  ggH ------ 
+mass = 800 :   bbH = 167.932  ggH ------ 
+mass = 900 :   bbH = 169.132  ggH ------ 
+mass = 1000 :   bbH = 180.52  ggH ------ 
+mass = 1200 :   bbH = 207.433  ggH ------ 
+mass = 1400 :   bbH = 161.961  ggH ------ 
+mass = 1600 :   bbH = 185.837  ggH ------ 
+mass = 1800 :   bbH = 176.957  ggH ------ 
+mass = 2000 :   bbH = 179.245  ggH ------ 
+mass = 2300 :   bbH = 183.885  ggH ------ 
+mass = 2600 :   bbH = 147.908  ggH ------ 
+mass = 2900 :   bbH = 135.838  ggH ------ 
+mass = 3200 :   bbH = 168.737  ggH ------ 
+     processing category em_nobtag_highmsv_highdzeta
+Top : 3322.52
+EWK : 1760.61
+W   : 271.19
+QCD : 500.214
+ZLL : 25.9866
+ZTT : 1201.79
+
+Model : 7099.15
+Data  : 6915
+ratio = 0.97406
+
+
+Chi2 = 4215.24
+
+
+Signal yields for 1 pb... 
+mass = 110 :   bbH = 0.464646  ggH ------ 
+mass = 120 :   bbH = 1.17151  ggH ------ 
+mass = 130 :   bbH = 1.85313  ggH ------ 
+mass = 140 :   bbH = 2.64047  ggH ------ 
+mass = 160 :   bbH = 4.54498  ggH ------ 
+mass = 180 :   bbH = 6.11579  ggH ------ 
+mass = 200 :   bbH = 8.47438  ggH ------ 
+mass = 250 :   bbH = 19.2301  ggH ------ 
+mass = 300 :   bbH = 27.4434  ggH ------ 
+mass = 350 :   bbH = 39.5049  ggH ------ 
+mass = 400 :   bbH = 43.3936  ggH ------ 
+mass = 450 :   bbH = 57.3838  ggH ------ 
+mass = 500 :   bbH = 66.1767  ggH ------ 
+mass = 600 :   bbH = 62.4985  ggH ------ 
+mass = 700 :   bbH = 83.1661  ggH ------ 
+mass = 800 :   bbH = 91.8772  ggH ------ 
+mass = 900 :   bbH = 110.86  ggH ------ 
+mass = 1000 :   bbH = 119.897  ggH ------ 
+mass = 1200 :   bbH = 118.193  ggH ------ 
+mass = 1400 :   bbH = 136.291  ggH ------ 
+mass = 1600 :   bbH = 152.797  ggH ------ 
+mass = 1800 :   bbH = 181.682  ggH ------ 
+mass = 2000 :   bbH = 194.495  ggH ------ 
+mass = 2300 :   bbH = 186.088  ggH ------ 
+mass = 2600 :   bbH = 201.555  ggH ------ 
+mass = 2900 :   bbH = 221.995  ggH ------ 
+mass = 3200 :   bbH = 229.001  ggH ------ 
+     processing category em_nobtag_highmsv_mediumdzeta
+Top : 2652.04
+EWK : 2368.49
+W   : 496.779
+QCD : 1398.76
+ZLL : 81.3045
+ZTT : 1184.44
+
+Model : 8219.54
+Data  : 7901
+ratio = 0.961246
+
+
+Chi2 = 8590.98
+
+
+Signal yields for 1 pb... 
+mass = 110 :   bbH = 0.752779  ggH ------ 
+mass = 120 :   bbH = 0.512941  ggH ------ 
+mass = 130 :   bbH = 1.16363  ggH ------ 
+mass = 140 :   bbH = 1.88406  ggH ------ 
+mass = 160 :   bbH = 4.97283  ggH ------ 
+mass = 180 :   bbH = 9.97313  ggH ------ 
+mass = 200 :   bbH = 21.9382  ggH ------ 
+mass = 250 :   bbH = 75.5508  ggH ------ 
+mass = 300 :   bbH = 141.39  ggH ------ 
+mass = 350 :   bbH = 213.21  ggH ------ 
+mass = 400 :   bbH = 292.249  ggH ------ 
+mass = 450 :   bbH = 281.07  ggH ------ 
+mass = 500 :   bbH = 332.631  ggH ------ 
+mass = 600 :   bbH = 367.929  ggH ------ 
+mass = 700 :   bbH = 460.086  ggH ------ 
+mass = 800 :   bbH = 410.873  ggH ------ 
+mass = 900 :   bbH = 516.081  ggH ------ 
+mass = 1000 :   bbH = 474.66  ggH ------ 
+mass = 1200 :   bbH = 475.833  ggH ------ 
+mass = 1400 :   bbH = 458.973  ggH ------ 
+mass = 1600 :   bbH = 473.139  ggH ------ 
+mass = 1800 :   bbH = 470.477  ggH ------ 
+mass = 2000 :   bbH = 474.525  ggH ------ 
+mass = 2300 :   bbH = 442.78  ggH ------ 
+mass = 2600 :   bbH = 411.477  ggH ------ 
+mass = 2900 :   bbH = 422.331  ggH ------ 
+mass = 3200 :   bbH = 440.804  ggH ------ 
+     category em_nobtag_highmsv_lowdzeta does not exist
+     nothing is done.. 
+     processing category em_btag_highdzeta
+Top : 30840.6
+EWK : 2287.67
+W   : 73.4291
+QCD : 221.592
+ZLL : 16.5565
+ZTT : 1071.56
+
+Model : 34511.5
+Data  : 34181
+ratio = 0.990425
+
+
+Chi2 = 153.27
+
+
+Signal yields for 1 pb... 
+mass = 110 :   bbH = 2.30311  ggH ------ 
+mass = 120 :   bbH = 5.98472  ggH ------ 
+mass = 130 :   bbH = 5.18262  ggH ------ 
+mass = 140 :   bbH = 8.78879  ggH ------ 
+mass = 160 :   bbH = 10.9429  ggH ------ 
+mass = 180 :   bbH = 16.2643  ggH ------ 
+mass = 200 :   bbH = 15.0844  ggH ------ 
+mass = 250 :   bbH = 34.9789  ggH ------ 
+mass = 300 :   bbH = 60.3506  ggH ------ 
+mass = 350 :   bbH = 57.0787  ggH ------ 
+mass = 400 :   bbH = 76.6292  ggH ------ 
+mass = 450 :   bbH = 78.5231  ggH ------ 
+mass = 500 :   bbH = 87.6741  ggH ------ 
+mass = 600 :   bbH = 116.673  ggH ------ 
+mass = 700 :   bbH = 151.084  ggH ------ 
+mass = 800 :   bbH = 163.846  ggH ------ 
+mass = 900 :   bbH = 162.963  ggH ------ 
+mass = 1000 :   bbH = 191.758  ggH ------ 
+mass = 1200 :   bbH = 218.972  ggH ------ 
+mass = 1400 :   bbH = 218.813  ggH ------ 
+mass = 1600 :   bbH = 253.971  ggH ------ 
+mass = 1800 :   bbH = 268.393  ggH ------ 
+mass = 2000 :   bbH = 296.909  ggH ------ 
+mass = 2300 :   bbH = 296.105  ggH ------ 
+mass = 2600 :   bbH = 338.767  ggH ------ 
+mass = 2900 :   bbH = 329.126  ggH ------ 
+mass = 3200 :   bbH = 358.61  ggH ------ 
+     processing category em_btag_mediumdzeta
+Top : 42969.4
+EWK : 3529.47
+W   : 196.933
+QCD : 2164.92
+ZLL : 92.2796
+ZTT : 3790.56
+
+Model : 52751.2
+Data  : 50697
+ratio = 0.961058
+
+
+Chi2 = 1534.1
+
+
+Signal yields for 1 pb... 
+mass = 110 :   bbH = 29.7073  ggH ------ 
+mass = 120 :   bbH = 33.2749  ggH ------ 
+mass = 130 :   bbH = 43.1888  ggH ------ 
+mass = 140 :   bbH = 61.2004  ggH ------ 
+mass = 160 :   bbH = 77.5042  ggH ------ 
+mass = 180 :   bbH = 90.7809  ggH ------ 
+mass = 200 :   bbH = 96.1201  ggH ------ 
+mass = 250 :   bbH = 149.278  ggH ------ 
+mass = 300 :   bbH = 193.782  ggH ------ 
+mass = 350 :   bbH = 194.774  ggH ------ 
+mass = 400 :   bbH = 210.886  ggH ------ 
+mass = 450 :   bbH = 246.096  ggH ------ 
+mass = 500 :   bbH = 271.868  ggH ------ 
+mass = 600 :   bbH = 259.418  ggH ------ 
+mass = 700 :   bbH = 294.204  ggH ------ 
+mass = 800 :   bbH = 305.547  ggH ------ 
+mass = 900 :   bbH = 287.38  ggH ------ 
+mass = 1000 :   bbH = 341.414  ggH ------ 
+mass = 1200 :   bbH = 316.837  ggH ------ 
+mass = 1400 :   bbH = 316.819  ggH ------ 
+mass = 1600 :   bbH = 330.651  ggH ------ 
+mass = 1800 :   bbH = 321.403  ggH ------ 
+mass = 2000 :   bbH = 298.269  ggH ------ 
+mass = 2300 :   bbH = 324.785  ggH ------ 
+mass = 2600 :   bbH = 312.855  ggH ------ 
+mass = 2900 :   bbH = 324.171  ggH ------ 
+mass = 3200 :   bbH = 331.885  ggH ------ 
+     processing category em_btag_lowdzeta
+Top : 40672.5
+EWK : 3413.41
+W   : 194.05
+QCD : 1993.25
+ZLL : 114.22
+ZTT : 2269.93
+
+Model : 48677.8
+Data  : 46502
+ratio = 0.955303
+
+
+Chi2 = 574.158
+
+
+Signal yields for 1 pb... 
+mass = 110 :   bbH = 11.9461  ggH ------ 
+mass = 120 :   bbH = 17.0598  ggH ------ 
+mass = 130 :   bbH = 23.1477  ggH ------ 
+mass = 140 :   bbH = 28.0987  ggH ------ 
+mass = 160 :   bbH = 35.7218  ggH ------ 
+mass = 180 :   bbH = 31.8697  ggH ------ 
+mass = 200 :   bbH = 41.1743  ggH ------ 
+mass = 250 :   bbH = 50.1916  ggH ------ 
+mass = 300 :   bbH = 73.8208  ggH ------ 
+mass = 350 :   bbH = 58.1999  ggH ------ 
+mass = 400 :   bbH = 88.4331  ggH ------ 
+mass = 450 :   bbH = 105.384  ggH ------ 
+mass = 500 :   bbH = 104.308  ggH ------ 
+mass = 600 :   bbH = 102.318  ggH ------ 
+mass = 700 :   bbH = 103.698  ggH ------ 
+mass = 800 :   bbH = 118.498  ggH ------ 
+mass = 900 :   bbH = 103.366  ggH ------ 
+mass = 1000 :   bbH = 129.131  ggH ------ 
+mass = 1200 :   bbH = 123.129  ggH ------ 
+mass = 1400 :   bbH = 110.113  ggH ------ 
+mass = 1600 :   bbH = 112.091  ggH ------ 
+mass = 1800 :   bbH = 113.661  ggH ------ 
+mass = 2000 :   bbH = 115.565  ggH ------ 
+mass = 2300 :   bbH = 125.959  ggH ------ 
+mass = 2600 :   bbH = 110.433  ggH ------ 
+mass = 2900 :   bbH = 117.498  ggH ------ 
+mass = 3200 :   bbH = 104.234  ggH ------ 
+processing era 2018 with trigger option : 2
+     processing category em_inclusive
+Top : 196581
+EWK : 42330.9
+W   : 9398.61
+QCD : 76083.7
+ZLL : 6699.63
+ZTT : 223453
+
+Model : 554547
+Data  : 537260
+ratio = 0.968827
+
+
+Chi2 = 1.52871e+06
+
+
+Signal yields for 1 pb... 
+mass = 110 :   bbH = 295.877  ggH = 300.539
+mass = 120 :   bbH = 361.199  ggH = 385.658
+mass = 130 :   bbH = 438.316  ggH = 434.085
+mass = 140 :   bbH = 498.089  ggH = 513.054
+mass = 160 :   bbH = 647.839  ggH = 637.996
+mass = 180 :   bbH = 760.897  ggH = 754.722
+mass = 200 :   bbH = 871.719  ggH = 848.231
+mass = 250 :   bbH = 1110.34  ggH = 1085.05
+mass = 300 :   bbH = 1329.54  ggH = 1276.38
+mass = 350 :   bbH ------   ggH = 1398.99
+mass = 400 :   bbH = 1613.56  ggH = 1518.64
+mass = 450 :   bbH = 1702.07  ggH = 1555.8
+mass = 500 :   bbH = 1801.21  ggH ------ 
+mass = 600 :   bbH = 1899.37  ggH = 1842.68
+mass = 700 :   bbH = 1994.14  ggH = 1932.07
+mass = 800 :   bbH = 2008.76  ggH = 1979.87
+mass = 900 :   bbH = 2167.04  ggH = 2028.18
+mass = 1000 :   bbH ------   ggH ------ 
+mass = 1200 :   bbH = 2241.64  ggH = 2197.7
+mass = 1400 :   bbH = 2166.33  ggH = 2220.36
+mass = 1600 :   bbH = 2237.69  ggH = 2243.68
+mass = 1800 :   bbH = 2282.01  ggH = 2292.65
+mass = 2000 :   bbH = 2126.9  ggH = 2294.67
+mass = 2300 :   bbH = 2291.62  ggH = 2309.23
+mass = 2600 :   bbH = 2307.97  ggH = 2356.66
+mass = 2900 :   bbH = 2382.62  ggH = 2316.31
+mass = 3200 :   bbH = 2289.05  ggH = 2366.93
+     processing category em_btag
+Top : 173610
+EWK : 14172.1
+W   : 623.757
+QCD : 7326.71
+ZLL : 400.697
+ZTT : 10797.5
+
+Model : 206932
+Data  : 191358
+ratio = 0.924741
+
+
+Chi2 = 3462.66
+
+
+Signal yields for 1 pb... 
+mass = 110 :   bbH = 69.5116  ggH = 18.0127
+mass = 120 :   bbH = 98.689  ggH = 21.6473
+mass = 130 :   bbH = 113.007  ggH = 23.1378
+mass = 140 :   bbH = 128.635  ggH = 25.2134
+mass = 160 :   bbH = 182.299  ggH = 36.7926
+mass = 180 :   bbH = 229.18  ggH = 42.9724
+mass = 200 :   bbH = 252.31  ggH = 50.7762
+mass = 250 :   bbH = 393.576  ggH = 67.8466
+mass = 300 :   bbH = 486.159  ggH = 69.4165
+mass = 350 :   bbH ------   ggH = 86.9297
+mass = 400 :   bbH = 624.168  ggH = 104.564
+mass = 450 :   bbH = 663.188  ggH = 104.37
+mass = 500 :   bbH = 726.612  ggH ------ 
+mass = 600 :   bbH = 832.49  ggH = 123.753
+mass = 700 :   bbH = 819.43  ggH = 146.499
+mass = 800 :   bbH = 889.231  ggH = 151.099
+mass = 900 :   bbH = 954.038  ggH = 165.58
+mass = 1000 :   bbH ------   ggH ------ 
+mass = 1200 :   bbH = 1029.84  ggH = 184.235
+mass = 1400 :   bbH = 1039.01  ggH = 188.125
+mass = 1600 :   bbH = 1080.61  ggH = 202.959
+mass = 1800 :   bbH = 1119.99  ggH = 209.865
+mass = 2000 :   bbH = 1004.84  ggH = 223.585
+mass = 2300 :   bbH = 1141.44  ggH = 221.23
+mass = 2600 :   bbH = 1176  ggH = 234.766
+mass = 2900 :   bbH = 1191.67  ggH = 233.837
+mass = 3200 :   bbH = 1146.25  ggH = 236.757
+     processing category em_nobtag
+Top : 22970.2
+EWK : 28158.8
+W   : 8774.86
+QCD : 68757
+ZLL : 6298.93
+ZTT : 212655
+
+Model : 347615
+Data  : 345902
+ratio = 0.995071
+
+
+Chi2 = 5.10096e+06
+
+
+Signal yields for 1 pb... 
+mass = 110 :   bbH = 226.365  ggH = 282.527
+mass = 120 :   bbH = 262.57  ggH = 364.011
+mass = 130 :   bbH = 325.308  ggH = 410.947
+mass = 140 :   bbH = 369.607  ggH = 487.84
+mass = 160 :   bbH = 465.639  ggH = 601.203
+mass = 180 :   bbH = 531.747  ggH = 711.75
+mass = 200 :   bbH = 619.212  ggH = 797.455
+mass = 250 :   bbH = 717.414  ggH = 1017.2
+mass = 300 :   bbH = 844.539  ggH = 1206.96
+mass = 350 :   bbH ------   ggH = 1312.06
+mass = 400 :   bbH = 990.19  ggH = 1414.07
+mass = 450 :   bbH = 1038.98  ggH = 1451.43
+mass = 500 :   bbH = 1076.11  ggH ------ 
+mass = 600 :   bbH = 1067.22  ggH = 1718.93
+mass = 700 :   bbH = 1174.71  ggH = 1785.57
+mass = 800 :   bbH = 1120.24  ggH = 1828.77
+mass = 900 :   bbH = 1214.42  ggH = 1862.6
+mass = 1000 :   bbH ------   ggH ------ 
+mass = 1200 :   bbH = 1211.68  ggH = 2013.46
+mass = 1400 :   bbH = 1128.39  ggH = 2032.23
+mass = 1600 :   bbH = 1157.32  ggH = 2040.72
+mass = 1800 :   bbH = 1162.09  ggH = 2082.79
+mass = 2000 :   bbH = 1123.68  ggH = 2071.09
+mass = 2300 :   bbH = 1152.21  ggH = 2088
+mass = 2600 :   bbH = 1133.3  ggH = 2121.89
+mass = 2900 :   bbH = 1191.82  ggH = 2082.47
+mass = 3200 :   bbH = 1145.58  ggH = 2130.17
+     processing category em_nobtag_highmsv
+Top : 9591.92
+EWK : 8636.17
+W   : 1534.4
+QCD : 4157.14
+ZLL : 194.094
+ZTT : 2811.85
+
+Model : 26925.6
+Data  : 26467
+ratio = 0.982969
+
+
+Chi2 = 15216.6
+
+
+Signal yields for 1 pb... 
+mass = 110 :   bbH = 0.984512  ggH = 1.48987
+mass = 120 :   bbH = 1.37068  ggH = 2.47722
+mass = 130 :   bbH = 3.30445  ggH = 3.69433
+mass = 140 :   bbH = 5.03326  ggH = 4.95925
+mass = 160 :   bbH = 10.9995  ggH = 11.018
+mass = 180 :   bbH = 15.9855  ggH = 24.3683
+mass = 200 :   bbH = 35.5492  ggH = 42.3454
+mass = 250 :   bbH = 137.75  ggH = 253.622
+mass = 300 :   bbH = 321.063  ggH = 609.247
+mass = 350 :   bbH ------   ggH = 881.904
+mass = 400 :   bbH = 636.165  ggH = 1081.3
+mass = 450 :   bbH = 759.053  ggH = 1190.41
+mass = 500 :   bbH = 830.41  ggH ------ 
+mass = 600 :   bbH = 926.284  ggH = 1572.73
+mass = 700 :   bbH = 1072.5  ggH = 1682.56
+mass = 800 :   bbH = 1049.98  ggH = 1752.21
+mass = 900 :   bbH = 1149.51  ggH = 1809.63
+mass = 1000 :   bbH ------   ggH ------ 
+mass = 1200 :   bbH = 1188.08  ggH = 1980.58
+mass = 1400 :   bbH = 1103.62  ggH = 2008.18
+mass = 1600 :   bbH = 1139.82  ggH = 2017.24
+mass = 1800 :   bbH = 1145.96  ggH = 2067.52
+mass = 2000 :   bbH = 1110.11  ggH = 2057.54
+mass = 2300 :   bbH = 1142.88  ggH = 2076.47
+mass = 2600 :   bbH = 1122.47  ggH = 2111.89
+mass = 2900 :   bbH = 1180.62  ggH = 2073.35
+mass = 3200 :   bbH = 1140.79  ggH = 2120.68
+     processing category em_ttbar_control
+Top : 424709
+EWK : 94384.2
+W   : 15599.4
+QCD : 23071.4
+ZLL : 1573.69
+ZTT : 13410.4
+
+Model : 572753
+Data  : 550231
+ratio = 0.960678
+
+
+Chi2 = 6810.3
+
+
+Signal yields for 1 pb... 
+mass = 110 :   bbH = 13.2697  ggH = 21.2406
+mass = 120 :   bbH = 20.0978  ggH = 22.6478
+mass = 130 :   bbH = 25.5285  ggH = 27.3953
+mass = 140 :   bbH = 25.4537  ggH = 27.1152
+mass = 160 :   bbH = 28.3025  ggH = 35.3002
+mass = 180 :   bbH = 27.2817  ggH = 43.1683
+mass = 200 :   bbH = 41.7276  ggH = 47.5451
+mass = 250 :   bbH = 50.1353  ggH = 59.2001
+mass = 300 :   bbH = 53.6345  ggH = 58.937
+mass = 350 :   bbH ------   ggH = 72.3479
+mass = 400 :   bbH = 76.335  ggH = 76.6205
+mass = 450 :   bbH = 91.3589  ggH = 74.8924
+mass = 500 :   bbH = 91.5431  ggH ------ 
+mass = 600 :   bbH = 75.9323  ggH = 87.1377
+mass = 700 :   bbH = 117.83  ggH = 90.227
+mass = 800 :   bbH = 126.136  ggH = 97.4523
+mass = 900 :   bbH = 97.5861  ggH = 104.611
+mass = 1000 :   bbH ------   ggH ------ 
+mass = 1200 :   bbH = 135.409  ggH = 114.539
+mass = 1400 :   bbH = 145.917  ggH = 126.819
+mass = 1600 :   bbH = 192.052  ggH = 127.019
+mass = 1800 :   bbH = 171.47  ggH = 127.225
+mass = 2000 :   bbH = 196.472  ggH = 132.313
+mass = 2300 :   bbH = 177.208  ggH = 137.628
+mass = 2600 :   bbH = 183.274  ggH = 131.633
+mass = 2900 :   bbH = 182.186  ggH = 142.517
+mass = 3200 :   bbH = 182.05  ggH = 144.663
+     processing category em_nobtag_highdzeta
+Top : 5938.58
+EWK : 3656.92
+W   : 491.392
+QCD : 1256.26
+ZLL : 131.493
+ZTT : 7661.4
+
+Model : 19201.6
+Data  : 19124
+ratio = 0.99596
+
+
+Chi2 = 41379.6
+
+
+Signal yields for 1 pb... 
+mass = 110 :   bbH = 3.77599  ggH = 33.4704
+mass = 120 :   bbH = 5.87792  ggH = 37.3458
+mass = 130 :   bbH = 6.21785  ggH = 49.6028
+mass = 140 :   bbH = 12.6091  ggH = 56.7194
+mass = 160 :   bbH = 15.9431  ggH = 81.4803
+mass = 180 :   bbH = 18.2948  ggH = 91.9744
+mass = 200 :   bbH = 29.1181  ggH = 95.915
+mass = 250 :   bbH = 40.1157  ggH = 157.166
+mass = 300 :   bbH = 52.5601  ggH = 204.444
+mass = 350 :   bbH ------   ggH = 243.707
+mass = 400 :   bbH = 77.0144  ggH = 284.322
+mass = 450 :   bbH = 79.6376  ggH = 313.426
+mass = 500 :   bbH = 81.5011  ggH ------ 
+mass = 600 :   bbH = 106.525  ggH = 426.491
+mass = 700 :   bbH = 100.344  ggH = 475.176
+mass = 800 :   bbH = 121.411  ggH = 500.163
+mass = 900 :   bbH = 155.119  ggH = 529.617
+mass = 1000 :   bbH ------   ggH ------ 
+mass = 1200 :   bbH = 193.065  ggH = 651.037
+mass = 1400 :   bbH = 181.243  ggH = 704.711
+mass = 1600 :   bbH = 211.63  ggH = 748.447
+mass = 1800 :   bbH = 226.873  ggH = 811.504
+mass = 2000 :   bbH = 223.136  ggH = 790.945
+mass = 2300 :   bbH = 267.401  ggH = 811.745
+mass = 2600 :   bbH = 292.187  ggH = 857.253
+mass = 2900 :   bbH = 321.895  ggH = 858.718
+mass = 3200 :   bbH = 324.205  ggH = 917.591
+     processing category em_nobtag_mediumdzeta
+Top : 8624.7
+EWK : 10417.6
+W   : 3401.91
+QCD : 35285.5
+ZLL : 3648.62
+ZTT : 140189
+
+Model : 201568
+Data  : 201671
+ratio = 1.00051
+
+
+Chi2 = 5.70834e+06
+
+
+Signal yields for 1 pb... 
+mass = 110 :   bbH = 139.195  ggH = 172.625
+mass = 120 :   bbH = 165.869  ggH = 227.866
+mass = 130 :   bbH = 218.366  ggH = 254.339
+mass = 140 :   bbH = 244.126  ggH = 301.887
+mass = 160 :   bbH = 306.216  ggH = 372.323
+mass = 180 :   bbH = 350.564  ggH = 453.547
+mass = 200 :   bbH = 435.766  ggH = 522.936
+mass = 250 :   bbH = 473.504  ggH = 634.913
+mass = 300 :   bbH = 542.075  ggH = 772.129
+mass = 350 :   bbH ------   ggH = 818.771
+mass = 400 :   bbH = 659.93  ggH = 861.087
+mass = 450 :   bbH = 687.765  ggH = 864.75
+mass = 500 :   bbH = 719.857  ggH ------ 
+mass = 600 :   bbH = 714.388  ggH = 999.838
+mass = 700 :   bbH = 785.756  ggH = 1020.64
+mass = 800 :   bbH = 723.962  ggH = 1037.07
+mass = 900 :   bbH = 788.21  ggH = 1011.65
+mass = 1000 :   bbH ------   ggH ------ 
+mass = 1200 :   bbH = 759.215  ggH = 1059.3
+mass = 1400 :   bbH = 701.092  ggH = 1027.61
+mass = 1600 :   bbH = 714.581  ggH = 1009.35
+mass = 1800 :   bbH = 697.145  ggH = 976.519
+mass = 2000 :   bbH = 666.471  ggH = 998.479
+mass = 2300 :   bbH = 683.537  ggH = 996.3
+mass = 2600 :   bbH = 632.947  ggH = 991.279
+mass = 2900 :   bbH = 641.94  ggH = 948.091
+mass = 3200 :   bbH = 634.191  ggH = 926.255
+     processing category em_nobtag_lowdzeta
+Top : 8406.96
+EWK : 14084.4
+W   : 4881.55
+QCD : 32215
+ZLL : 2518.82
+ZTT : 64804.9
+
+Model : 126914
+Data  : 125107
+ratio = 0.985763
+
+
+Chi2 = 985162
+
+
+Signal yields for 1 pb... 
+mass = 110 :   bbH = 84.0549  ggH = 76.4313
+mass = 120 :   bbH = 90.9923  ggH = 98.7995
+mass = 130 :   bbH = 101.766  ggH = 107.005
+mass = 140 :   bbH = 114.184  ggH = 129.234
+mass = 160 :   bbH = 143.822  ggH = 147.4
+mass = 180 :   bbH = 163.419  ggH = 166.229
+mass = 200 :   bbH = 155.624  ggH = 178.604
+mass = 250 :   bbH = 204.653  ggH = 225.12
+mass = 300 :   bbH = 250.736  ggH = 230.387
+mass = 350 :   bbH ------   ggH = 249.579
+mass = 400 :   bbH = 253.246  ggH = 268.666
+mass = 450 :   bbH = 271.906  ggH = 273.257
+mass = 500 :   bbH = 277.759  ggH ------ 
+mass = 600 :   bbH = 248.182  ggH = 292.597
+mass = 700 :   bbH = 293.73  ggH = 289.757
+mass = 800 :   bbH = 278.294  ggH = 291.537
+mass = 900 :   bbH = 275.292  ggH = 321.334
+mass = 1000 :   bbH ------   ggH ------ 
+mass = 1200 :   bbH = 263.983  ggH = 303.128
+mass = 1400 :   bbH = 249.497  ggH = 299.915
+mass = 1600 :   bbH = 238.652  ggH = 282.925
+mass = 1800 :   bbH = 242.952  ggH = 294.766
+mass = 2000 :   bbH = 241.278  ggH = 281.662
+mass = 2300 :   bbH = 210.171  ggH = 279.951
+mass = 2600 :   bbH = 214.055  ggH = 273.358
+mass = 2900 :   bbH = 235.883  ggH = 275.666
+mass = 3200 :   bbH = 192.467  ggH = 286.328
+     processing category em_nobtag_highmsv_highdzeta
+Top : 4166.25
+EWK : 2600.41
+W   : 255.029
+QCD : 570.181
+ZLL : 29.8638
+ZTT : 1075.78
+
+Model : 8750.47
+Data  : 8716
+ratio = 0.99606
+
+
+Chi2 = 2661.9
+
+
+Signal yields for 1 pb... 
+mass = 110 :   bbH = 0.576917  ggH = 1.05503
+mass = 120 :   bbH = 0.840419  ggH = 1.08185
+mass = 130 :   bbH = 2.00414  ggH = 2.46283
+mass = 140 :   bbH = 2.79272  ggH = 3.16891
+mass = 160 :   bbH = 5.79903  ggH = 4.83597
+mass = 180 :   bbH = 5.40751  ggH = 10.5557
+mass = 200 :   bbH = 10.9057  ggH = 13.7624
+mass = 250 :   bbH = 24.2675  ggH = 79.5
+mass = 300 :   bbH = 32.3565  ggH = 163.618
+mass = 350 :   bbH ------   ggH = 222.473
+mass = 400 :   bbH = 65.1436  ggH = 267.017
+mass = 450 :   bbH = 74.0937  ggH = 296.748
+mass = 500 :   bbH = 69.7246  ggH ------ 
+mass = 600 :   bbH = 94.0147  ggH = 416.398
+mass = 700 :   bbH = 96.2167  ggH = 465.476
+mass = 800 :   bbH = 120.985  ggH = 491.117
+mass = 900 :   bbH = 151.497  ggH = 521.762
+mass = 1000 :   bbH ------   ggH ------ 
+mass = 1200 :   bbH = 188.073  ggH = 645.285
+mass = 1400 :   bbH = 176.183  ggH = 697.082
+mass = 1600 :   bbH = 206.936  ggH = 740.137
+mass = 1800 :   bbH = 224.469  ggH = 807.849
+mass = 2000 :   bbH = 220.882  ggH = 786.482
+mass = 2300 :   bbH = 261.295  ggH = 806.463
+mass = 2600 :   bbH = 288.176  ggH = 853.833
+mass = 2900 :   bbH = 319.385  ggH = 855.111
+mass = 3200 :   bbH = 322.534  ggH = 913.249
+     processing category em_nobtag_highmsv_mediumdzeta
+Top : 3331.23
+EWK : 3453.74
+W   : 797.803
+QCD : 2491.34
+ZLL : 114.425
+ZTT : 1558.74
+
+Model : 11750.9
+Data  : 11357
+ratio = 0.966479
+
+
+Chi2 = 13157.9
+
+
+Signal yields for 1 pb... 
+mass = 110 :   bbH = 0.76031  ggH = 0.434837
+mass = 120 :   bbH = 0.830982  ggH = 1.39537
+mass = 130 :   bbH = 1.55594  ggH = 1.23149
+mass = 140 :   bbH = 2.46596  ggH = 1.79034
+mass = 160 :   bbH = 5.52635  ggH = 6.18204
+mass = 180 :   bbH = 10.4861  ggH = 13.6357
+mass = 200 :   bbH = 24.5254  ggH = 25.8735
+mass = 250 :   bbH = 90.3975  ggH = 144.883
+mass = 300 :   bbH = 205.882  ggH = 355.766
+mass = 350 :   bbH ------   ggH = 502.997
+mass = 400 :   bbH = 406.361  ggH = 622.879
+mass = 450 :   bbH = 480.093  ggH = 672.428
+mass = 500 :   bbH = 545.085  ggH ------ 
+mass = 600 :   bbH = 609.02  ggH = 889.908
+mass = 700 :   bbH = 704.485  ggH = 940.648
+mass = 800 :   bbH = 674.086  ggH = 980.707
+mass = 900 :   bbH = 737.16  ggH = 970.891
+mass = 1000 :   bbH ------   ggH ------ 
+mass = 1200 :   bbH = 747.266  ggH = 1035.57
+mass = 1400 :   bbH = 684.88  ggH = 1013.62
+mass = 1600 :   bbH = 703.065  ggH = 998.367
+mass = 1800 :   bbH = 686.391  ggH = 966.204
+mass = 2000 :   bbH = 660.502  ggH = 991.123
+mass = 2300 :   bbH = 678.949  ggH = 990.667
+mass = 2600 :   bbH = 627.624  ggH = 985.549
+mass = 2900 :   bbH = 634.159  ggH = 943.382
+mass = 3200 :   bbH = 633.184  ggH = 921.444
+     processing category em_nobtag_highmsv_lowdzeta
+Top : 2094.44
+EWK : 2582.02
+W   : 481.565
+QCD : 1095.36
+ZLL : 49.8053
+ZTT : 177.339
+
+Model : 6489.27
+Data  : 6394
+ratio = 0.985318
+
+
+Chi2 = 1872.38
+
+
+Signal yields for 1 pb... 
+mass = 110 :   bbH = 2e-05  ggH = 0
+mass = 120 :   bbH = 0.177417  ggH = 0
+mass = 130 :   bbH = 0.295249  ggH = 0
+mass = 140 :   bbH = 0  ggH = 0
+mass = 160 :   bbH = 0  ggH = 0
+mass = 180 :   bbH = 0.551394  ggH = 0.176924
+mass = 200 :   bbH = 1.31682  ggH = 2.70959
+mass = 250 :   bbH = 24.2219  ggH = 29.2388
+mass = 300 :   bbH = 84.0132  ggH = 89.8629
+mass = 350 :   bbH ------   ggH = 156.434
+mass = 400 :   bbH = 166.506  ggH = 191.405
+mass = 450 :   bbH = 208.112  ggH = 221.238
+mass = 500 :   bbH = 218.688  ggH ------ 
+mass = 600 :   bbH = 223.25  ggH = 266.428
+mass = 700 :   bbH = 277.24  ggH = 276.44
+mass = 800 :   bbH = 260.216  ggH = 280.389
+mass = 900 :   bbH = 262.783  ggH = 316.979
+mass = 1000 :   bbH ------   ggH ------ 
+mass = 1200 :   bbH = 256.918  ggH = 299.731
+mass = 1400 :   bbH = 247.975  ggH = 297.48
+mass = 1600 :   bbH = 235.564  ggH = 278.732
+mass = 1800 :   bbH = 241.303  ggH = 293.471
+mass = 2000 :   bbH = 235.809  ggH = 279.94
+mass = 2300 :   bbH = 207.053  ggH = 279.335
+mass = 2600 :   bbH = 212.159  ggH = 272.511
+mass = 2900 :   bbH = 234.289  ggH = 274.858
+mass = 3200 :   bbH = 190.402  ggH = 285.985
+     processing category em_btag_highdzeta
+Top : 46972.9
+EWK : 3562.31
+W   : 79.3215
+QCD : 385.001
+ZLL : 14.6534
+ZTT : 1452.51
+
+Model : 52471.3
+Data  : 48402
+ratio = 0.922446
+
+
+Chi2 = 234.851
+
+
+Signal yields for 1 pb... 
+mass = 110 :   bbH = 3.15849  ggH = 5.81822
+mass = 120 :   bbH = 3.76077  ggH = 4.15322
+mass = 130 :   bbH = 5.80639  ggH = 5.59027
+mass = 140 :   bbH = 10.5033  ggH = 5.11734
+mass = 160 :   bbH = 14.8442  ggH = 8.51649
+mass = 180 :   bbH = 19.4756  ggH = 10.1694
+mass = 200 :   bbH = 28.5497  ggH = 12.5922
+mass = 250 :   bbH = 54.1343  ggH = 21.0218
+mass = 300 :   bbH = 64.3922  ggH = 19.6545
+mass = 350 :   bbH ------   ggH = 28.7517
+mass = 400 :   bbH = 117.494  ggH = 33.1309
+mass = 450 :   bbH = 112.341  ggH = 35.8366
+mass = 500 :   bbH = 166.542  ggH ------ 
+mass = 600 :   bbH = 194.196  ggH = 48.1709
+mass = 700 :   bbH = 196.869  ggH = 50.5928
+mass = 800 :   bbH = 230.516  ggH = 60.4911
+mass = 900 :   bbH = 247.912  ggH = 68.1968
+mass = 1000 :   bbH ------   ggH ------ 
+mass = 1200 :   bbH = 344.544  ggH = 77.9598
+mass = 1400 :   bbH = 331.194  ggH = 80.127
+mass = 1600 :   bbH = 377.86  ggH = 89.8511
+mass = 1800 :   bbH = 425.576  ggH = 105.063
+mass = 2000 :   bbH = 376.426  ggH = 114.731
+mass = 2300 :   bbH = 463.999  ggH = 112.069
+mass = 2600 :   bbH = 525.973  ggH = 124.897
+mass = 2900 :   bbH = 554.228  ggH = 119.232
+mass = 3200 :   bbH = 523.891  ggH = 128.804
+     processing category em_btag_mediumdzeta
+Top : 65063.7
+EWK : 5385.59
+W   : 252.153
+QCD : 3492.07
+ZLL : 179.992
+ZTT : 5853.88
+
+Model : 80243.1
+Data  : 74320
+ratio = 0.926186
+
+
+Chi2 = 2766.54
+
+
+Signal yields for 1 pb... 
+mass = 110 :   bbH = 40.6561  ggH = 8.07617
+mass = 120 :   bbH = 66.2035  ggH = 13.3491
+mass = 130 :   bbH = 70.1023  ggH = 12.0597
+mass = 140 :   bbH = 79.4566  ggH = 14.6777
+mass = 160 :   bbH = 122.959  ggH = 19.5431
+mass = 180 :   bbH = 153.817  ggH = 25.2653
+mass = 200 :   bbH = 158.907  ggH = 26.8911
+mass = 250 :   bbH = 239.693  ggH = 33.4539
+mass = 300 :   bbH = 316.599  ggH = 39.0352
+mass = 350 :   bbH ------   ggH = 45.0368
+mass = 400 :   bbH = 393.969  ggH = 53.8603
+mass = 450 :   bbH = 402.484  ggH = 54.3576
+mass = 500 :   bbH = 406.602  ggH ------ 
+mass = 600 :   bbH = 471.917  ggH = 55.7647
+mass = 700 :   bbH = 473.546  ggH = 68.0186
+mass = 800 :   bbH = 472.966  ggH = 69.8088
+mass = 900 :   bbH = 550.366  ggH = 77.8305
+mass = 1000 :   bbH ------   ggH ------ 
+mass = 1200 :   bbH = 500.412  ggH = 79.6457
+mass = 1400 :   bbH = 545.607  ggH = 83.6657
+mass = 1600 :   bbH = 543.569  ggH = 83.7376
+mass = 1800 :   bbH = 514.684  ggH = 79.0796
+mass = 2000 :   bbH = 461.465  ggH = 79.8622
+mass = 2300 :   bbH = 508.898  ggH = 84.5902
+mass = 2600 :   bbH = 463.458  ggH = 82.8931
+mass = 2900 :   bbH = 480.336  ggH = 88.927
+mass = 3200 :   bbH = 472.74  ggH = 88.87
+     processing category em_btag_lowdzeta
+Top : 61573.8
+EWK : 5224.18
+W   : 292.282
+QCD : 3449.65
+ZLL : 206.052
+ZTT : 3491.15
+
+Model : 74243.4
+Data  : 68636
+ratio = 0.924473
+
+
+Chi2 = 1061.34
+
+
+Signal yields for 1 pb... 
+mass = 110 :   bbH = 25.9729  ggH = 4.11829
+mass = 120 :   bbH = 28.9262  ggH = 4.14499
+mass = 130 :   bbH = 37.1326  ggH = 5.48783
+mass = 140 :   bbH = 39.0402  ggH = 5.41838
+mass = 160 :   bbH = 44.8536  ggH = 8.73301
+mass = 180 :   bbH = 56.0019  ggH = 7.53773
+mass = 200 :   bbH = 66.0097  ggH = 11.293
+mass = 250 :   bbH = 100.554  ggH = 13.3709
+mass = 300 :   bbH = 105.461  ggH = 10.7268
+mass = 350 :   bbH ------   ggH = 13.1413
+mass = 400 :   bbH = 113.227  ggH = 17.5725
+mass = 450 :   bbH = 149.483  ggH = 14.176
+mass = 500 :   bbH = 154.414  ggH ------ 
+mass = 600 :   bbH = 166.377  ggH = 19.8175
+mass = 700 :   bbH = 149.145  ggH = 27.8871
+mass = 800 :   bbH = 186.123  ggH = 20.7988
+mass = 900 :   bbH = 159.872  ggH = 19.5528
+mass = 1000 :   bbH ------   ggH ------ 
+mass = 1200 :   bbH = 187.948  ggH = 26.6293
+mass = 1400 :   bbH = 165.828  ggH = 24.3321
+mass = 1600 :   bbH = 163.996  ggH = 29.3703
+mass = 1800 :   bbH = 182.741  ggH = 25.7227
+mass = 2000 :   bbH = 169.232  ggH = 28.9915
+mass = 2300 :   bbH = 171.624  ggH = 24.5715
+mass = 2600 :   bbH = 189.58  ggH = 26.9762
+mass = 2900 :   bbH = 159.173  ggH = 25.6775
+mass = 3200 :   bbH = 154.983  ggH = 19.0827

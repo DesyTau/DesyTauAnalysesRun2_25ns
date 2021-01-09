@@ -1,53 +1,63 @@
 #include "HttStylesNew.cc"
 #include "CMS_lumi.C"
-#include "settings.h"
+#include "/nfs/dust/cms/user/rasp/CMSSW/Update/CMSSW_10_2_22/src/DesyTauAnalyses/NTupleMaker/interface/settings.h"
 TString SpecificCut(TString sample) {
   TString cut("");
-  if (sample.Contains("EGamma")||sample.Contains("SingleElectron")) {
-    if (sample.Contains("2018"))
-      cut = "&&!(trg_singlemuon>0.5&&pt_2>25.)";
-    if (sample.Contains("2017"))
-      cut = "&&!(trg_singlemuon>0.5&&pt_2>25.)";
-    if (sample.Contains("2016"))
-      cut = "&&!(trg_singlemuon>0.5&&pt_2>23.)";
-  }
   if (sample.Contains("WJetsToLNu")||sample.Contains("DYJetsToLL_M-50"))
     cut = "&&gen_noutgoing==0";
-
   return cut;
 
 }
 
+// triggerOption = 0 (e+mu), 1 (single-lep), 2 (comb)
+// selection = 0 (inclusive), 1 (signal), 2 (ttbar)
 void Plot_emu( bool embedded = true,
-	       bool useSingleLepton = true,
-	       TString era = "2018") {
+	       int triggerOption = 2,
+	       TString era = "2017",
+	       bool correctTTBar = false,
+	       int selection = 1) {
 
   SetStyle();
-
-  // ****************************************
-  // ****** Variable to plot ****************
-  // ****************************************
-  TString Variable = "mt_tot";
-  //  TString Variable = "dmMVA_2";
-  //  TString xtitle = "IP signif. (#mu) (pv+bs)";
-  TString xtitle = "mTtot";
-  TString ytitle = "Events / 10 GeV";
-  int nBins  =                   1;
-  float xmin =                   0;
-  float xmax =                4000;
-  float yLower =               10;
-  float scaleYUpper =          10;
-
-  TString suffix = "";
-  if (embedded) suffix = "_embedded";
 
   bool plotLegend = true;
   bool legRight = true;
   bool logY = false;
   bool logX = false;
 
+  // ****************************************
+  // ****** Variable to plot ****************
+  // ****************************************
+  TString Variable = "m_vis";
+  TString xtitle = "m_vis";
+  TString ytitle = "Events";
+  int nBins  =                40;
+  float xmin =                 0;
+  float xmax =               200;
+  float yLower =               1;
+  float scaleYUpper =         10;
+
+  TString Selection("&&iso_1<0.15&&iso_2<0.20&&extraelec_veto<0.5&&extramuon_veto<0.5&&dr_tt>0.3&&pt_1>15.&&pt_2>15.");
+  
+  TString trigger_suffix("_emuTrig");
+  TString sel_suffix("_incl");
+  if (triggerOption==1)
+    trigger_suffix = "_singleLepTrig";
+  if (triggerOption==2)
+    trigger_suffix = "_combTrig";
+
+  if (selection==1) {
+    Selection += "&&pzeta>-35";    
+    sel_suffix = "_sig";
+  }
+  if (selection==2) {
+    Selection += "&&pzeta<-35";    
+    sel_suffix = "_ttbar";
+  }
+
+  TString suffix = "_mc";
+  if (embedded) suffix = "_embedded";
+
   // ******** end of settings *********
-  TString dirPostfix("etau");
   TString outputGraphics("figures");
 
   TString dir = "/nfs/dust/cms/user/rasp/grid-jobs/emu_MSSM_Dec20/"+era;
@@ -61,25 +71,60 @@ void Plot_emu( bool embedded = true,
     lumi_13TeV = "2016, 35.9 fb^{-1}";
 
   TString Weight("weightEMu*");
-  TString WeightQCD("2.2*");
+  TString QCDW("qcdweight*");
 
-  TString WeightSS = Weight + WeightQCD;
+  TString CutsEMu("((trg_muhigh_elow>0.5&&pt_2>24.0)||(trg_ehigh_mulow>0.5&&pt_1>24.0))");
 
-  TString Cuts("((trg_muhigh_elow>0.5&&pt_2>24.0&&pt_1>13.0)||(trg_ehigh_mulow>0.5&&pt_1>24.0&&pt_2>10.0))");
+  TString CutsSingleE = "trg_singleelectron>0.5&&pt_1>33.";
+  TString CutsSingleMu = "trg_singlemuon>0.5&&pt_2>25.";
 
-  if (useSingleLepton) {
-    Cuts = "((trg_singlemuon>0.5&&pt_2>25.)||(trg_singleelectron>0.5&&pt_1>33.))";
-    if (era=="2017")
-      Cuts = "((trg_singlemuon>0.5&&pt_2>25.)||(trg_singleelectron>0.5&&pt_1>28.))";
-    if (era=="2016")
-      Cuts = "((trg_singlemuon>0.5&&pt_2>23.)||(trg_singleelectron>0.5&&pt_1>26.))";
+  if (era=="2017") {
+    CutsSingleE = "trg_singleelectron>0.5&&pt_1>28.";
+    CutsSingleMu = "trg_singlemuon>0.5&&pt_2>25.";
   }
-  Cuts += TString("&&iso_1<0.15&&iso_2<0.20&&extraelec_veto<0.5&&extramuon_veto<0.5&&dr_tt>0.3&&pt_1>15.0&&pt_2>15.");
+  if (era=="2016") {
+    CutsSingleE = "trg_singleelectron>0.5&&pt_1>26.";
+    CutsSingleMu = "trg_singlemuon>0.5&&pt_2>23.";
+  }
 
-  //  Cuts += "&&!((trg_muhigh_elow>0.5&&pt_2>24.0&&pt_1>13.0)||(trg_ehigh_mulow>0.5&&pt_1>24.0&&pt_2>10.0))";
+  TString CutsMC = CutsEMu;
+  if (triggerOption==1) {
+    CutsMC = "(("+CutsSingleMu+")||("+CutsSingleE+"))";
+    Weight = "weightSingle*";
+  }
+  if (triggerOption==2) {
+    CutsMC = "((("+CutsSingleMu+")||("+CutsSingleE+"))||"+CutsEMu+")";
+    Weight = "weight*";
+  }
 
-  TString CutsOS = Cuts + TString("&&os>0.5");
-  TString CutsSS = Cuts + TString("&&os<0.5");
+  CutsMC += Selection;
+
+  TString CutsDataSingleMu = CutsSingleMu + Selection;
+
+  TString CutsDataSingleE = "("+CutsSingleE+")&&!("+CutsSingleMu+")";
+  CutsDataSingleE += Selection;
+
+  TString CutsDataEMu = CutsEMu;
+  if (triggerOption==2)
+    CutsDataEMu = CutsEMu + "&&!("+CutsSingleE+")&&!("+CutsSingleMu+")";
+  CutsDataEMu += Selection;
+
+  TString WeightQCD = Weight + QCDW;
+  
+  TString OS("&&os>0.5");
+  TString SS("&&os<0.5");
+
+  TString CutsDataSingleE_OS = CutsDataSingleE + OS;
+  TString CutsDataSingleE_SS = CutsDataSingleE + SS;
+
+  TString CutsDataSingleMu_OS = CutsDataSingleMu + OS;
+  TString CutsDataSingleMu_SS = CutsDataSingleMu + SS;
+
+  TString CutsDataEMu_OS = CutsDataEMu + OS;
+  TString CutsDataEMu_SS = CutsDataEMu + SS;
+
+  TString CutsOS = CutsMC + OS;
+  TString CutsSS = CutsMC + SS;
   TString CutsZTT_OS  = CutsOS + TString("&&gen_match_1==3&&gen_match_2==4");
   TString CutsZLL_OS  = CutsOS + TString("&&!(gen_match_1==3&&gen_match_2==4)");
   TString CutsZTT_SS  = CutsSS + TString("&&gen_match_1==3&&gen_match_2==4");
@@ -115,41 +160,25 @@ void Plot_emu( bool embedded = true,
     SingleMuon = SingleMuon_2016;
     MuonEG = MuonEG_2016;
     EmbedSamples = EmbeddedElMu_2016;
-    TTSamples = TT_INCL;
   }
-
-  std::vector<TString> DataSamples; DataSamples.clear();
-				      
-  if (useSingleLepton) {
-
-    for (unsigned int i=0; i<SingleElectron.size(); ++i)
-      DataSamples.push_back(SingleElectron.at(i));
-
-    for (unsigned int i=0; i<SingleMuon.size(); ++i)
-      DataSamples.push_back(SingleMuon.at(i));
-
-  }
-  else {
-    DataSamples = MuonEG;
-  }
-
-  std::cout << "Data samples : " << std::endl;
-  for (unsigned int i=0; i<DataSamples.size(); ++i)
-    std::cout << DataSamples.at(i) << std::endl;
 
   struct SampleAttributes {
     TString name;
     std::vector<TString> sampleNames;
-    TString weight;
-    TString weightSS;
     TString cuts;
     TString cutsSS;
     TH1D * hist;
     TH1D * histSS;
   };
 
-  TH1D * dataH   = new TH1D("data_os_Hist","",nBins,xmin,xmax);
-  TH1D * dataSSH = new TH1D("data_ss_Hist","",nBins,xmin,xmax);
+  TH1D * dataSingleMuH   = new TH1D("dataSingleMu_os_Hist","",nBins,xmin,xmax);
+  TH1D * dataSingleMuSSH = new TH1D("dataSingleMu_ss_Hist","",nBins,xmin,xmax);
+
+  TH1D * dataSingleEH   = new TH1D("dataSingleE_os_Hist","",nBins,xmin,xmax);
+  TH1D * dataSingleESSH = new TH1D("dataSingleE_ss_Hist","",nBins,xmin,xmax);
+
+  TH1D * dataEMuH   = new TH1D("dataEMu_os_Hist","",nBins,xmin,xmax);
+  TH1D * dataEMuSSH = new TH1D("dataEMu_ss_Hist","",nBins,xmin,xmax);
 
   TH1D * zttH   = new TH1D("ztt_os_Hist","",nBins,xmin,xmax);
   TH1D * zttSSH = new TH1D("ztt_ss_Hist","",nBins,xmin,xmax);
@@ -166,31 +195,46 @@ void Plot_emu( bool embedded = true,
   TH1D * ttH   = new TH1D("tt_os_Hist","",nBins,xmin,xmax);
   TH1D * ttSSH = new TH1D("tt_ss_Hist","",nBins,xmin,xmax);
 
+  TH1D * ttSysH   = new TH1D("tt_sys_os_Hist","",nBins,xmin,xmax);
+  TH1D * ttSysSSH = new TH1D("tt_sys_ss_Hist","",nBins,xmin,xmax);
+
   // data
-  SampleAttributes DataAttr;
-  DataAttr.name = "Data";
-  DataAttr.sampleNames = DataSamples;
-  DataAttr.weight = TString("1.0*");
-  DataAttr.weightSS = WeightQCD;
-  DataAttr.cuts = CutsOS;
-  DataAttr.cutsSS = CutsSS;
-  DataAttr.hist = dataH;
-  DataAttr.histSS = dataSSH;
+  SampleAttributes DataSingleMuAttr;
+  DataSingleMuAttr.name = "Data_SingleMu";
+  DataSingleMuAttr.sampleNames = SingleMuon;
+  DataSingleMuAttr.cuts = CutsDataSingleMu_OS;
+  DataSingleMuAttr.cutsSS = CutsDataSingleMu_SS;
+  DataSingleMuAttr.hist = dataSingleMuH;
+  DataSingleMuAttr.histSS = dataSingleMuSSH;
+
+  SampleAttributes DataSingleEAttr;
+  DataSingleEAttr.name = "Data_SingleE";
+  DataSingleEAttr.sampleNames = SingleElectron;
+  DataSingleEAttr.cuts = CutsDataSingleE_OS;
+  DataSingleEAttr.cutsSS = CutsDataSingleE_SS;
+  DataSingleEAttr.hist = dataSingleEH;
+  DataSingleEAttr.histSS = dataSingleESSH;
+
+  SampleAttributes DataEMuAttr;
+  DataEMuAttr.name = "Data_EMu";
+  DataEMuAttr.sampleNames = MuonEG;
+  DataEMuAttr.cuts = CutsDataEMu_OS;
+  DataEMuAttr.cutsSS = CutsDataEMu_SS;
+  DataEMuAttr.hist = dataEMuH;
+  DataEMuAttr.histSS = dataEMuSSH;
 
   // ZTT
   SampleAttributes ZttAttr;
   ZttAttr.name = "ZTT";
   if (embedded) {
+    ZttAttr.name = "EmbeddedZTT";
     ZttAttr.sampleNames = EmbedSamples;
-    ZttAttr.weight = WeightEmb;
-    ZttAttr.weightSS = WeightEmbSS;
     ZttAttr.cuts = CutsOS;
     ZttAttr.cutsSS = CutsSS;
   }
   else {
+    ZttAttr.name = "ZTT";
     ZttAttr.sampleNames = DYSamples;
-    ZttAttr.weight = WeightDY;
-    ZttAttr.weightSS = WeightDYSS;
     ZttAttr.cuts = CutsZTT_OS;
     ZttAttr.cutsSS = CutsZTT_SS;
   }
@@ -201,8 +245,6 @@ void Plot_emu( bool embedded = true,
   SampleAttributes ZllAttr;
   ZllAttr.name = "ZLL";
   ZllAttr.sampleNames = DYSamples;
-  ZllAttr.weight = WeightDY;
-  ZllAttr.weightSS = WeightDYSS;
   ZllAttr.cuts = CutsZLL_OS;
   ZllAttr.cutsSS = CutsZLL_SS;
   ZllAttr.hist = zllH;
@@ -212,8 +254,6 @@ void Plot_emu( bool embedded = true,
   SampleAttributes WJetsAttr;
   WJetsAttr.name = "WJets";
   WJetsAttr.sampleNames = WJetsSamples;
-  WJetsAttr.weight = Weight;
-  WJetsAttr.weightSS = WeightSS;
   if (embedded) {
     WJetsAttr.cuts = CutsZLL_OS;
     WJetsAttr.cutsSS = CutsZLL_SS;
@@ -236,18 +276,41 @@ void Plot_emu( bool embedded = true,
   SampleAttributes TTAttr = WJetsAttr;
   TTAttr.name = "TTBar";
   TTAttr.sampleNames = TTSamples;
-  TTAttr.weight = WeightTop;
-  TTAttr.weightSS = WeightTopSS;
   TTAttr.hist = ttH;
-  TTAttr.histSS = ttSSH;
+  TTAttr.histSS = ttSSH;  
 
-  std::vector<SampleAttributes> AllSamples;
-  AllSamples.push_back(DataAttr);
+  // TTBarSys
+  SampleAttributes TTSysAttr = TTAttr;
+  TTSysAttr.name = "TTBarSys";
+  TTSysAttr.sampleNames = TTSamples;
+  TTSysAttr.hist = ttSysH;
+  TTSysAttr.histSS = ttSysSSH;  
+
+  std::vector<SampleAttributes> AllSamples;  
   AllSamples.push_back(ZttAttr);
   AllSamples.push_back(ZllAttr);
   AllSamples.push_back(WJetsAttr);
   AllSamples.push_back(EWKAttr);
   AllSamples.push_back(TTAttr);
+  AllSamples.push_back(TTSysAttr);
+ 
+  if (triggerOption==1) {
+    AllSamples.push_back(DataSingleMuAttr);
+    AllSamples.push_back(DataSingleEAttr);
+  }
+  else if (triggerOption==2) {
+    AllSamples.push_back(DataEMuAttr);
+    AllSamples.push_back(DataSingleMuAttr);
+    AllSamples.push_back(DataSingleEAttr);
+  }
+  else {
+    AllSamples.push_back(DataEMuAttr);
+  }
+  
+  //  Weight = "puweight*mcweight*prefiringweight*zptweight*effweightEMu*";
+  //  Weight = "puweight*mcweight*prefiringweight*topptweight*effweightEMu*";
+  //  Weight = "trigweightEMu*";
+  //  Weight = "weightEMu*";
 
   TCanvas * dummy = new TCanvas("dummy","",400,400);
 
@@ -256,6 +319,12 @@ void Plot_emu( bool embedded = true,
     SampleAttributes sampleAttr = AllSamples.at(i);
     TString name = sampleAttr.name; 
     std::vector<TString> Samples = sampleAttr.sampleNames;
+    TString WeightSample = Weight;
+    TString WeightSampleQCD = WeightQCD;
+    if (name=="TTBarSys") {      
+      WeightSample = Weight+"topptweight*";
+      WeightSampleQCD = WeightQCD+"topptweight*";
+    }
     for (unsigned int j=0; j<Samples.size(); ++j) {
       TString sampleName = Samples.at(j);
       std::cout << "Processing sample : " << sampleName << std::endl;
@@ -270,19 +339,20 @@ void Plot_emu( bool embedded = true,
       histSampleSS->Sumw2();
       TString CutsSample = sampleAttr.cuts + SpecificCut(sampleName);
       TString CutsSampleSS = sampleAttr.cutsSS + SpecificCut(sampleName);
-      tree->Draw(Variable+">>"+histName,sampleAttr.weight+"("+CutsSample+")");
-      tree->Draw(Variable+">>"+histNameSS,sampleAttr.weightSS+"("+CutsSampleSS+")");
+      tree->Draw(Variable+">>"+histName,WeightSample+"("+CutsSample+")");
+      tree->Draw(Variable+">>"+histNameSS,WeightSampleQCD+"("+CutsSampleSS+")");
       double norm = 1.0;
-      if (name=="Data"||sampleName.Contains("Embed")) {
+      double nevents = 1.0;
+      double xsec = 1.0;
+      if (name.Contains("Data")||name.Contains("Embed")) {
 	norm = 1.;
-	//	std::cout << sampleName << " = " << histSample->GetSumOfWeights() 
-	//		  << " : " << histSampleSS->GetSumOfWeights() << std::endl;
       }
       else { 
-	double xsec = xsecs[sampleName];
-	double nevents = histWeightsH->GetSumOfWeights();
+	xsec = xsecs[sampleName];
+	nevents = histWeightsH->GetSumOfWeights();
 	norm = xsec*lumi/nevents;
       }
+      //      std::cout << "   " << sampleName << "   nEvents = " << nevents << "   xsec = " << xsec << "  entries = " << histSample->GetEntries() << "   yield =" << histSample->GetSumOfWeights() << std::endl;
       sampleAttr.hist->Add(sampleAttr.hist,histSample,1.,norm);
       sampleAttr.histSS->Add(sampleAttr.histSS,histSampleSS,1.,norm);
       //      delete file;
@@ -292,17 +362,42 @@ void Plot_emu( bool embedded = true,
     }
   }  
   
+  //  std::cout << "entries = " << ZttAttr.hist->GetEntries() << " : sumOfW = " << ZttAttr.hist->GetSumOfWeights() << std::endl;
+  //  std::cout << "entries = " << TTAttr.hist->GetEntries() << " : sumOfW = " << TTAttr.hist->GetSumOfWeights() << std::endl;
+
   //  return;
 
-  // creating QCD
-  DataAttr.histSS->Add(DataAttr.histSS,ZttAttr.histSS,1,-1);
-  DataAttr.histSS->Add(DataAttr.histSS,ZllAttr.histSS,1,-1);
-  DataAttr.histSS->Add(DataAttr.histSS,WJetsAttr.histSS,1,-1);
-  DataAttr.histSS->Add(DataAttr.histSS,EWKAttr.histSS,1,-1);
-  DataAttr.histSS->Add(DataAttr.histSS,TTAttr.histSS,1,-1);
-  
-  std::cout << "HERE" << std::endl;
+  // *******************
+  // adding data samples 
+  // *******************
+  TH1D * histData = NULL;
+  TH1D * QCD = NULL;
+  if (triggerOption==1) {
+    histData = DataSingleEAttr.hist;
+    histData->Add(histData,DataSingleMuAttr.hist,1.,1.);
+    QCD = DataSingleEAttr.histSS;
+    QCD->Add(QCD,DataSingleMuAttr.histSS,1.,1.);
+  }
+  else if (triggerOption==2) {
+    histData = DataSingleEAttr.hist;
+    histData->Add(histData,DataSingleMuAttr.hist,1.,1.);
+    histData->Add(histData,DataEMuAttr.hist,1.,1.);
+    QCD = DataSingleEAttr.histSS;
+    QCD->Add(QCD,DataSingleMuAttr.histSS,1.,1.);
+    QCD->Add(QCD,DataEMuAttr.histSS,1.,1.);
+  }
+  else {
+    histData = DataEMuAttr.hist;
+    QCD = DataEMuAttr.histSS;
+  }
 
+  QCD->Add(QCD,ZttAttr.histSS,1,-1);
+  QCD->Add(QCD,ZllAttr.histSS,1,-1);
+  QCD->Add(QCD,WJetsAttr.histSS,1,-1);
+  QCD->Add(QCD,EWKAttr.histSS,1,-1);
+  QCD->Add(QCD,TTAttr.histSS,1,-1);
+
+  /*  
   TFile * fileBBH = new TFile(dir+"/SUSYGluGluToBBHToTauTau_M-1200.root");
   TTree * treeBBH = (TTree*)fileBBH->Get("TauCheck");
   TH1D * histWeightsBBH = (TH1D*)fileBBH->Get("nWeightedEvents");
@@ -326,16 +421,15 @@ void Plot_emu( bool embedded = true,
     histBBH->SetBinError(iB,0);
     histGGH->SetBinError(iB,0);
   }
-
+  */
   delete dummy;
   
-  TH1D * histData = DataAttr.hist;
   TH1D * W        = WJetsAttr.hist;
   TH1D * TT       = TTAttr.hist;
   TH1D * EWK      = EWKAttr.hist;
   TH1D * ZLL      = ZllAttr.hist;
   TH1D * ZTT      = ZttAttr.hist;
-  TH1D * QCD      = DataAttr.histSS;
+  TH1D * TTSys    = TTSysAttr.hist;
 
   std::cout << "Top : " << TT->GetSumOfWeights() << std::endl;
   std::cout << "EWK : " << EWK->GetSumOfWeights() << std::endl;
@@ -345,25 +439,26 @@ void Plot_emu( bool embedded = true,
   std::cout << "ZTT : " << ZTT->GetSumOfWeights() << std::endl;
 
   //  adding normalization systematics
-  double ZTT_norm = 0.04; //  normalization ZTT :  5% (EMBEDDED)
-  double EWK_norm = 0.10; //  normalization EWK : 10%
-  double QCD_norm = 0.15; //  normalization Fakes : 15%
-  double ZLL_mtau = 0.10; //  mu->tau fake rate ZLL : 10%
-  double TT_norm  = 0.07; //  normalization TT  :  7%
-  double mu_ID    = 0.02; //  muon trigger ID   :  2%
-  double tau_ID   = 0.02; //  tau ID            :  5%
-  double W_norm   = 0.15; //  normalization W   : 15%
+  double ZTT_norm = 0.04; //  normalization ZTT :  4% (EMBEDDED)
+  double EWK_norm = 0.05; //  normalization EWK :  5%
+  double QCD_norm = 0.10; //  normalization Fakes : 10%
+  double ZLL_mtau = 0.02; //  mu->tau fake rate ZLL : 2%
+  double TT_norm  = 0.06; //  normalization TT  :  7%
+  double W_norm   = 0.06; //  normalization W   :  6%
+
+  double eff_Emb = 0.04;
+  double eff_MC  = 0.04;
 
   for (int iB=1; iB<=nBins; ++iB) {
 
     float ztt  = ZTT->GetBinContent(iB);
     float ztte = ZTT->GetBinError(iB);
-    ztte = TMath::Sqrt(ztte*ztte+ztt*ztt*(ZTT_norm*ZTT_norm+mu_ID*mu_ID+tau_ID*tau_ID));
+    ztte = TMath::Sqrt(ztte*ztte+ztt*ztt*(ZTT_norm*ZTT_norm+eff_Emb*eff_Emb));
     ZTT->SetBinError(iB,ztte);
 
     float ewk  = EWK->GetBinContent(iB);
     float ewke = EWK->GetBinError(iB);
-    ewke = TMath::Sqrt(ewke*ewke+ewk*ewk*EWK_norm*EWK_norm);
+    ewke = TMath::Sqrt(ewke*ewke+ewk*ewk*(EWK_norm*EWK_norm+eff_MC*eff_MC));
     EWK->SetBinError(iB,ewke);
 
     float qcd  = QCD->GetBinContent(iB);
@@ -374,20 +469,24 @@ void Plot_emu( bool embedded = true,
       QCD->SetBinContent(iB,0.);
       QCD->SetBinError(iB,0.);
     }
+    //    std::cout << "bin : " << iB << " : " << QCD->GetBinContent(iB) << std::endl;
 
     float w = W->GetBinContent(iB);
     float we = W->GetBinError(iB);
-    we = TMath::Sqrt(we*we+w*w*(W_norm*W_norm+mu_ID*mu_ID));
+    we = TMath::Sqrt(we*we+w*w*(W_norm*W_norm+eff_MC*eff_MC));
     W->SetBinError(iB,we);
 
     float tt  = TT->GetBinContent(iB);
     float tte = TT->GetBinError(iB);
-    tte = TMath::Sqrt(tte*tte+tt*tt*TT_norm*TT_norm);
+    float ttweight = TT->GetBinContent(iB) - TTSys->GetBinContent(iB);
+    tte = TMath::Sqrt(tte*tte+tt*tt*(TT_norm*TT_norm+eff_MC*eff_MC)+ttweight*ttweight);
+    //    tte = TMath::Sqrt(tte*tte+tt*tt*TT_norm*TT_norm);
+    std::cout << iB << "  " << ttweight/tt << std::endl;
     TT->SetBinError(iB,tte);
 
     float zll  = ZLL->GetBinContent(iB);
     float zlle = ZLL->GetBinError(iB);
-    zlle = TMath::Sqrt(zlle*zlle+zll*zll*(mu_ID*mu_ID+ZLL_mtau*ZLL_mtau));
+    zlle = TMath::Sqrt(zlle*zlle+zll*zll*eff_MC*eff_MC);
     ZLL->SetBinError(iB,zlle);
 
     /*
@@ -407,10 +506,12 @@ void Plot_emu( bool embedded = true,
   ZTT->Add(ZTT,ZLL);
 
   std::cout << std::endl;
-  std::cout << "MC : " << ZTT->GetSumOfWeights() << std::endl;
-  std::cout << "DAT : " << histData->GetSumOfWeights() << std::endl;
+  std::cout << "Model : " << ZTT->GetSumOfWeights() << std::endl;
+  std::cout << "Data  : " << histData->GetSumOfWeights() << std::endl;
+  std::cout << "ratio = " << histData->GetSumOfWeights()/ZTT->GetSumOfWeights() << std::endl;
 
   TH1D * bkgdErr = (TH1D*)ZTT->Clone("bkgdErr");
+  //  TH1
   bkgdErr->SetFillStyle(3013);
   bkgdErr->SetFillColor(1);
   bkgdErr->SetMarkerStyle(21);
@@ -484,8 +585,8 @@ void Plot_emu( bool embedded = true,
   histData->Draw("e1same");
   bkgdErr->Draw("e2same");
   histData->Draw("e1same");
-  histBBH->Draw("same");
-  histGGH->Draw("same");
+  //  histBBH->Draw("same");
+  //  histGGH->Draw("same");
   float chi2 = 0;
   for (int iB=1; iB<=nBins; ++iB) {
     float xData = histData->GetBinContent(iB);
@@ -514,8 +615,8 @@ void Plot_emu( bool embedded = true,
   leg->AddEntry(W,"W#rightarrow e#nu","f");
   leg->AddEntry(EWK,"electroweak","f");
   leg->AddEntry(TT,"t#bar{t}","f");
-  leg->AddEntry(histBBH,"bbH(1200)","l");
-  leg->AddEntry(histGGH,"ggH(1200)","l");
+  //  leg->AddEntry(histBBH,"bbH(1200)","l");
+  //  leg->AddEntry(histGGH,"ggH(1200)","l");
   if (plotLegend) leg->Draw();
   writeExtraText = true;
   extraText = "Preliminary";
@@ -536,7 +637,7 @@ void Plot_emu( bool embedded = true,
   ratioH->SetMarkerStyle(20);
   ratioH->SetMarkerSize(1.2);
   ratioH->SetLineColor(1);
-  ratioH->GetYaxis()->SetRangeUser(0.601,1.399);
+  ratioH->GetYaxis()->SetRangeUser(0.701,1.299);
   ratioH->GetYaxis()->SetNdivisions(505);
   ratioH->GetXaxis()->SetLabelFont(42);
   ratioH->GetXaxis()->SetLabelOffset(0.04);
@@ -614,6 +715,9 @@ void Plot_emu( bool embedded = true,
   canv1->cd();
   canv1->SetSelected(canv1);
   canv1->Update();
-  canv1->Print("plot_"+Variable+suffix+"_"+era+"_emu.png");
+  if (correctTTBar)
+    canv1->Print(Variable+suffix+sel_suffix+trigger_suffix+"_"+era+"_corrTT.png");
+  else
+    canv1->Print(Variable+suffix+sel_suffix+trigger_suffix+"_"+era+".png");
 
 }

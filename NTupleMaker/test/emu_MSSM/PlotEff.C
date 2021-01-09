@@ -1,5 +1,4 @@
 #include "HttStylesNew.cc"
-#include "settings.h"
 
 double getEff(TFile * file, TString Cuts, TString Weight) {
   TH1D * hist = new TH1D("hist","",100,0,4000);
@@ -31,7 +30,7 @@ void PlotEff(TString era ="2018",
   double rat[50];
   double ratioTot[50];
 
-  TString dir = "/nfs/dust/cms/user/rasp/grid-jobs/emu_MSSM/"+era;;
+  TString dir = "/nfs/dust/cms/user/rasp/Run/emu_MSSM/Jan1/"+era;
 
   TString Weight("puweight*mcweight*prefiringweight*");
   TString WeightSingle = Weight + "effweight*";
