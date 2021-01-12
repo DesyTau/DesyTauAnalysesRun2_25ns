@@ -763,7 +763,8 @@ int main(int argc, char * argv[]) {
   //////////////////////////////////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////////////////////
   
-  
+   TString sample(argv[2]);
+   bool is4tau = sample.Contains("ToAA_AToTauTau");
   
    int numberOfCandidates = tree_->GetEntries();
 
@@ -1015,7 +1016,7 @@ int main(int argc, char * argv[]) {
        higgsPt = higgsLV.Pt();
        higgsTree->Fill();
        
-       if (applyHiggsPtWeight) 
+       if (applyHiggsPtWeight&&is4tau) 
        {
 	   double HiggsPtForWeighting = higgsPt;
 	   if (higgsPt>500) HiggsPtForWeighting = 499;
@@ -1044,6 +1045,17 @@ int main(int argc, char * argv[]) {
                                                genparticles_pz[higgsSMIndex],
                                                genparticles_e[higgsSMIndex]);
        higgsSMPt = higgsLV.Pt();
+
+       if (applyHiggsPtWeight&&!is4tau)
+	 {
+           double HiggsPtForWeighting = higgsSMPt;
+           if (higgsSMPt>500) HiggsPtForWeighting = 499;
+           double higgsPtWeight = 1;
+	   higgsPtWeight = higgsPtH->GetBinContent(higgsPtH->FindBin(HiggsPtForWeighting));
+	   weight *= higgsPtWeight;
+	   HiggsPtWeightH->Fill(higgsPtWeight);
+	 }
+
        higgsSMTree->Fill();
      }
      
