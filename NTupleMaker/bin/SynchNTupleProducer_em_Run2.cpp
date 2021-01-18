@@ -79,7 +79,7 @@
 #define pionMass 	 0.1396
 
 #define expectedtauspinnerweights 5
-
+double MassFromTString(TString sample);
 void initializeGenTree(Synch17GenTree *gentree);
 void FillVertices(const AC1B * analysisTree,Synch17Tree *otree, const bool isData);
 void FillGenTree(const AC1B * analysisTree, Synch17GenTree *gentree);
@@ -188,6 +188,7 @@ bool triggerMatching(AC1B * analysisTree, Float_t eta, Float_t phi, bool isFilte
    return trigMatch;
 }
 
+void CorrectPuppiMET(AC1B * analysisTree, Synch17Tree * otree, int era); 
 
 // Synch ntuple producer in the e+mu channel
 
@@ -286,7 +287,7 @@ int main(int argc, char * argv[]){
   }
   else {
     m_resolution_from_file.reset(new JME::JetResolution(cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/JER/Autumn18_V7b_MC_PtResolution_AK4PFchs.txt"));
-    m_scale_factor_from_file.reset(new JME::JetResolutionScaleFactor(cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/JER/Autumn18_V7b_MC_SF_AK8PFchs.txt"));    
+    m_scale_factor_from_file.reset(new JME::JetResolutionScaleFactor(cmsswBase+"/src/DesyTauAnalyses/NTupleMaker/data/JER/Autumn18_V7b_MC_SF_AK4PFchs.txt"));    
   }
 
   JME::JetResolution resolution = *m_resolution_from_file;
@@ -977,6 +978,8 @@ int main(int argc, char * argv[]){
 
       //      std::cout << "after trigger" << std::endl;
 
+      jets::CreateUncorrectedJets(&analysisTree);
+
       // initialize JER (including data and embedded) 
       otree->apply_recoil = ApplyRecoilCorrections;
       jets::initializeJER(&analysisTree);
@@ -1529,27 +1532,9 @@ int main(int argc, char * argv[]){
       // MET and Recoil Corrections !  
       ////////////////////////////////////////////////////////////
       // !!!!!!!!!!! include electron pT correction !!!!!!!!!!!!!
-    
-      otree->met = TMath::Sqrt(analysisTree.pfmetcorr_ex*analysisTree.pfmetcorr_ex + analysisTree.pfmetcorr_ey*analysisTree.pfmetcorr_ey);
-      otree->metphi = TMath::ATan2(analysisTree.pfmetcorr_ey,analysisTree.pfmetcorr_ex);
-      otree->metcov00 = analysisTree.pfmetcorr_sigxx;
-      otree->metcov01 = analysisTree.pfmetcorr_sigxy;
-      otree->metcov10 = analysisTree.pfmetcorr_sigyx;
-      otree->metcov11 = analysisTree.pfmetcorr_sigyy;
+      CorrectPuppiMET(&analysisTree, otree, era);
 
-      otree->puppimet = TMath::Sqrt(analysisTree.puppimet_ex*analysisTree.puppimet_ex + analysisTree.puppimet_ey*analysisTree.puppimet_ey);
-      otree->puppimetphi = TMath::ATan2(analysisTree.puppimet_ey,analysisTree.puppimet_ex);
-      otree->puppimetcov00 = analysisTree.puppimet_sigxx;
-      otree->puppimetcov01 = analysisTree.puppimet_sigxy;
-      otree->puppimetcov10 = analysisTree.puppimet_sigyx;
-      otree->puppimetcov11 = analysisTree.puppimet_sigyy;
-
-      otree->puppimet_ex_UnclusteredEnUp = analysisTree.puppimet_ex_UnclusteredEnUp;
-      otree->puppimet_ex_UnclusteredEnDown = analysisTree.puppimet_ex_UnclusteredEnDown;
-
-      otree->puppimet_ey_UnclusteredEnUp = analysisTree.puppimet_ey_UnclusteredEnUp;
-      otree->puppimet_ey_UnclusteredEnDown = analysisTree.puppimet_ey_UnclusteredEnDown;
-
+      /*     
       float puppimetUp = sqrt(analysisTree.puppimet_ex_UnclusteredEnUp*analysisTree.puppimet_ex_UnclusteredEnUp+
 			      analysisTree.puppimet_ey_UnclusteredEnUp*analysisTree.puppimet_ey_UnclusteredEnUp);
       float puppimetphiUp = atan2(analysisTree.puppimet_ey_UnclusteredEnUp,
@@ -1560,7 +1545,6 @@ int main(int argc, char * argv[]){
       float puppimetphiDown = atan2(analysisTree.puppimet_ey_UnclusteredEnDown,
 				  analysisTree.puppimet_ex_UnclusteredEnDown); 
 
-      /*     
       std::cout << std::endl;
       std::cout << " Central : (" << analysisTree.puppimet_ex 
 		<< "," << analysisTree.puppimet_ey << ")" << std::endl;
@@ -2019,5 +2003,118 @@ void FillElMu(const AC1B *analysisTree, Synch17Tree *otree, int electronIndex, f
     otree->q_2 = 1;
 
   otree->dr_tt = deltaR(otree->eta_1,otree->phi_1,otree->eta_2,otree->phi_2);
+
+}
+
+double MassFromTString(TString sample) {
+  double mass = 1000.;
+  std::vector<int> masses_int = {
+    80,90,100,110,120,125,130,140,160,180,200,
+    250,300,350,400,450,500,600,700,800,900,1000,
+    1200,1400,1500,1600,1800,2000,2300,2600,2900,3200,3500
+  };
+  
+  for (auto mass_int : masses_int) {    
+    TString substring = "M-"+TString(to_string(mass_int))+"_";
+    if (sample.Contains(substring)) {
+      mass = double(mass_int);
+      break;
+    }
+  }
+  
+  return mass;
+  
+}
+
+void CorrectPuppiMET(AC1B * analysisTree, Synch17Tree * otree, int era) {
+
+  TLorentzVector uncorrJets; uncorrJets.SetXYZT(0.,0.,0.,0.);
+  TLorentzVector corrJets; corrJets.SetXYZT(0.,0.,0.,0.);
+
+  bool is2017 = false;
+
+  double metUncorr = TMath::Sqrt(analysisTree->puppimet_ex*analysisTree->puppimet_ex + analysisTree->puppimet_ey*analysisTree->puppimet_ey);
+
+  if (era==2017) is2017 = true;
+
+  for (unsigned int jet = 0; jet < analysisTree->pfjet_count; ++jet) {
+    float absJetEta = TMath::Abs(analysisTree->pfjet_eta[jet]);
+
+    TLorentzVector uncorrJet; uncorrJet.SetXYZT(analysisTree->pfjet_px_uncorr[jet],
+						analysisTree->pfjet_py_uncorr[jet],
+						analysisTree->pfjet_pz_uncorr[jet],
+						analysisTree->pfjet_e_uncorr[jet]
+						);
+
+    TLorentzVector corrJet; corrJet.SetXYZT(analysisTree->pfjet_px[jet],
+					    analysisTree->pfjet_py[jet],
+					    analysisTree->pfjet_pz[jet],
+					    analysisTree->pfjet_e[jet]
+					    );
+
+    float pT_uncorr = uncorrJet.Pt();
+    float pT_corr = corrJet.Pt();
+
+    if (absJetEta>4.7) continue;
+    if (is2017 && pT_uncorr < 50 && absJetEta > 2.65 && absJetEta < 3.139)
+      continue;
+
+    double DR1 = deltaR(otree->eta_1,otree->phi_2,
+		       corrJet.Eta(),corrJet.Phi());
+    if (DR1<0.5) continue;
+    
+    double DR2 = deltaR(otree->eta_2,otree->phi_2,
+		       corrJet.Eta(),corrJet.Phi());
+    if (DR2<0.5) continue;	
+					
+    if (pT_corr>15.0) {
+      corrJets += corrJet;
+    }
+    if (pT_uncorr>15.0) {  
+      uncorrJets += uncorrJet;
+    }
+
+  }
+
+  analysisTree->pfmetcorr_ex = analysisTree->pfmetcorr_ex + uncorrJets.Px() - corrJets.Px();
+  analysisTree->pfmetcorr_ey = analysisTree->pfmetcorr_ey + uncorrJets.Py() - corrJets.Py();
+
+  analysisTree->puppimet_ex = analysisTree->puppimet_ex + uncorrJets.Px() - corrJets.Px();
+  analysisTree->puppimet_ey = analysisTree->puppimet_ey + uncorrJets.Py() - corrJets.Py();
+
+  analysisTree->puppimet_ex_UnclusteredEnUp = 
+    analysisTree->puppimet_ex_UnclusteredEnUp + uncorrJets.Px() - corrJets.Px();
+
+  analysisTree->puppimet_ex_UnclusteredEnDown =
+    analysisTree->puppimet_ex_UnclusteredEnDown + uncorrJets.Px() - corrJets.Px();
+
+  analysisTree->puppimet_ey_UnclusteredEnUp = 
+    analysisTree->puppimet_ey_UnclusteredEnUp + uncorrJets.Py() - corrJets.Py();
+
+  analysisTree->puppimet_ey_UnclusteredEnDown =
+    analysisTree->puppimet_ey_UnclusteredEnDown + uncorrJets.Py() - corrJets.Py();
+
+
+  otree->met = TMath::Sqrt(analysisTree->pfmetcorr_ex*analysisTree->pfmetcorr_ex + analysisTree->pfmetcorr_ey*analysisTree->pfmetcorr_ey);
+  otree->metphi = TMath::ATan2(analysisTree->pfmetcorr_ey,analysisTree->pfmetcorr_ex);
+  otree->metcov00 = analysisTree->pfmetcorr_sigxx;
+  otree->metcov01 = analysisTree->pfmetcorr_sigxy;
+  otree->metcov10 = analysisTree->pfmetcorr_sigyx;
+  otree->metcov11 = analysisTree->pfmetcorr_sigyy;
+
+  otree->puppimet = TMath::Sqrt(analysisTree->puppimet_ex*analysisTree->puppimet_ex + analysisTree->puppimet_ey*analysisTree->puppimet_ey);
+  otree->puppimetphi = TMath::ATan2(analysisTree->puppimet_ey,analysisTree->puppimet_ex);
+  otree->puppimetcov00 = analysisTree->puppimet_sigxx;
+  otree->puppimetcov01 = analysisTree->puppimet_sigxy;
+  otree->puppimetcov10 = analysisTree->puppimet_sigyx;
+  otree->puppimetcov11 = analysisTree->puppimet_sigyy;
+  
+  otree->puppimet_ex_UnclusteredEnUp = analysisTree->puppimet_ex_UnclusteredEnUp;
+  otree->puppimet_ex_UnclusteredEnDown = analysisTree->puppimet_ex_UnclusteredEnDown;
+  
+  otree->puppimet_ey_UnclusteredEnUp = analysisTree->puppimet_ey_UnclusteredEnUp;
+  otree->puppimet_ey_UnclusteredEnDown = analysisTree->puppimet_ey_UnclusteredEnDown;
+
+  //  std::cout << analysisTree->event_nr << " -> uncorr = " << metUncorr << "  corrected = " << otree->puppimet << "   njets = " << otree->njets << "  jpt_1 = " << otree->jpt_1 << "  jpt_2 = " << otree->jpt_2 << std::endl;  
 
 }
