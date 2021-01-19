@@ -585,6 +585,12 @@ void Synch17Tree::ReadInit(TTree *tree, bool em)
    //jets
    fChain->SetBranchAddress("njets", &njets, &b_njets);
    fChain->SetBranchAddress("nbtag", &nbtag, &b_nbtag);
+   fChain->SetBranchAddress("jpt_1", &jpt_1, &b_jpt_1);
+   fChain->SetBranchAddress("jeta_1", &jeta_1, &b_jeta_1);
+   fChain->SetBranchAddress("jphi_1", &jphi_1, &b_jphi_1);
+   fChain->SetBranchAddress("jpt_2", &jpt_2, &b_jpt_2);
+   fChain->SetBranchAddress("jeta_2", &jeta_2, &b_jeta_2);
+   fChain->SetBranchAddress("jphi_2", &jphi_2, &b_jphi_2);
    //VBF
    if (!em) {
      fChain->SetBranchAddress("mjj", &mjj, &b_mjj);
@@ -595,13 +601,7 @@ void Synch17Tree::ReadInit(TTree *tree, bool em)
      fChain->SetBranchAddress("jdphi", &jdphi, &b_jdphi);
      fChain->SetBranchAddress("njetingap", &njetingap, &b_njetingap);
      fChain->SetBranchAddress("njetingap20", &njetingap20, &b_njetingap20);
-     fChain->SetBranchAddress("jpt_1", &jpt_1, &b_jpt_1);
-     fChain->SetBranchAddress("jeta_1", &jeta_1, &b_jeta_1);
-     fChain->SetBranchAddress("jphi_1", &jphi_1, &b_jphi_1);
      fChain->SetBranchAddress("jcsv_1", &jcsv_1, &b_jcsv_1);
-     fChain->SetBranchAddress("jpt_2", &jpt_2, &b_jpt_2);
-     fChain->SetBranchAddress("jeta_2", &jeta_2, &b_jeta_2);
-     fChain->SetBranchAddress("jphi_2", &jphi_2, &b_jphi_2);
      fChain->SetBranchAddress("jcsv_2", &jcsv_2, &b_jcsv_2);
      fChain->SetBranchAddress("bpt_1", &bpt_1, &b_bpt_1);
      fChain->SetBranchAddress("beta_1", &beta_1, &b_beta_1);
@@ -1385,6 +1385,13 @@ fChain->Branch("againstElectronVLooseMVA6_2", &againstElectronVLooseMVA6_2, "aga
    //jets
    fChain->Branch("njets", &njets, "njets/I");
    fChain->Branch("nbtag", &nbtag, "nbtag/I");
+   fChain->Branch("jpt_1", &jpt_1, "jpt_1/F");
+   fChain->Branch("jeta_1", &jeta_1, "jeta_1/F");
+   fChain->Branch("jphi_1", &jphi_1, "jphi_1/F");
+   fChain->Branch("jpt_2", &jpt_2, "jpt_2/F");
+   fChain->Branch("jeta_2", &jeta_2, "jeta_2/F");
+   fChain->Branch("jphi_2", &jphi_2, "jphi_2/F");
+   
    if (!em) {
      fChain->Branch("mjj", &mjj, "mjj/F");
      fChain->Branch("jdeta", &jdeta, "jdeta/F");
@@ -1394,14 +1401,8 @@ fChain->Branch("againstElectronVLooseMVA6_2", &againstElectronVLooseMVA6_2, "aga
      fChain->Branch("jdphi", &jdphi, "jdphi/F");
      fChain->Branch("njetingap", &njetingap, "njetingap/I");
      fChain->Branch("njetingap20", &njetingap20, "njetingap20/I");
-     fChain->Branch("jpt_1", &jpt_1, "jpt_1/F");
-     fChain->Branch("jeta_1", &jeta_1, "jeta_1/F");
-     fChain->Branch("jpt_2", &jpt_2, "jpt_2/F");
-     fChain->Branch("jeta_2", &jeta_2, "jeta_2/F");
 
-     fChain->Branch("jphi_1", &jphi_1, "jphi_1/F");
      fChain->Branch("jcsv_1", &jcsv_1, "jcsv_1/F");
-     fChain->Branch("jphi_2", &jphi_2, "jphi_2/F");
      fChain->Branch("jcsv_2", &jcsv_2, "jcsv_2/F");
      //b-jets
      fChain->Branch("bpt_1", &bpt_1, "bpt_1/F");

@@ -56,15 +56,20 @@ namespace jets{
 		) {
     
     TRandom3 randm = TRandom3(0);
-    double jet_resolution = resolution.getResolution({{JME::Binning::JetPt, analysisTree->pfjet_pt[jet]}, 
+    double jet_resolution = resolution.getResolution
+      ({{JME::Binning::JetPt, analysisTree->pfjet_pt[jet]}, 
 	  {JME::Binning::JetEta,analysisTree->pfjet_eta[jet]}, 
 	    {JME::Binning::Rho, analysisTree->rho}});
     double jer_sf_Up = resolution_sf.getScaleFactor({{JME::Binning::JetPt, analysisTree->pfjet_pt[jet]}, {JME::Binning::JetEta, analysisTree->pfjet_eta[jet]}}, Variation::UP);
     double jer_sf_Down = resolution_sf.getScaleFactor({{JME::Binning::JetPt, analysisTree->pfjet_pt[jet]}, {JME::Binning::JetEta, analysisTree->pfjet_eta[jet]}}, Variation::DOWN);
     double jer_sf_Central = resolution_sf.getScaleFactor({{JME::Binning::JetPt, analysisTree->pfjet_pt[jet]}, {JME::Binning::JetEta, analysisTree->pfjet_eta[jet]}}, Variation::NOMINAL);
+
+    //    double jer_sf_Up = resolution_sf.getScaleFactor({{JME::Binning::JetEta, analysisTree->pfjet_eta[jet]}}, Variation::UP);
+    //    double jer_sf_Down = resolution_sf.getScaleFactor({{JME::Binning::JetEta, analysisTree->pfjet_eta[jet]}}, Variation::DOWN);
+    //    double jer_sf_Central = resolution_sf.getScaleFactor({{JME::Binning::JetEta, analysisTree->pfjet_eta[jet]}}, Variation::NOMINAL);
     
     randm.SetSeed(static_cast<int>((analysisTree->pfjet_eta[jet] + 5) * 1000) * 1000 + static_cast<int>((analysisTree->pfjet_phi[jet] + 4) * 1000) + 10000);
-    
+
     if (Hybrid) {
       int genJet = analysisTree->pfjet_genJet[jet];
       //      std::cout << "GenJet = " << genJet << std::endl;
@@ -72,6 +77,18 @@ namespace jets{
 	analysisTree->pfjet_JER_Central[jet] = (jer_sf_Central-1)*(analysisTree->pfjet_pt[jet]-analysisTree->genjets_pt[genJet])/analysisTree->pfjet_pt[jet];
 	analysisTree->pfjet_JER_Up[jet]      = (jer_sf_Up-1)*(analysisTree->pfjet_pt[jet]-analysisTree->genjets_pt[genJet])/analysisTree->pfjet_pt[jet]; 
 	analysisTree->pfjet_JER_Down[jet]    = (jer_sf_Down-1)*(analysisTree->pfjet_pt[jet]-analysisTree->genjets_pt[genJet])/analysisTree->pfjet_pt[jet];
+	/*
+	std::cout << jet 
+		  << "  pt(reco) = " << analysisTree->pfjet_pt[jet]
+		  << "   eta(reco) = " << analysisTree->pfjet_eta[jet]
+		  << "   phi(reco) = " << analysisTree->pfjet_phi[jet] << std::endl;
+	std::cout << "   pt(gen) = " << analysisTree->genjets_pt[genJet]
+		  << "   eta(gen) = " << analysisTree->genjets_eta[genJet]
+		  << "   phi(gen) = " << analysisTree->genjets_phi[genJet] << std::endl;
+	double shift = 1 + analysisTree->pfjet_JER_Central[jet];
+	std::cout << "   abs(ptReco-ptGen) = " << abs(analysisTree->pfjet_pt[jet]-analysisTree->genjets_pt[genJet]) << "  3*sigma*ptReco = " << 3*jet_resolution*analysisTree->pfjet_pt[jet] << std::endl; 
+	std::cout << "   sJER = " << jer_sf_Central  << " cJER = " << shift << "   smeared pt = " << shift*analysisTree->pfjet_pt[jet] << std::endl;
+	*/
       }
       else { 
 	double randomNumber = randm.Gaus(0, jet_resolution);
@@ -214,7 +231,24 @@ namespace jets{
      analysisTree->pfjet_phi[jet] = jetLV.Phi();
      
    }
- };
+  }
+  
+  void CreateUncorrectedJets(AC1B * analysisTree) {
+    
+    for (unsigned int jet=0; jet<analysisTree->pfjet_count; ++jet) {
+      analysisTree->pfjet_px_uncorr[jet] = analysisTree->pfjet_px[jet]*analysisTree->pfjet_energycorr[jet];
+      analysisTree->pfjet_py_uncorr[jet] = analysisTree->pfjet_py[jet]*analysisTree->pfjet_energycorr[jet];
+      analysisTree->pfjet_pz_uncorr[jet] = analysisTree->pfjet_pz[jet]*analysisTree->pfjet_energycorr[jet];
+      analysisTree->pfjet_e_uncorr[jet] = analysisTree->pfjet_e[jet]*analysisTree->pfjet_energycorr[jet];
+      /*
+      std::cout << jet << " : " << " jetPT = " 
+		<< analysisTree->pfjet_pt[jet] << "   jetPT = " 
+		<< analysisTree->pfjet_pt[jet]/analysisTree->pfjet_energycorr[jet] 
+		<< "   jetETA = " << analysisTree->pfjet_eta[jet] 
+		<< "   jetPHI = " << analysisTree->pfjet_phi[jet] << std::endl;
+      */
+    }
+  }
 
  void counting_jets(const AC1B *analysisTree, Synch17Tree *otree, const Config *cfg, const btag_scaling_inputs *inputs_btag_scaling, 
 		    TString JESname = "central", TString direction = "None",  JESUncertainties * jecUncertainties = 0){
@@ -319,10 +353,10 @@ namespace jets{
      float dR2 = deltaR(analysisTree->pfjet_eta[jet], analysisTree->pfjet_phi[jet], otree->eta_2, otree->phi_2);
      if (dR2 <= dRJetLeptonCut) continue;
      
-     if (correctedJet.Pt()>10 && !(is2017 && rawPt < 50 && absJetEta > 2.65 && absJetEta < 3.139))
+     if (correctedJet.Pt()>15 && !(is2017 && rawPt < 50 && absJetEta > 2.65 && absJetEta < 3.139))
        correctedJets += correctedJet;
      
-     if (uncorrectedJet.Pt()>10 && !(is2017 && rawPt < 50 && absJetEta > 2.65 && absJetEta < 3.139))
+     if (uncorrectedJet.Pt()>15 && !(is2017 && rawPt < 50 && absJetEta > 2.65 && absJetEta < 3.139))
        uncorrectedJets += uncorrectedJet;        
      
      // skip prefiring region for 2017:

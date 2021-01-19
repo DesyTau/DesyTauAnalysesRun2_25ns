@@ -414,7 +414,6 @@ class CardsEMu {
   const map<TString,TString> ShapeSystematics_Common = {
     {"CMS_scale_e","CMS_scale_e_13TeV"},
     {"CMS_scale_m","CMS_scale_mu_13TeV"},
-    {"CMS_scale_met_unclustered","CMS_scale_met_unclustered_13TeV"},
     {"CMS_scale_j_FlavorQCD","CMS_scale_j_FlavorQCD_13TeV"},
     {"CMS_scale_j_RelativeBal","CMS_scale_j_RelativeBal_13TeV"},
     {"CMS_scale_j_HF","CMS_scale_j_HF_13TeV"},
@@ -424,6 +423,7 @@ class CardsEMu {
   };
 
   const map<TString,TString> ShapeSystematics_2016 = {
+    {"CMS_scale_met_unclustered_2016","CMS_scale_met_unclustered_13TeV"},
     {"CMS_htt_boson_res_met_2016","CMS_htt_boson_reso_met_13TeV"},
     {"CMS_htt_boson_scale_met_2016","CMS_htt_boson_scale_met_13TeV"},
     {"CMS_htt_eff_b_2016","CMS_eff_b_13TeV"},
@@ -437,6 +437,7 @@ class CardsEMu {
   };  
 
   const map<TString,TString> ShapeSystematics_2017 = {
+    {"CMS_scale_met_unclustered_2017","CMS_scale_met_unclustered_13TeV"},
     {"CMS_htt_boson_res_met_2017","CMS_htt_boson_reso_met_13TeV"},
     {"CMS_htt_boson_scale_met_2017","CMS_htt_boson_scale_met_13TeV"},
     {"CMS_htt_eff_b_2017","CMS_eff_b_13TeV"},
@@ -450,6 +451,7 @@ class CardsEMu {
   };  
 
   const map<TString,TString> ShapeSystematics_2018 = {
+    {"CMS_scale_met_unclustered_2018","CMS_scale_met_unclustered_13TeV"},
     {"CMS_htt_boson_res_met_2018","CMS_htt_boson_reso_met_13TeV"},
     {"CMS_htt_boson_scale_met_2018","CMS_htt_boson_scale_met_13TeV"},
     {"CMS_htt_eff_b_2018","CMS_eff_b_13TeV"},

@@ -27,7 +27,9 @@ int main(int argc, char * argv[]) {
     {20,40,60,80,100,120,140,160,180,200,250,300,350,400,500,700,4000};
 
   int nBinsTTbar = 13;
-  double binsTTbar[14] = {20,40,60,80,100,125,150,200,250,300,500,700,1000,4000};
+  double binsTTbar[14] = {0, 50, 60, 80, 100,
+			  120, 150, 200, 250, 300,
+			  500, 700, 1000, 5000};
 
   TString era(argv[1]);
   TString sample(argv[2]);
@@ -37,7 +39,8 @@ int main(int argc, char * argv[]) {
   int systematics = atoi(argv[5]);
 
   TString inputDir("/nfs/dust/cms/user/rasp/Run/emu_MSSM/Jan1/");
-  TString outputDir("/nfs/dust/cms/user/rasp/Run/emu_MSSM/Jan1/datacards_"+trigger+"/");
+  //  TString outputDir("/nfs/dust/cms/user/rasp/Run/emu_MSSM/Jan1/datacards_"+trigger+"/");
+  TString outputDir("/nfs/dust/cms/user/rasp/Run/emu_MSSM/Jan10/datacards_"+trigger+"/");
   TString variable("mt_tot");
   int nbins = 20;
   double xmin = 0;

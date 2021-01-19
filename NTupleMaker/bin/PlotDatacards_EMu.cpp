@@ -345,28 +345,28 @@ void Plot(
 
 int main(int argc, char * argv[]) {
 
-  TString input_dir = "/nfs/dust/cms/user/rasp/Run/emu_MSSM/Jan1/datacards";
+  TString input_dir = "/nfs/dust/cms/user/rasp/Run/emu_MSSM/Jan10/datacards";
 
   vector<TString> eras = {"2016","2017","2018"};
-  vector<TString> triggers = {"0","1","2"};
+  vector<TString> triggers = {"0"};
   vector<TString> categories = 
     {
-      "em_inclusive",
-      "em_btag",
-      "em_nobtag",
-      "em_nobtag_highmsv",
+      //      "em_inclusive",
+      //      "em_btag",
+      //      "em_nobtag",
+      //      "em_nobtag_highmsv",
       "em_ttbar_control",
-      "em_ttbar_nobtag",
-      "em_ttbar_btag",
-      "em_nobtag_highdzeta",
-      "em_nobtag_mediumdzeta",
-      "em_nobtag_lowdzeta",
-      "em_nobtag_highmsv_highdzeta",
-      "em_nobtag_highmsv_mediumdzeta",
-      "em_nobtag_highmsv_lowdzeta",
-      "em_btag_highdzeta",
-      "em_btag_mediumdzeta",
-      "em_btag_lowdzeta"
+      //      "em_ttbar_nobtag",
+      //      "em_ttbar_btag",
+      //      "em_nobtag_highdzeta",
+      //      "em_nobtag_mediumdzeta",
+      //      "em_nobtag_lowdzeta",
+      //      "em_nobtag_highmsv_highdzeta",
+      //      "em_nobtag_highmsv_mediumdzeta",
+      //      "em_nobtag_highmsv_lowdzeta",
+      //      "em_btag_highdzeta",
+      //      "em_btag_mediumdzeta",
+      //      "em_btag_lowdzeta"
     };
 
   for (auto trigger : triggers) {

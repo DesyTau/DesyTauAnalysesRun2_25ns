@@ -554,10 +554,12 @@ public :
   Int_t           njetshad;
   Int_t           njetspt20;
   Float_t         jpt_1;
+  Float_t         jpt_1_unsmeared;
   Float_t         jeta_1;
   Float_t         jphi_1;
   Float_t         jcsv_1;
   Float_t         jpt_2;
+  Float_t         jpt_2_unsmeared;
   Float_t         jeta_2;
   Float_t         jphi_2;
   Float_t         jcsv_2;

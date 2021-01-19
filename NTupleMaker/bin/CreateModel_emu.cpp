@@ -11,7 +11,6 @@
 #include "DesyTauAnalyses/NTupleMaker/interface/Config.h"
 
 std::vector<TString> sysToLnNames_Common = {
-  "CMS_scale_met_unclustered",
   "CMS_scale_j_FlavorQCD",
   "CMS_scale_j_RelativeBal",
   "CMS_scale_j_HF",
@@ -21,8 +20,7 @@ std::vector<TString> sysToLnNames_Common = {
 };
 
 std::vector<TString> sysToLnNames_Era = {
-  "CMS_htt_boson_res_met",
-  "CMS_htt_boson_scale_met",
+  "CMS_scale_met_unclustered",
   "CMS_htt_eff_b",
   "CMS_htt_mistag_b",
   "CMS_scale_j_Absolute",
@@ -34,17 +32,17 @@ std::vector<TString> sysToLnNames_Era = {
 };
 
 std::vector<TString> higgsMass = {
-  "200",
-  "400",
-  "600",
-  "800",
+  //  "200",
+  //  "400",
+  //  "600",
+  //  "800",
   "1200",
-  "1400",
-  "1600",
-  "1800",
-  "2000",
-  "2600",
-  "3200"
+  //  "1400",
+  //  "1600",
+  //  "1800",
+  //  "2000",
+  //  "2600",
+  //  "3200"
 };
 
 TString ExtractSys(TFile * file, 
@@ -78,19 +76,19 @@ int main(int argc, char * argv[]) {
   }
   TString trigger(argv[1]);
 
-  TString dir = "/nfs/dust/cms/user/rasp/Run/emu_MSSM/Jan1/datacards_"+trigger;
-  TString dir_cards = "/nfs/dust/cms/user/rasp/Run/emu_MSSM/Jan1/cards_"+trigger;
+  TString       dir = "/nfs/dust/cms/user/rasp/Run/emu_MSSM/Jan10/datacards_"+trigger;
+  TString dir_cards = "/nfs/dust/cms/user/rasp/Run/emu_MSSM/Jan10/cards_"+trigger;
 
   std::vector<TString> categories = { 
     "em_ttbar_control",
     "em_ttbar_btag",
     "em_ttbar_nobtag",
-    "em_btag_lowdzeta",
-    "em_btag_mediumdzeta",
-    "em_btag_highdzeta",
-    "em_nobtag_lowdzeta",
-    "em_nobtag_mediumdzeta",
-    "em_nobtag_highdzeta"
+    //    "em_btag_lowdzeta",
+    //    "em_btag_mediumdzeta",
+    //    "em_btag_highdzeta",
+    //    "em_nobtag_lowdzeta",
+    //    "em_nobtag_mediumdzeta",
+    //    "em_nobtag_highdzeta"
   };
 
   std::vector<TString> eras = {
@@ -165,6 +163,14 @@ int main(int argc, char * argv[]) {
 	ZLL_sys[sysName] = ExtractSys(file, cat, "ZLL", sysName); 
       }
 
+      if (Era=="2017"||Era=="2016") {	
+	TString sysName = "CMS_Prefiring";
+	TTL_sys[sysName] = ExtractSys(file, cat, "TTL", sysName);
+	VVL_sys[sysName] = ExtractSys(file, cat, "VVL", sysName);
+	W_sys[sysName]   = ExtractSys(file, cat, "W", sysName);
+	ZLL_sys[sysName] = ExtractSys(file, cat, "ZLL", sysName);	
+      }
+
       for (auto mass : higgsMass ) {
 	for (auto sig : signals) {
 
@@ -219,16 +225,19 @@ int main(int argc, char * argv[]) {
 		   << vv_yield << "  " 
 		   << zll_yield << std::endl;
 	  textFile << "-----------------------------" << std::endl;
+	  textFile << "CMS_htt_norm_QCD_" << Era << "             lnN      -     -     -     1.05  -  -  -  "<< std::endl;
+	  textFile << "CMS_htt_norm_emb_" << Era << "             lnN      -  1.04     -       -      -      -      -" << std::endl;
 	  textFile << "CMS_eff_m                        lnN   1.02     -   1.02      -   1.02   1.02   1.02" << std::endl;
 	  textFile << "CMS_eff_e                        lnN   1.02     -   1.02      -   1.02   1.02   1.02" << std::endl;
-	  textFile << "CMS_trigger_" << Era << "     lnN   1.02     -   1.02      -   1.02   1.02   1.02" << std::endl;
-	  textFile << "CMS_trigger_emb" << Era << "  lnN      -   1.02     -      -      -      -      -" << std::endl;
+	  textFile << "CMS_trigger_em_" << Era << "     lnN   1.02     -   1.02      -   1.02   1.02   1.02" << std::endl;
+	  textFile << "CMS_trigger_emb_em_" << Era << "  lnN      -   1.02     -      -      -      -      -" << std::endl;
 	  textFile << "CMS_eff_m_emb                    lnN      -   1.02      -      -     -     -   -" << std::endl;
 	  textFile << "CMS_eff_e_emb                    lnN      -   1.02      -      -     -     -   -" << std::endl;
 
 	  textFile << "CMS_htt_tjXsec                   lnN      -      -   1.06      -      -      -      -" << std::endl;
 	  textFile << "CMS_htt_wjXsec                   lnN      -      -      -      -   1.06      -      -" << std::endl;
 	  textFile << "CMS_htt_vvXsec                   lnN      -      -      -      -      -   1.06      -" << std::endl;
+	  textFile << "CMS_htt_zjXsec                   lnN      -      -      -      -      -      -   1.02" << std::endl;
 	  textFile << "CMS_htt_zjXsec                   lnN      -      -      -      -      -      -   1.02" << std::endl;
 	  textFile << "lumi_" << Era  << "           lnN   1.015    1.015   1.015      -   1.015   1.015   1.015" << std::endl;
 
@@ -265,7 +274,9 @@ int main(int argc, char * argv[]) {
 		     << ZLL_sys[sysName] << std::endl;
 	  }
 	  
-
+	  textFile << "CMS_htt_boson_res_met_" << Era << "  shape  1.0   -   -   -  -  -  1.0" << std::endl;
+	  textFile << "CMS_htt_boson_scale_met_" << Era << "  shape 1.0  -   -   -  -  -  1.0" << std::endl;
+	  
 	  textFile << "* autoMCStats 10 "<< std::endl;
 	  textFile.close();
 

@@ -126,8 +126,6 @@ CardsEMu::CardsEMu(TString Sample,
   std::vector<TString> EmbeddedSample = EmbeddedElMu_2018;
   lumi = 59740;
 
-
-
   commonCuts = "pt_1>15.&&pt_2>15.&&iso_1<0.15&&iso_2<0.2&&extraelec_veto<0.5&&extramuon_veto<0.5&&dr_tt>0.3";
   commonCuts += categoryCuts[category];
 
@@ -194,7 +192,7 @@ CardsEMu::CardsEMu(TString Sample,
   sampleXSecMap = xsecs;
 
   nameSampleMap["Data"] = DataSample; nameHistoMap["Data"] = "data_obs";
-  nameSampleMap["DYJetsToLL"] = DYJetsToLL; nameHistoMap["DYJetsToLL"] = "ZLL"; 
+  nameSampleMap["DYJetsToLL"] = DYJetsToLL; nameHistoMap["DYJetsToLL"] = "ZL"; 
   nameSampleMap["DYJetsToTT"] = DYJetsToTT; nameHistoMap["DYJetsToTT"] = "ZTT";
   nameSampleMap["WJets"] = WJets; nameHistoMap["WJets"] = "W";
   nameSampleMap["TTbar"] = TT; nameHistoMap["TTbar"] = "TTL";
