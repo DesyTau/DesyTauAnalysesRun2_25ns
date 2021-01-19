@@ -1034,6 +1034,7 @@ int main(int argc, char * argv[]) {
 	   }
 	   weight *= higgsPtWeight;
 	   HiggsPtWeightH->Fill(higgsPtWeight);
+	   //	   std::cout << "HiggsPt weight (Pythia) = " << higgsPtWeight << std::endl;
        }
        
      }
@@ -1054,6 +1055,7 @@ int main(int argc, char * argv[]) {
 	   higgsPtWeight = higgsPtH->GetBinContent(higgsPtH->FindBin(HiggsPtForWeighting));
 	   weight *= higgsPtWeight;
 	   HiggsPtWeightH->Fill(higgsPtWeight);
+	   //	   std::cout << "HiggsPt weight (Madgraph) = " << higgsPtWeight << std::endl;
 	 }
 
        higgsSMTree->Fill();
