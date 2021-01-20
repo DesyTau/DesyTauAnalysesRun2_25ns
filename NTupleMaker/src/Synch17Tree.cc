@@ -21,11 +21,17 @@ Synch17Tree::Synch17Tree(TTree *tree, bool emu) : fChain(0) {
 
 void Synch17Tree::Init(TTree *tree, bool emu){
   if(!tree) return;
+  
+  isGGHWeights = false;
 	      
   if(tree->GetEntries())
     ReadInit(tree, emu);
   else
     WriteInit(tree, emu);
+}
+
+void Synch17Tree::SetGGHWeights(bool isGGH) {
+  isGGHWeights = isGGH;
 }
 
 // Destructors
@@ -375,6 +381,11 @@ void Synch17Tree::ReadInit(TTree *tree, bool em)
    //   fChain->SetBranchAddress("byTightIsolationMVArun2017v2DBoldDMwLT2017_2", &byTightIsolationMVArun2017v2DBoldDMwLT2017_2, &b_byTightIsolationMVArun2017v2DBoldDMwLT2017_2);
    //   fChain->SetBranchAddress("byVTightIsolationMVArun2017v2DBoldDMwLT2017_2", &byVTightIsolationMVArun2017v2DBoldDMwLT2017_2, &b_byVTightIsolationMVArun2017v2DBoldDMwLT2017_2);
    //   fChain->SetBranchAddress("byVVTightIsolationMVArun2017v2DBoldDMwLT2017_2", &byVVTightIsolationMVArun2017v2DBoldDMwLT2017_2, &b_byVVTightIsolationMVArun2017v2DBoldDMwLT2017_2);
+
+   //   if (isGGHWeights) {
+   //     for (unsigned int i=0; i<30; ++i)
+   //       fChain->SetBranchAddress(ggHWeights_name[i], ggHWeights[i]);
+   //   }
 
    fChain->SetBranchAddress("weight", &weight, &b_weight);
    fChain->SetBranchAddress("weightSingle", &weightSingle, &b_weightSingle);
@@ -859,6 +870,12 @@ void Synch17Tree::WriteInit(TTree *tree, bool em) {
   fChain->Branch("npu", &npu, "npu/F");
   fChain->Branch("rho", &rho, "rho/F");
   
+  if (isGGHWeights) {
+    for (int i=0; i<30; ++i) {
+      fChain->Branch(TString(ggHWeights_name[i]),&ggHWeights[i],TString(ggHWeights_name[i])+"/F");      
+    }
+  }
+
   fChain->Branch("passedAllMetFilters", &passedAllMetFilters, "passedAllMetFilters/O");
 
   fChain->Branch("pt_1", &pt_1, "pt_1/F");

@@ -23,7 +23,42 @@
 
 class Synch17Tree {
 public :
+
+  const std::vector<std::string> ggHWeights_name = {
+    "A_b_ratio",
+    "A_t_ratio",
+    "A_i_ratio",
+    "H_b_ratio",
+    "H_t_ratio",
+    "H_i_ratio",
+    "A_b_ratio_scale_up",
+    "A_t_ratio_scale_up",
+    "A_i_ratio_scale_up",
+    "H_b_ratio_scale_up",
+    "H_t_ratio_scale_up",
+    "H_i_ratio_scale_up",
+    "A_b_ratio_scale_down",
+    "A_t_ratio_scale_down",
+    "A_i_ratio_scale_down",
+    "H_b_ratio_scale_down",
+    "H_t_ratio_scale_down",
+    "H_i_ratio_scale_down",
+    "A_b_ratio_hdamp_up",
+    "A_t_ratio_hdamp_up",
+    "A_i_ratio_hdamp_up",
+    "H_b_ratio_hdamp_up",
+    "H_t_ratio_hdamp_up",
+    "H_i_ratio_hdamp_up",
+    "A_b_ratio_hdamp_down",
+    "A_t_ratio_hdamp_down",
+    "A_i_ratio_hdamp_down",
+    "H_b_ratio_hdamp_down",
+    "H_t_ratio_hdamp_down",
+    "H_i_ratio_hdamp_down",
+  };
   
+
+
   TTree *fChain;   //!pointer to the analyzed TTree or TChain
   Int_t fCurrent;  //!current Tree number in a TChain
   
@@ -737,6 +772,8 @@ public :
 
   Bool_t apply_recoil;
 
+  Float_t ggHWeights[30];
+
   //////////////////////////////////////////////
   //            List of branches              //
   //////////////////////////////////////////////
@@ -1266,8 +1303,7 @@ public :
   TBranch	 *b_bphi_2;
   TBranch	 *b_bcsv_2;
   
-  //Misc
-  
+  //Misc  
 
   TBranch	 *b_gen_noutgoing;
   TBranch	 *b_os;
@@ -1425,11 +1461,14 @@ public :
   TBranch        *b_y2_ZMF;
   TBranch        *b_y1_TMF;
   TBranch        *b_y2_TMF;
+  
+  bool isGGHWeights;
 
   Synch17Tree(TTree *tree=0, bool emu = false);
   virtual ~Synch17Tree();
 
   virtual void Init(TTree *tree, bool emu);
+  virtual void SetGGHWeights(bool isGGH);
   
   //Read methods
   virtual void     ReadInit(TTree *tree, bool emu);

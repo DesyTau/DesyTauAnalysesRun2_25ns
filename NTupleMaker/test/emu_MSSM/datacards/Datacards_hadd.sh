@@ -1,7 +1,7 @@
 #!/bin/sh 
 era=$1
 trigger=$2
-dir=/nfs/dust/cms/user/rasp/Run/emu_MSSM/Jan1/
+dir=/nfs/dust/cms/user/rasp/Run/emu_MSSM/Jan10/
 
 echo "base directory" $dir
 

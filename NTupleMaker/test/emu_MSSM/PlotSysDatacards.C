@@ -3,10 +3,10 @@
 // CMS_htt_boson_scale_met
 // CMS_ZLShape_et_1prong1pizero_Run2017
 
-void PlotSysDatacards(TString fileName = "/nfs/dust/cms/user/rasp/Run/emu_MSSM/Jan1/datacards_2/2018/htt_em_mssm",
+void PlotSysDatacards(TString fileName = "/nfs/dust/cms/user/rasp/Run/emu_MSSM/Jan10/datacards_0/2016/htt_em_mssm",
 	     TString histName = "TTL",
 		      
-	     TString sysName  = "CMS_scale_j_RelativeBal",
+	     TString sysName  = "CMS_scale_j_Absolute",
 	     TString category = "em_ttbar_control",
 	     float xmax = 100,
 	     float upRange = -100) {

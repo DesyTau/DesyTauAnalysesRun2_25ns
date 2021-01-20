@@ -86,6 +86,8 @@ void FillGenTree(const AC1B * analysisTree, Synch17GenTree *gentree);
 float getEmbeddedWeight(const AC1B * analysisTree, RooWorkspace* WS);
 void FillElMu(const AC1B *analysisTree, Synch17Tree *otree, int electronIndex, float dRisoElectron, int muonIndex, float dRIsoMuon, int era, bool isEmbedded);
 
+void getHiggsPtWeight(const AC1B * analysisTree, Synch17Tree * tree, RooWorkspace * ws, double mass);
+
 bool accessTriggerInfo(const AC1B * analysisTree, TString HLTFilterName, unsigned int &nHLTFilter)
 {
    bool isHLTFilter = false;
@@ -188,7 +190,7 @@ bool triggerMatching(AC1B * analysisTree, Float_t eta, Float_t phi, bool isFilte
    return trigMatch;
 }
 
-void CorrectPuppiMET(AC1B * analysisTree, Synch17Tree * otree, int era); 
+void GetPuppiMET(AC1B * analysisTree, Synch17Tree * otree, int era, bool isEmbedded, bool isData); 
 
 // Synch ntuple producer in the e+mu channel
 
@@ -226,6 +228,11 @@ int main(int argc, char * argv[]){
   const string sample = argv[2];
   const bool isData = cfg.get<bool>("isData");
   const string infiles = argv[2];
+  TString SampleName(argv[2]);
+  bool isGGH = SampleName.Contains("SUSYGluGluToHToTauTau");
+  double HiggsMass = 1000.;
+  if (isGGH)
+    HiggsMass = MassFromTString(SampleName);
 
   lumi_json json;
   if (isData){ 
@@ -543,6 +550,17 @@ int main(int argc, char * argv[]){
   RooWorkspace *w = (RooWorkspace*)f_workspace->Get("w");
   RooWorkspace *correctionWS = (RooWorkspace*)f_workspace_kit->Get("w");
 
+  TString ggHWeightsFile("higgs_pt_v0.root");
+  if (era==2016)
+    ggHWeightsFile = "higgs_pt_2016_v0.root";
+  TFile * f_ggHWeights = new TFile(TString(cmsswBase) + "/src/DesyTauAnalyses/NTupleMaker/data/" + ggHWeightsFile);
+  if (f_ggHWeights->IsZombie()) {
+    std::cout << "Cannot open file " << ggHWeightsFile << std::endl;
+    exit(-1);
+  }
+
+  RooWorkspace * higgsPt_ws = (RooWorkspace*)f_ggHWeights->Get("w");
+
   // Zpt reweighting for LO DY samples 
   TFile *f_zptweight = new TFile(TString(cmsswBase) + "/src/" + ZptweightFile, "read");
   TH2D *h_zptweight = (TH2D*)f_zptweight->Get("zptmass_histo");
@@ -598,7 +616,8 @@ int main(int argc, char * argv[]){
   //  TTree *gtree = new TTree("GenTauCheck", "GenTauCheck");
   Synch17Tree *otree = new Synch17Tree(tree,true);
   //  Synch17GenTree *gentree = new Synch17GenTree(gtree);
-    
+  otree->SetGGHWeights(isGGH);
+
   int nTotalFiles = 0;
   int nEvents = 0;
   int selEvents = 0;
@@ -985,7 +1004,6 @@ int main(int argc, char * argv[]){
       jets::initializeJER(&analysisTree);
 
       //      std::cout << "initialising JER" << std::endl;
-
       //      std::cout << "event number = " << analysisTree.event_nr << std::endl;
       if (!isData && !isEmbedded) { // JER smearing
 	jets::associateRecoAndGenJets(&analysisTree, resolution);
@@ -1529,12 +1547,17 @@ int main(int argc, char * argv[]){
 	otree->weightEMu = 1.0;
       }
 
+      if (isGGH) {
+	getHiggsPtWeight(&analysisTree,otree,higgsPt_ws,HiggsMass);
+      }
+
 
       ////////////////////////////////////////////////////////////
       // MET and Recoil Corrections !  
       ////////////////////////////////////////////////////////////
       // !!!!!!!!!!! include electron pT correction !!!!!!!!!!!!!
-      CorrectPuppiMET(&analysisTree, otree, era);
+      GetPuppiMET(&analysisTree, otree, era, isData, isEmbedded);
+
 
       /*     
       float puppimetUp = sqrt(analysisTree.puppimet_ex_UnclusteredEnUp*analysisTree.puppimet_ex_UnclusteredEnUp+
@@ -2028,62 +2051,125 @@ double MassFromTString(TString sample) {
   
 }
 
-void CorrectPuppiMET(AC1B * analysisTree, Synch17Tree * otree, int era) {
-
+void GetPuppiMET(AC1B * analysisTree, Synch17Tree * otree, int era, bool isData, bool isEmbedded) {
 
   bool is2017 = false;
 
   double metUncorr = TMath::Sqrt(analysisTree->puppimet_ex*analysisTree->puppimet_ex + analysisTree->puppimet_ey*analysisTree->puppimet_ey);
+
   double metUncorrPx = analysisTree->puppimet_ex;
   double metUncorrPy = analysisTree->puppimet_ey;
-  double metCorrPx = analysisTree->puppimet_ex;
-  double metCorrPy = analysisTree->puppimet_ey;
+
+  double shiftX = 0;
+  double shiftY = 0;
 
   //  std::cout << "Event number = " << analysisTree->event_nr << std::endl;
 
   if (era==2017) is2017 = true;
 
-  for (unsigned int jet = 0; jet < analysisTree->pfjet_count; ++jet) {
-    float absJetEta = TMath::Abs(analysisTree->pfjet_eta[jet]);
+  if (!isData && !isEmbedded) { // jet corrections for MC
+    for (unsigned int jet = 0; jet < analysisTree->pfjet_count; ++jet) {
+      float absJetEta = TMath::Abs(analysisTree->pfjet_eta[jet]);
 
-    TLorentzVector uncorrJet; uncorrJet.SetXYZT(analysisTree->pfjet_px_uncorr[jet],
-						analysisTree->pfjet_py_uncorr[jet],
-						analysisTree->pfjet_pz_uncorr[jet],
-						analysisTree->pfjet_e_uncorr[jet]
-						);
-
-    TLorentzVector corrJet; corrJet.SetXYZT(analysisTree->pfjet_px[jet],
-					    analysisTree->pfjet_py[jet],
-					    analysisTree->pfjet_pz[jet],
-					    analysisTree->pfjet_e[jet]
-					    );
-
-    float pT_uncorr = uncorrJet.Pt();
-    float pT_corr = corrJet.Pt();
-
-    if (absJetEta>4.7) continue;
-    if (is2017 && pT_uncorr < 50 && absJetEta > 2.65 && absJetEta < 3.139)
-      continue;
-
-    double DR1 = deltaR(otree->eta_1,otree->phi_1,
-		       corrJet.Eta(),corrJet.Phi());
-    if (DR1<0.5) {
-      TLorentzVector electron; electron.SetPtEtaPhiM(otree->pt_1,otree->eta_1,otree->phi_1,otree->m_1);
-    
-      std::cout << "correcting MET for electron : px = " << electron.Px()
-		<< "   py = " << electron.Py() 
-		<< "   pz = " << electron.Pz() << std::endl; 
-      metCorrPx = metCorrPx + corrJet.Px() - electron.Px();
-      metCorrPy = metCorrPy + corrJet.Py() - electron.Py();
+      TLorentzVector uncorrJet; uncorrJet.SetXYZT(analysisTree->pfjet_px_uncorr[jet],
+						  analysisTree->pfjet_py_uncorr[jet],
+						  analysisTree->pfjet_pz_uncorr[jet],
+						  analysisTree->pfjet_e_uncorr[jet]
+						  );
+      
+      TLorentzVector corrJet; corrJet.SetXYZT(analysisTree->pfjet_px[jet],
+					      analysisTree->pfjet_py[jet],
+					      analysisTree->pfjet_pz[jet],
+					      analysisTree->pfjet_e[jet]
+					      );
+      
+      float pT_uncorr = uncorrJet.Pt();
+      float pT_corr = corrJet.Pt();
+      
+      if (absJetEta>4.7) continue;
+      if (is2017 && pT_uncorr < 50 && absJetEta > 2.65 && absJetEta < 3.139)
+	continue;
+      
+      if (pT_corr<15.0) continue;
+      
+      /*
+	std::cout << "jet : unsmeared = (" << uncorrJet.Px()
+	<< "," << uncorrJet.Py()
+	<< "," << uncorrJet.Pz()
+	<< ")   corrected/smeared = (" << corrJet.Px()
+	<< "," << corrJet.Py()
+	<< "," << corrJet.Pz() << ")" << std::endl;
+      */	      
+      
+      shiftX = shiftX + uncorrJet.Px() - corrJet.Px();
+      shiftY = shiftY + uncorrJet.Py() - corrJet.Py();
       
     }
+  } 
+  if (isEmbedded) { // additional electron correction (assuming it is small in data)
+    double px_ele_uncorr = otree->pt_uncorr_1*TMath::Cos(otree->phi_1);
+    double py_ele_uncorr = otree->pt_uncorr_1*TMath::Sin(otree->phi_1);
+    double px_ele = otree->pt_1*TMath::Cos(otree->phi_1);
+    double py_ele = otree->pt_1*TMath::Sin(otree->phi_1);
+    shiftX = shiftX + px_ele_uncorr - px_ele;
+    shiftY = shiftY + py_ele_uncorr - py_ele;
   }
 
-  std::cout << analysisTree->event_nr 
-	    << " -> uncorrX = " << metUncorrPx 
-	    << "    uncorrY = " << metUncorrPy 
-	    << "    :  corrX = " << metCorrPx 
-	    << "  corrY = " << metCorrPy << std::endl; 
+  double metCorrPx = metUncorrPx + shiftX;
+  double metCorrPy = metUncorrPy + shiftY;
+
+  otree->puppimet_ex_UnclusteredEnUp = analysisTree->puppimet_ex_UnclusteredEnUp + shiftX;
+  otree->puppimet_ex_UnclusteredEnDown = analysisTree->puppimet_ex_UnclusteredEnDown + shiftX;
+
+  otree->puppimet_ey_UnclusteredEnUp = analysisTree->puppimet_ey_UnclusteredEnUp + shiftY;
+  otree->puppimet_ey_UnclusteredEnDown = analysisTree->puppimet_ey_UnclusteredEnDown + shiftY;
+
+  otree->puppimet = TMath::Sqrt(metCorrPx*metCorrPx+metCorrPy*metCorrPy);
+  otree->puppimetphi = TMath::ATan2(metCorrPy,metCorrPx);
+
+  /*
+  std::cout << " shift in Met due to jets (x,y) = ("
+	    << shiftX << "," << shiftY << ")   "
+	    << " puppiMET : uncorr (x,y) = (" << metUncorrPx 
+	    << "," << metUncorrPy << ")" 
+	    << "    corr (x,y) = (" << metCorrPx 
+	    << "," << metCorrPy << ")" << std::endl; 
   std::cout << std::endl;
+  */
+}
+
+void getHiggsPtWeight(const AC1B * analysisTree, Synch17Tree * otree, RooWorkspace * ws, double mass) {
+
+  for (unsigned int i=0; i<30; ++i)
+    otree->ggHWeights[i] = 1.0;
+
+  int HiggsIndex = -1;
+  for (unsigned int i=0; i<analysisTree->genparticles_count; ++i) {
+    int pdgId = analysisTree->genparticles_pdgid[i];
+    if (pdgId==25||pdgId==35||pdgId==36) {
+      HiggsIndex = i;
+      TLorentzVector HiggsLV; HiggsLV.SetXYZT(analysisTree->genparticles_px[HiggsIndex],
+					      analysisTree->genparticles_py[HiggsIndex],
+					      analysisTree->genparticles_pz[HiggsIndex],
+					      analysisTree->genparticles_e[HiggsIndex]);
+
+      //      std::cout << "pdgid = " << pdgId << "  pt = " << HiggsLV.Pt() << std::endl;
+    }
+  }
+  if (HiggsIndex>=0) {
+    TLorentzVector HiggsLV; HiggsLV.SetXYZT(analysisTree->genparticles_px[HiggsIndex],
+					    analysisTree->genparticles_py[HiggsIndex],
+					    analysisTree->genparticles_pz[HiggsIndex],
+					    analysisTree->genparticles_e[HiggsIndex]);
+    ws->var("h_pt")->setVal(HiggsLV.Pt());
+    ws->var("h_mass")->setVal(mass);
+
+    //    std::cout << "Higgs mass = " << mass << "  pT = " << HiggsLV.Pt() << std::endl;
+    for (unsigned int i=0; i<30; ++i) {
+      otree->ggHWeights[i] = ws->function(otree->ggHWeights_name[i].c_str())->getVal();
+      //      std::cout << otree->ggHWeights_name[i] << " : " << otree->ggHWeights[i] << std::endl;
+    }
+  }
+  //  std::cout << std::endl;
 
 }

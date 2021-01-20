@@ -236,17 +236,16 @@ namespace jets{
   void CreateUncorrectedJets(AC1B * analysisTree) {
     
     for (unsigned int jet=0; jet<analysisTree->pfjet_count; ++jet) {
+      /*
       analysisTree->pfjet_px_uncorr[jet] = analysisTree->pfjet_px[jet]*analysisTree->pfjet_energycorr[jet];
       analysisTree->pfjet_py_uncorr[jet] = analysisTree->pfjet_py[jet]*analysisTree->pfjet_energycorr[jet];
       analysisTree->pfjet_pz_uncorr[jet] = analysisTree->pfjet_pz[jet]*analysisTree->pfjet_energycorr[jet];
       analysisTree->pfjet_e_uncorr[jet] = analysisTree->pfjet_e[jet]*analysisTree->pfjet_energycorr[jet];
-      /*
-      std::cout << jet << " : " << " jetPT = " 
-		<< analysisTree->pfjet_pt[jet] << "   jetPT = " 
-		<< analysisTree->pfjet_pt[jet]/analysisTree->pfjet_energycorr[jet] 
-		<< "   jetETA = " << analysisTree->pfjet_eta[jet] 
-		<< "   jetPHI = " << analysisTree->pfjet_phi[jet] << std::endl;
       */
+      analysisTree->pfjet_px_uncorr[jet] = analysisTree->pfjet_px[jet];
+      analysisTree->pfjet_py_uncorr[jet] = analysisTree->pfjet_py[jet];
+      analysisTree->pfjet_pz_uncorr[jet] = analysisTree->pfjet_pz[jet];
+      analysisTree->pfjet_e_uncorr[jet] = analysisTree->pfjet_e[jet];
     }
   }
 

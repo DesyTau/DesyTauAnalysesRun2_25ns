@@ -92,11 +92,11 @@ ls $dirEmbedded/EmbeddingRun2016H_ElMu/*root > $OUTDIR/EmbeddedElMu_Run2016H
 
 for j in $(less list_SUSY_ggH_2016);
 do
-    ls $dirMC/${j}/*.root > $OUTDIR/${j}
+    ls $dirMC/${j}/*.root > $OUTDIR/${j}_pythia
 done
 
 for j in $(less list_SUSY_bbH_2016);
 do
-    ls $dirMC/${j}/*.root > $OUTDIR/${j}
+    ls $dirMC/${j}/*.root > $OUTDIR/${j}_amcatnlo
 done
 
