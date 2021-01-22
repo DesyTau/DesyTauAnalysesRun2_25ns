@@ -1464,11 +1464,10 @@ public :
   
   bool isGGHWeights;
 
-  Synch17Tree(TTree *tree=0, bool emu = false);
+  Synch17Tree(TTree *tree=0, bool emu = false, bool isGGH = false);
   virtual ~Synch17Tree();
 
-  virtual void Init(TTree *tree, bool emu);
-  virtual void SetGGHWeights(bool isGGH);
+  virtual void Init(TTree *tree, bool emu, bool isGGH);
   
   //Read methods
   virtual void     ReadInit(TTree *tree, bool emu);

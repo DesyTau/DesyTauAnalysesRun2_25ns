@@ -614,9 +614,8 @@ int main(int argc, char * argv[]){
   
   TTree *tree = new TTree("TauCheck", "TauCheck");
   //  TTree *gtree = new TTree("GenTauCheck", "GenTauCheck");
-  Synch17Tree *otree = new Synch17Tree(tree,true);
+  Synch17Tree *otree = new Synch17Tree(tree,true,isGGH);
   //  Synch17GenTree *gentree = new Synch17GenTree(gtree);
-  otree->SetGGHWeights(isGGH);
 
   int nTotalFiles = 0;
   int nEvents = 0;

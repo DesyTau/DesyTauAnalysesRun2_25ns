@@ -10,28 +10,24 @@
 #include "DesyTauAnalyses/NTupleMaker/interface/Synch17Tree.h"
 
 // Initialization
-Synch17Tree::Synch17Tree(TTree *tree, bool emu) : fChain(0) {
+Synch17Tree::Synch17Tree(TTree *tree, bool emu, bool isGGH) : fChain(0) {
   lock = false;
   ientry = -2;
   
   if (!tree) return;
   
-  Init(tree, emu);
+  Init(tree, emu, isGGH);
 }
 
-void Synch17Tree::Init(TTree *tree, bool emu){
+void Synch17Tree::Init(TTree *tree, bool emu, bool isGGH){
   if(!tree) return;
   
-  isGGHWeights = false;
+  isGGHWeights = isGGH;
 	      
   if(tree->GetEntries())
     ReadInit(tree, emu);
   else
     WriteInit(tree, emu);
-}
-
-void Synch17Tree::SetGGHWeights(bool isGGH) {
-  isGGHWeights = isGGH;
 }
 
 // Destructors
