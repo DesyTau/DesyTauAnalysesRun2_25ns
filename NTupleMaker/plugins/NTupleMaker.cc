@@ -578,6 +578,7 @@ void NTupleMaker::beginJob(){
     tree->Branch("electron_pt", electron_pt, "electron_pt[electron_count]/F");
     tree->Branch("electron_eta", electron_eta, "electron_eta[electron_count]/F");
     tree->Branch("electron_phi", electron_phi, "electron_phi[electron_count]/F");
+    tree->Branch("electron_corr", electron_corr, "electron_corr[electron_count]/F");
     tree->Branch("electron_px_energyscale_up", electron_px_energyscale_up, "electron_px_energyscale_up[electron_count]/F");
     tree->Branch("electron_px_energyscale_down", electron_px_energyscale_down, "electron_px_energyscale_down[electron_count]/F");
     tree->Branch("electron_py_energyscale_up", electron_py_energyscale_up, "electron_py_energyscale_up[electron_count]/F");
@@ -4657,6 +4658,7 @@ unsigned int NTupleMaker::AddElectrons(const edm::Event& iEvent, const edm::Even
 	    electron_py[electron_count] = corrP4.Py();
 	    electron_pz[electron_count] = corrP4.Pz();
 	    electron_pt[electron_count] = corrP4.Pt();
+	    electron_corr[electron_count] = el->userFloat("ecalTrkEnergyPostCorr") / el->energy();
       auto corrP4_energyscale_up  = el->p4() * el->userFloat("energyScaleUp") / el->energy();
       auto corrP4_energyscale_down  = el->p4() * el->userFloat("energyScaleDown") / el->energy();
       electron_px_energyscale_up[electron_count] = corrP4_energyscale_up.Px();

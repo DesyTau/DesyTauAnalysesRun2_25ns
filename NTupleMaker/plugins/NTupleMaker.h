@@ -761,6 +761,7 @@ class NTupleMaker : public edm::EDAnalyzer{
   Float_t electron_pz[M_electronmaxcount];
   Float_t electron_pt[M_electronmaxcount];
   Float_t electron_eta[M_electronmaxcount];
+  Float_t electron_corr[M_electronmaxcount];
   Float_t electron_px_energyscale_down[M_electronmaxcount];
   Float_t electron_px_energyscale_up[M_electronmaxcount];
   Float_t electron_py_energyscale_down[M_electronmaxcount];
