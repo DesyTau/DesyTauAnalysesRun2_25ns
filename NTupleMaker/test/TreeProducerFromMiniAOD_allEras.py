@@ -7,8 +7,8 @@ isSingleMuonData = False # needed to record track collection for NMSSM ananlysis
 isEmbedded = False # set to true if you run over Z->TauTau embedded samples
 isRun2018D = False # needed for the correct Global Tag
 isHiggsSignal = False # Set to true if you run over higgs signal samples -> needed for STXS1p1 flags
-year = 2016
-period = '2016'
+year = 2017
+period = '2017'
 RunTauSpinnerProducer = False #only do this if you want to calculate tauspinner weights for a sample with two taus and flat tau polarisation
 
 # ============================================================================================
@@ -52,7 +52,7 @@ process.options = cms.untracked.PSet(
 
 # How many events to process
 process.maxEvents = cms.untracked.PSet(
-   input = cms.untracked.int32(100)
+    input = cms.untracked.int32(1000)
 )
 
 # Define the input source
@@ -60,9 +60,12 @@ import FWCore.PythonUtilities.LumiList as LumiList
 # https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideGoodLumiSectionsJSONFile#cmsRun
 process.source = cms.Source("PoolSource",
   fileNames = cms.untracked.vstring(
+      "/store/mc/RunIIFall17MiniAODv2/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/MINIAODSIM/PU2017_12Apr2018_new_pmx_94X_mc2017_realistic_v14-v1/100000/001984A9-07A9-E811-9FF8-FA163E1CCB4E.root"
 #        "/store/data/Run2017B/Tau/MINIAOD/31Mar2018-v1/90000/FECFEF99-4F37-E811-8243-001E67792562.root"  # use for testing (2017)
-#        "/store/mc/RunIIFall17MiniAODv2/TTToHadronic_TuneCP5_13TeV-powheg-pythia8/MINIAODSIM/PU2017_12Apr2018_new_pmx_94X_mc2017_realistic_v14-v2/120000/420D636B-4BBB-E811-B806-0025905C54C6.root"  # use for testing (2017)
-        "/store/mc/RunIISummer16MiniAODv3/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/MINIAODSIM/PUMoriond17_94X_mcRun2_asymptotic_v3-v1/120000/FE7E7C9D-3CBF-E811-8BA6-44A84223FF3C.root" # use for testing (2016)
+#      "/store/mc/RunIISummer16MiniAODv3/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/MINIAODSIM/PUMoriond17_94X_mcRun2_asymptotic_v3-v1/120000/FE7E7C9D-3CBF-E811-8BA6-44A84223FF3C.root" # use for testing (2016)
+#      "/store/mc/RunIISummer16MiniAODv2/SUSYVBFHToAA_AToMuMu_AToTauTau_M-15_4F_TuneCUETP8M1_13TeV_madgraph_pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v3/10000/02E5EBD2-929C-E711-B54A-008CFAC93F5C.root"
+      #"/store/mc/RunIISummer16MiniAODv2/SUSYVBFToHToAA_AToMuMu_AToTauTau_M-125_M-3p6_TuneCUETP8M1_13TeV_madgraph_pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/120000/9CA421A1-70BF-E811-B2F1-0CC47A4D7690.root"
+      #"/store/mc/RunIISummer16MiniAODv3/SUSYVBFToHToAA_AToMuMu_AToTauTau_M-20_TuneCUETP8M1_13TeV_madgraph_pythia8/MINIAODSIM/PUMoriond17_94X_mcRun2_asymptotic_v3-v1/230000/F2769646-62EE-E911-8488-20CF305B05CE.root"
         #"/store/data/Run2016C/SingleMuon/MINIAOD/17Jul2018-v1/20000/FEC97F81-0097-E811-A7B9-90E2BACC5EEC.root" # use for testing (2016)
         #"/store/mc/RunIIAutumn18MiniAOD/W1JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v2/120000/403882A2-1EFE-9D44-9D5D-EC55DDBE4091.root" # use for testing (2018)
 #        "/store/mc/RunIIAutumn18MiniAOD/SUSYGluGluToHToTauTau_M-900_TuneCP5_13TeV-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v2/00000/AF34DA46-3E14-F94F-BFE3-820EC6A90FC9.root" # 2018
@@ -783,7 +786,7 @@ RecTauFloatDiscriminators = cms.untracked.vstring(),
 RecTauBinaryDiscriminators = cms.untracked.vstring(),
 RecTauNum = cms.untracked.int32(0),
 # jets
-RecJetPtMin = cms.untracked.double(18.),
+RecJetPtMin = cms.untracked.double(10.),
 RecJetEtaMax = cms.untracked.double(5.2),
 RecJetHLTriggerMatching = jet_hlt_filters,
 #from https://twiki.cern.ch/twiki/bin/view/CMS/DeepJet

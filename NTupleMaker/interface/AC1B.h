@@ -195,6 +195,7 @@ public :
    Float_t         electron_py[100];   //[electron_count]
    Float_t         electron_pz[100];   //[electron_count]
    Float_t         electron_pt[100];   //[electron_count]
+   Float_t         electron_SF[100];   //[electron_count]
    Float_t         electron_eta[100];   //[electron_count]
    Float_t         electron_phi[100];   //[electron_count]
    Float_t         electron_trackchi2[100];   //[electron_count]
