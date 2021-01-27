@@ -2527,6 +2527,24 @@ int main(int argc, char * argv[]) {
 	    metZSelH->Fill(pfmet,weight);
 	    puppimetZSelH->Fill(puppimet,weight);
 
+	    /*
+	    if (puppimet>150.) {
+	      std::cout << "puppimet = " << puppimet << std::endl;
+	      for (unsigned int i=0; i<analysisTree.muon_count; ++i) {
+		if (analysisTree.muon_pt[i]>10.0) {
+		  std::cout << i 
+			    << " " << analysisTree.muon_pt[i]
+			    << " " << analysisTree.muon_eta[i]
+			    << " " << analysisTree.muon_phi[i]
+			    << " " << analysisTree.muon_isPF[i]
+			    << " " << analysisTree.muon_isTracker[i]
+			    << " " << analysisTree.muon_isGlobal[i]
+			    << std::endl;
+		}
+		  
+	      }
+	    }
+	    */
 	    metZSelNJetsH[jetBin]->Fill(pfmet,weight);
 	    puppimetZSelNJetsH[jetBin]->Fill(puppimet,weight);
 

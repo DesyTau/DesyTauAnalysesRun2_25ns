@@ -13,6 +13,22 @@
   <use name="rootmath"/>
 </bin>
 
+<bin name="ScaleFactor" file="ScaleFactor.cpp">
+ <use name="PhysicsTools/Utilities"/>
+ <use name="rootgraphics"/>
+ <use name="root"/>
+ <use name="rootmath"/>
+ <use name="roottmva"/>
+ <use name="boost" />
+ <use name="boost_program_options"/>
+ <use name="DesyTauAnalyses/NTupleMaker"/>
+ <use name="FWCore/ParameterSet"/>
+ <use name="CondFormats/BTauObjects"/>
+ <use name="CondTools/BTau"/>
+ <use name="HTT-utilities/LepEffInterface"/>
+ <use name="HTT-utilities/RecoilCorrections"/>
+</bin>
+
 <bin name="PlotDatacards_EMu" file="PlotDatacards_EMu.cpp">
   <use name="root"/>
   <use name="rootgraphics"/>
@@ -47,6 +63,22 @@
 </bin>
 
 <bin name="analysis_macro" file="analysis_macro.cpp">
+ <use name="PhysicsTools/Utilities"/>
+ <use name="rootgraphics"/>
+ <use name="root"/>
+ <use name="rootmath"/>
+ <use name="roottmva"/>
+ <use name="boost" />
+ <use name="boost_program_options"/>
+ <use name="DesyTauAnalyses/NTupleMaker"/>
+ <use name="FWCore/ParameterSet"/>
+ <use name="CondFormats/BTauObjects"/>
+ <use name="CondTools/BTau"/>
+ <use name="HTT-utilities/LepEffInterface"/>
+ <use name="HTT-utilities/RecoilCorrections"/>
+</bin>
+
+<bin name="analysis_macro_2mu2tau" file="analysis_macro_2mu2tau.cpp">
  <use name="PhysicsTools/Utilities"/>
  <use name="rootgraphics"/>
  <use name="root"/>
