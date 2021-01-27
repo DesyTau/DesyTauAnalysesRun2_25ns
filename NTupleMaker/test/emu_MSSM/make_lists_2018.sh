@@ -35,7 +35,6 @@ ls $dirMC/WZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8/*root > $OUTDIR/WZTo2L2Q
 ls $dirMC/WZTo3LNu_TuneCP5_13TeV-amcatnloFXFX-pythia8/*root > $OUTDIR/WZTo3LNu
 ls $dirMC/ZZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8/*root > $OUTDIR/ZZTo2L2Q
 ls $dirMC/ZZTo4L_TuneCP5_13TeV_powheg_pythia8/*root > $OUTDIR/ZZTo4L
-#ls $dirMC/ZZTo4L_TuneCP5_13TeV-amcatnloFXFX-pythia8/*root > $OUTDIR/ZZTo4L
 
 ls $dirMC/GluGluHToTauTau_M125_13TeV_powheg_pythia8/*root > $OUTDIR/GluGluHToTauTau_M125
 ls $dirMC/VBFHToTauTau_M125_13TeV_powheg_pythia8/*.root > $OUTDIR/VBFHToTauTau_M125
@@ -89,10 +88,10 @@ ls $dirEmbedded/EmbeddingRun2018D_ElMu/*root > $OUTDIR/EmbeddedElMu_Run2018D
 
 for j in $(less list_SUSY_ggH_2018);
 do
-    ls $dirMC/${j}/*.root > $OUTDIR/${j}
+    ls $dirMC/${j}/*.root > $OUTDIR/${j}_pythia
 done
 
 for j in $(less list_SUSY_bbH_2018);
 do
-    ls $dirMC/${j}/*.root > $OUTDIR/${j}
+    ls $dirMC/${j}/*.root > $OUTDIR/${j}_amcatnlo
 done

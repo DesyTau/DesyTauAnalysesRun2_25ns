@@ -29,9 +29,8 @@ ls $dirMC/W3JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/*root > $OUTDIR/W3JetsTo
 ls $dirMC/W4JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/*root > $OUTDIR/W4JetsToLNu
 
 ls $dirMC/TTToHadronic_TuneCP5_13TeV-powheg-pythia8/*root > $OUTDIR/TTToHadronic
-ls $dirMC/TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8/*root > $OUTDIR/TTTo2L2Nu
+ls $dirMC/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8_v1/*root > $OUTDIR/TTTo2L2Nu
 ls $dirMC/TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powheg-pythia8/*root > $OUTDIR/TTToSemiLeptonic
-ls $dirMC/TTToHadronic_TuneCP5_PSweights_13TeV-powheg-pythia8/*root >> $OUTDIR/TTToHadronic
 
 ls $dirMC/ST_t-channel_top_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8/*root > $OUTDIR/ST_t-channel_top_4f
 ls $dirMC/ST_t-channel_antitop_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8/*root > $OUTDIR/ST_t-channel_antitop_4f
@@ -82,11 +81,11 @@ ls $dirEmbedded/EmbeddingRun2017F_ElMu/*root > $OUTDIR/EmbeddedElMu_Run2017F
 
 for j in $(less list_SUSY_ggH_2017);
 do
-    ls $dirMC/${j}/*.root > $OUTDIR/${j}
+    ls $dirMC/${j}/*.root > $OUTDIR/${j}_pythia
 done
 
 for j in $(less list_SUSY_bbH_2017);
 do
-    ls $dirMC/${j}/*.root > $OUTDIR/${j}
+    ls $dirMC/${j}/*.root > $OUTDIR/${j}_amcatnlo
 done
 
