@@ -1,0 +1,18 @@
+#!/bin/sh 
+
++RequestRuntime=5000
+
+RequestMemory = 2000
+
+executable = HTC_TheScript.sh
+
+transfer_executable = True
+universe            = vanilla
+getenv              = True
+Requirements        = OpSysAndVer == "CentOS7"
+
+output              = BDTtraining.out
+error               = BDTtraining.error
+log                 = BDTtraining.log
+
+queue
