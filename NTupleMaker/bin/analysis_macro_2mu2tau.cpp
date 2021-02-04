@@ -255,6 +255,25 @@ int main(int argc, char *argv[])
 	const bool isVH = cfg.get<bool> ("IsVH");
 	// **********end of configuration *******************
 
+	float a0_MuMu_DR = 0.936;
+	float a1_MuMu_DR = 0.135;
+	float a0_TrkTrk_DR = 0.918;
+	float a1_TrkTrk_DR = 0.359;
+
+	if (year==2017) {
+	  a0_MuMu_DR = 0.919;
+	  a1_MuMu_DR = 0.164;
+	  a0_TrkTrk_DR = 0.920;
+	  a1_TrkTrk_DR = 0.331;
+	}
+
+	if (year==2016) {
+	  a0_MuMu_DR = 0.932;
+	  a1_MuMu_DR = 0.137;
+	  a0_TrkTrk_DR = 0.929;
+	  a1_TrkTrk_DR = 0.287;
+	}
+
 	std::ifstream fileList(argv[2]);
 
 	// event info
@@ -442,6 +461,12 @@ int main(int argc, char *argv[])
 	///Varables for Dataset
 	float MuMu_Mass, MuMu_Mass_muScaleUp, MuMu_Mass_muScaleDown, MuMu_Pt, MuMu_Pt_muScaleUp, MuMu_Pt_muScaleDown, MuMu_DR, MuMuMET_DPhi, TrkTrk_Mass, TrkTrk_Pt, TrkTrk_DR, TrkTrkMET_DPhi, MuMuTrkTrk_Mass, MuMuTrkTrk_Pt, MuMuTauTau_Mass, MuMuTauTau_Pt, MET_Pt, MuMuTrkTrkMET_Mass, MuMuTrkTrkMET_Mass_muScaleUp, MuMuTrkTrkMET_Mass_muScaleDown, MuMuTrkTrkMET_Mass_JetEnUp, MuMuTrkTrkMET_Mass_JetEnDown, MuMuTrkTrkMET_Mass_UnclEnUp, MuMuTrkTrkMET_Mass_UnclEnDown;
 	float Eventweight;
+	float Correctionweight;
+	float TrkTrk_DR_weight_Up;
+	float TrkTrk_DR_weight_Down;
+	float MuMu_DR_weight_Up;
+	float MuMu_DR_weight_Down;
+
 
 	////// Control Regions for Bkgd Estimation	////////
 	TTree *tree_NNNN[nDRInterval][nTrackCat][nTrackCat];
@@ -636,6 +661,11 @@ int main(int argc, char *argv[])
 				tree_VerySoftIso[iInt][jInt][kInt]->Branch("MET_Pt", &MET_Pt, "MET_Pt");
 				tree_VerySoftIso[iInt][jInt][kInt]->Branch("MuMuTrkTrkMET_Mass", &MuMuTrkTrkMET_Mass, "MuMuTrkTrkMET_Mass");
 				tree_VerySoftIso[iInt][jInt][kInt]->Branch("Eventweight", &Eventweight, "Eventweight");
+				tree_VerySoftIso[iInt][jInt][kInt]->Branch("Correctionweight",&Correctionweight,"Correctionweight");
+				tree_VerySoftIso[iInt][jInt][kInt]->Branch("TrkTrk_DR_weight_Up",&TrkTrk_DR_weight_Up,"TrkTrk_DR_weight_Up");
+				tree_VerySoftIso[iInt][jInt][kInt]->Branch("TrkTrk_DR_weight_Down",&TrkTrk_DR_weight_Down,"TrkTrk_DR_weight_Down");
+				tree_VerySoftIso[iInt][jInt][kInt]->Branch("MuMu_DR_weight_Up",&MuMu_DR_weight_Up,"MuMu_DR_weight_Up");
+				tree_VerySoftIso[iInt][jInt][kInt]->Branch("MuMu_DR_weight_Down",&MuMu_DR_weight_Down,"MuMu_DR_weight_Down");
 
 				////////////////// 00SoftIso Region	//////////////////
 				tree_00SoftIso[iInt][jInt][kInt] = new TTree("tree_00SoftIso" + DRIntervalString[iInt] + TrackCatString[jInt] + TrackCatString[kInt], "tree_00SoftIso" + DRIntervalString[iInt] + TrackCatString[jInt] + TrackCatString[kInt]);
@@ -2201,7 +2231,23 @@ int main(int argc, char *argv[])
 
 				if (controlVerySoftIso)
 				{
-					tree_VerySoftIso[iInt][IDAtautau1candidate][IDAtautau2candidate]->Fill();
+				  float mumu_DR = TMath::Min(float(1.5),MuMu_DR);
+				  float tautau_DR = TMath::Min(float(1.5),TrkTrk_DR);
+				  float weight_MuMu_DR = a0_MuMu_DR + a1_MuMu_DR*mumu_DR;
+				  float weight_TrkTrk_DR = a0_TrkTrk_DR + a1_TrkTrk_DR*tautau_DR;
+				  Correctionweight = weight_MuMu_DR * weight_TrkTrk_DR;
+				  TrkTrk_DR_weight_Down = Correctionweight/weight_TrkTrk_DR;
+				  MuMu_DR_weight_Down = Correctionweight/weight_MuMu_DR;
+				  TrkTrk_DR_weight_Up = Correctionweight*weight_TrkTrk_DR;
+				  MuMu_DR_weight_Up = Correctionweight*weight_MuMu_DR;
+				  /*
+				  std::cout << "Correction weight = " << Correctionweight << std::endl;
+				  std::cout << "TrkTrk_DR_weight_Down = " << TrkTrk_DR_weight_Down << std::endl; 
+				  std::cout << "TrkTrk_DR_weight_Up = " << TrkTrk_DR_weight_Up << std::endl; 
+				  std::cout << "MuMu_DR_weight_Down = " << MuMu_DR_weight_Down << std::endl; 
+				  std::cout << "MuMu_DR_weight_Up = " << MuMu_DR_weight_Up << std::endl; 
+				  */
+				  tree_VerySoftIso[iInt][IDAtautau1candidate][IDAtautau2candidate]->Fill();
 				}
 
 				if (control00SoftIso)
