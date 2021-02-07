@@ -580,7 +580,7 @@ protected:
 
     } else {
       if (ch == EMU)
-      lep1_scaled.SetXYZM(analysisTree->electron_px_energyscale_up[electronIndex],
+	lep1_scaled.SetXYZM(analysisTree->electron_px_energyscale_up[electronIndex],
         analysisTree->electron_py_energyscale_up[electronIndex],
         analysisTree->electron_pz_energyscale_up[electronIndex],
         lep1.M());
@@ -684,6 +684,72 @@ protected:
     this->Fill(ch, "Down");
   };
   
+  const AC1B * analysisTree;
+  int electronIndex;
+  bool isEmbedded;
+};
+
+class ElectronResSys : public LeptonScaleSys { 
+ public:
+  ElectronResSys(){};
+
+  ElectronResSys(Synch17Tree* c){
+    cenTree = c;
+    label = "CMS_res_e_13TeV";
+    
+    this->Init(cenTree);
+  };
+  
+  virtual ~ElectronResSys(){};
+
+  void SetAC1B(const AC1B * tree){
+    analysisTree = tree;
+  };
+  
+  void SetElectronIndex(int index){
+    electronIndex = index;
+  };
+  
+  void SetIsEmbedded(bool isEmbeddedFlag){
+    isEmbedded = isEmbeddedFlag;
+  };
+
+ protected:
+  virtual void InitSF(){};
+  
+  virtual void ScaleUp(utils::channel ch){
+    lep1_scaled = lep1;
+    lep2_scaled = lep2;
+    
+    if (ch == EMU)
+      lep1_scaled.SetXYZM(analysisTree->electron_px_energysigma_up[electronIndex],
+			  analysisTree->electron_py_energysigma_up[electronIndex],
+			  analysisTree->electron_pz_energysigma_up[electronIndex],
+			  lep1.M());
+    else if (ch == ETAU)
+      lep1_scaled.SetXYZM(analysisTree->electron_px_energysigma_up[electronIndex],
+			  analysisTree->electron_py_energysigma_up[electronIndex],
+			  analysisTree->electron_pz_energysigma_up[electronIndex],
+			  lep1.M());
+    this->Fill(ch, "Up");
+  };
+  
+  virtual void ScaleDown(utils::channel ch){
+    lep1_scaled = lep1;
+    lep2_scaled = lep2;
+
+    if (ch == EMU)
+      lep1_scaled.SetXYZM(analysisTree->electron_px_energysigma_down[electronIndex],
+			  analysisTree->electron_py_energysigma_down[electronIndex],
+			  analysisTree->electron_pz_energysigma_down[electronIndex],
+			  lep1.M());
+    else if (ch == ETAU)
+      lep1_scaled.SetXYZM(analysisTree->electron_px_energysigma_down[electronIndex],
+			  analysisTree->electron_py_energysigma_down[electronIndex],
+			  analysisTree->electron_pz_energysigma_down[electronIndex],
+			  lep1.M());
+    this->Fill(ch, "Down");
+  };  
   const AC1B * analysisTree;
   int electronIndex;
   bool isEmbedded;

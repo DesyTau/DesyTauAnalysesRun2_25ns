@@ -196,6 +196,7 @@ public :
    Float_t         electron_pz[100];   //[electron_count]
    Float_t         electron_pt[100];   //[electron_count]
    Float_t         electron_SF[100];   //[electron_count]
+   Float_t         electron_corr[100]; //[electron_count]
    Float_t         electron_eta[100];   //[electron_count]
    Float_t         electron_phi[100];   //[electron_count]
    Float_t         electron_trackchi2[100];   //[electron_count]
@@ -1010,6 +1011,7 @@ public :
    TBranch        *b_electron_py;   //!
    TBranch        *b_electron_pz;   //!
    TBranch        *b_electron_pt;   //!
+   TBranch        *b_electron_corr; //!
    TBranch        *b_electron_eta;   //!
    TBranch        *b_electron_phi;   //!
    TBranch        *b_electron_trackchi2;   //!
@@ -1919,6 +1921,7 @@ void AC1B::Init(TTree *tree, bool isData)
    fChain->SetBranchAddress("electron_py", electron_py, &b_electron_py);
    fChain->SetBranchAddress("electron_pz", electron_pz, &b_electron_pz);
    fChain->SetBranchAddress("electron_pt", electron_pt, &b_electron_pt);
+   fChain->SetBranchAddress("electron_corr",electron_corr,&b_electron_corr);
    fChain->SetBranchAddress("electron_eta", electron_eta, &b_electron_eta);
    fChain->SetBranchAddress("electron_phi", electron_phi, &b_electron_phi);
    fChain->SetBranchAddress("electron_trackchi2", electron_trackchi2, &b_electron_trackchi2);

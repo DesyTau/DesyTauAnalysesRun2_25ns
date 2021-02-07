@@ -84,7 +84,7 @@ void initializeGenTree(Synch17GenTree *gentree);
 void FillVertices(const AC1B * analysisTree,Synch17Tree *otree, const bool isData);
 void FillGenTree(const AC1B * analysisTree, Synch17GenTree *gentree);
 float getEmbeddedWeight(const AC1B * analysisTree, RooWorkspace* WS);
-void FillElMu(const AC1B *analysisTree, Synch17Tree *otree, int electronIndex, float dRisoElectron, int muonIndex, float dRIsoMuon, int era, bool isEmbedded);
+void FillElMu(const AC1B *analysisTree, Synch17Tree *otree, int electronIndex, float dRisoElectron, int muonIndex, float dRIsoMuon, int era, bool isEmbedded, bool isMcCorrectPuppi);
 
 void getHiggsPtWeight(const AC1B * analysisTree, Synch17Tree * tree, RooWorkspace * ws, double mass);
 
@@ -190,7 +190,7 @@ bool triggerMatching(AC1B * analysisTree, Float_t eta, Float_t phi, bool isFilte
    return trigMatch;
 }
 
-void GetPuppiMET(AC1B * analysisTree, Synch17Tree * otree, int era, bool isEmbedded, bool isData); 
+void GetPuppiMET(AC1B * analysisTree, Synch17Tree * otree, int era, bool isEmbedded, bool isData, bool isMcCorrectPuppi); 
 
 // Synch ntuple producer in the e+mu channel
 
@@ -359,6 +359,17 @@ int main(int argc, char * argv[]){
   const bool isMG = infiles.find("madgraph") != string::npos;
   const bool isMSSMsignal =  (infiles.find("SUSYGluGluToHToTauTau")!= string::npos) || (infiles.find("SUSYGluGluToBBHToTauTau")!= string::npos);
   const bool isTTbar = (infiles.find("TT_INCL") != string::npos) || (infiles.find("TTTo") != string::npos);
+
+  const bool isMcCorrectPuppi = 
+    SampleName.Contains("TTTo2L2Nu") ||
+    SampleName.Contains("ST_t-channel_antitop_4f") ||
+    SampleName.Contains("ST_t-channel_top_4f") ||
+    SampleName.Contains("ST_tW_antitop_5f") ||
+    SampleName.Contains("VVTo2L2Nu") ||
+    SampleName.Contains("WZTo2L2Q") ||
+    SampleName.Contains("WZTo3LNu") ||
+    SampleName.Contains("ZZTo2L2Q") ||
+    SampleName.Contains("ZZTo4L");
 
   bool isHiggs = isHToTauTau || isHToWW; 
 
@@ -896,7 +907,7 @@ int main(int argc, char * argv[]){
       if (muonIndex<0) continue;
       
       // Filling ntuple with the electron and muon information
-      FillElMu(&analysisTree,otree,electronIndex,dRIsoElectron,muonIndex,dRIsoMuon,era,isEmbedded);
+      FillElMu(&analysisTree,otree,electronIndex,dRIsoElectron,muonIndex,dRIsoMuon,era,isEmbedded,isMcCorrectPuppi);
 
       //      std::cout << "fill emu " << std::endl;
       //      std::cout << "e : pt = " << otree->pt_1 << "  eta = " << otree->eta_1 << "  phi = " << otree->phi_1 << std::endl;
@@ -1555,7 +1566,7 @@ int main(int argc, char * argv[]){
       // MET and Recoil Corrections !  
       ////////////////////////////////////////////////////////////
       // !!!!!!!!!!! include electron pT correction !!!!!!!!!!!!!
-      GetPuppiMET(&analysisTree, otree, era, isData, isEmbedded);
+      GetPuppiMET(&analysisTree, otree, era, isData, isEmbedded, isMcCorrectPuppi);
 
 
       /*     
@@ -1993,13 +2004,15 @@ void FillGenTree(const AC1B *analysisTree, Synch17GenTree *gentree){
 }
 
 //fill the otree with the electron/muon variables in channel emu
-void FillElMu(const AC1B *analysisTree, Synch17Tree *otree, int electronIndex, float dRIsoElectron, int muonIndex, float dRIsoMuon, int era, bool isEmbedded){
+void FillElMu(const AC1B *analysisTree, Synch17Tree *otree, int electronIndex, float dRIsoElectron, int muonIndex, float dRIsoMuon, int era, bool isEmbedded, bool isMcCorrectPuppi){
   
   float sf_eleES = 1.;
   if (isEmbedded) sf_eleES = EmbedElectronES_SF(analysisTree, era, electronIndex);  
 
   otree->pt_1  = 	sf_eleES*analysisTree->electron_pt[electronIndex];
   otree->pt_uncorr_1 =  analysisTree->electron_pt[electronIndex];
+  if (isMcCorrectPuppi) 
+    otree->pt_uncorr_1 = analysisTree->electron_pt[electronIndex]/analysisTree->electron_corr[electronIndex];
   otree->eta_1 = 	analysisTree->electron_eta[electronIndex];
   otree->phi_1 = 	analysisTree->electron_phi[electronIndex];
   otree->m_1 = 		electronMass;
@@ -2050,7 +2063,7 @@ double MassFromTString(TString sample) {
   
 }
 
-void GetPuppiMET(AC1B * analysisTree, Synch17Tree * otree, int era, bool isData, bool isEmbedded) {
+void GetPuppiMET(AC1B * analysisTree, Synch17Tree * otree, int era, bool isData, bool isEmbedded, bool isMcCorrectPuppi) {
 
   bool is2017 = false;
 
@@ -2062,7 +2075,7 @@ void GetPuppiMET(AC1B * analysisTree, Synch17Tree * otree, int era, bool isData,
   double shiftX = 0;
   double shiftY = 0;
 
-  //  std::cout << "Event number = " << analysisTree->event_nr << std::endl;
+  std::cout << "Event number = " << analysisTree->event_nr << std::endl;
 
   if (era==2017) is2017 = true;
 
@@ -2089,7 +2102,7 @@ void GetPuppiMET(AC1B * analysisTree, Synch17Tree * otree, int era, bool isData,
       if (is2017 && pT_uncorr < 50 && absJetEta > 2.65 && absJetEta < 3.139)
 	continue;
       
-      if (pT_corr<15.0) continue;
+      if (pT_corr<15.0&&pT_uncorr<15.0) continue;
       
       /*
 	std::cout << "jet : unsmeared = (" << uncorrJet.Px()
@@ -2105,13 +2118,18 @@ void GetPuppiMET(AC1B * analysisTree, Synch17Tree * otree, int era, bool isData,
       
     }
   } 
-  if (isEmbedded) { // additional electron correction (assuming it is small in data)
-    double px_ele_uncorr = otree->pt_uncorr_1*TMath::Cos(otree->phi_1);
-    double py_ele_uncorr = otree->pt_uncorr_1*TMath::Sin(otree->phi_1);
-    double px_ele = otree->pt_1*TMath::Cos(otree->phi_1);
-    double py_ele = otree->pt_1*TMath::Sin(otree->phi_1);
-    shiftX = shiftX + px_ele_uncorr - px_ele;
-    shiftY = shiftY + py_ele_uncorr - py_ele;
+  double shiftX_jets = shiftX;
+  double shiftY_jets = shiftY;
+
+  if (!isData) {
+    if (isEmbedded||isMcCorrectPuppi) { 
+      double px_ele_uncorr = otree->pt_uncorr_1*TMath::Cos(otree->phi_1);
+      double py_ele_uncorr = otree->pt_uncorr_1*TMath::Sin(otree->phi_1);
+      double px_ele = otree->pt_1*TMath::Cos(otree->phi_1);
+      double py_ele = otree->pt_1*TMath::Sin(otree->phi_1);
+      shiftX = shiftX + px_ele_uncorr - px_ele;
+      shiftY = shiftY + py_ele_uncorr - py_ele;
+    }
   }
 
   double metCorrPx = metUncorrPx + shiftX;
@@ -2126,15 +2144,15 @@ void GetPuppiMET(AC1B * analysisTree, Synch17Tree * otree, int era, bool isData,
   otree->puppimet = TMath::Sqrt(metCorrPx*metCorrPx+metCorrPy*metCorrPy);
   otree->puppimetphi = TMath::ATan2(metCorrPy,metCorrPx);
 
-  /*
+  
   std::cout << " shift in Met due to jets (x,y) = ("
-	    << shiftX << "," << shiftY << ")   "
+	    << shiftX_jets << "," << shiftY_jets << ")   "
 	    << " puppiMET : uncorr (x,y) = (" << metUncorrPx 
 	    << "," << metUncorrPy << ")" 
 	    << "    corr (x,y) = (" << metCorrPx 
 	    << "," << metCorrPy << ")" << std::endl; 
   std::cout << std::endl;
-  */
+  
 }
 
 void getHiggsPtWeight(const AC1B * analysisTree, Synch17Tree * otree, RooWorkspace * ws, double mass) {
