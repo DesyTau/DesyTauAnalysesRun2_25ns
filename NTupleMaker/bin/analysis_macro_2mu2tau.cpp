@@ -228,6 +228,7 @@ int main(int argc, char *argv[])
 
 	// trigger
 	const bool applyTriggerMatch = cfg.get<bool> ("ApplyTriggerMatch");
+	const bool sameSignTracks = cfg.get<bool>("SameSignTracks");
 
 	// IsoTkMu24 (2016), IsoMu27 (2017), IsoMu24 (2018) 
 	const string isomuTriggerName = cfg.get<string> ("IsoMuTriggerName");
@@ -473,17 +474,33 @@ int main(int argc, char *argv[])
 
 	TTree *tree_00NN[nDRInterval][nTrackCat][nTrackCat];
 
+	TTree *tree_VerySoftIsoNN[nDRInterval][nTrackCat][nTrackCat];
+
+	TTree *tree_SoftIsoNN[nDRInterval][nTrackCat][nTrackCat];
+
 	TTree *tree_00SemiIso[nDRInterval][nTrackCat][nTrackCat];
 
 	TTree *tree_SoftIso[nDRInterval][nTrackCat][nTrackCat];
 
 	TTree *tree_00SoftIso[nDRInterval][nTrackCat][nTrackCat];
 
-	TTree *tree_VerySoftIso[nDRInterval][nTrackCat][nTrackCat];
-
 	TTree *tree_00VerySoftIso[nDRInterval][nTrackCat][nTrackCat];
 
+	TTree *tree_VerySoftIso[nDRInterval][nTrackCat][nTrackCat];
+
+	TTree *tree_SoftIso00[nDRInterval][nTrackCat][nTrackCat];
+
+	TTree *tree_VerySoftIso00[nDRInterval][nTrackCat][nTrackCat];
+
+	TTree *tree_SoftIso_VerySoftIso[nDRInterval][nTrackCat][nTrackCat];
+	
+	TTree *tree_VerySoftIso_SoftIso[nDRInterval][nTrackCat][nTrackCat];
+
 	TTree *tree_NN00[nDRInterval][nTrackCat][nTrackCat];
+	
+	TTree *tree_NNVerySoftIso[nDRInterval][nTrackCat][nTrackCat]; 
+
+	TTree *tree_NNSoftIso[nDRInterval][nTrackCat][nTrackCat];
 
 	TTree *tree_00_0SemiIsoorSemiIso0[nDRInterval][nTrackCat][nTrackCat];
 
@@ -608,6 +625,42 @@ int main(int argc, char *argv[])
 				tree_00NN[iInt][jInt][kInt]->Branch("MuMuTrkTrkMET_Mass", &MuMuTrkTrkMET_Mass, "MuMuTrkTrkMET_Mass");
 				tree_00NN[iInt][jInt][kInt]->Branch("Eventweight", &Eventweight, "Eventweight");
 
+				////////////////// VerySoftIsoNN Region	//////////////////
+				tree_VerySoftIsoNN[iInt][jInt][kInt] = new TTree("tree_VerySoftIsoNN" + DRIntervalString[iInt] + TrackCatString[jInt] + TrackCatString[kInt], "tree_VerySoftIsoNN" + DRIntervalString[iInt] + TrackCatString[jInt] + TrackCatString[kInt]);
+				tree_VerySoftIsoNN[iInt][jInt][kInt]->Branch("MuMu_Mass", &MuMu_Mass, "MuMu_Mass");
+				tree_VerySoftIsoNN[iInt][jInt][kInt]->Branch("MuMu_Pt", &MuMu_Pt, "MuMu_Pt");
+				tree_VerySoftIsoNN[iInt][jInt][kInt]->Branch("MuMu_DR", &MuMu_DR, "MuMu_DR");
+				tree_VerySoftIsoNN[iInt][jInt][kInt]->Branch("MuMuMET_DPhi", &MuMuMET_DPhi, "MuMuMET_DPhi");
+				tree_VerySoftIsoNN[iInt][jInt][kInt]->Branch("TrkTrk_Mass", &TrkTrk_Mass, "TrkTrk_Mass");
+				tree_VerySoftIsoNN[iInt][jInt][kInt]->Branch("TrkTrk_Pt", &TrkTrk_Pt, "TrkTrk_Pt");
+				tree_VerySoftIsoNN[iInt][jInt][kInt]->Branch("TrkTrk_DR", &TrkTrk_DR, "TrkTrk_DR");
+				tree_VerySoftIsoNN[iInt][jInt][kInt]->Branch("TrkTrkMET_DPhi", &TrkTrkMET_DPhi, "TrkTrkMET_DPhi");
+				tree_VerySoftIsoNN[iInt][jInt][kInt]->Branch("MuMuTrkTrk_Mass", &MuMuTrkTrk_Mass, "MuMuTrkTrk_Mass");
+				tree_VerySoftIsoNN[iInt][jInt][kInt]->Branch("MuMuTrkTrk_Pt", &MuMuTrkTrk_Pt, "MuMuTrkTrk_Pt");
+				tree_VerySoftIsoNN[iInt][jInt][kInt]->Branch("MuMuTauTau_Mass", &MuMuTauTau_Mass, "MuMuTauTau_Mass");
+				tree_VerySoftIsoNN[iInt][jInt][kInt]->Branch("MuMuTauTau_Pt", &MuMuTauTau_Pt, "MuMuTauTau_Pt");
+				tree_VerySoftIsoNN[iInt][jInt][kInt]->Branch("MET_Pt", &MET_Pt, "MET_Pt");
+				tree_VerySoftIsoNN[iInt][jInt][kInt]->Branch("MuMuTrkTrkMET_Mass", &MuMuTrkTrkMET_Mass, "MuMuTrkTrkMET_Mass");
+				tree_VerySoftIsoNN[iInt][jInt][kInt]->Branch("Eventweight", &Eventweight, "Eventweight");
+
+				////////////////// SoftIsoNN Region	//////////////////
+				tree_SoftIsoNN[iInt][jInt][kInt] = new TTree("tree_SoftIsoNN" + DRIntervalString[iInt] + TrackCatString[jInt] + TrackCatString[kInt], "tree_SoftIsoNN" + DRIntervalString[iInt] + TrackCatString[jInt] + TrackCatString[kInt]);
+				tree_SoftIsoNN[iInt][jInt][kInt]->Branch("MuMu_Mass", &MuMu_Mass, "MuMu_Mass");
+				tree_SoftIsoNN[iInt][jInt][kInt]->Branch("MuMu_Pt", &MuMu_Pt, "MuMu_Pt");
+				tree_SoftIsoNN[iInt][jInt][kInt]->Branch("MuMu_DR", &MuMu_DR, "MuMu_DR");
+				tree_SoftIsoNN[iInt][jInt][kInt]->Branch("MuMuMET_DPhi", &MuMuMET_DPhi, "MuMuMET_DPhi");
+				tree_SoftIsoNN[iInt][jInt][kInt]->Branch("TrkTrk_Mass", &TrkTrk_Mass, "TrkTrk_Mass");
+				tree_SoftIsoNN[iInt][jInt][kInt]->Branch("TrkTrk_Pt", &TrkTrk_Pt, "TrkTrk_Pt");
+				tree_SoftIsoNN[iInt][jInt][kInt]->Branch("TrkTrk_DR", &TrkTrk_DR, "TrkTrk_DR");
+				tree_SoftIsoNN[iInt][jInt][kInt]->Branch("TrkTrkMET_DPhi", &TrkTrkMET_DPhi, "TrkTrkMET_DPhi");
+				tree_SoftIsoNN[iInt][jInt][kInt]->Branch("MuMuTrkTrk_Mass", &MuMuTrkTrk_Mass, "MuMuTrkTrk_Mass");
+				tree_SoftIsoNN[iInt][jInt][kInt]->Branch("MuMuTrkTrk_Pt", &MuMuTrkTrk_Pt, "MuMuTrkTrk_Pt");
+				tree_SoftIsoNN[iInt][jInt][kInt]->Branch("MuMuTauTau_Mass", &MuMuTauTau_Mass, "MuMuTauTau_Mass");
+				tree_SoftIsoNN[iInt][jInt][kInt]->Branch("MuMuTauTau_Pt", &MuMuTauTau_Pt, "MuMuTauTau_Pt");
+				tree_SoftIsoNN[iInt][jInt][kInt]->Branch("MET_Pt", &MET_Pt, "MET_Pt");
+				tree_SoftIsoNN[iInt][jInt][kInt]->Branch("MuMuTrkTrkMET_Mass", &MuMuTrkTrkMET_Mass, "MuMuTrkTrkMET_Mass");
+				tree_SoftIsoNN[iInt][jInt][kInt]->Branch("Eventweight", &Eventweight, "Eventweight");
+
 				////////////////// 00SemiIso Region	//////////////////
 				tree_00SemiIso[iInt][jInt][kInt] = new TTree("tree_00SemiIso" + DRIntervalString[iInt] + TrackCatString[jInt] + TrackCatString[kInt], "tree_00SemiIso" + DRIntervalString[iInt] + TrackCatString[jInt] + TrackCatString[kInt]);
 				tree_00SemiIso[iInt][jInt][kInt]->Branch("MuMu_Mass", &MuMu_Mass, "MuMu_Mass");
@@ -643,6 +696,12 @@ int main(int argc, char *argv[])
 				tree_SoftIso[iInt][jInt][kInt]->Branch("MET_Pt", &MET_Pt, "MET_Pt");
 				tree_SoftIso[iInt][jInt][kInt]->Branch("MuMuTrkTrkMET_Mass", &MuMuTrkTrkMET_Mass, "MuMuTrkTrkMET_Mass");
 				tree_SoftIso[iInt][jInt][kInt]->Branch("Eventweight", &Eventweight, "Eventweight");
+
+				tree_SoftIso[iInt][jInt][kInt]->Branch("Correctionweight",&Correctionweight,"Correctionweight");
+				tree_SoftIso[iInt][jInt][kInt]->Branch("TrkTrk_DR_weight_Up",&TrkTrk_DR_weight_Up,"TrkTrk_DR_weight_Up");
+				tree_SoftIso[iInt][jInt][kInt]->Branch("TrkTrk_DR_weight_Down",&TrkTrk_DR_weight_Down,"TrkTrk_DR_weight_Down");
+				tree_SoftIso[iInt][jInt][kInt]->Branch("MuMu_DR_weight_Up",&MuMu_DR_weight_Up,"MuMu_DR_weight_Up");
+				tree_SoftIso[iInt][jInt][kInt]->Branch("MuMu_DR_weight_Down",&MuMu_DR_weight_Down,"MuMu_DR_weight_Down");
 
 				////////////////// VerySoftIso Region	//////////////////
 				tree_VerySoftIso[iInt][jInt][kInt] = new TTree("tree_VerySoftIso" + DRIntervalString[iInt] + TrackCatString[jInt] + TrackCatString[kInt], "tree_VerySoftIso" + DRIntervalString[iInt] + TrackCatString[jInt] + TrackCatString[kInt]);
@@ -720,6 +779,115 @@ int main(int argc, char *argv[])
 				tree_NN00[iInt][jInt][kInt]->Branch("MET_Pt", &MET_Pt, "MET_Pt");
 				tree_NN00[iInt][jInt][kInt]->Branch("MuMuTrkTrkMET_Mass", &MuMuTrkTrkMET_Mass, "MuMuTrkTrkMET_Mass");
 				tree_NN00[iInt][jInt][kInt]->Branch("Eventweight", &Eventweight, "Eventweight");
+
+				////////////////// SoftIso00 Region	//////////////////
+				tree_SoftIso00[iInt][jInt][kInt] = new TTree("tree_SoftIso00" + DRIntervalString[iInt] + TrackCatString[jInt] + TrackCatString[kInt], "tree_SoftIso00" + DRIntervalString[iInt] + TrackCatString[jInt] + TrackCatString[kInt]);
+				tree_SoftIso00[iInt][jInt][kInt]->Branch("MuMu_Mass", &MuMu_Mass, "MuMu_Mass");
+				tree_SoftIso00[iInt][jInt][kInt]->Branch("MuMu_Pt", &MuMu_Pt, "MuMu_Pt");
+				tree_SoftIso00[iInt][jInt][kInt]->Branch("MuMu_DR", &MuMu_DR, "MuMu_DR");
+				tree_SoftIso00[iInt][jInt][kInt]->Branch("MuMuMET_DPhi", &MuMuMET_DPhi, "MuMuMET_DPhi");
+				tree_SoftIso00[iInt][jInt][kInt]->Branch("TrkTrk_Mass", &TrkTrk_Mass, "TrkTrk_Mass");
+				tree_SoftIso00[iInt][jInt][kInt]->Branch("TrkTrk_Pt", &TrkTrk_Pt, "TrkTrk_Pt");
+				tree_SoftIso00[iInt][jInt][kInt]->Branch("TrkTrk_DR", &TrkTrk_DR, "TrkTrk_DR");
+				tree_SoftIso00[iInt][jInt][kInt]->Branch("TrkTrkMET_DPhi", &TrkTrkMET_DPhi, "TrkTrkMET_DPhi");
+				tree_SoftIso00[iInt][jInt][kInt]->Branch("MuMuTrkTrk_Mass", &MuMuTrkTrk_Mass, "MuMuTrkTrk_Mass");
+				tree_SoftIso00[iInt][jInt][kInt]->Branch("MuMuTrkTrk_Pt", &MuMuTrkTrk_Pt, "MuMuTrkTrk_Pt");
+				tree_SoftIso00[iInt][jInt][kInt]->Branch("MuMuTauTau_Mass", &MuMuTauTau_Mass, "MuMuTauTau_Mass");
+				tree_SoftIso00[iInt][jInt][kInt]->Branch("MuMuTauTau_Pt", &MuMuTauTau_Pt, "MuMuTauTau_Pt");
+				tree_SoftIso00[iInt][jInt][kInt]->Branch("MET_Pt", &MET_Pt, "MET_Pt");
+				tree_SoftIso00[iInt][jInt][kInt]->Branch("MuMuTrkTrkMET_Mass", &MuMuTrkTrkMET_Mass, "MuMuTrkTrkMET_Mass");
+				tree_SoftIso00[iInt][jInt][kInt]->Branch("Eventweight", &Eventweight, "Eventweight");
+
+				////////////////// VerySoftIso00 Region	//////////////////
+				tree_VerySoftIso00[iInt][jInt][kInt] = new TTree("tree_VerySoftIso00" + DRIntervalString[iInt] + TrackCatString[jInt] + TrackCatString[kInt], "tree_VerySoftIso00" + DRIntervalString[iInt] + TrackCatString[jInt] + TrackCatString[kInt]);
+				tree_VerySoftIso00[iInt][jInt][kInt]->Branch("MuMu_Mass", &MuMu_Mass, "MuMu_Mass");
+				tree_VerySoftIso00[iInt][jInt][kInt]->Branch("MuMu_Pt", &MuMu_Pt, "MuMu_Pt");
+				tree_VerySoftIso00[iInt][jInt][kInt]->Branch("MuMu_DR", &MuMu_DR, "MuMu_DR");
+				tree_VerySoftIso00[iInt][jInt][kInt]->Branch("MuMuMET_DPhi", &MuMuMET_DPhi, "MuMuMET_DPhi");
+				tree_VerySoftIso00[iInt][jInt][kInt]->Branch("TrkTrk_Mass", &TrkTrk_Mass, "TrkTrk_Mass");
+				tree_VerySoftIso00[iInt][jInt][kInt]->Branch("TrkTrk_Pt", &TrkTrk_Pt, "TrkTrk_Pt");
+				tree_VerySoftIso00[iInt][jInt][kInt]->Branch("TrkTrk_DR", &TrkTrk_DR, "TrkTrk_DR");
+				tree_VerySoftIso00[iInt][jInt][kInt]->Branch("TrkTrkMET_DPhi", &TrkTrkMET_DPhi, "TrkTrkMET_DPhi");
+				tree_VerySoftIso00[iInt][jInt][kInt]->Branch("MuMuTrkTrk_Mass", &MuMuTrkTrk_Mass, "MuMuTrkTrk_Mass");
+				tree_VerySoftIso00[iInt][jInt][kInt]->Branch("MuMuTrkTrk_Pt", &MuMuTrkTrk_Pt, "MuMuTrkTrk_Pt");
+				tree_VerySoftIso00[iInt][jInt][kInt]->Branch("MuMuTauTau_Mass", &MuMuTauTau_Mass, "MuMuTauTau_Mass");
+				tree_VerySoftIso00[iInt][jInt][kInt]->Branch("MuMuTauTau_Pt", &MuMuTauTau_Pt, "MuMuTauTau_Pt");
+				tree_VerySoftIso00[iInt][jInt][kInt]->Branch("MET_Pt", &MET_Pt, "MET_Pt");
+				tree_VerySoftIso00[iInt][jInt][kInt]->Branch("MuMuTrkTrkMET_Mass", &MuMuTrkTrkMET_Mass, "MuMuTrkTrkMET_Mass");
+				tree_VerySoftIso00[iInt][jInt][kInt]->Branch("Eventweight", &Eventweight, "Eventweight");
+
+				////////////////// SoftIso_VerySoftIso Region	//////////////////
+				tree_SoftIso_VerySoftIso[iInt][jInt][kInt] = new TTree("tree_SoftIso_VerySoftIso" + DRIntervalString[iInt] + TrackCatString[jInt] + TrackCatString[kInt], "tree_SoftIso_VerySoftIso" + DRIntervalString[iInt] + TrackCatString[jInt] + TrackCatString[kInt]);
+				tree_SoftIso_VerySoftIso[iInt][jInt][kInt]->Branch("MuMu_Mass", &MuMu_Mass, "MuMu_Mass");
+				tree_SoftIso_VerySoftIso[iInt][jInt][kInt]->Branch("MuMu_Pt", &MuMu_Pt, "MuMu_Pt");
+				tree_SoftIso_VerySoftIso[iInt][jInt][kInt]->Branch("MuMu_DR", &MuMu_DR, "MuMu_DR");
+				tree_SoftIso_VerySoftIso[iInt][jInt][kInt]->Branch("MuMuMET_DPhi", &MuMuMET_DPhi, "MuMuMET_DPhi");
+				tree_SoftIso_VerySoftIso[iInt][jInt][kInt]->Branch("TrkTrk_Mass", &TrkTrk_Mass, "TrkTrk_Mass");
+				tree_SoftIso_VerySoftIso[iInt][jInt][kInt]->Branch("TrkTrk_Pt", &TrkTrk_Pt, "TrkTrk_Pt");
+				tree_SoftIso_VerySoftIso[iInt][jInt][kInt]->Branch("TrkTrk_DR", &TrkTrk_DR, "TrkTrk_DR");
+				tree_SoftIso_VerySoftIso[iInt][jInt][kInt]->Branch("TrkTrkMET_DPhi", &TrkTrkMET_DPhi, "TrkTrkMET_DPhi");
+				tree_SoftIso_VerySoftIso[iInt][jInt][kInt]->Branch("MuMuTrkTrk_Mass", &MuMuTrkTrk_Mass, "MuMuTrkTrk_Mass");
+				tree_SoftIso_VerySoftIso[iInt][jInt][kInt]->Branch("MuMuTrkTrk_Pt", &MuMuTrkTrk_Pt, "MuMuTrkTrk_Pt");
+				tree_SoftIso_VerySoftIso[iInt][jInt][kInt]->Branch("MuMuTauTau_Mass", &MuMuTauTau_Mass, "MuMuTauTau_Mass");
+				tree_SoftIso_VerySoftIso[iInt][jInt][kInt]->Branch("MuMuTauTau_Pt", &MuMuTauTau_Pt, "MuMuTauTau_Pt");
+				tree_SoftIso_VerySoftIso[iInt][jInt][kInt]->Branch("MET_Pt", &MET_Pt, "MET_Pt");
+				tree_SoftIso_VerySoftIso[iInt][jInt][kInt]->Branch("MuMuTrkTrkMET_Mass", &MuMuTrkTrkMET_Mass, "MuMuTrkTrkMET_Mass");
+				tree_SoftIso_VerySoftIso[iInt][jInt][kInt]->Branch("Eventweight", &Eventweight, "Eventweight");
+
+
+				////////////////// VerySoftIso_SoftIso Region	//////////////////
+				tree_VerySoftIso_SoftIso[iInt][jInt][kInt] = new TTree("tree_VerySoftIso_SoftIso" + DRIntervalString[iInt] + TrackCatString[jInt] + TrackCatString[kInt], "tree_VerySoftIso_SoftIso" + DRIntervalString[iInt] + TrackCatString[jInt] + TrackCatString[kInt]);
+				tree_VerySoftIso_SoftIso[iInt][jInt][kInt]->Branch("MuMu_Mass", &MuMu_Mass, "MuMu_Mass");
+				tree_VerySoftIso_SoftIso[iInt][jInt][kInt]->Branch("MuMu_Pt", &MuMu_Pt, "MuMu_Pt");
+				tree_VerySoftIso_SoftIso[iInt][jInt][kInt]->Branch("MuMu_DR", &MuMu_DR, "MuMu_DR");
+				tree_VerySoftIso_SoftIso[iInt][jInt][kInt]->Branch("MuMuMET_DPhi", &MuMuMET_DPhi, "MuMuMET_DPhi");
+				tree_VerySoftIso_SoftIso[iInt][jInt][kInt]->Branch("TrkTrk_Mass", &TrkTrk_Mass, "TrkTrk_Mass");
+				tree_VerySoftIso_SoftIso[iInt][jInt][kInt]->Branch("TrkTrk_Pt", &TrkTrk_Pt, "TrkTrk_Pt");
+				tree_VerySoftIso_SoftIso[iInt][jInt][kInt]->Branch("TrkTrk_DR", &TrkTrk_DR, "TrkTrk_DR");
+				tree_VerySoftIso_SoftIso[iInt][jInt][kInt]->Branch("TrkTrkMET_DPhi", &TrkTrkMET_DPhi, "TrkTrkMET_DPhi");
+				tree_VerySoftIso_SoftIso[iInt][jInt][kInt]->Branch("MuMuTrkTrk_Mass", &MuMuTrkTrk_Mass, "MuMuTrkTrk_Mass");
+				tree_VerySoftIso_SoftIso[iInt][jInt][kInt]->Branch("MuMuTrkTrk_Pt", &MuMuTrkTrk_Pt, "MuMuTrkTrk_Pt");
+				tree_VerySoftIso_SoftIso[iInt][jInt][kInt]->Branch("MuMuTauTau_Mass", &MuMuTauTau_Mass, "MuMuTauTau_Mass");
+				tree_VerySoftIso_SoftIso[iInt][jInt][kInt]->Branch("MuMuTauTau_Pt", &MuMuTauTau_Pt, "MuMuTauTau_Pt");
+				tree_VerySoftIso_SoftIso[iInt][jInt][kInt]->Branch("MET_Pt", &MET_Pt, "MET_Pt");
+				tree_VerySoftIso_SoftIso[iInt][jInt][kInt]->Branch("MuMuTrkTrkMET_Mass", &MuMuTrkTrkMET_Mass, "MuMuTrkTrkMET_Mass");
+				tree_VerySoftIso_SoftIso[iInt][jInt][kInt]->Branch("Eventweight", &Eventweight, "Eventweight");
+
+				////////////////// NNVerySoftIso Region	//////////////////
+				tree_NNVerySoftIso[iInt][jInt][kInt] = new TTree("tree_NNVerySoftIso" + DRIntervalString[iInt] + TrackCatString[jInt] + TrackCatString[kInt], "tree_NNVerySoftIso" + DRIntervalString[iInt] + TrackCatString[jInt] + TrackCatString[kInt]);
+				tree_NNVerySoftIso[iInt][jInt][kInt]->Branch("MuMu_Mass", &MuMu_Mass, "MuMu_Mass");
+				tree_NNVerySoftIso[iInt][jInt][kInt]->Branch("MuMu_Pt", &MuMu_Pt, "MuMu_Pt");
+				tree_NNVerySoftIso[iInt][jInt][kInt]->Branch("MuMu_DR", &MuMu_DR, "MuMu_DR");
+				tree_NNVerySoftIso[iInt][jInt][kInt]->Branch("MuMuMET_DPhi", &MuMuMET_DPhi, "MuMuMET_DPhi");
+				tree_NNVerySoftIso[iInt][jInt][kInt]->Branch("TrkTrk_Mass", &TrkTrk_Mass, "TrkTrk_Mass");
+				tree_NNVerySoftIso[iInt][jInt][kInt]->Branch("TrkTrk_Pt", &TrkTrk_Pt, "TrkTrk_Pt");
+				tree_NNVerySoftIso[iInt][jInt][kInt]->Branch("TrkTrk_DR", &TrkTrk_DR, "TrkTrk_DR");
+				tree_NNVerySoftIso[iInt][jInt][kInt]->Branch("TrkTrkMET_DPhi", &TrkTrkMET_DPhi, "TrkTrkMET_DPhi");
+				tree_NNVerySoftIso[iInt][jInt][kInt]->Branch("MuMuTrkTrk_Mass", &MuMuTrkTrk_Mass, "MuMuTrkTrk_Mass");
+				tree_NNVerySoftIso[iInt][jInt][kInt]->Branch("MuMuTrkTrk_Pt", &MuMuTrkTrk_Pt, "MuMuTrkTrk_Pt");
+				tree_NNVerySoftIso[iInt][jInt][kInt]->Branch("MuMuTauTau_Mass", &MuMuTauTau_Mass, "MuMuTauTau_Mass");
+				tree_NNVerySoftIso[iInt][jInt][kInt]->Branch("MuMuTauTau_Pt", &MuMuTauTau_Pt, "MuMuTauTau_Pt");
+				tree_NNVerySoftIso[iInt][jInt][kInt]->Branch("MET_Pt", &MET_Pt, "MET_Pt");
+				tree_NNVerySoftIso[iInt][jInt][kInt]->Branch("MuMuTrkTrkMET_Mass", &MuMuTrkTrkMET_Mass, "MuMuTrkTrkMET_Mass");
+				tree_NNVerySoftIso[iInt][jInt][kInt]->Branch("Eventweight", &Eventweight, "Eventweight");
+
+				////////////////// NNSoftIso Region	//////////////////
+				tree_NNSoftIso[iInt][jInt][kInt] = new TTree("tree_NNSoftIso" + DRIntervalString[iInt] + TrackCatString[jInt] + TrackCatString[kInt], "tree_NNSoftIso" + DRIntervalString[iInt] + TrackCatString[jInt] + TrackCatString[kInt]);
+				tree_NNSoftIso[iInt][jInt][kInt]->Branch("MuMu_Mass", &MuMu_Mass, "MuMu_Mass");
+				tree_NNSoftIso[iInt][jInt][kInt]->Branch("MuMu_Pt", &MuMu_Pt, "MuMu_Pt");
+				tree_NNSoftIso[iInt][jInt][kInt]->Branch("MuMu_DR", &MuMu_DR, "MuMu_DR");
+				tree_NNSoftIso[iInt][jInt][kInt]->Branch("MuMuMET_DPhi", &MuMuMET_DPhi, "MuMuMET_DPhi");
+				tree_NNSoftIso[iInt][jInt][kInt]->Branch("TrkTrk_Mass", &TrkTrk_Mass, "TrkTrk_Mass");
+				tree_NNSoftIso[iInt][jInt][kInt]->Branch("TrkTrk_Pt", &TrkTrk_Pt, "TrkTrk_Pt");
+				tree_NNSoftIso[iInt][jInt][kInt]->Branch("TrkTrk_DR", &TrkTrk_DR, "TrkTrk_DR");
+				tree_NNSoftIso[iInt][jInt][kInt]->Branch("TrkTrkMET_DPhi", &TrkTrkMET_DPhi, "TrkTrkMET_DPhi");
+				tree_NNSoftIso[iInt][jInt][kInt]->Branch("MuMuTrkTrk_Mass", &MuMuTrkTrk_Mass, "MuMuTrkTrk_Mass");
+				tree_NNSoftIso[iInt][jInt][kInt]->Branch("MuMuTrkTrk_Pt", &MuMuTrkTrk_Pt, "MuMuTrkTrk_Pt");
+				tree_NNSoftIso[iInt][jInt][kInt]->Branch("MuMuTauTau_Mass", &MuMuTauTau_Mass, "MuMuTauTau_Mass");
+				tree_NNSoftIso[iInt][jInt][kInt]->Branch("MuMuTauTau_Pt", &MuMuTauTau_Pt, "MuMuTauTau_Pt");
+				tree_NNSoftIso[iInt][jInt][kInt]->Branch("MET_Pt", &MET_Pt, "MET_Pt");
+				tree_NNSoftIso[iInt][jInt][kInt]->Branch("MuMuTrkTrkMET_Mass", &MuMuTrkTrkMET_Mass, "MuMuTrkTrkMET_Mass");
+				tree_NNSoftIso[iInt][jInt][kInt]->Branch("Eventweight", &Eventweight, "Eventweight");
 
 				////////////////// 00_0SemiIsoorSemiIso0 Region	//////////////////
 				tree_00_0SemiIsoorSemiIso0[iInt][jInt][kInt] = new TTree("tree_00_0SemiIsoorSemiIso0" + DRIntervalString[iInt] + TrackCatString[jInt] + TrackCatString[kInt], "tree_00_0SemiIsoorSemiIso0" + DRIntervalString[iInt] + TrackCatString[jInt] + TrackCatString[kInt]);
@@ -1609,7 +1777,7 @@ int main(int argc, char *argv[])
 			for (unsigned int iT = 0; iT < trigobject_count; ++iT)
 			{
 				float dRtrig = deltaR(muon_eta[iAmumu1candidate], muon_phi[iAmumu1candidate],
-					trigobject_eta[iT], trigobject_phi[iT]);
+						      trigobject_eta[iT], trigobject_phi[iT]);
 				if (dRtrig > DRTrigMatch) continue;
 				if (trigobject_filters[iT][nIsoMu])
 					mu1MatchIsoMu = true;
@@ -1669,7 +1837,7 @@ int main(int argc, char *argv[])
 					if (trigWeightMC > 0) triggerWeight = trigWeightData / trigWeightMC;
 				}
 				else triggerWeight = trigWeightData;
-
+				
 				correctionWS->var("m_pt")->setVal(muon_pt[iAmumu1candidate]);
 				correctionWS->var("m_eta")->setVal(muon_eta[iAmumu1candidate]);
 				correctionWS->var("m_iso")->setVal(0.0);
@@ -1772,7 +1940,8 @@ int main(int argc, char *argv[])
 			float metPt = Met4.Pt();
 			float dPhiMuMuMet = dPhiFrom2P(diMuon4.Px(), diMuon4.Py(), Met4.Px(), Met4.Py());
 
-			if (dimuonMass < massDiMuCut || dimuonMass > 22.) continue;	// requiring InvMass ("a" boson mass) to be greater than 2*mass_tau and less than 22
+			//			if (dimuonMass < massDiMuCut || dimuonMass > 22.) continue;	// requiring InvMass ("a" boson mass) to be greater than 2*mass_tau and less than 22
+			if (dimuonMass<massDiMuCut) continue;
 
 			// filling histograms (muon kinematics)
 			dimuonMassH->Fill(dimuonMass, weight);
@@ -1838,6 +2007,7 @@ int main(int argc, char *argv[])
 					float ptSum = diTrack4.Pt();
 					float charge = track_charge[index1] *track_charge[index2];
 					bool chargeSelection = charge < 0;
+					if (sameSignTracks) chargeSelection = charge > 0;
 					float drTrkTrk = deltaR(trk1st4.Eta(), trk1st4.Phi(),
 						trk2nd4.Eta(), trk2nd4.Phi());
 
@@ -1966,6 +2136,7 @@ int main(int argc, char *argv[])
 				for (unsigned int iTrk = 0; iTrk < track_count; ++iTrk)
 				{
 					if (fabs(track_charge[iTrk]) < 0.1) continue;	// make sure we are not taking neutral stuff
+					bool isNotMuon = abs(track_ID[iTrk])!=13;
 					if (fabs(track_dxy[iTrk]) > dxyTrkLooseCut) continue;
 					if (fabs(track_dz[iTrk]) > dzTrkLooseCut) continue;
 					if (fabs(track_eta[iTrk]) > etaTrkCut) continue;
@@ -1981,6 +2152,15 @@ int main(int argc, char *argv[])
 					TLorentzVector Atautau2candidateDiff = Atautau2candidate4 - trk4;
 					TLorentzVector Amumu1candidateDiff = Amumu1candidate4 - trk4;
 					TLorentzVector Amumu2candidateDiff = Amumu2candidate4 - trk4;
+
+					float mass1 = (Amumu1candidate4 + trk4).M();
+					float mass2 = (Amumu2candidate4 + trk4).M();
+
+					bool isResonance1 = mass1 > 8.5 && mass1 < 11.0;
+					bool isResonance2 = mass2 > 8.5 && mass2 < 11.0;
+					bool notResonance1 = !isResonance1;
+					bool notResonance2 = !isResonance2;
+
 
 					if (Atautau1candidateDiff.P() > 0.1 && Atautau2candidateDiff.P() > 0.1 && Amumu1candidateDiff.P() > 0.1 && Amumu2candidateDiff.P() > 0.1)	// track is not any of the selected objects
 					{
@@ -2109,76 +2289,146 @@ int main(int argc, char *argv[])
 				//////////////////////////////////////// **************************************////////////////////////////////////////////
 
 				// Signal Region
-				bool signalRegion = trkAmumu1candidate.size() == 0 && trkAmumu2candidate.size() == 0 && trkAtautau1candidate.size() == 0 && trkAtautau2candidate.size() == 0;
+				bool signalRegion = 
+				  trkAmumu1candidate.size() == 0 && 
+				  trkAmumu2candidate.size() == 0 && 
+				  trkAtautau1candidate.size() == 0 && 
+				  trkAtautau2candidate.size() == 0;
 
 				// Control Regions for Background Modeling 
 
 				bool controlNNNN = !signalRegion;
 
-				bool control00NN = trkAmumu1candidate.size() == 0 && trkAmumu2candidate.size() == 0 &&
+				bool control00NN = 
+				  trkAmumu1candidate.size() == 0 && 
+				  trkAmumu2candidate.size() == 0 &&
 					!signalRegion;
 
-				bool control00SemiIso = trkAmumu1candidate.size() == 0 && trkAmumu2candidate.size() == 0 &&
-					(soft_trkAtautau1candidate.size() == trkAtautau1candidate.size()) &&
-					(soft_trkAtautau2candidate.size() == trkAtautau2candidate.size()) &&
-					!signalRegion;
+				bool controlVerySoftIsoNN = 
+				  (trkAmumu1candidate.size() <= 1 && soft_trkAmumu1candidate.size() == trkAmumu1candidate.size()) &&
+				  (trkAmumu2candidate.size() <= 1 && soft_trkAmumu2candidate.size() == trkAmumu2candidate.size()) && 
+				  !signalRegion;
 
-				bool controlSoftIso = (trkAmumu1candidate.size() <= 2 && soft_trkAmumu1candidate.size() == trkAmumu1candidate.size()) &&
-					(trkAmumu2candidate.size() <= 2 && soft_trkAmumu2candidate.size() == trkAmumu2candidate.size()) &&
-					(trkAtautau1candidate.size() <= 2 && soft_trkAtautau1candidate.size() == trkAtautau1candidate.size()) &&
-					(trkAtautau2candidate.size() <= 2 && soft_trkAtautau2candidate.size() == trkAtautau2candidate.size()) &&
-					!signalRegion;
+				bool controlSoftIsoNN = 
+				  (trkAmumu1candidate.size() <= 2 && soft_trkAmumu1candidate.size() == trkAmumu1candidate.size()) &&
+				  (trkAmumu2candidate.size() <= 2 && soft_trkAmumu2candidate.size() == trkAmumu2candidate.size()) && 
+				  !signalRegion;
 
-				bool controlVerySoftIso = (trkAmumu1candidate.size() <= 1 && soft_trkAmumu1candidate.size() == trkAmumu1candidate.size()) &&
-					(trkAmumu2candidate.size() <= 1 && soft_trkAmumu2candidate.size() == trkAmumu2candidate.size()) &&
-					(trkAtautau1candidate.size() <= 1 && soft_trkAtautau1candidate.size() == trkAtautau1candidate.size()) &&
-					(trkAtautau2candidate.size() <= 1 && soft_trkAtautau2candidate.size() == trkAtautau2candidate.size()) &&
-					!signalRegion;
 
-				bool control00SoftIso = trkAmumu1candidate.size() == 0 && trkAmumu2candidate.size() == 0 &&
-					(trkAtautau1candidate.size() <= 2 && soft_trkAtautau1candidate.size() == trkAtautau1candidate.size()) &&
-					(trkAtautau2candidate.size() <= 2 && soft_trkAtautau2candidate.size() == trkAtautau2candidate.size()) &&
-					!signalRegion;
 
-				bool control00VerySoftIso = trkAmumu1candidate.size() == 0 && trkAmumu2candidate.size() == 0 &&
-					(trkAtautau1candidate.size() <= 1 && soft_trkAtautau1candidate.size() == trkAtautau1candidate.size()) &&
-					(trkAtautau2candidate.size() <= 1 && soft_trkAtautau2candidate.size() == trkAtautau2candidate.size()) &&
-					!signalRegion;
+				bool control00SemiIso = 
+				  trkAmumu1candidate.size() == 0 && 
+				  trkAmumu2candidate.size() == 0 && 
+				  (soft_trkAtautau1candidate.size() == trkAtautau1candidate.size()) &&
+				  (soft_trkAtautau2candidate.size() == trkAtautau2candidate.size()) &&
+				  !signalRegion;
 
-				bool controlNN00 = trkAtautau1candidate.size() == 0 && trkAtautau2candidate.size() == 0 &&
-					!signalRegion;
+				bool controlSoftIso = 
+				  (trkAmumu1candidate.size() <= 2 && soft_trkAmumu1candidate.size() == trkAmumu1candidate.size()) &&
+				  (trkAmumu2candidate.size() <= 2 && soft_trkAmumu2candidate.size() == trkAmumu2candidate.size()) &&
+				  (trkAtautau1candidate.size() <= 2 && soft_trkAtautau1candidate.size() == trkAtautau1candidate.size()) &&
+				  (trkAtautau2candidate.size() <= 2 && soft_trkAtautau2candidate.size() == trkAtautau2candidate.size()) &&
+				  !signalRegion;
 
-				bool control00_0SemiIsoorSemiIso0 = trkAmumu1candidate.size() == 0 && trkAmumu2candidate.size() == 0 &&
-					((trkAtautau1candidate.size() == 0 &&
-							soft_trkAtautau2candidate.size() == trkAtautau2candidate.size()) ||
-						(trkAtautau2candidate.size() == 0 &&
-							soft_trkAtautau1candidate.size() == trkAtautau1candidate.size())
-				) &&
-					!signalRegion;
+				bool controlVerySoftIso = 
+				  (trkAmumu1candidate.size() <= 1 && soft_trkAmumu1candidate.size() == trkAmumu1candidate.size()) &&
+				  (trkAmumu2candidate.size() <= 1 && soft_trkAmumu2candidate.size() == trkAmumu2candidate.size()) &&
+				  (trkAtautau1candidate.size() <= 1 && soft_trkAtautau1candidate.size() == trkAtautau1candidate.size()) &&
+				  (trkAtautau2candidate.size() <= 1 && soft_trkAtautau2candidate.size() == trkAtautau2candidate.size()) &&
+				  !signalRegion;
 
-				bool control00_0NorN0 = trkAmumu1candidate.size() == 0 && trkAmumu2candidate.size() == 0 &&
-					(trkAtautau1candidate.size() == 0 || trkAtautau2candidate.size() == 0) &&
-					!signalRegion;
+				bool control00SoftIso = 
+				  trkAmumu1candidate.size() == 0 && 
+				  trkAmumu2candidate.size() == 0 &&
+				  (trkAtautau1candidate.size() <= 2 && soft_trkAtautau1candidate.size() == trkAtautau1candidate.size()) &&
+				  (trkAtautau2candidate.size() <= 2 && soft_trkAtautau2candidate.size() == trkAtautau2candidate.size()) &&
+				  !signalRegion;
 
-				/////////////////////////****************///////////////////////////////
+				bool control00VerySoftIso = 
+				  trkAmumu1candidate.size() == 0 && 
+				  trkAmumu2candidate.size() == 0 &&
+				  (trkAtautau1candidate.size() <= 1 && soft_trkAtautau1candidate.size() == trkAtautau1candidate.size()) &&
+				  (trkAtautau2candidate.size() <= 1 && soft_trkAtautau2candidate.size() == trkAtautau2candidate.size()) &&
+				  !signalRegion;
+
+				bool controlVerySoftIso00 = 
+				  trkAtautau1candidate.size() == 0 && 
+				  trkAtautau2candidate.size() == 0 &&
+				  (trkAmumu1candidate.size() <= 1 && soft_trkAmumu1candidate.size() == trkAmumu1candidate.size()) &&
+				  (trkAmumu2candidate.size() <= 1 && soft_trkAmumu2candidate.size() == trkAmumu2candidate.size()) &&
+				  !signalRegion;
+
+				bool controlSoftIso00 = 
+				  trkAtautau1candidate.size() == 0 && 
+				  trkAtautau2candidate.size() == 0 &&
+				  (trkAmumu1candidate.size() <= 2 && soft_trkAmumu1candidate.size() == trkAmumu1candidate.size()) &&
+				  (trkAmumu2candidate.size() <= 2 && soft_trkAmumu2candidate.size() == trkAmumu2candidate.size()) &&
+				  !signalRegion;
+
+				bool control_SoftIso_VerySoftIso = 
+				  (trkAtautau1candidate.size() <= 1 && soft_trkAtautau1candidate.size() == trkAtautau1candidate.size()) &&
+				  (trkAtautau2candidate.size() <= 1 && soft_trkAtautau2candidate.size() == trkAtautau2candidate.size()) &&				  
+				  (trkAmumu1candidate.size() <= 2 && soft_trkAmumu1candidate.size() == trkAmumu1candidate.size()) &&
+				  (trkAmumu2candidate.size() <= 2 && soft_trkAmumu2candidate.size() == trkAmumu2candidate.size()) &&
+				  !signalRegion;
+				
+				bool control_VerySoftIso_SoftIso = 
+				  (trkAtautau1candidate.size() <= 2 && soft_trkAtautau1candidate.size() == trkAtautau1candidate.size()) &&
+				  (trkAtautau2candidate.size() <= 2 && soft_trkAtautau2candidate.size() == trkAtautau2candidate.size()) &&				  
+				  (trkAmumu1candidate.size() <= 1 && soft_trkAmumu1candidate.size() == trkAmumu1candidate.size()) &&
+				  (trkAmumu2candidate.size() <= 1 && soft_trkAmumu2candidate.size() == trkAmumu2candidate.size()) &&
+				  !signalRegion;
+				
+				bool controlNN00 = 
+				  trkAtautau1candidate.size() == 0 && 
+				  trkAtautau2candidate.size() == 0 && 
+				  !signalRegion;
+
+				bool controlNNVerySoftIso = 
+				  (trkAtautau1candidate.size() <= 1 && soft_trkAtautau1candidate.size() == trkAtautau1candidate.size()) &&
+				  (trkAtautau2candidate.size() <= 1 && soft_trkAtautau2candidate.size() == trkAtautau2candidate.size()) &&
+				  !signalRegion;
+
+				bool controlNNSoftIso = 
+				  (trkAtautau1candidate.size() <= 2 && soft_trkAtautau1candidate.size() == trkAtautau1candidate.size()) &&
+				  (trkAtautau2candidate.size() <= 2 && soft_trkAtautau2candidate.size() == trkAtautau2candidate.size()) &&
+				  !signalRegion;
+
+				bool control00_0SemiIsoorSemiIso0 = 
+				  trkAmumu1candidate.size() == 0 && 
+				  trkAmumu2candidate.size() == 0 &&
+				  ((trkAtautau1candidate.size() == 0 &&
+				   soft_trkAtautau2candidate.size() == trkAtautau2candidate.size()) ||
+				   (trkAtautau2candidate.size() == 0 &&
+				    soft_trkAtautau1candidate.size() == trkAtautau1candidate.size())
+				   ) &&
+				  !signalRegion;
+
+				bool control00_0NorN0 = 
+				  trkAmumu1candidate.size() == 0 && 
+				  trkAmumu2candidate.size() == 0 &&
+				  (trkAtautau1candidate.size() == 0 || trkAtautau2candidate.size() == 0) &&
+				  !signalRegion;
+
+				/////////////////////////****************/////////////////////////////
 				//////********filling histograms by Regions &Categories ********//////
-				/////////////////////////***************///////////////////////////////
+				/////////////////////////***************//////////////////////////////
 
 				////****Setting the values of the variables *****/////
 				MuMu_Mass = dimuonMass;
 				MuMu_Mass_muScaleUp = dimuonMass_muScaleUp;
 				MuMu_Mass_muScaleDown = dimuonMass_muScaleDown;
-				//				std::cout << "MuMu_Mass = " << MuMu_Mass
-				//					  << "    up = " << MuMu_Mass_muScaleUp
-				//					  << "    down = " << MuMu_Mass_muScaleDown 
-				//					  << std::endl;
+				//  std::cout << "MuMu_Mass = " << MuMu_Mass
+				//  << "    up = " << MuMu_Mass_muScaleUp
+				//  << "    down = " << MuMu_Mass_muScaleDown 
+				//  << std::endl;
 				MuMu_Pt = dimuonPt;
 				MuMu_Pt_muScaleUp = dimuonPt_muScaleUp;
 				MuMu_Pt_muScaleDown = dimuonPt_muScaleDown;
-				//				std::cout << "MuMu_Pt = " << MuMu_Pt
-				//					  << "    up = " << MuMu_Pt_muScaleUp
-				//					  << "    down = " << MuMu_Pt_muScaleDown 
-				//					  << std::endl;
+				// std::cout << "MuMu_Pt = " << MuMu_Pt
+				//	     << "    up = " << MuMu_Pt_muScaleUp
+				//	     << "    down = " << MuMu_Pt_muScaleDown 
+				//	     << std::endl;
 				
 				MuMu_DR = drMuMu;
 				MuMuMET_DPhi = dPhiMuMuMet;
@@ -2206,107 +2456,146 @@ int main(int argc, char *argv[])
 				//					  << "  JetEnDown = " << MuMuTrkTrkMET_Mass_JetEnDown 
 				//					  << "  UnclEnUp = " << MuMuTrkTrkMET_Mass_UnclEnUp
 				//					  << "  UnclEnDown = " << MuMuTrkTrkMET_Mass_UnclEnDown 
+
 				//					  << std::endl;
 				Eventweight = weight;
+				float mumu_DR = TMath::Min(float(1.5),MuMu_DR);
+				float tautau_DR = TMath::Min(float(1.5),TrkTrk_DR);
+				float weight_MuMu_DR = a0_MuMu_DR + a1_MuMu_DR*mumu_DR;
+				float weight_TrkTrk_DR = a0_TrkTrk_DR + a1_TrkTrk_DR*tautau_DR;
+				Correctionweight = weight_MuMu_DR * weight_TrkTrk_DR;
+				TrkTrk_DR_weight_Down = Correctionweight/weight_TrkTrk_DR;
+				MuMu_DR_weight_Down = Correctionweight/weight_MuMu_DR;
+				TrkTrk_DR_weight_Up = Correctionweight*weight_TrkTrk_DR;
+				MuMu_DR_weight_Up = Correctionweight*weight_MuMu_DR;
 
 				if (controlNNNN)
-				{
-					tree_NNNN[iInt][IDAtautau1candidate][IDAtautau2candidate]->Fill();
-				}
+				  {
+				    tree_NNNN[iInt][IDAtautau1candidate][IDAtautau2candidate]->Fill();
+				  }
 
 				if (control00NN)
-				{
-					tree_00NN[iInt][IDAtautau1candidate][IDAtautau2candidate]->Fill();
-				}
+				  {
+				    tree_00NN[iInt][IDAtautau1candidate][IDAtautau2candidate]->Fill();
+				  }
+
+				if (controlVerySoftIsoNN)
+				  {
+				    tree_VerySoftIsoNN[iInt][IDAtautau1candidate][IDAtautau2candidate]->Fill();
+				  }
+
+				if (controlSoftIsoNN)
+				  {
+				    tree_SoftIsoNN[iInt][IDAtautau1candidate][IDAtautau2candidate]->Fill();
+				  }
 
 				if (control00SemiIso)
-				{
-					tree_00SemiIso[iInt][IDAtautau1candidate][IDAtautau2candidate]->Fill();
-				}
-
+				  {
+				    tree_00SemiIso[iInt][IDAtautau1candidate][IDAtautau2candidate]->Fill();
+				  }
 				if (controlSoftIso)
-				{
-					tree_SoftIso[iInt][IDAtautau1candidate][IDAtautau2candidate]->Fill();
-				}
-
+				  {
+				    tree_SoftIso[iInt][IDAtautau1candidate][IDAtautau2candidate]->Fill();
+				  }
 				if (controlVerySoftIso)
-				{
-				  float mumu_DR = TMath::Min(float(1.5),MuMu_DR);
-				  float tautau_DR = TMath::Min(float(1.5),TrkTrk_DR);
-				  float weight_MuMu_DR = a0_MuMu_DR + a1_MuMu_DR*mumu_DR;
-				  float weight_TrkTrk_DR = a0_TrkTrk_DR + a1_TrkTrk_DR*tautau_DR;
-				  Correctionweight = weight_MuMu_DR * weight_TrkTrk_DR;
-				  TrkTrk_DR_weight_Down = Correctionweight/weight_TrkTrk_DR;
-				  MuMu_DR_weight_Down = Correctionweight/weight_MuMu_DR;
-				  TrkTrk_DR_weight_Up = Correctionweight*weight_TrkTrk_DR;
-				  MuMu_DR_weight_Up = Correctionweight*weight_MuMu_DR;
-				  /*
-				  std::cout << "Correction weight = " << Correctionweight << std::endl;
-				  std::cout << "TrkTrk_DR_weight_Down = " << TrkTrk_DR_weight_Down << std::endl; 
-				  std::cout << "TrkTrk_DR_weight_Up = " << TrkTrk_DR_weight_Up << std::endl; 
-				  std::cout << "MuMu_DR_weight_Down = " << MuMu_DR_weight_Down << std::endl; 
-				  std::cout << "MuMu_DR_weight_Up = " << MuMu_DR_weight_Up << std::endl; 
-				  */
-				  tree_VerySoftIso[iInt][IDAtautau1candidate][IDAtautau2candidate]->Fill();
-				}
+				  {
+				    /*
+				      std::cout << "Correction weight = " << Correctionweight << std::endl;
+				      std::cout << "TrkTrk_DR_weight_Down = " << TrkTrk_DR_weight_Down << std::endl; 
+				      std::cout << "TrkTrk_DR_weight_Up = " << TrkTrk_DR_weight_Up << std::endl; 
+				      std::cout << "MuMu_DR_weight_Down = " << MuMu_DR_weight_Down << std::endl; 
+				      std::cout << "MuMu_DR_weight_Up = " << MuMu_DR_weight_Up << std::endl; 
+				    */
+				    tree_VerySoftIso[iInt][IDAtautau1candidate][IDAtautau2candidate]->Fill();
+				  }
 
 				if (control00SoftIso)
-				{
-					tree_00SoftIso[iInt][IDAtautau1candidate][IDAtautau2candidate]->Fill();
-				}
+				  {
+				    tree_00SoftIso[iInt][IDAtautau1candidate][IDAtautau2candidate]->Fill();
+				  }
 
 				if (control00VerySoftIso)
-				{
-					tree_00VerySoftIso[iInt][IDAtautau1candidate][IDAtautau2candidate]->Fill();
-				}
+				  {
+				    tree_00VerySoftIso[iInt][IDAtautau1candidate][IDAtautau2candidate]->Fill();
+				  }
+
+				if (controlSoftIso00) 
+				  {
+				    tree_SoftIso00[iInt][IDAtautau1candidate][IDAtautau2candidate]->Fill();
+				  }
+
+				if (controlVerySoftIso00) 
+				  {
+				    tree_VerySoftIso00[iInt][IDAtautau1candidate][IDAtautau2candidate]->Fill();
+				  }
+
+				if (control_VerySoftIso_SoftIso)
+				  {
+				    tree_VerySoftIso_SoftIso[iInt][IDAtautau1candidate][IDAtautau2candidate]->Fill();
+				  }
+
+				if (control_SoftIso_VerySoftIso)
+				  {
+				    tree_SoftIso_VerySoftIso[iInt][IDAtautau1candidate][IDAtautau2candidate]->Fill();
+				  }
 
 				if (controlNN00)
-				{
-					tree_NN00[iInt][IDAtautau1candidate][IDAtautau2candidate]->Fill();
-				}
+				  {
+				    tree_NN00[iInt][IDAtautau1candidate][IDAtautau2candidate]->Fill();
+				  }
 
+				if (controlNNVerySoftIso) 
+				  {
+				    tree_NNVerySoftIso[iInt][IDAtautau1candidate][IDAtautau2candidate]->Fill();
+				  }
+
+				if (controlNNSoftIso) 
+				  {
+				    tree_NNSoftIso[iInt][IDAtautau1candidate][IDAtautau2candidate]->Fill();
+				  }
+				
 				if (control00_0SemiIsoorSemiIso0)
-				{
-					tree_00_0SemiIsoorSemiIso0[iInt][IDAtautau1candidate][IDAtautau2candidate]->Fill();
-				}
+				  {
+				    tree_00_0SemiIsoorSemiIso0[iInt][IDAtautau1candidate][IDAtautau2candidate]->Fill();
+				  }
 
 				if (control00_0NorN0)
-				{
-					tree_00_0NorN0[iInt][IDAtautau1candidate][IDAtautau2candidate]->Fill();
-				}
+				  {
+				    tree_00_0NorN0[iInt][IDAtautau1candidate][IDAtautau2candidate]->Fill();
+				  }
 
 				if (signalRegion)
-				{
+				  {
 
-					//event info
-					//std::cout << event_run <<":"<< event_luminosityblock <<":"<< event_nr << std::endl;
-
-					////////////////////Reweighting Track and Muon Iso/////////////////////////////
-					double scaleFIso;
-					if (year == 2016) scaleFIso = 0.933245;
-					else if (year == 2017) scaleFIso = 0.963655;
-					else if (year == 2018) scaleFIso = 0.909517;
-					else
-					{
-						std::cout << "year is not 2016, 2017, 2018 - exiting" << '\n';
-						exit(-1);
-					}
-
-					if (!isData) weight *= scaleFIso * scaleFIso;
-					////////////////////////////////////////////////////////////////////
-					/////////////////////////////////////////////////////
-
-					//////// now filling histograms	///////
-					Eventweight = weight;
-					treeSel[iInt][IDAtautau1candidate][IDAtautau2candidate]->Fill();
-
-					counter_FinalEventsCatH[iInt][IDAtautau1candidate][IDAtautau2candidate]->Fill(1., weight);
-					counter_FinalEventsH->Fill(1., weight);
-				}
+				    //event info
+				    //std::cout << event_run <<":"<< event_luminosityblock <<":"<< event_nr << std::endl;
+				    
+				    ////////////////////Reweighting Track and Muon Iso/////////////////////////////
+				    double scaleFIso;
+				    if (year == 2016) scaleFIso = 0.933245;
+				    else if (year == 2017) scaleFIso = 0.963655;
+				    else if (year == 2018) scaleFIso = 0.909517;
+				    else
+				      {
+					std::cout << "year is not 2016, 2017, 2018 - exiting" << '\n';
+					exit(-1);
+				      }
+				    
+				    if (!isData) weight *= scaleFIso * scaleFIso;
+				    ////////////////////////////////////////////////////////////////////
+				    /////////////////////////////////////////////////////
+				    
+				    //////// now filling histograms	///////
+				    Eventweight = weight;
+				    treeSel[iInt][IDAtautau1candidate][IDAtautau2candidate]->Fill();
+				    
+				    counter_FinalEventsCatH[iInt][IDAtautau1candidate][IDAtautau2candidate]->Fill(1., weight);
+				    counter_FinalEventsH->Fill(1., weight);
+				  }
 
 				//============================================================================================================//
 			}	/////end loop over all Intervals (Categories) used for Mu-Trk Pair
-
+			
 		}	// icand loop
 
 		delete tree_;

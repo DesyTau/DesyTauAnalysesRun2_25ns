@@ -14,8 +14,7 @@ using namespace std;
 void Plot(
 	  TFile * file,
 	  TString  era,
-	  TString category,
-	  TString trigger
+	  TString category
 	  ) {
 
   gStyle->SetOptStat(0000);
@@ -41,7 +40,7 @@ void Plot(
   }
   TH1D * TT  = (TH1D*)file->Get(category+"/TTL");
   TH1D * ZTT = (TH1D*)file->Get(category+"/EMB");
-  TH1D * ZLL = (TH1D*)file->Get(category+"/ZLL");
+  TH1D * ZLL = (TH1D*)file->Get(category+"/ZL");
   TH1D * W   = (TH1D*)file->Get(category+"/W");
   TH1D * EWK = (TH1D*)file->Get(category+"/VVL"); 
   TH1D * QCD = (TH1D*)file->Get(category+"/QCD");
@@ -322,69 +321,82 @@ void Plot(
   canv1->cd();
   canv1->SetSelected(canv1);
   canv1->Update();
-  canv1->Print(category+"_"+era+"_trig"+trigger+".png");
+  canv1->Print(category+"_"+era+".png");
 
   std::cout << std::endl;
   std::cout << "Signal yields for 1 pb... " << std::endl;
   for (auto mass : masses) {
-    TH1D * bbH = (TH1D*)file->Get(category+"/bbH"+mass);
-    TH1D * ggH = (TH1D*)file->Get(category+"/ggH"+mass);
-    std::cout << "mass = " << mass << " : ";
+    TH1D * bbH = (TH1D*)file->Get(category+"/bbH_"+mass);
+    TH1D * ggHt = (TH1D*)file->Get(category+"/ggH_t_"+mass);
+    TH1D * ggHb = (TH1D*)file->Get(category+"/ggH_b_"+mass);
+    TH1D * ggHi = (TH1D*)file->Get(category+"/ggH_i_"+mass);
+    TH1D * ggAt = (TH1D*)file->Get(category+"/ggA_t_"+mass);
+    TH1D * ggAb = (TH1D*)file->Get(category+"/ggA_b_"+mass);
+    TH1D * ggAi = (TH1D*)file->Get(category+"/ggA_i_"+mass);
+    std::cout << "mass=" << mass << " : ";
     if (bbH!=NULL) 
       std::cout << "  bbH = " << bbH->GetSumOfWeights();
     else 
-      std::cout << "  bbH ------ ";
-    if (ggH!=NULL) 
-      std::cout << "  ggH = " << ggH->GetSumOfWeights();
+      std::cout << "  bbH --- ";
+    if (ggHt!=NULL&&ggHb!=NULL&&ggHi!=NULL) 
+      std::cout << "  ggH_{t,b,i} = " 
+		<< "{" << ggHt->GetSumOfWeights() 
+		<< "," << ggHb->GetSumOfWeights()
+		<< "," << ggHi->GetSumOfWeights()
+		<< "}";
     else 
-      std::cout << "  ggH ------ ";
+      std::cout << "  ggH --- ";
+
+    if (ggAt!=NULL&&ggAb!=NULL&&ggAi!=NULL) 
+      std::cout << "  ggA_{t,b,i} = " 
+		<< "{" << ggAt->GetSumOfWeights() 
+		<< "," << ggAb->GetSumOfWeights()
+		<< "," << ggAi->GetSumOfWeights()
+		<< "}";
+    else 
+      std::cout << "  ggA --- ";
+
+
     std::cout << std::endl;
   }
+
+  std::cout << std::endl; 
+  std::cout << std::endl;
 
 }
 
 int main(int argc, char * argv[]) {
 
-  TString input_dir = "/nfs/dust/cms/user/rasp/Run/emu_MSSM/Jan10/datacards";
+  TString input_dir = "/nfs/dust/cms/user/rasp/Run/emu_MSSM/Feb10/datacards";
 
   vector<TString> eras = {"2016","2017","2018"};
-  vector<TString> triggers = {"0"};
   vector<TString> categories = 
     {
       //      "em_inclusive",
-      //      "em_btag",
-      //      "em_nobtag",
-      //      "em_nobtag_highmsv",
-      "em_ttbar_control",
-      //      "em_ttbar_nobtag",
-      //      "em_ttbar_btag",
-      //      "em_nobtag_highdzeta",
-      //      "em_nobtag_mediumdzeta",
-      //      "em_nobtag_lowdzeta",
-      //      "em_nobtag_highmsv_highdzeta",
-      //      "em_nobtag_highmsv_mediumdzeta",
-      //      "em_nobtag_highmsv_lowdzeta",
-      //      "em_btag_highdzeta",
-      //      "em_btag_mediumdzeta",
-      //      "em_btag_lowdzeta"
+      "em_DZetaLtm35",
+      "em_Nbtag0_DZetam35Tom10",
+      "em_Nbtag0_DZetam10To30",
+      "em_Nbtag0_DZetaGt30",
+      "em_NbtagGt1_DZetam35Tom10",
+      "em_NbtagGt1_DZetam10To30",
+      "em_NbtagGt1_DZetaGt30",
     };
 
-  for (auto trigger : triggers) {
-    for (auto era : eras) {
-      TString rootFileName = input_dir+"_"+trigger+"/"+era+"/htt_em_mssm.root";
-      TFile * file = new TFile(rootFileName);
-      if (file->IsZombie()) {
-	//	std::cout << "cannot open RooT file " << rootFileName << std::endl;
-	continue;
-      }
-      else {
-	std::cout << "processing era " << era << " with trigger option : " << trigger << std::endl;
-      }
-      for (auto category : categories) {
-	Plot(file,era,category,trigger);	
-      }
-      delete file;
+  for (auto era : eras) {
+    TString rootFileName = input_dir+"/"+era+"/htt_em_mssm.root";
+    TFile * file = new TFile(rootFileName);
+    if (file->IsZombie()) {
+      std::cout << "cannot open RooT file " << rootFileName << std::endl;
+      std::cout << "skipping..." << std::endl;
+      continue;
     }
+    else {
+      std::cout << "processing era " << era << std::endl;
+    }
+    for (auto category : categories) {
+      Plot(file,era,category);	
+    }
+    delete file;
   }
 
 }

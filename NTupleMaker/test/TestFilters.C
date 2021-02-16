@@ -11,7 +11,7 @@ void TestFilters(int numberOfEvents = 10) {
   //  TFile * file = new TFile("/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2016/data/Run2016-17Jul2018/MuonEG/MuonEG_Run2016F-17Jul2018-v1/MuonEG_Run2016F-17Jul2018-v1_979.root");
   //  TFile * file = new TFile("/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2016/data/Run2016-17Jul2018/MuonEG/MuonEG_Run2016G-17Jul2018-v1/MuonEG_Run2016G-17Jul2018-v1_909.root");
   // TFile * file = new TFile("/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2016/data/Run2016-17Jul2018/MuonEG/MuonEG_Run2016H-17Jul2018-v1/MuonEG_Run2016H-17Jul2018-v1_998.root");
-  TFile * file = new TFile("/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2018/data/MuonEG/MuonEG_Run2018D-PromptReco-v2/MuonEG_Run2018D-PromptReco-v2_437.root");
+  //  TFile * file = new TFile("/pnfs/desy.de/cms/tier2/store/user/mmeyer/ntuples/2018/data/MuonEG/MuonEG_Run2018D-PromptReco-v2/MuonEG_Run2018D-PromptReco-v2_437.root");
 
   //  TFile * file = new TFile("output_MC.root");
   //  TFile * file = new TFile("output_DATA.root");
@@ -32,12 +32,27 @@ void TestFilters(int numberOfEvents = 10) {
   //  TFile * file = new TFile("/pnfs/desy.de/cms/tier2/store/user/rasp/ntuples_Oct2020/2018/emb/EmbeddingRun2018B_ElTau/EmbeddingRun2018B_ElTau_276.root");
   //  TFile * file = new TFile("/pnfs/desy.de/cms/tier2/store/user/rasp/ntuples_Oct2020/2018/mc/SUSYGluGluToHToTauTau_M-1200/SUSYGluGluToHToTauTau_M-1200_470.root");
 
+  //  TFile * file = new TFile("/pnfs/desy.de/cms/tier2/store/user/rasp/ntuples_Dec2020/2017/data/MuonEG_Run2017B/MuonEG_Run2017B_1.root");
+  
+  //  TFile * file = new TFile("/pnfs/desy.de/cms/tier2/store/user/rasp/ntuples_Dec2020/2017/data/MuonEG_Run2017B/MuonEG_Run2017B_1.root");
+  TFile * file = new TFile("/pnfs/desy.de/cms/tier2/store/user/rasp/ntuples_Dec2020/2017/data/MuonEG_Run2017C/MuonEG_Run2017C_1107.root");
+  //  TFile * file = new TFile("/pnfs/desy.de/cms/tier2/store/user/rasp/ntuples_Dec2020/2017/data/MuonEG_Run2017D/MuonEG_Run2017D_152.root");
+
   TTree * tree = (TTree*)file->Get("makeroottree/AC1B");
 
   vector<string> * hltfilters = new vector<string>();
   ULong64_t event_nr;
 
   vector<TString> filterList = {
+    "hltL3fL1sMu7EG23f0Filtered8",
+    "hltMu8TrkIsoVVLEle23CaloIdLTrackIdLIsoVLMuonlegL3IsoFiltered8",
+    /*
+    "hltL3fL1sDoubleMu114L1f0L2f10OneMuL3Filtered17",
+    "hltL3pfL1sDoubleMu114L1f0L2pf0L3PreFiltered8",
+    "hltL3pfL1sDoubleMu114ORDoubleMu125L1f0L2pf0L3PreFiltered8",
+    "hltDiMuonGlb17Glb8DzFiltered0p2",
+    "hltDiMuonGlb17Glb8DzFiltered0p2SameSign"
+    */
     // DZ filters
     //    "hltMu23TrkIsoVVLEle12CaloIdLTrackIdLIsoVLDZFilter",
     //    "hltMu8TrkIsoVVLEle23CaloIdLTrackIdLIsoVLDZFilter",
@@ -71,7 +86,6 @@ void TestFilters(int numberOfEvents = 10) {
     /*    
     "hltL3crIsoL1sSingleMu22L1f0L2f10QL3f24QL3trkIsoFiltered0p07",
     "hltL3crIsoL1sMu22Or25L1f0L2f10QL3f27QL3trkIsoFiltered0p07",
-    */
     "hltEle32WPTightGsfTrackIsoFilter",
     "hltEle35noerWPTightGsfTrackIsoFilter",
     "hltL3crIsoL1sSingleMu22L1f0L2f10QL3f24QL3trkIsoFiltered0p07",

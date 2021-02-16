@@ -1,15 +1,11 @@
 #!/bin/bash
-# trigger option
-# $1 - trigger
-trigger=$1
-
 for era in 2016 2017 2018
 do
-    for dataset in Data EMB TTbar DYJets EWK SMHiggs MSSMHiggs
+    for dataset in Data EMB TTbar DYJets EWK SMggH SMothers bbH ggH_t ggH_b ggH_i ggA_t ggA_b ggA_i
     do
-	for category in em_inclusive em_ttbar_control em_btag_highdzeta em_btag_mediumdzeta em_btag_lowdzeta em_nobtag_highdzeta em_nobtag_mediumdzeta em_nobtag_lowdzeta em_nobtag_highmsv_highdzeta em_nobtag_highmsv_mediumdzeta em_nobtag_highmsv_lowdzeta em_btag em_nobtag em_nobtag_highmsv em_ttbar_btag em_ttbar_nobtag
+	for category in em_inclusive em_NbtagGt1 em_Nbtag0 em_DZetaLtm35 em_NbtagGt1_DZetaLtm35 em_Nbtag0_DZetaLtm35 em_Nbtag0_DZetaGt30 em_Nbtag0_DZetam10To30 em_Nbtag0_DZetam35Tom10 em_Nbtag0_DZetaGt30_MHGt250 em_Nbtag0_DZetam10To30_MHGt250 em_Nbtag0_DZetam35Tom10_MHGt250 em_NbtagGt1_DZetaGt30 em_NbtagGt1_DZetam10To30 em_NbtagGt1_DZetam35Tom10
 	do 
-	    ./Datacards_submit.sh ${era} ${dataset} ${category} ${trigger}
+	    ./Datacards_submit.sh ${era} ${dataset} ${category} 
 	done
     done 
 done

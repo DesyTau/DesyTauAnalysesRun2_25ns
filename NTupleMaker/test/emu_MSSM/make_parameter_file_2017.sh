@@ -4,19 +4,7 @@ CHANNEL=em
 echo "CONFIGFILE,FILELIST" > parameters.txt
 
 # data
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_data.conf SingleMuon_Run2017B 150
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_data.conf SingleMuon_Run2017C 150
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_data.conf SingleMuon_Run2017D 150
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_data.conf SingleMuon_Run2017E 150
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_data.conf SingleMuon_Run2017F 150
-
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_data.conf SingleElectron_Run2017B 150
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_data.conf SingleElectron_Run2017C 150
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_data.conf SingleElectron_Run2017D 150
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_data.conf SingleElectron_Run2017E 150
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_data.conf SingleElectron_Run2017F 150
-
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_data.conf MuonEG_Run2017B 150
+./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_dataB.conf MuonEG_Run2017B 150
 ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_data.conf MuonEG_Run2017C 150
 ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_data.conf MuonEG_Run2017D 150
 ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_data.conf MuonEG_Run2017E 150
@@ -79,11 +67,11 @@ echo "CONFIGFILE,FILELIST" > parameters.txt
 # SUSY_ggH
 for j in $(less list_SUSY_ggH_2017);
 do
-    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_MC_${j}.conf $j 5
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_MC_${j}.conf ${j}_pythia 5
 done
 
 # SUSY_bbH
 for j in $(less list_SUSY_bbH_2017);
 do
-    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_MC.conf $j 5
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_MC.conf ${j}_amcatnlo 5
 done

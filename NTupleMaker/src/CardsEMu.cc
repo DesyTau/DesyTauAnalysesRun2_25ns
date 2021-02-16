@@ -46,8 +46,15 @@ CardsEMu::CardsEMu(TString Sample,
       sampleToProcess!="TTbar"&&
       sampleToProcess!="DYJets"&&
       sampleToProcess!="EMB"&&
-      sampleToProcess!="SMHiggs"&&
-      sampleToProcess!="MSSMHiggs") {
+      sampleToProcess!="SMggH"&&
+      sampleToProcess!="SMothers"&&
+      sampleToProcess!="bbH"&&
+      sampleToProcess!="ggH_t"&&
+      sampleToProcess!="ggH_b"&&
+      sampleToProcess!="ggH_i"&&
+      sampleToProcess!="ggA_t"&&
+      sampleToProcess!="ggA_b"&&
+      sampleToProcess!="ggA_i") {
     std::cout << "Unknown sample specified : " << sampleToProcess << std::endl;
     std::cout << "Nothing will be done" << std::endl;
     block = true;
@@ -55,21 +62,24 @@ CardsEMu::CardsEMu(TString Sample,
   }  
 
   if (category!="em_inclusive"&&
-      category!="em_btag"&&
-      category!="em_nobtag"&&
-      category!="em_nobtag_highmsv"&&
-      category!="em_ttbar_control"&&
-      category!="em_ttbar_btag"&&
-      category!="em_ttbar_nobtag"&&
-      category!="em_nobtag_highdzeta"&&
-      category!="em_nobtag_mediumdzeta"&&
-      category!="em_nobtag_lowdzeta"&&
-      category!="em_nobtag_highmsv_highdzeta"&&
-      category!="em_nobtag_highmsv_mediumdzeta"&&
-      category!="em_nobtag_highmsv_lowdzeta"&&
-      category!="em_btag_highdzeta"&&
-      category!="em_btag_mediumdzeta"&&
-      category!="em_btag_lowdzeta") {
+      category!="em_Nbtag0"&&
+      category!="em_NbtagGt1"&&
+      // ---
+      category!="em_DZetaLtm35"&&
+      category!="em_Nbtag0_DZetaLtm35"&&
+      category!="em_NbtagGt1_DZetaLtm35"&&
+      // ---
+      category!="em_Nbtag0_DZetam35Tom10"&&
+      category!="em_Nbtag0_DZetam10To30"&&
+      category!="em_Nbtag0_DZetaGt30"&&
+      // ---
+      category!="em_Nbtag0_DZetam35Tom10_MHGt250"&&
+      category!="em_Nbtag0_DZetam10To30_MHGt250"&&
+      category!="em_Nbtag0_DZetaGt30_MHGt250"&&
+      // ---
+      category!="em_NbtagGt1_DZetam35Tom10"&&
+      category!="em_NbtagGt1_DZetam10To30"&&
+      category!="em_NbtagGt1_DZetaGt30") {
     std::cout << "Unknown category specified : " << category << std::endl;
     std::cout << "nothing will be done" << std::endl;
     block = true;
@@ -78,26 +88,24 @@ CardsEMu::CardsEMu(TString Sample,
 
   std::map<TString,TString> categoryCuts = {
     {"em_inclusive","&&pzeta>-35.0"},
+    {"em_NbtagGt1","&&pzeta>-35.0&&nbtag>0"},
+    {"em_Nbtag0"  ,"&&pzeta>-35.0&&nbtag==0"},
     // ---
-    {"em_btag","&&pzeta>-35.0&&nbtag>0"},
-    {"em_nobtag","&&pzeta>-35.0&&nbtag==0"},
-    {"em_nobtag_highmsv","&&pzeta>-35.0&&nbtag==0&&m_sv>250"},
+    {"em_DZetaLtm35",         "&&pzeta<-35.0"},
+    {"em_NbtagGt1_DZetaLtm35","&&pzeta<-35.0&&nbtag>0"},
+    {"em_Nbtag0_DZetaLtm35",  "&&pzeta<-35.0&&nbtag==0"},
     // ---
-    {"em_ttbar_control","&&pzeta<-35.0"},
-    {"em_ttbar_btag","&&pzeta<-35.0&&nbtag>0"},
-    {"em_ttbar_nobtag","&&pzeta<-35.0&&nbtag==0"},
+    {"em_Nbtag0_DZetaGt30"    ,"&&pzeta>30.0&&nbtag==0"},
+    {"em_Nbtag0_DZetam10To30" ,"&&pzeta>-10.0&&pzeta<30.0&&nbtag==0"},
+    {"em_Nbtag0_DZetam35Tom10","&&pzeta>-35.0&&pzeta<-10.0&&nbtag==0"},
     // ---
-    {"em_nobtag_highdzeta","&&pzeta>30.0&&nbtag==0"},
-    {"em_nobtag_mediumdzeta","&&pzeta>-10.0&&pzeta<30.0&&nbtag==0"},
-    {"em_nobtag_lowdzeta","&&pzeta>-35.0&&pzeta<-10.0&&nbtag==0"},
+    {"em_Nbtag0_DZetaGt30_MHGt250"    ,"&&pzeta>30.0&&nbtag==0&&m_sv>250.0"},
+    {"em_Nbtag0_DZetam10To30_MHGt250" ,"&&pzeta>-10.0&&pzeta<30.0&&nbtag==0&&m_sv>250.0"},
+    {"em_Nbtag0_DZetam35Tom10_MHGt250","&&pzeta>-35.0&&pzeta<-10.0&&nbtag==0&&m_sv>250.0"},
     // ---
-    {"em_nobtag_highmsv_highdzeta","&&pzeta>30.0&&nbtag==0&&m_sv>250.0"},
-    {"em_nobtag_highmsv_mediumdzeta","&&pzeta>-10.0&&pzeta<30.0&&nbtag==0&&m_sv>250.0"},
-    {"em_nobtag_highmsv_lowdzeta","&&pzeta>-35.0&&pzeta<-10.0&&nbtag==0&&m_sv>250.0"},
-    // ---
-    {"em_btag_highdzeta","&&pzeta>30.0&&nbtag>0"},
-    {"em_btag_mediumdzeta","&&pzeta>-10.0&&pzeta<30.0&&nbtag>0"},
-    {"em_btag_lowdzeta","&&pzeta>-35.0&&pzeta<-10.0&&nbtag>0"},
+    {"em_NbtagGt1_DZetaGt30"    ,"&&pzeta>30.0&&nbtag>0"},
+    {"em_NbtagGt1_DZetam10To30" ,"&&pzeta>-10.0&&pzeta<30.0&&nbtag>0"},
+    {"em_NbtagGt1_DZetam35Tom10","&&pzeta>-35.0&&pzeta<-10.0&&nbtag>0"},
   };
 
   TH1::SetDefaultSumw2(true);
@@ -107,7 +115,7 @@ CardsEMu::CardsEMu(TString Sample,
     isEquidistantBinning = false;
 
   isBTag = false;
-  if (Category.Contains("_btag"))
+  if (Category.Contains("_NbtagGt1"))
     isBTag = true;
 
   outputFile = new TFile(output_filename,"recreate");
@@ -141,7 +149,7 @@ CardsEMu::CardsEMu(TString Sample,
     EmbeddedSample = EmbeddedElMu_2017;
     TriggerSingleE = "trg_singleelectron>0.5&&pt_1>28.";
     TriggerSingleMu = "trg_singlemuon>0.5&&pt_2>25.";    
-    lumi = 41900;
+    lumi = 41500;
   }
   if (era=="2016") {
     SingleMuon = SingleMuon_2016;
@@ -206,8 +214,6 @@ CardsEMu::CardsEMu(TString Sample,
   nameSampleMap["qqHTT125"] = VBFHToTauTau; nameHistoMap["qqHTT125"] = "qqH125";
   nameSampleMap["WHTT125"] = WHToTauTau; nameHistoMap["WHTT125"] = "WH125";
   nameSampleMap["ZHTT125"] = ZHToTauTau; nameHistoMap["ZHTT125"] = "ZH125";
-  histNamesMSSM[baseNameBBH] = "bbH";
-  histNamesMSSM[baseNameGGH] = "ggH";
 
   samplesContainer.clear();
   if (sampleToProcess=="Data") {
@@ -226,6 +232,7 @@ CardsEMu::CardsEMu(TString Sample,
   }
   if (sampleToProcess=="EMB") {
     samplesContainer.push_back("EMB");
+    InitializeSample("TTbar");
   }
   if (sampleToProcess=="DYJets") {
     samplesContainer.push_back("DYJetsToLL");
@@ -236,19 +243,30 @@ CardsEMu::CardsEMu(TString Sample,
     samplesContainer.push_back("WJets");
     samplesContainer.push_back("EWK");
   }
-  if (sampleToProcess=="SMHiggs") {
+  if (sampleToProcess=="SMggH") {
     samplesContainer.push_back("ggHWW125");
+    samplesContainer.push_back("ggHTT125");
+  }
+  if (sampleToProcess=="SMothers") {
     samplesContainer.push_back("qqHWW125");
     samplesContainer.push_back("WHWW125");
     samplesContainer.push_back("ZHWW125");
-    samplesContainer.push_back("ggHTT125");
     samplesContainer.push_back("qqHTT125");
     samplesContainer.push_back("WHTT125");
     samplesContainer.push_back("ZHTT125");
   }
-  if (sampleToProcess=="MSSMHiggs") {
-    CreateMSSMList(baseNameBBH);
-    CreateMSSMList(baseNameGGH);
+
+  if (sampleToProcess=="bbH") {
+    CreateMSSMList(baseNameBBH,sampleToProcess);
+  }
+  if (sampleToProcess=="ggH_t"||
+      sampleToProcess=="ggH_b"||
+      sampleToProcess=="ggH_i"||
+      sampleToProcess=="ggA_t"||
+      sampleToProcess=="ggA_b"||
+      sampleToProcess=="ggA_i") {
+    CreateMSSMList(baseNameGGH,sampleToProcess);
+    globalWeight = globalWeight + weight_ggH[sampleToProcess] + "*"; 
   }
 
   InitializeSamples();
@@ -440,24 +458,24 @@ void CardsEMu::InitializeSamples() {
   }
 }
 
-void CardsEMu::CreateMSSMList(TString baseName) {
+void CardsEMu::CreateMSSMList(TString baseName, TString templName) {
 
   for (auto mass : masses) {
-    TString susyInputFile = input_dir + "/" + baseName + mass + ".root";
+    TString susyInputFile = input_dir + "/" + baseName + mass + "_" + generatorName[baseName] + ".root";
     TFile * file = new TFile(susyInputFile);
     if (file->IsZombie()) {
       std::cout << "CardsEMu::CreateMSSMList() -> " << std::endl;
       std::cout << "Cannot open file " << susyInputFile << std::endl;
-      std::cout << "skipping mass = " << mass << " for " << baseName << std::endl;
+      std::cout << "skipping mass = " << mass << "  for " << templName << std::endl;
       continue;
     }
-    TString sampleName = baseName + mass;
+    TString sampleName = baseName + mass + "_" + generatorName[baseName];
     vector<TString> sampleNames; 
     sampleNames.clear();
     sampleNames.push_back(sampleName);
     nameSampleMap[sampleName] = sampleNames;
     sampleXSecMap[sampleName] = 1.0; // 1 pb
-    nameHistoMap[sampleName] = histNamesMSSM[baseName]+mass;
+    nameHistoMap[sampleName] = templName+"_"+mass;
     samplesContainer.push_back(sampleName);
   }
   
@@ -619,7 +637,13 @@ int CardsEMu::CreateShapeSystematicsMap() {
       shapeSystematicsMap[sysName+"Up"] = treeName+"Up";
       shapeSystematicsMap[sysName+"Down"] = treeName+"Down";
       numberOfShapeSystematics += 2;
-    }       
+    }
+    for (auto mapIter : EmbeddedMetShapeSystematics) {
+      TString sysName = mapIter.first;
+      TString treeName = mapIter.second;
+      shapeSystematicsMap[sysName] = treeName;
+      numberOfShapeSystematics += 1;
+    }
     return numberOfShapeSystematics;
   }
   
@@ -687,13 +711,22 @@ int CardsEMu::CreateWeightSystematicsMap() {
   }
   
   // Prefiring weight;
-  if (era!="2018") {
-    for (auto mapIter : PrefiringSystematics) {
+  for (auto mapIter : PrefiringSystematics) {
+    TString sysName = mapIter.first;
+    TString weightName = mapIter.second;
+    weightSystematicsMap[sysName] = weightName+"*";      
+    numberOfWeightSystematics++;
+  }
+
+  if (sampleToProcess=="SMggH") {
+    for (auto mapIter : SignalSystematics) {
       TString sysName = mapIter.first;
       TString weightName = mapIter.second;
-      weightSystematicsMap[sysName] = weightName+"*";
-      numberOfWeightSystematics++;
+      weightSystematicsMap[sysName+"Up"] = weightName + "Up*";
+      weightSystematicsMap[sysName+"Down"] = weightName + "Down*";
+      numberOfWeightSystematics += 2;
     }
+    return numberOfWeightSystematics;
   }
 
   // MC ---->
@@ -711,6 +744,7 @@ int CardsEMu::CreateWeightSystematicsMap() {
     return numberOfWeightSystematics;
   }
 
+  // DYJets ---->
   if (sampleToProcess=="DYJets") {
     map<TString,TString> DYSys = DYShapeSystematics;
     if (era=="2016") DYSys = DYShapeSystematics_2016;
@@ -721,6 +755,29 @@ int CardsEMu::CreateWeightSystematicsMap() {
       numberOfWeightSystematics++;
     }
     return numberOfWeightSystematics;
+  }
+
+  // ggA/ggH
+  if (sampleToProcess=="ggA_t"||
+      sampleToProcess=="ggA_b"||
+      sampleToProcess=="ggA_i"||
+      sampleToProcess=="ggH_t"||
+      sampleToProcess=="ggH_b"||
+      sampleToProcess=="ggH_i") {
+    TString weightCentral = weight_ggH[sampleToProcess];
+    for (auto mapIter : systematics_ggH) {
+      TString sysName = mapIter.first + "Up";
+      TString weightName = weightCentral + "_" + mapIter.second + "_up";
+      TString sysWeight = "("+weightName+"/"+weightCentral+")*";
+      weightSystematicsMap[sysName] = sysWeight;
+      sysName = mapIter.first + "Down";
+      weightName = weightCentral + "_" + mapIter.second + "_down";
+      sysWeight = "("+weightName+"/"+weightCentral+")*";
+      weightSystematicsMap[sysName] = sysWeight;
+      numberOfWeightSystematics += 2;
+    }
+    return numberOfWeightSystematics;
+      
   }
 
   return numberOfWeightSystematics;
@@ -740,6 +797,7 @@ bool CardsEMu::RunData() {
     QCD->Add(QCD,hist,1.,-1.);
     delete hist;
   }
+  if (isBTag) QCD->Scale(scaleQCD[era]);
   nameTH1DMap["QCD"] = QCD;
 
   if (!runWithSystematics) { 
@@ -755,6 +813,7 @@ bool CardsEMu::RunData() {
       QCD_sys->Add(QCD_sys,hist,1.,-1.);
       delete hist;
     }
+    if (isBTag) QCD_sys->Scale(scaleQCD[era]);
     nameTH1DMap["QCD_"+sysName] = QCD_sys;
   }
 
@@ -765,7 +824,7 @@ bool CardsEMu::RunData() {
 bool CardsEMu::RunModel() {
 
   bool status = true;
-
+  
   // central templates ---->
   for (auto name : samplesContainer) {
     TH1D * hist = ProcessSample(name,"",true,false);
@@ -776,6 +835,20 @@ bool CardsEMu::RunModel() {
   if (!runWithSystematics) {
     status = false;
     return status;
+  }
+
+  // ttbar contamination --->
+  if (sampleToProcess=="EMB") {
+    TH1D * hist = ProcessSample("TTbar","",true,false);
+    TH1D * emb = nameTH1DMap["EMB"];
+    TString nameUp = "EMB_CMS_htt_emb_ttbar_"+era+"Up";
+    TString nameDown = "EMB_CMS_htt_emb_ttbar_"+era+"Down";
+    TH1D * histDown = (TH1D*)emb->Clone(nameDown);
+    TH1D * histUp = (TH1D*)emb->Clone(nameUp);
+    histDown->Add(histDown,hist,1.,-0.1);
+    histUp->Add(histUp,hist,1.,0.1);
+    nameTH1DMap[nameUp] = histUp;
+    nameTH1DMap[nameDown] = histDown;
   }
 
   // systematics ----->
@@ -858,7 +931,8 @@ void CardsEMu::PrintSamples() {
   std::cout << std::endl;
   std::cout << "Cuts to be applied for category " << category << std::endl;
   std::cout << "  -> " << commonCuts << std::endl;
-
+  std::cout << std::endl;
+  std::cout << "Global weight = " << globalWeight << std::endl;
   std::cout << std::endl;
 
 }

@@ -2,6 +2,7 @@
 dirData=/pnfs/desy.de/cms/tier2/store/user/rasp/ntuples_Dec2020/2018/data/
 dirEmbedded=/pnfs/desy.de/cms/tier2/store/user/rasp/ntuples_Dec2020/2018/emb
 dirMC=/pnfs/desy.de/cms/tier2/store/user/rasp/ntuples_Dec2020/2018/mc
+dirMC2=/pnfs/desy.de/cms/tier2/store/user/rasp/ntuples_Dec2020/2018/mc_2
 OUTDIR=./2018
 if [ ! -d "$OUTDIR" ]; then
   echo "Path does not exist: ${OUTDIR}"
@@ -21,20 +22,20 @@ ls $dirMC/W2JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/*root > $OUTDIR/W2JetsTo
 ls $dirMC/W3JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/*root > $OUTDIR/W3JetsToLNu
 ls $dirMC/W4JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/*root > $OUTDIR/W4JetsToLNu
 
-ls $dirMC/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/*root > $OUTDIR/TTTo2L2Nu
+ls $dirMC2/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/*root > $OUTDIR/TTTo2L2Nu
 ls $dirMC/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/*root > $OUTDIR/TTToSemiLeptonic
 ls $dirMC/TTToHadronic_TuneCP5_13TeV-powheg-pythia8/*root > $OUTDIR/TTToHadronic
 
-ls $dirMC/ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8/*root > $OUTDIR/ST_t-channel_antitop_4f
-ls $dirMC/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8/*root > $OUTDIR/ST_t-channel_top_4f
-ls $dirMC/ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8/*root > $OUTDIR/ST_tW_antitop_5f
-ls $dirMC/ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8/*root > $OUTDIR/ST_tW_top_5f
+ls $dirMC2/ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8/*root > $OUTDIR/ST_t-channel_antitop_4f
+ls $dirMC2/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8/*root > $OUTDIR/ST_t-channel_top_4f
+ls $dirMC2/ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8/*root > $OUTDIR/ST_tW_antitop_5f
+ls $dirMC2/ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8/*root > $OUTDIR/ST_tW_top_5f
 
-ls $dirMC/VVTo2L2Nu_13TeV_amcatnloFXFX_madspin_pythia8/*root > $OUTDIR/VVTo2L2Nu
-ls $dirMC/WZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8/*root > $OUTDIR/WZTo2L2Q
-ls $dirMC/WZTo3LNu_TuneCP5_13TeV-amcatnloFXFX-pythia8/*root > $OUTDIR/WZTo3LNu
-ls $dirMC/ZZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8/*root > $OUTDIR/ZZTo2L2Q
-ls $dirMC/ZZTo4L_TuneCP5_13TeV_powheg_pythia8/*root > $OUTDIR/ZZTo4L
+ls $dirMC2/VVTo2L2Nu_13TeV_amcatnloFXFX_madspin_pythia8/*root > $OUTDIR/VVTo2L2Nu
+ls $dirMC2/WZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8/*root > $OUTDIR/WZTo2L2Q
+ls $dirMC2/WZTo3LNu_TuneCP5_13TeV-amcatnloFXFX-pythia8/*root > $OUTDIR/WZTo3LNu
+ls $dirMC2/ZZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8/*root > $OUTDIR/ZZTo2L2Q
+ls $dirMC2/ZZTo4L_TuneCP5_13TeV_powheg_pythia8/*root > $OUTDIR/ZZTo4L
 
 ls $dirMC/GluGluHToTauTau_M125_13TeV_powheg_pythia8/*root > $OUTDIR/GluGluHToTauTau_M125
 ls $dirMC/VBFHToTauTau_M125_13TeV_powheg_pythia8/*.root > $OUTDIR/VBFHToTauTau_M125
@@ -47,34 +48,6 @@ ls $dirMC/VBFHToWWTo2L2Nu_M125_13TeV_powheg2_JHUGenV714_pythia8/*root > $OUTDIR/
 ls $dirMC/HWminusJ_HToWW_M125_13TeV_powheg_jhugen724_pythia8_TuneCP5/*root > $OUTDIR/HWminusJ_HToWW_M125
 ls $dirMC/HWplusJ_HToWW_M125_13TeV_powheg_jhugen724_pythia8_TuneCP5/*root > $OUTDIR/HWplusJ_HToWW_M125
 ls $dirMC/HZJ_HToWW_M125_13TeV_powheg_jhugen714_pythia8_TuneCP5/*root > $OUTDIR/ZHJ_HToWW_M125
-
-ls $dirData/SingleMuon_Run2018A/*.root > $OUTDIR/SingleMuon_Run2018A
-ls $dirData/SingleMuon_Run2018B/*.root > $OUTDIR/SingleMuon_Run2018B
-ls $dirData/SingleMuon_Run2018C/*.root > $OUTDIR/SingleMuon_Run2018C
-ls $dirData/SingleMuon_Run2018D/*0.root > $OUTDIR/SingleMuon_Run2018D
-ls $dirData/SingleMuon_Run2018D/*1.root >> $OUTDIR/SingleMuon_Run2018D
-ls $dirData/SingleMuon_Run2018D/*2.root >> $OUTDIR/SingleMuon_Run2018D
-ls $dirData/SingleMuon_Run2018D/*3.root >> $OUTDIR/SingleMuon_Run2018D
-ls $dirData/SingleMuon_Run2018D/*4.root >> $OUTDIR/SingleMuon_Run2018D
-ls $dirData/SingleMuon_Run2018D/*5.root >> $OUTDIR/SingleMuon_Run2018D
-ls $dirData/SingleMuon_Run2018D/*6.root >> $OUTDIR/SingleMuon_Run2018D
-ls $dirData/SingleMuon_Run2018D/*7.root >> $OUTDIR/SingleMuon_Run2018D
-ls $dirData/SingleMuon_Run2018D/*8.root >> $OUTDIR/SingleMuon_Run2018D
-ls $dirData/SingleMuon_Run2018D/*9.root >> $OUTDIR/SingleMuon_Run2018D
-
-ls $dirData/EGamma_Run2018A/*.root > $OUTDIR/EGamma_Run2018A
-ls $dirData/EGamma_Run2018B/*.root > $OUTDIR/EGamma_Run2018B
-ls $dirData/EGamma_Run2018C/*.root > $OUTDIR/EGamma_Run2018C
-ls $dirData/EGamma_Run2018D/*0.root > $OUTDIR/EGamma_Run2018D
-ls $dirData/EGamma_Run2018D/*1.root >> $OUTDIR/EGamma_Run2018D
-ls $dirData/EGamma_Run2018D/*2.root >> $OUTDIR/EGamma_Run2018D
-ls $dirData/EGamma_Run2018D/*3.root >> $OUTDIR/EGamma_Run2018D
-ls $dirData/EGamma_Run2018D/*4.root >> $OUTDIR/EGamma_Run2018D
-ls $dirData/EGamma_Run2018D/*5.root >> $OUTDIR/EGamma_Run2018D
-ls $dirData/EGamma_Run2018D/*6.root >> $OUTDIR/EGamma_Run2018D
-ls $dirData/EGamma_Run2018D/*7.root >> $OUTDIR/EGamma_Run2018D
-ls $dirData/EGamma_Run2018D/*8.root >> $OUTDIR/EGamma_Run2018D
-ls $dirData/EGamma_Run2018D/*9.root >> $OUTDIR/EGamma_Run2018D
 
 ls $dirData/MuonEG_Run2018A/*.root > $OUTDIR/MuonEG_Run2018A
 ls $dirData/MuonEG_Run2018B/*.root > $OUTDIR/MuonEG_Run2018B

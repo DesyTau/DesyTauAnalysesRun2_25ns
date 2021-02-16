@@ -1,15 +1,11 @@
 #include "HttStylesNew.cc"
-// CMS_htt_boson_reso_met
-// CMS_htt_boson_scale_met
-// CMS_ZLShape_et_1prong1pizero_Run2017
 
-void PlotSysDatacards(TString fileName = "/nfs/dust/cms/user/rasp/Run/emu_MSSM/Jan10/datacards_0/2016/htt_em_mssm",
-	     TString histName = "TTL",
-		      
-	     TString sysName  = "CMS_scale_j_Absolute",
-	     TString category = "em_ttbar_control",
-	     float xmax = 100,
-	     float upRange = -100) {
+void PlotSysDatacards(TString fileName = "/nfs/dust/cms/user/rasp/Run/emu_MSSM/Feb10/datacards/2018/htt_em_mssm",
+		      TString histName = "ggH_i_160",
+		      TString sysName  = "ggH_hdamp",
+		      TString category = "em_Nbtag0_DZetaGt30",
+		      float xmax = 100,
+		      float upRange = -100) {
 
   TString header = category+":"+histName;
   TString SysLeg = sysName;
@@ -25,6 +21,8 @@ void PlotSysDatacards(TString fileName = "/nfs/dust/cms/user/rasp/Run/emu_MSSM/J
   TH1D * histUp = (TH1D*)file->Get(category+"/"+histName+"_"+sysName+"Up");
   TH1D * histDown = (TH1D*)file->Get(category+"/"+histName+"_"+sysName+"Down");
   std::cout << histNominal << " " <<  histUp << " " << histDown << std::endl;
+  if (histNominal==NULL||histUp==NULL||histDown==NULL) return;
+
 
   double xNominal = histNominal->GetSumOfWeights();
   double xUp = histUp->GetSumOfWeights();
@@ -145,7 +143,7 @@ void PlotSysDatacards(TString fileName = "/nfs/dust/cms/user/rasp/Run/emu_MSSM/J
   canv1->cd();
 
   ratioUp->SetTitle("");
-  ratioUp->GetYaxis()->SetRangeUser(0.9001,1.09999);
+  ratioUp->GetYaxis()->SetRangeUser(0.701,1.29999);
   ratioUp->GetYaxis()->SetNdivisions(505);
   ratioUp->GetXaxis()->SetLabelFont(42);
   ratioUp->GetXaxis()->SetLabelOffset(0.04);

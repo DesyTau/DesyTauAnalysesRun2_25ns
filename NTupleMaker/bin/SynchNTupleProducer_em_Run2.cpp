@@ -87,6 +87,7 @@ float getEmbeddedWeight(const AC1B * analysisTree, RooWorkspace* WS);
 void FillElMu(const AC1B *analysisTree, Synch17Tree *otree, int electronIndex, float dRisoElectron, int muonIndex, float dRIsoMuon, int era, bool isEmbedded, bool isMcCorrectPuppi);
 
 void getHiggsPtWeight(const AC1B * analysisTree, Synch17Tree * tree, RooWorkspace * ws, double mass);
+void CorrectPuppiMET(const AC1B * analysisTree, Synch17Tree * otree, double scale);
 
 bool accessTriggerInfo(const AC1B * analysisTree, TString HLTFilterName, unsigned int &nHLTFilter)
 {
@@ -192,6 +193,8 @@ bool triggerMatching(AC1B * analysisTree, Float_t eta, Float_t phi, bool isFilte
 
 void GetPuppiMET(AC1B * analysisTree, Synch17Tree * otree, int era, bool isEmbedded, bool isData, bool isMcCorrectPuppi); 
 
+void GetPFMET(AC1B * analysisTree, Synch17Tree * otree);
+
 // Synch ntuple producer in the e+mu channel
 
 int main(int argc, char * argv[]){
@@ -251,6 +254,7 @@ int main(int argc, char * argv[]){
   const bool ApplyMetFilters  = cfg.get<bool>("ApplyMetFilters");
   const bool usePuppiMET      = cfg.get<bool>("UsePuppiMET");
   const bool ApplyBTagCP5Correction = cfg.get<bool>("ApplyBTagCP5Correction");
+  const bool ApplyMetCorrection = cfg.get<bool>("ApplyMetCorrection");
 
   // JER
   //  const string jer_resolution = cfg.get<string>("JER_Resolution");
@@ -300,7 +304,6 @@ int main(int argc, char * argv[]){
   JME::JetResolution resolution = *m_resolution_from_file;
   JME::JetResolutionScaleFactor resolution_sf = *m_scale_factor_from_file;
 
-  cout<<"using "<<BTagAlgorithm<<endl;
   BTagCalibration calib;
   BTagCalibrationReader reader_B;
   BTagCalibrationReader reader_C;
@@ -348,8 +351,6 @@ int main(int argc, char * argv[]){
   }  
   const struct btag_scaling_inputs inputs_btag_scaling_medium = {reader_B, reader_C, reader_Light, tagEff_B, tagEff_C, tagEff_Light, tagEff_B_nonCP5, tagEff_C_nonCP5, tagEff_Light_nonCP5, rand};
 
-  std::cout << "btagging loaded" << std::endl;
-
   // MET Recoil Corrections
   const bool isDY = (infiles.find("DY") != string::npos) || (infiles.find("EWKZ") != string::npos);//Corrections that should be applied on EWKZ are the same needed for DY
   const bool isWJets = (infiles.find("WJets") != string::npos) || (infiles.find("W1Jets") != string::npos) || (infiles.find("W2Jets") != string::npos) || (infiles.find("W3Jets") != string::npos) || (infiles.find("W4Jets") != string::npos) || (infiles.find("EWK") != string::npos);
@@ -380,7 +381,6 @@ int main(int argc, char * argv[]){
   kit::RecoilCorrector recoilCorrector(cfg.get<string>("RecoilFilePath"));
   kit::MEtSys MetSys(cfg.get<string>("RecoilSysFilePath"));
 
-  std::cout << "recoil corrections" << std::endl;
 
   // kinematic cuts on electrons
   const float ptElectronLowCut    = cfg.get<float>("ptElectronLowCut");
@@ -458,6 +458,15 @@ int main(int argc, char * argv[]){
   // correction workspace
   const string CorrectionWorkspaceFileName = cfg.get<string>("CorrectionWorkspaceFileName");
   const string CorrectionWorkspaceFileNameKIT = cfg.get<string>("CorrectionWorkspaceFileNameKIT");
+
+  // Met correction in embedded sample
+  double genMetScale = 1;
+  if (era==2016)
+    genMetScale = 0.992;
+  if (era==2017)
+    genMetScale = 0.955;
+  if (era==2018)
+    genMetScale = 0.957;
 
   bool triggerEmbed2017 = false;
   float ptTriggerEmbed2017 = 40;
@@ -654,6 +663,7 @@ int main(int argc, char * argv[]){
   std::vector<TString> metSysNames = {"CMS_scale_met_unclustered_13TeV"};
   std::vector<TString> recoilSysNames = {"CMS_htt_boson_reso_met_13TeV",
 					 "CMS_htt_boson_scale_met_13TeV"};
+  TString embeddedMetSystematics("CMS_scale_met_embedded_13TeV");
 
   std::vector<PFMETSys*> metSys;
   std::vector<PuppiMETSys*> puppiMetSys;
@@ -671,7 +681,7 @@ int main(int argc, char * argv[]){
     electronScaleSys->SetUseFastMTT(false);
     electronScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);
     electronScaleSys->SetUsePuppiMET(usePuppiMET);
-
+    
     // systematics only for MC
     if (!isEmbedded) {
       btagSys = new BtagSys(otree,TString("Btag"));
@@ -727,6 +737,9 @@ int main(int argc, char * argv[]){
       JERsys->SetBtagScaling(&inputs_btag_scaling_medium);
       JERsys->SetJESUncertainties(jecUncertainties);
       jetEnergyScaleSys.push_back(JERsys);
+    }
+    else {
+      puppiMetSys.push_back(new PuppiMETSys(otree,embeddedMetSystematics));
     }
   }
 
@@ -1563,10 +1576,17 @@ int main(int argc, char * argv[]){
 
 
       ////////////////////////////////////////////////////////////
-      // MET and Recoil Corrections !  
+      ////////////////////////  M E T ////////////////////////////
       ////////////////////////////////////////////////////////////
-      // !!!!!!!!!!! include electron pT correction !!!!!!!!!!!!!
+
+      // !!!!!!!!!!! include electron and jet !!!!!!!!!!!!!
+      // !!!!!!!!!!! smearing corrections !!!!!!!!!!!!!!!!!
       GetPuppiMET(&analysisTree, otree, era, isData, isEmbedded, isMcCorrectPuppi);
+      GetPFMET(&analysisTree, otree);
+
+      if (isEmbedded && ApplyMetCorrection)
+	CorrectPuppiMET(&analysisTree,otree,genMetScale);
+
 
 
       /*     
@@ -1725,7 +1745,12 @@ int main(int argc, char * argv[]){
 	    (metSys.at(i))->Eval();
 	}
       }
-			
+
+      if (isEmbedded && ApplySystShift) {
+	for(unsigned int i = 0; i < puppiMetSys.size(); ++i)
+	  (puppiMetSys.at(i))->Eval();	
+      }
+
       if ((!isData||isEmbedded) && ApplySystShift) {
 
 	muonScaleSys->Eval(utils::EMU);
@@ -2063,19 +2088,34 @@ double MassFromTString(TString sample) {
   
 }
 
+void GetPFMET(AC1B * analysisTree, Synch17Tree * otree) {
+
+  otree->met = TMath::Sqrt(analysisTree->pfmetcorr_ex*analysisTree->pfmetcorr_ex +
+			   analysisTree->pfmetcorr_ey*analysisTree->pfmetcorr_ey);
+
+  otree->metphi = TMath::ATan2(analysisTree->pfmetcorr_ey,analysisTree->pfmetcorr_ex);
+  otree->metcov00 = analysisTree->pfmetcorr_sigxx;
+  otree->metcov01 = analysisTree->pfmetcorr_sigxy;
+  otree->metcov10 = analysisTree->pfmetcorr_sigyx;
+  otree->metcov11 = analysisTree->pfmetcorr_sigyy;
+
+}
+
 void GetPuppiMET(AC1B * analysisTree, Synch17Tree * otree, int era, bool isData, bool isEmbedded, bool isMcCorrectPuppi) {
 
   bool is2017 = false;
 
   double metUncorr = TMath::Sqrt(analysisTree->puppimet_ex*analysisTree->puppimet_ex + analysisTree->puppimet_ey*analysisTree->puppimet_ey);
+  double puppimet_uncorr = metUncorr;
+  double puppimetphi_uncorr = TMath::ATan2(analysisTree->puppimet_ey,analysisTree->puppimet_ex);
 
   double metUncorrPx = analysisTree->puppimet_ex;
   double metUncorrPy = analysisTree->puppimet_ey;
 
-  double shiftX = 0;
-  double shiftY = 0;
+  double shiftX_jets = 0;
+  double shiftY_jets = 0;
 
-  std::cout << "Event number = " << analysisTree->event_nr << std::endl;
+  //  std::cout << "Event number = " << analysisTree->event_nr << std::endl;
 
   if (era==2017) is2017 = true;
 
@@ -2104,33 +2144,40 @@ void GetPuppiMET(AC1B * analysisTree, Synch17Tree * otree, int era, bool isData,
       
       if (pT_corr<15.0&&pT_uncorr<15.0) continue;
       
-      /*
-	std::cout << "jet : unsmeared = (" << uncorrJet.Px()
-	<< "," << uncorrJet.Py()
-	<< "," << uncorrJet.Pz()
-	<< ")   corrected/smeared = (" << corrJet.Px()
-	<< "," << corrJet.Py()
-	<< "," << corrJet.Pz() << ")" << std::endl;
-      */	      
+      /*      
+      std::cout << "jet : pT(uncorr) = "  << pT_uncorr 
+		<< "   pT(corr) = " << pT_corr
+		<< "   unsmeared = (" << uncorrJet.Px()
+		<< "," << uncorrJet.Py()
+		<< "," << uncorrJet.Pz()
+		<< ")   smeared = (" << corrJet.Px()
+		<< "," << corrJet.Py()
+		<< "," << corrJet.Pz() << ")" << std::endl;
+      */
       
-      shiftX = shiftX + uncorrJet.Px() - corrJet.Px();
-      shiftY = shiftY + uncorrJet.Py() - corrJet.Py();
+      shiftX_jets = shiftX_jets + uncorrJet.Px() - corrJet.Px();
+      shiftY_jets = shiftY_jets + uncorrJet.Py() - corrJet.Py();
       
     }
   } 
-  double shiftX_jets = shiftX;
-  double shiftY_jets = shiftY;
 
-  if (!isData) {
-    if (isEmbedded||isMcCorrectPuppi) { 
-      double px_ele_uncorr = otree->pt_uncorr_1*TMath::Cos(otree->phi_1);
-      double py_ele_uncorr = otree->pt_uncorr_1*TMath::Sin(otree->phi_1);
-      double px_ele = otree->pt_1*TMath::Cos(otree->phi_1);
-      double py_ele = otree->pt_1*TMath::Sin(otree->phi_1);
-      shiftX = shiftX + px_ele_uncorr - px_ele;
-      shiftY = shiftY + py_ele_uncorr - py_ele;
-    }
+  double shiftX_ele = 0;
+  double shiftY_ele = 0;
+
+  if (isEmbedded||isMcCorrectPuppi) { 
+    double px_ele_uncorr = otree->pt_uncorr_1*TMath::Cos(otree->phi_1);
+    double py_ele_uncorr = otree->pt_uncorr_1*TMath::Sin(otree->phi_1);
+    double px_ele = otree->pt_1*TMath::Cos(otree->phi_1);
+    double py_ele = otree->pt_1*TMath::Sin(otree->phi_1);
+    shiftX_ele = shiftX_ele + px_ele_uncorr - px_ele;
+    shiftY_ele = shiftY_ele + py_ele_uncorr - py_ele;
+    
+    //    std::cout << "electron : uncorr = (" << px_ele_uncorr << "," << py_ele_uncorr << ")   "
+    //	      << "   corr = (" << px_ele << "," << py_ele << ")" << std::endl;
   }
+
+  double shiftX = shiftX_jets + shiftX_ele;
+  double shiftY = shiftY_jets + shiftY_ele;
 
   double metCorrPx = metUncorrPx + shiftX;
   double metCorrPy = metUncorrPy + shiftY;
@@ -2143,16 +2190,77 @@ void GetPuppiMET(AC1B * analysisTree, Synch17Tree * otree, int era, bool isData,
 
   otree->puppimet = TMath::Sqrt(metCorrPx*metCorrPx+metCorrPy*metCorrPy);
   otree->puppimetphi = TMath::ATan2(metCorrPy,metCorrPx);
-
   
-  std::cout << " shift in Met due to jets (x,y) = ("
+  /*
+  std::cout << " shift jets (x,y) = ("
 	    << shiftX_jets << "," << shiftY_jets << ")   "
-	    << " puppiMET : uncorr (x,y) = (" << metUncorrPx 
+	    << "  ele (x,y) = (" 
+	    << shiftX_ele << "," << shiftY_ele << ")   "
+	    << "  puppiMET : uncorr (x,y) = (" << metUncorrPx 
 	    << "," << metUncorrPy << ")" 
 	    << "    corr (x,y) = (" << metCorrPx 
 	    << "," << metCorrPy << ")" << std::endl; 
+  std::cout << "puppimet   (corr) = " << otree->puppimet << "  phi = " << otree->puppimetphi << std::endl;
+  std::cout << "puppimet (uncorr) = " << puppimet_uncorr << "  phi = " << puppimetphi_uncorr << std::endl;
+  printf("px : central = %6.1f  down = %6.1f  up = %6.1f\n",
+	 metCorrPx,otree->puppimet_ex_UnclusteredEnDown,otree->puppimet_ex_UnclusteredEnUp);
+  printf("py : central = %6.1f  down = %6.1f  up = %6.1f\n",
+	 metCorrPy,otree->puppimet_ey_UnclusteredEnDown,otree->puppimet_ey_UnclusteredEnUp);
   std::cout << std::endl;
-  
+  */
+  otree->puppimetcov00 = analysisTree->puppimet_sigxx;
+  otree->puppimetcov01 = analysisTree->puppimet_sigxy;
+  otree->puppimetcov10 = analysisTree->puppimet_sigyx;
+  otree->puppimetcov11 = analysisTree->puppimet_sigyy;
+
+}
+
+void CorrectPuppiMET(const AC1B * analysisTree, Synch17Tree * otree, double scale) {
+
+  TLorentzVector neutrinos4; neutrinos4.SetXYZT(0.,0.,0.,0.);
+  for (unsigned int i=0; i<analysisTree->genparticles_count; ++i) {
+    int pdgId = TMath::Abs(analysisTree->genparticles_pdgid[i]);
+    bool isLastCopy = analysisTree->genparticles_isLastCopy[i]>0;
+    bool isNeutrino = pdgId==12 || pdgId==14 || pdgId==16;
+    bool isDirectPromptTauDecayProduct = analysisTree->genparticles_isDirectPromptTauDecayProduct[i]>0;
+    if (isNeutrino&&isLastCopy&&isDirectPromptTauDecayProduct) {
+      TLorentzVector neutrino4;
+      neutrino4.SetXYZT(analysisTree->genparticles_px[i],
+			analysisTree->genparticles_py[i],
+			analysisTree->genparticles_pz[i],
+			analysisTree->genparticles_e[i]);
+      neutrinos4 += neutrino4;
+    }
+    
+  }
+
+  //  std::cout << "Corrected Puppi Met (embedding) --> " << std::endl;
+  //  std::cout << "Neutrinos (px,py)=(" << neutrinos4.Px() << "," << neutrinos4.Py() << ")" << std::endl;
+
+  double metx = otree->puppimet*TMath::Cos(otree->puppimetphi);
+  double mety = otree->puppimet*TMath::Sin(otree->puppimetphi);
+  TLorentzVector met4; met4.SetXYZM(metx,mety,0.,0.);
+  TLorentzVector fakeMet4 = met4 - neutrinos4;
+  TLorentzVector corrFakeMet4 = scale * fakeMet4;
+  TLorentzVector twiceCorrFakeMet4 = scale * corrFakeMet4;
+  TLorentzVector corrMet4 = neutrinos4 + corrFakeMet4;
+  TLorentzVector twiceCorrMet4 = neutrinos4 + twiceCorrFakeMet4;
+
+  otree->puppimet = corrMet4.Pt();
+  otree->puppimetphi = corrMet4.Phi();
+
+  otree->puppimet_ex_UnclusteredEnDown = metx;
+  otree->puppimet_ey_UnclusteredEnDown = mety;
+
+  otree->puppimet_ex_UnclusteredEnUp = twiceCorrMet4.Px();
+  otree->puppimet_ey_UnclusteredEnUp = twiceCorrMet4.Py();
+
+  /*
+  printf("px : central = %6.1f ; down  = %6.1f ; up = %6.1f\n",corrMet4.Px(),otree->puppimet_ex_UnclusteredEnDown,otree->puppimet_ex_UnclusteredEnUp);
+  printf("py : central = %6.1f ; down  = %6.1f ; up = %6.1f\n",corrMet4.Py(),otree->puppimet_ey_UnclusteredEnDown,otree->puppimet_ey_UnclusteredEnUp);
+  std::cout << std::endl;
+  */
+
 }
 
 void getHiggsPtWeight(const AC1B * analysisTree, Synch17Tree * otree, RooWorkspace * ws, double mass) {

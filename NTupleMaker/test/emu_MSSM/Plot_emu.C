@@ -1,6 +1,6 @@
 #include "HttStylesNew.cc"
 #include "CMS_lumi.C"
-#include "/nfs/dust/cms/user/rasp/CMSSW/Update/CMSSW_10_2_22/src/DesyTauAnalyses/NTupleMaker/interface/settings.h"
+#include "/nfs/dust/cms/user/rasp/CMSSW/Update/CMSSW_10_2_22/src/DesyTauAnalyses/NTupleMaker/test/emu_MSSM/settings.h"
 TString SpecificCut(TString sample) {
   TString cut("");
   if (sample.Contains("WJetsToLNu")||sample.Contains("DYJetsToLL_M-50"))
@@ -12,27 +12,30 @@ TString SpecificCut(TString sample) {
 // triggerOption = 0 (e+mu), 1 (single-lep), 2 (comb)
 // selection = 0 (inclusive), 1 (signal), 2 (ttbar)
 void Plot_emu( bool embedded = true,
-	       int triggerOption = 2,
+	       int triggerOption = 0,
 	       TString era = "2017",
 	       bool correctTTBar = false,
 	       int selection = 1) {
 
   SetStyle();
 
+  TString dir = "/nfs/dust/cms/user/rasp/Run/emu_MSSM/Feb10/"+era;
+
   bool plotLegend = true;
   bool legRight = true;
   bool logY = false;
   bool logX = false;
+  bool applyNormSys = true;
 
   // ****************************************
   // ****** Variable to plot ****************
   // ****************************************
-  TString Variable = "m_vis";
-  TString xtitle = "m_vis";
+  TString Variable = "nbtag";
+  TString xtitle = "nbtag";
   TString ytitle = "Events";
-  int nBins  =                40;
-  float xmin =                 0;
-  float xmax =               200;
+  int nBins  =                  6;
+  float xmin =               -0.5;
+  float xmax =                5.5;
   float yLower =               1;
   float scaleYUpper =         10;
 
@@ -60,13 +63,12 @@ void Plot_emu( bool embedded = true,
   // ******** end of settings *********
   TString outputGraphics("figures");
 
-  TString dir = "/nfs/dust/cms/user/rasp/grid-jobs/emu_MSSM_Dec20/"+era;
 
   std::cout << dir << std::endl;
 
   lumi_13TeV = "2018, 59.7 fb^{-1}";
   if (era=="2017")
-    lumi_13TeV = "2017, 41.0 fb^{-1}";
+    lumi_13TeV = "2017, 41.5 fb^{-1}";
   if (era=="2016")
     lumi_13TeV = "2016, 35.9 fb^{-1}";
 
@@ -132,7 +134,7 @@ void Plot_emu( bool embedded = true,
 
   double lumi = 59740;
   if (era=="2017")
-    lumi = 41900;
+    lumi = 41500;
   if (era=="2016")
     lumi = 35890;
 
@@ -327,9 +329,11 @@ void Plot_emu( bool embedded = true,
     }
     for (unsigned int j=0; j<Samples.size(); ++j) {
       TString sampleName = Samples.at(j);
-      std::cout << "Processing sample : " << sampleName << std::endl;
       TFile * file = new TFile(dir+"/"+sampleName+".root");
       TTree * tree = (TTree*)file->Get("TauCheck");
+      std::cout << "Processing sample : " 
+		<< sampleName << "  number of entries in tree : " 
+		<< tree->GetEntries() << std::endl;      
       TH1D * histWeightsH = (TH1D*)file->Get("nWeightedEvents");
       TString histName = sampleName + "_os";
       TString histNameSS = sampleName + "_ss";
@@ -438,6 +442,15 @@ void Plot_emu( bool embedded = true,
   std::cout << "ZLL : " << ZLL->GetSumOfWeights() << std::endl;
   std::cout << "ZTT : " << ZTT->GetSumOfWeights() << std::endl;
 
+  // zero bins in the QCD background
+  for (int iB=1; iB<=nBins; ++iB) {
+    double qcd = QCD->GetBinContent(iB);
+    if (qcd<0) {
+      QCD->SetBinContent(iB,0.);
+      QCD->SetBinError(iB,0.);
+    }
+  }
+
   //  adding normalization systematics
   double ZTT_norm = 0.04; //  normalization ZTT :  4% (EMBEDDED)
   double EWK_norm = 0.05; //  normalization EWK :  5%
@@ -449,54 +462,52 @@ void Plot_emu( bool embedded = true,
   double eff_Emb = 0.04;
   double eff_MC  = 0.04;
 
-  for (int iB=1; iB<=nBins; ++iB) {
+  if (applyNormSys) {
+    for (int iB=1; iB<=nBins; ++iB) {
 
-    float ztt  = ZTT->GetBinContent(iB);
-    float ztte = ZTT->GetBinError(iB);
-    ztte = TMath::Sqrt(ztte*ztte+ztt*ztt*(ZTT_norm*ZTT_norm+eff_Emb*eff_Emb));
-    ZTT->SetBinError(iB,ztte);
+      float ztt  = ZTT->GetBinContent(iB);
+      float ztte = ZTT->GetBinError(iB);
+      ztte = TMath::Sqrt(ztte*ztte+ztt*ztt*(ZTT_norm*ZTT_norm+eff_Emb*eff_Emb));
+      ZTT->SetBinError(iB,ztte);
+      
+      float ewk  = EWK->GetBinContent(iB);
+      float ewke = EWK->GetBinError(iB);
+      ewke = TMath::Sqrt(ewke*ewke+ewk*ewk*(EWK_norm*EWK_norm+eff_MC*eff_MC));
+      EWK->SetBinError(iB,ewke);
+      
+      float qcd  = QCD->GetBinContent(iB);
+      float qcde = QCD->GetBinError(iB);
+      qcde = TMath::Sqrt(qcde*qcde+qcd*qcd*QCD_norm*QCD_norm);
+      QCD->SetBinError(iB,qcde);
+      //    std::cout << "bin : " << iB << " : " << QCD->GetBinContent(iB) << std::endl;
 
-    float ewk  = EWK->GetBinContent(iB);
-    float ewke = EWK->GetBinError(iB);
-    ewke = TMath::Sqrt(ewke*ewke+ewk*ewk*(EWK_norm*EWK_norm+eff_MC*eff_MC));
-    EWK->SetBinError(iB,ewke);
+      float w = W->GetBinContent(iB);
+      float we = W->GetBinError(iB);
+      we = TMath::Sqrt(we*we+w*w*(W_norm*W_norm+eff_MC*eff_MC));
+      W->SetBinError(iB,we);
 
-    float qcd  = QCD->GetBinContent(iB);
-    float qcde = QCD->GetBinError(iB);
-    qcde = TMath::Sqrt(qcde*qcde+qcd*qcd*QCD_norm*QCD_norm);
-    QCD->SetBinError(iB,qcde);
-    if (qcd<0) {
-      QCD->SetBinContent(iB,0.);
-      QCD->SetBinError(iB,0.);
+      float tt  = TT->GetBinContent(iB);
+      float tte = TT->GetBinError(iB);
+      float ttweight = TT->GetBinContent(iB) - TTSys->GetBinContent(iB);
+      tte = TMath::Sqrt(tte*tte+tt*tt*(TT_norm*TT_norm+eff_MC*eff_MC)+ttweight*ttweight);
+      //    tte = TMath::Sqrt(tte*tte+tt*tt*TT_norm*TT_norm);
+      //      std::cout << iB << "  " << ttweight/tt << std::endl;
+      TT->SetBinError(iB,tte);
+
+      float zll  = ZLL->GetBinContent(iB);
+      float zlle = ZLL->GetBinError(iB);
+      zlle = TMath::Sqrt(zlle*zlle+zll*zll*eff_MC*eff_MC);
+      ZLL->SetBinError(iB,zlle);
+      
+      /*
+	std::cout << iB << " : " 
+	<< "qcd = " << qcd << " +/- " << qcde 
+	<< "  w = " << w << " +/- " << we 
+	<< "  ztt = " << ztt << " +/- " << ztte
+	<< "  zll = " << zll << " +/- " << zlle 
+	<< "  ewk = " << ewk << " +/- " << ewke << std::endl;
+      */
     }
-    //    std::cout << "bin : " << iB << " : " << QCD->GetBinContent(iB) << std::endl;
-
-    float w = W->GetBinContent(iB);
-    float we = W->GetBinError(iB);
-    we = TMath::Sqrt(we*we+w*w*(W_norm*W_norm+eff_MC*eff_MC));
-    W->SetBinError(iB,we);
-
-    float tt  = TT->GetBinContent(iB);
-    float tte = TT->GetBinError(iB);
-    float ttweight = TT->GetBinContent(iB) - TTSys->GetBinContent(iB);
-    tte = TMath::Sqrt(tte*tte+tt*tt*(TT_norm*TT_norm+eff_MC*eff_MC)+ttweight*ttweight);
-    //    tte = TMath::Sqrt(tte*tte+tt*tt*TT_norm*TT_norm);
-    std::cout << iB << "  " << ttweight/tt << std::endl;
-    TT->SetBinError(iB,tte);
-
-    float zll  = ZLL->GetBinContent(iB);
-    float zlle = ZLL->GetBinError(iB);
-    zlle = TMath::Sqrt(zlle*zlle+zll*zll*eff_MC*eff_MC);
-    ZLL->SetBinError(iB,zlle);
-
-    /*
-    std::cout << iB << " : " 
-	      << "qcd = " << qcd << " +/- " << qcde 
-	      << "  w = " << w << " +/- " << we 
-	      << "  ztt = " << ztt << " +/- " << ztte
-	      << "  zll = " << zll << " +/- " << zlle 
-	      << "  ewk = " << ewk << " +/- " << ewke << std::endl;
-    */
   }
 
   EWK->Add(EWK,TT);
@@ -637,7 +648,7 @@ void Plot_emu( bool embedded = true,
   ratioH->SetMarkerStyle(20);
   ratioH->SetMarkerSize(1.2);
   ratioH->SetLineColor(1);
-  ratioH->GetYaxis()->SetRangeUser(0.701,1.299);
+  ratioH->GetYaxis()->SetRangeUser(0.601,1.399);
   ratioH->GetYaxis()->SetNdivisions(505);
   ratioH->GetXaxis()->SetLabelFont(42);
   ratioH->GetXaxis()->SetLabelOffset(0.04);

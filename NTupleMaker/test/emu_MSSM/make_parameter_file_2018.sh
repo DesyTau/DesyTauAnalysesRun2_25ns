@@ -4,18 +4,6 @@ CHANNEL=em
 echo "CONFIGFILE,FILELIST" > parameters.txt
 
 # data
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_data.conf SingleMuon_Run2018A 150
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_data.conf SingleMuon_Run2018B 150
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_data.conf SingleMuon_Run2018C 150
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_data.conf SingleMuon_Run2018D 150
-
-# data
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_data.conf EGamma_Run2018A 150
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_data.conf EGamma_Run2018B 150
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_data.conf EGamma_Run2018C 150
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_data.conf EGamma_Run2018D 150
-
-# data
 ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_data.conf MuonEG_Run2018A 150
 ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_data.conf MuonEG_Run2018B 150
 ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_data.conf MuonEG_Run2018C 150
@@ -43,7 +31,6 @@ echo "CONFIGFILE,FILELIST" > parameters.txt
 
 # Exclusive VV
 ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf VVTo2L2Nu 10
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf WWTo1L1Nu2Q 10
 ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf WZTo2L2Q 10
 ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf WZTo3LNu 10
 ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf ZZTo2L2Q 10
@@ -77,11 +64,11 @@ echo "CONFIGFILE,FILELIST" > parameters.txt
 # SUSY_ggH
 for j in $(less list_SUSY_ggH_2018);
 do
-    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf $j 5
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf ${j}_pythia 5
 done
 
 # SUSY_bbH
 for j in $(less list_SUSY_bbH_2018);
 do
-    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf $j 5
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf ${j}_amcatnlo 5
 done

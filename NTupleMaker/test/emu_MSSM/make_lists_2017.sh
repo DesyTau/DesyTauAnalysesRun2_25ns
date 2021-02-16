@@ -1,5 +1,6 @@
 #!/bin/sh
 
+dirMC2=/pnfs/desy.de/cms/tier2/store/user/rasp/ntuples_Dec2020/2017/mc_2
 dirMC=/pnfs/desy.de/cms/tier2/store/user/rasp/ntuples_Dec2020/2017/mc
 dirData=/pnfs/desy.de/cms/tier2/store/user/rasp/ntuples_Dec2020/2017/data
 dirEmbedded=/pnfs/desy.de/cms/tier2/store/user/rasp/ntuples_Dec2020/2017/emb
@@ -29,19 +30,19 @@ ls $dirMC/W3JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/*root > $OUTDIR/W3JetsTo
 ls $dirMC/W4JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/*root > $OUTDIR/W4JetsToLNu
 
 ls $dirMC/TTToHadronic_TuneCP5_13TeV-powheg-pythia8/*root > $OUTDIR/TTToHadronic
-ls $dirMC/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8_v1/*root > $OUTDIR/TTTo2L2Nu
+ls $dirMC2/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8_v1/*root > $OUTDIR/TTTo2L2Nu
 ls $dirMC/TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powheg-pythia8/*root > $OUTDIR/TTToSemiLeptonic
 
-ls $dirMC/ST_t-channel_top_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8/*root > $OUTDIR/ST_t-channel_top_4f
-ls $dirMC/ST_t-channel_antitop_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8/*root > $OUTDIR/ST_t-channel_antitop_4f
-ls $dirMC/ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8/*root > $OUTDIR/ST_tW_top_5f
-ls $dirMC/ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8/*root > $OUTDIR/ST_tW_antitop_5f
+ls $dirMC2/ST_t-channel_top_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8/*root > $OUTDIR/ST_t-channel_top_4f
+ls $dirMC2/ST_t-channel_antitop_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8/*root > $OUTDIR/ST_t-channel_antitop_4f
+ls $dirMC2/ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8/*root > $OUTDIR/ST_tW_top_5f
+ls $dirMC2/ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8/*root > $OUTDIR/ST_tW_antitop_5f
 
-ls $dirMC/VVTo2L2Nu_13TeV_amcatnloFXFX_madspin_pythia8/*root > $OUTDIR/VVTo2L2Nu
-ls $dirMC/WZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8/*root > $OUTDIR/WZTo2L2Q
-ls $dirMC/WZTo3LNu_TuneCP5_13TeV-amcatnloFXFX-pythia8/*root > $OUTDIR/WZTo3LNu
-ls $dirMC/ZZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8/*root > $OUTDIR/ZZTo2L2Q
-ls $dirMC/ZZTo4L_TuneCP5_13TeV-amcatnloFXFX-pythia8/*root > $OUTDIR/ZZTo4L
+ls $dirMC2/VVTo2L2Nu_13TeV_amcatnloFXFX_madspin_pythia8/*root > $OUTDIR/VVTo2L2Nu
+ls $dirMC2/WZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8/*root > $OUTDIR/WZTo2L2Q
+ls $dirMC2/WZTo3LNu_TuneCP5_13TeV-amcatnloFXFX-pythia8/*root > $OUTDIR/WZTo3LNu
+ls $dirMC2/ZZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8/*root > $OUTDIR/ZZTo2L2Q
+ls $dirMC2/ZZTo4L_TuneCP5_13TeV-amcatnloFXFX-pythia8/*root > $OUTDIR/ZZTo4L
 
 ls $dirMC/GluGluHToTauTau_M125_13TeV_powheg_pythia8/*root > $OUTDIR/GluGluHToTauTau_M125
 ls $dirMC/VBFHToTauTau_M125_13TeV_powheg_pythia8/*.root > $OUTDIR/VBFHToTauTau_M125
@@ -54,18 +55,6 @@ ls $dirMC/VBFHToWWTo2L2Nu_M125_13TeV_powheg2_JHUGenV714_pythia8/*root > $OUTDIR/
 ls $dirMC/HWminusJ_HToWW_M125_13TeV_powheg_jhugen724_pythia8_TuneCP5/*root > $OUTDIR/HWminusJ_HToWW_M125
 ls $dirMC/HWplusJ_HToWW_M125_13TeV_powheg_jhugen724_pythia8_TuneCP5/*root > $OUTDIR/HWplusJ_HToWW_M125
 ls $dirMC/HZJ_HToWW_M125_13TeV_powheg_jhugen714_pythia8_TuneCP5/*root > $OUTDIR/ZHJ_HToWW_M125
-
-ls $dirData/SingleMuon_Run2017B/*root > $OUTDIR/SingleMuon_Run2017B
-ls $dirData/SingleMuon/Run2017C/SingleMuon/*root > $OUTDIR/SingleMuon_Run2017C
-ls $dirData/SingleMuon/Run2017D/SingleMuon/*root > $OUTDIR/SingleMuon_Run2017D
-ls $dirData/SingleMuon/Run2017E/SingleMuon/*root > $OUTDIR/SingleMuon_Run2017E
-ls $dirData/SingleMuon/Run2017F/SingleMuon/*root > $OUTDIR/SingleMuon_Run2017F
-
-ls $dirData/SingleElectron_Run2017B/*root > $OUTDIR/SingleElectron_Run2017B
-ls $dirData/SingleElectron_Run2017C/*root > $OUTDIR/SingleElectron_Run2017C
-ls $dirData/SingleElectron_Run2017D/*root > $OUTDIR/SingleElectron_Run2017D
-ls $dirData/SingleElectron_Run2017E/*root > $OUTDIR/SingleElectron_Run2017E
-ls $dirData/SingleElectron_Run2017F/*root > $OUTDIR/SingleElectron_Run2017F
 
 ls $dirData/MuonEG_Run2017B/*.root > $OUTDIR/MuonEG_Run2017B
 ls $dirData/MuonEG_Run2017C/*.root > $OUTDIR/MuonEG_Run2017C

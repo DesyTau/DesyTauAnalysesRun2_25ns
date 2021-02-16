@@ -2,13 +2,13 @@ import FWCore.ParameterSet.Config as cms
 
 ### NOTE: Please keep the settings for MC 18 when pushing this file to the git repository ###
 # Configurable options =======================================================================
-isData = False
+isData = True
 isSingleMuonData = False # needed to record track collection for NMSSM ananlysis
 isEmbedded = False # set to true if you run over Z->TauTau embedded samples
 isRun2018D = False # needed for the correct Global Tag
 isHiggsSignal = False # Set to true if you run over higgs signal samples -> needed for STXS1p1 flags
-year = 2017
-period = '2017'
+year = 2018
+period = '2018'
 RunTauSpinnerProducer = False #only do this if you want to calculate tauspinner weights for a sample with two taus and flat tau polarisation
 
 # ============================================================================================
@@ -60,7 +60,7 @@ import FWCore.PythonUtilities.LumiList as LumiList
 # https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideGoodLumiSectionsJSONFile#cmsRun
 process.source = cms.Source("PoolSource",
   fileNames = cms.untracked.vstring(
-      "/store/mc/RunIIFall17MiniAODv2/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/MINIAODSIM/PU2017_12Apr2018_new_pmx_94X_mc2017_realistic_v14-v1/100000/001984A9-07A9-E811-9FF8-FA163E1CCB4E.root"
+#      "/store/mc/RunIIFall17MiniAODv2/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/MINIAODSIM/PU2017_12Apr2018_new_pmx_94X_mc2017_realistic_v14-v1/100000/001984A9-07A9-E811-9FF8-FA163E1CCB4E.root"
 #        "/store/data/Run2017B/Tau/MINIAOD/31Mar2018-v1/90000/FECFEF99-4F37-E811-8243-001E67792562.root"  # use for testing (2017)
 #      "/store/mc/RunIISummer16MiniAODv3/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/MINIAODSIM/PUMoriond17_94X_mcRun2_asymptotic_v3-v1/120000/FE7E7C9D-3CBF-E811-8BA6-44A84223FF3C.root" # use for testing (2016)
 #      "/store/mc/RunIISummer16MiniAODv2/SUSYVBFHToAA_AToMuMu_AToTauTau_M-15_4F_TuneCUETP8M1_13TeV_madgraph_pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v3/10000/02E5EBD2-929C-E711-B54A-008CFAC93F5C.root"
@@ -74,7 +74,7 @@ process.source = cms.Source("PoolSource",
       #"root://cms-xrd-global.cern.ch///store/user/aakhmets/gc_storage/MuTau_data_2017_CMSSW944_gridka/TauEmbedding_MuTau_data_2017_CMSSW944_Run2017D/1/merged_100.root"
         #"root://cms-xrd-global.cern.ch///store/user/sbrommer/gc_storage/ElTau_data_2017_CMSSW944/TauEmbedding_ElTau_data_2017_CMSSW944_Run2017E/1/merged_10300.root"
         #"/store/mc/RunIIFall17MiniAODv2/SUSYGluGluToHToTauTau_M-1200_TuneCP5_13TeV-pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/90000/408FF742-D941-E811-AEBD-484D7E8DF085.root",
-      #"/store/data/Run2018A/DoubleMuon/MINIAOD/17Sep2018-v2/00000/02F59D88-91F7-D14D-8FD4-6530DBC467FC.root"
+      "/store/data/Run2018A/DoubleMuon/MINIAOD/17Sep2018-v2/00000/02F59D88-91F7-D14D-8FD4-6530DBC467FC.root"
         #"/store/data/Run2018A/MET/MINIAOD/17Sep2018-v1/120000/7D0437D3-D24D-4C44-B015-6A2938D4D707.root" # use for testing (2018)
         #"/store/data/Run2018B/DoubleMuon/MINIAOD/26Sep2018-v1/110000/EEE985E6-A85C-9C4C-8747-5211105A0603.root" # for testing (2018)
         #"/store/data/Run2018D/JetHT/MINIAOD/PromptReco-v2/000/320/853/00000/2C20B666-3A9A-E811-9D32-FA163EAC4172.root"  # From Run2018D with a lot of events not passing the json file

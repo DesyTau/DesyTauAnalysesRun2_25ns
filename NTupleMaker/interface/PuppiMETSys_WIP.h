@@ -44,6 +44,11 @@ class PuppiMETSys : public METSys {
       obs.mety = cenTree->puppimet_ey_UnclusteredEnDown;
       uncertaintyFound = true;
     }
+    else if (label.Contains("embedded")) {
+      obs.metx = cenTree->puppimet_ex_UnclusteredEnDown;
+      obs.mety = cenTree->puppimet_ey_UnclusteredEnDown;
+      uncertaintyFound = true;
+    }
     else if (label.Contains("JetRes")) {
       obs.metx = cenTree->puppimet_ex_JetResDown;
       obs.mety = cenTree->puppimet_ey_JetResDown;
@@ -112,6 +117,16 @@ class PuppiMETSys : public METSys {
       obs.mety = 2.0*mety_central - cenTree->puppimet_ey_UnclusteredEnDown;
       uncertaintyFound = true;
     }
+    else if (label.Contains("embedded")) {
+      obs.metx = cenTree->puppimet_ex_UnclusteredEnUp;
+      obs.mety = cenTree->puppimet_ey_UnclusteredEnUp;
+      //      float metx_central = cenTree->puppimet*TMath::Cos(cenTree->puppimetphi);
+      //      float mety_central = cenTree->puppimet*TMath::Sin(cenTree->puppimetphi);
+      //      obs.metx = 2.0*metx_central - cenTree->puppimet_ex_UnclusteredEnDown;
+      //      obs.mety = 2.0*mety_central - cenTree->puppimet_ey_UnclusteredEnDown;
+      uncertaintyFound = true;
+    }
+
     else if (label.Contains("JetRes")) {
       obs.metx = cenTree->puppimet_ex_JetResUp;
       obs.mety = cenTree->puppimet_ey_JetResUp;

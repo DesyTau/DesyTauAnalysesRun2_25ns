@@ -26,15 +26,27 @@
 // qqH125 
 // WH125,
 // ZH125,  
-// bbH$mass 
-// ggH$mass
+// bbH_$mass 
+// ggH_t_$mass
+// ggH_b_$mass
+// ggH_i_$mass
+// ggA_t_$mass
+// ggA_b_$mass
+// ggA_i_$mass
 
 // sampleToProcess = Data (Data and QCD)
 //                 = DYJetsToLL
 //                 = EMB 
 //                 = MC (EWK WJets)
-//                 = SMHiggs (H->tautau and H->WW)
-//                 = MSSMHiggs (bbH and ggH)
+//                 = SMggH (gg->H H->tautau and H->WW)
+//                 = SMothers (qqH, WH, ZH)
+//                 = bbH (MSSM)
+//                 = ggH_t
+//                 = ggH_b
+//                 = ggH_i
+//                 = ggA_t
+//                 = ggA_b
+//                 = ggA_i
 
 using namespace std;
 
@@ -367,6 +379,7 @@ class CardsEMu {
   const vector<TString> masses = {
     "110",
     "120",
+    "125",
     "130",
     "140",
     "160",
@@ -400,7 +413,11 @@ class CardsEMu {
   const TString notTauTau = "&&!(gen_match_1==3&&gen_match_2==4)";
   const TString TauTau = "&&(gen_match_1==3&&gen_match_2==4)";
 
-  map<TString,TString> histNamesMSSM;
+  map<TString,TString> generatorName = 
+    {
+      {"SUSYGluGluToBBHToTauTau_M-","amcatnlo"},
+      {"SUSYGluGluToHToTauTau_M-","pythia"}
+    };
 
   // *****************************
   // ***** Shape systematics *****
@@ -409,6 +426,11 @@ class CardsEMu {
   const map<TString,TString> EmbeddedShapeSystematics = {
     {"CMS_scale_e_emb","CMS_scale_e_13TeV"},
     {"CMS_scale_m","CMS_scale_mu_13TeV"},
+  };
+
+  const map<TString,TString> EmbeddedMetShapeSystematics = {
+    {"scale_embed_metDown","CMS_scale_met_embedded_13TeVUp"},
+    {"scale_embed_metUp","CMS_scale_met_embedded_13TeVDown"}
   };
 
   const map<TString,TString> ShapeSystematics_Common = {
@@ -519,6 +541,26 @@ class CardsEMu {
     {"CMS_htt_qcd_iso_2018Down","(1.0/qcdweight_isolationcorrection)"},    
   };
 
+  map<TString,TString> weight_ggH = {
+    {"ggH_t","H_t_ratio"},
+    {"ggH_b","H_b_ratio"},
+    {"ggH_i","H_i_ratio"},
+    {"ggA_t","A_t_ratio"},
+    {"ggA_b","A_b_ratio"},
+    {"ggA_i","A_i_ratio"}
+  };
+
+  map<TString, double> scaleQCD = {
+    {"2016",0.71},
+    {"2017",0.69},
+    {"2018",0.67}
+  };
+
+  const map<TString,TString> systematics_ggH = {
+    {"QCDscale_ggH_REWEIGHT","scale"},
+    {"Hdamp_ggH_REWEIGHT","hdamp"}
+  };
+
   // ******************************************************* 
   // ************* CLASS VARIABLES *************************
   // *******************************************************
@@ -542,7 +584,6 @@ class CardsEMu {
 
   int numberOfShapeSystematics;
   int numberOfWeightSystematics;
-
 
   // for variables which are different from mt_tot; 
   int nBins;
@@ -579,7 +620,7 @@ class CardsEMu {
 
   void InitializeSample(TString name);
 
-  void CreateMSSMList(TString baseName);
+  void CreateMSSMList(TString baseName, TString templName);
   void InitializeSamples();
 
   TH1D * ProcessSample(TString name,

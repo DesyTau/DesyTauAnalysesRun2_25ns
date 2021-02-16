@@ -6,7 +6,7 @@ void TestTree(int numberOfEvents = 10) {
  // TFile * file = new TFile("/nfs/dust/cms/group/higgs-kit/80x_v3/SingleElectron__Run2016B-PromptReco-v2/SingleElectron__Run2016B-PromptReco-v2_489.root");
 
 //"/nfs/dust/cms/group/higgs-kit/80x_v2/SingleElectron__Run2016B-PromptReco-v2/SingleElectron__Run2016B-PromptReco-v2_3000.root");
-  TFile * file = new TFile("output_DATA.root");
+  TFile * file = new TFile("/pnfs/desy.de/cms/tier2/store/user/rasp/ntuples_Dec2020/2016/data/MuonEG_Run2016H/MuonEG_Run2016H_6189.root");
   //TFile * file = new TFile("/nfs/dust/cms/user/ywen/Storage/ReReco2017/SingleMuon__Run2017B-17Nov2017-v1/SingleMuon__Run2017B-17Nov2017-v1_1428.root");
 //  TFile * file = new TFile("/nfs/dust/cms/user/rasp/ntuples/Run2017/SingleElectron_Run2017B_23Jun2017/SingleElectron_Run2017B_23Jun2017_1934.root");
 

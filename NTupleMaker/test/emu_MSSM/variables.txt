@@ -1,2 +1,5 @@
-/nfs/dust/cms/user/rasp/Run/emu_MSSM/Jan1/
-CMS_eff_b_13TeV				nbtag		5	-0.5	4.5
+/nfs/dust/cms/user/rasp/Run/emu_MSSM/Feb10/
+CMS_scale_met_embedded_13TeV	mt_tot		40	0	400
+CMS_scale_met_embedded_13TeV	puppimet	40	0 	200
+CMS_scale_e_13TeV		pt_1		40	0	200
+CMS_scale_e_13TeV		mt_tot		40	0	400

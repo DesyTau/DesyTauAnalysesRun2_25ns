@@ -146,4 +146,7 @@ if [[ $DATA_TYPE == "data" ]]; then
     if [[ $YEAR -eq 16 ]]; then
 	sed "s/ApplyDzFilterMatch = false/ApplyDzFilterMatch = true/" $OUTDIR/${TEMPLATE_CFG_NAME}.conf > $OUTDIR/${TEMPLATE_CFG_NAME}GH.conf
     fi
+    if [[ $YEAR -eq 17 ]]; then
+	sed "s/LowPtLegMuon =  hltMu8TrkIsoVVLEle23CaloIdLTrackIdLIsoVLMuonlegL3IsoFiltered8/LowPtLegMuon =  hltL3fL1sMu7EG23f0Filtered8/" $OUTDIR/${TEMPLATE_CFG_NAME}.conf > $OUTDIR/${TEMPLATE_CFG_NAME}B.conf
+    fi	
 fi

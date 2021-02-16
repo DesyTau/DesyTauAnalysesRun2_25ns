@@ -1,11 +1,10 @@
 #!/bin/sh 
 era=$1
-trigger=$2
-dir=/nfs/dust/cms/user/rasp/Run/emu_MSSM/Jan10/
+dir=/nfs/dust/cms/user/rasp/Run/emu_MSSM/Feb10/
 
 echo "base directory" $dir
 
-folder=${dir}/datacards_${trigger}/${era}
+folder=${dir}/datacards/${era}
 echo "merging file in dir " ${folder}
 cd ${folder}
 rm htt_em_mssm.root
