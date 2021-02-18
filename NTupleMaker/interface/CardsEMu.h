@@ -528,23 +528,18 @@ class CardsEMu {
     {"CMS_htt_qcd_2jet_shape2","qcdweight_deltaR_0jet_Par2"},
   };
 
-  const map<TString,TString> QCDIsoSystematics_2016 = {
-    {"CMS_htt_qcd_iso_2016Up","qcdweight_isolationcorrection"},
-    {"CMS_htt_qcd_iso_2016Down","(1.0/qcdweight_isolationcorrection)"},    
-  };
-  const map<TString,TString> QCDIsoSystematics_2017 = {
-    {"CMS_htt_qcd_iso_2017Up","qcdweight_isolationcorrection"},
-    {"CMS_htt_qcd_iso_2017Down","(1.0/qcdweight_isolationcorrection)"},    
-  };
-  const map<TString,TString> QCDIsoSystematics_2018 = {
-    {"CMS_htt_qcd_iso_2018Up","qcdweight_isolationcorrection"},
-    {"CMS_htt_qcd_iso_2018Down","(1.0/qcdweight_isolationcorrection)"},    
+  const map<TString,TString> QCDIsoSystematics = {
+    {"CMS_htt_qcd_isoUp","qcdweight_isolationcorrection"},
+    {"CMS_htt_qcd_isoDown","(1.0/qcdweight_isolationcorrection)"},    
   };
 
   map<TString,TString> weight_ggH = {
     {"ggH_t","H_t_ratio"},
     {"ggH_b","H_b_ratio"},
     {"ggH_i","H_i_ratio"},
+    {"ggh_t","H_t_ratio"},
+    {"ggh_b","H_b_ratio"},
+    {"ggh_i","H_i_ratio"},
     {"ggA_t","A_t_ratio"},
     {"ggA_b","A_b_ratio"},
     {"ggA_i","A_i_ratio"}

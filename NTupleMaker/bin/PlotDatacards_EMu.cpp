@@ -380,6 +380,12 @@ int main(int argc, char * argv[]) {
       "em_NbtagGt1_DZetam35Tom10",
       "em_NbtagGt1_DZetam10To30",
       "em_NbtagGt1_DZetaGt30",
+      "em_Nbtag0_NjetLt1_DZetam35Tom10",
+      "em_Nbtag0_NjetLt1_DZetam10To30",
+      "em_Nbtag0_NjetLt1_DZetaGt30",
+      "em_NbtagGt1_NjetLt1_DZetam35Tom10",
+      "em_NbtagGt1_NjetLt1_DZetam10To30",
+      "em_NbtagGt1_NjetLt1_DZetaGt30",
     };
 
   for (auto era : eras) {

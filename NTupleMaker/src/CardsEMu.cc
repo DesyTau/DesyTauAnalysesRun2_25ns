@@ -52,6 +52,9 @@ CardsEMu::CardsEMu(TString Sample,
       sampleToProcess!="ggH_t"&&
       sampleToProcess!="ggH_b"&&
       sampleToProcess!="ggH_i"&&
+      sampleToProcess!="ggh_t"&&
+      sampleToProcess!="ggh_b"&&
+      sampleToProcess!="ggh_i"&&
       sampleToProcess!="ggA_t"&&
       sampleToProcess!="ggA_b"&&
       sampleToProcess!="ggA_i") {
@@ -73,13 +76,23 @@ CardsEMu::CardsEMu(TString Sample,
       category!="em_Nbtag0_DZetam10To30"&&
       category!="em_Nbtag0_DZetaGt30"&&
       // ---
+      category!="em_Nbtag0_NjetLt1_DZetam35Tom10"&&
+      category!="em_Nbtag0_NjetLt1_DZetam10To30"&&
+      category!="em_Nbtag0_NjetLt1_DZetaGt30"&&
+      // ---
       category!="em_Nbtag0_DZetam35Tom10_MHGt250"&&
       category!="em_Nbtag0_DZetam10To30_MHGt250"&&
       category!="em_Nbtag0_DZetaGt30_MHGt250"&&
       // ---
       category!="em_NbtagGt1_DZetam35Tom10"&&
       category!="em_NbtagGt1_DZetam10To30"&&
-      category!="em_NbtagGt1_DZetaGt30") {
+      category!="em_NbtagGt1_DZetaGt30"&&
+      // ---
+      category!="em_NbtagGt1_NjetLt1_DZetam35Tom10"&&
+      category!="em_NbtagGt1_NjetLt1_DZetam10To30"&&
+      category!="em_NbtagGt1_NjetLt1_DZetaGt30"
+
+) {
     std::cout << "Unknown category specified : " << category << std::endl;
     std::cout << "nothing will be done" << std::endl;
     block = true;
@@ -99,6 +112,10 @@ CardsEMu::CardsEMu(TString Sample,
     {"em_Nbtag0_DZetam10To30" ,"&&pzeta>-10.0&&pzeta<30.0&&nbtag==0"},
     {"em_Nbtag0_DZetam35Tom10","&&pzeta>-35.0&&pzeta<-10.0&&nbtag==0"},
     // ---
+    {"em_Nbtag0_NjetLt1_DZetaGt30"    ,"&&pzeta>30.0&&nbtag==0&&njets<=1"},
+    {"em_Nbtag0_NjetLt1_DZetam10To30" ,"&&pzeta>-10.0&&pzeta<30.0&&nbtag==0&&njets<=1"},
+    {"em_Nbtag0_NjetLt1_DZetam35Tom10","&&pzeta>-35.0&&pzeta<-10.0&&nbtag==0&&njets<=1"},
+    // ---
     {"em_Nbtag0_DZetaGt30_MHGt250"    ,"&&pzeta>30.0&&nbtag==0&&m_sv>250.0"},
     {"em_Nbtag0_DZetam10To30_MHGt250" ,"&&pzeta>-10.0&&pzeta<30.0&&nbtag==0&&m_sv>250.0"},
     {"em_Nbtag0_DZetam35Tom10_MHGt250","&&pzeta>-35.0&&pzeta<-10.0&&nbtag==0&&m_sv>250.0"},
@@ -106,6 +123,10 @@ CardsEMu::CardsEMu(TString Sample,
     {"em_NbtagGt1_DZetaGt30"    ,"&&pzeta>30.0&&nbtag>0"},
     {"em_NbtagGt1_DZetam10To30" ,"&&pzeta>-10.0&&pzeta<30.0&&nbtag>0"},
     {"em_NbtagGt1_DZetam35Tom10","&&pzeta>-35.0&&pzeta<-10.0&&nbtag>0"},
+    // ---
+    {"em_NbtagGt1_NjetLt1_DZetaGt30"    ,"&&pzeta>30.0&&nbtag>0&&njets<=1"},
+    {"em_NbtagGt1_NjetLt1_DZetam10To30" ,"&&pzeta>-10.0&&pzeta<30.0&&nbtag>0&&njets<=1"},
+    {"em_NbtagGt1_NjetLt1_DZetam35Tom10","&&pzeta>-35.0&&pzeta<-10.0&&nbtag>0&&njets<=1"},
   };
 
   TH1::SetDefaultSumw2(true);
@@ -262,6 +283,9 @@ CardsEMu::CardsEMu(TString Sample,
   if (sampleToProcess=="ggH_t"||
       sampleToProcess=="ggH_b"||
       sampleToProcess=="ggH_i"||
+      sampleToProcess=="ggh_t"||
+      sampleToProcess=="ggh_b"||
+      sampleToProcess=="ggh_i"||
       sampleToProcess=="ggA_t"||
       sampleToProcess=="ggA_b"||
       sampleToProcess=="ggA_i") {
@@ -693,13 +717,7 @@ int CardsEMu::CreateWeightSystematicsMap() {
       numberOfWeightSystematics += 2;
     }
   
-    std::map<TString,TString> QCDIsoSyst = QCDIsoSystematics_2016;
-    if (era=="2017") 
-      QCDIsoSyst = QCDIsoSystematics_2017;
-    if (era=="2018")
-      QCDIsoSyst = QCDIsoSystematics_2018;
-
-    for (auto mapIter : QCDIsoSyst) {
+    for (auto mapIter : QCDIsoSystematics) {
       TString sysName = mapIter.first;
       TString weightName = mapIter.second;
       weightSystematicsMap[sysName] = weightName + "*";
@@ -761,6 +779,9 @@ int CardsEMu::CreateWeightSystematicsMap() {
   if (sampleToProcess=="ggA_t"||
       sampleToProcess=="ggA_b"||
       sampleToProcess=="ggA_i"||
+      sampleToProcess=="ggh_t"||
+      sampleToProcess=="ggh_b"||
+      sampleToProcess=="ggh_i"||
       sampleToProcess=="ggH_t"||
       sampleToProcess=="ggH_b"||
       sampleToProcess=="ggH_i") {
