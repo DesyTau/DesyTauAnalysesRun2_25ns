@@ -84,6 +84,7 @@ void initializeGenTree(Synch17GenTree *gentree);
 void FillVertices(const AC1B * analysisTree,Synch17Tree *otree, const bool isData);
 void FillGenTree(const AC1B * analysisTree, Synch17GenTree *gentree);
 float getEmbeddedWeight(const AC1B * analysisTree, RooWorkspace* WS);
+float getEmbeddedWeightKIT(const AC1B * analysisTree, RooWorkspace* WS, int era);
 void FillElMu(const AC1B *analysisTree, Synch17Tree *otree, int electronIndex, float dRisoElectron, int muonIndex, float dRIsoMuon, int era, bool isEmbedded, bool isMcCorrectPuppi);
 
 void getHiggsPtWeight(const AC1B * analysisTree, Synch17Tree * tree, RooWorkspace * ws, double mass);
@@ -191,7 +192,7 @@ bool triggerMatching(AC1B * analysisTree, Float_t eta, Float_t phi, bool isFilte
    return trigMatch;
 }
 
-void GetPuppiMET(AC1B * analysisTree, Synch17Tree * otree, int era, bool isEmbedded, bool isData, bool isMcCorrectPuppi); 
+void GetPuppiMET(AC1B * analysisTree, Synch17Tree * otree, int era, bool isEmbedded, bool isData, bool isMcCorrectPuppi, bool smearMET); 
 
 void GetPFMET(AC1B * analysisTree, Synch17Tree * otree);
 
@@ -255,6 +256,7 @@ int main(int argc, char * argv[]){
   const bool usePuppiMET      = cfg.get<bool>("UsePuppiMET");
   const bool ApplyBTagCP5Correction = cfg.get<bool>("ApplyBTagCP5Correction");
   const bool ApplyMetCorrection = cfg.get<bool>("ApplyMetCorrection");
+  const bool smearMET = cfg.get<bool>("SmearMET");
 
   // JER
   //  const string jer_resolution = cfg.get<string>("JER_Resolution");
@@ -555,13 +557,15 @@ int main(int argc, char * argv[]){
   // Workspace with corrections
   TString workspace_filename = TString(cmsswBase) + "/src/" + CorrectionWorkspaceFileName;
   TString workspace_filename_kit = TString(cmsswBase) + "/src/" + CorrectionWorkspaceFileNameKIT;
-  cout << "Taking correction workspace from " << workspace_filename << endl;
+  cout << "Taking correction workspace (IC) from " << workspace_filename << endl;
   TFile *f_workspace = new TFile(workspace_filename, "read");
-  TFile *f_workspace_kit = new TFile(workspace_filename_kit, "read");
   if (f_workspace->IsZombie()) {
     std::cout << " workspace file " << workspace_filename << " not found. Please check. " << std::endl;
      exit(-1);
    }
+
+  cout << "Taking correction workspace (KIT) from " << workspace_filename_kit << endl;
+  TFile *f_workspace_kit = new TFile(workspace_filename_kit, "read");
   if (f_workspace_kit->IsZombie()) {
     std::cout << " workspace file " << workspace_filename_kit << " not found. Please check. " << std::endl;
      exit(-1);
@@ -570,9 +574,11 @@ int main(int argc, char * argv[]){
   RooWorkspace *w = (RooWorkspace*)f_workspace->Get("w");
   RooWorkspace *correctionWS = (RooWorkspace*)f_workspace_kit->Get("w");
 
-  TString ggHWeightsFile("higgs_pt_v0.root");
+  //  TString ggHWeightsFile("higgs_pt_v0.root");
+  TString ggHWeightsFile("higgs_pt_v1.root");
   if (era==2016)
-    ggHWeightsFile = "higgs_pt_2016_v0.root";
+    //    ggHWeightsFile = "higgs_pt_2016_v0.root";
+    ggHWeightsFile = "higgs_pt_2016_v1.root";
   TFile * f_ggHWeights = new TFile(TString(cmsswBase) + "/src/DesyTauAnalyses/NTupleMaker/data/" + ggHWeightsFile);
   if (f_ggHWeights->IsZombie()) {
     std::cout << "Cannot open file " << ggHWeightsFile << std::endl;
@@ -738,9 +744,9 @@ int main(int argc, char * argv[]){
       JERsys->SetJESUncertainties(jecUncertainties);
       jetEnergyScaleSys.push_back(JERsys);
     }
-    else {
-      puppiMetSys.push_back(new PuppiMETSys(otree,embeddedMetSystematics));
-    }
+    //    else {
+    //      puppiMetSys.push_back(new PuppiMETSys(otree,embeddedMetSystematics));
+    //    }
   }
 
   // list of met filters from config
@@ -1170,8 +1176,8 @@ int main(int argc, char * argv[]){
 	// scale factors (from KIT)
 	if (era==2016){
 	  if (isEmbedded) {
-	    isoweight_1_kit = correctionWS->function("e_idiso_ratio_emb")->getVal();
-	    isoweight_2_kit = correctionWS->function("m_idlooseiso_binned_ic_embed_ratio")->getVal();
+	    isoweight_1_kit = correctionWS->function("e_iso_ratio_emb")->getVal()*correctionWS->function("e_id_ratio_emb")->getVal();
+	    isoweight_2_kit = correctionWS->function("m_looseiso_ic_embed_ratio")->getVal()*correctionWS->function("m_id_ratio_emb")->getVal();
 	  }
 	  else {
 	    isoweight_1_kit = correctionWS->function("e_idiso_ratio")->getVal();
@@ -1180,8 +1186,14 @@ int main(int argc, char * argv[]){
 	}
 	else{
 	  if (isEmbedded) {
-	    isoweight_1_kit = correctionWS->function("e_id90_embed_kit_ratio")->getVal() * correctionWS->function("e_iso_embed_kit_ratio")->getVal();
-	    isoweight_2_kit = correctionWS->function("m_looseiso_ic_embed_ratio")->getVal()*correctionWS->function("m_id_embed_kit_ratio")->getVal();
+	    if (era==2017) {
+	      isoweight_1_kit = correctionWS->function("e_iso_binned_embed_kit_ratio")->getVal()*correctionWS->function("e_id90_embed_kit_ratio")->getVal();
+	      isoweight_2_kit = correctionWS->function("m_looseiso_binned_ic_embed_ratio")->getVal()*correctionWS->function("m_id_embed_kit_ratio")->getVal();
+	    }
+	    else {
+	      isoweight_1_kit = correctionWS->function("e_iso_binned_embed_kit_ratio")->getVal() * correctionWS->function("e_id90_embed_kit_ratio")->getVal();
+	      isoweight_2_kit = correctionWS->function("m_looseiso_binned_embed_ratio")->getVal()*correctionWS->function("m_id_embed_kit_ratio")->getVal();
+	    }
 	  }
 	  else {
 	    isoweight_1_kit = correctionWS->function("e_id90_kit_ratio")->getVal() * correctionWS->function("e_iso_kit_ratio")->getVal();
@@ -1360,7 +1372,8 @@ int main(int argc, char * argv[]){
       // embedded weight
       otree->embweight = 1.0;
       if (isEmbedded) {
-      	otree->embweight = getEmbeddedWeight(&analysisTree, w);
+	//	otree->embweight = getEmbeddedWeight(&analysisTree, w);
+      	otree->embweight = getEmbeddedWeightKIT(&analysisTree, correctionWS, era);
 	if (otree->embweight>10.0)
 	  cout << "warning : embedding weight = " << otree->embweight << endl;
 	otree->weight *= otree->embweight;
@@ -1581,7 +1594,7 @@ int main(int argc, char * argv[]){
 
       // !!!!!!!!!!! include electron and jet !!!!!!!!!!!!!
       // !!!!!!!!!!! smearing corrections !!!!!!!!!!!!!!!!!
-      GetPuppiMET(&analysisTree, otree, era, isData, isEmbedded, isMcCorrectPuppi);
+      GetPuppiMET(&analysisTree, otree, era, isData, isEmbedded, isMcCorrectPuppi, smearMET);
       GetPFMET(&analysisTree, otree);
 
       if (isEmbedded && ApplyMetCorrection)
@@ -1746,10 +1759,10 @@ int main(int argc, char * argv[]){
 	}
       }
 
-      if (isEmbedded && ApplySystShift) {
-	for(unsigned int i = 0; i < puppiMetSys.size(); ++i)
-	  (puppiMetSys.at(i))->Eval();	
-      }
+      //      if (isEmbedded && ApplySystShift) {
+      //	for(unsigned int i = 0; i < puppiMetSys.size(); ++i)
+      //	  (puppiMetSys.at(i))->Eval();	
+      //      }
 
       if ((!isData||isEmbedded) && ApplySystShift) {
 
@@ -1905,6 +1918,51 @@ float getEmbeddedWeight(const AC1B *analysisTree, RooWorkspace * wEm) {
     double trg_emb = wEm->function("m_sel_trg_ic_ratio")->getVal();
     emWeight = id1_embed * id2_embed * trg_emb;
   }
+  //  std::cout << "IC : EmbWeight = " << emWeight << std::endl;
+
+  return emWeight;
+
+}
+
+float getEmbeddedWeightKIT(const AC1B *analysisTree, RooWorkspace * wEm, int era) {
+
+  std::vector<TLorentzVector> taus; taus.clear();
+  float emWeight = 1;
+  for (unsigned int igentau = 0; igentau < analysisTree->gentau_count; ++igentau) {
+    TLorentzVector tauLV; tauLV.SetXYZT(analysisTree->gentau_px[igentau], 
+					analysisTree->gentau_py[igentau],
+					analysisTree->gentau_pz[igentau],
+					analysisTree->gentau_e[igentau]);
+    if (analysisTree->gentau_isPrompt[igentau]&&analysisTree->gentau_isFirstCopy[igentau]) {
+      taus.push_back(tauLV);
+    }
+  }
+
+  //  std::cout << "n taus = " << taus.size() << "  :  wEm = " << wEm << std::endl;
+
+  if (taus.size() == 2) {
+    double gt1_pt  = taus[0].Pt();
+    double gt1_eta = taus[0].Eta();
+    double gt2_pt  = taus[1].Pt();
+    double gt2_eta = taus[1].Eta();
+    wEm->var("gt_pt")->setVal(gt1_pt);
+    wEm->var("gt_eta")->setVal(gt1_eta);
+    double id1_embed = wEm->function("m_sel_idEmb_ratio")->getVal();
+    wEm->var("gt_pt")->setVal(gt2_pt);
+    wEm->var("gt_eta")->setVal(gt2_eta);
+    double id2_embed = wEm->function("m_sel_idEmb_ratio")->getVal();
+    wEm->var("gt1_pt")->setVal(gt1_pt);
+    wEm->var("gt2_pt")->setVal(gt2_pt);
+    wEm->var("gt1_eta")->setVal(gt1_eta);
+    wEm->var("gt2_eta")->setVal(gt2_eta);
+    double trg_emb = 1.0;
+    if (era==2016)
+      trg_emb = wEm->function("m_sel_trg_kit_ratio")->getVal();
+    else
+      trg_emb = wEm->function("m_sel_trg_ratio")->getVal();
+    emWeight = id1_embed * id2_embed * trg_emb;
+  }
+  //  std::cout << "KIT : EmbWeight = " << emWeight << std::endl;
 
   return emWeight;
 
@@ -2071,13 +2129,13 @@ void FillElMu(const AC1B *analysisTree, Synch17Tree *otree, int electronIndex, f
 double MassFromTString(TString sample) {
   double mass = 1000.;
   std::vector<int> masses_int = {
-    80,90,100,110,120,125,130,140,160,180,200,
+    60,80,90,100,110,120,125,130,140,160,180,200,
     250,300,350,400,450,500,600,700,800,900,1000,
     1200,1400,1500,1600,1800,2000,2300,2600,2900,3200,3500
   };
   
   for (auto mass_int : masses_int) {    
-    TString substring = "M-"+TString(to_string(mass_int))+"_";
+    TString substring = "M"+TString(to_string(mass_int))+"_";
     if (sample.Contains(substring)) {
       mass = double(mass_int);
       break;
@@ -2101,7 +2159,7 @@ void GetPFMET(AC1B * analysisTree, Synch17Tree * otree) {
 
 }
 
-void GetPuppiMET(AC1B * analysisTree, Synch17Tree * otree, int era, bool isData, bool isEmbedded, bool isMcCorrectPuppi) {
+void GetPuppiMET(AC1B * analysisTree, Synch17Tree * otree, int era, bool isData, bool isEmbedded, bool isMcCorrectPuppi, bool smearMET) {
 
   bool is2017 = false;
 
@@ -2119,7 +2177,7 @@ void GetPuppiMET(AC1B * analysisTree, Synch17Tree * otree, int era, bool isData,
 
   if (era==2017) is2017 = true;
 
-  if (!isData && !isEmbedded) { // jet corrections for MC
+  if (!isData && !isEmbedded && smearMET) { // jet corrections for MC
     for (unsigned int jet = 0; jet < analysisTree->pfjet_count; ++jet) {
       float absJetEta = TMath::Abs(analysisTree->pfjet_eta[jet]);
 
