@@ -112,10 +112,10 @@ class CardsEMu {
     {"TTTo2L2Nu"        , 88.29},  // NNLO (21)
     {"TTToHadronic"     , 377.96}, // NNLO (22)
     {"TTToSemiLeptonic" , 365.35}, // NNLO (23)
-    {"ST_t-channel_top_4f"      , 136.02}, // ? (24) -> could be improved
-    {"ST_t-channel_antitop_4f"  , 80.95}, // ? (25) -> could be improved
-    {"ST_tW_top_5f"             , 35.85}, // ? (26) -> could be improved
-    {"ST_tW_antitop_5f"         , 35.85}, // ? (27) -> could be improved
+    {"ST_t-channel_top_4f"      , 136.02}, 
+    {"ST_t-channel_antitop_4f"  , 80.95}, 
+    {"ST_tW_top_5f"             , 35.85}, 
+    {"ST_tW_antitop_5f"         , 35.85}, 
     {"VVTo2L2Nu"                , 13.84},
     {"WWToLNuQQ"                , 49.997},
     {"WZTo2L2Q"                 , 5.52},
@@ -125,6 +125,22 @@ class CardsEMu {
     {"WZTo3LNu"                 , 4.43},
     {"ZZTo4L"                   , 1.26},
     {"ZZTo2L2Q"                 , 3.38},
+    {"TTTo2L2Nu_corrMET"        , 88.29},  // NNLO (21)
+    {"TTToHadronic_corrMET"     , 377.96}, // NNLO (22)
+    {"TTToSemiLeptonic_corrMET" , 365.35}, // NNLO (23)
+    {"ST_t-channel_top_4f_corrMET"      , 136.02}, 
+    {"ST_t-channel_antitop_4f_corrMET"  , 80.95}, 
+    {"ST_tW_top_5f_corrMET"             , 35.85}, 
+    {"ST_tW_antitop_5f_corrMET"         , 35.85}, 
+    {"VVTo2L2Nu_corrMET"                , 13.84},
+    {"WWToLNuQQ_corrMET"                , 49.997},
+    {"WZTo2L2Q_corrMET"                 , 5.52},
+    {"WZTo1L1Nu2Q_corrMET"              , 10.71},
+    {"WZTo1L3Nu_corrMET"                , 3.05},
+    {"WZJToLLLNu_corrMET"               , 4.708},
+    {"WZTo3LNu_corrMET"                 , 4.43},
+    {"ZZTo4L_corrMET"                   , 1.26},
+    {"ZZTo2L2Q_corrMET"                 , 3.38},
     {"GluGluHToTauTau_M125"     , 3.00},
     {"VBFHToTauTau_M125"        , 0.237},
     {"WplusHToTauTau_M125"      , 0.0527},
@@ -158,12 +174,6 @@ class CardsEMu {
     "MuonEG_Run2018D"
   };
   
-  const vector<TString> EmbeddedElMu_2018 = {
-    "EmbeddedElMu_Run2018A",
-    "EmbeddedElMu_Run2018B",
-    "EmbeddedElMu_Run2018C",
-    "EmbeddedElMu_Run2018D"
-  };
   
   // ****** 2017 ********
 
@@ -191,13 +201,6 @@ class CardsEMu {
     "MuonEG_Run2017F"
   };
 
-  const vector<TString> EmbeddedElMu_2017 = {
-    "EmbeddedElMu_Run2017B",
-    "EmbeddedElMu_Run2017C",
-    "EmbeddedElMu_Run2017D",
-    "EmbeddedElMu_Run2017E",
-    "EmbeddedElMu_Run2017F",
-  };
   
   // ******* 2016 ******
 
@@ -231,6 +234,8 @@ class CardsEMu {
     "MuonEG_Run2016H"
   };
 
+  // ****** embedded samples *************
+
   const vector<TString> EmbeddedElMu_2016 = {
     "EmbeddedElMu_Run2016B",
     "EmbeddedElMu_Run2016C",
@@ -241,6 +246,24 @@ class CardsEMu {
     "EmbeddedElMu_Run2016H"
   };
   
+  const vector<TString> EmbeddedElMu_2017 = {
+    "EmbeddedElMu_Run2017B",
+    "EmbeddedElMu_Run2017C",
+    "EmbeddedElMu_Run2017D",
+    "EmbeddedElMu_Run2017E",
+    "EmbeddedElMu_Run2017F",
+  };
+
+  const vector<TString> EmbeddedElMu_2018 = {
+    "EmbeddedElMu_Run2018A",
+    "EmbeddedElMu_Run2018B",
+    "EmbeddedElMu_Run2018C",
+    "EmbeddedElMu_Run2018D"
+  };
+
+
+  // ******** MC samples *************
+
   const vector<TString> WJets = {
     "WJetsToLNu_0",
     "WJetsToLNu_1",
@@ -324,6 +347,26 @@ class CardsEMu {
     {"DY4JetsToTT_M-50","DY4JetsToLL_M-50"},
   };
   
+  /*
+  vector<TString> EWK = {
+    "ST_t-channel_top_4f_corrMET",
+    "ST_t-channel_antitop_4f_corrMET",
+    "ST_tW_top_5f_corrMET",
+    "ST_tW_antitop_5f_corrMET",
+    "VVTo2L2Nu_corrMET",
+    "WZTo2L2Q_corrMET",
+    "WZTo3LNu_corrMET",
+    "ZZTo2L2Q_corrMET",
+    "ZZTo4L_corrMET",
+  };
+
+  vector<TString> TT = {
+    "TTTo2L2Nu_corrMET",
+    "TTToHadronic_corrMET",
+    "TTToSemiLeptonic_corrMET"
+  };
+  */  
+
   vector<TString> EWK = {
     "ST_t-channel_top_4f",
     "ST_t-channel_antitop_4f",
@@ -377,6 +420,9 @@ class CardsEMu {
   };
 
   const vector<TString> masses = {
+    "60",
+    "80",
+    "100",
     "110",
     "120",
     "125",
@@ -404,19 +450,20 @@ class CardsEMu {
     "2300",
     "2600",
     "2900",
-    "3200"
+    "3200",
+    "3500"
   };
 
   const TString BaseTreeName = "TauCheck"; 
-  const TString baseNameBBH  = "SUSYGluGluToBBHToTauTau_M-";
-  const TString baseNameGGH  = "SUSYGluGluToHToTauTau_M-"; 
+  const TString baseNameBBH  = "SUSYGluGluToBBHToTauTau_powheg_M";
+  const TString baseNameGGH  = "SUSYGluGluToHToTauTau_powheg_M"; 
   const TString notTauTau = "&&!(gen_match_1==3&&gen_match_2==4)";
   const TString TauTau = "&&(gen_match_1==3&&gen_match_2==4)";
 
   map<TString,TString> generatorName = 
     {
-      {"SUSYGluGluToBBHToTauTau_M-","amcatnlo"},
-      {"SUSYGluGluToHToTauTau_M-","pythia"}
+      {"SUSYGluGluToBBHToTauTau_M","amcatnlo"},
+      {"SUSYGluGluToHToTauTau_M","pythia"}
     };
 
   // *****************************
@@ -428,10 +475,10 @@ class CardsEMu {
     {"CMS_scale_m","CMS_scale_mu_13TeV"},
   };
 
-  const map<TString,TString> EmbeddedMetShapeSystematics = {
-    {"scale_embed_metDown","CMS_scale_met_embedded_13TeVUp"},
-    {"scale_embed_metUp","CMS_scale_met_embedded_13TeVDown"}
-  };
+  //  const map<TString,TString> EmbeddedMetShapeSystematics = {
+  //    {"scale_embed_metDown","CMS_scale_met_embedded_13TeVUp"},
+  //    {"scale_embed_metUp","CMS_scale_met_embedded_13TeVDown"}
+  //  };
 
   const map<TString,TString> ShapeSystematics_Common = {
     {"CMS_scale_e","CMS_scale_e_13TeV"},
@@ -551,9 +598,19 @@ class CardsEMu {
     {"2018",0.67}
   };
 
-  const map<TString,TString> systematics_ggH = {
+  const map<TString,TString> systematics_ggH_t = {
     {"QCDscale_ggH_REWEIGHT","scale"},
-    {"Hdamp_ggH_REWEIGHT","hdamp"}
+    {"Hdamp_ggH_t_REWEIGHT","hdamp"}
+  };
+
+  const map<TString,TString> systematics_ggH_b = {
+    {"QCDscale_ggH_REWEIGHT","scale"},
+    {"Hdamp_ggH_b_REWEIGHT","hdamp"}
+  };
+
+  const map<TString,TString> systematics_ggH_i = {
+    {"QCDscale_ggH_REWEIGHT","scale"},
+    {"Hdamp_ggH_i_REWEIGHT","hdamp"}
   };
 
   // ******************************************************* 
@@ -582,7 +639,7 @@ class CardsEMu {
 
   // for variables which are different from mt_tot; 
   int nBins;
-  double Bins[100];
+  double Bins[500];
   double xMin;
   double xMax;
 

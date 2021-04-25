@@ -276,6 +276,7 @@ int main(int argc, char * argv[]) {
   Float_t jetPt_;
   Float_t jetEta_;
   Float_t jetPhi_;
+  Int_t jetFlavor_;
 
   Float_t jettauPt_;
   Float_t jettauEta_;
@@ -470,6 +471,7 @@ int main(int argc, char * argv[]) {
   ntuple_->Branch("jetPt", &jetPt_, "jetPt/F");
   ntuple_->Branch("jetEta",&jetEta_,"jetEta/F");
   ntuple_->Branch("jetPhi",&jetPhi_,"jetPhi/F");
+  ntuple_->Branch("jetFlavor",&jetFlavor_,"jetFlavor/I");
 
   ntuple_->Branch("jettauPt",&jettauPt_,"jettauPt/F");
   ntuple_->Branch("jettauEta",&jettauEta_,"jettauEta/F");
@@ -835,6 +837,7 @@ int main(int argc, char * argv[]) {
       jetPt_  = -9999;
       jetEta_ = -9999;
       jetPhi_ = -9999;
+      jetFlavor_ = 0;
 
       jettauPt_ = 0;
       jettauEta_ = 0;
@@ -1640,6 +1643,8 @@ int main(int argc, char * argv[]) {
 	jetPt_ = analysisTree.pfjet_pt[indexJet0];
 	jetEta_ = analysisTree.pfjet_eta[indexJet0];
 	jetPhi_ = analysisTree.pfjet_phi[indexJet0];
+	jetFlavor_ = analysisTree.pfjet_flavour[indexJet0];
+
 	jetChargedMult_ = analysisTree.pfjet_chargedmulti[indexJet0];
 	jetNeutralMult_ = analysisTree.pfjet_neutralmulti[indexJet0];
 	jetChargedHadMult_ = analysisTree.pfjet_chargedhadronmulti[indexJet0];

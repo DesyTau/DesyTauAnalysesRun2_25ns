@@ -69,10 +69,10 @@ std::vector<TString> MuonEG_2018 = {
 };
 
 std::vector<TString> EmbeddedElMu_2018 = {
-  "EmbeddedElMu_Run2018A",
-  "EmbeddedElMu_Run2018B",
-  "EmbeddedElMu_Run2018C",
-  "EmbeddedElMu_Run2018D"
+  "EmbeddedElMu_Run2018A_new",
+  "EmbeddedElMu_Run2018B_new",
+  "EmbeddedElMu_Run2018C_new",
+  "EmbeddedElMu_Run2018D_new"
 };
 
 // ****** 2017 ********
@@ -102,11 +102,11 @@ std::vector<TString> MuonEG_2017 = {
 };
 
 std::vector<TString> EmbeddedElMu_2017 = {
-  "EmbeddedElMu_Run2017B",
-  "EmbeddedElMu_Run2017C",
-  "EmbeddedElMu_Run2017D",
-  "EmbeddedElMu_Run2017E",
-  "EmbeddedElMu_Run2017F",
+  "EmbeddedElMu_Run2017B_new",
+  "EmbeddedElMu_Run2017C_new",
+  "EmbeddedElMu_Run2017D_new",
+  "EmbeddedElMu_Run2017E_new",
+  "EmbeddedElMu_Run2017F_new",
 };
 
 // ******* 2016 ******
@@ -142,13 +142,13 @@ std::vector<TString> MuonEG_2016 = {
 };
 
 std::vector<TString> EmbeddedElMu_2016 = {
-  "EmbeddedElMu_Run2016B",
-  "EmbeddedElMu_Run2016C",
-  "EmbeddedElMu_Run2016D",
-  "EmbeddedElMu_Run2016E",
-  "EmbeddedElMu_Run2016F",
-  "EmbeddedElMu_Run2016G",
-  "EmbeddedElMu_Run2016H"
+  "EmbeddedElMu_Run2016B_new",
+  "EmbeddedElMu_Run2016C_new",
+  "EmbeddedElMu_Run2016D_new",
+  "EmbeddedElMu_Run2016E_new",
+  "EmbeddedElMu_Run2016F_new",
+  "EmbeddedElMu_Run2016G_new",
+  "EmbeddedElMu_Run2016H_new"
 };
 
 std::vector<TString> WJets = {
@@ -225,8 +225,11 @@ TString baseNameBBH = "SUSYGluGluToBBHToTauTau_M-";
 TString baseNameGGH = "SUSYGluGluToHToTauTau_M-"; 
 
 std::vector<TString> masses = {
-  "110",
+  "60",
+  "80",
+  "100",
   "120",
+  "125",
   "130",
   "140",
   "160",
@@ -251,7 +254,8 @@ std::vector<TString> masses = {
   "2300",
   "2600",
   "2900",
-  "3200"
+  "3200",
+  "3500"
 };
 
 const TString BaseTreeName = "TauCheck"; 

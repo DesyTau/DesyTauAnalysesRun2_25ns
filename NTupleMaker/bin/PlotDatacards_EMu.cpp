@@ -26,17 +26,22 @@ void Plot(
   float yLower = 20;
   float scaleYUpper = 50;
   TString xtitle = "m_{T}^{tot}";
-  TString ytitle = "Events / bin";
+  TString ytitle = "";
 
 
   TH1D * histData = (TH1D*)file->Get(category+"/data_obs");
   if (histData==NULL) {
-    std::cout << "     category " << category << " does not exist" << std::endl;
-    std::cout << "     nothing is done.. " << std::endl;
+    std::cout << "  era/category " << era << "/" << category << " does not exist" << std::endl;
+    std::cout << "  nothing is done... " << std::endl;
+    std::cout << std::endl;
+    std::cout << "+++++++++++++++++++++++++++++++" << std::endl;
+    std::cout << std::endl;
     return;  
   }
   else {
-    std::cout << "     processing category " << category << std::endl;
+    std::cout << std::endl;
+    std::cout << "processing category era/category : " << era << "/" << category << std::endl;
+    std::cout << std::endl;
   }
   TH1D * TT  = (TH1D*)file->Get(category+"/TTL");
   TH1D * ZTT = (TH1D*)file->Get(category+"/EMB");
@@ -150,6 +155,7 @@ void Plot(
 
   histData->GetXaxis()->SetTitle(xtitle);
   histData->GetYaxis()->SetTitle(ytitle);
+  histData->GetXaxis()->SetRangeUser(61,3900);
   histData->GetYaxis()->SetTitleOffset(1.3);
   histData->GetYaxis()->SetTitleSize(0.06);
   float yUpper = histData->GetMaximum();
@@ -209,16 +215,17 @@ void Plot(
     }
   }
   std::cout << std::endl;
-  std::cout << "Chi2 = " << chi2 << std::endl;
+  std::cout << "Chi2/ndof = " << chi2 << "/" << nBins << std::endl;
+  std::cout << "Prob = " << TMath::Prob(chi2,double(nBins)) << std::endl;
   std::cout << std::endl;
 
   TLegend * leg;
-  if (legRight) leg = new TLegend(0.61,0.40,0.90,0.70);
+  if (legRight) leg = new TLegend(0.7,0.40,0.90,0.70);
   else leg = new TLegend(0.20,0.40,0.50,0.70);
   SetLegendStyle(leg);
-  leg->SetTextSize(0.044);
+  leg->SetTextSize(0.04);
   leg->AddEntry(histData,"Data","lp");
-  leg->AddEntry(ZTT,"embedded Z#rightarrow#tau#tau","f");
+  leg->AddEntry(ZTT,"embedded #tau#tau","f");
   leg->AddEntry(ZLL,"Z#rightarrow ll","f");
   leg->AddEntry(QCD,"QCD","f");
   leg->AddEntry(W,"electroweak","f");
@@ -243,7 +250,7 @@ void Plot(
   ratioH->SetMarkerStyle(20);
   ratioH->SetMarkerSize(1.2);
   ratioH->SetLineColor(1);
-  ratioH->GetYaxis()->SetRangeUser(0.801,1.199);
+  ratioH->GetYaxis()->SetRangeUser(0.301,1.699);
   ratioH->GetYaxis()->SetNdivisions(505);
   ratioH->GetXaxis()->SetLabelFont(42);
   ratioH->GetXaxis()->SetLabelOffset(0.04);
@@ -361,6 +368,7 @@ void Plot(
   }
 
   std::cout << std::endl; 
+  std::cout << "+++++++++++++++++++++++++++++++++++++++++" << std::endl;
   std::cout << std::endl;
 
 }
@@ -379,13 +387,7 @@ int main(int argc, char * argv[]) {
       "em_Nbtag0_DZetaGt30",
       "em_NbtagGt1_DZetam35Tom10",
       "em_NbtagGt1_DZetam10To30",
-      "em_NbtagGt1_DZetaGt30",
-      "em_Nbtag0_NjetLt1_DZetam35Tom10",
-      "em_Nbtag0_NjetLt1_DZetam10To30",
-      "em_Nbtag0_NjetLt1_DZetaGt30",
-      "em_NbtagGt1_NjetLt1_DZetam35Tom10",
-      "em_NbtagGt1_NjetLt1_DZetam10To30",
-      "em_NbtagGt1_NjetLt1_DZetaGt30",
+      "em_NbtagGt1_DZetaGt30"
     };
 
   for (auto era : eras) {

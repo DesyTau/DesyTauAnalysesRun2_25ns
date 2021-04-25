@@ -88,11 +88,17 @@ CardsEMu::CardsEMu(TString Sample,
       category!="em_NbtagGt1_DZetam10To30"&&
       category!="em_NbtagGt1_DZetaGt30"&&
       // ---
+      category!="em_Nbtag1_DZetam35Tom10"&&
+      category!="em_Nbtag1_DZetam10To30"&&
+      category!="em_Nbtag1_DZetaGt30"&&
+      // ---
+      category!="em_NbtagGt2_DZetam35Tom10"&&
+      category!="em_NbtagGt2_DZetam10To30"&&
+      category!="em_NbtagGt2_DZetaGt30"&&
+      // ---
       category!="em_NbtagGt1_NjetLt1_DZetam35Tom10"&&
       category!="em_NbtagGt1_NjetLt1_DZetam10To30"&&
-      category!="em_NbtagGt1_NjetLt1_DZetaGt30"
-
-) {
+      category!="em_NbtagGt1_NjetLt1_DZetaGt30") {
     std::cout << "Unknown category specified : " << category << std::endl;
     std::cout << "nothing will be done" << std::endl;
     block = true;
@@ -124,6 +130,14 @@ CardsEMu::CardsEMu(TString Sample,
     {"em_NbtagGt1_DZetam10To30" ,"&&pzeta>-10.0&&pzeta<30.0&&nbtag>0"},
     {"em_NbtagGt1_DZetam35Tom10","&&pzeta>-35.0&&pzeta<-10.0&&nbtag>0"},
     // ---
+    {"em_Nbtag1_DZetaGt30"    ,"&&pzeta>30.0&&nbtag==1"},
+    {"em_Nbtag1_DZetam10To30" ,"&&pzeta>-10.0&&pzeta<30.0&&nbtag==1"},
+    {"em_Nbtag1_DZetam35Tom10","&&pzeta>-35.0&&pzeta<-10.0&&nbtag==1"},
+    // ---
+    {"em_NbtagGt2_DZetaGt30"    ,"&&pzeta>30.0&&nbtag>1"},
+    {"em_NbtagGt2_DZetam10To30" ,"&&pzeta>-10.0&&pzeta<30.0&&nbtag>1"},
+    {"em_NbtagGt2_DZetam35Tom10","&&pzeta>-35.0&&pzeta<-10.0&&nbtag>1"},
+    // ---
     {"em_NbtagGt1_NjetLt1_DZetaGt30"    ,"&&pzeta>30.0&&nbtag>0&&njets<=1"},
     {"em_NbtagGt1_NjetLt1_DZetam10To30" ,"&&pzeta>-10.0&&pzeta<30.0&&nbtag>0&&njets<=1"},
     {"em_NbtagGt1_NjetLt1_DZetam35Tom10","&&pzeta>-35.0&&pzeta<-10.0&&nbtag>0&&njets<=1"},
@@ -136,7 +150,7 @@ CardsEMu::CardsEMu(TString Sample,
     isEquidistantBinning = false;
 
   isBTag = false;
-  if (Category.Contains("_NbtagGt1"))
+  if (Category.Contains("_NbtagGt1")||Category.Contains("_Nbtag1"))
     isBTag = true;
 
   outputFile = new TFile(output_filename,"recreate");
@@ -225,6 +239,7 @@ CardsEMu::CardsEMu(TString Sample,
   nameSampleMap["DYJetsToTT"] = DYJetsToTT; nameHistoMap["DYJetsToTT"] = "ZTT";
   nameSampleMap["WJets"] = WJets; nameHistoMap["WJets"] = "W";
   nameSampleMap["TTbar"] = TT; nameHistoMap["TTbar"] = "TTL";
+  nameSampleMap["TTbarTT"] = TT; nameHistoMap["TTbarTT"] = "TTT";
   nameSampleMap["EWK"] = EWK; nameHistoMap["EWK"] = "VVL";
   nameSampleMap["EMB"] = EmbeddedSample; nameHistoMap["EMB"] = "EMB";
   nameSampleMap["ggHWW125"] = GluGluHToWW; nameHistoMap["ggHWW125"] = "ggHWW125";
@@ -253,7 +268,7 @@ CardsEMu::CardsEMu(TString Sample,
   }
   if (sampleToProcess=="EMB") {
     samplesContainer.push_back("EMB");
-    InitializeSample("TTbar");
+    InitializeSample("TTbarTT");
   }
   if (sampleToProcess=="DYJets") {
     samplesContainer.push_back("DYJetsToLL");
@@ -298,7 +313,6 @@ CardsEMu::CardsEMu(TString Sample,
   numberOfShapeSystematics = CreateShapeSystematicsMap();
   numberOfWeightSystematics = CreateWeightSystematicsMap();
   
-
 }
 
 TString CardsEMu::SampleSpecificCut(TString name, TString sampleName) {
@@ -341,6 +355,9 @@ TString CardsEMu::SampleSpecificCut(TString name, TString sampleName) {
 
   if ((name=="TTbar"||name=="EWK"||name=="WJets")&&runOnEmbedded)
     mcDiTauVeto = "&&!(gen_match_1==3&&gen_match_2==4)";
+
+  if (name=="TTbarTT")
+    mcDiTauVeto = "&&(gen_match_1==3&&gen_match_2==4)";
 
   if (name=="DYJetsToLL")
     mcDiTauVeto = "&&!(gen_match_1==3&&gen_match_2==4)";
@@ -485,7 +502,8 @@ void CardsEMu::InitializeSamples() {
 void CardsEMu::CreateMSSMList(TString baseName, TString templName) {
 
   for (auto mass : masses) {
-    TString susyInputFile = input_dir + "/" + baseName + mass + "_" + generatorName[baseName] + ".root";
+    //    TString susyInputFile = input_dir + "/" + baseName + mass + "_" + generatorName[baseName] + ".root";
+    TString susyInputFile = input_dir + "/" + baseName + mass + ".root";
     TFile * file = new TFile(susyInputFile);
     if (file->IsZombie()) {
       std::cout << "CardsEMu::CreateMSSMList() -> " << std::endl;
@@ -493,7 +511,7 @@ void CardsEMu::CreateMSSMList(TString baseName, TString templName) {
       std::cout << "skipping mass = " << mass << "  for " << templName << std::endl;
       continue;
     }
-    TString sampleName = baseName + mass + "_" + generatorName[baseName];
+    TString sampleName = baseName + mass; // + "_" + generatorName[baseName];
     vector<TString> sampleNames; 
     sampleNames.clear();
     sampleNames.push_back(sampleName);
@@ -563,13 +581,14 @@ TH1D * CardsEMu::ProcessSample(TString name,
     double norm = sampleNormMap[sampleName];
     TH1D * histSample = createHisto("hist");
     TString Cuts = weight + "(" + cut + ")";
-    //    std::cout << "       cuts = " << Cuts << std::endl;
+    std::cout << "       cuts = " << Cuts << std::endl;
     tree->Draw(variable+">>hist",Cuts);
     hist->Add(hist,histSample,1.,norm);
+    //    std::cout << "    ENTRIES = " << histSample->GetEntries() << std::endl;
     delete histSample;
   }
 
-  zeroBins(hist);
+  //  zeroBins(hist);
   return hist;
 
 }
@@ -662,12 +681,14 @@ int CardsEMu::CreateShapeSystematicsMap() {
       shapeSystematicsMap[sysName+"Down"] = treeName+"Down";
       numberOfShapeSystematics += 2;
     }
+    /*
     for (auto mapIter : EmbeddedMetShapeSystematics) {
       TString sysName = mapIter.first;
       TString treeName = mapIter.second;
       shapeSystematicsMap[sysName] = treeName;
       numberOfShapeSystematics += 1;
     }
+    */
     return numberOfShapeSystematics;
   }
   
@@ -777,16 +798,10 @@ int CardsEMu::CreateWeightSystematicsMap() {
 
   // ggA/ggH
   if (sampleToProcess=="ggA_t"||
-      sampleToProcess=="ggA_b"||
-      sampleToProcess=="ggA_i"||
       sampleToProcess=="ggh_t"||
-      sampleToProcess=="ggh_b"||
-      sampleToProcess=="ggh_i"||
-      sampleToProcess=="ggH_t"||
-      sampleToProcess=="ggH_b"||
-      sampleToProcess=="ggH_i") {
+      sampleToProcess=="ggH_t") {
     TString weightCentral = weight_ggH[sampleToProcess];
-    for (auto mapIter : systematics_ggH) {
+    for (auto mapIter : systematics_ggH_t) {
       TString sysName = mapIter.first + "Up";
       TString weightName = weightCentral + "_" + mapIter.second + "_up";
       TString sysWeight = "("+weightName+"/"+weightCentral+")*";
@@ -797,8 +812,43 @@ int CardsEMu::CreateWeightSystematicsMap() {
       weightSystematicsMap[sysName] = sysWeight;
       numberOfWeightSystematics += 2;
     }
-    return numberOfWeightSystematics;
-      
+    return numberOfWeightSystematics;      
+  }
+
+  if (sampleToProcess=="ggA_b"||
+      sampleToProcess=="ggh_b"||
+      sampleToProcess=="ggH_b") {
+    TString weightCentral = weight_ggH[sampleToProcess];
+    for (auto mapIter : systematics_ggH_b) {
+      TString sysName = mapIter.first + "Up";
+      TString weightName = weightCentral + "_" + mapIter.second + "_up";
+      TString sysWeight = "("+weightName+"/"+weightCentral+")*";
+      weightSystematicsMap[sysName] = sysWeight;
+      sysName = mapIter.first + "Down";
+      weightName = weightCentral + "_" + mapIter.second + "_down";
+      sysWeight = "("+weightName+"/"+weightCentral+")*";
+      weightSystematicsMap[sysName] = sysWeight;
+      numberOfWeightSystematics += 2;
+    }
+    return numberOfWeightSystematics;      
+  }
+
+  if (sampleToProcess=="ggA_i"||
+      sampleToProcess=="ggh_i"||
+      sampleToProcess=="ggH_i") {
+    TString weightCentral = weight_ggH[sampleToProcess];
+    for (auto mapIter : systematics_ggH_i) {
+      TString sysName = mapIter.first + "Up";
+      TString weightName = weightCentral + "_" + mapIter.second + "_up";
+      TString sysWeight = "("+weightName+"/"+weightCentral+")*";
+      weightSystematicsMap[sysName] = sysWeight;
+      sysName = mapIter.first + "Down";
+      weightName = weightCentral + "_" + mapIter.second + "_down";
+      sysWeight = "("+weightName+"/"+weightCentral+")*";
+      weightSystematicsMap[sysName] = sysWeight;
+      numberOfWeightSystematics += 2;
+    }
+    return numberOfWeightSystematics;      
   }
 
   return numberOfWeightSystematics;
@@ -813,13 +863,26 @@ bool CardsEMu::RunData() {
   nameTH1DMap["data_obs"] = histData;
   
   TH1D * QCD = ProcessSample("Data","",false,false);
+  TH1D * QCD_Up = (TH1D*)QCD->Clone("QCDsubtrUp");
+  TH1D * QCD_Down = (TH1D*)QCD->Clone("QCDsubtrDown");
   for (auto name : samplesContainer) {
     TH1D * hist = ProcessSample(name,"",false,false);
     QCD->Add(QCD,hist,1.,-1.);
+    QCD_Up->Add(QCD_Up,hist,1.,-0.8);
+    QCD_Down->Add(QCD_Down,hist,1.,-1.2);
     delete hist;
   }
-  if (isBTag) QCD->Scale(scaleQCD[era]);
+  //  zeroBins(QCD);
+  if (isBTag) { 
+    QCD->Scale(scaleQCD[era]);
+    QCD_Up->Scale(scaleQCD[era]);
+    QCD_Down->Scale(scaleQCD[era]);
+  }
   nameTH1DMap["QCD"] = QCD;
+  nameTH1DMap["QCD_subtrMC_"+era+"Up"] = QCD_Up;
+  nameTH1DMap["QCD_subtrMC_"+era+"Down"] = QCD_Down;
+  nameTH1DMap["QCD_subtrMCUp"] = QCD_Up;
+  nameTH1DMap["QCD_subtrMCDown"] = QCD_Down;
 
   if (!runWithSystematics) { 
     status = false;
@@ -835,6 +898,7 @@ bool CardsEMu::RunData() {
       delete hist;
     }
     if (isBTag) QCD_sys->Scale(scaleQCD[era]);
+    //    zeroBins(QCD_sys);
     nameTH1DMap["QCD_"+sysName] = QCD_sys;
   }
 
@@ -851,6 +915,7 @@ bool CardsEMu::RunModel() {
     TH1D * hist = ProcessSample(name,"",true,false);
     TString sampleHistName = nameHistoMap[name];
     nameTH1DMap[sampleHistName] = hist;
+    std::cout << "hist : " << sampleHistName << "   entries = " << hist->GetEntries() << std::endl;
   }
 
   if (!runWithSystematics) {
@@ -860,16 +925,18 @@ bool CardsEMu::RunModel() {
 
   // ttbar contamination --->
   if (sampleToProcess=="EMB") {
-    TH1D * hist = ProcessSample("TTbar","",true,false);
+    TH1D * hist = ProcessSample("TTbarTT","",true,false);
     TH1D * emb = nameTH1DMap["EMB"];
-    TString nameUp = "EMB_CMS_htt_emb_ttbar_"+era+"Up";
-    TString nameDown = "EMB_CMS_htt_emb_ttbar_"+era+"Down";
+    TString nameUp = sampleToProcess + "_CMS_htt_emb_ttbar_"+era+"Up";
+    TString nameDown = sampleToProcess + "_CMS_htt_emb_ttbar_"+era+"Down";
     TH1D * histDown = (TH1D*)emb->Clone(nameDown);
     TH1D * histUp = (TH1D*)emb->Clone(nameUp);
     histDown->Add(histDown,hist,1.,-0.1);
     histUp->Add(histUp,hist,1.,0.1);
     nameTH1DMap[nameUp] = histUp;
     nameTH1DMap[nameDown] = histDown;
+    std::cout << "EMB_CMS_htt_emb_ttbar   lnN " << histDown->GetSum()/emb->GetSum() << "/" << histUp->GetSum()/emb->GetSum() << std::endl;
+    std::cout << std::endl;
   }
 
   // systematics ----->
