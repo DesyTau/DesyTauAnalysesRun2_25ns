@@ -75,13 +75,13 @@ ls $dirEmbedded/EmbeddingRun2016F_ElMu/*root > $OUTDIR/EmbeddedElMu_Run2016F
 ls $dirEmbedded/EmbeddingRun2016G_ElMu/*root > $OUTDIR/EmbeddedElMu_Run2016G
 ls $dirEmbedded/EmbeddingRun2016H_ElMu/*root > $OUTDIR/EmbeddedElMu_Run2016H
 
-for j in $(less list_SUSY_ggH_2016);
+for j in $(less list_SUSY_ggH_2016_powheg);
 do
-    ls $dirMC/${j}/*.root > $OUTDIR/${j}_pythia
+    ls $dirMC/${j}/*.root > $OUTDIR/${j}
 done
 
-for j in $(less list_SUSY_bbH_2016);
+for j in $(less list_SUSY_bbH_2016_powheg);
 do
-    ls $dirMC/${j}/*.root > $OUTDIR/${j}_amcatnlo
+    ls $dirMC/${j}/*.root > $OUTDIR/${j}
 done
 

@@ -70,13 +70,13 @@ echo "CONFIGFILE,FILELIST" > parameters.txt
 
 
 # SUSY_ggH
-for j in $(less list_SUSY_ggH_2016);
+for j in $(less list_SUSY_ggH_2016_powheg);
 do
-    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_MC.conf ${j}_pythia 5
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_MC.conf ${j} 2
 done
 
 # SUSY_bbH
-for j in $(less list_SUSY_bbH_2016);
+for j in $(less list_SUSY_bbH_2016_powheg);
 do
-    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_MC.conf ${j}_amcatnlo 5
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_MC.conf ${j} 2
 done

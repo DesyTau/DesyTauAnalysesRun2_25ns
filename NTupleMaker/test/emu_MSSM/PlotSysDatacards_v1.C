@@ -1,18 +1,14 @@
-#include "HtoH.h"
 #include "HttStylesNew.cc"
 
-void PlotSysDatacards(TString era = "2018",
-		      TString histName = "QCD",
-		      TString sysName  = "subtrMC",
+void PlotSysDatacards_v1(TString era = "2018",
+			 TString histName = "QCD",
+			 TString sysName  = "subtrMC",
+			 TString category = "htt_em_2_2018",
 		      //		      TString category = "em_Nbtag0_DZetam10To30",
-		      TString category = "em_DZetaLtm35",
-		      float xmax = 100,
-		      float upRange = -100) {
+			 float xmax = 100,
+			 float upRange = -100) {
 
-  int nBins = 15;
-  double xbins[16] = {0,60,70,80,90,100,150,200,250,300,350,400,500,600,700,1500};
-
-  TString fileName = "/nfs/dust/cms/user/rasp/Run/emu_MSSM/Feb10/datacards/"+era+"/htt_em_mssm";
+  TString fileName = "/nfs/dust/cms/user/rasp/CMSSW/CMSSW_10_2_13/src/CombineHarvester/MSSMvsSMRun2Legacy/output_ttbar_v2/cmb/common/htt_input_"+era+"_1200";
 
   TString header = category+":"+histName;
   TString SysLeg = sysName;
@@ -24,14 +20,11 @@ void PlotSysDatacards(TString era = "2018",
   SetStyle();
   gStyle->SetErrorX(0);
   TFile * file = new TFile(fileName+".root");
-  TH1D * histNominalX = (TH1D*)file->Get(category+"/"+histName);
-  TH1D * histUpX = (TH1D*)file->Get(category+"/"+histName+"_"+sysName+"Up");
-  TH1D * histDownX = (TH1D*)file->Get(category+"/"+histName+"_"+sysName+"Down");
-  std::cout << histNominalX << " " <<  histUpX << " " << histDownX << std::endl;
-  if (histNominalX==NULL||histUpX==NULL||histDownX==NULL) return;
-  TH1D * histNominal = TH1DtoTH1D(histNominalX,nBins,xbins,true,"_rebinned");
-  TH1D * histUp = TH1DtoTH1D(histUpX,nBins,xbins,true,"_rebinned");
-  TH1D * histDown = TH1DtoTH1D(histDownX,nBins,xbins,true,"_rebinned");
+  TH1D * histNominal = (TH1D*)file->Get(category+"/"+histName);
+  TH1D * histUp = (TH1D*)file->Get(category+"/"+histName+"_"+sysName+"Up");
+  TH1D * histDown = (TH1D*)file->Get(category+"/"+histName+"_"+sysName+"Down");
+  std::cout << histNominal << " " <<  histUp << " " << histDown << std::endl;
+  if (histNominal==NULL||histUp==NULL||histDown==NULL) return;
 
 
   double xNominal = histNominal->GetSumOfWeights();
@@ -40,17 +33,15 @@ void PlotSysDatacards(TString era = "2018",
 
   std::cout << "lnN    " << xDown/xNominal << "/" << xUp/xNominal << std::endl;
 
-  nBins = histNominal->GetNbinsX(); 
+  int nBins = histNominal->GetNbinsX(); 
   xmax = histNominal->GetBinLowEdge(nBins+1)-0.01;
 
   InitData(histNominal);
-  /*
-  for (int iB=1; iB<=nBins; ++iB) {
-    double x = histNominal->GetBinContent(iB);
-    double ex = TMath::Sqrt(x);
-    histNominal->SetBinError(iB,ex);
-  }
-  */
+  //  for (int iB=1; iB<=nBins; ++iB) {
+  //    double x = histNominal->GetBinContent(iB);
+    //    double ex = TMath::Sqrt(x);
+  //    histNominal->SetBinError(iB,ex);
+  //  }
 
   histNominal->GetXaxis()->SetTitleSize(0.0);
   histNominal->GetXaxis()->SetTitleOffset(1.2);
@@ -60,7 +51,7 @@ void PlotSysDatacards(TString era = "2018",
   histNominal->GetYaxis()->SetLabelSize(0.045);
 
   histNominal->GetYaxis()->SetRangeUser(0.01,1.2*histUp->GetMaximum());
-  histNominal->GetXaxis()->SetRangeUser(61,1499);
+  histNominal->GetXaxis()->SetRangeUser(51,1050);
   histNominal->SetLineColor(1);
   histUp->SetLineColor(2);
   histDown->SetLineColor(4);
@@ -136,10 +127,10 @@ void PlotSysDatacards(TString era = "2018",
   upper->SetFrameBorderMode(0);
   upper->SetFrameBorderSize(10);
 
-  histNominal->Draw("hpe");
+  histNominal->Draw("hpe1");
   histUp->Draw("hsame");
   histDown->Draw("hsame");
-  TLegend * leg = new TLegend(0.45,0.68,0.92,0.9);
+  TLegend * leg = new TLegend(0.5,0.68,0.92,0.9);
   leg->SetHeader(header);
   leg->SetFillColor(0);
   leg->SetTextSize(0.04);
@@ -156,7 +147,7 @@ void PlotSysDatacards(TString era = "2018",
   canv1->cd();
 
   ratioUp->SetTitle("");
-  ratioUp->GetYaxis()->SetRangeUser(0.00,2.51);
+  ratioUp->GetYaxis()->SetRangeUser(0.001,1.99999);
   ratioUp->GetYaxis()->SetNdivisions(505);
   ratioUp->GetXaxis()->SetLabelFont(42);
   ratioUp->GetXaxis()->SetLabelOffset(0.04);
@@ -197,9 +188,9 @@ void PlotSysDatacards(TString era = "2018",
   lower->SetFrameLineWidth(2);
   lower->SetFrameBorderMode(0);
   lower->SetFrameBorderSize(10);
-  
-  ratioUp->GetXaxis()->SetRangeUser(61,1499);
-  
+
+  ratioUp->GetXaxis()->SetRangeUser(51,1050);
+
   ratioUp->Draw("h");
   ratioDown->Draw("hsame");
   ratioCentral->Draw("he1same");

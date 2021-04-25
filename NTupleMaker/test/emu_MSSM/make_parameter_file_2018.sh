@@ -62,13 +62,13 @@ echo "CONFIGFILE,FILELIST" > parameters.txt
 ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf ZHToTauTau_M125_13TeV 10
 
 # SUSY_ggH
-for j in $(less list_SUSY_ggH_2018);
+for j in $(less list_SUSY_ggH_2018_powheg);
 do
-    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf ${j}_pythia 5
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf ${j} 2
 done
 
 # SUSY_bbH
-for j in $(less list_SUSY_bbH_2018);
+for j in $(less list_SUSY_bbH_2018_powheg);
 do
-    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf ${j}_amcatnlo 5
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf ${j} 2
 done

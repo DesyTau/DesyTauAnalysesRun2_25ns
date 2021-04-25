@@ -13,3 +13,4 @@ for j in $(less list_${SAMPLE}_20${YEAR});
 do
     ./hadd.sh ${j}_${GENERATOR}
 done
+
