@@ -420,6 +420,7 @@ class CardsEMu {
   };
 
   const vector<TString> masses = {
+    /*
     "60",
     "80",
     "100",
@@ -441,7 +442,9 @@ class CardsEMu {
     "700",
     "800",
     "900",
-    "1000",
+    */
+    "1000"
+    /*
     "1200",
     "1400",
     "1600",
@@ -452,6 +455,7 @@ class CardsEMu {
     "2900",
     "3200",
     "3500"
+    */
   };
 
   const TString BaseTreeName = "TauCheck"; 

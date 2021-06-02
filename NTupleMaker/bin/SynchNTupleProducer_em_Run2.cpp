@@ -575,10 +575,10 @@ int main(int argc, char * argv[]){
   RooWorkspace *correctionWS = (RooWorkspace*)f_workspace_kit->Get("w");
 
   //  TString ggHWeightsFile("higgs_pt_v0.root");
-  TString ggHWeightsFile("higgs_pt_v1.root");
+  TString ggHWeightsFile("higgs_pt_v2.root");
   if (era==2016)
     //    ggHWeightsFile = "higgs_pt_2016_v0.root";
-    ggHWeightsFile = "higgs_pt_2016_v1.root";
+    ggHWeightsFile = "higgs_pt_2016_v2.root";
   TFile * f_ggHWeights = new TFile(TString(cmsswBase) + "/src/DesyTauAnalyses/NTupleMaker/data/" + ggHWeightsFile);
   if (f_ggHWeights->IsZombie()) {
     std::cout << "Cannot open file " << ggHWeightsFile << std::endl;
@@ -2129,7 +2129,7 @@ void FillElMu(const AC1B *analysisTree, Synch17Tree *otree, int electronIndex, f
 double MassFromTString(TString sample) {
   double mass = 1000.;
   std::vector<int> masses_int = {
-    60,80,90,100,110,120,125,130,140,160,180,200,
+    60,80,90,95,100,110,120,125,130,140,160,180,200,
     250,300,350,400,450,500,600,700,800,900,1000,
     1200,1400,1500,1600,1800,2000,2300,2600,2900,3200,3500
   };
