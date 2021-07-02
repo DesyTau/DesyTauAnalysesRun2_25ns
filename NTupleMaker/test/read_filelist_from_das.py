@@ -32,7 +32,8 @@ def read_filelist_from_das(nick, query, outputfile, phys03, xootd_prefix):
     outfile.write("[{}] \n".format(nick))
     outfile.write("nickname = {} \n".format(nick))
     for file in filedict.keys():
-        outfile.write("{prefix}/{path} = {nevents} \n".format(prefix=xootd_prefix, path=file, nevents=filedict[file]))
+#        outfile.write("{prefix}/{path} = {nevents} \n".format(prefix=xootd_prefix, path=file, nevent
+        outfile.write("{path} = {nevents} \n".format(path=file, nevents=filedict[file]))
     outfile.close()
 
 if __name__ == '__main__':
