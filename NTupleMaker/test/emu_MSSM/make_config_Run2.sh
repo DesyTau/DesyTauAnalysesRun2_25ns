@@ -120,11 +120,6 @@ MC_SAMPLES_LIST+=(W3JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8 W4JetsToLNu_Tune
 MC_SAMPLES_LIST+=(TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8 TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powheg-pythia8)
 MC_SAMPLES_LIST+=(WW_TuneCP5_13TeV-pythia8 WZ_TuneCP5_13TeV-pythia8 ZZ_TuneCP5_13TeV-pythia8)
 
-for susyname in $(less list_SUSY_ggH_2017);
-do
-    MC_SAMPLES_LIST+=(${susyname} )
-done
-
 MC_SAMPLES_LEN=${#MC_SAMPLES_LIST[@]}
 
 if [[ $DATA_TYPE == "MC" ]]; then

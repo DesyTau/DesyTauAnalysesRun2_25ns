@@ -70,11 +70,11 @@ ls $dirEmbedded/EmbeddingRun2017F_ElMu/*root > $OUTDIR/EmbeddedElMu_Run2017F
 
 for j in $(less list_SUSY_ggH_2017_powheg);
 do
-    ls $dirMC/${j}/*.root > $OUTDIR/${j}
+    ls $dirMC2/${j}/*.root > $OUTDIR/${j}
 done
 
 for j in $(less list_SUSY_bbH_2017_powheg);
 do
-    ls $dirMC/${j}/*.root > $OUTDIR/${j}
+    ls $dirMC2/${j}/*.root > $OUTDIR/${j}
 done
 

@@ -61,10 +61,10 @@ ls $dirEmbedded/EmbeddingRun2018D_ElMu/*root > $OUTDIR/EmbeddedElMu_Run2018D
 
 for j in $(less list_SUSY_ggH_2018_powheg);
 do
-    ls $dirMC/${j}/*.root > $OUTDIR/${j}
+    ls $dirMC2/${j}/*.root > $OUTDIR/${j}
 done
 
 for j in $(less list_SUSY_bbH_2018_powheg);
 do
-    ls $dirMC/${j}/*.root > $OUTDIR/${j}
+    ls $dirMC2/${j}/*.root > $OUTDIR/${j}
 done
