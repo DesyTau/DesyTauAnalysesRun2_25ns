@@ -228,6 +228,8 @@ int main(int argc, char * argv[]){
   // **** configuration analysis  
   Config cfg(argv[1]);
 
+  TString ch("em");
+
   // configuration process
   const string sample = argv[2];
   const bool isData = cfg.get<bool>("isData");
@@ -640,7 +642,7 @@ int main(int argc, char * argv[]){
   
   TTree *tree = new TTree("TauCheck", "TauCheck");
   //  TTree *gtree = new TTree("GenTauCheck", "GenTauCheck");
-  Synch17Tree *otree = new Synch17Tree(tree,true,isGGH);
+  Synch17Tree *otree = new Synch17Tree(tree,ch,isGGH);
   //  Synch17GenTree *gentree = new Synch17GenTree(gtree);
 
   int nTotalFiles = 0;
@@ -2221,7 +2223,7 @@ void GetPuppiMET(AC1B * analysisTree, Synch17Tree * otree, int era, bool isData,
 
   double shiftX_ele = 0;
   double shiftY_ele = 0;
-
+  
   if (isEmbedded||isMcCorrectPuppi) { 
     double px_ele_uncorr = otree->pt_uncorr_1*TMath::Cos(otree->phi_1);
     double py_ele_uncorr = otree->pt_uncorr_1*TMath::Sin(otree->phi_1);
@@ -2229,11 +2231,8 @@ void GetPuppiMET(AC1B * analysisTree, Synch17Tree * otree, int era, bool isData,
     double py_ele = otree->pt_1*TMath::Sin(otree->phi_1);
     shiftX_ele = shiftX_ele + px_ele_uncorr - px_ele;
     shiftY_ele = shiftY_ele + py_ele_uncorr - py_ele;
-    
-    //    std::cout << "electron : uncorr = (" << px_ele_uncorr << "," << py_ele_uncorr << ")   "
-    //	      << "   corr = (" << px_ele << "," << py_ele << ")" << std::endl;
   }
-
+  
   double shiftX = shiftX_jets + shiftX_ele;
   double shiftY = shiftY_jets + shiftY_ele;
 

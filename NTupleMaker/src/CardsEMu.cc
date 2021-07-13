@@ -28,6 +28,13 @@ CardsEMu::CardsEMu(TString Sample,
 
   block = false;
 
+  TString ratioFileName = "/nfs/dust/cms/user/rasp/Run/emu_MSSM/Feb10/datacards/ratio_"+era+".root";
+  ratioFile = new TFile(ratioFileName);
+  if (ratioFile->IsZombie()) {
+    std::cout << "file " << ratioFileName << " does not exist" << std::endl;
+    exit(-1);
+  }
+
   if (xmin>xmax) {
     std::cout << "warning -> xmin for histogram  : " << xmin << " is greater than xmax : " << xmax << std::endl;
     std::cout << "nothing will be done..." << std::endl;
@@ -45,10 +52,12 @@ CardsEMu::CardsEMu(TString Sample,
       sampleToProcess!="EWK"&&
       sampleToProcess!="TTbar"&&
       sampleToProcess!="DYJets"&&
+      sampleToProcess!="DYJets_Low"&&
       sampleToProcess!="EMB"&&
       sampleToProcess!="SMggH"&&
       sampleToProcess!="SMothers"&&
       sampleToProcess!="bbH"&&
+      sampleToProcess!="qqH95"&&
       sampleToProcess!="ggH_t"&&
       sampleToProcess!="ggH_b"&&
       sampleToProcess!="ggH_i"&&
@@ -71,6 +80,7 @@ CardsEMu::CardsEMu(TString Sample,
       category!="em_DZetaLtm35"&&
       category!="em_Nbtag0_DZetaLtm35"&&
       category!="em_NbtagGt1_DZetaLtm35"&&
+      category!="em_NbtagGt1_DZetaLtm50"&&
       // ---
       category!="em_Nbtag0_DZetam35Tom10"&&
       category!="em_Nbtag0_DZetam10To30"&&
@@ -112,6 +122,7 @@ CardsEMu::CardsEMu(TString Sample,
     // ---
     {"em_DZetaLtm35",         "&&pzeta<-35.0"},
     {"em_NbtagGt1_DZetaLtm35","&&pzeta<-35.0&&nbtag>0"},
+    {"em_NbtagGt1_DZetaLtm50","&&pzeta<-50.0&&nbtag>0"},
     {"em_Nbtag0_DZetaLtm35",  "&&pzeta<-35.0&&nbtag==0"},
     // ---
     {"em_Nbtag0_DZetaGt30"    ,"&&pzeta>30.0&&nbtag==0"},
@@ -177,6 +188,12 @@ CardsEMu::CardsEMu(TString Sample,
   TString TriggerSingleMu = "trg_singlemuon>0.5&&pt_2>25.";
   globalWeight = "1.0*";
 
+  xsecs = xsecs_2016;
+  if (era=="2017")
+    xsecs = xsecs_2017;
+  if (era=="2018")
+    xsecs = xsecs_2018;
+
   if (era=="2017") {
     SingleMuon = SingleMuon_2017;
     SingleElectron = SingleElectron_2017;
@@ -237,6 +254,8 @@ CardsEMu::CardsEMu(TString Sample,
   nameSampleMap["Data"] = DataSample; nameHistoMap["Data"] = "data_obs";
   nameSampleMap["DYJetsToLL"] = DYJetsToLL; nameHistoMap["DYJetsToLL"] = "ZL"; 
   nameSampleMap["DYJetsToTT"] = DYJetsToTT; nameHistoMap["DYJetsToTT"] = "ZTT";
+  nameSampleMap["DYJetsLowToLL"] = DYJets_Low; nameHistoMap["DYJetsLowToLL"] = "ZL"; 
+  nameSampleMap["DYJetsLowToTT"] = DYJets_Low; nameHistoMap["DYJetsLowToTT"] = "ZTT";
   nameSampleMap["WJets"] = WJets; nameHistoMap["WJets"] = "W";
   nameSampleMap["TTbar"] = TT; nameHistoMap["TTbar"] = "TTL";
   nameSampleMap["TTbarTT"] = TT; nameHistoMap["TTbarTT"] = "TTT";
@@ -248,6 +267,7 @@ CardsEMu::CardsEMu(TString Sample,
   nameSampleMap["ZHWW125"] = ZHToWW; nameHistoMap["ZHWW125"] = "ZHWW125";
   nameSampleMap["ggHTT125"] = GluGluHToTauTau; nameHistoMap["ggHTT125"] = "ggH125";
   nameSampleMap["qqHTT125"] = VBFHToTauTau; nameHistoMap["qqHTT125"] = "qqH125";
+  nameSampleMap["qqHTT95"] = VBFHToTauTau95; nameHistoMap["qqHTT95"] = "qqH95";
   nameSampleMap["WHTT125"] = WHToTauTau; nameHistoMap["WHTT125"] = "WH125";
   nameSampleMap["ZHTT125"] = ZHToTauTau; nameHistoMap["ZHTT125"] = "ZH125";
 
@@ -263,6 +283,9 @@ CardsEMu::CardsEMu(TString Sample,
     samplesContainer.push_back("EWK");
     samplesContainer.push_back("TTbar");
   }
+  if (sampleToProcess=="DYJets_Low") {
+    samplesContainer.push_back("DYJetsLowToLL");
+  }
   if (sampleToProcess=="TTbar") {
     samplesContainer.push_back("TTbar");
   }
@@ -271,12 +294,12 @@ CardsEMu::CardsEMu(TString Sample,
     InitializeSample("TTbarTT");
   }
   if (sampleToProcess=="DYJets") {
-    samplesContainer.push_back("DYJetsToLL");
+    //    samplesContainer.push_back("DYJetsToLL");
     if (!runOnEmbedded) 
       samplesContainer.push_back("DYJetsToTT");
   }
   if (sampleToProcess=="EWK") {
-    samplesContainer.push_back("WJets");
+    //    samplesContainer.push_back("WJets");
     samplesContainer.push_back("EWK");
   }
   if (sampleToProcess=="SMggH") {
@@ -290,6 +313,9 @@ CardsEMu::CardsEMu(TString Sample,
     samplesContainer.push_back("qqHTT125");
     samplesContainer.push_back("WHTT125");
     samplesContainer.push_back("ZHTT125");
+  }
+  if (sampleToProcess=="qqH95") {
+    samplesContainer.push_back("qqHTT95");
   }
 
   if (sampleToProcess=="bbH") {
@@ -359,9 +385,9 @@ TString CardsEMu::SampleSpecificCut(TString name, TString sampleName) {
   if (name=="TTbarTT")
     mcDiTauVeto = "&&(gen_match_1==3&&gen_match_2==4)";
 
-  if (name=="DYJetsToLL")
+  if (name=="DYJetsToLL"||name=="DYJetsLowToLL")
     mcDiTauVeto = "&&!(gen_match_1==3&&gen_match_2==4)";
-  if (name=="DYJetsToTT")
+  if (name=="DYJetsToTT"||name=="DYJetsLowToTT")
     mcDiTauVeto = "&&(gen_match_1==3&&gen_match_2==4)";
 
   TString Cut = triggerCut+ngenPartonsCut+mcDiTauVeto;
@@ -437,8 +463,18 @@ void CardsEMu::InitializeSample(TString name) {
     float n3Jet = sampleNeventsMap["DY3JetsToTT_M-50"];
     float xsec3Jet = sampleXSecMap["DY3JetsToLL_M-50"];
 
-    float n4Jet = sampleNeventsMap["DY4JetsToLL_M-50"];
+    float n4Jet = sampleNeventsMap["DY4JetsToTT_M-50"];
     float xsec4Jet = sampleXSecMap["DY4JetsToLL_M-50"];
+
+    std::cout << std::endl;
+    std::cout << "+++++++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
+    std::cout << "nIncl = " << nIncl << "   xsecIncl = " << xsecIncl << std::endl;
+    std::cout << "n1Jet = " << n1Jet << "   xsec1Jet = " << xsec1Jet << std::endl;
+    std::cout << "n2Jet = " << n2Jet << "   xsec2Jet = " << xsec2Jet << std::endl;
+    std::cout << "n3Jet = " << n3Jet << "   xsec3Jet = " << xsec3Jet << std::endl;
+    std::cout << "n4Jet = " << n4Jet << "   xsec4Jet = " << xsec4Jet << std::endl;
+    std::cout << "+++++++++++++++++++++++++++++++++++++++++++++++++" << std::endl; 
+    std::cout << std::endl;
 
     sampleNormMap["DYJetsToTT_M-50_0"] = lumi*xsecIncl/nIncl;
     sampleNormMap["DYJetsToTT_M-50_1"] = lumi/(nIncl/xsecIncl+n1Jet/xsec1Jet);
@@ -468,6 +504,15 @@ void CardsEMu::InitializeSample(TString name) {
 
     float n4Jet = sampleNeventsMap["W4JetsToLNu"];
     float xsec4Jet = sampleXSecMap["W4JetsToLNu"];
+
+    std::cout << std::endl;
+    std::cout << "+++++++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
+    std::cout << "nIncl = " << nIncl << "   xsecIncl = " << xsecIncl << std::endl;
+    std::cout << "n1Jet = " << n1Jet << "   xsec1Jet = " << xsec1Jet << std::endl;
+    std::cout << "n2Jet = " << n2Jet << "   xsec2Jet = " << xsec2Jet << std::endl;
+    std::cout << "n3Jet = " << n3Jet << "   xsec3Jet = " << xsec3Jet << std::endl;
+    std::cout << "n4Jet = " << n4Jet << "   xsec4Jet = " << xsec4Jet << std::endl;
+    std::cout << "+++++++++++++++++++++++++++++++++++++++++++++++++" << std::endl; 
 
     sampleNormMap["WJetsToLNu_0"] = lumi*xsecIncl/nIncl;
     sampleNormMap["WJetsToLNu_1"] = lumi/(nIncl/xsecIncl+n1Jet/xsec1Jet);
@@ -914,8 +959,20 @@ bool CardsEMu::RunModel() {
   for (auto name : samplesContainer) {
     TH1D * hist = ProcessSample(name,"",true,false);
     TString sampleHistName = nameHistoMap[name];
+    bool applyCorrection = (sampleHistName=="TTL"||sampleHistName=="VVL")&&(era=="2017"||era=="2018");
+    if (applyCorrection) {
+      TH1D * ratioHist = (TH1D*)ratioFile->Get(category+"_"+nameHistoMap[name]);
+      if (ratioHist!=NULL) {
+	int nBinsX = ratioHist->GetNbinsX();
+	for (int iB=1; iB<=nBinsX; ++iB) {
+	  double content = hist->GetBinContent(iB);
+	  double ratio = ratioHist->GetBinContent(iB);
+	  hist->SetBinContent(iB,ratio*content);
+	}
+      }
+    }
     nameTH1DMap[sampleHistName] = hist;
-    std::cout << "hist : " << sampleHistName << "   entries = " << hist->GetEntries() << std::endl;
+    std::cout << "hist : " << sampleHistName << "   entries = " << hist->GetEntries() << "   sumOfW = " << hist->GetSumOfWeights() << std::endl;
   }
 
   if (!runWithSystematics) {
@@ -945,6 +1002,18 @@ bool CardsEMu::RunModel() {
       TString sysName = weightSys.first;
       TString sampleHistName = nameHistoMap[name] + "_" + sysName;
       TH1D * hist = ProcessSample(name,sysName,true,true);
+      bool applyCorrection = (nameHistoMap[name]=="TTL"||nameHistoMap[name]=="VVL")&&(era=="2017"||era=="2018");
+      if (applyCorrection) {
+	TH1D * ratioHist = (TH1D*)ratioFile->Get(category+"_"+nameHistoMap[name]);
+	if (ratioHist!=NULL) {
+	  int nBinsX = ratioHist->GetNbinsX();
+	  for (int iB=1; iB<=nBinsX; ++iB) {
+	    double content = hist->GetBinContent(iB);
+	    double ratio = ratioHist->GetBinContent(iB);
+	    hist->SetBinContent(iB,ratio*content);
+	  }
+	}
+      }
       nameTH1DMap[sampleHistName] = hist;
     }
     for (auto shapeSys : shapeSystematicsMap) {
@@ -952,15 +1021,27 @@ bool CardsEMu::RunModel() {
       TH1D * hist = ProcessSample(name,sysName,true,false);
       TString sampleHistName = nameHistoMap[name] + "_" + sysName;
       // Systematics may not exist, be careful
-      if (hist!=NULL) nameTH1DMap[sampleHistName] = hist;
+      if (hist!=NULL) { 
+	bool applyCorrection = (nameHistoMap[name]=="TTL"||nameHistoMap[name]=="VVL")&&(era=="2017"||era=="2018");
+	if (applyCorrection) {
+	  TH1D * ratioHist = (TH1D*)ratioFile->Get(category+"_"+nameHistoMap[name]);
+	  if (ratioHist!=NULL) {
+	    int nBinsX = ratioHist->GetNbinsX();
+	    for (int iB=1; iB<=nBinsX; ++iB) {
+	      double content = hist->GetBinContent(iB);
+	      double ratio = ratioHist->GetBinContent(iB);
+	      hist->SetBinContent(iB,ratio*content);
+	    }
+	  }
+	}
+	nameTH1DMap[sampleHistName] = hist;
+      }
     }
   }
-
+  
   return status;
 
 }
-
-
 
 void CardsEMu::PrintWeightSystematics() {
   if (block) return;

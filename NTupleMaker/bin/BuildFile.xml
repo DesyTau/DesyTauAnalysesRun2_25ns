@@ -55,6 +55,13 @@
   <use name="DesyTauAnalyses/NTupleMaker"/>
 </bin>
 
+<bin name="CopyDatacards" file="CopyDatacards.cpp">
+  <use name="root"/>
+  <use name="rootgraphics"/>
+  <use name="rootmath"/>
+  <use name="DesyTauAnalyses/NTupleMaker"/>
+</bin>
+
 <bin name="CreateModel_emu" file="CreateModel_emu.cpp">
   <use name="root"/>
   <use name="rootgraphics"/>
@@ -193,7 +200,7 @@
  <use name="HTT-utilities/TauTriggerSFs2017"/>
 </bin>
 
-<bin name="SynchNTupleProducer_tt_2017" file="SynchNTupleProducer_tt_2017.cpp">
+<bin name="SynchNTupleProducer_tt_Run2" file="SynchNTupleProducer_tt_Run2.cpp">
  <use name="PhysicsTools/Utilities"/>
  <use name="rootgraphics"/>
  <use name="root"/>

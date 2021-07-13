@@ -1605,42 +1605,42 @@ int main(int argc, char * argv[]) {
          if (leadingMuDiff.P()<0.1 || trailingMuDiff.P()<0.1 || trkleadingMuDiff.P()<0.1 || trktrailingMuDiff.P()<0.1) continue; // track is not any of the selected objects
          {
 
-	         float drtrkMuL = deltaR(LeadingMuon4.Eta(),LeadingMuon4.Phi(),
-                                     track_eta[iTrk],track_phi[iTrk]);
-             float drtrkMuT = deltaR(TrailingMuon4.Eta(),TrailingMuon4.Phi(),
-                                     track_eta[iTrk],track_phi[iTrk]);
-             float drtrkTrkMuL = deltaR(TrkLeadingMuon4.Eta(),TrkLeadingMuon4.Phi(),
-				                        track_eta[iTrk],track_phi[iTrk]);
-	         float drtrkTrkMuT = deltaR(TrkTrailingMuon4.Eta(),TrkTrailingMuon4.Phi(),
-				                        track_eta[iTrk],track_phi[iTrk]);
-
-
-	         if (drtrkMuL < dRIso)
-	         { 
-		         trksLeadingMuon.push_back(iTrk);
-		   
-		         if (fabs(track_pt[iTrk])<ptTrkCut) softtrksLeadingMuon.push_back(iTrk);
-	         }   
-	         if (drtrkMuT < dRIso)
-	         {
-		         trksTrailingMuon.push_back(iTrk);
-		    
-		         if (fabs(track_pt[iTrk])<ptTrkCut) softtrksTrailingMuon.push_back(iTrk);
-	         }
-	         if (drtrkTrkMuL < dRIso) 
-	         { 
-		         trksTrkLeadingMuon.push_back(iTrk);
-		   
-		         if (fabs(track_pt[iTrk])<ptTrkCut) softtrksTrkLeadingMuon.push_back(iTrk);
-	         }
-	         if (drtrkTrkMuT < dRIso) 
-	         {
-		         trksTrkTrailingMuon.push_back(iTrk);
-		   
-		         if (fabs(track_pt[iTrk])<ptTrkCut) softtrksTrkTrailingMuon.push_back(iTrk);
-	         } 
-		  
-     
+	   float drtrkMuL = deltaR(LeadingMuon4.Eta(),LeadingMuon4.Phi(),
+				   track_eta[iTrk],track_phi[iTrk]);
+	   float drtrkMuT = deltaR(TrailingMuon4.Eta(),TrailingMuon4.Phi(),
+				   track_eta[iTrk],track_phi[iTrk]);
+	   float drtrkTrkMuL = deltaR(TrkLeadingMuon4.Eta(),TrkLeadingMuon4.Phi(),
+				      track_eta[iTrk],track_phi[iTrk]);
+	   float drtrkTrkMuT = deltaR(TrkTrailingMuon4.Eta(),TrkTrailingMuon4.Phi(),
+				      track_eta[iTrk],track_phi[iTrk]);
+	   
+	   
+	   if (drtrkMuL < dRIso)
+	     { 
+	       trksLeadingMuon.push_back(iTrk);
+	       
+	       if (fabs(track_pt[iTrk])<ptTrkCut) softtrksLeadingMuon.push_back(iTrk);
+	     }   
+	   if (drtrkMuT < dRIso)
+	     {
+	       trksTrailingMuon.push_back(iTrk);
+	       
+	       if (fabs(track_pt[iTrk])<ptTrkCut) softtrksTrailingMuon.push_back(iTrk);
+	     }
+	   if (drtrkTrkMuL < dRIso) 
+	     { 
+	       trksTrkLeadingMuon.push_back(iTrk);
+	       
+	       if (fabs(track_pt[iTrk])<ptTrkCut) softtrksTrkLeadingMuon.push_back(iTrk);
+	     }
+	   if (drtrkTrkMuT < dRIso) 
+	     {
+	       trksTrkTrailingMuon.push_back(iTrk);
+	       
+	       if (fabs(track_pt[iTrk])<ptTrkCut) softtrksTrkTrailingMuon.push_back(iTrk);
+	     } 
+	   
+	   
          }
 
      } // end loop over tracks

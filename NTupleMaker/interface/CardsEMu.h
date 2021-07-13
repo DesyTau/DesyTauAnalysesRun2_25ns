@@ -11,12 +11,12 @@
 #include <iostream>
 #include <algorithm>
 
-// Samples = 
+// Samples :
 // Data - data_obs
 // DYJetsToLL - ZL
 // WJets - W
 // TTbar - TTL
-// EWK - VV
+// EWK - VVL
 // EMB - EMB 
 // ggHWW125, 
 // qqHWW125, 
@@ -98,12 +98,72 @@ class CardsEMu {
 
  private:
 
-  const map<TString, double> xsecs = {
+  TFile * ratioFile;
+
+  const map<TString, double> xsecs_2016 = {
     {"WJetsToLNu"  , 61526.7}, // NNLO (1)
     {"W1JetsToLNu" , 9370.5}, // NNLO (2)
     {"W2JetsToLNu" , 3170.9}, // NNLO (3)
     {"W3JetsToLNu" , 1132.5}, // NNLO (4)
     {"W4JetsToLNu" , 631.5 }, // NNLO (5)
+    {"DYJetsToLL_M-10to50",  21658.0}, // NNLO 
+    {"DYJetsToLL_M-50"       , 6077.22},  // NNLO (20)
+    {"DY1JetsToLL_M-50"      , 1253.1}, // NNLO (20a)
+    {"DY2JetsToLL_M-50"      , 409.4}, // NNLO (20b)
+    {"DY3JetsToLL_M-50"      , 124.8}, // NNLO (20c)
+    {"DY4JetsToLL_M-50"      , 67.33}, // NNLO (20d)
+    {"TTTo2L2Nu"        , 88.29},  // NNLO (21)
+    {"TTToHadronic"     , 377.96}, // NNLO (22)
+    {"TTToSemiLeptonic" , 365.35}, // NNLO (23)
+    {"ST_t-channel_top_4f"      , 136.02}, 
+    {"ST_t-channel_antitop_4f"  , 80.95}, 
+    {"ST_tW_top_5f"             , 35.85}, 
+    {"ST_tW_antitop_5f"         , 35.85}, 
+    {"VVTo2L2Nu"                , 13.84},
+    {"WWToLNuQQ"                , 49.997},
+    {"WZTo2L2Q"                 , 5.52},
+    {"WZTo1L1Nu2Q"              , 10.71},
+    {"WZTo1L3Nu"                , 3.05},
+    {"WZJToLLLNu"               , 4.708},
+    {"WZTo3LNu"                 , 4.43},
+    {"ZZTo4L"                   , 1.26},
+    {"ZZTo2L2Q"                 , 3.38},
+    {"TTTo2L2Nu_corrMET"        , 88.29},  // NNLO (21)
+    {"TTToHadronic_corrMET"     , 377.96}, // NNLO (22)
+    {"TTToSemiLeptonic_corrMET" , 365.35}, // NNLO (23)
+    {"ST_t-channel_top_4f_corrMET"      , 136.02}, 
+    {"ST_t-channel_antitop_4f_corrMET"  , 80.95}, 
+    {"ST_tW_top_5f_corrMET"             , 35.85}, 
+    {"ST_tW_antitop_5f_corrMET"         , 35.85}, 
+    {"VVTo2L2Nu_corrMET"                , 13.84},
+    {"WWToLNuQQ_corrMET"                , 49.997},
+    {"WZTo2L2Q_corrMET"                 , 5.52},
+    {"WZTo1L1Nu2Q_corrMET"              , 10.71},
+    {"WZTo1L3Nu_corrMET"                , 3.05},
+    {"WZJToLLLNu_corrMET"               , 4.708},
+    {"WZTo3LNu_corrMET"                 , 4.43},
+    {"ZZTo4L_corrMET"                   , 1.26},
+    {"ZZTo2L2Q_corrMET"                 , 3.38},
+    {"GluGluHToTauTau_M125"     , 3.00},
+    {"VBFHToTauTau_M125"        , 0.237},
+    {"VBFHToTauTau_M95"         , 1.00},
+    {"WplusHToTauTau_M125"      , 0.0527},
+    {"WminusHToTauTau_M125"     , 0.0334},
+    {"ZHToTauTau_M125_13TeV"    , 0.0477},
+    {"GluGluHToWWTo2L2Nu_M125"  , 1.09},
+    {"VBFHToWWTo2L2Nu_M125"     , 0.0850},
+    {"HWminusJ_HToWW_M125"      , 0.114},
+    {"HWplusJ_HToWW_M125"       , 0.18},
+    {"ZHJ_HToWW_M125"           , 0.163}
+  };
+
+  const map<TString, double> xsecs_2017 = {
+    {"WJetsToLNu"  , 61526.7}, // NNLO (1)
+    {"W1JetsToLNu" , 9370.5}, // NNLO (2)
+    {"W2JetsToLNu" , 3170.9}, // NNLO (3)
+    {"W3JetsToLNu" , 1132.5}, // NNLO (4)
+    {"W4JetsToLNu" , 631.5 }, // NNLO (5)
+    {"DYJetsToLL_M-10to50",  21658.0}, // NNLO 
     {"DYJetsToLL_M-50"       , 6077.22},  // NNLO (20)
     {"DY1JetsToLL_M-50"      , 977.1}, // NNLO (20a)
     {"DY2JetsToLL_M-50"      , 347.3}, // NNLO (20b)
@@ -143,6 +203,7 @@ class CardsEMu {
     {"ZZTo2L2Q_corrMET"                 , 3.38},
     {"GluGluHToTauTau_M125"     , 3.00},
     {"VBFHToTauTau_M125"        , 0.237},
+    {"VBFHToTauTau_M95"         , 1.00},
     {"WplusHToTauTau_M125"      , 0.0527},
     {"WminusHToTauTau_M125"     , 0.0334},
     {"ZHToTauTau_M125_13TeV"    , 0.0477},
@@ -152,6 +213,65 @@ class CardsEMu {
     {"HWplusJ_HToWW_M125"       , 0.18},
     {"ZHJ_HToWW_M125"           , 0.163}
   };
+
+  const map<TString, double> xsecs_2018 = {
+    {"WJetsToLNu"  , 61526.7}, // NNLO (1)
+    {"W1JetsToLNu" , 9370.5}, // NNLO (2)
+    {"W2JetsToLNu" , 3170.9}, // NNLO (3)
+    {"W3JetsToLNu" , 1132.5}, // NNLO (4)
+    {"W4JetsToLNu" , 631.5 }, // NNLO (5)
+    {"DYJetsToLL_M-10to50",  21658.0}, // NNLO 
+    {"DYJetsToLL_M-50"       , 6077.22},  // NNLO (20)
+    {"DY1JetsToLL_M-50"      , 1007.6}, // NNLO (20a)
+    {"DY2JetsToLL_M-50"      , 344.3}, // NNLO (20b)
+    {"DY3JetsToLL_M-50"      , 125.3}, // NNLO (20c)
+    {"DY4JetsToLL_M-50"      , 71.20}, // NNLO (20d)
+    {"TTTo2L2Nu"        , 88.29},  // NNLO (21)
+    {"TTToHadronic"     , 377.96}, // NNLO (22)
+    {"TTToSemiLeptonic" , 365.35}, // NNLO (23)
+    {"ST_t-channel_top_4f"      , 136.02}, 
+    {"ST_t-channel_antitop_4f"  , 80.95}, 
+    {"ST_tW_top_5f"             , 35.85}, 
+    {"ST_tW_antitop_5f"         , 35.85}, 
+    {"VVTo2L2Nu"                , 13.84},
+    {"WWToLNuQQ"                , 49.997},
+    {"WZTo2L2Q"                 , 5.52},
+    {"WZTo1L1Nu2Q"              , 10.71},
+    {"WZTo1L3Nu"                , 3.05},
+    {"WZJToLLLNu"               , 4.708},
+    {"WZTo3LNu"                 , 4.43},
+    {"ZZTo4L"                   , 1.26},
+    {"ZZTo2L2Q"                 , 3.38},
+    {"TTTo2L2Nu_corrMET"        , 88.29},  // NNLO (21)
+    {"TTToHadronic_corrMET"     , 377.96}, // NNLO (22)
+    {"TTToSemiLeptonic_corrMET" , 365.35}, // NNLO (23)
+    {"ST_t-channel_top_4f_corrMET"      , 136.02}, 
+    {"ST_t-channel_antitop_4f_corrMET"  , 80.95}, 
+    {"ST_tW_top_5f_corrMET"             , 35.85}, 
+    {"ST_tW_antitop_5f_corrMET"         , 35.85}, 
+    {"VVTo2L2Nu_corrMET"                , 13.84},
+    {"WWToLNuQQ_corrMET"                , 49.997},
+    {"WZTo2L2Q_corrMET"                 , 5.52},
+    {"WZTo1L1Nu2Q_corrMET"              , 10.71},
+    {"WZTo1L3Nu_corrMET"                , 3.05},
+    {"WZJToLLLNu_corrMET"               , 4.708},
+    {"WZTo3LNu_corrMET"                 , 4.43},
+    {"ZZTo4L_corrMET"                   , 1.26},
+    {"ZZTo2L2Q_corrMET"                 , 3.38},
+    {"GluGluHToTauTau_M125"     , 3.00},
+    {"VBFHToTauTau_M125"        , 0.237},
+    {"VBFHToTauTau_M95"         , 1.00},
+    {"WplusHToTauTau_M125"      , 0.0527},
+    {"WminusHToTauTau_M125"     , 0.0334},
+    {"ZHToTauTau_M125_13TeV"    , 0.0477},
+    {"GluGluHToWWTo2L2Nu_M125"  , 1.09},
+    {"VBFHToWWTo2L2Nu_M125"     , 0.0850},
+    {"HWminusJ_HToWW_M125"      , 0.114},
+    {"HWplusJ_HToWW_M125"       , 0.18},
+    {"ZHJ_HToWW_M125"           , 0.163}
+  };
+
+  map<TString,double> xsecs;
 
   const vector<TString> SingleMuon_2018 = {
     "SingleMuon_Run2018A",
@@ -200,7 +320,6 @@ class CardsEMu {
     "MuonEG_Run2017E",
     "MuonEG_Run2017F"
   };
-
   
   // ******* 2016 ******
 
@@ -384,6 +503,10 @@ class CardsEMu {
     "TTToHadronic",
     "TTToSemiLeptonic"
   };
+
+  vector<TString> DYJets_Low = {
+    "DYJetsToLL_M-10to50"
+  };
   
   vector<TString> GluGluHToTauTau = {
     "GluGluHToTauTau_M125"
@@ -391,6 +514,10 @@ class CardsEMu {
   
   vector<TString> VBFHToTauTau = {
     "VBFHToTauTau_M125"
+  };
+
+  vector<TString> VBFHToTauTau95 = {
+    "VBFHToTauTau_M95"
   };
 
   vector<TString> WHToTauTau = {
@@ -420,9 +547,9 @@ class CardsEMu {
   };
 
   const vector<TString> masses = {
-    /*
     "60",
     "80",
+    "95",
     "100",
     "110",
     "120",
@@ -442,9 +569,7 @@ class CardsEMu {
     "700",
     "800",
     "900",
-    */
-    "1000"
-    /*
+    "1000",
     "1200",
     "1400",
     "1600",
@@ -455,12 +580,12 @@ class CardsEMu {
     "2900",
     "3200",
     "3500"
-    */
   };
 
   const TString BaseTreeName = "TauCheck"; 
   const TString baseNameBBH  = "SUSYGluGluToBBHToTauTau_powheg_M";
   const TString baseNameGGH  = "SUSYGluGluToHToTauTau_powheg_M"; 
+  const TString baseNameVBF  = "VBFHToTauTau_M";
   const TString notTauTau = "&&!(gen_match_1==3&&gen_match_2==4)";
   const TString TauTau = "&&(gen_match_1==3&&gen_match_2==4)";
 

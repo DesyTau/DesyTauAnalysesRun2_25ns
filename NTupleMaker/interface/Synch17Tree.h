@@ -12,6 +12,7 @@
 #include <TROOT.h>
 #include <TChain.h>
 #include <TFile.h>
+#include <TString.h>
 
 // Header file for the classes stored in the TTree if any.
 //We´ll store for now 5 CP mixing scenarios: "sm_htt125", "ps_htt125", "mm_htt125" "minusmm_htt125", "mix0p375_htt125". Names chose to stay somewhat consistent with choices IC in the CH branch
@@ -298,6 +299,27 @@ public :
   Float_t	   deepTauVsEleRaw_1;	
   Float_t	   deepTauVsJetRaw_1;	
   Float_t	   deepTauVsMuRaw_1;	
+  Float_t	   byLooseDeepTau2017v2p1VSe_1;	
+  Float_t	   byLooseDeepTau2017v2p1VSjet_1;	
+  Float_t	   byLooseDeepTau2017v2p1VSmu_1;	
+  Float_t	   byMediumDeepTau2017v2p1VSe_1;	
+  Float_t	   byMediumDeepTau2017v2p1VSjet_1;	
+  Float_t	   byMediumDeepTau2017v2p1VSmu_1;	
+  Float_t	   byTightDeepTau2017v2p1VSe_1;	
+  Float_t	   byTightDeepTau2017v2p1VSjet_1;	
+  Float_t	   byTightDeepTau2017v2p1VSmu_1;	
+  Float_t	   byVLooseDeepTau2017v2p1VSe_1;	
+  Float_t	   byVLooseDeepTau2017v2p1VSjet_1;	
+  Float_t	   byVLooseDeepTau2017v2p1VSmu_1;	
+  Float_t	   byVTightDeepTau2017v2p1VSe_1;	
+  Float_t	   byVTightDeepTau2017v2p1VSjet_1;	
+  Float_t	   byVVLooseDeepTau2017v2p1VSe_1;	
+  Float_t	   byVVLooseDeepTau2017v2p1VSjet_1;	
+  Float_t	   byVVTightDeepTau2017v2p1VSe_1;	
+  Float_t	   byVVTightDeepTau2017v2p1VSjet_1;	
+  Float_t	   byVVVLooseDeepTau2017v2p1VSe_1;	
+  Float_t	   byVVVLooseDeepTau2017v2p1VSjet_1;	
+
   Float_t	   deepTauVsEleRaw_2;	
   Float_t	   deepTauVsJetRaw_2;	
   Float_t	   deepTauVsMuRaw_2;	
@@ -542,6 +564,12 @@ public :
 
   Float_t         puppimet_ey_UnclusteredEnUp;
   Float_t         puppimet_ey_UnclusteredEnDown;
+
+  Float_t         met_ex_UnclusteredEnUp;
+  Float_t         met_ex_UnclusteredEnDown;
+
+  Float_t         met_ey_UnclusteredEnUp;
+  Float_t         met_ey_UnclusteredEnDown;
 
   Float_t         puppimet_ex_JetEnUp;
   Float_t         puppimet_ex_JetEnDown;
@@ -980,6 +1008,27 @@ public :
   TBranch	   *b_deepTauVsEleRaw_1;	
   TBranch	   *b_deepTauVsJetRaw_1;	
   TBranch	   *b_deepTauVsMuRaw_1;	
+  TBranch	   *b_byLooseDeepTau2017v2p1VSe_1;	
+  TBranch	   *b_byLooseDeepTau2017v2p1VSjet_1;	
+  TBranch	   *b_byLooseDeepTau2017v2p1VSmu_1;	
+  TBranch	   *b_byMediumDeepTau2017v2p1VSe_1;	
+  TBranch	   *b_byMediumDeepTau2017v2p1VSjet_1;	
+  TBranch	   *b_byMediumDeepTau2017v2p1VSmu_1;	
+  TBranch	   *b_byTightDeepTau2017v2p1VSe_1;	
+  TBranch	   *b_byTightDeepTau2017v2p1VSjet_1;	
+  TBranch	   *b_byTightDeepTau2017v2p1VSmu_1;	
+  TBranch	   *b_byVLooseDeepTau2017v2p1VSe_1;	
+  TBranch	   *b_byVLooseDeepTau2017v2p1VSjet_1;	
+  TBranch	   *b_byVLooseDeepTau2017v2p1VSmu_1;	
+  TBranch	   *b_byVTightDeepTau2017v2p1VSe_1;	
+  TBranch	   *b_byVTightDeepTau2017v2p1VSjet_1;	
+  TBranch	   *b_byVVLooseDeepTau2017v2p1VSe_1;	
+  TBranch	   *b_byVVLooseDeepTau2017v2p1VSjet_1;	
+  TBranch	   *b_byVVTightDeepTau2017v2p1VSe_1;	
+  TBranch	   *b_byVVTightDeepTau2017v2p1VSjet_1;	
+  TBranch	   *b_byVVVLooseDeepTau2017v2p1VSe_1;	
+  TBranch	   *b_byVVVLooseDeepTau2017v2p1VSjet_1;	
+
   TBranch	   *b_deepTauVsEleRaw_2;	
   TBranch	   *b_deepTauVsJetRaw_2;	
   TBranch	   *b_deepTauVsMuRaw_2;	
@@ -1464,13 +1513,13 @@ public :
   
   bool isGGHWeights;
 
-  Synch17Tree(TTree *tree=0, bool emu = false, bool isGGH = false);
+  Synch17Tree(TTree *tree=0, TString ch = "mt", bool isGGH = false);
   virtual ~Synch17Tree();
 
-  virtual void Init(TTree *tree, bool emu, bool isGGH);
+  virtual void Init(TTree *tree, TString ch, bool);
   
   //Read methods
-  virtual void     ReadInit(TTree *tree, bool emu);
+  virtual void     ReadInit(TTree *tree, TString ch);
   virtual void     ReadReset();
   virtual Long64_t GetEntries();
   virtual Long64_t LoadTree(Long64_t entry);
@@ -1480,7 +1529,7 @@ public :
   virtual Int_t    Cut(Long64_t entry);
 
   //Write methods
-  virtual void WriteInit(TTree *tree, bool emu);
+  virtual void WriteInit(TTree *tree, TString ch);
   virtual void Fill();
 
 protected:

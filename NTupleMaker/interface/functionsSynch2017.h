@@ -423,6 +423,45 @@ bool extra_electron_veto(int leptonIndex, TString ch, const Config *cfg, const A
   return(0);
 }			
 
+bool extra_electron_veto_tt(const Config *cfg, const AC1B *analysisTree, Synch17Tree *otree, int era, bool isEmbedded){
+  for (unsigned int ie = 0; ie < analysisTree->electron_count; ++ie) {
+    float sf_eleES = 1.0;
+    if (isEmbedded) sf_eleES = EmbedElectronES_SF(analysisTree, era, ie);
+    float ptVetoElectronCut = cfg->get<float>("ptVetoElectronCut");
+    float etaVetoElectronCut = cfg->get<float>("etaVetoElectronCut");
+    float dxyVetoElectronCut = cfg->get<float>("dxyVetoElectronCut");
+    float dzVetoElectronCut = cfg->get<float>("dzVetoElectronCut");
+    float applyVetoElectronId = cfg->get<bool>("applyVetoElectronId");
+    float dRisoExtraElecVeto = cfg->get<float>("dRisoExtraElecVeto");
+    float isoVetoElectronCut = cfg->get<float>("isoVetoElectronCut");
+    float dRleptonsCut = cfg->get<float>("dRleptonsCut");
+
+    if (sf_eleES*analysisTree->electron_pt[ie] <= ptVetoElectronCut) continue;
+    if (fabs(analysisTree->electron_eta[ie]) >= etaVetoElectronCut) continue;
+    if (fabs(analysisTree->electron_dxy[ie]) >= dxyVetoElectronCut) continue;
+    if (fabs(analysisTree->electron_dz[ie]) >= dzVetoElectronCut) continue;
+
+    float dR1 = deltaR(otree->eta_1,otree->phi_1,
+		       analysisTree->electron_eta[ie],analysisTree->electron_phi[ie]);
+    if (dR1<dRleptonsCut) continue;
+
+    float dR2 = deltaR(otree->eta_2,otree->phi_2,
+		       analysisTree->electron_eta[ie],analysisTree->electron_phi[ie]);
+    if (dR2<dRleptonsCut) continue;
+
+    bool electronMvaId = analysisTree->electron_mva_wp90_noIso_Fall17_v2[ie] > 0.5;
+    if (!electronMvaId && applyVetoElectronId) continue;
+    if (!analysisTree->electron_pass_conversion[ie] && applyVetoElectronId) continue;
+    if (analysisTree->electron_nmissinginnerhits[ie] > 1 && applyVetoElectronId) continue;
+
+    float relIsoEle = abs_Iso_et(ie, analysisTree, dRisoExtraElecVeto) / (sf_eleES*analysisTree->electron_pt[ie]);
+    if (relIsoEle >= isoVetoElectronCut) continue;
+
+    return(1);		
+  }
+  return(0);
+}			
+
 //returns the extra muon veto
 bool extra_muon_veto(int leptonIndex, TString ch, const Config *cfg, const AC1B *analysisTree, bool isData){
   for (unsigned int im = 0; im < analysisTree->muon_count; ++im) {
@@ -449,6 +488,38 @@ bool extra_muon_veto(int leptonIndex, TString ch, const Config *cfg, const AC1B 
   return(0);
 }
 
+bool extra_muon_veto_tt(const Config *cfg, const AC1B *analysisTree, Synch17Tree *otree, bool isData){
+  for (unsigned int im = 0; im < analysisTree->muon_count; ++im) {
+    float ptVetoMuonCut = cfg->get<float>("ptVetoMuonCut");
+    float etaVetoMuonCut = cfg->get<float>("etaVetoMuonCut");
+    float dxyVetoMuonCut = cfg->get<float>("dxyVetoMuonCut");
+    float dzVetoMuonCut = cfg->get<float>("dzVetoMuonCut");
+    float applyVetoMuonId = cfg->get<bool>("applyVetoMuonId");
+    float dRisoExtraMuonVeto = cfg->get<float>("dRisoExtraMuonVeto");
+    float isoVetoMuonCut = cfg->get<float>("isoVetoMuonCut");
+    float dRleptonsCut = cfg->get<float>("dRleptonsCut");
+
+    if (analysisTree->muon_pt[im] <= ptVetoMuonCut) continue;
+    if (fabs(analysisTree->muon_eta[im]) >= etaVetoMuonCut) continue;
+    if (fabs(analysisTree->muon_dxy[im]) >= dxyVetoMuonCut) continue;
+    if (fabs(analysisTree->muon_dz[im]) >= dzVetoMuonCut) continue;
+
+    float dR1 = deltaR(otree->eta_1,otree->phi_1,
+		       analysisTree->muon_eta[im],analysisTree->muon_phi[im]);
+    if (dR1<dRleptonsCut) continue;
+
+    float dR2 = deltaR(otree->eta_2,otree->phi_2,
+		       analysisTree->muon_eta[im],analysisTree->muon_phi[im]);
+    if (dR2<dRleptonsCut) continue;
+
+    if (applyVetoMuonId && !(isIdentifiedMediumMuon(im, analysisTree, isData)) ) continue;
+    float relIsoMu = abs_Iso_mt(im, analysisTree, dRisoExtraMuonVeto) / analysisTree->muon_pt[im];
+    if (relIsoMu >= isoVetoMuonCut) continue;
+
+    return(1);
+  }
+  return(0);
+}
 
 //////MET FUNCTIONS
 
@@ -546,11 +617,21 @@ void svfit_variables(TString ch, const AC1B *analysisTree, Synch17Tree *otree, c
     if (ch == "tt") type_ = classic_svFit::MeasuredTauLepton::kTauToHadDecay;
     if (ch == "em") type_ = classic_svFit::MeasuredTauLepton::kTauToElecDecay;
     // define lepton four vectors
-    measuredTauLeptons.push_back(classic_svFit::MeasuredTauLepton(type_,
-								  otree->pt_1,
-								  otree->eta_1,
-								  otree->phi_1,
-								  otree->m_1));
+    if (ch == "tt") {
+      measuredTauLeptons.push_back(classic_svFit::MeasuredTauLepton(type_,
+                                                                    otree->pt_1,
+                                                                    otree->eta_1,
+                                                                    otree->phi_1,
+                                                                    otree->m_1,
+								    otree->tau_decay_mode_1));
+    }
+    else {
+      measuredTauLeptons.push_back(classic_svFit::MeasuredTauLepton(type_,
+								    otree->pt_1,
+								    otree->eta_1,
+								    otree->phi_1,
+								    otree->m_1));
+    }
     if (ch == "em") {
       measuredTauLeptons.push_back(classic_svFit::MeasuredTauLepton(classic_svFit::MeasuredTauLepton::kTauToMuDecay,
 								    otree->pt_2,
@@ -571,6 +652,12 @@ void svfit_variables(TString ch, const AC1B *analysisTree, Synch17Tree *otree, c
       int verbosity = 1;
       ClassicSVfit svFitAlgo(verbosity);
       double kappa = 4.; // use 3 for emu, 4 for etau and mutau, 5 for tautau channel
+      if (ch == "em") 
+	kappa = 3.;
+      else if (ch == "tt")
+	kappa = 5.;
+      else 
+	kappa = 4.;
       
       svFitAlgo.addLogM_fixed(true, kappa);
       svFitAlgo.integrate(measuredTauLeptons, measuredMETx, measuredMETy, covMET);
